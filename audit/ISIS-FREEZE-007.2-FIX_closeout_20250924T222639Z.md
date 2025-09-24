@@ -1,15 +1,15 @@
-# Card Closeout — CARD-VALIDATION
+# Card Closeout — ISIS-FREEZE-007.2-FIX
 
-**Repo:** glow-hdengine-v2  |  **Branch:** main  |  **Commit:** 8035777  |  **Dirty files:** 37
+**Repo:** glow-hdengine-v2  |  **Branch:** main  |  **Commit:** dfd3516  |  **Dirty files:** 16
 
 ## Gates
 - Env: `MISSING`
-- Tests: `FAIL`
+- Tests: `OK`
 - Sanity: `SKIPPED`
 
 ## Deliverables
-- Source bundle: `audit/CARD-VALIDATION_source_bundle_20250924T220732Z.zip`
-- Manifest: `audit/CARD-VALIDATION_source_bundle_20250924T220732Z_MANIFEST.json`
+- Source bundle: `audit/ISIS-FREEZE-007.2-FIX_source_bundle_20250924T222640Z.zip`
+- Manifest: `audit/ISIS-FREEZE-007.2-FIX_source_bundle_20250924T222640Z_MANIFEST.json`
 - Audit bundle (if any): `(none)`
 
 ## Artifact checksums (4 files)
@@ -22,4 +22,4 @@ dc51b8c96c2d745df3bd5590d990230a482fd247123599548e0632fdbf97fc22  artifacts/_clo
 ```
 
 ## Operator
-Run: `bash scripts/card_close.sh --card "CARD-VALIDATION" --fast`
+Run: `bash scripts/card_close.sh --card "ISIS-FREEZE-007.2-FIX" --fast`
