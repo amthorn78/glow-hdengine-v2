@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 
 from core.stable.freeze import iter_records
 from core.stable.identity import compute_release_id
+import scripts._emit_canon_checksums as _canon_emitter
 
 CFILE = Path("core/stable/identity_constants.py")
 ART = Path("artifacts"); ART.mkdir(exist_ok=True)
@@ -60,6 +61,7 @@ def main() -> int:
     _patch_constants(rid)
     _fresh_verify()
     _append_sync_log(rid, len(recs))
+    _canon_emitter.main()
     print("IDENTITY OK", rid)
     return 0
 
