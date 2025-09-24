@@ -1,0 +1,47 @@
+== SCHEMAS ==
+ 529 schemas/gates_v1.schema.json
+1370 schemas/channels_v1.schema.json
+1899 total
+== CATALOG HASHES ==
+e8f3e703fe74f302a5b9a0e69ab6fc573a2615263ba07d7d06eb1838d46ff1e3  catalog/gates_v1.json
+586d9179fef39cd2f30998ad9568a96a8c04b58ddb49892ac43cb0e9fb655b16  catalog/channels_v1.json
+== COUNTS ==
+gates=64
+channels=36
+== LOADER DEG / FIRST_LAST ==
+DEG [1, 2, 6, 4, 4, 5, 4, 5, 3]
+FIRST_LAST 01-08 47-64
+== CHECKSUM ORDER/CNT VALIDATION ==
+ORDER_OK True
+COUNTS_OK False
+OBSERVED_COUNTS {'head': 3, 'ajna': 6, 'throat': 11, 'g': 10, 'ego': 4, 'spleen': 6, 'solar_plexus': 7, 'sacral': 8, 'root': 9}
+8035777
+## main...origin/main
+ M artifacts/CANON_CHECKSUMS.json
+ M catalog/channels_v1.json
+ M catalog/gates_v1.json
+ M scripts/__pycache__/_emit_canon_checksums.cpython-312.pyc
+ M scripts/_emit_canon_checksums.py
+?? audit/ISIS-FREEZE-007.1_closeout_20250924T195305Z.md
+?? audit/REPORT.txt
+?? audit/observed_gate_counts.json
+?? core/catalog/
+?? schemas/channels_v1.schema.json
+?? schemas/gates_v1.schema.json
+?? tests/__pycache__/test_catalog_canon.cpython-312-pytest-8.4.1.pyc
+?? tests/test_catalog_canon.py
+ artifacts/CANON_CHECKSUMS.json                     |   2 +-
+ catalog/channels_v1.json                           |   2 +-
+ catalog/gates_v1.json                              |   2 +-
+ .../_emit_canon_checksums.cpython-312.pyc          | Bin 4723 -> 3070 bytes
+ scripts/_emit_canon_checksums.py                   |  97 ++++++++-------------
+ 5 files changed, 41 insertions(+), 62 deletions(-)
+Python 3.12.1
+pip 25.2 from /workspaces/glow-hdengine-v2/.venv/lib/python3.12/site-packages/pip (python 3.12)
+=== 007.2 Validation Failure Snapshot ===
+Expected: {"head":3,"ajna":6,"throat":11,"g":8,"ego":4,"spleen":7,"solar_plexus":7,"sacral":9,"root":9}
+Observed: {"head":3,"ajna":6,"throat":11,"g":10,"ego":4,"spleen":6,"solar_plexus":7,"sacral":8,"root":9}
+OFFENDERS []
+]633;E;echo "=== 007.2-FIX Step 4 Failures ===";c33310ca-ee05-49d0-8f82-862cb715bc79]633;C=== 007.2-FIX Step 4 Failures ===
+[A] test_channel_id_orientation => AssertionError: assert None
+[B] test_checksums_key_order_version_v2 => AssertionError: b'\n' vs b'\n'

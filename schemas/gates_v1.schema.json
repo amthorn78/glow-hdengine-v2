@@ -1,0 +1,13 @@
+{"$schema":"https://json-schema.org/draft/2020-12/schema","title":"gates_v1",
+"type":"object","additionalProperties":false,
+"properties":{
+  "gates":{"type":"array","minItems":64,"maxItems":64,
+    "items":{"type":"object","additionalProperties":false,
+      "properties":{
+        "gate":{"type":"integer","minimum":1,"maximum":64},
+        "center":{"type":"string","enum":["head","ajna","throat","g","ego","spleen","solar_plexus","sacral","root"]}
+      },
+      "required":["gate","center"]
+    }
+  }
+},"required":["gates"]}

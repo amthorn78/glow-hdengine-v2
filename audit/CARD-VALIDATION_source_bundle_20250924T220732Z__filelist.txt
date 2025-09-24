@@ -1,0 +1,35 @@
+.vscode/settings.json
+README.md
+catalog/channels_catalog_v1.json
+catalog/channels_v1.json
+catalog/gates_v1.json
+config/bands_4B60_v1.json
+config/toggles_v1.json
+core/__init__.py
+core/catalog/loader.py
+core/config/toggles_resolver.py
+core/stable/__init__.py
+core/stable/freeze.py
+core/stable/identity.py
+core/stable/identity_constants.py
+core/stable/sercanon.py
+docs/Engine Match Math v1 (current).md
+docs/Glow Development Best Practices.md
+docs/Glow HD Engine Architecture and Design v2.md
+docs/HD Engine Tasks v3.md
+docs/HD Gates and Channels v2.md
+docs/RUN.md
+docs/SYNC_LOG.md
+freeze/freeze_pack_v1.json
+schemas/canon_checksums_v2.schema.json
+schemas/channels_catalog_v1.schema.json
+schemas/channels_v1.schema.json
+schemas/gates_v1.schema.json
+schemas/toggles_v1.schema.json
+scripts/__init__.py
+scripts/_emit_canon_checksums.py
+scripts/card_close.sh
+scripts/identity_bump.py
+scripts/make_source_bundle.sh
+tests/test_catalog_canon.py
+tests/test_sercanon.py
