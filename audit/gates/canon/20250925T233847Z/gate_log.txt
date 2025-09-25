@@ -1,0 +1,6 @@
+# Canon Gate start: 20250925T233847Z (UTC)
++ scripts/validate_canon.sh
++ copy artifacts
++ wrote hash: audit/gates/canon/20250925T233847Z/canon_report.json.sha256
++ wrote hash: audit/gates/canon/20250925T233847Z/CANON_CHECKSUMS.json.sha256
+CANON_GATE: OK
