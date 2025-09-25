@@ -40,48 +40,50 @@ BUNDLE_MAN="${AUDIT_DIR}/${CARD}_source_bundle_${STAMP}_MANIFEST.json"
 PYTHON_BIN="${PYTHON_BIN:-python3}"
 
 "$PYTHON_BIN" - <<PY
-import os, json, time, hashlib, zipfile, stat
+import os, json, time, zipfile, stat
 root = os.getcwd()
 max_bytes = int(${MAX_MB}) * 1024 * 1024
 exclude_dirs = {'.git', '.venv', '__pycache__', '.pytest_cache'}
 exclude_exts = {'.zip','.tar','.tar.gz','.tgz','.7z','.rar','.bak','.tmp'}
-bundle = r"${BUNDLE_ZIP}"
-manifest_path = r"${BUNDLE_MAN}"
 
-entries = []
-def allow(path):
+def allowed(path):
     rp = os.path.relpath(path, root)
     parts = rp.split(os.sep)
-    if parts and parts[0] in exclude_dirs: return False
+    if parts and parts[0] in exclude_dirs:
+        return False
     le = path.lower()
     for ext in exclude_exts:
-        if le.endswith(ext): return False
+        if le.endswith(ext):
+            return False
     try:
         st = os.stat(path)
-        if not stat.S_ISREG(st.st_mode): return False
-        if st.st_size > max_bytes: return False
+        if not stat.S_ISREG(st.st_mode):
+            return False
+        if st.st_size > max_bytes:
+            return False
         return True
     except FileNotFoundError:
         return False
 
+entries = []
 for d, _, files in os.walk(root):
-    # Skip excluded directories early
     base = os.path.relpath(d, root)
     head = base.split(os.sep)[0] if base != '.' else '.'
-    if head in exclude_dirs: 
+    if head in exclude_dirs:
         continue
     for f in files:
         p = os.path.join(d, f)
-        if allow(p):
+        if allowed(p):
             st = os.stat(p)
+            rel = os.path.relpath(p, root).replace(os.sep, "/")
             entries.append({
-                "path": os.path.relpath(p, root).replace("\\","/"),
+                "path": rel,
                 "size": st.st_size,
                 "mtime": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(st.st_mtime))
             })
 
 # Write manifest
-with open(manifest_path, "w", encoding="utf-8") as mf:
+with open(r"${BUNDLE_MAN}", "w", encoding="utf-8") as mf:
     json.dump({
         "card": "${CARD}",
         "generated_at": "${STAMP}",
@@ -91,7 +93,7 @@ with open(manifest_path, "w", encoding="utf-8") as mf:
     }, mf, ensure_ascii=False, indent=2)
 
 # Create zip
-with zipfile.ZipFile(bundle, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+with zipfile.ZipFile(r"${BUNDLE_ZIP}", "w", compression=zipfile.ZIP_DEFLATED) as zf:
     for e in entries:
         zf.write(e["path"], arcname=e["path"])
 PY
