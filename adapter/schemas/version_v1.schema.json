@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "version_v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["ok", "schema", "engine_tag", "release_id", "checksums", "toggles_sha", "build"],
+  "properties": {
+    "ok": { "type": "boolean", "const": true },
+    "schema": { "type": "string", "const": "v1" },
+    "engine_tag": { "type": "string", "minLength": 1 },
+    "release_id": { "type": "string", "minLength": 1 },
+    "checksums": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["weights_sha", "bands_sha", "catalog_sha"],
+      "properties": {
+        "weights_sha": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "bands_sha":   { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "catalog_sha": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    },
+    "toggles_sha": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "build": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["commit", "timestamp"],
+      "properties": {
+        "commit": { "type": "string", "minLength": 1 },
+        "timestamp": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}
