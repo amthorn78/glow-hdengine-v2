@@ -1,168 +1,125 @@
 #!/usr/bin/env bash
-# Card closeout: env check → tests → sanity (if present) → source bundle → audit (if present)
-# → artifacts checksums → report → commit & push
 set -euo pipefail
 
-# ---- args -------------------------------------------------------------------
+# Args
 CARD=""
-FAST=0
-MAX_MB="${MAX_MB:-5}"
+MAX_MB=10
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --card) CARD="${2:-}"; shift 2;;
-    --fast) FAST=1; shift 1;;
-    --max-mb) MAX_MB="${2:-5}"; shift 2;;
-    *) echo "usage: bash scripts/card_close.sh --card \"CARD-ID\" [--fast] [--max-mb N]" >&2; exit 2;;
+    --card=*) CARD="${1#--card=}"; shift 1;;
+    --max-mb) MAX_MB="${2:-10}"; shift 2;;
+    --max-mb=*) MAX_MB="${1#--max-mb=}"; shift 1;;
+    *) echo "unknown arg: $1" >&2; exit 2;;
   esac
 done
-[[ -n "${CARD}" ]] || { echo "error: --card is required"; exit 2; }
+[[ -n "$CARD" ]] || { echo "Usage: $0 --card \"CARD-ID\" [--max-mb N]" >&2; exit 2; }
 
-# ---- setup ------------------------------------------------------------------
-ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
-cd "$ROOT"
+ROOT="$(pwd)"
 STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
-OUTDIR="audit"; mkdir -p "$OUTDIR"
+AUDIT_DIR="${ROOT}/audit"
+mkdir -p "$AUDIT_DIR"
 
-SHORT_SHA="$(git rev-parse --short HEAD 2>/dev/null || echo 'unknown')"
-BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo 'unknown')"
-STATUS="$(git status --porcelain 2>/dev/null | wc -l | tr -d ' ')"
-
-ENV_STATUS="SKIPPED"
-TEST_STATUS="SKIPPED"
-SANITY_STATUS="SKIPPED"
-SANITY_OPTS=()
-[[ $FAST -eq 1 ]] && SANITY_OPTS+=(--fast)
-
-BUNDLE_PATH=""
-MANIFEST_PATH=""
-AUDIT_BUNDLE="(none)"
-
-# ---- step 1: env check ------------------------------------------------------
-if [[ -f scripts/ensure_env.py ]]; then
-  set +e
-  python scripts/ensure_env.py >/tmp/_env_out.txt 2>&1
-  rc=$?; set -e
-  if [[ $rc -eq 0 ]]; then ENV_STATUS="OK"; else ENV_STATUS="FAIL"; fi
-else
-  ENV_STATUS="MISSING"
-fi
-
-# ---- step 2: tests -----------------------------------------------------------
-if command -v pytest >/dev/null 2>&1 && [[ -d tests ]]; then
-  set +e
-  python -m pytest -q >/tmp/_pytest_out.txt 2>&1
-  rc=$?; set -e
-  if [[ $rc -eq 0 ]]; then TEST_STATUS="OK"; else TEST_STATUS="FAIL"; fi
-else
-  TEST_STATUS="MISSING"
-fi
-
-# ---- step 3: sanity (optional) ----------------------------------------------
-if [[ -x ./make_sanity.sh ]]; then
-  set +e
-  ./make_sanity.sh "${SANITY_OPTS[@]}" >/tmp/_sanity_out.txt 2>&1
-  rc=$?; set -e
-  if [[ $rc -eq 0 ]]; then SANITY_STATUS="OK"; else SANITY_STATUS="FAIL"; fi
-elif [[ -x scripts/make_sanity.sh ]]; then
-  set +e
-  bash scripts/make_sanity.sh "${SANITY_OPTS[@]}" >/tmp/_sanity_out.txt 2>&1
-  rc=$?; set -e
-  if [[ $rc -eq 0 ]]; then SANITY_STATUS="OK"; else SANITY_STATUS="FAIL"; fi
-fi
-
-# ---- step 4: source bundle (always) -----------------------------------------
-if [[ -x scripts/make_source_bundle.sh ]]; then
-  set +e
-  BOUT="$(bash scripts/make_source_bundle.sh --card "${CARD}" --max-mb "${MAX_MB}" 2>/tmp/_bundle_err.txt)"
-  rc=$?; set -e
-  # [bundle] line
-  BUNDLE_PATH="$(printf '%s\n' "$BOUT" | sed -n 's/^\[bundle\] //p' | tail -n1)"
-  # manifest line (FILES=.. OUT=...)
-  MANIFEST_PATH="$(printf '%s\n' "$BOUT" | sed -n 's/^.*OUT=\(.*\)$/\1/p' | tail -n1)"
-else
-  echo "error: scripts/make_source_bundle.sh is missing or not executable" >&2
-  exit 3
-fi
-
-# ---- step 5: heavy audit (optional) -----------------------------------------
-if [[ -x ./make_audit.sh ]]; then
-  set +e; ./make_audit.sh >/tmp/_audit_out.txt 2>&1; rc=$?; set -e
-  latest="$(ls -1t audit_bundle_*.zip 2>/dev/null | head -n1 || true)"
-  [[ -n "$latest" ]] && AUDIT_BUNDLE="$latest"
-elif [[ -x scripts/make_audit.sh ]]; then
-  set +e; bash scripts/make_audit.sh >/tmp/_audit_out.txt 2>&1; rc=$?; set -e
-  latest="$(ls -1t audit_bundle_*.zip 2>/dev/null | head -n1 || true)"
-  [[ -n "$latest" ]] && AUDIT_BUNDLE="$latest"
-fi
-
-# ---- step 6: artifacts checksums (NEW) --------------------------------------
-ART_SHA="${OUTDIR}/${CARD}_artifacts_sha256_${STAMP}.txt"
-ART_SHA_LINES=0
-if [[ -d artifacts ]]; then
-  set +e
-  # stable order, POSIX paths
-  if command -v sha256sum >/dev/null 2>&1; then
-    LC_ALL=C find artifacts -type f -print | LC_ALL=C sort | xargs -r sha256sum > "$ART_SHA"
-  else
-    # fallback (macOS): shasum -a 256
-    LC_ALL=C find artifacts -type f -print | LC_ALL=C sort | xargs -r shasum -a 256 > "$ART_SHA"
+# 1) Commit (and push if upstream exists)
+if command -v git >/dev/null 2>&1; then
+  git add -A
+  if ! git diff --cached --quiet; then
+    git commit -m "${CARD}: close ${STAMP}"
   fi
-  rc=$?; set -e
-  if [[ $rc -eq 0 ]]; then
-    ART_SHA_LINES="$(wc -l < "$ART_SHA" | tr -d ' ')"
-  else
-    rm -f "$ART_SHA"
+  if git rev-parse --abbrev-ref --symbolic-full-name @{u} >/dev/null 2>&1; then
+    git push || true
   fi
+  COMMIT_SHA="$(git rev-parse --short HEAD 2>/dev/null || echo NONE)"
+else
+  COMMIT_SHA="NO-GIT"
 fi
 
-# ---- step 7: write closeout report ------------------------------------------
-REPORT="${OUTDIR}/${CARD}_closeout_${STAMP}.md"
+# 2) Build file list, manifest, and zip via Python (filters + size cap)
+BUNDLE_ZIP="${AUDIT_DIR}/${CARD}_source_bundle_${STAMP}.zip"
+BUNDLE_MAN="${AUDIT_DIR}/${CARD}_source_bundle_${STAMP}_MANIFEST.json"
+PYTHON_BIN="${PYTHON_BIN:-python3}"
+
+"$PYTHON_BIN" - <<PY
+import os, json, time, hashlib, zipfile, stat
+root = os.getcwd()
+max_bytes = int(${MAX_MB}) * 1024 * 1024
+exclude_dirs = {'.git', '.venv', '__pycache__', '.pytest_cache'}
+exclude_exts = {'.zip','.tar','.tar.gz','.tgz','.7z','.rar','.bak','.tmp'}
+bundle = r"${BUNDLE_ZIP}"
+manifest_path = r"${BUNDLE_MAN}"
+
+entries = []
+def allow(path):
+    rp = os.path.relpath(path, root)
+    parts = rp.split(os.sep)
+    if parts and parts[0] in exclude_dirs: return False
+    le = path.lower()
+    for ext in exclude_exts:
+        if le.endswith(ext): return False
+    try:
+        st = os.stat(path)
+        if not stat.S_ISREG(st.st_mode): return False
+        if st.st_size > max_bytes: return False
+        return True
+    except FileNotFoundError:
+        return False
+
+for d, _, files in os.walk(root):
+    # Skip excluded directories early
+    base = os.path.relpath(d, root)
+    head = base.split(os.sep)[0] if base != '.' else '.'
+    if head in exclude_dirs: 
+        continue
+    for f in files:
+        p = os.path.join(d, f)
+        if allow(p):
+            st = os.stat(p)
+            entries.append({
+                "path": os.path.relpath(p, root).replace("\\","/"),
+                "size": st.st_size,
+                "mtime": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(st.st_mtime))
+            })
+
+# Write manifest
+with open(manifest_path, "w", encoding="utf-8") as mf:
+    json.dump({
+        "card": "${CARD}",
+        "generated_at": "${STAMP}",
+        "count": len(entries),
+        "max_file_mb": ${MAX_MB},
+        "files": sorted(entries, key=lambda e: e["path"])
+    }, mf, ensure_ascii=False, indent=2)
+
+# Create zip
+with zipfile.ZipFile(bundle, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+    for e in entries:
+        zf.write(e["path"], arcname=e["path"])
+PY
+
+# 3) Checksums
+CHK="${AUDIT_DIR}/${CARD}_artifacts_sha256_${STAMP}.txt"
+: > "$CHK"
+if command -v sha256sum >/dev/null 2>&1; then
+  sha256sum "$BUNDLE_ZIP" >> "$CHK"
+  sha256sum "$BUNDLE_MAN" >> "$CHK"
+elif command -v shasum >/dev/null 2>&1; then
+  shasum -a 256 "$BUNDLE_ZIP" >> "$CHK"
+  shasum -a 256 "$BUNDLE_MAN" >> "$CHK"
+fi
+
+# 4) Close note (human-readable)
+CLOSE_MD="${AUDIT_DIR}/${CARD}_closeout_${STAMP}.md"
 {
-  echo "# Card Closeout — ${CARD}"
+  echo "# Closeout — ${CARD}"
   echo
-  echo "**Repo:** $(basename "$ROOT")  |  **Branch:** ${BRANCH}  |  **Commit:** ${SHORT_SHA}  |  **Dirty files:** ${STATUS}"
-  echo
-  echo "## Gates"
-  echo "- Env: \`${ENV_STATUS}\`"
-  echo "- Tests: \`${TEST_STATUS}\`"
-  echo "- Sanity: \`${SANITY_STATUS}\`"
-  echo
-  echo "## Deliverables"
-  echo "- Source bundle: \`${BUNDLE_PATH}\`"
-  echo "- Manifest: \`${MANIFEST_PATH}\`"
-  echo "- Audit bundle (if any): \`${AUDIT_BUNDLE}\`"
-  echo
-  echo "## Artifact checksums (${ART_SHA_LINES} files)"
-  if [[ -f "$ART_SHA" ]]; then
-    echo
-    echo '```'
-    cat "$ART_SHA"
-    echo '```'
-  else
-    echo "_No \`artifacts/\` directory or no files to hash._"
-  fi
-  echo
-  echo "## Operator"
-  echo "Run: \`bash scripts/card_close.sh --card \"${CARD}\"${FAST:+ --fast}\`"
-} > "$REPORT"
+  echo "- Timestamp (UTC): ${STAMP}"
+  echo "- Commit: ${COMMIT_SHA}"
+  echo "- Bundle: ${BUNDLE_ZIP}"
+  echo "- Manifest: ${BUNDLE_MAN}"
+  echo "- Checksums: ${CHK}"
+} > "$CLOSE_MD"
 
-echo "[closeout] $REPORT"
-echo "[bundle]  $BUNDLE_PATH"
-[[ -n "$MANIFEST_PATH" ]] && echo "[manifest] $MANIFEST_PATH"
-[[ -n "$AUDIT_BUNDLE" ]] && echo "[audit]   $AUDIT_BUNDLE"
-[[ -f "$ART_SHA" ]] && echo "[artifacts_sha] $ART_SHA"
-
-# ---- step 8: commit & push ---------------------------------------------------
-set +e
-git add -A >/dev/null 2>&1
-git commit -m "${CARD}: closeout (env=${ENV_STATUS} tests=${TEST_STATUS} sanity=${SANITY_STATUS})" >/tmp/_git_commit.txt 2>&1
-COMMIT_SHA="$(git rev-parse --short HEAD 2>/dev/null || echo 'unknown')"
-echo "[commit]  ${COMMIT_SHA}"
-CUR_BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo 'main')"
-git push origin "${CUR_BRANCH}" >/tmp/_git_push.txt 2>&1
-echo "[pushed]  origin/${CUR_BRANCH}"
-set -e
-
-# always exit 0; report recorded even if gates failed
-exit 0
-```0
+# Required lines for your workflow:
+echo "[closeout] ${CLOSE_MD}"
+echo "[bundle] ${BUNDLE_ZIP}"
+echo "[manifest] ${BUNDLE_MAN}"

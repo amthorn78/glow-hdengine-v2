@@ -1,0 +1,22 @@
+{
+  "type":"object",
+  "additionalProperties": false,
+  "properties":{
+    "bands":{"type":"array","items":{"type":"string"}},
+    "eligible":{"type":"boolean"},
+    "prompt":{"type":["string","null"]},
+    "uncertainty":{"type":"string","enum":["low","medium","high"]},
+    "flags":{"type":"array","items":{"type":"string"}},
+    "versions":{
+      "type":"object","additionalProperties":false,
+      "properties":{
+        "engine_tag":{"type":"string"},
+        "release_id":{"type":"string"},
+        "toggles_sha":{"type":"string"}
+      },
+      "required":["engine_tag","release_id","toggles_sha"]
+    },
+    "idempotence_hash":{"type":"string","pattern":"^[a-f0-9]{64}$"}
+  },
+  "required":["bands","eligible","uncertainty","flags","versions","idempotence_hash"]
+}
