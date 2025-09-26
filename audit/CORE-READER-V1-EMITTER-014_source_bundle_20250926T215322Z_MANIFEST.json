@@ -1,0 +1,1118 @@
+{
+  "card": "CORE-READER-V1-EMITTER-014",
+  "generated_at": "20250926T215322Z",
+  "count": 222,
+  "max_file_mb": 10,
+  "files": [
+    {
+      "path": ".env.example",
+      "size": 87,
+      "mtime": "2025-09-24T23:26:11Z"
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "size": 576,
+      "mtime": "2025-09-24T23:30:05Z"
+    },
+    {
+      "path": ".vscode/settings.json",
+      "size": 124,
+      "mtime": "2025-09-24T19:25:05Z"
+    },
+    {
+      "path": "CANON_CHECKSUMS.json",
+      "size": 1479,
+      "mtime": "2025-09-25T23:38:48Z"
+    },
+    {
+      "path": "LICENSE",
+      "size": 1066,
+      "mtime": "2025-09-24T06:12:41Z"
+    },
+    {
+      "path": "README.md",
+      "size": 31,
+      "mtime": "2025-09-24T06:12:41Z"
+    },
+    {
+      "path": "adapter/__init__.py",
+      "size": 55,
+      "mtime": "2025-09-25T03:22:50Z"
+    },
+    {
+      "path": "adapter/__pycache__/__init__.cpython-312.pyc",
+      "size": 169,
+      "mtime": "2025-09-25T03:25:32Z"
+    },
+    {
+      "path": "adapter/__pycache__/app.cpython-312.pyc",
+      "size": 11108,
+      "mtime": "2025-09-25T03:35:18Z"
+    },
+    {
+      "path": "adapter/app.py",
+      "size": 7427,
+      "mtime": "2025-09-25T03:35:06Z"
+    },
+    {
+      "path": "adapter/gunicorn.conf.py",
+      "size": 61,
+      "mtime": "2025-09-25T03:22:50Z"
+    },
+    {
+      "path": "adapter/schemas/error_v1.schema.json",
+      "size": 426,
+      "mtime": "2025-09-25T03:22:50Z"
+    },
+    {
+      "path": "adapter/schemas/healthz_v1.schema.json",
+      "size": 290,
+      "mtime": "2025-09-25T03:22:50Z"
+    },
+    {
+      "path": "adapter/schemas/readyz_v1.schema.json",
+      "size": 289,
+      "mtime": "2025-09-25T03:37:25Z"
+    },
+    {
+      "path": "adapter/schemas/version_v1.schema.json",
+      "size": 1208,
+      "mtime": "2025-09-25T03:37:25Z"
+    },
+    {
+      "path": "adapter/wsgi.py",
+      "size": 45,
+      "mtime": "2025-09-25T03:22:50Z"
+    },
+    {
+      "path": "artifacts/CANON_CHECKSUMS.json",
+      "size": 1095,
+      "mtime": "2025-09-24T22:26:40Z"
+    },
+    {
+      "path": "artifacts/CHECKSUMS.txt",
+      "size": 569,
+      "mtime": "2025-09-24T19:52:55Z"
+    },
+    {
+      "path": "artifacts/_closeout_validate.txt",
+      "size": 3,
+      "mtime": "2025-09-24T22:07:31Z"
+    },
+    {
+      "path": "artifacts/canon_report.json",
+      "size": 73,
+      "mtime": "2025-09-25T23:38:48Z"
+    },
+    {
+      "path": "artifacts/det_report.json",
+      "size": 259,
+      "mtime": "2025-09-26T09:03:02Z"
+    },
+    {
+      "path": "artifacts/det_report.json.sha256",
+      "size": 65,
+      "mtime": "2025-09-26T09:03:02Z"
+    },
+    {
+      "path": "artifacts/dyad_AB.json",
+      "size": 402,
+      "mtime": "2025-09-25T01:17:59Z"
+    },
+    {
+      "path": "artifacts/dyad_AB_debug.json",
+      "size": 553,
+      "mtime": "2025-09-25T00:02:12Z"
+    },
+    {
+      "path": "artifacts/dyad_BA.json",
+      "size": 402,
+      "mtime": "2025-09-25T01:17:59Z"
+    },
+    {
+      "path": "artifacts/dyad_BA_debug.json",
+      "size": 553,
+      "mtime": "2025-09-25T00:02:12Z"
+    },
+    {
+      "path": "artifacts/identity.txt",
+      "size": 93,
+      "mtime": "2025-09-24T19:52:55Z"
+    },
+    {
+      "path": "artifacts/release_id.txt",
+      "size": 65,
+      "mtime": "2025-09-26T21:49:09Z"
+    },
+    {
+      "path": "artifacts/release_pack_manifest.json",
+      "size": 401,
+      "mtime": "2025-09-26T21:49:09Z"
+    },
+    {
+      "path": "audit/CORE-EM-FLIP-001_artifacts_sha256_20250926T191351Z.txt",
+      "size": 316,
+      "mtime": "2025-09-26T19:13:56Z"
+    },
+    {
+      "path": "audit/CORE-EM-FLIP-001_closeout_20250926T191351Z.md",
+      "size": 396,
+      "mtime": "2025-09-26T19:13:56Z"
+    },
+    {
+      "path": "audit/CORE-EM-FLIP-001_source_bundle_20250926T191351Z_MANIFEST.json",
+      "size": 23254,
+      "mtime": "2025-09-26T19:13:55Z"
+    },
+    {
+      "path": "audit/REPORT.txt",
+      "size": 2149,
+      "mtime": "2025-09-24T21:37:11Z"
+    },
+    {
+      "path": "audit/audit_20250925T200219Z/CANON_CHECKSUMS.json",
+      "size": 1479,
+      "mtime": "2025-09-25T20:02:21Z"
+    },
+    {
+      "path": "audit/audit_20250925T200219Z/canon_report.json",
+      "size": 75,
+      "mtime": "2025-09-25T20:02:21Z"
+    },
+    {
+      "path": "audit/audit_20250925T200219Z/env_repo_diag.txt",
+      "size": 4221,
+      "mtime": "2025-09-25T20:02:20Z"
+    },
+    {
+      "path": "audit/audit_20250925T200219Z/pytest_canon.txt",
+      "size": 874,
+      "mtime": "2025-09-25T20:02:21Z"
+    },
+    {
+      "path": "audit/audit_20250925T200219Z/validate_canon_stderr.txt",
+      "size": 0,
+      "mtime": "2025-09-25T20:02:21Z"
+    },
+    {
+      "path": "audit/audit_20250925T200219Z/validate_canon_stdout.json",
+      "size": 243,
+      "mtime": "2025-09-25T20:02:21Z"
+    },
+    {
+      "path": "audit/gates/canon/20250925T233847Z/CANON_CHECKSUMS.json",
+      "size": 1479,
+      "mtime": "2025-09-25T23:38:47Z"
+    },
+    {
+      "path": "audit/gates/canon/20250925T233847Z/CANON_CHECKSUMS.json.sha256",
+      "size": 65,
+      "mtime": "2025-09-25T23:38:47Z"
+    },
+    {
+      "path": "audit/gates/canon/20250925T233847Z/canon_report.json",
+      "size": 73,
+      "mtime": "2025-09-25T23:38:47Z"
+    },
+    {
+      "path": "audit/gates/canon/20250925T233847Z/canon_report.json.sha256",
+      "size": 65,
+      "mtime": "2025-09-25T23:38:47Z"
+    },
+    {
+      "path": "audit/gates/canon/20250925T233847Z/gate_log.txt",
+      "size": 254,
+      "mtime": "2025-09-25T23:38:47Z"
+    },
+    {
+      "path": "audit/gates/canon/20250925T233848Z/CANON_CHECKSUMS.json",
+      "size": 1479,
+      "mtime": "2025-09-25T23:38:48Z"
+    },
+    {
+      "path": "audit/gates/canon/20250925T233848Z/CANON_CHECKSUMS.json.sha256",
+      "size": 65,
+      "mtime": "2025-09-25T23:38:48Z"
+    },
+    {
+      "path": "audit/gates/canon/20250925T233848Z/canon_report.json",
+      "size": 73,
+      "mtime": "2025-09-25T23:38:48Z"
+    },
+    {
+      "path": "audit/gates/canon/20250925T233848Z/canon_report.json.sha256",
+      "size": 65,
+      "mtime": "2025-09-25T23:38:48Z"
+    },
+    {
+      "path": "audit/gates/canon/20250925T233848Z/gate_log.txt",
+      "size": 254,
+      "mtime": "2025-09-25T23:38:48Z"
+    },
+    {
+      "path": "audit/observed_gate_counts.json",
+      "size": 132,
+      "mtime": "2025-09-24T20:40:32Z"
+    },
+    {
+      "path": "catalog/channels_catalog_v1.json",
+      "size": 62,
+      "mtime": "2025-09-24T14:00:52Z"
+    },
+    {
+      "path": "catalog/channels_v1.json",
+      "size": 6408,
+      "mtime": "2025-09-24T20:26:47Z"
+    },
+    {
+      "path": "catalog/gates_v1.json",
+      "size": 1876,
+      "mtime": "2025-09-24T21:14:09Z"
+    },
+    {
+      "path": "config/bands_4B60_v1.json",
+      "size": 45,
+      "mtime": "2025-09-24T14:00:52Z"
+    },
+    {
+      "path": "config/toggles_v1.json",
+      "size": 965,
+      "mtime": "2025-09-26T18:52:36Z"
+    },
+    {
+      "path": "core/__init__.py",
+      "size": 0,
+      "mtime": "2025-09-24T20:38:45Z"
+    },
+    {
+      "path": "core/__pycache__/__init__.cpython-312.pyc",
+      "size": 142,
+      "mtime": "2025-09-24T20:38:45Z"
+    },
+    {
+      "path": "core/canon/__init__.py",
+      "size": 84,
+      "mtime": "2025-09-25T19:36:40Z"
+    },
+    {
+      "path": "core/canon/__pycache__/__init__.cpython-312.pyc",
+      "size": 193,
+      "mtime": "2025-09-25T19:36:52Z"
+    },
+    {
+      "path": "core/canon/__pycache__/checksums.cpython-312.pyc",
+      "size": 4782,
+      "mtime": "2025-09-25T19:47:15Z"
+    },
+    {
+      "path": "core/canon/__pycache__/validate.cpython-312.pyc",
+      "size": 14115,
+      "mtime": "2025-09-25T23:21:59Z"
+    },
+    {
+      "path": "core/canon/checksums.py",
+      "size": 3561,
+      "mtime": "2025-09-25T19:47:03Z"
+    },
+    {
+      "path": "core/canon/validate.py",
+      "size": 9657,
+      "mtime": "2025-09-25T23:21:25Z"
+    },
+    {
+      "path": "core/catalog/__pycache__/loader.cpython-312.pyc",
+      "size": 5746,
+      "mtime": "2025-09-24T20:29:30Z"
+    },
+    {
+      "path": "core/catalog/loader.py",
+      "size": 3154,
+      "mtime": "2025-09-24T20:29:18Z"
+    },
+    {
+      "path": "core/config/__pycache__/toggles_resolver.cpython-312.pyc",
+      "size": 3174,
+      "mtime": "2025-09-24T19:32:38Z"
+    },
+    {
+      "path": "core/config/toggles_resolver.py",
+      "size": 1815,
+      "mtime": "2025-09-24T19:31:49Z"
+    },
+    {
+      "path": "core/pipeline/__pycache__/compute.cpython-312.pyc",
+      "size": 1481,
+      "mtime": "2025-09-24T23:51:46Z"
+    },
+    {
+      "path": "core/pipeline/__pycache__/idempotence.cpython-312.pyc",
+      "size": 506,
+      "mtime": "2025-09-24T23:34:45Z"
+    },
+    {
+      "path": "core/pipeline/__pycache__/presenter.cpython-312.pyc",
+      "size": 969,
+      "mtime": "2025-09-24T23:34:45Z"
+    },
+    {
+      "path": "core/pipeline/admin_debug_v1.schema.json",
+      "size": 204,
+      "mtime": "2025-09-24T23:34:08Z"
+    },
+    {
+      "path": "core/pipeline/compute.py",
+      "size": 1068,
+      "mtime": "2025-09-24T23:51:35Z"
+    },
+    {
+      "path": "core/pipeline/idempotence.py",
+      "size": 288,
+      "mtime": "2025-09-24T23:34:09Z"
+    },
+    {
+      "path": "core/pipeline/presenter.py",
+      "size": 693,
+      "mtime": "2025-09-24T23:34:09Z"
+    },
+    {
+      "path": "core/pipeline/public_result_v1.schema.json",
+      "size": 773,
+      "mtime": "2025-09-24T23:34:08Z"
+    },
+    {
+      "path": "core/stable/__init__.py",
+      "size": 0,
+      "mtime": "2025-09-24T20:38:45Z"
+    },
+    {
+      "path": "core/stable/__pycache__/__init__.cpython-312.pyc",
+      "size": 149,
+      "mtime": "2025-09-24T20:38:45Z"
+    },
+    {
+      "path": "core/stable/__pycache__/freeze.cpython-312.pyc",
+      "size": 3342,
+      "mtime": "2025-09-24T14:03:43Z"
+    },
+    {
+      "path": "core/stable/__pycache__/identity.cpython-312.pyc",
+      "size": 1416,
+      "mtime": "2025-09-24T14:14:59Z"
+    },
+    {
+      "path": "core/stable/__pycache__/identity_constants.cpython-312.pyc",
+      "size": 277,
+      "mtime": "2025-09-24T19:52:55Z"
+    },
+    {
+      "path": "core/stable/__pycache__/sercanon.cpython-312.pyc",
+      "size": 8245,
+      "mtime": "2025-09-24T14:03:44Z"
+    },
+    {
+      "path": "core/stable/freeze.py",
+      "size": 1683,
+      "mtime": "2025-09-24T14:03:29Z"
+    },
+    {
+      "path": "core/stable/identity.py",
+      "size": 535,
+      "mtime": "2025-09-24T14:05:47Z"
+    },
+    {
+      "path": "core/stable/identity_constants.py",
+      "size": 107,
+      "mtime": "2025-09-24T19:52:55Z"
+    },
+    {
+      "path": "core/stable/sercanon.py",
+      "size": 4135,
+      "mtime": "2025-09-24T06:14:51Z"
+    },
+    {
+      "path": "docs/ADAPTER_009.md",
+      "size": 2073,
+      "mtime": "2025-09-25T03:44:53Z"
+    },
+    {
+      "path": "docs/RUN.md",
+      "size": 129,
+      "mtime": "2025-09-24T06:23:45Z"
+    },
+    {
+      "path": "docs/SECRETS.md",
+      "size": 235,
+      "mtime": "2025-09-24T23:26:11Z"
+    },
+    {
+      "path": "docs/SYNC_LOG.md",
+      "size": 1107,
+      "mtime": "2025-09-24T19:52:55Z"
+    },
+    {
+      "path": "engine/__init__.py",
+      "size": 86,
+      "mtime": "2025-09-25T23:13:58Z"
+    },
+    {
+      "path": "engine/__pycache__/__init__.cpython-312.pyc",
+      "size": 183,
+      "mtime": "2025-09-25T23:16:52Z"
+    },
+    {
+      "path": "engine/canon/__init__.py",
+      "size": 132,
+      "mtime": "2025-09-25T23:13:58Z"
+    },
+    {
+      "path": "engine/stable/__init__.py",
+      "size": 123,
+      "mtime": "2025-09-25T23:13:58Z"
+    },
+    {
+      "path": "engine/stable/__pycache__/__init__.cpython-312.pyc",
+      "size": 225,
+      "mtime": "2025-09-25T23:16:52Z"
+    },
+    {
+      "path": "engine/stable/__pycache__/hashcouple.cpython-312.pyc",
+      "size": 1484,
+      "mtime": "2025-09-26T08:47:05Z"
+    },
+    {
+      "path": "engine/stable/__pycache__/sercanon.cpython-312.pyc",
+      "size": 1219,
+      "mtime": "2025-09-26T08:44:22Z"
+    },
+    {
+      "path": "engine/stable/hashcouple.py",
+      "size": 1001,
+      "mtime": "2025-09-26T08:46:44Z"
+    },
+    {
+      "path": "engine/stable/sercanon.py",
+      "size": 759,
+      "mtime": "2025-09-26T08:44:06Z"
+    },
+    {
+      "path": "freeze/freeze_pack_v1.json",
+      "size": 58,
+      "mtime": "2025-09-24T14:00:52Z"
+    },
+    {
+      "path": "goldens/reader/v1/g01_minimal_ineligible.json",
+      "size": 283,
+      "mtime": "2025-09-26T21:21:25Z"
+    },
+    {
+      "path": "goldens/reader/v1/g01_minimal_ineligible.json.sha256",
+      "size": 65,
+      "mtime": "2025-09-26T21:21:25Z"
+    },
+    {
+      "path": "goldens/reader/v1/g02_ab_ba_parity_A.jsonl",
+      "size": 804,
+      "mtime": "2025-09-26T21:19:18Z"
+    },
+    {
+      "path": "goldens/reader/v1/g02_ab_ba_parity_A.jsonl.sha256",
+      "size": 65,
+      "mtime": "2025-09-26T21:19:18Z"
+    },
+    {
+      "path": "goldens/reader/v1/g02_ab_ba_parity_B.jsonl",
+      "size": 804,
+      "mtime": "2025-09-26T21:19:18Z"
+    },
+    {
+      "path": "goldens/reader/v1/g02_ab_ba_parity_B.jsonl.sha256",
+      "size": 65,
+      "mtime": "2025-09-26T21:19:18Z"
+    },
+    {
+      "path": "goldens/reader/v1/g03_open_leader.json",
+      "size": 316,
+      "mtime": "2025-09-26T21:21:25Z"
+    },
+    {
+      "path": "goldens/reader/v1/g03_open_leader.json.sha256",
+      "size": 65,
+      "mtime": "2025-09-26T21:21:25Z"
+    },
+    {
+      "path": "goldens/reader/v1/g04_warm_leader.json",
+      "size": 316,
+      "mtime": "2025-09-26T21:21:25Z"
+    },
+    {
+      "path": "goldens/reader/v1/g04_warm_leader.json.sha256",
+      "size": 65,
+      "mtime": "2025-09-26T21:21:25Z"
+    },
+    {
+      "path": "goldens/reader/v1/g05_cool_leader.json",
+      "size": 316,
+      "mtime": "2025-09-26T21:21:25Z"
+    },
+    {
+      "path": "goldens/reader/v1/g05_cool_leader.json.sha256",
+      "size": 65,
+      "mtime": "2025-09-26T21:21:25Z"
+    },
+    {
+      "path": "goldens/reader/v1/g06_error_invalid_input.json",
+      "size": 55,
+      "mtime": "2025-09-26T21:21:25Z"
+    },
+    {
+      "path": "goldens/reader/v1/g06_error_invalid_input.json.sha256",
+      "size": 65,
+      "mtime": "2025-09-26T21:21:25Z"
+    },
+    {
+      "path": "presenter/__init__.py",
+      "size": 0,
+      "mtime": "2025-09-26T21:12:03Z"
+    },
+    {
+      "path": "presenter/__pycache__/__init__.cpython-312.pyc",
+      "size": 147,
+      "mtime": "2025-09-26T21:12:16Z"
+    },
+    {
+      "path": "presenter/reader_v1/__init__.py",
+      "size": 0,
+      "mtime": "2025-09-26T21:12:03Z"
+    },
+    {
+      "path": "presenter/reader_v1/__pycache__/__init__.cpython-312.pyc",
+      "size": 157,
+      "mtime": "2025-09-26T21:12:16Z"
+    },
+    {
+      "path": "presenter/reader_v1/__pycache__/emitter.cpython-312.pyc",
+      "size": 3096,
+      "mtime": "2025-09-26T21:12:16Z"
+    },
+    {
+      "path": "presenter/reader_v1/emitter.py",
+      "size": 2403,
+      "mtime": "2025-09-26T21:12:03Z"
+    },
+    {
+      "path": "requirements-dev.txt",
+      "size": 36,
+      "mtime": "2025-09-26T21:09:59Z"
+    },
+    {
+      "path": "schemas/canon_checksums_v2.schema.json",
+      "size": 1578,
+      "mtime": "2025-09-24T21:27:22Z"
+    },
+    {
+      "path": "schemas/channels_catalog_v1.schema.json",
+      "size": 105,
+      "mtime": "2025-09-24T14:00:52Z"
+    },
+    {
+      "path": "schemas/channels_v1.schema.json",
+      "size": 1370,
+      "mtime": "2025-09-24T20:19:51Z"
+    },
+    {
+      "path": "schemas/gates_v1.schema.json",
+      "size": 529,
+      "mtime": "2025-09-24T20:19:51Z"
+    },
+    {
+      "path": "schemas/reader.v1.schema.json",
+      "size": 2156,
+      "mtime": "2025-09-26T21:07:54Z"
+    },
+    {
+      "path": "schemas/toggles_v1.schema.json",
+      "size": 2933,
+      "mtime": "2025-09-24T19:22:43Z"
+    },
+    {
+      "path": "scripts/__init__.py",
+      "size": 0,
+      "mtime": "2025-09-24T20:38:45Z"
+    },
+    {
+      "path": "scripts/__pycache__/__init__.cpython-312.pyc",
+      "size": 145,
+      "mtime": "2025-09-24T21:21:04Z"
+    },
+    {
+      "path": "scripts/__pycache__/_emit_canon_checksums.cpython-312.pyc",
+      "size": 3085,
+      "mtime": "2025-09-24T21:22:36Z"
+    },
+    {
+      "path": "scripts/__pycache__/identity_bump.cpython-312.pyc",
+      "size": 4846,
+      "mtime": "2025-09-24T19:52:55Z"
+    },
+    {
+      "path": "scripts/_emit_canon_checksums.py",
+      "size": 1948,
+      "mtime": "2025-09-24T21:22:21Z"
+    },
+    {
+      "path": "scripts/card_close.sh",
+      "size": 4106,
+      "mtime": "2025-09-26T09:09:08Z"
+    },
+    {
+      "path": "scripts/diag_env.sh",
+      "size": 1759,
+      "mtime": "2025-09-25T00:58:56Z"
+    },
+    {
+      "path": "scripts/ensure_env.py",
+      "size": 265,
+      "mtime": "2025-09-24T23:26:11Z"
+    },
+    {
+      "path": "scripts/hd_cli.py",
+      "size": 1685,
+      "mtime": "2025-09-26T21:35:42Z"
+    },
+    {
+      "path": "scripts/hd_resolve.py",
+      "size": 787,
+      "mtime": "2025-09-26T09:00:58Z"
+    },
+    {
+      "path": "scripts/identity_bump.py",
+      "size": 2482,
+      "mtime": "2025-09-24T19:52:47Z"
+    },
+    {
+      "path": "scripts/make_audit.sh",
+      "size": 3698,
+      "mtime": "2025-09-25T20:02:09Z"
+    },
+    {
+      "path": "scripts/make_change_snapshot.sh",
+      "size": 4004,
+      "mtime": "2025-09-25T01:31:43Z"
+    },
+    {
+      "path": "scripts/make_reader_v1_goldens.py",
+      "size": 2355,
+      "mtime": "2025-09-26T21:15:26Z"
+    },
+    {
+      "path": "scripts/make_release_pack.sh",
+      "size": 1184,
+      "mtime": "2025-09-26T21:49:02Z"
+    },
+    {
+      "path": "scripts/make_source_bundle.sh",
+      "size": 3533,
+      "mtime": "2025-09-24T06:40:32Z"
+    },
+    {
+      "path": "scripts/run_gate_canon.sh",
+      "size": 1511,
+      "mtime": "2025-09-25T23:38:39Z"
+    },
+    {
+      "path": "scripts/validate_canon.sh",
+      "size": 3707,
+      "mtime": "2025-09-25T23:24:00Z"
+    },
+    {
+      "path": "scripts/validate_det.sh",
+      "size": 3350,
+      "mtime": "2025-09-26T09:02:55Z"
+    },
+    {
+      "path": "tests/__pycache__/conftest.cpython-312-pytest-7.4.4.pyc",
+      "size": 631,
+      "mtime": "2025-09-25T03:25:32Z"
+    },
+    {
+      "path": "tests/__pycache__/test_catalog_canon.cpython-312-pytest-7.4.4.pyc",
+      "size": 10237,
+      "mtime": "2025-09-25T00:59:12Z"
+    },
+    {
+      "path": "tests/__pycache__/test_catalog_canon.cpython-312-pytest-8.4.1.pyc",
+      "size": 5174,
+      "mtime": "2025-09-24T20:20:08Z"
+    },
+    {
+      "path": "tests/__pycache__/test_pipeline_properties.cpython-312-pytest-7.4.4.pyc",
+      "size": 6735,
+      "mtime": "2025-09-25T01:12:18Z"
+    },
+    {
+      "path": "tests/__pycache__/test_pipeline_public.cpython-312-pytest-7.4.4.pyc",
+      "size": 13088,
+      "mtime": "2025-09-25T00:19:14Z"
+    },
+    {
+      "path": "tests/__pycache__/test_resolver_prod_rules.cpython-312-pytest-7.4.4.pyc",
+      "size": 9284,
+      "mtime": "2025-09-25T01:15:33Z"
+    },
+    {
+      "path": "tests/__pycache__/test_sercanon.cpython-312-pytest-7.4.4.pyc",
+      "size": 8023,
+      "mtime": "2025-09-24T20:39:35Z"
+    },
+    {
+      "path": "tests/__pycache__/test_sercanon.cpython-312-pytest-8.4.1.pyc",
+      "size": 8285,
+      "mtime": "2025-09-24T06:15:12Z"
+    },
+    {
+      "path": "tests/adapter/__pycache__/test_gate_auth.cpython-312-pytest-7.4.4.pyc",
+      "size": 8030,
+      "mtime": "2025-09-25T03:28:18Z"
+    },
+    {
+      "path": "tests/adapter/__pycache__/test_headers_and_determinism.cpython-312-pytest-7.4.4.pyc",
+      "size": 11766,
+      "mtime": "2025-09-25T03:35:18Z"
+    },
+    {
+      "path": "tests/adapter/__pycache__/test_jsonschema.cpython-312-pytest-7.4.4.pyc",
+      "size": 15827,
+      "mtime": "2025-09-25T03:37:26Z"
+    },
+    {
+      "path": "tests/adapter/__pycache__/test_readyz.cpython-312-pytest-7.4.4.pyc",
+      "size": 8747,
+      "mtime": "2025-09-25T03:31:50Z"
+    },
+    {
+      "path": "tests/adapter/test_gate_auth.py",
+      "size": 1986,
+      "mtime": "2025-09-25T03:28:06Z"
+    },
+    {
+      "path": "tests/adapter/test_headers_and_determinism.py",
+      "size": 3358,
+      "mtime": "2025-09-25T03:35:06Z"
+    },
+    {
+      "path": "tests/adapter/test_jsonschema.py",
+      "size": 3552,
+      "mtime": "2025-09-25T03:37:25Z"
+    },
+    {
+      "path": "tests/adapter/test_readyz.py",
+      "size": 2136,
+      "mtime": "2025-09-25T03:31:37Z"
+    },
+    {
+      "path": "tests/canon/__pycache__/test_center_order_and_counts.cpython-312-pytest-7.4.4.pyc",
+      "size": 2142,
+      "mtime": "2025-09-25T23:19:59Z"
+    },
+    {
+      "path": "tests/canon/__pycache__/test_checksums.cpython-312-pytest-7.4.4.pyc",
+      "size": 16049,
+      "mtime": "2025-09-25T19:47:15Z"
+    },
+    {
+      "path": "tests/canon/__pycache__/test_error_envelope.cpython-312-pytest-7.4.4.pyc",
+      "size": 4982,
+      "mtime": "2025-09-25T23:24:13Z"
+    },
+    {
+      "path": "tests/canon/__pycache__/test_loader_integrity.cpython-312-pytest-7.4.4.pyc",
+      "size": 1565,
+      "mtime": "2025-09-25T19:44:32Z"
+    },
+    {
+      "path": "tests/canon/__pycache__/test_overrides_prod.cpython-312-pytest-7.4.4.pyc",
+      "size": 3519,
+      "mtime": "2025-09-25T23:21:59Z"
+    },
+    {
+      "path": "tests/canon/__pycache__/test_report_determinism.cpython-312-pytest-7.4.4.pyc",
+      "size": 8715,
+      "mtime": "2025-09-25T23:16:52Z"
+    },
+    {
+      "path": "tests/canon/test_center_order_and_counts.py",
+      "size": 638,
+      "mtime": "2025-09-25T23:19:51Z"
+    },
+    {
+      "path": "tests/canon/test_checksums.py",
+      "size": 1634,
+      "mtime": "2025-09-25T19:47:03Z"
+    },
+    {
+      "path": "tests/canon/test_error_envelope.py",
+      "size": 664,
+      "mtime": "2025-09-25T23:24:00Z"
+    },
+    {
+      "path": "tests/canon/test_loader_integrity.py",
+      "size": 456,
+      "mtime": "2025-09-25T19:44:13Z"
+    },
+    {
+      "path": "tests/canon/test_overrides_prod.py",
+      "size": 1147,
+      "mtime": "2025-09-25T23:21:25Z"
+    },
+    {
+      "path": "tests/canon/test_report_determinism.py",
+      "size": 1415,
+      "mtime": "2025-09-25T23:16:25Z"
+    },
+    {
+      "path": "tests/cli/__pycache__/test_hd_cli_sidecar_and_stdout.cpython-312-pytest-7.4.4.pyc",
+      "size": 9446,
+      "mtime": "2025-09-26T08:58:31Z"
+    },
+    {
+      "path": "tests/cli/test_hd_cli_sidecar_and_stdout.py",
+      "size": 1332,
+      "mtime": "2025-09-26T08:58:20Z"
+    },
+    {
+      "path": "tests/conftest.py",
+      "size": 201,
+      "mtime": "2025-09-25T03:25:24Z"
+    },
+    {
+      "path": "tests/em/__pycache__/test_em_defaults_and_ladder.cpython-312-pytest-7.4.4.pyc",
+      "size": 5440,
+      "mtime": "2025-09-26T18:52:47Z"
+    },
+    {
+      "path": "tests/em/__pycache__/test_em_throat_and_adjacency.cpython-312-pytest-7.4.4.pyc",
+      "size": 7166,
+      "mtime": "2025-09-26T19:05:37Z"
+    },
+    {
+      "path": "tests/em/__pycache__/test_goldens_public_shape_and_identity.cpython-312-pytest-7.4.4.pyc",
+      "size": 7707,
+      "mtime": "2025-09-26T19:12:15Z"
+    },
+    {
+      "path": "tests/em/test_em_defaults_and_ladder.py",
+      "size": 1324,
+      "mtime": "2025-09-26T18:52:34Z"
+    },
+    {
+      "path": "tests/em/test_em_off_toggle.py",
+      "size": 835,
+      "mtime": "2025-09-26T19:13:32Z"
+    },
+    {
+      "path": "tests/em/test_em_throat_and_adjacency.py",
+      "size": 1722,
+      "mtime": "2025-09-26T18:55:55Z"
+    },
+    {
+      "path": "tests/em/test_goldens_public_shape_and_identity.py",
+      "size": 825,
+      "mtime": "2025-09-26T19:12:06Z"
+    },
+    {
+      "path": "tests/fixtures/g05_adj_A.json",
+      "size": 19,
+      "mtime": "2025-09-26T18:55:55Z"
+    },
+    {
+      "path": "tests/fixtures/g05_adj_A.json__admin.json",
+      "size": 61,
+      "mtime": "2025-09-26T19:05:37Z"
+    },
+    {
+      "path": "tests/fixtures/g05_adj_B.json",
+      "size": 20,
+      "mtime": "2025-09-26T18:55:55Z"
+    },
+    {
+      "path": "tests/fixtures/g08_not_paced_A.json",
+      "size": 21,
+      "mtime": "2025-09-26T18:55:55Z"
+    },
+    {
+      "path": "tests/fixtures/g08_not_paced_B.json",
+      "size": 21,
+      "mtime": "2025-09-26T18:55:55Z"
+    },
+    {
+      "path": "tests/fixtures/g08_paced_A.json",
+      "size": 21,
+      "mtime": "2025-09-26T18:55:55Z"
+    },
+    {
+      "path": "tests/fixtures/g08_paced_A.json__admin.json",
+      "size": 61,
+      "mtime": "2025-09-26T19:05:37Z"
+    },
+    {
+      "path": "tests/fixtures/g08_paced_B.json",
+      "size": 21,
+      "mtime": "2025-09-26T18:55:55Z"
+    },
+    {
+      "path": "tests/fixtures/reader_v1/abba_A.json",
+      "size": 21,
+      "mtime": "2025-09-26T21:19:17Z"
+    },
+    {
+      "path": "tests/fixtures/reader_v1/abba_B.json",
+      "size": 18,
+      "mtime": "2025-09-26T21:19:17Z"
+    },
+    {
+      "path": "tests/goldens/g05_adjacency_only.json",
+      "size": 402,
+      "mtime": "2025-09-26T19:12:06Z"
+    },
+    {
+      "path": "tests/goldens/g05_adjacency_only.json.sha256",
+      "size": 65,
+      "mtime": "2025-09-26T19:12:06Z"
+    },
+    {
+      "path": "tests/goldens/g08_throat_em_bonus_not_paced.json",
+      "size": 402,
+      "mtime": "2025-09-26T19:12:06Z"
+    },
+    {
+      "path": "tests/goldens/g08_throat_em_bonus_not_paced.json.sha256",
+      "size": 65,
+      "mtime": "2025-09-26T19:12:06Z"
+    },
+    {
+      "path": "tests/goldens/g08_throat_em_bonus_paced.json",
+      "size": 402,
+      "mtime": "2025-09-26T19:12:06Z"
+    },
+    {
+      "path": "tests/goldens/g08_throat_em_bonus_paced.json.sha256",
+      "size": 65,
+      "mtime": "2025-09-26T19:12:06Z"
+    },
+    {
+      "path": "tests/infra/__pycache__/test_hash_coupling.cpython-312-pytest-7.4.4.pyc",
+      "size": 5052,
+      "mtime": "2025-09-26T08:47:05Z"
+    },
+    {
+      "path": "tests/infra/__pycache__/test_resolver_serializer_discipline.cpython-312-pytest-7.4.4.pyc",
+      "size": 4700,
+      "mtime": "2025-09-26T09:01:07Z"
+    },
+    {
+      "path": "tests/infra/__pycache__/test_sercanon_bytes.cpython-312-pytest-7.4.4.pyc",
+      "size": 4279,
+      "mtime": "2025-09-26T08:44:22Z"
+    },
+    {
+      "path": "tests/infra/__pycache__/test_serializer_guard.cpython-312-pytest-7.4.4.pyc",
+      "size": 5015,
+      "mtime": "2025-09-26T09:04:28Z"
+    },
+    {
+      "path": "tests/infra/test_hash_coupling.py",
+      "size": 966,
+      "mtime": "2025-09-26T08:46:44Z"
+    },
+    {
+      "path": "tests/infra/test_resolver_serializer_discipline.py",
+      "size": 624,
+      "mtime": "2025-09-26T09:00:58Z"
+    },
+    {
+      "path": "tests/infra/test_sercanon_bytes.py",
+      "size": 485,
+      "mtime": "2025-09-26T08:44:06Z"
+    },
+    {
+      "path": "tests/infra/test_serializer_guard.py",
+      "size": 568,
+      "mtime": "2025-09-26T09:04:17Z"
+    },
+    {
+      "path": "tests/reader_v1/__pycache__/test_cli_proof.cpython-312-pytest-7.4.4.pyc",
+      "size": 5517,
+      "mtime": "2025-09-26T21:24:29Z"
+    },
+    {
+      "path": "tests/reader_v1/__pycache__/test_emitter.cpython-312-pytest-7.4.4.pyc",
+      "size": 5556,
+      "mtime": "2025-09-26T21:12:16Z"
+    },
+    {
+      "path": "tests/reader_v1/__pycache__/test_goldens.cpython-312-pytest-7.4.4.pyc",
+      "size": 6108,
+      "mtime": "2025-09-26T21:16:08Z"
+    },
+    {
+      "path": "tests/reader_v1/__pycache__/test_release_pack.cpython-312-pytest-7.4.4.pyc",
+      "size": 4089,
+      "mtime": "2025-09-26T21:42:00Z"
+    },
+    {
+      "path": "tests/reader_v1/__pycache__/test_schema.cpython-312-pytest-7.4.4.pyc",
+      "size": 3891,
+      "mtime": "2025-09-26T21:08:29Z"
+    },
+    {
+      "path": "tests/reader_v1/test_cli_proof.py",
+      "size": 1310,
+      "mtime": "2025-09-26T21:24:20Z"
+    },
+    {
+      "path": "tests/reader_v1/test_emitter.py",
+      "size": 1630,
+      "mtime": "2025-09-26T21:12:03Z"
+    },
+    {
+      "path": "tests/reader_v1/test_goldens.py",
+      "size": 1446,
+      "mtime": "2025-09-26T21:15:26Z"
+    },
+    {
+      "path": "tests/reader_v1/test_release_pack.py",
+      "size": 1001,
+      "mtime": "2025-09-26T21:41:55Z"
+    },
+    {
+      "path": "tests/reader_v1/test_schema.py",
+      "size": 2383,
+      "mtime": "2025-09-26T21:07:54Z"
+    },
+    {
+      "path": "tests/test_catalog_canon.py",
+      "size": 1827,
+      "mtime": "2025-09-24T23:50:05Z"
+    },
+    {
+      "path": "tests/test_pipeline_properties.py",
+      "size": 1376,
+      "mtime": "2025-09-25T01:12:09Z"
+    },
+    {
+      "path": "tests/test_pipeline_public.py",
+      "size": 1504,
+      "mtime": "2025-09-25T00:19:13Z"
+    },
+    {
+      "path": "tests/test_resolver_prod_rules.py",
+      "size": 1740,
+      "mtime": "2025-09-25T01:15:24Z"
+    },
+    {
+      "path": "tests/test_sercanon.py",
+      "size": 1586,
+      "mtime": "2025-09-24T06:14:51Z"
+    }
+  ]
+}
