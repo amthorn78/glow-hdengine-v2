@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/reader.v1.schema.json",
+  "title": "Reader v1 — public envelope (success | error)",
+  "type": "object",
+  "additionalProperties": false,
+
+  "properties": {
+    "reader_version": { "type": "string", "const": "v1" },
+    "eligible": { "type": "boolean" },
+    "categories": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/category" }
+    },
+    "meta": { "$ref": "#/$defs/meta" },
+    "release_id": { "$ref": "#/$defs/hex64" },
+    "idempotence_hash": { "$ref": "#/$defs/hex64" },
+
+    "ok": { "type": "boolean", "const": false },
+    "code": { "type": "string", "minLength": 1 },
+    "error": { "type": "string", "minLength": 1 },
+    "retry_after_ms": { "type": "integer", "minimum": 0 }
+  },
+
+  "oneOf": [
+    {
+      "title": "success",
+      "required": ["reader_version","eligible","categories","meta","release_id","idempotence_hash"],
+      "not": { "required": ["ok"] }
+    },
+    {
+      "title": "error",
+      "required": ["ok","code","error"],
+      "properties": {
+        "ok": { "const": false }
+      }
+    }
+  ],
+
+  "$defs": {
+    "hex64": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "band": {
+      "type": "string",
+      "enum": ["Cool","Open","Warm","Glow"]
+    },
+    "category_id": {
+      "type": "string",
+      "enum": [
+        "open_leader",
+        "warm_leader",
+        "cool_leader",
+        "glow_leader"
+      ]
+    },
+    "category": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id","band"],
+      "properties": {
+        "id": { "$ref": "#/$defs/category_id" },
+        "band": { "$ref": "#/$defs/band" },
+        "prompt": {
+          "type": ["string","null"],
+          "maxLength": 160,
+          "pattern": "^[^\\r\\n]*$"
+        }
+      }
+    },
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["engine_tag","invocation_tag"],
+      "properties": {
+        "engine_tag": { "type": "string", "minLength": 1 },
+        "invocation_tag": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

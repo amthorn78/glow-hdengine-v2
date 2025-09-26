@@ -1,0 +1,12 @@
+{
+  "files": [
+    "schemas/reader.v1.schema.json",
+    "goldens/reader/v1/g01_minimal_ineligible.json",
+    "goldens/reader/v1/g03_open_leader.json",
+    "goldens/reader/v1/g04_warm_leader.json",
+    "goldens/reader/v1/g05_cool_leader.json",
+    "goldens/reader/v1/g06_error_invalid_input.json",
+    "goldens/reader/v1/g02_ab_ba_parity_A.jsonl",
+    "goldens/reader/v1/g02_ab_ba_parity_B.jsonl"
+  ]
+}
