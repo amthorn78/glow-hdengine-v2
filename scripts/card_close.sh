@@ -40,7 +40,7 @@ BUNDLE_MAN="${AUDIT_DIR}/${CARD}_source_bundle_${STAMP}_MANIFEST.json"
 PYTHON_BIN="${PYTHON_BIN:-python3}"
 
 "$PYTHON_BIN" - <<PY
-import os, json, time, zipfile, stat
+import os, json, time, zipfile, stat, sys
 root = os.getcwd()
 max_bytes = int(${MAX_MB}) * 1024 * 1024
 exclude_dirs = {'.git', '.venv', '__pycache__', '.pytest_cache'}
@@ -92,11 +92,21 @@ with open(r"${BUNDLE_MAN}", "w", encoding="utf-8") as mf:
         "files": sorted(entries, key=lambda e: e["path"])
     }, mf, ensure_ascii=False, indent=2)
 
-# Create zip
+# Create zip (ensures file is closed on exit)
 with zipfile.ZipFile(r"${BUNDLE_ZIP}", "w", compression=zipfile.ZIP_DEFLATED) as zf:
     for e in entries:
         zf.write(e["path"], arcname=e["path"])
 PY
+
+# 2.5) Barrier: wait for artifacts to exist and be non-empty (FS latency guard)
+for f in "$BUNDLE_ZIP" "$BUNDLE_MAN"; do
+  ok=0
+  for _ in {1..50}; do  # up to ~5s
+    [[ -s "$f" ]] && { ok=1; break; }
+    sleep 0.1
+  done
+  [[ $ok -eq 1 ]] || { echo "ERROR: expected artifact not created: $f" >&2; exit 1; }
+done
 
 # 3) Checksums
 CHK="${AUDIT_DIR}/${CARD}_artifacts_sha256_${STAMP}.txt"
@@ -121,7 +131,7 @@ CLOSE_MD="${AUDIT_DIR}/${CARD}_closeout_${STAMP}.md"
   echo "- Checksums: ${CHK}"
 } > "$CLOSE_MD"
 
-# Required lines for your workflow:
+# Required lines for your workflow (printed only after files are confirmed ready)
 echo "[closeout] ${CLOSE_MD}"
 echo "[bundle] ${BUNDLE_ZIP}"
 echo "[manifest] ${BUNDLE_MAN}"
