@@ -1,0 +1,255 @@
+from __future__ import annotations
+
+import json
+import logging
+import os
+import pathlib
+import tempfile
+from hashlib import sha256
+from typing import Optional
+
+from adapter.env_guard import EnvGuardError
+from engine.provider.base import Provider
+from engine.provider.fixtures import FixturesProvider
+from engine.provider.internal_engine import InternalEngineProvider
+from engine.provider.vendor_http import VendorHttpProvider
+
+
+# --- Canonical pins -----------------------------------------------------------
+DEFAULT_PROVIDER = "fixtures"
+_ALLOWED = {"fixtures", "internal_engine", "vendor_http"}
+
+# Decision write guard (one write per process)
+_decision_written = False
+_log = logging.getLogger("engine.provider")
+
+
+# --- Helpers -----------------------------------------------------------------
+def _is_prod() -> bool:
+    env = (os.environ.get("ENGINE_ENV") or os.environ.get("APP_ENV") or "").lower()
+    return env == "prod"
+
+
+def _secrets_dir() -> pathlib.Path:
+    """
+    Resolve the secrets directory. In non-prod, an explicit ENGINE_SECRETS_DIR
+    may be honored; in prod, its presence is a typed failure.
+    """
+    override = os.environ.get("ENGINE_SECRETS_DIR")
+    if override:
+        if _is_prod():
+            raise EnvGuardError(
+                "CANON_TOGGLES_OVERRIDE_IN_PROD",
+                "ENGINE_SECRETS_DIR is forbidden in prod",
+                {"var": "ENGINE_SECRETS_DIR"},
+            )
+        return pathlib.Path(override)
+    return pathlib.Path("secrets")
+
+
+def _secrets_path() -> pathlib.Path:
+    return _secrets_dir() / "provider.json"
+
+
+def _normalize_name(name: str) -> str:
+    return name.strip().lower()
+
+
+def _ensure_cid(correlation_id: Optional[str], seed: str) -> str:
+    """
+    Always provide a correlation id for resolve logs. Deterministic, no RNG.
+    """
+    if correlation_id:
+        return correlation_id
+    h = sha256(seed.encode("utf-8")).hexdigest()[:8]
+    return f"CID-{h}"
+
+
+def _atomic_write(path: pathlib.Path, data: bytes) -> None:
+    """
+    Write bytes atomically with perms 0600 and exactly one trailing LF preserved
+    by the caller. fsync file and directory. No import-time I/O – call from resolve().
+    """
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile(dir=path.parent, delete=False) as tmp:
+        tmp_path = pathlib.Path(tmp.name)
+        tmp.write(data)
+        tmp.flush()
+        os.fchmod(tmp.fileno(), 0o600)
+        os.fsync(tmp.fileno())
+    os.replace(tmp_path, path)
+    dir_fd = os.open(path.parent, os.O_DIRECTORY)
+    try:
+        os.fsync(dir_fd)
+    finally:
+        os.close(dir_fd)
+
+
+def _write_decision(name: str, source: str) -> None:
+    """Write decision artifact atomically; tolerate file deletion after first write."""
+    global _decision_written
+    d = pathlib.Path("artifacts/provider")
+    path = d / "decision.txt"
+    # If we wrote once but the file was removed later, write it again.
+    if _decision_written and path.exists():
+        return
+    content = f"provider={name} source={source}\n".encode("utf-8")
+    _atomic_write(path, content)
+    _decision_written = True
+
+
+# --- Public API ---------------------------------------------------------------
+def resolve_provider(correlation_id: Optional[str] = None) -> Provider:
+    """
+    Resolve and instantiate a provider with pinned precedence:
+      SECRETS -> ENV -> DEFAULT(fixtures).
+    Guards:
+      * Prod: any override (ENGINE_SECRETS_DIR or ENV) -> CANON_TOGGLES_OVERRIDE_IN_PROD
+      * SAFE_MODE: non-fixtures may refuse to construct (vendor/internal),
+                   vendor disallows network (call-time) even when constructed.
+    Logging:
+      keys-only JSON line with {route, provider|code, source, safe_mode, correlation_id}.
+    Lazy I/O: No file reads at import time; only inside this function.
+    """
+    name: Optional[str] = None
+    source = "default"
+
+    # 1) SECRETS
+    spath = _secrets_path()
+    if spath.exists():
+        try:
+            obj = json.loads(spath.read_text(encoding="utf-8"))
+            prov = obj.get("provider")
+            if not isinstance(prov, str) or not prov:
+                raise ValueError("missing 'provider'")
+            name, source = _normalize_name(prov), "secrets"
+        except Exception as e:
+            cid = _ensure_cid(correlation_id, "error:PROVIDER_MISCONFIGURED|secrets")
+            _log.info(
+                json.dumps(
+                    {
+                        "route": "provider.resolve.error",
+                        "code": "PROVIDER_MISCONFIGURED",
+                        "source": "secrets",
+                        "correlation_id": cid,
+                    }
+                )
+            )
+            raise EnvGuardError(
+                "PROVIDER_MISCONFIGURED",
+                "malformed secrets/provider.json",
+                {"source": "secrets", "path": str(spath), "error": str(e)},
+            )
+
+    # 2) ENV
+    if name is None:
+        env_val = os.environ.get("ENGINE_PROVIDER")
+        if env_val:
+            name, source = _normalize_name(env_val), "env"
+
+    # 3) DEFAULT
+    if name is None:
+        name, source = DEFAULT_PROVIDER, "default"
+
+    # Prod guard
+    if _is_prod() and source != "default":
+        cid = _ensure_cid(correlation_id, f"error:CANON_TOGGLES_OVERRIDE_IN_PROD|{source}")
+        _log.info(
+            json.dumps(
+                {
+                    "route": "provider.resolve.error",
+                    "code": "CANON_TOGGLES_OVERRIDE_IN_PROD",
+                    "source": source,
+                    "correlation_id": cid,
+                }
+            )
+        )
+        raise EnvGuardError(
+            "CANON_TOGGLES_OVERRIDE_IN_PROD",
+            f"provider override via {source} forbidden in prod",
+            {"source": source, "provider": name},
+        )
+
+    # Validate name
+    if name not in _ALLOWED:
+        cid = _ensure_cid(correlation_id, f"error:PROVIDER_MISCONFIGURED|{source}")
+        _log.info(
+            json.dumps(
+                {
+                    "route": "provider.resolve.error",
+                    "code": "PROVIDER_MISCONFIGURED",
+                    "source": source,
+                    "correlation_id": cid,
+                }
+            )
+        )
+        raise EnvGuardError(
+            "PROVIDER_MISCONFIGURED",
+            f"unknown provider '{name}'",
+            {"provider": name, "source": source},
+        )
+
+    # SAFE_MODE rails
+    safe_mode = os.environ.get("SAFE_MODE", "1") == "1"
+
+    # Construct
+    if name == "fixtures":
+        prov: Provider = FixturesProvider()
+    elif name == "internal_engine":
+        if safe_mode:
+            cid = _ensure_cid(correlation_id, "error:PROVIDER_UNAVAILABLE|internal_engine")
+            _log.info(
+                json.dumps(
+                    {
+                        "route": "provider.resolve.error",
+                        "code": "PROVIDER_UNAVAILABLE",
+                        "source": source,
+                        "correlation_id": cid,
+                    }
+                )
+            )
+            raise EnvGuardError(
+                "PROVIDER_UNAVAILABLE",
+                "internal_engine refused under SAFE_MODE",
+                {"safe_mode": True},
+            )
+        prov = InternalEngineProvider()
+    elif name == "vendor_http":
+        try:
+            prov = VendorHttpProvider(safe_mode=safe_mode)
+        except EnvGuardError as e:
+            cid = _ensure_cid(correlation_id, f"error:{getattr(e, 'code', 'ERR')}|vendor_http")
+            _log.info(
+                json.dumps(
+                    {
+                        "route": "provider.resolve.error",
+                        "code": getattr(e, "code", "ERR"),
+                        "source": source,
+                        "correlation_id": cid,
+                    }
+                )
+            )
+            raise
+    else:
+        # Defensive guard (should be unreachable)
+        raise EnvGuardError(
+            "PROVIDER_MISCONFIGURED",
+            f"unknown provider '{name}'",
+            {"provider": name},
+        )
+
+    # Success: write decision and log
+    _write_decision(name, source)
+    cid = _ensure_cid(correlation_id, f"{name}|{source}")
+    _log.info(
+        json.dumps(
+            {
+                "route": "provider.resolve",
+                "provider": name,
+                "source": source,
+                "safe_mode": safe_mode,
+                "correlation_id": cid,
+            }
+        )
+    )
+    return prov

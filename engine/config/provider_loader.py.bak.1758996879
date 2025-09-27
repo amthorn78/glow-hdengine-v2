@@ -1,0 +1,133 @@
+from __future__ import annotations
+import os, json
+from pathlib import Path
+from typing import Optional
+
+from adapter.env_guard import EnvGuardError
+from engine.provider.base import Provider
+from engine.provider.fixtures import FixturesProvider
+from engine.provider.internal_engine import InternalEngineProvider
+from engine.provider.vendor_http import VendorHttpProvider
+
+# Programmatic override (highest precedence; used by tests/tools if needed)
+_provider_override_name: Optional[str] = None
+_provider_override_source: Optional[str] = None
+
+
+def set_provider_override(name: str) -> None:
+    """Programmatic (highest) precedence for tests/tools."""
+    global _provider_override_name, _provider_override_source
+    _provider_override_name = name
+    _provider_override_source = "programmatic"
+
+
+def _is_prod() -> bool:
+    env = os.environ.get("ENGINE_ENV") or os.environ.get("APP_ENV") or ""
+    return env.lower() == "prod"
+
+
+def _secrets_dir() -> Path:
+    """Dev/test-only override via ENGINE_SECRETS_DIR; forbidden in prod."""
+    test_dir = os.environ.get("ENGINE_SECRETS_DIR")
+    if test_dir:
+        if _is_prod():
+            raise EnvGuardError(
+                "CANON_TOGGLES_OVERRIDE_IN_PROD",
+                "ENGINE_SECRETS_DIR is forbidden in prod",
+                {"var": "ENGINE_SECRETS_DIR"},
+            )
+        return Path(test_dir)
+    return Path("secrets")
+
+
+def _secrets_path() -> Path:
+    return _secrets_dir() / "provider.json"
+
+
+def _write_decision(name: str, source: str) -> None:
+    """
+    Idempotently write provider decision artifact at repo-root
+    artifacts/provider/decision.txt with exactly one trailing LF.
+    """
+    root = Path(__file__).resolve().parents[2]  # <repo root>
+    d = root / "artifacts" / "provider"
+    d.mkdir(parents=True, exist_ok=True)
+    f = d / "decision.txt"
+    if f.exists():
+        return
+    f.write_text(f"provider={name} source={source}\n", encoding="utf-8")
+
+
+def resolve_provider() -> Provider:
+    """
+    Resolve and instantiate the provider with pinned precedence:
+      programmatic -> secrets/provider.json -> ENGINE_PROVIDER env -> default(fixtures).
+
+    Guards:
+      - In prod: any non-default source fails with CANON_TOGGLES_OVERRIDE_IN_PROD.
+      - SAFE_MODE: vendor_http refuses to construct when SAFE_MODE=1.
+    Lazy I/O: no disk reads at import, only here.
+    """
+    name: Optional[str] = None
+    source: str = "default"
+
+    # 1) programmatic override
+    if _provider_override_name:
+        name = _provider_override_name
+        source = _provider_override_source or "programmatic"
+
+    # 2) secrets/provider.json
+    if name is None:
+        p = _secrets_path()
+        if p.exists():
+            try:
+                obj = json.loads(p.read_text(encoding="utf-8"))
+                prov = obj.get("provider")
+                if not isinstance(prov, str) or not prov:
+                    raise ValueError("missing 'provider'")
+                name, source = prov, "secrets"
+            except Exception as e:
+                raise EnvGuardError(
+                    "PROVIDER_MISCONFIGURED",
+                    "malformed secrets/provider.json",
+                    {"source": str(p), "error": str(e)},
+                )
+
+    # 3) ENGINE_PROVIDER env
+    if name is None:
+        env_val = os.environ.get("ENGINE_PROVIDER")
+        if env_val:
+            name, source = env_val, "env"
+
+    # 4) default
+    if name is None:
+        name, source = "fixtures", "default"
+
+    # Prod guard
+    if _is_prod() and source != "default":
+        raise EnvGuardError(
+            "CANON_TOGGLES_OVERRIDE_IN_PROD",
+            f"provider override via {source} forbidden in prod",
+            {"source": source, "provider": name},
+        )
+
+    # Normalize name for construct switch
+    name_norm = str(name).strip().lower()
+
+    # Construct (SAFE_MODE gate for vendor)
+    safe_mode = (os.environ.get("SAFE_MODE", "1") == "1")
+    if name_norm == "fixtures":
+        prov: Provider = FixturesProvider()
+    elif name_norm == "internal_engine":
+        prov = InternalEngineProvider()
+    elif name_norm == "vendor_http":
+        prov = VendorHttpProvider(safe_mode=safe_mode)
+    else:
+        raise EnvGuardError(
+            "PROVIDER_MISCONFIGURED",
+            f"unknown provider '{name}'",
+            {"provider": name},
+        )
+
+    _write_decision(name_norm, source)
+    return prov
