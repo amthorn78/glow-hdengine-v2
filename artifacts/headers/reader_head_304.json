@@ -1,5 +1,1 @@
-{
-  "ETag": "\"e7143dd3ec688727377e5311e077009829b4aa93ec08569ee5c450900e8eaa86\"",
-  "Cache-Control": "private, no-cache, must-revalidate",
-  "Vary": "Authorization, Accept-Encoding"
-}
+{"Cache-Control":"private, no-cache, must-revalidate","ETag":"\"e7143dd3ec688727377e5311e077009829b4aa93ec08569ee5c450900e8eaa86\"","Vary":"Authorization, Accept-Encoding"}

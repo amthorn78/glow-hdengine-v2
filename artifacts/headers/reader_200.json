@@ -1,7 +1,1 @@
-{
-  "ETag": "\"e7143dd3ec688727377e5311e077009829b4aa93ec08569ee5c450900e8eaa86\"",
-  "Cache-Control": "private, no-cache, must-revalidate",
-  "Vary": "Authorization, Accept-Encoding",
-  "Content-Type": "application/json; charset=utf-8",
-  "Content-Length": "282"
-}
+{"Cache-Control":"private, no-cache, must-revalidate","Content-Length":"282","Content-Type":"application/json; charset=utf-8","ETag":"\"e7143dd3ec688727377e5311e077009829b4aa93ec08569ee5c450900e8eaa86\"","Vary":"Authorization, Accept-Encoding"}
