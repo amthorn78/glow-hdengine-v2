@@ -6,4 +6,5 @@ def create_app():
     app.register_blueprint(reader_bp)
     return app
 
+# gunicorn/flask run will import "app"
 app = create_app()
