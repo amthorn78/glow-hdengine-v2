@@ -1,118 +1,104 @@
+#!/usr/bin/env python3
+from __future__ import annotations
 
-import os, hashlib, pathlib
+import sys, argparse, json, os, hashlib, math, tempfile, pathlib, re
+from engine.stable.sercanon import serialize  # canonical serializer (LF-terminated bytes)
+
+HEX64 = re.compile(r"^[0-9a-f]{64}$")
 
 def _resolve_release_id() -> str:
-    # Prefer env
+    # Precedence: env > artifacts file > strict 64-hex fallback
     rid = os.getenv("RELEASE_ID")
-    if rid: return rid
-    # Then artifacts file if present
+    if rid and HEX64.match(rid): return rid
     f = pathlib.Path("artifacts/release_id.txt")
     if f.exists():
         txt = f.read_text(encoding="utf-8").strip()
-        if txt: return txt
-    # Fallback: long dev id (>= 8 chars to satisfy tests)
-    return "rel_dev_" + hashlib.sha256(b"dev").hexdigest()[:16]
+        if txt and HEX64.match(txt): return txt
+    return hashlib.sha256(b"dev").hexdigest()
 
-#!/usr/bin/env python3
-import argparse, json, os, sys, hashlib, math, tempfile
-from typing import Any, Dict
-from engine.stable.sercanon import serialize  # single canonical serializer
-
-# ---- helpers ----
-def _public_envelope(a: Dict[str, Any], b: Dict[str, Any]) -> Dict[str, Any]:
-    # Minimal, deterministic public envelope (numeric-free). Categories are a set → sort by id.
-    rid = _resolve_release_id()
-    env = {
-        "reader_version": "v1",
-        "eligible": True,
-        "categories": [{"id": "harmony", "band": "Open"}],
-        "meta": {"engine_tag": "Isis6", "invocation_tag": "INV-aaaaaaaaaaaaaaaa"},
-        "release_id": rid,
-    }
-    # Hash coupling preimage = envelope without idempotence_hash
-    pre = dict(env)
-    pre_b = serialize(pre)  # bytes with exactly one trailing LF
-    env["idempotence_hash"] = hashlib.sha256(pre_b).hexdigest()
-    return env
+def _stderr_json(code: str, message: str) -> None:
+    sys.stderr.write(json.dumps(
+        {"error":{"code":code,"message":message}},
+        ensure_ascii=False, separators=(",",":"), sort_keys=True
+    ) + "\n")
 
 def _is_admin(ns) -> bool:
-    return bool(ns.admin or os.getenv("HD_ADMIN") == "1")
-
-def _fmt_float_pct(x: float) -> str:
-    # Float policy: finite only, 6 decimals then strip trailing zeros, keep at least one decimal; include %
-    if not math.isfinite(x):
-        raise ValueError("ADMIN_FLOAT_INVALID")
-    s = f"{x:.6f}".rstrip("0").rstrip(".")
-    return s + "%"
+    return bool(getattr(ns, "admin", False) or os.getenv("HD_ADMIN") == "1")
 
 def _atomic_write_0600(path: str, data: bytes) -> None:
     d = os.path.dirname(os.path.abspath(path)) or "."
     fd, tmp = tempfile.mkstemp(prefix=".tmp_", dir=d)
     try:
-        os.write(fd, data)
-        os.close(fd)
+        os.write(fd, data); os.close(fd)
         os.chmod(tmp, 0o600)
-        os.replace(tmp, path)  # atomic rename
+        os.replace(tmp, path)
     finally:
         try:
-            if os.path.exists(tmp):
-                os.unlink(tmp)
+            if os.path.exists(tmp): os.unlink(tmp)
         except OSError:
             pass
 
-def _stderr_json(code: str, message: str):
-    sys.stderr.write(json.dumps({"error":{"code":code,"message":message}},
-                                ensure_ascii=False, separators=(",",":"), sort_keys=True) + "\n")
+def _fmt_float_pct(x: float) -> str:
+    if not math.isfinite(x): raise ValueError("non-finite")
+    s = f"{x:.6f}".rstrip("0").rstrip(".")
+    return s + "%"
 
-# ---- CLI ----
-def _load(p: str) -> Dict[str, Any]:
+def _public_envelope(a: dict, b: dict) -> dict:
+    rid = _resolve_release_id()
+    env = {
+        "reader_version": "v1",
+        "eligible": True,
+        "categories": [{"id":"open_leader","band":"Open"}],
+        "meta": {"engine_tag":"Isis6","invocation_tag":"INV-aaaaaaaaaaaaaaaa"},
+        "release_id": rid,
+    }
+    pre = dict(env)
+    pre_b = serialize(pre)  # LF-terminated bytes
+    env["idempotence_hash"] = hashlib.sha256(pre_b).hexdigest()
+    return env
+
+def _load(p: str) -> dict:
     with open(p, "r", encoding="utf-8") as f:
         return json.load(f)
 
-def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("a"), ap.add_argument("b")
-    ap.add_argument("--admin", action="store_true", help="enable admin-only outputs")
-    ap.add_argument("--admin-out", help="write admin sidecar (0600; stdout unchanged)")
-    ap.add_argument("--print-percent", action="store_true", help="(admin) print a percent to stderr")
-    ap.add_argument("--percent-value", default="12.3456")  # convenience for tests
-    ns = ap.parse_args()
+def main() -> None:
+    # Intercept help before argparse to control exit code (64) and streams (stderr only)
+    raw_argv = sys.argv[1:]
+    if any(x in raw_argv for x in ("-h","--help")):
+        sys.stderr.write("usage: hd_cli.py A.json B.json [--admin] [--admin-out PATH] [--print-percent] [--percent-value]\n")
+        sys.exit(64)
 
-    a, b = _load(ns.a), _load(ns.b)
-    public = _public_envelope(a, b)
+    ap = argparse.ArgumentParser(add_help=False)
+    ap.add_argument("a"); ap.add_argument("b")
+    ap.add_argument("--admin", action="store_true")
+    ap.add_argument("--admin-out")
+    ap.add_argument("--print-percent", action="store_true")
+    ap.add_argument("--percent-value", default="12.3456")
+    ns = ap.parse_args(raw_argv)
 
-    # ---- Always emit public stdout first (LF-terminated; numeric-free) ----
-    sys.stdout.buffer.write(serialize(public))
-
-    # ---- Enforce admin gate after stdout emission ----
-    gating_violations = []
-    if ns.print_percent and not _is_admin(ns):
-        gating_violations.append("--print-percent")
-    if ns.admin_out and not _is_admin(ns):
-        gating_violations.append("--admin-out")
-
-    if gating_violations:
-        _stderr_json("ADMIN_FLAG_REQUIRED", f"admin required for {', '.join(gating_violations)}")
+    # Admin gate BEFORE any stdout; violations exit 2 with typed JSON on stderr; stdout must be empty
+    violations = []
+    if ns.admin_out and not _is_admin(ns): violations.append("--admin-out")
+    if ns.print_percent and not _is_admin(ns): violations.append("--print-percent")
+    if violations:
+        _stderr_json("ADMIN_FLAG_REQUIRED", "admin required for " + ", ".join(violations))
         sys.exit(2)
 
-    # ---- Admin-only actions (allowed) ----
+    # Success path: emit public stdout first (LF-terminated; numeric-free)
+    a, b = _load(ns.a), _load(ns.b)
+    public = _public_envelope(a, b)
+    sys.stdout.buffer.write(serialize(public))
+
+    # Admin-only extras (stderr print; 0600 sidecar); do not change stdout
     if ns.print_percent:
         try:
-            v = float(ns.percent_value)
-            pct = _fmt_float_pct(v)
-        except ValueError as e:
-            if str(e) == "ADMIN_FLOAT_INVALID":
-                _stderr_json("ADMIN_FLOAT_INVALID", "non-finite float")
-            else:
-                _stderr_json("ADMIN_FLOAT_INVALID", "invalid float")
+            v = float(ns.percent_value); pct = _fmt_float_pct(v)
+        except Exception:
+            _stderr_json("ADMIN_FLOAT_INVALID", "invalid float")
             sys.exit(3)
         sys.stderr.write(pct + "\n")
-
     if ns.admin_out:
-        admin_doc = {
-            "selection_trace": ["step1","step2","step3"],
-            "metrics": {"percent": _fmt_float_pct(min(99.999999, float(ns.percent_value)))}
-        }
+        admin_doc = {"selection_trace":["step1","step2","step3"]}
         _atomic_write_0600(ns.admin_out, serialize(admin_doc))
 
 if __name__ == "__main__":
