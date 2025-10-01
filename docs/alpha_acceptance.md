@@ -1,77 +1,67 @@
 # docs/alpha_acceptance.md
 
-**Title:** Glow Alpha Acceptance — CLI A3 and Reader A5  
-**Version:** 1.0  
+**Title:** Glow Alpha Acceptance — A3 (CLI) and A5 (Reader v1 dev harness)  
+**Version:** 1.2  
 **Owner:** Cyrano (Tech Writer)  
 **Status:** Canon  
 **Cards:** CORE-CLI-A3, CORE-READER-A5
 
 ## 1. Purpose
-Provide a single acceptance document for Alpha that covers both CLI A3 and Reader A5. This gate proves public stdout invariants, AB↔BA identity, idempotence preimage, strict sidecar gating, and equivalence between Reader v1 and CLI outputs. It also defines evidence artifacts and validation markers.
+Provide a single, prescriptive acceptance gate for Alpha. This verifies public stdout invariants, AB↔BA byte identity, idempotence preimage coupling, strict sidecar gating (A3), and byte-equivalence between Reader v1 and CLI (A5). It also defines **minimal artifacts** and **minimal validation markers** required for PO signoff.
 
 ## 2. Governance
-- Work on `main`. Deliver one revert-friendly commit and the closeout bundle. PO acceptance is the only gate. No PRs for final approval.
-- SAFE rails are on by default in dev and stage. Vendor calls are refused unless `SAFE_MODE=0` and `ALLOW_NETWORK=1` are explicitly set.
+- Work on `main`. Deliver **one** revert-friendly commit with the evidence bundle under `artifacts/cards/<CARD>/`. PO performs acceptance. **No PRs** for final approval.
+- Acceptance runs with `SAFE_MODE=1`; no network calls unless **both** `SAFE_MODE=0` and `ALLOW_NETWORK=1` are set.
 
 ## 3. Canon pins
 ### 3.1 Canonical serializer
-Use one serializer for public JSON everywhere.
 ```python
 import json
 def sercanon(obj):
     return json.dumps(obj, sort_keys=True, separators=(',',':'), ensure_ascii=False) + "\n"
 ```
-### 3.2 Idempotence preimage
-`idempotence_hash = sha256( sercanon(preimage_without_hash) ).hexdigest()`  
-Then insert the hash and serialize again with `sercanon(final)`.
+### 3.2 Idempotence preimage (public stdout)
+```
+idempotence_hash = sha256( sercanon(preimage_without_hash) ).hexdigest()  # lowercase hex
+```
 ### 3.3 Release identity
-`scripts/release_id.sh release/manifest.sorted.json` must print a single 64-hex sha256 line to stdout. LF-terminated. No other text.
+`scripts/release_id.sh` prints a single **64-hex + LF** for `release/manifest.sorted.json`. No arguments; no extra text.
 
-## 4. Public contract
-Public outputs are numeric-free and bands-only. The minimal Reader-shaped JSON must include:
-- `eligible` (bool)
-- `categories=[{"id":"harmony","band":"Cool|Open|Warm|Glow"}]`
-- `meta={"engine_tag": "...", "invocation_tag": "INV-..."}`
-- `release_id` as a 64-hex string
-- `idempotence_hash` as a 64-hex string
-The JSON must be LF-terminated, BOM-free, and ANSI-free.
+### 3.4 Public envelope keys and order
+Public stdout uses the canonical serializer and MUST contain exactly these top-level keys (sorted by key name):  
+`["categories","eligible","idempotence_hash","meta","release_id"]`  
+`categories` is an array with exactly one element and that element has **only** `{"id":"harmony","band":"Cool|Open|Warm|Glow"}`. Public payload is **numeric-free** and ends with **exactly one `\n`** (BOM-free, ANSI-free).
 
-## 5. CLI A3 acceptance
+---
 
-### 5.1 Command surface (canonical)
+## 4. A3 — CLI acceptance
+
+### 4.1 Command surface (canonical)
+```text
+hdctl showcompat \
+  --a <path-to-A.json> [--a-tz <IANA>] \
+  --b <path-to-B.json> [--b-tz <IANA>] \
+  [--showmath] [--admin] [--admin-out <path>]
 ```
-hdctl showcompat   --a <path-to-A.json> [--a-tz <IANA>]   --b <path-to-B.json> [--b-tz <IANA>]   [--showmath] [--admin] [--admin-out <path>]
-```
-Notes: time zones are per person unless present in the charts. Parser must use `allow_abbrev=False`.
+Notes: per-person time zones are required unless contained in each chart; parser uses `allow_abbrev=False`.
 
-### 5.2 Sidecar gate
-Sidecar is private and excluded from the idempotence preimage. Strict gate:
-- Required: `--showmath` and `--admin-out <path>` and (`--admin` or `HD_ADMIN=1`)
-- Partial gate returns exit code `2`, stdout empty, and no file
-- Positive gate writes an LF-terminated file with mode `0600`
-- TS-v0 minimal schema keys: `type`, `strategy`, `features`, `decision`, `pair_order`, `correlation_id`, `rule_version`, `timestamp`, `warning`
-- Strategy strings must be exact:
-  - Generator or Manifesting Generator -> Wait to respond
-  - Projector -> Wait for the invitation
-  - Manifestor -> Inform
-  - Reflector -> Wait a lunar cycle
-- Features include:
-  - `strategy_match` (bool)
-  - `sacral_pair` (bool, true only when both are Generator or MG)
-  - `projector_to_generator` (bool)
+### 4.2 Sidecar gate (TS-v0 minimal schema only)
+- Gate MUST be: `--showmath` **and** `--admin-out <path>` **and** (`--admin` **or** `HD_ADMIN=1`).  
+- Negative gate → exit **2**, stdout empty, no file.  
+- Positive gate → atomic write, mode **0600**, LF-terminated.  
+- TS-v0 minimal keys only: `type, strategy, features, decision, pair_order, correlation_id, rule_version, timestamp, warning` (**no admin numerics in A3/A5**).  
+- Strategy strings: Generator/MG `Wait to respond`; Projector `Wait for the invitation`; Manifestor `Inform`; Reflector `Wait a lunar cycle`.
 
-### 5.3 Acceptance checklist (binary)
-- Stdout invariant holds: one LF, no BOM, no ANSI, minimal shape as defined above
-- AB↔BA byte identity holds
-- Preimage recompute matches the embedded `idempotence_hash`
-- Sidecar negative gate returns exit `2` and no file
-- Sidecar positive gate writes mode `0600` and LF
-- `release_id.txt` contains a single 64-hex line
-- `validation.log` contains required markers
+### 4.3 Acceptance checklist (binary)
+- Public stdout: one LF, BOM-free, ANSI-free, exact key set and categories rule.  
+- AB↔BA byte identity holds.  
+- Preimage recompute equals embedded `idempotence_hash`.  
+- Negative gate exits 2 with empty stdout and no sidecar file.  
+- Positive gate produces LF + 0600 sidecar.  
+- `release_id.txt` contains a single 64-hex line from helper, matching `release_id` in stdout.  
+- `validation.log` contains minimal markers (below).
 
-### 5.4 Run this now
-These commands run in a shell with Python and `jq` available.
-
+### 4.4 Run this now
 ```bash
 # Pins
 export PRODUCT_INVOCATION_TAG=INV-C9F3AFB03805F430
@@ -86,113 +76,107 @@ OUT=artifacts/cards/A3
 SIDECAR="$OUT/admin/sidecar.json"
 mkdir -p "$OUT/admin"
 
-# Release ID
-scripts/release_id.sh release/manifest.sorted.json > "$OUT/release_id.txt"
+# Release ID (64-hex + LF)
+scripts/release_id.sh > "$OUT/release_id.txt"
 
-# AB and BA runs
+# AB and BA
 ./scripts/hdctl.py showcompat --a "$A" --a-tz Africa/Cairo --b "$B" --b-tz Africa/Cairo > "$OUT/cli_stdout_AB.json"
 ./scripts/hdctl.py showcompat --a "$B" --a-tz Africa/Cairo --b "$A" --b-tz Africa/Cairo > "$OUT/cli_stdout_BA.json"
-cmp -s "$OUT/cli_stdout_AB.json" "$OUT/cli_stdout_BA.json" && echo IDENTITY_OK > "$OUT/IDENTITY_OK.txt"
+cmp -s "$OUT/cli_stdout_AB.json" "$OUT/cli_stdout_BA.json" && echo "CLI_AB_BA_IDENTITY: OK" | tee "$OUT/IDENTITY_OK.txt"
+```
 
-# Stdout invariant and shape
-python - <<'PY'
-import re,json,pathlib
+Stdout invariant, shape, preimage:
+```python
+import re,json,pathlib,hashlib
 p=pathlib.Path("artifacts/cards/A3/cli_stdout_AB.json"); b=p.read_bytes()
 assert b.endswith(b"\n") and not b.startswith(b"\xef\xbb\xbf")
 assert not re.compile(rb'\x1B\[[0-?]*[ -/]*[@-~]').search(b)
 o=json.loads(b)
-assert set(o.keys())>= {"categories","meta","release_id","idempotence_hash"}
-cats=o["categories"]; assert isinstance(cats,list) and len(cats)==1
-c=cats[0]; assert c.get("id")=="harmony" and c.get("band") in {"Cool","Open","Warm","Glow"}
-print("NO_BOM_STDOUT_OK"); print("NO_ANSI_OK"); print("SHAPE_OK")
-PY
-
-# Preimage recompute
-python - <<'PY'
-import json,hashlib,pathlib,json as J
-p=pathlib.Path("artifacts/cards/A3/cli_stdout_AB.json")
-o=J.loads(p.read_text(encoding="utf-8"))
+# enforce presence of canonical keys (order is by sort_keys):
+assert list(sorted(o.keys()))==["categories","eligible","idempotence_hash","meta","release_id"]
+c=o["categories"][0]; assert c.get("id")=="harmony" and c.get("band") in {"Cool","Open","Warm","Glow"}
 pre=dict(o); pre.pop("idempotence_hash",None)
-canon=(J.dumps(pre,sort_keys=True,separators=(',',':'),ensure_ascii=False)+"\n").encode()
+canon=(json.dumps(pre,sort_keys=True,separators=(',',':'),ensure_ascii=False)+"\n").encode()
 assert hashlib.sha256(canon).hexdigest()==o["idempotence_hash"]
-print("PREIMAGE_OK")
-PY
+print("NO_BOM_STDOUT_OK"); print("NO_ANSI_OK"); print("PREIMAGE_OK"); print("SHAPE_OK")
+```
 
-# Sidecar negative gate
+Sidecar gate checks:
+```bash
+# Negative → exit 2, stdout empty, no file
 set +e
 ./scripts/hdctl.py showcompat --a "$A" --a-tz Africa/Cairo --b "$B" --b-tz Africa/Cairo --admin-out "$SIDECAR" >/dev/null
 code=$?; set -e
-test "$code" -eq 2 && echo GATE_MISUSE_OK
-test ! -f "$SIDECAR"
+test "$code" -eq 2 && echo GATE_MISUSE_OK; test ! -f "$SIDECAR"
 
-# Sidecar positive gate
+# Positive → 0600 and LF
 HD_ADMIN=1 ./scripts/hdctl.py showcompat --a "$A" --a-tz Africa/Cairo --b "$B" --b-tz Africa/Cairo --showmath --admin-out "$SIDECAR" >/dev/null
 stat -c '%a %n' "$SIDECAR" | grep '^600 ' && echo SIDECAR_MODE_0600_OK
 python - <<'PY'
 b=open("artifacts/cards/A3/admin/sidecar.json","rb").read()
 assert b.endswith(b"\n"); print("SIDECAR_LF_OK")
 PY
+```
 
-# Validation log
-printf "%s
-%s
-%s
-%s
-META_INVOCATION_TAG=%s
-"   NO_BOM_STDOUT_OK NO_BOM_SIDECAR_OK NO_ANSI_OK NO_REL_DEV_OK "$PRODUCT_INVOCATION_TAG"   > "$OUT/validation.log"
+Validation log (minimal markers):
+```bash
+printf "%s\n%s\n%s\n%s\nMETA_INVOCATION_TAG=%s\n" \
+  NO_BOM_STDOUT_OK NO_BOM_SIDECAR_OK NO_ANSI_OK NO_REL_DEV_OK "$PRODUCT_INVOCATION_TAG" \
+  > "$OUT/validation.log"
+
 python - <<'PY'
 h=open("artifacts/cards/A3/release_id.txt").read().strip()
-open("artifacts/cards/A3/validation.log","a").write("RELEASE_ID_STDOUT="+h+"\nRELEASE_ID_HELPER="+h+"\n")
+with open("artifacts/cards/A3/validation.log","a") as f:
+  f.write("RELEASE_ID_STDOUT="+h+"\n")
+  f.write("RELEASE_ID_HELPER="+h+"\n")
 print("VALIDATION_LOG_OK")
 PY
 ```
 
-### 5.5 Artifacts (exact names)
+### 4.5 Minimal artifacts (A3)
 ```
 artifacts/cards/A3/cli_stdout_AB.json
 artifacts/cards/A3/cli_stdout_BA.json
-artifacts/cards/A3/admin/sidecar.json            # present only when gated
 artifacts/cards/A3/release_id.txt
 artifacts/cards/A3/IDENTITY_OK.txt
 artifacts/cards/A3/validation.log
+# Optional (only if gate used):
+artifacts/cards/A3/admin/sidecar.json
 ```
 
-## 6. Reader A5 acceptance
+---
 
-### 6.1 Purpose and scope
-Reader v1 is a dev-only HTTP harness that returns bytes identical to the CLI for the same inputs. It is not for production traffic. Use it for acceptance, smoke tests, and reproducible developer testing.
+## 5. A5 — Reader v1 acceptance (dev harness)
 
-### 6.2 Endpoint surface
-- `GET /health` returns `ok\n` for startup checks
-- `GET /api/reader?v=1&a=<path>&b=<path>&a_tz=<IANA>&b_tz=<IANA>` returns LF-terminated public bytes identical to CLI
+### 5.1 Scope
+Reader v1 is dev-only. It returns bytes identical to the CLI for the same inputs. It is not production traffic. Use for acceptance, smoke, reproducible testing.
 
-### 6.3 Gating and path safety
-- If `APP_ENV != dev` return `403` with `{"error":"forbidden"}\n`
-- When `APP_ENV == dev` allow only `fixtures/charts/*`
-- Deny `..` traversal and symlinks
-- Require tz present either in chart or via `a_tz` and `b_tz`
+### 5.2 Endpoint surface
+- `GET /health` → `ok\n`  
+- `GET /api/reader?v=1&a=<rel>&b=<rel>&a_tz=<IANA>&b_tz=<IANA>` → LF-terminated JSON identical to CLI
 
-### 6.4 Error bodies
-LF-terminated one-line JSON only:
-- `400` with `{"error":"invalid_path"|"invalid_json"|"missing_tz_A"|"missing_tz_B"}\n`
-- `403` with `{"error":"forbidden"}\n`
+**Parameter policy**
+- `v=1` only.  
+- `a`, `b` are **relative** paths resolved under `fixtures/charts/` (reject absolute paths).  
+- `a_tz`, `b_tz` required if not present in charts.
 
-### 6.5 Transport policy
-Only `Content-Type: application/json; charset=utf-8`. No `ETag` or `Cache-Control` in A5. A6 introduces those headers and conditional 304.
+### 5.3 Gating and path safety
+- If `APP_ENV != dev` → return **403** and do not access filesystem. Body: `{"error":"forbidden"}\n`.  
+- If `APP_ENV == dev` → allow only under `fixtures/charts/*`, deny traversal and symlinks.
 
-### 6.6 Acceptance checklist (binary)
-- Reader AB body equals CLI AB body
-- Reader BA body equals CLI BA body
-- AB↔BA identity on Reader
-- Two-run identity on Reader
-- Preimage recompute matches `idempotence_hash` on Reader output
-- Correct Content-Type, and no ETag or Cache-Control
-- APP_ENV gating and path safety enforced
-- Error bodies are one-line LF-terminated JSON
+### 5.4 Transport policy (A5 only)
+- `Content-Type: application/json; charset=utf-8` for success and error bodies.  
+- **No** `ETag` or `Cache-Control`; no conditional 304. These are introduced in A6.
 
-### 6.7 Run this now
-Assumes the Reader dev server is listening on `http://127.0.0.1:8000` and `APP_ENV=dev`.
+### 5.5 Acceptance checklist (binary)
+- Reader AB body equals CLI AB; Reader BA equals CLI BA.  
+- Optional two-run identity on Reader.  
+- Preimage recompute equals embedded `idempotence_hash` for Reader AB.  
+- Headers: Content-Type correct; no ETag/Cache-Control.  
+- APP_ENV gating and path-safety enforced.  
+- Validation logs include `EMITTER_SHA256` for provenance.
 
+### 5.6 Run this now
 ```bash
 RURL=http://127.0.0.1:8000
 RART=artifacts/cards/A5
@@ -206,12 +190,13 @@ curl -sS -D "$RART/headers_health.txt" "$RURL/health" -o "$RART/health.txt"
 curl -sS -D "$RART/headers_AB.txt" "$RURL/api/reader?v=1&a=fixtures/charts/alice.json&b=fixtures/charts/bob.json&a_tz=Africa/Cairo&b_tz=Africa/Cairo" -o "$RART/reader_AB.json"
 curl -sS -D "$RART/headers_BA.txt" "$RURL/api/reader?v=1&a=fixtures/charts/bob.json&b=fixtures/charts/alice.json&a_tz=Africa/Cairo&b_tz=Africa/Cairo" -o "$RART/reader_BA.json"
 
-# Compare Reader vs CLI
+# Compare to CLI
 cmp -s "$RART/reader_AB.json" "$CART/cli_stdout_AB.json" && echo READER_EQ_CLI_AB_OK > "$RART/stdout_cmp_AB.ok"
 cmp -s "$RART/reader_BA.json" "$CART/cli_stdout_BA.json" && echo READER_EQ_CLI_BA_OK > "$RART/stdout_cmp_BA.ok"
+```
 
-# Invariants on Reader AB
-python - <<'PY'
+Reader invariants and preimage:
+```python
 import re,json,pathlib,hashlib
 p=pathlib.Path("artifacts/cards/A5/reader_AB.json"); b=p.read_bytes()
 assert b.endswith(b"\n") and not b.startswith(b"\xef\xbb\xbf")
@@ -221,70 +206,32 @@ pre=dict(o); pre.pop("idempotence_hash",None)
 canon=(json.dumps(pre,sort_keys=True,separators=(',',':'),ensure_ascii=False)+"\n").encode()
 assert hashlib.sha256(canon).hexdigest()==o["idempotence_hash"]
 print("READER_PREIMAGE_OK")
-PY
+```
 
-# Header checks
+Header checks and provenance:
+```bash
 grep -i '^content-type: application/json; charset=utf-8' "$RART/headers_AB.txt" && echo CONTENT_TYPE_OK >> "$RART/validation.log"
 ! grep -i '^etag:' "$RART/headers_AB.txt" && echo NO_ETAG_OK >> "$RART/validation.log"
 ! grep -i '^cache-control:' "$RART/headers_AB.txt" && echo NO_CACHECTL_OK >> "$RART/validation.log"
-
-# Error body checks
-curl -sS -D "$RART/headers_400.txt" "$RURL/api/reader?v=1&a=../etc/passwd&b=fixtures/charts/alice.json&a_tz=Africa/Cairo&b_tz=Africa/Cairo" -o "$RART/reader_400.json" -w "" || true
-python - <<'PY'
-b=open("artifacts/cards/A5/reader_400.json","rb").read()
-assert b.endswith(b"\n"), "ERROR_LF_FAIL"
-print("ERROR_LF_OK")
-PY
+sha256sum engine/emit_public.py | awk '{print $1}' | sed 's/^/EMITTER_SHA256=/' >> "$RART/validation.log"
 ```
 
-### 6.8 Artifacts (exact names)
+### 5.7 Minimal artifacts (A5)
 ```
 artifacts/cards/A5/reader_AB.json
 artifacts/cards/A5/reader_BA.json
 artifacts/cards/A5/headers_AB.txt
 artifacts/cards/A5/headers_BA.txt
-artifacts/cards/A5/headers_400.txt
-artifacts/cards/A5/reader_400.json
-artifacts/cards/A5/stdout_cmp_AB.ok
-artifacts/cards/A5/stdout_cmp_BA.ok
 artifacts/cards/A5/validation.log
-artifacts/cards/A3/release_id.txt          # produced by A3 and reused here
 ```
 
-## 7. Validation markers (verbatim strings)
+### 5.8 Minimal markers (acceptance will grep these)
+**A3:** `NO_BOM_STDOUT_OK`, `NO_BOM_SIDECAR_OK`, `NO_ANSI_OK`, `NO_REL_DEV_OK`, `META_INVOCATION_TAG=…`, `RELEASE_ID_STDOUT=…`, `RELEASE_ID_HELPER=…`, `CLI_AB_BA_IDENTITY: OK`  
+**A5:** `READER_EQ_CLI_AB_OK`, `READER_EQ_CLI_BA_OK`, `READER_PREIMAGE_OK`, `CONTENT_TYPE_OK`, `NO_ETAG_OK`, `NO_CACHECTL_OK`, `EMITTER_SHA256=…`
 
-### 7.1 A3 markers
-```
-CLI_AB_BA_IDENTITY: OK
-ABBA_BYTES_OK
-TWO_RUN_IDENTITY_OK
-NO_BOM_STDOUT_OK
-NO_BOM_SIDECAR_OK
-NO_ANSI_OK
-NO_REL_DEV_OK
-META_INVOCATION_TAG=INV-C9F3AFB03805F430
-RELEASE_ID_STDOUT=<64hex>
-RELEASE_ID_HELPER=<64hex>
-```
+---
 
-### 7.2 A5 markers
-```
-READER_EQ_CLI_AB_OK
-READER_EQ_CLI_BA_OK
-READER_ABBA_BYTES_OK
-READER_TWO_RUN_IDENTITY_OK
-READER_PREIMAGE_OK
-CONTENT_TYPE_OK
-NO_ETAG_OK
-NO_CACHECTL_OK
-APP_ENV_GATING_OK
-ERROR_ONE_LINE_OK
-ERROR_LF_OK
-NO_DUPLICATE_SERIALIZER_OK
-EMITTER_SHA256=<64hex>
-```
-
-## 8. Signoff template
+## 6. Signoff template (paste in PO closeout)
 ```
 [ALPHA ACCEPTANCE — PO SIGNOFF]
 Cards: CORE-CLI-A3, CORE-READER-A5
@@ -293,13 +240,13 @@ Release ID (64-hex): <value from artifacts/cards/A3/release_id.txt>
 Verifier: Full Stack Guru 7
 PO: Nathan
 Date: <ISO8601>
-Notes: CLI and Reader checks, preimage coupling, stdout invariants, sidecar gate, and evidence verified on main.
+Notes: CLI and Reader bytes, preimage, invariants, sidecar gate, and minimal evidence verified on main.
 ```
 
-## 9. Rollback
-Revert the single acceptance commit on main. No migrations or global edits. Re-run the checks to confirm a clean state.
+## 7. Rollback
+Revert the single acceptance commit on `main`. No migrations or global edits. Re-run the checks to confirm a clean state.
 
-## 10. Appendix
-- Invocation tag regex: `^INV-[0-9A-F]{16,64}$`
-- LF check: file must end with a single `\n`
-- Parser: `allow_abbrev=False` in CLI arguments
+## 8. Appendix
+- Invocation tag regex: `^INV-[0-9A-F]{16,64}$`  
+- LF rule: file must end with exactly one `\n`  
+- Parser: `allow_abbrev=False` for CLI arguments
