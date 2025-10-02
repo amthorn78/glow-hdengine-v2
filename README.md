@@ -1,191 +1,208 @@
-# Glow HD Engine — README
+Glow HD Engine — README
 
-**Version:** 1.0  
-**Status:** Active (Alpha A3–A5 scope; A6 doc deltas in progress)  
-**Owner:** Product Owner (PO) — Nathan  
-**Gatekeeper:** Isis (Head Dev — AI session)  
-**Lead Dev:** Full Stack Guru (AI session)
+Version: 2.0
+Status: Active (Alpha A3–A5 body; A7 transport adopted)
+Owner: Product Owner (PO) — Nathan
+Gatekeeper: Isis (Head Dev — AI session)
+Lead Dev: Full Stack Guru (AI session)  
 
----
-
-## Human/AI Disclosure (Fire compliance)
-
-All roles named here — except the **Product Owner** — are **AI-operated ChatGPT sessions**, not human persons.
-
-- **Only human participant:** Product Owner (PO) — Nathan.  
-- **All other roles are AI sessions:** “Isis,” “Full Stack Guru,” “Cyrano,” “HD Coder,” “QA,” etc. These are labels for ChatGPT sessions performing scoped tasks under PO direction.  
-- **Authority & approvals:** Approvals and signoffs are performed only by the PO. AI “signoff” lines are advisory and must be recorded by the PO to be effective.
 
 ---
 
-## What this is
+Human/AI disclosure (Fire compliance)
 
-Glow HD Engine produces a **minimal, numeric‑free public envelope** used by the SPA to display **Bands** for “harmony” and (optionally) a short **Aux Narrative**. In Alpha:
+Only human with agency: Product Owner (PO) — Nathan.
 
-- Public JSON is **bands‑only**, free of HD jargon.  
-- Determinism is enforced via a **canonical serializer**, **one trailing LF**, an **idempotence preimage** hash, and **AB↔BA parity**.  
-- **Reader v1** is a **dev harness** that reproduces the CLI public bytes for acceptance and smoke tests.
+All other roles are AI sessions: “Isis,” “Full Stack Guru,” “Cyrano,” “HD Coder,” “QA,” etc. These are ChatGPT sessions operating under PO direction.
 
-> Canonical source for engine/public contract: **HD Engine Math & Tech Spec v4.1.6** (serializer, keys, categories rule, preimage, parity).
+Authority & approvals: Only the PO’s signoffs are binding. AI “signoff” lines are advisory until recorded by the PO.
 
----
 
-## Canonical & repo docs
-
-- **Canon**: *HD Engine Math & Tech Spec v4.1.6* (single source of truth for public contract & math).  
-- **Repo playbooks** (implementation guides):
-  - `docs/CLI_commands.md` — CLI surface, idempotence, sidecar gate, artifacts, quick checks.  
-  - `docs/server/reader_v1.md` — Reader v1 dev harness (A5), APP_ENV gating, error tokens, **A5 transport guard**.  
-  - `docs/architecture/emitters.md` — **Single emitter canon** (`engine/emit_public.py`) & provenance.  
-  - `docs/alpha_acceptance.md` — A3 + A5 acceptance (minimal markers & artifacts).  
-  - `CHANGELOG.md` — doc updates summary.
-
-> Deprecated: *Glow HD Engine Architecture & Design v4* (do not reference).
 
 ---
 
-## Quick start (local/dev)
+What this is
 
-> Assumes Python is available. Use a virtualenv if preferred.
+Glow HD Engine produces a minimal, numeric-free public envelope used by the SPA to display Bands for harmony, and (optionally) a short Aux Narrative. In Alpha:
 
-```bash
-# 1) Create fixtures
-mkdir -p fixtures/charts
-# Place your two charts as JSON dicts:
-#   fixtures/charts/alice.json
-#   fixtures/charts/bob.json
+Public JSON is bands-only, free of HD jargon.
 
-# 2) Environment pins (Alpha acceptance posture)
-export SAFE_MODE=1
-export PRODUCT_INVOCATION_TAG=INV-C9F3AFB03805F430
-export ENGINE_TAG=hdengine-alpha
+Determinism is enforced via a canonical serializer, exactly one trailing LF, idempotence preimage hash, and AB↔BA parity.
 
-# 3) CLI: produce public bytes (AB/BA)
-OUT=artifacts/cards/A3
-mkdir -p "$OUT"
-./scripts/hdctl.py showcompat --a fixtures/charts/alice.json --a-tz Africa/Cairo \
-                              --b fixtures/charts/bob.json   --b-tz Africa/Cairo > "$OUT/cli_stdout_AB.json"
-./scripts/hdctl.py showcompat --a fixtures/charts/bob.json   --a-tz Africa/Cairo \
-                              --b fixtures/charts/alice.json --b-tz Africa/Cairo > "$OUT/cli_stdout_BA.json"
-cmp -s "$OUT/cli_stdout_AB.json" "$OUT/cli_stdout_BA.json" && echo "CLI_AB_BA_IDENTITY: OK"
-```
+Reader v1 is a developer harness that returns the same bytes as the CLI for the same inputs.
 
-**What to expect**  
-- LF‑terminated JSON, **no BOM**, **no ANSI**.  
-- Top‑level keys (sorted): `categories`, `eligible`, `idempotence_hash`, `meta`, `release_id`.  
-- `categories` contains one item: `{"id":"harmony","band":"Cool|Open|Warm|Glow"}`.
+A7 transport is adopted (strong quoted ETag, conditional GET/304, HEAD parity, compression invariance). Transport rules live outside this README (see “Sources of truth”).
+
+
 
 ---
 
-## Reader v1 (dev harness)
+Sources of truth & repo docs
 
-Reader v1 is a **dev‑only** HTTP harness that returns bytes **identical** to the CLI for the same inputs.
+Canonical homes
 
-- **Route:** `GET /api/reader?v=1&a=<rel>&b=<rel>&a_tz=<IANA>&b_tz=<IANA>`  
-- **APP_ENV gating:**  
-  - `APP_ENV=dev`: may read **only** `fixtures/charts/*`; rejects traversal & symlinks; errors are one‑line JSON + LF.  
-  - non‑dev: returns `403` (no filesystem access).  
-- **Transport (A5):** `Content-Type: application/json; charset=utf-8` only — **no `ETag` / `Cache-Control`**; conditional GET arrives in **A7**.
+Transport & caching (A7): Environment & Integration Plan v2.0.
 
-```bash
-# Smoke (Reader equals CLI), assumes server on http://127.0.0.1:8000
-RART=artifacts/cards/A5; CART=artifacts/cards/A3; mkdir -p "$RART"
-curl -sS -D "$RART/headers_AB.txt" \
-  "http://127.0.0.1:8000/api/reader?v=1&a=fixtures/charts/alice.json&b=fixtures/charts/bob.json&a_tz=Africa/Cairo&b_tz=Africa/Cairo" \
-  -o "$RART/reader_AB.json"
-cmp -s "$RART/reader_AB.json" "$CART/cli_stdout_AB.json" && echo READER_EQ_CLI_AB_OK
-```
+Public body (contract): docs/contracts/reader_v1_public_bytes.md.
 
----
+Reader surface (endpoints & gating): docs/server/reader_v1.md.
 
-## Determinism & emitter canon
+CLI behavior & numerics policy: Glow HD Engine — CLI, API & Vendor Ingest Spec v0.1.5 and docs/CLI_commands.md.
 
-- **Serializer (MUST):** `json.dumps(..., sort_keys=True, separators=(',',':'), ensure_ascii=False) + "\n"`  
-- **Preimage (MUST):** `idempotence_hash = sha256( sercanon(preimage_without_idempotence_hash) )` (lowercase 64‑hex).  
-- **Parity (MUST):** public bytes identical for AB and BA (swap inputs).  
-- **Single emitter (MUST):** both CLI and Reader call `engine/emit_public.py`; closeouts record `EMITTER_SHA256=<64hex>`.
+Governance & acceptance delivery: Glow Governance & Process Handbook — v1.1.
+
+Engine Tasks: HD Engine Tasks v10 (A7-aligned).
+
+
+Deprecated
+
+Glow HD Engine Architecture & Design v4 (do not reference).
+
+
 
 ---
 
-## Evidence & release identity
+Validation overview (no commands)
 
-- **Release ID:** `scripts/release_id.sh` prints **one 64‑hex + LF** (`sha256` of `release/manifest.sorted.json`).  
-- **A3 Artifacts (minimal):**
-  ```
-  artifacts/cards/A3/cli_stdout_AB.json
-  artifacts/cards/A3/cli_stdout_BA.json
-  artifacts/cards/A3/release_id.txt
-  artifacts/cards/A3/IDENTITY_OK.txt
-  artifacts/cards/A3/validation.log
-  ```
-- **A5 Artifacts (minimal):**
-  ```
-  artifacts/cards/A5/reader_AB.json
-  artifacts/cards/A5/reader_BA.json
-  artifacts/cards/A5/headers_AB.txt
-  artifacts/cards/A5/headers_BA.txt
-  artifacts/cards/A5/validation.log
-  ```
+To validate an Alpha build without prescribing code:
 
-See `docs/alpha_acceptance.md` for the Run‑This‑Now acceptance steps and minimal grep markers.
+CLI (A3): Produce cli_stdout_AB.json and cli_stdout_BA.json. Evidence must show: canonical formatting (UTF-8, one LF, no BOM/ANSI), idempotence preimage hash correctness, AB↔BA byte identity, and a release_id that matches release/manifest.sorted.json.
+
+Reader v1 (A5): For the same pair, produce reader_AB.json and reader_BA.json (dev-only harness). Evidence must show: bytes equal the CLI, content type is JSON, APP_ENV gating and path-safety enforced.
+
+Transport (A7): Evidence lives in Environment & Integration Plan v2.0: strong quoted ETag equals sha256 over the final LF-terminated body (pre-compression), CSV If-None-Match strong-match behavior, 304 empty body, HEAD parity, compression invariance, and no ETag + no-store on writers/errors.
+
+
+Marker names, artifact paths, and acceptance tables are defined in the documents above.
+
 
 ---
 
-## Environment variables
+Reader v1 (developer harness)
 
-- `SAFE_MODE` — **1** for acceptance (no network). **0** only for explicit vendor calls (requires `ALLOW_NETWORK=1`).  
-- `ALLOW_NETWORK` — set to **1** only when intentionally enabling vendor/network (never in acceptance).  
-- `PRODUCT_INVOCATION_TAG` — current invocation tag (e.g., `INV-C9F3AFB03805F430`).  
-- `ENGINE_TAG` — human‑readable engine tag for meta.  
-- `APP_ENV` — `dev` to enable Reader harness filesystem access; otherwise returns 403.
+Route: GET /api/reader?v=1&a=<rel>&b=<rel>&a_tz=<IANA>&b_tz=<IANA>.
+
+APP_ENV gating: APP_ENV=dev enables limited filesystem reads only under fixtures/charts/; traversal/symlink denial; non-dev returns 403 with a minimal error body.
+
+Transport: Governed by Environment & Integration Plan v2.0 (A7). This README does not restate header matrices.
+
+
 
 ---
 
-## Project layout (key paths)
+Determinism & emitter canon
 
-```
-docs/
-  CLI_commands.md
-  server/reader_v1.md
-  architecture/emitters.md
-  alpha_acceptance.md
+Serializer (MUST): UTF-8 JSON, sorted keys, compact separators, ensure_ascii=False, exactly one trailing \n, no BOM, ANSI-free.
+
+Idempotence (MUST): idempotence_hash = sha256(canonical_preimage_bytes) where the preimage omits idempotence_hash and is LF-terminated.
+
+Parity (MUST): public bytes are identical for AB and BA.
+
+Single emitter (MUST): both CLI and Reader call the same public emitter; closeouts record a provenance fingerprint for the emitter.
+
+
+
+---
+
+Evidence & release identity
+
+Release ID
+
+release_id is the lowercase 64-hex SHA-256 of release/manifest.sorted.json and must match the value embedded in public outputs.
+
+
+Minimal artifacts (by card)
+
+A3 (CLI):
+artifacts/cards/A3/cli_stdout_AB.json
+artifacts/cards/A3/cli_stdout_BA.json
+artifacts/cards/A3/release_id.txt
+artifacts/cards/A3/validation.log
+(optional when gated: artifacts/cards/A3/admin/sidecar.json)
+
+A5 (Reader v1):
+artifacts/cards/A5/reader_AB.json
+artifacts/cards/A5/reader_BA.json
+artifacts/cards/A5/headers_AB.txt
+artifacts/cards/A5/headers_BA.txt
+artifacts/cards/A5/validation.log
+
+A7 (Transport): see Environment & Integration Plan v2.0 for exact header artifacts and PASS markers.
+
+
+
+---
+
+Environment variables (reference)
+
+SAFE_MODE — 1 for tests/CI (recommended ON in dev/stage); 0 for prod. Vendor HTTP requires both SAFE_MODE=0 and ALLOW_NETWORK=1.
+
+ALLOW_NETWORK — second rail to permit HTTP when SAFE_MODE=0.
+
+PRODUCT_INVOCATION_TAG — current invocation tag (e.g., INV-…).
+
+ENGINE_TAG — human-readable engine tag for meta.
+
+APP_ENV — dev enables the Reader harness; otherwise requests are refused.
+
+
+
+---
+
+Project layout (key paths)
+
+docs/CLI_commands.md
+
+docs/server/reader_v1.md
+
+docs/contracts/reader_v1_public_bytes.md
+
+docs/architecture/emitters.md
+
+docs/alpha_acceptance.md
+
 CHANGELOG.md
-fixtures/
-  charts/           # input charts for dev/acceptance
-release/
-  manifest.sorted.json
-scripts/
-  hdctl.py          # CLI entrypoint
-  release_id.sh     # prints 64-hex + LF
-artifacts/
-  cards/
-    A3/             # CLI evidence
-    A5/             # Reader harness evidence
-```
+
+fixtures/charts/ (dev inputs)
+
+release/manifest.sorted.json
+
+scripts/ (entrypoints and helpers)
+
+artifacts/cards/ (evidence bundles per card)
+
+
 
 ---
 
-## Governance (acceptance delivery)
+Governance (acceptance delivery)
 
-- Work on `main`. **No PRs** for final acceptance.  
-- Each card ends with **one revert‑friendly commit** and an evidence bundle under `artifacts/cards/<CARD>/`.  
-- **PO** performs closeout and signoff; see template in `docs/alpha_acceptance.md`.
+Work on main; one revert-friendly commit per card with evidence under artifacts/cards/<CARD>/.
 
----
+PO performs closeout and signoff (template in docs/alpha_acceptance.md).
 
-## FAQ
+Transport and public body rules are not duplicated here; see sources of truth.
 
-**Q: Why no `ETag` in A5?**  
-A: Transport caching and conditional GET are introduced in **A7** to keep Alpha focused on body invariants and harness gating.
 
-**Q: Where is the engine/public contract defined?**  
-A: In *HD Engine Math & Tech Spec v4.1.6* — single source of truth.
-
-**Q: Is the old Architecture & Design doc required?**  
-A: No. It’s deprecated and removed from active references.
 
 ---
 
-## Changelog (README)
+FAQ
 
-- **v1.0 (2025‑10‑02):** Initial comprehensive README for Alpha A3–A5; links to canonical Spec and repo playbooks; A5 transport guard documented.
+Where are the transport rules?
+In Environment & Integration Plan v2.0 (A7). This README intentionally defers to that document.
+
+Where is the engine/public contract defined?
+In docs/contracts/reader_v1_public_bytes.md (example + preimage), referenced by Spec v0.1.5 and the Reader doc.
+
+Why numeric-free public JSON?
+Alpha SPA shows Bands only. CLI may expose score_pct only when --score is explicitly requested (see Spec v0.1.5).
+
+
+---
+
+Changelog (README)
+
+v2.0 (2025-10-02): Adopt A7 transport (deferred to Env & Integration Plan v2.0); add contract/source-of-truth links; remove command snippets; align evidence sections with Alpha/A7 acceptance.
+
+v1.0 (2025-10-02): Initial comprehensive README for Alpha A3–A5; A5 transport guard documented. 

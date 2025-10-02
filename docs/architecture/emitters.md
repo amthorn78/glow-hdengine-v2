@@ -1,98 +1,133 @@
-# docs/architecture/emitters.md
+docs/architecture/emitters.md  
 
-**Title:** Single Emitter Canon — public JSON emission for CLI and Reader  
-**Version:** 1.3  
-**Owner:** Cyrano (Tech Writer)  
-**Status:** Canon (A3–A5 scope)  
-**Cards:** CORE-CLI-A3, CORE-READER-A5
+Title: Single Emitter Canon — public JSON emission for CLI and Reader
+Version: 2.0
+Owner: Cyrano (Technical Writer)
+Status: Canon (A3–A7 scope)
+Cards: CORE-CLI-A3, CORE-READER-A5 (public body), A7 (transport lives outside this doc)
 
-## 1. Purpose
-Define one canonical emitter used by both the CLI and the Reader dev harness. This prevents drift, locks the serializer and idempotence rules, and guarantees that the same inputs produce the same public bytes across tools.
+1. Purpose
 
-## 2. Canonical module
-- **Path:** `engine/emit_public.py`  
-- **Signature:** `emit_public_envelope(a_chart, b_chart, engine_tag, invocation_tag, release_id) -> bytes`  
-- **Contract:** Returns LF-terminated UTF-8 bytes produced by the canonical serializer over the minimal public JSON envelope.
+Establish one canonical emitter used by both the CLI and the Reader dev harness. This prevents drift, locks the serializer/idempotence rules, and guarantees that the same inputs produce the same public bytes across tools. Transport (ETag/INM/304/HEAD) is documented in the Environment & Integration Plan v2.0; do not restate it here.
 
-### 2.1 Public envelope (A3–A5)
-The emitter MUST construct the minimal public JSON used by CLI and Reader.
-- Top-level keys (canonical set; order induced by `sort_keys=True`):  
-  `["categories","eligible","idempotence_hash","meta","release_id"]`
-- `categories` is an array with **exactly one** element whose **only** fields are `{"id":"harmony","band":"Cool|Open|Warm|Glow"}`.
-- Output MUST end with exactly one `\n`. No BOM. No ANSI. Numeric-free and bands-only.
+2. Canonical module (no alternatives)
 
-## 3. Canonical serializer
-Use one serializer everywhere that produces public bytes.
-```python
-import json
-def sercanon(obj):
-    return json.dumps(obj, sort_keys=True, separators=(',',':'), ensure_ascii=False) + "\n"
-```
+Path: engine/emit_public.py
 
-## 4. Idempotence preimage
-The emitter is responsible for coupling the bytes to a deterministic preimage:
-1) Build the envelope except `idempotence_hash`.  
-2) Compute `idempotence_hash = sha256( sercanon(preimage_without_hash) ).hexdigest()` (lowercase 64-hex).  
-3) Insert `idempotence_hash`.  
-4) Serialize with `sercanon(final)` and return bytes.
+Entrypoint name: emit_public_envelope
 
-## 5. AB↔BA parity
-Swapping inputs MUST NOT change the public bytes. CLI and Reader acceptance depend on this property.
+Return type: LF-terminated UTF-8 bytes representing the minimal public JSON envelope.
 
-## 6. Purity and safety
-- No import-time I/O. No environment reads at import.  
-- No network access. Pure function of inputs.  
-- No file writes. Only return bytes to caller.  
-- Logs (if any) MUST be keys-only and MUST NOT contain secrets.
+Single source of truth: CLI and Reader MUST both call this emitter for public output. No duplicate serializer or preimage logic is permitted elsewhere.
 
-## 7. Tooling usage
-- **CLI (`hdctl showcompat`)** MUST call `emit_public_envelope(...)` to produce stdout bytes.  
-- **Reader v1** MUST call the same function and write headers plus these bytes to the HTTP response body.
 
-### 7.1 Example usage
-```python
-from engine.emit_public import emit_public_envelope
+3. Public envelope (contract reference)
 
-# a_chart and b_chart are validated and normalized dicts
-public_bytes = emit_public_envelope(
-    a_chart=a_chart,
-    b_chart=b_chart,
-    engine_tag="hdengine-alpha",
-    invocation_tag="INV-C9F3AFB03805F430",
-    release_id=open("artifacts/cards/A3/release_id.txt").read().strip()
-)
-# CLI: write to stdout; Reader: write to HTTP response
-```
+Contract home: docs/contracts/reader_v1_public_bytes.md. This architecture page does not duplicate the example.
 
-## 8. Provenance (acceptance evidence)
-- Closeouts MUST record `EMITTER_SHA256=<64hex>` computed from the **file bytes** of `engine/emit_public.py`.  
-- Both CLI and the Reader harness MUST import this emitter (no duplicate serializer/preimage code paths).
+Canonical set of top-level keys (sorted): categories, eligible, idempotence_hash, meta, release_id.
 
-```bash
-sha256sum engine/emit_public.py | awk '{print $1}' | sed 's/^/EMITTER_SHA256=/' >> artifacts/cards/A5/validation.log
-```
+Categories rule: categories contains exactly one object with only id:"harmony" and band ∈ {Cool, Open, Warm, Glow}.
 
-Markers (examples):
-```
-NO_DUPLICATE_SERIALIZER_OK
-EMITTER_IMPORT_OK
+Numeric policy: public envelope is numeric-free (bands only).
+
+Determinism: AB↔BA parity and two-run identity MUST hold.
+
+
+4. Canonical serializer (rules)
+
+UTF-8; no BOM; ANSI-free.
+
+Sorted keys (lexicographic).
+
+Compact separators; parameters equivalent to separators=(',',':'), ensure_ascii=False.
+
+Exactly one trailing newline (\n) on the final public JSON.
+
+
+5. Idempotence preimage (rules)
+
+1. Build the envelope omitting the idempotence_hash.
+
+
+2. Canonically serialize that preimage (rules in §4), including the single trailing \n.
+
+
+3. Compute sha256(preimage_bytes) to produce a lowercase 64-hex idempotence_hash.
+
+
+4. Insert idempotence_hash, serialize canonically again, and return the final bytes.
+
+
+
+6. AB↔BA parity (bytes)
+
+Swapping inputs A and B MUST NOT change the public bytes. This requirement applies equally to CLI and Reader outputs.
+
+7. Purity and safety
+
+No import-time I/O or environment reads.
+
+No network access; function is a pure transformation of validated inputs.
+
+No file writes.
+
+Any logs are keys-only and never include secrets or payloads.
+
+
+8. Tooling usage (binding requirements)
+
+CLI (hdctl showcompat): MUST call emit_public_envelope for stdout bytes.
+
+Reader v1: MUST call the same emitter and place those bytes in the HTTP 200 body. (Transport headers/validators are governed by Environment & Integration Plan v2.0.)
+
+
+9. Provenance and evidence (names only)
+
+Closeouts MUST capture emitter provenance and absence of drift via artifact names (no commands here):
+
+artifacts/cards/<CARD>/EMITTER_SHA256.txt — sha256 over the file bytes of engine/emit_public.py.
+
+artifacts/cards/<CARD>/validation.log includes lines such as:
+
 EMITTER_SHA256=<64hex>
-```
 
-## 9. Unit tests and goldens
-- Two-run identity on same inputs.  
-- AB↔BA byte identity.  
-- Preimage recompute equals embedded `idempotence_hash`.  
-- Final text ends with a single LF and is BOM-free.  
-- Minimal envelope shape present and numeric-free.  
-- Reader bytes == CLI bytes for identical inputs.
+NO_DUPLICATE_SERIALIZER_OK (no other public-serialization code paths)
 
-## 10. Change control
-- Public envelope is **frozen for A3–A5**. Any change requires a card and refreshed acceptance evidence.  
-- New internal fields belong in the admin sidecar, not in the public envelope.  
-- When the emitter changes, update provenance markers and re-run A3 and A5 acceptance.
+EMITTER_IMPORT_OK (both CLI and Reader bind to the canonical emitter)
 
-## 11. Appendix
-**Invocation tag regex:** `^INV-[0-9A-F]{16,64}$`  
-**LF rule:** returned bytes MUST end with exactly one `\n`.  
-**Serializer:** `sort_keys=True`, `separators=(',',':')`, `ensure_ascii=False`
+READER_EQ_CLI_AB_OK and READER_EQ_CLI_BA_OK (byte equality)
+
+
+
+10. Unit checks and goldens (acceptance indicators)
+
+Two-run identity on the same inputs.
+
+AB↔BA byte identity.
+
+Preimage recompute equals embedded idempotence_hash.
+
+Final text ends with a single LF and is BOM-free.
+
+Minimal envelope shape present and numeric-free.
+
+Reader bytes == CLI bytes for identical inputs.
+
+
+11. Change control
+
+The public envelope remains frozen for A3–A5. Any change requires a lead-approved card and refreshed acceptance evidence.
+
+New internal fields belong in the admin sidecar, not in the public envelope.
+
+When the emitter changes, update provenance markers and re-run A3/A5 evidence.
+
+
+12. Cross-references
+
+Public body contract: docs/contracts/reader_v1_public_bytes.md.
+
+Reader transport and validators (A7): Environment & Integration Plan v2.0.
+
+CLI behavior and admin sidecar rules: docs/CLI_commands.md.
