@@ -2,6 +2,40 @@ from __future__ import annotations
 import os, json
 from flask import Flask, Response, request
 from engine.emit_public import emit_public_envelope
+
+import hashlib
+
+def _sha256_hex(b: bytes) -> str:
+    return hashlib.sha256(b).hexdigest()
+
+def _set_reader_200_headers(resp):
+    # A7 validators for successful reader responses
+    resp.headers["Content-Type"] = "application/json; charset=utf-8"
+    resp.headers["Cache-Control"] = "private, max-age=0, must-revalidate"
+    resp.headers["Vary"] = "Authorization, Accept-Encoding"
+    return resp
+
+def _clear_writer_error_caching(resp):
+    # A7 requirement: errors/writers are no-store and no ETag
+    resp.headers["Cache-Control"] = "no-store"
+    resp.headers.pop("ETag", None)
+    return resp
+
+def _parse_if_none_match(header: str | None) -> set[str]:
+    """
+    Parse If-None-Match, ignoring weak validators and handling CSV.
+    Returns a set of strong, quoted tokens like: {"\"abcd...\"", "\"ef01...\""}
+    """
+    if not header:
+        return set()
+    tokens = set()
+    for part in header.split(","):
+        t = part.strip()
+        if not t or t.startswith("W/"):
+            continue
+        tokens.add(t)
+    return tokens
+
 from pathlib import Path
 
 app = Flask(__name__)
@@ -18,7 +52,9 @@ def _error(token: str, code: int = 400):
     A5 transport: content-type only; no ETag/Cache-Control.
     """
     body = json.dumps({"error": token}, ensure_ascii=False, separators=(",", ":")) + "\n"
-    return Response(body, mimetype="application/json; charset=utf-8"), code
+    resp = Response(body, mimetype="application/json; charset=utf-8")
+    _clear_writer_error_caching(resp)
+    return resp, code
 
 ALLOWED_ROOT = Path("fixtures/charts").resolve()
 
@@ -102,7 +138,31 @@ def reader_v1():
     release_id    = os.environ.get("RELEASE_ID", "0" * 64)
 
     body = emit_public_envelope(a, b, engine_tag, invocation_tag, release_id)
-    return Response(body, mimetype="application/json; charset=utf-8"), 200
+    etag = "\"" + _sha256_hex(body) + "\""
+    tokens = _parse_if_none_match(request.headers.get("If-None-Match"))
+    # exact strong match only; '*' must not match
+    if etag in tokens and "*" not in tokens:
+        resp = Response(b"", status=304)
+        resp.headers["ETag"] = etag
+        _set_reader_200_headers(resp)
+        resp.content_length = 0
+        resp.headers["Content-Length"] = "0"
+        resp.headers["Content-Length"] = str(len(body))
+        return resp, 304
+
+    # HEAD parity: same validators as GET 200, empty body, Content-Length=len(identity body)
+    if request.method.upper() == "HEAD":
+        resp = Response(b"", status=200)
+        resp.headers["ETag"] = etag
+        _set_reader_200_headers(resp)
+        resp.content_length = len(body)
+        return resp, 200
+
+    # GET 200 with validators
+    resp = Response(body, status=200)
+    resp.headers["ETag"] = etag
+    _set_reader_200_headers(resp)
+    return resp, 200
 if __name__ == "__main__":
     host = os.environ.get("HOST", "127.0.0.1")
     port = int(os.environ.get("PORT", "5000"))
