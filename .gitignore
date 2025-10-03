@@ -3,3 +3,19 @@ __pycache__/
 *.pyc
 *.zip
 audit/
+# Verification artifacts
+h200*.txt
+h304*.txt
+hhead*.txt
+body200*.json
+.h*.txt
+.et_*.txt
+runner.log
+.verify_runner.log
+.runner.pid
+VERIFY.out
+
+# Backups/temps
+*.bak
+server_backup.tar
+EPIC1_PATCH_PACKET_*/
