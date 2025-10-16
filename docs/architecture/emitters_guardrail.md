@@ -1,15 +1,8 @@
-# Emitters — Single-emitter guardrail (normative)
+# Public emitter guardrails
 
-## Purpose
-Prevent serializer drift: the CLI and Reader MUST produce byte-identical public outputs by importing a single canonical emitter.
-
-## Requirement (MUST)
-- The public emitter entrypoint is `engine/emit_public.py`. CLI (`scripts/hdctl.py`) and Reader (`server/app.py` handler`) MUST import and call this emitter instead of re-serializing in-place.
-
-## Example import pattern (Python)
-```py
-# canonical usage (example)
-from engine.emit_public import emit_public_bytes
-# emit_public_bytes returns bytes: UTF-8, sorted keys, separators(',',':'), ensure_ascii=False, trailing '\n'
-body_bytes = emit_public_bytes(a_path, b_path, opts)
-return Response(body_bytes, content_type="application/json; charset=utf-8")
+## Guardrails for public emitters
+• Use a single emitter for CLI and Reader; no duplicate serialization paths.
+• Do not use ad-hoc json.dumps on public surfaces — use the canonical serializer.
+• ETag must hash the identity bytes (pre-compression) and include the single trailing LF.
+• Accept-Encoding invariance: identity vs gzip produce the same ETag; brotli optional.
+• Public JSON is numeric-free; envelope keys are stable and Spec-defined.

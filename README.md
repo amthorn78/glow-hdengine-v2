@@ -206,3 +206,35 @@ Changelog (README)
 v2.0 (2025-10-02): Adopt A7 transport (deferred to Env & Integration Plan v2.0); add contract/source-of-truth links; remove command snippets; align evidence sections with Alpha/A7 acceptance.
 
 v1.0 (2025-10-02): Initial comprehensive README for Alpha A3–A5; A5 transport guard documented. 
+
+
+
+## Status
+Reader v1 is stable. Local runs use the dev runner at dev/reader_harness/app.py (APP_ENV=dev). The canonical HTTP adapter lives at adapter/http_reader.py. The legacy server/ tree is deprecated and will be removed after consolidation.
+
+## Getting started (dev harness)
+Run the local Reader v1 (dev only):
+```bash
+export APP_ENV=dev
+python dev/reader_harness/app.py
+```
+Probe:
+```bash
+curl -i http://127.0.0.1:5000/api/reader?a=<rel>&b=<rel>&a_tz=<IANA>&b_tz=<IANA>
+```
+
+## Getting started (dev harness)
+Run the local Reader v1 (dev only):
+```bash
+export APP_ENV=dev
+python dev/reader_harness/app.py
+```
+Probe:
+```bash
+curl -i http://127.0.0.1:5000/api/reader?a=<rel>&b=<rel>&a_tz=<IANA>&b_tz=<IANA>
+```
+
+### Sources of Truth (SoT)
+• Public body & determinism — HD Engine — Math & Technical Spec  
+• Transport & caching (A7) acceptance — Governance & Process (Acceptance)
+(Repo docs link to these homes and do not restate their rules.)

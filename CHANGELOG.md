@@ -1,3 +1,9 @@
+2025-10-16 — Repo docs consolidation (SoT + HTTP home)
+• SoT clarified: Public body & determinism → “HD Engine — Math & Technical Spec”; Transport/caching acceptance → “Governance & Process (Acceptance)”.
+• HTTP home: canonical adapter at adapter/http_reader.py; dev runner at dev/reader_harness/app.py (APP_ENV=dev). server/ is legacy (kept temporarily).
+• Removed restatements of A7 tables from repo docs; link to Governance instead.
+• Embedded evidence pointers in notes: tests/test_emitter_determinism.py, tests/test_reader_transport.py, tests/cli/*.
+
 CHANGELOG
 
 2025-10-02 — A7 alignment and contract centralization (v2.0 / v0.1.5)
@@ -164,3 +170,4 @@ SAFE rails: acceptance runs with SAFE_MODE=1; network only if both SAFE_MODE=0 a
 
 Operator note
 Repo docs are implementation playbooks. Canonical project documents (Environment & Integration Plan, Governance/Process, Engine Math/TS-v0, Spec) carry the authoritative rules and links.
+
