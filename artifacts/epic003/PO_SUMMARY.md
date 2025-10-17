@@ -32,3 +32,17 @@ Artifacts rooted at artifacts/epic003/.
 - thresholds_snapshot_v1.json / thresholds_schema.txt
 - acceptance.log (PASS lines)
 - manifest.json / checksums.txt
+
+---
+
+## Cleanup follow-up (EPIC003 scope)
+- Reader modules (`adapter/http_reader.py`, `adapter/logging_filter.py`) contain `json.dumps(...)` for Reader development harness paths. **Compat surface is clean** (no ad-hoc emitters).
+- No runtime imports from `adapters/` in EPIC003 surfaces; guard test enforces the single-home rule (adapter/).
+- Any consolidation of `adapters/` is deferred to a future card per Isis’ scope.
+
+---
+## EPIC003 Cleanup — Final
+- Archived legacy trees: `core/`, `server/`, `adapters/` → `_archive/EPIC003_CLEAN_refs_20251017_211906/`.
+- Removed active files that imported `core.*` (moved to `_archive/EPIC003_CLEAN_refs_*`).
+- Added deny-list test to prevent re-introduction (`tests/epic003/test_legacy_imports_denied.py`).
+- Compat surface re-verified OK post-cleanup.

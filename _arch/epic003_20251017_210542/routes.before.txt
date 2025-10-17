@@ -1,0 +1,2 @@
+adapter/wsgi.py:19:    app.register_blueprint(reader_bp)
+adapter/app.py:7:    app.register_blueprint(compat_blueprint)

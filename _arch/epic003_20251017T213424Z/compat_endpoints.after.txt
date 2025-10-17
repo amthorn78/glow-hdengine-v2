@@ -1,0 +1,2 @@
+15:@compat_blueprint.get("")
+34:@compat_blueprint.post("")
