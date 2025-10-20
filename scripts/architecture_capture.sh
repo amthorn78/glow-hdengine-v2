@@ -1,125 +1,88 @@
 #!/usr/bin/env bash
-set +e
-set +o pipefail 2>/dev/null || true
+set -euo pipefail
+# Architecture Capture Protocol — run at epic close
+# Usage:
+#   EPIC_ID=HDE-EPIC003 scripts/architecture_capture.sh
+# or scripts/architecture_capture.sh HDE-EPIC003
 
-# === config ===
-TS="$(date -u +%Y%m%dT%H%M%SZ)"
-ARCH_DIR="_arch/epic003_${TS}"
-ART_DIR="artifacts/epic003"
-ROOT_MD="ARCHITECTURE.md"
-mkdir -p "$ARCH_DIR" "$ART_DIR"
+EPIC_ID="${EPIC_ID:-${1:-UNSPECIFIED_EPIC}}"
+STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
+OUT_DIR="_arch/${EPIC_ID}_${STAMP}"
+mkdir -p "${OUT_DIR}"
 
-# --- helpers ---
-_have() { command -v "$1" >/dev/null 2>&1; }
+# Helper: write file with guaranteed trailing LF
+writel() { printf "%s\n" "$1" > "$2"; }
 
-# --- BEFORE/AFTER snapshots (AFTER only here, but we reuse names) ---
-# Route registrations (adapter/)
-if _have rg; then
-  rg -n "add_url_rule|register_blueprint" adapter/ > "${ARCH_DIR}/routes.after.txt" || true
+# 1) Routes (adapter only should register)
+rg -n "add_url_rule|register_blueprint" adapter/ > "${OUT_DIR}/routes.txt" || true
+
+# 2) Deprecated imports (must be empty in active code)
+rg -n "from adapters|import adapters\." -g '!adapters/**' > "${OUT_DIR}/imports.adapters.txt" || true
+rg -n "from core|import core\."       -g '!core/**'      > "${OUT_DIR}/imports.core.txt"     || true
+rg -n "from server|import server\."   -g '!server/**'    > "${OUT_DIR}/imports.server.txt"   || true
+
+# 3) Ad-hoc emitters forbidden in handlers/CLI (must be empty)
+rg -n "json\.dumps\(|jsonify\(" engine/http cli > "${OUT_DIR}/emit.dumps.txt" || true
+
+# 4) Directory tree (compact)
+tree -a -L 3 > "${OUT_DIR}/tree.txt" || writel "tree unavailable" "${OUT_DIR}/tree.txt"
+
+# 5) Optional: service vs CLI byte parity snapshot (skips if hook not set)
+PARITY="${OUT_DIR}/byte_parity.txt"
+if [ -n "${HDE_CLI_SHOWCOMPAT:-}" ]; then
+  # Try a small service request; require defaults file if present
+  SVC="/tmp/_svc_${STAMP}.bin"
+  CLI="/tmp/_cli_${STAMP}.bin"
+  if [ -f config/compat_defaults.json ]; then
+    svc_body='{"a_id":"A","b_id":"B","viewer_prefs":'"$(cat config/compat_defaults.json)"'}'
+  else
+    svc_body='{"a_id":"A","b_id":"B"}'
+  fi
+  curl -s "${HDE_BASE_URL:-http://127.0.0.1:5000}/api/compat/v1" \
+       -H 'Content-Type: application/json' -X POST \
+       --data-binary "${svc_body}" > "${SVC}" || true
+  # CLI env hook: e.g. export HDE_CLI_SHOWCOMPAT='hdctl showcompat --a {A} --b {B} --prefs {PREFS}'
+  PREFS="/tmp/_prefs_${STAMP}.json"
+  if [ -f config/compat_defaults.json ]; then cp -f config/compat_defaults.json "${PREFS}"; else echo '{}' > "${PREFS}"; fi
+  CLI_CMD="${HDE_CLI_SHOWCOMPAT}"
+  CLI_CMD="${CLI_CMD//\{A\}/A}"
+  CLI_CMD="${CLI_CMD//\{B\}/B}"
+  CLI_CMD="${CLI_CMD//\{PREFS\}/${PREFS}}"
+  (eval "${CLI_CMD}" > "${CLI}" 2>/dev/null) || true
+  svc_sha="$(sha256sum "${SVC}" | awk '{print $1}')"
+  cli_sha="$(sha256sum "${CLI}" | awk '{print $1}')"
+  printf "service_sha=%s\ncli_sha=%s\nparity=%s\n" "$svc_sha" "$cli_sha" \
+    "$( [ "$svc_sha" = "$cli_sha" ] && echo PASS || echo FAIL )" > "${PARITY}"
 else
-  grep -RInE "add_url_rule|register_blueprint" adapter/ > "${ARCH_DIR}/routes.after.txt" 2>/dev/null || true
+  writel "parity=SKIPPED (HDE_CLI_SHOWCOMPAT not set)" "${PARITY}"
 fi
 
-# Compat endpoints (decorators)
-grep -RInE '@compat_blueprint\.(get|post)\(' engine/http/compat_handler.py \
-  > "${ARCH_DIR}/compat_endpoints.after.txt" 2>/dev/null || true
-
-# Compact tree (3 levels)
-if _have tree; then
-  tree -a -L 3 > "${ARCH_DIR}/tree.after.txt"
-else
-  find adapter engine -maxdepth 3 -print | sed 's|^\./||' | LC_ALL=C sort > "${ARCH_DIR}/tree.after.txt"
+# 6) ARCHITECTURE.md copy for the epic bundle (if present)
+if [ -f ARCHITECTURE.md ]; then
+  cp -f ARCHITECTURE.md "${OUT_DIR}/ARCHITECTURE_MAP_AFTER.md"
 fi
 
-# Archives present
-ARCH_MAIN="$(ls -1d _archive/EPIC003_CLEAN_* 2>/dev/null | tail -n1 || true)"
-ARCH_REFS="$(ls -1d _archive/EPIC003_CLEAN_refs_* 2>/dev/null | tail -n1 || true)"
+# 7) Status summary (simple PASS/FAIL based on emptiness / presence)
+passfail() { [ -s "$1" ] && echo FAIL || echo PASS; }
+# Empty means *pass* for the “must be empty” scans
+adapters="$(passfail "${OUT_DIR}/imports.adapters.txt")"
+core    ="$(passfail "${OUT_DIR}/imports.core.txt")"
+server  ="$(passfail "${OUT_DIR}/imports.server.txt")"
+emits   ="$(passfail "${OUT_DIR}/emit.dumps.txt")"
 
-# Read files safely
-routes="$(sed 's|^\./||' "${ARCH_DIR}/routes.after.txt" 2>/dev/null || true)"
-endpts="$(cat "${ARCH_DIR}/compat_endpoints.after.txt" 2>/dev/null || true)"
-tree3="$(cat "${ARCH_DIR}/tree.after.txt" 2>/dev/null || true)"
+routes_state="PASS" # informational: existence is expected; enforcement is in tests
+[ -s "${OUT_DIR}/routes.txt" ] || routes_state="WARN (no routes detected)"
 
-# Generate Architecture Map — AFTER (deterministic sections/order)
-MAP_PATH="${ARCH_DIR}/architecture_map_AFTER.md"
-{
-  echo "# Architecture Map — AFTER (EPIC003 Cleanup)"
-  echo
-  echo "Generated: ${TS}"
-  echo
-  echo "## 1) Active Trees"
-  echo "- adapter/  — single HTTP home (route wiring)"
-  echo "- engine/http/  — HTTP handlers (compat)"
-  echo "- engine/compat/  — compute, ordering, thresholds, constants"
-  echo "- engine/serializer/  — canonical JSON serializer (UTF-8, sort_keys, compact, LF)"
-  echo "- engine/presenter/  — single emitter (emit_compact_json)"
-  echo "- engine/validation/  — viewer_prefs validator (10 integer weights 0..100)"
-  echo "- engine/errors/  — error envelope {ok:false,code,error}"
-  echo "- cli/ (if present)  — must import same emitter as service"
-  echo
-  echo "## 2) Archived Trees & Pointers"
-  echo "- ${ARCH_MAIN:-\"(none found)\"}  (moved: core/, server/, adapters/)"
-  echo "- ${ARCH_REFS:-\"(none found)\"}  (moved: files that imported core.*)"
-  echo
-  echo "## 3) Routes (mechanical scrape + ownership)"
-  echo "Registered routes (adapter/):"
-  if [ -n "$routes" ]; then
-    echo '```'
-    printf "%s\n" "$routes"
-    echo '```'
-  else
-    echo "- (none found)"
-  fi
-  echo "Ownership: adapter/ is the only route registry; engine/http/ provides handlers."
-  echo
-  echo "## 4) Emitter/Serializer Contract"
-  echo "- All emission calls use engine.presenter.emitter.emit_compact_json"
-  echo "- Serializer: engine.serializer.canon.dumps (UTF-8, sort_keys, compact, one trailing LF)"
-  echo
-  echo "## 5) Import Boundaries (guards)"
-  echo "- Forbidden in active code: from core, from adapters, from server"
-  echo "- Forbid json.dumps/jsonify in handlers/CLI (single emitter path)"
-  echo
-  echo "## 6) Evidence & PASS Markers"
-  echo "- Snapshots: ${ARCH_DIR}/*"
-  echo "- PASS markers: ARCH_MAP_AFTER_OK, SERIALIZER_SINGLE_PATH_OK, BYTE_PARITY_OK,"
-  echo "  JSON_SORTED_KEYS_OK, READER_SINGLE_HOME_OK (future), etc."
-  echo
-  echo "## 7) Build/Run modes (dev)"
-  echo "- APP_ENV=dev; bind 127.0.0.1; adapter/app.py is the dev app home"
-  echo
-  echo "## 8) Known Guards & Tests"
-  echo "- tests/epic003/test_legacy_imports_denied.py (no core/adapters/server in active code)"
-  echo "- tests/epic003/test_http_home_single_path.py (no adapters/ imports in EPIC003 surfaces)"
-  echo "- tests/epic003/test_error_message_map.py (exact error strings)"
-  echo
-  echo "## Compact Tree (3 levels)"
-  if [ -n "$tree3" ]; then
-    echo '```'
-    printf "%s\n" "$tree3"
-    echo '```'
-  else
-    echo "- (not available)"
-  fi
-} > "$MAP_PATH"
+cat > "${OUT_DIR}/status.txt" <<TXT
+EPIC_ID=${EPIC_ID}
+STAMP=${STAMP}
+READER_SINGLE_HOME_SCAN=${routes_state}
+ADAPTERS_IMPORTS_EMPTY=${adapters}
+CORE_IMPORTS_EMPTY=${core}
+SERVER_IMPORTS_EMPTY=${server}
+ADHOC_EMITTERS_EMPTY=${emits}
+ARCH_SNAPSHOTS_LF=unchecked (enforced by tests)
+BYTE_PARITY=$(grep -o 'parity=.*' "${PARITY}" || echo "parity=SKIPPED")
+TXT
 
-# LF-termination guard
-python - <<'PY'
-import glob, io, os
-for p in glob.glob("_arch/epic003_*/architecture_map_AFTER.md"):
-    with open(p,"rb") as f: b=f.read()
-    if not b.endswith(b"\n"):
-        with open(p,"ab") as f: f.write(b"\n")
-print("ARCH_MAP_LF_OK=True")
-PY
-
-# Copy to evidence + canonical root
-cp -f "$MAP_PATH" "$ART_DIR/ARCHITECTURE_MAP_AFTER.md"
-cp -f "$MAP_PATH" "$ROOT_MD"
-
-# Acceptance line
-echo "ARCH_MAP_AFTER_OK=PASS" >> "$ART_DIR/acceptance.log"
-
-echo "WROTE: $MAP_PATH"
-echo "COPIED: $ART_DIR/ARCHITECTURE_MAP_AFTER.md"
-echo "COPIED: $ROOT_MD"
+echo "Architecture snapshots written to ${OUT_DIR}"

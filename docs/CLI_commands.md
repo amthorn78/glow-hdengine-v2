@@ -1,17 +1,26 @@
-# CLI commands
+# CLI & Commands — Compat v1 (Alpha)
 
-## 1. Purpose
-Document CLI usage for Reader v1. Public body examples live in the Spec; transport/caching acceptance lives in Governance. This page does not restate those rules.
+> The Compat endpoint is internal (dev). Success = 200 JSON; errors = envelope + `Cache-Control: no-store`. Use **POST** for any JSON payloads.
 
-## Reader Output (v1)
-The CLI emits the exact same bytes as Reader v1 (public surface is numeric-free).
+## Endpoint
+- `POST /api/compat/v1` — full payloads or large prefs
+- `GET /api/compat/v1?a_id=<ID>&b_id=<ID>` — ids-only (defaults applied); **no JSON body**
 
-Example body (compact JSON; one trailing LF implied):
-{"categories":[{"id":"harmony","band":"Open"}],"eligible":true,"idempotence_hash":"<64hex>","meta":{},"release_id":"<64hex>"}
+## Success (alpha)
+- **200 OK**
+- **Headers:** `Content-Type: application/json; charset=utf-8`
+- **Body (summary):** `{"categories":[{id,score:int,band,personal_key,shared_key}×10],"meta":{"engine_tag","release_id","invocation_tag"}}`
+  - Category order is fixed: heat, harmony, communication, alignment, comfort, consistency, expansion, creativity, drive, balance
+  - Bands by inclusive maxima; 100 ⇒ Glow; scores are ints (0..100), round-half-up then clamp 0..100
 
-## Transport & caching (delegated)
-Transport/caching acceptance (ETag, 304, HEAD/GET parity, Vary, no-store for errors/writers) is defined in Governance & Process (Acceptance). Do not restate it here.
+## Errors (alpha)
+- **400 Bad Request**
+- **Headers:** `Cache-Control: no-store` (no ETag)
+- **Envelope:** `{"ok":false,"code":"lower_snake","error":"human_readable"}`
+  - `invalid_json` — malformed or mixed id/payload
+  - `invalid_prefs` — `viewer_prefs.weights` must include all 10 categories as integers 0..100
 
-## Evidence pointers (tests)
-• CLI acceptance and parity tests: tests/cli/*
-• Serializer/parity: tests/test_emitter_determinism.py, tests/test_reader_transport.py
+## CLI parity
+- CLI MUST emit **identical bytes** to service (single emitter/serializer path).
+- Recommended hook for parity testing: env `HDE_CLI_SHOWCOMPAT` shelling `hdctl showcompat`.
+
