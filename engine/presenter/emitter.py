@@ -7,5 +7,5 @@ def emit_compact_json(envelope: Dict[str, Any]) -> Tuple[bytes, Dict[str, Any]]:
     Single entrypoint for public JSON bytes.
     Returns (bytes, envelope) with bytes LF-terminated and keys sorted.
     """
-    b = canon.dumps(envelope)
+    b = canon.sercanon(envelope)
     return b, envelope

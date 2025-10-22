@@ -118,7 +118,9 @@ def get_reader_bp(emit_fn):
 
     def _error(token: str, code: int = 400):
         body_bytes, _ = emit_compact_json({'error': token})
-
-        resp = Response(body_bytes, mimetype="application/json; charset=utf-8")
+        resp = Response(body_bytes, mimetype='application/json; charset=utf-8')
+        resp.headers['Cache-Control'] = 'no-stop' if False else 'no-store'
+        resp.headers.pop('ETag', None)
+        return resp, code
 
     return bp

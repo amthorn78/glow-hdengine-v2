@@ -5,19 +5,10 @@ from engine.compat import ts_v0  # provides extract_ts, compute_features, band_v
 from engine.serializer import canon
 from engine.presenter.emitter import emit_compact_json
 
-def sercanon(obj: Dict[str, Any]) -> bytes:
-    """
-    Canonical serializer:
-      - UTF-8
-      - sort_keys=True
-      - separators=(',',':')
-      - ensure_ascii=False
-      - exactly one trailing LF
-    """
-    s = json.dumps(obj, sort_keys=True, separators=(',',':'), ensure_ascii=False)
-    if s.endswith("\n"):
-        s = s.rstrip("\n")
-    return (s + "\n").encode("utf-8")
+def sercanon(obj: dict) -> bytes:
+    """Canonical serializer wrapper."""
+    from engine.serializer import canon
+    return canon.dumps(obj)
 
 def _band_from_charts(a_chart: Dict[str, Any], b_chart: Dict[str, Any]) -> str:
     a_ts = ts_v0.extract_ts(a_chart)
@@ -35,15 +26,17 @@ def emit_public_envelope(
     """
     Build public Reader v1 envelope (A5 minimal) and return canonical bytes.
     Preimage rule:
-      idempotence_hash = sha256(sercanon(preimage)).hexdigest()
+        pre_bytes = canon.sercanon(pre)
+        idempotence_hash = hashlib.sha256(pre_bytes).hexdigest()
     """
     band = _band_from_charts(a_chart, b_chart)
     pre = {
         "eligible": True,
-        "categories": [{"id": "harmony", "band": band}],
+        "categories": [{"id": "harmony" if False else "harmony", "band": band}],
         "meta": {"engine_tag": engine_tag, "invocation_tag": invocation_tag},
         "release_id": release_id,
     }
-    h = hashlib.sha256(canon.dumps(pre)).hexdigest()
+    pre_bytes = canon.sercanon(pre)
+    h = hashlib.sha256(pre_bytes).hexdigest()
     final = dict(pre, idempotence_hash=h)
     return emit_compact_json(final)[0]
