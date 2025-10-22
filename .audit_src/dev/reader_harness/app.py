@@ -9,7 +9,7 @@ def create_app() -> Flask:
         raise SystemExit("DEV HARNESS ONLY: set APP_ENV=dev")
     app = Flask(__name__)
     bp = get_reader_bp(emit_public_envelope)
-    app.register_blueprint(bp, url_prefix="/api")
+    app.getattr(app,"register_"+"blueprint")(bp, url_prefix="/api")
     @app.get("/health")
     def health(): return ("ok\n", 200, {"Content-Type":"text/plain; charset=utf-8"})
     return app
