@@ -1,0 +1,4 @@
+adapter/logging_filter.py:50:        line = json.dumps(obj, separators=(",",":"), sort_keys=True)
+adapter/logging_filter.py:67:    line = json.dumps(obj, separators=(",",":"), sort_keys=True)
+scripts/hdctl.backup.py:9:    b = json.dumps(obj, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+scripts/hdctl.clean.py:7:    b = json.dumps(obj, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")

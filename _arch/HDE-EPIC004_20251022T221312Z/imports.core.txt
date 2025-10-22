@@ -1,0 +1,40 @@
+./_archive/EPIC003_CLEAN_refs_20251017_211906/engine/canon/__init__.py:1:# Re-export canon components from core (import-safe)
+./_archive/EPIC003_CLEAN_refs_20251017_211906/engine/canon/__init__.py:2:from core.canon import validate, checksums
+./_archive/EPIC003_CLEAN_refs_20251017_211906/engine/stable/__init__.py:2:from core.stable import sercanon
+./_archive/EPIC003_CLEAN_refs_20251017_211906/scripts/_emit_canon_checksums.py:7:from core.stable.sercanon import stable_dumps
+./_archive/EPIC003_CLEAN_refs_20251017_211906/scripts/_emit_canon_checksums.py:8:from core.catalog import loader
+./_archive/EPIC003_CLEAN_refs_20251017_211906/scripts/_emit_canon_checksums.py:9:from core.config.toggles_resolver import resolve_toggles
+./_archive/EPIC003_CLEAN_refs_20251017_211906/scripts/validate_canon.sh:34:from core.canon.validate import load_repo_canon, detect_prod_overrides
+./_archive/EPIC003_CLEAN_refs_20251017_211906/scripts/validate_canon.sh:35:from core.canon.checksums import build_checksums
+./_archive/EPIC003_CLEAN_refs_20251017_211906/scripts/validate_canon.sh:36:from core.stable import sercanon  # single serializer
+./_archive/EPIC003_CLEAN_refs_20251017_211906/scripts/identity_bump.py:7:from core.stable.freeze import iter_records
+./_archive/EPIC003_CLEAN_refs_20251017_211906/scripts/identity_bump.py:8:from core.stable.identity import compute_release_id
+./_archive/EPIC003_CLEAN_refs_20251017_211906/scripts/identity_bump.py:40:        "from core.stable.freeze import iter_records;"
+./_archive/EPIC003_CLEAN_refs_20251017_211906/scripts/identity_bump.py:41:        "from core.stable.identity import compute_release_id;"
+./_archive/EPIC003_CLEAN_refs_20251017_211906/scripts/identity_bump.py:42:        "from core.stable.identity_constants import RELEASE_ID;"
+./_archive/EPIC003_CLEAN_refs_20251017_211906/scripts/hd_resolve.py:6:from core.config.toggles_resolver import resolve_toggles
+./artifacts/epic003/ARCHITECTURE_MAP_AFTER.md:40:- Fail on `from core|server|adapters` imports in active code
+./_doc_backup_20251018T020122Z/ARCHITECTURE.md.bak:32:- Forbidden in active code: from core, from adapters, from server
+./audit/escalations/reader_import_guard_20250927T224449Z/adapter/app.py.txt:80:    80	    from core.config.toggles_resolver import resolve_toggles, OverridesNotAllowedInProd
+./audit/escalations/reader_import_guard_20250927T224449Z/adapter/app.py.txt:85:    85	    from core.pipeline.compute import compute_pair
+./audit/escalations/reader_import_guard_20250927T224424Z/adapter/app.py.txt:80:    80	    from core.config.toggles_resolver import resolve_toggles, OverridesNotAllowedInProd
+./audit/escalations/reader_import_guard_20250927T224424Z/adapter/app.py.txt:85:    85	    from core.pipeline.compute import compute_pair
+./audit/escalations/reader_import_guard_20250927T224600Z/adapter/app.py.txt:80:    80	    from core.config.toggles_resolver import resolve_toggles, OverridesNotAllowedInProd
+./audit/escalations/reader_import_guard_20250927T224600Z/adapter/app.py.txt:85:    85	    from core.pipeline.compute import compute_pair
+./ARCHITECTURE.md:40:- Fail on `from core|server|adapters` imports in active code
+./tests/test_sercanon.py:2:from core.stable.sercanon import (
+./tests/test_catalog_canon.py:2:from core.catalog.loader import center_adj, deg_vector
+./tests/test_catalog_canon.py:3:from core.stable.sercanon import stable_dumps
+./tests/canon/test_overrides_prod.py:3:from core.canon.validate import detect_prod_overrides
+./tests/canon/test_center_order_and_counts.py:2:from core.canon.validate import load_repo_canon, validate_centers_strict
+./tests/canon/test_center_order_and_counts.py:3:from core.canon.checksums import build_checksums
+./tests/canon/test_loader_integrity.py:2:from core.canon.validate import load_repo_canon, validate_counts, validate_ids, validate_degree
+./tests/canon/test_report_determinism.py:2:from core.canon.validate import load_repo_canon
+./tests/canon/test_report_determinism.py:3:from core.canon.checksums import build_checksums
+./tests/canon/test_checksums.py:2:from core.canon.validate import load_repo_canon
+./tests/canon/test_checksums.py:3:from core.canon.checksums import build_checksums, V2_KEYS
+./tests/test_pipeline_public.py:2:from core.pipeline.compute import compute_pair
+./tests/test_pipeline_public.py:28:    from core.pipeline.compute import compute_pair
+./tests/em/test_em_defaults_and_ladder.py:2:from core.config.toggles_resolver import resolve_toggles
+./tests/test_resolver_prod_rules.py:10:from core.config.toggles_resolver import resolve_toggles, OverridesNotAllowedInProd
+./tests/test_pipeline_properties.py:9:from core.pipeline.compute import compute_pair  # repo layout uses 'core/'

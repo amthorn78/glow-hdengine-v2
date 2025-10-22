@@ -1,0 +1,2 @@
+adapter/logging_filter.py:50:        line = json.dumps(obj, separators=(",",":"), sort_keys=True)
+adapter/logging_filter.py:67:    line = json.dumps(obj, separators=(",",":"), sort_keys=True)

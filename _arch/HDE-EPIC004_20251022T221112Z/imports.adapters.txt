@@ -1,0 +1,36 @@
+./_arch/epic003_20251017_210542/imports.adapters.before.txt:1:./adapters/hdapi/client.py:3:from adapters._net import require_network
+./_arch/epic003_20251017_210542/imports.adapters.before.txt:2:./adapters/geo/timezone.py:2:from adapters._net import require_network
+./_arch/epic003_20251017_210542/imports.adapters.before.txt:3:./adapters/geo/places.py:2:from adapters._net import require_network
+./_arch/epic003_20251017_210542/imports.adapters.before.txt:4:./tests/adapters/test_safe_mode.py:3:from adapters._net import require_network, NetworkDisabledError, safe_mode_enabled
+./_arch/epic003_20251017_210542/imports.adapters.before.txt:5:./tests/epic003/test_http_home_single_path.py:2:FORBIDDEN = ("from adapters", "import adapters")
+./_arch/epic003_20251017_210542/imports.adapters.before.txt:6:./tests/unit/test_enum_closure.py:3:from adapters.hdapi.normalize import normalize, NormalizationEnumError
+./_arch/epic003_20251017_210542/imports.adapters.before.txt:7:./tests/unit/test_channel_derivation.py:3:from adapters.hdapi.normalize import normalize, derive_channels_from_gates
+./_arch/epic003_20251017T213424Z/architecture_map_AFTER.md:32:- Forbidden in active code: from core, from adapters, from server
+./scripts/architecture_capture.sh:11:  rg -n "from adapters|import adapters\." -g '!adapters/**' > "${OUT_DIR}/imports.adapters.txt" || true
+./scripts/architecture_capture.sh:17:  grep -R -n -E "from adapters|import adapters\." --exclude-dir=adapters . > "${OUT_DIR}/imports.adapters.txt" || true
+./_doc_backup_20251018T020122Z/ARCHITECTURE.md.bak:32:- Forbidden in active code: from core, from adapters, from server
+./.audit_src/_arch/epic003_20251017_210542/imports.adapters.before.txt:1:./adapters/hdapi/client.py:3:from adapters._net import require_network
+./.audit_src/_arch/epic003_20251017_210542/imports.adapters.before.txt:2:./adapters/geo/timezone.py:2:from adapters._net import require_network
+./.audit_src/_arch/epic003_20251017_210542/imports.adapters.before.txt:3:./adapters/geo/places.py:2:from adapters._net import require_network
+./.audit_src/_arch/epic003_20251017_210542/imports.adapters.before.txt:4:./tests/adapters/test_safe_mode.py:3:from adapters._net import require_network, NetworkDisabledError, safe_mode_enabled
+./.audit_src/_arch/epic003_20251017_210542/imports.adapters.before.txt:5:./tests/epic003/test_http_home_single_path.py:2:FORBIDDEN = ("from adapters", "import adapters")
+./.audit_src/_arch/epic003_20251017_210542/imports.adapters.before.txt:6:./tests/unit/test_enum_closure.py:3:from adapters.hdapi.normalize import normalize, NormalizationEnumError
+./.audit_src/_arch/epic003_20251017_210542/imports.adapters.before.txt:7:./tests/unit/test_channel_derivation.py:3:from adapters.hdapi.normalize import normalize, derive_channels_from_gates
+./.audit_src/_arch/epic003_20251017T213424Z/architecture_map_AFTER.md:32:- Forbidden in active code: from core, from adapters, from server
+./.audit_src/artifacts/epic003/ARCHITECTURE_MAP_AFTER.md:32:- Forbidden in active code: from core, from adapters, from server
+./.audit_src/scripts/architecture_capture.sh:80:  echo "- Forbidden in active code: from core, from adapters, from server"
+./.audit_src/ARCHITECTURE.md:32:- Forbidden in active code: from core, from adapters, from server
+./.audit_src/tests/epic003/test_http_home_single_path.py:2:FORBIDDEN = ("from adapters", "import adapters")
+./.audit_src/tests/unit/test_enum_closure.py:3:from adapters.hdapi.normalize import normalize, NormalizationEnumError
+./.audit_src/tests/unit/test_channel_derivation.py:3:from adapters.hdapi.normalize import normalize, derive_channels_from_gates
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.adapters.before.txt:1:./adapters/hdapi/client.py:3:from adapters._net import require_network
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.adapters.before.txt:2:./adapters/geo/timezone.py:2:from adapters._net import require_network
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.adapters.before.txt:3:./adapters/geo/places.py:2:from adapters._net import require_network
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.adapters.before.txt:4:./tests/adapters/test_safe_mode.py:3:from adapters._net import require_network, NetworkDisabledError, safe_mode_enabled
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.adapters.before.txt:5:./tests/epic003/test_http_home_single_path.py:2:FORBIDDEN = ("from adapters", "import adapters")
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.adapters.before.txt:6:./tests/unit/test_enum_closure.py:3:from adapters.hdapi.normalize import normalize, NormalizationEnumError
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.adapters.before.txt:7:./tests/unit/test_channel_derivation.py:3:from adapters.hdapi.normalize import normalize, derive_channels_from_gates
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017T213424Z/architecture_map_AFTER.md:32:- Forbidden in active code: from core, from adapters, from server
+./tests/epic003/test_http_home_single_path.py:2:FORBIDDEN = ("from adapters", "import adapters")
+./tests/unit/test_enum_closure.py:3:from adapters.hdapi.normalize import normalize, NormalizationEnumError
+./tests/unit/test_channel_derivation.py:3:from adapters.hdapi.normalize import normalize, derive_channels_from_gates

@@ -1,0 +1,1 @@
+./_doc_backup_20251018T020122Z/ARCHITECTURE.md.bak:32:- Forbidden in active code: from core, from adapters, from server

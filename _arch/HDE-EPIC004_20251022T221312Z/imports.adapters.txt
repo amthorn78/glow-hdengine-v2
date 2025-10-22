@@ -1,0 +1,4 @@
+./_doc_backup_20251018T020122Z/ARCHITECTURE.md.bak:32:- Forbidden in active code: from core, from adapters, from server
+./tests/epic003/test_http_home_single_path.py:2:FORBIDDEN = ("from adapters", "import adapters")
+./tests/unit/test_enum_closure.py:3:from adapters.hdapi.normalize import normalize, NormalizationEnumError
+./tests/unit/test_channel_derivation.py:3:from adapters.hdapi.normalize import normalize, derive_channels_from_gates

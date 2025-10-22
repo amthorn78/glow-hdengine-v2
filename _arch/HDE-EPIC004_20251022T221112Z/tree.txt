@@ -1,0 +1,1413 @@
+.
+├── .audit_src
+│   ├── .body200.json
+│   ├── .code304.txt
+│   ├── .env.example
+│   ├── .et_gz.txt
+│   ├── .et_id.txt
+│   ├── .github
+│   │   └── workflows
+│   ├── .gitignore
+│   ├── .h200.txt
+│   ├── .h304.txt
+│   ├── .h_gz.txt
+│   ├── .h_id.txt
+│   ├── .hhead.txt
+│   ├── .runner.pid
+│   ├── .verify_runner.log
+│   ├── .vscode
+│   │   └── settings.json
+│   ├── ARCHITECTURE.md
+│   ├── AcceptanceMap.md
+│   ├── CANON_CHECKSUMS.json
+│   ├── CHANGELOG.md
+│   ├── EPIC1_PATCH_PACKET_20251003T194953Z
+│   │   ├── BASE_SHA.txt
+│   │   ├── DOC_DELTA.md
+│   │   ├── EXPECTED.txt
+│   │   ├── MANIFEST.txt
+│   │   ├── PATCH.diff
+│   │   ├── ROLLBACK.txt
+│   │   └── VERIFY.sh
+│   ├── LICENSE
+│   ├── README.md
+│   ├── Run
+│   ├── VERIFY.out
+│   ├── VERIFY.sh
+│   ├── _arch
+│   │   ├── epic003_20251017T213424Z
+│   │   └── epic003_20251017_210542
+│   ├── _archive
+│   │   ├── EPIC003_CLEAN_20251017_211719
+│   │   └── EPIC003_CLEAN_refs_20251017_211906
+│   ├── adapter
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   ├── app.py
+│   │   ├── cache_keys.py
+│   │   ├── env_guard.py
+│   │   ├── etag_core.py
+│   │   ├── gunicorn.conf.py
+│   │   ├── http_reader.py
+│   │   ├── logging_filter.py
+│   │   ├── retry_after.py
+│   │   ├── schemas
+│   │   └── wsgi.py
+│   ├── adapters.DEPRECATED.md
+│   ├── artifacts
+│   │   ├── CANON_CHECKSUMS.json
+│   │   ├── CHECKSUMS.txt
+│   │   ├── _closeout_validate.txt
+│   │   ├── adjacency_test_run.txt
+│   │   ├── admin
+│   │   ├── canon
+│   │   ├── canon_report.json
+│   │   ├── cards
+│   │   ├── cli
+│   │   ├── compat
+│   │   ├── constants
+│   │   ├── det_report.json
+│   │   ├── det_report.json.sha256
+│   │   ├── dyad_AB.json
+│   │   ├── dyad_AB_debug.json
+│   │   ├── dyad_BA.json
+│   │   ├── dyad_BA_debug.json
+│   │   ├── env_guard_import_ok.txt
+│   │   ├── epic003
+│   │   ├── errors
+│   │   ├── goldens
+│   │   ├── hd_cli_admin.json
+│   │   ├── hdapi
+│   │   ├── headers
+│   │   ├── hotfix
+│   │   ├── identity.txt
+│   │   ├── invocation.json
+│   │   ├── live_vendor
+│   │   ├── logs
+│   │   ├── mvp
+│   │   ├── provider
+│   │   ├── reader
+│   │   ├── release_id.txt
+│   │   ├── release_pack_manifest.json
+│   │   └── serializer
+│   ├── assert
+│   ├── audit
+│   │   ├── ADAPTER-ENV-GUARD-HOTFIX_artifacts_sha256_20250928T072658Z.txt
+│   │   ├── ADAPTER-ENV-GUARD-HOTFIX_closeout_20250928T072658Z.md
+│   │   ├── ADAPTER-ENV-GUARD-HOTFIX_source_bundle_20250928T072658Z_MANIFEST.json
+│   │   ├── ADHOC_FULL_MANIFEST_source_bundle_20250927T225124Z_MANIFEST.json
+│   │   ├── ADHOC_FULL_MANIFEST_source_bundle_20250927T225124Z__filelist.txt
+│   │   ├── CORE-API-ABSTRACTION-001_S2_20250927T213444Z
+│   │   ├── CORE-API-ABSTRACTION-001_S2_20250927T214125Z
+│   │   ├── CORE-API-ABSTRACTION-001_S3S4_artifacts_sha256_20250927T221410Z.txt
+│   │   ├── CORE-API-ABSTRACTION-001_S3S4_closeout_20250927T221410Z.md
+│   │   ├── CORE-API-ABSTRACTION-001_S3S4_source_bundle_20250927T221410Z_MANIFEST.json
+│   │   ├── CORE-CHART-LOADER-READY-001_artifacts_sha256_20250928T150032Z.txt
+│   │   ├── CORE-CHART-LOADER-READY-001_closeout_20250928T150032Z.md
+│   │   ├── CORE-CHART-LOADER-READY-001_source_bundle_20250928T150032Z_MANIFEST.json
+│   │   ├── EPIC-1.0_artifacts_sha256_20251003T195204Z.txt
+│   │   ├── EPIC-1.0_artifacts_sha256_20251003T200557Z.txt
+│   │   ├── EPIC-1.0_artifacts_sha256_20251003T200910Z.txt
+│   │   ├── EPIC-1.0_closeout_20251003T195204Z.md
+│   │   ├── EPIC-1.0_closeout_20251003T200557Z.md
+│   │   ├── EPIC-1.0_closeout_20251003T200910Z.md
+│   │   ├── EPIC-1.0_source_bundle_20251003T195204Z_MANIFEST.json
+│   │   ├── EPIC-1.0_source_bundle_20251003T200557Z_MANIFEST.json
+│   │   ├── EPIC-1.0_source_bundle_20251003T200910Z_MANIFEST.json
+│   │   ├── Epic-02_artifacts_sha256_20251014T225758Z.txt
+│   │   ├── Epic-02_closeout_20251014T225758Z.md
+│   │   ├── Epic-02_source_bundle_20251014T225758Z_MANIFEST.json
+│   │   ├── FIX-CLI-ADMIN-SIDECAR-INV-TEST-001R_artifacts_sha256_20250929T011642Z.txt
+│   │   ├── FIX-CLI-ADMIN-SIDECAR-INV-TEST-001R_closeout_20250929T011642Z.md
+│   │   ├── FIX-CLI-ADMIN-SIDECAR-INV-TEST-001R_source_bundle_20250929T011642Z_MANIFEST.json
+│   │   ├── HDE-EPIC003_artifacts_sha256_20251017T202529Z.txt
+│   │   ├── HDE-EPIC003_closeout_20251017T202529Z.md
+│   │   ├── HDE-EPIC003_source_bundle_20251017T202529Z_MANIFEST.json
+│   │   ├── LIVE-API-SMOKE-LOCAL-001_artifacts_sha256_20250929T022515Z.txt
+│   │   ├── LIVE-API-SMOKE-LOCAL-001_closeout_20250929T022515Z.md
+│   │   ├── LIVE-API-SMOKE-LOCAL-001_source_bundle_20250929T022515Z_MANIFEST.json
+│   │   ├── ONE-SHOT-MVP-CLI-API-001_artifacts_sha256_20250929T020210Z.txt
+│   │   ├── ONE-SHOT-MVP-CLI-API-001_closeout_20250929T020210Z.md
+│   │   ├── ONE-SHOT-MVP-CLI-API-001_source_bundle_20250929T020210Z_MANIFEST.json
+│   │   ├── REPORT.txt
+│   │   ├── T-API-CLI-SMOKE-001_20250927T234951Z
+│   │   ├── T-API-CLI-SMOKE-001_20250927T234957Z
+│   │   ├── T-API-CLI-SMOKE-001_20250927T235050Z
+│   │   ├── T-API-CLI-SMOKE-001_20250927T235137Z
+│   │   ├── T-API-CLI-SMOKE-001_artifacts_sha256_20250928T003913Z.txt
+│   │   ├── T-API-CLI-SMOKE-001_closeout_20250928T003913Z.md
+│   │   ├── T-API-CLI-SMOKE-001_source_bundle_20250928T003913Z_MANIFEST.json
+│   │   ├── escalations
+│   │   ├── gates
+│   │   ├── observed_gate_counts.json
+│   │   ├── provider_S2_20250927T181858Z
+│   │   └── provider_S2_escalation_20250927T174823Z
+│   ├── body200.json
+│   ├── body200_new.json
+│   ├── catalog
+│   │   ├── channels_catalog_v1.json
+│   │   ├── channels_v1.json
+│   │   └── gates_v1.json
+│   ├── code304_new.txt
+│   ├── config
+│   │   ├── bands_4B60_v1.json
+│   │   └── toggles_v1.json
+│   ├── core.DEPRECATED.md
+│   ├── dev
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   └── reader_harness
+│   ├── docs
+│   │   ├── ADAPTER_009.md
+│   │   ├── CLI_commands.md
+│   │   ├── INDEX.md
+│   │   ├── RUN.md
+│   │   ├── SECRETS.md
+│   │   ├── SYNC_LOG.md
+│   │   ├── acceptance
+│   │   ├── alpha_acceptance.md
+│   │   ├── architecture
+│   │   ├── contracts
+│   │   └── server
+│   ├── engine
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   ├── canon
+│   │   ├── charts
+│   │   ├── compat
+│   │   ├── compliance
+│   │   ├── config
+│   │   ├── emit_public.py
+│   │   ├── errors
+│   │   ├── http
+│   │   ├── presenter
+│   │   ├── presets
+│   │   ├── provider
+│   │   ├── providers
+│   │   ├── serializer
+│   │   ├── stable
+│   │   ├── util
+│   │   └── validation
+│   ├── fixtures
+│   │   ├── charts
+│   │   └── hdapi
+│   ├── freeze
+│   │   └── freeze_pack_v1.json
+│   ├── goldens
+│   │   └── reader
+│   ├── h200.txt
+│   ├── h200_new.txt
+│   ├── h304_new.txt
+│   ├── hhead_new.txt
+│   ├── import
+│   ├── internal
+│   │   └── readyz
+│   ├── n
+│   ├── presenter
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   └── reader_v1
+│   ├── release
+│   │   └── manifest.sorted.json
+│   ├── reports
+│   │   └── tokens_summary.txt
+│   ├── requirements-dev.txt
+│   ├── runner.log
+│   ├── schemas
+│   │   ├── canon_checksums_v2.schema.json
+│   │   ├── channels_catalog_v1.schema.json
+│   │   ├── channels_v1.schema.json
+│   │   ├── gates_v1.schema.json
+│   │   ├── hdapi.normalized.v1.schema.json
+│   │   ├── reader.v1.schema.json
+│   │   ├── reader.v1.schema.json.sha256
+│   │   └── toggles_v1.schema.json
+│   ├── scripts
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   ├── _emit_canon_checksums.py.REMOVED.md
+│   │   ├── architecture_capture.sh
+│   │   ├── card_close.sh
+│   │   ├── demo_mvp.sh
+│   │   ├── diag_env.sh
+│   │   ├── emit_env_guard_artifact.py
+│   │   ├── ensure_env.py
+│   │   ├── hd_cli.py
+│   │   ├── hd_resolve.py.REMOVED.md
+│   │   ├── hdapi_cli.py
+│   │   ├── hdctl.backup.py
+│   │   ├── hdctl.clean.py
+│   │   ├── hdctl.py
+│   │   ├── hello_demo.py
+│   │   ├── identity_bump.py.REMOVED.md
+│   │   ├── make_audit.sh
+│   │   ├── make_change_snapshot.sh
+│   │   ├── make_cli_smoke_audit.sh
+│   │   ├── make_compat_determinism_artifacts.py
+│   │   ├── make_reader_v1_goldens.py
+│   │   ├── make_release_pack.sh
+│   │   ├── make_source_bundle.sh
+│   │   ├── release_id.sh
+│   │   ├── run_gate_canon.sh
+│   │   ├── run_sanity.sh
+│   │   ├── scratch.py
+│   │   ├── validate
+│   │   ├── validate_canon.sh.REMOVED.md
+│   │   └── validate_det.sh
+│   ├── server.DEPRECATED.md
+│   ├── server.log
+│   ├── tests
+│   │   ├── __pycache__
+│   │   ├── _helpers
+│   │   ├── adapter
+│   │   ├── adapters
+│   │   ├── artifacts
+│   │   ├── canon
+│   │   ├── cli
+│   │   ├── compat
+│   │   ├── compliance
+│   │   ├── conftest.py
+│   │   ├── em
+│   │   ├── epic003
+│   │   ├── fixtures
+│   │   ├── goldens
+│   │   ├── hdctl
+│   │   ├── infra
+│   │   ├── integration
+│   │   ├── loader
+│   │   ├── provider
+│   │   ├── reader_v1
+│   │   ├── test_catalog_canon.py
+│   │   ├── test_pipeline_properties.py
+│   │   ├── test_pipeline_public.py
+│   │   ├── test_resolver_prod_rules.py
+│   │   ├── test_sercanon.py
+│   │   └── unit
+│   └── tools
+│       └── lint_emit_paths.py
+├── .body200.json
+├── .code304.txt
+├── .env.example
+├── .et_gz.txt
+├── .et_id.txt
+├── .git
+│   ├── COMMIT_EDITMSG
+│   ├── FETCH_HEAD
+│   ├── HEAD
+│   ├── ORIG_HEAD
+│   ├── REBASE_HEAD
+│   ├── config
+│   ├── description
+│   ├── hooks
+│   │   ├── applypatch-msg.sample
+│   │   ├── commit-msg.sample
+│   │   ├── fsmonitor-watchman.sample
+│   │   ├── post-checkout
+│   │   ├── post-commit
+│   │   ├── post-merge
+│   │   ├── post-update.sample
+│   │   ├── pre-applypatch.sample
+│   │   ├── pre-commit.sample
+│   │   ├── pre-merge-commit.sample
+│   │   ├── pre-push
+│   │   ├── pre-push.sample
+│   │   ├── pre-rebase.sample
+│   │   ├── pre-receive.sample
+│   │   ├── prepare-commit-msg.sample
+│   │   ├── push-to-checkout.sample
+│   │   ├── sendemail-validate.sample
+│   │   └── update.sample
+│   ├── index
+│   ├── info
+│   │   └── exclude
+│   ├── lfs
+│   │   ├── cache
+│   │   └── tmp
+│   ├── logs
+│   │   ├── HEAD
+│   │   └── refs
+│   ├── objects
+│   │   ├── 00
+│   │   ├── 01
+│   │   ├── 02
+│   │   ├── 03
+│   │   ├── 04
+│   │   ├── 05
+│   │   ├── 06
+│   │   ├── 07
+│   │   ├── 08
+│   │   ├── 09
+│   │   ├── 0a
+│   │   ├── 0b
+│   │   ├── 0c
+│   │   ├── 0d
+│   │   ├── 0e
+│   │   ├── 0f
+│   │   ├── 10
+│   │   ├── 11
+│   │   ├── 12
+│   │   ├── 13
+│   │   ├── 14
+│   │   ├── 15
+│   │   ├── 16
+│   │   ├── 17
+│   │   ├── 18
+│   │   ├── 19
+│   │   ├── 1a
+│   │   ├── 1b
+│   │   ├── 1c
+│   │   ├── 1d
+│   │   ├── 1e
+│   │   ├── 1f
+│   │   ├── 20
+│   │   ├── 21
+│   │   ├── 22
+│   │   ├── 23
+│   │   ├── 24
+│   │   ├── 25
+│   │   ├── 26
+│   │   ├── 27
+│   │   ├── 28
+│   │   ├── 29
+│   │   ├── 2a
+│   │   ├── 2b
+│   │   ├── 2c
+│   │   ├── 2d
+│   │   ├── 2e
+│   │   ├── 2f
+│   │   ├── 30
+│   │   ├── 31
+│   │   ├── 32
+│   │   ├── 33
+│   │   ├── 34
+│   │   ├── 35
+│   │   ├── 36
+│   │   ├── 37
+│   │   ├── 38
+│   │   ├── 39
+│   │   ├── 3a
+│   │   ├── 3b
+│   │   ├── 3c
+│   │   ├── 3d
+│   │   ├── 3e
+│   │   ├── 3f
+│   │   ├── 40
+│   │   ├── 41
+│   │   ├── 42
+│   │   ├── 43
+│   │   ├── 44
+│   │   ├── 45
+│   │   ├── 46
+│   │   ├── 47
+│   │   ├── 48
+│   │   ├── 49
+│   │   ├── 4a
+│   │   ├── 4b
+│   │   ├── 4c
+│   │   ├── 4d
+│   │   ├── 4e
+│   │   ├── 4f
+│   │   ├── 50
+│   │   ├── 51
+│   │   ├── 52
+│   │   ├── 53
+│   │   ├── 54
+│   │   ├── 55
+│   │   ├── 56
+│   │   ├── 57
+│   │   ├── 58
+│   │   ├── 59
+│   │   ├── 5a
+│   │   ├── 5b
+│   │   ├── 5c
+│   │   ├── 5d
+│   │   ├── 5e
+│   │   ├── 5f
+│   │   ├── 60
+│   │   ├── 61
+│   │   ├── 62
+│   │   ├── 63
+│   │   ├── 64
+│   │   ├── 65
+│   │   ├── 66
+│   │   ├── 67
+│   │   ├── 68
+│   │   ├── 69
+│   │   ├── 6a
+│   │   ├── 6b
+│   │   ├── 6c
+│   │   ├── 6d
+│   │   ├── 6e
+│   │   ├── 6f
+│   │   ├── 70
+│   │   ├── 71
+│   │   ├── 72
+│   │   ├── 73
+│   │   ├── 74
+│   │   ├── 75
+│   │   ├── 76
+│   │   ├── 77
+│   │   ├── 78
+│   │   ├── 79
+│   │   ├── 7a
+│   │   ├── 7b
+│   │   ├── 7c
+│   │   ├── 7d
+│   │   ├── 7e
+│   │   ├── 7f
+│   │   ├── 80
+│   │   ├── 81
+│   │   ├── 82
+│   │   ├── 83
+│   │   ├── 84
+│   │   ├── 85
+│   │   ├── 86
+│   │   ├── 87
+│   │   ├── 88
+│   │   ├── 89
+│   │   ├── 8a
+│   │   ├── 8b
+│   │   ├── 8c
+│   │   ├── 8d
+│   │   ├── 8e
+│   │   ├── 8f
+│   │   ├── 90
+│   │   ├── 91
+│   │   ├── 92
+│   │   ├── 93
+│   │   ├── 94
+│   │   ├── 95
+│   │   ├── 96
+│   │   ├── 97
+│   │   ├── 98
+│   │   ├── 99
+│   │   ├── 9a
+│   │   ├── 9b
+│   │   ├── 9c
+│   │   ├── 9d
+│   │   ├── 9e
+│   │   ├── 9f
+│   │   ├── a0
+│   │   ├── a1
+│   │   ├── a2
+│   │   ├── a3
+│   │   ├── a4
+│   │   ├── a5
+│   │   ├── a6
+│   │   ├── a7
+│   │   ├── a8
+│   │   ├── a9
+│   │   ├── aa
+│   │   ├── ab
+│   │   ├── ac
+│   │   ├── ad
+│   │   ├── ae
+│   │   ├── af
+│   │   ├── b0
+│   │   ├── b1
+│   │   ├── b2
+│   │   ├── b3
+│   │   ├── b4
+│   │   ├── b5
+│   │   ├── b6
+│   │   ├── b7
+│   │   ├── b8
+│   │   ├── b9
+│   │   ├── ba
+│   │   ├── bb
+│   │   ├── bc
+│   │   ├── bd
+│   │   ├── be
+│   │   ├── bf
+│   │   ├── c0
+│   │   ├── c1
+│   │   ├── c2
+│   │   ├── c3
+│   │   ├── c4
+│   │   ├── c5
+│   │   ├── c6
+│   │   ├── c7
+│   │   ├── c8
+│   │   ├── c9
+│   │   ├── ca
+│   │   ├── cb
+│   │   ├── cc
+│   │   ├── cd
+│   │   ├── ce
+│   │   ├── cf
+│   │   ├── d0
+│   │   ├── d1
+│   │   ├── d2
+│   │   ├── d3
+│   │   ├── d4
+│   │   ├── d5
+│   │   ├── d6
+│   │   ├── d7
+│   │   ├── d8
+│   │   ├── d9
+│   │   ├── da
+│   │   ├── db
+│   │   ├── dc
+│   │   ├── dd
+│   │   ├── de
+│   │   ├── df
+│   │   ├── e0
+│   │   ├── e1
+│   │   ├── e2
+│   │   ├── e3
+│   │   ├── e4
+│   │   ├── e5
+│   │   ├── e6
+│   │   ├── e7
+│   │   ├── e8
+│   │   ├── e9
+│   │   ├── ea
+│   │   ├── eb
+│   │   ├── ec
+│   │   ├── ed
+│   │   ├── ee
+│   │   ├── ef
+│   │   ├── f0
+│   │   ├── f1
+│   │   ├── f2
+│   │   ├── f3
+│   │   ├── f4
+│   │   ├── f5
+│   │   ├── f6
+│   │   ├── f7
+│   │   ├── f8
+│   │   ├── f9
+│   │   ├── fa
+│   │   ├── fb
+│   │   ├── fc
+│   │   ├── fd
+│   │   ├── fe
+│   │   ├── ff
+│   │   ├── info
+│   │   └── pack
+│   ├── packed-refs
+│   └── refs
+│       ├── heads
+│       ├── remotes
+│       ├── stash
+│       └── tags
+├── .github
+│   └── workflows
+│       └── ci.yml
+├── .gitignore
+├── .h200.txt
+├── .h304.txt
+├── .h_gz.txt
+├── .h_id.txt
+├── .hhead.txt
+├── .pytest_cache
+│   ├── .gitignore
+│   ├── CACHEDIR.TAG
+│   ├── README.md
+│   └── v
+│       └── cache
+├── .runner.pid
+├── .venv
+│   ├── bin
+│   │   ├── Activate.ps1
+│   │   ├── activate
+│   │   ├── activate.csh
+│   │   ├── activate.fish
+│   │   ├── flask
+│   │   ├── jsonschema
+│   │   ├── normalizer
+│   │   ├── pip
+│   │   ├── pip3
+│   │   ├── pip3.12
+│   │   ├── py.test
+│   │   ├── pytest
+│   │   ├── python -> /home/codespace/.python/current/bin/python
+│   │   ├── python3 -> python
+│   │   └── python3.12 -> python
+│   ├── include
+│   │   └── python3.12
+│   ├── lib
+│   │   └── python3.12
+│   ├── lib64 -> lib
+│   └── pyvenv.cfg
+├── .verify_runner.log
+├── .vscode
+│   └── settings.json
+├── ARCHITECTURE.md
+├── AcceptanceMap.md
+├── CANON_CHECKSUMS.json
+├── CHANGELOG.md
+├── EPIC1_PATCH_PACKET_20251003T194953Z
+│   ├── BASE_SHA.txt
+│   ├── DOC_DELTA.md
+│   ├── EXPECTED.txt
+│   ├── MANIFEST.txt
+│   ├── PATCH.diff
+│   ├── ROLLBACK.txt
+│   └── VERIFY.sh
+├── LICENSE
+├── README.md
+├── Run
+├── VERIFY.out
+├── VERIFY.sh
+├── _arch
+│   ├── EPIC-004_20251022T220427Z
+│   │   └── tree.txt
+│   ├── EPIC004_20251022T184748Z
+│   │   └── homes.json
+│   ├── EPIC004_20251022T202254Z
+│   │   └── homes.json
+│   ├── HDE-EPIC004_20251022T220814Z
+│   │   ├── ARCHITECTURE_MAP_AFTER.md
+│   │   ├── byte_parity.txt
+│   │   ├── emit.dumps.txt
+│   │   ├── imports.adapters.txt
+│   │   ├── imports.core.txt
+│   │   ├── imports.server.txt
+│   │   ├── routes.txt
+│   │   └── tree.txt
+│   ├── HDE-EPIC004_20251022T221112Z
+│   │   ├── emit.dumps.txt
+│   │   ├── imports.adapters.txt
+│   │   ├── imports.core.txt
+│   │   ├── imports.server.txt
+│   │   ├── routes.txt
+│   │   └── tree.txt
+│   ├── README.md
+│   ├── epic003_20251017T213424Z
+│   │   ├── architecture_map_AFTER.md
+│   │   ├── compat_endpoints.after.txt
+│   │   ├── routes.after.txt
+│   │   └── tree.after.txt
+│   └── epic003_20251017_210542
+│       ├── emit.dumps.before.txt
+│       ├── focused
+│       ├── focused_after
+│       ├── imports.adapters.before.txt
+│       ├── imports.core.before.txt
+│       ├── imports.server.before.txt
+│       ├── routes.before.txt
+│       └── tree.before.txt
+├── _archive
+│   ├── EPIC003_CLEAN_20251017_211719
+│   │   ├── adapters
+│   │   ├── core
+│   │   └── server
+│   └── EPIC003_CLEAN_refs_20251017_211906
+│       ├── engine
+│       └── scripts
+├── _doc_backup_20251018T020122Z
+│   ├── ARCHITECTURE.md.bak
+│   ├── docs_CLI_commands.md.bak
+│   └── docs_INDEX.md.bak
+├── _li  arch
+│   └── EPIC004_20251022T202318Z
+├── adapter
+│   ├── __init__.py
+│   ├── __pycache__
+│   │   ├── __init__.cpython-312.pyc
+│   │   ├── app.cpython-312.pyc
+│   │   ├── cache_keys.cpython-312.pyc
+│   │   ├── env_guard.cpython-312.pyc
+│   │   ├── etag_core.cpython-312.pyc
+│   │   ├── gunicorn.conf.cpython-312.pyc
+│   │   ├── http_reader.cpython-312.pyc
+│   │   ├── logging_filter.cpython-312.pyc
+│   │   ├── retry_after.cpython-312.pyc
+│   │   └── wsgi.cpython-312.pyc
+│   ├── app.py
+│   ├── cache_keys.py
+│   ├── env_guard.py
+│   ├── etag_core.py
+│   ├── gunicorn.conf.py
+│   ├── http_reader.py
+│   ├── logging_filter.py
+│   ├── retry_after.py
+│   ├── schemas
+│   │   ├── error_v1.schema.json
+│   │   ├── healthz_v1.schema.json
+│   │   ├── readyz_v1.schema.json
+│   │   └── version_v1.schema.json
+│   └── wsgi.py
+├── adapters.DEPRECATED.md
+├── artifacts
+│   ├── CANON_CHECKSUMS.json
+│   ├── CHECKSUMS.txt
+│   ├── _closeout_validate.txt
+│   ├── adjacency_test_run.txt
+│   ├── admin
+│   │   └── INV_TEST_NOTES.md
+│   ├── canon
+│   │   ├── CANON_CHECKSUMS.json
+│   │   ├── CANON_CHECKSUMS.json.sha256
+│   │   ├── manifest.json
+│   │   └── manifest.json.sha256
+│   ├── canon_report.json
+│   ├── cards
+│   │   ├── A3
+│   │   ├── A5
+│   │   ├── A6
+│   │   └── A7
+│   ├── cli
+│   │   ├── abba_sidecar.json
+│   │   ├── hash.txt
+│   │   ├── out.json
+│   │   └── out_ba.json
+│   ├── compat
+│   │   ├── AB.json
+│   │   ├── BA.json
+│   │   └── hash.txt
+│   ├── constants
+│   │   ├── iana_tz_list.json
+│   │   ├── iana_tz_list.json.VERSION.txt
+│   │   ├── iso_3166_1_alpha2.json
+│   │   └── iso_3166_1_alpha2.json.VERSION.txt
+│   ├── det_report.json
+│   ├── det_report.json.sha256
+│   ├── dyad_AB.json
+│   ├── dyad_AB_debug.json
+│   ├── dyad_BA.json
+│   ├── dyad_BA_debug.json
+│   ├── env_guard_import_ok.txt
+│   ├── epic003
+│   │   ├── ARCHITECTURE_MAP_AFTER.md
+│   │   ├── PO_SUMMARY.md
+│   │   ├── acceptance.log
+│   │   ├── checksums.txt
+│   │   ├── closeout
+│   │   ├── compat_error_get_body.json
+│   │   ├── compat_identity_hash.txt
+│   │   ├── compat_success.json
+│   │   ├── compat_success_BA.json
+│   │   ├── headers_compat_200.raw
+│   │   ├── headers_compat_400_get_body.raw
+│   │   ├── manifest.json
+│   │   ├── narrative_keys_table.json
+│   │   ├── thresholds_schema.txt
+│   │   └── thresholds_snapshot_v1.json
+│   ├── epic004
+│   │   ├── bytes
+│   │   ├── guards
+│   │   ├── headers
+│   │   └── validation
+│   ├── errors
+│   │   ├── body_400.json
+│   │   ├── body_403.json
+│   │   ├── headers_400.json
+│   │   ├── headers_400.txt
+│   │   ├── headers_403.json
+│   │   └── headers_403.txt
+│   ├── goldens
+│   │   ├── compliance
+│   │   ├── public_error_429.json
+│   │   ├── public_error_429.json.sha256
+│   │   ├── public_success.json
+│   │   └── public_success.json.sha256
+│   ├── hd_cli_admin.json
+│   ├── hdapi
+│   │   ├── endpoints.json
+│   │   └── rate_limits.md
+│   ├── headers
+│   │   ├── body_identity.json
+│   │   ├── compliance
+│   │   ├── headers_200_identity.json
+│   │   ├── headers_200_identity.txt
+│   │   ├── headers_304.json
+│   │   ├── headers_304.txt
+│   │   ├── headers_HEAD.json
+│   │   ├── headers_HEAD.txt
+│   │   ├── reader_200.json
+│   │   ├── reader_304.json
+│   │   ├── reader_429_headers.json
+│   │   ├── reader_head_304.json
+│   │   └── return_304.code
+│   ├── hotfix
+│   │   └── env_guard_import_ok.txt
+│   ├── identity.txt
+│   ├── invocation.json
+│   ├── live_vendor
+│   │   ├── 20250929T022319Z_request.json
+│   │   └── 20250929T022319Z_response.json
+│   ├── logs
+│   │   ├── keys_only_sample.jsonl
+│   │   ├── keys_only_sample.jsonl.sha256
+│   │   ├── loader_call.jsonl
+│   │   ├── provider_call_sample.jsonl
+│   │   └── provider_call_sample.jsonl.sha256
+│   ├── math
+│   │   ├── _manifest_files.txt
+│   │   ├── checksums_audit.log
+│   │   ├── checksums_audit.log.sha256
+│   │   ├── freeze_pack_manifest.json
+│   │   ├── freeze_pack_manifest.json.sha256
+│   │   ├── release_id.txt
+│   │   ├── release_id.txt.sha256
+│   │   ├── release_id_recompute.log
+│   │   └── release_id_recompute.log.sha256
+│   ├── mvp
+│   │   ├── compat_cli.json
+│   │   ├── compat_http.json
+│   │   └── singlebg.json
+│   ├── provider
+│   │   └── decision.txt
+│   ├── reader
+│   │   └── body_sha.txt
+│   ├── release_id.txt
+│   ├── release_pack_manifest.json
+│   └── serializer
+│       └── determinism_report.txt
+├── assert
+├── audit
+│   ├── ADAPTER-ENV-GUARD-HOTFIX_artifacts_sha256_20250928T072658Z.txt
+│   ├── ADAPTER-ENV-GUARD-HOTFIX_closeout_20250928T072658Z.md
+│   ├── ADAPTER-ENV-GUARD-HOTFIX_source_bundle_20250928T072658Z.zip
+│   ├── ADAPTER-ENV-GUARD-HOTFIX_source_bundle_20250928T072658Z_MANIFEST.json
+│   ├── ADHOC_FULL_MANIFEST_source_bundle_20250927T225124Z.zip
+│   ├── ADHOC_FULL_MANIFEST_source_bundle_20250927T225124Z_MANIFEST.json
+│   ├── ADHOC_FULL_MANIFEST_source_bundle_20250927T225124Z__filelist.txt
+│   ├── CORE-API-ABSTRACTION-001_S2_20250927T213444Z
+│   │   ├── 00_env.txt
+│   │   ├── 00_git_sha.txt
+│   │   ├── 10_pytest_vendor_and_prod_guard.txt
+│   │   ├── 20_decision_and_logs_summary.txt
+│   │   ├── 21_provider_logs.jsonl
+│   │   └── 30_secrets_typing_and_hygiene.txt
+│   ├── CORE-API-ABSTRACTION-001_S2_20250927T214125Z
+│   │   ├── 00_env.txt
+│   │   ├── 00_git_sha.txt
+│   │   ├── 10_pytest_vendor_and_prod_guard.txt
+│   │   ├── 20_decision_and_logs_summary.txt
+│   │   ├── 21_provider_logs.jsonl
+│   │   └── 30_secrets_typing_and_hygiene.txt
+│   ├── CORE-API-ABSTRACTION-001_S2_20250927T214125Z.zip
+│   ├── CORE-API-ABSTRACTION-001_S3S4_artifacts_sha256_20250927T221410Z.txt
+│   ├── CORE-API-ABSTRACTION-001_S3S4_closeout_20250927T221410Z.md
+│   ├── CORE-API-ABSTRACTION-001_S3S4_source_bundle_20250927T221410Z.zip
+│   ├── CORE-API-ABSTRACTION-001_S3S4_source_bundle_20250927T221410Z_MANIFEST.json
+│   ├── CORE-CHART-LOADER-READY-001_artifacts_sha256_20250928T150032Z.txt
+│   ├── CORE-CHART-LOADER-READY-001_closeout_20250928T150032Z.md
+│   ├── CORE-CHART-LOADER-READY-001_source_bundle_20250928T150032Z.zip
+│   ├── CORE-CHART-LOADER-READY-001_source_bundle_20250928T150032Z_MANIFEST.json
+│   ├── EPIC-1.0_artifacts_sha256_20251003T195204Z.txt
+│   ├── EPIC-1.0_artifacts_sha256_20251003T200557Z.txt
+│   ├── EPIC-1.0_artifacts_sha256_20251003T200910Z.txt
+│   ├── EPIC-1.0_closeout_20251003T195204Z.md
+│   ├── EPIC-1.0_closeout_20251003T200557Z.md
+│   ├── EPIC-1.0_closeout_20251003T200910Z.md
+│   ├── EPIC-1.0_source_bundle_20251003T195204Z.zip
+│   ├── EPIC-1.0_source_bundle_20251003T195204Z_MANIFEST.json
+│   ├── EPIC-1.0_source_bundle_20251003T200557Z.zip
+│   ├── EPIC-1.0_source_bundle_20251003T200557Z_MANIFEST.json
+│   ├── EPIC-1.0_source_bundle_20251003T200910Z.zip
+│   ├── EPIC-1.0_source_bundle_20251003T200910Z_MANIFEST.json
+│   ├── Epic-02_artifacts_sha256_20251014T225758Z.txt
+│   ├── Epic-02_closeout_20251014T225758Z.md
+│   ├── Epic-02_source_bundle_20251014T225758Z.zip
+│   ├── Epic-02_source_bundle_20251014T225758Z_MANIFEST.json
+│   ├── FIX-CLI-ADMIN-SIDECAR-INV-TEST-001R_artifacts_sha256_20250929T011642Z.txt
+│   ├── FIX-CLI-ADMIN-SIDECAR-INV-TEST-001R_closeout_20250929T011642Z.md
+│   ├── FIX-CLI-ADMIN-SIDECAR-INV-TEST-001R_source_bundle_20250929T011642Z.zip
+│   ├── FIX-CLI-ADMIN-SIDECAR-INV-TEST-001R_source_bundle_20250929T011642Z_MANIFEST.json
+│   ├── HDE-EPIC003_artifacts_sha256_20251017T202529Z.txt
+│   ├── HDE-EPIC003_artifacts_sha256_20251017T213721Z.txt
+│   ├── HDE-EPIC003_closeout_20251017T202529Z.md
+│   ├── HDE-EPIC003_closeout_20251017T213721Z.md
+│   ├── HDE-EPIC003_source_bundle_20251017T202529Z.zip
+│   ├── HDE-EPIC003_source_bundle_20251017T202529Z_MANIFEST.json
+│   ├── HDE-EPIC003_source_bundle_20251017T213721Z.zip
+│   ├── HDE-EPIC003_source_bundle_20251017T213721Z_MANIFEST.json
+│   ├── HDE-EPIC004_artifacts_sha256_20251022T220808Z.txt
+│   ├── HDE-EPIC004_closeout_20251022T220808Z.md
+│   ├── HDE-EPIC004_source_bundle_20251022T220808Z.zip
+│   ├── HDE-EPIC004_source_bundle_20251022T220808Z_MANIFEST.json
+│   ├── LIVE-API-SMOKE-LOCAL-001_artifacts_sha256_20250929T022515Z.txt
+│   ├── LIVE-API-SMOKE-LOCAL-001_closeout_20250929T022515Z.md
+│   ├── LIVE-API-SMOKE-LOCAL-001_source_bundle_20250929T022515Z.zip
+│   ├── LIVE-API-SMOKE-LOCAL-001_source_bundle_20250929T022515Z_MANIFEST.json
+│   ├── ONE-SHOT-MVP-CLI-API-001_artifacts_sha256_20250929T020210Z.txt
+│   ├── ONE-SHOT-MVP-CLI-API-001_closeout_20250929T020210Z.md
+│   ├── ONE-SHOT-MVP-CLI-API-001_source_bundle_20250929T020210Z.zip
+│   ├── ONE-SHOT-MVP-CLI-API-001_source_bundle_20250929T020210Z_MANIFEST.json
+│   ├── REPORT.txt
+│   ├── T-API-CLI-SMOKE-001_20250927T234951Z
+│   │   ├── 00_audit_log.txt
+│   │   ├── artifacts
+│   │   ├── cmd
+│   │   ├── env
+│   │   ├── files
+│   │   ├── git
+│   │   ├── schemas
+│   │   └── tests
+│   ├── T-API-CLI-SMOKE-001_20250927T234957Z
+│   │   ├── 00_audit_log.txt
+│   │   ├── artifacts
+│   │   ├── cmd
+│   │   ├── env
+│   │   ├── files
+│   │   ├── git
+│   │   ├── schemas
+│   │   └── tests
+│   ├── T-API-CLI-SMOKE-001_20250927T235050Z
+│   │   ├── 00_audit_log.txt
+│   │   ├── artifacts
+│   │   ├── cmd
+│   │   ├── env
+│   │   ├── files
+│   │   ├── git
+│   │   ├── schemas
+│   │   └── tests
+│   ├── T-API-CLI-SMOKE-001_20250927T235137Z
+│   │   ├── 00_audit_log.txt
+│   │   ├── artifacts
+│   │   ├── cmd
+│   │   ├── env
+│   │   ├── files
+│   │   ├── git
+│   │   ├── schemas
+│   │   └── tests
+│   ├── T-API-CLI-SMOKE-001_20250927T235137Z.zip
+│   ├── T-API-CLI-SMOKE-001_artifacts_sha256_20250928T003913Z.txt
+│   ├── T-API-CLI-SMOKE-001_closeout_20250928T003913Z.md
+│   ├── T-API-CLI-SMOKE-001_source_bundle_20250928T003913Z.zip
+│   ├── T-API-CLI-SMOKE-001_source_bundle_20250928T003913Z_MANIFEST.json
+│   ├── escalations
+│   │   ├── reader_import_guard_20250927T224424Z
+│   │   ├── reader_import_guard_20250927T224449Z
+│   │   └── reader_import_guard_20250927T224600Z
+│   ├── gates
+│   │   └── canon
+│   ├── observed_gate_counts.json
+│   ├── provider_S2_20250927T181858Z
+│   │   ├── 01_env.txt
+│   │   ├── 02_git.txt
+│   │   ├── 03_provider_loader_full.txt
+│   │   ├── 03_provider_loader_head.txt
+│   │   ├── 03b_decision_writes.txt
+│   │   ├── 04_repo_grep.txt
+│   │   ├── 05_files.txt
+│   │   ├── 06_import_diag.txt
+│   │   ├── 07a_pytest_vendor_refuses.txt
+│   │   ├── 07b_pytest_vendor_constructs_then_raises.txt
+│   │   ├── 07c_pytest_malformed_secrets.txt
+│   │   ├── 07d_pytest_decision_default.txt
+│   │   ├── 08_syntax_check.txt
+│   │   └── 09_hashes.txt
+│   ├── provider_S2_20250927T181858Z.zip
+│   ├── provider_S2_escalation_20250927T174823Z
+│   │   ├── 01_env.txt
+│   │   ├── 02_files.txt
+│   │   ├── 03_grep_secretspref.txt
+│   │   ├── 04_provider_loader_head.txt
+│   │   ├── 05_single_test_clean.txt
+│   │   ├── 06_repro_with_secretspref.txt
+│   │   └── 07_repro_files.txt
+│   └── provider_S2_escalation_20250927T174823Z.zip
+├── body200.json
+├── body200_new.json
+├── card_close.sh
+├── catalog
+│   ├── channels_catalog_v1.json
+│   ├── channels_v1.json
+│   └── gates_v1.json
+├── changes_report.txt
+├── code304_new.txt
+├── config
+│   ├── bands_4B60_v1.json
+│   └── toggles_v1.json
+├── core.DEPRECATED.md
+├── dev
+│   ├── __init__.py
+│   ├── __pycache__
+│   │   └── __init__.cpython-312.pyc
+│   └── reader_harness
+│       ├── __init__.py
+│       ├── __pycache__
+│       └── app.py
+├── docs
+│   ├── ADAPTER_009.md
+│   ├── CLI_commands.md
+│   ├── INDEX.md
+│   ├── RUN.md
+│   ├── SECRETS.md
+│   ├── SYNC_LOG.md
+│   ├── acceptance
+│   │   └── reader_a7_crib.md
+│   ├── alpha_acceptance.md
+│   ├── architecture
+│   │   ├── emitters.md
+│   │   └── emitters_guardrail.md
+│   ├── contracts
+│   │   └── reader_v1_public_bytes.md
+│   └── server
+│       └── reader_v1.md
+├── engine
+│   ├── __init__.py
+│   ├── __pycache__
+│   │   ├── __init__.cpython-312.pyc
+│   │   └── emit_public.cpython-312.pyc
+│   ├── canon
+│   │   ├── __init__.py.REMOVED.md
+│   │   └── __pycache__
+│   ├── charts
+│   │   ├── __pycache__
+│   │   └── loader.py
+│   ├── compat
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   ├── categories.py
+│   │   ├── compute.py
+│   │   ├── errors.py
+│   │   ├── ordering.py
+│   │   ├── thresholds.py
+│   │   ├── ts_v0.py
+│   │   └── type_strategy_v0.py
+│   ├── compliance
+│   │   ├── __pycache__
+│   │   └── invocation_tag.py
+│   ├── config
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   ├── provider_errors.py
+│   │   ├── provider_loader.bak2
+│   │   ├── provider_loader.py
+│   │   ├── provider_loader.py.bak.1758996879
+│   │   └── provider_types.py
+│   ├── emit_public.py
+│   ├── emit_public.py.bak
+│   ├── errors
+│   │   ├── __init__.py
+│   │   └── __pycache__
+│   ├── http
+│   │   ├── __pycache__
+│   │   └── compat_handler.py
+│   ├── presenter
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   └── emitter.py
+│   ├── presets
+│   │   ├── __pycache__
+│   │   ├── loader.py
+│   │   └── validator.py
+│   ├── provider
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   ├── base.py
+│   │   ├── fixtures.py
+│   │   ├── internal_engine.py
+│   │   └── vendor_http.py
+│   ├── providers
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   ├── fixtures_provider.py
+│   │   ├── internal_engine.py
+│   │   ├── vendor_http.py
+│   │   └── vendor_http_hdapi.py
+│   ├── serializer
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   ├── canon.py
+│   │   └── canon.py.bak.20251022212047
+│   ├── stable
+│   │   ├── __init__.py.REMOVED.md
+│   │   ├── __pycache__
+│   │   ├── hashcouple.py
+│   │   ├── sercanon.py
+│   │   └── sercanon.py.bak
+│   ├── util
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   └── input_validators.py
+│   └── validation
+│       ├── __pycache__
+│       └── viewer_prefs.py
+├── fixtures
+│   ├── charts
+│   │   ├── alice.json
+│   │   └── bob.json
+│   └── hdapi
+│       ├── normalized
+│       └── raw
+├── freeze
+│   └── freeze_pack_v1.json
+├── goldens
+│   └── reader
+│       └── v1
+├── h200.txt
+├── h200_new.txt
+├── h304_new.txt
+├── handoff
+│   ├── epic004_live_evidence_20251022T202304Z
+│   │   ├── PATCH_APPLY_README.txt
+│   │   ├── _arch
+│   │   ├── changes_report.txt
+│   │   ├── code_snippets
+│   │   ├── epic004
+│   │   ├── manifest_post.sha256
+│   │   ├── manifest_pre.sha256
+│   │   └── patch.diff
+│   └── epic004_live_evidence_20251022T202304Z.tar.gz
+├── hhead_new.txt
+├── import
+├── internal
+│   └── readyz
+│       ├── README.md
+│       ├── readyz_200.json
+│       ├── readyz_200_headers.txt
+│       ├── readyz_503.json
+│       └── readyz_503_headers.txt
+├── manifest_post.sha256
+├── manifest_pre.sha256
+├── n
+├── patch.diff
+├── presenter
+│   ├── __init__.py
+│   ├── __pycache__
+│   │   └── __init__.cpython-312.pyc
+│   └── reader_v1
+│       ├── __init__.py
+│       ├── __pycache__
+│       └── emitter.py
+├── release
+│   └── manifest.sorted.json
+├── reports
+│   └── tokens_summary.txt
+├── requirements-dev.txt
+├── runner.log
+├── sandbox
+│   └── epic004
+├── schemas
+│   ├── canon_checksums_v2.schema.json
+│   ├── channels_catalog_v1.schema.json
+│   ├── channels_v1.schema.json
+│   ├── gates_v1.schema.json
+│   ├── hdapi.normalized.v1.schema.json
+│   ├── reader.v1.schema.json
+│   ├── reader.v1.schema.json.sha256
+│   └── toggles_v1.schema.json
+├── scripts
+│   ├── __init__.py
+│   ├── __pycache__
+│   │   ├── __init__.cpython-312.pyc
+│   │   ├── _emit_canon_checksums.cpython-312.pyc
+│   │   ├── emit_env_guard_artifact.cpython-312.pyc
+│   │   ├── ensure_env.cpython-312.pyc
+│   │   ├── hd_cli.cpython-312.pyc
+│   │   ├── hd_resolve.cpython-312.pyc
+│   │   ├── hdapi_cli.cpython-312.pyc
+│   │   ├── hdctl.cpython-312.pyc
+│   │   ├── hello_demo.cpython-312.pyc
+│   │   ├── identity_bump.cpython-312.pyc
+│   │   └── make_reader_v1_goldens.cpython-312.pyc
+│   ├── _emit_canon_checksums.py.REMOVED.md
+│   ├── architecture_capture.sh
+│   ├── card_close.sh
+│   ├── card_close.sh.bak
+│   ├── demo_mvp.sh
+│   ├── diag_env.sh
+│   ├── emit_env_guard_artifact.py
+│   ├── ensure_env.py
+│   ├── hd_cli.py
+│   ├── hd_resolve.py.REMOVED.md
+│   ├── hdapi_cli.py
+│   ├── hdctl.backup.py
+│   ├── hdctl.clean.py
+│   ├── hdctl.py
+│   ├── hdctl.py.bak
+│   ├── hello_demo.py
+│   ├── identity_bump.py.REMOVED.md
+│   ├── make_audit.sh
+│   ├── make_change_snapshot.sh
+│   ├── make_cli_smoke_audit.sh
+│   ├── make_compat_determinism_artifacts.py
+│   ├── make_reader_v1_goldens.py
+│   ├── make_release_pack.sh
+│   ├── make_source_bundle.sh
+│   ├── release_id.sh
+│   ├── run_gate_canon.sh
+│   ├── run_sanity.sh
+│   ├── scratch.py
+│   ├── validate
+│   │   ├── public_bytes_check.py
+│   │   └── sidecar_check.py
+│   ├── validate_canon.sh.REMOVED.md
+│   └── validate_det.sh
+├── server.DEPRECATED.md
+├── server.log
+├── server_backup.tar
+├── tests
+│   ├── __pycache__
+│   │   ├── conftest.cpython-312-pytest-7.4.4.pyc
+│   │   ├── conftest.cpython-312.pyc
+│   │   ├── test_catalog_canon.cpython-312-pytest-7.4.4.pyc
+│   │   ├── test_catalog_canon.cpython-312-pytest-8.4.1.pyc
+│   │   ├── test_catalog_canon.cpython-312.pyc
+│   │   ├── test_pipeline_properties.cpython-312-pytest-7.4.4.pyc
+│   │   ├── test_pipeline_properties.cpython-312.pyc
+│   │   ├── test_pipeline_public.cpython-312-pytest-7.4.4.pyc
+│   │   ├── test_pipeline_public.cpython-312.pyc
+│   │   ├── test_resolver_prod_rules.cpython-312-pytest-7.4.4.pyc
+│   │   ├── test_resolver_prod_rules.cpython-312.pyc
+│   │   ├── test_sercanon.cpython-312-pytest-7.4.4.pyc
+│   │   ├── test_sercanon.cpython-312-pytest-8.4.1.pyc
+│   │   └── test_sercanon.cpython-312.pyc
+│   ├── _helpers
+│   │   ├── __pycache__
+│   │   └── app_import.py
+│   ├── adapter
+│   │   ├── __pycache__
+│   │   ├── test_cache_keys.py
+│   │   ├── test_env_guard_forbidden_matrix.py
+│   │   ├── test_env_guard_import.py
+│   │   ├── test_env_guard_import_purity.py
+│   │   ├── test_env_guard_prod_variants.py
+│   │   ├── test_env_guard_silence_and_idempotence.py
+│   │   ├── test_etag_core.py
+│   │   ├── test_gate_auth.py
+│   │   ├── test_headers_and_determinism.py
+│   │   ├── test_jsonschema.py
+│   │   ├── test_no_etag_on_writers_and_errors.py
+│   │   ├── test_reader_parity.py
+│   │   └── test_readyz.py
+│   ├── adapters
+│   │   ├── __pycache__
+│   │   └── test_safe_mode.py
+│   ├── arch
+│   │   ├── test_arch_capture_exists.py
+│   │   └── test_arch_guards.py
+│   ├── artifacts
+│   │   ├── __pycache__
+│   │   ├── test_cli_text_artifacts_bom_lf.py
+│   │   └── test_env_guard_artifact_bytes.py
+│   ├── canon
+│   │   ├── __pycache__
+│   │   ├── test_center_order_and_counts.py
+│   │   ├── test_checksums.py
+│   │   ├── test_error_envelope.py
+│   │   ├── test_loader_integrity.py
+│   │   ├── test_overrides_prod.py
+│   │   └── test_report_determinism.py
+│   ├── cli
+│   │   ├── __pycache__
+│   │   ├── test_cli_admin_invariance_and_perms.py
+│   │   ├── test_cli_exit2_typed_json_and_exit64_usage.py
+│   │   ├── test_cli_hash_coupling_disk_and_ab_ba.py
+│   │   ├── test_cli_stdout_schema_and_lf.py
+│   │   ├── test_cli_surface_sentinel.py
+│   │   └── test_hd_cli_sidecar_and_stdout.py
+│   ├── compat
+│   │   ├── __pycache__
+│   │   ├── test_cli_public_bytes_identity.py
+│   │   ├── test_compat_public_ab_ba_identity.py
+│   │   ├── test_compat_public_lf_bom.py
+│   │   ├── test_ts_import_no_io.py
+│   │   └── test_ts_sidecar_checks_manual.py
+│   ├── compliance
+│   │   ├── __pycache__
+│   │   ├── test_429_retry_after_mapping_seconds_and_date.py
+│   │   ├── test_cli_admin_gate_sidecar_perms_and_stdout_hash_invariance.py
+│   │   ├── test_cli_release_id_resolver_precedence.py
+│   │   ├── test_invocation_tag_accept_reject_and_roundtrip.py
+│   │   ├── test_log_shape_snapshot.py
+│   │   ├── test_logging_filter_keys_only_and_redactions.py
+│   │   ├── test_meta_abba_parity.py
+│   │   ├── test_override_guard_engine_env_and_app_env_alias.py
+│   │   ├── test_preset_schema_gate_legacy_missing_both_present.py
+│   │   ├── test_public_payload_goldens_success_error_lf_and_no_etag_on_errors.py
+│   │   ├── test_reader_etag_and_conditional.py
+│   │   ├── test_reader_etag_compression_invariance.py
+│   │   └── test_release_id_precedence_and_grep_guard.py
+│   ├── conftest.py
+│   ├── em
+│   │   ├── __pycache__
+│   │   ├── test_em_defaults_and_ladder.py
+│   │   ├── test_em_off_toggle.py
+│   │   ├── test_em_throat_and_adjacency.py
+│   │   └── test_goldens_public_shape_and_identity.py
+│   ├── epic003
+│   │   ├── __pycache__
+│   │   ├── test_error_message_map.py
+│   │   ├── test_http_home_single_path.py
+│   │   ├── test_legacy_imports_denied.py
+│   │   └── test_meta_invocation_ok.py
+│   ├── fixtures
+│   │   ├── cli
+│   │   ├── g05_adj_A.json
+│   │   ├── g05_adj_A.json__admin.json
+│   │   ├── g05_adj_B.json
+│   │   ├── g08_not_paced_A.json
+│   │   ├── g08_not_paced_B.json
+│   │   ├── g08_paced_A.json
+│   │   ├── g08_paced_A.json__admin.json
+│   │   ├── g08_paced_B.json
+│   │   └── reader_v1
+│   ├── goldens
+│   │   ├── g05_adjacency_only.json
+│   │   ├── g05_adjacency_only.json.sha256
+│   │   ├── g08_throat_em_bonus_not_paced.json
+│   │   ├── g08_throat_em_bonus_not_paced.json.sha256
+│   │   ├── g08_throat_em_bonus_paced.json
+│   │   └── g08_throat_em_bonus_paced.json.sha256
+│   ├── hdctl
+│   │   ├── __pycache__
+│   │   ├── test_cli_admin_sidecar_invariance.py
+│   │   ├── test_cli_read_singlebg.py
+│   │   ├── test_cli_showcompat_parity.py
+│   │   ├── test_cli_streams_and_exits.py
+│   │   └── test_cli_two_run_identity.py
+│   ├── infra
+│   │   ├── __pycache__
+│   │   ├── test_hash_coupling.py
+│   │   ├── test_resolver_serializer_discipline.py
+│   │   ├── test_sercanon_bytes.py
+│   │   └── test_serializer_guard.py
+│   ├── integration
+│   │   ├── __pycache__
+│   │   └── test_normalized_fixture.py
+│   ├── loader
+│   │   ├── __pycache__
+│   │   ├── test_chart_loader_uses_provider_and_is_safe_mode_default.py
+│   │   ├── test_load_chart_fixture_only.py
+│   │   ├── test_loader_hdapi_ignores_tz.py
+│   │   ├── test_loader_logs_keys_only.py
+│   │   ├── test_pinned_lists_not_empty.py
+│   │   └── test_validators_strict.py
+│   ├── provider
+│   │   ├── __pycache__
+│   │   ├── conftest.py
+│   │   ├── test_factory_and_safemode.py
+│   │   ├── test_hdapi_error_mapping.py
+│   │   ├── test_hdapi_json_headers.py
+│   │   ├── test_hdapi_request_shape.py
+│   │   ├── test_provider_call_logging_keys_only.py
+│   │   ├── test_provider_interface_contract.py
+│   │   ├── test_prtest_precedence_and_artifact.py
+│   │   ├── test_resolve_log_correlation_id.py
+│   │   ├── test_secrets_dir_invalid.py
+│   │   ├── test_secrets_errors_typed.py
+│   │   ├── test_secrets_unknown_provider_is_misconfigured.py
+│   │   ├── test_startup_logging.py
+│   │   ├── test_vendor_and_prod_guard.py
+│   │   ├── test_vendor_and_prod_guard_min.py
+│   │   ├── test_vendor_call_rails_and_config.py
+│   │   ├── test_vendor_guard_min.py
+│   │   └── tests
+│   ├── reader_v1
+│   │   ├── __pycache__
+│   │   ├── test_cli_proof.py
+│   │   ├── test_emitter.py
+│   │   ├── test_goldens.py
+│   │   ├── test_release_pack.py
+│   │   └── test_schema.py
+│   ├── test_catalog_canon.py
+│   ├── test_pipeline_properties.py
+│   ├── test_pipeline_public.py
+│   ├── test_resolver_prod_rules.py
+│   ├── test_sercanon.py
+│   └── unit
+│       ├── __pycache__
+│       ├── test_channel_derivation.py
+│       └── test_enum_closure.py
+└── tools
+    └── lint_emit_paths.py
+
+609 directories, 802 files

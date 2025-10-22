@@ -1,0 +1,228 @@
+./_arch/epic003_20251017_210542/imports.core.before.txt:1:./engine/canon/__init__.py:1:# Re-export canon components from core (import-safe)
+./_arch/epic003_20251017_210542/imports.core.before.txt:2:./engine/canon/__init__.py:2:from core.canon import validate, checksums
+./_arch/epic003_20251017_210542/imports.core.before.txt:3:./engine/stable/__init__.py:2:from core.stable import sercanon
+./_arch/epic003_20251017_210542/imports.core.before.txt:4:./scripts/_emit_canon_checksums.py:7:from core.stable.sercanon import stable_dumps
+./_arch/epic003_20251017_210542/imports.core.before.txt:5:./scripts/_emit_canon_checksums.py:8:from core.catalog import loader
+./_arch/epic003_20251017_210542/imports.core.before.txt:6:./scripts/_emit_canon_checksums.py:9:from core.config.toggles_resolver import resolve_toggles
+./_arch/epic003_20251017_210542/imports.core.before.txt:7:./scripts/validate_canon.sh:34:from core.canon.validate import load_repo_canon, detect_prod_overrides
+./_arch/epic003_20251017_210542/imports.core.before.txt:8:./scripts/validate_canon.sh:35:from core.canon.checksums import build_checksums
+./_arch/epic003_20251017_210542/imports.core.before.txt:9:./scripts/validate_canon.sh:36:from core.stable import sercanon  # single serializer
+./_arch/epic003_20251017_210542/imports.core.before.txt:10:./scripts/identity_bump.py:7:from core.stable.freeze import iter_records
+./_arch/epic003_20251017_210542/imports.core.before.txt:11:./scripts/identity_bump.py:8:from core.stable.identity import compute_release_id
+./_arch/epic003_20251017_210542/imports.core.before.txt:12:./scripts/identity_bump.py:40:        "from core.stable.freeze import iter_records;"
+./_arch/epic003_20251017_210542/imports.core.before.txt:13:./scripts/identity_bump.py:41:        "from core.stable.identity import compute_release_id;"
+./_arch/epic003_20251017_210542/imports.core.before.txt:14:./scripts/identity_bump.py:42:        "from core.stable.identity_constants import RELEASE_ID;"
+./_arch/epic003_20251017_210542/imports.core.before.txt:15:./scripts/hd_resolve.py:6:from core.config.toggles_resolver import resolve_toggles
+./_arch/epic003_20251017_210542/imports.core.before.txt:16:./core/canon/checksums.py:7:from core.canon.validate import _iter_channel_pairs, _norm_channel_id
+./_arch/epic003_20251017_210542/imports.core.before.txt:17:./core/config/toggles_resolver.py:6:from core.stable.sercanon import stable_dumps
+./_arch/epic003_20251017_210542/imports.core.before.txt:18:./core/pipeline/compute.py:3:from core.pipeline.presenter import present_public
+./_arch/epic003_20251017_210542/imports.core.before.txt:19:./core/pipeline/compute.py:4:from core.config.toggles_resolver import resolve_toggles
+./_arch/epic003_20251017_210542/imports.core.before.txt:20:./core/pipeline/compute.py:5:from core.stable.identity_constants import ENGINE_TAG, RELEASE_ID
+./_arch/epic003_20251017_210542/imports.core.before.txt:21:./core/pipeline/presenter.py:3:from core.pipeline.idempotence import idempotence_hash
+./_arch/epic003_20251017_210542/imports.core.before.txt:22:./core/pipeline/idempotence.py:3:from core.stable.sercanon import stable_idempotence_hash
+./_arch/epic003_20251017_210542/imports.core.before.txt:23:./core/stable/freeze.py:32:    from core.stable.sercanon import stable_dumps
+./_arch/epic003_20251017_210542/imports.core.before.txt:24:./audit/escalations/reader_import_guard_20250927T224449Z/adapter/app.py.txt:80:    80	    from core.config.toggles_resolver import resolve_toggles, OverridesNotAllowedInProd
+./_arch/epic003_20251017_210542/imports.core.before.txt:25:./audit/escalations/reader_import_guard_20250927T224449Z/adapter/app.py.txt:85:    85	    from core.pipeline.compute import compute_pair
+./_arch/epic003_20251017_210542/imports.core.before.txt:26:./audit/escalations/reader_import_guard_20250927T224424Z/adapter/app.py.txt:80:    80	    from core.config.toggles_resolver import resolve_toggles, OverridesNotAllowedInProd
+./_arch/epic003_20251017_210542/imports.core.before.txt:27:./audit/escalations/reader_import_guard_20250927T224424Z/adapter/app.py.txt:85:    85	    from core.pipeline.compute import compute_pair
+./_arch/epic003_20251017_210542/imports.core.before.txt:28:./audit/escalations/reader_import_guard_20250927T224600Z/adapter/app.py.txt:80:    80	    from core.config.toggles_resolver import resolve_toggles, OverridesNotAllowedInProd
+./_arch/epic003_20251017_210542/imports.core.before.txt:29:./audit/escalations/reader_import_guard_20250927T224600Z/adapter/app.py.txt:85:    85	    from core.pipeline.compute import compute_pair
+./_arch/epic003_20251017_210542/imports.core.before.txt:30:./tests/test_sercanon.py:2:from core.stable.sercanon import (
+./_arch/epic003_20251017_210542/imports.core.before.txt:31:./tests/test_catalog_canon.py:2:from core.catalog.loader import center_adj, deg_vector
+./_arch/epic003_20251017_210542/imports.core.before.txt:32:./tests/test_catalog_canon.py:3:from core.stable.sercanon import stable_dumps
+./_arch/epic003_20251017_210542/imports.core.before.txt:33:./tests/canon/test_overrides_prod.py:3:from core.canon.validate import detect_prod_overrides
+./_arch/epic003_20251017_210542/imports.core.before.txt:34:./tests/canon/test_center_order_and_counts.py:2:from core.canon.validate import load_repo_canon, validate_centers_strict
+./_arch/epic003_20251017_210542/imports.core.before.txt:35:./tests/canon/test_center_order_and_counts.py:3:from core.canon.checksums import build_checksums
+./_arch/epic003_20251017_210542/imports.core.before.txt:36:./tests/canon/test_loader_integrity.py:2:from core.canon.validate import load_repo_canon, validate_counts, validate_ids, validate_degree
+./_arch/epic003_20251017_210542/imports.core.before.txt:37:./tests/canon/test_report_determinism.py:2:from core.canon.validate import load_repo_canon
+./_arch/epic003_20251017_210542/imports.core.before.txt:38:./tests/canon/test_report_determinism.py:3:from core.canon.checksums import build_checksums
+./_arch/epic003_20251017_210542/imports.core.before.txt:39:./tests/canon/test_checksums.py:2:from core.canon.validate import load_repo_canon
+./_arch/epic003_20251017_210542/imports.core.before.txt:40:./tests/canon/test_checksums.py:3:from core.canon.checksums import build_checksums, V2_KEYS
+./_arch/epic003_20251017_210542/imports.core.before.txt:41:./tests/test_pipeline_public.py:2:from core.pipeline.compute import compute_pair
+./_arch/epic003_20251017_210542/imports.core.before.txt:42:./tests/test_pipeline_public.py:28:    from core.pipeline.compute import compute_pair
+./_arch/epic003_20251017_210542/imports.core.before.txt:43:./tests/em/test_em_defaults_and_ladder.py:2:from core.config.toggles_resolver import resolve_toggles
+./_arch/epic003_20251017_210542/imports.core.before.txt:44:./tests/test_resolver_prod_rules.py:10:from core.config.toggles_resolver import resolve_toggles, OverridesNotAllowedInProd
+./_arch/epic003_20251017_210542/imports.core.before.txt:45:./tests/test_pipeline_properties.py:9:from core.pipeline.compute import compute_pair  # repo layout uses 'core/'
+./_arch/epic003_20251017T213424Z/architecture_map_AFTER.md:32:- Forbidden in active code: from core, from adapters, from server
+./_arch/HDE-EPIC004_20251022T221112Z/imports.adapters.txt:8:./_arch/epic003_20251017T213424Z/architecture_map_AFTER.md:32:- Forbidden in active code: from core, from adapters, from server
+./_arch/HDE-EPIC004_20251022T221112Z/imports.adapters.txt:11:./_doc_backup_20251018T020122Z/ARCHITECTURE.md.bak:32:- Forbidden in active code: from core, from adapters, from server
+./_arch/HDE-EPIC004_20251022T221112Z/imports.adapters.txt:19:./.audit_src/_arch/epic003_20251017T213424Z/architecture_map_AFTER.md:32:- Forbidden in active code: from core, from adapters, from server
+./_arch/HDE-EPIC004_20251022T221112Z/imports.adapters.txt:20:./.audit_src/artifacts/epic003/ARCHITECTURE_MAP_AFTER.md:32:- Forbidden in active code: from core, from adapters, from server
+./_arch/HDE-EPIC004_20251022T221112Z/imports.adapters.txt:21:./.audit_src/scripts/architecture_capture.sh:80:  echo "- Forbidden in active code: from core, from adapters, from server"
+./_arch/HDE-EPIC004_20251022T221112Z/imports.adapters.txt:22:./.audit_src/ARCHITECTURE.md:32:- Forbidden in active code: from core, from adapters, from server
+./_arch/HDE-EPIC004_20251022T221112Z/imports.adapters.txt:33:./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017T213424Z/architecture_map_AFTER.md:32:- Forbidden in active code: from core, from adapters, from server
+./_arch/HDE-EPIC004_20251022T220814Z/ARCHITECTURE_MAP_AFTER.md:40:- Fail on `from core|server|adapters` imports in active code
+./_archive/EPIC003_CLEAN_refs_20251017_211906/engine/canon/__init__.py:1:# Re-export canon components from core (import-safe)
+./_archive/EPIC003_CLEAN_refs_20251017_211906/engine/canon/__init__.py:2:from core.canon import validate, checksums
+./_archive/EPIC003_CLEAN_refs_20251017_211906/engine/stable/__init__.py:2:from core.stable import sercanon
+./_archive/EPIC003_CLEAN_refs_20251017_211906/scripts/_emit_canon_checksums.py:7:from core.stable.sercanon import stable_dumps
+./_archive/EPIC003_CLEAN_refs_20251017_211906/scripts/_emit_canon_checksums.py:8:from core.catalog import loader
+./_archive/EPIC003_CLEAN_refs_20251017_211906/scripts/_emit_canon_checksums.py:9:from core.config.toggles_resolver import resolve_toggles
+./_archive/EPIC003_CLEAN_refs_20251017_211906/scripts/validate_canon.sh:34:from core.canon.validate import load_repo_canon, detect_prod_overrides
+./_archive/EPIC003_CLEAN_refs_20251017_211906/scripts/validate_canon.sh:35:from core.canon.checksums import build_checksums
+./_archive/EPIC003_CLEAN_refs_20251017_211906/scripts/validate_canon.sh:36:from core.stable import sercanon  # single serializer
+./_archive/EPIC003_CLEAN_refs_20251017_211906/scripts/identity_bump.py:7:from core.stable.freeze import iter_records
+./_archive/EPIC003_CLEAN_refs_20251017_211906/scripts/identity_bump.py:8:from core.stable.identity import compute_release_id
+./_archive/EPIC003_CLEAN_refs_20251017_211906/scripts/identity_bump.py:40:        "from core.stable.freeze import iter_records;"
+./_archive/EPIC003_CLEAN_refs_20251017_211906/scripts/identity_bump.py:41:        "from core.stable.identity import compute_release_id;"
+./_archive/EPIC003_CLEAN_refs_20251017_211906/scripts/identity_bump.py:42:        "from core.stable.identity_constants import RELEASE_ID;"
+./_archive/EPIC003_CLEAN_refs_20251017_211906/scripts/hd_resolve.py:6:from core.config.toggles_resolver import resolve_toggles
+./artifacts/epic003/ARCHITECTURE_MAP_AFTER.md:40:- Fail on `from core|server|adapters` imports in active code
+./scripts/architecture_capture.sh:12:  rg -n "from core|import core\."         -g '!core/**'    > "${OUT_DIR}/imports.core.txt"     || true
+./scripts/architecture_capture.sh:18:  grep -R -n -E "from core|import core\."         --exclude-dir=core     . > "${OUT_DIR}/imports.core.txt"     || true
+./_doc_backup_20251018T020122Z/ARCHITECTURE.md.bak:32:- Forbidden in active code: from core, from adapters, from server
+./.audit_src/_arch/epic003_20251017_210542/imports.core.before.txt:1:./engine/canon/__init__.py:1:# Re-export canon components from core (import-safe)
+./.audit_src/_arch/epic003_20251017_210542/imports.core.before.txt:2:./engine/canon/__init__.py:2:from core.canon import validate, checksums
+./.audit_src/_arch/epic003_20251017_210542/imports.core.before.txt:3:./engine/stable/__init__.py:2:from core.stable import sercanon
+./.audit_src/_arch/epic003_20251017_210542/imports.core.before.txt:4:./scripts/_emit_canon_checksums.py:7:from core.stable.sercanon import stable_dumps
+./.audit_src/_arch/epic003_20251017_210542/imports.core.before.txt:5:./scripts/_emit_canon_checksums.py:8:from core.catalog import loader
+./.audit_src/_arch/epic003_20251017_210542/imports.core.before.txt:6:./scripts/_emit_canon_checksums.py:9:from core.config.toggles_resolver import resolve_toggles
+./.audit_src/_arch/epic003_20251017_210542/imports.core.before.txt:7:./scripts/validate_canon.sh:34:from core.canon.validate import load_repo_canon, detect_prod_overrides
+./.audit_src/_arch/epic003_20251017_210542/imports.core.before.txt:8:./scripts/validate_canon.sh:35:from core.canon.checksums import build_checksums
+./.audit_src/_arch/epic003_20251017_210542/imports.core.before.txt:9:./scripts/validate_canon.sh:36:from core.stable import sercanon  # single serializer
+./.audit_src/_arch/epic003_20251017_210542/imports.core.before.txt:10:./scripts/identity_bump.py:7:from core.stable.freeze import iter_records
+./.audit_src/_arch/epic003_20251017_210542/imports.core.before.txt:11:./scripts/identity_bump.py:8:from core.stable.identity import compute_release_id
+./.audit_src/_arch/epic003_20251017_210542/imports.core.before.txt:12:./scripts/identity_bump.py:40:        "from core.stable.freeze import iter_records;"
+./.audit_src/_arch/epic003_20251017_210542/imports.core.before.txt:13:./scripts/identity_bump.py:41:        "from core.stable.identity import compute_release_id;"
+./.audit_src/_arch/epic003_20251017_210542/imports.core.before.txt:14:./scripts/identity_bump.py:42:        "from core.stable.identity_constants import RELEASE_ID;"
+./.audit_src/_arch/epic003_20251017_210542/imports.core.before.txt:15:./scripts/hd_resolve.py:6:from core.config.toggles_resolver import resolve_toggles
+./.audit_src/_arch/epic003_20251017_210542/imports.core.before.txt:16:./core/canon/checksums.py:7:from core.canon.validate import _iter_channel_pairs, _norm_channel_id
+./.audit_src/_arch/epic003_20251017_210542/imports.core.before.txt:17:./core/config/toggles_resolver.py:6:from core.stable.sercanon import stable_dumps
+./.audit_src/_arch/epic003_20251017_210542/imports.core.before.txt:18:./core/pipeline/compute.py:3:from core.pipeline.presenter import present_public
+./.audit_src/_arch/epic003_20251017_210542/imports.core.before.txt:19:./core/pipeline/compute.py:4:from core.config.toggles_resolver import resolve_toggles
+./.audit_src/_arch/epic003_20251017_210542/imports.core.before.txt:20:./core/pipeline/compute.py:5:from core.stable.identity_constants import ENGINE_TAG, RELEASE_ID
+./.audit_src/_arch/epic003_20251017_210542/imports.core.before.txt:21:./core/pipeline/presenter.py:3:from core.pipeline.idempotence import idempotence_hash
+./.audit_src/_arch/epic003_20251017_210542/imports.core.before.txt:22:./core/pipeline/idempotence.py:3:from core.stable.sercanon import stable_idempotence_hash
+./.audit_src/_arch/epic003_20251017_210542/imports.core.before.txt:23:./core/stable/freeze.py:32:    from core.stable.sercanon import stable_dumps
+./.audit_src/_arch/epic003_20251017_210542/imports.core.before.txt:24:./audit/escalations/reader_import_guard_20250927T224449Z/adapter/app.py.txt:80:    80	    from core.config.toggles_resolver import resolve_toggles, OverridesNotAllowedInProd
+./.audit_src/_arch/epic003_20251017_210542/imports.core.before.txt:25:./audit/escalations/reader_import_guard_20250927T224449Z/adapter/app.py.txt:85:    85	    from core.pipeline.compute import compute_pair
+./.audit_src/_arch/epic003_20251017_210542/imports.core.before.txt:26:./audit/escalations/reader_import_guard_20250927T224424Z/adapter/app.py.txt:80:    80	    from core.config.toggles_resolver import resolve_toggles, OverridesNotAllowedInProd
+./.audit_src/_arch/epic003_20251017_210542/imports.core.before.txt:27:./audit/escalations/reader_import_guard_20250927T224424Z/adapter/app.py.txt:85:    85	    from core.pipeline.compute import compute_pair
+./.audit_src/_arch/epic003_20251017_210542/imports.core.before.txt:28:./audit/escalations/reader_import_guard_20250927T224600Z/adapter/app.py.txt:80:    80	    from core.config.toggles_resolver import resolve_toggles, OverridesNotAllowedInProd
+./.audit_src/_arch/epic003_20251017_210542/imports.core.before.txt:29:./audit/escalations/reader_import_guard_20250927T224600Z/adapter/app.py.txt:85:    85	    from core.pipeline.compute import compute_pair
+./.audit_src/_arch/epic003_20251017_210542/imports.core.before.txt:30:./tests/test_sercanon.py:2:from core.stable.sercanon import (
+./.audit_src/_arch/epic003_20251017_210542/imports.core.before.txt:31:./tests/test_catalog_canon.py:2:from core.catalog.loader import center_adj, deg_vector
+./.audit_src/_arch/epic003_20251017_210542/imports.core.before.txt:32:./tests/test_catalog_canon.py:3:from core.stable.sercanon import stable_dumps
+./.audit_src/_arch/epic003_20251017_210542/imports.core.before.txt:33:./tests/canon/test_overrides_prod.py:3:from core.canon.validate import detect_prod_overrides
+./.audit_src/_arch/epic003_20251017_210542/imports.core.before.txt:34:./tests/canon/test_center_order_and_counts.py:2:from core.canon.validate import load_repo_canon, validate_centers_strict
+./.audit_src/_arch/epic003_20251017_210542/imports.core.before.txt:35:./tests/canon/test_center_order_and_counts.py:3:from core.canon.checksums import build_checksums
+./.audit_src/_arch/epic003_20251017_210542/imports.core.before.txt:36:./tests/canon/test_loader_integrity.py:2:from core.canon.validate import load_repo_canon, validate_counts, validate_ids, validate_degree
+./.audit_src/_arch/epic003_20251017_210542/imports.core.before.txt:37:./tests/canon/test_report_determinism.py:2:from core.canon.validate import load_repo_canon
+./.audit_src/_arch/epic003_20251017_210542/imports.core.before.txt:38:./tests/canon/test_report_determinism.py:3:from core.canon.checksums import build_checksums
+./.audit_src/_arch/epic003_20251017_210542/imports.core.before.txt:39:./tests/canon/test_checksums.py:2:from core.canon.validate import load_repo_canon
+./.audit_src/_arch/epic003_20251017_210542/imports.core.before.txt:40:./tests/canon/test_checksums.py:3:from core.canon.checksums import build_checksums, V2_KEYS
+./.audit_src/_arch/epic003_20251017_210542/imports.core.before.txt:41:./tests/test_pipeline_public.py:2:from core.pipeline.compute import compute_pair
+./.audit_src/_arch/epic003_20251017_210542/imports.core.before.txt:42:./tests/test_pipeline_public.py:28:    from core.pipeline.compute import compute_pair
+./.audit_src/_arch/epic003_20251017_210542/imports.core.before.txt:43:./tests/em/test_em_defaults_and_ladder.py:2:from core.config.toggles_resolver import resolve_toggles
+./.audit_src/_arch/epic003_20251017_210542/imports.core.before.txt:44:./tests/test_resolver_prod_rules.py:10:from core.config.toggles_resolver import resolve_toggles, OverridesNotAllowedInProd
+./.audit_src/_arch/epic003_20251017_210542/imports.core.before.txt:45:./tests/test_pipeline_properties.py:9:from core.pipeline.compute import compute_pair  # repo layout uses 'core/'
+./.audit_src/_arch/epic003_20251017T213424Z/architecture_map_AFTER.md:32:- Forbidden in active code: from core, from adapters, from server
+./.audit_src/_archive/EPIC003_CLEAN_refs_20251017_211906/engine/canon/__init__.py:1:# Re-export canon components from core (import-safe)
+./.audit_src/_archive/EPIC003_CLEAN_refs_20251017_211906/engine/canon/__init__.py:2:from core.canon import validate, checksums
+./.audit_src/_archive/EPIC003_CLEAN_refs_20251017_211906/engine/stable/__init__.py:2:from core.stable import sercanon
+./.audit_src/_archive/EPIC003_CLEAN_refs_20251017_211906/scripts/_emit_canon_checksums.py:7:from core.stable.sercanon import stable_dumps
+./.audit_src/_archive/EPIC003_CLEAN_refs_20251017_211906/scripts/_emit_canon_checksums.py:8:from core.catalog import loader
+./.audit_src/_archive/EPIC003_CLEAN_refs_20251017_211906/scripts/_emit_canon_checksums.py:9:from core.config.toggles_resolver import resolve_toggles
+./.audit_src/_archive/EPIC003_CLEAN_refs_20251017_211906/scripts/validate_canon.sh:34:from core.canon.validate import load_repo_canon, detect_prod_overrides
+./.audit_src/_archive/EPIC003_CLEAN_refs_20251017_211906/scripts/validate_canon.sh:35:from core.canon.checksums import build_checksums
+./.audit_src/_archive/EPIC003_CLEAN_refs_20251017_211906/scripts/validate_canon.sh:36:from core.stable import sercanon  # single serializer
+./.audit_src/_archive/EPIC003_CLEAN_refs_20251017_211906/scripts/identity_bump.py:7:from core.stable.freeze import iter_records
+./.audit_src/_archive/EPIC003_CLEAN_refs_20251017_211906/scripts/identity_bump.py:8:from core.stable.identity import compute_release_id
+./.audit_src/_archive/EPIC003_CLEAN_refs_20251017_211906/scripts/identity_bump.py:40:        "from core.stable.freeze import iter_records;"
+./.audit_src/_archive/EPIC003_CLEAN_refs_20251017_211906/scripts/identity_bump.py:41:        "from core.stable.identity import compute_release_id;"
+./.audit_src/_archive/EPIC003_CLEAN_refs_20251017_211906/scripts/identity_bump.py:42:        "from core.stable.identity_constants import RELEASE_ID;"
+./.audit_src/_archive/EPIC003_CLEAN_refs_20251017_211906/scripts/hd_resolve.py:6:from core.config.toggles_resolver import resolve_toggles
+./.audit_src/artifacts/epic003/ARCHITECTURE_MAP_AFTER.md:32:- Forbidden in active code: from core, from adapters, from server
+./.audit_src/scripts/architecture_capture.sh:80:  echo "- Forbidden in active code: from core, from adapters, from server"
+./.audit_src/audit/escalations/reader_import_guard_20250927T224449Z/adapter/app.py.txt:80:    80	    from core.config.toggles_resolver import resolve_toggles, OverridesNotAllowedInProd
+./.audit_src/audit/escalations/reader_import_guard_20250927T224449Z/adapter/app.py.txt:85:    85	    from core.pipeline.compute import compute_pair
+./.audit_src/audit/escalations/reader_import_guard_20250927T224424Z/adapter/app.py.txt:80:    80	    from core.config.toggles_resolver import resolve_toggles, OverridesNotAllowedInProd
+./.audit_src/audit/escalations/reader_import_guard_20250927T224424Z/adapter/app.py.txt:85:    85	    from core.pipeline.compute import compute_pair
+./.audit_src/audit/escalations/reader_import_guard_20250927T224600Z/adapter/app.py.txt:80:    80	    from core.config.toggles_resolver import resolve_toggles, OverridesNotAllowedInProd
+./.audit_src/audit/escalations/reader_import_guard_20250927T224600Z/adapter/app.py.txt:85:    85	    from core.pipeline.compute import compute_pair
+./.audit_src/ARCHITECTURE.md:32:- Forbidden in active code: from core, from adapters, from server
+./.audit_src/tests/test_sercanon.py:2:from core.stable.sercanon import (
+./.audit_src/tests/test_catalog_canon.py:2:from core.catalog.loader import center_adj, deg_vector
+./.audit_src/tests/test_catalog_canon.py:3:from core.stable.sercanon import stable_dumps
+./.audit_src/tests/canon/test_overrides_prod.py:3:from core.canon.validate import detect_prod_overrides
+./.audit_src/tests/canon/test_center_order_and_counts.py:2:from core.canon.validate import load_repo_canon, validate_centers_strict
+./.audit_src/tests/canon/test_center_order_and_counts.py:3:from core.canon.checksums import build_checksums
+./.audit_src/tests/canon/test_loader_integrity.py:2:from core.canon.validate import load_repo_canon, validate_counts, validate_ids, validate_degree
+./.audit_src/tests/canon/test_report_determinism.py:2:from core.canon.validate import load_repo_canon
+./.audit_src/tests/canon/test_report_determinism.py:3:from core.canon.checksums import build_checksums
+./.audit_src/tests/canon/test_checksums.py:2:from core.canon.validate import load_repo_canon
+./.audit_src/tests/canon/test_checksums.py:3:from core.canon.checksums import build_checksums, V2_KEYS
+./.audit_src/tests/test_pipeline_public.py:2:from core.pipeline.compute import compute_pair
+./.audit_src/tests/test_pipeline_public.py:28:    from core.pipeline.compute import compute_pair
+./.audit_src/tests/em/test_em_defaults_and_ladder.py:2:from core.config.toggles_resolver import resolve_toggles
+./.audit_src/tests/test_resolver_prod_rules.py:10:from core.config.toggles_resolver import resolve_toggles, OverridesNotAllowedInProd
+./.audit_src/tests/test_pipeline_properties.py:9:from core.pipeline.compute import compute_pair  # repo layout uses 'core/'
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.core.before.txt:1:./engine/canon/__init__.py:1:# Re-export canon components from core (import-safe)
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.core.before.txt:2:./engine/canon/__init__.py:2:from core.canon import validate, checksums
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.core.before.txt:3:./engine/stable/__init__.py:2:from core.stable import sercanon
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.core.before.txt:4:./scripts/_emit_canon_checksums.py:7:from core.stable.sercanon import stable_dumps
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.core.before.txt:5:./scripts/_emit_canon_checksums.py:8:from core.catalog import loader
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.core.before.txt:6:./scripts/_emit_canon_checksums.py:9:from core.config.toggles_resolver import resolve_toggles
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.core.before.txt:7:./scripts/validate_canon.sh:34:from core.canon.validate import load_repo_canon, detect_prod_overrides
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.core.before.txt:8:./scripts/validate_canon.sh:35:from core.canon.checksums import build_checksums
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.core.before.txt:9:./scripts/validate_canon.sh:36:from core.stable import sercanon  # single serializer
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.core.before.txt:10:./scripts/identity_bump.py:7:from core.stable.freeze import iter_records
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.core.before.txt:11:./scripts/identity_bump.py:8:from core.stable.identity import compute_release_id
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.core.before.txt:12:./scripts/identity_bump.py:40:        "from core.stable.freeze import iter_records;"
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.core.before.txt:13:./scripts/identity_bump.py:41:        "from core.stable.identity import compute_release_id;"
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.core.before.txt:14:./scripts/identity_bump.py:42:        "from core.stable.identity_constants import RELEASE_ID;"
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.core.before.txt:15:./scripts/hd_resolve.py:6:from core.config.toggles_resolver import resolve_toggles
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.core.before.txt:16:./core/canon/checksums.py:7:from core.canon.validate import _iter_channel_pairs, _norm_channel_id
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.core.before.txt:17:./core/config/toggles_resolver.py:6:from core.stable.sercanon import stable_dumps
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.core.before.txt:18:./core/pipeline/compute.py:3:from core.pipeline.presenter import present_public
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.core.before.txt:19:./core/pipeline/compute.py:4:from core.config.toggles_resolver import resolve_toggles
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.core.before.txt:20:./core/pipeline/compute.py:5:from core.stable.identity_constants import ENGINE_TAG, RELEASE_ID
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.core.before.txt:21:./core/pipeline/presenter.py:3:from core.pipeline.idempotence import idempotence_hash
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.core.before.txt:22:./core/pipeline/idempotence.py:3:from core.stable.sercanon import stable_idempotence_hash
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.core.before.txt:23:./core/stable/freeze.py:32:    from core.stable.sercanon import stable_dumps
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.core.before.txt:24:./audit/escalations/reader_import_guard_20250927T224449Z/adapter/app.py.txt:80:    80	    from core.config.toggles_resolver import resolve_toggles, OverridesNotAllowedInProd
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.core.before.txt:25:./audit/escalations/reader_import_guard_20250927T224449Z/adapter/app.py.txt:85:    85	    from core.pipeline.compute import compute_pair
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.core.before.txt:26:./audit/escalations/reader_import_guard_20250927T224424Z/adapter/app.py.txt:80:    80	    from core.config.toggles_resolver import resolve_toggles, OverridesNotAllowedInProd
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.core.before.txt:27:./audit/escalations/reader_import_guard_20250927T224424Z/adapter/app.py.txt:85:    85	    from core.pipeline.compute import compute_pair
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.core.before.txt:28:./audit/escalations/reader_import_guard_20250927T224600Z/adapter/app.py.txt:80:    80	    from core.config.toggles_resolver import resolve_toggles, OverridesNotAllowedInProd
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.core.before.txt:29:./audit/escalations/reader_import_guard_20250927T224600Z/adapter/app.py.txt:85:    85	    from core.pipeline.compute import compute_pair
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.core.before.txt:30:./tests/test_sercanon.py:2:from core.stable.sercanon import (
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.core.before.txt:31:./tests/test_catalog_canon.py:2:from core.catalog.loader import center_adj, deg_vector
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.core.before.txt:32:./tests/test_catalog_canon.py:3:from core.stable.sercanon import stable_dumps
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.core.before.txt:33:./tests/canon/test_overrides_prod.py:3:from core.canon.validate import detect_prod_overrides
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.core.before.txt:34:./tests/canon/test_center_order_and_counts.py:2:from core.canon.validate import load_repo_canon, validate_centers_strict
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.core.before.txt:35:./tests/canon/test_center_order_and_counts.py:3:from core.canon.checksums import build_checksums
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.core.before.txt:36:./tests/canon/test_loader_integrity.py:2:from core.canon.validate import load_repo_canon, validate_counts, validate_ids, validate_degree
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.core.before.txt:37:./tests/canon/test_report_determinism.py:2:from core.canon.validate import load_repo_canon
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.core.before.txt:38:./tests/canon/test_report_determinism.py:3:from core.canon.checksums import build_checksums
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.core.before.txt:39:./tests/canon/test_checksums.py:2:from core.canon.validate import load_repo_canon
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.core.before.txt:40:./tests/canon/test_checksums.py:3:from core.canon.checksums import build_checksums, V2_KEYS
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.core.before.txt:41:./tests/test_pipeline_public.py:2:from core.pipeline.compute import compute_pair
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.core.before.txt:42:./tests/test_pipeline_public.py:28:    from core.pipeline.compute import compute_pair
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.core.before.txt:43:./tests/em/test_em_defaults_and_ladder.py:2:from core.config.toggles_resolver import resolve_toggles
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.core.before.txt:44:./tests/test_resolver_prod_rules.py:10:from core.config.toggles_resolver import resolve_toggles, OverridesNotAllowedInProd
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/imports.core.before.txt:45:./tests/test_pipeline_properties.py:9:from core.pipeline.compute import compute_pair  # repo layout uses 'core/'
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017T213424Z/architecture_map_AFTER.md:32:- Forbidden in active code: from core, from adapters, from server
+./audit/escalations/reader_import_guard_20250927T224449Z/adapter/app.py.txt:80:    80	    from core.config.toggles_resolver import resolve_toggles, OverridesNotAllowedInProd
+./audit/escalations/reader_import_guard_20250927T224449Z/adapter/app.py.txt:85:    85	    from core.pipeline.compute import compute_pair
+./audit/escalations/reader_import_guard_20250927T224424Z/adapter/app.py.txt:80:    80	    from core.config.toggles_resolver import resolve_toggles, OverridesNotAllowedInProd
+./audit/escalations/reader_import_guard_20250927T224424Z/adapter/app.py.txt:85:    85	    from core.pipeline.compute import compute_pair
+./audit/escalations/reader_import_guard_20250927T224600Z/adapter/app.py.txt:80:    80	    from core.config.toggles_resolver import resolve_toggles, OverridesNotAllowedInProd
+./audit/escalations/reader_import_guard_20250927T224600Z/adapter/app.py.txt:85:    85	    from core.pipeline.compute import compute_pair
+./ARCHITECTURE.md:40:- Fail on `from core|server|adapters` imports in active code
+./tests/test_sercanon.py:2:from core.stable.sercanon import (
+./tests/test_catalog_canon.py:2:from core.catalog.loader import center_adj, deg_vector
+./tests/test_catalog_canon.py:3:from core.stable.sercanon import stable_dumps
+./tests/canon/test_overrides_prod.py:3:from core.canon.validate import detect_prod_overrides
+./tests/canon/test_center_order_and_counts.py:2:from core.canon.validate import load_repo_canon, validate_centers_strict
+./tests/canon/test_center_order_and_counts.py:3:from core.canon.checksums import build_checksums
+./tests/canon/test_loader_integrity.py:2:from core.canon.validate import load_repo_canon, validate_counts, validate_ids, validate_degree
+./tests/canon/test_report_determinism.py:2:from core.canon.validate import load_repo_canon
+./tests/canon/test_report_determinism.py:3:from core.canon.checksums import build_checksums
+./tests/canon/test_checksums.py:2:from core.canon.validate import load_repo_canon
+./tests/canon/test_checksums.py:3:from core.canon.checksums import build_checksums, V2_KEYS
+./tests/test_pipeline_public.py:2:from core.pipeline.compute import compute_pair
+./tests/test_pipeline_public.py:28:    from core.pipeline.compute import compute_pair
+./tests/em/test_em_defaults_and_ladder.py:2:from core.config.toggles_resolver import resolve_toggles
+./tests/test_resolver_prod_rules.py:10:from core.config.toggles_resolver import resolve_toggles, OverridesNotAllowedInProd
+./tests/test_pipeline_properties.py:9:from core.pipeline.compute import compute_pair  # repo layout uses 'core/'

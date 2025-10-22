@@ -1,0 +1,30 @@
+./_arch/epic003_20251017T213424Z/architecture_map_AFTER.md:32:- Forbidden in active code: from core, from adapters, from server
+./_arch/HDE-EPIC004_20251022T221112Z/imports.adapters.txt:8:./_arch/epic003_20251017T213424Z/architecture_map_AFTER.md:32:- Forbidden in active code: from core, from adapters, from server
+./_arch/HDE-EPIC004_20251022T221112Z/imports.adapters.txt:11:./_doc_backup_20251018T020122Z/ARCHITECTURE.md.bak:32:- Forbidden in active code: from core, from adapters, from server
+./_arch/HDE-EPIC004_20251022T221112Z/imports.adapters.txt:19:./.audit_src/_arch/epic003_20251017T213424Z/architecture_map_AFTER.md:32:- Forbidden in active code: from core, from adapters, from server
+./_arch/HDE-EPIC004_20251022T221112Z/imports.adapters.txt:20:./.audit_src/artifacts/epic003/ARCHITECTURE_MAP_AFTER.md:32:- Forbidden in active code: from core, from adapters, from server
+./_arch/HDE-EPIC004_20251022T221112Z/imports.adapters.txt:21:./.audit_src/scripts/architecture_capture.sh:80:  echo "- Forbidden in active code: from core, from adapters, from server"
+./_arch/HDE-EPIC004_20251022T221112Z/imports.adapters.txt:22:./.audit_src/ARCHITECTURE.md:32:- Forbidden in active code: from core, from adapters, from server
+./_arch/HDE-EPIC004_20251022T221112Z/imports.adapters.txt:33:./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017T213424Z/architecture_map_AFTER.md:32:- Forbidden in active code: from core, from adapters, from server
+./_arch/HDE-EPIC004_20251022T221112Z/imports.core.txt:46:./_arch/epic003_20251017T213424Z/architecture_map_AFTER.md:32:- Forbidden in active code: from core, from adapters, from server
+./_arch/HDE-EPIC004_20251022T221112Z/imports.core.txt:47:./_arch/HDE-EPIC004_20251022T221112Z/imports.adapters.txt:8:./_arch/epic003_20251017T213424Z/architecture_map_AFTER.md:32:- Forbidden in active code: from core, from adapters, from server
+./_arch/HDE-EPIC004_20251022T221112Z/imports.core.txt:48:./_arch/HDE-EPIC004_20251022T221112Z/imports.adapters.txt:11:./_doc_backup_20251018T020122Z/ARCHITECTURE.md.bak:32:- Forbidden in active code: from core, from adapters, from server
+./_arch/HDE-EPIC004_20251022T221112Z/imports.core.txt:49:./_arch/HDE-EPIC004_20251022T221112Z/imports.adapters.txt:19:./.audit_src/_arch/epic003_20251017T213424Z/architecture_map_AFTER.md:32:- Forbidden in active code: from core, from adapters, from server
+./_arch/HDE-EPIC004_20251022T221112Z/imports.core.txt:50:./_arch/HDE-EPIC004_20251022T221112Z/imports.adapters.txt:20:./.audit_src/artifacts/epic003/ARCHITECTURE_MAP_AFTER.md:32:- Forbidden in active code: from core, from adapters, from server
+./_arch/HDE-EPIC004_20251022T221112Z/imports.core.txt:51:./_arch/HDE-EPIC004_20251022T221112Z/imports.adapters.txt:21:./.audit_src/scripts/architecture_capture.sh:80:  echo "- Forbidden in active code: from core, from adapters, from server"
+./_arch/HDE-EPIC004_20251022T221112Z/imports.core.txt:52:./_arch/HDE-EPIC004_20251022T221112Z/imports.adapters.txt:22:./.audit_src/ARCHITECTURE.md:32:- Forbidden in active code: from core, from adapters, from server
+./_arch/HDE-EPIC004_20251022T221112Z/imports.core.txt:53:./_arch/HDE-EPIC004_20251022T221112Z/imports.adapters.txt:33:./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017T213424Z/architecture_map_AFTER.md:32:- Forbidden in active code: from core, from adapters, from server
+./_arch/HDE-EPIC004_20251022T221112Z/imports.core.txt:73:./_doc_backup_20251018T020122Z/ARCHITECTURE.md.bak:32:- Forbidden in active code: from core, from adapters, from server
+./_arch/HDE-EPIC004_20251022T221112Z/imports.core.txt:119:./.audit_src/_arch/epic003_20251017T213424Z/architecture_map_AFTER.md:32:- Forbidden in active code: from core, from adapters, from server
+./_arch/HDE-EPIC004_20251022T221112Z/imports.core.txt:135:./.audit_src/artifacts/epic003/ARCHITECTURE_MAP_AFTER.md:32:- Forbidden in active code: from core, from adapters, from server
+./_arch/HDE-EPIC004_20251022T221112Z/imports.core.txt:136:./.audit_src/scripts/architecture_capture.sh:80:  echo "- Forbidden in active code: from core, from adapters, from server"
+./_arch/HDE-EPIC004_20251022T221112Z/imports.core.txt:143:./.audit_src/ARCHITECTURE.md:32:- Forbidden in active code: from core, from adapters, from server
+./_arch/HDE-EPIC004_20251022T221112Z/imports.core.txt:205:./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017T213424Z/architecture_map_AFTER.md:32:- Forbidden in active code: from core, from adapters, from server
+./scripts/architecture_capture.sh:13:  rg -n "from server|import server\."     -g '!server/**'  > "${OUT_DIR}/imports.server.txt"   || true
+./scripts/architecture_capture.sh:19:  grep -R -n -E "from server|import server\."     --exclude-dir=server   . > "${OUT_DIR}/imports.server.txt"   || true
+./_doc_backup_20251018T020122Z/ARCHITECTURE.md.bak:32:- Forbidden in active code: from core, from adapters, from server
+./.audit_src/_arch/epic003_20251017T213424Z/architecture_map_AFTER.md:32:- Forbidden in active code: from core, from adapters, from server
+./.audit_src/artifacts/epic003/ARCHITECTURE_MAP_AFTER.md:32:- Forbidden in active code: from core, from adapters, from server
+./.audit_src/scripts/architecture_capture.sh:80:  echo "- Forbidden in active code: from core, from adapters, from server"
+./.audit_src/ARCHITECTURE.md:32:- Forbidden in active code: from core, from adapters, from server
+./handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017T213424Z/architecture_map_AFTER.md:32:- Forbidden in active code: from core, from adapters, from server
