@@ -1,0 +1,3 @@
+adapter/http_reader.py:114:        body = json.dumps({"error": token}, ensure_ascii=False, separators=(",", ":")) + "\n"
+adapter/logging_filter.py:50:        line = json.dumps(obj, separators=(",",":"), sort_keys=True)
+adapter/logging_filter.py:67:    line = json.dumps(obj, separators=(",",":"), sort_keys=True)

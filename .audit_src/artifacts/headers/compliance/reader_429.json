@@ -1,0 +1,10 @@
+{
+  "status": 429,
+  "headers": {
+    "Cache-Control": "no-store",
+    "Content-Type": "application/json",
+    "Content-Length": "105",
+    "Retry-After": "7",
+    "X-Correlation-Id": "174e8095d4b043fface0679da603ccc9"
+  }
+}

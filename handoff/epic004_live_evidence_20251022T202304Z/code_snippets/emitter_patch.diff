@@ -1,0 +1,21 @@
+*** engine/presenter/emitter.py.orig
+--- engine/presenter/emitter.py
+@@
+-from typing import Tuple, Dict, Any
+-from engine.serializer import dumps
++from typing import Tuple, Dict, Any
++from engine.serializer import canon
+@@
+-def emit_compact_json(envelope: Dict[str, Any]) -> Tuple[bytes, Dict[str, Any]]:
+-    """
+-    Single entrypoint for public JSON bytes.
+-    Returns (bytes, envelope) with bytes LF-terminated and keys sorted.
+-    """
+-    b = dumps(envelope)
+-    return b, envelope
++def emit_compact_json(envelope: Dict[str, Any]) -> Tuple[bytes, Dict[str, Any]]:
++    """
++    Single entrypoint for public JSON bytes (LF-terminated, sorted keys, compact).
++    """
++    b = canon.dumps(envelope)
++    return b, envelope

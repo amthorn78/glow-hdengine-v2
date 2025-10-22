@@ -2,6 +2,7 @@ from __future__ import annotations
 import os, json, hashlib
 from pathlib import Path
 from flask import Blueprint, Response, request
+from engine.presenter.emitter import emit_compact_json
 
 # A7 helpers
 def _sha256_hex(b: bytes) -> str: return hashlib.sha256(b).hexdigest()
@@ -110,9 +111,14 @@ def get_reader_bp(emit_fn):
         _set_reader_200_headers(resp)
         return resp, 200
 
+    @bp.post("/reader")
+    def reader_v1_post():
+        # Explicit POST posture: typed JSON error, no-store, no ETag
+        return _error("method_not_allowed", 405)
+
     def _error(token: str, code: int = 400):
-        body = json.dumps({"error": token}, ensure_ascii=False, separators=(",", ":")) + "\n"
-        resp = Response(body, mimetype="application/json; charset=utf-8")
-        _clear_writer_error_caching(resp); return resp, code
+        body_bytes, _ = emit_compact_json({'error': token})
+
+        resp = Response(body_bytes, mimetype="application/json; charset=utf-8")
 
     return bp

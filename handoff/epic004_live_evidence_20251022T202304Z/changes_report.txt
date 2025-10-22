@@ -1,0 +1,33 @@
+--- manifest_pre.sha256	2025-10-22 20:22:54.731978003 +0000
++++ manifest_post.sha256	2025-10-22 20:23:02.933977931 +0000
+@@ -3017,16 +3017,17 @@
+ 5c4c99d4da9b75c1013ba5426dc8eaa97baf59512e20ba89e0244b3374ef7c60  ./artifacts/epic004/bytes/reader_gzip.sha256
+ 5d7f19230de75ed00c158d3380d9809df2b4808e982761a9f959971ba7012031  ./artifacts/epic004/bytes/reader_identity.bin
+ 5c4c99d4da9b75c1013ba5426dc8eaa97baf59512e20ba89e0244b3374ef7c60  ./artifacts/epic004/bytes/reader_identity.sha256
++3e66a4693d7182ad443bc3f626e8f65742921b777dd8832e7e985451baa1b815  ./artifacts/epic004/guards/forbidden_serializers.txt
+ e9639e3c4681ce85f852fbac48e2eeee5ba51296dbfec57c200d59b76237ab80  ./artifacts/epic004/headers/compat_get_with_body_400.json
+ e9639e3c4681ce85f852fbac48e2eeee5ba51296dbfec57c200d59b76237ab80  ./artifacts/epic004/headers/compat_post_200.json
+-77909b3028bb35d6ff45c9c441ba92acaed08004342e418ecf6c827b157d74d0  ./artifacts/epic004/headers/reader_200.json
++43a86729a8ad1d7ba8b528aa7dc864203a7130244da592e7d4387c5fd9c5002c  ./artifacts/epic004/headers/reader_200.json
+ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  ./artifacts/epic004/headers/reader_200.txt
+ bfddc6b5ad183b39c9eea025acf8cda279f289c6dd7d5ea51733c110baa3c246  ./artifacts/epic004/headers/reader_200_br.note.json
+-4eafceef5e98b4a811cab8592ffc2a1a70e93f49364cf70c1d3a7aa7f1ca27a4  ./artifacts/epic004/headers/reader_200_gzip.json
++43a86729a8ad1d7ba8b528aa7dc864203a7130244da592e7d4387c5fd9c5002c  ./artifacts/epic004/headers/reader_200_gzip.json
+ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  ./artifacts/epic004/headers/reader_200_gzip.txt
+-af87b8bee5ed6ba215d38d31e07d5e76ca28b2e82b2ba54c4a2018469e11240a  ./artifacts/epic004/headers/reader_304.json
++078813089deffcc8fba6aac8468f8ad8591558d916d02861cab5946d9b9e3dd3  ./artifacts/epic004/headers/reader_304.json
+ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  ./artifacts/epic004/headers/reader_304.txt
+-3547d4c7aab77ceb13a02d2cb3ee0e304142b26eb61002d10b836b69821989dc  ./artifacts/epic004/headers/reader_head.json
++5942650c94d4a87dbd77bb6c5347f099aaefb8ac8207f0818b0f9975e40894a3  ./artifacts/epic004/headers/reader_head.json
+ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  ./artifacts/epic004/headers/reader_head.txt
+ 1d2359a560f375f60588bc067022852c8ce9e8e8b7eec7e80143cb3fa8dc079c  ./artifacts/epic004/headers/reader_post_405.json
+ 08e2c8508f6fa0262f34b1895f413d087466ce4fe32230c5248c3b10227ccb14  ./artifacts/epic004/validation/a7_matrix.txt
+@@ -3439,7 +3440,7 @@
+ 74d45c5db69f8fabcd11c1097335ab951e7c9a9dca2a6d9aa09b78ae0bb9677d  ./internal/readyz/readyz_503.json
+ e9a3b82c9b70c10fbfd3a5396203aeb7df03e347d9426b9bc529bbf84c97256f  ./internal/readyz/readyz_503_headers.txt
+ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  ./manifest_post.sha256
+-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  ./manifest_pre.sha256
++0f3a02458744a2197e3155d4a10a1dc8ccf592c237a8f78b064993bf9da4d468  ./manifest_pre.sha256
+ 656fc8aadbc09b1cc17107cc1c50e634a9234b869c601f036f6d7818300563bb  ./n
+ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  ./patch.diff
+ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  ./presenter/__init__.py

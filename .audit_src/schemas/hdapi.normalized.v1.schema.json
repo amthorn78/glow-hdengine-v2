@@ -1,0 +1,57 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://glow.app/schemas/hdapi.normalized.v1.schema.json",
+  "title": "Glow normalized chart v1 (admin/private)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema","source","birth","location","mechanics","type","authority","definition"],
+  "properties": {
+    "schema": { "const": "chart.normalized.v1" },
+    "source": { "const": "hdapi" },
+    "birth": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["date","time","timezone"],
+      "properties": {
+        "date": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+        "time": { "type": "string", "pattern": "^\\d{2}:\\d{2}$" },
+        "timezone": { "type": "string" }
+      }
+    },
+    "location": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name","lat","lng"],
+      "properties": {
+        "name": { "type": "string" },
+        "lat":  { "type": "string", "pattern": "^-?\\d+\\.\\d{1,6}$" },
+        "lng":  { "type": "string", "pattern": "^-?\\d+\\.\\d{1,6}$" }
+      }
+    },
+    "mechanics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["gates","channels","centers"],
+      "properties": {
+        "gates": { "type": "array", "items": { "type": "string", "pattern": "^\\d{2}$" } },
+        "channels": { "type": "array", "items": { "type": "string", "pattern": "^\\d{2}-\\d{2}$" } },
+        "centers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id","state"],
+            "properties": {
+              "id": { "type": "string" },
+              "state": { "enum": ["defined","undefined"] }
+            }
+          }
+        }
+      }
+    },
+    "type": { "type": "string" },
+    "authority": { "type": "string" },
+    "definition": { "type": "string" }
+  }
+}
+

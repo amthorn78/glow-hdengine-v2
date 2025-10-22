@@ -1,0 +1,39 @@
+adapter/logging_filter.py:50:        line = json.dumps(obj, separators=(",",":"), sort_keys=True)
+adapter/logging_filter.py:67:    line = json.dumps(obj, separators=(",",":"), sort_keys=True)
+engine/emit_public.py:17:    s = json.dumps(obj, sort_keys=True, separators=(',',':'), ensure_ascii=False)
+engine/compat/type_strategy_v0.py:22:    canon = json.dumps({"gates": ints}, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+engine/config/provider_loader.bak2:129:                json.dumps(
+engine/config/provider_loader.bak2:158:            json.dumps(
+engine/config/provider_loader.bak2:177:            json.dumps(
+engine/config/provider_loader.bak2:202:                json.dumps(
+engine/config/provider_loader.bak2:223:                json.dumps(
+engine/config/provider_loader.bak2:245:        json.dumps(
+engine/config/provider_loader.py:179:                json.dumps(
+engine/config/provider_loader.py:198:                json.dumps(
+engine/config/provider_loader.py:235:            json.dumps(
+engine/config/provider_loader.py:254:            json.dumps(
+engine/config/provider_loader.py:279:                json.dumps(
+engine/config/provider_loader.py:300:                json.dumps(
+engine/config/provider_loader.py:323:            json.dumps(
+engine/config/provider_loader.py:339:        json.dumps(
+engine/serializer/canon.py:13:    s = json.dumps(obj, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+engine/emit_public.py.bak:17:    s = json.dumps(obj, sort_keys=True, separators=(',',':'), ensure_ascii=False)
+engine/stable/sercanon.py.bak:13:    return json.dumps(obj, ensure_ascii=False, separators=_COMPACT_SEPS, sort_keys=True)
+engine/stable/sercanon.py:5:    return json.dumps(obj, ensure_ascii=False, separators=_COMPACT_SEPS, sort_keys=True)
+engine/charts/loader.py:73:        fh.write(_json.dumps(line, separators=(",", ":"), ensure_ascii=False).encode("utf-8") + b"\n")
+scripts/make_audit.sh:101:manifest.write_text(json.dumps({
+scripts/hd_cli.py:20:    sys.stderr.write(json.dumps(
+scripts/make_source_bundle.sh:102:  o.write(json.dumps(rows, ensure_ascii=False, separators=(",",":")))
+scripts/make_reader_v1_goldens.py:52:b = (json.dumps(err, ensure_ascii=False, separators=(",",":"), sort_keys=True) + "\n").encode("utf-8")
+scripts/hdctl.backup.py:9:    b = json.dumps(obj, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+scripts/make_cli_smoke_audit.sh:25:print(json.dumps(mods, indent=2))
+scripts/make_cli_smoke_audit.sh:82:print(json.dumps({"cmd": sys.argv[1:]}, indent=2))
+scripts/make_cli_smoke_audit.sh:102:print(json.dumps({
+scripts/make_cli_smoke_audit.sh:125:pre_b = json.dumps(pre, ensure_ascii=False, separators=(",",":"), sort_keys=True).encode("utf-8")+b"\n"
+scripts/hello_demo.py:4:print(json.dumps({"ok": True}, sort_keys=True, separators=(",", ":")))
+scripts/hdctl.clean.py:7:    b = json.dumps(obj, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+scripts/hdapi_cli.py:6:    return json.dumps(obj, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8") + b"\n"
+scripts/hdapi_cli.py:30:        ap.write_text(json.dumps(meta, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n", encoding="utf-8")
+scripts/hdctl.py.bak:6:    b = json.dumps(obj, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+scripts/make_change_snapshot.sh:64:print(json.dumps({"changed": list(seen.values())}))
+scripts/make_change_snapshot.sh:108:print(json.dumps({

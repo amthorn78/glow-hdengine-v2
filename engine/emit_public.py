@@ -2,6 +2,8 @@ from __future__ import annotations
 import json, hashlib
 from typing import Dict, Any
 from engine.compat import ts_v0  # provides extract_ts, compute_features, band_v0
+from engine.serializer import canon
+from engine.presenter.emitter import emit_compact_json
 
 def sercanon(obj: Dict[str, Any]) -> bytes:
     """
@@ -42,6 +44,6 @@ def emit_public_envelope(
         "meta": {"engine_tag": engine_tag, "invocation_tag": invocation_tag},
         "release_id": release_id,
     }
-    h = hashlib.sha256(sercanon(pre)).hexdigest()
+    h = hashlib.sha256(canon.dumps(pre)).hexdigest()
     final = dict(pre, idempotence_hash=h)
-    return sercanon(final)
+    return emit_compact_json(final)[0]

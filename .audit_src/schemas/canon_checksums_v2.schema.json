@@ -1,0 +1,18 @@
+{"$schema":"https://json-schema.org/draft/2020-12/schema","title":"canon_checksums_v2",
+"type":"object","additionalProperties":false,
+"properties":{
+ "version":{"type":"integer","const":2},
+ "adjacency_sha":{"type":"string","pattern":"^[0-9a-f]{64}$"},
+ "deg_vector":{"type":"array","minItems":9,"maxItems":9,"items":{"type":"integer"}},
+ "channels_sorted":{"type":"array","minItems":36,"maxItems":36,"items":{"type":"string","pattern":"^\\d{2}-\\d{2}$"}},
+ "gate_counts_by_center":{"type":"object","additionalProperties":false,
+  "properties":{"head":{"type":"integer"},"ajna":{"type":"integer"},"throat":{"type":"integer"},"g":{"type":"integer"},"ego":{"type":"integer"},"spleen":{"type":"integer"},"solar_plexus":{"type":"integer"},"sacral":{"type":"integer"},"root":{"type":"integer"}},
+  "required":["head","ajna","throat","g","ego","spleen","solar_plexus","sacral","root"]},
+ "distinguished":{"type":"object","additionalProperties":false,
+  "properties":{"format_trio_sha":{"type":"string","pattern":"^[0-9a-f]{64}$"},"direct_mt_sha":{"type":"string","pattern":"^[0-9a-f]{64}$"},"talk_ladder_sha":{"type":"string","pattern":"^[0-9a-f]{64}$"}},
+  "required":["format_trio_sha","direct_mt_sha","talk_ladder_sha"]},
+ "domain_coverage":{"type":"object"},
+ "toggles_frozen_sha":{"type":"string","pattern":"^[0-9a-f]{64}$"},
+ "center_order":{"type":"array","minItems":9,"maxItems":9,"items":{"type":"string"}}
+},
+"required":["version","adjacency_sha","deg_vector","channels_sorted","gate_counts_by_center","distinguished","domain_coverage","toggles_frozen_sha","center_order"]}

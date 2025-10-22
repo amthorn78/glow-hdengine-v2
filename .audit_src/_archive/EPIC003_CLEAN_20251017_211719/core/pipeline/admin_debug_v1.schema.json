@@ -1,0 +1,9 @@
+{
+  "type":"object",
+  "additionalProperties": true,
+  "properties":{
+    "input":{"type":"object"},
+    "toggles_sha":{"type":"string"},
+    "explain":{"type":"object","additionalProperties":true}
+  }
+}

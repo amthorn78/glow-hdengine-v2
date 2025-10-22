@@ -1,0 +1,4613 @@
+{
+  "card": "HDE-EPIC003",
+  "generated_at": "20251017T213721Z",
+  "count": 921,
+  "max_file_mb": 32,
+  "files": [
+    {
+      "path": ".body200.json",
+      "size": 300,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": ".code304.txt",
+      "size": 4,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": ".env.example",
+      "size": 87,
+      "mtime": "2025-09-24T23:26:11Z"
+    },
+    {
+      "path": ".et_gz.txt",
+      "size": 67,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": ".et_id.txt",
+      "size": 67,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "size": 576,
+      "mtime": "2025-09-24T23:30:05Z"
+    },
+    {
+      "path": ".gitignore",
+      "size": 243,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": ".h200.txt",
+      "size": 345,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": ".h304.txt",
+      "size": 287,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": ".h_gz.txt",
+      "size": 345,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": ".h_id.txt",
+      "size": 345,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": ".hhead.txt",
+      "size": 345,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": ".runner.pid",
+      "size": 6,
+      "mtime": "2025-10-03T19:34:31Z"
+    },
+    {
+      "path": ".verify_runner.log",
+      "size": 1103,
+      "mtime": "2025-10-03T20:09:10Z"
+    },
+    {
+      "path": ".vscode/settings.json",
+      "size": 124,
+      "mtime": "2025-09-24T19:25:05Z"
+    },
+    {
+      "path": "ARCHITECTURE.md",
+      "size": 43101,
+      "mtime": "2025-10-17T21:34:24Z"
+    },
+    {
+      "path": "AcceptanceMap.md",
+      "size": 1657,
+      "mtime": "2025-10-14T22:49:09Z"
+    },
+    {
+      "path": "CANON_CHECKSUMS.json",
+      "size": 1479,
+      "mtime": "2025-09-27T11:12:01Z"
+    },
+    {
+      "path": "CHANGELOG.md",
+      "size": 7118,
+      "mtime": "2025-10-16T16:36:16Z"
+    },
+    {
+      "path": "EPIC1_PATCH_PACKET_20251003T194953Z/BASE_SHA.txt",
+      "size": 41,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "EPIC1_PATCH_PACKET_20251003T194953Z/DOC_DELTA.md",
+      "size": 1711,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "EPIC1_PATCH_PACKET_20251003T194953Z/EXPECTED.txt",
+      "size": 225,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "EPIC1_PATCH_PACKET_20251003T194953Z/MANIFEST.txt",
+      "size": 73,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "EPIC1_PATCH_PACKET_20251003T194953Z/PATCH.diff",
+      "size": 8090,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "EPIC1_PATCH_PACKET_20251003T194953Z/ROLLBACK.txt",
+      "size": 379,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "EPIC1_PATCH_PACKET_20251003T194953Z/VERIFY.sh",
+      "size": 4539,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "LICENSE",
+      "size": 1066,
+      "mtime": "2025-09-24T06:12:41Z"
+    },
+    {
+      "path": "README.md",
+      "size": 7114,
+      "mtime": "2025-10-16T16:36:16Z"
+    },
+    {
+      "path": "Run",
+      "size": 0,
+      "mtime": "2025-09-27T17:58:58Z"
+    },
+    {
+      "path": "VERIFY.out",
+      "size": 225,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "VERIFY.sh",
+      "size": 4539,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "_arch/epic003_20251017T213424Z/architecture_map_AFTER.md",
+      "size": 43101,
+      "mtime": "2025-10-17T21:34:24Z"
+    },
+    {
+      "path": "_arch/epic003_20251017T213424Z/compat_endpoints.after.txt",
+      "size": 59,
+      "mtime": "2025-10-17T21:34:24Z"
+    },
+    {
+      "path": "_arch/epic003_20251017T213424Z/routes.after.txt",
+      "size": 119,
+      "mtime": "2025-10-17T21:34:24Z"
+    },
+    {
+      "path": "_arch/epic003_20251017T213424Z/tree.after.txt",
+      "size": 41057,
+      "mtime": "2025-10-17T21:34:24Z"
+    },
+    {
+      "path": "_arch/epic003_20251017_210542/emit.dumps.before.txt",
+      "size": 1,
+      "mtime": "2025-10-17T21:05:50Z"
+    },
+    {
+      "path": "_arch/epic003_20251017_210542/focused/emit.dumps.focus.txt",
+      "size": 313,
+      "mtime": "2025-10-17T21:08:32Z"
+    },
+    {
+      "path": "_arch/epic003_20251017_210542/focused/imports.adapters.focus.txt",
+      "size": 0,
+      "mtime": "2025-10-17T21:08:32Z"
+    },
+    {
+      "path": "_arch/epic003_20251017_210542/focused/routes.focus.txt",
+      "size": 119,
+      "mtime": "2025-10-17T21:08:32Z"
+    },
+    {
+      "path": "_arch/epic003_20251017_210542/focused_after/emit.dumps.compat.after.txt",
+      "size": 0,
+      "mtime": "2025-10-17T21:11:29Z"
+    },
+    {
+      "path": "_arch/epic003_20251017_210542/imports.adapters.before.txt",
+      "size": 652,
+      "mtime": "2025-10-17T21:05:50Z"
+    },
+    {
+      "path": "_arch/epic003_20251017_210542/imports.core.before.txt",
+      "size": 4403,
+      "mtime": "2025-10-17T21:05:50Z"
+    },
+    {
+      "path": "_arch/epic003_20251017_210542/imports.server.before.txt",
+      "size": 1,
+      "mtime": "2025-10-17T21:05:50Z"
+    },
+    {
+      "path": "_arch/epic003_20251017_210542/routes.before.txt",
+      "size": 119,
+      "mtime": "2025-10-17T21:05:43Z"
+    },
+    {
+      "path": "_arch/epic003_20251017_210542/tree.before.txt",
+      "size": 41946,
+      "mtime": "2025-10-17T21:05:50Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/adapters/__pycache__/__init__.cpython-312.pyc",
+      "size": 146,
+      "mtime": "2025-09-27T02:03:02Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/adapters/__pycache__/_net.cpython-312.pyc",
+      "size": 1383,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/adapters/_net.py",
+      "size": 666,
+      "mtime": "2025-09-27T05:11:44Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/adapters/geo/__pycache__/places.cpython-312.pyc",
+      "size": 422,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/adapters/geo/__pycache__/timezone.cpython-312.pyc",
+      "size": 469,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/adapters/geo/places.py",
+      "size": 168,
+      "mtime": "2025-09-27T05:11:44Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/adapters/geo/timezone.py",
+      "size": 201,
+      "mtime": "2025-09-27T05:11:44Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/adapters/hdapi/__pycache__/__init__.cpython-312.pyc",
+      "size": 152,
+      "mtime": "2025-09-27T02:07:20Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/adapters/hdapi/__pycache__/client.cpython-312.pyc",
+      "size": 502,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/adapters/hdapi/__pycache__/normalize.cpython-312.pyc",
+      "size": 7681,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/adapters/hdapi/client.py",
+      "size": 230,
+      "mtime": "2025-09-27T05:11:44Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/adapters/hdapi/normalize.py",
+      "size": 5809,
+      "mtime": "2025-09-27T05:11:44Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/core/__init__.py",
+      "size": 0,
+      "mtime": "2025-09-24T20:38:45Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/core/__pycache__/__init__.cpython-312.pyc",
+      "size": 113,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/core/canon/__init__.py",
+      "size": 84,
+      "mtime": "2025-09-25T19:36:40Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/core/canon/__pycache__/__init__.cpython-312.pyc",
+      "size": 164,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/core/canon/__pycache__/checksums.cpython-312.pyc",
+      "size": 4753,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/core/canon/__pycache__/validate.cpython-312.pyc",
+      "size": 14086,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/core/canon/checksums.py",
+      "size": 3561,
+      "mtime": "2025-09-25T19:47:03Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/core/canon/validate.py",
+      "size": 9657,
+      "mtime": "2025-09-25T23:21:25Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/core/catalog/__pycache__/loader.cpython-312.pyc",
+      "size": 5717,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/core/catalog/loader.py",
+      "size": 3154,
+      "mtime": "2025-09-24T20:29:18Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/core/config/__pycache__/toggles_resolver.cpython-312.pyc",
+      "size": 3145,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/core/config/toggles_resolver.py",
+      "size": 1815,
+      "mtime": "2025-09-24T19:31:49Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/core/pipeline/__pycache__/compute.cpython-312.pyc",
+      "size": 1452,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/core/pipeline/__pycache__/idempotence.cpython-312.pyc",
+      "size": 477,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/core/pipeline/__pycache__/presenter.cpython-312.pyc",
+      "size": 940,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/core/pipeline/admin_debug_v1.schema.json",
+      "size": 204,
+      "mtime": "2025-09-24T23:34:08Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/core/pipeline/compute.py",
+      "size": 1068,
+      "mtime": "2025-09-24T23:51:35Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/core/pipeline/idempotence.py",
+      "size": 288,
+      "mtime": "2025-09-24T23:34:09Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/core/pipeline/presenter.py",
+      "size": 693,
+      "mtime": "2025-09-24T23:34:09Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/core/pipeline/public_result_v1.schema.json",
+      "size": 773,
+      "mtime": "2025-09-24T23:34:08Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/core/stable/__init__.py",
+      "size": 0,
+      "mtime": "2025-09-24T20:38:45Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/core/stable/__pycache__/__init__.cpython-312.pyc",
+      "size": 120,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/core/stable/__pycache__/freeze.cpython-312.pyc",
+      "size": 3313,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/core/stable/__pycache__/identity.cpython-312.pyc",
+      "size": 1387,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/core/stable/__pycache__/identity_constants.cpython-312.pyc",
+      "size": 248,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/core/stable/__pycache__/sercanon.cpython-312.pyc",
+      "size": 8216,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/core/stable/freeze.py",
+      "size": 1683,
+      "mtime": "2025-09-24T14:03:29Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/core/stable/identity.py",
+      "size": 535,
+      "mtime": "2025-09-24T14:05:47Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/core/stable/identity_constants.py",
+      "size": 107,
+      "mtime": "2025-09-24T19:52:55Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/core/stable/sercanon.py",
+      "size": 4135,
+      "mtime": "2025-09-24T06:14:51Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/server/__init__.py",
+      "size": 0,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/server/__pycache__/__init__.cpython-312.pyc",
+      "size": 144,
+      "mtime": "2025-10-14T22:24:58Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/server/__pycache__/app.cpython-312.pyc",
+      "size": 8439,
+      "mtime": "2025-10-14T22:24:58Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_20251017_211719/server/app.py",
+      "size": 5479,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_refs_20251017_211906/engine/canon/__init__.py",
+      "size": 132,
+      "mtime": "2025-09-25T23:13:58Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_refs_20251017_211906/engine/stable/__init__.py",
+      "size": 123,
+      "mtime": "2025-09-25T23:13:58Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_refs_20251017_211906/scripts/_emit_canon_checksums.py",
+      "size": 1948,
+      "mtime": "2025-09-24T21:22:21Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_refs_20251017_211906/scripts/hd_resolve.py",
+      "size": 787,
+      "mtime": "2025-09-26T09:00:58Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_refs_20251017_211906/scripts/identity_bump.py",
+      "size": 2482,
+      "mtime": "2025-09-24T19:52:47Z"
+    },
+    {
+      "path": "_archive/EPIC003_CLEAN_refs_20251017_211906/scripts/validate_canon.sh",
+      "size": 3707,
+      "mtime": "2025-09-25T23:24:00Z"
+    },
+    {
+      "path": "adapter/__init__.py",
+      "size": 18,
+      "mtime": "2025-09-27T07:44:45Z"
+    },
+    {
+      "path": "adapter/__pycache__/__init__.cpython-312.pyc",
+      "size": 116,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "adapter/__pycache__/app.cpython-312.pyc",
+      "size": 583,
+      "mtime": "2025-10-17T17:22:59Z"
+    },
+    {
+      "path": "adapter/__pycache__/cache_keys.cpython-312.pyc",
+      "size": 1079,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "adapter/__pycache__/env_guard.cpython-312.pyc",
+      "size": 4263,
+      "mtime": "2025-09-28T07:26:02Z"
+    },
+    {
+      "path": "adapter/__pycache__/etag_core.cpython-312.pyc",
+      "size": 2542,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "adapter/__pycache__/gunicorn.conf.cpython-312.pyc",
+      "size": 218,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "adapter/__pycache__/http_reader.cpython-312.pyc",
+      "size": 7166,
+      "mtime": "2025-10-03T20:00:13Z"
+    },
+    {
+      "path": "adapter/__pycache__/logging_filter.cpython-312.pyc",
+      "size": 4183,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "adapter/__pycache__/retry_after.cpython-312.pyc",
+      "size": 1607,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "adapter/__pycache__/wsgi.cpython-312.pyc",
+      "size": 1044,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "adapter/app.py",
+      "size": 285,
+      "mtime": "2025-10-17T17:21:32Z"
+    },
+    {
+      "path": "adapter/cache_keys.py",
+      "size": 723,
+      "mtime": "2025-09-27T08:20:13Z"
+    },
+    {
+      "path": "adapter/env_guard.py",
+      "size": 3301,
+      "mtime": "2025-09-28T07:25:53Z"
+    },
+    {
+      "path": "adapter/etag_core.py",
+      "size": 2071,
+      "mtime": "2025-09-27T07:44:45Z"
+    },
+    {
+      "path": "adapter/gunicorn.conf.py",
+      "size": 61,
+      "mtime": "2025-09-25T03:22:50Z"
+    },
+    {
+      "path": "adapter/http_reader.py",
+      "size": 4279,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "adapter/logging_filter.py",
+      "size": 2330,
+      "mtime": "2025-09-27T13:58:20Z"
+    },
+    {
+      "path": "adapter/retry_after.py",
+      "size": 933,
+      "mtime": "2025-09-27T11:54:05Z"
+    },
+    {
+      "path": "adapter/schemas/error_v1.schema.json",
+      "size": 426,
+      "mtime": "2025-09-25T03:22:50Z"
+    },
+    {
+      "path": "adapter/schemas/healthz_v1.schema.json",
+      "size": 290,
+      "mtime": "2025-09-25T03:22:50Z"
+    },
+    {
+      "path": "adapter/schemas/readyz_v1.schema.json",
+      "size": 289,
+      "mtime": "2025-09-25T03:37:25Z"
+    },
+    {
+      "path": "adapter/schemas/version_v1.schema.json",
+      "size": 1208,
+      "mtime": "2025-09-25T03:37:25Z"
+    },
+    {
+      "path": "adapter/wsgi.py",
+      "size": 707,
+      "mtime": "2025-09-27T12:14:25Z"
+    },
+    {
+      "path": "adapters.DEPRECATED.md",
+      "size": 109,
+      "mtime": "2025-10-17T21:17:19Z"
+    },
+    {
+      "path": "artifacts/CANON_CHECKSUMS.json",
+      "size": 1095,
+      "mtime": "2025-09-27T11:12:01Z"
+    },
+    {
+      "path": "artifacts/CHECKSUMS.txt",
+      "size": 569,
+      "mtime": "2025-09-24T19:52:55Z"
+    },
+    {
+      "path": "artifacts/_closeout_validate.txt",
+      "size": 3,
+      "mtime": "2025-09-24T22:07:31Z"
+    },
+    {
+      "path": "artifacts/adjacency_test_run.txt",
+      "size": 11557,
+      "mtime": "2025-09-27T07:42:54Z"
+    },
+    {
+      "path": "artifacts/admin/INV_TEST_NOTES.md",
+      "size": 1206,
+      "mtime": "2025-09-29T01:16:41Z"
+    },
+    {
+      "path": "artifacts/canon/CANON_CHECKSUMS.json",
+      "size": 1703,
+      "mtime": "2025-10-14T22:41:48Z"
+    },
+    {
+      "path": "artifacts/canon/CANON_CHECKSUMS.json.sha256",
+      "size": 65,
+      "mtime": "2025-10-14T22:41:48Z"
+    },
+    {
+      "path": "artifacts/canon/manifest.json",
+      "size": 233,
+      "mtime": "2025-10-14T22:41:48Z"
+    },
+    {
+      "path": "artifacts/canon/manifest.json.sha256",
+      "size": 65,
+      "mtime": "2025-10-14T22:41:48Z"
+    },
+    {
+      "path": "artifacts/canon_report.json",
+      "size": 73,
+      "mtime": "2025-09-27T11:12:01Z"
+    },
+    {
+      "path": "artifacts/cards/A3/IDENTITY_OK.txt",
+      "size": 84,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A3/admin/_probe.json",
+      "size": 12,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A3/admin/sidecar.json",
+      "size": 625,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A3/admin/sidecar_BA.json",
+      "size": 625,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A3/cli_stdout_AB.json",
+      "size": 309,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A3/cli_stdout_BA.json",
+      "size": 309,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A3/lastline_sidecar.hex",
+      "size": 9,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A3/lastline_stdout_AB.hex",
+      "size": 9,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A3/lastline_stdout_BA.hex",
+      "size": 9,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A3/sidecar.sha256",
+      "size": 79,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A3/stdout.sha256",
+      "size": 170,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A3/tmp_showmath_stdout.json",
+      "size": 309,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A3/validation.log",
+      "size": 60,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A5/cli_stdout_AB.json",
+      "size": 300,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A5/cli_stdout_BA.json",
+      "size": 300,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A5/headers_400.txt",
+      "size": 189,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A5/headers_AB.txt",
+      "size": 181,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A5/headers_BA.txt",
+      "size": 181,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A5/lastline_reader_AB.hex",
+      "size": 3,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A5/lastline_reader_BA.hex",
+      "size": 3,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A5/reader_400.json",
+      "size": 25,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A5/reader_AB.json",
+      "size": 300,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A5/reader_AB.prev",
+      "size": 300,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A5/reader_AB_2.json",
+      "size": 300,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A5/reader_BA.json",
+      "size": 300,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A5/reader_prod_block.txt",
+      "size": 22,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A5/status_400.txt",
+      "size": 4,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A5/status_prod.txt",
+      "size": 4,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A5/stdout_cmp_AB.ok",
+      "size": 0,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A5/stdout_cmp_BA.ok",
+      "size": 0,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A5/validation.log",
+      "size": 484,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A6/headers_reader_200.txt",
+      "size": 181,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A6/headers_reader_403.txt",
+      "size": 187,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A6/reader_200.json",
+      "size": 300,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A6/reader_403.json",
+      "size": 22,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A6/status_reader_403.txt",
+      "size": 4,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A6/validation.log",
+      "size": 285,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A7/body_sha256.txt",
+      "size": 65,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A7/reader_200_body.json",
+      "size": 300,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A7/reader_200_br_headers.txt",
+      "size": 345,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A7/reader_200_gzip_headers.txt",
+      "size": 345,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A7/reader_200_headers.txt",
+      "size": 345,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A7/reader_200_identity_headers.txt",
+      "size": 345,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A7/reader_304_body",
+      "size": 0,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A7/reader_304_csv_headers.txt",
+      "size": 287,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A7/reader_304_headers.txt",
+      "size": 287,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A7/reader_400_body.json",
+      "size": 25,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A7/reader_400_headers.txt",
+      "size": 214,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A7/reader_head_headers.txt",
+      "size": 345,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cards/A7/validation.log",
+      "size": 603,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/cli/abba_sidecar.json",
+      "size": 46,
+      "mtime": "2025-09-28T00:39:01Z"
+    },
+    {
+      "path": "artifacts/cli/hash.txt",
+      "size": 65,
+      "mtime": "2025-09-28T00:39:01Z"
+    },
+    {
+      "path": "artifacts/cli/out.json",
+      "size": 326,
+      "mtime": "2025-09-28T00:39:01Z"
+    },
+    {
+      "path": "artifacts/cli/out_ba.json",
+      "size": 326,
+      "mtime": "2025-09-28T00:39:01Z"
+    },
+    {
+      "path": "artifacts/compat/AB.json",
+      "size": 62,
+      "mtime": "2025-09-28T11:57:34Z"
+    },
+    {
+      "path": "artifacts/compat/BA.json",
+      "size": 62,
+      "mtime": "2025-09-28T11:57:34Z"
+    },
+    {
+      "path": "artifacts/compat/hash.txt",
+      "size": 65,
+      "mtime": "2025-09-28T11:57:34Z"
+    },
+    {
+      "path": "artifacts/constants/iana_tz_list.json",
+      "size": 83,
+      "mtime": "2025-09-28T08:38:19Z"
+    },
+    {
+      "path": "artifacts/constants/iana_tz_list.json.VERSION.txt",
+      "size": 24,
+      "mtime": "2025-09-28T08:38:19Z"
+    },
+    {
+      "path": "artifacts/constants/iso_3166_1_alpha2.json",
+      "size": 52,
+      "mtime": "2025-09-28T08:38:19Z"
+    },
+    {
+      "path": "artifacts/constants/iso_3166_1_alpha2.json.VERSION.txt",
+      "size": 24,
+      "mtime": "2025-09-28T08:38:19Z"
+    },
+    {
+      "path": "artifacts/det_report.json",
+      "size": 259,
+      "mtime": "2025-09-26T09:03:02Z"
+    },
+    {
+      "path": "artifacts/det_report.json.sha256",
+      "size": 65,
+      "mtime": "2025-09-26T09:03:02Z"
+    },
+    {
+      "path": "artifacts/dyad_AB.json",
+      "size": 402,
+      "mtime": "2025-09-25T01:17:59Z"
+    },
+    {
+      "path": "artifacts/dyad_AB_debug.json",
+      "size": 553,
+      "mtime": "2025-09-25T00:02:12Z"
+    },
+    {
+      "path": "artifacts/dyad_BA.json",
+      "size": 402,
+      "mtime": "2025-09-25T01:17:59Z"
+    },
+    {
+      "path": "artifacts/dyad_BA_debug.json",
+      "size": 553,
+      "mtime": "2025-09-25T00:02:12Z"
+    },
+    {
+      "path": "artifacts/env_guard_import_ok.txt",
+      "size": 20,
+      "mtime": "2025-09-28T07:42:50Z"
+    },
+    {
+      "path": "artifacts/epic003/ARCHITECTURE_MAP_AFTER.md",
+      "size": 43101,
+      "mtime": "2025-10-17T21:34:24Z"
+    },
+    {
+      "path": "artifacts/epic003/PO_SUMMARY.md",
+      "size": 1761,
+      "mtime": "2025-10-17T21:21:29Z"
+    },
+    {
+      "path": "artifacts/epic003/acceptance.log",
+      "size": 568,
+      "mtime": "2025-10-17T21:34:24Z"
+    },
+    {
+      "path": "artifacts/epic003/checksums.txt",
+      "size": 1081,
+      "mtime": "2025-10-17T20:17:06Z"
+    },
+    {
+      "path": "artifacts/epic003/compat_error_get_body.json",
+      "size": 115,
+      "mtime": "2025-10-17T20:07:50Z"
+    },
+    {
+      "path": "artifacts/epic003/compat_identity_hash.txt",
+      "size": 65,
+      "mtime": "2025-10-17T20:07:50Z"
+    },
+    {
+      "path": "artifacts/epic003/compat_success.json",
+      "size": 1346,
+      "mtime": "2025-10-17T20:07:50Z"
+    },
+    {
+      "path": "artifacts/epic003/compat_success_BA.json",
+      "size": 1346,
+      "mtime": "2025-10-17T20:07:50Z"
+    },
+    {
+      "path": "artifacts/epic003/headers_compat_200.raw",
+      "size": 182,
+      "mtime": "2025-10-17T20:07:50Z"
+    },
+    {
+      "path": "artifacts/epic003/headers_compat_400_get_body.raw",
+      "size": 215,
+      "mtime": "2025-10-17T20:07:50Z"
+    },
+    {
+      "path": "artifacts/epic003/manifest.json",
+      "size": 2007,
+      "mtime": "2025-10-17T20:17:06Z"
+    },
+    {
+      "path": "artifacts/epic003/narrative_keys_table.json",
+      "size": 1147,
+      "mtime": "2025-10-17T20:07:50Z"
+    },
+    {
+      "path": "artifacts/epic003/thresholds_schema.txt",
+      "size": 16,
+      "mtime": "2025-10-17T20:07:50Z"
+    },
+    {
+      "path": "artifacts/epic003/thresholds_snapshot_v1.json",
+      "size": 43,
+      "mtime": "2025-10-17T20:07:50Z"
+    },
+    {
+      "path": "artifacts/errors/body_400.json",
+      "size": 26,
+      "mtime": "2025-10-14T22:47:56Z"
+    },
+    {
+      "path": "artifacts/errors/body_403.json",
+      "size": 22,
+      "mtime": "2025-10-14T22:47:58Z"
+    },
+    {
+      "path": "artifacts/errors/headers_400.json",
+      "size": 200,
+      "mtime": "2025-10-14T22:47:56Z"
+    },
+    {
+      "path": "artifacts/errors/headers_400.txt",
+      "size": 214,
+      "mtime": "2025-10-14T22:47:56Z"
+    },
+    {
+      "path": "artifacts/errors/headers_403.json",
+      "size": 200,
+      "mtime": "2025-10-14T22:47:58Z"
+    },
+    {
+      "path": "artifacts/errors/headers_403.txt",
+      "size": 212,
+      "mtime": "2025-10-14T22:47:58Z"
+    },
+    {
+      "path": "artifacts/goldens/compliance/public_error_429.json",
+      "size": 105,
+      "mtime": "2025-09-27T14:10:09Z"
+    },
+    {
+      "path": "artifacts/goldens/compliance/public_error_429.json.sha256",
+      "size": 65,
+      "mtime": "2025-09-27T14:10:09Z"
+    },
+    {
+      "path": "artifacts/goldens/compliance/public_success.json",
+      "size": 282,
+      "mtime": "2025-09-27T14:09:55Z"
+    },
+    {
+      "path": "artifacts/goldens/compliance/public_success.json.sha256",
+      "size": 65,
+      "mtime": "2025-09-27T14:09:55Z"
+    },
+    {
+      "path": "artifacts/goldens/public_error_429.json",
+      "size": 105,
+      "mtime": "2025-09-27T13:58:30Z"
+    },
+    {
+      "path": "artifacts/goldens/public_error_429.json.sha256",
+      "size": 64,
+      "mtime": "2025-09-27T13:58:30Z"
+    },
+    {
+      "path": "artifacts/goldens/public_success.json",
+      "size": 282,
+      "mtime": "2025-09-27T13:58:30Z"
+    },
+    {
+      "path": "artifacts/goldens/public_success.json.sha256",
+      "size": 64,
+      "mtime": "2025-09-27T13:58:30Z"
+    },
+    {
+      "path": "artifacts/hd_cli_admin.json",
+      "size": 192,
+      "mtime": "2025-09-27T11:11:22Z"
+    },
+    {
+      "path": "artifacts/hdapi/endpoints.json",
+      "size": 621,
+      "mtime": "2025-09-27T05:11:44Z"
+    },
+    {
+      "path": "artifacts/hdapi/rate_limits.md",
+      "size": 195,
+      "mtime": "2025-09-27T05:11:44Z"
+    },
+    {
+      "path": "artifacts/headers/body_identity.json",
+      "size": 300,
+      "mtime": "2025-10-14T22:40:58Z"
+    },
+    {
+      "path": "artifacts/headers/compliance/reader_429.json",
+      "size": 225,
+      "mtime": "2025-09-27T14:10:09Z"
+    },
+    {
+      "path": "artifacts/headers/headers_200_identity.json",
+      "size": 346,
+      "mtime": "2025-10-14T22:40:58Z"
+    },
+    {
+      "path": "artifacts/headers/headers_200_identity.txt",
+      "size": 345,
+      "mtime": "2025-10-14T22:40:58Z"
+    },
+    {
+      "path": "artifacts/headers/headers_304.json",
+      "size": 274,
+      "mtime": "2025-10-14T22:40:58Z"
+    },
+    {
+      "path": "artifacts/headers/headers_304.txt",
+      "size": 287,
+      "mtime": "2025-10-14T22:40:58Z"
+    },
+    {
+      "path": "artifacts/headers/headers_HEAD.json",
+      "size": 346,
+      "mtime": "2025-10-14T22:40:58Z"
+    },
+    {
+      "path": "artifacts/headers/headers_HEAD.txt",
+      "size": 345,
+      "mtime": "2025-10-14T22:40:58Z"
+    },
+    {
+      "path": "artifacts/headers/reader_200.json",
+      "size": 245,
+      "mtime": "2025-09-27T09:44:44Z"
+    },
+    {
+      "path": "artifacts/headers/reader_304.json",
+      "size": 173,
+      "mtime": "2025-09-27T09:44:44Z"
+    },
+    {
+      "path": "artifacts/headers/reader_429_headers.json",
+      "size": 94,
+      "mtime": "2025-09-27T13:58:30Z"
+    },
+    {
+      "path": "artifacts/headers/reader_head_304.json",
+      "size": 173,
+      "mtime": "2025-09-27T09:44:44Z"
+    },
+    {
+      "path": "artifacts/headers/return_304.code",
+      "size": 4,
+      "mtime": "2025-10-14T22:40:58Z"
+    },
+    {
+      "path": "artifacts/hotfix/env_guard_import_ok.txt",
+      "size": 20,
+      "mtime": "2025-09-28T07:26:50Z"
+    },
+    {
+      "path": "artifacts/identity.txt",
+      "size": 93,
+      "mtime": "2025-09-24T19:52:55Z"
+    },
+    {
+      "path": "artifacts/invocation.json",
+      "size": 122,
+      "mtime": "2025-10-14T22:51:11Z"
+    },
+    {
+      "path": "artifacts/live_vendor/20250929T022319Z_request.json",
+      "size": 88,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/live_vendor/20250929T022319Z_response.json",
+      "size": 1174,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/logs/keys_only_sample.jsonl",
+      "size": 210,
+      "mtime": "2025-09-27T14:06:01Z"
+    },
+    {
+      "path": "artifacts/logs/keys_only_sample.jsonl.sha256",
+      "size": 65,
+      "mtime": "2025-09-27T14:06:01Z"
+    },
+    {
+      "path": "artifacts/logs/loader_call.jsonl",
+      "size": 9549,
+      "mtime": "2025-09-29T01:16:41Z"
+    },
+    {
+      "path": "artifacts/logs/provider_call_sample.jsonl",
+      "size": 356,
+      "mtime": "2025-09-27T22:13:00Z"
+    },
+    {
+      "path": "artifacts/logs/provider_call_sample.jsonl.sha256",
+      "size": 108,
+      "mtime": "2025-09-27T22:13:00Z"
+    },
+    {
+      "path": "artifacts/mvp/compat_cli.json",
+      "size": 63,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/mvp/compat_http.json",
+      "size": 62,
+      "mtime": "2025-09-29T01:57:36Z"
+    },
+    {
+      "path": "artifacts/mvp/singlebg.json",
+      "size": 115,
+      "mtime": "2025-09-29T01:56:37Z"
+    },
+    {
+      "path": "artifacts/provider/decision.txt",
+      "size": 33,
+      "mtime": "2025-09-27T22:11:53Z"
+    },
+    {
+      "path": "artifacts/reader/body_sha.txt",
+      "size": 65,
+      "mtime": "2025-09-27T09:44:44Z"
+    },
+    {
+      "path": "artifacts/release_id.txt",
+      "size": 65,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "artifacts/release_pack_manifest.json",
+      "size": 401,
+      "mtime": "2025-09-27T11:12:02Z"
+    },
+    {
+      "path": "artifacts/serializer/determinism_report.txt",
+      "size": 126,
+      "mtime": "2025-10-14T22:46:05Z"
+    },
+    {
+      "path": "assert",
+      "size": 0,
+      "mtime": "2025-09-28T00:16:28Z"
+    },
+    {
+      "path": "audit/ADAPTER-ENV-GUARD-HOTFIX_artifacts_sha256_20250928T072658Z.txt",
+      "size": 332,
+      "mtime": "2025-09-28T07:27:02Z"
+    },
+    {
+      "path": "audit/ADAPTER-ENV-GUARD-HOTFIX_closeout_20250928T072658Z.md",
+      "size": 428,
+      "mtime": "2025-09-28T07:27:02Z"
+    },
+    {
+      "path": "audit/ADAPTER-ENV-GUARD-HOTFIX_source_bundle_20250928T072658Z_MANIFEST.json",
+      "size": 87518,
+      "mtime": "2025-09-28T07:27:02Z"
+    },
+    {
+      "path": "audit/ADHOC_FULL_MANIFEST_source_bundle_20250927T225124Z_MANIFEST.json",
+      "size": 26672,
+      "mtime": "2025-09-27T22:51:24Z"
+    },
+    {
+      "path": "audit/ADHOC_FULL_MANIFEST_source_bundle_20250927T225124Z__filelist.txt",
+      "size": 7006,
+      "mtime": "2025-09-27T22:51:24Z"
+    },
+    {
+      "path": "audit/CORE-API-ABSTRACTION-001_S2_20250927T213444Z/00_env.txt",
+      "size": 8838,
+      "mtime": "2025-09-27T21:34:44Z"
+    },
+    {
+      "path": "audit/CORE-API-ABSTRACTION-001_S2_20250927T213444Z/00_git_sha.txt",
+      "size": 8,
+      "mtime": "2025-09-27T21:34:44Z"
+    },
+    {
+      "path": "audit/CORE-API-ABSTRACTION-001_S2_20250927T213444Z/10_pytest_vendor_and_prod_guard.txt",
+      "size": 98,
+      "mtime": "2025-09-27T21:34:44Z"
+    },
+    {
+      "path": "audit/CORE-API-ABSTRACTION-001_S2_20250927T213444Z/20_decision_and_logs_summary.txt",
+      "size": 224,
+      "mtime": "2025-09-27T21:34:44Z"
+    },
+    {
+      "path": "audit/CORE-API-ABSTRACTION-001_S2_20250927T213444Z/21_provider_logs.jsonl",
+      "size": 256,
+      "mtime": "2025-09-27T21:34:44Z"
+    },
+    {
+      "path": "audit/CORE-API-ABSTRACTION-001_S2_20250927T213444Z/30_secrets_typing_and_hygiene.txt",
+      "size": 235,
+      "mtime": "2025-09-27T21:34:45Z"
+    },
+    {
+      "path": "audit/CORE-API-ABSTRACTION-001_S2_20250927T214125Z/00_env.txt",
+      "size": 8828,
+      "mtime": "2025-09-27T21:41:25Z"
+    },
+    {
+      "path": "audit/CORE-API-ABSTRACTION-001_S2_20250927T214125Z/00_git_sha.txt",
+      "size": 8,
+      "mtime": "2025-09-27T21:41:25Z"
+    },
+    {
+      "path": "audit/CORE-API-ABSTRACTION-001_S2_20250927T214125Z/10_pytest_vendor_and_prod_guard.txt",
+      "size": 98,
+      "mtime": "2025-09-27T21:41:25Z"
+    },
+    {
+      "path": "audit/CORE-API-ABSTRACTION-001_S2_20250927T214125Z/20_decision_and_logs_summary.txt",
+      "size": 118,
+      "mtime": "2025-09-27T21:41:36Z"
+    },
+    {
+      "path": "audit/CORE-API-ABSTRACTION-001_S2_20250927T214125Z/21_provider_logs.jsonl",
+      "size": 256,
+      "mtime": "2025-09-27T21:41:36Z"
+    },
+    {
+      "path": "audit/CORE-API-ABSTRACTION-001_S2_20250927T214125Z/30_secrets_typing_and_hygiene.txt",
+      "size": 235,
+      "mtime": "2025-09-27T21:41:36Z"
+    },
+    {
+      "path": "audit/CORE-API-ABSTRACTION-001_S3S4_artifacts_sha256_20250927T221410Z.txt",
+      "size": 342,
+      "mtime": "2025-09-27T22:14:14Z"
+    },
+    {
+      "path": "audit/CORE-API-ABSTRACTION-001_S3S4_closeout_20250927T221410Z.md",
+      "size": 448,
+      "mtime": "2025-09-27T22:14:14Z"
+    },
+    {
+      "path": "audit/CORE-API-ABSTRACTION-001_S3S4_source_bundle_20250927T221410Z_MANIFEST.json",
+      "size": 66422,
+      "mtime": "2025-09-27T22:14:14Z"
+    },
+    {
+      "path": "audit/CORE-CHART-LOADER-READY-001_artifacts_sha256_20250928T150032Z.txt",
+      "size": 338,
+      "mtime": "2025-09-28T15:00:37Z"
+    },
+    {
+      "path": "audit/CORE-CHART-LOADER-READY-001_closeout_20250928T150032Z.md",
+      "size": 440,
+      "mtime": "2025-09-28T15:00:37Z"
+    },
+    {
+      "path": "audit/CORE-CHART-LOADER-READY-001_source_bundle_20250928T150032Z_MANIFEST.json",
+      "size": 94471,
+      "mtime": "2025-09-28T15:00:36Z"
+    },
+    {
+      "path": "audit/EPIC-1.0_artifacts_sha256_20251003T195204Z.txt",
+      "size": 300,
+      "mtime": "2025-10-03T19:52:08Z"
+    },
+    {
+      "path": "audit/EPIC-1.0_artifacts_sha256_20251003T200557Z.txt",
+      "size": 300,
+      "mtime": "2025-10-03T20:05:57Z"
+    },
+    {
+      "path": "audit/EPIC-1.0_artifacts_sha256_20251003T200910Z.txt",
+      "size": 300,
+      "mtime": "2025-10-03T20:09:10Z"
+    },
+    {
+      "path": "audit/EPIC-1.0_closeout_20251003T195204Z.md",
+      "size": 364,
+      "mtime": "2025-10-03T19:52:08Z"
+    },
+    {
+      "path": "audit/EPIC-1.0_closeout_20251003T200557Z.md",
+      "size": 364,
+      "mtime": "2025-10-03T20:05:57Z"
+    },
+    {
+      "path": "audit/EPIC-1.0_closeout_20251003T200910Z.md",
+      "size": 364,
+      "mtime": "2025-10-03T20:09:10Z"
+    },
+    {
+      "path": "audit/EPIC-1.0_source_bundle_20251003T195204Z_MANIFEST.json",
+      "size": 103479,
+      "mtime": "2025-10-03T19:52:07Z"
+    },
+    {
+      "path": "audit/EPIC-1.0_source_bundle_20251003T200557Z_MANIFEST.json",
+      "size": 112729,
+      "mtime": "2025-10-03T20:05:57Z"
+    },
+    {
+      "path": "audit/EPIC-1.0_source_bundle_20251003T200910Z_MANIFEST.json",
+      "size": 113386,
+      "mtime": "2025-10-03T20:09:10Z"
+    },
+    {
+      "path": "audit/Epic-02_artifacts_sha256_20251014T225758Z.txt",
+      "size": 298,
+      "mtime": "2025-10-14T22:58:02Z"
+    },
+    {
+      "path": "audit/Epic-02_closeout_20251014T225758Z.md",
+      "size": 360,
+      "mtime": "2025-10-14T22:58:02Z"
+    },
+    {
+      "path": "audit/Epic-02_source_bundle_20251014T225758Z_MANIFEST.json",
+      "size": 116379,
+      "mtime": "2025-10-14T22:58:00Z"
+    },
+    {
+      "path": "audit/FIX-CLI-ADMIN-SIDECAR-INV-TEST-001R_artifacts_sha256_20250929T011642Z.txt",
+      "size": 354,
+      "mtime": "2025-09-29T01:16:44Z"
+    },
+    {
+      "path": "audit/FIX-CLI-ADMIN-SIDECAR-INV-TEST-001R_closeout_20250929T011642Z.md",
+      "size": 472,
+      "mtime": "2025-09-29T01:16:44Z"
+    },
+    {
+      "path": "audit/FIX-CLI-ADMIN-SIDECAR-INV-TEST-001R_source_bundle_20250929T011642Z_MANIFEST.json",
+      "size": 96675,
+      "mtime": "2025-09-29T01:16:43Z"
+    },
+    {
+      "path": "audit/HDE-EPIC003_artifacts_sha256_20251017T202529Z.txt",
+      "size": 306,
+      "mtime": "2025-10-17T20:25:34Z"
+    },
+    {
+      "path": "audit/HDE-EPIC003_closeout_20251017T202529Z.md",
+      "size": 376,
+      "mtime": "2025-10-17T20:25:34Z"
+    },
+    {
+      "path": "audit/HDE-EPIC003_source_bundle_20251017T202529Z_MANIFEST.json",
+      "size": 121997,
+      "mtime": "2025-10-17T20:25:32Z"
+    },
+    {
+      "path": "audit/LIVE-API-SMOKE-LOCAL-001_artifacts_sha256_20250929T022515Z.txt",
+      "size": 332,
+      "mtime": "2025-09-29T02:25:17Z"
+    },
+    {
+      "path": "audit/LIVE-API-SMOKE-LOCAL-001_closeout_20250929T022515Z.md",
+      "size": 428,
+      "mtime": "2025-09-29T02:25:17Z"
+    },
+    {
+      "path": "audit/LIVE-API-SMOKE-LOCAL-001_source_bundle_20250929T022515Z_MANIFEST.json",
+      "size": 98496,
+      "mtime": "2025-09-29T02:25:17Z"
+    },
+    {
+      "path": "audit/ONE-SHOT-MVP-CLI-API-001_artifacts_sha256_20250929T020210Z.txt",
+      "size": 332,
+      "mtime": "2025-09-29T02:02:12Z"
+    },
+    {
+      "path": "audit/ONE-SHOT-MVP-CLI-API-001_closeout_20250929T020210Z.md",
+      "size": 428,
+      "mtime": "2025-09-29T02:02:12Z"
+    },
+    {
+      "path": "audit/ONE-SHOT-MVP-CLI-API-001_source_bundle_20250929T020210Z_MANIFEST.json",
+      "size": 97749,
+      "mtime": "2025-09-29T02:02:12Z"
+    },
+    {
+      "path": "audit/REPORT.txt",
+      "size": 2149,
+      "mtime": "2025-09-24T21:37:11Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T234951Z/00_audit_log.txt",
+      "size": 15,
+      "mtime": "2025-09-27T23:49:51Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T234951Z/cmd/help_meta.txt",
+      "size": 0,
+      "mtime": "2025-09-27T23:49:51Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T234951Z/env/00_env.txt",
+      "size": 1014,
+      "mtime": "2025-09-27T23:49:51Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T234951Z/files/grep_hd_cli.txt",
+      "size": 452,
+      "mtime": "2025-09-27T23:49:51Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T234951Z/files/hd_cli.py.txt",
+      "size": 4847,
+      "mtime": "2025-09-27T23:49:51Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T234951Z/files/test_cli_exit2_typed_json_and_exit64_usage.py.txt",
+      "size": 1322,
+      "mtime": "2025-09-27T23:49:51Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T234951Z/files/test_cli_stdout_schema_and_lf.py.txt",
+      "size": 1361,
+      "mtime": "2025-09-27T23:49:51Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T234951Z/git/00_head_sha.txt",
+      "size": 41,
+      "mtime": "2025-09-27T23:49:51Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T234951Z/git/01_status.txt",
+      "size": 435,
+      "mtime": "2025-09-27T23:49:51Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T234951Z/git/02_log.txt",
+      "size": 1457,
+      "mtime": "2025-09-27T23:49:51Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T234951Z/schemas/01_schema_hash_check.txt",
+      "size": 169,
+      "mtime": "2025-09-27T23:49:51Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T234951Z/schemas/reader.v1.schema.json",
+      "size": 2156,
+      "mtime": "2025-09-26T21:07:54Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T234951Z/schemas/reader.v1.schema.json.sha256",
+      "size": 96,
+      "mtime": "2025-09-27T23:17:29Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T234957Z/00_audit_log.txt",
+      "size": 15,
+      "mtime": "2025-09-27T23:49:57Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T234957Z/cmd/help_meta.txt",
+      "size": 0,
+      "mtime": "2025-09-27T23:49:57Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T234957Z/env/00_env.txt",
+      "size": 1014,
+      "mtime": "2025-09-27T23:49:57Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T234957Z/files/grep_hd_cli.txt",
+      "size": 452,
+      "mtime": "2025-09-27T23:49:57Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T234957Z/files/hd_cli.py.txt",
+      "size": 4847,
+      "mtime": "2025-09-27T23:49:57Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T234957Z/files/test_cli_exit2_typed_json_and_exit64_usage.py.txt",
+      "size": 1322,
+      "mtime": "2025-09-27T23:49:57Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T234957Z/files/test_cli_stdout_schema_and_lf.py.txt",
+      "size": 1361,
+      "mtime": "2025-09-27T23:49:57Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T234957Z/git/00_head_sha.txt",
+      "size": 41,
+      "mtime": "2025-09-27T23:49:57Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T234957Z/git/01_status.txt",
+      "size": 435,
+      "mtime": "2025-09-27T23:49:57Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T234957Z/git/02_log.txt",
+      "size": 1457,
+      "mtime": "2025-09-27T23:49:57Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T234957Z/schemas/01_schema_hash_check.txt",
+      "size": 169,
+      "mtime": "2025-09-27T23:49:57Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T234957Z/schemas/reader.v1.schema.json",
+      "size": 2156,
+      "mtime": "2025-09-26T21:07:54Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T234957Z/schemas/reader.v1.schema.json.sha256",
+      "size": 96,
+      "mtime": "2025-09-27T23:17:29Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T235050Z/00_audit_log.txt",
+      "size": 15,
+      "mtime": "2025-09-27T23:50:50Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T235050Z/env/00_env.txt",
+      "size": 869,
+      "mtime": "2025-09-27T23:50:50Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T235050Z/files/hd_cli.py.txt",
+      "size": 4847,
+      "mtime": "2025-09-27T23:50:50Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T235050Z/files/test_cli_exit2_typed_json_and_exit64_usage.py.txt",
+      "size": 1322,
+      "mtime": "2025-09-27T23:50:50Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T235050Z/files/test_cli_stdout_schema_and_lf.py.txt",
+      "size": 1361,
+      "mtime": "2025-09-27T23:50:50Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T235050Z/git/00_head_sha.txt",
+      "size": 41,
+      "mtime": "2025-09-27T23:50:50Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T235050Z/git/01_status.txt",
+      "size": 435,
+      "mtime": "2025-09-27T23:50:50Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T235050Z/git/02_log.txt",
+      "size": 1457,
+      "mtime": "2025-09-27T23:50:50Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T235137Z/00_audit_log.txt",
+      "size": 15,
+      "mtime": "2025-09-27T23:51:37Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T235137Z/artifacts/abba_json_validation.txt",
+      "size": 45,
+      "mtime": "2025-09-27T23:51:38Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T235137Z/cmd/ab_admin_violate_meta.txt",
+      "size": 234,
+      "mtime": "2025-09-27T23:51:37Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T235137Z/cmd/ab_admin_violate_rc.txt",
+      "size": 2,
+      "mtime": "2025-09-27T23:51:37Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T235137Z/cmd/ab_admin_violate_stderr.txt",
+      "size": 68,
+      "mtime": "2025-09-27T23:51:37Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T235137Z/cmd/ab_admin_violate_stdout.bin",
+      "size": 0,
+      "mtime": "2025-09-27T23:51:37Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T235137Z/cmd/ab_admin_violate_summary.txt",
+      "size": 205,
+      "mtime": "2025-09-27T23:51:38Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T235137Z/cmd/ab_meta.txt",
+      "size": 145,
+      "mtime": "2025-09-27T23:51:37Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T235137Z/cmd/ab_rc.txt",
+      "size": 2,
+      "mtime": "2025-09-27T23:51:37Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T235137Z/cmd/ab_stderr.txt",
+      "size": 0,
+      "mtime": "2025-09-27T23:51:37Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T235137Z/cmd/ab_stdout.bin",
+      "size": 326,
+      "mtime": "2025-09-27T23:51:37Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T235137Z/cmd/ab_summary.txt",
+      "size": 149,
+      "mtime": "2025-09-27T23:51:37Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T235137Z/cmd/help_meta.txt",
+      "size": 71,
+      "mtime": "2025-09-27T23:51:37Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T235137Z/cmd/help_rc.txt",
+      "size": 3,
+      "mtime": "2025-09-27T23:51:37Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T235137Z/cmd/help_stderr.txt",
+      "size": 96,
+      "mtime": "2025-09-27T23:51:37Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T235137Z/cmd/help_stdout.bin",
+      "size": 0,
+      "mtime": "2025-09-27T23:51:37Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T235137Z/cmd/help_summary.txt",
+      "size": 224,
+      "mtime": "2025-09-27T23:51:37Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T235137Z/env/00_env.txt",
+      "size": 869,
+      "mtime": "2025-09-27T23:51:37Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T235137Z/files/grep_hd_cli.txt",
+      "size": 452,
+      "mtime": "2025-09-27T23:51:37Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T235137Z/files/hd_cli.py.txt",
+      "size": 4847,
+      "mtime": "2025-09-27T23:51:37Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T235137Z/files/test_cli_exit2_typed_json_and_exit64_usage.py.txt",
+      "size": 1322,
+      "mtime": "2025-09-27T23:51:37Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T235137Z/files/test_cli_stdout_schema_and_lf.py.txt",
+      "size": 1361,
+      "mtime": "2025-09-27T23:51:37Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T235137Z/git/00_head_sha.txt",
+      "size": 41,
+      "mtime": "2025-09-27T23:51:37Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T235137Z/git/01_status.txt",
+      "size": 435,
+      "mtime": "2025-09-27T23:51:37Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T235137Z/git/02_log.txt",
+      "size": 1457,
+      "mtime": "2025-09-27T23:51:37Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T235137Z/schemas/01_schema_hash_check.txt",
+      "size": 169,
+      "mtime": "2025-09-27T23:51:37Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T235137Z/schemas/reader.v1.schema.json",
+      "size": 2156,
+      "mtime": "2025-09-26T21:07:54Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T235137Z/schemas/reader.v1.schema.json.sha256",
+      "size": 96,
+      "mtime": "2025-09-27T23:17:29Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_20250927T235137Z/tests/pytest_targeted.txt",
+      "size": 1307,
+      "mtime": "2025-09-27T23:51:38Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_artifacts_sha256_20250928T003913Z.txt",
+      "size": 322,
+      "mtime": "2025-09-28T00:39:16Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_closeout_20250928T003913Z.md",
+      "size": 408,
+      "mtime": "2025-09-28T00:39:16Z"
+    },
+    {
+      "path": "audit/T-API-CLI-SMOKE-001_source_bundle_20250928T003913Z_MANIFEST.json",
+      "size": 84809,
+      "mtime": "2025-09-28T00:39:15Z"
+    },
+    {
+      "path": "audit/escalations/reader_import_guard_20250927T224424Z/00_env.txt",
+      "size": 101,
+      "mtime": "2025-09-27T22:44:25Z"
+    },
+    {
+      "path": "audit/escalations/reader_import_guard_20250927T224424Z/01_git_log.txt",
+      "size": 1457,
+      "mtime": "2025-09-27T22:44:25Z"
+    },
+    {
+      "path": "audit/escalations/reader_import_guard_20250927T224424Z/02_validate_or_fail_grep.txt",
+      "size": 141,
+      "mtime": "2025-09-27T22:44:25Z"
+    },
+    {
+      "path": "audit/escalations/reader_import_guard_20250927T224424Z/10_pytest_compliance_fail.txt",
+      "size": 4925,
+      "mtime": "2025-09-27T22:44:25Z"
+    },
+    {
+      "path": "audit/escalations/reader_import_guard_20250927T224424Z/20_trees.txt",
+      "size": 1688,
+      "mtime": "2025-09-27T22:44:26Z"
+    },
+    {
+      "path": "audit/escalations/reader_import_guard_20250927T224424Z/adapter/app.py.txt",
+      "size": 8715,
+      "mtime": "2025-09-27T22:44:25Z"
+    },
+    {
+      "path": "audit/escalations/reader_import_guard_20250927T224424Z/adapter/env_guard.py.txt",
+      "size": 439,
+      "mtime": "2025-09-27T22:44:25Z"
+    },
+    {
+      "path": "audit/escalations/reader_import_guard_20250927T224424Z/adapter/wsgi.py.txt",
+      "size": 861,
+      "mtime": "2025-09-27T22:44:25Z"
+    },
+    {
+      "path": "audit/escalations/reader_import_guard_20250927T224449Z/00_env.txt",
+      "size": 101,
+      "mtime": "2025-09-27T22:44:49Z"
+    },
+    {
+      "path": "audit/escalations/reader_import_guard_20250927T224449Z/01_git_log.txt",
+      "size": 1457,
+      "mtime": "2025-09-27T22:44:49Z"
+    },
+    {
+      "path": "audit/escalations/reader_import_guard_20250927T224449Z/02_validate_or_fail_grep.txt",
+      "size": 141,
+      "mtime": "2025-09-27T22:44:49Z"
+    },
+    {
+      "path": "audit/escalations/reader_import_guard_20250927T224449Z/10_pytest_compliance_fail.txt",
+      "size": 4925,
+      "mtime": "2025-09-27T22:44:50Z"
+    },
+    {
+      "path": "audit/escalations/reader_import_guard_20250927T224449Z/20_trees.txt",
+      "size": 1688,
+      "mtime": "2025-09-27T22:44:50Z"
+    },
+    {
+      "path": "audit/escalations/reader_import_guard_20250927T224449Z/adapter/app.py.txt",
+      "size": 8715,
+      "mtime": "2025-09-27T22:44:49Z"
+    },
+    {
+      "path": "audit/escalations/reader_import_guard_20250927T224449Z/adapter/env_guard.py.txt",
+      "size": 439,
+      "mtime": "2025-09-27T22:44:49Z"
+    },
+    {
+      "path": "audit/escalations/reader_import_guard_20250927T224449Z/adapter/wsgi.py.txt",
+      "size": 861,
+      "mtime": "2025-09-27T22:44:49Z"
+    },
+    {
+      "path": "audit/escalations/reader_import_guard_20250927T224600Z/00_env.txt",
+      "size": 101,
+      "mtime": "2025-09-27T22:46:01Z"
+    },
+    {
+      "path": "audit/escalations/reader_import_guard_20250927T224600Z/01_git_log.txt",
+      "size": 1457,
+      "mtime": "2025-09-27T22:46:01Z"
+    },
+    {
+      "path": "audit/escalations/reader_import_guard_20250927T224600Z/02_validate_or_fail_grep.txt",
+      "size": 141,
+      "mtime": "2025-09-27T22:46:01Z"
+    },
+    {
+      "path": "audit/escalations/reader_import_guard_20250927T224600Z/10_pytest_compliance_fail.txt",
+      "size": 4925,
+      "mtime": "2025-09-27T22:46:01Z"
+    },
+    {
+      "path": "audit/escalations/reader_import_guard_20250927T224600Z/20_trees.txt",
+      "size": 1688,
+      "mtime": "2025-09-27T22:46:02Z"
+    },
+    {
+      "path": "audit/escalations/reader_import_guard_20250927T224600Z/adapter/app.py.txt",
+      "size": 8715,
+      "mtime": "2025-09-27T22:46:01Z"
+    },
+    {
+      "path": "audit/escalations/reader_import_guard_20250927T224600Z/adapter/env_guard.py.txt",
+      "size": 439,
+      "mtime": "2025-09-27T22:46:01Z"
+    },
+    {
+      "path": "audit/escalations/reader_import_guard_20250927T224600Z/adapter/wsgi.py.txt",
+      "size": 861,
+      "mtime": "2025-09-27T22:46:01Z"
+    },
+    {
+      "path": "audit/gates/canon/20250925T233847Z/CANON_CHECKSUMS.json",
+      "size": 1479,
+      "mtime": "2025-09-25T23:38:47Z"
+    },
+    {
+      "path": "audit/gates/canon/20250925T233847Z/CANON_CHECKSUMS.json.sha256",
+      "size": 65,
+      "mtime": "2025-09-25T23:38:47Z"
+    },
+    {
+      "path": "audit/gates/canon/20250925T233847Z/canon_report.json",
+      "size": 73,
+      "mtime": "2025-09-25T23:38:47Z"
+    },
+    {
+      "path": "audit/gates/canon/20250925T233847Z/canon_report.json.sha256",
+      "size": 65,
+      "mtime": "2025-09-25T23:38:47Z"
+    },
+    {
+      "path": "audit/gates/canon/20250925T233847Z/gate_log.txt",
+      "size": 254,
+      "mtime": "2025-09-25T23:38:47Z"
+    },
+    {
+      "path": "audit/gates/canon/20250925T233848Z/CANON_CHECKSUMS.json",
+      "size": 1479,
+      "mtime": "2025-09-25T23:38:48Z"
+    },
+    {
+      "path": "audit/gates/canon/20250925T233848Z/CANON_CHECKSUMS.json.sha256",
+      "size": 65,
+      "mtime": "2025-09-25T23:38:48Z"
+    },
+    {
+      "path": "audit/gates/canon/20250925T233848Z/canon_report.json",
+      "size": 73,
+      "mtime": "2025-09-25T23:38:48Z"
+    },
+    {
+      "path": "audit/gates/canon/20250925T233848Z/canon_report.json.sha256",
+      "size": 65,
+      "mtime": "2025-09-25T23:38:48Z"
+    },
+    {
+      "path": "audit/gates/canon/20250925T233848Z/gate_log.txt",
+      "size": 254,
+      "mtime": "2025-09-25T23:38:48Z"
+    },
+    {
+      "path": "audit/observed_gate_counts.json",
+      "size": 132,
+      "mtime": "2025-09-24T20:40:32Z"
+    },
+    {
+      "path": "audit/provider_S2_20250927T181858Z/01_env.txt",
+      "size": 63,
+      "mtime": "2025-09-27T18:18:58Z"
+    },
+    {
+      "path": "audit/provider_S2_20250927T181858Z/02_git.txt",
+      "size": 1025,
+      "mtime": "2025-09-27T18:18:58Z"
+    },
+    {
+      "path": "audit/provider_S2_20250927T181858Z/03_provider_loader_full.txt",
+      "size": 6256,
+      "mtime": "2025-09-27T18:18:58Z"
+    },
+    {
+      "path": "audit/provider_S2_20250927T181858Z/03_provider_loader_head.txt",
+      "size": 6256,
+      "mtime": "2025-09-27T18:18:58Z"
+    },
+    {
+      "path": "audit/provider_S2_20250927T181858Z/03b_decision_writes.txt",
+      "size": 292,
+      "mtime": "2025-09-27T18:18:58Z"
+    },
+    {
+      "path": "audit/provider_S2_20250927T181858Z/04_repo_grep.txt",
+      "size": 0,
+      "mtime": "2025-09-27T18:18:58Z"
+    },
+    {
+      "path": "audit/provider_S2_20250927T181858Z/05_files.txt",
+      "size": 98,
+      "mtime": "2025-09-27T18:18:58Z"
+    },
+    {
+      "path": "audit/provider_S2_20250927T181858Z/06_import_diag.txt",
+      "size": 1155,
+      "mtime": "2025-09-27T18:18:59Z"
+    },
+    {
+      "path": "audit/provider_S2_20250927T181858Z/07a_pytest_vendor_refuses.txt",
+      "size": 2151,
+      "mtime": "2025-09-27T18:18:59Z"
+    },
+    {
+      "path": "audit/provider_S2_20250927T181858Z/07b_pytest_vendor_constructs_then_raises.txt",
+      "size": 2177,
+      "mtime": "2025-09-27T18:18:59Z"
+    },
+    {
+      "path": "audit/provider_S2_20250927T181858Z/07c_pytest_malformed_secrets.txt",
+      "size": 2165,
+      "mtime": "2025-09-27T18:18:59Z"
+    },
+    {
+      "path": "audit/provider_S2_20250927T181858Z/07d_pytest_decision_default.txt",
+      "size": 2169,
+      "mtime": "2025-09-27T18:19:00Z"
+    },
+    {
+      "path": "audit/provider_S2_20250927T181858Z/08_syntax_check.txt",
+      "size": 420,
+      "mtime": "2025-09-27T18:19:00Z"
+    },
+    {
+      "path": "audit/provider_S2_20250927T181858Z/09_hashes.txt",
+      "size": 112,
+      "mtime": "2025-09-27T18:19:00Z"
+    },
+    {
+      "path": "audit/provider_S2_escalation_20250927T174823Z/01_env.txt",
+      "size": 30,
+      "mtime": "2025-09-27T17:48:23Z"
+    },
+    {
+      "path": "audit/provider_S2_escalation_20250927T174823Z/02_files.txt",
+      "size": 193,
+      "mtime": "2025-09-27T17:48:23Z"
+    },
+    {
+      "path": "audit/provider_S2_escalation_20250927T174823Z/03_grep_secretspref.txt",
+      "size": 0,
+      "mtime": "2025-09-27T17:48:24Z"
+    },
+    {
+      "path": "audit/provider_S2_escalation_20250927T174823Z/04_provider_loader_head.txt",
+      "size": 4324,
+      "mtime": "2025-09-27T17:48:26Z"
+    },
+    {
+      "path": "audit/provider_S2_escalation_20250927T174823Z/05_single_test_clean.txt",
+      "size": 525,
+      "mtime": "2025-09-27T17:48:27Z"
+    },
+    {
+      "path": "audit/provider_S2_escalation_20250927T174823Z/06_repro_with_secretspref.txt",
+      "size": 1570,
+      "mtime": "2025-09-27T17:48:27Z"
+    },
+    {
+      "path": "audit/provider_S2_escalation_20250927T174823Z/07_repro_files.txt",
+      "size": 73,
+      "mtime": "2025-09-27T17:48:27Z"
+    },
+    {
+      "path": "body200.json",
+      "size": 300,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "body200_new.json",
+      "size": 300,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "catalog/channels_catalog_v1.json",
+      "size": 62,
+      "mtime": "2025-09-24T14:00:52Z"
+    },
+    {
+      "path": "catalog/channels_v1.json",
+      "size": 6408,
+      "mtime": "2025-09-24T20:26:47Z"
+    },
+    {
+      "path": "catalog/gates_v1.json",
+      "size": 1876,
+      "mtime": "2025-09-24T21:14:09Z"
+    },
+    {
+      "path": "code304_new.txt",
+      "size": 4,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "config/bands_4B60_v1.json",
+      "size": 45,
+      "mtime": "2025-09-24T14:00:52Z"
+    },
+    {
+      "path": "config/toggles_v1.json",
+      "size": 965,
+      "mtime": "2025-09-26T18:52:36Z"
+    },
+    {
+      "path": "core.DEPRECATED.md",
+      "size": 105,
+      "mtime": "2025-10-17T21:17:19Z"
+    },
+    {
+      "path": "dev/__init__.py",
+      "size": 10,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "dev/__pycache__/__init__.cpython-312.pyc",
+      "size": 141,
+      "mtime": "2025-10-03T20:00:13Z"
+    },
+    {
+      "path": "dev/reader_harness/__init__.py",
+      "size": 10,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "dev/reader_harness/__pycache__/__init__.cpython-312.pyc",
+      "size": 156,
+      "mtime": "2025-10-03T20:00:13Z"
+    },
+    {
+      "path": "dev/reader_harness/__pycache__/app.cpython-312.pyc",
+      "size": 1534,
+      "mtime": "2025-10-03T20:00:13Z"
+    },
+    {
+      "path": "dev/reader_harness/app.py",
+      "size": 706,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "docs/ADAPTER_009.md",
+      "size": 2073,
+      "mtime": "2025-09-25T03:44:53Z"
+    },
+    {
+      "path": "docs/CLI_commands.md",
+      "size": 849,
+      "mtime": "2025-10-16T16:36:16Z"
+    },
+    {
+      "path": "docs/INDEX.md",
+      "size": 256,
+      "mtime": "2025-10-16T16:36:16Z"
+    },
+    {
+      "path": "docs/RUN.md",
+      "size": 129,
+      "mtime": "2025-09-24T06:23:45Z"
+    },
+    {
+      "path": "docs/SECRETS.md",
+      "size": 235,
+      "mtime": "2025-09-24T23:26:11Z"
+    },
+    {
+      "path": "docs/SYNC_LOG.md",
+      "size": 1107,
+      "mtime": "2025-09-24T19:52:55Z"
+    },
+    {
+      "path": "docs/acceptance/reader_a7_crib.md",
+      "size": 657,
+      "mtime": "2025-10-16T16:36:16Z"
+    },
+    {
+      "path": "docs/alpha_acceptance.md",
+      "size": 770,
+      "mtime": "2025-10-16T16:36:16Z"
+    },
+    {
+      "path": "docs/architecture/emitters.md",
+      "size": 277,
+      "mtime": "2025-10-16T16:36:16Z"
+    },
+    {
+      "path": "docs/architecture/emitters_guardrail.md",
+      "size": 485,
+      "mtime": "2025-10-16T16:36:16Z"
+    },
+    {
+      "path": "docs/contracts/reader_v1_public_bytes.md",
+      "size": 628,
+      "mtime": "2025-10-16T16:36:16Z"
+    },
+    {
+      "path": "docs/server/reader_v1.md",
+      "size": 5655,
+      "mtime": "2025-10-16T16:36:16Z"
+    },
+    {
+      "path": "engine/__init__.py",
+      "size": 0,
+      "mtime": "2025-09-28T08:38:19Z"
+    },
+    {
+      "path": "engine/__pycache__/__init__.cpython-312.pyc",
+      "size": 144,
+      "mtime": "2025-10-14T22:25:00Z"
+    },
+    {
+      "path": "engine/__pycache__/emit_public.cpython-312.pyc",
+      "size": 2309,
+      "mtime": "2025-10-14T22:25:00Z"
+    },
+    {
+      "path": "engine/canon/__init__.py.REMOVED.md",
+      "size": 129,
+      "mtime": "2025-10-17T21:19:07Z"
+    },
+    {
+      "path": "engine/canon/__pycache__/__init__.cpython-312.pyc",
+      "size": 224,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "engine/charts/__pycache__/loader.cpython-312.pyc",
+      "size": 8403,
+      "mtime": "2025-09-28T08:54:34Z"
+    },
+    {
+      "path": "engine/charts/loader.py",
+      "size": 6338,
+      "mtime": "2025-09-28T08:54:24Z"
+    },
+    {
+      "path": "engine/compat/__init__.py",
+      "size": 0,
+      "mtime": "2025-09-28T11:55:43Z"
+    },
+    {
+      "path": "engine/compat/__pycache__/__init__.cpython-312.pyc",
+      "size": 151,
+      "mtime": "2025-09-28T11:55:57Z"
+    },
+    {
+      "path": "engine/compat/__pycache__/categories.cpython-312.pyc",
+      "size": 597,
+      "mtime": "2025-10-17T17:19:02Z"
+    },
+    {
+      "path": "engine/compat/__pycache__/compute.cpython-312.pyc",
+      "size": 3082,
+      "mtime": "2025-10-17T17:21:21Z"
+    },
+    {
+      "path": "engine/compat/__pycache__/errors.cpython-312.pyc",
+      "size": 889,
+      "mtime": "2025-10-17T17:20:22Z"
+    },
+    {
+      "path": "engine/compat/__pycache__/ordering.cpython-312.pyc",
+      "size": 1930,
+      "mtime": "2025-10-17T17:20:46Z"
+    },
+    {
+      "path": "engine/compat/__pycache__/thresholds.cpython-312.pyc",
+      "size": 598,
+      "mtime": "2025-10-17T17:19:02Z"
+    },
+    {
+      "path": "engine/compat/__pycache__/ts_v0.cpython-312.pyc",
+      "size": 4263,
+      "mtime": "2025-10-14T22:25:00Z"
+    },
+    {
+      "path": "engine/compat/categories.py",
+      "size": 405,
+      "mtime": "2025-10-17T17:18:54Z"
+    },
+    {
+      "path": "engine/compat/compute.py",
+      "size": 1903,
+      "mtime": "2025-10-17T17:21:09Z"
+    },
+    {
+      "path": "engine/compat/errors.py",
+      "size": 599,
+      "mtime": "2025-10-17T17:20:12Z"
+    },
+    {
+      "path": "engine/compat/ordering.py",
+      "size": 891,
+      "mtime": "2025-10-17T17:20:30Z"
+    },
+    {
+      "path": "engine/compat/thresholds.py",
+      "size": 346,
+      "mtime": "2025-10-17T17:18:54Z"
+    },
+    {
+      "path": "engine/compat/ts_v0.py",
+      "size": 3542,
+      "mtime": "2025-10-07T20:09:31Z"
+    },
+    {
+      "path": "engine/compat/type_strategy_v0.py",
+      "size": 1011,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "engine/compliance/__pycache__/invocation_tag.cpython-312.pyc",
+      "size": 951,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "engine/compliance/invocation_tag.py",
+      "size": 558,
+      "mtime": "2025-09-27T10:18:24Z"
+    },
+    {
+      "path": "engine/config/__init__.py",
+      "size": 0,
+      "mtime": "2025-09-27T17:08:24Z"
+    },
+    {
+      "path": "engine/config/__pycache__/__init__.cpython-312.pyc",
+      "size": 122,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "engine/config/__pycache__/provider_errors.cpython-312.pyc",
+      "size": 1181,
+      "mtime": "2025-09-27T22:02:05Z"
+    },
+    {
+      "path": "engine/config/__pycache__/provider_loader.cpython-312.pyc",
+      "size": 11416,
+      "mtime": "2025-09-27T21:13:01Z"
+    },
+    {
+      "path": "engine/config/__pycache__/provider_types.cpython-312.pyc",
+      "size": 940,
+      "mtime": "2025-09-27T21:57:19Z"
+    },
+    {
+      "path": "engine/config/provider_errors.py",
+      "size": 534,
+      "mtime": "2025-09-27T22:01:35Z"
+    },
+    {
+      "path": "engine/config/provider_loader.bak2",
+      "size": 8501,
+      "mtime": "2025-09-27T19:57:20Z"
+    },
+    {
+      "path": "engine/config/provider_loader.py",
+      "size": 11276,
+      "mtime": "2025-09-27T21:01:44Z"
+    },
+    {
+      "path": "engine/config/provider_loader.py.bak.1758996879",
+      "size": 4388,
+      "mtime": "2025-09-27T19:37:55Z"
+    },
+    {
+      "path": "engine/config/provider_types.py",
+      "size": 441,
+      "mtime": "2025-09-27T21:57:07Z"
+    },
+    {
+      "path": "engine/emit_public.py",
+      "size": 1504,
+      "mtime": "2025-10-07T20:09:31Z"
+    },
+    {
+      "path": "engine/errors/__init__.py",
+      "size": 226,
+      "mtime": "2025-09-27T10:43:50Z"
+    },
+    {
+      "path": "engine/errors/__pycache__/__init__.cpython-312.pyc",
+      "size": 705,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "engine/http/__pycache__/compat_handler.cpython-312.pyc",
+      "size": 3708,
+      "mtime": "2025-10-17T17:22:59Z"
+    },
+    {
+      "path": "engine/http/compat_handler.py",
+      "size": 3050,
+      "mtime": "2025-10-17T17:21:32Z"
+    },
+    {
+      "path": "engine/presenter/__init__.py",
+      "size": 71,
+      "mtime": "2025-10-17T17:17:36Z"
+    },
+    {
+      "path": "engine/presenter/__pycache__/__init__.cpython-312.pyc",
+      "size": 234,
+      "mtime": "2025-10-17T17:17:53Z"
+    },
+    {
+      "path": "engine/presenter/__pycache__/emitter.cpython-312.pyc",
+      "size": 675,
+      "mtime": "2025-10-17T17:17:53Z"
+    },
+    {
+      "path": "engine/presenter/emitter.py",
+      "size": 369,
+      "mtime": "2025-10-17T17:17:36Z"
+    },
+    {
+      "path": "engine/presets/__pycache__/loader.cpython-312.pyc",
+      "size": 3327,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "engine/presets/__pycache__/validator.cpython-312.pyc",
+      "size": 5039,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "engine/presets/loader.py",
+      "size": 1823,
+      "mtime": "2025-09-27T10:50:15Z"
+    },
+    {
+      "path": "engine/presets/validator.py",
+      "size": 3977,
+      "mtime": "2025-09-27T11:48:38Z"
+    },
+    {
+      "path": "engine/provider/__init__.py",
+      "size": 0,
+      "mtime": "2025-09-27T17:08:24Z"
+    },
+    {
+      "path": "engine/provider/__pycache__/__init__.cpython-312.pyc",
+      "size": 124,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "engine/provider/__pycache__/base.cpython-312.pyc",
+      "size": 1014,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "engine/provider/__pycache__/fixtures.cpython-312.pyc",
+      "size": 1295,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "engine/provider/__pycache__/internal_engine.cpython-312.pyc",
+      "size": 1381,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "engine/provider/__pycache__/vendor_http.cpython-312.pyc",
+      "size": 1383,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "engine/provider/base.py",
+      "size": 478,
+      "mtime": "2025-09-27T17:08:38Z"
+    },
+    {
+      "path": "engine/provider/fixtures.py",
+      "size": 804,
+      "mtime": "2025-09-27T17:09:39Z"
+    },
+    {
+      "path": "engine/provider/internal_engine.py",
+      "size": 687,
+      "mtime": "2025-09-27T17:22:37Z"
+    },
+    {
+      "path": "engine/provider/vendor_http.py",
+      "size": 938,
+      "mtime": "2025-09-27T17:25:52Z"
+    },
+    {
+      "path": "engine/providers/__init__.py",
+      "size": 32,
+      "mtime": "2025-09-28T11:25:03Z"
+    },
+    {
+      "path": "engine/providers/__pycache__/__init__.cpython-312.pyc",
+      "size": 193,
+      "mtime": "2025-09-28T11:25:04Z"
+    },
+    {
+      "path": "engine/providers/__pycache__/fixtures_provider.cpython-312.pyc",
+      "size": 959,
+      "mtime": "2025-09-27T21:57:19Z"
+    },
+    {
+      "path": "engine/providers/__pycache__/internal_engine.cpython-312.pyc",
+      "size": 1685,
+      "mtime": "2025-09-27T21:57:19Z"
+    },
+    {
+      "path": "engine/providers/__pycache__/vendor_http.cpython-312.pyc",
+      "size": 3114,
+      "mtime": "2025-09-27T22:02:54Z"
+    },
+    {
+      "path": "engine/providers/__pycache__/vendor_http_hdapi.cpython-312.pyc",
+      "size": 11918,
+      "mtime": "2025-09-28T11:46:26Z"
+    },
+    {
+      "path": "engine/providers/fixtures_provider.py",
+      "size": 459,
+      "mtime": "2025-09-27T21:57:07Z"
+    },
+    {
+      "path": "engine/providers/internal_engine.py",
+      "size": 952,
+      "mtime": "2025-09-27T21:57:07Z"
+    },
+    {
+      "path": "engine/providers/vendor_http.py",
+      "size": 2054,
+      "mtime": "2025-09-27T22:01:35Z"
+    },
+    {
+      "path": "engine/providers/vendor_http_hdapi.py",
+      "size": 10176,
+      "mtime": "2025-09-28T11:46:15Z"
+    },
+    {
+      "path": "engine/serializer/__init__.py",
+      "size": 45,
+      "mtime": "2025-10-17T17:17:36Z"
+    },
+    {
+      "path": "engine/serializer/__pycache__/__init__.cpython-312.pyc",
+      "size": 220,
+      "mtime": "2025-10-17T17:17:53Z"
+    },
+    {
+      "path": "engine/serializer/__pycache__/canon.cpython-312.pyc",
+      "size": 857,
+      "mtime": "2025-10-17T17:17:53Z"
+    },
+    {
+      "path": "engine/serializer/canon.py",
+      "size": 417,
+      "mtime": "2025-10-17T17:17:36Z"
+    },
+    {
+      "path": "engine/stable/__init__.py.REMOVED.md",
+      "size": 130,
+      "mtime": "2025-10-17T21:19:07Z"
+    },
+    {
+      "path": "engine/stable/__pycache__/__init__.cpython-312.pyc",
+      "size": 196,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "engine/stable/__pycache__/hashcouple.cpython-312.pyc",
+      "size": 1455,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "engine/stable/__pycache__/sercanon.cpython-312.pyc",
+      "size": 863,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "engine/stable/hashcouple.py",
+      "size": 1001,
+      "mtime": "2025-09-26T08:46:44Z"
+    },
+    {
+      "path": "engine/stable/sercanon.py",
+      "size": 384,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "engine/util/__init__.py",
+      "size": 0,
+      "mtime": "2025-09-28T08:38:19Z"
+    },
+    {
+      "path": "engine/util/__pycache__/__init__.cpython-312.pyc",
+      "size": 149,
+      "mtime": "2025-09-28T08:38:20Z"
+    },
+    {
+      "path": "engine/util/__pycache__/input_validators.cpython-312.pyc",
+      "size": 4426,
+      "mtime": "2025-09-28T08:47:12Z"
+    },
+    {
+      "path": "engine/util/input_validators.py",
+      "size": 2527,
+      "mtime": "2025-09-28T08:47:02Z"
+    },
+    {
+      "path": "engine/validation/__pycache__/viewer_prefs.cpython-312.pyc",
+      "size": 1331,
+      "mtime": "2025-10-17T17:21:03Z"
+    },
+    {
+      "path": "engine/validation/viewer_prefs.py",
+      "size": 827,
+      "mtime": "2025-10-17T17:20:54Z"
+    },
+    {
+      "path": "fixtures/charts/alice.json",
+      "size": 35,
+      "mtime": "2025-10-07T20:09:31Z"
+    },
+    {
+      "path": "fixtures/charts/bob.json",
+      "size": 47,
+      "mtime": "2025-10-07T20:09:31Z"
+    },
+    {
+      "path": "fixtures/hdapi/normalized/bodygraph_20250927T012414Z_normalized.json",
+      "size": 762,
+      "mtime": "2025-09-27T05:11:44Z"
+    },
+    {
+      "path": "fixtures/hdapi/normalized/bodygraph_20250927T012414Z_normalized.json.sha256",
+      "size": 135,
+      "mtime": "2025-09-27T05:11:44Z"
+    },
+    {
+      "path": "fixtures/hdapi/normalized/bodygraph_20250927T015039Z_normalized.json",
+      "size": 753,
+      "mtime": "2025-09-27T05:11:44Z"
+    },
+    {
+      "path": "fixtures/hdapi/normalized/bodygraph_20250927T015039Z_normalized.json.sha256",
+      "size": 135,
+      "mtime": "2025-09-27T05:11:44Z"
+    },
+    {
+      "path": "fixtures/hdapi/normalized/bodygraph_20250927T015542Z_normalized.json",
+      "size": 763,
+      "mtime": "2025-09-27T05:11:44Z"
+    },
+    {
+      "path": "fixtures/hdapi/normalized/bodygraph_20250927T015542Z_normalized.json.sha256",
+      "size": 135,
+      "mtime": "2025-09-27T05:11:44Z"
+    },
+    {
+      "path": "fixtures/hdapi/raw/bodygraph_20250927T012414Z.json",
+      "size": 1176,
+      "mtime": "2025-09-27T05:11:44Z"
+    },
+    {
+      "path": "fixtures/hdapi/raw/bodygraph_20250927T012414Z.json.sha256",
+      "size": 117,
+      "mtime": "2025-09-27T05:11:44Z"
+    },
+    {
+      "path": "fixtures/hdapi/raw/bodygraph_20250927T012414Z_provenance.json",
+      "size": 190,
+      "mtime": "2025-09-27T05:11:44Z"
+    },
+    {
+      "path": "fixtures/hdapi/raw/bodygraph_20250927T015039Z.json",
+      "size": 1285,
+      "mtime": "2025-09-27T05:11:44Z"
+    },
+    {
+      "path": "fixtures/hdapi/raw/bodygraph_20250927T015039Z.json.sha256",
+      "size": 117,
+      "mtime": "2025-09-27T05:11:44Z"
+    },
+    {
+      "path": "fixtures/hdapi/raw/bodygraph_20250927T015039Z_provenance.json",
+      "size": 190,
+      "mtime": "2025-09-27T05:11:44Z"
+    },
+    {
+      "path": "fixtures/hdapi/raw/bodygraph_20250927T015542Z.json",
+      "size": 1273,
+      "mtime": "2025-09-27T05:11:44Z"
+    },
+    {
+      "path": "fixtures/hdapi/raw/bodygraph_20250927T015542Z.json.sha256",
+      "size": 117,
+      "mtime": "2025-09-27T05:11:44Z"
+    },
+    {
+      "path": "fixtures/hdapi/raw/bodygraph_20250927T015542Z_provenance.json",
+      "size": 190,
+      "mtime": "2025-09-27T05:11:44Z"
+    },
+    {
+      "path": "freeze/freeze_pack_v1.json",
+      "size": 58,
+      "mtime": "2025-09-24T14:00:52Z"
+    },
+    {
+      "path": "goldens/reader/v1/g01_minimal_ineligible.json",
+      "size": 283,
+      "mtime": "2025-09-26T21:21:25Z"
+    },
+    {
+      "path": "goldens/reader/v1/g01_minimal_ineligible.json.sha256",
+      "size": 65,
+      "mtime": "2025-09-26T21:21:25Z"
+    },
+    {
+      "path": "goldens/reader/v1/g02_ab_ba_parity_A.jsonl",
+      "size": 804,
+      "mtime": "2025-09-26T21:19:18Z"
+    },
+    {
+      "path": "goldens/reader/v1/g02_ab_ba_parity_A.jsonl.sha256",
+      "size": 65,
+      "mtime": "2025-09-26T21:19:18Z"
+    },
+    {
+      "path": "goldens/reader/v1/g02_ab_ba_parity_B.jsonl",
+      "size": 804,
+      "mtime": "2025-09-26T21:19:18Z"
+    },
+    {
+      "path": "goldens/reader/v1/g02_ab_ba_parity_B.jsonl.sha256",
+      "size": 65,
+      "mtime": "2025-09-26T21:19:18Z"
+    },
+    {
+      "path": "goldens/reader/v1/g03_open_leader.json",
+      "size": 316,
+      "mtime": "2025-09-26T21:21:25Z"
+    },
+    {
+      "path": "goldens/reader/v1/g03_open_leader.json.sha256",
+      "size": 65,
+      "mtime": "2025-09-26T21:21:25Z"
+    },
+    {
+      "path": "goldens/reader/v1/g04_warm_leader.json",
+      "size": 316,
+      "mtime": "2025-09-26T21:21:25Z"
+    },
+    {
+      "path": "goldens/reader/v1/g04_warm_leader.json.sha256",
+      "size": 65,
+      "mtime": "2025-09-26T21:21:25Z"
+    },
+    {
+      "path": "goldens/reader/v1/g05_cool_leader.json",
+      "size": 316,
+      "mtime": "2025-09-26T21:21:25Z"
+    },
+    {
+      "path": "goldens/reader/v1/g05_cool_leader.json.sha256",
+      "size": 65,
+      "mtime": "2025-09-26T21:21:25Z"
+    },
+    {
+      "path": "goldens/reader/v1/g06_error_invalid_input.json",
+      "size": 55,
+      "mtime": "2025-09-26T21:21:25Z"
+    },
+    {
+      "path": "goldens/reader/v1/g06_error_invalid_input.json.sha256",
+      "size": 65,
+      "mtime": "2025-09-26T21:21:25Z"
+    },
+    {
+      "path": "h200.txt",
+      "size": 345,
+      "mtime": "2025-10-03T19:04:24Z"
+    },
+    {
+      "path": "h200_new.txt",
+      "size": 345,
+      "mtime": "2025-10-03T19:34:32Z"
+    },
+    {
+      "path": "h304_new.txt",
+      "size": 287,
+      "mtime": "2025-10-03T19:35:39Z"
+    },
+    {
+      "path": "hhead_new.txt",
+      "size": 345,
+      "mtime": "2025-10-03T19:35:39Z"
+    },
+    {
+      "path": "import",
+      "size": 0,
+      "mtime": "2025-09-28T11:24:53Z"
+    },
+    {
+      "path": "internal/readyz/README.md",
+      "size": 612,
+      "mtime": "2025-09-28T07:42:36Z"
+    },
+    {
+      "path": "internal/readyz/readyz_200.json",
+      "size": 155,
+      "mtime": "2025-09-28T07:42:36Z"
+    },
+    {
+      "path": "internal/readyz/readyz_200_headers.txt",
+      "size": 491,
+      "mtime": "2025-09-28T07:42:36Z"
+    },
+    {
+      "path": "internal/readyz/readyz_503.json",
+      "size": 159,
+      "mtime": "2025-09-28T07:42:36Z"
+    },
+    {
+      "path": "internal/readyz/readyz_503_headers.txt",
+      "size": 428,
+      "mtime": "2025-09-28T07:42:36Z"
+    },
+    {
+      "path": "n",
+      "size": 8828,
+      "mtime": "2025-09-27T17:21:30Z"
+    },
+    {
+      "path": "presenter/__init__.py",
+      "size": 0,
+      "mtime": "2025-09-26T21:12:03Z"
+    },
+    {
+      "path": "presenter/__pycache__/__init__.cpython-312.pyc",
+      "size": 118,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "presenter/reader_v1/__init__.py",
+      "size": 0,
+      "mtime": "2025-09-26T21:12:03Z"
+    },
+    {
+      "path": "presenter/reader_v1/__pycache__/__init__.cpython-312.pyc",
+      "size": 128,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "presenter/reader_v1/__pycache__/emitter.cpython-312.pyc",
+      "size": 3067,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "presenter/reader_v1/emitter.py",
+      "size": 2403,
+      "mtime": "2025-09-26T21:12:03Z"
+    },
+    {
+      "path": "release/manifest.sorted.json",
+      "size": 2,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "reports/tokens_summary.txt",
+      "size": 530,
+      "mtime": "2025-10-14T22:49:57Z"
+    },
+    {
+      "path": "requirements-dev.txt",
+      "size": 36,
+      "mtime": "2025-09-26T21:09:59Z"
+    },
+    {
+      "path": "runner.log",
+      "size": 771,
+      "mtime": "2025-10-03T19:35:39Z"
+    },
+    {
+      "path": "schemas/canon_checksums_v2.schema.json",
+      "size": 1578,
+      "mtime": "2025-09-24T21:27:22Z"
+    },
+    {
+      "path": "schemas/channels_catalog_v1.schema.json",
+      "size": 105,
+      "mtime": "2025-09-24T14:00:52Z"
+    },
+    {
+      "path": "schemas/channels_v1.schema.json",
+      "size": 1370,
+      "mtime": "2025-09-24T20:19:51Z"
+    },
+    {
+      "path": "schemas/gates_v1.schema.json",
+      "size": 529,
+      "mtime": "2025-09-24T20:19:51Z"
+    },
+    {
+      "path": "schemas/hdapi.normalized.v1.schema.json",
+      "size": 1944,
+      "mtime": "2025-09-27T05:11:44Z"
+    },
+    {
+      "path": "schemas/reader.v1.schema.json",
+      "size": 2156,
+      "mtime": "2025-09-26T21:07:54Z"
+    },
+    {
+      "path": "schemas/reader.v1.schema.json.sha256",
+      "size": 96,
+      "mtime": "2025-09-27T23:17:29Z"
+    },
+    {
+      "path": "schemas/toggles_v1.schema.json",
+      "size": 2933,
+      "mtime": "2025-09-24T19:22:43Z"
+    },
+    {
+      "path": "scripts/__init__.py",
+      "size": 0,
+      "mtime": "2025-09-24T20:38:45Z"
+    },
+    {
+      "path": "scripts/__pycache__/__init__.cpython-312.pyc",
+      "size": 116,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "scripts/__pycache__/_emit_canon_checksums.cpython-312.pyc",
+      "size": 3056,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "scripts/__pycache__/emit_env_guard_artifact.cpython-312.pyc",
+      "size": 2561,
+      "mtime": "2025-09-28T07:26:50Z"
+    },
+    {
+      "path": "scripts/__pycache__/ensure_env.cpython-312.pyc",
+      "size": 576,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "scripts/__pycache__/hd_cli.cpython-312.pyc",
+      "size": 7141,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "scripts/__pycache__/hd_resolve.cpython-312.pyc",
+      "size": 1521,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "scripts/__pycache__/hdapi_cli.cpython-312.pyc",
+      "size": 3762,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "scripts/__pycache__/hdctl.cpython-312.pyc",
+      "size": 5428,
+      "mtime": "2025-10-03T18:44:35Z"
+    },
+    {
+      "path": "scripts/__pycache__/hello_demo.cpython-312.pyc",
+      "size": 423,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "scripts/__pycache__/identity_bump.cpython-312.pyc",
+      "size": 4817,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "scripts/__pycache__/make_reader_v1_goldens.cpython-312.pyc",
+      "size": 3466,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "scripts/_emit_canon_checksums.py.REMOVED.md",
+      "size": 137,
+      "mtime": "2025-10-17T21:19:07Z"
+    },
+    {
+      "path": "scripts/architecture_capture.sh",
+      "size": 4604,
+      "mtime": "2025-10-17T21:34:11Z"
+    },
+    {
+      "path": "scripts/card_close.sh",
+      "size": 4106,
+      "mtime": "2025-10-07T20:01:24Z"
+    },
+    {
+      "path": "scripts/demo_mvp.sh",
+      "size": 1219,
+      "mtime": "2025-09-29T01:50:17Z"
+    },
+    {
+      "path": "scripts/diag_env.sh",
+      "size": 1759,
+      "mtime": "2025-09-25T00:58:56Z"
+    },
+    {
+      "path": "scripts/emit_env_guard_artifact.py",
+      "size": 980,
+      "mtime": "2025-09-28T07:26:50Z"
+    },
+    {
+      "path": "scripts/ensure_env.py",
+      "size": 265,
+      "mtime": "2025-09-24T23:26:11Z"
+    },
+    {
+      "path": "scripts/hd_cli.py",
+      "size": 3896,
+      "mtime": "2025-09-28T00:16:36Z"
+    },
+    {
+      "path": "scripts/hd_resolve.py.REMOVED.md",
+      "size": 126,
+      "mtime": "2025-10-17T21:19:07Z"
+    },
+    {
+      "path": "scripts/hdapi_cli.py",
+      "size": 1902,
+      "mtime": "2025-09-27T07:42:50Z"
+    },
+    {
+      "path": "scripts/hdctl.backup.py",
+      "size": 3641,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "scripts/hdctl.clean.py",
+      "size": 3556,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "scripts/hdctl.py",
+      "size": 2429,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "scripts/hello_demo.py",
+      "size": 162,
+      "mtime": "2025-09-27T11:18:20Z"
+    },
+    {
+      "path": "scripts/identity_bump.py.REMOVED.md",
+      "size": 129,
+      "mtime": "2025-10-17T21:19:07Z"
+    },
+    {
+      "path": "scripts/make_audit.sh",
+      "size": 3698,
+      "mtime": "2025-09-25T20:02:09Z"
+    },
+    {
+      "path": "scripts/make_change_snapshot.sh",
+      "size": 4004,
+      "mtime": "2025-09-25T01:31:43Z"
+    },
+    {
+      "path": "scripts/make_cli_smoke_audit.sh",
+      "size": 5402,
+      "mtime": "2025-09-27T23:51:19Z"
+    },
+    {
+      "path": "scripts/make_compat_determinism_artifacts.py",
+      "size": 1284,
+      "mtime": "2025-09-28T11:57:34Z"
+    },
+    {
+      "path": "scripts/make_reader_v1_goldens.py",
+      "size": 2355,
+      "mtime": "2025-09-26T21:15:26Z"
+    },
+    {
+      "path": "scripts/make_release_pack.sh",
+      "size": 1184,
+      "mtime": "2025-09-26T21:49:02Z"
+    },
+    {
+      "path": "scripts/make_source_bundle.sh",
+      "size": 3533,
+      "mtime": "2025-09-24T06:40:32Z"
+    },
+    {
+      "path": "scripts/release_id.sh",
+      "size": 288,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "scripts/run_gate_canon.sh",
+      "size": 1511,
+      "mtime": "2025-09-25T23:38:39Z"
+    },
+    {
+      "path": "scripts/run_sanity.sh",
+      "size": 70,
+      "mtime": "2025-10-14T22:43:02Z"
+    },
+    {
+      "path": "scripts/scratch.py",
+      "size": 469,
+      "mtime": "2025-09-27T08:04:39Z"
+    },
+    {
+      "path": "scripts/validate/public_bytes_check.py",
+      "size": 966,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "scripts/validate/sidecar_check.py",
+      "size": 3286,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "scripts/validate_canon.sh.REMOVED.md",
+      "size": 130,
+      "mtime": "2025-10-17T21:19:07Z"
+    },
+    {
+      "path": "scripts/validate_det.sh",
+      "size": 3350,
+      "mtime": "2025-09-26T09:02:55Z"
+    },
+    {
+      "path": "server.DEPRECATED.md",
+      "size": 107,
+      "mtime": "2025-10-17T21:17:19Z"
+    },
+    {
+      "path": "server.log",
+      "size": 417,
+      "mtime": "2025-10-03T19:04:24Z"
+    },
+    {
+      "path": "tests/__pycache__/conftest.cpython-312-pytest-7.4.4.pyc",
+      "size": 631,
+      "mtime": "2025-09-25T03:25:32Z"
+    },
+    {
+      "path": "tests/__pycache__/conftest.cpython-312.pyc",
+      "size": 488,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/__pycache__/test_catalog_canon.cpython-312-pytest-7.4.4.pyc",
+      "size": 10237,
+      "mtime": "2025-09-25T00:59:12Z"
+    },
+    {
+      "path": "tests/__pycache__/test_catalog_canon.cpython-312-pytest-8.4.1.pyc",
+      "size": 5174,
+      "mtime": "2025-09-24T20:20:08Z"
+    },
+    {
+      "path": "tests/__pycache__/test_catalog_canon.cpython-312.pyc",
+      "size": 3778,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/__pycache__/test_pipeline_properties.cpython-312-pytest-7.4.4.pyc",
+      "size": 6735,
+      "mtime": "2025-09-25T01:12:18Z"
+    },
+    {
+      "path": "tests/__pycache__/test_pipeline_properties.cpython-312.pyc",
+      "size": 1964,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/__pycache__/test_pipeline_public.cpython-312-pytest-7.4.4.pyc",
+      "size": 13088,
+      "mtime": "2025-09-25T00:19:14Z"
+    },
+    {
+      "path": "tests/__pycache__/test_pipeline_public.cpython-312.pyc",
+      "size": 3014,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/__pycache__/test_resolver_prod_rules.cpython-312-pytest-7.4.4.pyc",
+      "size": 9284,
+      "mtime": "2025-09-25T01:15:33Z"
+    },
+    {
+      "path": "tests/__pycache__/test_resolver_prod_rules.cpython-312.pyc",
+      "size": 3485,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/__pycache__/test_sercanon.cpython-312-pytest-7.4.4.pyc",
+      "size": 8023,
+      "mtime": "2025-09-24T20:39:35Z"
+    },
+    {
+      "path": "tests/__pycache__/test_sercanon.cpython-312-pytest-8.4.1.pyc",
+      "size": 8285,
+      "mtime": "2025-09-24T06:15:12Z"
+    },
+    {
+      "path": "tests/__pycache__/test_sercanon.cpython-312.pyc",
+      "size": 2887,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/_helpers/__pycache__/app_import.cpython-312.pyc",
+      "size": 888,
+      "mtime": "2025-09-27T22:40:30Z"
+    },
+    {
+      "path": "tests/_helpers/app_import.py",
+      "size": 691,
+      "mtime": "2025-09-27T22:40:17Z"
+    },
+    {
+      "path": "tests/adapter/__pycache__/test_cache_keys.cpython-312-pytest-7.4.4.pyc",
+      "size": 5349,
+      "mtime": "2025-09-27T08:20:13Z"
+    },
+    {
+      "path": "tests/adapter/__pycache__/test_cache_keys.cpython-312.pyc",
+      "size": 1024,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/adapter/__pycache__/test_env_guard_forbidden_matrix.cpython-312-pytest-7.4.4.pyc",
+      "size": 3344,
+      "mtime": "2025-09-28T07:13:12Z"
+    },
+    {
+      "path": "tests/adapter/__pycache__/test_env_guard_import.cpython-312-pytest-7.4.4.pyc",
+      "size": 2863,
+      "mtime": "2025-09-28T07:01:53Z"
+    },
+    {
+      "path": "tests/adapter/__pycache__/test_env_guard_import_purity.cpython-312-pytest-7.4.4.pyc",
+      "size": 1885,
+      "mtime": "2025-09-28T07:24:03Z"
+    },
+    {
+      "path": "tests/adapter/__pycache__/test_env_guard_prod_variants.cpython-312-pytest-7.4.4.pyc",
+      "size": 2058,
+      "mtime": "2025-09-28T07:13:12Z"
+    },
+    {
+      "path": "tests/adapter/__pycache__/test_env_guard_silence_and_idempotence.cpython-312-pytest-7.4.4.pyc",
+      "size": 5492,
+      "mtime": "2025-09-28T07:23:13Z"
+    },
+    {
+      "path": "tests/adapter/__pycache__/test_etag_core.cpython-312-pytest-7.4.4.pyc",
+      "size": 15472,
+      "mtime": "2025-09-27T07:44:45Z"
+    },
+    {
+      "path": "tests/adapter/__pycache__/test_etag_core.cpython-312.pyc",
+      "size": 3526,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/adapter/__pycache__/test_gate_auth.cpython-312-pytest-7.4.4.pyc",
+      "size": 8030,
+      "mtime": "2025-09-25T03:28:18Z"
+    },
+    {
+      "path": "tests/adapter/__pycache__/test_gate_auth.cpython-312.pyc",
+      "size": 2773,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/adapter/__pycache__/test_headers_and_determinism.cpython-312-pytest-7.4.4.pyc",
+      "size": 11766,
+      "mtime": "2025-09-25T03:35:18Z"
+    },
+    {
+      "path": "tests/adapter/__pycache__/test_headers_and_determinism.cpython-312.pyc",
+      "size": 4579,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/adapter/__pycache__/test_jsonschema.cpython-312-pytest-7.4.4.pyc",
+      "size": 15827,
+      "mtime": "2025-09-25T03:37:26Z"
+    },
+    {
+      "path": "tests/adapter/__pycache__/test_jsonschema.cpython-312.pyc",
+      "size": 5955,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/adapter/__pycache__/test_no_etag_on_writers_and_errors.cpython-312-pytest-7.4.4.pyc",
+      "size": 6817,
+      "mtime": "2025-09-27T08:16:51Z"
+    },
+    {
+      "path": "tests/adapter/__pycache__/test_no_etag_on_writers_and_errors.cpython-312.pyc",
+      "size": 2300,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/adapter/__pycache__/test_reader_parity.cpython-312-pytest-7.4.4.pyc",
+      "size": 19269,
+      "mtime": "2025-09-27T08:15:48Z"
+    },
+    {
+      "path": "tests/adapter/__pycache__/test_reader_parity.cpython-312.pyc",
+      "size": 4016,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/adapter/__pycache__/test_readyz.cpython-312-pytest-7.4.4.pyc",
+      "size": 8747,
+      "mtime": "2025-09-25T03:31:50Z"
+    },
+    {
+      "path": "tests/adapter/__pycache__/test_readyz.cpython-312.pyc",
+      "size": 3903,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/adapter/test_cache_keys.py",
+      "size": 737,
+      "mtime": "2025-09-27T08:20:13Z"
+    },
+    {
+      "path": "tests/adapter/test_env_guard_forbidden_matrix.py",
+      "size": 1521,
+      "mtime": "2025-09-28T07:13:03Z"
+    },
+    {
+      "path": "tests/adapter/test_env_guard_import.py",
+      "size": 347,
+      "mtime": "2025-09-28T07:01:41Z"
+    },
+    {
+      "path": "tests/adapter/test_env_guard_import_purity.py",
+      "size": 1068,
+      "mtime": "2025-09-28T07:24:02Z"
+    },
+    {
+      "path": "tests/adapter/test_env_guard_prod_variants.py",
+      "size": 1000,
+      "mtime": "2025-09-28T07:13:03Z"
+    },
+    {
+      "path": "tests/adapter/test_env_guard_silence_and_idempotence.py",
+      "size": 1075,
+      "mtime": "2025-09-28T07:23:13Z"
+    },
+    {
+      "path": "tests/adapter/test_etag_core.py",
+      "size": 2069,
+      "mtime": "2025-09-27T07:44:45Z"
+    },
+    {
+      "path": "tests/adapter/test_gate_auth.py",
+      "size": 1986,
+      "mtime": "2025-09-25T03:28:06Z"
+    },
+    {
+      "path": "tests/adapter/test_headers_and_determinism.py",
+      "size": 3358,
+      "mtime": "2025-09-25T03:35:06Z"
+    },
+    {
+      "path": "tests/adapter/test_jsonschema.py",
+      "size": 3552,
+      "mtime": "2025-09-25T03:37:25Z"
+    },
+    {
+      "path": "tests/adapter/test_no_etag_on_writers_and_errors.py",
+      "size": 1147,
+      "mtime": "2025-09-27T08:16:50Z"
+    },
+    {
+      "path": "tests/adapter/test_reader_parity.py",
+      "size": 2177,
+      "mtime": "2025-09-27T08:15:47Z"
+    },
+    {
+      "path": "tests/adapter/test_readyz.py",
+      "size": 2136,
+      "mtime": "2025-09-25T03:31:37Z"
+    },
+    {
+      "path": "tests/adapters/__pycache__/test_safe_mode.cpython-312-pytest-7.4.4.pyc",
+      "size": 1602,
+      "mtime": "2025-09-27T05:21:27Z"
+    },
+    {
+      "path": "tests/adapters/__pycache__/test_safe_mode.cpython-312.pyc",
+      "size": 737,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/adapters/test_safe_mode.py",
+      "size": 321,
+      "mtime": "2025-09-27T05:11:44Z"
+    },
+    {
+      "path": "tests/artifacts/__pycache__/test_cli_text_artifacts_bom_lf.cpython-312-pytest-7.4.4.pyc",
+      "size": 6625,
+      "mtime": "2025-09-28T00:38:37Z"
+    },
+    {
+      "path": "tests/artifacts/__pycache__/test_env_guard_artifact_bytes.cpython-312-pytest-7.4.4.pyc",
+      "size": 4349,
+      "mtime": "2025-09-28T07:26:50Z"
+    },
+    {
+      "path": "tests/artifacts/test_cli_text_artifacts_bom_lf.py",
+      "size": 857,
+      "mtime": "2025-09-28T00:33:22Z"
+    },
+    {
+      "path": "tests/artifacts/test_env_guard_artifact_bytes.py",
+      "size": 605,
+      "mtime": "2025-09-28T07:26:50Z"
+    },
+    {
+      "path": "tests/canon/__pycache__/test_center_order_and_counts.cpython-312-pytest-7.4.4.pyc",
+      "size": 2142,
+      "mtime": "2025-09-25T23:19:59Z"
+    },
+    {
+      "path": "tests/canon/__pycache__/test_center_order_and_counts.cpython-312.pyc",
+      "size": 881,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/canon/__pycache__/test_checksums.cpython-312-pytest-7.4.4.pyc",
+      "size": 16049,
+      "mtime": "2025-09-25T19:47:15Z"
+    },
+    {
+      "path": "tests/canon/__pycache__/test_checksums.cpython-312.pyc",
+      "size": 3164,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/canon/__pycache__/test_error_envelope.cpython-312-pytest-7.4.4.pyc",
+      "size": 4982,
+      "mtime": "2025-09-25T23:24:13Z"
+    },
+    {
+      "path": "tests/canon/__pycache__/test_error_envelope.cpython-312.pyc",
+      "size": 1193,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/canon/__pycache__/test_loader_integrity.cpython-312-pytest-7.4.4.pyc",
+      "size": 1565,
+      "mtime": "2025-09-25T19:44:32Z"
+    },
+    {
+      "path": "tests/canon/__pycache__/test_loader_integrity.cpython-312.pyc",
+      "size": 770,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/canon/__pycache__/test_overrides_prod.cpython-312-pytest-7.4.4.pyc",
+      "size": 3519,
+      "mtime": "2025-09-25T23:21:59Z"
+    },
+    {
+      "path": "tests/canon/__pycache__/test_overrides_prod.cpython-312.pyc",
+      "size": 1851,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/canon/__pycache__/test_report_determinism.cpython-312-pytest-7.4.4.pyc",
+      "size": 8715,
+      "mtime": "2025-09-25T23:16:52Z"
+    },
+    {
+      "path": "tests/canon/__pycache__/test_report_determinism.cpython-312.pyc",
+      "size": 2624,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/canon/test_center_order_and_counts.py",
+      "size": 638,
+      "mtime": "2025-09-25T23:19:51Z"
+    },
+    {
+      "path": "tests/canon/test_checksums.py",
+      "size": 1634,
+      "mtime": "2025-09-25T19:47:03Z"
+    },
+    {
+      "path": "tests/canon/test_error_envelope.py",
+      "size": 664,
+      "mtime": "2025-09-25T23:24:00Z"
+    },
+    {
+      "path": "tests/canon/test_loader_integrity.py",
+      "size": 456,
+      "mtime": "2025-09-25T19:44:13Z"
+    },
+    {
+      "path": "tests/canon/test_overrides_prod.py",
+      "size": 1147,
+      "mtime": "2025-09-25T23:21:25Z"
+    },
+    {
+      "path": "tests/canon/test_report_determinism.py",
+      "size": 1415,
+      "mtime": "2025-09-25T23:16:25Z"
+    },
+    {
+      "path": "tests/cli/__pycache__/test_cli_admin_invariance_and_perms.cpython-312-pytest-7.4.4.pyc",
+      "size": 6933,
+      "mtime": "2025-09-28T00:30:44Z"
+    },
+    {
+      "path": "tests/cli/__pycache__/test_cli_exit2_typed_json_and_exit64_usage.cpython-312-pytest-7.4.4.pyc",
+      "size": 6517,
+      "mtime": "2025-09-28T00:20:46Z"
+    },
+    {
+      "path": "tests/cli/__pycache__/test_cli_hash_coupling_disk_and_ab_ba.cpython-312-pytest-7.4.4.pyc",
+      "size": 10355,
+      "mtime": "2025-09-27T23:32:41Z"
+    },
+    {
+      "path": "tests/cli/__pycache__/test_cli_stdout_schema_and_lf.cpython-312-pytest-7.4.4.pyc",
+      "size": 3678,
+      "mtime": "2025-09-27T23:10:44Z"
+    },
+    {
+      "path": "tests/cli/__pycache__/test_cli_surface_sentinel.cpython-312-pytest-7.4.4.pyc",
+      "size": 6381,
+      "mtime": "2025-09-27T23:10:29Z"
+    },
+    {
+      "path": "tests/cli/__pycache__/test_hd_cli_sidecar_and_stdout.cpython-312-pytest-7.4.4.pyc",
+      "size": 9446,
+      "mtime": "2025-09-26T08:58:31Z"
+    },
+    {
+      "path": "tests/cli/__pycache__/test_hd_cli_sidecar_and_stdout.cpython-312.pyc",
+      "size": 2540,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/cli/test_cli_admin_invariance_and_perms.py",
+      "size": 1256,
+      "mtime": "2025-09-28T00:30:36Z"
+    },
+    {
+      "path": "tests/cli/test_cli_exit2_typed_json_and_exit64_usage.py",
+      "size": 1258,
+      "mtime": "2025-09-28T00:20:38Z"
+    },
+    {
+      "path": "tests/cli/test_cli_hash_coupling_disk_and_ab_ba.py",
+      "size": 1213,
+      "mtime": "2025-09-27T23:32:34Z"
+    },
+    {
+      "path": "tests/cli/test_cli_stdout_schema_and_lf.py",
+      "size": 1172,
+      "mtime": "2025-09-27T23:10:21Z"
+    },
+    {
+      "path": "tests/cli/test_cli_surface_sentinel.py",
+      "size": 1177,
+      "mtime": "2025-09-27T23:10:14Z"
+    },
+    {
+      "path": "tests/cli/test_hd_cli_sidecar_and_stdout.py",
+      "size": 1332,
+      "mtime": "2025-09-26T08:58:20Z"
+    },
+    {
+      "path": "tests/compat/__pycache__/test_compat_public_ab_ba_identity.cpython-312-pytest-7.4.4.pyc",
+      "size": 9564,
+      "mtime": "2025-09-28T11:57:34Z"
+    },
+    {
+      "path": "tests/compat/__pycache__/test_compat_public_lf_bom.cpython-312-pytest-7.4.4.pyc",
+      "size": 2308,
+      "mtime": "2025-09-28T11:59:18Z"
+    },
+    {
+      "path": "tests/compat/test_cli_public_bytes_identity.py",
+      "size": 592,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "tests/compat/test_compat_public_ab_ba_identity.py",
+      "size": 1344,
+      "mtime": "2025-09-28T11:57:34Z"
+    },
+    {
+      "path": "tests/compat/test_compat_public_lf_bom.py",
+      "size": 559,
+      "mtime": "2025-09-28T11:59:17Z"
+    },
+    {
+      "path": "tests/compat/test_ts_import_no_io.py",
+      "size": 1549,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "tests/compat/test_ts_sidecar_checks_manual.py",
+      "size": 146,
+      "mtime": "2025-10-07T20:07:08Z"
+    },
+    {
+      "path": "tests/compliance/__pycache__/test_429_retry_after_mapping_seconds_and_date.cpython-312-pytest-7.4.4.pyc",
+      "size": 9545,
+      "mtime": "2025-09-27T11:54:34Z"
+    },
+    {
+      "path": "tests/compliance/__pycache__/test_429_retry_after_mapping_seconds_and_date.cpython-312.pyc",
+      "size": 2432,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/compliance/__pycache__/test_cli_admin_gate_sidecar_perms_and_stdout_hash_invariance.cpython-312-pytest-7.4.4.pyc",
+      "size": 10592,
+      "mtime": "2025-09-27T12:09:08Z"
+    },
+    {
+      "path": "tests/compliance/__pycache__/test_cli_admin_gate_sidecar_perms_and_stdout_hash_invariance.cpython-312.pyc",
+      "size": 3994,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/compliance/__pycache__/test_cli_release_id_resolver_precedence.cpython-312-pytest-7.4.4.pyc",
+      "size": 5222,
+      "mtime": "2025-09-27T13:48:31Z"
+    },
+    {
+      "path": "tests/compliance/__pycache__/test_cli_release_id_resolver_precedence.cpython-312.pyc",
+      "size": 2934,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/compliance/__pycache__/test_invocation_tag_accept_reject_and_roundtrip.cpython-312-pytest-7.4.4.pyc",
+      "size": 5095,
+      "mtime": "2025-09-27T10:18:48Z"
+    },
+    {
+      "path": "tests/compliance/__pycache__/test_invocation_tag_accept_reject_and_roundtrip.cpython-312.pyc",
+      "size": 1789,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/compliance/__pycache__/test_log_shape_snapshot.cpython-312-pytest-7.4.4.pyc",
+      "size": 8758,
+      "mtime": "2025-09-27T14:06:01Z"
+    },
+    {
+      "path": "tests/compliance/__pycache__/test_log_shape_snapshot.cpython-312.pyc",
+      "size": 2736,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/compliance/__pycache__/test_logging_filter_keys_only_and_redactions.cpython-312-pytest-7.4.4.pyc",
+      "size": 7551,
+      "mtime": "2025-09-27T10:31:54Z"
+    },
+    {
+      "path": "tests/compliance/__pycache__/test_logging_filter_keys_only_and_redactions.cpython-312.pyc",
+      "size": 2248,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/compliance/__pycache__/test_meta_abba_parity.cpython-312-pytest-7.4.4.pyc",
+      "size": 6972,
+      "mtime": "2025-09-27T14:06:21Z"
+    },
+    {
+      "path": "tests/compliance/__pycache__/test_meta_abba_parity.cpython-312.pyc",
+      "size": 2015,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/compliance/__pycache__/test_override_guard_engine_env_and_app_env_alias.cpython-312-pytest-7.4.4.pyc",
+      "size": 5473,
+      "mtime": "2025-09-27T10:39:09Z"
+    },
+    {
+      "path": "tests/compliance/__pycache__/test_override_guard_engine_env_and_app_env_alias.cpython-312.pyc",
+      "size": 2644,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/compliance/__pycache__/test_preset_schema_gate_legacy_missing_both_present.cpython-312-pytest-7.4.4.pyc",
+      "size": 6362,
+      "mtime": "2025-09-27T10:44:52Z"
+    },
+    {
+      "path": "tests/compliance/__pycache__/test_preset_schema_gate_legacy_missing_both_present.cpython-312.pyc",
+      "size": 3091,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/compliance/__pycache__/test_public_payload_goldens_success_error_lf_and_no_etag_on_errors.cpython-312-pytest-7.4.4.pyc",
+      "size": 16324,
+      "mtime": "2025-09-27T12:03:38Z"
+    },
+    {
+      "path": "tests/compliance/__pycache__/test_public_payload_goldens_success_error_lf_and_no_etag_on_errors.cpython-312.pyc",
+      "size": 4644,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/compliance/__pycache__/test_reader_etag_and_conditional.cpython-312-pytest-7.4.4.pyc",
+      "size": 9715,
+      "mtime": "2025-09-27T22:40:30Z"
+    },
+    {
+      "path": "tests/compliance/__pycache__/test_reader_etag_compression_invariance.cpython-312-pytest-7.4.4.pyc",
+      "size": 4707,
+      "mtime": "2025-09-27T22:40:30Z"
+    },
+    {
+      "path": "tests/compliance/__pycache__/test_release_id_precedence_and_grep_guard.cpython-312-pytest-7.4.4.pyc",
+      "size": 10316,
+      "mtime": "2025-09-28T00:28:24Z"
+    },
+    {
+      "path": "tests/compliance/test_429_retry_after_mapping_seconds_and_date.py",
+      "size": 1236,
+      "mtime": "2025-09-27T11:54:27Z"
+    },
+    {
+      "path": "tests/compliance/test_cli_admin_gate_sidecar_perms_and_stdout_hash_invariance.py",
+      "size": 1970,
+      "mtime": "2025-09-27T12:08:55Z"
+    },
+    {
+      "path": "tests/compliance/test_cli_release_id_resolver_precedence.py",
+      "size": 1494,
+      "mtime": "2025-09-27T13:48:15Z"
+    },
+    {
+      "path": "tests/compliance/test_invocation_tag_accept_reject_and_roundtrip.py",
+      "size": 1733,
+      "mtime": "2025-09-27T10:18:38Z"
+    },
+    {
+      "path": "tests/compliance/test_log_shape_snapshot.py",
+      "size": 1772,
+      "mtime": "2025-09-27T14:05:50Z"
+    },
+    {
+      "path": "tests/compliance/test_logging_filter_keys_only_and_redactions.py",
+      "size": 1538,
+      "mtime": "2025-09-27T10:31:36Z"
+    },
+    {
+      "path": "tests/compliance/test_meta_abba_parity.py",
+      "size": 1063,
+      "mtime": "2025-09-27T14:06:11Z"
+    },
+    {
+      "path": "tests/compliance/test_override_guard_engine_env_and_app_env_alias.py",
+      "size": 1364,
+      "mtime": "2025-09-27T10:38:59Z"
+    },
+    {
+      "path": "tests/compliance/test_preset_schema_gate_legacy_missing_both_present.py",
+      "size": 1650,
+      "mtime": "2025-09-27T10:44:44Z"
+    },
+    {
+      "path": "tests/compliance/test_public_payload_goldens_success_error_lf_and_no_etag_on_errors.py",
+      "size": 2879,
+      "mtime": "2025-09-27T12:03:02Z"
+    },
+    {
+      "path": "tests/compliance/test_reader_etag_and_conditional.py",
+      "size": 1478,
+      "mtime": "2025-09-27T22:40:17Z"
+    },
+    {
+      "path": "tests/compliance/test_reader_etag_compression_invariance.py",
+      "size": 821,
+      "mtime": "2025-09-27T22:40:17Z"
+    },
+    {
+      "path": "tests/compliance/test_release_id_precedence_and_grep_guard.py",
+      "size": 2485,
+      "mtime": "2025-09-28T00:28:16Z"
+    },
+    {
+      "path": "tests/conftest.py",
+      "size": 201,
+      "mtime": "2025-09-25T03:25:24Z"
+    },
+    {
+      "path": "tests/em/__pycache__/test_em_defaults_and_ladder.cpython-312-pytest-7.4.4.pyc",
+      "size": 5440,
+      "mtime": "2025-09-26T18:52:47Z"
+    },
+    {
+      "path": "tests/em/__pycache__/test_em_defaults_and_ladder.cpython-312.pyc",
+      "size": 2419,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/em/__pycache__/test_em_off_toggle.cpython-312-pytest-7.4.4.pyc",
+      "size": 4001,
+      "mtime": "2025-09-27T00:33:05Z"
+    },
+    {
+      "path": "tests/em/__pycache__/test_em_off_toggle.cpython-312.pyc",
+      "size": 1637,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/em/__pycache__/test_em_throat_and_adjacency.cpython-312-pytest-7.4.4.pyc",
+      "size": 7166,
+      "mtime": "2025-09-26T19:05:37Z"
+    },
+    {
+      "path": "tests/em/__pycache__/test_em_throat_and_adjacency.cpython-312.pyc",
+      "size": 3410,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/em/__pycache__/test_goldens_public_shape_and_identity.cpython-312-pytest-7.4.4.pyc",
+      "size": 7707,
+      "mtime": "2025-09-26T19:12:15Z"
+    },
+    {
+      "path": "tests/em/__pycache__/test_goldens_public_shape_and_identity.cpython-312.pyc",
+      "size": 1747,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/em/test_em_defaults_and_ladder.py",
+      "size": 1324,
+      "mtime": "2025-09-26T18:52:34Z"
+    },
+    {
+      "path": "tests/em/test_em_off_toggle.py",
+      "size": 835,
+      "mtime": "2025-09-26T19:13:32Z"
+    },
+    {
+      "path": "tests/em/test_em_throat_and_adjacency.py",
+      "size": 1722,
+      "mtime": "2025-09-26T18:55:55Z"
+    },
+    {
+      "path": "tests/em/test_goldens_public_shape_and_identity.py",
+      "size": 825,
+      "mtime": "2025-09-26T19:12:06Z"
+    },
+    {
+      "path": "tests/epic003/__pycache__/test_error_message_map.cpython-312-pytest-7.4.4.pyc",
+      "size": 2591,
+      "mtime": "2025-10-17T20:02:03Z"
+    },
+    {
+      "path": "tests/epic003/__pycache__/test_http_home_single_path.cpython-312-pytest-7.4.4.pyc",
+      "size": 1797,
+      "mtime": "2025-10-17T20:02:03Z"
+    },
+    {
+      "path": "tests/epic003/__pycache__/test_legacy_imports_denied.cpython-312-pytest-7.4.4.pyc",
+      "size": 1809,
+      "mtime": "2025-10-17T21:17:37Z"
+    },
+    {
+      "path": "tests/epic003/__pycache__/test_meta_invocation_ok.cpython-312-pytest-7.4.4.pyc",
+      "size": 3940,
+      "mtime": "2025-10-17T20:02:03Z"
+    },
+    {
+      "path": "tests/epic003/test_error_message_map.py",
+      "size": 361,
+      "mtime": "2025-10-17T20:01:40Z"
+    },
+    {
+      "path": "tests/epic003/test_http_home_single_path.py",
+      "size": 484,
+      "mtime": "2025-10-17T20:01:40Z"
+    },
+    {
+      "path": "tests/epic003/test_legacy_imports_denied.py",
+      "size": 711,
+      "mtime": "2025-10-17T21:17:36Z"
+    },
+    {
+      "path": "tests/epic003/test_meta_invocation_ok.py",
+      "size": 736,
+      "mtime": "2025-10-17T20:01:40Z"
+    },
+    {
+      "path": "tests/fixtures/cli/A.json",
+      "size": 8,
+      "mtime": "2025-09-27T12:08:55Z"
+    },
+    {
+      "path": "tests/fixtures/cli/B.json",
+      "size": 8,
+      "mtime": "2025-09-27T12:08:55Z"
+    },
+    {
+      "path": "tests/fixtures/g05_adj_A.json",
+      "size": 19,
+      "mtime": "2025-09-26T18:55:55Z"
+    },
+    {
+      "path": "tests/fixtures/g05_adj_A.json__admin.json",
+      "size": 178,
+      "mtime": "2025-09-27T11:12:02Z"
+    },
+    {
+      "path": "tests/fixtures/g05_adj_B.json",
+      "size": 20,
+      "mtime": "2025-09-26T18:55:55Z"
+    },
+    {
+      "path": "tests/fixtures/g08_not_paced_A.json",
+      "size": 21,
+      "mtime": "2025-09-26T18:55:55Z"
+    },
+    {
+      "path": "tests/fixtures/g08_not_paced_B.json",
+      "size": 21,
+      "mtime": "2025-09-26T18:55:55Z"
+    },
+    {
+      "path": "tests/fixtures/g08_paced_A.json",
+      "size": 21,
+      "mtime": "2025-09-26T18:55:55Z"
+    },
+    {
+      "path": "tests/fixtures/g08_paced_A.json__admin.json",
+      "size": 182,
+      "mtime": "2025-09-27T11:13:35Z"
+    },
+    {
+      "path": "tests/fixtures/g08_paced_B.json",
+      "size": 21,
+      "mtime": "2025-09-26T18:55:55Z"
+    },
+    {
+      "path": "tests/fixtures/reader_v1/abba_A.json",
+      "size": 21,
+      "mtime": "2025-09-26T21:19:17Z"
+    },
+    {
+      "path": "tests/fixtures/reader_v1/abba_B.json",
+      "size": 18,
+      "mtime": "2025-09-26T21:19:17Z"
+    },
+    {
+      "path": "tests/goldens/g05_adjacency_only.json",
+      "size": 402,
+      "mtime": "2025-09-26T19:12:06Z"
+    },
+    {
+      "path": "tests/goldens/g05_adjacency_only.json.sha256",
+      "size": 65,
+      "mtime": "2025-09-26T19:12:06Z"
+    },
+    {
+      "path": "tests/goldens/g08_throat_em_bonus_not_paced.json",
+      "size": 402,
+      "mtime": "2025-09-26T19:12:06Z"
+    },
+    {
+      "path": "tests/goldens/g08_throat_em_bonus_not_paced.json.sha256",
+      "size": 65,
+      "mtime": "2025-09-26T19:12:06Z"
+    },
+    {
+      "path": "tests/goldens/g08_throat_em_bonus_paced.json",
+      "size": 402,
+      "mtime": "2025-09-26T19:12:06Z"
+    },
+    {
+      "path": "tests/goldens/g08_throat_em_bonus_paced.json.sha256",
+      "size": 65,
+      "mtime": "2025-09-26T19:12:06Z"
+    },
+    {
+      "path": "tests/hdctl/__pycache__/test_cli_admin_sidecar_invariance.cpython-312-pytest-7.4.4.pyc",
+      "size": 9131,
+      "mtime": "2025-09-29T01:11:39Z"
+    },
+    {
+      "path": "tests/hdctl/__pycache__/test_cli_read_singlebg.cpython-312-pytest-7.4.4.pyc",
+      "size": 7993,
+      "mtime": "2025-09-29T00:10:42Z"
+    },
+    {
+      "path": "tests/hdctl/__pycache__/test_cli_showcompat_parity.cpython-312-pytest-7.4.4.pyc",
+      "size": 7245,
+      "mtime": "2025-09-29T00:17:26Z"
+    },
+    {
+      "path": "tests/hdctl/__pycache__/test_cli_streams_and_exits.cpython-312-pytest-7.4.4.pyc",
+      "size": 7802,
+      "mtime": "2025-09-29T00:08:59Z"
+    },
+    {
+      "path": "tests/hdctl/__pycache__/test_cli_two_run_identity.cpython-312-pytest-7.4.4.pyc",
+      "size": 4202,
+      "mtime": "2025-09-29T00:17:26Z"
+    },
+    {
+      "path": "tests/hdctl/test_cli_admin_sidecar_invariance.py",
+      "size": 1828,
+      "mtime": "2025-09-29T01:11:39Z"
+    },
+    {
+      "path": "tests/hdctl/test_cli_read_singlebg.py",
+      "size": 1145,
+      "mtime": "2025-09-29T00:10:42Z"
+    },
+    {
+      "path": "tests/hdctl/test_cli_showcompat_parity.py",
+      "size": 1317,
+      "mtime": "2025-09-29T00:17:26Z"
+    },
+    {
+      "path": "tests/hdctl/test_cli_streams_and_exits.py",
+      "size": 817,
+      "mtime": "2025-09-29T00:08:59Z"
+    },
+    {
+      "path": "tests/hdctl/test_cli_two_run_identity.py",
+      "size": 717,
+      "mtime": "2025-09-29T00:17:26Z"
+    },
+    {
+      "path": "tests/infra/__pycache__/test_hash_coupling.cpython-312-pytest-7.4.4.pyc",
+      "size": 5052,
+      "mtime": "2025-09-26T08:47:05Z"
+    },
+    {
+      "path": "tests/infra/__pycache__/test_hash_coupling.cpython-312.pyc",
+      "size": 1232,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/infra/__pycache__/test_resolver_serializer_discipline.cpython-312-pytest-7.4.4.pyc",
+      "size": 4700,
+      "mtime": "2025-09-26T09:01:07Z"
+    },
+    {
+      "path": "tests/infra/__pycache__/test_resolver_serializer_discipline.cpython-312.pyc",
+      "size": 1376,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/infra/__pycache__/test_sercanon_bytes.cpython-312-pytest-7.4.4.pyc",
+      "size": 4279,
+      "mtime": "2025-09-26T08:44:22Z"
+    },
+    {
+      "path": "tests/infra/__pycache__/test_sercanon_bytes.cpython-312.pyc",
+      "size": 717,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/infra/__pycache__/test_serializer_guard.cpython-312-pytest-7.4.4.pyc",
+      "size": 5015,
+      "mtime": "2025-09-26T09:04:28Z"
+    },
+    {
+      "path": "tests/infra/__pycache__/test_serializer_guard.cpython-312.pyc",
+      "size": 1226,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/infra/test_hash_coupling.py",
+      "size": 966,
+      "mtime": "2025-09-26T08:46:44Z"
+    },
+    {
+      "path": "tests/infra/test_resolver_serializer_discipline.py",
+      "size": 624,
+      "mtime": "2025-09-26T09:00:58Z"
+    },
+    {
+      "path": "tests/infra/test_sercanon_bytes.py",
+      "size": 485,
+      "mtime": "2025-09-26T08:44:06Z"
+    },
+    {
+      "path": "tests/infra/test_serializer_guard.py",
+      "size": 568,
+      "mtime": "2025-09-26T09:04:17Z"
+    },
+    {
+      "path": "tests/integration/__pycache__/test_normalized_fixture.cpython-312-pytest-7.4.4.pyc",
+      "size": 7955,
+      "mtime": "2025-09-27T05:21:27Z"
+    },
+    {
+      "path": "tests/integration/__pycache__/test_normalized_fixture.cpython-312.pyc",
+      "size": 2902,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/integration/test_normalized_fixture.py",
+      "size": 1306,
+      "mtime": "2025-09-27T05:11:44Z"
+    },
+    {
+      "path": "tests/loader/__pycache__/test_chart_loader_uses_provider_and_is_safe_mode_default.cpython-312-pytest-7.4.4.pyc",
+      "size": 5245,
+      "mtime": "2025-09-27T22:04:43Z"
+    },
+    {
+      "path": "tests/loader/__pycache__/test_load_chart_fixture_only.cpython-312-pytest-7.4.4.pyc",
+      "size": 7226,
+      "mtime": "2025-09-28T08:52:49Z"
+    },
+    {
+      "path": "tests/loader/__pycache__/test_loader_hdapi_ignores_tz.cpython-312-pytest-7.4.4.pyc",
+      "size": 4775,
+      "mtime": "2025-09-28T09:09:42Z"
+    },
+    {
+      "path": "tests/loader/__pycache__/test_loader_logs_keys_only.cpython-312-pytest-7.4.4.pyc",
+      "size": 6376,
+      "mtime": "2025-09-28T08:53:03Z"
+    },
+    {
+      "path": "tests/loader/__pycache__/test_pinned_lists_not_empty.cpython-312-pytest-7.4.4.pyc",
+      "size": 4671,
+      "mtime": "2025-09-28T08:38:21Z"
+    },
+    {
+      "path": "tests/loader/__pycache__/test_validators_strict.cpython-312-pytest-7.4.4.pyc",
+      "size": 9428,
+      "mtime": "2025-09-28T08:38:20Z"
+    },
+    {
+      "path": "tests/loader/test_chart_loader_uses_provider_and_is_safe_mode_default.py",
+      "size": 1237,
+      "mtime": "2025-09-27T22:04:33Z"
+    },
+    {
+      "path": "tests/loader/test_load_chart_fixture_only.py",
+      "size": 848,
+      "mtime": "2025-09-28T08:52:49Z"
+    },
+    {
+      "path": "tests/loader/test_loader_hdapi_ignores_tz.py",
+      "size": 972,
+      "mtime": "2025-09-28T09:02:02Z"
+    },
+    {
+      "path": "tests/loader/test_loader_logs_keys_only.py",
+      "size": 1267,
+      "mtime": "2025-09-28T08:53:03Z"
+    },
+    {
+      "path": "tests/loader/test_pinned_lists_not_empty.py",
+      "size": 480,
+      "mtime": "2025-09-28T08:38:19Z"
+    },
+    {
+      "path": "tests/loader/test_validators_strict.py",
+      "size": 1460,
+      "mtime": "2025-09-28T08:38:19Z"
+    },
+    {
+      "path": "tests/provider/__pycache__/conftest.cpython-312-pytest-7.4.4.pyc",
+      "size": 11523,
+      "mtime": "2025-09-27T21:18:26Z"
+    },
+    {
+      "path": "tests/provider/__pycache__/conftest.cpython-312.pyc",
+      "size": 1056,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/provider/__pycache__/test_factory_and_safemode.cpython-312-pytest-7.4.4.pyc",
+      "size": 4149,
+      "mtime": "2025-09-27T17:14:40Z"
+    },
+    {
+      "path": "tests/provider/__pycache__/test_factory_and_safemode.cpython-312.pyc",
+      "size": 2299,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/provider/__pycache__/test_hdapi_error_mapping.cpython-312-pytest-7.4.4.pyc",
+      "size": 5595,
+      "mtime": "2025-09-28T09:09:41Z"
+    },
+    {
+      "path": "tests/provider/__pycache__/test_hdapi_json_headers.cpython-312-pytest-7.4.4.pyc",
+      "size": 4164,
+      "mtime": "2025-09-28T11:39:38Z"
+    },
+    {
+      "path": "tests/provider/__pycache__/test_hdapi_request_shape.cpython-312-pytest-7.4.4.pyc",
+      "size": 8219,
+      "mtime": "2025-09-28T09:09:41Z"
+    },
+    {
+      "path": "tests/provider/__pycache__/test_provider_call_logging_keys_only.cpython-312-pytest-7.4.4.pyc",
+      "size": 12652,
+      "mtime": "2025-09-27T22:11:53Z"
+    },
+    {
+      "path": "tests/provider/__pycache__/test_provider_interface_contract.cpython-312-pytest-7.4.4.pyc",
+      "size": 7047,
+      "mtime": "2025-09-27T21:57:19Z"
+    },
+    {
+      "path": "tests/provider/__pycache__/test_prtest_precedence_and_artifact.cpython-312.pyc",
+      "size": 1794,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/provider/__pycache__/test_resolve_log_correlation_id.cpython-312-pytest-7.4.4.pyc",
+      "size": 3601,
+      "mtime": "2025-09-27T19:09:45Z"
+    },
+    {
+      "path": "tests/provider/__pycache__/test_resolve_log_correlation_id.cpython-312.pyc",
+      "size": 1475,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/provider/__pycache__/test_secrets_unknown_provider_is_misconfigured.cpython-312-pytest-7.4.4.pyc",
+      "size": 1980,
+      "mtime": "2025-09-27T18:00:34Z"
+    },
+    {
+      "path": "tests/provider/__pycache__/test_secrets_unknown_provider_is_misconfigured.cpython-312.pyc",
+      "size": 1032,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/provider/__pycache__/test_vendor_and_prod_guard.cpython-312-pytest-7.4.4.pyc",
+      "size": 12085,
+      "mtime": "2025-09-27T20:44:45Z"
+    },
+    {
+      "path": "tests/provider/__pycache__/test_vendor_and_prod_guard.cpython-312.pyc",
+      "size": 5729,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/provider/__pycache__/test_vendor_and_prod_guard_min.cpython-312-pytest-7.4.4.pyc",
+      "size": 3780,
+      "mtime": "2025-09-27T18:00:34Z"
+    },
+    {
+      "path": "tests/provider/__pycache__/test_vendor_and_prod_guard_min.cpython-312.pyc",
+      "size": 2245,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/provider/__pycache__/test_vendor_call_rails_and_config.cpython-312-pytest-7.4.4.pyc",
+      "size": 7343,
+      "mtime": "2025-09-27T22:02:54Z"
+    },
+    {
+      "path": "tests/provider/__pycache__/test_vendor_guard_min.cpython-312-pytest-7.4.4.pyc",
+      "size": 2372,
+      "mtime": "2025-09-27T19:11:25Z"
+    },
+    {
+      "path": "tests/provider/__pycache__/test_vendor_guard_min.cpython-312.pyc",
+      "size": 1061,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/provider/conftest.py",
+      "size": 11276,
+      "mtime": "2025-09-27T21:03:52Z"
+    },
+    {
+      "path": "tests/provider/test_factory_and_safemode.py",
+      "size": 1432,
+      "mtime": "2025-09-27T17:14:27Z"
+    },
+    {
+      "path": "tests/provider/test_hdapi_error_mapping.py",
+      "size": 1423,
+      "mtime": "2025-09-28T09:02:02Z"
+    },
+    {
+      "path": "tests/provider/test_hdapi_json_headers.py",
+      "size": 765,
+      "mtime": "2025-09-28T11:39:38Z"
+    },
+    {
+      "path": "tests/provider/test_hdapi_request_shape.py",
+      "size": 2361,
+      "mtime": "2025-09-28T09:02:02Z"
+    },
+    {
+      "path": "tests/provider/test_provider_call_logging_keys_only.py",
+      "size": 2457,
+      "mtime": "2025-09-27T22:11:40Z"
+    },
+    {
+      "path": "tests/provider/test_provider_interface_contract.py",
+      "size": 1217,
+      "mtime": "2025-09-27T21:57:07Z"
+    },
+    {
+      "path": "tests/provider/test_prtest_precedence_and_artifact.py",
+      "size": 1018,
+      "mtime": "2025-09-27T19:08:10Z"
+    },
+    {
+      "path": "tests/provider/test_resolve_log_correlation_id.py",
+      "size": 734,
+      "mtime": "2025-09-27T19:06:55Z"
+    },
+    {
+      "path": "tests/provider/test_secrets_dir_invalid.py",
+      "size": 782,
+      "mtime": "2025-09-27T21:05:22Z"
+    },
+    {
+      "path": "tests/provider/test_secrets_errors_typed.py",
+      "size": 11276,
+      "mtime": "2025-09-27T21:04:47Z"
+    },
+    {
+      "path": "tests/provider/test_secrets_unknown_provider_is_misconfigured.py",
+      "size": 510,
+      "mtime": "2025-09-27T17:59:55Z"
+    },
+    {
+      "path": "tests/provider/test_startup_logging.py",
+      "size": 1919,
+      "mtime": "2025-09-27T21:06:59Z"
+    },
+    {
+      "path": "tests/provider/test_vendor_and_prod_guard.py",
+      "size": 3116,
+      "mtime": "2025-09-27T20:43:59Z"
+    },
+    {
+      "path": "tests/provider/test_vendor_and_prod_guard_min.py",
+      "size": 1391,
+      "mtime": "2025-09-27T18:00:22Z"
+    },
+    {
+      "path": "tests/provider/test_vendor_call_rails_and_config.py",
+      "size": 1646,
+      "mtime": "2025-09-27T22:01:35Z"
+    },
+    {
+      "path": "tests/provider/test_vendor_guard_min.py",
+      "size": 518,
+      "mtime": "2025-09-27T19:09:17Z"
+    },
+    {
+      "path": "tests/provider/tests/provider/test_decisions_perms_and_newline.py",
+      "size": 751,
+      "mtime": "2025-09-27T21:06:41Z"
+    },
+    {
+      "path": "tests/reader_v1/__pycache__/test_cli_proof.cpython-312-pytest-7.4.4.pyc",
+      "size": 5517,
+      "mtime": "2025-09-26T21:24:29Z"
+    },
+    {
+      "path": "tests/reader_v1/__pycache__/test_cli_proof.cpython-312.pyc",
+      "size": 2423,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/reader_v1/__pycache__/test_emitter.cpython-312-pytest-7.4.4.pyc",
+      "size": 5556,
+      "mtime": "2025-09-26T21:12:16Z"
+    },
+    {
+      "path": "tests/reader_v1/__pycache__/test_emitter.cpython-312.pyc",
+      "size": 2734,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/reader_v1/__pycache__/test_goldens.cpython-312-pytest-7.4.4.pyc",
+      "size": 6108,
+      "mtime": "2025-09-26T21:16:08Z"
+    },
+    {
+      "path": "tests/reader_v1/__pycache__/test_goldens.cpython-312.pyc",
+      "size": 2525,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/reader_v1/__pycache__/test_release_pack.cpython-312-pytest-7.4.4.pyc",
+      "size": 4089,
+      "mtime": "2025-09-26T21:42:00Z"
+    },
+    {
+      "path": "tests/reader_v1/__pycache__/test_release_pack.cpython-312.pyc",
+      "size": 1599,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/reader_v1/__pycache__/test_schema.cpython-312-pytest-7.4.4.pyc",
+      "size": 3891,
+      "mtime": "2025-09-26T21:08:29Z"
+    },
+    {
+      "path": "tests/reader_v1/__pycache__/test_schema.cpython-312.pyc",
+      "size": 3748,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/reader_v1/test_cli_proof.py",
+      "size": 1310,
+      "mtime": "2025-09-26T21:24:20Z"
+    },
+    {
+      "path": "tests/reader_v1/test_emitter.py",
+      "size": 1630,
+      "mtime": "2025-09-26T21:12:03Z"
+    },
+    {
+      "path": "tests/reader_v1/test_goldens.py",
+      "size": 1446,
+      "mtime": "2025-09-26T21:15:26Z"
+    },
+    {
+      "path": "tests/reader_v1/test_release_pack.py",
+      "size": 1001,
+      "mtime": "2025-09-26T21:41:55Z"
+    },
+    {
+      "path": "tests/reader_v1/test_schema.py",
+      "size": 2383,
+      "mtime": "2025-09-26T21:07:54Z"
+    },
+    {
+      "path": "tests/test_catalog_canon.py",
+      "size": 1827,
+      "mtime": "2025-09-24T23:50:05Z"
+    },
+    {
+      "path": "tests/test_pipeline_properties.py",
+      "size": 1376,
+      "mtime": "2025-09-25T01:12:09Z"
+    },
+    {
+      "path": "tests/test_pipeline_public.py",
+      "size": 1504,
+      "mtime": "2025-09-25T00:19:13Z"
+    },
+    {
+      "path": "tests/test_resolver_prod_rules.py",
+      "size": 1740,
+      "mtime": "2025-09-25T01:15:24Z"
+    },
+    {
+      "path": "tests/test_sercanon.py",
+      "size": 1586,
+      "mtime": "2025-09-24T06:14:51Z"
+    },
+    {
+      "path": "tests/unit/__pycache__/test_channel_derivation.cpython-312-pytest-7.4.4.pyc",
+      "size": 3072,
+      "mtime": "2025-09-27T05:21:27Z"
+    },
+    {
+      "path": "tests/unit/__pycache__/test_channel_derivation.cpython-312.pyc",
+      "size": 1487,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/unit/__pycache__/test_enum_closure.cpython-312-pytest-7.4.4.pyc",
+      "size": 3350,
+      "mtime": "2025-09-27T05:21:27Z"
+    },
+    {
+      "path": "tests/unit/__pycache__/test_enum_closure.cpython-312.pyc",
+      "size": 2202,
+      "mtime": "2025-09-27T20:30:23Z"
+    },
+    {
+      "path": "tests/unit/test_channel_derivation.py",
+      "size": 1276,
+      "mtime": "2025-09-27T05:11:44Z"
+    },
+    {
+      "path": "tests/unit/test_enum_closure.py",
+      "size": 1499,
+      "mtime": "2025-09-27T05:11:44Z"
+    },
+    {
+      "path": "tools/lint_emit_paths.py",
+      "size": 1067,
+      "mtime": "2025-10-14T22:43:02Z"
+    }
+  ]
+}

@@ -1,18 +1,16 @@
-"""
-Canonical JSON serializer:
-- UTF-8 bytes
-- sort_keys=True
-- compact separators (",",":")
-- exactly ONE trailing newline
-- no BOM
-"""
 from __future__ import annotations
 import json
 
-_COMPACT = (",", ":")
-
-def dumps(obj: dict | list) -> bytes:
-    s = json.dumps(obj, ensure_ascii=False, sort_keys=True, separators=_COMPACT)
-    if s.endswith("\n"):
-        s = s.rstrip("\n")
-    return (s + "\n").encode("utf-8")
+def dumps(obj) -> bytes:
+    """
+    Canonical JSON serializer for public envelopes:
+      - UTF-8 bytes
+      - ensure_ascii=False
+      - sorted keys
+      - compact separators
+      - exactly one trailing newline
+    """
+    s = json.dumps(obj, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    if not s.endswith("\n"):
+        s += "\n"
+    return s.encode("utf-8")
