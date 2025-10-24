@@ -1,4 +1,4 @@
-# Reader v1 — HTTP Transport Evidence crib sheet (dev)
+# Reader v1 — A7 crib sheet (dev)
 
 Dev runner (APP_ENV=dev):
   python dev/reader_harness/app.py

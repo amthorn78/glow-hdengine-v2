@@ -238,10 +238,3 @@ curl -i http://127.0.0.1:5000/api/reader?a=<rel>&b=<rel>&a_tz=<IANA>&b_tz=<IANA>
 • Public body & determinism — HD Engine — Math & Technical Spec  
 • Transport & caching (A7) acceptance — Governance & Process (Acceptance)
 (Repo docs link to these homes and do not restate their rules.)
-
-<!-- EPIC-004 RUN -->
-### Quick run (EPIC-004)
-```bash
-python -m adapter.http_reader
-```
-Bind: http://127.0.0.1:5000   ·   Env: PYTHONHASHSEED=0 PYTHONUTF8=1 TZ=UTC SAFE_MODE=1

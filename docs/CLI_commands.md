@@ -24,3 +24,15 @@
 - CLI MUST emit **identical bytes** to service (single emitter/serializer path).
 - Recommended hook for parity testing: env `HDE_CLI_SHOWCOMPAT` shelling `hdctl showcompat`.
 
+
+<!-- EPIC-004 PATCH: CLI parity -->
+### EPIC-004 CLI parity
+CLI output **must equal** the service’s Reader compat identity body **byte-for-byte**.
+- Serialization: UTF-8, sorted keys, compact separators, **exactly one trailing LF**.
+- Presenter uses **engine/presenter/emitter.py** which calls **engine/serializer/canon.py:sercanon**.
+
+<!-- EPIC-004 CLI parity -->
+### EPIC-004 CLI parity
+CLI output **must equal** the Reader compat identity body **byte-for-byte**.
+- Serialization: UTF-8, sorted keys, compact separators, **exactly one trailing LF**.
+- Presenter uses **engine/presenter/emitter.py** which calls **engine/serializer/canon.py:sercanon**.

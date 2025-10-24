@@ -171,3 +171,14 @@ SAFE rails: acceptance runs with SAFE_MODE=1; network only if both SAFE_MODE=0 a
 Operator note
 Repo docs are implementation playbooks. Canonical project documents (Environment & Integration Plan, Governance/Process, Engine Math/TS-v0, Spec) carry the authoritative rules and links.
 
+
+## 2025-10-23 — HDE-EPIC004 Closed
+### Added
+- HTTP Transport Evidence goldens for Reader v1 (200, 304-after-200, HEAD, error & method posture, identity↔gzip invariance).
+- Architecture snapshot `_arch/EPIC-004_<ts>/{homes.json,tree.txt}` proving single HTTP home.
+### Changed
+- Reader consolidated to **adapter/http_reader.py** as the only HTTP home.
+- All public JSON now emitted via **engine/presenter/emitter.py** calling **engine/serializer/canon.py:sercanon**.
+- Canonical start command pinned in docs: `python -m adapter.http_reader`.
+### Removed/Deprecated
+- “A7” wording in docs replaced by **HTTP Transport Evidence**.

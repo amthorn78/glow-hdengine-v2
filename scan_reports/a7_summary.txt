@@ -1,0 +1,31 @@
+A7 scan summary (read-only)
+total hits: 268
+by category: code=6, config=17, docs=85, other=160
+by kind: link=65, standalone=203
+
+Top 25 rows:
+- /workspaces/glow-hdengine-v2/README.md:4 [docs/standalone] Status: Active (Alpha A3–A5 body; A7 transport adopted)
+- /workspaces/glow-hdengine-v2/README.md:34 [docs/standalone] A7 transport is adopted (strong quoted ETag, conditional GET/304, HEAD parity, compression invariance). Transport rules live outside this README (see “Sources of truth”).
+- /workspaces/glow-hdengine-v2/README.md:44 [docs/standalone] Transport & caching (A7): Environment & Integration Plan v2.0.
+- /workspaces/glow-hdengine-v2/README.md:73 [docs/standalone] Transport (A7): Evidence lives in Environment & Integration Plan v2.0: strong quoted ETag equals sha256 over the final LF-terminated body (pre-compression), CSV If-None-Match strong-match behavior, 304 empty body, HEAD parity, compression invariance, and no ETag + no-store on writers/errors.
+- /workspaces/glow-hdengine-v2/README.md:87 [docs/standalone] Transport: Governed by Environment & Integration Plan v2.0 (A7). This README does not restate header matrices.
+- /workspaces/glow-hdengine-v2/README.md:130 [docs/standalone] A7 (Transport): see Environment & Integration Plan v2.0 for exact header artifacts and PASS markers.
+- /workspaces/glow-hdengine-v2/README.md:193 [docs/standalone] In Environment & Integration Plan v2.0 (A7). This README intentionally defers to that document.
+- /workspaces/glow-hdengine-v2/README.md:206 [docs/standalone] v2.0 (2025-10-02): Adopt A7 transport (deferred to Env & Integration Plan v2.0); add contract/source-of-truth links; remove command snippets; align evidence sections with Alpha/A7 acceptance.
+- /workspaces/glow-hdengine-v2/README.md:239 [docs/standalone] • Transport & caching (A7) acceptance — Governance & Process (Acceptance)
+- /workspaces/glow-hdengine-v2/manifest_post.sha256:455 [other/link] b635265ded346e7e5a8dd6b74fe96784e58111e95aa213ccf978b5391b3e963d  ./.audit_src/docs/acceptance/reader_a7_crib.md
+- /workspaces/glow-hdengine-v2/manifest_post.sha256:3313 [other/link] b635265ded346e7e5a8dd6b74fe96784e58111e95aa213ccf978b5391b3e963d  ./docs/acceptance/reader_a7_crib.md
+- /workspaces/glow-hdengine-v2/CHANGELOG.md:4 [docs/standalone] • Removed restatements of A7 tables from repo docs; link to Governance instead.
+- /workspaces/glow-hdengine-v2/CHANGELOG.md:9 [docs/standalone] 2025-10-02 — A7 alignment and contract centralization (v2.0 / v0.1.5)
+- /workspaces/glow-hdengine-v2/CHANGELOG.md:13 [docs/standalone] Canonical home for HTTP transport (A7): strong quoted ETag = sha256(final LF-terminated public bytes, pre-compression), Cache-Control: private, max-age=0, must-revalidate, Vary: Authorization, Accept-Encoding.
+- /workspaces/glow-hdengine-v2/CHANGELOG.md:79 [docs/standalone] Notes that A7 transport acceptance lives in Env v2.0; not restated here.
+- /workspaces/glow-hdengine-v2/CHANGELOG.md:91 [docs/standalone] Tracks updated to align with A7 and current canon.
+- /workspaces/glow-hdengine-v2/CHANGELOG.md:100 [docs/link] [Acceptance crib] docs/acceptance/reader_a7_crib.md (new)
+- /workspaces/glow-hdengine-v2/CHANGELOG.md:102 [docs/standalone] One-page, command-free acceptance checklist names and artifact expectations for A7 transport, suitable for FE and QA rehearsals.
+- /workspaces/glow-hdengine-v2/CHANGELOG.md:184 [docs/standalone] - “A7” wording in docs replaced by **HTTP Transport Evidence**.
+- /workspaces/glow-hdengine-v2/manifest_pre.sha256:455 [other/link] b635265ded346e7e5a8dd6b74fe96784e58111e95aa213ccf978b5391b3e963d  ./.audit_src/docs/acceptance/reader_a7_crib.md
+- /workspaces/glow-hdengine-v2/manifest_pre.sha256:3308 [other/link] b635265ded346e7e5a8dd6b74fe96784e58111e95aa213ccf978b5391b3e963d  ./docs/acceptance/reader_a7_crib.md
+- /workspaces/glow-hdengine-v2/.backup_epic004/README.md.20251024121852:4 [other/standalone] Status: Active (Alpha A3–A5 body; A7 transport adopted)
+- /workspaces/glow-hdengine-v2/.backup_epic004/README.md.20251024121852:34 [other/standalone] A7 transport is adopted (strong quoted ETag, conditional GET/304, HEAD parity, compression invariance). Transport rules live outside this README (see “Sources of truth”).
+- /workspaces/glow-hdengine-v2/.backup_epic004/README.md.20251024121852:44 [other/standalone] Transport & caching (A7): Environment & Integration Plan v2.0.
+- /workspaces/glow-hdengine-v2/.backup_epic004/README.md.20251024121852:73 [other/standalone] Transport (A7): Evidence lives in Environment & Integration Plan v2.0: strong quoted ETag equals sha256 over the final LF-terminated body (pre-compression), CSV If-None-Match strong-match behavior, 304 empty body, HEAD parity, compression invariance, and no ETag + no-store on writers/errors.

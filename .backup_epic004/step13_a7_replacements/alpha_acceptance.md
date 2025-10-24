@@ -1,7 +1,7 @@
 # Reader v1 — Alpha acceptance (summary)
 
 ## Purpose
-Gate Reader v1 behavior at a high level. Details of HTTP Transport Evidence transport/caching are defined in Governance & Process (Acceptance). This page summarizes only what to probe.
+Gate Reader v1 behavior at a high level. Details of A7 transport/caching are defined in Governance & Process (Acceptance). This page summarizes only what to probe.
 
 ## Probes (summary)
 • 200 OK — strong quoted ETag over identity bytes; body matches CLI; one trailing LF
@@ -15,11 +15,6 @@ Gate Reader v1 behavior at a high level. Details of HTTP Transport Evidence tran
 • Byte identity and serializer: tests/test_emitter_determinism.py
 
 <!-- EPIC-004 PATCH: alpha acceptance pointer -->
-### Transport validation reference (EPIC-004)
-Reader transport is validated per **HTTP Transport Evidence**:
-`docs/acceptance/http_transport_evidence.md`
-
-<!-- EPIC-004 acceptance pointer -->
 ### Transport validation reference (EPIC-004)
 Reader transport is validated per **HTTP Transport Evidence**:
 `docs/acceptance/http_transport_evidence.md`

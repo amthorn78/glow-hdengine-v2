@@ -16,8 +16,8 @@ docs/server/reader_v1.md
 Title: Reader v1 — Dev Harness that Mirrors CLI
 Version: 2.1
 Owner: Cyrano (Tech Writer)
-Status: Draft (HTTP Transport Evidence scope; pending ISIS-12 sign-off)
-Cards: CORE-READER-A5 (body invariants), HTTP Transport Evidence transport
+Status: Draft (A7 scope; pending ISIS-12 sign-off)
+Cards: CORE-READER-A5 (body invariants), A7 transport
 
 
 ---
@@ -26,9 +26,9 @@ Cards: CORE-READER-A5 (body invariants), HTTP Transport Evidence transport
 
 Reader v1 is a developer-only HTTP harness. It returns bytes identical to the CLI public stdout for the same inputs. It is not for production traffic; use it for acceptance, smoke tests, and reproducible developer testing of the public envelope.
 
-Contract ownership. The public body shape (keys, enums, serializer rules, idempotence_hash preimage) lives in the HD Engine — Math & Technical Spec; HTTP transport semantics live in the Environment & Integration Plan (HTTP Transport Evidence). This document references both and does not redefine them. 
+Contract ownership. The public body shape (keys, enums, serializer rules, idempotence_hash preimage) lives in the HD Engine — Math & Technical Spec; HTTP transport semantics live in the Environment & Integration Plan (A7). This document references both and does not redefine them. 
 
-> HTTP Transport Evidence transport: Reader implements strong ETag, caching validators, conditional GET, and HEAD parity. Body semantics remain frozen by the Spec. 
+> A7 transport: Reader implements strong ETag, caching validators, conditional GET, and HEAD parity. Body semantics remain frozen by the Spec. 
 
 
 
@@ -64,7 +64,7 @@ If APP_ENV == dev → allow reads only from fixtures/charts/*; deny .. traversal
 
 ---
 
-4. Transport policy (HTTP Transport Evidence)
+4. Transport policy (A7)
 
 Success (200 OK)
 
@@ -145,7 +145,7 @@ Error bodies are single-line JSON with a trailing LF.
 
 ---
 
-7. HTTP Transport Evidence acceptance — evidence-only
+7. A7 acceptance — evidence-only
 
 Purpose. Prove Reader transport behavior and CLI equivalence without prescribing commands in this doc.
 
@@ -209,5 +209,5 @@ Use the same sercanon and preimage rule as the CLI. Do not introduce a second se
 
 ---
 
-Change note (2.1): Converted §7 from command snippets to evidence-only (artifacts + PASS markers), clarified contract ownership pointers, and kept HTTP Transport Evidence transport text aligned with the Env Plan. 
+Change note (2.1): Converted §7 from command snippets to evidence-only (artifacts + PASS markers), clarified contract ownership pointers, and kept A7 transport text aligned with the Env Plan. 
 

@@ -7,5 +7,4 @@
 2025-09-24T19:49:21Z release_id=b4f5c05c0d5aa4e80034e0e83e23a985b1795aa3600a7eb74c0b183497b8aace artifacts=6 operator=ISIS
 2025-09-24T19:52:55Z release_id=b4f5c05c0d5aa4e80034e0e83e23a985b1795aa3600a7eb74c0b183497b8aace artifacts=6 operator=ISIS
 2025-09-24T19:52:55Z release_id=b4f5c05c0d5aa4e80034e0e83e23a985b1795aa3600a7eb74c0b183497b8aace artifacts=6 operator=ISIS
-2025-10-24  EPIC-004 merged: replaced "HTTP Transport Evidence" with HTTP Transport Evidence; pinned single HTTP home; emitter+serializer canon; start-cmd gate added.
-2025-10-24  Note: _arch snapshot naming accepts both `_arch/EPIC-004_<ts>/…` and `_arch/EPIC004_<ts>/…`; do not rename existing folders.
+2025-10-24  EPIC-004 merged: replaced "A7" with HTTP Transport Evidence; pinned single HTTP home; emitter+serializer canon; start-cmd gate added.
