@@ -1,0 +1,3 @@
+db$'\t'current_user$'\t'session_user
+railway$'\t'postgres$'\t'postgres
+(1 row)

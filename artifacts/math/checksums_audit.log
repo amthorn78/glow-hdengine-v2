@@ -1,1 +1,4 @@
-CHECKSUMS_OK=PASS OK=2 BAD=0 MISSING=0 SKIP=0
+PASS adapter/http_reader.py
+PASS engine/presenter/emitter.py
+PASS engine/serializer/canon.py
+PASS migrations/005_identity.sql

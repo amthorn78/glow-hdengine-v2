@@ -1,7 +1,7 @@
 from __future__ import annotations
 import os, json, hashlib
 from pathlib import Path
-from flask import Blueprint, Response, request
+from flask import Blueprint, Response, request, Flask
 from engine.presenter.emitter import emit_compact_json
 
 # A7 helpers
@@ -124,3 +124,83 @@ def get_reader_bp(emit_fn):
         return resp, code
 
     return bp
+
+# === EPIC-005 /internal/version (Blueprint: bp) ===
+import hashlib, json, os, psycopg
+# 'bp', 'Response', and 'request' are already imported above
+
+def _read_release_id():
+    try:
+        return open("artifacts/math/release_id.txt","r",encoding="utf-8").read().strip()
+    except Exception:
+        return hashlib.sha256(open("catalog/manifest.json","rb").read()).hexdigest()
+
+
+# --- ensure blueprint exists for internal routes ---
+try:
+    bp
+except NameError:
+    bp = Blueprint("reader_v1", __name__)
+@bp.route("/internal/version", methods=["GET","HEAD"])
+def internal_version():
+    # deny identity overrides in prod
+    if request.headers.get("X-Identity-Override"):
+        body = b'{"error":"override_denied","detail":"identity overrides disabled in prod"}'
+        r = Response(body, status=400, mimetype="application/json; charset=utf-8")
+        r.headers["Cache-Control"] = "no-store"
+        return r  # NO ETag
+
+    # read identity from DB with short timeout
+    with psycopg.connect(os.environ["DATABASE_URL"], autocommit=False) as conn:
+        with conn.cursor() as cur:
+            cur.execute("SET LOCAL statement_timeout = '250ms'")
+            cur.execute("SELECT engine_tag, build_commit, invocation_tag, emitter_sha256 FROM hde.meta WHERE id='singleton'")
+            engine_tag, build_commit, invocation_tag, emitter_sha256 = cur.fetchone()
+
+    payload = {
+        "engine_tag": engine_tag,
+        "release_id": _read_release_id(),
+        "invocation_tag": invocation_tag,
+        "emitter_sha256": emitter_sha256,
+        "build_commit": build_commit,
+    }
+    body = json.dumps(payload, separators=(",",":"), ensure_ascii=False).encode("utf-8")
+
+    if request.method == "HEAD":
+        # HEAD parity: same type; no body; CL equals GET body size
+        r = Response(b"", status=200, mimetype="application/json; charset=utf-8")
+        r.headers["Content-Length"] = str(len(body))
+    else:
+        r = Response(body, status=200, mimetype="application/json; charset=utf-8")
+
+    r.headers["Cache-Control"] = "no-store"  # deliberately NO ETag
+    return r
+
+# === EPIC-005: app factory ===
+def create_app():
+    app = Flask(__name__)
+    # register internal reader blueprint at root
+    try:
+        app.register_blueprint(bp, url_prefix="")
+    except Exception as _e:
+        # if bp is not defined yet, raise a clear error for operator
+        raise RuntimeError("Blueprint 'bp' not found in adapter/http_reader.py") from _e
+
+    @app.after_request
+    def _strip_etag_on_internal(resp):
+        # governance: no ETag on /internal/* surfaces
+        try:
+            if resp.headers.get("ETag") and resp.request and resp.request.path.startswith("/internal/"):
+                del resp.headers["ETag"]
+        except Exception:
+            # safest behavior: ensure no ETag
+            if "ETag" in resp.headers: del resp.headers["ETag"]
+        return resp
+
+    return app
+
+if __name__ == "__main__":
+    # dev runner (Railway uses gunicorn via Procfile)
+    import os
+    create_app().run(host="0.0.0.0", port=int(os.environ.get("PORT","8000")))
+

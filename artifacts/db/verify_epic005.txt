@@ -1,0 +1,9 @@
+Output format is unaligned.
+PASS: schema hde exists
+PASS: all 4 base tables exist
+PASS: current-month partitions exist
+PASS: public_results PK(id, created_at)
+PASS: pair_evaluation PK(id, evaluated_at)
+PASS: pair_evaluation UNIQUE(min_user,max_user,release_id,evaluated_at)
+PASS: public_results indexes present
+PASS: pair_evaluation indexes present

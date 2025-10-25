@@ -1,0 +1,6 @@
+STATUS=400
+Content-Type: application/json; charset=utf-8
+Content-Length: 74
+Cache-Control: no-store
+
+{"error":"override_denied","detail":"identity overrides disabled in prod"}

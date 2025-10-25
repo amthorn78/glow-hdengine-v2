@@ -1,0 +1,14 @@
+table_schema$'\t'table_name$'\t'table_type$'\t'table_owner
+public$'\t'admin_action_log$'\t'BASE TABLE$'\t'postgres
+public$'\t'birth_data$'\t'BASE TABLE$'\t'postgres
+public$'\t'compatibility_matrix$'\t'BASE TABLE$'\t'postgres
+public$'\t'email_notifications$'\t'BASE TABLE$'\t'postgres
+public$'\t'human_design_data$'\t'BASE TABLE$'\t'postgres
+public$'\t'user_preferences$'\t'BASE TABLE$'\t'postgres
+public$'\t'user_priorities$'\t'BASE TABLE$'\t'postgres
+public$'\t'user_profiles$'\t'BASE TABLE$'\t'postgres
+public$'\t'user_resonance_prefs$'\t'BASE TABLE$'\t'postgres
+public$'\t'user_resonance_signals_private$'\t'BASE TABLE$'\t'postgres
+public$'\t'user_sessions$'\t'BASE TABLE$'\t'postgres
+public$'\t'users$'\t'BASE TABLE$'\t'postgres
+(12 rows)

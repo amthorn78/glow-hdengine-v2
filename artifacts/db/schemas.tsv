@@ -1,0 +1,6 @@
+schema
+information_schema
+pg_catalog
+pg_toast
+public
+(4 rows)

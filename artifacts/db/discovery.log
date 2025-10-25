@@ -1,0 +1,155 @@
+== EPIC005 Step 3S starting at 2025-10-24 19:57:00 UTC ==
+postgresql://***:***@metro.proxy.rlwy.net:52353/railway
+psql (PostgreSQL) 16.10 (Ubuntu 16.10-0ubuntu0.24.04.1)
+Connecting to metro.proxy.rlwy.net:52353 db=railway user=postgres (sslmode=require)
+ERROR:  column "table_owner" does not exist
+LINE 1: SELECT table_schema, table_name, table_type, table_owner FRO...
+                                                     ^
+WARN: query failed and was skipped: SELECT table_schema, table_name, table_type, table_owner FROM information_schema.tables WHERE table_schema NOT IN ('pg_catalog','information_schema') ORDER BY 1,2;
+WARN: query failed and was skipped: SELECT table_schema, table_name, table_type, table_owner FROM information_schema.tables WHERE table_schema NOT IN ('pg_catalog','information_schema') ORDER BY 1,2;
+== EPIC005 Step 3S finished at 2025-10-24 19:57:02 UTC ==
+Artifacts:
+ - active_connections.txt
+ - collisions.tsv
+ - discovery.log
+ - dsn_redacted.txt
+ - extensions.tsv
+ - max_connections.txt
+ - schema_privs_current_user.tsv
+ - schemas.tsv
+ - search_path.txt
+ - server_info.tsv
+ - tables.tsv
+ - version.txt
+ - whoami.tsv
+Log: artifacts/db/discovery.log
+]633;D;0]633;P;Cwd=/workspaces/glow-hdengine-v2[?2004h]633;A(.venv) [0;32m@amthorn78 [0m➜ [1;34m/workspaces/glow-hdengine-v2 [0;36m([1;31mmain[0;36m) [0m$ ]633;B[7m# Recreate tables.tsv using pg_catalog.pg_tables (works on Postgres 17)[27m
+[7mPSQLOPTS="-v ON_ERROR_STOP=1 -q -X -P pager=off -A -F $'\t'"[27m
+[7mCONN="host=${PGHOST:-} port=${PGPORT:-5432} dbname=${PGDATABASE:-postgres} user=${PGUSER:-} sslmode=require"[27m
+
+[7mpsql $PSQLOPTS "$CONN" -c "[27m
+[7m  SELECT schemaname AS table_schema,[27m
+[7m         tablename  AS table_name,[27m
+[7m         'BASE TABLE' AS table_type,[27m
+[7m         tableowner AS table_owner[27m
+[7m  FROM pg_catalog.pg_tables[27m
+[7m  WHERE schemaname NOT IN ('pg_catalog','information_schema')[27m
+[7m  ORDER BY 1,2;[27m
+[7m" > artifacts/db/tables.tsv[27m
+
+[7mecho "Rebuilt artifacts/db/tables.tsv"[27m[A[A[A[A[A[A[A[A[A[A[A[A[A[A]633;A(.venv) [0;32m@amthorn78 [0m➜ [1;34m/workspaces/glow-hdengine-v2 [0;36m([1;31mmain[0;36m) [0m$ ]633;B# Recreate tables.tsv using pg_catalog.pg_tables (works on Postgres 17)
+PSQLOPTS="-v ON_ERROR_STOP=1 -q -X -P pager=off -A -F $'\t'"
+CONN="host=${PGHOST:-} port=${PGPORT:-5432} dbname=${PGDATABASE:-postgres} user=${PGUSER:-} sslmode=require"
+
+psql $PSQLOPTS "$CONN" -c "
+  SELECT schemaname AS table_schema,
+         tablename  AS table_name,
+         'BASE TABLE' AS table_type,
+         tableowner AS table_owner
+  FROM pg_catalog.pg_tables
+  WHERE schemaname NOT IN ('pg_catalog','information_schema')
+  ORDER BY 1,2;
+" > artifacts/db/tables.tsv
+
+echo "Rebuilt artifacts/db/tables.tsv"
+[?2004l]633;E;PSQLOPTS="-v ON_ERROR_STOP=1 -q -X -P pager=off -A -F $'\\t'";be831d1e-06cf-4108-a4c9-22774a396765]633;CRebuilt artifacts/db/tables.tsv
+]633;D;0]633;P;Cwd=/workspaces/glow-hdengine-v2[?2004h]633;A(.venv) [0;32m@amthorn78 [0m➜ [1;34m/workspaces/glow-hdengine-v2 [0;36m([1;31mmain[0;36m) [0m$ ]633;B[7mpsql $PSQLOPTS "$CONN" -c "[27m
+[7m  SELECT schemaname AS table_schema,[27m
+[7m         viewname   AS table_name,[27m
+[7m         'VIEW'     AS table_type,[27m
+[7m         viewowner  AS table_owner[27m
+[7m  FROM pg_catalog.pg_views[27m
+[7m  WHERE schemaname NOT IN ('pg_catalog','information_schema')[27m
+[7m  ORDER BY 1,2;[27m
+[7m" > artifacts/db/views.tsv[27m
+
+[7mecho "Wrote artifacts/db/views.tsv"[27m[A[A[A[A[A[A[A[A[A[A]633;A(.venv) [0;32m@amthorn78 [0m➜ [1;34m/workspaces/glow-hdengine-v2 [0;36m([1;31mmain[0;36m) [0m$ ]633;Bpsql $PSQLOPTS "$CONN" -c "
+  SELECT schemaname AS table_schema,
+         viewname   AS table_name,
+         'VIEW'     AS table_type,
+         viewowner  AS table_owner
+  FROM pg_catalog.pg_views
+  WHERE schemaname NOT IN ('pg_catalog','information_schema')
+  ORDER BY 1,2;
+" > artifacts/db/views.tsv
+
+echo "Wrote artifacts/db/views.tsv"
+[?2004l]633;E;psql $PSQLOPTS "$CONN" -c "\x0a  SELECT schemaname AS table_schema,\x0a         viewname   AS table_name,\x0a         'VIEW'     AS table_type,\x0a         viewowner  AS table_owner\x0a  FROM pg_catalog.pg_views\x0a  WHERE schemaname NOT IN ('pg_catalog','information_schema')\x0a  ORDER BY 1,2\x3b\x0a" > artifacts/db/views.tsv;be831d1e-06cf-4108-a4c9-22774a396765]633;CWrote artifacts/db/views.tsv
+]633;D;0]633;P;Cwd=/workspaces/glow-hdengine-v2[?2004h]633;A(.venv) [0;32m@amthorn78 [0m➜ [1;34m/workspaces/glow-hdengine-v2 [0;36m([1;31mmain[0;36m) [0m$ ]633;B# EPIC005 — Step 4: Build discovery_report.md for ISIS (read-only results)
+set -uo pipefail
+
+report="artifacts/db/discovery_report.md"
+redacted_dsn="artifacts/db/dsn_redacted.txt"
+
+fence() { f="$1"; lang="${2:-}"; if [ -s "$f" ]; then echo '```'"$lang"; cat "$f"; echo '```'; else echo "_(no data: $f)_"; fi; }
+
+{
+  echo "# HDE-EPIC005 — Railway DB Discovery (Read-only)"
+  echo "Date (UTC): $(date -u '+%Y-%m-%d %H:%M:%S')"
+  echo
+  echo "## Context"
+  echo "- Existing Glow backend: present (separate repo/service)."
+  echo "- HDE production app: **planned**, not created yet."
+  echo "- Discovery posture: UI capture + SQL **SELECT/SHOW** only (no DDL)."
+[7m  echo[27m
+[7m  echo "## Connection (redacted)"[27m
+[7m  if [ -s "$redacted_dsn" ]; then cat "$redacted_dsn"; else echo "_(dsn_redacted.txt missing)_"; fi[27m
+[7m  echo[27m
+[7m  echo "## Version"[27m
+[7m  fence artifacts/db/version.txt[27m
+[7m  echo[27m
+[7m  echo "## Server Info"[27m
+[7m  fence artifacts/db/server_info.tsv[27m
+[7m  echo[27m
+[7m  echo "## Who & Search Path"[27m
+[7m  fence artifacts/db/whoami.tsv[27m
+[7m  fence artifacts/db/search_path.txt[27m
+[7m  echo[27m
+[7m  echo "## Schemas"[27m
+[7m  fence artifacts/db/schemas.tsv[27m
+[7m  echo[27m
+[7m  echo "## Tables (non-system)"[27m
+[7m  fence artifacts/db/tables.tsv[27m
+[7m  if [ -s artifacts/db/views.tsv ]; then[27m
+[7m    echo[27m
+[7m    echo "## Views (non-system)"[27m
+[7m    fence artifacts/db/views.tsv[27m
+[7m  fi[27m
+[7m  echo[27m
+[7m  echo "## Extensions"[27m
+[7m  fence artifacts/db/extensions.tsv[27m
+[7m  echo[27m
+[7m  echo "## Schema Privileges (current_user)"[27m
+[7m  fence artifacts/db/schema_privs_current_user.tsv[27m[7m  echo[27m[7m  echo "## Potential Table-Name Collisions"[27m[7m  fence artifacts/db/collisions.tsv[27m[7m  echo[27m[7m  echo "## Connection Posture"[27m[7m  fence artifacts/db/max_connections.txt[27m[7m  fence artifacts/db/active_connections.txt[27m[7m  echo[27m[7m  echo "## Notes / Risks"[27m[7m  echo "- Use **DATABASE_URL** for parity: Codespaces uses the public DSN; Railway will inject an internal DSN at deploy with the same var."[27m[7m  echo "- If we proceed with a shared Postgres instance, we recommend an **HDE-dedicated schema** to avoid name collisions."[27m[7m  echo "- If `schema_privs_current_user.tsv` shows no CREATE on target schema, we’ll need a privilege grant before migrations."[27m[7m} > "$report"[27m[7mecho "Wrote $report"[27m[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A  echo
+  echo "## Connection (redacted)"
+  if [ -s "$redacted_dsn" ]; then cat "$redacted_dsn"; else echo "_(dsn_redacted.txt missing)_"; fi
+  echo
+  echo "## Version"
+  fence artifacts/db/version.txt
+  echo
+  echo "## Server Info"
+  fence artifacts/db/server_info.tsv
+  echo
+  echo "## Who & Search Path"
+  fence artifacts/db/whoami.tsv
+  fence artifacts/db/search_path.txt
+  echo
+  echo "## Schemas"
+  fence artifacts/db/schemas.tsv
+  echo
+  echo "## Tables (non-system)"
+  fence artifacts/db/tables.tsv
+  if [ -s artifacts/db/views.tsv ]; then
+    echo
+    echo "## Views (non-system)"
+    fence artifacts/db/views.tsv
+  fi
+  echo
+  echo "## Extensions"
+  fence artifacts/db/extensions.tsv
+  echo
+  echo "## Schema Privileges (current_user)"
+  fence artifacts/db/schema_privs_current_user.tsv  echo  echo "## Potential Table-Name Collisions"  fence artifacts/db/collisions.tsv  echo  echo "## Connection Posture"  fence artifacts/db/max_connections.txt  fence artifacts/db/active_connections.txt  echo  echo "## Notes / Risks"  echo "- Use **DATABASE_URL** for parity: Codespaces uses the public DSN; Railway will inject an internal DSN at deploy with the same var."  echo "- If we proceed with a shared Postgres instance, we recommend an **HDE-dedicated schema** to avoid name collisions."  echo "- If `schema_privs_current_user.tsv` shows no CREATE on target schema, we’ll need a privilege grant before migrations."} > "$report"echo "Wrote $report"
+[?2004l]633;E;set -uo pipefail;be831d1e-06cf-4108-a4c9-22774a396765]633;Cbash: schema_privs_current_user.tsv: command not found
+Wrote artifacts/db/discovery_report.md
+]633;D;0]633;P;Cwd=/workspaces/glow-hdengine-v2[?2004h]633;A(.venv) [0;32m@amthorn78 [0m➜ [1;34m/workspaces/glow-hdengine-v2 [0;36m([1;31mmain[0;36m) [0m$ ]633;B[H[2J]633;A(.venv) [0;32m@amthorn78 [0m➜ [1;34m/workspaces/glow-hdengine-v2 [0;36m([1;31mmain[0;36m) [0m$ ]633;B
