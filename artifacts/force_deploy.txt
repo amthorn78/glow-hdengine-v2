@@ -1,0 +1,15 @@
+Force deploy for 
+
+
+
+ Use Railway’s venv-managed gunicorn entrypoint instead of `python -m gunicorn`
+
+Why:
+Railway’s launcher provisions a virtualenv and shims the `gunicorn` binary there.
+Running `python -m gunicorn` bypasses those shims, causing the app to start under the wrong interpreter and fail at runtime.
+
+What:
+Procfile → `web: gunicorn 'adapter.factory:create_app()' --bind 0.0.0.0:$PORT`
+
+Result:
+Railway executes the shimmed `gunicorn` inside its venv, ensuring packaged deps are available and the factory app imports correctly.
