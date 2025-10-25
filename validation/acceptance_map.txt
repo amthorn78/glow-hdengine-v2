@@ -1,0 +1,18 @@
+# EPIC-005 Acceptance Map (tokens → evidence files)
+
+# Transport
+INTVER_200_CTYPE_JSON_UTF8_OK,INTVER_200_NO_ETAG_OK -> artifacts/headers/internal_version_200.txt
+INTVER_HEAD_PARITY_OK -> artifacts/headers/internal_version_head.txt
+INTVER_CONDITIONALS_IGNORED_OK -> artifacts/headers/internal_version_if_none_match.txt
+PROD_OVERRIDES_DENIED_OK -> artifacts/headers/internal_version_override_denied.txt
+
+# Identity & provenance
+PROVENANCE_FIELDS_OK -> artifacts/identity/service_identity.json
+RELEASE_ID_RECOMPUTE_OK -> artifacts/math/release_id_recompute.log (and artifacts/math/release_id.txt)
+EMITTER_SHA256_RECOMPUTE_OK -> artifacts/identity/emitter_sha256.txt
+
+# Database baseline (already completed)
+DB_SCHEMA_CREATED_OK,DB_DDL_APPLIED_OK -> artifacts/db/ddl_applied.sql
+DB_PARTITION_READY_OK -> artifacts/db/check_schema.txt
+DB_ROLES_OK,SEARCH_PATH_OK -> artifacts/db/grants.txt
+DB_CHECK_CONSTRAINTS_OK -> artifacts/db/check_schema.txt
