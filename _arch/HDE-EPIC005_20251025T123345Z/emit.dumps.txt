@@ -1,0 +1,1 @@
+adapter/http_reader.py:167:    body = json.dumps(payload, separators=(",",":"), ensure_ascii=False).encode("utf-8")

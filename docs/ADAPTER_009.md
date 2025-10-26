@@ -5,6 +5,7 @@ Internal-only WSGI adapter exposing:
 - GET /internal/healthz — process up (no engine checks)
 - GET /internal/readyz — resolver + catalogs/freeze + smoke ≤800 ms; sets X-Toggles-SHA on success
 - GET /internal/version — engine/build metadata (prod requires Authorization: Bearer)
+- GET /internal/version — engine/build metadata
 
 Bodies are minified JSON with stable key order and one trailing newline. All responses include the header set below.
 
@@ -33,6 +34,8 @@ Bodies are minified JSON with stable key order and one trailing newline. All res
     {"ok":false,"schema":"v1","code":"Unauthorized","error":"InvalidOrMissingToken"}
   - Valid bearer (ENGINE_SERVICE_TOKEN) → 200
 
+*Note (EPIC-005): proofs captured in repo artifacts do not require Bearer. If a Bearer policy is later introduced, update the ops acceptance crib accordingly.*
+
 ## Readiness rules
 200 iff:
 1) resolve_toggles() succeeds and (prod) no runtime overrides applied,
@@ -43,3 +46,175 @@ Else 503 with typed code: OverridesNotAllowedInProd, DependencyFailure("resolver
 ## Env vars
 ENGINE_ENV=dev|staging|prod (default dev), ENGINE_SERVICE_TOKEN (prod only).
 Optional fixed meta: BUILD_COMMIT_SHORT, BUILD_TIMESTAMP_UTC, ENGINE_TAG, RELEASE_ID, TOGGLES_SHA.
+docs/EVIDENCE_INDEX.md
+New
++29
+-0
+
+# Appendix-D — Evidence Index (EPIC-005)
+
+**Transport — `/internal/version`**
+
+* `artifacts/headers/internal_version_200.txt`
+* `artifacts/headers/internal_version_head.txt`
+* `artifacts/headers/internal_version_if_none_match.txt`
+* `artifacts/headers/internal_version_override_denied.txt`
+
+**Identity & Math**
+
+* `artifacts/identity/service_identity.json`
+* `artifacts/math/release_id.txt`
+* `artifacts/math/release_id_recompute.log`
+* `artifacts/identity/emitter_sha256.txt`
+
+**Database**
+
+* `artifacts/db/ddl_applied.sql`
+* `artifacts/db/check_schema.txt`
+* `artifacts/db/check_constraints.txt`
+* `artifacts/db/partition_plan.txt`
+* `artifacts/db/grants.txt` *(deferred to HDE-EPIC-006)*
+
+**Ops pins**
+
+* `artifacts/validation/service_cmd.txt` *(deferred to HDE-EPIC-006)*
+* `artifacts/prod/exposure_note.md`
+
+docs/INDEX.md
++7
+-0
+
+# HD Engine Repo Docs — Index (SoT pointers)
+
+This repo contains implementation docs. Canon (spec/process) lives in PF documents; reference **titles only**:
+
+- Mechanics Guide to the HD Engine (Build Guide)
+- HD Engine Build Checklist (Components & Tasks)
+- HD Engine Math & Technical Spec
+- HD Engine — CLI, API & Vendor Ingest Spec
+- Governance & Process Handbook
+
+### Local map
+- **ARCHITECTURE.md** — single homes (engine/, adapter/), guards, providers
+- Architecture snapshots: `_arch/<epic_id>_<timestamp>/` (routes/imports/tree)
+
+### Developer quick-links
+- Emitter: `engine/presenter/emitter.py::emit_compact_json`
+- Serializer: `engine/serializer/canon.py::dumps` (UTF-8; sort_keys; one LF)
+- Compat handler (alpha): `engine/http/compat_handler.py`
+
+### Acceptance crib
+- Reader (EPIC-004): `docs/acceptance/reader_a7_crib.md`
+- Internal Ops (EPIC-005): `docs/acceptance/http_transport_evidence.md`
+
+### Evidence Index (EPIC-005)
+- `docs/EVIDENCE_INDEX.md`
+docs/RUN.md
++14
+-0
+
+@@ -2,25 +2,39 @@
+- Pins: `python scripts/ensure_env.py` → `[ENV] OK`
+- Tests: `pytest -q tests/test_sercanon.py`
+<!-- EPIC-004 PATCH: RUN posture -->
+### Deterministic run posture (Reader)
+```bash
+python -m adapter.http_reader
+```
+
+Bind target for captures: http://127.0.0.1:5000
+
+Environment for reproducible bytes/headers (same shell):
+```
+PYTHONHASHSEED=0
+PYTHONUTF8=1
+TZ=UTC
+SAFE_MODE=1
+```
+
+Auto-reload: **off** when capturing evidence.
+
+<!-- EPIC-004 RUN posture -->
+```bash
+python -m adapter.http_reader
+```
+Bind: http://127.0.0.1:5000  ·  Env: PYTHONHASHSEED=0 PYTHONUTF8=1 TZ=UTC SAFE_MODE=1  ·  Auto-reload: off
+
+---
+
+## RUN — Production start (EPIC-005, Railway)
+
+Use the exact start line that shipped in EPIC-005 (tactical; normalize later if desired):
+
+```bash
+python -m pip install --no-cache-dir -r requirements.txt \
+  && python -m gunicorn 'adapter.factory:create_app()' \
+     --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 30
+```
+
+Evidence: `artifacts/validation/service_cmd.txt` *(deferred to HDE-EPIC-006 if not yet captured)*
+docs/acceptance/http_transport_evidence.md
++34
+-27
+
+# Reader — HTTP Transport Evidence (Acceptance)
+
+**Scope:** Reader v1 transport; public payload remains numeric-free, bands-only.
+
+## Tokens (must be PASS)
+- `HTTP_200_HEADERS_OK` — JSON Content-Type; Cache-Control `private, max-age=0, must-revalidate`;
+  `Vary: Authorization, Accept-Encoding` (exact order, single comma+space);
+  **ETag = strong, quoted, lowercase-hex sha256(identity LF)** (pre-compression).
+- `HTTP_ETAG_INVARIANCE_IDENTITY_GZIP_OK` — identity ↔ gzip ETag identical (Brotli optional via `.note.json`).
+- `HTTP_304_OMIT_CONTENT_TYPE_OK` — 304 omits `Content-Type`; **no body** (Content-Length 0 or absent).
+- `HTTP_304_VALIDATORS_REPEAT_OK` — 304 repeats ETag / Vary / Cache-Control identically to the prior 200.
+- `HTTP_HEAD_CL_AND_CT_OK` — HEAD includes Content-Type; **no body**; `Content-Length == len(identity bytes)`;
+  validators equal 200.
+- `HTTP_ERRORS_NOSTORE_NOETAG_OK` — Errors/writers are JSON, **no-store**, **no ETag**.
+- `HTTP_POST_METHOD_POSTURE_OK` — Reader POST ⇒ 405 typed JSON (`no-store`, no ETag); Compat POST ⇒ 200 non-conditional.
+- `COMPAT_GET_BODY_400_OK` — Compat GET with body ⇒ 400 typed `{"error":"body_not_allowed"}`, `no-store`, no ETag.
+
+## Evidence shape
+Header goldens are canonical JSON: **lowercased keys**, sorted, compact, **exactly one trailing LF**.
+Bytes are LF-terminated; CLI output equals the Reader identity bytes (parity).
+
+<!-- EPIC-004 PATCH: _arch naming compatibility note -->
+### Snapshot directory naming (compatibility)
+- **New snapshots (recommended):** `_arch/EPIC-004_<timestamp>/…`
+- **Historic snapshots (valid):** `_arch/EPIC004_<timestamp>/…`
+
+Both forms are accepted by our docs and tools. **Do not rename** existing `_arch` folders.
+# Internal Ops — HTTP Transport Evidence (EPIC-005)
+
+**Endpoint:** `GET /internal/version` (+ `HEAD`)
+
+**Body (200):** exactly:
+```json
+{"engine_tag","release_id","invocation_tag","build_commit","emitter_sha256"}
+```
+LF-terminated JSON; no extra fields.
+
+**Headers (200):**
+
+* `Content-Type: application/json; charset=utf-8`
+* `Cache-Control: no-store`
+* **No** `ETag`
+
+**HEAD (200):**
+
+* same validators as 200
+* **no body**
+* `Content-Length ==` 200 body bytes
+
+**Conditionals:** `If-None-Match` ignored — still **200** (no 304)
+
+**Override (prod):** `X-Identity-Override` ⇒ **400** JSON; `no-store`; **no `ETag`**
+
+**Evidence (repo-relative):**
+
+* `artifacts/headers/internal_version_200.txt`
+* `artifacts/headers/internal_version_head.txt`
+* `artifacts/headers/internal_version_if_none_match.txt`
+* `artifacts/headers/internal_version_override_denied.txt`
+* `artifacts/identity/service_identity.json`
+
