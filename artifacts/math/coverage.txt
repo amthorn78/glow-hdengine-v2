@@ -1,0 +1,19 @@
+Category totals:
+- hashing: 4
+- time: 4
+- rounding: 1
+- normalization: 1
+- banding: 1
+- scoring: 1
+- random: 1
+- constraint: 2
+
+Top-level module totals:
+- engine: 11
+- adapter: 1
+- scripts: 2
+- migrations: 1
+
+Gaps / TODO:
+- Additional math-heavy modules (e.g., deprecated adapters, vendor fallbacks) remain unreviewed.
+- No aggregation or distance measures observed; future audits should confirm absence.
