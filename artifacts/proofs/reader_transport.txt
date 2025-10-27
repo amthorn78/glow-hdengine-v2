@@ -1,0 +1,65 @@
+# RUN_TS: 2025-10-27T18:58:25Z
+# RUN_ID: d0c1c079-1bf9-426a-8002-5d3ecf9900df
+# Endpoint: http://127.0.0.1:8000/api/reader
+
+## GET 200
+HTTP/1.1 200 OK
+Server: Werkzeug/3.1.3 Python/3.11.12
+Date: Mon, 27 Oct 2025 18:58:52 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 300
+ETag: "5d7f19230de75ed00c158d3380d9809df2b4808e982761a9f959971ba7012031"
+Cache-Control: private, max-age=0, must-revalidate
+Vary: Authorization, Accept-Encoding
+Connection: close
+
+{"categories":[{"band":"Warm","id":"harmony"}],"eligible":true,"idempotence_hash":"eb9a01ee1a2a5df5083e9410ab857b7af1528a8f05bf4d8cefd9bc7089535e80","meta":{"engine_tag":"hdengine-alpha","invocation_tag":"INV-UNKNOWN"},"release_id":"0000000000000000000000000000000000000000000000000000000000000000"}
+
+## HEAD 200
+HTTP/1.1 200 OK
+Server: Werkzeug/3.1.3 Python/3.11.12
+Date: Mon, 27 Oct 2025 18:59:02 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 300
+ETag: "5d7f19230de75ed00c158d3380d9809df2b4808e982761a9f959971ba7012031"
+Cache-Control: private, max-age=0, must-revalidate
+Vary: Authorization, Accept-Encoding
+Connection: close
+
+
+## GET 304 (If-None-Match "5d7f19230de75ed00c158d3380d9809df2b4808e982761a9f959971ba7012031")
+HTTP/1.1 304 NOT MODIFIED
+Server: Werkzeug/3.1.3 Python/3.11.12
+Date: Mon, 27 Oct 2025 18:59:06 GMT
+ETag: "5d7f19230de75ed00c158d3380d9809df2b4808e982761a9f959971ba7012031"
+Cache-Control: private, max-age=0, must-revalidate
+Vary: Authorization, Accept-Encoding
+Connection: close
+
+
+## GET error (invalid_version)
+HTTP/1.1 400 BAD REQUEST
+Server: Werkzeug/3.1.3 Python/3.11.12
+Date: Mon, 27 Oct 2025 18:59:11 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 28
+Cache-Control: no-store
+Connection: close
+
+{"error":"invalid_version"}
+
+## POST with If-* headers
+HTTP/1.1 405 METHOD NOT ALLOWED
+Server: Werkzeug/3.1.3 Python/3.11.12
+Date: Mon, 27 Oct 2025 18:59:18 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 31
+Cache-Control: no-store
+Connection: close
+
+{"error":"method_not_allowed"}
+
+## ETag validation
+Preimage rule: SHA-256 of LF-terminated 200 OK body bytes (pre-compression), quoted.
+Computed SHA-256: 5d7f19230de75ed00c158d3380d9809df2b4808e982761a9f959971ba7012031
+Returned ETag: "5d7f19230de75ed00c158d3380d9809df2b4808e982761a9f959971ba7012031"

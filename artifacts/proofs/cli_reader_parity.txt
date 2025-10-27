@@ -1,0 +1,26 @@
+# Reader vs CLI parity
+# RUN_ID: d0c1c079-1bf9-426a-8002-5d3ecf9900df
+# RUN_TS: 2025-10-27T18:58:25Z
+
+## Case 1: A=alice, B=bob
+Reader request: GET http://127.0.0.1:8000/api/reader?v=1&a=fixtures/charts/alice.json&b=fixtures/charts/bob.json&a_tz=UTC&b_tz=UTC&run_id=d0c1c079-1bf9-426a-8002-5d3ecf9900df&case=1
+CLI command: PYTHONPATH=. APP_ENV=dev python scripts/hdctl.py showcompat --a fixtures/charts/alice.json --a-tz UTC --b fixtures/charts/bob.json --b-tz UTC
+Reader bytes SHA-256: 5d7f19230de75ed00c158d3380d9809df2b4808e982761a9f959971ba7012031
+CLI bytes SHA-256: 5d7f19230de75ed00c158d3380d9809df2b4808e982761a9f959971ba7012031
+PASS case 1
+
+## Case 2: A=bob, B=alice
+Reader request: GET http://127.0.0.1:8000/api/reader?v=1&a=fixtures/charts/bob.json&b=fixtures/charts/alice.json&a_tz=UTC&b_tz=UTC&run_id=d0c1c079-1bf9-426a-8002-5d3ecf9900df&case=2
+CLI command: PYTHONPATH=. APP_ENV=dev python scripts/hdctl.py showcompat --a fixtures/charts/bob.json --a-tz UTC --b fixtures/charts/alice.json --b-tz UTC
+Reader bytes SHA-256: 5d7f19230de75ed00c158d3380d9809df2b4808e982761a9f959971ba7012031
+CLI bytes SHA-256: 5d7f19230de75ed00c158d3380d9809df2b4808e982761a9f959971ba7012031
+PASS case 2
+
+## Case 3: A=alice, B=alice (boundary same chart)
+Reader request: GET http://127.0.0.1:8000/api/reader?v=1&a=fixtures/charts/alice.json&b=fixtures/charts/alice.json&a_tz=UTC&b_tz=UTC&run_id=d0c1c079-1bf9-426a-8002-5d3ecf9900df&case=3
+CLI command: PYTHONPATH=. APP_ENV=dev python scripts/hdctl.py showcompat --a fixtures/charts/alice.json --a-tz UTC --b fixtures/charts/alice.json --b-tz UTC
+Reader bytes SHA-256: 5d7f19230de75ed00c158d3380d9809df2b4808e982761a9f959971ba7012031
+CLI bytes SHA-256: 5d7f19230de75ed00c158d3380d9809df2b4808e982761a9f959971ba7012031
+PASS case 3
+
+OVERALL PASS

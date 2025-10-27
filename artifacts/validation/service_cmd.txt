@@ -1,1 +1,1 @@
-python -m adapter.http_reader
+APP_ENV=dev python -c 'from flask import Flask; from engine.emit_public import emit_public_envelope; from adapter.http_reader import get_reader_bp; import os; app=Flask(__name__); app.register_blueprint(get_reader_bp(emit_public_envelope), url_prefix='/api'); app.run(host='0.0.0.0', port=int(os.environ.get('PORT','8000')));'
