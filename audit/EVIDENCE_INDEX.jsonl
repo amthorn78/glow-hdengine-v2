@@ -33,3 +33,14 @@
 {"added_in":"HDE-EPIC006","bytes":2431,"path":"artifacts/admin/qa/pair.compat.proof.json","sha256":"7a873ee7a95597346ea917f48db42d7b555c2de7fa29795fd8bf1d5beb687ca3"}
 {"added_in":"HDE-EPIC006","bytes":65,"path":"artifacts/admin/qa/pair.compat.proof.json.sha256","sha256":"09564a1acf807bb089bbdee301441d81fe6bfbabf6a049fb95ea724c64426bde"}
 {"path":"artifacts/db/attempts.json","bytes":335,"sha256":"be120fb5e6264dbcf47f6dd6289223a5a40347fdfeca41a469a5385a35a1315b","added_in":"HDE-EPIC006"}
+{"path":"artifacts/proofs/intver_get.txt","bytes":519,"sha256":"5093dadc0ad9078432ca5c231c52aadeb0eb1a264cc157dac83dcb1c9513fe6b","added_in":"HDE-EPIC006"}
+{"path":"artifacts/proofs/intver_head.txt","bytes":259,"sha256":"037ebdba3d666c67e7997e7928452f2fcd3234469bbf33288f32851b45fc1fd1","added_in":"HDE-EPIC006"}
+{"path":"artifacts/proofs/intver_cget.txt","bytes":519,"sha256":"04f6d3c86f63ffe509d3cd21c79a463031b95b39355092a3eeb2814e6b65f697","added_in":"HDE-EPIC006"}
+{"path":"artifacts/proofs/reader_get_200.txt","bytes":434,"sha256":"b450d7479a56eccd60251acb55e64a33d98a8e1976ee01a53e5c8b2289e17f30","added_in":"HDE-EPIC006"}
+{"path":"artifacts/proofs/reader_head_200.txt","bytes":227,"sha256":"c97c2c4317641db143da6f9daf757f933b8e62be939192bfac6cd07d6fddae25","added_in":"HDE-EPIC006"}
+{"path":"artifacts/proofs/cli_install.log","bytes":213,"sha256":"c488419800b970956f025fb370df2434a25c4a07750609578190b6601cb81d17","added_in":"HDE-EPIC006"}
+{"path":"artifacts/proofs/cli_which.txt","bytes":42,"sha256":"4237ee8c860959e62400843c9f55923494603b1912158c2940578617792ed916","added_in":"HDE-EPIC006"}
+{"path":"artifacts/proofs/cli_help.txt","bytes":262,"sha256":"d18fe2b61e7dbfd55bf4e87d5dc10f9c028fd336c994ac56c26334d8e5da9afa","added_in":"HDE-EPIC006"}
+{"path":"artifacts/qa/cli_ab.json","bytes":0,"sha256":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855","added_in":"HDE-EPIC006"}
+{"path":"artifacts/qa/cli_ba.json","bytes":0,"sha256":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855","added_in":"HDE-EPIC006"}
+{"path":"artifacts/db/conn_probe.txt","bytes":53,"sha256":"41c96291ecb51076d025b1ff6636a21054648de8f43e83e1e3e7c6d45874a594","added_in":"HDE-EPIC006"}
