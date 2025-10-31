@@ -1,3 +1,25 @@
+2025-10-31 — CLI file inputs and transport key-order fix
+- CLI: add --pair-file / --a-file & --b-file plus --dump-reader/--dump-admin-dir; stdin and --a/--b preserved.
+- Service: enforce internal/version key order and header invariants.
+- Tests, QA admin dumps, and docs updated; Evidence Index entries added.
+
+2025-10-31 — EPIC-006 Mechanics Foundations (closure)
+
+**Highlights**
+- Deterministic mechanics (comparators/helpers, arrays-as-sets, channel `NN-NN` min-first; stable-on-equal).
+- Frozen denominators and direct Motor→Throat set.
+- Category framework (harmony-first Magic-10), unknown-ID hard-fail; canonical registry report emitted.
+- `/internal/version` posture: GET/HEAD 200, no-store, no ETag, conditionals ignored; headers-only proofs captured.
+- Evidence Index (human + machine JSONL) updated in the same change.
+
+**Acceptance tokens achieved (subset)**
+- TIEBREAK_TOTAL_ORDER_OK, ORDER_STABLE_EQUAL_OK, CHANNEL_ID_FORMAT_OK, ARRAYS_AS_SETS_OK
+- CONSTANTS_FROZEN_OK, MOTOR_THROAT_DIRECT_ONLY_OK
+- CATEGORY_FRAMEWORK_OK, CATEGORY_CALC_PURE_OK, CONFIG_REPORT_CANON_OK
+- LOCALE_TZ_INVAR_OK, LC_ALL_C_OK, TZ_UTC_DEFAULT_OK
+- INTVER_200_CTYPE_JSON_UTF8_OK, INTVER_HEAD_PARITY_OK, INTVER_200_NO_ETAG_OK, INTVER_CONDITIONAL_IGNORED_OK
+- EVIDENCE_INDEX_MIRROR_OK, CHANGE_AWARE_GATES_ON_OK
+
 2025-10-16 — Repo docs consolidation (SoT + HTTP home)
 • SoT clarified: Public body & determinism → “HD Engine — Math & Technical Spec”; Transport/caching acceptance → “Governance & Process (Acceptance)”.
 • HTTP home: canonical adapter at adapter/http_reader.py; dev runner at dev/reader_harness/app.py (APP_ENV=dev). server/ is legacy (kept temporarily).

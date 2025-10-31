@@ -1,7 +1,7 @@
 from __future__ import annotations
 import json
 
-def sercanon(obj) -> bytes:
+def sercanon(obj, *, sort_keys: bool = True) -> bytes:
     """
     Canonical JSON serializer for public envelopes.
     - UTF-8 bytes
@@ -10,7 +10,7 @@ def sercanon(obj) -> bytes:
     - compact separators
     - exactly one trailing newline
     """
-    s = json.dumps(obj, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    s = json.dumps(obj, ensure_ascii=False, sort_keys=sort_keys, separators=(",", ":"))
     # Guarantee exactly one trailing LF
     if not s.endswith("\n"):
         s += "\n"

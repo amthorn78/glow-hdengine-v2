@@ -1,0 +1,2 @@
+{"case":"channel_minfirst","input":["34-20","20-34"],"output":["20-34"]}
+{"case":"magic10_rank","input":["alignment","harmony","balance"],"output":["harmony","alignment","balance"]}

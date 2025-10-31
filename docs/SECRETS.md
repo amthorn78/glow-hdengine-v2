@@ -5,3 +5,21 @@ The pipeline code does not read any secrets in this card. We document names for 
 - HD_API_SECRET
 
 CI may export them if present; absence must not fail 008.
+
+## Runtime environment variables (names-only)
+- `DATABASE_URL` - PostgreSQL DSN. **Required** when DB paths are live (prod); optional in dev.
+- `GEO_API_KEY` - Geocoder provider key (vendor ingest).
+- `HDAPI_BASE_URL` - Vendor HD API base URL (outbound).
+- `HD_API_KEY` - Vendor HD API key (outbound).
+- `SAFE_MODE` - Default 1 in tests; disables network.
+- `ALLOW_NETWORK` - Set `1` to allow network in approved flows (e.g., bridges).
+- `PP_ENV` - Process profile (dev/staging/prod) for ops posture.
+- `PORT` - HTTP bind port (service).
+- `TZ` - Timezone; tests pin to `UTC`.
+- `DB_BRIDGE_URL` - Optional read-only bridge URL for DB posture gathering (when allowed).
+- `ENGINE_TAG`, `RELEASE_ID`, `PRODUCT_INVOCATION_TAG`, `EMITTER_SHA256` - Identity surfaces for headers/QA.
+
+### Runtime DB variables (names only)
+- `DATABASE_URL` - canonical DSN used in production.
+- `DB_BRIDGE_URL` - HTTPS bridge endpoint for QA and ops.
+- `SAFE_MODE`, `ALLOW_NETWORK` - must be `0`/`1` respectively before bridge calls are attempted.

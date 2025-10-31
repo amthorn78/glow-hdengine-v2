@@ -37,4 +37,16 @@
 +     --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 30
 +```
 +
-+Evidence: `artifacts/validation/service_cmd.txt` *(deferred to HDE-EPIC-006 if not yet captured)*
+Evidence: `artifacts/validation/service_cmd.txt` *(deferred to HDE-EPIC-006 if not yet captured)*
+
+## EPIC-006 — acceptance run
+Run the marked suite with locale/timezone pins:
+```bash
+LC_ALL=C TZ=UTC pytest -q -m epic006
+```
+Capture transport proofs via tests (headers-only) written to:
+- `artifacts/proofs/internal_version_headers.json`
+- `artifacts/proofs/internal_version_headers.txt`
+Confirm Evidence Indexes updated:
+- `docs/EVIDENCE_INDEX.md`
+- `audit/EVIDENCE_INDEX.jsonl`

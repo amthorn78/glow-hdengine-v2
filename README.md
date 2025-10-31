@@ -1,5 +1,50 @@
 Glow HD Engine — README
 
+## CLI — Vendor JSON file inputs
+Examples:
+- Pair file:
+  ```bash
+  hdctl showcompat --pair-file path/to/pair.json > out.json
+  ```
+- Two person files:
+  ```bash
+  hdctl showcompat --a-file A.json --b-file B.json > out.json
+  ```
+Output is the public Reader v1 body (bands-only), canonical JSON, numeric-free.
+
+## EPIC-006 — Closure (Mechanics Foundations)
+
+**What shipped**
+- Deterministic mechanics layer: comparators & helpers (arrays-as-sets; channel `NN-NN` min-first; stable ordering).
+- Frozen constants: `EM_MAX=36`, `THROAT_EM_MAX=13`, `CENTER_MAX=9`, `MIND_THROAT_MAX=3`, `MOTOR_THROAT_MAX=4`, `COMP_MAX=6`; direct Motor→Throat set `{20-34,21-45,35-36,12-22}`.
+- Category framework (internal): frozen Magic-10 order **harmony, heat, communication, alignment, comfort, consistency, expansion, creativity, drive, balance**; unknown IDs hard-fail.
+- Programmatic config: emits canonical registry report.
+- Transport: `/internal/version` GET/HEAD 200, `Cache-Control: no-store`, **no ETag**, conditionals ignored; headers-only proofs captured.
+- Evidence discipline: human **and** machine Evidence Indexes updated in the same change.
+
+**How to validate**
+```bash
+LC_ALL=C TZ=UTC pytest -q -m epic006
+```
+Expected: all EPIC006 tests pass and artifacts are written.
+
+**Artifacts (key paths)**
+- Mechanics: `artifacts/mech/ordering_examples.jsonl`, `artifacts/mech/identity_hash.txt`, `artifacts/mech/constants_snapshot.json`
+- Transport proofs: `artifacts/proofs/internal_version_headers.json`, `artifacts/proofs/internal_version_headers.txt`
+- Registry: `artifacts/reports/registry_report.json`
+      - Evidence Indexes: `docs/EVIDENCE_INDEX.md`, `audit/EVIDENCE_INDEX.jsonl`
+
+## QA Evidence (tangible artifacts)
+When running `hdctl showcompat` for QA, pass `--dump-reader` and `--dump-admin-dir`.
+This writes:
+- Public Reader JSON: `artifacts/qa/cli/<case>.reader.json`
+- Admin proofs (0600 + .sha256):
+  - `artifacts/admin/qa/<case>.left.bodygraph.json`
+  - `artifacts/admin/qa/<case>.right.bodygraph.json`
+  - `artifacts/admin/qa/<case>.composite.bodygraph.json`
+  - `artifacts/admin/qa/<case>.compat.proof.json`
+Public stdout remains numeric-free; admin numerics live only in sidecars.
+
 Version: 2.0
 Status: Active (Alpha A3–A5 body; A7 transport adopted)
 Owner: Product Owner (PO) — Nathan

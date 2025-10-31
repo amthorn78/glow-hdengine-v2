@@ -1,1 +1,2 @@
-Output format is unaligned.
+status=unreachable
+reason=network_unreachable
