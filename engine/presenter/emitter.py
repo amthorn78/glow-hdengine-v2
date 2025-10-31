@@ -2,10 +2,16 @@ from __future__ import annotations
 from typing import Tuple, Dict, Any
 from engine.serializer import canon
 
-def emit_compact_json(envelope: Dict[str, Any]) -> Tuple[bytes, Dict[str, Any]]:
+
+def emit_compact_json(envelope: Dict[str, Any], *, sort_keys: bool = True) -> Tuple[bytes, Dict[str, Any]]:
     """
     Single entrypoint for public JSON bytes.
     Returns (bytes, envelope) with bytes LF-terminated and keys sorted.
     """
-    b = canon.sercanon(envelope)
+    b = canon.sercanon(envelope, sort_keys=sort_keys)
     return b, envelope
+
+
+def emit_public(envelope: Dict[str, Any]) -> bytes:
+    """Emit canonical public bytes for CLI/Reader surfaces."""
+    return emit_compact_json(envelope, sort_keys=True)[0]

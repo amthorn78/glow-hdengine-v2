@@ -19,6 +19,9 @@ simplejson
 ```
 Allowed only in tests/tools/logging; public bytes must flow via **emitter → serializer.canon.sercanon**.
 
+### EPIC-006 — internal version route exception
+The `/internal/version` route is **no-store** and **does not set ETag**. All other Reader 200 responses continue to use strong, quoted ETags over identity bytes.
+
 <!-- EPIC-004 guard -->
 ## EPIC-004 — Forbidden in public response paths
 Fail acceptance if any of these appear in Reader/CLI response code:

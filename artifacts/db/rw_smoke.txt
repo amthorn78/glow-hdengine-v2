@@ -1,0 +1,1 @@
+skip: DB_REQUIRED=0

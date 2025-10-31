@@ -1,0 +1,4 @@
+DATABASE_URL=postgresql://[redacted]@[host]:<port>/railway?sslmode=require
+PGSSLMODE=unset
+TZ=UTC
+SAFE_MODE=0

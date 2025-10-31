@@ -1,0 +1,35 @@
+== hdctl --help ==
+usage: hdctl [-h] {showcompat} ...
+
+Glow HD Engine compatibility CLI
+
+positional arguments:
+  {showcompat}
+    showcompat  Emit canonical Reader v1 bytes from vendor JSON (stdin or files)
+
+options:
+  -h, --help    show this help message and exit
+
+== hdctl showcompat --help ==
+usage: hdctl showcompat [-h] [--pair-file PAIR_FILE] [--a-file A_FILE] [--b-file B_FILE] [--a A_FILE] [--b B_FILE]
+
+options:
+  -h, --help            show this help message and exit
+  --pair-file PAIR_FILE
+                        Path to JSON with left/right payloads
+  --a-file A_FILE       Path to JSON file containing the left payload
+  --b-file B_FILE       Path to JSON file containing the right payload
+  --a A_FILE            Alias for --a-file
+  --b B_FILE            Alias for --b-file
+
+== python -m engine.cli --help ==
+usage: hdctl [-h] {showcompat} ...
+
+Glow HD Engine compatibility CLI
+
+positional arguments:
+  {showcompat}
+    showcompat  Emit canonical Reader v1 bytes from vendor JSON (stdin or files)
+
+options:
+  -h, --help    show this help message and exit

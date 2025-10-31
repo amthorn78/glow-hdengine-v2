@@ -1,5 +1,5 @@
 from __future__ import annotations
-import os, json, hashlib
+import hashlib, json, os
 from pathlib import Path
 from flask import Blueprint, Response, request, Flask
 from engine.presenter.emitter import emit_compact_json
@@ -125,15 +125,47 @@ def get_reader_bp(emit_fn):
 
     return bp
 
-# === EPIC-005 /internal/version (Blueprint: bp) ===
-import hashlib, json, os, psycopg
-# 'bp', 'Response', and 'request' are already imported above
+_SERVICE_IDENTITY_PATH = Path("artifacts/identity/service_identity.json")
 
-def _read_release_id():
+
+# === EPIC-005 /internal/version (Blueprint: bp) ===
+# 'bp', 'Response', and 'request' are already imported above
+# /internal/version stays DB-decoupled; no DB resolver imports or connections here.
+
+def _read_release_id() -> str:
     try:
-        return open("artifacts/math/release_id.txt","r",encoding="utf-8").read().strip()
-    except Exception:
-        return hashlib.sha256(open("catalog/manifest.json","rb").read()).hexdigest()
+        return Path("artifacts/math/release_id.txt").read_text(encoding="utf-8").strip()
+    except FileNotFoundError:
+        manifest = Path("catalog/manifest.json").read_bytes()
+        return hashlib.sha256(manifest).hexdigest()
+
+
+def _load_service_identity() -> dict[str, str]:
+    try:
+        raw = _SERVICE_IDENTITY_PATH.read_text(encoding="utf-8")
+    except FileNotFoundError:
+        return {}
+    try:
+        data = json.loads(raw)
+    except json.JSONDecodeError:
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def _build_internal_version_payload() -> dict[str, str]:
+    identity = _load_service_identity()
+    engine_tag = identity.get("engine_tag") or os.environ.get("ENGINE_TAG", "hdengine-alpha")
+    release_id = identity.get("release_id") or _read_release_id()
+    invocation_tag = identity.get("invocation_tag") or os.environ.get("PRODUCT_INVOCATION_TAG", "INV-UNKNOWN")
+    build_commit = identity.get("build_commit") or os.environ.get("BUILD_COMMIT", "unknown")
+    emitter_sha256 = identity.get("emitter_sha256") or os.environ.get("EMITTER_SHA256", "unknown")
+    return {
+        "engine_tag": engine_tag,
+        "release_id": release_id,
+        "invocation_tag": invocation_tag,
+        "build_commit": build_commit,
+        "emitter_sha256": emitter_sha256,
+    }
 
 
 # --- ensure blueprint exists for internal routes ---
@@ -141,39 +173,29 @@ try:
     bp
 except NameError:
     bp = Blueprint("reader_v1", __name__)
-@bp.route("/internal/version", methods=["GET","HEAD"])
+
+
+@bp.route("/internal/version", methods=["GET", "HEAD"])
 def internal_version():
     # deny identity overrides in prod
     if request.headers.get("X-Identity-Override"):
-        body = b'{"error":"override_denied","detail":"identity overrides disabled in prod"}'
-        r = Response(body, status=400, mimetype="application/json; charset=utf-8")
+        body_bytes, _ = emit_compact_json({"error": "override_denied", "detail": "identity overrides disabled in prod"})
+        r = Response(body_bytes, status=400, mimetype="application/json; charset=utf-8")
         r.headers["Cache-Control"] = "no-store"
         return r  # NO ETag
 
-    # read identity from DB with short timeout
-    with psycopg.connect(os.environ["DATABASE_URL"], autocommit=False) as conn:
-        with conn.cursor() as cur:
-            cur.execute("SET LOCAL statement_timeout = '250ms'")
-            cur.execute("SELECT engine_tag, build_commit, invocation_tag, emitter_sha256 FROM hde.meta WHERE id='singleton'")
-            engine_tag, build_commit, invocation_tag, emitter_sha256 = cur.fetchone()
-
-    payload = {
-        "engine_tag": engine_tag,
-        "release_id": _read_release_id(),
-        "invocation_tag": invocation_tag,
-        "emitter_sha256": emitter_sha256,
-        "build_commit": build_commit,
-    }
-    body = json.dumps(payload, separators=(",",":"), ensure_ascii=False).encode("utf-8")
+    payload = _build_internal_version_payload()
+    body_bytes, _ = emit_compact_json(payload, sort_keys=False)
 
     if request.method == "HEAD":
         # HEAD parity: same type; no body; CL equals GET body size
         r = Response(b"", status=200, mimetype="application/json; charset=utf-8")
-        r.headers["Content-Length"] = str(len(body))
+        r.headers["Content-Length"] = str(len(body_bytes))
     else:
-        r = Response(body, status=200, mimetype="application/json; charset=utf-8")
+        r = Response(body_bytes, status=200, mimetype="application/json; charset=utf-8")
 
     r.headers["Cache-Control"] = "no-store"  # deliberately NO ETag
+    r.headers.pop("ETag", None)
     return r
 
 # === EPIC-005: app factory ===
@@ -198,6 +220,9 @@ def create_app():
         return resp
 
     return app
+
+
+app = create_app()
 
 if __name__ == "__main__":
     # dev runner (Railway uses gunicorn via Procfile)

@@ -9,6 +9,13 @@ Internal-only WSGI adapter exposing:
 
 Bodies are minified JSON with stable key order and one trailing newline. All responses include the header set below.
 
+### `/internal/version` invariants (enforced)
+- GET and HEAD both return **200** with header parity.
+- **Cache-Control: no-store** and no ETag on this route.
+- Conditional validators are ignored; conditional GET still returns 200.
+- Body keys remain ordered: `engine_tag, release_id, invocation_tag, build_commit, emitter_sha256`.
+- Route stays DB-decoupled and renders without external dependencies.
+
 ## Environments
 - dev/staging: open on localhost; bearer optional (accepted if present).
 - prod: /internal/version requires Authorization: Bearer <ENGINE_SERVICE_TOKEN>.
@@ -217,4 +224,15 @@ LF-terminated JSON; no extra fields.
 * `artifacts/headers/internal_version_if_none_match.txt`
 * `artifacts/headers/internal_version_override_denied.txt`
 * `artifacts/identity/service_identity.json`
+
+### EPIC-006 — `/internal/version` posture
+- GET and HEAD both return **200** with header parity.
+- **Cache-Control: no-store**; **no ETag** on this route.
+- Conditional validators are **ignored** (conditional GET still returns 200).
+- Body is compact JSON with keys in order: `engine_tag, release_id, invocation_tag, build_commit, emitter_sha256`.
+- This route must be **DB-decoupled** and always render without external dependencies.
+
+### `/internal/version` invariants (enforced)
+GET/HEAD 200 with header parity; Cache-Control: no-store; no ETag; conditional GET ignored; body key order:
+`engine_tag, release_id, invocation_tag, build_commit, emitter_sha256`.
 
