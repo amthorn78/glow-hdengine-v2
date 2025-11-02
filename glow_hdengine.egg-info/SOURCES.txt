@@ -38,6 +38,9 @@ engine/config/provider_loader.py
 engine/config/provider_types.py
 engine/errors/__init__.py
 engine/http/compat_handler.py
+engine/magic10/__init__.py
+engine/magic10/calculators.py
+engine/magic10/thresholds.py
 engine/mech/__init__.py
 engine/mech/compare.py
 engine/mech/helpers.py
@@ -55,6 +58,8 @@ engine/providers/fixtures_provider.py
 engine/providers/internal_engine.py
 engine/providers/vendor_http.py
 engine/providers/vendor_http_hdapi.py
+engine/runtime/__init__.py
+engine/runtime/public.py
 engine/serializer/__init__.py
 engine/serializer/canon.py
 engine/stable/hashcouple.py
