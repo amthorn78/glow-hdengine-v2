@@ -22,7 +22,7 @@ from engine.constants import (
     THROAT_EM_MAX,
     CENTER_MAX,
 )
-from engine.presenter.emitter import emit_public
+from engine.runtime import emit_reader_public_envelope
 from engine.serializer.canon import sercanon
 
 from ._admin_dump import canon_dump
@@ -159,18 +159,6 @@ def _engine_identity() -> tuple[str, str, str]:
 
 def _viewer_weights() -> Dict[str, int]:
     return {cat: 50 for cat in CATEGORIES_ORDER_V1}
-
-
-def _public_payload(categories: Iterable[Dict[str, Any]]) -> Dict[str, Any]:
-    engine_tag, release_id, invocation_tag = _engine_identity()
-    public_categories = [{"id": cat["id"], "band": cat["band"]} for cat in categories]
-    base = {
-        "eligible": True,
-        "categories": public_categories,
-        "meta": {"engine_tag": engine_tag, "invocation_tag": invocation_tag},
-        "release_id": release_id,
-    }
-    return dict(base, idempotence_hash=_fingerprint(base))
 
 
 def _signals(features: Dict[str, Any]) -> list[Dict[str, Any]]:
@@ -341,8 +329,13 @@ def showcompat(_: argparse.Namespace) -> int:
         release_id=release_id,
         invocation_tag=invocation_tag,
     )
-    public_payload = _public_payload(compat_full.get("categories", []))
-    public_bytes = emit_public(public_payload)
+    public_bytes, _ = emit_reader_public_envelope(
+        a_chart,
+        b_chart,
+        engine_tag=engine_tag,
+        invocation_tag=invocation_tag,
+        release_id=release_id,
+    )
 
     if getattr(_, "dump_reader", None):
         _dump_reader_bytes(_.dump_reader, public_bytes)
