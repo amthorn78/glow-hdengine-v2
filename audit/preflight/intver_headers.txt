@@ -1,0 +1,26 @@
+BASE: https://glow-hdengine-v2-production.up.railway.app
+--- HEAD /internal/version
+HTTP/1.1 200 OK
+date: Sun, 02 Nov 2025 13:14:13 GMT
+server: envoy
+
+HTTP/1.1 200 OK
+cache-control: no-store
+content-type: application/json; charset=utf-8
+date: Sun, 02 Nov 2025 13:14:14 GMT
+server: envoy
+x-railway-edge: railway/us-east4-eqdc4a
+HEAD_Content-Length: 260
+--- GET /internal/version
+HTTP/1.1 200 OK
+date: Sun, 02 Nov 2025 13:14:14 GMT
+server: envoy
+
+HTTP/1.1 200 OK
+cache-control: no-store
+content-type: application/json; charset=utf-8
+date: Sun, 02 Nov 2025 13:14:15 GMT
+server: envoy
+x-railway-edge: railway/us-east4-eqdc4a
+GET_Content-Length: 260
+HEAD_EQ_GET_LEN_OK

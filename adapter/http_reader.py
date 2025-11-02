@@ -3,6 +3,7 @@ import hashlib, json, os
 from pathlib import Path
 from flask import Blueprint, Response, request, Flask
 from engine.presenter.emitter import emit_compact_json
+from engine.runtime import emit_reader_public_bytes
 
 # A7 helpers
 def _sha256_hex(b: bytes) -> str: return hashlib.sha256(b).hexdigest()
@@ -50,11 +51,13 @@ def _require_tz_or_raise(chart: dict, label: str, tz_flag: str | None) -> None:
         chart["tz"] = tz_flag; return
     raise ValueError(f"missing_tz_{label}")
 
-def get_reader_bp(emit_fn):
+def get_reader_bp(emit_fn=None):
     """
     Factory: returns a Blueprint exposing /reader (to be mounted under /api).
     emit_fn(a,b,engine_tag,invocation_tag,release_id) -> bytes
     """
+    if emit_fn is None:
+        emit_fn = emit_reader_public_bytes
     bp = Blueprint("reader_v1", __name__)
 
     @bp.get("/reader")
@@ -84,7 +87,13 @@ def get_reader_bp(emit_fn):
         invocation_tag = os.environ.get("PRODUCT_INVOCATION_TAG", "INV-UNKNOWN")
         release_id     = os.environ.get("RELEASE_ID", "0" * 64)
 
-        body = emit_fn(a, b, engine_tag, invocation_tag, release_id)
+        body = emit_fn(
+            a,
+            b,
+            engine_tag=engine_tag,
+            invocation_tag=invocation_tag,
+            release_id=release_id,
+        )
         etag = "\"" + _sha256_hex(body) + "\""
         tokens = _parse_if_none_match(request.headers.get("If-None-Match"))
 

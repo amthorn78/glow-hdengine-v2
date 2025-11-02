@@ -1,0 +1,10 @@
+harmony inputs (-10, 0) -> score=0 band=Cool
+harmony inputs (1, 1) -> score=1 band=Cool
+harmony inputs (24, 24) -> score=24 band=Cool
+harmony inputs (24, 25) -> score=25 band=Open
+harmony inputs (49, 49) -> score=49 band=Open
+harmony inputs (49, 50) -> score=50 band=Warm
+harmony inputs (74, 74) -> score=74 band=Warm
+harmony inputs (74, 75) -> score=75 band=Glow
+harmony inputs (120, 120) -> score=100 band=Glow
+harmony inputs (-50, 250) -> score=50 band=Warm (clamped)
