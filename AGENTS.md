@@ -18,14 +18,21 @@
 - /internal/version must serve GET and HEAD as application/json; charset=utf-8 with Cache-Control: no-store, no ETag, HEAD Content-Length equal to the GET body, and conditional GET remaining 200 (adapter/http_reader.py; tests/transport/test_internal_version_contract.py; artifacts/proofs/internal_version_headers.json).
 - CLI `showcompat` must emit non-empty canonical JSON (one LF) and pass two-run identity and AB↔BA parity on a fabricated pair.
 - A7 JSON success check: **Dev harness example (APP_ENV=dev)** GET "${HDE_BASE_URL:-http://127.0.0.1:5000}/api/reader?v=1&a=fixtures/charts/alice.json&b=fixtures/charts/bob.json&a_tz=Africa/Cairo&b_tz=Africa/Cairo" expecting Content-Type application/json (from VERIFY.sh). For staging/production, use a cataloged JSON success endpoint if present; otherwise record a documentation gap and skip A7.
+- Writers (EPIC-008):  
+  - Transport: HEAD→405 and OPTIONS→204 (no body), `Cache-Control: no-store`, no ETag, no compression; never 304 (conditionals ignored).  
+  - Validation: strict `Content-Type` (diagnostic empty-body exempt); 400 invalid JSON; 422 unknown_key / invalid_input; 413 ≥ 32 768 bytes.  
+  - Auth: `Authorization: Bearer` with `admin:write` (401/403 split).  
+  - Idempotence: preimage `{method, writer_route_id, canonical_request_body}`; sha256 lowercase hex; duplicate returns same status.
 
 ## Evidence & artifact paths
-- Machine mirror index: audit/EVIDENCE_INDEX.jsonl (one JSON object per line with keys path, bytes, sha256, added_in).
+- Machine mirror index: artifacts/evidence_index.jsonl (PF12 keys; one JSON object per line).
 - Proof artifacts live under artifacts/proofs/; QA captures under artifacts/qa/.
 
 ## Do / Don’t
 - Do use engine.presenter.emitter for public bytes, keep JSON canonical and LF-terminated, dedupe+sort arrays-as-sets, and normalize channel ids to NN-NN.
 - Don’t add new env vars, bypass the shared emitter, alter transport rules, or stash specs in Build Notes.
+- Do keep logs keys-only with exactly: {at, route, status, duration_ms, idempotence_hash, release_id}.
+- Don’t log request/response bodies or headers; redact emails/UUIDs/≥32-hex except allow-list {release_id, idempotence_hash, invocation_tag}.
 
 Referenced repo paths
 - docs/server/reader_v1.md
@@ -39,6 +46,6 @@ Referenced repo paths
 - pyproject.toml
 - tests/transport/test_internal_version_contract.py
 - artifacts/proofs/internal_version_headers.json
-- audit/EVIDENCE_INDEX.jsonl
+- artifacts/evidence_index.jsonl
 - artifacts/proofs/
 - artifacts/qa/

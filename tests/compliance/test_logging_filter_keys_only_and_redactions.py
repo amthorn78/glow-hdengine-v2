@@ -1,9 +1,10 @@
 import json
 from adapter.wsgi import create_app
 
-ALLOW_KEYS = {"ts","correlation_id","route","method","status","duration_ms","engine_tag","invocation_tag","release_id"}
+ALLOW_KEYS = {"at","route","status","duration_ms","idempotence_hash","release_id"}
 
-def test_keys_only_log_and_redactions_and_echo_cid():
+def test_keys_only_log_and_redactions_and_echo_cid(monkeypatch):
+    monkeypatch.setenv("APP_ENV", "dev")
     app = create_app()
     sink = []
     app.config["LOG_SINK"] = sink
@@ -13,7 +14,7 @@ def test_keys_only_log_and_redactions_and_echo_cid():
     with app.test_client() as c:
         # Send sensitive headers (must never appear in log line)
         r = c.get(
-            "/reader",
+            "/reader?v=1&a=fixtures/charts/alice.json&b=fixtures/charts/bob.json&a_tz=Africa/Cairo&b_tz=Africa/Cairo",
             headers={
                 "X-Correlation-Id": "abc123",
                 "X-Invocation-Id": "INV-aaaaaaaaaaaaaaaa",
@@ -31,9 +32,9 @@ def test_keys_only_log_and_redactions_and_echo_cid():
     assert len(sink) >= 1
     rec = json.loads(sink[-1])
     assert set(rec.keys()) == ALLOW_KEYS
-    assert rec["correlation_id"] == "abc123"
-    assert rec["route"] in ("adapter.http_reader.reader", "reader", "unknown")
-    assert rec["engine_tag"] == "Isis6"
+    assert rec["route"] in ("adapter.http_reader.reader", "reader", "reader_v1", "unknown")
+    assert isinstance(rec["duration_ms"], int)
+    assert rec["idempotence_hash"] == ""
     assert rec["release_id"] == "rel_abc123"
     # Sensitive names should not be present as keys
     bad_keys = {"authorization","cookie","proxy-authorization","x-api-token","set-cookie"}

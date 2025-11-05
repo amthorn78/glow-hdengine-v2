@@ -1,8 +1,10 @@
 from __future__ import annotations
 import hashlib, json, os
 from pathlib import Path
-from flask import Blueprint, Response, request, Flask
-from engine.presenter.emitter import emit_compact_json
+from flask import Blueprint, Response, request, Flask, g
+from threading import Lock
+from engine.presenter.emitter import emit_compact_json, emit_public
+from engine.serializer import canon
 from engine.runtime import emit_reader_public_bytes
 
 # A7 helpers
@@ -14,8 +16,145 @@ def _set_reader_200_headers(resp: Response) -> Response:
     resp.headers["Vary"] = "Authorization, Accept-Encoding"
     return resp
 
+_MAX_WRITER_BYTES = 32_768
+_DIAGNOSTIC_ROUTE_ID = "ops.writer.diagnostic.v1"
+
+_IDEMPOTENCE_CACHE: dict[str, dict[str, object]] = {}
+_IDEMPOTENCE_CACHE_LOCK = Lock()
+
+
+class _WriterTransportResponse(Response):
+    def get_wsgi_headers(self, environ):  # type: ignore[override]
+        headers = super().get_wsgi_headers(environ)
+        if self.status_code == 204:
+            headers["Content-Length"] = "0"
+        return headers
+
+_WRITER_ERROR_MESSAGES: dict[str, str] = {
+    "unauthorized": "authorization required",
+    "forbidden": "insufficient scope",
+    "invalid_content_type": "expected application/json; charset=utf-8",
+    "invalid_json": "malformed JSON request",
+    "invalid_input": "schema validation failed",
+    "unknown_key": "unknown request key",
+    "request_too_large": "request body exceeds 32 KiB",
+}
+
+
 def _clear_writer_error_caching(resp: Response) -> Response:
-    resp.headers["Cache-Control"] = "no-store"; resp.headers.pop("ETag", None); return resp
+    resp.headers["Cache-Control"] = "no-store"
+    resp.headers.pop("ETag", None)
+    return resp
+
+
+def _emit_writer_response(
+    envelope: dict[str, object],
+    *,
+    status: int,
+    extra_headers: dict[str, str] | None = None,
+) -> Response:
+    body = emit_public(envelope)
+    resp = Response(body, status=status, mimetype="application/json; charset=utf-8")
+    resp.headers["Cache-Control"] = "no-store"
+    resp.headers.pop("ETag", None)
+    resp.headers.pop("Content-Encoding", None)
+    resp.headers["Content-Length"] = str(len(body))
+    if extra_headers:
+        for key, value in extra_headers.items():
+            resp.headers[key] = value
+    return resp
+
+
+def _writer_error(
+    code: str,
+    *,
+    status: int,
+    extra_headers: dict[str, str] | None = None,
+) -> Response:
+    message = _WRITER_ERROR_MESSAGES[code]
+    envelope = {"ok": False, "schema": "v1", "code": code, "error": message}
+    return _emit_writer_response(envelope, status=status, extra_headers=extra_headers)
+
+
+def _json_content_type_ok(header_value: str | None) -> bool:
+    if not header_value:
+        return False
+    normalized = header_value.strip().lower()
+    return normalized == "application/json; charset=utf-8"
+
+
+def _reject_request_too_large() -> Response:
+    return _writer_error("request_too_large", status=413)
+
+
+def _read_writer_json(
+    *,
+    allow_empty_body: bool,
+    allowed_keys: set[str] | None = None,
+) -> tuple[dict[str, object] | None, Response | None]:
+    content_length = request.content_length
+    if content_length is not None and content_length > _MAX_WRITER_BYTES:
+        return None, _reject_request_too_large()
+
+    raw = request.get_data(cache=False)
+    if len(raw) > _MAX_WRITER_BYTES:
+        return None, _reject_request_too_large()
+
+    if not raw:
+        if allow_empty_body:
+            return {}, None
+        return None, _writer_error("invalid_content_type", status=415)
+
+    if not _json_content_type_ok(request.headers.get("Content-Type")):
+        return None, _writer_error("invalid_content_type", status=415)
+
+    try:
+        text = raw.decode("utf-8")
+    except UnicodeDecodeError:
+        return None, _writer_error("invalid_json", status=400)
+
+    if text.startswith("\ufeff"):
+        return None, _writer_error("invalid_json", status=400)
+
+    try:
+        data = json.loads(text)
+    except json.JSONDecodeError:
+        return None, _writer_error("invalid_json", status=400)
+
+    if not isinstance(data, dict):
+        return None, _writer_error("invalid_input", status=422)
+
+    if allowed_keys is not None:
+        unknown = [k for k in data.keys() if k not in allowed_keys]
+        if unknown:
+            return None, _writer_error("unknown_key", status=422)
+
+    return data, None
+
+
+def _require_admin_scope() -> Response | None:
+    auth_header = request.headers.get("Authorization", "")
+    if not auth_header.startswith("Bearer "):
+        return _writer_error(
+            "unauthorized",
+            status=401,
+            extra_headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    token = auth_header.split(" ", 1)[1].strip()
+    admin_token = (os.environ.get("HDE_TEST_TOKEN_ADMIN") or "").strip()
+    none_token = (os.environ.get("HDE_TEST_TOKEN_NONE") or "").strip()
+
+    if admin_token and token == admin_token:
+        return None
+    if none_token and token == none_token:
+        return _writer_error("forbidden", status=403)
+
+    return _writer_error(
+        "unauthorized",
+        status=401,
+        extra_headers={"WWW-Authenticate": "Bearer"},
+    )
 
 def _parse_if_none_match(header: str | None) -> set[str]:
     if not header: return set()
@@ -25,6 +164,92 @@ def _parse_if_none_match(header: str | None) -> set[str]:
         if not t or t.startswith("W/"): continue
         tokens.add(t)
     return tokens
+
+
+def _build_diagnostic_preimage(payload: dict[str, object]) -> tuple[str, str, dict[str, object]]:
+    canonical_body_bytes = canon.sercanon(payload, sort_keys=True)
+    canonical_body_text = canonical_body_bytes.decode("utf-8")
+    preimage_envelope = {
+        "canonical_request_body": canonical_body_text,
+        "method": "POST",
+        "writer_route_id": _DIAGNOSTIC_ROUTE_ID,
+    }
+    preimage_bytes = canon.sercanon(preimage_envelope, sort_keys=True)
+    digest = hashlib.sha256(preimage_bytes).hexdigest()
+    canonical_json = json.loads(canonical_body_text)
+    return digest, preimage_bytes.decode("utf-8"), canonical_json
+
+
+def _persist_idempotence_db(
+    digest: str,
+    canonical_preimage_text: str,
+    canonical_json: dict[str, object],
+) -> bool:
+    dsn = (os.environ.get("DATABASE_URL") or "").strip()
+    if not dsn:
+        return False
+    try:
+        import psycopg  # type: ignore
+    except Exception:
+        return False
+
+    try:
+        with psycopg.connect(dsn, connect_timeout=5) as conn, conn.cursor() as cur:  # type: ignore[attr-defined]
+            try:
+                cur.execute("SET LOCAL search_path TO hde, public")
+            except Exception:
+                cur.execute("SET search_path TO hde, public")
+            cur.execute(
+                """
+                INSERT INTO hde.idempotent_writes (idempotence_hash, canonical_bytes, canonical_json)
+                VALUES (%s, %s, %s)
+                ON CONFLICT (idempotence_hash) DO NOTHING
+                RETURNING canonical_bytes
+                """,
+                (
+                    digest,
+                    canonical_preimage_text,
+                    json.dumps(canonical_json, separators=(",", ":"), ensure_ascii=False),
+                ),
+            )
+            inserted = cur.fetchone()
+            conn.commit()
+            if inserted:
+                return True
+            cur.execute(
+                "SELECT canonical_bytes FROM hde.idempotent_writes WHERE idempotence_hash=%s",
+                (digest,),
+            )
+            row = cur.fetchone()
+            conn.commit()
+            if row and row[0] != canonical_preimage_text:
+                raise ValueError("idempotence hash collision for diagnostic writer")
+            return True
+    except ValueError:
+        raise
+    except Exception:
+        return False
+
+
+def _persist_idempotence_record(
+    digest: str,
+    canonical_preimage_text: str,
+    canonical_json: dict[str, object],
+) -> None:
+    if _persist_idempotence_db(digest, canonical_preimage_text, canonical_json):
+        return
+
+    with _IDEMPOTENCE_CACHE_LOCK:
+        existing = _IDEMPOTENCE_CACHE.get(digest)
+        if existing is None:
+            _IDEMPOTENCE_CACHE[digest] = {
+                "canonical_bytes": canonical_preimage_text,
+                "canonical_json": canonical_json,
+            }
+            return
+        if existing.get("canonical_bytes") != canonical_preimage_text:
+            raise ValueError("idempotence hash collision for diagnostic writer")
+
 
 ALLOWED_ROOT = Path("fixtures/charts").resolve()
 
@@ -134,6 +359,8 @@ def get_reader_bp(emit_fn=None):
 
     return bp
 
+bp = get_reader_bp()
+
 _SERVICE_IDENTITY_PATH = Path("artifacts/identity/service_identity.json")
 
 
@@ -207,6 +434,52 @@ def internal_version():
     r.headers.pop("ETag", None)
     return r
 
+
+@bp.route("/ops/writer/diagnostic", methods=["POST"], provide_automatic_options=False)
+def diagnostic_writer():
+    auth_error = _require_admin_scope()
+    if auth_error is not None:
+        return auth_error
+
+    payload, validation_error = _read_writer_json(allow_empty_body=True, allowed_keys=set())
+    if validation_error is not None:
+        return validation_error
+
+    payload = payload or {}
+    digest, canonical_preimage_text, canonical_json = _build_diagnostic_preimage(payload)
+    g._idempotence_hash = digest
+    _persist_idempotence_record(digest, canonical_preimage_text, canonical_json)
+
+    return _emit_writer_response({"ok": True, "message": "diagnostic"}, status=200)
+
+
+@bp.route("/ops/writer/diagnostic", methods=["HEAD"], provide_automatic_options=False)
+def diagnostic_writer_head():
+    resp = _WriterTransportResponse(b"", status=405)
+    resp.headers["Allow"] = "POST, OPTIONS"
+    resp.headers["Cache-Control"] = "no-store"
+    resp.headers["Content-Length"] = "0"
+    resp.headers.pop("Content-Type", None)
+    resp.headers.pop("ETag", None)
+    resp.headers.pop("Content-Encoding", None)
+    return resp
+
+
+@bp.route("/ops/writer/diagnostic", methods=["OPTIONS"], provide_automatic_options=False)
+def diagnostic_writer_options():
+    resp = _WriterTransportResponse(b"", status=204)
+    resp.headers["Allow"] = "POST, OPTIONS"
+    resp.headers["Cache-Control"] = "no-store"
+    resp.headers["Content-Length"] = "0"
+    resp.content_length = 0
+    resp.direct_passthrough = False
+    resp.set_data(b"")
+    resp.headers.pop("Content-Type", None)
+    resp.headers.pop("ETag", None)
+    resp.headers.pop("Content-Encoding", None)
+    return resp
+
+
 # === EPIC-005: app factory ===
 def create_app():
     app = Flask(__name__)
@@ -226,6 +499,12 @@ def create_app():
         except Exception:
             # safest behavior: ensure no ETag
             if "ETag" in resp.headers: del resp.headers["ETag"]
+        try:
+            req_path = resp.request.path if resp.request else ""
+        except Exception:
+            req_path = ""
+        if req_path == "/ops/writer/diagnostic" and resp.status_code in (204, 405):
+            resp.headers["Content-Length"] = resp.headers.get("Content-Length", "0") or "0"
         return resp
 
     return app

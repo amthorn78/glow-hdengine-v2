@@ -1,0 +1,7 @@
+keys-only log check:
+  recorded keys: ['at', 'duration_ms', 'idempotence_hash', 'release_id', 'route', 'status']
+  allowed keys: ['at', 'duration_ms', 'idempotence_hash', 'release_id', 'route', 'status']
+  duration_ms type: int
+  idempotence_hash: ''
+  release_id: 'rel_dummy_000000000000000000000000000000000000000000000000000000000000'
+sensitive fields absent: Authorization/Cookie not present

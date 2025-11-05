@@ -1,0 +1,4 @@
+status: 405
+allow: POST, OPTIONS
+cache-control: no-store
+content-length: 0

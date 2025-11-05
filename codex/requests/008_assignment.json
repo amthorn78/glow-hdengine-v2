@@ -1,0 +1,189 @@
+{
+  "request_id": "codex-assign-epic008",
+  "epic_id": "HDE-EPIC008",
+  "version": "2.0",
+  "created_utc": "2025-11-05T03:31:33Z",
+  "env_required": [
+    "HDE_TEST_TOKEN_ADMIN",
+    "HDE_TEST_TOKEN_NONE",
+    "DATABASE_URL"
+  ],
+  "constraints": {
+    "json_canonical": "UTF-8, sorted keys, compact separators, exactly one trailing LF",
+    "no_external_network": true,
+    "safe_mode_default": true
+  },
+  "tokens_required": [
+    "WRITERS_ERRORS_NOSTORE_NOETAG_OK",
+    "WRITERS_NO_304_OK",
+    "WRITERS_HEAD_405_OK",
+    "WRITERS_OPTIONS_204_OK",
+    "ERROR_CTYPE_JSON_UTF8_OK",
+    "WRITERS_2XX_CTYPE_JSON_UTF8_OK",
+    "WRITERS_SCHEMA_OK",
+    "AUTHZ_BOUNDARY_OK",
+    "IDEMPOTENT_WRITE_OK",
+    "PREIMAGE_RECOMPUTE_OK",
+    "TWO_RUN_IDENTITY_OK",
+    "JSON_CANONICAL_CHECK_OK",
+    "OBS_KEYS_ONLY_OK",
+    "PII_REDACTION_OK",
+    "SECRETS_READY_OK",
+    "ENV_RAILS_POLICY_OK",
+    "NO_PAYLOAD_ECHO_OK",
+    "EVIDENCE_INDEX_UPDATED_OK",
+    "EVIDENCE_INDEX_MIRROR_OK",
+    "EVIDENCE_PATHS_VALIDATED_OK",
+    "EVIDENCE_INDEX_HASH_OK",
+    "RELEASE_ID_RECORDED_OK"
+  ],
+  "artifacts_expected": [
+    "artifacts/headers/writer_200_diagnostic.json",
+    "artifacts/headers/writer_head_405.txt",
+    "artifacts/headers/writer_204.txt",
+    "artifacts/headers/writer_error_400.json",
+    "artifacts/headers/writer_error_401.json",
+    "artifacts/headers/writer_error_403.json",
+    "artifacts/headers/writer_error_415.json",
+    "artifacts/headers/writer_error_422_invalid_input.json",
+    "artifacts/headers/writer_error_422_unknown_key.json",
+    "artifacts/headers/writer_error_413.json",
+    "artifacts/idempotence/preimage_compare.log",
+    "artifacts/idempotence/two_run_identity.log",
+    "artifacts/redaction/grep_guard_report.txt",
+    "artifacts/evidence/risk_register_before.json",
+    "artifacts/evidence/risk_register_after.json",
+    "docs/evidence/INDEX.json",
+    "artifacts/evidence_index.jsonl",
+    "migrations/008_writers_auth.sql"
+  ],
+  "tasks": [
+    {
+      "name": "add_diagnostic_writer",
+      "summary": "POST /ops/writer/diagnostic returns 200 with minimal JSON body; admin scope required.",
+      "spec": {
+        "route": {"method": "POST", "path": "/ops/writer/diagnostic"},
+        "auth": {"scheme": "bearer", "required_scope": "admin:write"},
+        "response": {
+          "status": 200,
+          "headers": {
+            "cache-control": "no-store",
+            "content-type": "application/json; charset=utf-8",
+            "etag": "ABSENT",
+            "content-encoding": "ABSENT"
+          },
+          "body_exact": "{\"ok\":true,\"message\":\"diagnostic\"}\n"
+        }
+      },
+      "accept": {
+        "tokens": ["WRITERS_2XX_CTYPE_JSON_UTF8_OK", "WRITERS_ERRORS_NOSTORE_NOETAG_OK", "AUTHZ_BOUNDARY_OK", "NO_PAYLOAD_ECHO_OK"],
+        "artifacts": ["artifacts/headers/writer_200_diagnostic.json"]
+      }
+    },
+    {
+      "name": "writers_matrix_transport",
+      "summary": "Uniform HEAD/OPTIONS for all writer routes; ignore Accept and conditionals; disable compression.",
+      "spec": {
+        "head": {"status": 405, "headers": {"allow": "POST, OPTIONS", "cache-control": "no-store", "content-length": "0"}, "no_body": true},
+        "options": {"status": 204, "headers": {"allow": "POST, OPTIONS", "cache-control": "no-store", "content-length": "0"}, "no_body": true},
+        "never_304": true,
+        "ignore_accept": true,
+        "ignore_conditionals": true,
+        "no_compression": true
+      },
+      "accept": {
+        "tokens": ["WRITERS_HEAD_405_OK", "WRITERS_OPTIONS_204_OK", "WRITERS_NO_304_OK"],
+        "artifacts": ["artifacts/headers/writer_head_405.txt", "artifacts/headers/writer_204.txt"]
+      }
+    },
+    {
+      "name": "auth_boundary",
+      "summary": "Bearer auth with 401/403 split on the same route.",
+      "spec": {
+        "headers": {"www-authenticate_on_401": "Bearer"},
+        "fixtures_env": {"admin": "HDE_TEST_TOKEN_ADMIN", "none": "HDE_TEST_TOKEN_NONE"}
+      },
+      "accept": {
+        "tokens": ["AUTHZ_BOUNDARY_OK", "SECRETS_READY_OK", "ENV_RAILS_POLICY_OK"],
+        "artifacts": ["artifacts/headers/writer_error_401.json", "artifacts/headers/writer_error_403.json"]
+      }
+    },
+    {
+      "name": "request_gates",
+      "summary": "Strict Content-Type; invalid JSON; schema enforcement; unknown keys; 32,768-byte size cap.",
+      "spec": {
+        "content_type": {"required": true, "mime": "application/json", "charset": "utf-8", "diagnostic_empty_body_exempt": true},
+        "invalid_json_status": 400,
+        "schema_violation_status": 422,
+        "unknown_key_status": 422,
+        "size_cap_bytes": 32768,
+        "size_exceeded_status": 413,
+        "error_codes": {
+          "invalid_content_type": 415,
+          "invalid_json": 400,
+          "invalid_input": 422,
+          "unknown_key": 422,
+          "request_too_large": 413
+        }
+      },
+      "accept": {
+        "tokens": ["WRITERS_SCHEMA_OK", "ERROR_CTYPE_JSON_UTF8_OK", "NO_PAYLOAD_ECHO_OK"],
+        "artifacts": [
+          "artifacts/headers/writer_error_415.json",
+          "artifacts/headers/writer_error_400.json",
+          "artifacts/headers/writer_error_422_invalid_input.json",
+          "artifacts/headers/writer_error_422_unknown_key.json",
+          "artifacts/headers/writer_error_413.json"
+        ]
+      }
+    },
+    {
+      "name": "idempotent_write_path",
+      "summary": "Canonicalize → hash → transactional persist; duplicate returns same status.",
+      "spec": {
+        "preimage": {
+          "method": "POST",
+          "writer_route_id": "ops.writer.diagnostic.v1",
+          "canonical_request_body": {"sorted_keys": true, "compact": true, "one_trailing_lf": true, "empty_bytes": "{}\n"}
+        },
+        "digest": {"algo": "sha256", "hex_lowercase": true, "len": 64},
+        "persistence": {"table": "hde.idempotent_writes", "transactional": true, "global_scope": true, "store": ["canonical_bytes", "canonical_json", "idempotence_hash", "created_at"]},
+        "duplicate_status_policy": "same_as_first_success"
+      },
+      "accept": {
+        "tokens": ["IDEMPOTENT_WRITE_OK", "PREIMAGE_RECOMPUTE_OK", "TWO_RUN_IDENTITY_OK", "JSON_CANONICAL_CHECK_OK", "NO_PAYLOAD_ECHO_OK"],
+        "artifacts": ["artifacts/idempotence/preimage_compare.log", "artifacts/idempotence/two_run_identity.log", "migrations/008_writers_auth.sql"]
+      }
+    },
+    {
+      "name": "logging_and_redaction",
+      "summary": "Keys-only logs; redact PII/hex≥32 with allow-list exceptions; monotonic duration_ms.",
+      "spec": {
+        "log_fields": ["at", "route", "status", "duration_ms", "idempotence_hash", "release_id"],
+        "duration_ms": {"clock": "monotonic", "type": "int"},
+        "redact": {"emails": true, "uuids": true, "hex_len_gte": 32, "allowlist": ["release_id", "idempotence_hash", "invocation_tag"]},
+        "no_payloads_or_headers": true
+      },
+      "accept": {
+        "tokens": ["OBS_KEYS_ONLY_OK", "PII_REDACTION_OK", "SECRETS_READY_OK", "NO_PAYLOAD_ECHO_OK"],
+        "artifacts": ["artifacts/redaction/grep_guard_report.txt"]
+      }
+    },
+    {
+      "name": "evidence_and_indices",
+      "summary": "Write all header/idempotence artifacts; update human & machine indices in same commit; PF12 keys.",
+      "spec": {
+        "human_index": "docs/evidence/INDEX.json",
+        "machine_index": "artifacts/evidence_index.jsonl",
+        "pf12_keys": ["artifact_key", "discovered_physical_path", "produced_at_utc", "proof_anchor", "role", "sha256", "size_bytes"],
+        "proof_anchor_format": "token=<TOKEN>; release_id=<64-hex>",
+        "sort_machine_index_by": "discovered_physical_path",
+        "lf_policy": "exactly_one"
+      },
+      "accept": {
+        "tokens": ["EVIDENCE_INDEX_UPDATED_OK", "EVIDENCE_INDEX_MIRROR_OK", "EVIDENCE_PATHS_VALIDATED_OK", "EVIDENCE_INDEX_HASH_OK", "RELEASE_ID_RECORDED_OK"],
+        "artifacts": ["docs/evidence/INDEX.json", "artifacts/evidence_index.jsonl"]
+      }
+    }
+  ]
+}

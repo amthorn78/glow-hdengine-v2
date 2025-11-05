@@ -1,3 +1,25 @@
+2025-11-05 — EPIC-008: Writers & Auth
+
+### Added
+- Admin-only diagnostic writer endpoint to prove 2xx JSON rules.
+- Deterministic writer transport: `Cache-Control: no-store`, **no ETag**, **never 304**, **no compression**; **HEAD→405** (no body) and **OPTIONS→204** (no body) with `Allow: POST, OPTIONS` and `Content-Length: 0`.
+- Strict request validation for writer routes:
+  - wrong/missing `Content-Type` → **415** (`invalid_content_type`)
+  - malformed JSON/UTF-8/BOM → **400** (`invalid_json`)
+  - unknown fields → **422** (`unknown_key`)
+  - other schema violations → **422** (`invalid_input`)
+  - payloads over **32 768 bytes** → **413** (`request_too_large`)
+- Auth boundary for writers: `Authorization: Bearer`, **401** (with `WWW-Authenticate: Bearer`) vs **403**.
+- Idempotent write path (preimage → sha256 digest → transactional persist) with **same-status** behavior on duplicates.
+- Evidence updates: human index (`docs/evidence/INDEX.json`) and PF12 machine mirror (`artifacts/evidence_index.jsonl`) updated in the same commit; hash sentinel added.
+- DB migration DDL: `migrations/008_writers_auth.sql` (creates `hde.idempotent_writes`).
+
+### Changed
+- `/api/compat/v1` success responses now explicitly set `Cache-Control: no-store`.
+
+### Notes
+- DB ops migration tooling/runbook is scheduled for a later ops epic; this release includes DDL only.
+
 2025-10-31 — CLI file inputs and transport key-order fix
 - CLI: add --pair-file / --a-file & --b-file plus --dump-reader/--dump-admin-dir; stdin and --a/--b preserved.
 - Service: enforce internal/version key order and header invariants.
