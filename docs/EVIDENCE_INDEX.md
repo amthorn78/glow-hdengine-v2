@@ -1,3 +1,6 @@
+> **Note (EPIC-008):** The canonical human Evidence Index now lives at `docs/evidence/INDEX.json`.  
+> This page remains for historical context; new entries must be added to the JSON index.
+
 # Appendix-D — Evidence Index (EPIC-007)
 ## Step6
 * `artifacts/epic007/ACCEPTANCE_NOTE.txt` — bytes: 79, sha256: 29567dac1cba71373a9eaa3125e4bce8118b4e62f8e94469317fecc229c6d2a0, added_in: EPIC007/Step6

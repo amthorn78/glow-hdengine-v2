@@ -1,0 +1,1 @@
+{"allowed_fields":["at","route","status","duration_ms","idempotence_hash","release_id"],"correlation_id":{"header_name":"X-Correlation-Id","present":true},"keys_only_policy":true,"logger_lib":"logging","redaction_rules":["drop sensitive headers; restrict allow-list to at,route,status,duration_ms,idempotence_hash,release_id"]}

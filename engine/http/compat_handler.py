@@ -8,6 +8,59 @@ from engine.validation.viewer_prefs import validate_viewer_prefs
 
 compat_blueprint = Blueprint("compat", __name__, url_prefix="/api/compat/v1")
 
+
+def _writer_payload(env: Dict[str, Any], *, status: int) -> Response:
+    payload, _ = emit_compact_json(env)
+    resp = Response(payload, status=status, mimetype="application/json; charset=utf-8")
+    resp.headers["Cache-Control"] = "no-store"
+    resp.headers.pop("ETag", None)
+    resp.headers.pop("Content-Encoding", None)
+    resp.headers["Content-Length"] = str(len(payload))
+    return resp
+
+
+class _WriterTransportResponse(Response):
+    def get_wsgi_headers(self, environ):  # type: ignore[override]
+        headers = super().get_wsgi_headers(environ)
+        if self.status_code == 204:
+            headers["Content-Length"] = "0"
+        return headers
+
+
+def _writer_head_response() -> Response:
+    resp = _WriterTransportResponse(b"", status=405)
+    resp.headers["Allow"] = "POST, OPTIONS"
+    resp.headers["Cache-Control"] = "no-store"
+    resp.headers["Content-Length"] = "0"
+    resp.headers.pop("Content-Type", None)
+    resp.headers.pop("ETag", None)
+    resp.headers.pop("Content-Encoding", None)
+    return resp
+
+
+def _writer_options_response() -> Response:
+    resp = _WriterTransportResponse(b"", status=204)
+    resp.headers["Allow"] = "POST, OPTIONS"
+    resp.headers["Cache-Control"] = "no-store"
+    resp.headers["Content-Length"] = "0"
+    resp.direct_passthrough = False
+    resp.set_data(b"")
+    resp.headers.pop("Content-Type", None)
+    resp.headers.pop("ETag", None)
+    resp.headers.pop("Content-Encoding", None)
+    return resp
+
+
+@compat_blueprint.before_app_request
+def _compat_writer_transport_guard():
+    if request.path.rstrip("/") != "/api/compat/v1":
+        return None
+    if request.method == "HEAD":
+        return _writer_head_response()
+    if request.method == "OPTIONS":
+        return _writer_options_response()
+    return None
+
 # Minimal id resolver (fixtures/people.json optional). Fallback: build from ids.
 def _resolve_person_by_id(pid: str) -> Dict[str,Any]:
     return {"person_uid": pid}
@@ -17,21 +70,19 @@ def get_ids_only():
     a_id = request.args.get("a_id"); b_id = request.args.get("b_id")
     if request.data:  # reject GET with body
         env = error_envelope("invalid_json")
-        return Response(emit_compact_json(env)[0], status=400, headers={"Cache-Control":"no-store"},
-                        mimetype="application/json; charset=utf-8")
+        return _writer_payload(env, status=400)
     if not a_id or not b_id:
         env = error_envelope("invalid_json")
-        return Response(emit_compact_json(env)[0], status=400, headers={"Cache-Control":"no-store"},
-                        mimetype="application/json; charset=utf-8")
+        return _writer_payload(env, status=400)
     a = _resolve_person_by_id(a_id); b = _resolve_person_by_id(b_id)
     # viewer prefs defaults (equal weights)
     from engine.compat.categories import CATEGORIES_ORDER_V1
     w = {k:50 for k in CATEGORIES_ORDER_V1}
     body = compat_public(a,b, CATEGORIES_ORDER_V1[0], w,
                          engine_tag="dev", release_id="dev", invocation_tag="INV-DEV")
-    return Response(emit_compact_json(body)[0], status=200, mimetype="application/json; charset=utf-8")
+    return _writer_payload(body, status=200)
 
-@compat_blueprint.post("")
+@compat_blueprint.route("", methods=["POST"], provide_automatic_options=False)
 def post_json():
     data = request.get_json(silent=True) or {}
     a, b = data.get("a"), data.get("b")
@@ -39,21 +90,28 @@ def post_json():
     # Reject mixing id+payload per party
     if (a and a_id) or (b and b_id):
         env = error_envelope("invalid_json")
-        return Response(emit_compact_json(env)[0], status=400, headers={"Cache-Control":"no-store"},
-                        mimetype="application/json; charset=utf-8")
+        return _writer_payload(env, status=400)
     if a_id: a = _resolve_person_by_id(a_id)
     if b_id: b = _resolve_person_by_id(b_id)
     if not isinstance(a, dict) or not isinstance(b, dict) or "person_uid" not in a or "person_uid" not in b:
         env = error_envelope("invalid_json")
-        return Response(emit_compact_json(env)[0], status=400, headers={"Cache-Control":"no-store"},
-                        mimetype="application/json; charset=utf-8")
+        return _writer_payload(env, status=400)
     vp = data.get("viewer_prefs") or {}
     err = validate_viewer_prefs(vp)
     if err:
-        return Response(emit_compact_json(err)[0], status=400, headers={"Cache-Control":"no-store"},
-                        mimetype="application/json; charset=utf-8")
+        return _writer_payload(err, status=400)
     body = compat_public(
         a, b, vp["top_category"], vp["weights"],
         engine_tag="dev", release_id="dev", invocation_tag="INV-DEV",
     )
-    return Response(emit_compact_json(body)[0], status=200, mimetype="application/json; charset=utf-8")
+    return _writer_payload(body, status=200)
+
+
+@compat_blueprint.route("", methods=["HEAD"], provide_automatic_options=False)
+def post_json_head():
+    return _writer_head_response()
+
+
+@compat_blueprint.route("", methods=["OPTIONS"], provide_automatic_options=False)
+def post_json_options():
+    return _writer_options_response()

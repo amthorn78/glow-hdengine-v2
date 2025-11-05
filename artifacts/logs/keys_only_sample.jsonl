@@ -1,1 +1,1 @@
-{"correlation_id":"cid123","duration_ms":0,"engine_tag":"Isis6","invocation_tag":"INV-aaaaaaaaaaaaaaaa","method":"GET","release_id":"rel_dev_abcd1234","route":"reader","status":200,"ts":"2025-09-27T14:06:01Z"}
+{"at":"2025-11-05T04:05:03Z","duration_ms":0,"idempotence_hash":"","release_id":"rel_dev_abcd1234","route":"reader_v1","status":200}

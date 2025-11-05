@@ -146,6 +146,22 @@ Parity (MUST): public bytes are identical for AB and BA.
 Single emitter (MUST): both CLI and Reader call the same public emitter; closeouts record a provenance fingerprint for the emitter.
 
 
+### Security & Transport (Writers)
+
+Writer endpoints are governed and deterministic:
+
+- Responses: `Cache-Control: no-store`, **no ETag**, **no compression**, **never 304** (conditionals ignored).
+- Method matrix: **HEAD → 405** (no body), **OPTIONS → 204** (no body), both with `Allow: POST, OPTIONS` and `Content-Length: 0`.
+- Input validation:
+  - require `Content-Type: application/json; charset=utf-8` (diagnostic empty-body exempt)
+  - malformed JSON/UTF-8/BOM → 400; unknown key → 422; other schema violations → 422; body > 32 768 bytes → 413
+- Auth: `Authorization: Bearer` with `admin:write` scope (401/403 split).
+
+### Idempotent Writes
+
+We canonicalize request bodies (UTF-8, sorted keys, compact JSON, one trailing LF) and compute a sha256 digest over the preimage `{method, writer_route_id, canonical_request_body}`.  
+We persist the digest and canonical bytes in `hde.idempotent_writes` (created by `migrations/008_writers_auth.sql`). Duplicate requests return the same status as the first success.
+
 
 ---
 
@@ -173,6 +189,8 @@ artifacts/cards/A5/headers_BA.txt
 artifacts/cards/A5/validation.log
 
 A7 (Transport): see Environment & Integration Plan v2.0 for exact header artifacts and PASS markers.
+
+**Evidence indices:** human `docs/evidence/INDEX.json` and machine `artifacts/evidence_index.jsonl` (PF12 keys, sorted).
 
 
 

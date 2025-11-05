@@ -1,0 +1,1 @@
+{"cache_control":{"errors":"no-store","reader_success":"private, max-age=0, must-revalidate","writer_success":"no-store"},"etag_generation":{"error_etag":false,"generator_locations":["adapter/http_reader.py","adapter/etag_core.py"],"reader_success_strong_etag":true,"writer_success_etag":false},"status_matrix":{"errors_304_possible":false,"writer_head":405,"writer_options":204}}

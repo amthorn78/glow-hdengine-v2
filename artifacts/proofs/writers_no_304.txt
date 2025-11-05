@@ -1,0 +1,1 @@
+writers_no_304: POST /ops/writer/diagnostic with conditionals -> 200 (no 304 observed)

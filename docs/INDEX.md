@@ -2,7 +2,7 @@
 
 ### Acceptance & evidence
 - Evidence Index (human): `docs/EVIDENCE_INDEX.md`
-- Evidence Index (machine): `audit/EVIDENCE_INDEX.jsonl`
+- Evidence Index (machine): `artifacts/evidence_index.jsonl`
 - EPIC006 acceptance: run `LC_ALL=C TZ=UTC pytest -q -m epic006`
 
 This repo contains implementation docs. Canon (spec/process) lives in PF documents; reference **titles only**:

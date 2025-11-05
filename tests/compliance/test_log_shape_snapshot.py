@@ -6,7 +6,8 @@ ART = pathlib.Path("artifacts/logs")
 SNAP = ART / "keys_only_sample.jsonl"
 SUM = pathlib.Path(str(SNAP) + ".sha256")
 
-def test_keys_only_log_snapshot_and_sha256():
+def test_keys_only_log_snapshot_and_sha256(monkeypatch):
+    monkeypatch.setenv("APP_ENV", "dev")
     ART.mkdir(parents=True, exist_ok=True)
 
     app = create_app()
@@ -17,7 +18,7 @@ def test_keys_only_log_snapshot_and_sha256():
 
     with app.test_client() as c:
         r = c.get(
-            "/reader",
+            "/reader?v=1&a=fixtures/charts/alice.json&b=fixtures/charts/bob.json&a_tz=Africa/Cairo&b_tz=Africa/Cairo",
             headers={
                 "X-Correlation-Id": "cid123",
                 "X-Invocation-Id": "INV-aaaaaaaaaaaaaaaa",
@@ -36,7 +37,7 @@ def test_keys_only_log_snapshot_and_sha256():
         rec = json.loads(rec)
 
     # Required keys present; no bodies or sensitive values
-    want = {"ts","correlation_id","route","method","status","duration_ms","engine_tag","invocation_tag","release_id"}
+    want = {"at","route","status","duration_ms","idempotence_hash","release_id"}
     assert want.issubset(rec.keys())
     assert "Authorization" not in json.dumps(rec) and "Cookie" not in json.dumps(rec)
 

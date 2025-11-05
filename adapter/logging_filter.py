@@ -1,7 +1,7 @@
 import time, uuid, json
 from datetime import datetime, timezone
 import logging
-from flask import request, g, current_app
+from flask import request, g
 
 # Canonical logger
 _LOG = logging.getLogger("engine.app")
@@ -27,7 +27,7 @@ def _emit_line(app, line: str):
 def install(app):
     @app.before_request
     def _start_timer_and_cid():
-        g._t0 = time.time()
+        g._t0 = time.perf_counter()
         g._cid = request.headers.get("X-Correlation-Id") or uuid.uuid4().hex
 
     @app.after_request
@@ -35,17 +35,14 @@ def install(app):
         # Echo correlation id
         resp.headers["X-Correlation-Id"] = g.get("_cid", "")
         # Keys-only JSON line (no bodies, no headers mirrored)
-        duration_ms = int((time.time() - g.get("_t0", time.time())) * 1000)
+        duration_ms = int((time.perf_counter() - g.get("_t0", time.perf_counter())) * 1000)
         obj = {
-            "ts": _now_iso(),
-            "correlation_id": g.get("_cid", ""),
+            "at": _now_iso(),
             "route": _route_name(),
-            "method": request.method,
             "status": resp.status_code,
             "duration_ms": duration_ms,
-            "engine_tag": app.config.get("ENGINE_TAG", ""),
-            "invocation_tag": request.headers.get("X-Invocation-Id",""),
-            "release_id": app.config.get("RELEASE_ID",""),
+            "idempotence_hash": getattr(g, "_idempotence_hash", ""),
+            "release_id": app.config.get("RELEASE_ID", ""),
         }
         line = json.dumps(obj, separators=(",",":"), sort_keys=True)
         _emit_line(app, line)
@@ -54,15 +51,12 @@ def install(app):
 def log_startup_line(app, status: int = 0):
     """Emit one keys-only line during startup checks (no bodies)."""
     obj = {
-        "ts": _now_iso(),
-        "correlation_id": "",
+        "at": _now_iso(),
         "route": "startup",
-        "method": "BOOT",
         "status": status,
         "duration_ms": 0,
-        "engine_tag": app.config.get("ENGINE_TAG",""),
-        "invocation_tag": "",
-        "release_id": app.config.get("RELEASE_ID",""),
+        "idempotence_hash": "",
+        "release_id": app.config.get("RELEASE_ID", ""),
     }
     line = json.dumps(obj, separators=(",",":"), sort_keys=True)
     _emit_line(app, line)
