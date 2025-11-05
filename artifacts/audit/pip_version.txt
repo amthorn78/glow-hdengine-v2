@@ -1,0 +1,1 @@
+pip 25.2 from /root/.pyenv/versions/3.11.12/lib/python3.11/site-packages/pip (python 3.11)

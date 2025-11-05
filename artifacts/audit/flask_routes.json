@@ -1,0 +1,1 @@
+{"routes":[{"endpoint":"static","methods":["GET","HEAD","OPTIONS"],"rule":"/static/<path:filename>"},{"endpoint":"reader_v1.internal_version","methods":["GET","HEAD","OPTIONS"],"rule":"/internal/version"}]}

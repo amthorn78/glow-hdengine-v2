@@ -1,0 +1,1 @@
+python -m engine.cli showcompat --a-file artifacts/audit/alice_left.json --b-file artifacts/audit/bob_right.json

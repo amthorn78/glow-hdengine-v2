@@ -1,0 +1,10 @@
+usage: hdctl [-h] {showcompat} ...
+
+Glow HD Engine compatibility CLI
+
+positional arguments:
+  {showcompat}
+    showcompat  Emit canonical Reader v1 bytes from vendor JSON (stdin or files)
+
+options:
+  -h, --help    show this help message and exit

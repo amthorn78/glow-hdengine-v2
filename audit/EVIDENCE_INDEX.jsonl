@@ -76,3 +76,17 @@
 {"path":"artifacts/admin/qa/public_cli_BA.json","bytes":314,"sha256":"cd9c054901e6dec7b8d92ad9a03ab8f4c9ee8f0220c4b4d191eca6ca50b2864e","added_in":"EPIC007/Admin-QA"}
 {"path":"artifacts/admin/qa/M10_AB.idempotence.sha256","bytes":65,"sha256":"f3c76a76460bcea5145fe3bf09b224a5c9257912cdb5e0f8bae97e13845cc1ef","added_in":"EPIC007/Admin-QA"}
 {"path":"artifacts/admin/qa/M10_BA.idempotence.sha256","bytes":65,"sha256":"f3c76a76460bcea5145fe3bf09b224a5c9257912cdb5e0f8bae97e13845cc1ef","added_in":"EPIC007/Admin-QA"}
+{"path":"artifacts/audit/showcompat_AB.json","bytes":318,"sha256":"e47d50bb1db574ab3273864b25cc9e106ac5cf606c06d9479f8eca95090ac1a3","added_in":"Isis18"}
+{"path":"artifacts/audit/showcompat_BA.json","bytes":318,"sha256":"e47d50bb1db574ab3273864b25cc9e106ac5cf606c06d9479f8eca95090ac1a3","added_in":"Isis18"}
+{"path":"artifacts/audit/showcompat_exit_codes.txt","bytes":32,"sha256":"578771bb587d7e526204e2c5777b30e008437abab7a5463f1e407c9df3388904","added_in":"Isis18"}
+{"path":"artifacts/audit/cli_help_module.txt","bytes":246,"sha256":"6b3403ce752c603e842589bd425549fcbe9f81cf94436789772a894023290e3c","added_in":"Isis18"}
+{"path":"artifacts/audit/cli_help_console.txt","bytes":246,"sha256":"6b3403ce752c603e842589bd425549fcbe9f81cf94436789772a894023290e3c","added_in":"Isis18"}
+{"path":"artifacts/audit/flask_routes.json","bytes":207,"sha256":"37b7bf12017c614bf69b8172865ce9d87bd45966a985586c69f6b3d8520dc76a","added_in":"Isis18"}
+{"path":"artifacts/audit/endpoint_probe.json","bytes":24,"sha256":"2236293967ddc5e66ce14c26290657c6efa09500aa69f6716c485a3f7f963668","added_in":"Isis18"}
+{"path":"artifacts/audit/internal_version_probe.json","bytes":420,"sha256":"5c1d6b062686918cb51d3a5c3c4adcc5e30b08c2fe131a5fdeebb3009282fc38","added_in":"Isis18"}
+{"path":"artifacts/audit/ENDPOINTS_CATALOG.json","bytes":25,"sha256":"c912f1412522309e49088e46898b3d4d2494c238bc3c4f4c2d36ad8f80e9f489","added_in":"Isis18"}
+{"path":"artifacts/audit/ENDPOINTS_CATALOG.json.sha256","bytes":65,"sha256":"9e8bd44091cee674873184680ddf5c11d0f4cdaf9c5807ce3226ac5aaba1eb7a","added_in":"Isis18"}
+{"path":"artifacts/audit/pyproject_entrypoints.json","bytes":65,"sha256":"b30a5caa7e6f98d70b00991fce62ba902d88a788c35d52485b0bdb7724bedf7d","added_in":"Isis18"}
+{"path":"artifacts/audit/alice_left.json","bytes":132,"sha256":"1500fe15ca0a5d36b0df260194c53522f934ebd9bf732241cd019070d373a99f","added_in":"Isis18"}
+{"path":"artifacts/audit/bob_right.json","bytes":133,"sha256":"0875f44a1579f3a8bf716873a5ab70605fb6f4dcafe10b3f895c9ca84d9b418a","added_in":"Isis18"}
+{"path":"artifacts/audit/cli_presence.txt","bytes":12,"sha256":"0ca87df4adf173c5b1eb1cdad555842f63511b967564271ae54f27c715591fba","added_in":"Isis18"}
