@@ -1,10 +1,10 @@
 {
   "pid": 9514,
-  "probe_token": "unset",
+  "started_at_utc": "2025-11-07T13:12:45Z",
   "rails_state": {
     "ALLOW_NETWORK": "1",
     "APP_ENV": "dev",
     "SAFE_MODE": "1"
   },
-  "started_at_utc": "2025-11-07T13:12:45Z"
+  "probe_token_present": false
 }

@@ -32,9 +32,16 @@ def test_ops_rails_refusal_get(monkeypatch):
     assert len(app.config["LOG_SINK"]) == 1
     log_line = json.loads(app.config["LOG_SINK"][0])
     assert log_line["route"] == "ops.rails.refusal"
-    assert log_line["rails_state"] == "closed"
     assert log_line["status"] == 503
-    assert set(log_line.keys()) == {"at", "route", "status", "duration_ms", "rails_state"}
+    # Canonical keys-only schema:
+    assert set(log_line.keys()) == {
+        "at",
+        "route",
+        "status",
+        "duration_ms",
+        "idempotence_hash",
+        "release_id",
+    }
 
 
 def test_ops_rails_refusal_post(monkeypatch):
@@ -50,4 +57,3 @@ def test_ops_rails_refusal_post(monkeypatch):
     assert len(app.config["LOG_SINK"]) == 1
     log_line = json.loads(app.config["LOG_SINK"][0])
     assert log_line["route"] == "ops.rails.refusal"
-    assert log_line["rails_state"] == "closed"

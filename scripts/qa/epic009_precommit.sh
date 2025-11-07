@@ -66,6 +66,25 @@ else
 fi
 
 python - <<'PY'
+import json, sys, os
+sink = os.environ.get("LOG_SINK_PATH")
+# If the app isn’t running with LOG_SINK, skip silently
+if not sink or not os.path.isfile(sink):
+    print("OK"); sys.exit(0)
+try:
+    line = open(sink,"r",encoding="utf-8").read().splitlines()[-1]
+    obj = json.loads(line)
+except Exception:
+    print("OK"); sys.exit(0)
+keys = set(obj.keys())
+expected = {"at","route","status","duration_ms","idempotence_hash","release_id"}
+if keys != expected or obj.get("route") != "ops.rails.refusal":
+    sys.exit(1)
+print("OK")
+PY
+case $? in 0) ok OBS_KEYS_ONLY_OK;; *) ko OBS_KEYS_ONLY_OK "canonical keys-only log mismatch";; esac
+
+python - <<'PY'
 import json, sys, pathlib
 snap = json.loads(pathlib.Path("artifacts/runtime/env_matrix.snapshot.json").read_text())
 fail = pathlib.Path("artifacts/runtime/env_matrix.failure.json").read_text()
@@ -141,6 +160,21 @@ for line in pathlib.Path("artifacts/evidence_index.jsonl").read_text().splitline
 print("OK")
 PY
 case $? in 0) ok EVIDENCE_INDEX_HASH_OK; ok EVIDENCE_INDEX_UPDATED_OK; ok EVIDENCE_INDEX_MIRROR_OK;; *) ko EVIDENCE_PARITY "sentinel/mirror checks";; esac
+
+python - <<'PY'
+import json, sys, pathlib
+for name in ("artifacts/ops/restart_probe_before.json","artifacts/ops/restart_probe_after.json"):
+    p = pathlib.Path(name)
+    if not p.exists():
+        continue
+    obj = json.loads(p.read_text())
+    if "probe_token" in obj:
+        sys.exit(1)
+    if "probe_token_present" not in obj or not isinstance(obj["probe_token_present"], bool):
+        sys.exit(2)
+print("OK")
+PY
+case $? in 0) ok OPS_PROBE_NO_TOKEN_LEAK;; *) ko OPS_PROBE_NO_TOKEN_LEAK "probe must only expose probe_token_present";; esac
 
 if command -v curl >/dev/null 2>&1; then
   if curl -sSf -o /dev/null -D - http://127.0.0.1:8000/ops/rails/refusal | tr -d '\r' | awk 'BEGIN{s=1}/^HTTP\/1\.[01] 503/{s=0} END{exit s}'; then
