@@ -1,3 +1,4 @@
+# RUN — Developer Flight Checks
 
  - Pins: `python scripts/ensure_env.py` → `[ENV] OK`
  - Tests: `pytest -q tests/test_sercanon.py`
@@ -18,25 +19,32 @@
  ```
  
  Auto-reload: **off** when capturing evidence.
+
+## EPIC-009 — Pre-commit QA (evidence & parity)
+Run the consolidated refusal, env-matrix, DB posture, and PF12 parity checks:
+```bash
+scripts/qa/epic009_precommit.sh
+```
+Expect **QA_OK** with report at `artifacts/qa/epic009_precommit_report.json`.
  
  <!-- EPIC-004 RUN posture -->
  ```bash
  python -m adapter.http_reader
  ```
- Bind: http://127.0.0.1:5000  ·  Env: PYTHONHASHSEED=0 PYTHONUTF8=1 TZ=UTC SAFE_MODE=1  ·  Auto-reload: off
-+
-+---
-+
-+## RUN — Production start (EPIC-005, Railway)
-+
-+Use the exact start line that shipped in EPIC-005 (tactical; normalize later if desired):
-+
-+```bash
-+python -m pip install --no-cache-dir -r requirements.txt \
-+  && python -m gunicorn 'adapter.factory:create_app()' \
-+     --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 30
-+```
-+
+Bind: http://127.0.0.1:5000  ·  Env: PYTHONHASHSEED=0 PYTHONUTF8=1 TZ=UTC SAFE_MODE=1  ·  Auto-reload: off
+
+---
+
+## RUN — Production start (EPIC-005, Railway)
+
+Use the exact start line that shipped in EPIC-005 (tactical; normalize later if desired):
+
+```bash
+python -m pip install --no-cache-dir -r requirements.txt \
+  && python -m gunicorn 'adapter.factory:create_app()' \
+     --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 30
+```
+
 Evidence: `artifacts/validation/service_cmd.txt` *(deferred to HDE-EPIC-006 if not yet captured)*
 
 ## EPIC-006 — acceptance run

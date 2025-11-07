@@ -1,5 +1,34 @@
-> **Note (EPIC-008):** The canonical human Evidence Index now lives at `docs/evidence/INDEX.json`.  
-> This page remains for historical context; new entries must be added to the JSON index.
+> **Note (EPIC-009):** The canonical human Evidence Index lives at `docs/evidence/INDEX.json`.
+> Add new entries there first, then mirror key pointers here for quick navigation.
+
+# Appendix-D — Evidence Index (EPIC-009)
+
+## Ops rails refusal
+* `artifacts/ops/rails_refusal_proof.txt`
+* `artifacts/ops/no_io_guard.txt`
+
+## Env-matrix (selection-only)
+* `artifacts/runtime/env_matrix.snapshot.json`
+* `artifacts/runtime/env_matrix.failure.json`
+
+## Database (EPIC-009)
+* `artifacts/db/ddl_applied.sql`
+* `artifacts/db/check_schema.txt`
+* `artifacts/db/check_constraints.txt`
+* `artifacts/db/partition_plan.txt`
+* `artifacts/db/grants.txt`
+* `artifacts/db/ddl_fingerprint.json`
+* `artifacts/db/migration_runner.log`
+
+## QA Runs
+* `artifacts/qa/epic009_precommit_report.json`
+
+## PF12 parity (human + machine)
+* `docs/evidence/INDEX.json`
+* `docs/evidence/INDEX.sha256`
+* `artifacts/evidence_index.jsonl`
+
+---
 
 # Appendix-D — Evidence Index (EPIC-007)
 ## Step6
@@ -109,9 +138,9 @@
 * `artifacts/db/check_schema.txt`
 * `artifacts/db/check_constraints.txt`
 * `artifacts/db/partition_plan.txt`
-* `artifacts/db/grants.txt` *(deferred to HDE-EPIC-006)*
+* `artifacts/db/grants.txt`
 
 **Ops pins**
 
-* `artifacts/validation/service_cmd.txt` *(deferred to HDE-EPIC-006)*
+* `artifacts/validation/service_cmd.txt`
 * `artifacts/prod/exposure_note.md`
