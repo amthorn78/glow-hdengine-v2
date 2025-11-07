@@ -1,3 +1,29 @@
+# CHANGELOG
+
+2025-11-07 — EPIC-009: Ops Safety & DB Runtime Posture
+
+### Added
+- **SAFE rails refusal** at `/ops/rails/refusal` (GET/POST identical 503) with typed JSON body,
+  `Content-Type: application/json; charset=utf-8`, `Cache-Control: no-store`, and **no ETag**.
+- **Keys-only logging** for refusal using canonical keys `{at, route, status, duration_ms, idempotence_hash, release_id}`.
+- **No-I/O guard** proving zero external I/O (HTTP/DNS/sockets/SDK) during refusal.
+- **Env-matrix (selection-only)** evidence: success chooses `DATABASE_URL` or `DB_BRIDGE_URL` (redacted),
+  failure is a frozen typed envelope; no connectivity in snapshots.
+- **DB runtime posture** with connection-time fallback for scripts:
+  try `DATABASE_URL`, on connection failure fall back to **Postgres-scheme** `DB_BRIDGE_URL`; fail if neither connects.
+  Evidence includes exact `search_path = "hde, public"`, schema-qualified **grants** (ASCII sort; present-even-empty ADP),
+  normalized **DDL fingerprint** (extensions/sequences/indexes/constraints/domains/functions; strips volatiles & ext versions),
+  and **migration two-run identity** (`no-op` on second run).
+- **PF12 parity**: updated **Human Evidence Index** + **Machine mirror JSONL** in the **same PR**;
+  added **INDEX.sha256** sentinel (LF-terminated, lower-hex; not mirrored); path-proofs present.
+
+### Tokens (PASS)
+ENV_RAILS_POLICY_OK · ERROR_CACHECTL_NOSTORE_OK · ERROR_CTYPE_JSON_UTF8_OK · NO_CONTENT_ENCODING_OK
+· NO_EXTERNAL_IO_ON_REFUSAL_OK · OBS_KEYS_ONLY_OK · PII_REDACTION_OK · DB_CONN_ENV_OK · DB_CONN_TYPED_ERROR_OK
+· DB_RUNTIME_SEARCH_PATH_OK · DB_ROLE_OK · DB_SCHEMA_FINGERPRINT_OK · MIGRATION_RUNNER_OK · MIGRATION_LOGGED_OK
+· MIGRATION_REPLAY_IDENTITY_OK · EVIDENCE_INDEX_UPDATED_OK · EVIDENCE_INDEX_MIRROR_OK · EVIDENCE_PATHS_VALIDATED_OK
+· EVIDENCE_INDEX_HASH_OK · CI_CHECK_FINAL_LF_OK · CI_CHECK_MIRROR_SCHEMA_OK
+
 2025-11-05 — EPIC-008: Writers & Auth
 
 ### Added
@@ -47,8 +73,6 @@
 • HTTP home: canonical adapter at adapter/http_reader.py; dev runner at dev/reader_harness/app.py (APP_ENV=dev). server/ is legacy (kept temporarily).
 • Removed restatements of A7 tables from repo docs; link to Governance instead.
 • Embedded evidence pointers in notes: tests/test_emitter_determinism.py, tests/test_reader_transport.py, tests/cli/*.
-
-CHANGELOG
 
 2025-10-02 — A7 alignment and contract centralization (v2.0 / v0.1.5)
 

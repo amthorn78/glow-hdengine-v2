@@ -1,4 +1,13 @@
+# HD Engine dev harness repo — CLI & Reader (alpha)
+
 Glow HD Engine — README
+
+## EPIC-009 — Ops Safety & DB Runtime Posture (post-merge)
+- **Refusal (ops):** `/ops/rails/refusal` returns 503 with a typed JSON body, `Cache-Control: no-store`, **no ETag**, and no vendor I/O.
+- **Keys-only logs:** refusal route logs exactly `{at, route, status, duration_ms, idempotence_hash, release_id}` (no bodies/headers/secrets).
+- **Env-matrix snapshots:** selection-only evidence (success chooses `DATABASE_URL` or `DB_BRIDGE_URL`, failure is typed—no DB connectivity here).
+- **DB posture:** scripts use connection-time fallback (try `DATABASE_URL`, fall back to **Postgres DSN** `DB_BRIDGE_URL`); evidence includes `search_path`, **grants** (present-even-empty ADP), normalized **DDL fingerprint**, and migration **two-run identity**.
+- **QA quick run:** `scripts/qa/epic009_precommit.sh` → expect **QA_OK** and report at `artifacts/qa/epic009_precommit_report.json`.
 
 ## CLI — Vendor JSON file inputs
 Examples:

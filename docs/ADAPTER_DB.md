@@ -1,7 +1,17 @@
-# DB Connectivity - Attempt-Both Resolver
+# DB Connectivity — Connection-time fallback (EPIC-009)
 
-- Default preference: attempt DSN then Bridge. The first successful path becomes active.
-- Bridge requests require `SAFE_MODE=0` and `ALLOW_NETWORK=1` before any outbound calls.
-- DSN path enforces `search_path` `hde, public` with a 5s connect timeout.
-- `/internal/version` stays DB-decoupled and does not import the resolver.
-- Evidence artifacts: `artifacts/db/attempts.json`, `artifacts/db/rw_smoke.txt` (both LF-terminated, compact JSON where applicable).
+Scripts that connect to Postgres MUST:
+
+1. Try `DATABASE_URL` (if present).
+2. If connection fails, fall back to **`DB_BRIDGE_URL` only when it is a Postgres DSN** (`postgres://` or `postgresql://`).
+   Skip HTTP/HTTPS bridges for psycopg usage.
+3. If neither option succeeds, exit with a typed `missing_db_config` error.
+
+Dev: fallback may be exercised locally; log success/failure (keys-only).
+Prod/staging: use the configured DSN; do **not** attempt HTTP bridges.
+
+Evidence expectations:
+- `artifacts/db/check_schema.txt` (exact `hde, public`).
+- `artifacts/db/grants.txt` (schema-qualified; ASCII sort; present-even-empty ADP).
+- `artifacts/db/ddl_fingerprint.json` (normalized; compact; LF-terminated).
+- `artifacts/db/migration_runner.log` (second run reports "no-op").

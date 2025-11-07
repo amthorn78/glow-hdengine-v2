@@ -28,3 +28,9 @@ This repo contains implementation docs. Canon (spec/process) lives in PF documen
 
 ### Evidence Index (EPIC-005)
 - `docs/EVIDENCE_INDEX.md`
+
+### EPIC-009 — Ops Safety & DB runtime posture
+- Refusal surface & keys-only logging: see README and AGENTS
+- Env-matrix snapshots (selection-only): CHANGELOG entry 2025-11-07
+- DB posture scripts & evidence: `docs/ADAPTER_DB.md`
+- Pre-commit QA harness: `scripts/qa/epic009_precommit.sh` (report under `artifacts/qa/`)

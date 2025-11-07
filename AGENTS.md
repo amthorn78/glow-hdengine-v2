@@ -32,6 +32,10 @@
 - Do use engine.presenter.emitter for public bytes, keep JSON canonical and LF-terminated, dedupe+sort arrays-as-sets, and normalize channel ids to NN-NN.
 - Don’t add new env vars, bypass the shared emitter, alter transport rules, or stash specs in Build Notes.
 - Do keep logs keys-only with exactly: {at, route, status, duration_ms, idempotence_hash, release_id}.
+- Do label the refusal route with the symbolic route name **"ops.rails.refusal"**.
+- Do capture refusal evidence as a single file: lower-case header names → one blank line → frozen body (LF).
+- Do treat **env-matrix** as **selection-only** (no DB connectivity); snapshots choose `DATABASE_URL` or `DB_BRIDGE_URL` and freeze the failure envelope.
+- Do implement **connection-time fallback** for DB posture scripts: try `DATABASE_URL`, then fall back to **Postgres-scheme** `DB_BRIDGE_URL`; fail fast if both are unusable.
 - Don’t log request/response bodies or headers; redact emails/UUIDs/≥32-hex except allow-list {release_id, idempotence_hash, invocation_tag}.
 
 Referenced repo paths

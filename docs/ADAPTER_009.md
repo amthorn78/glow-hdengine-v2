@@ -53,10 +53,7 @@ Else 503 with typed code: OverridesNotAllowedInProd, DependencyFailure("resolver
 ## Env vars
 ENGINE_ENV=dev|staging|prod (default dev), ENGINE_SERVICE_TOKEN (prod only).
 Optional fixed meta: BUILD_COMMIT_SHORT, BUILD_TIMESTAMP_UTC, ENGINE_TAG, RELEASE_ID, TOGGLES_SHA.
-docs/EVIDENCE_INDEX.md
 New
-+29
--0
 
 # Appendix-D — Evidence Index (EPIC-005)
 
@@ -87,9 +84,6 @@ New
 * `artifacts/validation/service_cmd.txt` *(deferred to HDE-EPIC-006)*
 * `artifacts/prod/exposure_note.md`
 
-docs/INDEX.md
-+7
--0
 
 # HD Engine Repo Docs — Index (SoT pointers)
 
@@ -116,11 +110,7 @@ This repo contains implementation docs. Canon (spec/process) lives in PF documen
 
 ### Evidence Index (EPIC-005)
 - `docs/EVIDENCE_INDEX.md`
-docs/RUN.md
-+14
--0
 
-@@ -2,25 +2,39 @@
 - Pins: `python scripts/ensure_env.py` → `[ENV] OK`
 - Tests: `pytest -q tests/test_sercanon.py`
 <!-- EPIC-004 PATCH: RUN posture -->
@@ -160,9 +150,6 @@ python -m pip install --no-cache-dir -r requirements.txt \
 ```
 
 Evidence: `artifacts/validation/service_cmd.txt` *(deferred to HDE-EPIC-006 if not yet captured)*
-docs/acceptance/http_transport_evidence.md
-+34
--27
 
 # Reader — HTTP Transport Evidence (Acceptance)
 
