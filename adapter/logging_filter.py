@@ -39,19 +39,17 @@ def install(app):
         override = getattr(g, "_log_override", None)
         obj = {
             "at": _now_iso(),
+            "route": _route_name(),
             "status": resp.status_code,
             "duration_ms": duration_ms,
+            "idempotence_hash": getattr(g, "_idempotence_hash", ""),
+            "release_id": app.config.get("RELEASE_ID", ""),
         }
-        if override is None:
-            obj.update(
-                {
-                    "route": _route_name(),
-                    "idempotence_hash": getattr(g, "_idempotence_hash", ""),
-                    "release_id": app.config.get("RELEASE_ID", ""),
-                }
-            )
-        else:
-            obj.update(override)
+        if override:
+            allowed = {"route", "status", "duration_ms", "idempotence_hash", "release_id"}
+            for key, value in override.items():
+                if key in allowed:
+                    obj[key] = value
         line = json.dumps(obj, separators=(",",":"), sort_keys=True)
         _emit_line(app, line)
         return resp

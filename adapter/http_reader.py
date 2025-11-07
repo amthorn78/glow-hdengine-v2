@@ -391,7 +391,7 @@ def get_reader_bp(emit_fn=None):
 
     @bp.route("/ops/rails/refusal", methods=["GET", "POST"])
     def ops_rails_refusal():
-        g._log_override = {"route": "ops.rails.refusal", "rails_state": _rails_state()}
+        g._log_override = {"route": "ops.rails.refusal"}
         with NoIoGuard() as guard:
             resp = _rails_refusal_response()
         g._no_io_attempts = guard.attempts
@@ -399,12 +399,13 @@ def get_reader_bp(emit_fn=None):
 
     @bp.route("/ops/probe/env", methods=["GET"])
     def ops_probe_env():
-        g._log_override = {"route": "ops.probe.env", "rails_state": _rails_state()}
+        g._log_override = {"route": "ops.probe.env"}
+        probe_token = os.getenv("RESTART_PROBE_TOKEN")
         payload = {
             "pid": _PROCESS_PID,
             "started_at_utc": _PROCESS_STARTED_AT.replace(microsecond=0).isoformat().replace("+00:00", "Z"),
             "rails_state": _rails_env_snapshot(),
-            "probe_token": os.getenv("RESTART_PROBE_TOKEN") or "unset",
+            "probe_token_present": bool(probe_token),
         }
         body, _ = emit_compact_json(payload, sort_keys=False)
         resp = Response(body, status=200, mimetype="application/json; charset=utf-8")
