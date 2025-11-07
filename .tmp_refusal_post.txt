@@ -1,11 +1,10 @@
+HTTP/2 503 
 cache-control: no-store
 content-type: application/json; charset=utf-8
-date: Fri, 07 Nov 2025 18:14:43 GMT
+date: Fri, 07 Nov 2025 17:56:33 GMT
 server: railway-edge
 x-railway-edge: railway/europe-west4-drams3a
-x-railway-request-id: WyR59RCeQgK_ZWTn0-QtfA
+x-railway-request-id: I0MqVBqtT1utrqCvrJsmnA
 content-length: 76
 
-
 {"schema":"v1","ok":false,"code":"rails_closed","error":"rails are closed"}
-
