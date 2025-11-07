@@ -1,0 +1,25 @@
+{
+  "refusal_status_get": "503",
+  "refusal_status_post": "503",
+  "headers_present": {
+    "cache-control:no-store": true,
+    "content-type:application/json; charset=utf-8": true
+  },
+  "headers_forbidden": {
+    "etag": true,
+    "content-encoding": true,
+    "vary": true,
+    "transfer-encoding": true
+  },
+  "one_blank_line": true,
+  "body_exact": false,
+  "tokens": {
+    "ENV_RAILS_POLICY_OK": "PASS",
+    "ERROR_CACHECTL_NOSTORE_OK": "PASS",
+    "ERROR_CTYPE_JSON_UTF8_OK": "PASS",
+    "NO_CONTENT_ENCODING_OK": "PASS",
+    "NO_EXTERNAL_IO_ON_REFUSAL_OK": "UNVERIFIED",
+    "OBS_KEYS_ONLY_OK": "UNVERIFIED",
+    "PII_REDACTION_OK": "UNVERIFIED"
+  }
+}
