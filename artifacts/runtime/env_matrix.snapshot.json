@@ -1,0 +1,17 @@
+{
+  "schema": "v1",
+  "ok": true,
+  "checks": [
+    {
+      "name": "DATABASE_URL",
+      "value_kind": "unset"
+    },
+    {
+      "name": "DB_BRIDGE_URL",
+      "value_kind": "dsn_redacted"
+    }
+  ],
+  "result": {
+    "which": "DB_BRIDGE_URL"
+  }
+}
