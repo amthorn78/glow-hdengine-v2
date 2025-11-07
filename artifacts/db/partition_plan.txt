@@ -1,11 +1,1 @@
-hde.idx_pair_eval_evaluated_at|hde.pair_evaluation_pcur_evaluated_at_idx|
-hde.idx_pair_eval_id|hde.pair_evaluation_pcur_id_idx|
-hde.idx_pair_eval_release|hde.pair_evaluation_pcur_release_id_idx|
-hde.idx_public_results_created_at|hde.public_results_pcur_created_at_idx|
-hde.idx_public_results_id|hde.public_results_pcur_id_idx|
-hde.idx_public_results_release_id|hde.public_results_pcur_release_id_idx|
-hde.pair_evaluation|hde.pair_evaluation_pcur|FOR VALUES FROM ('2025-10-01 00:00:00+00') TO ('2025-11-01 00:00:00+00')
-hde.pair_evaluation_min_user_max_user_release_id_evaluated_at_key|hde.pair_evaluation_pcur_min_user_max_user_release_id_evaluated_key|
-hde.pair_evaluation_pkey|hde.pair_evaluation_pcur_pkey|
-hde.public_results|hde.public_results_pcur|FOR VALUES FROM ('2025-10-01 00:00:00+00') TO ('2025-11-01 00:00:00+00')
-hde.public_results_pkey|hde.public_results_pcur_pkey|
+

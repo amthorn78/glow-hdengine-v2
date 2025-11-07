@@ -36,6 +36,7 @@ def install(app):
         resp.headers["X-Correlation-Id"] = g.get("_cid", "")
         # Keys-only JSON line (no bodies, no headers mirrored)
         duration_ms = int((time.perf_counter() - g.get("_t0", time.perf_counter())) * 1000)
+        override = getattr(g, "_log_override", None)
         obj = {
             "at": _now_iso(),
             "route": _route_name(),
@@ -44,6 +45,11 @@ def install(app):
             "idempotence_hash": getattr(g, "_idempotence_hash", ""),
             "release_id": app.config.get("RELEASE_ID", ""),
         }
+        if override:
+            allowed = {"route", "status", "duration_ms", "idempotence_hash", "release_id"}
+            for key, value in override.items():
+                if key in allowed:
+                    obj[key] = value
         line = json.dumps(obj, separators=(",",":"), sort_keys=True)
         _emit_line(app, line)
         return resp

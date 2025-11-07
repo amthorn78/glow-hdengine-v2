@@ -1,2 +1,1 @@
-status=unreachable
-reason=network_unreachable
+hde, public

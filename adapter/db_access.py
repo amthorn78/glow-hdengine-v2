@@ -7,6 +7,14 @@ import urllib.request
 from typing import Any, Dict
 
 
+MISSING_DB_CONFIG = {
+    "schema": "v1",
+    "ok": False,
+    "code": "missing_db_config",
+    "error": "database configuration not found",
+}
+
+
 class DBStatus(dict):
     """Dictionary subtype describing an individual connection attempt."""
 
@@ -71,6 +79,35 @@ def db_resolve(preference: str = "dsn") -> Dict[str, Any]:
             active = candidate["path"]
             break
     return {"active": active, "dsn": dsn, "bridge": bridge}
+
+
+def resolve_env_matrix() -> tuple[bool, Dict[str, Any]]:
+    """Selection-only resolver that inspects environment variables."""
+
+    db_url = (os.environ.get("DATABASE_URL") or "").strip()
+    bridge_url = (os.environ.get("DB_BRIDGE_URL") or "").strip()
+
+    checks = [
+        {"name": "DATABASE_URL", "value_kind": "dsn_redacted" if db_url else "unset"},
+        {"name": "DB_BRIDGE_URL", "value_kind": "dsn_redacted" if bridge_url else "unset"},
+    ]
+
+    if db_url:
+        return True, {
+            "schema": "v1",
+            "ok": True,
+            "checks": checks,
+            "result": {"which": "DATABASE_URL"},
+        }
+    if bridge_url:
+        return True, {
+            "schema": "v1",
+            "ok": True,
+            "checks": checks,
+            "result": {"which": "DB_BRIDGE_URL"},
+        }
+
+    return False, MISSING_DB_CONFIG.copy()
 
 
 def db_rw_smoke(preference: str = "dsn") -> tuple[str, str]:

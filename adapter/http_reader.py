@@ -1,11 +1,16 @@
 from __future__ import annotations
 import hashlib, json, os
+from datetime import datetime, timezone
 from pathlib import Path
 from flask import Blueprint, Response, request, Flask, g
 from threading import Lock
-from engine.presenter.emitter import emit_compact_json, emit_public
+from engine.presenter.emitter import emit_compact_json
 from engine.serializer import canon
 from engine.runtime import emit_reader_public_bytes
+from adapter.no_io_guard import NoIoGuard
+
+_PROCESS_STARTED_AT = datetime.now(timezone.utc)
+_PROCESS_PID = os.getpid()
 
 # A7 helpers
 def _sha256_hex(b: bytes) -> str: return hashlib.sha256(b).hexdigest()
@@ -38,6 +43,7 @@ _WRITER_ERROR_MESSAGES: dict[str, str] = {
     "invalid_input": "schema validation failed",
     "unknown_key": "unknown request key",
     "request_too_large": "request body exceeds 32 KiB",
+    "rails_closed": "rails are closed",
 }
 
 
@@ -52,12 +58,15 @@ def _emit_writer_response(
     *,
     status: int,
     extra_headers: dict[str, str] | None = None,
+    sort_keys: bool = True,
 ) -> Response:
-    body = emit_public(envelope)
+    body = emit_compact_json(envelope, sort_keys=sort_keys)[0]
     resp = Response(body, status=status, mimetype="application/json; charset=utf-8")
+    resp.headers["Content-Type"] = "application/json; charset=utf-8"
     resp.headers["Cache-Control"] = "no-store"
     resp.headers.pop("ETag", None)
     resp.headers.pop("Content-Encoding", None)
+    resp.headers.pop("Vary", None)
     resp.headers["Content-Length"] = str(len(body))
     if extra_headers:
         for key, value in extra_headers.items():
@@ -70,10 +79,21 @@ def _writer_error(
     *,
     status: int,
     extra_headers: dict[str, str] | None = None,
+    sort_keys: bool = True,
 ) -> Response:
     message = _WRITER_ERROR_MESSAGES[code]
-    envelope = {"ok": False, "schema": "v1", "code": code, "error": message}
-    return _emit_writer_response(envelope, status=status, extra_headers=extra_headers)
+    envelope = {
+        "schema": "v1",
+        "ok": False,
+        "code": code,
+        "error": message,
+    }
+    return _emit_writer_response(
+        envelope,
+        status=status,
+        extra_headers=extra_headers,
+        sort_keys=sort_keys,
+    )
 
 
 def _json_content_type_ok(header_value: str | None) -> bool:
@@ -349,6 +369,49 @@ def get_reader_bp(emit_fn=None):
     def reader_v1_post():
         # Explicit POST posture: typed JSON error, no-store, no ETag
         return _error("method_not_allowed", 405)
+
+    def _rails_state() -> str:
+        safe_mode = os.getenv("SAFE_MODE", "1")
+        allow_network = os.getenv("ALLOW_NETWORK", "0")
+        return "open" if safe_mode == "0" and allow_network == "1" else "closed"
+
+    def _rails_env_snapshot() -> dict[str, str]:
+        def _value(key: str) -> str:
+            value = os.getenv(key)
+            return value if value is not None else "unset"
+
+        return {
+            "SAFE_MODE": _value("SAFE_MODE"),
+            "ALLOW_NETWORK": _value("ALLOW_NETWORK"),
+            "APP_ENV": _value("APP_ENV"),
+        }
+
+    def _rails_refusal_response() -> Response:
+        return _writer_error("rails_closed", status=503, sort_keys=False)
+
+    @bp.route("/ops/rails/refusal", methods=["GET", "POST"])
+    def ops_rails_refusal():
+        g._log_override = {"route": "ops.rails.refusal"}
+        with NoIoGuard() as guard:
+            resp = _rails_refusal_response()
+        g._no_io_attempts = guard.attempts
+        return resp
+
+    @bp.route("/ops/probe/env", methods=["GET"])
+    def ops_probe_env():
+        g._log_override = {"route": "ops.probe.env"}
+        probe_token = os.getenv("RESTART_PROBE_TOKEN")
+        payload = {
+            "pid": _PROCESS_PID,
+            "started_at_utc": _PROCESS_STARTED_AT.replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+            "rails_state": _rails_env_snapshot(),
+            "probe_token_present": bool(probe_token),
+        }
+        body, _ = emit_compact_json(payload, sort_keys=False)
+        resp = Response(body, status=200, mimetype="application/json; charset=utf-8")
+        resp.headers["Cache-Control"] = "no-store"
+        resp.headers.pop("ETag", None)
+        return resp
 
     def _error(token: str, code: int = 400):
         body_bytes, _ = emit_compact_json({'error': token})
