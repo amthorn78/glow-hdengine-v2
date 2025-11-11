@@ -1,0 +1,7 @@
+--- SNAPSHOT ---
+path: docs/addenda/BN-20251107-K-mirror-role-mapping-sort.md
+sha256: 7deb4aa76e25aa89e674df830adf3546f3bcd0b25374d1eeddb6ba9604d74adf
+size_bytes: 26
+mtime_utc: 2025-11-11T02:03:39Z
+
+(Your Addendum K content)

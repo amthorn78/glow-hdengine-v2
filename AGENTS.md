@@ -23,6 +23,13 @@
   - Validation: strict `Content-Type` (diagnostic empty-body exempt); 400 invalid JSON; 422 unknown_key / invalid_input; 413 ≥ 32 768 bytes.  
   - Auth: `Authorization: Bearer` with `admin:write` (401/403 split).  
   - Idempotence: preimage `{method, writer_route_id, canonical_request_body}`; sha256 lowercase hex; duplicate returns same status.
+- **Aux (EPIC-010)**:
+  - Text: **200** text/plain with quoted strong `ETag` over LF body; `Vary: Authorization, Accept-Encoding`.
+  - Suppression: **200 empty** and **no `ETag`** (may include policy header).
+  - Evidence expected in this repo: `tests/transport/headers/aux_text_200.snap`, `tests/transport/headers/aux_suppression_200.snap`, and `audit/gates/narratives/keys_10x4.table.json`.
+  - **Do not** add Aux HEAD/304 captures in this epic (A7 proofs are Catalog-only, different epic).
+
+
 
 ## Evidence & artifact paths
 - Machine mirror index: artifacts/evidence_index.jsonl (PF12 keys; one JSON object per line).
@@ -36,6 +43,7 @@
 - Do capture refusal evidence as a single file: lower-case header names → one blank line → frozen body (LF).
 - Do treat **env-matrix** as **selection-only** (no DB connectivity); snapshots choose `DATABASE_URL` or `DB_BRIDGE_URL` and freeze the failure envelope.
 - Do implement **connection-time fallback** for DB posture scripts: try `DATABASE_URL`, then fall back to **Postgres-scheme** `DB_BRIDGE_URL`; fail fast if both are unusable.
+- Do ensure compat/admin preview reuses the shared presenter/emitter when text output is required; ids-only preview is allowed for suppressed outcomes.
 - Don’t log request/response bodies or headers; redact emails/UUIDs/≥32-hex except allow-list {release_id, idempotence_hash, invocation_tag}.
 
 Referenced repo paths

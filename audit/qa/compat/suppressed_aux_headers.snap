@@ -1,0 +1,10 @@
+HTTP/1.1 200 OK
+Content-Type: text/plain; charset=utf-8
+Content-Length: 0
+Cache-Control: no-store
+Vary: Authorization, Accept-Encoding
+X-Narrative-Pack-Sha: 64e17c9c4d608f4feceedc16e43bff44e7a34208b2f32ebe49c81a8ee6ddc462
+X-Narrative-Composition: alignment.cool.personal.1
+X-Narrative-Key: alignment.cool.personal.1
+X-Narrative-Policy: duplicate
+

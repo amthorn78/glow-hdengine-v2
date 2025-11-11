@@ -1,0 +1,7 @@
+--- SNAPSHOT ---
+path: docs/evidence/INDEX.sha256
+sha256: d22878a346f1e614b28a5b742e4d0e396af158ff56868208e348b09cb05e7382
+size_bytes: 65
+mtime_utc: 2025-11-11T03:27:35Z
+
+640b98f1b31c00e3f8449ddfca4adf788a356ea511a1d9963a53902c0fec8bd6

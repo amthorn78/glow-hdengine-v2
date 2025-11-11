@@ -1,0 +1,13 @@
+--- SNAPSHOT ---
+path: docs/validation-writers.md
+sha256: 37f2019fe6c2e5cf4041d527c25d376c8a0055f8aee12343cf0201e27851cc1c
+size_bytes: 260
+mtime_utc: 2025-11-11T02:03:39Z
+
+# Writer Request Validation (EPIC-008)
+
+- Require `Content-Type: application/json; charset=utf-8` (diagnostic empty-body exempt)
+- 415 invalid content type
+- 400 invalid JSON/UTF-8/BOM
+- 422 unknown_key / invalid_input
+- Size cap: 32 768 bytes pre-parse (413)

@@ -1,5 +1,20 @@
 # CHANGELOG
 
+2025-11-11 — EPIC-010: Aux Narrative Surface (single PR)
+
+### Added
+- **Sealed narrative pack** under `catalog/narratives/{keys.json,templates.json,palettes.json,suppression_map.json,manifest.json}` with one `.sha256` sidecar per file; `pack_sha` = sha256 over canonical `manifest.json`.
+- **Loader mount** at `/narratives/<pack_sha>/…` (verify → atomic swap; **no DB on hot path**).
+- **Keys-only router & composer**: deterministic routing `(category, band, perspective, viewer_top, flags)` → `{personal_key, shared_key}`; tuple validation; **echo** `pack_sha` & `composition_id`.
+- **Aux narrative surface**: `GET /aux/narrative` returns **200 text/plain** + quoted strong `ETag` on text; **200 empty/no-ETag** on suppression.
+- **Evidence** (same PR): 10×4 coverage at `audit/gates/narratives/keys_10x4.table.json`; two Aux header snapshots at `tests/transport/headers/aux_text_200.snap` and `tests/transport/headers/aux_suppression_200.snap`; Human Index + Machine Mirror updated.
+
+### Tokens (PASS)
+JSON_CANONICAL_CHECK_OK · PACK_SHA256_SIDECARS_OK · PACKS_MANIFEST_OK · NARR_PACK_IDENTITY_OK ·
+NARR_ROUTER_KEYS_ONLY_OK · NARR_DETERMINISM_OK · NARR_AB_BA_COHERENCE_OK · COMPOSE_IDS_DETERMINISM_OK ·
+NARR_200_TEXT_OK · NARR_SUPPRESSED_NO_ETAG_OK · NARR_REGISTRY_CLOSURE_OK ·
+EVIDENCE_INDEX_UPDATED_OK · EVIDENCE_INDEX_HASH_OK · EVIDENCE_INDEX_MIRROR_OK · EVIDENCE_PATHS_VALIDATED_OK
+
 2025-11-07 — EPIC-009: Ops Safety & DB Runtime Posture
 
 ### Added

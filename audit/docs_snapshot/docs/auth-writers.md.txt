@@ -1,0 +1,12 @@
+--- SNAPSHOT ---
+path: docs/auth-writers.md
+sha256: 40d730de1beda0aa721553997e41872dcdaec79627988ce78be4f60edc1469a7
+size_bytes: 268
+mtime_utc: 2025-11-11T02:03:39Z
+
+# Writers Auth Boundary (EPIC-008)
+
+- Scheme: `Authorization: Bearer`
+- Scope: `admin:write`
+- 401: `{"ok":false,"schema":"v1","code":"unauthorized","error":"authorization required"}`
+- 403: `{"ok":false,"schema":"v1","code":"forbidden","error":"insufficient scope"}`

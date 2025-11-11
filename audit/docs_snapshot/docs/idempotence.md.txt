@@ -1,0 +1,12 @@
+--- SNAPSHOT ---
+path: docs/idempotence.md
+sha256: b343e4a87db9f360a76f75e1cb83d134054eda36bb0242fe63722ed2026da9f0
+size_bytes: 313
+mtime_utc: 2025-11-11T02:03:39Z
+
+# Idempotent Writes (EPIC-008)
+
+Preimage: `{method:"POST", writer_route_id:"ops.writer.diagnostic.v1", canonical_request_body}`  
+Digest: lowercase sha256 hex (64)  
+Storage: `hde.idempotent_writes (idempotence_hash, canonical_bytes, canonical_json, created_at)`  
+Duplicate-policy: same status as first success.
