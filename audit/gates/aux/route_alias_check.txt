@@ -1,0 +1,7 @@
+GET http://127.0.0.1:5000/api/aux/narrative?v=1
+GET http://127.0.0.1:5000/aux/narrative?v=1
+byte_identical: true
+status: 200
+Content-Type: text/plain; charset=utf-8
+ETag: "e4a96e2bff6638158d95833660899525cbe0e124c84544b52942e3eb79fb69c9"
+Vary: Authorization, Accept-Encoding

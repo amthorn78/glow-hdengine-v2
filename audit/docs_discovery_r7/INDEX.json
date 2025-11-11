@@ -1,0 +1,7 @@
+[
+  {"path":"README.md","lineno":12,"excerpt":"## Aux Narrative (EPIC-010)"},
+  {"path":"README.md","lineno":293,"excerpt":"## Aux Narrative (EPIC-010 — text surface)"},
+  {"path":"README.md","lineno":294,"excerpt":"**Endpoint:** `GET /aux/narrative`"},
+  {"path":"audit/qa/compat/suppressed_aux_headers.snap","lineno":9,"excerpt":"X-Narrative-Policy: duplicate"},
+  {"path":"docs/EVIDENCE_INDEX.md","lineno":31,"excerpt":"## Aux Narrative (EPIC-010) — Evidence"}
+]

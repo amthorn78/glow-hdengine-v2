@@ -1,0 +1,10 @@
+GET /api/aux/narrative?v=1&category=harmony&band=Cool&perspective=shared&families_fired=z&families_fired=a&release_id=0000000000000000000000000000000000000000000000000000000000000000&pack_sha=64e17c9c4d608f4feceedc16e43bff44e7a34208b2f32ebe49c81a8ee6ddc462
+GET /aux/narrative?v=1&category=harmony&band=Cool&perspective=shared&families_fired=z&families_fired=a&release_id=0000000000000000000000000000000000000000000000000000000000000000&pack_sha=64e17c9c4d608f4feceedc16e43bff44e7a34208b2f32ebe49c81a8ee6ddc462
+byte_identical: true
+status: 200
+headers:
+  Content-Type: text/plain; charset=utf-8
+  ETag: (absent)
+  Vary: Authorization, Accept-Encoding
+  X-Narrative-Policy: suppressed
+internal_policy_reason: policy_reason:"conflict"

@@ -1,0 +1,13 @@
+/api/aux/narrative?v=1
+/aux/narrative?v=1
+byte_identical: true
+text_response:
+  status: 200
+  headers:
+    X-Narrative-Pack-Sha: 64e17c9c4d608f4feceedc16e43bff44e7a34208b2f32ebe49c81a8ee6ddc462
+    X-Narrative-Composition: harmony.cool.shared.1
+suppressed_response:
+  status: 200
+  headers:
+    X-Narrative-Pack-Sha: 64e17c9c4d608f4feceedc16e43bff44e7a34208b2f32ebe49c81a8ee6ddc462
+    X-Narrative-Composition: missing_narrative_key

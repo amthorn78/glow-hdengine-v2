@@ -1,0 +1,5 @@
+env: LC_ALL=C, LANG=C, TZ=UTC
+routes: /api/aux/narrative?v=1, /aux/narrative?v=1
+text_two_run_identical: true
+suppressed_two_run_identical: true
+header_subset_equal: [Content-Type, ETag(Text only), Vary, X-Narrative-Pack-Sha, X-Narrative-Composition]
