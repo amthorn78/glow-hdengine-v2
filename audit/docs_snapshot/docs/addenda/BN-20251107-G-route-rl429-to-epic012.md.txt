@@ -1,0 +1,7 @@
+--- SNAPSHOT ---
+path: docs/addenda/BN-20251107-G-route-rl429-to-epic012.md
+sha256: 49d174d46e170749a378f8cf407b0810050b87e1284344c4c4433eb304dfef0c
+size_bytes: 48
+mtime_utc: 2025-11-11T02:03:39Z
+
+(Your Addendum G content from my prior message)

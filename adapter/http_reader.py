@@ -7,6 +7,7 @@ from threading import Lock
 from engine.presenter.emitter import emit_compact_json
 from engine.serializer import canon
 from engine.runtime import emit_reader_public_bytes
+from engine.narratives import compose_text, get_pack
 from adapter.no_io_guard import NoIoGuard
 
 _PROCESS_STARTED_AT = datetime.now(timezone.utc)
@@ -20,6 +21,16 @@ def _set_reader_200_headers(resp: Response) -> Response:
     resp.headers["Cache-Control"] = "private, max-age=0, must-revalidate"
     resp.headers["Vary"] = "Authorization, Accept-Encoding"
     return resp
+
+
+def _collect_query_values(name: str) -> list[str]:
+    values = [item.strip() for item in request.args.getlist(name) if item.strip()]
+    if values:
+        return values
+    raw = request.args.get(name)
+    if not raw:
+        return []
+    return [part.strip() for part in raw.split(",") if part.strip()]
 
 _MAX_WRITER_BYTES = 32_768
 _DIAGNOSTIC_ROUTE_ID = "ops.writer.diagnostic.v1"
@@ -365,6 +376,55 @@ def get_reader_bp(emit_fn=None):
         _set_reader_200_headers(resp)
         return resp, 200
 
+    @bp.get("/aux/narrative")
+    def aux_narrative():
+        g._log_override = {"route": "aux_narrative"}
+        pack = get_pack()
+        category = request.args.get("category", "")
+        band = request.args.get("band", "")
+        perspective = request.args.get("perspective", "shared")
+        viewer_top = request.args.get("viewer_top") or None
+        flags = _collect_query_values("flags") or _collect_query_values("flag")
+        families = _collect_query_values("families_fired")
+        release_id = request.args.get("release_id", "")
+        requested_pack_sha = request.args.get("pack_sha", "")
+
+        result = compose_text(
+            category=category,
+            band=band,
+            perspective=perspective,
+            viewer_top=viewer_top,
+            flags=flags,
+            families_fired=families,
+            release_id=release_id,
+            pack_sha=requested_pack_sha,
+        )
+
+        headers = {
+            "Content-Type": "text/plain; charset=utf-8",
+            "X-Narrative-Pack-Sha": pack.pack_sha,
+            "X-Narrative-Composition": result.composition_id,
+            "X-Narrative-Key": result.key,
+            "Vary": "Authorization, Accept-Encoding",
+        }
+
+        if result.ok and result.text is not None:
+            body_bytes = (result.text + "\n").encode("utf-8")
+            resp = Response(body_bytes, status=200, mimetype="text/plain; charset=utf-8")
+            resp.headers.update(headers)
+            resp.headers["Cache-Control"] = "private, max-age=0, must-revalidate"
+            digest = _sha256_hex(body_bytes)
+            resp.set_etag(digest)
+            resp.headers["ETag"] = f'"{digest}"'
+        else:
+            resp = Response(b"", status=200, mimetype="text/plain; charset=utf-8")
+            resp.headers.update(headers)
+            resp.headers["Cache-Control"] = "no-store"
+            resp.headers.pop("ETag", None)
+            resp.headers["X-Narrative-Policy"] = result.policy_reason or "suppressed"
+
+        return resp
+
     @bp.post("/reader")
     def reader_v1_post():
         # Explicit POST posture: typed JSON error, no-store, no ETag
@@ -556,16 +616,10 @@ def create_app():
     @app.after_request
     def _strip_etag_on_internal(resp):
         # governance: no ETag on /internal/* surfaces
-        try:
-            if resp.headers.get("ETag") and resp.request and resp.request.path.startswith("/internal/"):
-                del resp.headers["ETag"]
-        except Exception:
-            # safest behavior: ensure no ETag
-            if "ETag" in resp.headers: del resp.headers["ETag"]
-        try:
-            req_path = resp.request.path if resp.request else ""
-        except Exception:
-            req_path = ""
+        req = getattr(resp, "request", None)
+        req_path = getattr(req, "path", "")
+        if req_path.startswith("/internal/") and resp.headers.get("ETag"):
+            resp.headers.pop("ETag", None)
         if req_path == "/ops/writer/diagnostic" and resp.status_code in (204, 405):
             resp.headers["Content-Length"] = resp.headers.get("Content-Length", "0") or "0"
         return resp

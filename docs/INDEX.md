@@ -3,6 +3,8 @@
 ### Acceptance & evidence
 - Evidence Index (human): `docs/EVIDENCE_INDEX.md`
 - Evidence Index (machine): `artifacts/evidence_index.jsonl`
+- Aux (EPIC-010): `audit/gates/narratives/keys_10x4.table.json`,
+  `tests/transport/headers/aux_text_200.snap`, `tests/transport/headers/aux_suppression_200.snap`
 - EPIC006 acceptance: run `LC_ALL=C TZ=UTC pytest -q -m epic006`
 
 This repo contains implementation docs. Canon (spec/process) lives in PF documents; reference **titles only**:
@@ -25,6 +27,7 @@ This repo contains implementation docs. Canon (spec/process) lives in PF documen
 ### Acceptance crib
 - Reader (EPIC-004): `docs/acceptance/reader_a7_crib.md`
 - Internal Ops (EPIC-005): `docs/acceptance/http_transport_evidence.md`
+  *(Aux transport is scoped in EPIC-010; A7 proofs remain Catalog-only in a later epic.)*
 
 ### Evidence Index (EPIC-005)
 - `docs/EVIDENCE_INDEX.md`

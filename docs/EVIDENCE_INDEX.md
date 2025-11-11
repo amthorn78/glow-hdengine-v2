@@ -28,6 +28,11 @@
 * `docs/evidence/INDEX.sha256`
 * `artifacts/evidence_index.jsonl`
 
+## Aux Narrative (EPIC-010) — Evidence
+* `audit/gates/narratives/keys_10x4.table.json`
+* `tests/transport/headers/aux_text_200.snap`
+* `tests/transport/headers/aux_suppression_200.snap`
+
 ---
 
 # Appendix-D — Evidence Index (EPIC-007)

@@ -1,0 +1,7 @@
+--- SNAPSHOT ---
+path: docs/addenda/BN-20251107-J-close-pack-hygiene.md
+sha256: 76327dbc76da7e1ca09dd972255d02397881d2ec9d4809874aca94221031e15f
+size_bytes: 26
+mtime_utc: 2025-11-11T02:03:39Z
+
+(Your Addendum J content)

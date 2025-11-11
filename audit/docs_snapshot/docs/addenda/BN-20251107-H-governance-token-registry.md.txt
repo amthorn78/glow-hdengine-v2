@@ -1,0 +1,7 @@
+--- SNAPSHOT ---
+path: docs/addenda/BN-20251107-H-governance-token-registry.md
+sha256: 78455dbfc42bc4ba05404ef0cece67d6b5cc04c85b1c386a1b400c5e0f7eb3ef
+size_bytes: 26
+mtime_utc: 2025-11-11T02:03:39Z
+
+(Your Addendum H content)

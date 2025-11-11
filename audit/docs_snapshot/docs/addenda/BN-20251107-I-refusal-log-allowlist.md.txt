@@ -1,0 +1,7 @@
+--- SNAPSHOT ---
+path: docs/addenda/BN-20251107-I-refusal-log-allowlist.md
+sha256: cc8225f93181bd97255cee111f8ceb787b064a8b21c6e06099864882c0194312
+size_bytes: 26
+mtime_utc: 2025-11-11T02:03:39Z
+
+(Your Addendum I content)

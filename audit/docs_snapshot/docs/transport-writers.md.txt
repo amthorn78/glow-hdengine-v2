@@ -1,0 +1,14 @@
+--- SNAPSHOT ---
+path: docs/transport-writers.md
+sha256: b1c371125bb927d76dda1abebb5ebfcc9b1a1f3d0846dcd23d41c76b36c840b9
+size_bytes: 312
+mtime_utc: 2025-11-11T02:03:39Z
+
+# Writer Transport Contract (EPIC-008)
+
+- `Cache-Control: no-store`
+- `ETag: <absent>`
+- `Content-Encoding: <absent>`
+- Never returns 304 (conditionals ignored)
+- HEAD → 405 (no body) with `Allow: POST, OPTIONS`, `Content-Length: 0`
+- OPTIONS → 204 (no body) with `Allow: POST, OPTIONS`, `Content-Length: 0`

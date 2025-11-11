@@ -1,0 +1,7 @@
+--- SNAPSHOT ---
+path: docs/evidence/path_proof.txt
+sha256: 718c9553b7f156d5cda3fde6c9d2c50e4eba3dc349019fa09391107471c707d6
+size_bytes: 14
+mtime_utc: 2025-11-11T02:03:39Z
+
+docs/evidence

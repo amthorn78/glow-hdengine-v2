@@ -1,0 +1,7 @@
+--- SNAPSHOT ---
+path: docs/addenda/BN-20251107-L-epic009-merged-state.md
+sha256: 2551b05878bf3a2ab04e98822ea15e2fe8df0cade6b61947749efceb50f7e787
+size_bytes: 26
+mtime_utc: 2025-11-11T02:03:39Z
+
+(Your Addendum L content)
