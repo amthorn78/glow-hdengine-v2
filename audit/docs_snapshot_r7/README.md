@@ -288,6 +288,22 @@ v2.0 (2025-10-02): Adopt A7 transport (deferred to Env & Integration Plan v2.0);
 
 v1.0 (2025-10-02): Initial comprehensive README for Alpha A3–A5; A5 transport guard documented. 
 
+
+
+## Aux Narrative (EPIC-010 — text surface)
+**Endpoint:** `GET /aux/narrative`  
+**Text outcome:** `200` `text/plain; charset=utf-8`, LF-terminated body, quoted strong `ETag`, `Vary: Authorization, Accept-Encoding`, `Cache-Control: private, max-age=0, must-revalidate`.  
+**Suppressed outcome:** `200` with **empty body** and **no `ETag`** (may include `X-Narrative-Policy`).  
+**Pack identity:** sealed files are mounted at `/narratives/<pack_sha>/…`; `pack_sha` is sha256 over canonical `catalog/narratives/manifest.json`.
+
+**Evidence (this repo):**
+- `audit/gates/narratives/keys_10x4.table.json`
+- `tests/transport/headers/aux_text_200.snap`, `tests/transport/headers/aux_suppression_200.snap`
+- Human: `docs/evidence/INDEX.json` (+ `INDEX.sha256`); Machine: `artifacts/evidence_index.jsonl` (single JSONL file).
+
+**Note:** Reader v1 remains numeric-free and **narrative-free**; Aux is the only narrative text surface in EPIC-010.
+
+
 ## Status
 Reader v1 is stable. Local runs use the dev runner at dev/reader_harness/app.py (APP_ENV=dev). The canonical HTTP adapter lives at adapter/http_reader.py. The legacy server/ tree is deprecated and will be removed after consolidation.
 

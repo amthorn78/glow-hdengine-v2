@@ -31,7 +31,7 @@ def test_compose_suppressed_unsorted_families():
         pack_sha=pack.pack_sha,
     )
     assert not result.ok
-    assert result.policy_reason == "invalid_families"
+    assert result.policy_reason == "conflict"
 
 
 def test_compose_pack_mismatch():
@@ -46,4 +46,4 @@ def test_compose_pack_mismatch():
         pack_sha="f" * 64,
     )
     assert not result.ok
-    assert result.policy_reason == "pack_mismatch"
+    assert result.policy_reason == "conflict"

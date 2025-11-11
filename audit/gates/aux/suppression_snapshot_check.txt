@@ -1,0 +1,3 @@
+no_etag:true
+policy_header:suppressed
+body_empty:true

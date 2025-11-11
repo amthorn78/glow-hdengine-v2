@@ -376,6 +376,7 @@ def get_reader_bp(emit_fn=None):
         _set_reader_200_headers(resp)
         return resp, 200
 
+    @bp.get("/api/aux/narrative")
     @bp.get("/aux/narrative")
     def aux_narrative():
         g._log_override = {"route": "aux_narrative"}
@@ -421,7 +422,7 @@ def get_reader_bp(emit_fn=None):
             resp.headers.update(headers)
             resp.headers["Cache-Control"] = "no-store"
             resp.headers.pop("ETag", None)
-            resp.headers["X-Narrative-Policy"] = result.policy_reason or "suppressed"
+            resp.headers["X-Narrative-Policy"] = "suppressed"
 
         return resp
 

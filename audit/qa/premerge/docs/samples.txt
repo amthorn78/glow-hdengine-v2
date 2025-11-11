@@ -1,0 +1,16 @@
+## Aux Narrative (EPIC-010)
+- **Provenance headers:** `X-Narrative-Pack-Sha`, `X-Narrative-Composition` (emitted on both outcomes).
+- **Evidence pointers:** `tests/transport/headers/aux_text_200.snap`, `tests/transport/headers/aux_suppression_200.snap`, `audit/gates/narratives/keys_10x4.table.json`.
+- Evidence discipline: human **and** machine Evidence Indexes updated in the same change.
+      - Evidence Indexes: `docs/EVIDENCE_INDEX.md`, `audit/EVIDENCE_INDEX.jsonl`
+## QA Evidence (tangible artifacts)
+CLI (A3): Produce cli_stdout_AB.json and cli_stdout_BA.json. Evidence must show: canonical formatting (UTF-8, one LF, no BOM/ANSI), idempotence preimage hash correctness, AB↔BA byte identity, and a release_id that matches release/manifest.sorted.json.
+Reader v1 (A5): For the same pair, produce reader_AB.json and reader_BA.json (dev-only harness). Evidence must show: bytes equal the CLI, content type is JSON, APP_ENV gating and path-safety enforced.
+Transport (A7): Evidence lives in Environment & Integration Plan v2.0: strong quoted ETag equals sha256 over the final LF-terminated body (pre-compression), CSV If-None-Match strong-match behavior, 304 empty body, HEAD parity, compression invariance, and no ETag + no-store on writers/errors.
+Evidence & release identity
+**Evidence indices:** human `docs/evidence/INDEX.json` and machine `artifacts/evidence_index.jsonl` (PF12 keys, sorted).
+  - Text: **200** text/plain + quoted strong `ETag`; LF body; `Vary: Authorization, Accept-Encoding`.
+  - Suppressed: **200** empty, **no `ETag`**; optional generic `X-Narrative-Policy: suppressed`.
+  - Provenance headers on both outcomes: `X-Narrative-Pack-Sha`, `X-Narrative-Composition`.
+  - Evidence expected in this repo: `tests/transport/headers/aux_text_200.snap`, `tests/transport/headers/aux_suppression_200.snap`, `audit/gates/narratives/keys_10x4.table.json`.
+## Evidence & artifact paths
