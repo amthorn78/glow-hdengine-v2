@@ -7,7 +7,23 @@ Description-Content-Type: text/markdown
 License-File: LICENSE
 Dynamic: license-file
 
+# HD Engine dev harness repo — CLI & Reader (alpha)
+
 Glow HD Engine — README
+
+## EPIC-009 — Ops Safety & DB Runtime Posture (post-merge)
+- **Refusal (ops):** `/ops/rails/refusal` returns 503 with a typed JSON body, `Cache-Control: no-store`, **no ETag**, and no vendor I/O.
+- **Keys-only logs:** refusal route logs exactly `{at, route, status, duration_ms, idempotence_hash, release_id}` (no bodies/headers/secrets).
+- **Env-matrix snapshots:** selection-only evidence (success chooses `DATABASE_URL` or `DB_BRIDGE_URL`, failure is typed—no DB connectivity here).
+- **DB posture:** scripts use connection-time fallback (try `DATABASE_URL`, fall back to **Postgres DSN** `DB_BRIDGE_URL`); evidence includes `search_path`, **grants** (present-even-empty ADP), normalized **DDL fingerprint**, and migration **two-run identity**.
+- **QA quick run:** `scripts/qa/epic009_precommit.sh` → expect **QA_OK** and report at `artifacts/qa/epic009_precommit_report.json`.
+
+## Aux Narrative (EPIC-010)
+- **Route & alias:** `GET /api/aux/narrative?v=1` (canonical) and `/aux/narrative?v=1` (back-compat alias).
+- **Posture names:** Text → 200 text/plain with a quoted strong ETag, LF body, Vary; Suppressed → 200 empty, no ETag, optional generic policy header.
+- **Provenance headers:** `X-Narrative-Pack-Sha`, `X-Narrative-Composition` on both outcomes.
+- **Evidence pointers:** `tests/transport/headers/aux_text_200.snap`, `tests/transport/headers/aux_suppression_200.snap`, `audit/gates/narratives/keys_10x4.table.json`.
+- **CLI preview:** Admin `hdctl aux-preview` reuses the Aux emitter; stdout + sidecar artifacts are indexed in the Human and Machine evidence registries.
 
 ## CLI — Vendor JSON file inputs
 Examples:
@@ -155,6 +171,22 @@ Parity (MUST): public bytes are identical for AB and BA.
 Single emitter (MUST): both CLI and Reader call the same public emitter; closeouts record a provenance fingerprint for the emitter.
 
 
+### Security & Transport (Writers)
+
+Writer endpoints are governed and deterministic:
+
+- Responses: `Cache-Control: no-store`, **no ETag**, **no compression**, **never 304** (conditionals ignored).
+- Method matrix: **HEAD → 405** (no body), **OPTIONS → 204** (no body), both with `Allow: POST, OPTIONS` and `Content-Length: 0`.
+- Input validation:
+  - require `Content-Type: application/json; charset=utf-8` (diagnostic empty-body exempt)
+  - malformed JSON/UTF-8/BOM → 400; unknown key → 422; other schema violations → 422; body > 32 768 bytes → 413
+- Auth: `Authorization: Bearer` with `admin:write` scope (401/403 split).
+
+### Idempotent Writes
+
+We canonicalize request bodies (UTF-8, sorted keys, compact JSON, one trailing LF) and compute a sha256 digest over the preimage `{method, writer_route_id, canonical_request_body}`.  
+We persist the digest and canonical bytes in `hde.idempotent_writes` (created by `migrations/008_writers_auth.sql`). Duplicate requests return the same status as the first success.
+
 
 ---
 
@@ -182,6 +214,8 @@ artifacts/cards/A5/headers_BA.txt
 artifacts/cards/A5/validation.log
 
 A7 (Transport): see Environment & Integration Plan v2.0 for exact header artifacts and PASS markers.
+
+**Evidence indices:** human `docs/evidence/INDEX.json` and machine `artifacts/evidence_index.jsonl` (PF12 keys, sorted).
 
 
 
@@ -260,8 +294,6 @@ Changelog (README)
 v2.0 (2025-10-02): Adopt A7 transport (deferred to Env & Integration Plan v2.0); add contract/source-of-truth links; remove command snippets; align evidence sections with Alpha/A7 acceptance.
 
 v1.0 (2025-10-02): Initial comprehensive README for Alpha A3–A5; A5 transport guard documented. 
-
-
 
 ## Status
 Reader v1 is stable. Local runs use the dev runner at dev/reader_harness/app.py (APP_ENV=dev). The canonical HTTP adapter lives at adapter/http_reader.py. The legacy server/ tree is deprecated and will be removed after consolidation.

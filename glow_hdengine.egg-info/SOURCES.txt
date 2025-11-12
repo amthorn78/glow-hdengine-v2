@@ -11,6 +11,7 @@ adapter/factory.py
 adapter/gunicorn.conf.py
 adapter/http_reader.py
 adapter/logging_filter.py
+adapter/no_io_guard.py
 adapter/retry_after.py
 adapter/wsgi.py
 engine/__init__.py
@@ -44,6 +45,14 @@ engine/magic10/thresholds.py
 engine/mech/__init__.py
 engine/mech/compare.py
 engine/mech/helpers.py
+engine/narratives/__init__.py
+engine/narratives/composer.py
+engine/narratives/constants.py
+engine/narratives/lints.py
+engine/narratives/loader.py
+engine/narratives/preview.py
+engine/narratives/router.py
+engine/narratives/state.py
 engine/presenter/__init__.py
 engine/presenter/emitter.py
 engine/presets/loader.py
