@@ -1,0 +1,21 @@
+# EPIC-010 R7/v6.9.7 Readiness Audit
+
+| Requirement | Status | Evidence | Minimal delta to reach compliance |
+| --- | --- | --- | --- |
+| Aux transport snapshots (text & suppression) are present under `tests/transport/headers/` | PASS | `tests/transport/headers/aux_text_200.snap`, `tests/transport/headers/aux_suppression_200.snap`【F:tests/transport/headers/aux_text_200.snap†L1-L9】【F:tests/transport/headers/aux_suppression_200.snap†L1-L11】 | None |
+| Text snapshot posture: 200 text/plain, quoted strong ETag, LF body, provenance headers | PASS | `tests/transport/headers/aux_text_200.snap`【F:tests/transport/headers/aux_text_200.snap†L1-L9】 | None |
+| Suppression snapshot posture: 200 empty body, **no ETag**, generic policy header only, provenance headers | **FAIL** | Suppressed capture still emits `X-Narrative-Key` alongside provenance【F:tests/transport/headers/aux_suppression_200.snap†L1-L11】【F:adapter/http_reader.py†L404-L425】 | Stop setting `X-Narrative-Key` on suppressed responses and refresh the snapshot (adapter/http_reader.py, tests/transport/headers/aux_suppression_200.snap). |
+| `Vary: Authorization, Accept-Encoding` on text and suppressed outcomes | PASS | Transport tests and snapshots cover both outcomes【F:tests/transport/test_aux_narrative.py†L11-L66】【F:tests/transport/headers/aux_suppression_200.snap†L1-L11】 | None |
+| Canonical `/api/aux/narrative?v=1` and alias `/aux/narrative?v=1` are byte-identical | PASS | Flask tests and pre-merge parity proof confirm identical status/body/headers【F:tests/transport/test_aux_narrative.py†L71-L153】【F:audit/qa/premerge/routes/route_probe.json†L1-L5】 | None |
+| Provenance headers (`X-Narrative-Pack-Sha`, `X-Narrative-Composition`) on both outcomes | PASS | Provenance assertion and suppression posture capture show headers【F:audit/qa/premerge/provenance/echo_assert.json†L1-L3】【F:audit/qa/premerge/suppression/posture_headers.txt†L1-L9】 | None |
+| Public Aux handler limited to public tuple (category, band, perspective) | **FAIL** | Handler still requires `families_fired`, `release_id`, and `pack_sha` query params【F:adapter/http_reader.py†L383-L402】 | Relax handler to ignore the extra parameters on the public surface and update tests/proofs accordingly (adapter/http_reader.py, tests/transport/test_aux_narrative.py, audit/qa/premerge/route artifacts). |
+| CLI preview command & artifacts indexed | **FAIL** | CLI exposes only `showcompat`; no Aux preview flow or indexed artifacts【F:engine/cli/main.py†L38-L74】 | Add an Aux preview command (e.g., `hdctl aux-preview`) and capture/index its artifacts (engine/cli/main.py, scripts/hdctl.py, docs/evidence/INDEX.json). |
+| 10×4 coverage table present and populated | PASS | Coverage summary affirms 40 shared/personal entries【F:audit/qa/premerge/coverage/summary.json†L1-L1】 | None |
+| Acceptance tests cover Aux transport tokens (text, suppression, alias parity, determinism) | PASS | Parametrized transport tests exercise success, suppression, alias identity, two-run determinism【F:tests/transport/test_aux_narrative.py†L11-L153】 | None |
+| Docs evidence index + sha sentinel updated with Aux artifacts | PASS | Index lists Aux evidence and sha256 sentinel verifies【F:docs/evidence/INDEX.json†L1-L33】【F:docs/evidence/INDEX.sha256†L1-L1】【F:audit/qa/premerge/indices/human_assert.json†L1-L1】 | None |
+| Machine mirror discipline: single JSONL file, schema/order enforced, proof anchors present | PASS | Mirror audit asserts single-file schema, targeted records, unknown-key rejection【F:audit/qa/premerge/indices/mirror_assert.json†L1-L1】【F:artifacts/evidence_index.jsonl†L1-L33】 | None |
+| Observability logs are keys-only (token OBS_KEYS_ONLY_OK) | PASS | Pre-commit QA script enforces keys-only log shape and records pass token【F:scripts/qa/epic009_precommit.sh†L74-L109】【F:artifacts/qa/epic009_precommit_report.json†L1-L1】 | None |
+
+## Notes
+- Optional CLI preview indexing is marked **N/A** in the machine summary until a preview flow exists.
+- Per-reason Aux suppression headers (`X-Narrative-Policy: duplicate`) persist in compat captures and should be removed alongside the suppression header fix to align with EPIC-010 posture.【F:audit/qa/compat/suppressed_aux_headers.snap†L1-L10】

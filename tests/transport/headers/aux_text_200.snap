@@ -1,9 +1,8 @@
-Status: 200
-Content-Type: text/plain; charset=utf-8
-ETag: "e4a96e2bff6638158d95833660899525cbe0e124c84544b52942e3eb79fb69c9"
-Vary: Authorization, Accept-Encoding
-X-Narrative-Pack-Sha: 64e17c9c4d608f4feceedc16e43bff44e7a34208b2f32ebe49c81a8ee6ddc462
-X-Narrative-Composition: harmony.cool.shared.1
-Body:
+status: 200
+content-type: text/plain; charset=utf-8
+etag: "e4a96e2bff6638158d95833660899525cbe0e124c84544b52942e3eb79fb69c9"
+vary: authorization, accept-encoding
+x-narrative-pack-sha: 64e17c9c4d608f4feceedc16e43bff44e7a34208b2f32ebe49c81a8ee6ddc462
+x-narrative-composition: harmony.cool.shared.1
+body:
 Together you feel calm and even. The pace is kind and unforced.
-

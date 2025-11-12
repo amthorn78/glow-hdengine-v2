@@ -23,12 +23,12 @@
   - Validation: strict `Content-Type` (diagnostic empty-body exempt); 400 invalid JSON; 422 unknown_key / invalid_input; 413 ≥ 32 768 bytes.  
   - Auth: `Authorization: Bearer` with `admin:write` (401/403 split).  
   - Idempotence: preimage `{method, writer_route_id, canonical_request_body}`; sha256 lowercase hex; duplicate returns same status.
-- **Aux (EPIC-010)**:
-  - Text: **200** text/plain + quoted strong `ETag`; LF body; `Vary: Authorization, Accept-Encoding`.
-  - Suppressed: **200** empty, **no `ETag`**; optional generic `X-Narrative-Policy: suppressed`.
-  - Provenance headers on both outcomes: `X-Narrative-Pack-Sha`, `X-Narrative-Composition`.
-  - Evidence expected in this repo: `tests/transport/headers/aux_text_200.snap`, `tests/transport/headers/aux_suppression_200.snap`, `audit/gates/narratives/keys_10x4.table.json`.
-  - **Do not** add Aux HEAD/304 captures in this epic (A7 proofs are Catalog-only, different epic).
+- **Aux (EPIC-010) checklist:**
+  - Route & alias: `GET /api/aux/narrative?v=1` (canonical) and `/aux/narrative?v=1` (BC alias).
+  - Posture names: Text → 200 text/plain with quoted strong ETag, LF body, Vary; Suppressed → 200 empty, no ETag, optional generic policy header.
+  - Provenance headers: `X-Narrative-Pack-Sha`, `X-Narrative-Composition` on both outcomes.
+  - Evidence pointers: `tests/transport/headers/aux_text_200.snap`, `tests/transport/headers/aux_suppression_200.snap`, `audit/gates/narratives/keys_10x4.table.json`.
+  - Guard: no Aux HEAD/304 captures in this epic; Catalog/A7 proofs live elsewhere.
 
 
 

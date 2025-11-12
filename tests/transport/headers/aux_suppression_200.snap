@@ -1,11 +1,10 @@
-Status: 200
-Content-Type: text/plain; charset=utf-8
-Content-Length: 0
-X-Narrative-Pack-Sha: 64e17c9c4d608f4feceedc16e43bff44e7a34208b2f32ebe49c81a8ee6ddc462
-X-Narrative-Composition: missing_narrative_key
-X-Narrative-Key: missing_narrative_key
-Vary: Authorization, Accept-Encoding
-Cache-Control: no-store
-X-Narrative-Policy: suppressed
-Body:
+status: 200
+cache-control: no-store
+content-length: 0
+content-type: text/plain; charset=utf-8
+vary: authorization, accept-encoding
+x-narrative-composition: alignment.cool.personal.1
+x-narrative-pack-sha: 64e17c9c4d608f4feceedc16e43bff44e7a34208b2f32ebe49c81a8ee6ddc462
+x-narrative-policy: suppressed
+body:
 

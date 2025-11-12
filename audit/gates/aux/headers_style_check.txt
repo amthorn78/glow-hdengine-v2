@@ -1,0 +1,3 @@
+vary_on_text:true
+vary_on_suppressed:true
+headers_lowercase:true

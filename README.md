@@ -10,13 +10,11 @@ Glow HD Engine — README
 - **QA quick run:** `scripts/qa/epic009_precommit.sh` → expect **QA_OK** and report at `artifacts/qa/epic009_precommit_report.json`.
 
 ## Aux Narrative (EPIC-010)
-- **Route:** Canonical `GET /api/aux/narrative?v=1` with `/aux/narrative?v=1` preserved as a backward-compatibility alias (byte-identical handler).
-- **Posture:**
-  - Text responses return **200 text/plain** with a quoted strong `ETag` computed over the LF-terminated body (`Vary: Authorization, Accept-Encoding`).
-  - Suppressed responses return **200** with an empty body and **no `ETag`**; the optional generic header `X-Narrative-Policy: suppressed` appears only on suppressed outcomes.
-- **Provenance headers:** `X-Narrative-Pack-Sha`, `X-Narrative-Composition` (emitted on both outcomes).
+- **Route & alias:** `GET /api/aux/narrative?v=1` (canonical) and `/aux/narrative?v=1` (back-compat alias).
+- **Posture names:** Text → 200 text/plain with a quoted strong ETag, LF body, Vary; Suppressed → 200 empty, no ETag, optional generic policy header.
+- **Provenance headers:** `X-Narrative-Pack-Sha`, `X-Narrative-Composition` on both outcomes.
 - **Evidence pointers:** `tests/transport/headers/aux_text_200.snap`, `tests/transport/headers/aux_suppression_200.snap`, `audit/gates/narratives/keys_10x4.table.json`.
-- **Reader note:** Reader v1 remains narrative-free; Aux is the only narrative text surface in EPIC-010.
+- **CLI preview:** Admin `hdctl aux-preview` reuses the Aux emitter; stdout + sidecar artifacts are indexed in the Human and Machine evidence registries.
 
 ## CLI — Vendor JSON file inputs
 Examples:
