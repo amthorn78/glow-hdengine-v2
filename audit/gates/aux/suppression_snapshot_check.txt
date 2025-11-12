@@ -1,3 +1,4 @@
 no_etag:true
-policy_header:suppressed
+policy_header:suppressed|absent
 body_empty:true
+headers_lowercase:true

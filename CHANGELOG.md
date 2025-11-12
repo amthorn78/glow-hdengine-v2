@@ -195,6 +195,12 @@ One-page, command-free acceptance checklist names and artifact expectations for 
 
 
 
+## 2025-10-30 — EPIC-010 (R7) Aux Narrative readiness
+- Transport fixes: suppressed posture stays generic with no ETag.
+- Vary confirmed on text and suppressed outcomes; canonical/alias routes remain byte-identical.
+- CLI harness `hdctl aux-preview` shares the Aux emitter and its stdout + sidecar artifacts are indexed.
+- Human and Machine evidence indices stay in parity with a single JSONL mirror and proof_anchor discipline.
+
 ---
 
 2025-10-01 — Alpha docs/playbooks refresh (v1.2)

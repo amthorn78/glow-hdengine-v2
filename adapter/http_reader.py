@@ -7,7 +7,7 @@ from threading import Lock
 from engine.presenter.emitter import emit_compact_json
 from engine.serializer import canon
 from engine.runtime import emit_reader_public_bytes
-from engine.narratives import compose_text, get_pack
+from engine.narratives import emit_public_aux, get_pack
 from adapter.no_io_guard import NoIoGuard
 
 _PROCESS_STARTED_AT = datetime.now(timezone.utc)
@@ -386,11 +386,11 @@ def get_reader_bp(emit_fn=None):
         perspective = request.args.get("perspective", "shared")
         viewer_top = request.args.get("viewer_top") or None
         flags = _collect_query_values("flags") or _collect_query_values("flag")
-        families = _collect_query_values("families_fired")
-        release_id = request.args.get("release_id", "")
-        requested_pack_sha = request.args.get("pack_sha", "")
+        families = tuple(_collect_query_values("families_fired"))
+        release_id = request.args.get("release_id") or os.environ.get("RELEASE_ID", "0" * 64)
+        requested_pack_sha = request.args.get("pack_sha") or pack.pack_sha
 
-        result = compose_text(
+        emission = emit_public_aux(
             category=category,
             band=band,
             perspective=perspective,
@@ -404,17 +404,16 @@ def get_reader_bp(emit_fn=None):
         headers = {
             "Content-Type": "text/plain; charset=utf-8",
             "X-Narrative-Pack-Sha": pack.pack_sha,
-            "X-Narrative-Composition": result.composition_id,
-            "X-Narrative-Key": result.key,
+            "X-Narrative-Composition": emission.composition_id,
             "Vary": "Authorization, Accept-Encoding",
         }
 
-        if result.ok and result.text is not None:
-            body_bytes = (result.text + "\n").encode("utf-8")
-            resp = Response(body_bytes, status=200, mimetype="text/plain; charset=utf-8")
+        if not emission.suppressed:
+            resp = Response(emission.body, status=200, mimetype="text/plain; charset=utf-8")
             resp.headers.update(headers)
+            resp.headers["X-Narrative-Key"] = emission.key
             resp.headers["Cache-Control"] = "private, max-age=0, must-revalidate"
-            digest = _sha256_hex(body_bytes)
+            digest = _sha256_hex(emission.body)
             resp.set_etag(digest)
             resp.headers["ETag"] = f'"{digest}"'
         else:

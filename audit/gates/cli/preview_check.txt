@@ -1,0 +1,7 @@
+stdout_lf_only:true
+stdout_nonempty_text:true
+stdout_no_ansi:true
+parity_with_aux:true
+suppressed_stdout_empty:true
+sidecar_ids_only:true
+sidecar_canonical_json:true

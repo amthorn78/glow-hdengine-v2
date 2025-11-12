@@ -1,7 +1,14 @@
-GET http://127.0.0.1:5000/api/aux/narrative?v=1
-GET http://127.0.0.1:5000/aux/narrative?v=1
-byte_identical: true
+GET http://127.0.0.1:5000/api/aux/narrative?v=1&category=harmony&band=Cool&perspective=shared
+GET http://127.0.0.1:5000/aux/narrative?v=1&category=harmony&band=Cool&perspective=shared
+text_byte_identical: true
 status: 200
 Content-Type: text/plain; charset=utf-8
 ETag: "e4a96e2bff6638158d95833660899525cbe0e124c84544b52942e3eb79fb69c9"
+Vary: Authorization, Accept-Encoding
+
+GET http://127.0.0.1:5000/api/aux/narrative?v=1&category=alignment&band=Cool&perspective=a_to_b
+GET http://127.0.0.1:5000/aux/narrative?v=1&category=alignment&band=Cool&perspective=a_to_b
+suppressed_byte_identical: true
+status: 200
+body_sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
 Vary: Authorization, Accept-Encoding

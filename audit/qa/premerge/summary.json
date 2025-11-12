@@ -1,1 +1,1 @@
-{"routes_parity":true,"suppression_posture":true,"provenance_echoes":true,"determinism_two_run":true,"text_snapshot_ok":true,"coverage_10x4_ok":true,"pack_identity_ok":true,"lints_text_ok":true,"indices_parity_ok":true,"docs_currency_ok":true}
+{"cli_preview_ok":true,"coverage_10x4_ok":true,"determinism_two_run":true,"docs_currency_ok":true,"headers_lowercase":true,"indices_parity_ok":true,"provenance_echoes":true,"routes_parity":true,"suppression_posture":true,"text_snapshot_ok":true,"vary_both_outcomes":true}

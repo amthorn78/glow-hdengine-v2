@@ -24,6 +24,8 @@ from engine.constants import (
 )
 from engine.runtime import emit_reader_public_envelope
 from engine.serializer.canon import sercanon
+from engine.narratives import emit_public_aux, get_pack
+from engine.narratives.constants import BANDS as AUX_BANDS, PERSPECTIVES as AUX_PERSPECTIVES
 
 from ._admin_dump import canon_dump
 
@@ -73,6 +75,16 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Directory for admin proofs (writes 0600 JSON + .sha256 sidecars)",
     )
     show.set_defaults(handler=showcompat)
+
+    aux = sub.add_parser(
+        "aux-preview",
+        help="Preview Aux narrative text for a public tuple",
+        allow_abbrev=False,
+    )
+    aux.add_argument("--category", required=True, help="Narrative category slug")
+    aux.add_argument("--band", required=True, choices=AUX_BANDS)
+    aux.add_argument("--perspective", required=True, choices=AUX_PERSPECTIVES)
+    aux.set_defaults(handler=aux_preview)
     return parser
 
 
@@ -289,6 +301,25 @@ def _emit_admin_dumps(
     canon_dump(admin_dir / f"{case_name}.right.bodygraph.json", right)
     canon_dump(admin_dir / f"{case_name}.composite.bodygraph.json", composite)
     canon_dump(admin_dir / f"{case_name}.compat.proof.json", proof)
+
+
+def aux_preview(args: argparse.Namespace) -> int:
+    pack = get_pack()
+    release_id = os.environ.get("RELEASE_ID", "0" * 64)
+    emission = emit_public_aux(
+        category=args.category,
+        band=args.band,
+        perspective=args.perspective,
+        viewer_top=None,
+        flags=None,
+        families_fired=(),
+        release_id=release_id,
+        pack_sha=pack.pack_sha,
+    )
+
+    if not emission.suppressed:
+        sys.stdout.buffer.write(emission.body)
+    return 0
 
 
 def showcompat(_: argparse.Namespace) -> int:
