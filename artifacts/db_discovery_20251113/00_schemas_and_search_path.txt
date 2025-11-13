@@ -1,0 +1,14 @@
+                                       List of schemas
+  Name  |       Owner       |           Access privileges            |      Description       
+--------+-------------------+----------------------------------------+------------------------
+ hde    | postgres          | postgres=UC/postgres                  +| 
+        |                   | hde_rw=U/postgres                      | 
+ public | pg_database_owner | pg_database_owner=UC/pg_database_owner+| standard public schema
+        |                   | =U/pg_database_owner                   | 
+(2 rows)
+
+ search_path 
+-------------
+ hde, public
+(1 row)
+

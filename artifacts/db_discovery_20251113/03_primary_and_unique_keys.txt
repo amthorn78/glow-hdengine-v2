@@ -1,0 +1,26 @@
+ constraint_type |                         constraint_name                         | table_schema |           table_name           |                   columns                    
+-----------------+-----------------------------------------------------------------+--------------+--------------------------------+----------------------------------------------
+ PRIMARY KEY     | chart_snapshot_pkey                                             | hde          | chart_snapshot                 | id
+ UNIQUE          | chart_snapshot_user_id_release_id_key                           | hde          | chart_snapshot                 | user_id, release_id
+ PRIMARY KEY     | meta_pkey                                                       | hde          | meta                           | id
+ PRIMARY KEY     | pair_evaluation_pkey                                            | hde          | pair_evaluation                | id, evaluated_at
+ UNIQUE          | pair_evaluation_min_user_max_user_release_id_evaluated_at_key   | hde          | pair_evaluation                | min_user, max_user, release_id, evaluated_at
+ PRIMARY KEY     | pair_evaluation_pcur_pkey                                       | hde          | pair_evaluation_pcur           | id, evaluated_at
+ UNIQUE          | pair_evaluation_pcur_min_user_max_user_release_id_evaluated_key | hde          | pair_evaluation_pcur           | min_user, max_user, release_id, evaluated_at
+ PRIMARY KEY     | public_results_pkey                                             | hde          | public_results                 | id, created_at
+ PRIMARY KEY     | public_results_pcur_pkey                                        | hde          | public_results_pcur            | id, created_at
+ PRIMARY KEY     | admin_action_log_pkey                                           | public       | admin_action_log               | id
+ PRIMARY KEY     | birth_data_pkey                                                 | public       | birth_data                     | user_id
+ PRIMARY KEY     | compatibility_matrix_pkey                                       | public       | compatibility_matrix           | user_a_id, user_b_id
+ PRIMARY KEY     | email_notifications_pkey                                        | public       | email_notifications            | id
+ PRIMARY KEY     | human_design_data_pkey                                          | public       | human_design_data              | user_id
+ PRIMARY KEY     | user_preferences_pkey                                           | public       | user_preferences               | user_id
+ PRIMARY KEY     | user_priorities_pkey                                            | public       | user_priorities                | user_id
+ PRIMARY KEY     | user_profiles_pkey                                              | public       | user_profiles                  | id
+ UNIQUE          | user_profiles_user_id_key                                       | public       | user_profiles                  | user_id
+ PRIMARY KEY     | user_resonance_prefs_pkey                                       | public       | user_resonance_prefs           | user_id
+ PRIMARY KEY     | user_resonance_signals_private_pkey                             | public       | user_resonance_signals_private | user_id
+ PRIMARY KEY     | user_sessions_pkey                                              | public       | user_sessions                  | id
+ PRIMARY KEY     | users_pkey                                                      | public       | users                          | id
+(22 rows)
+

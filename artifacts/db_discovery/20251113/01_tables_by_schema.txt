@@ -1,0 +1,22 @@
+ table_schema |           table_name           | table_type 
+--------------+--------------------------------+------------
+ hde          | chart_snapshot                 | BASE TABLE
+ hde          | meta                           | BASE TABLE
+ hde          | pair_evaluation                | BASE TABLE
+ hde          | pair_evaluation_pcur           | BASE TABLE
+ hde          | public_results                 | BASE TABLE
+ hde          | public_results_pcur            | BASE TABLE
+ public       | admin_action_log               | BASE TABLE
+ public       | birth_data                     | BASE TABLE
+ public       | compatibility_matrix           | BASE TABLE
+ public       | email_notifications            | BASE TABLE
+ public       | human_design_data              | BASE TABLE
+ public       | user_preferences               | BASE TABLE
+ public       | user_priorities                | BASE TABLE
+ public       | user_profiles                  | BASE TABLE
+ public       | user_resonance_prefs           | BASE TABLE
+ public       | user_resonance_signals_private | BASE TABLE
+ public       | user_sessions                  | BASE TABLE
+ public       | users                          | BASE TABLE
+(18 rows)
+

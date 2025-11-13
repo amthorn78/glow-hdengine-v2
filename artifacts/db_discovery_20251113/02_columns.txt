@@ -1,0 +1,154 @@
+ table_schema |           table_name           |      column_name       | ordinal_position |          data_type          | is_nullable |                 column_default                  
+--------------+--------------------------------+------------------------+------------------+-----------------------------+-------------+-------------------------------------------------
+ hde          | chart_snapshot                 | id                     |                1 | uuid                        | NO          | 
+ hde          | chart_snapshot                 | user_id                |                2 | text                        | NO          | 
+ hde          | chart_snapshot                 | release_id             |                3 | text                        | NO          | 
+ hde          | chart_snapshot                 | chart_json             |                4 | jsonb                       | NO          | 
+ hde          | chart_snapshot                 | provider               |                5 | text                        | NO          | 
+ hde          | chart_snapshot                 | fingerprint            |                6 | text                        | NO          | 
+ hde          | chart_snapshot                 | computed_at            |                7 | timestamp with time zone    | NO          | now()
+ hde          | meta                           | id                     |                1 | text                        | NO          | 
+ hde          | meta                           | engine_tag             |                2 | text                        | NO          | 
+ hde          | meta                           | build_commit           |                3 | text                        | NO          | 
+ hde          | meta                           | invocation_tag         |                4 | text                        | NO          | 
+ hde          | meta                           | emitter_sha256         |                5 | text                        | NO          | 
+ hde          | meta                           | created_at             |                6 | timestamp with time zone    | NO          | now()
+ hde          | pair_evaluation                | id                     |                1 | uuid                        | NO          | 
+ hde          | pair_evaluation                | min_user               |                2 | text                        | NO          | 
+ hde          | pair_evaluation                | max_user               |                3 | text                        | NO          | 
+ hde          | pair_evaluation                | release_id             |                4 | text                        | NO          | 
+ hde          | pair_evaluation                | bands_json             |                5 | jsonb                       | NO          | 
+ hde          | pair_evaluation                | internal_json          |                6 | jsonb                       | YES         | 
+ hde          | pair_evaluation                | idempotence_hash       |                7 | text                        | NO          | 
+ hde          | pair_evaluation                | evaluated_at           |                8 | timestamp with time zone    | NO          | now()
+ hde          | pair_evaluation_pcur           | id                     |                1 | uuid                        | NO          | 
+ hde          | pair_evaluation_pcur           | min_user               |                2 | text                        | NO          | 
+ hde          | pair_evaluation_pcur           | max_user               |                3 | text                        | NO          | 
+ hde          | pair_evaluation_pcur           | release_id             |                4 | text                        | NO          | 
+ hde          | pair_evaluation_pcur           | bands_json             |                5 | jsonb                       | NO          | 
+ hde          | pair_evaluation_pcur           | internal_json          |                6 | jsonb                       | YES         | 
+ hde          | pair_evaluation_pcur           | idempotence_hash       |                7 | text                        | NO          | 
+ hde          | pair_evaluation_pcur           | evaluated_at           |                8 | timestamp with time zone    | NO          | now()
+ hde          | public_results                 | id                     |                1 | uuid                        | NO          | 
+ hde          | public_results                 | release_id             |                2 | text                        | NO          | 
+ hde          | public_results                 | payload                |                3 | jsonb                       | NO          | 
+ hde          | public_results                 | created_at             |                4 | timestamp with time zone    | NO          | now()
+ hde          | public_results_pcur            | id                     |                1 | uuid                        | NO          | 
+ hde          | public_results_pcur            | release_id             |                2 | text                        | NO          | 
+ hde          | public_results_pcur            | payload                |                3 | jsonb                       | NO          | 
+ hde          | public_results_pcur            | created_at             |                4 | timestamp with time zone    | NO          | now()
+ public       | admin_action_log               | id                     |                1 | integer                     | NO          | nextval('admin_action_log_id_seq'::regclass)
+ public       | admin_action_log               | admin_user_id          |                2 | integer                     | YES         | 
+ public       | admin_action_log               | action                 |                3 | character varying           | NO          | 
+ public       | admin_action_log               | target_user_id         |                4 | integer                     | YES         | 
+ public       | admin_action_log               | details                |                5 | text                        | YES         | 
+ public       | admin_action_log               | timestamp              |                6 | timestamp without time zone | YES         | 
+ public       | birth_data                     | user_id                |                1 | integer                     | NO          | 
+ public       | birth_data                     | birth_date             |                2 | date                        | YES         | 
+ public       | birth_data                     | birth_time             |                3 | time without time zone      | YES         | 
+ public       | birth_data                     | birth_location         |                4 | character varying           | YES         | 
+ public       | birth_data                     | latitude               |                5 | numeric                     | YES         | 
+ public       | birth_data                     | longitude              |                6 | numeric                     | YES         | 
+ public       | birth_data                     | data_consent           |                7 | boolean                     | YES         | 
+ public       | birth_data                     | sharing_consent        |                8 | boolean                     | YES         | 
+ public       | birth_data                     | location_display_name  |                9 | text                        | YES         | 
+ public       | birth_data                     | location_country       |               10 | character varying           | YES         | 
+ public       | birth_data                     | location_state         |               11 | character varying           | YES         | 
+ public       | birth_data                     | location_city          |               12 | character varying           | YES         | 
+ public       | birth_data                     | location_importance    |               13 | numeric                     | YES         | 
+ public       | birth_data                     | location_osm_id        |               14 | bigint                      | YES         | 
+ public       | birth_data                     | location_osm_type      |               15 | character varying           | YES         | 
+ public       | birth_data                     | timezone               |               16 | character varying           | YES         | 
+ public       | birth_data                     | location_source        |               17 | character varying           | YES         | 'manual'::character varying
+ public       | birth_data                     | location_verified      |               18 | boolean                     | YES         | false
+ public       | compatibility_matrix           | user_a_id              |                1 | integer                     | NO          | 
+ public       | compatibility_matrix           | user_b_id              |                2 | integer                     | NO          | 
+ public       | compatibility_matrix           | love_score             |                3 | smallint                    | YES         | 
+ public       | compatibility_matrix           | intimacy_score         |                4 | smallint                    | YES         | 
+ public       | compatibility_matrix           | communication_score    |                5 | smallint                    | YES         | 
+ public       | compatibility_matrix           | friendship_score       |                6 | smallint                    | YES         | 
+ public       | compatibility_matrix           | collaboration_score    |                7 | smallint                    | YES         | 
+ public       | compatibility_matrix           | lifestyle_score        |                8 | smallint                    | YES         | 
+ public       | compatibility_matrix           | decisions_score        |                9 | smallint                    | YES         | 
+ public       | compatibility_matrix           | support_score          |               10 | smallint                    | YES         | 
+ public       | compatibility_matrix           | growth_score           |               11 | smallint                    | YES         | 
+ public       | compatibility_matrix           | space_score            |               12 | smallint                    | YES         | 
+ public       | compatibility_matrix           | overall_score          |               13 | smallint                    | YES         | 
+ public       | compatibility_matrix           | calculated_at          |               14 | timestamp without time zone | YES         | 
+ public       | email_notifications            | id                     |                1 | integer                     | NO          | nextval('email_notifications_id_seq'::regclass)
+ public       | email_notifications            | user_id                |                2 | integer                     | YES         | 
+ public       | email_notifications            | email_type             |                3 | character varying           | NO          | 
+ public       | email_notifications            | recipient_email        |                4 | character varying           | NO          | 
+ public       | email_notifications            | subject                |                5 | character varying           | YES         | 
+ public       | email_notifications            | sent_at                |                6 | timestamp without time zone | YES         | 
+ public       | email_notifications            | delivery_status        |                7 | character varying           | YES         | 
+ public       | human_design_data              | user_id                |                1 | integer                     | NO          | 
+ public       | human_design_data              | chart_data             |                2 | text                        | YES         | 
+ public       | human_design_data              | energy_type            |                3 | character varying           | YES         | 
+ public       | human_design_data              | strategy               |                4 | character varying           | YES         | 
+ public       | human_design_data              | authority              |                5 | character varying           | YES         | 
+ public       | human_design_data              | profile                |                6 | character varying           | YES         | 
+ public       | human_design_data              | api_response           |                7 | text                        | YES         | 
+ public       | human_design_data              | calculated_at          |                8 | timestamp without time zone | YES         | 
+ public       | user_preferences               | user_id                |                1 | integer                     | NO          | 
+ public       | user_preferences               | prefs                  |                2 | json                        | YES         | 
+ public       | user_preferences               | updated_at             |                3 | timestamp without time zone | YES         | 
+ public       | user_priorities                | user_id                |                1 | integer                     | NO          | 
+ public       | user_priorities                | love_priority          |                2 | smallint                    | YES         | 
+ public       | user_priorities                | intimacy_priority      |                3 | smallint                    | YES         | 
+ public       | user_priorities                | communication_priority |                4 | smallint                    | YES         | 
+ public       | user_priorities                | friendship_priority    |                5 | smallint                    | YES         | 
+ public       | user_priorities                | collaboration_priority |                6 | smallint                    | YES         | 
+ public       | user_priorities                | lifestyle_priority     |                7 | smallint                    | YES         | 
+ public       | user_priorities                | decisions_priority     |                8 | smallint                    | YES         | 
+ public       | user_priorities                | support_priority       |                9 | smallint                    | YES         | 
+ public       | user_priorities                | growth_priority        |               10 | smallint                    | YES         | 
+ public       | user_priorities                | space_priority         |               11 | smallint                    | YES         | 
+ public       | user_profiles                  | id                     |                1 | integer                     | NO          | nextval('user_profiles_id_seq'::regclass)
+ public       | user_profiles                  | user_id                |                2 | integer                     | NO          | 
+ public       | user_profiles                  | first_name             |                3 | character varying           | YES         | 
+ public       | user_profiles                  | last_name              |                4 | character varying           | YES         | 
+ public       | user_profiles                  | bio                    |                5 | text                        | YES         | 
+ public       | user_profiles                  | age                    |                6 | integer                     | YES         | 
+ public       | user_profiles                  | profile_completion     |                7 | integer                     | YES         | 
+ public       | user_profiles                  | created_at             |                8 | timestamp without time zone | YES         | 
+ public       | user_profiles                  | updated_at             |                9 | timestamp without time zone | YES         | 
+ public       | user_profiles                  | display_name           |               10 | character varying           | YES         | 
+ public       | user_profiles                  | avatar_url             |               11 | character varying           | YES         | 
+ public       | user_resonance_prefs           | user_id                |                1 | integer                     | NO          | 
+ public       | user_resonance_prefs           | version                |                2 | integer                     | NO          | 
+ public       | user_resonance_prefs           | weights                |                3 | json                        | NO          | 
+ public       | user_resonance_prefs           | facets                 |                4 | json                        | YES         | 
+ public       | user_resonance_prefs           | created_at             |                5 | timestamp without time zone | NO          | 
+ public       | user_resonance_prefs           | updated_at             |                6 | timestamp without time zone | NO          | 
+ public       | user_resonance_signals_private | user_id                |                1 | integer                     | NO          | 
+ public       | user_resonance_signals_private | decision_mode          |                2 | character varying           | NO          | 
+ public       | user_resonance_signals_private | interaction_mode       |                3 | character varying           | NO          | 
+ public       | user_resonance_signals_private | connection_style       |                4 | character varying           | NO          | 
+ public       | user_resonance_signals_private | bridges_count          |                5 | smallint                    | NO          | 
+ public       | user_resonance_signals_private | emotion_signal         |                6 | boolean                     | NO          | 
+ public       | user_resonance_signals_private | work_energy            |                7 | boolean                     | NO          | 
+ public       | user_resonance_signals_private | will_signal            |                8 | boolean                     | NO          | 
+ public       | user_resonance_signals_private | expression_signal      |                9 | boolean                     | NO          | 
+ public       | user_resonance_signals_private | mind_signal            |               10 | boolean                     | NO          | 
+ public       | user_resonance_signals_private | role_pattern           |               11 | character varying           | NO          | 
+ public       | user_resonance_signals_private | tempo_pattern          |               12 | character varying           | YES         | 
+ public       | user_resonance_signals_private | identity_openness      |               13 | boolean                     | NO          | 
+ public       | user_resonance_signals_private | trajectory_code        |               14 | character varying           | YES         | 
+ public       | user_resonance_signals_private | confidence             |               15 | json                        | YES         | 
+ public       | user_resonance_signals_private | computed_at            |               16 | timestamp without time zone | NO          | 
+ public       | user_sessions                  | id                     |                1 | integer                     | NO          | nextval('user_sessions_id_seq'::regclass)
+ public       | user_sessions                  | user_id                |                2 | integer                     | NO          | 
+ public       | user_sessions                  | session_token          |                3 | character varying           | NO          | 
+ public       | user_sessions                  | created_at             |                4 | timestamp without time zone | YES         | 
+ public       | user_sessions                  | expires_at             |                5 | timestamp without time zone | NO          | 
+ public       | users                          | id                     |                1 | integer                     | NO          | nextval('users_id_seq'::regclass)
+ public       | users                          | email                  |                2 | character varying           | NO          | 
+ public       | users                          | password_hash          |                3 | character varying           | NO          | 
+ public       | users                          | status                 |                6 | character varying           | YES         | 
+ public       | users                          | created_at             |                7 | timestamp without time zone | YES         | 
+ public       | users                          | updated_at             |                8 | timestamp without time zone | YES         | 
+ public       | users                          | is_admin               |                9 | boolean                     | NO          | false
+ public       | users                          | profile_version        |               10 | integer                     | NO          | 1
+(150 rows)
+

@@ -1,0 +1,4 @@
+ table_schema | table_name | view_definition 
+--------------+------------+-----------------
+(0 rows)
+
