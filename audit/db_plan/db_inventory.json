@@ -1,0 +1,1921 @@
+{
+  "relationships": {
+    "foreign_keys": [
+      {
+        "constraint_name": "admin_action_log_admin_user_id_fkey",
+        "fk_columns": [
+          "admin_user_id"
+        ],
+        "fk_schema": "public",
+        "fk_table": "admin_action_log",
+        "pk_columns": [
+          "id"
+        ],
+        "pk_schema": "public",
+        "pk_table": "users"
+      },
+      {
+        "constraint_name": "admin_action_log_target_user_id_fkey",
+        "fk_columns": [
+          "target_user_id"
+        ],
+        "fk_schema": "public",
+        "fk_table": "admin_action_log",
+        "pk_columns": [
+          "id"
+        ],
+        "pk_schema": "public",
+        "pk_table": "users"
+      },
+      {
+        "constraint_name": "birth_data_user_id_fkey",
+        "fk_columns": [
+          "user_id"
+        ],
+        "fk_schema": "public",
+        "fk_table": "birth_data",
+        "pk_columns": [
+          "id"
+        ],
+        "pk_schema": "public",
+        "pk_table": "users"
+      },
+      {
+        "constraint_name": "compatibility_matrix_user_a_id_fkey",
+        "fk_columns": [
+          "user_a_id"
+        ],
+        "fk_schema": "public",
+        "fk_table": "compatibility_matrix",
+        "pk_columns": [
+          "id"
+        ],
+        "pk_schema": "public",
+        "pk_table": "users"
+      },
+      {
+        "constraint_name": "compatibility_matrix_user_b_id_fkey",
+        "fk_columns": [
+          "user_b_id"
+        ],
+        "fk_schema": "public",
+        "fk_table": "compatibility_matrix",
+        "pk_columns": [
+          "id"
+        ],
+        "pk_schema": "public",
+        "pk_table": "users"
+      },
+      {
+        "constraint_name": "email_notifications_user_id_fkey",
+        "fk_columns": [
+          "user_id"
+        ],
+        "fk_schema": "public",
+        "fk_table": "email_notifications",
+        "pk_columns": [
+          "id"
+        ],
+        "pk_schema": "public",
+        "pk_table": "users"
+      },
+      {
+        "constraint_name": "human_design_data_user_id_fkey",
+        "fk_columns": [
+          "user_id"
+        ],
+        "fk_schema": "public",
+        "fk_table": "human_design_data",
+        "pk_columns": [
+          "id"
+        ],
+        "pk_schema": "public",
+        "pk_table": "users"
+      },
+      {
+        "constraint_name": "user_preferences_user_id_fkey",
+        "fk_columns": [
+          "user_id"
+        ],
+        "fk_schema": "public",
+        "fk_table": "user_preferences",
+        "pk_columns": [
+          "id"
+        ],
+        "pk_schema": "public",
+        "pk_table": "users"
+      },
+      {
+        "constraint_name": "user_priorities_user_id_fkey",
+        "fk_columns": [
+          "user_id"
+        ],
+        "fk_schema": "public",
+        "fk_table": "user_priorities",
+        "pk_columns": [
+          "id"
+        ],
+        "pk_schema": "public",
+        "pk_table": "users"
+      },
+      {
+        "constraint_name": "user_profiles_user_id_fkey",
+        "fk_columns": [
+          "user_id"
+        ],
+        "fk_schema": "public",
+        "fk_table": "user_profiles",
+        "pk_columns": [
+          "id"
+        ],
+        "pk_schema": "public",
+        "pk_table": "users"
+      },
+      {
+        "constraint_name": "user_resonance_prefs_user_id_fkey",
+        "fk_columns": [
+          "user_id"
+        ],
+        "fk_schema": "public",
+        "fk_table": "user_resonance_prefs",
+        "pk_columns": [
+          "id"
+        ],
+        "pk_schema": "public",
+        "pk_table": "users"
+      },
+      {
+        "constraint_name": "user_resonance_signals_private_user_id_fkey",
+        "fk_columns": [
+          "user_id"
+        ],
+        "fk_schema": "public",
+        "fk_table": "user_resonance_signals_private",
+        "pk_columns": [
+          "id"
+        ],
+        "pk_schema": "public",
+        "pk_table": "users"
+      },
+      {
+        "constraint_name": "user_sessions_user_id_fkey",
+        "fk_columns": [
+          "user_id"
+        ],
+        "fk_schema": "public",
+        "fk_table": "user_sessions",
+        "pk_columns": [
+          "id"
+        ],
+        "pk_schema": "public",
+        "pk_table": "users"
+      }
+    ]
+  },
+  "schemas": [
+    {
+      "in_search_path": true,
+      "name": "hde",
+      "tables": [
+        {
+          "columns": [
+            {
+              "column_default": null,
+              "data_type": "uuid",
+              "is_nullable": false,
+              "name": "id",
+              "ordinal_position": 1
+            },
+            {
+              "column_default": null,
+              "data_type": "text",
+              "is_nullable": false,
+              "name": "user_id",
+              "ordinal_position": 2
+            },
+            {
+              "column_default": null,
+              "data_type": "text",
+              "is_nullable": false,
+              "name": "release_id",
+              "ordinal_position": 3
+            },
+            {
+              "column_default": null,
+              "data_type": "jsonb",
+              "is_nullable": false,
+              "name": "chart_json",
+              "ordinal_position": 4
+            },
+            {
+              "column_default": null,
+              "data_type": "text",
+              "is_nullable": false,
+              "name": "provider",
+              "ordinal_position": 5
+            },
+            {
+              "column_default": null,
+              "data_type": "text",
+              "is_nullable": false,
+              "name": "fingerprint",
+              "ordinal_position": 6
+            },
+            {
+              "column_default": "now()",
+              "data_type": "timestamp with time zone",
+              "is_nullable": false,
+              "name": "computed_at",
+              "ordinal_position": 7
+            }
+          ],
+          "foreign_keys": [],
+          "indexes": [
+            {
+              "index_name": "chart_snapshot_pkey",
+              "indexdef": "CREATE UNIQUE INDEX chart_snapshot_pkey ON hde.chart_snapshot USING btree (id)"
+            },
+            {
+              "index_name": "chart_snapshot_user_id_release_id_key",
+              "indexdef": "CREATE UNIQUE INDEX chart_snapshot_user_id_release_id_key ON hde.chart_snapshot USING btree (user_id, release_id)"
+            }
+          ],
+          "is_candidate_for_bodygraph": false,
+          "name": "chart_snapshot",
+          "primary_key": {
+            "columns": [
+              "id"
+            ],
+            "constraint_name": "chart_snapshot_pkey"
+          },
+          "table_type": "BASE TABLE",
+          "unique_constraints": [
+            {
+              "columns": [
+                "user_id",
+                "release_id"
+              ],
+              "constraint_name": "chart_snapshot_user_id_release_id_key"
+            }
+          ]
+        },
+        {
+          "columns": [
+            {
+              "column_default": null,
+              "data_type": "text",
+              "is_nullable": false,
+              "name": "id",
+              "ordinal_position": 1
+            },
+            {
+              "column_default": null,
+              "data_type": "text",
+              "is_nullable": false,
+              "name": "engine_tag",
+              "ordinal_position": 2
+            },
+            {
+              "column_default": null,
+              "data_type": "text",
+              "is_nullable": false,
+              "name": "build_commit",
+              "ordinal_position": 3
+            },
+            {
+              "column_default": null,
+              "data_type": "text",
+              "is_nullable": false,
+              "name": "invocation_tag",
+              "ordinal_position": 4
+            },
+            {
+              "column_default": null,
+              "data_type": "text",
+              "is_nullable": false,
+              "name": "emitter_sha256",
+              "ordinal_position": 5
+            },
+            {
+              "column_default": "now()",
+              "data_type": "timestamp with time zone",
+              "is_nullable": false,
+              "name": "created_at",
+              "ordinal_position": 6
+            }
+          ],
+          "foreign_keys": [],
+          "indexes": [
+            {
+              "index_name": "meta_pkey",
+              "indexdef": "CREATE UNIQUE INDEX meta_pkey ON hde.meta USING btree (id)"
+            }
+          ],
+          "is_candidate_for_bodygraph": false,
+          "name": "meta",
+          "primary_key": {
+            "columns": [
+              "id"
+            ],
+            "constraint_name": "meta_pkey"
+          },
+          "table_type": "BASE TABLE",
+          "unique_constraints": []
+        },
+        {
+          "columns": [
+            {
+              "column_default": null,
+              "data_type": "uuid",
+              "is_nullable": false,
+              "name": "id",
+              "ordinal_position": 1
+            },
+            {
+              "column_default": null,
+              "data_type": "text",
+              "is_nullable": false,
+              "name": "min_user",
+              "ordinal_position": 2
+            },
+            {
+              "column_default": null,
+              "data_type": "text",
+              "is_nullable": false,
+              "name": "max_user",
+              "ordinal_position": 3
+            },
+            {
+              "column_default": null,
+              "data_type": "text",
+              "is_nullable": false,
+              "name": "release_id",
+              "ordinal_position": 4
+            },
+            {
+              "column_default": null,
+              "data_type": "jsonb",
+              "is_nullable": false,
+              "name": "bands_json",
+              "ordinal_position": 5
+            },
+            {
+              "column_default": null,
+              "data_type": "jsonb",
+              "is_nullable": true,
+              "name": "internal_json",
+              "ordinal_position": 6
+            },
+            {
+              "column_default": null,
+              "data_type": "text",
+              "is_nullable": false,
+              "name": "idempotence_hash",
+              "ordinal_position": 7
+            },
+            {
+              "column_default": "now()",
+              "data_type": "timestamp with time zone",
+              "is_nullable": false,
+              "name": "evaluated_at",
+              "ordinal_position": 8
+            }
+          ],
+          "foreign_keys": [],
+          "indexes": [
+            {
+              "index_name": "idx_pair_eval_evaluated_at",
+              "indexdef": "CREATE INDEX idx_pair_eval_evaluated_at ON ONLY hde.pair_evaluation USING btree (evaluated_at)"
+            },
+            {
+              "index_name": "idx_pair_eval_id",
+              "indexdef": "CREATE INDEX idx_pair_eval_id ON ONLY hde.pair_evaluation USING btree (id)"
+            },
+            {
+              "index_name": "idx_pair_eval_release",
+              "indexdef": "CREATE INDEX idx_pair_eval_release ON ONLY hde.pair_evaluation USING btree (release_id)"
+            },
+            {
+              "index_name": "pair_evaluation_min_user_max_user_release_id_evaluated_at_key",
+              "indexdef": "CREATE UNIQUE INDEX pair_evaluation_min_user_max_user_release_id_evaluated_at_key ON ONLY hde.pair_evaluation USING btree (min_user, max_user, release_id, evaluated_at)"
+            },
+            {
+              "index_name": "pair_evaluation_pkey",
+              "indexdef": "CREATE UNIQUE INDEX pair_evaluation_pkey ON ONLY hde.pair_evaluation USING btree (id, evaluated_at)"
+            }
+          ],
+          "is_candidate_for_bodygraph": false,
+          "name": "pair_evaluation",
+          "primary_key": {
+            "columns": [
+              "id",
+              "evaluated_at"
+            ],
+            "constraint_name": "pair_evaluation_pkey"
+          },
+          "table_type": "BASE TABLE",
+          "unique_constraints": [
+            {
+              "columns": [
+                "min_user",
+                "max_user",
+                "release_id",
+                "evaluated_at"
+              ],
+              "constraint_name": "pair_evaluation_min_user_max_user_release_id_evaluated_at_key"
+            }
+          ]
+        },
+        {
+          "columns": [
+            {
+              "column_default": null,
+              "data_type": "uuid",
+              "is_nullable": false,
+              "name": "id",
+              "ordinal_position": 1
+            },
+            {
+              "column_default": null,
+              "data_type": "text",
+              "is_nullable": false,
+              "name": "min_user",
+              "ordinal_position": 2
+            },
+            {
+              "column_default": null,
+              "data_type": "text",
+              "is_nullable": false,
+              "name": "max_user",
+              "ordinal_position": 3
+            },
+            {
+              "column_default": null,
+              "data_type": "text",
+              "is_nullable": false,
+              "name": "release_id",
+              "ordinal_position": 4
+            },
+            {
+              "column_default": null,
+              "data_type": "jsonb",
+              "is_nullable": false,
+              "name": "bands_json",
+              "ordinal_position": 5
+            },
+            {
+              "column_default": null,
+              "data_type": "jsonb",
+              "is_nullable": true,
+              "name": "internal_json",
+              "ordinal_position": 6
+            },
+            {
+              "column_default": null,
+              "data_type": "text",
+              "is_nullable": false,
+              "name": "idempotence_hash",
+              "ordinal_position": 7
+            },
+            {
+              "column_default": "now()",
+              "data_type": "timestamp with time zone",
+              "is_nullable": false,
+              "name": "evaluated_at",
+              "ordinal_position": 8
+            }
+          ],
+          "foreign_keys": [],
+          "indexes": [
+            {
+              "index_name": "pair_evaluation_pcur_evaluated_at_idx",
+              "indexdef": "CREATE INDEX pair_evaluation_pcur_evaluated_at_idx ON hde.pair_evaluation_pcur USING btree (evaluated_at)"
+            },
+            {
+              "index_name": "pair_evaluation_pcur_id_idx",
+              "indexdef": "CREATE INDEX pair_evaluation_pcur_id_idx ON hde.pair_evaluation_pcur USING btree (id)"
+            },
+            {
+              "index_name": "pair_evaluation_pcur_min_user_max_user_release_id_evaluated_key",
+              "indexdef": "CREATE UNIQUE INDEX pair_evaluation_pcur_min_user_max_user_release_id_evaluated_key ON hde.pair_evaluation_pcur USING btree (min_user, max_user, release_id, evaluated_at)"
+            },
+            {
+              "index_name": "pair_evaluation_pcur_pkey",
+              "indexdef": "CREATE UNIQUE INDEX pair_evaluation_pcur_pkey ON hde.pair_evaluation_pcur USING btree (id, evaluated_at)"
+            },
+            {
+              "index_name": "pair_evaluation_pcur_release_id_idx",
+              "indexdef": "CREATE INDEX pair_evaluation_pcur_release_id_idx ON hde.pair_evaluation_pcur USING btree (release_id)"
+            }
+          ],
+          "is_candidate_for_bodygraph": false,
+          "name": "pair_evaluation_pcur",
+          "primary_key": {
+            "columns": [
+              "id",
+              "evaluated_at"
+            ],
+            "constraint_name": "pair_evaluation_pcur_pkey"
+          },
+          "table_type": "BASE TABLE",
+          "unique_constraints": [
+            {
+              "columns": [
+                "min_user",
+                "max_user",
+                "release_id",
+                "evaluated_at"
+              ],
+              "constraint_name": "pair_evaluation_pcur_min_user_max_user_release_id_evaluated_key"
+            }
+          ]
+        },
+        {
+          "columns": [
+            {
+              "column_default": null,
+              "data_type": "uuid",
+              "is_nullable": false,
+              "name": "id",
+              "ordinal_position": 1
+            },
+            {
+              "column_default": null,
+              "data_type": "text",
+              "is_nullable": false,
+              "name": "release_id",
+              "ordinal_position": 2
+            },
+            {
+              "column_default": null,
+              "data_type": "jsonb",
+              "is_nullable": false,
+              "name": "payload",
+              "ordinal_position": 3
+            },
+            {
+              "column_default": "now()",
+              "data_type": "timestamp with time zone",
+              "is_nullable": false,
+              "name": "created_at",
+              "ordinal_position": 4
+            }
+          ],
+          "foreign_keys": [],
+          "indexes": [
+            {
+              "index_name": "idx_public_results_created_at",
+              "indexdef": "CREATE INDEX idx_public_results_created_at ON ONLY hde.public_results USING btree (created_at)"
+            },
+            {
+              "index_name": "idx_public_results_id",
+              "indexdef": "CREATE INDEX idx_public_results_id ON ONLY hde.public_results USING btree (id)"
+            },
+            {
+              "index_name": "idx_public_results_release_id",
+              "indexdef": "CREATE INDEX idx_public_results_release_id ON ONLY hde.public_results USING btree (release_id)"
+            },
+            {
+              "index_name": "public_results_pkey",
+              "indexdef": "CREATE UNIQUE INDEX public_results_pkey ON ONLY hde.public_results USING btree (id, created_at)"
+            }
+          ],
+          "is_candidate_for_bodygraph": false,
+          "name": "public_results",
+          "primary_key": {
+            "columns": [
+              "id",
+              "created_at"
+            ],
+            "constraint_name": "public_results_pkey"
+          },
+          "table_type": "BASE TABLE",
+          "unique_constraints": []
+        },
+        {
+          "columns": [
+            {
+              "column_default": null,
+              "data_type": "uuid",
+              "is_nullable": false,
+              "name": "id",
+              "ordinal_position": 1
+            },
+            {
+              "column_default": null,
+              "data_type": "text",
+              "is_nullable": false,
+              "name": "release_id",
+              "ordinal_position": 2
+            },
+            {
+              "column_default": null,
+              "data_type": "jsonb",
+              "is_nullable": false,
+              "name": "payload",
+              "ordinal_position": 3
+            },
+            {
+              "column_default": "now()",
+              "data_type": "timestamp with time zone",
+              "is_nullable": false,
+              "name": "created_at",
+              "ordinal_position": 4
+            }
+          ],
+          "foreign_keys": [],
+          "indexes": [
+            {
+              "index_name": "public_results_pcur_created_at_idx",
+              "indexdef": "CREATE INDEX public_results_pcur_created_at_idx ON hde.public_results_pcur USING btree (created_at)"
+            },
+            {
+              "index_name": "public_results_pcur_id_idx",
+              "indexdef": "CREATE INDEX public_results_pcur_id_idx ON hde.public_results_pcur USING btree (id)"
+            },
+            {
+              "index_name": "public_results_pcur_pkey",
+              "indexdef": "CREATE UNIQUE INDEX public_results_pcur_pkey ON hde.public_results_pcur USING btree (id, created_at)"
+            },
+            {
+              "index_name": "public_results_pcur_release_id_idx",
+              "indexdef": "CREATE INDEX public_results_pcur_release_id_idx ON hde.public_results_pcur USING btree (release_id)"
+            }
+          ],
+          "is_candidate_for_bodygraph": false,
+          "name": "public_results_pcur",
+          "primary_key": {
+            "columns": [
+              "id",
+              "created_at"
+            ],
+            "constraint_name": "public_results_pcur_pkey"
+          },
+          "table_type": "BASE TABLE",
+          "unique_constraints": []
+        }
+      ],
+      "views": []
+    },
+    {
+      "in_search_path": true,
+      "name": "public",
+      "tables": [
+        {
+          "columns": [
+            {
+              "column_default": "nextval('admin_action_log_id_seq'::regclass)",
+              "data_type": "integer",
+              "is_nullable": false,
+              "name": "id",
+              "ordinal_position": 1
+            },
+            {
+              "column_default": null,
+              "data_type": "integer",
+              "is_nullable": true,
+              "name": "admin_user_id",
+              "ordinal_position": 2
+            },
+            {
+              "column_default": null,
+              "data_type": "character varying",
+              "is_nullable": false,
+              "name": "action",
+              "ordinal_position": 3
+            },
+            {
+              "column_default": null,
+              "data_type": "integer",
+              "is_nullable": true,
+              "name": "target_user_id",
+              "ordinal_position": 4
+            },
+            {
+              "column_default": null,
+              "data_type": "text",
+              "is_nullable": true,
+              "name": "details",
+              "ordinal_position": 5
+            },
+            {
+              "column_default": null,
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "name": "timestamp",
+              "ordinal_position": 6
+            }
+          ],
+          "foreign_keys": [
+            {
+              "constraint_name": "admin_action_log_admin_user_id_fkey",
+              "fk_columns": [
+                "admin_user_id"
+              ],
+              "pk_columns": [
+                "id"
+              ],
+              "pk_schema": "public",
+              "pk_table": "users"
+            },
+            {
+              "constraint_name": "admin_action_log_target_user_id_fkey",
+              "fk_columns": [
+                "target_user_id"
+              ],
+              "pk_columns": [
+                "id"
+              ],
+              "pk_schema": "public",
+              "pk_table": "users"
+            }
+          ],
+          "indexes": [
+            {
+              "index_name": "admin_action_log_pkey",
+              "indexdef": "CREATE UNIQUE INDEX admin_action_log_pkey ON public.admin_action_log USING btree (id)"
+            }
+          ],
+          "is_candidate_for_bodygraph": true,
+          "name": "admin_action_log",
+          "primary_key": {
+            "columns": [
+              "id"
+            ],
+            "constraint_name": "admin_action_log_pkey"
+          },
+          "table_type": "BASE TABLE",
+          "unique_constraints": []
+        },
+        {
+          "columns": [
+            {
+              "column_default": null,
+              "data_type": "integer",
+              "is_nullable": false,
+              "name": "user_id",
+              "ordinal_position": 1
+            },
+            {
+              "column_default": null,
+              "data_type": "date",
+              "is_nullable": true,
+              "name": "birth_date",
+              "ordinal_position": 2
+            },
+            {
+              "column_default": null,
+              "data_type": "time without time zone",
+              "is_nullable": true,
+              "name": "birth_time",
+              "ordinal_position": 3
+            },
+            {
+              "column_default": null,
+              "data_type": "character varying",
+              "is_nullable": true,
+              "name": "birth_location",
+              "ordinal_position": 4
+            },
+            {
+              "column_default": null,
+              "data_type": "numeric",
+              "is_nullable": true,
+              "name": "latitude",
+              "ordinal_position": 5
+            },
+            {
+              "column_default": null,
+              "data_type": "numeric",
+              "is_nullable": true,
+              "name": "longitude",
+              "ordinal_position": 6
+            },
+            {
+              "column_default": null,
+              "data_type": "boolean",
+              "is_nullable": true,
+              "name": "data_consent",
+              "ordinal_position": 7
+            },
+            {
+              "column_default": null,
+              "data_type": "boolean",
+              "is_nullable": true,
+              "name": "sharing_consent",
+              "ordinal_position": 8
+            },
+            {
+              "column_default": null,
+              "data_type": "text",
+              "is_nullable": true,
+              "name": "location_display_name",
+              "ordinal_position": 9
+            },
+            {
+              "column_default": null,
+              "data_type": "character varying",
+              "is_nullable": true,
+              "name": "location_country",
+              "ordinal_position": 10
+            },
+            {
+              "column_default": null,
+              "data_type": "character varying",
+              "is_nullable": true,
+              "name": "location_state",
+              "ordinal_position": 11
+            },
+            {
+              "column_default": null,
+              "data_type": "character varying",
+              "is_nullable": true,
+              "name": "location_city",
+              "ordinal_position": 12
+            },
+            {
+              "column_default": null,
+              "data_type": "numeric",
+              "is_nullable": true,
+              "name": "location_importance",
+              "ordinal_position": 13
+            },
+            {
+              "column_default": null,
+              "data_type": "bigint",
+              "is_nullable": true,
+              "name": "location_osm_id",
+              "ordinal_position": 14
+            },
+            {
+              "column_default": null,
+              "data_type": "character varying",
+              "is_nullable": true,
+              "name": "location_osm_type",
+              "ordinal_position": 15
+            },
+            {
+              "column_default": null,
+              "data_type": "character varying",
+              "is_nullable": true,
+              "name": "timezone",
+              "ordinal_position": 16
+            },
+            {
+              "column_default": "'manual'::character varying",
+              "data_type": "character varying",
+              "is_nullable": true,
+              "name": "location_source",
+              "ordinal_position": 17
+            },
+            {
+              "column_default": "false",
+              "data_type": "boolean",
+              "is_nullable": true,
+              "name": "location_verified",
+              "ordinal_position": 18
+            }
+          ],
+          "foreign_keys": [
+            {
+              "constraint_name": "birth_data_user_id_fkey",
+              "fk_columns": [
+                "user_id"
+              ],
+              "pk_columns": [
+                "id"
+              ],
+              "pk_schema": "public",
+              "pk_table": "users"
+            }
+          ],
+          "indexes": [
+            {
+              "index_name": "birth_data_pkey",
+              "indexdef": "CREATE UNIQUE INDEX birth_data_pkey ON public.birth_data USING btree (user_id)"
+            },
+            {
+              "index_name": "idx_birth_data_city",
+              "indexdef": "CREATE INDEX idx_birth_data_city ON public.birth_data USING btree (location_city)"
+            },
+            {
+              "index_name": "idx_birth_data_country",
+              "indexdef": "CREATE INDEX idx_birth_data_country ON public.birth_data USING btree (location_country)"
+            },
+            {
+              "index_name": "idx_birth_data_source",
+              "indexdef": "CREATE INDEX idx_birth_data_source ON public.birth_data USING btree (location_source)"
+            },
+            {
+              "index_name": "idx_birth_data_verified",
+              "indexdef": "CREATE INDEX idx_birth_data_verified ON public.birth_data USING btree (location_verified)"
+            }
+          ],
+          "is_candidate_for_bodygraph": true,
+          "name": "birth_data",
+          "primary_key": {
+            "columns": [
+              "user_id"
+            ],
+            "constraint_name": "birth_data_pkey"
+          },
+          "table_type": "BASE TABLE",
+          "unique_constraints": []
+        },
+        {
+          "columns": [
+            {
+              "column_default": null,
+              "data_type": "integer",
+              "is_nullable": false,
+              "name": "user_a_id",
+              "ordinal_position": 1
+            },
+            {
+              "column_default": null,
+              "data_type": "integer",
+              "is_nullable": false,
+              "name": "user_b_id",
+              "ordinal_position": 2
+            },
+            {
+              "column_default": null,
+              "data_type": "smallint",
+              "is_nullable": true,
+              "name": "love_score",
+              "ordinal_position": 3
+            },
+            {
+              "column_default": null,
+              "data_type": "smallint",
+              "is_nullable": true,
+              "name": "intimacy_score",
+              "ordinal_position": 4
+            },
+            {
+              "column_default": null,
+              "data_type": "smallint",
+              "is_nullable": true,
+              "name": "communication_score",
+              "ordinal_position": 5
+            },
+            {
+              "column_default": null,
+              "data_type": "smallint",
+              "is_nullable": true,
+              "name": "friendship_score",
+              "ordinal_position": 6
+            },
+            {
+              "column_default": null,
+              "data_type": "smallint",
+              "is_nullable": true,
+              "name": "collaboration_score",
+              "ordinal_position": 7
+            },
+            {
+              "column_default": null,
+              "data_type": "smallint",
+              "is_nullable": true,
+              "name": "lifestyle_score",
+              "ordinal_position": 8
+            },
+            {
+              "column_default": null,
+              "data_type": "smallint",
+              "is_nullable": true,
+              "name": "decisions_score",
+              "ordinal_position": 9
+            },
+            {
+              "column_default": null,
+              "data_type": "smallint",
+              "is_nullable": true,
+              "name": "support_score",
+              "ordinal_position": 10
+            },
+            {
+              "column_default": null,
+              "data_type": "smallint",
+              "is_nullable": true,
+              "name": "growth_score",
+              "ordinal_position": 11
+            },
+            {
+              "column_default": null,
+              "data_type": "smallint",
+              "is_nullable": true,
+              "name": "space_score",
+              "ordinal_position": 12
+            },
+            {
+              "column_default": null,
+              "data_type": "smallint",
+              "is_nullable": true,
+              "name": "overall_score",
+              "ordinal_position": 13
+            },
+            {
+              "column_default": null,
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "name": "calculated_at",
+              "ordinal_position": 14
+            }
+          ],
+          "foreign_keys": [
+            {
+              "constraint_name": "compatibility_matrix_user_a_id_fkey",
+              "fk_columns": [
+                "user_a_id"
+              ],
+              "pk_columns": [
+                "id"
+              ],
+              "pk_schema": "public",
+              "pk_table": "users"
+            },
+            {
+              "constraint_name": "compatibility_matrix_user_b_id_fkey",
+              "fk_columns": [
+                "user_b_id"
+              ],
+              "pk_columns": [
+                "id"
+              ],
+              "pk_schema": "public",
+              "pk_table": "users"
+            }
+          ],
+          "indexes": [
+            {
+              "index_name": "compatibility_matrix_pkey",
+              "indexdef": "CREATE UNIQUE INDEX compatibility_matrix_pkey ON public.compatibility_matrix USING btree (user_a_id, user_b_id)"
+            }
+          ],
+          "is_candidate_for_bodygraph": true,
+          "name": "compatibility_matrix",
+          "primary_key": {
+            "columns": [
+              "user_a_id",
+              "user_b_id"
+            ],
+            "constraint_name": "compatibility_matrix_pkey"
+          },
+          "table_type": "BASE TABLE",
+          "unique_constraints": []
+        },
+        {
+          "columns": [
+            {
+              "column_default": "nextval('email_notifications_id_seq'::regclass)",
+              "data_type": "integer",
+              "is_nullable": false,
+              "name": "id",
+              "ordinal_position": 1
+            },
+            {
+              "column_default": null,
+              "data_type": "integer",
+              "is_nullable": true,
+              "name": "user_id",
+              "ordinal_position": 2
+            },
+            {
+              "column_default": null,
+              "data_type": "character varying",
+              "is_nullable": false,
+              "name": "email_type",
+              "ordinal_position": 3
+            },
+            {
+              "column_default": null,
+              "data_type": "character varying",
+              "is_nullable": false,
+              "name": "recipient_email",
+              "ordinal_position": 4
+            },
+            {
+              "column_default": null,
+              "data_type": "character varying",
+              "is_nullable": true,
+              "name": "subject",
+              "ordinal_position": 5
+            },
+            {
+              "column_default": null,
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "name": "sent_at",
+              "ordinal_position": 6
+            },
+            {
+              "column_default": null,
+              "data_type": "character varying",
+              "is_nullable": true,
+              "name": "delivery_status",
+              "ordinal_position": 7
+            }
+          ],
+          "foreign_keys": [
+            {
+              "constraint_name": "email_notifications_user_id_fkey",
+              "fk_columns": [
+                "user_id"
+              ],
+              "pk_columns": [
+                "id"
+              ],
+              "pk_schema": "public",
+              "pk_table": "users"
+            }
+          ],
+          "indexes": [
+            {
+              "index_name": "email_notifications_pkey",
+              "indexdef": "CREATE UNIQUE INDEX email_notifications_pkey ON public.email_notifications USING btree (id)"
+            }
+          ],
+          "is_candidate_for_bodygraph": true,
+          "name": "email_notifications",
+          "primary_key": {
+            "columns": [
+              "id"
+            ],
+            "constraint_name": "email_notifications_pkey"
+          },
+          "table_type": "BASE TABLE",
+          "unique_constraints": []
+        },
+        {
+          "columns": [
+            {
+              "column_default": null,
+              "data_type": "integer",
+              "is_nullable": false,
+              "name": "user_id",
+              "ordinal_position": 1
+            },
+            {
+              "column_default": null,
+              "data_type": "text",
+              "is_nullable": true,
+              "name": "chart_data",
+              "ordinal_position": 2
+            },
+            {
+              "column_default": null,
+              "data_type": "character varying",
+              "is_nullable": true,
+              "name": "energy_type",
+              "ordinal_position": 3
+            },
+            {
+              "column_default": null,
+              "data_type": "character varying",
+              "is_nullable": true,
+              "name": "strategy",
+              "ordinal_position": 4
+            },
+            {
+              "column_default": null,
+              "data_type": "character varying",
+              "is_nullable": true,
+              "name": "authority",
+              "ordinal_position": 5
+            },
+            {
+              "column_default": null,
+              "data_type": "character varying",
+              "is_nullable": true,
+              "name": "profile",
+              "ordinal_position": 6
+            },
+            {
+              "column_default": null,
+              "data_type": "text",
+              "is_nullable": true,
+              "name": "api_response",
+              "ordinal_position": 7
+            },
+            {
+              "column_default": null,
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "name": "calculated_at",
+              "ordinal_position": 8
+            }
+          ],
+          "foreign_keys": [
+            {
+              "constraint_name": "human_design_data_user_id_fkey",
+              "fk_columns": [
+                "user_id"
+              ],
+              "pk_columns": [
+                "id"
+              ],
+              "pk_schema": "public",
+              "pk_table": "users"
+            }
+          ],
+          "indexes": [
+            {
+              "index_name": "human_design_data_pkey",
+              "indexdef": "CREATE UNIQUE INDEX human_design_data_pkey ON public.human_design_data USING btree (user_id)"
+            }
+          ],
+          "is_candidate_for_bodygraph": true,
+          "name": "human_design_data",
+          "primary_key": {
+            "columns": [
+              "user_id"
+            ],
+            "constraint_name": "human_design_data_pkey"
+          },
+          "table_type": "BASE TABLE",
+          "unique_constraints": []
+        },
+        {
+          "columns": [
+            {
+              "column_default": null,
+              "data_type": "integer",
+              "is_nullable": false,
+              "name": "user_id",
+              "ordinal_position": 1
+            },
+            {
+              "column_default": null,
+              "data_type": "json",
+              "is_nullable": true,
+              "name": "prefs",
+              "ordinal_position": 2
+            },
+            {
+              "column_default": null,
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "name": "updated_at",
+              "ordinal_position": 3
+            }
+          ],
+          "foreign_keys": [
+            {
+              "constraint_name": "user_preferences_user_id_fkey",
+              "fk_columns": [
+                "user_id"
+              ],
+              "pk_columns": [
+                "id"
+              ],
+              "pk_schema": "public",
+              "pk_table": "users"
+            }
+          ],
+          "indexes": [
+            {
+              "index_name": "user_preferences_pkey",
+              "indexdef": "CREATE UNIQUE INDEX user_preferences_pkey ON public.user_preferences USING btree (user_id)"
+            }
+          ],
+          "is_candidate_for_bodygraph": true,
+          "name": "user_preferences",
+          "primary_key": {
+            "columns": [
+              "user_id"
+            ],
+            "constraint_name": "user_preferences_pkey"
+          },
+          "table_type": "BASE TABLE",
+          "unique_constraints": []
+        },
+        {
+          "columns": [
+            {
+              "column_default": null,
+              "data_type": "integer",
+              "is_nullable": false,
+              "name": "user_id",
+              "ordinal_position": 1
+            },
+            {
+              "column_default": null,
+              "data_type": "smallint",
+              "is_nullable": true,
+              "name": "love_priority",
+              "ordinal_position": 2
+            },
+            {
+              "column_default": null,
+              "data_type": "smallint",
+              "is_nullable": true,
+              "name": "intimacy_priority",
+              "ordinal_position": 3
+            },
+            {
+              "column_default": null,
+              "data_type": "smallint",
+              "is_nullable": true,
+              "name": "communication_priority",
+              "ordinal_position": 4
+            },
+            {
+              "column_default": null,
+              "data_type": "smallint",
+              "is_nullable": true,
+              "name": "friendship_priority",
+              "ordinal_position": 5
+            },
+            {
+              "column_default": null,
+              "data_type": "smallint",
+              "is_nullable": true,
+              "name": "collaboration_priority",
+              "ordinal_position": 6
+            },
+            {
+              "column_default": null,
+              "data_type": "smallint",
+              "is_nullable": true,
+              "name": "lifestyle_priority",
+              "ordinal_position": 7
+            },
+            {
+              "column_default": null,
+              "data_type": "smallint",
+              "is_nullable": true,
+              "name": "decisions_priority",
+              "ordinal_position": 8
+            },
+            {
+              "column_default": null,
+              "data_type": "smallint",
+              "is_nullable": true,
+              "name": "support_priority",
+              "ordinal_position": 9
+            },
+            {
+              "column_default": null,
+              "data_type": "smallint",
+              "is_nullable": true,
+              "name": "growth_priority",
+              "ordinal_position": 10
+            },
+            {
+              "column_default": null,
+              "data_type": "smallint",
+              "is_nullable": true,
+              "name": "space_priority",
+              "ordinal_position": 11
+            }
+          ],
+          "foreign_keys": [
+            {
+              "constraint_name": "user_priorities_user_id_fkey",
+              "fk_columns": [
+                "user_id"
+              ],
+              "pk_columns": [
+                "id"
+              ],
+              "pk_schema": "public",
+              "pk_table": "users"
+            }
+          ],
+          "indexes": [
+            {
+              "index_name": "user_priorities_pkey",
+              "indexdef": "CREATE UNIQUE INDEX user_priorities_pkey ON public.user_priorities USING btree (user_id)"
+            }
+          ],
+          "is_candidate_for_bodygraph": true,
+          "name": "user_priorities",
+          "primary_key": {
+            "columns": [
+              "user_id"
+            ],
+            "constraint_name": "user_priorities_pkey"
+          },
+          "table_type": "BASE TABLE",
+          "unique_constraints": []
+        },
+        {
+          "columns": [
+            {
+              "column_default": "nextval('user_profiles_id_seq'::regclass)",
+              "data_type": "integer",
+              "is_nullable": false,
+              "name": "id",
+              "ordinal_position": 1
+            },
+            {
+              "column_default": null,
+              "data_type": "integer",
+              "is_nullable": false,
+              "name": "user_id",
+              "ordinal_position": 2
+            },
+            {
+              "column_default": null,
+              "data_type": "character varying",
+              "is_nullable": true,
+              "name": "first_name",
+              "ordinal_position": 3
+            },
+            {
+              "column_default": null,
+              "data_type": "character varying",
+              "is_nullable": true,
+              "name": "last_name",
+              "ordinal_position": 4
+            },
+            {
+              "column_default": null,
+              "data_type": "text",
+              "is_nullable": true,
+              "name": "bio",
+              "ordinal_position": 5
+            },
+            {
+              "column_default": null,
+              "data_type": "integer",
+              "is_nullable": true,
+              "name": "age",
+              "ordinal_position": 6
+            },
+            {
+              "column_default": null,
+              "data_type": "integer",
+              "is_nullable": true,
+              "name": "profile_completion",
+              "ordinal_position": 7
+            },
+            {
+              "column_default": null,
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "name": "created_at",
+              "ordinal_position": 8
+            },
+            {
+              "column_default": null,
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "name": "updated_at",
+              "ordinal_position": 9
+            },
+            {
+              "column_default": null,
+              "data_type": "character varying",
+              "is_nullable": true,
+              "name": "display_name",
+              "ordinal_position": 10
+            },
+            {
+              "column_default": null,
+              "data_type": "character varying",
+              "is_nullable": true,
+              "name": "avatar_url",
+              "ordinal_position": 11
+            }
+          ],
+          "foreign_keys": [
+            {
+              "constraint_name": "user_profiles_user_id_fkey",
+              "fk_columns": [
+                "user_id"
+              ],
+              "pk_columns": [
+                "id"
+              ],
+              "pk_schema": "public",
+              "pk_table": "users"
+            }
+          ],
+          "indexes": [
+            {
+              "index_name": "user_profiles_pkey",
+              "indexdef": "CREATE UNIQUE INDEX user_profiles_pkey ON public.user_profiles USING btree (id)"
+            },
+            {
+              "index_name": "user_profiles_user_id_key",
+              "indexdef": "CREATE UNIQUE INDEX user_profiles_user_id_key ON public.user_profiles USING btree (user_id)"
+            }
+          ],
+          "is_candidate_for_bodygraph": true,
+          "name": "user_profiles",
+          "primary_key": {
+            "columns": [
+              "id"
+            ],
+            "constraint_name": "user_profiles_pkey"
+          },
+          "table_type": "BASE TABLE",
+          "unique_constraints": [
+            {
+              "columns": [
+                "user_id"
+              ],
+              "constraint_name": "user_profiles_user_id_key"
+            }
+          ]
+        },
+        {
+          "columns": [
+            {
+              "column_default": null,
+              "data_type": "integer",
+              "is_nullable": false,
+              "name": "user_id",
+              "ordinal_position": 1
+            },
+            {
+              "column_default": null,
+              "data_type": "integer",
+              "is_nullable": false,
+              "name": "version",
+              "ordinal_position": 2
+            },
+            {
+              "column_default": null,
+              "data_type": "json",
+              "is_nullable": false,
+              "name": "weights",
+              "ordinal_position": 3
+            },
+            {
+              "column_default": null,
+              "data_type": "json",
+              "is_nullable": true,
+              "name": "facets",
+              "ordinal_position": 4
+            },
+            {
+              "column_default": null,
+              "data_type": "timestamp without time zone",
+              "is_nullable": false,
+              "name": "created_at",
+              "ordinal_position": 5
+            },
+            {
+              "column_default": null,
+              "data_type": "timestamp without time zone",
+              "is_nullable": false,
+              "name": "updated_at",
+              "ordinal_position": 6
+            }
+          ],
+          "foreign_keys": [
+            {
+              "constraint_name": "user_resonance_prefs_user_id_fkey",
+              "fk_columns": [
+                "user_id"
+              ],
+              "pk_columns": [
+                "id"
+              ],
+              "pk_schema": "public",
+              "pk_table": "users"
+            }
+          ],
+          "indexes": [
+            {
+              "index_name": "user_resonance_prefs_pkey",
+              "indexdef": "CREATE UNIQUE INDEX user_resonance_prefs_pkey ON public.user_resonance_prefs USING btree (user_id)"
+            }
+          ],
+          "is_candidate_for_bodygraph": true,
+          "name": "user_resonance_prefs",
+          "primary_key": {
+            "columns": [
+              "user_id"
+            ],
+            "constraint_name": "user_resonance_prefs_pkey"
+          },
+          "table_type": "BASE TABLE",
+          "unique_constraints": []
+        },
+        {
+          "columns": [
+            {
+              "column_default": null,
+              "data_type": "integer",
+              "is_nullable": false,
+              "name": "user_id",
+              "ordinal_position": 1
+            },
+            {
+              "column_default": null,
+              "data_type": "character varying",
+              "is_nullable": false,
+              "name": "decision_mode",
+              "ordinal_position": 2
+            },
+            {
+              "column_default": null,
+              "data_type": "character varying",
+              "is_nullable": false,
+              "name": "interaction_mode",
+              "ordinal_position": 3
+            },
+            {
+              "column_default": null,
+              "data_type": "character varying",
+              "is_nullable": false,
+              "name": "connection_style",
+              "ordinal_position": 4
+            },
+            {
+              "column_default": null,
+              "data_type": "smallint",
+              "is_nullable": false,
+              "name": "bridges_count",
+              "ordinal_position": 5
+            },
+            {
+              "column_default": null,
+              "data_type": "boolean",
+              "is_nullable": false,
+              "name": "emotion_signal",
+              "ordinal_position": 6
+            },
+            {
+              "column_default": null,
+              "data_type": "boolean",
+              "is_nullable": false,
+              "name": "work_energy",
+              "ordinal_position": 7
+            },
+            {
+              "column_default": null,
+              "data_type": "boolean",
+              "is_nullable": false,
+              "name": "will_signal",
+              "ordinal_position": 8
+            },
+            {
+              "column_default": null,
+              "data_type": "boolean",
+              "is_nullable": false,
+              "name": "expression_signal",
+              "ordinal_position": 9
+            },
+            {
+              "column_default": null,
+              "data_type": "boolean",
+              "is_nullable": false,
+              "name": "mind_signal",
+              "ordinal_position": 10
+            },
+            {
+              "column_default": null,
+              "data_type": "character varying",
+              "is_nullable": false,
+              "name": "role_pattern",
+              "ordinal_position": 11
+            },
+            {
+              "column_default": null,
+              "data_type": "character varying",
+              "is_nullable": true,
+              "name": "tempo_pattern",
+              "ordinal_position": 12
+            },
+            {
+              "column_default": null,
+              "data_type": "boolean",
+              "is_nullable": false,
+              "name": "identity_openness",
+              "ordinal_position": 13
+            },
+            {
+              "column_default": null,
+              "data_type": "character varying",
+              "is_nullable": true,
+              "name": "trajectory_code",
+              "ordinal_position": 14
+            },
+            {
+              "column_default": null,
+              "data_type": "json",
+              "is_nullable": true,
+              "name": "confidence",
+              "ordinal_position": 15
+            },
+            {
+              "column_default": null,
+              "data_type": "timestamp without time zone",
+              "is_nullable": false,
+              "name": "computed_at",
+              "ordinal_position": 16
+            }
+          ],
+          "foreign_keys": [
+            {
+              "constraint_name": "user_resonance_signals_private_user_id_fkey",
+              "fk_columns": [
+                "user_id"
+              ],
+              "pk_columns": [
+                "id"
+              ],
+              "pk_schema": "public",
+              "pk_table": "users"
+            }
+          ],
+          "indexes": [
+            {
+              "index_name": "user_resonance_signals_private_pkey",
+              "indexdef": "CREATE UNIQUE INDEX user_resonance_signals_private_pkey ON public.user_resonance_signals_private USING btree (user_id)"
+            }
+          ],
+          "is_candidate_for_bodygraph": true,
+          "name": "user_resonance_signals_private",
+          "primary_key": {
+            "columns": [
+              "user_id"
+            ],
+            "constraint_name": "user_resonance_signals_private_pkey"
+          },
+          "table_type": "BASE TABLE",
+          "unique_constraints": []
+        },
+        {
+          "columns": [
+            {
+              "column_default": "nextval('user_sessions_id_seq'::regclass)",
+              "data_type": "integer",
+              "is_nullable": false,
+              "name": "id",
+              "ordinal_position": 1
+            },
+            {
+              "column_default": null,
+              "data_type": "integer",
+              "is_nullable": false,
+              "name": "user_id",
+              "ordinal_position": 2
+            },
+            {
+              "column_default": null,
+              "data_type": "character varying",
+              "is_nullable": false,
+              "name": "session_token",
+              "ordinal_position": 3
+            },
+            {
+              "column_default": null,
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "name": "created_at",
+              "ordinal_position": 4
+            },
+            {
+              "column_default": null,
+              "data_type": "timestamp without time zone",
+              "is_nullable": false,
+              "name": "expires_at",
+              "ordinal_position": 5
+            }
+          ],
+          "foreign_keys": [
+            {
+              "constraint_name": "user_sessions_user_id_fkey",
+              "fk_columns": [
+                "user_id"
+              ],
+              "pk_columns": [
+                "id"
+              ],
+              "pk_schema": "public",
+              "pk_table": "users"
+            }
+          ],
+          "indexes": [
+            {
+              "index_name": "ix_user_sessions_session_token",
+              "indexdef": "CREATE UNIQUE INDEX ix_user_sessions_session_token ON public.user_sessions USING btree (session_token)"
+            },
+            {
+              "index_name": "user_sessions_pkey",
+              "indexdef": "CREATE UNIQUE INDEX user_sessions_pkey ON public.user_sessions USING btree (id)"
+            }
+          ],
+          "is_candidate_for_bodygraph": true,
+          "name": "user_sessions",
+          "primary_key": {
+            "columns": [
+              "id"
+            ],
+            "constraint_name": "user_sessions_pkey"
+          },
+          "table_type": "BASE TABLE",
+          "unique_constraints": []
+        },
+        {
+          "columns": [
+            {
+              "column_default": "nextval('users_id_seq'::regclass)",
+              "data_type": "integer",
+              "is_nullable": false,
+              "name": "id",
+              "ordinal_position": 1
+            },
+            {
+              "column_default": null,
+              "data_type": "character varying",
+              "is_nullable": false,
+              "name": "email",
+              "ordinal_position": 2
+            },
+            {
+              "column_default": null,
+              "data_type": "character varying",
+              "is_nullable": false,
+              "name": "password_hash",
+              "ordinal_position": 3
+            },
+            {
+              "column_default": null,
+              "data_type": "character varying",
+              "is_nullable": true,
+              "name": "status",
+              "ordinal_position": 6
+            },
+            {
+              "column_default": null,
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "name": "created_at",
+              "ordinal_position": 7
+            },
+            {
+              "column_default": null,
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "name": "updated_at",
+              "ordinal_position": 8
+            },
+            {
+              "column_default": "false",
+              "data_type": "boolean",
+              "is_nullable": false,
+              "name": "is_admin",
+              "ordinal_position": 9
+            },
+            {
+              "column_default": "1",
+              "data_type": "integer",
+              "is_nullable": false,
+              "name": "profile_version",
+              "ordinal_position": 10
+            }
+          ],
+          "foreign_keys": [],
+          "indexes": [
+            {
+              "index_name": "ix_users_email",
+              "indexdef": "CREATE UNIQUE INDEX ix_users_email ON public.users USING btree (email)"
+            },
+            {
+              "index_name": "users_pkey",
+              "indexdef": "CREATE UNIQUE INDEX users_pkey ON public.users USING btree (id)"
+            }
+          ],
+          "is_candidate_for_bodygraph": true,
+          "name": "users",
+          "primary_key": {
+            "columns": [
+              "id"
+            ],
+            "constraint_name": "users_pkey"
+          },
+          "table_type": "BASE TABLE",
+          "unique_constraints": []
+        }
+      ],
+      "views": []
+    }
+  ],
+  "signals": {
+    "engine_like_schemas": [
+      "hde"
+    ],
+    "existing_bodygraph_like_tables": [],
+    "user_tables": [
+      "public.user_preferences",
+      "public.user_priorities",
+      "public.user_profiles",
+      "public.user_resonance_prefs",
+      "public.user_resonance_signals_private",
+      "public.user_sessions",
+      "public.users"
+    ]
+  },
+  "sources": {
+    "discovery_dir": "artifacts/db_discovery/20251113",
+    "schema_dump": "artifacts/db_discovery/20251113/postgres_schema_only.sql"
+  },
+  "version": "v1"
+}
