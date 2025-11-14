@@ -18,38 +18,35 @@ paths = sorted(p for p in MIGRATIONS_DIR.glob("*.sql") if p.is_file())
 
 log_lines: list[str] = []
 
-with _util.connect() as conn:
-    with conn.cursor() as cur:
-        cur.execute(
-            """
-            CREATE TABLE IF NOT EXISTS schema_migrations (
-                migration text PRIMARY KEY,
-                applied_at timestamptz NOT NULL DEFAULT now()
-            )
-            """
-        )
-    conn.commit()
+db = _util.db_access()
 
-    for path in paths:
-        name = path.name
-        with conn.cursor() as cur:
-            cur.execute(
-                "SELECT 1 FROM schema_migrations WHERE migration = %s",
-                (name,),
-            )
-            if cur.fetchone():
-                continue
+db.exec(
+    """
+    CREATE TABLE IF NOT EXISTS schema_migrations (
+        migration text PRIMARY KEY,
+        applied_at timestamptz NOT NULL DEFAULT now()
+    )
+    """
+)
 
-        sql = path.read_text(encoding="utf-8")
-        log_lines.append(f"apply {name}")
+for path in paths:
+    name = path.name
+    existing = db.query("SELECT 1 FROM schema_migrations WHERE migration = %s", (name,))
+    if existing:
+        continue
 
-        with conn.cursor() as cur:
-            cur.execute(sql)
-            cur.execute(
-                "INSERT INTO schema_migrations (migration) VALUES (%s)",
-                (name,),
-            )
-        conn.commit()
+    sql = path.read_text(encoding="utf-8")
+    log_lines.append(f"apply {name}")
+
+    db.tx(
+        [
+            _util.Statement(sql=sql),
+            _util.Statement(
+                sql="INSERT INTO schema_migrations (migration) VALUES (%s)",
+                params=(name,),
+            ),
+        ]
+    )
 
 if not log_lines:
     log_text = "no-op: no migrations to run\n"
@@ -57,4 +54,3 @@ else:
     log_text = "\n".join(log_lines) + "\n"
 
 _util.write_text(TARGET, log_text)
-PY

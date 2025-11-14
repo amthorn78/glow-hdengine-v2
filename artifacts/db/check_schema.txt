@@ -1,1 +1,1 @@
-(missing_db_config)
+missing_db_config

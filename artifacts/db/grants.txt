@@ -1,1 +1,1 @@
-(missing_db_config: unable to inspect grants)
+missing_db_config: unable to inspect grants
