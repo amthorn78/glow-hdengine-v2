@@ -1,11 +1,11 @@
-# Coverage Matrix — DB Bridge Fallback
+# Coverage Matrix — Bridge provider & evidence
 
 | Scenario | DATABASE_URL | DB_BRIDGE_URL | Expected Result | Verification |
 | --- | --- | --- | --- | --- |
-| Primary succeeds | Valid Postgres DSN | Optional | Use `DATABASE_URL`; do not touch bridge. | Posture smoke run in `VERIFY.sh`.|
-| Primary fails, bridge succeeds | Invalid/timeout | Valid Postgres DSN | Connect via bridge; emit success artifacts with fallback note. | Targeted harness run in `scripts/architecture_capture.sh`.|
-| Both fail | Invalid | Missing/invalid | Emit `missing_db_config` failure envelope; no partial writes. | Unit test asserts typed error and refusal format.|
-| Bridge non-Postgres | Valid primary | HTTP/empty | Skip bridge attempt; rely on primary; warn during validation. | Static config validator in CLI smoke test.|
-| Env-matrix selection | Unset | Postgres DSN | Snapshot run chooses bridge path; envelopes frozen for review. | `env-matrix` capture log + audit diff.| 
+| Primary succeeds | Reachable psycopg DSN | Optional | Adapter returns psycopg provider; bridge attempts marked `skip`. | Unit tests + adapter selection snapshot (`provider="psycopg"`). |
+| Primary fails, bridge succeeds | Invalid/timeout | HTTPS pg-bridge | Adapter selects `bridge`; harness captures `/health`, `/`, `/query`, `/introspect/*` payloads. | `scripts/db_bridge/capture_introspection.py`, adapter snapshot JSON. |
+| Both fail | Invalid | Missing/invalid | Adapter raises typed `AdapterError` (`missing_database_url`, `missing_bridge_url`, or `bridge_guard_blocked`). | Unit tests covering error codes + refusal envelope parity. |
+| Rails-open scope | Any | HTTPS pg-bridge | Keys-only log shows only `db_bridge.*` routes; `vendor_call_count: 0`. | `scripts/ops/capture_rails_open_scope.py` summary + JSONL log inspection. |
+| Env-matrix selection | Unset | HTTPS pg-bridge | Snapshot records the fallback order without attempting connectivity. | `artifacts/runtime/env_matrix.snapshot.json` + diff/prev baselines. |
 
-Coverage ensures fallback behavior remains deterministic across CLI, adapter server, and automated snapshots. All evidence is LF-terminated and cataloged under `artifacts/db/`.
+Coverage keeps fallback deterministic, auditable, and LF-terminated; all governed artifacts land under `artifacts/db_bridge/`, `artifacts/db/`, `artifacts/engine/`, `artifacts/logs/`, or `artifacts/ops/` with matching `.path_proof.txt` files and Evidence Index entries.

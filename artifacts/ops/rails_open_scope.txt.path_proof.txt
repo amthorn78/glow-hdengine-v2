@@ -1,0 +1,1 @@
+artifacts/ops/rails_open_scope.txt

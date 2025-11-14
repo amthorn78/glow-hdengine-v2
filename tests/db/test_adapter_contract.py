@@ -7,8 +7,8 @@ import urllib.error
 
 import pytest
 
-from engine.db.adapter import Statement
-from engine.db.errors import BridgeUnavailable
+from engine.db.adapter import DBAccess, Statement
+from engine.db.errors import BridgeUnavailable, IntrospectionError
 from engine.db.providers.bridge_provider import BridgeProvider, BridgeResponse
 from engine.db.providers.psycopg_provider import PsycopgProvider
 
@@ -124,7 +124,10 @@ def test_introspect_grants_parity(monkeypatch: pytest.MonkeyPatch) -> None:
         ),
     )
 
-    assert bridge_provider.introspect("grants") == grants_payload
+    expected = dict(grants_payload)
+    expected["status"] = "ok"
+
+    assert bridge_provider.introspect("grants") == expected
 
 
 def test_introspect_fingerprint_parity(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -153,4 +156,88 @@ def test_introspect_fingerprint_parity(monkeypatch: pytest.MonkeyPatch) -> None:
         ),
     )
 
-    assert bridge_provider.introspect("fingerprint") == fingerprint_payload
+    expected = dict(fingerprint_payload)
+    expected["status"] = "ok"
+
+    assert bridge_provider.introspect("fingerprint") == expected
+
+
+def test_bridge_introspect_accepts_inline_payload() -> None:
+    response = {"status": "ok", "search_path": "hde, public"}
+
+    provider = BridgeProvider(
+        "https://bridge.example",
+        request=lambda url, method, data, headers: BridgeResponse(
+            status=200,
+            body=json.dumps(response).encode("utf-8"),
+            headers={},
+        ),
+    )
+
+    assert provider.introspect("search_path") == response
+
+
+def test_bridge_introspect_grants_keeps_dict_entries() -> None:
+    response = {
+        "status": "ok",
+        "grants": [{"role": "reader", "object": "hde", "priv": "SELECT"}],
+    }
+
+    provider = BridgeProvider(
+        "https://bridge.example",
+        request=lambda url, method, data, headers: BridgeResponse(
+            status=200,
+            body=json.dumps(response).encode("utf-8"),
+            headers={},
+        ),
+    )
+
+    payload = provider.introspect("grants")
+    assert payload["grants"] == response["grants"]
+
+
+def test_bridge_introspect_version_uses_query() -> None:
+    def request(url: str, method: str, data, headers):
+        if url.endswith("/query"):
+            body = json.dumps({"status": "ok", "rows": [["16.1"]]}).encode("utf-8")
+            return BridgeResponse(status=200, body=body, headers={})
+        raise AssertionError(f"unexpected request {url} {method}")
+
+    provider = BridgeProvider("https://bridge.example", request=request)
+
+    assert provider.introspect("version") == {"status": "ok", "version": "16.1"}
+
+
+def test_dbaccess_introspect_wrappers_normalize_payloads() -> None:
+    class StubProvider:
+        name = "stub"
+
+        def introspect(self, kind: str):
+            if kind == "search_path":
+                return "hde, public"
+            if kind == "fingerprint":
+                return {"objects": [1, 2, 3]}
+            if kind == "version":
+                return {"status": "ok", "version": "15.4"}
+            raise AssertionError(kind)
+
+    db = DBAccess(StubProvider())
+
+    assert db.introspect_search_path() == {"status": "ok", "search_path": "hde, public"}
+    fingerprint = db.introspect_fingerprint()
+    assert fingerprint["status"] == "ok"
+    assert fingerprint["objects"] == [1, 2, 3]
+    assert db.introspect_version() == {"status": "ok", "version": "15.4"}
+
+
+def test_dbaccess_introspect_wrappers_propagate_errors() -> None:
+    class FailingProvider:
+        name = "stub"
+
+        def introspect(self, kind: str):
+            raise IntrospectionError("boom", code="boom")
+
+    db = DBAccess(FailingProvider())
+
+    with pytest.raises(IntrospectionError):
+        db.introspect_version()

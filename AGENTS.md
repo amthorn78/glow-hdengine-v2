@@ -30,11 +30,19 @@
   - Evidence pointers: `tests/transport/headers/aux_text_200.snap`, `tests/transport/headers/aux_suppression_200.snap`, `audit/gates/narratives/keys_10x4.table.json`.
   - Guard: no Aux HEAD/304 captures in this epic; Catalog/A7 proofs live elsewhere.
 
-
+## DB bridge / adapter evidence (EPIC-011)
+- Bridge provider must use HTTPS `DB_BRIDGE_URL`; surface `/health`, `/`, `/query`, and `/introspect/{search_path,grants,fingerprint}` plus the adapter’s version probe. Wrap network failures as typed adapter errors (no raw `urllib` tracebacks).
+- Harness sequence (rails open, SAFE logging):
+  - `python scripts/db_bridge/capture_introspection.py`
+  - `python scripts/db_adapter/capture_adapter_introspection.py`
+  - `python scripts/ops/capture_rails_open_scope.py`
+- Keys-only HTTP logs live at `artifacts/logs/keys_only.sample.jsonl` via `engine.ops.http_log.log_http_call`; only `{at, route, status, duration_ms, idempotence_hash?, release_id?}` are recorded.
+- `artifacts/ops/rails_open_scope.txt` must report `vendor_call_count: 0` for EPIC-011 harness runs.
 
 ## Evidence & artifact paths
 - Machine mirror index: artifacts/evidence_index.jsonl (PF12 keys; one JSON object per line).
 - Proof artifacts live under artifacts/proofs/; QA captures under artifacts/qa/.
+- Every governed artifact needs a sibling `.path_proof.txt` plus entries in `docs/evidence/INDEX.json` and `artifacts/evidence_index.jsonl` in the same PR (see HDE-Build Checklist, HDE-Schemas & Artifacts).
 
 ## Do / Don’t
 - Do use engine.presenter.emitter for public bytes, keep JSON canonical and LF-terminated, dedupe+sort arrays-as-sets, and normalize channel ids to NN-NN.
@@ -43,7 +51,7 @@
 - Do label the refusal route with the symbolic route name **"ops.rails.refusal"**.
 - Do capture refusal evidence as a single file: lower-case header names → one blank line → frozen body (LF).
 - Do treat **env-matrix** as **selection-only** (no DB connectivity); snapshots choose `DATABASE_URL` or `DB_BRIDGE_URL` and freeze the failure envelope.
-- Do implement **connection-time fallback** for DB posture scripts: try `DATABASE_URL`, then fall back to **Postgres-scheme** `DB_BRIDGE_URL`; fail fast if both are unusable.
+- Do implement **connection-time fallback** for DB posture scripts: try `DATABASE_URL`, then fall back to HTTPS `DB_BRIDGE_URL` through `BridgeProvider`; fail fast if both are unusable.
 - Do ensure compat/admin preview reuses the shared presenter/emitter when text output is required; ids-only preview is allowed for suppressed outcomes.
 - Don’t log request/response bodies or headers; redact emails/UUIDs/≥32-hex except allow-list {release_id, idempotence_hash, invocation_tag}.
 

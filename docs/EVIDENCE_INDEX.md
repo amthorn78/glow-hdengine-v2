@@ -1,37 +1,44 @@
-> **Note (EPIC-009):** The canonical human Evidence Index lives at `docs/evidence/INDEX.json`.
+> **Note (EPIC-011):** The canonical human Evidence Index lives at `docs/evidence/INDEX.json`.
 > Add new entries there first, then mirror key pointers here for quick navigation.
 
-# Appendix-D — Evidence Index (EPIC-009)
+# Appendix-D — Evidence Index (EPIC-011)
 
-## Ops rails refusal
-* `artifacts/ops/rails_refusal_proof.txt`
-* `artifacts/ops/no_io_guard.txt`
+## Bridge adapter & rails-open scope
+* `artifacts/db_bridge/adapter_selection.snapshot.json`
+* `artifacts/db_bridge/health.json`
+* `artifacts/db_bridge/root.json`
+* `artifacts/db_bridge/query_select_1.json`
+* `artifacts/db/introspect.search_path.json`
+* `artifacts/db/introspect.grants.json`
+* `artifacts/db/introspect.fingerprint.json`
+* `artifacts/engine/db_adapter.version.json`
+* `artifacts/engine/db_adapter.search_path.json`
+* `artifacts/engine/db_adapter.fingerprint.json`
+* `artifacts/logs/keys_only.sample.jsonl`
+* `artifacts/ops/rails_open_scope.txt`
 
 ## Env-matrix (selection-only)
 * `artifacts/runtime/env_matrix.snapshot.json`
-* `artifacts/runtime/env_matrix.failure.json`
+* `artifacts/runtime/env_matrix.diff.json`
+* `artifacts/runtime/env_matrix.prev.json`
 
-## Database (EPIC-009)
-* `artifacts/db/ddl_applied.sql`
-* `artifacts/db/check_schema.txt`
-* `artifacts/db/check_constraints.txt`
-* `artifacts/db/partition_plan.txt`
-* `artifacts/db/grants.txt`
-* `artifacts/db/ddl_fingerprint.json`
-* `artifacts/db/migration_runner.log`
-
-## QA Runs
-* `artifacts/qa/epic009_precommit_report.json`
-
-## PF12 parity (human + machine)
+## Indices & proofs (PF12)
 * `docs/evidence/INDEX.json`
 * `docs/evidence/INDEX.sha256`
 * `artifacts/evidence_index.jsonl`
+* `*.path_proof.txt` siblings for every governed artifact
 
-## Aux Narrative (EPIC-010) — Evidence
+## Ops rails refusal (historical)
+* `artifacts/ops/rails_refusal_proof.txt`
+* `artifacts/ops/no_io_guard.txt`
+
+## Aux Narrative (EPIC-010)
 * `audit/gates/narratives/keys_10x4.table.json`
 * `tests/transport/headers/aux_text_200.snap`
 * `tests/transport/headers/aux_suppression_200.snap`
+
+## QA Runs (EPIC-009)
+* `artifacts/qa/epic009_precommit_report.json`
 
 ---
 

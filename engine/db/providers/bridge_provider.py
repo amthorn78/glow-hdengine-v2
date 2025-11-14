@@ -4,11 +4,13 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Callable, Dict, List, Mapping, Sequence
 import json
+import time
 from urllib.parse import urlparse
 import urllib.error
 import urllib.request
 
 from ..errors import BridgeUnavailable, BridgeUnsupported, IntrospectionError, SqlExecError, TxError
+from ...ops.http_log import log_http_call
 
 Params = Sequence[Any] | Mapping[str, Any] | None
 
@@ -27,15 +29,28 @@ def _default_request(url: str, method: str, data: bytes | None, headers: Mapping
     req = urllib.request.Request(url, data=data, method=method)
     for key, value in headers.items():
         req.add_header(key, value)
+
+    parsed = urlparse(url)
+    path = parsed.path or "/"
+    route = f"db_bridge.{method.lower()}:{path}"
+    start = time.monotonic()
+    status: int | str = "error"
     try:
         with urllib.request.urlopen(req, timeout=10) as resp:  # type: ignore[arg-type]
-            return BridgeResponse(
-                status=getattr(resp, "status", resp.getcode()),
+            status = getattr(resp, "status", resp.getcode())
+            response = BridgeResponse(
+                status=status,
                 body=resp.read(),
                 headers={k.lower(): v for k, v in resp.headers.items()},
             )
     except urllib.error.HTTPError as exc:  # pragma: no cover - network behavior mocked
-        return BridgeResponse(status=exc.code, body=exc.read(), headers=dict(exc.headers or {}))
+        status = exc.code
+        response = BridgeResponse(status=exc.code, body=exc.read(), headers=dict(exc.headers or {}))
+    finally:
+        duration = (time.monotonic() - start) * 1000.0
+        log_http_call(route=route, status=status, duration_ms=duration)
+
+    return response
 
 
 class BridgeProvider:
@@ -158,6 +173,9 @@ class BridgeProvider:
         return results
 
     def introspect(self, kind: str) -> Any:
+        if kind == "version":
+            return self._introspect_version()
+
         data = self._json_request("GET", f"/introspect/{kind}")
         if data.get("status") != "ok":
             raise IntrospectionError(
@@ -165,13 +183,47 @@ class BridgeProvider:
                 attempts=["DATABASE_URL", "DB_BRIDGE_URL"],
                 code=str(data.get("error", "bridge_introspect_failed")),
             )
+
         payload = data.get("payload")
+        if payload is None:
+            payload = data
+
         return self._normalize_introspect(kind, payload)
 
     def _normalize_introspect(self, kind: str, payload: Any) -> Any:
-        if kind == "grants" and isinstance(payload, dict):
-            grants = [tuple(entry) for entry in payload.get("grants", [])]
+        if kind == "search_path" and isinstance(payload, str):
+            return {"status": "ok", "search_path": payload}
+
+        if isinstance(payload, dict):
             normalised = dict(payload)
-            normalised["grants"] = grants
+            normalised.setdefault("status", "ok")
+            if kind == "grants":
+                grants = normalised.get("grants", [])
+                if isinstance(grants, list):
+                    converted: List[Any] = []
+                    for entry in grants:
+                        if isinstance(entry, list):
+                            converted.append(tuple(entry))
+                        else:
+                            converted.append(entry)
+                    normalised["grants"] = converted
             return normalised
+
         return payload
+
+    def _introspect_version(self) -> Mapping[str, Any]:
+        try:
+            rows = self.query("SELECT current_setting('server_version')", [])
+        except SqlExecError as exc:
+            raise IntrospectionError(
+                "bridge_version_failed",
+                attempts=["DATABASE_URL", "DB_BRIDGE_URL"],
+                code="bridge_version_failed",
+            ) from exc
+
+        version = ""
+        if rows and rows[0]:
+            first = rows[0]
+            version = str(first[0]) if first else ""
+
+        return {"status": "ok", "version": version}

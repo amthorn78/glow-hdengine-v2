@@ -1,5 +1,20 @@
 # CHANGELOG
 
+2025-11-14 — EPIC-011: Bridge adapter evidence (S2–S7)
+
+### Added
+- HTTPS pg-bridge coverage in `BridgeProvider`, including `/health`, `/`, `/query`, and `/introspect/{search_path,grants,fingerprint}` with typed error mapping and a version probe.
+- Adapter-level introspection helpers (`DBAccess.introspect_version/search_path/grants/fingerprint`) and harness scripts:
+  - `scripts/db_bridge/capture_introspection.py`
+  - `scripts/db_adapter/capture_adapter_introspection.py`
+  - `scripts/ops/capture_rails_open_scope.py`
+- Keys-only HTTP logging via `engine.ops.http_log.log_http_call`, writing canonical JSONL to `artifacts/logs/keys_only.sample.jsonl`.
+- Rails-open scope evidence at `artifacts/ops/rails_open_scope.txt` proving only bridge routes were exercised.
+- Human and machine evidence indices updated with `.path_proof.txt` files for all S2–S7 artifacts (PF09 / PF12 discipline).
+
+### Changed
+- Updated documentation (README, AGENTS, docs/ADAPTER_DB.md, design package) to reflect the HTTPS bridge adapter workflow and evidence lifecycle.
+
 2025-11-12 — EPIC-010: R7 remediation (docs & evidence pointers)
 
 ### Changed

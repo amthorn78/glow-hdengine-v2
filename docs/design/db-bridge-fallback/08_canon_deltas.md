@@ -1,11 +1,11 @@
-# Canon Deltas — DB Bridge Fallback
+# Canon Deltas — Bridge adapter (EPIC-011)
 
-| Area | Current Canon | Delta | Notes |
+| Area | Prior Canon | Delta | Notes |
 | --- | --- | --- | --- |
-| Connection precedence | Primary DSN only | Introduce two-step attempt (`DATABASE_URL` → `DB_BRIDGE_URL`) before failing. | Aligns with `docs/ADAPTER_DB.md` guidance; no other retry layers added. |
-| URL validation | Minimal schema checks | Require Postgres scheme for bridge DSN; reject HTTP/HTTPS. | Prevents psycopg misuse and aligns with repo invariants. |
-| Error taxonomy | Generic connection failures | Normalize to typed `missing_db_config` when both DSNs unusable. | Ensures refusal evidence remains machine-parseable. |
-| Evidence catalog | Primary-only artifacts | Add fallback success/failure captures to `artifacts/db/` and index updates. | Maintain LF-termination and ASCII sorting. |
-| Documentation | High-level policy | New design docs under `docs/design/db-bridge-fallback/` referenced by audit snapshots. | Keeps change traceable without touching runbooks outside scope. |
+| Connection precedence | Psycopg-only | Preserve psycopg first, then HTTPS `DB_BRIDGE_URL` via `BridgeProvider`; record attempts in adapter snapshot. | Matches `docs/ADAPTER_DB.md`; no third-party retries added. |
+| Bridge validation | Allow Postgres DSN fallback | Require HTTPS pg-bridge endpoint; reject plaintext or missing URLs with typed `AdapterError`. | Prevents misuse and aligns with SAFE rails policy. |
+| Introspection surface | Manual SQL probes | Provide adapter helpers (`introspect_{version,search_path,fingerprint}`) that delegate to bridge endpoints and normalize payloads. | Shapes mirror pg-bridge responses and stay canonical JSON. |
+| Logging & telemetry | Route-specific logging only | Centralize keys-only HTTP logging via `engine.ops.http_log.log_http_call` (`{at,route,status,duration_ms,idempotence_hash?,release_id?}`). | Ensures no payloads/headers leak while preserving auditability. |
+| Evidence discipline | Partial indexing | Mandate `.path_proof.txt` files and synchronized updates to `docs/evidence/INDEX.json` + `artifacts/evidence_index.jsonl` for every governed artifact. | Reinforces PF09 / PF12 acceptance tokens. |
 
-Canon updates respect presenter requirements and avoid modifying transport/writer contracts.
+Canon updates respect presenter requirements, keep refusal handling unchanged, and document bridge usage through deterministic, auditable artifacts.
