@@ -1,0 +1,7 @@
+{"at":"2025-11-14T20:04:18.939Z","duration_ms":694.309,"route":"db_bridge.get:/introspect/search_path","status":200}
+{"at":"2025-11-14T20:04:19.520Z","duration_ms":580.004,"route":"db_bridge.get:/introspect/grants","status":200}
+{"at":"2025-11-14T20:04:19.978Z","duration_ms":457.864,"route":"db_bridge.get:/introspect/fingerprint","status":200}
+{"at":"2025-11-14T20:04:20.870Z","duration_ms":269.119,"route":"db_bridge.get:/health","status":200}
+{"at":"2025-11-14T20:04:21.306Z","duration_ms":434.674,"route":"db_bridge.post:/query","status":200}
+{"at":"2025-11-14T20:04:21.834Z","duration_ms":527.585,"route":"db_bridge.get:/introspect/search_path","status":200}
+{"at":"2025-11-14T20:04:22.223Z","duration_ms":388.251,"route":"db_bridge.get:/introspect/fingerprint","status":200}

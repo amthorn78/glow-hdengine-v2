@@ -115,6 +115,8 @@ class PsycopgProvider:
             return self._introspect_grants()
         if kind == "fingerprint":
             return self._introspect_fingerprint()
+        if kind == "version":
+            return self._introspect_version()
         raise IntrospectionError(
             f"unknown_introspection_kind:{kind}",
             code="unknown_introspection_kind",
@@ -298,3 +300,20 @@ class PsycopgProvider:
             fingerprint["objects"][key] = {"definition": definition}
 
         return fingerprint
+
+    def _introspect_version(self) -> Mapping[str, Any]:
+        try:
+            rows = self.query("SELECT current_setting('server_version')")
+        except SqlExecError as exc:
+            raise IntrospectionError(
+                "version_unavailable",
+                attempts=["DATABASE_URL"],
+                code="version_unavailable",
+            ) from exc
+
+        version = ""
+        if rows and rows[0]:
+            first = rows[0]
+            version = str(first[0]) if first else ""
+
+        return {"status": "ok", "version": version}

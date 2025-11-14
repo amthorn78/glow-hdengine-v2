@@ -1,0 +1,1 @@
+artifacts/db_bridge/adapter_selection.snapshot.json

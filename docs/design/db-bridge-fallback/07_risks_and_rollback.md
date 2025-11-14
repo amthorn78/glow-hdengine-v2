@@ -1,15 +1,14 @@
-# Risks & Rollback — DB Bridge Fallback
+# Risks & Rollback — Bridge adapter (EPIC-011)
 
 ## Key Risks
-- **Misconfigured bridge DSN**: Non-Postgres URLs may slip through and cause runtime errors. *Mitigation*: strict prefix validation and unit tests covering HTTP/HTTPS rejection.
-- **Divergent envelopes**: Fallback responses could deviate from canonical refusal format. *Mitigation*: reuse shared emitter and regression snapshots.
-- **Silent data drift**: Bridge-hosted database may lag behind primary. *Mitigation*: capture schema/grant fingerprints and compare during audit reviews.
-- **Operational ambiguity**: Operators might not know when fallback engaged. *Mitigation*: log keys-only events containing route, status, idempotence hash, release id.
+- **Invalid bridge URL**: Non-HTTPS URLs or missing `DB_BRIDGE_URL` block fallback. *Mitigation*: `BridgeProvider` enforces HTTPS and raises `bridge_requires_https` / `missing_bridge_url` early; adapter tests cover these paths.
+- **Payload drift**: Bridge responses could add unexpected fields. *Mitigation*: harness scripts write canonical JSON checked into the Evidence Index; adapter normalization ensures search_path, grants, fingerprint, and version stay typed.
+- **Logging leakage**: Mistakes could log bodies or headers. *Mitigation*: `engine.ops.http_log.log_http_call` only records keys `{at,route,status,duration_ms,idempotence_hash?,release_id?}`; tests guard the schema.
+- **Silent vendor access**: Rails-open runs might hit vendor HTTP. *Mitigation*: `scripts/ops/capture_rails_open_scope.py` computes per-route counts and fails if any `vendor.*` entry appears.
 
 ## Rollback Strategy
-1. Feature flag fallback helper behind configuration toggle defaulting to enabled; disable if incidents arise.
-2. Revert posture scripts to primary-only connection by redeploying prior adapter build (tagged in release manifest).
-3. Purge fallback-specific evidence entries while keeping baseline artifacts intact for traceability.
-4. Notify audit trail maintainers via `docs/SYNC_LOG.md` entry summarizing the rollback window.
+1. Disable bridge usage by setting `DB_FORCE_PG=1` (or removing `DB_BRIDGE_URL`) while leaving harness scripts intact for parity checks.
+2. Revert the adapter/bridge modules to the prior release tag and prune bridge artifacts from the Evidence Index (documenting removals in `docs/SYNC_LOG.md`).
+3. Retain `artifacts/logs/keys_only.sample.jsonl` and scope reports for the rollback window to show vendor HTTP stayed disabled.
 
-Rollback maintains canonical output expectations and preserves refusal capture workflow.
+Rollback preserves canonical outputs and refuses to bypass the shared emitter; evidence remains auditable throughout the transition.

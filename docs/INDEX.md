@@ -8,6 +8,10 @@
   - Posture: Text → 200 text/plain + quoted strong `ETag` (LF body, `Vary: Authorization, Accept-Encoding`); Suppressed → 200 empty, no `ETag`, optional generic `X-Narrative-Policy: suppressed` only.
   - Provenance headers (both outcomes): `X-Narrative-Pack-Sha`, `X-Narrative-Composition`.
   - Evidence: `audit/gates/narratives/keys_10x4.table.json`, `tests/transport/headers/aux_text_200.snap`, `tests/transport/headers/aux_suppression_200.snap`.
+- Bridge adapter evidence (EPIC-011):
+  - Harnesses: `scripts/db_bridge/capture_introspection.py`, `scripts/db_adapter/capture_adapter_introspection.py`, `scripts/ops/capture_rails_open_scope.py`.
+  - Artifacts: `artifacts/db_bridge/adapter_selection.snapshot.json`, `artifacts/db_bridge/{health.json,root.json,query_select_1.json}`, `artifacts/db/introspect.{search_path,grants,fingerprint}.json`, `artifacts/engine/db_adapter.{version,search_path,fingerprint}.json`, `artifacts/logs/keys_only.sample.jsonl`, `artifacts/ops/rails_open_scope.txt`.
+  - Indexing: every governed artifact has a `.path_proof.txt` plus entries in `docs/evidence/INDEX.json` and `artifacts/evidence_index.jsonl` (PF09 / PF12 discipline).
 - EPIC006 acceptance: run `LC_ALL=C TZ=UTC pytest -q -m epic006`
 
 This repo contains implementation docs. Canon (spec/process) lives in PF documents; reference **titles only**:

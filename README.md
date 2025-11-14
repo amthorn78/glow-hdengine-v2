@@ -6,8 +6,18 @@ Glow HD Engine — README
 - **Refusal (ops):** `/ops/rails/refusal` returns 503 with a typed JSON body, `Cache-Control: no-store`, **no ETag**, and no vendor I/O.
 - **Keys-only logs:** refusal route logs exactly `{at, route, status, duration_ms, idempotence_hash, release_id}` (no bodies/headers/secrets).
 - **Env-matrix snapshots:** selection-only evidence (success chooses `DATABASE_URL` or `DB_BRIDGE_URL`, failure is typed—no DB connectivity here).
-- **DB posture:** scripts use connection-time fallback (try `DATABASE_URL`, fall back to **Postgres DSN** `DB_BRIDGE_URL`); evidence includes `search_path`, **grants** (present-even-empty ADP), normalized **DDL fingerprint**, and migration **two-run identity**.
+- **DB posture:** scripts use the adapter’s connection-time fallback (try `DATABASE_URL`, then HTTPS `DB_BRIDGE_URL` through the bridge); evidence includes `search_path`, **grants** (present-even-empty ADP), normalized **DDL fingerprint**, and migration **two-run identity**.
 - **QA quick run:** `scripts/qa/epic009_precommit.sh` → expect **QA_OK** and report at `artifacts/qa/epic009_precommit_report.json`.
+
+## EPIC-011 — Bridge adapter evidence (S2–S7)
+- **Bridge provider:** `engine.db.providers.BridgeProvider` talks to `DB_BRIDGE_URL` over HTTPS (`/health`, `/`, `/query`, `/introspect/{search_path,grants,fingerprint}`, plus a version probe). Network failures surface as typed adapter errors.
+- **Adapter selection:** `DBAccess.for_current_env` records attempts in `artifacts/db_bridge/adapter_selection.snapshot.json` (canonical JSON, LF-terminated) showing the fallback order and selected provider.
+- **Harnesses:**
+  - `scripts/db_bridge/capture_introspection.py` hits the bridge endpoints directly and writes canonical snapshots under `artifacts/db_bridge/` and `artifacts/db/`.
+  - `scripts/db_adapter/capture_adapter_introspection.py` exercises `DBAccess.introspect_{version,search_path,grants,fingerprint}` and stores adapter-level evidence under `artifacts/engine/`.
+  - `scripts/ops/capture_rails_open_scope.py` reruns both harnesses with rails open, asserts only bridge routes were hit, and summarizes counts in `artifacts/ops/rails_open_scope.txt`.
+- **Keys-only HTTP logging:** `engine.ops.http_log.log_http_call` appends `{at,route,status,duration_ms,idempotence_hash?,release_id?}` to `artifacts/logs/keys_only.sample.jsonl` for every bridge (and vendor) request—no URLs, headers, or payload bodies are persisted.
+- **Evidence discipline:** Every governed artifact ships with a `.path_proof.txt`, a human index entry (`docs/evidence/INDEX.json`), and a machine mirror record (`artifacts/evidence_index.jsonl`) in the same PR.
 
 ## Aux Narrative (EPIC-010)
 - **Route & alias:** `GET /api/aux/narrative?v=1` (canonical) and `/aux/narrative?v=1` (back-compat alias).
@@ -107,6 +117,8 @@ Transport & caching (A7): Environment & Integration Plan v2.0.
 Public body (contract): docs/contracts/reader_v1_public_bytes.md.
 
 Reader surface (endpoints & gating): docs/server/reader_v1.md.
+
+Bridge adapter & pg-bridge evidence: docs/ADAPTER_DB.md, docs/design/db-bridge-fallback/.
 
 CLI behavior & numerics policy: Glow HD Engine — CLI, API & Vendor Ingest Spec v0.1.5 and docs/CLI_commands.md.
 

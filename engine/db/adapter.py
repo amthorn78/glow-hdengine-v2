@@ -84,6 +84,24 @@ def _canonical_attempt(provider: str, status: str, *, reason: str | None = None)
     return attempt
 
 
+def _normalize_introspect_payload(kind: str, payload: Any) -> Dict[str, Any]:
+    if isinstance(payload, Mapping):
+        result = dict(payload)
+        result.setdefault("status", "ok")
+        return result
+
+    if kind == "search_path":
+        return {"status": "ok", "search_path": str(payload)}
+
+    if kind == "version":
+        return {"status": "ok", "version": str(payload)}
+
+    raise IntrospectionError(
+        f"unexpected_introspection_payload:{kind}",
+        code="unexpected_introspection_payload",
+    )
+
+
 class DBAccess:
     """High-level façade exposing DB operations across providers."""
 
@@ -240,3 +258,16 @@ class DBAccess:
 
     def health(self) -> None:
         self._provider.health()
+
+    # structured introspection helpers ----------------------------------
+    def introspect_search_path(self) -> Mapping[str, Any]:
+        payload = self.introspect("search_path")
+        return _normalize_introspect_payload("search_path", payload)
+
+    def introspect_fingerprint(self) -> Mapping[str, Any]:
+        payload = self.introspect("fingerprint")
+        return _normalize_introspect_payload("fingerprint", payload)
+
+    def introspect_version(self) -> Mapping[str, Any]:
+        payload = self.introspect("version")
+        return _normalize_introspect_payload("version", payload)
