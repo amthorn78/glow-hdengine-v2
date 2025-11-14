@@ -1,0 +1,8 @@
+Resolver summary (scripts/db/_util.py):
+- Reads both DATABASE_URL and DB_BRIDGE_URL via os.getenv.
+- Attempts DATABASE_URL first; if psycopg.connect succeeds the resolver returns it immediately.
+- Records DATABASE_URL failures before considering fallback.
+- Fallback considers DB_BRIDGE_URL only when urlparse(...) reports a postgres/postgresql scheme and when the environment allows dev/test fallback (APP_ENV/ENGINE_ENV unset defaults to dev-allowed).
+- If DB_BRIDGE_URL has a postgres scheme, the resolver attempts psycopg.connect and returns it on success.
+- https:// bridge URLs are skipped (not handed to psycopg) but noted in the attempts list, yielding MissingDbConfigError when no DSN path works.
+- Production-like envs (APP_ENV not in dev/test set) keep fallback disabled even for postgres-scheme bridges.

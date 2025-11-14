@@ -9,6 +9,14 @@ from urllib.parse import urlparse
 import psycopg
 
 
+class MissingDbConfigError(RuntimeError):
+    code = "missing_db_config"
+
+    def __init__(self, message: str = "missing_db_config", *, attempts: list[str] | None = None):
+        super().__init__(message)
+        self.attempts = attempts or []
+
+
 def _is_pg_dsn(value: str | None) -> bool:
     if not value:
         return False
@@ -17,9 +25,18 @@ def _is_pg_dsn(value: str | None) -> bool:
     return scheme in ("postgres", "postgresql")
 
 
+def _env_allows_bridge_fallback() -> bool:
+    env = (os.getenv("APP_ENV") or os.getenv("ENGINE_ENV") or "").strip().lower()
+    if not env:
+        return True
+    return env in {"dev", "development", "test", "testing"}
+
+
 def dsn_for_db_scripts() -> str:
     dsn1 = os.getenv("DATABASE_URL")
     dsn2 = os.getenv("DB_BRIDGE_URL")
+
+    attempts: list[str] = []
 
     if dsn1:
         try:
@@ -27,14 +44,21 @@ def dsn_for_db_scripts() -> str:
                 pass
             return dsn1
         except Exception:
-            pass
+            attempts.append("DATABASE_URL")
 
-    if _is_pg_dsn(dsn2):
-        with psycopg.connect(dsn2, connect_timeout=5) as _conn:
-            pass
-        return dsn2
+    allow_bridge = _env_allows_bridge_fallback()
 
-    raise RuntimeError("missing_db_config")
+    if _is_pg_dsn(dsn2) and (allow_bridge or not dsn1):
+        try:
+            with psycopg.connect(dsn2, connect_timeout=5) as _conn:
+                pass
+            return dsn2
+        except Exception:
+            attempts.append("DB_BRIDGE_URL")
+    elif _is_pg_dsn(dsn2) and not allow_bridge:
+        attempts.append("DB_BRIDGE_URL")
+
+    raise MissingDbConfigError(attempts=attempts)
 
 
 @contextmanager
