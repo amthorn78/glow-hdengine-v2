@@ -1,0 +1,4 @@
+DB_BRIDGE_URL request: ok
+endpoint: https://illustrious-freedom-production.up.railway.app
+status: 200
+body_sample: {"ok":true,"service":"pg-bridge"}

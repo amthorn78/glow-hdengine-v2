@@ -1,0 +1,4 @@
+docs/adr/hde/body_graphs_adr.md
+Captured by Codex for HDE-EPIC011 (DB ADR & DDL freeze).
+SAFE_MODE=1, ALLOW_NETWORK=0, LC_ALL=C, LANG=C, TZ=UTC.
+No DB or network calls were made when this ADR was created.

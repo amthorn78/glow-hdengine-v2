@@ -1,0 +1,19 @@
+DB_BRIDGE_URL references:
+- CHANGELOG.md:L34-L37 — Narrative describing env-matrix selection-only behavior and fallback expectations.
+- scripts/db/_util.py:L18-L60 — Shared resolver reads DB_BRIDGE_URL but only uses it when it is a postgres:// DSN and fallback is allowed.
+- scripts/qa/epic009_precommit.sh:L92-L96 — QA script validates env matrix inputs for DATABASE_URL / DB_BRIDGE_URL.
+- adapter/db_access.py:L40-L152 — HTTP bridge client that hits <bridge>/meta and /rw-smoke when SAFE_MODE and ALLOW_NETWORK allow it; treats DB_BRIDGE_URL as HTTPS endpoint.
+- tests/db/test_dsn_resolver.py:L30-L92 — Unit tests covering postgres-scheme fallback behavior.
+- tests/db/test_env_matrix_resolver.py:L15-L36 — Tests ensuring env-matrix resolver surfaces which URL was selected.
+- tests/db/test_db_resolver_attempt_both.py:L20-L33 — Regression test showing https:// bridge URLs should not be fed to psycopg.
+- docs/ADAPTER_DB.md, docs/SECRETS.md, README.md, etc. — Documentation reinforcing postgres-only fallback rules and HTTPS bridge usage for QA tooling.
+
+DATABASE_URL references:
+- scripts/db/_util.py — Primary DSN attempt for posture scripts.
+- adapter/db_access.py — Direct Postgres connections for diagnostics and RW smoke tests when rails permit.
+- scripts/qa/epic009_precommit.sh — Evidence matrix gating.
+- Various docs (README.md, CHANGELOG.md, docs/adr/hde/body_graphs_adr.md) — Canon statements about posture and fallback.
+
+Bridge usage classification:
+- No code paths attempt to hand an https:// DB_BRIDGE_URL to psycopg; postgres-scheme URLs are eligible for fallback.
+- The adapter/db_access.py helper treats DB_BRIDGE_URL as an HTTP bridge (GET /meta, POST /rw-smoke) guarded by SAFE_MODE/ALLOW_NETWORK.
