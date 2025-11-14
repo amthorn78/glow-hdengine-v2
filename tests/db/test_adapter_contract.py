@@ -3,8 +3,12 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 from typing import Any, List
+import urllib.error
+
+import pytest
 
 from engine.db.adapter import Statement
+from engine.db.errors import BridgeUnavailable
 from engine.db.providers.bridge_provider import BridgeProvider, BridgeResponse
 from engine.db.providers.psycopg_provider import PsycopgProvider
 
@@ -66,6 +70,19 @@ def test_bridge_payload_serialization_is_canonical() -> None:
     provider.query("SELECT 1", {"b": 2, "a": 1})
 
     assert recorded == ['{"params":{"a":1,"b":2},"sql":"SELECT 1"}']
+
+
+def test_bridge_network_errors_are_wrapped() -> None:
+    def failing_request(url: str, method: str, data, headers):
+        raise urllib.error.URLError("temporary failure")
+
+    provider = BridgeProvider("https://bridge.example", request=failing_request)
+
+    with pytest.raises(BridgeUnavailable) as excinfo:
+        provider.health()
+
+    assert excinfo.value.code == "bridge_network_error"
+    assert excinfo.value.attempts == ["DATABASE_URL", "DB_BRIDGE_URL"]
 
 
 def test_psycopg_tx_returns_tuples() -> None:

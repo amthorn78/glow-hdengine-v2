@@ -67,7 +67,26 @@ class BridgeProvider:
         headers = {"Content-Type": "application/json"}
         if payload is not None:
             data = json.dumps(payload, separators=(",", ":"), sort_keys=True).encode("utf-8")
-        response = self._request(url, method, data, headers)
+        try:
+            response = self._request(url, method, data, headers)
+        except urllib.error.URLError as exc:
+            raise BridgeUnavailable(
+                "bridge_network_error",
+                attempts=["DATABASE_URL", "DB_BRIDGE_URL"],
+                code="bridge_network_error",
+            ) from exc
+        except TimeoutError as exc:
+            raise BridgeUnavailable(
+                "bridge_network_timeout",
+                attempts=["DATABASE_URL", "DB_BRIDGE_URL"],
+                code="bridge_network_timeout",
+            ) from exc
+        except OSError as exc:
+            raise BridgeUnavailable(
+                "bridge_network_error",
+                attempts=["DATABASE_URL", "DB_BRIDGE_URL"],
+                code="bridge_network_error",
+            ) from exc
         if response.status != 200:
             raise BridgeUnavailable(
                 "bridge_http_error",
