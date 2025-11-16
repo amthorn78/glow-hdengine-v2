@@ -110,6 +110,13 @@ def test_bg_resolve_vendor_open_rails_success(monkeypatch: pytest.MonkeyPatch, c
     payload = json.loads(captured.out)
     assert payload["status"] == "ok"
     ingest = payload["ingest"]
+    assert ingest["provider"] == fake_outcome.vendor
+    assert ingest["vendor_version"] == fake_outcome.vendor_version
     assert ingest["input_fingerprint"] == fake_outcome.input_fingerprint
-    assert ingest["rows_written"] == 1
-    assert ingest["parity_match"] is True
+    assert ingest["idempotency_key"] == fake_outcome.idempotency_key
+    assert ingest["rows_written"] == fake_outcome.rows_written
+    assert ingest["db_rows_after"] == fake_outcome.db_rows_after
+    assert ingest["duration_ms"] == round(fake_outcome.duration_ms, 3)
+    assert ingest["payload_sha256"] == fake_outcome.payload_sha256
+    assert ingest["db_emitted_sha256"] == fake_outcome.db_emitted_sha256
+    assert ingest["parity_match"] == fake_outcome.parity_match
