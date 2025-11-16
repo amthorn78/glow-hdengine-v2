@@ -2,10 +2,16 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Mapping, MutableMapping, Optional
 
-from .ingest import IngestOutcome, VendorInputs, gather_inputs_from_env, ingest_vendor_bodygraph
+from .ingest import (
+    IngestOutcome,
+    VendorInputs,
+    gather_inputs_from_env,
+    ingest_vendor_bodygraph,
+    resolve_db_user_id,
+)
 from .vendor_client import VendorError
 
 def _truthy(value: object) -> bool:
@@ -133,6 +139,18 @@ def _resolve_vendor(
         vendor_inputs = _resolve_inputs(user_id, birthdate, birthtime, location)
     except VendorError as exc:
         return _vendor_error(exc, resolver_meta)
+    try:
+        normalized_user_id = resolve_db_user_id(vendor_inputs.user_id)
+    except VendorError as exc:
+        return _vendor_error(exc, resolver_meta)
+    except Exception as exc:  # pragma: no cover - defensive guardrail
+        unexpected = VendorError(
+            "PROVIDER_INPUT_INVALID",
+            "user_id normalization failed",
+            details={"error": exc.__class__.__name__},
+        )
+        return _vendor_error(unexpected, resolver_meta)
+    vendor_inputs = replace(vendor_inputs, user_id=normalized_user_id)
     try:
         outcome = ingest_vendor_bodygraph(vendor_inputs, env=env)
     except VendorError as exc:
