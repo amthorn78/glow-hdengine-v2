@@ -4,7 +4,7 @@ import json
 
 import pytest
 
-from engine.bodygraph.ingest import IngestOutcome
+from engine.bodygraph.ingest import IngestOutcome, resolve_db_user_id
 from engine.cli.main import cli
 
 
@@ -68,11 +68,13 @@ def test_bg_resolve_vendor_open_rails_success(monkeypatch: pytest.MonkeyPatch, c
     _set_open_rails(monkeypatch)
     monkeypatch.setenv("APP_ENV", "dev")
 
+    normalized_user_id = resolve_db_user_id("open-rails")
+
     fake_outcome = IngestOutcome(
         vendor="hdapi",
         vendor_version=1,
         input_fingerprint="abc123",
-        idempotency_key="open-rails:hdapi:1:abc123",
+        idempotency_key=f"{normalized_user_id}:hdapi:1:abc123",
         rows_written=1,
         duration_ms=25.0,
         payload_sha256="p",
@@ -82,7 +84,7 @@ def test_bg_resolve_vendor_open_rails_success(monkeypatch: pytest.MonkeyPatch, c
     )
 
     def _fake_ingest(inputs, **kwargs):
-        assert inputs.user_id == "open-rails"
+        assert inputs.user_id == normalized_user_id
         return fake_outcome
 
     monkeypatch.setattr("engine.bodygraph.resolver.ingest_vendor_bodygraph", _fake_ingest)
