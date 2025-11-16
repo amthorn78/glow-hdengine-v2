@@ -1,0 +1,4 @@
+VERIFY 2025-11-15T03:57:44.872253Z
+- curl exit code: 0
+- bridge response status: ok
+- rows returned: 0 (LIMIT 0)

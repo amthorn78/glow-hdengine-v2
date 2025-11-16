@@ -1,0 +1,1 @@
+artifacts/db/migrations/rollback_verify.log

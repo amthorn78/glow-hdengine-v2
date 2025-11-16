@@ -44,6 +44,17 @@
 - Proof artifacts live under artifacts/proofs/; QA captures under artifacts/qa/.
 - Every governed artifact needs a sibling `.path_proof.txt` plus entries in `docs/evidence/INDEX.json` and `artifacts/evidence_index.jsonl` in the same PR (see HDE-Build Checklist, HDE-Schemas & Artifacts).
 
+## EPIC011 – Source invariance test chart (S10)
+
+Use this synthetic chart for vendor ingest, refresh posture, and DB-only invariance checks (no real user system required):
+
+- user_id: `epic011-s10-invariance-1`
+- birthdate: `1990-01-01`
+- birthtime: `12:00`
+- location: `Amsterdam, Netherlands`
+
+These pins drive the S9/S10/S11 harnesses and must remain stable so the ingest path, parity proofs, and refresh worker share the same BodyGraph row.
+
 ## Do / Don’t
 - Do use engine.presenter.emitter for public bytes, keep JSON canonical and LF-terminated, dedupe+sort arrays-as-sets, and normalize channel ids to NN-NN.
 - Don’t add new env vars, bypass the shared emitter, alter transport rules, or stash specs in Build Notes.

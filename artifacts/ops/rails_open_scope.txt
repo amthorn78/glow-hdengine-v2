@@ -1,12 +1,9 @@
-captured_at_utc: 2025-11-14T20:04:22Z
-safe_mode: 0
-allow_network: 1
-db_bridge_url_present: True
-database_url_present: True
-route_counts:
-  db_bridge.get:/health 1
-  db_bridge.get:/introspect/fingerprint 2
-  db_bridge.get:/introspect/grants 1
+summary:
+  total_calls = 11
+routes:
+  db_bridge.get:/health 2
+  db_bridge.get:/introspect/fingerprint 3
   db_bridge.get:/introspect/search_path 2
-  db_bridge.post:/query 1
-vendor_call_count: 0
+  db_bridge.post:/query 3
+  ops.bootstrap.s0 1
+vendor_routes_detected: 0

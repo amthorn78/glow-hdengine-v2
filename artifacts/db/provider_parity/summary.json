@@ -1,0 +1,1 @@
+{"bridge_provider":"bridge","db_provider":"bridge","psycopg_attempt":{"provider":"psycopg","reason":"primary_connect_failed","status":"error"},"query":"SELECT 1","rows_match":true,"schema":"v1"}

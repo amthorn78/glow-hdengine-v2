@@ -1,1 +1,4 @@
-no-op: no migrations to run
+DRYRUN 2025-11-15T03:52:47.374420Z
+- inspected migrations directory: migrations
+- pending migrations: 005_identity.sql, 008_writers_auth.sql
+- applied migrations remain unchanged

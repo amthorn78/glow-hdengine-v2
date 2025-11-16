@@ -9,6 +9,7 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, Iterable
 
+from engine.bodygraph import resolve_bodygraph
 from engine.compat import ts_v0
 from engine.compat.categories import CATEGORIES_ORDER_V1
 from engine.compat.compute import compat_public, band_for
@@ -22,6 +23,7 @@ from engine.constants import (
     THROAT_EM_MAX,
     CENTER_MAX,
 )
+from engine.presenter import emitter
 from engine.runtime import emit_reader_public_envelope
 from engine.serializer.canon import sercanon
 from engine.narratives import emit_public_aux, get_pack
@@ -85,7 +87,54 @@ def _build_parser() -> argparse.ArgumentParser:
     aux.add_argument("--band", required=True, choices=AUX_BANDS)
     aux.add_argument("--perspective", required=True, choices=AUX_PERSPECTIVES)
     aux.set_defaults(handler=aux_preview)
+    bg = sub.add_parser(
+        "bg:resolve",
+        help="Resolve BodyGraphs from db/vendor sources (Phase S8a stub)",
+        allow_abbrev=False,
+    )
+    bg.add_argument("--user", required=True, help="BodyGraph user identifier")
+    bg.add_argument(
+        "--source",
+        choices=("auto", "db", "vendor"),
+        default="auto",
+        help="Source to consult (default: auto)",
+    )
+    bg.add_argument(
+        "--upsert",
+        action="store_true",
+        help="Request durability upsert once implemented",
+    )
+    bg.add_argument(
+        "--dry-run",
+        dest="dry_run",
+        action="store_true",
+        help="Emit planning envelope without performing writes",
+    )
+    bg.add_argument("--birthdate", help="Birthdate (YYYY-MM-DD) for vendor source")
+    bg.add_argument("--birthtime", help="Birth time (HH:MM) for vendor source")
+    bg.add_argument("--location", help="Location string for vendor source")
+    bg.set_defaults(handler=bg_resolve)
     return parser
+
+
+def _resolver_env() -> Dict[str, str | None]:
+    return {name: os.environ.get(name) for name in ("SAFE_MODE", "ALLOW_NETWORK", "APP_ENV")}
+
+
+def bg_resolve(args: argparse.Namespace) -> int:
+    result = resolve_bodygraph(
+        args.user,
+        source=args.source,
+        upsert=bool(args.upsert),
+        dry_run=bool(getattr(args, "dry_run", False)),
+        env=_resolver_env(),
+        birthdate=getattr(args, "birthdate", None),
+        birthtime=getattr(args, "birthtime", None),
+        location=getattr(args, "location", None),
+    )
+    output = emitter.emit_public(result.payload).decode("utf-8")
+    sys.stdout.write(output)
+    return result.exit_code
 
 
 def cli(argv: list[str] | None = None) -> int:

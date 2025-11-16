@@ -1,0 +1,1 @@
+artifacts/presenter/json_canon_compare.log

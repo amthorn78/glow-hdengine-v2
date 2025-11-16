@@ -1,0 +1,1 @@
+artifacts/db/check_schema.txt

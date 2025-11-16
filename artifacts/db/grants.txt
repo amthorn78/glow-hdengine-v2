@@ -1,1 +1,14 @@
-missing_db_config: unable to inspect grants
+object: hde
+  postgres: CREATE, USAGE
+
+object: hde.body_graphs
+  postgres: DELETE, INSERT, REFERENCES, SELECT, TRIGGER, TRUNCATE, UPDATE
+
+object: hde.body_graphs_current
+  postgres: DELETE, INSERT, REFERENCES, SELECT, TRIGGER, TRUNCATE, UPDATE
+
+object: public.hde_body_graphs_current
+  postgres: DELETE, INSERT, REFERENCES, SELECT, TRIGGER, TRUNCATE, UPDATE
+
+ALTER DEFAULT PRIVILEGES:
+(none)
