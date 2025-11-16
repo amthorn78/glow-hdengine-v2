@@ -1,3 +1,4 @@
-apply 005_identity.sql
-apply 008_writers_auth.sql
-apply 011_body_graphs_durability.sql
+APPLY 2025-11-15T03:57:50.037452Z
+- replayed migrations via bridge provider
+- applied migrations: 011_body_graphs_durability.sql
+- pending migrations: 005_identity.sql, 008_writers_auth.sql

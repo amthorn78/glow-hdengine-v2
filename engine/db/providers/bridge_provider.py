@@ -76,7 +76,7 @@ class BridgeProvider:
         self._base_url = cleaned.rstrip("/")
         self._request = request or _default_request
 
-    def _json_request(self, method: str, path: str, payload: Mapping[str, Any] | None = None) -> Dict[str, Any]:
+    def _json_request(self, method: str, path: str, payload: Mapping[str, Any] | None = None) -> tuple[Dict[str, Any], int]:
         url = f"{self._base_url}{path}"
         data: bytes | None = None
         headers = {"Content-Type": "application/json"}
@@ -102,24 +102,19 @@ class BridgeProvider:
                 attempts=["DATABASE_URL", "DB_BRIDGE_URL"],
                 code="bridge_network_error",
             ) from exc
-        if response.status != 200:
-            raise BridgeUnavailable(
-                "bridge_http_error",
-                attempts=["DATABASE_URL", "DB_BRIDGE_URL"],
-                code="bridge_http_error",
-            )
         try:
-            return json.loads(response.body.decode("utf-8"))
+            payload_obj = json.loads(response.body.decode("utf-8"))
         except Exception as exc:
             raise BridgeUnavailable(
                 "bridge_invalid_json",
                 attempts=["DATABASE_URL", "DB_BRIDGE_URL"],
                 code="bridge_invalid_json",
             ) from exc
+        return payload_obj, response.status
 
     def health(self) -> None:
-        data = self._json_request("GET", "/health")
-        if data.get("status") != "ok":
+        data, status = self._json_request("GET", "/health")
+        if status != 200 or data.get("status") != "ok":
             raise BridgeUnavailable(
                 "bridge_health_failed",
                 attempts=["DATABASE_URL", "DB_BRIDGE_URL"],
@@ -127,11 +122,21 @@ class BridgeProvider:
             )
 
     def query(self, sql: str, params: Params = None) -> List[Sequence[Any]]:
-        payload = {"sql": sql, "params": params}
-        data = self._json_request("POST", "/query", payload)
-        if data.get("status") != "ok":
+        payload: Dict[str, Any] = {"sql": sql}
+        if params is not None:
+            payload["params"] = params
+        data, status = self._json_request("POST", "/query", payload)
+        if status != 200:
+            detail = str(data.get("detail") or data.get("error") or "bridge_query_failed")
             raise SqlExecError(
-                "bridge_query_failed",
+                detail,
+                attempts=["DATABASE_URL", "DB_BRIDGE_URL"],
+                code=str(data.get("error", "bridge_query_failed")),
+            )
+        if data.get("status") != "ok":
+            detail = str(data.get("detail") or data.get("error") or "bridge_query_failed")
+            raise SqlExecError(
+                detail,
                 attempts=["DATABASE_URL", "DB_BRIDGE_URL"],
                 code=str(data.get("error", "bridge_query_failed")),
             )
@@ -139,28 +144,48 @@ class BridgeProvider:
         return [tuple(row) if isinstance(row, list) else tuple(row) for row in rows]
 
     def exec(self, sql: str, params: Params = None) -> None:
-        payload = {"sql": sql, "params": params}
-        data = self._json_request("POST", "/exec", payload)
-        if data.get("status") != "ok":
+        payload: Dict[str, Any] = {"sql": sql}
+        if params is not None:
+            payload["params"] = params
+        data, status = self._json_request("POST", "/exec", payload)
+        if status != 200:
+            detail = str(data.get("detail") or data.get("error") or "bridge_exec_failed")
             raise SqlExecError(
-                "bridge_exec_failed",
+                detail,
+                attempts=["DATABASE_URL", "DB_BRIDGE_URL"],
+                code=str(data.get("error", "bridge_exec_failed")),
+            )
+        if data.get("status") != "ok":
+            detail = str(data.get("detail") or data.get("error") or "bridge_exec_failed")
+            raise SqlExecError(
+                detail,
                 attempts=["DATABASE_URL", "DB_BRIDGE_URL"],
                 code=str(data.get("error", "bridge_exec_failed")),
             )
 
     def tx(self, statements: Sequence[Any]) -> List[Sequence[Any] | None]:
-        serialised = [
-            {
+        serialised = []
+        for stmt in statements:
+            entry: Dict[str, Any] = {
                 "sql": getattr(stmt, "sql"),
-                "params": getattr(stmt, "params", None),
                 "fetch": bool(getattr(stmt, "fetch", False)),
             }
-            for stmt in statements
-        ]
-        data = self._json_request("POST", "/tx", {"statements": serialised})
-        if data.get("status") != "ok":
+            params = getattr(stmt, "params", None)
+            if params is not None:
+                entry["params"] = params
+            serialised.append(entry)
+        data, status = self._json_request("POST", "/tx", {"statements": serialised})
+        if status != 200:
+            detail = str(data.get("detail") or data.get("error") or "bridge_tx_failed")
             raise TxError(
-                "bridge_tx_failed",
+                detail,
+                attempts=["DATABASE_URL", "DB_BRIDGE_URL"],
+                code=str(data.get("error", "bridge_tx_failed")),
+            )
+        if data.get("status") != "ok":
+            detail = str(data.get("detail") or data.get("error") or "bridge_tx_failed")
+            raise TxError(
+                detail,
                 attempts=["DATABASE_URL", "DB_BRIDGE_URL"],
                 code=str(data.get("error", "bridge_tx_failed")),
             )
@@ -176,8 +201,8 @@ class BridgeProvider:
         if kind == "version":
             return self._introspect_version()
 
-        data = self._json_request("GET", f"/introspect/{kind}")
-        if data.get("status") != "ok":
+        data, status = self._json_request("GET", f"/introspect/{kind}")
+        if status != 200 or data.get("status") != "ok":
             raise IntrospectionError(
                 "bridge_introspect_failed",
                 attempts=["DATABASE_URL", "DB_BRIDGE_URL"],

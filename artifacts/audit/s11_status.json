@@ -1,0 +1,10 @@
+{
+  "phase": "S11",
+  "status": "captured",
+  "reason": "Out-of-band refresh worker captured TTL/SWR policy, metrics, and keys-only logs.",
+  "artifacts": {
+    "refresh_policy": "artifacts/bodygraph/refresh_policy.snapshot.json",
+    "metrics": "artifacts/bodygraph/metrics.snapshot.json",
+    "refresh_logs": "artifacts/bodygraph/keys_only.logs.sample"
+  }
+}

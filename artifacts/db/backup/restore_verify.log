@@ -1,0 +1,12 @@
+2025-11-16T00:49:13Z - Restore rehearsal
+provider: railway
+backup_id: 2025-11-16 00:04 UTC
+restored_to: deployment bd8b82a4-11bb-4354-8948-0f13b3a2a87b
+steps:
+  - trigger restore in Railway UI for backup 2025-11-16 00:04 UTC (succeeded)
+  - run 'python -m scripts.db.verify_backup_restore' against restored DB
+    - check_search_path: OK (value='hde, public')
+    - body_graphs_exists: OK
+    - rows_in_body_graphs: 3
+  - run 'pytest tests/bodygraph/test_ingest.py tests/cli/test_bg_resolve.py -q' (pytest: 5 passed)
+result: OK

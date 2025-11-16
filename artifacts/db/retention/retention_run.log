@@ -1,0 +1,4 @@
+{"action":"verify-only","at":"2025-11-16T01:54:46Z","deleted_rows":0,"inspected_rows":3,"route":"ops.retention.bodygraph","status":"ok","table":"hde.body_graphs"}
+{"action":"verify-only","at":"2025-11-16T01:54:46Z","deleted_rows":0,"inspected_rows":2,"route":"ops.retention.bodygraph","status":"ok","table":"hde.body_graphs_current"}
+{"action":"verify-only","at":"2025-11-16T01:54:46Z","deleted_rows":0,"inspected_rows":2,"route":"ops.retention.bodygraph","status":"ok","table":"public.hde_body_graphs_current"}
+{"at":"2025-11-16T01:54:46Z","duration_ms":1961.194,"route":"ops.retention.bodygraph","status":"ok","summary":{"bodygraph_deletes":0,"checked_tables":3}}

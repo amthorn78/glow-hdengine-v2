@@ -1,1 +1,1 @@
-{"pending":["005_identity.sql","008_writers_auth.sql","011_body_graphs_durability.sql"],"schema":"v1"}
+{"applied":["011_body_graphs_durability.sql"],"pending":["005_identity.sql","008_writers_auth.sql"],"schema":"v1"}

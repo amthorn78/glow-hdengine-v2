@@ -1,0 +1,4 @@
+{"at":"2025-11-15T21:15:08Z","attempt":1,"duration_ms":1173.331,"error_class":"none","profile":"exponential","route":"vendor.hdapi.post:/bodygraphs","status":200}
+{"at":"2025-11-15T21:15:14Z","attempt":1,"duration_ms":1365.704,"error_class":"none","profile":"exponential","route":"vendor.hdapi.post:/bodygraphs","status":200}
+{"at":"2025-11-15T23:30:39Z","attempt":1,"duration_ms":1353.495,"error_class":"none","profile":"exponential","route":"vendor.hdapi.post:/bodygraphs","status":200}
+{"at":"2025-11-15T23:32:02Z","attempt":1,"duration_ms":914.515,"error_class":"none","profile":"exponential","route":"vendor.hdapi.post:/bodygraphs","status":200}

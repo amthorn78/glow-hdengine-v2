@@ -20,3 +20,4 @@ VERIFY.out
 *.bak
 server_backup.tar
 EPIC1_PATCH_PACKET_*/
+artifacts/bodygraph/refresh_state.json

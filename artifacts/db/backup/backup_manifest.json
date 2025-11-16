@@ -1,0 +1,1 @@
+{"last_reviewed_at_utc":"2025-11-16T00:22:31Z","notes":"Backups managed via Railway UI; restore rehearsals recorded in restore_verify.log.","provider":"railway","schedule":{"frequency":"daily","retention_days":6,"time_window_utc":"configured in Railway project"},"schema":"v1","targets":[{"db_name":"glow_hdengine_primary","region":"railway-managed","role":"primary"}]}

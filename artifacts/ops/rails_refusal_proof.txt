@@ -1,11 +1,8 @@
-cache-control: no-store
-content-type: application/json; charset=utf-8
-date: Fri, 07 Nov 2025 18:14:43 GMT
-server: railway-edge
-x-railway-edge: railway/europe-west4-drams3a
-x-railway-request-id: WyR59RCeQgK_ZWTn0-QtfA
-content-length: 76
+phase: s8b (rails refusal proof for vendor source under safe rails)
+command: python -m engine.cli bg:resolve --user epic011-refusal --source vendor
+safe_mode: 1
+allow_network: 0
+app_env: dev
+notes: logs confirm vendor routes absent (see artifacts/ops/rails_open_scope.txt)
 
-
-{"schema":"v1","ok":false,"code":"rails_closed","error":"rails are closed"}
-
+{"error":{"code":"PROVIDER_REFUSED","message":"Vendor source is refused under SAFE rails (SAFE_MODE=1)."},"resolver":{"allow_network":false,"dry_run":false,"requested_source":"vendor","resolved_source":"vendor","safe_mode":true,"upsert":false,"user_id":"epic011-refusal"},"status":"error"}

@@ -1,0 +1,1 @@
+{"at":"2025-11-15T21:15:21Z","attempts":2,"idempotency_key":"3fa85f64-5717-4562-b3fc-2c963f66afab:hdapi:1:2bb1d4c1c7ac5aa893a6fcf4136e6549898beceb102cbdc07f621584f6af175a","rows_after":1,"rows_per_attempt":[{"attempt":1,"duration_ms":6530.383,"rows_written":1},{"attempt":2,"duration_ms":8042.081,"rows_written":0}],"writes":1}

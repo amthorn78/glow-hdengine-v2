@@ -1,0 +1,3 @@
+hde.body_graphs (base table)
+- partitions: (none observed)
+- bounds: n/a
