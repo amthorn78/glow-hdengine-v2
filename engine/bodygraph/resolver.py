@@ -143,6 +143,13 @@ def _resolve_vendor(
         normalized_user_id = resolve_db_user_id(vendor_inputs.user_id)
     except VendorError as exc:
         return _vendor_error(exc, resolver_meta)
+    except Exception as exc:  # pragma: no cover - defensive guardrail
+        unexpected = VendorError(
+            "PROVIDER_INPUT_INVALID",
+            "user_id normalization failed",
+            details={"error": exc.__class__.__name__},
+        )
+        return _vendor_error(unexpected, resolver_meta)
     vendor_inputs = replace(vendor_inputs, user_id=normalized_user_id)
     try:
         outcome = ingest_vendor_bodygraph(vendor_inputs, env=env)
