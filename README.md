@@ -7,6 +7,14 @@ Glow HD Engine — README
 - **Keys-only logs:** refusal route logs exactly `{at, route, status, duration_ms, idempotence_hash, release_id}` (no bodies/headers/secrets).
 - **Env-matrix snapshots:** selection-only evidence (success chooses `DATABASE_URL` or `DB_BRIDGE_URL`, failure is typed—no DB connectivity here).
 - **DB posture:** scripts use the adapter’s connection-time fallback (try `DATABASE_URL`, then HTTPS `DB_BRIDGE_URL` through the bridge); evidence includes `search_path`, **grants** (present-even-empty ADP), normalized **DDL fingerprint**, and migration **two-run identity**.
+## Codespaces bootstrap
+
+- Locale/timezone pins: `LC_ALL=C`, `LANG=C`, and `TZ=UTC` for all CLI/test runs.
+- Canonical CLI invocation: `python -m engine.cli …`. Use the module-run form in docs, QA runbooks, and automation; the `hdctl` console script remains available for convenience once the project is installed.
+- Installation: The repo’s devcontainer config installs the project in editable mode during `postCreateCommand`, so a fresh Codespace already has both `python -m engine.cli` and `hdctl` available on `PATH` without manual pip work.
+
+Direct `hdctl …` examples remain in this README for brevity, but automation and QA scripts must prefer `python -m engine.cli` to guarantee parity with module-run execution.
+
 - **QA quick run:** `scripts/qa/epic009_precommit.sh` → expect **QA_OK** and report at `artifacts/qa/epic009_precommit_report.json`.
 
 ## EPIC-011 — Bridge adapter evidence (S2–S7)
@@ -27,6 +35,9 @@ Glow HD Engine — README
 - **CLI preview:** Admin `hdctl aux-preview` reuses the Aux emitter; stdout + sidecar artifacts are indexed in the Human and Machine evidence registries.
 
 ## CLI — Vendor JSON file inputs
+
+> **Note:** Module-run (`python -m engine.cli`) is the default for QA. The `hdctl` console script behaves the same way after Codespaces bootstrap installs the package.
+
 Examples:
 - Pair file:
   ```bash

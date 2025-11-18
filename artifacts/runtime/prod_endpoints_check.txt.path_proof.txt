@@ -1,0 +1,4 @@
+path: artifacts/runtime/prod_endpoints_check.txt
+sha256: cc436976bd060f1f3e33f0f45da47f995d215e6eeeee464f46ee52af284ee42e
+size_bytes: 136
+mtime_utc: 2025-11-18T18:37:33Z
