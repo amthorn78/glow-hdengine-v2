@@ -1,0 +1,1 @@
+-rw-r--r-- 818 artifacts/audit/a7/reader_cli_parity.diff

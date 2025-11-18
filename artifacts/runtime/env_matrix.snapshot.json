@@ -1,1 +1,1 @@
-{"ALLOW_NETWORK":"1","APP_ENV":"dev","DATABASE_URL_present":true,"DB_BRIDGE_URL_present":true,"GEO_API_KEY_present":true,"HDAPI_BASE_URL_present":true,"HDE_BASE_URL_present":false,"HD_API_KEY_present":true,"LANG":"C","LC_ALL":"C","SAFE_MODE":"0","TZ":"UTC","dev_stage_policy_posture":"open","prod_policy_posture":"closed","schema":"v3"}
+{"DATABASE_URL_present":true,"DB_BRIDGE_URL_present":true,"determinism":{"LANG":"C","LC_ALL":"C","TZ":"UTC"},"env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","SAFE_MODE":"1"},"rails_posture":{"dev_stage":"open","prod_ci":"closed"},"schema":"v3"}

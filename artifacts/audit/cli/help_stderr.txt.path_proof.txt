@@ -1,0 +1,1 @@
+-rw-r--r-- 0 artifacts/audit/cli/help_stderr.txt
