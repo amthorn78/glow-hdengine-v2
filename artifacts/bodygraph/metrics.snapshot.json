@@ -1,1 +1,1 @@
-{"counters":{"breaker_tripped_total":0,"refresh_attempts_total":1,"refresh_failure_total":0,"refresh_success_total":1},"labels":{"env":"dev","rails":"closed"},"schema":"v1","timers_ms":{"refresh_duration_p95":1200}}
+{"captured_at_utc":"2025-11-18T10:27:03Z","counters":{"breaker_tripped_total":0,"refresh_attempts_total":2,"refresh_failure_total":0,"refresh_success_total":2},"gauges":{"bridge_latency_ms":320},"labels":{"env":"dev","rails":"open"},"schema":"v1","timers_ms":{"refresh_duration_p95":980,"vendor_call_p95":620}}

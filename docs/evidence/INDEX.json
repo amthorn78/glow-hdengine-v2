@@ -271,6 +271,11 @@
     "title": "runtime.env_matrix.snapshot"
   },
   {
+    "path": "artifacts/vendor/retry_backoff.behavior.log",
+    "proof": "artifacts/vendor/retry_backoff.behavior.log.path_proof.txt",
+    "title": "vendor.retry_backoff_behavior"
+  },
+  {
     "path": "audit/gates/aux/suppression_snapshot_check.txt",
     "title": "audit.aux.suppression_snapshot_check"
   },
