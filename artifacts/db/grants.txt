@@ -1,14 +1,12 @@
-object: hde
-  postgres: CREATE, USAGE
-
-object: hde.body_graphs
-  postgres: DELETE, INSERT, REFERENCES, SELECT, TRIGGER, TRUNCATE, UPDATE
-
-object: hde.body_graphs_current
-  postgres: DELETE, INSERT, REFERENCES, SELECT, TRIGGER, TRUNCATE, UPDATE
-
-object: public.hde_body_graphs_current
-  postgres: DELETE, INSERT, REFERENCES, SELECT, TRIGGER, TRUNCATE, UPDATE
+hde_reader hde.body_graphs SELECT
+hde_reader hde.body_graphs_current SELECT
+hde_reader public.hde_body_graphs_current SELECT
+hde_writer hde.body_graphs DELETE
+hde_writer hde.body_graphs INSERT
+hde_writer hde.body_graphs UPDATE
+hde_writer public.hde_body_graphs_current SELECT
 
 ALTER DEFAULT PRIVILEGES:
-(none)
+hde_reader TABLES SELECT
+hde_writer TABLES INSERT
+hde_writer TABLES UPDATE

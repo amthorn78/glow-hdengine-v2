@@ -128,13 +128,13 @@
     "title": "db.migrations.rollback_verify"
   },
   {
-    "path": "artifacts/db/partition/partition_plan.txt",
-    "proof": "artifacts/db/partition/partition_plan.txt.path_proof.txt",
+    "path": "artifacts/db/partition_plan.txt",
+    "proof": "artifacts/db/partition_plan.txt.path_proof.txt",
     "title": "db.partition.plan"
   },
   {
-    "path": "artifacts/db/partition/partition_verify.log",
-    "proof": "artifacts/db/partition/partition_verify.log.path_proof.txt",
+    "path": "artifacts/db/partition_verify.log",
+    "proof": "artifacts/db/partition_verify.log.path_proof.txt",
     "title": "db.partition.verify"
   },
   {
@@ -242,7 +242,8 @@
     "title": "ops.rails_open_scope"
   },
   {
-    "path": "artifacts/ops/rails_refusal_proof.txt",
+    "path": "artifacts/proofs/ops_refusal_proof.txt",
+    "proof": "artifacts/proofs/ops_refusal_proof.txt.path_proof.txt",
     "title": "ops.rails_refusal"
   },
   {

@@ -1,1 +1,4 @@
-artifacts/bodygraph/keys_only.logs.sample
+path: artifacts/bodygraph/keys_only.logs.sample
+sha256: 75b72776c1831d2d0e71bab021c3d0fef246574030093b02c3605541a30d8f26
+size_bytes: 233
+mtime_utc: 2025-11-18T05:24:24Z

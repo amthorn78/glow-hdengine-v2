@@ -1,0 +1,3 @@
+check: hde.public_results partition block -> verified from migrations/005_identity.sql
+check: hde.pair_evaluation partition block -> verified from migrations/005_identity.sql
+result: PARTITION_PLAN_OK (static harness)
