@@ -1,1 +1,0 @@
-artifacts/db/provider_parity/db.json

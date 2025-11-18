@@ -1,1 +1,4 @@
-artifacts/db/provider_parity/summary.json
+path: artifacts/db/provider_parity/summary.json
+sha256: 045af6561f64818c72b6e7ca7556ff1986d260e9a5dd68119582eca8b26bedc7
+size_bytes: 2271
+mtime_utc: 2025-11-18T22:15:24Z

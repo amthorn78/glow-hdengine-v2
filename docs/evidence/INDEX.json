@@ -143,9 +143,9 @@
     "title": "db.provider_parity.bridge"
   },
   {
-    "path": "artifacts/db/provider_parity/db.json",
-    "proof": "artifacts/db/provider_parity/db.json.path_proof.txt",
-    "title": "db.provider_parity.db"
+    "path": "artifacts/db/provider_parity/direct.json",
+    "proof": "artifacts/db/provider_parity/direct.json.path_proof.txt",
+    "title": "db.provider_parity.direct"
   },
   {
     "path": "artifacts/db/provider_parity/summary.json",
