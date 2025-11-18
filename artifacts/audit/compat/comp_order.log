@@ -1,18 +1,3 @@
-{
-  "count": 10,
-  "order_matches": true,
-  "first": {
-    "id": "heat",
-    "score": 23,
-    "band": "Cool",
-    "personal_key": "heat_cool_personal_v1",
-    "shared_key": "heat_cool_shared_v1"
-  },
-  "last": {
-    "id": "balance",
-    "score": 66,
-    "band": "Warm",
-    "personal_key": "balance_warm_personal_v1",
-    "shared_key": "balance_warm_shared_v1"
-  }
-}
+order_match True
+order ['heat', 'harmony', 'communication', 'alignment', 'comfort', 'consistency', 'expansion', 'creativity', 'drive', 'balance']
+band_edges ['Cool', 'Warm', 'Cool']

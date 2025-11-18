@@ -1,3 +1,1 @@
-match=True
-orig_len=318
-reemitted_len=318
+{"match": true, "orig_len": 318, "orig_sha256": "e47d50bb1db574ab3273864b25cc9e106ac5cf606c06d9479f8eca95090ac1a3", "reemitted_sha256": "e47d50bb1db574ab3273864b25cc9e106ac5cf606c06d9479f8eca95090ac1a3"}

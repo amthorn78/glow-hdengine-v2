@@ -1,1 +1,1 @@
--rw-r--r-- 1 root root 163 Nov 18 01:00 artifacts/audit/env/env_snapshot.json
+-rw-r--r-- 1 root root 181 Nov 18 01:22 artifacts/audit/env/env_snapshot.json
