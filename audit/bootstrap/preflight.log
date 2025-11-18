@@ -1,0 +1,3 @@
+timestamp_utc=2025-11-18T18:22:58Z
+CLI_HELP_OK exit=0 stdout_bytes=461
+PROD_ENDPOINTS_OK envs=1 services=1

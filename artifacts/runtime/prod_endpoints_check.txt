@@ -1,0 +1,4 @@
+timestamp_utc=2025-11-18T18:22:53Z
+environments=1
+services=1
+prod.hd_engine.base_url=https://glow-hdengine-v2-production.up.railway.app

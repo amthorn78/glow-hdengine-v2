@@ -271,9 +271,19 @@
     "title": "runtime.env_matrix.snapshot"
   },
   {
+    "path": "artifacts/runtime/prod_endpoints_check.txt",
+    "proof": "artifacts/runtime/prod_endpoints_check.txt.path_proof.txt",
+    "title": "runtime.prod_endpoints_check"
+  },
+  {
     "path": "artifacts/vendor/retry_backoff.behavior.log",
     "proof": "artifacts/vendor/retry_backoff.behavior.log.path_proof.txt",
     "title": "vendor.retry_backoff_behavior"
+  },
+  {
+    "path": "audit/bootstrap/preflight.log",
+    "proof": "audit/bootstrap/preflight.log.path_proof.txt",
+    "title": "audit.bootstrap.preflight"
   },
   {
     "path": "audit/gates/aux/suppression_snapshot_check.txt",
@@ -402,6 +412,11 @@
       "ADR_DB_RUNTIME_POSTURE"
     ],
     "title": "adr.body_graphs.runtime_posture"
+  },
+  {
+    "path": "docs/run/PROD_ENDPOINTS.json",
+    "proof": "docs/run/PROD_ENDPOINTS.json.path_proof.txt",
+    "title": "run.prod_endpoints"
   },
   {
     "path": "tests/transport/headers/aux_suppression_200.snap",
