@@ -1,4 +1,4 @@
 path: artifacts/db/partition_verify.log
-sha256: 1f94ebb18a186e0fa3598683dd91aa9575d7bb6ba8f3668f99008a3d0f0a683c
-size_bytes: 218
-mtime_utc: 2025-11-18T05:24:24Z
+sha256: 3edf7464fc9af4d071d1aa0c04cc8971b00bfd11fa5296423c15f8014b100b6c
+size_bytes: 126
+mtime_utc: 2025-11-18T22:15:21Z

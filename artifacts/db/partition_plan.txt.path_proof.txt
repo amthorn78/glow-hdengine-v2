@@ -1,4 +1,4 @@
 path: artifacts/db/partition_plan.txt
-sha256: 91874c5b718058fc4208ed61a64518734b33b5e01344c1b888d359b367a3eaef
-size_bytes: 107
-mtime_utc: 2025-11-18T05:24:24Z
+sha256: 1e709db0250ea8bbcb25d7fc6f0ebbcca3ce9a81deb9d218372ffd38a2715072
+size_bytes: 79
+mtime_utc: 2025-11-18T22:15:21Z
