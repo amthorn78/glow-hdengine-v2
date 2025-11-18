@@ -1,0 +1,5 @@
+--- artifacts/audit/cli/showcompat_ab.json	2025-11-18 00:41:52.753080199 +0000
++++ artifacts/audit/a7/reader_200_body_envmatch.json	2025-11-18 00:42:15.837120593 +0000
+@@ -1 +1 @@
+-{"categories":[{"band":"Open","id":"harmony"}],"eligible":true,"idempotence_hash":"3bef6be6a557bb60bab13bb06f0f1558d617956e8b64ac4586d67b9b42518557","meta":{"engine_tag":"hdengine-dev","invocation_tag":"INV-LOCAL"},"reader_version":"v1","release_id":"0000000000000000000000000000000000000000000000000000000000000000"}
++{"categories":[{"band":"Warm","id":"harmony"}],"eligible":true,"idempotence_hash":"856becf65edb21a402b040592a72b24deda02ecc40dd2f4dbba92ac0f3c3165f","meta":{"engine_tag":"hdengine-dev","invocation_tag":"INV-LOCAL"},"reader_version":"v1","release_id":"0000000000000000000000000000000000000000000000000000000000000000"}

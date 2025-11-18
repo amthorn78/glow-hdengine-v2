@@ -1,0 +1,1 @@
+-rw-r--r-- 1 root root 0 Nov 18 00:44 artifacts/audit/cli/showcompat_ab_ba.diff

@@ -1,0 +1,1 @@
+-rw-r--r-- 29 artifacts/audit/cli/error_stderr.log
