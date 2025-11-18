@@ -1,0 +1,11 @@
+{
+  "key_count": 6,
+  "keys": [
+    "categories",
+    "eligible",
+    "idempotence_hash",
+    "meta",
+    "reader_version",
+    "release_id"
+  ]
+}

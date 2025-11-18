@@ -1,0 +1,26 @@
+{
+  "ab_categories": [
+    {
+      "band": "Open",
+      "id": "harmony"
+    }
+  ],
+  "ba_categories": [
+    {
+      "band": "Open",
+      "id": "harmony"
+    }
+  ],
+  "ab_idem": "3bef6be6a557bb60bab13bb06f0f1558d617956e8b64ac4586d67b9b42518557",
+  "ba_idem": "3bef6be6a557bb60bab13bb06f0f1558d617956e8b64ac4586d67b9b42518557",
+  "ab_meta": {
+    "engine_tag": "hdengine-dev",
+    "invocation_tag": "INV-LOCAL"
+  },
+  "ba_meta": {
+    "engine_tag": "hdengine-dev",
+    "invocation_tag": "INV-LOCAL"
+  },
+  "ab_eligible": true,
+  "ba_eligible": true
+}

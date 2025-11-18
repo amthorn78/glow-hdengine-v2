@@ -1,0 +1,16 @@
+{
+  "left": {
+    "birthdate": "1990-01-01",
+    "birthtime": "12:00",
+    "location": "Amsterdam, Netherlands",
+    "tz": "Europe/Amsterdam",
+    "person_uid": "cli-beb135567fffd36e8b5e0bc3ab9a244b"
+  },
+  "right": {
+    "birthdate": "1992-04-05",
+    "birthtime": "08:30",
+    "location": "Lisbon, Portugal",
+    "tz": "Europe/Lisbon",
+    "person_uid": "cli-6c146963a70ef8833d20b05551ca68fc"
+  }
+}

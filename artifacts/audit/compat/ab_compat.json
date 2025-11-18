@@ -1,0 +1,79 @@
+{
+  "categories": [
+    {
+      "id": "heat",
+      "score": 23,
+      "band": "Cool",
+      "personal_key": "heat_cool_personal_v1",
+      "shared_key": "heat_cool_shared_v1"
+    },
+    {
+      "id": "harmony",
+      "score": 17,
+      "band": "Cool",
+      "personal_key": "harmony_cool_personal_v1",
+      "shared_key": "harmony_cool_shared_v1"
+    },
+    {
+      "id": "communication",
+      "score": 59,
+      "band": "Warm",
+      "personal_key": "communication_warm_personal_v1",
+      "shared_key": "communication_warm_shared_v1"
+    },
+    {
+      "id": "alignment",
+      "score": 36,
+      "band": "Open",
+      "personal_key": "alignment_open_personal_v1",
+      "shared_key": "alignment_open_shared_v1"
+    },
+    {
+      "id": "comfort",
+      "score": 0,
+      "band": "Cool",
+      "personal_key": "comfort_cool_personal_v1",
+      "shared_key": "comfort_cool_shared_v1"
+    },
+    {
+      "id": "consistency",
+      "score": 5,
+      "band": "Cool",
+      "personal_key": "consistency_cool_personal_v1",
+      "shared_key": "consistency_cool_shared_v1"
+    },
+    {
+      "id": "expansion",
+      "score": 42,
+      "band": "Open",
+      "personal_key": "expansion_open_personal_v1",
+      "shared_key": "expansion_open_shared_v1"
+    },
+    {
+      "id": "creativity",
+      "score": 0,
+      "band": "Cool",
+      "personal_key": "creativity_cool_personal_v1",
+      "shared_key": "creativity_cool_shared_v1"
+    },
+    {
+      "id": "drive",
+      "score": 39,
+      "band": "Open",
+      "personal_key": "drive_open_personal_v1",
+      "shared_key": "drive_open_shared_v1"
+    },
+    {
+      "id": "balance",
+      "score": 66,
+      "band": "Warm",
+      "personal_key": "balance_warm_personal_v1",
+      "shared_key": "balance_warm_shared_v1"
+    }
+  ],
+  "meta": {
+    "engine_tag": "hdengine-dev",
+    "release_id": "0000000000000000000000000000000000000000000000000000000000000000",
+    "invocation_tag": "INV-LOCAL"
+  }
+}
