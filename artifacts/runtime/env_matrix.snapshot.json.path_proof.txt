@@ -1,1 +1,4 @@
--rw-r--r-- 1 root root 240 Nov 18 00:43 artifacts/runtime/env_matrix.snapshot.json
+path: artifacts/runtime/env_matrix.snapshot.json
+sha256: b1bd54252e0883c129c6a6dfa039c90c59f3acddc9814f92cb604dbc064ec05d
+size_bytes: 295
+mtime_utc: 2025-11-18T05:24:24Z

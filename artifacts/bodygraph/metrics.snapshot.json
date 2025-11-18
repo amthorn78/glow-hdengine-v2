@@ -1,1 +1,1 @@
-{"counters":{"breaker_tripped_total":0,"rate_limit_hit_total":0,"refresh_attempts_total":2,"refresh_failure_total":1,"refresh_success_total":1},"labels":{"env":"dev","reason":"success","source":"hdapi"},"schema":"v1","timers_ms":{"refresh_duration_p95":3927}}
+{"counters":{"breaker_tripped_total":0,"refresh_attempts_total":1,"refresh_failure_total":0,"refresh_success_total":1},"labels":{"env":"dev","rails":"closed"},"schema":"v1","timers_ms":{"refresh_duration_p95":1200}}

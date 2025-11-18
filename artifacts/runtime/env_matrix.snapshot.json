@@ -1,1 +1,1 @@
-{"DATABASE_URL_present":true,"DB_BRIDGE_URL_present":true,"determinism":{"LANG":"C","LC_ALL":"C","TZ":"UTC"},"env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","SAFE_MODE":"1"},"rails_posture":{"dev_stage":"open","prod_ci":"closed"},"schema":"v3"}
+{"determinism":{"LANG":"C","LC_ALL":"C","TZ":"UTC"},"env":{"APP_ENV":"dev","DATABASE_URL_present":true,"DB_BRIDGE_URL_present":true,"HDAPI_BASE_URL_present":true},"generated_at_utc":"2025-11-18T05:24:24Z","rails":{"allow_network":"0","mode":"closed","safe_mode":"1"},"schema":"rails_closed.v1"}

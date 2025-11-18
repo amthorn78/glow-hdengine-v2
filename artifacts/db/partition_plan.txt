@@ -1,1 +1,2 @@
-
+hde.public_results RANGE created_at monthly_current
+hde.pair_evaluation RANGE evaluated_at monthly_current

@@ -1,1 +1,1 @@
-{"at":"2025-11-15T23:32:05Z","duration_ms":3926.508,"route":"ops.refresh.bodygraph","status":200}
+{"at":"2025-11-18T05:24:24Z","duration_ms":1234,"idempotence_hash":"sha256:rails-closed-bodygraph-refresh","release_id":"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff","route":"ops.refresh.bodygraph","status":200}
