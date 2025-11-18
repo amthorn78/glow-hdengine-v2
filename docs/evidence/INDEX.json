@@ -75,22 +75,22 @@
   {
     "path": "artifacts/db/boundary_view.readonly.proof.txt",
     "proof": "artifacts/db/boundary_view.readonly.proof.txt.path_proof.txt",
-    "title": "db.boundary_view.readonly_proof"
+    "title": "db.boundary_view.readonly"
   },
   {
     "path": "artifacts/db/check_schema.txt",
     "proof": "artifacts/db/check_schema.txt.path_proof.txt",
-    "title": "db.check_schema"
+    "title": "db.check_schema.search_path"
   },
   {
     "path": "artifacts/db/ddl_fingerprint.json",
     "proof": "artifacts/db/ddl_fingerprint.json.path_proof.txt",
-    "title": "db.ddl_fingerprint"
+    "title": "db.ddl_fingerprint.hde"
   },
   {
     "path": "artifacts/db/grants.txt",
     "proof": "artifacts/db/grants.txt.path_proof.txt",
-    "title": "db.grants"
+    "title": "db.grants.body_graphs"
   },
   {
     "path": "artifacts/db/introspect.fingerprint.json",
@@ -145,7 +145,7 @@
   {
     "path": "artifacts/db/provider_parity/db.json",
     "proof": "artifacts/db/provider_parity/db.json.path_proof.txt",
-    "title": "db.provider_parity.db"
+    "title": "db.provider_parity.direct"
   },
   {
     "path": "artifacts/db/provider_parity/summary.json",
@@ -160,12 +160,12 @@
   {
     "path": "artifacts/db_bridge/adapter_selection.snapshot.json",
     "proof": "artifacts/db_bridge/adapter_selection.snapshot.json.path_proof.txt",
-    "title": "db_bridge.adapter_selection.snapshot"
+    "title": "db_bridge.adapter_selection"
   },
   {
     "path": "artifacts/db_bridge/caps.snapshot.json",
     "proof": "artifacts/db_bridge/caps.snapshot.json.path_proof.txt",
-    "title": "db_bridge.caps.snapshot"
+    "title": "db_bridge.caps"
   },
   {
     "path": "artifacts/db_bridge/health.json",
@@ -258,7 +258,7 @@
   {
     "path": "artifacts/runtime/env_connectivity.snapshot.json",
     "proof": "artifacts/runtime/env_connectivity.snapshot.json.path_proof.txt",
-    "title": "runtime.env_connectivity"
+    "title": "runtime.env_connectivity.dev"
   },
   {
     "path": "artifacts/runtime/env_matrix.diff.json",

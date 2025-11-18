@@ -1,3 +1,11 @@
-operation: UPDATE public.hde_body_graphs_current SET payload='{}'::jsonb
-result: ERROR policy_enforced readonly view public.hde_body_graphs_current
-diagnostic: closed-rails harness refuses write attempts against boundary view
+object: hde.body_graphs_current
+is_updatable: NO
+is_insertable_into: NO
+is_trigger_updatable: NO
+---
+object: public.hde_body_graphs_current
+is_updatable: NO
+is_insertable_into: NO
+is_trigger_updatable: NO
+---
+result: DB_BOUNDARY_VIEW_OK

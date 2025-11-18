@@ -1,2 +1,2 @@
-hde.public_results RANGE created_at monthly_current
-hde.pair_evaluation RANGE evaluated_at monthly_current
+hde.pair_evaluation strategy=RANGE key=RANGE (evaluated_at) children=hde.pair_evaluation_pcur
+hde.public_results strategy=RANGE key=RANGE (created_at) children=hde.public_results_pcur

@@ -1,4 +1,4 @@
 path: artifacts/db_bridge/caps.snapshot.json
-sha256: d78f6131646008828d83c3694dbfe2b075305616b77bbe59872da9a4c3d5413c
-size_bytes: 442
-mtime_utc: 2025-11-18T05:24:24Z
+sha256: c25f02bec46135ea8993f13f3149a37c5dfddce5bfbc1d69be098019bc820fe4
+size_bytes: 485
+mtime_utc: 2025-11-18T19:16:15Z

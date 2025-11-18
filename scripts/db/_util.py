@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from pathlib import Path
 from typing import Any
+import datetime as _dt
+import hashlib
 
 from engine.db import (
     DBAccess,
@@ -42,6 +44,28 @@ def write_json(path: str, payload: Any) -> None:
     target.write_text(json.dumps(payload, separators=(",", ":"), sort_keys=True) + "\n", encoding="utf-8")
 
 
+def write_path_proof(path: str) -> None:
+    target = Path(path)
+    if not target.exists():
+        raise FileNotFoundError(f"artifact not found: {path}")
+    proof_path = Path(f"{path}.path_proof.txt")
+    proof_path.parent.mkdir(parents=True, exist_ok=True)
+    data = target.read_bytes()
+    sha = hashlib.sha256(data).hexdigest()
+    stat = target.stat()
+    mtime = _dt.datetime.fromtimestamp(stat.st_mtime, tz=_dt.timezone.utc).replace(microsecond=0)
+    proof = "\n".join(
+        [
+            f"path: {path}",
+            f"sha256: {sha}",
+            f"size_bytes: {stat.st_size}",
+            f"mtime_utc: {mtime.isoformat().replace('+00:00', 'Z')}",
+            "",
+        ]
+    )
+    proof_path.write_text(proof, encoding="utf-8")
+
+
 __all__ = [
     "ADAPTER_SNAPSHOT",
     "DBAccess",
@@ -50,6 +74,7 @@ __all__ = [
     "ensure_artifact",
     "write_text",
     "write_json",
+    "write_path_proof",
     "MissingDbConfigError",
     "BridgeUnavailable",
     "BridgeUnsupported",

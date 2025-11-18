@@ -1,12 +1,24 @@
-hde_reader hde.body_graphs SELECT
-hde_reader hde.body_graphs_current SELECT
-hde_reader public.hde_body_graphs_current SELECT
-hde_writer hde.body_graphs DELETE
-hde_writer hde.body_graphs INSERT
-hde_writer hde.body_graphs UPDATE
-hde_writer public.hde_body_graphs_current SELECT
+postgres hde.body_graphs DELETE
+postgres hde.body_graphs INSERT
+postgres hde.body_graphs REFERENCES
+postgres hde.body_graphs SELECT
+postgres hde.body_graphs TRIGGER
+postgres hde.body_graphs TRUNCATE
+postgres hde.body_graphs UPDATE
+postgres hde.body_graphs_current DELETE
+postgres hde.body_graphs_current INSERT
+postgres hde.body_graphs_current REFERENCES
+postgres hde.body_graphs_current SELECT
+postgres hde.body_graphs_current TRIGGER
+postgres hde.body_graphs_current TRUNCATE
+postgres hde.body_graphs_current UPDATE
+postgres public.hde_body_graphs_current DELETE
+postgres public.hde_body_graphs_current INSERT
+postgres public.hde_body_graphs_current REFERENCES
+postgres public.hde_body_graphs_current SELECT
+postgres public.hde_body_graphs_current TRIGGER
+postgres public.hde_body_graphs_current TRUNCATE
+postgres public.hde_body_graphs_current UPDATE
 
 ALTER DEFAULT PRIVILEGES:
-hde_reader TABLES SELECT
-hde_writer TABLES INSERT
-hde_writer TABLES UPDATE
+(none)

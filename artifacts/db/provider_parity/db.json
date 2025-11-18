@@ -1,1 +1,1 @@
-{"provider":"bridge","rows":[["1"]],"schema":"v1"}
+{"attempts":[{"provider":"psycopg","reason":"primary_connect_failed","status":"error"}],"capabilities":{},"captured_at_utc":"2025-11-18T19:16:10Z","error":"primary_connect_failed","provider":"psycopg","schema":"v1","status":"error"}
