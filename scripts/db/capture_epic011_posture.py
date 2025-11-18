@@ -140,8 +140,14 @@ def _fingerprint_objects(db: "DBAccess") -> List[Dict[str, Any]]:
     return normalized
 
 
-def _grant_lines(db: "DBAccess") -> List[str]:
-    payload = db.introspect("grants") or {}
+def _grant_payload(db: "DBAccess") -> Mapping[str, Any]:
+    payload = db.introspect("grants")
+    if isinstance(payload, Mapping):
+        return payload
+    return {}
+
+
+def _grant_lines(payload: Mapping[str, Any]) -> List[str]:
     grants = payload.get("grants", []) if isinstance(payload, Mapping) else []
     lines: List[str] = []
     for entry in grants:
@@ -164,6 +170,35 @@ def _grant_lines(db: "DBAccess") -> List[str]:
         lines.append(f"{grantee} {obj} {priv}")
     deduped = sorted(dict.fromkeys(lines))
     return deduped
+
+
+def _default_privilege_lines(payload: Mapping[str, Any]) -> List[str]:
+    defaults_raw = payload.get("default_privileges", []) if isinstance(payload, Mapping) else []
+    lines: List[str] = []
+    for entry in defaults_raw:
+        if isinstance(entry, str):
+            text = entry.strip()
+        elif isinstance(entry, Mapping):
+            # Fallback for structured payloads: join any values that look like
+            # statement fragments so the artifact remains human-readable.
+            text = " ".join(
+                str(value).strip()
+                for value in (
+                    entry.get("owner"),
+                    entry.get("schema"),
+                    entry.get("type"),
+                    entry.get("grantee"),
+                    entry.get("privilege"),
+                )
+                if value
+            ).strip()
+        else:
+            text = str(entry or "").strip()
+        if text:
+            lines.append(text)
+    if not lines:
+        lines.append("(none)")
+    return lines
 
 
 def _strip_strategy_prefix(raw: str) -> str:
@@ -263,7 +298,7 @@ def _select_one(db: "DBAccess") -> int:
 CAPABILITIES: tuple[CapabilityProbe, ...] = (
     CapabilityProbe("search_path", lambda db: _search_path_value(db)),
     CapabilityProbe("ddl_fingerprint", lambda db: _fingerprint_objects(db)),
-    CapabilityProbe("grants", lambda db: _grant_lines(db)),
+    CapabilityProbe("grants", lambda db: _grant_lines(_grant_payload(db))),
     CapabilityProbe("select_one", _select_one),
 )
 
@@ -486,10 +521,13 @@ def main() -> None:
         {"schema": "hde", "captured_at_utc": captured_at, "objects": fingerprint_objects},
     )
 
-    grants = _grant_lines(db)
+    grant_payload = _grant_payload(db)
+    grants = _grant_lines(grant_payload)
     if not grants:
         raise SystemExit("no grants captured for EPIC011 objects")
-    _write_text("artifacts/db/grants.txt", "\n".join(grants))
+    default_lines = _default_privilege_lines(grant_payload)
+    artifact_lines = [*grants, "", "ALTER DEFAULT PRIVILEGES:", *default_lines]
+    _write_text("artifacts/db/grants.txt", "\n".join(artifact_lines))
 
     plan_lines, observed = _partition_plan(db)
     _write_text("artifacts/db/partition_plan.txt", "\n".join(plan_lines))
