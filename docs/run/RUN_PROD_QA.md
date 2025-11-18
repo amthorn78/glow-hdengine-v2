@@ -12,7 +12,7 @@ This runbook defines the exact operator choreography for **EPIC011 — Vendor In
 
 ## Step 1 — Capture Pre-window Refusal (Rails Closed)
 1. Confirm that either SAFE_MODE=1 or ALLOW_NETWORK=0 (or both). Rails must be closed.
-2. Call the ops resolve route (`_ops/bodygraph/resolve`) or `python -m engine.cli bg:resolve --user <UUID> --source vendor --upsert true` with the consented UUID, while rails are closed. This call must target `source="vendor"` with `upsert=true` so the Engine refuses it.
+2. Call the ops resolve route (`_ops/bodygraph/resolve`) or `python -m engine.cli bg:resolve --user <UUID> --source vendor --upsert` with the consented UUID, while rails are closed. This call must target `source="vendor"` with `upsert=true` so the Engine refuses it.
 3. Save headers and body to temporary files exactly as received. Normalize header names to lower-case and ensure `cache-control: no-store` is present. The refusal response must not include `etag`, `vary`, or compression headers.
 4. Combine headers + body into `artifacts/proofs/ops_refusal_proof.txt` under a clearly labeled section `# PRE-WINDOW`. Each section must render as:
    ```
@@ -35,7 +35,7 @@ This runbook defines the exact operator choreography for **EPIC011 — Vendor In
 ## Step 3 — Vendor Upsert Ingest (Rails Open)
 1. Run the explicit vendor resolve/upsert call for the consented UUID, e.g.:
    ```bash
-   python -m engine.cli bg:resolve --user <UUID> --source vendor --upsert true --emit-json
+   python -m engine.cli bg:resolve --user <UUID> --source vendor --upsert
    ```
    or invoke the HTTP route derived from `docs/run/PROD_ENDPOINTS.json` with the same parameters.
 2. Confirm the response shows a successful vendor hit (the CLI prints `source":"vendor"` in the JSON) and that the Engine persisted the BodyGraph row.
@@ -44,15 +44,15 @@ This runbook defines the exact operator choreography for **EPIC011 — Vendor In
 ## Step 4 — DB Resolve (DB-first Hot Path)
 1. Immediately resolve the same UUID through the DB-only source:
    ```bash
-   python -m engine.cli bg:resolve --user <UUID> --source db --emit-json
+   python -m engine.cli bg:resolve --user <UUID> --source db
    ```
    (or the equivalent HTTP call with `source=db` and no `upsert` flag).
 2. Save the JSON response to `artifacts/bodygraph/db_resolve.<UUID>.json`. This file should reflect the persisted BodyGraph without any vendor network access.
 3. Confirm the CLI/HTTP output shows `source":"db"` so the run proves the prod default is DB-first even when rails are open.
 
 ## Step 5 — Byte-level Parity Check
-1. Use the shared presenter/emitter parity helper (e.g., `python -m presenter.json_canon_compare artifacts/bodygraph/vendor_upsert.<UUID>.json artifacts/bodygraph/db_resolve.<UUID>.json`) or the ops script that canonicalizes both payloads with the same emitter.
-2. Record the parity outcome to `artifacts/presenter/json_canon_compare.log` using the structure:
+1. Use the shared presenter/emitter parity helper (`python -m presenter.json_canon_compare artifacts/bodygraph/vendor_upsert.<UUID>.json artifacts/bodygraph/db_resolve.<UUID>.json`) or the ops script that canonicalizes both payloads with the same emitter. The helper prints the parity decision and can append the canonical JSON record directly to the governed log via `--log` (defaults to `artifacts/presenter/json_canon_compare.log`).
+2. Record the parity outcome to `artifacts/presenter/json_canon_compare.log` using the structure printed by the helper:
    ```
    compare: FILE_EQ_CANON_BYTES_OK   # or compare: DIFF
    ab_sha256: <sha256 of vendor_upsert file>
