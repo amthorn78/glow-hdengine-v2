@@ -1,1 +1,4 @@
-artifacts/db_bridge/provider_parity.proof.json
+path: artifacts/db_bridge/provider_parity.proof.json
+sha256: 4a8011c4c0330233f349f1d3adf1472103325946ac0b5493572ce6f374a8ca19
+size_bytes: 1271
+mtime_utc: 2025-11-18T10:25:05Z

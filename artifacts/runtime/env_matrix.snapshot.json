@@ -1,1 +1,1 @@
-{"determinism":{"LANG":"C","LC_ALL":"C","TZ":"UTC"},"env":{"APP_ENV":"dev","DATABASE_URL_present":true,"DB_BRIDGE_URL_present":true,"HDAPI_BASE_URL_present":true},"generated_at_utc":"2025-11-18T05:24:24Z","rails":{"allow_network":"0","mode":"closed","safe_mode":"1"},"schema":"rails_closed.v1"}
+{"checks":[{"name":"DATABASE_URL","value_kind":"dsn_redacted"},{"name":"DB_BRIDGE_URL","value_kind":"dsn_redacted"}],"ok":true,"result":{"which":"DATABASE_URL"},"schema":"v1"}
