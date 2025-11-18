@@ -1,0 +1,14 @@
+{
+  "left": {
+    "birthdate": "1992-04-05",
+    "birthtime": "08:30",
+    "location": "Lisbon, Portugal",
+    "tz": "Europe/Lisbon"
+  },
+  "right": {
+    "birthdate": "1990-01-01",
+    "birthtime": "12:00",
+    "location": "Amsterdam, Netherlands",
+    "tz": "Europe/Amsterdam"
+  }
+}
