@@ -9,6 +9,8 @@ import os
 from pathlib import Path
 from typing import Iterable, Mapping
 
+from adapter import db_access
+
 ROOT = Path(__file__).resolve().parents[2]
 NOW = _dt.datetime.now(tz=_dt.timezone.utc).replace(microsecond=0)
 NOW_STR = NOW.isoformat().replace("+00:00", "Z")
@@ -72,26 +74,9 @@ app_env = (os.getenv("APP_ENV") or os.getenv("ENGINE_ENV") or "dev").strip()
 safe_mode = os.getenv("SAFE_MODE", "1")
 allow_network = os.getenv("ALLOW_NETWORK", "0")
 
-_env_snapshot = {
-    "schema": "rails_closed.v1",
-    "generated_at_utc": NOW_STR,
-    "determinism": {
-        "LC_ALL": os.getenv("LC_ALL", ""),
-        "LANG": os.getenv("LANG", ""),
-        "TZ": os.getenv("TZ", ""),
-    },
-    "rails": {
-        "mode": "closed" if safe_mode == "1" or allow_network != "1" else "open",
-        "safe_mode": safe_mode,
-        "allow_network": allow_network,
-    },
-    "env": {
-        "APP_ENV": app_env,
-        "DATABASE_URL_present": dsn_present,
-        "DB_BRIDGE_URL_present": bridge_present,
-        "HDAPI_BASE_URL_present": bool((os.getenv("HDAPI_BASE_URL") or "").strip()),
-    },
-}
+_resolver_ok, _env_snapshot = db_access.resolve_env_matrix()
+if not _resolver_ok:
+    _env_snapshot = db_access.MISSING_DB_CONFIG.copy()
 _write_json("artifacts/runtime/env_matrix.snapshot.json", _env_snapshot)
 
 # ---------------------------------------------------------------------------
