@@ -1,7 +1,7 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build Notes   
-**Version:** 7.5.2  
+**Version:** 7.5.6  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -457,4 +457,320 @@ ALTER DEFAULT PRIVILEGES:
 **Note:** Once these addenda are merged into PF10, drain the normative parts to their permanent homes on next cuts: token names to **PF04** (Governance), artifact shapes & index rules to **PF12**, runbook & synthetic identity docs to **`docs/run`**, and phase sequencing to **PF06/PF19**.
 
 If you want, I can output these as an updated `PF10-HDE-Build Notes v7.5.2.md` file blob ready to commit.
+
+## **ADDENDUM 20 — Prod admin vendor direct override (PO decision; CLI \+ SAFE rails change)**
+
+**Timestamp:** 111925 21:10  
+ **owner:** Thoth (Head of Development)
+
+**Details (what changed):**
+
+Earlier text and some PF-docs effectively treated “prod never calls vendor inline” as a rule. The Product Owner has explicitly overridden that: **admins must be able to call the vendor directly in production with `hdctl`**, for testing and integration, while public routes remain DB-first and SAFE by default.
+
+This addendum records that decision so PF-canon can be updated instead of silently drifting.
+
+**Policy (titles-only routing):**
+
+* **HDE-Governance (PF04)**
+
+  * SAFE rails stay the same: in prod, defaults are `SAFE_MODE=1`, `ALLOW_NETWORK=0` (**closed**).
+
+  * A new **admin override path** is allowed for `bg:resolve` when:
+
+    * Ops explicitly opens rails for that run (e.g. `SAFE_MODE=0`, `ALLOW_NETWORK=1` in the prod env), and
+
+    * The CLI call carries an explicit confirmation flag (e.g. `--confirm-prod-vendor`) indicating an intentional admin test.
+
+  * Public Reader/API behavior is unchanged: no inline vendor calls for public traffic.
+
+* **HDE-CLI-API-Vendor-Ref (PF05)**
+
+  * `hdctl bg:resolve --source {db|vendor|auto} [--upsert] --user <id>` remains the canonical operator surface.
+
+  * In **prod**, `--source vendor|auto` is **allowed** when the admin override conditions above are met; otherwise the CLI MUST fail closed (non-zero exit, typed JSON error) without attempting vendor HTTP.
+
+**Canon impact (to be drained):**
+
+* PF04 and PF05 must be updated to say “**prod vendor calls are disabled for public users, but permitted for admins under an explicit override**” instead of implying “never in prod.”
+
+* Any acceptance tokens that read like `BG_VENDOR_CALLS_DISABLED_IN_PROD_OK` need to be reworded to “for public in prod” or paired with an explicit admin-override token in PF04’s token registry, rather than implying absolute prohibition.
+
+No new tokens are defined here; PF10 is just logging the PO-approved exception so it can be canonically encoded in PF04/PF05 later.
+
+---
+
+## **ADDENDUM 21 — OPS-managed lifecycle capture (Railway backups/restore/retention; manual evidence import)**
+
+**Timestamp:** 111925 21:15  
+ **owner:** Thoth (Head of Development / OPS)
+
+**Details (what changed):**
+
+Backups, restores, and retention for the engine DB are **managed operationally on Railway**, and the PO does **not** want additional CI automation at this time. A full manual backup and restore cycle has already been run and recorded in the app; the missing piece was **promotion into governed artifacts \+ indices**.
+
+This addendum records that, for EPIC-011, lifecycle acceptance will be satisfied by **manual OPS capture** of lifecycle facts into the fixed artifact paths, **then** updating the Evidence Index \+ Machine Mirror in the same PR. There is no separate CI job pulling provider metadata.
+
+**Policy (titles-only routing):**
+
+* **HDE-Schemas and Artifacts (PF12)**
+
+  * Remains the single home for:
+
+    * Evidence Index (`docs/evidence/INDEX.json` \+ `.sha256`) and mirror (`artifacts/evidence_index.jsonl`) schema and rules (single file; canonical JSONL; one LF; unknown-key reject; `proof_anchor` required).
+
+    * Artifact paths for DB lifecycle proofs.
+
+* **Glow QA Guide (PF19)**
+
+  * For EPIC-011, backup/restore/retention QA steps are **OPS-driven**: the operator runs the Railway actions, then creates/updates the three governed artifacts and index entries by hand as part of the evidence PR.
+
+**Artifacts (paths only; shapes defined in PF12 or the Implementation Review):**
+
+* `artifacts/db/backup/backup_manifest.json` — describes the most recent relevant Railway backup/snapshot/export (id/timestamp/objects; no raw dump).
+
+* `artifacts/db/backup/restore_verify.log` — summarizes a restore rehearsal (target, time window, DDL/rowcount smoke; status).
+
+* `artifacts/db/retention/retention_run.log` — retention activity summary (policy id, labels and counts only; no payload/PII).
+
+**Indexing requirement (unchanged, but explicit here):**
+
+* For each of the three artifacts above, OPS MUST:
+
+  * Ensure canonical encoding (for JSON: sorted keys, compact separators, 1 LF; for text: 1 LF termination).
+
+  * Add/update the entry in `docs/evidence/INDEX.json` and recompute `docs/evidence/INDEX.sha256`.
+
+  * Append a record to `artifacts/evidence_index.jsonl` with the required fields and a valid `proof_anchor` pointing to an adjacent path-proof file.
+
+* All of this happens in **the same evidence PR**; there is **no CI job that calls Railway**. PF12’s mirror/index rules still apply exactly.
+
+**Canon impact (to be drained):**
+
+* PF19’s lifecycle QA sections need a note stating that for EPIC-011, lifecycle evidence is captured manually by OPS and committed as governed artifacts, instead of being generated by CI harnesses.
+
+* PF09’s checklist rows for backup/restore/retention should treat these three artifacts as the canonical sources of truth and not require an automated jobs definition for this epic.
+
+No changes are made to existing tokens (`BACKUP_RESTORE_OK`, `RETENTION_JOBS_OK` etc.); this addendum only documents the **manual capture path** you’ve chosen so we don’t try to re-architect CI around it.
+
+## Addendum 22 — EPIC-011 preservation guard for CLI, vendor ingest, compat math, and Aux
+
+**Timestamp:** 111925 21:30  
+ **owner:** Thoth (Head of Development)
+
+**Details.**  
+ This addendum records a hard constraint for EPIC-011:
+
+**EPIC-011 MUST NOT alter or break:**
+
+1. The CLI surfaces (`hdctl` commands, flags, streams, and exit codes).
+
+2. The vendor request/response bytes (headers and three-key body).
+
+3. Compat math (Magic-10 categories, scoring, band thresholds, and AB↔BA identity).
+
+4. Aux narratives (packs, IDs, suppression rules, and output surfaces).
+
+Any change that touches these areas belongs in future epics that explicitly own those surfaces, not under EPIC-011 (Vendor Ingest & Data Durability).
+
+**Scope (titles-only routing):**
+
+* **HDE-CLI-API-Vendor-Ref (PF05)**
+
+  * Owns CLI `hdctl` surface (`bg:resolve`, `showcompat`, etc.), flags, success/err streams, and on-wire HTTP bytes for vendor ingest.
+
+  * EPIC-011 may **exercise** CLI for admin/ops and add tests, but must not change flags, usage text, output shape, or error contracts.
+
+* **HDE Math & Technical Spec (PF01)**
+
+  * Owns compat math: ten categories, integer scores, band thresholds, AB↔BA identity, and Reader v1 envelope.
+
+  * EPIC-011 must not change category set, score computation, band thresholds, or Reader v1 public contract.
+
+* **HDE Narratives Guide (PF17)**
+
+  * Owns Aux narrative packs, keys, suppression rules, and output surfaces (Aux, CLI preview).
+
+  * EPIC-011 must not change narrative pack contents, coverage, or routing; it may only add or update headers-only proofs and indices.
+
+* **HDE Mechanics (PF14)**
+
+  * Owns single-emitter guarantees, CLI↔Reader parity, two-run identity, and JSON canonicalization.
+
+  * EPIC-011 must preserve these invariants when adding new ingest/durability code and evidence.
+
+**Normative effect (for EPIC-011):**
+
+For any code change or plan under EPIC-011:
+
+* If it:
+
+  * introduces or removes a CLI flag,
+
+  * modifies CLI output structure or stream behavior,
+
+  * changes vendor header/body shape,
+
+  * touches compat scoring logic, category IDs, or band thresholds,
+
+  * alters narrative pack IDs, text, or surfaces,
+
+  * or weakens the single-emitter/parity rules,
+
+then **that change is out-of-scope for EPIC-011** and must be moved to a separate epic or rejected.
+
+EPIC-011 is allowed to:
+
+* Add admin/ops entrypoints (e.g., prod admin vendor override) that wrap the existing CLI and vendor surfaces without changing their contracts.
+
+* Add DB durability structures and lifecycle processes.
+
+* Add tests and evidence that *prove* CLI, vendor ingest, compat math, and Aux are unchanged (e.g., showcompat AB↔BA parity checks, Aux composer determinism lints, refusal proof capture).
+
+**QA and CI guidance (non-token, concrete):**
+
+* Keep and/or add **smoke tests** that run before/after EPIC-011 changes:
+
+  * `hdctl bg:resolve --help` and `hdctl showcompat --help` (exit 0; stdout help; no flag removal).
+
+  * A fixed compat test pair for `showcompat` proving AB=BA and two-run identity.
+
+  * A fixed Aux test that runs the composer on known inputs and verifies no change in pack IDs or suppression behavior.
+
+* If any such smoke test output changes in the EPIC-011 branch when compared to a known-good baseline, that change must be treated as a **compatibility regression**, not as part of this epic.
+
+**Doc-Delta (titles-only, to be applied later):**
+
+* **PF09 / PF19 (Build Checklist / QA Guide):**
+
+  * Under EPIC-011, add a short note that CLI, compat math, and Aux are **preservation surfaces** only; any functional changes require a separate epic.
+
+* **PF16 (Epics Map):**
+
+  * In the EPIC-011 row, record “Preservation: CLI, vendor ingest, compat math, Aux” to make this constraint visible alongside the acceptance tokens.
+
+## Addendum 23 — Token scope for prod vendor calls (admin override without CLI change)
+
+**Timestamp:** 111925 21:50  
+ **owner:** Thoth (Head of Development)
+
+**Details.**  
+ To preserve **CLI stability** under EPIC‑011 (A22) and implement the **admin vendor‑direct override** (A20) without adding flags, scope acceptance and ops behavior as follows:
+
+* **Token scope clarification (PF04 drain):** Interpret `BG_VENDOR_CALLS_DISABLED_IN_PROD_OK` as **“disabled for public traffic”**. It does **not** forbid admin‑run `hdctl` in prod during an ops window.
+
+* **Override guard (ops runbook; no CLI change):** Admin override requires **both**:
+
+  * Rails explicitly open (`SAFE_MODE=0`, `ALLOW_NETWORK=1`), and
+
+  * A one‑shot **environment confirmation**: `HDE_ADMIN_OVERRIDE=vendor` (consumed by the ops wrapper/runbook; *no* new CLI flags).
+
+* **Evidence (paths already used by A15; index in same PR):**
+
+  * `artifacts/bodygraph/vendor_upsert.<alias>.json`
+
+  * `artifacts/bodygraph/db_resolve.<alias>.json`
+
+  * `artifacts/presenter/json_canon_compare.log`
+
+  * `artifacts/proofs/ops_refusal_proof.txt` (after rails are closed)
+
+* **Doc‑Delta drains:**  
+   PF04 — revise token description for `BG_VENDOR_CALLS_DISABLED_IN_PROD_OK` to “public routes,” note admin override guard.  
+   PF05 — note that “operator action” includes a **documented** admin override via environment (no new flags) when rails are open, consistent with §7.4 adapter policy.
+
+---
+
+## Addendum 24 — EPIC‑011 partition stance (drain to PF16)
+
+**Timestamp:** 111925 21:52  
+ **owner:** Thoth (Head of Development)
+
+**Details.**  
+ Record that **EPIC‑011 requires a non‑deferred partition plan** and verification under the standard paths:
+
+* Required artifacts (unchanged):  
+   `artifacts/db/partition/partition_plan.txt`, `artifacts/db/partition/partition_verify.log` (adjacent).
+
+* Acceptance in PF09/PF19 remains `PARTITION_PLAN_OK` (no defer token).
+
+* **Doc‑Delta drain:** PF16 “EPIC‑011 — Vendor Ingest & Data Durability” → replace “Define **or explicitly defer** …” with **non‑deferred** language for EPIC‑011 only; keep “define or defer” phrasing in other epics as written.  
+
+## Addendum 25 — Vendor endpoint usage: full BodyGraph only (drop `/v1/bodygraphs/simple`)
+
+**Timestamp:** 112025 18:05  
+ **owner:** Thoth (Head of Development)
+
+**Details.**  
+ This addendum records the PO decision that the engine will **never** use the optional “simple BodyGraph” endpoint. For HDE integrations, only the **full BodyGraph endpoint** is allowed; the `/v1/bodygraphs/simple` variant is treated as **unsupported**.
+
+**Policy (titles-only routing):**
+
+* **HDE-CLI-API-Vendor-Ref (PF05)**
+
+  * Canonical request for vendor ingest is:  
+     `POST /v1/bodygraphs` with the three-key JSON body `{birthdate, birthtime, location}` and the exact header set currently documented (Accept, Content-Type, HD-Api-Key, optional HD-Geocode-Key, User-Agent=GlowHDEngine/\<release\_id\>).
+
+  * The alternative `POST /v1/bodygraphs/simple` is **not used** by HDE and must not appear in engine code, QA harnesses, or docs for EPIC-011 and forward.
+
+* **HDE Math & Technical Spec (PF01)**
+
+  * Compat math and BodyGraph topology continue to assume the **full** BodyGraph payload; there is no “simple” mode in the engine’s internal models or invariants.
+
+**Normative effect (now):**
+
+* Any new or existing code that calls `/v1/bodygraphs/simple` for HDE is out-of-policy and must be removed or migrated to `/v1/bodygraphs`.
+
+* Any CLI flags, scripts, or docs that mention a “simple” vendor route must be updated or deleted; the plan and QA harness should only ever exercise the full route.
+
+**Evidence (optional guard, not mandatory if you don’t want CI):**
+
+* A simple grep-guard can be used locally or in CI to prevent regressions:  
+   *Reject PRs that introduce `/v1/bodygraphs/simple` or `vendor-mode` variants into engine or QA code.*
+
+* No new tokens are required; PF05 remains the single home for on-wire bytes.
+
+**Doc-Delta (titles-only, to be applied later):**
+
+* **PF05:**
+
+  * Clarify that `/v1/bodygraphs` is the **only** endpoint used by the HDE engine; mark `/v1/bodygraphs/simple` as an optional vendor feature that is **not used** by this product.
+
+  * Ensure the examples and text for HDE omit `/v1/bodygraphs/simple`.
+
+## Addendum 26 — BodyGraph refresh policy (TTL/SWR & circuit‑breaker evidence)
+
+**Timestamp:** 112025 18:40  
+ **owner:** Thoth (Head of Development)
+
+**Details.**  
+ Record the EPIC‑011 requirement to **evidence** the out‑of‑band refresh posture for BodyGraph: TTL, SWR, vendor rate‑limits, and Circuit‑Breaker (CB) thresholds. This is a *policy capture* (names‑only) that does not change CLI or vendor bytes.
+
+**Artifacts (paths fixed; canonical JSON; one LF):**
+
+`artifacts/bodygraph/refresh_policy.snapshot.json` —
+
+ `{`  
+  `"ttl_s": <int>,`  
+  `"swr_s": <int>,`  
+  `"rate_limit": {"requests": <int>, "per_s": <int>},`  
+  `"cb": {"fail": <int>, "window_s": <int>, "cooldown_s": <int>},`  
+  `"sample_counts": {"refresh_attempts": <int>, "refresh_skips": <int>, "cb_trips": <int>}`  
+`}`
+
+*   
+* `artifacts/bodygraph/metrics.snapshot.json` (already used) and `artifacts/bodygraph/keys_only.logs.sample` remain the observability companions.
+
+**Acceptance (names‑only; to be claimed when the snapshot is present and indexed):**
+
+* `BG_TTL_SWR_POLICY_OK` — snapshot present & indexed (Human Index \+ Machine Mirror same‑PR).
+
+* `BG_CIRCUIT_BREAKER_POLICY_OK` — snapshot proves CB thresholds and shows non‑zero `sample_counts` over a QA window.
+
+**Indexing discipline:** Update `docs/evidence/INDEX.json` (+ `.sha256`) and append records to `artifacts/evidence_index.jsonl` with a `proof_anchor` for each file in the **same PR**.
+
+**Doc‑Delta (titles‑only drains):**
+
+* PF12 — include `refresh_policy.snapshot.json` under BodyGraph artifacts.
+
+* PF19 — add a short QA step to run an out‑of‑band refresh window and capture `sample_counts` into the snapshot.
 
