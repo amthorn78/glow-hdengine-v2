@@ -1,1 +1,4 @@
-artifacts/db/partition/partition_plan.txt
+path: artifacts/db/partition/partition_plan.txt
+sha256: 97323e278f717ce1bf4454212d2e83bb0cea61b30aa76c82aa5abf0940469080
+size_bytes: 79
+mtime_utc: 2025-11-19T23:12:14Z

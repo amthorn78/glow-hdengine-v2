@@ -135,9 +135,19 @@
     "title": "db.partition.plan"
   },
   {
+    "path": "artifacts/db/partition/partition_plan.txt",
+    "proof": "artifacts/db/partition/partition_plan.txt.path_proof.txt",
+    "title": "db.partition.plan.detail"
+  },
+  {
     "path": "artifacts/db/partition_verify.log",
     "proof": "artifacts/db/partition_verify.log.path_proof.txt",
     "title": "db.partition.verify"
+  },
+  {
+    "path": "artifacts/db/partition/partition_verify.log",
+    "proof": "artifacts/db/partition/partition_verify.log.path_proof.txt",
+    "title": "db.partition.verify.detail"
   },
   {
     "path": "artifacts/db/provider_parity/bridge.json",

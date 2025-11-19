@@ -1,3 +1,2 @@
-hde.body_graphs (base table)
-- partitions: (none observed)
-- bounds: n/a
+hde.public_results: RANGE(created_at)
+hde.pair_evaluation: RANGE(evaluated_at)

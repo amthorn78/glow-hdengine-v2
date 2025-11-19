@@ -1,1 +1,4 @@
-artifacts/db/partition/partition_verify.log
+path: artifacts/db/partition/partition_verify.log
+sha256: e1fb7d01ab91cb54e0c00fda6733d89c144f15bfc24d79250a99b31c02d6024e
+size_bytes: 202
+mtime_utc: 2025-11-19T23:12:16Z

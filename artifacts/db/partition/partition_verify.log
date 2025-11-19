@@ -1,4 +1,3 @@
-VERIFY 2025-11-15T03:57:44.872253Z
-- curl exit code: 0
-- bridge response status: ok
-- rows returned: 0 (LIMIT 0)
+expected: hde.public_results RANGE(created_at); hde.pair_evaluation RANGE(evaluated_at)
+observed: hde.public_results RANGE(created_at); hde.pair_evaluation RANGE(evaluated_at)
+result: PARTITION_PLAN_OK
