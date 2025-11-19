@@ -1,0 +1,10 @@
+docs/run/EPIC011_TEST_IDENTITIES.md:27:   export INGEST_TEST_USER_ID=epic011-s10-invariance-1
+docs/run/EPIC011_TEST_IDENTITIES.md:28:   export INGEST_TEST_BIRTHDATE=1990-01-01
+docs/run/EPIC011_TEST_IDENTITIES.md:29:   export INGEST_TEST_BIRTHTIME=12:00
+docs/run/EPIC011_TEST_IDENTITIES.md:30:   export INGEST_TEST_LOCATION="Amsterdam, Netherlands"
+engine/bodygraph/ingest.py:99:    missing = [name for name in ("INGEST_TEST_USER_ID", "INGEST_TEST_BIRTHDATE", "INGEST_TEST_BIRTHTIME", "INGEST_TEST_LOCATION") if not (env.get(name) or "").strip()]
+engine/bodygraph/ingest.py:101:        raise VendorError("PROVIDER_INPUT_MISSING", "ingest inputs missing", details={"missing": missing})
+engine/bodygraph/ingest.py:103:        user_id=env["INGEST_TEST_USER_ID"].strip(),
+engine/bodygraph/ingest.py:104:        birthdate=env["INGEST_TEST_BIRTHDATE"].strip(),
+engine/bodygraph/ingest.py:105:        birthtime=env["INGEST_TEST_BIRTHTIME"].strip(),
+engine/bodygraph/ingest.py:106:        location=env["INGEST_TEST_LOCATION"].strip(),

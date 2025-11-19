@@ -1,0 +1,9 @@
+docs/pfcanon/PF17-Canon-HDE-Narratives Guide v1.4.md:626:**Acceptance (names-only).** `NARR_METRICS_KEYS_ONLY_OK`, `BG_PRIVACY_REDACTION_OK`.
+docs/pfcanon/PF10-HDE-Build Notes  v7.5.2.md:72: `VENDOR_RETRY_BACKOFF_OK · PROVIDER_429_TYPED_OK · RETRY_AFTER_PARSE_OK · LOGS_KEYS_ONLY_OK`  
+docs/pfcanon/PF10-HDE-Build Notes  v7.5.2.md:158:* **Addenda-PF04-A02** formally pins `/internal/version` behavior (conditionals ignored, no ETag, no A7 participation) and centralizes rails-open SAFE policy token names (`VENDOR_RETRY_BACKOFF_OK`, `PROVIDER_429_TYPED_OK`, `RETRY_AFTER_PARSE_OK`, `LOGS_KEYS_ONLY_OK`).
+docs/pfcanon/PF10-HDE-Build Notes  v7.5.2.md:224:**Intent.** Name BodyGraph‑specific observability gates that extend PF04’s logging posture beyond `LOGS_KEYS_ONLY_OK`.
+docs/pfcanon/PF10-HDE-Build Notes  v7.5.2.md:228:* **`BG_PRIVACY_REDACTION_OK`** — BodyGraph logs are keys‑only, redact PII/payload fragments; no secrets.
+docs/pfcanon/PF10-HDE-Build Notes  v7.5.2.md:230:* **`BG_METRICS_EXPOSED_OK`** — BodyGraph metrics limited to counters/histograms; no payload or PII in labels.
+docs/pfcanon/PF10-HDE-Build Notes  v7.5.2.md:424:   `LOGS_KEYS_ONLY_OK · BG_PRIVACY_REDACTION_OK · BG_METRICS_EXPOSED_OK`.  
+artifacts/qa/vendor_429.rg.txt:4:docs/pfcanon/PF10-HDE-Build Notes  v7.5.2.md:72: `VENDOR_RETRY_BACKOFF_OK · PROVIDER_429_TYPED_OK · RETRY_AFTER_PARSE_OK · LOGS_KEYS_ONLY_OK`  
+artifacts/qa/vendor_429.rg.txt:6:docs/pfcanon/PF10-HDE-Build Notes  v7.5.2.md:158:* **Addenda-PF04-A02** formally pins `/internal/version` behavior (conditionals ignored, no ETag, no A7 participation) and centralizes rails-open SAFE policy token names (`VENDOR_RETRY_BACKOFF_OK`, `PROVIDER_429_TYPED_OK`, `RETRY_AFTER_PARSE_OK`, `LOGS_KEYS_ONLY_OK`).

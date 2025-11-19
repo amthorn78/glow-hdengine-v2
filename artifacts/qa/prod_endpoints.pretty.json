@@ -1,0 +1,8 @@
+{
+  "prod": {
+    "hd_engine": {
+      "base_url": "https://glow-hdengine-v2-production.up.railway.app",
+      "provider": "Railway"
+    }
+  }
+}

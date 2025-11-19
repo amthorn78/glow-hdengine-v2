@@ -1,0 +1,9 @@
+docs/run/PROD_ENDPOINTS.json:1:{"prod":{"hd_engine":{"base_url":"https://glow-hdengine-v2-production.up.railway.app","provider":"Railway"}}}
+docs/pfcanon/PF07-Canon-Glow-Infrastructure v1.0.7.md:91:| HD Engine | Railway | ample-illumination | glow-hdengine-v2 | TBD | [https://glow-hdengine-v2-production.up.railway.app](https://glow-hdengine-v2-production.up.railway.app) | ample-illumination/production/postgres | **hde** |
+docs/pfcanon/PF07-Canon-Glow-Infrastructure v1.0.7.md:213:  * **HD Engine:** `https://glow-hdengine-v2-production.up.railway.app`  
+docs/pfcanon/PF07-Canon-Glow-Infrastructure v1.0.7.md:248:* **Hosting:** provider **Railway** · project **ample-illumination** · service **glow-hdengine-v2** · base URL [**https://glow-hdengine-v2-production.up.railway.app**](https://glow-hdengine-v2-production.up.railway.app)  
+docs/pfcanon/PF07-Canon-Glow-Infrastructure v1.0.7.md:527:* Dev (CodEx): `https://illustrious-freedom-production.up.railway.app`
+docs/pfcanon/PF07-Canon-Glow-Infrastructure v1.0.7.md:626:* **HD Engine (Railway)** — service `glow-hdengine-v2` · base URL `https://glow-hdengine-v2-production.up.railway.app`  
+docs/pfcanon/PF07-Canon-Glow-Infrastructure v1.0.7.md:628:* **PG bridge (Railway)** — service `pg-bridge` · host `https://illustrious-freedom-production.up.railway.app` *(names-only; `DB_BRIDGE_URL` values map per environment in §8; PF07 lists names only)*  
+docs/pfcanon/PF07-Canon-Glow-Infrastructure v1.0.7.md:733:        "base\_url": "https://glow-hdengine-v2-production.up.railway.app",  
+docs/pfcanon/PF07-Canon-Glow-Infrastructure v1.0.7.md:751:        "base\_url": "https://illustrious-freedom-production.up.railway.app",  
