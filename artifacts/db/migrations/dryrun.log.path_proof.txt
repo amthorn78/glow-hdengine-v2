@@ -1,1 +1,4 @@
-artifacts/db/migrations/dryrun.log
+path: artifacts/db/migrations/dryrun.log
+sha256: 46cb4ca3cd33908c86f951ecd96efd03cd4871b843e922a3150eb2b9c1cf714d
+size_bytes: 179
+mtime_utc: 2025-11-19T22:21:08Z

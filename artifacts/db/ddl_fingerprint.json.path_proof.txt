@@ -1,4 +1,4 @@
 path: artifacts/db/ddl_fingerprint.json
 sha256: fd96c730ba589ebd9bb9944913984cf16f8494f789c1e774d09c3daacb45a3ff
 size_bytes: 634
-mtime_utc: 2025-11-18T22:15:21Z
+mtime_utc: 2025-11-19T22:21:08Z

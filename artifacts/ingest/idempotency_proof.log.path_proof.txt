@@ -1,1 +1,4 @@
-artifacts/ingest/idempotency_proof.log
+path: artifacts/ingest/idempotency_proof.log
+sha256: 2b66490c21c9e37b5682c7107594f200e96404a6c1a71ece0173a6e530943462
+size_bytes: 328
+mtime_utc: 2025-11-19T22:21:08Z

@@ -1,1 +1,4 @@
-artifacts/db_bridge/health.json
+path: artifacts/db_bridge/health.json
+sha256: 6489d6d7a33c5d40e18fc61eeb6c34c341279ee61816394dde5189aa4ad8fae5
+size_bytes: 16
+mtime_utc: 2025-11-19T22:21:08Z

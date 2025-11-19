@@ -1,1 +1,4 @@
--rw-r--r-- 1 root root 852 Nov 18 01:29 artifacts/audit/pf09_anomalies_rails_closed.json
+path: artifacts/audit/pf09_anomalies_rails_closed.json
+sha256: e0da6434fe187e740b3dac9a61e63fc9e7a83d22be201d537e5458e657b347af
+size_bytes: 852
+mtime_utc: 2025-11-19T22:21:08Z

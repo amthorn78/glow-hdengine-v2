@@ -1,1 +1,4 @@
-artifacts/engine/db_adapter.search_path.json
+path: artifacts/engine/db_adapter.search_path.json
+sha256: f1ffbbc605876edc91955fb149b016bf9b15a66bff74989ecf993cb5940d7f35
+size_bytes: 44
+mtime_utc: 2025-11-19T22:21:08Z

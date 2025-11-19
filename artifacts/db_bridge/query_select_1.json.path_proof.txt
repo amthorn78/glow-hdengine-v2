@@ -1,1 +1,4 @@
-artifacts/db_bridge/query_select_1.json
+path: artifacts/db_bridge/query_select_1.json
+sha256: bd919ec13cc10567b72b81f4326a8b525d4db8a2d8914fc884b86a6530726862
+size_bytes: 63
+mtime_utc: 2025-11-19T22:21:08Z
