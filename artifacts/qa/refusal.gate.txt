@@ -1,0 +1,8 @@
+docs/run/RUN_PROD_QA.md:73:| `artifacts/proofs/ops_refusal_proof.txt` | Demonstrates rails are closed outside the window, both before and after, with canonical refusal formatting. | SNAPSHOT_HEADER_LOWERCASE_OK, BG_VENDOR_CALLS_DISABLED_IN_PROD_OK |
+docs/pfcanon/PF19-Canon-Glow QA Guide v0.4.md:1573:* **Header names lower‑case.** All governed header snapshots store header names in **lower‑case**; values are verbatim. *Acceptance token:* **`SNAPSHOT_HEADER_LOWERCASE_OK`** (definition lives in PF05/PF09).  
+docs/pfcanon/PF17-Canon-HDE-Narratives Guide v1.4.md:55:   • Header snapshots store **lower-case header names** (values verbatim). Acceptance: `SNAPSHOT_HEADER_LOWERCASE_OK`.
+docs/pfcanon/PF17-Canon-HDE-Narratives Guide v1.4.md:1163:* **Header snapshot normalization.** Stored snapshots use lower-case header names; values are verbatim (PF12; `SNAPSHOT_HEADER_LOWERCASE_OK`).
+docs/pfcanon/PF14-Canon-HDE-Mechanics Guide v1.8.md:173:**Header snapshot normalization:** stored snapshots use **lower‑case header names**; values verbatim. **Acceptance:** `SNAPSHOT_HEADER_LOWERCASE_OK`.
+docs/pfcanon/PF10-HDE-Build Notes  v7.5.2.md:389:   `SNAPSHOT_HEADER_LOWERCASE_OK · INGEST_OK · INGEST_IDEMPOTENT_OK · BG_SOURCE_SELECTION_OK · BG_SOURCE_INVARIANCE_OK · BG_VENDOR_CALLS_DISABLED_IN_PROD_OK`.
+docs/pfcanon/PF10-HDE-Build Notes  v7.5.2.md:422:   `SNAPSHOT_HEADER_LOWERCASE_OK · INGEST_OK · INGEST_IDEMPOTENT_OK · BG_SOURCE_SELECTION_OK · BG_SOURCE_INVARIANCE_OK · BG_VENDOR_CALLS_DISABLED_IN_PROD_OK`.  
+docs/pfcanon/PF05-Canon-HDE-CLI-API-Vendor-Ref v1.3.md:956:* Normalization is governed in HDE-Schemas & Artifacts; **acceptance:** `SNAPSHOT_HEADER_LOWERCASE_OK`.  

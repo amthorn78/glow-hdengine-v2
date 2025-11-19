@@ -1,0 +1,485 @@
+docs/CLI_commands.md:10:- `hdctl showcompat --pair-file <pair.json>`
+docs/CLI_commands.md:11:- `hdctl showcompat --a-file <A.json> --b-file <B.json>`
+docs/CLI_commands.md:12:- `hdctl showcompat` (reads one pair from stdin)
+docs/CLI_commands.md:16:- `hdctl showcompat --pair-file <pair.json> --dump-reader <out.json> --dump-admin-dir <dir>`
+docs/CLI_commands.md:17:- `hdctl showcompat --a-file <A.json> --b-file <B.json> --dump-reader <out.json> --dump-admin-dir <dir>`
+docs/CLI_commands.md:36:- Recommended hook for parity testing: env `HDE_CLI_SHOWCOMPAT` shelling `hdctl showcompat`.
+docs/run/RUN_PROD_QA.md:15:2. Call the ops resolve route (`_ops/bodygraph/resolve`) or `python -m engine.cli bg:resolve --user <EPIC011_TEST_USER> --source vendor --upsert` with the synthetic identity while rails are closed. This call must target `source="vendor"` with `upsert=true` so the Engine refuses it.
+docs/run/RUN_PROD_QA.md:38:   python -m engine.cli bg:resolve --user <EPIC011_TEST_USER> --source vendor --upsert
+docs/run/RUN_PROD_QA.md:47:   python -m engine.cli bg:resolve --user <EPIC011_TEST_USER> --source db
+docs/run/EPIC011_TEST_IDENTITIES.md:17:- **Resolver + ingest code paths** — `engine/bodygraph/ingest.resolve_db_user_id` and CLI commands such as `python -m engine.cli bg:resolve --user epic011-s10-invariance-1 --source vendor --upsert` exercise the alias bridge and write rows keyed to the mapped UUID.
+docs/design/db-bridge-fallback/02_adapter_architecture.md:17:- CLI (`hdctl`, `engine.cli`) reuses `DBAccess` so evidence harnesses and runtime commands share the same selection flow.
+manifest_pre.sha256:613:5a5546e2f241175e9b8fdc45bee88822799cf06b5c6baa9c9354a7cd07ab5fe3  ./.audit_src/scripts/__pycache__/hdctl.cpython-312.pyc
+manifest_pre.sha256:627:cdc0b2a8e9a55f4f49a6e92e31c9e4bb1cbf21c6e73d446999e26fd8c4104750  ./.audit_src/scripts/hdctl.backup.py
+manifest_pre.sha256:628:b6528fa452a6829d895d09932660925df533d91226ac9f7fbda7c69e45724f4b  ./.audit_src/scripts/hdctl.clean.py
+manifest_pre.sha256:629:fccf6047aa7ede824d7abe29afb07c06dd24075c334824086c65c5747a0141e4  ./.audit_src/scripts/hdctl.py
+manifest_pre.sha256:819:0f504f35d4e21f5f217d5bf4fa9fe1739470bce90e0bdb0f4376863fbac0559a  ./.audit_src/tests/hdctl/__pycache__/test_cli_admin_sidecar_invariance.cpython-312-pytest-7.4.4.pyc
+manifest_pre.sha256:820:623232ce98bc0248aeea797ba1ef7c553e57dfdf2260ecd0d1318496b993e48d  ./.audit_src/tests/hdctl/__pycache__/test_cli_read_singlebg.cpython-312-pytest-7.4.4.pyc
+manifest_pre.sha256:821:bdcc13fe3fa5c589845f990e4c7cd0d490bf5eddde5bd3a9c8fbe6b90a945883  ./.audit_src/tests/hdctl/__pycache__/test_cli_showcompat_parity.cpython-312-pytest-7.4.4.pyc
+manifest_pre.sha256:822:e2c46e0a54d3bc71ccff4bfa6a6b47a61630a352baaee704f1f02ec2a276e4b6  ./.audit_src/tests/hdctl/__pycache__/test_cli_streams_and_exits.cpython-312-pytest-7.4.4.pyc
+manifest_pre.sha256:823:8298b02c0303b66710a4acfdb53462bfa521f7659e522109d5551fd3b3c3991a  ./.audit_src/tests/hdctl/__pycache__/test_cli_two_run_identity.cpython-312-pytest-7.4.4.pyc
+manifest_pre.sha256:824:a6290499ef50e38395cea2bd3e85b624cde876fb3ae4f92bcecb74824a577fc4  ./.audit_src/tests/hdctl/test_cli_admin_sidecar_invariance.py
+manifest_pre.sha256:825:bb1fea3059019a7eab93f8f21e1133277cf1cf1055b45d8c8cb8d7b3cf14a062  ./.audit_src/tests/hdctl/test_cli_read_singlebg.py
+manifest_pre.sha256:826:cf842ecfebb8e41a450326ac8244927e7545265a6b167bbad11eb6d578b1bdeb  ./.audit_src/tests/hdctl/test_cli_showcompat_parity.py
+manifest_pre.sha256:827:74fd5b64c2c59b134b68cf083f9950978407ecfb90a03856b82ab8ea9e2b22e2  ./.audit_src/tests/hdctl/test_cli_streams_and_exits.py
+manifest_pre.sha256:828:b99a154373dbea787ac2d1407284d61077d2000880a11b501209953e172ffbdb  ./.audit_src/tests/hdctl/test_cli_two_run_identity.py
+manifest_pre.sha256:3471:5a5546e2f241175e9b8fdc45bee88822799cf06b5c6baa9c9354a7cd07ab5fe3  ./scripts/__pycache__/hdctl.cpython-312.pyc
+manifest_pre.sha256:3486:cdc0b2a8e9a55f4f49a6e92e31c9e4bb1cbf21c6e73d446999e26fd8c4104750  ./scripts/hdctl.backup.py
+manifest_pre.sha256:3487:b6528fa452a6829d895d09932660925df533d91226ac9f7fbda7c69e45724f4b  ./scripts/hdctl.clean.py
+manifest_pre.sha256:3488:fccf6047aa7ede824d7abe29afb07c06dd24075c334824086c65c5747a0141e4  ./scripts/hdctl.py
+manifest_pre.sha256:3489:05bb290c1508da124252b1b06c4e45701fe7a859132aa1b61a2b67a295154dfe  ./scripts/hdctl.py.bak
+manifest_pre.sha256:3682:0f504f35d4e21f5f217d5bf4fa9fe1739470bce90e0bdb0f4376863fbac0559a  ./tests/hdctl/__pycache__/test_cli_admin_sidecar_invariance.cpython-312-pytest-7.4.4.pyc
+manifest_pre.sha256:3683:623232ce98bc0248aeea797ba1ef7c553e57dfdf2260ecd0d1318496b993e48d  ./tests/hdctl/__pycache__/test_cli_read_singlebg.cpython-312-pytest-7.4.4.pyc
+manifest_pre.sha256:3684:bdcc13fe3fa5c589845f990e4c7cd0d490bf5eddde5bd3a9c8fbe6b90a945883  ./tests/hdctl/__pycache__/test_cli_showcompat_parity.cpython-312-pytest-7.4.4.pyc
+manifest_pre.sha256:3685:e2c46e0a54d3bc71ccff4bfa6a6b47a61630a352baaee704f1f02ec2a276e4b6  ./tests/hdctl/__pycache__/test_cli_streams_and_exits.cpython-312-pytest-7.4.4.pyc
+manifest_pre.sha256:3686:8298b02c0303b66710a4acfdb53462bfa521f7659e522109d5551fd3b3c3991a  ./tests/hdctl/__pycache__/test_cli_two_run_identity.cpython-312-pytest-7.4.4.pyc
+manifest_pre.sha256:3687:a6290499ef50e38395cea2bd3e85b624cde876fb3ae4f92bcecb74824a577fc4  ./tests/hdctl/test_cli_admin_sidecar_invariance.py
+manifest_pre.sha256:3688:bb1fea3059019a7eab93f8f21e1133277cf1cf1055b45d8c8cb8d7b3cf14a062  ./tests/hdctl/test_cli_read_singlebg.py
+manifest_pre.sha256:3689:cf842ecfebb8e41a450326ac8244927e7545265a6b167bbad11eb6d578b1bdeb  ./tests/hdctl/test_cli_showcompat_parity.py
+manifest_pre.sha256:3690:74fd5b64c2c59b134b68cf083f9950978407ecfb90a03856b82ab8ea9e2b22e2  ./tests/hdctl/test_cli_streams_and_exits.py
+manifest_pre.sha256:3691:b99a154373dbea787ac2d1407284d61077d2000880a11b501209953e172ffbdb  ./tests/hdctl/test_cli_two_run_identity.py
+AGENTS.md:14:- CLI setup and help: python -m pip -q install -e ., then hdctl --help and python -m engine.cli --help (pyproject.toml exposes hdctl via engine.cli.main:cli).
+AGENTS.md:15:- python -m engine.cli --help must exit 0 (parity with hdctl --help).
+docs/pfcanon/PF06-Canon-Epic-Process-Guide v1.0.md:777:  \- name: "CLI\_READER\_PARITY\_OK"                \# Reader 200 body equals hdctl/glowctl showcompat stdout (LF-terminated)
+docs/pfcanon/PF14-Canon-HDE-Mechanics Guide v1.8.md:1126:* `hdctl showcompat …` — prints the exact Reader v1 public body (six keys, canonical JSON, one LF) for the same inputs/environment using the shared presenter/emitter. Merge-blocking until Reader↔CLI parity passes.
+docs/pfcanon/PF14-Canon-HDE-Mechanics Guide v1.8.md:1128:* `hdctl sample …` — prints the same deterministic selection/ordering as the corresponding Reader surface documented in PF05.
+docs/pfcanon/PF14-Canon-HDE-Mechanics Guide v1.8.md:1172:* **Console script.** `pyproject` console-script `hdctl` present and installable.
+docs/pfcanon/PF14-Canon-HDE-Mechanics Guide v1.8.md:1174:* **Module-run.** `python -m engine.cli` parity proven with console script.
+docs/pfcanon/PF10-HDE-Build Notes  v7.5.2.md:317:* **Codespaces bootstrap:** `.devcontainer/devcontainer.json` installs package in editable mode and prepends `~/.local/bin` to `PATH`. Canonical CLI invocation is **module‑run** (`python -m engine.cli`).  
+docs/pfcanon/PF05-Canon-HDE-CLI-API-Vendor-Ref v1.3.md:39:* **QA status note (informative).** The CLI is installable and `--help` / `--version` behave correctly. A known issue remains: in some runs `hdctl showcompat` emits **empty output**, violating non-empty canonical JSON and parity requirements (six-key success body, LF-terminated; Reader↔CLI byte equality; AB↔BA and two-run identity). Until that path is corrected, related CLI tokens remain pending (token names live in **HDE-Governance §2**).
+docs/pfcanon/PF05-Canon-HDE-CLI-API-Vendor-Ref v1.3.md:79:* **`hdctl showcompat` — Implemented; *merge-blocking* until Reader↔CLI parity passes.** Prints the public Reader body to **stdout** (six keys, **exactly one LF**, no ANSI). Output **must be non-empty canonical JSON**; **AB↔BA** and **two-run identity** required; **Reader↔CLI byte parity** required. QA: install/help OK; some runs emitted empty output, so related CLI tokens remain pending (tokens tracked in HDE-Governance §2.0).  
+docs/pfcanon/PF05-Canon-HDE-CLI-API-Vendor-Ref v1.3.md:80:   *Notes:* single presenter/emitter (§6.2); stdout only on success, stderr only on errors (§3.3/§3.4); module-runner parity required (`python -m engine.cli`).
+docs/pfcanon/PF05-Canon-HDE-CLI-API-Vendor-Ref v1.3.md:156:**QA status note (informative).** The CLI is installable and `--help` / `--version` behave as expected. A known issue remains: in some runs `hdctl showcompat` emits **empty output**, which violates the non-empty canonical JSON and parity requirements (six-key success body, LF-terminated; Reader↔CLI byte equality; AB↔BA and two-run identity). Until that path is corrected, the related acceptance tokens remain **pending**: `CLI_READER_PARITY_OK`, `TWO_RUN_IDENTITY_OK`, `COMPOSITE_ABBA_IDENTITY_OK`, `JSON_CANONICAL_CHECK_OK` (see §2.0 and §4.1). All success output **must** be produced by the single canonical emitter, use UTF-8 with sorted keys and exactly one trailing LF, and be validated under `LC_ALL=C` and `TZ=UTC`.
+docs/pfcanon/PF05-Canon-HDE-CLI-API-Vendor-Ref v1.3.md:161:   `[project.scripts]` defines `hdctl = "engine.cli.main:cli"`.  
+docs/pfcanon/PF05-Canon-HDE-CLI-API-Vendor-Ref v1.3.md:162:   **Module-runner parity:** `python -m engine.cli --help` ≡ `hdctl --help` (exit 0).  
+docs/pfcanon/PF05-Canon-HDE-CLI-API-Vendor-Ref v1.3.md:316:  ## **4.1 `hdctl showcompat` \[Implemented\]**
+docs/pfcanon/PF05-Canon-HDE-CLI-API-Vendor-Ref v1.3.md:371:  ## **4.2 `hdctl read singlebg` \[Speculative\]**
+docs/pfcanon/PF05-Canon-HDE-CLI-API-Vendor-Ref v1.3.md:426:## **4.3 `hdctl list people` \[Speculative\]**
+docs/pfcanon/PF05-Canon-HDE-CLI-API-Vendor-Ref v1.3.md:540:* **`hdctl fetch person --name <str> --birthdate <YYYY-MM-DD> --birthtime <HH:MM> --place "<City, CC>" [--tz <IANA>]`**
+docs/pfcanon/PF05-Canon-HDE-CLI-API-Vendor-Ref v1.3.md:544:* **`hdctl fetch batch --file <CSV|JSON>`**
+docs/pfcanon/PF05-Canon-HDE-CLI-API-Vendor-Ref v1.3.md:564: • “CLI” for this epic refers to the admin preview surface exposed over HTTP that calls the same emitter as Reader. A local binary (for example, hdctl) is not normative for acceptance.  
+docs/pfcanon/PF05-Canon-HDE-CLI-API-Vendor-Ref v1.3.md:585:## **4.6 `hdctl bg:resolve` \[Required-Now\]**
+docs/pfcanon/PF05-Canon-HDE-CLI-API-Vendor-Ref v1.3.md:733:* **Reader↔CLI parity.** For identical inputs and environment, harness responses are **byte-identical** to `hdctl showcompat` stdout (six keys, LF).  
+docs/pfcanon/PF05-Canon-HDE-CLI-API-Vendor-Ref v1.3.md:808:* **Public parity lives in §5.4** (`/api/reader?v=1` ↔ `hdctl showcompat` stdout).  
+docs/pfcanon/PF05-Canon-HDE-CLI-API-Vendor-Ref v1.3.md:1005:**Routing (titles‑only).** Selection semantics mirror `hdctl bg:resolve` (§4.6). Governance (rails/tokens) and PF14 (adapter mechanics) are single homes.
+docs/pfcanon/PF05-Canon-HDE-CLI-API-Vendor-Ref v1.3.md:1667:2. **Run CLI** `hdctl showcompat` for the same inputs; capture **stdout**.
+CHANGELOG.md:216:- CLI harness `hdctl aux-preview` shares the Aux emitter and its stdout + sidecar artifacts are indexed.
+engine/cli/_admin_dump.py:1:"""Admin proof dump helpers for the hdctl CLI."""
+engine/cli/main.py:54:        prog="hdctl",
+artifacts/proofs/cli_help.txt:1:usage: hdctl [-h] {showcompat} ...
+artifacts/proofs/cli_install.txt:1:== hdctl --help ==
+artifacts/proofs/cli_install.txt:2:usage: hdctl [-h] {showcompat} ...
+artifacts/proofs/cli_install.txt:13:== hdctl showcompat --help ==
+artifacts/proofs/cli_install.txt:14:usage: hdctl showcompat [-h] [--pair-file PAIR_FILE] [--a-file A_FILE] [--b-file B_FILE] [--a A_FILE] [--b B_FILE]
+artifacts/proofs/cli_install.txt:25:== python -m engine.cli --help ==
+artifacts/proofs/cli_install.txt:26:usage: hdctl [-h] {showcompat} ...
+artifacts/proofs/cli_install.log:1:  WARNING: The script hdctl is installed in '/usr/local/python/3.12.1/bin' which is not on PATH.
+artifacts/proofs/cli_reader_parity.txt:7:CLI command: PYTHONPATH=. APP_ENV=dev python scripts/hdctl.py showcompat --a-file fixtures/charts/alice.json --b-file fixtures/charts/bob.json
+artifacts/proofs/cli_reader_parity.txt:14:CLI command: PYTHONPATH=. APP_ENV=dev python scripts/hdctl.py showcompat --a-file fixtures/charts/bob.json --b-file fixtures/charts/alice.json
+artifacts/proofs/cli_reader_parity.txt:21:CLI command: PYTHONPATH=. APP_ENV=dev python scripts/hdctl.py showcompat --a-file fixtures/charts/alice.json --b-file fixtures/charts/alice.json
+artifacts/proofs/cli_which.txt:1:/home/codespace/.python/current/bin/hdctl
+artifacts/math/_manifest_files.txt:965:scripts/__pycache__/hdctl.cpython-312.pyc
+artifacts/math/_manifest_files.txt:979:scripts/hdctl.backup.py
+artifacts/math/_manifest_files.txt:980:scripts/hdctl.clean.py
+artifacts/math/_manifest_files.txt:981:scripts/hdctl.py
+artifacts/math/_manifest_files.txt:1171:tests/hdctl/__pycache__/test_cli_admin_sidecar_invariance.cpython-312-pytest-7.4.4.pyc
+artifacts/math/_manifest_files.txt:1172:tests/hdctl/__pycache__/test_cli_read_singlebg.cpython-312-pytest-7.4.4.pyc
+artifacts/math/_manifest_files.txt:1173:tests/hdctl/__pycache__/test_cli_showcompat_parity.cpython-312-pytest-7.4.4.pyc
+artifacts/math/_manifest_files.txt:1174:tests/hdctl/__pycache__/test_cli_streams_and_exits.cpython-312-pytest-7.4.4.pyc
+artifacts/math/_manifest_files.txt:1175:tests/hdctl/__pycache__/test_cli_two_run_identity.cpython-312-pytest-7.4.4.pyc
+artifacts/math/_manifest_files.txt:1176:tests/hdctl/test_cli_admin_sidecar_invariance.py
+artifacts/math/_manifest_files.txt:1177:tests/hdctl/test_cli_read_singlebg.py
+artifacts/math/_manifest_files.txt:1178:tests/hdctl/test_cli_showcompat_parity.py
+artifacts/math/_manifest_files.txt:1179:tests/hdctl/test_cli_streams_and_exits.py
+artifacts/math/_manifest_files.txt:1180:tests/hdctl/test_cli_two_run_identity.py
+artifacts/audit/pyproject_entrypoints.json:1:{"console_scripts":{},"scripts":{"hdctl":"engine.cli.main:cli"}}
+artifacts/audit/cli_help_module.txt:1:usage: hdctl [-h] {showcompat} ...
+glow_hdengine.egg-info/PKG-INFO:22:- Canonical CLI invocation: `python -m engine.cli …`. Use the module-run form in docs, QA runbooks, and automation; the `hdctl` console script remains available for convenience once the project is installed.
+glow_hdengine.egg-info/PKG-INFO:23:- Installation: The repo’s devcontainer config installs the project in editable mode during `postCreateCommand`, so a fresh Codespace already has both `python -m engine.cli` and `hdctl` available on `PATH` without manual pip work.
+glow_hdengine.egg-info/PKG-INFO:25:Direct `hdctl …` examples remain in this README for brevity, but automation and QA scripts must prefer `python -m engine.cli` to guarantee parity with module-run execution.
+glow_hdengine.egg-info/PKG-INFO:44:- **CLI preview:** Admin `hdctl aux-preview` reuses the Aux emitter; stdout + sidecar artifacts are indexed in the Human and Machine evidence registries.
+glow_hdengine.egg-info/PKG-INFO:48:> **Note:** Module-run (`python -m engine.cli`) is the default for QA. The `hdctl` console script behaves the same way after Codespaces bootstrap installs the package.
+glow_hdengine.egg-info/PKG-INFO:53:  hdctl showcompat --pair-file path/to/pair.json > out.json
+glow_hdengine.egg-info/PKG-INFO:57:  hdctl showcompat --a-file A.json --b-file B.json > out.json
+glow_hdengine.egg-info/PKG-INFO:84:When running `hdctl showcompat` for QA, pass `--dump-reader` and `--dump-admin-dir`.
+glow_hdengine.egg-info/entry_points.txt:2:hdctl = engine.cli.main:cli
+artifacts/audit/cli/help.txt:1:usage: hdctl [-h] {showcompat,aux-preview,bg:resolve} ...
+artifacts/audit/cli/help_stdout_cli.txt:1:usage: hdctl [-h] {showcompat,aux-preview,bg:resolve} ...
+codex/out/docs_snapshots/docs/CLI_commands.md.txt:10:- `hdctl showcompat --pair-file <pair.json>`
+codex/out/docs_snapshots/docs/CLI_commands.md.txt:11:- `hdctl showcompat --a-file <A.json> --b-file <B.json>`
+codex/out/docs_snapshots/docs/CLI_commands.md.txt:12:- `hdctl showcompat` (reads one pair from stdin)
+codex/out/docs_snapshots/docs/CLI_commands.md.txt:16:- `hdctl showcompat --pair-file <pair.json> --dump-reader <out.json> --dump-admin-dir <dir>`
+codex/out/docs_snapshots/docs/CLI_commands.md.txt:17:- `hdctl showcompat --a-file <A.json> --b-file <B.json> --dump-reader <out.json> --dump-admin-dir <dir>`
+codex/out/docs_snapshots/docs/CLI_commands.md.txt:36:- Recommended hook for parity testing: env `HDE_CLI_SHOWCOMPAT` shelling `hdctl showcompat`.
+artifacts/audit/cli/help_stdout.txt:1:usage: hdctl [-h] {showcompat,aux-preview,bg:resolve} ...
+artifacts/audit/showcompat_example_BA.txt:1:python -m engine.cli showcompat --a-file artifacts/audit/bob_right.json --b-file artifacts/audit/alice_left.json
+codex/out/docs_snapshots/AGENTS.md.txt:14:- CLI setup and help: python -m pip -q install -e ., then hdctl --help and python -m engine.cli --help (pyproject.toml exposes hdctl via engine.cli.main:cli).
+codex/out/docs_snapshots/AGENTS.md.txt:15:- python -m engine.cli --help must exit 0 (parity with hdctl --help).
+codex/out/docs_snapshots/README.md.txt:7:  hdctl showcompat --pair-file path/to/pair.json > out.json
+codex/out/docs_snapshots/README.md.txt:11:  hdctl showcompat --a-file A.json --b-file B.json > out.json
+codex/out/docs_snapshots/README.md.txt:38:When running `hdctl showcompat` for QA, pass `--dump-reader` and `--dump-admin-dir`.
+codex/AGENTS_RFI.md:10:3) Which repo files/commands will you rely on (e.g., pyproject for hdctl, Makefile targets, scripts, presenter/emitter import path, audit/EVIDENCE_INDEX.jsonl)? List exact paths/commands.
+artifacts/audit/cli_presence.txt:1:hdctl found
+artifacts/audit/showcompat_example_AB.txt:1:python -m engine.cli showcompat --a-file artifacts/audit/alice_left.json --b-file artifacts/audit/bob_right.json
+handoff/epic004_live_evidence_20251022T202304Z/epic004/guards/forbidden_serializers.txt:28:scripts/hdctl.backup.py:9:    b = json.dumps(obj, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+handoff/epic004_live_evidence_20251022T202304Z/epic004/guards/forbidden_serializers.txt:34:scripts/hdctl.clean.py:7:    b = json.dumps(obj, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+handoff/epic004_live_evidence_20251022T202304Z/epic004/guards/forbidden_serializers.txt:37:scripts/hdctl.py.bak:6:    b = json.dumps(obj, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+artifacts/audit/cli_help_console.txt:1:usage: hdctl [-h] {showcompat} ...
+handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/tree.before.txt:864:│   │   ├── hdctl.cpython-312.pyc
+handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/tree.before.txt:878:│   ├── hdctl.backup.py
+handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/tree.before.txt:879:│   ├── hdctl.clean.py
+handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/tree.before.txt:880:│   ├── hdctl.py
+handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/tree.before.txt:881:│   ├── hdctl.py.bak
+handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017_210542/tree.before.txt:1017:│   ├── hdctl
+handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017T213424Z/tree.after.txt:838:│   │   ├── hdctl.cpython-312.pyc
+handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017T213424Z/tree.after.txt:853:│   ├── hdctl.backup.py
+handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017T213424Z/tree.after.txt:854:│   ├── hdctl.clean.py
+handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017T213424Z/tree.after.txt:855:│   ├── hdctl.py
+handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017T213424Z/tree.after.txt:856:│   ├── hdctl.py.bak
+handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017T213424Z/tree.after.txt:988:│   ├── hdctl
+handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017T213424Z/architecture_map_AFTER.md:887:│   │   ├── hdctl.cpython-312.pyc
+handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017T213424Z/architecture_map_AFTER.md:902:│   ├── hdctl.backup.py
+handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017T213424Z/architecture_map_AFTER.md:903:│   ├── hdctl.clean.py
+handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017T213424Z/architecture_map_AFTER.md:904:│   ├── hdctl.py
+handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017T213424Z/architecture_map_AFTER.md:905:│   ├── hdctl.py.bak
+handoff/epic004_live_evidence_20251022T202304Z/_arch/epic003_20251017T213424Z/architecture_map_AFTER.md:1037:│   ├── hdctl
+handoff/epic004_live_evidence_20251022T202304Z/manifest_post.sha256:613:5a5546e2f241175e9b8fdc45bee88822799cf06b5c6baa9c9354a7cd07ab5fe3  ./.audit_src/scripts/__pycache__/hdctl.cpython-312.pyc
+handoff/epic004_live_evidence_20251022T202304Z/manifest_post.sha256:627:cdc0b2a8e9a55f4f49a6e92e31c9e4bb1cbf21c6e73d446999e26fd8c4104750  ./.audit_src/scripts/hdctl.backup.py
+handoff/epic004_live_evidence_20251022T202304Z/manifest_post.sha256:628:b6528fa452a6829d895d09932660925df533d91226ac9f7fbda7c69e45724f4b  ./.audit_src/scripts/hdctl.clean.py
+handoff/epic004_live_evidence_20251022T202304Z/manifest_post.sha256:629:fccf6047aa7ede824d7abe29afb07c06dd24075c334824086c65c5747a0141e4  ./.audit_src/scripts/hdctl.py
+handoff/epic004_live_evidence_20251022T202304Z/manifest_post.sha256:819:0f504f35d4e21f5f217d5bf4fa9fe1739470bce90e0bdb0f4376863fbac0559a  ./.audit_src/tests/hdctl/__pycache__/test_cli_admin_sidecar_invariance.cpython-312-pytest-7.4.4.pyc
+handoff/epic004_live_evidence_20251022T202304Z/manifest_post.sha256:820:623232ce98bc0248aeea797ba1ef7c553e57dfdf2260ecd0d1318496b993e48d  ./.audit_src/tests/hdctl/__pycache__/test_cli_read_singlebg.cpython-312-pytest-7.4.4.pyc
+handoff/epic004_live_evidence_20251022T202304Z/manifest_post.sha256:821:bdcc13fe3fa5c589845f990e4c7cd0d490bf5eddde5bd3a9c8fbe6b90a945883  ./.audit_src/tests/hdctl/__pycache__/test_cli_showcompat_parity.cpython-312-pytest-7.4.4.pyc
+handoff/epic004_live_evidence_20251022T202304Z/manifest_post.sha256:822:e2c46e0a54d3bc71ccff4bfa6a6b47a61630a352baaee704f1f02ec2a276e4b6  ./.audit_src/tests/hdctl/__pycache__/test_cli_streams_and_exits.cpython-312-pytest-7.4.4.pyc
+handoff/epic004_live_evidence_20251022T202304Z/manifest_post.sha256:823:8298b02c0303b66710a4acfdb53462bfa521f7659e522109d5551fd3b3c3991a  ./.audit_src/tests/hdctl/__pycache__/test_cli_two_run_identity.cpython-312-pytest-7.4.4.pyc
+handoff/epic004_live_evidence_20251022T202304Z/manifest_post.sha256:824:a6290499ef50e38395cea2bd3e85b624cde876fb3ae4f92bcecb74824a577fc4  ./.audit_src/tests/hdctl/test_cli_admin_sidecar_invariance.py
+handoff/epic004_live_evidence_20251022T202304Z/manifest_post.sha256:825:bb1fea3059019a7eab93f8f21e1133277cf1cf1055b45d8c8cb8d7b3cf14a062  ./.audit_src/tests/hdctl/test_cli_read_singlebg.py
+handoff/epic004_live_evidence_20251022T202304Z/manifest_post.sha256:826:cf842ecfebb8e41a450326ac8244927e7545265a6b167bbad11eb6d578b1bdeb  ./.audit_src/tests/hdctl/test_cli_showcompat_parity.py
+handoff/epic004_live_evidence_20251022T202304Z/manifest_post.sha256:827:74fd5b64c2c59b134b68cf083f9950978407ecfb90a03856b82ab8ea9e2b22e2  ./.audit_src/tests/hdctl/test_cli_streams_and_exits.py
+handoff/epic004_live_evidence_20251022T202304Z/manifest_post.sha256:828:b99a154373dbea787ac2d1407284d61077d2000880a11b501209953e172ffbdb  ./.audit_src/tests/hdctl/test_cli_two_run_identity.py
+handoff/epic004_live_evidence_20251022T202304Z/manifest_post.sha256:3472:5a5546e2f241175e9b8fdc45bee88822799cf06b5c6baa9c9354a7cd07ab5fe3  ./scripts/__pycache__/hdctl.cpython-312.pyc
+handoff/epic004_live_evidence_20251022T202304Z/manifest_post.sha256:3487:cdc0b2a8e9a55f4f49a6e92e31c9e4bb1cbf21c6e73d446999e26fd8c4104750  ./scripts/hdctl.backup.py
+handoff/epic004_live_evidence_20251022T202304Z/manifest_post.sha256:3488:b6528fa452a6829d895d09932660925df533d91226ac9f7fbda7c69e45724f4b  ./scripts/hdctl.clean.py
+handoff/epic004_live_evidence_20251022T202304Z/manifest_post.sha256:3489:fccf6047aa7ede824d7abe29afb07c06dd24075c334824086c65c5747a0141e4  ./scripts/hdctl.py
+handoff/epic004_live_evidence_20251022T202304Z/manifest_post.sha256:3490:05bb290c1508da124252b1b06c4e45701fe7a859132aa1b61a2b67a295154dfe  ./scripts/hdctl.py.bak
+handoff/epic004_live_evidence_20251022T202304Z/manifest_post.sha256:3683:0f504f35d4e21f5f217d5bf4fa9fe1739470bce90e0bdb0f4376863fbac0559a  ./tests/hdctl/__pycache__/test_cli_admin_sidecar_invariance.cpython-312-pytest-7.4.4.pyc
+handoff/epic004_live_evidence_20251022T202304Z/manifest_post.sha256:3684:623232ce98bc0248aeea797ba1ef7c553e57dfdf2260ecd0d1318496b993e48d  ./tests/hdctl/__pycache__/test_cli_read_singlebg.cpython-312-pytest-7.4.4.pyc
+handoff/epic004_live_evidence_20251022T202304Z/manifest_post.sha256:3685:bdcc13fe3fa5c589845f990e4c7cd0d490bf5eddde5bd3a9c8fbe6b90a945883  ./tests/hdctl/__pycache__/test_cli_showcompat_parity.cpython-312-pytest-7.4.4.pyc
+handoff/epic004_live_evidence_20251022T202304Z/manifest_post.sha256:3686:e2c46e0a54d3bc71ccff4bfa6a6b47a61630a352baaee704f1f02ec2a276e4b6  ./tests/hdctl/__pycache__/test_cli_streams_and_exits.cpython-312-pytest-7.4.4.pyc
+handoff/epic004_live_evidence_20251022T202304Z/manifest_post.sha256:3687:8298b02c0303b66710a4acfdb53462bfa521f7659e522109d5551fd3b3c3991a  ./tests/hdctl/__pycache__/test_cli_two_run_identity.cpython-312-pytest-7.4.4.pyc
+handoff/epic004_live_evidence_20251022T202304Z/manifest_post.sha256:3688:a6290499ef50e38395cea2bd3e85b624cde876fb3ae4f92bcecb74824a577fc4  ./tests/hdctl/test_cli_admin_sidecar_invariance.py
+handoff/epic004_live_evidence_20251022T202304Z/manifest_post.sha256:3689:bb1fea3059019a7eab93f8f21e1133277cf1cf1055b45d8c8cb8d7b3cf14a062  ./tests/hdctl/test_cli_read_singlebg.py
+handoff/epic004_live_evidence_20251022T202304Z/manifest_post.sha256:3690:cf842ecfebb8e41a450326ac8244927e7545265a6b167bbad11eb6d578b1bdeb  ./tests/hdctl/test_cli_showcompat_parity.py
+handoff/epic004_live_evidence_20251022T202304Z/manifest_post.sha256:3691:74fd5b64c2c59b134b68cf083f9950978407ecfb90a03856b82ab8ea9e2b22e2  ./tests/hdctl/test_cli_streams_and_exits.py
+handoff/epic004_live_evidence_20251022T202304Z/manifest_post.sha256:3692:b99a154373dbea787ac2d1407284d61077d2000880a11b501209953e172ffbdb  ./tests/hdctl/test_cli_two_run_identity.py
+handoff/epic004_live_evidence_20251022T202304Z/manifest_pre.sha256:613:5a5546e2f241175e9b8fdc45bee88822799cf06b5c6baa9c9354a7cd07ab5fe3  ./.audit_src/scripts/__pycache__/hdctl.cpython-312.pyc
+handoff/epic004_live_evidence_20251022T202304Z/manifest_pre.sha256:627:cdc0b2a8e9a55f4f49a6e92e31c9e4bb1cbf21c6e73d446999e26fd8c4104750  ./.audit_src/scripts/hdctl.backup.py
+handoff/epic004_live_evidence_20251022T202304Z/manifest_pre.sha256:628:b6528fa452a6829d895d09932660925df533d91226ac9f7fbda7c69e45724f4b  ./.audit_src/scripts/hdctl.clean.py
+handoff/epic004_live_evidence_20251022T202304Z/manifest_pre.sha256:629:fccf6047aa7ede824d7abe29afb07c06dd24075c334824086c65c5747a0141e4  ./.audit_src/scripts/hdctl.py
+handoff/epic004_live_evidence_20251022T202304Z/manifest_pre.sha256:819:0f504f35d4e21f5f217d5bf4fa9fe1739470bce90e0bdb0f4376863fbac0559a  ./.audit_src/tests/hdctl/__pycache__/test_cli_admin_sidecar_invariance.cpython-312-pytest-7.4.4.pyc
+handoff/epic004_live_evidence_20251022T202304Z/manifest_pre.sha256:820:623232ce98bc0248aeea797ba1ef7c553e57dfdf2260ecd0d1318496b993e48d  ./.audit_src/tests/hdctl/__pycache__/test_cli_read_singlebg.cpython-312-pytest-7.4.4.pyc
+handoff/epic004_live_evidence_20251022T202304Z/manifest_pre.sha256:821:bdcc13fe3fa5c589845f990e4c7cd0d490bf5eddde5bd3a9c8fbe6b90a945883  ./.audit_src/tests/hdctl/__pycache__/test_cli_showcompat_parity.cpython-312-pytest-7.4.4.pyc
+handoff/epic004_live_evidence_20251022T202304Z/manifest_pre.sha256:822:e2c46e0a54d3bc71ccff4bfa6a6b47a61630a352baaee704f1f02ec2a276e4b6  ./.audit_src/tests/hdctl/__pycache__/test_cli_streams_and_exits.cpython-312-pytest-7.4.4.pyc
+handoff/epic004_live_evidence_20251022T202304Z/manifest_pre.sha256:823:8298b02c0303b66710a4acfdb53462bfa521f7659e522109d5551fd3b3c3991a  ./.audit_src/tests/hdctl/__pycache__/test_cli_two_run_identity.cpython-312-pytest-7.4.4.pyc
+handoff/epic004_live_evidence_20251022T202304Z/manifest_pre.sha256:824:a6290499ef50e38395cea2bd3e85b624cde876fb3ae4f92bcecb74824a577fc4  ./.audit_src/tests/hdctl/test_cli_admin_sidecar_invariance.py
+handoff/epic004_live_evidence_20251022T202304Z/manifest_pre.sha256:825:bb1fea3059019a7eab93f8f21e1133277cf1cf1055b45d8c8cb8d7b3cf14a062  ./.audit_src/tests/hdctl/test_cli_read_singlebg.py
+handoff/epic004_live_evidence_20251022T202304Z/manifest_pre.sha256:826:cf842ecfebb8e41a450326ac8244927e7545265a6b167bbad11eb6d578b1bdeb  ./.audit_src/tests/hdctl/test_cli_showcompat_parity.py
+handoff/epic004_live_evidence_20251022T202304Z/manifest_pre.sha256:827:74fd5b64c2c59b134b68cf083f9950978407ecfb90a03856b82ab8ea9e2b22e2  ./.audit_src/tests/hdctl/test_cli_streams_and_exits.py
+handoff/epic004_live_evidence_20251022T202304Z/manifest_pre.sha256:828:b99a154373dbea787ac2d1407284d61077d2000880a11b501209953e172ffbdb  ./.audit_src/tests/hdctl/test_cli_two_run_identity.py
+handoff/epic004_live_evidence_20251022T202304Z/manifest_pre.sha256:3471:5a5546e2f241175e9b8fdc45bee88822799cf06b5c6baa9c9354a7cd07ab5fe3  ./scripts/__pycache__/hdctl.cpython-312.pyc
+handoff/epic004_live_evidence_20251022T202304Z/manifest_pre.sha256:3486:cdc0b2a8e9a55f4f49a6e92e31c9e4bb1cbf21c6e73d446999e26fd8c4104750  ./scripts/hdctl.backup.py
+handoff/epic004_live_evidence_20251022T202304Z/manifest_pre.sha256:3487:b6528fa452a6829d895d09932660925df533d91226ac9f7fbda7c69e45724f4b  ./scripts/hdctl.clean.py
+handoff/epic004_live_evidence_20251022T202304Z/manifest_pre.sha256:3488:fccf6047aa7ede824d7abe29afb07c06dd24075c334824086c65c5747a0141e4  ./scripts/hdctl.py
+handoff/epic004_live_evidence_20251022T202304Z/manifest_pre.sha256:3489:05bb290c1508da124252b1b06c4e45701fe7a859132aa1b61a2b67a295154dfe  ./scripts/hdctl.py.bak
+handoff/epic004_live_evidence_20251022T202304Z/manifest_pre.sha256:3682:0f504f35d4e21f5f217d5bf4fa9fe1739470bce90e0bdb0f4376863fbac0559a  ./tests/hdctl/__pycache__/test_cli_admin_sidecar_invariance.cpython-312-pytest-7.4.4.pyc
+handoff/epic004_live_evidence_20251022T202304Z/manifest_pre.sha256:3683:623232ce98bc0248aeea797ba1ef7c553e57dfdf2260ecd0d1318496b993e48d  ./tests/hdctl/__pycache__/test_cli_read_singlebg.cpython-312-pytest-7.4.4.pyc
+handoff/epic004_live_evidence_20251022T202304Z/manifest_pre.sha256:3684:bdcc13fe3fa5c589845f990e4c7cd0d490bf5eddde5bd3a9c8fbe6b90a945883  ./tests/hdctl/__pycache__/test_cli_showcompat_parity.cpython-312-pytest-7.4.4.pyc
+handoff/epic004_live_evidence_20251022T202304Z/manifest_pre.sha256:3685:e2c46e0a54d3bc71ccff4bfa6a6b47a61630a352baaee704f1f02ec2a276e4b6  ./tests/hdctl/__pycache__/test_cli_streams_and_exits.cpython-312-pytest-7.4.4.pyc
+handoff/epic004_live_evidence_20251022T202304Z/manifest_pre.sha256:3686:8298b02c0303b66710a4acfdb53462bfa521f7659e522109d5551fd3b3c3991a  ./tests/hdctl/__pycache__/test_cli_two_run_identity.cpython-312-pytest-7.4.4.pyc
+handoff/epic004_live_evidence_20251022T202304Z/manifest_pre.sha256:3687:a6290499ef50e38395cea2bd3e85b624cde876fb3ae4f92bcecb74824a577fc4  ./tests/hdctl/test_cli_admin_sidecar_invariance.py
+handoff/epic004_live_evidence_20251022T202304Z/manifest_pre.sha256:3688:bb1fea3059019a7eab93f8f21e1133277cf1cf1055b45d8c8cb8d7b3cf14a062  ./tests/hdctl/test_cli_read_singlebg.py
+handoff/epic004_live_evidence_20251022T202304Z/manifest_pre.sha256:3689:cf842ecfebb8e41a450326ac8244927e7545265a6b167bbad11eb6d578b1bdeb  ./tests/hdctl/test_cli_showcompat_parity.py
+handoff/epic004_live_evidence_20251022T202304Z/manifest_pre.sha256:3690:74fd5b64c2c59b134b68cf083f9950978407ecfb90a03856b82ab8ea9e2b22e2  ./tests/hdctl/test_cli_streams_and_exits.py
+handoff/epic004_live_evidence_20251022T202304Z/manifest_pre.sha256:3691:b99a154373dbea787ac2d1407284d61077d2000880a11b501209953e172ffbdb  ./tests/hdctl/test_cli_two_run_identity.py
+artifacts/epic004/guards/forbidden_serializers.txt:28:scripts/hdctl.backup.py:9:    b = json.dumps(obj, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+artifacts/epic004/guards/forbidden_serializers.txt:34:scripts/hdctl.clean.py:7:    b = json.dumps(obj, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+artifacts/epic004/guards/forbidden_serializers.txt:37:scripts/hdctl.py.bak:6:    b = json.dumps(obj, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+artifacts/ops/rails_refusal_proof.txt:2:command: python -m engine.cli bg:resolve --user epic011-refusal --source vendor
+_arch/HDE-EPIC004_20251022T221112Z/tree.txt:238:│   │   ├── hdctl.backup.py
+_arch/HDE-EPIC004_20251022T221112Z/tree.txt:239:│   │   ├── hdctl.clean.py
+_arch/HDE-EPIC004_20251022T221112Z/tree.txt:240:│   │   ├── hdctl.py
+_arch/HDE-EPIC004_20251022T221112Z/tree.txt:274:│   │   ├── hdctl
+_arch/HDE-EPIC004_20251022T221112Z/tree.txt:1197:│   │   ├── hdctl.cpython-312.pyc
+_arch/HDE-EPIC004_20251022T221112Z/tree.txt:1212:│   ├── hdctl.backup.py
+_arch/HDE-EPIC004_20251022T221112Z/tree.txt:1213:│   ├── hdctl.clean.py
+_arch/HDE-EPIC004_20251022T221112Z/tree.txt:1214:│   ├── hdctl.py
+_arch/HDE-EPIC004_20251022T221112Z/tree.txt:1215:│   ├── hdctl.py.bak
+_arch/HDE-EPIC004_20251022T221112Z/tree.txt:1350:│   ├── hdctl
+artifacts/admin/INV_TEST_NOTES.md:7:  1) hdctl showcompat --a-birthdate 1990-05-04 --a-birthtime 14:22 --a-place "Austin, US" --a-tz Europe/Amsterdam \
+artifacts/admin/INV_TEST_NOTES.md:9:  2) hdctl showcompat [same args] --showmath <test-scoped path>
+artifacts/admin/INV_TEST_NOTES.md:20:  `tests/hdctl/test_cli_admin_sidecar_invariance.py`.
+_arch/HDE-EPIC004_20251022T223008Z/tree.txt:238:│   │   ├── hdctl.backup.py
+_arch/HDE-EPIC004_20251022T223008Z/tree.txt:239:│   │   ├── hdctl.clean.py
+_arch/HDE-EPIC004_20251022T223008Z/tree.txt:240:│   │   ├── hdctl.py
+_arch/HDE-EPIC004_20251022T223008Z/tree.txt:274:│   │   ├── hdctl
+_arch/HDE-EPIC004_20251022T223008Z/tree.txt:1305:│   │   ├── hdctl.cpython-312.pyc
+_arch/HDE-EPIC004_20251022T223008Z/tree.txt:1320:│   ├── hdctl.backup.py
+_arch/HDE-EPIC004_20251022T223008Z/tree.txt:1321:│   ├── hdctl.clean.py
+_arch/HDE-EPIC004_20251022T223008Z/tree.txt:1322:│   ├── hdctl.py
+_arch/HDE-EPIC004_20251022T223008Z/tree.txt:1323:│   ├── hdctl.py.bak
+_arch/HDE-EPIC004_20251022T223008Z/tree.txt:1459:│   ├── hdctl
+_arch/HDE-EPIC004_20251022T222050Z/tree.txt:238:│   │   ├── hdctl.backup.py
+_arch/HDE-EPIC004_20251022T222050Z/tree.txt:239:│   │   ├── hdctl.clean.py
+_arch/HDE-EPIC004_20251022T222050Z/tree.txt:240:│   │   ├── hdctl.py
+_arch/HDE-EPIC004_20251022T222050Z/tree.txt:274:│   │   ├── hdctl
+_arch/HDE-EPIC004_20251022T222050Z/tree.txt:1257:│   │   ├── hdctl.cpython-312.pyc
+_arch/HDE-EPIC004_20251022T222050Z/tree.txt:1272:│   ├── hdctl.backup.py
+_arch/HDE-EPIC004_20251022T222050Z/tree.txt:1273:│   ├── hdctl.clean.py
+_arch/HDE-EPIC004_20251022T222050Z/tree.txt:1274:│   ├── hdctl.py
+_arch/HDE-EPIC004_20251022T222050Z/tree.txt:1275:│   ├── hdctl.py.bak
+_arch/HDE-EPIC004_20251022T222050Z/tree.txt:1411:│   ├── hdctl
+_arch/HDE-EPIC004_20251022T222448Z/tree.txt:238:│   │   ├── hdctl.backup.py
+_arch/HDE-EPIC004_20251022T222448Z/tree.txt:239:│   │   ├── hdctl.clean.py
+_arch/HDE-EPIC004_20251022T222448Z/tree.txt:240:│   │   ├── hdctl.py
+_arch/HDE-EPIC004_20251022T222448Z/tree.txt:274:│   │   ├── hdctl
+_arch/HDE-EPIC004_20251022T222448Z/tree.txt:1265:│   │   ├── hdctl.cpython-312.pyc
+_arch/HDE-EPIC004_20251022T222448Z/tree.txt:1280:│   ├── hdctl.backup.py
+_arch/HDE-EPIC004_20251022T222448Z/tree.txt:1281:│   ├── hdctl.clean.py
+_arch/HDE-EPIC004_20251022T222448Z/tree.txt:1282:│   ├── hdctl.py
+_arch/HDE-EPIC004_20251022T222448Z/tree.txt:1283:│   ├── hdctl.py.bak
+_arch/HDE-EPIC004_20251022T222448Z/tree.txt:1419:│   ├── hdctl
+_arch/HDE-EPIC004_20251022T221617Z/tree.txt:238:│   │   ├── hdctl.backup.py
+_arch/HDE-EPIC004_20251022T221617Z/tree.txt:239:│   │   ├── hdctl.clean.py
+_arch/HDE-EPIC004_20251022T221617Z/tree.txt:240:│   │   ├── hdctl.py
+_arch/HDE-EPIC004_20251022T221617Z/tree.txt:274:│   │   ├── hdctl
+_arch/HDE-EPIC004_20251022T221617Z/tree.txt:1216:│   │   ├── hdctl.cpython-312.pyc
+_arch/HDE-EPIC004_20251022T221617Z/tree.txt:1231:│   ├── hdctl.backup.py
+_arch/HDE-EPIC004_20251022T221617Z/tree.txt:1232:│   ├── hdctl.clean.py
+_arch/HDE-EPIC004_20251022T221617Z/tree.txt:1233:│   ├── hdctl.py
+_arch/HDE-EPIC004_20251022T221617Z/tree.txt:1234:│   ├── hdctl.py.bak
+_arch/HDE-EPIC004_20251022T221617Z/tree.txt:1369:│   ├── hdctl
+_arch/HDE-EPIC004_20251022T222814Z/tree.txt:238:│   │   ├── hdctl.backup.py
+_arch/HDE-EPIC004_20251022T222814Z/tree.txt:239:│   │   ├── hdctl.clean.py
+_arch/HDE-EPIC004_20251022T222814Z/tree.txt:240:│   │   ├── hdctl.py
+_arch/HDE-EPIC004_20251022T222814Z/tree.txt:274:│   │   ├── hdctl
+_arch/HDE-EPIC004_20251022T222814Z/tree.txt:1283:│   │   ├── hdctl.cpython-312.pyc
+_arch/HDE-EPIC004_20251022T222814Z/tree.txt:1298:│   ├── hdctl.backup.py
+_arch/HDE-EPIC004_20251022T222814Z/tree.txt:1299:│   ├── hdctl.clean.py
+_arch/HDE-EPIC004_20251022T222814Z/tree.txt:1300:│   ├── hdctl.py
+_arch/HDE-EPIC004_20251022T222814Z/tree.txt:1301:│   ├── hdctl.py.bak
+_arch/HDE-EPIC004_20251022T222814Z/tree.txt:1437:│   ├── hdctl
+_arch/EPIC-004_20251022T220427Z/tree.txt:595:./.audit_src/scripts/__pycache__/hdctl.cpython-312.pyc
+_arch/EPIC-004_20251022T220427Z/tree.txt:609:./.audit_src/scripts/hdctl.backup.py
+_arch/EPIC-004_20251022T220427Z/tree.txt:610:./.audit_src/scripts/hdctl.clean.py
+_arch/EPIC-004_20251022T220427Z/tree.txt:611:./.audit_src/scripts/hdctl.py
+_arch/EPIC-004_20251022T220427Z/tree.txt:801:./.audit_src/tests/hdctl/__pycache__/test_cli_admin_sidecar_invariance.cpython-312-pytest-7.4.4.pyc
+_arch/EPIC-004_20251022T220427Z/tree.txt:802:./.audit_src/tests/hdctl/__pycache__/test_cli_read_singlebg.cpython-312-pytest-7.4.4.pyc
+_arch/EPIC-004_20251022T220427Z/tree.txt:803:./.audit_src/tests/hdctl/__pycache__/test_cli_showcompat_parity.cpython-312-pytest-7.4.4.pyc
+_arch/EPIC-004_20251022T220427Z/tree.txt:804:./.audit_src/tests/hdctl/__pycache__/test_cli_streams_and_exits.cpython-312-pytest-7.4.4.pyc
+_arch/EPIC-004_20251022T220427Z/tree.txt:805:./.audit_src/tests/hdctl/__pycache__/test_cli_two_run_identity.cpython-312-pytest-7.4.4.pyc
+_arch/EPIC-004_20251022T220427Z/tree.txt:806:./.audit_src/tests/hdctl/test_cli_admin_sidecar_invariance.py
+_arch/EPIC-004_20251022T220427Z/tree.txt:807:./.audit_src/tests/hdctl/test_cli_read_singlebg.py
+_arch/EPIC-004_20251022T220427Z/tree.txt:808:./.audit_src/tests/hdctl/test_cli_showcompat_parity.py
+_arch/EPIC-004_20251022T220427Z/tree.txt:809:./.audit_src/tests/hdctl/test_cli_streams_and_exits.py
+_arch/EPIC-004_20251022T220427Z/tree.txt:810:./.audit_src/tests/hdctl/test_cli_two_run_identity.py
+_arch/EPIC-004_20251022T220427Z/tree.txt:2098:./scripts/__pycache__/hdctl.cpython-312.pyc
+_arch/EPIC-004_20251022T220427Z/tree.txt:2113:./scripts/hdctl.backup.py
+_arch/EPIC-004_20251022T220427Z/tree.txt:2114:./scripts/hdctl.clean.py
+_arch/EPIC-004_20251022T220427Z/tree.txt:2115:./scripts/hdctl.py
+_arch/EPIC-004_20251022T220427Z/tree.txt:2116:./scripts/hdctl.py.bak
+_arch/EPIC-004_20251022T220427Z/tree.txt:2309:./tests/hdctl/__pycache__/test_cli_admin_sidecar_invariance.cpython-312-pytest-7.4.4.pyc
+_arch/EPIC-004_20251022T220427Z/tree.txt:2310:./tests/hdctl/__pycache__/test_cli_read_singlebg.cpython-312-pytest-7.4.4.pyc
+_arch/EPIC-004_20251022T220427Z/tree.txt:2311:./tests/hdctl/__pycache__/test_cli_showcompat_parity.cpython-312-pytest-7.4.4.pyc
+_arch/EPIC-004_20251022T220427Z/tree.txt:2312:./tests/hdctl/__pycache__/test_cli_streams_and_exits.cpython-312-pytest-7.4.4.pyc
+_arch/EPIC-004_20251022T220427Z/tree.txt:2313:./tests/hdctl/__pycache__/test_cli_two_run_identity.cpython-312-pytest-7.4.4.pyc
+_arch/EPIC-004_20251022T220427Z/tree.txt:2314:./tests/hdctl/test_cli_admin_sidecar_invariance.py
+_arch/EPIC-004_20251022T220427Z/tree.txt:2315:./tests/hdctl/test_cli_read_singlebg.py
+_arch/EPIC-004_20251022T220427Z/tree.txt:2316:./tests/hdctl/test_cli_showcompat_parity.py
+_arch/EPIC-004_20251022T220427Z/tree.txt:2317:./tests/hdctl/test_cli_streams_and_exits.py
+_arch/EPIC-004_20251022T220427Z/tree.txt:2318:./tests/hdctl/test_cli_two_run_identity.py
+_arch/HDE-EPIC005_20251025T123345Z/tree.txt:238:│   │   ├── hdctl.backup.py
+_arch/HDE-EPIC005_20251025T123345Z/tree.txt:239:│   │   ├── hdctl.clean.py
+_arch/HDE-EPIC005_20251025T123345Z/tree.txt:240:│   │   ├── hdctl.py
+_arch/HDE-EPIC005_20251025T123345Z/tree.txt:274:│   │   ├── hdctl
+_arch/HDE-EPIC005_20251025T123345Z/tree.txt:1397:│   │   ├── hdctl.cpython-312.pyc
+_arch/HDE-EPIC005_20251025T123345Z/tree.txt:1414:│   ├── hdctl.backup.py
+_arch/HDE-EPIC005_20251025T123345Z/tree.txt:1415:│   ├── hdctl.clean.py
+_arch/HDE-EPIC005_20251025T123345Z/tree.txt:1416:│   ├── hdctl.py
+_arch/HDE-EPIC005_20251025T123345Z/tree.txt:1417:│   ├── hdctl.py.bak
+_arch/HDE-EPIC005_20251025T123345Z/tree.txt:1558:│   ├── hdctl
+_arch/missing/not_20251025T122821Z/tree.txt:238:│   │   ├── hdctl.backup.py
+_arch/missing/not_20251025T122821Z/tree.txt:239:│   │   ├── hdctl.clean.py
+_arch/missing/not_20251025T122821Z/tree.txt:240:│   │   ├── hdctl.py
+_arch/missing/not_20251025T122821Z/tree.txt:274:│   │   ├── hdctl
+_arch/missing/not_20251025T122821Z/tree.txt:1384:│   │   ├── hdctl.cpython-312.pyc
+_arch/missing/not_20251025T122821Z/tree.txt:1401:│   ├── hdctl.backup.py
+_arch/missing/not_20251025T122821Z/tree.txt:1402:│   ├── hdctl.clean.py
+_arch/missing/not_20251025T122821Z/tree.txt:1403:│   ├── hdctl.py
+_arch/missing/not_20251025T122821Z/tree.txt:1404:│   ├── hdctl.py.bak
+_arch/missing/not_20251025T122821Z/tree.txt:1545:│   ├── hdctl
+_arch/HDE-EPIC004_20251022T221832Z/tree.txt:238:│   │   ├── hdctl.backup.py
+_arch/HDE-EPIC004_20251022T221832Z/tree.txt:239:│   │   ├── hdctl.clean.py
+_arch/HDE-EPIC004_20251022T221832Z/tree.txt:240:│   │   ├── hdctl.py
+_arch/HDE-EPIC004_20251022T221832Z/tree.txt:274:│   │   ├── hdctl
+_arch/HDE-EPIC004_20251022T221832Z/tree.txt:1247:│   │   ├── hdctl.cpython-312.pyc
+_arch/HDE-EPIC004_20251022T221832Z/tree.txt:1262:│   ├── hdctl.backup.py
+_arch/HDE-EPIC004_20251022T221832Z/tree.txt:1263:│   ├── hdctl.clean.py
+_arch/HDE-EPIC004_20251022T221832Z/tree.txt:1264:│   ├── hdctl.py
+_arch/HDE-EPIC004_20251022T221832Z/tree.txt:1265:│   ├── hdctl.py.bak
+_arch/HDE-EPIC004_20251022T221832Z/tree.txt:1400:│   ├── hdctl
+_arch/HDE-EPIC004_20251022T221820Z/tree.txt:238:│   │   ├── hdctl.backup.py
+_arch/HDE-EPIC004_20251022T221820Z/tree.txt:239:│   │   ├── hdctl.clean.py
+_arch/HDE-EPIC004_20251022T221820Z/tree.txt:240:│   │   ├── hdctl.py
+_arch/HDE-EPIC004_20251022T221820Z/tree.txt:274:│   │   ├── hdctl
+_arch/HDE-EPIC004_20251022T221820Z/tree.txt:1234:│   │   ├── hdctl.cpython-312.pyc
+_arch/HDE-EPIC004_20251022T221820Z/tree.txt:1249:│   ├── hdctl.backup.py
+_arch/HDE-EPIC004_20251022T221820Z/tree.txt:1250:│   ├── hdctl.clean.py
+_arch/HDE-EPIC004_20251022T221820Z/tree.txt:1251:│   ├── hdctl.py
+_arch/HDE-EPIC004_20251022T221820Z/tree.txt:1252:│   ├── hdctl.py.bak
+_arch/HDE-EPIC004_20251022T221820Z/tree.txt:1387:│   ├── hdctl
+artifacts/qa/evidence_presence.rg.txt:322:codex/AGENTS_RFI.md:10:3) Which repo files/commands will you rely on (e.g., pyproject for hdctl, Makefile targets, scripts, presenter/emitter import path, audit/EVIDENCE_INDEX.jsonl)? List exact paths/commands.
+_arch/epic003_20251017_210542/tree.before.txt:864:│   │   ├── hdctl.cpython-312.pyc
+_arch/epic003_20251017_210542/tree.before.txt:878:│   ├── hdctl.backup.py
+_arch/epic003_20251017_210542/tree.before.txt:879:│   ├── hdctl.clean.py
+_arch/epic003_20251017_210542/tree.before.txt:880:│   ├── hdctl.py
+_arch/epic003_20251017_210542/tree.before.txt:881:│   ├── hdctl.py.bak
+_arch/epic003_20251017_210542/tree.before.txt:1017:│   ├── hdctl
+_arch/HDE-EPIC004_20251022T222828Z/tree.txt:238:│   │   ├── hdctl.backup.py
+_arch/HDE-EPIC004_20251022T222828Z/tree.txt:239:│   │   ├── hdctl.clean.py
+_arch/HDE-EPIC004_20251022T222828Z/tree.txt:240:│   │   ├── hdctl.py
+_arch/HDE-EPIC004_20251022T222828Z/tree.txt:274:│   │   ├── hdctl
+_arch/HDE-EPIC004_20251022T222828Z/tree.txt:1292:│   │   ├── hdctl.cpython-312.pyc
+_arch/HDE-EPIC004_20251022T222828Z/tree.txt:1307:│   ├── hdctl.backup.py
+_arch/HDE-EPIC004_20251022T222828Z/tree.txt:1308:│   ├── hdctl.clean.py
+_arch/HDE-EPIC004_20251022T222828Z/tree.txt:1309:│   ├── hdctl.py
+_arch/HDE-EPIC004_20251022T222828Z/tree.txt:1310:│   ├── hdctl.py.bak
+_arch/HDE-EPIC004_20251022T222828Z/tree.txt:1446:│   ├── hdctl
+_arch/HDE-EPIC004_20251022T221312Z/emit.dumps.txt:3:scripts/hdctl.backup.py:9:    b = json.dumps(obj, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+_arch/HDE-EPIC004_20251022T221312Z/emit.dumps.txt:4:scripts/hdctl.clean.py:7:    b = json.dumps(obj, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+_arch/HDE-EPIC004_20251022T221312Z/tree.txt:238:│   │   ├── hdctl.backup.py
+_arch/HDE-EPIC004_20251022T221312Z/tree.txt:239:│   │   ├── hdctl.clean.py
+_arch/HDE-EPIC004_20251022T221312Z/tree.txt:240:│   │   ├── hdctl.py
+_arch/HDE-EPIC004_20251022T221312Z/tree.txt:274:│   │   ├── hdctl
+_arch/HDE-EPIC004_20251022T221312Z/tree.txt:1207:│   │   ├── hdctl.cpython-312.pyc
+_arch/HDE-EPIC004_20251022T221312Z/tree.txt:1222:│   ├── hdctl.backup.py
+_arch/HDE-EPIC004_20251022T221312Z/tree.txt:1223:│   ├── hdctl.clean.py
+_arch/HDE-EPIC004_20251022T221312Z/tree.txt:1224:│   ├── hdctl.py
+_arch/HDE-EPIC004_20251022T221312Z/tree.txt:1225:│   ├── hdctl.py.bak
+_arch/HDE-EPIC004_20251022T221312Z/tree.txt:1360:│   ├── hdctl
+_arch/HDE-EPIC004_20251022T221803Z/tree.txt:238:│   │   ├── hdctl.backup.py
+_arch/HDE-EPIC004_20251022T221803Z/tree.txt:239:│   │   ├── hdctl.clean.py
+_arch/HDE-EPIC004_20251022T221803Z/tree.txt:240:│   │   ├── hdctl.py
+_arch/HDE-EPIC004_20251022T221803Z/tree.txt:274:│   │   ├── hdctl
+_arch/HDE-EPIC004_20251022T221803Z/tree.txt:1225:│   │   ├── hdctl.cpython-312.pyc
+_arch/HDE-EPIC004_20251022T221803Z/tree.txt:1240:│   ├── hdctl.backup.py
+_arch/HDE-EPIC004_20251022T221803Z/tree.txt:1241:│   ├── hdctl.clean.py
+_arch/HDE-EPIC004_20251022T221803Z/tree.txt:1242:│   ├── hdctl.py
+_arch/HDE-EPIC004_20251022T221803Z/tree.txt:1243:│   ├── hdctl.py.bak
+_arch/HDE-EPIC004_20251022T221803Z/tree.txt:1378:│   ├── hdctl
+_arch/HDE-EPIC004_20251022T223200Z/tree.txt:238:│   │   ├── hdctl.backup.py
+_arch/HDE-EPIC004_20251022T223200Z/tree.txt:239:│   │   ├── hdctl.clean.py
+_arch/HDE-EPIC004_20251022T223200Z/tree.txt:240:│   │   ├── hdctl.py
+_arch/HDE-EPIC004_20251022T223200Z/tree.txt:274:│   │   ├── hdctl
+_arch/HDE-EPIC004_20251022T223200Z/tree.txt:1318:│   │   ├── hdctl.cpython-312.pyc
+_arch/HDE-EPIC004_20251022T223200Z/tree.txt:1333:│   ├── hdctl.backup.py
+_arch/HDE-EPIC004_20251022T223200Z/tree.txt:1334:│   ├── hdctl.clean.py
+_arch/HDE-EPIC004_20251022T223200Z/tree.txt:1335:│   ├── hdctl.py
+_arch/HDE-EPIC004_20251022T223200Z/tree.txt:1336:│   ├── hdctl.py.bak
+_arch/HDE-EPIC004_20251022T223200Z/tree.txt:1472:│   ├── hdctl
+_arch/epic003_20251017T213424Z/tree.after.txt:838:│   │   ├── hdctl.cpython-312.pyc
+_arch/epic003_20251017T213424Z/tree.after.txt:853:│   ├── hdctl.backup.py
+_arch/epic003_20251017T213424Z/tree.after.txt:854:│   ├── hdctl.clean.py
+_arch/epic003_20251017T213424Z/tree.after.txt:855:│   ├── hdctl.py
+_arch/epic003_20251017T213424Z/tree.after.txt:856:│   ├── hdctl.py.bak
+_arch/epic003_20251017T213424Z/tree.after.txt:988:│   ├── hdctl
+_arch/epic003_20251017T213424Z/architecture_map_AFTER.md:887:│   │   ├── hdctl.cpython-312.pyc
+_arch/epic003_20251017T213424Z/architecture_map_AFTER.md:902:│   ├── hdctl.backup.py
+_arch/epic003_20251017T213424Z/architecture_map_AFTER.md:903:│   ├── hdctl.clean.py
+_arch/epic003_20251017T213424Z/architecture_map_AFTER.md:904:│   ├── hdctl.py
+_arch/epic003_20251017T213424Z/architecture_map_AFTER.md:905:│   ├── hdctl.py.bak
+_arch/epic003_20251017T213424Z/architecture_map_AFTER.md:1037:│   ├── hdctl
+scripts/hdctl.clean.py:12:    ap = argparse.ArgumentParser(prog="hdctl", allow_abbrev=False)
+_arch/HDE-EPIC004_20251022T222639Z/tree.txt:238:│   │   ├── hdctl.backup.py
+_arch/HDE-EPIC004_20251022T222639Z/tree.txt:239:│   │   ├── hdctl.clean.py
+_arch/HDE-EPIC004_20251022T222639Z/tree.txt:240:│   │   ├── hdctl.py
+_arch/HDE-EPIC004_20251022T222639Z/tree.txt:274:│   │   ├── hdctl
+_arch/HDE-EPIC004_20251022T222639Z/tree.txt:1274:│   │   ├── hdctl.cpython-312.pyc
+_arch/HDE-EPIC004_20251022T222639Z/tree.txt:1289:│   ├── hdctl.backup.py
+_arch/HDE-EPIC004_20251022T222639Z/tree.txt:1290:│   ├── hdctl.clean.py
+_arch/HDE-EPIC004_20251022T222639Z/tree.txt:1291:│   ├── hdctl.py
+_arch/HDE-EPIC004_20251022T222639Z/tree.txt:1292:│   ├── hdctl.py.bak
+_arch/HDE-EPIC004_20251022T222639Z/tree.txt:1428:│   ├── hdctl
+_arch/HDE-EPIC004_20251022T220814Z/tree.txt:238:│   │   ├── hdctl.backup.py
+_arch/HDE-EPIC004_20251022T220814Z/tree.txt:239:│   │   ├── hdctl.clean.py
+_arch/HDE-EPIC004_20251022T220814Z/tree.txt:240:│   │   ├── hdctl.py
+_arch/HDE-EPIC004_20251022T220814Z/tree.txt:274:│   │   ├── hdctl
+_arch/HDE-EPIC004_20251022T220814Z/tree.txt:1188:│   │   ├── hdctl.cpython-312.pyc
+_arch/HDE-EPIC004_20251022T220814Z/tree.txt:1203:│   ├── hdctl.backup.py
+_arch/HDE-EPIC004_20251022T220814Z/tree.txt:1204:│   ├── hdctl.clean.py
+_arch/HDE-EPIC004_20251022T220814Z/tree.txt:1205:│   ├── hdctl.py
+_arch/HDE-EPIC004_20251022T220814Z/tree.txt:1206:│   ├── hdctl.py.bak
+_arch/HDE-EPIC004_20251022T220814Z/tree.txt:1341:│   ├── hdctl
+scripts/validate/public_bytes_check.py:7:        sys.executable, "scripts/hdctl.py", "showcompat",
+scripts/validate/sidecar_check.py:18:            sys.executable, "scripts/hdctl.py", "showcompat",
+scripts/validate/sidecar_check.py:55:            sys.executable, "scripts/hdctl.py", "showcompat",
+scripts/hdctl.backup.py:14:    ap = argparse.ArgumentParser(prog="hdctl", allow_abbrev=False)
+scripts/architecture_capture.sh:53:    rg -n "json\\.dumps\\(|jsonify\\(|orjson|ujson|simplejson" ${ADAPTER_LIST} engine/presenter/ engine/emit_public.py scripts/hdctl.py || true
+scripts/architecture_capture.sh:56:    grep -n -E "json\\.dumps\\(|jsonify\\(|orjson|ujson|simplejson" ${ADAPTER_LIST} engine/presenter/* engine/emit_public.py scripts/hdctl.py ${INCLUDE_PY} --binary-files=without-match || true
+scripts/hdctl.py:5:Use `hdctl showcompat --pair-file <pair.json> --dump-reader <out.json> --dump-admin-dir <dir>`
+tests/compat/test_cli_public_bytes_identity.py:4:    cmd = [sys.executable, "scripts/hdctl.py", "showcompat",
+scripts/demo_mvp.sh:9:python scripts/hdctl.py showcompat \
+scripts/demo_mvp.sh:24:python scripts/hdctl.py read singlebg \
+pyproject.toml:14:hdctl = "engine.cli.main:cli"
+README.md:13:- Canonical CLI invocation: `python -m engine.cli …`. Use the module-run form in docs, QA runbooks, and automation; the `hdctl` console script remains available for convenience once the project is installed.
+README.md:14:- Installation: The repo’s devcontainer config installs the project in editable mode during `postCreateCommand`, so a fresh Codespace already has both `python -m engine.cli` and `hdctl` available on `PATH` without manual pip work.
+README.md:16:Direct `hdctl …` examples remain in this README for brevity, but automation and QA scripts must prefer `python -m engine.cli` to guarantee parity with module-run execution.
+README.md:35:- **CLI preview:** Admin `hdctl aux-preview` reuses the Aux emitter; stdout + sidecar artifacts are indexed in the Human and Machine evidence registries.
+README.md:39:> **Note:** Module-run (`python -m engine.cli`) is the default for QA. The `hdctl` console script behaves the same way after Codespaces bootstrap installs the package.
+README.md:44:  hdctl showcompat --pair-file path/to/pair.json > out.json
+README.md:48:  hdctl showcompat --a-file A.json --b-file B.json > out.json
+README.md:75:When running `hdctl showcompat` for QA, pass `--dump-reader` and `--dump-admin-dir`.
+tests/cli/test_cli_usage_and_errors.py:21:    result = subprocess.run(["hdctl", "showcompat", "--pair-file", "no_such.json"], capture_output=True, text=True, env=_cli_env())
+tests/cli/test_cli_usage_and_errors.py:31:    result = subprocess.run(["hdctl", "showcompat", "--pair-file", str(bad)], capture_output=True, text=True, env=_cli_env())
+tests/cli/test_cli_install_help.py:18:def test_hdctl_and_module_help():
+tests/cli/test_cli_install_help.py:21:    r1 = subprocess.run(["hdctl", "--help"], capture_output=True, text=True, env=env)
+tests/cli/test_cli_file_inputs.py:42:    r_pair = subprocess.run(["hdctl", "showcompat", "--pair-file", str(pp)], capture_output=True, env=env)
+tests/cli/test_cli_file_inputs.py:43:    r_ab = subprocess.run(["hdctl", "showcompat", "--a-file", str(pa), "--b-file", str(pb)], capture_output=True, env=env)
+tests/cli/test_cli_file_inputs.py:44:    r_ba = subprocess.run(["hdctl", "showcompat", "--a-file", str(pb), "--b-file", str(pa)], capture_output=True, env=env)
+tests/cli/test_cli_canonical_bytes.py:22:    result = subprocess.run(["hdctl", "showcompat"], input=(PAIR + "\n").encode(), capture_output=True, env=_cli_env())
+tests/hdctl/test_cli_two_run_identity.py:9:    p = subprocess.run([sys.executable, "scripts/hdctl.py", "showcompat", *ARGS],
+tests/hdctl/test_cli_admin_sidecar_invariance.py:24:    p = subprocess.run([sys.executable, "scripts/hdctl.py", *ARGS, *extra],
+tests/hdctl/test_cli_streams_and_exits.py:4:PINNED_USAGE = "usage: hdctl read singlebg | showcompat [flags]  (see --help)\n"
+tests/hdctl/test_cli_streams_and_exits.py:7:    p = subprocess.run([sys.executable, "scripts/hdctl.py", *argv],
+tests/hdctl/test_cli_showcompat_parity.py:6:    p = subprocess.run([sys.executable, "scripts/hdctl.py", "showcompat", *argv],
+tests/hdctl/test_cli_read_singlebg.py:6:    p = subprocess.run([sys.executable, "scripts/hdctl.py", *argv],
+tests/qa/test_cli_admin_dumps.py:55:            "hdctl",
+tests/qa/test_cli_admin_parity.py:31:            "hdctl",
+manifest_post.sha256:613:5a5546e2f241175e9b8fdc45bee88822799cf06b5c6baa9c9354a7cd07ab5fe3  ./.audit_src/scripts/__pycache__/hdctl.cpython-312.pyc
+manifest_post.sha256:627:cdc0b2a8e9a55f4f49a6e92e31c9e4bb1cbf21c6e73d446999e26fd8c4104750  ./.audit_src/scripts/hdctl.backup.py
+manifest_post.sha256:628:b6528fa452a6829d895d09932660925df533d91226ac9f7fbda7c69e45724f4b  ./.audit_src/scripts/hdctl.clean.py
+manifest_post.sha256:629:fccf6047aa7ede824d7abe29afb07c06dd24075c334824086c65c5747a0141e4  ./.audit_src/scripts/hdctl.py
+manifest_post.sha256:819:0f504f35d4e21f5f217d5bf4fa9fe1739470bce90e0bdb0f4376863fbac0559a  ./.audit_src/tests/hdctl/__pycache__/test_cli_admin_sidecar_invariance.cpython-312-pytest-7.4.4.pyc
+manifest_post.sha256:820:623232ce98bc0248aeea797ba1ef7c553e57dfdf2260ecd0d1318496b993e48d  ./.audit_src/tests/hdctl/__pycache__/test_cli_read_singlebg.cpython-312-pytest-7.4.4.pyc
+manifest_post.sha256:821:bdcc13fe3fa5c589845f990e4c7cd0d490bf5eddde5bd3a9c8fbe6b90a945883  ./.audit_src/tests/hdctl/__pycache__/test_cli_showcompat_parity.cpython-312-pytest-7.4.4.pyc
+manifest_post.sha256:822:e2c46e0a54d3bc71ccff4bfa6a6b47a61630a352baaee704f1f02ec2a276e4b6  ./.audit_src/tests/hdctl/__pycache__/test_cli_streams_and_exits.cpython-312-pytest-7.4.4.pyc
+manifest_post.sha256:823:8298b02c0303b66710a4acfdb53462bfa521f7659e522109d5551fd3b3c3991a  ./.audit_src/tests/hdctl/__pycache__/test_cli_two_run_identity.cpython-312-pytest-7.4.4.pyc
+manifest_post.sha256:824:a6290499ef50e38395cea2bd3e85b624cde876fb3ae4f92bcecb74824a577fc4  ./.audit_src/tests/hdctl/test_cli_admin_sidecar_invariance.py
+manifest_post.sha256:825:bb1fea3059019a7eab93f8f21e1133277cf1cf1055b45d8c8cb8d7b3cf14a062  ./.audit_src/tests/hdctl/test_cli_read_singlebg.py
+manifest_post.sha256:826:cf842ecfebb8e41a450326ac8244927e7545265a6b167bbad11eb6d578b1bdeb  ./.audit_src/tests/hdctl/test_cli_showcompat_parity.py
+manifest_post.sha256:827:74fd5b64c2c59b134b68cf083f9950978407ecfb90a03856b82ab8ea9e2b22e2  ./.audit_src/tests/hdctl/test_cli_streams_and_exits.py
+manifest_post.sha256:828:b99a154373dbea787ac2d1407284d61077d2000880a11b501209953e172ffbdb  ./.audit_src/tests/hdctl/test_cli_two_run_identity.py
+manifest_post.sha256:3527:5a5546e2f241175e9b8fdc45bee88822799cf06b5c6baa9c9354a7cd07ab5fe3  ./scripts/__pycache__/hdctl.cpython-312.pyc
+manifest_post.sha256:3542:cdc0b2a8e9a55f4f49a6e92e31c9e4bb1cbf21c6e73d446999e26fd8c4104750  ./scripts/hdctl.backup.py
+manifest_post.sha256:3543:b6528fa452a6829d895d09932660925df533d91226ac9f7fbda7c69e45724f4b  ./scripts/hdctl.clean.py
+manifest_post.sha256:3544:fccf6047aa7ede824d7abe29afb07c06dd24075c334824086c65c5747a0141e4  ./scripts/hdctl.py
+manifest_post.sha256:3545:05bb290c1508da124252b1b06c4e45701fe7a859132aa1b61a2b67a295154dfe  ./scripts/hdctl.py.bak
+manifest_post.sha256:3738:0f504f35d4e21f5f217d5bf4fa9fe1739470bce90e0bdb0f4376863fbac0559a  ./tests/hdctl/__pycache__/test_cli_admin_sidecar_invariance.cpython-312-pytest-7.4.4.pyc
+manifest_post.sha256:3739:623232ce98bc0248aeea797ba1ef7c553e57dfdf2260ecd0d1318496b993e48d  ./tests/hdctl/__pycache__/test_cli_read_singlebg.cpython-312-pytest-7.4.4.pyc
+manifest_post.sha256:3740:bdcc13fe3fa5c589845f990e4c7cd0d490bf5eddde5bd3a9c8fbe6b90a945883  ./tests/hdctl/__pycache__/test_cli_showcompat_parity.cpython-312-pytest-7.4.4.pyc
+manifest_post.sha256:3741:e2c46e0a54d3bc71ccff4bfa6a6b47a61630a352baaee704f1f02ec2a276e4b6  ./tests/hdctl/__pycache__/test_cli_streams_and_exits.cpython-312-pytest-7.4.4.pyc
+manifest_post.sha256:3742:8298b02c0303b66710a4acfdb53462bfa521f7659e522109d5551fd3b3c3991a  ./tests/hdctl/__pycache__/test_cli_two_run_identity.cpython-312-pytest-7.4.4.pyc
+manifest_post.sha256:3743:a6290499ef50e38395cea2bd3e85b624cde876fb3ae4f92bcecb74824a577fc4  ./tests/hdctl/test_cli_admin_sidecar_invariance.py
+manifest_post.sha256:3744:bb1fea3059019a7eab93f8f21e1133277cf1cf1055b45d8c8cb8d7b3cf14a062  ./tests/hdctl/test_cli_read_singlebg.py
+manifest_post.sha256:3745:cf842ecfebb8e41a450326ac8244927e7545265a6b167bbad11eb6d578b1bdeb  ./tests/hdctl/test_cli_showcompat_parity.py
+manifest_post.sha256:3746:74fd5b64c2c59b134b68cf083f9950978407ecfb90a03856b82ab8ea9e2b22e2  ./tests/hdctl/test_cli_streams_and_exits.py
+manifest_post.sha256:3747:b99a154373dbea787ac2d1407284d61077d2000880a11b501209953e172ffbdb  ./tests/hdctl/test_cli_two_run_identity.py

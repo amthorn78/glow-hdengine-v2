@@ -1,0 +1,28 @@
+docs/run/RUN_PROD_QA.md:73:| `artifacts/proofs/ops_refusal_proof.txt` | Demonstrates rails are closed outside the window, both before and after, with canonical refusal formatting. | SNAPSHOT_HEADER_LOWERCASE_OK, BG_VENDOR_CALLS_DISABLED_IN_PROD_OK |
+docs/run/RUN_PROD_QA.md:74:| `artifacts/bodygraph/vendor_upsert.<EPIC011_TEST_USER>.json` | Captures the successful vendor ingest while rails are open. | INGEST_OK |
+docs/run/RUN_PROD_QA.md:75:| `artifacts/bodygraph/db_resolve.<EPIC011_TEST_USER>.json` | Shows DB-first resolution for the same user without re-hitting the vendor. | INGEST_IDEMPOTENT_OK, BG_SOURCE_SELECTION_OK |
+docs/run/RUN_PROD_QA.md:76:| `artifacts/presenter/json_canon_compare.log` | Proves byte-level parity between vendor ingest and DB resolve outputs. | BG_SOURCE_INVARIANCE_OK |
+docs/pfcanon/PF14-Canon-HDE-Mechanics Guide v1.8.md:1316:* `BG_SOURCE_SELECTION_OK`
+docs/pfcanon/PF14-Canon-HDE-Mechanics Guide v1.8.md:1318:* `BG_VENDOR_CALLS_DISABLED_IN_PROD_OK`
+docs/pfcanon/PF14-Canon-HDE-Mechanics Guide v1.8.md:1322:* `BG_SOURCE_INVARIANCE_OK`
+docs/pfcanon/PF14-Canon-HDE-Mechanics Guide v1.8.md:1344: • `BG_TTL_SWR_POLICY_OK`  
+docs/pfcanon/PF14-Canon-HDE-Mechanics Guide v1.8.md:1346: • `BG_RATE_LIMIT_POLICY_OK`  
+docs/pfcanon/PF14-Canon-HDE-Mechanics Guide v1.8.md:1347: • `BG_CIRCUIT_BREAKER_POLICY_OK`  
+docs/pfcanon/PF09-Canon-HDE-Build Checklist v1.4.9.md:1210:   `DB_RUNTIME_SEARCH_PATH_OK · DB_ROLE_OK · DB_SCHEMA_FINGERPRINT_OK · DB_CONN_ENV_OK · BG_SOURCE_SELECTION_OK · BG_DEV_DB_BRIDGE_FALLBACK_OK · BG_VENDOR_DISABLED_OK · BG_SOURCE_INVARIANCE_OK · BG_TTL_SWR_OK · BG_RATE_LIMIT_POLICY_OK · BG_CIRCUIT_BREAKER_OK`
+docs/pfcanon/PF16-Canon-HD Engine Epics Map v2.3.5.md:349:* **Ingest:** `INGEST_OK, INGEST_IDEMPOTENT_OK, VENDOR_RETRY_BACKOFF_OK, VENDOR_NO_PAYLOAD_LOGGING_OK`
+docs/pfcanon/PF16-Canon-HD Engine Epics Map v2.3.5.md:362:   `BG_SOURCE_SELECTION_OK, BG_VENDOR_CALLS_DISABLED_IN_PROD_OK, BG_DEV_DIRECT_CALLS_UPSERT_OK, BG_SOURCE_INVARIANCE_OK, BG_TTL_SWR_POLICY_OK, BG_RATE_LIMIT_POLICY_OK, BG_CIRCUIT_BREAKER_POLICY_OK`
+docs/pfcanon/PF10-HDE-Build Notes  v7.5.2.md:389:   `SNAPSHOT_HEADER_LOWERCASE_OK · INGEST_OK · INGEST_IDEMPOTENT_OK · BG_SOURCE_SELECTION_OK · BG_SOURCE_INVARIANCE_OK · BG_VENDOR_CALLS_DISABLED_IN_PROD_OK`.
+docs/pfcanon/PF10-HDE-Build Notes  v7.5.2.md:403:* **Acceptance impact:** using a single pinned identity stabilizes `INGEST_IDEMPOTENT_OK`, `BG_SOURCE_INVARIANCE_OK`, and parity checks across vendor‑upsert vs DB‑resolve.  
+docs/pfcanon/PF10-HDE-Build Notes  v7.5.2.md:422:   `SNAPSHOT_HEADER_LOWERCASE_OK · INGEST_OK · INGEST_IDEMPOTENT_OK · BG_SOURCE_SELECTION_OK · BG_SOURCE_INVARIANCE_OK · BG_VENDOR_CALLS_DISABLED_IN_PROD_OK`.  
+artifacts/ingest/_s9.acceptance.txt:1:INGEST_OK · INGEST_IDEMPOTENT_OK · VENDOR_RETRY_BACKOFF_OK · VENDOR_NO_PAYLOAD_LOGGING_OK · EVIDENCE_INDEX_UPDATED_OK · EVIDENCE_INDEX_HASH_OK · MACHINE_MIRROR_UPDATED_OK
+artifacts/qa/bg_parity_presence.rg.txt:11:docs/run/RUN_PROD_QA.md:76:| `artifacts/presenter/json_canon_compare.log` | Proves byte-level parity between vendor ingest and DB resolve outputs. | BG_SOURCE_INVARIANCE_OK |
+artifacts/qa/db_tokens.rg.txt:27:docs/pfcanon/PF09-Canon-HDE-Build Checklist v1.4.9.md:1210:   `DB_RUNTIME_SEARCH_PATH_OK · DB_ROLE_OK · DB_SCHEMA_FINGERPRINT_OK · DB_CONN_ENV_OK · BG_SOURCE_SELECTION_OK · BG_DEV_DB_BRIDGE_FALLBACK_OK · BG_VENDOR_DISABLED_OK · BG_SOURCE_INVARIANCE_OK · BG_TTL_SWR_OK · BG_RATE_LIMIT_POLICY_OK · BG_CIRCUIT_BREAKER_OK`
+artifacts/qa/vendor_429.rg.txt:2:docs/pfcanon/PF16-Canon-HD Engine Epics Map v2.3.5.md:349:* **Ingest:** `INGEST_OK, INGEST_IDEMPOTENT_OK, VENDOR_RETRY_BACKOFF_OK, VENDOR_NO_PAYLOAD_LOGGING_OK`
+artifacts/qa/vendor_429.rg.txt:9:artifacts/ingest/_s9.acceptance.txt:1:INGEST_OK · INGEST_IDEMPOTENT_OK · VENDOR_RETRY_BACKOFF_OK · VENDOR_NO_PAYLOAD_LOGGING_OK · EVIDENCE_INDEX_UPDATED_OK · EVIDENCE_INDEX_HASH_OK · MACHINE_MIRROR_UPDATED_OK
+artifacts/qa/vendor_429.rg.txt:11:artifacts/qa/evidence_presence.rg.txt:324:artifacts/ingest/_s9.acceptance.txt:1:INGEST_OK · INGEST_IDEMPOTENT_OK · VENDOR_RETRY_BACKOFF_OK · VENDOR_NO_PAYLOAD_LOGGING_OK · EVIDENCE_INDEX_UPDATED_OK · EVIDENCE_INDEX_HASH_OK · MACHINE_MIRROR_UPDATED_OK
+artifacts/qa/vendor_429.rg.txt:12:scripts/ingest/run_vendor_ingest.py:109:        "INGEST_OK · INGEST_IDEMPOTENT_OK · VENDOR_RETRY_BACKOFF_OK · VENDOR_NO_PAYLOAD_LOGGING_OK · "
+artifacts/qa/evidence_presence.rg.txt:324:artifacts/ingest/_s9.acceptance.txt:1:INGEST_OK · INGEST_IDEMPOTENT_OK · VENDOR_RETRY_BACKOFF_OK · VENDOR_NO_PAYLOAD_LOGGING_OK · EVIDENCE_INDEX_UPDATED_OK · EVIDENCE_INDEX_HASH_OK · MACHINE_MIRROR_UPDATED_OK
+artifacts/qa/refusal.gate.txt:1:docs/run/RUN_PROD_QA.md:73:| `artifacts/proofs/ops_refusal_proof.txt` | Demonstrates rails are closed outside the window, both before and after, with canonical refusal formatting. | SNAPSHOT_HEADER_LOWERCASE_OK, BG_VENDOR_CALLS_DISABLED_IN_PROD_OK |
+artifacts/qa/refusal.gate.txt:6:docs/pfcanon/PF10-HDE-Build Notes  v7.5.2.md:389:   `SNAPSHOT_HEADER_LOWERCASE_OK · INGEST_OK · INGEST_IDEMPOTENT_OK · BG_SOURCE_SELECTION_OK · BG_SOURCE_INVARIANCE_OK · BG_VENDOR_CALLS_DISABLED_IN_PROD_OK`.
+artifacts/qa/refusal.gate.txt:7:docs/pfcanon/PF10-HDE-Build Notes  v7.5.2.md:422:   `SNAPSHOT_HEADER_LOWERCASE_OK · INGEST_OK · INGEST_IDEMPOTENT_OK · BG_SOURCE_SELECTION_OK · BG_SOURCE_INVARIANCE_OK · BG_VENDOR_CALLS_DISABLED_IN_PROD_OK`.  
+scripts/ingest/run_vendor_ingest.py:109:        "INGEST_OK · INGEST_IDEMPOTENT_OK · VENDOR_RETRY_BACKOFF_OK · VENDOR_NO_PAYLOAD_LOGGING_OK · "

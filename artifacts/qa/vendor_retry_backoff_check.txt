@@ -1,0 +1,4 @@
+docs/evidence/INDEX.json:279:    "path": "artifacts/vendor/retry_backoff.behavior.log",
+docs/evidence/INDEX.json:280:    "proof": "artifacts/vendor/retry_backoff.behavior.log.path_proof.txt",
+artifacts/evidence_index.jsonl:89:{"artifact_key":"vendor.retry_backoff_behavior","discovered_physical_path":"artifacts/vendor/retry_backoff.behavior.log","produced_at_utc":"2025-11-18T10:26:42Z","proof_anchor":"artifacts/vendor/retry_backoff.behavior.log.path_proof.txt","role":"vendor","sha256":"6f37a1cec296292af906b4fab09bc73c363148105c9e39344f27b8e5618fa34b","size_bytes":3369}
+artifacts/vendor/retry_backoff.behavior.log.path_proof.txt:1:path: artifacts/vendor/retry_backoff.behavior.log

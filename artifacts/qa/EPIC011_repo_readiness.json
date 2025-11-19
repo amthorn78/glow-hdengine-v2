@@ -1,0 +1,128 @@
+{
+  "sections": [
+    {
+      "id": "evidence_system",
+      "status": "PASS",
+      "evidence": [
+        "docs/evidence/INDEX.json",
+        "docs/evidence/INDEX.sha256",
+        "artifacts/evidence_index.jsonl",
+        "artifacts/qa/evidence_index.schema_check.json",
+        "artifacts/qa/evidence_presence.rg.txt"
+      ]
+    },
+    {
+      "id": "refusal_proof",
+      "status": "PASS",
+      "evidence": [
+        "artifacts/proofs/ops_refusal_proof.txt",
+        "artifacts/qa/refusal.head.txt",
+        "artifacts/qa/refusal.gate.txt"
+      ]
+    },
+    {
+      "id": "db_posture_bridge",
+      "status": "FAIL",
+      "evidence": [
+        "artifacts/db/check_schema.txt",
+        "artifacts/db/ddl_fingerprint.json",
+        "artifacts/db/grants.txt",
+        "artifacts/db/partition_plan.txt",
+        "artifacts/db/partition_verify.log",
+        "artifacts/db/boundary_view.readonly.proof.txt",
+        "artifacts/db_bridge/caps.snapshot.json",
+        "artifacts/db_bridge/adapter_selection.snapshot.json",
+        "artifacts/db/provider_parity/bridge.json",
+        "artifacts/db/provider_parity/direct.json",
+        "artifacts/db/provider_parity/summary.json",
+        "artifacts/db_bridge/provider_parity.proof.json",
+        "artifacts/db_bridge/health.json",
+        "artifacts/db_bridge/query_select_1.json",
+        "artifacts/qa/db_presence.rg.txt",
+        "artifacts/qa/db_schema.value.txt",
+        "artifacts/qa/db_tokens.rg.txt"
+      ],
+      "drift": [
+        "provider_parity_in_db_bridge",
+        "legacy_env_matrix_snapshot"
+      ]
+    },
+    {
+      "id": "vendor_request_shaping",
+      "status": "FAIL",
+      "evidence": [
+        "artifacts/qa/vendor_drift.rg.txt",
+        "artifacts/qa/vendor_429.rg.txt"
+      ],
+      "drift": [
+        "missing_retry_after_parse_log",
+        "non_canonical_vendor_inputs",
+        "legacy_retry_backoff_artifact"
+      ]
+    },
+    {
+      "id": "bodygraph_source_invariance",
+      "status": "PASS",
+      "evidence": [
+        "artifacts/bodygraph/source_selection.snapshot.json",
+        "artifacts/presenter/json_canon_compare.log",
+        "artifacts/qa/bg_parity_presence.rg.txt",
+        "artifacts/qa/bg_tokens.rg.txt"
+      ]
+    },
+    {
+      "id": "observability",
+      "status": "PASS",
+      "evidence": [
+        "artifacts/bodygraph/keys_only.logs.sample",
+        "artifacts/bodygraph/metrics.snapshot.json",
+        "artifacts/qa/bg_logs.head.txt",
+        "artifacts/qa/obs_tokens.rg.txt"
+      ]
+    },
+    {
+      "id": "cli_devcontainer_parity",
+      "status": "PASS",
+      "evidence": [
+        "artifacts/qa/cli_presence.rg.txt",
+        "pyproject.toml",
+        ".devcontainer/devcontainer.json",
+        "artifacts/qa/devcontainer_envpins.rg.txt"
+      ]
+    },
+    {
+      "id": "prod_endpoints_sot",
+      "status": "FAIL",
+      "evidence": [
+        "docs/run/PROD_ENDPOINTS.json",
+        "artifacts/qa/prod_endpoints.pretty.json",
+        "artifacts/qa/hardcoded_urls.rg.txt"
+      ],
+      "drift": [
+        "prod_endpoints_include_urls",
+        "hardcoded_prod_urls"
+      ]
+    },
+    {
+      "id": "db_lifecycle",
+      "status": "PASS",
+      "evidence": [
+        "artifacts/db/backup/backup_manifest.json",
+        "artifacts/db/backup/restore_verify.log",
+        "artifacts/db/retention/retention_run.log",
+        "artifacts/qa/db_lifecycle.rg.txt",
+        "artifacts/qa/db_lifecycle.tokens.txt"
+      ]
+    },
+    {
+      "id": "a7_separation",
+      "status": "FAIL",
+      "evidence": [
+        "artifacts/qa/a7_presence.rg.txt"
+      ],
+      "drift": [
+        "a7_tokens_present"
+      ]
+    }
+  ]
+}

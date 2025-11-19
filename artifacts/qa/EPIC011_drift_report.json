@@ -1,0 +1,59 @@
+{
+  "drift": [
+    {
+      "code": "a7_tokens_present",
+      "evidence": [
+        "artifacts/qa/a7_presence.rg.txt"
+      ]
+    },
+    {
+      "code": "hardcoded_prod_urls",
+      "evidence": [
+        "artifacts/qa/hardcoded_urls.rg.txt"
+      ]
+    },
+    {
+      "code": "legacy_env_matrix_snapshot",
+      "evidence": [
+        "artifacts/runtime/env_matrix.snapshot.json"
+      ]
+    },
+    {
+      "code": "legacy_retry_backoff_artifact",
+      "evidence": [
+        "artifacts/vendor/retry_backoff.behavior.log"
+      ]
+    },
+    {
+      "code": "missing_retry_after_parse_log",
+      "evidence": [
+        "artifacts/vendor/retry_after_parse.log"
+      ]
+    },
+    {
+      "code": "non_canonical_vendor_inputs",
+      "evidence": [
+        "engine/bodygraph/ingest.py:101:        raise VendorError(\"PROVIDER_INPUT_MISSING\", \"ingest inputs missing\", details={\"missing\": missing})",
+        "engine/bodygraph/ingest.py:103:        user_id=env[\"INGEST_TEST_USER_ID\"].strip(),",
+        "engine/bodygraph/ingest.py:104:        birthdate=env[\"INGEST_TEST_BIRTHDATE\"].strip(),",
+        "engine/bodygraph/ingest.py:105:        birthtime=env[\"INGEST_TEST_BIRTHTIME\"].strip(),",
+        "engine/bodygraph/ingest.py:106:        location=env[\"INGEST_TEST_LOCATION\"].strip(),",
+        "engine/bodygraph/ingest.py:99:    missing = [name for name in (\"INGEST_TEST_USER_ID\", \"INGEST_TEST_BIRTHDATE\", \"INGEST_TEST_BIRTHTIME\", \"INGEST_TEST_LOCATION\") if not (env.get(name) or \"\").strip()]"
+      ]
+    },
+    {
+      "code": "prod_endpoints_include_urls",
+      "evidence": [
+        "artifacts/qa/prod_endpoints.pretty.json",
+        "docs/run/PROD_ENDPOINTS.json"
+      ]
+    },
+    {
+      "code": "provider_parity_in_db_bridge",
+      "evidence": [
+        "artifacts/db_bridge/provider_parity.proof.json",
+        "artifacts/db_bridge/provider_parity.proof.json.path_proof.txt"
+      ]
+    }
+  ]
+}

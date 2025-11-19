@@ -1,0 +1,4 @@
+.devcontainer/devcontainer.json:5:    "LC_ALL": "C",
+.devcontainer/devcontainer.json:8:    "PATH": "/home/vscode/.local/bin:${containerEnv:PATH}"
+.devcontainer/devcontainer.json:6:    "LANG": "C",
+.devcontainer/devcontainer.json:7:    "TZ": "UTC",
