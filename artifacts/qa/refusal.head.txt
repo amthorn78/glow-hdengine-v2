@@ -1,5 +1,5 @@
-1:cache-control: no-store
-2:content-type: application/json; charset=utf-8
-3:x-rails-mode: closed
-4:
-5:{"code":"rails_closed","error":"rails remain closed","ok":false,"schema":"rails_closed"}
+cache-control: no-store
+content-type: application/json; charset=utf-8
+x-rails-mode: closed
+
+{"code":"rails_closed","error":"rails remain closed","ok":false,"schema":"rails_closed"}
