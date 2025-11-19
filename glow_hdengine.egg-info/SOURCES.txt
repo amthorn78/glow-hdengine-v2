@@ -17,6 +17,11 @@ adapter/wsgi.py
 engine/__init__.py
 engine/constants.py
 engine/emit_public.py
+engine/bodygraph/__init__.py
+engine/bodygraph/ingest.py
+engine/bodygraph/resolver.py
+engine/bodygraph/retention.py
+engine/bodygraph/vendor_client.py
 engine/categories/__init__.py
 engine/categories/registry.py
 engine/charts/loader.py
@@ -37,6 +42,12 @@ engine/config/__init__.py
 engine/config/provider_errors.py
 engine/config/provider_loader.py
 engine/config/provider_types.py
+engine/db/__init__.py
+engine/db/adapter.py
+engine/db/errors.py
+engine/db/providers/__init__.py
+engine/db/providers/bridge_provider.py
+engine/db/providers/psycopg_provider.py
 engine/errors/__init__.py
 engine/http/compat_handler.py
 engine/magic10/__init__.py
@@ -53,6 +64,8 @@ engine/narratives/loader.py
 engine/narratives/preview.py
 engine/narratives/router.py
 engine/narratives/state.py
+engine/ops/__init__.py
+engine/ops/http_log.py
 engine/presenter/__init__.py
 engine/presenter/emitter.py
 engine/presets/loader.py
@@ -84,6 +97,7 @@ glow_hdengine.egg-info/dependency_links.txt
 glow_hdengine.egg-info/entry_points.txt
 glow_hdengine.egg-info/top_level.txt
 presenter/__init__.py
+presenter/json_canon_compare.py
 presenter/reader_v1/__init__.py
 presenter/reader_v1/emitter.py
 tests/test_catalog_canon.py
