@@ -1,0 +1,6 @@
+at: 2025-11-19T13:39:09Z
+content-type: application/json
+route: ops.rails.refusal
+x-safe-mode: 1
+
+{"code": "rails_closed", "message": "vendor rails closed under SAFE_MODE", "status": "error"}

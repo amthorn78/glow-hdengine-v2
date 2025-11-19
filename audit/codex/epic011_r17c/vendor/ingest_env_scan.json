@@ -1,0 +1,72 @@
+{
+  "GEO_API_KEY": {
+    "files": [
+      "codex/out/docs_snapshots/docs/SECRETS.md.txt",
+      "engine/bodygraph/vendor_client.py",
+      "engine/providers/vendor_http_hdapi.py",
+      "docs/pfcanon/PF05-Canon-HDE-CLI-API-Vendor-Ref v1.3.md",
+      "docs/pfcanon/PF14-Canon-HDE-Mechanics Guide v1.8.md",
+      "docs/pfcanon/PF04-Canon-HDE-Governance v1.4.md",
+      "docs/SECRETS.md",
+      "scripts/demo_mvp.sh",
+      "scripts/ingest/run_vendor_ingest.py",
+      "artifacts/runtime/env_matrix.prev.json",
+      "artifacts/runtime/env_matrix.diff.json",
+      "artifacts/hdapi/endpoints.json",
+      "tests/provider/test_hdapi_request_shape.py",
+      "tests/provider/test_hdapi_error_mapping.py",
+      "tests/provider/test_hdapi_json_headers.py",
+      "tests/hdctl/test_cli_admin_sidecar_invariance.py",
+      "tests/loader/test_loader_hdapi_ignores_tz.py",
+      "n",
+      "artifacts/admin/INV_TEST_NOTES.md"
+    ],
+    "present": true,
+    "total": 19
+  },
+  "HDAPI_BASE_URL": {
+    "files": [
+      "engine/bodygraph/vendor_client.py",
+      "engine/providers/vendor_http_hdapi.py",
+      "codex/out/docs_snapshots/docs/SECRETS.md.txt",
+      "docs/run/RUN_PROD_QA.md",
+      "docs/pfcanon/PF05-Canon-HDE-CLI-API-Vendor-Ref v1.3.md",
+      "docs/pfcanon/PF01-Canon-HDE-Math-Spec v1.2.6.md",
+      "docs/pfcanon/PF14-Canon-HDE-Mechanics Guide v1.8.md",
+      "docs/pfcanon/PF04-Canon-HDE-Governance v1.4.md",
+      "docs/SECRETS.md",
+      "artifacts/runtime/env_matrix.prev.json",
+      "artifacts/runtime/env_matrix.diff.json",
+      "scripts/ingest/run_vendor_ingest.py",
+      "tests/provider/test_hdapi_request_shape.py"
+    ],
+    "present": true,
+    "total": 13
+  },
+  "HD_API_KEY": {
+    "files": [
+      "tests/provider/test_hdapi_request_shape.py",
+      "tests/provider/test_hdapi_error_mapping.py",
+      "tests/provider/test_hdapi_json_headers.py",
+      "tests/hdctl/test_cli_admin_sidecar_invariance.py",
+      "codex/out/docs_snapshots/docs/SECRETS.md.txt",
+      "tests/loader/test_loader_hdapi_ignores_tz.py",
+      "docs/run/RUN_PROD_QA.md",
+      "docs/pfcanon/PF05-Canon-HDE-CLI-API-Vendor-Ref v1.3.md",
+      "docs/pfcanon/PF14-Canon-HDE-Mechanics Guide v1.8.md",
+      "docs/pfcanon/PF04-Canon-HDE-Governance v1.4.md",
+      "engine/bodygraph/vendor_client.py",
+      "docs/SECRETS.md",
+      "engine/providers/vendor_http_hdapi.py",
+      "scripts/demo_mvp.sh",
+      "scripts/ingest/run_vendor_ingest.py",
+      "scripts/ensure_env.py",
+      "artifacts/admin/INV_TEST_NOTES.md",
+      "n",
+      "artifacts/runtime/env_matrix.prev.json",
+      "artifacts/runtime/env_matrix.diff.json"
+    ],
+    "present": true,
+    "total": 21
+  }
+}

@@ -1,0 +1,1 @@
+stderr was empty; CLI emitted refusal JSON to stdout.

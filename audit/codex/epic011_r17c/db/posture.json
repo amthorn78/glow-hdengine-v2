@@ -1,0 +1,1 @@
+{"boundary_proof_path": "artifacts/db/boundary_view.readonly.proof.txt", "boundary_view_ro_ok": true, "ddl_fingerprint_ok": true, "ddl_object_count": 23, "grants_count": 165, "grants_status": "ok", "search_path": "hde, public", "search_path_status": "ok"}

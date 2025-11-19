@@ -1,0 +1,114 @@
+{
+  "A1_cli_help": {
+    "paths": [
+      "pyproject.toml",
+      "audit/codex/epic011_r17c/cli/help.txt"
+    ],
+    "reason": "`hdctl` console script is missing from PATH so only `python -m engine.cli` works; help capture begins with `bash: command not found: hdctl`.",
+    "status": "FAIL"
+  },
+  "A2_bg_resolve_closed": {
+    "paths": [
+      "audit/codex/epic011_r17c/cli/bg_resolve.closed.db.json",
+      "audit/codex/epic011_r17c/cli/bg_resolve.closed.vendor.txt",
+      "audit/codex/epic011_r17c/cli/bg_resolve.closed.vendor.stdout.json",
+      "engine/bodygraph/resolver.py"
+    ],
+    "reason": "DB path emits canonical JSON but vendor refusal is printed to stdout while stderr remains empty, violating PF05 refusal guidance.",
+    "status": "FAIL"
+  },
+  "A3_source_invariance": {
+    "paths": [
+      "audit/codex/epic011_r17c/bodygraph/source_selection.snap.json",
+      "engine/bodygraph/resolver.py"
+    ],
+    "reason": "Source snapshot captures SAFE rails refusing vendor without switching providers.",
+    "status": "PASS"
+  },
+  "B1_vendor_request_shape": {
+    "paths": [
+      "engine/bodygraph/vendor_client.py",
+      "engine/providers/vendor_http_hdapi.py",
+      "audit/codex/epic011_r17c/vendor/request_shape.static.json"
+    ],
+    "reason": "Vendor client shapes POST /bodygraphs with Accept, Content-Type, HD-Api-Key, HD-Geocode-Key, and User-Agent plus the three birth fields.",
+    "status": "PASS"
+  },
+  "B2_vendor_env_scan": {
+    "paths": [
+      "audit/codex/epic011_r17c/vendor/ingest_env_scan.json"
+    ],
+    "reason": "Repository contains multiple references to HD_API_KEY, GEO_API_KEY, and HDAPI_BASE_URL across provider code and docs.",
+    "status": "PASS"
+  },
+  "B3_retry_after": {
+    "paths": [
+      "engine/bodygraph/vendor_client.py",
+      "audit/codex/epic011_r17c/vendor/retry_after_parse.log"
+    ],
+    "reason": "`HdApiClient._retry_after_ms` only handles numeric Retry-After values; HTTP-date inputs return `None`.",
+    "status": "FAIL"
+  },
+  "B4_vendor_open": {
+    "paths": [
+      "audit/codex/epic011_r17c/cli/bg_resolve.open.vendor.json"
+    ],
+    "reason": "No stubbed vendor harness or cassette exists to run rails-open ingest safely.",
+    "status": "ABSENT"
+  },
+  "C_db_posture": {
+    "paths": [
+      "artifacts/db/introspect.search_path.json",
+      "artifacts/db/introspect.grants.json",
+      "artifacts/db/introspect.fingerprint.json",
+      "artifacts/db/boundary_view.readonly.proof.txt",
+      "audit/codex/epic011_r17c/db/posture.json"
+    ],
+    "reason": "Captured artifacts show search_path 'hde, public', grants inventory, fingerprint objects, and boundary view read-only proof.",
+    "status": "PASS"
+  },
+  "D_bridge_selection": {
+    "paths": [
+      "engine/db/adapter.py",
+      "engine/db/providers/bridge_provider.py",
+      "audit/codex/epic011_r17c/bridge/adapter_selection.json",
+      "audit/codex/epic011_r17c/bridge/caps.snapshot.json",
+      "audit/codex/epic011_r17c/bridge/provider_parity.json"
+    ],
+    "reason": "Adapter snapshot reports psycopg errors and bridge selection but parity testing and caps capture rely on static code rather than live bridge introspection.",
+    "status": "DRIFT"
+  },
+  "E_evidence_hygiene": {
+    "paths": [
+      "docs/evidence/INDEX.json",
+      "docs/evidence/INDEX.sha256",
+      "artifacts/evidence_index.jsonl",
+      "audit/codex/epic011_r17c/evidence/mirror_check.json"
+    ],
+    "reason": "docs/evidence index, sha256 sentinel, and artifacts/evidence_index.jsonl all exist with canonical JSONL (one LF, no unknown keys, proof anchors present).",
+    "status": "PASS"
+  },
+  "F_rails_refusal": {
+    "paths": [
+      "audit/codex/epic011_r17c/rails/refusal_proof.txt",
+      "audit/codex/epic011_r17c/evidence/mirror_check.json"
+    ],
+    "reason": "Refusal snapshot stored with lower-case headers and canonical JSON body referenced in mirror report.",
+    "status": "PASS"
+  },
+  "G_bodygraph_invariance": {
+    "paths": [
+      "audit/codex/epic011_r17c/bodygraph/invariance.summary.json",
+      "fixtures"
+    ],
+    "reason": "Repo lacks fixtures/bodygraph inputs, so AB/BA and two-run identity could not be exercised.",
+    "status": "ABSENT"
+  },
+  "H_catalog_presence": {
+    "paths": [
+      "audit/codex/epic011_r17c/docs/catalog_presence.json"
+    ],
+    "reason": "docs/ENDPOINTS_CATALOG.json and .sha256 are not present in the repository.",
+    "status": "ABSENT"
+  }
+}
