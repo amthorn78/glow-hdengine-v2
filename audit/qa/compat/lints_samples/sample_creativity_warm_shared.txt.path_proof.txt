@@ -1,0 +1,4 @@
+path: audit/qa/compat/lints_samples/sample_creativity_warm_shared.txt
+sha256: 63d3edf5992c3728f51d9b0392e7e7ee2f2019b6d739a2855fb496def3f42e7e
+size_bytes: 64
+mtime_utc: 2025-11-19T22:42:55Z

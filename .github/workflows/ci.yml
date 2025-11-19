@@ -4,9 +4,11 @@ jobs:
   test:
     runs-on: ubuntu-latest
     env:
-      HD_API_BASE_URL: ${{ secrets.HD_API_BASE_URL }}
-      HD_API_KEY: ${{ secrets.HD_API_KEY }}
-      HD_API_SECRET: ${{ secrets.HD_API_SECRET }}
+      LC_ALL: C
+      LANG: C
+      TZ: UTC
+      SAFE_MODE: "1"
+      ALLOW_NETWORK: "0"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -14,5 +16,10 @@ jobs:
           python-version: '3.12'
       - run: python -m pip install -U pip
       - run: test -f requirements.txt && python -m pip install -r requirements.txt || true
-      - run: python scripts/ensure_env.py || true
-      - run: pytest -q || true
+      - run: test -f requirements-dev.txt && python -m pip install -r requirements-dev.txt || true
+      - run: python -m pip install -e .
+      - run: ci/checks/check_env_pins.sh
+      - run: ci/checks/check_cli_help.sh
+      - run: ci/checks/check_evidence_index_hash.sh
+      - run: ci/checks/check_mirror_schema.sh
+      - run: ci/checks/check_final_lf.sh

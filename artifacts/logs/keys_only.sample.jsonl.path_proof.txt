@@ -1,1 +1,4 @@
-artifacts/logs/keys_only.sample.jsonl
+path: artifacts/logs/keys_only.sample.jsonl
+sha256: 462303765fe4a5bc49e7458bdc48a51d45d42104070c1b7ff73cc6d45c3ca328
+size_bytes: 4935
+mtime_utc: 2025-11-19T22:21:08Z

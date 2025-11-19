@@ -1,1 +1,4 @@
--rw-r--r-- 1 root root 9658 Nov 18 01:29 artifacts/audit/pf09_functional_report_rails_closed.json
+path: artifacts/audit/pf09_functional_report_rails_closed.json
+sha256: f33e814b1d92c543ab685b9f0589589a5f2bd40fb0d94bbc34d2452ede8409cf
+size_bytes: 9658
+mtime_utc: 2025-11-19T22:21:08Z

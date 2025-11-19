@@ -1,0 +1,4 @@
+path: tests/transport/headers/aux_text_200.snap
+sha256: deca94399871c57001d41e79387341c00b6fbe83fc1998711077349d03548803
+size_bytes: 366
+mtime_utc: 2025-11-19T22:21:08Z

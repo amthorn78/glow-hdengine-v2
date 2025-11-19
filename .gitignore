@@ -3,6 +3,22 @@ __pycache__/
 *.pyc
 *.zip
 audit/*
+!audit/qa/
+audit/qa/*
+!audit/qa/compat/
+audit/qa/compat/*
+!audit/qa/compat/lints_samples/
+audit/qa/compat/lints_samples/*
+!audit/qa/compat/lints_samples/*.path_proof.txt
+!audit/qa/compat/**/*.path_proof.txt
+!audit/gates/
+audit/gates/*
+!audit/gates/aux/
+audit/gates/aux/*
+!audit/gates/aux/*.path_proof.txt
+!audit/gates/narratives/
+audit/gates/narratives/*
+!audit/gates/narratives/*.path_proof.txt
 !audit/adr_body_graphs_adr.path_proof.txt
 # Verification artifacts
 h200*.txt

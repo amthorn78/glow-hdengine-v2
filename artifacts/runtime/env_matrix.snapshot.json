@@ -1,1 +1,12 @@
-{"checks":[{"name":"DATABASE_URL","value_kind":"dsn_redacted"},{"name":"DB_BRIDGE_URL","value_kind":"dsn_redacted"}],"ok":true,"result":{"which":"DATABASE_URL"},"schema":"v1"}
+{
+  "schema": "v1",
+  "ok": true,
+  "result": {"which": "CLOSED_RAILS_DEFAULTS"},
+  "checks": [
+    {"name": "LC_ALL", "value_kind": "literal", "value": "C"},
+    {"name": "LANG", "value_kind": "literal", "value": "C"},
+    {"name": "TZ", "value_kind": "literal", "value": "UTC"},
+    {"name": "SAFE_MODE", "value_kind": "literal", "value": "1"},
+    {"name": "ALLOW_NETWORK", "value": "0", "value_kind": "literal"}
+  ]
+}

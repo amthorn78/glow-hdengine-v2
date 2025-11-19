@@ -1,4 +1,4 @@
 path: artifacts/proofs/ops_refusal_proof.txt
 sha256: e2126bbe57803df280c105091980e044a46f07b100b51f5521282c2d6247fcb4
 size_bytes: 181
-mtime_utc: 2025-11-18T05:24:24Z
+mtime_utc: 2025-11-19T22:21:08Z
