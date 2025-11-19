@@ -291,10 +291,12 @@
   },
   {
     "path": "audit/gates/aux/suppression_snapshot_check.txt",
+    "proof": "audit/gates/aux/suppression_snapshot_check.txt.path_proof.txt",
     "title": "audit.aux.suppression_snapshot_check"
   },
   {
     "path": "audit/gates/aux/text_snapshot_check.txt",
+    "proof": "audit/gates/aux/text_snapshot_check.txt.path_proof.txt",
     "title": "audit.aux.text_snapshot_check"
   },
   {
