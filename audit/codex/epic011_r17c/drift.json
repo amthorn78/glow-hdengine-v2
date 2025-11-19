@@ -1,0 +1,46 @@
+[
+  {
+    "expected": "`hdctl` entry point available after install",
+    "found": "Shell reports `bash: command not found: hdctl` in help capture",
+    "id": "A1",
+    "issue": "Console script missing",
+    "paths": [
+      "pyproject.toml",
+      "audit/codex/epic011_r17c/cli/help.txt"
+    ],
+    "suggestion": "Run `pip install -e .` or ensure the hdctl console script is packaged so PF05 CLI parity works."
+  },
+  {
+    "expected": "Typed refusal goes to stderr (PF05) or references refusal proof path",
+    "found": "`bg_resolve.closed.vendor.txt` is empty while stdout carries the JSON envelope",
+    "id": "A2",
+    "issue": "Vendor refusal emitted on stdout",
+    "paths": [
+      "engine/bodygraph/resolver.py",
+      "audit/codex/epic011_r17c/cli/bg_resolve.closed.vendor.stdout.json"
+    ],
+    "suggestion": "Have `bg:resolve` emit refusal metadata on stderr when rails are closed."
+  },
+  {
+    "expected": "PF05 requires both integer seconds and HTTP-date parsing",
+    "found": "`HdApiClient._retry_after_ms` returns `None` for RFC 7231 date strings",
+    "id": "B3",
+    "issue": "Retry-After parser ignores HTTP-date",
+    "paths": [
+      "engine/bodygraph/vendor_client.py",
+      "audit/codex/epic011_r17c/vendor/retry_after_parse.log"
+    ],
+    "suggestion": "Extend `_retry_after_ms` to parse HTTP-date formats in addition to seconds."
+  },
+  {
+    "expected": "Capture live `/health` and `/introspect/*` outputs under audit",
+    "found": "`bridge/caps.snapshot.json` was generated from source declarations instead of bridge responses",
+    "id": "D",
+    "issue": "Bridge caps snapshot is static",
+    "paths": [
+      "engine/db/providers/bridge_provider.py",
+      "audit/codex/epic011_r17c/bridge/caps.snapshot.json"
+    ],
+    "suggestion": "Run scripts/db_bridge/capture_introspection.py against the bridge to freeze real capabilities."
+  }
+]

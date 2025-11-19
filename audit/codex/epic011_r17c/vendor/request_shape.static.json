@@ -1,0 +1,1 @@
+{"headers_present": ["Accept", "Content-Type", "HD-Api-Key", "HD-Geocode-Key", "User-Agent"], "json_body_keys": ["birthdate", "birthtime", "location"], "method": "POST", "route": "/bodygraphs"}

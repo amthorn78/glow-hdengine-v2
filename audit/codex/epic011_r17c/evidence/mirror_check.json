@@ -1,0 +1,23 @@
+{
+  "docs_entries": 93,
+  "docs_index": {
+    "exists": true,
+    "path": "docs/evidence/INDEX.json"
+  },
+  "docs_missing_proofs": 0,
+  "docs_sha": {
+    "exists": true,
+    "path": "docs/evidence/INDEX.sha256"
+  },
+  "mirror": {
+    "exists": true,
+    "path": "artifacts/evidence_index.jsonl"
+  },
+  "mirror_has_trailing_lf": true,
+  "mirror_lines": 90,
+  "mirror_missing_proofs": [],
+  "mirror_parse_errors": [],
+  "mirror_schema_missing": [],
+  "mirror_schema_unknown": [],
+  "rails_refusal_proof": "audit/codex/epic011_r17c/rails/refusal_proof.txt"
+}

@@ -1,0 +1,1 @@
+{"resolver":{"allow_network":false,"dry_run":false,"note":"BodyGraph DB resolution is stubbed for Phase S8a; no IO performed.","requested_source":"db","resolved_source":"db","safe_mode":true,"upsert":false,"user_id":"test@example"},"status":"ok"}

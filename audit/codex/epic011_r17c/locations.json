@@ -1,0 +1,63 @@
+{
+  "A1": [
+    "pyproject.toml",
+    "engine/cli/main.py",
+    "audit/codex/epic011_r17c/cli/help.txt"
+  ],
+  "A2": [
+    "engine/bodygraph/resolver.py",
+    "audit/codex/epic011_r17c/cli/bg_resolve.closed.db.json",
+    "audit/codex/epic011_r17c/cli/bg_resolve.closed.vendor.txt",
+    "audit/codex/epic011_r17c/cli/bg_resolve.closed.vendor.stdout.json"
+  ],
+  "A3": [
+    "engine/bodygraph/resolver.py",
+    "audit/codex/epic011_r17c/bodygraph/source_selection.snap.json"
+  ],
+  "B1": [
+    "engine/bodygraph/vendor_client.py",
+    "engine/providers/vendor_http_hdapi.py",
+    "audit/codex/epic011_r17c/vendor/request_shape.static.json"
+  ],
+  "B2": [
+    "audit/codex/epic011_r17c/vendor/ingest_env_scan.json"
+  ],
+  "B3": [
+    "engine/bodygraph/vendor_client.py",
+    "audit/codex/epic011_r17c/vendor/retry_after_parse.log"
+  ],
+  "B4": [
+    "audit/codex/epic011_r17c/cli/bg_resolve.open.vendor.json"
+  ],
+  "C": [
+    "artifacts/db/introspect.search_path.json",
+    "artifacts/db/introspect.grants.json",
+    "artifacts/db/introspect.fingerprint.json",
+    "artifacts/db/boundary_view.readonly.proof.txt",
+    "audit/codex/epic011_r17c/db/posture.json"
+  ],
+  "D": [
+    "engine/db/adapter.py",
+    "engine/db/providers/bridge_provider.py",
+    "audit/codex/epic011_r17c/bridge/adapter_selection.json",
+    "audit/codex/epic011_r17c/bridge/caps.snapshot.json",
+    "audit/codex/epic011_r17c/bridge/provider_parity.json"
+  ],
+  "E": [
+    "docs/evidence/INDEX.json",
+    "docs/evidence/INDEX.sha256",
+    "artifacts/evidence_index.jsonl",
+    "audit/codex/epic011_r17c/evidence/mirror_check.json"
+  ],
+  "F": [
+    "audit/codex/epic011_r17c/rails/refusal_proof.txt"
+  ],
+  "G": [
+    "fixtures",
+    "audit/codex/epic011_r17c/bodygraph/invariance.summary.json",
+    "audit/codex/epic011_r17c/bodygraph/source_selection.snap.json"
+  ],
+  "H": [
+    "audit/codex/epic011_r17c/docs/catalog_presence.json"
+  ]
+}

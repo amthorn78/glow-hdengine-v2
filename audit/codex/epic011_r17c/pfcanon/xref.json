@@ -1,0 +1,54 @@
+[
+  {
+    "anchors": [
+      {
+        "line": 585,
+        "section": "4.6 hdctl bg:resolve"
+      },
+      {
+        "line": 1145,
+        "section": "Primary endpoint POST /v1/bodygraphs"
+      }
+    ],
+    "doc": "docs/pfcanon/PF05-Canon-HDE-CLI-API-Vendor-Ref v1.3.md"
+  },
+  {
+    "anchors": [
+      {
+        "line": 20,
+        "section": "Human Evidence Index"
+      },
+      {
+        "line": 22,
+        "section": "Machine Evidence Mirror"
+      }
+    ],
+    "doc": "docs/pfcanon/PF12-Canon-HDE-Schemas and Artifacts v1.2.8.md"
+  },
+  {
+    "anchors": [
+      {
+        "line": 1383,
+        "section": "Bridge errors & pg-bridge contract"
+      },
+      {
+        "line": 1405,
+        "section": "Adapter selection snapshot"
+      }
+    ],
+    "doc": "docs/pfcanon/PF14-Canon-HDE-Mechanics Guide v1.8.md"
+  },
+  {
+    "anchors": [
+      {
+        "line": 146,
+        "section": "QA routing"
+      },
+      {
+        "line": 153,
+        "section": "Transport bytes route"
+      }
+    ],
+    "doc": "docs/pfcanon/PF19-Canon-Glow QA Guide v0.4.md"
+  }
+]
