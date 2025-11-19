@@ -1,0 +1,4 @@
+path: audit/qa/compat/lints_samples/sample_harmony_cool_shared.txt
+sha256: e4a96e2bff6638158d95833660899525cbe0e124c84544b52942e3eb79fb69c9
+size_bytes: 64
+mtime_utc: 2025-11-19T21:14:43Z

@@ -1,1 +1,4 @@
-artifacts/db/backup/restore_verify.log
+path: artifacts/db/backup/restore_verify.log
+sha256: b141ae886ca8fdc2f439e6756a0b0d7785e46d5e725c442cd947b640fa264666
+size_bytes: 528
+mtime_utc: 2025-11-19T21:14:43Z

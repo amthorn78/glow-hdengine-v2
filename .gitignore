@@ -3,6 +3,8 @@ __pycache__/
 *.pyc
 *.zip
 audit/*
+!audit/**/
+!audit/**/*.path_proof.txt
 !audit/adr_body_graphs_adr.path_proof.txt
 # Verification artifacts
 h200*.txt

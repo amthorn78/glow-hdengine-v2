@@ -56,11 +56,13 @@
   },
   {
     "path": "artifacts/cli/narrative/sidecar.json",
-    "title": "cli.narrative.preview_sidecar"
+    "title": "cli.narrative.preview_sidecar",
+    "proof": "artifacts/cli/narrative/sidecar.json.path_proof.txt"
   },
   {
     "path": "artifacts/cli/narrative/stdout.txt",
-    "title": "cli.narrative.preview_stdout"
+    "title": "cli.narrative.preview_stdout",
+    "proof": "artifacts/cli/narrative/stdout.txt.path_proof.txt"
   },
   {
     "path": "artifacts/db/backup/backup_manifest.json",
@@ -234,7 +236,8 @@
   },
   {
     "path": "artifacts/ops/no_io_guard.txt",
-    "title": "ops.no_io_guard"
+    "title": "ops.no_io_guard",
+    "proof": "artifacts/ops/no_io_guard.txt.path_proof.txt"
   },
   {
     "path": "artifacts/ops/rails_open_scope.txt",
@@ -253,7 +256,8 @@
   },
   {
     "path": "artifacts/qa/EPIC009_PROD_QA_REPORT.json",
-    "title": "qa.epic009.report"
+    "title": "qa.epic009.report",
+    "proof": "artifacts/qa/EPIC009_PROD_QA_REPORT.json.path_proof.txt"
   },
   {
     "path": "artifacts/runtime/env_connectivity.snapshot.json",
@@ -295,115 +299,143 @@
   },
   {
     "path": "audit/gates/narratives/keys_10x4.table.json",
-    "title": "audit.narratives.keys_10x4"
+    "title": "audit.narratives.keys_10x4",
+    "proof": "audit/gates/narratives/keys_10x4.table.json.path_proof.txt"
   },
   {
     "path": "audit/qa/compat/abba_meta.json",
-    "title": "qa.compat.abba_meta"
+    "title": "qa.compat.abba_meta",
+    "proof": "audit/qa/compat/abba_meta.json.path_proof.txt"
   },
   {
     "path": "audit/qa/compat/abba_personal.diff",
-    "title": "qa.compat.abba_personal.diff"
+    "title": "qa.compat.abba_personal.diff",
+    "proof": "audit/qa/compat/abba_personal.diff.path_proof.txt"
   },
   {
     "path": "audit/qa/compat/abba_personal_A_B.out",
-    "title": "qa.compat.abba_personal_A_B"
+    "title": "qa.compat.abba_personal_A_B",
+    "proof": "audit/qa/compat/abba_personal_A_B.out.path_proof.txt"
   },
   {
     "path": "audit/qa/compat/abba_personal_B_A.out",
-    "title": "qa.compat.abba_personal_B_A"
+    "title": "qa.compat.abba_personal_B_A",
+    "proof": "audit/qa/compat/abba_personal_B_A.out.path_proof.txt"
   },
   {
     "path": "audit/qa/compat/abba_shared.diff",
-    "title": "qa.compat.abba_shared.diff"
+    "title": "qa.compat.abba_shared.diff",
+    "proof": "audit/qa/compat/abba_shared.diff.path_proof.txt"
   },
   {
     "path": "audit/qa/compat/abba_shared_A_B.out",
-    "title": "qa.compat.abba_shared_A_B"
+    "title": "qa.compat.abba_shared_A_B",
+    "proof": "audit/qa/compat/abba_shared_A_B.out.path_proof.txt"
   },
   {
     "path": "audit/qa/compat/abba_shared_B_A.out",
-    "title": "qa.compat.abba_shared_B_A"
+    "title": "qa.compat.abba_shared_B_A",
+    "proof": "audit/qa/compat/abba_shared_B_A.out.path_proof.txt"
   },
   {
     "path": "audit/qa/compat/coverage_sweep.log",
-    "title": "qa.compat.coverage_log"
+    "title": "qa.compat.coverage_log",
+    "proof": "audit/qa/compat/coverage_sweep.log.path_proof.txt"
   },
   {
     "path": "audit/qa/compat/coverage_sweep_summary.json",
-    "title": "qa.compat.coverage_summary"
+    "title": "qa.compat.coverage_summary",
+    "proof": "audit/qa/compat/coverage_sweep_summary.json.path_proof.txt"
   },
   {
     "path": "audit/qa/compat/lints_report.json",
-    "title": "qa.compat.lints_report"
+    "title": "qa.compat.lints_report",
+    "proof": "audit/qa/compat/lints_report.json.path_proof.txt"
   },
   {
     "path": "audit/qa/compat/lints_samples/sample_alignment_cool_a_to_b.json",
-    "title": "qa.compat.lints_sample_alignment_cool_a_to_b"
+    "title": "qa.compat.lints_sample_alignment_cool_a_to_b",
+    "proof": "audit/qa/compat/lints_samples/sample_alignment_cool_a_to_b.json.path_proof.txt"
   },
   {
     "path": "audit/qa/compat/lints_samples/sample_creativity_warm_shared.txt",
-    "title": "qa.compat.lints_sample_creativity_warm_shared"
+    "title": "qa.compat.lints_sample_creativity_warm_shared",
+    "proof": "audit/qa/compat/lints_samples/sample_creativity_warm_shared.txt.path_proof.txt"
   },
   {
     "path": "audit/qa/compat/lints_samples/sample_harmony_cool_shared.txt",
-    "title": "qa.compat.lints_sample_harmony_cool_shared"
+    "title": "qa.compat.lints_sample_harmony_cool_shared",
+    "proof": "audit/qa/compat/lints_samples/sample_harmony_cool_shared.txt.path_proof.txt"
   },
   {
     "path": "audit/qa/compat/lints_samples/sample_heat_open_shared.txt",
-    "title": "qa.compat.lints_sample_heat_open_shared"
+    "title": "qa.compat.lints_sample_heat_open_shared",
+    "proof": "audit/qa/compat/lints_samples/sample_heat_open_shared.txt.path_proof.txt"
   },
   {
     "path": "audit/qa/compat/parity_meta.json",
-    "title": "qa.compat.parity_meta"
+    "title": "qa.compat.parity_meta",
+    "proof": "audit/qa/compat/parity_meta.json.path_proof.txt"
   },
   {
     "path": "audit/qa/compat/parity_personal.diff",
-    "title": "qa.compat.parity_personal.diff"
+    "title": "qa.compat.parity_personal.diff",
+    "proof": "audit/qa/compat/parity_personal.diff.path_proof.txt"
   },
   {
     "path": "audit/qa/compat/parity_personal.out",
-    "title": "qa.compat.parity_personal"
+    "title": "qa.compat.parity_personal",
+    "proof": "audit/qa/compat/parity_personal.out.path_proof.txt"
   },
   {
     "path": "audit/qa/compat/parity_shared.diff",
-    "title": "qa.compat.parity_shared.diff"
+    "title": "qa.compat.parity_shared.diff",
+    "proof": "audit/qa/compat/parity_shared.diff.path_proof.txt"
   },
   {
     "path": "audit/qa/compat/parity_shared.out",
-    "title": "qa.compat.parity_shared"
+    "title": "qa.compat.parity_shared",
+    "proof": "audit/qa/compat/parity_shared.out.path_proof.txt"
   },
   {
     "path": "audit/qa/compat/suppressed_aux_headers.snap",
-    "title": "qa.compat.suppressed_aux_headers"
+    "title": "qa.compat.suppressed_aux_headers",
+    "proof": "audit/qa/compat/suppressed_aux_headers.snap.path_proof.txt"
   },
   {
     "path": "audit/qa/compat/suppressed_compat.out",
-    "title": "qa.compat.suppressed_compat"
+    "title": "qa.compat.suppressed_compat",
+    "proof": "audit/qa/compat/suppressed_compat.out.path_proof.txt"
   },
   {
     "path": "audit/qa/compat/suppressed_meta.json",
-    "title": "qa.compat.suppressed_meta"
+    "title": "qa.compat.suppressed_meta",
+    "proof": "audit/qa/compat/suppressed_meta.json.path_proof.txt"
   },
   {
     "path": "catalog/narratives/keys.json",
-    "title": "catalog.narratives.keys"
+    "title": "catalog.narratives.keys",
+    "proof": "catalog/narratives/keys.json.path_proof.txt"
   },
   {
     "path": "catalog/narratives/manifest.json",
-    "title": "catalog.narratives.manifest"
+    "title": "catalog.narratives.manifest",
+    "proof": "catalog/narratives/manifest.json.path_proof.txt"
   },
   {
     "path": "catalog/narratives/palettes.json",
-    "title": "catalog.narratives.palettes"
+    "title": "catalog.narratives.palettes",
+    "proof": "catalog/narratives/palettes.json.path_proof.txt"
   },
   {
     "path": "catalog/narratives/suppression_map.json",
-    "title": "catalog.narratives.suppression_map"
+    "title": "catalog.narratives.suppression_map",
+    "proof": "catalog/narratives/suppression_map.json.path_proof.txt"
   },
   {
     "path": "catalog/narratives/templates.json",
-    "title": "catalog.narratives.templates"
+    "title": "catalog.narratives.templates",
+    "proof": "catalog/narratives/templates.json.path_proof.txt"
   },
   {
     "path": "docs/adr/hde/body_graphs_adr.md",
@@ -425,10 +457,12 @@
   },
   {
     "path": "tests/transport/headers/aux_suppression_200.snap",
-    "title": "transport.aux.headers.suppression"
+    "title": "transport.aux.headers.suppression",
+    "proof": "tests/transport/headers/aux_suppression_200.snap.path_proof.txt"
   },
   {
     "path": "tests/transport/headers/aux_text_200.snap",
-    "title": "transport.aux.headers.text"
+    "title": "transport.aux.headers.text",
+    "proof": "tests/transport/headers/aux_text_200.snap.path_proof.txt"
   }
 ]
