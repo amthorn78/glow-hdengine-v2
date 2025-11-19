@@ -1,4 +1,4 @@
 path: artifacts/db_bridge/adapter_selection.snapshot.json
-sha256: d50a316f7cffcc6141885fcda8147877a8ff2ba021b541883565c18d1af9e70e
-size_bytes: 278
+sha256: 17fbda5a427c3fc2c3e5de8897c44f4f9c4b55a8e2a81317820b745f8d467543
+size_bytes: 245
 mtime_utc: 2025-11-19T23:14:32Z
