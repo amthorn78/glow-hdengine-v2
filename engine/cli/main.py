@@ -122,6 +122,11 @@ def _resolver_env() -> Dict[str, str | None]:
 
 
 def bg_resolve(args: argparse.Namespace) -> int:
+    if args.source == "vendor":
+        # PF-canon: vendor CLI invocations must supply the full birth tuple explicitly.
+        missing = [name for name in ("birthdate", "birthtime", "location") if not getattr(args, name, None)]
+        if missing:
+            raise CliError("MISSING_VENDOR_INPUT", exit_code=64)
     result = resolve_bodygraph(
         args.user,
         source=args.source,
