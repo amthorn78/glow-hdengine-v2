@@ -1,4 +1,4 @@
 path: artifacts/presenter/json_canon_compare.log
-sha256: 601c48f5a1d57a15e769d34fe02ae9ada830e3e46256e0c66e596cf6d4f8102a
-size_bytes: 411
-mtime_utc: 2025-11-19T22:21:08Z
+sha256: 97f311cddd25cfab2059d83852f6cce05ee1fe71b91c44ff4295e68decdd3e5a
+size_bytes: 789
+mtime_utc: 2025-11-20T01:10:21Z
