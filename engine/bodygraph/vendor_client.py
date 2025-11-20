@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import json
 import os
 import socket
 import time
@@ -147,10 +146,10 @@ class HdApiClient:
         request: Callable[[urlrequest.Request, float], tuple[int, bytes, Mapping[str, str]]] | None = None,
     ) -> "HdApiClient":
         env = os.environ
-        base_url = (env.get("HDAPI_BASE_URL") or "").strip()
+        raw_base_url = (env.get("HDAPI_BASE_URL") or "").strip().rstrip("/")
         api_key = (env.get("HD_API_KEY") or "").strip()
         geo_key = (env.get("GEO_API_KEY") or "").strip()
-        pairs = (("HDAPI_BASE_URL", base_url), ("HD_API_KEY", api_key), ("GEO_API_KEY", geo_key))
+        pairs = (("HDAPI_BASE_URL", raw_base_url), ("HD_API_KEY", api_key), ("GEO_API_KEY", geo_key))
         missing = [key for key, value in pairs if not value]
         if missing:
             raise VendorError(
@@ -158,6 +157,7 @@ class HdApiClient:
                 "missing vendor configuration",
                 details={"missing": sorted(missing)},
             )
+        base_url = raw_base_url
         rid = (release_id or env.get("RELEASE_ID") or "").strip().lower()
         if not rid:
             rid = "0" * 64

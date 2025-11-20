@@ -30,6 +30,19 @@ def test_build_request_validates_date():
     assert excinfo.value.code == "PROVIDER_INPUT_INVALID"
 
 
+def test_from_env_normalizes_base_and_headers(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("HDAPI_BASE_URL", "https://vendor.test/v1")
+    monkeypatch.setenv("HD_API_KEY", "api-key")
+    monkeypatch.setenv("GEO_API_KEY", "geo-key")
+
+    client = HdApiClient.from_env(release_id="0" * 64)
+    request = client.build_request(birthdate="1990-01-01", birthtime="12:00", location="X")
+
+    assert request.url == "https://vendor.test/v1/bodygraphs"
+    assert request.headers["HD-Api-Key"] == "api-key"
+    assert request.headers["HD-Geocode-Key"] == "geo-key"
+
+
 def test_fetch_maps_status_to_typed_error():
     def failing_request(req, timeout):
         return 401, b"{}", {}
