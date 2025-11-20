@@ -18,6 +18,8 @@ from engine.bodygraph.ingest import (
     resolve_db_user_id,
 )
 
+# TODO: reconcile this POLICY shape (flat rate_limit and cb fields) with the
+# v1 snapshot schema that uses nested rate_limit and circuit_breaker objects.
 POLICY = {
     "schema": "v1",
     "ttl_s": 604800,
