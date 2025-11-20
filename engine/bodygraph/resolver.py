@@ -125,16 +125,6 @@ def _resolve_vendor(
             "resolver": resolver_meta,
         }
         return ResolveBodygraphResult(status="error", payload=payload, exit_code=1)
-    if dry_run:
-        payload = {
-            "status": "error",
-            "error": {
-                "code": "PROVIDER_NOT_READY",
-                "message": "Vendor dry-run path is not implemented yet.",
-            },
-            "resolver": resolver_meta,
-        }
-        return ResolveBodygraphResult(status="error", payload=payload, exit_code=1)
     try:
         vendor_inputs = _resolve_inputs(user_id, birthdate, birthtime, location)
     except VendorError as exc:
@@ -152,7 +142,7 @@ def _resolve_vendor(
         return _vendor_error(unexpected, resolver_meta)
     vendor_inputs = replace(vendor_inputs, user_id=normalized_user_id)
     try:
-        outcome = ingest_vendor_bodygraph(vendor_inputs, env=env)
+        outcome = ingest_vendor_bodygraph(vendor_inputs, env=env, dry_run=dry_run)
     except VendorError as exc:
         return _vendor_error(exc, resolver_meta)
     ingest_section = {

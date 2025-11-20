@@ -14,6 +14,7 @@ def _make_outcome():
         db_emitted_sha256="payload",
         parity_match=True,
         db_rows_after=1,
+        payload={"ok": True},
     )
 
 

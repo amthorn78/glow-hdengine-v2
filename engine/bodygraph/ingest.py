@@ -24,7 +24,8 @@ from .vendor_client import HdApiClient, VendorError, VendorRequest
 # non-UUID identifier we derive a uuid5 alias deterministically. This keeps the
 # ingest path idempotent for synthetic IDs today, but the alias layer is not a
 # long-term identity model and should be revisited once a proper user system is
-# available.
+# available. The `user_id` here is purely an internal durability anchor for our
+# own database row; the vendor never sees this value.
 SYNTHETIC_USER_ID_MAP = {
     "epic011-s10-invariance-1": "3fa85f64-5717-4562-b3fc-2c963f66afab",
 }
@@ -92,6 +93,7 @@ class IngestOutcome:
     db_emitted_sha256: str
     parity_match: bool
     db_rows_after: int
+    payload: Mapping[str, Any]
 
 
 def gather_inputs_from_env() -> VendorInputs:
@@ -126,8 +128,6 @@ def ingest_vendor_bodygraph(
         raise VendorError("PROVIDER_REFUSED", "Vendor source refused under SAFE rails", details={"SAFE_MODE": True})
     if not allow_network:
         raise VendorError("PROVIDER_NETWORK_BLOCKED", "Network blocked by rails")
-    if dry_run:
-        raise VendorError("PROVIDER_NOT_READY", "dry-run not implemented for ingest")
     start = time.monotonic()
     client = client or HdApiClient.from_env(log_path=retry_log)
     request = client.build_request(birthdate=inputs.birthdate, birthtime=inputs.birthtime, location=inputs.location)
@@ -136,6 +136,33 @@ def ingest_vendor_bodygraph(
     payload_text = payload_bytes.decode("utf-8")
     payload_sha = sha256(payload_bytes).hexdigest()
     idempotency_key = _idempotency_key(inputs.user_id, "hdapi", vendor_version, request.input_fingerprint)
+    if dry_run:
+        duration_ms = (time.monotonic() - start) * 1000.0
+        _append_jsonl(success_log, {
+            "at": _utc_iso(),
+            "route": "ops.ingest.bodygraph",
+            "status": "ok",
+            "user_id": inputs.user_id,
+            "provider": "hdapi",
+            "vendor_version": vendor_version,
+            "input_fingerprint": request.input_fingerprint,
+            "idempotency_key": idempotency_key,
+            "rows_affected": 0,
+            "duration_ms": round(duration_ms, 3),
+        })
+        return IngestOutcome(
+            vendor="hdapi",
+            vendor_version=vendor_version,
+            input_fingerprint=request.input_fingerprint,
+            idempotency_key=idempotency_key,
+            rows_written=0,
+            duration_ms=duration_ms,
+            payload_sha256=payload_sha,
+            db_emitted_sha256=payload_sha,
+            parity_match=True,
+            db_rows_after=0,
+            payload=vendor_result.payload,
+        )
     db = db_access or DBAccess.for_current_env()
     rows_before = _row_count(db, inputs.user_id, "hdapi", vendor_version, request.input_fingerprint)
     _persist_bodygraph(db, inputs.user_id, vendor_version, request, payload_text)
@@ -180,6 +207,7 @@ def ingest_vendor_bodygraph(
         db_emitted_sha256=db_emitted_sha,
         parity_match=parity_match,
         db_rows_after=db_rows_after,
+        payload=vendor_result.payload,
     )
 
 
