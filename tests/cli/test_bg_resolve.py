@@ -41,7 +41,21 @@ def test_bg_resolve_vendor_refused_under_safe_rails(
 ) -> None:
     _set_safe_rails(monkeypatch)
 
-    exit_code = cli(["bg:resolve", "--user", "user-123", "--source", "vendor"])
+    exit_code = cli(
+        [
+            "bg:resolve",
+            "--user",
+            "user-123",
+            "--source",
+            "vendor",
+            "--birthdate",
+            "1990-01-01",
+            "--birthtime",
+            "12:00",
+            "--location",
+            "Amsterdam, Netherlands",
+        ]
+    )
     captured = capsys.readouterr()
 
     assert exit_code != 0
@@ -120,3 +134,11 @@ def test_bg_resolve_vendor_open_rails_success(monkeypatch: pytest.MonkeyPatch, c
     assert ingest["payload_sha256"] == fake_outcome.payload_sha256
     assert ingest["db_emitted_sha256"] == fake_outcome.db_emitted_sha256
     assert ingest["parity_match"] == fake_outcome.parity_match
+
+
+def test_bg_resolve_vendor_missing_inputs(monkeypatch: pytest.MonkeyPatch) -> None:
+    _set_open_rails(monkeypatch)
+
+    exit_code = cli(["bg:resolve", "--user", "open-rails", "--source", "vendor"])
+
+    assert exit_code == 64

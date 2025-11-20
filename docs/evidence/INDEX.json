@@ -476,5 +476,25 @@
     "path": "tests/transport/headers/aux_text_200.snap",
     "title": "transport.aux.headers.text",
     "proof": "tests/transport/headers/aux_text_200.snap.path_proof.txt"
+  },
+  {
+    "path": "artifacts/bodygraph/vendor_upsert.epic011-s10-invariance-1.json",
+    "proof": "artifacts/bodygraph/vendor_upsert.epic011-s10-invariance-1.json.path_proof.txt",
+    "title": "bodygraph.vendor_upsert.epic011-s10-invariance-1"
+  },
+  {
+    "path": "artifacts/bodygraph/db_resolve.epic011-s10-invariance-1.json",
+    "proof": "artifacts/bodygraph/db_resolve.epic011-s10-invariance-1.json.path_proof.txt",
+    "title": "bodygraph.db_resolve.epic011-s10-invariance-1"
+  },
+  {
+    "path": "artifacts/vendor/retry_after_parse.log",
+    "proof": "artifacts/vendor/retry_after_parse.log.path_proof.txt",
+    "title": "vendor.retry_after_parse"
+  },
+  {
+    "path": "artifacts/proofs/ops_refusal_proof.txt",
+    "proof": "artifacts/proofs/ops_refusal_proof.txt.path_proof.txt",
+    "title": "ops.refusal_proof"
   }
 ]

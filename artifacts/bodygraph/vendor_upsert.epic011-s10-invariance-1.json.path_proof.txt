@@ -1,0 +1,4 @@
+path: artifacts/bodygraph/vendor_upsert.epic011-s10-invariance-1.json
+sha256: fa0baad03333ad1d03fde339a9ce25ebd5289431afc57edd3b220706d11d37c4
+size_bytes: 481
+mtime_utc: 2025-11-20T01:10:08Z
