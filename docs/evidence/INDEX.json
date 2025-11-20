@@ -488,6 +488,11 @@
     "title": "bodygraph.db_resolve.epic011-s10-invariance-1"
   },
   {
+    "path": "artifacts/ops/admin_vendor_calls.jsonl",
+    "proof": "artifacts/ops/admin_vendor_calls.jsonl.path_proof.txt",
+    "title": "ops.admin_vendor_calls"
+  },
+  {
     "path": "artifacts/vendor/retry_after_parse.log",
     "proof": "artifacts/vendor/retry_after_parse.log.path_proof.txt",
     "title": "vendor.retry_after_parse"
