@@ -665,14 +665,7 @@ def showcompat(_: argparse.Namespace) -> int:
     case_name = _case_name(_)
     _emit_admin_dumps(_, case_name, left_person, right_person, a_chart, b_chart, compat_full.get("categories", []), features, viewer_prefs["weights"])
 
-    output = {
-        "a": left_person,
-        "b": right_person,
-        "viewer_prefs": viewer_prefs,
-        "compat": compat_full,
-    }
-    rendered, _ = emitter.emit_compact_json(output)
-    sys.stdout.buffer.write(rendered)
+    sys.stdout.buffer.write(public_bytes)
     return 0
 
 

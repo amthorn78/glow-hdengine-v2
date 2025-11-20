@@ -25,5 +25,12 @@ def test_canonical_and_numeric_free():
     out = result.stdout
     assert out.endswith(b"\n") and b"\n\n" not in out
     payload = json.loads(out)
-    compat = payload.get("compat") or {}
-    assert isinstance(compat.get("categories"), list)
+    assert set(payload) == {
+        "categories",
+        "eligible",
+        "idempotence_hash",
+        "meta",
+        "reader_version",
+        "release_id",
+    }
+    assert isinstance(payload.get("categories"), list)

@@ -51,7 +51,8 @@ def test_showcompat_vendor_dry_run(monkeypatch: pytest.MonkeyPatch, capsys: pyte
     captured = capsys.readouterr()
     assert exit_code == 0
     payload = json.loads(captured.out)
-    assert payload["compat"]["meta"]["engine_tag"]
+    assert payload["meta"]["engine_tag"]
+    assert payload["idempotence_hash"]
     assert called and called[0]["kwargs"]["dry_run"] is True
 
 
@@ -71,6 +72,6 @@ def test_showcompat_db_source(monkeypatch: pytest.MonkeyPatch, capsys: pytest.Ca
     captured = capsys.readouterr()
     assert exit_code == 0
     payload = json.loads(captured.out)
-    compat = payload["compat"]
-    assert compat["categories"]
-    assert compat["meta"]["release_id"]
+    assert payload["categories"]
+    assert payload["release_id"]
+    assert payload["meta"]["invocation_tag"]
