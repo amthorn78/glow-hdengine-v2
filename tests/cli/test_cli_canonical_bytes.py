@@ -1,3 +1,4 @@
+import json
 import os
 import subprocess
 import sys
@@ -23,5 +24,13 @@ def test_canonical_and_numeric_free():
     assert result.returncode == 0
     out = result.stdout
     assert out.endswith(b"\n") and b"\n\n" not in out
-    text = out.decode("utf-8")
-    assert '"id":"harmony"' in text or '"categories":[]' in text
+    payload = json.loads(out)
+    assert set(payload) == {
+        "categories",
+        "eligible",
+        "idempotence_hash",
+        "meta",
+        "reader_version",
+        "release_id",
+    }
+    assert isinstance(payload.get("categories"), list)

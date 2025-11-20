@@ -95,6 +95,7 @@ def test_bg_resolve_vendor_open_rails_success(monkeypatch: pytest.MonkeyPatch, c
         db_emitted_sha256="p",
         parity_match=True,
         db_rows_after=1,
+        payload={"ok": True},
     )
 
     def _fake_ingest(inputs, **kwargs):

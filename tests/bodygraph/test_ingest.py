@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 from engine.bodygraph.ingest import VendorInputs, ingest_vendor_bodygraph
 from engine.bodygraph.vendor_client import VendorRequest, VendorResult
 
@@ -93,3 +95,34 @@ def test_ingest_idempotent(tmp_path: Path) -> None:
     assert canon_records
     assert canon_records[-1]["match"] is True
     assert canon_records[-1]["vendor_sha256"] == canon_records[-1]["db_emitted_sha256"]
+    assert outcome1.payload == {"ok": True}
+
+
+def test_ingest_dry_run_skips_db(monkeypatch: pytest.MonkeyPatch) -> None:
+    client = FakeClient()
+    env = {"SAFE_MODE": "0", "ALLOW_NETWORK": "1"}
+    called = False
+
+    def _boom():
+        nonlocal called
+        called = True
+        raise AssertionError("DB should not be touched during dry-run")
+
+    monkeypatch.setattr("engine.bodygraph.ingest.DBAccess.for_current_env", lambda: _boom())
+    outcome = ingest_vendor_bodygraph(
+        VendorInputs(
+            user_id="user-2",
+            birthdate="1991-02-02",
+            birthtime="01:02",
+            location="Paris",
+        ),
+        env=env,
+        client=client,
+        dry_run=True,
+    )
+
+    assert called is False
+    assert outcome.rows_written == 0
+    assert outcome.db_rows_after == 0
+    assert outcome.parity_match is True
+    assert outcome.payload == {"ok": True}

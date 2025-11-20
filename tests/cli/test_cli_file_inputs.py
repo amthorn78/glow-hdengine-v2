@@ -2,9 +2,13 @@ import json
 import os
 import subprocess
 import sys
-import sysconfig
-import pathlib
 import hashlib
+import json
+import os
+import pathlib
+import subprocess
+import sys
+import sysconfig
 
 import pytest
 
@@ -51,8 +55,7 @@ def test_pair_file_and_ab_file_modes(tmp_path: pathlib.Path):
         out = result.stdout
         assert out.endswith(b"\n") and b"\n\n" not in out
         obj = json.loads(out)
-        assert "categories" in obj
-        text = out.decode("utf-8")
-        assert '"id":"harmony"' in text or '"categories":[]' in text
+        compat = obj.get("compat") or {}
+        assert isinstance(compat.get("categories"), list)
 
     assert _sha(r_ab.stdout) == _sha(r_ba.stdout)
