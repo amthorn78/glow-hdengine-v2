@@ -412,7 +412,7 @@ def _parity_summary(
             entry["parity_reason"] = reason
         summary_caps.append(entry)
     return {
-        "schema": "v1",
+        "schema": "v2",
         "captured_at_utc": captured_at,
         "environment": env_tag or "unset",
         "selected": selected,
@@ -433,12 +433,15 @@ def _caps_snapshot(direct_capture: Mapping[str, Any], bridge_capture: Mapping[st
         capabilities = []
         for cap in capture.get("capabilities", []):
             if isinstance(cap, Mapping):
-                capabilities.append({"name": cap.get("name"), "status": cap.get("status")})
+                cap_entry = {"name": cap.get("name"), "status": cap.get("status")}
+                if cap.get("reason"):
+                    cap_entry["reason"] = cap.get("reason")
+                capabilities.append(cap_entry)
         if capabilities:
             entry["capabilities"] = capabilities
         providers.append(entry)
     return {
-        "schema": "v1",
+        "schema": "v2",
         "captured_at_utc": captured_at,
         "providers": providers,
     }
@@ -448,6 +451,7 @@ def _adapter_snapshot(db: "DBAccess", env_tag: str, captured_at: str) -> Dict[st
     return {
         "schema": "v2",
         "captured_at_utc": captured_at,
+        "environment": env_tag or "unset",
         "selected": db.provider_name,
         "attempts": list(db.attempts),
         "flags": {
@@ -487,6 +491,7 @@ def _env_connectivity_payload(env_tag: str, attempts: Sequence[Mapping[str, Any]
         "fallback_rules": list(FALLBACK_RULES),
         "resolver_ok": matrix_ok,
         "resolver_snapshot": snapshot,
+        "selection_result": {"provider": selected, "attempts": list(attempts)},
         "final_selection": {"provider": selected, "attempts": list(attempts)},
         "missing_config_envelope": resolver.MISSING_DB_CONFIG,
     }

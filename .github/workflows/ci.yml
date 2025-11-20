@@ -21,5 +21,6 @@ jobs:
       - run: ci/checks/check_env_pins.sh
       - run: ci/checks/check_cli_help.sh
       - run: ci/checks/check_evidence_index_hash.sh
+      - run: python ci/checks/check_bridge_consistency.py
       - run: ci/checks/check_mirror_schema.sh
       - run: ci/checks/check_final_lf.sh

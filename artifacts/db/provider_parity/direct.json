@@ -1,1 +1,1 @@
-{"attempts":[{"provider":"psycopg","reason":"primary_connect_failed","status":"error"}],"captured_at_utc":"2025-11-19T23:10:44Z","provider":"direct","reason":"primary_connect_failed","schema":"v1","status":"error"}
+{"attempts":[{"provider":"psycopg","reason":"primary_connect_failed","status":"error"}],"captured_at_utc":"2025-11-20T00:18:22Z","provider":"direct","reason":"primary_connect_failed","schema":"v1","status":"error"}
