@@ -1,4 +1,4 @@
 path: artifacts/db/boundary_view.readonly.proof.txt
 sha256: e86aa1373e4e5c4b8774506a99c4659e89e4fd2897f81b688265b73eca260aeb
 size_bytes: 198
-mtime_utc: 2025-11-19T22:21:08Z
+mtime_utc: 2025-11-19T23:10:47Z

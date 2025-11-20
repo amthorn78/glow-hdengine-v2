@@ -1,4 +1,4 @@
 path: artifacts/db/provider_parity/direct.json
-sha256: ead498fd144eb5cda5306253118cba7eaff5284d9a530ca66a5aec589b83c8c0
+sha256: ecc2ad5918c487f73fc62e146ea4a35b7ef5522a940a0512590e5ce3dbd67fac
 size_bytes: 215
-mtime_utc: 2025-11-19T22:21:08Z
+mtime_utc: 2025-11-19T23:10:49Z

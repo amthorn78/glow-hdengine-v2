@@ -19,3 +19,6 @@ postgres public.hde_body_graphs_current SELECT
 postgres public.hde_body_graphs_current TRIGGER
 postgres public.hde_body_graphs_current TRUNCATE
 postgres public.hde_body_graphs_current UPDATE
+
+ALTER DEFAULT PRIVILEGES:
+(none)
