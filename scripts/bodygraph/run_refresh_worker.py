@@ -22,8 +22,12 @@ POLICY = {
     "schema": "v1",
     "ttl_s": 604800,
     "swr_s": 86400,
-    "rate_limit": 60,
-    "cb": {"fail": 5, "window_s": 300, "cooldown_s": 900},
+    "rate_limit": {"requests_per_window": 60, "window_s": 60},
+    "circuit_breaker": {
+        "fail_threshold": 5,
+        "window_s": 300,
+        "cooldown_s": 900,
+    },
 }
 STATE_PATH = Path("artifacts/bodygraph/refresh_state.json")
 POLICY_SNAPSHOT = Path("artifacts/bodygraph/refresh_policy.snapshot.json")
@@ -120,13 +124,13 @@ def _refresh_due(state: RefreshState, now: float) -> bool:
 
 
 def _maybe_reset_rate_limit(state: RefreshState, now: float) -> None:
-    if now - state.window_start >= 60:
+    if now - state.window_start >= POLICY["rate_limit"]["window_s"]:
         state.window_start = now
         state.attempts_in_window = 0
 
 
 def _prune_failures(state: RefreshState, now: float) -> None:
-    window = POLICY["cb"]["window_s"]
+    window = POLICY["circuit_breaker"]["window_s"]
     state.failure_timestamps = [ts for ts in state.failure_timestamps if now - ts <= window]
 
 
@@ -150,7 +154,7 @@ def run_refresh(env: Mapping[str, object] | None = None) -> None:
     else:
         attempt_allowed = True
 
-    if attempt_allowed and state.attempts_in_window >= POLICY["rate_limit"]:
+    if attempt_allowed and state.attempts_in_window >= POLICY["rate_limit"]["requests_per_window"]:
         attempt_allowed = False
         status = 429
         attempt_reason = "rate_limited"
@@ -162,12 +166,14 @@ def run_refresh(env: Mapping[str, object] | None = None) -> None:
             status = 503
             attempt_reason = "breaker_cooldown"
             state.breaker_tripped_total += 1
-        elif len(state.failure_timestamps) >= POLICY["cb"]["fail"]:
+        elif len(state.failure_timestamps) >= POLICY["circuit_breaker"]["fail_threshold"]:
             attempt_allowed = False
             status = 503
             attempt_reason = "breaker_open"
             state.breaker_tripped_total += 1
-            state.breaker_open_until = max(state.breaker_open_until, now + POLICY["cb"]["cooldown_s"])
+            state.breaker_open_until = max(
+                state.breaker_open_until, now + POLICY["circuit_breaker"]["cooldown_s"]
+            )
 
     if attempt_allowed and safe_mode:
         attempt_allowed = False
@@ -212,8 +218,10 @@ def run_refresh(env: Mapping[str, object] | None = None) -> None:
             duration_ms = (time.monotonic() - start) * 1000.0
             state.refresh_failure_total += 1
             state.failure_timestamps.append(now)
-            if len(state.failure_timestamps) >= POLICY["cb"]["fail"]:
-                state.breaker_open_until = max(state.breaker_open_until, now + POLICY["cb"]["cooldown_s"])
+            if len(state.failure_timestamps) >= POLICY["circuit_breaker"]["fail_threshold"]:
+                state.breaker_open_until = max(
+                    state.breaker_open_until, now + POLICY["circuit_breaker"]["cooldown_s"]
+                )
                 state.breaker_tripped_total += 1
             status = 502
             attempt_reason = exc.code

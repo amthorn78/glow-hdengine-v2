@@ -30,9 +30,9 @@
     "title": "bodygraph.refresh_metrics"
   },
   {
+    "title": "bodygraph.refresh_policy.snapshot",
     "path": "artifacts/bodygraph/refresh_policy.snapshot.json",
-    "proof": "artifacts/bodygraph/refresh_policy.snapshot.json.path_proof.txt",
-    "title": "bodygraph.refresh_policy"
+    "proof": "artifacts/bodygraph/refresh_policy.snapshot.json.path_proof.txt"
   },
   {
     "path": "artifacts/bodygraph/source_invariance/ab.json",
