@@ -6,9 +6,9 @@
 
 * **Title:** PF19 — Review: Glow QA Guide  
 * **Status:** Canon  
-* **Version:** 0.4  
-* **Effective date:** 2025-11-17  
-* **Last Update Gate:** BN 7.1 Drain
+* **Version:** 0.5  
+* **Effective date:** 2025-11-21  
+* **Last Update Gate:** BN 7.6.6 Drain
 
 ---
 
@@ -52,11 +52,11 @@ The following governance tokens apply to PF19 itself; definitions and semantics 
 
   ---
 
-  ## **0.4 Principles & Single Homes (routing only)**
+### **0.4 Principles & Single Homes (routing only)**
 
-  ### **0.4.1 Intent**
+#### **0.4.1 Intent**
 
-Pin what PF19 owns (**process, checklists, playbooks**) versus where **bytes** and **policy** live.
+Pin what PF19 owns (**process, checklists, playbooks**) versus where **bytes** and **policy** live. PF19 stays names-only and routing-only.
 
 PF19:
 
@@ -64,7 +64,7 @@ PF19:
 
 * never restates transport bytes, schemas, or token tables.
 
-  ### **0.4.2 Single homes (titles-only)**
+#### **0.4.2 Single homes (titles-only)**
 
 PF19 routes to these existing single homes:
 
@@ -82,24 +82,79 @@ PF19 routes to these existing single homes:
 
 * **Process (PR-first):** PF06 — Epic-Process-Guide
 
-  ### **0.4.3 Core principles (names-only)**
+#### **0.4.3 Core principles (names-only)**
 
 PF19 assumes and reinforces these core QA principles:
 
-* **Titles-only cross-refs.** No duplicated bytes or schemas; always route to the owning PF by title.
+* **Titles-only cross-refs.**  
+   No duplicated bytes or schemas; always route to the owning PF by title. PF19 never redefines wire contracts or token semantics.
 
 * **Determinism & env pins (all environments).**  
-   All canonicalization, hashing, header snapshotting, and governed evidence capture **MUST** run with `LC_ALL=C`, `LANG=C`, `TZ=UTC`. These pins apply in **dev, stage, prod, and CI** whenever governed bytes are produced. (Definitions/tokens live in HDE-Governance / HDE-Build Checklist.)
+   All canonicalization, hashing, header snapshotting, and governed evidence capture **MUST** run with:
+
+  * `LC_ALL=C`
+
+  * `LANG=C`
+
+  * `TZ=UTC`
+
+* These pins apply in **dev, stage, prod, and CI** whenever governed bytes are produced. (Definitions/tokens live in HDE-Governance / HDE-Build Checklist; PF19 enforces their use in QA playbooks.)
 
 * **Same-PR parity for evidence.**  
-   The Human Evidence Index (`docs/evidence/INDEX.json` \+ `docs/evidence/INDEX.sha256`) and the Machine Mirror (`artifacts/evidence_index.jsonl`) are updated **together in the same PR** whenever evidence changes. (Schema/CI rules live in HDE-Schemas & Artifacts / HDE-Build Checklist.)
+   The Human Evidence Index (`docs/evidence/INDEX.json` \+ `docs/evidence/INDEX.sha256`) and the Machine Mirror (`artifacts/evidence_index.jsonl`) are updated **together in the same PR** whenever evidence changes. Schema and CI rules live in HDE-Schemas & Artifacts / HDE-Build Checklist; PF19 requires QA to treat “code change without evidence parity” as a failure, not a warning.
+
+* **Evidence completeness (Index ↔ Mirror ↔ path\_proof).**  
+   For governed evidence, QA is responsible for **completeness**, not just formatting:
+
+  * Every governed artifact under `docs/**` or `artifacts/**` **must** have:
+
+    * one Human Evidence Index entry in `docs/evidence/INDEX.json`,
+
+    * one Machine Mirror record in `artifacts/evidence_index.jsonl`, and
+
+    * one co-located `path_proof.txt` whose path is referenced by the Mirror record’s `proof_anchor`.
+
+  * Mirror entries and path-proofs follow schema and field semantics defined only in **HDE-Schemas & Artifacts** (titles-only).
+
+  * Lifecycle and OPS-managed artifacts (for example backup/restore/retention runs) still follow the same triple: **artifact → path\_proof → Mirror record**. If any leg is missing, QA must treat the evidence as **incomplete** and block tokens that depend on it.
 
 * **CI default CLOSED (rails).**  
-   CI pipelines run with rails closed by default (`SAFE_MODE=1`, `ALLOW_NETWORK=0`). Any job that opens rails **must** pin policy and attach governed evidence **in the same PR**.
+   CI pipelines run with rails closed by default (`SAFE_MODE=1`, `ALLOW_NETWORK=0`). Any job that opens rails **must**:
 
-* **A7 is Catalog-only.** A7 proofs run only on a **cataloged JSON success route** (Catalog/A7 surface); **Aux HEAD/304 are out of scope under EPIC-010**.
+  * pin SAFE policy (timeouts/retries/backoff from closed domains; no jitter) as defined in Governance, and
 
-**Industry anchors (reference‑only).** PF19’s QA rules and proofs align with: **IETF RFC 9110/9111** for HTTP semantics and caching (ETag strength/quoting, HEAD parity, 304 header/body rules); **RFC 8785 (JCS)** for JSON canonicalization (PF12 governs canonical JSON; PF19 cites JCS as an external anchor); **OWASP ASVS** for App FE/BE security verification; **NIST SSDF** and **SLSA** for supply‑chain QA and provenance expectations. PF19 remains titles‑only; bytes/schemas/tokens stay in PF05/PF12/PF04/PF09.
+  * attach governed evidence and update Index \+ Mirror in the same PR.
+
+* **A7 is Catalog-only.**  
+   A7 proofs run only on a **cataloged JSON success route** (Catalog/A7 surface); Aux HEAD/304 are out of scope under EPIC-010. PF19 never treats `/internal/*` (including `/internal/version`) as an A7 surface; ops/posture rules for those routes live in Governance.
+
+* **A7 depends on Endpoint Catalog.**  
+   A7 QA only runs when **Endpoint Catalog artifacts** exist and declare the route under test:
+
+  * `docs/ENDPOINTS_CATALOG.json` is present and valid per HDE-Schemas & Artifacts.
+
+  * The Catalog row for the Reader JSON success surface exists and is marked as a JSON success route.
+
+* If these conditions are not met, QA treats the A7 suite as **gated off**:
+
+  * no A7 tokens are claimed for that PR, and
+
+  * the missing or invalid Catalog entry is reported as a QA failure, not a cosmetic skip.
+
+* **Industry anchors (reference-only).**  
+   PF19’s QA rules and proofs align with:
+
+  * **IETF RFC 9110/9111** for HTTP semantics and caching (ETag strength/quoting, HEAD parity, 304 header/body rules);
+
+  * **RFC 8785 (JCS)** for JSON canonicalization (HDE-Schemas & Artifacts governs canonical JSON; PF19 cites JCS as an external anchor);
+
+  * **OWASP ASVS** for App FE/BE security verification;
+
+  * **NIST SSDF** and **SLSA** for supply-chain QA and provenance expectations.
+
+* PF19 remains titles-only; bytes, schemas, and token definitions stay in PF05/PF12/PF04/PF09.
+
+---
 
 ## 1\. Environments & surfaces map (names-only)
 
@@ -472,6 +527,28 @@ All snapshot and evidence-capture commands MUST run with:
 * `TZ=UTC`
 
 This applies to both Engine and App captures, ensuring that bytes and headers are stable across environments and CI runs.
+
+#### **4.3.1 Provenance vs filesystem time (`produced_at_utc` vs `mtime_utc`)**
+
+QA needs to distinguish **when evidence was produced** from **when files were last touched**:
+
+* `produced_at_utc` (Mirror field) records **when the evidence harness ran** and produced that Mirror record.
+
+* `mtime_utc` (stored in `path_proof.txt`) records the filesystem **last-modified timestamp** for the artifact file.
+
+Rules (semantics from **PF12 — HDE‑Schemas & Artifacts**):
+
+* Do **not** hand-edit `produced_at_utc`. If the run time is wrong, rerun the harness and let it write a new record.
+
+* It is acceptable for `mtime_utc` to change (for example when artifacts are moved or regenerated), but QA must treat any discrepancy as a prompt to re-run or re-verify the corresponding evidence, not as a reason to “patch” Mirror by hand.
+
+* QA checks for lifecycle or OPS‑managed artifacts should always read both:
+
+  * `produced_at_utc` (provenance: “when did we prove this?”), and
+
+  * `mtime_utc` (filesystem time: “what file state did we observe?”).
+
+Together, they give a stable, auditable trail for when evidence was captured and which bytes it covered.
 
 ---
 
@@ -1428,7 +1505,87 @@ Emitter parity is normative. CLI and SDK outputs **must** be in parity with HDE 
 
 ---
 
-## **6\. Catalog/A7 proofs (collected rules; HDE-specific bytes live elsewhere)**
+### **5.7 Prod QA playbook for EPIC‑011 (rails window)**
+
+**Anchor.** “Prod QA playbook (EPIC‑011 rails window)”
+
+**Purpose.** Define the QA responsibilities around the **short, supervised rails-open window** used to validate EPIC‑011 in prod, using the admin/vendor QA harness.
+
+**Single homes (titles-only)**
+
+* Day‑of runbook: **docs/run/RUN\_PROD\_QA.md**.
+
+* Vendor and DB call contracts: **PF05 — HDE‑CLI‑API‑Vendor‑Ref**.
+
+* DB posture, connectivity, and bridge parity artifacts: **PF12 — HDE‑Schemas & Artifacts**, **PF04 — HDE‑Governance**, **PF09 — HDE‑Build Checklist**.
+
+* SAFE rails policy and tokens: **PF04 — HDE‑Governance**.
+
+#### **5.7.1 Rails-open QA window (EPIC‑011)**
+
+During EPIC‑011, prod QA uses a **short rails-open window** with these constraints:
+
+* **Closed by default.** Prod and CI run with SAFE rails closed (`SAFE_MODE=1`, `ALLOW_NETWORK=0`) unless a specific, approved QA job opens them.
+
+* **Narrow, supervised window.** For the prod QA run:
+
+  * a single admin job opens rails for a bounded duration and a fixed test corpus;
+
+  * only the documented Engine/BodyGraph/vendor routes are exercised;
+
+  * no ad‑hoc or exploratory vendor calls are permitted.
+
+* **Immediate return to closed rails.** After the QA run finishes:
+
+  * rails are returned to the closed posture, and
+
+  * refusal and DB connectivity checks are run under closed rails (see below).
+
+QA’s job is to verify that the prod QA window followed this pattern and that evidence for both the rails‑open and rails‑closed runs was captured and indexed.
+
+#### **5.7.2 Admin/vendor QA harness (names-only)**
+
+The admin/vendor QA harness is implemented (names-only) as:
+
+* `scripts/ops/admin_vendor_qa.py` — a scripted run that:
+
+  * sets deterministic env pins (`LC_ALL=C`, `LANG=C`, `TZ=UTC`);
+
+  * uses synthetic identities and fixed tuples (see synthetic-identity docs and PF12) to exercise:
+
+    * BodyGraph source selection and invariance,
+
+    * compat math and Reader envelopes (via `showcompat` / Reader),
+
+    * Aux narrative previews,
+
+  * records governed artifacts under `artifacts/**` (for example CLI AB/BA/summary JSON, BodyGraph snapshots, A7 proofs).
+
+The harness must **not** introduce its own retry or backoff policy; vendor SAFE behaviour and retry semantics remain defined only in PF04/PF05.
+
+QA is responsible for:
+
+* confirming that the harness ran with the expected env pins and rails posture;
+
+* checking that the expected governed artifacts were produced and indexed (using the checklists in §9.2 and §9.5); and
+
+* treating missing or extra artifacts as QA failures, not as optional noise.
+
+#### **5.7.3 Closed-rails proofs after the window**
+
+Immediately after the rails‑open run, QA must ensure that:
+
+* a closed‑rails refusal proof is captured under the path defined in **PF12** (for example `artifacts/proofs/ops_refusal_proof.txt`, titles-only); and
+
+* DB connectivity evidence is captured for prod, matching `DB_CONN_ENV_OK` semantics (presence‑order selection between direct DB and bridge, numeric‑free error on total failure).
+
+Both sets of artifacts must be:
+
+* indexed in `docs/evidence/INDEX.json` and mirrored in `artifacts/evidence_index.jsonl` in the same PR; and
+
+* accompanied by co-located `path_proof.txt` entries.
+
+  ## **6\. Catalog/A7 proofs (collected rules; HDE-specific bytes live elsewhere)**
 
 HDE-specific. Transport bytes and route contract live in **PF05 — HDE-CLI-API-Vendor-Ref**; policy and tokens in **PF04 — HDE-Governance**; schemas in **PF12 — HDE-Schemas & Artifacts** (titles-only).
 
@@ -1568,7 +1725,87 @@ A single **composite A7 proof JSON** (or records-only JSONL) **MUST** be produce
 
 ---
 
-## **7\. Evidence & indexing reference (quick rules)**
+## **7\. BodyGraph refresh & observability QA**
+
+**Anchor.** “BodyGraph refresh & observability QA”
+
+**Purpose.** Make the BodyGraph evidence and privacy guarantees testable, using the governed artifacts defined in PF12.
+
+**Single homes (titles-only)**
+
+* BodyGraph schemas and artifacts: **PF12 — HDE‑Schemas & Artifacts**.
+
+* Vendor SAFE and BodyGraph source selection rules: **PF04 — HDE‑Governance**, **PF05 — HDE‑CLI‑API‑Vendor‑Ref**.
+
+* Metrics and logs privacy posture: **PF04 — HDE‑Governance**.
+
+### **7.1 Evidence artifacts (BodyGraph)**
+
+QA expects the following governed artifacts (paths are normative; schema lives in PF12):
+
+* `artifacts/bodygraph/source_selection.snapshot.json`
+
+* `artifacts/bodygraph/source_invariance/ab.json`
+
+* `artifacts/bodygraph/source_invariance/ba.json`
+
+* `artifacts/bodygraph/source_invariance/summary.json`
+
+* `artifacts/bodygraph/refresh_policy.snapshot.json`
+
+* `artifacts/bodygraph/metrics.snapshot.json`
+
+* `artifacts/bodygraph/keys_only.logs.sample`
+
+Each artifact must be indexed in `docs/evidence/INDEX.json` and mirrored in `artifacts/evidence_index.jsonl` with a co-located `path_proof.txt` (see §4.3 and §9.2).
+
+### **7.2 Refresh policy QA**
+
+For **refresh\_policy.snapshot.json**, QA must ensure that:
+
+* the refresh worker (or equivalent job) has been run long enough in the target environment to populate non-trivial `sample_counts` (PF12 defines exact fields and semantics);
+
+* the snapshot corresponds to the same release and BodyGraph configuration that will ship; and
+
+* any change to refresh policy logic or thresholds is accompanied by a new snapshot and a new Mirror record in the same PR.
+
+QA treats a zeroed or obviously stale `sample_counts` field as a failure to meet refresh-policy QA, not as a cosmetic issue.
+
+### **7.3 Observability and privacy QA**
+
+For `metrics.snapshot.json` and `keys_only.logs.sample`, QA must:
+
+* verify that metrics cover the BodyGraph flows exercised during QA (names and labels as defined in PF12/PF04);
+
+* confirm that:
+
+  * logs are **keys-only** (no raw birth data, no payload bodies, no secrets);
+
+  * metrics and logs do not contain PII or secret values; and
+
+  * labels are bounded and match the expected dimensions (for example `route`, `outcome`, `rails_state`, `timeout_profile`, `attempt_idx`).
+
+If any privacy or labeling violations are found, QA blocks the release until the logging/metrics configuration is corrected and new snapshots are captured and indexed.
+
+---
+
+**Acceptance / artifact impact**
+
+* PF19 now codifies QA expectations around the BodyGraph artifacts already defined in PF12:
+
+  * `artifacts/bodygraph/source_selection.snapshot.json`
+
+  * `artifacts/bodygraph/source_invariance/*.json`
+
+  * `artifacts/bodygraph/refresh_policy.snapshot.json`
+
+  * `artifacts/bodygraph/metrics.snapshot.json`
+
+  * `artifacts/bodygraph/keys_only.logs.sample`
+
+* Tokens such as `BG_SOURCE_SELECTION_OK`, `BG_SOURCE_INVARIANCE_OK`, `BG_TTL_SWR_OK`, `BG_PRIVACY_OK`, `BG_METRICS_OK` remain defined in PF04/PF12; PF19 just grounds how QA should interpret them.
+
+  ## **8\. Evidence & indexing reference (quick rules)**
 
 * **Header names lower‑case.** All governed header snapshots store header names in **lower‑case**; values are verbatim. *Acceptance token:* **`SNAPSHOT_HEADER_LOWERCASE_OK`** (definition lives in PF05/PF09).  
 * **Same-PR rule.**  
@@ -1596,7 +1833,7 @@ A single **composite A7 proof JSON** (or records-only JSONL) **MUST** be produce
 
 ---
 
-## **8\. Tokens glossary (names-only; sources in PF04/PF09)**
+## **9\. Tokens glossary (names-only; sources in PF04/PF09)**
 
 PF19 lists names only. Token spellings and normative definitions live in **PF04 — HDE-Governance** and **PF09 — HDE-Build Checklist**.
 
@@ -1674,11 +1911,11 @@ PF19 lists names only. Token spellings and normative definitions live in **PF04 
 
 ---
 
-## **9\. Templates & harnesses (to be filled; titles-only anchors)**
+## **10\. Templates & harnesses (to be filled; titles-only anchors)**
 
 This section names the standard QA templates and harnesses. Concrete formats, scripts, and CI wiring live in **PF09 — HDE-Build Checklist** and **PF12 — HDE-Schemas & Artifacts** (titles-only).
 
-### **9.1 Pre-commit checklist (CI job stub)**
+### **10.1 Pre-commit checklist (CI job stub)**
 
 **Anchor.** “Pre-commit QA checklist (PF09 CI stub)”  
  **Purpose.** A copyable block that teams can drop into their CI config to enforce:
@@ -1696,7 +1933,7 @@ This section names the standard QA templates and harnesses. Concrete formats, sc
 
 ---
 
-### **9.2 Post-commit capture checklist (headers \+ index)**
+### **10.2 Post-commit capture checklist (headers \+ index)**
 
 **Anchor.** “Post-commit evidence capture checklist”  
  **Purpose.** A step-by-step recipe to:
@@ -1709,14 +1946,20 @@ This section names the standard QA templates and harnesses. Concrete formats, sc
 
 * **Governed locations only.** All indexed artifacts **must** live under `artifacts/**` or `docs/**`. Transient/generator paths are **forbidden** as sources for indexed evidence. ← **added**
 
-* normalize header names to lower-case before persisting governed snapshots
+* normalize header names to lower-case before persisting governed snapshots  
+* For each new or changed governed artifact under `docs/**` or `artifacts/**`:
 
-**Notes.**  
- PF19 describes the sequence; PF09 carries the concrete shell/CI snippets for running it.
+  * create or update a co-located `path_proof.txt` file, and
+
+  * ensure there is exactly one Mirror record whose `proof_anchor` points at that `path_proof.txt`.
+
+* Treat “artifact present but no path\_proof” or “path\_proof present but no Mirror record” as **QA failures**, not as minor hygiene issues.
+
+* For lifecycle and OPS‑managed artifacts (for example backup/restore probes), confirm that the associated evidence changes (artifact \+ path\_proof \+ Mirror) land in the **same PR** as the code or configuration change they support.
 
 ---
 
-### **9.3 Validated-tuple QA harness (Aux & CLI parity)**
+### **10.3 Validated-tuple QA harness (Aux & CLI parity)**
 
 **Anchor.** “Validated-tuple QA harness for Aux & CLI parity” ← **heading & anchor adjusted**  
  **Purpose.** A small, repeatable harness that:
@@ -1738,7 +1981,7 @@ This section names the standard QA templates and harnesses. Concrete formats, sc
 
 ---
 
-### **9.4 A7 proof capture recipe**
+### **10.4 A7 proof capture recipe**
 
 **Anchor.** “A7 proof capture recipe (Catalog /reader)”  
  **Purpose.** A reusable recipe that:
@@ -1751,12 +1994,23 @@ This section names the standard QA templates and harnesses. Concrete formats, sc
 
 * builds and validates composite A7 proof JSON against PF12 schema
 
-**Notes.**  
- PF19 defines what must be proven; PF09 and PF12 provide the concrete CLI/curl/runner scripts and schema.
+**Preconditions (merge gate).**
+
+Before capturing any A7 proofs, the harness must:
+
+* verify that `docs/ENDPOINTS_CATALOG.json` exists and that the Reader JSON success route is present and marked as a Catalog JSON surface; and
+
+* abort with a clear QA failure if the Catalog entry is missing or invalid (no partial A7 runs).
+
+After capturing proofs, the harness must:
+
+* update `docs/evidence/INDEX.json` \+ `.sha256` and `artifacts/evidence_index.jsonl` in the same PR, and
+
+* run the mirror quick-check (§9.5). Failure to index or mirror any A7 artifact means the A7 gate is **not satisfied**, and no A7 tokens may be claimed for that PR.
 
 ---
 
-### **9.5 Mirror schema quick-check**
+### **10.5 Mirror schema quick-check**
 
 **Anchor.** “Machine mirror schema quick-check”  
  **Purpose.** A small tool or CI step that:
@@ -1778,9 +2032,9 @@ This section names the standard QA templates and harnesses. Concrete formats, sc
 
 ---
 
-## **10\. Roles & RACI (QA)**
+## **11\. Roles & RACI (QA)**
 
-### **10.1 QA roles (titles-only pointer to PF06)**
+### **11.1 QA roles (titles-only pointer to PF06)**
 
 Process flow, handoffs, and non-QA responsibilities are defined in **PF06 — Epic-Process-Guide**. PF19 only adds QA-specific duties.
 
@@ -1854,7 +2108,7 @@ Process flow, handoffs, and non-QA responsibilities are defined in **PF06 — Ep
 
   ---
 
-  ### **10.2 Component ownership**
+  ### **11.2 Component ownership**
 
 PF19 is the orchestration guide for QA. Day-to-day ownership of specific playbooks lives with the corresponding component leads:
 
@@ -1890,9 +2144,9 @@ For each component:
 
   ---
 
-  ## **11\. Change control**
+  ## **12\. Change control**
 
-  ### **11.1 Living document**
+  ### **12.1 Living document**
 
 * PF19 is a living QA guide.
 
@@ -1912,7 +2166,7 @@ For each component:
 
   * use clear, minimal redlines when updating PF19.
 
-    ### **11.2 Supersession rule (PF10 addenda)**
+    ### **12.2 Supersession rule (PF10 addenda)**
 
 * PF10 addenda are ordered. When multiple PF10 addenda address the same topic, the newer addendum supersedes the earlier.
 

@@ -4,12 +4,12 @@
 
 **Title:** PF12-Canon-HDE-Schemas and Artifacts
 
-**Version:** v1.2.8
+**Version:** v1.3
 
 **Status:** Canon
 
-**Effective date:** 2025-11-17  
-**Last Update Gate:** BN 7.1 Drain 
+**Effective date:** 2025-11-20  
+**Last Update Gate:** BN 7.5 Drain 
 
 ## **0.2 Scope (single home)**
 
@@ -21,7 +21,9 @@
 
 **Machine Evidence Mirror (governed here).** The JSONL mirror at `artifacts/evidence_index.jsonl` is a governed artifact (records-only); its content and schema are owned here (see §8.3). CI enforces 1:1 parity with the Human Evidence Index. Each record MUST include fields sufficient for proof and reproducibility (`sha256`, `size_bytes`, `produced_at_utc`, a `discovered_physical_path`, and a `proof_anchor` to a transcript plus on-disk stat). Path-proofs are stored alongside each artifact. Bytes are produced by build steps and validated in CI per §8; determinism follows §4; all comparisons run with `LC_ALL=C`, `TZ=UTC`, canonical JSON (UTF-8, sorted keys, compact, exactly one LF). CI hygiene (pointer; detailed rules in §8.3): mirror is canonical JSONL; unknown-key rejection is enforced; ASCII field order and sort-before-write are required; exactly one mirror file must exist. Governed locations only: evidence must live under governed repo paths (for example, `artifacts/**`, `docs/**`); transient generator paths are disallowed (details §8.3 and §8.6). Governed evidence families include Endpoint Catalog proofs, CLI parity set, `/internal/version` ops proof, DB posture snapshots, and BodyGraph artifacts enumerated in §8.6.
 
-**Routing by title only.** Math arithmetic (scoring, thresholds, preimage recipe) and transport bytes (Reader, CLI, vendor) are routed by title only to their owning documents — HDE Math Spec, HDE-CLI-API-Vendor Ref, HDE-Governance, HDE Architecture — and are not duplicated here.
+**Routing by title only.** Math arithmetic (scoring, thresholds, preimage recipe) and transport bytes (Reader, CLI, vendor) are routed by title only to their owning documents — HDE-Math-Spec, HDE-Governance, HDE-CLI-API-Vendor-Ref, HDE-Architecture — and are not duplicated here.
+
+**Token Registry and acceptance hints (names-only).** HDE-Governance owns the Token Registry and the semantics of all acceptance tokens. PF12 binds those tokens to concrete artifact shapes and Evidence Index / Machine Mirror records via “Acceptance hints (names-only)” lists in later sections; it does not redefine semantics. PF09-Canon-HDE-Build-Checklist is a consumer-only view: its token rosters must be a subset of the Token Registry / PF12 names and may not introduce new token names.
 
 **Process and PR workflow.** The “update repo docs and Evidence Index in the same PR” rule lives in Epic-Process-Guide (titles only).
 
@@ -1599,113 +1601,241 @@ This document routes by **title only**. Do not restate or duplicate content from
 
 ## **8.3 Machine Evidence Index — JSONL mirror (records-only) \[Required-Now\]**
 
-**Single home and path**  
- Path (fixed): `artifacts/evidence_index.jsonl` (there must be exactly one mirror file).  
- Governed locations only: every evidence file referenced by the mirror MUST live under governed repo paths (e.g., `artifacts/**`, `docs/**`). Transient generator paths (scratch/temp) are disallowed; mirror entries pointing to non-governed paths fail CI.
+**Single home and path**
 
-**Format (canonical JSONL)**  
- One JSON object per line.  
- §4 canonical JSON for each line: UTF-8 (no BOM); sorted keys; compact separators; ends with exactly one `\n`; no blank lines; no trailing spaces.  
- Unknown keys are rejected (CI-blocking).
+* **Path (fixed).** `artifacts/evidence_index.jsonl` (there must be exactly one mirror file in the repo).
+
+* **Governed locations only.** Every evidence file referenced by the mirror MUST live under governed repo paths (for example, `artifacts/**`, `docs/**`). Transient generator paths (scratch/temp) are disallowed; mirror entries pointing to non-governed paths fail CI.
+
+* **Tracked files (no `.gitignore` for governed artifacts).** Governed evidence artifacts and their `artifacts/path_proofs/...` files MUST NOT be ignored by `.gitignore`. Governed locations are expected to be tracked; using `.gitignore` to hide governed artifacts or path-proofs is invalid and should be treated as a QA failure.
+
+**Format (canonical JSONL)**
+
+* One JSON object per line.
+
+* Canonical JSON per §4 for each line:
+
+  * UTF-8 (no BOM).
+
+  * Sorted keys.
+
+  * Compact separators.
+
+  * Exactly one trailing `\n` per line.
+
+  * No blank lines; no trailing spaces.
+
+* Unknown keys are rejected (CI-blocking).
 
 **Minimum record schema (reject unknown keys)**
 
-{
+Each line in the mirror uses at least the following schema; unknown keys are rejected:
 
-  "artifact\_key": "\<string\>",
+{  
+ "artifact\_key": "",  
+ "role": "\<proof|golden|snapshot|script|log\>",  
+ "sha256": "\<lowercase 64-hex\>",  
+ "size\_bytes": ,  
+ "produced\_at\_utc": "",  
+ "discovered\_physical\_path": "",  
+ "proof\_anchor": ""  
+ }
 
-  "role": "\<proof|golden|snapshot|script|log\>",
+**Field order and write discipline (merge-blocking)**
 
-  "sha256": "\<lowercase 64-hex\>",
+* ASCII field order (exact):
 
-  "size\_bytes": \<non-negative integer\>,
+   `artifact_key, discovered_physical_path, produced_at_utc, proof_anchor, role, sha256, size_bytes`.
 
-  "produced\_at\_utc": "\<UTC ISO-8601 with Z\>",
+* Sort-before-write by the tuple `(artifact_key, discovered_physical_path)`.
 
-  "discovered\_physical\_path": "\<repo-relative POSIX path\>",
+* Uniqueness: the pair `(artifact_key, discovered_physical_path)` is unique; duplicates fail CI.
 
-  "proof\_anchor": "\<transcript ref or on-disk stat path\>"
+* Single mirror file: only one `artifacts/evidence_index.jsonl` may exist in the repo.
 
-}
+**Produced\_at\_utc vs mtime\_utc**
 
-**Field order & write discipline (merge-blocking)**  
- ASCII field order (exact): `artifact_key`, `discovered_physical_path`, `produced_at_utc`, `proof_anchor`, `role`, `sha256`, `size_bytes`.  
- Sort-before-write by the tuple `(artifact_key, discovered_physical_path)`.  
- Uniqueness: the pair `(artifact_key, discovered_physical_path)` is unique; duplicates fail CI.  
- Single mirror file: only one `artifacts/evidence_index.jsonl` may exist in the repo.
+* `produced_at_utc` records when the evidence was **logically produced** (the event time). It is part of the mirror record and is used to reason about when posture snapshots and QA runs occurred.
 
-**Acceptance hints (titles-only; tokens live in HDE-Governance §2.0)**  
- MACHINE\_MIRROR\_UPDATED\_OK, EVIDENCE\_INDEX\_MIRROR\_OK, EVIDENCE\_INDEX\_UPDATED\_OK, EVIDENCE\_INDEX\_HASH\_OK, CI\_CHECK\_MIRROR\_SCHEMA\_OK, CI\_CHECK\_FINAL\_LF\_OK, EVIDENCE\_PATHS\_VALIDATED\_OK.
+* `mtime_utc` is recorded in the per-artifact path-proof (`artifacts/path_proofs/...`) as the filesystem modification time for the artifact.
 
-**Join to the human index (parity & proofs)**  
- 1:1 parity: every §8.6 Evidence Index entry has exactly one mirror record, and every mirror record has a corresponding human entry.  
- `artifact_key` equals the human Index title; `discovered_physical_path` equals the human Index path.  
- Path-proofs: each artifact’s directory contains a stored path-proof (e.g., `path_proof.txt` with a stat transcript). The mirror record’s `proof_anchor` must exactly match the stored path-proof for that artifact.
+* Differences between `produced_at_utc` and `mtime_utc` are allowed but must be truthful — no “backdating” or forward-dating to distort ordering. QA may rely on `produced_at_utc` as the primary ordering key for evidence; disagreements should be rare and explainable in the PR.
 
-**Determinism**  
- All checks run with `LC_ALL=C`, `LANG=C`, `TZ=UTC`; JSONL records are canonical and LF-terminated (exactly one `\n` per record).
+**Acceptance hints (titles-only; tokens live in HDE-Governance §2.0)**
 
-**Header snapshots in artifacts (normative)**  
- Normative (snapshots): For artifacts that capture headers, header names MUST be lower-case and values MUST be verbatim; exact checks apply to values. (Wire casing may differ and is validated by transport owners.)  
- Acceptance: SNAPSHOT\_HEADER\_LOWERCASE\_OK.
+Names-only list of tokens that gate the mirror and its parity with the human index:
 
-**Refusal proofs (policy note)**  
- Refusal proofs are error/ops evidence (not JSON success). They must not set `ETag`, `Vary`, or compression, and must use  
- `Content-Type: application/json; charset=utf-8`.  
- The refusal log allow-list is exactly:  
- `{at, route, status, duration_ms, idempotence_hash, release_id}`.  
- Records with any additional fields fail policy checks.  
- Rate-limit (429) evidence uses a different allow-list and is governed by HDE-Governance. Do not mix refusal and 429 fields in the mirror.
+* `MACHINE_MIRROR_UPDATED_OK`
 
-**Role usage notes (non-normative examples)**  
- proof → `artifacts/db/ddl_fingerprint.json`, `artifacts/proofs/endpoints_env_gate_proof.log`, `artifacts/bodygraph/source_invariance/ab.json`, `/ba.json`, `/summary.json`  
- golden → `catalog/manifest.json`, `catalog/schemas/*.json`  
- snapshot → `artifacts/runtime/env_matrix.snapshot.json`, `artifacts/reader/endpoints_snapshot.json`, `artifacts/bodygraph/refresh_policy.snapshot.json`, `artifacts/bodygraph/metrics.snapshot.json`  
- script → `scripts/card_close.sh`, `scripts/migration_runner.sh`  
- log → `artifacts/db/migration_runner.log`, `artifacts/proofs/headers_probe.log`, `artifacts/bodygraph/keys_only.logs.sample` (sanitized; keys-only, no PII per Governance)
+* `EVIDENCE_INDEX_MIRROR_OK`
 
-**Acceptance hints (titles-only; tokens live in HDE-Governance §2.0)**  
- EVIDENCE\_INDEX\_MIRROR\_OK, EVIDENCE\_INDEX\_UPDATED\_OK, EVIDENCE\_PATHS\_VALIDATED\_OK,  
- JSON\_CANONICAL\_CHECK\_OK, CI\_CHECK\_FINAL\_LF\_OK, CI\_CHECK\_MIRROR\_SCHEMA\_OK,  
- EVIDENCE\_INDEX\_HASH\_OK, EVIDENCE\_PATH\_PROOFS\_OK.
+* `EVIDENCE_INDEX_UPDATED_OK`
 
----
+* `EVIDENCE_INDEX_HASH_OK`
+
+* `CI_CHECK_MIRROR_SCHEMA_OK`
+
+* `CI_CHECK_FINAL_LF_OK`
+
+* `EVIDENCE_PATHS_VALIDATED_OK`
+
+* `JSON_CANONICAL_CHECK_OK`
+
+* `EVIDENCE_PATH_PROOFS_OK`
+
+**Join to the human index (parity, proofs, same-PR rule)**
+
+* **1:1 parity.** Every §8.6 Evidence Index entry has exactly one mirror record, and every mirror record has a corresponding human entry:
+
+  * `artifact_key` equals the Human Index title.
+
+  * `discovered_physical_path` equals the Human Index path.
+
+* **Path-proofs.** Each artifact’s directory contains a stored path-proof (for example, `path_proof.txt` with a stat transcript). The mirror record’s `proof_anchor` must exactly match the stored path-proof for that artifact.
+
+* **Same-PR rule.** For every governed artifact in §8.6, any change to the artifact **MUST** update, in the same PR:
+
+  * The artifact bytes on disk under a governed path.
+
+  * Its `artifacts/path_proofs/...` path-proof file (`proof_anchor` target).
+
+  * The corresponding machine mirror record in `artifacts/evidence_index.jsonl`.
+
+  * The Human Evidence Index entry in `docs/evidence/INDEX.json` and its hash sentinel `docs/evidence/INDEX.sha256`.
+
+* Mirror or index entries that refer to non-existent artifacts or stale path-proofs are invalid and must be corrected, not ignored.
+
+**Determinism**
+
+* All checks run with `LC_ALL=C`, `LANG=C`, `TZ=UTC`.
+
+* JSONL records are canonical and LF-terminated (exactly one `\n` per record).
+
+**Header snapshots in artifacts (normative)**
+
+* For artifacts that capture headers, header names MUST be lower-case and values MUST be verbatim; exact checks apply to values.
+
+* Wire casing may differ and is validated by transport owners.
+
+* Acceptance hint (names-only): `SNAPSHOT_HEADER_LOWERCASE_OK`.
+
+**Refusal proofs (policy note)**
+
+* Refusal proofs are error/ops evidence (not JSON success). They must:
+
+  * Not set `ETag`, `Vary`, or compression headers.
+
+  * Use `Content-Type: application/json; charset=utf-8`.
+
+* The refusal log allow-list for JSON body fields is exactly:
+
+   `{at, route, status, duration_ms, idempotence_hash, release_id}`
+
+* Records with any additional fields fail policy checks.
+
+* Rate-limit (429) evidence uses a different allow-list and is governed by HDE-Governance. Do not mix refusal and 429 fields in the mirror.
+
+**Role usage notes (non-normative examples)**
+
+* `proof` → `artifacts/db/ddl_fingerprint.json`, `artifacts/proofs/endpoints_env_gate_proof.log`, `artifacts/bodygraph/source_invariance/ab.json`, `/ba.json`, `/summary.json`
+
+* `golden` → `catalog/manifest.json`, `catalog/schemas/*.json`
+
+* `snapshot` → `artifacts/runtime/env_matrix.snapshot.json`, `artifacts/reader/endpoints_snapshot.json`, `artifacts/bodygraph/refresh_policy.snapshot.json`, `artifacts/bodygraph/metrics.snapshot.json`
+
+* `script` → `scripts/card_close.sh`, `scripts/migration_runner.sh`
+
+* `log` → `artifacts/db/migration_runner.log`, `artifacts/proofs/headers_probe.log`, `artifacts/bodygraph/keys_only.logs.sample` (sanitized; keys-only, no PII per Governance)
 
 ### **8.3.1 Refusal proof (single-file canonical) \[Required-Now\]**
 
-Path (fixed). `artifacts/proofs/ops_refusal_proof.txt` — single-file refusal: headers block → one blank line → LF-terminated JSON body. Index in both `docs/evidence/INDEX.json` (human) and `artifacts/evidence_index.jsonl` (machine) in the same PR; include a co-located `path_proof.txt` and reference it via `proof_anchor` in the mirror. (Policy/tokens live in HDE-Governance.)
+**Path (fixed)**
 
-Purpose. Capture a refusal response verbatim (headers \+ JSON body) for ops/evidence. This is not a JSON success route.
+* `artifacts/proofs/ops_refusal_proof.txt` — single-file refusal:
 
-**File format (exact)**  
- The file consists of a header block, one blank line, then a JSON body. The file ends with exactly one `\n`.
+  * Header block.
 
-**Header block**  
- One header per line, format: `<lowercase-name>: <value>`  
- Required: `content-type: application/json; charset=utf-8`  
- Forbidden: `etag`, `vary`, `content-encoding`  
- Other headers may appear as governed elsewhere (e.g., date).  
- Header names are lower-case; values are verbatim. Order is preserved as captured.
+  * One blank line.
 
-**Separator**  
- Exactly one blank line (a single `\n`) between headers and body.
+  * LF-terminated JSON body.
 
-**Body (JSON, single line)**  
- Canonical JSON per §4: UTF-8, sorted keys, compact separators, one trailing `\n`.  
- Fields must conform to the refusal allow-list:  
- `{at, route, status, duration_ms, idempotence_hash, release_id}`.  
- Unknown keys fail policy checks.
+* Index this file in both `docs/evidence/INDEX.json` (human) and `artifacts/evidence_index.jsonl` (machine) in the same PR.
 
-**Mirror linkage**  
- The mirror record uses `role:"log"` and must point to this file via `discovered_physical_path`.  
- Each artifact directory also contains a `path_proof.txt` stat transcript; the mirror `proof_anchor` must exactly match that path-proof entry.
+* Include a co-located `path_proof.txt` and reference it via `proof_anchor` in the mirror.
 
-**Validation checks (CI)**  
- File ends with exactly one `\n`.  
- Headers lower-case; required header present; forbidden headers absent.  
- Exactly one blank line between headers and body.  
- Body is single-line canonical JSON with the refusal allow-list only.  
- Determinism: checks run with `LC_ALL=C`, `TZ=UTC`.
+* Policy and tokens live in HDE-Governance (titles only).
+
+**Purpose**
+
+* Capture a refusal response verbatim (headers \+ JSON body) for ops/evidence.
+
+* This is not a JSON success route.
+
+**File format (exact)**
+
+* The file consists of:
+
+  * A header block.
+
+  * Exactly one blank line.
+
+  * A JSON body.
+
+* The file ends with exactly one `\n`.
+
+**Header block**
+
+* One header per line, format: `<lowercase-name>: <value>`.
+
+* Required header:
+
+   `content-type: application/json; charset=utf-8`
+
+* Forbidden headers: `etag`, `vary`, `content-encoding`.
+
+* Other headers may appear as governed elsewhere (for example, `date`).
+
+* Header names are lower-case; values are verbatim. Order is preserved as captured.
+
+**Separator**
+
+* Exactly one blank line (a single `\n`) between headers and body.
+
+**Body (JSON, single line)**
+
+* Canonical JSON per §4:
+
+  * UTF-8.
+
+  * Sorted keys.
+
+  * Compact separators.
+
+  * One trailing `\n`.
+
+* Fields must conform to the refusal allow-list:
+
+   `{at, route, status, duration_ms, idempotence_hash, release_id}`
+
+* Unknown keys fail policy checks.
+
+**Mirror linkage**
+
+* The mirror record uses `role:"log"` and must point to this file via `discovered_physical_path`.
+
+* The artifact directory also contains a `path_proof.txt` stat transcript; the mirror `proof_anchor` must exactly match that path-proof entry.
+
+**Validation checks (CI)**
+
+* File ends with exactly one `\n`.
+
+* Headers lower-case; required header present; forbidden headers absent.
+
+* Exactly one blank line between headers and body.
+
+* Body is single-line canonical JSON with the refusal allow-list only.
+
+* Determinism: checks run with `LC_ALL=C`, `TZ=UTC`.
 
 **Example (illustrative)**
 
@@ -1714,129 +1844,194 @@ content-type: application/json; charset=utf-8
 
 {"at":"2025-11-07T21:00:00Z","route":"/ops/rails/refusal","status":503,"duration\_ms":12,"idempotence\_hash":"\<64-hex\>","release\_id":"\<64-hex\>"}
 
-**Acceptance hints (titles-only; tokens live in HDE-Governance)**  
- OPS\_REFUSAL\_FILE\_FORMAT\_OK, OPS\_REFUSAL\_HEADERS\_OK, OPS\_REFUSAL\_BODY\_OK, OPS\_REFUSAL\_MIRROR\_LINK\_OK.
+**Acceptance hints (titles-only; tokens live in HDE-Governance)**
 
----
+* `OPS_REFUSAL_FILE_FORMAT_OK`
+
+* `OPS_REFUSAL_HEADERS_OK`
+
+* `OPS_REFUSAL_BODY_OK`
+
+* `OPS_REFUSAL_MIRROR_LINK_OK`
 
 ### **8.3.2 Environment matrix snapshot (singleton, v3) \[Required-Now\]**
 
-Path (fixed). `artifacts/runtime/env_matrix.snapshot.json` — one file per repo (singleton).
+**Path (fixed)**
 
-Purpose. Record the default rails posture and determinism pins across environments, as captured by the build/test harness. PF04 owns policy & tokens; PF07 lists names-only env inventory; PF12 owns this artifact’s schema and indexing.
+* `artifacts/runtime/env_matrix.snapshot.json` — one file per repo (singleton).
 
-Schema (v3; reject unknown keys). Canonical JSON per §4 (UTF-8; sorted keys; compact; exactly one LF).  
- Minimum fields:
+**Purpose**
 
-{
+* Record the default rails posture and determinism pins across environments, as captured by the build/test harness.
 
-  "schema\_version": 3,
+* HDE-Governance owns policy and tokens; Glow-Infrastructure lists names-only env inventory; PF12 owns this artifact’s schema and indexing.
 
-  "default\_rails": {
+**Schema (v3; reject unknown keys)**
 
-    "dev":   {"SAFE\_MODE": 0, "ALLOW\_NETWORK": 1},
+* Canonical JSON per §4 (UTF-8; sorted keys; compact; exactly one LF).
 
-    "stage": {"SAFE\_MODE": 0, "ALLOW\_NETWORK": 1},
+Minimum fields:
 
-    "prod":  {"SAFE\_MODE": 1, "ALLOW\_NETWORK": 0},
+{  
+ "schema\_version": 3,  
+ "default\_rails": {  
+ "dev": {"SAFE\_MODE": 0, "ALLOW\_NETWORK": 1},  
+ "stage": {"SAFE\_MODE": 0, "ALLOW\_NETWORK": 1},  
+ "prod": {"SAFE\_MODE": 1, "ALLOW\_NETWORK": 0},  
+ "CI": {"SAFE\_MODE": 1, "ALLOW\_NETWORK": 0}  
+ },  
+ "determinism\_pins": {"LC\_ALL": "C", "LANG": "C", "TZ": "UTC"},  
+ "presence": {  
+ "DATABASE\_URL": {"present": true},  
+ "DB\_BRIDGE\_URL": {"present": false},  
+ "db\_allow\_bridge\_in\_prod": {"present": false}  
+ },  
+ "notes": \[\]  
+ }
 
-    "CI":    {"SAFE\_MODE": 1, "ALLOW\_NETWORK": 0}
+**Field rules**
 
-  },
+* Uppercase rails keys (`SAFE_MODE`, `ALLOW_NETWORK`) and env names as shown.
 
-  "determinism\_pins": {"LC\_ALL": "C", "LANG": "C", "TZ": "UTC"},
+* `schema_version` MUST equal `3`.
 
-  "presence": {
+* `presence.*.present` are booleans indicating whether the variable (or prod guard) is set at capture time; do not record secrets or values.
 
-    "DATABASE\_URL": {"present": true},
+* `notes` is optional (short strings; no secrets).
 
-    "DB\_BRIDGE\_URL": {"present": false},
+**Indexing (both indices; same PR)**
 
-    "db\_allow\_bridge\_in\_prod": {"present": false}
+* Add a titles/paths entry in §8.6 and a mirror record (`role:"snapshot"`) in `artifacts/evidence_index.jsonl` with `proof_anchor` to a co-located `path_proof.txt` (stat transcript).
 
-  },
+* Mirror schema and “single mirror file” rule are per §8.3.
 
-  "notes": \[\]
+**Acceptance hints (names-only; tokens live in HDE-Governance)**
 
-}
+* `ENV_RAILS_POLICY_OK`
 
-Field rules.  
- • Uppercase rails keys (`SAFE_MODE`, `ALLOW_NETWORK`) and env names as shown.  
- • `schema_version` must equal 3\.  
- • `presence.*.present` are booleans indicating whether the variable (or prod guard) is set at capture time; do not record secrets or values.  
- • `notes` is optional (short strings; no secrets).
+* `ENV_LC_ALL_C_OK`
 
-Indexing (both indices; same PR).  
- Add a titles/paths entry in §8.6 and a mirror record (`role:"snapshot"`) in `artifacts/evidence_index.jsonl` with `proof_anchor` to a co-located `path_proof.txt` (stat transcript). Mirror schema and “single mirror file” rule are per §8.3.
+* `EVIDENCE_INDEX_UPDATED_OK`
 
-Acceptance (names-only; tokens live in PF04).  
- ENV\_RAILS\_POLICY\_OK, ENV\_LC\_ALL\_C\_OK, EVIDENCE\_INDEX\_UPDATED\_OK, CI\_CHECK\_FINAL\_LF\_OK, CI\_CHECK\_MIRROR\_SCHEMA\_OK.
+* `CI_CHECK_FINAL_LF_OK`
 
-Routing (titles-only). Policy & refusal semantics → HDE-Governance; env inventory → Glow-Infrastructure.
+* `CI_CHECK_MIRROR_SCHEMA_OK`
 
----
+**Routing (titles-only)**
 
-## 8.4 Human Evidence Index (titles/paths only)
+* Policy and refusal semantics → HDE-Governance.
 
-**Single home and format**  
- Path: `docs/evidence/INDEX.json` (canonical JSON file; titles/paths only; no payload bytes).  
- Canonical JSON per §4. Used for human review; must maintain **1:1 parity** with the machine JSONL mirror in §8.3.
+* Env inventory → Glow-Infrastructure.
+
+## **8.4 Human Evidence Index (titles/paths only)**
+
+**Single home and format**
+
+* Path: `docs/evidence/INDEX.json`.
+
+* Canonical JSON per §4 (titles/paths only; no payload bytes).
+
+* Used for human review; must maintain 1:1 parity with the machine JSONL mirror in §8.3.
 
 **Update rule**
 
-* **When an artifact is added, moved, or removed, update this file *and* its hash sentinel `docs/evidence/INDEX.sha256` *and* the machine mirror `artifacts/evidence_index.jsonl` in the same PR/commit (1:1 parity).**
+* When an artifact is added, moved, or removed, update in the same PR/commit:
 
-**Acceptance hints**  
- `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_HASH_OK`.
+  * `docs/evidence/INDEX.json` (Human Index).
 
-## ---
+  * `docs/evidence/INDEX.sha256` (hash sentinel).
 
-## 8.5 Registry report (records-only)
+  * `artifacts/evidence_index.jsonl` (machine mirror).
 
-**Purpose & format**  
- Names-only, records-only indicator that the configuration registry was generated for this cut; no secrets or payload values.  
- Canonical JSON object (UTF-8, no BOM; sorted keys; compact; exactly one trailing LF).  
- Intended for automated consumption (e.g., CI, auditors), not for human-readable narrative.
+* Parity rules and same-PR discipline are defined in §8.3.
 
-**Path (single home)**  
- `artifacts/registry/registry_report.json` (fixed)
+**Acceptance hints (titles-only; tokens live in HDE-Governance)**
+
+* `EVIDENCE_INDEX_UPDATED_OK`
+
+* `EVIDENCE_INDEX_HASH_OK`
+
+## **8.5 Registry report (records-only)**
+
+**Purpose and format**
+
+* Names-only, records-only indicator that the configuration registry was generated for this cut; no secrets or payload values.
+
+* Canonical JSON object (UTF-8, no BOM; sorted keys; compact; exactly one trailing LF).
+
+* Intended for automated consumption (for example, CI, auditors), not for human-readable narrative.
+
+**Path (single home)**
+
+* `artifacts/registry/registry_report.json` (fixed).
 
 **Content (minimum shape; reject unknown keys)**
 
-* `generated_at_utc` — ISO-8601 UTC timestamp of the registry build.  
-* `inputs` — names-only list of upstream sources consulted (e.g., `["env:LC_ALL","env:LANG","env:TZ","catalog/*.json","…"]`).  
-* `artifacts` — names-only list of emitted registry artifacts (titles only, e.g., `"artifacts/registry/registry_report.json"`).  
-* `notes` — optional short array of strings (free text; no secrets). (This artifact is not a substitute for the human Evidence Index; it is a machine-oriented summary.)
+* `generated_at_utc` — ISO-8601 UTC timestamp of the registry build.
 
-**Indexing (titles/paths only)**  
- Machine mirror: Append a records-only entry to `artifacts/evidence_index.jsonl` in the same PR: `artifact_key` (title), `role:"snapshot"`, `discovered_physical_path`, `sha256`, `size_bytes`, `produced_at_utc`, and `proof_anchor` (path to `path_proof.txt` stored alongside the file).  
- Human index (optional): Add a titles/paths-only entry in §8.6 (no payload bytes).  
- Mirror records must follow §8.3 (canonical JSONL; one LF, sorted keys, unknown-key rejection, path-proof; single mirror file).
+* `inputs` — names-only list of upstream sources consulted (for example, `["env:LC_ALL","env:LANG","env:TZ","catalog/*.json","…"]`).
 
-**Acceptance hints (titles only; tokens live in HDE-Governance §2.0)**  
- `REGISTRY_REPORT_OK` (registry report present, canonical, and indexed)  
- `EVIDENCE_INDEX_UPDATED_OK` (human/machine parity in the same PR)  
- `EVIDENCE_PATHS_VALIDATED_OK` (mirror record has proof\_anchor for on-disk path proof)
+* `artifacts` — names-only list of emitted registry artifacts (titles only, for example, `"artifacts/registry/registry_report.json"`).
 
----
+* `notes` — optional short array of strings (free text; no secrets).
 
-## 8.6 Evidence Index entries (titles/paths only) \[Required-Now\]
+* This artifact is not a substitute for the Human Evidence Index; it is a machine-oriented summary.
 
-**Discipline.** Update both the Human Index (`docs/evidence/INDEX.json`) and the machine mirror (`artifacts/evidence_index.jsonl`) in the same PR. Records-only; canonical JSONL; one LF; unknown-key rejection; ASCII field order; sort-before-write; single mirror file; `proof_anchor` present. (Process: Epic-Process-Guide; acceptance sentinel gating per PF12 front-matter.)
+**Indexing (titles/paths only)**
 
-**Parity rule (MUST).** Update **all** of the following in the same PR:
+* **Machine mirror.** Append a records-only entry to `artifacts/evidence_index.jsonl` in the same PR:
 
-* `docs/evidence/INDEX.json` (Human Index)
+  * `artifact_key` (title),
 
-* `docs/evidence/INDEX.sha256` (hash sentinel)
+  * `role:"snapshot"`,
 
-* `artifacts/evidence_index.jsonl` (machine mirror)
+  * `discovered_physical_path`,
+
+  * `sha256`,
+
+  * `size_bytes`,
+
+  * `produced_at_utc`,
+
+  * `proof_anchor` (path to `path_proof.txt` stored alongside the file).
+
+* **Human index (optional).** Add a titles/paths-only entry in §8.6 (no payload bytes).
+
+* Mirror records must follow §8.3 (canonical JSONL; one LF; sorted keys; unknown-key rejection; path-proof; single mirror file).
+
+**Acceptance hints (titles-only; tokens live in HDE-Governance §2.0)**
+
+* `REGISTRY_REPORT_OK` (registry report present, canonical, and indexed).
+
+* `EVIDENCE_INDEX_UPDATED_OK` (human/machine parity in the same PR).
+
+* `EVIDENCE_PATHS_VALIDATED_OK` (mirror record has `proof_anchor` for on-disk path-proof).
+
+## **8.6 Evidence Index entries (titles/paths only) \[Required-Now\]**
+
+**Discipline**
+
+* Update both the Human Index (`docs/evidence/INDEX.json`) and the machine mirror (`artifacts/evidence_index.jsonl`) in the same PR.
+
+* Records-only; canonical JSONL; one LF; unknown-key rejection; ASCII field order; sort-before-write; single mirror file; `proof_anchor` present.
+
+* Process is defined in Epic-Process-Guide; acceptance sentinel gating per PF12 front-matter.
+
+**Parity rule (MUST)**
+
+Update all of the following in the same PR:
+
+* `docs/evidence/INDEX.json` (Human Index).
+
+* `docs/evidence/INDEX.sha256` (hash sentinel).
+
+* `artifacts/evidence_index.jsonl` (machine mirror).
 
 Assert the mirror/index tokens named in §8.3 on every change.
 
-**Entries (authoritative list; titles/paths only).**
+**Entries (authoritative list; titles/paths only)**
 
-**Freeze-pack & math**
+*Freeze-pack and math*
 
 * `artifacts/math/freeze_pack_manifest.json`
 
@@ -1848,7 +2043,7 @@ Assert the mirror/index tokens named in §8.3 on every change.
 
 * `artifacts/math/manifest_snapshot.json`
 
-**Canonical JSON & topology**
+*Canonical JSON and topology*
 
 * `artifacts/canonical/arrays_as_sets_report.log`
 
@@ -1856,11 +2051,11 @@ Assert the mirror/index tokens named in §8.3 on every change.
 
 * `artifacts/topology/topology_coherence.log`
 
-**Endpoint Catalog & A7 proofs**
+*Endpoint Catalog and A7 proofs*
 
 * `artifacts/reader/endpoints_snapshot.json`
 
-* `artifacts/proofs/endpoints_ev_gate_proof.log`
+* `artifacts/proofs/endpoints_env_gate_proof.log`
 
 * `artifacts/proofs/success_get.txt`
 
@@ -1874,31 +2069,31 @@ Assert the mirror/index tokens named in §8.3 on every change.
 
 * `artifacts/proofs/reader_success_get_head_304.json` (composite proof; schema in §8.12)
 
-**Aux Narrative (text) — header snapshots**
+*Aux Narrative (text) — header snapshots*
 
 * `tests/transport/headers/aux_text_200.snap`
 
 * `tests/transport/headers/aux_suppression_200.snap`
 
-**CLI Admin Preview (narrative) — evidence**
+*CLI Admin Preview (narrative) — evidence*
 
 * `artifacts/cli/narrative/stdout.txt` (LF-terminated narrative text; no ANSI)
 
 * `artifacts/cli/narrative/sidecar.json` (ids-only: `composition_id`, `fragment_ids[]`, `pack_sha`, optional `release_id`; canonical JSON)
 
-**Narratives coverage (router)**
+*Narratives coverage (router)*
 
 * `audit/gates/narratives/keys_10x4.table.json`
 
-**Rails proofs (ops)**
+*Rails proofs (ops)*
 
-* `artifacts/proofs/refusal_run.txt` (single-file canonical; §8.3.1)
+* `artifacts/proofs/ops_refusal_proof.txt` — single-file refusal (headers → blank line → LF-terminated JSON). (Record type: `ops_refusal_proof`; policy/tokens by title in Governance.)
 
 * `ci/jobs/logs_keys_only_redaction.yml`
 
 * `ci/jobs/rails_open_conformance.yml`
 
-**DB posture & runtime**
+*DB posture and runtime*
 
 * `artifacts/db/ddl_fingerprint.json`
 
@@ -1912,21 +2107,21 @@ Assert the mirror/index tokens named in §8.3 on every change.
 
 * `artifacts/db/db_rw_smoke.log` (optional)
 
-**Runtime / env**
+*Runtime / env*
 
-* `artifacts/runtime/env_matrix.snapshot.json` — **singleton** snapshot (schema\_version 3); default rails and determinism pins; presence booleans for DB/bridge/guard. (Schema in §8.3.2; tokens by title in Governance.)
+* `artifacts/runtime/env_matrix.snapshot.json` — singleton snapshot (`schema_version` 3); default rails and determinism pins; presence booleans for DB/bridge/guard. (Schema in §8.3.2; tokens by title in Governance.)
 
 * `artifacts/runtime/env_connectivity.snapshot.json` — dev resolver snapshot (records attempts and selected source on fallback).
 
-**Ops / refusal (closed-rails)**
+*Ops / refusal (closed-rails)*
 
-* `artifacts/proofs/ops_refusal_proof.txt` — single-file refusal (headers → blank line → LF-terminated JSON). (Record type: `ops_refusal_proof`; policy/tokens by title in Governance.)
+* `artifacts/proofs/ops_refusal_proof.txt` — single-file refusal (headers → blank line → LF-terminated JSON). (Policy and tokens by title in Governance.)
 
-**Internal-ops surface**
+*Internal-ops surface*
 
-* `/internal/version` headers/body proofs (titles/paths per PF04 Appendix D).
+* `/internal/version` headers/body proofs (titles/paths per HDE-Governance appendix for internal ops).
 
-**CLI parity & determinism**
+*CLI parity and determinism*
 
 * `artifacts/cli/showcompat/stdout.json`
 
@@ -1936,17 +2131,17 @@ Assert the mirror/index tokens named in §8.3 on every change.
 
 * `artifacts/cli/showcompat/reader_cli_parity.diff`
 
-**SBOM**
+*SBOM*
 
 * `sbom/cyclonedx.json`
 
 * `sbom/cyclonedx.json.sha256`
 
-**Registry/reporting**
+*Registry/reporting*
 
 * `artifacts/registry/registry_report.json`
 
-**BodyGraph adapter data-source & invariance**
+*BodyGraph adapter data-source and invariance*
 
 * `artifacts/bodygraph/source_selection.snapshot.json`
 
@@ -1964,33 +2159,79 @@ Assert the mirror/index tokens named in §8.3 on every change.
 
 * `artifacts/bodygraph/keys_only.logs.sample`
 
-Human Index entries are **titles/paths only**; mirror records include `sha256`, `size_bytes`, `produced_at_utc`, `discovered_physical_path`, and `proof_anchor`.
+*Lifecycle (backup/restore/retention) — OPS-managed captures*
 
-**Discipline reminder.** Every entry above must have exactly one Human Index entry and one mirror record; mirrors must follow §8.3 (canonical JSONL, single file, sorted, LF-terminated, unknown-key reject, `proof_anchor` to a stored `path_proof.txt`).
+* `artifacts/db/backup_manifest.json`
 
-**Acceptance impact.** None new; this section remains a names-only catalog. Enforcement is via existing mirror/index tokens (EVIDENCE\_INDEX\_UPDATED\_OK, EVIDENCE\_INDEX\_HASH\_OK, EVIDENCE\_PATHS\_VALIDATED\_OK, etc.).
+* `artifacts/db/restore_verify.log`
 
----
+* `artifacts/db/retention_run.log`
 
-## 8.7 DB fingerprint & smoke artifacts \[Required-Now\]
+*Admin QA and runbooks*
 
-**Purpose.** Capture database posture and minimal activity proofs as records-only governed evidence.
+* `docs/run/PROD_ENDPOINTS.json`
 
-**Artifacts (titles/paths only).**
+* `docs/run/RUN_PROD_QA.md`
 
-* DB fingerprint — normalized DDL \+ sha256 → `artifacts/db/ddl_fingerprint.json`  
-* Roles/grants snapshot — `artifacts/db/grants.txt`  
-* Schema/search\_path echo — `artifacts/db/check_schema.txt`  
-* Constraints check — `artifacts/db/check_constraints.txt`  
-* Partition plan — `artifacts/db/partition_plan.txt`  
-* RW smoke (optional) — `artifacts/db/db_rw_smoke.log`  
-* Connection env selection (dev-only snapshot) — `artifacts/runtime/env_connectivity.snapshot.json` (new)  
-* Env posture (names-only) — `artifacts/runtime/env_matrix.snapshot.json`
+* `docs/run/EPIC011_TEST_IDENTITIES.md`
 
-**Indexing.** List each artifact in `docs/evidence/INDEX.json` and add matching records to `artifacts/evidence_index.jsonl` in the same PR, with path\_proof path-proofs. Canonical JSONL; one LF; unknown-key reject; ASCII field order; sort-before-write.
+* `artifacts/ops/admin_vendor_calls.jsonl`
 
-**Acceptance (titles-only; tokens live in Governance).**  
- `DB_SCHEMA_FINGERPRINT_OK`, `DB_ROLE_OK`, `DB_RUNTIME_SEARCH_PATH_OK`, `DB_CONN_ENV_OK`, `DEV_DB_BRIDGE_FALLBACK_OK`, `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`.
+Human Index entries are titles/paths only; mirror records include `sha256`, `size_bytes`, `produced_at_utc`, `discovered_physical_path`, and `proof_anchor`.
+
+**Discipline reminder**
+
+* Every entry above must have exactly one Human Index entry and one mirror record.
+
+* Mirrors must follow §8.3 (canonical JSONL, single file, sorted, LF-terminated, unknown-key reject, `proof_anchor` to a stored `path_proof.txt`).
+
+**Acceptance impact**
+
+* None new; this section remains a names-only catalog.
+
+* Enforcement is via existing mirror/index tokens (`EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_HASH_OK`, `EVIDENCE_PATHS_VALIDATED_OK`, etc.).
+
+## **8.7 DB fingerprint & smoke artifacts \[Required-Now\]**
+
+**Purpose.** Capture database posture and minimal activity proofs as records-only governed evidence for EPIC-011 and future epics.
+
+**Artifacts (titles and paths only)**
+
+* **DB fingerprint — normalized DDL \+ sha256.**  
+   `artifacts/db/ddl_fingerprint.json`
+
+* **Roles/grants snapshot.**  
+   `artifacts/db/grants.txt`
+
+* **Schema/search\_path echo.**  
+   `artifacts/db/check_schema.txt`
+
+* **Constraints check.**  
+   `artifacts/db/check_constraints.txt`
+
+* **Partition plan (summary).**  
+   `artifacts/db/partition_plan.txt`
+
+* **RW smoke (optional).**  
+   `artifacts/db/db_rw_smoke.log`
+
+* **Connection env selection (dev-only snapshot).**  
+   `artifacts/runtime/env_connectivity.snapshot.json`
+
+* **Env posture (names-only).**  
+   `artifacts/runtime/env_matrix.snapshot.json`
+
+**Indexing.**  
+ List each artifact in `docs/evidence/INDEX.json` and update `docs/evidence/INDEX.sha256` and `artifacts/evidence_index.jsonl` in the same PR, with a matching `*.path_proof.txt` for every governed artifact. The machine mirror is canonical JSONL (UTF-8; sorted keys; compact; one LF per record), enforces unknown-key rejection, and is sorted by `(artifact_key, discovered_physical_path)`. See §8.3 for mirror schema, sort order, and path-proof rules.
+
+### **Primary key posture (current EPIC-011 reality)**
+
+The canonical fingerprint schema for EPIC-011 includes a `primary_key` array and `constraints` list for each table. In the current captured posture for `hde.body_graphs`, both `primary_key` and `constraints` are empty; this accurately reflects the production database at the time of capture (no primary key is defined on `hde.body_graphs`).
+
+For EPIC-011, tokens such as `DB_SCHEMA_FINGERPRINT_OK` and `DB_ROLE_OK` are defined as “posture is captured and indexed as-is,” so this no-PK state is sufficient for those tokens once fingerprint, grants, mirror, and path-proofs are in sync. The missing PK on `hde.body_graphs` is recorded technical debt: a future DB/infra migration epic must introduce and enforce an appropriate primary key on `(user_id, vendor, vendor_version, input_fingerprint)`, re-capture `ddl_fingerprint.json` and `grants.txt`, and update PF12 and PF10 accordingly. Until that epic lands, PF12’s role is to document the current posture truthfully, not to prescribe the eventual PK.
+
+**Acceptance (titles-only; tokens live in HDE-Governance).**  
+ `DB_SCHEMA_FINGERPRINT_OK`, `DB_ROLE_OK`, `DB_RUNTIME_SEARCH_PATH_OK`, `DB_CONN_ENV_OK`, `DEV_DB_BRIDGE_FALLBACK_OK`, `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`. Interpretation of `DB_ROLE_OK` and related posture tokens under EPIC-011 follows the governance rules in HDE-Governance and the BN 7.6.6 drain plan.
 
 ---
 

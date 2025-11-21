@@ -4,13 +4,13 @@
 
 **Title:** PF05-Canon-HDE-CLI-API-Vendor-Ref
 
-**Version:** v1.3
+**Version:** v1.3.1
 
 **Status:** Canon
 
-**Effective date:** 2025-11-17
+**Effective date:** 2025-11-21
 
-**Last Update Gate:** BN 7.1 Drain
+**Last Update Gate:** BN 7.6.6 Drain
 
 ---
 
@@ -311,280 +311,338 @@ Exit codes are exhaustive for the public surface. **Non-zero** exits must **not*
 * **Locale/TZ pins.** All CLI tests and byte comparisons run under `LC_ALL=C` and, where relevant, `TZ=UTC`.  
   ---
 
-  # 4\. Commands (by status)
+  ## **4\. Commands (by status)**
 
-  ## **4.1 `hdctl showcompat` \[Implemented\]**
+*This section keeps the existing requirements as canon and adds per‑command implementation status based on the Codex CLI audit (no code changes were made in the audit). The audit reports a single `hdctl showcompat` subcommand; both §4.1 and §4.7 describe that same command and will need a later doc reconciliation.*
 
-**Purpose (normative).** Produce the Reader v1 public body for a pair of charts and print it to **stdout** using the **single presenter/emitter** (six keys, LF-terminated). The CLI is a test/debug surface; **bytes must match Reader** for identical inputs and environment. **Status:** merge-blocking until Reader↔CLI parity passes.
+---
+
+### **4.1 hdctl showcompat \[Implemented\]**
+
+**Purpose (normative).**  
+ Produce the Reader v1 public body for a pair of charts and print it to stdout using the single presenter/emitter (six keys, LF‑terminated). The CLI is a test/debug surface; bytes must match Reader for identical inputs and environment. Status: merge‑blocking until Reader↔CLI parity passes.
 
 **Inputs — flags and normalization**
 
-* `--a <path>` / `--b <path>`: paths to canonical chart JSON files (see §3.2 Files).  
-* `--a-tz <IANA>` / `--b-tz <IANA>`: optional time-zone overrides **only** when the chart is missing tz (see §3.2). **Invalid tz ⇒ typed input error** (stderr; stdout empty).  
-* **Normalization.** The CLI **must** normalize the pair to canonical order before invoking the engine (**AB↔BA neutral**).  
-* **SAFE rails.** This command **does not open vendor rails**; it exercises in-proc engine math and the presenter/emitter only.
+* `--a <path>` / `--b <path>`: paths to canonical chart JSON files (see §3.2 Files).
+
+* `--a-tz <IANA>` / `--b-tz <IANA>`: optional time‑zone overrides only when the chart is missing `tz` (see §3.2). Invalid tz ⇒ typed input error (stderr; stdout empty).
+
+* **Normalization.** The CLI must normalize the pair to canonical order before invoking the engine (AB↔BA neutral).
+
+* **SAFE rails.** This command does not open vendor rails; it exercises in‑proc engine math and the presenter/emitter only.
 
 **Output — public body to stdout**
 
-* **Success payload.** Print the six-key Reader v1 success object (numeric-free; `categories[*]` exactly `{"id","band"}`; v1 exposure from §5.1) and terminate with **exactly one LF**. Output **must be non-empty canonical JSON**.  
-* **Parity.** `stdout` **must be byte-identical** to the Reader body for the same inputs and environment. **AB↔BA** and **two-run identity** must hold.
+* **Success payload.** Print the six‑key Reader v1 success object (numeric‑free; `categories[*]` exactly `{"id","band"}`; v1 exposure from §5.1) and terminate with exactly one LF. Output must be non‑empty canonical JSON.
+
+* **Parity.** `stdout` must be byte‑identical to the Reader body for the same inputs and environment. AB↔BA and two‑run identity must hold.
 
 **Serialization and emitter (canonical)**
 
-* **Single emitter.** CLI **must** call the **same presenter/emitter** as Reader (§6.2).  
-* **Canonical JSON.** UTF-8 (no BOM), sorted keys (ASCII), compact, exactly one trailing LF. Arrays that represent sets are deduped and ASCII-sorted (§6.1). All byte checks run with `LC_ALL=C`, `TZ=UTC`.  
+* **Single emitter.** CLI must call the same presenter/emitter as Reader (§6.2).
+
+* **Canonical JSON.** UTF‑8 (no BOM), sorted keys (ASCII), compact, exactly one trailing LF. Arrays that represent sets are deduped and ASCII‑sorted (§6.1). All byte checks run with `LC_ALL=C`, `TZ=UTC`.
+
 * **No ANSI or prompts.** No color codes, prompts, extra lines, or trailing spaces in stdout.
 
 **Optional flags (disabled by default) \[Speculative\]**
 
-* `--score`: would add a top-level `score_pct` in **CLI-only** output (Reader remains numeric-free).  
-* **Admin sidecar.** Opt-in, file-backed emission of internal numeric diagnostics with stdout unchanged. **Status:** disabled by default. Enabling either option requires an approved Doc-Delta, CI grep-guards, and refreshed parity/idempotence/LF evidence.
+* `--score`: would add a top‑level `score_pct` in CLI‑only output (Reader remains numeric‑free).
+
+* **Admin sidecar.** Opt‑in, file‑backed emission of internal numeric diagnostics with stdout unchanged. Status: disabled by default. Enabling either option requires an approved Doc‑Delta, CI grep‑guards, and refreshed parity/idempotence/LF evidence.
 
 **Errors — typed object to stderr**
 
-* **Usage (exit 64).** Print a short synopsis to **stderr**; **stdout empty**.  
-* **Typed failure (exit 2).** Print a numeric-free error object to **stderr** (LF-terminated; no PII); **stdout empty**.  
+* **Usage (exit 64).** Print a short synopsis to stderr; stdout empty.
+
+* **Typed failure (exit 2).** Print a numeric‑free error object to stderr (LF‑terminated; no PII); stdout empty.
+
 * **No mixed streams.** Never interleave diagnostics with public bytes (see §3.3 Streams; §3.4 Exit codes).
 
 **Determinism and acceptance**
 
-* **Idempotence re-check.** Removing `idempotence_hash`, canonicalize the **preimage fields** as defined in PF01 and verify `sha256(preimage_bytes)` reproduces the published digest (**Reader and CLI**).  
-* **Parity proofs.** **AB↔BA** and **two-run identity** must hold at the byte level; **Reader↔CLI bytes must be equal** for identical inputs.  
-* **Acceptance (tokens).** `CLI_SHOWCOMPAT_CANON_OK`, `CLI_TWO_RUN_IDENTITY_OK`, `PARITY_AB_BA_OK`, `CLI_READER_PARITY_OK`, `CLI_STDOUT_LF_OK`, `JSON_CANONICAL_CHECK_OK`, `PREIMAGE_RECOMPUTE_OK`, `CLI_IMPLEMENTED_SET_OK`. *(Token names tracked in HDE-Governance §2.0.)*
+* **Idempotence re‑check.** Removing `idempotence_hash`, canonicalize the preimage fields as defined in PF01 and verify `sha256(preimage_bytes)` reproduces the published digest (Reader and CLI).
 
-**Evidence (records-only; titles-only; indexed via PF12 machine mirror)**
+* **Parity proofs.** AB↔BA and two‑run identity must hold at the byte level; Reader↔CLI bytes must be equal for identical inputs.
 
-* `showcompat/stdout` — exact stdout bytes (non-empty; LF-terminated) \+ sha256.  
-* `showcompat/two_run` — two-run identity log (same bytes twice).  
-* `showcompat/abba` — AB vs BA byte-diff (expected empty).  
-* `reader_vs_cli` — Reader body vs CLI stdout diff (expected empty).  
-* `preimage_recompute` — recompute log proving `sha256(preimage_bytes)` equals `idempotence_hash`.  
-   Each mirror record includes `artifact_key`, `sha256`, `size_bytes`, `produced_at_utc`, `discovered_physical_path`, and `proof_anchor` (transcript anchor \+ on-disk stat). Update **PF12** human `INDEX.json` \+ hash sentinel and the machine mirror **in the same PR**.
+* **Acceptance (tokens).** `CLI_SHOWCOMPAT_CANON_OK`, `CLI_TWO_RUN_IDENTITY_OK`, `PARITY_AB_BA_OK`, `CLI_READER_PARITY_OK`, `CLI_STDOUT_LF_OK`, `JSON_CANONICAL_CHECK_OK`, `PREIMAGE_RECOMPUTE_OK`, `CLI_IMPLEMENTED_SET_OK`. (Token names tracked in HDE‑Governance §2.0.)
 
-**Routing (titles-only)**
+**Evidence (records‑only; titles‑only; indexed via PF12 machine mirror)**
 
-* Reader payload covenant and preimage: **PF01 — HDE-Math-Spec (§2.1/§3)**.  
-* Canonical JSON and pack/manifest rules: **PF12 — HDE-Schemas & Artifacts (§4)**.  
-* Transport behavior (headers/conditionals) and vendor rails: **this document (§5.3, §7)** and **HDE-Governance (A7)**.  
+* `showcompat/stdout` — exact stdout bytes (non‑empty; LF‑terminated) \+ sha256.
+
+* `showcompat/two_run` — two‑run identity log (same bytes twice).
+
+* `showcompat/abba` — AB vs BA byte‑diff (expected empty).
+
+* `reader_vs_cli` — Reader body vs CLI stdout diff (expected empty).
+
+* `preimage_recompute` — recompute log proving `sha256(preimage_bytes)` equals `idempotence_hash`.
+
+Each mirror record includes `artifact_key`, `sha256`, `size_bytes`, `produced_at_utc`, `discovered_physical_path`, and `proof_anchor` (transcript anchor \+ on‑disk stat). Update PF12 human `INDEX.json` \+ hash sentinel and the machine mirror in the same PR.
+
+**Routing (titles‑only)**
+
+* Reader payload covenant and preimage: PF01 — HDE‑Math‑Spec (§2.1/§3).
+
+* Canonical JSON and pack/manifest rules: PF12 — HDE‑Schemas & Artifacts (§4).
+
+* Transport behavior (headers/conditionals) and vendor rails: this document (§5.3, §7) and HDE‑Governance (A7).
+
+**Implementation status (audit v1)**
+
+* **Implementation status:** Partially implemented.
+
+* **Evidence:** The audit reports a `hdctl` console script wired to `engine.cli.main:cli`, with a `showcompat` subcommand defined in `engine/cli/main.py`. The subcommand supports `--pair-file`, `--a-file/--a`, `--b-file/--b`, and additional DB/vendor‑related options (user ids and birth tuple fields). Legacy scripts `scripts/hd_cli.py` and `scripts/hdctl.clean.py` also expose `showcompat`‑like flows and compute compat bands with canonical JSON output and optional admin sidecar.
+
+* **Gaps:** The audit does not inspect the JSON payload shape for `hdctl showcompat`, does not confirm that stdout matches the Reader v1 six‑key envelope, and does not validate AB↔BA/two‑run identity, preimage recompute, or the acceptance tokens above. Presence of an optional `--score` flag and diagnostics sidecar is not confirmed. Error envelopes and stream separation are described in canon but not checked in the audit.
+
   ---
 
-  ## **4.2 `hdctl read singlebg` \[Speculative\]**
+  ### **4.2 hdctl read singlebg \[Speculative\]**
 
 **Purpose (normative, draft).**  
- Emit a **single-chart** diagnostic to **stdout** using the **same canonical emitter** as Reader/CLI success bodies (UTF-8, **sorted keys**, compact, **exactly one LF**). This command is for **testing & debugging** chart ingestion/normalization; it is **not** a product surface.
+ Emit a single‑chart diagnostic to stdout using the same canonical emitter as Reader/CLI success bodies (UTF‑8, sorted keys, compact, exactly one LF). This command is for testing & debugging chart ingestion/normalization; it is not a product surface.
 
-### **Inputs — intended flags & validators \[Speculative\]**
+**Inputs — intended flags & validators \[Speculative\]**
 
-* **Chart path.** Accept **one** path to a chart JSON file (normalized or raw, per validator).
+* **Chart path.** Accept one path to a chart JSON file (normalized or raw, per validator).
 
-* **Time-zone override (optional).** An **IANA tz** override is permitted **only** when the chart lacks `tz`.
+* **Time‑zone override (optional).** An IANA tz override is permitted only when the chart lacks `tz`.
 
 * **Validation.**
 
-  * Validate against the **single-chart schema** (**titles-only** reference; owned with the chart provider).
+  * Validate against the single‑chart schema (titles‑only reference; owned with the chart provider).
 
-  * Require the minimal fields needed to deterministically construct a normalized chart (birth **date**, **time**, **place** *or* **tz**).
+  * Require the minimal fields needed to deterministically construct a normalized chart (birth date, time, place or tz).
 
-  * **No best-effort parsing:** **missing/invalid** date/time/place/tz **MUST** yield **typed failures**; do **not** infer or coerce values.
+  * No best‑effort parsing: missing/invalid date/time/place/tz MUST yield typed failures; do not infer or coerce values.
 
-  * Enforce **locale-neutral** parsing and **no floats** for canonical fields.
+  * Enforce locale‑neutral parsing and no floats for canonical fields.
 
-**Note.** Exact flag spellings follow the CLI’s global conventions; final names will be pinned when the command is enabled.
+* **Note.** Exact flag spellings follow the CLI’s global conventions; final names will be pinned when the command is enabled.
 
-### **Stdout schema (single-chart) \[Speculative\]**
+**Stdout schema (single‑chart) \[Speculative\]**
 
-* **Schema ownership.** The **single-chart (BG)** schema is referenced **by title only** (no bytes duplicated here).
+* **Schema ownership.** The single‑chart (BG) schema is referenced by title only (no bytes duplicated here).
 
-* **Canonical emission.** Serialize with the **single emitter** (UTF-8, sorted keys, compact, **one LF**).
+* **Canonical emission.** Serialize with the single emitter (UTF‑8, sorted keys, compact, one LF).
 
-* **Numeric-free public posture.** Output is a **diagnostic** object for engine inputs; it **does not** alter the public Reader covenant (no narratives, no prompts).
+* **Numeric‑free public posture.** Output is a diagnostic object for engine inputs; it does not alter the public Reader covenant (no narratives, no prompts).
 
-* **Determinism.** Two identical inputs yield **byte-identical** stdout (**two-run identity**). **AB↔BA does not apply** (single input).
+* **Determinism.** Two identical inputs yield byte‑identical stdout (two‑run identity). AB↔BA does not apply (single input).
 
-  ### **Errors & exits \[Required-Now\]**
+**Errors & exits \[Required‑Now\]**
 
-* **Usage (exit 64).** Synopsis to **stderr**; **stdout empty**.
+* **Usage (exit 64).** Synopsis to stderr; stdout empty.
 
-* **Typed failure (exit 2).** Numeric-free error object (LF-terminated) to **stderr**; **stdout empty**.
+* **Typed failure (exit 2).** Numeric‑free error object (LF‑terminated) to stderr; stdout empty.
 
 * **No mixed streams.** Never interleave diagnostics with stdout payloads.
 
-  ### **Status & acceptance gating (to enable later) \[Speculative\]**
+**Status & acceptance gating (to enable later) \[Speculative\]**
 
-* **Schema pinning.** Pin the single-chart schema title/anchor and add schema tests.
+* **Schema pinning.** Pin the single‑chart schema title/anchor and add schema tests.
 
-* **Emitter parity.** Prove stdout uses the **same emitter** as Reader (§6), with **one LF** and canonical key order.
+* **Emitter parity.** Prove stdout uses the same emitter as Reader (§6), with one LF and canonical key order.
 
-* **Two-run identity.** Add byte-compare fixtures for repeated runs on the same input.
+* **Two‑run identity.** Add byte‑compare fixtures for repeated runs on the same input.
 
-* **CI hygiene.** Grep-guard against ad-hoc `json.dumps` and local canonicalizers on this path.
+* **CI hygiene.** Grep‑guard against ad‑hoc `json.dumps` and local canonicalizers on this path.
 
-* **Security.** Confirm **no PII** is written to logs; only stdout/stderr per stream rules. 
+* **Security.** Confirm no PII is written to logs; only stdout/stderr per stream rules.
 
-* 
+**Implementation status (audit v1)**
 
-## **4.3 `hdctl list people` \[Speculative\]**
+* **Implementation status:** Not implemented.
+
+* **Evidence:** The audit enumerates `hdctl` subcommands `showcompat`, `aux-preview`, and `bg:resolve` in `engine/cli/main.py`. It does not report any `hdctl read singlebg` or equivalently named subcommand. Legacy scripts (`scripts/hd_cli.py`, `scripts/hdctl.clean.py`) implement compat flows but not a single‑chart diagnostic command.
+
+* **Gaps:** The core requirement “CLI can emit a single BodyGraph/chart result via a dedicated command” is not satisfied under this name; single‑chart output likely flows through `bg:resolve` or lower‑level helpers, but the audit does not confirm stdout schema, flags, or determinism for a single‑BG diagnostic surface.
+
+  ---
+
+  ### **4.3 hdctl list people \[Speculative\]**
 
 **Purpose (normative, draft).**  
- List the locally known **people entries** for test/debug workflows (e.g., feeding `showcompat` by slug/path). This is a **developer convenience**; it is **not** a product surface and must not leak PII beyond the stored display name/slug needed for local testing.
+ List the locally known people entries for test/debug workflows (e.g., feeding `showcompat` by slug/path). This is a developer convenience; it is not a product surface and must not leak PII beyond the stored display name/slug needed for local testing.
 
-### **Output modes & streams \[Speculative\]**
+**Output modes & streams \[Speculative\]**
 
-* **`--format table` (default).**
+* `--format table` (default).
 
   * Columns: `slug`, `name`, `stored_at`.
 
-  * Rendering: plain text table to **stdout**, **no ANSI**, **one trailing LF**.
+  * Rendering: plain text table to stdout, no ANSI, one trailing LF.
 
-* **`--format json`.**
+* `--format json`.
 
-  * Schema: a JSON **array** of objects, each **exactly** `{ "slug": <string>, "name": <string>, "stored_at": <RFC3339 string> }`.
+  * Schema: a JSON array of objects, each exactly `{ "slug": <string>, "name": <string>, "stored_at": <RFC3339 string> }`.
 
-  * Emission: canonical emitter (UTF-8, sorted keys, compact separators, **exactly one LF**).
+  * Emission: canonical emitter (UTF‑8, sorted keys, compact separators, exactly one LF).
 
-* **Errors & usage.** As in §3.3/§3.4: usage → stderr exit **64**; typed error → stderr exit **2**; **stdout empty**.
+**Errors & usage.** As in §3.3/§3.4: usage → stderr exit 64; typed error → stderr exit 2; stdout empty.
 
-### **Sorting rules \[Speculative\]**
+**Sorting rules \[Speculative\]**
 
-* **Default:** `stored_at` **descending** (most recent first).
+* Default: `stored_at` descending (most recent first).
 
-* **Alternates:** `--sort slug` (ASCII ascending), `--sort name` (ASCII ascending), `--sort stored_at:asc|desc`.
+* Alternates: `--sort slug` (ASCII ascending), `--sort name` (ASCII ascending), `--sort stored_at:asc|desc`.
 
-* **Determinism:** when values tie, break with **ASCII ascending `slug`**, then `name`. All orders are **order-independent** and **stable**.
+* Determinism: when values tie, break with ASCII ascending `slug`, then `name`. All orders are order‑independent and stable.
 
-### **Filters \[Speculative\]**
+**Filters \[Speculative\]**
 
-* **Name/slug filter:** `--filter "<substring>"` matches case-insensitive substring on `name` **or** `slug`.
+* Name/slug filter: `--filter "<substring>"` matches case‑insensitive substring on name or slug.
 
-* **Time-window:** `--since <RFC3339>`, `--until <RFC3339>` filter by `stored_at` (inclusive).
+* Time‑window: `--since <RFC3339>`, `--until <RFC3339>` filter by `stored_at` (inclusive).
 
-* **Limit:** `--limit <N>` returns at most `N` rows **after** filtering/sorting (deterministic).
+* Limit: `--limit <N>` returns at most N rows after filtering/sorting (deterministic).
 
-* **Exact match (optional):** `--slug <slug>` restricts to one entry (fail-closed if missing).
+* Exact match (optional): `--slug <slug>` restricts to one entry (fail‑closed if missing).
 
-### **Determinism & hygiene \[Required-Now\]**
+**Determinism & hygiene \[Required‑Now\]**
 
-* **Canonical JSON.** For `--format json`, use the **single presenter emitter** (UTF-8, sorted keys, compact, one LF); **no ad-hoc** `json.dumps`.
+* **Canonical JSON.** For `--format json`, use the single presenter emitter (UTF‑8, sorted keys, compact, one LF); no ad‑hoc `json.dumps`.
 
-* **Two-run identity.** Given the same underlying people store, the same flags produce **byte-identical** stdout across runs.
+* **Two‑run identity.** Given the same underlying people store, the same flags produce byte‑identical stdout across runs.
 
-* **No PII beyond schema.** Do **not** print secrets, internal IDs, or auxiliary metadata. Only `{slug, name, stored_at}`.
+* **No PII beyond schema.** Do not print secrets, internal IDs, or auxiliary metadata. Only `{slug, name, stored_at}`.
 
-### **Status & acceptance gating (to enable later) \[Speculative\]**
+**Status & acceptance gating (to enable later) \[Speculative\]**
 
-* **Schema pinning:** add a tiny JSON Schema for the list output (array of `{slug,name,stored_at}`) and tests for table/json parity.
+* Schema pinning; sorting/filter tests; emitter parity; CI hygiene; and security constraints as described in the original text.
 
-* **Sorting/filters:** golden fixtures that prove stable ordering (tie-breaks), filter correctness, and `--limit` determinism.
+**Implementation status (audit v1)**
 
-* **Emitter parity:** `--format json` goes through the **same** canonical emitter as Reader/CLI success (LF, sorted keys).
+* **Implementation status:** Not implemented.
 
-* **CI hygiene:** grep-guard against `json.dumps` and alternate serializers on this path; forbid ANSI in table output; assert **one** trailing LF.
+* **Evidence:** The audit lists `showcompat`, `aux-preview`, and `bg:resolve` as `hdctl` subcommands; no `list people` or equivalent enumeration command is present. Legacy scripts are focused on compat calculations and admin output, not listing stored people.
 
-* **Security:** confirm **no vendor calls**, and that logs/stderr do **not** include PII beyond the schema fields.
+* **Gaps:** All behaviour described here (tabular/JSON listing, filters, sorting, and schema) remains unimplemented. Any future implementation must ensure the PII and determinism constraints are enforced.
 
-## **4.4 Fetch commands (person/batch) \[Speculative\]**
+  ---
+
+  ### **4.4 Fetch commands (person/batch) \[Speculative\]**
 
 **Purpose (normative, draft).**  
- Provide CLI helpers to **fetch** person data (single/batch) from a vendor service for test/debug and fixture generation. These commands are **not** product surfaces.
+ Provide CLI helpers to fetch person data (single/batch) from a vendor service for test/debug and fixture generation. These commands are not product surfaces.
 
-### **Status — Explicitly disabled in Alpha**
+**Status — Explicitly disabled in Alpha**
 
-* **Default posture:** `fetch person` / `fetch batch` are **disabled**.
+* **Default posture:** fetch person / fetch batch are disabled.
 
-* **Observed behavior when called:** return a **typed error** to **stderr** (exit **2**) stating that **fetch commands are disabled in Alpha**; **stdout empty**.
+* **Observed behavior when called:** return a typed error to stderr (exit 2\) stating that fetch commands are disabled in Alpha; stdout empty.
 
-* **No vendor I/O** is attempted when disabled.
+* **No vendor I/O is attempted when disabled.**
 
-### **Preconditions to enable (all MUST be satisfied)**
+**Preconditions to enable (all MUST be satisfied)**
 
-1. **SAFE rails & env**
+* **SAFE rails & env**
 
-   * Rails explicitly **opened**: `SAFE_MODE=0` **and** `ALLOW_NETWORK=1`.
+  * Rails explicitly opened: `SAFE_MODE=0` and `ALLOW_NETWORK=1`.
 
-   * Required **env/keys** present and non-empty (e.g., `HDAPI_BASE_URL`, `HD_API_KEY`, `GEO_API_KEY`). **Never** print secrets.
+  * Required env/keys present and non‑empty (e.g., `HDAPI_BASE_URL`, `HD_API_KEY`, `GEO_API_KEY`). Never print secrets.
 
-2. **Request shaping completeness** (owned in this document)
+* **Request shaping completeness (owned in this document)**
 
-   * Canonical **endpoint/method**, **headers**, and **body schema** (birthdate, time, location) pinned.
+  * Canonical endpoint/method, headers, and body schema (birthdate, time, location) pinned.
 
-   * **Typed error mapping** from vendor responses to CLI/Reader error tokens (numeric-free).
+  * Typed error mapping from vendor responses to CLI/Reader error tokens (numeric‑free).
 
-3. **Transport acceptance**
+* **Transport acceptance**
 
-   * **Timeouts**, **retries**, **rate-limit/backoff** policies pinned (closed enums/integers).
+  * Timeouts, retries, rate‑limit/backoff policies pinned (closed enums/integers).
 
-   * **Observability**: bounded counters/timers only (no PII, no payload logging).
+  * Observability: bounded counters/timers only (no PII, no payload logging).
 
-   * **Refusal posture** proven when rails are closed (no outbound calls).
+  * Refusal posture proven when rails are closed (no outbound calls).
 
-4. **Determinism & hygiene**
+* **Determinism & hygiene**
 
-   * CLI stdout (on success) still prints only the **public Reader bytes** or a **pinned fetch result schema** (if different), via the **single presenter emitter** (UTF-8, sorted keys, compact, one LF).
+  * CLI stdout (on success) still prints only the public Reader bytes or a pinned fetch result schema (if different), via the single presenter emitter (UTF‑8, sorted keys, compact, one LF).
 
-   * **No ad-hoc** `json.dumps` on public paths; no ANSI to stdout.
+  * No ad‑hoc `json.dumps` on public paths; no ANSI to stdout.
 
-5. **Security & privacy**
+* **Security & privacy**
 
-   * **No PII** beyond explicitly allowed fields in the fetch schema; secrets never echoed.
+  * No PII beyond explicitly allowed fields in the fetch schema; secrets never echoed.
 
-   * **Redaction** rules for logs firmly applied; stderr contains only typed tokens/messages.
+  * Redaction rules for logs firmly applied; stderr contains only typed tokens/messages.
 
-6. **Evidence & CI**
+* **Evidence & CI**
 
-   * Goldens for **idempotence** (preimage re-check where applicable), **LF discipline**, **AB↔BA** (if pair-derived), and **two-run identity** (deterministic pagination and sorting).
+  * Goldens for idempotence, LF discipline, AB↔BA (if pair‑derived), two‑run identity; CI grep‑guards; network tests gated on rails.
 
-   * CI grep-guards for ad-hoc serializers; network tests **skip** unless rails are open in the job.
+**Command sketches (deferred/speculative)**
 
-### **Command sketches (deferred/speculative)**
+* `hdctl fetch person --name <str> --birthdate <YYYY-MM-DD> --birthtime <HH:MM> --place "<City, CC>" [--tz <IANA>]`
 
-* **`hdctl fetch person --name <str> --birthdate <YYYY-MM-DD> --birthtime <HH:MM> --place "<City, CC>" [--tz <IANA>]`**
+* `hdctl fetch batch --file <CSV|JSON>`
 
-  * On success (rails open): emit **canonical JSON** using the single emitter; on failure: typed error to stderr.
+Exact flag names, stdout schemas, and mapping tables are pinned in this document when the feature is enabled; until then, these commands remain disabled by default.
 
-* **`hdctl fetch batch --file <CSV|JSON>`**
+**Routing (titles‑only)**  
+ Reader payload covenant and serializer rules are referenced by title only in Architecture/Math; this document owns transport/vendor bytes (headers, validators, error mapping).
 
-  * Deterministic ordering of results (ASCII by key); identical runs ⇒ byte-identical stdout; typed failures per row reported to stderr.
+**Implementation status (audit v1)**
 
-Exact flag names, stdout schemas, and mapping tables are pinned **in this document** when the feature is enabled; until then, these commands remain **disabled** by default.
+* **Implementation status:** Not implemented (and disabled by design).
 
-### **Routing (titles-only)**
+* **Evidence:** The audit finds no `fetch`‑prefixed `hdctl` subcommands or equivalent person/batch fetch commands. It also notes no network‑calling CLI commands beyond those implied by `bg:resolve` using `resolve_bodygraph`, whose external behaviour is not inspected.
 
-* Reader payload covenant and serializer rules are referenced **by title only** in **Architecture/Math**; this document owns transport/vendor bytes (headers, validators, error mapping).
+* **Gaps:** All fetch behaviour remains speculative; if these commands are added, they must satisfy the rails, privacy, and determinism constraints above.
 
----
+  ---
 
-## 4.5 CLI Admin Preview (narrative) \[Required-Now\]
+  ### **4.5 CLI Admin Preview (narrative) \[Required‑Now\]**
 
-### Purpose.
-
+**Purpose.**  
  Admin preview of Aux narrative text via the shared presenter/emitter used by Reader (no change to Reader public contract).
 
-### Posture (EPIC-010)
+**Posture (EPIC‑010)**
 
- • “CLI” for this epic refers to the admin preview surface exposed over HTTP that calls the same emitter as Reader. A local binary (for example, hdctl) is not normative for acceptance.  
- • Enabled by default (admin-only) across dev, stage, and production; no environment gate.
+* “CLI” for this epic refers to the admin preview surface exposed over HTTP that calls the same emitter as Reader. A local binary (for example, `hdctl`) is not normative for acceptance.
 
-### Outputs and hygiene
+* Enabled by default (admin‑only) across dev, stage, and production; no environment gate.
 
- • stdout: LF-terminated text; no carriage returns, no ANSI, no extra lines.  
- • Sidecar (ids-only): canonical JSON written by the single emitter; UTF-8, sorted keys, compact, exactly one LF; no prose.  
- • Fields (names-only): pack\_sha, composition\_id, fragment\_ids\[\], optional release\_id. (Schema ownership lives in HDE-Schemas and Artifacts.)
+**Outputs and hygiene**
 
-### Determinism and parity
+* **stdout:** LF‑terminated text; no carriage returns, no ANSI, no extra lines.
 
- • Uses the same emitter as Aux; for identical inputs, preview bytes match Aux emitter bytes.  
- • Acceptance (titles-only): CLI\_PREVIEW\_ENABLED\_OK, CLI\_READER\_EMITTER\_PARITY\_OK, CLI\_PREVIEW\_INDEXED\_OK.
+* **Sidecar (ids‑only):** canonical JSON written by the single emitter; UTF‑8, sorted keys, compact, exactly one LF; no prose.
 
-### Evidence (titles/paths only; PF12 single home)
+* **Fields (names‑only):** `pack_sha`, `composition_id`, `fragment_ids[]`, optional `release_id`. (Schema ownership lives in HDE‑Schemas and Artifacts.)
 
- • artifacts/cli/narrative/stdout.txt — LF-terminated narrative text (no ANSI)  
- • artifacts/cli/narrative/sidecar.json — ids-only canonical JSON
+**Determinism and parity**
+
+* Uses the same emitter as Aux; for identical inputs, preview bytes match Aux emitter bytes.
+
+* **Acceptance (titles‑only):** `CLI_PREVIEW_ENABLED_OK`, `CLI_READER_EMITTER_PARITY_OK`, `CLI_PREVIEW_INDEXED_OK`.
+
+**Evidence (titles/paths only; PF12 single home)**
+
+* `artifacts/cli/narrative/stdout.txt` — LF‑terminated narrative text (no ANSI).
+
+* `artifacts/cli/narrative/sidecar.json` — ids‑only canonical JSON.
 
 Index both with the human Evidence Index and the machine JSONL mirror in the same PR. PF12 governs indexing and mirror behavior.
 
-## **4.6 `hdctl bg:resolve` \[Required-Now\]**
+**Implementation status (audit v1)**
 
-**Purpose.** Operator‑facing command to **resolve** a BodyGraph with explicit **per‑call source selection**. The Engine remains mode‑free; selection is externalized to the adapter via this command.
+* **Implementation status:** Partially implemented (CLI entrypoint only).
+
+* **Evidence:** The audit reports a `hdctl` subcommand `aux-preview` in `engine/cli/main.py` with flags `--category`, `--band` (using an `AUX_BANDS` enum), `--pair-file`, `--show-narrative` (boolean), and `--admin-out`. It further notes that `hdctl aux-preview` “reads compat pair file, optionally writes admin output via `get_pack/emit_public_aux`,” indicating a CLI wires into the Aux emitter for narrative preview.
+
+* **Gaps:** The audit does not examine the HTTP admin preview surface described here, does not verify LF‑only text output and sidecar schema, and does not confirm indexing of `artifacts/cli/narrative/*`. It also does not validate acceptance tokens or access control (admin‑only behaviour). Narrative count and category coverage (3× narratives per category) are not checked.
+
+  ---
+
+  ### **4.6 hdctl bg:resolve \[Required‑Now\]**
+
+**Purpose.**  
+ Operator‑facing command to resolve a BodyGraph with explicit per‑call source selection. The Engine remains mode‑free; selection is externalized to the adapter via this command.
 
 **Flags (normative).**
 
@@ -594,65 +652,288 @@ Index both with the human Evidence Index and the machine JSONL mirror in the sam
 
   * `db` — use persistent BodyGraph (if present); no vendor call.
 
-  * `vendor` — perform a live fetch **only if rails are open**; on success, **upsert** to DB.
+  * `vendor` — perform a live fetch only if rails are open; on success, upsert to DB.
 
   * `auto` — adapter default (check DB, then follow environment policy).
 
-* `--upsert` — when `--source=vendor`, **upsert** result to DB (idempotent per uniqueness/fingerprint; details live in PF14).
+* `--upsert` — when `--source=vendor`, upsert result to DB (idempotent per uniqueness/fingerprint; details live in PF14).
 
-**Rails interaction.** If rails are **closed**, `--source=vendor` yields a **typed refusal** (no network I/O).
+**Rails interaction.**  
+ If rails are closed, `--source=vendor` yields a typed refusal (no network I/O).
 
-**Streams & exit codes.** Success prints canonical JSON via the single emitter; typed failures print to **stderr** and exit **2**; usage exits **64** (see §3.3–§3.4).
+**Streams & exit codes.**  
+ Success prints canonical JSON via the single emitter; typed failures print to stderr and exit 2; usage exits 64 (see §3.3–§3.4).
 
-**Evidence & routing (titles‑only).** Source‑selection snapshots and invariance set under **Appendix D → D.12**; persistence/home and DB mechanics live in **HDE‑Mechanics**; governance tokens live in **HDE‑Governance**.
+**Evidence & routing (titles‑only).**  
+ Source‑selection snapshots and invariance set under Appendix D → D.12; persistence/home and DB mechanics live in HDE‑Mechanics; governance tokens live in HDE‑Governance.
 
-**Acceptance impact:** None new; documents an implemented path from PF10 (per‑call source).
+**Acceptance impact.**  
+ None new; documents an implemented path from PF10 (per‑call source).
 
-# **5\. Reader Transport (public bytes) \[Required-Now\]**
+**Implementation status (audit v1)**
+
+* **Implementation status:** Partially implemented.
+
+* **Evidence:** The audit describes a `hdctl` subcommand `bg:resolve` in `engine/cli/main.py` with required `--user` and optional `--source {auto,db,vendor}` (default `auto`), plus `--upsert` and `--dry-run`, and vendor birth tuple fields. It notes that `hdctl` uses `_resolver_env()` reading `SAFE_MODE`, `ALLOW_NETWORK`, and `APP_ENV`; DB source modes use supplied user IDs, and vendor modes use birth tuple arguments. It further states that `hdctl bg:resolve` calls `resolve_bodygraph`, which may access DB or vendor, and “writes public payload to stdout only.”
+
+* **Gaps:** The audit does not verify that `--source` semantics exactly match the policy above, does not inspect the BodyGraph JSON schema, and does not test rails‑closed behaviour, typed refusals, or evidence/indexing for source selection. It also does not confirm that this satisfies the “single BodyGraph output” diagnostic requirement from §4.2.
+
+  ---
+
+  ### **4.7 hdctl showcompat \[Required‑Now\]**
+
+`hdctl showcompat` is the canonical compat harness for comparing two users and driving Aux narrative preview. It is an admin/QA tool; it is not a public API.
+
+It binds three things together:
+
+* The Reader v1 public envelope (compat result exposed to clients).
+
+* The compat math over Magic‑10 categories and bands (owned by the HDE Math Spec).
+
+* Aux narrative selection (owned by the Narratives Guide and Narrative Deliverables).
+
+  #### **4.7.1 Inputs (normative)**
+
+`showcompat` supports three input families:
+
+**DB‑backed users**
+
+* hdctl showcompat \--user-a \<idA\> \--user-b \<idB\> \[--source {db|vendor|auto}\]  
+* or equivalent aliases:  
+* hdctl showcompat \--a-user \<idA\> \--b-user \<idB\> \[--source {db|vendor|auto}\]  
+    
+* `--user-a` / `--a-user`, `--user-b` / `--b-user` are internal user ids.
+
+* `--source` has the same semantics as in `bg:resolve`:
+
+  * `db` — both BodyGraphs are fetched from DB only (no vendor).
+
+  * `vendor` — both are resolved from vendor only.
+
+  * `auto` — DB‑first, vendor‑fallback for each user independently.
+
+**File inputs (fixtures)**
+
+* hdctl showcompat \--file \<path\>  
+    
+* `<path>` is a compat fixture file containing the two BodyGraphs and any required metadata.
+
+* No DB or vendor access occurs in this mode.
+
+**STDIN**
+
+* cat compat\_input.json | hdctl showcompat \--stdin  
+    
+* Reads BodyGraphs and metadata from STDIN.
+
+* No DB or vendor access occurs in this mode.
+
+In all modes, user ids and other internal identifiers never leave the engine; they are used only to locate BodyGraphs and inputs in internal storage.
+
+#### **4.7.2 Output (normative)**
+
+On success, `showcompat` MUST emit the Reader v1 public envelope on stdout.
+
+**Shape:**
+
+* Exactly the success envelope defined in §5.1 (six‑key, numeric‑free JSON).
+
+* Canonical JSON: UTF‑8, sorted keys, compact separators, exactly one trailing LF.
+
+* No compat‑internal or vendor‑specific fields are added to the public envelope.
+
+**Semantics:**
+
+* Represents the compat result for the input pair (bands and key indicators).
+
+* Is byte‑identical to what the public Reader API would return for the same underlying BodyGraphs.
+
+Compat “rich” JSON (scores, feature flags, internal diagnostics) is allowed only in admin/test artifacts, such as sidecar files or dedicated admin commands; it MUST NOT be added to the on‑wire Reader envelope or to `showcompat` stdout.
+
+#### **4.7.3 Exit status and parity**
+
+**Exit status:**
+
+* 0 on success (Reader v1 envelope emitted on stdout).
+
+* Non‑zero on any typed failure (error envelope as defined in the JSON error section).
+
+**Reader/CLI parity:**
+
+* For DB‑backed runs with `--source db`, `showcompat` stdout MUST be byte‑identical to the Reader v1 success body for the same pair.
+
+* Appendix C.1 defines the parity harness that enforces this equality.
+
+  #### **4.7.4 Usage with Aux preview**
+
+`showcompat` can be used to generate compat inputs for `hdctl aux-preview`:
+
+* Admin/test compat JSON (when produced) is written to a file (e.g., via separate admin flags or tools) and consumed by `aux-preview` via `--pair-file`.
+
+* `aux-preview` uses that compat JSON to drive Aux narrative selection but does not reach DB or vendor; see §4.5 and §5.7 for details.
+
+**Acceptance impact.**  
+ Aligns CLI behaviour with existing Reader v1 envelope spec and the CLI/Reader parity harness in Appendix C. No new acceptance tokens are introduced; this section clarifies behaviour required for existing CLI/Reader parity and narrative preview tokens elsewhere.
+
+**Implementation status (audit v1)**
+
+* **Implementation status:** Partially implemented.
+
+* **Evidence:** The audit confirms a `hdctl showcompat` subcommand in `engine/cli/main.py` with:
+
+  * File/STDIN inputs (`--pair-file`, `--a-file/--a`, `--b-file/--b`) and
+
+  * DB/vendor inputs via user‑id and birth‑tuple options (`--user-a/--user-b`, and vendor birthdate/time/location flags),  
+     and notes that these modes are validated in code. It also summarizes behaviour as “hdctl showcompat: may read JSON from files or stdin; can write compat‑related output depending on source,” and references legacy CLIs (`scripts/hd_cli.py`, `scripts/hdctl.clean.py`) that read charts and compute compat bands.
+
+* **Gaps:** The audit does **not** describe the exact JSON envelope emitted by `hdctl showcompat`, does not confirm that stdout matches the six‑key Reader v1 envelope, and does not verify inclusion or exclusion of scores, bands, or narrative keys. It does not validate parity with the Reader API, exit codes, or the Aux preview integration described here. As a result, the core requirement “compat run produces a Reader v1 envelope on stdout while rich compat JSON (scores, bands, narratives) lives only in sidecars/admin commands” remains unverified and may be in conflict with actual compat‑JSON behaviour in legacy CLIs.
+
+  ---
+
+  ### 4.8 mplementation Matrix (audit v1)
+
+* | Requirement / area                                     | Spec location        | Status from audit       | Key CLI touchpoints                                    | Gap / note                                                                                                  |  
+* |--------------------------------------------------------|----------------------|-------------------------|--------------------------------------------------------|--------------------------------------------------------------------------------------------------------------|  
+* | hdctl showcompat – file AB/BA harness                  | §4.1                 | Partially implemented   | \`hdctl\` subcommand \`showcompat\`; \`scripts/hd\_cli.py\`, \`scripts/hdctl.clean.py\` | Command and flags exist; audit does not confirm Reader v1 envelope, AB↔BA harness, or preimage/identity checks. |  
+* | hdctl read singlebg – single-chart diagnostic          | §4.2                 | Not implemented         | None reported                                          | No \`read singlebg\` subcommand; single BG output likely via \`bg:resolve\` but not exposed as this command.     |  
+* | hdctl list people                                      | §4.3                 | Not implemented         | None reported                                          | No listing command for people; all behaviour here remains speculative.                                       |  
+* | Fetch commands (person/batch)                          | §4.4                 | Not implemented         | None reported                                          | No \`fetch\` CLI commands; feature remains disabled/speculative as intended.                                   |  
+* | CLI Admin Preview (HTTP Aux emitter)                   | §4.5                 | Partially implemented   | \`hdctl aux-preview\` subcommand                         | CLI aux-preview exists and calls Aux emitter; audit does not cover HTTP admin surface or evidence/indexing.  |  
+* | hdctl bg:resolve – BodyGraph resolver                  | §4.6                 | Partially implemented   | \`hdctl\` subcommand \`bg:resolve\`                        | Flags and env handling implemented; audit does not inspect BG schema, rails-closed behaviour, or evidence.   |  
+* | hdctl showcompat – compat harness for Aux/Reader       | §4.7                 | Partially implemented   | \`hdctl\` subcommand \`showcompat\`; legacy compat scripts | Inputs match design (file/STDIN, DB/vendor); emitted JSON shape and Reader parity are unknown from audit.    |  
+* | Core: single BodyGraph output capability               | §§4.2, 4.6           | Partially implemented   | \`hdctl bg:resolve\`; helper scripts                     | Resolver command exists and writes a public payload; dedicated \`read singlebg\` CLI and stdout schema unpinned.|  
+* | Core: compat outputs (scores, bands, narratives)       | §§4.1, 4.5, 4.7      | Unknown from audit       | \`hdctl showcompat\`, \`hdctl aux-preview\`, \`scripts/hdctl.clean.py\` | Audit mentions compat bands and narrative preview flags, but does not inspect JSON payload to confirm scores or narrative keys per category. |  
+* | Core: BodyGraph data source selection (DB vs vendor)   | §§4.6, 4.7           | Partially implemented   | \`hdctl bg:resolve \--source\`, \`hdctl showcompat \--source\`; \`\_resolver\_env()\` | CLI exposes \`--source {auto,db,vendor}\` and uses env rails; internal resolver semantics and guardrails are not fully audited. |  
+* | Doc-level: two showcompat specs (4.1 vs 4.7)           | §§4.1, 4.7           | Conflict in docs; one CLI | Same \`hdctl showcompat\` subcommand                     | Audit sees a single \`showcompat\` command; the two doc sections describe overlapping but not clearly unified behaviour and must be reconciled separately. |
+
+
+If you want, next step can be a much narrower follow-up prompt for Codex that turns the “Unknown from audit” cells (especially compat scores/bands/narratives and Reader envelope parity) into concrete tests or small probe scripts, still without changing any code.
+
+* 
+
+  # **5\. Reader Transport (public bytes) \[Required-Now\]**
 
 \*\*Cross-doc alignment (titles-only).\*\* Transport matrices and acceptance checklists are mirrored in PF-Canon-HDE-Governance; this chapter owns the bytes; Appendix A remains aligned.
 
-## **5.1 Success envelope \[Required-Now\]**
+## 5.1 Success envelope \[Required-Now\]
 
-**Body shape (six keys).** The Reader v1 success body contains exactly these six top-level keys — **no extras**:
+Body shape (six keys). The Reader v1 success body contains exactly these six top‑level keys — no extras:
 
-1. `reader_version` — fixed string `"v1"`.  
-2. `eligible` — boolean.  
-3. `categories` — array of items exactly `{ "id","band" }`.  
-4. `meta` — object **exactly** `{ "engine_tag","invocation_tag" }`.  
-5. `release_id` — lowercase 64-hex string.  
-6. `idempotence_hash` — lowercase 64-hex string.
+* `reader_version` — fixed string `"v1"`.
 
-**Categories (v1 Alpha).**
+* `eligible` — boolean.
 
-* If `eligible == true`: emit **exactly one** item `{"id":"harmony","band":…}`.  
-* If `eligible == false`: `categories` **may be** `[]`.  
-* Each item is **exactly** `{ "id","band" }`; `band ∈ {"Cool","Open","Warm","Glow"}`; **no numerics** or narrative fields.  
-* `id` **MUST** come from the **Magic-10 closed set** (PF-Schemas & Artifacts §2.6; PF-01 §5.1). *(v1 publicly exposes only `harmony`.)*
+* `categories` — array of items exactly `{ "id", "band" }`.
 
-**Emission algorithm (success case).**
+* `meta` — object exactly `{ "engine_tag", "invocation_tag" }`.
 
-1. **Build preimage (defer to PF-01).** Construct the idempotence **preimage exactly as defined in PF-01** (do **not** restate fields here). The preimage **excludes** `idempotence_hash`.  
-2. **Canonicalize & hash.** Serialize the preimage with the **single shared emitter** and **canonical JSON** rules (§6.1) to obtain `preimage_bytes`, then compute `idempotence_hash = sha256(preimage_bytes)` (lowercase 64-hex).  
-3. **Finalize.** Add `idempotence_hash` and **re-serialize with the same emitter** to produce the final bytes (**LF-terminated**).
+* `release_id` — lowercase 64‑hex string.
 
-**Serialization.** Canonical JSON (§6.1): UTF-8 (no BOM), **sorted keys** (ASCII), compact, **exactly one trailing LF**; arrays used as sets are **deduped & ASCII-sorted**. All byte checks run under **`LC_ALL=C`**.  
- **Public covenant.** The success body is **numeric-free**; fields such as “prompt” or “uncertainty” **must not appear**.
+* `idempotence_hash` — lowercase 64‑hex string.
 
-**Determinism and parity.**
+CLI and admin compatibility surfaces.
 
-* **AB vs BA:** normalization guarantees identical preimages and identical final bytes.  
-* **Two-run identity:** two serializations with the same inputs produce byte-identical output.  
-* **Reader vs CLI:** bodies are **byte-equal** for identical inputs/environment.
+* The Reader v1 success envelope above is the **only** public compat payload exposed by the Reader API. It remains six‑key and numeric‑free.
 
-**Routing (titles-only).**
+* The compat engine also produces a richer compat JSON structure (scores, bands, narrative keys, and per‑category metadata) used for admin/test workflows. This richer JSON is **not** the Reader v1 envelope.
 
-* Canonical JSON & pack/manifest rules: **PF-Canon-HDE-Schemas & Artifacts**.  
-* Magic-10 IDs/ordering: **PF-01 / PF-Schemas §2.6**.  
-* Transport status & headers: **PF-Governance A7** and this document’s **§5.3**.  
-* Preimage/idempotence details: **PF-01 §3**.
+* `hdctl showcompat` is an admin/QA tool. In its current implementation it:
 
-**Normalization note (informative).** If future versions surface channel identifiers in public payloads, they **MUST** be normalized per PF-Schemas §2.1 to **min→max, zero-padded `NN-NN`** before emission. IDs are authoritative; labels are non-normative.
+  * Resolves the pair inputs and viewer preferences.
+
+  * Computes full compat JSON (including `score`, `band`, and narrative key fields for each category).
+
+  * Emits that compat JSON to `stdout` as a single LF‑terminated canonical JSON document of the form `{ "a": {…}, "b": {…}, "viewer_prefs": {…}, "compat": { "categories": [...], "meta": {...} } }` (shape owned by HDE‑CLI‑API‑Vendor‑Ref and HDE‑Mechanics; titles‑only).
+
+  * Optionally writes the Reader v1 success envelope bytes to a file via its reader‑dump path; those bytes are generated through the same `emit_reader_public_envelope` path as the Reader API.
+
+* When the Reader v1 envelope is produced (by the Reader API or by the CLI reader‑dump path), its bytes **MUST**:
+
+  * Match the six‑key shape defined above, with no additional fields.
+
+  * Be canonical JSON per §6.1 (UTF‑8, sorted keys, compact, exactly one trailing LF).
+
+  * Be byte‑identical across Reader and CLI for the same underlying compat result and environment (used for parity tests and evidence).
+
+Richer compat JSON (including numeric scores and narrative selection keys) is restricted to admin/test artifacts (for example, `hdctl showcompat` compat JSON, admin sidecars, and Aux preview inputs). These admin surfaces **must not** extend or change the Reader v1 public envelope; the six‑key envelope remains numeric‑free and field‑closed.
+
+Categories (v1 Alpha).
+
+* If `eligible == true`: emit exactly one item `{"id": "harmony", "band": …}` in `categories`.
+
+* If `eligible == false`: `categories` MAY be `[]`.
+
+* Each item in `categories` is exactly `{ "id", "band" }`.
+
+  * `band ∈ {"Cool","Open","Warm","Glow"}`.
+
+  * No numeric fields (scores) or narrative fields appear in `categories`.
+
+* `id` MUST come from the Magic‑10 closed set (see HDE‑Schemas & Artifacts §2.6 and HDE‑Math‑Spec §5.1). The v1 envelope publicly exposes only the `"harmony"` category; the full Magic‑10 framework (scores, bands, narrative keys per category) remains internal to compat and admin/test JSON surfaces.
+
+Emission algorithm (success case).
+
+1. Build preimage (defer to HDE‑Math‑Spec). Construct the idempotence preimage exactly as defined in HDE‑Math‑Spec §3. The preimage contains all fields required there and **excludes** `idempotence_hash` itself.
+
+2. Canonicalize & hash.
+
+   * Serialize the preimage with the single shared emitter and canonical JSON rules (§6.1) to obtain `preimage_bytes`.
+
+   * Compute `idempotence_hash = sha256(preimage_bytes)` (lowercase 64‑hex).
+
+3. Finalize.
+
+   * Add `idempotence_hash` to the envelope.
+
+   * Re‑serialize with the same emitter to produce the final success body bytes (LF‑terminated).
+
+Serialization. Canonical JSON (§6.1):
+
+* UTF‑8 (no BOM).
+
+* ASCII‑sorted keys.
+
+* Compact separators.
+
+* Exactly one trailing LF.
+
+* Arrays used as sets are deduped and ASCII‑sorted.
+
+* All byte checks run under `LC_ALL=C`.
+
+Public covenant.
+
+* The Reader v1 success body is numeric‑free.
+
+* Fields such as `score`, `prompt`, `uncertainty`, narrative keys, or any other internal compat diagnostics MUST NOT appear in the Reader v1 envelope.
+
+* Numeric scores and narrative keys exist only in internal compat/admin JSON (for example, compat JSON from `showcompat` and Aux preview inputs), never in the public Reader v1 response.
+
+Determinism and parity.
+
+* AB vs BA: normalization at the compat layer guarantees identical preimages and identical final Reader v1 envelope bytes for `{a,b}` and `{b,a}`.
+
+* Two‑run identity: two serializations with the same inputs produce byte‑identical Reader v1 envelope bytes.
+
+* Reader vs CLI:
+
+  * When the CLI produces Reader v1 bytes (via the reader‑dump path), those bytes MUST be identical to the Reader API success body for the same inputs and environment.
+
+  * CLI compat JSON (admin/test) is canonical JSON and deterministic, but it is a distinct envelope from the Reader v1 public envelope.
+
+Routing (titles‑only).
+
+* Canonical JSON & pack/manifest rules: HDE‑Schemas & Artifacts.
+
+* Magic‑10 IDs, scoring, and band selection: HDE‑Math‑Spec and HDE‑Mechanics Guide.
+
+* Transport status & headers: HDE‑Governance (A7) and this document’s §5.3.
+
+* Preimage/idempotence details: HDE‑Math‑Spec §3.
+
+* CLI compat JSON shape and admin/test evidence surfaces: HDE‑CLI‑API‑Vendor‑Ref and HDE‑Mechanics Guide.
+
+Normalization note (informative). If future versions surface channel identifiers in public payloads, they MUST be normalized per HDE‑Schemas & Artifacts §2.1 to `NN-NN` (zero‑padded, min‑first) before emission. IDs remain authoritative; labels are non‑normative.
 
 ---
 
@@ -1084,33 +1365,99 @@ Update the **human index**, its **hash sentinel**, and the **machine mirror** in
 
 ## **7.1 Rails & Environment \[Required-Now\]**
 
-Rails defaults (env inventory; titles-only).  
- By default **dev** and **stage** run with rails **OPEN** (`SAFE_MODE=0`, `ALLOW_NETWORK=1`); **prod** and **CI** run with rails **CLOSED** (`SAFE_MODE=1`, `ALLOW_NETWORK=0`). Opening rails is an explicit job/session decision (ops/config), not a runtime toggle. The authoritative inventory lives in **Glow-Infrastructure** (titles-only).
+### **7.1.1 Rails defaults (env inventory; titles-only)**
 
-Two-gate rule (both required).  
- A live HDAPI call is permitted only when `SAFE_MODE=0` **and** `ALLOW_NETWORK=1`.
+* **Dev / stage:** rails **OPEN** by default
 
-Refusal semantics (closed rails).  
- When either gate is not satisfied, vendor paths **MUST NOT** perform any network I/O (no sockets, DNS, HTTP). Return a **typed refusal** (numeric-free, LF-terminated canonical JSON), and log no secrets (keys-only posture). Proof remains a single-file capture: headers → blank line → LF-terminated JSON body (see PF12).
+  * `SAFE_MODE = 0`
 
-Environment variables (must be present and non-empty; names-only).  
- `HDAPI_BASE_URL`, `HD_API_KEY`, and (when needed) `GEO_API_KEY`. Missing/empty ⇒ typed failure **without** I/O.
+  * `ALLOW_NETWORK = 1`
 
-Determinism and shaping (closed).  
- With rails closed, providers may shape the request (URL, headers, body schema) deterministically (order-neutral, no time/random) but **must not** send it; output is the refusal. Run checks under `LC_ALL=C`, `TZ=UTC`.
+* **Prod / CI:** rails **CLOSED** by default
 
-CI/test posture.  
- CI runs **CLOSED** by default. Any CI job that opens rails must pin timeout/retry/backoff policy and attach keys-only evidence in the same PR.
+  * `SAFE_MODE = 1`
 
-Evidence (titles/paths only; PF12 single home).
+  * `ALLOW_NETWORK = 0`
 
-* `artifacts/proofs/ops_refusal_proof.txt` (single-file refusal)
+* Opening rails is an **explicit job/session decision** (ops/config), not a runtime toggle.
 
-* `artifacts/runtime/env_connectivity.snapshot.json` (dev jobs)
+* The authoritative environment inventory lives in **Glow-Infrastructure** (titles-only).
 
-* grep-guard reports for keys-only logging
+### **7.1.2 Two-gate rule (both required)**
 
-Acceptance (titles-only; tokens live in Governance).
+* A live HDAPI call is permitted **only when both**:
+
+  * `SAFE_MODE = 0`, and
+
+  * `ALLOW_NETWORK = 1`.
+
+### **7.1.3 Refusal semantics (closed rails)**
+
+* When either gate is not satisfied, vendor paths **MUST NOT** perform any network I/O (no sockets, DNS, HTTP).
+
+* In this case, return a **typed refusal**:
+
+  * Numeric-free, LF-terminated canonical JSON.
+
+  * No secrets; logs follow **keys-only** posture.
+
+* Proof remains a **single-file capture**:
+
+  * Headers → blank line → LF-terminated JSON body.
+
+  * Path: `artifacts/proofs/ops_refusal_proof.txt` (see PF12).
+
+### **7.1.4 Environment variables (must be present and non-empty; names-only)**
+
+* `HDAPI_BASE_URL`
+
+* `HD_API_KEY`
+
+* `GEO_API_KEY` (when needed)
+
+Missing or empty env values **MUST** produce a typed failure **without** I/O.
+
+### **7.1.5 Determinism and shaping (closed rails)**
+
+* With rails closed:
+
+  * Providers **may shape** the request (URL, headers, body schema) **deterministically**:
+
+    * Order-neutral.
+
+    * No time/locale/random dependence.
+
+  * Providers **must not send** the request; the output is the typed refusal.
+
+* All checks run under:
+
+  * `LC_ALL = C`
+
+  * `TZ = UTC`.
+
+### **7.1.6 CI / test posture**
+
+* CI runs **CLOSED** by default (`SAFE_MODE=1`, `ALLOW_NETWORK=0`).
+
+* Any CI job that opens rails **must**:
+
+  * Pin timeout/retry/backoff policy.
+
+  * Attach **keys-only** evidence in the same PR.
+
+### **7.1.7 Evidence (titles/paths only; PF12 single home)**
+
+The following artifacts are governed and indexed in **PF12**:
+
+* `artifacts/proofs/ops_refusal_proof.txt` — single-file refusal (headers → blank line → LF-terminated JSON).
+
+* `artifacts/runtime/env_connectivity.snapshot.json` — dev jobs (env and connectivity snapshot).
+
+* Grep-guard reports for keys-only logging.
+
+### **7.1.8 Acceptance (titles-only; tokens live in Governance)**
+
+The behavior above is covered by acceptance tokens owned in **HDE-Governance** (names-only):
 
 * `NO_EXTERNAL_IO_ON_REFUSAL_OK`
 
@@ -1130,8 +1477,75 @@ Acceptance (titles-only; tokens live in Governance).
 
 * `OPS_REFUSAL_MIRROR_LINK_OK`
 
-Routing (titles-only).  
- Env inventory: **Glow-Infrastructure**. Transport matrices: **HDE-Governance**. Evidence index/mirror: **HDE-Schemas & Artifacts**.
+### **7.1.9 Routing (titles-only)**
+
+* Env inventory: **Glow-Infrastructure**.
+
+* Transport matrices and refusal/error policy: **HDE-Governance**.
+
+* Evidence index and mirror: **HDE-Schemas & Artifacts**.
+
+---
+
+### **7.1.10 Endpoint policy (BodyGraph vendor HTTP)**
+
+**Full BodyGraph endpoint (only):**
+
+The engine uses **only** the full BodyGraph endpoint:
+
+ POST /bodygraphs
+
+ with the three-key JSON body:
+
+ {"birthdate": "...", "birthtime": "...", "location": "..."}
+
+* 
+
+**Unsupported endpoint (simple BodyGraph):**
+
+The optional vendor endpoint:
+
+ POST /bodygraphs/simple
+
+*  is **unsupported** for HDE and **MUST NOT** appear in engine code, QA harnesses, or docs for this engine.
+
+* Any such usage is out-of-policy and must be removed or migrated to `POST /bodygraphs`.
+
+**Privacy / payload constraints:**
+
+* Vendor HTTP **never** receives internal user ids or other internal identifiers.
+
+* Only the birth payload and location are sent, along with the documented header set:
+
+  * `Accept`
+
+  * `Content-Type`
+
+  * `HD-Api-Key`
+
+  * Optional `HD-Geocode-Key`
+
+  * `User-Agent`, etc.
+
+---
+
+### **7.1.11 SAFE rails and admin override (vendor ingest)**
+
+Vendor HTTP for BodyGraph ingest is subject to the SAFE rails posture described in Governance:
+
+* When rails are **closed** (`SAFE_MODE=1` or `ALLOW_NETWORK=0`):
+
+  * **No vendor HTTP calls** are made.
+
+* In **prod**, admin vendor calls are permitted **only** when:
+
+  * Rails are explicitly **open** (`SAFE_MODE=0`, `ALLOW_NETWORK=1`), and
+
+  * The documented **admin override environment guard** is set.
+
+* Otherwise, vendor calls **MUST NOT** be attempted and `bg:resolve` / CLI commands **MUST** fail closed with a typed error.
+
+This section owns the **on-wire HTTP contract** (endpoint, headers, body). Policy, rails, and override semantics are owned by **HDE-Governance** and referenced here by title only.
 
 ---
 
@@ -1142,9 +1556,9 @@ Purpose (normative).
 
 ### **7.2.1 Endpoints, method, base URL**
 
-* **Primary endpoint:** `POST /v1/bodygraphs` (JSON).
+* **Primary endpoint:** `POST /bodygraphs` (JSON).
 
-* **Alternate endpoint:** `POST /v1/bodygraphs/simple` (CLI may expose `--vendor-mode full|simple`, default `full`).
+* **Alternate endpoint:** `POST /bodygraphs/simple` (CLI may expose `--vendor-mode full|simple`, default `full`).
 
 * **Base-URL resolution (no fallback).** Resolve **only** from `HDAPI_BASE_URL`. If missing or empty, fail with typed error (see §7.1). Do **not** default to a literal.
 
@@ -1614,26 +2028,39 @@ Otherwise, it is **Rejected** (no partial merges).
 
 ### **B.1 Request (redacted example; rails open)**
 
-* **Method/Path:** `POST /v1/bodygraphs`
+The canonical vendor BodyGraph request for HDE is:
 
-* **Base URL:** `${HDAPI_BASE_URL}`
+POST /bodygraphs
 
-* **Headers:**
+with JSON body:
 
-  * `Accept: application/json`
+{  
+  "birthdate": "YYYY-MM-DD",  
+  "birthtime": "HH:MM",  
+  "location": "free-text or structured location (see vendor docs)"  
+}
 
-  * `Content-Type: application/json; charset=utf-8`
+and headers:
 
-  * `HD-Api-Key: REDACTED`
+* `Accept: application/json`
 
-  * `HD-Geocode-Key: REDACTED`
+* `Content-Type: application/json; charset=utf-8`
 
-  * `User-Agent: GlowHDEngine/<release_id>`
+* `HD-Api-Key: <redacted>`
 
-* **Body (three keys):** `{"birthdate":"DD-MMM-YYYY","birthtime":"HH:MM","location":"City, Country"}` (ASCII/UTF-8; no `tz`).
+* `HD-Geocode-Key: <optional, redacted>`
 
-### **B.2 Response → typed error mapping (deterministic)**
+* `User-Agent: GlowHDEngine/<release_id>`
 
+HDE does **not** use `POST /bodygraphs/simple`. That endpoint is treated as unsupported for this engine and MUST NOT appear in engine code, QA harnesses, or governed documentation.
+
+**Acceptance impact**
+
+* No new tokens; this redline encodes endpoint policy that is already implied by PF10 and PF01.
+
+* Keeps PF05 as the single home for the on-wire vendor HTTP contract while deferring rails and override policy to PF04.
+
+* **B.2 Response → typed error mapping (deterministic)**  
 * `401` → `PROVIDER_UNAUTHORIZED`
 
 * `403` → `PROVIDER_FORBIDDEN`

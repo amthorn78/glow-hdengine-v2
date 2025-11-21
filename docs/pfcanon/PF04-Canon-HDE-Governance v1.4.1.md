@@ -4,12 +4,12 @@
 
 **Title:** PF04-Canon-HDE-Governance
 
-**Version:** v1.4
+**Version:** v1.4.1
 
 **Status:** Canon
 
-**Effective date:** 2025-11-17  
-**Last Update Gate:** BN 7.1 Drain
+**Effective date:** 2025-11-21  
+**Last Update Gate:** BN 7.6.6 Drain
 
 ## **0.2 Scope \[Required-Now\]**
 
@@ -98,154 +98,305 @@ This governance document defines how the HD Engine is built, validated, and rele
 
 * **Auditability.** All references to external homes are titles/anchors only; proofs (goldens, scripts, snapshots) are indexed under **Appendix D: Evidence Index** and kept in sync with repo changes.
 
-  ---
+## **1.3 EPIC‑011 preservation surfaces \[Required-Now\]**
+
+EPIC‑011 introduces a **preservation guard** over key public and admin surfaces. Under this Epic, certain contracts are treated as **frozen**: governance and QA may strengthen proofs and evidence, but they may **not** change these surfaces’ wire contracts.
+
+**Preserved surfaces (names-only)**
+
+* **CLI admin preview (Aux preview).**  
+   Wire bytes, stdout/sidecar contracts, and exit‑code behavior for CLI admin preview are owned by **HDE-CLI-API-Vendor-Ref**. EPIC‑011 allows QA and evidence changes only (e.g., additional proofs, harnesses), not contract changes.
+
+* **Vendor ingest wire bytes.**  
+   Vendor HTTP request/response shapes, paths, and typed error envelopes are owned by **HDE-CLI-API-Vendor-Ref**. Governance ensures SAFE rails posture and observability; EPIC‑011 does not change vendor wire contracts.
+
+* **Compat JSON surface.**  
+   The compat surface used by `showcompat` and other callers is governed by **HDE-Math-Spec** and **HDE-CLI-API-Vendor-Ref**. EPIC‑011 treats this as frozen; only QA evidence around compat (AB↔BA parity, two‑run identity) may change.
+
+* **Aux narrative surface.**  
+   Narrative packs, text, suppression rules, and Aux routes are governed by **HDE-Narratives Guide** and **HDE-CLI-API-Vendor-Ref**. Under EPIC‑011, narrative contracts are preserved; QA captures headers, packs, IDs, and transport proofs only.
+
+**Governance stance**
+
+* Governance **may** tighten tests, add acceptance tokens, and require new evidence artifacts **without** changing preserved wire contracts.
+
+* Any change to a preserved surface’s contract must be treated as **out of scope for EPIC‑011** and routed through a future Epic in **HDE Epics Map**.
+
+**Acceptance and artifact impact**
+
+* No new tokens; this section clarifies EPIC‑011’s scope for existing tokens.
+
+Evidence: downstream PF09/PF19 updates should reflect that EPIC‑011 QA focuses on evidence around these preserved surfaces, not contract changes.
+
+---
 
 # **2\. Acceptance Policy — A3–A4–A7 \[Required-Now\]**
 
 ---
 
-## 2.0 Acceptance Tokens (single-home roster) \[Required-Now\] 
+## **2.0 Acceptance Tokens (single-home roster) \[Required-Now\]**
 
-Single home for governance tokens. This roster centralizes token semantics; the bytes and tests live elsewhere and are referenced by title only. Other sections must reference §2.0 and must not restate token lists. Supersession: PF10 uses numbered addenda; the later number governs. Case-sensitive.
+**Single home for governance tokens.** This roster centralizes token semantics; the bytes and tests live elsewhere and are referenced by title only. Other sections must reference §2.0 and must not restate token lists. Supersession: PF10 uses numbered addenda; the later number governs. All token names are case-sensitive.
+
+**Token Registry.** This section is the **Token Registry** for HDE acceptance tokens. Token names and semantics are **owned here**. **HDE-Schemas and Artifacts** mirrors these names and attaches acceptance hints to concrete artifacts; it does **not** change semantics. **HDE-Build Checklist** is strictly **consumer-only**: it lists and groups tokens by phase and Epic but may not introduce new token names. Any new acceptance token must be defined in this section first and then mirrored into **HDE-Schemas and Artifacts** and **HDE-Build Checklist** by title.
+
+---
 
 ### **2.0.1 Determinism & identity**
 
-* TWO\_RUN\_IDENTITY\_OK — Two serializations of the same inputs produce identical bytes. (Owned: HDE Math Spec; Mechanics Guide; Evidence & Artifacts)  
-* COMPOSITE\_ABBA\_IDENTITY\_OK — AB↔BA fingerprint byte-equality (no vendor flags in composite). (Owned: HDE Math Spec; Evidence & Artifacts)  
-* JSON\_CANONICAL\_CHECK\_OK — Canonical JSON everywhere: UTF-8 (no BOM), sorted keys, compact, exactly one trailing LF; arrays-as-sets. (Owned: Mechanics Guide; Evidence & Artifacts)  
-* PREIMAGE\_RECOMPUTE\_OK — Strip idempotence\_hash, canonicalize preimage, sha256 matches published. (Owned: HDE Math Spec; Evidence & Artifacts)
+* **TWO\_RUN\_IDENTITY\_OK** — Two serializations of the same inputs produce identical bytes. (Owned: HDE Math Spec; Mechanics Guide; Evidence & Artifacts)
+
+* **COMPOSITE\_ABBA\_IDENTITY\_OK** — AB↔BA fingerprint byte-equality (no vendor flags in composite). (Owned: HDE Math Spec; Evidence & Artifacts)
+
+* **JSON\_CANONICAL\_CHECK\_OK** — Canonical JSON everywhere: UTF-8 (no BOM), sorted keys, compact, exactly one trailing LF; arrays-as-sets as required. (Owned: Mechanics Guide; Evidence & Artifacts)
+
+* **PREIMAGE\_RECOMPUTE\_OK** — Strip `idempotence_hash`, canonicalize preimage, sha256 matches published preimage hash. (Owned: HDE Math Spec; Evidence & Artifacts)
+
+---
 
 ### **2.0.2 Internal-ops identity (/internal/version)**
 
-* INTERNAL\_VERSION\_200\_CTYPE\_JSON\_UTF8\_OK — GET 200 uses application/json; charset=utf-8. (Owned: Governance; Mechanics Guide)  
-* INTERNAL\_VERSION\_HEAD\_PARITY\_OK — HEAD 200 mirrors GET validators (no body). (Owned: Governance; Mechanics Guide)  
-* INTERNAL\_VERSION\_CONDITIONALS\_IGNORED\_OK — If-None-Match / If-Modified-Since ignored → 200 (never 304). (Owned: Governance; Mechanics Guide)  
-* INTERNAL\_VERSION\_NO\_ETAG\_OK — No ETag on GET/HEAD. (Owned: Governance; Build Notes — Prod QA)  
-* INTERNAL\_VERSION\_NO\_STORE\_OK — Cache-Control: no-store on GET/HEAD. (Owned: Governance; Build Notes — Prod QA)
+* **INTERNAL\_VERSION\_200\_CTYPE\_JSON\_UTF8\_OK** — `GET /internal/version` 200 uses `Content-Type: application/json; charset=utf-8`. (Owned: Governance; Mechanics Guide)
 
-Naming cleanup: The INTVER\_\* aliases are deprecated in favor of INTERNAL\_VERSION\_\*. Use only the canonical names above going forward.
+* **INTERNAL\_VERSION\_HEAD\_PARITY\_OK** — `HEAD /internal/version` 200 mirrors GET validators (no body). (Owned: Governance; Mechanics Guide)
+
+* **INTERNAL\_VERSION\_CONDITIONALS\_IGNORED\_OK** — `If-None-Match` / `If-Modified-Since` are ignored; success uses 200 (never 304). (Owned: Governance; Mechanics Guide)
+
+* **INTERNAL\_VERSION\_NO\_ETAG\_OK** — No `ETag` on `GET`/`HEAD`. (Owned: Governance; Build Notes — Prod QA)
+
+* **INTERNAL\_VERSION\_NO\_STORE\_OK** — `Cache-Control: no-store` on `GET`/`HEAD`. (Owned: Governance; Build Notes — Prod QA)
+
+*Naming cleanup.* The `INTVER_*` aliases are deprecated in favor of `INTERNAL_VERSION_*`. Use only the canonical names above going forward.
+
+---
 
 ### **2.0.3 Reader A7 (Catalog JSON success; prove on the Endpoint Catalog)**
 
-* ENDPOINTS\_CATALOG\_OK — Catalog of JSON success routes is present (titles-only in CLI/API Vendor Ref). (Owned: CLI/API Vendor Ref)  
-* ENDPOINTS\_CATALOG\_INTERNAL\_OK — Catalog is internal-only; not a client contract. (Owned: Governance; CLI/API Vendor Ref)  
-* ENDPOINTS\_CATALOG\_ENV\_GATE\_OK — Each entry declares an env gate; non-prod entries are unreachable in prod. (Owned: Governance; CLI/API Vendor Ref)  
-* A7\_GET\_QUOTED\_ETAG\_OK — GET 200 has strong, quoted ETag (identity over LF-terminated body; pre-compression). (Owned: Governance; CLI/API Vendor Ref)  
-* A7\_HEAD\_PARITY\_OK — HEAD 200 mirrors 200 validators (no body). (Owned: Governance; CLI/API Vendor Ref)  
-* A7\_304\_OMITS\_CT\_CL\_OK — 304 only after prior 200; omit both Content-Type and Content-Length. (Owned: Governance; CLI/API Vendor Ref)  
-* A7\_ENCODING\_INVARIANCE\_OK — For the same canonical body, identity (ETag) and effective Content-Length are stable across accepted encodings. (Owned: Governance; CLI/API Vendor Ref)  
-* A7\_VARY\_AUTH\_AE\_OK — Vary: Authorization, Accept-Encoding present. (Owned: Governance; CLI/API Vendor Ref)  
-* READER\_200\_CTYPE\_JSON\_UTF8\_OK — application/json; charset=utf-8 on 200\. (Owned: Governance; CLI/API Vendor Ref)  
-* READER\_200\_CACHECTL\_OK — Cache-Control on 200/HEAD is policy-compliant. (Owned: Governance; CLI/API Vendor Ref)  
-* READER\_VARY\_ACCEPT\_ENCODING\_OK — Vary includes Accept-Encoding. (Owned: Governance; CLI/API Vendor Ref)  
-* READER\_VARY\_AUTHORIZATION\_OK — Vary includes Authorization. (Owned: Governance; CLI/API Vendor Ref)  
-* READER\_304\_NO\_CL\_OK — 304 omits Content-Length. (Owned: Governance; CLI/API Vendor Ref)  
-* READER\_304\_NO\_CTYPE\_OK — 304 omits Content-Type. (Owned: Governance; CLI/API Vendor Ref)  
-* READER\_HEAD\_ETAG\_MATCH\_OK — HEAD validators (incl. ETag) match GET. (Owned: Governance; CLI/API Vendor Ref)  
-* READER\_HEAD\_CL\_MATCH\_OK — HEAD Content-Length equals identity 200 body length. (Owned: Governance; CLI/API Vendor Ref)  
-* A7\_TRANSPORT\_PROOF\_OK — Capture one full A7 proof set for a cataloged route. (Owned: CLI/API Vendor Ref; Evidence & Artifacts)
+* **ENDPOINTS\_CATALOG\_OK** — Catalog of JSON success routes is present (titles-only in CLI/API Vendor Ref). (Owned: CLI/API Vendor Ref)
 
-#### Equivalence notes (titles-only).
+* **ENDPOINTS\_CATALOG\_INTERNAL\_OK** — Catalog is internal-only; not a client contract. (Owned: Governance; CLI/API Vendor Ref)
 
-* A7\_304\_OMITS\_CT\_CL\_OK ≡ (READER\_304\_NO\_CTYPE\_OK ∧ READER\_304\_NO\_CL\_OK)  
-* A7\_VARY\_AUTH\_AE\_OK ≡ (READER\_VARY\_AUTHORIZATION\_OK ∧ READER\_VARY\_ACCEPT\_ENCODING\_OK)
+* **ENDPOINTS\_CATALOG\_ENV\_GATE\_OK** — Each entry declares an env gate; non-prod entries are unreachable in prod. (Owned: Governance; CLI/API Vendor Ref)
+
+* **A7\_GET\_QUOTED\_ETAG\_OK** — `GET` 200 has strong, quoted ETag (identity over LF-terminated body; pre-compression). (Owned: Governance; CLI/API Vendor Ref)
+
+* **A7\_HEAD\_PARITY\_OK** — `HEAD` 200 mirrors 200 validators (no body). (Owned: Governance; CLI/API Vendor Ref)
+
+* **A7\_304\_OMITS\_CT\_CL\_OK** — 304 only after prior 200; omits both `Content-Type` and `Content-Length`. (Owned: Governance; CLI/API Vendor Ref)
+
+* **A7\_ENCODING\_INVARIANCE\_OK** — For the same canonical body, identity (ETag) and effective `Content-Length` are stable across accepted encodings. (Owned: Governance; CLI/API Vendor Ref)
+
+* **A7\_VARY\_AUTH\_AE\_OK** — `Vary: Authorization, Accept-Encoding` present. (Owned: Governance; CLI/API Vendor Ref)
+
+* **READER\_200\_CTYPE\_JSON\_UTF8\_OK** — `Content-Type: application/json; charset=utf-8` on 200\. (Owned: Governance; CLI/API Vendor Ref)
+
+* **READER\_200\_CACHECTL\_OK** — `Cache-Control` on 200/HEAD is policy-compliant. (Owned: Governance; CLI/API Vendor Ref)
+
+* **READER\_VARY\_ACCEPT\_ENCODING\_OK** — `Vary` includes `Accept-Encoding`. (Owned: Governance; CLI/API Vendor Ref)
+
+* **READER\_VARY\_AUTHORIZATION\_OK** — `Vary` includes `Authorization`. (Owned: Governance; CLI/API Vendor Ref)
+
+* **READER\_304\_NO\_CL\_OK** — 304 omits `Content-Length`. (Owned: Governance; CLI/API Vendor Ref)
+
+* **READER\_304\_NO\_CTYPE\_OK** — 304 omits `Content-Type`. (Owned: Governance; CLI/API Vendor Ref)
+
+* **READER\_HEAD\_ETAG\_MATCH\_OK** — HEAD validators (including ETag) match GET. (Owned: Governance; CLI/API Vendor Ref)
+
+* **READER\_HEAD\_CL\_MATCH\_OK** — HEAD `Content-Length` equals identity 200 body length. (Owned: Governance; CLI/API Vendor Ref)
+
+* **A7\_TRANSPORT\_PROOF\_OK** — Capture one full A7 proof set for a cataloged route. (Owned: CLI/API Vendor Ref; Evidence & Artifacts)
+
+*Equivalence notes (titles-only).*
+
+* `A7_304_OMITS_CT_CL_OK` ≡ (`READER_304_NO_CTYPE_OK` ∧ `READER_304_NO_CL_OK`)
+
+* `A7_VARY_AUTH_AE_OK` ≡ (`READER_VARY_AUTHORIZATION_OK` ∧ `READER_VARY_ACCEPT_ENCODING_OK`)
+
+---
 
 ### **2.0.4 Aux Narrative transport (success \+ suppression; prove on Endpoint Catalog)**
 
-* Tokens (Aux surface; names-only)  
-  * NARR\_200\_TEXT\_OK  
-  * NARR\_SUPPRESSED\_NO\_ETAG\_OK  
-  * NARR\_VARY\_AUTH\_AE\_OK  
-  * AUX\_CANON\_ALIAS\_PARITY\_OK
+*Tokens (Aux surface; names-only).*
 
-  * (Notes: these replace legacy AUX\_\* names; one-release grace for AUX\_\* may be handled in PF09. Aux HEAD/304 tokens are out-of-scope for EPIC-010; A7 remains Catalog-only.)
+* **NARR\_200\_TEXT\_OK**
+
+* **NARR\_SUPPRESSED\_NO\_ETAG\_OK**
+
+* **NARR\_VARY\_AUTH\_AE\_OK**
+
+* **AUX\_CANON\_ALIAS\_PARITY\_OK**
+
+*Notes.* These replace legacy `AUX_*` names; one-release grace for `AUX_*` may be handled in HDE-Build Checklist. Aux HEAD/304 tokens are out-of-scope for EPIC-010; A7 remains Catalog-only.
+
+---
 
 ### **2.0.5 Writers / refusal & ops posture (rails)**
 
-* WRITERS\_OPTIONS\_204\_NO\_BODY\_OK — Writers’ OPTIONS returns 204 (no body). Never emit body/ETag/Vary/compression; HEAD 405 remains strict with Content-Length: 0\. (Owned: Governance)  
-* ERROR\_CTYPE\_JSON\_UTF8\_OK — Refusal responses use application/json; charset=utf-8. (Owned: Governance)  
-* NO\_CONTENT\_ENCODING\_OK — No Content-Encoding on refusal. (Owned: Governance)  
-* NO\_EXTERNAL\_IO\_ON\_REFUSAL\_OK — Refusal path performs no external I/O. (Owned: Governance)  
-* PF04\_LOG\_ALLOWLIST\_009\_OK — Refusal logs are keys-only with the allow-list {at, route, status, duration\_ms, idempotence\_hash, release\_id}. (Owned: Governance)  
-* REFUSAL\_ROUTE\_PINNED\_OK — Canonical refusal probe route is /ops/rails/refusal (GET/POST equivalent; OPTIONS/HEAD per matrix). (Owned: Governance)
+* **WRITERS\_OPTIONS\_204\_NO\_BODY\_OK** — Writers’ `OPTIONS` returns 204 (no body). Never emit body/ETag/Vary/compression; HEAD 405 remains strict with `Content-Length: 0`. (Owned: Governance)
 
-## **Refusal proof artifact (shape & linkage)**
+* **ERROR\_CTYPE\_JSON\_UTF8\_OK** — Refusal responses use `Content-Type: application/json; charset=utf-8`. (Owned: Governance)
 
-* OPS\_REFUSAL\_FILE\_FORMAT\_OK  
-* OPS\_REFUSAL\_HEADERS\_OK  
-* OPS\_REFUSAL\_BODY\_OK  
-* OPS\_REFUSAL\_MIRROR\_LINK\_OK
+* **NO\_CONTENT\_ENCODING\_OK** — No `Content-Encoding` on refusal. (Owned: Governance)
+
+* **NO\_EXTERNAL\_IO\_ON\_REFUSAL\_OK** — Refusal path performs no external I/O. (Owned: Governance)
+
+* **PF04\_LOG\_ALLOWLIST\_009\_OK** — Refusal logs are keys-only with the allow-list `{at, route, status, duration_ms, idempotence_hash, release_id}`. (Owned: Governance)
+
+* **REFUSAL\_ROUTE\_PINNED\_OK** — Canonical refusal probe route is `/ops/rails/refusal` (GET/POST equivalent; OPTIONS/HEAD per matrix). (Owned: Governance)
+
+*Refusal proof artifact (shape & linkage).*
+
+* **OPS\_REFUSAL\_FILE\_FORMAT\_OK**
+
+* **OPS\_REFUSAL\_HEADERS\_OK**
+
+* **OPS\_REFUSAL\_BODY\_OK**
+
+* **OPS\_REFUSAL\_MIRROR\_LINK\_OK**
+
+---
 
 ### **2.0.6 Evidence & indexing**
 
-* EVIDENCE\_INDEX\_UPDATED\_OK — Human Evidence Index updated in the same change as artifacts. (Owned: Governance; Evidence & Artifacts)  
-* EVIDENCE\_INDEX\_MIRROR\_OK — Machine JSONL mirror (records-only; sorted keys; one LF) present and valid. (Owned: Evidence & Artifacts)  
-* EVIDENCE\_PATHS\_VALIDATED\_OK — Each record has a discovered path plus path-proof; human↔machine parity is 1:1. (Owned: Governance; Evidence & Artifacts)  
-* EVIDENCE\_PATH\_PROOFS\_OK — Path-proofs present and linked. (Owned: Evidence & Artifacts)  
-* CI\_CHECK\_FINAL\_LF\_OK — All evidence artifacts & mirror lines are LF-terminated (exactly one). (Owned: Evidence & Artifacts; Build Notes)  
-* CI\_CHECK\_MIRROR\_SCHEMA\_OK — Mirror records pass schema/role/field-order checks (unknown-key rejection). (Owned: Evidence & Artifacts; Build Notes)  
-* EVIDENCE\_INDEX\_HASH\_OK — Human index hash sentinel present and gating merges. (Owned: Governance; Evidence & Artifacts)  
-* \+SNAPSHOT\_HEADER\_LOWERCASE\_OK (Normative header-name lowercasing for stored snapshots; PF12 owns the rule and schema.)
+* **EVIDENCE\_INDEX\_UPDATED\_OK** — Human Evidence Index updated in the same change as artifacts. (Owned: Governance; Evidence & Artifacts)
+
+* **EVIDENCE\_INDEX\_MIRROR\_OK** — Machine JSONL mirror (records-only; sorted keys; one LF) present and valid. (Owned: Evidence & Artifacts)
+
+* **EVIDENCE\_PATHS\_VALIDATED\_OK** — Each record has a discovered path plus path-proof; human↔machine parity is 1:1. (Owned: Governance; Evidence & Artifacts)
+
+* **EVIDENCE\_PATH\_PROOFS\_OK** — Path-proofs present and linked for governed artifacts. (Owned: Evidence & Artifacts)
+
+* **CI\_CHECK\_FINAL\_LF\_OK** — All evidence artifacts & mirror lines are LF-terminated (exactly one). (Owned: Evidence & Artifacts; Build Notes)
+
+* **CI\_CHECK\_MIRROR\_SCHEMA\_OK** — Mirror records pass schema/role/field-order checks (unknown-key rejection). (Owned: Evidence & Artifacts; Build Notes)
+
+* **EVIDENCE\_INDEX\_HASH\_OK** — Human index hash sentinel present and gating merges. (Owned: Governance; Evidence & Artifacts)
+
+* **SNAPSHOT\_HEADER\_LOWERCASE\_OK** — Stored header snapshots use lower-case header names; norm enforced by schema rules in HDE-Schemas and Artifacts. (Owned: HDE-Schemas and Artifacts)
+
+---
 
 ### **2.0.7 Freeze-Pack & manifest**
 
-* PACK\_ROOT\_PINNED\_OK — root: "catalog/" pinned. (Owned: Evidence & Artifacts — Manifest)  
-* PACK\_MANIFEST\_NO\_SELF\_LISTING\_OK — Root manifest does not list itself or sidecars. (Owned: Evidence & Artifacts — Manifest)  
-* MANIFEST\_SHA256\_HEX64\_OK — Each entry sha256 is lowercase 64-hex of canonical bytes. (Owned: Evidence & Artifacts — Manifest)  
-* MANIFEST\_FILE\_EXISTS\_OK — Each listed file exists at the path. (Owned: Evidence & Artifacts — Manifest)  
-* MANIFEST\_PATH\_ASCII\_SORT\_OK — files\[\] ASCII-sorted by path. (Owned: Evidence & Artifacts — Manifest)  
-* RELEASE\_ID\_FROM\_MANIFEST\_OK — release\_id derives only from the manifest. (Owned: Evidence & Artifacts — Manifest)  
-* RELEASE\_ID\_RECOMPUTE\_OK — sha256(canonical\_manifest\_bytes) matches recompute. (Owned: Evidence & Artifacts — Manifest)  
-* TWO\_RUN\_IDENTITY\_OK — Two-run identity of the recompute step. (Owned: Evidence & Artifacts — Manifest)
+* **PACK\_ROOT\_PINNED\_OK** — `root: "catalog/"` pinned. (Owned: Evidence & Artifacts — Manifest)
+
+* **PACK\_MANIFEST\_NO\_SELF\_LISTING\_OK** — Root manifest does not list itself or sidecars. (Owned: Evidence & Artifacts — Manifest)
+
+* **MANIFEST\_SHA256\_HEX64\_OK** — Each entry `sha256` is lowercase 64-hex of canonical bytes. (Owned: Evidence & Artifacts — Manifest)
+
+* **MANIFEST\_FILE\_EXISTS\_OK** — Each listed file exists at the path. (Owned: Evidence & Artifacts — Manifest)
+
+* **MANIFEST\_PATH\_ASCII\_SORT\_OK** — `files[]` ASCII-sorted by path. (Owned: Evidence & Artifacts — Manifest)
+
+* **RELEASE\_ID\_FROM\_MANIFEST\_OK** — `release_id` derives only from the manifest. (Owned: Evidence & Artifacts — Manifest)
+
+* **RELEASE\_ID\_RECOMPUTE\_OK** — `sha256(canonical_manifest_bytes)` matches recompute. (Owned: Evidence & Artifacts — Manifest)
+
+* **TWO\_RUN\_IDENTITY\_OK** — Two-run identity of the recompute step. (Owned: Evidence & Artifacts — Manifest)
+
+---
 
 ### **2.0.8 CLI/SDK parity harness**
 
-* \- CLI\_READER\_EMITTER\_PARITY\_OK  
-* \+ CLI\_READER\_PARITY\_OK  
-* \+ CLI\_PREVIEW\_ENABLED\_OK  
-* \+ CLI\_PREVIEW\_INDEXED\_OK
+* **CLI\_READER\_PARITY\_OK** — CLI `showcompat` parity with Reader public envelope is maintained: same emitter, same bytes for the same normalized inputs. (Owned: Governance; CLI/API Vendor Ref)
 
-(CLI admin preview is enabled for admins and uses the same emitter as Aux; evidence is required and indexed.)
+* **CLI\_PREVIEW\_ENABLED\_OK** — CLI admin preview (for Aux narratives) is enabled only for admins and uses the same emitter as Aux. (Owned: Governance; CLI/API Vendor Ref)
 
-### 2.0.9 Database posture
+* **CLI\_PREVIEW\_INDEXED\_OK** — CLI admin preview outputs are captured and indexed as governed artifacts (stdout text \+ ids-only JSON). (Owned: Governance; Evidence & Artifacts)
 
-DB\_CONN\_ENV\_OK — Selection order `DATABASE_URL → DB_BRIDGE_URL → typed error`. (Owned: Glow Infrastructure; Mechanics Guide)  
- DB\_RUNTIME\_SEARCH\_PATH\_OK — Runtime `search_path = hde, public` (in that order). (Owned: Glow Infrastructure; Mechanics Guide; Evidence & Artifacts)  
- DB\_ROLE\_OK — Least-privilege runtime grants. (Owned: Glow Infrastructure; Evidence & Artifacts)  
- DB\_SCHEMA\_FINGERPRINT\_OK — Canonical DDL fingerprint captured. (Owned: Evidence & Artifacts)  
- DB\_BOUNDARY\_VIEW\_OK — Boundary view (`public.hde_body_graphs_current`) is read-only; no rules/triggers allow writes outside the `hde` schema. (Owned: Governance; Glow Infrastructure; Evidence & Artifacts)  
- DB\_WRITERS\_ISOLATED\_OK — Only Engine roles can mutate `hde.*`; backend roles and other consumers have no DML rights on `hde` data (write isolation enforced). (Owned: Governance; Glow Infrastructure; Evidence & Artifacts)  
- DEV\_DB\_BRIDGE\_FALLBACK\_OK — In dev, when `DATABASE_URL` is unusable, fall back to `DB_BRIDGE_URL`; dev connectivity snapshot present; keys-only diagnostics; no secrets. (Owned: Governance; Glow Infrastructure; Evidence & Artifacts)  
- PROD\_CONN\_SINGLE\_SOURCE\_OK — In prod, connection source is single and explicit (no bridge fallback). (Owned: Governance; Glow Infrastructure)
+*Note.* `CLI_READER_EMITTER_PARITY_OK` is deprecated in favor of `CLI_READER_PARITY_OK`. Keep the legacy token only for historical boards and references.
 
-### 2.0.10 Env / rails / infra
+---
 
-ENV\_PORT\_REQUIRED\_OK — Runtime `PORT` is present and bound. (Owned: Glow Infrastructure)  
- SERVICE\_START\_CMD\_CAPTURED\_OK — Production start command captured (bytes \+ sha256). (Owned: Glow Infrastructure; Evidence & Artifacts)  
- GUNICORN\_APP\_FACTORY\_OK — Adapter entry `adapter.factory:create_app()` binds `$PORT`. (Owned: Glow Infrastructure; Evidence & Artifacts)  
- ENV\_RAILS\_POLICY\_OK — Dev/QA may be open; Prod must not depend on rails-open settings; CI/test harness runs default to closed rails. (Owned: Mechanics Guide; Governance)  
- ENV\_LC\_ALL\_C\_OK — All determinism and evidence jobs run with canonical pins `LC_ALL=C`, `LANG=C`, `TZ=UTC` for HDE services and CI (env pins present and enforced). (Owned: Governance; Build Checklist; Mechanics Guide)  
- OBS\_KEYS\_ONLY\_OK — Operational logs are keys-only and secret-free (no payload bodies or header values; secrets redacted), in accordance with Governance logging policy. (Owned: Governance)
+### **2.0.9 Database posture**
+
+* **DB\_CONN\_ENV\_OK** — DB connections in each environment use the governed source: `DATABASE_URL` for primary DB, `DB_BRIDGE_URL` only where bridge use is explicitly allowed, and mocks/fixtures only in dev/test. Prod public traffic must not use `DB_BRIDGE_URL` for Reader/Aux routes. Connection failures are typed and recorded as evidence (artifacts and schemas live in HDE-Schemas and Artifacts and Glow QA Guide); ad-hoc connection logic is forbidden.
+
+* **DB\_RUNTIME\_SEARCH\_PATH\_OK** — Runtime `search_path = hde, public` (in that order). (Owned: Glow Infrastructure; Mechanics Guide; Evidence & Artifacts)
+
+* **DB\_ROLE\_OK** — Current DB role and privilege posture is **captured and indexed**, not assumed ideal. Grants, default privileges, `search_path`, and boundary views are documented via governed artifacts and included in the Evidence Index. Under EPIC-011, `DB_ROLE_OK` asserts accurate capture and review of the existing posture; known design debt (e.g., missing primary keys) is treated as documented debt, not an EPIC-011 blocker. A future PK-focused Epic in HDE Epics Map will tighten this token’s target state.
+
+* **DB\_SCHEMA\_FINGERPRINT\_OK** — Canonical DDL fingerprint captured for the EPIC-011 objects. (Owned: Evidence & Artifacts)
+
+* **DB\_BOUNDARY\_VIEW\_OK** — Boundary view (`public.hde_body_graphs_current`) is read-only; no rules/triggers allow writes outside the `hde` schema. (Owned: Governance; Glow Infrastructure; Evidence & Artifacts)
+
+* **DB\_WRITERS\_ISOLATED\_OK** — Only Engine roles can mutate `hde.*`; backend roles and other consumers have no DML rights on HDE data (write isolation enforced). (Owned: Governance; Glow Infrastructure; Evidence & Artifacts)
+
+* **DEV\_DB\_BRIDGE\_FALLBACK\_OK** — In dev, when `DATABASE_URL` is unusable, fall back to `DB_BRIDGE_URL`; dev connectivity snapshot present; keys-only diagnostics; no secrets. (Owned: Governance; Glow Infrastructure; Evidence & Artifacts)
+
+* **PROD\_CONN\_SINGLE\_SOURCE\_OK** — In prod, connection source is single and explicit (no bridge fallback). (Owned: Governance; Glow Infrastructure)
+
+---
+
+### **2.0.10 Env / rails / infra**
+
+* **ENV\_PORT\_REQUIRED\_OK** — Runtime `PORT` is present and bound. (Owned: Glow Infrastructure)
+
+* **SERVICE\_START\_CMD\_CAPTURED\_OK** — Production start command captured (bytes \+ sha256). (Owned: Glow Infrastructure; Evidence & Artifacts)
+
+* **GUNICORN\_APP\_FACTORY\_OK** — Adapter entry `adapter.factory:create_app()` binds `$PORT`. (Owned: Glow Infrastructure; Evidence & Artifacts)
+
+* **ENV\_RAILS\_POLICY\_OK** — Dev/QA may be open; Prod must not depend on rails-open settings; CI/test harness runs default to closed rails. (Owned: Mechanics Guide; Governance)
+
+* **ENV\_LC\_ALL\_C\_OK** — All determinism and evidence jobs run with canonical pins `LC_ALL=C`, `LANG=C`, `TZ=UTC` for HDE services and CI (env pins present and enforced). (Owned: Governance; Build Checklist; Mechanics Guide)
+
+* **OBS\_KEYS\_ONLY\_OK** — Operational logs are keys-only and secret-free (no payload bodies or header values; secrets redacted), in accordance with Governance logging policy. (Owned: Governance)
+
+*Observability & privacy tokens.*
+
+* **LOGS\_KEYS\_ONLY\_OK** — Governed logs (including A7 proofs, BodyGraph diagnostics, and ops probes) are keys-only: no payload values, no PII. Payload bytes and PII must never appear in governed logs.
+
+* **BG\_PRIVACY\_REDACTION\_OK** — BodyGraph-specific logs and metrics apply privacy-preserving redaction rules as defined in Glow QA Guide; sensitive fields are omitted or redacted before emission.
+
+* **BG\_METRICS\_EXPOSED\_OK** — Exposed BodyGraph metrics are limited, non-PII, and consistent with infra/QA observability policy; metrics surfaces must not leak user-identifying or sensitive information.
+
+*Rails-open SAFE tokens (vendor 429 & logging).*
+
+* **VENDOR\_RETRY\_BACKOFF\_OK** — Vendor `429` responses are subject to governed retry behavior with bounded backoff. Retry logic is transport-level and deterministic; no unbounded or ad-hoc retries are permitted.
+
+* **PROVIDER\_429\_TYPED\_OK** — Vendor `429` responses are parsed into a typed error envelope owned by HDE-CLI-API-Vendor-Ref. Governance asserts that prod traffic sees typed 429s, not opaque errors.
+
+* **RETRY\_AFTER\_PARSE\_OK** — `Retry-After` headers on vendor `429` responses are parsed and enforced according to rules in HDE-CLI-API-Vendor-Ref. Unparseable values are handled under a safe default policy and never result in unbounded retry loops.
+
+* **VENDOR\_NO\_PAYLOAD\_LOGGING\_OK** — Logging for vendor calls (requests and responses) is keys-only; governed logs must not contain payload bodies or PII. Payload bytes live only in transport-level artifacts and external vendor systems, not in logs.
+
+These tokens apply whenever SAFE rails are opened for vendor calls in any environment, including admin-guarded prod windows.
+
+---
 
 ### **2.0.11 Catalog hygiene (where applicable)**
 
-* CATALOG\_ORIENTATION\_CANON\_OK — Channel IDs canonical NN-NN (zero-padded, min-first); ASCII ordered. (Owned: Evidence & Artifacts — Catalogs)  
-* CATALOG\_DENOMINATORS\_FROZEN\_OK — Pack denominators are present and frozen; no runtime overrides. (Owned: HDE Math Spec; Evidence & Artifacts)  
-* FEATURE\_NULL\_DEFAULT\_OK — Default null → 0 unless D3 explicitly overrides. (Owned: HDE Math Spec)  
-* BAND\_MAX\_INCLUSIVE\_OK — Bands use inclusive-high thresholds. (Owned: HDE Math Spec)  
-* BAND\_EDGE\_GOLDENS\_OK — Goldens at 24/49/74/100 pass. (Owned: HDE Math Spec; Evidence & Artifacts)  
-* PREFS\_KEYSET\_10\_OK — Preference keyset is the canonical 10\. (Owned: HDE Math Spec; Governance)
+* **CATALOG\_ORIENTATION\_CANON\_OK** — Channel IDs canonical `NN-NN` (zero-padded, min-first); ASCII ordered. (Owned: Evidence & Artifacts — Catalogs)
+
+* **CATALOG\_DENOMINATORS\_FROZEN\_OK** — Pack denominators are present and frozen; no runtime overrides. (Owned: HDE Math Spec; Evidence & Artifacts)
+
+* **FEATURE\_NULL\_DEFAULT\_OK** — Default `null → 0` unless D3 explicitly overrides. (Owned: HDE Math Spec)
+
+* **BAND\_MAX\_INCLUSIVE\_OK** — Bands use inclusive-high thresholds. (Owned: HDE Math Spec)
+
+* **BAND\_EDGE\_GOLDENS\_OK** — Goldens at 24/49/74/100 pass. (Owned: HDE Math Spec; Evidence & Artifacts)
+
+* **PREFS\_KEYSET\_10\_OK** — Preference keyset is the canonical 10\. (Owned: HDE Math Spec; Governance)
+
+---
 
 ### **2.0.12 Narratives — packs & gate**
 
-* NARR\_PACKS\_IN\_MANIFEST\_OK  
-* NARR\_PACK\_SHA\_OK  
-* NARR\_PACKS\_CANONICAL\_JSON\_OK  
-* NARR\_PACK\_MANIFEST\_OK  
-* NARR\_PACK\_IDENTITY\_OK  
-* GRACE\_DELIVERABLES\_GATE\_OK
+* **NARR\_PACKS\_IN\_MANIFEST\_OK**
 
-*Naming cleanup:* `CLI_READER_EMITTER_PARITY_OK` is deprecated in favor of `CLI_READER_PARITY_OK`. Keep the legacy token only for historical boards.\*
+* **NARR\_PACK\_SHA\_OK**
+
+* **NARR\_PACKS\_CANONICAL\_JSON\_OK**
+
+* **NARR\_PACK\_MANIFEST\_OK**
+
+* **NARR\_PACK\_IDENTITY\_OK**
+
+* **GRACE\_DELIVERABLES\_GATE\_OK**
+
+*Naming cleanup.* `CLI_READER_EMITTER_PARITY_OK` is deprecated in favor of `CLI_READER_PARITY_OK`. Keep the legacy token only for historical boards and references.
+
+---
 
 ## **2.1 A3 — Determinism gates \[Required-Now\]**
 
@@ -325,24 +476,45 @@ ENV\_PORT\_REQUIRED\_OK — Runtime `PORT` is present and bound. (Owned: Glow In
 
 ## **3.1 SAFE rails default ON \[Required-Now\]**
 
-Default posture by environment.  
- In **development** and **stage** environments, rails are **OPEN by default** (`SAFE_MODE=0`, `ALLOW_NETWORK=1`); vendor HTTP is allowed in these environments unless rails are explicitly closed. In **production**, rails are **CLOSED by default** (`SAFE_MODE=1`, `ALLOW_NETWORK=0`); vendor HTTP is refused unless rails are explicitly opened by ops.
+SAFE rails for **vendor HTTP** are **default closed** in all environments. Opening rails is an explicit, governed action with evidence and tokens.
 
-Two-gate rule (both required).  
- Live HTTP is allowed only when **both** `SAFE_MODE=0` **and** `ALLOW_NETWORK=1`. If either gate is not satisfied, vendor HTTP is treated as closed-rails and refused.
+### **Public traffic (Reader/Aux)**
 
-No implicit overrides.  
- Reader/CLI **MUST NOT** toggle rails; opening rails is an **operational (env/config) decision**, not a runtime flag. Jobs or sessions that open rails for vendor ingest must do so explicitly via configuration and meet the evidence requirements in this document and in the Epic-Process-Guide.
+* Prod public surfaces (Reader JSON success, Aux narrative) must serve requests **without** vendor HTTP.
 
-Determinism while closed.  
- With rails closed, provider code may shape requests (for diagnostics) but **MUST NOT** perform any network I/O (no sockets, DNS, HTTP). It returns a typed refusal (numeric-free JSON; canonical: UTF-8 no BOM, sorted keys, compact, exactly one LF) and logs no secrets. Run checks under `LC_ALL=C`, `TZ=UTC`.
+* **BG\_VENDOR\_CALLS\_DISABLED\_IN\_PROD\_OK** asserts that public traffic in prod is **DB-backed only**; the Engine does not call vendor HTTP to satisfy public Reader/Aux requests.
 
-CI/test posture.  
- Rails remain **CLOSED by default** in CI and test harness runs (`SAFE_MODE=1`, `ALLOW_NETWORK=0`). Any CI job that opens rails must pin timeout/retry/backoff policy, remain keys-only in diagnostics, and attach required evidence (including env snapshot and path-proofs) in the same change, as governed by this document and by the Epic-Process-Guide.
+* Any vendor-originated data used in prod public responses must arrive via prior ingest and DB, not live vendor calls.
 
----
+### **Admin ops windows (vendor override)**
 
-## **3.2 Refusal semantics (rails closed) \[Required-Now\]**
+* Ops may run vendor calls in prod.
+
+* Vendor override is driven by CLI flags.
+
+* When override is enabled:
+
+  * SAFE rails tokens in §2.0 apply:
+
+    * Bounded retry and backoff (**VENDOR\_RETRY\_BACKOFF\_OK**).
+
+    * Typed 429 handling (**PROVIDER\_429\_TYPED\_OK**).
+
+    * `Retry-After` parsing (**RETRY\_AFTER\_PARSE\_OK**).
+
+    * No payload logging (**VENDOR\_NO\_PAYLOAD\_LOGGING\_OK**, **LOGS\_KEYS\_ONLY\_OK**).
+
+  * Observability and privacy tokens (**BG\_PRIVACY\_REDACTION\_OK**, **BG\_METRICS\_EXPOSED\_OK**) remain in force.
+
+### **Governance stance**
+
+* **BG\_VENDOR\_CALLS\_DISABLED\_IN\_PROD\_OK** scopes to **public traffic**. It does **not** forbid admin-guarded CLI commands that call vendor in prod.
+
+* All vendor override behavior must be evidenced and indexed via artifacts governed in **HDE-Schemas and Artifacts** and **Glow QA Guide**; PF04 owns the token semantics only.
+
+  ---
+
+  ## **3.2 Refusal semantics (rails closed) \[Required-Now\]**
 
 When rails are closed (i.e., `SAFE_MODE≠0` or `ALLOW_NETWORK≠1`), vendor paths **MUST NOT** open sockets, resolve DNS, or attempt HTTP (no external I/O). This applies to **all** vendor invocations, including manual or CLI requests that explicitly set `source="vendor"`; such attempts **MUST** produce a deterministic typed refusal and **MUST NOT** perform any upstream call.
 
@@ -786,23 +958,58 @@ Evidence/index shapes and merge‑gating sentinel: PF12. Process/PR flow: Epic�
 
 ### 6.3.2 Development (PF10-A) — bridge fallback with evidence
 
-Fallback rule (dev-only).  
- If `APP_ENV=dev` and `DATABASE_URL` is present but not usable, fall back to `DB_BRIDGE_URL`; refuse (typed error) if neither is usable.
+**Fallback rule (dev-only).**  
+ If `APP_ENV=dev` and `DATABASE_URL` is present but not usable, the resolver **falls back to `DB_BRIDGE_URL`**. If neither `DATABASE_URL` nor `DB_BRIDGE_URL` is usable, the resolver must **refuse with a typed error** (numeric-free JSON envelope), not a raw exception.
 
-Diagnostics.  
- Keys-only logs; no secrets, no payloads.
+**Diagnostics.**  
+ Diagnostics for dev fallback are **keys-only**:
 
-Error handling (bridge failures).  
- Any network-level error from the HTTPS bridge is caught and surfaced as a **typed internal adapter error** (for example `BridgeUnavailable` with a coded reason), not as a raw exception. This preserves SAFE-rails and logging posture: no low-level stack traces or unredacted messages leak into logs or outputs, and error bodies follow the standard typed, numeric-free envelope.
+* No secrets (passwords, DSNs, tokens).
 
-Search path.  
- Runtime `search_path` remains `hde, public`.
+* No request/response payload bodies.
 
-Acceptance (titles-only).  
- `DEV_DB_BRIDGE_FALLBACK_OK`, `DB_CONN_ENV_OK`, `DB_RUNTIME_SEARCH_PATH_OK`, `DB_ROLE_OK`, `DB_SCHEMA_FINGERPRINT_OK`.
+* No full SQL or stack traces in governed logs.
 
-Evidence (titles-only; PF12 single home).  
- `artifacts/runtime/env_connectivity.snapshot.json` (dev resolver snapshot), plus the D.11 DB posture set. See **Appendix D: D.12**.
+**Error handling (bridge failures).**  
+ Any network-level error from the HTTPS bridge (for example, TLS handshake failure, connection refused, timeout) must be:
+
+* Caught by the bridge adapter.
+
+* Surfaced as a **typed internal adapter error** (for example, `BridgeUnavailable` with a coded reason), not a raw exception.
+
+This preserves SAFE-rails and logging posture:
+
+* No low-level stack traces or unredacted messages leak into logs or outputs.
+
+* Error bodies follow the standard typed, numeric-free envelope.
+
+**Search path.**  
+ Runtime `search_path` remains `hde, public` during dev resolution, even when falling back to `DB_BRIDGE_URL`.
+
+**EPIC-011 stance and future PK Epic.**  
+ Under EPIC-011, DB posture acceptance tokens (including `DB_SCHEMA_FINGERPRINT_OK`, `DB_BOUNDARY_VIEW_OK`, `DB_RUNTIME_SEARCH_PATH_OK`, `DB_CONN_ENV_OK`, and `DB_ROLE_OK`) assert that the **current** posture is fully captured, reviewed, and indexed. They do **not** claim that the schema is ideal. Known structural debt — such as tables without primary keys — is treated as **documented debt**, not an EPIC-011 blocker. A future PK-focused Epic, owned in HDE Epics Map, will tighten posture requirements and evolve these tokens’ target state; PF04 records that future work but does not pre-empt it.
+
+**Acceptance (titles-only).**
+
+* `DEV_DB_BRIDGE_FALLBACK_OK`
+
+* `DB_CONN_ENV_OK`
+
+* `DB_RUNTIME_SEARCH_PATH_OK`
+
+* `DB_ROLE_OK`
+
+* `DB_SCHEMA_FINGERPRINT_OK`
+
+**Evidence (titles-only; PF12 single home).**
+
+* `artifacts/runtime/env_connectivity.snapshot.json` — dev resolver snapshot (bridge vs direct selection, attempts, and typed failures; keys-only, no secrets).
+
+* The D.11 DB posture set (DDL fingerprint, grants, boundary view read-only proof, partition plan and verify, and related artifacts).
+
+See **Appendix D: D.12** for the full DB posture evidence bundle and indexing rules.
+
+---
 
 ### 6.3.3 Routing (titles-only)
 
@@ -1261,58 +1468,160 @@ Got it — here’s your **§10.3 Writers and errors** cleaned up for clarity an
 
 ---
 
-## 10.5 Internal-ops surface: /internal/version
+## 10.5 `/internal/version` ops surface (identity only; non-A7) \[Required-Now\]
 
- **Intent and scope.** **Internal-only** identity/version surface for operators. **Not** a public Reader success route; **A7 does not apply**.
+#### **Intent and scope**
 
-**Methods and status**
+`/internal/version` is an **ops-only identity route**, used by operators to inspect the running release identity. It is **not** a public Reader success route, and **A7 does not apply**. A7 transport proofs run only on the Endpoint Catalog JSON success surface (see HDE-CLI-API-Vendor-Ref and HDE-Schemas and Artifacts by title).
 
-* Supports **GET** and **HEAD**.  
-* **Content-Type on 200:** `application/json; charset=utf-8`.  
-* **HEAD parity:** HEAD returns **200**, mirrors GET validators, **empty body**; `Content-Length == len(identity GET body)` (LF-terminated bytes); `Content-Type == GET`.  
-* Always returns **200** on success. *(Production override ⇒ `400` JSON with `Cache-Control: no-store`, no `ETag`, when an override is explicitly denied.)*
+---
 
-**Caching and validators**
+#### **Methods and status**
 
-* **Cache-Control: `no-store`** on **all** responses.  
-* **No `ETag`** and **no `Last-Modified`** on this surface.  
-* Conditional request headers are **ignored**; **never 304** on this surface.  
-* `Vary` is **optional** (may be present; not required for acceptance).
+* `GET /internal/version` and `HEAD /internal/version` **always return 200** on success.
 
-**Payload (frozen minimal identity).** Expose **exactly six** provenance fields; **no extra fields**:
+* Conditional request headers (`If-None-Match`, `If-Modified-Since`, and similar) are **ignored**; `/internal/version` **never returns 304**.
 
-1. `engine_tag`  
-2. `build_commit`  
-3. `invocation_tag`  
-4. `invocation_sha256`  
-5. `emitter_sha256`  
-6. `release_id`  
-    Canonical JSON; UTF-8; compact separators; **exactly one trailing LF**.
+* `HEAD /internal/version`:
 
-**Acceptance (binary gates)**
+  * Returns `200` with the same validators as `GET` (where present).
 
-1. **INTERNAL\_VERSION\_200\_CTYPE\_JSON\_UTF8\_OK.** GET 200 includes `Content-Type: application/json; charset=utf-8`.  
-2. **INTERNAL\_VERSION\_HEAD\_PARITY\_OK.** HEAD returns 200; mirrors GET validators; empty body; `Content-Length == len(identity GET)`; `Content-Type == GET`.  
-3. **INTERNAL\_VERSION\_CONDITIONALS\_IGNORED\_OK.** `If-None-Match` / `If-Modified-Since` ignored; always 200 (**never 304**).  
-4. **INTERNAL\_VERSION\_NO\_ETAG\_OK.** No `ETag` on GET/HEAD.  
-5. **INTERNAL\_VERSION\_NO\_STORE\_OK.** `Cache-Control: no-store` present on GET/HEAD.
+  * May carry `Content-Length` equal to `len(identity GET body)` (LF-terminated bytes).
 
-**Evidence (records-only; titles-only; indexed via PF12)**
+  * Has an empty body.
 
-* **intver/headers\_get** — raw GET response headers (proves `no-store`, no `ETag`, correct `Content-Type`).  
-* **intver/headers\_head** — raw HEAD response headers (HEAD 200, `Content-Type` parity, `Content-Length ==` identity GET).  
-* **intver/body\_get** — exact GET body bytes (LF-terminated; six keys; stable order) \+ sha256 record.  
-* **intver/cond\_if\_none\_match** — GET with `If-None-Match` (still 200).  
-* **intver/cond\_if\_modified\_since** — GET with `If-Modified-Since` (still 200).  
-* **intver/two\_run\_identity** — two-run byte identity log.  
-   *(Mirror records include: `artifact_key`, `sha256`, `size_bytes`, `produced_at_utc`, `discovered_physical_path`, and a `proof_anchor` to a co-located path-proof. Update the PF12 human index \+ hash sentinel and the machine mirror **in the same PR**.)*
+---
 
-**Routing (titles-only)**
+#### **Headers and caching**
 
-* Contract bytes (examples/schema) for **GET /internal/version** live in **HDE-CLI-API-Vendor-Ref**.  
-* Operational policy and runbooks live in **HDE-Governance** (this document).
+* All successful responses **must** include:
 
-**Prod QA note.** In production, `/internal/version` returns `application/json; charset=utf-8` with **`Cache-Control: no-store`**, **no `ETag`**, ignores conditional request headers (**never 304**), and **HEAD 200** mirrors GET validators with `Content-Length == GET` and `Content-Type == GET`. This surface is operator-only and is **not** a JSON success route.
+  * `Cache-Control: no-store`.
+
+  * **No** `ETag`.
+
+  * **No** `Last-Modified`.
+
+* `Vary` is optional on this surface (it may be present but is not required for acceptance).
+
+---
+
+#### **Payload (frozen minimal identity)**
+
+The JSON body is a **frozen minimal identity envelope**. It exposes exactly **six** provenance fields and **no extras**:
+
+* `engine_tag`
+
+* `build_commit`
+
+* `invocation_tag`
+
+* `invocation_sha256`
+
+* `emitter_sha256`
+
+* `release_id`
+
+The body must be canonical JSON:
+
+* UTF-8 (no BOM).
+
+* Sorted keys; compact separators.
+
+* Exactly one trailing `\n` (LF).
+
+---
+
+#### **Acceptance (binary gates)**
+
+Names-only; token semantics live in this document, bytes and tests live elsewhere by title.
+
+* **INTERNAL\_VERSION\_200\_CTYPE\_JSON\_UTF8\_OK**  
+   `GET /internal/version` 200 includes `Content-Type: application/json; charset=utf-8`.
+
+* **INTERNAL\_VERSION\_HEAD\_PARITY\_OK**  
+   `HEAD /internal/version` returns 200; mirrors GET validators; empty body; `Content-Length == len(identity GET body)`; `Content-Type == GET`.
+
+* **INTERNAL\_VERSION\_CONDITIONALS\_IGNORED\_OK**  
+   `If-None-Match` / `If-Modified-Since` are ignored; on success, the route always returns 200 (never 304).
+
+* **INTERNAL\_VERSION\_NO\_ETAG\_OK**  
+   No `ETag` on `GET` or `HEAD`.
+
+* **INTERNAL\_VERSION\_NO\_STORE\_OK**  
+   `Cache-Control: no-store` is present on `GET` and `HEAD`.
+
+---
+
+#### **Evidence and A7 separation**
+
+`/internal/version` is **not** an A7 proof surface. A7 transport proofs run only on the Endpoint Catalog JSON success route owned by HDE-CLI-API-Vendor-Ref and indexed in HDE-Schemas and Artifacts.
+
+Evidence for `/internal/version` is records-only and titles-only at this level; bytes and schemas live in HDE-Schemas and Artifacts and Glow QA Guide.
+
+Evidence artifacts (names-only):
+
+* `intver/headers_get` — raw `GET /internal/version` response headers (proves `Cache-Control: no-store`, absence of `ETag`/`Last-Modified`, correct `Content-Type`).
+
+* `intver/headers_head` — raw `HEAD /internal/version` response headers (200, `Content-Length == identity GET body`, `Content-Type == GET`).
+
+* `intver/body_get` — exact `GET` body bytes (LF-terminated; six keys; stable order) \+ sha256 record.
+
+* `intver/cond_if_none_match` — `GET` with `If-None-Match` (still 200).
+
+* `intver/cond_if_modified_since` — `GET` with `If-Modified-Since` (still 200).
+
+* `intver/two_run_identity` — two-run byte identity log for the body.
+
+Indexing requirements:
+
+* For each artifact above:
+
+  * Add a titles/paths entry in `docs/evidence/INDEX.json` and update `docs/evidence/INDEX.sha256`.
+
+  * Add or update a Machine Mirror record in `artifacts/evidence_index.jsonl` with:
+
+    * `artifact_key`,
+
+    * `discovered_physical_path`,
+
+    * `produced_at_utc`,
+
+    * `proof_anchor` (path to the co-located `*.path_proof.txt`),
+
+    * `role`, `sha256`, `size_bytes`.
+
+* Mirror rules (single file, canonical JSONL, sorted keys, unknown-key rejection) and path-proof schema are defined in HDE-Schemas and Artifacts; PF04 governs only the token and routing semantics.
+
+---
+
+#### **Routing (titles-only)**
+
+* Contract bytes (examples and schema) for `GET /internal/version` live in **HDE-CLI-API-Vendor-Ref**.
+
+* Operational policy, acceptance tokens, and runbook semantics live here in **HDE-Governance**.
+
+* Evidence artifacts and their indexing rules live in **HDE-Schemas and Artifacts** and **Glow QA Guide** (names-only at this level).
+
+---
+
+#### **Prod QA note**
+
+In production, `/internal/version`:
+
+* Returns `application/json; charset=utf-8`.
+
+* Uses `Cache-Control: no-store`.
+
+* Never emits `ETag` or `Last-Modified`.
+
+* Ignores conditional request headers (`If-None-Match`, `If-Modified-Since`); never returns 304\.
+
+* Ensures `HEAD` 200 mirrors GET validators and may carry `Content-Length == len(identity GET body)` with an empty body.
+
+This surface is operator-only, is not a JSON success route for clients, and remains **outside A7**.
+
+---
 
 # **11\. Vendor Ingest Governance (HDAPI) \[Required-Now\] / \[Speculative\]**
 

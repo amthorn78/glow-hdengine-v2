@@ -1,11 +1,11 @@
 # **0\. Front Matter**
 
 **Title:** PF07-Canon-Glow-Infrastructure  
- **Version:** v1.0.7
+ **Version:** v1.0.8
 
 **Status:** Canon  
-**Effective date:** 2025-11-17  
-**Last Update Gate:** BN 7.1 Drain
+**Effective date:** 2025-11-21  
+**Last Update Gate:** BN 7.6.6 Drain
 
 **Invocation tag:** `INV-f2ac55d77ce9aacc`
 
@@ -196,6 +196,54 @@ PF07 is **names-only**. Admin-only narratives persistence **DB/schema locations*
  • Determinism pins are required for all evidence/canonicalization jobs.  
  • Details/tokens: see **HDE-Governance**; jobs/proofs: **HDE-Schemas & Artifacts**; process: **Epic-Process-Guide**.
 
+## **2.5 QA windows (names‑only)**
+
+**Policy routing.** This section records only the existence and locations of prod QA windows and their harnesses. Rails semantics, override guards, and acceptance tokens live in HDE‑Governance and Glow QA Guide (titles‑only).
+
+### **2.5.1 EPIC‑011 prod QA rails‑open window (Codespaces → prod)**
+
+* **Scope (names‑only).** For EPIC‑011, there is a PO‑approved, time‑boxed prod QA window that exercises production endpoints from the staging/QA environment (GitHub Codespaces). This is an admin‑only QA run; it is not general user traffic.
+
+* **Rails posture during the window.**
+
+  * For the HD Engine service in prod, the QA window opens rails to:
+
+    * `SAFE_MODE=0`
+
+    * `ALLOW_NETWORK=1`
+
+  * Outside the window, prod rails posture reverts to the defaults in §2.4 and HDE‑Governance.
+
+  * Rails‑open applies only to the QA harness invocation; normal production traffic remains governed by the default prod rails posture.
+
+* **Harness entrypoint (names‑only).**
+
+  * Supported operator harness for the prod QA choreography:
+
+    * `scripts/ops/admin_vendor_qa.py`
+
+  * The canonical runbook and command sequencing for this harness live in:
+
+    * `docs/run/RUN_PROD_QA.md` (names‑only here)
+
+    * Glow QA Guide (step‑by‑step QA procedure; titles‑only)
+
+* **Routing (titles‑only).**
+
+  * Rails/override semantics and acceptance tokens → HDE‑Governance.
+
+  * QA choreography, sample runs, and evidence expectations → Glow QA Guide.
+
+  * Endpoint bytes and A7 behavior for the probed routes → HDE‑CLI‑API‑Vendor‑Ref.
+
+  * Evidence artifacts and indices produced by the harness → HDE‑Schemas & Artifacts.
+
+**Acceptance and artifact impact**
+
+* **Acceptance tokens:** None new in PF07; all tokens remain defined in HDE‑Governance.
+
+* **Artifact paths:** Names‑only references to docs/run/RUN\_PROD\_QA.md and scripts/ops/admin\_vendor\_qa.py; governed evidence artifacts remain owned and shaped in PF12 and PF19.
+
 ---
 
 # 3\) Provider inventory (names-only)
@@ -291,14 +339,72 @@ PF07 is **names-only**. Admin-only narratives persistence **DB/schema locations*
 
 ## **5.1 HD Engine repo**
 
-* **Repository:** `amthorn78/glow-hdengine-v2`  
-* **Primary paths of interest:** `adapter/`, `engine/`, `presenter/`  
-* **Service mapping (names-only):**  
-  * **Railway project:** `ample-illumination`  
-  * **Railway service:** `glow-hdengine-v2`  
-    ---
+**Repository.**  
+ `amthorn78/glow-hdengine-v2`
 
-    ## **5.2 Glow Backend repo**
+**Primary paths of interest.**
+
+* `adapter/`
+
+* `engine/`
+
+* `presenter/`
+
+---
+
+### **5.1.1 Additional governed paths (EPIC-011; names-only)**
+
+These paths are infra-relevant assets in the HD Engine repo for EPIC-011. Only names are recorded here; behavior, schemas, and acceptance are routed by title.
+
+* `docs/run/PROD_ENDPOINTS.json`  
+   Canonical source-of-truth for production endpoint base URLs (names-only; no secrets).
+
+* `docs/run/RUN_PROD_QA.md`  
+   Prod QA rails-window runbook for admin QA (Codespaces → prod). Step-by-step choreography and acceptance live in **Glow QA Guide**.
+
+* `scripts/runtime/validate_prod_endpoints.py`  
+   Helper that validates `PROD_ENDPOINTS.json` against the deployed production endpoints. Evidence paths and schema are governed in **HDE-Schemas & Artifacts** and **Glow QA Guide**.
+
+* `scripts/ops/admin_vendor_qa.py`  
+   Admin vendor QA harness used to execute the prod QA runbook from the staging/QA environment. Behavior, rails policy, and acceptance tokens live in **HDE-Governance** and **Glow QA Guide**.
+
+---
+
+### **5.1.2 Notes (routing only)**
+
+PF07 records these paths as part of the HD Engine repo **inventory**. It does not own their behavior or policy.
+
+On-wire behavior, endpoint contracts, evidence shapes, and acceptance tokens for these assets are owned by:
+
+* **HDE-CLI-API-Vendor-Ref** — endpoint bytes and A7 behavior.
+
+* **HDE-Schemas & Artifacts** — artifact schemas and indexing rules.
+
+* **Glow QA Guide** — QA procedures and sample runs.
+
+* **HDE-Governance** — policy and acceptance tokens.
+
+---
+
+### **5.1.3 Acceptance and artifact impact**
+
+* **Acceptance tokens.**  
+   None new in PF07; acceptance remains defined in **HDE-Governance** and is referenced here by title only.
+
+* **Artifact paths.**  
+   PF07 names `docs/run/PROD_ENDPOINTS.json`, `docs/run/RUN_PROD_QA.md`, `scripts/runtime/validate_prod_endpoints.py`, and `scripts/ops/admin_vendor_qa.py` as HD Engine repo assets of infrastructure interest; detailed schemas and indexing live in **HDE-Schemas & Artifacts**.
+
+---
+
+### **5.1.4 Service mapping (names-only)**
+
+* **Railway project:** `ample-illumination`
+
+* **Railway service:** `glow-hdengine-v2`
+
+  ---
+
+  ## **5.2 Glow Backend repo**
 
 * **Repository:** `amthorn78/glow-backend-v4`  
 * **Primary service code paths:** **TBD**  
@@ -468,6 +574,40 @@ Inventory-only. List schema names and key objects per application. No DDL, types
 * **Records-only mirror (HDE-Schemas & Artifacts).** Canonical DDL dump \+ fingerprint; roles/grants snapshot; connection echo, `search_path` echo; optional RW-smoke log when DB is in scope; **env-selection proof** and **env-matrix snapshot/failure envelopes** are indexed there by title.  
 * **Same-PR rule.** Update the human Evidence Index, its **hash sentinel** (`docs/evidence/INDEX.sha256`), and the machine mirror in the **same PR**; CI enforces 1:1 parity, canonical JSONL (one LF), unknown-key rejection, and presence of `proof_anchor` path-proofs.  
 * **Routing.** Canonical bytes & mirror schema: **HDE-Schemas & Artifacts**; governance/evidence policy: **HDE-Governance**.
+
+### **7.3.1 DB lifecycle evidence (OPS‑managed; names‑only)**
+
+**Execution model (names‑only).** For EPIC‑011, database lifecycle operations for the HD Engine DB — backup, restore rehearsal, and retention — are executed by OPS via the Railway UI or equivalent provider tooling. There is no dedicated CI job that calls the provider APIs for these tasks; lifecycle work is OPS‑run and promoted into governed artifacts by hand as part of an evidence PR.
+
+**Governed lifecycle artifacts (paths only).**
+
+* `artifacts/db/backup/backup_manifest.json` — describes the most recent Railway backup/snapshot/export (id/timestamp/objects; no raw dump).
+
+* `artifacts/db/backup/restore_verify.log` — summarizes a restore rehearsal (target, time window, smoke checks, status).
+
+* `artifacts/db/retention/retention_run.log` — retention activity summary (policy id and label/count metadata only; no payload/PII).
+
+Each of the above artifacts has a corresponding path‑proof sidecar:
+
+* `artifacts/db/backup/backup_manifest.json.path_proof.txt`
+
+* `artifacts/db/backup/restore_verify.log.path_proof.txt`
+
+* `artifacts/db/retention/retention_run.log.path_proof.txt`
+
+**Indexing and routing (titles‑only).**
+
+* Indexing rules, mirror schema, and field‑level constraints for these artifacts live in HDE‑Schemas & Artifacts (Evidence Index and JSONL mirror).
+
+* Backup/restore/retention QA procedures and acceptance criteria live in Glow QA Guide, with policy and tokens routed to HDE‑Governance.
+
+* PF07 records only that lifecycle work is OPS‑run on Railway and where its governed artifacts live; it does not restate lifecycle policy, token names, or artifact schemas.
+
+**Acceptance and artifact impact**
+
+* **Acceptance tokens:** None new in PF07; lifecycle acceptance remains defined in HDE‑Governance and Glow QA Guide, with PF12 owning mirror/index behavior.
+
+* **Artifact paths:** Names‑only registration of the three lifecycle artifacts and their `.path_proof.txt` sidecars as part of the DB evidence set.
 
 ---
 

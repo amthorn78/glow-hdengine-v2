@@ -1,10 +1,14 @@
 # PF16‑Canon — HD Engine Epics Map
 
 **Status:** Canon  
- **Version:** v2.3.5  
- **Date:** 2025‑11‑18  
- **Last Update Gate:** PF09 Review 2025-11-18  
+ **Version:** v2.3.8  
+ **Date:** 2025‑11‑21  
+ **Last Update Gate:** BN 7.6.6 Drain  
  **Invocation tag:** INV-f2ac55d77ce9aacc
+
+## **Deprecation note**
+
+**Deprecation note.** This epics map is **deprecated** and maintained for historical purposes only. EPIC‑011 is recorded here as a **failed** epic (its acceptance roster was not fully satisfied at the time this document was frozen). EPIC‑012 and later epics in this map are **won’t do** and are preserved only as design history. Current and future epic planning is owned by **PF20 — Canon‑HDE‑Phased Epics**; PF16 must not be used as the source of truth for new work.
 
 ## **Epic principle (North Star)**
 
@@ -257,47 +261,61 @@ Index human \+ machine in the same PR (canonical JSONL; one LF; unknown-key reje
 
 ---
 
-## **HDE‑EPIC011 — Vendor Ingest & Data Durability**
+### **HDE-EPIC011 — Vendor Ingest & Data Durability *(failed)***
 
-**Depends on:** HDE‑EPIC005 *(consumes rails/DB posture delivered by EPIC‑009)*.
+**Depends on.** HDE-EPIC005 (consumes rails/DB posture delivered by EPIC-009).
 
-**Resolves** *(including PF09 carry‑ins)*: vendor ingest (SAFE‑default), idempotent persistence, deterministic retry/backoff conformance, migrations with rollback drills, backups & restore, data retention, partition plan, BodyGraph ingest policy, out‑of‑band refresh posture, source invariance concept. *(PF09 items routed here remain titles‑only and are evidenced in this epic.)*
+**Resolves (including PF09 carry-ins).** Vendor ingest (SAFE-default), idempotent persistence, deterministic retry/backoff conformance, migrations with rollback drills, backups & restore, data retention, partition plan, BodyGraph ingest policy, out-of-band refresh posture, source invariance concept. PF09 items routed here remain titles-only and are evidenced in this epic.
 
-### **Scope (titles‑only)**
+#### **Scope (titles-only)**
 
-* **Vendor ingest (SAFE‑default).** Integrations are refusal‑first unless rails are open (EPIC‑009). When open, requests follow **pinned timeouts/retries/backoff**; responses map to **typed errors**; no payload/header logging; **secrets redacted** (keys‑only diagnostics).
+* **Vendor ingest (SAFE-default).** Integrations are refusal-first unless rails are open (per EPIC-009 / Governance). When open, requests follow pinned timeouts/retries/backoff; responses map to typed errors; no payload/header logging; secrets redacted (keys-only diagnostics).
 
-* **Idempotent persistence.** Ingest writes are idempotent (idempotency key or content hash); transactional boundary proven; stored public body **byte‑compares** to unified emitter bytes.
+* **Idempotent persistence.** Ingest writes are idempotent (idempotency key or content hash); transactional boundary proven; stored public body byte-compares to unified emitter bytes.
 
-* **Retry/backoff conformance.** Profiles `{none,fixed,exponential}` with **closed integer params**, **no jitter**, total time respected; `retryable = {network_error, 5xx}`; **do not retry** other 4xx. **429 success‑path activity is owned by EPIC‑012**; ingest only records the typed outcome.
+* **Retry/backoff conformance.** Profiles `{none, fixed, exponential}` with closed integer params, no jitter, total time respected; `retryable = {network_error, 5xx}`; do not retry other 4xx. `429` success-path activity is owned by EPIC-012; this epic only records the typed outcome.
 
-* **Migrations with rollback drills.** Dry‑run plan → forward apply → rollback verified → post‑migration consistency checks.
+* **Migrations with rollback drills.** Dry-run plan → forward apply → rollback verified → post-migration consistency checks.
 
-* **Backups & restore.** Point‑in‑time backup plan \+ restore rehearsal; integrity/hash verification; operational runbook artifacts.
+* **Backups & restore.** Point-in-time backup plan \+ restore rehearsal; integrity/hash verification; operational runbook artifacts.
 
-* **Data retention jobs.** Policy‑driven deletes/archives; proof of effect with **bounded labels** (no payloads).
+* **Data retention jobs.** Policy-driven deletes/archives; proof of effect with bounded labels (no payloads).
 
-* **Partition plan.** Define or explicitly defer with a decision record; where defined, verify **partition predicates** and maintenance jobs.
+* **Partition plan *(non-deferred for EPIC-011*.** Provide and maintain a concrete partition plan for the governed tables (for example `hde.body_graphs`, `hde.body_graphs_current`, `hde.pair_evaluation`, `hde.public_results`). Where a plan exists, verify partition predicates and maintenance jobs via governed artifacts under `artifacts/db/partition/partition_plan.txt` and `artifacts/db/partition/partition_verify.log` (schemas and evidence rules live in **HDE-Schemas & Artifacts**). For this epic, the partition plan is **non-deferred**: EPIC-011 is gated by `PARTITION_PLAN_OK` only; there is no `PARTITION_PLAN_DEFERRED_NOTED` path under this epic (the “defer” pattern remains available in PF09 for other scopes).
 
-* **BodyGraph ingest policy (adapter; env‑aware).**  
-   Prod: BodyGraph from DB; vendor calls only by explicit trigger or scheduled refresh (never inline).  
-   Dev: direct vendor allowed; on success **upsert to DB** for repeatability. *(SAFE rails apply.)*
+* **BodyGraph ingest policy (adapter; env-aware).**
 
-* **Refresh posture (out‑of‑band).** Enforce TTL and SWR; refreshes run out‑of‑band with vendor **rate‑limits** and a **circuit breaker** `{fail, window_s, cooldown_s}`; no inline vendor calls in prod.
+  * **Prod:** BodyGraph from DB; vendor calls only by explicit trigger or scheduled refresh (never inline).
 
-* **Source invariance (concept).** For identical normalized inputs, DB‑sourced and vendor‑sourced bodies render to **byte‑identical** canonical JSON (single shared emitter).
+  * **Dev:** Direct vendor allowed; on success, upsert to DB for repeatability. SAFE rails apply (rails CLOSED by default; rails-open guard and tokens live in Governance / PF04, PF07).
 
-### **Evidence (titles/paths only)**
+* **Refresh posture (out-of-band).** Enforce TTL and SWR; refreshes run out-of-band; apply vendor rate-limits and a circuit breaker `{fail_threshold, window_s, cooldown_s}`; no inline vendor calls in prod.
+
+* **Source invariance (concept).** For identical normalized inputs, DB-sourced and vendor-sourced bodies render to byte-identical canonical JSON under the single shared presenter/emitter.
+
+* **Preservation: CLI, vendor ingest, compat math, Aux.** Under EPIC-011, the following surfaces are **preservation surfaces** (EPIC-011 may add durability and evidence but MUST NOT change their contracts):
+
+  * CLI (`hdctl` commands, flags, streams, exit codes) and on-wire vendor request/response bytes — owned by **HDE-CLI-API-Vendor-Ref**.
+
+  * Compat math (Magic-10 category definitions, scoring, band thresholds, AB↔BA identity, Reader v1 envelope) — owned by **HDE Math & Technical Spec**.
+
+  * Aux narratives (packs, IDs, suppression rules, text surfaces) — owned by **HDE Narratives Guide**.
+
+  * Single-emitter, Reader↔CLI parity, two-run identity, canonical-JSON posture — owned by **HDE-Mechanics Guide**.
+
+* Any functional change to these surfaces MUST be owned by a separate epic with its own scope and acceptance (per Governance); EPIC-011 only proves that these surfaces behave as defined in their canonical homes.
+
+#### **Evidence (titles/paths only)**
 
 **BodyGraph proofs**
 
-* `artifacts/bodygraph/source_selection.snapshot.json` — `{app_env, attempted, selected, reason, upserted}` (canonical JSON; one LF)
+* `artifacts/bodygraph/source_selection.snapshot.json` — `{app_env, attempted, selected, reason, upserted}` (canonical JSON; one LF).
 
-* `artifacts/bodygraph/source_invariance/ab.json` · `…/ba.json` · `…/summary.json` — DB vs vendor bytes equality via shared emitter
+* `artifacts/bodygraph/source_invariance/ab.json` · `.../ba.json` · `.../summary.json` — DB vs vendor bytes equality via shared emitter.
 
-* `artifacts/bodygraph/refresh_policy.snapshot.json` — `{ttl_s, swr_s, rate_limit, cb{fail,window_s,cooldown_s}, sample_counts}`
+* `artifacts/bodygraph/refresh_policy.snapshot.json` — `{ttl_s, swr_s, rate_limit, cb{fail,window_s,cooldown_s}, sample_counts}`.
 
-* *(Observability)* `artifacts/bodygraph/metrics.snapshot.json`, `artifacts/bodygraph/keys_only.logs.sample`
+* *(Observability)* `artifacts/bodygraph/metrics.snapshot.json`, `artifacts/bodygraph/keys_only.logs.sample`.
 
 **Ingest**
 
@@ -317,7 +335,7 @@ Index human \+ machine in the same PR (canonical JSONL; one LF; unknown-key reje
 
 * `artifacts/db/migrations/rollback_verify.log`
 
-**Backups/restore**
+**Backups / restore**
 
 * `artifacts/db/backup/backup_manifest.json`
 
@@ -335,39 +353,79 @@ Index human \+ machine in the same PR (canonical JSONL; one LF; unknown-key reje
 
 **Parity proof**
 
-* `artifacts/presenter/json_canon_compare.log` *(stored vs emitted)*
+* `artifacts/presenter/json_canon_compare.log` — stored vs emitted bytes, via canonical presenter.
 
-### **Interfaces & constraints (titles‑only)**
+#### **Interfaces & constraints (titles-only)**
 
-Rails posture & open/closed policy pins → **EPIC‑009 / HDE‑Governance**.  
- 429 success‑path parse → **EPIC‑012 / HDE‑Governance**.  
- DB runtime posture (search\_path / grants / fingerprint / conn order) → **EPIC‑009 / HDE‑Schemas & Artifacts evidence rules**.  
- Public bytes parity (emitters) → **HDE‑CLI‑API‑Vendor‑Ref**; canonical JSON → **HDE‑Schemas & Artifacts §4**.
+* Rails posture & open/closed policy pins → **EPIC-009** / **HDE-Governance**.
 
-### **Acceptance (titles‑only)**
+* `429` success-path A7 behavior → **EPIC-012** / **HDE-Governance** (this epic only asserts typed refusal and logging posture).
 
-* **Ingest:** `INGEST_OK, INGEST_IDEMPOTENT_OK, VENDOR_RETRY_BACKOFF_OK, VENDOR_NO_PAYLOAD_LOGGING_OK`
+* DB runtime posture (search\_path / grants / fingerprint / connection order) → **EPIC-009** / **HDE-Schemas & Artifacts** evidence rules.
 
-* **Migrations:** `MIGRATE_ROLLBACK_OK`
+* Public bytes parity (emitters) → **HDE-CLI-API-Vendor-Ref**; canonical JSON rules → **HDE-Schemas & Artifacts** §4.
 
-* **Backups/restore:** `BACKUP_RESTORE_OK`
+#### **Acceptance (titles-only; tokens live in HDE-Governance / PF09)**
 
-* **Retention:** `RETENTION_JOBS_OK`
+**Ingest**
 
-* **Partitioning:** `PARTITION_PLAN_OK` *or* `PARTITION_PLAN_DEFERRED_NOTED`
+* `INGEST_OK`
 
-* **Indexing:** `EVIDENCE_INDEX_UPDATED_OK, EVIDENCE_INDEX_HASH_OK, MACHINE_MIRROR_UPDATED_OK, EPIC_IS_GATE_OK`
+* `INGEST_IDEMPOTENT_OK`
 
-* **BodyGraph ingress/durability:**  
-   `BG_SOURCE_SELECTION_OK, BG_VENDOR_CALLS_DISABLED_IN_PROD_OK, BG_DEV_DIRECT_CALLS_UPSERT_OK, BG_SOURCE_INVARIANCE_OK, BG_TTL_SWR_POLICY_OK, BG_RATE_LIMIT_POLICY_OK, BG_CIRCUIT_BREAKER_POLICY_OK`
+* `VENDOR_RETRY_BACKOFF_OK`
 
-### **Indexing**
+* `VENDOR_NO_PAYLOAD_LOGGING_OK`
 
-Update **docs/evidence/INDEX.json** \+ **docs/evidence/INDEX.sha256** \+ **artifacts/evidence\_index.jsonl** **in the same PR** (records‑only canonical JSONL; one LF; unknown‑key reject; fixed field order; each record includes a `proof_anchor`). Single home for listings/schemas: **PF12 §8.6 / Appendix C**.
+**Migrations**
+
+* `MIGRATE_ROLLBACK_OK`
+
+**Backups / restore**
+
+* `BACKUP_RESTORE_OK`
+
+**Retention**
+
+* `RETENTION_JOBS_OK`
+
+**Partitioning**
+
+* `PARTITION_PLAN_OK` — EPIC-011 is **non-deferred** on partitioning; there is no `PARTITION_PLAN_DEFERRED_NOTED` success path under this epic.
+
+**Indexing & epic gate**
+
+* `EVIDENCE_INDEX_UPDATED_OK`
+
+* `EVIDENCE_INDEX_HASH_OK`
+
+* `MACHINE_MIRROR_UPDATED_OK` *(see PF12 / PF09 for canonical naming and semantics)*
+
+* `EPIC_IS_GATE_OK`
+
+**BodyGraph ingress / durability**
+
+* `BG_SOURCE_SELECTION_OK`
+
+* `BG_VENDOR_CALLS_DISABLED_IN_PROD_OK`
+
+* `BG_DEV_DIRECT_CALLS_UPSERT_OK`
+
+* `BG_SOURCE_INVARIANCE_OK`
+
+* `BG_TTL_SWR_POLICY_OK`
+
+* `BG_RATE_LIMIT_POLICY_OK`
+
+* `BG_CIRCUIT_BREAKER_OK`
+
+#### **Indexing**
+
+Update `docs/evidence/INDEX.json` \+ `docs/evidence/INDEX.sha256` \+ `artifacts/evidence_index.jsonl` in the same PR (records-only canonical JSONL; one LF; unknown-key reject; fixed field order; each record includes a `proof_anchor`). Single home for listings/schemas: **HDE-Schemas & Artifacts** §8.6 / Appendix C.
 
 ---
 
-## **HDE‑EPIC012 — Distillation: Reader A7 proofs & Performance**
+## **HDE‑EPIC012 — Distillation: Reader A7 proofs & Performance (won’t do)**
 
 **Depends on:** HDE‑EPIC004 *(shared presenter/emitter)*; consumes rails/DB posture from **EPIC‑009**; interfaces with **EPIC‑011** as needed.
 
@@ -446,7 +504,7 @@ Update **docs/evidence/INDEX.json** \+ **docs/evidence/INDEX.sha256** \+ **artif
 
 ---
 
-## **HDE‑EPIC013 — Release & Provenance**
+## **HDE‑EPIC013 — Release & Provenance (won’t do)**
 
 **Depends on:** HDE‑EPIC005, HDE‑EPIC012 (success route \+ A7 complete before release work lands). This epic packages the runtime, freezes provenance, and ships governed identity artifacts with same‑PR evidence parity.
 
@@ -536,7 +594,7 @@ Public bytes & Endpoint Catalog → **HDE‑CLI‑API‑Vendor‑Ref** · A7/tra
 
 ---
 
-## **HDE‑EPIC014 — SDKs & Admin UI**
+## **HDE‑EPIC014 — SDKs & Admin UI (won’t do)**
 
 **Depends on:** HDE‑EPIC007, HDE‑EPIC010, HDE‑EPIC013  
  **Interfaces:** consumes the six‑key Reader envelope and transport posture delivered under EPIC‑012 (titles‑only).

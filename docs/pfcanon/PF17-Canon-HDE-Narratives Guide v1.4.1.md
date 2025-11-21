@@ -3,7 +3,7 @@
 ## 0.1 Document Control
 
 **Title:** PF17-Review-HDE Narratives Guide  
-**Version:** v1.4  
+**Version:** v1.4.1  
 **Status:** Canon  
 **Effective** date: 2025-11-17
 
@@ -121,6 +121,38 @@ Specify a **deterministic, LLM-free** layer that converts a set of keys into a s
 * **No “pacing” gate here.** “Too early” is a **policy outcome** (validation conflict or `suppression_map` guard); ineligible dyads are **not surfaced** (see **§2.4 can-emit**).
 
 * **No A7 proof details here.** PF17 does not restate A7 bytes; it only notes that proofs require **env-gate headers** and a **composite A7 proof JSON** (PF12 schema) on a **cataloged success route**.
+
+### **1.1.1 EPIC-011 preservation boundary (historical; pattern for future epics)**
+
+For **EPIC-011 — Vendor Ingest & Data Durability (failed)**, Aux narratives were treated as **preservation surfaces**, not a feature surface. This pattern remains in force for any future “durability-only” epics:
+
+* **No new narrative semantics under EPIC-011.**  
+   EPIC-011 was allowed to add durability structures, tests, and headers-only evidence around Aux narratives, but it **must not** change:
+
+  * the set of narrative packs and their IDs,
+
+  * pack text or composition,
+
+  * suppression rules, or
+
+  * which output surfaces exist (Aux API and CLI admin preview) or how packs are routed to them.
+
+* **Pattern for future durability-only epics.**  
+   The same boundary applies to any future epic whose scope is durability, ingest, or infrastructure rather than content:
+
+  * narrative packs and semantics stay owned here in PF17;
+
+  * durability/infra epics may add tests, headers-only proofs, and indices around these surfaces;
+
+  * content changes (new or revised text, suppression rules, pack coverage/routing, new surfaces) must be owned by **content epics**, not durability epics.
+
+* **Scope routing (titles-only).**  
+   PF17 remains the single home for narrative semantics (packs, keys, suppression, and surfaces).
+
+  * Epic-level planning and acceptance rosters now live in **PF20 — Canon-HDE-Phased Epics**; **PF16 — HD Engine Epics Map** is historical only.
+
+  * Token semantics and epic acceptance sets live in **HDE-Governance**.  
+     Any functional change to Aux narratives or CLI preview content **must** be owned by a separate epic that explicitly claims those surfaces in PF20; it is out of scope for EPIC-011 and for any purely durability-focused epic.
 
 ---
 

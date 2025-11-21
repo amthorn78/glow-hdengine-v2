@@ -1,7 +1,7 @@
 # **0\. Front Matter**
 
 **Title:** PF02-Canon-HDE Architecture  
- **Version:** v1.0.8  
+ **Version:** v1.0.9  
  **Status:** Canon  
 **Effective date:** 2025-11-16
 
@@ -17,7 +17,7 @@ What PF02 is. The architectural map of the Glow HD Engine at the level of compon
 * adapter/ — single HTTP home,  
 * presenter/ — single canonical emitter (used by Adapter and CLI).
 
-Supersession rule (PF10 addenda). Where PF10 includes multiple lettered addenda on the same topic, the **later letter supersedes earlier guidance**. PF02 reflects the latest position and routes work to canonical homes **by title only** (no version numbers).
+Supersession rule (PF10 addenda). Where PF10 includes multiple numbered addenda on the same topic, the **later number supersedes earlier guidance**. PF02 reflects the latest position and routes work to canonical homes **by title only** (no version numbers).
 
 Contract-free. PF02 never carries headers, payload schemas, status matrices, exit codes, SLAs, or acceptance tables.
 
