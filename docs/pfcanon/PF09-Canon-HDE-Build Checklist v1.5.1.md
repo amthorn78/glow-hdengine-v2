@@ -1,10 +1,10 @@
 # **PF09-Canon-HDE-Build Checklist**
 
-**Version:** v1.5  
+**Version:** v1.5.1  
  **Status:** Canon  
 **Effective date:** 2025-11-21
 
-**Last Update Gate:** BN 7.6.6 Drain
+**Last Update Gate:** HDE-EPIC017 planning
 
 ### **Scope (canon)**
 
@@ -1248,7 +1248,7 @@ PF09 is consumer-only; token semantics and schemas live in Governance/CLI/Schema
 
 * Reader and CLI are specified to share **one emitter**:
 
-  * CLI stdout for public routes must be byte-identical to the Reader body.
+  * CLI **Reader surfaces** (stdout or `--dump-reader`) must be byte‑identical to the Reader body
 
   * No ad-hoc serializers on public paths; guarded via grep and import-graph symbol proofs.
 

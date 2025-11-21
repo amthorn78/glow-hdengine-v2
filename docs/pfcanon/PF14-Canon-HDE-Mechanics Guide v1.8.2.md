@@ -2,9 +2,9 @@
 
 **Version:** v1.8.2  
  **Status:** Canon  
-**Effective date:** 2025-11-22
+**Effective date:** 2025-11-21
 
-**Last Update Gate:** BN 7.6.6 Drain
+**Last Update Gate:** HDE-EPIC017 planning
 
 ## **Purpose — Components & build tasks (Mechanics scope)**
 
@@ -1121,17 +1121,17 @@ Each mirror record includes `artifact_key`, `sha256`, `size_bytes`, `produced_at
 **Conformance expectation.**  
  CLI help/usage, flags, and behavior must match PF05; any divergence is a defect until corrected.
 
-**Examples (non-exhaustive).**
+**Examples (non‑exhaustive).**
 
-* `hdctl showcompat …` — prints the exact Reader v1 public body (six keys, canonical JSON, one LF) for the same inputs/environment using the shared presenter/emitter. Merge-blocking until Reader↔CLI parity passes.
+* `hdctl showcompat …` — prints the **compat JSON payload** (admin/test surface) to `stdout` as canonical JSON (UTF‑8, sorted keys, compact, one LF) and, when invoked with `--dump-reader`, writes the exact Reader v1 public body (six keys) using the shared presenter/emitter. Reader↔CLI parity is defined between the Reader API and the `--dump-reader` output; CLI determinism (AB↔BA and two‑run identity) is merge‑blocking until the associated tokens are green.
 
 * `hdctl sample …` — prints the same deterministic selection/ordering as the corresponding Reader surface documented in PF05.
 
-* Additional commands (for example, `read singlebg`, `list people`, `disabled fetch *`) are defined and governed in PF05; implement here per PF05 without duplication.
+* Additional commands (for example, `read singlebg`, `list people`, disabled `fetch *`) are defined and governed in PF05; this document only illustrates conformance expectations.
 
-  ---
+---
 
-  ### **16.2 Streams & exits**
+### **16.2 Streams & exits**
 
 * **stdout (success):** public JSON body only, LF-terminated, no ANSI, no extra bytes.
 
