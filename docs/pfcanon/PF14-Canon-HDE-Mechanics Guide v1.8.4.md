@@ -1,10 +1,10 @@
 # PF14-Canon-HDE-Mechanics Guide
 
-**Version:** v1.8.2  
+**Version:** v1.8.4  
  **Status:** Canon  
-**Effective date:** 2025-11-21
+**Effective date:** 2025-11-22
 
-**Last Update Gate:** HDE-EPIC017 planning r1
+**Last Update Gate:** HDE-EPIC017 planning r2
 
 ## **Purpose — Components & build tasks (Mechanics scope)**
 
@@ -1220,9 +1220,8 @@ Required artifacts:
 
 * `artifacts/cli/summary.json` — canonical JSON with attempted commands, sha256 of `ab.json` / `ba.json`, and `ab_ba_equal: true`
 
-* `audit/gates/guards/emitter_symbol_proof.txt` — single-emitter guard (presenter symbol)
-
-* `audit/gates/guards/serializer_grep_guard.log` — single-emitter guard (no ad-hoc serializers)
+* `artifacts/cli/guards/emitter_symbol_proof.txt` — single-emitter guard (presenter symbol)  
+* `artifacts/cli/guards/serializer_grep_guard.log` — grep-guard proving there are no ad-hoc serializers on public paths
 
 * `audit/gates/canonical/json_canonical_check.log` — canonical JSON checks
 
@@ -2539,11 +2538,22 @@ with:
 
 * (Optional) Encoding-invariance proof: `artifacts/proofs/encoding_invariance.txt`
 
-#### Serializer / Emitter guards
+#### **`Serializer / Emitter guards`**
 
-* Grep guard (no ad-hoc serializers on public paths): `audit/gates/guards/serializer_grep_guard.log`
+`* Grep guard (no ad-hoc serializers on public paths): artifacts/cli/guards/serializer_grep_guard.log`  
+ `* Shared presenter/emitter symbol proof: artifacts/cli/guards/emitter_symbol_proof.txt`
 
-* Shared presenter/emitter symbol proof: `audit/gates/guards/emitter_symbol_proof.txt`
+**`NEW CANON — Serializer / emitter guard homes (EPIC017 and onward).`**
+
+1. `The canonical location for CLI serializer/emitter guard artifacts is:`  
+    `artifacts/cli/guards/serializer_grep_guard.log and`  
+    `artifacts/cli/guards/emitter_symbol_proof.txt.`
+
+2. `These are the paths of record for Phase I serializer work, EPIC017 acceptance, and evidence indexing. The Evidence Index and machine mirror MUST use these paths as the discovered_physical_path for the corresponding records.`
+
+3. `For backward compatibility, implementations MAY also write copies under audit/gates/guards/… for internal audit workflows. Those locations are secondary and are not required for mechanic-level acceptance.`
+
+4. `Future PF documents and epic records that reference these guard artifacts SHOULD use the artifacts/cli/guards/… paths and treat audit/gates/guards/… as historical/auxiliary only.`
 
 #### CLI parity & determinism (public bytes)
 

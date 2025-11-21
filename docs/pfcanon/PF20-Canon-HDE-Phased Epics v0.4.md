@@ -2,11 +2,11 @@
 
 **Status:** Canon
 
-**Version:** v0.2
+**Version:** v0.4
 
-**Effective Date:** 2025-11-21
+**Effective Date:** 2025-11-22
 
-**Last Update Gate:** HDE-EPOC017
+**Last Update Gate:** HDE-EPIC017 planning r2
 
 ## **0\. Purpose & Scope**
 
@@ -149,7 +149,8 @@ This is the **names‑only acceptance roster** plus pointers to evidence surface
   * Human Evidence Index: `docs/evidence/INDEX.json` record titles.  
   * Hash sentinel: `docs/evidence/INDEX.sha256`.  
   * Machine Mirror: `artifacts/evidence_index.jsonl` records (artifact\_key \+ proof\_anchor).  
-  * Close pack: `audit/EPIC-<ID>_close_report.md`, `audit/EPIC-<ID>_MANIFEST.json` (titles-only; schema in PF12).
+  * Close pack: `audit/EPIC-<ID>_close_report.md`, `audit/EPIC-<ID>_MANIFEST.json` (titles-only; schema in PF12).  
+  * When an epic uses CLI serializer/emitter guards as part of its acceptance (for example, a Calcination epic that hardens the Canonical Serialization Package), the canonical evidence paths for those guards MUST be `artifacts/cli/guards/serializer_grep_guard.log` and `artifacts/cli/guards/emitter_symbol_proof.txt`. Any `audit/gates/guards/…` copies are considered legacy/auxiliary and are not required for epic acceptance.
 
 **Rule (normative):**
 
@@ -331,7 +332,7 @@ EPIC017 is defined to address **exactly these Phase I gaps** plus any drift that
 
   * AB↔BA and two-run identity logs.
 
-  * CLI stdout snapshot for `showcompat` (six-key body, one LF).
+  * \* CLI stdout snapshot for \`showcompat\` compat JSON (LF-terminated canonical JSON; non-empty) \*\*plus\*\* Reader↔CLI parity artifacts for the Reader v1 envelope via Reader HTTP and the \`hdctl showcompat \--dump-reader \<path\>\` sidecar.
 
 * *PF references:* PF01 — HDE-Math-Spec (idempotence, bands), PF02 — HDE Architecture (single emitter), PF05 — HDE-CLI-API-Vendor-Ref (Reader/CLI bytes), PF12 — HDE-Schemas & Artifacts (canonical JSON), PF14 — HDE-Mechanics Guide (serializer tasks), PF09 — HDE-Build Checklist §Phase I.
 

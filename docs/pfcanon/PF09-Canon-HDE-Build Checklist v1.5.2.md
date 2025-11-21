@@ -1,6 +1,6 @@
 # **PF09-Canon-HDE-Build Checklist**
 
-**Version:** v1.5.1  
+**Version:** v1.5.2  
  **Status:** Canon  
 **Effective date:** 2025-11-21
 
@@ -322,6 +322,14 @@ Evidence: — (no passing evidence artifacts recorded for this package).
 * `artifacts/cli/guards/serializer_grep_guard.log`
 
 * `artifacts/cli/guards/emitter_symbol_proof.txt`
+
+**`Note (canonical guard paths).`** `For CLI serializer/emitter guard artifacts, the canonical home is`
+
+`artifacts/cli/guards/serializer_grep_guard.log and`
+
+`artifacts/cli/guards/emitter_symbol_proof.txt.`
+
+`The Evidence Index and machine mirror MUST use these paths as discovered_physical_path values. Implementations MAY also write copies under audit/gates/guards/… for internal audit workflows, but those locations are secondary and not required for PF09 acceptance.`
 
 ---
 
