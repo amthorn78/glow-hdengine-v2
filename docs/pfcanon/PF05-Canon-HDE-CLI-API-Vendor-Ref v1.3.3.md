@@ -4,13 +4,13 @@
 
 **Title:** PF05-Canon-HDE-CLI-API-Vendor-Ref
 
-**Version:** v1.3.2
+**Version:** v1.3.3
 
 **Status:** Canon
 
 **Effective date:** 2025-11-21
 
-**Last Update Gate:** HDE-EPIC017 planning
+**Last Update Gate:** HDE-EPIC017 planning r1
 
 ---
 
@@ -76,8 +76,7 @@
 
 ## CLI commands
 
-* **`hdctl showcompat` — Implemented; *merge-blocking* until Reader↔CLI parity passes.** Prints the public Reader body to **stdout** (six keys, **exactly one LF**, no ANSI). Output **must be non-empty canonical JSON**; **AB↔BA** and **two-run identity** required; **Reader↔CLI byte parity** required. QA: install/help OK; some runs emitted empty output, so related CLI tokens remain pending (tokens tracked in HDE-Governance §2.0).  
-   *Notes:* single presenter/emitter (§6.2); stdout only on success, stderr only on errors (§3.3/§3.4); module-runner parity required (`python -m engine.cli`).
+* \* \*\*\`hdctl showcompat\` — Implemented; \*merge-blocking\* until compat JSON determinism and Reader↔CLI parity (via reader-dump) are proven.\*\* On success, stdout carries a single LF-terminated compat JSON object (admin/test surface) emitted by the shared presenter/emitter (canonical JSON, UTF‑8, sorted keys, compact, one LF; no ANSI). When \`--dump-reader \<path\>\` is present, the command also writes the six-key Reader v1 success envelope to \`\<path\>\` using the same emitter; those bytes must be byte-identical to the Reader 200 body for the same inputs/environment. AB↔BA and two-run identity are required for both stdout compat JSON and reader-dump bytes.
 
 * **`read singlebg` — Speculative.** Single-chart read; flags/validators to be defined; not wired.
 
@@ -153,7 +152,9 @@
 
   # **3\) CLI Overview & Conventions \[Required-Now\]**
 
-**QA status note (informative).** The CLI is installable and `--help` / `--version` behave as expected. A known issue remains: in some runs `hdctl showcompat` emits **empty output**, which violates the non-empty canonical JSON and parity requirements (six-key success body, LF-terminated; Reader↔CLI byte equality; AB↔BA and two-run identity). Until that path is corrected, the related acceptance tokens remain **pending**: `CLI_READER_PARITY_OK`, `TWO_RUN_IDENTITY_OK`, `COMPOSITE_ABBA_IDENTITY_OK`, `JSON_CANONICAL_CHECK_OK` (see §2.0 and §4.1). All success output **must** be produced by the single canonical emitter, use UTF-8 with sorted keys and exactly one trailing LF, and be validated under `LC_ALL=C` and `TZ=UTC`.
+**QA status note (informative).** The CLI is installable and \`--help\` / \`--version\` behave as expected. A known issue remains: in some runs \`hdctl showcompat\` emits empty stdout, which violates the non-empty compat JSON requirement and blocks the determinism/parity tokens (\`CLI\_SHOWCOMPAT\_CANON\_OK\`, \`CLI\_STDOUT\_LF\_OK\`, \`PARITY\_AB\_BA\_OK\`, \`TWO\_RUN\_IDENTITY\_OK\`, \`CLI\_READER\_PARITY\_OK\`, \`JSON\_CANONICAL\_CHECK\_OK\`). Until this is fixed and re-proven, those tokens remain pending. All success output must come from the single canonical emitter, use UTF‑8 with ASCII-sorted keys and exactly one trailing LF, and be validated under \`LC\_ALL=C\` and \`TZ=UTC\`.
+
+.
 
 ## **3.1 Global flags & process contract**
 

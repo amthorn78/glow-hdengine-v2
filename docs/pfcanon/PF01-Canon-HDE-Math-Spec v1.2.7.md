@@ -4,13 +4,13 @@
 
 **Title:** PF01-Canon-HDE-Math-Spec
 
-**Version:** v1.2.6
+**Version:** v1.2.7
 
 **Status:** Canon
 
-**Effective date:** 2025-11-04
+**Effective date:** 2025-11-21
 
-**Last Update Gate:** Narratives Drain 2025-11-04
+**Last Update Gate:** HDE-EPIC011 Planning
 
 ## **0.2 Change policy**
 
@@ -2632,7 +2632,7 @@ Maintain reproducible proof in the repo (no private data), for example:
 
 * **Parity harness/scripts:** `scripts/make_reader_v1_goldens.py`, `scripts/make_compat_determinism_artifacts.py`.
 
-* **Reader/CLI parity runs:** evidence that Reader body and CLI stdout are **byte-equal** for the same inputs (§9.2).
+* **Reader/CLI parity runs:** \* evidence that the Reader 200 body and the corresponding CLI Reader-envelope bytes (stdout or reader-dump surface as defined in \*\*HDE-CLI-API-Vendor-Ref\*\*) are byte-equal for the same inputs (§9.2).
 
 Exact locations are indexed in **Appendix B — Evidence Index**; transport/HTTP acceptance is routed **by title only** to PF-Canon-HDE-CLI-API-Vendor-Ref.
 
@@ -2968,7 +2968,7 @@ To prove Reader↔CLI byte-equality for the same logical invocation:
 
 2. **Emit via Reader:** call the dev harness; capture the **LF-terminated** success body.
 
-3. **Emit via CLI:** run the CLI command for the same inputs; capture **stdout**.
+3. **Emit via CLI:** run the CLI surface that emits the Reader v1 success envelope for the same inputs (for example, the reader-dump path defined in the CLI/API reference) and capture those envelope bytes (stdout or file, depending on the command).
 
 4. **Byte-compare:** bodies must be **identical** (including the single trailing LF).
 

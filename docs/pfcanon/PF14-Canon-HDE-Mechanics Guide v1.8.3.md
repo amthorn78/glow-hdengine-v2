@@ -4,7 +4,7 @@
  **Status:** Canon  
 **Effective date:** 2025-11-21
 
-**Last Update Gate:** HDE-EPIC017 planning
+**Last Update Gate:** HDE-EPIC017 planning r1
 
 ## **Purpose — Components & build tasks (Mechanics scope)**
 
@@ -1242,8 +1242,7 @@ Required artifacts:
 
 **Examples (non‑exhaustive).**
 
-* `hdctl showcompat …` — canonical compat harness for comparing two users and driving Aux narrative preview. On success it prints the exact Reader v1 public body (six keys, canonical JSON, one LF) for the same inputs/environment using the shared presenter/emitter. It remains merge‑blocking until the Reader↔CLI parity and determinism tokens pass.
-
+* \* \`hdctl showcompat …\` — canonical compat harness for comparing two users and driving Aux narrative preview. On success, its primary success payload is a single compat JSON document on stdout (admin/test surface), emitted via the shared presenter/emitter as canonical JSON (UTF‑8, ASCII-sorted keys, compact, one LF; no ANSI). When \`--dump-reader \<path\>\` is present, it also writes the six-key Reader v1 success envelope to \`\<path\>\` using the same emitter; those bytes must be byte-identical to the Reader 200 body for the same inputs/environment. The command remains merge-blocking until the compat JSON determinism and Reader↔CLI parity tokens are passing.  
 * Additional commands (for example, `read singlebg`, `list people`, `bg:resolve`, and disabled `fetch` variants) are defined and governed in PF05, including whether they are **Required‑Now** or **Speculative**. Implement and test them according to PF05 without redefining schemas or bytes here.
 
 ---
@@ -1268,7 +1267,7 @@ Required artifacts:
 
 ### **17.3 Determinism & parity**
 
-* **Reader↔CLI parity.** For mirrored surfaces, CLI stdout is byte‑identical to the Reader 200 body (single shared emitter, same canonical JSON rules, exactly one LF).
+* **Reader↔CLI parity.** For each mirrored surface where the CLI emits Reader v1 bytes (stdout or via a reader-dump path, as defined in \*\*HDE-CLI-API-Vendor-Ref\*\*), those CLI bytes are byte-identical to the Reader 200 body for the same inputs/environment (single shared emitter, canonical JSON, exactly one LF). For \`hdctl showcompat\`, parity is defined between Reader HTTP and the \`--dump-reader\` sidecar file; stdout compat JSON is governed separately by determinism and canonical-JSON tokens.
 
 * **AB↔BA identity.** For pair‑sensitive inputs, swapping the parties (A/B) yields identical outputs once normalized.
 

@@ -1,11 +1,11 @@
 # **0\. Front Matter**
 
 **Title:** PF02-Canon-HDE Architecture  
- **Version:** v1.0.9  
+ **Version:** v1.1  
  **Status:** Canon  
-**Effective date:** 2025-11-16
+**Effective date:** 2025-11-21
 
-**Last Update Gate:** BN 7.1 Drain
+**Last Update Gate:** HDE-EPIC017 Planning
 
 ---
 
@@ -94,7 +94,7 @@ CLI parity work remains open; Architecture keeps the single-emitter rule while P
 * **Canonical JSON.** All public JSON is UTF-8 (no BOM), keys sorted in ASCII order, compact separators, and ends with **exactly one** newline (LF). Arrays used as sets are **deduplicated and ASCII-sorted**. Canonicalization rules are owned by **HDE-Schemas and Artifacts §4** (titles-only).  
 * **Two-step idempotence.** Build the idempotence **preimage** (excluding `idempotence_hash`), canonicalize it, compute `sha256(preimage_bytes)`, then insert `idempotence_hash` and re-emit the final LF-terminated body. The preimage recipe and hashing posture are owned by **HDE-Math-Spec** (titles-only).  
 * **Single emitter entrypoint.** CLI and Adapter **call the same Presenter emitter symbol**; Architecture forbids alternate public-byte code paths (no ad-hoc serializers on public paths).  
-* **Reader↔CLI parity.** For mirrored surfaces, CLI stdout is **byte-identical** to the Reader 200 body (single emitter).  
+* **Reader↔CLI parity.** For mirrored surfaces where the CLI emits Reader v1 bytes (stdout or reader-dump, per \*\*HDE-CLI-API-Vendor-Ref\*\*), those CLI bytes are byte-identical to the Reader 200 body (single emitter).  
 * **AB↔BA parity.** For the same pair of inputs in either order, the public bytes are **identical** (pair normalization).  
 * **Two-run identity.** Re-emitting the same logical representation produces **byte-identical** output.  
 * **Locale pins (required).** All canonicalization and compares run with **`LC_ALL=C`, `LANG=C`, `TZ=UTC`**.
