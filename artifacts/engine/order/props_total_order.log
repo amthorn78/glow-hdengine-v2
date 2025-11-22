@@ -1,0 +1,4 @@
+ids:antisymmetry=ok,totality=ok,transitivity=ok
+channels:antisymmetry=ok,totality=ok,transitivity=ok|count=36
+categories:antisymmetry=ok,totality=ok,transitivity=ok|count=10
+sets:cmp(alpha/bravo/charlie_vs_brv/chl)=-1

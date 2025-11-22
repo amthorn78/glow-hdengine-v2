@@ -58,6 +58,10 @@ def _write_path_proof(rel: str, *, sha256: str, size_bytes: int, produced_at: st
     proof_path = ROOT / proof_rel
     proof_path.parent.mkdir(parents=True, exist_ok=True)
 
+    # Invariants: every governed artifact has exactly one proof file with a single
+    # path/size_bytes/sha256/produced_at_utc quartet. Earlier drift came from
+    # stale proofs retaining old sha/size pairs; always rewrite the proof payload
+    # to keep mirror records, proof, and on-disk bytes aligned.
     existing = _load_existing_proof(proof_path)
     produced = produced_at or existing.get("produced_at_utc")
     if produced:
@@ -76,8 +80,7 @@ def _write_path_proof(rel: str, *, sha256: str, size_bytes: int, produced_at: st
         "",
     ]
     proof_text = "\n".join(proof_lines)
-    if proof_path.read_text(encoding="utf-8") if proof_path.exists() else None != proof_text:
-        proof_path.write_text(proof_text, encoding="utf-8")
+    proof_path.write_text(proof_text, encoding="utf-8")
     return proof_rel, produced
 
 
@@ -140,6 +143,11 @@ def _render_mirror(entries: Iterable[Mapping[str, str]]) -> bytes:
             "size_bytes": None,
         }
         if rel_path == MIRROR_PATH:
+            # check_mirror_schema.sh treats the mirror specially: the sha256 stored
+            # in the self-record and proof must be the body hash (mirror contents
+            # without the self-record). Prior drift was caused by stale proof data
+            # lingering after the mirror payload changed; recompute and rewrite on
+            # every run to keep the self-record, proof, and body hash in lockstep.
             record["_mirror_marker"] = True
             existing_proof = _load_existing_proof(rel_path.with_suffix(".jsonl.path_proof.txt"))
             record["produced_at_utc"] = existing_proof.get("produced_at_utc") or _dt.datetime.now(tz=_dt.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
