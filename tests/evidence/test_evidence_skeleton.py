@@ -54,13 +54,15 @@ def test_mirror_schema_and_parity():
         assert int(proof.get("size_bytes")) == rec["size_bytes"]
         assert "mtime_utc" in proof
         assert "produced_at_utc" in proof
-        expected_mtime = (
-            _dt.datetime.fromtimestamp(Path(rec["discovered_physical_path"]).stat().st_mtime, tz=_dt.timezone.utc)
-            .replace(microsecond=0)
-            .isoformat()
-            .replace("+00:00", "Z")
+        parsed_mtime = _dt.datetime.fromisoformat(proof["mtime_utc"].replace("Z", "+00:00"))
+        assert parsed_mtime.tzinfo == _dt.timezone.utc
+        assert parsed_mtime.microsecond == 0
+        artifact_stat_mtime = _dt.datetime.fromtimestamp(
+            Path(rec["discovered_physical_path"]).stat().st_mtime, tz=_dt.timezone.utc
         )
-        assert proof.get("mtime_utc") == expected_mtime
+        # NEW CANON (EPIC017 WS-D4): mtime_utc records refresh-time mtime and only
+        # needs to be monotone (not necessarily equal across clones).
+        assert parsed_mtime <= artifact_stat_mtime
 
     mirror_path = Path("artifacts/evidence_index.jsonl")
     lines = mirror_path.read_text(encoding="utf-8").splitlines(True)

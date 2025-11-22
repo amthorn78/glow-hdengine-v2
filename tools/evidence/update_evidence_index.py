@@ -34,6 +34,19 @@ def _isoformat(dt: _dt.datetime) -> str:
     return dt.replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
+def _isoformat_from_timestamp(ts: float) -> str:
+    return _isoformat(_dt.datetime.fromtimestamp(ts, tz=_dt.timezone.utc))
+
+
+def _parse_utc_iso8601(raw: str) -> _dt.datetime:
+    dt = _dt.datetime.fromisoformat(raw.replace("Z", "+00:00"))
+    if dt.tzinfo != _dt.timezone.utc:
+        raise ValueError("expected UTC tzinfo")
+    if dt.microsecond:
+        raise ValueError("expected zero microseconds")
+    return dt
+
+
 def _load_mirror_roles() -> dict[tuple[str, str], str]:
     roles: dict[tuple[str, str], str] = {}
     if not MIRROR_PATH.exists():
@@ -64,18 +77,58 @@ def _write_path_proof(
     sha256: str,
     size_bytes: int,
     mtime_utc: str | None,
-    default_mtime_utc: str,
     produced_at: str | None,
     default_produced_at: str,
     check: bool,
+    stat_mtime: float,
 ) -> tuple[str, str]:
+    """Write or validate a path-proof for the given relative path.
+
+    NEW CANON (EPIC017 WS-D4 mtime semantics): mtime_utc captures the filesystem
+    mtime at evidence refresh time, truncated to seconds. It is not required to
+    remain equal to future stat() values across clones. Proof checks validate
+    shape and monotonicity but do not fail solely due to mtime drift.
+    """
+
     proof_rel = f"{rel}.path_proof.txt"
     proof_path = ROOT / proof_rel
     proof_path.parent.mkdir(parents=True, exist_ok=True)
 
     existing = _load_existing_proof(proof_path)
     produced = produced_at or existing.get("produced_at_utc") or default_produced_at
-    mtime = mtime_utc or existing.get("mtime_utc") or default_mtime_utc
+    stat_mtime_iso = _isoformat_from_timestamp(stat_mtime)
+
+    if check:
+        if not proof_path.exists():
+            raise SystemExit(f"MISSING_PROOF:{proof_rel}")
+        proof = existing
+        if proof.get("path") != rel:
+            raise SystemExit(f"PROOF_PATH:{proof_rel}")
+        if proof.get("sha256") != sha256:
+            raise SystemExit(f"PROOF_SHA:{proof_rel}")
+        try:
+            recorded_size = int(proof.get("size_bytes", ""))
+        except ValueError as exc:  # pragma: no cover - defensive
+            raise SystemExit(f"PROOF_SIZE:{proof_rel}") from exc
+        if recorded_size != size_bytes:
+            raise SystemExit(f"PROOF_SIZE:{proof_rel}")
+
+        mtime_raw = proof.get("mtime_utc")
+        produced_raw = proof.get("produced_at_utc")
+        if not mtime_raw or not produced_raw:
+            raise SystemExit(f"PROOF_FIELDS:{proof_rel}")
+        try:
+            mtime_parsed = _parse_utc_iso8601(mtime_raw)
+            _parse_utc_iso8601(produced_raw)
+        except Exception as exc:  # noqa: BLE001
+            raise SystemExit(f"PROOF_MTIME:{proof_rel}") from exc
+
+        stat_mtime_dt = _dt.datetime.fromtimestamp(stat_mtime, tz=_dt.timezone.utc)
+        if mtime_parsed > stat_mtime_dt:
+            raise SystemExit(f"PROOF_MTIME_FUTURE:{proof_rel}")
+        return proof_rel, produced
+
+    mtime = mtime_utc or stat_mtime_iso
     proof_lines = [
         f"path: {rel}",
         f"size_bytes: {size_bytes}",
@@ -89,8 +142,6 @@ def _write_path_proof(
         existing_text = proof_path.read_text(encoding="utf-8")
         if existing_text == proof_text:
             return proof_rel, produced
-        if check:
-            raise SystemExit(f"STALE_PROOF:{proof_rel}")
     proof_path.write_text(proof_text, encoding="utf-8")
     return proof_rel, produced
 
@@ -179,11 +230,11 @@ def _render_mirror(
             path,
             sha256=sha,
             size_bytes=stat.st_size,
-            mtime_utc=None,
-            default_mtime_utc=produced_default,
+            mtime_utc=_isoformat_from_timestamp(stat.st_mtime) if not check else None,
             produced_at=None,
             default_produced_at=produced_default,
             check=check,
+            stat_mtime=stat.st_mtime,
         )
         record.update({
             "sha256": sha,
@@ -262,10 +313,10 @@ def main(argv: list[str] | None = None) -> None:
         sha256=str(mirror_rec["sha256"]),
         size_bytes=int(mirror_rec["size_bytes"]),
         mtime_utc=mirror_proof_existing.get("mtime_utc"),
-        default_mtime_utc=produced_default,
         produced_at=str(mirror_rec.get("produced_at_utc")),
         default_produced_at=produced_default,
         check=args.check,
+        stat_mtime=mirror_stat.st_mtime,
     )
     if proof_anchor != mirror_rec["proof_anchor"]:
         mirror_rec["proof_anchor"] = proof_anchor
