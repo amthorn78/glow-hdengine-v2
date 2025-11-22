@@ -4,6 +4,8 @@ import hashlib
 import json
 from pathlib import Path
 
+from tools.evidence import update_evidence_index
+
 
 TARGETS = [
     ("db_bridge.adapter_selection.snapshot", "artifacts/db_bridge/adapter_selection.snapshot.json"),
@@ -26,17 +28,16 @@ def test_evidence_index_has_required_artifacts():
     idx_entries = json.loads(idx_path.read_text(encoding="utf-8"))
     assert isinstance(idx_entries, list)
 
-    entries_by_path = {entry["path"]: entry for entry in idx_entries}
+    entries_by_path = {entry["discovered_physical_path"]: entry for entry in idx_entries}
 
     for key, path in TARGETS:
         assert path in entries_by_path, f"missing {path} in INDEX.json"
         entry = entries_by_path[path]
-        assert entry.get("title") == key
-        expected_proof = f"{path}.path_proof.txt"
-        assert entry.get("proof") == expected_proof
-        proof_path = Path(expected_proof)
-        assert proof_path.exists()
-        assert proof_path.read_text(encoding="utf-8") == f"{path}\n"
+        assert entry.get("artifact_key") == key
+        expected_proof = Path(f"{path}.path_proof.txt")
+        assert expected_proof.exists()
+        proof_data = update_evidence_index._load_existing_proof(expected_proof)
+        assert proof_data.get("path") == path
 
     mirror_path = Path("artifacts/evidence_index.jsonl")
     records = {}

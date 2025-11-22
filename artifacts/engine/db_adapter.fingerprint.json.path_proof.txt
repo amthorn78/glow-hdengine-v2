@@ -1,4 +1,4 @@
 path: artifacts/engine/db_adapter.fingerprint.json
-sha256: 2385b8c421b1dabcd624e24344c71212403939021303fc68b393461a77a12c7f
 size_bytes: 9428
-mtime_utc: 2025-11-19T22:21:08Z
+sha256: 2385b8c421b1dabcd624e24344c71212403939021303fc68b393461a77a12c7f
+produced_at_utc: 2025-11-22T02:27:04Z
