@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import datetime as _dt
 import json
 import sys
 from pathlib import Path
@@ -57,6 +58,15 @@ def _validate(entries: Iterable[dict[str, str]], records: Iterable[dict[str, obj
         proof = _load_existing_proof(proof_path)
         sha = proof.get("sha256")
         size = proof.get("size_bytes")
+        mtime = proof.get("mtime_utc")
+        produced = proof.get("produced_at_utc")
+        if produced is None or mtime is None:
+            messages.append(f"PROOF_FIELDS {key[0]} missing mtime_utc/produced_at_utc")
+        else:
+            try:
+                _dt.datetime.fromisoformat(mtime.replace("Z", "+00:00"))
+            except ValueError:
+                messages.append(f"PROOF_MTIME_FORMAT {key[0]} {mtime}")
         if sha != rec.get("sha256"):
             messages.append(f"SHA_MISMATCH {key[0]} {sha}!={rec.get('sha256')}")
         if size is None or int(size) != rec.get("size_bytes"):

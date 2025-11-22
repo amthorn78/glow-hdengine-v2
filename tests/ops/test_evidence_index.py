@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import hashlib
+import datetime as _dt
+import hashlib
 import json
 from pathlib import Path
 
@@ -38,6 +40,15 @@ def test_evidence_index_has_required_artifacts():
         assert expected_proof.exists()
         proof_data = update_evidence_index._load_existing_proof(expected_proof)
         assert proof_data.get("path") == path
+        assert "mtime_utc" in proof_data
+        assert "produced_at_utc" in proof_data
+        expected_mtime = (
+            _dt.datetime.fromtimestamp(Path(path).stat().st_mtime, tz=_dt.timezone.utc)
+            .replace(microsecond=0)
+            .isoformat()
+            .replace("+00:00", "Z")
+        )
+        assert proof_data.get("mtime_utc") == expected_mtime
 
     mirror_path = Path("artifacts/evidence_index.jsonl")
     records = {}
