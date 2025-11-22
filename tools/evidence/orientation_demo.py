@@ -84,10 +84,9 @@ def generate_orientation(check: bool = False) -> None:
     records = _load_mirror_records()
     messages, total = _validate(entries, records)
     text = _render_report(messages, total)
-    # Discovery: current index/mirror/proof set holds 109 artifacts with no mismatches;
-    # CI drift was triggered even when the rendered report already matched the committed
-    # orientation demo because the comparison below treated an existing file as truthy.
-    # Keep the comparison explicit so --check only raises when content truly diverges.
+    # Note: ORIENTATION_DRIFT means the evidence skeleton is coherent (messages empty)
+    # but the committed orientation_demo.txt is stale relative to the newly rendered
+    # report. The explicit comparison below keeps --check aligned to that semantics.
     if check and messages:
         raise SystemExit("ORIENTATION_MISMATCH")
     ORIENTATION_PATH.parent.mkdir(parents=True, exist_ok=True)
