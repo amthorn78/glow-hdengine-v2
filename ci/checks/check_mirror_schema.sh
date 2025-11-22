@@ -36,6 +36,15 @@ def load_proof(path: Path):
     return data
 
 
+def parse_utc_iso8601(raw: str) -> _dt.datetime:
+    dt = _dt.datetime.fromisoformat(raw.replace("Z", "+00:00"))
+    if dt.tzinfo != _dt.timezone.utc:
+        raise ValueError("non-UTC timestamp")
+    if dt.microsecond:
+        raise ValueError("sub-second mtime not allowed")
+    return dt
+
+
 def main():
     ok = True
     prev = None
@@ -96,10 +105,13 @@ def main():
             ok = False
 
         mtime = proof_data.get("mtime_utc")
+        mtime_dt = None
+        produced_at_raw = proof_data.get("produced_at_utc")
         try:
-            if mtime is None:
+            if mtime is None or produced_at_raw is None:
                 raise ValueError("missing")
-            _dt.datetime.fromisoformat(mtime.replace("Z", "+00:00"))
+            mtime_dt = parse_utc_iso8601(mtime)
+            parse_utc_iso8601(produced_at_raw)
         except Exception:
             print(f"PROOF_MTIME:{i}:{mtime}", file=sys.stderr)
             ok = False
@@ -141,6 +153,16 @@ def main():
             ok = False
         if obj.get("size_bytes") != actual_size:
             print(f"SIZE_MISMATCH:{i}:{obj.get('size_bytes')}!={actual_size}", file=sys.stderr)
+            ok = False
+
+        try:
+            stat_mtime_dt = _dt.datetime.fromtimestamp(
+                artifact_path.stat().st_mtime, tz=_dt.timezone.utc
+            )
+            if mtime_dt and mtime_dt > stat_mtime_dt:
+                raise ValueError("mtime later than filesystem stat")
+        except Exception:
+            print(f"PROOF_MTIME:{i}:{mtime}", file=sys.stderr)
             ok = False
 
         if proof_data.get("sha256") != actual_sha:

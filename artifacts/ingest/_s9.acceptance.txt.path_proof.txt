@@ -1,5 +1,5 @@
 path: artifacts/ingest/_s9.acceptance.txt
 size_bytes: 177
 sha256: 1b71b5c7b6b812f9f75aad58021a712439c55d900f4286bb0fb95d2653e8cb72
-mtime_utc: 2025-11-22T18:08:38Z
+mtime_utc: 2025-11-22T18:43:59Z
 produced_at_utc: 2025-11-22T02:27:04Z

@@ -1,5 +1,5 @@
 path: audit/qa/compat/lints_samples/sample_heat_open_shared.txt
 size_bytes: 62
 sha256: 92539263420e01974403f2facf1d59f34ba9933d81a495368c1dd40bb939ba4a
-mtime_utc: 2025-11-22T18:08:38Z
+mtime_utc: 2025-11-22T18:43:59Z
 produced_at_utc: 2025-11-22T02:27:04Z

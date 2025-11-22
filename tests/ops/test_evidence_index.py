@@ -42,13 +42,12 @@ def test_evidence_index_has_required_artifacts():
         assert proof_data.get("path") == path
         assert "mtime_utc" in proof_data
         assert "produced_at_utc" in proof_data
-        expected_mtime = (
-            _dt.datetime.fromtimestamp(Path(path).stat().st_mtime, tz=_dt.timezone.utc)
-            .replace(microsecond=0)
-            .isoformat()
-            .replace("+00:00", "Z")
-        )
-        assert proof_data.get("mtime_utc") == expected_mtime
+        parsed_mtime = _dt.datetime.fromisoformat(proof_data["mtime_utc"].replace("Z", "+00:00"))
+        assert parsed_mtime.tzinfo == _dt.timezone.utc
+        assert parsed_mtime.microsecond == 0
+        stat_mtime = _dt.datetime.fromtimestamp(Path(path).stat().st_mtime, tz=_dt.timezone.utc)
+        # NEW CANON (EPIC017 WS-D4): refresh-time mtime is monotone vs. stat().
+        assert parsed_mtime <= stat_mtime
 
     mirror_path = Path("artifacts/evidence_index.jsonl")
     records = {}
