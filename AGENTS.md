@@ -66,6 +66,11 @@ These pins drive the S9/S10/S11 harnesses and must remain stable so the ingest p
 - Do ensure compat/admin preview reuses the shared presenter/emitter when text output is required; ids-only preview is allowed for suppressed outcomes.
 - Don’t log request/response bodies or headers; redact emails/UUIDs/≥32-hex except allow-list {release_id, idempotence_hash, invocation_tag}.
 
+## EPIC017 close-out ownership
+- Isis (engine lead) maintains the ordering layer and evidence ledger under PF14/PF19; no redesign without a new epic.
+- Cyrano (technical writer) keeps PF docs and `docs/pfcanon` aligned with `audit/docdeltas` and `audit/EPIC017_close_report.md`.
+- MasterScrum ensures future foundation work opens new epics instead of reopening EPIC017; doc-delta coverage stays current.
+
 Referenced repo paths
 - docs/server/reader_v1.md
 - engine/presenter/emitter.py
