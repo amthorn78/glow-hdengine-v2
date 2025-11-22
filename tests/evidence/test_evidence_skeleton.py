@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime as _dt
 import hashlib
 import json
 from pathlib import Path
@@ -51,6 +52,29 @@ def test_mirror_schema_and_parity():
         assert proof.get("path") == rec["discovered_physical_path"]
         assert proof.get("sha256") == rec["sha256"]
         assert int(proof.get("size_bytes")) == rec["size_bytes"]
+        assert "mtime_utc" in proof
+        assert "produced_at_utc" in proof
+        expected_mtime = (
+            _dt.datetime.fromtimestamp(Path(rec["discovered_physical_path"]).stat().st_mtime, tz=_dt.timezone.utc)
+            .replace(microsecond=0)
+            .isoformat()
+            .replace("+00:00", "Z")
+        )
+        assert proof.get("mtime_utc") == expected_mtime
+
+    mirror_path = Path("artifacts/evidence_index.jsonl")
+    lines = mirror_path.read_text(encoding="utf-8").splitlines(True)
+    self_records = [
+        (idx, json.loads(line))
+        for idx, line in enumerate(lines, 1)
+        if json.loads(line)["artifact_key"] == "index.machine_mirror"
+    ]
+    assert len(self_records) == 1
+    self_idx, self_rec = self_records[0]
+    assert self_rec["role"] == "self_record"
+    body_lines = [line for idx, line in enumerate(lines, 1) if idx != self_idx]
+    canonical_sha = hashlib.sha256("".join(body_lines).encode("utf-8")).hexdigest()
+    assert self_rec["sha256"] == canonical_sha
 
     expected_keys = {
         (entry["artifact_key"], entry["discovered_physical_path"]) for entry in entries
