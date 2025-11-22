@@ -1,4 +1,5 @@
 path: catalog/narratives/manifest.json
 size_bytes: 634
 sha256: 112e4cc7c449e457e223f7ebfaa79e74303d5b34a6cccfb6b9f117cb987dce51
+mtime_utc: 2025-11-22T17:00:00Z
 produced_at_utc: 2025-11-22T02:27:04Z

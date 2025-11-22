@@ -23,10 +23,15 @@ ROOT = Path(__file__).resolve().parents[2]
 HUMAN_INDEX = ROOT / "docs/evidence/INDEX.json"
 HASH_SENTINEL = ROOT / "docs/evidence/INDEX.sha256"
 MIRROR_PATH = ROOT / "artifacts/evidence_index.jsonl"
+MIRROR_REL = MIRROR_PATH.relative_to(ROOT).as_posix()
 
 
 def _sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
+
+
+def _isoformat(dt: _dt.datetime) -> str:
+    return dt.replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
 def _load_mirror_roles() -> dict[tuple[str, str], str]:
@@ -53,31 +58,38 @@ def _load_existing_proof(proof_path: Path) -> dict[str, str]:
     return data
 
 
-def _write_path_proof(rel: str, *, sha256: str, size_bytes: int, produced_at: str | None = None) -> tuple[str, str]:
+def _write_path_proof(
+    rel: str,
+    *,
+    sha256: str,
+    size_bytes: int,
+    mtime_utc: str,
+    produced_at: str | None,
+    default_produced_at: str,
+    check: bool,
+) -> tuple[str, str]:
     proof_rel = f"{rel}.path_proof.txt"
     proof_path = ROOT / proof_rel
     proof_path.parent.mkdir(parents=True, exist_ok=True)
 
     existing = _load_existing_proof(proof_path)
-    produced = produced_at or existing.get("produced_at_utc")
-    if produced:
-        try:
-            _dt.datetime.fromisoformat(produced.replace("Z", "+00:00"))
-        except ValueError:
-            produced = None
-    if not produced:
-        produced = _dt.datetime.now(tz=_dt.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
-
+    produced = produced_at or existing.get("produced_at_utc") or default_produced_at
     proof_lines = [
         f"path: {rel}",
         f"size_bytes: {size_bytes}",
         f"sha256: {sha256}",
+        f"mtime_utc: {mtime_utc}",
         f"produced_at_utc: {produced}",
         "",
     ]
     proof_text = "\n".join(proof_lines)
-    if proof_path.read_text(encoding="utf-8") if proof_path.exists() else None != proof_text:
-        proof_path.write_text(proof_text, encoding="utf-8")
+    if proof_path.exists():
+        existing_text = proof_path.read_text(encoding="utf-8")
+        if existing_text == proof_text:
+            return proof_rel, produced
+        if check:
+            raise SystemExit(f"STALE_PROOF:{proof_rel}")
+    proof_path.write_text(proof_text, encoding="utf-8")
     return proof_rel, produced
 
 
@@ -123,77 +135,83 @@ def _role_for(entry: Mapping[str, str], roles: Mapping[tuple[str, str], str]) ->
     return "snapshot"
 
 
-def _render_mirror(entries: Iterable[Mapping[str, str]]) -> bytes:
-    roles = _load_mirror_roles()
+def _render_mirror(
+    entries: Iterable[Mapping[str, str]], *, produced_default: str, check: bool
+) -> tuple[bytes, dict[str, object]]:
+    raise_on_duplicate: set[tuple[str, str]] = set()
     records: list[dict[str, object]] = []
-    mirror_key = None
+    mirror_idx: int | None = None
     for entry in entries:
         path = entry["discovered_physical_path"]
         rel_path = ROOT / path
+        key = (entry["artifact_key"], path)
+        if key in raise_on_duplicate:
+            raise SystemExit(f"DUPLICATE_MIRROR_KEY:{key}")
+        raise_on_duplicate.add(key)
+
         record: dict[str, object] = {
             "artifact_key": entry["artifact_key"],
             "discovered_physical_path": path,
             "produced_at_utc": None,
             "proof_anchor": f"{path}.path_proof.txt",
-            "role": _role_for(entry, roles),
+            "role": _role_for(entry, {}),
             "sha256": None,
             "size_bytes": None,
         }
+
         if rel_path == MIRROR_PATH:
-            record["_mirror_marker"] = True
-            existing_proof = _load_existing_proof(rel_path.with_suffix(".jsonl.path_proof.txt"))
-            record["produced_at_utc"] = existing_proof.get("produced_at_utc") or _dt.datetime.now(tz=_dt.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
-            record["sha256"] = existing_proof.get("sha256") or ""
-            size_val = existing_proof.get("size_bytes")
-            try:
-                size_val = int(size_val) if size_val is not None else None
-            except ValueError:
-                size_val = None
-            fallback_size = rel_path.stat().st_size if rel_path.exists() else 0
-            record["size_bytes"] = size_val or fallback_size
-        else:
-            sha = _sha256_bytes(rel_path.read_bytes())
-            size = rel_path.stat().st_size
-            proof_anchor, produced_at = _write_path_proof(path, sha256=sha, size_bytes=size)
-            record.update({
-                "sha256": sha,
-                "size_bytes": size,
-                "produced_at_utc": produced_at,
-                "proof_anchor": proof_anchor,
-            })
+            record["role"] = "self_record"
+            mirror_idx = len(records)
+            records.append(record)
+            continue
+
+        sha = _sha256_bytes(rel_path.read_bytes())
+        stat = rel_path.stat()
+        mtime_utc = _isoformat(_dt.datetime.fromtimestamp(stat.st_mtime, tz=_dt.timezone.utc))
+        proof_anchor, produced_at = _write_path_proof(
+            path,
+            sha256=sha,
+            size_bytes=stat.st_size,
+            mtime_utc=mtime_utc,
+            produced_at=None,
+            default_produced_at=produced_default,
+            check=check,
+        )
+        record.update({
+            "sha256": sha,
+            "size_bytes": stat.st_size,
+            "produced_at_utc": produced_at,
+            "proof_anchor": proof_anchor,
+        })
         records.append(record)
 
     records.sort(key=lambda rec: (rec["artifact_key"], rec["discovered_physical_path"]))
-    for idx, rec in enumerate(records):
-        if rec.pop("_mirror_marker", False):
-            mirror_key = idx
-            break
+    if mirror_idx is None:
+        raise SystemExit("MISSING_SELF_RECORD")
+
+    mirror_key = next(
+        i
+        for i, rec in enumerate(records)
+        if rec["artifact_key"] == "index.machine_mirror"
+        and rec["discovered_physical_path"] == MIRROR_REL
+    )
 
     rendered_lines = [json.dumps(rec, separators=(",", ":"), sort_keys=True) for rec in records]
-
-    if mirror_key is not None:
-        body_lines = [line for i, line in enumerate(rendered_lines) if i != mirror_key]
-        body_text = "\n".join(body_lines) + ("\n" if body_lines else "")
-        mirror_rec = records[mirror_key]
-        mirror_rec["sha256"] = _sha256_bytes(body_text.encode("utf-8"))
-        for _ in range(5):
-            rendered_lines = [json.dumps(rec, separators=(",", ":"), sort_keys=True) for rec in records]
-            text = "\n".join(rendered_lines) + "\n"
-            size = len(text.encode("utf-8"))
-            if mirror_rec["size_bytes"] == size:
-                break
-            mirror_rec["size_bytes"] = size
-        proof_anchor, produced_at = _write_path_proof(
-            "artifacts/evidence_index.jsonl",
-            sha256=str(mirror_rec["sha256"]),
-            size_bytes=int(mirror_rec["size_bytes"]),
-            produced_at=str(mirror_rec["produced_at_utc"]),
-        )
-        mirror_rec["proof_anchor"] = proof_anchor
-        mirror_rec["produced_at_utc"] = produced_at
+    body_lines = [line for i, line in enumerate(rendered_lines) if i != mirror_key]
+    body_text = "\n".join(body_lines) + ("\n" if body_lines else "")
+    mirror_rec = records[mirror_key]
+    mirror_rec["produced_at_utc"] = produced_default
+    mirror_rec["sha256"] = _sha256_bytes(body_text.encode("utf-8"))
+    mirror_rec["size_bytes"] = 0
+    while True:
         rendered_lines = [json.dumps(rec, separators=(",", ":"), sort_keys=True) for rec in records]
+        text = "\n".join(rendered_lines) + "\n"
+        size = len(text.encode("utf-8"))
+        if size == mirror_rec["size_bytes"]:
+            break
+        mirror_rec["size_bytes"] = size
 
-    return ("\n".join(rendered_lines) + "\n").encode("utf-8")
+    return ("\n".join(rendered_lines) + "\n").encode("utf-8"), mirror_rec
 
 
 def _write_if_changed(path: Path, content: bytes, *, check: bool) -> None:
@@ -212,6 +230,12 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument("--check", action="store_true", help="Fail if files would change")
     args = parser.parse_args(argv)
 
+    produced_default = _isoformat(_dt.datetime.now(tz=_dt.timezone.utc))
+    mirror_proof_path = MIRROR_PATH.with_suffix(".jsonl.path_proof.txt")
+    mirror_proof_existing = _load_existing_proof(mirror_proof_path)
+    if mirror_proof_existing.get("produced_at_utc"):
+        produced_default = mirror_proof_existing["produced_at_utc"]
+
     entries = _load_human_index()
     index_bytes = _render_human_index(entries)
     _write_if_changed(HUMAN_INDEX, index_bytes, check=args.check)
@@ -219,8 +243,26 @@ def main(argv: list[str] | None = None) -> None:
     hash_line = f"{_sha256_bytes(index_bytes)}  docs/evidence/INDEX.json\n".encode("utf-8")
     _write_if_changed(HASH_SENTINEL, hash_line, check=args.check)
 
-    mirror_bytes = _render_mirror(entries)
+    mirror_bytes, mirror_rec = _render_mirror(entries, produced_default=produced_default, check=args.check)
     _write_if_changed(MIRROR_PATH, mirror_bytes, check=args.check)
+
+    mirror_stat = MIRROR_PATH.stat()
+    mirror_mtime = _isoformat(_dt.datetime.fromtimestamp(mirror_stat.st_mtime, tz=_dt.timezone.utc))
+    proof_anchor, produced_at = _write_path_proof(
+        MIRROR_REL,
+        sha256=str(mirror_rec["sha256"]),
+        size_bytes=int(mirror_rec["size_bytes"]),
+        mtime_utc=mirror_mtime,
+        produced_at=str(mirror_rec.get("produced_at_utc")),
+        default_produced_at=produced_default,
+        check=args.check,
+    )
+    if proof_anchor != mirror_rec["proof_anchor"] or produced_at != mirror_rec["produced_at_utc"]:
+        mirror_rec["proof_anchor"] = proof_anchor
+        mirror_rec["produced_at_utc"] = produced_at
+        mirror_rec["size_bytes"] = mirror_stat.st_size
+        mirror_bytes, _ = _render_mirror(entries, produced_default=produced_at, check=args.check)
+        _write_if_changed(MIRROR_PATH, mirror_bytes, check=args.check)
 
 
 if __name__ == "__main__":
