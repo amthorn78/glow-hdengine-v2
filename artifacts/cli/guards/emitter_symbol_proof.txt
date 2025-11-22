@@ -1,0 +1,10 @@
+Canonical emitter symbol: engine.presenter.emitter.emit_public
+== engine/cli/main.py ==
+from engine.narratives import emit_public_aux, get_pack
+    output = emitter.emit_public(result.payload).decode("utf-8")
+    emission = emit_public_aux(
+    compat_bytes = emitter.emit_public(compat_payload)
+== engine/runtime/public.py ==
+<no matches>
+== presenter/reader_v1/emitter.py ==
+<no matches>

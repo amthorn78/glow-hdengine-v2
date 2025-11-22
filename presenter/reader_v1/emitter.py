@@ -2,7 +2,7 @@ from __future__ import annotations
 import hashlib
 from typing import Dict, List, Any, Tuple
 
-from engine.stable.sercanon import serialize  # emits UTF-8 with exactly one trailing LF
+from engine.presenter import emitter  # emits UTF-8 with exactly one trailing LF
 
 _CATEGORY_BANDS = {"Cool","Open","Warm","Glow"}
 
@@ -57,9 +57,9 @@ def emit_reader_v1(enriched: Dict[str, Any]) -> Tuple[bytes, Dict[str, Any]]:
     public_bytes are LF-terminated, produced by sercanon.serialize.
     """
     preimage = _build_preimage(enriched)
-    pre_bytes = serialize(preimage)  # includes exactly one trailing LF
+    pre_bytes, _ = emitter.emit_compact_json(preimage)
     digest = hashlib.sha256(pre_bytes).hexdigest()
     final = dict(preimage)
     final["idempotence_hash"] = digest
-    public_bytes = serialize(final)
+    public_bytes, _ = emitter.emit_compact_json(final)
     return public_bytes, final

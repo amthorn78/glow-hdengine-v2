@@ -18,7 +18,7 @@ from engine.bodygraph.ingest import (
 from engine.compat import ts_v0
 from engine.compat.categories import CATEGORIES_ORDER_V1
 from engine.compat.compute import compat_public, band_for
-from engine.compat.ordering import pair_key
+from engine.compat.ordering import normalize_pair, pair_key
 from engine.compat.thresholds import THRESHOLDS_V1
 from engine.db import DBAccess
 from engine.db.errors import AdapterError
@@ -575,6 +575,21 @@ def aux_preview(args: argparse.Namespace) -> int:
     return 0
 
 
+def _canonical_pair(
+    left_person: Dict[str, Any],
+    right_person: Dict[str, Any],
+    left_chart: Dict[str, Any],
+    right_chart: Dict[str, Any],
+) -> Tuple[Dict[str, Any], Dict[str, Any], Dict[str, Any], Dict[str, Any]]:
+    ordered_people = list(normalize_pair(left_person, right_person))
+    charts = {
+        left_person["person_uid"]: left_chart,
+        right_person["person_uid"]: right_chart,
+    }
+    ordered_charts = [charts[p["person_uid"]] for p in ordered_people]
+    return ordered_people[0], ordered_people[1], ordered_charts[0], ordered_charts[1]
+
+
 def showcompat(_: argparse.Namespace) -> int:
     viewer_prefs = _load_viewer_prefs(getattr(_, "viewer_prefs_file", None))
     engine_tag, release_id, invocation_tag = _engine_identity()
@@ -639,6 +654,9 @@ def showcompat(_: argparse.Namespace) -> int:
         return left_person, right_person, left_chart, right_chart
 
     left_person, right_person, a_chart, b_chart = _load_from_source()
+    left_person, right_person, a_chart, b_chart = _canonical_pair(
+        left_person, right_person, a_chart, b_chart
+    )
     a_ts = ts_v0.extract_ts(a_chart)
     b_ts = ts_v0.extract_ts(b_chart)
     features = ts_v0.compute_features(a_ts, b_ts)
@@ -651,7 +669,15 @@ def showcompat(_: argparse.Namespace) -> int:
         release_id=release_id,
         invocation_tag=invocation_tag,
     )
-    public_bytes, _ = emit_reader_public_envelope(
+    compat_payload = {
+        "a": left_person,
+        "b": right_person,
+        "viewer_prefs": viewer_prefs,
+        "compat": compat_full,
+    }
+    compat_bytes = emitter.emit_public(compat_payload)
+
+    reader_bytes, reader_envelope = emit_reader_public_envelope(
         a_chart,
         b_chart,
         engine_tag=engine_tag,
@@ -660,12 +686,22 @@ def showcompat(_: argparse.Namespace) -> int:
     )
 
     if getattr(_, "dump_reader", None):
-        _dump_reader_bytes(_.dump_reader, public_bytes)
+        _dump_reader_bytes(_.dump_reader, reader_bytes)
 
     case_name = _case_name(_)
-    _emit_admin_dumps(_, case_name, left_person, right_person, a_chart, b_chart, compat_full.get("categories", []), features, viewer_prefs["weights"])
+    _emit_admin_dumps(
+        _,
+        case_name,
+        left_person,
+        right_person,
+        a_chart,
+        b_chart,
+        compat_full.get("categories", []),
+        features,
+        viewer_prefs["weights"],
+    )
 
-    sys.stdout.buffer.write(public_bytes)
+    sys.stdout.buffer.write(compat_bytes)
     return 0
 
 
