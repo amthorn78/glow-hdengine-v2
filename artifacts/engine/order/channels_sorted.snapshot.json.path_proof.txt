@@ -1,5 +1,5 @@
 path: artifacts/engine/order/channels_sorted.snapshot.json
 size_bytes: 290
 sha256: 65b7f0e4700c7a36c27d7b0fe25117e4b1518c947efdbb8087f51e064d734995
-mtime_utc: 2025-11-22T17:26:17Z
+mtime_utc: 2025-11-22T17:56:35Z
 produced_at_utc: 2025-11-22T04:02:02Z
