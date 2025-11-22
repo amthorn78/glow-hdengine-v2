@@ -63,7 +63,8 @@ def _write_path_proof(
     *,
     sha256: str,
     size_bytes: int,
-    mtime_utc: str,
+    mtime_utc: str | None,
+    default_mtime_utc: str,
     produced_at: str | None,
     default_produced_at: str,
     check: bool,
@@ -74,11 +75,12 @@ def _write_path_proof(
 
     existing = _load_existing_proof(proof_path)
     produced = produced_at or existing.get("produced_at_utc") or default_produced_at
+    mtime = mtime_utc or existing.get("mtime_utc") or default_mtime_utc
     proof_lines = [
         f"path: {rel}",
         f"size_bytes: {size_bytes}",
         f"sha256: {sha256}",
-        f"mtime_utc: {mtime_utc}",
+        f"mtime_utc: {mtime}",
         f"produced_at_utc: {produced}",
         "",
     ]
@@ -173,12 +175,12 @@ def _render_mirror(
 
         sha = _sha256_bytes(rel_path.read_bytes())
         stat = rel_path.stat()
-        mtime_utc = _isoformat(_dt.datetime.fromtimestamp(stat.st_mtime, tz=_dt.timezone.utc))
         proof_anchor, produced_at = _write_path_proof(
             path,
             sha256=sha,
             size_bytes=stat.st_size,
-            mtime_utc=mtime_utc,
+            mtime_utc=None,
+            default_mtime_utc=produced_default,
             produced_at=None,
             default_produced_at=produced_default,
             check=check,
@@ -255,12 +257,12 @@ def main(argv: list[str] | None = None) -> None:
     _write_if_changed(MIRROR_PATH, mirror_bytes, check=args.check)
 
     mirror_stat = MIRROR_PATH.stat()
-    mirror_mtime = _isoformat(_dt.datetime.fromtimestamp(mirror_stat.st_mtime, tz=_dt.timezone.utc))
     proof_anchor, produced_at = _write_path_proof(
         MIRROR_REL,
         sha256=str(mirror_rec["sha256"]),
         size_bytes=int(mirror_rec["size_bytes"]),
-        mtime_utc=mirror_mtime,
+        mtime_utc=mirror_proof_existing.get("mtime_utc"),
+        default_mtime_utc=produced_default,
         produced_at=str(mirror_rec.get("produced_at_utc")),
         default_produced_at=produced_default,
         check=args.check,

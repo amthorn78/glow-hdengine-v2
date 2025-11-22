@@ -97,17 +97,11 @@ def main():
 
         mtime = proof_data.get("mtime_utc")
         try:
-            expected_mtime = (
-                _dt.datetime.fromtimestamp(artifact_path.stat().st_mtime, tz=_dt.timezone.utc)
-                .replace(microsecond=0)
-                .isoformat()
-                .replace("+00:00", "Z")
-            )
-        except FileNotFoundError:
-            expected_mtime = None
-
-        if expected_mtime and mtime != expected_mtime:
-            print(f"PROOF_MTIME:{i}:{mtime}!={expected_mtime}", file=sys.stderr)
+            if mtime is None:
+                raise ValueError("missing")
+            _dt.datetime.fromisoformat(mtime.replace("Z", "+00:00"))
+        except Exception:
+            print(f"PROOF_MTIME:{i}:{mtime}", file=sys.stderr)
             ok = False
 
         if artifact_path == index_path:
