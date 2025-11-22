@@ -1,0 +1,13 @@
+presenter/json_canon_compare.py:    text = json.dumps(record, sort_keys=True, separators=(",", ":")) + "\n"
+adapter/http_reader.py:                    json.dumps(canonical_json, separators=(",", ":"), ensure_ascii=False),
+adapter/logging_filter.py:        line = json.dumps(obj, separators=(",",":"), sort_keys=True)
+adapter/logging_filter.py:    line = json.dumps(obj, separators=(",",":"), sort_keys=True)
+engine/bodygraph/vendor_client.py:        text = json.dumps(record, sort_keys=True, separators=(",", ":")) + "\n"
+engine/bodygraph/vendor_client.py:        body_bytes = json.dumps(body, sort_keys=True, separators=(",", ":")).encode("utf-8") + b"\n"
+engine/bodygraph/ingest.py:        text = json.dumps(record, sort_keys=True, separators=(",", ":")) + "\n"
+engine/charts/loader.py:        fh.write(_json.dumps(line, separators=(",", ":"), ensure_ascii=False).encode("utf-8") + b"\n")
+engine/compat/type_strategy_v0.py:    canon = json.dumps({"gates": ints}, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+engine/narratives/loader.py:    canonical = json.dumps(obj, separators=(",", ":"), sort_keys=True)
+engine/db/adapter.py:    text = json.dumps(payload, separators=(",", ":"), sort_keys=True) + "\n"
+engine/db/providers/bridge_provider.py:            data = json.dumps(payload, separators=(",", ":"), sort_keys=True).encode("utf-8")
+engine/ops/http_log.py:            handle.write(json.dumps(record, sort_keys=True, separators=(",", ":")))
