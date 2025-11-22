@@ -1,5 +1,15 @@
 # CHANGELOG
 
+2025-11-22 — EPIC-017: HD Calcination Pass 2 close-out
+
+### Added
+- EPIC017 manifest and close-out report under `audit/` plus PF doc-delta drafts for PF09/PF10/PF12/PF14/PF19/PF20/PF04.
+- Acceptance map for EPIC017 foundations (`docs/acceptance_map_epic017.json`).
+
+### Changed
+- README/AGENTS/docs refreshed to describe the canonical emitter, registry loader, deterministic ordering layer, and the evidence ledger now backed by a machine mirror self-record.
+- CHANGELOG now marks Calcination foundations as complete; vendor ingest (EPIC011) remains parked while matching foundations carry forward.
+
 2025-11-14 — EPIC-011: Bridge adapter evidence (S2–S7)
 
 ### Added

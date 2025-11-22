@@ -1,5 +1,5 @@
 path: audit/qa/compat/coverage_sweep.log
 size_bytes: 2816
 sha256: 048f24824b7f48b0860a2d616eae8753a2975e7cdd1b0c3750d5991af55e13e5
-mtime_utc: 2025-11-22T18:43:59Z
+mtime_utc: 2025-11-22T19:54:07Z
 produced_at_utc: 2025-11-22T02:27:04Z

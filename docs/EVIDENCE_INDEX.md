@@ -1,5 +1,27 @@
-> **Note (EPIC-011):** The canonical human Evidence Index lives at `docs/evidence/INDEX.json`.
+> **Note:** The canonical human Evidence Index lives at `docs/evidence/INDEX.json`.
 > Add new entries there first, then mirror key pointers here for quick navigation.
+
+# Appendix-D — Evidence Index (EPIC-017)
+
+## Close-out artifacts
+* Manifest: `audit/EPIC017_MANIFEST.json` (token→artifact map)
+* Close report: `audit/EPIC017_close_report.md`
+* Acceptance map: `docs/acceptance_map_epic017.json`
+* PF doc-deltas: `audit/docdeltas/` (PF09, PF10, PF12, PF14, PF19, PF20, PF04)
+
+## Canonical compatibility & ordering
+* `artifacts/cli/summary.json`, `artifacts/cli/ab.json`, `artifacts/cli/ba.json`
+* `artifacts/cli/reader_cli_parity.json` (parity harness)
+* `artifacts/cli/preimage_recompute.log`
+* `artifacts/engine/order/props_total_order.log` (deterministic ordering)
+* `artifacts/engine/order/abba_identity.bytes`
+
+## Registry and evidence ledger
+* `artifacts/registry/registry_report.json`
+* `artifacts/evidence_index.jsonl` (machine mirror self-record)
+* `topology.orientation_demo` under `artifacts/gates/` (path-proof exemplar)
+
+---
 
 # Appendix-D — Evidence Index (EPIC-011)
 

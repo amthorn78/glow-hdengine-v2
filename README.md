@@ -2,6 +2,14 @@
 
 Glow HD Engine — README
 
+## Current state (EPIC017 — HD Calcination complete)
+
+- **Deterministic matching & explanations:** The CLI and Reader share one emitter for compatibility output. AB↔BA runs are identical, two-run identity is proven, and stdout stays canonical and LF-terminated.
+- **Transparent evidence ledger:** Every governed artifact carries a path proof and a mirror entry (with a self-record). The new EPIC017 manifest and close-out report summarize token→artifact links; see `audit/EPIC017_MANIFEST.json` and `audit/EPIC017_close_report.md`.
+- **Programmatic registry:** Charts and relationships load through the typed registry loader and produce a canonical `registry_report.v1` under evidence discipline.
+- **Predictable ordering:** The ordering layer (tie-break and total order) ships reproducible artifacts so ranking remains stable and explainable.
+- **Retired ingest epic:** The earlier vendor ingest foundation (EPIC011) was parked; Calcination replaces it with hardened local, deterministic rails for Phase I.
+
 ## EPIC-009 — Ops Safety & DB Runtime Posture (post-merge)
 - **Refusal (ops):** `/ops/rails/refusal` returns 503 with a typed JSON body, `Cache-Control: no-store`, **no ETag**, and no vendor I/O.
 - **Keys-only logs:** refusal route logs exactly `{at, route, status, duration_ms, idempotence_hash, release_id}` (no bodies/headers/secrets).

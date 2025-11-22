@@ -1,6 +1,7 @@
 # HD Engine Repo Docs — Index (SoT pointers)
 
 ### Acceptance & evidence
+- EPIC017 close-out: manifest (`audit/EPIC017_MANIFEST.json`), close report (`audit/EPIC017_close_report.md`), acceptance map (`docs/acceptance_map_epic017.json`).
 - Evidence Index (human): `docs/EVIDENCE_INDEX.md`
 - Evidence Index (machine): `artifacts/evidence_index.jsonl`
 - Aux narrative surface (EPIC-010):
@@ -13,6 +14,7 @@
   - Artifacts: `artifacts/db_bridge/adapter_selection.snapshot.json`, `artifacts/db_bridge/{health.json,root.json,query_select_1.json}`, `artifacts/db/introspect.{search_path,grants,fingerprint}.json`, `artifacts/engine/db_adapter.{version,search_path,fingerprint}.json`, `artifacts/logs/keys_only.sample.jsonl`, `artifacts/ops/rails_open_scope.txt`.
   - Indexing: every governed artifact has a `.path_proof.txt` plus entries in `docs/evidence/INDEX.json` and `artifacts/evidence_index.jsonl` (PF09 / PF12 discipline).
 - EPIC006 acceptance: run `LC_ALL=C TZ=UTC pytest -q -m epic006`
+- EPIC017 acceptance artifacts live under `artifacts/cli/`, `artifacts/engine/order/`, `artifacts/registry/`, and the machine mirror; see the manifest for token mapping.
 
 This repo contains implementation docs. Canon (spec/process) lives in PF documents; reference **titles only**:
 
@@ -44,3 +46,9 @@ This repo contains implementation docs. Canon (spec/process) lives in PF documen
 - Env-matrix snapshots (selection-only): CHANGELOG entry 2025-11-07
 - DB posture scripts & evidence: `docs/ADAPTER_DB.md`
 - Pre-commit QA harness: `scripts/qa/epic009_precommit.sh` (report under `artifacts/qa/`)
+
+### EPIC-017 — HD Calcination (foundations closed)
+- Canonical compatibility path with AB↔BA parity and two-run identity (CLI/Reader share one emitter).
+- Machine mirror self-record and path proofs for all governed artifacts; orientation demo shows path-proof discipline.
+- Registry loader emits `registry_report.v1` under evidence rails; ordering artifacts prove deterministic tie-breaks.
+- EPIC011 vendor ingest remained parked; Calcination hardened the local deterministic core for Phase I.
