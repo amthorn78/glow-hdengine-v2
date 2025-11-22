@@ -24,3 +24,6 @@ jobs:
       - run: python ci/checks/check_bridge_consistency.py
       - run: ci/checks/check_mirror_schema.sh
       - run: ci/checks/check_final_lf.sh
+      - run: python tools/evidence/update_evidence_index.py --check
+      - run: python tools/evidence/orientation_demo.py --check
+      - run: pytest tests/evidence tests/ops/test_evidence_index.py

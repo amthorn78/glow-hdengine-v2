@@ -43,7 +43,8 @@ def main():
         print("MISSING:artifacts/evidence_index.jsonl", file=sys.stderr)
         return 1
 
-    for i, raw in enumerate(index_path.read_text().splitlines(), 1):
+    lines = index_path.read_text().splitlines(True)
+    for i, raw in enumerate(lines, 1):
         if not raw:
             print(f"EMPTY:{i}", file=sys.stderr)
             ok = False
@@ -76,15 +77,35 @@ def main():
             ok = False
             continue
 
-        if not artifact_path.exists():
-            print(f"ARTIFACT_MISSING:{i}:{artifact_path}", file=sys.stderr)
-            ok = False
-            continue
-
         proof_data = load_proof(proof_path)
         if proof_data.get("path") != artifact_path.as_posix():
             print(f"PROOF_PATH:{i}:{proof_data.get('path')}!={artifact_path.as_posix()}", file=sys.stderr)
             ok = False
+
+        if artifact_path == index_path:
+            body_lines = [line for j, line in enumerate(lines, 1) if j != i]
+            body_text = "".join(body_lines)
+            canonical_sha = hashlib.sha256(body_text.encode()).hexdigest()
+            expected_size = len(index_path.read_bytes())
+            if obj.get("sha256") != canonical_sha:
+                print(f"SELF_SHA:{i}:{obj.get('sha256')}!={canonical_sha}", file=sys.stderr)
+                ok = False
+            if obj.get("size_bytes") != expected_size:
+                print(f"SELF_SIZE:{i}:{obj.get('size_bytes')}!={expected_size}", file=sys.stderr)
+                ok = False
+            if proof_data.get("sha256") != canonical_sha:
+                print(f"PROOF_SHA:{i}:{proof_data.get('sha256')}!={canonical_sha}", file=sys.stderr)
+                ok = False
+            proof_size_val = proof_data.get("size_bytes")
+            if proof_size_val is None or int(proof_size_val) != expected_size:
+                print(f"PROOF_SIZE:{i}:{proof_size_val}!={expected_size}", file=sys.stderr)
+                ok = False
+            continue
+
+        if not artifact_path.exists():
+            print(f"ARTIFACT_MISSING:{i}:{artifact_path}", file=sys.stderr)
+            ok = False
+            continue
 
         actual_sha = sha256(artifact_path)
         actual_size = artifact_path.stat().st_size

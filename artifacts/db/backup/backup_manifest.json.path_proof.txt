@@ -1,4 +1,4 @@
 path: artifacts/db/backup/backup_manifest.json
-sha256: fc1bfec5472011a28a70353f5fc5aa0f7ac360700263a46f5e8cd2c93908b4a8
 size_bytes: 370
-mtime_utc: 2025-11-20T08:26:28Z
+sha256: fc1bfec5472011a28a70353f5fc5aa0f7ac360700263a46f5e8cd2c93908b4a8
+produced_at_utc: 2025-11-22T02:27:04Z

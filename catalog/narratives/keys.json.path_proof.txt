@@ -1,4 +1,4 @@
 path: catalog/narratives/keys.json
-sha256: d17f6466814e81c7ba3de5c484db03315b116e0c58fcde1fa552c8ae9de29aa6
 size_bytes: 35306
-mtime_utc: 2025-11-19T22:21:08Z
+sha256: d17f6466814e81c7ba3de5c484db03315b116e0c58fcde1fa552c8ae9de29aa6
+produced_at_utc: 2025-11-22T02:27:04Z
