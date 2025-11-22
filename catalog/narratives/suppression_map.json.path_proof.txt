@@ -1,4 +1,4 @@
 path: catalog/narratives/suppression_map.json
-sha256: ed5f35608fabe34b6ac4eab5ebf50070fff226532f995d01de8f4f138e08cf7c
 size_bytes: 18242
-mtime_utc: 2025-11-19T22:21:08Z
+sha256: ed5f35608fabe34b6ac4eab5ebf50070fff226532f995d01de8f4f138e08cf7c
+produced_at_utc: 2025-11-22T02:27:04Z

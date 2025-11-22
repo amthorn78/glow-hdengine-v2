@@ -1,4 +1,4 @@
 path: artifacts/db/migrations/apply.log
-sha256: c4a42eef7d38b7651b86d44fe2a3ea7fa24668300b862aa522838099b61ddd22
 size_bytes: 190
-mtime_utc: 2025-11-19T22:21:08Z
+sha256: c4a42eef7d38b7651b86d44fe2a3ea7fa24668300b862aa522838099b61ddd22
+produced_at_utc: 2025-11-22T02:27:04Z

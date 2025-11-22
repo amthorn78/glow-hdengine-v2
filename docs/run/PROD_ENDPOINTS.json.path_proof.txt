@@ -1,4 +1,4 @@
 path: docs/run/PROD_ENDPOINTS.json
-sha256: cf0353445f5f23020334177eb5fcf494dbf8683499473c4bbbc22e5b4ba3eb7d
 size_bytes: 110
-mtime_utc: 2025-11-19T22:21:08Z
+sha256: cf0353445f5f23020334177eb5fcf494dbf8683499473c4bbbc22e5b4ba3eb7d
+produced_at_utc: 2025-11-22T02:27:04Z

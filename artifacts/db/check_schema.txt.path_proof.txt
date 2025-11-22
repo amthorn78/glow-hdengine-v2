@@ -1,4 +1,4 @@
 path: artifacts/db/check_schema.txt
-sha256: 239944b558d2dcf93e254a3ab36884c17408f31ee738c2fa540c26ec5cc9aa34
 size_bytes: 12
-mtime_utc: 2025-11-19T23:10:45Z
+sha256: 239944b558d2dcf93e254a3ab36884c17408f31ee738c2fa540c26ec5cc9aa34
+produced_at_utc: 2025-11-22T02:27:04Z

@@ -1,4 +1,4 @@
 path: artifacts/runtime/env_matrix.snapshot.json
-sha256: 831635f4e375fb8e701aba0e90d5fe4ad1a63b93aa68154fe6dc48172bee26db
 size_bytes: 422
-mtime_utc: 2025-11-19T22:23:37Z
+sha256: 831635f4e375fb8e701aba0e90d5fe4ad1a63b93aa68154fe6dc48172bee26db
+produced_at_utc: 2025-11-22T02:27:04Z

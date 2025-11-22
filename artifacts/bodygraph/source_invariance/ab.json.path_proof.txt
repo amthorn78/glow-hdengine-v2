@@ -1,4 +1,4 @@
 path: artifacts/bodygraph/source_invariance/ab.json
-sha256: ff585cd344e0796c9c4a3a19282b63ae9e58937b1dee1e796a98f4f4ad8cb458
 size_bytes: 651
-mtime_utc: 2025-11-19T22:21:08Z
+sha256: ff585cd344e0796c9c4a3a19282b63ae9e58937b1dee1e796a98f4f4ad8cb458
+produced_at_utc: 2025-11-22T02:27:04Z
