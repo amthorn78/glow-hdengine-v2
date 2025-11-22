@@ -1,4 +1,4 @@
 path: audit/bootstrap/preflight.log
-sha256: ab19cd28e649b7f5465a85fbbd0061ae0a157670cc4fb67f9159664cf7255ebd
 size_bytes: 107
-mtime_utc: 2025-11-19T22:21:08Z
+sha256: ab19cd28e649b7f5465a85fbbd0061ae0a157670cc4fb67f9159664cf7255ebd
+produced_at_utc: 2025-11-22T02:27:04Z

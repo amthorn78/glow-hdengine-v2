@@ -1,4 +1,4 @@
 path: artifacts/logs/keys_only.sample.jsonl
-sha256: 9d4b35cff56c92bfc939ffa6c90f165290e9462d6874691b5377d02fe3d6b9ae
 size_bytes: 6786
-mtime_utc: 2025-11-19T23:14:32Z
+sha256: 9d4b35cff56c92bfc939ffa6c90f165290e9462d6874691b5377d02fe3d6b9ae
+produced_at_utc: 2025-11-22T02:27:04Z

@@ -1,4 +1,4 @@
 path: catalog/narratives/templates.json
-sha256: 5c76f155d99e4bcf79361b9e9c00bde36dc7ef9c887b8558eab0c9a05f9bb580
 size_bytes: 20439
-mtime_utc: 2025-11-19T22:21:08Z
+sha256: 5c76f155d99e4bcf79361b9e9c00bde36dc7ef9c887b8558eab0c9a05f9bb580
+produced_at_utc: 2025-11-22T02:27:04Z
