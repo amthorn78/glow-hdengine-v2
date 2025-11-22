@@ -1,0 +1,78 @@
+{
+  "epic_id": "HDE-EPIC017",
+  "manifest": "audit/EPIC017_MANIFEST.json",
+  "foundations": [
+    {
+      "deliverable": "D1",
+      "name": "Canonical serialization and parity",
+      "status": "done",
+      "tokens": [
+        "CLI_NO_ALT_JSON_OK",
+        "CLI_READER_PARITY_OK",
+        "CLI_SHOWCOMPAT_CANON_OK",
+        "CLI_STDOUT_LF_OK",
+        "JSON_CANONICAL_CHECK_OK",
+        "TWO_RUN_IDENTITY_OK",
+        "COMPOSITE_ABBA_IDENTITY_OK"
+      ],
+      "manifest_tokens": [
+        "CLI_NO_ALT_JSON_OK",
+        "CLI_READER_PARITY_OK",
+        "JSON_CANONICAL_CHECK_OK",
+        "TWO_RUN_IDENTITY_OK",
+        "COMPOSITE_ABBA_IDENTITY_OK"
+      ]
+    },
+    {
+      "deliverable": "D2",
+      "name": "Evidence skeleton & transparency",
+      "status": "done",
+      "tokens": [
+        "EVIDENCE_INDEX_UPDATED_OK",
+        "MACHINE_MIRROR_UPDATED_OK",
+        "EVIDENCE_INDEX_HASH_OK",
+        "EVIDENCE_INDEX_MIRROR_OK",
+        "EVIDENCE_PATHS_VALIDATED_OK",
+        "EVIDENCE_PATH_PROOFS_OK",
+        "CI_CHECK_MIRROR_SCHEMA_OK",
+        "CI_CHECK_FINAL_LF_OK"
+      ],
+      "manifest_tokens": [
+        "EVIDENCE_INDEX_UPDATED_OK",
+        "MACHINE_MIRROR_UPDATED_OK",
+        "EVIDENCE_INDEX_HASH_OK",
+        "EVIDENCE_PATHS_VALIDATED_OK",
+        "CI_CHECK_MIRROR_SCHEMA_OK",
+        "CI_CHECK_FINAL_LF_OK"
+      ]
+    },
+    {
+      "deliverable": "D3",
+      "name": "Programmatic configuration and registry",
+      "status": "done",
+      "tokens": [
+        "CONFIG_GEN_OK",
+        "UNKNOWN_IDS_FAIL_CLOSED_OK",
+        "JSON_CANONICAL_CHECK_OK"
+      ],
+      "manifest_tokens": [
+        "CONFIG_GEN_OK",
+        "UNKNOWN_IDS_FAIL_CLOSED_OK"
+      ]
+    },
+    {
+      "deliverable": "D4",
+      "name": "Deterministic ordering layer",
+      "status": "done",
+      "tokens": [
+        "TIEBREAK_TOTAL_ORDER_OK",
+        "COMPOSITE_ABBA_IDENTITY_OK",
+        "JSON_CANONICAL_CHECK_OK"
+      ],
+      "manifest_tokens": [
+        "TIEBREAK_TOTAL_ORDER_OK",
+        "COMPOSITE_ABBA_IDENTITY_OK"
+      ]
+    }
+  ]
+}

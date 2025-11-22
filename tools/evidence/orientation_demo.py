@@ -21,6 +21,11 @@ from tools.evidence.update_evidence_index import (  # noqa: E402
 )
 
 ORIENTATION_PATH = ROOT / "audit/gates/topology/orientation_demo.txt"
+# Evidence refresh order: update_evidence_index.py must run first (write mode)
+# to render INDEX/mirror/proofs, then generate_orientation(check=False) should
+# write the orientation report from that skeleton. CI runs the --check variants
+# in the same order to flag drift when INDEX changes without refreshing this
+# report.
 
 
 def _load_mirror_records() -> list[dict[str, object]]:
