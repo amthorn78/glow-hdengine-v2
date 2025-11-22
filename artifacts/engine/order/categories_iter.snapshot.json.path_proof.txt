@@ -1,0 +1,5 @@
+path: artifacts/engine/order/categories_iter.snapshot.json
+size_bytes: 114
+sha256: 82e19ac46596e3d09a2427246b74bea6e653f293a19ec70ba3735889b0c6a89d
+mtime_utc: 2025-11-22T17:26:17Z
+produced_at_utc: 2025-11-22T04:02:02Z

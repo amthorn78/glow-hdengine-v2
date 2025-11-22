@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
+import datetime as _dt
+import hashlib
 import json
 import sys
-import hashlib
 from pathlib import Path
 
 REQUIRED_KEYS = [
@@ -38,6 +39,8 @@ def load_proof(path: Path):
 def main():
     ok = True
     prev = None
+    seen_keys = set()
+    self_records = []
     index_path = Path("artifacts/evidence_index.jsonl")
     if not index_path.exists():
         print("MISSING:artifacts/evidence_index.jsonl", file=sys.stderr)
@@ -61,6 +64,12 @@ def main():
             print(f"KEYS:{i}:{sorted(key_set)}", file=sys.stderr)
             ok = False
 
+        key_pair = (obj["artifact_key"], obj["discovered_physical_path"])
+        if key_pair in seen_keys:
+            print(f"DUPLICATE:{i}:{key_pair}", file=sys.stderr)
+            ok = False
+        seen_keys.add(key_pair)
+
         if prev and (obj["artifact_key"], obj["discovered_physical_path"]) < prev:
             print(f"SORT:{i}:{(obj['artifact_key'], obj['discovered_physical_path'])} < {prev}", file=sys.stderr)
             ok = False
@@ -82,6 +91,25 @@ def main():
             print(f"PROOF_PATH:{i}:{proof_data.get('path')}!={artifact_path.as_posix()}", file=sys.stderr)
             ok = False
 
+        if "mtime_utc" not in proof_data or "produced_at_utc" not in proof_data:
+            print(f"PROOF_FIELDS:{i}", file=sys.stderr)
+            ok = False
+
+        mtime = proof_data.get("mtime_utc")
+        try:
+            expected_mtime = (
+                _dt.datetime.fromtimestamp(artifact_path.stat().st_mtime, tz=_dt.timezone.utc)
+                .replace(microsecond=0)
+                .isoformat()
+                .replace("+00:00", "Z")
+            )
+        except FileNotFoundError:
+            expected_mtime = None
+
+        if expected_mtime and mtime != expected_mtime:
+            print(f"PROOF_MTIME:{i}:{mtime}!={expected_mtime}", file=sys.stderr)
+            ok = False
+
         if artifact_path == index_path:
             body_lines = [line for j, line in enumerate(lines, 1) if j != i]
             body_text = "".join(body_lines)
@@ -100,6 +128,10 @@ def main():
             if proof_size_val is None or int(proof_size_val) != expected_size:
                 print(f"PROOF_SIZE:{i}:{proof_size_val}!={expected_size}", file=sys.stderr)
                 ok = False
+            if obj.get("role") != "self_record":
+                print(f"SELF_ROLE:{i}:{obj.get('role')}", file=sys.stderr)
+                ok = False
+            self_records.append(key_pair)
             continue
 
         if not artifact_path.exists():
@@ -124,6 +156,10 @@ def main():
         if proof_size_val is None or int(proof_size_val) != actual_size:
             print(f"PROOF_SIZE:{i}:{proof_size_val}!={actual_size}", file=sys.stderr)
             ok = False
+
+    if len(self_records) != 1:
+        print(f"SELF_RECORD_COUNT:{len(self_records)}", file=sys.stderr)
+        ok = False
 
     return 0 if ok else 1
 

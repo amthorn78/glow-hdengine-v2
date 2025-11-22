@@ -1,4 +1,5 @@
 path: audit/qa/compat/abba_meta.json
 size_bytes: 310
 sha256: 08ecfe6807252619f51a0aff0f4ed440af328d5a7a1c535106623b31bf29eada
+mtime_utc: 2025-11-22T17:25:53Z
 produced_at_utc: 2025-11-22T02:27:04Z

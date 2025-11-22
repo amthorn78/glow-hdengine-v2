@@ -1,4 +1,5 @@
 path: artifacts/db/migrations/plan.json
 size_bytes: 115
 sha256: 9d59661fcda6b277666c9a5a5bfeeb1ee81032fe5bfcb022c72afbeb7752ac92
+mtime_utc: 2025-11-22T17:25:53Z
 produced_at_utc: 2025-11-22T02:27:04Z
