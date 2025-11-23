@@ -1,0 +1,7 @@
+AB sha256:
+9afffeff1e4b1dbca0bad401a96e5225bb98bab061344831b6f469d3b7e1745b  Audit/QA/HDE-EPIC017/logs/step_showcompat_vendor_birth1.txt
+
+BA sha256:
+9afffeff1e4b1dbca0bad401a96e5225bb98bab061344831b6f469d3b7e1745b  Audit/QA/HDE-EPIC017/logs/step_showcompat_vendor_birth1_ba.txt
+
+DIFF (AB vs BA):
