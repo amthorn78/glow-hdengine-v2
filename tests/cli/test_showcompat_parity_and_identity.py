@@ -10,6 +10,9 @@ from engine.cli import main as cli_main
 from engine.presenter import emitter
 from engine.runtime import emit_reader_public_envelope
 
+AB_ARTIFACT = Path("artifacts/cli/ab.json")
+BA_ARTIFACT = Path("artifacts/cli/ba.json")
+
 PAIR = {
     "left": {"birthdate": "1990-01-10", "birthtime": "14:05", "location": "Chicago, US"},
     "right": {"birthdate": "1992-03-04", "birthtime": "08:15", "location": "Berlin, DE"},
@@ -82,6 +85,21 @@ def test_two_run_identity_and_reemit():
     payload = json.loads(first.stdout)
     re_emitted = emitter.emit_public(payload)
     assert re_emitted == first.stdout
+
+
+def test_ab_ba_identity_and_artifacts():
+    env = _cli_env()
+    ab_proc = _run_showcompat(PAIR, env=env)
+    swapped = {"left": PAIR["right"], "right": PAIR["left"]}
+    ba_proc = _run_showcompat(swapped, env=env)
+
+    assert ab_proc.returncode == ba_proc.returncode == 0
+    assert ab_proc.stderr == ba_proc.stderr == b""
+    assert ab_proc.stdout == ba_proc.stdout
+    assert ab_proc.stdout.endswith(b"\n")
+
+    assert AB_ARTIFACT.read_bytes() == ab_proc.stdout
+    assert BA_ARTIFACT.read_bytes() == ba_proc.stdout
 
 
 def test_reader_dump_matches_runtime(tmp_path: Path):
