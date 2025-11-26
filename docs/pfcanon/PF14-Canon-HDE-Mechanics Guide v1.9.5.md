@@ -1,63 +1,145 @@
-# PF14-Canon-HDE-Mechanics Guide
+1. ## Document Control 
 
-**Version:** v1.8.4  
+## 0.1 **Header**
+
+ **Title:** PF14-Canon-HDE-Mechanics Guide  
+ **Version:** v1.9.5  
  **Status:** Canon  
-**Effective date:** 2025-11-22
+ **Effective date:** 2025-11-25  
+ **Last Update Gate:** BN 7.7.8 Drain A11  
+ **Invocation tag:** INV-f2ac55d77ce9aacc
 
-**Last Update Gate:** HDE-EPIC017 planning r2
+---
 
-## **Purpose — Components & build tasks (Mechanics scope)**
+## 0.2 **Purpose — Components & build tasks (mechanics scope)**
 
-Mechanics wires and **proves** the HD Engine for production. It does **not** restate Math formulas or public transport bytes.
+Mechanics wires and proves the HD Engine for production. This guide:
 
-**Public posture (Reader v1).** Bands-only, **numeric-free** public surface; resonance **SR-only** (α=1.0); **hysteresis \= 1** is armed for future XR and **not exposed**.
+* Describes **components and build tasks** that must exist in the engine repo.
 
-**Rules.**
+* Specifies **mechanical responsibilities only** (what must be wired and proven).
 
-* **Titles-only cross-refs** in body text (**no version numbers**).  
-* **Single homes** (route by title; do not duplicate):  
-   • **Public bytes:** PF-Canon-HDE-CLI-API-Vendor-Ref  
-   • **Math:** PF-Canon-HDE-Math-Spec  
-   • **Schemas/pack & canonical JSON:** PF-Canon-HDE-Schemas & Artifacts  
-   • **Governance/acceptance & Evidence Index:** PF-Canon-HDE-Governance
+* Does **not** restate math formulas or public transport bytes, which live in their single-home PF documents.
+
+**Public posture (Reader v1).**  
+ Reader v1’s public surface is:
+
+* Bands-only, numeric-free.
+
+* Resonance posture: SR-only (α \= 1.0).
+
+* Hysteresis \= 1 is armed for future XR but **not exposed** in this version.
+
+**Routing rules.**
+
+* Cross-references in this guide are **titles-only** (no version numbers).
+
+* Single homes (route by title; do not duplicate):
+
+  * Public bytes & HTTP contracts: **HDE-CLI-API-Vendor-Ref**
+
+  * Math & algorithms: **HDE-Math-Spec**
+
+  * Schemas, pack/manifest, canonical JSON, Evidence Index & Machine Mirror: **HDE-Schemas & Artifacts**
+
+  * Governance, acceptance gates, A7/ops posture: **HDE-Governance**
 
 **References (titles-only).**
 
-* PF-Canon-HDE-Governance  
-* PF-Canon-HDE-CLI-API-Vendor-Ref  
-* PF-Canon-HDE-Math-Spec  
-* PF-Canon-HDE Architecture  
-* PF13 — Glow Development Philosophy  
-* PF-Canon-HD Engine Epics Map  
+This guide assumes and routes to the following PF documents:
+
+* HDE-Governance
+
+* HDE-CLI-API-Vendor-Ref
+
+* HDE-Math-Spec
+
+* HDE Architecture
+
+* Glow Development Philosophy
+
+* HD Engine Epics Map
+
 * Glow HD Engine — Build Notes & Integration Addenda (Living)
 
-**Provenance & deltas (informative).** Canonicalized from the REVIEW addenda and aligned with **PF10-HDE-Build Notes (Living)**. Rolled in previously-optional items (Server Cache; Reader conditional-GET helper). **Locked A7 transport posture**. Added the **/internal/version** ops posture (**no-store**, **no `ETag`**, **conditionals ignored**; **HEAD 200 with `Content-Type` parity**), clarified **optional `build_commit`**, and expanded Evidence Index captures with **same-PR updates**, **machine-mirror parity**, and **path-proofs**.
+**Provenance & deltas (informative).**  
+ Mechanics here have been canonicalized from the REVIEW addenda and aligned with **Glow HD Engine — Build Notes & Integration Addenda (Living)**. In particular, this guide:
 
----
+* Rolled in previously optional items (Server Cache; Reader conditional-GET helper).
 
-## **Preamble — Product scope**
+* Locked the A7 transport posture.
 
-**Viewer inputs & presets.** Presets are optional templates. Each user selects a top category and sets weights (`0..100`) across the ten Magic-10 IDs (closed set & order; titles-only to **HDE-Schemas and Artifacts §2.6** / **HDE-Math-Spec §5.1**). **Zero-weight rule:** if a viewer sets a category’s weight to `0`, candidates whose \#1 is that category are excluded.
+* Added the `/internal/version` ops posture (no-store, no ETag, conditionals ignored; HEAD 200 with Content-Type parity).
 
-**Engine outputs (internal/admin).** The engine computes per-category numbers (`0..100`) which map to bands (**Cool, Open, Warm, Glow**) using **inclusive-high** thresholds and `round_half_up` (titles-only to **HDE-Math-Spec §5.3**). The engine selects two narrative keys per category (personal, shared). The engine selects keys; it does not write copy. **Resonance posture (v1):** SR-only (`alpha=1.0`); XR is dormant and not part of public output.
+* Clarified optional `build_commit`.
 
-**Public covenant (titles-only).** Public Reader payloads are **bands-only and numeric-free**; internal numbers remain admin-only. Public bytes & schemas live in **HDE-CLI-API-Vendor Ref** by title. **Canonical JSON** is required end-to-end: UTF-8 (no BOM), keys ASCII-sorted, compact separators, exactly one trailing LF; arrays used as sets are deduped & ASCII-sorted. **Determinism:** AB↔BA parity and two-run identity hold; Reader↔CLI parity is required; all checks run with `LC_ALL=C`, `LANG=C`, `TZ=UTC`. Cross-doc references in this guide are **titles-only** (no version numbers), with math/transport/ops details routed to their single homes.
+* Expanded Evidence Index captures to require same-PR updates, Machine Mirror parity, and path-proofs.
 
----
+## ---
 
-# **HD Engine — the plain story**
+## 0.3 **Preamble — Product scope**
 
-## **What it is**
+**Viewer inputs & presets.**  
+ Viewer presets are optional templates. Each viewer:
+
+* Selects a **top category** from the closed Magic-10 set.
+
+* Sets weights in the range 0..100 across the ten Magic-10 IDs (closed set and order; see **HDE-Schemas & Artifacts §2.6** / **HDE-Math-Spec §5.1** by title).
+
+Zero-weight rule: if a viewer sets a category’s weight to 0, candidates whose **\#1 category** is that category are excluded.
+
+**Engine outputs (internal/admin).**  
+ Internally, the engine:
+
+* Computes per-category numbers in 0..100.
+
+* Maps those numbers to bands (Cool, Open, Warm, Glow) using inclusive-high thresholds and `round_half_up` (see **HDE-Math-Spec §5.3** by title).
+
+* Selects **two narrative keys per category** (personal, shared).
+
+The engine **selects keys**; it does not write copy. Resonance posture for v1 is SR-only (α \= 1.0); XR is dormant and not part of public output.
+
+**Public covenant (titles-only).**
+
+* Public Reader payloads are bands-only and numeric-free; underlying numbers remain admin-only.
+
+* Public bytes & schemas live in **HDE-CLI-API-Vendor-Ref** by title.
+
+* Canonical JSON is required end-to-end:
+
+  * UTF-8, no BOM
+
+  * ASCII-sorted keys
+
+  * Compact separators
+
+  * Exactly one trailing LF
+
+  * Arrays used as sets are deduped & ASCII-sorted
+
+Determinism posture:
+
+* AB↔BA parity holds for pair-sensitive flows.
+
+* Two-run identity holds under determinism pins (`LC_ALL=C`, `LANG=C`, `TZ=UTC`).
+
+* Reader↔CLI parity is required wherever both surfaces exist.
+
+Math, transport, and ops details are routed to their single homes by title; this guide records the mechanics expectations at the component level and does not duplicate contracts or formulas.
+
+## 0.4 HD Engine — the plain story
+
+**What it is**
 
 The HD Engine computes per-category compatibility and drives which copy lines appear. It selects and routes copy via a deterministic system. It does not generate text.
 
-## **What it is for**
+**What it is for**
 
 * Power connection matching from user priorities and weights across ten categories.  
 * Give explanations, not only scores: two short narrative lines per category (one personal, one shared) chosen by rules (no HD jargon in user copy).  
-* Let admins tune numbers safely while user-visible results remain stable and understandable.
+* Let admins tune numbers safely while user-visible results remain stable and **understandable.**
 
-## **What it does**
+**What it does**
 
 * Compute pair results across ten categories
 
@@ -78,26 +160,20 @@ The HD Engine computes per-category compatibility and drives which copy lines ap
 
   * Rank candidates by viewer weights and diversify results.
 
-## **What it does not do**
+**What it does not do**
 
 * No copywriting; the engine selects keys only.  
 * No public UI; the engine sits behind the app.  
 * No direct Internet exposure.  
 * No business policy beyond inputs; app controls product flow.
 
-# **Components and tasks**
-
-Numbering is stable. New inserts use letter suffixes to preserve references.
-
-You’re right. I over-specified repo paths and target names. That invites drift. I’ve rewritten the section to be **capability-level and titles-only**, with no pinned paths or tool names.
-
 ---
 
-## **1\) Repository & Tooling Skeleton (capabilities, not paths)**
+# 1\) Repository & Tooling Skeleton (capabilities, not paths)
 
 **Scope (normative).** Mechanics requires a **set of capabilities** that enable determinism, transport acceptance, and evidence generation. The **concrete repository layout, file names, and tool targets are implementation-defined** and **must not be pinned** here. This section states *what must exist*, not *where or how*.
 
-### **1.1 Capabilities the repo must provide**
+## 1.1 Capabilities the repo must provide
 
 * **Adapter surface (HTTP only).** Wires Reader routes and the ops endpoint; **does not define public bytes** (route by title to PF-Canon-HDE-CLI-API-Vendor-Ref).  
 * **Mechanics core.** Pure orchestration for math, comparators, config loader, and public emitter wiring (route math to PF-Canon-HDE-Math-Spec).  
@@ -108,7 +184,7 @@ You’re right. I over-specified repo paths and target names. That invites drift
 * **Ops artifacts.** Start-command capture (bytes \+ hash), health/ready checks; no secrets in logs; SAFE rails defaults enforced per Governance.  
 * **Scriptable pipeline.** A single **sanity pipeline** (name is implementation-defined) that runs, in order: formatting → lint/type → unit/prop tests → schema checks → goldens/evidence capture → **index & mirror parity \+ path-proof validation**.
 
-### 1.2 Environment & secrets (names-only)
+## 1.2 Environment & secrets (names-only)
 
 **Env allow-list.**  
  Defined by title (HDE-Schemas & Artifacts / HDE-Governance). CI **fails** on unknown or missing required keys; secrets are never printed (keys-only logs with redaction).
@@ -130,7 +206,7 @@ You’re right. I over-specified repo paths and target names. That invites drift
 
 Acceptance (names-only): `ENV_LC_ALL_C_OK`.
 
-### 1.3 Evidence & CI coupling \[Required-Now\]
+## 1.3 Evidence & CI coupling \[Required-Now\]
 
 **Scope (normative).** Mechanics must keep human and machine evidence in lockstep for every artifact this guide produces (math proofs, goldens, headers‑only snapshots, scripts). Transport bytes and ops surfaces are routed by title only to **HDE‑CLI‑API‑Vendor Ref** and **HDE‑Governance**.
 
@@ -176,34 +252,107 @@ Acceptance (names-only): `ENV_LC_ALL_C_OK`.
 
 **Governed locations (normative).** All QA/audit proofs **MUST** reside under governed paths: `artifacts/**`, `audit/**`, and `docs/evidence/**`. Files under transient generators (e.g., `codex/out/**`) **MUST NOT** be indexed. Human Index and machine mirror updates **MUST** occur in the **same PR**; mirror is **records‑only canonical JSONL** (UTF‑8, ASCII‑sorted keys, compact, exactly one LF), rejects **unknown keys**, and carries a `proof_anchor` to a path‑proof file in the same dir. Gate on `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`, and `EVIDENCE_INDEX_HASH_OK`. (Routing by title to **HDE‑Schemas & Artifacts / HDE‑Governance**.) 
 
+### **1.3.1 Evidence jobs (single-writer tools)**
+
+**Scope (normative).**  
+ Only a **small set of evidence tools** may write governed evidence artifacts (ordering artifacts, Evidence Index, Machine Mirror, and path-proofs). All other code — including tests and ad-hoc scripts — **MUST NOT** modify governed evidence directly.
+
+**Evidence tools (titles-only).**
+
+* **Ordering generator.**
+
+  * `tools/order/generate_ordering_artifacts.py` is the **single writer** for ordering artifacts under `artifacts/engine/order/**` (for example, sorted snapshots, ordering logs, ABBA evidence).
+
+* **Evidence skeleton tools.**
+
+  * `tools/evidence/update_evidence_index.py` is the **single writer** for:
+
+    * `docs/evidence/INDEX.json` (Human Index, titles/paths only),
+
+    * `docs/evidence/INDEX.sha256` (hash sentinel),
+
+    * `artifacts/evidence_index.jsonl` (Machine Mirror), and
+
+    * governed `*.path_proof.txt` transcripts for artifacts listed in this guide.
+
+  * `tools/evidence/orientation_demo.py` owns the topology orientation demo artifact (`audit/gates/topology/orientation_demo.txt`) and its path-proof and **MUST NOT** be bypassed by ad-hoc edits.
+
+Mechanics **MUST NOT** hand-edit governed evidence artifacts (ordering artifacts, Index, mirror, path-proofs, topology orientation demo). Manual editing is reserved for canonical Doc-Delta work in PF documents; repository artifacts are **tool-generated** only.
+
+### **1.3.2 Evidence change workflow**
+
+**Scope (normative).**  
+ Any PR that changes **governed artifacts** under `artifacts/**`, `docs/evidence/**`, or `audit/**` **MUST** follow the evidence change workflow. Governed artifacts include, at minimum, the ordering artifacts under `artifacts/engine/order/**`, the Evidence Index and Machine Mirror, topology orientation demo, and all `*.path_proof.txt` listed in this guide and in §37 Documentation Artifacts and Registry.
+
+**Workflow (minimum sequence).**
+
+For PRs that touch governed evidence:
+
+1. **Ordering artifacts (when in scope).**
+
+   * Run `python tools/order/generate_ordering_artifacts.py` and its `--check` mode whenever ordering artifacts are in scope for the change.
+
+   * Verify two-run identity for ordering artifacts under determinism pins (`LC_ALL=C`, `LANG=C`, `TZ=UTC`).
+
+2. **Evidence Index and mirror.**
+
+   * Run `python tools/evidence/update_evidence_index.py --check` to regenerate `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl`, and governed `*.path_proof.txt` from a single source of truth.
+
+3. **Topology orientation demo.**
+
+   * Run `python tools/evidence/orientation_demo.py --check` to validate that the on-disk orientation report (`audit/gates/topology/orientation_demo.txt`) is coherent with the current Index/Mirror state and not stale.
+
+4. **Mirror schema and path-proofs.**
+
+   * Run `ci/checks/check_mirror_schema.sh` to enforce:
+
+     * the canonical mirror schema (field set, field order, canonical JSONL),
+
+     * uniqueness of `(artifact_key, discovered_physical_path)`, and
+
+     * correctness of `proof_anchor` and `.path_proof.txt` contents for all governed artifacts.
+
+5. **Evidence ledger.**
+
+   * Record an evidence addendum in **Glow HD Engine — Build Notes & Integration Addenda (Living)** for the PR, describing new or changed governed artifacts and the evidence tools that produced them.
+
+**Determinism & rails.**  
+ The evidence change workflow **MUST** run under rails-closed, determinism-pinned CI environments (`SAFE_MODE=1`, `ALLOW_NETWORK=0`, `LC_ALL=C`, `LANG=C`, `TZ=UTC`), consistent with the rails posture described in §1.2 and the Evidence Index tokens in §1.3.
+
+This workflow makes the Evidence Index, Machine Mirror, ordering artifacts, and path-proofs move in **lockstep** and ensures that drift is caught early by CI, rather than after the fact.
+
+**`mtime_utc` semantics (routing only).**  
+ Evidence jobs that write or validate governed `*.path_proof.txt` **MUST** treat `mtime_utc` and `produced_at_utc` according to the canonical semantics defined in **HDE-Schemas & Artifacts** (Machine Evidence Mirror / path-proof schema) and **Glow QA Guide** (evidence CI rails and `mtime_utc` checks), summarised as:
+
+* `mtime_utc` is the **refresh-time mtime** for the artifact: a UTC ISO-8601 timestamp truncated to seconds, with **microsecond \== 0**, captured when the evidence job refreshes that artifact. It is **not required** to remain equal to future `stat().st_mtime` values across clones, but CI checks MUST enforce that `parsed_mtime <= current_fs_mtime` at check time (monotone semantics).
+
+* `produced_at_utc` is the **logical evidence refresh time** for the artifact (when the evidence job was run), also in UTC ISO-8601 form.
+
+Mechanics does **not** redefine these semantics here; it routes to PF-Canon-HDE-Schemas & Artifacts and the Glow QA Guide by title. The evidence change workflow in this section **assumes** that `tools/evidence/update_evidence_index.py`, `ci/checks/check_mirror_schema.sh`, and the evidence tests are wired to these `mtime_utc` rules and that any governed path-proofs they emit or validate satisfy the schema and monotone constraints pinned in those PF documents.
+
 ---
 
-### **1.4 Routing (single homes; no duplication)**
+## 1.4 Routing (single homes; no duplication)
 
 * **Public bytes:** PF-Canon-HDE-CLI-API-Vendor-Ref  
 * **Math & preimage:** PF-Canon-HDE-Math-Spec  
 * **Schemas, pack/manifest, canonical bytes, machine mirror:** PF-Canon-HDE-Schemas & Artifacts  
 * **Governance (A7, ops posture, Evidence Index policy):** PF-Canon-HDE-Governance
 
-### **1.5 Acceptance (tokens; titles-only)**
+## 1.5 Acceptance (tokens; titles-only)
 
 * **Evidence & indices:** `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`  
 * **Determinism:** `TWO_RUN_IDENTITY_OK`, `COMPOSITE_ABBA_IDENTITY_OK`, `JSON_CANONICAL_CHECK_OK`  
 * **Rails posture:** `ENV_RAILS_POLICY_OK`  
 * **Ops start-command:** `SERVICE_START_CMD_CAPTURED_OK`, `GUNICORN_APP_FACTORY_OK`, `ENV_PORT_REQUIRED_OK`
 
-  ## **2\) Canonical Enumerations Registry**
+  # 2\) Canonical Enumerations Registry
 
 **Purpose.** Wire and prove the frozen domain registries (centers, gates, channels, categories) used by the engine. Mechanics validates and snapshots the domains; **HDE-Schemas and Artifacts** is the single home for authoritative catalogs and schemas. Developer notes in this repo are informative only (never authoritative).
 
-**Single homes (titles-only).**
+---
 
-* **Domains & schemas:** HDE-Schemas and Artifacts (§2.1 Centers/Gates/Channels; §2.6 Magic-10).  
-* **Canonical JSON & machine mirror:** HDE-Schemas and Artifacts (§4, §8).  
-* **Math semantics (ordering/banding):** HDE-Math-Spec (§2.2, §2.4, §5.x).  
-  ---
-
-  ### **2.1 Domain invariants (normative)**
+## 2.1 Domain invariants (normative)
 
 * **Centers:** closed set; `snake_case` identifiers; ASCII; unique.  
 * **Gates:** closed domain; numeric identity per schema; unique; each attached to a single center by catalog.  
@@ -213,7 +362,7 @@ Acceptance (names-only): `ENV_LC_ALL_C_OK`.
 * **Validation posture:** unknown IDs, duplicates, non-canonical channel forms, or schema mismatches **hard-fail** with typed errors.  
   ---
 
-  ### **2.2 Validation & generation (mechanics)**
+  ## 2.2 Validation & generation (mechanics)
 
 Mechanics provides a single **registry job** that:
 
@@ -228,7 +377,7 @@ Mechanics provides a single **registry job** that:
 
 ---
 
-### **2.3 Artifacts (records-only; path-agnostic; indexed via the machine mirror)**
+## 2.3 Artifacts (records-only; path-agnostic; indexed via the machine mirror)
 
 List by **title/path** in Appendix D and mirror **1:1** in `artifacts/evidence_index.jsonl` (each record includes `artifact_key`, `sha256`, `size_bytes`, `produced_at_utc`, `discovered_physical_path`, `proof_anchor`; one LF; canonical JSON).
 
@@ -237,7 +386,7 @@ List by **title/path** in Appendix D and mirror **1:1** in `artifacts/evidence_i
 * **`registry_checksums`** — summarized checksums for governed artifacts (for quick diffing).  
   ---
 
-  ### **2.4 Acceptance (tokens; titles-only)**
+  ## 2.4 Acceptance (tokens; titles-only)
 
 * **Domains closed & frozen:** `CATALOG_DOMAIN_CLOSED_OK`, `M10_DEFS_OK`, `MAGIC10_NAMES_FROZEN_OK`.  
 * **Orientation & normalization:** `CATALOG_ORIENTATION_CANON_OK` (channels `NN-NN` min-first; ASCII-sorted; deduped).  
@@ -245,7 +394,7 @@ List by **title/path** in Appendix D and mirror **1:1** in `artifacts/evidence_i
 * **Seeds (when present):** `M10_SEEDS_OK`, `RELEASE_ID_RECOMPUTE_OK` (manifest bump on change).  
   ---
 
-## **3\) Programmatic Configuration System**
+# 3\) Programmatic Configuration System
 
 **Purpose (normative).** Provide a **typed, deterministic configuration surface** for the engine and its clients. The system loads governed catalogs, **validates & normalizes** them, **fails on unknown/duplicate IDs**, and **emits typed artifacts** for FE/BE alongside a **registry report**. Concrete file names and directories are **implementation-defined** and **not pinned here**.
 
@@ -255,33 +404,115 @@ List by **title/path** in Appendix D and mirror **1:1** in `artifacts/evidence_i
 * **Math semantics (constants, ordering/banding):** PF-Canon-HDE-Math-Spec.  
 * **Governance (evidence policy & tokens):** PF-Canon-HDE-Governance.
 
-### **3.1 Loader behavior (normative)**
+## 3.1 Loader behavior (normative)
 
 * **Unknown/duplicate IDs → fail build.** The loader **MUST** hard-fail (typed error) on any unknown identifier, duplicate entry, schema mismatch, or non-canonical channel form.  
 * **Alias policy \= OFF (default).** No implicit aliases. If an allow-list is explicitly enabled, only **declared aliases** are recognized; all others **fail**.  
 * **Normalization.** Channel IDs normalize to **zero-padded `NN–NN` (min-first)**; arrays that represent sets are **deduped & ASCII-sorted** before hashing/compare.  
 * **Determinism.** Output is **order-neutral (AB↔BA)**, **locale-neutral** (`LC_ALL=C`), and **two-run identical**; canonical JSON is **UTF-8 (no BOM), sorted keys, compact, exactly one LF** (PF-12 §4).
 
-### **3.2 Typed artifacts (codegen) — outputs, not paths**
+**Implementation note (informative).**
+
+In the current Engine repo, the typed loader behavior described in this section is implemented by `engine.config.registry_loader.load_registry_config`. This reference is non-normative; the canonical rules remain those in PF-Canon-HDE-Schemas & Artifacts and this section.
+
+## 3.2 Typed artifacts (codegen) — outputs, not paths
 
 * **FE typed constants bundle.** A generated artifact that exposes **closed enums/domains** and **read-only constants** needed by the FE client (e.g., category IDs, band labels), typed and **immutable**.  
 * **BE enums & constants bundle.** A generated artifact that exposes the same **frozen domains** to backend code (enums, discriminated unions), typed and **immutable**.  
    *(The exact filenames/locations are implementation-defined; Mechanics only requires that both bundles exist and are **consistent, typed, and deterministic**.)*
 
-### **3.3 Registry report (records-only; machine-readable)**
+  ## 3.3 Registry report (records-only; machine-readable)
 
-Emit a **registry report** documenting the **effective** configuration for this build.
+**Purpose (normative).** Emit a **registry report** that documents the **effective configuration** for this build: which catalogs and manifest were used, what domains and Magic-10 categories are present, and what alias policy is in effect. The report is **names-only** (no payload values) and is consumed by CI and auditors as a summary of the registry state.
 
-* **Required fields (minimal):**  
-   `version` (string), `generated_at_utc` (ISO-8601 “Z”),  
-   `alias_policy` (`OFF` or `ON` \+ allow-list),  
-   `enabled_features` (array; set-semantics),  
-   `catalog_counts` (object with stable keys),  
-   `rejects` (sorted array with reasons), `warnings` (sorted array).  
-* **Serialization:** canonical JSON (PF-12 §4).  
-* **Indexing:** appear as a **records-only** entry in the **PF-12 machine JSONL mirror** with `sha256`, `size_bytes`, `produced_at_utc`, **discovered `physical_path`**, and a **path-proof** (transcript anchor \+ on-disk stat). Update the **human Evidence Index** in the **same change**; CI enforces **1:1 parity**.
+**Single home & schema.**
 
-### **3.4 Validation (binary)**
+* The registry report is a governed artifact at:
+
+  * `artifacts/registry/registry_report.json` (titles-only; path/scheme details live in **HDE-Schemas and Artifacts §8.5**).
+
+* The **canonical schema and field shapes** for `registry_report.v1` are defined in **HDE-Schemas and Artifacts**. Mechanics **must not** restate the full schema here. At a high level, the report:
+
+  * declares a `schema` tag (for example `"registry_report.v1"`),
+
+  * records `generated_at_utc`,
+
+  * describes upstream `inputs` (catalogs and manifest), and
+
+  * summarizes registry state under `artifacts.registry` (channels, gates/centers, domains and counts, Magic-10, alias\_policy),
+
+  * with optional `notes` for internal commentary.
+
+**Programmatic generation & determinism.**
+
+* The registry report **MUST** be generated programmatically by the Programmatic Configuration System:
+
+  * load and validate catalogs and manifest via the typed loader described in §3.1, and
+
+  * construct the report object in memory and emit it via the **canonical serializer** (see §4 / §10.1).
+
+* `generated_at_utc` **SHOULD** be stable across two runs in a determinism-pinned environment: tools **MUST** either **reuse the existing `generated_at_utc`** from a prior report when inputs have not changed, or use a **pinned time source** controlled by environment (for example, an epoch exposed via `SOURCE_DATE_EPOCH` or equivalent) so that two runs under the same conditions produce **byte-identical** JSON.
+
+  * tools **MUST** either:
+
+    * reuse the existing `generated_at_utc` from a prior report when inputs have not changed, or
+
+    * use a pinned time source (for example, an epoch configured by environment) so that two runs under the same conditions produce identical bytes.
+
+* Two-run identity **MUST** hold for the registry report:
+
+  * running the generator twice with identical inputs and environment yields **byte-identical** JSON (UTF-8, no BOM; ASCII-sorted keys; compact; exactly one trailing LF).
+
+**Implementation note (informative).**
+
+For the current Engine, the registry report generator is implemented by `tools/generate_registry_report.py`, which loads catalogs and manifest via the typed loader in §3.1 and emits `artifacts/registry/registry_report.json` through the canonical serializer. This reference is informative only; Mechanics remains implementation-agnostic and the governed rules are those in PF-Canon-HDE-Schemas & Artifacts and this section.
+
+**Alias policy summary.**
+
+* The report **MUST** expose a names-only alias policy summary under `artifacts.registry` (see HDE-Schemas and Artifacts for exact shape):
+
+  * `mode` — `"off"` or `"allow_list"` (or equivalent closed set), and
+
+  * `aliases` — a mapping from alias IDs to canonical channel IDs when the allow-list is enabled.
+
+* This summary **reflects the loader’s alias behavior**:
+
+  * aliases are **OFF by default**, and
+
+  * when an allow-list is configured, only declared aliases are present; all others fail closed (see §3.1).
+
+Mechanics does not carry alias ledger content or catalog values; it only enforces that the alias policy exposed in the report matches the loader behavior.
+
+**Evidence & indexing (titles-only).**
+
+* The registry report **MUST** be part of the **evidence skeleton**:
+
+  * A human Evidence Index entry is present in `docs/evidence/INDEX.json` (titles/paths only), and
+
+  * A Machine Mirror record is present in `artifacts/evidence_index.jsonl` with:
+
+    * `artifact_key` (for example `"registry.registry_report"`),
+
+    * `role:"snapshot"`,
+
+    * `discovered_physical_path:"artifacts/registry/registry_report.json"`,
+
+    * `sha256`, `size_bytes`, `produced_at_utc`, and
+
+    * `proof_anchor` pointing to the corresponding path-proof transcript.
+
+* Human Index, hash sentinel, mirror record, and path-proof for the report **MUST** be updated in the **same PR** as any change to the report; CI enforces human↔machine **1:1 parity**, canonical JSONL, and path-proof presence (tokens routed by title to **HDE-Governance** and **HDE-Schemas and Artifacts**).
+
+**Routing (titles-only).**
+
+* Catalog/manifest schemas and the full `registry_report.v1` JSON shape: **HDE-Schemas and Artifacts**.
+
+* Loader error semantics and alias policy: **Programmatic Configuration System** (§3.1) and **HDE-Schemas and Artifacts**.
+
+* Evidence skeleton tokens and CI posture: **HDE-Governance**, **HDE-Build Checklist**, and **HDE Phased Epics**.  
+* 
+
+## 3.4 Validation (binary)
 
 1. **Schema & domain closure:** all catalogs validate; no unknown/duplicate IDs; channels canonicalized; categories match the **closed** Magic-10 set.  
 2. **Alias policy:** `OFF` by default; if `ON`, only allow-listed aliases pass; all others fail.  
@@ -289,23 +520,23 @@ Emit a **registry report** documenting the **effective** configuration for this 
 4. **Determinism:** re-running the loader yields identical bytes for codegen bundles and the registry report.  
 5. **Evidence:** human Index and PF-12 mirror contain synchronized records with **path-proofs**; canonical JSON lints pass (UTF-8/no BOM, sorted keys, one LF).
 
-### **3.5 Acceptance (tokens; titles-only)**
+## 3.5 Acceptance (tokens; titles-only)
 
 * **Config loader/report:** `CONFIG_GEN_OK`, `JSON_CANONICAL_CHECK_OK`, `TWO_RUN_IDENTITY_OK`.  
 * **Evidence discipline:** `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`.  
 * **Domains closed/canonicalization (supporting):** `CATALOG_DOMAIN_CLOSED_OK`, `CATALOG_ORIENTATION_CANON_OK`, `M10_DEFS_OK`.
 
-### **3.6 Routing (no duplication)**
+## 3.6 Routing (no duplication)
 
 * Canonical rules & mirror schema: **PF-Canon-HDE-Schemas & Artifacts**.  
 * Math semantics & constants: **PF-Canon-HDE-Math-Spec**.  
 * Evidence policy & governance tokens: **PF-Canon-HDE-Governance**.
 
-## **4\) Canonical Serialization Package**
+# 4\) Canonical Serialization Package
 
 **One serializer and one emitter for all public bytes** (Reader, CLI, evidence artifacts).
 
-### **4.1 Policy (normative)**
+## 4.1 Policy (normative)
 
 * **Single presenter/emitter.** All public JSON bytes **MUST** be produced by one presenter/emitter entrypoint symbol. Reader and CLI **MUST** call this exact symbol (titles-only allow-list; no alternates). See §10.2 for the unified entrypoint and §10.1 for canonicalization; the preimage recipe is in §3.2.  
 * **Canonical JSON.** UTF-8 (no BOM); ASCII-sorted keys; compact separators (`,` and `:` only); exactly one trailing LF (`\n`). Arrays that function as sets are **deduplicated and ASCII-sorted** by identity.  
@@ -313,22 +544,22 @@ Emit a **registry report** documenting the **effective** configuration for this 
 * **Determinism.** **AB↔BA parity** and **two-run identity** **MUST** hold for identical inputs/environment. Run all canonicalization and byte-compares with `LC_ALL=C`, `LANG=C`, `TZ=UTC`.  
 * **Tests use the same path.** Test code **MUST NOT** bypass the shared presenter/emitter.
 
-### **4.2 Prohibited (hard fail)**
+## 4.2 Prohibited (hard fail)
 
 * **No ad-hoc serialization on public paths.** No `json.dumps(`, no `jsonify(`, no templated/string-built JSON, no framework helpers that bypass the presenter, no pretty/indented output, **no test-only shims**.
 
-### **4.3 Allow-list (code/CI owned)**
+## 4.3 Allow-list (code/CI owned)
 
 * Maintain an explicit **allow-list of presenter/emitter symbols**. Only allow-listed symbols may serialize public bytes (allow-list owned in code/CI; not pinned here).
 
-### **4.4 Acceptance (titles-only; token names live in HDE-Governance §2.0)**
+## 4.4 Acceptance (titles-only; token names live in HDE-Governance §2.0)
 
 * **Symbol parity.** Reader & CLI resolve to the same emitter entrypoint → `CLI_READER_EMITTER_PARITY_OK`, `CLI_NO_ALT_JSON_OK`.  
 * **Canonical bytes.** Encoding, key order, compactness, single LF, arrays-as-sets proven by canonical re-serialization byte-compare → `JSON_CANONICAL_CHECK_OK`.  
 * **Determinism.** `TWO_RUN_IDENTITY_OK`, `COMPOSITE_ABBA_IDENTITY_OK`.  
 * **Evidence discipline.** `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`.
 
-### **4.5 Evidence (records-only; path-agnostic; indexed via the machine mirror)**
+## 4.5 Evidence (records-only; path-agnostic; indexed via the machine mirror)
 
 List by **title/path** in **Appendix D: Evidence Index** and add **1:1** records in `artifacts/evidence_index.jsonl` (each with `artifact_key`, `sha256`, `size_bytes`, `produced_at_utc`, `discovered_physical_path`, `proof_anchor`; canonical JSONL; one LF). Examples:
 
@@ -337,24 +568,24 @@ List by **title/path** in **Appendix D: Evidence Index** and add **1:1** records
 * **`canonical_json/check`** — policy check (UTF-8/no BOM, sorted keys, compact, one LF).  
 * **`canonical_json/compare`** — byte-compare of public bytes vs canonical re-serialization (expected empty diff).
 
-### **4.6 Routing (titles-only)**
+## 4.6 Routing (titles-only)
 
 Transport and HTTP behavior (headers, conditional delivery, caching) and CLI stream policy live in **HDE-CLI-API-Vendor Ref**; token roster in **HDE-Governance**.
 
 ---
 
-## **5\) Deterministic Tie-Break & Total-Order Module \[Required-Now\]**
+# 5\) Deterministic Tie-Break & Total-Order Module \[Required-Now\]
 
 **Purpose.** Provide reusable comparators and helpers that impose a total, deterministic order over strings, numeric tuples, and domain identities the Engine uses. These utilities are called wherever ordering is consumed (selection, aggregation, snapshotting, evidence), ensuring **AB↔BA** neutrality and **two-run** identity. All byte-sensitive checks run with `LC_ALL=C`, `LANG=C`, `TZ=UTC`.
 
-### **5.1 Comparator policy (normative)**
+## 5.1 Comparator policy (normative)
 
 * **Locale-free, bytewise order.** All string ordering is **ASCII byte order** (code-point ascending), case-sensitive, under `LC_ALL=C`. No locale collation; no Unicode normalization.  
 * **Stable total order.** Comparators are **antisymmetric**, **transitive**, and **total** (every pair comparable). Equal inputs are **stable** (no reordering of equals).  
 * **Arrays-as-sets discipline.** When an array is used as a set: **dedupe by identity**, then **ASCII-sort** with the appropriate comparator; never rely on map/set iteration order.  
 * **No clocks/RNG.** Tie-breaks never consult time or randomness.
 
-  ### **5.2 Domain comparators (exact)**
+  ## 5.2 Domain comparators (exact)
 
 * **IDs (general strings).** `cmp_id(a,b)` → ASCII bytewise comparison.  
 * **Magic-10 categories.** `cmp_category(a,b)` → compare by **frozen Magic-10 rank** (titles-only to **HDE-Schemas and Artifacts §2.6** / **HDE-Math-Spec §5.1**); if still equal (should not occur), fall back to `cmp_id`.  
@@ -365,26 +596,26 @@ Transport and HTTP behavior (headers, conditional delivery, caching) and CLI str
   2. break ties with `cmp_id` (stability preserved).  
       *Descending variants* use an explicit **descending numeric comparator** (do not negate and re-sort), then the same `cmp_id` tie-break.
 
-  ### **5.3 Helpers (reusable)**
+  ## 5.3 Helpers (reusable)
 
 * **`dedupe_sort(set_like, cmp)`** → returns unique, ASCII-sorted array using `cmp`.  
 * **`sort_pairs(pairs, key_cmp, val_cmp)`** → stable sort over `(key,val)` with `key_cmp` then `val_cmp`.  
 * **`ensure_total_order(cmp, generator)`** → property-test harness asserting antisymmetry, transitivity, and totality for domain samples.  
 * **`canonicalize_array(arr, cmp)`** → enforce set discipline (**dedupe \+ ASCII sort**) prior to canonical JSON emission.
 
-  ### **5.4 Engine call-sites (must use)**
+  ## 5.4 Engine call-sites (must use)
 
 * **Composite surfaces.** Ordering of `channels_defined`, `channels_em`, `centers_defined` **must** use `cmp_channel` / `cmp_center` before emission/evidence (see **Appendix E — Composite fingerprint**).  
 * **Category iteration.** All multi-category passes **must** iterate in the **frozen Magic-10 order** (titles-only **HDE-Schemas and Artifacts §2.6**); never rely on hash iteration.  
 * **Presenter paths.** Before canonical serialization, arrays-as-sets **must** pass through `dedupe_sort` with the appropriate comparator.
 
-  ### **5.5 Determinism & neutrality**
+  ## 5.5 Determinism & neutrality
 
 * **AB↔BA identity.** Using the same comparators on normalized `(A,B)` and `(B,A)` yields **identical** arrays/tuples.  
 * **Two-run identity.** Re-running with the same inputs produces **byte-identical** sequences after canonicalization.  
 * **Serializer coupling.** Canonical dumps use UTF-8 (no BOM), sorted keys, compact, exactly one LF (§4/§10.1), with arrays already **deduped & ASCII-sorted**.
 
-  ### **5.6 Validation (binary & property tests)**
+  ## 5.6 Validation (binary & property tests)
 
 1. **Property tests:** for each domain comparator, prove **antisymmetry**, **transitivity**, **totality** over generated samples.  
 2. **Set discipline:** `dedupe_sort` removes duplicates and preserves canonical order (idempotent on already-canonical arrays).  
@@ -393,7 +624,7 @@ Transport and HTTP behavior (headers, conditional delivery, caching) and CLI str
 5. **ABBA / two-run:** byte-compare outputs for `(A,B)` vs `(B,A)` and across two identical runs (must match).  
 6. **Serializer cross-check:** canonical re-serialization byte-compare (UTF-8, no BOM, one LF).
 
-   ### **5.7 Evidence (records-only; path-agnostic; indexed via the machine mirror)**
+   ## 5.7 Evidence (records-only; path-agnostic; indexed via the machine mirror)
 
 List by **title/path** in **Appendix D: Evidence Index** and mirror **1:1** in `artifacts/evidence_index.jsonl` (**records-only JSONL**; UTF-8 no BOM; sorted keys; compact; exactly one LF). Each mirror record includes:  
  `artifact_key`, `sha256`, `size_bytes`, `produced_at_utc`, `discovered_physical_path`, `proof_anchor`. Update human Index and mirror **in the same PR**; CI enforces 1:1 parity and **path-proofs**.
@@ -411,17 +642,17 @@ List by **title/path** in **Appendix D: Evidence Index** and mirror **1:1** in `
 * Governance tokens roster: **HDE-Governance §2.0 Acceptance Tokens**.  
   ---
 
-  ## **6\) Deterministic Engine Core \[Required-Now\]**
+  # 6\) Deterministic Engine Core \[Required-Now\]
 
 **Contract.** The Engine Core is **pure compute** (ops, scoring, aggregation). It performs **no I/O**, uses **no clocks**, reads **no globals/env**, and does **not** depend on system locale. All behavior is driven by **explicit inputs** and **frozen pack/preset constants** (titles-only to **PF-Canon-HDE-Schemas & Artifacts** / **PF-Canon-HDE-Math-Spec**).
 
-### **6.1 Inputs & state (explicit only)**
+## 6.1 Inputs & state (explicit only)
 
 * **Explicit parameters.** All data (composite, feature flags, constants, viewer\_prefs) is passed **by value** or via a **typed config object**.  
 * **No hidden sources.** Do **not** read files, environment variables, or the clock; do **not** mutate module globals or singletons.  
 * **Preconditions satisfied upstream.** Alias normalization, tz resolution, and ingestion occur **before** the core (titles-only to PF-Canon-HDE-Schemas & Artifacts §2.1 / PF-Canon-HDE-CLI-API-Vendor-Ref §3.2).
 
-  ### **6.2 Determinism pins**
+  ## 6.2 Determinism pins
 
 * **AB↔BA neutral.** Core results are **identical** when inputs `A,B` are swapped (AB \== BA after normalization).  
 * **Two-run identity.** Two evaluations over the same inputs \+ constants produce **byte-identical** results.  
@@ -429,17 +660,17 @@ List by **title/path** in **Appendix D: Evidence Index** and mirror **1:1** in `
 * **Locale & serializer.** All canonicalization/compares run under **`LC_ALL=C`**. Any JSON the core emits for evidence uses the **canonical serializer** (UTF-8 no BOM, sorted keys, compact, **exactly one LF**).  
 * **Numeric rules (titles-only).** Follow **PF-Canon-HDE-Math-Spec** for integerization and rounding (**round\_half\_up**); avoid floating-point accumulation for public-path numerics—use integer/fixed-point paths defined in **PF-01**.
 
-  ### **6.3 Concurrency & parallelism**
+  ## 6.3 Concurrency & parallelism
 
 * **Allowed if deterministic.** Parallel evaluation is permitted **only** when reductions/merges are **order-invariant** (commutative/associative) and the final ordering is **stabilized (ASCII sort)** before exposure.  
 * **No race-driven clocks/RNG.** Do **not** consult time or RNG; if samplers/rankers require stochastic behavior, they **must be seeded and isolated** (see local policy section on stochastic samplers).
 
-  ### **6.4 Errors & logging (internal only)**
+  ## 6.4 Errors & logging (internal only)
 
 * **Typed errors.** Fail fast with **typed, numeric-free** errors; do **not** include vendor payloads.  
 * **No payload/secret logging.** Keys-only diagnostics; redact secrets; never echo request/response bodies.
 
-  ### **6.5 Acceptance (binary)**
+  ## 6.5 Acceptance (binary)
 
 1. **Two-run identity:** run core twice on the same inputs → **byte-equal** outputs.  
 2. **ABBA:** swap `A,B` → outputs (and any core-level artifacts) **byte-equal**.  
@@ -447,7 +678,7 @@ List by **title/path** in **Appendix D: Evidence Index** and mirror **1:1** in `
 4. **Serializer check** (if core emits JSON artifacts): canonical re-serialization byte-compare (UTF-8, no BOM, **one LF**).  
 5. **No I/O/clocks/globals:** static/grep-guard \+ import-graph proof show **no file/env/time** access in core modules.
 
-   ### **6.6 Evidence (records-only; path-agnostic; indexed via PF-12 machine mirror)**
+   ## 6.6 Evidence (records-only; path-agnostic; indexed via PF-12 machine mirror)
 
 * **artifact\_key:** `engine/tworun_identity` — two-run proof.  
 * **artifact\_key:** `engine/abba_identity` — ABBA compare.  
@@ -461,13 +692,11 @@ List by **title/path** in **Appendix D: Evidence Index** and mirror **1:1** in `
 * Canonical JSON & pack/manifest: **PF-Canon-HDE-Schemas & Artifacts**.  
 * Governance tokens: **PF-04 — §2.0 Acceptance Tokens**.
 
-Acknowledged — I may reformat structure/wording only to conform to canon and improve readability, while preserving substance.
-
 ---
 
-## 7\) Category Framework (internal) \[Required-Now\]
+# 7\) Category Framework (internal) \[Required-Now\]
 
-### 7.1 Closed list & scaffolds for per-category calculators
+## 7.1 Closed list & scaffolds for per-category calculators
 
 **Purpose.** Wire per-category **subtotal → band** calculators with precedence hooks; do **not** restate Math or public payload schemas.
 
@@ -479,7 +708,7 @@ Acknowledged — I may reformat structure/wording only to conform to canon and i
 
 ---
 
-### 7.2 Compatibility Engine (pair) — contract
+## 7.2 Compatibility Engine (pair) — contract
 
 **Inputs (typed; titles-only).**
 
@@ -513,7 +742,7 @@ Acknowledged — I may reformat structure/wording only to conform to canon and i
 
 ---
 
-### 7.3 Band thresholds & tuning (admin)
+## 7.3 Band thresholds & tuning (admin)
 
 **Registry only (titles-only).** Mechanics maintains the authoring workflow for number→band thresholds (global or per-category) and the associated tooling; it does **not** restate numeric values.
 
@@ -523,56 +752,200 @@ Acknowledged — I may reformat structure/wording only to conform to canon and i
 
 ---
 
-## **8\) Public Presenter & Emitter \[Required-Now\]**
+# 8\) Public Presenter & Emitter \[Required-Now\]
 
-Transforms engine outputs into the Reader/CLI **public envelope** and emits **canonical JSON** via the **allow-listed** presenter–emitter.
-
-### **Policy**
-
-* **Single emitter.** Reader and CLI **MUST** call the **same presenter–emitter entrypoint symbol** to build the public body (CI maintains a **symbol allow-list**; no alternates).  
-* **Canonical serializer.** The presenter **MUST** use the **Canonical Serialization Package** (§4): UTF-8 (no BOM), **ASCII-sorted keys**, **compact JSON**, **exactly one trailing LF**; arrays-as-sets **deduped & ASCII-sorted**; all byte checks under **`LC_ALL=C`**.  
-* **Public shape (titles-only).** The public payload shape is owned by **PF-Canon-HDE-CLI-API-Vendor-Ref** and **PF-Canon-HDE-Math-Spec**. Mechanics **does not duplicate** those bytes here.
-
-  ### **Idempotence**
-
-* **Preimage (five keys).** Compute `idempotence_hash` over the **canonical preimage**: an object with **exactly** `reader_version, eligible, categories, meta, release_id` (**no** `idempotence_hash` yet). (Preimage fields are defined in **PF-01 §3**.)  
-* **Finalize.** Insert `idempotence_hash` (**lowercase 64-hex**) and **re-emit canonically** to produce the public bytes (**LF-terminated**).  
-* **Identity coupling.** `release_id` is taken from the **freeze-pack manifest** (**PF-12 §6**); `meta.invocation_tag` participates in the preimage (**PF-01 §3**).
-
-  ### **Parity**
-
-* **Reader↔CLI.** On parity surfaces, **CLI stdout** **MUST** be **byte-identical** to the **Reader 200** body.  
-* **AB↔BA.** For pair-sensitive flows, **AB** and **BA** **MUST** produce **identical** bytes.  
-* **Two-run identity.** With identical inputs/environment, **two serializations** **MUST** produce **bitwise-identical** public bytes.
-
-  ### **Prohibited**
-
-* **No ad-hoc serialization or templating** on public paths (`json.dumps(`, framework helpers, string-built JSON, pretty/indented output). **Only** the allow-listed emitter may serialize public bytes.
-
-  ### **Acceptance (tokens; titles-only)**
-
-* **Symbol parity:** Reader & CLI resolve to the **same emitter entrypoint** → **CLI\_READER\_EMITTER\_PARITY\_OK**, **CLI\_NO\_ALT\_JSON\_OK**.  
-* **Parity proofs:** byte-compare **CLI vs Reader** outputs; **AB↔BA** parity; **two-run identity** → **TWO\_RUN\_IDENTITY\_OK**, **COMPOSITE\_ABBA\_IDENTITY\_OK**.  
-* **Canonical compare:** canonical re-serialization byte-compare (encoding, key order, compactness, one LF, arrays-as-sets) → **JSON\_CANONICAL\_CHECK\_OK**.  
-* **Evidence discipline:** **EVIDENCE\_INDEX\_UPDATED\_OK**, **EVIDENCE\_INDEX\_MIRROR\_OK**, **EVIDENCE\_PATHS\_VALIDATED\_OK** (same-PR update; human↔machine parity; path-proofs).
-
-  ### **Evidence (records-only; path-agnostic; indexed via PF-12 machine mirror)**
-
-* **artifact\_key:** `parity/reader_cli` — Reader↔CLI byte equality (public surface).  
-* **artifact\_key:** `parity/abba_identity` — AB↔BA byte equality.  
-* **artifact\_key:** `parity/two_run_identity` — two-run identity digest/log.  
-* **artifact\_key:** `emitter_symbol/proof` — import-graph/reflection proof of shared presenter symbol.  
-* **artifact\_key:** `canonical_json/compare` — canonical re-serialization byte-compare of the public body.  
-   Each mirror record includes `artifact_key, sha256, size_bytes, produced_at_utc, discovered physical_path, proof`; update the **human Evidence Index** in the **same change**; CI enforces **1:1 parity** and **path-proofs**.
-
-**Routing (titles-only).**  
- Public payload & headers: **PF-Canon-HDE-CLI-API-Vendor-Ref**. Preimage/rounding/banding: **PF-Canon-HDE-Math-Spec**. Evidence policy & tokens: **PF-Canon-HDE-Governance**.
+Transforms engine outputs into the Reader/CLI public envelope and emits canonical JSON via the allow-listed presenter–emitter.
 
 ---
 
-## **9\) Reader & Compat endpoints**
+## 8.1 Role
 
-### **9.1 Endpoint Catalog (JSON success) \[Required-Now\]**
+* Single public presenter/emitter for Reader and CLI.
+
+* Responsible for:
+
+  * Building the public body from engine outputs.
+
+  * Applying canonical serialization rules.
+
+  * Injecting idempotence metadata (`idempotence_hash`, `release_id`, `meta.invocation_tag`).
+
+  * Feeding evidence artifacts for parity and determinism.
+
+---
+
+## 8.2 Policy — Emitter & serializer
+
+* **Single emitter.**  
+   Reader and CLI **MUST** call the same presenter–emitter entrypoint symbol to build the public body.
+
+  * CI maintains a symbol allow-list; no alternate emitters are allowed.
+
+* **Canonical serializer.**  
+   The presenter **MUST** use the Canonical Serialization Package (§4):
+
+  * UTF-8 (no BOM).
+
+  * ASCII-sorted keys.
+
+  * Compact JSON (no pretty/indented output).
+
+  * Exactly one trailing LF.
+
+  * Arrays-as-sets deduped and ASCII-sorted.
+
+  * All byte checks under `LC_ALL=C`.
+
+* **Public shape (titles-only).**  
+   The public payload shape is owned by:
+
+  * **HDE-CLI-API-Vendor-Ref** (public contract, headers, success/error envelopes).
+
+  * **HDE-Math-Spec** (Reader v1 preimage fields, bands, rounding).
+
+* Mechanics does **not** duplicate those bytes here.
+
+---
+
+## 8.3 Idempotence & identity
+
+* **Preimage (five keys).**  
+   Compute `idempotence_hash` over the canonical preimage: an object with exactly:
+
+  * `reader_version`
+
+  * `eligible`
+
+  * `categories`
+
+  * `meta`
+
+  * `release_id`
+
+* (No `idempotence_hash` field yet. Preimage fields are defined in **HDE-Math-Spec**.)
+
+* **Finalize.**  
+   Insert `idempotence_hash` (lowercase 64-hex) into the object and re-emit canonically to produce the public bytes (LF-terminated).
+
+* **Identity coupling.**
+
+  * `release_id` is taken from the freeze-pack manifest (**HDE-Schemas and Artifacts** §6).
+
+  * `meta.invocation_tag` participates in the preimage (**HDE-Math-Spec**).
+
+---
+
+## 8.4 Parity requirements
+
+* **Reader↔CLI parity.**  
+   On parity surfaces, CLI stdout **MUST** be byte-identical to the Reader 200 body.
+
+* **AB↔BA parity.**  
+   For pair-sensitive flows (e.g., compat), AB and BA **MUST** produce identical bytes.
+
+* **Two-run identity.**  
+   With identical inputs and environment, two serializations **MUST** produce bitwise-identical public bytes.
+
+---
+
+## 8.5 Prohibited practices
+
+On governed public paths, the following are **not allowed**:
+
+* Ad-hoc serialization (`json.dumps(...)`, templating helpers, framework-specific `jsonify`\-style calls).
+
+* String-built JSON or partial concatenation.
+
+* Pretty/indented output or multi-LF endings.
+
+Only the allow-listed presenter/emitter may serialize public bytes.
+
+---
+
+## 8.6 Acceptance (tokens; titles-only)
+
+Token semantics live in **HDE-Governance** (§2.0). Mechanics binds them to this component as follows:
+
+* **Symbol parity (shared emitter):**
+
+  * `CLI_READER_EMITTER_PARITY_OK`
+
+  * `CLI_NO_ALT_JSON_OK`
+
+* **Parity proofs (byte equality & determinism):**
+
+  * `TWO_RUN_IDENTITY_OK`
+
+  * `COMPOSITE_ABBA_IDENTITY_OK`
+
+* **Canonical compare (canonical JSON invariants):**
+
+  * `JSON_CANONICAL_CHECK_OK`
+
+* **Evidence discipline (Index/mirror/path-proofs; same PR):**
+
+  * `EVIDENCE_INDEX_UPDATED_OK`
+
+  * `EVIDENCE_INDEX_MIRROR_OK`
+
+  * `EVIDENCE_PATHS_VALIDATED_OK`
+
+---
+
+## 8.7 Evidence (records-only; path-agnostic; indexed via PF-12 Machine Mirror)
+
+Evidence artifacts are indexed and mirrored according to **HDE-Schemas and Artifacts** (§8.3 / §8.6). Typical `artifact_key` families for this component:
+
+* `parity/reader_cli` — Reader↔CLI byte-equality (public surface).
+
+* `parity/abba_identity` — AB↔BA byte-equality.
+
+* `parity/two_run_identity` — Two-run identity digest/log.
+
+* `emitter_symbol/proof` — Import-graph/reflection proof of shared presenter symbol.
+
+* `canonical_json/compare` — Canonical re-serialization byte-compare of the public body.
+
+Each mirror record **MUST** include:
+
+* `artifact_key`
+
+* `sha256`
+
+* `size_bytes`
+
+* `produced_at_utc`
+
+* `discovered_physical_path`
+
+* `proof_anchor` (path to the co-located path-proof transcript)
+
+The human Evidence Index (`docs/evidence/INDEX.json`) **MUST** be updated in the same change. CI enforces:
+
+* Human↔machine **1:1 parity**, and
+
+* Presence and correctness of path-proofs.
+
+---
+
+## 8.8 Routing (titles-only)
+
+* **Public payload & headers:**  
+   **HDE-CLI-API-Vendor-Ref**
+
+* **Preimage / rounding / banding:**  
+   **HDE-Math-Spec**
+
+* **Evidence policy & tokens:**  
+   **HDE-Governance**
+
+This section governs **mechanics only**; all concrete bytes, tokens, and schemas are owned by the PF-Canon documents above.
+
+---
+
+# 9\) Reader & Compat endpoints
+
+## 9.1 Endpoint Catalog (JSON success) \[Required-Now\]
 
 **Purpose (normative).** Name the Reader **JSON success** routes eligible for A7 proofs. Entries are **titles-only**; bytes/examples live elsewhere.
 
@@ -618,7 +991,7 @@ Transforms engine outputs into the Reader/CLI **public envelope** and emits **ca
 
 ---
 
-### **9.2 Reader (dev harness only) \[Implemented (dev-only)\]**
+## 9.2 Reader (dev harness only) \[Implemented (dev-only)\]
 
 * **Route (dev-only).** `GET|POST /api/reader?v=1` is a **dev harness** enabled only when `APP_ENV=dev`; rails remain closed (`SAFE_MODE=1`, `ALLOW_NETWORK=0`; no vendor I/O).  
 * **Emitter.** Uses the **allow-listed shared presenter/emitter** (see §4 / §10.2); tests must **not** bypass the shared emitter.  
@@ -657,7 +1030,7 @@ Transforms engine outputs into the Reader/CLI **public envelope** and emits **ca
 
 ---
 
-### **9.3 Compat (pair; internal/admin) \[Implemented (dev/admin)\]**
+## 9.3 Compat (pair; internal/admin) \[Implemented (dev/admin)\]
 
 * **Route.** `POST /api/compat/v1` (pair) — internal/admin surface (**not public**).  
 * **POST non-conditional.** POST carries no validators and never returns 304\.  
@@ -675,7 +1048,7 @@ Transforms engine outputs into the Reader/CLI **public envelope** and emits **ca
 
 ---
 
-### **9.4 Internal ops: `/internal/version` (ops-only) \[Required-Now\]**
+## 9.4 Internal ops: `/internal/version` (ops-only) \[Required-Now\]
 
 **Purpose (normative).** Operator surface for identity and provenance. **Not** a JSON success route and **not** A7-eligible (see HDE-Governance §10.5).
 
@@ -703,18 +1076,18 @@ Transforms engine outputs into the Reader/CLI **public envelope** and emits **ca
 
 ---
 
-## **10\) Writer Surfaces (API)**
+# 10\) Writer Surfaces (API)
 
 **Purpose.** Provide **minimal, idempotent** writer endpoints (e.g., **preferences**) with **strict schema validation** and **deterministic effects**. Mechanics wires determinism and validation; **public transport rules and error headers live in Governance/CLI-API** (titles-only).
 
-### **10.1 Contract (normative)**
+## 10.1 Contract (normative)
 
 * **Idempotent semantics.** Repeating the **same request** produces the **same effect** and response semantics (no double-writes, no drift).  
 * **Strict schema.** Requests **MUST** validate against the governing schema (titles-only to PF-Canon-HDE-Schemas & Artifacts). **Unknown or extra keys are rejected** (typed error).  
 * **Normalization.** Where arrays represent sets, **dedupe & ASCII-sort**; category/channel IDs must be **canonical** (Magic-10 closed set; `NN-NN` min-first for channels).  
 * **Explicit inputs only.** Writers **do not** read clocks/env/files and **do not** depend on locale.
 
-  ### **10.2 Transport posture (titles-only; owned by Governance)**
+  ## 10.2 Transport posture (titles-only; owned by Governance)
 
 **Routing only.** Transport behavior is governed in **HDE-Governance §10** and matrices live in **HDE-CLI-API-Vendor Ref**. This guide does not restate headers or validator details.
 
@@ -740,18 +1113,18 @@ Transforms engine outputs into the Reader/CLI **public envelope** and emits **ca
 * Internal ops: `INTVER_200_CTYPE_JSON_UTF8_OK`, `INTVER_HEAD_PARITY_OK`, `INTVER_CONDITIONALS_IGNORED_OK`, `INTVER_200_NO_ETAG_OK`.  
   ---
 
-### **10.3 Determinism & safety**
+## 10.3 Determinism & safety
 
 * **Two-run identity (effect).** Two identical writer invocations over the same state produce **identical post-state** and the same response semantics.  
 * **Order stability.** Any JSON emission (if the writer returns a body) uses the **Canonical Serialization Package** (§4): UTF-8 no BOM, **sorted keys**, compact, **one LF**; arrays-as-sets **deduped & ASCII-sorted**; checks under **`LC_ALL=C`**.  
 * **No RNG/time.** Writers do **not** consult clocks or randomness; no non-deterministic merges.
 
-### **10.4 Errors & logging (internal)**
+## 10.4 Errors & logging (internal)
 
 * **Typed errors only.** `invalid_input`, `invalid_json`, `unknown_key`, etc. (PF-05 titles-only); **no PII/secrets**.  
 * **Keys-only logs.** Never log request/response bodies, header values, or secrets; redact references; bounded labels.
 
-### **10.5 Validation (binary)**
+## 10.5 Validation (binary)
 
 1. **Schema pass:** request validates; **unknown/extra keys → fail** (typed error).  
 2. **A7 writers posture:** responses carry **`no-store`**, **no `ETag`** (titles-only to Governance).  
@@ -759,7 +1132,7 @@ Transforms engine outputs into the Reader/CLI **public envelope** and emits **ca
 4. **Canonical bytes (if body present):** canonical re-serialization byte-compare passes (UTF-8/no BOM, sorted keys, **one LF**, arrays-as-sets).  
 5. **No locale/I/O:** static/grep checks show **no** file/env/time use in writer modules.
 
-### **10.6 Evidence (records-only; path-agnostic; indexed via PF-12 machine mirror)**
+## 10.6 Evidence (records-only; path-agnostic; indexed via PF-12 machine mirror)
 
 * **artifact\_key:** `writers/no_store_headers` — header proof (`no-store`, no `ETag`).  
 * **artifact\_key:** `writers/schema_validation` — JSON-Schema validation log (unknown/extra → typed error).  
@@ -775,11 +1148,11 @@ Transforms engine outputs into the Reader/CLI **public envelope** and emits **ca
 
 ---
 
-## **11\) Input Normalization & Validation Layer** 
+# 11\) Input Normalization & Validation Layer 
 
 **Scope.** Normalize IDs and **validate payloads against schemas** (titles-only to **PF-Canon-HDE-Schemas & Artifacts**). Mechanics **wires** the checks; it **does not restate** schemas here.
 
-### **11.1 Viewer prefs (normative)**
+## 11.1 Viewer prefs (normative)
 
 **Closed set & types**
 
@@ -805,7 +1178,7 @@ Transforms engine outputs into the Reader/CLI **public envelope** and emits **ca
 * Normalization **MUST** produce **identical normalized forms** for `(A,B)` and `(B,A)`.  
   ---
 
-  ### **11.2 Validation (binary)**
+  ## 11.2 Validation (binary)
 
 1. **Completeness.** `weights` includes **all ten** category keys; each value is **int `0..100`**.  
 2. **Invalid shapes.** Malformed/missing keys or floats ⇒ **`invalid_prefs`** (typed error).  
@@ -821,36 +1194,36 @@ Transforms engine outputs into the Reader/CLI **public envelope** and emits **ca
 * Governance tokens: **PF-04 — §2.0 Acceptance Tokens**.  
   ---
 
-  ### **11.3 Swipe Sampler & Ranker**
+  ## 11.3 Swipe Sampler & Ranker
 
 **Purpose.** Build a candidate pool that respects viewer weights (including the **zero-weight rule**) and then **rank deterministically**. Deterministic \= **order-neutral (AB↔BA)** and **seedable** (when used in **dev/admin** flows); **seeds never affect public bytes**.
 
-#### **11.3.1 Sampling & exclusion**
+### 11.3.1 Sampling & exclusion
 
 * **Zero-weight rule.** Exclude any candidate whose **\#1** equals a viewer weight of **0**.  
 * **Pool formation.** Apply viewer **eligibility filters** (titles-only), then enforce **diversity** (§11.3.3) **before** ranking.
 
-  #### **11.3.2 Scoring & ranking (deterministic)**
+  ### 11.3.2 Scoring & ranking (deterministic)
 
 * **Score function.** Deterministic **fixed-point** combination across the ten categories (integer path), consistent with **PF-01** rounding/banding (titles-only).  
 * **\#1 influence.** The other party’s **\#1** may serve as a **stable tie-break** (integer/priority rule); the rule **must be pinned** and **stable**.  
 * **Total order.** Sort by the specified **numeric** direction, then break ties by **ID comparator (ASCII)** to guarantee a **stable total order** (§5).  
 * **Seedability.** Any stochastic element (if used in **non-public** flows) **must be seedable & isolated**; the seed does **not** alter public bytes.
 
-  #### **11.3.3 Diversity acceptance (deterministic)**
+  ### 11.3.3 Diversity acceptance (deterministic)
 
 * **Sliding window:** `K = 50`.  
 * **Cardinality bound:** at most `N = 2` share the same **design fingerprint** within the window.  
 * **No recent repeats:** none repeat from the last `R = 20`.  
 * **Fingerprint.** A **deterministic** function (titles-only to PF-Math/PF-Spec) used **only** for diversity checks (**never exposed**).
 
-  #### **11.3.4 Dev-only sampling endpoint (optional harness)**
+  ### 11.3.4 Dev-only sampling endpoint (optional harness)
 
 * **Endpoint (dev-only).** `POST /api/sample/v1` with body containing `viewer_prefs{…}` and optional `seed:int`.  
 * **Response.** List of **candidate IDs only**; the app hydrates details. If a seed was provided, **echo it in `meta`**.  
 * **Determinism.** With the same inputs/seed, the output is **byte-identical**; **AB↔BA** has no effect on ordering.
 
-  #### **11.3.5 Validation & evidence (binary; path-agnostic)**
+  ### 11.3.5 Validation & evidence (binary; path-agnostic)
 
 * **Zero-weight exclusion** demonstrably enforced.  
 * **Stable order:** ABBA and two-run proofs; **comparator laws** honored (see §5).  
@@ -867,18 +1240,18 @@ Transforms engine outputs into the Reader/CLI **public envelope** and emits **ca
   ---
 
 
-  ## **12\) Error Envelope & Token Set \[Required-Now\]**
+  # 12\) Error Envelope & Token Set \[Required-Now\]
 
 **Purpose.** Provide a **central formatter** for typed, numeric-free errors. Public error transport (writers/errors `no-store`, headers) lives in **PF-Canon-HDE-Governance** and **PF-Canon-HDE-CLI-API-Vendor-Ref** (titles-only). **Identity/Meta** content has been moved to **§13 (Identity & Provenance Module)** and **§14 (Internal Meta Surface)** to avoid duplication.
 
-### **12.1 Error envelope (normative)**
+## 12.1 Error envelope (normative)
 
 * **Shape (exact):** `{"ok": false, "code": "<lower_snake_token>", "error": "<human message>"}` — **only** these keys.  
 * **Canonical JSON:** UTF-8 (no BOM), **ASCII-sorted keys**, compact, **exactly one trailing LF**; checks under **`LC_ALL=C`**.  
 * **Numeric-free & secret-free:** never include stack traces, payload excerpts, header values, or secrets; keys-only logs (redacted).  
 * **Deterministic mapping:** the same condition always yields the same `{code,error}` pair; **byte-stable** across Reader and CLI.
 
-  ### **12.2 Token set (lower\_snake; examples)**
+  ## 12.2 Token set (lower\_snake; examples)
 
 **Tokens include (non-exhaustive):**
 
@@ -888,12 +1261,12 @@ Transforms engine outputs into the Reader/CLI **public envelope** and emits **ca
 
 The canonical **token→message map** is tested and stored as evidence (titles-only). Add/retire tokens via Doc-Delta; message text is stable and versioned in the map.
 
-### **12.3 Transport (titles-only)**
+## 12.3 Transport (titles-only)
 
 * **Writers & errors posture:** `Cache-Control: no-store`; **no `ETag`**; `Content-Type: application/json; charset=utf-8` (PF-04).  
 * **A7 success rules** are **not** restated here (see PF-04/PF-05).
 
-  ### **12.4 Acceptance (binary; tokens & evidence are titles-only)**
+  ## 12.4 Acceptance (binary; tokens & evidence are titles-only)
 
 1. **Schema:** envelope has **exactly** `ok=false`, `code`, `error`; no extras; LF-terminated, canonical JSON.  
 2. **Casing & map:** all tokens are **lower\_snake**; the **token→message** table matches the golden map (**exact bytes**).  
@@ -903,7 +1276,7 @@ The canonical **token→message map** is tested and stored as evidence (titles-o
 
 **Gating tokens (titles-only):** `ERROR_TOKEN_MAP_OK`, `ERROR_JSON_CANON_OK`, `CLI_READER_EMITTER_PARITY_OK`, `TWO_RUN_IDENTITY_OK`, `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`.
 
-### **12.5 Evidence (records-only; path-agnostic; indexed via PF-12 machine mirror)**
+## 12.5 Evidence (records-only; path-agnostic; indexed via PF-12 machine mirror)
 
 * **artifact\_key:** `errors/token_map` — canonical token→message snapshot (golden).  
 * **artifact\_key:** `errors/schema_check` — JSON-Schema check for the envelope.  
@@ -919,11 +1292,11 @@ The canonical **token→message map** is tested and stored as evidence (titles-o
 * Engine identity & `/internal/version`: **§13** and **§14** (this guide does not duplicate those bytes).  
   ---
 
-  ## **13\) Identity & Provenance Module \[Required-Now\]**
+# 13\) Identity & Provenance Module \[Required-Now\]
 
 **Purpose.** Single source of truth for **engine** and **release** identity. Values are **initialized once per cut** and are **read-only thereafter**; all public and operator surfaces **consume via helpers** (no direct env reads at emit time).
 
-### **13.1 Fields (read-only after freeze; stable key order)**
+## 13.1 Fields (read-only after freeze; stable key order)
 
 Expose and persist **exactly** these fields; **no extras**:
 
@@ -936,25 +1309,25 @@ Expose and persist **exactly** these fields; **no extras**:
 
 **Source of truth (titles-only):** `release_id` derives **only** from the PF-12 pack manifest; Invocation tag/bytes come from the Invocation registry; `engine_tag`, `build_commit`, `emitter_sha256`, and `invocation_sha256` are taken from the **build snapshot** at cut. No request-time hashing.
 
-### **13.2 Accessors**
+## 13.2 Accessors
 
 * **`identity_meta()` →** `{"engine_tag","invocation_tag"}` — inserted into the **public** envelope **before** idempotence hashing (**PF-01 §3.2**).  
 * **`identity_admin()` →** `{"engine_tag","release_id","invocation_tag","invocation_sha256","build_commit","emitter_sha256"}` — for **internal/admin** surfaces (e.g., **/internal/version**, evidence capture).
 
-  ### **13.3 Flow & constraints**
+  ## 13.3 Flow & constraints
 
 * **Fetch-only module.** Presenter (Reader) and CLI call this module’s helpers; **no direct env reads** at emit time; **no mutation** after freeze.  
 * **Preimage coupling.** `identity_meta()` enters the **five-key preimage** (public path) **before** `idempotence_hash` is computed (PF-01 §3.2).  
 * **Evidence coupling.** The same values flow into artifacts and audit evidence (titles-only); **do not duplicate** identity bytes in prose or ad-hoc files.
 
-  ### **13.4 Prohibited**
+  ## 13.4 Prohibited
 
 * **No recomputation of `release_id`** during request handling.  
 * **No mutation** of identity fields after freeze.  
 * **No alternative sources** (env vars, flags) on public paths.  
 * **No request-time hashing** for `emitter_sha256` or `invocation_sha256` — compute at **build only**.
 
-  ### **13.5 Acceptance (binary; titles-only)**
+  ## 13.5 Acceptance (binary; titles-only)
 
 1. **Two-run identity:** repeated emits with identical inputs yield **bitwise-identical** bytes (**one LF**).  
 2. **`release_id` recompute:** equals **sha256(canonical manifest bytes)**; recompute job passes.  
@@ -963,7 +1336,7 @@ Expose and persist **exactly** these fields; **no extras**:
 
 **Gating tokens:** `RELEASE_ID_RECOMPUTE_OK`, `TWO_RUN_IDENTITY_OK`, `CLI_READER_EMITTER_PARITY_OK`, `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`.
 
-### **13.6 Evidence (records-only; path-agnostic; indexed via the machine mirror)**
+## 13.6 Evidence (records-only; path-agnostic; indexed via the machine mirror)
 
 **Scope (normative).** Identity artifacts are **records-only** and MUST be listed by title/path in **Appendix D: Evidence Index** and mirrored **1:1** in `artifacts/evidence_index.jsonl`. Mirror records are canonical JSONL (UTF-8, no BOM; sorted keys; compact; exactly one trailing `\n`) and include: `artifact_key`, `sha256`, `size_bytes`, `produced_at_utc`, `discovered_physical_path`, `proof_anchor`. Update the human Index and mirror **in the same commit/PR**; CI fails on mismatch or missing path-proofs. All captures run with `LC_ALL=C`, `LANG=C`, `TZ=UTC`.
 
@@ -990,13 +1363,13 @@ Expose and persist **exactly** these fields; **no extras**:
 * Transport ops surface: **§14 Internal Meta Surface** (policy owned by **HDE-Governance**).  
   ---
 
-## **14\) Internal Meta Surface \[Required-Now\]**
+# 14\) Internal Meta Surface \[Required-Now\]
 
-### **14.1 Purpose & scope (normative)**
+## 14.1 Purpose & scope (normative)
 
 Operator-only, side-effect-free endpoint exposing engine identity for diagnostics. **Single home:** `GET /internal/version`.
 
-### **14.2 Payload (exact fields; frozen key order)**
+## 14.2 Payload (exact fields; frozen key order)
 
 Expose **exactly six** provenance fields — **no extras** — in this **frozen order**:
 
@@ -1009,7 +1382,7 @@ Expose **exactly six** provenance fields — **no extras** — in this **frozen 
 
 **Source of truth.** Values originate from the Identity & Provenance Module (§13) and are read-only after freeze (see **HDE-Schemas & Artifacts** for release identity rules).
 
-### **14.3 Transport (ops posture)**
+## 14.3 Transport (ops posture)
 
 * `Cache-Control: no-store`  
 * **No ETag**; **Last-Modified absent**  
@@ -1019,27 +1392,27 @@ Expose **exactly six** provenance fields — **no extras** — in this **frozen 
 * **Vary:** optional (MAY be present; not required for acceptance)  
    *(Policy owner: **HDE-Governance**; Mechanics reiterates here for ops wiring.)*
 
-### **14.4 Posture**
+## 14.4 Posture
 
 * Operator-only; minimal payload; no secrets; no side effects.  
 * Body is **canonical JSON** (UTF-8/no BOM, compact, **exactly one LF**).  
 * **Key order is frozen as in §14.2** (do **not** re-sort keys for this endpoint).
 
-### **14.5 Example (informative)**
+## 14.5 Example (informative)
 
 **Request** `GET /internal/version`  
  **Response** `200 OK` `Cache-Control: no-store` `Content-Type: application/json; charset=utf-8`
 
 {"engine\_tag":"hdengine-x.y.z","build\_commit":"\<shortsha\>","invocation\_tag":"INV-…","invocation\_sha256":"\<64hex\>","emitter\_sha256":"\<64hex\>","release\_id":"\<64hex\>"}
 
-### **14.6 Acceptance (titles-only; token names live in HDE-Governance §2.0)**
+## 14.6 Acceptance (titles-only; token names live in HDE-Governance §2.0)
 
 * **Headers/behavior:** `INTVER_200_CTYPE_JSON_UTF8_OK`, `INTVER_HEAD_PARITY_OK`, `INTVER_CONDITIONALS_IGNORED_OK`, `INTVER_200_NO_ETAG_OK`  
 * **Body shape:** six fields in frozen order; canonical JSON; numeric-free; exactly one LF  
 * **Stability:** two consecutive GETs produce byte-identical bodies (**two-run identity proof recorded**)  
 * **Index discipline:** **Evidence Index (human)** and **machine mirror** updated in the **same PR**; human↔machine **1:1 parity** enforced
 
-### **14.7 Evidence (records-only; path-agnostic; indexed via the machine mirror)**
+## 14.7 Evidence (records-only; path-agnostic; indexed via the machine mirror)
 
 * `intver/headers_get` — raw GET headers (proves **no-store**, **no ETag**, correct `Content-Type`)  
 * `intver/headers_head` — raw HEAD headers (200; `Content-Type == GET`; `Content-Length ==` identity GET)  
@@ -1051,14 +1424,14 @@ Expose **exactly six** provenance fields — **no extras** — in this **frozen 
 
 Each mirror record includes `artifact_key`, `sha256`, `size_bytes`, `produced_at_utc`, `discovered_physical_path`, `proof_anchor`. Update the human Evidence Index in the **same change**; CI enforces **1:1 parity** and **path-proofs**.
 
-### **14.8 Routing (titles-only)**
+## 14.8 Routing (titles-only)
 
 * **HDE-Governance §10.5** — `/internal/version` policy (no-store, no ETag, conditionals ignored, HEAD parity)  
 * **HDE-Math-Spec §3** — identity/preimage rules (single home for idempotence & identity semantics)  
 * **HDE-Schemas & Artifacts §6** — pack/manifest coupling for `release_id`  
   ---
 
-## **15\) Narrative Selection Router (keys only)**
+# 15\) Narrative Selection Router (keys only)
 
 **Purpose**  
  Map viewer/context inputs to narrative keys without generating text.
@@ -1086,7 +1459,7 @@ Each mirror record includes `artifact_key`, `sha256`, `size_bytes`, `produced_at
 * Authoring **DB plane** (intake, lints, preview) and runtime **file-backed pack** (sealed; no DB in hot path) live in the **Narratives Guide** / **Schemas & Artifacts**.  
 * Mechanics proves **determinism** and **parity (CLI \= HTTP)**, and records **keys-only evidence** in the **same PR**.
 
-## **16\) Narrative Key Registry and Manifests**
+# 16\) Narrative Key Registry and Manifests
 
 **Purpose**
 
@@ -1113,7 +1486,7 @@ Each mirror record includes `artifact_key`, `sha256`, `size_bytes`, `produced_at
 
   ---
 
-  ### **16.1 Command catalog (titles-only; PF05 governs)**
+  ## 16.1 Command catalog (titles-only; PF05 governs)
 
 **Single home for commands.**  
  The complete CLI command/flag catalog and their status live in PF05 (for example, “Commands (by status)”, “CLI Overview & Conventions”). This guide does not enumerate all commands.
@@ -1131,7 +1504,7 @@ Each mirror record includes `artifact_key`, `sha256`, `size_bytes`, `produced_at
 
 ---
 
-### **16.2 Streams & exits**
+## 16.2 Streams & exits
 
 * **stdout (success):** public JSON body only, LF-terminated, no ANSI, no extra bytes.
 
@@ -1143,7 +1516,7 @@ Each mirror record includes `artifact_key`, `sha256`, `size_bytes`, `produced_at
 
   ---
 
-  ### **16.3 Determinism & parity**
+  ## 16.3 Determinism & parity
 
 * **Reader↔CLI parity.** CLI stdout is byte-identical to the Reader 200 body for mirrored surfaces (single emitter).
 
@@ -1157,7 +1530,7 @@ Each mirror record includes `artifact_key`, `sha256`, `size_bytes`, `produced_at
 
   ---
 
-  ### **16.4 Inputs & schemas (titles-only)**
+  ## 16.4 Inputs & schemas (titles-only)
 
 * **IDs & catalogs.** Validate against **HDE-Schemas & Artifacts** (§2.1/§2.6).
 
@@ -1167,7 +1540,7 @@ Each mirror record includes `artifact_key`, `sha256`, `size_bytes`, `produced_at
 
   ---
 
-  ### **16.5 Installability & entrypoints**
+  ## 16.5 Installability & entrypoints
 
 * **Console script.** `pyproject` console-script `hdctl` present and installable.
 
@@ -1177,7 +1550,7 @@ Each mirror record includes `artifact_key`, `sha256`, `size_bytes`, `produced_at
 
   ---
 
-  ### **16.6 Environment pins (runtime)**
+  ## 16.6 Environment pins (runtime)
 
 * **Pins.** `LC_ALL=C`, `LANG=C`, `TZ=UTC`; keys-only logs; no ANSI.
 
@@ -1185,7 +1558,7 @@ Each mirror record includes `artifact_key`, `sha256`, `size_bytes`, `produced_at
 
   ---
 
-  ### **16.7 Acceptance (titles-only; token names live in HDE-Governance §2.0)**
+  ## 16.7 Acceptance (titles-only; token names live in HDE-Governance §2.0)
 
 **Entrypoints/install:**  
  `CLI_PYPROJECT_ENTRYPOINT_OK, CLI_MODULE_RUN_OK, CLI_INSTALL_OK, CLI_HELP_EXIT_0_OK, CLI_HELP_STDOUT_OK.`
@@ -1208,7 +1581,7 @@ Each mirror record includes `artifact_key`, `sha256`, `size_bytes`, `produced_at
 
 ---
 
-### **16.8 Evidence (records-only; machine mirror; same-PR rule)**
+## 16.8 Evidence (records-only; machine mirror; same-PR rule)
 
 List by title/path in **Appendix D: Evidence Index** and mirror 1:1 in `artifacts/evidence_index.jsonl` (record fields as per §1.3). The machine mirror is canonical JSONL (UTF-8; ASCII-sorted keys; compact; one LF), rejects unknown keys, and each record includes a `proof_anchor` to a co-located path-proof file. Update the human Index and machine mirror in the same PR.
 
@@ -1229,9 +1602,9 @@ Required artifacts:
 
 (Index human+machine in the same PR; mirror canonical JSONL; one LF; `proof_anchor` present.)
 
-## **17 CLI Components**
+# 17\) CLI Components
 
-### **17.1 Command catalog (titles‑only; PF05 governs)**
+## 17.1 Command catalog (titles‑only; PF05 governs)
 
 **Single home for commands.**  
  The complete CLI command/flag catalog and their status live in **PF05 — HDE‑CLI‑API‑Vendor‑Ref** (for example, “CLI Overview & Conventions”, “Commands (by status)”). PF14 does **not** enumerate or norm all commands; it records mechanical expectations and routes to PF05 by title.
@@ -1246,7 +1619,7 @@ Required artifacts:
 
 ---
 
-### **17.2 Streams & exits**
+## 17.2 Streams & exits
 
 * **stdout (success):** public JSON body only, LF‑terminated, no ANSI, no extra bytes.
 
@@ -1264,7 +1637,7 @@ Required artifacts:
 
 ---
 
-### **17.3 Determinism & parity**
+## 17.3 Determinism & parity
 
 * **Reader↔CLI parity.** For each mirrored surface where the CLI emits Reader v1 bytes (stdout or via a reader-dump path, as defined in \*\*HDE-CLI-API-Vendor-Ref\*\*), those CLI bytes are byte-identical to the Reader 200 body for the same inputs/environment (single shared emitter, canonical JSON, exactly one LF). For \`hdctl showcompat\`, parity is defined between Reader HTTP and the \`--dump-reader\` sidecar file; stdout compat JSON is governed separately by determinism and canonical-JSON tokens.
 
@@ -1278,7 +1651,7 @@ Required artifacts:
 
 ---
 
-### **17.4 Inputs & schemas (titles‑only)**
+## 17.4 Inputs & schemas (titles‑only)
 
 * **IDs & catalogs.** CLI commands that accept IDs or cataloged names validate them against **HDE‑Schemas & Artifacts** (§2.1/§2.6). This guide does not duplicate schema bytes.
 
@@ -1288,7 +1661,7 @@ Required artifacts:
 
 ---
 
-### **17.5 Installability & entrypoints**
+## 17.5 Installability & entrypoints
 
 * **Console script.** The `pyproject` console‑script entrypoint `hdctl` is present and installable.
 
@@ -1298,7 +1671,7 @@ Required artifacts:
 
 ---
 
-### **17.6 Environment pins (runtime)**
+## 17.6 Environment pins (runtime)
 
 * **Pins.** All CLI acceptance jobs run with `LC_ALL=C`, `LANG=C`, `TZ=UTC`. Logs are keys‑only, with no ANSI escapes.
 
@@ -1306,7 +1679,7 @@ Required artifacts:
 
 ---
 
-### **17.7 Acceptance (titles‑only; token names live in HDE‑Governance §2.0)**
+## 17.7 Acceptance (titles‑only; token names live in HDE‑Governance §2.0)
 
 **Entrypoints/install:**  
  `CLI_PYPROJECT_ENTRYPOINT_OK, CLI_MODULE_RUN_OK, CLI_INSTALL_OK, CLI_HELP_EXIT_0_OK, CLI_HELP_STDOUT_OK.`
@@ -1329,7 +1702,7 @@ Required artifacts:
 
 ---
 
-### **17.8 Evidence (records‑only; machine mirror; same‑PR rule)**
+## 17.8 Evidence (records‑only; machine mirror; same‑PR rule)
 
 Evidence listings are titles‑only here; PF12 is single home for schemas and indexing rules.
 
@@ -1357,13 +1730,201 @@ All of the above must be indexed in both the Human Index and the machine mirror 
 
 ---
 
-## 
+## **17.9 Stateless JSON QA mode (informative)**
 
-## **18\) CLI Serializer Coupling \[Required-Now\]**
+**Status:** Informative, non-gating  
+ This section records a future mechanics requirement from HDE-Build Notes (Addendum 11\) for a no-DB, stateless JSON QA mode. It does not add any new acceptance gates for the current engine or CLI posture.
+
+### **17.9.1 Background and scope**
+
+HDE-Build Notes observes that, in pre-Glow environments:
+
+* There is no app-level user model or user IDs.
+
+* There are no persistent user-bound BodyGraphs in production.
+
+* We must not create app-like user records in production ahead of Glow App integration.
+
+* Many earlier QA flows assumed DB-backed users  
+   (for example, `showcompat --user-a/--user-b --source=db`, `bg:resolve --source=vendor --upsert`),  
+   which cannot run under these constraints.
+
+Current mechanics in this guide assume DB-backed flows for:
+
+* CLI commands that resolve or store BodyGraphs via DB (or vendor+DB).
+
+* Evidence capture tied to DB posture and runtime environment.
+
+This section does not change those flows. It describes the additional stateless capabilities that a future epic is expected to add so that engine math can be exercised purely via CLI plus files, without DB.
+
+---
+
+### **17.9.2 Required capability: no-DB JSON QA mode**
+
+Addendum 11 in HDE-Build Notes introduces a future requirement for a **stateless JSON QA mode**, consisting of three mechanical capabilities:
+
+#### **a) Stateless BodyGraph export**
+
+A future CLI flow must:
+
+* Accept only birth data or vendor JSON (no user IDs, no DB lookup).
+
+* Call engine math directly, without DB.
+
+* Emit a canonical JSON BodyGraph export containing:
+
+  * Raw birth/event details needed to reconstruct the chart.
+
+  * Full BodyGraph topology (centers, gates, channels, lines, profile, authority, definition, type).
+
+  * Stable identifiers consistent with the domain catalogs (IDs only; no prose).
+
+* Write canonical JSON governed by **HDE-Schemas and Artifacts**  
+   (UTF-8, no BOM, ASCII-sorted keys, compact, exactly one LF, arrays-as-sets deduped then ASCII-sorted).
+
+#### **b) Stateless compat export**
+
+A future CLI flow must:
+
+* Accept two BodyGraph JSON files *or* two birth tuples.
+
+* Compute compat and Reader v1 envelopes directly, without DB.
+
+* Write canonical JSON compat output and Reader envelopes under governed paths.
+
+* Preserve determinism and AB↔BA parity using the same canonical serializer and comparator rules defined in this guide (§4/§5/§6).
+
+#### **c) Stateless vendor-to-engine pipeline**
+
+A future CLI-driven pipeline must support:
+
+`birth → vendor fetch (dry-run) → BodyGraph JSON → compat + Reader JSON`
+
+Each stage must:
+
+* Be invokable via CLI.
+
+* Write only JSON files and logs under governed paths.
+
+* Perform **no DB writes**, unless an explicit upsert path is chosen (and that upsert remains clearly separated from stateless QA flows and governed by vendor/DB posture sections (§19/§20) and Governance).
+
+Mechanics does **not** define specific command names, flags, or paths for these flows.  
+ It records that when implemented, they must reuse the shared emitter, canonical serializer, comparators, and deterministic engine posture defined in this guide.
+
+---
+
+### **17.9.3 Single homes for schemas and flows**
+
+This guide records the mechanical requirement only. Ownership remains:
+
+* **HDE-Schemas and Artifacts** — JSON schemas and artifact catalogs for stateless BodyGraph, compat, and any run-bundle exports.
+
+* **HDE-CLI-API-Vendor-Ref** — CLI command shapes and behavior for stateless flows.
+
+* **Glow QA Guide** and **HDE Phased Epics** — QA plans and acceptance wiring for stateless QA mode.
+
+Mechanics MUST NOT define concrete paths or JSON schemas for these artifacts; it references the owning documents by title only.
+
+---
+
+### **17.9.4 Normative status and gating**
+
+Until the stateless JSON QA mode is implemented and drained into the relevant PF documents:
+
+* **No acceptance token** may treat the presence or absence of stateless JSON QA artifacts as a gate.
+
+* PF14’s normative mechanics remain those of the current **DB-backed** engine and CLI flows.
+
+* QA plans that cannot rely on DB users SHOULD:
+
+  * Call out “no user IDs / no DB users” as an environment constraint.
+
+  * Use birth-based and vendor dry-run patterns described in HDE-Build Notes and the QA documents, while continuing to satisfy all existing determinism and evidence checks defined in this guide.
+
+### **17.10 Interim no-user QA mode (pre-Glow prod)**
+
+**Status (normative).**  
+ This section is **normative for pre-Glow production environments** where there is **no app-level user model** and **no persistent user-bound BodyGraph rows** configured in the database. It constrains how existing mechanics are exercised in Live QA. It does **not** change the long-term semantics of DB-backed flows, which will be re-opened in a future epic once the Glow App is integrated (see **HDE Phased Epics** and **Glow QA Guide** by title).
+
+**Assumptions (pre-Glow prod).**
+
+* No app-level user IDs exist in production.
+
+* No persistent user-bound BodyGraphs exist in production.
+
+* Mechanics and QA **MUST NOT** create app-like user records in production ahead of Glow App integration.
+
+#### **17.10.1 Compat & Reader (prod QA)**
+
+For Live QA in pre-Glow prod:
+
+* `hdctl showcompat` **MUST** be exercised with **birth arguments only** (for example, `--birthdate-a/-b`, `--birthtime-a/-b`, `--location-a/-b`).
+
+* `--user-a/--user-b` and `--source=db` **MUST NOT** be used in production QA flows while the app user model is absent.
+
+* QA **MUST** continue to verify:
+
+  * canonical JSON on stdout (UTF-8, no BOM; ASCII-sorted keys; compact; exactly one trailing LF),
+
+  * AB↔BA identity using swapped birth tuples, and
+
+  * Reader v1 envelopes via `--dump-reader`, with Reader↔CLI parity proven via the shared presenter/emitter (§4, §8, §18).
+
+These checks reuse the existing determinism and canonicalization rules in this guide and do not add new transport bytes.
+
+#### **17.10.2 Aux narratives (prod QA)**
+
+For Aux preview in pre-Glow prod:
+
+* `hdctl aux-preview` **MUST** consume compat JSON produced from **birth-based** `showcompat` runs as described in §17.10.1.
+
+* QA **MUST NOT** rely on DB-backed users to exercise Aux; the Aux preview surface remains a **file-based consumer** of compat JSON in this mode.
+
+#### **17.10.3 BodyGraph resolver & vendor ingest (prod QA)**
+
+In pre-Glow prod, BodyGraph resolver and vendor ingest QA flows **MUST** respect the following additional constraints (in addition to §19 Vendor Ingest Pipeline and §22 SAFE Rails and Provider Gate):
+
+* CLI `--user` arguments passed to `bg:resolve` **MUST** be treated as **ephemeral QA keys only** (for example, `qa_epic017_resolve1`, `qa_epic017_vendor1`) and **MUST NOT** be interpreted as real app user IDs.
+
+* Under **rails CLOSED**, any `bg:resolve --source=vendor` invocation **MUST** return a typed refusal and **MUST NOT** perform outbound HTTP.
+
+* Under **rails OPEN** in pre-Glow prod, QA **MAY** run:
+
+  * `bg:resolve` DB/auto **stub** checks (no real DB rows), and
+
+  * `bg:resolve --source=vendor --dry-run` to exercise vendor shaping and ingest metadata **without writing DB rows**.
+
+* `bg:resolve --source=vendor --upsert` **MUST NOT** be invoked in production until an app-level user model is live and a future epic re-opens user-bound DB coverage via **HDE Phased Epics** and **Glow QA Guide**.
+
+These constraints are environment-specific; they do not change the long-term semantics of vendor upsert flows in dev or in future epics with a live app user model.
+
+#### **17.10.4 Evidence skeleton for CLI QA**
+
+For Live QA sessions in pre-Glow prod:
+
+* Mechanics **MUST** snapshot the **Human Evidence Index** and **Machine Mirror** **before and after** CLI QA runs that exercise `showcompat`, `aux-preview`, or `bg:resolve` in this mode.
+
+* Any mutation of governed evidence artifacts (`docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl`, or governed `*.path_proof.txt`) during such QA runs **MUST** be treated as a defect or unexpected side effect.
+
+* CLI QA flows in this mode **MUST NOT** write governed evidence artifacts directly; they **only consume** the evidence skeleton defined in §1.3, §25, and §37, leaving governed paths unchanged.
+
+#### **17.10.5 Forward plan (routing only)**
+
+* Once the Glow App and user model are integrated, a future epic recorded in **HDE Phased Epics** and governed by the **Glow QA Guide** will:
+
+  * use real app user IDs to exercise DB-backed `showcompat` and `bg:resolve --source=vendor --upsert` in prod or stage, and
+
+  * close out any acceptance tokens that currently depend on DB-backed user flows (routing by title to **HDE-Governance** and **HDE Phased Epics**).
+
+* Until that epic is live, QA requirements that assume “existing users in prod” **MUST** be treated as **blocked by environment** and satisfied instead using the no-user QA mode described in this section.
+
+  ## 
+
+  # 18\) CLI Serializer Coupling \[Required-Now\]
 
 **Scope.** Force all CLI public bytes through the **same allow-listed presenter/emitter** entrypoint used by Reader. Tests must not bypass the unified entrypoint.
 
-### **18.1 Policy (normative)**
+## 18.1 Policy (normative)
 
 * **Single entrypoint.** CLI **MUST** route every public body through the shared presenter/emitter symbol (see §10.2).  
 * **Canonical rules apply.** §4/§10.1 canonicalization (UTF-8; sorted keys; compact; one LF; arrays-as-sets) **MUST** hold for CLI stdout.  
@@ -1371,29 +1932,29 @@ All of the above must be indexed in both the Human Index and the machine mirror 
   * `/api/compat/v1`: CLI stdout is **byte-identical** to the Reader 200 body.  
   * `/api/sample/v1`: CLI stdout uses the **same deterministic selection \+ ordering** as Reader.
 
-  ### **18.2 Prohibited (hard fail)**
+  ## 18.2 Prohibited (hard fail)
 
 * Any ad-hoc JSON on public paths: **no** `json.dumps(`, **no** `jsonify(`, **no** templating, **no** manual string building, **no** pretty/indented output.
 
-  ### **18.3 Guards (CI)**
+  ## 18.3 Guards (CI)
 
 * **Symbol allow-list.** Maintain a code/CI allow-list of presenter/emitter symbols; only these may serialize public bytes.  
 * **Grep-guard.** CI **fails** on public paths if ad-hoc serialization is detected (regex for `\bjson\.dumps\(` and known alternates).
 
-  ### **18.4 Acceptance (titles-only; token names live in HDE-Governance §2.0)**
+  ## 18.4 Acceptance (titles-only; token names live in HDE-Governance §2.0)
 
 * **Coupling:** `CLI_READER_EMITTER_PARITY_OK`, `CLI_NO_ALT_JSON_OK`.  
 * **Surface parity:** `CLI_READER_EMITTER_PARITY_OK` (compat), ordering proof present (sample).  
 * **Determinism:** `COMPOSITE_ABBA_IDENTITY_OK`, `TWO_RUN_IDENTITY_OK`, `JSON_CANONICAL_CHECK_OK`.  
 * **Evidence discipline:** `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`.
 
-  ### **18.5 Evidence (records-only; machine mirror; same-PR rule)**
+  ## 18.5 Evidence (records-only; machine mirror; same-PR rule)
 
 `artifacts/cli/ab.json`, `artifacts/cli/ba.json`, `artifacts/cli/summary.json`,  
  `audit/gates/guards/serializer_grep_guard.log`, `audit/gates/guards/emitter_symbol_proof.txt`,  
  `audit/gates/canonical/json_canonical_check.log`, `audit/gates/canonical/json_canon_compare.log`.
 
-### **18.6 Routing (titles-only)**
+## 18.6 Routing (titles-only)
 
 * Canonical serializer & unified entrypoint: **§4** and **§10.2**.  
 * Public payload/transport: **HDE-CLI-API-Vendor Ref** / **HDE-Governance**.  
@@ -1403,29 +1964,43 @@ All of the above must be indexed in both the Human Index and the machine mirror 
   
 
 
-  ## **19\) Vendor Ingest Pipeline — source policy & proofs (normative)**
+  # 19\) Vendor Ingest Pipeline — source policy & proofs (normative)
 
-  ### **19.1 Policy (normative)**
+## **19.1 Policy (normative)**
 
 **Policy (env-aware)**
 
 * **Prod.** Source of truth is the database. Vendor APIs run only on explicit triggers or scheduled refresh; never inline on the request path.
 
+* **Pre-Glow prod (no users).** When there is no app-level user model integrated with the HD Engine and no persistent user-bound BodyGraph rows configured in production:
+
+  * Mechanics and QA **MUST NOT** create app-like user records in prod via CLI or vendor ingest.
+
+  * `bg:resolve --source=vendor --upsert` **MUST NOT** be invoked in prod; QA and ops flows in this environment MAY use only DB/auto stub behavior and vendor dry-run semantics as described below.
+
 * **Dev.** Direct vendor calls are allowed; on success, ingest MUST upsert the BodyGraph to DB for repeatability.
 
-* **SAFE rails.** SAFE rails apply in all environments; rails posture and acceptance tokens are owned by HDE‑Governance (titles‑only).
+* **SAFE rails.** SAFE rails apply in all environments; rails posture and acceptance tokens are owned by **HDE-Governance** (titles-only).
 
-**Per‑call selection (explicit)**
+**Per-call selection (explicit)**
 
 * Source is chosen **per call** on operator surfaces (CLI flag / ops param); there are no engine “modes.”
 
-* Any unknown `ENGINE_*` env MUST fail fast with a typed error (no vendor I/O).
+* Any unknown `ENGINE_*` env **MUST** fail fast with a typed error (no vendor I/O).
 
-* When rails are closed, any request that sets `source=vendor` MUST return a typed refusal and MUST NOT perform outbound HTTP.
+* When rails are closed, any request that sets `source=vendor` **MUST** return a typed refusal and **MUST NOT** perform outbound HTTP.
 
-Routing and token semantics for per‑call selection are owned by HDE‑Governance and HDE‑CLI‑API‑Vendor‑Ref (titles‑only).
+* In **pre-Glow prod QA flows**, CLI `--user` values passed to `bg:resolve` **MUST** be treated as **ephemeral QA keys only** and **MUST NOT** be bound to real app user IDs; DB behavior remains stub-only until the Glow App is integrated.
 
-**Evidence (records‑only)**
+* When rails are **OPEN** in pre-Glow prod QA flows:
+
+  * `bg:resolve` DB/auto MAY be exercised in **stub** mode (no real DB rows), and
+
+  * `bg:resolve --source=vendor --dry-run` MAY perform a single vendor call that returns ingest metadata and **MUST NOT** write DB rows.
+
+Routing and token semantics for per-call selection are owned by **HDE-Governance** and **HDE-CLI-API-Vendor-Ref** (titles-only).
+
+**Evidence (records-only)**
 
 * `artifacts/bodygraph/source_selection.snapshot.json` capturing at least:
 
@@ -1439,11 +2014,11 @@ Routing and token semantics for per‑call selection are owned by HDE‑Governan
 
   * `upserted` (boolean indicating DB upsert)
 
-* Canonical JSON (UTF‑8, no BOM; sorted keys; compact; exactly one trailing `\n`); unknown keys are rejected.
+* Canonical JSON (UTF-8, no BOM; sorted keys; compact; exactly one trailing `\n`); unknown keys are rejected.
 
 **Source invariance (single presenter/emitter)**
 
-For the same normalized inputs, DB‑sourced and vendor‑sourced bodies MUST be byte‑identical when emitted via the shared presenter/emitter.
+For the same normalized inputs, DB-sourced and vendor-sourced bodies **MUST** be byte-identical when emitted via the shared presenter/emitter.
 
 Proofs live under `artifacts/bodygraph/source_invariance/` as at least:
 
@@ -1453,7 +2028,7 @@ Proofs live under `artifacts/bodygraph/source_invariance/` as at least:
 
 * `summary.json` — summary (attempts, `sha256` digests, `ab_ba_equal: true` on success)
 
-**Acceptance (titles‑only)**
+**Acceptance (titles-only)**
 
 * `BG_SOURCE_SELECTION_OK`
 
@@ -1466,11 +2041,11 @@ Proofs live under `artifacts/bodygraph/source_invariance/` as at least:
 Index/mirror parity uses the existing index tokens:  
  `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`.
 
-Routing for artifact schemas and indexing lives in HDE‑Schemas & Artifacts; policy and tokens live in HDE‑Governance.
+Routing for artifact schemas and indexing lives in **HDE-Schemas & Artifacts**; policy and tokens live in **HDE-Governance**.
 
 ---
 
-### **19.2 Refresh, TTL & SWR (out‑of‑band; normative)**
+## 19.2 Refresh, TTL & SWR (out‑of‑band; normative)
 
 **Purpose.** Pin the invariants for the BodyGraph refresh worker (EPIC‑011), its policy, and the governed refresh policy snapshot. Mechanics, ADR values, and detailed schema live in the ADR, Build Notes, and HDE‑Schemas & Artifacts; this section states the mechanical invariants only.
 
@@ -1550,11 +2125,11 @@ The refresh worker runs under the same determinism pins and SAFE‑rails posture
 
   ---
 
-  ## **20\) Persistence Layer (DB posture, partition & bridge) \[Required‑Now\]**
+  # 20\) Persistence Layer (DB posture, partition & bridge) \[Required‑Now\]
 
 **Scope (normative).** Database mechanics for schema identity, runtime posture, partition stance, and bridge parity. Artifact schemas and indexing live in HDE‑Schemas & Artifacts; governance tokens live in HDE‑Governance and the Build Notes. PF14 owns the mechanics that produce and prove the posture.
 
-### **20.1 DB posture mechanics (build‑time identity)**
+## 20.1 DB posture mechanics (build‑time identity)
 
 **Objective.** Capture the runtime DB schema, roles/grants, and boundary view posture in a deterministic way.
 
@@ -1590,7 +2165,7 @@ All posture captures MUST:
 
 * Remain secret‑free; logs and artifacts contain no credentials.
 
-  ### **20.2 Partition mechanics (EPIC‑011)**
+  ## 20.2 Partition mechanics (EPIC‑011)
 
 **Objective.** Enforce EPIC‑011’s non‑deferred partition stance under standard artifact paths.
 
@@ -1606,7 +2181,7 @@ The partition harness MUST produce:
 
 For EPIC‑011 there is **no** “defer partition” token: both a partition plan and verify log are required. Semantics of `PARTITION_PLAN_OK` remain defined in Governance/infra docs; PF14 owns the mechanics that generate these artifacts.
 
-### **20.3 Bridge parity mechanics**
+## 20.3 Bridge parity mechanics
 
 **Objective.** Prove parity between direct DB reads and bridge‑mediated reads and capture env connectivity posture.
 
@@ -1630,11 +2205,11 @@ Bridge parity and env connectivity artifacts are indexed via HDE‑Schemas & Art
 
 ---
 
-## **21\) BodyGraph refresh worker (dev‑only; policy‑aligned) \[Required‑Now\]**
+# 21\) BodyGraph refresh worker (dev‑only; policy‑aligned) \[Required‑Now\]
 
 **Role.** `scripts/bodygraph/run_refresh_worker.py` is a dev‑only worker that refreshes BodyGraphs according to a governed policy. It is not wired into CI; policy and schema are governed by HDE‑Build Notes (ADR/Addenda 44–45) and HDE‑Schemas & Artifacts (snapshot schema).
 
-### **21.1 Policy alignment (v1 schema)**
+## 21.1 Policy alignment (v1 schema)
 
 The worker uses a `POLICY` dict whose structure and values MUST match the ADR and the governed `refresh_policy.snapshot.json` v1 schema:
 
@@ -1648,7 +2223,7 @@ The worker uses a `POLICY` dict whose structure and values MUST match the ADR an
 
 PF14 does not restate specific numeric values; they live in HDE‑Build Notes/ADR and in the snapshot schema in HDE‑Schemas & Artifacts. The worker MUST treat `POLICY` as the single source of truth for its behavior.
 
-### **21.2 Behavior and sample counts**
+## 21.2 Behavior and sample counts
 
 The worker:
 
@@ -1664,7 +2239,7 @@ The worker:
 
 The exact metrics surface and aggregation are governed in infra/ops docs (PF07/PF19); PF14 records that these counts are produced and governed.
 
-### **21.3 Schema stability and coordination**
+## 21.3 Schema stability and coordination
 
 Mechanics MUST ensure:
 
@@ -1682,7 +2257,7 @@ Mechanics MUST ensure:
 
 ---
 
-## **22\) SAFE Rails and Provider Gate**
+# 22\) SAFE Rails and Provider Gate
 
 Refuse outbound/vendor work unless explicitly enabled. Provide open/close hooks for surfaces/providers and a posture sanity script.
 
@@ -1696,7 +2271,7 @@ Policy, SAFE‑rails tokens, and vendor transport matrices remain single‑homed
 
 ---
 
-## **23\) Rate Limit and Backoff Component (429)**
+# 23\) Rate Limit and Backoff Component (429)
 
 **Closed policy (normative)**
 
@@ -1708,15 +2283,15 @@ Policy, SAFE‑rails tokens, and vendor transport matrices remain single‑homed
 
 * **Envelope & logs:** typed, numeric-free error; keys-only diagnostics (no payload bodies or header values; secrets always redacted).
 
-## **24\) Caching and Transport Wiring \[Required-Now\]**
+# 24\) Caching and Transport Wiring \[Required-Now\]
 
-### **24.1 Alpha posture (engine behind the app)**
+## 24.1 Alpha posture (engine behind the app)
 
 * **Compat surfaces.** Return **`200 OK`** deterministic JSON only (no validators).  
 * **No conditionals.** Do **not** implement **304** or **HEAD** in alpha; do **not** attach validators; skip CDN ceremony.  
 * **Determinism.** Canonical JSON (UTF-8 no BOM, sorted keys, compact, exactly one LF); AB↔BA and two-run identity hold (see §10.1 / §4).
 
-  ### **24.2 Production posture (Reader / Compat)**
+  ## 24.2 Production posture (Reader / Compat)
 
 **Scope (normative).** Mechanics wires and verifies runtime transport behavior for **JSON success routes** and companion surfaces. Full matrices live in **HDE-CLI-API-Vendor Ref (Appendix A)**; **A7 proofs run on a Catalog JSON success route** (not `/internal/version`).
 
@@ -1732,34 +2307,34 @@ Policy, SAFE‑rails tokens, and vendor transport matrices remain single‑homed
 
 ---
 
-### **24.3 Proof surface & scope (titles-only routing)**
+## 24.3 Proof surface & scope (titles-only routing)
 
 * **Success route proofs.** Run on a route listed in `docs/ENDPOINTS_CATALOG.json` (**not** `/internal/version`). Include **GET**, **HEAD parity**, **304 omission**, **writers/errors posture**, and **encoding-invariance** captures; **index human \+ machine** in the **same PR**.  
 * **Ops exclusion.** `/internal/version` is operator-only and **not** A7-eligible (see §14 / HDE-Governance §10.5).  
 * **Matrices & bytes.** Owned by **HDE-Governance** / **HDE-CLI-API-Vendor Ref** (titles-only). This guide enforces wiring and evidence.
 
-  ### **24.4 Acceptance (titles-only; token names live in HDE-Governance §2.0)**
+  ## 24.4 Acceptance (titles-only; token names live in HDE-Governance §2.0)
 
 * **A7 success.** Governed by the **A7 token family** (200 `ETag`, HEAD parity, 304 omission, success cache/`Vary`).  
 * **Writers/errors.** Governed by the **writers/error token family** (no-store, no `ETag`, error `Content-Type`).  
 * **POST posture & invariance.** Governed by Governance tokens for **non-conditional POST** and **encoding/header invariance**.
 
-  ### **24.5 Evidence (records-only; path-agnostic; indexed via the machine mirror)**
+  ## 24.5 Evidence (records-only; path-agnostic; indexed via the machine mirror)
 
 * **Single home for titles/paths.** §36 **Documentation Artifacts and Registry** (“Reader success catalog & A7 proofs”).  
 * **Indexing.** List titles/paths in **Appendix D: Evidence Index** and mirror **1:1** in `artifacts/evidence_index.jsonl` (canonical JSONL; one LF; each record includes `artifact_key`, `sha256`, `size_bytes`, `produced_at_utc`, `discovered_physical_path`, `proof_anchor`).  
 * **Same-PR rule.** Update human Index and mirror **in the same commit/PR**; CI enforces parity and path-proofs.
 
-  ### **24.6 Routing (titles-only)**
+  ## 24.6 Routing (titles-only)
 
 * **Transport matrices & header rules.** **HDE-Governance** / **HDE-CLI-API-Vendor Ref**.  
 * **Evidence registry & mirror discipline.** §1.3 and §36.
 
 ---
 
-## 25\) Gate Scripts and Evidence Harness \[Required-Now\]
+# 25\) Gate Scripts and Evidence Harness \[Required-Now\]
 
-### 25.1 Scope & pins (capability-level)
+## 25.1 Scope & pins (capability-level)
 
 Dev/run scripts (or CI jobs) produce **binary acceptance** and **records-only evidence** for the Engine. Script names and locations are implementation-defined (not pinned here).
 
@@ -1783,7 +2358,7 @@ JSON is canonical:
 
   ---
 
-  ### 25.2 What the harness must prove
+  ## 25.2 What the harness must prove
 
 * **Determinism (math & emission)**
 
@@ -1793,7 +2368,8 @@ JSON is canonical:
 
   * Canonical re-serialization byte-compare
 
-  * Preimage → hash → final reproducibility
+  * Preimage → hash → final reproducibility  
+  * **Registry configuration snapshot:** a canonical `registry_report` (`registry_report.v1`) exists at `artifacts/registry/registry_report.json`, generated via the Programmatic Configuration System (§3), and participates in the same two-run identity and canonical-JSON checks as other governed artifacts.
 
     
 
@@ -1861,7 +2437,7 @@ JSON is canonical:
 
   ---
 
-  ### 25.3 Orchestration & ordering
+  ## 25.3 Orchestration & ordering
 
 The harness can be invoked standalone or as part of the sanity pipeline (see §26.5).
 
@@ -1885,7 +2461,7 @@ The harness can be invoked standalone or as part of the sanity pipeline (see §2
 
    ---
 
-   ### 25.4 Acceptance (titles-only; token names live in HDE-Governance §2.0)
+   ## 25.4 Acceptance (titles-only; token names live in HDE-Governance §2.0)
 
 * **Determinism**
 
@@ -1925,7 +2501,7 @@ The harness can be invoked standalone or as part of the sanity pipeline (see §2
 
   ---
 
-  ### 25.5 Evidence & indexing (records-only; machine mirror; same-PR rule)
+  ## 25.5 Evidence & indexing (records-only; machine mirror; same-PR rule)
 
 * **Single home for titles/paths**
 
@@ -1991,7 +2567,7 @@ The harness can be invoked standalone or as part of the sanity pipeline (see §2
 
   ---
 
-  ### 25.6 Routing (titles-only)
+  ## 25.6 Routing (titles-only)
 
 * **Transport matrices & A7 policy**
 
@@ -2013,18 +2589,18 @@ The harness can be invoked standalone or as part of the sanity pipeline (see §2
 
   ---
 
-## **26\) Performance and Load Harness**
+# 26\) Performance and Load Harness
 
 Load tests for Reader, Compat, and Narrative Selection Router (keys-only). Microbenchmarks: `compat()` core computation \+ narrative key lookups.  
  **Outputs:** non-PII bench reports (bounded histograms \+ percentiles), thresholds, and regression flags.  
  **Routing:** SLO targets and failure posture live in Governance (titles only).
 
-## **27\) Release and Provenance Packaging**
+# 27\) Release and Provenance Packaging
 
 **Purpose (normative).** Freeze the engine pack and prove that  
  `release_id = sha256(canonical_bytes("catalog/manifest.json"))`. Mechanics owns the **jobs and evidence**; manifest shape and canonical rules live in **HDE-Schemas and Artifacts** (titles only).
 
-### **27.1 Manifest integrity checks**
+## 27.1 Manifest integrity checks
 
 * **Canonical bytes.** The on-disk `catalog/manifest.json` **equals** its canonical serialization (UTF-8, no BOM; ASCII-sorted keys; compact separators; exactly one trailing `\n`).  
 * **`files[]` order.** Entries are **ASCII-ascending by `path`**; **no duplicates** by `path`.  
@@ -2033,14 +2609,14 @@ Load tests for Reader, Compat, and Narrative Selection Router (keys-only). Micro
 * **Entry identity.** For every `{path, sha256, size}`: `sha256` is **lowercase 64-hex of the artifact’s canonical bytes** and `size` matches those canonical bytes.  
 * **Pins.** All checks run with `LC_ALL=C`, `LANG=C`, `TZ=UTC`.
 
-### **27.2 Recompute `release_id`**
+## 27.2 Recompute `release_id`
 
 1. Read `catalog/manifest.json` in **binary**.  
 2. Re-serialize to **canonical bytes** (see **HDE-Schemas and Artifacts §4**).  
 3. **Verify** on-disk bytes **equal** canonical bytes (fail closed if not).  
 4. Compute SHA-256 over canonical bytes → 64-hex **lowercase**; record as `release_id`.
 
-### **27.3 Evidence & mirror (records-only; same-PR rule)**
+## 27.3 Evidence & mirror (records-only; same-PR rule)
 
 List by **title/path** in **Appendix D: Evidence Index** and mirror **1:1** in `artifacts/evidence_index.jsonl` (each record includes `artifact_key`, `sha256`, `size_bytes`, `produced_at_utc`, `discovered_physical_path`, `proof_anchor`; canonical JSONL; one LF). Update human Index and mirror **in the same commit/PR**; CI fails on mismatch or missing path-proofs.
 
@@ -2051,7 +2627,7 @@ List by **title/path** in **Appendix D: Evidence Index** and mirror **1:1** in `
 
 * `artifacts/bodygraph/release_bindings.json` — `{release_id, data_source_policy, ttl_s, swr_s, snapshot_counts{fresh,swr,refresh_queued}}` (canonical JSON; one LF). *(Human+machine indices updated in the same PR.)*
 
-### **27.4 Acceptance (titles-only; token names live in HDE-Governance §2.0)**
+## 27.4 Acceptance (titles-only; token names live in HDE-Governance §2.0)
 
 * `RELEASE_ID_RECOMPUTE_OK`  
 * `MANIFEST_SHA256_HEX64_OK`  
@@ -2062,13 +2638,7 @@ List by **title/path** in **Appendix D: Evidence Index** and mirror **1:1** in `
 
 **Routing (titles-only).** Manifest shape, canonical JSON rules, and mirror schema: **HDE-Schemas and Artifacts**. Public transport remains in **HDE-CLI-API-Vendor Ref** / **HDE-Governance**.
 
-Great question. The **sanity pipeline** is part of your release/provenance work, so the cleanest place is **inside §26 “Release and Provenance Packaging,” as a new numbered subsection right after 27.4**. That keeps all pack identity chores and the end-of-release checks together, and it complements the high-level pipeline note already in §1.3.
-
-Here’s a paste-ready addition:
-
----
-
-### **27.5 Sanity pipeline (release & provenance) \[Required-Now\]**
+## 27.5 Sanity pipeline (release & provenance) \[Required-Now\]
 
 **Purpose (normative).** Provide a single, scriptable pipeline that verifies the release **end-to-end** and **fails closed** on any drift. It finishes by updating the human index and the machine mirror with **1:1 parity** and **path-proofs**.
 
@@ -2106,16 +2676,16 @@ Here’s a paste-ready addition:
 
 ---
 
-## **28\) Post-deploy Smoke**
+# 28\) Post-deploy Smoke
 
 **Purpose (normative).** Run a minimal, production-against-production verification immediately after deploy. Prove transport correctness on a **cataloged success route**, confirm **writers/errors** posture, verify **internal ops** surface, and spot-check **DB posture**. Mechanics captures artifacts and indexes them in the Evidence Index and machine mirror **in the same commit/PR**.
 
-### **28.1 Scope & pins**
+## 28.1 Scope & pins
 
 * **Environment pins.** All captures/compares run with `LC_ALL=C`, `LANG=C`, `TZ=UTC`.  
 * **Routing.** Transport matrices live in **HDE-CLI-API-Vendor Ref**; `/internal/version` policy in **HDE-Governance §10.5**; DB mechanics in **§20**.
 
-### **28.2 Success route (A7) — transport smoke**
+## 28.2 Success route (A7) — transport smoke
 
 * **Surface.** Use a route listed in the **Endpoint Catalog (JSON success)** (see §9.1).  
 * **Prove (headers-only):**  
@@ -2123,26 +2693,26 @@ Here’s a paste-ready addition:
   * **HEAD parity:** no body; validators mirror 200; **`Content-Type == GET`**; **`Content-Length == identity 200 body`**.  
   * **304:** served **only after** a prior 200; **no body; omit `Content-Type` and `Content-Length`**; validators mirror cached 200\.
 
-### **28.3 Writers & errors — posture smoke**
+## 28.3 Writers & errors — posture smoke
 
 * **Writers/errors:** `Cache-Control: no-store`; **no `ETag`**.  
 * **Errors:** `Content-Type: application/json; charset=utf-8`; typed, numeric-free error bodies (see Vendor Ref error model).
 
-### **28.4 Internal ops `/internal/version` — ops-only smoke**
+## 28.4 Internal ops `/internal/version` — ops-only smoke
 
 * **GET 200:** JSON UTF-8; `Cache-Control: no-store`; **no `ETag`**; `Last-Modified` absent; `Vary` optional.  
 * **HEAD 200:** mirrors GET validators; **no body**; **`Content-Length == identity GET body`**; **`Content-Type == GET`**.  
 * **Conditionals:** `If-None-Match` / `If-Modified-Since` **ignored**; **never 304**.  
 * **A7:** **not** a success route; **exclude** from A7 proofs.
 
-### **28.5 Database posture — live checks**
+## 28.5 Database posture — live checks
 
 * **search\_path:** prove `hde, public` (unquoted, in that order).  
 * **Roles/grants:** least-privilege at runtime (snapshot grants/constraints).  
 * **Schema identity:** normalized DDL fingerprint captured (see §20.1).  
 * **(Optional) RW smoke:** insert→delete round-trip against a scratch table (job-profile gated).
 
-### **28.6 Evidence (records-only; machine mirror; same-PR rule)**
+## 28.6 Evidence (records-only; machine mirror; same-PR rule)
 
 List by **title/path** in **Appendix D: Evidence Index** and mirror **1:1** in `artifacts/evidence_index.jsonl` (each record: `artifact_key`, `sha256`, `size_bytes`, `produced_at_utc`, `discovered_physical_path`, `proof_anchor`; canonical JSONL; one LF).
 
@@ -2172,7 +2742,7 @@ List by **title/path** in **Appendix D: Evidence Index** and mirror **1:1** in `
 
 * `artifacts/proofs/env_pins.txt`
 
-  ### **28.7 Acceptance (titles-only; tokens live in HDE-Governance §2.0)**
+  ## 28.7 Acceptance (titles-only; tokens live in HDE-Governance §2.0)
 
 * **Success route (A7).** Governed by the **A7 token family** in Governance (200 `ETag`, HEAD parity, 304 omission, success cache/`Vary`).  
 * **Writers/errors.** Governed by the **writers/error token family** (no-store, no `ETag`, error `Content-Type`).  
@@ -2184,7 +2754,7 @@ This guide asserts capability-level conformance and **routes all token names to 
 
 ---
 
-## **29\) Server Cache (Production) — rolled in**
+# 29\) Server Cache (Production) — rolled in
 
 **Purpose.** Optional, private, composite-key cache for **Reader** and **Compat** that preserves A7 transport rules and deterministic invalidation.
 
@@ -2213,19 +2783,10 @@ This guide asserts capability-level conformance and **routes all token names to 
 
 * **Default OFF.** Enable via a runtime flag.  
 * **Metrics.** Emit counters for **hits**, **misses**, **invalidations**.  
-* **Diagnostics (optional).** A keyed, redaction-safe debug log of cache decisions for local analysis (titles-only in indices).
+* **Diagnostics (optional).** A keyed, redaction-safe debug log of cache decisions for local analysis (titles-only in indices).  
+  ---
 
-  ### **Acceptance (titles-only; token names live in HDE-Governance §2.0)**
-
-* **A7 transport preserved:** `A7_GET_QUOTED_ETAG_OK`, `A7_HEAD_PARITY_OK`, `A7_304_OMITS_CT_CL_OK`, `A7_VARY_AUTH_AE_OK`, `A7_ENCODING_INVARIANCE_OK`.  
-* **Correctness:** deterministic composite keys; **no stale bytes** after invalidation.  
-* **Performance posture:** hit-ratio and latency guardrails met under load (titles-only; perf jobs live outside this guide).
-
-*Proof surface reminder:* A7 proofs run on a **Catalog JSON success** route (see §9.1); caching must **not** change transport bytes or success/conditional behavior.
-
----
-
-## **30\) Observability (Logs and Metrics)**
+# 30\) Observability (Logs and Metrics)
 
 **Logging (keys-only)**
 
@@ -2245,7 +2806,7 @@ This guide asserts capability-level conformance and **routes all token names to 
 * **Gauges:** staleness percentage.  
 * **Evidence:** `artifacts/bodygraph/metrics.snapshot.json` (keys-only, canonical JSON, single LF).
 
-## **31\) Security Posture**
+# 31\) Security Posture
 
 **Controls**
 
@@ -2272,11 +2833,11 @@ This guide asserts capability-level conformance and **routes all token names to 
 * Keys-only logs; no raw birth data; no vendor payloads; secrets never logged  
 * Provide a sanitized sample: `artifacts/bodygraph/keys_only.logs.sample`
 
-## **32\) Packaging and Runtime \[Required-Now\]**
+# 32\) Packaging and Runtime \[Required-Now\]
 
 **Scope.** Container packaging and runtime posture for the HD Engine. Mechanics owns image/process hardening, config plumbing, health/ready behavior, and operational guardrails. Public bytes, schemas, and transport matrices are referenced by title only. All byte-sensitive checks run with `LC_ALL=C`, `LANG=C`, `TZ=UTC`.
 
-### **32.1 Image & process posture**
+## 32.1 Image & process posture
 
 * **Deterministic build.** Reproducible container image; pin base; lock package indexes; emit SBOM.  
 * **Least privilege.** Run as non-root; drop Linux capabilities; prefer read-only root FS with writable tmp/cache only if required.  
@@ -2284,7 +2845,7 @@ This guide asserts capability-level conformance and **routes all token names to 
 * **Locale pins.** Export `LC_ALL=C`, `LANG=C`, `TZ=UTC` for all emit/compare paths to preserve byte identity.  
 * **Resource limits.** Set CPU/memory limits and graceful shutdown (SIGTERM → drain → exit 0).
 
-### **32.1A Start command & service factory \[Required-Now\]**
+## 32.1A Start command & service factory \[Required-Now\]
 
 **Purpose (normative).** Capture the exact production start command and prove the app factory binds to **`$PORT`**.
 
@@ -2292,14 +2853,14 @@ This guide asserts capability-level conformance and **routes all token names to 
 * **Factory binding to `$PORT`.** Prove the service initializes via the factory `adapter.factory:create_app()` (titles only) and binds to **`$PORT`** from the environment (no hard-coded port).  
 * **Runtime pins (minimal).** Record `PORT`, `APP_ENV`, and identity pins required for traceability as a keys-only text snapshot (UTF-8; one `\n`). *(Evidence path listed in §36.)*
 
-### **32.2 Configuration & environment**
+## 32.2 Configuration & environment
 
 * **Typed config at build.** Generate a typed runtime config artifact at build (defaults, switches, A7 posture) and vendor it into the image.  
 * **Env allow-list (secrets/coordinates only).** Only read whitelisted keys at startup: `SAFE_MODE`, `ALLOW_NETWORK`, `HDAPI_BASE_URL`, `HD_API_KEY` (secret), `GEO_API_KEY` (secret), `PORT`, and explicitly documented toggles.  
 * **Fail-closed on unknowns.** Unknown env keys or malformed values fail fast; do not partially boot.  
 * **Rails posture.** Rails defaults derive from the **Env Deployment Inventory** (titles-only): **dev & stage OPEN**, **prod CLOSED**, **CI CLOSED**. In CI, any job that opens rails must pin policy and index governed evidence **in the same PR**. Determinism pins (`LC_ALL=C`, `LANG=C`, `TZ=UTC`) apply in **all** environments that produce governed bytes.
 
-### **32.3 Health/ready & lifecycle**
+## 32.3 Health/ready & lifecycle
 
 * **HTTP probes.**  
    `/healthz`: liveness (process up, core initialized).  
@@ -2307,19 +2868,19 @@ This guide asserts capability-level conformance and **routes all token names to 
 * **Probe bytes.** Minimal, numeric-free JSON; canonicalized (UTF-8/no BOM, sorted keys, compact, one LF).  
 * **Graceful shutdown.** Stop accepting traffic on TERM; complete in-flight; emit final health with `status:"stopping"`; exit cleanly.
 
-### **32.4 Security & observability**
+## 32.4 Security & observability
 
 * **Keys-only logs.** No payload or header values in logs; secrets always REDACTED; bounded labels (route, outcome, rails\_state, timeout\_profile, attempt\_idx).  
 * **Metrics (bounded).** Counters/timers/histograms for engine/presenter latency and transport outcomes; no PII.  
 * **Tracing.** Optional `correlation_id` (non-PII) with bounded cardinality.
 
-### **32.5 Transport & identity (titles-only)**
+## 32.5 Transport & identity (titles-only)
 
 * **Reader A7 (public).** See **HDE-CLI-API-Vendor Ref** and **HDE-Governance** (ETag over LF-terminated body; `Vary` policy; 304 omits `Content-Type` and `Content-Length`; HEAD parity; POST non-conditional).  
 * **Internal ops `/internal/version`.** Operator-only; `Cache-Control: no-store`; **no `ETag`**; HEAD parity; conditionals ignored; body includes `engine_tag`, `release_id`, `invocation_tag`, `emitter_sha256`, optional `build_commit` (see §14).  
 * **Identity.** `release_id` from canonical manifest (**HDE-Schemas and Artifacts §6**); `invocation_tag` participates in preimage (**HDE-Math-Spec §3**); presenter uses canonical serializer (§4).
 
-### **32.6 Acceptance (binary)**
+## 32.6 Acceptance (binary)
 
 * **Image & user.** SBOM produced; runs as non-root; read-only FS validated at runtime.  
 * **Config discipline.** Only allow-listed env consumed; unknowns fail; typed config present; SAFE rails ON by default.  
@@ -2333,7 +2894,7 @@ This guide asserts capability-level conformance and **routes all token names to 
  `DB_CONN_ENV_OK` *(if DB env validated here)*,  
  plus any applicable transport/ops tokens referenced by §14 and §9.
 
-### **32.7 Evidence (titles/paths only)**
+## 32.7 Evidence (titles/paths only)
 
 **Single home for artifact titles/paths.** Do **not** pin file paths here. The authoritative registry of artifacts and their titles/paths lives in **§36 Documentation Artifacts and Registry**. Mechanics **MUST**:
 
@@ -2347,7 +2908,7 @@ This guide asserts capability-level conformance and **routes all token names to 
 
 ---
 
-## **33\) SDKs (Client Libraries) — rolled in**
+# 33\) SDKs (Client Libraries) — rolled in
 
 Client libraries use the allow-listed presenter-emitter and enforce transport rules.
 
@@ -2380,7 +2941,7 @@ Client libraries use the allow-listed presenter-emitter and enforce transport ru
 * `conditionalGetHelper` sends `If-None-Match` and handles `304` semantics exactly (no body, omit `Content-Type`, `Content-Length 0/absent`).  
 * Python SDK parity tests pass for bytes and ordering across all three calls.
 
-## **34\) Dev HTTP Harness (single home)**
+# 34\) Dev HTTP Harness (single home)
 
 Dev-only; bound to `127.0.0.1`; not public; CORS disabled; `APP_ENV=dev`; debug reloader **off** during captures. Emits canonical JSON via the allow-listed presenter-emitter (§4/§8).
 
@@ -2428,229 +2989,367 @@ curl \-s http://127.0.0.1:5000/api/sample/v1 \-H 'Content-Type: application/json
 
   \-X POST \-d '{"viewer\_prefs":{…},"seed":12345}' | jq .
 
-## **35\) Runbooks (Operations)**
+# 35\) Runbooks (Operations)
 
 Runbooks for elevated 5xx, slow Reader/Compat, stuck queue, DB lag. Fast rollback \+ data safety notes.  
  **Pointers:** rollback uses pointer-flip to last known-good `release_id` (titles only).
 
-## **36\) Dashboards and Alerts**
+# 36\) Dashboards and Alerts
 
 Dashboards for Reader, Compat, Narrative Router, and Server Cache latencies, error rates, hit/miss, and rate-limits. Actionable alerts for error spikes and budget breaches.  
  **Notes:** include A7 headers health and cache hit ratio panels.
 
 ---
 
-## 37\) Documentation Artifacts and Registry \[Required-Now\]
-
-### Purpose
+# 37\) Documentation Artifacts and Registry \[Required-Now\] 
 
 Registry for small, deterministic documentation artifacts and gate evidence. Titles-only cross-refs; bytes live in files. Mechanics keeps the human index and the machine mirror in lockstep (same-PR rule).
 
-### Governance note
+---
 
-Governed paths only; transient generator paths (for example, `codex/out/**`) are not authoritative and **MUST NOT** be indexed.
+## 37.1 Purpose & scope
 
-### Homes
+* Provide a **single registry** for governed documentation artifacts and gate evidence.
 
-* `/artifacts` — public documentation snapshots and pack/identity evidence.
+* Keep **Human Index** and **Machine Mirror** in 1:1 parity, updated in the **same commit/PR**.
 
-* `/audit/gates` — gate evidence produced by §24 scripts (bands / canonical / props / etc.).
+* Act only on **governed paths**; transient generator outputs are never authoritative.
 
-* Human Index (single home): `docs/evidence/INDEX.json` (titles/paths only; no bytes).
+---
 
-* Machine Mirror (single home): `artifacts/evidence_index.jsonl` (records-only JSONL; one LF).
+## 37.2 Governance & homes
 
-### Conventions
+* **Governed paths only**
+
+  * `/artifacts/**` — public documentation snapshots and pack/identity evidence.
+
+  * `/audit/gates/**` — gate evidence produced by §24 scripts (bands / canonical / props / etc.).
+
+  * Transient generator paths (for example, `codex/out/**`) are **not authoritative** and **MUST NOT** be indexed.
+
+* **Human Index (single home)**
+
+  * `docs/evidence/INDEX.json` — titles/paths only; no payload bytes.
+
+* **Machine Mirror (single home)**
+
+  * `artifacts/evidence_index.jsonl` — records-only JSONL; one LF per record.
+
+---
+
+## 37.3 Conventions
 
 * Deterministic filenames (lowercase, stable tokens).
 
-* Extensions: `.json`, `.log`, `.txt`, `.bytes`.
+* Allowed extensions: `.json`, `.log`, `.txt`, `.bytes`.
 
-* Text artifacts end with exactly one trailing LF (`\n`).
+* Text artifacts end with **exactly one trailing LF** (`\n`).
 
-* JSON is canonical (UTF-8, no BOM, ASCII-sorted keys, compact, one LF).
+* JSON is **canonical**:
+
+  * UTF-8, no BOM
+
+  * ASCII-sorted keys
+
+  * compact (no pretty-printing)
+
+  * exactly one trailing LF
 
 * `.bytes` files mirror the exact body bytes (including the body’s own trailing LF, if present).
 
 * Header snapshots follow §4.3 normalization (lower-cased keys, compact, one LF).
 
-### Mirror (records-only)
+---
 
-Every artifact listed here must have a 1:1 record in `artifacts/evidence_index.jsonl` (canonical JSONL; one LF) with:
+## 37.4 Machine Mirror (records-only)
 
-* `artifact_key`
+Every artifact listed in this registry **MUST** have a 1:1 record in `artifacts/evidence_index.jsonl`:
 
-* `role`
+* Required fields per record:
 
-* `sha256`
+  * `artifact_key`
 
-* `size_bytes`
+  * `role`
 
-* `produced_at_utc`
+  * `sha256`
 
-* `discovered_physical_path`
+  * `size_bytes`
 
-* `proof_anchor` (path-proof transcript)
+  * `produced_at_utc`
 
-Unknown keys are rejected. Update the Human Index and the machine mirror in the same commit/PR.
+  * `discovered_physical_path`
 
-**Exact field order (normative).** Mirror records use:
+  * `proof_anchor` (path-proof transcript)
 
-* `artifact_key`
+* **Exact field order (normative)**
 
-* `discovered_physical_path`
+  * `artifact_key`
 
-* `produced_at_utc`
+  * `discovered_physical_path`
 
-* `proof_anchor`
+  * `produced_at_utc`
 
-* `role`
+  * `proof_anchor`
 
-* `sha256`
+  * `role`
 
-* `size_bytes`
+  * `sha256`
 
-with:
+  * `size_bytes`
 
-* sort-before-write
+* **Discipline**
 
-* unknown-key reject
+  * Sort-before-write by `(artifact_key, discovered_physical_path)`.
 
-* one LF per record
+  * Unknown keys are **rejected**.
 
-**Acceptance:** `MACHINE_MIRROR_UPDATED_OK · CI_CHECK_MIRROR_SCHEMA_OK · CI_CHECK_FINAL_LF_OK` (plus index parity tokens already listed).
+  * One LF per record; no blank lines.
 
-### Required captures (titles/paths only)
+  * Update the Human Index and Machine Mirror in the **same commit/PR**.
 
-#### Reader success catalog & A7 proofs
+* **Acceptance tokens (titles-only)**
 
-* Catalog: `docs/ENDPOINTS_CATALOG.json` (+ `docs/ENDPOINTS_CATALOG.json.sha256`)
+  * `MACHINE_MIRROR_UPDATED_OK`
 
-* Env-gate proof: `artifacts/proofs/endpoints_env_gate_proof.log` (proves non-prod entries are unreachable in prod)
+  * `CI_CHECK_MIRROR_SCHEMA_OK`
 
-* Success GET proof: `artifacts/proofs/success_get.txt`
+  * `CI_CHECK_FINAL_LF_OK`
 
-* Success HEAD parity proof: `artifacts/proofs/success_head.txt`
+  * (plus index parity tokens already listed elsewhere: `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_HASH_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`)
 
-* Success 304 omission proof: `artifacts/proofs/success_304.txt` (omits Content-Type and Content-Length)
+---
 
-* Writers/Errors posture proof: `artifacts/proofs/success_writers_errors.txt`
+## 37.5 Required captures — Reader success catalog & A7 proofs
 
-* (Optional) Encoding-invariance proof: `artifacts/proofs/encoding_invariance.txt`
+* **Catalog**
 
-#### **`Serializer / Emitter guards`**
+  * `docs/ENDPOINTS_CATALOG.json`
 
-`* Grep guard (no ad-hoc serializers on public paths): artifacts/cli/guards/serializer_grep_guard.log`  
- `* Shared presenter/emitter symbol proof: artifacts/cli/guards/emitter_symbol_proof.txt`
+  * `docs/ENDPOINTS_CATALOG.json.sha256`
 
-**`NEW CANON — Serializer / emitter guard homes (EPIC017 and onward).`**
+* **Env-gate proof**
 
-1. `The canonical location for CLI serializer/emitter guard artifacts is:`  
-    `artifacts/cli/guards/serializer_grep_guard.log and`  
-    `artifacts/cli/guards/emitter_symbol_proof.txt.`
+  * `artifacts/proofs/endpoints_env_gate_proof.log`
 
-2. `These are the paths of record for Phase I serializer work, EPIC017 acceptance, and evidence indexing. The Evidence Index and machine mirror MUST use these paths as the discovered_physical_path for the corresponding records.`
+    * Proves non-prod entries are unreachable in prod.
 
-3. `For backward compatibility, implementations MAY also write copies under audit/gates/guards/… for internal audit workflows. Those locations are secondary and are not required for mechanic-level acceptance.`
+* **Success route proofs**
 
-4. `Future PF documents and epic records that reference these guard artifacts SHOULD use the artifacts/cli/guards/… paths and treat audit/gates/guards/… as historical/auxiliary only.`
+  * `artifacts/proofs/success_get.txt` — GET 200 proof.
 
-#### CLI parity & determinism (public bytes)
+  * `artifacts/proofs/success_head.txt` — HEAD 200 parity proof.
 
-* AB ↔ BA goldens:
+  * `artifacts/proofs/success_304.txt` — 304 omission proof (omits `Content-Type` and `Content-Length`).
+
+  * `artifacts/proofs/success_writers_errors.txt` — writers/errors posture proof.
+
+  * *(Optional)* `artifacts/proofs/encoding_invariance.txt` — encoding-invariance proof.
+
+---
+
+## 37.6 Serializer / emitter guards
+
+* **Grep guard (no ad-hoc serializers on public paths)**
+
+  * `artifacts/cli/guards/serializer_grep_guard.log`
+
+* **Shared presenter/emitter symbol proof**
+
+  * `artifacts/cli/guards/emitter_symbol_proof.txt`
+
+**NEW CANON — Serializer / emitter guard homes (EPIC017 and onward).**
+
+* Canonical locations:
+
+  * `artifacts/cli/guards/serializer_grep_guard.log`
+
+  * `artifacts/cli/guards/emitter_symbol_proof.txt`
+
+* These are the **paths of record** for:
+
+  * Phase I serializer work,
+
+  * EPIC017 acceptance, and
+
+  * evidence indexing.
+
+* The Evidence Index and Machine Mirror **MUST** use these paths as `discovered_physical_path` for the corresponding records.
+
+* For backward compatibility:
+
+  * Implementations **MAY** also write copies under `audit/gates/guards/**` for internal audit workflows.
+
+  * Those locations are **secondary** and not required for mechanics-level acceptance.
+
+* Future PF docs and epic records that reference these guard artifacts **SHOULD** use `artifacts/cli/guards/**` paths and treat `audit/gates/guards/**` as historical/auxiliary only.
+
+---
+
+## 37.7 CLI parity & determinism (public bytes)
+
+* **AB ↔ BA goldens**
 
   * `artifacts/cli/ab.json`
 
-  * `artifacts/cli/ba.json`  
-     (LF-terminated, canonical JSON; BA must be byte-identical to AB)
+  * `artifacts/cli/ba.json` — LF-terminated canonical JSON; BA must be **byte-identical** to AB.
 
-* Parity summary: `artifacts/cli/summary.json` (attempted commands, sha256 of AB/BA, `ab_ba_equal: true`)
+* **Parity summary**
 
-* Two-run marker: `artifacts/cards/A3/IDENTITY_OK.txt`
+  * `artifacts/cli/summary.json` — canonical JSON with:
 
-* Canonical compare: `audit/gates/canonical/json_canon_compare.log`
+    * attempted commands,
 
-#### CLI Admin Preview (narrative)
+    * sha256 of AB/BA,
 
-* `artifacts/cli/narrative/stdout.txt` — LF-terminated text (no ANSI)
+    * `ab_ba_equal: true`.
 
-* `artifacts/cli/narrative/sidecar.json` — ids-only canonical JSON (no prose)
+* **Two-run marker**
 
-Index both in the human index and the machine mirror in the same PR.
+  * `artifacts/cards/A3/IDENTITY_OK.txt`
 
-#### Canonical JSON checks
+* **Canonical compare**
 
-* Policy check: `audit/gates/canonical/json_canonical_check.log`
+  * `audit/gates/canonical/json_canon_compare.log`
 
-* Canonical re-serialization compare: `audit/gates/canonical/json_canon_compare.log`
+---
 
-#### Bands edges (inclusive-high)
+## 37.8 CLI Admin Preview (narrative)
 
-* Edges snapshot: `audit/gates/bands/edges.snapshot.json`
+* `artifacts/cli/narrative/stdout.txt` — LF-terminated text (no ANSI).
 
-* Edges diff: `audit/gates/bands/edges.diff.json`
+* `artifacts/cli/narrative/sidecar.json` — ids-only canonical JSON (no prose).
 
-#### Pack identity & provenance
+Both **must** be indexed in the Human Index and Machine Mirror in the same PR.
 
-* Evidence copy of manifest: `artifacts/math/freeze_pack_manifest.json`
+---
 
-* Recomputed `release_id`: `artifacts/math/release_id.txt`
+## 37.9 Canonical JSON checks
 
-* Recompute log: `artifacts/math/release_id_recompute.log`
+* **Policy check**
 
-* Checksums audit: `artifacts/math/checksums_audit.log`
+  * `audit/gates/canonical/json_canonical_check.log`
 
-* (Optional) SBOM (CycloneDX) \+ hash:
+* **Canonical re-serialization compare**
+
+  * `audit/gates/canonical/json_canon_compare.log`
+
+---
+
+## 37.10 Bands edges (inclusive-high)
+
+* **Edges snapshot**
+
+  * `audit/gates/bands/edges.snapshot.json`
+
+* **Edges diff**
+
+  * `audit/gates/bands/edges.diff.json`
+
+---
+
+## 37.11 Pack identity & provenance
+
+* **Evidence copy of manifest**
+
+  * `artifacts/math/freeze_pack_manifest.json`
+
+* **Recomputed release\_id**
+
+  * `artifacts/math/release_id.txt`
+
+* **Recompute log**
+
+  * `artifacts/math/release_id_recompute.log`
+
+* **Checksums audit**
+
+  * `artifacts/math/checksums_audit.log`
+
+* *(Optional) SBOM (CycloneDX) \+ hash*
 
   * `sbom/cyclonedx.json`
 
   * `sbom/cyclonedx.json.sha256`
 
-#### Identity & Math
+---
 
-* Service identity (admin JSON): `artifacts/identity/service_identity.json`
+## 37.12 Identity & Math
 
-* Emitter SHA-256: `artifacts/identity/emitter_sha256.txt`
+* **Service identity (admin JSON)**
 
-#### Internal-ops `/internal/version` snapshots
+  * `artifacts/identity/service_identity.json`
 
-* GET headers: `artifacts/ops/internal_version/headers_get.txt`
+* **Emitter SHA-256**
 
-* HEAD headers: `artifacts/ops/internal_version/headers_head.txt`
+  * `artifacts/identity/emitter_sha256.txt`
 
-* Cond: If-None-Match: `artifacts/ops/internal_version/cond_if_none_match_headers.txt`
+---
 
-* Cond: If-Modified-Since: `artifacts/ops/internal_version/cond_if_modified_since_headers.txt`
+## 37.13 Internal-ops `/internal/version` snapshots
 
-* Body (JSON): `artifacts/ops/internal_version/body_get.json`
+* **GET headers**
 
-* Body SHA-256: `artifacts/ops/internal_version/body_get.sha256`
+  * `artifacts/ops/internal_version/headers_get.txt`
 
-* Provenance note: `artifacts/ops/internal_version/provenance_note.md`
+* **HEAD headers**
 
-#### Database proofs & ops pins
+  * `artifacts/ops/internal_version/headers_head.txt`
 
-* DDL snapshot: `artifacts/db/ddl_fingerprint.json`
+* **Conditional headers**
 
-* Grants/constraints checks:
+  * `artifacts/ops/internal_version/cond_if_none_match_headers.txt`
+
+  * `artifacts/ops/internal_version/cond_if_modified_since_headers.txt`
+
+* **Body & hash**
+
+  * `artifacts/ops/internal_version/body_get.json`
+
+  * `artifacts/ops/internal_version/body_get.sha256`
+
+* **Provenance note**
+
+  * `artifacts/ops/internal_version/provenance_note.md`
+
+---
+
+## 37.14 Database proofs & ops pins
+
+* **DDL snapshot**
+
+  * `artifacts/db/ddl_fingerprint.json`
+
+* **Grants/constraints checks**
 
   * `artifacts/db/grants.txt`
 
   * `artifacts/db/check_constraints.txt`
 
-* Schema check: `artifacts/db/check_schema.txt`
+* **Schema check**
 
-* Partition plan: `artifacts/db/partition_plan.txt`
+  * `artifacts/db/check_schema.txt`
 
-* Start command capture: `artifacts/proofs/start_command_capture.txt`
+* **Partition plan**
 
-* Environment pins: `artifacts/proofs/env_pins.txt`
+  * `artifacts/db/partition_plan.txt`
 
-#### BodyGraph proofs
+* **Start command capture**
 
-* Source selection snapshot: `artifacts/bodygraph/source_selection.snapshot.json`
+  * `artifacts/proofs/start_command_capture.txt`
 
-* Source invariance:
+* **Environment pins**
+
+  * `artifacts/proofs/env_pins.txt`
+
+---
+
+## 37.15 BodyGraph proofs
+
+* **Source selection snapshot**
+
+  * `artifacts/bodygraph/source_selection.snapshot.json`
+
+* **Source invariance**
 
   * `artifacts/bodygraph/source_invariance/ab.json`
 
@@ -2658,35 +3357,69 @@ Index both in the human index and the machine mirror in the same PR.
 
   * `artifacts/bodygraph/source_invariance/summary.json`
 
-* Refresh policy: `artifacts/bodygraph/refresh_policy.snapshot.json`
+* **Refresh policy**
 
-* Metrics: `artifacts/bodygraph/metrics.snapshot.json`
+  * `artifacts/bodygraph/refresh_policy.snapshot.json`
 
-* Sanitized logs sample: `artifacts/bodygraph/keys_only.logs.sample`
+* **Metrics**
 
-* Release bindings: `artifacts/bodygraph/release_bindings.json`
+  * `artifacts/bodygraph/metrics.snapshot.json`
 
-#### Narratives 
+* **Sanitized logs sample**
 
-* Narratives coverage (router):  
-   `audit/gates/narratives/keys_10x4.table.json` (10 categories × 4 bands)
+  * `artifacts/bodygraph/keys_only.logs.sample`
 
-* Aux (EPIC-010 scope; headers-only):
+* **Release bindings**
+
+  * `artifacts/bodygraph/release_bindings.json`
+
+---
+
+## 37.16 Narratives
+
+* **Narratives coverage (router)**
+
+  * `audit/gates/narratives/keys_10x4.table.json` — 10 categories × 4 bands.
+
+* **Aux (EPIC-010 scope; headers-only)**
 
   * `tests/transport/headers/aux_text_200.snap`
 
-  * `tests/transport/headers/aux_suppression_200.snap`  
-     (No Aux HEAD/304 captures in EPIC-010; A7 remains Catalog-only.)
+  * `tests/transport/headers/aux_suppression_200.snap`
 
-#### Architecture capture
+* *(No Aux HEAD/304 captures in EPIC-010; A7 remains Catalog-only.)*
 
-* Snapshot path root: `audit/gates/arch/_arch/<epic>_<ts>/…`
+---
 
-## **Index and synchronization**
+## 37.17 Architecture capture
 
-* Human index: `docs/evidence/INDEX.json` (titles/paths only).
+* **Snapshot root**
 
-* Machine mirror: `artifacts/evidence_index.jsonl` (records-only JSONL).
+  * `audit/gates/arch/_arch/<epic>_<ts>/…`
 
-* Same-PR rule: Any addition, removal, or relocation here must update both indices in the same commit/PR. CI enforces human↔machine 1:1 parity, canonical JSONL, unknown-key rejection, and path-proofs.
+---
+
+## 37.18 Index & synchronization
+
+* **Human Index**
+
+  * `docs/evidence/INDEX.json` — titles/paths only.
+
+* **Machine Mirror**
+
+  * `artifacts/evidence_index.jsonl` — records-only JSONL.
+
+* **Same-PR rule**
+
+  * Any addition, removal, or relocation in this registry **must** update both Index and Mirror in the same commit/PR.
+
+  * CI enforces:
+
+    * Human↔machine 1:1 parity,
+
+    * canonical JSONL,
+
+    * unknown-key rejection,
+
+    * presence and correctness of path-proofs.
 

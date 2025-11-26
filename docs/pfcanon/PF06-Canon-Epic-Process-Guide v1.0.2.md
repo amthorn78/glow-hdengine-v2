@@ -2,13 +2,13 @@
 
 **Title:** PF06-Canon-Epic-Process-Guide 
 
-**Version:** v1.0
+**Version:** v1.0.2
 
 **Status:** Canon
 
-**Effective date**: 2025-11-17
+**Effective date**: 2025-11-25
 
-**Last Update Gate:** BN 7.1 Drain
+**Last Update Gate:** BN 7.7.8 Drain A13
 
 **tag:** INV-f2ac55d77ce9aacc
 
@@ -39,23 +39,125 @@ You can paste this straight into your PF06 source and let Docs interpret `##` as
 
 ## **0.2 Policy and principles**
 
-PR-first via CodEx. CodEx opens the PR automatically (one PR per epic or slice), pushes code plus Doc-Delta (repo docs) and both evidence indices (human `docs/evidence/INDEX.json` and machine `artifacts/evidence_index.jsonl`). The Lead Developer gates; the Product Owner is the sole merger and uses squash on PASS. Agents do not run git and do not create PRs. The main branch is protected with required checks; squash is the only merge mode. Re-run proofs only on qualifying drift (green-freeze).
+**PR-first via CodEx.**  
+ CodEx opens PRs automatically for each epic slice and pushes:
 
-Evidence parity in the same PR. Whenever proofs or artifacts change, update the human Evidence Index, the hash sentinel, and the machine JSONL mirror in the same PR. The machine mirror is records-only, canonical JSONL (UTF-8, sorted keys, compact, exactly one trailing LF) and rejects unknown keys. Each mirror record includes `artifact_key`, `role`, `sha256`, `size_bytes`, `produced_at_utc`, `discovered_physical_path`, and a `proof_anchor` to a co-located path-proof.
+* Code changes
 
-A7 proof surface (when applicable). Run HTTP success-path proofs only on a cataloged JSON success route from the Endpoint Catalog. The `/internal/version` endpoint is ops-only and not A7-eligible.
+* Doc-Delta updates (repo docs)
 
-Single homes.  
- Public transport & CLI/Reader bytes → HDE-CLI-API-Vendor-Ref.  
- Governance & token semantics → HDE-Governance.  
- Deterministic serializer/idempotence → HDE-Math-Spec.  
- Architecture & single-emitter rules → HDE Architecture.  
- Evidence index & mirror schema → HDE-Schemas & Artifacts.
+* Both evidence indices:
 
-Baseline PR tokens (titles-only).  
- PR\_OPENED\_OK, TESTS\_PASS\_OK, DOC\_DELTA\_PRESENT\_OK, EVIDENCE\_INDEX\_UPDATED\_OK, EVIDENCE\_INDEX\_HASH\_OK, MACHINE\_MIRROR\_UPDATED\_OK.
+  * Human: `docs/evidence/INDEX.json`
 
-Deprecation. The legacy card\_close script is retired and not authoritative.
+  * Machine: `artifacts/evidence_index.jsonl`
+
+Implementation Agent analyzes PR bundles and produces PF-canon Doc Deltas.
+
+* An epic **MAY** be delivered in a series of PRs (up to **10 PRs per epic**), each PR carrying a coherent slice of work with its own code \+ evidence parity.
+
+* The **Lead Developer** gates; the **Product Owner** is the sole merger and uses **squash on PASS**.
+
+* Agents do **not** run git and do **not** create PRs.
+
+* The `main` branch is protected with required checks; **squash is the only merge mode**.
+
+* Re-run proofs only on qualifying drift (**green-freeze**).
+
+---
+
+**Evidence parity in the same PR.**  
+ Whenever proofs or artifacts change, update in the **same PR**:
+
+* The human Evidence Index (`docs/evidence/INDEX.json`)
+
+* The hash sentinel
+
+* The machine JSONL mirror (`artifacts/evidence_index.jsonl`)
+
+The machine mirror is:
+
+* Records-only
+
+* Canonical JSONL (UTF-8, sorted keys, compact, exactly one trailing LF)
+
+* Strict: rejects unknown keys
+
+Each mirror record includes:
+
+* `artifact_key`
+
+* `role`
+
+* `sha256`
+
+* `size_bytes`
+
+* `produced_at_utc`
+
+* `discovered_physical_path`
+
+* `proof_anchor` (to a co-located path-proof)
+
+---
+
+**A7 proof surface (when applicable).**
+
+* Run HTTP success-path proofs **only** on a cataloged JSON success route from the **Endpoint Catalog**.
+
+* The `/internal/version` endpoint is **ops-only** and **not A7-eligible**.
+
+---
+
+**Single homes.**
+
+* **Public transport & CLI/Reader bytes** → *HDE-CLI-API-Vendor-Ref*.
+
+* **Governance & token semantics** → *HDE-Governance*.
+
+* **Deterministic serializer/idempotence** → *HDE-Math-Spec*.
+
+* **Architecture & single-emitter rules** → *HDE Architecture*.
+
+* **Evidence index & mirror schema** → *HDE-Schemas & Artifacts*.
+
+* **Infra and environment names** → *Glow Infrastructure*.
+
+For HD Engine epics:
+
+* “Prod” is the **production HD Engine service and its production database** as defined in *Glow Infrastructure*.
+
+* PF06 does **not** redefine environment semantics and treats those names as the single home.
+
+When epic docs or QA plans talk about **“prod via Codespaces”**:
+
+* They must treat Codespaces as a **QA console** that talks to that production service and DB, **not** as a prod environment in its own right.
+
+* In this guide, “prod via Codespaces” means:
+
+   “Run commands from Codespaces that talk to the production HD Engine service/DB and store QA artifacts in the repo,”  
+   consistent with PF10’s “Prod on Railway, QA via Codespaces” addendum.
+
+---
+
+**Baseline PR tokens (titles-only).**
+
+* `PR_OPENED_OK`
+
+* `TESTS_PASS_OK`
+
+* `DOC_DELTA_PRESENT_OK`
+
+* `EVIDENCE_INDEX_UPDATED_OK`
+
+* `EVIDENCE_INDEX_HASH_OK`
+
+* `MACHINE_MIRROR_UPDATED_OK`
+
+---
+
+**Deprecation.**  
+ The **legacy `card_close` script** is retired and **not authoritative**.
 
 ---
 
@@ -175,21 +277,25 @@ Determinism pins
  Run all captures and CI with `LC_ALL=C`, `TZ=UTC` to keep bytes stable.
 
 CI posture (diff-scoped)  
- CI validates governed files changed in the QA branch. At minimum:  
- Mirror schema check (records-only JSONL, sorted keys, one LF, unknown keys rejected).  
- Final-LF check on governed text artifacts.  
- Appendix-D ↔ mirror 1:1 parity and `proof_anchor` path-proof linkage.  
- A7 headers proofs on a cataloged JSON success route (not `/internal/version`), including GET/HEAD/304, `Vary: Authorization, Accept-Encoding`, and encoding-invariance of identity and effective length.  
- Writers/errors posture headers: `no-store`; JSON errors, no ETag.  
- Rails default: CI/test harness runs **CLOSED** by default; any job that opens rails must pin policy and attach evidence in the same PR.
+ CI validates governed files changed in the QA branch. At minimum:
+
+* Mirror schema check (records-only JSONL, sorted keys, one LF, unknown keys rejected).
+
+* Final-LF check on governed text artifacts.
+
+* Appendix-D ↔ mirror 1:1 parity and `proof_anchor` path-proof linkage.
+
+* A7 headers proofs on a cataloged JSON success route (not `/internal/version`), including GET/HEAD/304, `Vary: Authorization, Accept-Encoding`, and encoding-invariance of identity and effective length.
+
+* Writers/errors posture headers: `no-store`; JSON errors, no ETag.
+
+* When a QA branch or plan claims to exercise **prod via Codespaces** for an HDE epic, it **must** include at least one simple **prod handshake** that proves the commands are talking to the canonical production HD Engine service and DB (as defined in Glow Infrastructure). A typical handshake is a `curl` to the production HD Engine base URL’s `/internal/version` endpoint from within Codespaces, with the full response captured under `Audit/QA/<EPIC-ID>/logs/`. QA that omits this handshake is treated as **underspecified** until the handshake and its artifact are added.【13:WCXnEc3R2LFdFyBrPKcjx9†file-WCXnEc3R2LFdFyBrPKcjx9†L3-L7】
+
+* Rails default: CI/test harness runs **CLOSED** by default; any job that opens rails must pin policy and attach evidence in the same PR.
 
 Acceptance (titles only)  
- QA\_EVIDENCE\_ONLY\_OK — branch contains evidence updates only (no production code).  
- QA\_CI\_DIFF\_SCOPED\_OK — CI restricted to changed governed files passed.
-
-Notes  
- Close-pack files are N/A for QA unless you are simultaneously closing an epic (then follow §3.5).  
- Cross-document references by title only: Governance (A7/writers policy), Schemas & Artifacts (mirror/evidence), CLI-API-Vendor-Ref (Reader/CLI contract), Math-Spec (serializer/idempotence).
+ `QA_EVIDENCE_ONLY_OK` — branch contains evidence updates only (no production code).  
+ `QA_CI_DIFF_SCOPED_OK` — CI restricted to changed governed files passed.
 
 ---
 
@@ -203,6 +309,18 @@ Notes
  CodEx runs Audit \+ Sandbox Build/Test, then opens the PR automatically using the template. CodEx attaches the close pack and the PASS token list, and pushes code \+ Doc-Delta (repo docs) \+ human Evidence Index \+ machine JSONL mirror in the same PR.  
  Lead Dev gates the PR (verifies PASS tokens, A7 proof surface/env-gate/encoding-invariance when applicable, and 1:1 index↔mirror parity with path-proofs).  
  PO is the sole merger; squash-merge on PASS; inform Scrum Master. Suites green-freeze unless a qualifying change lands.
+
+For some epics (for example, EPIC017 and similar Calcination/Separation passes), the work may be split into a **series of PRs (up to 10 PRs per epic)**, each PR carrying a self-contained slice with code \+ Doc-Delta \+ evidence. The PR-first pattern and same-PR parity apply to **each** PR; epic-level acceptance (as recorded in HDE Phased Epics) occurs only after all required PRs for that epic have merged.
+
+When a PLAN or CRD for an HDE epic expects **Live QA “in prod via Codespaces,”** it **must** also:
+
+* Name the production HD Engine **service and base URL** and the production **DB instance/schema** by title, routing to Glow Infrastructure as the single home for those names (do not invent new environment labels).
+
+* State explicitly that **Codespaces is a QA console** that runs CLI/HTTP commands **against** that production service and DB, not a prod environment in its own right.
+
+* Describe, at a high level, the **prod handshake** step and where its artifact will live (for example, “Step 0: `curl` the production `/internal/version` endpoint from Codespaces and store the output under `Audit/QA/<EPIC-ID>/logs/` before running deeper QA”).
+
+PLAN/CRD entries that refer to “prod via Codespaces” without these clarifications are considered **incomplete** and must be updated before the epic moves into implementation or Live QA.
 
 ## ---
 
@@ -691,194 +809,279 @@ ip\_approval:
 
 From this point, CodEx and IA proceed per the approved IP. Lead Dev returns only to gate the PR.
 
-## **3.5 Close Gate (PR-first)**
-
-**Requirement.** CodEx opens the PR automatically (**one PR per epic**). The PO is the sole merger (**squash on PASS**). The PR **must** include the close-pack, the PASS-token section, and the **same-PR** docs/evidence updates. If the CodEx UI cannot include doc edits, the IA supplies verbatim text **in the same PR body** for CodEx to commit. **Governed locations only:** evidence lives under `artifacts/**` and `docs/**`; transient/generator paths are disallowed.
-
-**PR must contain**
-
-* **Close-pack files**
-
-  * `audit/EPIC-<ID>_close_report.md`  
-  * `audit/EPIC-<ID>_MANIFEST.json`  
-* **PASS tokens section** (final status; **titles only**, see §2.0 roster)
-
-  * Core determinism & parity: `DET_SERIALIZER_OK`, `CLI_READER_PARITY_OK`, `TWO_RUN_IDENTITY_OK`  
-  * Index/mirror trio (**same PR**): `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_HASH_OK`, `MACHINE_MIRROR_UPDATED_OK`  
-  * Close-pack presence: `CLOSE_PACK_FILES_PRESENT_OK`  
-  * **When A7 is in scope (Catalog success route):**  
-     `A7_GET_QUOTED_ETAG_OK`, `A7_HEAD_PARITY_OK`, `A7_304_OMITS_CT_CL_OK`, `A7_VARY_AUTH_AE_OK`, `A7_ENCODING_INVARIANCE_OK`, `ENDPOINTS_CATALOG_INTERNAL_OK`, `A7_TRANSPORT_PROOF_OK`  
-  * **When /internal/version is in scope (ops surface):**  
-     `INTVER_200_CTYPE_JSON_UTF8_OK`, `INTVER_HEAD_PARITY_OK`, `INTVER_CONDITIONALS_IGNORED_OK`, `INTVER_200_NO_ETAG_OK`  
-* **Repo-docs & evidence updates (same PR)**
-
-  * **Human Evidence Index** updated: `docs/evidence/INDEX.json`  
-  * **Index hash sentinel** updated: `docs/evidence/INDEX.sha256` (hash matches `INDEX.json` bytes)  
-  * **Machine mirror** updated: `artifacts/evidence_index.jsonl` (records-only canonical JSONL; **one LF**; **unknown-keys rejected**; **ASCII field order**; **sort-before-write**; **single mirror file**; each record has `discovered_physical_path` \+ `proof_anchor` to a co-located path-proof)  
-  * Repo index and acceptance crib notes updated  
-  * Doc-Delta note added (if applicable)  
-* **A7 artifacts (include when A7 in scope; titles only)**
-
-  * Endpoint Catalog **file** \+ checksum: `docs/ENDPOINTS_CATALOG.json`, `docs/ENDPOINTS_CATALOG.json.sha256`  
-  * Env-gate **headers-only** proof: `artifacts/proofs/endpoints_env_gate_proof.log`  
-  * **Composite success proof JSON** (records-only; **PF12 schema-validated**): `artifacts/proofs/reader_success_get_head_304.json`  
-  * Success headers: GET/HEAD/304; writers/errors posture; encoding-invariance capture
-
-**Merge**
-
-* **Lead Dev** performs the gate review on the PR (checks PASS tokens, A7/ops applicability, index/mirror hygiene, governed locations only).  
-* **PO** squashes on PASS.  
-* **Scrum Master** is informed after merge.  
-* **IA** files the Closure Report and confirms docs/evidence are synchronized **in the merged PR**.
+Here’s a tightened, more logically structured version that makes the per-PR vs final epic close much clearer, while keeping all the same requirements and tokens.
 
 ---
 
-# 4\) PR & COMMIT PLAN (PR-first via CodEx; Lead Dev gates)
+### **3.5 Close Gate (PR-first)**
 
-## 4.1 Machine header
+**Requirement.**
+
+* For every epic, work is delivered **PR-first via CodEx**.
+
+* CodEx opens PRs automatically for each epic slice and pushes **code \+ Doc-Delta \+ evidence** in the **same PR**.
+
+* An epic MAY use **up to 10 PRs** to deliver its full scope; **each PR** must be self-contained and follow the PR-first and parity rules in §0.2.
+
+* The Product Owner (PO) is the sole merger (squash on PASS).
+
+* **Epic-level acceptance** (as recorded in **HDE Phased Epics**) occurs only after **all required PRs for that epic have merged** and the Close Gate has been satisfied.
+
+The Close Gate applies to the **PR that carries the epic close-out** (“close PR”). All earlier PRs in the series must still be PR-first and parity-clean, but only the close PR is required to carry the full close-pack and final PASS roster described below.
+
+---
+
+**Close PR must contain**
+
+**Close-pack files**
+
+* `audit/EPIC-<ID>_close_report.md`
+
+* `audit/EPIC-<ID>_MANIFEST.json`
+
+* PASS tokens section (final status; titles only, see §2.0 roster)
+
+**Core determinism & parity tokens**
+
+* `DET_SERIALIZER_OK`
+
+* `CLI_READER_PARITY_OK`
+
+* `TWO_RUN_IDENTITY_OK`
+
+**Index/mirror trio (same PR)**
+
+* `EVIDENCE_INDEX_UPDATED_OK`
+
+* `EVIDENCE_INDEX_HASH_OK`
+
+* `MACHINE_MIRROR_UPDATED_OK`
+
+**Close-pack presence**
+
+* `CLOSE_PACK_FILES_PRESENT_OK`
+
+**When A7 is in scope (Catalog success route)**
+
+* `A7_GET_QUOTED_ETAG_OK`
+
+* `A7_HEAD_PARITY_OK`
+
+* `A7_304_OMITS_CT_CL_OK`
+
+* `A7_VARY_AUTH_AE_OK`
+
+* `A7_ENCODING_INVARIANCE_OK`
+
+* `ENDPOINTS_CATALOG_INTERNAL_OK`
+
+* `A7_TRANSPORT_PROOF_OK`
+
+**When `/internal/version` is in scope (ops surface)**
+
+* `INTVER_200_CTYPE_JSON_UTF8_OK`
+
+* `INTVER_HEAD_PARITY_OK`
+
+* `INTVER_CONDITIONALS_IGNORED_OK`
+
+* `INTVER_200_NO_ETAG_OK`
+
+  ---
+
+**Repo-docs & evidence updates (same PR)**
+
+The close PR MUST update, in the **same PR**:
+
+* Human Evidence Index: `docs/evidence/INDEX.json`
+
+* Index hash sentinel: `docs/evidence/INDEX.sha256` (hash matches `INDEX.json` bytes)
+
+* Machine mirror: `artifacts/evidence_index.jsonl` (records-only canonical JSONL; one LF; unknown keys rejected; ASCII field order; sort-before-write; single mirror file; each record has `discovered_physical_path` \+ `proof_anchor` to a co-located path-proof)
+
+* Repo index and acceptance crib notes
+
+* Doc-Delta note (if applicable)
+
+**A7 artifacts** (include when A7 is in scope; titles only)
+
+* Endpoint Catalog file \+ checksum:
+
+  * `docs/ENDPOINTS_CATALOG.json`
+
+  * `docs/ENDPOINTS_CATALOG.json.sha256`
+
+* Env-gate headers-only proof:
+
+  * `artifacts/proofs/endpoints_env_gate_proof.log`
+
+* Composite success proof JSON (records-only; PF12 schema-validated):
+
+  * `artifacts/proofs/reader_success_get_head_304.json`
+
+  * Success headers: GET / HEAD / 304; writers/errors posture; encoding-invariance capture
+
+  ---
+
+**Merge**
+
+* The **Lead Dev** performs the gate review on the close PR (checks PASS tokens, A7/ops applicability, index/mirror hygiene, governed locations only).
+
+* The **PO** squashes on PASS.
+
+* The **Scrum Master** is informed after merge.
+
+* The **Implementation Agent (IA)** files the Closure Report and confirms that docs and evidence are synchronized in the merged PR.
+
+---
+
+Here’s a tightened, structured version of that whole block. I’ve kept every field, token, and artifact name; changes are only to wording, ordering, and clarity.
+
+---
+
+### **4\) PR & COMMIT PLAN (PR-first via CodEx; Lead Dev gates)**
+
+#### **4.1 Machine header**
 
 type: PR\_COMMIT\_PLAN  
- epic\_id: "EPIC-?.?"  
- one\_line\_outcome: ""
+epic\_id: "EPIC-?.?"  
+one\_line\_outcome: ""
 
-precommit\_prereqs:
+precommit\_prereqs:  
+  reader\_json\_success\_route\_registered: true   \# Endpoint Catalog entry exists (internal-only, env-gated)  
+  reader\_a7\_matrix:  
+    \- "200+STRONG\_ETAG"  
+    \- "HEAD\_200\_PARITY"  
+    \- "304\_OMIT\_CT\_CL"  
+  a7\_vary\_auth\_ae\_ready: true                  \# Vary: Authorization, Accept-Encoding supported  
+  a7\_encoding\_invariance\_ready: true           \# ETag & effective Content-Length stable across encodings  
+  env\_gate\_proof\_ready: true                   \# Plan to capture headers proving non-prod endpoints are unreachable in prod  
+  writers\_errors\_no\_store\_no\_etag: true  
+  ab\_ba\_identity\_ok: true  
+  two\_run\_identity\_ok: true  
+  narrative\_policy\_ok: "\<if Aux in scope (200/no body/no ETag on suppression)\>"  
+  logs\_keys\_only: true  
+  indices\_ready\_same\_pr: true                  \# Human INDEX.json and machine evidence\_index.jsonl updated in same PR; mirror canonical JSONL (UTF-8, sorted keys, compact, one LF), unknown keys rejected; each record includes proof\_anchor to a path-proof file  
+  single\_finalization\_scope: "\<precisely what is finalized by this PR (one coherent slice)\>"  
+  revert\_concept: "\<simple revert path: single squash commit rollback; no data loss; how to disable feature flag if applicable\>"
 
-* reader\_json\_success\_route\_registered: true ← Endpoint Catalog entry exists (internal-only, env-gated)  
-* reader\_a7\_matrix: \["200+STRONG\_ETAG", "HEAD\_200\_PARITY", "304\_OMIT\_CT\_CL"\]  
-* a7\_vary\_auth\_ae\_ready: true ← `Vary: Authorization, Accept-Encoding` supported  
-* a7\_encoding\_invariance\_ready: true ← ETag & effective Content-Length stable across encodings  
-* env\_gate\_proof\_ready: true ← plan to capture headers proving non-prod endpoints are unreachable in prod  
-* writers\_errors\_no\_store\_no\_etag: true  
-* ab\_ba\_identity\_ok: true  
-* two\_run\_identity\_ok: true  
-* narrative\_policy\_ok: "\<if Aux in scope (200/no body/no ETag on suppression)\>"  
-* logs\_keys\_only: true  
-* indices\_ready\_same\_pr: true ← human `docs/evidence/INDEX.json` and machine `artifacts/evidence_index.jsonl` will be updated in the same PR; mirror is canonical JSONL (UTF-8, sorted keys, compact, one LF) and rejects unknown keys; each record will include a `proof_anchor` to a path-proof file
+#### **4.2 Required pre-merge evidence (titles-only; CodEx supplies artifacts)**
 
-single\_finalization\_scope: "\<precisely what is finalized by this PR (one coherent slice)\>"  
- revert\_concept: "\<simple revert path: single squash commit rollback; no data loss; how to disable feature flag if applicable\>"
+premerge\_evidence\_required:  
+  \- name: "PR\_OPENED\_OK"                      \# PR opened by CodEx using epic template; PASS tokens listed in body  
+  \- name: "DOC\_DELTA\_PRESENT\_OK"              \# Repo docs (indexes/cribs) updated in this PR  
+  \- name: "CLOSE\_PACK\_FILES\_PRESENT\_OK"       \# audit/EPIC-\<ID\>\_close\_report.md and audit/EPIC-\<ID\>\_MANIFEST.json included in this PR  
+  \- name: "EVIDENCE\_INDEX\_UPDATED\_OK"         \# docs/evidence/INDEX.json updated (titles/paths only)  
+  \- name: "MACHINE\_MIRROR\_UPDATED\_OK"         \# artifacts/evidence\_index.jsonl present; canonical JSONL (one LF), unknown keys rejected; each record has proof\_anchor to a path-proof file  
+  \- name: "EVIDENCE\_INDEX\_HASH\_OK"            \# docs/evidence/INDEX.sha256 updated; hash matches INDEX.json bytes
 
-## **4.2 Required pre-merge evidence (titles-only; CodEx supplies artifacts)**
+  \- name: "CLI\_READER\_PARITY\_OK"              \# Reader 200 body equals hdctl/glowctl showcompat stdout (LF-terminated)  
+  \- name: "TWO\_RUN\_IDENTITY\_OK"               \# Two independent runs produce byte-identical bodies and ETag
 
-premerge\_evidence\_required:
+  \- name: "A7\_GET\_QUOTED\_ETAG\_OK"             \# GET 200 returns strong quoted ETag over LF-terminated canonical body  
+  \- name: "A7\_HEAD\_PARITY\_OK"                 \# HEAD 200 mirrors GET validators; Content-Type \== GET; no body; Content-Length \== length(identity 200 body)  
+  \- name: "A7\_304\_OMITS\_CT\_CL\_OK"             \# 304 only after prior 200; no body; omits both Content-Type and Content-Length; validators mirror cached GET  
+  \- name: "A7\_VARY\_AUTH\_AE\_OK"                \# Vary: Authorization, Accept-Encoding present  
+  \- name: "A7\_ENCODING\_INVARIANCE\_OK"         \# ETag and effective Content-Length stable across accepted encodings  
+  \- name: "ENDPOINTS\_CATALOG\_INTERNAL\_OK"     \# Catalog internal-only; entries env-gated; non-prod entries unreachable in prod (headers-only env-gate proof)
 
-  \- name: "PR\_OPENED\_OK"                        \# PR opened by CodEx using epic template; PASS tokens listed in body
+  \- name: "WRITERS\_ERRORS\_NOSTORE\_NOETAG\_OK"  \# Writers no-store; errors have Content-Type: application/json; charset=utf-8; no ETag
 
-  \- name: "DOC\_DELTA\_PRESENT\_OK"                \# repo docs (indexes/cribs) updated in this PR
+#### **4.3 Guidance for PO (CodEx UI)**
 
-  \- name: "CLOSE\_PACK\_FILES\_PRESENT\_OK"         \# audit/EPIC-\<ID\>\_close\_report.md and audit/EPIC-\<ID\>\_MANIFEST.json included in this PR
+* Do **not** create a PR manually. Confirm CodEx has opened the PR for this epic (PR ID present) and that the close pack \+ PASS tokens appear in the PR body.
 
-  \- name: "EVIDENCE\_INDEX\_UPDATED\_OK"           \# human docs/evidence/INDEX.json updated (titles/paths only)
+* Verify this PR contains:
 
-  \- name: "MACHINE\_MIRROR\_UPDATED\_OK"           \# artifacts/evidence\_index.jsonl present, canonical JSONL (one LF), unknown keys rejected, each record has proof\_anchor to a path-proof file
+  * Doc-Delta (repo docs),
 
-  \- name: "EVIDENCE\_INDEX\_HASH\_OK"              \# docs/evidence/INDEX.sha256 updated; hash matches INDEX.json bytes
+  * Human Evidence Index update, and
 
-  \- name: "CLI\_READER\_PARITY\_OK"                \# Reader 200 body equals hdctl/glowctl showcompat stdout (LF-terminated)
+  * Machine JSONL mirror update,  
+     as required. If any index/doc was omitted, ask the IA to raise an immediate docs-only PR.
 
-  \- name: "TWO\_RUN\_IDENTITY\_OK"                 \# two independent runs produce byte-identical bodies and ETag
+* Wait for the Lead Dev gate review (PASS).
 
-  \- name: "A7\_GET\_QUOTED\_ETAG\_OK"               \# GET 200 returns strong quoted ETag over LF-terminated canonical body
+* On PASS, perform a **squash merge**, then notify the Scrum Master.
 
-  \- name: "A7\_HEAD\_PARITY\_OK"                   \# HEAD 200 mirrors GET validators; Content-Type \== GET; no body; Content-Length \== length(identity 200 body)
+#### **4.4 PO approval and commit record**
 
-  \- name: "A7\_304\_OMITS\_CT\_CL\_OK"               \# 304 only after prior 200; no body; omits both Content-Type and Content-Length; validators mirror cached GET
+po\_approval:  
+  decision: "APPROVED"  
+  notes: ""
 
-  \- name: "A7\_VARY\_AUTH\_AE\_OK"                  \# Vary: Authorization, Accept-Encoding present
+commit\_record:  
+  pr\_id: ""  
+  commit\_id: ""  
+  closeout\_evidence\_pointer: "\<pointer to close pack / proof bundle in PR\>"
 
-  \- name: "A7\_ENCODING\_INVARIANCE\_OK"           \# ETag and effective Content-Length stable across accepted encodings
+#### **4.5 PR template — evidence-only QA**
 
-  \- name: "ENDPOINTS\_CATALOG\_INTERNAL\_OK"       \# Catalog is internal-only; entries env-gated; non-prod entries unreachable in prod (headers-only env-gate proof)
+For PRs whose sole purpose is to verify evidence and transport posture **without** changing production code. Use titles only for cross-doc references. Keep the human Evidence Index \+ hash sentinel \+ machine mirror in the **same PR**.
 
-  \- name: "WRITERS\_ERRORS\_NOSTORE\_NOETAG\_OK"    \# writers no-store; errors have Content-Type: application/json; charset=utf-8; no ETag
+Paste this as the PR body and fill in:
 
-## 4.3 Guidance for PO (CodEx UI)
-
-* **Do not create a PR.** Confirm **CodEx has opened the PR** for this epic (PR ID present) and the **close pack \+ PASS tokens** are in the PR body.  
-* Verify this PR contains **Doc-Delta** (repo docs), **human Evidence Index**, and **machine JSONL mirror** updates as required. If any index/doc was omitted, ask IA to raise an immediate docs-only PR.  
-* Wait for the **Lead Dev gate review** (PASS).  
-* Perform a **squash merge** on PASS; notify the Scrum Master.
-
-## 4.4 PO approval and commit record
-
-po\_approval:
-
-* decision: "APPROVED"  
-* notes: ""
-
-commit\_record:
-
-* pr\_id: ""  
-* commit\_id: ""  
-* closeout\_evidence\_pointer: "\<pointer to close pack / proof bundle in PR\>"
-
-## **4.5 PR template — evidence-only QA**
-
-For PRs whose purpose is to verify evidence and transport posture **without changing production code**. Use **titles only** for cross-doc references. Keep the **human Evidence Index \+ hash sentinel \+ machine mirror** in the **same PR**.
-
-Paste this as the PR body and fill in.
-
-\# Evidence-only QA — \<short scope\>  (EPIC-\<ID\> QA)
+\# Evidence-only QA — \<short scope\> (EPIC-\<ID\> QA)
 
 \#\# Summary  
 \- Purpose: \<one paragraph describing what is being verified and why\>  
 \- Scope: evidence-only; no production code changes  
 \- Determinism pins set for all captures and CI: LC\_ALL=C, TZ=UTC
 
-\#\# Artifacts included (titles and repo-relative paths only)  
-\# Indexes (must update in the same PR)  
+\#\# Artifacts included (titles and repo-relative paths only)
+
+\#\#\# Indexes (must update in the same PR)  
 \- Evidence Index (human) — docs/evidence/INDEX.json  
 \- Evidence Index hash sentinel — docs/evidence/INDEX.sha256  
 \- Machine Evidence Index (JSONL) — artifacts/evidence\_index.jsonl
 
-\# Endpoint Catalog (A7 proof surface; Catalog-only)  
+\#\#\# Endpoint Catalog (A7 proof surface; Catalog-only)  
 \- Catalog file (records-only) — docs/ENDPOINTS\_CATALOG.json  
 \- Catalog checksum — docs/ENDPOINTS\_CATALOG.json.sha256  
 \- Endpoint Catalog snapshot (titles-only) — artifacts/reader/endpoints\_snapshot.json  
 \- Env-gate proof (headers-only) — artifacts/proofs/endpoints\_env\_gate\_proof.log
 
-\# A7 proofs on a cataloged JSON success route (headers-only)  
+\#\#\# A7 proofs on a cataloged JSON success route (headers-only)  
 \- GET (200) — artifacts/proofs/success\_get.txt  
 \- HEAD (200) — artifacts/proofs/success\_head.txt  
 \- 304 — artifacts/proofs/success\_304.txt  
 \- Writers/errors posture — artifacts/proofs/success\_writers\_errors.txt  
 \- Encoding-invariance — artifacts/proofs/encoding\_invariance.txt  
-\- Composite success proof JSON — artifacts/proofs/reader\_success\_get\_head\_304.json  
+\- Composite success proof JSON — artifacts/proofs/reader\_success\_get\_head\_304.json    
   \# (records-only; validated against PF12 composite proof schema)
 
-\#Ops — rails refusal proof (closed‑rails)
+\#\#\# Ops — rails refusal proof (closed-rails)  
+\- Refusal probe capture — artifacts/proofs/ops\_refusal\_proof.txt    
+  \# headers → blank line → LF-terminated numeric-free JSON body; titles-only routing to HDE-Governance for policy/tokens and HDE-Schemas & Artifacts for indexing/mirror rules
 
-* Refusal probe capture — `artifacts/proofs/ops_refusal_proof.txt`  
-   *(headers → blank line → LF‑terminated numeric‑free JSON body; titles‑only routing to HDE‑Governance for policy/tokens and HDE‑Schemas & Artifacts for indexing/mirror rules)*
-
-\# CLI / Reader parity & determinism  
+\#\#\# CLI / Reader parity & determinism  
 \- CLI parity set (AB/BA/summary) — artifacts/cli/ab.json; artifacts/cli/ba.json; artifacts/cli/summary.json  
 \- Reader vs CLI parity diff (expected empty) — artifacts/cli/showcompat/reader\_vs\_cli.diff  
 \- CLI showcompat stdout (LF-terminated; non-empty) — artifacts/cli/showcompat/stdout.json  
 \- CLI two-run identity log — artifacts/cli/showcompat/two\_run\_identity.log  
 \- Preimage recompute log — artifacts/cli/showcompat/preimage\_recompute.log
 
-\# DB evidence (if in scope)  
+\#\#\# DB evidence (if in scope)  
 \- DDL fingerprint — artifacts/db/ddl\_fingerprint.json  
 \- Grants snapshot — artifacts/db/grants.txt  
 \- Schema/search\_path echo — artifacts/db/check\_schema.txt  
 \- Connection env selection proof — artifacts/db/conn\_env\_selection.log  
 \- Dev connectivity snapshot (PF10-A) — artifacts/runtime/env\_connectivity.snapshot.json
 
-\#\# PASS tokens (check what applies)  
-\- \[ \] PR\_OPENED\_OK  
-\- \[ \] DOC\_DELTA\_PRESENT\_OK
+\#\# PASS tokens (check what applies)
 
-\# Index/mirror gates (same PR)  
+\#\#\# Index/mirror gates (same PR)  
+\- \[ \] PR\_OPENED\_OK  
+\- \[ \] DOC\_DELTA\_PRESENT\_OK  
 \- \[ \] EVIDENCE\_INDEX\_UPDATED\_OK  
 \- \[ \] EVIDENCE\_INDEX\_HASH\_OK  
 \- \[ \] MACHINE\_MIRROR\_UPDATED\_OK
 
-\# Determinism & parity  
+\#\#\# Determinism & parity  
 \- \[ \] CLI\_READER\_PARITY\_OK  
 \- \[ \] TWO\_RUN\_IDENTITY\_OK
 
-\# A7 (Catalog-only)  
+\#\#\# A7 (Catalog-only)  
 \- \[ \] ENDPOINTS\_CATALOG\_OK  
 \- \[ \] ENDPOINTS\_CATALOG\_INTERNAL\_OK  
 \- \[ \] A7\_GET\_QUOTED\_ETAG\_OK  
@@ -888,14 +1091,14 @@ Paste this as the PR body and fill in.
 \- \[ \] A7\_ENCODING\_INVARIANCE\_OK  
 \- \[ \] A7\_TRANSPORT\_PROOF\_OK
 
-\# Writers/errors posture  
+\#\#\# Writers/errors posture  
 \- \[ \] WRITERS\_ERRORS\_NOSTORE\_NOETAG\_OK
 
-\# QA process (branches)  
+\#\#\# QA process (branches)  
 \- \[ \] QA\_EVIDENCE\_ONLY\_OK  
 \- \[ \] QA\_CI\_DIFF\_SCOPED\_OK
 
-\# Close-pack (use N/A for QA if not an epic close)  
+\#\#\# Close-pack (use N/A for QA if not an epic close)  
 \- \[ \] CLOSE\_PACK\_FILES\_PRESENT\_OK    \# audit/EPIC-\<ID\>\_close\_report.md; audit/EPIC-\<ID\>\_MANIFEST.json
 
 \#\# Human↔Machine parity checks  
@@ -911,9 +1114,9 @@ domain\_closure: pass|fail
 topology: pass|fail  
 arrays\_as\_sets: pass|fail  
 canonical\_json: pass|fail  
-mirror\_schema: pass|fail      \# CI\_CHECK\_MIRROR\_SCHEMA\_OK  
-final\_lf: pass|fail           \# CI\_CHECK\_FINAL\_LF\_OK  
-env\_pins: pass|fail           \# LC\_ALL=C, LANG=C, TZ=UTC
+mirror\_schema: pass|fail        \# CI\_CHECK\_MIRROR\_SCHEMA\_OK  
+final\_lf: pass|fail             \# CI\_CHECK\_FINAL\_LF\_OK  
+env\_pins: pass|fail             \# LC\_ALL=C, LANG=C, TZ=UTC
 
 \#\# Reviewer checklist  
 \- A7 proofs run only on a cataloged JSON success route (not /internal/version)  
@@ -929,11 +1132,12 @@ env\_pins: pass|fail           \# LC\_ALL=C, LANG=C, TZ=UTC
 \- Machine mirror updated in this same PR and passes schema checks (records-only, unknown-key reject, ASCII order, sort-before-write, single file)
 
 \#\# Notes  
-\- Cross-doc references (titles only):  
-  \- Governance and A7 policy — HDE-Governance  
-  \- Evidence mirror and artifacts — HDE-Schemas & Artifacts  
-  \- CLI and Reader contract — HDE-CLI-API-Vendor-Ref  
-  \- Math and serializer rules — HDE-Math-Spec
+Cross-doc references (titles only):
+
+\- Governance and A7 policy — HDE-Governance  
+\- Evidence mirror and artifacts — HDE-Schemas & Artifacts  
+\- CLI and Reader contract — HDE-CLI-API-Vendor-Ref  
+\- Math and serializer rules — HDE-Math-Spec
 
 ---
 

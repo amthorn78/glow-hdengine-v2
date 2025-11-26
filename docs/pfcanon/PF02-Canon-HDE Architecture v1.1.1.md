@@ -1,11 +1,11 @@
 # **0\. Front Matter**
 
 **Title:** PF02-Canon-HDE Architecture  
- **Version:** v1.1  
+ **Version:** v1.1.1  
  **Status:** Canon  
-**Effective date:** 2025-11-21
+**Effective date:** 2025-11-23
 
-**Last Update Gate:** HDE-EPIC017 Planning
+**Last Update Gate:** BN 7.7.8 Drain
 
 ---
 
@@ -250,12 +250,6 @@ This section names runtime surfaces and their responsibilities. It remains contr
 **Parity expectations.** For identical inputs, public bytes match CLI output (byte identity). Output is non-empty canonical JSON (LF-terminated). Locale pins for byte checks: `LC_ALL=C`, `LANG=C`, `TZ=UTC`.
 
 **Routing (titles-only).** Request/response details, field lists, examples, and CLI↔Reader byte-parity rules: **HDE-CLI-API-Vendor Ref**. A7 validators and header behavior: **HDE-Governance**. Canonical JSON policy: **HDE-Schemas and Artifacts**. Process & PR workflow (PR-first; Evidence Index and mirror updated in the same PR): **Epic-Process-Guide**.
-
-## **SAFE Rails & Provider Posture \[Required-Now\]**
-
-## **6.1 Rails concept**
-
-## 
 
 ## **3.2 Reader v1 \[Required-Now\] (public success route)**
 

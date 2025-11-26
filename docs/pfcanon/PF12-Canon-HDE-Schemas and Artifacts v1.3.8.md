@@ -1,211 +1,359 @@
-# **0\. Document Control \[Required-Now\]**
+# 0\. Document Control \[Required-Now\] 
 
-## **0.1 Header**
+## 0.1 Header
 
-**Title:** PF12-Canon-HDE-Schemas and Artifacts
+ **Title:** PF12-Canon-HDE-Schemas and Artifacts  
+ **Version:** v1.3.8  
+ **Status:** Canon  
+ **Effective date:** 2025-11-25  
+ **Last Update Gate:** BN 7.7.8 Drain A11
 
-**Version:** v1.3
+**Invocation tag:** INV-f2ac55d77ce9aacc
 
-**Status:** Canon
+## **0.2 Scope & single homes Required−NowRequired-NowRequired−Now**
 
-**Effective date:** 2025-11-20  
-**Last Update Gate:** BN 7.5 Drain 
+**Supersession (PF10 addenda).**  
+ PF10 — Glow HD Engine Build Notes is living. Where multiple numbered addenda exist, later addenda supersede earlier guidance. PF12 integrates the latest addenda and routes by **titles only** to other PF documents (no version numbers).
 
-## **0.2 Scope (single home)**
+**Ownership.**  
+ This document is the single home for:
 
-**Supersession (PF10 addenda).** PF10 is living; when multiple numbered addenda exist, the later number supersedes earlier guidance. PF12 integrates the latest addenda and routes by title only to single homes (no version numbers).
+* Engine **catalogs** (under `catalog/`).
 
-**Ownership.** This document is the single home for engine catalogs, the freeze-pack manifest at `catalog/manifest.json`, and checksum sidecars (`*.sha256`). It defines closed enumerations and canonical artifact rules (manifest → `release_id`). `CANON_CHECKSUMS.json` is deprecated; the manifest at `catalog/manifest.json` is authoritative.
+* The **freeze-pack manifest** at `catalog/manifest.json`.
 
-**Human Evidence Index (single home).** Path: `docs/evidence/INDEX.json`. Canonical JSON (UTF-8, no BOM; ASCII-sorted keys; compact; exactly one trailing LF). Titles and paths only; no payload bytes. Must maintain 1:1 parity with the machine mirror (see §8.3). Acceptance sentinel: `EVIDENCE_INDEX_HASH_OK` (merge-gating).
+* Checksum sidecars (`*.sha256`) for governed files.
 
-**Machine Evidence Mirror (governed here).** The JSONL mirror at `artifacts/evidence_index.jsonl` is a governed artifact (records-only); its content and schema are owned here (see §8.3). CI enforces 1:1 parity with the Human Evidence Index. Each record MUST include fields sufficient for proof and reproducibility (`sha256`, `size_bytes`, `produced_at_utc`, a `discovered_physical_path`, and a `proof_anchor` to a transcript plus on-disk stat). Path-proofs are stored alongside each artifact. Bytes are produced by build steps and validated in CI per §8; determinism follows §4; all comparisons run with `LC_ALL=C`, `TZ=UTC`, canonical JSON (UTF-8, sorted keys, compact, exactly one LF). CI hygiene (pointer; detailed rules in §8.3): mirror is canonical JSONL; unknown-key rejection is enforced; ASCII field order and sort-before-write are required; exactly one mirror file must exist. Governed locations only: evidence must live under governed repo paths (for example, `artifacts/**`, `docs/**`); transient generator paths are disallowed (details §8.3 and §8.6). Governed evidence families include Endpoint Catalog proofs, CLI parity set, `/internal/version` ops proof, DB posture snapshots, and BodyGraph artifacts enumerated in §8.6.
+* Closed enumerations and canonical artifact rules (manifest → `release_id`).
 
-**Routing by title only.** Math arithmetic (scoring, thresholds, preimage recipe) and transport bytes (Reader, CLI, vendor) are routed by title only to their owning documents — HDE-Math-Spec, HDE-Governance, HDE-CLI-API-Vendor-Ref, HDE-Architecture — and are not duplicated here.
+* **Engine QA export artifacts for stateless/no-DB modes** — canonical JSON schemas and Evidence Catalog families for BodyGraph export JSON, compat export JSON, and optional “run bundle” aggregates produced directly from birth data or vendor JSON without relying on database user records (see §1.1 and §8.x).
 
-**Token Registry and acceptance hints (names-only).** HDE-Governance owns the Token Registry and the semantics of all acceptance tokens. PF12 binds those tokens to concrete artifact shapes and Evidence Index / Machine Mirror records via “Acceptance hints (names-only)” lists in later sections; it does not redefine semantics. PF09-Canon-HDE-Build-Checklist is a consumer-only view: its token rosters must be a subset of the Token Registry / PF12 names and may not introduce new token names.
+`CANON_CHECKSUMS.json` is deprecated; the manifest at `catalog/manifest.json` is authoritative for frozen inputs and pack identity.
 
-**Process and PR workflow.** The “update repo docs and Evidence Index in the same PR” rule lives in Epic-Process-Guide (titles only).
+**Human Evidence Index (single home).**  
+ Path: `docs/evidence/INDEX.json`.
 
-**Catalogized seeds (admin-only).** The Magic-10 seeds catalog at `catalog/magic10_seeds.json` is governed here (see §2.7). Changes are frozen-input changes and require `release_id` recomputation per §6.
+* Canonical JSON (UTF-8, no BOM; ASCII-sorted keys; compact; exactly one trailing LF).
 
-## **0.3 Tagging**
+* Titles and paths only; **no payload bytes**.
+
+* Must maintain 1:1 parity with the Machine Evidence Mirror (see §8.3).
+
+* Hash sentinel `docs/evidence/INDEX.sha256` is computed over the canonical bytes of `INDEX.json` (merge-gating; token semantics live in HDE-Governance).
+
+**Machine Evidence Mirror (governed here).**  
+ Path: `artifacts/evidence_index.jsonl`.
+
+* Governed artifact; records-only JSONL.
+
+* Content and schema are owned in §8.3.
+
+* CI enforces 1:1 parity with the Human Evidence Index.
+
+* Each record **MUST** include fields sufficient for proof and reproducibility (`artifact_key`, `role`, `sha256`, `size_bytes`, `produced_at_utc`, `discovered_physical_path`, `proof_anchor`).
+
+* Path-proofs are stored alongside each artifact; `proof_anchor` must point to the matching transcript.
+
+Mirror discipline (detailed in §8.3):
+
+* Canonical JSONL (UTF-8; ASCII-sorted keys; compact; exactly one LF per record).
+
+* Unknown-key rejection is enforced.
+
+* Fixed ASCII field order and sort-before-write by `(artifact_key, discovered_physical_path)`.
+
+* Exactly one mirror file must exist at `artifacts/evidence_index.jsonl`.
+
+**Governed locations only.**
+
+* Evidence must live under governed repo paths (for example, `artifacts/**`, `docs/**`, `audit/**`).
+
+* Transient generator paths (e.g. `codex/out/**`) are not authoritative and **MUST NOT** be indexed.
+
+* Governed evidence families include, at minimum, the Endpoint Catalog proofs, CLI parity set, `/internal/version` ops proofs, DB posture snapshots, BodyGraph artifacts, **stateless QA export artifacts (BodyGraph export JSON, compat export JSON, run bundles)**, and other families enumerated in §8.6.
+
+**Evidence Catalog (single home).**  
+ PF12 §8.x and §8.6 together form the **Evidence Catalog**: the single home for governed evidence artifact **families** and their titles/paths. Other PF documents (PF04/PF05/PF09/PF14/PF20) must refer to these families by name and **must not** maintain parallel path lists.
+
+**Routing by title only.**
+
+* Math arithmetic (scoring, thresholds, preimage recipe) and transport bytes (Reader, CLI, vendor) are **not** defined here; they are referenced by title only from:
+
+  * **HDE-Math-Spec**,
+
+  * **HDE-Governance**,
+
+  * **HDE-CLI-API-Vendor-Ref**,
+
+  * **HDE Architecture**.
+
+**Tokens & acceptance hints (names-only).**
+
+* **HDE-Governance** owns the Token Registry and all acceptance token semantics.
+
+* PF12 binds those tokens to concrete artifact shapes and Evidence Index / Machine Mirror records via “Acceptance hints (names-only)” lists in later sections; it does **not** redefine semantics.
+
+* **HDE-Build Checklist** (PF09) is a consumer-only view: its token references must be a subset of PF04/PF12 names and may not introduce new token names.
+
+**Process and PR workflow.**
+
+* The “update repo docs and Evidence Index in the same PR” rule and other PR workflow details live in **Epic-Process-Guide** (PF06). PF12 describes what must be kept in sync (catalogs, manifest, Index/Mirror, stateless QA export families), not how PRs are managed.
+
+**Catalogized seeds (admin-only).**
+
+* The Magic-10 seeds catalog at `catalog/magic10_seeds.json` is governed here (see §2.7).
+
+* Changes to this catalog are frozen-input changes and require `release_id` recomputation per §6.
+
+## 0.3 Tagging
 
 Each section is labeled to indicate implementation status:
 
-* **\[Implemented\]** — verified in the repository and enforced by CI and tests.  
-* **\[Required-Now\]** — required for the current build and release discipline; must be satisfied before promotion.  
-* **\[Speculative\]** — accepted future design; not yet wired.  
-* **\[OPEN\]** — unresolved items or toggles pending a Doc-Delta.
+* \[Implemented\] — verified in the repository and enforced by CI and tests.
 
-  ## **0.4 Change policy \[Required-Now\]**
+* \[Required-Now\] — required for the current build and release discipline; must be satisfied before promotion.
 
-**Single homes.** This document owns catalogs (`catalog/`), the freeze-pack manifest at `catalog/manifest.json`, and checksum sidecars (`*.sha256`). Bytes owned by PF01 (scoring, thresholds, deterministic preimage and idempotence), PF02 (boundaries, single homes), PF05 (transport and vendor shaping), and PF04 (A-gates, Reader transport) are referenced by title only and are not restated here.
+* \[Speculative\] — accepted future design; not yet wired.
 
-**Doc-Delta discipline (normative edits only).** A Doc-Delta is required for any change to:
+* \[OPEN\] — unresolved items or toggles pending a Doc-Delta.
 
-* a catalog’s closed domain (IDs, enums, order);  
-* a catalog’s schema;  
-* canonical JSON serialization rules;  
-* the freeze-pack manifest shape or entries (`catalog/manifest.json`);  
-* frozen math inputs under `catalog/` (for example `catalog/magic10.json` IDs or inclusive maxima, `catalog/channels.json` contents);  
-* the Machine Evidence Mirror path or record schema (`artifacts/evidence_index.jsonl`) or its parity rule with the Human Evidence Index (§8.3);  
-* governed records-only artifacts in §8 (format or path), including:  
-  * Endpoint Catalog file: `docs/ENDPOINTS_CATALOG.json` and `docs/ENDPOINTS_CATALOG.json.sha256`;  
-  * Reader A7 composite proof JSON: `artifacts/proofs/reader_success_get_head_304.json`;  
-  * Dev connectivity snapshot: `artifacts/runtime/env_connectivity.snapshot.json`;  
-  * CLI and SDK parity JSONs: `artifacts/cli/{ab.json,ba.json,summary.json}`;  
-  * `/internal/version` ops proof: `proofs/internal_version/get_head.json`;  
-  * Registry report, DB fingerprint, start-command capture, environment inventories and validator outputs (names as in §8.6);  
-  * **BodyGraph release bindings:** `artifacts/bodygraph/release_bindings.json`;  
-  * **BodyGraph refresh policy snapshot:** `artifacts/bodygraph/refresh_policy.snapshot.json`;  
-  * **BodyGraph metrics snapshot (keys-only):** `artifacts/bodygraph/metrics.snapshot.json`;  
-  * **BodyGraph keys-only logs sample (sanitized):** `artifacts/bodygraph/keys_only.logs.sample`.
+## 0.4 Change policy \[Required-Now\]
 
-The Doc-Delta must state scope, targets, acceptance impact, evidence updates, and whether a new `release_id` is required.
+**Single homes.**
 
-**Evidence Index updates (same PR).** Whenever any golden, artifact, snapshot, or script path changes, update this document’s human Evidence Index (titles and paths only), the Evidence Index hash sentinel (`docs/evidence/INDEX.sha256`), and the machine JSONL mirror at `artifacts/evidence_index.jsonl` in the same PR or commit; add a matching entry to the Change Log and Doc-Delta hooks (PF06 owns the process).
+* This document owns:
 
-**Release identity (freeze-pack).** Any byte-level change to frozen inputs enumerated by the manifest, or to the canonical bytes of `catalog/manifest.json`, MUST produce a new `release_id` and record it in the Doc-Delta. Changes to `catalog/magic10_seeds.json` are frozen-input changes and require `release_id` recomputation. For narratives, frozen inputs include the narratives pack manifest at `catalog/narratives/manifest.json` and the pack members under `catalog/narratives/*` per §2.8.
+  * Catalogs under `catalog/`.
 
-**Editorial vs. normative.** Pure editorial rearrangements that do not change catalogs, schemas, or canonical bytes do not require a Doc-Delta. All normative changes do.
+  * The freeze-pack manifest at `catalog/manifest.json`.
 
-**CI enforcement (merge-blocking).** CI fails if any of the following are true:
+  * Checksum sidecars (`*.sha256`) for governed files.
 
-* catalogs fail schema or closed-domain checks;  
-* artifact files violate canonical JSON rules (UTF-8, sorted keys, compact separators, exactly one LF, no BOM);  
-* the human Evidence Index or machine JSONL mirror is not updated alongside changed paths, or parity between them is broken;  
-* the JSONL mirror is non-deterministic (not one object per line, unsorted keys, missing trailing LF), has unknown keys, is missing path-proofs, violates ASCII field order or sort-before-write, or more than one `artifacts/evidence_index.jsonl` exists;  
-* required checksum sidecars for governed files are missing;  
-* the Evidence Index hash sentinel does not match `INDEX.json` bytes.  
-* the **Environment Matrix Snapshot** artifact — `artifacts/runtime/env_matrix.snapshot.json` (**schema v3**; **singleton** semantics); any change to its schema or path requires a Doc‑Delta and same‑PR index/mirror updates.
+* Bytes owned by other PF documents are referenced by title only and are not restated here:
 
-* **Acceptance impact:** None; clarifies Doc‑Delta scope already enforced by `EVIDENCE_INDEX_UPDATED_OK` and `EVIDENCE_INDEX_HASH_OK`.
+  * PF01 — scoring, thresholds, deterministic preimage and idempotence.
 
-## **0.5 Open decisions \[Tracking\]**
+  * PF02 — architectural boundaries and single-home routing.
 
-This section records unresolved items that require confirmation. Each remains **\[OPEN\]** until the named owner confirms. Changes that affect frozen inputs, schemas, closed domains, or canonical bytes must land with a Doc-Delta.
+  * PF05 — transport and vendor shaping.
 
-**CH-PRIMARY**  
- **Status:** RESOLVED  
- **Decision:** canonical Channels catalog path is `catalog/channels.json`.  
- **Owner:** Isis  
- **Severity:** critical  
- **Affects:** §§2.1, 3.2.1, 5, 6  
- **Next:** update all references; retire other channel files to Historical.
+  * PF04 — acceptance gates and Reader transport policy.
 
-**CHANNEL-IDENTITY**  
- **Status:** RESOLVED  
- **Decision:** `channel_id = "NN-NN"` with gates zero-padded `01..64`, min-first; arrays-as-sets sort ASCII by `channel_id`.  
- **Owner:** Isis  
- **Severity:** high  
- **Affects:** §§3.2.1, 4.2  
- **Next:** enforce in schemas and CI; fail on duplicates or wrong order.
+**Doc-Delta discipline (normative edits only).**  
+ A Doc-Delta is required for any change to:
 
-**CHECKSUMS-NAMING**  
- **Status:** RESOLVED  
- **Decision:** the freeze-pack manifest file is `catalog/manifest.json`. Any prior `CANON_CHECKSUMS.json` name is deprecated and must not be used.  
- **Owner:** Isis  
- **Severity:** high  
- **Affects:** §§5.1–5.3, 6.1–6.4  
- **Next:** rename references and stubs; ensure sidecars `*.sha256` exist for governed files.
+* A catalog’s closed domain (IDs, enums, order).
 
-**MAGIC10-HOME**  
- **Status:** RESOLVED  
- **Decision:** Magic-10 IDs and inclusive maxima live in `catalog/magic10.json` (not embedded in presets).  
- **Owner:** Isis  
- **Severity:** high  
- **Affects:** §§2.5–2.6, 6.1  
- **Next:** point presets to this catalog; Doc-Delta on any byte change.
+* A catalog’s schema.
 
-**PACK-ROOT**  
- **Status:** RESOLVED  
- **Decision:** pack root is `catalog/` (used to resolve relative paths in the manifest).  
- **Owner:** Isis  
- **Severity:** medium  
- **Affects:** §5.1, §6.1  
- **Next:** pin in text and examples; changing it bumps `release_id`.
+* Canonical JSON serialization rules.
 
-**SELF-LISTING**  
- **Status:** RESOLVED  
- **Decision:** NO self-listing for `catalog/manifest.json`.  
- **Owner:** Isis  
- **Severity:** low  
- **Affects:** §§5.2, 6.1  
- **Next:** keep manifest entries for governed files only; validate manifest like any other governed artifact.
+* The freeze-pack manifest shape or entries (`catalog/manifest.json`).
 
-**AUTH-PROFILES-USAGE**  
- **Status:** OPEN  
- **Current:** whether Authorities and Profiles catalogs are consumed in v1.  
- **Owner:** Isis  
- **Severity:** medium  
- **Affects:** §2.2 (and CI inclusion)  
- **Next:** confirm usage; include or exclude from CI scope accordingly.
+* Frozen math inputs under `catalog/` (for example, `catalog/magic10.json` IDs or inclusive maxima, `catalog/channels.json` contents).
 
-**ID-CHARSET**  
- **Status:** RESOLVED  
- **Decision:** catalog ID charset/case policy is `^[a-z0-9_]+$`, case-sensitive.  
- **Owner:** Isis  
- **Severity:** medium  
- **Affects:** §3.3 and owning schemas  
- **Next:** reflect in schemas and validation text.
+* The Machine Evidence Mirror path or record schema (`artifacts/evidence_index.jsonl`) or its parity rule with the Human Evidence Index (§8.3).
 
-**PATH-CHARSET**  
- **Status:** RESOLVED  
- **Decision:** POSIX paths, no `..`, no `//`, max 256 bytes.  
- **Owner:** Isis  
- **Severity:** low  
- **Affects:** §5.1  
- **Next:** pin constraints; add to §5.1 validation rules.
+* Governed records-only artifacts in §8, including (titles/paths only):
 
-**SCHEMA-DRAFT**  
- **Status:** RESOLVED  
- **Decision:** JSON Schema 2020-12; `$id` is a stable title-path.  
- **Owner:** Isis  
- **Severity:** medium  
- **Affects:** §3.1 and schema files  
- **Next:** ensure existing schemas declare `$schema`/`$id` accordingly.
+  * Endpoint Catalog file and checksum: `docs/ENDPOINTS_CATALOG.json`, `docs/ENDPOINTS_CATALOG.json.sha256`.
 
-**ALIASES-POLICY**  
- **Status:** RESOLVED  
- **Decision:** input-only aliases in request handling; outputs remain canonical (centers/planets/lines).  
- **Owner:** Isis  
- **Severity:** medium  
- **Affects:** §3.3 and request rules in **HDE-CLI-API-Vendor Ref**  
- **Next:** add the corresponding note here and rules in the request spec (titles only).
+  * Reader A7 composite proof JSON: `artifacts/proofs/reader_success_get_head_304.json`.
 
-**SERIALIZATION-SCOPE**  
- **Status:** RESOLVED  
- **Decision:** Canonical JSON rules apply to JSON evidence artifacts; operational logs remain keys-only (not necessarily canonical JSON).  
- **Owner:** Isis  
- **Severity:** low  
- **Affects:** §4, §5  
- **Next:** none; already reflected in §4.
+  * Dev connectivity snapshot: `artifacts/runtime/env_connectivity.snapshot.json`.
 
-**EVIDENCE-PATHS**  
- **Status:** RESOLVED *(updated)*  
- **Decision:** fix the machine mirror path to `artifacts/evidence_index.jsonl` (records-only). Require 1:1 parity with the human Evidence Index, path-proofs, canonical JSONL (UTF-8, sorted keys, compact, single trailing LF).  
- **Owner:** audit  
- **Severity:** low  
- **Affects:** §8.3, §4  
- **Next:** enforce in CI; fail on mismatch.
+  * CLI parity artifacts: `artifacts/cli/ab.json`, `artifacts/cli/ba.json`, `artifacts/cli/summary.json`.
 
-**MIRROR-RECORD-SCHEMA**  
- **Status:** RESOLVED *(updated)*  
- **Decision:** minimum mirror record keys are  
- `{"artifact_key","role","sha256","size_bytes","produced_at_utc","discovered_physical_path","proof_anchor"}`; reject unknown keys.  
- **Owner:** audit  
- **Severity:** low  
- **Affects:** §8.3  
- **Next:** validate against schema; reject unknown keys; ensure join with human Index `(title,path)`.
+  * `/internal/version` ops proofs (headers/body snapshots) as enumerated in §8.6.
 
-**SEEDS-CATALOGIZE**  
- **Status:** RESOLVED  
- **Decision:** catalogize Magic-10 seeds at `catalog/magic10_seeds.json` (admin-only; exactly 10 entries).  
- **Owner:** Isis  
- **Severity:** medium  
- **Affects:** §2.7 (new), §3, §6  
- **Next:** add catalog \+ schema; include in manifest; any byte change recomputes `release_id`.
+  * Registry report, DB fingerprint, start-command capture, environment inventories and validator outputs (names as in §8.6).
+
+  * BodyGraph release bindings: `artifacts/bodygraph/release_bindings.json`.
+
+  * BodyGraph refresh policy snapshot: `artifacts/bodygraph/refresh_policy.snapshot.json`.
+
+  * BodyGraph metrics snapshot (keys-only): `artifacts/bodygraph/metrics.snapshot.json`.
+
+  * BodyGraph keys-only logs sample (sanitized): `artifacts/bodygraph/keys_only.logs.sample`.
+
+Each Doc-Delta **must** state scope, targets, acceptance impact, evidence updates, and whether a new `release_id` is required.
+
+**Evidence Index updates (same PR).**
+
+* Whenever any golden, artifact, snapshot, or script path changes, update in the **same PR/commit**:
+
+  * The Human Evidence Index (`docs/evidence/INDEX.json`),
+
+  * The Evidence Index hash sentinel (`docs/evidence/INDEX.sha256`),
+
+  * The Machine Evidence Mirror (`artifacts/evidence_index.jsonl`).
+
+* Add a matching entry to the Change Log and Doc-Delta hooks (process ownership lives in PF06 — Epic-Process-Guide).
+
+**Release identity (freeze-pack).**
+
+* Any byte-level change to frozen inputs enumerated by the manifest, or to the canonical bytes of `catalog/manifest.json`, **MUST** produce a new `release_id` and record it in the Doc-Delta.
+
+* Changes to `catalog/magic10_seeds.json` are frozen-input changes and require `release_id` recomputation.
+
+* For narratives, frozen inputs include the narratives pack manifest at `catalog/narratives/manifest.json` and the pack members under `catalog/narratives/*` per §2.8.
+
+**Editorial vs normative.**
+
+* Pure editorial rearrangements that do not change catalogs, schemas, or canonical bytes do **not** require a Doc-Delta.
+
+* All normative changes do.
+
+**CI enforcement (merge-blocking).**  
+ CI must fail if any of the following are true:
+
+* Catalogs fail schema or closed-domain checks.
+
+* Artifact files violate canonical JSON rules (UTF-8, sorted keys, compact separators, exactly one LF, no BOM).
+
+* The Human Evidence Index or Machine Evidence Mirror is not updated alongside changed paths, or parity between them is broken.
+
+* The JSONL Mirror is non-deterministic (not one object per line, unsorted keys, missing trailing LF), has unknown keys, is missing path-proofs, violates ASCII field order or sort-before-write, or more than one `artifacts/evidence_index.jsonl` exists.
+
+* Required checksum sidecars for governed files are missing.
+
+* The Evidence Index hash sentinel does not match `INDEX.json` bytes.
+
+* The Environment Matrix Snapshot artifact — `artifacts/runtime/env_matrix.snapshot.json` (schema v3; singleton semantics) — is missing or invalid; any change to its schema or path requires a Doc-Delta and same-PR Index/Mirror updates.
+
+## 0.5 Open decisions \[Tracking\]
+
+This section records unresolved items that require confirmation. Each remains \[OPEN\] until the named owner confirms. Changes that affect frozen inputs, schemas, closed domains, or canonical bytes must land with a Doc-Delta.
+
+* **CH-PRIMARY**  
+   Status: RESOLVED  
+   Decision: canonical Channels catalog path is `catalog/channels.json`.  
+   Owner: Isis  
+   Severity: critical  
+   Affects: §§2.1, 3.2.1, 5, 6  
+   Next: update all references; retire other channel files to Historical.
+
+* **CHANNEL-IDENTITY**  
+   Status: RESOLVED  
+   Decision: `channel_id = "NN-NN"` with gates zero-padded `01..64`, min-first; arrays-as-sets sort ASCII by `channel_id`.  
+   Owner: Isis  
+   Severity: high  
+   Affects: §§3.2.1, 4.2  
+   Next: enforce in schemas and CI; fail on duplicates or wrong order.
+
+* **CHECKSUMS-NAMING**  
+   Status: RESOLVED  
+   Decision: the freeze-pack manifest file is `catalog/manifest.json`. Any prior `CANON_CHECKSUMS.json` name is deprecated and must not be used.  
+   Owner: Isis  
+   Severity: high  
+   Affects: §§5.1–5.3, 6.1–6.4  
+   Next: rename references and stubs; ensure `*.sha256` sidecars exist for governed files.
+
+* **MAGIC10-HOME**  
+   Status: RESOLVED  
+   Decision: Magic-10 IDs and inclusive maxima live in `catalog/magic10.json` (not embedded in presets).  
+   Owner: Isis  
+   Severity: high  
+   Affects: §§2.5–2.6, 6.1  
+   Next: point presets to this catalog; Doc-Delta on any byte change.
+
+* **PACK-ROOT**  
+   Status: RESOLVED  
+   Decision: pack root is `catalog/` (used to resolve relative paths in the manifest).  
+   Owner: Isis  
+   Severity: medium  
+   Affects: §5.1, §6.1  
+   Next: pin in text and examples; changing it bumps `release_id`.
+
+* **SELF-LISTING**  
+   Status: RESOLVED  
+   Decision: **no** self-listing for `catalog/manifest.json`.  
+   Owner: Isis  
+   Severity: low  
+   Affects: §§5.2, 6.1  
+   Next: keep manifest entries for governed files only; validate manifest like any other governed artifact.
+
+* **AUTH-PROFILES-USAGE**  
+   Status: OPEN  
+   Current: whether Authorities and Profiles catalogs are consumed in v1.  
+   Owner: Isis  
+   Severity: medium  
+   Affects: §2.2 (and CI inclusion)  
+   Next: confirm usage; include or exclude from CI scope accordingly.
+
+* **ID-CHARSET**  
+   Status: RESOLVED  
+   Decision: catalog ID charset/case policy is `^[a-z0-9_]+$`, case-sensitive.  
+   Owner: Isis  
+   Severity: medium  
+   Affects: §3.3 and owning schemas  
+   Next: reflect in schemas and validation text.
+
+* **PATH-CHARSET**  
+   Status: RESOLVED  
+   Decision: POSIX paths, no `..`, no `//`, max 256 bytes.  
+   Owner: Isis  
+   Severity: low  
+   Affects: §5.1  
+   Next: pin constraints; add to §5.1 validation rules.
+
+* **SCHEMA-DRAFT**  
+   Status: RESOLVED  
+   Decision: JSON Schema 2020-12; `$id` is a stable title-path.  
+   Owner: Isis  
+   Severity: medium  
+   Affects: §3.1 and schema files  
+   Next: ensure existing schemas declare `$schema` / `$id` accordingly.
+
+* **ALIASES-POLICY**  
+   Status: RESOLVED  
+   Decision: input-only aliases in request handling; outputs remain canonical (centers/planets/lines).  
+   Owner: Isis  
+   Severity: medium  
+   Affects: §3.3 and request rules in HDE-CLI-API-Vendor-Ref  
+   Next: add the corresponding note here and rules in the request spec (titles only).
+
+* **SERIALIZATION-SCOPE**  
+   Status: RESOLVED  
+   Decision: Canonical JSON rules apply to JSON evidence artifacts; operational logs remain keys-only (not necessarily canonical JSON).  
+   Owner: Isis  
+   Severity: low  
+   Affects: §4, §5  
+   Next: none; already reflected in §4.
+
+* **EVIDENCE-PATHS**  
+   Status: RESOLVED (updated)  
+   Decision: fix the Machine Mirror path to `artifacts/evidence_index.jsonl` (records-only). Require 1:1 parity with the Human Evidence Index, path-proofs, and canonical JSONL (UTF-8, sorted keys, compact, single trailing LF).  
+   Owner: audit  
+   Severity: low  
+   Affects: §8.3, §4  
+   Next: enforce in CI; fail on mismatch.
+
+
+* **MTIME-UTC-SEMANTICS**  
+   Status: RESOLVED  
+   Decision: `mtime_utc` in governed path-proof transcripts is the **refresh-time mtime** of the artifact: a UTC ISO-8601 timestamp captured when the evidence job refreshed that artifact, truncated to whole seconds with **microsecond \== 0**, and **not later than** the artifact’s current filesystem `stat().st_mtime` at the time of capture or check (monotone semantics). It is **not** required to stay equal to future `stat()` values across clones or reruns on other machines. `produced_at_utc` remains the logical evidence refresh timestamp (when the evidence job ran) and is also a UTC ISO-8601 string; it may be updated on each refresh or carried forward when `mtime_utc` is unchanged. Integrity gates continue to rely primarily on `sha256` and `size_bytes` equality between the artifact, its mirror record, and its path-proof; `mtime_utc` and `produced_at_utc` provide temporal context and are validated for format and monotonicity.  
+   Owner: Isis  
+   Severity: medium  
+   Affects: §8.3 (path-proof transcript schema), PF19 (QA checks), PF10 (evidence addenda)  
+   Next: Treat the refresh-time, monotone `mtime_utc` semantics as **canon** for all governed path-proofs. Any future change to these semantics MUST land with a Doc-Delta and synchronized updates to PF19, evidence tools (`tools/evidence/update_evidence_index.py`, `ci/checks/check_mirror_schema.sh`), and the relevant tests before being considered accepted. 
+
+* **MIRROR-RECORD-SCHEMA**  
+   Status: RESOLVED (updated)  
+   Decision: minimum mirror record keys are  
+   `{"artifact_key","role","sha256","size_bytes","produced_at_utc","discovered_physical_path","proof_anchor"}`; reject unknown keys.  
+   Owner: audit  
+   Severity: low  
+   Affects: §8.3  
+   Next: validate against schema; reject unknown keys; ensure join with Human Index (title,path).
+
+* **SEEDS-CATALOGIZE**  
+   Status: RESOLVED  
+   Decision: catalogize Magic-10 seeds at `catalog/magic10_seeds.json` (admin-only; exactly 10 entries).  
+   Owner: Isis  
+   Severity: medium  
+   Affects: §2.7 (new), §3, §6  
+   Next: add catalog \+ schema; include in manifest; any byte change recomputes `release_id`.
 
 ---
 
@@ -225,6 +373,38 @@ This document is the single home for the engine’s **pack inputs** and **pack a
   * **Sidecars:** governed files carry `*.sha256` checksum sidecars.  
   * **Release identity:** `release_id = sha256(canonical_manifest_bytes)` (lowercase 64-hex). **Any byte change** to frozen inputs or to the manifest’s canonical bytes **requires a new `release_id`**.  
   * **Deprecation note:** `CANON_CHECKSUMS.json` is deprecated; use `catalog/manifest.json`.
+
+**Stateless QA export artifacts (no-DB mode).**  
+ PF12 also governs the schemas and Evidence Catalog families for **stateless QA exports** produced directly by the engine and CLI from birth data or vendor JSON, without requiring database user records:
+
+* **BodyGraph export JSON** — a canonical JSON object that records:
+
+  * raw birth inputs used for the computation (date, time, location as normalized fields),
+
+  * the resolved BodyGraph topology (centers, gates, channels, profile, authority, definition, type) as IDs and structures only, and
+
+  * any internal registry IDs required for downstream compat or narratives.  
+     It MUST NOT embed app-level user identifiers or database primary keys. It is a pure engine result over frozen catalogs and math inputs (titles-only to HDE-Math-Spec and HDE-Schemas & Artifacts).
+
+* **Compat export JSON (stateless mode)** — a canonical JSON object that records compat results computed either from two BodyGraph export files or two birth tuples:
+
+  * the pair of inputs (referenced by birth data and/or BodyGraph export identity),
+
+  * the internal compat result (closed Magic-10 IDs and bands only; numbers remain admin/internal), and
+
+  * the Reader v1 public envelope (six-key object per PF01/PF05) as a nested structure for parity checks.  
+     This artifact is a QA/admin surface only; it remains numeric-free at the public Reader layer.
+
+* **Optional “run bundle” JSON** — a composite QA artifact that aggregates, for a single compat run:
+
+  * the originating birth inputs or vendor JSON,
+
+  * the resulting BodyGraph export JSON for each chart, and
+
+  * the compat export JSON for the pair.  
+     It exists to support reproducible QA runs and audits; concrete schema and usage live under §8.x Evidence Catalog.
+
+All three stateless QA artifact types MUST follow the canonical JSON policy defined in this document (UTF-8, sorted keys, compact separators, exactly one trailing LF; arrays-as-sets deduped and ASCII-sorted) and MUST be admissible to the Evidence Index/Mirror under governed paths (`artifacts/**`, `audit/**`) when used as part of QA. They are **not** public app payloads; transport bytes and CLI flags live in HDE-CLI-API-Vendor-Ref and HDE-Governance (titles-only).
 
 By design, **math arithmetic** (scoring, thresholds, preimage recipe) and **transport bytes** (Reader/CLI/vendor) are **not duplicated here** and are referenced **by title only** in their owning documents.
 
@@ -247,7 +427,7 @@ By design, **math arithmetic** (scoring, thresholds, preimage recipe) and **tran
 
 ---
 
-**2\. Catalogs Index (titles/paths only) \[Required-Now\]**
+#  **2\. Catalogs Index (titles/paths only) \[Required-Now\]**
 
 Master list of every catalog consumed by the engine with a pointer to its JSON Schema. No payload bytes in this doc.
 
@@ -466,7 +646,7 @@ Acknowledged — applying the plan exactly (append-only edits; canon \+ readabil
 
 ---
 
-### **2.8 Narratives pack (keys/templates/palettes/suppression\_map) \[Required‑Now\]**
+## 2.8 Narratives pack (keys/templates/palettes/suppression\_map) \[Required‑Now\]
 
 **Catalog paths.**
 
@@ -760,11 +940,9 @@ Acceptance hints
 * ALIASES\_INPUT\_ONLY\_OK  
 * ID\_CHARSET\_POLICY\_OK
 
-Acknowledged — I may reformat structure/wording only to conform to canon and improve readability, while preserving substance.
-
 ---
 
-### **3.4 Narratives composer response schema \[Required‑Now\]**
+## 3.4 Narratives composer response schema \[Required‑Now\]
 
 **Schema path.** `schemas/narratives.composer.response.v1.json`
 
@@ -1641,6 +1819,20 @@ Each line in the mirror uses at least the following schema; unknown keys are rej
  "proof\_anchor": ""  
  }
 
+**Self-record semantics (index.machine\_mirror).**
+
+* The mirror **MAY** include a single record whose `artifact_key` identifies the Machine Evidence Mirror itself (for example, `"index.machine_mirror"`). This is the **self-record** for `artifacts/evidence_index.jsonl`.
+
+* For this self-record:
+
+  * `sha256` **MUST** equal the SHA-256 digest of the mirror’s canonical JSONL body **excluding the self-record line**.
+
+  * `size_bytes` **MUST** equal the byte length of the complete `artifacts/evidence_index.jsonl` file **including** the self-record line.
+
+  * The associated path-proof transcript for `artifacts/evidence_index.jsonl` **MUST** contain exactly one `sha256`/`size_bytes` pair and those values **MUST** match the self-record’s `sha256` and `size_bytes`.
+
+* All other mirror records (non self-records) follow the normal mirror discipline: `sha256` and `size_bytes` are for the referenced artifact at `discovered_physical_path`, and their path-proof transcripts must match those values (see “Path-proof transcript schema”).
+
 **Field order and write discipline (merge-blocking)**
 
 * ASCII field order (exact):
@@ -1661,27 +1853,113 @@ Each line in the mirror uses at least the following schema; unknown keys are rej
 
 * Differences between `produced_at_utc` and `mtime_utc` are allowed but must be truthful — no “backdating” or forward-dating to distort ordering. QA may rely on `produced_at_utc` as the primary ordering key for evidence; disagreements should be rare and explainable in the PR.
 
-**Acceptance hints (titles-only; tokens live in HDE-Governance §2.0)**
+**path-proof transcript schema (governed artifacts).**
 
-Names-only list of tokens that gate the mirror and its parity with the human index:
+For every governed artifact in **§8.6**, the file
 
-* `MACHINE_MIRROR_UPDATED_OK`
+`artifacts/path_proofs/.../*.path_proof.txt`
 
-* `EVIDENCE_INDEX_MIRROR_OK`
+**MUST** describe exactly one artifact and follow a stable, line-oriented schema.
 
-* `EVIDENCE_INDEX_UPDATED_OK`
+**Required fields (exactly one record per file).**
 
-* `EVIDENCE_INDEX_HASH_OK`
+Each path-proof **MUST** contain **exactly one** record for the artifact it describes, with the following required fields:
 
-* `CI_CHECK_MIRROR_SCHEMA_OK`
+* `path` — repo-relative path to the artifact (for example `artifacts/engine/order/channels_sorted.snapshot.json`).
 
-* `CI_CHECK_FINAL_LF_OK`
+* `sha256` — lowercase 64-hex SHA-256 digest of the artifact’s canonical bytes.
 
-* `EVIDENCE_PATHS_VALIDATED_OK`
+* `size_bytes` — non-negative integer byte length of the artifact’s canonical bytes.
 
-* `JSON_CANONICAL_CHECK_OK`
+* `mtime_utc` — UTC ISO-8601 timestamp (e.g. `YYYY-MM-DDThh:mm:ssZ`) representing the artifact’s **refresh-time mtime** (see “`mtime_utc` semantics” below).
 
-* `EVIDENCE_PATH_PROOFS_OK`
+* `produced_at_utc` — UTC ISO-8601 time when the evidence for this artifact was logically produced.
+
+These fields **MUST** appear exactly once per file; path-proofs **MUST NOT** contain multiple or conflicting `sha256`/`size_bytes` pairs, nor multiple `mtime_utc` or `produced_at_utc` values for the same artifact.
+
+**Optional fields.**
+
+Path-proof transcripts **MAY** include additional informational fields beyond the required set above, but those fields:
+
+* **MUST NOT** change acceptance semantics, and
+
+* **MUST NOT** conflict with the required record for `path`, `sha256`, `size_bytes`, `mtime_utc`, or `produced_at_utc`.
+
+The authoritative truth remains the match between:
+
+* the artifact’s canonical bytes,
+
+* the mirror record’s `sha256` and `size_bytes`, and
+
+* the path-proof’s single `sha256`/`size_bytes` triple for that artifact.
+
+**Relationship to `proof_anchor`.**
+
+* Each mirror record’s `proof_anchor` field **MUST** equal the path to the corresponding `.path_proof.txt` for that artifact.
+
+* CI **MUST** verify that:
+
+  * the file referenced by `proof_anchor` exists under governed paths,
+
+  * its `path` matches the mirror’s `discovered_physical_path`,
+
+  * its `sha256`/`size_bytes` match the mirror record’s `sha256`/`size_bytes`, and
+
+  * there are no duplicate or conflicting `sha256`/`size_bytes` entries within the path-proof.
+
+Failure of any of these conditions is a hard error under the mirror/index tokens declared in §8.3 and §0.2.
+
+**`mtime_utc` semantics (normative).**
+
+* **Refresh-time mtime.**
+
+  * `mtime_utc` records the artifact’s **refresh-time mtime**: the filesystem modification time observed when the evidence job refreshed that artifact, encoded as a UTC ISO-8601 timestamp (`YYYY-MM-DDThh:mm:ssZ`) with **no fractional seconds** (microsecond component MUST be zero).
+
+* **Monotone vs filesystem `stat()`.**
+
+  * On any run that writes or checks a path-proof, the evidence tooling **MUST** verify that `mtime_utc` parses as UTC (with microsecond \== 0\) and that `parsed_mtime <= current_fs_mtime`, where `current_fs_mtime` is the artifact’s `stat().st_mtime` observed at check time.
+
+  * `mtime_utc` is **not required** to be exactly equal to `stat().st_mtime`; it is permitted to be **earlier** (for example, when a proof is refreshed without the underlying file changing) but **MUST NOT** lie in the future relative to the current filesystem mtime.
+
+* **Interaction with `produced_at_utc`.**
+
+  * `produced_at_utc` captures when the evidence for the artifact was **logically produced** (the evidence refresh event). It is also a UTC ISO-8601 timestamp and may be updated on each refresh or left unchanged when appropriate.
+
+  * It is expected, but not strictly required, that `produced_at_utc` be greater than or equal to prior `produced_at_utc` values for the same artifact; any non-monotone behavior should be rare and explained in the PR.
+
+* **Integrity semantics.**
+
+  * The **primary integrity check** for governed evidence remains the equality of `sha256` and `size_bytes` between:
+
+    * the artifact’s canonical bytes on disk,
+
+    * the Machine Mirror record (§8.3), and
+
+    * the single record in the path-proof transcript.
+
+  * `mtime_utc` and `produced_at_utc` provide temporal context and are enforced for format and monotone constraints as described above; they **do not replace** the sha/size equality as the core integrity proof.
+
+* **Alignment with tools and QA.**
+
+  * Evidence tooling (`tools/evidence/update_evidence_index.py`) and CI checks (`ci/checks/check_mirror_schema.sh`) **MUST** implement these semantics:
+
+    * when writing path-proofs, always recompute `size_bytes` and `sha256` from the artifact’s canonical bytes;
+
+    * set or carry forward `mtime_utc` as the refresh-time mtime, and validate that it is a UTC ISO timestamp with microsecond \== 0 and `mtime_utc <= current_fs_mtime`;
+
+    * set or carry forward `produced_at_utc` as the evidence refresh time.
+
+  * Evidence tests (for example, `tests/evidence/test_evidence_skeleton.py`, `tests/ops/test_evidence_index.py`) **MUST** assert these same semantics (format \+ monotone `<= stat_mtime`) and MUST be kept in sync with this section.
+
+* **Change control.**
+
+  * Any change to the definition or validation of `mtime_utc` or `produced_at_utc` semantics is a normative change and **requires**:
+
+    * a PF12 Doc-Delta (§9),
+
+    * synchronized updates to PF19 (Glow QA Guide) and PF10 Build Notes, and
+
+    * updates to the evidence tooling and tests that enforce these semantics.
 
 **Join to the human index (parity, proofs, same-PR rule)**
 
@@ -1734,6 +2012,18 @@ Names-only list of tokens that gate the mirror and its parity with the human ind
 * Records with any additional fields fail policy checks.
 
 * Rate-limit (429) evidence uses a different allow-list and is governed by HDE-Governance. Do not mix refusal and 429 fields in the mirror.
+
+**Refresh sequence (normative).**
+
+When governed evidence artifacts change, the canonical refresh sequence is:
+
+1. Update `docs/evidence/INDEX.json` with the new or changed titles and paths.
+
+2. Run `python tools/evidence/update_evidence_index.py` in write mode to regenerate `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl`, and all governed `*.path_proof.txt` transcripts.
+
+3. Run the mirror schema/shape check job (for example, `ci/checks/check_mirror_schema.sh`) and fix any discrepancies before merge.
+
+Process and PR workflow (who runs which command and when) remains single-homed in Epic-Process-Guide; this section pins the file-level ordering and artifacts that **MUST** be updated together.
 
 **Role usage notes (non-normative examples)**
 
@@ -1933,6 +2223,9 @@ Minimum fields:
 
 * Used for human review; must maintain 1:1 parity with the machine JSONL mirror in §8.3.
 
+**Shape and normalization.**  
+ `INDEX.json` stores an array of `{artifact_key, discovered_physical_path}` objects. Before render, duplicate `(artifact_key, discovered_physical_path)` pairs **MUST** be deduplicated, and the array **MUST** be ASCII-ascending first by `artifact_key` and then by `discovered_physical_path` (byte-wise, locale-independent). The hash sentinel `docs/evidence/INDEX.sha256` is computed over the canonical bytes of `INDEX.json` and **is not** mirrored into `artifacts/evidence_index.jsonl`; it is a Human Index–only guard.
+
 **Update rule**
 
 * When an artifact is added, moved, or removed, update in the same PR/commit:
@@ -1951,41 +2244,74 @@ Minimum fields:
 
 * `EVIDENCE_INDEX_HASH_OK`
 
-## **8.5 Registry report (records-only)**
+  ## **8.5 Registry report (records-only)**
 
-**Purpose and format**
+**Purpose.** Names-only, records-only summary of the configuration registry for a given cut. This artifact is used by CI and auditors to prove that the registry catalogs and manifest are internally consistent, and that alias policy is enforced as configured. It contains **no secrets** and **no raw payload values**.
 
-* Names-only, records-only indicator that the configuration registry was generated for this cut; no secrets or payload values.
+**Path (single home).**  
+ `artifacts/registry/registry_report.json` (fixed).
 
-* Canonical JSON object (UTF-8, no BOM; sorted keys; compact; exactly one trailing LF).
+**Canonical JSON & schema.**
 
-* Intended for automated consumption (for example, CI, auditors), not for human-readable narrative.
+* Canonical JSON per §4 (UTF-8, no BOM; sorted keys; compact; exactly one trailing LF).
 
-**Path (single home)**
+* Top-level object **MUST** use at least the following keys; unknown top-level keys are rejected:
 
-* `artifacts/registry/registry_report.json` (fixed).
+  * `schema` — string, **MUST** equal `"registry_report.v1"`.
 
-**Content (minimum shape; reject unknown keys)**
+  * `generated_at_utc` — string. UTC ISO-8601 timestamp (`YYYY-MM-DDThh:mm:ssZ`).
 
-* `generated_at_utc` — ISO-8601 UTC timestamp of the registry build.
+  * `inputs` — object. Names-only descriptions of upstream sources (titles and paths for catalogs, manifest, and environment inputs).
 
-* `inputs` — names-only list of upstream sources consulted (for example, `["env:LC_ALL","env:LANG","env:TZ","catalog/*.json","…"]`).
+  * `artifacts` — object. Contains at least one member `registry` (see below).
 
-* `artifacts` — names-only list of emitted registry artifacts (titles only, for example, `"artifacts/registry/registry_report.json"`).
+  * `notes` — array of strings (optional; short internal comments only, no secrets).
 
-* `notes` — optional short array of strings (free text; no secrets).
+**Generated-at stability.**
 
-* This artifact is not a substitute for the Human Evidence Index; it is a machine-oriented summary.
+* `generated_at_utc` is intended to be **stable across two runs** unless the environment explicitly opts into new timestamps (for example, via `SOURCE_DATE_EPOCH` or an equivalent mechanism).
 
-**Indexing (titles/paths only)**
+* Tools **SHOULD** reuse the existing `generated_at_utc` from a prior report when regenerating in a determinism-pinned environment and no inputs have changed.
 
-* **Machine mirror.** Append a records-only entry to `artifacts/evidence_index.jsonl` in the same PR:
+**`artifacts.registry` shape (names-only summary).**
 
-  * `artifact_key` (title),
+`artifacts.registry` **MUST** be present and is a names-only summary of registry state. At minimum, it **MUST** contain:
+
+* `channel_ids` — array of strings. Canonical channel IDs (`NN-NN`) drawn from the Channels catalog; arrays-as-sets discipline from §4.2 applies (deduped, ASCII-sorted).
+
+* `gate_centers` — object mapping gate IDs (1..64 as strings) to center IDs (`head, ajna, throat, g_center, ego, spleen, sacral, solar_plexus, root`). Names-only; values must match the topology catalogs.
+
+* `centers` — array of center IDs (closed domain from §2.1).
+
+* `domains` — array of domain/category labels used by the registry (names-only).
+
+* `domain_counts` — object mapping domain labels to **non-negative integers** (counts of channels per domain).
+
+* `magic10` — object summarizing Magic-10 registry state:
+
+  * `order` — array of the ten Magic-10 category IDs (normative order, names-only).
+
+  * `seeds` — names-only summary keyed by category ID; may include `seed_version` or other admin-only identifiers.
+
+  * `caps` — object keyed by category ID with integer caps, when present (names-only; values must match `catalog/magic10.json` and any related caps catalog).
+
+* `alias_policy` — object describing alias behavior:
+
+  * `mode` — string, one of `"off"` or `"allow_list"`. `"off"` means alias entries are not accepted; `"allow_list"` means they are accepted only when explicitly configured.
+
+  * `aliases` — object mapping alias IDs (strings) to canonical channel IDs (strings) when `mode:"allow_list"`; keys and values are names-only; any alias included here **must** correspond to validated catalog entries.
+
+Implementation details (how these fields are computed, or where the aliases ledger lives) are out of scope for this document; they live in Mechanics and QA. PF12 only governs the **shape**, **names-only content**, and canonical JSON requirements.
+
+**Indexing (titles/paths only).**
+
+* **Machine mirror.** Every registry\_report instance **MUST** have a corresponding record in `artifacts/evidence_index.jsonl` with:
+
+  * `artifact_key` (for example `"registry.registry_report"`),
 
   * `role:"snapshot"`,
 
-  * `discovered_physical_path`,
+  * `discovered_physical_path:"artifacts/registry/registry_report.json"`,
 
   * `sha256`,
 
@@ -1993,19 +2319,32 @@ Minimum fields:
 
   * `produced_at_utc`,
 
-  * `proof_anchor` (path to `path_proof.txt` stored alongside the file).
+  * `proof_anchor` (path to `artifacts/registry/registry_report.json.path_proof.txt` stored alongside the JSON file).
 
-* **Human index (optional).** Add a titles/paths-only entry in §8.6 (no payload bytes).
+* **Human index.** Add a titles/paths-only entry in `docs/evidence/INDEX.json` with the same artifact\_key/title and path. Update `docs/evidence/INDEX.sha256` in the **same PR**.
 
-* Mirror records must follow §8.3 (canonical JSONL; one LF; sorted keys; unknown-key rejection; path-proof; single mirror file).
+Mirror records **MUST** obey §8.3 (canonical JSONL; one LF; unknown-key rejection; ASCII field order; sort-before-write; single mirror file; governed paths only; path-proofs present).
 
-**Acceptance hints (titles-only; tokens live in HDE-Governance §2.0)**
+**Acceptance hints (titles-only; tokens live in HDE-Governance §2.0).**
 
-* `REGISTRY_REPORT_OK` (registry report present, canonical, and indexed).
+* `REGISTRY_REPORT_OK` — registry\_report present, canonical JSON, and indexed.
 
-* `EVIDENCE_INDEX_UPDATED_OK` (human/machine parity in the same PR).
+* `EVIDENCE_INDEX_UPDATED_OK` — human/machine parity updated in the same PR.
 
-* `EVIDENCE_PATHS_VALIDATED_OK` (mirror record has `proof_anchor` for on-disk path-proof).
+* `EVIDENCE_INDEX_HASH_OK` — human index hash sentinel matches `INDEX.json` bytes.
+
+* `EVIDENCE_PATHS_VALIDATED_OK` — mirror record has `proof_anchor` to a matching path-proof.
+
+* `EVIDENCE_INDEX_MIRROR_OK` — mirror schema and self-record semantics are satisfied per §8.3 and §0.2.
+
+**Generation & env rails.**  
+ `registry_report.v1` is generated by the typed loader (tools/generate\_registry\_report.py) under the closed-rails profile used for evidence jobs (`SAFE_MODE=1, ALLOW_NETWORK=0, LC_ALL=C, LANG=C, TZ=UTC`). The report is names-only and **MUST NOT** contain secrets or raw payload values.
+
+**ID and alias semantics.**  
+ During generation, unknown IDs and enum values from the catalogs fail closed: the loader **MUST** reject any ID or enum value that is not a member of the closed domains defined in §3.3. Where alias catalogs are present, aliases are resolved to canonical IDs **before** validation and emission, and the report records only canonical IDs. Aliases remain input-only; all outputs are canonical, per §3.3.
+
+**Determinism tests.**  
+ Registry report generation participates in the global determinism contract: two successive runs over the same inputs **MUST** produce byte-identical `registry_report.v1` documents. CI tests **MUST** assert both canonical JSON (§4) and two-run identity for this artifact; failures are hard errors and block merge.
 
 ## **8.6 Evidence Index entries (titles/paths only) \[Required-Now\]**
 
@@ -2050,6 +2389,30 @@ Assert the mirror/index tokens named in §8.3 on every change.
 * `audit/gates/canonical_json/json_canon_compare.log`
 
 * `artifacts/topology/topology_coherence.log`
+
+*Topology orientation demo*
+
+* `audit/gates/topology/orientation_demo.txt`
+
+* `audit/gates/topology/degree_check.log`
+
+* `audit/gates/topology/multiplicity_vector.log`
+
+These artifacts form the `topology.orientation_demo` family and serve as the exemplar for path-proof validation and topology invariants; each **MUST** be indexed in both the Human Evidence Index and the Machine Evidence Mirror with matching path-proofs.
+
+*Deterministic order & comparators required−nowrequired-nowrequired−now*
+
+* `artifacts/engine/order/props_total_order.log`  
+   Log of ordering properties and invariants (antisymmetry, transitivity, totality) for the canonical comparators.
+
+* `artifacts/engine/order/channels_sorted.snapshot.json`  
+   Canonical JSON snapshot of channels in comparator order.
+
+* `artifacts/engine/order/categories_iter.snapshot.json`  
+   Canonical JSON snapshot of categories in comparator order.
+
+* `artifacts/engine/order/abba_identity.bytes`  
+   Binary AB↔BA identity sample for comparator behavior, governed by the same mirror and path-proof discipline (`abba_identity.bytes.path_proof.txt`) as other artifacts in this section.
 
 *Endpoint Catalog and A7 proofs*
 
@@ -2438,6 +2801,87 @@ For EPIC-011, tokens such as `DB_SCHEMA_FINGERPRINT_OK` and `DB_ROLE_OK` are def
  `A7_GET_QUOTED_ETAG_OK`, `A7_HEAD_PARITY_OK`, `A7_304_OMITS_CT_CL_OK`, `A7_VARY_AUTH_AE_OK`, `A7_ENCODING_INVARIANCE_OK`, `A7_TRANSPORT_PROOF_OK`,  
  `ENDPOINTS_CATALOG_OK`, `ENDPOINTS_CATALOG_INTERNAL_OK`, `ENDPOINTS_CATALOG_ENV_GATE_OK`,  
  `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_HASH_OK`, `EVIDENCE_INDEX_MIRROR_OK`.
+
+## **8.13 Stateless QA export families (no-DB JSON mode) Required−NowRequired-NowRequired−Now**
+
+**Purpose.**  
+ Record the governed evidence families used to exercise the engine in a **stateless/no-DB QA mode**, using only CLI \+ files. These families do not replace existing DB-bound evidence; they provide a complementary way to prove engine math and Reader/CLI parity when no app user model or persistent BodyGraph records are available.
+
+**Family: `qa.bodygraph_export.stateless`**
+
+* **Role.** Captures a single BodyGraph export JSON object produced directly from birth data or vendor JSON via CLI, without reading or writing app/user tables.
+
+* **Minimum content (names-only).**
+
+  * `schema` — a string tag (e.g. `"hdctl_bodygraph_export.v1"`) governed by this document.
+
+  * `input` — a birth tuple or vendor JSON descriptor (names-only; schema pinned in PF12 §3.x).
+
+  * `bodygraph` — a structure containing centers, channels, gates, profile, authority, definition, and type as IDs (titles-only to HDE-Math-Spec and HDE-Schemas & Artifacts catalogs).
+
+  * `meta` — engine/build identity fields (e.g. `engine_tag`, `release_id`, `invocation_tag`) routed to HDE-Math-Spec/HDE-Governance by title.
+
+* **Canonical JSON.** Artifact bytes MUST obey PF12 canonical JSON rules: UTF-8, no BOM; ASCII-sorted keys; compact separators; exactly one trailing LF; arrays used as sets deduped and ASCII-sorted.
+
+* **Stateless posture.** No app-level user IDs or DB row identifiers are permitted in this artifact; provenance is via `input` and catalog IDs only.
+
+* **Indexing.** When used as governed evidence, each artifact MUST be indexed in `docs/evidence/INDEX.json` and mirrored in `artifacts/evidence_index.jsonl` with a `proof_anchor` to a co-located path-proof transcript (see §8.3).
+
+**Family: `qa.compat_export.stateless`**
+
+* **Role.** Captures a compat run in stateless mode, using two BodyGraph exports or two birth tuples as inputs, and emits compat \+ Reader envelope JSON without DB users.
+
+* **Minimum content (names-only).**
+
+  * `schema` — a string tag (e.g. `"hdctl_compat_export.v1"`) governed here.
+
+  * `inputs` — references to the two charts (by birth data and/or BodyGraph export identity).
+
+  * `compat` — internal compat result (Magic-10 IDs and bands only; numbers remain admin/internal; arithmetic lives in HDE-Math-Spec).
+
+  * `reader_envelope` — nested copy of the six-key Reader v1 success body for this pair (see PF01/PF05 by title), used for Reader↔CLI parity checks; this is not a separate public transport surface.
+
+  * `meta` — identity fields as above (engine\_tag, release\_id, invocation\_tag).
+
+* **Canonical JSON.** Same canonical JSON requirements as `qa.bodygraph_export.stateless`.
+
+* **Stateless posture.** No DB user IDs; only birth/BodyGraph identities and catalog IDs.
+
+* **Indexing.** Governed uses MUST be indexed and mirrored under the Evidence Index discipline, with path-proofs, like other PF12 evidence families.
+
+**Family: `qa.run_bundle.stateless` (optional)**
+
+* **Role.** Provides a single-file “bundle” tying together inputs, BodyGraph exports, and compat exports for a QA run, to simplify reproduction and auditing.
+
+* **Minimum content (names-only).**
+
+  * `schema` — bundle schema tag (e.g. `"hdctl_run_bundle.v1"`).
+
+  * `inputs` — original birth tuples or vendor descriptors.
+
+  * `artifacts` — references (by `artifact_key` and/or file path) to the BodyGraph export and compat export artifacts produced in this run.
+
+  * `meta` — minimal identity fields (engine\_tag, release\_id, invocation\_tag, run\_id).
+
+* **Canonical JSON.** Same canonical JSON posture as other QA families; arrays-as-sets semantics apply to any list of artifact references.
+
+* **Indexing.** When used as governed evidence, bundles are indexed and mirrored like other artifacts; they do not replace indexing of the underlying BodyGraph/compat exports.
+
+**No transport bytes here.**  
+ These families define **artifact shapes and governance**, not CLI flags or HTTP contracts. CLI command names, flags (for example, a future `hdctl bg:export-json` or pure-mode `showcompat`), and any QA scripts that produce these artifacts are specified in HDE-CLI-API-Vendor-Ref and HDE-Mechanics Guide; PF12 remains contract-free and schema-first.
+
+**Acceptance (names-only).**  
+ When these families are adopted by a future epic, PF12 and PF09 may attach the following hints to them (token semantics live in HDE-Governance):
+
+* `JSON_CANONICAL_CHECK_OK` — canonical JSON checks for stateless QA artifacts.
+
+* `TWO_RUN_IDENTITY_OK` — two-run identity for stateless exports.
+
+* `CLI_SHOWCOMPAT_CANON_OK`, `CLI_STDOUT_LF_OK`, `CLI_READER_PARITY_OK` — when compat exports are wired through the canonical emitter and Reader parity harnesses (titles-only to HDE-CLI-API-Vendor-Ref / HDE-Math-Spec).
+
+* `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`, `EVIDENCE_INDEX_HASH_OK` — Index/Mirror parity and path-proof discipline including these families.
+
+Governance and QA docs (PF04, PF09, PF19, PF20) refer to these families by name (`qa.bodygraph_export.stateless`, `qa.compat_export.stateless`, `qa.run_bundle.stateless`) and must not define parallel path lists.
 
 # **9\) Change Log & Doc-Delta Hooks \[Required-Now\]**
 
@@ -3188,7 +3632,7 @@ Titles and paths only. One-line purpose each. Bytes live outside PF12; this appe
 
 * reader\_success\_proof — Composite proof JSON for GET/HEAD/304 on Catalog route. (path: `artifacts/proofs/reader_success_get_head_304.json`)
 
-* ops\_refusal\_proof — Single-file refusal proof (headers block, one blank line, LF-terminated JSON body). (path: `[OPEN: confirm final path; recommended artifacts/proofs/ops_refusal_proof.txt]`)
+* artifacts/proofs/ops\_refusal\_proof.txt — ops refusal proof capturing why rails were closed and how the system declined a run under closed‑rails posture.
 
 * encoding\_invariance\_probe — Proof that identity (ETag) and effective length are stable across Accept-Encoding. (path: `artifacts/proofs/encoding_invariance.txt`)
 
@@ -3228,7 +3672,8 @@ Titles and paths only. One-line purpose each. Bytes live outside PF12; this appe
 
 * canonical\_json\_check — Canonical JSON check report. (path: `audit/gates/canonical_json/json_canonical_check.log`)
 
-* canonicalization\_compare — Canonicalization compare report. (path: `audit/gates/canonical_json/json_canon_compare.log`)
+* canonicalization\_compare — Canonicalization compare report. (path: `audit/gates/canonical_json/json_canon_compare.log`)  
+* topology\_orientation\_demo — Orientation demo transcript and helper reports used as the exemplar for path-proof validation and topology invariants. (paths: `audit/gates/topology/orientation_demo.txt`, `audit/gates/topology/degree_check.log`, `audit/gates/topology/multiplicity_vector.log`)
 
 * env\_matrix\_snapshot — Runtime environment matrix (names-only; capture). (path: `artifacts/runtime/env_matrix.snapshot.json`)
 
@@ -3255,4 +3700,104 @@ Titles and paths only. One-line purpose each. Bytes live outside PF12; this appe
 * cli\_preview\_sidecar — Admin preview sidecar (ids-only; canonical JSON; no prose). (path: `artifacts/cli/narrative/sidecar.json`)
 
 * narratives\_coverage\_10x4 — Router coverage table (10 categories × 4 bands). (path: `audit/gates/narratives/keys_10x4.table.json`)
+
+# **Appendix D — Stateless JSON QA artifacts SpeculativeSpeculativeSpeculative**
+
+**Status:** SpeculativeSpeculativeSpeculative — accepted future design, not yet wired.  
+ This appendix canonically defines stateless JSON artifact *families* for a future no-DB QA mode, as described in **HDE-Build Notes Addendum 11**.  
+ These artifacts are **not required for current acceptance** until a dedicated epic defines concrete paths and schemas.
+
+---
+
+## **D.1 Scope**
+
+This appendix describes the intended artifact families for a **stateless (no-DB) QA mode**:
+
+* A canonical **BodyGraph export JSON** for single-chart QA.
+
+* A canonical **compat export JSON** for compatibility QA.
+
+* An optional composite **run-bundle artifact** that groups per-run JSON exports and proof metadata.
+
+This appendix **does not** fix concrete paths or full JSON schemas.  
+ Those will be defined by a future epic and then drained into this appendix as normative detail.
+
+Process, CLI surfaces, and CI flows for stateless QA remain single-homed in:
+
+* **HDE-CLI-API-Vendor-Ref**
+
+* **HDE-Mechanics Guide**
+
+* **Glow QA Guide**
+
+* **HDE-Phased Epics**
+
+---
+
+## **D.2 Artifact families (design, not yet wired)**
+
+### **D.2.1 BodyGraph export JSON**
+
+A canonical JSON document representing a **single BodyGraph**, suitable for round-trip QA without access to the backing database.
+
+Informal expectations:
+
+* Includes the birth/event inputs needed to reconstruct the chart.
+
+* Encodes the derived BodyGraph topology (centers, gates, channels, splits).
+
+* Uses stable identifiers consistent with the catalogs defined elsewhere in PF canon.
+
+Exact field names, nesting, and allowed value ranges are intentionally deferred to a future epic.
+
+---
+
+### **D.2.2 Compat export JSON**
+
+A canonical JSON document representing the **compatibility view** for one or more charts (for example, relationships or composites) in a form that can be evaluated by stateless tools.
+
+Informal expectations:
+
+* Mirrors the compat structures already used by the engine.
+
+* Is sufficient to replay compat scoring and bands in a stateless QA harness.
+
+No precise JSON shape is fixed in this appendix.
+
+---
+
+### **D.2.3 Run-bundle artifact**
+
+An optional composite artifact that groups:
+
+* One or more **BodyGraph export** JSON documents.
+
+* Any corresponding **compat export** JSON documents.
+
+* Minimal metadata required to replay a QA run (for example: tool/version identifiers, rails posture, references to evidence artifacts).
+
+This concept is recorded here to give future work a **canonical home** for its schema.  
+ Current PF canon does **not** require this artifact for acceptance.
+
+---
+
+## **D.3 Normative status and gating**
+
+Until a dedicated epic defines concrete JSON schemas and paths:
+
+* These artifact families are **not** referenced by any acceptance token.
+
+* No CI job, QA checklist, or governance rule may treat their presence or absence as a gate.
+
+* Any prototype implementation **MUST** be clearly marked as experimental and **SHOULD** reference:
+
+  * this appendix, and
+
+  * the corresponding entry in **HDE-Build Notes**.
+
+Once schemas and paths are finalized in a future epic:
+
+* This appendix will be updated with full canonical detail (paths and schemas).
+
+* Relevant PF documents will reference this appendix as the **single home** for stateless JSON QA artifact definitions.
 

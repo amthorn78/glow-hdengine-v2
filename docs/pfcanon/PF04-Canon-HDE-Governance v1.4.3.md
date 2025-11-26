@@ -1,134 +1,269 @@
-# **0\. Document Control \[Required-Now\]**
+# 0 Document Control \[Required-Now\] 
 
-## **0.1 Header**
+## 0.1 Header
 
-**Title:** PF04-Canon-HDE-Governance
+ **Title:** PF04-Canon-HDE-Governance  
+ **Version:** v1.4.3  
+ **Status:** Canon  
+ **Effective date:** 2025-11-25  
+ **Last Update Gate:** BN 7.7.8 Drain A12
 
-**Version:** v1.4.1
+## 0.2 Scope & boundaries \[Required-Now\]
 
-**Status:** Canon
+**Role.**  
+ This document defines **governance, validation, and operational policy** for the Glow HD Engine. It owns:
 
-**Effective date:** 2025-11-21  
-**Last Update Gate:** BN 7.6.6 Drain
+* Acceptance gates (A3 / A4 / A7 and Epic-level gates).
 
-## **0.2 Scope \[Required-Now\]**
+* Evidence and release discipline (freeze-pack identity, rollback posture).
 
-This document defines governance, validation, and operational policy for the Glow HD Engine. It owns the acceptance gates (A3 / A4 / A7), evidence and release discipline, SAFE-rails posture, logging & privacy requirements, and the public resonance posture (Reader v1 is bands-only, numeric-free; SR-only alpha=1.0; hysteresis=1 is armed for future XR and not exposed).
+* SAFE-rails posture and vendor HTTP policy.
 
-Supersession (PF10 addenda). PF10 is living; when multiple numbered addenda exist, the later number supersedes earlier guidance. This document integrates the latest addenda and routes by title only to single homes (no version numbers).
+* Logging & privacy requirements (keys-only logs; no secrets/PII).
 
-Ownership boundaries (titles-only routing). • Transport & ops policy live here. A7 invariants, cache & writers policy, conditional rules, parity requirements, refusal posture, the Aux-suppression carve-out, and the /internal/version ops surface are governed in this document. Exact wire bytes / presenter / CLI flows live in HDE-CLI-API-Vendor-Ref. • Math & algorithms (composite, scoring, bands, primitives) live in HDE-Math-Spec. • Schemas & pack/manifest/canonical JSON live in HDE-Schemas & Artifacts — includes catalog/manifest.json for release\_id, canonical JSON rules (UTF-8 no BOM, ASCII-sorted keys, compact, one trailing LF; arrays-as-sets deduped & ASCII-sorted), and the machine-mirror schema & ordering. Run all byte checks under LC\_ALL=C, TZ=UTC. • Architecture references live in HDE Architecture. • Endpoint Catalog (JSON success) — single proof surface for A7. The Catalog is internal-only and env-gated per entry; entries not gated for prod are unreachable in production. A7 transport proofs must run on a Catalog JSON success route (titles-only; path-agnostic). The /internal/version ops surface is excluded and governed in §10.5. A headers-only env-gate proof is required to demonstrate non-prod entries are unreachable in prod. **For EPIC-010, Aux HEAD and 304 are explicitly out of scope; A7 proofs remain Catalog JSON success only.**
+* The public resonance posture (Reader v1 is bands-only, numeric-free; SR-only α=1.0; hysteresis=1 armed for future XR and not exposed).
 
-Single homes. • Token roster. All governance tokens are listed once in §2.0 Acceptance Tokens; other sections reference §2.0 and do not restate token lists. • Evidence Index (PF12 single home). PF12 §8.6 is the single home for evidence titles/paths, the human Evidence Index (docs/evidence/INDEX.json) and its hash sentinel, and the machine JSONL mirror (artifacts/evidence\_index.jsonl). Updates must land in the same PR as artifact changes. PF12 governs: records-only JSONL, one trailing LF, unknown-key rejection, ASCII field order, sort-before-write, single mirror file, and required proof\_anchor path-proofs. (PF04 Appendix D may list required titles only; PF12 remains the single home for the index and mirror.)
+**Supersession (PF10 addenda).**  
+ PF10 — Glow HD Engine Build Notes is living. Where multiple numbered addenda exist, **later addenda supersede earlier guidance**. This document integrates the latest positions from PF10 and routes by **titles only** to single-home PF documents (no version numbers).
 
-## **0.3 Tagging convention**
+**Ownership boundaries (titles-only routing).**
+
+* **Transport & ops policy (this document).**  
+   A7 invariants, cache & writers policy, conditional delivery rules, parity requirements, refusal posture, the Aux-suppression carve-out, and the `/internal/version` ops surface are governed here.  
+   Exact wire bytes / presenter / CLI flows live in **HDE-CLI-API-Vendor-Ref**.
+
+* **Math & algorithms.**  
+   Composite logic, scoring, bands, constants, and preimage definitions live in **HDE-Math-Spec**.
+
+* **Schemas, pack/manifest, canonical JSON, mirror schema.**  
+   Catalog/manifest, canonical JSON rules (UTF-8, no BOM; ASCII-sorted keys; compact; one trailing LF; arrays-as-sets deduped & ASCII-sorted), and the machine-mirror schema & ordering live in **HDE-Schemas & Artifacts**.  
+   All byte checks run under `LC_ALL=C`, `TZ=UTC` (and `LANG=C` where applicable).
+
+* **Architecture.**  
+   Engine/adapter/presenter boundaries and flows live in **HDE Architecture**; this document references those boundaries by title only.
+
+* **Endpoint Catalog (A7 proof surface).**  
+   The Endpoint Catalog (JSON success) is the **single proof surface** for A7. The Catalog is internal-only and env-gated per entry; entries not gated for prod are unreachable in production.  
+   A7 transport proofs **must** run on a Catalog JSON success route (titles-only; path-agnostic).  
+   The `/internal/version` ops surface is explicitly excluded and governed in §10.5.  
+   A headers-only env-gate proof is required to demonstrate non-prod entries are unreachable in prod.  
+   For EPIC-010, Aux HEAD and 304 are explicitly out of scope; A7 proofs remain Catalog JSON success only.
+
+**Single homes.**
+
+* **Token roster.**  
+   All governance tokens are listed **once** in §2.0 **Acceptance Tokens**. Other sections refer to §2.0 and do not restate token lists.
+
+* **Evidence Index & Machine Mirror (PF12 single home).**  
+   **HDE-Schemas & Artifacts §8.6** is the single home for:
+
+  * Evidence titles/paths.
+
+  * The human Evidence Index (`docs/evidence/INDEX.json`) and its hash sentinel.
+
+  * The machine JSONL mirror (`artifacts/evidence_index.jsonl`).
+
+* PF12 governs records-only JSONL, one trailing LF, unknown-key rejection, ASCII field order, sort-before-write, single mirror file, and required `proof_anchor` path-proofs.  
+   PF04 may reference required titles only; PF12 remains the single home for index/mirror schema and catalogs.
+
+## 0.3 Tagging convention
 
 Each section is tagged to show implementation status:
 
-* \[Implemented\] — verified in repo and enforced by tests.  
-* \[Required-Now\] — required for the current build or acceptance gates.  
-* \[Speculative\] — design accepted for future release; not yet wired.  
+* \[Implemented\] — verified in repo and enforced by tests.
+
+* \[Required-Now\] — required for the current build or acceptance gates.
+
+* \[Speculative\] — design accepted for a future release; not yet wired.
+
 * \[OPEN\] — unresolved or gated pending Doc-Delta review.
 
-  ## **0.4 Change policy**
+## 0.4 Change policy
 
-* Single homes; no duplication. Math and Architecture bytes are not restated here; transport bytes remain in CLI/API/Vendor-Ref; artifacts & mirror are owned by PF12.  
-* **Governed paths only.** Evidence must live under governed repo paths (artifacts/**, docs/**); transient generator paths are disallowed; mirror entries pointing to non-governed paths **fail CI**.  
-* Determinism first. Any change that affects byte identity (serializer path, schema keys, A7 headers) must include updated parity and idempotence evidence.  
-* Doc-Delta discipline. All normative edits (math/public/acceptance/rails) require a Doc-Delta entry: scope, affected sections, acceptance impact, evidence updates, and freeze-pack effect.  
-* Evidence synchronization (PR-first). When any golden or artifact path changes, Appendix D — Evidence Index must be updated in the same PR/commit that changes those items, with a matching entry in §9 Change Management — Doc-Delta Hooks. Process ownership for this requirement lives in PF06-Canon-Epic-Process-Guide.  
-* Mirror hygiene (merge-blocking). The machine mirror must be canonical JSONL (one trailing LF, unknown-keys rejected); each record must include a proof\_anchor pointing to a path-proof stored alongside the artifact. (Field order and sort/join details live in PF12; this doc references policy only.)
+**Single homes; no duplication.**  
+ Math and Architecture bytes are not restated here. Transport bytes remain in **HDE-CLI-API-Vendor-Ref**. Artifacts and mirror schemas are owned by **HDE-Schemas & Artifacts**.
 
-**Editorial vs normative.** Stylistic or non-functional rewordings need not be logged; any change that modifies bytes, tests, or acceptance criteria must be logged.
+**Governed paths only.**  
+ Evidence must live under governed repo paths (`artifacts/**`, `docs/**`, `audit/**`).  
+ Transient generator paths (for example, `codex/out/**`) are not authoritative and **MUST NOT** be indexed. Mirror entries pointing to non-governed paths fail CI.
+
+**Determinism first.**  
+ Any change that affects byte identity (serializer path, schema keys, A7 headers, `/internal/version` headers) must include updated parity and idempotence evidence.
+
+**Doc-Delta discipline.**  
+ All **normative** edits (math/public/acceptance/rails) require a Doc-Delta entry: scope, affected sections, acceptance impact, evidence updates, and freeze-pack effect.
+
+**Evidence synchronization (PR-first).**  
+ When any golden or artifact path changes, the Evidence Index and mirror **must** be updated in the same PR/commit that changes those items, with a matching entry in PF06 — **HDE Epic-Process Guide** §9 “Change Management — Doc-Delta Hooks”.
+
+**Mirror hygiene (merge-blocking).**  
+ The machine mirror must be canonical JSONL (one trailing LF; unknown keys rejected). Each record must include a `proof_anchor` pointing to a path-proof stored alongside the artifact.  
+ Field order and sort/join rules live in PF12; this document references policy only.
+
+**Editorial vs normative.**  
+ Stylistic or non-functional rewordings need not be logged. Any change that modifies bytes, tests, or acceptance criteria must be logged via Doc-Delta and reflected in Evidence Index updates.
 
 ---
 
-# **1\. Purpose & Single-Home Governance \[Required-Now\]**
+# 1\. Purpose & Single-Home Governance \[Required-Now\] 
 
-## **1.1 Purpose \[Required-Now\]**
+## 1.1 Purpose \[Required-Now\]
 
-This governance document defines how the HD Engine is built, validated, and released under explicit Epic gates. Each Epic functions as a governance gate: a bounded set of features and acceptance tests that must be fully implemented, validated, and evidenced before the next Epic begins. Governance, validation, and operations are inseparable—an Epic closes only when its governance and evidence gates pass. **Supersession rule:** where lettered addenda conflict, the later addendum supersedes the earlier; this document integrates the latest positions.
+This governance document defines **how the HD Engine is built, validated, and released** under explicit Epic gates.
 
-**This document owns**
+* Each Epic functions as a **governance gate**: a bounded set of features and acceptance tests that must be fully implemented, validated, and evidenced before the next Epic begins.
+
+* Governance, validation, and operations are inseparable: an Epic **closes** only when its governance and evidence gates pass.
+
+* Supersession rule: where lettered addenda conflict, the later addendum supersedes the earlier; this document integrates the latest positions from PF10 and the HDE Phased Epics map.
+
+This document owns:
 
 * **Acceptance gates (A-gates and Epic gates).**
 
-  * **A3 / A4 / A7** enforce determinism, Reader↔CLI parity, and transport correctness.  
-  * Every Epic applies the same internal criteria: **AB↔BA parity**, **two-run identity**, **canonical JSON** discipline, and **A7 transport** compliance.  
-  * Governance and testing during an Epic use the **same binary proofs** required for release acceptance.  
-* **Reader transport and A7 policy.** Governs public transport behavior (headers, conditional delivery, caching). **Single proof surface:** A7 proofs run on a **Catalog JSON success** route (see Endpoint Catalog in PF05); the Catalog is **internal-only** and **env-gated** per entry, and entries not gated for prod are **unreachable in production**. `/internal/version` is **ops-only and excluded**. Required posture includes:
+  * A3 / A4 / A7 enforce determinism, Reader↔CLI parity, and transport correctness.
 
-  * strong **quoted ETag** on 200;  
-  * `Vary: Authorization, Accept-Encoding`;  
-  * `HEAD 200` with validator parity and `Content-Length == len(identity 200 body)`;  
-  * **304 only after 200**, with **no body**, and **omit `Content-Type` and `Content-Length`**;  
-  * writers/errors `Cache-Control: no-store` and **no ETag**;  
-  * **POST non-conditional**;  
-  * **encoding invariance** (identity stable across accepted `Accept-Encoding`).  
-* **Rails and environments (vendor posture).** **SAFE-rails** model for vendor HTTP: default **closed**, explicit open conditions, deterministic refusal semantics, and non-PII observability.
+  * Every Epic uses the same internal criteria: AB↔BA parity, two-run identity, canonical JSON discipline, and A7 transport compliance.
 
-* **Public resonance posture (Reader v1).** Public surface is **bands-only, numeric-free**; resonance is **SR-only** (`alpha=1.0`); **`hysteresis=1`** is armed for future XR and is not exposed. Any XR diagnostics, if supported, are **CLI-only** behind an admin guard (never on Reader 200).
+  * Governance and testing during an Epic use the same binary proofs required for release acceptance.
 
-* **Operations and evidence.** Required evidence classes (parity, idempotence, transport, rails, band-edge, constants), CI hygiene (grep-guards, LF/encoding checks), SLO posture, and the **Evidence Index single-home rule**. Index updates must land **in the same PR** as the artifacts.
+* **Reader transport and A7 policy.**
 
-* **Release discipline.** Manages freeze-pack identity (`release_id`), pointer-flip and rollback, drift checks. **Any frozen-math or manifest canonical-bytes change yields a new `release_id`** (pack manifest is canonical JSON with `root:"catalog/"`, `version`, `built_at_utc`, and `files:[{path,sha256,size}]`).
+  * Governs public transport behavior (headers, conditional delivery, caching).
 
-* **Security and privacy.** Enforces the **numeric-free public covenant**, keys-only logging, and **no secrets/PII in logs**; labels and correlation IDs remain bounded and deterministic.
+  * Single proof surface: A7 proofs run on a Catalog JSON success route (see Endpoint Catalog in HDE-CLI-API-Vendor-Ref).
 
-* **Change management.** Defines the **Doc-Delta** workflow (scope, targets, acceptance, evidence, freeze-pack impact) and mandates that every normative change updates the **Evidence Index** in the same commit.
+  * The Catalog is internal-only and env-gated per entry; entries not gated for prod are unreachable in production.
 
-**Single-home routing (titles-only)**
+  * `/internal/version` is ops-only and excluded from A7; its posture is governed separately (§10.x).
 
-* Mathematical rules (composite, scoring, banding, preimage), pack constants, and category catalogs: **HDE-Math-Spec** and **HDE-Schemas & Artifacts**.  
-* Architectural boundaries: **HDE Architecture**.  
-* Operational governance and Epic acceptance gates: **here**. Exact wire bytes / presenter / CLI flows: **HDE-CLI-API-Vendor-Ref**. **No duplication** of math or serializer bytes in this document.  
-  ---
+  * Required A7 posture includes, at minimum:
 
-  ## **1.2 Single homes & routing \[Required-Now\]**
+    * Strong quoted ETag on 200\.
 
-* **Ownership (this doc).** Governance owns operational and transport bytes for the HD Engine: A-gates (acceptance policy), Reader transport (headers, conditional delivery, caching), rails posture (enable/disable vendor HTTP), logging/privacy, bench/SLO, release/pointer-flip, and evidence/CI hygiene.
+    * `Vary: Authorization, Accept-Encoding`.
 
-* **Titles-only routing (no duplication).** Mathematical rules (e.g., scoring, thresholds, fixed-point/rounding, preimage definition) and architectural boundaries (engine/adapter/presenter responsibilities) are referenced by title only from **HDE-Math-Spec** and **HDE Architecture**; they are not restated here.
+    * HEAD 200 with validator parity and `Content-Length == len(identity 200 body)`.
 
-* **Aux Narrative routing note.** Aux Narrative payload and route bytes (examples, endpoint bytes, CLI admin flags) are documented in **HDE-CLI-API-Vendor-Ref**; this document owns the acceptance matrices and policy carve-outs only (e.g., suppression posture).
+    * 304 only after 200, with no body, omitting both `Content-Type` and `Content-Length`.
 
-* **Single homes, single emitter.** Transport bytes and governance processes live here; the canonical serializer/emitter rules and public payload schema are owned in their respective homes and referenced by title only.
+    * Writers/errors `Cache-Control: no-store` and **no ETag**.
 
-* **Change discipline.** If a change touches Math or Architecture, it must be made in that home and routed here via Doc-Delta; if a change alters transport/ops, it lands here with updated evidence and pointers, never by duplicating content across documents.
+    * Success route non-conditional; encoding invariance (identity stable across accepted `Accept-Encoding` values).
 
-* **Auditability.** All references to external homes are titles/anchors only; proofs (goldens, scripts, snapshots) are indexed under **Appendix D: Evidence Index** and kept in sync with repo changes.
+* **Rails and environments (vendor posture).**
 
-## **1.3 EPIC‑011 preservation surfaces \[Required-Now\]**
+  * SAFE-rails model for vendor HTTP: default closed, explicit open conditions, deterministic refusal semantics, and non-PII observability.
 
-EPIC‑011 introduces a **preservation guard** over key public and admin surfaces. Under this Epic, certain contracts are treated as **frozen**: governance and QA may strengthen proofs and evidence, but they may **not** change these surfaces’ wire contracts.
+* **Public resonance posture (Reader v1).**
 
-**Preserved surfaces (names-only)**
+  * Public surface is bands-only, numeric-free.
+
+  * Resonance is SR-only (α=1.0).
+
+  * Hysteresis=1 is armed for future XR and is not exposed.
+
+  * Any XR diagnostics, if supported, are CLI-only behind an admin guard (never present on Reader 200).
+
+* **Operations and evidence.**
+
+  * Required evidence classes (parity, idempotence, transport, rails, band-edge, constants).
+
+  * CI hygiene (grep-guards, LF/encoding checks).
+
+  * Evidence Index single-home rule (PF12) and requirement that Index updates land in the same PR as artifacts.
+
+* **Release discipline.**
+
+  * Manages freeze-pack identity (`release_id`), pointer-flip and rollback, drift checks.
+
+  * Any frozen-math or manifest canonical-bytes change yields a new `release_id` (pack manifest is canonical JSON with `root:"catalog/"`, `version`, `built_at_utc`, and `files:[{path,sha256,size}]`).
+
+* **Security and privacy.**
+
+  * Enforces the numeric-free public covenant.
+
+  * Keys-only logging; no secrets/PII in logs.
+
+  * Labels and correlation IDs remain bounded and deterministic.
+
+* **Change management.**
+
+  * Defines the Doc-Delta workflow (scope, targets, acceptance, evidence, freeze-pack impact).
+
+  * Mandates that every normative change updates the Evidence Index in the same commit.
+
+## 1.2 Single homes & routing \[Required-Now\]
+
+**Ownership (this document).**  
+ Governance owns **operational and transport policy** for the HD Engine:
+
+* A-gates (acceptance policy and token semantics).
+
+* Reader transport (headers, conditional delivery, caching).
+
+* Rails posture (enable/disable vendor HTTP).
+
+* Logging/privacy.
+
+* Bench/SLO posture.
+
+* Release/pointer-flip discipline.
+
+* Evidence/CI hygiene policy.
+
+**Titles-only routing (no duplication).**
+
+* **Math and architecture.**  
+   Mathematical rules (scoring, thresholds, fixed-point/rounding, preimage definition) and architectural boundaries (engine/adapter/presenter responsibilities) are referenced by title only from **HDE-Math-Spec** and **HDE Architecture**; they are not restated here.
+
+* **Aux Narrative.**  
+   Aux Narrative payload and route bytes (examples, endpoint bytes, CLI admin flags) are documented in **HDE-CLI-API-Vendor-Ref** and **HDE-Narratives Guide**. This document owns the acceptance matrices and policy carve-outs only (e.g., suppression posture).
+
+* **Serializer/emitter and schemas.**  
+   Canonical serializer/emitter rules and public payload schemas are owned by **HDE-Math-Spec**, **HDE-Schemas & Artifacts**, and **HDE-CLI-API-Vendor-Ref** and are referenced by title here.
+
+**Change discipline.**
+
+* If a change touches **Math or Architecture**, it must be made in that home and routed here via Doc-Delta.
+
+* If a change alters **transport/ops**, it lands here with updated evidence and pointers, never by duplicating content across documents.
+
+**Auditability.**
+
+* All references to external homes are titles/anchors only.
+
+* Proofs (goldens, scripts, snapshots) are indexed in the Evidence Index governed by **HDE-Schemas & Artifacts** and **HDE-Build Checklist** and kept in sync with repo changes.
+
+## 1.3 EPIC-011 preservation surfaces \[Required-Now\]
+
+EPIC-011 introduced a **preservation guard** over key public and admin surfaces. Under this Epic, certain contracts are treated as **frozen**:
+
+* Governance and QA may **strengthen proofs and evidence**,
+
+* but **may not change wire contracts** for these surfaces within EPIC-011’s scope.
+
+**Preserved surfaces (names-only).**
 
 * **CLI admin preview (Aux preview).**  
-   Wire bytes, stdout/sidecar contracts, and exit‑code behavior for CLI admin preview are owned by **HDE-CLI-API-Vendor-Ref**. EPIC‑011 allows QA and evidence changes only (e.g., additional proofs, harnesses), not contract changes.
+   Wire bytes, stdout/sidecar contracts, and exit-code behavior for CLI admin preview are owned by **HDE-CLI-API-Vendor-Ref**. EPIC-011 allows QA and evidence changes only (additional proofs, harnesses), not contract changes.
 
 * **Vendor ingest wire bytes.**  
-   Vendor HTTP request/response shapes, paths, and typed error envelopes are owned by **HDE-CLI-API-Vendor-Ref**. Governance ensures SAFE rails posture and observability; EPIC‑011 does not change vendor wire contracts.
+   Vendor HTTP request/response shapes, paths, and typed error envelopes are owned by **HDE-CLI-API-Vendor-Ref**. Governance ensures SAFE rails posture and observability; EPIC-011 does not change vendor wire contracts.
 
 * **Compat JSON surface.**  
-   The compat surface used by `showcompat` and other callers is governed by **HDE-Math-Spec** and **HDE-CLI-API-Vendor-Ref**. EPIC‑011 treats this as frozen; only QA evidence around compat (AB↔BA parity, two‑run identity) may change.
+   The compat surface used by `showcompat` and other callers is governed by **HDE-Math-Spec** and **HDE-CLI-API-Vendor-Ref**. EPIC-011 treats this as frozen; only QA evidence around compat (AB↔BA parity, two-run identity) may change.
 
 * **Aux narrative surface.**  
-   Narrative packs, text, suppression rules, and Aux routes are governed by **HDE-Narratives Guide** and **HDE-CLI-API-Vendor-Ref**. Under EPIC‑011, narrative contracts are preserved; QA captures headers, packs, IDs, and transport proofs only.
+   Narrative packs, text, suppression rules, and Aux routes are governed by **HDE-Narratives Guide** and **HDE-CLI-API-Vendor-Ref**. Under EPIC-011, narrative contracts are preserved; QA captures headers, packs, IDs, and transport proofs only.
 
-**Governance stance**
+**Governance stance.**
 
-* Governance **may** tighten tests, add acceptance tokens, and require new evidence artifacts **without** changing preserved wire contracts.
+* Governance may tighten tests, add acceptance tokens, and require new evidence artifacts **without** changing preserved wire contracts.
 
-* Any change to a preserved surface’s contract must be treated as **out of scope for EPIC‑011** and routed through a future Epic in **HDE Epics Map**.
+* Any change to a preserved surface’s contract must be treated as **out of scope** for EPIC-011 and routed through a future Epic in **HDE Epics Map** (HDE Phased Epics).
 
-**Acceptance and artifact impact**
-
-* No new tokens; this section clarifies EPIC‑011’s scope for existing tokens.
-
-Evidence: downstream PF09/PF19 updates should reflect that EPIC‑011 QA focuses on evidence around these preserved surfaces, not contract changes.
-
----
+  ---
 
 # **2\. Acceptance Policy — A3–A4–A7 \[Required-Now\]**
 
@@ -260,11 +395,11 @@ Evidence: downstream PF09/PF19 updates should reflect that EPIC‑011 QA focuses
 
 * **EVIDENCE\_INDEX\_UPDATED\_OK** — Human Evidence Index updated in the same change as artifacts. (Owned: Governance; Evidence & Artifacts)
 
-* **EVIDENCE\_INDEX\_MIRROR\_OK** — Machine JSONL mirror (records-only; sorted keys; one LF) present and valid. (Owned: Evidence & Artifacts)
+* **EVIDENCE\_INDEX\_MIRROR\_OK** — Machine JSONL mirror (records-only; sorted keys; one LF) present and valid. (Owned: Evidence & Artifacts)  
+* **MACHINE\_MIRROR\_UPDATED\_OK** — The `index.machine_mirror` self-record in the machine JSONL mirror exists and is current: its `sha256` and `size_bytes` fields match the canonical body of `artifacts/evidence_index.jsonl`. (Owned: Evidence & Artifacts)
 
-* **EVIDENCE\_PATHS\_VALIDATED\_OK** — Each record has a discovered path plus path-proof; human↔machine parity is 1:1. (Owned: Governance; Evidence & Artifacts)
-
-* **EVIDENCE\_PATH\_PROOFS\_OK** — Path-proofs present and linked for governed artifacts. (Owned: Evidence & Artifacts)
+* **EVIDENCE\_PATHS\_VALIDATED\_OK** — Each record has a discovered path plus path-proof; human↔machine parity is 1:1. (Owned: Governance; Evidence & Artifacts)  
+* **EVIDENCE\_PATH\_PROOFS\_OK** — For every governed artifact indexed in the machine mirror, a co-located path-proof file exists and validates: each mirror record’s `proof_anchor` resolves to a `*.path_proof.txt` stored alongside the artifact, and the proof’s contents (path, size, sha256, timestamps and any required orientation metadata) match the indexed artifact’s canonical bytes. Missing, mismatched, or stale path-proofs **fail CI**. (Owned: Evidence & Artifacts; Governance)
 
 * **CI\_CHECK\_FINAL\_LF\_OK** — All evidence artifacts & mirror lines are LF-terminated (exactly one). (Owned: Evidence & Artifacts; Build Notes)
 
@@ -298,7 +433,12 @@ Evidence: downstream PF09/PF19 updates should reflect that EPIC‑011 QA focuses
 
 ### **2.0.8 CLI/SDK parity harness**
 
-* **CLI\_READER\_PARITY\_OK** — CLI `showcompat` parity with Reader public envelope is maintained: same emitter, same bytes for the same normalized inputs. (Owned: Governance; CLI/API Vendor Ref)
+* **CLI\_READER\_PARITY\_OK** — CLI `showcompat` parity with Reader public envelope is maintained: same emitter, same bytes for the same normalized inputs. (Owned: Governance; CLI/API Vendor Ref)  
+* **CLI\_NO\_ALT\_JSON\_OK** — `hdctl showcompat` emits only the canonical JSON compatibility envelope on stdout; legacy or alternative JSON shapes are disabled on this path. (Owned: Governance; CLI/API Vendor Ref)
+
+* **CLI\_SHOWCOMPAT\_CANON\_OK** — `hdctl showcompat` uses the same canonical emitter as Reader/aux for compatibility outputs; no ad-hoc serializers are permitted on this path. (Owned: Governance; CLI/API Vendor Ref)
+
+* **CLI\_STDOUT\_LF\_OK** — `hdctl showcompat` stdout is canonical: UTF-8, BOM-free, and terminated with exactly one LF. (Owned: Governance; Evidence & Artifacts)
 
 * **CLI\_PREVIEW\_ENABLED\_OK** — CLI admin preview (for Aux narratives) is enabled only for admins and uses the same emitter as Aux. (Owned: Governance; CLI/API Vendor Ref)
 
@@ -338,7 +478,16 @@ Evidence: downstream PF09/PF19 updates should reflect that EPIC‑011 QA focuses
 
 * **ENV\_RAILS\_POLICY\_OK** — Dev/QA may be open; Prod must not depend on rails-open settings; CI/test harness runs default to closed rails. (Owned: Mechanics Guide; Governance)
 
-* **ENV\_LC\_ALL\_C\_OK** — All determinism and evidence jobs run with canonical pins `LC_ALL=C`, `LANG=C`, `TZ=UTC` for HDE services and CI (env pins present and enforced). (Owned: Governance; Build Checklist; Mechanics Guide)
+* **ENV\_LC\_ALL\_C\_OK** — All determinism and evidence jobs run with canonical pins `LC_ALL=C`, `LANG=C`, `TZ=UTC` for HDE services and CI (env pins present and enforced). (Owned: Governance; Build Checklist; Mechanics Guide)  
+* **BG\_VENDOR\_CALLS\_DISABLED\_IN\_PROD\_OK** — In production, **public Reader and Aux traffic is DB-backed only**: the Engine does **not** make live vendor HTTP calls to satisfy public requests. Any vendor-originated data used in prod public responses must arrive via prior ingest and the governed DB; live vendor calls in prod are limited to admin-guarded ops windows (for example, CLI runs under explicit rails-open profiles). Evidence includes env/config snapshots, connectivity proofs, and keys-only logs demonstrating that public prod routes do not open vendor sockets. (Owned: Governance; Glow Infrastructure; Glow QA Guide; Evidence & Artifacts)
+
+For EPIC017 evidence and compat jobs, the default closed-rails profile for CLI, evidence, ordering, and registry jobs is:
+
+`SAFE_MODE=1, ALLOW_NETWORK=0, LC_ALL=C, LANG=C, TZ=UTC`.
+
+Acceptance tokens `ENV_RAILS_POLICY_OK` and `ENV_LC_ALL_C_OK` together assert that this tuple is enforced for those jobs unless a Doc-Delta explicitly opens rails for a specific integration profile.
+
+This directly encodes the “Default: SAFE\_MODE=1 ALLOW\_NETWORK=0 LC\_ALL=C LANG=C TZ=UTC for CLI, evidence, ordering, and registry jobs” rule from the addendum into PF04’s env section. 
 
 * **OBS\_KEYS\_ONLY\_OK** — Operational logs are keys-only and secret-free (no payload bodies or header values; secrets redacted), in accordance with Governance logging policy. (Owned: Governance)
 
@@ -376,7 +525,10 @@ These tokens apply whenever SAFE rails are opened for vendor calls in any enviro
 
 * **BAND\_EDGE\_GOLDENS\_OK** — Goldens at 24/49/74/100 pass. (Owned: HDE Math Spec; Evidence & Artifacts)
 
-* **PREFS\_KEYSET\_10\_OK** — Preference keyset is the canonical 10\. (Owned: HDE Math Spec; Governance)
+* **PREFS\_KEYSET\_10\_OK** — Preference keyset is the canonical 10\. (Owned: HDE Math Spec; Governance)  
+* **RESONANCE\_PUBLIC\_POSTURE\_OK** — Reader v1 and CLI public surfaces obey the **numeric-free, narrative-free public covenant**: success payloads expose exactly six top-level keys (`reader_version, eligible, categories, meta, release_id, idempotence_hash`); `categories[*]` items are exactly `{ "id", "band" }` with `band ∈ {"Cool","Open","Warm","Glow"}`; no SR/XR or other numerics appear in public bodies; typed error envelopes are numeric-free (except optional `retry_after_ms` under governed vendor-rate-limit policy), and no prompts or narratives are emitted on public or admin surfaces. v1 ships SR-only (α=1.0) and does not expose XR or hysteresis knobs. (Owned: Governance; HDE-Math-Spec; HDE-Schemas & Artifacts; Glow QA Guide)
+
+* **MAGIC10\_DOMAIN\_CLOSED\_OK** — The public category `id` domain is the **closed Magic‑10 set with pinned order**: public `categories[*].id` values are drawn only from the canonical Magic‑10 identifiers; no extras or omissions are allowed, and internal math (including viewer prefs and presets) uses the same closed id domain. Evidence includes schema and validation tests that enforce the Magic‑10 keyset, plus fixtures demonstrating that unknown ids fail closed. (Owned: HDE-Math-Spec; Governance; Glow QA Guide; Evidence & Artifacts)
 
 ---
 
@@ -395,6 +547,24 @@ These tokens apply whenever SAFE rails are opened for vendor calls in any enviro
 * **GRACE\_DELIVERABLES\_GATE\_OK**
 
 *Naming cleanup.* `CLI_READER_EMITTER_PARITY_OK` is deprecated in favor of `CLI_READER_PARITY_OK`. Keep the legacy token only for historical boards and references.
+
+### **2.0.13 Registry, ordering & doc-delta harness (EPIC017)**
+
+* **CONFIG\_GEN\_OK** — The `registry_report.v1` configuration report is generated by the typed loader, written as canonical JSON, and present in evidence. (Owned: Governance; Evidence & Artifacts)
+
+* **UNKNOWN\_IDS\_FAIL\_CLOSED\_OK** — The registry loader rejects unknown IDs and fails closed; no unknown IDs are silently accepted into the registry. (Owned: Governance; Evidence & Artifacts)
+
+* **TIEBREAK\_TOTAL\_ORDER\_OK** — Ordering comparators are deterministic and total; tie-breaks are pinned and stable, as demonstrated by the EPIC017 ordering logs (for example, `engine.order.props_total_order.log`). (Owned: Governance; Evidence & Artifacts)
+
+* **DOC\_DELTA\_PRESENT\_OK** — For the current epic, PF-doc Doc-Delta drafts (including this document’s EPIC017 token/env update) are staged under `audit/docdeltas/`, present in the repo, and indexed in the Evidence Index and mirror. (Owned: Governance; Evidence & Artifacts)
+
+* **TESTS\_PASS\_OK** — The EPIC017 QA suite for compat, registry, ordering, and evidence (including manifest and acceptance-map tests) is present and passing, with coverage recorded in `qa.compat.coverage_summary`. (Owned: Glow QA Guide; Evidence & Artifacts)
+
+### **2.0.14 QA branches & diff-scoped CI**
+
+* **QA\_EVIDENCE\_ONLY\_OK** — QA branches are **evidence-only**: changes are limited to governed evidence artifacts and their indices (for example, `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl`, and new or rotated proofs under `artifacts/**`), plus any required `*.path_proof.txt` files. Application, presenter, schema, and runtime config bytes **must not** change on QA branches; CI and review confirm that diffs are restricted to governed evidence paths, and that human↔machine mirror parity still holds. (Owned: Governance; PF06 — HDE Epic-Process Guide; Glow QA Guide; Evidence & Artifacts)
+
+* **QA\_CI\_DIFF\_SCOPED\_OK** — CI on QA branches is **diff-scoped** to governed evidence files: jobs validate that only evidence/index/mirror artifacts have changed, that index ↔ mirror ↔ `proof_anchor` parity holds, and that no unapproved code/schema/config changes are introduced. QA CI remains merge-gating on evidence integrity, but intentionally limits test scope to the governed diffs for QA branches. (Owned: Glow QA Guide; Governance; PF12 — HDE-Schemas & Artifacts)
 
 ---
 
@@ -751,18 +921,17 @@ See **§2.0 Acceptance Tokens**: `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MI
 * Integration degree check. Gates **10/20/34/57** ⇒ degree 3; all other gates ⇒ degree 1\.  
 * Center-pair multiplicity. Unordered center-pair counts sum to **36**.
 
-### **4.3.8 Environment pins**
+### **4.3.8 Environment pins Required−NowRequired-NowRequired−Now**
 
-Record **LC\_ALL=C, LANG=C, TZ=UTC** for all jobs; **fail if missing**.
+Record **LC\_ALL=C, LANG=C, TZ=UTC** for all determinism, transport, and evidence jobs and **fail** CI if any pin is missing.
 
-### **4.3.9 Evidence Index enforcement**
+For EPIC017 and later, CLI, evidence, ordering, and registry jobs MUST also run under closed rails by default:
 
-* **Same-change updates (MUST).** Fail the pipeline if **Appendix D** (human) and the **machine JSONL mirror** are not updated in the **same commit/PR** when any golden/artifact/script changes.  
-* **Human↔machine parity.** Require **1:1 membership**; fail on mismatch.  
-* **Path-proofs.** Every mirror record must include a discovered physical path and a proof (transcript anchor \+ on-disk stat); **fail if absent**.  
-* **Single mirror file.** Fail if more than one `artifacts/evidence_index.jsonl` exists or if any record is non-canonical (unsorted keys, wrong line ending, **unknown keys**, missing/unequal `proof_anchor`).
+`SAFE_MODE=1, ALLOW_NETWORK=0, LC_ALL=C, LANG=C, TZ=UTC`.
 
-**Tokens:** see **§2.0**.
+Evidence for this profile (for example, `env_matrix.snapshot.json` and dev connectivity snapshots) is indexed alongside other governed artifacts and mirrored in `artifacts/evidence_index.jsonl` in the same PR as any changes to these jobs.
+
+This ties the EPIC017 env rule into the existing CI “pin and enforce env variables” gate.
 
 ---
 
@@ -2109,6 +2278,33 @@ Titles and paths only; no payload bytes. This appendix lists gate checklists and
   * `ci/jobs/public_numeric_ban_guard.yml`
 
 **Maintenance rule (MUST).** When a gate’s golden/snapshot/script path changes, update **Appendix D — Evidence Index** and the corresponding CI job references here **in the same change**, and add a one-line entry in **§9 Change Management — Doc-Delta Hooks**.
+
+### **B.7 EPIC017 token/test mapping (compat, registry, ordering, evidence)**
+
+*Compat & CLI tokens*
+
+* **CLI\_NO\_ALT\_JSON\_OK**, **CLI\_SHOWCOMPAT\_CANON\_OK**, **CLI\_STDOUT\_LF\_OK**, **CLI\_READER\_PARITY\_OK**  
+   *Tests/scripts (titles-only):* `tests/test_emitter_determinism.py`, `tests/test_reader_transport.py`, `tests/cli/test_cli_showcompat.py`.
+
+*Determinism & composite tokens*
+
+* **JSON\_CANONICAL\_CHECK\_OK**, **TWO\_RUN\_IDENTITY\_OK**, **COMPOSITE\_ABBA\_IDENTITY\_OK**, **TIEBREAK\_TOTAL\_ORDER\_OK**  
+   *Tests/scripts (titles-only):* `tools/order/generate_ordering_artifacts.py`, `tests/order/test_ordering_artifacts.py`, `cli.showcompat.*` determinism tests.
+
+*Registry tokens*
+
+* **CONFIG\_GEN\_OK**, **UNKNOWN\_IDS\_FAIL\_CLOSED\_OK**  
+   *Tests/scripts (titles-only):* `tools/generate_registry_report.py`, `tests/config/test_registry_report_determinism.py`, `tests/config/test_registry_report_exists_and_is_canonical.py`.
+
+*Evidence and mirror tokens*
+
+* **EVIDENCE\_INDEX\_UPDATED\_OK**, **MACHINE\_MIRROR\_UPDATED\_OK**, **EVIDENCE\_INDEX\_HASH\_OK**, **EVIDENCE\_INDEX\_MIRROR\_OK**, **EVIDENCE\_PATHS\_VALIDATED\_OK**, **EVIDENCE\_PATH\_PROOFS\_OK**, **CI\_CHECK\_MIRROR\_SCHEMA\_OK**, **CI\_CHECK\_FINAL\_LF\_OK**  
+   *Tests/scripts (titles-only):* `tools/evidence/update_evidence_index.py`, `tests/ops/test_evidence_index.py`, `tests/evidence/test_evidence_skeleton.py`.
+
+*Doc-deltas & QA coverage tokens*
+
+* **DOC\_DELTA\_PRESENT\_OK**, **TESTS\_PASS\_OK**  
+   *Artifacts/tests (titles-only):* `audit/docdeltas/PF04_EPIC017_tokens_and_env.md`, `audit/docdeltas/PF04_EPIC017_tokens_and_env.md.path_proof.txt`, `qa.compat.coverage_summary`.
 
 ---
 

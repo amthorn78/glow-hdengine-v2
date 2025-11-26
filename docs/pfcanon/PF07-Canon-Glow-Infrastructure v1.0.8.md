@@ -1,11 +1,11 @@
 # **0\. Front Matter**
 
 **Title:** PF07-Canon-Glow-Infrastructure  
- **Version:** v1.0.8
+ **Version:** v1.0.9
 
 **Status:** Canon  
-**Effective date:** 2025-11-21  
-**Last Update Gate:** BN 7.6.6 Drain
+**Effective date:** 2025-11-25  
+**Last Update Gate:** BN 7.7.8 Drain A13
 
 **Invocation tag:** `INV-f2ac55d77ce9aacc`
 
@@ -243,6 +243,45 @@ PF07 is **names-only**. Admin-only narratives persistence **DB/schema locations*
 * **Acceptance tokens:** None new in PF07; all tokens remain defined in HDE‑Governance.
 
 * **Artifact paths:** Names‑only references to docs/run/RUN\_PROD\_QA.md and scripts/ops/admin\_vendor\_qa.py; governed evidence artifacts remain owned and shaped in PF12 and PF19.
+
+## **2.6 Prod on Railway, QA via Codespaces (names-only)**
+
+**Production definition (HD Engine, names-only).**  
+ For the HD Engine, “prod” is defined by the **Railway** service and database names already recorded in §2.2 and §4.1:
+
+* Railway project: `ample-illumination`.
+
+* HD Engine service: `glow-hdengine-v2`.
+
+* Base URL: `https://glow-hdengine-v2-production.up.railway.app`.
+
+* Production database instance: `ample-illumination/production/postgres`.
+
+* HD Engine schema: `hde`.
+
+These are the authoritative names for the HD Engine production service and its primary database. Transport policy, A7 behavior, and acceptance tokens remain owned by **HDE-Governance** and **HDE-CLI-API-Vendor-Ref** (titles-only); PF07 is inventory-only.
+
+**Codespaces role (QA console, names-only).**  
+ GitHub Codespaces for the repository `amthorn78/glow-hdengine-v2` is a **QA console**, not a production environment:
+
+* It clones the HD Engine repo into a hosted devcontainer.
+
+* It runs CLI (`hdctl`) and HTTP (`curl`) commands that can target the Railway HD Engine service and the shared Postgres instance when environment configuration and rails allow it.
+
+* It writes QA artifacts (logs, notes, snapshots) back into the repo under governed paths (for example, `Audit/QA/**`, `artifacts/**`, `docs/**`).
+
+Codespaces does **not** host the production HD Engine itself; it is a remote shell talking to the Railway `glow-hdengine-v2` service and `ample-illumination/production/postgres` database. Names and paths for QA harnesses and windows (for example, EPIC-specific QA rails windows) are recorded in §2.5 and **Glow QA Guide** by title.
+
+**“Prod via Codespaces” (gloss, names-only).**  
+ When other PF documents or QA guides use the phrase **“prod via Codespaces”**, it SHOULD be read as:
+
+* Commands are run **from** a Codespace attached to `amthorn78/glow-hdengine-v2` (or an equivalent workspace), and
+
+* Those commands **talk to** the HD Engine production service at `https://glow-hdengine-v2-production.up.railway.app` and/or the `ample-illumination/production/postgres` database (schema `hde`), and
+
+* QA artifacts from those runs are stored in the HD Engine repo under governed paths.
+
+It does **not** mean that the Codespace itself is a production environment. Any shell that can reach the Railway base URL and/or connect to the production DB with the correct configuration can exercise production behavior; PF07 names the standard providers, projects, services, and repos, and routes QA procedures and proof steps by title to **Glow QA Guide**, **HDE-Governance**, and **HDE-CLI-API-Vendor-Ref**.
 
 ---
 

@@ -2,12 +2,12 @@
 
 ## 0.1 Document Control
 
-**Title:** PF17-Review-HDE Narratives Guide  
-**Version:** v1.4.1  
+**Title:** PF17-Canon-HDE Narratives Guide  
+**Version:** v1.4.2  
 **Status:** Canon  
-**Effective** date: 2025-11-17
+**Effective** date: 2025-11-25
 
-**Last Update Gate:** BN 7.1 drain  
+**Last Update Gate:** BN 7.7.8 drain A20  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
 ---
@@ -742,6 +742,17 @@ The composer is a **closed, deterministic function**:
 
 * PF04 — Governance: transport (ETag/HEAD/304; writers+errors).
 
+**CLI/QA posture (non-prod release\_id).**  
+ In CLI/QA usage, it is acceptable for `release_id` in admin sidecars to be a **non-prod value** (for example, all zeros) when the preview is explicitly marked as a local Engine identity. In this posture:
+
+* `pack_sha` remains the **primary identity** for the narratives pack and **must still match** the SHA-256 derived from the manifest-listed pack for the same freeze.
+
+* CLI/QA sidecars **must** continue to echo `pack_sha` (and `composition_id`) so evidence and audits can tie any preview back to a specific pack.
+
+* The authoritative Engine release identity for production remains `/internal/version` (PF05/PF04), not the CLI-local `release_id` used in QA previews.
+
+This clarification does not change the validation rules: both `pack_sha` and `release_id` **MUST** remain lowercase 64-hex, and incorrect ids still fail closed (suppressed/conflict).
+
 **Runtime (titles-only).**  
  Sealed narratives packs are served from `/narratives/<pack_sha>/…`. Identity binding is to the canonical bytes of `catalog/narratives/manifest.json`. Loader/mount behavior is referenced here by title only (PF02/PF12).
 
@@ -904,6 +915,27 @@ NARR\_200\_TEXT\_OK · NARR\_SUPPRESSED\_NO\_ETAG\_OK · A7\_GET\_QUOTED\_ETAG\_
 * The machine mirror is records-only, canonical JSONL (UTF-8, sorted keys, compact, one trailing LF), rejects unknown keys, and each record includes a `proof_anchor` to a path-proof stored alongside the artifact.
 
 * Maintain LF discipline in all artifacts (no `\r`).
+
+**Example (EPIC017 Aux admin preview, QA07 — informative).**  
+ In EPIC017 QA, `hdctl aux-preview --admin-out` was run for a synthetic birth pair using the same compat JSON as Aux. The admin sidecar was a single JSON object containing:
+
+* `composition_id` and `key` with a naming pattern of `category.band.perspective.slot` (for example, `heat.open.shared.1` for the Heat / Open / shared case and first slot in the pack).
+
+* `pack_sha` as a 64-character lowercase hex digest that identifies the pinned narratives pack.
+
+* `pair` with `a_person_uid` and `b_person_uid` values matching the `a.person_uid` and `b.person_uid` fields in the compat JSON for the same CLI-scoped people.
+
+* `release_id` as a 64-character lowercase hex value that was all zeros in this CLI-only QA preview, reflecting a local preview identity rather than a specific production Engine release.
+
+This example confirms that the Aux admin preview:
+
+* selects a composition based on `{category, band, perspective, slot}` consistent with the pack and compat outcome,
+
+* carries `pack_sha` so QA and ops can trace the narrative back to a specific narratives pack version, and
+
+* ties the preview to the same CLI-scoped pair ids used by compat, with `release_id` allowed to be a non-prod value (such as all zeros) in CLI/QA, while `pack_sha` remains the primary identity for the narratives pack and the authoritative Engine identity stays `/internal/version` (PF05/PF04).
+
+This subsection remains **informative**; byte contracts and schemas for the sidecar continue to live in PF05/PF12.
 
 **Routing (titles-only).**
 

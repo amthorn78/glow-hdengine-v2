@@ -4,13 +4,13 @@
 
 **Title:** PF05-Canon-HDE-CLI-API-Vendor-Ref
 
-**Version:** v1.3.3
+**Version:** v1.3.5
 
 **Status:** Canon
 
-**Effective date:** 2025-11-21
+**Effective date:** 2025-11-25
 
-**Last Update Gate:** HDE-EPIC017 planning r1
+**Last Update Gate:** BD 7.7.8 Drain A19
 
 ---
 
@@ -36,7 +36,7 @@
 
 * **Process and PR workflow (titles only).** CodEx staging, PR-first merging, **evidence-only QA branches**, and diff-scoped validation live in **Epic-Process-Guide**. Follow the evidence-only PR template. **Build Notes** are WIP-only and not a single home; drained guidance must land in canon.
 
-* **QA status note (informative).** The CLI is installable and `--help` / `--version` behave correctly. A known issue remains: in some runs `hdctl showcompat` emits **empty output**, violating non-empty canonical JSON and parity requirements (six-key success body, LF-terminated; Reader↔CLI byte equality; AB↔BA and two-run identity). Until that path is corrected, related CLI tokens remain pending (token names live in **HDE-Governance §2**).
+* **QA status note (informative).** The CLI is installable and `--help` / `--version` behave correctly. `hdctl showcompat` is wired through the single canonical presenter/emitter and is expected to **always** emit a non-empty, LF-terminated compat JSON document on success. AB↔BA parity, two-run identity, Reader↔CLI parity (via `--dump-reader`), and preimage recompute for the Reader v1 envelope are enforced via dedicated harnesses and indexed evidence (titles-only; see Appendix D and HDE-Schemas & Artifacts). Any empty stdout on a reported success, any deviation from the compat/Reader contracts in §§3–5, or any canonicalization/schema failure **must be treated as a regression** and must fail the associated CLI acceptance tokens (`CLI_SHOWCOMPAT_CANON_OK`, `CLI_STDOUT_LF_OK`, `PARITY_AB_BA_OK`, `TWO_RUN_IDENTITY_OK`, `CLI_READER_PARITY_OK`, `JSON_CANONICAL_CHECK_OK`, `PREIMAGE_RECOMPUTE_OK`). These tokens remain merge-gating for EPIC017; failures indicate bugs to be remediated, not acceptable behavior.
 
 * **Narratives routing (titles only).** Reader remains **numeric-free and narrative-free**. Narrative bytes are carried via **Aux (text surface)** and **CLI admin preview** only. A7 transport and suppression policy lives in **HDE-Governance**. **Aux and CLI endpoint bytes live here** (see §5.7 and §4.5). No narrative text appears on Reader 200\.
 
@@ -132,7 +132,7 @@
 
   ---
 
-  # **2\. Purpose & Scope \[Required-Now\]**
+  # **2\) Purpose & Scope \[Required-Now\]**
 
   ## **2.1 Purpose**
 
@@ -210,7 +210,7 @@ Input methods for commands that compare or display charts. Titles-only pointers;
 
 **Routing (titles-only).** Canonical JSON rules & chart schemas: **HDE-Schemas & Artifacts**. Governance tokens: **HDE-Governance** (§2.0).
 
-### **3.3 Streams discipline (stdout / stderr) Required‑NowRequired‑NowRequired‑Now**
+## 3.3 Streams discipline (stdout / stderr) Required‑NowRequired‑NowRequired‑Now
 
 **Rules for command output streams.** Transport acceptance (A7) lives in HDE‑Governance; do not restate it here. Serialization rules are in §6.1/§6.2.
 
@@ -354,18 +354,75 @@ Exit codes are exhaustive for the public surface. **Non‑zero** exits must **no
 * **AB↔BA parity.** For identical inputs differing only by pair order, stdout bytes are identical (including the single trailing LF).  
 * **Two-run identity.** Running the same command twice with the same inputs/environment produces byte-identical stdout.  
 * **Schema & shape gates.** The printed body must validate the six-key covenant and `{id,band}` policy (see §2.1–§2.2); any violation results in a typed error to stderr with exit 2\.  
-* **Locale/TZ pins.** All CLI tests and byte comparisons run under `LC_ALL=C` and, where relevant, `TZ=UTC`.  
+* **Locale/TZ pins.** All CLI tests and byte comparisons run under `LC_ALL=C` and, where relevant, `TZ=UTC`.
+
+  ## **3.7 Interim “no-user” QA mode (pre-Glow prod)**
+
+**Status.** Informative for HDE-EPIC017 Live QA. CLI bytes and flag semantics in this document remain canonical; this subsection constrains **how** those commands are used in the current production environment until a Glow App user model exists.
+
+**Environment premise.**
+
+* No app-level user model is integrated with the HD Engine.
+
+* No persistent user-bound BodyGraph records exist in production.
+
+* We must not create app-like user records in prod ahead of Glow App integration.
+
+**Compat & Reader (`hdctl showcompat`).**
+
+* For pre-Glow prod QA, use `hdctl showcompat` with **birth arguments only** as the primary compat harness:
+
+  * `--birthdate-a/-b`, `--birthtime-a/-b`, `--location-a/-b`.
+
+* In this environment, **set `--source vendor` explicitly** for birth-based compat runs. The default source selection may follow DB/auto paths that are blocked or misconfigured when there is no user model.
+
+* Do **not** use `--user-a` / `--user-b` or `--source=db` in prod QA until a user model is live and an epic explicitly re-opens DB-backed compat flows.
+
+* AB↔BA identity, two-run identity, canonical JSON, and Reader↔CLI parity are still required and are exercised via birth-based compat plus `--dump-reader`.
+
+**Aux narratives (`hdctl aux-preview`).**
+
+* Drive `hdctl aux-preview` from compat JSON produced by the **birth-based** `showcompat` flow.
+
+* Do not rely on DB users or user-bound BodyGraph rows for Aux tests in pre-Glow prod.
+
+**BodyGraph resolver & vendor ingest (`hdctl bg:resolve`).**
+
+* In pre-Glow prod QA, treat `--user` keys as **ephemeral QA identifiers**, not stable app user IDs.
+
+* Allowed in prod:
+
+  * `bg:resolve` with `--source=db` or `--source=auto` in **stub** mode when there is no real DB behind the adapter.
+
+  * `bg:resolve --source=vendor` under **closed rails** as a typed refusal (no network I/O).
+
+  * `bg:resolve --source=vendor --dry-run` under **open rails** for a single vendor call that returns ingest metadata and does **not** write DB rows that look like app user records.
+
+* Disallowed in prod until a Glow App user model exists:
+
+  * `bg:resolve --source=vendor --upsert` (no vendor-driven writes that appear to create user-bound BodyGraph records).
+
+**Evidence skeleton (CLI QA).**
+
+* Live QA runs that only execute the flows above are expected to be **behaviorally read-only** with respect to governed evidence.
+
+* Snapshot the Evidence Index and machine mirror before and after CLI QA runs; treat any mutation as a defect or unexpected side effect and remediate before closing epic-level acceptance.
+
+**Forward plan.**
+
+* A future epic, once a Glow App user model and user IDs exist, will re-run EPIC017-style QA with **real app user IDs**, exercise DB-backed `showcompat` and `bg:resolve --source=vendor --upsert` semantics in prod or stage, and close any remaining tokens that require real user-bound DB coverage (see **HDE-Phased Epics** and **Glow QA Guide** by title).
+
   ---
 
-## **4\. Commands (by status)**
+# 4\. Commands (by status)
 
 *This section keeps the existing requirements as canon and adds per‑command implementation status based on the Codex CLI audit (no code changes were made in the audit). The audit reports a single `hdctl showcompat` subcommand; this version reconciles all `showcompat` behaviour into §4.1, and §4.7 now routes to that single spec.*
 
 ---
 
-### **4.1 hdctl showcompat Implemented;Required‑NowImplemented; Required‑NowImplemented;Required‑Now**
+## 4.1 hdctl showcompat Implemented;Required‑NowImplemented; Required‑NowImplemented;Required‑Now
 
-#### **4.1.1 Purpose and posture (normative)**
+### 4.1.1 Purpose and posture (normative)
 
 `hdctl showcompat` is the canonical compat harness for:
 
@@ -381,11 +438,11 @@ It is an admin/QA tool, not a public API. It is **implemented** in the CLI but r
 
 *Single emitter.* All JSON surfaces (stdout compat JSON, reader‑dump envelope, admin sidecars) must use the single canonical presenter/emitter shared with Reader (§6).
 
-#### **4.1.2 Inputs — flags and normalization (normative)**
+### 4.1.2 Inputs — flags and normalization (normative)
 
 `showcompat` supports three input families for the *pair* of BodyGraphs; flags below are as reported by the Codex CLI audit and are now normative.
 
-**A. DB‑backed users**
+**A. DB-backed users**
 
 `hdctl showcompat --user-a <idA> --user-b <idB> [--source {db|vendor|auto}]`
 
@@ -393,15 +450,18 @@ It is an admin/QA tool, not a public API. It is **implemented** in the CLI but r
 
 `hdctl showcompat --a-user <idA> --b-user <idB> [--source {db|vendor|auto}]`
 
-* `--user-a` / `--a-user`, `--user-b` / `--b-user` are internal user IDs.
+* `--user-a` / `--a-user`, `--user-b` / `--b-user` are **engine user keys**. In the long run they are expected to align with Glow App user IDs; in pre-Glow prod QA (EPIC017) they are used as **ephemeral QA keys** and do not correspond to a real app user model.
 
 * `--source {db|vendor|auto}` has the same semantics as `bg:resolve` (§4.6):
 
   * `db` — read both BodyGraphs from DB only (no vendor I/O).
 
-  * `vendor` — resolve both from vendor only; vendor calls are allowed **only** when SAFE rails are open (see Rails interaction below). On success, the resolved BodyGraphs may be upserted according to PF14 (titles‑only).
+  * `vendor` — resolve both from vendor only; vendor calls are allowed **only** when SAFE rails are open (see Rails interaction below). On success, the resolved BodyGraphs may be upserted according to the adapter policy in the **HDE-Mechanics Guide** (titles-only).
 
-  * `auto` — DB‑first, vendor‑fallback per user, following the adapter’s environment policy (PF14/PF04; titles‑only).
+  * `auto` — DB-first, vendor-fallback per user key, following the adapter’s environment policy (**HDE-Mechanics Guide** / **HDE-Governance**; titles-only).
+
+* **Pre-Glow prod QA constraint (informative).** Because there is currently no app-level user model or persistent user-bound BodyGraph table in production, DB-backed `showcompat` flows (`--user-*` with `--source=db` or `--source=auto`) and vendor-backed user upserts are **blocked by environment** in prod QA and are exercised only in closed-rails dev/QA harnesses. For EPIC017 Live QA, compat/Reader acceptance is proved via **birth-based** flows; see §3.7 for the interim “no-user” QA mode.
+
 
 **B. File‑based BodyGraph fixtures**
 
@@ -439,100 +499,99 @@ Before invoking compat math, `showcompat` **must normalize the pair** into a can
 
 * Rails resolution uses the same `_resolver_env()` mechanism as `bg:resolve` (SAFE rails and env policy are titles‑only in Governance/Mechanics).
 
-#### **4.1.3 Output surfaces and shapes (normative)**
+### 4.1.3 Output surfaces and shapes (normative)
+
+### **4.1.3 Output surfaces and shapes (normative)**
 
 `showcompat` has **two** primary byte surfaces and optional admin sidecars:
 
 1. **Compat JSON to stdout (admin/test surface)** — **primary** CLI output.
 
-2. **Reader v1 success envelope via reader‑dump** — **secondary parity surface**.
+2. **Reader v1 success envelope via reader-dump** — **secondary parity surface**.
 
-3. **Admin sidecars** — optional, file‑backed diagnostics.
+3. **Admin sidecars** — optional, file-backed diagnostics.
 
 All JSON surfaces:
 
 * Use the single canonical emitter (§6).
 
-* Are UTF‑8 (no BOM), ASCII‑sorted keys, compact, exactly **one trailing LF**.
+* Are UTF-8 (no BOM), ASCII-sorted keys, compact, exactly **one trailing LF**.
 
-* Treat arrays that represent sets as deduped and ASCII‑sorted.
+* Treat arrays that represent sets as deduped and ASCII-sorted.
 
----
+  ---
 
 **1\) Compat JSON — stdout (primary)**
 
-On success, and **in the absence of explicit reader‑dump overrides**, `showcompat` **MUST** write a single LF‑terminated compat JSON object to **stdout**, and **MUST NOT** print the Reader v1 envelope directly to stdout.
+On success, and **in the absence of explicit reader-dump overrides**, `showcompat` **MUST** write a single LF-terminated compat JSON object to **stdout**, and **MUST NOT** print the Reader v1 envelope directly to stdout.
 
 **Envelope (informative outline).**  
- Compat JSON is a single object, canonically emitted, whose high‑level shape is:
+ Compat JSON is a single object, canonically emitted, whose high-level shape is:
 
- `{`
+* `{`  
+*   `"a": { … },`  
+*   `"b": { … },`  
+*   `"viewer_prefs": { … },`  
+*   `"compat": {`  
+*     `"categories": [ … ],`  
+*     `"meta": { … }`  
+*   `}`  
+* `}`
 
-  `"a": { … },`
 
-  `"b": { … },`
+*The exact internal schema (fields for scores, bands, narrative keys per category, and identity fields) is owned by this document (later sections) and the HDE-Mechanics Guide (titles-only), and is **not** the Reader v1 envelope.*
 
-  `"viewer_prefs": { … },`
+**Semantics.**
 
-  `"compat": {`
+* `a` / `b` describe the pair participants and resolved BodyGraphs for this compat run.
 
-    `"categories": [ … ],`
+* `viewer_prefs` captures viewer-preference inputs where applicable (for example `top_category` and weights across the Magic-10 set). In pre-App QA contexts it is expected to be present but neutral (equal weights) unless the test explicitly varies it.
 
-    `"meta": { … }`
+* `compat.categories[*]` carries per-category compat details (including scores, bands, and narrative selection keys) for the full Magic-10 set; the **public** Reader envelope continues to expose only `"harmony"` and bands (§5.1).
 
-  `}`
+* `compat.meta` carries **CLI/local compat identity**, not the prod engine identity:
 
-`}`
+  * In CLI contexts (including dev Codespaces), `meta.engine_tag`, `meta.invocation_tag`, and `meta.release_id` describe the **engine instance and invocation used by the CLI** (for example `hdengine-dev`, `INV-LOCAL`, or an all-zero `release_id` in early QA).
 
-*  The exact internal schema (fields for scores, bands, and narrative keys per category) is owned by this document (later sections) and **HDE‑Mechanics Guide** (titles‑only), and is **not** the Reader v1 envelope.
+  * These values **may differ** from the prod Reader identity reported by `/internal/version` on Railway (`engine_tag: "hdengine@prod"`, non-zero `release_id`, etc.). The authoritative source for prod engine identity remains the `/internal/version` ops endpoint and the Reader v1 envelope on Railway, as governed by **HDE-Governance** and **HDE-Mechanics Guide** (titles-only).
 
-* **Semantics.**
+  * QA and tooling **must not** treat compat.meta as proving the identity of a remote prod engine; it is a local/CLI identity context used for debugging and evidence tagging.
 
-  * `a` / `b` describe the pair participants and resolved BodyGraphs.
+**Streams.**
 
-  * `viewer_prefs` captures viewer‑preference inputs where applicable.
+* On success: stdout \= single compat JSON document; stderr empty.
 
-  * `compat.categories[*]` carries per‑category compat details (including scores, bands, and narrative selection keys) for the full Magic‑10 set; the **public** Reader envelope continues to expose only `"harmony"` and bands (§5.1).
+* Errors and usage go to **stderr** only (see §3.3/§3.4).
 
-* **Streams.**
-
-  * On success: stdout \= single compat JSON document; stderr empty.
-
-  * Errors and usage go to **stderr** only (see §3.3/§3.4).
+Compat JSON is an **admin/test surface only**; it is not a public Reader payload.
 
 ---
 
-**2\) Reader v1 success envelope — reader‑dump path**
+**2\) Reader v1 success envelope — reader-dump path**
 
 When the `--dump-reader <path>` flag is present, `showcompat` **MUST**:
 
-* Compute the Reader v1 success envelope (six keys; numeric‑free) for the resolved pair, using the same `emit_reader_public_envelope` path as the Reader API.
+* Compute the Reader v1 success envelope (six keys; numeric-free) for the resolved pair, using the same `emit_reader_public_envelope` path as the Reader API.
 
-* Serialize it with the single emitter as canonical JSON (UTF‑8, sorted keys, compact, one LF).
+* Serialize it with the single emitter as canonical JSON (UTF-8, sorted keys, compact, one LF).
 
-* Write those bytes to the target file `<path>` (0600 permissions recommended; enforcement details in PF14; titles‑only).
+* Write those bytes to the target file `<path>` (0600 permissions recommended; enforcement details in HDE-Mechanics Guide; titles-only).
 
-* Ensure the resulting bytes are **byte‑identical** to the Reader 200 success body for the same inputs/environment.
+* Ensure the resulting bytes are **byte-identical** to the Reader 200 success body for the same inputs/environment.
 
 The Reader v1 envelope **MUST NOT** be extended with compat scores or narrative fields. It remains:
 
-`{`
+* `{`  
+*   `"reader_version": "v1",`  
+*   `"eligible": …,`  
+*   `"categories": [ { "id": "harmony", "band": "Cool|Open|Warm|Glow" } or [] ],`  
+*   `"meta": { "engine_tag": "...", "invocation_tag": "..." },`  
+*   `"release_id": "<hex64>",`  
+*   `"idempotence_hash": "<hex64>"`  
+* `}`
 
-  `"reader_version": "v1",`
 
-  `"eligible": …,`
-
-  `"categories": [ { "id": "harmony", "band": "Cool|Open|Warm|Glow" } or [] ],`
-
-  `"meta": { "engine_tag": "...", "invocation_tag": "..." },`
-
-  `"release_id": "<hex64>",`
-
-  `"idempotence_hash": "<hex64>"`
-
-`}`
-
-(Full covenant and preimage rules live in §5.1 and PF01/PF04; titles‑only.)
+(Full covenant and preimage rules live in §5.1 and HDE-Math-Spec / HDE-Governance by title.)
 
 ---
 
@@ -542,9 +601,9 @@ When `--dump-admin-dir <dir>` (or equivalent) is set, `showcompat` MAY emit addi
 
 * Admin compat JSON snapshots (potentially richer than stdout, e.g., extra diagnostics), written via the canonical emitter.
 
-* SHA‑256 sidecars (`.sha256`) for each artifact.
+* SHA-256 sidecars (`.sha256`) for each artifact.
 
-* Additional logs needed for acceptance tokens (AB↔BA, two‑run, preimage recompute), titles‑only referenced in PF12/PF14.
+* Additional logs needed for acceptance tokens (AB↔BA, two-run, preimage recompute), titles-only referenced in HDE-Schemas & Artifacts / HDE-Mechanics Guide.
 
 Admin sidecars:
 
@@ -552,9 +611,9 @@ Admin sidecars:
 
 * Must never be treated as public API bytes.
 
-* Must remain numeric‑free where they mirror public envelopes; compat‑internal numerics remain admin‑only.
+* Must remain numeric-free where they mirror public envelopes; compat-internal numerics remain admin-only.
 
-#### **4.1.4 Errors and exit codes (normative)**
+### 4.1.4 Errors and exit codes (normative)
 
 Exit codes follow §3.4. The mapping for `showcompat`:
 
@@ -568,7 +627,7 @@ Exit codes follow §3.4. The mapping for `showcompat`:
 
 Error envelopes and streams follow §5.2.
 
-#### **4.1.5 Determinism, parity, and acceptance (normative)**
+### 4.1.5 Determinism, parity, and acceptance (normative)
 
 **Determinism (compat JSON and Reader envelope).**
 
@@ -618,7 +677,7 @@ Examples (names may be adjusted in PF12):
 
 All records must be indexed in `docs/evidence/INDEX.json` and mirrored in `artifacts/evidence_index.jsonl` in the same PR (PF12/PF04).
 
-#### **4.1.6 Implementation status (audit v1)**
+### 4.1.6 Implementation status (audit v1)
 
 * **Implementation status:** Partially implemented.
 
@@ -644,9 +703,80 @@ All records must be indexed in `docs/evidence/INDEX.json` and mirrored in `artif
 
 The canonical behaviour is now specified in §4.1/§5.1; any divergence in code is a defect until corrected or explicitly re‑canonized.
 
+### **4.1.7 Stateless compat export mode (gap; no-DB JSON QA)**
+
+**Purpose (normative, future-epic).**  
+ Provide a **no-DB JSON QA mode** for compat that:
+
+* Takes only **birth tuples** and/or **BodyGraph JSON files** as inputs,
+
+* Calls the compat engine directly (no DB reads, no user-ID lookups), and
+
+* Writes both **compat JSON** and the **Reader v1 envelope** to governed JSON artifacts, so QA can exercise compat, AB↔BA identity, two-run identity, narratives, and Reader parity **without** an app DB or user IDs.
+
+This capability is a **Calcination gap** recorded in Build Notes (Addendum 11). It is required for future calcination/separation/conjunction epics that want to QA engine math independently of any app user model and persistence.
+
+**Inputs (stateless compat harness).**
+
+In addition to the existing input families in §4.1.2, `showcompat` **MUST**, in a future epic, support a stateless QA mode that:
+
+* Accepts **either**:
+
+  * two BodyGraph export JSON files (produced by `hdctl bg:export-json`; see §4.8), **or**
+
+  * two birth tuples (equivalent to the vendor birth payload) that can be resolved via a **dry-run** vendor path, without DB writes; and
+
+* Does **not** require `--user-a` / `--user-b` or any DB-backed `--source=db`/`auto` behaviour.
+
+Exact flag names and wiring (`--export-dir`, `--from-bodygraph`, etc.) are **\[OPEN\]** and will be pinned in a future Doc-Delta; this section constrains behaviour, not the CLI UX.
+
+**Outputs (files, not DB).**
+
+In stateless compat export mode, `showcompat` **MUST**:
+
+* Call the compat engine directly using the provided BodyGraph inputs (or the derived BodyGraph from vendor dry-run), without reading from or writing to DB; and
+
+* Emit, under governed repo paths (for example `artifacts/hdctl/…` or `artifacts/qa/…` — exact locations and schemas are owned by **HDE-Schemas & Artifacts**):
+
+  1. A **compat JSON** file containing the full admin/test compat structure (scores, bands, narrative selection keys per category) as defined in this document and **HDE-Mechanics Guide** (titles-only), and
+
+  2. A **Reader v1 envelope** JSON file containing the six-key, numeric-free public body defined in §5.1 (and HDE-Math-Spec / HDE-Governance by title), such that:
+
+     * both files are canonical JSON (UTF-8, sorted keys, compact, exactly one LF; arrays-as-sets deduped and ASCII-sorted), per §6.1 and **HDE-Schemas & Artifacts**, and
+
+     * the Reader v1 file is **byte-identical** to the Reader 200 success body for the same inputs/environment.
+
+Compat stdout behaviour for the general case remains as in §4.1.3: compat JSON on stdout, and optional `--dump-reader` sidecars. The stateless export mode adds **file-backed** outputs for QA; it does **not** change the public Reader envelope.
+
+**Rails and DB posture (informative).**
+
+* In the stateless compat export mode, `showcompat` **must not**:
+
+  * create or update DB rows that look like app users, or
+
+  * depend on an app-level user model or user IDs.
+
+* Vendor use (if any) **must** follow §7.1/§7.2/§7.3 SAFE rails and dry-run semantics (no writes) and be clearly separated from any future `--upsert`/DB-binding behaviour.
+
+**QA and evidence hooks (titles-only).**
+
+* QA harnesses (defined in **HDE-Mechanics Guide** and **Glow QA Guide**) will use the stateless compat export mode to run AB↔BA, two-run, Reader parity, and narrative tests entirely from files.
+
+* Schemas and evidence records for compat export JSON and stateless Reader-envelope files are owned by **HDE-Schemas & Artifacts**; PF05 references them by title only.
+
+**Implementation status.**
+
+* **Not implemented.** This subsection records a **required capability and gap**. Current EPIC017 Live QA uses birth-based `showcompat` plus `--dump-reader` and cannot yet produce a full no-DB JSON run bundle. A future epic (for example “Stateless JSON Export & QA Harness”) must:
+
+  * Wire this mode into the CLI,
+
+  * Pin schemas and artifact paths in **HDE-Schemas & Artifacts**, and
+
+  * Add the corresponding evidence entries and tokens in **HDE-Mechanics Guide**, **Glow QA Guide**, and **HDE-Phased Epics**.
+
 ---
 
-### **4.2 hdctl read singlebg SpeculativeSpeculativeSpeculative**
+## 4.2 hdctl read singlebg SpeculativeSpeculativeSpeculative
 
 *(Unchanged in spirit; shown here only for completeness with minor wording aligned to Option B. No new semantics were invented.)*
 
@@ -659,31 +789,69 @@ Implementation status (audit v1): **Not implemented**; see existing PF05 languag
 
 ---
 
-### **4.3 hdctl list people SpeculativeSpeculativeSpeculative**
+## 4.3 hdctl list people SpeculativeSpeculativeSpeculative
 
 *(Unchanged; still speculative developer convenience for local people store listing.)*
 
 ---
 
-### **4.4 Fetch commands (person/batch) Speculative;disabledinAlphaSpeculative; disabled in AlphaSpeculative;disabledinAlpha**
+## 4.4 Fetch commands (person/batch) Speculative;disabledinAlphaSpeculative; disabled in AlphaSpeculative;disabledinAlpha
 
 *(Unchanged; still disabled by design; rails, privacy, and determinism constraints remain as previously specified.)*
 
 ---
 
-### **4.5 CLI Admin Preview (narrative) Required‑NowRequired‑NowRequired‑Now**
+## 4.5 CLI Admin Preview (narrative) Required‑NowRequired‑NowRequired‑Now
 
 *(Unchanged in substance.)* `hdctl aux-preview` remains the admin preview surface for Aux narrative text and IDs, reading compat JSON from `--pair-file` and calling the Aux emitter. It must **not** change Reader 200 bytes; it is admin‑only and LF‑only.
 
 ---
 
-### **4.6 hdctl bg:resolve Required‑NowRequired‑NowRequired‑Now**
+## 4.6 hdctl bg:resolve Required-NowRequired-NowRequired-Now
 
-*(Unchanged in substance.)* Operator command for resolving a single BodyGraph with explicit `--source {db|vendor|auto}` selection, sharing rails semantics with `showcompat`. Success prints canonical JSON via the shared emitter; failures use typed stderr errors.
+`hdctl bg:resolve` is the operator command for resolving a single BodyGraph for a given key and data source.
+
+**Inputs and sources (normative).**
+
+* `--user <id>` — engine user key. In the long run it is expected to align with a Glow App user ID; in pre-Glow prod QA it is used as an **ephemeral QA key** and not as a durable app user identifier.
+
+* `--source {db|vendor|auto}` selects the data source:
+
+  * `db` — resolve from DB only (no vendor I/O).
+
+  * `vendor` — resolve from vendor only; vendor HTTP calls are allowed **only** when SAFE rails are open (`SAFE_MODE=0` and `ALLOW_NETWORK=1`). Shaping and error mapping follow §7.1/§7.2/§7.3 and the policies in **HDE-Governance** and the **HDE-Mechanics Guide** (titles-only).
+
+  * `auto` — DB-first, vendor-fallback according to the adapter’s environment policy (HDE-Mechanics Guide; titles-only).
+
+* Implementations MAY expose `--dry-run` and `--upsert` switches; when present they must follow the vendor rails and adapter data-source policy in §7.1/§7.4 and the **HDE-Mechanics Guide** (titles-only).
+
+**Outputs and streams.**
+
+* On success, `bg:resolve` prints the resolved BodyGraph JSON to **stdout** using the single canonical emitter (UTF-8, sorted keys, compact, exactly one LF; arrays-as-sets deduped and ASCII-sorted).
+
+* Typed failures and usage errors follow the error and exit-code taxonomy in §3.3/§3.4/§5.2: errors go to **stderr** only; stdout is empty.
+
+**Pre-Glow prod QA constraint (informative).**
+
+* In the current pre-Glow production environment there is no app-level user model and no persistent user-bound BodyGraph table. For EPIC017 Live QA:
+
+  * `--user` is treated as an **ephemeral QA key**.
+
+  * Allowed flows in prod are:
+
+    * `bg:resolve` with `--source=db` or `--source=auto` in **stub** mode when no real DB is configured behind the adapter.
+
+    * `bg:resolve --source=vendor` under **closed rails** as a typed refusal (no network I/O).
+
+    * `bg:resolve --source=vendor --dry-run` under **open rails** for a single vendor call that returns ingest metadata and does **not** write DB rows that look like app user records.
+
+  * `bg:resolve --source=vendor --upsert` **must not** be used in prod until a Glow App user model exists and a future epic explicitly re-opens user-bound upsert flows.
+
+These constraints do not change the CLI bytes or flags defined elsewhere in this document; they constrain how `bg:resolve` is used in pre-Glow prod QA. Once a user model exists and DB-backed flows are re-opened by a later epic, this subsection remains as historical context for how EPIC017 was exercised.
 
 ---
 
-### **4.7 Implementation Matrix (audit v1)**
+## 4.7 Implementation Matrix (audit v1)
 
 Update rows that refer to `showcompat` to point to §4.1 and reflect Option B:
 
@@ -699,11 +867,104 @@ Update rows that refer to `showcompat` to point to §4.1 and reflect Option B:
 | Core: BodyGraph data source selection | §4.1, §4.6 | Partially implemented | `hdctl bg:resolve --source`, `hdctl showcompat --source`, `_resolver_env()` | CLI exposes `--source {auto,db,vendor}` and uses env rails; internal resolver semantics and guardrails are not fully audited. |
 |  |  |  |  |  |
 
+## **4.8 hdctl bg:export-json Speculative; gap — stateless BodyGraph export**
+
+**Purpose (normative, future-epic).**  
+ `hdctl bg:export-json` is the **stateless BodyGraph export** command. It exists to:
+
+* Drive engine **BodyGraph math directly** (no DB read/write),
+
+* Emit a complete BodyGraph export JSON artifact suitable for compat/narratives QA, and
+
+* Enable a fully **no-DB JSON QA mode** when combined with `hdctl showcompat` stateless compat export (§4.1.7).
+
+This command is a **required capability and gap** recorded in Build Notes (Addendum 11). It is not implemented in the current CLI; status is **Speculative; gap** until a dedicated epic delivers it.
+
+### **4.8.1 Inputs (stateless only)**
+
+`hdctl bg:export-json` **MUST**, in a future epic, support:
+
+* **Birth-tuple inputs** equivalent to the vendor BodyGraph payload and existing CLI birth flags, for example:
+
+  * `--birthdate`, `--birthtime`, `--location`, and any existing options that map to the three-key vendor body (`birthdate`, `birthtime`, `location`) as defined in §7.2; and/or
+
+* **Vendor BodyGraph JSON input** (optional):
+
+  * a BodyGraph JSON file previously returned by the vendor in a **dry-run** ingest flow (schema single home in **HDE-Schemas & Artifacts**).
+
+Exact flag names and combinations are **\[OPEN\]** and will be pinned in a later Doc-Delta; this section constrains semantics:
+
+* The command **must not** require an app-level user ID or DB-backed `--source=db` / `--source=auto` modes.
+
+* Any use of `bg:resolve` or vendor HTTP under the hood **must** respect §7.1/§7.2/§7.3 SAFE rails and **dry-run** semantics (no DB writes) unless an explicit, separately-documented `--upsert`\-style switch is provided and enabled in a non-QA context.
+
+### **4.8.2 Behaviour and outputs (no DB, canonical JSON)**
+
+In all success cases, `hdctl bg:export-json` **MUST**:
+
+* Call the engine BodyGraph math directly (no DB reads, no DB writes). The engine remains pure; adapters may use vendor HTTP under SAFE rails but may not touch DB in stateless mode.
+
+* Write a **single BodyGraph export JSON file** under a governed path (for example `artifacts/hdctl/bg_export/…` or `artifacts/qa/…`; exact path and schema are owned by **HDE-Schemas & Artifacts**), containing:
+
+  * **Provenance:** raw birth details used to construct the chart (so audits can trace inputs), and, when applicable, a reference to any vendor response used (IDs only; no full vendor payload).
+
+  * **Full BodyGraph topology:** centers, channels, gates, lines, profile, authority, definition, and type in the canonical forms defined by **HDE-Schemas & Artifacts** and **HDE-Math-Spec** (titles-only).
+
+  * **Registry IDs:** any internal IDs required for downstream compat/narratives (for example IDs that compat uses to look up presets or narratives). Only IDs and structural metadata appear; no narrative text.
+
+* Emit the file as **canonical JSON** using the single emitter (§6.1/§6.2):
+
+  * UTF-8 (no BOM),
+
+  * ASCII-sorted keys,
+
+  * compact separators,
+
+  * exactly **one trailing LF**,
+
+  * arrays-as-sets deduped and ASCII-sorted where appropriate.
+
+Stdout/stderr follow the general rules in §3.3/§3.4:
+
+* On success: stdout may remain empty or print a short, numeric-free synopsis; the exported JSON lives on disk.
+
+* On error: emit a typed error JSON to stderr (`ok:false, code, error`), LF-terminated, with `exit 2`; stdout empty.
+
+### **4.8.3 QA usage and evidence (titles-only)**
+
+**QA harness role.**
+
+* `hdctl bg:export-json` is the **first leg** of the stateless QA pipeline:
+
+  * birth (or vendor BodyGraph) → `bg:export-json` → BodyGraph export JSON → `showcompat` stateless compat export (§4.1.7) → compat JSON \+ Reader v1 envelope files.
+
+* QA plans defined in **Glow QA Guide** and epic records in **HDE-Phased Epics** will use this pipeline to test BodyGraph, compat, and narratives **without DB**.
+
+**Evidence & schemas.**
+
+* Schemas for BodyGraph export JSON and any “run bundle” composite artifacts are owned by **HDE-Schemas & Artifacts**; PF05 **must not** define those schemas.
+
+* Evidence index entries (for example “BodyGraph export JSON golden”, “stateless run bundle”) live in **PF12**; this section simply requires that the CLI surfaces exist and honour canonical JSON and no-DB semantics.
+
+### **4.8.4 Implementation status (gap record)**
+
+* **Current status:** Not implemented; no `bg:export-json` command exists, and no standard BodyGraph export JSON artifact is produced in the repository.
+
+* **Gap:** EPIC017 Live QA is limited to compat/Reader behaviour and cannot fully validate internal BodyGraph derivations in a DB-independent way.
+
+* **Future work:** A dedicated epic (for example “Stateless JSON Export & QA Harness”) must:
+
+  * Implement `hdctl bg:export-json` as specified here,
+
+  * Extend **HDE-Schemas & Artifacts** with BodyGraph export and optional composite “run bundle” schemas, and
+
+  * Wire QA harnesses and evidence (PF14/PF19/PF20) to use these stateless artifacts.
+
 ---
 
-## **5\. Reader Transport (public bytes) Required‑NowRequired‑NowRequired‑Now**
+# 5\. Reader Transport (public bytes) Required‑NowRequired‑NowRequired‑Now
 
-### **5.1 Success envelope Required‑NowRequired‑NowRequired‑Now**
+## 5.1 Success envelope Required‑NowRequired‑NowRequired‑Now
 
 **Body shape (six keys).**  
  The Reader v1 success body contains exactly these six top‑level keys — no extras:
@@ -720,7 +981,7 @@ Update rows that refer to `showcompat` to point to §4.1 and reflect Option B:
 
 * `idempotence_hash` — lowercase 64‑hex string.
 
-#### **5.1.1 CLI and admin compatibility surfaces (normative)**
+### 5.1.1 CLI and admin compatibility surfaces (normative)
 
 * The Reader v1 success envelope above is the **only** public compat payload exposed by the Reader API. It remains six‑key and numeric‑free.
 
@@ -762,7 +1023,7 @@ Emits that compat JSON to **stdout** as a single LF‑terminated canonical JSON 
 
 * When `--dump-reader <path>` is provided, `showcompat` also writes the Reader v1 success envelope bytes to `<path>` via the same `emit_reader_public_envelope` path as the Reader API. These bytes must obey the six‑key covenant above and the canonical JSON rules in §6.1.
 
-#### **5.1.2 Reader v1 envelope bytes (normative)**
+### 5.1.2 Reader v1 envelope bytes (normative)
 
 When the Reader v1 envelope is produced (either by the Reader API on a Catalog JSON success route, or by the CLI via its reader‑dump path), its bytes **MUST**:
 
@@ -796,7 +1057,7 @@ When the Reader v1 envelope is produced (either by the Reader API on a Catalog J
 
 Richer compat JSON (including numeric scores and narrative selection keys) is restricted to **admin/test artifacts** (for example, `hdctl showcompat` compat JSON on stdout, admin sidecars, and Aux preview inputs). These admin surfaces **must not** extend or change the Reader v1 public envelope; the six‑key envelope remains numeric‑free and field‑closed.
 
-#### **5.1.3 Emission algorithm (success case; titles‑only)**
+### 5.1.3 Emission algorithm (success case; titles‑only)
 
 The emission algorithm for the Reader v1 envelope is unchanged and remains:
 
@@ -816,7 +1077,7 @@ The emission algorithm for the Reader v1 envelope is unchanged and remains:
 
 All byte checks run under `LC_ALL=C` (and `TZ=UTC` where relevant), as described in PF01/PF12 (titles‑only).
 
-#### **5.1.4 Public covenant and determinism**
+### 5.1.4 Public covenant and determinism
 
 **Public covenant.**
 
@@ -850,7 +1111,27 @@ All byte checks run under `LC_ALL=C` (and `TZ=UTC` where relevant), as described
 
 * CLI compat JSON schema and admin/test evidence surfaces: this document (later CLI/compat sections) and **HDE‑Mechanics Guide** (titles‑only).
 
-  ---
+### **5.1.5 EPIC017 CLI reader-dump QA status (informative)**
+
+EPIC017 Live QA captured a Reader v1 envelope produced by:
+
+`hdctl showcompat --source vendor --dump-reader <path>`
+
+for a synthetic birth pair in the CLI/Codespaces environment. The captured JSON:
+
+* has exactly the six canonical top-level keys (`reader_version`, `eligible`, `categories`, `meta`, `release_id`, `idempotence_hash`), with no extras;
+
+* is numeric-free and satisfies the v1 `categories` policy (`categories` either `[]` or a single `{ "id": "harmony", "band": … }` when `eligible == true`);
+
+* uses `meta.engine_tag` / `meta.invocation_tag` values from the CLI/dev context (for example `hdengine-dev`, `INV-LOCAL`) and a lowercase 64-hex `release_id` (all zeros in this QA run), consistent with the pattern requirements in this section; and
+
+* passes the canonical JSON gates in §6.1 (UTF-8, sorted keys, compact, exactly one LF).
+
+This evidence confirms that the CLI `--dump-reader` path can produce a valid Reader v1 envelope in the Codespaces QA environment using a **CLI-local identity**. The authoritative production engine identity remains the `/internal/version` ops endpoint and the Reader v1 envelope on Railway, governed by **HDE-Governance** and **HDE-Mechanics Guide** (titles-only); compat and CLI meta fields are local/admin identity contexts and must not be treated as proof of a remote prod engine’s identity.
+
+AB↔BA identity, two-run identity, and Reader↔CLI parity for Reader v1 envelope bytes remain required by this spec and are exercised via dedicated harnesses and evidence families (see §3.6, §5.1.2, and Appendix D). This QA step validates a single well-formed envelope instance in the CLI QA environment; it does not, by itself, satisfy the broader parity and determinism acceptance tokens.
+
+---
 
 ## **5.2 Errors \[Required-Now\]**
 

@@ -4,13 +4,13 @@
 
 **Title:** PF01-Canon-HDE-Math-Spec
 
-**Version:** v1.2.7
+**Version:** v1.2.8
 
 **Status:** Canon
 
-**Effective date:** 2025-11-21
+**Effective date:** 2025-11-23
 
-**Last Update Gate:** HDE-EPIC011 Planning
+**Last Update Gate:** BN 7.7.8 Drain
 
 ## **0.2 Change policy**
 
@@ -32,6 +32,19 @@
 **Frozen-input change ⇒ new `release_id`.** Any byte change to a frozen input or the manifest requires a Doc-Delta and a new `release_id` (**HDE-Schemas & Artifacts** §6: `release_id = sha256(canonical_bytes("catalog/manifest.json"))`).
 
 **Canonical bytes** (**HDE-Schemas & Artifacts** §4). All governed JSON (including the manifest and any constants or catalog files) is serialized as UTF-8 without BOM, sorted keys, compact, with exactly one trailing LF; numbers are JSON numbers; arrays used as sets are deduplicated and ASCII-sorted. Hashing, parity, and equality checks run with `LC_ALL=C`, `LANG=C`, `TZ=UTC`. This spec references those rules and does not restate them.
+
+**EPIC017 proof posture (informative).**  
+ EPIC017, as recorded in **HDE Phased Epics Map**, is the first epic that fully proves the canonical-bytes and determinism rules defined in this spec. Its deliverables exercise:
+
+* canonical JSON (UTF-8, sorted keys, compact, one trailing LF)
+
+* arrays-as-sets (deduped and ASCII-sorted)
+
+* the `LC_ALL=C` / `LANG=C` / `TZ=UTC` posture for hashing and canonicalization
+
+* determinism evidence (AB↔BA identity, two-run identity, idempotence recompute)
+
+These proofs are implemented through tests and evidence artifacts owned by **HDE-Mechanics Guide** and **HDE-Build Checklist**. EPIC017 does **not** modify any math or canonical JSON semantics in this spec; it brings implementation and evidence into full alignment with the existing contract.
 
 **Identifier and path policy** (**HDE-Schemas & Artifacts** §0.5 / §2.1). String IDs are ASCII and match `^[a-z0-9_]+$` (case-sensitive). Pack paths are POSIX (no `..`, no `//`, max 256 bytes). Centers are `snake_case` in outputs; Title Case is an ingestion alias.
 
@@ -72,6 +85,21 @@
   * **Two-step idempotence.** Build the preimage (without `idempotence_hash`), compute `sha256(preimage_bytes)`, then re-emit with `idempotence_hash` inserted (see §3.2).  
   * **AB↔BA identity.** Pair inputs are normalized to a canonical order; the same pair key drives downstream math so AB and BA produce byte-identical outputs (see §3.4).  
   * **Evidence (titles-only).** Reader/CLI schema & LF discipline, AB↔BA goldens, idempotence recompute logs; all entries mirrored 1:1 in the machine mirror.  
+  * **EPIC017 proof record (informative).**  
+     EPIC017, as tracked in **HDE Phased Epics Map**, is the first complete implementation of the determinism invariants defined in this spec. Its deliverables exercise:
+
+    * canonical JSON checks
+
+    * Reader↔CLI parity
+
+    * AB↔BA identity
+
+    * two-run identity
+
+    * idempotence-recompute harnesses
+
+  * Acceptance tokens such as `JSON_CANONICAL_CHECK_OK`, `TWO_RUN_IDENTITY_OK`, and `COMPOSITE_ABBA_IDENTITY_OK` are mapped to evidence artifacts owned by **HDE-Mechanics Guide** and **HDE-Build Checklist**. These proofs demonstrate that implementation conforms to the rules defined here; they do **not** introduce any new math or any alternative determinism contract.
+
 * **Compat Magic-10 (10 categories; scores→bands) — \[Speculative\] (internal math present; not public)**
 
   * **Closed set & order.** Magic-10 IDs and their pinned order are defined in **HDE-Schemas and Artifacts §2.6** (this spec is math-only; public exposure is constrained in §2.2).  
@@ -239,7 +267,8 @@
 
 **Evidence (records-only; indexed via the machine mirror).** Property tests (antisymmetry / transitivity / totality), a channel-normalization corpus (input → canonical `NN-NN`, rejects for non-canonical), and canonical before/after examples for set-normalized arrays. List by title/path in **Appendix D: Evidence Index** and mirror 1:1 in `artifacts/evidence_index.jsonl` with path-proofs.
 
----
+**EPIC017 D4 proof (informative).**  
+ EPIC017’s “deterministic tie-break and total-order module” deliverable, as recorded in **HDE Phased Epics Map**, implements comparators for IDs, channels, categories, and arrays-as-sets exactly as specified in this section. It proves antisymmetry, transitivity, totality, AB↔BA identity, and two-run identity using ordering artifacts and tests defined in **HDE-Mechanics Guide** and **HDE-Schemas & Artifacts**. These proofs confirm the semantics defined here; EPIC017 does **not** alter the ordering rules or arrays-as-sets behavior in this spec. Any future change to comparator policy or set semantics remains a PF01 math change and must follow the usual release-id and evidence requirements.
 
 ---
 
