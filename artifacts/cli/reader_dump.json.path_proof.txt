@@ -1,5 +1,5 @@
 path: artifacts/cli/reader_dump.json
 size_bytes: 320
 sha256: 1c8009b23095fb556225864f04136839ac4433b656465055379235db604fef42
-mtime_utc: 2025-11-22T21:09:47Z
+mtime_utc: 2025-11-26T20:36:13Z
 produced_at_utc: 2025-11-22T02:27:04Z
