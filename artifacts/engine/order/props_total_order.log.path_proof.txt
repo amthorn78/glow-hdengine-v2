@@ -1,5 +1,5 @@
 path: artifacts/engine/order/props_total_order.log
 size_bytes: 218
 sha256: 08afdd2cb6e6685549661359eaa9f14ee246a979d31621142cd3b0b1c624a26c
-mtime_utc: 2025-11-22T21:09:47Z
+mtime_utc: 2025-11-26T21:10:36Z
 produced_at_utc: 2025-11-22T04:02:02Z
