@@ -13,6 +13,10 @@ audit/qa/compat/lints_samples/*
 !audit/qa/compat/**/*.path_proof.txt
 !audit/gates/
 audit/gates/*
+!audit/gates/determinism/
+audit/gates/determinism/*
+!audit/gates/determinism/*.log
+!audit/gates/determinism/*.path_proof.txt
 !audit/gates/aux/
 audit/gates/aux/*
 !audit/gates/aux/*.path_proof.txt
