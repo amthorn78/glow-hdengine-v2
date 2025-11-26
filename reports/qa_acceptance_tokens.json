@@ -1,0 +1,935 @@
+{
+  "tokens": [
+    {
+      "name": "EMIT_PATH_NO_JSON_DUMPS_OK",
+      "scope": "pre_commit_ci",
+      "feature_label": "Presenter/adapter emit paths avoid direct json.dumps",
+      "code_locations": [
+        {
+          "path": "tools/lint_emit_paths.py",
+          "summary": "Lints public emit code for stray json.dumps calls"
+        }
+      ],
+      "tests_and_ci": [
+        {
+          "path": "tools/lint_emit_paths.py",
+          "summary": "Exit 1 if any emit path uses json.dumps"
+        }
+      ],
+      "evidence_artifacts": [],
+      "notes": "Used as gate in sanity runs; fails build if emit paths bypass shared canon."
+    },
+    {
+      "name": "FILE_EQ_CANON_BYTES_OK",
+      "scope": "evidence_index",
+      "feature_label": "Canonical byte equality check for paired JSON payloads",
+      "code_locations": [
+        {
+          "path": "presenter/json_canon_compare.py",
+          "summary": "CLI compares two JSON files using canonical serializer"
+        }
+      ],
+      "tests_and_ci": [
+        {
+          "path": "presenter/json_canon_compare.py",
+          "summary": "Main routine emits FILE_EQ_CANON_BYTES_OK when payloads match"
+        }
+      ],
+      "evidence_artifacts": [
+        {
+          "path": "artifacts/ingest/json_canon_compare.log",
+          "summary": "Ingest harness log capturing canonical comparisons"
+        }
+      ]
+    },
+    {
+      "name": "CLI_HELP_OK",
+      "scope": "cli_sdk",
+      "feature_label": "engine.cli --help exits 0 with help text",
+      "code_locations": [
+        {
+          "path": "scripts/audit/bootstrap_preflight.py",
+          "summary": "Runs engine.cli --help and records CLI_HELP_OK line"
+        }
+      ],
+      "tests_and_ci": [
+        {
+          "path": "scripts/audit/bootstrap_preflight.py",
+          "summary": "Preflight script fails if CLI help non-zero"
+        }
+      ],
+      "evidence_artifacts": [
+        {
+          "path": "audit/bootstrap/preflight.log",
+          "summary": "Captured CLI help status including CLI_HELP_OK"
+        },
+        {
+          "path": "proofs/HELP_OK.txt",
+          "summary": "Static proof noting CLI_HELP_OK"
+        }
+      ]
+    },
+    {
+      "name": "MODULE_HELP_OK",
+      "scope": "cli_sdk",
+      "feature_label": "python -m engine.cli --help parity",
+      "code_locations": [
+        {
+          "path": "proofs/HELP_OK.txt",
+          "summary": "Proof file records MODULE_HELP_OK"
+        }
+      ],
+      "tests_and_ci": [],
+      "evidence_artifacts": [
+        {
+          "path": "proofs/HELP_OK.txt",
+          "summary": "Proof showing module help succeeds"
+        }
+      ]
+    },
+    {
+      "name": "AB_BA_PARITY_OK",
+      "scope": "cli_sdk",
+      "feature_label": "AB vs BA CLI parity check",
+      "code_locations": [
+        {
+          "path": "proofs/AB_BA_PARITY.txt",
+          "summary": "Proof token for AB/BA parity"
+        }
+      ],
+      "tests_and_ci": [],
+      "evidence_artifacts": [
+        {
+          "path": "proofs/AB_BA_PARITY.txt",
+          "summary": "Captured parity result"
+        }
+      ]
+    },
+    {
+      "name": "TWO_RUN_IDENTITY_OK",
+      "scope": "cli_sdk",
+      "feature_label": "Repeat CLI runs produce identical output",
+      "code_locations": [
+        {
+          "path": "proofs/TWO_RUN_IDENTITY.txt",
+          "summary": "Proof token for two-run identity"
+        },
+        {
+          "path": "tests/audit/test_epic017_manifest.py",
+          "summary": "EPIC017 manifest expects TWO_RUN_IDENTITY_OK"
+        }
+      ],
+      "tests_and_ci": [
+        {
+          "path": "tests/audit/test_epic017_manifest.py",
+          "summary": "Validates manifest contains token and artifacts"
+        }
+      ],
+      "evidence_artifacts": [
+        {
+          "path": "proofs/TWO_RUN_IDENTITY.txt",
+          "summary": "Recorded two-run identity result"
+        },
+        {
+          "path": "audit/EPIC017_MANIFEST.json",
+          "summary": "Manifest entry with artifacts proving two-run identity"
+        }
+      ]
+    },
+    {
+      "name": "SIX_KEY_SUCCESS_ENVELOPE_OK",
+      "scope": "transport_a7",
+      "feature_label": "Success envelopes expose six canonical keys",
+      "code_locations": [
+        {
+          "path": "proofs/SUCCESS_SHAPE.txt",
+          "summary": "Proof token for envelope shape"
+        }
+      ],
+      "tests_and_ci": [],
+      "evidence_artifacts": [
+        {
+          "path": "proofs/SUCCESS_SHAPE.txt",
+          "summary": "Captured success envelope proof"
+        }
+      ]
+    },
+    {
+      "name": "READER_CLI_BYTE_IDENTITY_OK",
+      "scope": "cli_sdk",
+      "feature_label": "Reader CLI output matches engine emitter bytes",
+      "code_locations": [
+        {
+          "path": "proofs/READER_CLI_PARITY.txt",
+          "summary": "Proof recording reader CLI byte parity"
+        }
+      ],
+      "tests_and_ci": [],
+      "evidence_artifacts": [
+        {
+          "path": "proofs/READER_CLI_PARITY.txt",
+          "summary": "AB vs emitter parity record"
+        }
+      ]
+    },
+    {
+      "name": "SINGLE_EMITTER_OK",
+      "scope": "pre_commit_ci",
+      "feature_label": "Public bytes flow through shared presenter/emitter",
+      "code_locations": [
+        {
+          "path": "proofs/SERIALIZER_GUARD.txt",
+          "summary": "Proof token showing single emitter guard"
+        }
+      ],
+      "tests_and_ci": [
+        {
+          "path": "tools/lint_emit_paths.py",
+          "summary": "Emit path lint backs the single-emitter guard"
+        }
+      ],
+      "evidence_artifacts": [
+        {
+          "path": "proofs/SERIALIZER_GUARD.txt",
+          "summary": "Guard proof"
+        }
+      ]
+    },
+    {
+      "name": "PARTITION_PLAN_OK",
+      "scope": "db_bridge",
+      "feature_label": "Partition plan captured for closed rails posture",
+      "code_locations": [
+        {
+          "path": "tools/evidence/generate_rails_closed_phase1.py",
+          "summary": "Writes partition verification log with PARTITION_PLAN_OK"
+        },
+        {
+          "path": "scripts/db/capture_epic011_posture.py",
+          "summary": "DB posture capture references partition plan"
+        }
+      ],
+      "tests_and_ci": [
+        {
+          "path": "tools/evidence/generate_rails_closed_phase1.py",
+          "summary": "Generation step emits partition verification"
+        }
+      ],
+      "evidence_artifacts": [
+        {
+          "path": "artifacts/db/partition_verify.log",
+          "summary": "Logged checks concluding PARTITION_PLAN_OK"
+        }
+      ]
+    },
+    {
+      "name": "INGEST_OK",
+      "scope": "ingest_harness",
+      "feature_label": "Vendor ingest run completes and records acceptance",
+      "code_locations": [
+        {
+          "path": "scripts/ingest/run_vendor_ingest.py",
+          "summary": "Ingest harness writes acceptance stamp including INGEST_OK"
+        }
+      ],
+      "tests_and_ci": [],
+      "evidence_artifacts": [
+        {
+          "path": "artifacts/ingest/_s9.acceptance.txt",
+          "summary": "Acceptance stamp listing ingest gates"
+        }
+      ]
+    },
+    {
+      "name": "INGEST_IDEMPOTENT_OK",
+      "scope": "ingest_harness",
+      "feature_label": "Repeated vendor ingest is idempotent",
+      "code_locations": [
+        {
+          "path": "scripts/ingest/run_vendor_ingest.py",
+          "summary": "Acceptance file lists INGEST_IDEMPOTENT_OK"
+        }
+      ],
+      "tests_and_ci": [],
+      "evidence_artifacts": [
+        {
+          "path": "artifacts/ingest/idempotency_proof.log",
+          "summary": "Idempotency log produced by harness"
+        }
+      ]
+    },
+    {
+      "name": "VENDOR_RETRY_BACKOFF_OK",
+      "scope": "ingest_harness",
+      "feature_label": "Vendor ingest retries back off correctly",
+      "code_locations": [
+        {
+          "path": "scripts/ingest/run_vendor_ingest.py",
+          "summary": "Acceptance stamp includes retry backoff token"
+        }
+      ],
+      "tests_and_ci": [],
+      "evidence_artifacts": [
+        {
+          "path": "artifacts/ingest/retry.log",
+          "summary": "Retry trace confirming backoff"
+        }
+      ]
+    },
+    {
+      "name": "VENDOR_NO_PAYLOAD_LOGGING_OK",
+      "scope": "ingest_harness",
+      "feature_label": "Vendor ingest avoids payload logging",
+      "code_locations": [
+        {
+          "path": "scripts/ingest/run_vendor_ingest.py",
+          "summary": "Acceptance stamp includes no-payload-logging gate"
+        }
+      ],
+      "tests_and_ci": [],
+      "evidence_artifacts": [
+        {
+          "path": "artifacts/ingest/retry.log",
+          "summary": "Retry log without payload content"
+        }
+      ]
+    },
+    {
+      "name": "EVIDENCE_INDEX_UPDATED_OK",
+      "scope": "evidence_index",
+      "feature_label": "Evidence index updated after ingest",
+      "code_locations": [
+        {
+          "path": "scripts/ingest/run_vendor_ingest.py",
+          "summary": "Acceptance string enumerates evidence index tokens"
+        },
+        {
+          "path": "tools/audit/generate_epic017_manifest.py",
+          "summary": "Manifest builder carries evidence index tokens"
+        },
+        {
+          "path": "tests/audit/test_epic017_manifest.py",
+          "summary": "Test asserts manifest token set includes EVIDENCE_INDEX_UPDATED_OK"
+        }
+      ],
+      "tests_and_ci": [
+        {
+          "path": "tests/audit/test_epic017_manifest.py",
+          "summary": "Validates manifest entries and proof anchors for evidence index"
+        }
+      ],
+      "evidence_artifacts": [
+        {
+          "path": "audit/EPIC017_MANIFEST.json",
+          "summary": "Manifest entries for updated evidence index"
+        },
+        {
+          "path": "artifacts/evidence_index.jsonl",
+          "summary": "Machine mirror of evidence entries"
+        }
+      ]
+    },
+    {
+      "name": "EVIDENCE_INDEX_HASH_OK",
+      "scope": "evidence_index",
+      "feature_label": "Evidence index hash recorded for integrity",
+      "code_locations": [
+        {
+          "path": "scripts/ingest/run_vendor_ingest.py",
+          "summary": "Acceptance stamp includes EVIDENCE_INDEX_HASH_OK"
+        },
+        {
+          "path": "tools/audit/generate_epic017_manifest.py",
+          "summary": "Manifest enumerates hash token"
+        },
+        {
+          "path": "tests/audit/test_epic017_manifest.py",
+          "summary": "Manifest test checks token presence"
+        }
+      ],
+      "tests_and_ci": [
+        {
+          "path": "tests/audit/test_epic017_manifest.py",
+          "summary": "Ensures hash token entries match mirror"
+        }
+      ],
+      "evidence_artifacts": [
+        {
+          "path": "audit/EPIC017_MANIFEST.json",
+          "summary": "Manifest line holding hash proof"
+        }
+      ]
+    },
+    {
+      "name": "MACHINE_MIRROR_UPDATED_OK",
+      "scope": "evidence_index",
+      "feature_label": "Machine mirror refreshed alongside evidence index",
+      "code_locations": [
+        {
+          "path": "scripts/ingest/run_vendor_ingest.py",
+          "summary": "Acceptance string includes mirror update"
+        },
+        {
+          "path": "tools/audit/generate_epic017_manifest.py",
+          "summary": "Manifest builder lists machine mirror token"
+        },
+        {
+          "path": "tests/audit/test_epic017_manifest.py",
+          "summary": "Test enforces machine mirror token coverage"
+        }
+      ],
+      "tests_and_ci": [
+        {
+          "path": "tests/audit/test_epic017_manifest.py",
+          "summary": "Checks manifest entries for mirror artifacts"
+        }
+      ],
+      "evidence_artifacts": [
+        {
+          "path": "artifacts/evidence_index.jsonl",
+          "summary": "Mirror data referenced by manifest"
+        }
+      ]
+    },
+    {
+      "name": "BYTES_OK",
+      "scope": "cli_sdk",
+      "feature_label": "showcompat emits deterministic bytes",
+      "code_locations": [
+        {
+          "path": "scripts/validate/public_bytes_check.py",
+          "summary": "Runs showcompat twice and prints BYTES_OK on byte equality"
+        }
+      ],
+      "tests_and_ci": [
+        {
+          "path": "scripts/validate/public_bytes_check.py",
+          "summary": "Check script fails if bytes differ"
+        }
+      ],
+      "evidence_artifacts": [
+        {
+          "path": "artifacts/cli/public_bytes_check.log",
+          "summary": "Run log from bytes check"
+        }
+      ]
+    },
+    {
+      "name": "LF_OK",
+      "scope": "cli_sdk",
+      "feature_label": "showcompat output terminates with LF",
+      "code_locations": [
+        {
+          "path": "scripts/validate/public_bytes_check.py",
+          "summary": "Ensures outputs end with line feed and emits LF_OK"
+        }
+      ],
+      "tests_and_ci": [
+        {
+          "path": "scripts/validate/public_bytes_check.py",
+          "summary": "Exit non-zero if LF missing"
+        }
+      ],
+      "evidence_artifacts": [
+        {
+          "path": "artifacts/cli/public_bytes_check.log",
+          "summary": "Run log showing LF_OK"
+        }
+      ]
+    },
+    {
+      "name": "SIDE_OK",
+      "scope": "cli_sdk",
+      "feature_label": "showmath admin output only when admin flag present",
+      "code_locations": [
+        {
+          "path": "scripts/validate/sidecar_check.py",
+          "summary": "Verifies admin-only sidecar output and prints SIDE_OK"
+        }
+      ],
+      "tests_and_ci": [
+        {
+          "path": "scripts/validate/sidecar_check.py",
+          "summary": "Check fails if sidecar leaks without admin"
+        }
+      ],
+      "evidence_artifacts": [
+        {
+          "path": "artifacts/cli/sidecar_check.log",
+          "summary": "Log from sidecar check run"
+        }
+      ]
+    },
+    {
+      "name": "ENV_GUARD_IMPORT_OK",
+      "scope": "env_guard",
+      "feature_label": "Env guard import works for dev posture",
+      "code_locations": [
+        {
+          "path": "scripts/emit_env_guard_artifact.py",
+          "summary": "Imports adapter.env_guard and writes ENV_GUARD_IMPORT_OK"
+        }
+      ],
+      "tests_and_ci": [
+        {
+          "path": "scripts/emit_env_guard_artifact.py",
+          "summary": "Script exits non-zero on import failure"
+        }
+      ],
+      "evidence_artifacts": [
+        {
+          "path": "artifacts/hotfix/env_guard_import_ok.txt",
+          "summary": "Artifact recording import success"
+        }
+      ]
+    },
+    {
+      "name": "SECRETS_OK",
+      "scope": "env_guard",
+      "feature_label": "Required HD API secrets present in environment",
+      "code_locations": [
+        {
+          "path": "scripts/ensure_env.py",
+          "summary": "Checks env vars and prints SECRETS_OK status"
+        }
+      ],
+      "tests_and_ci": [
+        {
+          "path": "scripts/ensure_env.py",
+          "summary": "Informational check for EPIC-008 readiness"
+        }
+      ],
+      "evidence_artifacts": [
+        {
+          "path": "artifacts/runtime/ensure_env.log",
+          "summary": "Captured output showing SECRETS_OK"
+        }
+      ]
+    },
+    {
+      "name": "CLI_NO_ALT_JSON_OK",
+      "scope": "cli_sdk",
+      "feature_label": "CLI outputs canonical JSON without alt forms",
+      "code_locations": [
+        {
+          "path": "tools/audit/generate_epic017_manifest.py",
+          "summary": "Registers CLI_NO_ALT_JSON_OK in EPIC017 manifest"
+        },
+        {
+          "path": "tests/audit/test_epic017_manifest.py",
+          "summary": "Asserts token set includes CLI_NO_ALT_JSON_OK"
+        }
+      ],
+      "tests_and_ci": [
+        {
+          "path": "tests/audit/test_epic017_manifest.py",
+          "summary": "Validates manifest entries against evidence mirror"
+        }
+      ],
+      "evidence_artifacts": [
+        {
+          "path": "audit/EPIC017_MANIFEST.json",
+          "summary": "Manifest entry pointing to artifacts/cli/summary.json"
+        },
+        {
+          "path": "artifacts/cli/summary.json",
+          "summary": "CLI summary artifact used to prove canonical output"
+        }
+      ]
+    },
+    {
+      "name": "CLI_READER_PARITY_OK",
+      "scope": "cli_sdk",
+      "feature_label": "CLI reader parity with emitter",
+      "code_locations": [
+        {
+          "path": "tools/audit/generate_epic017_manifest.py",
+          "summary": "Includes CLI_READER_PARITY_OK token"
+        },
+        {
+          "path": "tests/audit/test_epic017_manifest.py",
+          "summary": "Ensures manifest has parity token"
+        }
+      ],
+      "tests_and_ci": [
+        {
+          "path": "tests/audit/test_epic017_manifest.py",
+          "summary": "Manifest validation"
+        }
+      ],
+      "evidence_artifacts": [
+        {
+          "path": "proofs/READER_CLI_PARITY.txt",
+          "summary": "Parity proof backing manifest"
+        },
+        {
+          "path": "audit/EPIC017_MANIFEST.json",
+          "summary": "Manifest references parity artifacts"
+        }
+      ]
+    },
+    {
+      "name": "CLI_SHOWCOMPAT_CANON_OK",
+      "scope": "cli_sdk",
+      "feature_label": "showcompat output canonicalized",
+      "code_locations": [
+        {
+          "path": "tools/audit/generate_epic017_manifest.py",
+          "summary": "Adds showcompat canon token"
+        },
+        {
+          "path": "tests/audit/test_epic017_manifest.py",
+          "summary": "Token expected in manifest"
+        }
+      ],
+      "tests_and_ci": [
+        {
+          "path": "tests/audit/test_epic017_manifest.py",
+          "summary": "Manifest mirror and artifact consistency"
+        }
+      ],
+      "evidence_artifacts": [
+        {
+          "path": "artifacts/cli/summary.json",
+          "summary": "showcompat output capture"
+        },
+        {
+          "path": "audit/EPIC017_MANIFEST.json",
+          "summary": "Manifest entry for showcompat"
+        }
+      ]
+    },
+    {
+      "name": "CLI_STDOUT_LF_OK",
+      "scope": "cli_sdk",
+      "feature_label": "CLI stdout terminated with LF",
+      "code_locations": [
+        {
+          "path": "tools/audit/generate_epic017_manifest.py",
+          "summary": "Lists LF token"
+        },
+        {
+          "path": "tests/audit/test_epic017_manifest.py",
+          "summary": "Checks token presence"
+        }
+      ],
+      "tests_and_ci": [
+        {
+          "path": "tests/audit/test_epic017_manifest.py",
+          "summary": "Manifest validation"
+        }
+      ],
+      "evidence_artifacts": [
+        {
+          "path": "artifacts/cli/summary.json",
+          "summary": "LF-terminated CLI output"
+        },
+        {
+          "path": "audit/EPIC017_MANIFEST.json",
+          "summary": "Token entry with proof anchor"
+        }
+      ]
+    },
+    {
+      "name": "JSON_CANONICAL_CHECK_OK",
+      "scope": "pre_commit_ci",
+      "feature_label": "Canonical JSON check for governed artifacts",
+      "code_locations": [
+        {
+          "path": "tools/audit/generate_epic017_manifest.py",
+          "summary": "Token registered in manifest"
+        },
+        {
+          "path": "tests/audit/test_epic017_manifest.py",
+          "summary": "Token set includes JSON_CANONICAL_CHECK_OK"
+        }
+      ],
+      "tests_and_ci": [
+        {
+          "path": "tests/audit/test_epic017_manifest.py",
+          "summary": "Ensures manifest artifacts hashed and mirrored"
+        }
+      ],
+      "evidence_artifacts": [
+        {
+          "path": "audit/EPIC017_MANIFEST.json",
+          "summary": "Manifest rows for canonical JSON check"
+        }
+      ]
+    },
+    {
+      "name": "EVIDENCE_PATHS_VALIDATED_OK",
+      "scope": "evidence_index",
+      "feature_label": "Artifact paths validated against mirror",
+      "code_locations": [
+        {
+          "path": "tools/audit/generate_epic017_manifest.py",
+          "summary": "Includes path validation token"
+        },
+        {
+          "path": "tests/audit/test_epic017_manifest.py",
+          "summary": "Asserts path validation entries present"
+        }
+      ],
+      "tests_and_ci": [
+        {
+          "path": "tests/audit/test_epic017_manifest.py",
+          "summary": "Checks physical paths exist and match mirror"
+        }
+      ],
+      "evidence_artifacts": [
+        {
+          "path": "audit/EPIC017_MANIFEST.json",
+          "summary": "Manifest entries with discovered paths and proofs"
+        }
+      ]
+    },
+    {
+      "name": "EVIDENCE_PATH_PROOFS_OK",
+      "scope": "evidence_index",
+      "feature_label": "Each artifact accompanied by path proof",
+      "code_locations": [
+        {
+          "path": "tools/audit/generate_epic017_manifest.py",
+          "summary": "Captures proof anchors per artifact"
+        },
+        {
+          "path": "tests/audit/test_epic017_manifest.py",
+          "summary": "Verifies proof files exist and match metadata"
+        }
+      ],
+      "tests_and_ci": [
+        {
+          "path": "tests/audit/test_epic017_manifest.py",
+          "summary": "Validates proof anchors and hashes"
+        }
+      ],
+      "evidence_artifacts": [
+        {
+          "path": "audit/EPIC017_MANIFEST.json",
+          "summary": "Proof anchor references"
+        }
+      ]
+    },
+    {
+      "name": "CI_CHECK_MIRROR_SCHEMA_OK",
+      "scope": "pre_commit_ci",
+      "feature_label": "CI mirror schema check captured in EPIC017 manifest",
+      "code_locations": [
+        {
+          "path": "tools/audit/generate_epic017_manifest.py",
+          "summary": "Includes CI mirror schema token"
+        },
+        {
+          "path": "tests/audit/test_epic017_manifest.py",
+          "summary": "Token set enforced"
+        }
+      ],
+      "tests_and_ci": [
+        {
+          "path": "tests/audit/test_epic017_manifest.py",
+          "summary": "Validation of CI mirror schema artifacts"
+        }
+      ],
+      "evidence_artifacts": [
+        {
+          "path": "audit/EPIC017_MANIFEST.json",
+          "summary": "Manifest records mirror schema proof anchors"
+        }
+      ]
+    },
+    {
+      "name": "CI_CHECK_FINAL_LF_OK",
+      "scope": "pre_commit_ci",
+      "feature_label": "LF termination check captured in manifest",
+      "code_locations": [
+        {
+          "path": "tools/audit/generate_epic017_manifest.py",
+          "summary": "Adds final-LF token"
+        },
+        {
+          "path": "tests/audit/test_epic017_manifest.py",
+          "summary": "Checks token presence and artifacts"
+        }
+      ],
+      "tests_and_ci": [
+        {
+          "path": "tests/audit/test_epic017_manifest.py",
+          "summary": "Validates LF check artifacts"
+        }
+      ],
+      "evidence_artifacts": [
+        {
+          "path": "audit/EPIC017_MANIFEST.json",
+          "summary": "Manifest entries for LF check"
+        }
+      ]
+    },
+    {
+      "name": "CONFIG_GEN_OK",
+      "scope": "pre_commit_ci",
+      "feature_label": "Config generator output captured",
+      "code_locations": [
+        {
+          "path": "tools/audit/generate_epic017_manifest.py",
+          "summary": "Includes config generation token"
+        },
+        {
+          "path": "tests/audit/test_epic017_manifest.py",
+          "summary": "Token enforced in manifest"
+        }
+      ],
+      "tests_and_ci": [
+        {
+          "path": "tests/audit/test_epic017_manifest.py",
+          "summary": "Manifest validation"
+        }
+      ],
+      "evidence_artifacts": [
+        {
+          "path": "audit/EPIC017_MANIFEST.json",
+          "summary": "Config generator artifact references"
+        }
+      ]
+    },
+    {
+      "name": "UNKNOWN_IDS_FAIL_CLOSED_OK",
+      "scope": "evidence_index",
+      "feature_label": "Unknown artifact IDs rejected during manifest build",
+      "code_locations": [
+        {
+          "path": "tools/audit/generate_epic017_manifest.py",
+          "summary": "Registers fail-closed token"
+        },
+        {
+          "path": "tests/audit/test_epic017_manifest.py",
+          "summary": "Token presence asserted"
+        }
+      ],
+      "tests_and_ci": [
+        {
+          "path": "tests/audit/test_epic017_manifest.py",
+          "summary": "Ensures manifest only contains known artifact IDs"
+        }
+      ],
+      "evidence_artifacts": [
+        {
+          "path": "audit/EPIC017_MANIFEST.json",
+          "summary": "Manifest token entries"
+        }
+      ]
+    },
+    {
+      "name": "TIEBREAK_TOTAL_ORDER_OK",
+      "scope": "evidence_index",
+      "feature_label": "Deterministic ordering applied when ties occur",
+      "code_locations": [
+        {
+          "path": "tools/audit/generate_epic017_manifest.py",
+          "summary": "Adds tiebreak ordering token"
+        },
+        {
+          "path": "tests/audit/test_epic017_manifest.py",
+          "summary": "Asserts token present"
+        }
+      ],
+      "tests_and_ci": [
+        {
+          "path": "tests/audit/test_epic017_manifest.py",
+          "summary": "Manifest validation"
+        }
+      ],
+      "evidence_artifacts": [
+        {
+          "path": "audit/EPIC017_MANIFEST.json",
+          "summary": "Manifest entries proving ordering"
+        }
+      ]
+    },
+    {
+      "name": "DOC_DELTA_PRESENT_OK",
+      "scope": "evidence_index",
+      "feature_label": "Doc delta artifacts captured for EPIC017",
+      "code_locations": [
+        {
+          "path": "tools/audit/generate_epic017_manifest.py",
+          "summary": "Includes doc delta token"
+        },
+        {
+          "path": "tests/audit/test_epic017_manifest.py",
+          "summary": "Token set enforced"
+        }
+      ],
+      "tests_and_ci": [
+        {
+          "path": "tests/audit/test_epic017_manifest.py",
+          "summary": "Checks doc delta artifacts exist and hashed"
+        }
+      ],
+      "evidence_artifacts": [
+        {
+          "path": "audit/EPIC017_MANIFEST.json",
+          "summary": "Manifest listing doc delta proofs"
+        }
+      ]
+    },
+    {
+      "name": "TESTS_PASS_OK",
+      "scope": "pre_commit_ci",
+      "feature_label": "Automated test suite recorded as passing for EPIC017",
+      "code_locations": [
+        {
+          "path": "tools/audit/generate_epic017_manifest.py",
+          "summary": "Token included in manifest"
+        },
+        {
+          "path": "tests/audit/test_epic017_manifest.py",
+          "summary": "Token set validated"
+        }
+      ],
+      "tests_and_ci": [
+        {
+          "path": "tests/audit/test_epic017_manifest.py",
+          "summary": "Ensures manifest asserts test pass token"
+        }
+      ],
+      "evidence_artifacts": [
+        {
+          "path": "audit/EPIC017_MANIFEST.json",
+          "summary": "Recorded proof anchor for test run"
+        }
+      ]
+    },
+    {
+      "name": "COMPOSITE_ABBA_IDENTITY_OK",
+      "scope": "cli_sdk",
+      "feature_label": "ABBA composite output identity",
+      "code_locations": [
+        {
+          "path": "tools/audit/generate_epic017_manifest.py",
+          "summary": "Manifest token for ABBA identity"
+        },
+        {
+          "path": "tests/audit/test_epic017_manifest.py",
+          "summary": "Token asserted"
+        }
+      ],
+      "tests_and_ci": [
+        {
+          "path": "tests/audit/test_epic017_manifest.py",
+          "summary": "Manifest validation"
+        }
+      ],
+      "evidence_artifacts": [
+        {
+          "path": "proofs/AB_BA_PARITY.txt",
+          "summary": "Parity proof reused for ABBA identity"
+        },
+        {
+          "path": "audit/EPIC017_MANIFEST.json",
+          "summary": "Manifest entry"
+        }
+      ]
+    }
+  ]
+}
