@@ -1,5 +1,5 @@
 path: audit/qa/compat/lints_samples/sample_alignment_cool_a_to_b.json
 size_bytes: 235
 sha256: 00e8d11348a61462715b9168d1f85df0f4ffcadf74fb5ccb3b2912390601e23b
-mtime_utc: 2025-11-22T21:09:47Z
+mtime_utc: 2025-11-26T21:10:36Z
 produced_at_utc: 2025-11-22T02:27:04Z
