@@ -1,5 +1,5 @@
 path: artifacts/bodygraph/source_selection.snapshot.json
 size_bytes: 628
 sha256: fc96581052a9902ae35c7e8923460dbcfeac4dfc282ffd1d4be8f626447d08a8
-mtime_utc: 2025-11-27T04:04:10Z
+mtime_utc: 2025-11-27T05:13:17Z
 produced_at_utc: 2025-11-22T02:27:04Z

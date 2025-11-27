@@ -1,5 +1,5 @@
 path: artifacts/db_bridge/root.json
 size_bytes: 34
 sha256: c3afa09727b1dfbfb1eb831658c392b2d20ab3843a5dfd946ad2bb0c12fd8ea5
-mtime_utc: 2025-11-27T04:04:10Z
+mtime_utc: 2025-11-27T05:13:17Z
 produced_at_utc: 2025-11-22T02:27:04Z
