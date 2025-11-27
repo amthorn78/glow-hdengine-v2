@@ -1,0 +1,5 @@
+path: audit/gates/determinism/env_pins.log
+size_bytes: 198
+sha256: 89ed1c541fce2b9b2fb072648e4baff62c482ce8852638f5c46501370befa605
+mtime_utc: 2025-11-26T22:03:08Z
+produced_at_utc: 2025-11-22T17:07:45Z

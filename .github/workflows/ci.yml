@@ -9,6 +9,7 @@ jobs:
       TZ: UTC
       SAFE_MODE: "1"
       ALLOW_NETWORK: "0"
+    # Determinism-sensitive CI rails remain closed: LC_ALL=C, LANG=C, TZ=UTC, SAFE_MODE=1, ALLOW_NETWORK=0.
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
