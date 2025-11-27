@@ -1,44 +1,22 @@
-# CLI & Commands — Compat v1 (Alpha)
+# CLI commands — Compat v1 (EPIC018)
 
-> The Compat endpoint is internal (dev). Success = 200 JSON; errors = envelope + `Cache-Control: no-store`. Use **POST** for any JSON payloads.
+The CLI shares the canonical emitter and serializer with the Reader harness. Run all commands under closed rails (`LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0`), enforced by `engine.runtime.determinism_env.ensure_determinism_env`.
 
-## Endpoint
-- `POST /api/compat/v1` — full payloads or large prefs
-- `GET /api/compat/v1?a_id=<ID>&b_id=<ID>` — ids-only (defaults applied); **no JSON body**
-
-## CLI Usage
+## Usage
 - `hdctl showcompat --pair-file <pair.json>`
 - `hdctl showcompat --a-file <A.json> --b-file <B.json>`
 - `hdctl showcompat` (reads one pair from stdin)
-Exit codes: 0 success, 64 usage error, 2 typed failure. Errors on stderr only.
+- Flags for QA sidecars: `--dump-reader <out.json> --dump-admin-dir <dir>`
 
-### File inputs & QA proof dumps
-- `hdctl showcompat --pair-file <pair.json> --dump-reader <out.json> --dump-admin-dir <dir>`
-- `hdctl showcompat --a-file <A.json> --b-file <B.json> --dump-reader <out.json> --dump-admin-dir <dir>`
-Admin proofs include per-category percent and full math steps used to derive bands.
+Exit codes: 0 success, 64 usage error, 2 typed failure. Errors print to stderr only. CLI output is numeric-free, canonical JSON (UTF-8, sorted keys, compact separators, one trailing LF) and matches Reader bytes (AB↔BA identity, two-run identity).
 
-## Success (alpha)
-- **200 OK**
-- **Headers:** `Content-Type: application/json; charset=utf-8`
-- **Body (summary):** `{"categories":[{id,score:int,band,personal_key,shared_key}×10],"meta":{"engine_tag","release_id","invocation_tag"}}`
-  - Category order is fixed: harmony, heat, communication, alignment, comfort, consistency, expansion, creativity, drive, balance
-  - Bands by inclusive maxima; 100 ⇒ Glow; scores are ints (0..100), round-half-up then clamp 0..100
+## Guards (D3)
+- Serializer grep guard: `python tools/cli/serializer_grep_guard.py` → `artifacts/cli/guards/serializer_grep_guard.log`
+- Emitter symbol proof: `python tools/cli/emitter_symbol_proof.py` → `artifacts/cli/guards/emitter_symbol_proof.txt`
+Both guards fail fast if determinism rails are not pinned.
 
-## Errors (alpha)
-- **400 Bad Request**
-- **Headers:** `Cache-Control: no-store` (no ETag)
-- **Envelope:** `{"ok":false,"code":"lower_snake","error":"human_readable"}`
-  - `invalid_json` — malformed or mixed id/payload
-  - `invalid_prefs` — `viewer_prefs.weights` must include all 10 categories as integers 0..100
+## Evidence discipline (D4)
+- Guard outputs, QA dumps, and other governed artifacts must have `.path_proof.txt` siblings plus entries in `docs/evidence/INDEX.json` and `artifacts/evidence_index.jsonl`. Use `python tools/evidence/update_evidence_index.py` to refresh.
+- Orientation and sanity checks: `python tools/evidence/orientation_demo.py` and `python tools/evidence/run_sanity_pipeline.py`.
 
-## CLI parity
-- CLI MUST emit **identical bytes** to service (single emitter/serializer path).
-- Recommended hook for parity testing: env `HDE_CLI_SHOWCOMPAT` shelling `hdctl showcompat`.
-
-
-<!-- EPIC-004 PATCH: CLI parity -->
-### EPIC-004 CLI parity
-CLI output **must equal** the service’s Reader compat identity body **byte-for-byte**.
-- Serialization: UTF-8, sorted keys, compact separators, **exactly one trailing LF**.
-- Presenter uses **engine/presenter/emitter.py** which calls **engine/serializer/canon.py:sercanon**.
-
+See PF05 — CLI/API/Vendor Ref and PF12 — Schemas & Artifacts for canonical rules (title references only).

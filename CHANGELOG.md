@@ -1,5 +1,19 @@
 # CHANGELOG
 
+2025-12-02 — EPIC-018: HD Calcination Pass 3 close-out
+
+### Added
+- Determinism rails (D1/D2) finalized with canonical JSON, AB↔BA/two-run identity proofs, and a determinism helper that pins locale/timezone and blocks network.
+- CLI guard rails (D3): serializer grep guard and emitter symbol proof, both gated by the determinism helper and writing governed artifacts under `artifacts/cli/guards/`.
+- Evidence skeleton and sanity pipeline (D4): orientation demo, sanity log capture, and governed index/mirror/path-proof discipline for all artifacts.
+- Governed config artifacts and acceptance map (D5): config generators plus `audit/EPIC-018_config_acceptance_map.json` tying PF09 tasks to governed outputs.
+- Typed FE/BE bundles (D6): bundle generator and schemas for frontend/backend parity with governed config and registry.
+- Epic manifest and close report (D7): `audit/EPIC-018_MANIFEST.json` and `audit/EPIC-018_close_report.md` with path proofs.
+
+### Changed
+- README/AGENTS/docs now describe closed-rails posture, evidence harness workflow, config governance, and EPIC018 manifest/close-pack references.
+- Deprecated guidance about manual evidence edits and open-rails runs removed; documentation now points to PF-Canon titles for transport and acceptance specifics.
+
 2025-11-22 — EPIC-017: HD Calcination Pass 2 close-out
 
 ### Added

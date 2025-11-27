@@ -1,355 +1,59 @@
-# HD Engine dev harness repo — CLI & Reader (alpha)
+# Glow HD Engine — deterministic compat and evidence rails
 
-Glow HD Engine — README
+The Glow HD Engine is a deterministic Human Design–driven matching and insight engine. After **HDE-EPIC018 (Calcination Pass 3)** the public and CLI surfaces share a single canonical emitter and serializer, run only under closed rails, and ship governed evidence with path proofs, mirrors, and epic-level manifests/close reports.
 
-## Current state (EPIC017 — HD Calcination complete)
+## Quickstart (closed rails)
 
-- **Deterministic matching & explanations:** The CLI and Reader share one emitter for compatibility output. AB↔BA runs are identical, two-run identity is proven, and stdout stays canonical and LF-terminated.
-- **Transparent evidence ledger:** Every governed artifact carries a path proof and a mirror entry (with a self-record). The new EPIC017 manifest and close-out report summarize token→artifact links; see `audit/EPIC017_MANIFEST.json` and `audit/EPIC017_close_report.md`.
-- **Programmatic registry:** Charts and relationships load through the typed registry loader and produce a canonical `registry_report.v1` under evidence discipline.
-- **Predictable ordering:** The ordering layer (tie-break and total order) ships reproducible artifacts so ranking remains stable and explainable.
-- **Retired ingest epic:** The earlier vendor ingest foundation (EPIC011) was parked; Calcination replaces it with hardened local, deterministic rails for Phase I.
+All commands assume the pinned environment used by the determinism helper: `LC_ALL=C`, `LANG=C`, `TZ=UTC`, `SAFE_MODE=1`, `ALLOW_NETWORK=0`.
 
-## EPIC-009 — Ops Safety & DB Runtime Posture (post-merge)
-- **Refusal (ops):** `/ops/rails/refusal` returns 503 with a typed JSON body, `Cache-Control: no-store`, **no ETag**, and no vendor I/O.
-- **Keys-only logs:** refusal route logs exactly `{at, route, status, duration_ms, idempotence_hash, release_id}` (no bodies/headers/secrets).
-- **Env-matrix snapshots:** selection-only evidence (success chooses `DATABASE_URL` or `DB_BRIDGE_URL`, failure is typed—no DB connectivity here).
-- **DB posture:** scripts use the adapter’s connection-time fallback (try `DATABASE_URL`, then HTTPS `DB_BRIDGE_URL` through the bridge); evidence includes `search_path`, **grants** (present-even-empty ADP), normalized **DDL fingerprint**, and migration **two-run identity**.
-## Codespaces bootstrap
-
-- Locale/timezone pins: `LC_ALL=C`, `LANG=C`, and `TZ=UTC` for all CLI/test runs.
-- Canonical CLI invocation: `python -m engine.cli …`. Use the module-run form in docs, QA runbooks, and automation; the `hdctl` console script remains available for convenience once the project is installed.
-- Installation: The repo’s devcontainer config installs the project in editable mode during `postCreateCommand`, so a fresh Codespace already has both `python -m engine.cli` and `hdctl` available on `PATH` without manual pip work.
-
-Direct `hdctl …` examples remain in this README for brevity, but automation and QA scripts must prefer `python -m engine.cli` to guarantee parity with module-run execution.
-
-- **QA quick run:** `scripts/qa/epic009_precommit.sh` → expect **QA_OK** and report at `artifacts/qa/epic009_precommit_report.json`.
-
-## EPIC-011 — Bridge adapter evidence (S2–S7)
-- **Bridge provider:** `engine.db.providers.BridgeProvider` talks to `DB_BRIDGE_URL` over HTTPS (`/health`, `/`, `/query`, `/introspect/{search_path,grants,fingerprint}`, plus a version probe). Network failures surface as typed adapter errors.
-- **Adapter selection:** `DBAccess.for_current_env` records attempts in `artifacts/db_bridge/adapter_selection.snapshot.json` (canonical JSON, LF-terminated) showing the fallback order and selected provider.
-- **Harnesses:**
-  - `scripts/db_bridge/capture_introspection.py` hits the bridge endpoints directly and writes canonical snapshots under `artifacts/db_bridge/` and `artifacts/db/`.
-  - `scripts/db_adapter/capture_adapter_introspection.py` exercises `DBAccess.introspect_{version,search_path,grants,fingerprint}` and stores adapter-level evidence under `artifacts/engine/`.
-  - `scripts/ops/capture_rails_open_scope.py` reruns both harnesses with rails open, asserts only bridge routes were hit, and summarizes counts in `artifacts/ops/rails_open_scope.txt`.
-- **Keys-only HTTP logging:** `engine.ops.http_log.log_http_call` appends `{at,route,status,duration_ms,idempotence_hash?,release_id?}` to `artifacts/logs/keys_only.sample.jsonl` for every bridge (and vendor) request—no URLs, headers, or payload bodies are persisted.
-- **Evidence discipline:** Every governed artifact ships with a `.path_proof.txt`, a human index entry (`docs/evidence/INDEX.json`), and a machine mirror record (`artifacts/evidence_index.jsonl`) in the same PR.
-
-## Aux Narrative (EPIC-010)
-- **Route & alias:** `GET /api/aux/narrative?v=1` (canonical) and `/aux/narrative?v=1` (back-compat alias).
-- **Posture names:** Text → 200 text/plain with a quoted strong ETag, LF body, Vary; Suppressed → 200 empty, no ETag, optional generic policy header.
-- **Provenance headers:** `X-Narrative-Pack-Sha`, `X-Narrative-Composition` on both outcomes.
-- **Evidence pointers:** `tests/transport/headers/aux_text_200.snap`, `tests/transport/headers/aux_suppression_200.snap`, `audit/gates/narratives/keys_10x4.table.json`.
-- **CLI preview:** Admin `hdctl aux-preview` reuses the Aux emitter; stdout + sidecar artifacts are indexed in the Human and Machine evidence registries.
-
-## CLI — Vendor JSON file inputs
-
-> **Note:** Module-run (`python -m engine.cli`) is the default for QA. The `hdctl` console script behaves the same way after Codespaces bootstrap installs the package.
-
-Examples:
-- Pair file:
-  ```bash
-  hdctl showcompat --pair-file path/to/pair.json > out.json
-  ```
-- Two person files:
-  ```bash
-  hdctl showcompat --a-file A.json --b-file B.json > out.json
-  ```
-Output is the public Reader v1 body (bands-only), canonical JSON, numeric-free.
-
-## EPIC-006 — Closure (Mechanics Foundations)
-
-**What shipped**
-- Deterministic mechanics layer: comparators & helpers (arrays-as-sets; channel `NN-NN` min-first; stable ordering).
-- Frozen constants: `EM_MAX=36`, `THROAT_EM_MAX=13`, `CENTER_MAX=9`, `MIND_THROAT_MAX=3`, `MOTOR_THROAT_MAX=4`, `COMP_MAX=6`; direct Motor→Throat set `{20-34,21-45,35-36,12-22}`.
-- Category framework (internal): frozen Magic-10 order **harmony, heat, communication, alignment, comfort, consistency, expansion, creativity, drive, balance**; unknown IDs hard-fail.
-- Programmatic config: emits canonical registry report.
-- Transport: `/internal/version` GET/HEAD 200, `Cache-Control: no-store`, **no ETag**, conditionals ignored; headers-only proofs captured.
-- Evidence discipline: human **and** machine Evidence Indexes updated in the same change.
-
-**How to validate**
 ```bash
-LC_ALL=C TZ=UTC pytest -q -m epic006
-```
-Expected: all EPIC006 tests pass and artifacts are written.
-
-**Artifacts (key paths)**
-- Mechanics: `artifacts/mech/ordering_examples.jsonl`, `artifacts/mech/identity_hash.txt`, `artifacts/mech/constants_snapshot.json`
-- Transport proofs: `artifacts/proofs/internal_version_headers.json`, `artifacts/proofs/internal_version_headers.txt`
-- Registry: `artifacts/reports/registry_report.json`
-      - Evidence Indexes: `docs/EVIDENCE_INDEX.md`, `audit/EVIDENCE_INDEX.jsonl`
-
-## QA Evidence (tangible artifacts)
-When running `hdctl showcompat` for QA, pass `--dump-reader` and `--dump-admin-dir`.
-This writes:
-- Public Reader JSON: `artifacts/qa/cli/<case>.reader.json`
-- Admin proofs (0600 + .sha256):
-  - `artifacts/admin/qa/<case>.left.bodygraph.json`
-  - `artifacts/admin/qa/<case>.right.bodygraph.json`
-  - `artifacts/admin/qa/<case>.composite.bodygraph.json`
-  - `artifacts/admin/qa/<case>.compat.proof.json`
-Public stdout remains numeric-free; admin numerics live only in sidecars.
-
-Version: 2.0
-Status: Active (Alpha A3–A5 body; A7 transport adopted)
-Owner: Product Owner (PO) — Nathan
-Gatekeeper: Isis (Head Dev — AI session)
-Lead Dev: Full Stack Guru (AI session)  
-
-
----
-
-Human/AI disclosure (Fire compliance)
-
-Only human with agency: Product Owner (PO) — Nathan.
-
-All other roles are AI sessions: “Isis,” “Full Stack Guru,” “Cyrano,” “HD Coder,” “QA,” etc. These are ChatGPT sessions operating under PO direction.
-
-Authority & approvals: Only the PO’s signoffs are binding. AI “signoff” lines are advisory until recorded by the PO.
-
-
-
----
-
-What this is
-
-Glow HD Engine produces a minimal, numeric-free public envelope used by the SPA to display Bands for harmony, and (optionally) a short Aux Narrative. In Alpha:
-
-Public JSON is bands-only, free of HD jargon.
-
-Determinism is enforced via a canonical serializer, exactly one trailing LF, idempotence preimage hash, and AB↔BA parity.
-
-Reader v1 is a developer harness that returns the same bytes as the CLI for the same inputs.
-
-A7 transport is adopted (strong quoted ETag, conditional GET/304, HEAD parity, compression invariance). Transport rules live outside this README (see “Sources of truth”).
-
-
-
----
-
-Sources of truth & repo docs
-
-Canonical homes
-
-Transport & caching (A7): Environment & Integration Plan v2.0.
-
-Public body (contract): docs/contracts/reader_v1_public_bytes.md.
-
-Reader surface (endpoints & gating): docs/server/reader_v1.md.
-
-Bridge adapter & pg-bridge evidence: docs/ADAPTER_DB.md, docs/design/db-bridge-fallback/.
-
-CLI behavior & numerics policy: Glow HD Engine — CLI, API & Vendor Ingest Spec v0.1.5 and docs/CLI_commands.md.
-
-Governance & acceptance delivery: Glow Governance & Process Handbook — v1.1.
-
-Engine Tasks: HD Engine Tasks v10 (A7-aligned).
-
-
-Deprecated
-
-Glow HD Engine Architecture & Design v4 (do not reference).
-
-
-
----
-
-Validation overview (no commands)
-
-To validate an Alpha build without prescribing code:
-
-CLI (A3): Produce cli_stdout_AB.json and cli_stdout_BA.json. Evidence must show: canonical formatting (UTF-8, one LF, no BOM/ANSI), idempotence preimage hash correctness, AB↔BA byte identity, and a release_id that matches release/manifest.sorted.json.
-
-Reader v1 (A5): For the same pair, produce reader_AB.json and reader_BA.json (dev-only harness). Evidence must show: bytes equal the CLI, content type is JSON, APP_ENV gating and path-safety enforced.
-
-Transport (A7): Evidence lives in Environment & Integration Plan v2.0: strong quoted ETag equals sha256 over the final LF-terminated body (pre-compression), CSV If-None-Match strong-match behavior, 304 empty body, HEAD parity, compression invariance, and no ETag + no-store on writers/errors.
-
-
-Marker names, artifact paths, and acceptance tables are defined in the documents above.
-
-
----
-
-Reader v1 (developer harness)
-
-Route: GET /api/reader?v=1&a=<rel>&b=<rel>&a_tz=<IANA>&b_tz=<IANA>.
-
-APP_ENV gating: APP_ENV=dev enables limited filesystem reads only under fixtures/charts/; traversal/symlink denial; non-dev returns 403 with a minimal error body.
-
-Transport: Governed by Environment & Integration Plan v2.0 (A7). This README does not restate header matrices.
-
-
-
----
-
-Determinism & emitter canon
-
-Serializer (MUST): UTF-8 JSON, sorted keys, compact separators, ensure_ascii=False, exactly one trailing \n, no BOM, ANSI-free.
-
-Idempotence (MUST): idempotence_hash = sha256(canonical_preimage_bytes) where the preimage omits idempotence_hash and is LF-terminated.
-
-Parity (MUST): public bytes are identical for AB and BA.
-
-Single emitter (MUST): both CLI and Reader call the same public emitter; closeouts record a provenance fingerprint for the emitter.
-
-
-### Security & Transport (Writers)
-
-Writer endpoints are governed and deterministic:
-
-- Responses: `Cache-Control: no-store`, **no ETag**, **no compression**, **never 304** (conditionals ignored).
-- Method matrix: **HEAD → 405** (no body), **OPTIONS → 204** (no body), both with `Allow: POST, OPTIONS` and `Content-Length: 0`.
-- Input validation:
-  - require `Content-Type: application/json; charset=utf-8` (diagnostic empty-body exempt)
-  - malformed JSON/UTF-8/BOM → 400; unknown key → 422; other schema violations → 422; body > 32 768 bytes → 413
-- Auth: `Authorization: Bearer` with `admin:write` scope (401/403 split).
-
-### Idempotent Writes
-
-We canonicalize request bodies (UTF-8, sorted keys, compact JSON, one trailing LF) and compute a sha256 digest over the preimage `{method, writer_route_id, canonical_request_body}`.  
-We persist the digest and canonical bytes in `hde.idempotent_writes` (created by `migrations/008_writers_auth.sql`). Duplicate requests return the same status as the first success.
-
-
----
-
-Evidence & release identity
-
-Release ID
-
-release_id is the lowercase 64-hex SHA-256 of release/manifest.sorted.json and must match the value embedded in public outputs.
-
-
-Minimal artifacts (by card)
-
-A3 (CLI):
-artifacts/cards/A3/cli_stdout_AB.json
-artifacts/cards/A3/cli_stdout_BA.json
-artifacts/cards/A3/release_id.txt
-artifacts/cards/A3/validation.log
-(optional when gated: artifacts/cards/A3/admin/sidecar.json)
-
-A5 (Reader v1):
-artifacts/cards/A5/reader_AB.json
-artifacts/cards/A5/reader_BA.json
-artifacts/cards/A5/headers_AB.txt
-artifacts/cards/A5/headers_BA.txt
-artifacts/cards/A5/validation.log
-
-A7 (Transport): see Environment & Integration Plan v2.0 for exact header artifacts and PASS markers.
-
-**Evidence indices:** human `docs/evidence/INDEX.json` and machine `artifacts/evidence_index.jsonl` (PF12 keys, sorted).
-
-
-
----
-
-Environment variables (reference)
-
-SAFE_MODE — 1 for tests/CI (recommended ON in dev/stage); 0 for prod. Vendor HTTP requires both SAFE_MODE=0 and ALLOW_NETWORK=1.
-
-ALLOW_NETWORK — second rail to permit HTTP when SAFE_MODE=0.
-
-PRODUCT_INVOCATION_TAG — current invocation tag (e.g., INV-…).
-
-ENGINE_TAG — human-readable engine tag for meta.
-
-APP_ENV — dev enables the Reader harness; otherwise requests are refused.
-
-
-
----
-
-Project layout (key paths)
-
-docs/CLI_commands.md
-
-docs/server/reader_v1.md
-
-docs/contracts/reader_v1_public_bytes.md
-
-docs/architecture/emitters.md
-
-docs/alpha_acceptance.md
-
-CHANGELOG.md
-
-fixtures/charts/ (dev inputs)
-
-release/manifest.sorted.json
-
-scripts/ (entrypoints and helpers)
-
-artifacts/cards/ (evidence bundles per card)
-
-
-
----
-
-Governance (acceptance delivery)
-
-Work on main; one revert-friendly commit per card with evidence under artifacts/cards/<CARD>/.
-
-PO performs closeout and signoff (template in docs/alpha_acceptance.md).
-
-Transport and public body rules are not duplicated here; see sources of truth.
-
-
-
----
-
-FAQ
-
-Where are the transport rules?
-In Environment & Integration Plan v2.0 (A7). This README intentionally defers to that document.
-
-Where is the engine/public contract defined?
-In docs/contracts/reader_v1_public_bytes.md (example + preimage), referenced by Spec v0.1.5 and the Reader doc.
-
-Why numeric-free public JSON?
-Alpha SPA shows Bands only. CLI may expose score_pct only when --score is explicitly requested (see Spec v0.1.5).
-
-
----
-
-Changelog (README)
-
-v2.0 (2025-10-02): Adopt A7 transport (deferred to Env & Integration Plan v2.0); add contract/source-of-truth links; remove command snippets; align evidence sections with Alpha/A7 acceptance.
-
-v1.0 (2025-10-02): Initial comprehensive README for Alpha A3–A5; A5 transport guard documented. 
-
-## Status
-Reader v1 is stable. Local runs use the dev runner at dev/reader_harness/app.py (APP_ENV=dev). The canonical HTTP adapter lives at adapter/http_reader.py. The legacy server/ tree is deprecated and will be removed after consolidation.
-
-## Getting started (dev harness)
-Run the local Reader v1 (dev only):
-```bash
-export APP_ENV=dev
-python dev/reader_harness/app.py
-```
-Probe:
-```bash
-curl -i http://127.0.0.1:5000/api/reader?a=<rel>&b=<rel>&a_tz=<IANA>&b_tz=<IANA>
+python -m pip install -e .
+LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 python -m engine.cli --help
+LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 hdctl showcompat --pair-file fixtures/charts/pair.sample.json
 ```
 
-## Getting started (dev harness)
-Run the local Reader v1 (dev only):
-```bash
-export APP_ENV=dev
-python dev/reader_harness/app.py
-```
-Probe:
-```bash
-curl -i http://127.0.0.1:5000/api/reader?a=<rel>&b=<rel>&a_tz=<IANA>&b_tz=<IANA>
-```
+- CLI and module-run are interchangeable (`hdctl …` is exposed via `engine.cli.main:cli`).
+- Evidence runs must use the determinism helper (`engine.runtime.determinism_env.ensure_determinism_env`) which enforces the rails above.
 
-### Sources of Truth (SoT)
-• Public body & determinism — HD Engine — Math & Technical Spec  
-• Transport & caching (A7) acceptance — Governance & Process (Acceptance)
-(Repo docs link to these homes and do not restate their rules.)
+## Determinism & evidence posture (EPIC018)
 
-<!-- EPIC-004 RUN -->
-### Quick run (EPIC-004)
-```bash
-python -m adapter.http_reader
-```
-Bind: http://127.0.0.1:5000   ·   Env: PYTHONHASHSEED=0 PYTHONUTF8=1 TZ=UTC SAFE_MODE=1
+- **D1 – Canonical JSON:** `engine/serializer/canon.py` emits UTF-8, sorted keys, compact separators, and exactly one trailing LF. AB↔BA runs and two-run identity are required for public bodies.
+- **D2 – Closed rails:** Determinism helper pins locale/timezone and disables network. Use it in CLI guards, evidence harnesses, and tests.
+- **D3 – CLI guards:**
+  - `python tools/cli/serializer_grep_guard.py` scans governed CLI paths for forbidden serializers and writes `artifacts/cli/guards/serializer_grep_guard.log`.
+  - `python tools/cli/emitter_symbol_proof.py` proves governed CLI handlers call the canonical emitter and writes `artifacts/cli/guards/emitter_symbol_proof.txt`.
+- **D4 – Evidence skeleton & sanity pipeline:**
+  - Governed artifacts carry `.path_proof.txt` siblings, human index entries (`docs/evidence/INDEX.json`), and machine mirror entries (`artifacts/evidence_index.jsonl`).
+  - Orientation demo: `python tools/evidence/orientation_demo.py` checks mirror self-proof posture.
+  - Sanity pipeline: `python tools/evidence/run_sanity_pipeline.py` performs serializer parity checks, orientation, and evidence hygiene under closed rails.
+  - Use `python tools/evidence/update_evidence_index.py` to refresh governed evidence indexes; **never edit index, mirror, proofs, manifest, or close reports by hand**.
+- **D5 – Governed config artifacts:** Config artifacts (e.g., `config/bands_4B60_v1.json`, `config/toggles_v1.json`) are generated via `python tools/config/generate_config_artifacts.py` and mapped to acceptance tokens in `audit/EPIC-018_config_acceptance_map.json`.
+- **D6 – Typed FE/BE bundles:** `python tools/config/generate_bundles.py` emits typed frontend/backend bundles aligned with governed config and registry, using schemas in `docs/schemas/config_bundle_{fe,be}.json`.
+- **D7 – Manifest & close report:** EPIC018 governance is summarized in `audit/EPIC-018_MANIFEST.json` and `audit/EPIC-018_close_report.md` (both governed with path proofs); see PF20 — Phased Epics for canon context.
+
+See PF12 — Schemas & Artifacts and PF19 — QA Guide for canonical process details.
+
+## Config & bundles (D5/D6)
+
+- Run `python tools/config/generate_config_artifacts.py` under closed rails to regenerate governed config artifacts; outputs must be indexed and path-proofed by the evidence tools.
+- Run `python tools/config/generate_bundles.py` to produce typed FE/BE bundles that mirror the governed configs and registry. Bundle schemas live in `docs/schemas/` and are referenced by PF14 — Mechanics.
+- The acceptance map `audit/EPIC-018_config_acceptance_map.json` links PF09 tasks to config artifacts and registry tokens; treat it as governed evidence.
+
+## Deterministic CLI & reader surfaces
+
+- Compat CLI: `hdctl showcompat --pair-file <pair.json>` (or `--a-file/--b-file`) emits numeric-free public JSON using the canonical emitter/serializer (AB↔BA identity, LF-terminated).
+- Reader harness mirrors CLI bytes for the same inputs; APP_ENV gating remains in `engine/http/compat_handler.py`.
+- `hdctl showcompat` accepts `--dump-reader` and `--dump-admin-dir` for QA sidecars; governed evidence follows the PF12 indexing rules.
+
+## Evidence harness workflow
+
+1. Ensure determinism rails are set (`ensure_determinism_env`).
+2. Generate or refresh governed artifacts with the provided tools (CLI guards, config generators, bundles).
+3. Update evidence indexes with `tools/evidence/update_evidence_index.py` (human index + machine mirror + path proofs).
+4. Run `tools/evidence/orientation_demo.py` to verify mirror self-proof posture.
+5. Run `tools/evidence/run_sanity_pipeline.py` for serializer parity, guard verification, and sanity log capture.
+6. Confirm manifest/close-pack references before merging (EPIC-018 manifest and close report live under `audit/`).
+
+## Epic018 close-pack
+
+The EPIC018 manifest and close report document the acceptance map, tokens, and governed evidence roster for Calcination Pass 3. They are read-only and referenced from PF20 — Phased Epics and PF19 — QA Guide. Use them to locate tokens and artifacts; do not hand-edit.
