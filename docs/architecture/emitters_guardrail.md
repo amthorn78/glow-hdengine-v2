@@ -1,15 +1,12 @@
-# Public emitter guardrails
+# Public emitter guardrails (EPIC018)
 
-## Guardrails for public emitters
-• Use a single emitter for CLI and Reader; no duplicate serialization paths.
-• Do not use ad-hoc json.dumps on public surfaces — use the canonical serializer.
-• ETag must hash the identity bytes (pre-compression) and include the single trailing LF.
-• Accept-Encoding invariance: identity vs gzip produce the same ETag; brotli optional.
-• Public JSON is numeric-free; envelope keys are stable and Spec-defined.
+## Canonical requirements
+- Public surfaces (CLI and Reader) must route through `engine/presenter/emitter.py` and `engine/serializer/canon.py`.
+- Canonical serializer rules: UTF-8, `ensure_ascii=False`, sorted keys, compact separators, exactly one trailing LF, arrays-as-sets, normalized channel ids.
+- AB↔BA and two-run identity proofs are required for public envelopes.
 
-<!-- EPIC-004 PATCH: forbidden serializers guard -->
-## EPIC-004 — Forbidden in public response paths
-Fail acceptance if any of these appear in Reader/CLI response code:
+## Forbidden in governed paths
+The CLI guard enforces these rules; acceptance fails if they appear in governed CLI scope:
 ```
 json.dumps(
 jsonify(
@@ -17,19 +14,13 @@ orjson
 ujson
 simplejson
 ```
-Allowed only in tests/tools/logging; public bytes must flow via **emitter → serializer.canon.sercanon**.
+Use the canonical serializer instead. Run `python tools/cli/serializer_grep_guard.py` under closed rails to produce `artifacts/cli/guards/serializer_grep_guard.log`.
 
-### EPIC-006 — internal version route exception
-The `/internal/version` route is **no-store** and **does not set ETag**. All other Reader 200 responses continue to use strong, quoted ETags over identity bytes.
+## Emitter symbol proof
+`python tools/cli/emitter_symbol_proof.py` inspects governed CLI handlers (`showcompat`, `aux-preview`, `bg:resolve`) and records which canonical emitters they call. Output: `artifacts/cli/guards/emitter_symbol_proof.txt`.
 
-<!-- EPIC-004 guard -->
-## EPIC-004 — Forbidden in public response paths
-Fail acceptance if any of these appear in Reader/CLI response code:
-```
-json.dumps(
-jsonify(
-orjson
-ujson
-simplejson
-```
-Allowed only in tests/tools/logging; public bytes must flow via **emitter → serializer.canon.sercanon**.
+## Determinism helper
+Both guard scripts invoke `engine.runtime.determinism_env.ensure_determinism_env`, which pins `LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0`. Do not bypass these rails.
+
+## Evidence posture
+Guard outputs are governed evidence: index them via `tools/evidence/update_evidence_index.py` and validate path proofs and mirrors with the orientation demo and sanity pipeline. No manual edits.
