@@ -4,9 +4,11 @@ import subprocess
 import sys
 from pathlib import Path
 
+from tests.config.helpers import closed_rails_env
+
 
 def _run_generator() -> bytes:
-    subprocess.run([sys.executable, "tools/generate_registry_report.py"], check=True)
+    subprocess.run([sys.executable, "tools/generate_registry_report.py"], check=True, env=closed_rails_env())
     path = Path("artifacts/registry/registry_report.json")
     return path.read_bytes()
 

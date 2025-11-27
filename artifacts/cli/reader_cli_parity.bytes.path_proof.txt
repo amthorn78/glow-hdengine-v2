@@ -1,5 +1,5 @@
 path: artifacts/cli/reader_cli_parity.bytes
 size_bytes: 320
 sha256: 1c8009b23095fb556225864f04136839ac4433b656465055379235db604fef42
-mtime_utc: 2025-11-27T01:59:29Z
+mtime_utc: 2025-11-27T03:37:39Z
 produced_at_utc: 2025-11-22T02:27:04Z
