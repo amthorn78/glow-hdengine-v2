@@ -24,6 +24,7 @@ from engine.config.registry_loader import (  # noqa: E402
     load_registry_config,
 )
 from engine.serializer import canon  # noqa: E402
+from tools.config.artifacts import require_closed_rails  # noqa: E402
 
 
 # Discovery note (PR3 / EPIC017): legacy registry_report lived at artifacts/reports/ with
@@ -165,6 +166,7 @@ def build_registry_report(root: Path | None = None, *, allow_aliases: bool = Fal
 
 
 def write_registry_report(root: Path | None = None, *, allow_aliases: bool = False, alias_ledger: Mapping[str, str] | None = None) -> Path:
+    require_closed_rails()
     payload = build_registry_report(root, allow_aliases=allow_aliases, alias_ledger=alias_ledger)
     report_path = (root or ROOT) / REPORT_PATH.relative_to(ROOT)
     report_path.parent.mkdir(parents=True, exist_ok=True)
