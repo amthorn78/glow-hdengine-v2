@@ -82,3 +82,26 @@ def test_mirror_schema_and_parity():
         (entry["artifact_key"], entry["discovered_physical_path"]) for entry in entries
     }
     assert expected_keys == seen
+
+
+def test_index_entries_have_mirrors_and_path_proofs():
+    entries = update_evidence_index._load_human_index()
+    mirror = Path("artifacts/evidence_index.jsonl").read_text(encoding="utf-8").splitlines()
+
+    mirror_by_key = {}
+    for raw in mirror:
+        rec = json.loads(raw)
+        mirror_by_key[(rec["artifact_key"], rec["discovered_physical_path"])] = rec
+
+    for entry in entries:
+        key = (entry["artifact_key"], entry["discovered_physical_path"])
+        assert key in mirror_by_key, f"missing mirror record for {key}"
+        rec = mirror_by_key[key]
+        proof_path = Path(rec["proof_anchor"])
+        assert proof_path.exists(), f"missing path proof for {key}"
+        proof = update_evidence_index._load_existing_proof(proof_path)
+        assert proof.get("path") == entry["discovered_physical_path"]
+        assert proof.get("sha256") == rec["sha256"]
+        assert int(proof.get("size_bytes", "0")) == rec["size_bytes"]
+        assert proof.get("mtime_utc")
+        assert proof.get("produced_at_utc")

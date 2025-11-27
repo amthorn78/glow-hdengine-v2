@@ -37,3 +37,23 @@ jobs:
       - run: python -m pytest tests/evidence tests/ops/test_evidence_index.py
       - run: python -m pytest tests/order tests/mech/test_order_properties.py
       - run: python -m pytest tests/cli/test_serializer_guards.py
+  sanity-pipeline:
+    runs-on: ubuntu-latest
+    env:
+      LC_ALL: C
+      LANG: C
+      TZ: UTC
+      SAFE_MODE: "1"
+      ALLOW_NETWORK: "0"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -U pip
+      - run: test -f requirements.txt && python -m pip install -r requirements.txt || true
+      - run: test -f requirements-dev.txt && python -m pip install -r requirements-dev.txt || true
+      - run: python -m pip install -e .
+      - run: python -m pip install pytest
+      - name: Run sanity pipeline
+        run: python tools/evidence/run_sanity_pipeline.py
