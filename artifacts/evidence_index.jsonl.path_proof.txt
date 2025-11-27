@@ -1,5 +1,5 @@
 path: artifacts/evidence_index.jsonl
-size_bytes: 44564
-sha256: c49c2e93c4aa400a610a202e15fb68bc7dedff14c75f70a6d30d916232689495
+size_bytes: 45224
+sha256: 353adfa9c76ecdbe44c1a1e038e4431673cebd56b930934ae4a284c09ad8100d
 mtime_utc: 2025-11-22T21:24:46Z
 produced_at_utc: 2025-11-22T17:07:45Z
