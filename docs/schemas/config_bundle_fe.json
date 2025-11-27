@@ -1,0 +1,123 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "magic10", "bands", "channels", "sources"],
+  "properties": {
+    "schema": {"const": "config_bundle.fe.v1"},
+    "magic10": {
+      "type": "object",
+      "required": ["order", "caps"],
+      "additionalProperties": false,
+      "properties": {
+        "order": {
+          "type": "array",
+          "items": {"type": "string"},
+          "minItems": 10,
+          "maxItems": 10
+        },
+        "caps": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "required": ["bounds", "inputs"],
+            "additionalProperties": false,
+            "properties": {
+              "bounds": {
+                "type": "object",
+                "required": ["min", "max"],
+                "additionalProperties": false,
+                "properties": {
+                  "min": {"type": "integer"},
+                  "max": {"type": "integer"}
+                }
+              },
+              "inputs": {
+                "type": "array",
+                "items": {"type": "string"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "bands": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bands", "edges", "clamp", "rounding"],
+      "properties": {
+        "bands": {
+          "type": "array",
+          "items": {"type": "string"},
+          "minItems": 4
+        },
+        "edges": {
+          "type": "array",
+          "items": {"type": "integer"},
+          "minItems": 4
+        },
+        "clamp": {
+          "type": "array",
+          "items": {"type": "integer"},
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "rounding": {"type": "string"},
+        "version": {"type": "string"}
+      }
+    },
+    "channels": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ids", "alias_policy", "domains", "centers"],
+      "properties": {
+        "ids": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "alias_policy": {
+          "type": "object",
+          "required": ["mode", "aliases"],
+          "additionalProperties": false,
+          "properties": {
+            "mode": {"type": "string"},
+            "aliases": {
+              "type": "object",
+              "additionalProperties": {"type": "string"}
+            }
+          }
+        },
+        "domains": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "centers": {
+          "type": "array",
+          "items": {"type": "string"}
+        }
+      }
+    },
+    "sources": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["magic10_config", "band_edges", "registry_report"],
+      "properties": {
+        "magic10_config": {"$ref": "#/definitions/digest"},
+        "band_edges": {"$ref": "#/definitions/digest"},
+        "registry_report": {"$ref": "#/definitions/digest"}
+      }
+    }
+  },
+  "definitions": {
+    "digest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "size_bytes"],
+      "properties": {
+        "path": {"type": "string"},
+        "sha256": {"type": "string"},
+        "size_bytes": {"type": "integer"}
+      }
+    }
+  }
+}

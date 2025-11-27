@@ -1,5 +1,5 @@
 path: audit/gates/canonical_json/cli_surfaces.log
 size_bytes: 154
 sha256: 948a6b2ed4f3df171bd002518d917b3b7bbe3be70a32b0642eb0bca7288d1552
-mtime_utc: 2025-11-27T03:37:39Z
+mtime_utc: 2025-11-27T04:04:10Z
 produced_at_utc: 2025-11-22T17:07:45Z

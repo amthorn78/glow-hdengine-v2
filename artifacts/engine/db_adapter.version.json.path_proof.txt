@@ -1,5 +1,5 @@
 path: artifacts/engine/db_adapter.version.json
 size_bytes: 58
 sha256: 3f68c4612405223922f71694b79598021bf141e304dacb0847e24d2774c7dd6b
-mtime_utc: 2025-11-27T03:37:39Z
+mtime_utc: 2025-11-27T04:04:10Z
 produced_at_utc: 2025-11-22T02:27:04Z
