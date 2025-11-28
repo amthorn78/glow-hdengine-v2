@@ -672,7 +672,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 
   * EPIC017 QA05 Reader envelope evidence (CLI QA environment):
 
-    * Audit/QA/HDE-EPIC017/logs/step\_showcompat\_dump\_reader1.txt (path name indicative; exact path governed by QA harness) — Reader v1 envelope produced by hdctl showcompat \--source vendor \--dump-reader for a synthetic birth pair, showing:
+    * audit/qa/hde-epic017/logs/step\_showcompat\_dump\_reader1.txt (path name indicative; exact path governed by QA harness) — Reader v1 envelope produced by hdctl showcompat \--source vendor \--dump-reader for a synthetic birth pair, showing:
 
       * Exactly the six canonical keys (reader\_version, eligible, categories, meta, release\_id, idempotence\_hash).
 
@@ -3129,9 +3129,9 @@ Enforce CLI stream and exit-code discipline for all CLI commands in alignment wi
 
 * **Evidence / artifacts:**
 
-  * `Audit/QA/HDE-EPIC017/logs/intver_get_conditional.txt` — conditional GET `/internal/version` with `If-*` headers showing 200 OK, `Cache-Control: no-store`, no `ETag`/`Last-Modified`, and a JSON body identical to the non-conditional GET.
+  * `audit/qa/hde-epic017/logs/intver_get_conditional.txt` — conditional GET `/internal/version` with `If-*` headers showing 200 OK, `Cache-Control: no-store`, no `ETag`/`Last-Modified`, and a JSON body identical to the non-conditional GET.
 
-  * `Audit/QA/HDE-EPIC017/logs/intver_get_full.txt` — baseline non-conditional GET `/internal/version` headers/body for comparison.
+  * `audit/qa/hde-epic017/logs/intver_get_full.txt` — baseline non-conditional GET `/internal/version` headers/body for comparison.
 
 * **Notes:**  
    This QA evidence demonstrates that `/internal/version` ignores conditional headers for GET and never returns 304, while preserving header posture and body equality relative to non-conditional GET. The remaining open work for `/internal/version` (body-shape contract and identity/two-run proof) is tracked at the task level and in other subtasks, not here.
@@ -3161,11 +3161,11 @@ Enforce CLI stream and exit-code discipline for all CLI commands in alignment wi
 
 * **Evidence / artifacts:**
 
-  * `Audit/QA/HDE-EPIC017/logs/intver_get_full.txt` — GET `/internal/version` showing 200 OK, `Cache-Control: no-store`, JSON content type, and no `ETag`/`Last-Modified` headers.
+  * `audit/qa/hde-epic017/logs/intver_get_full.txt` — GET `/internal/version` showing 200 OK, `Cache-Control: no-store`, JSON content type, and no `ETag`/`Last-Modified` headers.
 
-  * `Audit/QA/HDE-EPIC017/logs/intver_head_full.txt` — HEAD `/internal/version` showing 200 OK, matching validators (including `Content-Type`) and no `ETag`/`Last-Modified`, with no body.
+  * `audit/qa/hde-epic017/logs/intver_head_full.txt` — HEAD `/internal/version` showing 200 OK, matching validators (including `Content-Type`) and no `ETag`/`Last-Modified`, with no body.
 
-  * `Audit/QA/HDE-EPIC017/logs/intver_get_conditional.txt` — conditional GET `/internal/version` with `If-*` headers showing the same header posture (no-store, no validators, JSON content type) as the ordinary GET.
+  * `audit/qa/hde-epic017/logs/intver_get_conditional.txt` — conditional GET `/internal/version` with `If-*` headers showing the same header posture (no-store, no validators, JSON content type) as the ordinary GET.
 
 * **Notes:**  
    Together, these artifacts show that `/internal/version` consistently uses `Cache-Control: no-store` and omits `ETag` and `Last-Modified` for GET, HEAD, and conditional GET in Railway prod. Body-shape compliance (adding `invocation_sha256`, frozen field order) is still outstanding and is handled by other tasks; this subtask is scoped only to header posture.
@@ -5586,7 +5586,7 @@ These artifacts must be listed in the **Human Evidence Index** and mirrored in t
 
 * EPIC-017 QA06 Aux narrative evidence (CLI QA environment):
 
-  * `Audit/QA/HDE-EPIC017/logs/step_aux_preview1.txt` — narrative text produced by:
+  * `audit/qa/hde-epic017/logs/step_aux_preview1.txt` — narrative text produced by:
 
     * `hdctl aux-preview --show-narrative` against compat JSON from `showcompat --source vendor` for a synthetic birth pair.
 
@@ -5594,7 +5594,7 @@ These artifacts must be listed in the **Human Evidence Index** and mirrored in t
 
 * EPIC-017 QA07 Aux admin JSON sidecar evidence (CLI QA environment):
 
-  * `Audit/QA/HDE-EPIC017/logs/step_aux_preview1_admin.json` — Aux admin JSON sidecar produced by:
+  * `audit/qa/hde-epic017/logs/step_aux_preview1_admin.json` — Aux admin JSON sidecar produced by:
 
     * `hdctl aux-preview --admin-out` for the same compat JSON.
 
@@ -5656,9 +5656,9 @@ Deeper determinism checks for Aux (e.g. AB↔BA and two-run identity for admin J
 
 * `artifacts/evidence_index.jsonl` — Machine Mirror records for CLI preview artifacts, with `proof_anchor` references to path-proof transcripts.
 
-* `Audit/QA/HDE-EPIC017/logs/step_aux_preview1.txt` — EPIC-017 QA06 Aux narrative evidence.
+* `audit/qa/hde-epic017/logs/step_aux_preview1.txt` — EPIC-017 QA06 Aux narrative evidence.
 
-* `Audit/QA/HDE-EPIC017/logs/step_aux_preview1_admin.json` — EPIC-017 QA07 Aux admin JSON sidecar evidence.
+* `audit/qa/hde-epic017/logs/step_aux_preview1_admin.json` — EPIC-017 QA07 Aux admin JSON sidecar evidence.
 
 # 
 
@@ -6185,7 +6185,7 @@ Use the Distillation harness to **prove and exercise** the DB runtime posture de
 
   * EPIC017 QA08 vendor dry-run evidence (CLI QA environment):
 
-    * Audit/QA/HDE-EPIC017/logs/step\_bg\_resolve\_vendor\_dry\_run1.txt — resolver+ingest metadata JSON for hdctl bg:resolve \--source vendor \--dry-run on a synthetic birth tuple, showing:
+    * audit/qa/hde-epic017/logs/step\_bg\_resolve\_vendor\_dry\_run1.txt — resolver+ingest metadata JSON for hdctl bg:resolve \--source vendor \--dry-run on a synthetic birth tuple, showing:
 
       * requested\_source and resolved\_source both "vendor", allow\_network: true, safe\_mode: false, dry\_run: true, upsert: false, user\_id "qa\_epic017\_vendor1";
 

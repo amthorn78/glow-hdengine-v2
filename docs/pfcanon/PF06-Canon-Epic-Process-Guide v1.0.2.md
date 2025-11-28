@@ -289,7 +289,7 @@ CI posture (diff-scoped)
 
 * Writers/errors posture headers: `no-store`; JSON errors, no ETag.
 
-* When a QA branch or plan claims to exercise **prod via Codespaces** for an HDE epic, it **must** include at least one simple **prod handshake** that proves the commands are talking to the canonical production HD Engine service and DB (as defined in Glow Infrastructure). A typical handshake is a `curl` to the production HD Engine base URL’s `/internal/version` endpoint from within Codespaces, with the full response captured under `Audit/QA/<EPIC-ID>/logs/`. QA that omits this handshake is treated as **underspecified** until the handshake and its artifact are added.【13:WCXnEc3R2LFdFyBrPKcjx9†file-WCXnEc3R2LFdFyBrPKcjx9†L3-L7】
+* When a QA branch or plan claims to exercise **prod via Codespaces** for an HDE epic, it **must** include at least one simple **prod handshake** that proves the commands are talking to the canonical production HD Engine service and DB (as defined in Glow Infrastructure). A typical handshake is a `curl` to the production HD Engine base URL’s `/internal/version` endpoint from within Codespaces, with the full response captured under `audit/qa/<epic-id>/logs/`. QA that omits this handshake is treated as **underspecified** until the handshake and its artifact are added.【13:WCXnEc3R2LFdFyBrPKcjx9†file-WCXnEc3R2LFdFyBrPKcjx9†L3-L7】
 
 * Rails default: CI/test harness runs **CLOSED** by default; any job that opens rails must pin policy and attach evidence in the same PR.
 
@@ -318,7 +318,7 @@ When a PLAN or CRD for an HDE epic expects **Live QA “in prod via Codespaces,�
 
 * State explicitly that **Codespaces is a QA console** that runs CLI/HTTP commands **against** that production service and DB, not a prod environment in its own right.
 
-* Describe, at a high level, the **prod handshake** step and where its artifact will live (for example, “Step 0: `curl` the production `/internal/version` endpoint from Codespaces and store the output under `Audit/QA/<EPIC-ID>/logs/` before running deeper QA”).
+* Describe, at a high level, the **prod handshake** step and where its artifact will live (for example, “Step 0: `curl` the production `/internal/version` endpoint from Codespaces and store the output under `audit/qa/<epic-id>/logs/` before running deeper QA”).
 
 PLAN/CRD entries that refer to “prod via Codespaces” without these clarifications are considered **incomplete** and must be updated before the epic moves into implementation or Live QA.
 
