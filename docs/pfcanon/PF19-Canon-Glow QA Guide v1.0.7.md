@@ -577,9 +577,9 @@ For **HDE-EPIC017**, manual Live QA converged on a specific pattern that PF19 ad
 
 * That command must write exactly **one primary evidence file** (log or JSON) under:
 
-  * `Audit/QA/HDE-EPIC017/logs/`, or
+  * `audit/qa/hde-epic017/logs/`, or
 
-  * another clearly named subdirectory under `Audit/QA/HDE-EPIC017/**`.
+  * another clearly named subdirectory under `audit/qa/hde-epic017/**`.
 
 * The designated Live QA reviewer (for example a QA persona like Kronos) reviews that primary file and issues a short QA addendum (QA0X) summarizing:
 
@@ -591,7 +591,7 @@ For **HDE-EPIC017**, manual Live QA converged on a specific pattern that PF19 ad
 
   * the QA verdict for that step.
 
-* Any helper files for that step (for example parsed JSON derived from the log) also live under `Audit/QA/HDE-EPIC017/**` and are referenced from the same addendum, but there is always **one** clearly identified primary artifact per step.
+* Any helper files for that step (for example parsed JSON derived from the log) also live under `audit/qa/hde-epic017/**` and are referenced from the same addendum, but there is always **one** clearly identified primary artifact per step.
 
 **Rails posture for manual Live QA (EPIC017 only).**
 
@@ -601,7 +601,7 @@ For **HDE-EPIC017**, manual Live QA converged on a specific pattern that PF19 ad
 
   * vendor dry-run ingest calls (`bg:resolve --source=vendor --dry-run`).
 
-* Manual Live QA must **not** modify code or configuration and must **not** write outside `Audit/QA/**` for evidence.
+* Manual Live QA must **not** modify code or configuration and must **not** write outside `audit/qa/**` for evidence.
 
 * Closed-rails testing (`SAFE_MODE=1`, `ALLOW_NETWORK=0`) remains the responsibility of:
 
@@ -1561,7 +1561,7 @@ For EPIC017, vendor ingest QA followed a **single-command, single-artifact dry-r
 
 * One `hdctl bg:resolve --source=vendor --dry-run` call per synthetic birth tuple and QA user key (for example `qa_epic017_vendor1`), run from a Codespace attached to the engine repo with open rails (`ALLOW_NETWORK=1`, `SAFE_MODE=0` as required).
 
-* Each call produced **one resolver+ingest metadata JSON artifact** under `Audit/QA/HDE-EPIC017/logs/**` (names-only), which was treated as the primary evidence file for that QA step.
+* Each call produced **one resolver+ingest metadata JSON artifact** under `audit/qa/hde-epic017/logs/**` (names-only), which was treated as the primary evidence file for that QA step.
 
 The resolver/ingest metadata for a successful dry-run vendor QA step is expected to show, at minimum:
 
@@ -1575,7 +1575,7 @@ The resolver/ingest metadata for a successful dry-run vendor QA step is expected
 
 When these conditions are met and the artifact is:
 
-* stored under governed paths (`Audit/QA/<EPIC>/logs/**` and, if normalized, under `artifacts/**` or `docs/**`), and
+* stored under governed paths (`audit/qa/<epic>/logs/**` and, if normalized, under `artifacts/**` or `docs/**`), and
 
 * properly indexed in `docs/evidence/INDEX.json` (+ `.sha256`) and `artifacts/evidence_index.jsonl` with a co-located path-proof,
 

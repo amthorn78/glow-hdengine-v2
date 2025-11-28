@@ -777,13 +777,13 @@ For the internal ops endpoint `/internal/version`, EPIC017 has **split acceptanc
 
 * **Transport / headers / conditionals — QA proved in prod via Codespaces (EPIC017):**
 
-  * Manual QA captured non-conditional GET, HEAD, and conditional GET (`GET /internal/version` with `If-*` headers) against the Railway HD Engine endpoint and stored the artifacts under `Audit/QA/HDE-EPIC017/logs`, including at least:
+  * Manual QA captured non-conditional GET, HEAD, and conditional GET (`GET /internal/version` with `If-*` headers) against the Railway HD Engine endpoint and stored the artifacts under `audit/qa/hde-epic017/logs`, including at least:
 
-    * `Audit/QA/HDE-EPIC017/logs/intver_get_full.txt` — baseline GET status/headers/body.
+    * `audit/qa/hde-epic017/logs/intver_get_full.txt` — baseline GET status/headers/body.
 
-    * `Audit/QA/HDE-EPIC017/logs/intver_head_full.txt` — baseline HEAD status/headers.
+    * `audit/qa/hde-epic017/logs/intver_head_full.txt` — baseline HEAD status/headers.
 
-    * `Audit/QA/HDE-EPIC017/logs/intver_get_conditional.txt` — conditional GET status/headers/body.
+    * `audit/qa/hde-epic017/logs/intver_get_conditional.txt` — conditional GET status/headers/body.
 
   * These artifacts show that, for `/internal/version` on Railway prod:
 
@@ -821,7 +821,7 @@ For vendor ingest, EPIC017 includes a **single dry-run resolver step** as part o
 
 * **QA step and artifact:**
 
-  * A manual QA step runs `hdctl bg:resolve --source vendor --dry-run` for a synthetic birth tuple and QA user key and writes a single JSON artifact under `Audit/QA/HDE-EPIC017/logs/`, for example `Audit/QA/HDE-EPIC017/logs/step_bg_resolve_vendor_dry_run1.txt`.
+  * A manual QA step runs `hdctl bg:resolve --source vendor --dry-run` for a synthetic birth tuple and QA user key and writes a single JSON artifact under `audit/qa/hde-epic017/logs/`, for example `audit/qa/hde-epic017/logs/step_bg_resolve_vendor_dry_run1.txt`.
 
   * This artifact contains both the resolver block and the ingest metadata for that call; it is the primary evidence file for this vendor dry-run QA step.
 
@@ -901,11 +901,11 @@ Both must be recorded here.
 
     * The PO runs **one command per QA step** in a Codespace attached to the engine repo (either a CLI command such as `hdctl …` or a single HTTP request).
 
-    * Each step writes exactly **one primary evidence file** (log or JSON) under `Audit/QA/HDE-EPIC017/…` — typically under `Audit/QA/HDE-EPIC017/logs/`.
+    * Each step writes exactly **one primary evidence file** (log or JSON) under `audit/qa/hde-epic017/…` — typically under `audit/qa/hde-epic017/logs/`.
 
     * Kronos (QA persona) reviews that single file and issues a QA addendum (`QA0X`) summarizing behavior, doc deltas, and verdict for that step.
 
-    * Any helper files derived from that step (for example, a prettified JSON view) must also live under `Audit/QA/HDE-EPIC017/**` and be referenced from the same QA addendum, but the canonical artifact for the step is one file.
+    * Any helper files derived from that step (for example, a prettified JSON view) must also live under `audit/qa/hde-epic017/**` and be referenced from the same QA addendum, but the canonical artifact for the step is one file.
 
   * **Rails posture for manual Live QA (EPIC017 only):**
 
@@ -915,7 +915,7 @@ Both must be recorded here.
 
       * No production code or configuration changes.
 
-      * No writes outside `Audit/QA/**`.
+      * No writes outside `audit/qa/**`.
 
       * For vendor ingest, only `bg:resolve --source vendor --dry-run` (no DB writes) or clearly identified vendor stubs are permitted; `bg:resolve --source vendor --upsert` remains prohibited in pre-Glow prod.
 

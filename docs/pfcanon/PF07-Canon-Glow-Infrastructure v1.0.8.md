@@ -268,7 +268,7 @@ These are the authoritative names for the HD Engine production service and its p
 
 * It runs CLI (`hdctl`) and HTTP (`curl`) commands that can target the Railway HD Engine service and the shared Postgres instance when environment configuration and rails allow it.
 
-* It writes QA artifacts (logs, notes, snapshots) back into the repo under governed paths (for example, `Audit/QA/**`, `artifacts/**`, `docs/**`).
+* It writes QA artifacts (logs, notes, snapshots) back into the repo under governed paths (for example, `audit/qa/**`, `artifacts/**`, `docs/**`).
 
 Codespaces does **not** host the production HD Engine itself; it is a remote shell talking to the Railway `glow-hdengine-v2` service and `ample-illumination/production/postgres` database. Names and paths for QA harnesses and windows (for example, EPIC-specific QA rails windows) are recorded in §2.5 and **Glow QA Guide** by title.
 
