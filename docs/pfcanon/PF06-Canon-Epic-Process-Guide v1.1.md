@@ -2,13 +2,13 @@
 
 **Title:** PF06-Canon-Epic-Process-Guide 
 
-**Version:** v1.0.2
+**Version:** v1.1
 
 **Status:** Canon
 
-**Effective date**: 2025-11-25
+**Effective date**: 2025-11-29
 
-**Last Update Gate:** BN 7.7.8 Drain A13
+**Last Update Gate:** BN 7.8.9 Drain A27
 
 **tag:** INV-f2ac55d77ce9aacc
 
@@ -16,24 +16,6 @@
 
  This guide defines the epic delivery process for a human \+ pair-programming \+ CodEx workflow. It supplies paste-ready headers, checklists, and prompts; requires an Audit and a Sandbox Build/Test in each epoch; and sets Close to be **PR-first**. **CodEx automatically opens the pull request** and attaches the close pack and the **acceptance tokens (PASS) list**.  
  This is **process guidance only**. It does not constrain execution environments, repository tooling, or any transport or payload bytes (those remain in their canonical homes).
-
-I get why your confidence is low here, and I’m going to keep this as simple and explicit as possible.
-
-Below is **one cohesive block** for **§0.2–§0.7 of PF06**, with:
-
-* **Markdown headings** (`## 0.2 …` etc.)
-
-* **Your deltas applied**:
-
-  * 0.2 fully replaced
-
-  * 0.5 extended with ops-refusal \+ merge gate
-
-  * 0.7 Allowed changes replaced \+ rails note in CI posture
-
-* All other subsections (**0.3, 0.4, 0.6**) preserved.
-
-You can paste this straight into your PF06 source and let Docs interpret `##` as Heading 2\.
 
 ---
 
@@ -187,7 +169,7 @@ Lead Developer publishes the Implementation Guide to the Implementation Agent.
  IA drafts the Implementation Plan; Lead Developer approves once and then acts only as PR gate.  
  IA → CodEx: Build instructions plus verbatim components and schemas. CodEx may adapt within scope and must report all changes; returns a detailed change report and artifacts and evidence.  
  IA requests changes or approves.  
- CodEx opens the PR `epic/<EPIC-ID>-<slug>`, pushes code, Doc-Delta (repo docs), the human Evidence Index, the machine JSONL mirror, and the close-pack (`audit/EPIC-<ID>_close_report.md`, `audit/EPIC-<ID>_MANIFEST.json`). The machine mirror is records-only, canonical JSONL, one LF per line, unknown keys rejected, each record with a `proof_anchor`.  
+ CodEx opens the PR `epic/<epic-id>-<slug>`, pushes code, Doc-Delta (repo docs), the human Evidence Index, the machine JSONL mirror, and the close-pack (`audit/EPIC-<ID>_close_report.md`, `audit/EPIC-<ID>_MANIFEST.json`). The machine mirror is records-only, canonical JSONL, one LF per line, unknown keys rejected, each record with a `proof_anchor`.  
  Lead Developer gate review. Verify PASS tokens; verify A7 proof surface on the cataloged JSON success route (not `/internal/version`); verify env-gate proof and encoding invariance; verify same-PR evidence parity. Verify Endpoint Catalog single home present (`docs/ENDPOINTS_CATALOG.json` \+ `.sha256`) and Reader A7 proof JSON is captured and indexed (human \+ machine, same PR).  
  Product Owner merge. Perform squash merge on PASS and notify the Scrum Master.  
  Closure. IA files the Closure Report; boards and sprint reports updated; suites green-freeze until a qualifying change lands.
@@ -234,13 +216,211 @@ Cross-doc references. Use titles only for all external references; do not duplic
 
 ## **0.6 Discipline**
 
-No background work.
+### **0.6.1 Canon-first planning**
 
-No manual git.
+Implementation Agents **MUST** treat PF-Canon as the primary source of facts for epic planning and QA.
 
-No manually created PRs by agents.
+Before drafting any QA Plan or Implementation Plan for a Live QA epic, they **MUST**:
 
-Main is protected; squash merge is the only close path.
+* Read **Glow Infrastructure**, **HDE-Build Notes**, **Glow QA Guide**, and **HDE Phased Epics** (by title) to collect:
+
+  * environment and infrastructure facts,
+
+  * QA tokens, and
+
+  * epic D-goals and exclusions.
+
+* Use canonical infra/env values (for example, production service name, base URL, and DB instance/schema) from those documents directly, instead of treating them as unknowns.
+
+Implementation Agents **MUST NOT** treat canonical infra/env details that PF-Canon already defines (for example, prod base URL and DB for the HD Engine) as PO inputs unless PF-Canon explicitly marks them **OPEN/TBD**.
+
+Any QA Plan or Implementation Plan that asks the PO to “provide” such a value **without** citing an OPEN/TBD gap in PF-Canon is **non-conforming** and must be corrected before use.
+
+---
+
+### **0.6.2 Rails and environments (closed-rails vs open-rails QA)**
+
+QA Plans **MUST** distinguish between:
+
+* **Closed-rails determinism checks** that run locally with rails closed  
+   (for example, serializer and bundle determinism jobs), and
+
+* **Open-rails production checks** that run from a console  
+   (for example, Codespaces) against the production HD Engine service and DB  
+   as defined in **Glow Infrastructure** and clarified in **HDE-Build Notes** (titles only).
+
+Determinism pins (for example locale/time settings) apply to determinism-sensitive jobs.
+
+When a step is explicitly described as “prod via Codespaces,” the plan **MUST**:
+
+* assume an open-rails posture sufficient to reach prod, and
+
+* prove determinism via repeatable runs and evidence, **not** by pretending that rails are closed.
+
+---
+
+### **0.6.3 Prod behavior vs Codespaces artifact sink (Live QA)**
+
+For Live QA epics:
+
+* **Prod behavior runs in a prod-facing environment.**  
+   Any D-goal that is about behavior (for example compat math, narrative generation, vendor ingest, “full product payload” for a pair) **MUST** define a primary **exercise context** that can reach the production HD Engine service and DB as defined in **Glow Infrastructure**.  
+   Examples include:
+
+  * a terminal with `hdctl` configured to call the production base URL, or
+
+  * an admin GUI in a browser hitting a Railway route.
+
+* **Codespaces is a console and artifact sink, not the prod executor.**  
+   Codespaces **MAY**:
+
+  * run offline tools against a checkout of the same code/commit as prod,
+
+  * receive and store artifacts (logs, JSON, headers, transcripts) under `audit/qa/<epic-id>/...`, and
+
+  * run offline validation (for example `python -m json.tool`, `cmp`, `sha256sum`) against those artifacts,
+
+* but Codespaces **MUST NOT** be treated as “where prod runs” unless the step explicitly:
+
+  * describes how the commands in Codespaces are reaching the production service over the network, and
+
+  * uses that connection as the exercise context.
+
+* **Behavior vs artifact phases.**  
+   Live QA steps that refer to behavior **MUST** separate:
+
+  * a **behavior run phase** (where the behavior is exercised in a prod-facing environment), and
+
+  * an **artifact capture & analysis phase** (where artifacts from that run are copied or uploaded into the Codespace under `audit/qa/<epic-id>/...` and analyzed offline).
+
+* The QA Plan **MUST** be clear about both phases for each such step.
+
+* **Codespaces-only runs are local smoke checks.**  
+   Steps that run `hdctl` or other logic **purely inside Codespaces** (for example under closed rails with no network) **MAY** be included as local smoke checks but **MUST NOT** be used to satisfy prod behavior tokens.
+
+   When a token is about prod behavior, its satisfaction **MUST** be tied to a prod-facing behavior run as described above, with artifacts captured under `audit/qa/<epic-id>/...`.
+
+---
+
+### **0.6.4 PO Live QA vendor-first scope**
+
+For epics that include **PO-run Live QA** sessions:
+
+* **Purpose.**  
+   PO Live QA is a **vendor-first** activity. Its primary and explicit goal is to exercise live vendor behavior against the production HD Engine and to capture mechanical evidence of that behavior.
+
+* **What belongs in PO Live QA.**  
+   Steps in a PO Live QA session **MUST** be scoped to vendor flows, including (as applicable to the epic):
+
+  * vendor-backed BodyGraph resolution (for example `bg:resolve --source=vendor` in dry-run or controlled modes),
+
+  * vendor-backed compat calculations (for example compat via vendor-backed inputs or the Admin bundle path once defined by other PF docs), and
+
+  * vendor error conditions and edge cases (for example malformed input, missing data, timeouts) that the epic chooses to exercise.
+
+* **What does not belong in PO Live QA.**  
+   Steps whose only purpose is:
+
+  * proving connectivity (for example `/internal/version` identity pings), or
+
+  * re-running determinism, serializer/guard, or sanity checks that are already covered by CI/QA/infra,
+
+* **MUST NOT** be treated as part of the PO’s Live QA workload.  
+   These checks remain **CI/QA/infra** responsibilities and may be referenced as pre-work or prerequisites, but they are not, by themselves, a reason to convene a PO Live QA session.
+
+* **Codespaces rails in PO Live QA.**  
+   In the context of PO Live QA:
+
+  * Codespaces is, by default, an **artifact sink and offline analysis console** (see §0.6.3).
+
+  * Codespaces **MAY** temporarily open rails (for example setting `SAFE_MODE=0`, `ALLOW_NETWORK=1`, base URL pointing to production) **only when**:
+
+    * the goal of that step is to exercise a live vendor flow as described above, and
+
+    * the rail-opening is documented (env vars set, commands logged, and artifacts captured under `audit/qa/<epic-id>/logs/`).
+
+  * For non-vendor behavior (serializer determinism, guard proofs, sanity pipeline), Codespaces **MUST NOT** be used as a surrogate “prod” environment in PO Live QA; those checks belong to CI/QA/infra.
+
+Plans or runs that:
+
+* assign non-vendor checks to the PO’s Live QA workload, or
+
+* treat vendor-neutral smoke checks as PO Live QA,
+
+are **non-conforming** and must be corrected by moving those checks into CI/QA and keeping the PO session focused on vendor behavior.
+
+---
+
+### **0.6.5 Fail-closed to spec gap**
+
+If, during planning, PF-Canon appears ambiguous or incomplete:
+
+* Implementation Agents **MUST** treat the affected check as **blocked by a spec gap**,
+
+* capture enough evidence to describe the gap, and
+
+* route it into **Build Notes** and/or **HDE Phased Epics** as a documented issue,
+
+instead of improvising new rails, redefining environment semantics, or asking the PO to guess.
+
+---
+
+### **0.6.6 Filesystem naming (directories)**
+
+PF-Canon and QA docs **MUST** use lowercase directory names in all canonical path examples and requirements.
+
+In particular:
+
+* Repository and artifact directories under the project root (for example `docs/`, `artifacts/`, `audit/qa/`, `schemas/`) and epic-specific QA directories (for example `audit/qa/hde-epic017/logs/`) **MUST** be spelled in lowercase ASCII.
+
+* New specs, QA Plans, and evidence path examples **MUST NOT** introduce mixed-case or uppercase directory names (for example `Audit/QA/...` or `Audit/Qa/...`). Any remaining mixed-case directories are treated as legacy drift and **must** be normalized to the lowercase convention in remediation work, not copied forward into new epics.
+
+This rule applies to **directory components only**; file names and extensions continue to follow their existing conventions unless otherwise governed by other PF documents.
+
+---
+
+### **0.6.7 Mechanical evidence (Live QA)**
+
+For any Live QA epic, the QA Plan and Implementation Plan **MUST** treat evidence as mechanical and step-explicit:
+
+* **Per-step evidence expectations.**  
+   Every Live QA step in the QA Plan **MUST** include explicit mechanical evidence expectations: the commands to run and the expected artifacts (paths and filenames) under the canonical QA root `audit/qa/<epic-id>/...` for that step.
+
+   It is not sufficient to say “take notes” or “observe output”; each step **must** name at least one concrete file it will produce.
+
+* **PO actions → artifacts.**  
+   Every PO action in a Live QA run (for example, running a CLI command, issuing a curl, changing rails, or approving a QA slice) **MUST** result in at least one inspectable artifact under `audit/qa/<epic-id>/...` (for example, a log, tree snapshot, or summary file).
+
+   If a PO action does not currently produce an artifact, the QA Plan **must** add a mechanical capture command (for example, `echo` or a script) so the step becomes observable.
+
+* **Mechanical, not manual.**  
+   Live QA evidence files **MUST** be produced by commands (shell, scripts, CLI tools) rather than manual editing.
+
+   Human notes are allowed only if they are written via mechanical commands into files under `audit/qa/<epic-id>/...` and treated as governed artifacts; free-form, untracked notes are **not** considered evidence.
+
+Plans or runs that:
+
+* omit per-step mechanical evidence expectations, or
+
+* include PO actions without at least one corresponding artifact under `audit/qa/<epic-id>/...`,
+
+are **non-conforming** and must be corrected before the Live QA work is considered acceptable.
+
+---
+
+### **0.6.8 Operational guardrails**
+
+* **No background work.**  
+   Agents do not perform unseen or open-ended work outside the documented epic process. All outputs must be paste-ready, reviewable, and traceable to PF-Canon and epic artifacts.
+
+* **No manual git.**  
+   Agents do not run git, do not create branches, and do not push commits.
+
+* **No manually created PRs by agents.**  
+   Pull requests are created by CodEx (for main epic slices) or by the PO in the CodEx UI as defined elsewhere in this guide; agents do not create PRs directly.
+
+* **Main is protected.**  
+   The `main` branch is protected; squash merge on PASS is the only close path for epic work.
 
 ---
 
@@ -270,7 +450,7 @@ Forbidden: changes under app/service code, migrations/DDL writers, runtime confi
 APPEND — Path normalization. Transient/generator paths (e.g., `codex/out/**`) are forbidden as sources for governed proofs; relocate into `artifacts/**` / `docs/**` before indexing.
 
 Branch and PR  
- Branch naming suggestion: `qa/<EPIC-ID>-<slug>`.  
+ Branch naming suggestion: `qa/<epic-id>-<slug>`.  
  Open a PR using §4.5 PR template — evidence-only QA. Keep all evidence and indices in the same PR (see §0.2 parity rule).
 
 Determinism pins  
@@ -301,26 +481,247 @@ Acceptance (titles only)
 
 # 1\) EPIC PLAN → CRD (Lead Dev) 
 
-## 1.1 Workflow at a glance
+## **1.1 Workflow at a glance**
 
- Draft the PLAN machine header (single post).  
- After one review, issue the CRD with the approved scope and acceptance tokens by title only (e.g., A3/A4/A7; no byte listings).  
- Finalize code-capsules before IP approval; capsules freeze at IP.  
- CodEx runs Audit \+ Sandbox Build/Test, then opens the PR automatically using the template. CodEx attaches the close pack and the PASS token list, and pushes code \+ Doc-Delta (repo docs) \+ human Evidence Index \+ machine JSONL mirror in the same PR.  
- Lead Dev gates the PR (verifies PASS tokens, A7 proof surface/env-gate/encoding-invariance when applicable, and 1:1 index↔mirror parity with path-proofs).  
- PO is the sole merger; squash-merge on PASS; inform Scrum Master. Suites green-freeze unless a qualifying change lands.
+### **1.1.1 Standard epic flow**
 
-For some epics (for example, EPIC017 and similar Calcination/Separation passes), the work may be split into a **series of PRs (up to 10 PRs per epic)**, each PR carrying a self-contained slice with code \+ Doc-Delta \+ evidence. The PR-first pattern and same-PR parity apply to **each** PR; epic-level acceptance (as recorded in HDE Phased Epics) occurs only after all required PRs for that epic have merged.
+Before applying the steps below, every epic **MUST** perform a **canon inventory**:
 
-When a PLAN or CRD for an HDE epic expects **Live QA “in prod via Codespaces,”** it **must** also:
+* Read, by title, the current **Glow Infrastructure**, **HDE-Build Notes**, **Glow QA Guide**, and **HDE Phased Epics** entries that apply to this epic.
 
-* Name the production HD Engine **service and base URL** and the production **DB instance/schema** by title, routing to Glow Infrastructure as the single home for those names (do not invent new environment labels).
+* Record, in the PLAN context header or adjacent notes, the key environment and infra facts, relevant QA tokens, and D-goals/exclusions discovered there.
 
-* State explicitly that **Codespaces is a QA console** that runs CLI/HTTP commands **against** that production service and DB, not a prod environment in its own right.
+* If any required fact appears missing or ambiguous, mark it as a **spec gap** per §0.6.5 (blocked-by-spec) instead of treating it as a PO input or improvising rails.
 
-* Describe, at a high level, the **prod handshake** step and where its artifact will live (for example, “Step 0: `curl` the production `/internal/version` endpoint from Codespaces and store the output under `audit/qa/<epic-id>/logs/` before running deeper QA”).
+Only after this canon inventory is complete should the PLAN header and CRD be drafted.
 
-PLAN/CRD entries that refer to “prod via Codespaces” without these clarifications are considered **incomplete** and must be updated before the epic moves into implementation or Live QA.
+1. **PLAN header (machine-ready).**  
+    Draft the PLAN machine header as a single post.
+
+2. **CRD with approved scope.**  
+    After one review, issue the CRD with the approved scope and acceptance tokens **by title only** (for example `A3`, `A4`, `A7`); do **not** list bytes or payload shapes in the CRD.
+
+3. **Code capsules before IP.**  
+    Finalize code-capsules before IP approval; capsules **freeze at IP**.
+
+4. **CodEx PR creation.**  
+    CodEx runs **Audit \+ Sandbox Build/Test**, then opens the PR automatically using the standard template. In that PR, CodEx pushes, in a single slice:
+
+   * Code
+
+   * Doc-Delta (repo docs)
+
+   * Human Evidence Index (`docs/evidence/INDEX.json`)
+
+   * Machine JSONL mirror (`artifacts/evidence_index.jsonl`)
+
+5. CodEx also attaches:
+
+   * The close pack
+
+   * The PASS token list
+
+6. **Lead Developer gate.**  
+    Lead Dev gates the PR by verifying, as applicable:
+
+   * PASS token list is consistent and complete
+
+   * A7 proof surface is correct (cataloged JSON success route only)
+
+   * Env-gates and encoding invariance are respected for A7 proofs
+
+   * 1:1 Evidence Index ↔ machine mirror parity with path-proofs
+
+7. **PO merge and green-freeze.**  
+    The Product Owner is the sole merger and uses **squash-merge on PASS**. After merge:
+
+   * Scrum Master is informed
+
+   * Suites are green-freeze unless a qualifying change lands
+
+---
+
+### **1.1.2 Multi-PR epics**
+
+For some epics (for example EPIC017 and similar Calcination/Separation passes):
+
+* The work may be split into a **series of PRs** (up to **10 PRs per epic**).
+
+* Each PR must carry a **self-contained slice** with code \+ Doc-Delta \+ evidence.
+
+* The **PR-first pattern and same-PR parity** (code \+ docs \+ Evidence Index \+ machine mirror) apply to **each PR**.
+
+* **Epic-level acceptance** (as recorded in *HDE Phased Epics*) occurs **only after all required PRs for that epic have merged**.
+
+---
+
+### **1.1.3 “Prod via Codespaces” requirements (PLAN/CRD)**
+
+When a PLAN or CRD for an HDE epic expects Live QA **“in prod via Codespaces”**, it must:
+
+1. **Name prod surfaces by title.**
+
+   * Name the production HD Engine service and base URL, and the production DB instance/schema by **title**, routing to *Glow Infrastructure* as the single home for those names.
+
+   * Do **not** invent new environment labels.
+
+2. **Clarify Codespaces role.**
+
+   * State explicitly that **Codespaces is a QA console** that runs CLI/HTTP commands against that production service and DB.
+
+   * Codespaces is **not** a prod environment in its own right.
+
+3. **Describe the prod handshake & artifact location (identity-only).**  
+* Describe, at a high level, the prod identity handshake step and where its artifact will live, for example:  
+   *“Step 0: curl the production `/internal/version` endpoint from Codespaces and store the output under `audit/qa/<epic-id>/logs/` before running deeper QA.”*  
+* Treat this handshake as an identity/pre-flight check only: it proves that the console can reach the production HD Engine, and records which `engine_tag`, `release_id`, commit, and `invocation_tag` are live at the time of QA.  
+* Live QA plans MUST NOT use `/internal/version` to satisfy any D-goals related to behavior (for example compat math, narratives, vendor ingest, admin bundle). Those goals require separate behavior steps that exercise prod-facing behavior surfaces and produce their own artifacts under `audit/qa/<epic-id>/...`.
+
+PLAN/CRD entries that refer to **“prod via Codespaces”** without these clarifications are **incomplete** and must be updated before the epic moves into implementation or Live QA.
+
+For epics that intend to run **vendor-first Live QA** (as described in §0.6.4 and §1.1.6) using the “prod via Codespaces” pattern above, the PLAN/CRD **MUST ALSO** ensure that:
+
+* The epic’s acceptance roster in **HDE Phased Epics** explicitly declares this posture by title (for example, an acceptance row that states that Live QA will exercise vendor-backed behavior in prod via Codespaces → Railway, with artifacts under `audit/qa/<epic-id>/...`), and
+
+* The Live QA Plan includes at least one **vendor-focused step** that:
+
+  * uses or references the prod identity handshake described above (for example the `/internal/version` artifact under `audit/qa/<epic-id>/logs/`) to anchor which engine instance is under test, **and**
+
+  * demonstrates a **vendor-backed end-to-end flow** (for example vendor-backed resolve or compat) executed against the production HD Engine service, with its own mechanical artifacts captured under `audit/qa/<epic-id>/...` as required by §1.1.4–§1.1.6.
+
+This identity+vendor step does **not** change the identity-only semantics of `/internal/version`: the handshake remains a pre-flight proof of “which engine is live,” while the vendor-backed flow in the same step (or tightly paired steps) is what satisfies the vendor behavior portion of the D-goals and is recorded in the PF20 acceptance roster.
+
+---
+
+### **1.1.4 Live QA mechanical evidence expectations**
+
+For **Live QA epics**, the PLAN and CRD must make the **mechanical evidence expectations explicit**:
+
+* For each Live QA step in the QA Plan, specify:
+
+  * The **commands to run** (CLI/HTTP), and
+
+  * The **concrete artifacts** (paths and filenames) that will be written under the canonical QA root:
+
+    * `audit/qa/<epic-id>/...`
+
+* Ensure that **every PO action** in the Live QA run produces at least one such artifact.
+
+PLAN/CRD authors must:
+
+* Reference §0.6 “Discipline” for the canonical requirements on mechanical evidence and directory casing.
+
+* Treat any PLAN/CRD that describes Live QA **without per-step mechanical evidence expectations under** `audit/qa/<epic-id>/...` as **incomplete**; it must be corrected before Live QA starts.
+
+### 1.1.5 Live QA behavior vs artifact pattern
+
+For Live QA steps that exercise **behavior** (for example compat, narratives, vendor ingest, admin bundle), the PLAN and CRD **MUST** follow a two-part pattern and make both parts explicit:
+
+1. Behavior run (prod-facing).
+
+   * Describe **where** the behavior is exercised: for example, an admin CLI run on a machine that can reach the production HD Engine base URL, or an admin GUI action in a browser hitting a Railway route.
+
+   * Specify the exact **inputs** and any expected **outputs** for that behavior run.
+
+   * If possible, include a prescribed way to capture outputs at the behavior environment (for example, saving JSON response bodies or logs to files that will later be moved into the repo).
+
+2. Artifact capture & analysis (Codespaces).
+
+   * Provide fenced commands for Codespaces that:
+
+     * Create or confirm the appropriate subdirectories under `audit/qa/<epic-id>/...` (for example `audit/qa/<epic-id>/d2-env/`, `.../d3-cli-guards/`, `.../logs/`).
+
+     * Copy or upload the artifacts from the behavior environment into the Codespace (for example via `scp`, `gh` upload, or another documented mechanism).
+
+     * Run offline validation against those artifacts (for example `python -m json.tool`, `cmp`, `sha256sum`, header checks), writing results to new files under `audit/qa/<epic-id>/...`.
+
+     * Append any human-readable notes via mechanical commands (for example `echo` into `qa_notes.md`), not manual editing.
+
+Plans **MUST NOT** conflate these two phases or imply that “running hdctl in Codespaces” alone is sufficient to satisfy prod behavior D-goals. Codespaces is the **artifact sink and analysis console**; the behavior itself must be exercised in a prod-facing environment, and the artifacts from that run must be brought into `audit/qa/<epic-id>/...` for analysis and evidence.
+
+### 1.1.6 PO Live QA vendor-first scope
+
+When a PLAN or CRD describes **PO Live QA** (a Live QA session that requires PO time), it **MUST**:
+
+* **Declare PO Live QA as vendor-first.** Clearly state that PO Live QA for this epic is a short, focused session whose primary goal is to exercise **live vendor behavior** against the production HD Engine and capture mechanical evidence of that behavior.
+
+* **Label vendor vs non-vendor steps.** For all Live QA steps, classify them into:
+
+  * **Vendor-focused** (class 3): steps that exercise vendor-backed flows (for example vendor-backed BodyGraph resolution, compat, vendor error behavior).
+
+  * **Ops/identity** (class 1): connectivity and identity checks (for example `/internal/version`).
+
+  * **Internal functional/determinism** (class 2): serializer/guard/sanity/determinism checks that can run under CI/QA without involving the PO.
+
+* **Identify the PO workload explicitly.** Identify the subset of Live QA steps that the PO is expected to run in a Live QA session:
+
+  * This subset **MUST** consist only of vendor-focused steps.
+
+  * Ops/identity and internal functional/determinism steps **MUST** be marked as **preconditions or CI/QA responsibilities**, not PO Live QA workload. They may be referenced as “pre-flight / internal” work but not scheduled into PO’s Live QA time.
+
+* **Tie vendor steps to mechanical vendor evidence.** For each vendor-focused PO step:
+
+  * Specify the **behavior run context** (prod-facing environment), per §1.1.5.
+
+  * Specify the **artifact capture & analysis** commands in Codespaces, including the paths and filenames under `audit/qa/<epic-id>/...` where vendor-related artifacts will be stored (for example JSON bodies, logs, error responses).
+
+  * Ensure that artifacts for vendor steps are clearly identifiable as vendor evidence (for example via a vendor-specific subdirectory or filename convention) so that they can be referenced from epic acceptance in *HDE Phased Epics* and from QA tokens in *Glow QA Guide* (titles-only).
+
+Plans that:
+
+* describe PO Live QA without labeling vendor vs non-vendor steps,
+
+* assign ops/identity or internal determinism steps to the PO’s Live QA workload, or
+
+* omit mechanical vendor evidence expectations for PO-run vendor steps under `audit/qa/<epic-id>/...`
+
+are **incomplete** and must be corrected before PO Live QA is scheduled.
+
+### **1.1.7 D3 CLI guard runs — CI vs open-rails Live QA**
+
+Live QA planning **MUST** explicitly distinguish between:
+
+1. **CI / closed-rails D3 guard runs (authoritative).**
+
+   * D3 CLI guard tokens (for example the serializer and emitter guard tokens defined by title in the HDE-Build Checklist and HDE-Mechanics Guide) are **authoritatively satisfied by CI and closed-rails runs**.
+
+   * The canonical D3 acceptance condition is: guard tools run under the closed determinism rails (for example `LC_ALL=C`, `LANG=C`, `TZ=UTC`, `SAFE_MODE=1`, `ALLOW_NETWORK=0` as defined by other PF docs) and **exit successfully**, with their evidence captured and indexed according to those documents.
+
+   * Live QA Plans **MUST NOT** assume that an open-rails Live QA environment is responsible for re-satisfying these D3 guard tokens; instead, they **MUST** point to the CI/closed-rails evidence when claiming D3 acceptance.
+
+2. **Open-rails Live QA guard runs (optional, env-enforcement only).**
+
+   * In an intentionally **open-rails** Live QA environment (for example, a Codespace used for prod-facing behavior tests and artifact capture per §0.6.3–§0.6.4), running the CLI guard tools is **optional** and is treated as an **env-enforcement check only**.
+
+   * In this context, a guard run that **fails solely due to env mismatch** (for example, exit code 1 because the environment is open rails instead of the closed determinism rails expected by CI) **MUST NOT** be treated as:
+
+     * a wiring bug, or
+
+     * a failure to satisfy D3 guard tokens.
+
+   * Live QA Plans **MUST**:
+
+     * State explicitly when a guard step is being run in an open-rails environment “for information only” (to confirm that guards enforce env pins), and
+
+     * Tie D3 guard tokens back to the CI/closed-rails runs, not to these open-rails checks.
+
+3. **Effect on PO Live QA.**
+
+   * For PO-run Live QA sessions in open-rails environments:
+
+     * Guard runs, if present, **MAY** be used to demonstrate that env pins are enforced,
+
+     * Guard failures due solely to env mismatch **MUST NOT** block PO Live QA or be interpreted as D3 token failures, and
+
+     * The Live QA Plan **MUST** refer back to the CI/closed-rails guard evidence as the source of truth for D3 acceptance.
+
+Plans that:
+
+* treat open-rails guard failures as D3 token failures, or
+
+* omit the CI vs open-rails distinction for guard steps,
+
+are **non-conforming** and **MUST** be corrected so that D3 acceptance is clearly anchored in CI/closed-rails runs, with open-rails guard runs documented as optional env-enforcement checks only.
 
 ## ---
 
@@ -558,7 +959,7 @@ execution\_flow:
 
   \- "IA: requests changes or APPROVES."
 
-  \- "PR-first via CodEx: CodEx opens PR \`epic/\<EPIC-ID\>-\<slug\>\` and pushes code \+ Doc-Delta (repo docs) \+ Evidence Index (human JSON) \+ Evidence Index hash sentinel \+ machine JSONL mirror (records-only, canonical, one LF, unknown keys rejected, ASCII field order, sort-before-write, single mirror file; each record has discovered\_physical\_path and a proof\_anchor to a path-proof file) \+ close-pack files (audit/EPIC-\<ID\>\_close\_report.md, audit/EPIC-\<ID\>\_MANIFEST.json)."
+  \- "PR-first via CodEx: CodEx opens PR \`epic/\<epic-id\>-\<slug\>\` and pushes code \+ Doc-Delta (repo docs) \+ Evidence Index (human JSON) \+ Evidence Index hash sentinel \+ machine JSONL mirror (records-only, canonical, one LF, unknown keys rejected, ASCII field order, sort-before-write, single mirror file; each record has discovered\_physical\_path and a proof\_anchor to a path-proof file) \+ close-pack files (audit/EPIC-\<ID\>\_close\_report.md, audit/EPIC-\<ID\>\_MANIFEST.json)."
 
   \- "When A7 is in scope, the PR also carries: Endpoint Catalog file (docs/ENDPOINTS\_CATALOG.json \+ .sha256), env-gate headers proof, and the composite success proof JSON (artifacts/proofs/reader\_success\_get\_head\_304.json) validated against the PF12 schema."
 
@@ -813,27 +1214,37 @@ Here’s a tightened, more logically structured version that makes the per-PR vs
 
 ---
 
-### **3.5 Close Gate (PR-first)**
+## **3.5 Close Gate (PR-first)**
 
-**Requirement.**
+### **3.5.1 Requirement**
 
-* For every epic, work is delivered **PR-first via CodEx**.
+1. For every epic, work is delivered **PR-first via CodEx**.
 
-* CodEx opens PRs automatically for each epic slice and pushes **code \+ Doc-Delta \+ evidence** in the **same PR**.
+2. CodEx opens PRs automatically for each epic slice and pushes **code \+ Doc-Delta \+ evidence in the same PR**.
 
-* An epic MAY use **up to 10 PRs** to deliver its full scope; **each PR** must be self-contained and follow the PR-first and parity rules in §0.2.
+3. An epic **MAY** use up to **10 PRs** to deliver its full scope; each PR **MUST** be self-contained and follow the PR-first and parity rules in §0.2.
 
-* The Product Owner (PO) is the sole merger (squash on PASS).
+4. The **Product Owner (PO)** is the sole merger (squash on PASS).
 
-* **Epic-level acceptance** (as recorded in **HDE Phased Epics**) occurs only after **all required PRs for that epic have merged** and the Close Gate has been satisfied.
+5. Epic-level acceptance (as recorded in **HDE Phased Epics**) occurs **only after**:
 
-The Close Gate applies to the **PR that carries the epic close-out** (“close PR”). All earlier PRs in the series must still be PR-first and parity-clean, but only the close PR is required to carry the full close-pack and final PASS roster described below.
+   * all required PRs for that epic have merged, **and**
 
----
+   * the **Close Gate** has been satisfied.
 
-**Close PR must contain**
+6. The Close Gate applies to the PR that carries the epic **close-out** (“close PR”).
 
-**Close-pack files**
+   * All earlier PRs in the series must still be PR-first and parity-clean,
+
+   * but **only the close PR** is required to carry the full close-pack and final PASS roster described below.
+
+   ---
+
+   ### **3.5.2 Close PR contents**
+
+   #### **3.5.2.1 Close-pack files**
+
+The close PR **MUST** include the epic close-pack:
 
 * `audit/EPIC-<ID>_close_report.md`
 
@@ -841,7 +1252,11 @@ The Close Gate applies to the **PR that carries the epic close-out** (“close P
 
 * PASS tokens section (final status; titles only, see §2.0 roster)
 
-**Core determinism & parity tokens**
+* `CLOSE_PACK_FILES_PRESENT_OK` (token confirming presence of the close-pack files)
+
+  #### **3.5.2.2 Core determinism & parity tokens**
+
+The close PR **MUST** demonstrate core determinism and parity via (titles only):
 
 * `DET_SERIALIZER_OK`
 
@@ -849,7 +1264,9 @@ The Close Gate applies to the **PR that carries the epic close-out** (“close P
 
 * `TWO_RUN_IDENTITY_OK`
 
-**Index/mirror trio (same PR)**
+  #### **3.5.2.3 Index/mirror trio (same PR)**
+
+The close PR **MUST** update the Evidence Index and machine mirror in the **same PR**, satisfying:
 
 * `EVIDENCE_INDEX_UPDATED_OK`
 
@@ -857,11 +1274,39 @@ The Close Gate applies to the **PR that carries the epic close-out** (“close P
 
 * `MACHINE_MIRROR_UPDATED_OK`
 
-**Close-pack presence**
+  #### **3.5.2.4 Repo-docs & evidence updates (same PR)**
 
-* `CLOSE_PACK_FILES_PRESENT_OK`
+The close PR **MUST** update, in the **same PR**:
 
-**When A7 is in scope (Catalog success route)**
+* **Human Evidence Index:** `docs/evidence/INDEX.json`
+
+* **Index hash sentinel:** `docs/evidence/INDEX.sha256`
+
+  * hash **MUST** match the bytes of `INDEX.json`
+
+* **Machine mirror:** `artifacts/evidence_index.jsonl`
+
+  * records-only canonical JSONL
+
+  * exactly one trailing LF
+
+  * unknown keys rejected
+
+  * ASCII field order
+
+  * sort-before-write
+
+  * single mirror file
+
+  * each record has `discovered_physical_path` \+ `proof_anchor` to a co-located path-proof
+
+* Repo index and acceptance crib notes
+
+* Doc-Delta note (if applicable)
+
+  #### **3.5.2.5 A7 tokens (when A7 is in scope — Catalog success route)**
+
+When A7 is in scope for the epic, the close PR **MUST** satisfy the relevant A7 tokens (titles only), including:
 
 * `A7_GET_QUOTED_ETAG_OK`
 
@@ -877,7 +1322,9 @@ The Close Gate applies to the **PR that carries the epic close-out** (“close P
 
 * `A7_TRANSPORT_PROOF_OK`
 
-**When `/internal/version` is in scope (ops surface)**
+  #### **3.5.2.6 /internal/version tokens (when in scope — ops surface)**
+
+When `/internal/version` is in scope, the close PR **MUST** satisfy:
 
 * `INTVER_200_CTYPE_JSON_UTF8_OK`
 
@@ -887,61 +1334,177 @@ The Close Gate applies to the **PR that carries the epic close-out** (“close P
 
 * `INTVER_200_NO_ETAG_OK`
 
-  ---
+  #### **3.5.2.7 A7 artifacts (when A7 is in scope; titles only)**
 
-**Repo-docs & evidence updates (same PR)**
+When A7 is in scope, the close PR **MUST** include the governed A7 artifacts (titles only):
 
-The close PR MUST update, in the **same PR**:
-
-* Human Evidence Index: `docs/evidence/INDEX.json`
-
-* Index hash sentinel: `docs/evidence/INDEX.sha256` (hash matches `INDEX.json` bytes)
-
-* Machine mirror: `artifacts/evidence_index.jsonl` (records-only canonical JSONL; one LF; unknown keys rejected; ASCII field order; sort-before-write; single mirror file; each record has `discovered_physical_path` \+ `proof_anchor` to a co-located path-proof)
-
-* Repo index and acceptance crib notes
-
-* Doc-Delta note (if applicable)
-
-**A7 artifacts** (include when A7 is in scope; titles only)
-
-* Endpoint Catalog file \+ checksum:
+* **Endpoint Catalog file \+ checksum:**
 
   * `docs/ENDPOINTS_CATALOG.json`
 
   * `docs/ENDPOINTS_CATALOG.json.sha256`
 
-* Env-gate headers-only proof:
+* **Env-gate headers-only proof:**
 
   * `artifacts/proofs/endpoints_env_gate_proof.log`
 
-* Composite success proof JSON (records-only; PF12 schema-validated):
+* **Composite success proof JSON** (records-only; PF12 schema-validated):
 
   * `artifacts/proofs/reader_success_get_head_304.json`
 
-  * Success headers: GET / HEAD / 304; writers/errors posture; encoding-invariance capture
+  * covers:
+
+    * success headers for **GET / HEAD / 304**,
+
+    * writers/errors posture,
+
+    * encoding-invariance capture.
 
   ---
 
-**Merge**
+  ### **3.5.3 Repo docs sweep (major epics)**
 
-* The **Lead Dev** performs the gate review on the close PR (checks PASS tokens, A7/ops applicability, index/mirror hygiene, governed locations only).
+For **major epics** (for example, HDE-EPIC018), the close PR **MUST** also include a final **“repo docs sweep”** that:
 
-* The **PO** squashes on PASS.
+1. **Aligns non-canonical repo docs.**  
+    Brings top-level, non-canonical repo docs — for example:
 
-* The **Scrum Master** is informed after merge.
+   * `README.md`
 
-* The **Implementation Agent (IA)** files the Closure Report and confirms that docs and evidence are synchronized in the merged PR.
+   * `CHANGELOG.md`
+
+   * `AGENTS.md`
+
+   * non-pfcanon files under `docs/**`
+
+2. into alignment with:
+
+   * the epic’s manifest and close report, and
+
+   * PF-Canon (by title).
+
+3. **Updates or retires older epic-specific guidance.**  
+    Brings older, epic-specific guidance (for example:
+
+   * EPIC011/EPIC017-only notes,
+
+   * Alpha/A7-only descriptions,
+
+   * outdated evidence practices)
+
+4. into line with the current epic’s rails and acceptance outcomes, **or** clearly retires it.
+
+5. **Does not modify PF-Canon itself.**  
+    The repo docs sweep **MUST NOT** modify any PF-Canon docs (for example files under `docs/pfcanon/**`). PF-Canon remains the single home for normative rules; the repo docs sweep is strictly an implementation-level alignment.
+
+6. **Lives in the close PR.**  
+    This repo docs sweep is part of the close-out tasks for such epics and is performed in the **same close PR** that carries:
+
+   * the close-pack,
+
+   * the index/mirror trio, and
+
+   * other close-out evidence.
+
+   ---
+
+   ### **3.5.4 ADR block in the close-pack (all epics)**
+
+The close PR **MUST** ensure that the epic’s close-pack includes a brief **ADR block** summarizing the key architectural and behavioral decisions made during the epic.
+
+At minimum, this ADR block **MUST**:
+
+1. **Use neutral, titles-only references back to PF-Canon**, for example:
+
+   * *Glow Infrastructure*
+
+   * *HDE-CLI-API-Vendor-Ref*
+
+   * *Glow QA Guide*
+
+   * *HDE Phased Epics*
+
+2. **List each decision as a short item** with:
+
+   * a **decision label** (for example “ADR — QA evidence root and directory casing”),
+
+   * a **one–two sentence statement** of the decision, and
+
+   * the **PF documents** that should receive the corresponding Doc Deltas (by title only).
+
+3. **Location.**  
+    The ADR block lives in the close report:
+
+   * `audit/EPIC-<ID>_close_report.md`
+
+4. and is part of the epic’s permanent record. Follow-on epics and doc-only work can then use it to drive PF-Canon deltas.
+
+   ---
+
+   ### **3.5.5 Remediation PR pattern (separate from Live QA)**
+
+Structural remediations that do **not** change engine behavior — for example:
+
+* directory casing normalization,
+
+* path refactors,
+
+* relocation of evidence files into governed roots —
+
+**MUST** be handled as explicit **remediation PRs**, not buried inside Live QA runs.
+
+1. **Separate remediation PRs.**  
+    Each remediation PR should:
+
+   * be tracked by its own card or PF10 addendum, and
+
+   * be scoped narrowly to the remediation at hand.
+
+2. **Live QA may depend on, but not perform, remediation.**  
+    Live QA plans **may depend** on such remediation PRs (for example, “EPIC017 QA evidence is consolidated under `audit/qa/hde-epic017/logs/`”), but Live QA steps themselves **MUST NOT** perform large-scale structural migrations as part of a PO session.
+
+3. **Close Gate responsibility.**  
+    The Close Gate for the epic **MUST** confirm that:
+
+   * any required remediation PRs have merged, and
+
+   * the close-pack and Evidence Index/mirror reflect the **post-remediation state**.
+
+4. Live QA evidence artifacts should assume those canonical paths, not improvise new ones.
+
+Using a distinct remediation PR pattern keeps Live QA focused on behavior and evidence capture, while structural cleanups are performed once, auditable, and referenced by title from **HDE Phased Epics** and **Build Notes**.
 
 ---
 
-Here’s a tightened, structured version of that whole block. I’ve kept every field, token, and artifact name; changes are only to wording, ordering, and clarity.
+### **3.5.6 Merge responsibilities**
+
+At Close Gate, merge responsibilities are:
+
+1. **Lead Dev.**  
+    Performs the gate review on the close PR:
+
+   * checks PASS tokens,
+
+   * checks A7/ops applicability,
+
+   * checks index/mirror hygiene,
+
+   * verifies governed locations only.
+
+2. **Product Owner (PO).**  
+    Squashes the close PR on PASS.
+
+3. **Scrum Master.**  
+    Is informed after merge.
+
+4. **Implementation Agent (IA).**  
+    Files the Closure Report and confirms that docs and evidence are synchronized in the merged PR.
 
 ---
 
-### **4\) PR & COMMIT PLAN (PR-first via CodEx; Lead Dev gates)**
+# 4\) PR & COMMIT PLAN (PR-first via CodEx; Lead Dev gates)
 
-#### **4.1 Machine header**
+## 4.1 Machine header
 
 type: PR\_COMMIT\_PLAN  
 epic\_id: "EPIC-?.?"  
@@ -965,7 +1528,7 @@ precommit\_prereqs:
   single\_finalization\_scope: "\<precisely what is finalized by this PR (one coherent slice)\>"  
   revert\_concept: "\<simple revert path: single squash commit rollback; no data loss; how to disable feature flag if applicable\>"
 
-#### **4.2 Required pre-merge evidence (titles-only; CodEx supplies artifacts)**
+## 4.2 Required pre-merge evidence (titles-only; CodEx supplies artifacts)
 
 premerge\_evidence\_required:  
   \- name: "PR\_OPENED\_OK"                      \# PR opened by CodEx using epic template; PASS tokens listed in body  
@@ -987,7 +1550,7 @@ premerge\_evidence\_required:
 
   \- name: "WRITERS\_ERRORS\_NOSTORE\_NOETAG\_OK"  \# Writers no-store; errors have Content-Type: application/json; charset=utf-8; no ETag
 
-#### **4.3 Guidance for PO (CodEx UI)**
+## 4.3 Guidance for PO (CodEx UI)
 
 * Do **not** create a PR manually. Confirm CodEx has opened the PR for this epic (PR ID present) and that the close pack \+ PASS tokens appear in the PR body.
 
@@ -1004,7 +1567,7 @@ premerge\_evidence\_required:
 
 * On PASS, perform a **squash merge**, then notify the Scrum Master.
 
-#### **4.4 PO approval and commit record**
+## 4.4 PO approval and commit record
 
 po\_approval:  
   decision: "APPROVED"  
@@ -1015,7 +1578,7 @@ commit\_record:
   commit\_id: ""  
   closeout\_evidence\_pointer: "\<pointer to close pack / proof bundle in PR\>"
 
-#### **4.5 PR template — evidence-only QA**
+## 4.5 PR template — evidence-only QA
 
 For PRs whose sole purpose is to verify evidence and transport posture **without** changing production code. Use titles only for cross-doc references. Keep the human Evidence Index \+ hash sentinel \+ machine mirror in the **same PR**.
 

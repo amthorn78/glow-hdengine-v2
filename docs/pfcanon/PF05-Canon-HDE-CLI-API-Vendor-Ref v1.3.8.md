@@ -4,13 +4,13 @@
 
 **Title:** PF05-Canon-HDE-CLI-API-Vendor-Ref
 
-**Version:** v1.3.5
+**Version:** v1.3.8
 
 **Status:** Canon
 
-**Effective date:** 2025-11-25
+**Effective date:** 2025-11-29
 
-**Last Update Gate:** BD 7.7.8 Drain A19
+**Last Update Gate:** BD 7.8.9 Drain A12
 
 ---
 
@@ -627,55 +627,81 @@ Exit codes follow §3.4. The mapping for `showcompat`:
 
 Error envelopes and streams follow §5.2.
 
-### 4.1.5 Determinism, parity, and acceptance (normative)
+### **4.1.5 Determinism, parity, environment, and acceptance (normative)**
 
 **Determinism (compat JSON and Reader envelope).**
 
 For a fixed pair and environment:
 
-* **AB↔BA parity.** Swapping the pair inputs (`a`,`b`) yields byte‑identical compat JSON on stdout and a byte‑identical Reader envelope (when produced).
+* **AB↔BA parity.** Swapping the pair inputs (`a`,`b`) yields byte-identical compat JSON on stdout and a byte-identical Reader envelope (when produced).
 
-* **Two‑run identity.** Running the same command twice with the same inputs/flags/environment produces identical stdout bytes and identical reader‑dump bytes (if enabled).
+* **Two-run identity.** Running the same command twice with the same inputs/flags/environment produces identical stdout bytes and identical reader-dump bytes (if enabled).
 
-* **Canonical JSON.** Re‑serializing outputs via the canonical emitter must yield identical bytes.
+* **Canonical JSON.** Re-serializing outputs via the canonical emitter must yield identical bytes.
 
 **Reader vs CLI parity.**
 
-* When CLI produces Reader v1 bytes via `--dump-reader`, those bytes **MUST** be byte‑identical to the Reader 200 body for the same inputs/environment.
+* When CLI produces Reader v1 bytes via `--dump-reader`, those bytes **MUST** be byte-identical to the Reader 200 body for the same inputs/environment.
 
-**Acceptance tokens (names‑only).** At minimum:
+**Environments for `showcompat` acceptance (dev harness vs vendor-backed).**
 
-* `CLI_SHOWCOMPAT_CANON_OK` — stdout compat JSON uses canonical emitter and canonical JSON rules.
+The behavior and tokens for `hdctl showcompat` are **environment-agnostic**: the same determinism, parity, and canonical JSON rules apply whether `showcompat` is exercised against:
+
+* a **dev harness** Reader surface with rails closed (`SAFE_MODE=1`, `ALLOW_NETWORK=0`), or
+
+* a **vendor-backed engine** with rails open (`SAFE_MODE=0`, `ALLOW_NETWORK=1`) that may resolve BodyGraphs via vendor HTTP subject to the Vendor Ingest rules in §7.
+
+This section constrains the CLI and transport bytes; it does **not** pick a single canonical environment. Instead:
+
+* In **dev/CI** contexts, `CLI_SHOWCOMPAT_CANON_OK` and related tokens may be satisfied via:
+
+  * `hdctl showcompat` invoking the compat engine locally and/or via a **dev harness** Reader route that runs entirely with closed rails (no vendor I/O), and
+
+  * evidence that AB↔BA parity, two-run identity, canonical JSON, and Reader↔CLI parity hold under those closed-rails conditions.
+
+* In **vendor-backed QA** contexts (for example Live QA from Codespaces to Railway prod), the same tokens may be exercised via:
+
+  * `hdctl showcompat` calling a vendor-backed engine with rails explicitly opened (`SAFE_MODE=0`, `ALLOW_NETWORK=1`), and
+
+  * evidence that, even in this open-rails environment, the compat stdout payload is canonical and the Reader v1 envelope bytes produced by the engine still satisfy the determinism and parity requirements above.
+
+The QA guide and epic records (by title only) **must declare** which environment is canonical for a given epic’s `CLI_SHOWCOMPAT_CANON_OK` and related tokens; PF05 provides the byte-level contract and rails constraints that must hold in whichever environment is chosen.
+
+**Acceptance tokens (names-only).** At minimum:
+
+* `CLI_SHOWCOMPAT_CANON_OK` — stdout compat JSON uses canonical emitter and canonical JSON rules in the chosen environment (dev harness or vendor-backed), with non-empty, LF-terminated bytes.
 
 * `CLI_STDOUT_LF_OK` — exactly one trailing LF on stdout compat JSON.
 
-* `PARITY_AB_BA_OK` — AB↔BA identity for stdout compat JSON and reader‑dump envelope.
+* `PARITY_AB_BA_OK` — AB↔BA identity for stdout compat JSON and reader-dump envelope in the chosen environment.
 
-* `TWO_RUN_IDENTITY_OK` — two‑run identity for stdout compat JSON (and reader‑dump when enabled).
+* `TWO_RUN_IDENTITY_OK` — two-run identity for stdout compat JSON (and reader-dump when enabled).
 
-* `CLI_READER_PARITY_OK` — reader‑dump bytes \== Reader 200 body.
+* `CLI_READER_PARITY_OK` — reader-dump bytes equal the Reader 200 body for the same inputs/environment.
 
-* `JSON_CANONICAL_CHECK_OK` — global canonicalization checks pass.
+* `JSON_CANONICAL_CHECK_OK` — global canonicalization checks pass for compat JSON and Reader envelopes.
 
-* `PREIMAGE_RECOMPUTE_OK` — idempotence preimage recompute for Reader envelope passes.
+* `PREIMAGE_RECOMPUTE_OK` — idempotence preimage recompute for Reader envelope `idempotence_hash` passes.
 
 * `CLI_IMPLEMENTED_SET_OK` — command present and wired as specified.
 
-**Evidence surfaces (titles‑only; PF12 owns schema).**
+These token names are owned by Governance and the QA guide; this section constrains the underlying `showcompat` behavior so that the tokens can be evaluated consistently in either dev harness or vendor-backed environments.
+
+**Evidence surfaces (titles-only; PF12 owns schema).**
 
 Examples (names may be adjusted in PF12):
 
-* `cli/showcompat/stdout` — exact stdout compat JSON bytes (non‑empty; LF‑terminated) \+ sha256.
+* `cli/showcompat/stdout` — exact stdout compat JSON bytes (non-empty; LF-terminated) plus sha256.
 
-* `cli/showcompat/two_run` — two‑run identity log.
+* `cli/showcompat/two_run` — two-run identity log.
 
 * `cli/showcompat/abba` — AB vs BA stdout diff (expected empty).
 
-* `cli/reader_vs_cli` — Reader vs CLI reader‑dump envelope diff (expected empty).
+* `cli/reader_vs_cli` — Reader vs CLI reader-dump envelope diff (expected empty).
 
-* `cli/showcompat/preimage_recompute` — preimage recompute log for Reader envelope idempotence\_hash.
+* `cli/showcompat/preimage_recompute` — preimage recompute log for Reader envelope `idempotence_hash`.
 
-All records must be indexed in `docs/evidence/INDEX.json` and mirrored in `artifacts/evidence_index.jsonl` in the same PR (PF12/PF04).
+Evidence must clearly indicate which environment (dev harness vs vendor-backed) each capture represents. All records must be indexed in `docs/evidence/INDEX.json` and mirrored in `artifacts/evidence_index.jsonl` in the same PR, per PF12.
 
 ### 4.1.6 Implementation status (audit v1)
 
@@ -959,6 +985,243 @@ Stdout/stderr follow the general rules in §3.3/§3.4:
   * Extend **HDE-Schemas & Artifacts** with BodyGraph export and optional composite “run bundle” schemas, and
 
   * Wire QA harnesses and evidence (PF14/PF19/PF20) to use these stateless artifacts.
+
+## **4.9 hdctl admin-bundle Required-Now; admin-only**
+
+### **4.9.1 Purpose and posture (normative)**
+
+hdctl admin-bundle is the canonical CLI surface for producing a full admin bundle for a single match. It exists to:
+
+* Compose, for a given pair, the full product payload that already exists in canon:
+
+  * the per-person BodyGraph JSON for each party
+
+  * the full compat JSON for the pair (all categories, scores, bands, narrative selection keys)
+
+  * three narrative compositions for the match
+
+  * a meta block with engine identity and rails context
+
+* Emit that composition as a single canonical JSON object (the admin bundle) for admin, QA, and internal product use.
+
+Posture:
+
+* Admin-only surface. The admin bundle is explicitly not a public Reader response and is not subject to the public numeric-free covenant. It may contain numeric scores and narrative text.
+
+* Pre-Glow product requirement. A build that cannot produce admin bundles via hdctl admin-bundle against Railway prod is considered unusable pre-Glow, regardless of any Admin GUI.
+
+* Not an A7 surface. Admin bundle transport is not part of the A7 proof surface; A7 proofs remain on cataloged Reader JSON success routes only.
+
+The mechanical implementation of the admin bundle builder (pure function or module inside the engine) is owned by the HDE-Mechanics Guide. This section defines the CLI contract that uses that builder.
+
+### **4.9.2 Inputs and environment targeting (normative)**
+
+hdctl admin-bundle takes inputs for a single pair and uses existing resolvers and compat logic; it does not introduce new math.
+
+Pre-Glow, inputs are birth-based. The CLI command must support:
+
+* Either a births-file option that points at a JSON file describing the two parties by birth tuples, or an equivalent structured set of flags for party A and party B birth details
+
+* Future support for user-id based inputs is reserved; when a user model is live, flags for user keys may be added and pinned in this section
+
+Exact flag names are pinned here:
+
+* hdctl admin-bundle
+
+  * Required pair inputs (pre-Glow): either
+
+    * births-file PATH, or
+
+    * a set of birth flags for party A and party B that map to the three-key vendor birth payload (birthdate, birthtime, location) as defined in Vendor Ingest
+
+  * Optional output file flag for the bundle (see below)
+
+  * Optional flags to select input source once a user model exists (user-a, user-b) are reserved for a later Doc-Delta
+
+Environment targeting:
+
+* hdctl admin-bundle must be able to run from any terminal that can reach the Railway production engine, not only from Codespaces.
+
+* Base URL resolution for remote calls is handled via the same configuration rules used for other CLI commands:
+
+  * read the prod engine base URL from Glow-Infrastructure governed configuration (for example a PROD\_ENDPOINTS file or environment variables such as HDE\_BASE\_URL)
+
+  * do not hard-code Codespaces-specific hostnames or ports
+
+  * any host with the same configuration and network reachability must be able to run hdctl admin-bundle
+
+When hdctl admin-bundle needs remote data, it must:
+
+* Use the existing engine resolvers and adapter policy described for showcompat and bg:resolve
+
+* Honor SAFE rails for any vendor calls; rails logic and vendor shaping remain owned by Governance and Vendor Ingest sections
+
+### **4.9.3 Admin bundle JSON shape (normative)**
+
+On success, hdctl admin-bundle produces a single JSON object, the admin bundle, with at least the following top-level keys:
+
+* a\_bodygraph: canonical BodyGraph JSON for person A
+
+* b\_bodygraph: canonical BodyGraph JSON for person B
+
+* compat: canonical compat JSON for the pair (full categories and meta as already defined for compat JSON in this document)
+
+* narratives: array of three narrative compositions for the match, each including at least composition identifiers and text
+
+* meta: meta information about the bundle and environment, including:
+
+  * engine\_tag
+
+  * release\_id
+
+  * invocation\_tag or equivalent invocation marker
+
+  * bundle source (CLI, GUI, or other)
+
+  * any rails context needed for audit (for example whether the bundle was built using birth-based inputs or user IDs when available)
+
+Semantics and constraints:
+
+* a\_bodygraph and b\_bodygraph reuse the existing canonical BodyGraph JSON shape defined in the HDE-Math-Spec, HDE-Mechanics Guide, and HDE-Schemas and Artifacts. This section does not restate their internal schema.
+
+* compat reuses the existing compat JSON shape already specified for hdctl showcompat:
+
+  * categories covers the full Magic-10 set with scores, bands, and narrative selection keys for each category
+
+  * compat meta continues to carry compat-level identity and viewer preference context
+
+* narratives contains exactly three entries:
+
+  * each entry includes at least:
+
+    * the composition identifier used by the narrative engine
+
+    * a pack identifier or SHA that identifies the narrative pack
+
+    * the narrative text itself
+
+  * the exact internal schema of each narrative entry is owned by the HDE-Narratives Guide and HDE-Narrative Deliverables; this section pins the requirement that three narrative compositions for the match are present
+
+* meta is part of the admin-only surface. It may include identifiers used to correlate this bundle with other logs and evidence; it is not the public Reader identity.
+
+The admin bundle must be:
+
+* canonical JSON emitted by the single presenter/emitter:
+
+  * UTF-8 without BOM
+
+  * keys sorted in ASCII order
+
+  * compact separators
+
+  * exactly one trailing newline character
+
+  * any arrays that represent sets deduplicated and ASCII-sorted
+
+* admin-only:
+
+  * may contain numeric scores and narrative text
+
+  * not constrained by the numeric-free public covenant that applies to Reader v1 success envelopes
+
+* used consistently across admin surfaces:
+
+  * the CLI admin-bundle command and the admin HTTP route must produce byte-identical bundles for the same inputs and environment
+
+### **4.9.4 Streams, exit codes, and destination (normative)**
+
+hdctl admin-bundle follows the global streams and exit code rules:
+
+* On success (exit 0):
+
+  * either writes the admin bundle JSON to stdout and leaves stderr empty, or
+
+  * writes the admin bundle JSON to a specified output file and prints a short, numeric-free synopsis to stdout, leaving stderr empty
+
+* On usage errors (exit 64):
+
+  * prints a short synopsis to stderr; stdout remains empty
+
+* On typed failures (exit 2):
+
+  * prints a typed error JSON object to stderr using the standard error shape and canonical JSON rules; stdout remains empty
+
+* No mixed streams: public bytes for the admin bundle never interleave with diagnostics
+
+When writing to a file:
+
+* the file must be emitted with canonical JSON and exactly one trailing newline
+
+* the file path must be accepted via an explicit flag and must not overlap with governed Evidence Index paths unless explicitly documented in HDE-Schemas and Artifacts
+
+### **4.9.5 Authentication, authorization, and admin-only gating (normative)**
+
+hdctl admin-bundle must always enforce authentication and authorization before an admin bundle can be obtained:
+
+* A secret admin credential must be required for all admin bundle requests:
+
+  * high-entropy value
+
+  * not checked into the repository
+
+  * stored as a secret in Railway or equivalent infrastructure
+
+* The CLI must present this credential with every admin-bundle request to the engine:
+
+  * for example, via an Authorization header or another explicit header pinned in the admin HTTP route section
+
+* The admin credential must not be printed, logged, or echoed in errors. Keys-only logging posture still applies.
+
+Admin-only gating:
+
+* If the required credential is missing or invalid, the engine must:
+
+  * reject the admin bundle request
+
+  * return a typed, numeric-free error via the HTTP route
+
+  * surface a typed error on stderr for the CLI
+
+* An unauthenticated request must never receive the full admin bundle.
+
+Post-Glow, authentication for admin surfaces must align with the wider identity and auth model for app admins and users; until that is pinned, this section requires that pre-Glow admin surfaces are not left open in production.
+
+### **4.9.6 Logging, audit, and parity (normative)**
+
+Every successful hdctl admin-bundle call must produce an audit trail:
+
+* Logs must record:
+
+  * the timestamp of the request
+
+  * whether the caller used CLI or an Admin GUI
+
+  * a high-level description of the input:
+
+    * for birth-based runs: that it was a birth-based match for two anonymous parties
+
+    * for future user-based runs: user identifiers used, without including raw birth or other PII
+
+  * a correlation identifier that allows operators to trace the request across logs and systems
+
+Logs must:
+
+* follow keys-only posture (no secrets, no full payload bodies, no vendor responses)
+
+* be governed by Glow QA Guide and HDE-Governance for retention and PII handling
+
+Parity expectations:
+
+* For the same inputs and environment, hdctl admin-bundle and the admin HTTP route must produce byte-identical admin bundle JSON.
+
+* Future QA tokens that enforce:
+
+  * CLI and HTTP admin bundle parity
+
+  * bundle structural completeness (BodyGraphs, compat, narratives, meta present)
+
+  * required authentication for admin surfaces  
+     will be owned and named in HDE-Governance and Glow QA Guide. This section requires the underlying behavior and byte equality; token names are referenced there.
 
 ---
 
@@ -1483,6 +1746,210 @@ Update the **human index**, its **hash sentinel**, and the **machine mirror** in
 
 **Acceptance impact:** None; documents implemented ops path for auditability.
 
+## **5.10 Admin bundle HTTP route (admin-only; non-public) Required-Now**
+
+### **5.10.1 Purpose and posture**
+
+The admin bundle HTTP route is the canonical HTTP surface for returning the full admin bundle JSON for a single match, for use by an Admin GUI and other internal tools.
+
+Purpose:
+
+* Provide a single HTTP route that composes:
+
+  * per-person BodyGraph JSON for both parties
+
+  * full compat JSON for the pair
+
+  * three narrative compositions for the match
+
+  * a meta block with engine identity and bundle provenance
+
+* Allow an Admin GUI to query Railway prod and display the full product payload for a match using the same bundle as the CLI.
+
+Posture:
+
+* Admin-only route. This route is not a public Reader JSON success route and is not part of the A7 proof surface.
+
+* Not cataloged for A7. It must not be listed as a JSON success endpoint in the Endpoint Catalog used for A7 proofs.
+
+* Not numeric-free. The admin bundle may include numeric scores and narrative text; the public numeric-free covenant continues to apply only to the Reader v1 success envelope.
+
+  ### **5.10.2 Route, method, and request body (normative)**
+
+Route and method:
+
+* Method: POST
+
+* Path: an admin path pinned here, for example:
+
+  * POST /admin/bundle
+
+* The exact path string chosen here is the canonical bytes; any aliases must produce byte-identical responses and headers.
+
+Request body:
+
+* JSON request describing the two parties whose match should be bundled:
+
+  * pre-Glow:
+
+    * birth-based payload describing the two parties by birth tuples, sufficient for the engine to resolve BodyGraphs using existing resolvers and adapter policy
+
+  * post user-model (future):
+
+    * request body that can address two parties by canonical user identifiers
+
+This section constrains behavior, not the internal schema of the request beyond requiring that:
+
+* the request body is JSON
+
+* it is emitted and processed as UTF-8 without BOM
+
+* it is validated and rejected with a typed error if required fields are missing or malformed
+
+The exact request shape for birth-based and user-based inputs is owned by the HDE-Mechanics Guide and Schemas and Artifacts. PF05 requires that the admin bundle route accepts a single JSON object describing the two parties and returns the admin bundle for that pair.
+
+### **5.10.3 Response body and headers (normative)**
+
+On success:
+
+* Status: 200
+
+* Headers:
+
+  * Content-Type: application/json; charset=utf-8
+
+  * Cache-Control: private, max-age=0, must-revalidate
+
+  * No ETag requirement for admin bundle responses; this route is not an A7 proof surface
+
+* Body:
+
+  * the admin bundle JSON object defined in the CLI section, with top-level keys:
+
+    * a\_bodygraph
+
+    * b\_bodygraph
+
+    * compat
+
+    * narratives
+
+    * meta
+
+  * emitted as canonical JSON:
+
+    * UTF-8 without BOM
+
+    * keys sorted in ASCII order
+
+    * compact separators
+
+    * exactly one trailing newline character
+
+    * arrays that represent sets deduplicated and ASCII-sorted
+
+On error:
+
+* Status:
+
+  * usage or validation errors, authentication failures, or authorization failures:
+
+    * use the existing error taxonomy (typed error body, numeric-free)
+
+* Headers:
+
+  * Content-Type: application/json; charset=utf-8
+
+  * Cache-Control: no-store
+
+  * No ETag
+
+* Body:
+
+  * typed, numeric-free error object as defined in the error model section
+
+  * must not echo secrets, raw birth data, or full bundle content
+
+This route must never return a body that follows the public Reader v1 six-key envelope shape. It always returns either an admin bundle or a typed error body.
+
+### **5.10.4 Authentication, authorization, and admin-only gating (normative)**
+
+The admin bundle HTTP route must be protected by authentication and authorization:
+
+* Every successful admin bundle response must be the result of an authenticated, authorized admin request.
+
+* Pre-Glow minimal requirement:
+
+  * a secret admin credential must exist and be stored as a secret in Railway or equivalent infrastructure
+
+  * the route must require this credential on every request, for example:
+
+    * using an Authorization header that carries a bearer token, or
+
+    * another explicit header pinned for admin use only
+
+* When the credential is missing, invalid, or expired:
+
+  * the route must return a typed error indicating that admin authorization is required
+
+  * the body must be a typed, numeric-free error object
+
+  * no part of the admin bundle may be returned
+
+Post-Glow:
+
+* the authentication and authorization model for admin surfaces must align with the wider app identity and auth model
+
+* until that is pinned, the requirement that admin bundle routes are not left open in production remains in force
+
+This route is not accessible to end users; only admin operators or admin GUI services with the correct credential may call it.
+
+### **5.10.5 Logging and audit (normative)**
+
+Every successful admin bundle HTTP request must be logged and auditable:
+
+* Logs must capture:
+
+  * timestamp
+
+  * caller identity (for example which admin account or client application invoked the route)
+
+  * a high-level description of inputs:
+
+    * for birth-based requests: that the bundle was generated from two birth tuples
+
+    * for user-based requests when available: identifiers for user A and user B without including raw birth details or other PII beyond what Governance permits
+
+  * a correlation identifier usable across logs
+
+Logs must follow keys-only posture:
+
+* no secrets
+
+* no complete request or response bodies
+
+* no vendor payloads
+
+These logs are operations logs and are governed by Glow QA Guide and HDE-Governance for retention, PII handling, and security.
+
+### **5.10.6 Parity with CLI admin bundle (normative)**
+
+For a given pair of parties and environment:
+
+* The admin bundle HTTP route must produce an admin bundle that is byte-identical to the bundle produced by hdctl admin-bundle, once both are emitted as canonical JSON.
+
+* Differences in where meta fields are populated (for example engine\_tag or invocation\_tag) must be controlled; for the same engine instance and configuration the CLI and HTTP bundles must match, including meta.
+
+Future QA tokens that enforce:
+
+* parity between CLI and HTTP bundle outputs
+
+* structural completeness of the bundle
+
+* enforcement of authentication for admin surfaces
+
+will be owned and named in Governance and QA documents. PF05 requires the underlying parity behavior between the CLI and HTTP admin bundle surfaces.
+
 ---
 
 # 6\. Serializer Canon & Single Emitter \[Required-Now\]
@@ -1517,12 +1984,23 @@ Update the **human index**, its **hash sentinel**, and the **machine mirror** in
 
 **Evidence (records-only; titles-only; indexed via PF12)**
 
-* `grep_guard/report` — proves no disallowed serializers on public paths.  
-* `emitter_symbol/proof` — import-graph or reflection proof of the shared presenter symbol used by Reader and CLI.  
-* `parity/fixtures` — byte-compare cases showing **CLI stdout equals Reader body** for the same inputs (see parity artifacts referenced in **PF12 Appendix C**).  
-* **Indexing discipline:** update **PF12** human Evidence Index and hash sentinel and the machine mirror **in the same PR**; each mirror record includes `artifact_key`, `sha256`, `size_bytes`, `produced_at_utc`, `discovered_physical_path`, and `proof_anchor` (transcript anchor \+ on-disk stat).
+* **Serializer grep guard (CLI scope).**  
+   `artifacts/cli/guards/serializer_grep_guard.log` — AST-based grep guard over the governed CLI scope (`engine/cli/**`) proving there are **no ad-hoc serializers** on public paths. The guard runs under determinism pins (`LC_ALL="C"`, `LANG="C"`, `TZ="UTC"`, `SAFE_MODE=1`, `ALLOW_NETWORK=0`) and emits a stable PASS/FAIL summary and sorted violation list without timestamps or env-dependent content.
 
-**Routing (titles-only).** Canonical JSON rules: **HDE-Schemas & Artifacts (§4)**. Governance tokens: **HDE-Governance (§2.0 Acceptance Tokens)**.
+* **Shared emitter symbol proof (CLI handlers).**  
+   `artifacts/cli/guards/emitter_symbol_proof.txt` — import-graph/AST proof that governed CLI handlers (at minimum `showcompat` and `bg:resolve`) call only the **allow-listed presenter/emitter symbols** (for example `emitter.emit_public`, `emit_reader_public_envelope`) for public bytes. Optional handlers such as `aux-preview` may be listed with an explicit `<none>` emitter entry when exempt; in that case the proof remains PASS for required handlers and still surfaces the exemption as governed evidence.
+
+* **Parity fixtures (Reader↔CLI, AB↔BA, two-run).**  
+   Reader/CLI parity and AB↔BA/two-run identity fixtures for compat and Reader v1 envelopes (for example `artifacts/cli/ab.json`, `artifacts/cli/ba.json`, `artifacts/cli/summary.json`, `artifacts/cli/reader_cli_parity.bytes`, and related harness outputs) remain listed and schema-governed in **HDE-Schemas & Artifacts** (titles-only) and are referenced here only as the parity evidence family for §6.2.
+
+* **Indexing discipline (PF12 single home).**  
+   All guard and parity artifacts **MUST**:
+
+  * be listed in the human Evidence Index (`docs/evidence/INDEX.json` with `docs/evidence/INDEX.sha256` sentinel), and
+
+  * have corresponding Machine Mirror records in `artifacts/evidence_index.jsonl`,
+
+* updated in the **same PR** as any change to the artifacts. Each mirror record uses canonical JSONL (UTF-8; ASCII-sorted keys; compact; one LF) with **exactly** the field set and order defined in **HDE-Schemas & Artifacts** and includes a `proof_anchor` pointing to a co-located `*.path_proof.txt` transcript for the artifact’s `discovered_physical_path`, `sha256`, `size_bytes`, and `produced_at_utc`. PF05 does not define mirror schema; it relies on PF12 as the single home for Evidence Index and mirror rules.
 
 ## 6.3 Idempotence preimage recipe (Reader/CLI parity) \[Required-Now\]
 
@@ -2087,11 +2565,67 @@ If you want, I can also append the required **titles** for those BodyGraph artif
 
 * **Parity evidence, not a product surface.** The harness exists to prove schema/LF, AB↔BA, two-run, and Reader↔CLI byte parity; it does not relax any privacy rules. 
 
-  
+## **10.4 Admin surfaces: authentication, authorization, and audit**
 
-  # **11\. Change Log & Doc-Delta Hooks \[Required-Now\]**
+Admin-only surfaces:
 
-  ## **11.1 Change Log (concise, normative)**
+* hdctl admin-bundle
+
+* the admin bundle HTTP route
+
+* any future admin-only routes that expose full product payloads
+
+must follow stricter authentication and audit rules than public Reader or dev harness endpoints.
+
+Authentication and authorization:
+
+* All admin bundle surfaces must require a valid admin credential for access in production.
+
+* Pre-Glow:
+
+  * a high-entropy secret or equivalent credential must be provisioned as a Railway or infrastructure secret
+
+  * CLI and HTTP admin bundle calls must present this credential; unauthenticated calls must not receive an admin bundle
+
+* Post-Glow:
+
+  * admin surfaces must align with the app-level admin identity model once it is defined; until then, they must not be left open
+
+Logging and audit:
+
+* Every successful admin bundle operation must be logged in operations logs with:
+
+  * timestamp
+
+  * caller identity or account
+
+  * a high-level description of the requested match
+
+  * a correlation identifier for tracing
+
+* Logs must:
+
+  * remain keys-only (no secrets, no full bundle payloads, no vendor bodies)
+
+  * be governed by the same retention and PII constraints as other operations logs
+
+QA hooks (names-only; owned elsewhere):
+
+* Governance and QA documents will define QA tokens that ensure:
+
+  * parity between CLI and HTTP admin bundle outputs
+
+  * that admin bundles contain the required structural elements (BodyGraphs, compat JSON, three narratives, meta)
+
+  * that admin surfaces are not callable without the admin credential
+
+* PF05 does not define token semantics; it requires that CLI and HTTP surfaces be designed so such QA checks can be implemented and tied to evidence in the Evidence Index.
+
+Admin surfaces are never part of the Reader public covenant and must remain clearly separated from the A7 success surfaces defined for Reader.
+
+# **11\. Change Log & Doc-Delta Hooks \[Required-Now\]**
+
+## **11.1 Change Log (concise, normative)**
 
 * **Policy.** Log normative deltas only—changes that affect math, the public contract/transport, or acceptance evidence. Pure editorial moves (reordering, wording without byte/evidence impact) need not be logged.  
 * **Entry style.** One line per version, action-oriented, with verbs and the smallest set of affected sections/anchors.  

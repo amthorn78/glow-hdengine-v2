@@ -3,10 +3,10 @@
 ## 0.1 **Header**
 
  **Title:** PF14-Canon-HDE-Mechanics Guide  
- **Version:** v1.9.5  
+ **Version:** v2.0.3  
  **Status:** Canon  
- **Effective date:** 2025-11-25  
- **Last Update Gate:** BN 7.7.8 Drain A11  
+ **Effective date:** 2025-11-29  
+ **Last Update Gate:** BN 7.8.9 Drain A20  
  **Invocation tag:** INV-f2ac55d77ce9aacc
 
 ---
@@ -166,6 +166,12 @@ The HD Engine computes per-category compatibility and drives which copy lines ap
 * No public UI; the engine sits behind the app.  
 * No direct Internet exposure.  
 * No business policy beyond inputs; app controls product flow.
+
+## 0.5 Section Update Log
+
+### HDE-EPIC018 Updates
+
+37.6, 18.5, 17.8, 3.8, 17.11, 17.12
 
 ---
 
@@ -344,7 +350,8 @@ Mechanics does **not** redefine these semantics here; it routes to PF-Canon-HDE-
 * **Evidence & indices:** `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`  
 * **Determinism:** `TWO_RUN_IDENTITY_OK`, `COMPOSITE_ABBA_IDENTITY_OK`, `JSON_CANONICAL_CHECK_OK`  
 * **Rails posture:** `ENV_RAILS_POLICY_OK`  
-* **Ops start-command:** `SERVICE_START_CMD_CAPTURED_OK`, `GUNICORN_APP_FACTORY_OK`, `ENV_PORT_REQUIRED_OK`
+* **Ops start-command:** `SERVICE_START_CMD_CAPTURED_OK`, `GUNICORN_APP_FACTORY_OK`, `ENV_PORT_REQUIRED_OK`  
+* 
 
   # 2\) Canonical Enumerations Registry
 
@@ -531,6 +538,212 @@ Mechanics does not carry alias ledger content or catalog values; it only enforce
 * Canonical rules & mirror schema: **PF-Canon-HDE-Schemas & Artifacts**.  
 * Math semantics & constants: **PF-Canon-HDE-Math-Spec**.  
 * Evidence policy & governance tokens: **PF-Canon-HDE-Governance**.
+
+## **3.7 Config artifacts (Magic-10 and band edges)**
+
+**Purpose (normative).**  
+ The Programmatic Configuration System must emit **governed configuration artifacts** for the Magic-10 category configuration and band thresholds, alongside the registry report. These artifacts are the canonical, deterministic configuration views used by the engine math and by QA; schemas and artifact keys remain single-homed in HDE-Schemas & Artifacts, and token semantics remain in HDE-Governance and the Glow QA Guide.
+
+### **3.7.1 Generator posture (closed rails, canonical JSON)**
+
+The configuration generator responsible for producing governed config artifacts **MUST**:
+
+* Run under closed rails and determinism pins before writing any governed config artifact:
+
+  * SAFE\_MODE \= 1
+
+  * ALLOW\_NETWORK \= 0
+
+  * LC\_ALL \= C
+
+  * LANG \= C
+
+  * TZ \= UTC
+
+* Use the typed loader behavior defined in §3.1 to read catalogs, manifest, and any thresholds inputs.
+
+* Emit all config artifacts via the Canonical Serialization Package (see §4 and §10.1):
+
+  * UTF-8, no BOM
+
+  * ASCII-sorted keys
+
+  * compact separators
+
+  * exactly one trailing line feed
+
+  * arrays that represent sets deduped and ASCII-sorted before emission
+
+Two-run identity **MUST** hold for each governed config artifact: running the generator twice with identical inputs and environment yields byte-identical JSON.
+
+Implementation note (informative).  
+ In the current engine repository, this behavior is implemented by a closed-rails generator script in tools/config/generate\_config\_artifacts.py and helper functions in tools/config/artifacts.py. These names are informative only; the normative rules remain those in this section and in HDE-Schemas & Artifacts.
+
+### **3.7.2 Magic-10 config artifact**
+
+The configuration system **MUST** materialize a governed Magic-10 configuration artifact whose schema and artifact\_key are owned by HDE-Schemas & Artifacts (for example, magic10\_config.v1 and config.magic10). At a minimum, this artifact:
+
+* Captures the **Magic-10 category order** exactly as used by the engine (closed set and pinned order).
+
+* Records per-category configuration and bounds, including:
+
+  * numeric caps for inputs and derived scores (integer bounds), and
+
+  * any additional per-category configuration metadata required by the engine math.
+
+* Records **seed metadata** for the Magic-10 configuration as a structured block, including at least:
+
+  * template identifier (template\_id),
+
+  * seed version (seed\_version),
+
+  * updated\_at\_utc (UTC ISO time, semantics single-homed in HDE-Schemas & Artifacts and Glow QA Guide), and
+
+  * checksum\_sha256 over the underlying config source or thresholds used to derive this artifact.
+
+* Emits canonical, deterministic JSON governed by the rules in §3.7.1 and §4.
+
+The Magic-10 config artifact is admin/test-only; the public Reader surface remains bands-only and numeric-free as described in the preamble and in HDE-CLI-API-Vendor-Ref.
+
+### **3.7.3 Band-edges config artifact**
+
+The configuration system **MUST** also materialize a governed band-edges configuration artifact whose schema and artifact\_key are owned by HDE-Schemas & Artifacts (for example, band\_edges.v1 and config.band\_edges). At a minimum, this artifact:
+
+* Captures band labels and numeric edges for the engine’s banding policy (such as inclusive-high thresholds).
+
+* Records, in a names-only form, the clamp and rounding behavior used by the engine (for example, clamp bounds and the rounding mode consistent with round\_half\_up in HDE-Math-Spec).
+
+* Carries a version tag and a structured pointer back to the thresholds input used to derive it (for example, a reference to the thresholds pack or math thresholds source discussed in §7.3 and in HDE-Schemas & Artifacts).
+
+* Emits canonical JSON governed by §3.7.1 and §4, under the same two-run identity requirements as the registry report.
+
+Band-edges configuration is admin/test-visible only; band mechanics and public band behavior remain specified in HDE-Math-Spec and in the Category Framework (§7).
+
+### **3.7.4 Evidence and acceptance map (routing only)**
+
+Governed config artifacts participate in the same evidence skeleton as other artifacts described in §1.3 and §25:
+
+* Each config artifact (registry report, Magic-10 config, band-edges config) **MUST** appear in the human Evidence Index with a title and discovered path, and have a corresponding record in the machine mirror with sha256, size\_bytes, produced\_at\_utc, role, and proof\_anchor.
+
+* Each config artifact **MUST** have a co-located path-proof transcript referenced by proof\_anchor; governed evidence tools described in §1.3.1 are the only writers for these path-proofs and the mirror.
+
+Mapping of PF09 tasks and QA tokens to config artifacts and tests lives in the config acceptance map and QA documents by title (HDE-Build Checklist, HDE-Schemas & Artifacts, Glow QA Guide, and HDE Phased Epics). PF14 records only that governed config artifacts exist, are generated under closed rails, are canonical and two-run identical, and are part of the evidence skeleton; it does not duplicate the acceptance map schema or token definitions.
+
+## **3.8 Typed FE/BE config bundles (projections of governed config)**
+
+**Purpose (normative).**  
+ The Programmatic Configuration System must expose **typed configuration bundles** for backend and frontend consumers as **read-only projections** of the governed config artifacts and registry state described in §3.3 and §3.7. These bundles are canonical JSON snapshots used by internal code and adapters; schemas and artifact\_keys remain single-homed in HDE-Schemas & Artifacts, and token semantics remain in HDE-Governance and the Glow QA Guide.
+
+### **3.8.1 Generator posture (closed rails, canonical JSON)**
+
+The bundle generator responsible for producing FE/BE config bundles **MUST**:
+
+* Run under closed rails and determinism pins before computing or writing any bundle:
+
+  * SAFE\_MODE \= 1
+
+  * ALLOW\_NETWORK \= 0
+
+  * LC\_ALL \= C
+
+  * LANG \= C
+
+  * TZ \= UTC
+
+* Load configuration exclusively through the typed loader described in §3.1 and the governed config artifacts described in §3.7 (registry report, Magic-10 config, band-edges config), without introducing new configuration sources.
+
+* Emit both bundles using the Canonical Serialization Package (§4 / §10.1):
+
+  * UTF-8, no BOM
+
+  * ASCII-sorted keys
+
+  * compact separators
+
+  * exactly one trailing line feed
+
+  * arrays that represent sets deduped and ASCII-sorted before emission
+
+Two-run identity **MUST** hold for each bundle: generating FE and BE bundles twice with identical inputs and environment yields byte-identical JSON.
+
+Implementation note (informative).  
+ In the current engine repository, this behavior is implemented by a closed-rails bundle builder in engine/config/bundles.py and a CLI script in tools/config/generate\_bundles.py. These names are informative only; the normative rules remain those in this section and in HDE-Schemas & Artifacts.
+
+### **3.8.2 Backend config bundle (internal scope)**
+
+The backend bundle is a governed config snapshot whose artifact\_key and schema tag are owned by HDE-Schemas & Artifacts (for example, config\_bundle.be and config\_bundle.be.v1). At a minimum, this bundle:
+
+* Includes the **full Magic-10 configuration** as derived from the Magic-10 config artifact:
+
+  * closed category order,
+
+  * per-category caps and other configuration parameters, and
+
+  * the seed metadata block (template identifier, seed version, updated\_at\_utc, checksum) consistent with §3.7.2.
+
+* Includes the **full band-edges payload** as derived from the band-edges config artifact:
+
+  * band labels, edges, clamp behavior, rounding mode, version, and source pointer consistent with §3.7.3.
+
+* Includes the **registry-backed domain view** needed by backend scoring and ordering logic, such as:
+
+  * channels with ids, gates, centers, circuit\_primary/substream, primary\_domain, domains, and any flags required by the engine,
+
+  * centers and domains as recorded in the registry report, and
+
+  * alias\_policy in a names-only form consistent with §3.1 and §3.3.
+
+* Carries a structured **sources** block that, for each upstream governed config artifact used (for example, registry\_report, Magic-10 config, band-edges config), records at least path, sha256, and size\_bytes values matching the current Evidence Index / Machine Mirror entries.
+
+The backend bundle is internal/admin-visible only and serves as a typed configuration source for backend consumers; it does not define public Reader or CLI bytes.
+
+### **3.8.3 Frontend config bundle (client-facing scope)**
+
+The frontend bundle is a governed config snapshot whose artifact\_key and schema tag are owned by HDE-Schemas & Artifacts (for example, config\_bundle.fe and config\_bundle.fe.v1). At a minimum, this bundle:
+
+* Provides a **slimmed view of Magic-10 configuration** suitable for clients:
+
+  * Magic-10 category order and caps, and
+
+  * any additional per-category configuration needed for UI behavior.
+
+* Provides a **reduced band-edges view**:
+
+  * band labels, edges, clamp behavior, rounding mode, and version, with a names-only reference back to the same thresholds source used for the backend bundle.
+
+* Exposes **channel identifiers and related metadata** required by clients:
+
+  * channel ids plus associated centers and domains, and
+
+  * alias policy in the same names-only form as the backend bundle.
+
+* Carries a **sources** block with the same structure and guarantees as the backend bundle, so clients can verify that FE config reflects the current governed config artifacts and registry state.
+
+The frontend bundle is intended for FE/client consumption and must not introduce new semantics beyond what is already defined by the governed config artifacts and registry report. It remains an internal, governed artifact; public Reader and CLI contracts are still owned by HDE-CLI-API-Vendor-Ref.
+
+### **3.8.4 Schemas and evidence (routing only)**
+
+Typed bundle structures are validated in tests against JSON Schemas that live alongside the code, but those schemas are **not** PF-canonical until HDE-Schemas & Artifacts is updated to include them. For now:
+
+* HDE-Schemas & Artifacts owns the canonical **artifact\_keys**, path conventions, and any future bundle schema catalogs; PF14 references bundles and their schemas by title only and does not restate the JSON schemas here.
+
+* Each bundle **MUST**:
+
+  * appear in the human Evidence Index with an artifact\_key and discovered\_physical\_path,
+
+  * have a corresponding record in the machine mirror with sha256, size\_bytes, produced\_at\_utc, role, and proof\_anchor, and
+
+  * have a co-located path-proof transcript referenced by proof\_anchor.
+
+* Tests for typed bundles **MUST**:
+
+  * prove canonical formatting and two-run identity,
+
+  * validate bundle structures against the local JSON Schemas, and
+
+  * assert that Magic-10, band-edges, channels, centers, domains, alias\_policy, and the sources block are consistent with the governed config artifacts and registry report described in §3.3 and §3.7.
+
+PF14 does not introduce new acceptance tokens for bundles; token names and gating for config bundles remain single-homed in HDE-Governance, HDE-Build Checklist, Glow QA Guide, and HDE Phased Epics.
 
 # 4\) Canonical Serialization Package
 
@@ -742,13 +955,35 @@ List by **title/path** in **Appendix D: Evidence Index** and mirror **1:1** in `
 
 ---
 
-## 7.3 Band thresholds & tuning (admin)
+## **7.3 Band thresholds and tuning (admin)**
 
-**Registry only (titles-only).** Mechanics maintains the authoring workflow for number→band thresholds (global or per-category) and the associated tooling; it does **not** restate numeric values.
+**Registry only (titles-only).**  
+ Mechanics maintains the authoring workflow for number-to-band thresholds (global or per-category) and the associated tooling; it does not restate numeric values. Band thresholds are internal/admin configuration only; the public Reader surface remains bands-only and numeric-free.
 
-**Normative sources.** Inclusive-high policy and `24/49/74/100` global edges: **HDE-Math-Spec §5.3**. Per-category overrides and the constants pack: **HDE-Schemas & Artifacts** (constants & manifest rules).
+**Normative sources.**  
+ Inclusive-high policy and global edges (for example, 24, 49, 74, 100\) are specified in HDE-Math-Spec. Per-category overrides and the constants pack live in HDE-Schemas & Artifacts (constants and manifest rules); Mechanics routes to those documents by title and does not duplicate numeric tables here.
 
-**Visibility & evidence.** Thresholds and scores are **admin/test-visible only**; the public surface remains **bands-only**. Mechanics provides helpers to dump/apply sets and captures: **edge-case fixtures** (`24/49/74/100`) and **identity/stability proofs** (e.g., `sha256` over canonical **compat** bytes, including the final LF). All tuning artifacts are listed in the **Evidence Index** (**HDE-Governance Appendix D**) and must be updated in the **same PR**.
+**Config artifacts (governed snapshots).**  
+ Band thresholds are materialized by the Programmatic Configuration System as a governed band-edges config artifact (see §3.7):
+
+* The band-edges config artifact captures band names, numeric edges, clamp behavior, rounding mode, and a version tag, and includes a structured pointer back to the thresholds source used to derive it.
+
+* The artifact is generated under closed rails with canonical JSON (UTF-8, no BOM; ASCII-sorted keys; compact; exactly one trailing line feed) and must satisfy two-run identity in determinism-pinned environments, consistent with §3.7 and §4.
+
+* Schema, artifact\_key, and any additional metadata fields for the band-edges config artifact remain single-homed in HDE-Schemas & Artifacts; Mechanics only requires that such an artifact exist, be deterministic, and be wired into the evidence skeleton.
+
+The same configuration system may also produce a governed Magic-10 config artifact (see §3.7) that defines per-category caps and seed metadata; band tuning and band-edges behavior must remain consistent with the Magic-10 configuration and the math rules in HDE-Math-Spec.
+
+**Visibility and evidence.**  
+ Thresholds and scores are admin/test-visible only. Mechanics provides helpers to dump and apply band-threshold sets and to capture identity and stability proofs, such as canonical snapshots and sha256 digests over compat bytes that include the final line feed. All tuning artifacts, including the band-edges config artifact and any supporting snapshots, must:
+
+* be listed in the human Evidence Index with titles and paths,
+
+* have corresponding machine-mirror records in artifacts/evidence\_index.jsonl with canonical JSONL records and path-proof anchors, and
+
+* be updated together with their mirror records in the same PR, under the evidence discipline defined in §1.3 and §37.
+
+Mechanics does not define additional acceptance tokens for band tuning; token names and their semantics remain single-homed in HDE-Governance, HDE-Build Checklist, and HDE Phased Epics.
 
 ---
 
@@ -1702,31 +1937,41 @@ Required artifacts:
 
 ---
 
-## 17.8 Evidence (records‑only; machine mirror; same‑PR rule)
+## **17.8 Evidence (records-only; machine mirror; same-PR rule)**
 
-Evidence listings are titles‑only here; PF12 is single home for schemas and indexing rules.
+CLI components share the core evidence discipline:
 
-* **Indexing discipline.** List each CLI evidence artifact by title/path in **Appendix D: Evidence Index** and mirror it 1:1 in `artifacts/evidence_index.jsonl` (record fields as per PF12/§1.3). The machine mirror is canonical JSONL (UTF‑8; ASCII‑sorted keys; compact; one LF), rejects unknown keys, and each record includes a `proof_anchor` to a co‑located path‑proof file. Update the human Index and machine mirror in the same PR.
+* List each CLI evidence artifact by title and path in Appendix D: Evidence Index.
 
-* **Required artifacts (CLI parity harness):**
+* Mirror artifacts 1:1 in artifacts/evidence\_index.jsonl (record fields as per PF12 and §1.3).
 
-  * `artifacts/cli/ab.json` — canonical output for AB inputs (LF‑terminated).
+* Ensure the machine mirror is canonical JSONL (UTF-8, ASCII-sorted keys, compact, one LF), rejects unknown keys, and includes a proof\_anchor to a co-located path\_proof file.
 
-  * `artifacts/cli/ba.json` — canonical output for BA inputs (must be byte‑identical to AB).
+* Update the human Index and machine mirror in the same PR; CI fails on mismatch, non-canonical JSONL, unknown keys, or missing path-proofs.
 
-  * `artifacts/cli/summary.json` — canonical JSON with attempted commands, sha256 of `ab.json`/`ba.json`, and `ab_ba_equal: true`.
+Required artifacts for the CLI parity and serializer-coupling harness include:
 
-* **Emitter and canonicalization guards:**
+* Parity harness artifacts
 
-  * `audit/gates/guards/emitter_symbol_proof.txt` — single‑emitter guard (presenter symbol).
+  * artifacts/cli/ab.json — canonical output for AB inputs (LF-terminated).
 
-  * `audit/gates/guards/serializer_grep_guard.log` — grep‑guard proving there are no ad‑hoc serializers on public paths.
+  * artifacts/cli/ba.json — canonical output for BA inputs (must be byte-identical to AB).
 
-  * `audit/gates/canonical/json_canonical_check.log` — canonical JSON checks.
+  * artifacts/cli/summary.json — canonical JSON summarizing attempted commands, sha256 of AB/BA, and an ab\_ba\_equal: true marker.
 
-  * `audit/gates/canonical/json_canon_compare.log` — canonical output comparisons (including Reader↔CLI cases where defined in PF05).
+* Serializer and emitter guard artifacts (canonical homes; see §37.6)
 
-All of the above must be indexed in both the Human Index and the machine mirror in the same PR, with canonical JSONL records and `proof_anchor` set.
+  * artifacts/cli/guards/serializer\_grep\_guard.log — grep guard log proving there are no ad-hoc serializers on governed CLI public paths.
+
+  * artifacts/cli/guards/emitter\_symbol\_proof.txt — emitter symbol proof snapshot for governed CLI handlers, including the optional aux-preview exemption.
+
+* Canonical JSON policy and compare logs
+
+  * audit/gates/canonical/json\_canonical\_check.log — canonical JSON checks for CLI and related artifacts.
+
+  * audit/gates/canonical/json\_canon\_compare.log — canonical re-serialization compare for public bytes and parity harness outputs.
+
+Copies of the guard artifacts under audit/gates/guards/\*\* may exist for internal audit workflows, but those paths are secondary. Mechanics treats artifacts/cli/guards/\*\* as the canonical homes for CLI serializer/emitter guards; indexing and mirror records must use those canonical paths as discovered\_physical\_path, consistent with §37.6 and §1.3.
 
 ---
 
@@ -1841,7 +2086,7 @@ Until the stateless JSON QA mode is implemented and drained into the relevant PF
 
   * Use birth-based and vendor dry-run patterns described in HDE-Build Notes and the QA documents, while continuing to satisfy all existing determinism and evidence checks defined in this guide.
 
-### **17.10 Interim no-user QA mode (pre-Glow prod)**
+## 17.10 Interim no-user QA mode (pre-Glow prod)
 
 **Status (normative).**  
  This section is **normative for pre-Glow production environments** where there is **no app-level user model** and **no persistent user-bound BodyGraph rows** configured in the database. It constrains how existing mechanics are exercised in Live QA. It does **not** change the long-term semantics of DB-backed flows, which will be re-opened in a future epic once the Glow App is integrated (see **HDE Phased Epics** and **Glow QA Guide** by title).
@@ -1854,7 +2099,7 @@ Until the stateless JSON QA mode is implemented and drained into the relevant PF
 
 * Mechanics and QA **MUST NOT** create app-like user records in production ahead of Glow App integration.
 
-#### **17.10.1 Compat & Reader (prod QA)**
+### 17.10.1 Compat & Reader (prod QA)
 
 For Live QA in pre-Glow prod:
 
@@ -1872,7 +2117,7 @@ For Live QA in pre-Glow prod:
 
 These checks reuse the existing determinism and canonicalization rules in this guide and do not add new transport bytes.
 
-#### **17.10.2 Aux narratives (prod QA)**
+### 17.10.2 Aux narratives (prod QA)
 
 For Aux preview in pre-Glow prod:
 
@@ -1880,7 +2125,7 @@ For Aux preview in pre-Glow prod:
 
 * QA **MUST NOT** rely on DB-backed users to exercise Aux; the Aux preview surface remains a **file-based consumer** of compat JSON in this mode.
 
-#### **17.10.3 BodyGraph resolver & vendor ingest (prod QA)**
+### 17.10.3 BodyGraph resolver & vendor ingest (prod QA)
 
 In pre-Glow prod, BodyGraph resolver and vendor ingest QA flows **MUST** respect the following additional constraints (in addition to §19 Vendor Ingest Pipeline and §22 SAFE Rails and Provider Gate):
 
@@ -1898,7 +2143,7 @@ In pre-Glow prod, BodyGraph resolver and vendor ingest QA flows **MUST** respect
 
 These constraints are environment-specific; they do not change the long-term semantics of vendor upsert flows in dev or in future epics with a live app user model.
 
-#### **17.10.4 Evidence skeleton for CLI QA**
+### 17.10.4 Evidence skeleton for CLI QA
 
 For Live QA sessions in pre-Glow prod:
 
@@ -1908,7 +2153,7 @@ For Live QA sessions in pre-Glow prod:
 
 * CLI QA flows in this mode **MUST NOT** write governed evidence artifacts directly; they **only consume** the evidence skeleton defined in §1.3, §25, and §37, leaving governed paths unchanged.
 
-#### **17.10.5 Forward plan (routing only)**
+### 17.10.5 Forward plan (routing only)
 
 * Once the Glow App and user model are integrated, a future epic recorded in **HDE Phased Epics** and governed by the **Glow QA Guide** will:
 
@@ -1918,7 +2163,264 @@ For Live QA sessions in pre-Glow prod:
 
 * Until that epic is live, QA requirements that assume “existing users in prod” **MUST** be treated as **blocked by environment** and satisfied instead using the no-user QA mode described in this section.
 
-  ## 
+## 17.11 Admin QA bundle surfaces (full product payload)
+
+**Status (normative, admin-only).**  
+ This section defines an **admin-only bundle** and its CLI/HTTP consumers for pre-Glow QA. The bundle is a single canonical JSON object that combines BodyGraph JSON, compat results, and Aux narratives for a match. It is intended for **internal operators and PO only** and is not a public Reader or app surface. Reader v1’s public covenant (bands-only, numeric-free, six-key envelope) and existing app-facing contracts remain unchanged and continue to be governed by HDE-CLI-API-Vendor-Ref, HDE-Math-Spec, and Glow QA Guide by title.
+
+### **17.11.1 Admin bundle builder (internal module)**
+
+Mechanics defines an internal **admin bundle builder** that:
+
+* Accepts a canonical pair input in the same compat input space as the Compatibility Engine (§7.2) and the CLI `showcompat` harness: two parties (IDs, BodyGraphs, or births as permitted by the existing compat contract) plus viewer preferences (top category and weights across the closed Magic-10 set).
+
+* Uses the existing BodyGraph resolver mechanics (titles-only to the BodyGraph resolver sections of this guide and to HDE-Schemas & Artifacts / HDE-Math-Spec) to obtain **canonical BodyGraph JSON** for each party, as already required for `bg:resolve` and related flows.
+
+* Calls the internal compat math (titles-only to Category Framework and Compatibility Engine) to compute the per-category compat result over the closed Magic-10 set, at minimum:
+
+  * category identity,
+
+  * integer score `0..100`,
+
+  * band (Cool, Open, Warm, Glow), and
+
+  * narrative keys `{personal_key, shared_key}` consistent with the main compat contract.
+
+* Calls the Aux/Narratives system (titles-only to Narratives Guide and HDE Narrative Deliverables) to obtain **three narratives per match**:
+
+  * a private A→B narrative,
+
+  * a private B→A narrative, and
+
+  * a shared narrative.
+
+* Assembles a single in-memory **admin bundle** object with at least the following **top-level keys** (names are pinned here; detailed schemas remain in HDE-Schemas & Artifacts):
+
+  * `a_bodygraph` — canonical BodyGraph JSON for person A, as produced by the resolvers.
+
+  * `b_bodygraph` — canonical BodyGraph JSON for person B, as produced by the resolvers.
+
+  * `compat` — the canonical compat JSON for the pair (categories in frozen Magic-10 order), where each category entry carries `{id, score, band, personal_key, shared_key}` and existing compat meta as defined by math and schemas.
+
+  * `narratives` — an array of **exactly three** Aux narrative compositions for this match (A→B, B→A, shared). Each narrative entry includes, at minimum, the composition identifier and pack SHA (or equivalent identity) plus the narrative text; the exact narrative payload schema remains single-homed in the Narratives documents.
+
+  * `meta` — build and environment metadata, including at minimum the engine identity (for example, `engine_tag`, `release_id`), invocation identity (for example, `invocation_tag` or equivalent), and a names-only description of the bundle source and rails posture (for example, whether the bundle was built locally or via a prod route, and whether SAFE rails were closed or open). Detailed field schemas for `meta` remain single-homed in HDE-Schemas & Artifacts and HDE-Governance.
+
+The admin bundle builder is **pure mechanics**: it calls existing resolvers, compat, and Aux engines; it does not perform I/O, does not serve HTTP, and does not define transport or CLI flags. Its output is serialized only via the canonical serializer (§4 / §10.1) when consumed by CLI or HTTP surfaces:
+
+* UTF-8, no BOM
+
+* ASCII-sorted keys
+
+* compact separators
+
+* exactly one trailing line feed
+
+* arrays-as-sets deduped and ASCII-sorted
+
+AB↔BA parity and two-run identity **MUST** hold for the admin bundle under determinism pins (`LC_ALL=C`, `LANG=C`, `TZ=UTC`).
+
+All scores, BodyGraph JSON, narrative keys, and narrative text carried in this bundle are **admin/internal only**. They must never be exposed as public Reader or app payloads and must not alter the public Reader contracts described elsewhere by title.
+
+### 17.11.2 CLI admin bundle experience (any terminal → Railway prod)
+
+Mechanics requires that the CLI provide a **repeatable admin bundle experience** that can be run from any terminal capable of reaching the production Engine, subject to the usual secrets and rails posture governed by HDE-Governance, HDE-CLI-API-Vendor-Ref, Infrastructure, and Glow QA Guide (titles-only):
+
+* The CLI admin-bundle flow **MUST** use the admin bundle builder described in §17.11.1 as its source of truth. It may be implemented either as:
+
+  * a dedicated aggregator command, or
+
+  * a documented harness/composition of existing commands (`bg:resolve`, `showcompat`, Aux preview), as long as the composition is mechanically defined and stable.
+
+* The CLI admin-bundle flow **MUST**:
+
+  * accept a canonical pair input (fixture, births, or internal IDs consistent with existing compat/BodyGraph contracts),
+
+  * obtain the bundle by calling the Engine (directly or via the admin HTTP route described in §17.11.3), and
+
+  * emit the bundle as canonical JSON on stdout or to a single bundle file, subject to:
+
+    * UTF-8, no BOM,
+
+    * ASCII-sorted keys,
+
+    * compact separators,
+
+    * exactly one trailing LF, and
+
+    * arrays-as-sets deduped and ASCII-sorted.
+
+* The flow **MUST** be reproducible from:
+
+  * a Codespaces image used for HDE QA, and
+
+  * at least one “clean” local environment matching supported Python versions,
+
+* using the same documented entrypoints described in the CLI sections of this guide and in HDE-CLI-API-Vendor-Ref.
+
+* Rails and env posture for this flow (SAFE rails, vendor behavior, secrets) remain governed by HDE-Governance, HDE-CLI-API-Vendor-Ref, Infrastructure, and Glow QA Guide. PF14 requires that the CLI admin-bundle flow:
+
+  * respect SAFE rails and determinism pins (`SAFE_MODE`, `ALLOW_NETWORK`, `LC_ALL`, `LANG`, `TZ`) for any bundle generation used as evidence, and
+
+  * not bypass the allow-listed presenter/emitter, canonical serializer, or existing CLI parity and serializer guards (§4, §16, §17.3, §18).
+
+Evidence for the CLI admin bundle experience (for example, bundle JSON artifacts and canonical-compare logs) must be captured and indexed under the existing evidence skeleton rules (§1.3, §25, §37); token names and QA acceptance rosters remain single-homed in HDE-Governance, HDE-Build Checklist, Glow QA Guide, and HDE Phased Epics.
+
+### 17.11.3 HTTP admin bundle route (GUI consumer)
+
+Mechanics also requires an internal **HTTP admin bundle route** to serve the same admin bundle to a minimal Admin GUI:
+
+* The route is an **internal admin/QA surface**, not a public user route:
+
+  * it is not A7-eligible,
+
+  * it is not a Reader v1 success route, and
+
+  * it is protected by whatever authentication and authorization posture is defined in Governance/Infrastructure (titles-only).
+
+* The route:
+
+  * accepts a canonical pair input (fixture, births, or internal IDs consistent with existing BodyGraph and compat mechanics),
+
+  * calls the admin bundle builder (§17.11.1) to construct the full product payload bundle, and
+
+  * returns **JSON only**, with no HTML, using the canonical serializer (§4 / §10.1) and determinism pins (`LC_ALL=C`, `LANG=C`, `TZ=UTC`).
+
+* The Admin GUI (which may live in a separate repo) is expected to:
+
+  * call this route against the same production Engine on Railway that the Glow App will later use, and
+
+  * render BodyGraphs, compat categories with numeric scores and bands, and three narratives (A→B, B→A, shared) from the returned bundle.
+
+PF14 does not define the HTTP route name, auth model, or HTML/UX; those live in HDE-CLI-API-Vendor-Ref, Governance, and any Admin-UI epic records by title. PF14 only requires that such an admin bundle route exist, be wired to the admin bundle builder, use canonical JSON, and behave as an internal admin-only surface.
+
+### 17.11.4 Posture vs Reader/App and evidence (routing only)
+
+The admin bundle surfaces (builder, CLI experience, HTTP route) are strictly **admin QA** and **operator** tools:
+
+* They may expose BodyGraph JSON, per-category scores, bands, and narrative keys/text for internal use.
+
+* They **MUST NOT** be used directly as public app routes or as replacements for Reader v1 or Aux public contracts. App integration continues to go through the Reader/Aux paths governed in HDE-Math-Spec, HDE-CLI-API-Vendor-Ref, Narratives Guide, and Glow QA Guide.
+
+* All admin bundle captures and parity checks (for example, CLI vs HTTP bundle equality for the same inputs) must follow the existing evidence skeleton rules for canonical JSON, AB↔BA and two-run identity, and Index/Mirror parity (§1.3, §25, §37). Any new tokens or epic-level acceptance criteria for admin bundle flows are defined in HDE-Governance, HDE-Build Checklist, Glow QA Guide, and HDE Phased Epics by title; PF14 does not define new token names here.
+
+### **17.11.5 Authentication, authorization, and logging (admin surfaces)**
+
+**Status (normative, pre-Glow).**  
+ The admin bundle surfaces defined in §17.11 (builder, CLI experience, HTTP route) are **security-sensitive admin/QA tools**. Mechanics requires that they be protected by real authentication and authorization, that successful calls be logged for audit, and that credentials be rotatable and revocable without code changes. Exact credential schemes and policies remain single-homed in HDE-Governance, Glow QA Guide, and Glow Infrastructure by title.
+
+#### **17.11.5.1 Authentication and authorization (no open admin endpoints)**
+
+Mechanics requires that:
+
+* The CLI admin-bundle flow (§17.11.2) and the HTTP admin bundle route (§17.11.3) **MUST NOT** be callable without an admin credential. An unauthenticated request **MUST NOT** be able to obtain the full admin bundle.
+
+* The admin credential (for example, a token or equivalent secret) **MUST**:
+
+  * be stored as a secret under the infrastructure and governance policies described by HDE-Governance and Glow Infrastructure (for example, Railway secrets), not checked into the repo, and
+
+  * be required on every admin bundle call (CLI and HTTP), using a transport mechanism and header/field semantics pinned in HDE-CLI-API-Vendor-Ref and HDE-Governance.
+
+* The same underlying authentication and authorization posture **MUST** apply to both admin surfaces:
+
+  * CLI and Admin GUI both act as clients presenting the admin credential to the Engine, and
+
+  * the Engine enforces that only authenticated and authorized admin callers may access the admin bundle route or equivalent CLI path.
+
+Mechanics does not pick specific header names or token formats; it requires that admin bundle surfaces are never “open admin endpoints” in production and routes the detailed auth model to HDE-Governance, Glow Infrastructure, Glow QA Guide, and HDE-CLI-API-Vendor-Ref.
+
+#### **17.11.5.2 Logging and audit of admin bundle calls**
+
+Mechanics further requires that every **successful** admin bundle call (CLI or HTTP):
+
+* be logged with, at minimum:
+
+  * a timestamp,
+
+  * a caller identity or account (for example, operator username, service account, or equivalent),
+
+  * a high-level description of the input type (for example, “birth-based pair” vs “user-id pair” once user IDs exist, without logging raw birth details or other PII beyond what Governance allows), and
+
+  * a correlation identifier that can be used to trace the call across logs.
+
+* produce logs that are treated as **operations logs** and governed by the logging, retention, and PII rules in HDE-Governance and Glow QA Guide. Mechanics does not restate those policies; it assumes that any fields logged here comply with them.
+
+Admin bundle logs must not capture secrets (credentials, tokens) or raw config values; they only record high-level audit information necessary for operational tracing.
+
+#### **17.11.5.3 Credential rotation and revocation**
+
+Admin credentials used for CLI and HTTP admin bundle surfaces **MUST** be:
+
+* **Rotatable** without code changes:
+
+  * credentials are loaded from environment or configuration governed by HDE-Governance and Glow Infrastructure, and
+
+  * rotation of the secret value (for example, updating a Railway secret) does not require code deploys.
+
+* **Revocable**:
+
+  * removing or changing the admin credential in the secret store MUST immediately prevent old credentials from successfully calling the admin bundle surfaces, and
+
+  * tests and QA harnesses for admin surfaces MUST assume that credentials can change between runs and MUST NOT bake secrets into test fixtures.
+
+Mechanics does not define acceptance tokens for authentication, logging, or rotation; token names and QA playbooks (for example, admin-bundle auth required, CLI/HTTP parity, and “no open admin endpoints”) remain single-homed in HDE-Governance, Glow QA Guide, HDE-Build Checklist, and HDE Phased Epics by title. PF14 records the mechanical requirement that admin bundle surfaces are authenticated, logged, and backed by rotatable, revocable credentials in pre-Glow.
+
+## **17.12 CLI as admin product surface (pre-Glow)**
+
+**Status (normative, pre-Glow).**  
+ In the pre-Glow era, the canonical CLI (for example, `hdctl` or its module-run equivalent, as defined in HDE-CLI-API-Vendor-Ref) is a **required admin-facing product surface**, not just a dev/QA tool. A build that cannot be exercised via this CLI from a terminal that can reach the production Engine on Railway fails Mechanics requirements for pre-Glow “product usable by humans” posture.
+
+### **17.12.1 Terminal scope (any shell → Railway prod)**
+
+Mechanics requires that:
+
+* The CLI be runnable from **any shell** that can reach the production Engine on Railway (and, where applicable, its DB), subject to the secrets and rails posture governed by HDE-Governance, HDE-CLI-API-Vendor-Ref, Infrastructure, and Glow QA Guide (titles-only), not just from GitHub Codespaces.
+
+* The same CLI mechanics defined in §16 and §17 (streams/exits, determinism, canonical JSON, parity) apply regardless of where the CLI is run (Codespaces, local machine, or other operator shell), provided environment pins and rails policy are satisfied.
+
+* The CLI continue to respect all pre-Glow constraints recorded elsewhere in this guide and in Governance:
+
+  * `--user` remains an ephemeral QA key in pre-Glow prod; it is not bound to an app-level user model.
+
+  * `bg:resolve --source=vendor --upsert` **MUST NOT** be used in prod until a future epic explicitly re-opens user-bound upsert flows.
+
+  * Any flows that open rails or reach vendor APIs must follow the SAFE rails and vendor posture defined in HDE-Governance, HDE-CLI-API-Vendor-Ref, Infrastructure, and Glow QA Guide.
+
+This section does not add new commands or flags; it binds the existing CLI mechanics to a stronger product requirement: terminal CLI access to the Engine is part of the pre-Glow product surface.
+
+### **17.12.2 Full product payload via CLI (within existing rails)**
+
+Mechanics further requires that, in pre-Glow:
+
+* The combination of CLI subcommands and harnesses defined in this guide and in HDE-CLI-API-Vendor-Ref be **sufficient to obtain the full product payload** for a match, consistent with:
+
+  * Compatibility engine math and banding (titles-only to HDE-Math-Spec and §7.2).
+
+  * BodyGraph resolver mechanics (titles-only to the BodyGraph resolver sections of this guide and to HDE-Schemas & Artifacts).
+
+  * Aux/Narratives behavior (titles-only to Narratives Guide and HDE Narrative Deliverables).
+
+* For a given pair input (fixture, births, or internal IDs allowed by existing contracts), an operator using only CLI subcommands (direct commands and/or a documented harness) can obtain, as structured output:
+
+  * per-person BodyGraph JSON,
+
+  * compat results with bands and numeric scores over the closed Magic-10 set, and
+
+  * three narratives per match (two private, one shared), as already wired via the admin bundle builder (§17.11.1) and related Aux mechanics.
+
+* These flows **MUST** operate within the pre-Glow rails posture described in §17.9, §17.10, §19.1, and in Governance/Infrastructure:
+
+  * When no user model exists, they rely on birth-based and dry-run vendor flows; they do not create app-like user records in prod.
+
+  * Any DB-writing flows remain governed by SAFE rails defaults and explicit rails-open windows as defined in Governance and Infrastructure; the requirement to support terminal CLI access does not relax those policies.
+
+Mechanics treats the admin bundle surfaces in §17.11 as the preferred way to structure the full product payload for CLI, but does not require a single new command name. Whether the full payload is retrieved via a dedicated aggregator command or a documented composition of existing commands, the CLI must be able to produce the full product payload from a terminal in a way that satisfies the determinism, canonical JSON, and evidence discipline already defined in §4, §16, §17, §18, §25, and §37.
+
+### **17.12.3 Evidence and planning (routing only)**
+
+* Evidence that terminal CLI access is a functioning product surface (for example, bundle JSON produced from a non-Codespaces shell hitting Railway prod, plus canonical-compare logs) must be captured and indexed under the existing evidence skeleton rules (§1.3, §25, §37). Mechanics does not define new artifact names or paths here; it routes titles and token semantics to HDE-Governance, HDE-Build Checklist, Glow QA Guide, and HDE Phased Epics.
+
+* Epic-level planning and acceptance tokens for “CLI terminal access to full product payload” remain single-homed in HDE-Governance, HDE-Build Checklist, Glow QA Guide, and HDE Phased Epics. PF14 records the mechanical requirement that the CLI is a required admin product surface in pre-Glow and that its existing mechanics must support full product payload flows from any eligible terminal.
 
   # 18\) CLI Serializer Coupling \[Required-Now\]
 
@@ -1948,11 +2450,41 @@ For Live QA sessions in pre-Glow prod:
 * **Determinism:** `COMPOSITE_ABBA_IDENTITY_OK`, `TWO_RUN_IDENTITY_OK`, `JSON_CANONICAL_CHECK_OK`.  
 * **Evidence discipline:** `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`.
 
-  ## 18.5 Evidence (records-only; machine mirror; same-PR rule)
+  ## **18.5 Evidence (records-only; machine mirror; same-PR rule)**
 
-`artifacts/cli/ab.json`, `artifacts/cli/ba.json`, `artifacts/cli/summary.json`,  
- `audit/gates/guards/serializer_grep_guard.log`, `audit/gates/guards/emitter_symbol_proof.txt`,  
- `audit/gates/canonical/json_canonical_check.log`, `audit/gates/canonical/json_canon_compare.log`.
+CLI serializer coupling evidence must demonstrate:
+
+* AB↔BA and two-run identity for compat bytes under the shared presenter/emitter,
+
+* canonical JSON on CLI stdout for governed commands, and
+
+* that governed CLI handlers use the allow-listed emitter and do not call ad-hoc JSON serializers.
+
+List evidence artifacts by title and path in Appendix D and mirror them 1:1 in artifacts/evidence\_index.jsonl (record fields as per §1.3). The machine mirror is canonical JSONL (UTF-8, ASCII-sorted keys, compact, one LF), rejects unknown keys, and each record includes a proof\_anchor to a co-located path\_proof file.
+
+Required artifacts for CLI serializer coupling:
+
+* CLI AB/BA parity artifacts (parity harness)
+
+  * artifacts/cli/ab.json — canonical output for AB inputs (LF-terminated).
+
+  * artifacts/cli/ba.json — canonical output for BA inputs (must be byte-identical to AB).
+
+  * artifacts/cli/summary.json — canonical JSON with attempted commands, sha256 of ab.json and ba.json, and ab\_ba\_equal: true.
+
+* Serializer and emitter guards (see §37.6 for guard tool behavior and roles)
+
+  * artifacts/cli/guards/serializer\_grep\_guard.log — grep guard report proving no ad-hoc serializers on governed CLI public paths.
+
+  * artifacts/cli/guards/emitter\_symbol\_proof.txt — emitter symbol proof listing governed handlers and their allow-listed emitter symbols (with aux-preview explicitly exempt when it lists none).
+
+* Canonical JSON policy and compare logs
+
+  * audit/gates/canonical/json\_canonical\_check.log — canonical JSON policy checks for CLI and evidence output.
+
+  * audit/gates/canonical/json\_canon\_compare.log — canonical re-serialization compares for CLI parity and serializer coupling.
+
+If audit/gates/guards/\*\* copies of the guard artifacts are present for internal audit workflows, they are secondary only. The artifacts/cli/guards/\*\* paths are the canonical locations for serializer/emitter guards; the Evidence Index and Machine Mirror must use those canonical paths as discovered\_physical\_path.
 
 ## 18.6 Routing (titles-only)
 
@@ -3147,41 +3679,124 @@ Every artifact listed in this registry **MUST** have a 1:1 record in `artifacts/
 
 ---
 
-## 37.6 Serializer / emitter guards
+## **37.6 Serializer / emitter guards**
 
-* **Grep guard (no ad-hoc serializers on public paths)**
+Serializer and emitter guards are the mechanical enforcement layer for CLI serializer coupling (see §4 and §18). They prove that:
 
-  * `artifacts/cli/guards/serializer_grep_guard.log`
+* public CLI flows do not use ad-hoc JSON serializers, and
 
-* **Shared presenter/emitter symbol proof**
+* governed CLI handlers call the allow-listed presenter/emitter symbols.
 
-  * `artifacts/cli/guards/emitter_symbol_proof.txt`
+  ### **37.6.1 Guard tools (closed-rails, deterministic)**
 
-**NEW CANON — Serializer / emitter guard homes (EPIC017 and onward).**
+Mechanics defines two canonical CLI guard tools:
 
-* Canonical locations:
+* tools/cli/serializer\_grep\_guard.py
 
-  * `artifacts/cli/guards/serializer_grep_guard.log`
+  * AST-based grep guard over the governed CLI scope (default roots under engine/cli).
 
-  * `artifacts/cli/guards/emitter_symbol_proof.txt`
+  * Detects imports of the json module and call-sites that resolve to json.dumps or json.dump (including alias imports).
 
-* These are the **paths of record** for:
+  * Renders a deterministic report with:
 
-  * Phase I serializer work,
+    * a single scope line describing the scanned roots, and
 
-  * EPIC017 acceptance, and
+    * a summary line of the form “summary: PASS” or “summary: FAIL” followed by sorted violation lines when present.
 
-  * evidence indexing.
+  * The report contains no timestamps, environment echoes, or non-deterministic content.
 
-* The Evidence Index and Machine Mirror **MUST** use these paths as `discovered_physical_path` for the corresponding records.
+* tools/cli/emitter\_symbol\_proof.py
 
-* For backward compatibility:
+  * AST-based emitter proof over the CLI module (engine/cli/main.py).
 
-  * Implementations **MAY** also write copies under `audit/gates/guards/**` for internal audit workflows.
+  * Tracks call-sites in the governed handlers (showcompat, aux\_preview, bg\_resolve) and records which allow-listed emitter symbols they invoke.
 
-  * Those locations are **secondary** and not required for mechanics-level acceptance.
+  * Emits deterministic lines of the form “handler:function:emitters” plus a summary line indicating PASS or FAIL for the non-optional handlers.
 
-* Future PF docs and epic records that reference these guard artifacts **SHOULD** use `artifacts/cli/guards/**` paths and treat `audit/gates/guards/**` as historical/auxiliary only.
+Both guard tools:
+
+* import and call ensure\_determinism\_env from engine/runtime/determinism\_env.py at startup,
+
+* require the determinism pins and closed rails to be satisfied (LC\_ALL=C, LANG=C, TZ=UTC, SAFE\_MODE=1, ALLOW\_NETWORK=0), and
+
+* fail closed (non-zero exit) if the pins are not met.
+
+CI must call these tools only under the closed-rails determinism posture described in §1.2 and §6.2; check\_env\_pins and related jobs enforce the pins before running the guards.
+
+### **37.6.2 Guard artifacts (canonical paths and roles)**
+
+The canonical guard artifacts and their roles are:
+
+* artifacts/cli/guards/serializer\_grep\_guard.log
+
+  * Role: log.
+
+  * Contains the serializer grep guard report (scope line, summary line, and any sorted violation lines).
+
+  * A PASS report demonstrates that the governed CLI scope has no direct json.dumps or json.dump usage and that public JSON flows pass through the canonical emitter.
+
+* artifacts/cli/guards/emitter\_symbol\_proof.txt
+
+  * Role: snapshot.
+
+  * Contains the emitter symbol proof for the governed CLI handlers.
+
+  * For showcompat and bg\_resolve, the proof must show at least one allow-listed emitter symbol (for example, emitter.emit\_public or emit\_reader\_public\_envelope) and must mark the summary as PASS.
+
+  * aux-preview is treated as an optional emitter handler: when it has no canonical emitter, it is rendered as a handler line with a “none” emitter listing and is explicitly exempt in the PASS/FAIL decision, so the absence of an emitter for aux-preview does not cause the guard to fail, while still keeping the handler visible in the proof.
+
+These artifacts are the paths of record for:
+
+* Phase I serializer work,
+
+* EPIC017 and EPIC018 CLI serializer acceptance, and
+
+* evidence indexing for serializer/emitter guards.
+
+The Evidence Index and Machine Mirror must use these paths as discovered\_physical\_path for the corresponding records; any other locations are copies only.
+
+### **37.6.3 Indexing, mirror, and secondary locations**
+
+Indexing and mirror discipline for guard artifacts follow §1.3 and §37.4:
+
+* List guard artifacts by title and path in Appendix D: Evidence Index.
+
+* Mirror them 1:1 in artifacts/evidence\_index.jsonl (canonical JSONL; UTF-8, ASCII-sorted keys, compact, one LF; unknown keys rejected; exact field order pinned in §1.3).
+
+* Each mirror record includes a proof\_anchor pointing at a co-located path\_proof transcript for the guard artifact.
+
+For backward compatibility:
+
+* Implementations may also write copies of the guard artifacts under audit/gates/guards/\*\* for internal audit workflows.
+
+* These audit/gates/guards/\*\* paths are secondary only and are not required for mechanics-level acceptance.
+
+Future PF documents and epic records that reference CLI serializer/emitter guards should use the artifacts/cli/guards/\*\* paths as canonical and treat audit/gates/guards/\*\* as historical or auxiliary.
+
+### **37.6.4 Live QA runs under open rails (informative)**
+
+**Status (informative, mechanics-aware).**  
+ The canonical pass condition for CLI serializer/emitter guards is defined under **closed determinism rails** in CI and other CLOSED-rails environments (see §1.2, §6.2, and §37.6.1). In deliberately open-rails Live QA environments (for example, PO-run Codespaces sessions used for hands-on product checks), Mechanics treats guard behavior differently:
+
+* **Env-mismatch failures are expected.** When the determinism pins required by ensure\_determinism\_env are not satisfied (for example, SAFE\_MODE or ALLOW\_NETWORK differ from the closed-rails CI posture), the guard tools are expected to:
+
+  * refuse to run in “PASS” mode, and
+
+  * exit non-zero with logs that clearly indicate an environment mismatch rather than a serializer/emitter wiring error.
+
+* **Open-rails Live QA is env-enforcement only.** Running the guards in an open-rails Live QA environment is allowed as an **env-enforcement check**:
+
+  * A non-zero exit due solely to determinism env mismatch confirms that the guards are enforcing the closed-rails policy correctly.
+
+  * Such runs do **not** contribute to the canonical guard acceptance condition and must not be interpreted as evidence of broken CLI serializer or emitter wiring.
+
+* **Canonical acceptance remains CLOSED-rails.** The **authoritative acceptance** for CLI serializer/emitter guard tokens remains:
+
+  * CI and other CLOSED-rails jobs that run the guard tools under the determinism pins described in §1.2 and §6.2, and
+
+  * guard artifacts and mirror records produced in that posture, as described in §17.8, §18.5, and §37.6.2–§37.6.3.
+
+Mechanics records this distinction so that PF-Canon and QA plans can treat open-rails guard runs as **informational** (env-pin enforcement) while continuing to rely on CLOSED-rails CI runs for normative D-stage/guard acceptance. PF14 does not define new tokens here; token semantics and QA expectations for guard runs remain single-homed in HDE-Governance, Glow QA Guide, HDE-Build Checklist, and HDE Phased Epics by title.
 
 ---
 

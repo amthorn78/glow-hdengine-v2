@@ -4,13 +4,13 @@
 
 **Title:** PF09-Canon-HDE-Build Checklist
 
-**Version:** v2.0.4
+**Version:** v2.2.9
 
 **Status:** Canon
 
-**Effective date:** 2025-11-26
+**Effective date:** 2025-11-29
 
-**Last Update Gate:** PF14 Review s22
+**Last Update Gate:** BN 7.8.9 Drain A24
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -339,7 +339,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 
   * Enumerations are frozen in canon (HDE-Math-Spec; HDE-Schemas & Artifacts; titles-only).
 
-  * The Registry structure and generation scripts are in place; this component is considered complete for Calcination.
+  * The Registry structure and generation scripts are in place; this component is considered Done for Calcination.
 
 ### Subtask HDE-CALC001.1 — Registry validation job
 
@@ -348,7 +348,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Subtask description:**  
    Provide a single registry job that loads centers, gates, channels, and categories from PF12 catalogs and validates each domain against its JSON Schema, hard-failing on unknown IDs, duplicates, non-canonical channel forms, or schema mismatches.
 
-* **Subtask status:** **Complete**
+* **Subtask status:** **Done**
 
 * **Epic or card:** **Unknown**
 
@@ -368,7 +368,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Subtask description:**  
    Normalize channels to canonical `NN–NN` (zero-padded, min-first) form and enforce ASCII sort \+ dedupe for any arrays that represent sets before hashing/compare.
 
-* **Subtask status:** **Complete**
+* **Subtask status:** **Done**
 
 * **Epic or card:** **Unknown**
 
@@ -388,7 +388,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Subtask description:**  
    Registry validation must prove closure and uniqueness across all domains (no extras or omissions, no duplicate IDs, no cross-catalog drift). Any drift must fail CI.
 
-* **Subtask status:** **Complete**
+* **Subtask status:** **Done**
 
 * **Epic or card:** **Unknown**
 
@@ -408,7 +408,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Subtask description:**  
    Emit a records-only registry snapshot and supporting reports (closure and checksums) that capture domain counts and canonical sha256/size\_bytes for governed artifacts, and ensure they are indexed under the Evidence Index discipline (Human Index \+ Machine Mirror in the same PR, with path-proofs).
 
-* **Subtask status:** **Complete**
+* **Subtask status:** **Done**
 
 * **Epic or card:** **Unknown**
 
@@ -439,7 +439,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Subtask description:**  
    Run registry validation and snapshot generation under determinism pins using canonical JSON: `LC_ALL=C`, `LANG=C`, `TZ=UTC`; UTF-8 (no BOM); sorted keys; compact; exactly one trailing LF.
 
-* **Subtask status:** **Complete**
+* **Subtask status:** **Done**
 
 * **Epic or card:** **Unknown**
 
@@ -461,7 +461,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Subtask description:**  
    Index registry evidence in `docs/evidence/INDEX.json` and mirror it in `artifacts/evidence_index.jsonl` in the same PR (records-only canonical JSONL; one LF; unknown-key reject; fixed field order; each record includes a `proof_anchor` to a co-located path-proof).
 
-* **Subtask status:** **Complete**
+* **Subtask status:** **Done**
 
 * **Epic or card:** **Unknown**
 
@@ -522,7 +522,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Subtask description:**  
    Ensure a single presenter/emitter entrypoint symbol is shared between Reader and CLI for public JSON emission.
 
-* **Subtask status:** **In progress** (harness and guards exist but not fully proven)
+* **Subtask status: Consolidation Pending** (harness and guards exist but not fully proven)
 
 * **Epic or card:** EPIC-017 (D1)
 
@@ -548,7 +548,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Subtask description:**  
    Enforce canonical JSON: UTF-8 (no BOM), ASCII-sorted keys, compact separators, exactly one trailing LF; arrays-as-sets deduped and ASCII-sorted.
 
-* **Subtask status:** **In progress**
+* **Subtask status: Consolidation Pending**
 
 * **Epic or card:** EPIC-017 (D1)
 
@@ -576,7 +576,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Subtask description:**  
    Deduplicate and ASCII-sort arrays that function as sets before hashing or comparison.
 
-* **Subtask status:** **In progress**
+* **Subtask status: Consolidation Pending**
 
 * **Epic or card:** EPIC-017 (D1)
 
@@ -596,7 +596,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Subtask description:**  
    Run all dumps/compares under `LC_ALL=C`, `LANG=C`, `TZ=UTC`.
 
-* **Subtask status:** **In progress**
+* **Subtask status: Consolidation Pending**
 
 * **Epic or card:** EPIC-017 (D1)
 
@@ -611,7 +611,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Notes:**  
    Applies to both CLI/Reader canonicalization and evidence capture.
 
-### **Subtask HDE-CALC002.5 — Determinism & parity harness**
+  ### **Subtask HDE-CALC002.5 — Determinism and parity harness**
 
 * Subtask name/label: Determinism and parity harness
 
@@ -620,7 +620,11 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 
 * Subtask status: Done
 
-* Epic or card: EPIC-017 (D1)
+* Epic or card:
+
+  * EPIC-017 (D1 — canonical serializer and parity harness for hdctl showcompat)
+
+  * EPIC-018 (QA04 — D1 compat spot-check for a synthetic birth pair)
 
 * Tokens:
 
@@ -640,7 +644,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 
   * Harness script (titles-only):
 
-    * scripts/cli/canonical\_harness.py — drives AB↔BA, two-run, Reader↔CLI parity, and preimage recompute for hdctl showcompat under rails-closed env.
+    * scripts/cli/canonical\_harness.py — drives AB↔BA, two-run identity, Reader↔CLI parity, and preimage recompute for hdctl showcompat under rails-closed env.
 
   * CLI tests (titles-only):
 
@@ -666,69 +670,167 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 
   * Serializer guard artifacts (shared with HDE-CALC002.6):
 
-    * artifacts/cli/guards/serializer\_grep\_guard.log — grep guard confirming no ad-hoc JSON serializers on governed paths.
+    * artifacts/cli/guards/serializer\_grep\_guard.log — grep/AST guard confirming there are no disallowed JSON serializers (for example json.dumps/json.dump) on governed CLI paths.
 
-    * artifacts/cli/guards/emitter\_symbol\_proof.txt — emitter symbol proof documenting emit\_public and Reader emitter call sites.
+    * artifacts/cli/guards/emitter\_symbol\_proof.txt — emitter symbol proof documenting the allow-listed emitter symbols used by governed CLI handlers and Reader.
 
   * EPIC017 QA05 Reader envelope evidence (CLI QA environment):
 
-    * audit/qa/hde-epic017/logs/step\_showcompat\_dump\_reader1.txt (path name indicative; exact path governed by QA harness) — Reader v1 envelope produced by hdctl showcompat \--source vendor \--dump-reader for a synthetic birth pair, showing:
+    * audit/qa/hde-epic017/logs/step\_showcompat\_dump\_reader1.txt (path name indicative; exact path governed by the QA harness) — Reader v1 envelope produced by hdctl showcompat \--source vendor \--dump-reader for a synthetic birth pair, showing:
 
-      * Exactly the six canonical keys (reader\_version, eligible, categories, meta, release\_id, idempotence\_hash).
+      * exactly the six canonical keys (reader\_version, eligible, categories, meta, release\_id, idempotence\_hash)
 
-      * categories containing a single harmony entry with a band drawn from Cool, Open, Warm, or Glow and no numerics.
+      * categories containing a single harmony entry with a band drawn from Cool, Open, Warm, or Glow and no numerics
 
       * meta.engine\_tag \= hdengine-dev, meta.invocation\_tag \= INV-LOCAL, release\_id as an all-zero 64-hex string, and idempotence\_hash as a 64-hex lowercase string.
 
+  * Path-normalization QA summary (context only):
+
+    * audit/qa/hde-epic018/logs/qa\_dir\_casing\_normalization\_summary.md — EPIC018 QA01 summary describing the move of all EPIC017 Live QA logs from the legacy Audit/QA/HDE-EPIC017/logs tree into the canonical audit/qa/hde-epic017/logs root; path-only/doc-only remediation, tests explicitly “Not run (not requested)”.
+
+  * EPIC018 QA04 D1 compat spot-check evidence (CLI QA environment):
+
+    * audit/qa/hde-epic018/d1-serializer/d1-serializer-compat-001-request.txt — request description for the synthetic compat pair:
+
+      * A: 1985-03-21 08:30 New York, USA
+
+      * B: 1992-11-05 16:45 London, UK.
+
+    * audit/qa/hde-epic018/d1-serializer/d1-serializer-compat-001-ab-run1.json and d1-serializer-compat-001-ab-run2.json — raw hdctl showcompat JSON outputs for AB run 1 and AB run 2; both parse cleanly and have the canonical compat structure:
+
+      * a.person\_uid and b.person\_uid with consistent CLI-scoped IDs
+
+      * compat.categories including all 10 Magic-10 ids (heat, harmony, communication, alignment, comfort, consistency, expansion, creativity, drive, balance) with band, score, personal\_key, shared\_key
+
+      * compat.meta with engine\_tag \= hdengine-dev, invocation\_tag \= INV-LOCAL, release\_id all zeros for this CLI/dev context
+
+      * viewer\_prefs with top\_category \= "heat" and uniform weights of 50 for all categories.
+
+    * audit/qa/hde-epic018/d1-serializer/d1-serializer-compat-001-ab-run1.pretty.json and d1-serializer-compat-001-ab-run2.pretty.json — pretty-printed versions of the same JSON outputs, used only to confirm parseability and human readability (value-equal to the raw JSON).
+
+    * audit/qa/hde-epic018/d1-serializer/d1-serializer-compat-001-ab-cmp-exit.txt — cmp exit code file containing only 0, confirming that the two raw JSON outputs for AB run 1 and AB run 2 are byte-identical (two-run identity for this synthetic pair).
+
+    * audit/qa/hde-epic018/qa\_notes.md — mechanical QA notes entries for Step 2 indicating that the D1 compat two-run identity check completed, including one line explicitly mentioning hdctl showcompat \--source vendor.
+
 * Notes:
 
-  * The harness and CI artifacts above are run under closed rails with determinism pins (SAFE\_MODE=1, ALLOW\_NETWORK=0, LC\_ALL=C, LANG=C, TZ=UTC) and are indexed under the Evidence Index and Mirror discipline (see sections 0.3 and 0.5).
+  * The harness and CI artifacts above are run under closed rails with determinism pins (SAFE\_MODE=1, ALLOW\_NETWORK=0, LC\_ALL=C, LANG=C, TZ=UTC) and are indexed under the Evidence Index and Machine Mirror discipline (see sections 0.3 and 0.5).
 
-  * EPIC017 D1 closes the canonical serialization slice for hdctl showcompat: stdout compat output is canonical JSON and non-empty, AB↔BA parity and two-run identity are proven, Reader↔CLI parity is established via \--dump-reader, and preimage recompute for Reader envelopes is verified.
+  * EPIC017 D1 closes the core canonical serialization slice for hdctl showcompat: stdout compat output is canonical JSON and non-empty; AB↔BA parity and two-run identity are proven; Reader↔CLI parity is established via \--dump-reader; and preimage recompute for Reader envelopes is verified.
 
-  * EPIC017 QA05 adds a QA-layer confirmation that hdctl showcompat \--source vendor \--dump-reader in the Codespaces CLI environment produces a Reader v1 envelope that matches the six-key, numeric-free covenant (harmony-only categories, eligible flag, meta, release\_id, idempotence\_hash). The meta.engine\_tag, meta.invocation\_tag, and release\_id values in this envelope reflect the CLI/local identity (hdengine-dev, INV-LOCAL, zero release) and must not be treated as the Railway production engine identity; the canonical production identity remains the /internal/version ops surface on Railway.
+  * EPIC017 QA05 adds a QA-layer confirmation that hdctl showcompat \--source vendor \--dump-reader in the Codespaces CLI environment produces a Reader v1 envelope that matches the six-key, numeric-free covenant; the meta.engine\_tag, meta.invocation\_tag, and release\_id values in this envelope reflect the CLI/local identity (hdengine-dev, INV-LOCAL, zero release) and must not be treated as the Railway production engine identity. The canonical production identity remains the /internal/version ops surface on Railway.
 
-  * This subtask remains scoped to the serializer and parity harness; API-level Reader A7 transport proofs and Catalog routing are handled in Conjunction and Distillation tasks.
+  * EPIC018 QA01 directory-casing normalization is path-level only and does not alter the semantics of this harness or the acceptance tokens; it ensures that all EPIC017 QA artifacts referenced here are now discoverable under the canonical audit/qa/hde-epic017/logs root.
 
-### **Subtask HDE-CALC002.6 — Canonical guard artifacts for CLI serializer/emitter**
+  * EPIC018 QA04 extends this story by running a D1 compat spot-check for a synthetic birth pair via hdctl showcompat, storing raw and pretty JSON outputs and a cmp exit-code file under audit/qa/hde-epic018/d1-serializer. This QA step confirms that compat JSON for that pair has the canonical structure and that two successive hdctl showcompat runs (AB run 1 and AB run 2\) produce byte-identical JSON under CLI/dev identity (hdengine-dev, INV-LOCAL, zero release). It is consistent with the harness-level determinism guarantees in this subtask and provides additional QA evidence for TWO\_RUN\_IDENTITY\_OK and JSON\_CANONICAL\_CHECK\_OK on the compat surface without changing the Done status of this row.  
+  * 
 
-* **Subtask name/label:** Canonical guard artifacts for CLI serializer/emitter
+  ### **Subtask HDE-CALC002.6 — Canonical guard artifacts for CLI serializer/emitter**
 
-* **Subtask description:**  
-   Treat the CLI serializer/emitter guard logs under `artifacts/cli/guards/**` as the canonical guard artifacts for CLI serializer coupling. In particular:
+* Subtask name/label: Canonical guard artifacts for CLI serializer/emitter
 
-  * `artifacts/cli/guards/serializer_grep_guard.log` — grep-guard proving there are no ad-hoc serializers on public paths.
+* Subtask description:  
+   Treat the CLI serializer/emitter guard logs under `artifacts/cli/guards/**` as the canonical guard artifacts for CLI serializer coupling and ensure they are produced and verified via the canonical guard tools:
 
-  * `artifacts/cli/guards/emitter_symbol_proof.txt` — import-graph/symbol proof that only the shared presenter/emitter symbol is used for public bytes.
+  * Canonical guard artifacts (homes):
 
-* Ensure that Evidence Index and Machine Mirror records for CLI serializer coupling use these paths as their `discovered_physical_path` values, with co-located `path_proof` files and canonical JSONL mirror records. Implementations MAY also write copies of these logs under `audit/gates/guards/**` for internal audit workflows, but those locations are **secondary** and not required for mechanics-level acceptance.
+    * `artifacts/cli/guards/serializer_grep_guard.log` — AST-based grep-guard report confirming there are no disallowed JSON serializers (for example `json.dumps`/`json.dump`) on governed CLI paths.
 
-* **Subtask status:** **In progress**
+    * `artifacts/cli/guards/emitter_symbol_proof.txt` — AST-based emitter symbol proof documenting which canonical emitter symbols are used by governed CLI handlers (for example `showcompat`, `bg:resolve`, and `aux-preview`), including explicit `<none>` listing for optional emitters such as `aux-preview`.
 
-* **Epic or card:** **EPIC-017 (D1)**
+  * Guard tools (titles-only):
 
-* **Tokens:**
+    * `tools/cli/serializer_grep_guard.py` — runs under determinism env rails (`LC_ALL=C`, `LANG=C`, `TZ=UTC`, `SAFE_MODE=1`, `ALLOW_NETWORK=0`) and scans the governed CLI scope (default `engine/cli/**`, plus optional extra paths) for disallowed JSON serialization; emits a stable PASS/FAIL log at `artifacts/cli/guards/serializer_grep_guard.log` with no timestamps or env-dependent content.
 
-  * `EVIDENCE_PATHS_VALIDATED_OK`
+    * `tools/cli/emitter_symbol_proof.py` — runs under the same determinism env rails and analyzes the CLI module to prove that governed handlers route through allow-listed emitter symbols; emits a stable proof at `artifacts/cli/guards/emitter_symbol_proof.txt` listing handler→emitter mappings and a summary PASS/FAIL line.
 
-  * `EVIDENCE_INDEX_UPDATED_OK`
+  * CI integration (titles-only):
 
-  * `EVIDENCE_INDEX_MIRROR_OK`
+    * CI MUST invoke the guard tools under closed determinism rails (after `ci/checks/check_env_pins.sh`), failing the job if either guard reports violations.
 
-* **Evidence / artifacts:**
+    * CI MUST run `pytest tests/cli/test_serializer_guards.py`, which exercises both tools in clean and synthetic violation scenarios and asserts correct PASS/FAIL behavior and log contents.
 
-  * `artifacts/cli/guards/serializer_grep_guard.log`
+  * Index/Mirror discipline (shared with the Evidence Index canon):
 
-  * `artifacts/cli/guards/emitter_symbol_proof.txt`
+    * Evidence Index and Machine Mirror records for CLI serializer coupling MUST use `artifacts/cli/guards/serializer_grep_guard.log` and `artifacts/cli/guards/emitter_symbol_proof.txt` as their `discovered_physical_path` values.
 
-  * `docs/evidence/INDEX.json`
+    * Each guard artifact has a co-located `*.path_proof.txt` transcript that records at least the governed fields (path, size\_bytes, sha256, timestamps) and is referenced via the mirror record’s `proof_anchor`.
 
-  * `docs/evidence/INDEX.sha256`
+    * Mirror records for the guard artifacts obey the global mirror discipline (records-only canonical JSONL; UTF-8, sorted keys, compact, exactly one LF; unknown-key reject; fixed field order), as enforced by `ci/checks/check_mirror_schema.sh` and the evidence skeleton tests.
 
-  * `artifacts/evidence_index.jsonl`
+    * Implementations MAY also write copies of the guard logs under `audit/gates/guards/**` for internal audit workflows, but those locations are secondary and not required for mechanics-level acceptance in PF09.
 
-* **Notes:**  
-   This subtask aligns CLI serializer/emitter guard evidence with the Documentation Artifacts and Registry canon: guard logs live at `artifacts/cli/guards/**` and are indexed and mirrored under the global Evidence Index discipline. PF09 remains consumer-only for record schemas and token semantics; those live in HDE-Governance and HDE-Schemas & Artifacts.
+* Subtask status: Done
+
+* Epic or card: EPIC-017 (D1); EPIC-018 (D3 CLI serializer guards)
+
+* Tokens:
+
+  * CLI\_SERIALIZER\_GUARD\_OK
+
+  * SERIALIZER\_GREP\_GUARD\_OK
+
+  * EMITTER\_SYMBOL\_PROOF\_OK
+
+  * EVIDENCE\_PATHS\_VALIDATED\_OK
+
+  * EVIDENCE\_INDEX\_UPDATED\_OK
+
+  * EVIDENCE\_INDEX\_MIRROR\_OK
+
+* Evidence / artifacts:
+
+  * Guard tools and tests (titles-only):
+
+    * `tools/cli/serializer_grep_guard.py`
+
+    * `tools/cli/emitter_symbol_proof.py`
+
+    * `tests/cli/test_serializer_guards.py` — exercises guard behavior in clean and violation scenarios.
+
+  * Guard artifacts and proofs (closed-rails CI acceptance):
+
+    * `artifacts/cli/guards/serializer_grep_guard.log`
+
+    * `artifacts/cli/guards/serializer_grep_guard.log.path_proof.txt`
+
+    * `artifacts/cli/guards/emitter_symbol_proof.txt`
+
+    * `artifacts/cli/guards/emitter_symbol_proof.txt.path_proof.txt`
+
+  * Index/Mirror records (closed-rails CI acceptance):
+
+    * `docs/evidence/INDEX.json`
+
+    * `docs/evidence/INDEX.sha256`
+
+    * `artifacts/evidence_index.jsonl`
+
+  * Open-rails Live QA (informational, non-gating):
+
+    * `audit/qa/hde-epic018/d3-cli-guards/d3-cli-guard-001-serializer_grep_guard.log`
+
+    * `audit/qa/hde-epic018/d3-cli-guards/d3-cli-guard-001-serializer_grep_guard-exit.txt` (contains `1` under open rails).
+
+    * `audit/qa/hde-epic018/d3-cli-guards/d3-cli-guard-001-emitter_symbol_proof.txt`
+
+    * `audit/qa/hde-epic018/d3-cli-guards/d3-cli-guard-001-emitter_symbol_proof-exit.txt` (contains `1` under open rails).
+
+    * `audit/qa/hde-epic018/qa_notes.md` — Step 3 entry noting that D3 CLI guards were run under an open-rails Codespaces environment.
+
+* Notes:
+
+  * EPIC017 D1 originally introduced the CLI guard logs under `artifacts/cli/guards/**` and wired them into the evidence skeleton. EPIC018 PR03 completes the D3 slice by adding canonical guard tools, determinism-rails integration, CI wiring, and `tests/cli/test_serializer_guards.py`, and by ensuring that each guard artifact has a governed path-proof and Index/Mirror entry. For D3 guard tokens (`CLI_SERIALIZER_GUARD_OK`, `SERIALIZER_GREP_GUARD_OK`, `EMITTER_SYMBOL_PROOF_OK`), **closed-rails CI runs** using these tools and artifacts are the authoritative acceptance surface.
+
+  * EPIC018 QA05 (D3 open-rails CLI guard step) runs the same guard tools from a Codespaces environment that is intentionally **open rails only** for Live QA (SAFE\_MODE=0, ALLOW\_NETWORK=1). In that environment, both guards exit with code `1` and their logs and exit-code files are stored under `audit/qa/hde-epic018/d3-cli-guards/`. These failures are expected and non-actionable: they show that the guards correctly enforce determinism env pins and **fail closed when rails are not pinned**, not that CLI serializer/emitter wiring is broken.
+
+  * For PF09 and Governance:
+
+    * D3 guard checklist items and guard tokens are **satisfied** by CI runs under closed determinism rails and the canonical guard artifacts in `artifacts/cli/guards/**` plus their Index/Mirror entries.
+
+    * Live QA in open-rails environments may run the guards **informationally** (to confirm env-pin enforcement) and **reference** CI status for D3 acceptance; open-rails guard runs are not required to exit 0 and MUST NOT be treated as satisfying D3 guard tokens on their own.
+
+  * Broader CLI/Reader parity and A7 transport behavior remain the responsibility of Conjunction and Distillation tasks (for example HDE-CONJ003, HDE-CONJ004, HDE-DIST001) that consume these guard artifacts and tokens; this subtask is scoped to the presence, correctness, and evidence discipline of the CLI serializer/emitter guard tools and logs.
 
 ---
 
@@ -763,17 +865,70 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 
   
 
-### Subtask HDE-CALC003.1 — Sanity pipeline (ordered)
+  ### **Subtask HDE-CALC003.1 — Closed-rails sanity pipeline (ordered)**
 
-* **Subtask name/label:** Sanity pipeline (ordered)
+* **Subtask name/label:** Closed-rails sanity pipeline (ordered)
 
 * **Subtask description:**  
-   Provide a single local sanity target (e.g. `scripts/make_sanity.sh`) that, when run, executes in order:  
-   formatting → lint/type checks → unit and property tests → JSON-Schema validation for governed inputs → goldens/evidence capture → Index & Machine Mirror parity checks with path-proof validation.
+   Provide a single, closed-rails sanity pipeline entrypoint that orchestrates the core Calcination evidence harness under determinism env rails and fails closed on any drift:
 
-* **Subtask status:** **Unknown**
+  * **Canonical entrypoint (titles-only).**
 
-* **Epic or card:** **Unknown**
+    * Use `tools/evidence/run_sanity_pipeline.py` as the canonical sanity pipeline entrypoint for Calcination evidence (EPIC018 D4).
+
+    * The pipeline MUST call `ensure_determinism_env()` from `engine.runtime.determinism_env` at startup and abort with a clear error if the determinism env pins are not satisfied.
+
+  * **Ordered steps (minimum).**
+
+    * Run a fixed sequence of steps that, at minimum, covers:
+
+      * D1 serializer determinism and CLI canonical bytes tests.
+
+      * D2 determinism env rails checks (env pins helper and `ci/checks/check_env_pins.sh`).
+
+      * D3 CLI serializer/emitter guards.
+
+      * PF12 evidence skeleton checks (Human Index, sentinel, Machine Mirror, path-proofs, orientation demo).
+
+    * For each step, record a deterministic line in the sanity log such as `check <name>:OK` or `check <name>:FAIL`, and emit a final `summary:PASS` or `summary:FAIL` line; stop on the first failure.
+
+    * The pipeline runs under closed rails (`SAFE_MODE=1`, `ALLOW_NETWORK=0`, `LC_ALL=C`, `LANG=C`, `TZ=UTC`) and must not perform vendor or external I/O.
+
+  * **Sanity log artifact.**
+
+    * Emit `artifacts/sanity/sanity.log` as a stable, canonical text log (LF-terminated, no timestamps or env-specific noise) containing:
+
+      * A header line (for example `sanity_pipeline`).
+
+      * A single `env:` line capturing the determinism env pins and suite set in a normalized form.
+
+      * One `check <step>:OK|FAIL` line per step.
+
+      * A final `summary:PASS|FAIL` line.
+
+    * For `artifacts/sanity/sanity.log`, maintain a co-located `artifacts/sanity/sanity.log.path_proof.txt` transcript with governed fields (path, size\_bytes, sha256, mtime\_utc, produced\_at\_utc) consistent with PF12 semantics.
+
+  * **Index/Mirror discipline.**
+
+    * Treat the sanity log as a governed artifact:
+
+      * Add an entry to `docs/evidence/INDEX.json` (for example `artifact_key: "sanity.pipeline.log"`, `discovered_physical_path: "artifacts/sanity/sanity.log"`).
+
+      * Ensure `docs/evidence/INDEX.sha256` is updated to match the canonical `INDEX.json` bytes.
+
+      * Ensure `artifacts/evidence_index.jsonl` contains a matching mirror record with correct `sha256`, `size_bytes`, and `proof_anchor` pointing to `artifacts/sanity/sanity.log.path_proof.txt`, following mirror field-order and canonical JSONL rules.
+
+    * Any change to the sanity pipeline steps or log format MUST be accompanied by refreshed sanity log, path-proof, and Index/Mirror entries in the same PR, validated via `tools/evidence/update_evidence_index.py --check` and `tools/evidence/orientation_demo.py --check`.
+
+  * **CI integration (titles-only).**
+
+    * CI MUST include a dedicated sanity-pipeline job that runs `python tools/evidence/run_sanity_pipeline.py` under closed rails, alongside the underlying suites it orchestrates (serializer tests, env pins checks, CLI guards, evidence skeleton tests).
+
+    * The sanity pipeline job is a “belt and suspenders” orchestrator: it does not replace the individual determinism/evidence jobs, but it MUST be green for D4 acceptance.
+
+* **Subtask status:** **Done**
+
+* **Epic or card:** **EPIC-018 (D4 — Evidence skeleton & sanity pipeline)**
 
 * **Tokens:**
 
@@ -785,10 +940,26 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 
 * **Evidence / artifacts:**
 
-  * Sanity pipeline transcripts/logs (not explicitly named here; referenced via gate scripts).
+  * `tools/evidence/run_sanity_pipeline.py` — Calcination sanity pipeline entrypoint.
+
+  * `artifacts/sanity/sanity.log` — closed-rails sanity log (canonical text, LF-terminated).
+
+  * `artifacts/sanity/sanity.log.path_proof.txt` — path-proof transcript for the sanity log.
+
+  * `docs/evidence/INDEX.json` / `docs/evidence/INDEX.sha256` — Human Index and sentinel including the sanity log entry.
+
+  * `artifacts/evidence_index.jsonl` — Machine Mirror record for `sanity.pipeline.log` with `proof_anchor` to the sanity log path-proof.
+
+  * CI evidence (titles-only):
+
+    * `.github/workflows/ci.yml` sanity-pipeline job configuration.
+
+    * `tests/evidence/test_sanity_pipeline.py` — unit tests for sanity pipeline orchestrator behavior (success and fail-fast cases).
+
+    * `tests/evidence/test_evidence_skeleton.py` and `tests/ops/test_evidence_index.py` — evidence skeleton and self-record invariants used by the pipeline.
 
 * **Notes:**  
-   PF09 does not pin script name or tools; it requires this ordered pipeline to exist and be runnable.
+   EPIC018 PR04 (“Evidence Index Self-Proof Coherence — sanity pipeline”) implements the closed-rails sanity pipeline entrypoint and wires it into CI, regenerates the Evidence Index/mirror and path-proofs (including the `index.machine_mirror` self-record) and fixes P1 metadata drift for `engine.order.abba_identity.bytes` and the Machine Mirror self-record. This subtask is now considered **Done** for the sanity pipeline slice of HDE-CALC003; broader release-level sanity pipeline work (pack/manifest, A7, DB posture, BodyGraph mechanics) remains tracked under Distillation tasks such as HDE-DIST001.6.
 
 ### Subtask HDE-CALC003.2 — Human Evidence Index
 
@@ -797,7 +968,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Subtask description:**  
    Maintain `docs/evidence/INDEX.json` as the single home for evidence titles/paths; update in the same PR as governed artifacts, without duplicating its entries in PF09.
 
-* **Subtask status:** **Complete**
+* **Subtask status:** **Done**
 
 * **Epic or card:** **EPIC-017 (D2)**
 
@@ -829,7 +1000,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 **Subtask description:**  
  Maintain `docs/evidence/INDEX.sha256` as sha256 over the exact bytes of `INDEX.json`; update in the same PR as the Human Index and gate on `EVIDENCE_INDEX_HASH_OK`.
 
-**Subtask status:** **Complete**
+**Subtask status:** **Done**
 
 **Epic or card:** **EPIC-017 (D2)**
 
@@ -855,7 +1026,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 **Subtask description:**  
  Provide `artifacts/evidence_index.jsonl` as a records-only Machine Mirror with one JSON object per line; canonical JSONL (UTF-8, no BOM; ASCII-sorted keys; compact; exactly one LF); unknown keys rejected; maintain 1:1 parity with the Human Index; provide path-proofs.
 
-**Subtask status:** **Complete**
+**Subtask status:** **Done**
 
 **Epic or card:** **EPIC-017 (D2)**
 
@@ -889,7 +1060,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 **Subtask description:**  
  Enforce ASCII field order `artifact_key, discovered_physical_path, produced_at_utc, proof_anchor, role, sha256, size_bytes`; sort-before-write by `(artifact_key, discovered_physical_path)`; ensure uniqueness of that pair; keep `artifacts/evidence_index.jsonl` as the single Machine Mirror file.
 
-**Subtask status:** **Complete**
+**Subtask status:** **Done**
 
 **Epic or card:** **EPIC-017 (D2)**
 
@@ -931,16 +1102,58 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Notes:**  
    High-level behavioral requirement; detailed schema is governed by PF12.
 
-### Subtask HDE-CALC003.7 — Locale pins (repo-wide)
+### **Subtask HDE-CALC003.7 — Locale pins (repo-wide)**
 
 * **Subtask name/label:** Locale pins for all byte checks
 
 * **Subtask description:**  
-   Export `LC_ALL=C`, `LANG=C`, `TZ=UTC` in all lint/test/artifact jobs to ensure determinism across builds.
+   Export and enforce deterministic locale/env pins for all byte-sensitive checks, with explicit rails posture for determinism suites:
+
+  * **Repo-wide intent.**
+
+    * All lint/test/artifact jobs that produce or compare governed bytes SHOULD run under:
+
+      * `LC_ALL=C`
+
+      * `LANG=C`
+
+      * `TZ=UTC`
+
+    * PF09 does not enumerate every job; it requires that the CI configuration and scripts make these pins explicit and keep them stable for determinism-sensitive work.
+
+  * **Determinism suites (EPIC017 D2 / EPIC018 D2).**
+
+    * Determinism-sensitive suites (evidence skeleton, orientation, invariance) MUST run under closed rails:
+
+      * `LC_ALL=C`, `LANG=C`, `TZ=UTC`
+
+      * `SAFE_MODE=1`, `ALLOW_NETWORK=0`
+
+    * The canonical implementation of these pins lives in:
+
+      * `engine/runtime/determinism_env.py` — defines `DETERMINISM_ENV_PINS` and helper functions (e.g., `ensure_determinism_env`, `render_env_log`, `record_env_log`).
+
+      * CI job env in `.github/workflows/ci.yml` for determinism jobs.
+
+      * `ci/checks/check_env_pins.sh` — asserts the determinism env pins and fails if they deviate.
+
+  * **Determinism env evidence.**
+
+    * Capture a governed determinism env log under:
+
+      * `audit/gates/determinism/env_pins.log` — single-line canonical JSON (UTF-8; sorted keys; compact; one LF) recording the determinism env pins and the suite set (e.g., `ci:determinism-rails`, `tests:invariance`, `tests:evidence-ordering`, `orientation:demo`).
+
+      * `audit/gates/determinism/env_pins.log.path_proof.txt` — path proof for the env pins log (path, size\_bytes, sha256, mtime\_utc, produced\_at\_utc).
+
+    * Index the env pins artifact under the Evidence Index discipline:
+
+      * Add an entry to `docs/evidence/INDEX.json` with `artifact_key` (for example `audit.determinism.env_pins`) and `discovered_physical_path: "audit/gates/determinism/env_pins.log"`.
+
+      * Ensure `artifacts/evidence_index.jsonl` contains a corresponding mirror record with matching `sha256`, `size_bytes`, `proof_anchor` pointing to `audit/gates/determinism/env_pins.log.path_proof.txt`, and canonical JSONL shape.
 
 * **Subtask status:** **Partial**
 
-* **Epic or card:** **EPIC-017 (D2)**
+* **Epic or card:** **EPIC-017 (D2); EPIC-018 (D2 determinism env rails)**
 
 * **Tokens:**
 
@@ -948,20 +1161,32 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 
 * **Evidence / artifacts:**
 
-  * CI workflow environment for evidence skeleton jobs (titles-only):
+  * CI workflow environment for determinism/evidence jobs (titles-only):
 
-    * `.github/workflows/ci.yml` — sets `SAFE_MODE=1`, `ALLOW_NETWORK=0`, `LC_ALL=C`, `LANG=C`, `TZ=UTC` for evidence runs.
+    * `.github/workflows/ci.yml` — sets `SAFE_MODE=1`, `ALLOW_NETWORK=0`, `LC_ALL=C`, `LANG=C`, `TZ=UTC` for determinism and evidence skeleton runs.
 
-  * CI logs for:
+  * CI checks:
 
-    * `python tools/evidence/update_evidence_index.py --check`
+    * `ci/checks/check_env_pins.sh` — asserts determinism env pins and fails on mismatch.
 
-    * `python tools/evidence/orientation_demo.py --check`
+    * `python tools/evidence/update_evidence_index.py --check` — evidence skeleton checks under closed rails.
 
-    * `python -m pytest tests/evidence tests/ops/test_evidence_index.py`
+    * `python tools/evidence/orientation_demo.py --check` — orientation/mirror coherence checks under closed rails.
+
+    * `python -m pytest tests/invariance/test_locale_tz.py tests/invariance/test_bytes_identity.py tests/invariance/test_determinism_env_helper.py` — invariance tests that import and exercise `DETERMINISM_ENV_PINS` and `ensure_determinism_env`.
+
+  * Determinism env evidence artifacts (titles/paths only):
+
+    * `audit/gates/determinism/env_pins.log`
+
+    * `audit/gates/determinism/env_pins.log.path_proof.txt`
+
+    * `docs/evidence/INDEX.json` / `docs/evidence/INDEX.sha256`
+
+    * `artifacts/evidence_index.jsonl`
 
 * **Notes:**  
-   Locale pins are now enforced for evidence skeleton and mirror checks under EPIC017 D2. Additional work is needed to extend these pins to **all** lint/test/artifact jobs before this subtask can be considered fully complete.
+   EPIC017 D2 established the initial evidence skeleton pins for the Index/Mirror harness. EPIC018 PR02 (“Evidence Index Self-Proof Coherence — determinism env rails”) extends this by introducing the canonical determinism env helper and env pins log, pinning CI env and rails for determinism suites, and wiring `ci/checks/check_env_pins.sh` into the CI pipeline. This subtask remains **Partial** because extending these pins to **all** lint/test/artifact jobs (beyond the determinism/evidence suites) is still outstanding work and will be completed in future slices; PF09 records both the current determinism env discipline and the broader repo-wide intent.
 
 ### Subtask HDE-CALC003.8 — Topology orientation demo
 
@@ -970,7 +1195,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 **Subtask description:**  
  Add `audit/gates/topology/orientation_demo.txt` showing high→low normalized to min→max `NN–NN` (before/after) as a topology orientation demo.
 
-**Subtask status:** **Complete**
+**Subtask status:** **Done**
 
 **Epic or card:** **EPIC-017 (D2)**
 
@@ -1064,26 +1289,98 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
   **Notes:**  
      EPIC017 PR02 wires Index/Mirror/Orientation gating into CI and closes a large part of this subtask. Additional CI integration (e.g., full sanity pipeline covering pack identity, A7 proofs, DB posture, BodyGraph gates) remains to be implemented in later Distillation tasks.
 
----
+### **Subtask HDE-CALC003.11 — Evidence index touch discipline**
 
-## Task HDE-CALC004 — Programmatic Configuration System
+* **Subtask name/label:** Evidence Index/Mirror touch discipline
+
+* **Subtask description:**  
+   For any change that touches the Human Index, its sentinel, or the Machine Mirror, enforce a standard tool chain under closed rails in the same PR so that the index, mirror, and path-proofs stay in lockstep:
+
+  * **Scope.** This discipline applies to any PR that adds, removes, or edits:
+
+    * `docs/evidence/INDEX.json`
+
+    * `docs/evidence/INDEX.sha256`
+
+    * `artifacts/evidence_index.jsonl`
+
+  * **Required commands (closed-rails env).**
+
+    * Run `python tools/evidence/update_evidence_index.py` in write mode to regenerate the Human Index (`INDEX.json` and `INDEX.sha256`) and the Machine Mirror (`artifacts/evidence_index.jsonl`) according to PF12 semantics.
+
+    * Then run `python tools/evidence/update_evidence_index.py --check` to validate the regenerated index and mirror against the committed artifacts (including the mirror body hash and hash sentinel) under closed rails (`SAFE_MODE=1`, `ALLOW_NETWORK=0`, `LC_ALL=C`, `LANG=C`, `TZ=UTC`).
+
+    * Run `python tools/evidence/orientation_demo.py` to regenerate the topology orientation report and any associated mirror-coherence evidence.
+
+    * Then run `python tools/evidence/orientation_demo.py --check` to verify that index entries, mirror records, and path-proofs are coherent (including the `index.machine_mirror` self-record) under the same closed-rails env.
+
+  * **Same-PR rule.** All of the above commands MUST be run, and their outputs committed, in the **same PR** that changes the Human Index, sentinel, or Machine Mirror so that:
+
+    * `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl`, and `*.path_proof.txt` remain consistent, and
+
+    * the acceptance tokens `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_HASH_OK`, and `MACHINE_MIRROR_UPDATED_OK` continue to be satisfied for the current mirror body and index.
+
+* **Subtask status:** Not done
+
+* **Epic or card:** EPIC-018 (D4 evidence skeleton & mirror)
+
+* **Tokens:**
+
+  * `EVIDENCE_INDEX_UPDATED_OK`
+
+  * `EVIDENCE_INDEX_HASH_OK`
+
+  * `MACHINE_MIRROR_UPDATED_OK`
+
+* **Evidence / artifacts:**
+
+  * CI and local run logs for:
+
+    * `python tools/evidence/update_evidence_index.py` (write mode)
+
+    * `python tools/evidence/update_evidence_index.py --check`
+
+    * `python tools/evidence/orientation_demo.py`
+
+    * `python tools/evidence/orientation_demo.py --check`
+
+  * Hardened artifacts (unchanged; governed by other subtasks):
+
+    * `docs/evidence/INDEX.json`
+
+    * `docs/evidence/INDEX.sha256`
+
+    * `artifacts/evidence_index.jsonl`
+
+    * `artifacts/evidence_index.jsonl.path_proof.txt` and other `*.path_proof.txt` for governed artifacts
+
+* **Notes:**  
+   EPIC018 PR01 (“machine mirror self-proof fix”) is a completed example of this discipline: it only touched `artifacts/evidence_index.jsonl` and `artifacts/evidence_index.jsonl.path_proof.txt` to repair stale SHA/size metadata for the `index.machine_mirror` self-record and its path-proof and passed the full evidence skeleton CI (update\_evidence\_index and orientation demo write/--check under closed rails). This subtask records that **future** changes to Index/sentinel/Mirror MUST follow the same tool-driven process rather than hand-editing metadata.
+
+  ## **Task HDE-CALC004 — Programmatic Configuration System**
 
 * **Task name/label:** Programmatic Configuration System
 
-* **Task status:** **Partial**
+* **Task status:** **Done**
 
 * **Task ID:** HDE-CALC004
 
 * **Task description:**  
-   Provide a typed, deterministic configuration system that loads governed catalogs, validates/normalizes them, enforces alias policy, emits a registry report, and exposes typed FE/BE bundles, with evidence integrated into the Index/Mirror system.
+   Provide a typed, deterministic configuration system that loads governed catalogs, validates/normalizes them, enforces alias policy, emits a registry report, and exposes typed FE/BE bundles, with evidence integrated into the Evidence Index/Mirror system.
 
 * **Task notes:**
 
-  * Audit (v1 — 2025-11-17) originally flagged missing unknown-ID failure capture and registry report artifacts, with indices not updated. EPIC017 PR03 (D3) implemented the PF12-aligned registry loader (`engine.config.registry_loader`), enforced explicit alias policy OFF/ON with allow-list ledgers, added the canonical `registry_report.v1` generator (`tools/generate_registry_report.py`), and wired `artifacts/registry/registry_report.json` into the Evidence Index/Mirror with a governed path-proof under rails-closed CI.
+  * EPIC017 PR03 (D3) implemented the PF12-aligned registry loader (`engine.config.registry_loader`), enforced explicit alias policy OFF/ON with allow-list ledgers, added the canonical `registry_report.v1` generator (`tools/generate_registry_report.py`), and wired `artifacts/registry/registry_report.json` into the Evidence Index/Mirror with a governed path-proof under rails-closed CI. Loader tests under `tests/config/` cover unknown IDs, duplicates, and alias policy behavior, and registry\_report tests cover canonical JSON and two-run identity.
 
-  * D3 evidence includes loader tests under `tests/config/` (unknown IDs, duplicates, alias policy), registry\_report determinism tests (`registry_report.v1` shape, canonical LF-terminated JSON, two-run identity), and Index/Mirror coherence tests for `registry_report` and its path-proof.
+  * EPIC018 D5 extended this by introducing the closed-rails config artifact generator (`tools/config/generate_config_artifacts.py` / `tools/config/artifacts.py`), materializing governed Magic-10 and band-edges config artifacts under `artifacts/thresholds/magic10_config.json` and `artifacts/thresholds/band_edges.json`, and validating canonical formatting and domain invariants via `tests/config/test_config_artifacts.py`. These artifacts are wired into the Evidence Index/Mirror with path-proofs, and the D5 config acceptance map (`audit/EPIC-018_config_acceptance_map.json`) ties PF09 config tasks to artifact\_keys, tokens, and tests.
 
-  * Task remains **Partial** until typed FE/BE bundles (004.5/004.6) and any additional configuration artifacts are implemented and indexed; this row currently reflects only the loader \+ registry\_report slice (EPIC017 D3).
+  * EPIC018 D6 added typed FE/BE bundles via a closed-rails bundle generator (`engine/config/bundles.py` and `tools/config/generate_bundles.py`), emitting canonical FE/BE bundle JSON under `artifacts/config_bundles/` with a `sources` block that records digests for upstream config artifacts. `tests/config/test_typed_bundles.py` validates canonical JSON, two-run identity, JSON Schema conformance (local test schemas), and strict linkage back to governed config artifacts and the registry report. FE/BE bundles are wired into the Evidence Index/Mirror with path-proofs and tested under the same determinism env rails as other config artifacts.
+
+  * From PF09’s perspective (code and evidence only), the Programmatic Configuration System as defined here is now complete: loader, alias policy, registry\_report (`registry_report.v1`), governed Magic-10 and band-edges configs, and typed FE/BE bundles all exist, run under closed rails, are canonical/deterministic, and are integrated into the Evidence Index/Mirror. Remaining gaps called out in D5/D6 and Addendum 27 are documentation-only (formalizing config/bundle tokens and artifact descriptions in PF19/PF12/PF20) and do not block this checklist task; any future configuration families will be handled via new epics and tasks, not by reopening HDE-CALC004.
+
+---
+
+* 
 
   ### Subtask HDE-CALC004.1 — Unknown-ID hard-fail
 
@@ -1092,7 +1389,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Subtask description:**  
    Loader must hard-fail (typed error) on any unknown identifier.
 
-* **Subtask status:** **Complete**
+* **Subtask status:** **Done**
 
 * **Epic or card:** **EPIC-017 (D3)**
 
@@ -1118,7 +1415,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Subtask description:**  
    Default alias policy **OFF**; if ON, normalize via declared alias ledgers; outputs remain canonical; reject unknown aliases and undeclared entries.
 
-* **Subtask status:** **Complete**
+* **Subtask status:** **Done**
 
 * **Epic or card:** **EPIC-017 (D3)**
 
@@ -1133,45 +1430,20 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Notes:**  
    Alias-policy token semantics are single-homed in Governance/Schemas; PF09 records that the loader tests enforce the OFF/allow-list/fail-closed behavior.
 
-### Subtask HDE-CALC004.3 — Registry report emission
+  ### **Subtask HDE-CALC004.3 — Registry report emission**
 
 * **Subtask name/label:** Emit registry report each run
 
 * **Subtask description:**  
-   Emit a names-only, canonical JSON registry report each run at `artifacts/registry/registry_report.json`.
+   Emit a names-only, canonical JSON registry report each run at `artifacts/registry/registry_report.json`, generated under closed rails via the hardened registry loader and shared serializer:
 
-* **Subtask status:** **Complete**
+  * Use the canonical registry report generator (titles-only; for example `tools/generate_registry_report.py` or `tools/config/generate_config_artifacts.py`) to emit `registry_report.v1` under determinism env rails (`LC_ALL=C`, `LANG=C`, `TZ=UTC`, `SAFE_MODE=1`, `ALLOW_NETWORK=0`).
 
-* **Epic or card:**EPIC-017 (D3)  
-* **Tokens:**  
-* `CONFIG_GEN_OK`
+  * Ensure the report is canonical JSON (UTF-8, no BOM; sorted keys; compact; exactly one trailing LF) and carries `schema: "registry_report.v1"` and stable identity fields (for example `generated_at_utc`) consistent with PF14’s registry invariants and two-run identity.
 
-* `JSON_CANONICAL_CHECK_OK`
+* **Subtask status:** **Done**
 
-* `EVIDENCE_INDEX_UPDATED_OK`
-
-* `EVIDENCE_INDEX_MIRROR_OK`  
-* **Evidence / artifacts:**
-
-  * `tools/generate_registry_report.py` — programmatic generator for `registry_report.v1`, driven by the canonical loader in HDE-CALC004.1.
-
-  * `artifacts/registry/registry_report.json` — LF-terminated, canonical JSON registry report (schema and field shapes governed by PF12).
-
-  * `artifacts/registry/registry_report.json.path_proof.txt` — path-proof transcript for the registry report artifact (path, sha256, size\_bytes, produced\_at\_utc).
-
-* **Notes:**  
-  Registry report generation is now implemented via `tools/generate_registry_report.py` and participates in canonical JSON and Index/Mirror discipline as required for D3.
-
-### Subtask HDE-CALC004.4 — Registry report alias policy summary
-
-* **Subtask name/label:** Registry report alias policy summary
-
-* **Subtask description:**  
-   Ensure the registry report includes a names-only alias policy summary that reflects loader behavior: `mode` is `off` or `allow_list` (closed set), and `aliases` is a mapping from alias IDs to canonical channel IDs when allow-list is enabled.
-
-* **Subtask status:** **Complete**
-
-* **Epic or card:** **EPIC-017 (D3)**
+* **Epic or card:** **EPIC-017 (D3); EPIC-018 (D5 config artifacts)**
 
 * **Tokens:**
 
@@ -1179,57 +1451,211 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 
   * `JSON_CANONICAL_CHECK_OK`
 
+  * `EVIDENCE_INDEX_UPDATED_OK`
+
+  * `CONFIG_REGISTRY_OK`
+
 * **Evidence / artifacts:**
 
-  * Registry report fields; schema lives in PF12.
+  * `engine.config.registry_loader` — typed loader implementation for PF12 catalogs and manifest (fail-closed on unknown/duplicate IDs and schema violations).
+
+  * Registry report generator (titles-only):
+
+    * `tools/generate_registry_report.py` / `tools/config/generate_config_artifacts.py` — closed-rails generator for `artifacts/registry/registry_report.json`.
+
+  * Registry report artifacts:
+
+    * `artifacts/registry/registry_report.json` — `registry_report.v1` canonical JSON snapshot.
+
+    * `artifacts/registry/registry_report.json.path_proof.txt` — path-proof transcript for the registry report artifact.
+
+  * Registry report tests (titles-only):
+
+    * `tests/config/test_registry_report.py` — canonical formatting and schema tests (`registry_report.v1`).
+
+    * `tests/config/test_registry_report_determinism.py` — two-run identity tests for the registry report.
 
 * **Notes:**  
-   D3 registry\_report tests verify that `alias_policy.mode` and `alias_policy.aliases` reflect the loader’s alias allow-list mode and ledger contents. PF09 stays schema-agnostic and records that this summary exists and is governed.
+   EPIC017 D3 established the `registry_report.v1` generator and initial Index/Mirror wiring for `artifacts/registry/registry_report.json`. EPIC018 D5 extends this by running the generator under determinism env rails, enforcing canonical JSON and two-run identity via new tests, and integrating the registry report into the D5 config acceptance map (mapping HDE-CALC004.3 → `registry.registry_report` → `CONFIG_REGISTRY_OK` plus associated tests). This subtask is considered **Complete** for the registry report slice; additional configuration artifacts are tracked in separate subtasks under HDE-CALC004.
 
-### Subtask HDE-CALC004.5 — Typed FE bundle
+* 
+
+  ### **Subtask HDE-CALC004.4 — Magic-10 & band-edges config artifacts**
+
+* **Subtask name/label:** Magic-10 & band-edges config artifacts
+
+* **Subtask description:**  
+   Generate governed Magic-10 and band-edges configuration artifacts under closed rails via the hardened config generator and ensure they satisfy canonical JSON and domain invariants:
+
+  * Run the canonical config artifact generator (titles-only; for example `python tools/config/generate_config_artifacts.py`) under determinism env rails (`LC_ALL=C`, `LANG=C`, `TZ=UTC`, `SAFE_MODE=1`, `ALLOW_NETWORK=0`).
+
+  * Produce:
+
+    * `artifacts/thresholds/magic10_config.json` (`schema: "magic10_config.v1"`) capturing the Magic-10 order, per-category caps (inputs and integer bounds), and seed metadata (template\_id, seed\_version, updated\_at\_utc, checksum\_sha256).
+
+    * `artifacts/thresholds/band_edges.json` (`schema: "band_edges.v1"`) capturing band names, edges, clamp, rounding mode, version, and a source pointer back to `math/thresholds.json`.
+
+  * Ensure both artifacts are canonical JSON (UTF-8, sorted keys, compact, exactly one trailing LF) and satisfy domain invariants (Magic-10 order matches FROZEN\_MAGIC10\_ORDER; caps cover all keys with integer bounds; band edges are sorted, span the clamp range, and match the engine’s BANDS constant).
+
+* **Subtask status:** **Done**
+
+* **Epic or card:** **EPIC-018 (D5 — Config artifacts & acceptance map)**
+
+* **Tokens:**
+
+  * `CONFIG_MAGIC10_OK`
+
+  * `JSON_CANONICAL_CHECK_OK`
+
+* **Evidence / artifacts:**
+
+  * Config generator (titles-only):
+
+    * `tools/config/generate_config_artifacts.py`
+
+    * `tools/config/artifacts.py`
+
+  * Config artifacts:
+
+    * `artifacts/thresholds/magic10_config.json`
+
+    * `artifacts/thresholds/magic10_config.json.path_proof.txt`
+
+    * `artifacts/thresholds/band_edges.json`
+
+    * `artifacts/thresholds/band_edges.json.path_proof.txt`
+
+  * Config tests (titles-only):
+
+    * `tests/config/test_config_artifacts.py` — canonical JSON and domain invariants for Magic-10 and band-edges configs.
+
+* **Notes:**  
+   EPIC018 D5 introduces `tools/config/generate_config_artifacts.py` and the governed Magic-10 and band-edges config artifacts, with tests ensuring canonical formatting and domain invariants. This subtask records the existence and behavior of those artifacts; indexing and parity for these configs are handled in HDE-CALC004.7.
+
+### **Subtask HDE-CALC004.5 — Typed FE bundle**
 
 * **Subtask name/label:** Typed FE bundle
 
 * **Subtask description:**  
-   Generate a front-end typed constants bundle exposing closed enums/domains and read-only constants needed by the FE client (e.g. category IDs and band labels); bundle exists, is typed/immutable, and is consistent with PF12 catalogs.
+   Generate a typed frontend config bundle under closed rails as a projection of governed config artifacts and the registry loader, and ensure it is canonical, deterministic, and correctly linked back to its sources:
 
-* **Subtask status:** **Unknown**
+  * Use the canonical bundle generator (titles-only; for example `python tools/config/generate_bundles.py`) under determinism env rails (`LC_ALL=C`, `LANG=C`, `TZ=UTC`, `SAFE_MODE=1`, `ALLOW_NETWORK=0`) to produce a frontend bundle artifact (for example `artifacts/config_bundles/fe_bundle.json`).
 
-* **Epic or card:** **Unknown**
+  * Serialize the frontend bundle via the canonical JSON emitter (`canon.sercanon`), so bundle bytes are deterministic UTF-8 JSON with sorted keys, compact separators, and exactly one trailing LF.
 
-* **Tokens:** **Unknown**
+  * Ensure the frontend bundle (`config_bundle.fe.v1`) exposes a reduced, client-appropriate view:
+
+    * Magic-10 order and caps.
+
+    * Band edges/bands/clamp/rounding/version.
+
+    * Channel IDs plus centers/domains and alias policy needed by clients.
+
+    * A `sources` block that records `path`, `sha256`, and `size_bytes` for each upstream governed artifact (at minimum Magic-10 config, band edges, and registry report), so bundles are provably derived from governed config and registry artifacts.
+
+* **Subtask status:** **Done**
+
+* **Epic or card:** **EPIC-018 (D6 — Typed FE/BE bundles)**
+
+* **Tokens:**
+
+  * `CONFIG_BUNDLES_DETERMINISTIC_OK`
+
+  * `JSON_CANONICAL_CHECK_OK`
+
+  * `TWO_RUN_IDENTITY_OK`
 
 * **Evidence / artifacts:**
 
-  * FE bundle artifacts (not enumerated here).
+  * Bundle generator (titles-only):
 
-### Subtask HDE-CALC004.6 — Typed BE bundle
+    * `engine/config/bundles.py`
+
+    * `tools/config/generate_bundles.py`
+
+  * FE bundle artifacts:
+
+    * `artifacts/config_bundles/fe_bundle.json`
+
+    * `artifacts/config_bundles/fe_bundle.json.path_proof.txt`
+
+  * FE bundle tests (titles-only):
+
+    * `tests/config/test_typed_bundles.py::test_two_run_identity` — asserts two-run identity for FE/BE bundles.
+
+    * `tests/config/test_typed_bundles.py::test_frontend_bundle_schema_and_sources` — validates frontend bundle schema and linkage to Magic-10, band edges, and registry report.
+
+* **Notes:**  
+   EPIC018 D6 introduces typed FE/BE bundles built from governed config artifacts and the registry loader; this frontend bundle subtask is now Done for the D6 slice. PF09 does not restate JSON Schema details for bundles; those remain single-homed in PF12 and the local test schemas under `docs/schemas/`.
+
+  ### **Subtask HDE-CALC004.6 — Typed BE bundle**
 
 * **Subtask name/label:** Typed BE bundle
 
 * **Subtask description:**  
-   Generate a backend enums & constants bundle exposing the same frozen domains to backend code (enums, discriminated unions); bundle exists, is typed/immutable, and stays in sync with the FE bundle and underlying catalogs.
+   Generate a typed backend config bundle under closed rails as a full projection of governed config artifacts and the registry loader, and ensure it is canonical, deterministic, and strictly linked to its sources:
 
-* **Subtask status:** **Unknown**
+  * Use the canonical bundle generator (titles-only; for example `python tools/config/generate_bundles.py`) under determinism env rails (`LC_ALL=C`, `LANG=C`, `TZ=UTC`, `SAFE_MODE=1`, `ALLOW_NETWORK=0`) to produce a backend bundle artifact (for example `artifacts/config_bundles/be_bundle.json`).
 
-* **Epic or card:** **Unknown**
+  * Serialize the backend bundle via the canonical JSON emitter (`canon.sercanon`), so bundle bytes are deterministic UTF-8 JSON with sorted keys, compact separators, and exactly one trailing LF.
 
-* **Tokens:** **Unknown**
+  * Ensure the backend bundle (`config_bundle.be.v1`) exposes:
+
+    * Full Magic-10 config (order, caps, seeds, schema).
+
+    * Full band-edges payload (schema, source pointer to `math/thresholds.json`, bands, edges, clamp, rounding, version).
+
+    * Full channel objects (id, gates, centers, circuit\_primary, substream, primary\_domain, domains, flags).
+
+    * Centers, domains, and alias policy as needed by backend code.
+
+    * A `sources` block that records `path`, `sha256`, and `size_bytes` for each upstream governed artifact (registry report, Magic-10 config, band edges, and any other config inputs), so backend bundles are provably derived from governed config and registry artifacts.
+
+* **Subtask status:** **Done**
+
+* **Epic or card:** **EPIC-018 (D6 — Typed FE/BE bundles)**
+
+* **Tokens:**
+
+  * `CONFIG_BUNDLES_DETERMINISTIC_OK`
+
+  * `JSON_CANONICAL_CHECK_OK`
+
+  * `TWO_RUN_IDENTITY_OK`
 
 * **Evidence / artifacts:**
 
-  * BE bundle artifacts (not enumerated here).
+  * Bundle generator (titles-only):
 
-  ### **Subtask HDE-CALC004.7 — Indexing & parity for config artifacts**
+    * `engine/config/bundles.py`
+
+    * `tools/config/generate_bundles.py`
+
+  * BE bundle artifacts:
+
+    * `artifacts/config_bundles/be_bundle.json`
+
+    * `artifacts/config_bundles/be_bundle.json.path_proof.txt`
+
+  * BE bundle tests (titles-only):
+
+    * `tests/config/test_typed_bundles.py::test_two_run_identity` — asserts two-run identity for FE/BE bundles.
+
+    * `tests/config/test_typed_bundles.py::test_backend_bundle_schema_and_sources` — validates backend bundle schema and linkage to governed config artifacts and registry report.
+
+* **Notes:**  
+   EPIC018 D6 introduces a typed backend bundle that mirrors governed config artifacts and registry structure for backend consumers. This subtask is now Done for the D6 slice; PF09 continues to route detailed schema and semantics for bundles and their tokens to PF12 and PF19 by title.
+
+  ### **Subtask HDE-CALC004.7 — Indexing & parity (Programmatic Configuration System)**
 
 * **Subtask name/label:** Indexing & parity (Programmatic Configuration System)
 
 * **Subtask description:**  
-   Update Human Index and Machine Mirror in the same PR (records-only; with path-proofs) for registry report and configuration-related artifacts; do not list entries in PF09; see PF12 §8.6 for Index/Mirror schema.
+   Update the Human Index and Machine Mirror in the same PR (records-only; with path-proofs) for registry report and configuration-related artifacts, including the D5 config artifacts and acceptance map, and ensure that configuration bundles built from these artifacts are treated as governed and indexed evidence; do not list entries in PF09, and treat PF12 §8.6 as the single home for Index/Mirror schema.
 
-* **Subtask status:** **Partial**
+* **Subtask status:** **Done**
 
-* **Epic or card:** **EPIC-017 (D3)**
+* **Epic or card:** **EPIC-017 (D3); EPIC-018 (D5 config artifacts & acceptance map; D6 typed FE/BE bundles)**
 
 * **Tokens:**
 
@@ -1243,12 +1669,72 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 
 * **Evidence / artifacts:**
 
-  * Index/Mirror entries for `artifacts/registry/registry_report.json` (artifact\_key `registry.registry_report` in `docs/evidence/INDEX.json` and corresponding record in `artifacts/evidence_index.jsonl` with a `proof_anchor` to `artifacts/registry/registry_report.json.path_proof.txt`).
+  * **Index/Mirror entries for registry report:**
 
-  * `tests/config/` registry\_report tests (titles-only) that verify canonical shape, `schema:"registry_report.v1"`, two-run identity, and Index/Mirror coherence for `registry_report` (including SHA/size matching Index and mirror).
+    * `artifacts/registry/registry_report.json` — governed registry report (`registry_report.v1`), with:
 
-* **Notes:**  
-   D3 closes the indexing and parity story for the **registry\_report** artifact. Additional config artifacts (e.g., FE/BE bundles) will extend this subtask beyond D3; hence status remains **Partial** until all configuration-related artifacts are governed and indexed under the same discipline.
+      * `docs/evidence/INDEX.json` entry (for example `artifact_key: "registry.registry_report"`, `discovered_physical_path: "artifacts/registry/registry_report.json"`), and
+
+      * matching `artifacts/evidence_index.jsonl` record whose `proof_anchor` points to `artifacts/registry/registry_report.json.path_proof.txt`.
+
+  * **Index/Mirror entries for D5 config artifacts:**
+
+    * `artifacts/thresholds/magic10_config.json` — governed Magic-10 config (`magic10_config.v1`), with:
+
+      * `artifact_key: "config.magic10"` in `docs/evidence/INDEX.json`, and
+
+      * a corresponding Machine Mirror record whose `proof_anchor` points to `artifacts/thresholds/magic10_config.json.path_proof.txt`.
+
+    * `artifacts/thresholds/band_edges.json` — governed band-edges config (`band_edges.v1`), with:
+
+      * `artifact_key: "config.band_edges"` in `docs/evidence/INDEX.json`, and
+
+      * a corresponding Machine Mirror record whose `proof_anchor` points to `artifacts/thresholds/band_edges.json.path_proof.txt`.
+
+  * **Config acceptance map:**
+
+    * `audit/EPIC-018_config_acceptance_map.json` — EPIC018 config acceptance map tying PF09 config tasks (HDE-CALC004, HDE-CALC004.3, HDE-CALC004.7) to artifact\_keys, tokens, and tests, with:
+
+      * `artifact_key: "epic018.config.acceptance_map"` in `docs/evidence/INDEX.json`, and
+
+      * a Machine Mirror record pointing to `audit/EPIC-018_config_acceptance_map.json.path_proof.txt`.
+
+    * `audit/EPIC-018_config_acceptance_map.json.path_proof.txt` — path proof for the acceptance map artifact.
+
+    * `tests/config/test_config_acceptance_map.py` — tests ensuring the map is canonical JSON, that PF09 task IDs and token names are whitelisted, and that every `artifact_key` exists in `docs/evidence/INDEX.json` and every listed `test_names` entry refers to a real test node.
+
+  * **Index/Mirror entries for typed FE/BE bundles:**
+
+    * `artifacts/config_bundles/fe_bundle.json` — typed frontend bundle (`config_bundle.fe.v1`), with:
+
+      * `artifact_key` (for example `config_bundle.fe`) and `discovered_physical_path: "artifacts/config_bundles/fe_bundle.json"` in `docs/evidence/INDEX.json`,
+
+      * `artifacts/config_bundles/fe_bundle.json.path_proof.txt` as the governed path-proof, and
+
+      * a Machine Mirror record that includes `proof_anchor` pointing to that path-proof and records `sha256` and `size_bytes` for the FE bundle.
+
+    * `artifacts/config_bundles/be_bundle.json` — typed backend bundle (`config_bundle.be.v1`), with:
+
+      * `artifact_key` (for example `config_bundle.be`) and `discovered_physical_path: "artifacts/config_bundles/be_bundle.json"` in `docs/evidence/INDEX.json`,
+
+      * `artifacts/config_bundles/be_bundle.json.path_proof.txt` as the governed path-proof, and
+
+      * a Machine Mirror record that mirrors this entry with a `proof_anchor` to the path-proof.
+
+  * **Index/Mirror core artifacts:**
+
+    * `docs/evidence/INDEX.json` / `docs/evidence/INDEX.sha256` — Human Index and hash sentinel covering registry report, Magic-10 config, band-edges config, EPIC018 config acceptance map, and typed FE/BE bundles.
+
+    * `artifacts/evidence_index.jsonl` — Machine Mirror with 1:1 records for each of the artifacts above, following canonical JSONL rules (UTF-8; sorted keys; compact; exactly one LF; unknown-key reject; fixed field order; `proof_anchor` to co-located path-proof).
+
+* **Notes:**
+
+  * EPIC017 D3 closed the indexing and parity story for the `registry_report` artifact by wiring `artifacts/registry/registry_report.json` into the Evidence Index/Mirror with a governed path-proof and enforcing mirror schema and parity via CI. EPIC018 D5 extended this subtask by adding governed Magic-10 and band-edges config artifacts and the EPIC018 config acceptance map, all wired into the Evidence Index/Mirror with path-proofs and validated by acceptance-map tests.
+
+  * EPIC018 D6 further extends this indexing slice by adding typed FE/BE bundles under `artifacts/config_bundles/` and ensuring they are treated as governed artifacts: both bundles are canonical JSON (UTF-8; sorted keys; compact; exactly one LF), have `sources` blocks that link back to registry and thresholds artifacts, and are listed in the Human Index and mirrored in the Machine Mirror with co-located path-proofs and canonical mirror records.
+
+  * With registry report, D5 config artifacts, EPIC018 config acceptance map, and D6 typed FE/BE bundles now all present, canonical, deterministic, and fully indexed, this subtask is considered **Done** for the Programmatic Configuration System slice. Future configuration-related artifacts (beyond the registry, thresholds, acceptance map, and typed FE/BE bundles) will be introduced and governed via new epics and tasks; HDE-CALC004.7 does not remain open as a catch-all for unspecified future config families.
+
 
 ---
 
@@ -1256,8 +1742,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 
 * **Task name/label:** Deterministic Tie-Break & Total-Order Module
 
-* **Task status:** **Done**
-
+* **Task status:** Partial  
 * **Task ID:** HDE-CALC005
 
 * **Task description:**  
@@ -1297,7 +1782,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 
     * Updated `tools/evidence/update_evidence_index.py`, `ci/checks/check_mirror_schema.sh`, and the evidence tests (`tests/evidence/test_evidence_skeleton.py`, `tests/ops/test_evidence_index.py`) to enforce the same `mtime_utc` semantics (format \+ monotone vs `stat()`), so mirror schema and evidence skeleton checks now pass under rails-closed CI.
 
-  * As a result, WS-D4 tokens that depend on ordering math and generator ownership **and** on the hardened evidence skeleton (for example `ORDERING_ARTIFACTS_SINGLE_SOURCE_OK`, `ORDERING_ARTIFACTS_DETERMINISTIC_OK`, `EVIDENCE_PATH_PROOFS_OK`, `EVIDENCE_PATH_PROOFS_SHAPE_OK`, `CI_CHECK_MIRROR_SCHEMA_OK`) are now **green** under the standard rails-closed CI pipeline. All subtasks HDE-CALC005.1–HDE-CALC005.6 are treated as complete for this Phase-I module; remaining ordering usage is enforced by higher-level “global discipline” tasks.
+  * As a result, WS-D4 tokens that depend on ordering math and generator ownership **and** on the hardened evidence skeleton (for example `ORDERING_ARTIFACTS_SINGLE_SOURCE_OK`, `ORDERING_ARTIFACTS_DETERMINISTIC_OK`, `EVIDENCE_PATH_PROOFS_OK`, `EVIDENCE_PATH_PROOFS_SHAPE_OK`, `CI_CHECK_MIRROR_SCHEMA_OK`) are now **green** under the standard rails-closed CI pipeline. All subtasks HDE-CALC005.1–HDE-CALC005.6 are treated as Done for this Phase-I module; remaining ordering usage is enforced by higher-level “global discipline” tasks.
 
 ---
 
@@ -1314,7 +1799,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 
   * categories (frozen Magic-10 rank → ASCII)
 
-* **Subtask status:** **Complete**
+* **Subtask status:** **Done**
 
 * **Epic or card:** **HDE-EPIC006 (Mechanics Foundations); EPIC-017 (D4)**
 
@@ -1333,7 +1818,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Subtask description:**  
    Provide helpers: `dedupe_sort`, `ensure_total_order`, `canonicalize_array`, `sort_pairs`, and require their use at all ordered emission sites (composites, categories, evidence).
 
-* **Subtask status:** **Complete**
+* **Subtask status:** **Done**
 
 * **Epic or card:** **HDE-EPIC006 (Mechanics Foundations); EPIC-017 (D4)**
 
@@ -1352,7 +1837,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Subtask description:**  
    Add property tests for antisymmetry, transitivity, and totality; prove channel order (min-first `NN–NN`) and category iteration loop equals the frozen order.
 
-* **Subtask status:** **Complete**
+* **Subtask status:** **Done**
 
 * **Epic or card:** **EPIC-017 (D4)**
 
@@ -1382,7 +1867,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Subtask description:**  
    Add AB↔BA and two-run identity checks for outputs produced under these comparators; canonical re-serialization byte-compare under `LC_ALL=C`, `LANG=C`, `TZ=UTC`.
 
-* **Subtask status:** **Complete**
+* **Subtask status:** **Done**
 
 * **Epic or card:** **EPIC-017 (D1)** *(harness artifacts referenced)*
 
@@ -1415,7 +1900,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Subtask description:**  
    Provide tests and logs that prove serializer determinism and canonical JSON under these comparator policies.
 
-* **Subtask status:** **Complete**
+* **Subtask status:** **Done**
 
 * **Epic or card:** **EPIC-017 (D1)**
 
@@ -1473,7 +1958,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 
 * PF09 does not define ordering schemas or comparator math; those remain single-homed in HDE-Math-Spec and HDE-Schemas & Artifacts. This subtask ensures that ordering artifacts and their evidence plumbing are generator-owned, deterministic, and fully integrated into the Evidence Index/Mirror system.
 
-* **Subtask status:** **Complete**
+* **Subtask status:** **Done**
 
 * **Epic or card:** **EPIC-017 (D4, WS-D4b — Evidence mtime re-alignment)**
 
@@ -1549,7 +2034,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 
   * Under the standard rails-closed CI pipeline (`SAFE_MODE=1`, `ALLOW_NETWORK=0`, `LC_ALL=C`, `LANG=C`, `TZ=UTC`), the ordering evidence families and their Index/Mirror wiring now satisfy all of the tokens listed above, including `CI_CHECK_MIRROR_SCHEMA_OK` and `EVIDENCE_PATH_PROOFS_SHAPE_OK`.
 
-  * Further ordering-related work (for example, wiring comparators into all surfaces and the global discipline tasks) is tracked in other subtasks and tasks; this subtask specifically is considered **Complete** for EPIC017 D4/D4b.
+  * Further ordering-related work (for example, wiring comparators into all surfaces and the global discipline tasks) is tracked in other subtasks and tasks; this subtask specifically is considered **Done** for EPIC017 D4/D4b.
 
   # Phase II — Dissolution (Normalize and make it pure) 
 
@@ -1615,7 +2100,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Subtask description:**  
    Normalize IDs via declared alias ledgers when normalization is enabled; otherwise, reject unknown IDs with a typed error.
 
-* **Subtask status:** **Complete**
+* **Subtask status:** **Done**
 
 * **Epic or card:** **Unknown**
 
@@ -1641,7 +2126,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Subtask description:**  
    Enforce that `viewer_prefs.top_category ∈ Magic-10` and `viewer_prefs.weights` contains exactly all ten Magic-10 keys with integer values 0..100 (no floats).
 
-* **Subtask status:** **Complete**
+* **Subtask status:** **Done**
 
 * **Epic or card:** **Unknown**
 
@@ -1665,7 +2150,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Subtask description:**  
    Ensure that viewer\_prefs normalization preserves weight=0 semantics and that enforcement of “exclude candidates whose \#1 equals a 0-weight category” is delegated to the sampler/ranker.
 
-* **Subtask status:** **Complete (SoT-level behavior; enforced downstream)**
+* **Subtask status:** **Done (SoT-level behavior; enforced downstream)**
 
 * **Epic or card:** **Unknown**
 
@@ -1687,7 +2172,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Subtask description:**  
    Re-serialize normalized inputs to canonical JSON: UTF-8 (no BOM), ASCII-sorted keys, compact, exactly one LF; arrays-as-sets are deduped and ASCII-sorted. Normalization must be AB↔BA neutral: (A,B) and (B,A) normalize to byte-identical JSON.
 
-* **Subtask status:** **Complete**
+* **Subtask status:** **Done**
 
 * **Epic or card:** **Unknown**
 
@@ -1713,7 +2198,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Subtask description:**  
    Maintain a JSON-Schema validation CI job that is present and passing for all governed input shapes (IDs, prefs, and other catalog-bound payloads); use an allowed JSON-Schema validator (e.g. AJV or equivalent); any schema drift or unknown field must fail the job.
 
-* **Subtask status:** **Complete**
+* **Subtask status:** **Done**
 
 * **Epic or card:** **Unknown**
 
@@ -1737,7 +2222,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Subtask description:**  
    Maintain evidence for normalization and validation behavior, including success parity, invalid shapes/IDs, and canonicalization logs, and index them under the global Evidence Index & mirror discipline.
 
-* **Subtask status:** **Complete** (for the named artifacts)
+* **Subtask status:** **Done** (for the named artifacts)
 
 * **Epic or card:** **Unknown**
 
@@ -1812,7 +2297,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Subtask description:**  
    Compute per-category integer scores (0..100) and map each to a band using inclusive-high thresholds (e.g. 24/49/74/100) with `round_half_up`, consistent with PF-Math.
 
-* **Subtask status:** **Complete**
+* **Subtask status:** **Done**
 
 * **Epic or card:** **Unknown**
 
@@ -1831,7 +2316,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Subtask description:**  
    Select `{personal_key, shared_key}` per category from governed narrative key ledgers, emitting ten categories in frozen Magic-10 order.
 
-* **Subtask status:** **Complete**
+* **Subtask status:** **Done**
 
 * **Epic or card:** **Unknown**
 
@@ -1850,7 +2335,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Subtask description:**  
    Treat each channel as canonical `NN-NN` (min-first, zero-padded), recording compromise direction \+ gate. Integration channels {10, 20, 34, 57} are independent and must be validated for AB↔BA parity.
 
-* **Subtask status:** **Complete**
+* **Subtask status:** **Done**
 
 * **Epic or card:** **Unknown**
 
@@ -1869,7 +2354,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Subtask description:**  
    For inputs `a` and `b`, ensure each is either an ID or a full person payload (Reader schema); do not mix ID vs payload for the same party; mixed shape must produce `invalid_json`.
 
-* **Subtask status:** **Complete**
+* **Subtask status:** **Done**
 
 * **Epic or card:** **Unknown**
 
@@ -1888,7 +2373,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Subtask description:**  
    Ensure compat output is canonical JSON (UTF-8/no BOM; sorted keys; compact; one LF; arrays-as-sets deduped & ASCII-sorted) and compute an `identity_hash` (sha256 of LF-terminated compat body).
 
-* **Subtask status:** **Complete**
+* **Subtask status:** **Done**
 
 * **Epic or card:** **Unknown**
 
@@ -1909,7 +2394,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Subtask description:**  
    Maintain compat evidence (narrative key table, compat identity hash, AB↔BA logs) and index them in the Evidence Index and Machine Mirror with path-proofs, per global Evidence Index discipline.
 
-* **Subtask status:** **Complete** (for named artifacts)
+* **Subtask status:** **Done** (for named artifacts)
 
 * **Epic or card:** **Unknown**
 
@@ -1944,7 +2429,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 
 * **Task notes:**
 
-  * Audit (v1 — 2025-11-17): zero-weight enforcement, diversity checks, and sampler/ranker evidence are referenced from canon but not yet wired as a complete engine-level harness.
+  * Audit (v1 — 2025-11-17): zero-weight enforcement, diversity checks, and sampler/ranker evidence are referenced from canon but not yet wired as a Done engine-level harness.
 
 * **Task-level tokens (titles-only):**
 
@@ -2217,7 +2702,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Subtask description:**  
    Pin inclusive-high band policy; add edge-case fixtures at 24/49/74/100 per preset (with \+1 transitions).
 
-* **Subtask status:** **Complete (history-only; satisfied under HDE-EPIC007)**
+* **Subtask status:** **Done (history-only; satisfied under HDE-EPIC007)**
 
 * **Epic or card:** **HDE-EPIC007 — Magic-10 Category Engine (Signals)**
 
@@ -2240,7 +2725,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Subtask description:**  
    Route numeric thresholds to the constants pack (HDE-Math-Spec / HDE-Schemas & Artifacts) and keep public output numeric-free.
 
-* **Subtask status:** **Complete (history-only; satisfied under HDE-EPIC007)**
+* **Subtask status:** **Done (history-only; satisfied under HDE-EPIC007)**
 
 * **Epic or card:** **HDE-EPIC007 — Magic-10 Category Engine (Signals)**
 
@@ -2261,7 +2746,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Subtask description:**  
    Capture compact diffs per change and compute `identity_hash` over the LF-terminated compat body for each tuning run.
 
-* **Subtask status:** **Complete (history-only; satisfied under HDE-EPIC007)**
+* **Subtask status:** **Done (history-only; satisfied under HDE-EPIC007)**
 
 * **Epic or card:** **HDE-EPIC007 — Magic-10 Category Engine (Signals)**
 
@@ -2284,7 +2769,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Subtask description:**  
    Update `docs/evidence/INDEX.json` and mirror `artifacts/evidence_index.jsonl` in the same PR (records-only; with path-proofs) for all band thresholds artifacts, following Evidence Index & mirror discipline.
 
-* **Subtask status:** **Complete (history-only; satisfied under HDE-EPIC007)**
+* **Subtask status:** **Done (history-only; satisfied under HDE-EPIC007)**
 
 * **Epic or card:** **HDE-EPIC007 — Magic-10 Category Engine (Signals)**
 
@@ -2337,7 +2822,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Subtask description:**  
    Implement per-category calculators and precedence hooks; use total-order utilities (§5) for any ordered emission.
 
-* **Subtask status:** **Complete (history-only; satisfied under HDE-EPIC007)**
+* **Subtask status:** **Done (history-only; satisfied under HDE-EPIC007)**
 
 * **Epic or card:** **HDE-EPIC007 — Magic-10 Category Engine (Signals)**
 
@@ -2358,7 +2843,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Subtask description:**  
    Enforce frozen Magic-10 order at all emission points and enforce AB↔BA and two-run identity for category-level outputs.
 
-* **Subtask status:** **Complete (history-only; satisfied under HDE-EPIC007)**
+* **Subtask status:** **Done (history-only; satisfied under HDE-EPIC007)**
 
 * **Epic or card:** **HDE-EPIC007 — Magic-10 Category Engine (Signals)**
 
@@ -2387,7 +2872,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 
   * Treat circuit as channel-scoped, with optional bridge/timing analytics for internal use.
 
-* **Subtask status:** **Complete (history-only; satisfied under HDE-EPIC007)**
+* **Subtask status:** **Done (history-only; satisfied under HDE-EPIC007)**
 
 * **Epic or card:** **HDE-EPIC007 — Magic-10 Category Engine (Signals)**
 
@@ -2408,7 +2893,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Subtask description:**  
    Ensure category framework evidence (calculators snapshot, ABBA identity, canonical-compare logs) uses canonical JSON and satisfies JSON re-serialization compare (UTF-8/no BOM; sorted keys; compact; one LF).
 
-* **Subtask status:** **Complete (history-only; satisfied under HDE-EPIC007)**
+* **Subtask status:** **Done (history-only; satisfied under HDE-EPIC007)**
 
 * **Epic or card:** **HDE-EPIC007 — Magic-10 Category Engine (Signals)**
 
@@ -2433,7 +2918,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Subtask description:**  
    Update `docs/evidence/INDEX.json` and mirror `artifacts/evidence_index.jsonl` in the same PR (records-only; with path-proofs) for category framework artifacts, using the global Evidence Index & mirror rules.
 
-* **Subtask status:** **Complete (history-only; satisfied under HDE-EPIC007)**
+* **Subtask status:** **Done (history-only; satisfied under HDE-EPIC007)**
 
 * **Epic or card:** **HDE-EPIC007 — Magic-10 Category Engine (Signals)**
 
@@ -2467,7 +2952,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Task description:**  
    Persist public results and provenance with canonical bytes, an explicit link to `release_id`, idempotent DB writes, and integrity checks that stored bodies equal emitted bodies, under least‑privilege DB posture and without logging secrets/PII.
 
-* **Task status:** **Complete** (marked “Done”)
+* **Task status:** **Done** (marked “Done”)
 
 * **Task notes:**
 
@@ -2484,7 +2969,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Subtask description:**  
    Ensure an idempotent write path to the DB for public payloads so that repeated writes do not produce double‑writes or drift.
 
-* **Subtask status:** **Complete**
+* **Subtask status:** **Done**
 
 * **Epic or card:** Unknown
 
@@ -2506,7 +2991,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Subtask description:**  
    Verify via canonical byte-compare that the stored public body in the DB is **byte‑for‑byte equal** to the emitter output.
 
-* **Subtask status:** **Complete**
+* **Subtask status:** **Done**
 
 * **Epic or card:** Unknown
 
@@ -2527,7 +3012,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Subtask description:**  
    Keep DB grants and DDL artifacts current and consistent with least‑privilege posture for persistence of public payloads.
 
-* **Subtask status:** **Complete**
+* **Subtask status:** **Done**
 
 * **Epic or card:** Unknown
 
@@ -2548,7 +3033,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Subtask description:**  
    Ensure that persistence and writer pathways do **not** emit secrets or PII into logs; logs are keys‑only and redacted as needed.
 
-* **Subtask status:** **Complete**
+* **Subtask status:** **Done**
 
 * **Epic or card:** Unknown
 
@@ -2567,7 +3052,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 * **Subtask description:**  
    Maintain a service identity snapshot for persisted public results and provenance.
 
-* **Subtask status:** **Complete**
+* **Subtask status:** **Done**
 
 * **Epic or card:** Unknown
 
@@ -2592,7 +3077,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 
   * Update `artifacts/evidence_index.jsonl` (records-only canonical JSONL; UTF‑8, one LF; unknown‑key reject; fixed field order; each record includes a `proof_anchor` to a co‑located path\_proof).
 
-* **Subtask status:** **Complete**
+* **Subtask status:** **Done**
 
 * **Epic or card:** Unknown
 
@@ -2646,7 +3131,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 
   * No PII, no payload echoes, no SR/XR numerics.
 
-* **Subtask status:** **Not started / evidence missing** (spec is present, but package is marked Not done)
+* **Subtask status:** **Not done / evidence missing** (spec is present, but package is marked Not done)
 
 * **Epic or card:** Unknown
 
@@ -2674,7 +3159,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
   * No `ETag` header  
      on writers/errors routes, which are **not** Catalog‑eligible; A7 success proofs stay bound to Catalog success routes only.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** Unknown
 
@@ -2699,7 +3184,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 
   * Uses lower\_snake casing for all tokens.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** Unknown
 
@@ -2729,7 +3214,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
   * Arrays‑as‑sets deduped and ASCII‑sorted.  
      Prove canonicality via re‑serialization compare (expected empty diff).
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** Unknown
 
@@ -2758,7 +3243,7 @@ PF09 remains a **consumer** of these tokens and artifact definitions; token sema
 
   * Re‑emitting the same error twice produces bitwise‑identical bytes.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** Unknown
 
@@ -2796,7 +3281,7 @@ Enforce CLI stream and exit-code discipline for all CLI commands in alignment wi
 
   * Other failures use non-zero codes as defined in Governance/CLI specs; stdout remains empty on failure.
 
-*Subtask status:* Not started (behavior specified; evidence pending)
+*Subtask status:* Not done (behavior specified; evidence pending)
 
 *Epic or card:* Unknown
 
@@ -2831,7 +3316,7 @@ Enforce CLI stream and exit-code discipline for all CLI commands in alignment wi
 
   * No `ETag`
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** Unknown
 
@@ -2909,7 +3394,7 @@ Enforce CLI stream and exit-code discipline for all CLI commands in alignment wi
 * **Subtask description:**  
    Ensure Reader and CLI both call the **same** presenter/emitter entrypoint symbol, enforced via a CI allow‑list.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** Unknown
 
@@ -2938,7 +3423,7 @@ Enforce CLI stream and exit-code discipline for all CLI commands in alignment wi
 
   * Compact; one trailing LF.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** Unknown
 
@@ -2965,7 +3450,7 @@ Enforce CLI stream and exit-code discipline for all CLI commands in alignment wi
 
   * Errors → `stderr` only.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** Unknown
 
@@ -2992,7 +3477,7 @@ Enforce CLI stream and exit-code discipline for all CLI commands in alignment wi
 
   * Two runs with identical inputs produce bitwise‑identical public bytes.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** Unknown
 
@@ -3015,7 +3500,7 @@ Enforce CLI stream and exit-code discipline for all CLI commands in alignment wi
 * **Subtask description:**  
    Prove that preimage hashing (`idempotence_hash`) and identity coupling (e.g., `release_id`) are correct by recomputing preimage/digests and comparing against emitted bytes.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** Unknown
 
@@ -3088,7 +3573,7 @@ Enforce CLI stream and exit-code discipline for all CLI commands in alignment wi
 
   * `HEAD` returns 200, mirrors GET validators (including `Content-Type`), has no body, and `Content-Length == len(identity GET body)`.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** Unknown
 
@@ -3108,41 +3593,43 @@ Enforce CLI stream and exit-code discipline for all CLI commands in alignment wi
 
   * `artifacts/ops/internal_version/body_get.sha256`
 
-### **Subtask HDE-SEPA004.2 — Conditionals ignored (never 304\)**
+  ### **Subtask HDE-SEPA004.2 — Conditionals ignored (never 304\)**
 
-* **Subtask ID:** HDE-SEPA004.2
+* Subtask ID: HDE-SEPA004.2
 
-* **Subtask name/label:** Conditional-ignore behavior
+* Subtask name/label: Conditional-ignore behavior
 
-* **Subtask description:**  
+* Subtask description:  
    Ensure that `/internal/version` ignores conditional headers and never returns 304:
 
   * Requests with `If-None-Match` or `If-Modified-Since` still return 200 with the same body and headers as an ordinary GET.
 
-* **Subtask status:** **Done**
+* Subtask status: Done
 
-* **Epic or card:** EPIC-017 (QA01 conditional GET verification)
+* Epic or card: EPIC-017 (QA01 conditional GET verification)
 
-* **Tokens:**
+* Tokens:
 
-  * `INTVER_CONDITIONALS_IGNORED_OK`
+  * INTVER\_CONDITIONALS\_IGNORED\_OK
 
-* **Evidence / artifacts:**
+* Evidence / artifacts:
 
-  * `audit/qa/hde-epic017/logs/intver_get_conditional.txt` — conditional GET `/internal/version` with `If-*` headers showing 200 OK, `Cache-Control: no-store`, no `ETag`/`Last-Modified`, and a JSON body identical to the non-conditional GET.
+  * audit/qa/hde-epic017/logs/intver\_get\_conditional.txt — conditional GET `/internal/version` with `If-*` headers showing 200 OK, `Cache-Control: no-store`, no `ETag`/`Last-Modified`, and a JSON body identical to the non-conditional GET.
 
-  * `audit/qa/hde-epic017/logs/intver_get_full.txt` — baseline non-conditional GET `/internal/version` headers/body for comparison.
+  * audit/qa/hde-epic017/logs/intver\_get\_full.txt — baseline non-conditional GET `/internal/version` headers/body for comparison.
 
-* **Notes:**  
-   This QA evidence demonstrates that `/internal/version` ignores conditional headers for GET and never returns 304, while preserving header posture and body equality relative to non-conditional GET. The remaining open work for `/internal/version` (body-shape contract and identity/two-run proof) is tracked at the task level and in other subtasks, not here.
+  * audit/qa/hde-epic018/logs/qa\_dir\_casing\_normalization\_summary.md — QA01 review summary documenting that all EPIC017 Live QA logs for `/internal/version` (GET/HEAD/conditional) were moved from the legacy `Audit/QA/HDE-EPIC017/logs/...` tree into the canonical `audit/qa/hde-epic017/logs/...` root; path-only/doc-only remediation, tests explicitly “Not run (not requested)”.
 
-### Subtask HDE-SEPA004.3 — No-store & no ETag posture
+* Notes:  
+   This QA evidence demonstrates that `/internal/version` ignores conditional headers for GET and never returns 304, while preserving header posture and body equality relative to non-conditional GET. The later QA01 casing normalization step only updated directory names and references; it did not change the observed behavior or acceptance tokens for this subtask. The remaining open work for `/internal/version` (body-shape contract and identity/two-run proof) is tracked at the task level and in other subtasks, not here.
 
-* **Subtask ID:** HDE-SEPA004.3
+  ### **Subtask HDE-SEPA004.3 — No-store & no ETag posture**
 
-* **Subtask name/label:** No-store, no ETag headers
+* Subtask ID: HDE-SEPA004.3
 
-* **Subtask description:**  
+* Subtask name/label: No-store, no ETag headers
+
+* Subtask description:  
    Maintain ops-surface posture for `/internal/version`:
 
   * `Cache-Control: no-store`
@@ -3151,57 +3638,100 @@ Enforce CLI stream and exit-code discipline for all CLI commands in alignment wi
 
   * No caching validators (no `Last-Modified`).
 
-* **Subtask status:** **Done**
+* Subtask status: Done
 
-* **Epic or card:** EPIC-017 (QA01 conditional GET verification)
+* Epic or card: EPIC-017 (QA01 conditional GET verification)
 
-* **Tokens:**
+* Tokens:
 
-  * `INTVER_200_NO_ETAG_OK`
+  * INTVER\_200\_NO\_ETAG\_OK
 
-* **Evidence / artifacts:**
+* Evidence / artifacts:
 
-  * `audit/qa/hde-epic017/logs/intver_get_full.txt` — GET `/internal/version` showing 200 OK, `Cache-Control: no-store`, JSON content type, and no `ETag`/`Last-Modified` headers.
+  * audit/qa/hde-epic017/logs/intver\_get\_full.txt — GET `/internal/version` showing 200 OK, `Cache-Control: no-store`, JSON content type, and no `ETag`/`Last-Modified` headers.
 
-  * `audit/qa/hde-epic017/logs/intver_head_full.txt` — HEAD `/internal/version` showing 200 OK, matching validators (including `Content-Type`) and no `ETag`/`Last-Modified`, with no body.
+  * audit/qa/hde-epic017/logs/intver\_head\_full.txt — HEAD `/internal/version` showing 200 OK, matching validators (including `Content-Type`) and no `ETag`/`Last-Modified`, with no body.
 
-  * `audit/qa/hde-epic017/logs/intver_get_conditional.txt` — conditional GET `/internal/version` with `If-*` headers showing the same header posture (no-store, no validators, JSON content type) as the ordinary GET.
+  * audit/qa/hde-epic017/logs/intver\_get\_conditional.txt — conditional GET `/internal/version` with `If-*` headers showing the same header posture (no-store, no validators, JSON content type) as the ordinary GET.
 
-* **Notes:**  
-   Together, these artifacts show that `/internal/version` consistently uses `Cache-Control: no-store` and omits `ETag` and `Last-Modified` for GET, HEAD, and conditional GET in Railway prod. Body-shape compliance (adding `invocation_sha256`, frozen field order) is still outstanding and is handled by other tasks; this subtask is scoped only to header posture.
+* Notes:  
+   Together, these artifacts show that `/internal/version` consistently uses `Cache-Control: no-store` and omits `ETag` and `Last-Modified` for GET, HEAD, and conditional GET in Railway prod. Directory casing normalization for the EPIC017 QA logs is recorded in the EPIC018 QA summary listed above; it does not alter the header posture proofs captured here. Body-shape compliance (adding `invocation_sha256`, frozen field order) is still outstanding and is handled by other tasks; this subtask is scoped only to header posture.
 
-### Subtask HDE-SEPA004.4 — Two-run identity & related identity artifacts
+### **Subtask HDE-SEPA004.4 — Two-run identity & identity coupling**
 
-* **Subtask ID:** HDE-SEPA004.4
+* Subtask ID: HDE-SEPA004.4
 
-* **Subtask name/label:** Two-run identity & identity coupling
+* Subtask name/label: Two-run identity and identity coupling
 
-* **Subtask description:**  
-   Prove two-run identity for `/internal/version` bodies and ensure they are consistent with identity/provenance artifacts:
+* Subtask description:
 
-  * Two consecutive GETs produce byte‑identical bodies (LF‑terminated).
+   Prove two-run identity for `/internal/version` bodies and ensure they are consistent with identity and provenance artifacts:
 
-  * Body values match identity & math artifacts (`release_id`, etc.).
+  * Two consecutive GET requests to `/internal/version` on the same environment produce byte-identical, LF-terminated JSON bodies when captured under pinned env (LC\_ALL=C, LANG=C, TZ=UTC).
 
-* **Subtask status:** **Not started**
+  * The body values for engine\_tag, release\_id, invocation\_tag, build\_commit, emitter\_sha256, and any additional identity fields required by the Identity and Provenance module match the frozen identity artifacts for this release (pack manifest, release\_id artifacts, emitter hash, and service identity snapshot).
 
-* **Epic or card:** Unknown
+* Subtask status: Not done
 
-* **Tokens:**
+* Epic or card: EPIC-018 (D2 env/prod handshake and identity snapshot for /internal/version)
 
-  * Supports `TWO_RUN_IDENTITY_OK` for identity components (not named explicitly here).
+* Tokens:
 
-* **Evidence / artifacts:**
+  * Supports TWO\_RUN\_IDENTITY\_OK for identity components (token semantics live in Governance and Mechanics; PF09 is consumer-only).
 
-  * `artifacts/ops/internal_version/two_run_identity.log`
+* Evidence / artifacts:
 
-  * `artifacts/math/freeze_pack_manifest.json`
+  * Planned canonical ops and identity artifacts (governed artifacts; paths and schemas owned by HDE-Schemas & Artifacts and Mechanics):
 
-  * `artifacts/math/release_id.txt`
+    * artifacts/ops/internal\_version/two\_run\_identity.log — two-run identity log for `/internal/version` showing byte-identical LF-terminated bodies across runs on the same environment.
 
-  * `artifacts/math/release_id_recompute.log`
+    * artifacts/ops/internal\_version/body\_get.json — canonical JSON body for a representative GET `/internal/version` call, emitted via the Identity and Provenance helper, with fixed key order and all required identity fields, including invocation\_sha256 once implemented.
 
-  * `artifacts/identity/emitter_sha256.txt`
+    * artifacts/math/freeze\_pack\_manifest.json — freeze pack manifest snapshot used to derive release\_id.
+
+    * artifacts/math/release\_id.txt — release\_id derived as the lowercase 64-hex sha256 of canonical catalog/manifest.json bytes.
+
+    * artifacts/math/release\_id\_recompute.log — recompute proof that sha256(canonical manifest bytes) equals the stored release\_id for this cut.
+
+    * artifacts/identity/emitter\_sha256.txt — hash of the allow-listed presenter/emitter source for this release.
+
+  * EPIC018 QA03 env/prod handshake artifacts (Codespaces → Railway prod, context evidence):
+
+    * audit/qa/hde-epic018/d2-env/d2-env-prod-handshake-001.json — raw JSON body from a curl GET of the Railway prod `/internal/version` endpoint, captured from the D2 env/prod handshake step, showing:
+
+      * engine\_tag: "hdengine@prod"
+
+      * release\_id: a lowercase 64-hex value corresponding to the current prod release.
+
+      * invocation\_tag: "INV-f2ac55d77ce9aacc"
+
+      * build\_commit: "9479d28"
+
+      * emitter\_sha256: a lowercase 64-hex hash for the emitter.
+
+    * (The body currently has only these five fields; the missing invocation\_sha256 field and non-canonical key order are a known bug tracked elsewhere and are out of scope for this handshake.)
+
+    * audit/qa/hde-epic018/d2-env/d2-env-prod-handshake-001.pretty.json — pretty-printed version of the same JSON, used only to confirm parseability and human readability; contents identical in value to the raw JSON.
+
+    * audit/qa/hde-epic018/d2-env/d2-env-prod-handshake-001.stderr — curl stderr from the handshake run, present and empty, confirming that the request completed without network or protocol errors when using \-sS.
+
+* Notes:
+
+  * SoT: canon for this subtask is that `/internal/version` acts as the operator-only identity surface for the engine and must eventually satisfy both two-run identity (stable bytes under pinned env) and identity coupling (body values aligned with the frozen manifest- and identity-module artifacts for the release). HDE-SEPA004.4 remains Not done because there is no committed canonical two-run identity log under artifacts/ops/internal\_version, the body shape still lacks invocation\_sha256 and frozen key order, and the coupling to pack/manifest and identity artifacts has not yet been proven and indexed.
+
+  * EPIC017 QA01 (already recorded under HDE-SEPA004.2 and HDE-SEPA004.3) validated header posture and conditional-ignore behavior for `/internal/version` on Railway prod (no-store, no ETag, conditionals ignored). EPIC018 QA01 later normalized QA directory casing so that all EPIC017 logs live under audit/qa/hde-epic017/logs. These QA slices do not change the identity fields themselves.
+
+  * EPIC018 QA03 (D2 env/prod handshake, Addendum 15\) adds a successful Codespaces → Railway prod handshake for `/internal/version` and confirms that the prod identity snapshot matches PF-canon expectations for the current deployment (engine\_tag, release\_id, invocation\_tag, build\_commit, emitter\_sha256), with evidence under audit/qa/hde-epic018/d2-env. This handshake establishes that the Codespace can reach Railway prod and that `/internal/version` returns valid JSON with the expected identity fields; it does not, by itself, satisfy two-run identity, fix the known body-shape bug (missing invocation\_sha256, non-canonical key order), or complete the coupling to manifest and identity artifacts required for TWO\_RUN\_IDENTITY\_OK at the ops surface.
+
+  * Future EPIC018 slices for identity and provenance will need to:
+
+    * Add invocation\_sha256 to the `/internal/version` body and freeze the key order to match the identity and provenance spec before recomputing body\_get.json.
+
+    * Capture two\_run\_identity.log under artifacts/ops/internal\_version with two successive GETs on Railway prod that are byte-identical under pinned env.
+
+    * Cross-check `/internal/version` identity fields against artifacts/math/freeze\_pack\_manifest.json, artifacts/math/release\_id.txt, artifacts/math/release\_id\_recompute.log, and artifacts/identity/emitter\_sha256.txt, and index all of these artifacts and path-proofs in the Human Index and Machine Mirror in the same PR.
+
+\[END TEXT TO PASTE\]
 
 ### Subtask HDE-SEPA004.5 — Internal ops evidence indexing
 
@@ -3305,7 +3835,7 @@ Enforce CLI stream and exit-code discipline for all CLI commands in alignment wi
 
 * PF09 does not pin the exact set of dev routes or curl commands; those remain documented in Mechanics and CLI/API docs by title. This subtask requires that the harness be dev-only, loopback-bound, canonical, and non-public when used for evidence.
 
-* **Subtask status:** **Complete** (behavioral target; evidence already exists for current harness)
+* **Subtask status:** **Done** (behavioral target; evidence already exists for current harness)
 
 * **Epic or card:** **Unknown**
 
@@ -3329,7 +3859,7 @@ Enforce CLI stream and exit-code discipline for all CLI commands in alignment wi
 
   * Passes canonicalization checks (canonical JSON, LF-termination, sorted keys, arrays-as-sets deduped and sorted).
 
-* **Subtask status:** **Complete**
+* **Subtask status:** **Done**
 
 * **Epic or card:** **Unknown**
 
@@ -3348,7 +3878,7 @@ Enforce CLI stream and exit-code discipline for all CLI commands in alignment wi
 * **Subtask description:**  
    Index harness evidence in the human Evidence Index (`docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`) and mirror it in `artifacts/evidence_index.jsonl` in the same PR (records-only canonical JSONL; one LF; unknown-key reject; `proof_anchor` present).
 
-* **Subtask status:** **Complete**
+* **Subtask status:** **Done**
 
 * **Epic or card:** **Unknown**
 
@@ -3414,7 +3944,7 @@ Enforce CLI stream and exit-code discipline for all CLI commands in alignment wi
 
   * Never exposes SR/XR numerics on Reader; CLI diagnostics (if any) are flag-guarded and admin-only.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -3435,7 +3965,7 @@ Enforce CLI stream and exit-code discipline for all CLI commands in alignment wi
 
   * Obey AB↔BA parity on the full compat body, including Integration channel cases (e.g. `20–34` vs `20–57`).
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -3460,7 +3990,7 @@ Enforce CLI stream and exit-code discipline for all CLI commands in alignment wi
 * **Subtask description:**  
    Capture `identity_hash` for compat payloads as sha256 over the LF-terminated compat body for internal/admin evidence.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -3481,7 +4011,7 @@ Enforce CLI stream and exit-code discipline for all CLI commands in alignment wi
 * **Subtask description:**  
    Index compat artifacts (`artifacts/compat/identity_hash.txt`, `tests/compat/test_abba_parity.py`) in the human Evidence Index and machine mirror in the same PR (records-only canonical JSONL; one LF; unknown-key reject; `proof_anchor` present).
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -3547,7 +4077,7 @@ Enforce CLI stream and exit-code discipline for all CLI commands in alignment wi
 * **Subtask description:**  
    Ensure all test harnesses that exercise public JSON (Reader, CLI, compat) call the same presenter/emitter symbol used in production; no test-only serializers or bypass paths permitted.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -3568,7 +4098,7 @@ Enforce CLI stream and exit-code discipline for all CLI commands in alignment wi
 * **Subtask description:**  
    Maintain and enforce an explicit allow-list of presenter/emitter symbols for public bytes; CI uses grep/symbol proofs to ensure only allow-listed symbols serialize public bytes.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -3589,7 +4119,7 @@ Enforce CLI stream and exit-code discipline for all CLI commands in alignment wi
 * **Subtask description:**  
    Prove that CLI Reader surfaces (stdout / `--dump-reader`) are byte-identical to Reader bodies and that outputs are canonical JSON with LF-termination.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -3616,7 +4146,7 @@ Enforce CLI stream and exit-code discipline for all CLI commands in alignment wi
 * **Subtask description:**  
    Index `tests/test_emitter_determinism.py`, `serializer_grep_guard.log`, `emitter_symbol_proof.txt`, and `reader_cli_parity.bytes` in the human Evidence Index and machine mirror in the same PR (records-only JSONL; one LF; with path-proofs).
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -3713,7 +4243,7 @@ Enforce CLI stream and exit-code discipline for all CLI commands in alignment wi
 
   * This subtask remains Partial because it still requires explicit evidence for pyproject and python \-m entrypoints and installation path across supported environments; those will be validated and indexed in future work. The help-related tokens (CLI\_HELP\_EXIT\_0\_OK and CLI\_HELP\_STDOUT\_OK) are considered covered for EPIC017 in the Codespaces → Railway QA setup, but the broader CLI installation and entrypoint tokens remain open until additional evidence is captured.
 
-### **Subtask HDE-CONJ004.2 — showcompat canonical JSON & presence**
+    ### **Subtask HDE-CONJ004.2 — showcompat canonical JSON and presence**
 
 * Subtask name/label: showcompat presence and canonical JSON
 
@@ -3722,7 +4252,11 @@ Enforce CLI stream and exit-code discipline for all CLI commands in alignment wi
 
 * Subtask status: Partial
 
-* Epic or card: EPIC-017 (QA03 showcompat from birth data)
+* Epic or card:
+
+  * EPIC-017 (QA03 — showcompat from birth data)
+
+  * EPIC-018 (QA04 — D1 compat spot-check for a synthetic pair)
 
 * Tokens:
 
@@ -3734,9 +4268,43 @@ Enforce CLI stream and exit-code discipline for all CLI commands in alignment wi
 
 * Evidence / artifacts:
 
-  * EPIC017 QA03 showcompat run in Codespaces: hdctl showcompat \--source vendor with synthetic birth-only inputs producing a single compat JSON object (top-level keys a, b, compat, viewer\_prefs) with 10 Magic-10 categories, band and score fields, neutral viewer\_prefs (all weights set to 50), and a CLI meta block (local engine\_tag, invocation\_tag, and all-zero release\_id).
+  * EPIC017 QA03 showcompat run in Codespaces:
 
-  * Planned and existing CLI harness artifacts for canonical JSON and parity (mechanics-level evidence):
+    * hdctl showcompat \--source vendor with synthetic birth-only inputs producing a single compat JSON object (top-level keys a, b, compat, viewer\_prefs) with:
+
+      * 10 Magic-10 categories (heat, harmony, communication, alignment, comfort, consistency, expansion, creativity, drive, balance)
+
+      * per-category band and score fields
+
+      * viewer\_prefs with all ten categories in weights and integer values 50 (neutral)
+
+      * compat.meta with engine\_tag \= hdengine-dev, invocation\_tag \= INV-LOCAL, and release\_id all zeros (CLI/dev identity).
+
+  * EPIC018 QA04 D1 compat spot-check (Codespaces CLI QA environment, audit/qa/hde-epic018/d1-serializer/):
+
+    * d1-serializer-compat-001-request.txt — describes the synthetic compat pair used for D1:
+
+      * A: 1985-03-21 08:30 New York, USA
+
+      * B: 1992-11-05 16:45 London, UK.
+
+    * d1-serializer-compat-001-ab-run1.json and d1-serializer-compat-001-ab-run2.json — raw hdctl showcompat outputs for AB run 1 and run 2 using the request above, both:
+
+      * parse cleanly into the same compat JSON shape (a, b, compat, viewer\_prefs)
+
+      * show all 10 Magic-10 categories with band, score, personal\_key, shared\_key
+
+      * have compat.meta with engine\_tag \= hdengine-dev, invocation\_tag \= INV-LOCAL, release\_id all zeros
+
+      * have viewer\_prefs with top\_category \= "heat" and uniform weights 50\.
+
+    * d1-serializer-compat-001-ab-run1.pretty.json and d1-serializer-compat-001-ab-run2.pretty.json — pretty-printed versions of the same JSON, used only for human inspection; their values match the raw JSON outputs.
+
+    * d1-serializer-compat-001-ab-cmp-exit.txt — cmp exit code file containing only 0, confirming that the two raw JSON files for AB run 1 and AB run 2 are byte-identical (two-run identity for this compat payload in the CLI/dev context).
+
+    * qa\_notes.md (under audit/qa/hde-epic018/qa\_notes.md) containing two mechanically appended Step 2 entries documenting that the D1 compat two-run identity check completed, including an entry that explicitly names hdctl showcompat \--source vendor.
+
+  * Planned and existing CLI harness artifacts for canonical JSON and parity (mechanics-level evidence, shared with HDE-CALC002.5 and future Conjunction/Distillation tasks):
 
     * artifacts/cli/ab.json
 
@@ -3746,13 +4314,28 @@ Enforce CLI stream and exit-code discipline for all CLI commands in alignment wi
 
 * Notes:
 
-  * EPIC017 QA03 proves that showcompat is present and runnable in the Codespaces environment, and that showcompat \--source vendor from birth-only input produces a compat JSON payload with 10 Magic-10 categories, bands, scores, neutral viewer\_prefs, and a CLI-scoped meta section. For this QA step, the acceptance criterion is simply “compat JSON produced from births with explicit \--source vendor”; AB↔BA parity, Reader envelope checks, and vendor ingest traces are intentionally deferred to later QA steps.
+  * EPIC017 QA03 proves that showcompat is present and runnable in the Codespaces environment, and that showcompat \--source vendor from birth-only input produces a compat JSON payload with 10 Magic-10 categories, bands, scores, neutral viewer\_prefs, and a CLI-scoped meta section. For that QA step, the acceptance criterion is “compat JSON produced from births with explicit \--source vendor”; AB↔BA parity, Reader envelope checks, and vendor ingest traces are intentionally deferred to later QA steps.
 
-  * In the current pre-App, no-user posture, showcompat from births must be invoked with \--source vendor to avoid hanging or following DB/auto paths that are not appropriate for this environment; the default showcompat without \--source remains discouraged for QA until DB-backed user flows and app integration exist.
+  * EPIC018 QA04 builds on this by executing the D1 compat spot-check for a concrete synthetic pair and verifying that:
 
-  * The meta fields in compat output (engine\_tag \= hdengine-dev, invocation\_tag \= INV-LOCAL, release\_id all zeros) are CLI/local identifiers and must not be confused with the Railway prod engine identity, which is governed by the /internal/version ops surface on Railway. This is an expected split between “CLI as QA console” and “prod engine identity,” not a canon violation.
+    * the compat JSON structure for hdctl showcompat matches PF-canon for that pair (10 Magic-10 categories, bands, scores, keys, meta, viewer\_prefs), and
 
-  * This subtask is marked Partial because the full scope still requires canonical JSON enforcement and participation in the parity harness (AB↔BA, two-run identity, Reader↔CLI parity, and evidence indexing using artifacts/cli/ab.json, artifacts/cli/ba.json, and artifacts/cli/summary.json). Those aspects are covered mechanically by the Canonical Serialization Package and related subtasks and will be reflected here as Done once the CLI conformance harness and indexing are fully wired and passing.
+    * two successive hdctl showcompat runs (AB run 1 and AB run 2\) produce byte-identical JSON, as shown by cmp exit code 0, with identity fields consistent with a local CLI/dev D1 check (engine\_tag hdengine-dev, invocation\_tag INV-LOCAL, release\_id all zeros).
+
+  * In the current pre-App, no-user posture, any Live QA step that intends to test real compat behavior (for example D-goals about compat math or “full product payload” for a pair) MUST call the vendor explicitly. Practically, that means hdctl showcompat in Live QA behavior steps MUST include \--source vendor on birth-based runs; showcompat without an explicit vendor source is acceptable only as a local/offline math or serializer check and MUST NOT be used to satisfy behavior tokens or PO Live QA requirements in this environment.
+
+  * The compat meta fields observed in EPIC017 QA03 and EPIC018 QA04 (engine\_tag \= hdengine-dev, invocation\_tag \= INV-LOCAL, release\_id zeros) are CLI/local identifiers and must not be confused with the Railway production engine identity, which is governed by the /internal/version ops surface on Railway. This split between “CLI as QA console” and “prod engine identity” is expected and consistent with canon.
+
+  * D1 compat determinism and canonical JSON harnesses that run under closed rails without vendor (for example the artifacts/cli/ab.json, artifacts/cli/ba.json, artifacts/cli/summary.json family in HDE-CALC002.5) are explicitly local/offline checks: they prove math/serializer determinism and canonicality, but do not count as vendor-backed behavior tests. Tokens whose intent is to cover live vendor behavior in the current pre-App environment must be satisfied by vendor-backed runs (with \--source vendor) such as the EPIC017/EPIC018 QA slices above and future Live QA steps, not by local-only D1 serializer checks.
+
+  * This subtask remains Partial because the full scope still requires:
+
+    * canonical JSON enforcement and parity harness coverage for showcompat using artifacts/cli/ab.json, artifacts/cli/ba.json, and artifacts/cli/summary.json,
+
+    * AB↔BA parity and Reader↔CLI parity proven and indexed, and
+
+    * integration of these artifacts into the global Distillation gates and Index/Mirror discipline. Those aspects are covered mechanically by the Canonical Serialization Package and higher-phase tasks and will be reflected here by moving the status to Done once the CLI conformance harness and indexing are fully wired and passing.  
+    * 
 
   ### Subtask HDE-CONJ004.3 — CLI compat parity & determinism
 
@@ -3761,7 +4344,7 @@ Enforce CLI stream and exit-code discipline for all CLI commands in alignment wi
 * **Subtask description:**  
    Prove Reader↔CLI parity and AB↔BA / two-run identity for CLI compat flows, using `ab.json`, `ba.json`, and `summary.json`.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -3790,7 +4373,7 @@ Enforce CLI stream and exit-code discipline for all CLI commands in alignment wi
 * **Subtask description:**  
    Index `ab.json`, `ba.json`, and `summary.json` in both the Human Index and machine mirror in the same PR (records-only canonical JSONL; one LF; unknown-key reject; `proof_anchor` present).
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -3840,7 +4423,7 @@ Verify that the implemented CLI command set and behavior conform to **HDE-CLI-AP
 
   * Gate this via `CLI_IMPLEMENTED_SET_OK` to indicate that the implemented set is in sync with PF05.
 
-*Subtask status:* Not started
+*Subtask status:* Not done
 
 *Epic or card:* Unknown
 
@@ -3927,7 +4510,7 @@ Verify that the implemented CLI command set and behavior conform to **HDE-CLI-AP
 * }  
 *  Emitted via the single presenter/emitter as canonical JSON: UTF-8 (no BOM); ASCII-sorted keys; compact; exactly one LF; arrays-as-sets deduped and ASCII-sorted; checks under `LC_ALL=C`, `LANG=C`, `TZ=UTC`.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -3948,7 +4531,7 @@ Verify that the implemented CLI command set and behavior conform to **HDE-CLI-AP
 * **Subtask description:**  
    Maintain `docs/ENDPOINTS_CATALOG.json` as the single home for JSON success routes eligible for A7 proofs, with env-gates per entry; non-prod entries must be unreachable in prod.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -3987,7 +4570,7 @@ Verify that the implemented CLI command set and behavior conform to **HDE-CLI-AP
 
   * Encoding invariance: ETag and effective Content-Length stable across accepted encodings.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -4022,7 +4605,7 @@ Verify that the implemented CLI command set and behavior conform to **HDE-CLI-AP
 * **Subtask description:**  
    Index Catalog and A7 artifacts (`docs/ENDPOINTS_CATALOG.*`, `success_get/head/304/encoding_invariance`, `endpoints_env_gate_proof.log`, `success_writers_errors.txt`) in both Human Index and machine mirror in the same PR.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -4076,7 +4659,7 @@ Verify that the implemented CLI command set and behavior conform to **HDE-CLI-AP
 
   * Writers/errors: `Cache-Control: no-store`.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -4109,7 +4692,7 @@ Verify that the implemented CLI command set and behavior conform to **HDE-CLI-AP
 * **Subtask description:**  
    Prove encoding invariance across accepted `Accept-Encoding` values and provide env-gate proof for the Catalog route.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -4132,7 +4715,7 @@ Verify that the implemented CLI command set and behavior conform to **HDE-CLI-AP
 * **Subtask description:**  
    Update Human Index and mirror in the same PR for Reader transport proofs (success\_get/head/304, encoding\_invariance, writers\_errors, env\_gate).
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -4182,7 +4765,7 @@ Verify that the implemented CLI command set and behavior conform to **HDE-CLI-AP
 
   * Keep merge-blocking until parity/determinism tokens pass.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -4223,7 +4806,7 @@ Verify that the implemented CLI command set and behavior conform to **HDE-CLI-AP
 
   * Exactly one LF in output.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -4264,7 +4847,7 @@ Verify that the implemented CLI command set and behavior conform to **HDE-CLI-AP
 
     * `CLI_SHOWCOMPAT_CANON_OK`
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -4285,7 +4868,7 @@ Verify that the implemented CLI command set and behavior conform to **HDE-CLI-AP
 * **Subtask description:**  
    Index `artifacts/cli/ab.json`, `ba.json`, and `summary.json` in Human Index and mirror (records-only canonical JSONL; one LF; unknown-key reject; `proof_anchor` present) in the same PR.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -4333,7 +4916,7 @@ Verify that the implemented CLI command set and behavior conform to **HDE-CLI-AP
 
   * Errors: typed, numeric-free JSON with `Content-Type: application/json; charset=utf-8`.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -4358,7 +4941,7 @@ Verify that the implemented CLI command set and behavior conform to **HDE-CLI-AP
 
   * Re-issuing the same valid request leaves state unchanged and preserves response semantics.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -4375,7 +4958,7 @@ Verify that the implemented CLI command set and behavior conform to **HDE-CLI-AP
 * **Subtask description:**  
    Capture and index writer evidence artifacts (write/readback logs, DDL updates, ops logs) with Evidence Index entries and machine mirror records; `EVIDENCE_INDEX_UPDATED_OK` and related Index/Mirror tokens gate that evidence is captured and synchronized.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -4400,7 +4983,7 @@ Verify that the implemented CLI command set and behavior conform to **HDE-CLI-AP
 * **Subtask description:**  
    Ensure Governance A7 tokens (`A7_*`, `READER_*`) remain bound to Catalog JSON success routes only; writer routes are not used as A7 proof surfaces and are not directly gated by A7 tokens.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -4452,7 +5035,7 @@ Verify that the implemented CLI command set and behavior conform to **HDE-CLI-AP
 * **Subtask description:**  
    Enforce canonical JSON invariants (encoding, key order, compactness, LF, set ordering) for all surfaces that emit JSON, using the single shared emitter.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -4471,7 +5054,7 @@ Verify that the implemented CLI command set and behavior conform to **HDE-CLI-AP
 * **Subtask description:**  
    Ensure that whenever any artifacts are added or changed, the Evidence Index and Machine Mirror are updated in the same PR, with canonical JSONL, unknown-key reject, and path-proofs in place.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -4582,7 +5165,7 @@ Verify that the implemented CLI command set and behavior conform to **HDE-CLI-AP
 
     * All secret values (for example `HD-Api-Key`) are redacted (e.g. `HD-Api-Key: REDACTED`); no payload bodies are logged.
 
-* **Subtask status:** Not started
+* **Subtask status:** Not done
 
 * **Epic or card:** Unknown
 
@@ -4644,7 +5227,7 @@ Verify that the implemented CLI command set and behavior conform to **HDE-CLI-AP
 
     * Determinism and AB↔BA coherence remain satisfied under this policy (canonical JSON, single LF, two-run identity where applicable).
 
-* **Subtask status:** Not started
+* **Subtask status:** Not done
 
 * **Epic or card:** Unknown
 
@@ -4688,7 +5271,7 @@ Verify that the implemented CLI command set and behavior conform to **HDE-CLI-AP
 
     * Secret-like fields are consistently redacted while preserving enough keys to diagnose rails state and outcome.
 
-* **Subtask status:** Not started
+* **Subtask status:** Not done
 
 * **Epic or card:** Unknown
 
@@ -4752,7 +5335,7 @@ Verify that the implemented CLI command set and behavior conform to **HDE-CLI-AP
 
     * Treat **HDE-Schemas & Artifacts** §8.6 as the single home for the evidence listing; Appendix C defines record types and schemas. PF09 (this subtask) does not duplicate those schemas.
 
-* **Subtask status:** Not started
+* **Subtask status:** Not done
 
 * **Epic or card:** Unknown
 
@@ -4867,7 +5450,7 @@ Verify that the implemented CLI command set and behavior conform to **HDE-CLI-AP
 
       * The JSON envelopes on each surface are canonical and byte-identical where PF05 defines Reader↔CLI parity.
 
-* **Subtask status:** Not started
+* **Subtask status:** Not done
 
 * **Epic or card:** Unknown
 
@@ -4957,7 +5540,7 @@ Verify that the implemented CLI command set and behavior conform to **HDE-CLI-AP
 
     * **HDE-Schemas & Artifacts** §8.6 and Appendix C remain the single homes for evidence listing and record types; PF09 does not restate schemas.
 
-* **Subtask status:** Not started
+* **Subtask status:** Not done
 
 * **Epic or card:** Unknown
 
@@ -5069,7 +5652,7 @@ Define the manifest schema and implement closure checks over the narrative key s
 
 * Ensure that all narrative key usage routes through these manifests; other components (router, packs, exporter/loader) treat the manifests as authoritative, by title only.
 
-*Subtask status:* Not started
+*Subtask status:* Not done
 
 *Epic or card:* Unknown
 
@@ -5151,7 +5734,7 @@ Add diff tooling, Doc-Delta policy, pack identity computation, and evidence/inde
 
 * `HDE-Schemas & Artifacts` §8.6 and Appendix C remain the single homes for listing and record types; PF09 routes to them by title only and does not restate schemas.
 
-*Subtask status:* Not started
+*Subtask status:* Not done
 
 *Epic or card:* Unknown
 
@@ -5271,7 +5854,7 @@ Define and prove the core runtime DB posture, using the provider-agnostic adapte
 
   * The boundary-view proof path and schema remain single-homed in **HDE-Schemas & Artifacts**; PF09 only requires that the proof artifact exists and is kept in sync with runtime posture.
 
-*Subtask status:* Not started
+*Subtask status:* Not done
 
 *Epic or card:* Unknown
 
@@ -5327,7 +5910,7 @@ Define and prove the core runtime DB posture, using the provider-agnostic adapte
 
     * Use a normalized output format for comparison and store parity results under governed paths.
 
-* **Subtask status:** Not started
+* **Subtask status:** Not done
 
 * **Epic or card:** Unknown
 
@@ -5379,7 +5962,7 @@ Define and prove the core runtime DB posture, using the provider-agnostic adapte
 
     * Error payloads must remain numeric-free in user-visible text; traceability goes through IDs and logs, not numeric error codes in public envelopes.
 
-* **Subtask status:** Not started
+* **Subtask status:** Not done
 
 * **Epic or card:** Unknown
 
@@ -5477,7 +6060,7 @@ Wire DB posture acceptance tokens for this phase and enforce a single capture/in
 
   * PF09 does **not** define mirror schema or token semantics; it routes to **HDE-Schemas & Artifacts** and **HDE-Governance** by title.
 
-*Subtask status:* Not started
+*Subtask status:* Not done
 
 *Epic or card:* Unknown
 
@@ -5586,7 +6169,7 @@ These artifacts must be listed in the **Human Evidence Index** and mirrored in t
 
 * EPIC-017 QA06 Aux narrative evidence (CLI QA environment):
 
-  * `audit/qa/hde-epic017/logs/step_aux_preview1.txt` — narrative text produced by:
+  * audit/qa/hde-epic017/logs/step\_aux\_preview1.txt — narrative text produced by:
 
     * `hdctl aux-preview --show-narrative` against compat JSON from `showcompat --source vendor` for a synthetic birth pair.
 
@@ -5594,7 +6177,7 @@ These artifacts must be listed in the **Human Evidence Index** and mirrored in t
 
 * EPIC-017 QA07 Aux admin JSON sidecar evidence (CLI QA environment):
 
-  * `audit/qa/hde-epic017/logs/step_aux_preview1_admin.json` — Aux admin JSON sidecar produced by:
+  * audit/qa/hde-epic017/logs/step\_aux\_preview1\_admin.json — Aux admin JSON sidecar produced by:
 
     * `hdctl aux-preview --admin-out` for the same compat JSON.
 
@@ -5622,7 +6205,7 @@ These artifacts must be listed in the **Human Evidence Index** and mirrored in t
 
   * A minimal admin JSON selector (`composition_id`/`key`, `pack_sha`, `pair` IDs, `release_id`) consistent with compat and the pinned narratives pack.
 
-Deeper determinism checks for Aux (e.g. AB↔BA and two-run identity for admin JSON and narrative text, multi-pack routing invariants) remain scoped to other tasks and future QA phases; this Fermentation subtask records preview posture, evidence presence, basic tonality compliance, and minimal admin JSON sidecar correctness.
+Deeper determinism checks for Aux (for example AB↔BA and two-run identity for admin JSON and narrative text, multi-pack routing invariants) remain scoped to other tasks and future QA phases; this Fermentation subtask records preview posture, evidence presence, basic tonality compliance, and minimal admin JSON sidecar correctness.
 
 *Subtask status:* Done (EPIC-010 / EPIC-017)
 
@@ -5656,11 +6239,10 @@ Deeper determinism checks for Aux (e.g. AB↔BA and two-run identity for admin J
 
 * `artifacts/evidence_index.jsonl` — Machine Mirror records for CLI preview artifacts, with `proof_anchor` references to path-proof transcripts.
 
-* `audit/qa/hde-epic017/logs/step_aux_preview1.txt` — EPIC-017 QA06 Aux narrative evidence.
+* audit/qa/hde-epic017/logs/step\_aux\_preview1.txt — EPIC-017 QA06 Aux narrative evidence.
 
-* `audit/qa/hde-epic017/logs/step_aux_preview1_admin.json` — EPIC-017 QA07 Aux admin JSON sidecar evidence.
-
-# 
+* audit/qa/hde-epic017/logs/step\_aux\_preview1\_admin.json — EPIC-017 QA07 Aux admin JSON sidecar evidence.  
+* 
 
 # 
 
@@ -5711,7 +6293,7 @@ Deeper determinism checks for Aux (e.g. AB↔BA and two-run identity for admin J
 
   * **Canonical JSON compare:** Re-emit a sample of envelopes and verify they are canonical JSON and match their canonical re-serialization.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -5779,7 +6361,7 @@ Deeper determinism checks for Aux (e.g. AB↔BA and two-run identity for admin J
 
   * Env-gating proof: non-prod Catalog entries are unreachable with `APP_ENV=prod`.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -5868,7 +6450,7 @@ Deeper determinism checks for Aux (e.g. AB↔BA and two-run identity for admin J
 
 * PF09 does not redefine SAFE-rails token semantics or transport matrices; those remain single-homed in HDE-Governance and HDE-CLI-API-Vendor-Ref. This subtask requires that the rails harnesses (closed and open), refusal fixtures, and logs exist and are indexed, and that they prove the SAFE-rails and retry/backoff behavior described above.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -5958,7 +6540,7 @@ Use the Distillation harness to **prove and exercise** the DB runtime posture de
 
   * PF09 does not define mirror schema or token semantics; it routes to **HDE-Schemas & Artifacts** and **HDE-Governance** by title.
 
-*Subtask status:* Not started
+*Subtask status:* Not done
 
 *Epic or card:* Unknown
 
@@ -6006,7 +6588,7 @@ Use the Distillation harness to **prove and exercise** the DB runtime posture de
   * TTL / stale-while-revalidate policy is pinned.  
   * Rate-limit and circuit-breaker policies behave as specified.  
   * **Refresh worker & POLICY alignment (titles-only).** The BodyGraph refresh worker (`scripts/bodygraph/run_refresh_worker.py`) is the dev-only job that drives the TTL/SWR, rate-limit, and circuit-breaker behavior captured in `artifacts/bodygraph/refresh_policy.snapshot.json` and related metrics/logs. PF14 and the ADRs define a v1 nested schema for this snapshot (including `ttl_s`/`swr_s`, nested `rate_limit{requests_per_window,window_s}`, nested `circuit_breaker{fail_threshold,window_s,cooldown_s}`, and a `sample_counts` block with counters such as `refresh_failures`, `breaker_tripped`, and `rate_limit_hits`). This subtask records that the refresh worker’s internal `POLICY` constant and behavior remain in lock-step with that v1 schema and the ADR/snapshot owned by HDE-Build Notes and HDE-Schemas & Artifacts; PF09 does not restate the schema or numeric values here, it only requires that the governed snapshot and associated metrics/logs exist and reflect the policy those documents describe.  
-* **Subtask status:** **Not started**  
+* **Subtask status:** **Not done**  
 * **Epic or card:** **Unknown**  
 * **Tokens (if verified here):**  
   * `BG_SOURCE_SELECTION_OK`  
@@ -6082,7 +6664,7 @@ Use the Distillation harness to **prove and exercise** the DB runtime posture de
 
 * PF09 does not redefine token semantics for determinism, A7, `/internal/version`, DB posture, or BodyGraph behavior; those remain single-homed in HDE-Governance, HDE-CLI-API-Vendor-Ref, HDE-Schemas & Artifacts, and Mechanics. This subtask requires that the one-button runner drive all governed gates for a release and enforce Index/Mirror parity for the resulting artifacts.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -6110,7 +6692,7 @@ Use the Distillation harness to **prove and exercise** the DB runtime posture de
 
   * `artifacts/evidence_index.jsonl`
 
-  ### **Subtask HDE-DIST001.7 — Vendor ingest source policy & proofs**
+    ### **Subtask HDE-DIST001.7 — Vendor ingest source policy & proofs**
 
 * Subtask name/label: Vendor ingest source policy & proofs
 
@@ -6127,7 +6709,7 @@ Use the Distillation harness to **prove and exercise** the DB runtime posture de
 
     * Source is chosen per call on operator surfaces (for example via CLI flag or ops parameter); there are no hidden “engine modes” that silently flip between DB and vendor.
 
-    * For BodyGraph flows, capture artifacts/bodygraph/source\_selection.snapshot.json as canonical JSON (titles-only to HDE-Schemas & Artifacts for schema) with at least attempted and selected source information; gate via BG\_SOURCE\_SELECTION\_OK.
+    * For BodyGraph flows, capture artifacts/bodygraph/source\_selection.snapshot.json as canonical JSON (titles-only to HDE-Schemas & Artifacts for schema) with at least attempted and selected source information; gate via `BG_SOURCE_SELECTION_OK`.
 
   * Unknown ENGINE\_\* env fail-closed.
 
@@ -6139,13 +6721,13 @@ Use the Distillation harness to **prove and exercise** the DB runtime posture de
 
     * When rails are closed, any request that sets source=vendor MUST return a typed refusal and MUST NOT issue outbound HTTP to the vendor.
 
-    * This requirement is enforced in conjunction with the CI rails gates (ENV\_RAILS\_POLICY\_OK) and BodyGraph source selection tests.
+    * This requirement is enforced in conjunction with the CI rails gates (`ENV_RAILS_POLICY_OK`) and BodyGraph source selection tests.
 
   * Source invariance (DB vs vendor).
 
     * For the same normalized inputs, show that DB-sourced and vendor-sourced bodies are byte-identical when emitted via the shared presenter/emitter.
 
-    * Use the BodyGraph invariance artifacts under artifacts/bodygraph/source\_invariance/ (ab.json, ba.json, summary.json) and prove ab\_ba\_equal: true in the summary.
+    * Use the BodyGraph invariance artifacts under `artifacts/bodygraph/source_invariance/` (ab.json, ba.json, summary.json) and prove ab\_ba\_equal: true in the summary.
 
 * Subtask status: Partial
 
@@ -6153,35 +6735,35 @@ Use the Distillation harness to **prove and exercise** the DB runtime posture de
 
 * Tokens:
 
-  * BG\_SOURCE\_SELECTION\_OK
+  * `BG_SOURCE_SELECTION_OK`
 
-  * BG\_VENDOR\_CALLS\_DISABLED\_IN\_PROD\_OK
+  * `BG_VENDOR_CALLS_DISABLED_IN_PROD_OK`
 
-  * BG\_DEV\_DIRECT\_CALLS\_UPSERT\_OK
+  * `BG_DEV_DIRECT_CALLS_UPSERT_OK`
 
-  * BG\_SOURCE\_INVARIANCE\_OK
+  * `BG_SOURCE_INVARIANCE_OK`
 
-  * ENV\_RAILS\_POLICY\_OK
+  * `ENV_RAILS_POLICY_OK`
 
-  * EVIDENCE\_INDEX\_UPDATED\_OK
+  * `EVIDENCE_INDEX_UPDATED_OK`
 
-  * EVIDENCE\_INDEX\_MIRROR\_OK
+  * `EVIDENCE_INDEX_MIRROR_OK`
 
 * Evidence / artifacts:
 
-  * artifacts/bodygraph/source\_selection.snapshot.json — canonical JSON snapshot of attempted and selected sources for BodyGraph flows (schema and details routed to HDE-Schemas & Artifacts).
+  * `artifacts/bodygraph/source_selection.snapshot.json` — canonical JSON snapshot of attempted and selected sources for BodyGraph flows (schema and details routed to HDE-Schemas & Artifacts).
 
-  * artifacts/bodygraph/source\_invariance/ab.json — DB vs vendor AB BodyGraph invariance sample.
+  * `artifacts/bodygraph/source_invariance/ab.json` — DB vs vendor AB BodyGraph invariance sample.
 
-  * artifacts/bodygraph/source\_invariance/ba.json — DB vs vendor BA BodyGraph invariance sample.
+  * `artifacts/bodygraph/source_invariance/ba.json` — DB vs vendor BA BodyGraph invariance sample.
 
-  * artifacts/bodygraph/source\_invariance/summary.json — summary proving ab\_ba\_equal: true for DB/vender invariance when implemented.
+  * `artifacts/bodygraph/source_invariance/summary.json` — summary proving ab\_ba\_equal: true for DB/vendor invariance when implemented.
 
   * Rails/CI logs demonstrating closed-rails refusal and no outbound vendor I/O (paths not pinned here; governed by HDE-Governance and Glow QA Guide).
 
-  * docs/evidence/INDEX.json / docs/evidence/INDEX.sha256 — Human Evidence Index and hash sentinel including the above artifacts.
+  * `docs/evidence/INDEX.json` / `docs/evidence/INDEX.sha256` — Human Evidence Index and hash sentinel including the above artifacts.
 
-  * artifacts/evidence\_index.jsonl — Machine Mirror entries and path-proofs for the above artifacts.
+  * `artifacts/evidence_index.jsonl` — Machine Mirror entries and path-proofs for the above artifacts.
 
   * EPIC017 QA08 vendor dry-run evidence (CLI QA environment):
 
@@ -6199,7 +6781,11 @@ Use the Distillation harness to **prove and exercise** the DB runtime posture de
 
   * EPIC017 QA08 demonstrates that, in the Codespaces → Railway QA posture, vendor ingest can be exercised via hdctl bg:resolve \--source vendor \--dry-run for a synthetic birth tuple and QA user key, with open rails explicitly enabled (SAFE\_MODE=0, ALLOW\_NETWORK=1), no DB writes (rows\_written: 0, db\_rows\_after: 0), and parity\_match: true between vendor payload and would-be DB shape. This satisfies the “vendor dry-run resolve” slice of this subtask and confirms that the vendor path and ingest bridge behave as expected in dry-run mode without mutating the DB.
 
-  * This subtask remains Partial because the broader vendor ingest source policy is not fully proven yet: prod rails-closed refusal semantics, unknown ENGINE\_\* fail-closed behavior, full BG\_SOURCE\_SELECTION\_OK coverage, and DB vs vendor source invariance using the artifacts/bodygraph/source\_invariance/\*\* family still require implementation and evidence. Those aspects are reserved for future epics and will be reflected here by promoting this subtask to Done once the remaining tokens and artifacts are in place and indexed.
+  * This subtask remains Partial because the broader vendor ingest source policy is not fully proven yet: prod rails-closed refusal semantics, unknown ENGINE\_\* fail-closed behavior, full `BG_SOURCE_SELECTION_OK` coverage, and DB vs vendor source invariance using the `artifacts/bodygraph/source_invariance/**` family still require implementation and evidence. Those aspects are reserved for future epics and will be reflected here by promoting this subtask to Done once the remaining tokens and artifacts are in place and indexed.
+
+  * Directory-casing normalization for the EPIC017 QA logs is recorded in the EPIC018 QA summary; the path update above aligns this subtask’s evidence with the canonical audit/qa/hde-epic017/logs root without changing the underlying QA behavior or acceptance tokens.
+
+    
 
 ### **Subtask HDE-DIST001.8 — Partition plan & verify (EPIC-011)**
 
@@ -6214,7 +6800,7 @@ Use the Distillation harness to **prove and exercise** the DB runtime posture de
 
 * For EPIC-011 there is no “defer partition” behavior for these tables: both the partition plan and verify artifacts are required. PF09 does not define partition semantics or thresholds; those remain in HDE-Governance and infra docs. This subtask ensures that the mechanics harness generates the governed artifacts and that they are part of the Evidence Index/Mirror set.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -6261,7 +6847,7 @@ Use the Distillation harness to **prove and exercise** the DB runtime posture de
 
 * PF09 does not restate the JSON schemas for these artifacts or define DB/bridge policy values; those remain in HDE-Schemas & Artifacts and HDE-Governance. This subtask requires that the governed bridge parity and env connectivity artifacts exist, are canonical, and are indexed under the Evidence Index discipline.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -6306,7 +6892,7 @@ Use the Distillation harness to **prove and exercise** the DB runtime posture de
 
 * PF09 does not define the concrete path or schema for the architecture snapshot; those remain single-homed in HDE-Schemas & Artifacts and HDE-Governance. This subtask requires that the governed snapshot exist, be canonical and secret-free, and be indexed under the global Evidence Index discipline.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -6378,7 +6964,7 @@ Use the Distillation harness to **prove and exercise** the DB runtime posture de
 
 * All manifest checks MUST run under `LC_ALL=C`, `LANG=C`, `TZ=UTC` using canonical JSON rules shared with the rest of the Evidence Index discipline.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -6413,7 +6999,7 @@ Use the Distillation harness to **prove and exercise** the DB runtime posture de
 
   * Capture recompute logs showing recomputation equals the on-disk `release_id`.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -6436,7 +7022,7 @@ Use the Distillation harness to **prove and exercise** the DB runtime posture de
 * **Subtask description:**  
    Run a checksums audit over manifest-listed artifacts and capture its log.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -6453,7 +7039,7 @@ Use the Distillation harness to **prove and exercise** the DB runtime posture de
 * **Subtask description:**  
    Index manifest and release identity artifacts in Human Index and Machine Mirror in the same PR; each mirror record includes a `proof_anchor` path-proof; HDE-Schemas & Artifacts §8.6 is the single home for listing and record types.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -6486,7 +7072,7 @@ Use the Distillation harness to **prove and exercise** the DB runtime posture de
 
 * PF09 does not define the JSON schema or semantics of `release_bindings.json`; those remain single-homed in HDE-Schemas & Artifacts and HDE-Governance. This subtask requires that the governed artifact exist, be canonical, and be indexed alongside pack/manifest identity evidence.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -6549,7 +7135,7 @@ Use the Distillation harness to **prove and exercise** the DB runtime posture de
 
   * Open in write mode (overwrite, never append); exactly one JSON object; final LF; no auxiliary content.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -6577,7 +7163,7 @@ Use the Distillation harness to **prove and exercise** the DB runtime posture de
 
   * Provide a sanitized log sample at `artifacts/bodygraph/keys_only.logs.sample`.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -6609,7 +7195,7 @@ Use the Distillation harness to **prove and exercise** the DB runtime posture de
 
   * Store as canonical JSON at `artifacts/bodygraph/metrics.snapshot.json` (single LF).
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -6628,7 +7214,7 @@ Use the Distillation harness to **prove and exercise** the DB runtime posture de
 * **Subtask description:**  
    Update `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, and `artifacts/evidence_index.jsonl` in the same PR to include env snapshot, logs sample, and metrics artifacts, with `proof_anchor` path-proofs.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -6678,7 +7264,7 @@ Use the Distillation harness to **prove and exercise** the DB runtime posture de
 
 * PF09 does not define numeric SLO thresholds or success/failure posture; those remain single-homed in Governance. This subtask requires that the performance harness exercise these surfaces and microbenchmarks under the defined profiles.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -6704,7 +7290,7 @@ Use the Distillation harness to **prove and exercise** the DB runtime posture de
 
   * Prove parity under realistic load.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -6731,7 +7317,7 @@ Use the Distillation harness to **prove and exercise** the DB runtime posture de
 
   * `ci/jobs/slo_verify.yml`
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -6748,7 +7334,7 @@ Use the Distillation harness to **prove and exercise** the DB runtime posture de
 * **Subtask description:**  
    Update Human Index and Machine Mirror in the same PR for bench artifacts (records-only canonical JSONL; one LF; `proof_anchor` present).
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -6800,7 +7386,7 @@ Use the Distillation harness to **prove and exercise** the DB runtime posture de
 
   * Are produced under `LC_ALL=C`, `LANG=C`, `TZ=UTC` for any byte-sensitive harnesses.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -6829,7 +7415,7 @@ Use the Distillation harness to **prove and exercise** the DB runtime posture de
 
   * Maintain fixed field order and `proof_anchor` to co-located path\_proof files.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -6862,7 +7448,7 @@ Use the Distillation harness to **prove and exercise** the DB runtime posture de
 *Task description:*  
  Wire the Identity & Provenance module as the single source of truth for engine and release identity. Identity values are initialized once per cut and are read-only thereafter; all public and operator surfaces consume via helpers (titles-only to PF‑Canon‑HDE‑Mechanics §13). PF09 binds the identity fields, helpers, and evidence artifacts to specific acceptance tokens.
 
-*Task status:* Not started
+*Task status:* Not done
 
 *Epic or card:* Unknown
 
@@ -6894,7 +7480,7 @@ Use the Distillation harness to **prove and exercise** the DB runtime posture de
 
   * Identity fields are not mutated after freeze and are not overridden by env vars, flags, or other alternate sources on public paths.
 
-*Subtask status:* Not started
+*Subtask status:* Not done
 
 *Epic or card:* Unknown
 
@@ -6934,7 +7520,7 @@ Use the Distillation harness to **prove and exercise** the DB runtime posture de
 
 * Demonstrate CLI↔Reader parity on identity\_meta: the same inputs yield byte-identical public bodies (LF-terminated canonical JSON).
 
-*Subtask status:* Not started
+*Subtask status:* Not done
 
 *Epic or card:* Unknown
 
@@ -6974,7 +7560,7 @@ Use the Distillation harness to **prove and exercise** the DB runtime posture de
 
   * Each record includes a `proof_anchor` path-proof stored alongside the artifact.
 
-*Subtask status:* Not started
+*Subtask status:* Not done
 
 *Epic or card:* Unknown
 
@@ -7076,7 +7662,7 @@ Schemas and exact field shapes remain routed to PF‑Canon‑HDE‑Schemas & Art
 
   * Generate a **CycloneDX SBOM** for the runtime image.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -7106,7 +7692,7 @@ Schemas and exact field shapes remain routed to PF‑Canon‑HDE‑Schemas & Art
 
   * Export and verify `LC_ALL=C`, `LANG=C`, `TZ=UTC` in the runtime environment to preserve determinism.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -7132,7 +7718,7 @@ Schemas and exact field shapes remain routed to PF‑Canon‑HDE‑Schemas & Art
 
   * Ensure the service binds `$PORT`, not a hard-coded port (enforce `ENV_PORT_REQUIRED_OK`).
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -7197,7 +7783,7 @@ Schemas and exact field shapes remain routed to PF‑Canon‑HDE‑Schemas & Art
 
   * Values are sourced via `identity_admin()` from the Identity & Provenance module (no direct env reads at emit time; no mutation after freeze).
 
-*Subtask status:* Not started
+*Subtask status:* Not done
 
 *Epic or card:* Unknown
 
@@ -7331,7 +7917,7 @@ If a production cache is used, provide a **private, composite-key cache** for Re
 
 * PF09 does not define cache internals, SLO thresholds, or diagnostics log paths; those remain single-homed in Governance, Mechanics, and infra/ops docs. This subtask records that, when a production cache is present, it obeys composite-key, determinism, A7-consistent transport, deterministic invalidation, metrics, and optional diagnostic logging as described above.
 
-*Subtask status:* Not started
+*Subtask status:* Not done
 
 *Epic or card:* Unknown
 
@@ -7355,7 +7941,7 @@ If a production cache is used, provide a **private, composite-key cache** for Re
 
   * For browser-facing writers: rotate CSRF token on login and allow exactly one safe retry on CSRF failure.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -7414,7 +8000,7 @@ If a production cache is used, provide a **private, composite-key cache** for Re
 
   * Rely on HDE-Schemas & Artifacts §8.6 and Appendix C for entry listings and record-type schemas.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -7469,7 +8055,7 @@ If a production cache is used, provide a **private, composite-key cache** for Re
 
 * PF09 does not define the exact JSON schema or artifact paths for the probes and lifecycle logs; those remain single-homed in HDE-Schemas & Artifacts and HDE-Governance. This subtask requires that the governed probes and lifecycle behavior exist, are canonical and numeric-free, and are evidenced and indexed.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -7495,6 +8081,108 @@ If a production cache is used, provide a **private, composite-key cache** for Re
 
   * `artifacts/evidence_index.jsonl`
 
+  ### **Subtask HDE-COAG001.9 — CLI packaging & terminal access (pre-Glow prod)**
+
+* **Subtask name/label:** CLI packaging & terminal access (pre-Glow prod)
+
+* **Subtask description:**  
+   Treat the canonical CLI (hdctl or successor) as a required admin product surface in the pre-Glow period and ensure it can be installed and used from a generic terminal to reach Railway prod and obtain the full product payload:
+
+  * **Packaging & entrypoints (terminals, not just Codespaces).**
+
+    * Provide a documented way to install or run the canonical CLI from a **generic shell**, not only from GitHub Codespaces, against the production HD Engine on Railway (per Glow-Infrastructure §2.2/§2.6; titles-only).
+
+    * Acceptable forms include, for example (titles-only):
+
+      * A packaged CLI (binary or pip-installable tool) with a pyproject console\_script entrypoint.
+
+      * A module runner path (`python -m engine.cli`).
+
+      * A containerized CLI that can be invoked from any shell that can reach Railway.
+
+    * The packaging must preserve the existing CLI surface defined in HDE-CLI-API-Vendor-Ref (PF05) — commands/flags/behavior remain governed there; this subtask does not redefine CLI bytes or flags.
+
+  * **Terminal CLI access requirement (pre-Glow).**
+
+    * In pre-Glow production, any shell that can reach the Railway HD Engine base URL and/or DB (per Glow-Infrastructure §2.6; titles-only) **MUST** be able to:
+
+      * Install and invoke the canonical CLI using documented entrypoints, **and**
+
+      * Use CLI subcommands defined in PF05 (for example some composition of `bg:resolve`, `showcompat`, `aux-preview`) to obtain the **full product payload** for a match:
+
+        * Per-person BodyGraphs (from the existing resolver mechanics).
+
+        * Compat results with numeric scores and bands.
+
+        * Three Aux narratives (A→B, B→A, shared) for the match.
+
+    * Admin GUI alone is **not** sufficient; a build that cannot be exercised from a terminal CLI (within pre-Glow rails) is considered incomplete for this packaging/runtime slice.
+
+  * **Rails & pre-Glow constraints (titles-only).**
+
+    * All CLI runs used as evidence here MUST respect the pre-Glow prod rails and constraints already recorded in PF14/PF19/PF07:
+
+      * No app-level user model; no persistent user-bound BodyGraph rows in prod.
+
+      * `--user` remains an ephemeral QA key; `bg:resolve --source=vendor --upsert` MUST NOT be used in prod until a future epic explicitly re-opens user-bound upsert flows.
+
+      * Full payload must therefore be produced via stateless/dry-run flows and/or non-upserting DB paths, within SAFE rails policy (closed by default; explicit open-rails windows governed by HDE-Governance).
+
+    * This subtask does **not** relax SAFE rails, network policy, or upsert prohibitions; it only requires that, *within* those rails, a terminal CLI remains a usable admin surface for the full product payload.
+
+* **Subtask status:** **Not done**
+
+* **Epic or card:** **Unknown** (future Admin/Packaging epic; titles-only until assigned)
+
+* **Tokens (titles-only; PF09 is consumer-only):**
+
+  * Existing CLI conformance and install tokens (to be reused):
+
+    * `CLI_PYPROJECT_ENTRYPOINT_OK`
+
+    * `CLI_MODULE_RUN_OK`
+
+    * `CLI_INSTALL_OK`
+
+    * `CLI_HELP_EXIT_0_OK`
+
+    * `CLI_HELP_STDOUT_OK`
+
+  * Canonical JSON and evidence tokens:
+
+    * `JSON_CANONICAL_CHECK_OK`
+
+    * `EVIDENCE_INDEX_UPDATED_OK`
+
+    * `EVIDENCE_INDEX_MIRROR_OK`
+
+    * `EVIDENCE_PATHS_VALIDATED_OK`
+
+* **Evidence / artifacts (titles/paths only; to be supplied by future epic):**
+
+  * CLI install/help/version logs captured from at least one **non-Codespaces** terminal environment (for example a clean local shell) showing:
+
+    * Successful install or container run.
+
+    * `hdctl --help` and `hdctl --version` exiting with code 0 and writing to stdout only.
+
+    * Available subcommands matching PF05’s CLI catalog (at minimum: `showcompat`, `aux-preview`, `bg:resolve`).
+
+  * At least one prod-against-Railway QA run from a generic terminal that:
+
+    * Uses CLI alone (or CLI \+ a thin harness script) to accept a canonical pair input (fixture or births).
+
+    * Produces a **full product payload** bundle containing both BodyGraphs, compat scores/bands, and three narratives (A→B, B→A, shared).
+
+    * Stores the resulting bundle JSON under a governed path (for example `Audit/QA/...` or `artifacts/cli/admin_bundle.json`), with:
+
+      * A sibling path-proof transcript (`*.path_proof.txt`).
+
+      * Entries in `docs/evidence/INDEX.json` and `artifacts/evidence_index.jsonl` (Machine Mirror) in the same PR, following the global Evidence Index discipline.
+
+* **Notes:**  
+   SoT: canon — this subtask records that **terminal CLI access to the full product payload is a required product surface** before Glow App integration, echoing the Product Owner’s decision in Addendum 11\. Mechanics for CLI commands/flags, admin bundle composition, and HTTP admin bundle routes will be pinned in PF05/PF14/PF19/PF07; PF09 tracks that a packaging/runtime slice exists to make CLI usable from any terminal that can reach Railway prod and to capture governed evidence for such runs.  
+    
   ---
 
   ## Task HDE-COAG002 — SDKs (TypeScript / Python)
@@ -7536,7 +8224,7 @@ If a production cache is used, provide a **private, composite-key cache** for Re
 
     * Exactly one trailing LF.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -7568,7 +8256,7 @@ If a production cache is used, provide a **private, composite-key cache** for Re
 
     * No renaming.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -7610,7 +8298,7 @@ If a production cache is used, provide a **private, composite-key cache** for Re
 
     * Must not change ETag semantics.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -7627,7 +8315,7 @@ If a production cache is used, provide a **private, composite-key cache** for Re
 * **Subtask description:**  
    Update Human Index (`docs/evidence/INDEX.json` \+ `docs/evidence/INDEX.sha256`) and Machine Mirror (`artifacts/evidence_index.jsonl`) in the same PR for all SDK artifacts; ensure mirror records follow HDE-Schemas & Artifacts §8.3/§8.6 (canonical JSONL, single file, `proof_anchor`, governed paths).
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -7699,7 +8387,7 @@ If a production cache is used, provide a **private, composite-key cache** for Re
 
 * Runbooks SHOULD reference the “pointer-flip” rollback pattern by title (flipping pointers to the last known-good `release_id`) where appropriate; PF09 does not restate pointer mechanics or DB migration steps. This subtask requires that operational runbooks exist, are kept in sync with release identity and evidence practices, and are captured as governed artifacts.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -7730,7 +8418,7 @@ If a production cache is used, provide a **private, composite-key cache** for Re
 
   * 429 handling regressions.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -7785,7 +8473,7 @@ If a production cache is used, provide a **private, composite-key cache** for Re
 
 * PF09 does not define SLO thresholds or alert routing; those remain single-homed in Governance and ops docs. This subtask requires that metrics/dashboards reflect the key Engine surfaces and cache, and that alerts are wired to error/latency/A7/evidence/cache health in a bounded, non-PII way.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -7803,7 +8491,7 @@ If a production cache is used, provide a **private, composite-key cache** for Re
 * **Subtask description:**  
    Update Human Index (`docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`) and Machine Mirror (`artifacts/evidence_index.jsonl`) in the same PR for runbooks, ops dry runs, and alert configs. Mirror must follow HDE-Schemas & Artifacts §8.3/§8.6 (canonical JSONL, one file, unknown-key reject, `proof_anchor` path-proofs). PF09 depends on Governance and Schemas for token semantics and record schemas; it only requires evidence presence and indexing.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -7892,7 +8580,7 @@ If a production cache is used, provide a **private, composite-key cache** for Re
 
 * PF09 does not redefine A7, writers/error, INTVER, or DB token semantics; those remain single-homed in HDE-Governance and HDE-CLI-API-Vendor-Ref. This subtask requires that a post-deploy smoke harness exist, capture the governed artifacts above, and satisfy Evidence Index & Mirror discipline.
 
-* **Subtask status:** **Not started**
+* **Subtask status:** **Not done**
 
 * **Epic or card:** **Unknown**
 
@@ -7970,7 +8658,7 @@ If a production cache is used, provide a **private, composite-key cache** for Re
 
 *Task ID:* HDE-COAG00X  
  *Task name/label:* Stateless JSON QA mode (non-gating tracker)  
- *Task status:* Not started
+ *Task status:* Not done
 
 *Task description:*  
  Track the future stateless JSON QA mode described in PF14 and ensure it does not accidentally become a merge-blocking gate before the owning epic lands:
@@ -8016,121 +8704,448 @@ If a production cache is used, provide a **private, composite-key cache** for Re
 
 ## **Task HDE-COAG005 — Interim no-user CLI QA posture (pre-Glow prod)**
 
-*Task ID:* HDE-COAG00Y  
- *Task name/label:* Interim no-user CLI QA posture (pre-Glow prod)  
- *Task status:* Not started
+*Task ID: HDE-COAG005*
+
+*Task name/label:* Interim no-user CLI QA posture (pre-Glow prod)  
+ *Task status:* Not done
 
 *Task description:*  
- Encode, for PF09, the pre-Glow production CLI QA constraints from PF14 §17.10 and the QA docs, without redefining schemas or transport bytes:
+ Encode, for PF09, the pre-Glow production CLI QA constraints from Mechanics and QA canon for environments with no app-level user model, without redefining schemas or transport bytes. In this posture, Live QA behavior tests for compat and BodyGraph must be vendor-backed, and local CLI runs that do not call vendor are treated as offline math/serializer checks only.
+
+*Task notes:*
 
 * **Environment assumptions (titles-only).**
 
   * In pre-Glow production, there is no app-level user model and no persistent user-bound BodyGraph rows configured in the database.
 
-  * Mechanics and QA MUST NOT create app-like user records in production ahead of Glow App integration (see PF14 — HDE-Mechanics Guide §17.10 and Glow QA Guide by title).
+  * Mechanics and QA MUST NOT create app-like user records in production ahead of Glow App integration (see Mechanics guide §17.10 and Glow QA Guide by title).
 
-* **Compat & Reader Live QA (showcompat).**
+* **Compat and Reader Live QA (showcompat).**
 
-  * In pre-Glow prod Live QA, `hdctl showcompat` MUST be exercised with birth arguments only (for example, `--birthdate-a/-b`, `--birthtime-a/-b`, `--location-a/-b`).
+  * In pre-Glow prod Live QA, hdctl showcompat MUST be exercised:
 
-  * `--user-a/--user-b` and `--source=db` MUST NOT be used in production QA flows while the app user model is absent.
+    * With birth arguments only (for example \--birthdate-a/--birthdate-b, \--birthtime-a/--birthtime-b, \--location-a/--location-b), and
 
-  * QA MUST continue to verify, for birth-based compat runs:
+    * With an explicit vendor source: Live QA behavior steps that intend to test compat behavior MUST use hdctl showcompat \--source vendor in this environment.
 
-    * Canonical JSON on stdout (UTF-8, no BOM; ASCII-sorted keys; compact; exactly one trailing LF), reusing the canonical JSON harness covered by HDE-CALC005 and HDE-CONJ004.
+  * \--user-a/--user-b and \--source=db MUST NOT be used in production QA flows while the app user model is absent.
 
-    * AB↔BA identity using swapped birth tuples (AB vs BA), reusing the CLI AB/BA parity harness (`artifacts/cli/ab.json`, `ba.json`, `summary.json`).
+  * Any hdctl showcompat run that does not call vendor (for example showcompat without an explicit source) MUST be treated as a local/offline math or serializer check only; it may be useful for D1/D2 canonical JSON and determinism proofs under closed rails but MUST NOT be used to satisfy tokens whose intent is “live behavior with vendor rails active” or to satisfy PO Live QA steps.
 
-    * Reader v1 envelopes via `--dump-reader`, with Reader↔CLI parity proven via the shared presenter/emitter, as governed by PF14 and the CLI parity tasks in this checklist.
+  * QA MUST continue to verify, for birth-based compat runs that are vendor-backed:
+
+    * Canonical JSON on stdout (UTF-8, no BOM; ASCII-sorted keys; compact; exactly one trailing LF).
+
+    * AB↔BA identity using swapped birth tuples (AB vs BA), reusing the CLI AB/BA parity harness (artifacts/cli/ab.json, artifacts/cli/ba.json, artifacts/cli/summary.json).
+
+    * Reader v1 envelopes via \--dump-reader, with Reader↔CLI parity proven via the shared presenter/emitter, as governed by Mechanics and the CLI parity tasks in this checklist.
 
 * **Aux narratives Live QA (aux-preview).**
 
-  * In pre-Glow prod, `hdctl aux-preview` MUST consume compat JSON produced from birth-based `showcompat` runs as described above; QA MUST NOT rely on DB-backed users to exercise Aux.
+  * In pre-Glow prod, hdctl aux-preview MUST consume compat JSON produced from birth-based hdctl showcompat \--source vendor runs as described above; QA MUST NOT rely on DB-backed users to exercise Aux.
 
-  * Aux preview remains a file-based consumer of compat JSON in this mode; narrative IDs and bands are exposed to admins only via governed JSON sidecars, as defined in PF05/PF17/PF18 by title.
+  * Aux preview remains a file-based consumer of compat JSON in this mode; narrative IDs and bands are exposed to admins only via governed JSON sidecars, as defined in CLI/API, Narratives Guide, and Narrative Deliverables by title.
 
-* **BodyGraph resolver & vendor ingest (bg:resolve).**
+* **BodyGraph resolver and vendor ingest (bg:resolve).**
 
-  * In pre-Glow prod, CLI `--user` arguments passed to `bg:resolve` MUST be treated as ephemeral QA keys only (for example, `qa_epic017_resolve1`, `qa_epic017_vendor1`) and MUST NOT be interpreted as real app user IDs.
+  * In pre-Glow prod, CLI \--user arguments passed to bg:resolve MUST be treated as ephemeral QA keys only (for example qa\_epic017\_resolve1, qa\_epic017\_vendor1) and MUST NOT be interpreted as real app user IDs.
 
-  * Under rails CLOSED, any `bg:resolve --source=vendor` invocation MUST return a typed refusal and MUST NOT perform outbound HTTP.
+  * Under rails CLOSED, any bg:resolve \--source vendor invocation MUST return a typed refusal and MUST NOT perform outbound HTTP.
 
   * Under rails OPEN in pre-Glow prod, QA MAY:
 
-    * Run `bg:resolve` DB/auto stub checks that do not create real DB rows.
+    * Run bg:resolve \--source vendor \--dry-run to exercise vendor shaping and ingest metadata without writing DB rows, consistent with vendor ingest policy and SAFE rails rules.
 
-    * Run `bg:resolve --source=vendor --dry-run` to exercise vendor shaping and ingest metadata without writing DB rows.
+    * Run limited bg:resolve DB/auto stub checks that do not create real DB rows, but such runs MUST be explicitly labeled as local/offline checks and MUST NOT be used to satisfy vendor-backed behavior tokens; live BodyGraph behavior tests in this environment MUST use explicit vendor-backed modes (for example bg:resolve \--source vendor or vendor-backed resolver flows governed in Mechanics and QA canon).
 
-  * `bg:resolve --source=vendor --upsert` MUST NOT be invoked in production until a future epic (recorded in HDE Phased Epics and governed by Glow QA Guide) re-opens user-bound DB coverage for environments with a live app user model.
+  * bg:resolve \--source vendor \--upsert MUST NOT be invoked in production until a future epic (recorded in HDE Phased Epics and governed by Glow QA Guide) re-opens user-bound DB coverage for environments with a live app user model.
 
 * **Evidence skeleton for CLI QA (pre-Glow prod).**
 
-  * For Live QA sessions in pre-Glow prod that exercise `showcompat`, `aux-preview`, or `bg:resolve`:
+  * For Live QA sessions in pre-Glow prod that exercise showcompat, aux-preview, or bg:resolve as vendor-backed behavior tests:
 
     * Mechanics MUST snapshot the Human Evidence Index and Machine Mirror before and after the QA run:
 
-      * `docs/evidence/INDEX.json`
+      * docs/evidence/INDEX.json
 
-      * `docs/evidence/INDEX.sha256`
+      * docs/evidence/INDEX.sha256
 
-      * `artifacts/evidence_index.jsonl`
+      * artifacts/evidence\_index.jsonl
 
-      * governed `*.path_proof.txt` records
+      * governed \*.path\_proof.txt records
 
-    * Any mutation of these governed evidence artifacts during such QA runs MUST be treated as a defect or unexpected side effect.
+    * Any mutation of these governed evidence artifacts during such QA runs MUST be treated as a defect or unexpected side effect. CLI QA flows in this mode consume the evidence skeleton defined elsewhere in this checklist and in PF12/PF14; they do not write governed Evidence Index or Mirror artifacts directly.
 
-    * CLI QA flows in this mode MUST NOT write governed evidence artifacts directly; they only consume the evidence skeleton defined elsewhere in this checklist (HDE-COAG001 and HDE-DIST001) and in PF12/PF14.
+  * QA notes (qa\_notes.md) for Live QA steps in this posture MUST distinguish between:
+
+    * Vendor-backed behavior runs (for example “Step 2 — D1 compat vendor-backed behavior, hdctl showcompat \--source vendor …”), and
+
+    * Local/offline math or serializer checks (for example “local D1 canonical JSON check, no vendor”).
+
+  * This labeling ensures that PF09 and PF19 can map vendor-backed behavior tokens only to the appropriate steps, and that local-only checks are not misinterpreted as vendor behavior proofs.
 
 * **Forward plan (routing only; titles-only).**
 
   * Once the Glow App and user model are integrated, a future epic recorded in HDE Phased Epics and governed by the Glow QA Guide will:
 
-    * Use real app user IDs to exercise DB-backed `showcompat` and `bg:resolve --source=vendor --upsert` in prod or stage.
+    * Use real app user IDs to exercise DB-backed showcompat and bg:resolve \--source vendor \--upsert in prod or stage.
 
-    * Close out any acceptance tokens that currently depend on DB-backed user flows, routing to HDE-Governance/HDE Phased Epics by title.
+    * Close out any acceptance tokens that currently depend on DB-backed user flows, routing to HDE-Governance and HDE Phased Epics by title.
 
-  * Until that epic is live, QA requirements that assume “existing users in prod” MUST be treated as blocked by environment and satisfied instead using the no-user QA mode recorded in this task.
-
-*Task notes:*
-
-* PF09 does not define new CLI commands, flags, or schemas here; those remain single-homed in PF05, PF12, PF14, PF19, and PF20 by title.
-
-* This task ties the pre-Glow no-user QA posture for CLI to concrete checklist expectations without changing long-term DB-backed semantics.
+  * Until that epic is live, QA requirements that assume “existing users in prod” MUST be treated as blocked by environment and satisfied instead using the no-user, vendor-first QA mode recorded in this task.
 
 *Epic or card:* Unknown (pre-Glow QA epic; titles-only)
 
-*Tokens (titles-only; semantics live in Governance/QA docs):*
+*Tokens (titles-only; semantics live in Governance and QA docs):*
 
-* This row primarily reuses existing tokens and environment constraints:
+* Rails and env pins: SAFE\_RAILS\_DEFAULT\_OK, ENV\_LC\_ALL\_C\_OK, ENV\_TZ\_UTC\_OK.
 
-  * Rails and env pins: `SAFE_RAILS_DEFAULT_OK`, `ENV_LC_ALL_C_OK`, `ENV_TZ_UTC_OK` (already referenced elsewhere in PF09).
+* Canonical JSON and parity: JSON\_CANONICAL\_CHECK\_OK, CLI\_AB\_BA\_PARITY\_OK, CLI\_TWO\_RUN\_IDENTITY\_OK, CLI\_READER\_EMITTER\_PARITY\_OK.
 
-  * Canonical JSON and parity: `JSON_CANONICAL_CHECK_OK`, `CLI_AB_BA_PARITY_OK`, `CLI_TWO_RUN_IDENTITY_OK`, `CLI_READER_EMITTER_PARITY_OK`.
-
-  * Evidence discipline: `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`.
-
-* If Governance adds a dedicated “NO\_USER\_QA\_MODE\_OK” token in future, this task should reference it by title only.
+* Evidence discipline: EVIDENCE\_INDEX\_UPDATED\_OK, EVIDENCE\_INDEX\_MIRROR\_OK, EVIDENCE\_PATHS\_VALIDATED\_OK.
 
 *Evidence / artifacts (titles/paths only):*
 
-* For compat & Aux QA:
+* For compat and Aux QA:
 
-  * `artifacts/cli/ab.json`
+  * artifacts/cli/ab.json
 
-  * `artifacts/cli/ba.json`
+  * artifacts/cli/ba.json
 
-  * `artifacts/cli/summary.json`
+  * artifacts/cli/summary.json
 
-  * `artifacts/cli/narrative/stdout.txt` (Aux preview text; titles-only)
+  * artifacts/cli/narrative/stdout.txt (Aux preview text; titles-only)
 
-  * `artifacts/cli/narrative/sidecar.json` (Aux preview IDs-only JSON sidecar)
+  * artifacts/cli/narrative/sidecar.json (Aux preview IDs-only JSON sidecar)
 
 * Evidence skeleton (snapshots, read-only posture):
 
-  * `docs/evidence/INDEX.json`
+  * docs/evidence/INDEX.json
 
-  * `docs/evidence/INDEX.sha256`
+  * docs/evidence/INDEX.sha256
 
-  * `artifacts/evidence_index.jsonl`
+  * artifacts/evidence\_index.jsonl
 
-  * governed `*.path_proof.txt` (paths and schemas single-homed in HDE-Schemas & Artifacts)  
+  * governed \*.path\_proof.txt (paths and schemas single-homed in HDE-Schemas & Artifacts)
+
+  ## **Task HDE-COAG006 — Admin QA surfaces (full product payload, GUI \+ CLI)**
+
+* Task ID: HDE-COAG006
+
+* Task name/label: Admin QA surfaces (full product payload, GUI and CLI)
+
+* Task status: Not done
+
+* Task description:  
+   Ensure that, prior to Glow App integration, the Engine exposes a canonical admin-only full product bundle and that both a basic Admin GUI and CLI runs from arbitrary terminals can retrieve and present this bundle for a given pair, with canonical JSON evidence and Evidence Index plus Machine Mirror discipline, and with mandatory authentication and audit rails for all admin bundle surfaces.
+
+* Task notes:
+
+  * Scope is admin QA only: these surfaces are for operators and the Product Owner, not end users. Reader v1 public covenant (bands-only, numeric-free) remains unchanged; app integrations continue to go through Reader and Aux contracts governed in HDE-Math-Spec, HDE-CLI-API-Vendor-Ref, HDE-Narratives Guide, HDE-Narrative Deliverables, and the Glow QA Guide by title.
+
+  * The full product payload bundle for a given compat evaluation includes, at minimum:
+
+    * Per-person BodyGraphs as canonical BodyGraph JSON for each party, using resolver mechanics defined in canon.
+
+    * Compat result over the closed Magic-10 set, including per-category id, score, band, personal\_key, shared\_key, and compat meta as already defined in math, schemas, mechanics, and CLI references.
+
+    * Three Aux narratives from the narratives system for the match: private A to B, private B to A, and shared.
+
+  * Mechanics and transport for admin bundle construction and surfaces (internal admin bundle builder, CLI subcommand, HTTP route shape, and Admin GUI wiring) are single-homed in HDE-Mechanics Guide, HDE-CLI-API-Vendor-Ref, HDE-CLI and dev harness sections, and infra and QA docs by title. PF09 tracks that engine-level mechanics and evidence tasks exist, and that QA tokens for admin bundle coverage, parity, and auth rails are wired, but does not redefine schemas or transport bytes.
+
+  * Addendum 12 tightens pre-Glow canon to require:
+
+    * An internal admin bundle builder that composes the full product payload into a single canonical JSON object for admin use.
+
+    * CLI and HTTP admin bundle surfaces that consume the same builder and produce the same bundle for the same inputs.
+
+    * Authentication and authorization for both CLI and HTTP admin bundle paths, with an admin-only credential, logging and audit requirements, and rotation and revocation discipline.
+
+    * New QA tokens CLI\_ADMIN\_BUNDLE\_PARITY\_OK, ADMIN\_BUNDLE\_FULL\_PAYLOAD\_OK, and ADMIN\_AUTH\_REQUIRED\_OK, which PF09 now consumes by name for this row.
+
+  ---
+
+  ### **Subtask HDE-COAG006.1 — CLI full product bundle (any terminal to Railway)**
+
+* Subtask name/label: CLI full product bundle (any terminal to Railway)
+
+* Subtask description:
+
+  * Extend existing CLI install and entrypoint coverage so that the canonical CLI (hdctl or successor) can be installed and invoked in at least:
+
+    * Codespaces images used for HDE QA, and
+
+    * A clean local environment matching supported Python versions,
+
+  * using the same entrypoints (pyproject console script and module runner).
+
+  * Define and document a CLI runbook that, starting from a canonical pair input (fixture or births), yields the admin bundle JSON for a given pair by calling the deployed Engine on Railway production under SAFE rails appropriate for QA. This may be a single aggregator command to be pinned in CLI and mechanics docs or a composition of existing commands such as bg:resolve, showcompat, and aux-preview plus a harness script.
+
+  * Ensure this CLI flow is reproducible from any terminal that has:
+
+    * Network reachability to the Railway production HD Engine, and
+
+    * Correct secrets and environment rails set according to Governance, CLI and infra, and QA docs by title.
+
+* Subtask status: Not done
+
+* Epic or card: Unknown (planning row; future Admin QA or packaging epic will own this work)
+
+* Tokens:
+
+  * CLI\_PYPROJECT\_ENTRYPOINT\_OK
+
+  * CLI\_MODULE\_RUN\_OK
+
+  * CLI\_INSTALL\_OK
+
+  * CLI\_HELP\_EXIT\_0\_OK
+
+  * CLI\_HELP\_STDOUT\_OK
+
+  * EVIDENCE\_INDEX\_UPDATED\_OK
+
+  * EVIDENCE\_INDEX\_MIRROR\_OK
+
+  * EVIDENCE\_PATHS\_VALIDATED\_OK
+
+* Evidence / artifacts:
+
+  * CLI install logs for supported environments (pyproject entrypoint and module runner).
+
+  * At least one production-against-Railway run capturing the admin bundle JSON under a governed Audit or artifacts path.
+
+  * Evidence Index entry and Machine Mirror record for the CLI admin bundle artifact, with co-located path-proof transcripts.
+
+* Notes:  
+   SoT: canon only at this stage. This subtask records that CLI must be able to produce the full product bundle from any terminal that can reach Railway production; details of the aggregator command or harness remain single-homed in mechanics and CLI references and will be wired back here by a future epic.
+
+  ---
+
+  ### **Subtask HDE-COAG006.2 — HTTP admin bundle route and GUI harness**
+
+* Subtask name/label: HTTP admin bundle route and GUI harness
+
+* Subtask description:
+
+  * Implement and prove an internal HTTP admin bundle route, to be pinned in mechanics and CLI/API references, that:
+
+    * Accepts a canonical pair input (fixture, births, or internal identifiers resolved via existing mechanics).
+
+    * Calls the internal admin bundle builder to assemble the full product payload bundle (BodyGraphs plus compat result plus three narratives).
+
+    * Emits canonical JSON (UTF-8, sorted keys, compact, exactly one trailing line feed; arrays functioning as sets are deduped and sorted) under an internal or QA-only path with admin-only operations posture (not public and not an A7 proof surface).
+
+  * Wire a minimal Admin GUI to call this HTTP admin bundle route against the same production Engine on Railway that the Glow App will eventually use:
+
+    * The GUI is not the Glow App and is not a public surface; it is a basic internal web page for operators and the Product Owner.
+
+    * For at least one synthetic pair and one real pair, the GUI must render:
+
+      * Each person’s BodyGraph diagram derived from canonical BodyGraph JSON.
+
+      * Compat categories with numeric scores and bands.
+
+      * The three narratives (A to B, B to A, and shared) for the match.
+
+  * Ensure all JSON bundle outputs from the HTTP admin route are canonical and indexed in the Evidence Index and Machine Mirror, with governed path-proofs.
+
+* Subtask status: Not done
+
+* Epic or card: Unknown (likely future Admin-UI or admin bundle epic; ID to be assigned)
+
+* Tokens:
+
+  * ADMIN\_BUNDLE\_FULL\_PAYLOAD\_OK
+
+  * JSON\_CANONICAL\_CHECK\_OK
+
+  * EVIDENCE\_INDEX\_UPDATED\_OK
+
+  * EVIDENCE\_INDEX\_MIRROR\_OK
+
+  * EVIDENCE\_PATHS\_VALIDATED\_OK
+
+* Evidence / artifacts:
+
+  * HTTP admin bundle JSON artifacts for representative pairs, for example CLI path and Admin GUI path captures.
+
+  * Evidence Index and Machine Mirror entries for the HTTP admin bundle artifacts, with path-proofs.
+
+  * Screenshots or HTML snapshots showing the Admin GUI rendering BodyGraphs, compat scores and bands, and three narratives per match.
+
+* Notes:  
+   This subtask records the requirement for an internal HTTP admin bundle route and a minimal Admin GUI harness. Route naming, detailed request and response schemas, and associated QA tokens remain single-homed in mechanics, CLI/API references, Governance, QA Guide, and Phased Epics by title; PF09 records the work and binds ADMIN\_BUNDLE\_FULL\_PAYLOAD\_OK to this slice.
+
+  ---
+
+  ### **Subtask HDE-COAG006.3 — CLI versus HTTP admin bundle parity**
+
+* Subtask name/label: CLI versus HTTP admin bundle parity
+
+* Subtask description:
+
+  * Prove that, for identical inputs and environment, the CLI admin bundle JSON and the HTTP admin bundle JSON are byte-identical once canonicalization is applied:
+
+    * For one or more representative pairs, capture the CLI-produced admin bundle and the HTTP admin bundle route output.
+
+    * Run a canonical compare, using the same canonical JSON rules as elsewhere, to confirm that the two bundles match exactly with no diff after canonicalization.
+
+  * Apply AB versus BA and two-run identity checks to the admin bundle surface, by title to the math and mechanics canon:
+
+    * AB versus BA: swapping persons A and B yields identical normalized admin bundles.
+
+    * Two-run identity: repeating the same GUI or CLI bundle call with identical inputs and environment yields identical bundle bytes with a single trailing line feed.
+
+* Subtask status: Not done
+
+* Epic or card: Unknown
+
+* Tokens:
+
+  * CLI\_ADMIN\_BUNDLE\_PARITY\_OK
+
+  * ADMIN\_BUNDLE\_FULL\_PAYLOAD\_OK
+
+  * JSON\_CANONICAL\_CHECK\_OK
+
+  * TWO\_RUN\_IDENTITY\_OK
+
+  * EVIDENCE\_INDEX\_UPDATED\_OK
+
+  * EVIDENCE\_INDEX\_MIRROR\_OK
+
+  * EVIDENCE\_PATHS\_VALIDATED\_OK
+
+* Evidence / artifacts:
+
+  * Pairs of CLI versus HTTP admin bundle JSON artifacts for at least one synthetic and one real pair.
+
+  * Canonical compare logs proving parity with no differences between CLI and HTTP admin bundles.
+
+  * AB versus BA and two-run identity logs for admin bundles, with math and serializer mechanics governed by other PF docs.
+
+* Notes:  
+   This subtask will be considered Done only when there is concrete evidence that CLI and HTTP admin bundle surfaces are in parity under canonical JSON, that the admin bundle always contains the full bundle components covered by ADMIN\_BUNDLE\_FULL\_PAYLOAD\_OK, and that AB versus BA and two-run identity properties are enforced and proven in the same way as existing compat and Reader surfaces.
+
+  ---
+
+  ### **Subtask HDE-COAG006.4 — Internal admin bundle builder (composition only)**
+
+* Subtask name/label: Internal admin bundle builder (composition only)
+
+* Subtask description:
+
+  * Define and implement an internal admin bundle builder as a pure function or module that composes the full product payload into a single JSON object (the admin bundle) with at least the following top-level keys:
+
+    * a\_bodygraph: canonical BodyGraph JSON for person A.
+
+    * b\_bodygraph: canonical BodyGraph JSON for person B.
+
+    * compat: canonical compat JSON for the pair, including categories and meta as already defined in math, CLI/API, and schemas.
+
+    * narratives: an array of three Aux narrative compositions for this match, including metadata and text, consistent with narrative mechanics and deliverables doc sets.
+
+    * meta: build and environment metadata such as engine\_tag, release\_id, invocation\_tag or equivalent, bundle source, and any relevant rails information.
+
+  * Ensure the admin bundle builder:
+
+    * Uses the single canonical JSON serializer and emitter used for other governed JSON surfaces, producing UTF-8, sorted keys, compact JSON with exactly one trailing line feed.
+
+    * Is internal and admin-only: it may contain numeric scores and narrative text and is not a Reader public body and not governed by the public numeric-free covenant. It is intended for admin, QA, and internal use only.
+
+    * Is the common internal surface for both CLI and HTTP admin bundle routes; external admin surfaces must not reconstruct the bundle ad hoc.
+
+* Subtask status: Not done
+
+* Epic or card: Unknown (future admin bundle epic; planning row)
+
+* Tokens:
+
+  * ADMIN\_BUNDLE\_FULL\_PAYLOAD\_OK
+
+  * JSON\_CANONICAL\_CHECK\_OK
+
+  * EVIDENCE\_INDEX\_UPDATED\_OK
+
+  * EVIDENCE\_INDEX\_MIRROR\_OK
+
+  * EVIDENCE\_PATHS\_VALIDATED\_OK
+
+* Evidence / artifacts:
+
+  * Canonical sample admin bundle JSON artifacts for synthetic and real pairs, produced by the internal builder.
+
+  * Evidence Index and Machine Mirror entries for admin bundle sample artifacts, with governed path-proofs.
+
+* Notes:  
+   SoT: canon — this subtask encodes that the structure and composition of the admin bundle are now locked by spec for pre-Glow. Implementation, test harnesses, and artifact paths remain to be supplied by a future epic and will be wired back here as evidence when available.
+
+  ---
+
+  ### **Subtask HDE-COAG006.5 — Admin surfaces authentication, audit logging, and rotation rails**
+
+* Subtask name/label: Admin surfaces authentication, audit logging, and rotation rails
+
+* Subtask description:
+
+  * Enforce authentication and authorization requirements for both CLI admin bundle paths and HTTP admin bundle routes:
+
+    * Both admin surfaces must require an admin credential; an unauthenticated request must not be able to obtain the full admin bundle.
+
+    * Pre-Glow minimal requirement:
+
+      * A secret admin token or equivalent credential must exist with high entropy, not checked into the repository, and stored as a secret in Railway or equivalent infra.
+
+      * The token must be required on every admin bundle request, for example as an Authorization header or other secure transport mechanism pinned in Governance and CLI/API docs.
+
+      * The credential must be known only to admin operators and not to end users.
+
+  * Provide logging and audit behavior for successful admin bundle requests:
+
+    * Each successful admin bundle request must be logged with, at minimum:
+
+      * Timestamp.
+
+      * Who or what called it (CLI operator, GUI user, or service account).
+
+      * A high-level description of inputs, such as whether the request was birth-based for two anonymous parties or user-identifier-based in a future user-model world.
+
+      * A correlation identifier suitable for tracing across logs and related artifacts.
+
+    * These logs must be treated as operations logs and governed by QA and Governance docs for retention, privacy, and security; no sensitive payloads or secrets may be logged.
+
+  * Ensure token rotation and revocation behavior:
+
+    * The admin credential must be rotatable without code changes, for example via environment configuration or Infra secrets.
+
+    * Revocation must be effective: removing or changing the secret must cause old tokens to stop working immediately.
+
+    * Any change to the admin credential set must be treated as a governed change and, where appropriate, recorded with evidence and Doc-Delta notes in the owning PF docs.
+
+* Subtask status: Not done
+
+* Epic or card: Unknown
+
+* Tokens:
+
+  * ADMIN\_AUTH\_REQUIRED\_OK
+
+  * EVIDENCE\_INDEX\_UPDATED\_OK
+
+  * EVIDENCE\_INDEX\_MIRROR\_OK
+
+  * EVIDENCE\_PATHS\_VALIDATED\_OK
+
+* Evidence / artifacts:
+
+  * Admin auth harness logs showing that unauthenticated admin bundle requests are rejected and authenticated requests succeed, for both CLI and HTTP admin bundle surfaces.
+
+  * Operations log samples demonstrating required fields (timestamp, caller, high-level input description, correlation identifier) without payload bodies or secrets.
+
+  * Evidence Index and Machine Mirror entries for admin auth and audit artifacts, with governed path-proofs, when those artifacts are captured.
+
+* Notes:  
+   This subtask binds ADMIN\_AUTH\_REQUIRED\_OK to a concrete set of expectations for admin bundle surfaces. Authentication and authorization semantics, header formats, and storage details remain single-homed in Governance, infra, and QA docs by title; PF09 records that there is explicit checklisted work and evidence for these rails and that admin surfaces are no longer permitted to remain open or unauthenticated under canon.  
+* 
+

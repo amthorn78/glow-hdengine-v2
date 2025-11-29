@@ -2,11 +2,12 @@
 
 ## **0\. Front Matter — Document Control**
 
-Title: PF03-Technical Writing Best Practices  
- Version: v1.0.3  
+Title: PF03-Reference-Technical Writing Best Practices  
+ Version: v1.0.4  
  Status: Reference  
- Effective date: 2025-11-17  
- Last Update Gate: Review 2025-11-17  
+ Effective date: 2025-11-29
+
+Last Update Gate: BN 7.8.9 Drain A27  
  Invocation tag: INV-f2ac55d77ce9aacc
 
 Scope (titles-only)  
@@ -308,6 +309,24 @@ Error reporting — MUST. If a tool/canvas action fails, state the failure plain
 Escalation — SHOULD. If doctrine conflicts, cite governing PF titles and § numbers; propose the smallest corrective redline.
 
 Determinism in thread — MUST. Keep terms, tokens, and headings consistent inside a session; do not rename mid-flow.
+
+### **12.1 Engineering docs / QA plans (Live QA pattern)**
+
+Engineering docs such as Live QA plans are action lists, not narratives. When the PO asks for a Live QA plan, the writer MUST treat it as a mechanical script that another person or agent can run without interpretation.
+
+Live QA plans MUST follow these patterns:
+
+* One command per step. Present the plan as a numbered list where each step is a single, copy-pasteable command string (for example, a `bash` invocation or CLI call). Describe any needed context (environment, directory, preconditions) before or after the command, not interleaved inside it.
+
+* One primary artifact per command. For each step, name at least one expected evidence artifact (for example, a file path, log, or bundle) that the command produces. State this next to the step so the relationship is explicit.
+
+* Mechanical evidence only. Copy the exact command text and path names that will appear in the repo or QA tree. Avoid paraphrasing commands or artifact locations; the plan must match what will actually be executed.
+
+* PF-canon citations by title and section. When a step relies on a rail, token, or behavior defined in PF-canon (for example, determinism env helpers or ownership of QA tokens), cite the governing document by title and § anchor in the plan. Do not include version numbers or quote older text; routing is titles-only.
+
+* Separate mechanics from interpretation. Keep the step list purely mechanical. Any narrative interpretation, retrospective, or ADR commentary belongs in a short notes block after the steps or in a separate doc (for example, epic closeout or Build Notes), not interleaved with the commands themselves.
+
+These rules apply only to how Live QA plans are written and presented. They do not redefine where rails, tokens, or behaviors are owned in PF-canon; those remain in their existing single-home documents.
 
 ## **13\) Security & privacy for writing**
 

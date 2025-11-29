@@ -1,11 +1,11 @@
 # **0\. Front Matter**
 
 **Title:** PF07-Canon-Glow-Infrastructure  
- **Version:** v1.0.9
+ **Version:** v1.1.2
 
 **Status:** Canon  
-**Effective date:** 2025-11-25  
-**Last Update Gate:** BN 7.7.8 Drain A13
+**Effective date:** 2025-11-29  
+**Last Update Gate:** BN 7.8.9 Drain A16
 
 **Invocation tag:** `INV-f2ac55d77ce9aacc`
 
@@ -261,27 +261,71 @@ PF07 is **names-only**. Admin-only narratives persistence **DB/schema locations*
 
 These are the authoritative names for the HD Engine production service and its primary database. Transport policy, A7 behavior, and acceptance tokens remain owned by **HDE-Governance** and **HDE-CLI-API-Vendor-Ref** (titles-only); PF07 is inventory-only.
 
-**Codespaces role (QA console, names-only).**  
+**Codespaces role (QA console & artifact sink, names-only).**  
  GitHub Codespaces for the repository `amthorn78/glow-hdengine-v2` is a **QA console**, not a production environment:
 
 * It clones the HD Engine repo into a hosted devcontainer.
 
-* It runs CLI (`hdctl`) and HTTP (`curl`) commands that can target the Railway HD Engine service and the shared Postgres instance when environment configuration and rails allow it.
+* It can run CLI (`hdctl`) and HTTP (`curl`) tools configured to talk to the Railway HD Engine service and the shared Postgres instance when environment configuration and rails allow it.
 
-* It writes QA artifacts (logs, notes, snapshots) back into the repo under governed paths (for example, `audit/qa/**`, `artifacts/**`, `docs/**`).
+* It writes QA artifacts (logs, notes, snapshots) back into the repo under governed paths (for example, `audit/qa/**`, `artifacts/**`, `docs/**`), and serves as the **artifact sink and analysis workspace** for Live QA runs.
 
 Codespaces does **not** host the production HD Engine itself; it is a remote shell talking to the Railway `glow-hdengine-v2` service and `ample-illumination/production/postgres` database. Names and paths for QA harnesses and windows (for example, EPIC-specific QA rails windows) are recorded in §2.5 and **Glow QA Guide** by title.
 
-**“Prod via Codespaces” (gloss, names-only).**  
- When other PF documents or QA guides use the phrase **“prod via Codespaces”**, it SHOULD be read as:
+**Behavior vs artifacts (routing-only).**  
+ Within this document:
 
-* Commands are run **from** a Codespace attached to `amthorn78/glow-hdengine-v2` (or an equivalent workspace), and
+* “Prod” refers to the Railway HD Engine service and shared DB named above, reached via HTTP/admin surfaces defined in other PF documents.
 
-* Those commands **talk to** the HD Engine production service at `https://glow-hdengine-v2-production.up.railway.app` and/or the `ample-illumination/production/postgres` database (schema `hde`), and
+* “Codespaces” is treated as a **console and artifact sink**: a place to store and inspect QA evidence under `audit/qa/<epic-id>/...` and to run offline checks against those artifacts.
 
-* QA artifacts from those runs are stored in the HD Engine repo under governed paths.
+PF07 does **not** decide where behavior tests that satisfy D-goals are executed; those decisions (for example, which admin terminal or GUI exercises compat, narratives, vendor, or admin bundle behavior) are specified in **Epic-Process-Guide** and **Glow QA Guide** by title. PF07 names only the providers, projects, services, repositories, and canonical QA evidence roots that those documents rely on. 
 
-It does **not** mean that the Codespace itself is a production environment. Any shell that can reach the Railway base URL and/or connect to the production DB with the correct configuration can exercise production behavior; PF07 names the standard providers, projects, services, and repos, and routes QA procedures and proof steps by title to **Glow QA Guide**, **HDE-Governance**, and **HDE-CLI-API-Vendor-Ref**.
+## **2.7 Terminal CLI access as admin surface (names-only, pre-Glow)**
+
+**Scope (inventory-only).**  
+ This section records, at the names-only level, that in the **pre-Glow** period the HD Engine exposes two admin-facing product access surfaces:
+
+* an **Admin GUI** (as recorded in PF10 addenda by title), and
+
+* a **terminal CLI** for the HD Engine (for example, `hdctl` as defined in **HDE-CLI-API-Vendor-Ref**).
+
+PF07 does not define CLI flags, bytes, or payloads; it names the surfaces and routes all CLI contracts and behavior to **HDE-CLI-API-Vendor-Ref** and other PF documents by title only.
+
+**Production target (Railway names).**  
+ Terminal CLI access for the HD Engine is always **aimed at the same production resources** already listed in §2.2:
+
+* Railway project: `ample-illumination`.
+
+* HD Engine service: `glow-hdengine-v2`.
+
+* Base URL: `https://glow-hdengine-v2-production.up.railway.app`.
+
+* Production DB instance: `ample-illumination/production/postgres`.
+
+* HD Engine schema: `hde`.
+
+Any shell that can reach this base URL and/or connect to this DB instance with the correct configuration can act as a console for the canonical HD Engine CLI in pre-Glow. Governance, SAFE rails, and acceptance tokens remain owned by **HDE-Governance**; CLI bytes and subcommands remain owned by **HDE-CLI-API-Vendor-Ref**.
+
+**Codespaces as canonical QA console.**  
+ GitHub Codespaces for `amthorn78/glow-hdengine-v2` remains the **canonical QA console**:
+
+* It clones the HD Engine repo into a hosted devcontainer.
+
+* It runs the canonical CLI and HTTP tools against the Railway HD Engine service and shared DB when environment pins and rails allow it.
+
+* It stores QA artifacts (logs, notes, snapshots) back into the repo under governed paths (`audit/qa/**`, `artifacts/**`, `docs/**`).
+
+In this model, **Codespaces is a client to prod, not prod itself**. The phrase “prod via Codespaces” should be read as “run commands from a Codespace that talk to the Railway HD Engine prod service and DB, and store artifacts in the repo,” consistent with the Production and Staging/QA tables in §2.2.
+
+**Any-shell terminal access (names-only).**  
+ Pre-Glow, terminal CLI access is **not limited to Codespaces**:
+
+* Any shell (local terminal, CI shell, or other remote environment) that can reach the production Railway base URL and/or connect to `ample-illumination/production/postgres` with the appropriate environment configuration is a valid console for the canonical HD Engine CLI.
+
+* PF07 records this as an **infrastructure fact only**. It does not define when or how such shells may be used; usage, rails posture (for example, SAFE\_MODE and ALLOW\_NETWORK), and QA expectations are governed by **HDE-Governance**, **Glow QA Guide**, **HDE-Mechanics Guide**, and **HDE-Build Checklist** (titles-only).
+
+In other words, **terminal CLI access** is a named, supported admin-facing product surface in the pre-Glow period. PF07 keeps it names-only, tying it to the production Railway HD Engine and shared DB instances; product semantics, payload completeness (BodyGraphs, bands/scores, narratives), and acceptance tokens remain defined in the owning PF documents (by title) rather than here.
 
 ---
 
@@ -745,11 +789,16 @@ Each of the above artifacts has a corresponding path‑proof sidecar:
 
 **Admin writer credentials** (names-only; no values here)
 
-* `HDE_ADMIN_TOKENS`, `HDE_ADMIN_SCOPES` — OPEN/TBD
+* `HDE_ADMIN_TOKENS`, `HDE_ADMIN_SCOPES` — **OPEN/TBD**  
+   Names-only keys for the admin credentials used to gate **admin-only HD Engine surfaces**, including CLI and HTTP admin bundle access to the Railway HD Engine (`glow-hdengine-v2`) and its shared database.
 
-Notes: Values are operator-managed in production; QA uses the same channel. Rotation process is documented by title (no secrets in repo).
+**Notes.**
 
-* 
+* Values are **not** stored in the repo; they are realized as provider-managed secrets (for example, Railway environment secrets) and configured per environment by operators.  
+* QA uses the same channel (provider secrets / environment configuration) for exercising admin-only surfaces under rails and QA windows defined elsewhere.
+
+* Rotation and revocation procedures (for example, changing or removing admin tokens) are documented by title in **HDE-Governance**, **Glow QA Guide**, and any relevant runbooks; PF07 records only the key names and their association with admin surfaces (CLI and HTTP admin bundle).  
+* Requiredness, defaults, and validation rules for these keys are not defined here: ownership/requiredness → **HDE-Schemas & Artifacts**; rails/policy (including “admin auth required” and logging) → **HDE-Governance** (titles-only).
 
   ## **8.2 Component-specific keys**
 

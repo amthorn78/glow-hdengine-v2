@@ -3,10 +3,10 @@
 ## 0.1 Header
 
  **Title:** PF04-Canon-HDE-Governance  
- **Version:** v1.4.3  
+ **Version:** v1.4.8  
  **Status:** Canon  
- **Effective date:** 2025-11-25  
- **Last Update Gate:** BN 7.7.8 Drain A12
+ **Effective date:** 2025-11-29  
+ **Last Update Gate:** BN 7.8.9 Drain A12
 
 ## 0.2 Scope & boundaries \[Required-Now\]
 
@@ -193,7 +193,7 @@ This document owns:
 
   * Mandates that every normative change updates the Evidence Index in the same commit.
 
-## 1.2 Single homes & routing \[Required-Now\]
+  ## **1.2 Single homes & routing Required−NowRequired-NowRequired−Now**
 
 **Ownership (this document).**  
  Governance owns **operational and transport policy** for the HD Engine:
@@ -215,24 +215,22 @@ This document owns:
 **Titles-only routing (no duplication).**
 
 * **Math and architecture.**  
-   Mathematical rules (scoring, thresholds, fixed-point/rounding, preimage definition) and architectural boundaries (engine/adapter/presenter responsibilities) are referenced by title only from **HDE-Math-Spec** and **HDE Architecture**; they are not restated here.
-
+   Mathematical rules (scoring, thresholds, fixed-point/rounding, preimage definition) and architectural boundaries (engine/adapter/presenter responsibilities) are referenced by title only from **HDE-Math-Spec** and **HDE Architecture**; they are not restated here.  
 * **Aux Narrative.**  
-   Aux Narrative payload and route bytes (examples, endpoint bytes, CLI admin flags) are documented in **HDE-CLI-API-Vendor-Ref** and **HDE-Narratives Guide**. This document owns the acceptance matrices and policy carve-outs only (e.g., suppression posture).
-
+   Aux Narrative payload and route bytes (examples, endpoint bytes, CLI admin flags) are documented in **HDE-CLI-API-Vendor-Ref** and **HDE-Narratives Guide**. This document owns the acceptance matrices and policy carve-outs only (e.g., suppression posture).  
+* **Admin bundle & admin surfaces.**  
+   The internal **admin bundle builder** (composition of per-person BodyGraphs, compat JSON, narratives, and meta) and the concrete **CLI/HTTP admin bundle surfaces** are defined mechanically and byte-wise in **HDE-Mechanics Guide** and **HDE-CLI-API-Vendor-Ref** (titles-only). Governance owns only the **policy** for these admin surfaces: authentication/authorization, logging/audit posture, and their acceptance tokens (`CLI_ADMIN_BUNDLE_PARITY_OK`, `ADMIN_BUNDLE_FULL_PAYLOAD_OK`, `ADMIN_AUTH_REQUIRED_OK`). Admin bundle bytes are not part of the Reader v1 public contract and are not A7 proof surfaces; they are admin-only internal surfaces.  
 * **Serializer/emitter and schemas.**  
    Canonical serializer/emitter rules and public payload schemas are owned by **HDE-Math-Spec**, **HDE-Schemas & Artifacts**, and **HDE-CLI-API-Vendor-Ref** and are referenced by title here.
 
 **Change discipline.**
 
-* If a change touches **Math or Architecture**, it must be made in that home and routed here via Doc-Delta.
-
-* If a change alters **transport/ops**, it lands here with updated evidence and pointers, never by duplicating content across documents.
+* If a change touches **Math or Architecture**, it must be made in that home and routed here via Doc-Delta.  
+* If a change alters **transport/ops** (including admin bundle auth/logging policy), it lands here with updated evidence and pointers, never by duplicating content across documents.
 
 **Auditability.**
 
-* All references to external homes are titles/anchors only.
-
+* All references to external homes are titles/anchors only.  
 * Proofs (goldens, scripts, snapshots) are indexed in the Evidence Index governed by **HDE-Schemas & Artifacts** and **HDE-Build Checklist** and kept in sync with repo changes.
 
 ## 1.3 EPIC-011 preservation surfaces \[Required-Now\]
@@ -279,13 +277,17 @@ EPIC-011 introduced a **preservation guard** over key public and admin surfaces.
 
 ### **2.0.1 Determinism & identity**
 
-* **TWO\_RUN\_IDENTITY\_OK** — Two serializations of the same inputs produce identical bytes. (Owned: HDE Math Spec; Mechanics Guide; Evidence & Artifacts)
+* **TWO\_RUN\_IDENTITY\_OK** — Two serializations of the same inputs produce identical bytes. (Owned: HDE-Math-Spec; HDE-Mechanics Guide; Evidence & Artifacts)
 
-* **COMPOSITE\_ABBA\_IDENTITY\_OK** — AB↔BA fingerprint byte-equality (no vendor flags in composite). (Owned: HDE Math Spec; Evidence & Artifacts)
+* **COMPOSITE\_ABBA\_IDENTITY\_OK** — AB↔BA fingerprint byte-equality (no vendor flags in composite). (Owned: HDE-Math-Spec; Evidence & Artifacts)
 
-* **JSON\_CANONICAL\_CHECK\_OK** — Canonical JSON everywhere: UTF-8 (no BOM), sorted keys, compact, exactly one trailing LF; arrays-as-sets as required. (Owned: Mechanics Guide; Evidence & Artifacts)
+* **JSON\_CANONICAL\_CHECK\_OK** — Canonical JSON everywhere: UTF-8 (no BOM), ASCII-sorted keys, compact separators, exactly one trailing LF; arrays-as-sets deduped and ASCII-sorted wherever required. (Owned: HDE-Mechanics Guide; Evidence & Artifacts)
 
-* **PREIMAGE\_RECOMPUTE\_OK** — Strip `idempotence_hash`, canonicalize preimage, sha256 matches published preimage hash. (Owned: HDE Math Spec; Evidence & Artifacts)
+* **PREIMAGE\_RECOMPUTE\_OK** — Strip `idempotence_hash`, canonicalize the preimage (as defined in HDE-Math-Spec), recompute `sha256(preimage_bytes)`, and match the published hash; evidence includes recompute logs/scripts and mirror records under determinism pins. (Owned: HDE-Math-Spec; Evidence & Artifacts)
+
+* **DETERMINISM\_ENV\_PINS\_OK** — All **determinism-sensitive suites** (at minimum: serializer/idempotence proofs, AB↔BA identity, evidence ordering/orientation demos, and other invariance tests named in HDE-Mechanics Guide and Glow QA Guide) run under the **closed determinism env pins**  
+   `SAFE_MODE=1`, `ALLOW_NETWORK=0`, `LC_ALL=C`, `LANG=C`, `TZ=UTC`  
+   as enforced by the canonical determinism env helper and CI rails harness. The helper (`engine/runtime/determinism_env.py`) owns the pinned env map and exposes a single abstraction for checking/applying pins and rendering an env-pins log; CI wires this via job-level env in `.github/workflows/ci.yml` and a dedicated check script (for example `ci/checks/check_env_pins.sh`) that fails closed on any deviation. Evidence for this token consists of a governed **determinism env-pins log** (records-only, canonical JSON; LF-terminated) plus its path-proof and corresponding Evidence Index/mirror entries, with schemas and catalog entries owned by **HDE-Schemas & Artifacts** and QA semantics owned by **Glow QA Guide**. (Owned: Governance; HDE-Mechanics Guide; HDE-Schemas & Artifacts; Glow QA Guide; HDE-Build Checklist)
 
 ---
 
@@ -407,7 +409,8 @@ EPIC-011 introduced a **preservation guard** over key public and admin surfaces.
 
 * **EVIDENCE\_INDEX\_HASH\_OK** — Human index hash sentinel present and gating merges. (Owned: Governance; Evidence & Artifacts)
 
-* **SNAPSHOT\_HEADER\_LOWERCASE\_OK** — Stored header snapshots use lower-case header names; norm enforced by schema rules in HDE-Schemas and Artifacts. (Owned: HDE-Schemas and Artifacts)
+* **SNAPSHOT\_HEADER\_LOWERCASE\_OK** — Stored header snapshots use lower-case header names; norm enforced by schema rules in HDE-Schemas and Artifacts. (Owned: HDE-Schemas and Artifacts)  
+* **SANITY\_PIPELINE\_OK** — A closed-rails sanity pipeline entrypoint (`tools/evidence/run_sanity_pipeline.py`) **must** run and succeed as a single, deterministic orchestration of core governance checks (at minimum: serializer/idempotence invariants, determinism env pins checks, CLI serializer guards, evidence ordering/orientation checks, and PF12 evidence skeleton checks) under the canonical env tuple `SAFE_MODE=1, ALLOW_NETWORK=0, LC_ALL=C, LANG=C, TZ=UTC`. The pipeline writes a governed sanity log at `artifacts/sanity/sanity.log` with a stable, canonical shape (single-line header, one `env:` line with sorted pins, one `check <name>:OK|FAIL` line per step in a fixed order, and a final `summary:PASS|FAIL` line; no timestamps or env-dependent noise) and exits non-zero on the first failure. Evidence for this token consists of: (a) the sanity log and its co-located path-proof, (b) matching entries in `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, and `artifacts/evidence_index.jsonl` keyed by a reserved `artifact_key` for the sanity pipeline, and (c) a CI job that invokes the sanity pipeline under closed rails and is merge-gating for engine releases. PF04 owns the governance semantics and token; schemas, artifact field sets, and the QA token wiring live in **HDE-Schemas & Artifacts**, **Glow QA Guide**, and **HDE-Build Checklist** (titles-only).
 
 ---
 
@@ -515,20 +518,14 @@ These tokens apply whenever SAFE rails are opened for vendor calls in any enviro
 
 ### **2.0.11 Catalog hygiene (where applicable)**
 
-* **CATALOG\_ORIENTATION\_CANON\_OK** — Channel IDs canonical `NN-NN` (zero-padded, min-first); ASCII ordered. (Owned: Evidence & Artifacts — Catalogs)
-
-* **CATALOG\_DENOMINATORS\_FROZEN\_OK** — Pack denominators are present and frozen; no runtime overrides. (Owned: HDE Math Spec; Evidence & Artifacts)
-
-* **FEATURE\_NULL\_DEFAULT\_OK** — Default `null → 0` unless D3 explicitly overrides. (Owned: HDE Math Spec)
-
-* **BAND\_MAX\_INCLUSIVE\_OK** — Bands use inclusive-high thresholds. (Owned: HDE Math Spec)
-
-* **BAND\_EDGE\_GOLDENS\_OK** — Goldens at 24/49/74/100 pass. (Owned: HDE Math Spec; Evidence & Artifacts)
-
+* **CATALOG\_ORIENTATION\_CANON\_OK** — Channel IDs canonical `NN-NN` (zero-padded, min-first); ASCII ordered. (Owned: Evidence & Artifacts — Catalogs)  
+* **CATALOG\_DENOMINATORS\_FROZEN\_OK** — Pack denominators are present and frozen; no runtime overrides. (Owned: HDE Math Spec; Evidence & Artifacts)  
+* **FEATURE\_NULL\_DEFAULT\_OK** — Default `null → 0` unless D3 explicitly overrides. (Owned: HDE Math Spec)  
+* **BAND\_MAX\_INCLUSIVE\_OK** — Bands use inclusive-high thresholds. (Owned: HDE Math Spec)  
+* **BAND\_EDGE\_GOLDENS\_OK** — Goldens at 24/49/74/100 pass. (Owned: HDE Math Spec; Evidence & Artifacts)  
 * **PREFS\_KEYSET\_10\_OK** — Preference keyset is the canonical 10\. (Owned: HDE Math Spec; Governance)  
-* **RESONANCE\_PUBLIC\_POSTURE\_OK** — Reader v1 and CLI public surfaces obey the **numeric-free, narrative-free public covenant**: success payloads expose exactly six top-level keys (`reader_version, eligible, categories, meta, release_id, idempotence_hash`); `categories[*]` items are exactly `{ "id", "band" }` with `band ∈ {"Cool","Open","Warm","Glow"}`; no SR/XR or other numerics appear in public bodies; typed error envelopes are numeric-free (except optional `retry_after_ms` under governed vendor-rate-limit policy), and no prompts or narratives are emitted on public or admin surfaces. v1 ships SR-only (α=1.0) and does not expose XR or hysteresis knobs. (Owned: Governance; HDE-Math-Spec; HDE-Schemas & Artifacts; Glow QA Guide)
-
-* **MAGIC10\_DOMAIN\_CLOSED\_OK** — The public category `id` domain is the **closed Magic‑10 set with pinned order**: public `categories[*].id` values are drawn only from the canonical Magic‑10 identifiers; no extras or omissions are allowed, and internal math (including viewer prefs and presets) uses the same closed id domain. Evidence includes schema and validation tests that enforce the Magic‑10 keyset, plus fixtures demonstrating that unknown ids fail closed. (Owned: HDE-Math-Spec; Governance; Glow QA Guide; Evidence & Artifacts)
+* **RESONANCE\_PUBLIC\_POSTURE\_OK** — Reader v1 and CLI **public** surfaces obey the **numeric-free, narrative-free public covenant**: success payloads expose exactly six top-level keys (`reader_version, eligible, categories, meta, release_id, idempotence_hash`); `categories[*]` items are exactly `{ "id", "band" }` with `band ∈ {"Cool","Open","Warm","Glow"}`; no SR/XR or other numerics appear in public bodies; typed error envelopes are numeric-free (except optional `retry_after_ms` under governed vendor-rate-limit policy); and no prompts or narratives are emitted on **public** Reader/CLI surfaces. This token does **not** govern admin-only surfaces such as the admin bundle; those surfaces may include numeric scores and narrative text but must remain non-public and are covered by the admin-surface tokens in §2.0.17 and the logging/security rules in §7–§8. (Owned: Governance; HDE-Math-Spec; HDE-Schemas & Artifacts; Glow QA Guide)  
+* **MAGIC10\_DOMAIN\_CLOSED\_OK** — The public category `id` domain is the **closed Magic-10 set with pinned order**: public `categories[*].id` values are drawn only from the canonical Magic-10 identifiers; no extras or omissions are allowed, and internal math (including viewer prefs and presets) uses the same closed id domain. Evidence includes schema and validation tests that enforce the Magic-10 keyset, plus fixtures demonstrating that unknown ids fail closed. (Owned: HDE-Math-Spec; Governance; Glow QA Guide; Evidence & Artifacts)
 
 ---
 
@@ -565,6 +562,47 @@ These tokens apply whenever SAFE rails are opened for vendor calls in any enviro
 * **QA\_EVIDENCE\_ONLY\_OK** — QA branches are **evidence-only**: changes are limited to governed evidence artifacts and their indices (for example, `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl`, and new or rotated proofs under `artifacts/**`), plus any required `*.path_proof.txt` files. Application, presenter, schema, and runtime config bytes **must not** change on QA branches; CI and review confirm that diffs are restricted to governed evidence paths, and that human↔machine mirror parity still holds. (Owned: Governance; PF06 — HDE Epic-Process Guide; Glow QA Guide; Evidence & Artifacts)
 
 * **QA\_CI\_DIFF\_SCOPED\_OK** — CI on QA branches is **diff-scoped** to governed evidence files: jobs validate that only evidence/index/mirror artifacts have changed, that index ↔ mirror ↔ `proof_anchor` parity holds, and that no unapproved code/schema/config changes are introduced. QA CI remains merge-gating on evidence integrity, but intentionally limits test scope to the governed diffs for QA branches. (Owned: Glow QA Guide; Governance; PF12 — HDE-Schemas & Artifacts)
+
+### **2.0.15 Config artifacts & acceptance map (EPIC018+)**
+
+* **CONFIG\_REGISTRY\_OK** — The canonical registry report is generated under closed rails and governed as part of the evidence skeleton. The only accepted writer for this artifact is the config generator (`tools/config/generate_config_artifacts.py` or equivalent entrypoint named in HDE-Mechanics Guide). The generator **MUST** enforce the canonical determinism env pins (the closed-rails tuple in §2.0.10/§4.1.4) before emitting the registry report, load registry data via the hardened loader, and serialize the report as canonical JSON (UTF-8, no BOM; ASCII-sorted keys; compact separators; exactly one trailing LF) using the shared serializer. Evidence for this token consists of: (a) the governed registry report artifact (for example `artifacts/registry/registry_report.json`) written under closed rails, (b) its co-located path-proof, and (c) matching entries in `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, and `artifacts/evidence_index.jsonl` keyed by a reserved `artifact_key` for the registry report. PF12 — HDE-Schemas & Artifacts owns the schema, artifact\_key, and mirror mapping; PF19 — Glow QA Guide and PF09 — HDE-Build Checklist own the QA wiring and acceptance map that ties this token to specific tasks and tests. PF04 owns the token semantics and closed-rails governance.
+
+* **CONFIG\_MAGIC10\_OK** — The Magic-10 and band-edges config artifacts are generated under closed rails from the canonical math inputs and governed as part of the evidence skeleton. The config generator (`tools/config/generate_config_artifacts.py` or equivalent) **MUST**:
+
+  * enforce the canonical determinism env pins (closed-rails tuple in §2.0.10/§4.1.4),
+
+  * derive Magic-10 configuration and band-edges from the hardened registry/thresholds inputs defined by Math and Mechanics (titles-only), and
+
+  * serialize the resulting artifacts (for example `artifacts/thresholds/magic10_config.json` and `artifacts/thresholds/band_edges.json`) as canonical JSON using the shared serializer (UTF-8, no BOM; sorted keys; compact separators; exactly one trailing LF).
+
+* Evidence for this token consists of: (a) the governed Magic-10 and band-edges config artifacts with co-located path-proofs, (b) matching entries in the human Evidence Index and machine mirror keyed by reserved `artifact_key` values for these configs, and (c) a validated EPIC-018 config acceptance map (for example `audit/EPIC-018_config_acceptance_map.json`) that maps PF09 config tasks (e.g. HDE-CALC004/HDE-CALC004.3/HDE-CALC004.7) to artifact keys, tokens, and tests without dangling references. PF12 owns schemas and artifact\_key mapping; PF19 and PF09 own the QA acceptance map; PF04 owns the governance token semantics and the closed-rails requirement.
+
+### **2.0.16 Typed bundles (EPIC018+)**
+
+* **CONFIG\_BUNDLES\_DETERMINISTIC\_OK** — Typed frontend and backend config bundles are generated under closed rails from the same governed config artifacts as EPIC018 D5 and are treated as **governed evidence artifacts**, not runtime switches. The only accepted writers for these bundles are the canonical bundle generator entrypoints named in **HDE-Mechanics Guide** (for example `engine/config/bundles.py` and `tools/config/generate_bundles.py`), which **MUST**:
+
+  * enforce the canonical closed-rails env tuple (`SAFE_MODE=1`, `ALLOW_NETWORK=0`, `LC_ALL=C`, `LANG=C`, `TZ=UTC`) before generating any bundle,
+
+  * derive all bundle contents **only** from hardened registry/config sources (the governed registry report and Magic-10/band-edges config artifacts defined by Math/Mechanics and governed in §2.0.15 / §4.1.9), and
+
+  * serialize the resulting frontend and backend bundles using the shared canonical serializer (UTF-8, no BOM; ASCII-sorted keys; compact separators; exactly one trailing LF), yielding deterministic bytes with **two-run identity** for each bundle.
+
+* Evidence for this token consists of:
+
+  * governed bundle artifacts under a pinned path (for example `artifacts/config_bundles/fe_bundle.json` and `artifacts/config_bundles/be_bundle.json`), each with a co-located `*.path_proof.txt`,
+
+  * corresponding entries in `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, and `artifacts/evidence_index.jsonl` keyed by reserved `artifact_key` values for the frontend and backend bundles, and
+
+  * tests and harnesses (named in **Glow QA Guide** and **HDE-Build Checklist**) that assert canonical formatting, two-run identity, schema conformance via local bundle schemas, and strict linkage back to the governed config artifacts (for example, a `sources` block in each bundle that records path, sha256, and size for the upstream config artifacts and matches the current skeleton).
+
+* PF12 — HDE-Schemas & Artifacts owns the bundle schemas, artifact paths, and mirror mapping; PF19 — Glow QA Guide and PF09 — HDE-Build Checklist own the QA wiring and acceptance map for this token. PF04 owns the governance semantics: bundles are generated under closed rails from governed config inputs, contain no secrets or dynamic runtime state, and any change in bundle shape or semantics is treated as a config/evidence change that **must** refresh the evidence skeleton and associated tests in the same PR.
+
+  ### **2.0.17 Admin bundle & admin surfaces (pre-Glow)**
+
+* **ADMIN\_BUNDLE\_FULL\_PAYLOAD\_OK** — The internal **admin bundle builder** composes the full product payload for a match into a single JSON object using only the canonical components defined elsewhere by title: per-person BodyGraph JSON for each party, the full Magic-10 compat JSON for the pair (categories \+ compat meta), exactly three Aux narrative compositions selected for that match, and a `meta` block carrying engine/build identity (for example `engine_tag`, `release_id`, `invocation_tag` or equivalent) and a bounded description of the bundle source and rails posture. The admin bundle is emitted via the shared canonical serializer (UTF-8, no BOM; ASCII-sorted keys; compact separators; exactly one trailing LF) and is explicitly **admin-only**: it is not a Reader v1 public payload, is not an A7 proof surface, and may contain numeric scores and narrative text. Evidence for this token consists of shape/coverage tests for the admin bundle builder, plus governed artifacts (for example, fixture bundles and schema checks) showing that all required components are present and correctly wired to their single homes. Ownership: Governance (token semantics); **HDE-Mechanics Guide** (builder implementation and schema); **HDE-Schemas & Artifacts** (admin-bundle schema and evidence mapping); **Glow QA Guide** and **HDE-Build Checklist** (QA wiring).
+
+* **CLI\_ADMIN\_BUNDLE\_PARITY\_OK** — The canonical **CLI admin bundle command** and the **HTTP admin bundle route** both use the same internal admin bundle builder and canonical emitter and, given the same logical inputs and environment, produce **byte-identical** admin bundle JSON (including the single trailing LF). Pre-Glow, both surfaces target the Railway production engine and DB using the configuration names defined in **Glow Infrastructure** and **HDE-CLI-API-Vendor-Ref** (titles-only) rather than hard-coded hosts; any host with the same config and network reachability can exercise the CLI. Evidence includes: (a) governed parity runs that call CLI and HTTP admin surfaces with the same inputs and byte-compare the resulting bundles, and (b) machine-mirror entries for those parity captures. Ownership: Governance (parity semantics); **HDE-CLI-API-Vendor-Ref** (CLI/HTTP contracts); **HDE-Mechanics Guide** (builder wiring); **Glow QA Guide** and **HDE-Build Checklist** (tests and tasks); **HDE-Schemas & Artifacts** (evidence mapping).  
+* **ADMIN\_AUTH\_REQUIRED\_OK** — All admin bundle surfaces are **authentication- and authorization-guarded**: neither the CLI admin bundle command nor the HTTP admin bundle route may return the admin bundle without a valid admin credential. Pre-Glow, this means a high-entropy admin secret (or equivalent credential) stored as a secret in Railway (names-only in Glow Infrastructure), not checked into the repo, and required on every admin-bundle request via a transport mechanism pinned in **HDE-CLI-API-Vendor-Ref** (for example, a single admin header). Missing or invalid credentials must produce a typed, numeric-free error; they must never return the bundle. The admin credential must be **rotatable** and **revocable** by configuration or secret management only (no code changes), and rotation must immediately invalidate prior values. Evidence for this token consists of: (a) QA harness runs that show unauthenticated and mis-authenticated CLI/HTTP admin-bundle calls fail closed with typed errors and do not emit bundles; (b) a governed description of the active admin credential source (titles-only; no secret values); and (c) machine-mirror entries linking these proofs to this token. Ownership: Governance (auth/rails semantics); **Glow Infrastructure** (secret names and storage, titles-only); **HDE-CLI-API-Vendor-Ref** (auth carrier and error mapping); **Glow QA Guide** and **HDE-Build Checklist** (QA playbook “Live QA via CLI and HTTP admin bundle”).
 
 ---
 
@@ -805,10 +843,56 @@ What must be proved for every cut (**binary gates; no partial**). Index all arti
 
 ### **4.1.4 Rails posture — closed refusal; open conformance**
 
-* **Closed rails (default).** No network I/O; typed, numeric-free refusal; keys-only logs with secrets redacted.  
-* **Open rails (controlled).** Pinned timeouts/retries/backoff; deterministic vendor error mapping; logs contain no payloads or secrets; Reader↔CLI parity and idempotence unaffected.  
-* **Evidence.** CI job proving closed-rails refusal; integration job proving open-rails conformance; redaction/observability fixtures (records-only).  
-* **Tokens.** `ENV_RAILS_POLICY_OK`.
+**Closed rails (default).**  
+ SAFE rails for vendor HTTP are **closed by default** in all environments. When rails are closed (`SAFE_MODE≠0` or `ALLOW_NETWORK≠1`):
+
+* Vendor paths **MUST NOT** open sockets, resolve DNS, or attempt HTTP (no external I/O).
+
+* All attempts to call vendor, including explicit `source="vendor"` flows, **MUST** return a deterministic, numeric-free refusal body and **MUST NOT** perform upstream calls.
+
+* Refusal responses **MUST** use `Cache-Control: no-store`, `Content-Type: application/json; charset=utf-8`, and include **no** `ETag`, `Vary`, or `Content-Encoding`; the body is LF-terminated, numeric-free JSON.
+
+* Logs for refusal paths are **keys-only**, secret-free, and bounded (`route`, `outcome`, `rails_state`, etc.), with secrets redacted. (Tokens: `NO_EXTERNAL_IO_ON_REFUSAL_OK`, `VENDOR_NO_PAYLOAD_LOGGING_OK`, `LOGS_KEYS_ONLY_OK`, `BG_PRIVACY_REDACTION_OK`)
+
+**Open rails (controlled).**  
+ Opening rails (`SAFE_MODE=0` and `ALLOW_NETWORK=1`) is an **explicit, governed action**:
+
+* Network policy (timeouts, retries, backoff, 429 behavior) is pinned by Governance and **must** remain deterministic and keys-only in logs.
+
+* Live vendor calls **must not** change Reader↔CLI parity, A7 conformance, or idempotence proofs.
+
+* Evidence includes a governed **open-rails conformance** run (vendor success, retry, 429 paths) captured as records-only artifacts and indexed in the Evidence Index and machine mirror under the tokens listed in §2.0 (e.g., `VENDOR_RETRY_BACKOFF_OK`, `PROVIDER_429_TYPED_OK`, `RETRY_AFTER_PARSE_OK`, `VENDOR_NO_PAYLOAD_LOGGING_OK`).
+
+**Determinism env pins harness (EPIC018 D2).**
+
+For **determinism-sensitive suites** (serializer identity, AB↔BA, evidence ordering/orientation, and other invariance tests named in HDE-Mechanics Guide and Glow QA Guide), rails policy is further constrained:
+
+* **Canonical determinism env pins.** Determinism suites **MUST** run under the closed-rails env tuple  
+   `SAFE_MODE=1`, `ALLOW_NETWORK=0`, `LC_ALL=C`, `LANG=C`, `TZ=UTC`,  
+   with these pins treated as **mandatory** for any job that produces or verifies governed determinism evidence (including `engine/order` identity proofs and topology orientation demos). This tuple extends the EPIC017 default for CLI/evidence/ordering/registry jobs called out in §2.0.10.
+
+* **Canonical implementation (helper \+ CI).** The env pins are implemented by a single helper module (`engine/runtime/determinism_env.py`) that defines the pinned env map and exposes a typed API for checking/applying pins and rendering an env-pins log. CI wires this helper into determinism suites via job-level env in `.github/workflows/ci.yml` and a dedicated env-check script (for example `ci/checks/check_env_pins.sh`) that fails closed when pins are missing, mismatched, or unset. Mechanics and tests for this helper live in **HDE-Mechanics Guide** and the repo’s invariance test suite; PF04 owns only the policy and token semantics.
+
+* **Evidence surfaces (titles-only).** Determinism env pins produce a governed **env-pins evidence artifact family**, consisting of:
+
+  * a single-line, canonical JSON env-pins log (records the env map and determinism suite set), and
+
+  * a co-located path-proof plus human Index/mirror entries keyed by an `artifact_key` reserved for determinism env rails.  
+     The **schema, artifact path, and Index/mirror mapping** for this family live in **HDE-Schemas & Artifacts** and **Glow QA Guide**; PF04 references them by title only and treats them as the normative evidence surfaces for determinism env rails.
+
+**Tokens and coupling.**
+
+* **ENV\_RAILS\_POLICY\_OK** — Rails posture is correct and backed by evidence: closed rails refuse deterministically with no network I/O and keys-only logs; open rails (where enabled) follow pinned, deterministic policy without affecting Reader↔CLI parity, A7 conformance, or idempotence. Evidence includes the closed-rails refusal proof, open-rails conformance proof, and env-validator outputs per environment, all indexed under the Evidence Index and mirror. (Owned: Governance; Glow QA Guide; HDE-Build Checklist; HDE-Schemas & Artifacts)
+
+* **DETERMINISM\_ENV\_PINS\_OK** — Determinism env pins are enforced and evidenced: determinism suites run under the canonical env tuple above; the determinism env helper is present and used; the env-check CI harness is wired and failing closed; and the determinism env-pins evidence family (log \+ path-proof \+ Index/mirror entries) is present and coherent. This token couples env rails policy to the deterministic env pins harness and points QA to the env-pins artifacts defined in **HDE-Schemas & Artifacts** and the QA registry in **Glow QA Guide**. (Owned: Governance; HDE-Mechanics Guide; Glow QA Guide; HDE-Schemas & Artifacts; HDE-Build Checklist)
+
+Together, `ENV_RAILS_POLICY_OK`, `ENV_LC_ALL_C_OK`, and `DETERMINISM_ENV_PINS_OK` assert that:
+
+* rails are **closed by default** with deterministic refusal and keys-only logs,
+
+* any open-rails behavior is pinned and evidenced without breaking parity or idempotence, and
+
+* all determinism-sensitive suites run under the **canonical deterministic env pins**, with the env posture captured and indexed as governed evidence.
 
 ### **4.1.5 Bands — inclusive-high thresholds (by preset)**
 
@@ -831,6 +915,192 @@ What must be proved for every cut (**binary gates; no partial**). Index all arti
 * **Tokens.** `CATALOG_ORIENTATION_CANON_OK` (and related topology tokens in Evidence & Artifacts).
 
 **Pass criteria.** All classes pass (parity, idempotence, A7, rails, bands, pack constants/manifest, topology) with evidence listed in **Appendix D: Evidence Index** and CI gates enabled (grep-guards for ad hoc emitters; LF/encoding checks; A7 cache header and ETag/no-ETag checks).
+
+### **4.1.8 Sanity pipeline & evidence skeleton (EPIC018+)**
+
+**Scope.** This class covers a **closed-rails sanity pipeline** that orchestrates core governance checks in a single, deterministic run and proves that the evidence skeleton (INDEX, hash sentinel, machine mirror, and path-proofs) is coherent. It does **not** replace individual tests; it is an additional, merge-gating harness.
+
+**Pipeline entrypoint (normative).**
+
+* The canonical sanity entrypoint **MUST** be `python tools/evidence/run_sanity_pipeline.py`.
+
+* Before running any checks, the pipeline **MUST** assert and/or apply the canonical determinism env pins (`SAFE_MODE=1`, `ALLOW_NETWORK=0`, `LC_ALL=C`, `LANG=C`, `TZ=UTC`) via the determinism env helper; failures **MUST** stop the pipeline.
+
+* The pipeline **MUST** then run a fixed, ordered sequence of steps that at minimum covers:
+
+  * serializer determinism/idempotence checks (A3),
+
+  * determinism env pins verification (DETERMINISM\_ENV\_PINS\_OK),
+
+  * CLI serializer/guard checks for compat/Reader parity (A4),
+
+  * evidence index/mirror/path-proof checks and orientation/skeleton demos (PF12 evidence skeleton), and
+
+  * any additional invariance suites identified in **HDE-Mechanics Guide** and **Glow QA Guide** as part of D1–D4.
+
+* The pipeline **MUST** be fail-fast: on the first failing step, it records the failure and emits a `summary:FAIL` line, then exits with a non-zero status code.
+
+**Sanity log artifact (records-only; governed).**
+
+* The pipeline **MUST** write a canonical sanity log at `artifacts/sanity/sanity.log`. The log is treated as a governed artifact with a co-located path-proof and Index/mirror entries; PF12 owns the schema, path, and mirror mapping.
+
+* The log **MUST** be stable and records-only:
+
+  * first line identifying the pipeline (for example, `sanity_pipeline`),
+
+  * exactly one `env:` line describing the determinism env pins in a canonical, sorted form,
+
+  * one `check <name>:OK|FAIL` line per step, in a fixed order, and
+
+  * a final `summary:PASS|FAIL` line.
+
+* The log **MUST NOT** include timestamps, wall-clock data, or env-dependent noise that would break determinism. It is LF-terminated and BOM-free.
+
+**Coupling to the evidence skeleton.**
+
+* A **green sanity pipeline run** asserts that:
+
+  * the determinism env pins are in place and enforced (as per §4.1.4 and `DETERMINISM_ENV_PINS_OK`), and
+
+  * the evidence skeleton checks (INDEX/`INDEX.sha256`/mirror/path-proofs, including the mirror self-record) succeed under closed rails.
+
+* PF12 remains the single home for INDEX/mirror schemas, path-proof format, and the `artifact_key` used for the sanity log; PF04 records only the policy and token coupling.
+
+**CI posture and token coupling.**
+
+* A dedicated CI job **MUST** run the sanity pipeline under the canonical closed-rails env tuple and **MUST** be merge-gating for engine releases and Epic-level gates that rely on the EPIC017 evidence skeleton.
+
+* `SANITY_PIPELINE_OK` is **satisfied** only when:
+
+  * the sanity pipeline job has completed successfully under closed rails,
+
+  * `artifacts/sanity/sanity.log` and its path-proof exist and validate, and
+
+  * `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, and `artifacts/evidence_index.jsonl` have been updated and remain coherent in the same change (as enforced by the existing evidence tokens in §2.0.6).
+
+* PF19 — Glow QA Guide owns the broader QA semantics and any composite QA tokens built on top of `SANITY_PIPELINE_OK`; PF04 is the single home for the governance token and its coupling to env pins and the evidence skeleton.
+
+### **4.1.9 Config artifacts & acceptance map (EPIC018+)**
+
+**Scope.** This class covers the governed **config artifacts** and the **EPIC-018 config acceptance map** that tie PF09 config tasks to concrete artifacts, tokens, and tests. It is part of the same evidence skeleton as the EPIC-017 artifacts: governed artifacts, path-proofs, the human Evidence Index, the hash sentinel, and the machine mirror must remain coherent under closed rails.
+
+**Config generator (closed rails; titles-only).**
+
+* The canonical generator for governed config artifacts **MUST** be a single, closed-rails entrypoint (for example `python tools/config/generate_config_artifacts.py` as named in HDE-Mechanics Guide).
+
+* Before writing any config artifact, the generator **MUST** enforce the canonical determinism env pins (closed-rails tuple in §2.0.10/§4.1.4): the generator and its tests run under the same closed-rails env profile used for determinism and evidence jobs.
+
+* The generator **MUST** read only from the hardened registry/threshold inputs defined by Math and Mechanics (for example the registry loader and thresholds catalog) and **MUST** emit artifacts using the shared canonical serializer (UTF-8, no BOM; ASCII-sorted keys; compact separators; exactly one trailing LF). PF12 — HDE-Schemas & Artifacts owns the schemas and specific artifact\_key mappings; PF04 records the governance policy only.
+
+### **4.1.10 Typed FE/BE bundles (EPIC018+)**
+
+**Scope.** This class covers the **typed frontend and backend config bundles** introduced in EPIC018 D6. These bundles are **projections of governed config artifacts**, not runtime configuration switches. They are part of the same evidence skeleton as the EPIC017/EPIC018 artifacts: governed artifacts with path-proofs, indexed in the human Evidence Index and machine mirror, maintained under closed rails.
+
+**Bundle generation (closed rails; titles-only).**
+
+* The canonical bundle generator for typed FE/BE bundles **MUST** be a single, closed-rails entrypoint (for example `python tools/config/generate_bundles.py`, with implementation owned by **HDE-Mechanics Guide**).
+
+* Before building any bundle, the generator **MUST** enforce the canonical determinism env pins (`SAFE_MODE=1`, `ALLOW_NETWORK=0`, `LC_ALL=C`, `LANG=C`, `TZ=UTC`) as described in §2.0.10 / §4.1.4.
+
+* The generator **MUST** derive bundle content **only** from the governed config artifacts and registry loader defined by EPIC018 D5:
+
+  * the registry report snapshot,
+
+  * the Magic-10 config artifact, and
+
+  * the band-edges config artifact,
+
+* with structure and schema owned by **HDE-Schemas & Artifacts** and **HDE-Mechanics Guide** (titles-only). Bundles **must not** introduce new configuration sources or ad-hoc inputs.
+
+* Bundles **MUST** be emitted via the shared canonical serializer (UTF-8, no BOM; ASCII-sorted keys; compact; exactly one trailing LF). Two runs with identical inputs and env pins **MUST** produce byte-identical bundles (two-run identity).
+
+**Governed bundle artifacts (records-only; titles/paths only).**
+
+* The frontend and backend bundles are treated as governed artifacts (for example: `artifacts/config_bundles/fe_bundle.json` and `artifacts/config_bundles/be_bundle.json`, with exact paths and `artifact_key` mappings defined in **HDE-Schemas & Artifacts**).
+
+* Each bundle **MUST** have a co-located `*.path_proof.txt` file and **MUST** appear in both `docs/evidence/INDEX.json` and `artifacts/evidence_index.jsonl` with reserved `artifact_key` values, maintained exclusively by the canonical bundle generator and the evidence index updater under closed rails. Manual edits to bundle bytes, path-proofs, or mirror records are a governance violation and are expected to fail the evidence and config-bundle tokens in §2.0.6 and §2.0.16.
+
+**Sources linkage (config → bundle).**
+
+* Each bundle **MUST** carry a “sources” block (or equivalent structure defined by **HDE-Schemas & Artifacts**) that records, for each upstream governed config artifact used to build the bundle:
+
+  * the `artifact_key` of the source,
+
+  * the `path` within the repo, and
+
+  * the `sha256` and `size_bytes` of the source artifact.
+
+* Validation tests (named in **Glow QA Guide** and **HDE-Build Checklist**) **MUST** assert that:
+
+  * the paths, hashes, and sizes in the bundle’s sources block exactly match the current governed config artifacts and the Evidence Index/mirror, and
+
+  * frontend/backend bundle contents for Magic-10 and band-edges agree with the underlying config artifacts (no drift).
+
+**Coupling to tokens and skeleton.**
+
+* `CONFIG_BUNDLES_DETERMINISTIC_OK` (see §2.0.16) is **satisfied** only when:
+
+  * the FE/BE bundles are generated under closed rails by the canonical bundle generator,
+
+  * FE/BE bundle artifacts and their path-proofs are present and coherent in the Evidence Index and mirror,
+
+  * bundle bytes are canonical JSON and pass two-run identity checks, and
+
+  * the sources block in each bundle correctly links to the current governed config artifacts and registry report (no dangling or mismatched references).
+
+* The existing evidence and indexing tokens in §2.0.6 (including `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `MACHINE_MIRROR_UPDATED_OK`, `EVIDENCE_PATHS_VALIDATED_OK`, `EVIDENCE_PATH_PROOFS_OK`, `CI_CHECK_FINAL_LF_OK`, and `CI_CHECK_MIRROR_SCHEMA_OK`) continue to govern the skeleton as a whole. This class adds bundle-specific constraints that ensure typed FE/BE bundles are **deterministic, closed-rails projections** of governed config artifacts and are always accompanied by up-to-date skeleton evidence.
+
+**Governed config artifacts (records-only; titles/paths only).**
+
+* The following config artifacts are treated as governed members of the evidence skeleton (names-only; PF12 owns exact schemas/paths):
+
+  * the registry report (for example `artifacts/registry/registry_report.json`),
+
+  * the Magic-10 config artifact (for example `artifacts/thresholds/magic10_config.json`), and
+
+  * the band-edges config artifact (for example `artifacts/thresholds/band_edges.json`).
+
+* Each governed config artifact **MUST** have a co-located `*.path_proof.txt` and **MUST** appear in both `docs/evidence/INDEX.json` and `artifacts/evidence_index.jsonl` with a reserved `artifact_key`, maintained exclusively by the canonical generators/writers (config generator and evidence index updater) under closed rails. Manual edits to these artifacts, their path-proofs, or their mirror records are a governance violation and are expected to fail the evidence tokens in §2.0.6 and the config tokens in §2.0.15.
+
+**EPIC-018 config acceptance map (records-only; titles/paths only).**
+
+* The EPIC-018 config acceptance map (for example `audit/EPIC-018_config_acceptance_map.json`) is a governed artifact that ties PF09 config tasks (e.g. HDE-CALC004/HDE-CALC004.3/HDE-CALC004.7) to:
+
+  * specific `artifact_key` values for the registry report and config artifacts,
+
+  * config tokens (including `CONFIG_REGISTRY_OK` and `CONFIG_MAGIC10_OK`), and
+
+  * the tests or harnesses that back those tokens.
+
+* The acceptance map **MUST** be canonical JSON (UTF-8, no BOM; sorted keys; compact separators; exactly one trailing LF), and validation tests **MUST** assert that:
+
+  * every task ID in the map is a known PF09 config task,
+
+  * every `artifact_key` in the map exists in `docs/evidence/INDEX.json` and in the machine mirror, and
+
+  * every test reference in the map corresponds to a real test file (and optional node) in the repo.
+
+* As with other governed evidence, the acceptance map and its path-proof **MUST** be added to the human Evidence Index, hash sentinel, and machine mirror in the same change that updates them.
+
+**Coupling to tokens and skeleton.**
+
+* `CONFIG_REGISTRY_OK` is **satisfied** only when:
+
+  * the registry report has been generated under closed rails by the canonical config generator,
+
+  * the registry report artifact, its path-proof, and its Index/mirror entries are present and coherent, and
+
+  * the EPIC-018 config acceptance map links the registry report’s `artifact_key` to this token and to the associated tests without dangling references.
+
+* `CONFIG_MAGIC10_OK` is **satisfied** only when:
+
+  * the Magic-10 and band-edges config artifacts have been generated under closed rails and serialized canonically from the math/threshold inputs,
+
+  * these artifacts and their path-proofs are present and correctly indexed in the Evidence Index and mirror, and
+
+  * the EPIC-018 config acceptance map ties the relevant PF09 config tasks to these artifacts, this token, and the backing tests with no broken links.
+
+* The existing evidence and indexing tokens in §2.0.6 (including `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `MACHINE_MIRROR_UPDATED_OK`, `EVIDENCE_PATHS_VALIDATED_OK`, `EVIDENCE_PATH_PROOFS_OK`, `CI_CHECK_FINAL_LF_OK`, and `CI_CHECK_MIRROR_SCHEMA_OK`) continue to govern the skeleton as a whole; this class adds **config-specific** constraints on how governed config artifacts and the acceptance map participate in that skeleton.
 
 ---
 
@@ -1313,6 +1583,45 @@ Carrier name, precise header casing, and where/when it is set are defined in **H
 * Storage locations and DB names: **Glow Infrastructure** (names-only).  
 * Transport and A7 policy: **HDE-Governance** (this document) and **HDE-CLI-API-Vendor-Ref** for endpoint bytes.
 
+### **7.4 Admin bundle audit logging (admin-only) Required−NowRequired-NowRequired−Now**
+
+**Principle (normative).**  
+ Every **admin bundle** request (CLI or HTTP) that successfully returns a bundle **must** produce a single, bounded **audit log record** that is keys-only, numeric-free, and secret-free, consistent with §7.1 and §8.2. Audit logs are ops-only and are never exposed on public surfaces.
+
+#### **7.4.1 Required audit fields (keys-only)**
+
+For each successful admin bundle invocation, the audit record **MUST** include at least:
+
+* `at` — timestamp in UTC ISO-8601/RFC format.
+
+* `route` — a bounded route identifier (for example, `cli_admin_bundle` or `http_admin_bundle`); no URLs or free text.
+
+* `caller` — a bounded identifier for who/what invoked the surface (for example, an admin account id or CLI principal label), not a name or email address.
+
+* `input_kind` — a small enum describing the input type (for example, `birth_match` vs `user_match`); must **not** contain raw birth data, names, or locations.
+
+* `release_id` — the release identifier of the running pack.
+
+* `correlation_id` — the correlation identifier described in §7.2 (non-PII; bounded charset/length).
+
+Additional fields, if any, must follow the keys-only and bounded-label rules of §7.1 and §8.2. No free-text narratives, payload excerpts, or header values are permitted.
+
+#### **7.4.2 Prohibitions (admin bundle)**
+
+In addition to the general prohibitions in §7.1 and §8.2:
+
+* **No birth data or BodyGraph inputs.** Admin bundle audit logs **must not** include birth dates, times, locations, or any BodyGraph input fields (see §7.1.6).
+
+* **No payload echo.** Do not log any part of the admin bundle JSON (BodyGraphs, compat payloads, narratives, or meta).
+
+* **No secrets.** Admin credentials (e.g. admin tokens) and HTTP header values (including `Authorization` or any admin header) must never appear in logs; if referenced, they must be redacted placeholders (e.g., `Admin-Token: REDACTED`).
+
+#### **7.4.3 Evidence and routing (titles-only)**
+
+* Evidence: At least one governed sample of admin bundle audit logs (with payload/secret redaction) and a CI job or test that asserts the required fields are present and that no disallowed content appears.
+
+* Routing: Field-level schema and storage locations for admin bundle audit logs (files vs log streams) are owned by **HDE-Schemas & Artifacts**, **Glow Infrastructure**, and **Glow QA Guide** (titles-only). PF04 owns the policy for **what must be logged and what must not**; logging mechanics live elsewhere.
+
 ---
 
 # **8\. Security & Privacy \[Required-Now\]**
@@ -1391,6 +1700,71 @@ Math and scoring details are defined in **PF-Canon-HDE-Math-Spec**. The public e
 * **Evidence and follow up.** Record the incident (titles and paths only), add tests and guards to prevent recurrence, and document the fix in the Change Log or Doc-Delta.
 
 **Routing.** This section governs ops logging only. Public payload rules remain in §8.1. Transport specifics and vendor behaviors are referenced by title only in the **PF-Canon-HDE-CLI-API-Vendor-Ref**.
+
+## **8.3 Admin surfaces authentication & authorization Required−NowRequired-NowRequired−Now**
+
+**Principle (normative).**  
+ Any surface that exposes the **full product payload** (admin bundle) is **admin-only** and **must be authentication- and authorization-gated**. An unauthenticated or unauthorized caller **MUST NOT** be able to obtain an admin bundle, regardless of network location or environment. Admin surfaces are not governed by the numeric-free public covenant in §8.1, but they remain subject to all logging and privacy rules in §7 and §8.
+
+### **8.3.1 Admin surfaces in scope**
+
+This section applies to:
+
+* The **CLI admin bundle command** (titles-only in HDE-CLI-API-Vendor-Ref and HDE-Mechanics Guide).
+
+* The **HTTP admin bundle route** used by the Admin GUI (titles-only in HDE-CLI-API-Vendor-Ref).
+
+Both surfaces call the internal admin bundle builder defined in **HDE-Mechanics Guide** and may return BodyGraph JSON, compat JSON, narrative text, and meta. They are **not** Reader v1 public surfaces and are **not** A7 proof surfaces.
+
+### **8.3.2 Pre-Glow minimal authentication posture**
+
+Pre-Glow, admin surfaces **MUST** be protected by at least one high-entropy admin credential:
+
+* The credential is stored as a **secret** in Railway or equivalent secret storage defined by **Glow Infrastructure** (names-only) and is **never** checked into the repo.
+
+* Every admin bundle request (CLI or HTTP) **MUST** present this credential via a transport mechanism pinned in **HDE-CLI-API-Vendor-Ref** (for example, a single admin header).
+
+* Missing, empty, or invalid credentials **MUST** result in a typed, numeric-free error; they must **never** return the admin bundle.
+
+* Admin credentials **MUST** be:
+
+  * **Rotatable** without code changes (via secret/config updates only), and
+
+  * **Revocable**, such that removing or changing the secret stops old credentials from working immediately.
+
+Post-Glow, admin surfaces **MUST** align with the wider identity/auth model for app users and admins; this section records the minimum pre-Glow requirement that admin surfaces **must not remain open**.
+
+### **8.3.3 Authorization and least privilege**
+
+* Admin credentials and accounts used for admin bundle access **MUST NOT** be shared with end users or application-level identities.
+
+* Access to admin credentials **MUST** be limited to designated operators; storage locations and access control are governed by **Glow Infrastructure** and **Glow QA Guide** (titles-only).
+
+* Any future role-based or multi-tenant admin model must preserve the invariant that only authorized admin principals can call admin bundle surfaces.
+
+### **8.3.4 Logging and privacy coupling**
+
+Admin surfaces remain fully subject to:
+
+* The **keys-only logging** rules and redaction posture in §7.1 and §8.2 (no payload bodies, no header values, no secrets or PII in logs).
+
+* The BodyGraph-specific privacy rules in §7.1.6 (no birth data or BodyGraph inputs in logs).
+
+* The admin bundle audit logging requirements in §7.4 (per-call audit record with timestamp, caller, input kind, release\_id, correlation\_id).
+
+Admin credentials themselves (for example, admin tokens) **must never** appear in logs or user-visible payloads; if mentioned, they must be fully redacted (e.g., `Admin-Token: REDACTED`).
+
+### **8.3.5 Token coupling**
+
+The **ADMIN\_AUTH\_REQUIRED\_OK** token in §2.0.17 is **satisfied** only when:
+
+* Both CLI and HTTP admin bundle surfaces are protected by admin authentication as described above.
+
+* QA harnesses demonstrate that unauthenticated and mis-authenticated calls fail closed with typed, numeric-free errors and never return bundles.
+
+* Evidence of the active auth posture (titles and paths only) is present in the Evidence Index and machine mirror in the same PR as any change to admin auth behavior.
+
+Routing for admin auth mechanics (credential shape, header names, GUI auth flows) lives in **HDE-CLI-API-Vendor-Ref**, **HDE-Mechanics Guide**, **Glow Infrastructure**, and **Glow QA Guide** (titles-only). PF04 owns the governance: admin surfaces are **never open**, and any change to their auth posture is a **normative change** that requires a Doc-Delta and updated evidence.
 
 # 9\) Change Management — Doc-Delta Hooks & Merge Gates \[Required-Now\]
 
