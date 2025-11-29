@@ -41,3 +41,6 @@ VERIFY.out
 server_backup.tar
 EPIC1_PATCH_PACKET_*/
 artifacts/bodygraph/refresh_state.json
+
+# Allow QA evidence under audit/qa (canonical QA root)
+!audit/qa/**

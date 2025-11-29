@@ -1,0 +1,22 @@
+{
+    "bands": [
+        "Cool",
+        "Open",
+        "Warm",
+        "Glow"
+    ],
+    "clamp": [
+        0,
+        100
+    ],
+    "edges": [
+        24,
+        49,
+        74,
+        100
+    ],
+    "rounding": "ROUND_HALF_UP",
+    "schema": "band_edges.v1",
+    "source": "math/thresholds.json",
+    "version": "1"
+}

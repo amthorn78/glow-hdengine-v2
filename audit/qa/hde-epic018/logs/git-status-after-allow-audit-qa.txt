@@ -1,0 +1,21 @@
+On branch main
+Your branch is up to date with 'origin/main'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   .gitignore
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	audit/qa/hde-epic018/logs/d0-bootstrap-001-pwd.txt
+	audit/qa/hde-epic018/logs/d0-bootstrap-001-python-version.txt
+	audit/qa/hde-epic018/logs/d0-bootstrap-001-qa_notes-original.txt
+	audit/qa/hde-epic018/logs/d0-bootstrap-001-tree.txt
+	audit/qa/hde-epic018/logs/git-check-ignore-before-allow-audit-qa.txt
+	audit/qa/hde-epic018/logs/git-status-after-allow-audit-qa.txt
+	audit/qa/hde-epic018/logs/git-status-before-allow-audit-qa.txt
+	audit/qa/hde-epic018/logs/gitignore-tail-after-allow-audit-qa.txt
+	audit/qa/hde-epic018/qa_notes.md
+
+no changes added to commit (use "git add" and/or "git commit -a")
