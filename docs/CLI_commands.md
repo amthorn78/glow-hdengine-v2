@@ -6,7 +6,7 @@ The CLI shares the canonical emitter and serializer with the Reader harness. Run
 - `hdctl showcompat --pair-file <pair.json>`
 - `hdctl showcompat --a-file <A.json> --b-file <B.json>`
 - `hdctl showcompat` (reads one pair from stdin)
-- Dev-only sampler CLI (APP_ENV=dev, QA only): `hdctl dev:sampler --pair-file <pair.json> [--seed <seed>]`
+- Dev-only sampler CLI (APP_ENV=dev, QA only): `hdctl dev:sampler --viewer <viewer_id> --candidates-file <candidates.json> [--seed <seed>]`
 - Flags for QA sidecars: `--dump-reader <out.json> --dump-admin-dir <dir>`
 
 Exit codes: 0 success, 64 usage error, 2 typed failure. Errors print to stderr only. CLI output is numeric-free, canonical JSON (UTF-8, sorted keys, compact separators, one trailing LF) and matches Reader bytes (AB↔BA identity, two-run identity).

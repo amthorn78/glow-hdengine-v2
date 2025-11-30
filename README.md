@@ -12,7 +12,7 @@ LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 python -m engine.cli --help
 LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 hdctl showcompat --pair-file fixtures/charts/pair.sample.json
 
 # Dev/admin-only sampler harnesses (do not use in production):
-LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 hdctl dev:sampler --pair-file fixtures/charts/pair.sample.json --seed seed-1
+LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev hdctl dev:sampler --viewer viewer-001 --candidates-file path/to/candidates.json --seed seed-1
 LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 python -m adapter.http_reader  # exposes /internal/dev/sampler when APP_ENV=dev
 ```
 
@@ -49,7 +49,7 @@ See PF12 — Schemas & Artifacts, PF14 — Mechanics Guide, PF19 — QA Guide, a
 ## Deterministic CLI & reader surfaces
 
 - Compat CLI: `hdctl showcompat --pair-file <pair.json>` (or `--a-file/--b-file`) emits numeric-free public JSON using the canonical emitter/serializer (AB↔BA identity, LF-terminated).
-- Dev-only sampler CLI: `hdctl dev:sampler --pair-file <pair.json> [--seed <seed>]` emits deterministic sampler JSON under closed rails for QA only.
+- Dev-only sampler CLI: `APP_ENV=dev hdctl dev:sampler --viewer <viewer_id> --candidates-file <candidates.json> [--seed <seed>]` emits deterministic sampler JSON under closed rails for QA only.
 - Reader harness mirrors CLI bytes for the same inputs; APP_ENV gating remains in `engine/http/compat_handler.py`. A dev-only sampler endpoint lives at `/internal/dev/sampler` (APP_ENV=dev) for QA parity with the sampler CLI.
 - `hdctl showcompat` accepts `--dump-reader` and `--dump-admin-dir` for QA sidecars; governed evidence follows the PF12 indexing rules.
 

@@ -1,7 +1,5 @@
 # CHANGELOG
 
-# CHANGELOG
-
 2025-12-15 — EPIC-019: HD Dissolution Pass 2 close-out
 
 ### Added

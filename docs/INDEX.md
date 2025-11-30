@@ -23,7 +23,7 @@
 - Compat handler: `engine/http/compat_handler.py` (APP_ENV gating)
 - Dev sampler endpoint: `adapter/http_reader.py::/internal/dev/sampler` (APP_ENV=dev)
 - Dev sampler CLI command: `engine/cli/main.py::dev:sampler`
-- Engine Core compute: `engine/core.py::compute_core`
+- Engine Core compute: `engine/core/core.py::compute_core`
 - Determinism helper: `engine/runtime/determinism_env.py`
 
 ## Evidence posture crib
