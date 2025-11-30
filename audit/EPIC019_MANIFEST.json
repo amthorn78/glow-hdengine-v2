@@ -155,8 +155,8 @@
         "artifact_key": "sanity.pipeline.log",
         "discovered_physical_path": "artifacts/sanity/sanity.log",
         "proof_anchor": "artifacts/sanity/sanity.log.path_proof.txt",
-        "sha256": "83cf131d02787641de136e0eae9b0cbed4bacbe0e46c77ef631159814416b2fe",
-        "size_bytes": 856
+        "sha256": "328907515189f74626f00cb408236dcfde82e483fb50ba84a78eabc13c5f5b5d",
+        "size_bytes": 298
       }
     ],
     "TESTS_PASS_OK": [
