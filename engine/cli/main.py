@@ -7,7 +7,7 @@ import math
 import os
 import sys
 from pathlib import Path
-from typing import Any, Dict, Iterable, Mapping, Tuple
+from typing import Any, Dict, Iterable, Mapping, Sequence, Tuple
 
 from engine.bodygraph import resolve_bodygraph
 from engine.bodygraph.ingest import (
@@ -37,6 +37,7 @@ from engine.narratives import emit_public_aux, get_pack
 from engine.narratives.constants import BANDS as AUX_BANDS, PERSPECTIVES as AUX_PERSPECTIVES
 from engine.validation.viewer_prefs import validate_viewer_prefs
 from engine.bodygraph.vendor_client import VendorError
+from engine.sampler.core import CandidateFeatures, ViewerProfile, sample_and_rank
 
 from ._admin_dump import canon_dump
 
@@ -144,6 +145,25 @@ def _build_parser() -> argparse.ArgumentParser:
     bg.add_argument("--birthtime", help="Birth time (HH:MM) for vendor source")
     bg.add_argument("--location", help="Location string for vendor source")
     bg.set_defaults(handler=bg_resolve)
+
+    dev_sampler = sub.add_parser(
+        "dev:sampler",
+        help="DEV/ADMIN ONLY: deterministic sampler harness (seedable)",
+        allow_abbrev=False,
+    )
+    dev_sampler.add_argument("--viewer", required=True, help="Viewer identifier for the sampler run")
+    dev_sampler.add_argument(
+        "--candidates-file",
+        required=True,
+        help="Path to JSON payload containing sampler candidates",
+    )
+    dev_sampler.add_argument(
+        "--seed",
+        help=(
+            "Optional seed value (echoed only; reserved for deterministic tie-breakers in future phases)"
+        ),
+    )
+    dev_sampler.set_defaults(handler=dev_sampler_run)
     return parser
 
 
@@ -702,6 +722,111 @@ def showcompat(_: argparse.Namespace) -> int:
     )
 
     sys.stdout.buffer.write(compat_bytes)
+    return 0
+
+
+def _ensure_dev_admin_env() -> None:
+    app_env = (os.environ.get("APP_ENV") or "").lower()
+    if app_env not in ("dev", "test", "local"):
+        raise CliError("DEV_ADMIN_ONLY")
+
+
+def _normalize_categories(raw: Any) -> Sequence[str] | None:
+    if raw is None:
+        return None
+    if isinstance(raw, (str, bytes)) or not isinstance(raw, Iterable):
+        raise CliError("INVALID_CANDIDATE_CATEGORIES")
+    normalized: list[str] = []
+    for item in raw:
+        if not isinstance(item, str) or not item.strip():
+            raise CliError("INVALID_CANDIDATE_CATEGORIES")
+        normalized.append(item.strip())
+    return tuple(normalized)
+
+
+def _candidate_from_payload(raw: Mapping[str, Any]) -> CandidateFeatures:
+    person_uid = raw.get("person_uid") or raw.get("id")
+    weight = raw.get("weight")
+    compat_score = raw.get("compat_score")
+    band = raw.get("band")
+    diversity_key = raw.get("diversity_key")
+    is_recent = bool(raw.get("is_recent", False))
+    categories = raw.get("categories")
+
+    if not isinstance(person_uid, str) or not person_uid.strip():
+        raise CliError("INVALID_CANDIDATE_ID")
+    if not isinstance(weight, (int, float)):
+        raise CliError("INVALID_CANDIDATE_WEIGHT")
+    if not isinstance(compat_score, int):
+        raise CliError("INVALID_COMPAT_SCORE")
+    if band is not None and not isinstance(band, str):
+        raise CliError("INVALID_CANDIDATE_BAND")
+    if diversity_key is not None and not isinstance(diversity_key, str):
+        raise CliError("INVALID_DIVERSITY_KEY")
+
+    return CandidateFeatures(
+        person_uid=person_uid.strip(),
+        weight=float(weight),
+        compat_score=int(compat_score),
+        band=band.strip() if isinstance(band, str) and band.strip() else None,
+        diversity_key=diversity_key.strip() if isinstance(diversity_key, str) and diversity_key.strip() else None,
+        is_recent=is_recent,
+        categories=_normalize_categories(categories),
+    )
+
+
+def _load_candidates_from_path(path: str) -> list[CandidateFeatures]:
+    raw = _read_file(path)
+    try:
+        payload = json.loads(raw)
+    except json.JSONDecodeError as exc:
+        raise CliError("INVALID_CANDIDATES_JSON") from exc
+
+    if isinstance(payload, Mapping):
+        candidates_raw = payload.get("candidates")
+    else:
+        candidates_raw = payload
+
+    if not isinstance(candidates_raw, list):
+        raise CliError("INVALID_CANDIDATES_PAYLOAD")
+
+    candidates: list[CandidateFeatures] = []
+    for item in candidates_raw:
+        if not isinstance(item, Mapping):
+            raise CliError("INVALID_CANDIDATE_ENTRY")
+        candidates.append(_candidate_from_payload(item))
+    return candidates
+
+
+def _emit_sampler_output(viewer_id: str, seed: str | None, ranked) -> None:
+    payload = {
+        "viewer_id": viewer_id,
+        # Seed is echoed only for now; future phases may use this for tie-breaking hooks.
+        "seed": seed if seed is not None else None,
+        "candidates": [
+            {
+                "person_uid": cand.person_uid,
+                "score": cand.score,
+                "weight": cand.weight,
+                "band": cand.band,
+                "rank": cand.rank,
+                "diversity_key": cand.diversity_key,
+                "is_recent": cand.is_recent,
+            }
+            for cand in ranked.candidates
+        ],
+    }
+    sys.stdout.buffer.write(sercanon(payload))
+
+
+def dev_sampler_run(args: argparse.Namespace) -> int:
+    _ensure_dev_admin_env()
+    viewer_id = args.viewer.strip()
+    viewer = ViewerProfile(person_uid=viewer_id)
+    candidates = _load_candidates_from_path(args.candidates_file)
+    ranked = sample_and_rank(viewer, candidates)
+    seed = args.seed if args.seed is not None else None
+    _emit_sampler_output(viewer.person_uid, seed, ranked)
     return 0
 
 
