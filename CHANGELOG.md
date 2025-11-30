@@ -1,5 +1,18 @@
 # CHANGELOG
 
+2025-12-15 — EPIC-019: HD Dissolution Pass 2 close-out
+
+### Added
+- Sampler core (HDE-DISS003) completed with deterministic sampler harnesses (dev-only CLI `hdctl dev:sampler` and HTTP `/internal/dev/sampler`), seeded replay logs, diversity proofs, and governed evidence families indexed for sampler pool snapshots, ABBA parity, two-run identity, and seed replay.
+- Engine Core (HDE-DISS004) completed with purity checks, JSON compare logs, ABBA parity, and two-run identity evidence; outputs are governed under `artifacts/core/` with schemas in `docs/schemas/core/`.
+- Determinism/sanity pipeline now executes sampler and Engine Core evidence generators under closed rails, enforcing env pins and mirroring evidence to INDEX/Mirror with path proofs.
+- Acceptance posture updated: EPIC019 sampler/core tokens are Green and mapped in `docs/acceptance_map_epic019.json` with manifest references in `docs/acceptance_maps.json`.
+
+### Changed / Fixed
+- Env-pins mismatch resolved: determinism helper enforcement is documented alongside `ci/checks/check_env_pins.sh` to gate SAFE_MODE/ALLOW_NETWORK/locale/timezone pins for docs and tests.
+- Manifest token bindings corrected for EPIC019 acceptance, aligning sampler/core artifacts with the acceptance map and mirror records.
+- `SANITY_PIPELINE_OK` manifest hash/size corrected to reflect the updated pipeline log and mirror entries.
+
 2025-12-02 — EPIC-018: HD Calcination Pass 3 close-out
 
 ### Added
