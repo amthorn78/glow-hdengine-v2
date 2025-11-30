@@ -1,0 +1,105 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Engine Core JSON compare logs v1",
+  "type": "object",
+  "required": ["schema", "generated_at_utc", "env", "cases"],
+  "properties": {
+    "schema": {"const": "engine_core_json_compare_logs.v1"},
+    "generated_at_utc": {"type": "string"},
+    "env": {"$ref": "#/definitions/env"},
+    "cases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "case_id",
+          "viewer",
+          "candidate",
+          "config",
+          "core_result",
+          "canonical_sha256",
+          "plain_sha256",
+          "equivalent"
+        ],
+        "properties": {
+          "case_id": {"type": "string"},
+          "viewer": {"$ref": "#/definitions/participant"},
+          "candidate": {"$ref": "#/definitions/participant"},
+          "config": {"$ref": "#/definitions/config"},
+          "core_result": {"$ref": "#/definitions/core_result"},
+          "canonical_sha256": {"type": "string"},
+          "plain_sha256": {"type": "string"},
+          "equivalent": {"type": "boolean"}
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "definitions": {
+    "participant": {
+      "type": "object",
+      "required": ["person_uid", "compat_score", "band", "traits"],
+      "properties": {
+        "person_uid": {"type": "string"},
+        "compat_score": {"type": "integer"},
+        "band": {"type": "string"},
+        "traits": {"type": "array", "items": {"type": "string"}}
+      },
+      "additionalProperties": false
+    },
+    "config": {
+      "type": "object",
+      "required": ["band_priority"],
+      "properties": {
+        "band_priority": {"type": "array", "items": {"type": "string"}}
+      },
+      "additionalProperties": false
+    },
+    "core_result": {
+      "type": "object",
+      "required": [
+        "viewer_id",
+        "candidate_id",
+        "neutral_score",
+        "ordered_pair",
+        "ordered_bands",
+        "shared_traits",
+        "band_alignment",
+        "perspective"
+      ],
+      "properties": {
+        "viewer_id": {"type": "string"},
+        "candidate_id": {"type": "string"},
+        "neutral_score": {"type": "integer"},
+        "ordered_pair": {"type": "array", "items": {"type": "string"}, "minItems": 2, "maxItems": 2},
+        "ordered_bands": {"type": "array", "items": {"type": "string"}, "minItems": 2, "maxItems": 2},
+        "shared_traits": {"type": "array", "items": {"type": "string"}},
+        "band_alignment": {"type": "boolean"},
+        "perspective": {
+          "type": "object",
+          "required": ["from_viewer", "from_candidate", "delta"],
+          "properties": {
+            "from_viewer": {"type": "integer"},
+            "from_candidate": {"type": "integer"},
+            "delta": {"type": "integer"}
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "env": {
+      "type": "object",
+      "required": ["LC_ALL", "LANG", "TZ", "SAFE_MODE", "ALLOW_NETWORK"],
+      "properties": {
+        "LC_ALL": {"type": "string"},
+        "LANG": {"type": "string"},
+        "TZ": {"type": "string"},
+        "SAFE_MODE": {"type": "string"},
+        "ALLOW_NETWORK": {"type": "string"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

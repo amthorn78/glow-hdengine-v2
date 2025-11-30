@@ -1,0 +1,5 @@
+path: docs/evidence/INDEX.sha256
+size_bytes: 91
+sha256: bd1ab3b01b6fe05371cdb0056a7c818c45980494c80aec3aec5c5cfa6098bf19
+mtime_utc: 2025-11-30T05:19:45Z
+produced_at_utc: 2025-11-30T05:22:34Z

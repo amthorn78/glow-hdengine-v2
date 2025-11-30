@@ -3,10 +3,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 MAP_PATH = ROOT / "docs/acceptance_map_epic019.json"
+MANIFEST_PATH = ROOT / "audit/EPIC019_MANIFEST.json"
 
 EXPECTED_FOUNDATIONS = {
     "D1": {
-        "status": "pending",
+        "status": "done",
         "tokens": {
             "PR_OPENED_OK",
             "TESTS_PASS_OK",
@@ -19,7 +20,7 @@ EXPECTED_FOUNDATIONS = {
         },
     },
     "D2": {
-        "status": "pending",
+        "status": "done",
         "tokens": {
             "DOC_DELTA_PRESENT_OK",
             "ENV_RAILS_POLICY_OK",
@@ -28,7 +29,7 @@ EXPECTED_FOUNDATIONS = {
         },
     },
     "D3": {
-        "status": "pending",
+        "status": "done",
         "tokens": {
             "QA_POSTCOMMIT_CHECKLIST_OK",
             "SANITY_PIPELINE_OK",
@@ -36,7 +37,7 @@ EXPECTED_FOUNDATIONS = {
         },
     },
     "D4": {
-        "status": "pending",
+        "status": "done",
         "tokens": {
             "EVIDENCE_INDEX_UPDATED_OK",
             "EVIDENCE_INDEX_HASH_OK",
@@ -46,7 +47,7 @@ EXPECTED_FOUNDATIONS = {
         },
     },
     "D5": {
-        "status": "pending",
+        "status": "done",
         "tokens": {
             "SANITY_PIPELINE_OK",
             "DETERMINISM_ENV_PINS_OK",
@@ -97,9 +98,34 @@ def test_acceptance_map_shape():
     token_status = data["token_status"]
     assert set(token_status) == EXPECTED_TOKENS
     for name, payload in token_status.items():
-        assert payload["status"] == "PENDING"
-        assert payload["tests"] == []
-        assert payload["artifacts"] == []
+        assert payload["status"] == "GREEN"
+        assert payload["tests"], name
+        assert payload["artifacts"], name
 
     referenced_tokens = {token for foundation in data["foundations"] for token in foundation["tokens"]}
     assert referenced_tokens <= set(token_status)
+
+
+def test_manifest_aligns_with_acceptance_map():
+    acceptance = json.loads(MAP_PATH.read_text())
+    manifest = json.loads(MANIFEST_PATH.read_text())
+
+    acceptance_tokens = acceptance["token_status"]
+    manifest_tokens = manifest["tokens"]
+
+    assert set(acceptance_tokens) <= set(manifest_tokens)
+
+    for token, status in acceptance_tokens.items():
+        records = manifest_tokens.get(token)
+        assert records, f"missing manifest entry for {token}"
+
+        allowed = set(status["artifacts"])
+        allowed |= {f"{artifact}.path_proof.txt" for artifact in status["artifacts"]}
+        allowed |= {artifact.removesuffix(".path_proof.txt") for artifact in status["artifacts"] if artifact.endswith(".path_proof.txt")}
+
+        for record in records:
+            assert record["discovered_physical_path"] in allowed, (
+                token,
+                record["discovered_physical_path"],
+            )
+            assert record.get("artifact_key"), token
