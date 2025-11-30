@@ -97,3 +97,26 @@ def test_dev_sampler_rejected_in_prod(monkeypatch):
         "code": "forbidden",
         "error": "insufficient scope",
     }
+
+
+def test_dev_sampler_rejected_when_app_env_missing(monkeypatch):
+    monkeypatch.delenv("APP_ENV", raising=False)
+    app = create_app()
+    payload = {"viewer_id": "viewer-456", "candidate_ids": ["one", "two"]}
+
+    with app.test_client() as client:
+        resp = _post(client, payload)
+
+    assert resp.status_code == 403
+    assert json.loads(resp.data)["code"] == "forbidden"
+
+
+def test_dev_sampler_rejected_when_app_env_empty(monkeypatch):
+    app = _app(monkeypatch, "")
+    payload = {"viewer_id": "viewer-789", "candidate_ids": ["one", "two"]}
+
+    with app.test_client() as client:
+        resp = _post(client, payload)
+
+    assert resp.status_code == 403
+    assert json.loads(resp.data)["code"] == "forbidden"

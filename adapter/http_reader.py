@@ -478,8 +478,9 @@ def get_reader_bp(emit_fn=None):
     # and return writer-style envelopes for errors. Reuse that posture here for
     # the sampler harness while keeping it out of public catalogs/A7.
     def _dev_admin_gate() -> Response | None:
-        app_env = (os.environ.get("APP_ENV") or "").strip().lower()
-        if app_env in {"dev", "test", "local", ""}:
+        raw_app_env = os.environ.get("APP_ENV")
+        app_env = raw_app_env.strip().lower() if raw_app_env is not None else None
+        if app_env in {"dev", "test", "local"}:
             return None
         # Preserve writer-style error envelopes for internal/dev surfaces.
         return _writer_error("forbidden", status=403)
