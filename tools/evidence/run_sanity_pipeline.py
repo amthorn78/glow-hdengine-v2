@@ -3,9 +3,14 @@ from __future__ import annotations
 
 import argparse
 import subprocess
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable, List, Sequence
+
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 from engine.runtime.determinism_env import DETERMINISM_ENV_PINS, ensure_determinism_env
 
@@ -44,6 +49,8 @@ def default_steps() -> List[SanityStep]:
         SanityStep("pytest tests/cli/test_showcompat_parity_and_identity.py", ["python", "-m", "pytest", "tests/cli/test_showcompat_parity_and_identity.py"]),
         SanityStep("pytest tests/invariance/test_bytes_identity.py", ["python", "-m", "pytest", "tests/invariance/test_bytes_identity.py"]),
         SanityStep("ci/checks/check_env_pins.sh", ["ci/checks/check_env_pins.sh"]),
+        SanityStep("python tools/evidence/generate_sampler_evidence.py", ["python", "tools/evidence/generate_sampler_evidence.py"]),
+        SanityStep("python tools/evidence/generate_engine_core_evidence.py", ["python", "tools/evidence/generate_engine_core_evidence.py"]),
         SanityStep("pytest tests/invariance/test_locale_tz.py", ["python", "-m", "pytest", "tests/invariance/test_locale_tz.py"]),
         SanityStep("python tools/cli/serializer_grep_guard.py", ["python", "tools/cli/serializer_grep_guard.py"]),
         SanityStep("python tools/cli/emitter_symbol_proof.py", ["python", "tools/cli/emitter_symbol_proof.py"]),
