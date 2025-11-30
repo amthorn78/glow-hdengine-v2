@@ -1,0 +1,83 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Sampler diversity artifacts v1",
+  "type": "object",
+  "required": ["schema", "generated_at_utc", "cases"],
+  "properties": {
+    "schema": {"const": "sampler_diversity_artifacts.v1"},
+    "generated_at_utc": {"type": "string"},
+    "cases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["case_id", "viewer_id", "config", "candidates", "ranked"],
+        "properties": {
+          "case_id": {"type": "string"},
+          "viewer_id": {"type": "string"},
+          "config": {
+            "type": "object",
+            "required": ["min_compat_score", "allowed_bands", "require_diversity_key", "band_priority"],
+            "properties": {
+              "min_compat_score": {"type": "integer"},
+              "allowed_bands": {"type": ["array", "null"], "items": {"type": "string"}},
+              "require_diversity_key": {"type": "boolean"},
+              "band_priority": {"type": "array", "items": {"type": "string"}}
+            },
+            "additionalProperties": false
+          },
+          "candidates": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "person_uid",
+                "weight",
+                "compat_score",
+                "band_input",
+                "resolved_band",
+                "diversity_key",
+                "is_recent",
+                "eligible",
+                "exclusion_reason"
+              ],
+              "properties": {
+                "person_uid": {"type": "string"},
+                "weight": {"type": "number"},
+                "compat_score": {"type": "integer"},
+                "band_input": {"type": ["string", "null"]},
+                "resolved_band": {"type": "string"},
+                "diversity_key": {"type": ["string", "null"]},
+                "is_recent": {"type": "boolean"},
+                "eligible": {"type": "boolean"},
+                "exclusion_reason": {"type": ["string", "null"]}
+              },
+              "additionalProperties": false
+            }
+          },
+          "ranked": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/ranked_candidate"}
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "definitions": {
+    "ranked_candidate": {
+      "type": "object",
+      "required": ["person_uid", "score", "weight", "band", "rank", "diversity_key", "is_recent"],
+      "properties": {
+        "person_uid": {"type": "string"},
+        "score": {"type": "integer"},
+        "weight": {"type": "number"},
+        "band": {"type": "string"},
+        "rank": {"type": "integer"},
+        "diversity_key": {"type": ["string", "null"]},
+        "is_recent": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

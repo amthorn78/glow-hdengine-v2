@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Sampler two-run logs v1",
+  "type": "object",
+  "required": ["schema", "generated_at_utc", "runs"],
+  "properties": {
+    "schema": {"const": "sampler_two_run_logs.v1"},
+    "generated_at_utc": {"type": "string"},
+    "runs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "case_id",
+          "viewer_id",
+          "seed",
+          "input_candidate_ids",
+          "first_run",
+          "second_run",
+          "identical"
+        ],
+        "properties": {
+          "case_id": {"type": "string"},
+          "viewer_id": {"type": "string"},
+          "seed": {"type": ["string", "null"]},
+          "input_candidate_ids": {"type": "array", "items": {"type": "string"}},
+          "first_run": {"type": "array", "items": {"$ref": "#/definitions/ranked_candidate"}},
+          "second_run": {"type": "array", "items": {"$ref": "#/definitions/ranked_candidate"}},
+          "identical": {"type": "boolean"}
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "definitions": {
+    "ranked_candidate": {
+      "type": "object",
+      "required": ["person_uid", "score", "weight", "band", "rank", "diversity_key", "is_recent"],
+      "properties": {
+        "person_uid": {"type": "string"},
+        "score": {"type": "integer"},
+        "weight": {"type": "number"},
+        "band": {"type": "string"},
+        "rank": {"type": "integer"},
+        "diversity_key": {"type": ["string", "null"]},
+        "is_recent": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
