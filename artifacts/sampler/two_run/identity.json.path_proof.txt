@@ -1,5 +1,5 @@
 path: artifacts/sampler/two_run/identity.json
 size_bytes: 914
-sha256: d7c2e8a0f6512661c4f3a147ec62d7f348f4e9975c4c35a44e86be8e9673c467
-mtime_utc: 2025-11-30T03:57:10Z
+sha256: 6ceb5fd14576c52be74fe72ce405c00ab759972d4e6f31712e23e95351ded13b
+mtime_utc: 2025-11-30T04:45:16Z
 produced_at_utc: 2025-11-30T03:58:47Z

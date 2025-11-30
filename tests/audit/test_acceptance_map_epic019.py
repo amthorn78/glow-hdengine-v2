@@ -6,7 +6,7 @@ MAP_PATH = ROOT / "docs/acceptance_map_epic019.json"
 
 EXPECTED_FOUNDATIONS = {
     "D1": {
-        "status": "pending",
+        "status": "done",
         "tokens": {
             "PR_OPENED_OK",
             "TESTS_PASS_OK",
@@ -19,7 +19,7 @@ EXPECTED_FOUNDATIONS = {
         },
     },
     "D2": {
-        "status": "pending",
+        "status": "done",
         "tokens": {
             "DOC_DELTA_PRESENT_OK",
             "ENV_RAILS_POLICY_OK",
@@ -28,7 +28,7 @@ EXPECTED_FOUNDATIONS = {
         },
     },
     "D3": {
-        "status": "pending",
+        "status": "done",
         "tokens": {
             "QA_POSTCOMMIT_CHECKLIST_OK",
             "SANITY_PIPELINE_OK",
@@ -36,7 +36,7 @@ EXPECTED_FOUNDATIONS = {
         },
     },
     "D4": {
-        "status": "pending",
+        "status": "done",
         "tokens": {
             "EVIDENCE_INDEX_UPDATED_OK",
             "EVIDENCE_INDEX_HASH_OK",
@@ -46,7 +46,7 @@ EXPECTED_FOUNDATIONS = {
         },
     },
     "D5": {
-        "status": "pending",
+        "status": "done",
         "tokens": {
             "SANITY_PIPELINE_OK",
             "DETERMINISM_ENV_PINS_OK",
@@ -97,9 +97,9 @@ def test_acceptance_map_shape():
     token_status = data["token_status"]
     assert set(token_status) == EXPECTED_TOKENS
     for name, payload in token_status.items():
-        assert payload["status"] == "PENDING"
-        assert payload["tests"] == []
-        assert payload["artifacts"] == []
+        assert payload["status"] == "GREEN"
+        assert payload["tests"], name
+        assert payload["artifacts"], name
 
     referenced_tokens = {token for foundation in data["foundations"] for token in foundation["tokens"]}
     assert referenced_tokens <= set(token_status)

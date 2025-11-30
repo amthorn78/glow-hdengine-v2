@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Engine Core purity report v1",
+  "type": "object",
+  "required": ["schema", "generated_at_utc", "module", "checks", "env"],
+  "properties": {
+    "schema": {"const": "engine_core_purity_report.v1"},
+    "generated_at_utc": {"type": "string"},
+    "module": {"type": "string"},
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["check_id", "status", "details"],
+        "properties": {
+          "check_id": {"type": "string"},
+          "status": {"enum": ["pass", "fail"]},
+          "details": {"type": "object"}
+        },
+        "additionalProperties": false
+      }
+    },
+    "env": {
+      "type": "object",
+      "required": ["LC_ALL", "LANG", "TZ", "SAFE_MODE", "ALLOW_NETWORK"],
+      "properties": {
+        "LC_ALL": {"type": "string"},
+        "LANG": {"type": "string"},
+        "TZ": {"type": "string"},
+        "SAFE_MODE": {"type": "string"},
+        "ALLOW_NETWORK": {"type": "string"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
