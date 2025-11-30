@@ -1,5 +1,5 @@
 path: artifacts/ingest/ingest_success.log
-size_bytes: 4196
-sha256: f2a4038e71cb82d152962a091e2a046962237b0291d4fd822e375e6ae80a0658
-mtime_utc: 2025-11-27T05:13:17Z
+size_bytes: 5871
+sha256: 240cc5a7111e50c8216925a5a45ed7aa1b2abfff786bd0860cd3515d4d7007e6
+mtime_utc: 2025-11-30T03:44:46Z
 produced_at_utc: 2025-11-22T02:27:04Z
