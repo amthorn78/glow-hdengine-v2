@@ -8,6 +8,7 @@ from engine.presenter.emitter import emit_compact_json
 from engine.serializer import canon
 from engine.runtime import emit_reader_public_bytes
 from engine.narratives import emit_public_aux, get_pack
+from engine.sampler.core import CandidateFeatures, ViewerProfile, sample_and_rank
 from adapter.no_io_guard import NoIoGuard
 
 _PROCESS_STARTED_AT = datetime.now(timezone.utc)
@@ -468,6 +469,84 @@ def get_reader_bp(emit_fn=None):
             "probe_token_present": bool(probe_token),
         }
         body, _ = emit_compact_json(payload, sort_keys=False)
+        resp = Response(body, status=200, mimetype="application/json; charset=utf-8")
+        resp.headers["Cache-Control"] = "no-store"
+        resp.headers.pop("ETag", None)
+        return resp
+
+    # Discovery: internal/dev surfaces (e.g., /reader, ops probes) gate via APP_ENV
+    # and return writer-style envelopes for errors. Reuse that posture here for
+    # the sampler harness while keeping it out of public catalogs/A7.
+    def _dev_admin_gate() -> Response | None:
+        app_env = (os.environ.get("APP_ENV") or "").strip().lower()
+        if app_env in {"dev", "test", "local", ""}:
+            return None
+        # Preserve writer-style error envelopes for internal/dev surfaces.
+        return _writer_error("forbidden", status=403)
+
+    @bp.route("/internal/dev/sampler", methods=["POST"], provide_automatic_options=False)
+    def dev_sampler_internal():
+        """
+        Dev-only sampler harness (PF20 HDE-EPIC019 D3).
+
+        Notes:
+        - Mirrors the dev sampler CLI (PR3) but keeps the CLI as the primary harness.
+        - Uses the sampler core directly (PR2) and echoes seed only (PF09 DISS003.5).
+        - Dev/admin gated via APP_ENV and excluded from public catalogs/A7 (PF04/PF05).
+        """
+
+        g._log_override = {"route": "internal.dev.sampler"}
+
+        gate = _dev_admin_gate()
+        if gate is not None:
+            return gate
+
+        payload, validation_error = _read_writer_json(
+            allow_empty_body=False,
+            allowed_keys={"viewer_id", "candidate_ids", "seed"},
+        )
+        if validation_error is not None:
+            return validation_error
+
+        payload = payload or {}
+        viewer_id = payload.get("viewer_id")
+        candidate_ids = payload.get("candidate_ids")
+        seed = payload.get("seed") if "seed" in payload else None
+
+        if not isinstance(viewer_id, str) or not viewer_id.strip():
+            return _writer_error("invalid_input", status=422)
+        if not isinstance(candidate_ids, list) or not candidate_ids:
+            return _writer_error("invalid_input", status=422)
+
+        normalized_ids: list[str] = []
+        for cid in candidate_ids:
+            if not isinstance(cid, str) or not cid.strip():
+                return _writer_error("invalid_input", status=422)
+            normalized_ids.append(cid.strip())
+
+        viewer = ViewerProfile(person_uid=viewer_id.strip())
+        candidates = [
+            CandidateFeatures(
+                person_uid=cid,
+                weight=1.0,
+                compat_score=0,
+                band=None,
+                diversity_key=None,
+                is_recent=False,
+                categories=None,
+            )
+            for cid in normalized_ids
+        ]
+
+        ranked = sample_and_rank(viewer, candidates)
+        seed_value = str(seed) if seed is not None else None
+        response_payload = {
+            "viewer_id": viewer.person_uid,
+            "meta": {"seed": seed_value},
+            "candidate_ids": [cand.person_uid for cand in ranked.candidates],
+        }
+
+        body, _ = emit_compact_json(response_payload, sort_keys=True)
         resp = Response(body, status=200, mimetype="application/json; charset=utf-8")
         resp.headers["Cache-Control"] = "no-store"
         resp.headers.pop("ETag", None)
