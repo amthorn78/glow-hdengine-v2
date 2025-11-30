@@ -1,0 +1,53 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Sampler AB/BA logs v1",
+  "type": "object",
+  "required": ["schema", "generated_at_utc", "runs"],
+  "properties": {
+    "schema": {"const": "sampler_abba_logs.v1"},
+    "generated_at_utc": {"type": "string"},
+    "runs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["case_id", "viewer_a", "viewer_b", "ab_run", "ba_run", "swap_consistent"],
+        "properties": {
+          "case_id": {"type": "string"},
+          "viewer_a": {"type": "string"},
+          "viewer_b": {"type": "string"},
+          "ab_run": {"$ref": "#/definitions/run_payload"},
+          "ba_run": {"$ref": "#/definitions/run_payload"},
+          "swap_consistent": {"type": "boolean"}
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "definitions": {
+    "run_payload": {
+      "type": "object",
+      "required": ["viewer_id", "ordered_ids", "ranked"],
+      "properties": {
+        "viewer_id": {"type": "string"},
+        "ordered_ids": {"type": "array", "items": {"type": "string"}},
+        "ranked": {"type": "array", "items": {"$ref": "#/definitions/ranked_candidate"}}
+      },
+      "additionalProperties": false
+    },
+    "ranked_candidate": {
+      "type": "object",
+      "required": ["person_uid", "score", "weight", "band", "rank", "diversity_key", "is_recent"],
+      "properties": {
+        "person_uid": {"type": "string"},
+        "score": {"type": "integer"},
+        "weight": {"type": "number"},
+        "band": {"type": "string"},
+        "rank": {"type": "integer"},
+        "diversity_key": {"type": ["string", "null"]},
+        "is_recent": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,71 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Sampler seed replay logs v1",
+  "type": "object",
+  "required": ["schema", "generated_at_utc", "runs"],
+  "properties": {
+    "schema": {"const": "sampler_seed_replay_logs.v1"},
+    "generated_at_utc": {"type": "string"},
+    "runs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["harness", "viewer_id", "seed", "candidate_ids", "response"],
+        "properties": {
+          "harness": {"enum": ["cli", "http"]},
+          "viewer_id": {"type": ["string", "null"]},
+          "seed": {"type": ["string", "null"]},
+          "candidate_ids": {"type": "array", "items": {"type": "string"}},
+          "response": {"oneOf": [{"$ref": "#/definitions/cli_response"}, {"$ref": "#/definitions/http_response"}]},
+          "ordering_equal_to_seed2": {"type": "boolean"},
+          "ordering_equal_to_seed1": {"type": "boolean"},
+          "ordering_equal_to_second": {"type": "boolean"},
+          "ordering_equal_to_first": {"type": "boolean"}
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "definitions": {
+    "ranked_candidate": {
+      "type": "object",
+      "required": ["person_uid", "score", "weight", "band", "rank", "diversity_key", "is_recent"],
+      "properties": {
+        "person_uid": {"type": "string"},
+        "score": {"type": "integer"},
+        "weight": {"type": "number"},
+        "band": {"type": "string"},
+        "rank": {"type": "integer"},
+        "diversity_key": {"type": ["string", "null"]},
+        "is_recent": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "cli_response": {
+      "type": "object",
+      "required": ["viewer_id", "seed", "candidates"],
+      "properties": {
+        "viewer_id": {"type": "string"},
+        "seed": {"type": ["string", "null"]},
+        "candidates": {"type": "array", "items": {"$ref": "#/definitions/ranked_candidate"}}
+      },
+      "additionalProperties": false
+    },
+    "http_response": {
+      "type": "object",
+      "required": ["viewer_id", "meta", "candidate_ids"],
+      "properties": {
+        "viewer_id": {"type": "string"},
+        "meta": {
+          "type": "object",
+          "required": ["seed"],
+          "properties": {"seed": {"type": ["string", "null"]}},
+          "additionalProperties": false
+        },
+        "candidate_ids": {"type": "array", "items": {"type": "string"}}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,5 @@
+path: artifacts/sampler/pool_snapshots/baseline.json
+size_bytes: 1368
+sha256: 6e873d9d819f406ab4c268e091d5ebe17f5082e99832c294a65a99a827008be6
+mtime_utc: 2025-11-30T03:20:28Z
+produced_at_utc: 2025-11-22T17:07:45Z

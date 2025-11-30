@@ -1,5 +1,5 @@
 path: artifacts/cli/guards/serializer_grep_guard.log
 size_bytes: 114
 sha256: 1ef6547750443e8ddc421bf6f8d3aa0d56bf1e7c6af9158e748ffe8e43e10c47
-mtime_utc: 2025-11-27T05:13:17Z
+mtime_utc: 2025-11-30T03:14:25Z
 produced_at_utc: 2025-11-22T17:07:45Z
