@@ -1,0 +1,193 @@
+{
+  "epic_id": "HDE-EPIC019",
+  "epic_name": "Dissolution Pass 2",
+  "pf20_ref": "PF20 §2.4 HDE-EPIC019",
+  "manifest": "audit/EPIC019_MANIFEST.json",
+  "foundations": [
+    {
+      "deliverable": "D1",
+      "name": "D1 — Sampler/ranker deterministic pool and scoring (HDE-DISS003.1–.3)",
+      "status": "pending",
+      "tokens": [
+        "PR_OPENED_OK",
+        "TESTS_PASS_OK",
+        "DETERMINISM_ENV_PINS_OK",
+        "TWO_RUN_IDENTITY_OK",
+        "COMPOSITE_ABBA_IDENTITY_OK",
+        "AB_BA_PARITY_OK",
+        "NO_IO_NO_CLOCKS_OK",
+        "JSON_CANONICAL_CHECK_OK"
+      ],
+      "manifest_tokens": [
+        "PR_OPENED_OK",
+        "TESTS_PASS_OK",
+        "DETERMINISM_ENV_PINS_OK",
+        "TWO_RUN_IDENTITY_OK",
+        "COMPOSITE_ABBA_IDENTITY_OK",
+        "AB_BA_PARITY_OK",
+        "NO_IO_NO_CLOCKS_OK",
+        "JSON_CANONICAL_CHECK_OK"
+      ]
+    },
+    {
+      "deliverable": "D2",
+      "name": "D2 — Seedable dev/admin sampler flows (HDE-DISS003.4)",
+      "status": "pending",
+      "tokens": [
+        "DOC_DELTA_PRESENT_OK",
+        "ENV_RAILS_POLICY_OK",
+        "QA_PRECOMMIT_CHECKLIST_OK",
+        "DETERMINISM_ENV_PINS_OK"
+      ],
+      "manifest_tokens": [
+        "DOC_DELTA_PRESENT_OK",
+        "ENV_RAILS_POLICY_OK",
+        "QA_PRECOMMIT_CHECKLIST_OK"
+      ]
+    },
+    {
+      "deliverable": "D3",
+      "name": "D3 — Dev-only sampler endpoint harness (HDE-DISS003.5)",
+      "status": "pending",
+      "tokens": [
+        "QA_POSTCOMMIT_CHECKLIST_OK",
+        "SANITY_PIPELINE_OK",
+        "DETERMINISM_ENV_PINS_OK"
+      ],
+      "manifest_tokens": [
+        "QA_POSTCOMMIT_CHECKLIST_OK",
+        "SANITY_PIPELINE_OK"
+      ]
+    },
+    {
+      "deliverable": "D4",
+      "name": "D4 — Sampler/ranker evidence and indexing (HDE-DISS003.6)",
+      "status": "pending",
+      "tokens": [
+        "EVIDENCE_INDEX_UPDATED_OK",
+        "EVIDENCE_INDEX_HASH_OK",
+        "EVIDENCE_INDEX_MIRROR_OK",
+        "EVIDENCE_PATHS_VALIDATED_OK",
+        "MACHINE_MIRROR_UPDATED_OK"
+      ],
+      "manifest_tokens": [
+        "EVIDENCE_INDEX_UPDATED_OK",
+        "EVIDENCE_INDEX_HASH_OK",
+        "EVIDENCE_INDEX_MIRROR_OK",
+        "EVIDENCE_PATHS_VALIDATED_OK",
+        "MACHINE_MIRROR_UPDATED_OK"
+      ]
+    },
+    {
+      "deliverable": "D5",
+      "name": "D5 — Deterministic Engine Core behavior and evidence (HDE-DISS004.1–.4)",
+      "status": "pending",
+      "tokens": [
+        "SANITY_PIPELINE_OK",
+        "DETERMINISM_ENV_PINS_OK",
+        "AB_BA_PARITY_OK",
+        "JSON_CANONICAL_CHECK_OK",
+        "NO_IO_NO_CLOCKS_OK"
+      ],
+      "manifest_tokens": [
+        "SANITY_PIPELINE_OK",
+        "DETERMINISM_ENV_PINS_OK",
+        "AB_BA_PARITY_OK",
+        "JSON_CANONICAL_CHECK_OK",
+        "NO_IO_NO_CLOCKS_OK"
+      ]
+    }
+  ],
+  "token_status": {
+    "PR_OPENED_OK": {
+      "status": "PENDING",
+      "tests": [],
+      "artifacts": []
+    },
+    "TESTS_PASS_OK": {
+      "status": "PENDING",
+      "tests": [],
+      "artifacts": []
+    },
+    "DOC_DELTA_PRESENT_OK": {
+      "status": "PENDING",
+      "tests": [],
+      "artifacts": []
+    },
+    "EVIDENCE_INDEX_UPDATED_OK": {
+      "status": "PENDING",
+      "tests": [],
+      "artifacts": []
+    },
+    "EVIDENCE_INDEX_HASH_OK": {
+      "status": "PENDING",
+      "tests": [],
+      "artifacts": []
+    },
+    "EVIDENCE_INDEX_MIRROR_OK": {
+      "status": "PENDING",
+      "tests": [],
+      "artifacts": []
+    },
+    "EVIDENCE_PATHS_VALIDATED_OK": {
+      "status": "PENDING",
+      "tests": [],
+      "artifacts": []
+    },
+    "MACHINE_MIRROR_UPDATED_OK": {
+      "status": "PENDING",
+      "tests": [],
+      "artifacts": []
+    },
+    "QA_PRECOMMIT_CHECKLIST_OK": {
+      "status": "PENDING",
+      "tests": [],
+      "artifacts": []
+    },
+    "QA_POSTCOMMIT_CHECKLIST_OK": {
+      "status": "PENDING",
+      "tests": [],
+      "artifacts": []
+    },
+    "ENV_RAILS_POLICY_OK": {
+      "status": "PENDING",
+      "tests": [],
+      "artifacts": []
+    },
+    "DETERMINISM_ENV_PINS_OK": {
+      "status": "PENDING",
+      "tests": [],
+      "artifacts": []
+    },
+    "SANITY_PIPELINE_OK": {
+      "status": "PENDING",
+      "tests": [],
+      "artifacts": []
+    },
+    "TWO_RUN_IDENTITY_OK": {
+      "status": "PENDING",
+      "tests": [],
+      "artifacts": []
+    },
+    "COMPOSITE_ABBA_IDENTITY_OK": {
+      "status": "PENDING",
+      "tests": [],
+      "artifacts": []
+    },
+    "AB_BA_PARITY_OK": {
+      "status": "PENDING",
+      "tests": [],
+      "artifacts": []
+    },
+    "NO_IO_NO_CLOCKS_OK": {
+      "status": "PENDING",
+      "tests": [],
+      "artifacts": []
+    },
+    "JSON_CANONICAL_CHECK_OK": {
+      "status": "PENDING",
+      "tests": [],
+      "artifacts": []
+    }
+  }
+}
