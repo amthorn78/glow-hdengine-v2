@@ -1,0 +1,9 @@
+]633;E;echo "check_id: D1D2_cli_sampler_rerun";fb3578a4-86ee-447b-bebc-741e4f64b1e8]633;Ccheck_id: D1D2_cli_sampler_rerun
+command: derive sampler params from tests/cli/test_dev_sampler_cli.py + two-run identity + seed variation
+rails: SAFE_MODE=1, ALLOW_NETWORK=0, LC_ALL=C, LANG=C, TZ=UTC, APP_ENV=dev
+pf_refs: [PF20 HDE-EPIC019 D1–D2, PF09 HDE-DISS003.1–.4, PF05 CLI-API, PF14 sampler mechanics, PF19 determinism tokens]
+tokens: [TWO_RUN_IDENTITY_OK, AB_BA_PARITY_OK, JSON_CANONICAL_CHECK_OK]
+status: PENDING
+
+=== derive CANDIDATES_FILE and VIEWER_ID from tests/cli/test_dev_sampler_cli.py ===
+ERROR: Could not derive CANDIDATES_FILE from tests/cli/test_dev_sampler_cli.py

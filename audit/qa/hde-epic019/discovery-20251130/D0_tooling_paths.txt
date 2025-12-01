@@ -1,0 +1,12 @@
+check_id: D0_tooling_paths
+command: command -v python/pytest/hdctl/jq/curl + python -m pytest --version
+
+=== which python / pytest / hdctl / jq / curl ===
+python: /usr/local/bin/python
+pytest: /workspaces/glow-hdengine-v2/.venv/bin/pytest
+hdctl: /home/vscode/.local/bin/hdctl
+jq: /usr/bin/jq
+curl: /usr/bin/curl
+
+=== python -m pytest --version ===
+pytest 9.0.1

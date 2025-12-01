@@ -1,0 +1,9 @@
+{
+  "viewer_id": "viewer-001",
+  "candidate_ids": [
+    "bravo",
+    "alpha",
+    "charlie"
+  ],
+  "seed": "111"
+}

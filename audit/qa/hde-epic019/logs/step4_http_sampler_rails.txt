@@ -1,0 +1,5 @@
+check_id: D3_http_sampler_rails
+command: set DEV_SAMPLER_URL + open ALLOW_NETWORK=1 for HTTP checks
+rails: SAFE_MODE=1, ALLOW_NETWORK=1, LC_ALL=C, LANG=C, TZ=UTC, APP_ENV=dev
+url: http://localhost:8000/internal/dev/sampler
+status: PENDING

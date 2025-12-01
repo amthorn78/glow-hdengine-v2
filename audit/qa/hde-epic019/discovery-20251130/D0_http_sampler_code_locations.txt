@@ -1,0 +1,7 @@
+check_id: D0_http_sampler_code_locations
+command: grep -R "internal/dev/sampler" in repo
+
+=== grep -R "internal/dev/sampler" . ===
+./tests/adapter/test_dev_sampler_http.py:14:        "/internal/dev/sampler",
+./tools/evidence/generate_sampler_evidence.py:310:            "/internal/dev/sampler",
+./adapter/http_reader.py:488:    @bp.route("/internal/dev/sampler", methods=["POST"], provide_automatic_options=False)

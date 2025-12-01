@@ -1,0 +1,10 @@
+]633;E;echo "check_id: D_all_acceptance_map_tests";133f1680-ceae-4b3b-af8e-cb3c9368d48e]633;Ccheck_id: D_all_acceptance_map_tests
+command: python -m pytest tests/audit/test_acceptance_map_epic019.py -q
+rails: SAFE_MODE=1, ALLOW_NETWORK=0, LC_ALL=C, LANG=C, TZ=UTC, APP_ENV=dev
+pf_refs: [PF20 HDE-EPIC019 acceptance, PF19 §9A token registry, PF12 schemas, PF09 acceptance tasks]
+tokens: [TESTS_PASS_OK]
+status: PENDING
+
+=== python -m pytest tests/audit/test_acceptance_map_epic019.py -q ===
+..                                                                       [100%]
+2 passed in 0.03s

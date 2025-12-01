@@ -1,0 +1,21 @@
+check_id: D-all_env_rails_baseline
+command: init_rails (exports + git context)
+rails: SAFE_MODE=1, ALLOW_NETWORK=0, LC_ALL=C, LANG=C, TZ=UTC, APP_ENV=dev
+pf_refs: [PF19 Glow QA Guide, PF20 HDE-EPIC019 all D, PF09 env pins, PF14 determinism_env helper, PF07 infrastructure]
+tokens: [ENV_RAILS_POLICY_OK, DETERMINISM_ENV_PINS_OK]
+status: PENDING
+
+=== git context ===
+b6982d1d65ba4a148c8b396b266b50c390299ca4
+main
+
+=== working tree status (short) ===
+?? audit/qa/hde-epic019/
+
+=== env rails snapshot ===
+ALLOW_NETWORK=0
+APP_ENV=dev
+LANG=C
+LC_ALL=C
+SAFE_MODE=1
+TZ=UTC

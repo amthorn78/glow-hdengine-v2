@@ -1,0 +1,14 @@
+check_id: D0_cli_dev_sampler_help
+command: hdctl dev:sampler --help
+
+=== hdctl dev:sampler --help ===
+usage: hdctl dev:sampler [-h] --viewer VIEWER --candidates-file
+                         CANDIDATES_FILE [--seed SEED]
+
+options:
+  -h, --help            show this help message and exit
+  --viewer VIEWER       Viewer identifier for the sampler run
+  --candidates-file CANDIDATES_FILE
+                        Path to JSON payload containing sampler candidates
+  --seed SEED           Optional seed value (echoed only; reserved for
+                        deterministic tie-breakers in future phases)

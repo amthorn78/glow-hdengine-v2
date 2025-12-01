@@ -1,0 +1,12 @@
+check_id: D0_env_snapshot
+command: env | egrep '^(SAFE_MODE|ALLOW_NETWORK|LC_ALL|LANG|TZ|APP_ENV|QA_DATE|QA_ROOT)=' | sort
+
+=== rails-related env vars (if any) ===
+ALLOW_NETWORK=0
+APP_ENV=dev
+LANG=C
+LC_ALL=C
+QA_DATE=20251130
+QA_ROOT=audit/qa/hde-epic019/live-qa-20251130
+SAFE_MODE=1
+TZ=UTC

@@ -3,5 +3,6 @@ env:ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC
 check pytest tests/cli/test_cli_canonical_bytes.py:OK
 check pytest tests/cli/test_showcompat_parity_and_identity.py:OK
 check pytest tests/invariance/test_bytes_identity.py:OK
-check ci/checks/check_env_pins.sh:FAIL
+check ci/checks/check_env_pins.sh:OK
+check python tools/evidence/generate_sampler_evidence.py:FAIL
 summary:FAIL

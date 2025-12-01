@@ -1,0 +1,12 @@
+]633;E;echo "check_id: D_all_sanity_pipeline";133f1680-ceae-4b3b-af8e-cb3c9368d48e]633;Ccheck_id: D_all_sanity_pipeline
+command: python tools/evidence/run_sanity_pipeline.py
+rails: SAFE_MODE=1, ALLOW_NETWORK=0, LC_ALL=C, LANG=C, TZ=UTC, APP_ENV=dev
+pf_refs: [PF09 env-pins & sanity pipeline, PF14 mechanics, PF20 HDE-EPIC019 acceptance, PF19 QA rails]
+tokens: [SANITY_PIPELINE_OK, DETERMINISM_ENV_PINS_OK]
+status: PENDING
+
+=== python tools/evidence/run_sanity_pipeline.py ===
+]633;E;echo;133f1680-ceae-4b3b-af8e-cb3c9368d48e]633;C
+=== python tools/evidence/run_sanity_pipeline.py (RERUN) ===
+]633;E;echo;133f1680-ceae-4b3b-af8e-cb3c9368d48e]633;C
+=== python tools/evidence/run_sanity_pipeline.py (RUN) ===

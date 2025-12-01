@@ -1,0 +1,22 @@
+]633;E;echo "check_id: D5_core_tests";133f1680-ceae-4b3b-af8e-cb3c9368d48e]633;Ccheck_id: D5_core_tests
+command: python -m pytest tests/core/test_engine_core_determinism.py -q + python -m pytest tests/core/test_engine_core_abba.py -q + python -m pytest tests/core/test_engine_core_purity.py -q + python -m pytest tests/evidence/test_engine_core_evidence.py -q
+rails: SAFE_MODE=1, ALLOW_NETWORK=0, LC_ALL=C, LANG=C, TZ=UTC, APP_ENV=dev
+pf_refs: [PF20 HDE-EPIC019 D5, PF09 DISS004.*, PF14 core mechanics, PF12 core schemas, PF19 determinism tokens]
+tokens: [TWO_RUN_IDENTITY_OK, COMPOSITE_ABBA_IDENTITY_OK, AB_BA_PARITY_OK, NO_IO_NO_CLOCKS_OK, JSON_CANONICAL_CHECK_OK]
+status: PENDING
+
+=== python -m pytest tests/core/test_engine_core_determinism.py -q ===
+..                                                                       [100%]
+2 passed in 0.03s
+]633;E;echo;133f1680-ceae-4b3b-af8e-cb3c9368d48e]633;C
+=== python -m pytest tests/core/test_engine_core_abba.py -q ===
+.                                                                        [100%]
+1 passed in 0.04s
+]633;E;echo;133f1680-ceae-4b3b-af8e-cb3c9368d48e]633;C
+=== python -m pytest tests/core/test_engine_core_purity.py -q ===
+...                                                                      [100%]
+3 passed in 0.03s
+]633;E;echo;133f1680-ceae-4b3b-af8e-cb3c9368d48e]633;C
+=== python -m pytest tests/evidence/test_engine_core_evidence.py -q ===
+..                                                                       [100%]
+2 passed in 0.03s

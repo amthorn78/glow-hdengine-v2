@@ -1,0 +1,32 @@
+]633;E;echo "check_id: D1_cli_two_run";fb3578a4-86ee-447b-bebc-741e4f64b1e8]633;Ccheck_id: D1_cli_two_run
+command: hdctl dev:sampler --help + two runs with fixed seed
+rails: SAFE_MODE=1, ALLOW_NETWORK=0, LC_ALL=C, LANG=C, TZ=UTC, APP_ENV=dev
+pf_refs: [PF20 HDE-EPIC019 D1–D2, PF09 HDE-DISS003.1–.4, PF05 CLI-API, PF14 sampler mechanics, PF19 determinism tokens]
+tokens: [TWO_RUN_IDENTITY_OK, AB_BA_PARITY_OK, JSON_CANONICAL_CHECK_OK]
+status: PENDING
+
+=== hdctl dev:sampler --help ===
+usage: hdctl dev:sampler [-h] --viewer VIEWER --candidates-file
+                         CANDIDATES_FILE [--seed SEED]
+
+options:
+  -h, --help            show this help message and exit
+  --viewer VIEWER       Viewer identifier for the sampler run
+  --candidates-file CANDIDATES_FILE
+                        Path to JSON payload containing sampler candidates
+  --seed SEED           Optional seed value (echoed only; reserved for
+                        deterministic tie-breakers in future phases)
+
+=== seed1 run 1 ===
+seed1_run1_exit_code: 0
+{"candidates":[{"band":"Glow","diversity_key":null,"is_recent":false,"person_uid":"bravo","rank":1,"score":80,"weight":2.0},{"band":"Warm","diversity_key":null,"is_recent":false,"person_uid":"alpha","rank":2,"score":70,"weight":2.0},{"band":"Glow","diversity_key":null,"is_recent":false,"person_uid":"charlie","rank":3,"score":90,"weight":1.0}],"seed":"111","viewer_id":"viewer-001"}
+
+=== seed1 run 2 ===
+seed1_run2_exit_code: 0
+{"candidates":[{"band":"Glow","diversity_key":null,"is_recent":false,"person_uid":"bravo","rank":1,"score":80,"weight":2.0},{"band":"Warm","diversity_key":null,"is_recent":false,"person_uid":"alpha","rank":2,"score":70,"weight":2.0},{"band":"Glow","diversity_key":null,"is_recent":false,"person_uid":"charlie","rank":3,"score":90,"weight":1.0}],"seed":"111","viewer_id":"viewer-001"}
+
+=== meta.seed fields for the two seed1 runs ===
+"111"
+"111"
+
+=== diff between seed1_run1 and seed1_run2 (should be empty) ===

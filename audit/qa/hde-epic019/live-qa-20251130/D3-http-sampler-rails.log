@@ -1,0 +1,8 @@
+check_id: D3_http_sampler_rails
+command: set DEV_SAMPLER_URL + open ALLOW_NETWORK=1 for HTTP dev sampler checks
+rails: SAFE_MODE=1, ALLOW_NETWORK=1, LC_ALL=C, LANG=C, TZ=UTC, APP_ENV=dev
+pf_refs: [PF20 HDE-EPIC019 D3, PF09 HDE-DISS003.5, PF05 internal/dev endpoints, PF14 HTTP adapter, PF19 QA rails]
+tokens: [ENV_RAILS_POLICY_OK]
+status: PENDING
+
+DEV_SAMPLER_URL=http://127.0.0.1:2000/internal/dev/sampler

@@ -1,0 +1,14 @@
+]633;E;echo "check_id: D_all_env_rails_end";133f1680-ceae-4b3b-af8e-cb3c9368d48e]633;Ccheck_id: D_all_env_rails_end
+command: final env snapshot for SAFE_MODE/ALLOW_NETWORK/LC_ALL/LANG/TZ/APP_ENV
+rails: SAFE_MODE=1, ALLOW_NETWORK=0, LC_ALL=C, LANG=C, TZ=UTC, APP_ENV=dev
+pf_refs: [PF19 QA rails, PF09 env-pins]
+tokens: [ENV_RAILS_POLICY_OK]
+status: PENDING
+
+=== final env rails snapshot ===
+ALLOW_NETWORK=0
+APP_ENV=dev
+LANG=C
+LC_ALL=C
+SAFE_MODE=1
+TZ=UTC

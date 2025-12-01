@@ -1,0 +1,22 @@
+]633;E;echo "check_id: D3_http_sampler_allowed";fb3578a4-86ee-447b-bebc-741e4f64b1e8]633;Ccheck_id: D3_http_sampler_allowed
+command: curl -X POST http://127.0.0.1:2000/internal/dev/sampler (APP_ENV=dev, ALLOW_NETWORK=1)
+rails: SAFE_MODE=1, ALLOW_NETWORK=1, LC_ALL=C, LANG=C, TZ=UTC, APP_ENV=dev
+pf_refs: [PF20 HDE-EPIC019 D3, PF09 HDE-DISS003.5, PF05 internal/dev endpoints, PF14 HTTP adapter, PF19 determinism tokens]
+tokens: [ENV_RAILS_POLICY_OK]
+status: PENDING
+
+=== request payload (derived from CLI seed1 run) ===
+{
+  "viewer_id": "viewer-001",
+  "candidate_ids": [
+    "bravo",
+    "alpha",
+    "charlie"
+  ],
+  "seed": "111"
+}
+
+=== response (body + HTTP status) ===
+curl: (1) Received HTTP/0.9 when not allowed
+
+HTTP_STATUS:000
