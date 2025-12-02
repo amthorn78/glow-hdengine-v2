@@ -1,5 +1,5 @@
 path: artifacts/ops/no_io_guard.txt
 size_bytes: 24
 sha256: 4f855ce4fe14115ea61924a347b503eb7eaffc5742b8113aef456ac19c0fa88c
-mtime_utc: 2025-12-02T05:42:54Z
+mtime_utc: 2025-12-02T12:26:45Z
 produced_at_utc: 2025-11-22T02:27:04Z
