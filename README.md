@@ -13,7 +13,7 @@ LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 hdctl showcompat --pair-file 
 
 # Dev/admin-only sampler harnesses (do not use in production):
 LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev hdctl dev:sampler --viewer viewer-001 --candidates-file path/to/candidates.json --seed seed-1
-LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 python -m adapter.http_reader  # exposes /internal/dev/sampler when APP_ENV=dev
+LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev PORT=8000 scripts/dev_start_reader.sh  # exposes /internal/dev/sampler
 ```
 
 - CLI and module-run are interchangeable (`hdctl …` is exposed via `engine.cli.main:cli`).
@@ -51,6 +51,12 @@ See PF12 — Schemas & Artifacts, PF14 — Mechanics Guide, PF19 — QA Guide, a
 - Compat CLI: `hdctl showcompat --pair-file <pair.json>` (or `--a-file/--b-file`) emits numeric-free public JSON using the canonical emitter/serializer (AB↔BA identity, LF-terminated).
 - Dev-only sampler CLI: `APP_ENV=dev hdctl dev:sampler --viewer <viewer_id> --candidates-file <candidates.json> [--seed <seed>]` emits deterministic sampler JSON under closed rails for QA only.
 - Reader harness mirrors CLI bytes for the same inputs; APP_ENV gating remains in `engine/http/compat_handler.py`. A dev-only sampler endpoint lives at `/internal/dev/sampler` (APP_ENV=dev) for QA parity with the sampler CLI.
+
+### Dev sampler HTTP harness (dev/admin-only)
+
+- Canonical dev Reader start command: `APP_ENV=dev SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC PORT=8000 scripts/dev_start_reader.sh` (binds to port 8000; uses `python -m adapter.http_reader`).
+- Infra-owned URL binding: `DEV_SAMPLER_URL=http://127.0.0.1:8000/internal/dev/sampler` (exported in `.devcontainer/devcontainer.json`).
+- Healthcheck/diagnostic harness: `scripts/qa/dev_sampler_healthcheck.py` starts the Reader, posts a minimal payload under APP_ENV=dev (expects 200), then records the APP_ENV=prod gate result for follow-up (logs in `notes/dev-sampler/dev_sampler_healthcheck.log`).
 - `hdctl showcompat` accepts `--dump-reader` and `--dump-admin-dir` for QA sidecars; governed evidence follows the PF12 indexing rules.
 
 ## Evidence harness workflow
