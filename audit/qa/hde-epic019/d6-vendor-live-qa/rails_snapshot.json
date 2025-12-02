@@ -1,0 +1,24 @@
+{
+  "notes": "Open-rails vendor QA per PF04/PF19 with classification log",
+  "payload_keys": [
+    "birthdate",
+    "birthtime",
+    "location"
+  ],
+  "pf_canon_refs": [
+    "PF04 \u2014 HDE-Governance",
+    "PF05 \u2014 HDE-CLI-API-Vendor-Ref",
+    "PF07 \u2014 Glow Infrastructure",
+    "PF19 \u2014 Glow QA Guide"
+  ],
+  "rails": {
+    "ALLOW_NETWORK": "1",
+    "LANG": "C",
+    "LC_ALL": "C",
+    "SAFE_MODE": "0",
+    "TZ": "UTC"
+  },
+  "schema": "epic019-d6-vendor-live-qa",
+  "surface": "engine.cli vendor HTTP POST /bodygraphs",
+  "vendor_host": "api.humandesignapi.nl"
+}

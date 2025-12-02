@@ -1,5 +1,5 @@
 path: artifacts/bodygraph/keys_only.logs.sample
 size_bytes: 376
 sha256: d9462a5c840f21c0630c25885dfb2e1013b6c3af8ffdda4c9f7c150d63aaa38b
-mtime_utc: 2025-12-02T12:52:32Z
+mtime_utc: 2025-12-02T14:23:58Z
 produced_at_utc: 2025-11-22T02:27:04Z
