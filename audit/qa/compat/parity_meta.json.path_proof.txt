@@ -1,5 +1,5 @@
 path: audit/qa/compat/parity_meta.json
 size_bytes: 582
 sha256: 24da89ead0dd913d0d29fcab4f6e41a2cc863a2ba5133407867c898ed39960eb
-mtime_utc: 2025-11-30T04:40:45Z
+mtime_utc: 2025-12-02T12:52:32Z
 produced_at_utc: 2025-11-22T02:27:04Z
