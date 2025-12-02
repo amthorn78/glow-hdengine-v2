@@ -1,0 +1,9 @@
+HTTP/1.1 200 OK
+Server: Werkzeug/3.1.4 Python/3.11.14
+Date: Tue, 02 Dec 2025 04:13:35 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 74
+Cache-Control: no-store
+Connection: close
+
+{"candidate_ids":["A","B"],"meta":{"seed":"111"},"viewer_id":"qa-viewer"}

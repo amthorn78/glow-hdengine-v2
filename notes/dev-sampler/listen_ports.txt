@@ -1,0 +1,2 @@
+COMMAND PID   USER FD   TYPE DEVICE SIZE/OFF NODE NAME
+node    239 vscode 21u  IPv4  30725      0t0  TCP localhost:45173 (LISTEN)
