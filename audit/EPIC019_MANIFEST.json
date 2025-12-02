@@ -45,34 +45,34 @@
       }
     ],
     "ENV_RAILS_POLICY_OK": [
-      {
-        "artifact_key": "dev_sampler_http_live_qa_allowed",
-        "discovered_physical_path": "audit/qa/hde-epic019/dev_sampler_http/allowed_dev.jsonl",
-        "proof_anchor": "audit/qa/hde-epic019/dev_sampler_http/allowed_dev.jsonl.path_proof.txt",
-        "sha256": "f531e0d2a9c55a5afd82be634ae77c24eead5569969d1b842da55eced5c58ca1",
-        "size_bytes": 575
-      },
-      {
-        "artifact_key": "dev_sampler_http_live_qa_forbidden_prod",
-        "discovered_physical_path": "audit/qa/hde-epic019/dev_sampler_http/forbidden_prod.jsonl",
-        "proof_anchor": "audit/qa/hde-epic019/dev_sampler_http/forbidden_prod.jsonl.path_proof.txt",
-        "sha256": "1b719469f75fd31c382b5b751eb841ec9fcef4c2e3f50c8265f6404561b53241",
-        "size_bytes": 539
-      },
-      {
-        "artifact_key": "dev_sampler_http_live_qa_forbidden_empty",
-        "discovered_physical_path": "audit/qa/hde-epic019/dev_sampler_http/forbidden_empty.jsonl",
-        "proof_anchor": "audit/qa/hde-epic019/dev_sampler_http/forbidden_empty.jsonl.path_proof.txt",
-        "sha256": "590d097f773665f831f8dc90b0714b36d14bb52fd89a5778b23aea5a6cad722e",
-        "size_bytes": 574
-      },
-      {
-        "artifact_key": "dev_sampler_http_live_qa_forbidden_unset",
-        "discovered_physical_path": "audit/qa/hde-epic019/dev_sampler_http/forbidden_unset.jsonl",
-        "proof_anchor": "audit/qa/hde-epic019/dev_sampler_http/forbidden_unset.jsonl.path_proof.txt",
-        "sha256": "926cd91c968d375168501a4b3775d322324530db8d8496db5b548a36c4a2d231",
-        "size_bytes": 579
-      },
+        {
+          "artifact_key": "dev_sampler_http_live_qa_allowed",
+          "discovered_physical_path": "audit/qa/hde-epic019/dev_sampler_http/allowed_dev.jsonl",
+          "proof_anchor": "audit/qa/hde-epic019/dev_sampler_http/allowed_dev.jsonl.path_proof.txt",
+          "sha256": "9199e74a62f5db2358b330f996216a6c9a9ca0d5dff5291ecb4ed7f75695b7ea",
+          "size_bytes": 575
+        },
+        {
+          "artifact_key": "dev_sampler_http_live_qa_forbidden_prod",
+          "discovered_physical_path": "audit/qa/hde-epic019/dev_sampler_http/forbidden_prod.jsonl",
+          "proof_anchor": "audit/qa/hde-epic019/dev_sampler_http/forbidden_prod.jsonl.path_proof.txt",
+          "sha256": "654232c53d1e78e684ed07accda1d075d6b56eef720e54d0202f97269390ba6f",
+          "size_bytes": 539
+        },
+        {
+          "artifact_key": "dev_sampler_http_live_qa_forbidden_empty",
+          "discovered_physical_path": "audit/qa/hde-epic019/dev_sampler_http/forbidden_empty.jsonl",
+          "proof_anchor": "audit/qa/hde-epic019/dev_sampler_http/forbidden_empty.jsonl.path_proof.txt",
+          "sha256": "3c672f91caa88fe0b6ae362572a8ea1bec44a5e379e81cc714e160027f47d7d8",
+          "size_bytes": 574
+        },
+        {
+          "artifact_key": "dev_sampler_http_live_qa_forbidden_unset",
+          "discovered_physical_path": "audit/qa/hde-epic019/dev_sampler_http/forbidden_unset.jsonl",
+          "proof_anchor": "audit/qa/hde-epic019/dev_sampler_http/forbidden_unset.jsonl.path_proof.txt",
+          "sha256": "e68ad3309517901c707855210f39bd943178d6c3fbaa751b0b511cc4f8f9f885",
+          "size_bytes": 579
+        },
       {
         "artifact_key": "audit.determinism.env_pins",
         "discovered_physical_path": "audit/gates/determinism/env_pins.log",
@@ -91,16 +91,16 @@
       }
     ],
     "EVIDENCE_INDEX_MIRROR_OK": [
-      {
-        "artifact_key": "index.machine_mirror",
-        "discovered_physical_path": "artifacts/evidence_index.jsonl",
-        "proof_anchor": "artifacts/evidence_index.jsonl.path_proof.txt",
-        "sha256": "c2465b5787ee788557a9a787a6f051fca59ecb264d25afb96fcdd1741351152e",
-        "size_bytes": 53844
-      }
-    ],
-    "EVIDENCE_INDEX_UPDATED_OK": [
-      {
+        {
+          "artifact_key": "index.machine_mirror",
+          "discovered_physical_path": "artifacts/evidence_index.jsonl",
+          "proof_anchor": "artifacts/evidence_index.jsonl.path_proof.txt",
+          "sha256": "09432b700d6a55ee29ecd4790125f3a32baee7d25fbf605267547994864a6359",
+          "size_bytes": 53844
+        }
+      ],
+      "EVIDENCE_INDEX_UPDATED_OK": [
+        {
         "artifact_key": "index.human_evidence",
         "discovered_physical_path": "docs/evidence/INDEX.json",
         "proof_anchor": "docs/evidence/INDEX.json.path_proof.txt",
@@ -109,35 +109,35 @@
       }
     ],
     "EVIDENCE_PATHS_VALIDATED_OK": [
-      {
-        "artifact_key": "dev_sampler_http_live_qa_allowed.path_proof",
-        "discovered_physical_path": "audit/qa/hde-epic019/dev_sampler_http/allowed_dev.jsonl.path_proof.txt",
-        "proof_anchor": null,
-        "sha256": "457f3e1f8a3ffcd533218f59de092bb9084d565613b1edb7d12163b27df4a45e",
-        "size_bytes": 221
-      },
-      {
-        "artifact_key": "dev_sampler_http_live_qa_forbidden_prod.path_proof",
-        "discovered_physical_path": "audit/qa/hde-epic019/dev_sampler_http/forbidden_prod.jsonl.path_proof.txt",
-        "proof_anchor": null,
-        "sha256": "2d202f91ca129f5db223e088ba3421ac38cdfa853fb05b1bd20f4a80e1ba5a5a",
-        "size_bytes": 224
-      },
-      {
-        "artifact_key": "dev_sampler_http_live_qa_forbidden_empty.path_proof",
-        "discovered_physical_path": "audit/qa/hde-epic019/dev_sampler_http/forbidden_empty.jsonl.path_proof.txt",
-        "proof_anchor": null,
-        "sha256": "8dd89c927ebaabd6f5f10d004e70c3e74dbb6a9744b412bdb911085f1783b7fc",
-        "size_bytes": 225
-      },
-      {
-        "artifact_key": "dev_sampler_http_live_qa_forbidden_unset.path_proof",
-        "discovered_physical_path": "audit/qa/hde-epic019/dev_sampler_http/forbidden_unset.jsonl.path_proof.txt",
-        "proof_anchor": null,
-        "sha256": "37353851f6bef738983bf32e704c8b3bf0a94d87b4dd3052454031e1a850bb7e",
-        "size_bytes": 225
-      }
-    ],
+        {
+          "artifact_key": "dev_sampler_http_live_qa_allowed.path_proof",
+          "discovered_physical_path": "audit/qa/hde-epic019/dev_sampler_http/allowed_dev.jsonl.path_proof.txt",
+          "proof_anchor": null,
+          "sha256": "6a8fdf83ef821436749ac8781795852a22d2e55ab42bde0777cc70b341c56257",
+          "size_bytes": 221
+        },
+        {
+          "artifact_key": "dev_sampler_http_live_qa_forbidden_prod.path_proof",
+          "discovered_physical_path": "audit/qa/hde-epic019/dev_sampler_http/forbidden_prod.jsonl.path_proof.txt",
+          "proof_anchor": null,
+          "sha256": "23cd367c4ec71ed2ac2f0ec6a39aafc77255501733b56ddffe192ba5a28dbf16",
+          "size_bytes": 224
+        },
+        {
+          "artifact_key": "dev_sampler_http_live_qa_forbidden_empty.path_proof",
+          "discovered_physical_path": "audit/qa/hde-epic019/dev_sampler_http/forbidden_empty.jsonl.path_proof.txt",
+          "proof_anchor": null,
+          "sha256": "e4ba8ee92e46c2d5ec81b10e1369f3a564465240584c2418cca123c194d3e69d",
+          "size_bytes": 225
+        },
+        {
+          "artifact_key": "dev_sampler_http_live_qa_forbidden_unset.path_proof",
+          "discovered_physical_path": "audit/qa/hde-epic019/dev_sampler_http/forbidden_unset.jsonl.path_proof.txt",
+          "proof_anchor": null,
+          "sha256": "deb1f1b52f2e3ad177bb0bf58fdfb11ff8d9c4beef116f5ff32dfc9fac6fa3a0",
+          "size_bytes": 225
+        }
+      ],
     "JSON_CANONICAL_CHECK_OK": [
       {
         "artifact_key": "engine_core_json_compare_logs",
@@ -147,15 +147,15 @@
         "size_bytes": 928
       }
     ],
-    "MACHINE_MIRROR_UPDATED_OK": [
-      {
-        "artifact_key": "index.machine_mirror.path_proof",
-        "discovered_physical_path": "artifacts/evidence_index.jsonl.path_proof.txt",
-        "proof_anchor": null,
-        "sha256": "bf44f4eb908ad3f3380452b6dbc8f03b0613974f258e7db042593b989d5fd9b5",
-        "size_bytes": 198
-      }
-    ],
+      "MACHINE_MIRROR_UPDATED_OK": [
+        {
+          "artifact_key": "index.machine_mirror.path_proof",
+          "discovered_physical_path": "artifacts/evidence_index.jsonl.path_proof.txt",
+          "proof_anchor": null,
+          "sha256": "79aad416b456c8255f970e57f23fb19b791a2e882d5e2e3f556dd558ac6f719a",
+          "size_bytes": 198
+        }
+      ],
     "NO_IO_NO_CLOCKS_OK": [
       {
         "artifact_key": "engine_core_purity_report",

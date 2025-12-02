@@ -1,5 +1,5 @@
 path: artifacts/thresholds/band_edges.json
 size_bytes: 177
 sha256: 7e8931934b147e8a2069e3d2e5c5febada250fb889a1fd6d53405a6dd9986e49
-mtime_utc: 2025-12-02T12:26:45Z
+mtime_utc: 2025-12-02T12:52:32Z
 produced_at_utc: 2025-11-22T17:07:45Z
