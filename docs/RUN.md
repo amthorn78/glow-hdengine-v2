@@ -2,7 +2,7 @@
 
 ## Rails
 - Pin determinism env: `LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0` (or call `engine.runtime.determinism_env.ensure_determinism_env`).
-- Disable auto-reload when capturing evidence. Reader harness binds to http://127.0.0.1:5000 when run locally.
+- Disable auto-reload when capturing evidence. Reader harness binds to http://127.0.0.1:5000 when run locally (dev helper can override port via `PORT`).
 
 ## Quick checks
 - Env pins: `python scripts/ensure_env.py` → expect `[ENV] OK` with rails above; CI mirrors this via `ci/checks/check_env_pins.sh`.
@@ -33,8 +33,25 @@ python tools/evidence/update_evidence_index.py  # index generated artifacts unde
 ```
 The config acceptance map lives at `audit/EPIC-018_config_acceptance_map.json` (governed). Sampler/core acceptance for EPIC019 is tracked in `docs/acceptance_map_epic019.json` with a path proof.
 
-## Service entry (dev harness)
+## Dev/admin harnesses
+
+Closed rails unless noted; APP_ENV gating applies for `/internal/dev/sampler`.
+
 ```bash
-python -m adapter.http_reader
+# Start dev Reader helper (APP_ENV=dev by default; port override allowed)
+LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev PORT=8000 scripts/dev_start_reader.sh
+
+# Dev sampler healthcheck (closed rails, uses DEV_SAMPLER_URL from environment)
+LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev DEV_SAMPLER_URL="$DEV_SAMPLER_URL" scripts/qa/dev_sampler_healthcheck.py
+
+# Dev sampler Live QA (closed rails; APP_ENV permutations logged)
+LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 DEV_SAMPLER_URL="$DEV_SAMPLER_URL" scripts/qa/dev_sampler_live_qa.py
+
+# D6 vendor Live QA (open rails; vendor test identity, governed logs only)
+ALLOW_NETWORK=1 scripts/qa/d6_live_vendor_qa.py
 ```
-APP_ENV gating applies; use for local parity checks only. Closed rails remain required for captures.
+
+Logs:
+- Dev sampler healthcheck → `notes/dev-sampler/dev_sampler_healthcheck.log`
+- Dev sampler Live QA → `audit/qa/hde-epic019/dev_sampler_http/`
+- D6 vendor Live QA → `audit/qa/hde-epic019/d6-vendor-live-qa/`

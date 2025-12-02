@@ -5,12 +5,12 @@
 - Governed evidence (INDEX/mirror/path proofs/orientation/manifest/close report/config acceptance map) must be produced only by the canonical tools. **Never hand-edit governed artifacts.**
 
 ## Roles and responsibilities
-- **Lead Dev:** approves implementation/evidence plans, keeps acceptance maps/manifests coherent, and signs off on sampler + Engine Core scope (EPIC019) before close.
-- **Codex / dev agents:** implement features/docs/evidence under PO direction, run CLI guards and sampler/core harnesses under closed rails, and ensure determinism helper + env pins are honored.
-- **Evidence harness:** runs `tools/evidence/update_evidence_index.py`, `tools/evidence/orientation_demo.py`, `tools/evidence/run_sanity_pipeline.py`, `tools/evidence/generate_sampler_evidence.py`, and `tools/evidence/generate_engine_core_evidence.py`; keeps `docs/evidence/INDEX.json` and `artifacts/evidence_index.jsonl` in sync with path proofs and EPIC019 acceptance bindings.
+- **Lead Dev:** approves implementation/evidence plans, keeps acceptance maps/manifests coherent, and signs off on sampler + Engine Core scope (EPIC019, including remedial Cards C1–C3) before close.
+- **Codex / dev agents:** implement features/docs/evidence under PO direction, run CLI guards and sampler/core harnesses under closed rails, and ensure determinism helper + env pins are honored; own the dev Reader helper (`scripts/dev_start_reader.sh`) and DEV_SAMPLER_URL wiring for dev/test/local only.
+- **Evidence harness:** runs `tools/evidence/update_evidence_index.py`, `tools/evidence/orientation_demo.py`, `tools/evidence/run_sanity_pipeline.py`, `tools/evidence/generate_sampler_evidence.py`, and `tools/evidence/generate_engine_core_evidence.py`; keeps `docs/evidence/INDEX.json` and `artifacts/evidence_index.jsonl` in sync with path proofs and EPIC019 acceptance bindings (including D3 dev sampler Live QA and D6 vendor Live QA families under `audit/qa/hde-epic019/`).
 - **Config/bundle agents:** run `tools/config/generate_config_artifacts.py` and `tools/config/generate_bundles.py`; confirm `audit/EPIC-018_config_acceptance_map.json` remains consistent with generated artifacts.
-- **QA/Verifier:** executes the sanity pipeline, env-pins gate, and sampler/core harness tests; confirms tokens and evidence coverage in manifests/acceptance maps and updates Index/Mirror as needed.
-- **Doc agents:** refresh README/CHANGELOG/AGENTS/docs to reflect PF-Canon titles and EPIC outcomes; include rails and guardrails for determinism and evidence, especially sampler/core families and env-pin posture.
+- **QA/Verifier:** executes the sanity pipeline, env-pins gate, sampler/core harness tests, and EPIC019 QA harnesses (`scripts/qa/dev_sampler_healthcheck.py`, `scripts/qa/dev_sampler_live_qa.py`, `scripts/qa/d6_live_vendor_qa.py`); confirms tokens and evidence coverage in manifests/acceptance maps and updates Index/Mirror as needed.
+- **Doc agents:** refresh README/CHANGELOG/AGENTS/docs to reflect PF-Canon titles and EPIC outcomes; include rails/guardrails for determinism and evidence, sampler/core families, dev vs public surfaces, and rails posture for D3 (closed) vs D6 (open vendor rails only).
 
 ## Rails (EPIC019 closed posture)
 - Environment pins: `LC_ALL=C`, `LANG=C`, `TZ=UTC`, `SAFE_MODE=1`, `ALLOW_NETWORK=0` (enforced by `engine.runtime.determinism_env.ensure_determinism_env` and checked via `ci/checks/check_env_pins.sh`).
