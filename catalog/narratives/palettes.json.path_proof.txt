@@ -1,5 +1,5 @@
 path: catalog/narratives/palettes.json
 size_bytes: 43
 sha256: 71e464a053fea60b48f7735662247a2256a6daf8eee8ed3532a098fac8c766ce
-mtime_utc: 2025-11-30T04:40:45Z
+mtime_utc: 2025-12-02T05:42:54Z
 produced_at_utc: 2025-11-22T02:27:04Z

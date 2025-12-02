@@ -1,0 +1,11 @@
+[dev-start] APP_ENV=dev SAFE_MODE=1 ALLOW_NETWORK=0
+[dev-start] LC_ALL=C LANG=C TZ=UTC
+[dev-start] Binding port 8000 via python -m adapter.http_reader (host=0.0.0.0)
+ * Serving Flask app 'http_reader'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8000
+ * Running on http://127.0.0.1:8000
+[33mPress CTRL+C to quit[0m
+127.0.0.1 - - [02/Dec/2025 05:48:07] "POST /internal/dev/sampler HTTP/1.1" 200 -

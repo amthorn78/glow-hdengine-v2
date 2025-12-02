@@ -1,5 +1,5 @@
 path: artifacts/cli/narrative/sidecar.json
 size_bytes: 242
 sha256: 8c5425aa890533ccb8877caf612b56a242abd27029d1245ba719b051c250f55b
-mtime_utc: 2025-11-30T04:40:45Z
+mtime_utc: 2025-12-02T05:42:54Z
 produced_at_utc: 2025-11-22T02:27:04Z

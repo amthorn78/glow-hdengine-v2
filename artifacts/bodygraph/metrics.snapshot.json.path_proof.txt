@@ -1,5 +1,5 @@
 path: artifacts/bodygraph/metrics.snapshot.json
 size_bytes: 311
 sha256: 0147c9a959279843555600baff82f5737fcfc21877d1c2703211b43dfae0603a
-mtime_utc: 2025-11-30T04:40:45Z
+mtime_utc: 2025-12-02T05:42:54Z
 produced_at_utc: 2025-11-22T02:27:04Z

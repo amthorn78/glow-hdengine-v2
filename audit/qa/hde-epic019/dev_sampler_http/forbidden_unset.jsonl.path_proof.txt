@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic019/dev_sampler_http/forbidden_unset.jsonl
+size_bytes: 579
+sha256: 926cd91c968d375168501a4b3775d322324530db8d8496db5b548a36c4a2d231
+mtime_utc: 2025-12-02T05:48:08Z
+produced_at_utc: 2025-11-30T03:58:47Z
