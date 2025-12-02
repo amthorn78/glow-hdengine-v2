@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic019/dev_sampler_http/allowed_dev.jsonl
+size_bytes: 575
+sha256: 9199e74a62f5db2358b330f996216a6c9a9ca0d5dff5291ecb4ed7f75695b7ea
+mtime_utc: 2025-12-02T12:52:52Z
+produced_at_utc: 2025-11-30T03:58:47Z

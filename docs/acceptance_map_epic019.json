@@ -1,14 +1,10 @@
 {
   "epic_id": "HDE-EPIC019",
   "epic_name": "Dissolution Pass 2",
-  "pf20_ref": "PF20 §2.4 HDE-EPIC019",
-  "manifest": "audit/EPIC019_MANIFEST.json",
   "foundations": [
     {
       "deliverable": "D1",
-      "name": "D1 — Sampler/ranker deterministic pool and scoring (HDE-DISS003.1–.3)",
-      "status": "done",
-      "tokens": [
+      "manifest_tokens": [
         "PR_OPENED_OK",
         "TESTS_PASS_OK",
         "DETERMINISM_ENV_PINS_OK",
@@ -18,7 +14,9 @@
         "NO_IO_NO_CLOCKS_OK",
         "JSON_CANONICAL_CHECK_OK"
       ],
-      "manifest_tokens": [
+      "name": "D1 \u2014 Sampler/ranker deterministic pool and scoring (HDE-DISS003.1\u2013.3)",
+      "status": "done",
+      "tokens": [
         "PR_OPENED_OK",
         "TESTS_PASS_OK",
         "DETERMINISM_ENV_PINS_OK",
@@ -31,46 +29,53 @@
     },
     {
       "deliverable": "D2",
-      "name": "D2 — Seedable dev/admin sampler flows (HDE-DISS003.4)",
+      "manifest_tokens": [
+        "DOC_DELTA_PRESENT_OK",
+        "ENV_RAILS_POLICY_OK",
+        "QA_PRECOMMIT_CHECKLIST_OK"
+      ],
+      "name": "D2 \u2014 Seedable dev/admin sampler flows (HDE-DISS003.4)",
       "status": "done",
       "tokens": [
         "DOC_DELTA_PRESENT_OK",
         "ENV_RAILS_POLICY_OK",
         "QA_PRECOMMIT_CHECKLIST_OK",
         "DETERMINISM_ENV_PINS_OK"
-      ],
-      "manifest_tokens": [
-        "DOC_DELTA_PRESENT_OK",
-        "ENV_RAILS_POLICY_OK",
-        "QA_PRECOMMIT_CHECKLIST_OK"
       ]
     },
     {
       "deliverable": "D3",
-      "name": "D3 — Dev-only sampler endpoint harness (HDE-DISS003.5)",
-      "status": "done",
-      "tokens": [
-        "QA_POSTCOMMIT_CHECKLIST_OK",
-        "SANITY_PIPELINE_OK",
-        "DETERMINISM_ENV_PINS_OK"
-      ],
       "manifest_tokens": [
-        "QA_POSTCOMMIT_CHECKLIST_OK",
-        "SANITY_PIPELINE_OK"
-      ]
-    },
-    {
-      "deliverable": "D4",
-      "name": "D4 — Sampler/ranker evidence and indexing (HDE-DISS003.6)",
-      "status": "done",
-      "tokens": [
+        "ENV_RAILS_POLICY_OK",
         "EVIDENCE_INDEX_UPDATED_OK",
         "EVIDENCE_INDEX_HASH_OK",
         "EVIDENCE_INDEX_MIRROR_OK",
         "EVIDENCE_PATHS_VALIDATED_OK",
         "MACHINE_MIRROR_UPDATED_OK"
       ],
+      "name": "D3 \u2014 Dev-only sampler endpoint harness (HDE-DISS003.5)",
+      "status": "green",
+      "tokens": [
+        "ENV_RAILS_POLICY_OK",
+        "EVIDENCE_INDEX_UPDATED_OK",
+        "EVIDENCE_INDEX_HASH_OK",
+        "EVIDENCE_INDEX_MIRROR_OK",
+        "EVIDENCE_PATHS_VALIDATED_OK",
+        "MACHINE_MIRROR_UPDATED_OK"
+      ]
+    },
+    {
+      "deliverable": "D4",
       "manifest_tokens": [
+        "EVIDENCE_INDEX_UPDATED_OK",
+        "EVIDENCE_INDEX_HASH_OK",
+        "EVIDENCE_INDEX_MIRROR_OK",
+        "EVIDENCE_PATHS_VALIDATED_OK",
+        "MACHINE_MIRROR_UPDATED_OK"
+      ],
+      "name": "D4 \u2014 Sampler/ranker evidence and indexing (HDE-DISS003.6)",
+      "status": "done",
+      "tokens": [
         "EVIDENCE_INDEX_UPDATED_OK",
         "EVIDENCE_INDEX_HASH_OK",
         "EVIDENCE_INDEX_MIRROR_OK",
@@ -80,16 +85,16 @@
     },
     {
       "deliverable": "D5",
-      "name": "D5 — Deterministic Engine Core behavior and evidence (HDE-DISS004.1–.4)",
-      "status": "done",
-      "tokens": [
+      "manifest_tokens": [
         "SANITY_PIPELINE_OK",
         "DETERMINISM_ENV_PINS_OK",
         "AB_BA_PARITY_OK",
         "JSON_CANONICAL_CHECK_OK",
         "NO_IO_NO_CLOCKS_OK"
       ],
-      "manifest_tokens": [
+      "name": "D5 \u2014 Deterministic Engine Core behavior and evidence (HDE-DISS004.1\u2013.4)",
+      "status": "done",
+      "tokens": [
         "SANITY_PIPELINE_OK",
         "DETERMINISM_ENV_PINS_OK",
         "AB_BA_PARITY_OK",
@@ -98,119 +103,185 @@
       ]
     }
   ],
+  "manifest": "audit/EPIC019_MANIFEST.json",
+  "pf20_ref": "PF20 \u00a72.4 HDE-EPIC019",
   "token_status": {
-    "PR_OPENED_OK": {
-      "status": "GREEN",
-      "tests": ["audit manifest token recorded"],
-      "artifacts": ["audit/EPIC019_MANIFEST.json"]
-    },
-    "TESTS_PASS_OK": {
-      "status": "GREEN",
-      "tests": ["python -m pytest"],
-      "artifacts": ["artifacts/sanity/sanity.log"]
-    },
-    "DOC_DELTA_PRESENT_OK": {
-      "status": "GREEN",
-      "tests": ["docs delta review"],
-      "artifacts": ["docs/acceptance_map_epic019.json"]
-    },
-    "EVIDENCE_INDEX_UPDATED_OK": {
-      "status": "GREEN",
-      "tests": ["python tools/evidence/update_evidence_index.py --check"],
-      "artifacts": ["docs/evidence/INDEX.json"]
-    },
-    "EVIDENCE_INDEX_HASH_OK": {
-      "status": "GREEN",
-      "tests": ["ci/checks/check_evidence_index_hash.sh"],
-      "artifacts": ["docs/evidence/INDEX.sha256"]
-    },
-    "EVIDENCE_INDEX_MIRROR_OK": {
-      "status": "GREEN",
-      "tests": ["ci/checks/check_mirror_schema.sh"],
-      "artifacts": ["artifacts/evidence_index.jsonl"]
-    },
-    "EVIDENCE_PATHS_VALIDATED_OK": {
-      "status": "GREEN",
-      "tests": ["python tools/evidence/update_evidence_index.py --check"],
+    "AB_BA_PARITY_OK": {
       "artifacts": [
-        "artifacts/core/purity/purity_report.json.path_proof.txt",
-        "docs/schemas/core/engine_core_purity_report.schema.json.path_proof.txt"
-      ]
-    },
-    "MACHINE_MIRROR_UPDATED_OK": {
-      "status": "GREEN",
-      "tests": ["python tools/evidence/update_evidence_index.py"],
-      "artifacts": ["artifacts/evidence_index.jsonl.path_proof.txt"]
-    },
-    "QA_PRECOMMIT_CHECKLIST_OK": {
-      "status": "GREEN",
-      "tests": ["python tools/evidence/run_sanity_pipeline.py"],
-      "artifacts": ["artifacts/sanity/sanity.log"]
-    },
-    "QA_POSTCOMMIT_CHECKLIST_OK": {
-      "status": "GREEN",
-      "tests": ["python tools/evidence/run_sanity_pipeline.py"],
-      "artifacts": ["artifacts/sanity/sanity.log"]
-    },
-    "ENV_RAILS_POLICY_OK": {
-      "status": "GREEN",
-      "tests": ["ci/checks/check_env_pins.sh"],
-      "artifacts": ["audit/gates/determinism/env_pins.log"]
-    },
-    "DETERMINISM_ENV_PINS_OK": {
-      "status": "GREEN",
-      "tests": ["ci/checks/check_env_pins.sh"],
-      "artifacts": ["audit/gates/determinism/env_pins.log"]
-    },
-    "SANITY_PIPELINE_OK": {
-      "status": "GREEN",
-      "tests": ["python tools/evidence/run_sanity_pipeline.py"],
-      "artifacts": ["artifacts/sanity/sanity.log"]
-    },
-    "TWO_RUN_IDENTITY_OK": {
+        "artifacts/core/abba/ab_ba_parity.json"
+      ],
       "status": "GREEN",
       "tests": [
-        "tests/core/test_engine_core_determinism.py::test_compute_core_is_two_run_identical",
-        "tests/evidence/test_sampler_evidence.py::test_sampler_artifacts_match_schemas"
-      ],
-      "artifacts": [
-        "artifacts/core/two_run/identity.json",
-        "artifacts/sampler/two_run/identity.json"
+        "tests/core/test_engine_core_abba.py::test_ab_ba_parity_is_neutral_where_expected"
       ]
     },
     "COMPOSITE_ABBA_IDENTITY_OK": {
+      "artifacts": [
+        "artifacts/core/abba/ab_ba_parity.json",
+        "artifacts/sampler/abba/ab_ba_parity.json"
+      ],
       "status": "GREEN",
       "tests": [
         "tests/core/test_engine_core_abba.py::test_ab_ba_parity_is_neutral_where_expected",
         "tests/evidence/test_sampler_evidence.py::test_sampler_artifacts_match_schemas"
-      ],
-      "artifacts": [
-        "artifacts/core/abba/ab_ba_parity.json",
-        "artifacts/sampler/abba/ab_ba_parity.json"
       ]
     },
-    "AB_BA_PARITY_OK": {
+    "DETERMINISM_ENV_PINS_OK": {
+      "artifacts": [
+        "audit/gates/determinism/env_pins.log"
+      ],
       "status": "GREEN",
-      "tests": ["tests/core/test_engine_core_abba.py::test_ab_ba_parity_is_neutral_where_expected"],
-      "artifacts": ["artifacts/core/abba/ab_ba_parity.json"]
+      "tests": [
+        "ci/checks/check_env_pins.sh"
+      ]
+    },
+    "DOC_DELTA_PRESENT_OK": {
+      "artifacts": [
+        "docs/acceptance_map_epic019.json"
+      ],
+      "status": "GREEN",
+      "tests": [
+        "docs delta review"
+      ]
+    },
+    "ENV_RAILS_POLICY_OK": {
+      "artifacts": [
+        "audit/qa/hde-epic019/dev_sampler_http/allowed_dev.jsonl",
+        "audit/qa/hde-epic019/dev_sampler_http/forbidden_prod.jsonl",
+        "audit/qa/hde-epic019/dev_sampler_http/forbidden_empty.jsonl",
+        "audit/qa/hde-epic019/dev_sampler_http/forbidden_unset.jsonl",
+        "audit/gates/determinism/env_pins.log"
+      ],
+      "status": "GREEN",
+      "tests": [
+        "python scripts/qa/dev_sampler_live_qa.py",
+        "ci/checks/check_env_pins.sh"
+      ]
+    },
+    "EVIDENCE_INDEX_HASH_OK": {
+      "artifacts": [
+        "docs/evidence/INDEX.sha256"
+      ],
+      "status": "GREEN",
+      "tests": [
+        "python tools/evidence/update_evidence_index.py"
+      ]
+    },
+    "EVIDENCE_INDEX_MIRROR_OK": {
+      "artifacts": [
+        "artifacts/evidence_index.jsonl"
+      ],
+      "status": "GREEN",
+      "tests": [
+        "python tools/evidence/update_evidence_index.py",
+        "ci/checks/check_mirror_schema.sh"
+      ]
+    },
+    "EVIDENCE_INDEX_UPDATED_OK": {
+      "artifacts": [
+        "docs/evidence/INDEX.json"
+      ],
+      "status": "GREEN",
+      "tests": [
+        "python tools/evidence/update_evidence_index.py"
+      ]
+    },
+    "EVIDENCE_PATHS_VALIDATED_OK": {
+      "artifacts": [
+        "audit/qa/hde-epic019/dev_sampler_http/allowed_dev.jsonl.path_proof.txt",
+        "audit/qa/hde-epic019/dev_sampler_http/forbidden_prod.jsonl.path_proof.txt",
+        "audit/qa/hde-epic019/dev_sampler_http/forbidden_empty.jsonl.path_proof.txt",
+        "audit/qa/hde-epic019/dev_sampler_http/forbidden_unset.jsonl.path_proof.txt"
+      ],
+      "status": "GREEN",
+      "tests": [
+        "python tools/evidence/update_evidence_index.py"
+      ]
+    },
+    "JSON_CANONICAL_CHECK_OK": {
+      "artifacts": [
+        "artifacts/core/json_compare/core_result_json_compare.json",
+        "artifacts/sampler/pool_snapshots/baseline.json"
+      ],
+      "status": "GREEN",
+      "tests": [
+        "tests/core/test_engine_core_determinism.py::test_compute_core_is_two_run_identical"
+      ]
+    },
+    "MACHINE_MIRROR_UPDATED_OK": {
+      "artifacts": [
+        "artifacts/evidence_index.jsonl.path_proof.txt"
+      ],
+      "status": "GREEN",
+      "tests": [
+        "python tools/evidence/update_evidence_index.py"
+      ]
     },
     "NO_IO_NO_CLOCKS_OK": {
+      "artifacts": [
+        "artifacts/core/purity/purity_report.json",
+        "docs/schemas/core/engine_core_purity_report.schema.json"
+      ],
       "status": "GREEN",
       "tests": [
         "tests/core/test_engine_core_purity.py::test_engine_core_avoids_forbidden_imports",
         "tests/core/test_engine_core_purity.py::test_engine_core_import_has_no_side_effects"
-      ],
-      "artifacts": [
-        "artifacts/core/purity/purity_report.json",
-        "docs/schemas/core/engine_core_purity_report.schema.json"
       ]
     },
-    "JSON_CANONICAL_CHECK_OK": {
-      "status": "GREEN",
-      "tests": ["tests/core/test_engine_core_determinism.py::test_compute_core_is_two_run_identical"],
+    "PR_OPENED_OK": {
       "artifacts": [
-        "artifacts/core/json_compare/core_result_json_compare.json",
-        "artifacts/sampler/pool_snapshots/baseline.json"
+        "audit/EPIC019_MANIFEST.json"
+      ],
+      "status": "GREEN",
+      "tests": [
+        "audit manifest token recorded"
+      ]
+    },
+    "QA_POSTCOMMIT_CHECKLIST_OK": {
+      "artifacts": [
+        "artifacts/sanity/sanity.log"
+      ],
+      "status": "GREEN",
+      "tests": [
+        "python tools/evidence/run_sanity_pipeline.py"
+      ]
+    },
+    "QA_PRECOMMIT_CHECKLIST_OK": {
+      "artifacts": [
+        "artifacts/sanity/sanity.log"
+      ],
+      "status": "GREEN",
+      "tests": [
+        "python tools/evidence/run_sanity_pipeline.py"
+      ]
+    },
+    "SANITY_PIPELINE_OK": {
+      "artifacts": [
+        "artifacts/sanity/sanity.log"
+      ],
+      "status": "GREEN",
+      "tests": [
+        "python tools/evidence/run_sanity_pipeline.py"
+      ]
+    },
+    "TESTS_PASS_OK": {
+      "artifacts": [
+        "artifacts/sanity/sanity.log"
+      ],
+      "status": "GREEN",
+      "tests": [
+        "python -m pytest"
+      ]
+    },
+    "TWO_RUN_IDENTITY_OK": {
+      "artifacts": [
+        "artifacts/core/two_run/identity.json",
+        "artifacts/sampler/two_run/identity.json"
+      ],
+      "status": "GREEN",
+      "tests": [
+        "tests/core/test_engine_core_determinism.py::test_compute_core_is_two_run_identical",
+        "tests/evidence/test_sampler_evidence.py::test_sampler_artifacts_match_schemas"
       ]
     }
   }
