@@ -11,6 +11,12 @@
   - `tools/cli/serializer_grep_guard.py` (forbids ad-hoc JSON in governed CLI scope).
   - `tools/cli/emitter_symbol_proof.py` (proves governed CLI handlers call canonical emitters).
 
+## Sampler and harness layering (EPIC019)
+- Public surfaces: Reader v1 endpoints and `hdctl showcompat` share the emitter/serializer and remain the only public APIs.
+- Dev/admin sampler surfaces: `hdctl dev:sampler` (APP_ENV=dev) and `/internal/dev/sampler` (APP_ENV=dev via `scripts/dev_start_reader.sh`) mirror public bytes for QA only.
+- QA harnesses: closed-rails healthcheck and Live QA (`scripts/qa/dev_sampler_healthcheck.py`, `scripts/qa/dev_sampler_live_qa.py`) plus open-rails vendor Live QA (`scripts/qa/d6_live_vendor_qa.py`, controlled vendor identity). Outputs are governed evidence under `audit/qa/hde-epic019/` and are indexed into EPIC019 acceptance artifacts.
+
+
 ## Evidence coupling
 - Governed artifacts using the emitter/serializer must carry `.path_proof.txt` files, human index entries, and machine mirror entries. Update with `tools/evidence/update_evidence_index.py` and validate with `tools/evidence/orientation_demo.py`.
 - Sanity pipeline (`tools/evidence/run_sanity_pipeline.py`) asserts serializer parity, sampler/core harness outputs, mirror posture, and LF termination for emitter outputs.

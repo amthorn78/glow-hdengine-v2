@@ -1,6 +1,6 @@
-# CLI commands — Compat v1 and dev sampler (EPIC019)
+# CLI commands — Compat v1 and dev/admin harnesses (EPIC019)
 
-The CLI shares the canonical emitter and serializer with the Reader harness. Run all commands under closed rails (`LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0`), enforced by `engine.runtime.determinism_env.ensure_determinism_env`.
+The CLI shares the canonical emitter and serializer with the Reader harness. Run public and dev sampler commands under closed rails (`LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0`), enforced by `engine.runtime.determinism_env.ensure_determinism_env`. Open-rails allowances are limited to the D6 vendor Live QA harness below.
 
 ## Usage
 - `hdctl showcompat --pair-file <pair.json>`
@@ -21,5 +21,12 @@ Both guards fail fast if determinism rails are not pinned.
 - Orientation and sanity checks: `python tools/evidence/orientation_demo.py` and `python tools/evidence/run_sanity_pipeline.py` (pipeline invokes sampler + Engine Core evidence generators).
 - Sampler evidence harness: `python tools/evidence/generate_sampler_evidence.py` runs dev sampler CLI + HTTP harnesses and captures seed replay, diversity, ABBA, and two-run identity logs.
 - Engine Core evidence harness: `python tools/evidence/generate_engine_core_evidence.py` captures purity, JSON compare, ABBA, and two-run identity logs.
+
+## Dev/admin harnesses (dev/test/local only)
+
+- Dev Reader helper: `APP_ENV=dev SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC PORT=8000 scripts/dev_start_reader.sh`
+- Dev sampler healthcheck (closed rails): `APP_ENV=dev DEV_SAMPLER_URL="$DEV_SAMPLER_URL" SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC scripts/qa/dev_sampler_healthcheck.py`
+- Dev sampler Live QA (closed rails; APP_ENV permutations): `DEV_SAMPLER_URL="$DEV_SAMPLER_URL" SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC scripts/qa/dev_sampler_live_qa.py`
+- D6 vendor Live QA (open rails vendor harness, governed): `scripts/qa/d6_live_vendor_qa.py` (allows `ALLOW_NETWORK=1`; SAFE_MODE may be 0/1; runs under controlled vendor test identity only).
 
 See PF05 — CLI/API/Vendor Ref and PF12 — Schemas & Artifacts for canonical rules (title references only).

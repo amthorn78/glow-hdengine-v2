@@ -1,5 +1,16 @@
 # CHANGELOG
 
+2025-12-18 — EPIC-019: Remedial harnesses and evidence wiring (C1–C3)
+
+### Added
+- Dev Reader helper (`scripts/dev_start_reader.sh`) and infra-owned `DEV_SAMPLER_URL` binding documented for Codespaces/local dev; dev sampler healthcheck harness (`scripts/qa/dev_sampler_healthcheck.py`) captures APP_ENV gating under closed rails.
+- Dev sampler Live QA harness (`scripts/qa/dev_sampler_live_qa.py`) produces governed D3 evidence (allowed/forbidden APP_ENV permutations) under `audit/qa/hde-epic019/dev_sampler_http/` and is indexed into acceptance map/manifest bindings.
+- D6 open-rails Live Vendor QA harness (`scripts/qa/d6_live_vendor_qa.py`) with classified outcomes (`OK`, `FAIL_VENDOR`, `FAIL_TOOLING`) and governed logs/snapshots under `audit/qa/hde-epic019/d6-vendor-live-qa/`, mapped to D6 tokens.
+
+### Changed / Fixed
+- Dev Reader helper now tolerates empty/unset APP_ENV when invoked by harnesses; README/AGENTS/docs describe dev/admin-only posture and APP_ENV gating semantics without over-specifying edge cases.
+- Evidence docs and acceptance roster updated to reflect EPIC019 remedial bindings (D3 Live QA + D6 vendor Live QA) and to reference PF-Canon titles for rails semantics.
+
 2025-12-15 — EPIC-019: HD Dissolution Pass 2 close-out
 
 ### Added

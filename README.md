@@ -1,79 +1,66 @@
 # Glow HD Engine — deterministic sampler + Engine Core rails
 
-The Glow HD Engine is a deterministic Human Design–driven matching and insight engine. After **HDE-EPIC019 (Dissolution Pass 2)** the engine layers now include a deterministic sampler core (HDE-DISS003) and Engine Core (HDE-DISS004) alongside the established compat stack. Public surfaces and dev/admin harnesses share the canonical emitter/serializer, run only under closed rails, and ship governed evidence with path proofs, mirrors, and epic-level manifests/close reports.
+The Glow HD Engine is a deterministic Human Design–driven matching and insight engine. After **HDE-EPIC019 (Dissolution Pass 2)** the stack layers compat, a deterministic sampler core (HDE-DISS003), and Engine Core (HDE-DISS004). Closed-rails public surfaces (Reader v1 + CLI) share the canonical emitter/serializer; dev/admin harnesses mirror those bytes for QA and generate governed evidence with path proofs, mirrors, and epic-level manifests/acceptance maps.
 
-## Quickstart (closed rails)
+## Project overview
 
-All commands assume the pinned environment used by the determinism helper: `LC_ALL=C`, `LANG=C`, `TZ=UTC`, `SAFE_MODE=1`, `ALLOW_NETWORK=0`.
+- Compat endpoints and CLI remain the public Reader v1 surface.
+- Sampler core (HDE-DISS003) provides deterministic pool selection and scoring; Engine Core (HDE-DISS004) provides deterministic compute parity.
+- **HDE-EPIC019** completes Dissolution Pass 2 and includes remedial work for D3 (dev sampler harness + evidence) and D6 (open-rails vendor Live QA harness) while keeping PF-Canon intent for dev/test/local vs prod/other.
+
+## Architecture & components
+
+- **Sampler core module:** deterministic pool + scoring behavior exercised via dev-only CLI (`hdctl dev:sampler`) and `/internal/dev/sampler` HTTP harness. Evidence families cover seed replay, diversity, ABBA, and two-run identity.
+- **Engine Core module:** pure compute surfaces with parity/ABBA/two-run identity coverage under governed evidence families.
+- **Internal/dev HTTP harness:** `/internal/dev/sampler` (APP_ENV=dev) is started by `scripts/dev_start_reader.sh`; used only for QA/admin parity.
+- **Evidence and QA:** Evidence Index (`docs/evidence/INDEX.json`), machine Mirror (`artifacts/evidence_index.jsonl`), path proofs, orientation demo, and acceptance artifacts (EPIC019 acceptance map + manifest roster). Dev sampler Live QA (D3) and D6 open-rails vendor Live QA artifacts are wired into the evidence skeleton under `audit/qa/hde-epic019/`.
+- **Surface separation:** public Reader/CLI endpoints follow PF05; dev/admin harnesses (dev sampler HTTP/CLI, QA harnesses, evidence tools) are restricted to dev/test/local contexts.
+
+## Determinism & rails
+
+- **Closed rails (default for determinism/evidence):** `SAFE_MODE=1`, `ALLOW_NETWORK=0`, `LC_ALL=C`, `LANG=C`, `TZ=UTC` (enforced by `engine.runtime.determinism_env.ensure_determinism_env` and `ci/checks/check_env_pins.sh`). Sampler dev harness (healthcheck + Live QA) and Engine Core evidence run here.
+- **Open rails (D6 vendor Live QA only):** `scripts/qa/d6_live_vendor_qa.py` may set `ALLOW_NETWORK=1` (SAFE_MODE=0 or 1) for governed vendor-facing checks; runs are logged and not part of CI determinism jobs.
+- Rails semantics follow PF titles: “Glow QA Guide” (rails semantics and Live Vendor QA), “HDE-Build Checklist” and “HDE-Mechanics Guide” (determinism posture), and “Glow Infrastructure” (Reader start processes and infra-owned URLs).
+
+## Dev vs public surfaces
+
+- **Public CLI/Reader:** `python -m engine.cli` / `hdctl` (same entrypoint) and Reader v1 endpoints remain the only public API.
+- **Dev Reader helper:** `scripts/dev_start_reader.sh` starts the Reader with APP_ENV gating; used by dev sampler healthcheck and Live QA harnesses.
+- **Infra-owned sampler URL:** `DEV_SAMPLER_URL` (exported by the devcontainer) binds to the dev sampler endpoint for Codespaces/local dev; use the value from the environment rather than hardcoding host/port.
+- **Dev/admin harnesses (dev/test/local only):** `/internal/dev/sampler`, `scripts/qa/dev_sampler_healthcheck.py`, `scripts/qa/dev_sampler_live_qa.py`, and `scripts/qa/d6_live_vendor_qa.py` are QA/admin tools, not public Reader APIs.
+
+## Quickstart
+
+All commands assume closed rails unless noted.
 
 ```bash
 python -m pip install -e .
+
+# Public CLI
 LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 python -m engine.cli --help
 LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 hdctl showcompat --pair-file fixtures/charts/pair.sample.json
 
-# Dev/admin-only sampler harnesses (do not use in production):
+# Dev/admin sampler CLI (closed rails)
 LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev hdctl dev:sampler --viewer viewer-001 --candidates-file path/to/candidates.json --seed seed-1
-LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev PORT=8000 scripts/dev_start_reader.sh  # exposes /internal/dev/sampler
+
+# Start dev Reader harness (APP_ENV=dev; closed rails) via helper
+LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev PORT=8000 scripts/dev_start_reader.sh
+
+# Healthcheck (closed rails) using the infra-owned URL
+LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 \
+APP_ENV=dev DEV_SAMPLER_URL="$DEV_SAMPLER_URL" scripts/qa/dev_sampler_healthcheck.py
 ```
 
-- CLI and module-run are interchangeable (`hdctl …` is exposed via `engine.cli.main:cli`).
-- Evidence runs must use the determinism helper (`engine.runtime.determinism_env.ensure_determinism_env`) which enforces the rails above.
-- Dev/admin sampler flows (CLI + HTTP) are gated to APP_ENV=dev and exist for QA only; production surfaces remain compat Reader v1.
+- `DEV_SAMPLER_URL` comes from the devcontainer/local env; do not embed literal values in docs or scripts.
+- Healthcheck logs live under `notes/dev-sampler/dev_sampler_healthcheck.log`; reader logs for Live QA land under `audit/qa/hde-epic019/dev_sampler_http/reader/`.
+- D3 dev sampler Live QA (`scripts/qa/dev_sampler_live_qa.py`) runs under closed rails across APP_ENV permutations (dev/prod/empty) and records governed outputs under `audit/qa/hde-epic019/dev_sampler_http/`.
+- D6 vendor Live QA (`scripts/qa/d6_live_vendor_qa.py`) is open-rails and logs to `audit/qa/hde-epic019/d6-vendor-live-qa/`; run only in controlled vendor test environments.
 
-## Determinism & evidence posture (EPIC019)
+## Evidence & QA
 
-- **D1 – Canonical JSON:** `engine/serializer/canon.py` emits UTF-8, sorted keys, compact separators, and exactly one trailing LF. AB↔BA runs and two-run identity are required for public bodies, sampler outputs, and Engine Core results.
-- **D2 – Closed rails + env pins:** Determinism helper pins locale/timezone and disables network. The env-pins gate (`ci/checks/check_env_pins.sh`) guards docs/tests for `LC_ALL=C`, `LANG=C`, `TZ=UTC`, `SAFE_MODE=1`, `ALLOW_NETWORK=0`.
-- **D3 – CLI guards:**
-  - `python tools/cli/serializer_grep_guard.py` scans governed CLI paths for forbidden serializers and writes `artifacts/cli/guards/serializer_grep_guard.log`.
-  - `python tools/cli/emitter_symbol_proof.py` proves governed CLI handlers call the canonical emitter and writes `artifacts/cli/guards/emitter_symbol_proof.txt`.
-- **D4 – Evidence skeleton & sanity pipeline:**
-  - Governed artifacts carry `.path_proof.txt` siblings, human index entries (`docs/evidence/INDEX.json`), and machine mirror entries (`artifacts/evidence_index.jsonl`).
-  - Orientation demo: `python tools/evidence/orientation_demo.py` checks mirror self-proof posture.
-  - Sanity pipeline: `python tools/evidence/run_sanity_pipeline.py` performs serializer parity checks, sampler/core harness runs, orientation, and evidence hygiene under closed rails.
-  - Use `python tools/evidence/update_evidence_index.py` to refresh governed evidence indexes; **never edit index, mirror, proofs, manifest, or acceptance maps by hand**.
-- **Sampler evidence (HDE-DISS003):** `python tools/evidence/generate_sampler_evidence.py` exercises sampler core plus dev CLI/HTTP harnesses (seeded runs, diversity checks, ABBA/two-run identity) and writes governed artifacts under `artifacts/sampler/` with schemas in `docs/schemas/sampler/`.
-- **Engine Core evidence (HDE-DISS004):** `python tools/evidence/generate_engine_core_evidence.py` exercises pure-compute core parity (purity, two-run identity, ABBA, JSON compare) with governed outputs under `artifacts/core/` and schemas in `docs/schemas/core/`.
-- **D5 – Governed config artifacts:** Config artifacts (e.g., `config/bands_4B60_v1.json`, `config/toggles_v1.json`) are generated via `python tools/config/generate_config_artifacts.py` and mapped to acceptance tokens in `audit/EPIC-018_config_acceptance_map.json`.
-- **D6 – Typed FE/BE bundles:** `python tools/config/generate_bundles.py` emits typed frontend/backend bundles aligned with governed config and registry, using schemas in `docs/schemas/config_bundle_{fe,be}.json`.
-- **Epic manifests & acceptance maps:** EPIC018 governance remains in `audit/EPIC-018_MANIFEST.json` / `audit/EPIC-018_close_report.md`. EPIC019 adds sampler/core acceptance mapping in `docs/acceptance_map_epic019.json` (with path proof) and closes tokens in `docs/acceptance_maps.json`; see PF20 — Phased Epics for canon context.
+- **Indexes & proofs:** `docs/evidence/INDEX.json` (human), `artifacts/evidence_index.jsonl` (machine Mirror), and `.path_proof.txt` siblings. Update with `python tools/evidence/update_evidence_index.py` and validate with `python tools/evidence/orientation_demo.py`.
+- **Evidence generators:** `python tools/evidence/generate_sampler_evidence.py` (sampler core + dev harness parity) and `python tools/evidence/generate_engine_core_evidence.py` (Engine Core parity). Sanity pipeline (`python tools/evidence/run_sanity_pipeline.py`) runs both under closed rails.
+- **Acceptance artifacts:** EPIC019 acceptance map (`docs/acceptance_map_epic019.json` + path proof) and consolidated acceptance roster (`docs/acceptance_maps.json`) bind tokens to evidence families. D3 (dev sampler Live QA) and D6 (vendor Live QA) evidence families reside under `audit/qa/hde-epic019/` and are mirrored into Index/Mirror.
+- **Config/bundles:** Governed config artifacts and typed FE/BE bundles are generated via `tools/config/generate_config_artifacts.py` and `tools/config/generate_bundles.py` (closed rails); acceptance bindings live in `audit/EPIC-018_config_acceptance_map.json`.
 
-See PF12 — Schemas & Artifacts, PF14 — Mechanics Guide, PF19 — QA Guide, and PF20 — Phased Epics for canonical process details.
-
-## Config & bundles (D5/D6)
-
-- Run `python tools/config/generate_config_artifacts.py` under closed rails to regenerate governed config artifacts; outputs must be indexed and path-proofed by the evidence tools.
-- Run `python tools/config/generate_bundles.py` to produce typed FE/BE bundles that mirror the governed configs and registry. Bundle schemas live in `docs/schemas/` and are referenced by PF14 — Mechanics.
-- The acceptance map `audit/EPIC-018_config_acceptance_map.json` links PF09 tasks to config artifacts and registry tokens; treat it as governed evidence.
-
-## Deterministic CLI & reader surfaces
-
-- Compat CLI: `hdctl showcompat --pair-file <pair.json>` (or `--a-file/--b-file`) emits numeric-free public JSON using the canonical emitter/serializer (AB↔BA identity, LF-terminated).
-- Dev-only sampler CLI: `APP_ENV=dev hdctl dev:sampler --viewer <viewer_id> --candidates-file <candidates.json> [--seed <seed>]` emits deterministic sampler JSON under closed rails for QA only.
-- Reader harness mirrors CLI bytes for the same inputs; APP_ENV gating remains in `engine/http/compat_handler.py`. A dev-only sampler endpoint lives at `/internal/dev/sampler` (APP_ENV=dev) for QA parity with the sampler CLI.
-
-### Dev sampler HTTP harness (dev/admin-only)
-
-- Canonical dev Reader start command: `APP_ENV=dev SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC PORT=8000 scripts/dev_start_reader.sh` (binds to port 8000; uses `python -m adapter.http_reader`).
-- Infra-owned URL binding: `DEV_SAMPLER_URL=http://127.0.0.1:8000/internal/dev/sampler` (exported in `.devcontainer/devcontainer.json`).
-- Healthcheck/diagnostic harness: `scripts/qa/dev_sampler_healthcheck.py` starts the Reader, posts a minimal payload under APP_ENV=dev (expects 200), then records the APP_ENV=prod gate result for follow-up (logs in `notes/dev-sampler/dev_sampler_healthcheck.log`).
-- `hdctl showcompat` accepts `--dump-reader` and `--dump-admin-dir` for QA sidecars; governed evidence follows the PF12 indexing rules.
-
-## Evidence harness workflow
-
-1. Ensure determinism rails are set (`ensure_determinism_env`).
-2. Generate or refresh governed artifacts:
-   - CLI guards (`tools/cli/serializer_grep_guard.py`, `tools/cli/emitter_symbol_proof.py`).
-   - Config/bundle generators (`tools/config/generate_config_artifacts.py`, `tools/config/generate_bundles.py`).
-   - Sampler evidence (`tools/evidence/generate_sampler_evidence.py`) and Engine Core evidence (`tools/evidence/generate_engine_core_evidence.py`).
-3. Update evidence indexes with `tools/evidence/update_evidence_index.py` (human index + machine mirror + path proofs).
-4. Run `tools/evidence/orientation_demo.py` to verify mirror self-proof posture.
-5. Run `tools/evidence/run_sanity_pipeline.py` for serializer parity, sampler/core harness checks, env-pin validation, and sanity log capture.
-6. Confirm manifest/acceptance map references before merging (EPIC-018 manifest, EPIC019 acceptance map, and EPIC-018 close report live under `audit/` and `docs/`).
-
-## Epic acceptance references
-
-- EPIC018: manifest and close report document Calcination Pass 3; read-only governed artifacts under `audit/`.
-- EPIC019: sampler/core acceptance is captured in `docs/acceptance_map_epic019.json` with a path proof and is summarized in `docs/acceptance_maps.json`. Tokens are green with indexed evidence for sampler/core families.
-
-See PF12 — Schemas & Artifacts, PF14 — Mechanics Guide, PF19 — QA Guide, and PF20 — Phased Epics for canonical process details.
+See “HDE-Phased Epics”, “HDE-Build Checklist”, “HDE-Mechanics Guide”, “HDE-Schemas & Artifacts”, “Glow QA Guide”, and “Glow Infrastructure” (titles only) in PF-Canon for authoritative behavior and token semantics.

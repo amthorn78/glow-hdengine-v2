@@ -8,6 +8,8 @@
 - Orientation demo and sanity pipeline: `tools/evidence/orientation_demo.py`, `tools/evidence/run_sanity_pipeline.py` (closed rails enforced by the determinism helper; pipeline runs sampler/core generators).
 - Sampler evidence generator: `tools/evidence/generate_sampler_evidence.py` (dev sampler CLI + HTTP harness runs, seed replay/diversity/ABBA/two-run logs).
 - Engine Core evidence generator: `tools/evidence/generate_engine_core_evidence.py` (purity/ABBA/two-run/JSON compare logs).
+- Dev sampler QA harnesses: `scripts/qa/dev_sampler_healthcheck.py` (closed-rails gating check) and `scripts/qa/dev_sampler_live_qa.py` (closed-rails Live QA across APP_ENV permutations).
+- D6 vendor QA harness: `scripts/qa/d6_live_vendor_qa.py` (open-rails vendor Live QA with governed logs under `audit/qa/hde-epic019/d6-vendor-live-qa/`).
 - Env pins gate: `ci/checks/check_env_pins.sh` validates `LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0` for docs/tests.
 - CLI guard rails: `tools/cli/serializer_grep_guard.py`, `tools/cli/emitter_symbol_proof.py` (outputs under `artifacts/cli/guards/`).
 - Config governance: `tools/config/generate_config_artifacts.py`, `tools/config/generate_bundles.py`, and schemas in `docs/schemas/`.
@@ -16,13 +18,14 @@
 ## Local map
 - **ARCHITECTURE.md** — entrypoints and providers
 - Architecture snapshots: `_arch/<epic_id>_<timestamp>/` (routes/imports/tree)
+- EPIC019 remedial summary: `docs/hde_epic019_remediation.md` (dev Reader helper, DEV_SAMPLER_URL, dev sampler harnesses)
 
 ## Developer quick-links
 - Emitter: `engine/presenter/emitter.py::emit_compact_json`
 - Serializer: `engine/serializer/canon.py::dumps` (UTF-8; sort_keys; one LF)
 - Compat handler: `engine/http/compat_handler.py` (APP_ENV gating)
-- Dev sampler endpoint: `adapter/http_reader.py::/internal/dev/sampler` (APP_ENV=dev)
-- Dev sampler CLI command: `engine/cli/main.py::dev:sampler`
+- Dev sampler endpoint: `adapter/http_reader.py::/internal/dev/sampler` (APP_ENV=dev; helper `scripts/dev_start_reader.sh`)
+- Dev sampler CLI command: `engine/cli/main.py::dev:sampler`; harnesses under `scripts/qa/`
 - Engine Core compute: `engine/core/core.py::compute_core`
 - Determinism helper: `engine/runtime/determinism_env.py`
 
