@@ -171,19 +171,29 @@ def _summarize_response(status: int | None, content_type: str, body: Mapping[str
     }
 
 
-def _run_mode(mode: str, app_env_value: str | None, url: str, host: str, port: int, log_path: Path) -> bool:
+def _run_mode(
+    mode: str,
+    expected_status: int,
+    app_env_value: str | None,
+    url: str,
+    host: str,
+    port: int,
+    log_path: Path,
+) -> bool:
     env = _base_env(app_env_value, port)
     record: Dict[str, object] = {
         "timestamp_utc": _iso_now(),
         "mode": mode,
         "env": _env_snapshot(env),
         "request": _summarize_request(url, PAYLOAD),
+        "expected_status": expected_status,
     }
 
     try:
         proc = _start_reader(app_env_value, host, port)
     except SamplerHarnessError as err:
         record["response"] = {"status": None, "error": str(err)}
+        record["ok"] = False
         _log_record(log_path, record)
         return False
 
@@ -195,8 +205,10 @@ def _run_mode(mode: str, app_env_value: str | None, url: str, host: str, port: i
     finally:
         _stop_reader(proc)
 
+    ok = status == expected_status
+    record["ok"] = ok
     _log_record(log_path, record)
-    return status is not None
+    return ok
 
 
 def main() -> int:
@@ -222,15 +234,23 @@ def main() -> int:
             path.unlink()
 
     modes = [
-        ("dev", "dev"),
-        ("prod", "prod"),
-        ("empty", ""),
-        ("unset", None),
+        ("dev", 200, "dev"),
+        ("prod", 403, "prod"),
+        ("empty", 403, ""),
+        ("unset", 403, None),
     ]
 
     successes = []
-    for mode, app_env_value in modes:
-        ok = _run_mode(mode, app_env_value, dev_sampler_url, host, port, logs[mode])
+    for mode, expected_status, app_env_value in modes:
+        ok = _run_mode(
+            mode,
+            expected_status,
+            app_env_value,
+            dev_sampler_url,
+            host,
+            port,
+            logs[mode],
+        )
         successes.append(ok)
 
     return 0 if all(successes) else 1
