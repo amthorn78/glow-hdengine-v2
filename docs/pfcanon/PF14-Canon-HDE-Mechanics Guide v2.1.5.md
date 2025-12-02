@@ -3,36 +3,37 @@
 ## 0.1 **Header**
 
  **Title:** PF14-Canon-HDE-Mechanics Guide  
- **Version:** v2.0.3  
+ **Version:** v2.1.5  
  **Status:** Canon  
- **Effective date:** 2025-11-29  
- **Last Update Gate:** BN 7.8.9 Drain A20  
+ **Effective date:** 2025-12-02  
+ **Last Update Gate:** BN 7.9.7 Drain A19  
  **Invocation tag:** INV-f2ac55d77ce9aacc
 
 ---
 
-## 0.2 **Purpose — Components & build tasks (mechanics scope)**
+0.2 Purpose — Components & build tasks (mechanics scope)  
+ Mechanics is the **mechanical schematic** for the HD Engine and its tooling. This guide is the single place where we enumerate and describe **every component and build task that must exist in the engine repo** so that the Engine can run, be tested, and be proven for production.
 
-Mechanics wires and proves the HD Engine for production. This guide:
+This guide:
 
-* Describes **components and build tasks** that must exist in the engine repo.
+* Describes components, jobs, tools, and build tasks that must exist in the engine repo (including adapters, CLI, evidence tools, QA harnesses, and sanity/rails checks). This includes operational and infrastructure components as well as software.
 
-* Specifies **mechanical responsibilities only** (what must be wired and proven).
+* Specifies **mechanical responsibilities only**: what must be wired, what artifacts must be produced, and what evidence must be captured and checked.
 
-* Does **not** restate math formulas or public transport bytes, which live in their single-home PF documents.
+* Does **not** restate math formulas or public transport bytes; those live in their single-home PF documents and are referenced here by title only. When a mechanic depends on math or transport, this guide names the component and its responsibilities and routes the details to the owning PF doc.
 
-**Public posture (Reader v1).**  
- Reader v1’s public surface is:
+Public posture (Reader v1).  
+ For Reader v1, this guide assumes and enforces:
 
-* Bands-only, numeric-free.
+* Bands-only, numeric-free public payloads (numbers remain admin-only).
 
 * Resonance posture: SR-only (α \= 1.0).
 
-* Hysteresis \= 1 is armed for future XR but **not exposed** in this version.
+* Hysteresis \= 1 is armed for future XR but not exposed in this version.
 
-**Routing rules.**
+Routing rules.
 
-* Cross-references in this guide are **titles-only** (no version numbers).
+* Cross-references in this guide are **titles-only** (no version numbers in prose).
 
 * Single homes (route by title; do not duplicate):
 
@@ -40,82 +41,83 @@ Mechanics wires and proves the HD Engine for production. This guide:
 
   * Math & algorithms: **HDE-Math-Spec**
 
-  * Schemas, pack/manifest, canonical JSON, Evidence Index & Machine Mirror: **HDE-Schemas & Artifacts**
+  * Schemas, packs/manifests, canonical JSON, Evidence Index & Machine Mirror: **HDE-Schemas & Artifacts**
 
   * Governance, acceptance gates, A7/ops posture: **HDE-Governance**
 
-**References (titles-only).**
+References (titles-only).  
+ This guide assumes, and routes mechanical responsibilities to, the following PF documents:
 
-This guide assumes and routes to the following PF documents:
+* **HDE-Governance**
 
-* HDE-Governance
+* **HDE-CLI-API-Vendor-Ref**
 
-* HDE-CLI-API-Vendor-Ref
+* **HDE-Math-Spec**
 
-* HDE-Math-Spec
+* **HDE Architecture**
 
-* HDE Architecture
+* **Glow Development Philosophy**
 
-* Glow Development Philosophy
+* **HD Engine Epics Map** (historical; epic planning now lives in **HDE-Phased Epics** by title)
 
-* HD Engine Epics Map
+* **Glow HD Engine — Build Notes & Integration Addenda (Living)**
 
-* Glow HD Engine — Build Notes & Integration Addenda (Living)
-
-**Provenance & deltas (informative).**  
- Mechanics here have been canonicalized from the REVIEW addenda and aligned with **Glow HD Engine — Build Notes & Integration Addenda (Living)**. In particular, this guide:
+Provenance & deltas (informative).  
+ Mechanics here have been canonicalized from REVIEW addenda and aligned with **Glow HD Engine — Build Notes & Integration Addenda (Living)**. In particular, this guide:
 
 * Rolled in previously optional items (Server Cache; Reader conditional-GET helper).
 
 * Locked the A7 transport posture.
 
-* Added the `/internal/version` ops posture (no-store, no ETag, conditionals ignored; HEAD 200 with Content-Type parity).
+* Added the `/internal/version` ops posture (no-store, no ETag, conditionals ignored; HEAD 200 with `Content-Type` parity).
 
 * Clarified optional `build_commit`.
 
 * Expanded Evidence Index captures to require same-PR updates, Machine Mirror parity, and path-proofs.
 
-## ---
+This document should be read as the **full mechanical schematic** of the HD Engine and its repo: if a component, job, harness, or governed artifact must be built and kept working, it is accounted for here and wired by reference to its canonical PF homes.
 
-## 0.3 **Preamble — Product scope**
+---
 
-**Viewer inputs & presets.**  
+0.3 Preamble — Product scope
+
+Viewer inputs & presets.  
  Viewer presets are optional templates. Each viewer:
 
-* Selects a **top category** from the closed Magic-10 set.
+* Selects a top category from the closed Magic-10 set.
 
-* Sets weights in the range 0..100 across the ten Magic-10 IDs (closed set and order; see **HDE-Schemas & Artifacts §2.6** / **HDE-Math-Spec §5.1** by title).
+* Sets weights in the range `0..100` across the ten Magic-10 IDs (closed set and order; see **HDE-Schemas & Artifacts** §2.6 and **HDE-Math-Spec** §5.1 by title).
 
-Zero-weight rule: if a viewer sets a category’s weight to 0, candidates whose **\#1 category** is that category are excluded.
+* Zero-weight rule: if a viewer sets a category’s weight to `0`, candidates whose \#1 category is that category are excluded.
 
-**Engine outputs (internal/admin).**  
+Engine outputs (internal/admin).  
  Internally, the engine:
 
-* Computes per-category numbers in 0..100.
+* Computes per-category numbers in `0..100`.
 
-* Maps those numbers to bands (Cool, Open, Warm, Glow) using inclusive-high thresholds and `round_half_up` (see **HDE-Math-Spec §5.3** by title).
+* Maps those numbers to bands (Cool, Open, Warm, Glow) using inclusive-high thresholds and `round_half_up` (see **HDE-Math-Spec** §5.3 by title).
 
-* Selects **two narrative keys per category** (personal, shared).
+* Selects two narrative keys per category (personal, shared).
 
-The engine **selects keys**; it does not write copy. Resonance posture for v1 is SR-only (α \= 1.0); XR is dormant and not part of public output.
+The engine selects keys; it does not write copy. Resonance posture for v1 is SR-only (α \= 1.0); XR is dormant and not part of public output.
 
-**Public covenant (titles-only).**
+Public covenant (titles-only).
 
 * Public Reader payloads are bands-only and numeric-free; underlying numbers remain admin-only.
 
 * Public bytes & schemas live in **HDE-CLI-API-Vendor-Ref** by title.
 
-* Canonical JSON is required end-to-end:
+Canonical JSON is required end-to-end:
 
-  * UTF-8, no BOM
+* UTF-8, no BOM
 
-  * ASCII-sorted keys
+* ASCII-sorted keys
 
-  * Compact separators
+* Compact separators
 
-  * Exactly one trailing LF
+* Exactly one trailing LF
 
-  * Arrays used as sets are deduped & ASCII-sorted
+* Arrays used as sets are deduped and ASCII-sorted
 
 Determinism posture:
 
@@ -125,7 +127,7 @@ Determinism posture:
 
 * Reader↔CLI parity is required wherever both surfaces exist.
 
-Math, transport, and ops details are routed to their single homes by title; this guide records the mechanics expectations at the component level and does not duplicate contracts or formulas.
+Math, transport, and ops details are routed to their single homes by title; this guide records the **mechanics expectations at the component level** (what must exist, how it plugs together, and what it must emit) and does not duplicate contracts or formulas.
 
 ## 0.4 HD Engine — the plain story
 
@@ -288,7 +290,7 @@ Mechanics **MUST NOT** hand-edit governed evidence artifacts (ordering artifacts
 ### **1.3.2 Evidence change workflow**
 
 **Scope (normative).**  
- Any PR that changes **governed artifacts** under `artifacts/**`, `docs/evidence/**`, or `audit/**` **MUST** follow the evidence change workflow. Governed artifacts include, at minimum, the ordering artifacts under `artifacts/engine/order/**`, the Evidence Index and Machine Mirror, topology orientation demo, and all `*.path_proof.txt` listed in this guide and in §37 Documentation Artifacts and Registry.
+ Any PR that changes **governed artifacts** under `artifacts/**`, `docs/evidence/**`, or `audit/**` **MUST** follow the evidence change workflow. Governed artifacts include, at minimum, the ordering artifacts under `artifacts/engine/order/**`, the Evidence Index and Machine Mirror, topology orientation demo, sampler evidence families under `artifacts/sampler/**`, Engine Core evidence families under `artifacts/core/**`, their schemas under `docs/schemas/**`, and all `*.path_proof.txt` listed in this guide and in §37 Documentation Artifacts and Registry.
 
 **Workflow (minimum sequence).**
 
@@ -296,19 +298,35 @@ For PRs that touch governed evidence:
 
 1. **Ordering artifacts (when in scope).**
 
-   * Run `python tools/order/generate_ordering_artifacts.py` and its `--check` mode whenever ordering artifacts are in scope for the change.
+   * Run the ordering generator and its `--check` mode whenever ordering artifacts are in scope for the change.
 
    * Verify two-run identity for ordering artifacts under determinism pins (`LC_ALL=C`, `LANG=C`, `TZ=UTC`).
 
-2. **Evidence Index and mirror.**
+2. **Sampler and Engine Core evidence (when in scope).**
 
-   * Run `python tools/evidence/update_evidence_index.py --check` to regenerate `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl`, and governed `*.path_proof.txt` from a single source of truth.
+   * When sampler evidence families (`artifacts/sampler/**`) and their schemas (`docs/schemas/sampler/**`) are in scope, run the sampler evidence generator under closed rails to refresh those artifacts and their schema files. Tools **MUST** call the sampler core in pure-compute mode and **MUST NOT** hand-edit sampler evidence or schemas.
 
-3. **Topology orientation demo.**
+   * When Engine Core evidence families are in scope, run `python tools/evidence/generate_engine_core_evidence.py` under closed rails to regenerate Engine Core evidence artifacts and their schemas (for example, purity, two-run identity, AB↔BA parity, and JSON-compare logs under `artifacts/core/**` with matching schemas under `docs/schemas/core/**`). Tools **MUST NOT** hand-edit Engine Core evidence artifacts or schemas.
+
+   * After sampler and Engine Core evidence artifacts have been refreshed, `python tools/evidence/update_evidence_index.py --check` (see step 3 below) **MUST** be used to regenerate the Human Index, Machine Mirror, and path-proofs so that `produced_at_utc` in mirror records and path-proofs reflects the actual refresh time for both sampler and Engine Core evidence and is consistent across artifact payload, mirror record, and proof transcript.
+
+3. **Evidence Index and mirror.**
+
+   * Run `python tools/evidence/update_evidence_index.py --check` to regenerate:
+
+     * `docs/evidence/INDEX.json` (Human Index, titles/paths only),
+
+     * `docs/evidence/INDEX.sha256` (hash sentinel),
+
+     * `artifacts/evidence_index.jsonl` (Machine Mirror), and
+
+     * governed `*.path_proof.txt` from a single source of truth.
+
+4. **Topology orientation demo.**
 
    * Run `python tools/evidence/orientation_demo.py --check` to validate that the on-disk orientation report (`audit/gates/topology/orientation_demo.txt`) is coherent with the current Index/Mirror state and not stale.
 
-4. **Mirror schema and path-proofs.**
+5. **Mirror schema and path-proofs.**
 
    * Run `ci/checks/check_mirror_schema.sh` to enforce:
 
@@ -316,25 +334,29 @@ For PRs that touch governed evidence:
 
      * uniqueness of `(artifact_key, discovered_physical_path)`, and
 
-     * correctness of `proof_anchor` and `.path_proof.txt` contents for all governed artifacts.
+     * correctness of `proof_anchor` and `.path_proof.txt` contents for all governed artifacts, including sampler and Engine Core families and their schemas.
 
-5. **Evidence ledger.**
+6. **Evidence ledger.**
 
    * Record an evidence addendum in **Glow HD Engine — Build Notes & Integration Addenda (Living)** for the PR, describing new or changed governed artifacts and the evidence tools that produced them.
 
 **Determinism & rails.**  
  The evidence change workflow **MUST** run under rails-closed, determinism-pinned CI environments (`SAFE_MODE=1`, `ALLOW_NETWORK=0`, `LC_ALL=C`, `LANG=C`, `TZ=UTC`), consistent with the rails posture described in §1.2 and the Evidence Index tokens in §1.3.
 
-This workflow makes the Evidence Index, Machine Mirror, ordering artifacts, and path-proofs move in **lockstep** and ensures that drift is caught early by CI, rather than after the fact.
+The release sanity pipeline harness (for example, `python tools/evidence/run_sanity_pipeline.py`) is treated as the scripted implementation of this workflow for sampler and Engine Core evidence under closed rails. It **MUST** call the sampler evidence generator and `tools/evidence/generate_engine_core_evidence.py` under the same determinism pins before refreshing the Evidence Index and Machine Mirror, so that the sanity pipeline log reflects the full suite of determinism and evidence checks for both sampler and Engine Core.
+
+The determinism env-pins gate (`ci/checks/check_env_pins.sh`) **MUST** be wired to the same closed-rails suite set. It runs the expanded determinism and evidence checks (including sampler and Engine Core suites) and verifies that the env-pins log remains in sync with the on-disk evidence skeleton; the sanity pipeline log and env-pins log are treated as governed artifacts whose path-proofs and Machine Mirror records **MUST** track their canonical bytes over time.
+
+This workflow makes the Evidence Index, Machine Mirror, ordering artifacts, sampler evidence, Engine Core evidence, and path-proofs move in **lockstep** and ensures that drift is caught early by CI, rather than after the fact.
 
 **`mtime_utc` semantics (routing only).**  
  Evidence jobs that write or validate governed `*.path_proof.txt` **MUST** treat `mtime_utc` and `produced_at_utc` according to the canonical semantics defined in **HDE-Schemas & Artifacts** (Machine Evidence Mirror / path-proof schema) and **Glow QA Guide** (evidence CI rails and `mtime_utc` checks), summarised as:
 
 * `mtime_utc` is the **refresh-time mtime** for the artifact: a UTC ISO-8601 timestamp truncated to seconds, with **microsecond \== 0**, captured when the evidence job refreshes that artifact. It is **not required** to remain equal to future `stat().st_mtime` values across clones, but CI checks MUST enforce that `parsed_mtime <= current_fs_mtime` at check time (monotone semantics).
 
-* `produced_at_utc` is the **logical evidence refresh time** for the artifact (when the evidence job was run), also in UTC ISO-8601 form.
+* `produced_at_utc` is the **logical evidence refresh time** for the artifact (when the evidence job was run), also in UTC ISO-8601 form. For governed families such as sampler and Engine Core evidence, the artifact payload, mirror record, and path-proof transcript for a given artifact **MUST** agree on `produced_at_utc` for a given refresh; backdating or leaving mirror/proof `produced_at_utc` stale relative to the artifact’s refresh time is out of policy.
 
-Mechanics does **not** redefine these semantics here; it routes to PF-Canon-HDE-Schemas & Artifacts and the Glow QA Guide by title. The evidence change workflow in this section **assumes** that `tools/evidence/update_evidence_index.py`, `ci/checks/check_mirror_schema.sh`, and the evidence tests are wired to these `mtime_utc` rules and that any governed path-proofs they emit or validate satisfy the schema and monotone constraints pinned in those PF documents.
+Mechanics does **not** redefine these semantics here; it routes to HDE-Schemas & Artifacts and the Glow QA Guide by title. The evidence change workflow in this section **assumes** that `tools/evidence/update_evidence_index.py`, `tools/evidence/generate_engine_core_evidence.py`, `ci/checks/check_mirror_schema.sh`, sampler and Engine Core evidence generators, the sanity pipeline harness, the env-pins check, and the evidence tests are wired to these `mtime_utc` and `produced_at_utc` rules and that any governed path-proofs they emit or validate satisfy the schema and monotone constraints pinned in those PF documents.
 
 ---
 
@@ -353,7 +375,128 @@ Mechanics does **not** redefine these semantics here; it routes to PF-Canon-HDE-
 * **Ops start-command:** `SERVICE_START_CMD_CAPTURED_OK`, `GUNICORN_APP_FACTORY_OK`, `ENV_PORT_REQUIRED_OK`  
 * 
 
-  # 2\) Canonical Enumerations Registry
+## **1.6 QA tooling bootstrap & Live QA harness (mechanics)**
+
+**Scope (normative).**  
+ Mechanics requires a set of **QA tooling components** that support both CI and Live QA without relying on hand-edited commands or ad-hoc shells. This section defines the mechanical responsibilities for:
+
+* a **QA tooling bootstrap harness** that verifies the basic test/tooling environment, and
+
+* a **Live QA harness** that runs CLI/tests for QA, classifies failures as **tooling** vs **behavior**, and writes structured QA logs (including empties, exit codes, and stderr) under governed audit locations.
+
+QA plans, acceptance tokens, and epic-specific QA steps remain single-homed in **Glow QA Guide**, **HDE-Build Checklist**, **HDE Phased Epics**, and **Glow Infrastructure** by title; this section records the components that must exist in the repo.
+
+### **1.6.1 QA tooling bootstrap harness (PRE-step component)**
+
+**Purpose (normative).**  
+ Provide a single, scriptable **bootstrap step** that verifies the test tooling environment before any QA plan or Live QA flow runs tests or CLI commands against the Engine.
+
+**Behavior (minimum).**
+
+The QA tooling bootstrap harness **MUST**:
+
+* **Activate the project environment.**
+
+  * Activate the project’s Python environment (for example, via a venv or equivalent). Mechanics does not pin the exact activation command; it requires that the harness run under the same Python interpreter and environment that the Engine uses for tests and CLI tools.
+
+* **Verify pytest availability via the Python interpreter.**
+
+  * Run `python -m pytest --version` under the activated environment.
+
+  * Treat any non-zero exit or import failure as a **tooling failure**, not a test failure. The harness **MUST NOT** proceed to project tests when this check fails.
+
+* **Verify primary CLI/tool dependencies.**
+
+  * Run `command -v hdctl` and `command -v jq` (or equivalent checks for the canonical CLI binary and JSON tool) and require **success** for each.
+
+  * Treat missing CLI or missing `jq` as a **tooling failure**.
+
+* **Write a QA tooling bootstrap log.**
+
+  * Emit a structured log under an `audit/qa/**` prefix that records, at minimum:
+
+    * the commands executed (`python -m pytest --version`, `command -v hdctl`, `command -v jq`),
+
+    * their exit codes, and
+
+    * a top-level classification field (for example, `tooling_failure: true/false` or an equivalent status enum).
+
+  * When any bootstrap check fails, the log **MUST** mark the run as a **tooling failure** and identify which check failed; QA plans and tokens may then treat this as a **tooling/infra blocker**, not as an epic behavior failure.
+
+Mechanics does **not** pin the exact file name or JSON schema for the bootstrap log; those live in **Glow QA Guide** and **HDE-Schemas & Artifacts** by title. It requires that such a log exist under governed audit paths and that it clearly distinguishes tooling failures from behavior failures for any QA session that uses the Engine.
+
+**Preferred pytest invocation (Codespaces and similar dev environments).**
+
+In environments like shared dev containers or Codespaces, Mechanics requires:
+
+* Normative tests and QA flows **MUST** invoke pytest as `python -m pytest …`, using the same Python interpreter that runs the Engine.
+
+* QA plans and CI jobs **SHOULD** standardize on `python -m pytest` for all test steps rather than calling `pytest` via a venv shim, to avoid “broken shim” failures where `.venv/bin/pytest` exists but is not executable.
+
+* Any failure of `python -m pytest --version` in the bootstrap harness **MUST** be recorded and classified as a tooling failure in the bootstrap log; epic acceptance and behavior tokens **MUST NOT** be marked failed solely because pytest is missing or misconfigured.
+
+### **1.6.2 Live QA harness (commands, classification, and logs)**
+
+**Purpose (normative).**  
+ Provide a reusable **Live QA harness** that runs CLI and other Engine-facing commands for QA (including PO-run Live QA sessions) in a way that is deterministic, copy/paste-ready, and distinguishable between tooling failures and behavior failures.
+
+**Behavior (minimum).**
+
+The Live QA harness **MUST**:
+
+* **Depend on a successful bootstrap.**
+
+  * Check the QA tooling bootstrap harness result before executing Engine tests or CLI commands.
+
+  * If the most recent bootstrap log reports a tooling failure, the Live QA harness **MUST NOT** proceed to run tests or Engine commands and **MUST** surface that condition as a tooling problem (for example, via a `tooling_failure: true` or equivalent marker in its own logs).
+
+* **Provide copy/paste-ready commands (no hand-editing).**
+
+  * All PO-facing QA commands exposed by the harness **MUST** be fully concrete and copy/paste-ready (no `<PO: ...>` placeholders).
+
+  * When commands require values that are present in tests or configs (for example, fixed VIEWER\_IDs, seeds, or candidate payloads), the harness **MUST** discover or construct those values programmatically by mirroring test semantics (for example, calling the same helpers that write candidate payloads) instead of asking the PO to hand-edit commands.
+
+* **Reuse test semantics directly instead of scraping.**
+
+  * When tests construct data dynamically (for example, writing candidates to a temporary file and passing that path into a CLI command), the Live QA harness **MUST** mirror the same construction logic directly (for example, by writing the same payload under an `audit/qa/**` path) rather than attempting to scrape arguments out of test source files.
+
+  * For CLI QA flows, this means the harness should call the same underlying functions or fixtures that tests use to prepare inputs, so that QA inputs are deterministic and aligned with test coverage.
+
+* **Capture exit codes, sizes, and stderr for QA artifacts.**
+
+  * For each QA artifact that is expected to be non-empty (for example, JSON outputs, sorted candidate listings, or other CLI outputs under `audit/qa/**`), the harness **MUST**:
+
+    * record the generating command and its exit code,
+
+    * record the artifact’s size (for example, via `wc -c` or an equivalent size measurement), and
+
+    * capture any stderr emitted by the command in a corresponding QA log entry.
+
+  * If such an artifact is zero bytes, the harness **MUST** treat this as a **failure signal** (tooling or behavior) and record it explicitly; an empty artifact **MUST NOT** be left ambiguous.
+
+* **Classify failures as tooling vs behavior.**
+
+  * For each QA run, the Live QA harness **MUST** classify the outcome as either:
+
+    * a **tooling failure** (for example, missing pytest, broken CLI entrypoint, environment not bootstrapped), or
+
+    * a **behavior failure** (tests assertions failing, CLI returning incorrect JSON or exit codes).
+
+  * This classification **MUST** be visible in the QA logs written under `audit/qa/**` (for example, through a `status` field or `tooling_failure: true/false`), so that Governance/QA documents and tokens can distinguish infra/tooling problems from Engine behavior problems.
+
+Mechanics does **not** define the token names or acceptance rules associated with these logs; those remain single-homed in **Glow QA Guide**, **HDE-Build Checklist**, **HDE Phased Epics**, and **Glow Infrastructure** by title. This section requires that the QA bootstrap harness and Live QA harness exist as concrete components, that they enforce the behaviors listed above, and that their logs live under governed audit locations and are suitable for use by those documents.
+
+**Routing (titles-only).**
+
+* **QA plans, acceptance tokens, and epic-specific QA steps:** **Glow QA Guide**, **HDE-Build Checklist**, **HDE Phased Epics**.
+
+* **Environment and Codespaces posture:** **Glow Infrastructure** and **GitHub Codespaces in a QA Workflow**.
+
+* **Schemas and canonical JSON rules for QA logs (when governed):** **HDE-Schemas & Artifacts**.
+
+Mechanics records the existence and behavior of the QA tooling bootstrap and Live QA harness here so that they are treated as first-class components of the HD Engine’s tooling skeleton, on par with the sanity pipeline, env-pins checks, and evidence tools.
+
+# 2\) Canonical Enumerations Registry
 
 **Purpose.** Wire and prove the frozen domain registries (centers, gates, channels, categories) used by the engine. Mechanics validates and snapshots the domains; **HDE-Schemas and Artifacts** is the single home for authoritative catalogs and schemas. Developer notes in this repo are informative only (never authoritative).
 
@@ -852,10 +995,172 @@ List by **title/path** in **Appendix D: Evidence Index** and mirror **1:1** in `
 
 * Frozen Magic-10 order & IDs: **HDE-Schemas and Artifacts §2.6**, **HDE-Math-Spec §5.1**.  
 * Canonical JSON rules & fingerprint shape: **HDE-Schemas and Artifacts §4**, **HDE-Math-Spec Appendix E**.  
-* Governance tokens roster: **HDE-Governance §2.0 Acceptance Tokens**.  
-  ---
+* Governance tokens roster: **HDE-Governance §2.0 Acceptance Tokens**.
 
-  # 6\) Deterministic Engine Core \[Required-Now\]
+  ## **5.8 Dev sampler HTTP harness (internal/dev-only)**
+
+**Purpose.**  
+ Provide a dev/admin-only HTTP harness for the sampler core that mirrors the dev sampler CLI semantics while remaining a strictly internal surface. This harness is for local and dev/admin use; it is not part of the public API, is not listed in the Endpoint Catalog, and is not an A7 proof surface.
+
+**Route and method.**
+
+* Route: POST /internal/dev/sampler
+
+* Method posture: POST only; non-conditional (no conditional headers are honored, and the route never returns 304).
+
+* Transport posture: emitted via the same canonical serializer used elsewhere in this document (UTF-8, no BOM, ASCII-sorted keys, compact, exactly one trailing LF; arrays-as-sets deduped and ASCII-sorted). Cache-control and error envelopes follow the writer/error posture defined elsewhere in this document (no-store, no ETag for errors).
+
+**Environment gating (dev/admin only).**
+
+The dev sampler HTTP harness is enabled only when APP\_ENV is explicitly one of:
+
+* dev
+
+* test
+
+* local
+
+Mechanics requires that:
+
+* When APP\_ENV is any other value (including prod), or when APP\_ENV is missing or empty, POST /internal/dev/sampler returns a writer-style 403 forbidden response with the standard typed error envelope for refusal (numeric-free, canonical JSON), and does not call the sampler core.
+
+* When APP\_ENV is allowed, the handler may proceed to parse the request body and invoke the sampler core as described below.
+
+Detailed auth and env policy (including any additional guards applied to internal/dev routes) remain single-homed in HDE-Governance and Glow Infrastructure; this section records only that APP\_ENV gating is required and that prod/misconfigured environments must be refused.
+
+**Request body (dev/admin only).**
+
+The handler accepts a single JSON object body with these fields:
+
+* viewer\_id — required non-empty string identifying the viewer in this dev/admin context.
+
+* candidate\_ids — required non-empty array of non-empty string identifiers for the candidates to be ranked.
+
+* seed — optional value used only as metadata for this dev harness; it does not alter eligibility or ordering.
+
+Mechanics requires strict schema behavior:
+
+* Missing or malformed viewer\_id, an empty candidate\_ids array, non-string candidate ids, or unknown extra top-level keys must be rejected with a 422 invalid\_input error using the standard error envelope and writer transport posture.
+
+* No other fields are accepted on this route.
+
+The intent is to drive the sampler core with IDs and fixed placeholder feature values for dev/admin inspection; this harness does not expose compat scores, bands, or any other internal numeric state.
+
+**Behavior and payload.**
+
+When APP\_ENV is allowed and the request body is valid, the handler:
+
+* Builds in-memory sampler inputs (for example, a viewer profile and candidate feature records) from viewer\_id and candidate\_ids, using fixed safe placeholders for any features not specified by PF-Canon.
+
+* Invokes the existing sampler core (for example, sample\_and\_rank) without changing its eligibility or ordering rules.
+
+* Constructs a response payload with exactly these top-level keys:
+
+  * viewer\_id — echo of the viewer\_id from the request.
+
+  * meta — an object that, at minimum, includes:
+
+    * seed — the provided seed value rendered as a string if present, or null if no seed was supplied.
+
+  * candidate\_ids — an array of candidate ids in the ranked order returned by the sampler core.
+
+Mechanics requires that:
+
+* For a fixed viewer\_id, candidate\_ids set, and seed, repeated calls under the same environment produce byte-identical response bodies (two-run identity).
+
+* For a fixed viewer\_id and candidate\_ids but different seeds, candidate\_ids remain identical; only meta.seed differs between responses.
+
+* The response body is canonical JSON (UTF-8, ASCII-sorted keys, compact, one LF; arrays-as-sets deduped and ASCII-sorted).
+
+**Dev harness start commands, base URLs, and responsibilities (dev/admin-only).**
+
+For `/internal/dev/sampler` and any other internal/dev HTTP harness that is intended for QA or evidence flows and is not part of the public API, Mechanics requires a clear split of responsibilities between infra/ops and QA/PO, and concrete wiring for start commands and URLs.
+
+**Infra-owned dev start commands (per environment).**
+
+* For each environment where `/internal/dev/sampler` is intended to be used (at minimum: local dev and Codespaces), infra/ops **MUST** define and maintain a canonical dev Reader start command or service definition that:
+
+  * starts the Reader process with APP\_ENV set to an allowed value for this harness (dev/test/local per §5.8), and
+
+  * binds to a deterministic host and port for that environment (for example, `127.0.0.1:<port>` or the platform-assigned `$PORT`), consistent with the runtime posture in §32.
+
+* This start command or service definition **MUST** be treated as infra-owned configuration:
+
+  * PO and QA agents **MUST NOT** guess the dev harness start command, choose a port on their own, or “invent” a Reader process wiring for QA.
+
+  * Changes to the start command, binding host, or port are infra changes and must be reflected in the same places that document other runtime wiring (Infrastructure docs by title).
+
+The example runner shown elsewhere in this guide (for example, a local `python -m adapter.http_reader --bind 127.0.0.1:5000` command) is illustrative only; the normative requirement is that there is at least one **infra-owned** dev start command for each environment where this harness is intended to run.
+
+**Base URLs and DEV\_SAMPLER\_URL (env wiring).**
+
+* Infra/ops **MUST** derive and publish, for each such environment, a concrete base URL for the dev Reader process (for example, `http://127.0.0.1:<port>` in local dev or the appropriate forwarded port in Codespaces), and from that base URL define a concrete sampler harness URL:
+
+  * `DEV_SAMPLER_URL = <base_url>/internal/dev/sampler`
+
+* `DEV_SAMPLER_URL` **MUST** be treated as an infra-owned configuration value:
+
+  * QA plans and doc agents **MUST** consume `DEV_SAMPLER_URL` (or an equivalent infra-exposed value) as an input and **MUST NOT** guess hostnames, ports, or full URLs for `/internal/dev/sampler`.
+
+  * Any change to the underlying dev Reader binding (host/port) **MUST** be reflected by infra in the published `DEV_SAMPLER_URL` value; QA and docs do not hard-code ports or recompute URLs independently.
+
+Mechanics does not pin where `DEV_SAMPLER_URL` is stored (for example, env var, config file, or Codespaces devcontainer config), only that it exists as a single infra-owned binding for `/internal/dev/sampler` per environment and that QA/PO treat it as the authority for that harness URL.
+
+**Infra validation of dev harness URLs (pre-QA).**
+
+Before handing any `DEV_SAMPLER_URL` to QA or using it in QA plans, infra/ops **MUST** validate the dev sampler HTTP harness locally:
+
+* Run the infra-owned dev Reader start command with APP\_ENV=dev (and, where feasible, the determinism pins used elsewhere in this guide: `SAFE_MODE=1`, `ALLOW_NETWORK=0`, `LC_ALL=C`, `LANG=C`, `TZ=UTC`).
+
+* Issue at least one simple HTTP/1.1 POST to `DEV_SAMPLER_URL` with:
+
+  * `Content-Type: application/json; charset=utf-8`, and
+
+  * a minimal, schema-valid request body consistent with §5.8 (for example, a non-empty `viewer_id` and a non-empty array of string `candidate_ids`, with or without `seed`).
+
+* Confirm that the response:
+
+  * uses canonical JSON output and the canonical serializer posture defined elsewhere in this guide (UTF-8, no BOM; ASCII-sorted keys; compact; exactly one trailing LF; arrays-as-sets deduped and ASCII-sorted),
+
+  * matches the request/response shape for `/internal/dev/sampler` described in §5.8 (top-level keys, types, and determinism requirements), and
+
+  * carries headers consistent with internal/dev writer posture (for this dev harness: JSON `Content-Type`, `Cache-Control: no-store` for errors, no ETag).
+
+If this validation fails, infra **MUST** treat the issue as an infra/tooling misconfiguration, not as an Engine/sampler behavior failure, and correct the wiring before any QA plan or doc step refers to `DEV_SAMPLER_URL`.
+
+**Responsibility split (normative).**
+
+* **Infra/ops agents** are responsible for:
+
+  * defining and maintaining the dev Reader start commands for internal/dev harnesses (including `/internal/dev/sampler`) per environment,
+
+  * choosing and wiring the base URL and port for the dev Reader process,
+
+  * defining and updating `DEV_SAMPLER_URL` (and any similar dev harness URLs) to reflect actual Reader wiring, and
+
+  * validating those URLs via local HTTP/1.1 JSON POSTs under the appropriate rails before they are handed to QA or docs.
+
+* **PO and QA agents** are responsible for:
+
+  * consuming `DEV_SAMPLER_URL` (and similar infra-defined URLs) as inputs in QA plans, scripts, and documentation steps, and
+
+  * treating failures to reach or use `DEV_SAMPLER_URL` as **tooling/infra issues** to be escalated, not as sampler/core bugs, unless the infra validation above has already passed and QA has concrete behavior evidence.
+
+Mechanics records these responsibilities so the dev sampler HTTP harness and any similar internal/dev harnesses are fully accounted for in the mechanical schematic: the harness route and behavior in §5.8, the dev Reader process and ports via infra-owned start commands, and the dev URLs (`DEV_SAMPLER_URL` and equivalents) wired and validated before QA exercises them.
+
+**A7 and Endpoint Catalog posture.**
+
+* POST /internal/dev/sampler is an internal/dev surface and is explicitly **not** a JSON success route in the Endpoint Catalog.
+
+* No A7 proofs are run against this route, and it must not be referenced in the Catalog or any A7 composite proofs.
+
+* Any headers-only captures for this route are local/dev diagnostics only and do not contribute to A7 acceptance tokens.
+
+The CLI dev sampler remains the primary sampler harness; this HTTP dev harness is a convenience wrapper around the same sampler core for dev/admin workflows, subject to the same canonical JSON and determinism constraints.
+
+---
+
+# 6\) Deterministic Engine Core \[Required-Now\]
 
 **Contract.** The Engine Core is **pure compute** (ops, scoring, aggregation). It performs **no I/O**, uses **no clocks**, reads **no globals/env**, and does **not** depend on system locale. All behavior is driven by **explicit inputs** and **frozen pack/preset constants** (titles-only to **PF-Canon-HDE-Schemas & Artifacts** / **PF-Canon-HDE-Math-Spec**).
 
@@ -904,6 +1209,73 @@ List by **title/path** in **Appendix D: Evidence Index** and mirror **1:1** in `
 * Numeric rules & public rounding/banding: **PF-Canon-HDE-Math-Spec**.  
 * Canonical JSON & pack/manifest: **PF-Canon-HDE-Schemas & Artifacts**.  
 * Governance tokens: **PF-04 — §2.0 Acceptance Tokens**.
+
+## 6.7 Canonical Engine Core module and tests
+
+**Scope (normative).**  
+ The Dissolution engine work for tasks `HDE-DISS004.1–.3` realizes the Deterministic Engine Core described in this section as a **pure-compute module** under the `engine.core` package. Mechanics records the canonical implementation and test harness here so that future changes stay aligned with §6.1–§6.6.
+
+**Canonical module and entrypoint.**
+
+* The Engine Core module lives at `engine/core/core.py` and exports frozen dataclasses and helpers that implement the pure-compute contract in §6:
+
+  * `ParticipantState` — frozen dataclass capturing the normalized state per party (for example, person identifier, compat score, band, and an immutable traits tuple).
+
+  * `CoreConfig` — frozen dataclass carrying Engine Core configuration, including `band_priority`, which defaults to the canonical band ordering (for example, the `BANDS` tuple from compat thresholds).
+
+  * `PerspectiveBreakdown` — frozen dataclass capturing perspective-specific metrics for one party (for example, party-local score, delta, and any supporting breakdowns).
+
+  * `CoreResult` — frozen dataclass aggregating neutral metrics, ordered identifiers and bands, perspective breakdowns for both parties, and any shared-traits summary.
+
+* The canonical Engine Core entrypoint is `engine.core.core.compute_core`. Mechanics and tests **MUST** treat this symbol as the single home for Engine Core behavior when evaluating the determinism and neutrality requirements in §6.2 and the acceptance checks in §6.5.
+
+**Neutral metrics, ordering, and shared traits.**
+
+* Neutral metrics are computed as **symmetric functions** of the two parties. In particular, the neutral compat score is an integer average of the two compat scores, and shared traits are derived via set intersection (using the existing canonical set helper and ID comparator) so that the shared traits tuple is identical for normalized AB and BA inputs.
+
+* Identifier and band ordering use the deterministic ordering utilities from the Engine’s comparators and thresholds:
+
+  * Party identifiers are canonicalized via `compare_ids`. When both identifiers are equal, the pair is mapped to the `ABBA_CANONICAL_PAIR` constant so that self-pairs have a fixed canonical representation.
+
+  * Band pairs are ordered via a `_band_rank` function derived from `CoreConfig.band_priority` and then by band name, ensuring that for a fixed configuration, `ordered_bands` is identical for `compute_core(A,B, config)` and `compute_core(B,A, config)` and deterministic across runs.
+
+These behaviors are **normative** for Engine Core; any future Engine Core changes **MUST** preserve AB↔BA neutrality and two-run identity as defined in §6.2.
+
+**Dedicated Engine Core test suite (closed rails).**
+
+* Purity tests live under `tests/core/test_engine_core_purity.py` and **MUST**:
+
+  * import and reload `engine.core.core` under `ensure_determinism_env(apply=True)` to enforce determinism pins and closed rails,
+
+  * use AST-based checks to reject imports whose root module is in `{os, time, datetime, random, socket, subprocess}`, and
+
+  * scan the module source text for forbidden snippets such as `"os.environ"`, `"time."`, `"datetime."`, `"random."`, and `"socket."`.
+
+* Together, these guards prove that the Engine Core performs **no file, network, clock, RNG, or env access** and does not introduce import-time side effects, satisfying the “no I/O/clocks/globals” requirement in §6.1 and §6.5.
+
+* AB↔BA behavior tests live under `tests/core/test_engine_core_abba.py` and **MUST**:
+
+  * construct asymmetric A/B inputs (different compat scores and bands) using `ParticipantState` and `CoreConfig`,
+
+  * assert that neutral fields in `CoreResult` (for example, neutral score, `ordered_pair`, `ordered_bands`, and shared traits) are **identical** for `compute_core(A,B, config)` and `compute_core(B,A, config)`, and
+
+  * assert that perspective-specific metrics in the `PerspectiveBreakdown` structures cross-swap as expected (for example, deltas for BA are the negation of the AB deltas) while remaining internally consistent.
+
+* These tests are the canonical proof of AB↔BA neutrality for Engine Core and directly exercise the requirements in §6.2 and §6.5.
+
+* Determinism and JSON-compatibility tests live under `tests/core/test_engine_core_determinism.py` and **MUST**:
+
+  * call `compute_core` twice with identical inputs and `CoreConfig` under `ensure_determinism_env(apply=True)` and assert that the two `CoreResult` instances are equal,
+
+  * serialize each result via `json.dumps(dataclasses.asdict(result), sort_keys=True)` and assert that the resulting JSON strings are **byte-identical**, and
+
+  * verify that when `CoreConfig.band_priority` is customized, `ordered_bands` and `ordered_pair` remain deterministic and consistent with the configured band priority.
+
+* These tests serve as the Engine Core’s two-run identity and JSON-compatibility proof under the determinism posture in §6.2 and §6.3. They demonstrate that `CoreResult` is safe for use with the canonical serializer and evidence tooling described elsewhere in this guide, even though the Engine Core evidence artifacts themselves are wired in a later epic.
+
+**Evidence wiring (future epic).**
+
+This subsection records the Engine Core’s pure-compute module and test harness only. The evidence artifacts and Machine Mirror records listed in §6.6 remain the long-term target for Engine Core evidence, but their wiring is explicitly assigned to a later epic (`HDE-DISS004.4`) and is **not** part of the mechanics recorded for the behavior-only work on `HDE-DISS004.1–.3`.
 
 ---
 
@@ -1471,9 +1843,65 @@ This section governs **mechanics only**; all concrete bytes, tokens, and schemas
 
 * Scoring/banding/rounding rules: **PF-Canon-HDE-Math-Spec**.  
 * Public contract & transport: **PF-Canon-HDE-CLI-API-Vendor-Ref**, **PF-Canon-HDE-Governance (A7)**.  
-* Canonical JSON rules: **PF-Canon-HDE-Schemas & Artifacts §4**.  
-  ---
+* Canonical JSON rules: **PF-Canon-HDE-Schemas & Artifacts §4**.
 
+### **11.3.6 Engine sampler core (pure-compute implementation)**
+
+**Scope (normative).**  
+ The Dissolution sampler/ranker behavior described in §11.3 is realized in the engine as a **pure-compute sampler core**. Mechanics records both the canonical module/entrypoints and the behavioral contract so that future work can change internals without breaking determinism, eligibility, or harness behavior.
+
+**Canonical module and entrypoints.**
+
+* The canonical sampler core module lives at `engine/sampler/core.py` and exports the pure-compute helpers that implement the contracted behavior in §11.3:
+
+  * `build_candidate_pool` — constructs the in-memory candidate pool from viewer inputs and candidate feature records, enforcing zero-weight exclusion and eligibility filters.
+
+  * `rank_candidates` — applies the deterministic ordering rules over the pool (weight, compat score, band priority, ID comparator) to produce a total order.
+
+  * `sample_and_rank` — the main helper used by dev/admin harnesses to build the pool, apply diversity where configured, and produce a ranked list of candidates.
+
+* CLI and HTTP sampler harnesses in this repo (including the dev/admin CLI sampler and the `/internal/dev/sampler` HTTP harness) **MUST** call these canonical helpers rather than reimplementing sampling or ranking logic locally. Mechanics treats `engine.sampler.core` as the **single home** for sampler/ranker behavior; harnesses add only I/O, env wiring, and evidence capture.
+
+**Pure-compute contract.**
+
+The sampler core operates on in-memory data structures (for example, viewer profile, candidate feature records, sampler configuration, candidate pool entries, and ranked candidates) and **returns new values only**. It does **not**:
+
+* perform file or network I/O,
+
+* read environment variables, clocks, or random sources, or
+
+* mutate module-level state.
+
+Zero-weight rules and basic eligibility are enforced **inside the core**:
+
+* candidates with weight `<= 0` are excluded from the pool before any other checks (zero-weight rule),
+
+* minimum compat score and band-based filters (allowed/excluded bands) are applied according to the sampler configuration, and
+
+* optional diversity markers and recency flags are carried through in the pool entries for later diversity phases.
+
+**Deterministic ordering.**
+
+Deterministic ordering in the sampler core is implemented by:
+
+* preferring higher weight, then higher compat score,
+
+* applying a **band priority** derived from the canonical band ordering (for example, Glow \> Warm \> Open \> Cool, consistent with the `BANDS` tuple from compat thresholds), and
+
+* using the existing **ID comparator** (ASCII comparator over person identifiers) as the final tie-break to guarantee a **total order**, in line with the comparator laws in §5.
+
+These rules must be applied by `rank_candidates` and any helper that produces a ranked candidate list. For a fixed viewer profile, candidate feature set, and sampler configuration, running the sampler core twice with the same inputs and determinism pins (`LC_ALL=C`, `LANG=C`, `TZ=UTC`) **MUST** yield byte-identical ranked candidate sequences (two-run identity) and respect AB/BA sanity as described in §11.3.
+
+**Harness usage (routing only).**
+
+* Dev/admin CLI sampler and HTTP sampler harnesses **MUST**:
+
+  * construct their in-memory inputs (viewer profile, candidate feature records, sampler configuration) and then call `sample_and_rank` (or the equivalent composition of `build_candidate_pool` and `rank_candidates`), and
+
+  * treat any deviations from the canonical sampler core behavior (for example, alternative ordering or eligibility rules) as defects.
+
+* Evidence and acceptance tokens for sampler behavior and sampler evidence families remain single-homed in **HDE-Schemas & Artifacts**, **HDE-Build Checklist**, **Glow QA Guide**, and **HDE Phased Epics** by title; this section records only that the sampler core behavior in §11.3 is implemented by the canonical `engine.sampler.core` module and its entrypoints and that all harnesses and evidence generators must call into that module under the determinism and closed-rails posture described elsewhere in this guide.  
+  ---
 
   # 12\) Error Envelope & Token Set \[Required-Now\]
 
@@ -2558,7 +2986,76 @@ Proofs live under `artifacts/bodygraph/source_invariance/` as at least:
 
 * `ba.json` — vendor body for the same inputs
 
-* `summary.json` — summary (attempts, `sha256` digests, `ab_ba_equal: true` on success)
+* `summary.json` — summary (attempts, `sha256` digests, `ab_ba_equal: true` on success)  
+* 
+
+**Live vendor transport proofs (open-rails QA vs offline tests).**
+
+For epics whose D-goals or QA acceptance explicitly require **live vendor activity** (for example, “prove that at least one flow hits the live vendor under open rails”), Mechanics adds the following mechanical requirements on top of the policy and evidence in this section:
+
+* **Separation of offline ingest tests vs live vendor tests (normative).**
+
+  * Offline ingest tests (for example, unit/integration tests, dry-run pipelines, and source invariance proofs that never open vendor rails) are **not sufficient** on their own to satisfy “live vendor activity” D-goals. They remain necessary for correctness and invariance, but count as **offline evidence only**.
+
+  * A **live vendor transport proof** requires at least one run in which the Engine/Reader or CLI:
+
+    * executes under **open rails** (for example, `ALLOW_NETWORK=1` with SAFE rails posture consistent with Governance and Infrastructure), and
+
+    * actually sends a request from the Engine/Reader/CLI surface to a vendor endpoint, with the transport captured as governed evidence.
+
+* **Required elements of a live vendor transport proof (mechanics only).**
+
+   For any epic that claims live vendor coverage via this pipeline, Mechanics requires at least one governed evidence artifact (names and schemas single-homed in HDE-Schemas & Artifacts and Glow QA Guide) that records, at minimum:
+
+  * **Rails snapshot at call time** — a names-only env log for the live-vendor step (for example, a D0/Dn env snapshot) including at least `SAFE_MODE`, `ALLOW_NETWORK`, `APP_ENV`, `LC_ALL`, `LANG`, and `TZ`, so that auditors can see that the vendor call actually ran under open rails and determinism pins.
+
+  * **Vendor endpoint and method** — the vendor **hostname**, **scheme**, and **path** (for example, `https://<vendor_host>/<path>` or equivalent) and the **HTTP method** used (`GET`, `POST`, etc.), with any secrets (API keys, auth tokens) removed or redacted per Governance.
+
+  * **Request/response status and headers** — a headers-only or structured log that captures:
+
+    * the HTTP status code returned by the vendor,
+
+    * selected response headers (for example, `Date`, `Content-Type`, and vendor-specific rate-limit headers where allowed), and
+
+    * any vendor error codes or reason phrases that are needed to interpret the result,
+
+  * again with secrets and PII stripped or redacted according to Governance and Glow QA Guide.
+
+  * **Body visibility (names-only).** Bodies **MUST NOT** be logged verbatim for vendor responses; when bodies are needed for debugging or QA, Mechanics requires that they be down-sampled or transformed into names-only or bounded summaries consistent with the logging posture in this guide and Governance. Raw vendor payloads and PII must not appear in governed live-vendor proof artifacts.
+
+* The exact artifact names, JSON shapes, and token mappings for these proofs are defined in **HDE-Schemas & Artifacts**, **Glow QA Guide**, **HDE-Governance**, and **HDE-Build Checklist** by title; this section records that at least one such artifact **MUST** exist for any epic that claims live vendor coverage through this pipeline.
+
+* **Surfaces and harnesses (CLI vs HTTP).**
+
+  * A live vendor transport proof may be obtained via either:
+
+    * a **CLI surface** that drives vendor ingest and records the evidence above, or
+
+    * an **HTTP surface** (for example, a Reader or internal admin route) that drives vendor ingest and is exercised by a QA harness.
+
+  * Mechanics requires that each epic’s QA plan declare **which surface(s)** are used for live vendor proofs (CLI and/or HTTP) and that the corresponding harness:
+
+    * uses the same Vendor Ingest Pipeline mechanics and source-selection rules defined in this section,
+
+    * runs under clearly logged rails (closed vs open, SAFE rails posture), and
+
+    * writes the live-vendor proof artifacts as governed evidence under the existing evidence skeleton (Index/Mirror, path-proofs, same-PR rule), using **titles-only** routing for schemas and directories.
+
+  * Pre-Glow constraints in §19.1 (no app-like users in prod, upsert disabled in pre-Glow prod, dry-run only in certain flows) remain fully in force; live vendor proofs **must respect** those environment rules and may use dry-run or non-upsert surfaces where required.
+
+* **Routing (titles-only).**
+
+  * The **names and schemas** for live vendor transport evidence families, their locations under `artifacts/**` or `audit/**`, and the **acceptance tokens** (for example, any “live vendor transport” or “open rails env” tokens) remain single-homed in:
+
+    * **Glow QA Guide** (QA plans and token evidence requirements),
+
+    * **HDE-Phased Epics** (epic-specific D-goals and acceptance),
+
+    * **HDE-Build Checklist** (build and QA gates), and
+
+    * **HDE-Schemas & Artifacts** (artifact schemas and catalog entries).
+
+  * PF14 records that, when an epic requires live vendor activity, Mechanics expects at least one **open-rails vendor call** to be exercised from an Engine/Reader/CLI surface using this pipeline, with the transport-level evidence and rails snapshot captured as governed artifacts under the shared evidence skeleton and indexed in the same PR as other ingest evidence.
 
 **Acceptance (titles-only)**
 
@@ -2681,7 +3178,7 @@ Mechanics MUST drive a posture harness that produces at least:
 
 * `artifacts/db/check_constraints.txt`
 
-  * Constraint checks (including FK, uniqueness, and any invariants called out in PF16).
+  * Constraint checks (including FK, uniqueness, and any invariants called out in canon).
 
 * `boundary_view.readonly.proof`
 
@@ -3196,6 +3693,36 @@ List by **title/path** in **Appendix D: Evidence Index** and mirror **1:1** in `
 
 * `artifacts/proofs/sanity_pipeline.transcript.log` — pipeline transcript (ordered steps \+ pass/fail summary)  
 * Existing artifacts produced in step 6 (see 26.3, §27, §20, §36) must also be indexed and mirrored **in this run**
+
+When the sanity pipeline script (for example, `python tools/evidence/run_sanity_pipeline.py`) is invoked **from a Live QA harness** rather than as part of the release CI, Mechanics requires additional behavior on top of the release pipeline rules in this section:
+
+* **Explicit QA log capture.**
+
+  * Any QA step that invokes the sanity pipeline **MUST** capture a primary QA log under `audit/qa/<epic>/<run-id>/` (for example, `stepN_sanity_pipeline.log`), treated as the canonical evidence for that step.
+
+  * The sanity pipeline script **MUST** emit a clear, parseable **pass/fail summary** suitable for inclusion in this log, either:
+
+    * directly on stdout (so the harness can tee it into the QA log), or
+
+    * to a deterministic, harness-readable log file that the QA harness then copies into `audit/qa/<epic>/...`.
+
+  * The summary **MUST** include, at minimum, an overall status line (for example, a `status_final` value or equivalent) that allows QA and auditors to determine whether the pipeline completed successfully in that QA environment.
+
+* **Classification of QA pipeline failures.**
+
+  * If the QA harness invokes the sanity pipeline but **no output is captured** in the primary QA log (for example, the log remains empty or contains only a header with no pipeline summary), that QA step **MUST** be classified as a **tooling/harness failure** rather than as a behavioral failure of the engine or the sanity pipeline itself.
+
+  * In that case, PF14 treats the step as **FAIL\_TOOLING** from a mechanics perspective: the harness or environment prevented the pipeline’s output from being captured, and the step remains blocked until the harness is fixed.
+
+  * The semantics and exact vocabulary for `FAIL_TOOLING` vs `FAIL_BEHAVIOR` or `PASS` remain single-homed in **Glow QA Guide** and **HDE-Build Checklist**; this guide only requires that QA steps distinguish “pipeline could not be observed” (tooling) from “pipeline ran and failed tests” (behavior).
+
+* **Routing to tokens and QA docs (titles-only).**
+
+  * The acceptance tokens that depend on the sanity pipeline (for example, `SANITY_PIPELINE_OK`, `DETERMINISM_ENV_PINS_OK`, and related QA tokens) and their exact evidence requirements remain defined in **Glow QA Guide**, **HDE-Build Checklist**, and **HDE Phased Epics** by title.
+
+  * PF14 records that, for QA-invoked runs, those tokens **must not** be treated as proven unless there is a captured sanity pipeline QA log with a clear pass/fail summary; if QA runs the pipeline and captures no output, that run is mechanics-wise a **tooling/harness issue** and cannot be used as evidence for those tokens.
+
+These QA-specific requirements do **not** change the release/CI semantics of the sanity pipeline described earlier in this section. Release acceptance and the canonical pipeline transcript remain governed by the closed-rails CI posture; QA invocations add a second usage of the same pipeline script, with additional logging and classification requirements so that Live QA evidence is unambiguous and mechanics-complete.
 
 **Acceptance (titles-only; token names live in HDE-Governance §2.0)**
 

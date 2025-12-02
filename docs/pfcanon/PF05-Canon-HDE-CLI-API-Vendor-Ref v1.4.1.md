@@ -4,13 +4,15 @@
 
 **Title:** PF05-Canon-HDE-CLI-API-Vendor-Ref
 
-**Version:** v1.3.8
+**Version:** v1.4.1
 
 **Status:** Canon
 
-**Effective date:** 2025-11-29
+**Effective date:** 2025-12-02
 
-**Last Update Gate:** BD 7.8.9 Drain A12
+**Last Update Gate:** BN 7.9.7 Drain A19
+
+**Invocation tag:** INV-f2ac55d77ce9aacc
 
 ---
 
@@ -72,63 +74,57 @@
 
 ---
 
-# 1\) “Map at a Glance” — What’s live vs planned \[Required-Now\]
+# **1\) “Map at a Glance” — What’s live vs planned \[Required-Now\]**
 
-## CLI commands
+## **CLI commands**
 
-* \* \*\*\`hdctl showcompat\` — Implemented; \*merge-blocking\* until compat JSON determinism and Reader↔CLI parity (via reader-dump) are proven.\*\* On success, stdout carries a single LF-terminated compat JSON object (admin/test surface) emitted by the shared presenter/emitter (canonical JSON, UTF‑8, sorted keys, compact, one LF; no ANSI). When \`--dump-reader \<path\>\` is present, the command also writes the six-key Reader v1 success envelope to \`\<path\>\` using the same emitter; those bytes must be byte-identical to the Reader 200 body for the same inputs/environment. AB↔BA and two-run identity are required for both stdout compat JSON and reader-dump bytes.
+* **`hdctl showcompat` — Implemented; merge-blocking until compat determinism and Reader↔CLI parity are proven.** Canonical compat admin harness and Reader parity surface. See §4.1 for full CLI contract, canonical JSON rules, and acceptance tokens.
 
-* **`read singlebg` — Speculative.** Single-chart read; flags/validators to be defined; not wired.
+* **`read singlebg` — Speculative.** Planned single-chart read. Flags, validators, and payload shape will be owned in §4.2 when wired.
 
-* **`list people` — Speculative.** Table/JSON listing; sorting/filters to be defined; not wired.
+* **`list people` — Speculative.** Planned listing command for people. Sorting/filters and JSON/tabular payloads will be owned in §4.3 when wired.
 
-* **Fetch commands (person/batch) — Speculative.** Explicitly disabled in Alpha; activation requires transport acceptance.
+* **Fetch commands (person/batch) — Speculative.** Explicitly disabled in Alpha. Enabling them requires transport acceptance and Governance tokens as defined in the CLI and Vendor sections (§4.4, §7).
 
-  ---
-
-  ## Reader transport
-
-* **Endpoint Catalog (JSON success) — Required-Now.** Internal-only and **env-gated** per entry; non-prod entries are **unreachable in prod**. **Single A7 proof surface** (not `/internal/version`). Run 200/HEAD/304 proofs here: **quoted strong ETag** on 200; **Vary: Authorization, Accept-Encoding** required; **HEAD 200 mirrors 200** (no body; **Content-Length \= len(identity 200 body)**); **304 only after 200** and **omits both `Content-Type` and `Content-Length`** (body empty). **Encoding-invariance** holds (ETag and HEAD identity length stable across encodings). Keep Catalog **titles-only, path-agnostic**; file schema in **Appendix B**. Publish:  
-   – records-only **Catalog snapshot** → `artifacts/reader/endpoints_snapshot.json`  
-   – **env-gate proof (headers-only)** → `artifacts/proofs/endpoints_env_gate_proof.log`  
-   – **composite A7 proof JSON** → `artifacts/proofs/reader_success_get_head_304.json` (PF12 schema)  
-   – checksum sidecar for the example Catalog file → `docs/ENDPOINTS_CATALOG.json.sha256`
-
-* **Dev harness — Implemented (dev-only).** `/api/reader?v=1` gated by `APP_ENV=dev`; used for schema/LF checks and Reader↔CLI parity. Rails remain closed in dev/CI (`SAFE_MODE=1`, `ALLOW_NETWORK=0`); **no vendor I/O**. Harness proofs are supplemental and **do not replace** Endpoint Catalog A7 proofs.
-
-* **`/internal/version` (ops endpoint) — Required-Now.** Ops-only identity surface; not cacheable. JSON (UTF-8); `Cache-Control: no-store`; **no ETag**; **HEAD=200** with validator parity and `Content-Type == GET`; conditionals ignored (**never 304**); `Vary` optional. Acceptance lives in HDE-Governance §10.5 (titles only).
-
-* **Production Reader surface — Speculative.** Future public endpoint; conditional delivery and headers owned here when enabled.
+* **`hdctl dev:sampler` — Implemented (dev/admin-only).** Dev/admin sampler harness; runs only when `APP_ENV ∈ {dev, test, local}` under closed rails, reads a JSON candidates file, calls the sampler core, and emits canonical JSON for deterministic QA replay. Full contract (inputs, seed semantics, determinism, and streams) lives in §4.10.
 
   ---
 
-  ## Serializer and emitter
+  ## **Reader transport**
 
-* **Single canonical emitter shared by CLI and Reader — Required-Now.** UTF-8, sorted keys, compact separators, **exactly one LF**; arrays-as-sets (dedupe \+ ASCII sort); **preimage → idempotence\_hash → final**. **No ad-hoc `json.dumps`**. Both surfaces call the **same entry point**. All byte checks run with `LC_ALL=C`, `TZ=UTC`.
+* **Endpoint Catalog (JSON success) — Required-Now.** Internal-only, env-gated per entry, and the **single A7 proof surface** for Reader success routes (not `/internal/version`). A7 header matrix, conditional behavior, and proof artifacts are specified in §5.3, §5.6, and Appendix A; PF12 owns the Evidence Index and mirror schema.
 
-  ---
+* **Dev harness — Implemented (dev-only).** `/api/reader?v=1` dev Reader surface for schema/LF checks, AB↔BA and two-run identity, and Reader↔CLI parity. Rails remain closed (`SAFE_MODE=1`, `ALLOW_NETWORK=0`); harness proofs are **supplemental** and do not replace Endpoint Catalog A7 proofs. See §5.4.
 
-  ## Vendor ingest (HDAPI)
+* **`/internal/version` (ops endpoint) — Required-Now.** Ops-only identity surface (JSON, no cache, no ETag) used for engine identity and rails snapshots. Header and refusal posture are governed by HDE-Governance §10.5; bytes live in the internal-ops section of Reader transport.
 
-* **Request shaping — Implemented.** Canonical endpoint/method, **dash-case headers**, and **three-key body** (`birthdate`, `birthtime`, `location`) defined; deterministic **typed error mapping** owned here (§7.2).
-
-* **Base-URL resolution — Required-Now.** `HDAPI_BASE_URL` **required** (env); **no literal default**. Missing/empty ⇒ **typed failure (no network I/O)**.
-
-* **Live HTTP gated or disabled by SAFE rails — Required-Now.** Vendor calls allowed **only** when `SAFE_MODE=0` **and** `ALLOW_NETWORK=1`; default **closed** for dev/CI (§7.1).
-
-* **Adapter data-source policy (PF10-AA) — Required-Now.** **Prod:** adapter reads **from DB** on the hot path; vendor calls only on explicit triggers (birth-data change/scheduled refresh/operator). **Dev:** vendor direct allowed; **must upsert** into DB for repeatability (§7.4). Evidence family registered in **Appendix D → D.12**.
-
-* **Production calls — Speculative.** Timeouts, retries, rate limits, observability to be **pinned** (closed enums/integers) prior to enabling (see §7.3).
+* **Production Reader surface — Speculative.** Future public endpoint for Glow App. When enabled, public header and conditional-delivery rules will be owned in §5.2/§5.3; until then, behavior is dev/ops-only.
 
   ---
 
-  ## Evidence discipline: indices and parity
+  ## **Serializer and emitter**
 
-* **Appendix D (human) and machine mirror — Required-Now.** Update **both** in the **same PR**. CI enforces **1:1 parity** and **path-proofs** for all artifacts. Listings are **titles-only**. Machine mirror lives at `artifacts/evidence_index.jsonl` (records-only). Record:  
-   – Endpoint-Catalog snapshot → `artifacts/reader/endpoints_snapshot.json`  
-   – env-gate proof → `artifacts/proofs/endpoints_env_gate_proof.log`  
-   – composite A7 proof JSON → `artifacts/proofs/reader_success_get_head_304.json`  
-   – BodyGraph adapter evidence set → see **Appendix D → D.12** (source selection, AB/BA invariance set, release bindings, refresh policy, metrics, keys-only log sample)
+* **Single canonical emitter shared by CLI and Reader — Required-Now.** All public JSON (success and typed errors) is emitted by a single presenter/emitter entrypoint with canonical JSON rules (UTF-8, sorted keys, compact, one LF). No ad-hoc `json.dumps` or alternate serializers on public paths. Full rules and grep-guards live in §6.
+
+  ---
+
+  ## **Vendor ingest (HDAPI)**
+
+* **Request shaping — Implemented.** Canonical vendor endpoint, HTTP method, headers, and three-key BodyGraph JSON body, plus deterministic mapping from provider responses to typed CLI/Reader errors. See §7.2.
+
+* **Base-URL resolution — Required-Now.** `HDAPI_BASE_URL` is required and must be non-empty. No literal default; missing/empty fails closed with a typed error and **no network I/O**, per §7.1.
+
+* **Live HTTP gated by SAFE rails — Required-Now.** Vendor calls are permitted only when rails are explicitly open (`SAFE_MODE=0` and `ALLOW_NETWORK=1`); default posture for dev/CI is closed. Closed-rails refusal behavior, admin override, and rails evidence live in §7.1.
+
+* **Adapter data-source policy — Required-Now.** In prod, the adapter reads from DB on the hot path, using vendor only on explicit triggers (birth-data change, scheduled refresh, operator). In dev, direct vendor calls are allowed but must upsert into DB for repeatability. See §7.4.
+
+* **Production calls — Speculative.** Concrete timeout, retry, backoff, and observability profiles are defined in §7.3 and must be pinned (closed enums/integers) before enabling production vendor traffic.
+
+  ---
+
+  ## **Evidence discipline: indices and parity**
+
+* **Evidence index & mirror — Required-Now.** Appendix D and HDE-Schemas & Artifacts govern the human Evidence Index (`docs/evidence/INDEX.json` \+ hash sentinel), the machine mirror (`artifacts/evidence_index.jsonl`), and all governed Reader/Vendor proof artifacts. PF05 relies on PF12 for schema and path details; every change to governed artifacts must update both human index and mirror in the same PR, with CI enforcing 1:1 parity and path-proofs.
 
   ---
 
@@ -1223,6 +1219,214 @@ Parity expectations:
   * required authentication for admin surfaces  
      will be owned and named in HDE-Governance and Glow QA Guide. This section requires the underlying behavior and byte equality; token names are referenced there.
 
+## **4.10 hdctl dev:sampler Implemented; dev/admin-only**
+
+### **4.10.1 Purpose and posture (normative)**
+
+`hdctl dev:sampler` is a **dev/admin-only** CLI subcommand that provides an internal harness for the sampler core introduced in HDE-EPIC019:
+
+* It exercises the **sampler core** with a viewer and a set of candidates, using the current sampler rules to produce a ranked candidate list.
+
+* It emits a **single canonical JSON payload** that includes:
+
+  * the viewer identifier used for the run,
+
+  * an optional seed echo, and
+
+  * a list of candidates with ranking and key diagnostic fields.
+
+Posture:
+
+* **Dev/admin-only surface.** `dev:sampler` is a non-public tool for engine developers and admin operators. It is not a user-facing CLI command for Glow App users and is **not** part of the public Reader or Aux contracts.
+
+* **No A7 or public covenant.** The sampler output is internal/admin JSON; it may contain numeric scores, weights, bands, and diagnostic flags. It is not governed by the Reader v1 numeric-free public covenant.
+
+* **No schema ownership.** Any reusable schemas for sampler inputs/outputs live in **HDE-Schemas & Artifacts**; this section defines only the CLI contract and behavior and references schemas by title only.
+
+  ### **4.10.2 Environment gating and rails (normative)**
+
+`hdctl dev:sampler` is **strictly environment-gated** and runs under closed rails:
+
+* **APP\_ENV gate.**
+
+  * The command **MUST** only run when `APP_ENV ∈ {dev, test, local}`.
+
+  * When `APP_ENV` is unset, empty, or set to any other value (including `prod`), `dev:sampler` **MUST** fail fast with a typed CLI error (for example a `DEV_ADMIN_ONLY` style code) on `stderr` and exit with a non-zero code; `stdout` remains empty.
+
+* **Rails posture (closed by default).**
+
+  * Runs under determinism rails pinned by the shared determinism helper:
+
+    * `SAFE_MODE=1`, `ALLOW_NETWORK=0`
+
+    * `LC_ALL=C`, `LANG=C`, `TZ=UTC`
+
+  * `dev:sampler` **MUST NOT** perform network I/O or vendor calls. It operates purely on local JSON input and the in-process sampler core.
+
+* **Determinism.**
+
+  * Under a fixed `APP_ENV ∈ {dev, test, local}` and determinism env pins, `dev:sampler` runs are subject to the same **two-run identity** and canonical JSON requirements as other governed CLI JSON surfaces (§3.3, §6).
+
+### **4.10.3 Inputs and candidates file (normative)**
+
+`dev:sampler` accepts the following inputs:
+
+* `--viewer <viewer_id>` (required)
+
+  * Opaque viewer identifier used by the sampler core. Semantics are owned by the sampler mechanics; PF05 treats it as a string key.
+
+* `--candidates-file <path>` (required)
+
+  * Path to a JSON file describing the candidate pool.
+
+  * The file is read using the existing CLI file helper (`_read_file` semantics; titles-only), and **MUST** obey the global file input rules (§3.2): readable file, valid JSON, canonical JSON (UTF-8, sorted keys, compact, one LF), and schema-conformant for the sampler candidates payload.
+
+  * The payload MAY be either:
+
+    * a top-level JSON array of candidate objects, or
+
+    * a JSON object with a `candidates` array field containing the candidate objects.
+
+  * Any other top-level shape (missing `candidates`, non-array, wrong types) MUST produce a typed input error on `stderr` with a clear error code (for example “INVALID\_CANDIDATES\_PAYLOAD”); `stdout` remains empty.
+
+* `--seed <string>` (optional)
+
+  * Arbitrary string used as a **metadata seed**. In the current implementation it is **echoed only**:
+
+    * It appears in the `seed` field of the output JSON.
+
+    * It does **not** influence candidate ranking or selection.
+
+  * Future versions MAY extend the sampler core to use seed for tie-breaking; any such change MUST preserve determinism (same inputs/seed ⇒ same output) and MUST be accompanied by updated acceptance evidence.
+
+Per-candidate payload (titles-only):
+
+* Each candidate object MUST include an identifier and MAY include additional sampler fields:
+
+  * identifier fields: `person_uid` (preferred) or `id` (legacy) as a string.
+
+  * `weight`: numeric (int/float) weight used by the sampler core.
+
+  * `compat_score`: numeric (int/float) score used by the sampler core.
+
+  * `band`: optional string band label.
+
+  * `diversity_key`: optional string used for diversity balancing.
+
+  * `is_recent`: optional boolean flag.
+
+* The CLI harness MUST:
+
+  * Normalize identifier fields into a single internal candidate identifier (for example preferring `person_uid` over `id` when both are present).
+
+  * Validate that required fields are of the expected type (non-empty string IDs, numeric weights/scores); type mismatches or missing required fields MUST yield a typed input error on `stderr` with a clear error code (for example `INVALID_CANDIDATE_ID`, `INVALID_CANDIDATE_WEIGHT`, `INVALID_COMPAT_SCORE`), and `stdout` remains empty.
+
+All validation and error behavior follows the global CLI input and streams rules in §3.2 and §3.3: on any input error, `stderr` carries a numeric-free error object or synopsis; `stdout` remains empty, and exit code is non-zero.
+
+### **4.10.4 Output JSON and determinism (normative)**
+
+On success (exit code 0), `hdctl dev:sampler` emits a single JSON object on `stdout` with at least:
+
+* `viewer_id` — the `viewer` input value.
+
+* `seed` — the `--seed` argument value if present, otherwise `null`.
+
+* `candidates` — an array of candidate result objects; for each candidate:
+
+  * `person_uid` — the canonical candidate identifier.
+
+  * `score` — numeric score from the sampler core.
+
+  * `weight` — numeric weight used by the sampler.
+
+  * `band` — string band label if available.
+
+  * `rank` — 1-based rank assigned by the sampler core (1 \= highest priority).
+
+  * `diversity_key` — string if present in input; omitted or null otherwise.
+
+  * `is_recent` — boolean if present in input; omitted or null otherwise.
+
+Serialization and determinism:
+
+* The output MUST be produced by the **single canonical emitter** (§6):
+
+  * UTF-8, no BOM.
+
+  * ASCII-sorted keys in all objects.
+
+  * Compact separators.
+
+  * Exactly **one** trailing LF.
+
+  * Arrays that conceptually represent sets (for example, if any set-valued sampler fields are added later) MUST be deduplicated and ASCII-sorted.
+
+* Two-run identity:
+
+  * For fixed inputs (`viewer`, `candidates-file` contents, `seed`), environment pins, and `APP_ENV`, two successive runs of `hdctl dev:sampler` **MUST** produce byte-identical stdout, including the trailing LF.
+
+* Seed-only impact:
+
+  * For fixed viewer and candidate inputs, changing `--seed` **MUST** affect only the `seed` field in the output JSON. The `candidates` array (including ordering, scores, weights, bands, diversity flags, and `is_recent`) **MUST** remain byte-identical across runs with different seeds.
+
+* Streams:
+
+  * On success, `stdout` carries only the sampler JSON payload; `stderr` is empty.
+
+  * On usage errors (e.g., missing `--viewer` or `--candidates-file`), exit code is 64 and a short synopsis appears on `stderr`; `stdout` remains empty.
+
+  * On typed errors (validation failures), exit code is 2 and a typed error JSON object appears on `stderr` per §5.2; `stdout` remains empty.
+
+    ### **4.10.5 Relationship to other surfaces (informative)**
+
+* `hdctl dev:sampler` is **orthogonal** to:
+
+  * `hdctl showcompat` (compat harness and Reader parity),
+
+  * `hdctl bg:resolve` (BodyGraph resolver and vendor ingest),
+
+  * `hdctl bg:export-json` (stateless BodyGraph export), and
+
+  * `hdctl admin-bundle` (full product admin bundle).
+
+* It does **not**:
+
+  * call Reader or Aux endpoints,
+
+  * write governed evidence artifacts directly, or
+
+  * alter the public Reader or Aux contracts.
+
+* QA coverage (CLI harness):
+
+  * CLI tests for `dev:sampler` are expected to prove:
+
+    * two-run identity for a fixed seed,
+
+    * seed-only impact (seed changes, candidates unchanged), and
+
+    * help output clearly marking the command as “DEV/ADMIN ONLY”.
+
+* Relationship to the HTTP dev sampler harness (§5.11):
+
+  * For sampler behavior and determinism, `hdctl dev:sampler` is the **primary** sampler QA harness:
+
+    * it runs entirely under closed rails, without HTTP or vendor dependencies,
+
+    * it is the first place sampler/core determinism and seed-only semantics must be proven.
+
+  * The dev sampler HTTP harness (`POST /internal/dev/sampler` in §5.11) is a **secondary**, infra-dependent harness:
+
+    * it wraps the same sampler core for internal HTTP use,
+
+    * it is used to layer HTTP-level determinism and seed-only checks on top of the CLI proofs when a Reader dev environment is available,
+
+    * it remains dev/admin-only and is explicitly excluded from the Endpoint Catalog and A7 proof surface.
+
+  * QA plans should treat CLI sampler proofs as required foundation, and HTTP sampler proofs as additional coverage when infra allows; behavior discrepancies between the two must be treated as defects.
+
+    
+
 ---
 
 # 5\. Reader Transport (public bytes) Required‑NowRequired‑NowRequired‑Now
@@ -1950,7 +2154,169 @@ Future QA tokens that enforce:
 
 will be owned and named in Governance and QA documents. PF05 requires the underlying parity behavior between the CLI and HTTP admin bundle surfaces.
 
----
+## **5.11 Dev sampler HTTP harness (dev/admin-only) \[Implemented\]**
+
+### **5.11.1 Purpose and posture**
+
+The dev sampler HTTP harness is a **dev/admin-only** route that wraps the sampler core behind HTTP, mirroring the semantics of `hdctl dev:sampler` while returning a minimal, IDs-only payload for internal QA and debugging.
+
+Purpose:
+
+* Provide an HTTP entrypoint that:
+
+  * accepts a viewer identifier and a set of candidate IDs,
+
+  * calls the same sampler core used by the CLI dev sampler, and
+
+  * returns the ranked candidate IDs plus a seed echo in canonical JSON for deterministic replay.
+
+Posture:
+
+* **Dev/admin-only.** The route is intended for engine developers and admin operators only. It is not a public Reader contract and is not exposed to end users.
+
+* **Not cataloged; not A7.** This route **MUST NOT** appear in the Endpoint Catalog (§5.6) and is not an A7 proof surface. A7 transport proofs continue to run only on cataloged JSON success routes.
+
+* **Writer-style errors.** The route uses the standard typed error envelope and headers from §5.2/§8; gating failures and validation errors are treated as writer-style/ops outcomes (`Cache-Control: no-store`, no `ETag`), not as public Reader errors.
+
+  ### **5.11.2 Route, method, and APP\_ENV gate (normative)**
+
+Route and method:
+
+* Method: `POST`.
+
+* Path: `/internal/dev/sampler`.
+
+* Bound to the existing reader blueprint, but with **dev/admin-only** gating and HTTP posture as defined here.
+
+APP\_ENV gate:
+
+* The handler **MUST** enforce `APP_ENV ∈ {dev, test, local}`:
+
+  * When `APP_ENV` is exactly one of `dev`, `test`, or `local`, the handler may proceed to validate input and call the sampler core.
+
+  * When `APP_ENV` is unset, empty, or set to any other value (including `prod`), the handler **MUST** return a **403 Forbidden** response using the typed error envelope from §5.2 (for example with a `DEV_ADMIN_ONLY` style code), and **MUST NOT** call the sampler core. The body is a numeric-free error object; `Cache-Control: no-store`; no `ETag`.
+
+Rails posture:
+
+* The route runs under closed rails:
+
+  * `SAFE_MODE=1`, `ALLOW_NETWORK=0`.
+
+  * No vendor HTTP calls or other network I/O are performed.
+
+* The harness operates purely on the provided candidate IDs and the in-process sampler core.
+
+  ### **5.11.3 Request body and validation (normative)**
+
+The handler accepts a JSON request body with the following fields:
+
+* `viewer_id` — required; non-empty string.
+
+* `candidate_ids` — required; non-empty array of non-empty strings.
+
+* `seed` — optional; string; if absent, treated as `null`.
+
+Validation rules:
+
+* The handler **MUST** reject any request where:
+
+  * `viewer_id` is missing, not a string, or an empty string; or
+
+  * `candidate_ids` is missing, not an array, empty, or contains any element that is not a non-empty string.
+
+* On validation failure, the handler returns:
+
+  * `422` (or the existing invalid-input status used by writer-style routes),
+
+  * a typed, numeric-free error object as defined in §5.2/§8 (for example with an `INVALID_INPUT` style code), and
+
+  * `Cache-Control: no-store`, no `ETag`, `Content-Type: application/json; charset=utf-8`.
+
+* The request body **MUST** be read and validated using the existing writer JSON helpers; it is processed as UTF-8 without BOM and rejected with a typed error if it is not valid JSON or does not match the expected shape.
+
+  ### **5.11.4 Sampler invocation and response payload (normative)**
+
+On a valid, gated request, the handler:
+
+* Constructs internal sampler inputs from `viewer_id` and `candidate_ids` (details owned by the sampler mechanics; this spec treats them as opaque identifiers).
+
+* Invokes the sampler core (same function used by `hdctl dev:sampler`) to obtain a ranked list of candidate IDs.
+
+Response:
+
+* Status: `200`.
+
+* Headers:
+
+  * `Content-Type: application/json; charset=utf-8`.
+
+  * `Cache-Control: private, max-age=0, must-revalidate`.
+
+  * No `ETag` requirement; this route is not an A7 surface.
+
+* Body: a JSON object with at least:
+
+  * `viewer_id` — the `viewer_id` from the request.
+
+  * `meta` — an object with at least:
+
+    * `seed` — the seed string from the request, or `null` if no seed was provided.
+
+  * `candidate_ids` — an array of candidate IDs (strings) in the ranked order returned by the sampler core.
+
+Serialization:
+
+* The response body **MUST** be emitted via the single canonical emitter (§6):
+
+  * UTF-8 (no BOM).
+
+  * ASCII-sorted keys at each object level.
+
+  * Compact separators.
+
+  * Exactly one trailing newline (`\n`).
+
+* Arrays that conceptually represent sets (notably `candidate_ids`) are not treated as sets; they preserve the sampler’s ranking order and are not resorted.
+
+  ### **5.11.5 Determinism and seed semantics (normative)**
+
+Determinism:
+
+* For a fixed `viewer_id`, `candidate_ids` array, `seed` value (including `null`), environment pins, and `APP_ENV`, two successive `POST /internal/dev/sampler` calls **MUST** produce byte-identical responses (status, headers, and LF-terminated body).
+
+Seed-only differences:
+
+* For fixed `viewer_id` and `candidate_ids`, changing `seed` **MUST** affect only the `meta.seed` field in the response body:
+
+  * The `candidate_ids` array **MUST** remain byte-identical across runs with different seeds.
+
+  * No other fields in the response (including ordering of `candidate_ids`) may change as a function of `seed` in the current implementation.
+
+These semantics mirror the CLI sampler (§4.10): seed is metadata-only at this stage and does not influence eligibility or ordering. Any future change that uses seed for tie-breaking must preserve determinism (same inputs/seed ⇒ same output) and be accompanied by updated acceptance evidence.
+
+### **5.11.6 A7, Catalog, and evidence (informative)**
+
+A7 and Catalog:
+
+* `POST /internal/dev/sampler` is a **dev/admin-only internal harness** and is explicitly excluded from the Endpoint Catalog (§5.6). No A7 proofs run on this route.
+
+* The A7 transport invariants in §5.3 apply only to cataloged JSON success routes; this harness follows the writer/error header posture in §5.2 for errors and the standard success headers above for 200 responses.
+
+Evidence and tests (titles-only):
+
+* Adapter-level tests (for example in the `tests/adapter` tree) are expected to:
+
+  * verify determinism (two-run identity),
+
+  * verify seed-only differences (same `candidate_ids` across seeds),
+
+  * verify APP\_ENV gating for `dev`, `test`, `local` vs `prod`/unset/empty, and
+
+  * verify canonical JSON (UTF-8, sorted keys, compact, one LF).
+
+* Any governed evidence artifacts and test transcripts for this route are indexed in the Evidence Index and machine mirror per PF12 (titles/paths only); PF05 does not duplicate those paths.
+
+  ---
 
 # 6\. Serializer Canon & Single Emitter \[Required-Now\]
 

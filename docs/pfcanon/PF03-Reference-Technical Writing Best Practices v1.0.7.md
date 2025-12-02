@@ -2,13 +2,17 @@
 
 ## **0\. Front Matter — Document Control**
 
-Title: PF03-Reference-Technical Writing Best Practices  
- Version: v1.0.4  
- Status: Reference  
- Effective date: 2025-11-29
+**Title:** PF03-Reference-Technical Writing Best Practices
 
-Last Update Gate: BN 7.8.9 Drain A27  
- Invocation tag: INV-f2ac55d77ce9aacc
+**Version**: v1.0.7
+
+**Status:** Reference
+
+**Effective date:** 2025-12-01
+
+**Last Update Gate:** BN 7.9.7 Drain A17
+
+**Invocation tag:** INV-f2ac55d77ce9aacc
 
 Scope (titles-only)  
  Writing norms, placement rules, redline style, Build Notes usage, registry hygiene, and acceptance for documentation work. Bytes/transport live in PF05 (CLI/API/Vendor); governance tokens and A-gates live in PF04; math/thresholds live in PF01; architectural single homes live in PF02.
@@ -328,6 +332,36 @@ Live QA plans MUST follow these patterns:
 
 These rules apply only to how Live QA plans are written and presented. They do not redefine where rails, tokens, or behaviors are owned in PF-canon; those remain in their existing single-home documents.
 
+### **12.2 Tool runs & FAIL\_TOOLING in QA plans**
+
+For QA plans, steps that say “run this tool/script” (for example, a sanity pipeline) are only useful if they define what it means for the tool to have actually run and been observed. Extend the §12.1 pattern as follows:
+
+* Run-evidence definition — MUST. For every “run this tool/script” step, the plan MUST state what evidence shows that the tool ran. This can be a specific log file path, a named section inside a step log, or explicit pass/fail lines that the operator should see. Without this, the step is underspecified.
+
+* No-output classification — MUST. If the operator follows the step as written (including any reasonable reruns requested by the plan) and the expected evidence remains completely absent (no log section, no pass/fail lines, no error output), the outcome MUST be classified as a tooling or harness failure, not as a QA execution or application behavior failure. Use a distinct status marker such as `FAIL_TOOLING` in the step log to make this explicit.
+
+* Stop and escalate, do not grind — MUST. Once a step is clearly in a `FAIL_TOOLING` state (no evidence after multiple correct attempts), the QA plan MUST instruct the operator to stop re-running the same command, append a short failure summary to the step log, and escalate by opening a follow-up task/bug. Plans SHOULD NOT ask the operator to repeat an unchanged command indefinitely when the harness is not producing evidence.
+
+* Separation from behavior verdicts — SHOULD. Behavior-level verdicts (for example, claims about application correctness) MUST NOT be asserted when the underlying tool or harness has not produced any evidence of running. In this case, the only honest summary is that the step is blocked on tooling, and behavior remains unproven for that run.
+
+These conventions keep Live QA plans mechanical, fair to the operator, and honest about the difference between “the app failed” and “our harness is not capturing the run.”
+
+### 12.3 Command and procedure style (QA plans)
+
+Commands in QA plans are not suggestions or templates; they are the exact procedures the operator will run, usually in a Codespaces shell at the repo root. Extend §12.1 and §12.2 as follows:
+
+Fully concrete commands — MUST. Every QA plan command MUST be fully concrete and free of placeholders (no \<PO: …\>, \<path\>, or “TODO” markers). If a value is variable, compute or derive it in a prior step or via a helper script so that the command line itself requires no manual editing.
+
+Copy/paste-ready for Codespaces — MUST. Commands MUST be usable as-is in the intended environment (typically a Bash shell in Codespaces at the repo root). The operator SHOULD be able to select the command line and paste it directly into the shell without adding flags, editing paths, or guessing environment variables.
+
+Evidence paths and outcomes — MUST. For each command, the plan MUST name one or more concrete evidence paths (for example, specific log files or artifacts under audit/qa/...) and state the expected high-level outcome (for example, “2 passed, 0 failed” or “HTTP 200 from Reader”). This pairs the procedure with what the operator should see if the step succeeds.
+
+No deferred decisions to the PO — MUST NOT. QA plans MUST NOT offload key decisions (paths, ports, env vars) to the PO in prose. If a value cannot be hard-coded, the plan MUST either provide a discovery command to obtain it or delegate that logic to a script whose own invocation is concrete and copy/paste-ready.
+
+Clear separation from discovery — SHOULD. When discovery is required (for example, finding a service port or vendor URL), treat it as its own concrete step with its own commands and evidence, not an implicit “figure it out” inside a later test step.
+
+These rules make QA plans executable without guesswork, align them with Codespaces as the default operator environment, and ensure each command is tied to explicit evidence and outcomes instead of informal expectations.
+
 ## **13\) Security & privacy for writing**
 
 * No secrets in examples — MUST. Redact or use obvious placeholders; never paste API keys, cookies, or bearer tokens.  
@@ -335,7 +369,32 @@ These rules apply only to how Live QA plans are written and presented. They do n
 * Local only — MUST. Do not imply writes to repos or external systems; all outputs are paste-ready text.  
 * Evidence artifacts — SHOULD. Names/paths only in PF; bytes live outside PF and follow §4 canonical JSON rules.
 
-  ## **14\) “Run-this-now” (writer’s quick path)**
+### **13.1 Evidence & log naming (QA)**
+
+QA evidence logs are text artifacts and follow the same naming hygiene as all examples in this doc. When you design or update a Live QA plan or QA harness, apply these rules:
+
+* Run-root location — MUST. Each QA run defines a single run root directory (for example, `QA_ROOT`). The primary step logs for that run MUST live directly under that run root; do not scatter primary step logs into ad-hoc subdirectories such as `logs/` without a clear pointer from the root.
+
+* Deterministic step-log names — MUST. Within a given run root, name step logs using a single, consistent pattern. Two accepted patterns are:
+
+  * `D<goal>_<shortname>.log` (for example, `D4_sampler_evidence_index.log`), or
+
+  * `stepN_<shortname>.log` (for example, `step5_sampler_evidence_index.log`).  
+     Pick one pattern per epic or QA run and use it consistently for all steps in that context.
+
+* One primary log per step — MUST. For each QA plan step, choose a single primary step log file at the run root and append all tests and checks for that step to that log (pytest output, greps, summary lines). Do not split the same step’s evidence across multiple unnamed or unreferenced logs.
+
+* No mixed schemes in the same context — MUST NOT. Within a single run root, do not mix different step-log naming schemes (for example, `D3-http-*`, `step4_*`, `D1D2-*` side by side). Mixed schemes make evidence hard to trace and review.
+
+* Temporary scratch files — SHOULD. Temporary request/response bodies or scratch outputs SHOULD:
+
+  * Use a `tmp_` prefix in the filename, and
+
+  * Either live next to the step log they support, or live under a dedicated `tmp/` subdirectory under the run root.
+
+These rules do not change how sampler/core or other tests are written; they set expectations for the quality and traceability of QA evidence artifacts and keep log naming consistent with the Evidence artifacts guidance in this section.
+
+## **14\) “Run-this-now” (writer’s quick path)**
 
 1. Confirm the latest PF bundle (or changed file) is attached and named in the registry.  
 2. Create `doc_delta[]` items with precise `section_anchor` (Doc § and heading) and `op` (ADD|REPLACE|DELETE|INSERT AFTER|INSERT BEFORE).  

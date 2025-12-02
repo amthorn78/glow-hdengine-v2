@@ -2,13 +2,13 @@
 
 **Title:** PF06-Canon-Epic-Process-Guide 
 
-**Version:** v1.1
+**Version:** v1.1.3
 
 **Status:** Canon
 
-**Effective date**: 2025-11-29
+**Effective date**: 2025-12-02
 
-**Last Update Gate:** BN 7.8.9 Drain A27
+**Last Update Gate:**  BN 7.9.7 Drain A19
 
 **tag:** INV-f2ac55d77ce9aacc
 
@@ -176,6 +176,54 @@ Lead Developer publishes the Implementation Guide to the Implementation Agent.
 
 Determinism pins  
  Set `LC_ALL=C` and `TZ=UTC` for all capture and CI checks to keep bytes stable.
+
+### **0.4.1 Live QA discovery and RCA (execution requirements)**
+
+For epics that include **Live QA** as part of their acceptance:
+
+1. **Mandatory D0 Discovery artifact (Live QA epics).**
+
+   * Before running any Live QA steps that exercise behavior or vendor flows, the epic **MUST** produce at least one **Discovery artifact** that captures the baseline environment and rails for the Live QA session.
+
+   * At minimum, this Discovery artifact must:
+
+     * Record the effective rails posture and runtime context (for example `SAFE_MODE`, `ALLOW_NETWORK`, `APP_ENV`, locale/timezone pins, and any other env variables materially affecting Live QA behavior).
+
+     * Summarize which services and surfaces are expected to be reachable for Live QA (for example “CLI only”, “Reader HTTP routes”, “Railway prod endpoints”) and any known constraints.
+
+     * Capture the initial tool health for key entrypoints (for example CLI/`hdctl` help, test harness availability) so later failures can be distinguished from simple environment misconfiguration.
+
+   * The Discovery artifact is a governed, mechanical file under the epic’s QA tree (titles-only; concrete paths and schemas are owned by other PF documents). It is part of the evidence that the Live QA session was run under known, documented conditions.
+
+2. **Mandatory QA RCA & Doc Delta summary (all Live QA epics).**
+
+   * Every Live QA epic **MUST** produce a **QA RCA & Doc Delta summary** as part of its execution deliverables, regardless of whether large gaps are observed.
+
+   * At minimum, this summary must:
+
+     * Describe the key Live QA findings at a level suitable for future readers (not just raw logs). When no substantial gaps are found, the summary **MUST** still state that fact explicitly (for example “No new PF-Canon deltas identified for this epic”).
+
+     * Map each substantive finding that **does** imply a change in behavior, infra, or process to **explicit PF-Canon doc deltas by title** (for example entries to be added or updated in *HDE Phased Epics*, *HDE-Build Checklist*, *Glow QA Guide*, *HDE-Mechanics Guide*, *Glow Infrastructure*, *HDE-Schemas & Artifacts*).
+
+     * Identify which follow-on cards or epics are expected to carry those PF updates, when they are not covered by the current epic.
+
+   * The QA RCA & Doc Delta summary may live:
+
+     * as a section of `audit/EPIC-<ID>_close_report.md`, **or**
+
+     * as a separate governed artifact referenced from the close report,
+
+   * but it is a **mandatory execution deliverable** for all Live QA epics. The level of detail is proportional to the findings (brief when no deltas, more extensive when multiple PF docs are impacted).
+
+3. **Execution gate.**
+
+   * For Live QA epics, the Close Gate (§3.5) **MUST** confirm:
+
+     * that a D0 Discovery artifact exists for the Live QA session(s), and
+
+     * that a QA RCA & Doc Delta summary exists and, where substantial gaps were found, points to concrete PF-Canon updates.
+
+   * If either the Discovery artifact or the QA RCA & Doc Delta summary is missing, the epic **MUST NOT** be treated as fully accepted, even if code/tests/CI tokens are green.
 
 ---
 

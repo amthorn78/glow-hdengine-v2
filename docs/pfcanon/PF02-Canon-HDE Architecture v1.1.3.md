@@ -1,11 +1,11 @@
 # **0\. Front Matter**
 
 **Title:** PF02-Canon-HDE Architecture  
- **Version:** v1.1.1  
+ **Version:** v1.1.3  
  **Status:** Canon  
-**Effective date:** 2025-11-23
+**Effective date:** 2025-12-02
 
-**Last Update Gate:** BN 7.7.8 Drain
+ **Last Update Gate:** BN 7.9.7 Drain A19
 
 ---
 
@@ -151,6 +151,42 @@ CLI parity work remains open; Architecture keeps the single-emitter rule while P
 engine/ \# math only  
  adapter/ \# single HTTP home  
  presenter/ \# single emitter entrypoint for all public bytes
+
+**Sampler and Engine Core modules (names-only)**
+
+**Names & roles.**
+
+* The canonical sampler behavior lives in a single module under the `engine/` tree, referred to here as the **sampler core module** (currently `engine.sampler.core`). It owns sampler/ranker behavior: pool formation, eligibility, ordering, and sampling decisions.
+
+* The canonical Engine Core behavior lives in a single module under the `engine/` tree, referred to here as the **Engine Core module** (currently `engine.core.core`). It owns the core compatibility computation: neutral and directional metrics, AB↔BA parity, and the normalized result structure consumed by Presenter and evidence tooling.
+
+**Behavior-only boundary.**
+
+* Both modules are **pure compute**: no time, network, file I/O, randomness, or environment reads at compute time; no import-time side effects. They accept normalized inputs and return normalized structures; they do not know about CLI commands, HTTP routes, rails, or evidence files.
+
+* These modules are the **single homes** for sampler and Engine Core behavior. Any CLI, HTTP, or dev harness that needs sampler/core behavior MUST call into these engine modules rather than reimplementing sampling or core logic.
+
+**Surfaces vs evidence (concept-only).**
+
+* CLI and HTTP harnesses that expose sampler or Engine Core behavior live outside `engine/` (for example, in adapter/ or CLI trees) and are responsible for:
+
+  * collecting and validating inputs,
+
+  * enforcing rails and APP\_ENV gating, and
+
+  * invoking the sampler/Engine Core modules in-process.
+
+* Evidence families, determinism pipelines, and acceptance maps that speak about sampler/core proofs treat these engine modules as the behavior source. The **shapes and paths** of those evidence artifacts are single-home in **HDE-Schemas & Artifacts**, the **HDE-Mechanics Guide**, and the **HDE-Build Checklist**, not in Architecture.
+
+**Routing (titles-only).**
+
+* Detailed sampler/core mechanics, including evidence generators and determinism pipelines → **HDE-Mechanics Guide**.
+
+* Evidence schemas, artifact keys, and indices/mirror discipline for sampler/core families → **HDE-Schemas & Artifacts**.
+
+* QA tokens and epic D-goals for sampler/core behavior and evidence → **Glow QA Guide** and **HDE-Phased Epics**.
+
+* CLI and HTTP harness bytes for sampler/core behavior → **HDE-CLI-API-Vendor-Ref**.
 
 ### **Deny-list (normative)**
 
@@ -377,6 +413,42 @@ This section names runtime surfaces and their responsibilities. It remains contr
 * **Reader posture:** Reader stays **narrative-free**; Aux suppression returns **200 empty, no ETag** (policy by title).
 
 **Ownership & indexing (titles-only).** Evidence/indexing discipline lives in **Schemas & Artifacts**; mechanics in the **Mechanics Guide**; narrative posture in the **Narratives Guide**.
+
+## **3.8 Reader dev/QA posture & services Required−NowRequired-NowRequired−Now**
+
+**Intent.** This subsection records, at the architectural level, how the Reader runs in dev/QA environments and how Live QA chooses between Reader and other entrypoints, while keeping PF02 contract-free. Concrete commands, ports, and environment wiring remain single-home in other documents and are referenced here by title only.
+
+**Dev/QA Reader availability.**
+
+* Reader v1 is exposed through the adapter process as one of the runtime surfaces named in this section. It uses the single canonical Presenter emitter and never hand-crafts public JSON.
+
+* In any dev/QA console that plans to exercise Reader or other HTTP runtime surfaces, the adapter/Reader process MUST be started explicitly using the canonical start command and environment described in **Glow Infrastructure** and the **HDE-Mechanics Guide**. Live QA MUST NOT rely on guessing hostnames or ports.
+
+* PF02 does not introduce service names, ports, or commands. Those details are single-home in **Glow Infrastructure**, the **HDE-Mechanics Guide**, and any field guides that describe running the adapter and Reader inside a dev container (including Codespaces). This document only records the responsibility that HTTP-based tests must target a known, running Reader instance.
+
+**Live QA surface selection.**
+
+* For epics whose D-goals include live vendor behavior or Reader/HTTP behavior, Live QA MUST either:
+
+  * start and use a Reader (or other HTTP) surface that reaches the Engine through the adapter and the single Presenter emitter, or
+
+  * use a CLI entrypoint that exercises the same Engine and Presenter path and is documented in **HDE-CLI-API-Vendor-Ref**.
+
+* Reader and CLI surfaces are peers with respect to the single-emitter rule: both call the same Presenter emitter symbol. PF02 does not define which surface satisfies any particular D-goal; that choice and its evidence requirements are owned by **HDE-Phased Epics**, the **Glow QA Guide**, and **HDE-Governance**. Architecture only requires that any surface chosen for Live QA be canonical and emitter-backed.
+
+**Discovery vs guessing.**
+
+* Environment and service discovery for dev/QA is canon-first. Before designing high-stakes HTTP QA steps, implementers and QA must consult **HDE Architecture**, **Glow Infrastructure**, the **HDE-Mechanics Guide**, and the **GitHub Codespaces in a QA Workflow** document (where relevant) to determine how to start and reach the Reader and other services.
+
+* HTTP QA against “Reader” or dev harness surfaces is considered misconfigured if there is no running adapter/Reader process discoverable through the documented commands and ports. Attempts to hit guessed URLs or ports are a plan defect, not a property of the Engine or Presenter.
+
+**Routing (titles-only).**
+
+* Service start commands, ports, and environment wiring for dev/QA consoles → **Glow Infrastructure** and the **HDE-Mechanics Guide**.
+
+* Live QA process, discovery baselines, and rails posture (e.g., `SAFE_MODE`, `ALLOW_NETWORK`, `APP_ENV`) → **Epic-Process-Guide** and the **Glow QA Guide**.
+
+* CLI and Reader surface bytes, request/response shapes, and admin surfaces used for Live QA → **HDE-CLI-API-Vendor-Ref**.
 
 # **4\. Boundaries & Contracts (Conceptual) \[Required-Now\]**
 

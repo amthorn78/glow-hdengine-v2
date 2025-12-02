@@ -2,11 +2,10 @@
 
 **Status:** Canon
 
-**Version:** v1.1.8
+**Version:** v1.2.78
 
-**Effective Date:** 2025-11-30
-
-**Last Update Gate:** HDE-EPIC018 Closure
+ **Effective date:** 2025-12-01  
+ **Last Update Gate:** BN 7.9.7 Drain A18
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -1991,186 +1990,329 @@ Deliverables D1–D5 correspond to the five workstreams defined in the kickoff, 
 
 ---
 
-##### Deliverable D1 — Sampler/ranker deterministic pool and scoring (HDE-DISS003.1–.3)
+##### **Deliverable D1 — Sampler/ranker deterministic pool and scoring (HDE-DISS003.1–.3)**
 
 * **PF09 scope:**
 
-  * HDE‑DISS003 — Swipe Sampler & Ranker (task‑level)
+  * HDE-DISS003 — Swipe Sampler & Ranker (task-level)
 
-  * HDE‑DISS003.1 — Zero‑weight rule enforcement
+  * HDE-DISS003.1 — Zero-weight rule enforcement
 
-  * HDE‑DISS003.2 — Pool formation & eligibility filters
+  * HDE-DISS003.2 — Pool formation & eligibility filters
 
-  * HDE‑DISS003.3 — Deterministic scoring & total order
+  * HDE-DISS003.3 — Deterministic scoring & total order
 
 * **Job to be done:**  
    Implement the sampler/ranker such that it:
 
-  * Honors viewer weights and **enforces zero‑weight rules** (zero‑weight users never appear in the sampled pool).
+  * Honors viewer weights and **enforces zero-weight rules** (zero-weight users never appear in the sampled pool).
 
-  * Forms an eligibility‑filtered candidate pool consistent with PF09 Phase II semantics (normalization/compat/bands/categories already applied).
+  * Forms an eligibility-filtered candidate pool consistent with PF09 Phase II semantics (normalization/compat/bands/categories already applied).
 
-  * Applies deterministic scoring and tie‑breaking consistent with PF01/PF14 comparators, producing a total order over the candidate pool.
+  * Applies deterministic scoring and tie-breaking consistent with PF01/PF14 comparators, producing a total order over the candidate pool.
 
-* **Evidence required (titles‑only):**
+* **Evidence required (titles-only):**
 
   * Sampler pool formation and eligibility snapshots.
 
   * Scoring and ordering logs showing stable rank order across repeated runs under closed rails.
 
-  * Zero‑weight enforcement tests and logs (demonstrating zero‑weight users are excluded).
+  * Zero-weight enforcement tests and logs (demonstrating zero-weight users are excluded).
+
+* **Implementation note (non-normative):**  
+   As of PR 2 for HDE-EPIC019, the “deterministic pool and scoring” behavior for this deliverable is realized by the pure-compute sampler core in `engine/sampler/core.py` (exported via `engine/sampler/__init__.py`) together with unit tests in `tests/unit/test_sampler_core.py`; this module enforces zero-weight exclusion, PF09/PF14-aligned eligibility rules, and deterministic ordering using existing comparators, all without introducing I/O, clocks, environment reads, or module-level global state.
 
 * **PF references:**
 
-  * PF09 — Canon‑HDE‑Build Checklist, Phase II — Dissolution (HDE‑DISS003.1–.3).
+  * PF09 — Canon-HDE-Build Checklist, Phase II — Dissolution (HDE-DISS003.1–.3).
 
-  * PF01 — Canon‑HDE‑Math‑Spec (score and comparator semantics).
+  * PF01 — Canon-HDE-Math-Spec (score and comparator semantics).
 
-  * PF14 — Canon‑HDE‑Mechanics Guide (sampler/ranker mechanics and ordering module).
+  * PF14 — Canon-HDE-Mechanics Guide (sampler/ranker mechanics and ordering module).
 
-  * PF12 — Canon‑HDE‑Schemas and Artifacts (sampler snapshot / evidence schemas).
+  * PF12 — Canon-HDE-Schemas and Artifacts (sampler snapshot / evidence schemas).
 
-  * PF19 — Canon‑Glow QA Guide (determinism test patterns and QA token mappings).
+  * PF19 — Canon-Glow QA Guide (determinism test patterns and QA token mappings).
 
 ---
 
-##### Deliverable D2 — Seedable dev/admin sampler flows (HDE-DISS003.4)
+##### **Deliverable D2 — Seedable dev/admin sampler flows (HDE-DISS003.4)**
 
 * **PF09 scope:**
 
-  * HDE‑DISS003.4 — Seedable sampler behavior for dev/admin.
+  * HDE-DISS003.4 — Seedable sampler behavior for dev/admin.
 
 * **Job to be done:**  
-   Ensure dev/admin‑only sampler flows accept an optional seed and, under closed rails, produce byte‑identical outputs for identical inputs \+ seed without changing any public‑visible bytes or external behavior.
+   Ensure dev/admin-only sampler flows accept an optional seed and, under closed rails, produce byte-identical outputs for identical inputs \+ seed without changing any public-visible bytes or external behavior.
 
-* **Evidence required (titles‑only):**
+* **Evidence required (titles-only):**
 
-  * Seed replay logs demonstrating two‑run identity and ABBA behavior for sampler outputs.
+  * Seed replay logs demonstrating two-run identity and ABBA behavior for sampler outputs.
 
   * Tests/logs proving that enabling/disabling seed affects only candidate ordering and not the underlying pool or public result payload.
 
+* **Implementation note (non-normative):**  
+   As of PR 3 for HDE-EPIC019, the seedable dev/admin sampler flows for this deliverable are realized via a dev/admin-only `hdctl` subcommand `dev:sampler` that is gated by `APP_ENV` (restricted to dev/test/local), reads a JSON candidates payload into the pure-compute sampler core used for Deliverable D1, and emits canonical JSON on stdout that includes the viewer identifier, the seed echo, and ranked candidate details under closed rails. In this PR, the `seed` argument is metadata-only and does **not** influence candidate selection or ordering; any future seed-based tie-breaking behavior will be added in subsequent epic work while preserving the determinism and candidate-set stability required by this PF20 record. This CLI command is an internal QA/admin harness, not part of the public user-facing CLI contract; detailed CLI bytes and harness semantics remain single-homed in the CLI/API and schema documents (titles-only, e.g. CLI/API reference and schemas & artifacts), not here.
+
 * **PF references:**
 
-  * PF09 — Canon‑HDE‑Build Checklist, Phase II (HDE‑DISS003.4).
+  * PF09 — Canon-HDE-Build Checklist, Phase II (HDE-DISS003.4).
 
-  * PF14 — Canon‑HDE‑Mechanics Guide (sampler dev/admin flows).
+  * PF14 — Canon-HDE-Mechanics Guide (sampler dev/admin flows).
 
-  * PF19 — Canon‑Glow QA Guide (two‑run identity QA mappings and rails).
+  * PF19 — Canon-Glow QA Guide (two-run identity QA mappings and rails).
 
 ---
 
-##### Deliverable D3 — Dev-only sampler endpoint harness (HDE-DISS003.5)
+##### **Deliverable D3 — Dev-only sampler endpoint harness (HDE-DISS003.5)**
 
 * **PF09 scope:**
 
-  * HDE‑DISS003.5 — Dev‑only sampler endpoint harness.
+  * HDE-DISS003.5 — Dev-only sampler endpoint harness.
 
 * **Job to be done:**  
-   Provide a dev‑only sampler endpoint harness that:
+   Provide a dev-only sampler endpoint harness that:
 
   * Exposes candidate IDs and seed echo in canonical JSON, suitable for QA and debugging.
 
   * Uses the same deterministic sampler/ranker logic as CLI harnesses.
 
-  * Remains clearly non‑public and adheres to PF19/PF04 rails for dev/admin surfaces.
+  * Remains clearly non-public and adheres to PF19/PF04 rails for dev/admin surfaces.
 
-* **Evidence required (titles‑only):**
+* **Evidence required (titles-only):**
 
-  * Endpoint harness tests and logs demonstrating canonical JSON, two‑run identity, and AB↔BA behavior for sampler outputs.
+  * Endpoint harness tests and logs demonstrating canonical JSON, two-run identity, and AB↔BA behavior for sampler outputs.
 
-  * Evidence that endpoint is gated by dev/admin rails (e.g., auth/whitelist checks, environment flags).
+  * Evidence that endpoint is gated by dev/admin rails (for example explicit environment gating and writer-style forbidden envelopes outside allowed dev/admin environments).
 
-* **PF references:**
+* **Implementation note (non-normative):**  
+   As of PR 4 for HDE-EPIC019, this deliverable is realized by a dev/admin-only HTTP sampler harness at `POST /internal/dev/sampler` on the internal reader surface. The handler uses the same pure-compute sampler core as Deliverables D1/D2, building `ViewerProfile` and `CandidateFeatures` from the incoming candidate IDs and calling the sampler’s `sample_and_rank` function without changing eligibility or ordering semantics. It emits canonical JSON (UTF-8, sorted keys, compact, single trailing newline) containing only `viewer_id`, `meta.seed`, and the ordered `candidate_ids` list, and is **strictly gated by `APP_ENV`**: requests are permitted only when `APP_ENV` is explicitly one of `dev`, `test`, or `local`; missing, empty, or any other `APP_ENV` value produce a writer-style `403 forbidden` envelope. The HTTP harness mirrors the dev sampler CLI semantics (seed is echoed as metadata but does not alter ranking in this PR) and remains an internal dev/admin tool: it is excluded from the Endpoint Catalog and A7 proofs, and detailed HTTP bytes and rails semantics are single-homed in the CLI/API reference, infrastructure, governance, and QA guide documents (titles-only).
 
-  * PF05 — Canon‑HDE‑CLI‑API‑Vendor‑Ref (endpoint surfaces and CLI/HTTP behavior).
+   For **live HTTP QA runs** (for example Live QA steps that call `/internal/dev/sampler` from a Codespaces shell), D3 acceptance is contingent on a working dev Reader HTTP harness in the target environment, at the canonical host/port defined in the infrastructure canon. When QA rails are correctly set (for example `SAFE_MODE=1`, `ALLOW_NETWORK=1`, `APP_ENV=dev` for the allowed call and `APP_ENV=prod` for the gated call) and the request payload matches the handler’s expected JSON shape but the HTTP call fails at the protocol layer (for example `HTTP_STATUS:000`, HTTP/0.9 errors, or otherwise no HTTP/1.x status and no JSON body), the result MUST be classified as an infra/tooling failure (for example `FAIL_TOOLING` in QA logs) rather than as a sampler behavior pass/fail: the dev sampler handler has not been invoked, and D3 behavior and gating remain unproven. Under those conditions, D3 cannot be marked satisfied or Green for this epic; it remains **blocked by infra** until:
 
-  * PF09 — Canon‑HDE‑Build Checklist, Phase II (HDE‑DISS003.5).
+  * a dev Reader HTTP harness is available and reachable at the documented host/port in the target environment; and
 
-  * PF19 — Canon‑Glow QA Guide (rails and QA playbooks for dev‑only endpoints).
+  * QA can successfully exercise `/internal/dev/sampler` under both APP\_ENV=dev (expected canonical JSON 200\) and APP\_ENV=prod (expected writer-style 403 forbidden envelope), with the resulting logs and artifacts wired into the acceptance map and manifest for this epic.
 
-  * PF02 — Canon‑HDE‑Architecture (placement of sampler endpoint within the engine architecture).
-
----
-
-##### Deliverable D4 — Sampler/ranker evidence and indexing (HDE-DISS003.6)
-
-* **PF09 scope:**
-
-  * HDE‑DISS003.6 — Sampler evidence & Index/Mirror coverage.
-
-* **Job to be done:**  
-   Bring sampler/ranker artifacts into the governed Evidence Index & Machine Mirror with path‑proofs, enforcing canonical JSONL (UTF‑8, one LF), fixed field order, and unknown‑key rejection for mirror entries, in parity with compat/category evidence.
-
-* **Evidence required (titles‑only):**
-
-  * Updated human Evidence Index entries and hash sentinel for sampler evidence families.
-
-  * Updated machine Evidence Mirror records (JSONL) for sampler snapshots, diversity checks, and seed replay logs, with `proof_anchor` fields pointing to path‑proof files.
-
-  * Path‑proof artifacts showing that mirror entries match underlying artifacts.
+* This PF20 record tracks that D3’s acceptance depends on both the implemented endpoint behavior and the availability of a suitable dev Reader HTTP harness; the detailed service start commands, canonical host/port, and QA classification semantics for infra/tooling failures are defined and owned in the infrastructure and QA canon (titles-only).
 
 * **PF references:**
 
-  * PF09 — Canon‑HDE‑Build Checklist (Evidence Index rules and DISS003.6).
+  * PF05 — Canon-HDE-CLI-API-Vendor-Ref (endpoint surfaces and CLI/HTTP behavior).
 
-  * PF12 — Canon‑HDE‑Schemas and Artifacts (Index/Mirror schemas, path‑proof structures).
+  * PF07 — Canon-Glow-Infrastructure (dev Reader HTTP harness and host/port definitions).
 
-  * PF14 — Canon‑HDE‑Mechanics Guide (evidence tooling and mirror writers).
+  * PF09 — Canon-HDE-Build Checklist, Phase II (HDE-DISS003.5).
 
-  * PF19 — Canon‑Glow QA Guide (evidence discipline and QA tokens for Index/Mirror).
+  * PF19 — Canon-Glow QA Guide (rails, QA failure classifications, and QA playbooks for dev-only endpoints).
+
+  * PF02 — Canon-HDE-Architecture (placement of sampler endpoint within the engine architecture).  
+  * 
 
 ---
 
-##### Deliverable D5 — Deterministic Engine Core behavior and evidence (HDE-DISS004.1–.4)
+##### **Deliverable D4 — Sampler/ranker evidence and indexing (HDE-DISS003.6)**
 
 * **PF09 scope:**
 
-  * HDE‑DISS004 — Deterministic Engine Core (task‑level)
-
-  * HDE‑DISS004.1 — Pure compute (no I/O/clocks/globals)
-
-  * HDE‑DISS004.2 — AB↔BA & two‑run identity for Engine Core
-
-  * HDE‑DISS004.3 — Canonical JSON compare for core artifacts
-
-  * HDE‑DISS004.4 — Engine core evidence & indexing
+  * HDE-DISS003.6 — Sampler evidence & Index/Mirror coverage.
 
 * **Job to be done:**  
-   Prove the Engine Core is a pure‑compute unit that:
+   Bring sampler/ranker artifacts into the governed Evidence Index & Machine Mirror with path-proofs, enforcing canonical JSONL (UTF-8, one LF), fixed field order, and unknown-key rejection for mirror entries, in parity with compat/category evidence, so that sampler behavior (pool, ordering, diversity, seed behavior) is evidenced under the same discipline as compat and category layers.
 
-  * Performs no I/O, does not touch clocks, environment, filesystem, network, or process‑wide globals under governed rails.
+* **Evidence required (titles-only):**
 
-  * Satisfies AB↔BA neutrality and two‑run identity for core operations (same inputs under closed rails → same outputs; swapping A/B yields expected neutral/compatible behavior).
+  * **Sampler evidence families (names-only; schemas, artifacts, and Mirror records governed by the schemas & artifacts and mechanics docs):**
 
-  * Emits any JSON evidence in canonical form and passes canonical‑compare checks.
+    * `sampler_pool_snapshots` — sampler pool/eligibility snapshot artifacts (viewer, candidate IDs, bands, compat scores, weights, eligibility flags) with governed artifacts under `artifacts/sampler/pool_snapshots/…` and a sampler pool snapshots schema under `docs/schemas/sampler/pool_snapshots.schema.json`.
 
-  * Has all governed core evidence indexed and mirrored with path‑proofs alongside sampler and compat/category evidence.
+    * `sampler_two_run_logs` — sampler two-run identity logs (same inputs → identical ordering), with artifacts under `artifacts/sampler/two_run/…` and a corresponding two-run logs schema.
 
-* **Evidence required (titles‑only):**
+    * `sampler_abba_logs` — AB/BA/ABBA sampler runs for parity checks, with artifacts under `artifacts/sampler/abba/…` and an ABBA logs schema.
+
+    * `sampler_diversity_artifacts` — diversity/window/recent-constraint evidence, with artifacts under `artifacts/sampler/diversity/…` and a diversity artifacts schema.
+
+    * `sampler_seed_replay_logs` — seed replay logs from dev sampler CLI/HTTP harnesses, showing repeated seeded runs and proving seed-echo semantics and candidate-set stability, with artifacts under `artifacts/sampler/seed_replay/…` and a seed replay logs schema.
+
+  * **Index & sentinel (human Evidence Index; titles-only):**
+
+    * `docs/evidence/INDEX.json` entries for each sampler family (artifact\_key names such as `sampler_pool_snapshots`, `sampler_two_run_logs`, `sampler_abba_logs`, `sampler_diversity_artifacts`, `sampler_seed_replay_logs`) pointing to the governed sampler artifacts above.
+
+    * `docs/evidence/INDEX.sha256` regenerated over the canonical bytes of `docs/evidence/INDEX.json` after sampler families are added.
+
+  * **Machine Evidence Mirror & path-proofs (JSONL, Mirror-wide discipline):**
+
+    * `artifacts/evidence_index.jsonl` records for sampler artifacts and their schemas, each with the full Mirror field set (including `artifact_key`, `role`, `sha256`, `size_bytes`, `produced_at_utc`, `discovered_physical_path`, `proof_anchor`) and governed field order, in parity with existing compat/category evidence families.
+
+    * Path-proof transcripts (`*.path_proof.txt`) for each sampler artifact and schema (for example sampler pool snapshots, two-run identity logs, ABBA logs, diversity artifacts, seed replay logs, and their schemas), with path, `sha256`, `size_bytes`, and UTC time fields consistent with the corresponding Mirror records.
+
+  * **Tests and tooling (titles-only):**
+
+    * Sampler evidence generator tooling (for example a dedicated sampler evidence generator that calls the sampler core plus dev sampler CLI/HTTP harnesses under closed rails) and the evidence-index update toolchain used to wire sampler families into the Index/Mirror and sentinel.
+
+    * Evidence tests (for example `tests/evidence/test_sampler_evidence.py` and related suites) that:
+
+      * validate sampler artifacts against their schemas;
+
+      * assert that `docs/evidence/INDEX.json` contains sampler family entries with the expected shapes and that `docs/evidence/INDEX.sha256` matches the canonical Index body; and
+
+      * verify that `artifacts/evidence_index.jsonl` contains sampler Mirror records matching the Index entries and that each sampler artifact/schema has a corresponding path-proof referenced by `proof_anchor`.
+
+* **Implementation note (non-normative):**  
+   As of PR 5 for HDE-EPIC019, this deliverable is realized by defining the sampler evidence families `sampler_pool_snapshots`, `sampler_two_run_logs`, `sampler_abba_logs`, `sampler_diversity_artifacts`, and `sampler_seed_replay_logs`, generating their governed artifacts under `artifacts/sampler/**` via a sampler evidence generator that reuses the sampler core and dev sampler harnesses under closed rails, adding matching sampler schemas under `docs/schemas/sampler/**`, and extending `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, and `artifacts/evidence_index.jsonl` with sampler entries and path-proofs via the existing evidence tooling. A follow-up bugfix PR corrects a provenance defect by refreshing the sampler Mirror entries and their path-proof transcripts so that `produced_at_utc` for sampler families reflects the actual evidence refresh time and matches the corresponding path-proof timestamps.
+
+   For D4, EPIC019 is considered complete when these sampler families, artifacts, schemas, Index/Mirror entries, and path-proofs are present and coherent under the schemas & artifacts and mechanics canon; detailed schema shapes, Mirror field semantics, and provenance rules remain single-homed in those PF documents. As of the HDE-EPIC019 QA summary referenced in this version (combined CI sampler evidence tests and Live QA Step 5 in the prod Codespace run), those conditions are met: the sampler families above exist under governed paths, their schemas and Index/Mirror entries are wired and validated by `tests/evidence/test_sampler_evidence.py` and related suites, and acceptance map/manifest bindings for D4 tokens point at these artifacts. This deliverable is therefore treated as **satisfied** for HDE-EPIC019; future epics may add new sampler evidence families or QA playbooks without reopening D4, provided they respect the same PF12/PF14 evidence discipline.
+
+* **PF references:**
+
+  * PF09 — Canon-HDE-Build Checklist (Evidence Index rules and DISS003.6).
+
+  * PF12 — Canon-HDE-Schemas and Artifacts (Index/Mirror schemas, sampler evidence families, path-proof structures).
+
+  * PF14 — Canon-HDE-Mechanics Guide (evidence tooling, sampler evidence generator, Mirror writers).
+
+  * PF19 — Canon-Glow QA Guide (evidence discipline and QA tokens for Index/Mirror).
+
+    
+
+---
+
+##### **Deliverable D5 — Deterministic Engine Core behavior and evidence (HDE-DISS004.1–.4)**
+
+* **PF09 scope:**
+
+  * HDE-DISS004 — Deterministic Engine Core (task-level)
+
+  * HDE-DISS004.1 — Pure compute (no I/O/clocks/globals)
+
+  * HDE-DISS004.2 — AB↔BA & two-run identity for Engine Core
+
+  * HDE-DISS004.3 — Canonical JSON compare for core artifacts
+
+  * HDE-DISS004.4 — Engine core evidence & indexing
+
+* **Job to be done:**  
+   Prove the Engine Core is a pure-compute unit that:
+
+  * Performs no I/O, does not touch clocks, environment, filesystem, network, or process-wide globals under governed rails.
+
+  * Satisfies AB↔BA neutrality and two-run identity for core operations (same inputs under closed rails → same outputs; swapping A/B yields expected neutral/compatible behavior).
+
+  * Emits any JSON evidence in canonical form and passes canonical-compare checks.
+
+  * Has all governed core evidence indexed and mirrored with path-proofs alongside sampler and compat/category evidence.
+
+* **Evidence required (titles-only):**
 
   * Static guard report showing no I/O/clocks/globals for core code paths.
 
-  * Two‑run identity logs for core computations.
+  * Two-run identity logs for core computations.
 
   * ABBA/AB↔BA identity bytes/logs for Engine Core behavior.
 
-  * Canonical‑JSON compare logs for core evidence artifacts.
+  * Canonical-JSON compare logs for core evidence artifacts.
 
-  * Index/Mirror entries and path‑proofs for all core evidence families.
+  * Index/Mirror entries and path-proofs for all core evidence families.
+
+* **Implementation note (non-normative):**  
+   As of the completed HDE-EPIC019 work, this deliverable is realized in two parts:
+
+  * **Behavior (HDE-DISS004.1–.3):**  
+     The pure-compute Engine Core module in `engine/core/core.py` (exported via `engine/core/__init__.py`) with the frozen dataclasses `ParticipantState`, `CoreConfig`, `PerspectiveBreakdown`, and `CoreResult` as the Engine Core input/output structures. A dedicated test suite under `tests/core/` enforces (under closed determinism rails) that Engine Core code paths import without side effects (no I/O, env, clocks, network, or globals), satisfy AB↔BA neutral metrics for neutral outputs, and exhibit two-run identity and JSON-ready `CoreResult` semantics when serialized via `dataclasses.asdict` with sorted keys.
+
+  * **Evidence & indexing (HDE-DISS004.4):**  
+     Engine Core evidence families are added as governed artifacts and schemas and wired into the Evidence Index and Machine Mirror with path-proofs, mirroring the sampler evidence pattern for D4 (titles-only; shapes and field semantics remain single-homed in the schemas & artifacts and mechanics documents). Specifically:
+
+    * Engine Core evidence families (names-only, governed elsewhere), for example:
+
+      * `engine_core_purity_report` — purity report artifacts under `artifacts/core/purity/…` with a corresponding Engine Core purity-report schema.
+
+      * `engine_core_two_run_logs` — Engine Core two-run identity logs under `artifacts/core/two_run/…` with a corresponding two-run logs schema.
+
+      * `engine_core_abba_logs` — Engine Core AB/BA/ABBA parity logs under `artifacts/core/abba/…` with a corresponding ABBA logs schema.
+
+      * `engine_core_json_compare_logs` — canonical JSON compare logs for Engine Core evidence under `artifacts/core/json_compare/…` with a corresponding JSON-compare logs schema.
+
+    * Human Evidence Index entries and hash sentinel for these families (`docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`), plus Machine Mirror JSONL records in `artifacts/evidence_index.jsonl` and path-proof transcripts (`*.path_proof.txt`) that satisfy the Mirror and provenance invariants alongside sampler evidence.
+
+    * Inclusion of these Engine Core evidence generators and checks in the closed-rails determinism/sanity pipeline and env-pins gate so that the pipeline produces canonical `sanity.log` and env-pins logs whose updated hashes and sizes are reflected in the Human Evidence Index, Machine Mirror, path-proofs, and the EPIC019 manifest.
+
+* EPIC019’s acceptance map and manifest now bind the D5-related tokens (for example `SANITY_PIPELINE_OK`, `DETERMINISM_ENV_PINS_OK`, `AB_BA_PARITY_OK`, `JSON_CANONICAL_CHECK_OK`, `NO_IO_NO_CLOCKS_OK`, and the relevant `EVIDENCE_INDEX_*`/`EVIDENCE_PATHS_VALIDATED_OK`/`MACHINE_MIRROR_UPDATED_OK` tokens) to these Engine Core evidence families, sanity/env-pins runs, and Index/Mirror artifacts, and new audit tests enforce manifest↔acceptance map consistency for these bindings. For D5, HDE-EPIC019 is considered complete when the Engine Core behavior and evidence requirements above are satisfied under governed rails and the EPIC019 acceptance map and manifest show all D5 tokens as Green with corresponding governed artifacts and tests, with detailed schema shapes, evidence family layouts, and Mirror/provenance rules remaining single-homed in the schemas & artifacts, mechanics, governance, and QA canon.
+
+   As of the HDE-EPIC019 QA summary reflected in this version, those conditions are met at the repo/CI level and reinforced by Live QA: Engine Core behavior tests (`tests/core/**`) and Engine Core evidence tests (`tests/evidence/test_engine_core_evidence.py` and related suites) run and pass under closed determinism rails; Engine Core evidence families appear in `docs/evidence/INDEX.json` and `artifacts/evidence_index.jsonl` with governed path-proofs; and the determinism/sanity pipeline and env-pins CI jobs execute successfully, producing canonical `artifacts/sanity/sanity.log` and env-pins logs whose hashes and sizes match their Index/Mirror and manifest entries. The Codespace Live QA run for Step 6 re-exercised core behavior and evidence tests successfully; Step 7’s attempt to invoke the sanity pipeline from that environment produced no captured log and is classified in the QA summary as a **tooling/logging gap for that environment**, not as a failure of D5 behavior or evidence, because the closed-rails CI pipeline remains the canonical evidence for `SANITY_PIPELINE_OK` and `DETERMINISM_ENV_PINS_OK` in this epic. Taken together, D5 is therefore treated as **satisfied** for HDE-EPIC019 in PF20; any future changes to Engine Core evidence or the sanity pipeline must preserve these properties and update PF09/PF12/PF14/PF19 and the EPIC019 acceptance map/manifest accordingly.
 
 * **PF references:**
 
-  * PF09 — Canon‑HDE‑Build Checklist, Phase II (HDE‑DISS004.\*).
+  * PF09 — Canon-HDE-Build Checklist, Phase II (HDE-DISS004.\*).  
+  * PF14 — Canon-HDE-Mechanics Guide (Engine Core semantics, ABBA/two-run proofs, evidence tooling).  
+  * PF12 — Canon-HDE-Schemas and Artifacts (core evidence schemas and mirror records).  
+  * PF19 — Canon-Glow QA Guide (determinism and no-I/O QA playbooks).  
+  * PF01 — Canon-HDE-Math-Spec (core math invariants).  
+  * PF02 — Canon-HDE-Architecture (Engine Core component boundaries).
 
-  * PF14 — Canon‑HDE‑Mechanics Guide (Engine Core semantics, ABBA/two‑run proofs).
+##### **Deliverable D6 — Live vendor transport proof under open rails (EPIC019 vendor D-goal)**
 
-  * PF12 — Canon‑HDE‑Schemas and Artifacts (core evidence schemas and mirror records).
+* **PF09 scope:**
 
-  * PF19 — Canon‑Glow QA Guide (determinism and no‑I/O QA playbooks).
+  * Vendor ingest–related Dissolution tasks for this epic (titles-only; see PF09 Phase II vendor ingest / live vendor QA tasks for normative scope and names).
 
-  * PF01 — Canon‑HDE‑Math‑Spec (core math invariants).
+* **Job to be done:**  
+   Demonstrate at least **one real vendor transport** for this epic under **open rails**, in a prod-like environment, with evidence sufficient to prove that:
 
-  * PF02 — Canon‑HDE‑Architecture (Engine Core component boundaries).
+  * `ALLOW_NETWORK=1` was enabled and rails were explicitly set to an open-rails posture appropriate for Live Vendor QA (including `SAFE_MODE` and core determinism pins, per PF04/PF19);
+
+  * a real HTTP or CLI call reached the vendor (for example via engine/Reader/CLI ingest paths as defined in PF05/PF14/PF07), and a response (success or controlled failure) was received; and
+
+  * the rails and environment at the time of the vendor call were captured as evidence alongside the transport trace.
+
+* Closed-rails tests (for example ingest unit tests, local harnesses, or CI runs with `ALLOW_NETWORK=0`) may prove sampler/core mechanics and evidence wiring but **cannot**, by themselves, satisfy this D6 D-goal for live vendor activity.
+
+* **Evidence required (titles-only):**
+
+  * **Open-rails environment baseline:**
+
+    * A dedicated env/rails baseline log for the Live Vendor QA run (for example `audit/qa/hde-epic019/D0_env_rails_open.log`), recording at least `SAFE_MODE`, `ALLOW_NETWORK`, `APP_ENV`, `LC_ALL`, `LANG`, and `TZ` and clearly marking the session as an open-rails Live Vendor QA run for HDE-EPIC019.
+
+  * **Prod connectivity to vendor / Railway:**
+
+    * Discovery evidence that vendor-facing endpoints are reachable from the QA environment (for example a connectivity check to the canonical Railway host/port or vendor gateway URL under open rails, with response or connection failure captured as a governed log).
+
+    * This evidence must distinguish “no path to vendor” (pure infra failure) from “vendor responded with an application or transport error.”
+
+  * **Reader/CLI service readiness (dev/prod harness):**
+
+    * Evidence that the engine/Reader/CLI surfaces used for live vendor calls are running and reachable in the target environment (for example a simple CLI/HTTP health check to a known internal endpoint with an HTTP/1.x status and JSON body before attempting vendor calls).
+
+  * **Live vendor transport trace (minimum proof):**
+
+    * At least one governed log or JSON artifact under `audit/qa/hde-epic019/…` that shows:
+
+      * the exact command or HTTP request used to trigger vendor ingest (CLI or Reader/HTTP), including target URL or CLI arguments and rails context;
+
+      * the resulting HTTP status and headers for the vendor-facing call (including vendor host/URL or an unambiguous proxy of it per PF14/PF07); and
+
+      * either a successful vendor response (for example a JSON payload or an expected success code) or a controlled, documented failure (for example a vendor 4xx/5xx, timeout, or auth failure) that still proves real transport to the vendor surface.
+
+    * This evidence must be sufficient to support a QA acceptance token (for example `LIVE_VENDOR_TRANSPORT_OK`) in PF19 §9A, with EPIC019 consuming that token by name in its acceptance map.
+
+  * **Rails and discovery linkage (names-only):**
+
+    * A short QA summary artifact for the Live Vendor QA session (for example `audit/qa/hde-epic019/qa_rerun_vendor_live_summary.md`) that:
+
+      * ties the vendor transport trace back to the rails baseline log and any discovery artifacts (for example service topology, Railway endpoints, Reader/CLI readiness);
+
+      * states explicitly whether the vendor call met the intended acceptance condition (for example “success response from vendor X under open rails” or “controlled failure from vendor X under open rails”); and
+
+      * identifies which PF19 QA tokens and PF09 tasks this evidence satisfies (names-only, for example `LIVE_VENDOR_TRANSPORT_OK`, `OPEN_RAILS_ENV_OK`, `DISCOVERY_BASELINE_OK` once those tokens are registered in PF19).
+
+* **Implementation note (non-normative):**  
+   For HDE-EPIC019, this deliverable is a **Live QA D-goal** that sits on top of the sampler/core mechanics and evidence work in D1–D5. The sampler and Engine Core mechanics and evidence families (D1–D5) may be exercised entirely under closed rails and CI harnesses, but D6 requires at least one **explicit Live Vendor QA run** under open rails, using the actual engine/Reader/CLI surfaces and vendor/Railway topology described in PF05/PF07/PF14, with rails, environment, and transport captured as governed evidence. The detailed token semantics for Live Vendor QA (for example `LIVE_VENDOR_TRANSPORT_OK`, `OPEN_RAILS_ENV_OK`, `DISCOVERY_BASELINE_OK`) and their evidence mappings are owned by PF19 §9A and PF04/PF09/PF12/PF14; EPIC019’s role in PF20 is to:
+
+  * declare this D6 D-goal and require at least one live vendor transport proof under open rails for epic acceptance;
+
+  * ensure that the EPIC019 acceptance map and manifest list the relevant Live Vendor QA tokens and bind them to the Live Vendor QA evidence artifacts described above; and
+
+  * treat closed-rails tests and purely local harnesses as **necessary but not sufficient** for satisfying D6: they may prove mechanics and indexing, but without the live vendor transport trace and rails baseline, D6 remains Not done and EPIC019 cannot be marked Done in PF20.
 
 #### 2.4.4 PF Reference Map
 
@@ -2342,6 +2484,17 @@ Evidence must be captured and indexed according to PF12/PF09/PF14; titles below 
 
 Each evidence family must be reflected in both the human Evidence Index and Machine Mirror, and mapped to the corresponding tokens in the acceptance roster for HDE‑EPIC019.
 
+**EPIC019 acceptance map (titles-only):**
+
+* `docs/acceptance_map_epic019.json` — EPIC019 acceptance map that enumerates Deliverables D1–D5 and their PF19/PF09 QA tokens and exposes a `token_status` table keyed by token name. The acceptance map and `audit/EPIC019_MANIFEST.json` together form the canonical acceptance roster for this epic:
+
+  * For each deliverable D1–D5, the acceptance map lists the PF19/PF09 tokens that must be satisfied (for example sampler determinism and purity tokens for D1, rails and CLI/endpoint QA tokens for D2–D3, sampler evidence tokens for D4, and Engine Core determinism and evidence tokens for D5), and the `token_status` table records, for each token, its status plus titles-only references to the tests and governed artifacts that prove it.
+
+  * The EPIC019 manifest binds each token to concrete evidence artifacts (for example the Epic manifest and acceptance map themselves, sampler and Engine Core evidence families in the Evidence Index and Machine Mirror, and the determinism/sanity pipeline and env-pins logs), and dedicated audit tests assert that every token in the acceptance map is backed by manifest entries whose artifact titles and paths match the map’s declared evidence homes.
+
+  * In the final, closed state for HDE-EPIC019, all required baseline and phase-specific tokens for this epic (as listed in §2.4.5) are expected to be Green in this acceptance map/manifest pair, with non-empty `tests` and `artifacts` lists that point to governed evidence families under the schemas & artifacts and mechanics canon; PF20 records this structure and the requirement that manifest, acceptance map, Evidence Index, and Machine Mirror remain in sync, but the detailed schema shapes, evidence family layouts, and token semantics remain single-homed in the governance, build, schemas, and QA documents.
+
+
 #### 2.4.6 QA Rails — Open/Close (Final PR)
 
 Rails posture for HDE‑EPIC019 follows PF19/PF04 and the determinism patterns from HDE‑EPIC018; this epic extends those rails to sampler and Engine Core suites.
@@ -2417,6 +2570,4 @@ At planning time for HDE‑EPIC019:
     * Promoted to a cross‑epic ISSUE‑XXX in PF20 §1, or
 
     * Explicitly dropped with a one‑line rationale, in line with PF20’s normative rules.
-
-ASK OK?
 

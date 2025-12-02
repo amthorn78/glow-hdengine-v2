@@ -3,10 +3,11 @@
 ## 0.1 Header
 
  **Title:** PF12-Canon-HDE-Schemas and Artifacts  
- **Version:** v1.4.6  
+ **Version:** v1.5
+
  **Status:** Canon  
- **Effective date:** 2025-11-28  
- **Last Update Gate:** BN 7.8.9 Drain A22
+ **Effective date:** 2025-12-01  
+ **Last Update Gate:** BN 7.9.7 Drain A18
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -2037,6 +2038,65 @@ Process and PR workflow (who runs which command and when) remains single-homed i
 
 * `log` → `artifacts/db/migration_runner.log`, `artifacts/proofs/headers_probe.log`, `artifacts/bodygraph/keys_only.logs.sample` (sanitized; keys-only, no PII per Governance)
 
+### 
+
+**Artifacts with `generated_at_utc` (provenance discipline, including sampler and Engine Core evidence).**
+
+Some governed artifacts (for example, sampler evidence artifacts under `artifacts/sampler/**` and Engine Core evidence artifacts under `artifacts/core/**`) include a `generated_at_utc` field in their own JSON payloads. For these artifact families, provenance discipline tightens the relationship between the payload timestamp and the evidence timestamps recorded in the Machine Mirror and path-proofs.
+
+Normative rules (in addition to the general rules in this section):
+
+* When an artifact carries a `generated_at_utc` field in its payload, the evidence tooling **MUST** treat that field as the artifact’s self-reported generation time for the current refresh and enforce all of the following:
+
+  * `produced_at_utc` in the Machine Evidence Mirror record for that artifact **MUST NOT** be **earlier** than the artifact’s `generated_at_utc` value. Backdating Mirror `produced_at_utc` relative to `generated_at_utc` is not allowed.
+
+  * `produced_at_utc` in the Machine Evidence Mirror record and `produced_at_utc` in the artifact’s path-proof transcript **MUST** be identical strings (same UTC ISO-8601 representation). Mirror and path-proof timestamps **MUST** stay in lockstep for a given artifact.
+
+  * `mtime_utc` in the path-proof remains the refresh-time filesystem mtime (see “`mtime_utc` semantics” above) and **MUST NOT** be later than the artifact’s current filesystem `stat().st_mtime` at check time. `mtime_utc` may be earlier than `generated_at_utc` (for example, when an artifact’s content has not changed between runs but evidence is refreshed), but `sha256` and `size_bytes` **MUST** still match.
+
+* For governed families that include both `generated_at_utc` and `produced_at_utc` (including the sampler families registered in §8.6.3 and the Engine Core families `engine_core_purity_report`, `engine_core_two_run_logs`, `engine_core_abba_logs`, and `engine_core_json_compare_logs`), provenance correctness for a given refresh requires:
+
+  * the artifact’s payload `generated_at_utc` and the Mirror `produced_at_utc` to describe the **same refresh window** (`produced_at_utc` ≥ `generated_at_utc` in UTC time), and
+
+  * the path-proof `produced_at_utc` to match the Mirror `produced_at_utc` exactly.
+
+* Integrity gates for these artifacts continue to rely primarily on `sha256` and `size_bytes` equality across artifact, Mirror record, and path-proof. Timestamp checks are **additive**: format, monotonicity (per “`mtime_utc` semantics”), and the non-backdating rule relative to payload `generated_at_utc` are enforced **in addition to** the existing sha/size equality rules.
+
+Example — sampler and Engine Core evidence fixes (HDE-EPIC019):
+
+* In earlier EPIC019 work, sampler Mirror records and path-proofs for `sampler_pool_snapshots`, `sampler_two_run_logs`, `sampler_abba_logs`, `sampler_diversity_artifacts`, and `sampler_seed_replay_logs` carried `produced_at_utc` values copied from an older skeleton baseline even after the artifacts themselves were regenerated with later `generated_at_utc` timestamps. Engine Core evidence families added in PR7 (`engine_core_purity_report`, `engine_core_two_run_logs`, `engine_core_abba_logs`, `engine_core_json_compare_logs`) were wired with `generated_at_utc` and closed-rails env metadata from the start.
+
+* The EPIC019 bugfix refreshed Mirror records and path-proofs so that:
+
+  * sampler artifacts under `artifacts/sampler/**` and Engine Core artifacts under `artifacts/core/**` retain canonical bytes (`sha256` and `size_bytes` unchanged when content is unchanged),
+
+  * their payload `generated_at_utc` values reflect the actual regeneration time for the latest evidence run, and
+
+  * `produced_at_utc` in both Mirror and path-proofs is updated to the later refresh time, satisfying the non-backdating rule above and restoring consistency between payload generation timestamps and evidence timestamps for all families that carry `generated_at_utc`.
+
+Tools and tests:
+
+* Evidence tooling (for example, `tools/evidence/update_evidence_index.py` and any Engine Core/sampler-specific generators) and Mirror schema checks **MUST** implement these provenance rules whenever an artifact family introduces a payload-level `generated_at_utc` field.
+
+* Tests that exercise those families (for example, sampler evidence tests under `tests/evidence/` and Engine Core evidence tests under `tests/evidence/test_engine_core_evidence.py`) **SHOULD** assert that:
+
+  * `produced_at_utc` in Mirror and path-proofs matches for each artifact instance, and
+
+  * where `generated_at_utc` is present, Mirror `produced_at_utc` is not earlier than payload `generated_at_utc`.
+
+Change control:
+
+* Any change to the relationship between payload `generated_at_utc` and evidence `produced_at_utc` semantics is a normative change and **MUST** land with:
+
+  * a PF12 Doc-Delta (§9),
+
+  * synchronized updates to the relevant Mechanics/QA specs that describe Engine Core and sampler evidence behavior, and
+
+  * synchronized changes to the evidence tools and tests that enforce these semantics before the change is considered accepted.
+
+
+### 
+
 ### **8.3.1 Refusal proof (single-file canonical) \[Required-Now\]**
 
 **Path (fixed)**
@@ -2679,11 +2739,11 @@ And you **MUST** assert the mirror/index tokens named in §8.3 (for example, `EV
 
 ---
 
-### **8.6.3 Entries (authoritative list; titles/paths only)**
+### **`8.6.3 Entries (authoritative list; titles/paths only)`**
 
-Human Index entries are **titles/paths only**. Mirror records include at least `artifact_key`, `role`, `sha256`, `size_bytes`, `produced_at_utc`, `discovered_physical_path`, and `proof_anchor`. Every artifact listed below must have exactly one Human Index entry and one Mirror record, plus a single governed `*.path_proof.txt` transcript, all kept in lockstep.
+`Human Index entries are titles/paths only. Machine Mirror records include at least artifact_key, role, sha256, size_bytes, produced_at_utc, discovered_physical_path, and proof_anchor. Every artifact listed below must have exactly one Human Index entry and one Machine Mirror record, plus a single governed *.path_proof.txt transcript, all kept in lockstep.`
 
-#### **Freeze-pack and math**
+#### **`8.6.3.1 Freeze-pack and math`**
 
 * `artifacts/math/freeze_pack_manifest.json`
 
@@ -2695,7 +2755,7 @@ Human Index entries are **titles/paths only**. Mirror records include at least `
 
 * `artifacts/math/manifest_snapshot.json`
 
-  #### **Canonical JSON and topology**
+  #### **`8.6.3.2 Canonical JSON and topology`**
 
 * `artifacts/canonical/arrays_as_sets_report.log`
 
@@ -2703,7 +2763,7 @@ Human Index entries are **titles/paths only**. Mirror records include at least `
 
 * `artifacts/topology/topology_coherence.log`
 
-  #### **Topology orientation demo**
+  #### **`8.6.3.3 Topology orientation demo`**
 
 * `audit/gates/topology/orientation_demo.txt`
 
@@ -2711,23 +2771,23 @@ Human Index entries are **titles/paths only**. Mirror records include at least `
 
 * `audit/gates/topology/multiplicity_vector.log`
 
-These artifacts form the **topology.orientation\_demo** family and serve as the exemplar for path-proof validation and topology invariants; each **MUST** be indexed in both the Human Evidence Index and the Machine Evidence Mirror with matching path-proofs.
+`These artifacts form the topology.orientation_demo family and serve as the exemplar for path-proof validation and topology invariants; each MUST be indexed in both the Human Evidence Index and the Machine Evidence Mirror with matching path-proofs.`
 
-#### **Deterministic order & comparators \[Required-Now\]**
+#### **`8.6.3.4 Deterministic order & comparators [Required-Now]`**
 
 * `artifacts/engine/order/props_total_order.log`  
-   Log of ordering properties and invariants (antisymmetry, transitivity, totality) for the canonical comparators.
+   `Log of ordering properties and invariants (antisymmetry, transitivity, totality) for the canonical comparators.`
 
 * `artifacts/engine/order/channels_sorted.snapshot.json`  
-   Canonical JSON snapshot of channels in comparator order.
+   `Canonical JSON snapshot of channels in comparator order.`
 
 * `artifacts/engine/order/categories_iter.snapshot.json`  
-   Canonical JSON snapshot of categories in comparator order.
+   `Canonical JSON snapshot of categories in comparator order.`
 
 * `artifacts/engine/order/abba_identity.bytes`  
-   Binary AB↔BA identity sample for comparator behavior, governed by the same mirror and path-proof discipline (`abba_identity.bytes.path_proof.txt`) as other artifacts in this section.
+   `Binary AB↔BA identity sample for comparator behavior, governed by the same Mirror and path-proof discipline (abba_identity.bytes.path_proof.txt) as other artifacts in this section.`
 
-  #### **Endpoint Catalog and A7 proofs**
+  #### **`8.6.3.5 Endpoint Catalog and A7 proofs`**
 
 * `artifacts/reader/endpoints_snapshot.json`
 
@@ -2741,40 +2801,40 @@ These artifacts form the **topology.orientation\_demo** family and serve as the 
 
 * `artifacts/proofs/success_writers_errors.txt`
 
-* `artifacts/proofs/encoding_invariance.txt` *(optional)*
+* `artifacts/proofs/encoding_invariance.txt (optional)`
 
 * `artifacts/proofs/reader_success_get_head_304.json`  
-   Composite proof; schema owned by the Endpoint Catalog evidence section (§8.12).
+   `Composite proof; schema owned by the Endpoint Catalog evidence section (§8.12).`
 
-  #### **Aux Narrative (text) — header snapshots**
+  #### **`8.6.3.6 Aux Narrative (text) — header snapshots`**
 
 * `tests/transport/headers/aux_text_200.snap`
 
 * `tests/transport/headers/aux_suppression_200.snap`
 
-  #### **CLI Admin Preview (narrative) — evidence**
+  #### **`8.6.3.7 CLI Admin Preview (narrative) — evidence`**
 
 * `artifacts/cli/narrative/stdout.txt`  
-   LF-terminated narrative text; **no ANSI**.
+   `LF-terminated narrative text; no ANSI.`
 
 * `artifacts/cli/narrative/sidecar.json`  
-   IDs-only: `composition_id`, `fragment_ids[]`, `pack_sha`, optional `release_id`; canonical JSON.
+   `IDs-only: composition_id, fragment_ids[], pack_sha, optional release_id; canonical JSON.`
 
-  #### **Narratives coverage (router)**
+  #### **`8.6.3.8 Narratives coverage (router)`**
 
 * `audit/gates/narratives/keys_10x4.table.json`
 
-  #### **Rails proofs (ops)**
+  #### **`8.6.3.9 Rails proofs (ops)`**
 
 * `artifacts/proofs/ops_refusal_proof.txt`  
-   Single-file refusal (headers → blank line → LF-terminated JSON).  
-   Record type: `ops_refusal_proof`; policy and tokens are owned by **HDE-Governance** (titles-only).
+   `Single-file refusal (headers → blank line → LF-terminated JSON).`  
+   `Record type: ops_refusal_proof; policy and tokens are owned by HDE-Governance (titles-only).`
 
 * `ci/jobs/logs_keys_only_redaction.yml`
 
 * `ci/jobs/rails_open_conformance.yml`
 
-  #### **DB posture and runtime**
+  #### **`8.6.3.10 DB posture and runtime`**
 
 * `artifacts/db/ddl_fingerprint.json`
 
@@ -2786,27 +2846,27 @@ These artifacts form the **topology.orientation\_demo** family and serve as the 
 
 * `artifacts/db/partition_plan.txt`
 
-* `artifacts/db/db_rw_smoke.log` *(optional)*
+* `artifacts/db/db_rw_smoke.log (optional)`
 
-  #### **Runtime / env**
+  #### **`8.6.3.11 Runtime / env`**
 
 * `artifacts/runtime/env_matrix.snapshot.json`  
-   Singleton snapshot (`schema_version: 3`); default rails and determinism pins; presence booleans for DB/bridge/guard. Schema owned by §8.3.2; tokens by title in Governance.
+   `Singleton snapshot (schema_version: 3); default rails and determinism pins; presence booleans for DB/bridge/guard. Schema owned by §8.3.2; tokens by title in Governance.`
 
 * `artifacts/runtime/env_connectivity.snapshot.json`  
-   Dev resolver snapshot; records attempts and selected source on fallback.
+   `Dev resolver snapshot; records attempts and selected source on fallback.`
 
-  #### **Ops / refusal (closed-rails)**
+  #### **`8.6.3.12 Ops / refusal (closed-rails)`**
 
 * `artifacts/proofs/ops_refusal_proof.txt`  
-   Same governed artifact as above, viewed here specifically as the **closed-rails refusal proof** (headers → blank line → LF-terminated JSON). Policy and tokens by title in Governance.
+   `Same governed artifact as above, viewed here specifically as the closed-rails refusal proof (headers → blank line → LF-terminated JSON). Policy and tokens by title in Governance.`
 
-  #### **Internal-ops surface**
+  #### **`8.6.3.13 Internal-ops surface`**
 
-* `/internal/version` headers/body proofs  
-   Titles/paths for header/body evidence artifacts are defined by **HDE-Governance** in the internal ops appendix; PF12 records them here as part of the Evidence Catalog, not as a transport spec.
+* `/internal/version headers/body proofs`  
+   `Titles/paths for header/body evidence artifacts are defined by HDE-Governance in the internal ops appendix; PF12 records them here as part of the Evidence Catalog, not as a transport spec.`
 
-  #### **CLI parity and determinism**
+  #### **`8.6.3.14 CLI parity and determinism`**
 
 * `artifacts/cli/showcompat/stdout.json`
 
@@ -2816,65 +2876,199 @@ These artifacts form the **topology.orientation\_demo** family and serve as the 
 
 * `artifacts/cli/showcompat/reader_cli_parity.diff`
 
-* `sanity.pipeline.log` — Sanity pipeline run log (closed-rails orchestrator over serializer determinism, env pins, CLI guards, and evidence skeleton checks).
+* `sanity.pipeline.log — Sanity pipeline run log (closed-rails orchestrator over serializer determinism, env pins, CLI guards, and evidence skeleton checks).`
 
-  * **Path:** `artifacts/sanity/sanity.log`
+  * **`Path:`** `artifacts/sanity/sanity.log`
 
-  * **Path-proof:** `artifacts/sanity/sanity.log.path_proof.txt`
+  * **`Path-proof:`** `artifacts/sanity/sanity.log.path_proof.txt`
 
-  * **Mirror record:** `artifact_key:"sanity.pipeline.log"`, `role:"log"`, `discovered_physical_path:"artifacts/sanity/sanity.log"`, with `sha256`, `size_bytes`, `produced_at_utc`, and `proof_anchor` matching the log bytes and path-proof as required by §8.3.x “Sanity pipeline log (sanity.pipeline.log)” and the general mirror/path-proof rules in §8.3.
+  * **`Mirror record:`** `artifact_key:"sanity.pipeline.log", role:"log", discovered_physical_path:"artifacts/sanity/sanity.log", with sha256, size_bytes, produced_at_utc, and proof_anchor matching the log bytes and path-proof as required by §8.3 (“Sanity pipeline log (sanity.pipeline.log)”) and the general Mirror/path-proof rules in §8.3.`
 
-  #### **SBOM**
+  #### **`8.6.3.15 Sampler evidence (D4 — HDE-EPIC019)`**
+
+`These entries register the sampler/ranker evidence families introduced by HDE-EPIC019 D4 as governed members of the Evidence Catalog. They follow the same canonical JSON and Evidence Index/Mirror discipline as other families in this section (UTF-8, sorted keys, compact, exactly one LF; governed paths only; path-proofs and Index/Mirror parity per §8.3–§8.6).`
+
+##### **`8.6.3.15.1 sampler_pool_snapshots — sampler pool/eligibility snapshots`**
+
+* **`Purpose.`** `Canonical JSON snapshots of sampler candidate pools, including viewer ID, candidate IDs, bands, compat scores, weights, and eligibility flags, used to prove sampler pool composition and eligibility filters (D1 core behavior).`
+
+* **`Artifact path (example).`** `artifacts/sampler/pool_snapshots/baseline.json (and siblings under artifacts/sampler/pool_snapshots/).`
+
+* **`Schema path.`** `docs/schemas/sampler/pool_snapshots.schema.json (JSON Schema 2020-12, titles-only here).`
+
+* **`PII posture.`** `Artifacts omit PII beyond IDs, bands, compat labels, and QA-necessary metadata; no app-level user identifiers or raw personal data are permitted.`
+
+  ##### **`8.6.3.15.2 sampler_two_run_logs — sampler two-run identity logs`**
+
+* **`Purpose.`** `Logs demonstrating two-run identity for sampler output (same inputs ⇒ identical ordering), used to prove sampler determinism under closed rails.`
+
+* **`Artifact path.`** `artifacts/sampler/two_run/identity.json.`
+
+* **`Schema path.`** `docs/schemas/sampler/two_run_logs.schema.json.`
+
+* **`Notes.`** `Canonical JSON; array fields that represent sets follow arrays-as-sets rules (§4.2).`
+
+  ##### **`8.6.3.15.3 sampler_abba_logs — AB/BA/ABBA parity logs`**
+
+* **`Purpose.`** `AB/BA/ABBA sampler runs for parity checks (A→B, B→A, ABBA), used to show that sampler ranking is invariant under label order when inputs are normalized.`
+
+* **`Artifact path.`** `artifacts/sampler/abba/ab_ba_parity.json.`
+
+* **`Schema path.`** `docs/schemas/sampler/abba_logs.schema.json.`
+
+  ##### **`8.6.3.15.4 sampler_diversity_artifacts — diversity/window evidence`**
+
+* **`Purpose.`** `Evidence for diversity, window, and “recent selection” constraints in the sampler, used to show that the sampler respects configured spread and recency rules.`
+
+* **`Artifact path.`** `artifacts/sampler/diversity/diversity_requirements.json.`
+
+* **`Schema path.`** `docs/schemas/sampler/diversity_artifacts.schema.json.`
+
+  ##### **`8.6.3.15.5 sampler_seed_replay_logs — seed replay logs (CLI/HTTP harnesses)`**
+
+* **`Purpose.`** `Seed replay logs from dev sampler CLI/HTTP harnesses, capturing repeated seeded runs and proving seed-echo semantics and candidate-set stability across surfaces.`
+
+* **`Artifact path.`** `artifacts/sampler/seed_replay/cli_http_seed_replay.json.`
+
+* **`Schema path.`** `docs/schemas/sampler/seed_replay_logs.schema.json.`
+
+  ##### **`8.6.3.15.6 Canonical JSON policy and governed locations (sampler)`**
+
+* `All sampler artifacts listed above MUST use the canonical JSON emitter governed by §4 (UTF-8, ASCII-sorted keys, compact separators, exactly one trailing LF; arrays treated as sets are deduped and ASCII-sorted by identity).`
+
+* `All sampler artifacts and schemas MUST live under governed locations: artifacts/sampler/** and docs/schemas/sampler/**. Transient generator paths (for example, codex/out/**, temp directories) MUST NOT be indexed or mirrored.`
+
+  ##### **`8.6.3.15.7 Evidence Index/Mirror and path-proofs (sampler)`**
+
+* `For each sampler family, the Human Evidence Index (docs/evidence/INDEX.json) MUST contain an entry with the appropriate artifact_key (for example, "sampler_pool_snapshots") and discovered_physical_path pointing to the governed artifact path; docs/evidence/INDEX.sha256 MUST be updated in the same PR.`
+
+* `The Machine Evidence Mirror (artifacts/evidence_index.jsonl) MUST contain a canonical JSONL record for each governed sampler artifact and schema, using artifact_key names exactly as above and the minimum Mirror record schema in §8.3 (artifact_key, role, sha256, size_bytes, produced_at_utc, discovered_physical_path, proof_anchor).`
+
+* `Each sampler artifact and schema MUST have a sibling path-proof transcript (for example, artifacts/sampler/pool_snapshots/baseline.json.path_proof.txt, docs/schemas/sampler/pool_snapshots.schema.json.path_proof.txt) that satisfies the path-proof schema in §8.3 and is referenced from the Mirror record via proof_anchor.`
+
+  ##### **`8.6.3.15.8 Acceptance hints (names-only; sampler)`**
+
+`Sampler evidence families participate in the existing mirror/index tokens referenced in §0.2 and §8.3 (for example, EVIDENCE_INDEX_UPDATED_OK, EVIDENCE_INDEX_HASH_OK, EVIDENCE_INDEX_MIRROR_OK, EVIDENCE_PATHS_VALIDATED_OK, MACHINE_MIRROR_UPDATED_OK, JSON_CANONICAL_CHECK_OK). PF12 binds these tokens to sampler artifacts by name and path only; token semantics remain owned by Governance and Glow QA Guide.`
+
+#### **`8.6.3.16 Engine Core evidence (DISS003/DISS004 — HDE-EPIC019)`**
+
+`These entries register the Engine Core evidence families introduced by HDE-EPIC019 PR7 as governed members of the Evidence Catalog. They mirror the sampler evidence pattern: canonical JSON artifacts under artifacts/core/**, schemas under docs/schemas/core/**, and full Index/Mirror + path-proof discipline under §8.3–§8.6.`
+
+##### **`8.6.3.16.1 engine_core_purity_report — Engine Core purity report`**
+
+* **`Purpose.`** `Canonical JSON report that summarizes Engine Core “purity” checks over compute_core scenarios (for example, invariants that must hold for all core calls under closed rails). Each report instance is produced under closed rails and records env posture and provenance alongside result data.`
+
+* **`Artifact path.`** `artifacts/core/purity/purity_report.json (and siblings under artifacts/core/purity/ if multiple purity reports are captured).`
+
+* **`Schema path.`** `docs/schemas/core/engine_core_purity_report.schema.json (JSON Schema 2020-12, titles-only here).`
+
+* **`Generated-at and env metadata.`** `Each artifact MUST include a payload-level generated_at_utc field (UTC ISO-8601) and closed-rails env metadata sufficient to reconstruct the determinism posture used for the run; provenance semantics and timestamp constraints follow §8.3 (“Artifacts with generated_at_utc”) for all Engine Core families.`
+
+  ##### **`8.6.3.16.2 engine_core_two_run_logs — Engine Core two-run identity logs`**
+
+* **`Purpose.`** `Canonical JSON logs demonstrating two-run identity for Engine Core output (same inputs ⇒ identical outputs) under closed rails. These logs are used to prove TWO_RUN_IDENTITY_OK and related determinism tokens for the core engine.`
+
+* **`Artifact path.`** `artifacts/core/two_run/identity.json.`
+
+* **`Schema path.`** `docs/schemas/core/engine_core_two_run_logs.schema.json.`
+
+* **`Notes.`** `Arrays that function as sets (for example, lists of tested scenarios) MUST follow arrays-as-sets rules in §4.2 (deduped by identity, ASCII-sorted).`
+
+  ##### **`8.6.3.16.3 engine_core_abba_logs — Engine Core AB/BA/ABBA parity logs`**
+
+* **`Purpose.`** `Canonical JSON logs for AB/BA/ABBA runs over Engine Core (for example, swapping label order where appropriate), used to demonstrate that core behavior is invariant under symmetry-preserving input permutations after normalization.`
+
+* **`Artifact path.`** `artifacts/core/abba/ab_ba_parity.json.`
+
+* **`Schema path.`** `docs/schemas/core/engine_core_abba_logs.schema.json.`
+
+* **`Notes.`** `These logs complement engine_core_two_run_logs by proving parity properties; the same canonical JSON and path-proof discipline applies.`
+
+  ##### **`8.6.3.16.4 engine_core_json_compare_logs — Engine Core JSON-compare logs`**
+
+* **`Purpose.`** `Canonical JSON logs produced by comparing Engine Core result JSON across two runs or two surfaces (for example, CLI vs internal harness) and recording equality/inequality at the structured JSON level. These artifacts are used to support JSON_CANONICAL_CHECK_OK, TWO_RUN_IDENTITY_OK, and related core evidence tokens.`
+
+* **`Artifact path.`** `artifacts/core/json_compare/core_result_json_compare.json.`
+
+* **`Schema path.`** `docs/schemas/core/engine_core_json_compare_logs.schema.json.`
+
+* **`Notes.`** `Logs MUST NOT include raw payloads beyond what the schema requires for comparison; they remain names-only and structural, and rely on canonical JSON for reproducible diffs.`
+
+  ##### **`8.6.3.16.5 Canonical JSON policy and governed locations (Engine Core)`**
+
+* `All Engine Core artifacts listed above MUST use the canonical JSON emitter governed by §4 (UTF-8, ASCII-sorted keys, compact separators, exactly one trailing LF; arrays used as sets are deduped and ASCII-sorted by identity).`
+
+* `All Engine Core artifacts and schemas MUST live under governed locations:`
+
+  * `artifacts: artifacts/core/**`
+
+  * `schemas: docs/schemas/core/**`
+
+* `Transient generator paths (for example, scratch or codex/out/**) MUST NOT be indexed or mirrored.`
+
+  ##### **`8.6.3.16.6 Evidence Index/Mirror and path-proofs (Engine Core)`**
+
+* `For each Engine Core family, the Human Evidence Index (docs/evidence/INDEX.json) MUST contain at least one entry with the appropriate artifact_key (for example, "engine_core_purity_report") and a discovered_physical_path pointing to the governed artifact path; docs/evidence/INDEX.sha256 MUST be updated in the same PR when adding or changing any Engine Core artifact.`
+
+* `The Machine Evidence Mirror (artifacts/evidence_index.jsonl) MUST contain canonical JSONL records for each governed Engine Core artifact and schema, using artifact_key names exactly as above and the minimum Mirror record schema in §8.3 (artifact_key, role, sha256, size_bytes, produced_at_utc, discovered_physical_path, proof_anchor).`
+
+* `Each Engine Core artifact and schema MUST have a sibling path-proof transcript (for example, artifacts/core/purity/purity_report.json.path_proof.txt, docs/schemas/core/engine_core_purity_report.schema.json.path_proof.txt) that satisfies the path-proof schema in §8.3 and is referenced from the Mirror record via proof_anchor. Path-proof sha256 and size_bytes MUST match both the artifact’s canonical bytes and the Mirror record values.`
+
+  ##### **`8.6.3.16.7 Acceptance hints (names-only; Engine Core skeleton)`**
+
+`Engine Core evidence families participate in the existing Mirror/Index tokens referenced in §0.2 and §8.3 (for example, EVIDENCE_INDEX_UPDATED_OK, EVIDENCE_INDEX_HASH_OK, EVIDENCE_INDEX_MIRROR_OK, EVIDENCE_PATHS_VALIDATED_OK, MACHINE_MIRROR_UPDATED_OK, JSON_CANONICAL_CHECK_OK, TWO_RUN_IDENTITY_OK). Together with the sampler evidence families, they form the governed Engine Core/sampler evidence skeleton for DISS003/DISS004; PF12 binds these tokens to Engine Core artifacts by name and path only. Token semantics remain owned by Governance and Glow QA Guide.`
+
+#### **`8.6.3.17 SBOM`**
 
 * `sbom/cyclonedx.json`
 
 * `sbom/cyclonedx.json.sha256`
 
-  #### **Registry/reporting & config**
+  #### **`8.6.3.18 Registry/reporting & config`**
 
 * `artifacts/registry/registry_report.json`
 
-* `config.magic10` — Magic-10 configuration snapshot (names-only summary of Magic-10 order, caps, and seed metadata; canonical JSON).
+* `config.magic10 — Magic-10 configuration snapshot (names-only summary of Magic-10 order, caps, and seed metadata; canonical JSON).`
 
-  * **Path:** `artifacts/thresholds/magic10_config.json`
+  * **`Path:`** `artifacts/thresholds/magic10_config.json`
 
-  * **Path-proof:** `artifacts/thresholds/magic10_config.json.path_proof.txt`
+  * **`Path-proof:`** `artifacts/thresholds/magic10_config.json.path_proof.txt`
 
-  * **Mirror record:** `artifact_key:"config.magic10"`, `role:"snapshot"`, `discovered_physical_path:"artifacts/thresholds/magic10_config.json"`, with `sha256`, `size_bytes`, `produced_at_utc`, and `proof_anchor` matching the artifact’s canonical bytes and path-proof as required by §8.3 and §8.14.1.
+  * **`Mirror record:`** `artifact_key:"config.magic10", role:"snapshot", discovered_physical_path:"artifacts/thresholds/magic10_config.json", with sha256, size_bytes, produced_at_utc, and proof_anchor matching the artifact’s canonical bytes and path-proof as required by §8.3 and §8.14.1.`
 
-* `config.band_edges` — Band-edges configuration snapshot (names-only summary of band names, edges, clamp, rounding mode, and version linked to `math/thresholds.json`; canonical JSON).
+* `config.band_edges — Band-edges configuration snapshot (names-only summary of band names, edges, clamp, rounding mode, and version linked to math/thresholds.json; canonical JSON).`
 
-  * **Path:** `artifacts/thresholds/band_edges.json`
+  * **`Path:`** `artifacts/thresholds/band_edges.json`
 
-  * **Path-proof:** `artifacts/thresholds/band_edges.json.path_proof.txt`
+  * **`Path-proof:`** `artifacts/thresholds/band_edges.json.path_proof.txt`
 
-  * **Mirror record:** `artifact_key:"config.band_edges"`, `role:"snapshot"`, `discovered_physical_path:"artifacts/thresholds/band_edges.json"`, with `sha256`, `size_bytes`, `produced_at_utc`, and `proof_anchor` matching the artifact’s canonical bytes and path-proof as required by §8.3 and §8.14.2.
+  * **`Mirror record:`** `artifact_key:"config.band_edges", role:"snapshot", discovered_physical_path:"artifacts/thresholds/band_edges.json", with sha256, size_bytes, produced_at_utc, and proof_anchor matching the artifact’s canonical bytes and path-proof as required by §8.3 and §8.14.2.`
 
-* `epic018.config.acceptance_map` — HDE-EPIC018 config acceptance map (PF09-style mapping from config tasks → artifact keys → tokens/tests; canonical JSON).
+* `epic018.config.acceptance_map — HDE-EPIC018 config acceptance map (PF09-style mapping from config tasks → artifact keys → tokens/tests; canonical JSON).`
 
-  * **Path:** `audit/EPIC-018_config_acceptance_map.json`
+  * **`Path:`** `audit/EPIC-018_config_acceptance_map.json`
 
-  * **Path-proof:** `audit/EPIC-018_config_acceptance_map.json.path_proof.txt`
+  * **`Path-proof:`** `audit/EPIC-018_config_acceptance_map.json.path_proof.txt`
 
-  * **Mirror record:** `artifact_key:"epic018.config.acceptance_map"`, `role:"snapshot"`, `discovered_physical_path:"audit/EPIC-018_config_acceptance_map.json"`, with `sha256`, `size_bytes`, `produced_at_utc`, and `proof_anchor` matching the artifact’s canonical bytes and path-proof as required by §8.3 and §8.14.3.
+  * **`Mirror record:`** `artifact_key:"epic018.config.acceptance_map", role:"snapshot", discovered_physical_path:"audit/EPIC-018_config_acceptance_map.json", with sha256, size_bytes, produced_at_utc, and proof_anchor matching the artifact’s canonical bytes and path-proof as required by §8.3 and §8.14.3.`
 
-* `config_bundle.fe` — Typed frontend config bundle (names-only projection of governed Magic-10 config, band-edges config, and registry topology/alias policy for client consumption; canonical JSON; includes a sources block keyed to the underlying config artifacts and registry report).
+* `config_bundle.fe — Typed frontend config bundle (names-only projection of governed Magic-10 config, band-edges config, and registry topology/alias policy for client consumption; canonical JSON; includes a sources block keyed to the underlying config artifacts and registry report).`
 
-  * **Path:** JSON file under `artifacts/config_bundles/` (exact filename pinned by the bundle generator and tests).
+  * **`Path:`** `JSON file under artifacts/config_bundles/ (exact filename pinned by the bundle generator and tests).`
 
-  * **Path-proof:** sibling `.path_proof.txt` transcript under `artifacts/path_proofs/...` for the same path.
+  * **`Path-proof:`** `sibling .path_proof.txt transcript under artifacts/path_proofs/... for the same path.`
 
-  * **Mirror record:** `artifact_key:"config_bundle.fe"`, `role:"snapshot"`, `discovered_physical_path` equal to the bundle path, with `sha256`, `size_bytes`, `produced_at_utc`, and `proof_anchor` matching the bundle’s canonical bytes and path-proof as required by §8.3 and §8.15.
+  * **`Mirror record:`** `artifact_key:"config_bundle.fe", role:"snapshot", discovered_physical_path equal to the bundle path, with sha256, size_bytes, produced_at_utc, and proof_anchor matching the bundle’s canonical bytes and path-proof as required by §8.3 and §8.15.`
 
-* `config_bundle.be` — Typed backend config bundle (names-only projection of governed Magic-10 config, band-edges config, full channels/centers/domains/alias policy, and registry-derived topology for engine/internal use; canonical JSON; includes a sources block keyed to the underlying config artifacts and registry report).
+* `config_bundle.be — Typed backend config bundle (names-only projection of governed Magic-10 config, band-edges config, full channels/centers/domains/alias policy, and registry-derived topology for engine/internal use; canonical JSON; includes a sources block keyed to the underlying config artifacts and registry report).`
 
-  * **Path:** JSON file under `artifacts/config_bundles/` (exact filename pinned by the bundle generator and tests).
+  * **`Path:`** `JSON file under artifacts/config_bundles/ (exact filename pinned by the bundle generator and tests).`
 
-  * **Path-proof:** sibling `.path_proof.txt` transcript under `artifacts/path_proofs/...` for the same path.
+  * **`Path-proof:`** `sibling .path_proof.txt transcript under artifacts/path_proofs/... for the same path.`
 
-  * **Mirror record:** `artifact_key:"config_bundle.be"`, `role:"snapshot"`, `discovered_physical_path` equal to the bundle path, with `sha256`, `size_bytes`, `produced_at_utc`, and `proof_anchor` matching the bundle’s canonical bytes and path-proof as required by §8.3 and §8.15.
+  * **`Mirror record:`** `artifact_key:"config_bundle.be", role:"snapshot", discovered_physical_path equal to the bundle path, with sha256, size_bytes, produced_at_utc, and proof_anchor matching the bundle’s canonical bytes and path-proof as required by §8.3 and §8.15.`
 
-  #### **BodyGraph adapter data-source and invariance**
+  #### **`8.6.3.19 BodyGraph adapter data-source and invariance`**
 
 * `artifacts/bodygraph/source_selection.snapshot.json`
 
@@ -2892,7 +3086,7 @@ These artifacts form the **topology.orientation\_demo** family and serve as the 
 
 * `artifacts/bodygraph/keys_only.logs.sample`
 
-  #### **Lifecycle (backup/restore/retention) — OPS-managed captures**
+  #### **`8.6.3.20 Lifecycle (backup/restore/retention) — OPS-managed captures`**
 
 * `artifacts/db/backup_manifest.json`
 
@@ -2900,7 +3094,7 @@ These artifacts form the **topology.orientation\_demo** family and serve as the 
 
 * `artifacts/db/retention_run.log`
 
-  #### **Admin QA and runbooks**
+  #### **`8.6.3.21 Admin QA and runbooks`**
 
 * `docs/run/PROD_ENDPOINTS.json`
 
@@ -2910,6 +3104,7 @@ These artifacts form the **topology.orientation\_demo** family and serve as the 
 
 * `artifacts/ops/admin_vendor_calls.jsonl`
 
+*   
   ---
 
   ### **8.6.4 Discipline reminder**
@@ -3792,6 +3987,182 @@ Repo docs themselves do **not** require a Doc-Delta when they change wording or 
   * the PF12 sections it affects (for example, §8.5, §8.14, §8.15, §8.6, Appendix C), and
 
   * the new or updated repo docs (by path) as **implementation references only**.
+
+## **8.17 Live QA evidence layout (audit/qa/\<epic-id\>/\<run-id\>/…) Required−NowRequired-NowRequired−Now**
+
+**Purpose.**  
+ Standardize the layout and naming of Live QA evidence under the governed `audit/**` root so that:
+
+* Live QA artifacts are easy to locate and reason about across epics and runs.
+
+* Evidence promoted to governed status can be indexed and mirrored consistently.
+
+* Glow QA Guide and HDE-Phased Epics can rely on a predictable directory and file naming scheme without re-specifying it for each epic.
+
+**Scope.**  
+ This section governs **layout and naming** for Live QA evidence directories and primary logs under:
+
+* `audit/qa/<epic-id>/<run-id>/…` — the canonical Live QA evidence root (`QA_ROOT`) for a single run of an epic.
+
+Where:
+
+* `<epic-id>` is the epic identifier used in HDE-Phased Epics (for example `hde-epic017`, `hde-epic018`, `hde-epic019`), lower-case and hyphenated.
+
+* `<run-id>` is a stable slug for a particular Live QA run of that epic (for example `run-20251130-a`); semantics and lifecycle are owned by Glow QA Guide and HDE-Phased Epics.
+
+This section does **not** define:
+
+* Live QA rails posture, D-goal semantics, or QA tokens (titles-only routing to Glow QA Guide, HDE-Phased Epics, HDE-Governance, and HDE-Build Checklist).
+
+* Which specific Live QA artifacts must be indexed in the Evidence Index/Mirror; that remains governed by Glow QA Guide, HDE-Build Checklist, HDE-Phased Epics, and epic-specific plans.
+
+### **8.17.1 Root and step directories**
+
+**Root.**
+
+* All Live QA artifacts for a single run of an epic **MUST** live under a single root:
+
+  * `QA_ROOT = audit/qa/<epic-id>/<run-id>/`
+
+* Directory names created directly under `QA_ROOT` **MUST** be lower-case and use `-` as the separator (for example `d0-planning`, `d3-cli-guards`, `d5-vendor`, `logs`).
+
+**Step directories (optional but recommended).**
+
+* Live QA steps **MAY** be grouped into step directories under `QA_ROOT`:
+
+  * `d<N>-<slug>/` where `<N>` is a non-negative integer (for example `d0-planning/`, `d3-cli-guards/`, `d7-docs/`).
+
+* Additional helper artifacts for a given step **SHOULD** either:
+
+  * live inside the corresponding `d<N>-<slug>/` directory, or
+
+  * use filenames that begin with the same `d<N>-<slug>` prefix (for example `d3-cli-guards-env.log`, `d3-cli-guards-exit.txt`).
+
+This directory-level structure is for human navigation and grouping only. Canonical evidence for a step is defined by the primary log rules in §8.17.2.
+
+### **8.17.2 Primary step logs and emptiness rules**
+
+**Primary log per step.**
+
+* Each Live QA step that produces evidence **MUST** have **exactly one** primary log file under `QA_ROOT`.
+
+* The primary log filename **MUST** use one of these patterns:
+
+  * `D<goal>_<short>.log` — D-goal keyed, for example `D1_discovery.log`, `D3_http_sampler.log`.
+
+  * `step<no>_<short>.log` — step-number keyed, for example `step1_vendor_ingest.log`, `step4_core_evidence.log`.
+
+* The `<goal>` / `<no>` component is a non-negative integer; the `<short>` component is a short, lower-case ASCII slug with `_` separators (no spaces).
+
+* The primary log for a step **MAY** be located:
+
+  * directly under `QA_ROOT` (for simple runs), or
+
+  * inside a step directory `d<N>-<slug>/` created under `QA_ROOT`.
+
+**Non-empty requirement.**
+
+* The primary log for a step **MUST** be a non-empty, LF-terminated text file. It **MUST NOT** be zero bytes.
+
+* If a step fails to complete or the underlying tooling fails (for example, missing service, broken harness), the primary log **MUST STILL** be written and **MUST** contain at least:
+
+  * a short summary of what the step attempted, and
+
+  * a terse failure description and/or final status line consistent with the Live QA status semantics owned by Glow QA Guide (for example, PASS/FAIL\_BEHAVIOR/FAIL\_TOOLING).
+
+* It is an error for a planned step to have **no** primary log at all.
+
+**Empty files.**
+
+* Governed Live QA evidence files (primary logs, env snapshots, planning outputs) under `audit/qa/<epic-id>/<run-id>/…` **MUST NOT** be empty:
+
+  * If a planned artifact is not produced, the file **MUST** be absent rather than present with size 0\.
+
+  * Path-proofs and Machine Mirror records **MUST NOT** point to zero-byte QA artifacts.
+
+* The only exception is clearly-marked sentinel markers (for example, “no-op” markers used by harnesses). Sentinel files **MAY** be empty but **MUST NOT** be:
+
+  * referenced by the Human Evidence Index or Machine Evidence Mirror, or
+
+  * used as governed evidence for any QA token.
+
+This rule is **additive** to the general Mirror discipline (canonical JSONL, 1:1 parity, unknown-key rejection, path-proofs) and applies whenever a Live QA file is promoted to governed evidence (for example, referenced by Glow QA Guide / HDE-Phased Epics acceptance or indexed in the Evidence Index/Mirror).
+
+### **8.17.3 Supporting files and `tmp_*` naming**
+
+**Supporting files (non-canonical per-step).**
+
+* A Live QA step **MAY** produce additional supporting files (for example, JSON request bodies, sorted ID lists, raw CLI outputs). These files are **not** canonical evidence on their own; they support the interpretation of the primary log.
+
+* Any such supporting file **SHOULD**:
+
+  * live under `QA_ROOT` (typically inside the corresponding step directory, if present), and
+
+  * have a filename that begins with `tmp_` (for example, `tmp_http_request.json`, `tmp_sorted_ids.txt`, `tmp_seed111_output.json`).
+
+* Where a supporting file materially contributes to the proof for a D-goal or QA token, the primary log for that step **SHOULD**:
+
+  * mention the file name explicitly, and
+
+  * briefly describe how it is used (for example, “see tmp\_http\_request.json for the POST body used in this step”).
+
+**Canonical per-step surface.**
+
+* For acceptance and audit purposes, the **primary log** remains the **canonical per-step artifact**. Supporting files are treated as auxiliary:
+
+  * Evidence Index entries and Mirror records for Live QA typically point to primary logs, not to all supporting files.
+
+  * Supporting files that need to be governed evidence in their own right (for example, a canonical JSON request body used across multiple runs) **MUST** be separately listed in §8.6 and indexed in both the Human Evidence Index and Machine Mirror.
+
+### **8.17.4 Env/rails snapshots and D-goal linkage**
+
+**Env/rails snapshots.**
+
+* Env/rails snapshots for Live QA **MUST** be captured as text files under `QA_ROOT` with either:
+
+  * a D-goal–keyed name (for example, `D0_env_rails_baseline.log`, `D5_env_rails_open_begin.log`, `D5_env_rails_open_end.log`), or
+
+  * a step-number–keyed name (for example, `step1_env_rails_start.log`, `step7_env_rails_end.log`),
+
+* and **SHOULD** be stored alongside other artifacts for the same step (for example, inside `d0-planning/` or `d5-vendor/`).
+
+* Each env snapshot **MUST** clearly record, at minimum, the values of:
+
+  * `SAFE_MODE`
+
+  * `ALLOW_NETWORK`
+
+  * `APP_ENV`
+
+  * `LC_ALL`
+
+  * `LANG`
+
+  * `TZ`
+
+* in a machine-parsable form consistent with Glow QA Guide’s rails pins.
+
+**D-goal/token references.**
+
+* When a Live QA artifact is intended to satisfy or inform a specific D-goal or QA token:
+
+  * The corresponding primary log **SHOULD** include a short, machine-grep-friendly header line stating the D-goal and token names (for example `D5 – LIVE_VENDOR_TRANSPORT_OK – ENV_RAILS_POLICY_OK`).
+
+  * HDE-Phased Epics epic records and Glow QA Guide QA plans **SHOULD** reference the D-step and filename by title only (for example `audit/qa/hde-epic019/run-20251130-a/D5_vendor_transport.log` or `audit/qa/hde-epic019/run-20251130-a/step4_http_sampler.log`).
+
+**Ownership of semantics.**
+
+* PF12 remains the single home for Live QA **layout and naming**.
+
+* Semantics for:
+
+  * rails posture and env pins,
+
+  * D-goals and QA tokens, and
+
+  * Live QA workflows and status classifications (for example, PASS/FAIL\_BEHAVIOR/FAIL\_TOOLING),
+
+* remain owned by Glow QA Guide, HDE-Phased Epics, HDE-Governance, and HDE-Build Checklist and are referenced here by title only.
 
 # **9\) Change Log & Doc-Delta Hooks \[Required-Now\]**
 

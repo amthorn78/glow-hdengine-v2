@@ -3,10 +3,10 @@
 ## 0.1 Header
 
  **Title:** PF04-Canon-HDE-Governance  
- **Version:** v1.4.8  
+ **Version:** v1.4.9  
  **Status:** Canon  
- **Effective date:** 2025-11-29  
- **Last Update Gate:** BN 7.8.9 Drain A12
+ **Effective date:** 2025-12-02  
+ **Last Update Gate:** BN 7.9.7 Drain A19
 
 ## 0.2 Scope & boundaries \[Required-Now\]
 
@@ -479,18 +479,37 @@ EPIC-011 introduced a **preservation guard** over key public and admin surfaces.
 
 * **GUNICORN\_APP\_FACTORY\_OK** — Adapter entry `adapter.factory:create_app()` binds `$PORT`. (Owned: Glow Infrastructure; Evidence & Artifacts)
 
-* **ENV\_RAILS\_POLICY\_OK** — Dev/QA may be open; Prod must not depend on rails-open settings; CI/test harness runs default to closed rails. (Owned: Mechanics Guide; Governance)
+* **ENV\_RAILS\_POLICY\_OK** — Rails posture is explicit and deterministic across environments and surfaces:
 
-* **ENV\_LC\_ALL\_C\_OK** — All determinism and evidence jobs run with canonical pins `LC_ALL=C`, `LANG=C`, `TZ=UTC` for HDE services and CI (env pins present and enforced). (Owned: Governance; Build Checklist; Mechanics Guide)  
+  * **Dev/QA rails posture.** Dev/QA environments **may** open rails for vendor HTTP under controlled profiles, but the rails state (`SAFE_MODE`, `ALLOW_NETWORK`) must always be explicit in env and captured in evidence. CI and test harnesses default to **closed rails** for determinism and evidence jobs unless a Doc-Delta names an integration profile that requires open rails.
+
+  * **Prod posture.** Production acceptance must **not** depend on rails-open settings; public Reader/Aux behavior and acceptance proofs assume closed rails for vendor HTTP. Admin-guarded vendor override windows are governed separately (§3.1) and must not weaken the public covenant.
+
+  * **Dev/admin APP\_ENV gating (NEW CANON).** Dev/admin-only surfaces (for example, CLI dev harnesses, internal/dev HTTP sampler endpoints, and similar tools named in HDE-CLI-API-Vendor-Ref and HDE-Mechanics Guide) **MUST** enforce strict `APP_ENV` gating:
+
+    * Allowed values for dev/admin surfaces are exactly `{"dev","test","local"}`.
+
+    * If `APP_ENV` is **missing**, **empty**, or has any other value (including `"prod"` or typos), the dev/admin surface **MUST** treat this as a **rails violation**:
+
+      * fail closed with a typed, numeric-free error (for CLI) or a writer-style refusal envelope (for HTTP),
+
+      * **MUST NOT** silently assume `dev` or any other default, and
+
+      * **MUST NOT** perform underlying sampler/engine/vendor work.
+
+    * Tests and QA evidence (named in Glow QA Guide and HDE-Build Checklist by title) **MUST** show that all dev/admin-only surfaces that call sampler/core or similar internals honor this gating behavior.
+
+* Ownership: Mechanics Guide; Governance; Glow QA Guide; HDE-Build Checklist.
+
+* **ENV\_LC\_ALL\_C\_OK** — All determinism and evidence jobs run with canonical pins `LC_ALL=C`, `LANG=C`, `TZ=UTC` for HDE services and CI (env pins present and enforced). (Owned: Governance; Build Checklist; Mechanics Guide)
+
 * **BG\_VENDOR\_CALLS\_DISABLED\_IN\_PROD\_OK** — In production, **public Reader and Aux traffic is DB-backed only**: the Engine does **not** make live vendor HTTP calls to satisfy public requests. Any vendor-originated data used in prod public responses must arrive via prior ingest and the governed DB; live vendor calls in prod are limited to admin-guarded ops windows (for example, CLI runs under explicit rails-open profiles). Evidence includes env/config snapshots, connectivity proofs, and keys-only logs demonstrating that public prod routes do not open vendor sockets. (Owned: Governance; Glow Infrastructure; Glow QA Guide; Evidence & Artifacts)
 
 For EPIC017 evidence and compat jobs, the default closed-rails profile for CLI, evidence, ordering, and registry jobs is:
 
 `SAFE_MODE=1, ALLOW_NETWORK=0, LC_ALL=C, LANG=C, TZ=UTC`.
 
-Acceptance tokens `ENV_RAILS_POLICY_OK` and `ENV_LC_ALL_C_OK` together assert that this tuple is enforced for those jobs unless a Doc-Delta explicitly opens rails for a specific integration profile.
-
-This directly encodes the “Default: SAFE\_MODE=1 ALLOW\_NETWORK=0 LC\_ALL=C LANG=C TZ=UTC for CLI, evidence, ordering, and registry jobs” rule from the addendum into PF04’s env section. 
+Acceptance tokens `ENV_RAILS_POLICY_OK` and `ENV_LC_ALL_C_OK` together assert that this tuple is enforced for those jobs unless a Doc-Delta explicitly opens rails for a specific integration profile. This directly encodes the “Default: `SAFE_MODE=1, ALLOW_NETWORK=0, LC_ALL=C, LANG=C, TZ=UTC` for CLI, evidence, ordering, and registry jobs” rule into PF04’s env section, and now additionally encodes dev/admin APP\_ENV gating for Dissolution-era dev/admin surfaces.
 
 * **OBS\_KEYS\_ONLY\_OK** — Operational logs are keys-only and secret-free (no payload bodies or header values; secrets redacted), in accordance with Governance logging policy. (Owned: Governance)
 
@@ -861,11 +880,31 @@ What must be proved for every cut (**binary gates; no partial**). Index all arti
 
 * Live vendor calls **must not** change Reader↔CLI parity, A7 conformance, or idempotence proofs.
 
-* Evidence includes a governed **open-rails conformance** run (vendor success, retry, 429 paths) captured as records-only artifacts and indexed in the Evidence Index and machine mirror under the tokens listed in §2.0 (e.g., `VENDOR_RETRY_BACKOFF_OK`, `PROVIDER_429_TYPED_OK`, `RETRY_AFTER_PARSE_OK`, `VENDOR_NO_PAYLOAD_LOGGING_OK`).
+* Evidence includes a governed **open-rails conformance** run (vendor success, retry, 429 paths) captured as records-only artifacts and indexed in the Evidence Index and machine mirror under the tokens listed in §2.0 (for example, `VENDOR_RETRY_BACKOFF_OK`, `PROVIDER_429_TYPED_OK`, `RETRY_AFTER_PARSE_OK`, `VENDOR_NO_PAYLOAD_LOGGING_OK`).
+
+**Dev/admin APP\_ENV gating (dev/test/local only) NEWCANONNEW CANONNEWCANON.**
+
+Dev/admin-only surfaces that exercise engine internals under controlled rails (for example, CLI dev harnesses, internal/dev HTTP sampler routes, and similar tools called out in **HDE-CLI-API-Vendor-Ref** and **HDE-Mechanics Guide**) **MUST** enforce strict `APP_ENV` gating:
+
+* Allowed `APP_ENV` values for these dev/admin surfaces are exactly `{"dev","test","local"}`.
+
+* If `APP_ENV` is **missing**, **empty**, or any other value (including `"prod"` or any unrecognized string):
+
+  * The surface **MUST** treat this as a **rails violation**,
+
+  * **MUST** fail closed with a typed, numeric-free error (for CLI) or a writer-style refusal envelope (for HTTP),
+
+  * **MUST NOT** assume a default (for example, treating missing/empty as `"dev"`), and
+
+  * **MUST NOT** perform sampler/core/vendor work on that invocation.
+
+* Gating behavior is part of the rails contract: tests and QA harnesses (named by title in Glow QA Guide and HDE-Build Checklist) **MUST** prove that dev/admin-only surfaces cannot be invoked successfully when `APP_ENV` is missing, empty, or outside the allowed set.
+
+This `APP_ENV` gating is a precondition for treating any dev/admin-only surface as “on-rails”; it couples to `ENV_RAILS_POLICY_OK` in §2.0.10 and applies regardless of whether vendor rails are open or closed.
 
 **Determinism env pins harness (EPIC018 D2).**
 
-For **determinism-sensitive suites** (serializer identity, AB↔BA, evidence ordering/orientation, and other invariance tests named in HDE-Mechanics Guide and Glow QA Guide), rails policy is further constrained:
+For **determinism-sensitive suites** (serializer identity, AB↔BA, evidence ordering/orientation, and other invariance tests named in **HDE-Mechanics Guide** and **Glow QA Guide**), rails policy is further constrained:
 
 * **Canonical determinism env pins.** Determinism suites **MUST** run under the closed-rails env tuple  
    `SAFE_MODE=1`, `ALLOW_NETWORK=0`, `LC_ALL=C`, `LANG=C`, `TZ=UTC`,  
@@ -877,22 +916,16 @@ For **determinism-sensitive suites** (serializer identity, AB↔BA, evidence ord
 
   * a single-line, canonical JSON env-pins log (records the env map and determinism suite set), and
 
-  * a co-located path-proof plus human Index/mirror entries keyed by an `artifact_key` reserved for determinism env rails.  
-     The **schema, artifact path, and Index/mirror mapping** for this family live in **HDE-Schemas & Artifacts** and **Glow QA Guide**; PF04 references them by title only and treats them as the normative evidence surfaces for determinism env rails.
+  * a co-located path-proof plus human Index/mirror entries keyed by an `artifact_key` reserved for determinism env rails.
+
+* The schema, artifact path, and Index/mirror mapping for this family live in **HDE-Schemas & Artifacts** and **Glow QA Guide**; PF04 references them by title only and treats them as the normative evidence surfaces for determinism env rails.
 
 **Tokens and coupling.**
 
-* **ENV\_RAILS\_POLICY\_OK** — Rails posture is correct and backed by evidence: closed rails refuse deterministically with no network I/O and keys-only logs; open rails (where enabled) follow pinned, deterministic policy without affecting Reader↔CLI parity, A7 conformance, or idempotence. Evidence includes the closed-rails refusal proof, open-rails conformance proof, and env-validator outputs per environment, all indexed under the Evidence Index and mirror. (Owned: Governance; Glow QA Guide; HDE-Build Checklist; HDE-Schemas & Artifacts)
+* `ENV_RAILS_POLICY_OK` and `ENV_LC_ALL_C_OK` (see §2.0.10) together assert that the closed-rails tuple is enforced for determinism suites and that dev/admin APP\_ENV gating is in place for the relevant surfaces.
 
-* **DETERMINISM\_ENV\_PINS\_OK** — Determinism env pins are enforced and evidenced: determinism suites run under the canonical env tuple above; the determinism env helper is present and used; the env-check CI harness is wired and failing closed; and the determinism env-pins evidence family (log \+ path-proof \+ Index/mirror entries) is present and coherent. This token couples env rails policy to the deterministic env pins harness and points QA to the env-pins artifacts defined in **HDE-Schemas & Artifacts** and the QA registry in **Glow QA Guide**. (Owned: Governance; HDE-Mechanics Guide; Glow QA Guide; HDE-Schemas & Artifacts; HDE-Build Checklist)
-
-Together, `ENV_RAILS_POLICY_OK`, `ENV_LC_ALL_C_OK`, and `DETERMINISM_ENV_PINS_OK` assert that:
-
-* rails are **closed by default** with deterministic refusal and keys-only logs,
-
-* any open-rails behavior is pinned and evidenced without breaking parity or idempotence, and
-
-* all determinism-sensitive suites run under the **canonical deterministic env pins**, with the env posture captured and indexed as governed evidence.
+* Determinism env-pins artifacts and their mirror records couple to `DETERMINISM_ENV_PINS_OK` in §2.0.1, which remains the single determinism-env token for A-gates.  
+* 
 
 ### **4.1.5 Bands — inclusive-high thresholds (by preset)**
 

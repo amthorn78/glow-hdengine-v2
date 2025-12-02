@@ -1,7 +1,7 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build Notes   
-**Version:** 7.9  
+**Version:** 7.9.8  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -63,4 +63,3 @@ Details: \<specific information to drain to canon, it’s origin, and any eviden
 ---
 
 # Numbered Addenda Begin
-

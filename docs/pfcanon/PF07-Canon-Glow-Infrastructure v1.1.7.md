@@ -1,11 +1,11 @@
 # **0\. Front Matter**
 
 **Title:** PF07-Canon-Glow-Infrastructure  
- **Version:** v1.1.2
+ **Version:** v1.1.7
 
 **Status:** Canon  
-**Effective date:** 2025-11-29  
-**Last Update Gate:** BN 7.8.9 Drain A16
+**Effective date:** 2025-12-01  
+**Last Update Gate:** BN 7.9.7 Drain A18
 
 **Invocation tag:** `INV-f2ac55d77ce9aacc`
 
@@ -327,28 +327,104 @@ In this model, **Codespaces is a client to prod, not prod itself**. The phrase �
 
 In other words, **terminal CLI access** is a named, supported admin-facing product surface in the pre-Glow period. PF07 keeps it names-only, tying it to the production Railway HD Engine and shared DB instances; product semantics, payload completeness (BodyGraphs, bands/scores, narratives), and acceptance tokens remain defined in the owning PF documents (by title) rather than here.
 
+## **2.8 GitHub Codespaces / local dev environments (names-only)**
+
+**Scope.**  
+ This subsection records **names-only expectations** for the HD Engine project’s GitHub Codespaces and other local dev environments. PF07 names providers, repositories, and key tools; it does **not** define QA procedures or test plans. QA rails, tooling checks, and behavior vs tooling classification live in:
+
+* **Glow QA Guide** (QA rails, environment setup, tooling vs behavior semantics),
+
+* **HDE-Build Checklist** (build/CI tasks and blockers), and
+
+* **Epic-Process-Guide** (epic lifecycle, Live QA planning),
+
+all referenced by title only.
+
+**Project Codespaces expectations (HD Engine).**
+
+For the repository `amthorn78/glow-hdengine-v2`, a **project Codespace** is expected to provide, at minimum:
+
+* A working Python virtual environment rooted at `.venv/` for the Engine repo.
+
+* `pytest` installed in that virtual environment and callable via `python -m pytest` when the venv is active.
+
+* A shell prompt from which Engine tests and QA commands can be run under the env pins described in §2.4 (for example, `LC_ALL=C`, `LANG=C`, `TZ=UTC`), and with HD Engine-specific env vars (SAFE\_MODE, ALLOW\_NETWORK, APP\_ENV) set via the usual configuration mechanisms.
+
+PF07 does **not** prescribe how the venv is created or how `pytest` is installed; those steps and any required bootstrap scripts are owned by **Glow QA Guide**, **HDE-Build Checklist**, and **Epic-Process-Guide**.
+
+**Tooling failure vs behavior failure (names-only classification).**
+
+Within this infrastructure map:
+
+* A missing or non-executable `pytest` entrypoint in `.venv/bin/pytest` is treated as an **infra/tooling misconfiguration** for the Codespace or local dev environment, not as an HD Engine ingest or behavior failure.
+
+* The canonical expectation is that tests can be run via `python -m pytest` in an activated venv; if that pattern cannot run the ingest test suite (for example, `tests/bodygraph/test_ingest.py`), this is a **tooling blocker** for QA and CI, not a data- or math-level defect in the Engine.
+
+Log format, evidence paths (for example, `audit/qa/hde-epic019/live-qa-<date>/D0-vendor-ingest.log`), and how tooling failures are captured and escalated are specified by title in **Glow QA Guide** and **HDE-Build Checklist**.
+
+**Dev Reader HTTP harness expectations (names-only).**
+
+For internal/dev HTTP harnesses on the HD Engine (including but not limited to `POST /internal/dev/sampler`), Codespaces and other local dev environments are expected to provide:
+
+* A **running dev Reader HTTP service** in APP\_ENV=dev that exposes the internal/dev routes defined in the Engine adapter (for example, `/internal/dev/sampler`), reachable from the Codespaces shell.
+
+* A configured **base URL** for that service, exposed via an infra-owned config key such as `DEV_SAMPLER_URL` (see §8.2.1 for the key name), whose value (host and port) is derived from the actual Reader process wiring and **not guessed** by PO, QA, or documentation agents.
+
+* Network reachability from the Codespace (or local dev shell) to that base URL under the appropriate rails posture (for example, APP\_ENV=dev with ALLOW\_NETWORK=1 for HTTP dev harness checks, as defined by Governance and QA guides by title).
+
+Within this infrastructure map:
+
+* The existence of a dev Reader HTTP harness and its base URL/port are treated as **infra readiness** for internal/dev HTTP QA; PF07 records the **names** of the keys and services only.
+
+* If the configured `DEV_SAMPLER_URL` (or equivalent dev harness URL) is not reachable from the Codespace shell, or responds with the wrong protocol (for example, HTTP/0.9 errors or `HTTP_STATUS:000`), this is classified here as a **tooling/infra blocker** for the HTTP dev harness, not an HD Engine behavior failure.
+
+The detailed classification and handling of such cases (for example, `FAIL_TOOLING` vs behavior-failure statuses in QA logs, preconditions such as “dev Reader HTTP ready” before behavior tests, and D-goal blocking semantics) are specified by title in **Glow QA Guide**, **HDE-Build Checklist**, and **Epic-Process-Guide**. PF07 remains **inventory-only**: it names the environments, keys (such as `DEV_SAMPLER_URL`), and components that those documents rely on, without prescribing runbooks or acceptance rules.
+
+**Routing note (names-only).**
+
+* Requirements that QA plans include an explicit “env/tooling bootstrap” step (for example, a small health check for `python -m pytest` before running ingest tests) are owned by **Glow QA Guide** and **HDE-Build Checklist**; PF07 only names the expected tools and locations.
+
+* Any future changes to the canonical test runner (for example, a different module entrypoint) must be reflected here as names-only updates and fully specified in the owning PF documents.
+
 ---
 
 # 3\) Provider inventory (names-only)
 
-## 3.1 Railway
+## **3.1 Railway**
 
-* **Account / org:** **TBD**  
-* **Project(s):**  
-  * **ample-illumination** — *(id: **TBD**)*  
-* **Services by component:**  
-  * **HD Engine:** `glow-hdengine-v2`  
-  * **Glow Backend:** `glow-backend-v4`  
-* **Regions:** **TBD**  
-* **Base URLs (names-only):**  
-  * **HD Engine:** `https://glow-hdengine-v2-production.up.railway.app`  
+* **Account / org:** **TBD**
+
+* **Project(s):**
+
+  * **ample-illumination** — *(id: **TBD**)*
+
+* **Services by component:**
+
+  * **HD Engine:** `glow-hdengine-v2`
+
+  * **Glow Backend:** `glow-backend-v4`
+
+* **Regions:** **TBD**
+
+* **Base URLs (names-only):**
+
+  * **HD Engine:** `https://glow-hdengine-v2-production.up.railway.app`
+
   * **Glow Backend:** **TBD**
 
 *Names-only; no policy, runbooks, or tokens here. Transport/A7 policy → HDE-Governance (titles-only).*
 
----
+**Connectivity from Codespaces (names-only).**
 
-## 3.2 Vercel
+* GitHub Codespaces and other external shells that exercise production HD Engine or Backend behavior use these same Railway **project** and **service** names and **base URLs** as their connectivity targets; there are no separate “Codespaces-only” hostnames recorded here.
+
+* Live QA connectivity checks described in **Glow QA Guide** (for example, curl or CLI commands that prove reachability to production HD Engine or Backend services, or to the shared Postgres instance listed in §2.2/§7.1) are expected to rely on the names in this section; authentication, rails posture (SAFE\_MODE/ALLOW\_NETWORK, APP\_ENV, credentials), and acceptance semantics are governed by **HDE-Governance**, **Glow QA Guide**, **HDE-Build Checklist**, and **HDE-Mechanics Guide** (titles-only).
+
+* PF07 does **not** define how connectivity tests are run or which D-goals or QA tokens they satisfy; it records only the provider, project, service, base-URL, and instance names that those tests and tokens depend on.  
+    
+  ---
+
+  ## 3.2 Vercel
 
 * **Team / org:** **TBD**  
 * **Projects & aliases:**  
@@ -809,18 +885,29 @@ Each of the above artifacts has a corresponding path‑proof sidecar:
  • QA (Codespaces): 8000  
  • Prod (Railway): 8000
 
+**Dev harness URLs (internal/dev HTTP; names-only)**
+
+• `DEV_SAMPLER_URL` — **OPEN/TBD**  
+ *Names-only key for the dev-only sampler HTTP harness base URL (for routes such as `POST /internal/dev/sampler`) in dev/Codespaces/local-dev environments. The concrete value (host and port) is **infra-owned** and MUST be derived from the actual Reader process wiring (ports/host binding) for that environment, not guessed by PO, QA, or documentation agents. PF07 records the key name only; behavior, validation steps (for example, HTTP/1.1 JSON POST checks), and header/body contracts are specified by title in **HDE-CLI-API-Vendor-Ref**, **HDE-Mechanics Guide**, and **Glow QA Guide**.*
+
 **LOG\_LEVEL**  
  • OPEN/TBD (all envs)
 
 **Loader selector**  
- • PACK\_SHA: OPEN/TBD (active narratives pack identity; file-backed runtime)
+ • `PACK_SHA`: OPEN/TBD (active narratives pack identity; file-backed runtime)
 
 **Vendor-ingest keys (present where noted; secrets redacted)**  
- • HDAPI\_BASE\_URL: [https://api.humandesignapi.nl/v1](https://api.humandesignapi.nl/v1) (where configured)  
- • HD\_API\_KEY:  
- • GEO\_API\_KEY: 
+ • `HDAPI_BASE_URL`: [https://api.humandesignapi.nl/v1](https://api.humandesignapi.nl/v1) (where configured)  
+ • `HD_API_KEY`  
+ • `GEO_API_KEY`
 
-### **8.2.2 Glow Backend — TBD (names-only)**
+**Notes (inventory-only).**
+
+* PF07 names the HD Engine port mapping and the `DEV_SAMPLER_URL` key as part of the infrastructure inventory. It does **not** pin the actual `DEV_SAMPLER_URL` value, define how the dev harness is started, or specify QA procedures; those details (start commands, curl patterns, acceptance tokens) live by title in **HDE-Mechanics Guide**, **HDE-CLI-API-Vendor-Ref**, **Glow QA Guide**, and **HDE-Build Checklist**.
+
+* Requiredness, defaults, and validation rules for these keys are not defined here: ownership/requiredness → **HDE-Schemas & Artifacts**; rails/policy (including dev-harness validation and rails posture) → **HDE-Governance** and **Glow QA Guide** (titles-only).
+
+  ### **8.2.2 Glow Backend — TBD (names-only)**
 
 * `PORT`, `LOG_LEVEL`, `SECRET_KEY`, `REDIS_URL`, `MAILGUN_API_KEY`, `MAILGUN_DOMAIN`, `SESSION_SECRET`, `CSRF_SECRET`, `TZ`, \[TBD additional names\] — **OPEN/TBD** (all values)
 
