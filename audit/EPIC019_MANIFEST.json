@@ -40,8 +40,8 @@
         "artifact_key": "docs.acceptance_map_epic019",
         "discovered_physical_path": "docs/acceptance_map_epic019.json",
         "proof_anchor": "docs/acceptance_map_epic019.json.path_proof.txt",
-        "sha256": "7d71b144ad516dc77d80b5f9b5c6e79c1753b44dcb0f74376f2231faa1f1451f",
-        "size_bytes": 8264
+        "sha256": "a1bcab05a3734e5ccba01634ece4e2064803fa8e9f95d677233463f0c83d8045",
+        "size_bytes": 9622
       }
     ],
     "ENV_RAILS_POLICY_OK": [
@@ -147,15 +147,31 @@
         "size_bytes": 928
       }
     ],
-      "MACHINE_MIRROR_UPDATED_OK": [
-        {
-          "artifact_key": "index.machine_mirror.path_proof",
-          "discovered_physical_path": "artifacts/evidence_index.jsonl.path_proof.txt",
-          "proof_anchor": null,
-          "sha256": "79aad416b456c8255f970e57f23fb19b791a2e882d5e2e3f556dd558ac6f719a",
-          "size_bytes": 198
-        }
-      ],
+    "MACHINE_MIRROR_UPDATED_OK": [
+      {
+        "artifact_key": "index.machine_mirror.path_proof",
+        "discovered_physical_path": "artifacts/evidence_index.jsonl.path_proof.txt",
+        "proof_anchor": null,
+        "sha256": "79aad416b456c8255f970e57f23fb19b791a2e882d5e2e3f556dd558ac6f719a",
+        "size_bytes": 198
+      }
+    ],
+    "DISCOVERY_BASELINE_OK": [
+      {
+        "artifact_key": "epic019.d6.vendor_live_qa.discovery_notes",
+        "discovered_physical_path": "notes/d6_vendor_live_qa_discovery.md",
+        "proof_anchor": "notes/d6_vendor_live_qa_discovery.md.path_proof.txt",
+        "sha256": "b9bfe177872798962cfb4505fd2b921fb737ef7f8e7c7a40cce97b0afd012509",
+        "size_bytes": 3205
+      },
+      {
+        "artifact_key": "epic019.d6.vendor_live_qa.rails_snapshot",
+        "discovered_physical_path": "audit/qa/hde-epic019/d6-vendor-live-qa/rails_snapshot.json",
+        "proof_anchor": "audit/qa/hde-epic019/d6-vendor-live-qa/rails_snapshot.json.path_proof.txt",
+        "sha256": "4f8104bb1cafe4efadfcd553603d2bba608dc61fc306142ac833de38b72fb07c",
+        "size_bytes": 580
+      }
+    ],
     "NO_IO_NO_CLOCKS_OK": [
       {
         "artifact_key": "engine_core_purity_report",
@@ -163,6 +179,45 @@
         "proof_anchor": "artifacts/core/purity/purity_report.json.path_proof.txt",
         "sha256": "da14897b6aac6237edaf65b374f002bd19e1ce63f607e403fde2a63259fe3ef5",
         "size_bytes": 487
+      }
+    ],
+    "LIVE_VENDOR_TRANSPORT_OK": [
+      {
+        "artifact_key": "epic019.d6.vendor_live_qa.happy_path",
+        "discovered_physical_path": "audit/qa/hde-epic019/d6-vendor-live-qa/happy_path.jsonl",
+        "proof_anchor": "audit/qa/hde-epic019/d6-vendor-live-qa/happy_path.jsonl.path_proof.txt",
+        "sha256": "c5697d79f32616b316225c77e14c8bf50ed126a13d35d4e43802cd874c7580f2",
+        "size_bytes": 2409
+      },
+      {
+        "artifact_key": "epic019.d6.vendor_live_qa.fail_vendor",
+        "discovered_physical_path": "audit/qa/hde-epic019/d6-vendor-live-qa/fail_vendor.jsonl",
+        "proof_anchor": "audit/qa/hde-epic019/d6-vendor-live-qa/fail_vendor.jsonl.path_proof.txt",
+        "sha256": "151be3c983176c7174d7a9bfff735b03c53903b29a002a1cf753c7f0d21f9e0b",
+        "size_bytes": 628
+      },
+      {
+        "artifact_key": "epic019.d6.vendor_live_qa.fail_tooling",
+        "discovered_physical_path": "audit/qa/hde-epic019/d6-vendor-live-qa/fail_tooling.jsonl",
+        "proof_anchor": "audit/qa/hde-epic019/d6-vendor-live-qa/fail_tooling.jsonl.path_proof.txt",
+        "sha256": "d20359280ae57bb8771e8287068a76b8724751cbee80b53d1c0e09fcf287a79a",
+        "size_bytes": 603
+      }
+    ],
+    "OPEN_RAILS_ENV_OK": [
+      {
+        "artifact_key": "epic019.d6.vendor_live_qa.rails_snapshot",
+        "discovered_physical_path": "audit/qa/hde-epic019/d6-vendor-live-qa/rails_snapshot.json",
+        "proof_anchor": "audit/qa/hde-epic019/d6-vendor-live-qa/rails_snapshot.json.path_proof.txt",
+        "sha256": "4f8104bb1cafe4efadfcd553603d2bba608dc61fc306142ac833de38b72fb07c",
+        "size_bytes": 580
+      },
+      {
+        "artifact_key": "epic019.d6.vendor_live_qa.happy_path",
+        "discovered_physical_path": "audit/qa/hde-epic019/d6-vendor-live-qa/happy_path.jsonl",
+        "proof_anchor": "audit/qa/hde-epic019/d6-vendor-live-qa/happy_path.jsonl.path_proof.txt",
+        "sha256": "c5697d79f32616b316225c77e14c8bf50ed126a13d35d4e43802cd874c7580f2",
+        "size_bytes": 2409
       }
     ],
     "PR_OPENED_OK": [

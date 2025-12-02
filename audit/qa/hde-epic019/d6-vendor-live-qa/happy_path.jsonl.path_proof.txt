@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic019/d6-vendor-live-qa/happy_path.jsonl
+size_bytes: 2409
+sha256: c5697d79f32616b316225c77e14c8bf50ed126a13d35d4e43802cd874c7580f2
+mtime_utc: 2025-12-02T14:29:50Z
+produced_at_utc: 2025-11-30T03:58:47Z

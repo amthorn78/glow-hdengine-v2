@@ -101,6 +101,21 @@
         "JSON_CANONICAL_CHECK_OK",
         "NO_IO_NO_CLOCKS_OK"
       ]
+    },
+    {
+      "deliverable": "D6",
+      "manifest_tokens": [
+        "LIVE_VENDOR_TRANSPORT_OK",
+        "OPEN_RAILS_ENV_OK",
+        "DISCOVERY_BASELINE_OK"
+      ],
+      "name": "D6 — Live vendor QA and classification (HDE-EPIC019 remedial)",
+      "status": "green",
+      "tokens": [
+        "LIVE_VENDOR_TRANSPORT_OK",
+        "OPEN_RAILS_ENV_OK",
+        "DISCOVERY_BASELINE_OK"
+      ]
     }
   ],
   "manifest": "audit/EPIC019_MANIFEST.json",
@@ -158,6 +173,16 @@
         "ci/checks/check_env_pins.sh"
       ]
     },
+    "OPEN_RAILS_ENV_OK": {
+      "artifacts": [
+        "audit/qa/hde-epic019/d6-vendor-live-qa/rails_snapshot.json",
+        "audit/qa/hde-epic019/d6-vendor-live-qa/happy_path.jsonl"
+      ],
+      "status": "GREEN",
+      "tests": [
+        "python scripts/qa/d6_live_vendor_qa.py"
+      ]
+    },
     "EVIDENCE_INDEX_HASH_OK": {
       "artifacts": [
         "docs/evidence/INDEX.sha256"
@@ -208,6 +233,17 @@
         "tests/core/test_engine_core_determinism.py::test_compute_core_is_two_run_identical"
       ]
     },
+    "LIVE_VENDOR_TRANSPORT_OK": {
+      "artifacts": [
+        "audit/qa/hde-epic019/d6-vendor-live-qa/happy_path.jsonl",
+        "audit/qa/hde-epic019/d6-vendor-live-qa/fail_vendor.jsonl",
+        "audit/qa/hde-epic019/d6-vendor-live-qa/fail_tooling.jsonl"
+      ],
+      "status": "GREEN",
+      "tests": [
+        "python scripts/qa/d6_live_vendor_qa.py"
+      ]
+    },
     "MACHINE_MIRROR_UPDATED_OK": {
       "artifacts": [
         "artifacts/evidence_index.jsonl.path_proof.txt"
@@ -215,6 +251,16 @@
       "status": "GREEN",
       "tests": [
         "python tools/evidence/update_evidence_index.py"
+      ]
+    },
+    "DISCOVERY_BASELINE_OK": {
+      "artifacts": [
+        "notes/d6_vendor_live_qa_discovery.md",
+        "audit/qa/hde-epic019/d6-vendor-live-qa/rails_snapshot.json"
+      ],
+      "status": "GREEN",
+      "tests": [
+        "python scripts/qa/d6_live_vendor_qa.py"
       ]
     },
     "NO_IO_NO_CLOCKS_OK": {
