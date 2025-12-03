@@ -1,0 +1,7 @@
+ALLOW_NETWORK=1
+APP_ENV=dev
+HDAPI_BASE_URL=https://api.humandesignapi.nl/v1
+LANG=C
+LC_ALL=C
+SAFE_MODE=0
+TZ=UTC

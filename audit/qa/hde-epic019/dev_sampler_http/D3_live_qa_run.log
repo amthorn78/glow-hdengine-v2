@@ -1,0 +1,14 @@
+2025-12-03T02:25:23.852295+00:00 - dev_sampler_live_qa.py starting
+Detected harness JSONL files: allowed_dev.jsonl, forbidden_empty.jsonl, forbidden_prod.jsonl
+
+Run summary:
+- allowed_dev.jsonl -> result: OK (status 200, response body keys OK)
+- forbidden_empty.jsonl -> result: FAIL_BEHAVIOR (APP_ENV empty; behavior differs from expected)
+- forbidden_prod.jsonl -> result: FAIL_TOOLING (prod gating prevented allowed dev behavior)
+
+Total runs: 3
+Completed: 2025-12-03T02:25:24.000000+00:00
+Exit: 0
+
+Full details are available in the JSONL files in the same directory.
+

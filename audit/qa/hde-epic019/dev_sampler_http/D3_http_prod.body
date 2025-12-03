@@ -1,0 +1,11 @@
+{
+	"type": "https://example.com/probs/internal-server-error",
+	"title": "Internal Server Error",
+	"status": 500,
+	"detail": "An unexpected error occurred while processing your request.",
+	"instance": "/internal/dev/sampler",
+	"error": {
+		"code": "INTERNAL_SERVER_ERROR",
+		"timestamp": "2025-12-03T02:30:00Z"
+	}
+}

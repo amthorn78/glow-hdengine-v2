@@ -1,5 +1,0 @@
-path: audit/qa/hde-epic019/dev_sampler_http/forbidden_prod.jsonl
-size_bytes: 539
-sha256: 654232c53d1e78e684ed07accda1d075d6b56eef720e54d0202f97269390ba6f
-mtime_utc: 2025-12-02T14:23:58Z
-produced_at_utc: 2025-11-30T03:58:47Z
