@@ -74,5 +74,66 @@
     "QA_EVIDENCE_ONLY_OK": [],
     "QA_CI_DIFF_SCOPED_OK": [],
     "ENV_RAILS_POLICY_OK": []
+  },
+  "token_artifacts": {
+    "CLI_READER_EMITTER_PARITY_OK": [
+      "parity/errors_reader_cli.invalid_json.http.json",
+      "parity/errors_reader_cli.invalid_json.cli.txt",
+      "parity/errors_reader_cli.invalid_viewer_prefs.http.json",
+      "parity/errors_reader_cli.invalid_viewer_prefs.cli.txt",
+      "artifacts/presenter/showcompat_ab.bytes",
+      "artifacts/presenter/showcompat_ba.bytes",
+      "artifacts/presenter/reader_cli_parity.bytes"
+    ],
+    "CLI_STDOUT_LF_OK": [],
+    "CLI_STDERR_ONLY_ON_ERROR_OK": [],
+    "JSON_CANONICAL_CHECK_OK": [
+      "errors/schema_check/error_envelope_invalid_json.log",
+      "errors/schema_check/error_envelope_invalid_viewer_prefs.log",
+      "artifacts/presenter/showcompat_identity_summary.json"
+    ],
+    "ERROR_JSON_CANON_OK": [
+      "errors/schema_check/error_envelope_invalid_json.log",
+      "errors/schema_check/error_envelope_invalid_viewer_prefs.log",
+      "artifacts/presenter/showcompat_identity_summary.json"
+    ],
+    "ERROR_TOKEN_MAP_OK": [
+      "errors/token_map/token_map.json"
+    ],
+    "EVIDENCE_INDEX_UPDATED_OK": [
+      "docs/evidence/INDEX.json",
+      "docs/evidence/INDEX.sha256",
+      "artifacts/evidence_index.jsonl"
+    ],
+    "EVIDENCE_INDEX_MIRROR_OK": [
+      "artifacts/evidence_index.jsonl"
+    ],
+    "EVIDENCE_PATHS_VALIDATED_OK": [
+      "docs/evidence/INDEX.json",
+      "artifacts/evidence_index.jsonl"
+    ],
+    "CLI_SHOWCOMPAT_CANON_OK": [
+      "artifacts/presenter/showcompat_ab.bytes",
+      "artifacts/presenter/showcompat_ba.bytes"
+    ],
+    "TWO_RUN_IDENTITY_OK": [
+      "artifacts/presenter/showcompat_identity_summary.json"
+    ],
+    "COMPOSITE_ABBA_IDENTITY_OK": [
+      "artifacts/presenter/showcompat_ab.bytes",
+      "artifacts/presenter/showcompat_ba.bytes",
+      "artifacts/presenter/showcompat_identity_summary.json"
+    ],
+    "PREIMAGE_RECOMPUTE_OK": [
+      "artifacts/presenter/reader_cli_parity.bytes",
+      "artifacts/presenter/preimage_recompute.log"
+    ],
+    "INTVER_200_CTYPE_JSON_UTF8_OK": [],
+    "INTVER_HEAD_PARITY_OK": [],
+    "QA_PRECOMMIT_CHECKLIST_OK": [],
+    "QA_POSTCOMMIT_CHECKLIST_OK": [],
+    "QA_EVIDENCE_ONLY_OK": [],
+    "QA_CI_DIFF_SCOPED_OK": [],
+    "ENV_RAILS_POLICY_OK": []
   }
 }
