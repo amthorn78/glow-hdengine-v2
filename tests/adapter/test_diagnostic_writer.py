@@ -138,7 +138,7 @@ def test_diagnostic_writer_rejects_wrong_content_type(client):
     )
     assert resp.status_code == 415
     assert resp.headers.get("Cache-Control") == "no-store"
-    assert resp.data == b'{"code":"invalid_content_type","error":"expected application/json; charset=utf-8","ok":false,"schema":"v1"}\n'
+    assert resp.data == b'{"code":"ERR_WRITER_INVALID_CONTENT_TYPE","error":"expected application/json; charset=utf-8","ok":false,"schema":"v1"}\n'
 
 
 def test_diagnostic_writer_rejects_malformed_json(client):
@@ -151,7 +151,7 @@ def test_diagnostic_writer_rejects_malformed_json(client):
         data=b"{\n",
     )
     assert resp.status_code == 400
-    assert resp.data == b'{"code":"invalid_json","error":"malformed JSON request","ok":false,"schema":"v1"}\n'
+    assert resp.data == b'{"code":"ERR_WRITER_INVALID_JSON","error":"malformed JSON request","ok":false,"schema":"v1"}\n'
 
 
 def test_diagnostic_writer_rejects_unknown_keys(client):
@@ -164,7 +164,7 @@ def test_diagnostic_writer_rejects_unknown_keys(client):
         json={"extra": True},
     )
     assert resp.status_code == 422
-    assert resp.data == b'{"code":"unknown_key","error":"unknown request key","ok":false,"schema":"v1"}\n'
+    assert resp.data == b'{"code":"ERR_WRITER_UNKNOWN_KEY","error":"unknown request key","ok":false,"schema":"v1"}\n'
 
 
 def test_diagnostic_writer_enforces_size_cap(client):
@@ -178,7 +178,7 @@ def test_diagnostic_writer_enforces_size_cap(client):
         data=big_body,
     )
     assert resp.status_code == 413
-    assert resp.data == b'{"code":"request_too_large","error":"request body exceeds 32 KiB","ok":false,"schema":"v1"}\n'
+    assert resp.data == b'{"code":"ERR_WRITER_REQUEST_TOO_LARGE","error":"request body exceeds 32 KiB","ok":false,"schema":"v1"}\n'
 
 
 def test_diagnostic_writer_rejects_non_object(client):
@@ -191,4 +191,4 @@ def test_diagnostic_writer_rejects_non_object(client):
         data="[]",
     )
     assert resp.status_code == 422
-    assert resp.data == b'{"code":"invalid_input","error":"schema validation failed","ok":false,"schema":"v1"}\n'
+    assert resp.data == b'{"code":"ERR_WRITER_INVALID_INPUT","error":"schema validation failed","ok":false,"schema":"v1"}\n'

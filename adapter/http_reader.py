@@ -10,6 +10,7 @@ from engine.runtime import emit_reader_public_bytes
 from engine.narratives import emit_public_aux, get_pack
 from engine.sampler.core import CandidateFeatures, ViewerProfile, sample_and_rank
 from adapter.no_io_guard import NoIoGuard
+from engine.compat.errors import error_envelope
 
 _PROCESS_STARTED_AT = datetime.now(timezone.utc)
 _PROCESS_PID = os.getpid()
@@ -47,18 +48,6 @@ class _WriterTransportResponse(Response):
             headers["Content-Length"] = "0"
         return headers
 
-_WRITER_ERROR_MESSAGES: dict[str, str] = {
-    "unauthorized": "authorization required",
-    "forbidden": "insufficient scope",
-    "invalid_content_type": "expected application/json; charset=utf-8",
-    "invalid_json": "malformed JSON request",
-    "invalid_input": "schema validation failed",
-    "unknown_key": "unknown request key",
-    "request_too_large": "request body exceeds 32 KiB",
-    "rails_closed": "rails are closed",
-}
-
-
 def _clear_writer_error_caching(resp: Response) -> Response:
     resp.headers["Cache-Control"] = "no-store"
     resp.headers.pop("ETag", None)
@@ -93,13 +82,7 @@ def _writer_error(
     extra_headers: dict[str, str] | None = None,
     sort_keys: bool = True,
 ) -> Response:
-    message = _WRITER_ERROR_MESSAGES[code]
-    envelope = {
-        "schema": "v1",
-        "ok": False,
-        "code": code,
-        "error": message,
-    }
+    envelope = error_envelope(code)
     return _emit_writer_response(
         envelope,
         status=status,
@@ -116,7 +99,7 @@ def _json_content_type_ok(header_value: str | None) -> bool:
 
 
 def _reject_request_too_large() -> Response:
-    return _writer_error("request_too_large", status=413)
+    return _writer_error("ERR_WRITER_REQUEST_TOO_LARGE", status=413)
 
 
 def _read_writer_json(
@@ -135,31 +118,31 @@ def _read_writer_json(
     if not raw:
         if allow_empty_body:
             return {}, None
-        return None, _writer_error("invalid_content_type", status=415)
+        return None, _writer_error("ERR_WRITER_INVALID_CONTENT_TYPE", status=415)
 
     if not _json_content_type_ok(request.headers.get("Content-Type")):
-        return None, _writer_error("invalid_content_type", status=415)
+        return None, _writer_error("ERR_WRITER_INVALID_CONTENT_TYPE", status=415)
 
     try:
         text = raw.decode("utf-8")
     except UnicodeDecodeError:
-        return None, _writer_error("invalid_json", status=400)
+        return None, _writer_error("ERR_WRITER_INVALID_JSON", status=400)
 
     if text.startswith("\ufeff"):
-        return None, _writer_error("invalid_json", status=400)
+        return None, _writer_error("ERR_WRITER_INVALID_JSON", status=400)
 
     try:
         data = json.loads(text)
     except json.JSONDecodeError:
-        return None, _writer_error("invalid_json", status=400)
+        return None, _writer_error("ERR_WRITER_INVALID_JSON", status=400)
 
     if not isinstance(data, dict):
-        return None, _writer_error("invalid_input", status=422)
+        return None, _writer_error("ERR_WRITER_INVALID_INPUT", status=422)
 
     if allowed_keys is not None:
         unknown = [k for k in data.keys() if k not in allowed_keys]
         if unknown:
-            return None, _writer_error("unknown_key", status=422)
+            return None, _writer_error("ERR_WRITER_UNKNOWN_KEY", status=422)
 
     return data, None
 
@@ -168,7 +151,7 @@ def _require_admin_scope() -> Response | None:
     auth_header = request.headers.get("Authorization", "")
     if not auth_header.startswith("Bearer "):
         return _writer_error(
-            "unauthorized",
+            "ERR_WRITER_UNAUTHORIZED",
             status=401,
             extra_headers={"WWW-Authenticate": "Bearer"},
         )
@@ -180,10 +163,10 @@ def _require_admin_scope() -> Response | None:
     if admin_token and token == admin_token:
         return None
     if none_token and token == none_token:
-        return _writer_error("forbidden", status=403)
+        return _writer_error("ERR_WRITER_FORBIDDEN", status=403)
 
     return _writer_error(
-        "unauthorized",
+        "ERR_WRITER_UNAUTHORIZED",
         status=401,
         extra_headers={"WWW-Authenticate": "Bearer"},
     )
@@ -290,15 +273,15 @@ def _safe_load_chart(path_str: str) -> dict:
     try:
         rp = p.resolve(strict=True)
     except FileNotFoundError:
-        raise ValueError("invalid_path")
+        raise ValueError("ERR_READER_INVALID_PATH")
     if rp.is_symlink() or not str(rp).startswith(str(ALLOWED_ROOT) + os.sep):
         raise ValueError("invalid_path")
     try:
         obj = json.loads(rp.read_text(encoding="utf-8"))
     except Exception:
-        raise ValueError("invalid_json")
+        raise ValueError("ERR_READER_INVALID_CHART")
     if not isinstance(obj, dict):
-        raise ValueError("invalid_json")
+        raise ValueError("ERR_READER_INVALID_CHART")
     return obj
 
 def _require_tz_or_raise(chart: dict, label: str, tz_flag: str | None) -> None:
@@ -306,7 +289,7 @@ def _require_tz_or_raise(chart: dict, label: str, tz_flag: str | None) -> None:
     if isinstance(tz, str) and tz.strip(): return
     if isinstance(tz_flag, str) and tz_flag.strip():
         chart["tz"] = tz_flag; return
-    raise ValueError(f"missing_tz_{label}")
+    raise ValueError(f"ERR_READER_MISSING_TZ_{label}")
 
 def get_reader_bp(emit_fn=None):
     """
@@ -320,14 +303,14 @@ def get_reader_bp(emit_fn=None):
     @bp.get("/reader")
     def reader_v1():
         if request.args.get("v") != "1":
-            return _error("invalid_version")
+            return _error("ERR_READER_INVALID_VERSION")
         if os.environ.get("APP_ENV", "dev") != "dev":
-            return _error("forbidden", 403)
+            return _error("ERR_READER_FORBIDDEN", 403)
 
         a_path = request.args.get("a"); b_path = request.args.get("b")
         a_tz  = request.args.get("a_tz"); b_tz  = request.args.get("b_tz")
         if not a_path or not b_path:
-            return _error("missing_param")
+            return _error("ERR_READER_MISSING_PARAM")
 
         try:
             a = _safe_load_chart(a_path); b = _safe_load_chart(b_path)
@@ -554,9 +537,10 @@ def get_reader_bp(emit_fn=None):
         return resp
 
     def _error(token: str, code: int = 400):
-        body_bytes, _ = emit_compact_json({'error': token})
-        resp = Response(body_bytes, mimetype='application/json; charset=utf-8')
-        resp.headers['Cache-Control'] = 'no-stop' if False else 'no-store'
+        envelope = error_envelope(token)
+        body_bytes, _ = emit_compact_json(envelope)
+        resp = Response(body_bytes, status=code, mimetype='application/json; charset=utf-8')
+        resp.headers['Cache-Control'] = 'no-store'
         resp.headers.pop('ETag', None)
         return resp, code
 
