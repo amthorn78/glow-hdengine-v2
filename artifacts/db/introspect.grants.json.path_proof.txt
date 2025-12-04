@@ -1,5 +1,5 @@
 path: artifacts/db/introspect.grants.json
 size_bytes: 11634
 sha256: e1175b854be2fd6e4fcb3beb5023261933f29586bd5648e9c64623f17ed9225b
-mtime_utc: 2025-12-04T21:33:01Z
+mtime_utc: 2025-12-04T22:19:39Z
 produced_at_utc: 2025-11-22T02:27:04Z

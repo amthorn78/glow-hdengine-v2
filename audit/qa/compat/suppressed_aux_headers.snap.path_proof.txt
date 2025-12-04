@@ -1,5 +1,5 @@
 path: audit/qa/compat/suppressed_aux_headers.snap
 size_bytes: 347
 sha256: 8e15cf2d45b0fc6079e93613c66768aa0982d28048d87022843cef9616621d4c
-mtime_utc: 2025-12-04T21:33:01Z
+mtime_utc: 2025-12-04T22:19:39Z
 produced_at_utc: 2025-11-22T02:27:04Z
