@@ -1,0 +1,4 @@
+scenario: invalid_json
+status: 400
+code: ERR_COMPAT_INVALID_JSON
+schema: ok

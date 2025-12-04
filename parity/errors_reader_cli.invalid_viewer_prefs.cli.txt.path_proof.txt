@@ -1,0 +1,5 @@
+path: parity/errors_reader_cli.invalid_viewer_prefs.cli.txt
+size_bytes: 52
+sha256: 2370ac573193ba8aa7122b31e9db4c47c9c3b94ac3562a0a34e8fac605eff653
+mtime_utc: 2025-12-04T18:17:17Z
+produced_at_utc: 2025-11-30T03:58:47Z
