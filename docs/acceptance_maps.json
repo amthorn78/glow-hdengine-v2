@@ -1,10 +1,23 @@
 [
   {
     "epic_id": "HDE-EPIC017",
-    "path": "docs/acceptance_map_epic017.json"
+    "epic_name": "Foundations / Canon",
+    "path": "docs/acceptance_map_epic017.json",
+    "acceptance_map_path": "docs/acceptance_map_epic017.json",
+    "manifest_path": "audit/EPIC017_MANIFEST.json"
   },
   {
     "epic_id": "HDE-EPIC019",
-    "path": "docs/acceptance_map_epic019.json"
+    "epic_name": "Dissolution Pass 2",
+    "path": "docs/acceptance_map_epic019.json",
+    "acceptance_map_path": "docs/acceptance_map_epic019.json",
+    "manifest_path": "audit/EPIC019_MANIFEST.json"
+  },
+  {
+    "epic_id": "HDE-EPIC020",
+    "epic_name": "Separation Pass 1 — Error & Identity Surfaces",
+    "path": "docs/acceptance_map_epic020.json",
+    "acceptance_map_path": "docs/acceptance_map_epic020.json",
+    "manifest_path": "audit/EPIC020_MANIFEST.json"
   }
 ]

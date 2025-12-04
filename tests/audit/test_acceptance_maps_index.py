@@ -7,6 +7,7 @@ INDEX_PATH = ROOT / "docs/acceptance_maps.json"
 EXPECTED = {
     "HDE-EPIC017": "docs/acceptance_map_epic017.json",
     "HDE-EPIC019": "docs/acceptance_map_epic019.json",
+    "HDE-EPIC020": "docs/acceptance_map_epic020.json",
 }
 
 
