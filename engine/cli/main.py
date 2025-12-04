@@ -217,7 +217,8 @@ def cli(argv: list[str] | None = None) -> int:
     try:
         args = parser.parse_args(argv)
     except SystemExit as exc:  # argparse already emitted help/usage
-        return int(exc.code or 0)
+        code = int(exc.code or 0)
+        return 64 if code else 0
     handler = getattr(args, "handler", None)
     if handler is None:
         parser.print_usage(sys.stderr)

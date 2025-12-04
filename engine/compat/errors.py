@@ -1,13 +1,25 @@
 from __future__ import annotations
-from typing import Dict, Tuple
+from typing import Dict
 
-# Canonical error messages (exact strings, tests assert these)
-ERROR_MESSAGES: Dict[str, str] = {
-    "invalid_json": "malformed or mixed id/payload: supply either a_id/b_id or a/b objects",
-    "invalid_prefs": "viewer_prefs.weights must include all 10 categories as integers 0..100",
-    "missing_narrative_key": "narrative key not found for category/band/perspective",
-}
+from .error_tokens import ERROR_TOKEN_MAP, canonical_token_for
 
-def error_envelope(code: str) -> Dict[str, object]:
-    msg = ERROR_MESSAGES.get(code, "unknown error")
-    return {"ok": False, "code": code, "error": msg}
+# Legacy alias map preserved for older tests
+ERROR_MESSAGES: Dict[str, str] = {}
+for token, meta in ERROR_TOKEN_MAP.items():
+    for alias in meta.get("aliases", ()):
+        ERROR_MESSAGES[alias] = meta["message"]
+
+
+def error_envelope(code: str, *, details: object | None = None) -> Dict[str, object]:
+    token = canonical_token_for(code)
+    meta = ERROR_TOKEN_MAP.get(token, {})
+    message = meta.get("message", "unknown error")
+    envelope: Dict[str, object] = {
+        "schema": "v1",
+        "ok": False,
+        "code": token,
+        "error": message,
+    }
+    if details is not None:
+        envelope["details"] = details
+    return envelope

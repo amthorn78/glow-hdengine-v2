@@ -2,11 +2,30 @@
   "epic_id": "HDE-EPIC020",
   "tokens": {
     "CLI_READER_EMITTER_PARITY_OK": [],
-    "CLI_STDOUT_LF_OK": [],
-    "CLI_STDERR_ONLY_ON_ERROR_OK": [],
-    "JSON_CANONICAL_CHECK_OK": [],
-    "ERROR_JSON_CANON_OK": [],
-    "ERROR_TOKEN_MAP_OK": [],
+    "CLI_STDOUT_LF_OK": [
+      "tests/cli/test_cli_usage_and_errors.py::test_success_writes_stdout_only"
+    ],
+    "CLI_STDERR_ONLY_ON_ERROR_OK": [
+      "tests/cli/test_cli_usage_and_errors.py::test_missing_file_returns_64_and_stderr",
+      "tests/cli/test_cli_usage_and_errors.py::test_bad_json_returns_64_and_stderr",
+      "tests/cli/test_cli_usage_and_errors.py::test_usage_error_writes_stderr_only",
+      "tests/cli/test_cli_usage_and_errors.py::test_engine_error_writes_stderr_only"
+    ],
+    "JSON_CANONICAL_CHECK_OK": [
+      "tests/adapter/test_jsonschema.py::test_error_envelope_schema_on_unauthorized_prod",
+      "tests/adapter/test_jsonschema.py::test_notfound_uses_error_schema"
+    ],
+    "ERROR_JSON_CANON_OK": [
+      "tests/adapter/test_jsonschema.py::test_error_envelope_schema_on_unauthorized_prod",
+      "tests/adapter/test_jsonschema.py::test_notfound_uses_error_schema"
+    ],
+    "ERROR_TOKEN_MAP_OK": [
+      "tests/adapter/test_diagnostic_writer.py::test_diagnostic_writer_rejects_wrong_content_type",
+      "tests/adapter/test_diagnostic_writer.py::test_diagnostic_writer_rejects_malformed_json",
+      "tests/adapter/test_diagnostic_writer.py::test_diagnostic_writer_rejects_unknown_keys",
+      "tests/adapter/test_diagnostic_writer.py::test_diagnostic_writer_enforces_size_cap",
+      "tests/adapter/test_diagnostic_writer.py::test_diagnostic_writer_rejects_non_object"
+    ],
     "EVIDENCE_INDEX_UPDATED_OK": [],
     "EVIDENCE_INDEX_MIRROR_OK": [],
     "EVIDENCE_PATHS_VALIDATED_OK": [],
