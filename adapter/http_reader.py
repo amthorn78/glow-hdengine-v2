@@ -549,6 +549,9 @@ def get_reader_bp(emit_fn=None):
 bp = get_reader_bp()
 
 _SERVICE_IDENTITY_PATH = Path("artifacts/identity/service_identity.json")
+_INVOCATION_PATH = Path("artifacts/invocation.json")
+_RELEASE_ID_PATH = Path("artifacts/math/release_id.txt")
+_EMITTER_SHA256_PATH = Path("artifacts/identity/emitter_sha256.txt")
 
 
 # === EPIC-005 /internal/version (Blueprint: bp) ===
@@ -557,7 +560,7 @@ _SERVICE_IDENTITY_PATH = Path("artifacts/identity/service_identity.json")
 
 def _read_release_id() -> str:
     try:
-        return Path("artifacts/math/release_id.txt").read_text(encoding="utf-8").strip()
+        return _RELEASE_ID_PATH.read_text(encoding="utf-8").strip()
     except FileNotFoundError:
         manifest = Path("catalog/manifest.json").read_bytes()
         return hashlib.sha256(manifest).hexdigest()
@@ -575,20 +578,37 @@ def _load_service_identity() -> dict[str, str]:
     return data if isinstance(data, dict) else {}
 
 
+def _load_invocation_identity() -> tuple[str, str]:
+    try:
+        raw = _INVOCATION_PATH.read_text(encoding="utf-8")
+    except FileNotFoundError:
+        return "", ""
+    try:
+        data = json.loads(raw)
+    except json.JSONDecodeError:
+        return "", ""
+    invocation = data.get("invocation") if isinstance(data, dict) else {}
+    if not isinstance(invocation, dict):
+        return "", ""
+    return str(invocation.get("tag") or ""), str(invocation.get("sha256") or "")
+
+
 def _build_internal_version_payload() -> dict[str, str]:
     identity = _load_service_identity()
+    invocation_tag, invocation_sha256 = _load_invocation_identity()
     engine_tag = identity.get("engine_tag") or os.environ.get("ENGINE_TAG", "hdengine-alpha")
-    release_id = identity.get("release_id") or _read_release_id()
-    invocation_tag = identity.get("invocation_tag") or os.environ.get("PRODUCT_INVOCATION_TAG", "INV-UNKNOWN")
     build_commit = identity.get("build_commit") or os.environ.get("BUILD_COMMIT", "unknown")
-    emitter_sha256 = identity.get("emitter_sha256") or os.environ.get("EMITTER_SHA256", "unknown")
-    return {
+    emitter_sha256 = identity.get("emitter_sha256") or (_EMITTER_SHA256_PATH.read_text(encoding="utf-8").strip() if _EMITTER_SHA256_PATH.exists() else os.environ.get("EMITTER_SHA256", "unknown"))
+    release_id = _read_release_id()
+    payload = {
         "engine_tag": engine_tag,
-        "release_id": release_id,
-        "invocation_tag": invocation_tag,
         "build_commit": build_commit,
+        "invocation_tag": invocation_tag or identity.get("invocation_tag") or os.environ.get("PRODUCT_INVOCATION_TAG", "INV-UNKNOWN"),
+        "invocation_sha256": invocation_sha256,
         "emitter_sha256": emitter_sha256,
+        "release_id": release_id,
     }
+    return payload
 
 
 # --- ensure blueprint exists for internal routes ---

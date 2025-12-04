@@ -1,5 +1,5 @@
 path: docs/schemas/sampler/pool_snapshots.schema.json
 size_bytes: 3280
 sha256: 9b9ded9f29002bd93b6bf1fbda062c1b3cb2d291388d0b0decb901bf9bfae3af
-mtime_utc: 2025-12-04T19:04:26Z
+mtime_utc: 2025-12-04T21:33:01Z
 produced_at_utc: 2025-11-30T03:58:47Z

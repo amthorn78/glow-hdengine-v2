@@ -14,8 +14,6 @@
         "EVIDENCE_INDEX_UPDATED_OK",
         "EVIDENCE_INDEX_MIRROR_OK",
         "EVIDENCE_PATHS_VALIDATED_OK",
-        "INTVER_200_CTYPE_JSON_UTF8_OK",
-        "INTVER_HEAD_PARITY_OK",
         "QA_PRECOMMIT_CHECKLIST_OK",
         "QA_POSTCOMMIT_CHECKLIST_OK",
         "QA_EVIDENCE_ONLY_OK",
@@ -34,8 +32,6 @@
         "EVIDENCE_INDEX_UPDATED_OK",
         "EVIDENCE_INDEX_MIRROR_OK",
         "EVIDENCE_PATHS_VALIDATED_OK",
-        "INTVER_200_CTYPE_JSON_UTF8_OK",
-        "INTVER_HEAD_PARITY_OK",
         "QA_PRECOMMIT_CHECKLIST_OK",
         "QA_POSTCOMMIT_CHECKLIST_OK",
         "QA_EVIDENCE_ONLY_OK",
@@ -268,22 +264,36 @@
     },
     "TWO_RUN_IDENTITY_OK": {
       "artifacts": [
-        "artifacts/presenter/showcompat_identity_summary.json"
+        "artifacts/presenter/showcompat_identity_summary.json",
+        "artifacts/ops/internal_version/body_get.sha256",
+        "artifacts/ops/internal_version/two_run_identity.log"
       ],
       "status": "DONE",
       "tests": [
-        "tests/cli/test_showcompat_parity_and_identity.py::test_two_run_identity_and_reemit"
+        "tests/cli/test_showcompat_parity_and_identity.py::test_two_run_identity_and_reemit",
+        "tests/transport/test_internal_version_contract.py::test_internal_version_invariants_and_artifacts"
       ]
     },
     "INTVER_200_CTYPE_JSON_UTF8_OK": {
-      "artifacts": [],
-      "status": "pending",
-      "tests": []
+      "artifacts": [
+        "artifacts/ops/internal_version/headers_get.txt",
+        "artifacts/ops/internal_version/body_get.json",
+        "artifacts/ops/internal_version/body_get.sha256"
+      ],
+      "status": "DONE",
+      "tests": [
+        "tests/transport/test_internal_version_contract.py::test_internal_version_invariants_and_artifacts"
+      ]
     },
     "INTVER_HEAD_PARITY_OK": {
-      "artifacts": [],
-      "status": "pending",
-      "tests": []
+      "artifacts": [
+        "artifacts/ops/internal_version/headers_head.txt",
+        "artifacts/ops/internal_version/two_run_identity.log"
+      ],
+      "status": "DONE",
+      "tests": [
+        "tests/transport/test_internal_version_contract.py::test_internal_version_invariants_and_artifacts"
+      ]
     },
     "QA_PRECOMMIT_CHECKLIST_OK": {
       "artifacts": [],
