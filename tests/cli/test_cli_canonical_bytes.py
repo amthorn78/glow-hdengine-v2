@@ -7,6 +7,7 @@ import sysconfig
 import pytest
 
 from engine.serializer.canon import sercanon
+from engine.presenter import emitter
 
 pytestmark = pytest.mark.epic006
 
@@ -47,7 +48,9 @@ def _run_hdctl(args: list[str], *, stdin: bytes | None = None) -> subprocess.Com
 def test_showcompat_stdout_is_canonical():
     result = _run_hdctl(["showcompat"], stdin=(PAIR + "\n").encode())
     assert result.returncode == 0
+    assert result.stderr == b""
     payload = _assert_canonical_bytes(result.stdout)
+    assert result.stdout == emitter.emit_public(payload)
     assert set(payload) == {"a", "b", "compat", "viewer_prefs"}
     compat = payload["compat"]
     assert isinstance(compat.get("categories"), list)

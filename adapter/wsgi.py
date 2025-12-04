@@ -1,6 +1,6 @@
 import os
 from flask import Flask, Blueprint, jsonify, request, make_response, Response
-from engine.presenter.emitter import emit_compact_json
+from engine.presenter.emitter import emit_public
 from engine.stable.sercanon import serialize
 from adapter.http_reader import bp as reader_bp
 from engine.http.compat_handler import compat_blueprint
@@ -39,27 +39,27 @@ def create_app():
 
     @app.get("/internal/healthz")
     def internal_healthz():
-        body, _ = emit_compact_json({"ok": True, "schema": "v1"})
+        body = emit_public({"ok": True, "schema": "v1"})
         resp = Response(body, status=200, mimetype="application/json; charset=utf-8")
         return _apply_common_headers(resp)
 
     @app.get("/internal/readyz")
     def internal_readyz():
-        body, _ = emit_compact_json({"ok": True, "schema": "v1"})
+        body = emit_public({"ok": True, "schema": "v1"})
         resp = Response(body, status=200, mimetype="application/json; charset=utf-8")
         return _apply_common_headers(resp)
 
     @app.errorhandler(404)
     def _not_found(err):  # type: ignore[override]
         env = error_envelope("ERR_NOT_FOUND")
-        body, _ = emit_compact_json(env)
+        body = emit_public(env)
         resp = Response(body, status=404, mimetype="application/json; charset=utf-8")
         return _apply_common_headers(resp)
 
     @app.errorhandler(405)
     def _method_not_allowed(err):  # type: ignore[override]
         env = error_envelope("ERR_NOT_FOUND")
-        body, _ = emit_compact_json(env)
+        body = emit_public(env)
         resp = Response(body, status=405, mimetype="application/json; charset=utf-8")
         return _apply_common_headers(resp)
 

@@ -1,5 +1,5 @@
 path: parity/errors_reader_cli.invalid_json.http.json
 size_bytes: 305
 sha256: 62c4365b913352d27911aa27daf5e61905ba2e468bcdc41aff6d13852f297b2c
-mtime_utc: 2025-12-04T18:17:17Z
+mtime_utc: 2025-12-04T19:04:26Z
 produced_at_utc: 2025-11-30T03:58:47Z

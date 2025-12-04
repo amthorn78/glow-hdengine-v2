@@ -12,6 +12,10 @@ from engine.runtime import emit_reader_public_envelope
 
 AB_ARTIFACT = Path("artifacts/cli/ab.json")
 BA_ARTIFACT = Path("artifacts/cli/ba.json")
+PRESENTER_AB_ARTIFACT = Path("artifacts/presenter/showcompat_ab.bytes")
+PRESENTER_BA_ARTIFACT = Path("artifacts/presenter/showcompat_ba.bytes")
+PRESENTER_READER_ARTIFACT = Path("artifacts/presenter/reader_cli_parity.bytes")
+PRESENTER_PREIMAGE_LOG = Path("artifacts/presenter/preimage_recompute.log")
 
 PAIR = {
     "left": {"birthdate": "1990-01-10", "birthtime": "14:05", "location": "Chicago, US"},
@@ -82,6 +86,8 @@ def test_two_run_identity_and_reemit():
     assert first.stdout == second.stdout
     assert first.stdout.endswith(b"\n") and b"\n\n" not in first.stdout
 
+    assert PRESENTER_AB_ARTIFACT.read_bytes() == first.stdout
+
     payload = json.loads(first.stdout)
     re_emitted = emitter.emit_public(payload)
     assert re_emitted == first.stdout
@@ -100,6 +106,8 @@ def test_ab_ba_identity_and_artifacts():
 
     assert AB_ARTIFACT.read_bytes() == ab_proc.stdout
     assert BA_ARTIFACT.read_bytes() == ba_proc.stdout
+    assert PRESENTER_AB_ARTIFACT.read_bytes() == ab_proc.stdout
+    assert PRESENTER_BA_ARTIFACT.read_bytes() == ba_proc.stdout
 
 
 def test_reader_dump_matches_runtime(tmp_path: Path):
@@ -129,8 +137,29 @@ def test_reader_dump_matches_runtime(tmp_path: Path):
     dump_bytes = dump_path.read_bytes()
     expected = _canonical_reader_bytes(PAIR, env=env)
     assert dump_bytes == expected
+    assert PRESENTER_READER_ARTIFACT.read_bytes() == expected
 
     envelope = json.loads(dump_bytes)
     preimage = {k: v for k, v in envelope.items() if k != "idempotence_hash"}
     digest = hashlib.sha256(emitter.emit_public(preimage)).hexdigest()
     assert digest == envelope["idempotence_hash"]
+
+
+def _parse_preimage_log(path: Path) -> dict[str, str]:
+    parts = {}
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        parts[key.strip()] = value.strip()
+    return parts
+
+
+def test_preimage_artifact_matches_log():
+    envelope = json.loads(PRESENTER_READER_ARTIFACT.read_bytes())
+    preimage = {k: v for k, v in envelope.items() if k != "idempotence_hash"}
+    digest = hashlib.sha256(emitter.emit_public(preimage)).hexdigest()
+    log_parts = _parse_preimage_log(PRESENTER_PREIMAGE_LOG)
+    assert log_parts.get("computed_sha256") == digest
+    assert log_parts.get("stored_sha256") == envelope["idempotence_hash"]
+    assert log_parts.get("match") == str(digest == envelope["idempotence_hash"]).lower()

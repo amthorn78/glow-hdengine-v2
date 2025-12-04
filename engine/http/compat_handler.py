@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import Dict, Any
 from flask import Blueprint, request, Response
-from engine.presenter import emit_compact_json
+from engine.presenter import emit_public
 from engine.compat.errors import error_envelope
 from engine.compat.compute import compat_public
 from engine.validation.viewer_prefs import validate_viewer_prefs
@@ -10,7 +10,7 @@ compat_blueprint = Blueprint("compat", __name__, url_prefix="/api/compat/v1")
 
 
 def _writer_payload(env: Dict[str, Any], *, status: int) -> Response:
-    payload, _ = emit_compact_json(env)
+    payload = emit_public(env)
     resp = Response(payload, status=status, mimetype="application/json; charset=utf-8")
     resp.headers["Cache-Control"] = "no-store"
     resp.headers.pop("ETag", None)

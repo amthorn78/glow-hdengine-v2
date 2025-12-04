@@ -40,8 +40,12 @@ def test_guards_pass_on_repo_state(tmp_path: Path) -> None:
 
     assert ser.returncode == 0, ser.stderr
     assert proof.returncode == 0, proof.stderr
-    assert "summary: PASS" in serializer_log.read_text(encoding="utf-8")
-    assert "summary:PASS" in proof_log.read_text(encoding="utf-8")
+    serializer_body = serializer_log.read_text(encoding="utf-8")
+    proof_body = proof_log.read_text(encoding="utf-8")
+    assert "summary: PASS" in serializer_body
+    assert "summary:PASS" in proof_body
+    assert "canonical_emitters:emit_reader_public_envelope,emitter.emit_public" in proof_body
+    assert "showcompat:showcompat:emit_reader_public_envelope,emitter.emit_public" in proof_body
 
 
 def test_serializer_guard_detects_violation(tmp_path: Path) -> None:
