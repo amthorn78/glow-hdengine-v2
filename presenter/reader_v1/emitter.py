@@ -57,9 +57,9 @@ def emit_reader_v1(enriched: Dict[str, Any]) -> Tuple[bytes, Dict[str, Any]]:
     public_bytes are LF-terminated, produced by sercanon.serialize.
     """
     preimage = _build_preimage(enriched)
-    pre_bytes, _ = emitter.emit_compact_json(preimage)
+    pre_bytes = emitter.emit_public(preimage)
     digest = hashlib.sha256(pre_bytes).hexdigest()
     final = dict(preimage)
     final["idempotence_hash"] = digest
-    public_bytes, _ = emitter.emit_compact_json(final)
+    public_bytes = emitter.emit_public(final)
     return public_bytes, final

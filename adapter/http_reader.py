@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from flask import Blueprint, Response, request, Flask, g
 from threading import Lock
-from engine.presenter.emitter import emit_compact_json
+from engine.presenter.emitter import emit_public
 from engine.serializer import canon
 from engine.runtime import emit_reader_public_bytes
 from engine.narratives import emit_public_aux, get_pack
@@ -61,7 +61,7 @@ def _emit_writer_response(
     extra_headers: dict[str, str] | None = None,
     sort_keys: bool = True,
 ) -> Response:
-    body = emit_compact_json(envelope, sort_keys=sort_keys)[0]
+    body = emit_public(envelope, sort_keys=sort_keys)
     resp = Response(body, status=status, mimetype="application/json; charset=utf-8")
     resp.headers["Content-Type"] = "application/json; charset=utf-8"
     resp.headers["Cache-Control"] = "no-store"
@@ -451,7 +451,7 @@ def get_reader_bp(emit_fn=None):
             "rails_state": _rails_env_snapshot(),
             "probe_token_present": bool(probe_token),
         }
-        body, _ = emit_compact_json(payload, sort_keys=False)
+        body = emit_public(payload, sort_keys=False)
         resp = Response(body, status=200, mimetype="application/json; charset=utf-8")
         resp.headers["Cache-Control"] = "no-store"
         resp.headers.pop("ETag", None)
@@ -530,7 +530,7 @@ def get_reader_bp(emit_fn=None):
             "candidate_ids": [cand.person_uid for cand in ranked.candidates],
         }
 
-        body, _ = emit_compact_json(response_payload, sort_keys=True)
+        body = emit_public(response_payload, sort_keys=True)
         resp = Response(body, status=200, mimetype="application/json; charset=utf-8")
         resp.headers["Cache-Control"] = "no-store"
         resp.headers.pop("ETag", None)
@@ -538,7 +538,7 @@ def get_reader_bp(emit_fn=None):
 
     def _error(token: str, code: int = 400):
         envelope = error_envelope(token)
-        body_bytes, _ = emit_compact_json(envelope)
+        body_bytes = emit_public(envelope)
         resp = Response(body_bytes, status=code, mimetype='application/json; charset=utf-8')
         resp.headers['Cache-Control'] = 'no-store'
         resp.headers.pop('ETag', None)
@@ -602,13 +602,13 @@ except NameError:
 def internal_version():
     # deny identity overrides in prod
     if request.headers.get("X-Identity-Override"):
-        body_bytes, _ = emit_compact_json({"error": "override_denied", "detail": "identity overrides disabled in prod"})
+        body_bytes = emit_public({"error": "override_denied", "detail": "identity overrides disabled in prod"})
         r = Response(body_bytes, status=400, mimetype="application/json; charset=utf-8")
         r.headers["Cache-Control"] = "no-store"
         return r  # NO ETag
 
     payload = _build_internal_version_payload()
-    body_bytes, _ = emit_compact_json(payload, sort_keys=False)
+    body_bytes = emit_public(payload, sort_keys=False)
 
     if request.method == "HEAD":
         # HEAD parity: same type; no body; CL equals GET body size

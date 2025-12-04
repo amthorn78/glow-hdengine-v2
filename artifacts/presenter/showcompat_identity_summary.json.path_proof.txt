@@ -1,0 +1,5 @@
+path: artifacts/presenter/showcompat_identity_summary.json
+size_bytes: 371
+sha256: f529cdd45f0298a228f85ac33ad2ee796974843646045f40249090443d94bb76
+mtime_utc: 2025-12-04T19:10:34Z
+produced_at_utc: 2025-11-30T03:58:47Z

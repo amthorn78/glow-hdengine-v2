@@ -2,26 +2,34 @@
   "epic_id": "HDE-EPIC020",
   "tokens": {
     "CLI_READER_EMITTER_PARITY_OK": [
-      "tests/cli/test_errors_parity.py::test_http_and_cli_parity"
+      "tests/cli/test_errors_parity.py::test_http_and_cli_parity",
+      "tests/cli/test_showcompat_parity_and_identity.py::test_reader_dump_matches_runtime",
+      "tests/cli/test_serializer_guards.py::test_guards_pass_on_repo_state"
     ],
     "CLI_STDOUT_LF_OK": [
-      "tests/cli/test_cli_usage_and_errors.py::test_success_writes_stdout_only"
+      "tests/cli/test_cli_usage_and_errors.py::test_success_writes_stdout_only",
+      "tests/cli/test_cli_canonical_bytes.py::test_showcompat_stdout_is_canonical"
     ],
     "CLI_STDERR_ONLY_ON_ERROR_OK": [
       "tests/cli/test_cli_usage_and_errors.py::test_missing_file_returns_64_and_stderr",
       "tests/cli/test_cli_usage_and_errors.py::test_bad_json_returns_64_and_stderr",
       "tests/cli/test_cli_usage_and_errors.py::test_usage_error_writes_stderr_only",
-      "tests/cli/test_cli_usage_and_errors.py::test_engine_error_writes_stderr_only"
+      "tests/cli/test_cli_usage_and_errors.py::test_engine_error_writes_stderr_only",
+      "tests/cli/test_cli_canonical_bytes.py::test_showcompat_stdout_is_canonical"
     ],
     "JSON_CANONICAL_CHECK_OK": [
       "tests/adapter/test_jsonschema.py::test_error_envelope_schema_on_unauthorized_prod",
       "tests/adapter/test_jsonschema.py::test_notfound_uses_error_schema",
-      "tests/cli/test_errors_parity.py::test_http_and_cli_parity"
+      "tests/cli/test_errors_parity.py::test_http_and_cli_parity",
+      "tests/cli/test_cli_canonical_bytes.py::test_showcompat_stdout_is_canonical",
+      "tests/cli/test_showcompat_parity_and_identity.py::test_two_run_identity_and_reemit"
     ],
     "ERROR_JSON_CANON_OK": [
       "tests/adapter/test_jsonschema.py::test_error_envelope_schema_on_unauthorized_prod",
       "tests/adapter/test_jsonschema.py::test_notfound_uses_error_schema",
-      "tests/cli/test_errors_parity.py::test_http_and_cli_parity"
+      "tests/cli/test_errors_parity.py::test_http_and_cli_parity",
+      "tests/cli/test_cli_canonical_bytes.py::test_showcompat_stdout_is_canonical",
+      "tests/cli/test_showcompat_parity_and_identity.py::test_two_run_identity_and_reemit"
     ],
     "ERROR_TOKEN_MAP_OK": [
       "tests/adapter/test_diagnostic_writer.py::test_diagnostic_writer_rejects_wrong_content_type",
@@ -46,10 +54,80 @@
       "tests/evidence/test_evidence_skeleton.py::test_index_entries_have_mirrors_and_path_proofs",
       "tests/ops/test_evidence_index.py::test_evidence_index_has_required_artifacts"
     ],
-    "CLI_SHOWCOMPAT_CANON_OK": [],
-    "TWO_RUN_IDENTITY_OK": [],
-    "COMPOSITE_ABBA_IDENTITY_OK": [],
-    "PREIMAGE_RECOMPUTE_OK": [],
+    "CLI_SHOWCOMPAT_CANON_OK": [
+      "tests/cli/test_cli_canonical_bytes.py::test_showcompat_stdout_is_canonical"
+    ],
+    "TWO_RUN_IDENTITY_OK": [
+      "tests/cli/test_showcompat_parity_and_identity.py::test_two_run_identity_and_reemit"
+    ],
+    "COMPOSITE_ABBA_IDENTITY_OK": [
+      "tests/cli/test_showcompat_parity_and_identity.py::test_ab_ba_identity_and_artifacts"
+    ],
+    "PREIMAGE_RECOMPUTE_OK": [
+      "tests/cli/test_showcompat_parity_and_identity.py::test_reader_dump_matches_runtime",
+      "tests/cli/test_showcompat_parity_and_identity.py::test_preimage_artifact_matches_log"
+    ],
+    "INTVER_200_CTYPE_JSON_UTF8_OK": [],
+    "INTVER_HEAD_PARITY_OK": [],
+    "QA_PRECOMMIT_CHECKLIST_OK": [],
+    "QA_POSTCOMMIT_CHECKLIST_OK": [],
+    "QA_EVIDENCE_ONLY_OK": [],
+    "QA_CI_DIFF_SCOPED_OK": [],
+    "ENV_RAILS_POLICY_OK": []
+  },
+  "token_artifacts": {
+    "CLI_READER_EMITTER_PARITY_OK": [
+      "parity/errors_reader_cli.invalid_json.http.json",
+      "parity/errors_reader_cli.invalid_json.cli.txt",
+      "parity/errors_reader_cli.invalid_viewer_prefs.http.json",
+      "parity/errors_reader_cli.invalid_viewer_prefs.cli.txt",
+      "artifacts/presenter/showcompat_ab.bytes",
+      "artifacts/presenter/showcompat_ba.bytes",
+      "artifacts/presenter/reader_cli_parity.bytes"
+    ],
+    "CLI_STDOUT_LF_OK": [],
+    "CLI_STDERR_ONLY_ON_ERROR_OK": [],
+    "JSON_CANONICAL_CHECK_OK": [
+      "errors/schema_check/error_envelope_invalid_json.log",
+      "errors/schema_check/error_envelope_invalid_viewer_prefs.log",
+      "artifacts/presenter/showcompat_identity_summary.json"
+    ],
+    "ERROR_JSON_CANON_OK": [
+      "errors/schema_check/error_envelope_invalid_json.log",
+      "errors/schema_check/error_envelope_invalid_viewer_prefs.log",
+      "artifacts/presenter/showcompat_identity_summary.json"
+    ],
+    "ERROR_TOKEN_MAP_OK": [
+      "errors/token_map/token_map.json"
+    ],
+    "EVIDENCE_INDEX_UPDATED_OK": [
+      "docs/evidence/INDEX.json",
+      "docs/evidence/INDEX.sha256",
+      "artifacts/evidence_index.jsonl"
+    ],
+    "EVIDENCE_INDEX_MIRROR_OK": [
+      "artifacts/evidence_index.jsonl"
+    ],
+    "EVIDENCE_PATHS_VALIDATED_OK": [
+      "docs/evidence/INDEX.json",
+      "artifacts/evidence_index.jsonl"
+    ],
+    "CLI_SHOWCOMPAT_CANON_OK": [
+      "artifacts/presenter/showcompat_ab.bytes",
+      "artifacts/presenter/showcompat_ba.bytes"
+    ],
+    "TWO_RUN_IDENTITY_OK": [
+      "artifacts/presenter/showcompat_identity_summary.json"
+    ],
+    "COMPOSITE_ABBA_IDENTITY_OK": [
+      "artifacts/presenter/showcompat_ab.bytes",
+      "artifacts/presenter/showcompat_ba.bytes",
+      "artifacts/presenter/showcompat_identity_summary.json"
+    ],
+    "PREIMAGE_RECOMPUTE_OK": [
+      "artifacts/presenter/reader_cli_parity.bytes",
+      "artifacts/presenter/preimage_recompute.log"
+    ],
     "INTVER_200_CTYPE_JSON_UTF8_OK": [],
     "INTVER_HEAD_PARITY_OK": [],
     "QA_PRECOMMIT_CHECKLIST_OK": [],

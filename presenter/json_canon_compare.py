@@ -34,8 +34,7 @@ def _load_json(path: Path) -> Any:
 def _canonical_bytes(payload: Any) -> bytes:
     if not isinstance(payload, dict):
         raise JsonCanonCompareError("inputs must be JSON objects")
-    canonical_bytes, _ = emitter.emit_compact_json(payload, sort_keys=True)
-    return canonical_bytes
+    return emitter.emit_public(payload, sort_keys=True)
 
 
 def _sha256(data: bytes) -> str:

@@ -1,5 +1,5 @@
 path: audit/qa/compat/coverage_sweep_summary.json
 size_bytes: 2180
 sha256: 39ec72a48ec87e89f45afa0b9f53b24ecb1a0d996ab6c1c88892778e3128fdf6
-mtime_utc: 2025-12-04T18:17:01Z
+mtime_utc: 2025-12-04T19:04:26Z
 produced_at_utc: 2025-11-22T02:27:04Z

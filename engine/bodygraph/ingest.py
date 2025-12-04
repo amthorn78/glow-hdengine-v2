@@ -132,7 +132,7 @@ def ingest_vendor_bodygraph(
     client = client or HdApiClient.from_env(log_path=retry_log)
     request = client.build_request(birthdate=inputs.birthdate, birthtime=inputs.birthtime, location=inputs.location)
     vendor_result = client.fetch(request)
-    payload_bytes, _ = emitter.emit_compact_json(vendor_result.payload)
+    payload_bytes, _ = emitter.emit_public_with_envelope(vendor_result.payload)
     payload_text = payload_bytes.decode("utf-8")
     payload_sha = sha256(payload_bytes).hexdigest()
     idempotency_key = _idempotency_key(inputs.user_id, "hdapi", vendor_version, request.input_fingerprint)
@@ -170,7 +170,7 @@ def ingest_vendor_bodygraph(
     rows_written = max(db_rows_after - rows_before, 0)
     stored_payload = _fetch_payload(db, inputs.user_id, "hdapi", vendor_version, request.input_fingerprint)
     db_payload = json.loads(stored_payload)
-    db_emitted_bytes, _ = emitter.emit_compact_json(db_payload)
+    db_emitted_bytes, _ = emitter.emit_public_with_envelope(db_payload)
     db_emitted_sha = sha256(db_emitted_bytes).hexdigest()
     parity_match = payload_sha == db_emitted_sha
     duration_ms = (time.monotonic() - start) * 1000.0
