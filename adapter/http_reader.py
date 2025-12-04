@@ -466,7 +466,7 @@ def get_reader_bp(emit_fn=None):
         if app_env in {"dev", "test", "local"}:
             return None
         # Preserve writer-style error envelopes for internal/dev surfaces.
-        return _writer_error("forbidden", status=403)
+        return _writer_error("ERR_WRITER_FORBIDDEN", status=403)
 
     @bp.route("/internal/dev/sampler", methods=["POST"], provide_automatic_options=False)
     def dev_sampler_internal():
