@@ -102,6 +102,6 @@
     }
   ],
   "manifest": "audit/EPIC020_MANIFEST.json",
-  "pf20_ref": "PF20 §2.x HDE-EPIC020",
+  "pf20_ref": "PF20 §2.5 HDE-EPIC020",
   "token_status": {}
 }
