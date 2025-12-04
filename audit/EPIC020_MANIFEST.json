@@ -58,7 +58,8 @@
       "tests/cli/test_cli_canonical_bytes.py::test_showcompat_stdout_is_canonical"
     ],
     "TWO_RUN_IDENTITY_OK": [
-      "tests/cli/test_showcompat_parity_and_identity.py::test_two_run_identity_and_reemit"
+      "tests/cli/test_showcompat_parity_and_identity.py::test_two_run_identity_and_reemit",
+      "tests/transport/test_internal_version_contract.py::test_internal_version_invariants_and_artifacts"
     ],
     "COMPOSITE_ABBA_IDENTITY_OK": [
       "tests/cli/test_showcompat_parity_and_identity.py::test_ab_ba_identity_and_artifacts"
@@ -67,8 +68,12 @@
       "tests/cli/test_showcompat_parity_and_identity.py::test_reader_dump_matches_runtime",
       "tests/cli/test_showcompat_parity_and_identity.py::test_preimage_artifact_matches_log"
     ],
-    "INTVER_200_CTYPE_JSON_UTF8_OK": [],
-    "INTVER_HEAD_PARITY_OK": [],
+    "INTVER_200_CTYPE_JSON_UTF8_OK": [
+      "tests/transport/test_internal_version_contract.py::test_internal_version_invariants_and_artifacts"
+    ],
+    "INTVER_HEAD_PARITY_OK": [
+      "tests/transport/test_internal_version_contract.py::test_internal_version_invariants_and_artifacts"
+    ],
     "QA_PRECOMMIT_CHECKLIST_OK": [],
     "QA_POSTCOMMIT_CHECKLIST_OK": [],
     "QA_EVIDENCE_ONLY_OK": [],
@@ -117,7 +122,9 @@
       "artifacts/presenter/showcompat_ba.bytes"
     ],
     "TWO_RUN_IDENTITY_OK": [
-      "artifacts/presenter/showcompat_identity_summary.json"
+      "artifacts/presenter/showcompat_identity_summary.json",
+      "artifacts/ops/internal_version/body_get.sha256",
+      "artifacts/ops/internal_version/two_run_identity.log"
     ],
     "COMPOSITE_ABBA_IDENTITY_OK": [
       "artifacts/presenter/showcompat_ab.bytes",
@@ -128,8 +135,15 @@
       "artifacts/presenter/reader_cli_parity.bytes",
       "artifacts/presenter/preimage_recompute.log"
     ],
-    "INTVER_200_CTYPE_JSON_UTF8_OK": [],
-    "INTVER_HEAD_PARITY_OK": [],
+    "INTVER_200_CTYPE_JSON_UTF8_OK": [
+      "artifacts/ops/internal_version/headers_get.txt",
+      "artifacts/ops/internal_version/body_get.json",
+      "artifacts/ops/internal_version/body_get.sha256"
+    ],
+    "INTVER_HEAD_PARITY_OK": [
+      "artifacts/ops/internal_version/headers_head.txt",
+      "artifacts/ops/internal_version/two_run_identity.log"
+    ],
     "QA_PRECOMMIT_CHECKLIST_OK": [],
     "QA_POSTCOMMIT_CHECKLIST_OK": [],
     "QA_EVIDENCE_ONLY_OK": [],
