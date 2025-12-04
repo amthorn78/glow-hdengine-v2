@@ -1,35 +1,32 @@
 # AGENTS.md — Glow HD Engine (agent rules)
 
 ## Scope and hierarchy
-- This file governs all agents in the repo; PF-Canon remains the source of truth (see `docs/pfcanon/`, titles such as PF12 — Schemas & Artifacts, PF19 — QA Guide, PF20 — Phased Epics). Where this file and PF-Canon diverge, PF-Canon wins.
+- This file governs all agents in the repo; PF-Canon remains the source of truth (see `docs/pfcanon/`, titles such as PF05 — CLI/API/Vendor Ref, PF12 — Schemas & Artifacts, PF14 — Mechanics Guide, PF19 — QA Guide, PF20 — Phased Epics). Where this file and PF-Canon diverge, PF-Canon wins.
 - Governed evidence (INDEX/mirror/path proofs/orientation/manifest/close report/config acceptance map) must be produced only by the canonical tools. **Never hand-edit governed artifacts.**
 
 ## Roles and responsibilities
-- **Lead Dev:** approves implementation/evidence plans, keeps acceptance maps/manifests coherent, and signs off on sampler + Engine Core scope (EPIC019, including remedial Cards C1–C3) before close.
-- **Codex / dev agents:** implement features/docs/evidence under PO direction, run CLI guards and sampler/core harnesses under closed rails, and ensure determinism helper + env pins are honored; own the dev Reader helper (`scripts/dev_start_reader.sh`) and DEV_SAMPLER_URL wiring for dev/test/local only.
-- **Evidence harness:** runs `tools/evidence/update_evidence_index.py`, `tools/evidence/orientation_demo.py`, `tools/evidence/run_sanity_pipeline.py`, `tools/evidence/generate_sampler_evidence.py`, and `tools/evidence/generate_engine_core_evidence.py`; keeps `docs/evidence/INDEX.json` and `artifacts/evidence_index.jsonl` in sync with path proofs and EPIC019 acceptance bindings (including D3 dev sampler Live QA and D6 vendor Live QA families under `audit/qa/hde-epic019/`).
+- **Lead Dev / Product Owner:** approves epic scopes and evidence plans, keeps acceptance maps/manifests coherent, and signs off on public/ops surfaces (EPIC020 separation features) before close.
+- **Codex / dev agents:** implement features/docs/evidence under PO direction, run CLI guards and harnesses under closed rails, and ensure determinism helper + env pins are honored; own the dev Reader helper (`scripts/dev_start_reader.sh`) and DEV_SAMPLER_URL wiring for dev/test/local only.
+- **Evidence harness:** runs `tools/evidence/update_evidence_index.py`, `tools/evidence/orientation_demo.py`, `tools/evidence/run_sanity_pipeline.py`, and epic-specific generators; keeps `docs/evidence/INDEX.json` and `artifacts/evidence_index.jsonl` in sync with path proofs and current acceptance bindings (EPIC020 error/presenter/internal-version families under `errors/`, `parity/`, `artifacts/presenter/`, `artifacts/ops/internal_version/`).
 - **Config/bundle agents:** run `tools/config/generate_config_artifacts.py` and `tools/config/generate_bundles.py`; confirm `audit/EPIC-018_config_acceptance_map.json` remains consistent with generated artifacts.
-- **QA/Verifier:** executes the sanity pipeline, env-pins gate, sampler/core harness tests, and EPIC019 QA harnesses (`scripts/qa/dev_sampler_healthcheck.py`, `scripts/qa/dev_sampler_live_qa.py`, `scripts/qa/d6_live_vendor_qa.py`); confirms tokens and evidence coverage in manifests/acceptance maps and updates Index/Mirror as needed.
-- **Doc agents:** refresh README/CHANGELOG/AGENTS/docs to reflect PF-Canon titles and EPIC outcomes; include rails/guardrails for determinism and evidence, sampler/core families, dev vs public surfaces, and rails posture for D3 (closed) vs D6 (open vendor rails only).
+- **QA/Verifier:** executes the sanity pipeline, env-pins gate, EPIC020 deterministic suites (error envelope, presenter, `/internal/version`), and targeted harnesses; confirms tokens and evidence coverage in manifests/acceptance maps and updates Index/Mirror as needed.
+- **Doc agents:** refresh README/CHANGELOG/AGENTS/docs to reflect PF-Canon titles and epic outcomes; include rails/guardrails for determinism and evidence, dev vs public surfaces, and closed-rails posture for EPIC020 (no new open-rails scopes).
 
-## Rails (EPIC019 closed posture)
-- Environment pins: `LC_ALL=C`, `LANG=C`, `TZ=UTC`, `SAFE_MODE=1`, `ALLOW_NETWORK=0` (enforced by `engine.runtime.determinism_env.ensure_determinism_env` and checked via `ci/checks/check_env_pins.sh`).
-- Use the canonical emitter and serializer (`engine/presenter/emitter.py`, `engine/serializer/canon.py`) for all public bytes; CLI, Reader, sampler harnesses, and Engine Core outputs must remain byte-identical (AB↔BA, two-run identity).
+## Rails (closed posture)
+- Environment pins: `LC_ALL=C`, `LANG=C`, `TZ=UTC`, `SAFE_MODE=1`, `ALLOW_NETWORK=0` (enforced by `engine.runtime.determinism_env.ensure_determinism_env` and checked via `ci/checks/check_env_pins.sh`). EPIC020 CI runs under these pins.
+- Use the canonical emitter and serializer (`engine/presenter/emitter.py`, `engine/serializer/canon.py`) for all public bytes; CLI and Reader share the presenter/emitter (including `showcompat` canonical JSON). AB↔BA and two-run identity proofs remain required.
 - CLI guard tools:
   - `python tools/cli/serializer_grep_guard.py` → `artifacts/cli/guards/serializer_grep_guard.log`
   - `python tools/cli/emitter_symbol_proof.py` → `artifacts/cli/guards/emitter_symbol_proof.txt`
-- Sampler/core evidence tools:
-  - `python tools/evidence/generate_sampler_evidence.py` (dev-only sampler CLI/HTTP harness runs, diversity + seed replay evidence)
-  - `python tools/evidence/generate_engine_core_evidence.py` (Engine Core purity/identity/ABBA evidence)
-- Evidence tools: orientation demo, sanity pipeline (includes sampler/core runs), and evidence index updater listed above. Rails are closed for all runs.
+- Evidence tools: orientation demo, sanity pipeline, and evidence index updater listed above. Rails are closed for all runs; EPIC020-specific artifacts cover error envelopes, presenter identity proofs, and `/internal/version` identity runs.
 
 ## Workflows
 - **Before merging governed changes (code, config, or docs touching evidence):**
   1) Pin environment (rails above) and run CLI guards.
-  2) Regenerate governed artifacts (config, bundles, sampler/core evidence, guard logs) with the provided tools.
+  2) Regenerate governed artifacts (config, bundles, sampler/core evidence, guard logs, EPIC020 evidence families) with the provided tools.
   3) Refresh indexes with `tools/evidence/update_evidence_index.py` and confirm `.path_proof.txt` siblings are present.
   4) Run `tools/evidence/orientation_demo.py` and `tools/evidence/run_sanity_pipeline.py`; review `sanity.log` and env-pin results.
-  5) Verify manifest/acceptance map references (EPIC-018 manifest/close report under `audit/`; EPIC019 acceptance map under `docs/`).
+  5) Verify manifest/acceptance map references (EPIC-018 manifest/close report under `audit/`; EPIC019/EPIC020 acceptance maps under `docs/`).
 - **No manual edits** to: evidence indexes, path proofs, manifest/close reports, acceptance maps, orientation artifacts, or config acceptance map.
 
 ## Entrypoints and references

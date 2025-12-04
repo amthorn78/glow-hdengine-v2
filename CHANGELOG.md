@@ -1,5 +1,17 @@
 # CHANGELOG
 
+2025-12-22 — EPIC-020: Separation Pass 1 — Error & Identity Surfaces
+
+### Added
+- Canonical `error_v1` envelope with typed error tokens, CLI stdout/stderr separation, LF discipline, and usage-exit 64 handling; error parity harnesses and schema checks wired into governed evidence under `errors/*` and `parity/*`.
+- Shared presenter/emitter across Reader HTTP and CLI with serializer guards; `showcompat` emits canonical JSON bytes with AB↔BA/two-run identity and preimage recompute proofs captured under `artifacts/presenter/*`.
+- `/internal/version` internal identity surface returns fixed-order fields (`engine_tag`, `build_commit`, `invocation_tag`, `invocation_sha256`, `emitter_sha256`, `release_id`) with GET/HEAD/conditional parity and identity artifacts under `artifacts/ops/internal_version/*` and `artifacts/math/*`.
+- EPIC020 closed-rails CI job (SAFE_MODE=1, ALLOW_NETWORK=0, LC_ALL=C, LANG=C, TZ=UTC) plus EPIC020 QA checklist (`docs/QA_CHECKLIST_EPIC020.md`) covering deterministic suites, env-pin evidence, and scoped evidence-only expectations.
+
+### Changed / Fixed
+- README/AGENTS/docs now describe EPIC020 separation posture, presenter/emitter allow-listing, canonical error handling, and the `/internal/version` ops-only surface.
+- Evidence and QA references updated to point to EPIC020 artifact families (`ERROR_*`, `PRESENTER_*`, `INTVER_*`) and acceptance map bindings.
+
 2025-12-18 — EPIC-019: Remedial harnesses and evidence wiring (C1–C3)
 
 ### Added
