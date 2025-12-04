@@ -1,0 +1,133 @@
+[
+  {
+    "aliases": [
+      "invalid_json"
+    ],
+    "code": "ERR_COMPAT_INVALID_JSON",
+    "message": "malformed or mixed id/payload: supply either a_id/b_id or a/b objects"
+  },
+  {
+    "aliases": [
+      "invalid_prefs"
+    ],
+    "code": "ERR_INVALID_VIEWER_PREFS",
+    "message": "viewer_prefs.weights must include all 10 categories as integers 0..100"
+  },
+  {
+    "aliases": [
+      "missing_narrative_key"
+    ],
+    "code": "ERR_MISSING_NARRATIVE_KEY",
+    "message": "narrative key not found for category/band/perspective"
+  },
+  {
+    "aliases": [
+      "not_found"
+    ],
+    "code": "ERR_NOT_FOUND",
+    "message": "not found"
+  },
+  {
+    "aliases": [
+      "forbidden"
+    ],
+    "code": "ERR_READER_FORBIDDEN",
+    "message": "reader endpoint disabled"
+  },
+  {
+    "aliases": [
+      "invalid_chart"
+    ],
+    "code": "ERR_READER_INVALID_CHART",
+    "message": "invalid reader payload"
+  },
+  {
+    "aliases": [
+      "invalid_path"
+    ],
+    "code": "ERR_READER_INVALID_PATH",
+    "message": "invalid chart path"
+  },
+  {
+    "aliases": [
+      "invalid_version"
+    ],
+    "code": "ERR_READER_INVALID_VERSION",
+    "message": "unsupported reader version"
+  },
+  {
+    "aliases": [
+      "missing_param"
+    ],
+    "code": "ERR_READER_MISSING_PARAM",
+    "message": "missing required reader parameters"
+  },
+  {
+    "aliases": [
+      "missing_tz_A"
+    ],
+    "code": "ERR_READER_MISSING_TZ_A",
+    "message": "missing tz for party A"
+  },
+  {
+    "aliases": [
+      "missing_tz_B"
+    ],
+    "code": "ERR_READER_MISSING_TZ_B",
+    "message": "missing tz for party B"
+  },
+  {
+    "aliases": [
+      "forbidden"
+    ],
+    "code": "ERR_WRITER_FORBIDDEN",
+    "message": "insufficient scope"
+  },
+  {
+    "aliases": [
+      "invalid_content_type"
+    ],
+    "code": "ERR_WRITER_INVALID_CONTENT_TYPE",
+    "message": "expected application/json; charset=utf-8"
+  },
+  {
+    "aliases": [
+      "invalid_input"
+    ],
+    "code": "ERR_WRITER_INVALID_INPUT",
+    "message": "schema validation failed"
+  },
+  {
+    "aliases": [],
+    "code": "ERR_WRITER_INVALID_JSON",
+    "message": "malformed JSON request"
+  },
+  {
+    "aliases": [
+      "rails_closed"
+    ],
+    "code": "ERR_WRITER_RAILS_CLOSED",
+    "message": "rails are closed"
+  },
+  {
+    "aliases": [
+      "request_too_large"
+    ],
+    "code": "ERR_WRITER_REQUEST_TOO_LARGE",
+    "message": "request body exceeds 32 KiB"
+  },
+  {
+    "aliases": [
+      "unauthorized"
+    ],
+    "code": "ERR_WRITER_UNAUTHORIZED",
+    "message": "authorization required"
+  },
+  {
+    "aliases": [
+      "unknown_key"
+    ],
+    "code": "ERR_WRITER_UNKNOWN_KEY",
+    "message": "unknown request key"
+  }
+]

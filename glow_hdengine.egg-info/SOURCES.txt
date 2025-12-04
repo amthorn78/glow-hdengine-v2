@@ -32,6 +32,7 @@ engine/cli/main.py
 engine/compat/__init__.py
 engine/compat/categories.py
 engine/compat/compute.py
+engine/compat/error_tokens.py
 engine/compat/errors.py
 engine/compat/ordering.py
 engine/compat/thresholds.py

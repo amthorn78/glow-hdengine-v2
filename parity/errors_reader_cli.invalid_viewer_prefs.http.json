@@ -1,0 +1,13 @@
+{
+  "body": {
+    "code": "ERR_INVALID_VIEWER_PREFS",
+    "error": "viewer_prefs.weights must include all 10 categories as integers 0..100",
+    "ok": false,
+    "schema": "v1"
+  },
+  "headers": {
+    "cache-control": "no-store",
+    "content-type": "application/json; charset=utf-8"
+  },
+  "status": 400
+}

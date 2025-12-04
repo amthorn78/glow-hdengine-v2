@@ -1,0 +1,4 @@
+scenario: invalid_viewer_prefs
+status: 400
+code: ERR_INVALID_VIEWER_PREFS
+schema: ok

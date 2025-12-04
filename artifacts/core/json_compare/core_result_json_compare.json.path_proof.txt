@@ -1,5 +1,5 @@
 path: artifacts/core/json_compare/core_result_json_compare.json
 size_bytes: 928
 sha256: a6ea30588f7eb8e07aa5d5b118c1da819604d8fe788cd536b8ea731206b7d491
-mtime_utc: 2025-12-02T14:23:58Z
+mtime_utc: 2025-12-04T18:17:01Z
 produced_at_utc: 2025-11-30T03:58:47Z
