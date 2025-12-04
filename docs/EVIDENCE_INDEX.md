@@ -8,13 +8,18 @@
 * `parity/` error parity harness outputs and schema checks
 
 ## Presenter identity
-* `artifacts/presenter/abba_identity.json` (AB↔BA)
-* `artifacts/presenter/two_run_identity.json`
+* `artifacts/presenter/showcompat_ab.bytes` (AB)
+* `artifacts/presenter/showcompat_ba.bytes` (BA)
+* `artifacts/presenter/reader_cli_parity.bytes`
+* `artifacts/presenter/showcompat_identity_summary.json`
 * `artifacts/presenter/preimage_recompute.log`
 
 ## Internal identity (`/internal/version`)
-* `artifacts/ops/internal_version/identity_run.json`
-* `artifacts/ops/internal_version/head_parity.json`
+* `artifacts/ops/internal_version/body_get.json`
+* `artifacts/ops/internal_version/body_get.sha256`
+* `artifacts/ops/internal_version/headers_get.txt`
+* `artifacts/ops/internal_version/headers_head.txt`
+* `artifacts/ops/internal_version/two_run_identity.log`
 * `artifacts/math/release_id.txt`
 
 ## Rails and env pins

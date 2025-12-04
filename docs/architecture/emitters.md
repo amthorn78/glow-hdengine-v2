@@ -15,7 +15,7 @@
 ## Surfaces and harnesses
 - Public surfaces: Reader v1 endpoints and `hdctl showcompat` share the presenter/emitter and remain the only public APIs.
 - Dev/admin sampler surfaces: `hdctl dev:sampler` (APP_ENV=dev) and `/internal/dev/sampler` (APP_ENV=dev via `scripts/dev_start_reader.sh`) mirror public bytes for QA only.
-- QA harnesses: closed-rails healthcheck and Live QA (`scripts/qa/dev_sampler_healthcheck.py`, `scripts/qa/dev_sampler_live_qa.py`) plus open-rails vendor Live QA (`scripts/qa/d6_live_vendor_qa.py`, controlled vendor identity). Outputs are governed evidence under `audit/qa/hde-epic019/` and EPIC020 error/presenter/internal-version artifacts under `errors/`, `parity/`, and `artifacts/presenter/`.
+- QA harnesses: closed-rails healthcheck and Live QA (`scripts/qa/dev_sampler_healthcheck.py`, `scripts/qa/dev_sampler_live_qa.py`) plus open-rails vendor Live QA (`scripts/qa/d6_live_vendor_qa.py`, controlled vendor identity). Outputs are governed evidence under `audit/qa/hde-epic019/`; EPIC020 evidence families live under `errors/` and `parity/` (error envelopes), `artifacts/presenter/` (presenter identity proofs), and `artifacts/ops/internal_version/` + `artifacts/math/` (internal identity).
 
 ## Evidence coupling
 - Governed artifacts using the presenter/emitter must carry `.path_proof.txt` files, human index entries, and machine mirror entries. Update with `tools/evidence/update_evidence_index.py` and validate with `tools/evidence/orientation_demo.py`.
