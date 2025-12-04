@@ -1,6 +1,6 @@
-# CLI commands — Compat v1 and dev/admin harnesses (EPIC019)
+# CLI commands — Compat v1 and dev/admin harnesses (EPIC020)
 
-The CLI shares the canonical emitter and serializer with the Reader harness. Run public and dev sampler commands under closed rails (`LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0`), enforced by `engine.runtime.determinism_env.ensure_determinism_env`. Open-rails allowances are limited to the D6 vendor Live QA harness below.
+The CLI shares the canonical presenter/emitter and serializer with the Reader harness. Run public commands under closed rails (`LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0`), enforced by `engine.runtime.determinism_env.ensure_determinism_env`.
 
 ## Usage
 - `hdctl showcompat --pair-file <pair.json>`
@@ -9,14 +9,14 @@ The CLI shares the canonical emitter and serializer with the Reader harness. Run
 - Dev-only sampler CLI (APP_ENV=dev, QA only): `hdctl dev:sampler --viewer <viewer_id> --candidates-file <candidates.json> [--seed <seed>]`
 - Flags for QA sidecars: `--dump-reader <out.json> --dump-admin-dir <dir>`
 
-Exit codes: 0 success, 64 usage error, 2 typed failure. Errors print to stderr only. CLI output is numeric-free, canonical JSON (UTF-8, sorted keys, compact separators, one trailing LF) and matches Reader bytes (AB↔BA identity, two-run identity).
+Exit codes: 0 success, 64 usage error, 2 typed failure. Success bytes are LF-terminated canonical JSON printed to stdout. Error envelopes use `error_v1` with typed tokens and are printed to stderr only (LF-terminated JSON). CLI output is numeric-free and matches Reader bytes (AB↔BA identity, two-run identity, preimage recompute preserved).
 
-## Guards (D3)
+## Guards
 - Serializer grep guard: `python tools/cli/serializer_grep_guard.py` → `artifacts/cli/guards/serializer_grep_guard.log`
 - Emitter symbol proof: `python tools/cli/emitter_symbol_proof.py` → `artifacts/cli/guards/emitter_symbol_proof.txt`
-Both guards fail fast if determinism rails are not pinned.
+Both guards fail fast if determinism rails are not pinned and protect the allow-listed presenter/emitter.
 
-## Evidence discipline (D4)
+## Evidence discipline
 - Guard outputs, QA dumps, and other governed artifacts must have `.path_proof.txt` siblings plus entries in `docs/evidence/INDEX.json` and `artifacts/evidence_index.jsonl`. Use `python tools/evidence/update_evidence_index.py` to refresh.
 - Orientation and sanity checks: `python tools/evidence/orientation_demo.py` and `python tools/evidence/run_sanity_pipeline.py` (pipeline invokes sampler + Engine Core evidence generators).
 - Sampler evidence harness: `python tools/evidence/generate_sampler_evidence.py` runs dev sampler CLI + HTTP harnesses and captures seed replay, diversity, ABBA, and two-run identity logs.

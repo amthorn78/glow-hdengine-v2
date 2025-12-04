@@ -1,6 +1,26 @@
 > **Note:** The canonical human Evidence Index lives at `docs/evidence/INDEX.json`.
 > Add new entries there first, then mirror key pointers here for quick navigation.
 
+# Appendix-D — Evidence Index (EPIC-020)
+
+## Error envelopes and parity
+* `errors/` canonical error envelopes (typed tokens, `error_v1` schema)
+* `parity/` error parity harness outputs and schema checks
+
+## Presenter identity
+* `artifacts/presenter/abba_identity.json` (AB↔BA)
+* `artifacts/presenter/two_run_identity.json`
+* `artifacts/presenter/preimage_recompute.log`
+
+## Internal identity (`/internal/version`)
+* `artifacts/ops/internal_version/identity_run.json`
+* `artifacts/ops/internal_version/head_parity.json`
+* `artifacts/math/release_id.txt`
+
+## Rails and env pins
+* `audit/gates/determinism/env_pins.log`
+* EPIC020 QA checklist: `docs/QA_CHECKLIST_EPIC020.md`
+
 # Appendix-D — Evidence Index (EPIC-017)
 
 ## Close-out artifacts

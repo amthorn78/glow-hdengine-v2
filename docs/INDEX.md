@@ -1,6 +1,7 @@
-# HD Engine Repo Docs — Index (EPIC019 aligned)
+# HD Engine Repo Docs — Index (EPIC020 aligned)
 
 ## Acceptance & evidence
+- EPIC020 separation: acceptance map bindings cover `ERROR_*`, `PRESENTER_*`, and `INTVER_*` families tied to canonical error envelopes, shared presenter/emitter, and `/internal/version` identity artifacts. QA checklist: `docs/QA_CHECKLIST_EPIC020.md`.
 - EPIC019 close-out: sampler/core acceptance map (`docs/acceptance_map_epic019.json` + path proof) and consolidated acceptance map roster (`docs/acceptance_maps.json`) capture tokens for HDE-DISS003/004; entries are governed and indexed.
 - EPIC018 references remain for Calcination: manifest (`audit/EPIC-018_MANIFEST.json`), close report (`audit/EPIC-018_close_report.md`), and config acceptance map (`audit/EPIC-018_config_acceptance_map.json`). All are governed with path proofs and mirrored in PF-Canon (see PF20 — Phased Epics, PF19 — QA Guide).
 - Evidence Index (human): `docs/evidence/INDEX.json`
@@ -10,8 +11,9 @@
 - Engine Core evidence generator: `tools/evidence/generate_engine_core_evidence.py` (purity/ABBA/two-run/JSON compare logs).
 - Dev sampler QA harnesses: `scripts/qa/dev_sampler_healthcheck.py` (closed-rails gating check) and `scripts/qa/dev_sampler_live_qa.py` (closed-rails Live QA across APP_ENV permutations).
 - D6 vendor QA harness: `scripts/qa/d6_live_vendor_qa.py` (open-rails vendor Live QA with governed logs under `audit/qa/hde-epic019/d6-vendor-live-qa/`).
-- Env pins gate: `ci/checks/check_env_pins.sh` validates `LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0` for docs/tests.
+- Env pins gate: `ci/checks/check_env_pins.sh` validates `LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0` for docs/tests; EPIC020 CI runs with these pins.
 - CLI guard rails: `tools/cli/serializer_grep_guard.py`, `tools/cli/emitter_symbol_proof.py` (outputs under `artifacts/cli/guards/`).
+- Error/presenter/identity evidence families: `errors/`, `parity/`, `artifacts/presenter/`, `artifacts/ops/internal_version/`, and `artifacts/math/` are mirrored in Index/Mirror.
 - Config governance: `tools/config/generate_config_artifacts.py`, `tools/config/generate_bundles.py`, and schemas in `docs/schemas/`.
 - Past epics remain referenced through PF-Canon titles (PF12 — Schemas & Artifacts, PF14 — Mechanics, PF05 — CLI/API/Vendor Ref).
 
