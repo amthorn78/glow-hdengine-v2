@@ -3,10 +3,13 @@
 ## 0.1 Header
 
  **Title:** PF04-Canon-HDE-Governance  
- **Version:** v1.4.9  
+ **Version:** v1.5.8  
  **Status:** Canon  
- **Effective date:** 2025-12-02  
- **Last Update Gate:** BN 7.9.7 Drain A19
+**Effective date:** 2025-12-04
+
+**Last Update Gate:** BN 8.0.7 Drain A9/10
+
+**Invocation tag:** `INV-f2ac55d77ce9aacc`
 
 ## 0.2 Scope & boundaries \[Required-Now\]
 

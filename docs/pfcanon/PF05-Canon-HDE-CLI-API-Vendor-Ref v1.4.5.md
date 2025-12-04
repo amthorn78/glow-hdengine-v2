@@ -4,13 +4,13 @@
 
 **Title:** PF05-Canon-HDE-CLI-API-Vendor-Ref
 
-**Version:** v1.4.1
+**Version:** v1.4.5
 
 **Status:** Canon
 
-**Effective date:** 2025-12-02
+**Effective date:** 2025-12-04
 
-**Last Update Gate:** BN 7.9.7 Drain A19
+**Last Update Gate:** BN 8.0.7 Drain A8
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -2598,11 +2598,19 @@ Purpose (normative).
 
 * **Primary endpoint:** `POST /bodygraphs` (JSON).
 
-* **Alternate endpoint:** `POST /bodygraphs/simple` (CLI may expose `--vendor-mode full|simple`, default `full`).
+  * This is the **only** vendor BodyGraph endpoint HDE uses. No alternate vendor endpoint is defined here; see §7.1.10 for the explicit statement that `POST /bodygraphs/simple` is unsupported for this engine.
 
-* **Base-URL resolution (no fallback).** Resolve **only** from `HDAPI_BASE_URL`. If missing or empty, fail with typed error (see §7.1). Do **not** default to a literal.
+* **Base-URL resolution (no fallback).**
 
-* **Method rules.** `POST` is normative for JSON bodies. `GET` must not carry a request body (if ever used for a dev-harness health probe only).
+  * Resolve **only** from `HDAPI_BASE_URL`.
+
+  * If `HDAPI_BASE_URL` is missing or empty, fail closed with a typed error (see §7.1); do **not** default to any literal URL.
+
+* **Method rules.**
+
+  * `POST` is normative for JSON BodyGraph requests.
+
+  * `GET` **MUST NOT** carry a request body; if ever used, it is only for dev-harness health probes and not for BodyGraph computation.
 
 ### **7.2.2 Canonical headers (dash-case, exact on wire)**
 

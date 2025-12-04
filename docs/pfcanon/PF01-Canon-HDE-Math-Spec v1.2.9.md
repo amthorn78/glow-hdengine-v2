@@ -4,13 +4,13 @@
 
 **Title:** PF01-Canon-HDE-Math-Spec
 
-**Version:** v1.2.8
+**Version:** v1.2.9
 
 **Status:** Canon
 
-**Effective date:** 2025-11-23
+**Effective date:** 2025-12-03
 
-**Last Update Gate:** BN 7.7.8 Drain
+**Last Update Gate:** 2025-12-03 Audit
 
 ## **0.2 Change policy**
 

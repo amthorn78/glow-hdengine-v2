@@ -3,10 +3,11 @@
 ## 0.1 **Header**
 
  **Title:** PF14-Canon-HDE-Mechanics Guide  
- **Version:** v2.1.5  
+ **Version:** v2.2.2  
  **Status:** Canon  
- **Effective date:** 2025-12-02  
- **Last Update Gate:** BN 7.9.7 Drain A19  
+**Effective date:** 2025-12-04
+
+**Last Update Gate:** BN 8.0.7 Drain A14/15  
  **Invocation tag:** INV-f2ac55d77ce9aacc
 
 ---
@@ -1027,6 +1028,22 @@ Mechanics requires that:
 * When APP\_ENV is allowed, the handler may proceed to parse the request body and invoke the sampler core as described below.
 
 Detailed auth and env policy (including any additional guards applied to internal/dev routes) remain single-homed in HDE-Governance and Glow Infrastructure; this section records only that APP\_ENV gating is required and that prod/misconfigured environments must be refused.
+
+**Dev Reader start helpers (APP\_ENV propagation).**
+
+Infra-owned dev Reader start helpers (for example, scripts that launch `adapter.http_reader` in Codespaces or local dev) **MUST**:
+
+* propagate `APP_ENV` from the calling environment **as-is**, including when it is explicitly set to `"dev"`, `"test"`, `"local"`, `"prod"`, an empty string, or left unset; and
+
+* **MUST NOT** supply a default `APP_ENV` value (for example, forcing `APP_ENV=dev` when it is empty or unset).
+
+The start helper **may** set SAFE rails (`SAFE_MODE`, `ALLOW_NETWORK`) and locale/time pins (`LC_ALL`, `LANG`, `TZ`) and **may** set `PORT`, but it **must not** override the caller’s choice of `APP_ENV`. APP\_ENV gating semantics for `/internal/dev/sampler` remain owned by this section and the adapter:
+
+* when `APP_ENV ∈ {dev, test, local}`, the handler may proceed to validate the request body and invoke the sampler core;
+
+* when `APP_ENV` is any other value (including `prod`, missing, or empty), the handler **must** return a 403 writer-style refusal and **must not** call the sampler core, as specified above.
+
+Live QA harnesses (for example, dev sampler Live QA scripts) rely on this behavior to exercise and verify the full set of APP\_ENV modes (dev/test/local vs prod/empty/unset) required by Governance and QA rails (names and token semantics remain single-homed in Glow Infrastructure, Glow QA Guide, and HDE-Governance). This clarification ensures infra start helpers do not silently mask gating bugs by forcing `APP_ENV` to an allowed value.
 
 **Request body (dev/admin only).**
 

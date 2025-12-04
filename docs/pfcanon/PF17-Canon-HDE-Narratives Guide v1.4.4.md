@@ -3,11 +3,11 @@
 ## 0.1 Document Control
 
 **Title:** PF17-Canon-HDE Narratives Guide  
-**Version:** v1.4.2  
+**Version:** v1.4.4  
 **Status:** Canon  
-**Effective** date: 2025-11-25
+**Effective** **date**: 2025-12-03
 
-**Last Update Gate:** BN 7.7.8 drain A20  
+**Last Update Gate:** Audit 2025-12-03  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
 ---

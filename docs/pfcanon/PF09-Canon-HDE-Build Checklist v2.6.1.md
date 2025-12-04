@@ -4,13 +4,13 @@
 
 **Title:** PF09-Canon-HDE-Build Checklist
 
-**Version:** v2.5.3
+**Version:** v2.6.1
 
 **Status:** Canon
 
-**Effective date:** 2025-12-01
+**Effective date:** 2025-12-04
 
-**Last Update Gate:** BN 7.9.7 Drain A19/PF14
+**Last Update Gate:** BN 8.0.7 Drain A14/15
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -2904,15 +2904,44 @@ This subtask is scoped to the dev/admin CLI harness; it does not introduce a pub
 **Subtask description:**  
  Wire a dev-only sampling endpoint that returns candidate IDs only and echoes the seed in `meta` when present; CLI tooling remains the primary dev harness.
 
-**Subtask status:** **Done**
+The dev sampler HTTP harness is implemented as `POST /internal/dev/sampler` on the Reader adapter and MUST:
+
+* Treat the route as **dev/admin-only** (internal, non-public, not part of the Endpoint Catalog).
+
+* Accept a JSON body with:
+
+  * `viewer_id`: non-empty string, and
+
+  * `candidate_ids`: non-empty list of non-empty strings, and
+
+  * optional `seed`: string.
+
+* Invalid shapes MUST yield typed 4xx invalid-input envelopes, not sampler output.
+
+* Build a `ViewerProfile` and `CandidateFeatures` from IDs using fixed, non-conflicting placeholder values (weight/compat/band) so that sampler invariants are preserved while the HTTP payload stays IDs-only.
+
+* Call the pure-compute sampler core (`engine.sampler.core.sample_and_rank`) to obtain ranked candidates; the HTTP harness MUST NOT reimplement eligibility or ranking logic.
+
+* Construct a response payload:
+
+  * `viewer_id`: the request viewer ID,
+
+  * `meta.seed`: provided seed string or null when omitted, and
+
+  * `candidate_ids`: ordered list of ranked candidate IDs.
+
+* Emit the response via the canonical JSON emitter (UTF-8, no BOM; ASCII-sorted keys; compact; exactly one trailing LF; arrays-as-sets deduped and sorted), under determinism env pins for tests and closed-rails QA (`LC_ALL=C`, `LANG=C`, `TZ=UTC`, `SAFE_MODE=1`, `ALLOW_NETWORK=0`).
+
+APP\_ENV gating semantics for this endpoint remain governed by Mechanics and Governance (dev/test/local allowed; `prod`/missing/empty refused) and are exercised more fully in the Phase IV dev/internal HTTP harness and SAFE-rails subtasks; this subtask focuses on the existence, determinism, and canonical JSON behavior of the endpoint harness itself.
+
+**Subtask status:** **Partial**
 
 **Epic or card:** **EPIC-019 (D3 — Dev-only sampler HTTP endpoint harness)**
 
 **Tokens:**
 
-`JSON_CANONICAL_CHECK_OK`
-
-`TWO_RUN_IDENTITY_OK`
+`JSON_CANONICAL_CHECK_OK`  
+ `TWO_RUN_IDENTITY_OK`
 
 **Evidence / artifacts:**
 
@@ -2920,63 +2949,52 @@ This subtask is scoped to the dev/admin CLI harness; it does not introduce a pub
 
 `adapter/http_reader.py` — registers and implements `POST /internal/dev/sampler` as a dev/admin-only sampler harness that:
 
-Uses a `_dev_admin_gate` helper that reads `APP_ENV` and allows only `dev`, `test`, or `local`; any other value (including missing or empty) yields a writer-style 403 forbidden envelope.
+* Validates `viewer_id` and `candidate_ids` shapes as described above and returns typed invalid-input envelopes on error.
 
-Reads request JSON via writer helpers, accepting `viewer_id`, `candidate_ids`, and optional `seed`.
+* Builds `ViewerProfile` and `CandidateFeatures` from IDs with fixed placeholder values and calls `engine.sampler.core.sample_and_rank` to obtain ranked candidates.
 
-Validates `viewer_id` as a non-empty string and `candidate_ids` as a non-empty list of non-empty strings; invalid shapes yield 422 invalid\_input envelopes.
+* Returns canonical JSON with `viewer_id`, `meta.seed`, and `candidate_ids` via the shared emitter, with `Cache-Control: no-store`, no `ETag`, and `Content-Type: application/json; charset=utf-8`.
 
-Builds a `ViewerProfile` from `viewer_id` and a list of `CandidateFeatures` from `candidate_ids` using fixed, non-conflicting placeholder values (weight/compat/band) that preserve sampler invariants while keeping the HTTP payload IDs-only.
+**Determinism and seed behavior tests (titles-only):**
 
-Calls `engine.sampler.core.sample_and_rank(viewer_profile, candidates)` to obtain ranked candidates, without modifying eligibility or ordering logic.
+`tests/adapter/test_dev_sampler_http.py::test_dev_sampler_determinism` — under `APP_ENV=dev` and closed rails, posts the same valid payload twice and asserts:
 
-Constructs a response payload:
+* Both responses have status 200\.
 
-`viewer_id`: viewer identifier.
+* Response bodies are byte-identical (two-run identity).
 
-`meta.seed`: the provided seed as a string, or null when omitted.
-
-`candidate_ids`: ordered list of ranked candidate IDs.
-
-Emits the response via `emit_compact_json(response_payload, sort_keys=True)` into a Response with `Cache-Control: no-store`, no `ETag`, and `Content-Type: application/json; charset=utf-8`, producing LF-terminated canonical JSON.
-
-**Adapter tests (titles-only):**
-
-`tests/adapter/test_dev_sampler_http.py::test_dev_sampler_determinism` — under `APP_ENV=dev` and closed rails, posts the same valid payload to `POST /internal/dev/sampler` twice and asserts:
-
-Both responses have status 200\.
-
-Response bodies are byte-identical (two-run identity).
-
-Parsed JSON payloads have the same `viewer_id`, `meta.seed`, and `candidate_ids` arrays.
+* Parsed JSON payloads share the same `viewer_id`, `meta.seed`, and `candidate_ids` array.
 
 `tests/adapter/test_dev_sampler_http.py::test_dev_sampler_seed_only_changes_seed` — posts the same viewer/candidate set with different seeds (e.g. `"111"` and `"222"`) and asserts:
 
-Both responses have status 200\.
+* Both responses have status 200\.
 
-`candidate_ids` arrays are identical.
+* `candidate_ids` arrays are identical.
 
-`meta.seed` reflects the respective seed values, confirming **seed-only** differences.
+* `meta.seed` reflects the respective seed values, confirming seed-only differences.
 
-`tests/adapter/test_dev_sampler_http.py::test_dev_sampler_rejected_in_prod` — sets `APP_ENV="prod"` and asserts that `POST /internal/dev/sampler` returns 403 forbidden with a writer-style forbidden envelope (no body data leakage).
+**Closed-rails QA evidence for D3 (titles/paths only):**
 
-`tests/adapter/test_dev_sampler_http.py::test_dev_sampler_rejected_when_app_env_missing` and `test_dev_sampler_rejected_when_app_env_empty` — verify that missing or empty `APP_ENV` also yield 403 forbidden, fixing the prior bug where missing/empty `APP_ENV` was implicitly treated as allowed.
+`audit/qa/hde-epic019/dev_sampler_http/D3_env_rails.log` — rails snapshot for Step 2, showing `SAFE_MODE=1`, `ALLOW_NETWORK=0`, `APP_ENV=dev`, `LC_ALL=C`, `TZ=UTC`, and non-empty `DEV_SAMPLER_URL` (Codespaces dev sampler endpoint).
 
-`tests/adapter/test_dev_sampler_http.py::test_dev_sampler_invalid_input_envelopes` (name indicative) — exercises invalid payload shapes (missing `viewer_id`, empty `candidate_ids`, wrong types) and asserts 422 invalid\_input envelopes with canonical JSON error bodies and no change to sampler behavior.
+`audit/qa/hde-epic019/dev_sampler_http/D3_http_run1.headers`  
+ `audit/qa/hde-epic019/dev_sampler_http/D3_http_run1.body`  
+ `audit/qa/hde-epic019/dev_sampler_http/D3_http_run2.headers`  
+ `audit/qa/hde-epic019/dev_sampler_http/D3_http_run2.body` — two-run identity slice: both runs return HTTP/1.1 200 with canonical JSON bodies that are byte-identical under closed rails for a fixed payload.
+
+`audit/qa/hde-epic019/dev_sampler_http/D3_http_seed_111.body`  
+ `audit/qa/hde-epic019/dev_sampler_http/D3_http_seed_222.body` — seed behavior slice: same `viewer_id` and `candidate_ids` ordering; only `meta.seed` differs between `"111"` and `"222"`.
 
 **Notes:**
 
-EPIC019 PR04 completes the dev-only sampler endpoint harness for this subtask:
+* The dev sampler HTTP harness exists, is wired to the pure-compute sampler core, and meets the determinism and seed behavior requirements for D3 under closed rails, as demonstrated by the Step 2 and Step 3 runs in the EPIC019 Live QA evidence set.
 
-The `POST /internal/dev/sampler` endpoint wraps the pure-compute sampler core and provides an HTTP interface that mirrors the dev sampler CLI semantics: IDs-only payload, `meta.seed` echo, deterministic ordering, and seed-independent ranking.
+* **SoT: canon — APP\_ENV gating for `/internal/dev/sampler` remains dev/test/local-only; `APP_ENV="prod"`, missing, or empty MUST NOT yield sampler JSON.** Current Codespaces evidence (`forbidden_prod.jsonl` and related logs from the D3 harness) shows at least one scenario where `APP_ENV="prod"` still returns a 200 sampler payload body, which is inconsistent with that gating requirement. This defect is tracked at the epic/build level and via global rails and harness subtasks; until it is fixed and re-verified, this subtask is marked **Partial** even though `JSON_CANONICAL_CHECK_OK` and `TWO_RUN_IDENTITY_OK` are satisfied for the dev-mode harness.
 
-Strict `APP_ENV` gating (`dev`, `test`, or `local` only) ensures the endpoint can be safely used for dev/admin QA without being accidentally exposed in prod; missing/empty `APP_ENV` and `APP_ENV="prod"` now correctly yield 403 forbidden, aligning HTTP behavior with CLI `_ensure_dev_admin_env`.
+* The APP\_ENV gating tokens themselves (such as `ENV_RAILS_POLICY_OK`) remain single-homed in the SAFE-rails and dev HTTP harness subtasks in later phases; PF09 records here that the endpoint harness’s core behavior and evidence are in place and that APP\_ENV gating behavior is still outstanding in at least one environment scenario documented by EPIC019 Live QA.
 
-Response JSON is canonical (UTF-8, sorted keys, compact, one LF) and limited to IDs and seed metadata; no compat scores, bands, or narrative text are exposed. This satisfies the “IDs-only plus seed echo” requirement while keeping the CLI as the primary dev harness for richer debug output.
 
-This subtask is scoped to the dev/admin HTTP harness only. It does not introduce a public sampler API, does not alter Reader v1 or other public surfaces, and does not yet produce governed sampler evidence or Index/Mirror entries; those responsibilities remain with HDE-DISS003.6 and later Distillation tasks that will define sampler evidence families (snapshots, parity logs, seed replay logs) and index them under the Evidence Index discipline.
-
-### **Subtask HDE-DISS003.6 — Evidence & indexing (sampler/ranker)**
+  ### **Subtask HDE-DISS003.6 — Evidence & indexing (sampler/ranker)**
 
 **Subtask name/label:** Sampler/ranker evidence & indexing
 
@@ -3085,23 +3103,14 @@ For each sampler artifact and schema, the mirror includes a record with:
 
 **Notes:**
 
-EPIC019 PR05 implements the sampler evidence generator and five governed evidence families under `artifacts/sampler/**` with schemas under `docs/schemas/sampler/**`, all produced under closed rails (`SAFE_MODE=1`, `ALLOW_NETWORK=0`, `LC_ALL=C`, `LANG=C`, `TZ=UTC`) and emitted as canonical JSON (UTF-8; sorted keys; compact; one LF), with no PII beyond IDs, bands, compat labels, and QA metadata.
+**Notes:**
 
-The same PR wires these families into the Evidence Index and Machine Mirror:
+* The dev sampler HTTP harness exists, is wired to the pure-compute sampler core, and meets the determinism and seed behavior requirements for D3 under closed rails, as demonstrated by the Step 2 and Step 3 runs in the EPIC019 Live QA evidence set (two-run identity and seed-only differences for a fixed viewer/candidate set).
 
-New Human Index entries (`artifact_key` → `discovered_physical_path`) for each sampler family, with `docs/evidence/INDEX.sha256` regenerated via the evidence tooling.
+* **SoT: canon — APP\_ENV gating for `/internal/dev/sampler` remains dev/test/local-only; `APP_ENV="prod"`, missing, or empty MUST NOT yield sampler JSON.** Current Codespaces evidence (`forbidden_prod.jsonl` and related logs from the D3 harness) shows at least one scenario where `APP_ENV="prod"` still returns a 200 sampler payload body, which is inconsistent with that gating requirement. This gating defect is tracked as **ISSUE-APPENV-D3-GATING — Dev sampler HTTP harness does not enforce APP\_ENV=prod/empty/unset gating** in the PF09 outstanding issues registry. Until that issue is fixed (adapter/Reader gating updated, tests extended for prod/empty/unset, and Live QA re-run) and re-verified, this subtask remains **Partial** even though `JSON_CANONICAL_CHECK_OK` and `TWO_RUN_IDENTITY_OK` are satisfied for the dev-mode harness.
 
-Matching Machine Mirror records in `artifacts/evidence_index.jsonl` for each sampler artifact and schema, using the PF12 mirror field set and order, `proof_anchor` pointers to co-located path-proofs, and sort-before-write by `(artifact_key, discovered_physical_path)`.
+* The APP\_ENV gating tokens themselves (such as `ENV_RAILS_POLICY_OK`) remain single-homed in the SAFE-rails and dev HTTP harness subtasks in later phases; PF09 records here that the endpoint harness’s core behavior and evidence are in place and that APP\_ENV gating behavior is still outstanding in at least one environment scenario documented by EPIC019 Live QA and ISSUE-APPENV-D3-GATING.
 
-A follow-up bugfix PR corrects **produced\_at\_utc provenance** for sampler Mirror records and path-proofs:
-
-Sampler mirror records initially used an older `produced_at_utc` value (e.g., `2025-11-22`) copied from a baseline; they now reflect the actual evidence refresh time (e.g., `2025-11-30`).
-
-Sampler artifact path-proofs (`*.path_proof.txt`) are regenerated so that `produced_at_utc` in each path-proof matches the corresponding mirror record and remains consistent with artifact `generated_at_utc` and `mtime_utc` semantics from PF12.
-
-The Machine Mirror self-record and its path-proof are refreshed to keep `produced_at_utc` and SHA/size metadata consistent for the mirror body itself.
-
-With the sampler evidence generator, five governed sampler evidence families, schemas, Human Index entries, Machine Mirror records, and path-proofs in place — and the provenance bug fixed — this subtask now satisfies the sampler D4 token set (`EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_HASH_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`, `MACHINE_MIRROR_UPDATED_OK`, `JSON_CANONICAL_CHECK_OK`) for HDE-EPIC019. Future sampler evidence families, if any, will be added via new epics and corresponding Index/Mirror updates; this subtask is considered **Done** for the sampler/ranker evidence slice.
 
 ## **Task HDE-DISS004 — Deterministic Engine Core**
 
@@ -4555,7 +4564,7 @@ Passes canonicalization checks (canonical JSON, LF-termination, sorted keys, arr
  Ensure that any **internal/dev HTTP harness** intended for QA or evidence flows (including, but not limited to, `POST /internal/dev/sampler`) has infra-owned start commands and URLs, so QA and PO are never guessing hosts, ports, or paths:
 
 * **Infra-owned dev start command / service definition.**  
-   Infra/ops MUST provide and maintain a canonical dev start command or service definition that runs the Reader process in dev/Codespaces (and other dev environments) with `APP_ENV=dev` and the determinism rails required by Mechanics and Governance (titles-only). PF09 does not pin the exact command; it requires that such a command or service definition exist, be documented, and be used when exercising internal/dev HTTP harnesses.
+   Infra/ops MUST provide and maintain a canonical dev start command or service definition that runs the Reader process in dev/Codespaces (and other dev environments) with `APP_ENV` set by the caller and the determinism rails required by Mechanics and Governance (titles-only). PF09 does not pin the exact command; it requires that such a command or service definition exist, be documented, and be used when exercising internal/dev HTTP harnesses.
 
 * **Base URL and `DEV_SAMPLER_URL` per environment (infra-owned).**  
    For each environment where an internal/dev HTTP harness is expected to be used (at minimum Codespaces and local dev), infra/ops MUST derive and publish a concrete **base URL** for the dev Reader process (for example `http://127.0.0.1:<port>` in local dev or the appropriate forwarded port in Codespaces) and from that base URL define a concrete sampler harness URL:
@@ -4570,10 +4579,19 @@ Passes canonicalization checks (canonical JSON, LF-termination, sorted keys, arr
 
   * Mechanics does not pin where `DEV_SAMPLER_URL` lives (env var, config file, devcontainer config); it requires that there is a **single infra-owned binding** for `/internal/dev/sampler` per environment and that QA/PO treat it as the authority for that harness URL.
 
+* **Codespaces dev: canonical home and value.**  
+   For the Codespaces dev environment:
+
+  * The **canonical home** for `DEV_SAMPLER_URL` MUST be the devcontainer configuration (for example a `containerEnv` block in `.devcontainer/devcontainer.json`); every shell in the Codespace MUST see the same default value without manual export.
+
+  * The devcontainer binding MUST set `DEV_SAMPLER_URL` to the base URL derived from the dev Reader helper: for the current EPIC019 D3 wiring this is `http://127.0.0.1:8000/internal/dev/sampler`. Shell-level overrides `export DEV_SAMPLER_URL=…` MAY be used for debugging, but the devcontainer env is the authoritative infra binding for this environment.
+
+  * Dev sampler HTTP harnesses (healthcheck and D3 Live QA) MUST NOT reconstruct host/port internally or hardcode `DEV_SAMPLER_URL`; they MUST read it from the environment and treat any mismatch with the actual Reader binding as a tooling/infra issue.
+
 * **Infra validation of dev harness URLs before QA.**  
    Before handing any `DEV_SAMPLER_URL` (or similar dev harness URL) to QA or using it in QA plans, infra/ops MUST validate it locally by:
 
-  * Running the infra-owned dev Reader start command with `APP_ENV=dev` and, where feasible, the determinism pins used elsewhere in this checklist and in the Glow QA Guide by title (`SAFE_MODE=1`, `ALLOW_NETWORK=0`, `LC_ALL=C`, `LANG=C`, `TZ=UTC` for evidence runs).
+  * Running the infra-owned dev Reader start command with determinism pins and a chosen `APP_ENV` (for example `APP_ENV=dev` for allowed-mode checks) using the same env rails described elsewhere in this checklist and in the Glow QA Guide by title (for example `SAFE_MODE=1`, `ALLOW_NETWORK=0`, `LC_ALL=C`, `LANG=C`, `TZ=UTC` for evidence runs).
 
   * Issuing at least one simple HTTP/1.1 `POST` to `DEV_SAMPLER_URL` with:
 
@@ -4591,37 +4609,80 @@ Passes canonicalization checks (canonical JSON, LF-termination, sorted keys, arr
 
 * If this validation fails (for example the URL is unreachable, the response body/headers do not match Mechanics, or JSON is not canonical), infra MUST treat the issue as an **infra/tooling misconfiguration**, correct the wiring, and rerun validation before any QA plan or doc step relies on `DEV_SAMPLER_URL`.
 
+* **Harness behavior when DEV\_SAMPLER\_URL is missing or mismatched.**  
+   Dev sampler HTTP harnesses (including the dev sampler healthcheck and the D3 Live QA harness):
+
+  * MUST read `DEV_SAMPLER_URL` directly from the environment and MUST NOT hardcode host/port or reconstruct the URL internally.
+
+  * MUST treat a missing `DEV_SAMPLER_URL` (unset or empty) as a **tooling/infra failure** and fail loudly (non-zero exit code) with a clear log entry indicating that the binding is missing, rather than attempting to fall back to any default.
+
+  * SHOULD treat obvious mismatches between `DEV_SAMPLER_URL` and the actual Reader binding (for example wrong host or port) as tooling/infra failures and log the discrepancy, since such mismatches indicate that infra and harness are out of sync.
+
+  * MUST record the effective `DEV_SAMPLER_URL` value and rails (`APP_ENV`, `SAFE_MODE`, `ALLOW_NETWORK`, `LC_ALL`, `LANG`, `TZ`) in their QA logs under `audit/qa/<epic>/…` so that later audits can see exactly which dev Reader endpoint the harness spoke to and under which rails.
+
 * **Clear responsibility split.**  
    Infra/ops agents are responsible for **defining, maintaining, and validating** dev Reader start commands and dev harness URLs (including `DEV_SAMPLER_URL`) in each environment. PO, QA, and documentation agents **consume** these URLs and MUST NOT define, change, or guess them in PF10, Glow QA Guide, HDE Phased Epics, PF09, or QA plans:
 
-  * If infra has not yet provided a validated `DEV_SAMPLER_URL` for a given environment, this subtask remains **Not done** and the sampler HTTP harness is not considered ready for Live QA in that environment.
+  * If infra has not yet provided a validated `DEV_SAMPLER_URL` for a given environment, this subtask remains **Not done** for that environment and the sampler HTTP harness is not considered ready for Live QA in that environment.
 
   * QA and PO treat failures to reach or use `DEV_SAMPLER_URL` as **tooling/infra issues** to be escalated back to infra unless there is already a passing infra validation log showing the harness is healthy and subsequent QA evidence clearly attributes a failure to sampler/core behavior.
 
-**Subtask status:** **Not done**
+**Subtask status:** **Partial**
 
-**Epic or card:** **Unknown** (future infra/Conjunction epic to wire dev harness start commands and URLs)
+**Epic or card:** **HDE-EPIC019 (D3 — Dev-only sampler HTTP endpoint harness), Remediation PR01/PR02A (dev Reader start command & DEV\_SAMPLER\_URL wiring and APP\_ENV forwarding for Codespaces)**
 
 **Tokens:** **Unknown** (any infra/HTTP harness tokens for dev-only internal surfaces will be defined in Governance, Glow Infrastructure, and Mechanics; PF09 will reference them by title once minted)
 
 **Evidence / artifacts:**
 
-* Infra/ops documentation (titles-only) specifying the dev Reader start command or service definition and the base URL/port for internal/dev harnesses in Codespaces/local dev.
+* Infra/ops documentation and dev tooling (titles-only) for **Codespaces dev**:
+
+  * `scripts/dev_start_reader.sh` — canonical dev Reader start script that:
+
+    * pins determinism env pins (`SAFE_MODE=1`, `ALLOW_NETWORK=0`, `LC_ALL=C`, `LANG=C`, `TZ=UTC`) and `PORT` (default 8000), and
+
+    * **forwards `APP_ENV` from the caller without forcing a default**, exporting `APP_ENV` only when it is present so that harnesses can exercise `APP_ENV=dev`, `APP_ENV=prod`, empty, and unset modes exactly as PF-canon defines.
+
+    * logs `APP_ENV_DISPLAY` in its `[dev-start] APP_ENV=` line so operators and QA can see when `APP_ENV` is unset or empty.
+
+  * `.devcontainer/devcontainer.json` — devcontainer configuration exporting an infra-owned `DEV_SAMPLER_URL` binding (`DEV_SAMPLER_URL=http://127.0.0.1:8000/internal/dev/sampler`) for Codespaces dev.
+
+  * `scripts/qa/dev_sampler_healthcheck.py` — healthcheck/diagnostic harness that:
+
+    * reads and validates `DEV_SAMPLER_URL` from the environment,
+
+    * starts the Reader in `APP_ENV=dev` (and in `APP_ENV=prod` or other modes for gating diagnostics) under determinism pins,
+
+    * issues HTTP/1.1 POSTs with a minimal sampler payload, and
+
+    * logs rails and responses (including the effective `DEV_SAMPLER_URL` value) without modifying sampler behavior.
+
+  * `tests/scripts/test_dev_sampler_healthcheck.py` — pytest that runs the healthcheck harness against a local Reader binding, asserts a 200 dev response, and checks for expected log lines (for example a `sampler_response mode=dev` marker) to prove infra validation is wired and test-covered.
 
 * QA-facing configuration such as `DEV_SAMPLER_URL` bindings (titles-only) that are derived from infra-owned base URLs and ports, not guessed by QA.
 
-* Infra or QA logs showing a successful local validation POST to each internal/dev HTTP harness URL (for example dev sampler), demonstrating:
+* Infra or QA logs (titles-only) showing successful local validation POSTs to `DEV_SAMPLER_URL` in Codespaces dev, demonstrating:
 
   * `APP_ENV=dev` and determinism env pins where applicable.
 
-  * Canonical JSON request/response bodies and correct sampler schema.
+  * Canonical JSON request/response bodies and correct sampler schema for dev runs.
 
   * Headers consistent with HDE-CLI-API-Vendor-Ref and HDE-Mechanics Guide internal/dev HTTP behavior.
 
-* Evidence Index and Machine Mirror entries for the validation artifacts once governed (titles/paths only); PF09 does not restate mirror schema.
+* D3-specific QA logs (titles-only) under `audit/qa/hde-epic019/dev_sampler_http/…` that:
+
+  * record the effective `DEV_SAMPLER_URL` used for the dev sampler Live QA harness, and
+
+  * capture the rails snapshot (`SAFE_MODE`, `ALLOW_NETWORK`, `APP_ENV`, `LC_ALL`, `LANG`, `TZ`) alongside request/response details, so D3 evidence clearly ties behavior to the configured endpoint and rails posture.
+
+* Evidence Index and Machine Mirror entries for dev harness validation artifacts, once they are governed and indexed (titles/paths only); PF09 does not restate mirror schema.
 
 **Notes:**  
- Added from PF10 Build Notes Addendum 12 (“Dev sampler HTTP harness infra wiring”) and the HDE-Mechanics Guide section on QA tooling and dev harness env wiring. This subtask records that internal/dev HTTP harnesses are first-class components of the tooling skeleton: infra/ops own their start commands and `DEV_SAMPLER_URL` bindings per environment, must validate those URLs before QA uses them, and PO/QA/doc agents consume the validated URLs instead of guessing.
+ This subtask reflects the split between **infra wiring** and **behavioral gating** for the dev sampler HTTP harness. For EPIC019:
+
+* Codespaces dev now has a canonical dev Reader start command that no longer overrides `APP_ENV`, a single infra-owned `DEV_SAMPLER_URL` binding via the devcontainer, and a healthcheck harness and pytest that validate the dev sampler HTTP harness behavior under `APP_ENV=dev`; these satisfy the infra/validation slice of this subtask for that environment.
+
+* APP\_ENV gating for forbidden modes (for example `APP_ENV=prod`, empty, unset) remains a behavioral responsibility of the adapter and Mechanics; forwarding `APP_ENV` unchanged and treating missing/mismatched `DEV_SAMPLER_URL` as a tooling failure make those modes **testable** by Live QA harnesses instead of being silently remapped to dev. Once gating behavior is corrected and similar infra wiring exists for other environments (for example non-Codespaces local dev), this subtask can be revisited and moved from **Partial** to **Done**.
 
 ---
 
@@ -7592,9 +7653,12 @@ PF09 does not redefine token semantics for determinism, A7, `/internal/version`,
 
 * Offline ingest tests, dry-run pipelines, and source-invariance artifacts remain necessary but do **not** satisfy `LIVE_VENDOR_TRANSPORT_OK` by themselves; that token requires evidence of an actual vendor transport under open rails.
 
-**Subtask status:** **Partial**
+**Subtask status:** **Done**
 
-**Epic or card:** **EPIC-017 (QA08 vendor dry-run resolve) for the dry-run slice; future epic (TBD) for full live-vendor transport proofs and invariance closure**
+**Epic or card:**
+
+EPIC-017 (QA08 vendor dry-run resolve) — offline/vendor dry-run slice  
+ EPIC-019 (D6 — Live vendor QA and classification, remedial) — open-rails Live Vendor QA harness and artifacts
 
 **Tokens (titles-only; semantics live in Governance / QA / Phased Epics):**
 
@@ -7605,40 +7669,98 @@ PF09 does not redefine token semantics for determinism, A7, `/internal/version`,
  `ENV_RAILS_POLICY_OK`  
  `LIVE_VENDOR_TRANSPORT_OK`  
  `EVIDENCE_INDEX_UPDATED_OK`  
- `EVIDENCE_INDEX_MIRROR_OK`
+ `EVIDENCE_INDEX_MIRROR_OK`  
+ `EVIDENCE_PATHS_VALIDATED_OK`  
+ `MACHINE_MIRROR_UPDATED_OK`
 
 **Evidence / artifacts (titles/paths only):**
 
-* BodyGraph source selection and invariance artifacts:
+*BodyGraph source selection and invariance artifacts (offline / dry-run slices):*
 
-  * `artifacts/bodygraph/source_selection.snapshot.json` — names-only snapshot of attempted and selected sources for BodyGraph flows.
+* `artifacts/bodygraph/source_selection.snapshot.json` — names-only snapshot of attempted and selected sources for BodyGraph flows.
 
-  * `artifacts/bodygraph/source_invariance/ab.json` — DB vs vendor AB invariance sample.
+* `artifacts/bodygraph/source_invariance/ab.json` — DB vs vendor AB invariance sample.
 
-  * `artifacts/bodygraph/source_invariance/ba.json` — DB vs vendor BA invariance sample.
+* `artifacts/bodygraph/source_invariance/ba.json` — DB vs vendor BA invariance sample.
 
-  * `artifacts/bodygraph/source_invariance/summary.json` — summary proving `ab_ba_equal: true` when invariance is implemented.
+* `artifacts/bodygraph/source_invariance/summary.json` — summary proving `ab_ba_equal: true` when invariance is implemented.
 
-* Vendor dry-run evidence (EPIC017 QA08; rails and env posture documented in QA logs):
+*Vendor dry-run evidence (EPIC017 QA08; rails and env posture documented in QA logs):*
 
-  * `audit/qa/hde-epic017/logs/step_bg_resolve_vendor_dry_run1.txt` — dry-run ingest metadata for `hdctl bg:resolve --source vendor --dry-run` on a synthetic birth tuple and QA user key, showing requested vs resolved source, SAFE rails posture, ingest metadata, `parity_match: true`, and idempotency key details.
+* `audit/qa/hde-epic017/logs/step_bg_resolve_vendor_dry_run1.txt` — dry-run ingest metadata for `hdctl bg:resolve --source vendor --dry-run` on a synthetic birth tuple and QA user key, showing requested vs resolved source, SAFE rails posture, ingest metadata, `parity_match: true`, and idempotency key details.
 
-* Live vendor transport proofs (future, titles/paths only):
+*Live vendor transport proofs (EPIC019 D6 — Live vendor QA and classification):*
 
-  * To be supplied by future live-vendor epics; expected to include an env/rails snapshot for the open-rails call, a vendor endpoint/method snapshot, and a bounded headers-only or names-only transport log consistent with Mechanics and Governance.
+* Harness:
 
-* Index/Mirror discipline (shared with Evidence Index front matter):
+  * `scripts/qa/d6_live_vendor_qa.py` — open-rails Live Vendor QA harness that:
 
-  * `docs/evidence/INDEX.json` / `docs/evidence/INDEX.sha256` — Human Index & sentinel including BodyGraph vendor ingest artifacts and, when present, live vendor transport proof artifacts.
+    * sets `ALLOW_NETWORK=1`, `SAFE_MODE=0`, `LC_ALL=C`, `LANG=C`, `TZ=UTC` and requires HDAPI credentials (by title);
 
-  * `artifacts/evidence_index.jsonl` — Machine Mirror records for these artifacts and their schemas, with canonical JSONL (UTF-8; sorted keys; compact; one LF; unknown-key reject) and `proof_anchor` fields pointing to co-located `*.path_proof.txt` transcripts.
+    * exercises the HDAPI BodyGraph endpoint with a minimal, non-PII BodyGraph payload; and
+
+    * classifies outcomes as `OK` (2xx and parsed), `FAIL_VENDOR` (vendor-side errors like 401/4xx/5xx with parsed error bodies), or `FAIL_TOOLING` (DNS/transport failures, decode errors) without logging secrets.
+
+* Evidence families under `audit/qa/hde-epic019/d6-vendor-live-qa/`:
+
+  * `notes/d6_vendor_live_qa_discovery.md` — discovery notes for D6 (existing vendor surfaces, prior closed-rails posture, open-rails design for this harness).
+
+  * `happy_path.jsonl` — structured JSONL log capturing at least one 2xx response from the HDAPI BodyGraph endpoint under open rails, with:
+
+    * classification `result: "OK"`,
+
+    * a redacted URL (scheme \+ host), HTTP status, and selected response headers, and
+
+    * a parsed, non-PII BodyGraph payload summary.
+
+  * `fail_vendor.jsonl` — structured JSONL log capturing at least one vendor-side error (for example 401 "Invalid API Key") classified as `result: "FAIL_VENDOR"` with parsed error body fields (code, message, status) but no secrets.
+
+  * `fail_tooling.jsonl` — structured JSONL log capturing at least one tooling/infra error (for example hitting `https://invalid.invalid`) classified as `result: "FAIL_TOOLING"`, with status and error details but no secrets.
+
+  * `rails_snapshot.json` — canonical JSON rails snapshot recording the open-rails posture for D6 (including `SAFE_MODE`, `ALLOW_NETWORK`, `APP_ENV`, `LC_ALL`, `LANG`, `TZ`), the vendor host, surface description (e.g., `engine.cli vendor HTTP POST /bodygraphs`), and PF-canon references by title.
+
+*Human Evidence Index & sentinel:*
+
+* `docs/evidence/INDEX.json` — Human Index entries for the D6 evidence families, with artifact\_keys such as:
+
+  * `"epic019.d6.vendor_live_qa.discovery_notes"` → `audit/qa/hde-epic019/d6-vendor-live-qa/notes/d6_vendor_live_qa_discovery.md`
+
+  * `"epic019.d6.vendor_live_qa.happy_path"` → `audit/qa/hde-epic019/d6-vendor-live-qa/happy_path.jsonl`
+
+  * `"epic019.d6.vendor_live_qa.fail_vendor"` → `audit/qa/hde-epic019/d6-vendor-live-qa/fail_vendor.jsonl`
+
+  * `"epic019.d6.vendor_live_qa.fail_tooling"` → `audit/qa/hde-epic019/d6-vendor-live-qa/fail_tooling.jsonl`
+
+  * `"epic019.d6.vendor_live_qa.rails_snapshot"` → `audit/qa/hde-epic019/d6-vendor-live-qa/rails_snapshot.json`
+
+* `docs/evidence/INDEX.sha256` — sha256 sentinel over canonical `INDEX.json` bytes including the D6 entries.
+
+*Machine Mirror & path-proofs:*
+
+* `artifacts/evidence_index.jsonl` — Machine Mirror records for the D6 evidence families and their path-proofs, following PF12 mirror discipline (records-only canonical JSONL; field order `artifact_key, discovered_physical_path, produced_at_utc, proof_anchor, role, sha256, size_bytes`; unknown-key reject; sort-before-write).
+
+* Co-located `*.path_proof.txt` transcripts for each D6 artifact (notes, JSONL logs, rails snapshot), with `proof_anchor` references in the mirror.
+
+*EPIC019 acceptance map and manifest bindings (titles-only):*
+
+* `docs/acceptance_map_epic019.json` — extended with a D6 foundation “D6 — Live vendor QA and classification (HDE-EPIC019 remedial)” and token bindings for `LIVE_VENDOR_TRANSPORT_OK`, `OPEN_RAILS_ENV_OK`, and `DISCOVERY_BASELINE_OK`, each wired to the D6 harness and artifacts (`happy_path`, `fail_vendor`, `fail_tooling`, `rails_snapshot`, discovery notes).
+
+* `audit/EPIC019_MANIFEST.json` — updated manifest entries for the D6 artifacts (correct paths, hashes, sizes, roles, and proof\_anchors), consistent with the Human Index and Machine Mirror.
 
 **Notes:**  
- EPIC017 QA08 demonstrates the **vendor dry-run resolve** slice (open-rails dev→prod vendor call with `--dry-run`, no DB write, and parity between would-be DB shape and vendor payload). That evidence contributes to `BG_SOURCE_SELECTION_OK`, `BG_DEV_DIRECT_CALLS_UPSERT_OK` (for the dev fallback behavior), and `ENV_RAILS_POLICY_OK`, but it does not, by itself, close `LIVE_VENDOR_TRANSPORT_OK` for a production epic that demands live vendor proofs under the new PF14 semantics. This subtask remains **Partial** until there is at least one governed live-vendor transport artifact (as described above) and associated tokens are marked green for the relevant epics.
+ EPIC017 QA08 provides the **offline/vendor dry-run resolve** slice: it exercises `hdctl bg:resolve --source vendor --dry-run` under controlled rails, demonstrates source-selection and invariance behavior, and contributes to `BG_SOURCE_SELECTION_OK`, `BG_DEV_DIRECT_CALLS_UPSERT_OK` (for dev fallback behavior), and `ENV_RAILS_POLICY_OK`.
 
-### **Subtask HDE-DIST001.8 — Partition plan & verify (EPIC-011)**
+EPIC019 D6 now supplies the missing **live vendor transport slice**:
 
-**Subtask name/label:** Partition plan & verify (EPIC-011)
+* It runs an explicit open-rails Live Vendor QA harness against the HDAPI BodyGraph endpoint, capturing a happy-path 2xx response, a vendor-side failure, and a tooling failure, each classified and logged under governed paths, with an accompanying rails snapshot and discovery notes.
+
+* It wires the new D6 evidence families into the Human Evidence Index and Machine Mirror with path-proofs, and binds the D6 acceptance tokens `LIVE_VENDOR_TRANSPORT_OK`, `OPEN_RAILS_ENV_OK`, and `DISCOVERY_BASELINE_OK` in the EPIC019 acceptance map and manifest.
+
+Taken together, the existing offline invariance artifacts, EPIC017 vendor dry-run evidence, and EPIC019 D6 Live Vendor QA harness and artifacts satisfy the vendor ingest source-policy and live-vendor-proof requirements for this Distillation slice. HDE-DIST001.7 is therefore considered **Done**; future vendor ingest work (beyond the current BodyGraph/HDAPI path and EPIC017/EPIC019 coverage) will be tracked via new epics and PF09 rows rather than by reopening this subtask.
+
+### **Subtask HDE-DIST001.8 — Partition plan & verify** 
+
+**Subtask name/label:** Partition plan & verify
 
 **Subtask description:**  
  Enforce EPIC-011’s non-deferred partition stance by producing and indexing partition plan and verification artifacts under governed paths:

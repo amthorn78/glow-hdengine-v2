@@ -2,13 +2,13 @@
 
 **Title:** PF06-Canon-Epic-Process-Guide 
 
-**Version:** v1.1.3
+**Version:** v1.1.4
 
 **Status:** Canon
 
-**Effective date**: 2025-12-02
+**Effective date**: 2025-12-03
 
-**Last Update Gate:**  BN 7.9.7 Drain A19
+**Last Update Gate:**  Audit 2025-12-03
 
 **tag:** INV-f2ac55d77ce9aacc
 

@@ -6,11 +6,11 @@
 
 **Status:** Canon
 
-**Version:** 1.3.6
+**Version:** 1.4.4
 
-**Effective date:** 2025-12-01
+**Effective date:** 2025-12-04
 
-**Last Update Gate:** BN 7.9.7 Drain A18
+**Last Update Gate:** BN 8.0.7 Drain A14/15
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -1591,6 +1591,162 @@ Steps may define additional, more granular status fields if needed, but they mus
   * QA Plans **MUST** reference these primary log filenames explicitly so that operators and reviewers know exactly where to look.
 
 This per-step log structure works together with the mechanical evidence rules (§4.3) and the Live QA patterns (§3.4–§3.6) to make QA runs reproducible, reviewable, and easy to audit: one run root, one primary log per step, clearly labeled headers and statuses, and supporting artifacts where needed.
+
+## **4.5 External AI QA evidence batching (10-file limit, no zips)**
+
+In some workflows, external AI QA reviewers (for example Kronos or other analysis agents) receive evidence via **manual file uploads** from the operator’s environment. That review channel has two hard constraints:
+
+* **Per-batch file limit.** At most **10 files** can be uploaded in a single batch.
+
+* **Zip archives are unreliable.** Zip files are not guaranteed to be unpacked or interpretable by the review tool. Reviewers only see the raw files they are explicitly given.
+
+PF19 requires QA plans and evidence design to **respect these constraints** whenever external AI QA review is expected.
+
+**Channel constraints (normative).**
+
+* For external AI QA review flows:
+
+  * Zip archives **MUST NOT** be relied on as the primary evidence transport. Raw files (text/JSON/etc.) are the only reliable inputs.
+
+  * A single reviewable evidence slice **MUST fit into 10 files or fewer per upload batch**.
+
+  * Reviewers cannot “see a folder”; they only see the files explicitly provided. QA plans must not assume the reviewer can browse directories.
+
+**Step-level evidence sets (≤ 10 files).**
+
+For any QA step or Live QA slice that is expected to be reviewed by an external AI QA persona:
+
+* The QA Plan **MUST** define a **minimal evidence set** for that step that can be captured and reviewed in **10 files or fewer**.
+
+* This minimal set **SHOULD** be explicitly listed in the QA Plan or Live QA Guide, using fully qualified paths (for example `audit/qa/<epic-id>/dev_sampler_http/D3_env_rails.log`).
+
+* When a step naturally produces more than 10 governed artifacts, the QA Plan **MUST**:
+
+  * identify a **priority subset** (≤ 10 files) that captures the essential behavior and rails for external review; and
+
+  * treat any additional files as **optional or follow-up material**, not required for the primary verdict.
+
+**No zip-only evidence.**
+
+* QA Plans **MUST NOT** specify “zip the evidence directory and upload it” as the primary or only way to supply evidence to the reviewer.
+
+* Zips **MAY** be created for local storage or human consumption, but the canonical external-review path **MUST** be through individual files that respect the 10-file limit.
+
+**QA author responsibilities.**
+
+When authors write or revise QA Implementation Plans or Live QA Guides for steps that will go to external AI QA review, they **MUST**:
+
+* name the exact paths and filenames that constitute the minimal evidence set for each such step;
+
+* confirm that the number of files in that set is **10 or fewer**; and
+
+* avoid vague instructions such as “send all logs from this folder” or “upload all JSONL files”; instead, they must name a concrete, bounded set.
+
+These batching rules do not change what local evidence must be captured or how it is indexed; they ensure that every QA step that needs external AI review has a **deterministic, reviewable evidence slice** that fits within the channel’s operational constraints.
+
+## **4.6 Derived AI-readable evidence for HTTP response bodies**
+
+Raw HTTP `.body` files (for example `D3_http_run1.body`, `compat_http_200.body`, `…_prod.body`) are often the **canonical local evidence** for HTTP behavior. PF19 requires those files to be written under `audit/qa/<epic-id>/…` and captured as governed artifacts where applicable. However:
+
+* External AI QA reviewers cannot reliably open or process arbitrary raw `.body` files, and
+
+* The **≤ 10-file** evidence limit for external review (§4.5) makes shipping large sets of `.body` files impractical.
+
+PF19 therefore requires a small, structured, AI-readable **derived artifact** for HTTP-centric steps that will be reviewed by external AI QA.
+
+**Scope.**
+
+This section applies to QA steps that:
+
+* use one or more `*.body` files as **acceptance evidence**, and
+
+* are intended to be reviewed by an external AI QA reviewer.
+
+Raw `.body` files remain the canonical local QA artifacts; derived summaries are **additional** review-layer artifacts.
+
+**Principle.**
+
+* Raw `*.body` files **MUST** continue to be written and preserved under `audit/qa/<epic-id>/…` as specified in QA Plans.
+
+* External AI QA review **MUST** be performed on **small, derived, AI-readable summaries**, **not** on the raw `*.body` files themselves.
+
+**Requirements for derived HTTP review artifacts.**
+
+For each HTTP-centric QA step in scope:
+
+* The QA Plan **MUST** define one or more **derived review artifacts** with all of the following properties:
+
+  * **Location**
+
+    * Stored alongside the `.body` files under the same evidence directory, for example:
+
+      * `audit/qa/<epic-id>/<step-dir>/<step>_http_bodies_review.md`, or
+
+      * `audit/qa/<epic-id>/<step-dir>/<step>_http_bodies_review.json`.
+
+  * **Format**
+
+    * Plain text (Markdown) or JSON only — no binary.
+
+    * Structured enough that an AI can reason about it without seeing the raw bodies (for example simple tables or JSON objects per scenario).
+
+  * **Contents (per scenario / family)**
+
+     For each group of `*.body` files used in acceptance (for example, dev run1/run2, seed 111 vs 222, APP\_ENV=prod vs dev), the derived artifact **MUST** record:
+
+    * A **scenario ID/name** (for example `two_run_identity_dev`, `seed_111`, `seed_222`, `prod_forbidden`).
+
+    * **Source files:** exact filenames of the `*.body` files summarized for that scenario.
+
+    * **HTTP outcome summary** (from the associated headers and QA expectations):
+
+      * status code (for example `200`, `403`, `4xx/5xx`),
+
+      * how the QA Plan treated it (for example “success”, “forbidden”, “error/vendor failure”).
+
+    * **Shape summary:**
+
+      * top-level keys present (for example `["viewer_id","candidate_ids","seed","scores"]` vs `["error","code","message"]`), and
+
+      * a one-line description of whether the body is a sampler JSON payload, a vendor response, or an error envelope.
+
+    * **Key field relationships required by the Plan**, such as:
+
+      * two-run identity: “run1 vs run2 bodies: IDENTICAL / DIFFERENT”;
+
+      * seed-only behavior: “viewer\_id equal? yes/no; candidate\_ids equal? yes/no; changed fields: …”;
+
+      * gating: “prod/unset/empty bodies: sampler JSON? yes/no; error envelope? yes/no”.
+
+    * **Optional but recommended:**
+
+      * a hash (for example SHA-256) for each `.body` file to support identity checks without exposing contents.
+
+* Each HTTP-centric QA step **MUST** limit itself to at most one or two such derived review artifacts so that the entire AI-review evidence set for that step still fits under the **≤ 10-file** constraint (§4.5).
+
+* QA Plans **MUST NOT** require uploading raw `.body` files for external AI review. Raw bodies remain on disk as backing evidence and may be manually inspected by human operators or auditors.
+
+**Guidance for QA Plan authors.**
+
+When writing or updating QA Implementation Plans and Live QA Guides for HTTP-centric steps:
+
+* Explicitly list:
+
+  * the `*.body` files to be produced (local canonical evidence), and
+
+  * the corresponding derived review artifact (for example `<step>_http_bodies_review.md` or `<step>_http_bodies_review.json`), with a short schema describing what must be recorded.
+
+* In any “Evidence for external review” section, reference the derived artifact(s) instead of the raw `.body` files. For example:
+
+  * “External AI QA evidence for Step 2 (dev sampler HTTP Live QA): `D3_env_rails.log`, `D3_http_bodies_review.md`, `D3_live_qa_run.log`, and the priority JSONL summaries; raw `.body` files remain on disk as backing evidence and are not required for external review.”
+
+This derived-evidence requirement does not change the underlying acceptance criteria for HTTP surfaces (those still depend on the actual body content per PF01/PF14/PF20); it adds a **translation layer** between local QA artifacts and external AI review constraints, so that:
+
+* QA Plans remain precise and deterministic,
+
+* operators can keep using full `.body` files locally, and
+
+* external AI reviewers can work with small, structured, privacy-respecting summaries instead of opaque raw payloads.
 
 ---
 
