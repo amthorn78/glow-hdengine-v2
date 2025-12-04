@@ -18,10 +18,11 @@
         "QA_POSTCOMMIT_CHECKLIST_OK",
         "QA_EVIDENCE_ONLY_OK",
         "QA_CI_DIFF_SCOPED_OK",
-        "ENV_RAILS_POLICY_OK"
+        "ENV_RAILS_POLICY_OK",
+        "DETERMINISM_ENV_PINS_OK"
       ],
       "name": "D1 \u2014 Error Envelope & Token Set (HDE-SEPA002.*)",
-      "status": "pending",
+      "status": "DONE",
       "tokens": [
         "ERROR_JSON_CANON_OK",
         "JSON_CANONICAL_CHECK_OK",
@@ -36,7 +37,8 @@
         "QA_POSTCOMMIT_CHECKLIST_OK",
         "QA_EVIDENCE_ONLY_OK",
         "QA_CI_DIFF_SCOPED_OK",
-        "ENV_RAILS_POLICY_OK"
+        "ENV_RAILS_POLICY_OK",
+        "DETERMINISM_ENV_PINS_OK"
       ]
     },
     {
@@ -52,10 +54,12 @@
         "PREIMAGE_RECOMPUTE_OK",
         "EVIDENCE_INDEX_UPDATED_OK",
         "EVIDENCE_INDEX_MIRROR_OK",
-        "EVIDENCE_PATHS_VALIDATED_OK"
+        "EVIDENCE_PATHS_VALIDATED_OK",
+        "ENV_RAILS_POLICY_OK",
+        "DETERMINISM_ENV_PINS_OK"
       ],
       "name": "D2 \u2014 Public Presenter / Emitter (HDE-SEPA003.*)",
-      "status": "pending",
+      "status": "DONE",
       "tokens": [
         "CLI_READER_EMITTER_PARITY_OK",
         "CLI_SHOWCOMPAT_CANON_OK",
@@ -67,7 +71,9 @@
         "PREIMAGE_RECOMPUTE_OK",
         "EVIDENCE_INDEX_UPDATED_OK",
         "EVIDENCE_INDEX_MIRROR_OK",
-        "EVIDENCE_PATHS_VALIDATED_OK"
+        "EVIDENCE_PATHS_VALIDATED_OK",
+        "ENV_RAILS_POLICY_OK",
+        "DETERMINISM_ENV_PINS_OK"
       ]
     },
     {
@@ -78,17 +84,21 @@
         "TWO_RUN_IDENTITY_OK",
         "EVIDENCE_INDEX_UPDATED_OK",
         "EVIDENCE_INDEX_MIRROR_OK",
-        "EVIDENCE_PATHS_VALIDATED_OK"
+        "EVIDENCE_PATHS_VALIDATED_OK",
+        "ENV_RAILS_POLICY_OK",
+        "DETERMINISM_ENV_PINS_OK"
       ],
       "name": "D3 \u2014 Internal Ops Identity Surface `/internal/version` (HDE-SEPA004.1 & 004.4)",
-      "status": "pending",
+      "status": "DONE",
       "tokens": [
         "INTVER_200_CTYPE_JSON_UTF8_OK",
         "INTVER_HEAD_PARITY_OK",
         "TWO_RUN_IDENTITY_OK",
         "EVIDENCE_INDEX_UPDATED_OK",
         "EVIDENCE_INDEX_MIRROR_OK",
-        "EVIDENCE_PATHS_VALIDATED_OK"
+        "EVIDENCE_PATHS_VALIDATED_OK",
+        "ENV_RAILS_POLICY_OK",
+        "DETERMINISM_ENV_PINS_OK"
       ]
     },
     {
@@ -98,16 +108,18 @@
         "QA_POSTCOMMIT_CHECKLIST_OK",
         "QA_EVIDENCE_ONLY_OK",
         "QA_CI_DIFF_SCOPED_OK",
-        "ENV_RAILS_POLICY_OK"
+        "ENV_RAILS_POLICY_OK",
+        "DETERMINISM_ENV_PINS_OK"
       ],
       "name": "Global QA rails (PF19 QA token library)",
-      "status": "pending",
+      "status": "DONE",
       "tokens": [
         "QA_PRECOMMIT_CHECKLIST_OK",
         "QA_POSTCOMMIT_CHECKLIST_OK",
         "QA_EVIDENCE_ONLY_OK",
         "QA_CI_DIFF_SCOPED_OK",
-        "ENV_RAILS_POLICY_OK"
+        "ENV_RAILS_POLICY_OK",
+        "DETERMINISM_ENV_PINS_OK"
       ]
     }
   ],
@@ -296,29 +308,69 @@
       ]
     },
     "QA_PRECOMMIT_CHECKLIST_OK": {
-      "artifacts": [],
-      "status": "pending",
-      "tests": []
+      "artifacts": [
+        "docs/QA_CHECKLIST_EPIC020.md"
+      ],
+      "status": "DONE",
+      "tests": [
+        "tests/qa/test_epic020_qa_docs.py::test_checklist_covers_required_sections",
+        "tests/qa/test_epic020_qa_docs.py::test_acceptance_metadata_captures_qa_tokens"
+      ]
     },
     "QA_POSTCOMMIT_CHECKLIST_OK": {
-      "artifacts": [],
-      "status": "pending",
-      "tests": []
+      "artifacts": [
+        "docs/QA_CHECKLIST_EPIC020.md",
+        "audit/qa/hde-epic020/README.md"
+      ],
+      "status": "DONE",
+      "tests": [
+        "tests/qa/test_epic020_qa_docs.py::test_checklist_covers_required_sections",
+        "tests/qa/test_epic020_qa_docs.py::test_acceptance_metadata_captures_qa_tokens"
+      ]
     },
     "QA_EVIDENCE_ONLY_OK": {
-      "artifacts": [],
-      "status": "pending",
-      "tests": []
+      "artifacts": [
+        "docs/QA_CHECKLIST_EPIC020.md"
+      ],
+      "status": "DONE",
+      "tests": [
+        "tests/qa/test_epic020_qa_docs.py::test_checklist_covers_required_sections",
+        "tests/qa/test_epic020_qa_docs.py::test_acceptance_metadata_captures_qa_tokens"
+      ]
     },
     "QA_CI_DIFF_SCOPED_OK": {
-      "artifacts": [],
-      "status": "pending",
-      "tests": []
+      "artifacts": [
+        "docs/QA_CHECKLIST_EPIC020.md"
+      ],
+      "status": "DONE",
+      "tests": [
+        "tests/qa/test_epic020_qa_docs.py::test_checklist_covers_required_sections",
+        "tests/qa/test_epic020_qa_docs.py::test_acceptance_metadata_captures_qa_tokens"
+      ]
     },
     "ENV_RAILS_POLICY_OK": {
-      "artifacts": [],
-      "status": "pending",
-      "tests": []
+      "artifacts": [
+        "docs/QA_CHECKLIST_EPIC020.md",
+        "audit/gates/determinism/env_pins.log",
+        "audit/gates/determinism/env_pins.log.path_proof.txt"
+      ],
+      "status": "DONE",
+      "tests": [
+        "ci/checks/check_env_pins.sh",
+        "tests/qa/test_epic020_qa_docs.py::test_env_pin_artifact_is_indexed",
+        "tests/qa/test_epic020_qa_docs.py::test_acceptance_metadata_captures_qa_tokens"
+      ]
+    },
+    "DETERMINISM_ENV_PINS_OK": {
+      "artifacts": [
+        "audit/gates/determinism/env_pins.log",
+        "audit/gates/determinism/env_pins.log.path_proof.txt"
+      ],
+      "status": "DONE",
+      "tests": [
+        "ci/checks/check_env_pins.sh",
+        "tests/qa/test_epic020_qa_docs.py::test_env_pin_artifact_is_indexed"
+      ]
     }
   }
 }

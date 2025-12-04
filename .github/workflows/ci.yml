@@ -37,6 +37,37 @@ jobs:
       - run: python -m pytest tests/evidence tests/ops/test_evidence_index.py
       - run: python -m pytest tests/order tests/mech/test_order_properties.py
       - run: python -m pytest tests/cli/test_serializer_guards.py
+  epic020:
+    name: epic020 acceptance suites (closed rails)
+    runs-on: ubuntu-latest
+    env:
+      LC_ALL: C
+      LANG: C
+      TZ: UTC
+      SAFE_MODE: "1"
+      ALLOW_NETWORK: "0"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -U pip
+      - run: test -f requirements.txt && python -m pip install -r requirements.txt || true
+      - run: test -f requirements-dev.txt && python -m pip install -r requirements-dev.txt || true
+      - run: python -m pip install -e .
+      - run: python -m pip install pytest
+      - run: ci/checks/check_env_pins.sh
+      - name: Run EPIC020 determinism-rails acceptance tests
+        run: |
+          python -m pytest \
+            tests/adapter/test_jsonschema.py \
+            tests/cli/test_cli_usage_and_errors.py \
+            tests/cli/test_errors_parity.py \
+            tests/cli/test_cli_canonical_bytes.py \
+            tests/cli/test_showcompat_parity_and_identity.py \
+            tests/cli/test_serializer_guards.py \
+            tests/transport/test_internal_version_contract.py \
+            tests/qa/test_epic020_qa_docs.py
   sanity-pipeline:
     runs-on: ubuntu-latest
     env:

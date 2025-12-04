@@ -74,11 +74,31 @@
     "INTVER_HEAD_PARITY_OK": [
       "tests/transport/test_internal_version_contract.py::test_internal_version_invariants_and_artifacts"
     ],
-    "QA_PRECOMMIT_CHECKLIST_OK": [],
-    "QA_POSTCOMMIT_CHECKLIST_OK": [],
-    "QA_EVIDENCE_ONLY_OK": [],
-    "QA_CI_DIFF_SCOPED_OK": [],
-    "ENV_RAILS_POLICY_OK": []
+    "QA_PRECOMMIT_CHECKLIST_OK": [
+      "tests/qa/test_epic020_qa_docs.py::test_checklist_covers_required_sections",
+      "tests/qa/test_epic020_qa_docs.py::test_acceptance_metadata_captures_qa_tokens"
+    ],
+    "QA_POSTCOMMIT_CHECKLIST_OK": [
+      "tests/qa/test_epic020_qa_docs.py::test_checklist_covers_required_sections",
+      "tests/qa/test_epic020_qa_docs.py::test_acceptance_metadata_captures_qa_tokens"
+    ],
+    "QA_EVIDENCE_ONLY_OK": [
+      "tests/qa/test_epic020_qa_docs.py::test_checklist_covers_required_sections",
+      "tests/qa/test_epic020_qa_docs.py::test_acceptance_metadata_captures_qa_tokens"
+    ],
+    "QA_CI_DIFF_SCOPED_OK": [
+      "tests/qa/test_epic020_qa_docs.py::test_checklist_covers_required_sections",
+      "tests/qa/test_epic020_qa_docs.py::test_acceptance_metadata_captures_qa_tokens"
+    ],
+    "ENV_RAILS_POLICY_OK": [
+      "ci/checks/check_env_pins.sh",
+      "tests/qa/test_epic020_qa_docs.py::test_env_pin_artifact_is_indexed",
+      "tests/qa/test_epic020_qa_docs.py::test_acceptance_metadata_captures_qa_tokens"
+    ],
+    "DETERMINISM_ENV_PINS_OK": [
+      "ci/checks/check_env_pins.sh",
+      "tests/qa/test_epic020_qa_docs.py::test_env_pin_artifact_is_indexed"
+    ]
   },
   "token_artifacts": {
     "CLI_READER_EMITTER_PARITY_OK": [
@@ -144,10 +164,27 @@
       "artifacts/ops/internal_version/headers_head.txt",
       "artifacts/ops/internal_version/two_run_identity.log"
     ],
-    "QA_PRECOMMIT_CHECKLIST_OK": [],
-    "QA_POSTCOMMIT_CHECKLIST_OK": [],
-    "QA_EVIDENCE_ONLY_OK": [],
-    "QA_CI_DIFF_SCOPED_OK": [],
-    "ENV_RAILS_POLICY_OK": []
+    "QA_PRECOMMIT_CHECKLIST_OK": [
+      "docs/QA_CHECKLIST_EPIC020.md"
+    ],
+    "QA_POSTCOMMIT_CHECKLIST_OK": [
+      "docs/QA_CHECKLIST_EPIC020.md",
+      "audit/qa/hde-epic020/README.md"
+    ],
+    "QA_EVIDENCE_ONLY_OK": [
+      "docs/QA_CHECKLIST_EPIC020.md"
+    ],
+    "QA_CI_DIFF_SCOPED_OK": [
+      "docs/QA_CHECKLIST_EPIC020.md"
+    ],
+    "ENV_RAILS_POLICY_OK": [
+      "docs/QA_CHECKLIST_EPIC020.md",
+      "audit/gates/determinism/env_pins.log",
+      "audit/gates/determinism/env_pins.log.path_proof.txt"
+    ],
+    "DETERMINISM_ENV_PINS_OK": [
+      "audit/gates/determinism/env_pins.log",
+      "audit/gates/determinism/env_pins.log.path_proof.txt"
+    ]
   }
 }
