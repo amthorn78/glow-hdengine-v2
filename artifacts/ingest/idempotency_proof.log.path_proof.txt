@@ -1,5 +1,5 @@
 path: artifacts/ingest/idempotency_proof.log
 size_bytes: 328
 sha256: 2b66490c21c9e37b5682c7107594f200e96404a6c1a71ece0173a6e530943462
-mtime_utc: 2025-12-02T14:23:58Z
+mtime_utc: 2025-12-04T17:26:38Z
 produced_at_utc: 2025-11-22T02:27:04Z

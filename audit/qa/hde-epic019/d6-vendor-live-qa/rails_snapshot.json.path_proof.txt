@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic019/d6-vendor-live-qa/rails_snapshot.json
+size_bytes: 580
+sha256: 4f8104bb1cafe4efadfcd553603d2bba608dc61fc306142ac833de38b72fb07c
+mtime_utc: 2025-12-04T17:26:38Z
+produced_at_utc: 2025-11-30T03:58:47Z

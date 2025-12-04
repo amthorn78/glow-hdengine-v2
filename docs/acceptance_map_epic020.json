@@ -1,6 +1,6 @@
 {
   "epic_id": "HDE-EPIC020",
-  "epic_name": "Separation Pass 1 — Error & Identity Surfaces",
+  "epic_name": "Separation Pass 1 \u2014 Error & Identity Surfaces",
   "foundations": [
     {
       "deliverable": "D1",
@@ -15,7 +15,7 @@
         "EVIDENCE_INDEX_MIRROR_OK",
         "EVIDENCE_PATHS_VALIDATED_OK"
       ],
-      "name": "D1 — Error Envelope & Token Set (HDE-SEPA002.*)",
+      "name": "D1 \u2014 Error Envelope & Token Set (HDE-SEPA002.*)",
       "status": "pending",
       "tokens": [
         "ERROR_JSON_CANON_OK",
@@ -44,7 +44,7 @@
         "EVIDENCE_INDEX_MIRROR_OK",
         "EVIDENCE_PATHS_VALIDATED_OK"
       ],
-      "name": "D2 — Public Presenter / Emitter (HDE-SEPA003.*)",
+      "name": "D2 \u2014 Public Presenter / Emitter (HDE-SEPA003.*)",
       "status": "pending",
       "tokens": [
         "CLI_READER_EMITTER_PARITY_OK",
@@ -70,7 +70,7 @@
         "EVIDENCE_INDEX_MIRROR_OK",
         "EVIDENCE_PATHS_VALIDATED_OK"
       ],
-      "name": "D3 — Internal Ops Identity Surface `/internal/version` (HDE-SEPA004.1 & 004.4)",
+      "name": "D3 \u2014 Internal Ops Identity Surface `/internal/version` (HDE-SEPA004.1 & 004.4)",
       "status": "pending",
       "tokens": [
         "INTVER_200_CTYPE_JSON_UTF8_OK",
@@ -102,18 +102,18 @@
     }
   ],
   "manifest": "audit/EPIC020_MANIFEST.json",
-  "pf20_ref": "PF20 §2.5 HDE-EPIC020",
+  "pf20_ref": "PF20 \u00a72.5 HDE-EPIC020",
   "token_status": {
     "CLI_STDOUT_LF_OK": {
       "artifacts": [],
-      "status": "PARTIAL",
+      "status": "DONE",
       "tests": [
         "tests/cli/test_cli_usage_and_errors.py::test_success_writes_stdout_only"
       ]
     },
     "CLI_STDERR_ONLY_ON_ERROR_OK": {
       "artifacts": [],
-      "status": "PARTIAL",
+      "status": "DONE",
       "tests": [
         "tests/cli/test_cli_usage_and_errors.py::test_missing_file_returns_64_and_stderr",
         "tests/cli/test_cli_usage_and_errors.py::test_bad_json_returns_64_and_stderr",
@@ -122,30 +122,89 @@
       ]
     },
     "ERROR_JSON_CANON_OK": {
-      "artifacts": [],
-      "status": "PARTIAL",
+      "artifacts": [
+        "errors/schema_check/error_envelope_invalid_json.log",
+        "errors/schema_check/error_envelope_invalid_viewer_prefs.log"
+      ],
+      "status": "DONE",
       "tests": [
         "tests/adapter/test_jsonschema.py::test_error_envelope_schema_on_unauthorized_prod",
-        "tests/adapter/test_jsonschema.py::test_notfound_uses_error_schema"
+        "tests/adapter/test_jsonschema.py::test_notfound_uses_error_schema",
+        "tests/cli/test_errors_parity.py::test_http_and_cli_parity"
       ]
     },
     "JSON_CANONICAL_CHECK_OK": {
-      "artifacts": [],
-      "status": "PARTIAL",
+      "artifacts": [
+        "errors/schema_check/error_envelope_invalid_json.log",
+        "errors/schema_check/error_envelope_invalid_viewer_prefs.log"
+      ],
+      "status": "DONE",
       "tests": [
         "tests/adapter/test_jsonschema.py::test_error_envelope_schema_on_unauthorized_prod",
-        "tests/adapter/test_jsonschema.py::test_notfound_uses_error_schema"
+        "tests/adapter/test_jsonschema.py::test_notfound_uses_error_schema",
+        "tests/cli/test_errors_parity.py::test_http_and_cli_parity"
       ]
     },
     "ERROR_TOKEN_MAP_OK": {
-      "artifacts": [],
-      "status": "PARTIAL",
+      "artifacts": [
+        "errors/token_map/token_map.json"
+      ],
+      "status": "DONE",
       "tests": [
         "tests/adapter/test_diagnostic_writer.py::test_diagnostic_writer_rejects_wrong_content_type",
         "tests/adapter/test_diagnostic_writer.py::test_diagnostic_writer_rejects_malformed_json",
         "tests/adapter/test_diagnostic_writer.py::test_diagnostic_writer_rejects_unknown_keys",
         "tests/adapter/test_diagnostic_writer.py::test_diagnostic_writer_enforces_size_cap",
-        "tests/adapter/test_diagnostic_writer.py::test_diagnostic_writer_rejects_non_object"
+        "tests/adapter/test_diagnostic_writer.py::test_diagnostic_writer_rejects_non_object",
+        "tests/cli/test_errors_parity.py::test_token_map_snapshot_matches_canonical"
+      ]
+    },
+    "CLI_READER_EMITTER_PARITY_OK": {
+      "artifacts": [
+        "parity/errors_reader_cli.invalid_json.http.json",
+        "parity/errors_reader_cli.invalid_json.cli.txt",
+        "parity/errors_reader_cli.invalid_viewer_prefs.http.json",
+        "parity/errors_reader_cli.invalid_viewer_prefs.cli.txt"
+      ],
+      "status": "DONE",
+      "tests": [
+        "tests/cli/test_errors_parity.py::test_http_and_cli_parity"
+      ]
+    },
+    "EVIDENCE_INDEX_UPDATED_OK": {
+      "artifacts": [
+        "docs/evidence/INDEX.json",
+        "docs/evidence/INDEX.sha256",
+        "artifacts/evidence_index.jsonl"
+      ],
+      "status": "DONE",
+      "tests": [
+        "tests/evidence/test_evidence_skeleton.py::test_index_canonical_and_hash_matches",
+        "tests/evidence/test_evidence_skeleton.py::test_index_entries_have_mirrors_and_path_proofs",
+        "tests/evidence/test_evidence_skeleton.py::test_mirror_schema_and_parity",
+        "tests/ops/test_evidence_index.py::test_evidence_index_has_required_artifacts",
+        "tests/evidence/test_machine_mirror_self_proof.py::test_machine_mirror_self_proof_matches_canonical_digest"
+      ]
+    },
+    "EVIDENCE_INDEX_MIRROR_OK": {
+      "artifacts": [
+        "artifacts/evidence_index.jsonl"
+      ],
+      "status": "DONE",
+      "tests": [
+        "tests/evidence/test_evidence_skeleton.py::test_mirror_schema_and_parity",
+        "tests/evidence/test_machine_mirror_self_proof.py::test_machine_mirror_self_proof_matches_canonical_digest"
+      ]
+    },
+    "EVIDENCE_PATHS_VALIDATED_OK": {
+      "artifacts": [
+        "docs/evidence/INDEX.json",
+        "artifacts/evidence_index.jsonl"
+      ],
+      "status": "DONE",
+      "tests": [
+        "tests/evidence/test_evidence_skeleton.py::test_index_entries_have_mirrors_and_path_proofs",
+        "tests/ops/test_evidence_index.py::test_evidence_index_has_required_artifacts"
       ]
     }
   }

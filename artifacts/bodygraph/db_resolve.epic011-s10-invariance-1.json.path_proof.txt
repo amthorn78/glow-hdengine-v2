@@ -1,5 +1,5 @@
 path: artifacts/bodygraph/db_resolve.epic011-s10-invariance-1.json
 size_bytes: 259
 sha256: 5226051a12100ae06a91e17ed3264afba177708f18424666c1aefd4d85f395aa
-mtime_utc: 2025-12-02T14:23:58Z
+mtime_utc: 2025-12-04T17:26:38Z
 produced_at_utc: 2025-11-22T02:27:04Z

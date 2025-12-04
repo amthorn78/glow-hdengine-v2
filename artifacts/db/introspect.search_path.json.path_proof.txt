@@ -1,5 +1,5 @@
 path: artifacts/db/introspect.search_path.json
 size_bytes: 44
 sha256: f1ffbbc605876edc91955fb149b016bf9b15a66bff74989ecf993cb5940d7f35
-mtime_utc: 2025-12-02T14:23:58Z
+mtime_utc: 2025-12-04T17:26:38Z
 produced_at_utc: 2025-11-22T02:27:04Z

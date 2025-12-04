@@ -1,5 +1,5 @@
 path: artifacts/db_bridge/query_select_1.json
 size_bytes: 63
 sha256: bd919ec13cc10567b72b81f4326a8b525d4db8a2d8914fc884b86a6530726862
-mtime_utc: 2025-12-02T14:23:58Z
+mtime_utc: 2025-12-04T17:26:38Z
 produced_at_utc: 2025-11-22T02:27:04Z

@@ -1,5 +1,5 @@
 path: docs/schemas/sampler/diversity_artifacts.schema.json
 size_bytes: 2905
 sha256: df16679333483caa85aa8d78926d6471f83549ff7bd39716d5cdb93f51d561e0
-mtime_utc: 2025-12-02T14:23:58Z
+mtime_utc: 2025-12-04T17:26:38Z
 produced_at_utc: 2025-11-30T03:58:47Z

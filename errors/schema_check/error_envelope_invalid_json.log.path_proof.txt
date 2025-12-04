@@ -1,0 +1,5 @@
+path: errors/schema_check/error_envelope_invalid_json.log
+size_bytes: 76
+sha256: b4fcb4834b589d6b7a177269f48a73893352bea1e93697222dff65a24a3ae637
+mtime_utc: 2025-12-04T17:34:03Z
+produced_at_utc: 2025-11-30T03:58:47Z
