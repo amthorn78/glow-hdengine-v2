@@ -1,0 +1,107 @@
+{
+  "epic_id": "HDE-EPIC020",
+  "epic_name": "Separation Pass 1 — Error & Identity Surfaces",
+  "foundations": [
+    {
+      "deliverable": "D1",
+      "manifest_tokens": [
+        "ERROR_JSON_CANON_OK",
+        "JSON_CANONICAL_CHECK_OK",
+        "ERROR_TOKEN_MAP_OK",
+        "CLI_READER_EMITTER_PARITY_OK",
+        "CLI_STDOUT_LF_OK",
+        "CLI_STDERR_ONLY_ON_ERROR_OK",
+        "EVIDENCE_INDEX_UPDATED_OK",
+        "EVIDENCE_INDEX_MIRROR_OK",
+        "EVIDENCE_PATHS_VALIDATED_OK"
+      ],
+      "name": "D1 — Error Envelope & Token Set (HDE-SEPA002.*)",
+      "status": "pending",
+      "tokens": [
+        "ERROR_JSON_CANON_OK",
+        "JSON_CANONICAL_CHECK_OK",
+        "ERROR_TOKEN_MAP_OK",
+        "CLI_READER_EMITTER_PARITY_OK",
+        "CLI_STDOUT_LF_OK",
+        "CLI_STDERR_ONLY_ON_ERROR_OK",
+        "EVIDENCE_INDEX_UPDATED_OK",
+        "EVIDENCE_INDEX_MIRROR_OK",
+        "EVIDENCE_PATHS_VALIDATED_OK"
+      ]
+    },
+    {
+      "deliverable": "D2",
+      "manifest_tokens": [
+        "CLI_READER_EMITTER_PARITY_OK",
+        "CLI_SHOWCOMPAT_CANON_OK",
+        "JSON_CANONICAL_CHECK_OK",
+        "CLI_STDOUT_LF_OK",
+        "CLI_STDERR_ONLY_ON_ERROR_OK",
+        "TWO_RUN_IDENTITY_OK",
+        "COMPOSITE_ABBA_IDENTITY_OK",
+        "PREIMAGE_RECOMPUTE_OK",
+        "EVIDENCE_INDEX_UPDATED_OK",
+        "EVIDENCE_INDEX_MIRROR_OK",
+        "EVIDENCE_PATHS_VALIDATED_OK"
+      ],
+      "name": "D2 — Public Presenter / Emitter (HDE-SEPA003.*)",
+      "status": "pending",
+      "tokens": [
+        "CLI_READER_EMITTER_PARITY_OK",
+        "CLI_SHOWCOMPAT_CANON_OK",
+        "JSON_CANONICAL_CHECK_OK",
+        "CLI_STDOUT_LF_OK",
+        "CLI_STDERR_ONLY_ON_ERROR_OK",
+        "TWO_RUN_IDENTITY_OK",
+        "COMPOSITE_ABBA_IDENTITY_OK",
+        "PREIMAGE_RECOMPUTE_OK",
+        "EVIDENCE_INDEX_UPDATED_OK",
+        "EVIDENCE_INDEX_MIRROR_OK",
+        "EVIDENCE_PATHS_VALIDATED_OK"
+      ]
+    },
+    {
+      "deliverable": "D3",
+      "manifest_tokens": [
+        "INTVER_200_CTYPE_JSON_UTF8_OK",
+        "INTVER_HEAD_PARITY_OK",
+        "TWO_RUN_IDENTITY_OK",
+        "EVIDENCE_INDEX_UPDATED_OK",
+        "EVIDENCE_INDEX_MIRROR_OK",
+        "EVIDENCE_PATHS_VALIDATED_OK"
+      ],
+      "name": "D3 — Internal Ops Identity Surface `/internal/version` (HDE-SEPA004.1 & 004.4)",
+      "status": "pending",
+      "tokens": [
+        "INTVER_200_CTYPE_JSON_UTF8_OK",
+        "INTVER_HEAD_PARITY_OK",
+        "TWO_RUN_IDENTITY_OK",
+        "EVIDENCE_INDEX_UPDATED_OK",
+        "EVIDENCE_INDEX_MIRROR_OK",
+        "EVIDENCE_PATHS_VALIDATED_OK"
+      ]
+    },
+    {
+      "deliverable": "GLOBAL",
+      "manifest_tokens": [
+        "QA_PRECOMMIT_CHECKLIST_OK",
+        "QA_POSTCOMMIT_CHECKLIST_OK",
+        "QA_EVIDENCE_ONLY_OK",
+        "QA_CI_DIFF_SCOPED_OK",
+        "ENV_RAILS_POLICY_OK"
+      ],
+      "name": "Global QA rails (PF19 QA token library)",
+      "status": "pending",
+      "tokens": [
+        "QA_PRECOMMIT_CHECKLIST_OK",
+        "QA_POSTCOMMIT_CHECKLIST_OK",
+        "QA_EVIDENCE_ONLY_OK",
+        "QA_CI_DIFF_SCOPED_OK",
+        "ENV_RAILS_POLICY_OK"
+      ]
+    }
+  ],
+  "manifest": "audit/EPIC020_MANIFEST.json",
+  "pf20_ref": "PF20 §2.5 HDE-EPIC020",
+  "token_status": {}
+}
