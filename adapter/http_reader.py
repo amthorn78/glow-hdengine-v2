@@ -11,6 +11,7 @@ from engine.narratives import emit_public_aux, get_pack
 from engine.sampler.core import CandidateFeatures, ViewerProfile, sample_and_rank
 from adapter.no_io_guard import NoIoGuard
 from engine.compat.errors import error_envelope
+from engine.http.compat_handler import compat_blueprint
 
 _PROCESS_STARTED_AT = datetime.now(timezone.utc)
 _PROCESS_PID = os.getpid()
@@ -696,6 +697,31 @@ def create_app():
     except Exception as _e:
         # if bp is not defined yet, raise a clear error for operator
         raise RuntimeError("Blueprint 'bp' not found in adapter/http_reader.py") from _e
+
+    # compat blueprint (shared with wsgi) -- scoped to compat routes only
+    app.register_blueprint(compat_blueprint)
+
+    def _compat_error_response(status: int) -> Response:
+        envelope = error_envelope("ERR_NOT_FOUND")
+        payload = emit_public(envelope)
+        resp = Response(payload, status=status, mimetype="application/json; charset=utf-8")
+        resp.headers["Cache-Control"] = "no-store"
+        resp.headers.pop("ETag", None)
+        resp.headers.pop("Content-Encoding", None)
+        resp.headers["Content-Length"] = str(len(payload))
+        return resp
+
+    @app.errorhandler(404)
+    def _compat_scoped_not_found(err):  # type: ignore[override]
+        if request.path.rstrip("/").startswith("/api/compat/v1"):
+            return _compat_error_response(404)
+        return err
+
+    @app.errorhandler(405)
+    def _compat_scoped_method_not_allowed(err):  # type: ignore[override]
+        if request.path.rstrip("/").startswith("/api/compat/v1"):
+            return _compat_error_response(405)
+        return err
 
     @app.after_request
     def _strip_etag_on_internal(resp):
