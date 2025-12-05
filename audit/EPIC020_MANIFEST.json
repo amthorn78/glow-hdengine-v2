@@ -177,6 +177,21 @@
     "QA_CI_DIFF_SCOPED_OK": [
       "docs/QA_CHECKLIST_EPIC020.md"
     ],
+    "EPIC020.D1.HTTP_COMPAT_MALFORMED_JSON": {
+      "d_goal": "D1",
+      "status": "DONE",
+      "tests": [
+        "tests/adapter/test_compat_http_dev.py::test_dev_compat_malformed_json_returns_governed_error_json",
+        "tests/adapter/test_compat_http_dev.py::test_dev_compat_minimal_valid_payload_success_behavior",
+        "tests/adapter/test_compat_http_parity.py::test_dev_vs_wsgi_compat_parity_malformed_json",
+        "tests/adapter/test_compat_http_parity.py::test_dev_vs_wsgi_compat_parity_minimal_valid_payload"
+      ],
+      "artifacts": [
+        "artifacts/compat/dev_malformed.json",
+        "artifacts/compat/dev_wsgi_parity.log"
+      ],
+      "notes": "Dev harness compat HTTP malformed-JSON & minimal payload parity vs wsgi, under closed rails."
+    },
     "ENV_RAILS_POLICY_OK": [
       "docs/QA_CHECKLIST_EPIC020.md",
       "audit/gates/determinism/env_pins.log",
