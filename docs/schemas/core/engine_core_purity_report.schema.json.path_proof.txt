@@ -1,5 +1,5 @@
 path: docs/schemas/core/engine_core_purity_report.schema.json
 size_bytes: 1118
 sha256: 89c3944bf1a3b1cd55ab721c320c55afd683fb703634b5cb91487b4a36b5e537
-mtime_utc: 2025-12-05T21:57:05Z
+mtime_utc: 2025-12-05T22:10:26Z
 produced_at_utc: 2025-11-30T03:58:47Z

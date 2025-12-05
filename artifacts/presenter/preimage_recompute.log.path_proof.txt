@@ -1,5 +1,5 @@
 path: artifacts/presenter/preimage_recompute.log
 size_bytes: 171
 sha256: 8922fd390c67f4f3c8f0b1e614e7c83c8257757a80e82f84debb6502a7ad03bf
-mtime_utc: 2025-12-05T21:57:05Z
+mtime_utc: 2025-12-05T22:10:26Z
 produced_at_utc: 2025-11-30T03:58:47Z
