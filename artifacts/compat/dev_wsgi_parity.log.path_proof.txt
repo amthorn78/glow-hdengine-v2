@@ -1,0 +1,5 @@
+path: artifacts/compat/dev_wsgi_parity.log
+size_bytes: 6084
+sha256: 54c52cf04f3b3b41ce28dc2c30e967fab51ce4074615b62c343d9a967618ecef
+mtime_utc: 2025-12-05T21:57:20Z
+produced_at_utc: 2025-11-30T03:58:47Z

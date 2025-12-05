@@ -305,13 +305,16 @@ def main(argv: list[str] | None = None) -> None:
     _write_if_changed(HASH_SENTINEL, hash_line, check=args.check)
 
     mirror_bytes, mirror_rec = _render_mirror(entries, produced_default=produced_default, check=args.check)
+    mirror_sha = _sha256_bytes(mirror_bytes)
+    mirror_size = len(mirror_bytes)
+    mirror_rec["size_bytes"] = mirror_size
     _write_if_changed(MIRROR_PATH, mirror_bytes, check=args.check)
 
     mirror_stat = MIRROR_PATH.stat()
     proof_anchor, produced_at = _write_path_proof(
         MIRROR_REL,
-        sha256=str(mirror_rec["sha256"]),
-        size_bytes=int(mirror_rec["size_bytes"]),
+        sha256=mirror_sha,
+        size_bytes=mirror_size,
         mtime_utc=mirror_proof_existing.get("mtime_utc"),
         produced_at=str(mirror_rec.get("produced_at_utc")),
         default_produced_at=produced_default,

@@ -1,5 +1,5 @@
 path: parity/errors_reader_cli.invalid_viewer_prefs.http.json
 size_bytes: 307
 sha256: b7bb766ee8e55135aeafeac5ba428e1efef65db93d5de056fa1ca2c273cd8795
-mtime_utc: 2025-12-04T22:19:39Z
+mtime_utc: 2025-12-05T21:57:05Z
 produced_at_utc: 2025-11-30T03:58:47Z

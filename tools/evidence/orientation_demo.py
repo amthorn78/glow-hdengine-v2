@@ -16,6 +16,7 @@ if str(ROOT) not in sys.path:
 from tools.evidence.update_evidence_index import (  # noqa: E402
     MIRROR_PATH,
     ROOT as EVIDENCE_ROOT,
+    _sha256_bytes,
     _load_existing_proof,
     _load_human_index,
 )
@@ -72,10 +73,18 @@ def _validate(entries: Iterable[dict[str, str]], records: Iterable[dict[str, obj
                 _dt.datetime.fromisoformat(mtime.replace("Z", "+00:00"))
             except ValueError:
                 messages.append(f"PROOF_MTIME_FORMAT {key[0]} {mtime}")
-        if sha != rec.get("sha256"):
-            messages.append(f"SHA_MISMATCH {key[0]} {sha}!={rec.get('sha256')}")
-        if size is None or int(size) != rec.get("size_bytes"):
-            messages.append(f"SIZE_MISMATCH {key[0]} {size}!={rec.get('size_bytes')}")
+        artifact_bytes = artifact_path.read_bytes()
+        artifact_sha = _sha256_bytes(artifact_bytes)
+        artifact_size = len(artifact_bytes)
+        if sha != artifact_sha:
+            messages.append(f"SHA_MISMATCH {key[0]} {sha}!={artifact_sha}")
+        if size is None or int(size) != artifact_size:
+            messages.append(f"SIZE_MISMATCH {key[0]} {size}!={artifact_size}")
+        if key[0] != "index.machine_mirror":
+            if sha != rec.get("sha256"):
+                messages.append(f"SHA_MIRROR_MISMATCH {key[0]} {sha}!={rec.get('sha256')}")
+            if rec.get("size_bytes") != artifact_size:
+                messages.append(f"SIZE_MIRROR_MISMATCH {key[0]} {rec.get('size_bytes')}!={artifact_size}")
 
     return messages, total
 
