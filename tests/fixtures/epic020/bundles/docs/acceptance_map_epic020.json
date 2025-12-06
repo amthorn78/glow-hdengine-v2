@@ -1,0 +1,23 @@
+{
+  "epic_id": "HDE-EPIC020",
+  "token_status": {
+    "EPIC020.D1.HTTP_COMPAT_MALFORMED_JSON": {
+      "artifacts": [
+        {
+          "artifact_key": "EPIC020.D1.HTTP_COMPAT_MALFORMED_JSON",
+          "bundle_artifact_key": "EPIC020.D1.HTTP_COMPAT_HTTP_BUNDLE",
+          "path": "artifacts/compat/invalid_payload.json"
+        }
+      ]
+    },
+    "EPIC020.D1.HTTP_COMPAT_MINIMAL_VALID": {
+      "artifacts": [
+        {
+          "artifact_key": "EPIC020.D1.HTTP_COMPAT_MINIMAL_VALID",
+          "bundle_artifact_key": "EPIC020.D1.HTTP_COMPAT_HTTP_BUNDLE",
+          "path": "artifacts/compat/minimal_valid.json"
+        }
+      ]
+    }
+  }
+}
