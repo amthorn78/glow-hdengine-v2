@@ -55,10 +55,10 @@ def _iso_now() -> str:
 
 
 def _rails_env() -> dict[str, str]:
-    env = os.environ.copy()
+    env = os.environ
     env.setdefault("APP_ENV", "dev")
     ensure_determinism_env(environ=env, apply=True)
-    return env
+    return dict(env)
 
 
 def _canonical_write(path: Path, payload: Mapping[str, object]) -> bytes:
