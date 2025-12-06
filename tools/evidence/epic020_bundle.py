@@ -107,7 +107,12 @@ def _discover_artifacts(
         artifacts = entry.get("artifacts", []) if isinstance(entry, Mapping) else []
         for raw in artifacts:
             if isinstance(raw, Mapping):
-                path_value = raw.get("path") or raw.get("artifact_path") or raw.get("artifact_key")
+                path_value = (
+                    raw.get("path")
+                    or raw.get("artifact_path")
+                    or raw.get("discovered_physical_path")
+                    or raw.get("artifact_key")
+                )
                 artifact_key = raw.get("artifact_key") or raw.get("bundle_artifact_key") or path_value
                 bundle_key = raw.get("bundle_artifact_key") or raw.get("artifact_key") or token
             else:
@@ -118,6 +123,12 @@ def _discover_artifacts(
             if not path_value:
                 raise Epic020BundleError(f"Artifact entry for token {token} is missing physical path")
             rel_path = Path(str(path_value))
+            if rel_path.name.endswith((".bundle.json", ".manifest.json")) and Path(
+                "artifacts/epic020/bundles"
+            ) in rel_path.parents:
+                # Skip generated bundle/manifest outputs listed in acceptance map inputs
+                continue
+
             physical_path = base_dir / rel_path
             if not physical_path.is_file():
                 raise Epic020BundleError(f"Artifact path {physical_path} not found for {artifact_key}")

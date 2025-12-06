@@ -145,3 +145,85 @@ def test_epic020_bundle_handles_string_artifact_entries(tmp_path: Path) -> None:
         dry_run=True,
     )
     assert result.returncode == 0, result.stderr
+
+
+def test_epic020_bundle_accepts_discovered_physical_path_entries(tmp_path: Path) -> None:
+    acceptance_map = tmp_path / "acceptance_map_epic020.json"
+    acceptance_map.write_text(
+        json.dumps(
+            {
+                "epic_id": "HDE-EPIC020",
+                "token_status": {
+                    "EPIC020.D1.HTTP_COMPAT_MALFORMED_JSON": {
+                        "artifacts": [
+                            {
+                                "artifact_key": "EPIC020.D1.HTTP_COMPAT_MALFORMED_JSON",
+                                "bundle_artifact_key": "EPIC020.D1.HTTP_COMPAT_HTTP_BUNDLE",
+                                "discovered_physical_path": "artifacts/compat/invalid_payload.json",
+                            }
+                        ]
+                    }
+                },
+            }
+        )
+        + "\n"
+    )
+
+    result = _run_tool(
+        tmp_path,
+        "build",
+        acceptance_map=acceptance_map,
+        audit_manifest=_fixture_root("audit/EPIC020_MANIFEST.json"),
+        base_dir=_fixture_root(""),
+        dry_run=True,
+    )
+
+    assert result.returncode == 0, result.stderr
+
+
+def test_epic020_bundle_ignores_outputs_listed_as_artifacts(tmp_path: Path) -> None:
+    acceptance_map = tmp_path / "acceptance_map_epic020.json"
+    acceptance_map.write_text(
+        json.dumps(
+            {
+                "epic_id": "HDE-EPIC020",
+                "token_status": {
+                    "EPIC020.D1.HTTP_COMPAT_MALFORMED_JSON": {
+                        "artifacts": [
+                            {
+                                "artifact_key": "EPIC020.D1.HTTP_COMPAT_MALFORMED_JSON",
+                                "bundle_artifact_key": "EPIC020.D1.HTTP_COMPAT_HTTP_BUNDLE",
+                                "discovered_physical_path": "artifacts/compat/invalid_payload.json",
+                            },
+                            {
+                                "artifact_key": "EPIC020.D1.HTTP_COMPAT_HTTP_BUNDLE",
+                                "bundle_artifact_key": "EPIC020.D1.HTTP_COMPAT_HTTP_BUNDLE",
+                                "discovered_physical_path": "artifacts/epic020/bundles/EPIC020.D1.HTTP_COMPAT_HTTP_BUNDLE.bundle.json",
+                            },
+                            {
+                                "artifact_key": "EPIC020.D1.HTTP_COMPAT_HTTP_BUNDLE",
+                                "bundle_artifact_key": "EPIC020.D1.HTTP_COMPAT_HTTP_BUNDLE",
+                                "discovered_physical_path": "artifacts/epic020/bundles/EPIC020.D1.HTTP_COMPAT_HTTP_BUNDLE.manifest.json",
+                            },
+                        ]
+                    }
+                },
+            }
+        )
+        + "\n",
+    )
+
+    result = _run_tool(
+        tmp_path,
+        "build",
+        acceptance_map=acceptance_map,
+        audit_manifest=_fixture_root("audit/EPIC020_MANIFEST.json"),
+        base_dir=_fixture_root(""),
+    )
+
+    assert result.returncode == 0, result.stderr
+
+    bundle_path = tmp_path / "artifacts" / "EPIC020.D1.HTTP_COMPAT_HTTP_BUNDLE.bundle.json"
+    bundle = _load_json(bundle_path)
+    assert len(bundle["members"]) == 1
+    assert all("/epic020/bundles/" not in member["discovered_physical_path"] for member in bundle["members"])
