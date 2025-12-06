@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 from tools.evidence import orientation_demo
@@ -15,6 +16,17 @@ def test_orientation_report_matches_files(tmp_path):
 def test_orientation_detects_mismatch(tmp_path, monkeypatch):
     entries = [{"artifact_key": "demo", "discovered_physical_path": "missing/path.txt"}]
     records = []
-    messages, total = orientation_demo._validate(entries, records)
+    mirror_lines = [
+        json.dumps(
+            {
+                "artifact_key": "index.machine_mirror",
+                "discovered_physical_path": "docs/evidence/INDEX.json",
+                "sha256": "",
+                "size_bytes": 0,
+            }
+        )
+        + "\n"
+    ]
+    messages, total = orientation_demo._validate(entries, records, mirror_lines=mirror_lines)
     assert total == 1
     assert messages and messages[0].startswith("MISSING_MIRROR")
