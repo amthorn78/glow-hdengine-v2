@@ -102,27 +102,22 @@ def _discover_artifacts(
 
     token_status = acceptance.get("token_status", {})
     descriptors: list[ArtifactDescriptor] = []
+
     for token, entry in sorted(token_status.items()):
         artifacts = entry.get("artifacts", []) if isinstance(entry, Mapping) else []
         for raw in artifacts:
-            if not isinstance(raw, Mapping):
-                raise Epic020BundleError(
-                    f"Artifact entry for token {token} must include artifact_key/bundle_artifact_key; missing in {raw!r}"
-                )
-            artifact_key = raw.get("artifact_key")
-            bundle_key = raw.get("bundle_artifact_key")
-            path_value = raw.get("path") or raw.get("artifact_path")
-            if not artifact_key:
-                raise Epic020BundleError(
-                    f"Artifact entry for token {token} is missing artifact_key (PF10/PF12 canon gap)"
-                )
-            if not bundle_key:
-                raise Epic020BundleError(
-                    f"Artifact {artifact_key} is missing bundle_artifact_key (PF10/PF12 canon gap)"
-                )
+            if isinstance(raw, Mapping):
+                path_value = raw.get("path") or raw.get("artifact_path") or raw.get("artifact_key")
+                artifact_key = raw.get("artifact_key") or raw.get("bundle_artifact_key") or path_value
+                bundle_key = raw.get("bundle_artifact_key") or raw.get("artifact_key") or token
+            else:
+                path_value = raw
+                artifact_key = raw
+                bundle_key = token
+
             if not path_value:
-                raise Epic020BundleError(f"Artifact {artifact_key} is missing physical path")
-            rel_path = Path(path_value)
+                raise Epic020BundleError(f"Artifact entry for token {token} is missing physical path")
+            rel_path = Path(str(path_value))
             physical_path = base_dir / rel_path
             if not physical_path.is_file():
                 raise Epic020BundleError(f"Artifact path {physical_path} not found for {artifact_key}")

@@ -30,10 +30,22 @@ def _fixture_root(name: str) -> Path:
     return REPO_ROOT / "tests" / "fixtures" / "epic020" / "bundles" / name
 
 
-def _run_tool(tmp_path: Path, mode: str, extra_env: dict[str, str] | None = None, dry_run: bool = False) -> subprocess.CompletedProcess:
+def _run_tool(
+    tmp_path: Path,
+    mode: str,
+    *,
+    acceptance_map: Path | None = None,
+    audit_manifest: Path | None = None,
+    base_dir: Path | None = None,
+    extra_env: dict[str, str] | None = None,
+    dry_run: bool = False,
+) -> subprocess.CompletedProcess:
     env = _env_with_rails()
     if extra_env:
         env.update(extra_env)
+    acceptance_map = acceptance_map or _fixture_root("docs/acceptance_map_epic020.json")
+    audit_manifest = audit_manifest or _fixture_root("audit/EPIC020_MANIFEST.json")
+    base_dir = base_dir or _fixture_root("")
     args = [
         "python",
         "-m",
@@ -42,13 +54,13 @@ def _run_tool(tmp_path: Path, mode: str, extra_env: dict[str, str] | None = None
         "--epic-id",
         "HDE-EPIC020",
         "--acceptance-map",
-        str(_fixture_root("docs/acceptance_map_epic020.json")),
+        str(acceptance_map),
         "--audit-manifest",
-        str(_fixture_root("audit/EPIC020_MANIFEST.json")),
+        str(audit_manifest),
         "--out-dir",
         str(tmp_path / "artifacts"),
         "--base-dir",
-        str(_fixture_root("")),
+        str(base_dir),
     ]
     if dry_run:
         args.append("--dry-run")
@@ -121,3 +133,15 @@ def test_epic020_bundle_check_mode_validates_without_writing(tmp_path: Path) -> 
     failure = _run_tool(tmp_path, "check")
     assert failure.returncode != 0
     assert "mismatch" in failure.stderr.lower()
+
+
+def test_epic020_bundle_handles_string_artifact_entries(tmp_path: Path) -> None:
+    result = _run_tool(
+        tmp_path,
+        "build",
+        acceptance_map=REPO_ROOT / "docs" / "acceptance_map_epic020.json",
+        audit_manifest=REPO_ROOT / "audit" / "EPIC020_MANIFEST.json",
+        base_dir=REPO_ROOT,
+        dry_run=True,
+    )
+    assert result.returncode == 0, result.stderr
