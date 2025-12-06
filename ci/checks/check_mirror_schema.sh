@@ -5,7 +5,7 @@ import json
 import sys
 from pathlib import Path
 
-REQUIRED_KEYS = [
+REQUIRED_KEYS = {
     "artifact_key",
     "discovered_physical_path",
     "produced_at_utc",
@@ -13,7 +13,17 @@ REQUIRED_KEYS = [
     "role",
     "sha256",
     "size_bytes",
-]
+}
+
+OPTIONAL_KEYS = {
+    "epic_id",
+    "notes",
+    "record_type",
+    "schema_version",
+    "tokens",
+}
+
+EPIC020_ACCEPTANCE = Path("docs/acceptance_map_epic020.json")
 
 
 def sha256(path: Path) -> str:
@@ -36,6 +46,15 @@ def load_proof(path: Path):
     return data
 
 
+def load_epic020_tokens():
+    if not EPIC020_ACCEPTANCE.exists():
+        return set()
+    payload = json.loads(EPIC020_ACCEPTANCE.read_text())
+    if payload.get("epic_id") != "HDE-EPIC020":
+        return set()
+    return set(payload.get("token_status", {}))
+
+
 def parse_utc_iso8601(raw: str) -> _dt.datetime:
     dt = _dt.datetime.fromisoformat(raw.replace("Z", "+00:00"))
     if dt.tzinfo != _dt.timezone.utc:
@@ -56,6 +75,7 @@ def main():
         return 1
 
     lines = index_path.read_text().splitlines(True)
+    epic020_tokens = load_epic020_tokens()
     for i, raw in enumerate(lines, 1):
         if not raw:
             print(f"EMPTY:{i}", file=sys.stderr)
@@ -69,8 +89,13 @@ def main():
             continue
 
         key_set = set(obj.keys())
-        if key_set != set(REQUIRED_KEYS):
-            print(f"KEYS:{i}:{sorted(key_set)}", file=sys.stderr)
+        missing_keys = REQUIRED_KEYS - key_set
+        extra_keys = key_set - (REQUIRED_KEYS | OPTIONAL_KEYS)
+        if missing_keys:
+            print(f"KEYS_MISSING:{i}:{sorted(missing_keys)}", file=sys.stderr)
+            ok = False
+        if extra_keys:
+            print(f"KEYS_EXTRA:{i}:{sorted(extra_keys)}", file=sys.stderr)
             ok = False
 
         key_pair = (obj["artifact_key"], obj["discovered_physical_path"])
@@ -83,6 +108,21 @@ def main():
             print(f"SORT:{i}:{(obj['artifact_key'], obj['discovered_physical_path'])} < {prev}", file=sys.stderr)
             ok = False
         prev = (obj["artifact_key"], obj["discovered_physical_path"])
+
+        if "tokens" in obj:
+            tokens = obj.get("tokens")
+            if not isinstance(tokens, list) or not tokens:
+                print(f"TOKENS:{i}:{tokens}", file=sys.stderr)
+                ok = False
+            elif obj.get("epic_id") == "HDE-EPIC020":
+                if not epic020_tokens:
+                    print(f"TOKENS_CANON_GAP:{i}", file=sys.stderr)
+                    ok = False
+                else:
+                    invalid = [tok for tok in tokens if tok not in epic020_tokens]
+                    if invalid:
+                        print(f"TOKENS_CANON:{i}:{invalid}", file=sys.stderr)
+                        ok = False
 
         artifact_path = Path(obj["discovered_physical_path"])
         proof_path = Path(obj["proof_anchor"])

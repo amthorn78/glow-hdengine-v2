@@ -1,0 +1,5 @@
+path: artifacts/epic020/bundles/ENV_RAILS_POLICY_OK.bundle.json
+size_bytes: 1104
+sha256: bccbba588de717168f49ff637fa8c97acbd7864bc77abb00ec249fa718814d67
+mtime_utc: 2025-12-06T04:12:03Z
+produced_at_utc: 2025-12-06T04:11:16Z

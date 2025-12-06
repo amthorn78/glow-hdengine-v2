@@ -1,0 +1,5 @@
+path: artifacts/epic020/bundles/PREIMAGE_RECOMPUTE_OK.manifest.json
+size_bytes: 927
+sha256: 66ca08440d8abf8e730ff67c1693a3571cf825952ce2e941003cd540a1e34ebb
+mtime_utc: 2025-12-06T04:12:03Z
+produced_at_utc: 2025-12-06T04:11:16Z

@@ -27,18 +27,33 @@ def test_mirror_schema_and_parity():
 
     seen = set()
     prev = None
+    required_fields = {
+        "artifact_key",
+        "discovered_physical_path",
+        "produced_at_utc",
+        "proof_anchor",
+        "role",
+        "sha256",
+        "size_bytes",
+    }
+    optional_fields = {
+        "epic_id",
+        "notes",
+        "record_type",
+        "schema_version",
+        "tokens",
+    }
+    acceptance_tokens = set(json.loads(Path("docs/acceptance_map_epic020.json").read_text()).get("token_status", {}))
     for line in mirror:
         assert line.endswith("\n")
         rec = json.loads(line)
-        assert set(rec.keys()) == {
-            "artifact_key",
-            "discovered_physical_path",
-            "produced_at_utc",
-            "proof_anchor",
-            "role",
-            "sha256",
-            "size_bytes",
-        }
+        key_set = set(rec.keys())
+        assert required_fields.issubset(key_set)
+        assert key_set - (required_fields | optional_fields) == set()
+        if "tokens" in rec:
+            assert rec["tokens"], f"tokens missing for {rec['artifact_key']}"
+            if acceptance_tokens:
+                assert set(rec["tokens"]).issubset(acceptance_tokens)
         key = (rec["artifact_key"], rec["discovered_physical_path"])
         assert key not in seen
         seen.add(key)

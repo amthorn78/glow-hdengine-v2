@@ -1,0 +1,5 @@
+path: artifacts/epic020/bundles/CLI_SHOWCOMPAT_CANON_OK.bundle.json
+size_bytes: 795
+sha256: 50731be8c8a6b2bbf98ba9b712aac632e170cc9d7b9ab29f2b91e00dc34515cf
+mtime_utc: 2025-12-06T04:12:03Z
+produced_at_utc: 2025-12-06T04:11:16Z

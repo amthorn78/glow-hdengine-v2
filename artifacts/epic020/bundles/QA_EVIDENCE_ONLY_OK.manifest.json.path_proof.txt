@@ -1,0 +1,5 @@
+path: artifacts/epic020/bundles/QA_EVIDENCE_ONLY_OK.manifest.json
+size_bytes: 558
+sha256: e0002d1202d5d89af3e69d2d54ea2f34a161d0cde880362859eb4aa859c648f3
+mtime_utc: 2025-12-06T04:12:03Z
+produced_at_utc: 2025-12-06T04:11:16Z

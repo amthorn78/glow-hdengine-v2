@@ -17,17 +17,23 @@ import datetime as _dt
 import hashlib
 import json
 from pathlib import Path
-from typing import Iterable, Mapping
+from typing import Iterable, Mapping, Sequence
 
 ROOT = Path(__file__).resolve().parents[2]
 HUMAN_INDEX = ROOT / "docs/evidence/INDEX.json"
 HASH_SENTINEL = ROOT / "docs/evidence/INDEX.sha256"
 MIRROR_PATH = ROOT / "artifacts/evidence_index.jsonl"
 MIRROR_REL = MIRROR_PATH.relative_to(ROOT).as_posix()
+EPIC020_BUNDLE_DIR = ROOT / "artifacts" / "epic020" / "bundles"
+EPIC020_ACCEPTANCE_MAP = ROOT / "docs" / "acceptance_map_epic020.json"
 
 
 def _sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
+
+
+def _sha256_path(path: Path) -> str:
+    return _sha256_bytes(path.read_bytes())
 
 
 def _isoformat(dt: _dt.datetime) -> str:
@@ -146,31 +152,59 @@ def _write_path_proof(
     return proof_rel, produced
 
 
-def _normalize_index_entry(entry: Mapping[str, object]) -> dict[str, str]:
+_ALLOWED_INDEX_FIELDS = {
+    "artifact_key",
+    "discovered_physical_path",
+    "epic_id",
+    "record_type",
+    "schema_version",
+    "tokens",
+    "notes",
+    "produced_at_utc",
+    "sha256",
+    "size_bytes",
+}
+
+
+def _normalize_index_entry(entry: Mapping[str, object]) -> dict[str, object]:
     key = entry.get("artifact_key") or entry.get("title")
     path = entry.get("discovered_physical_path") or entry.get("path")
     if not isinstance(key, str) or not isinstance(path, str):
         raise ValueError(f"Invalid entry: {entry!r}")
-    return {"artifact_key": key, "discovered_physical_path": path}
+
+    normalized: dict[str, object] = {
+        "artifact_key": key,
+        "discovered_physical_path": path,
+    }
+
+    for field in _ALLOWED_INDEX_FIELDS:
+        if field in {"artifact_key", "discovered_physical_path"}:
+            continue
+        if field in entry:
+            value = entry[field]
+            if field == "tokens":
+                if not isinstance(value, (list, tuple)):
+                    raise ValueError(f"Invalid tokens for {key}: {value!r}")
+                value = list(value)
+            normalized[field] = value
+    return normalized
 
 
-def _load_human_index() -> list[dict[str, str]]:
-    payload = json.loads(HUMAN_INDEX.read_text(encoding="utf-8"))
-    entries = [_normalize_index_entry(entry) for entry in payload]
-    deduped: dict[tuple[str, str], dict[str, str]] = {}
+def _dedupe_entries(entries: Iterable[Mapping[str, object]]) -> list[dict[str, object]]:
+    deduped: dict[tuple[str, str], dict[str, object]] = {}
     for entry in entries:
-        deduped[(entry["artifact_key"], entry["discovered_physical_path"])] = entry
+        normalized = _normalize_index_entry(entry)
+        deduped[(normalized["artifact_key"], normalized["discovered_physical_path"])] = normalized
     return sorted(deduped.values(), key=lambda item: (item["artifact_key"], item["discovered_physical_path"]))
 
 
-def _render_human_index(entries: Iterable[Mapping[str, str]]) -> bytes:
-    normalized = [
-        {
-            "artifact_key": entry["artifact_key"],
-            "discovered_physical_path": entry["discovered_physical_path"],
-        }
-        for entry in entries
-    ]
+def _load_human_index() -> list[dict[str, object]]:
+    payload = json.loads(HUMAN_INDEX.read_text(encoding="utf-8"))
+    return _dedupe_entries(payload)
+
+
+def _render_human_index(entries: Iterable[Mapping[str, object]]) -> bytes:
+    normalized = _dedupe_entries(entries)
     return (json.dumps(normalized, separators=(",", ":"), sort_keys=True) + "\n").encode("utf-8")
 
 
@@ -188,6 +222,90 @@ def _role_for(entry: Mapping[str, str], roles: Mapping[tuple[str, str], str]) ->
     return "snapshot"
 
 
+def _load_epic020_tokens(epic_id: str) -> set[str]:
+    if epic_id != "HDE-EPIC020":
+        return set()
+    if not EPIC020_ACCEPTANCE_MAP.exists():
+        raise SystemExit("MISSING:docs/acceptance_map_epic020.json")
+    data = json.loads(EPIC020_ACCEPTANCE_MAP.read_text(encoding="utf-8"))
+    if data.get("epic_id") != epic_id:
+        raise SystemExit(f"EPIC_MISMATCH:{EPIC020_ACCEPTANCE_MAP}")
+    tokens = set(data.get("token_status", {}))
+    if not tokens:
+        raise SystemExit("CANON_GAP:EPIC020_TOKENS")
+    return tokens
+
+
+def _load_epic020_bundle_entries(epic_id: str, allowed_tokens: Sequence[str]) -> list[dict[str, object]]:
+    manifests = sorted(EPIC020_BUNDLE_DIR.glob("*.manifest.json"))
+    if not manifests:
+        raise SystemExit("MISSING_EPIC020_BUNDLES")
+
+    allowed = set(allowed_tokens)
+    if not allowed:
+        raise SystemExit("CANON_GAP:EPIC020_TOKENS")
+
+    entries: list[dict[str, object]] = []
+    for manifest_path in manifests:
+        manifest_rel = manifest_path.relative_to(ROOT).as_posix()
+        manifest_payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+        bundle_key = manifest_payload.get("artifact_key")
+        bundle_path_rel = manifest_payload.get("bundle_path")
+        produced_at = manifest_payload.get("produced_at_utc")
+        schema_version = manifest_payload.get("schema_version", "1.0")
+
+        if not bundle_key or not bundle_path_rel:
+            raise SystemExit(f"INVALID_MANIFEST:{manifest_rel}")
+        if produced_at is None:
+            raise SystemExit(f"MISSING_PRODUCED_AT:{manifest_rel}")
+        if bundle_key not in allowed:
+            raise SystemExit(f"CANON_GAP:{bundle_key}")
+
+        bundle_path = ROOT / bundle_path_rel
+        if not bundle_path.exists():
+            raise SystemExit(f"MISSING_BUNDLE:{bundle_path_rel}")
+
+        bundle_sha = _sha256_path(bundle_path)
+        bundle_size = bundle_path.stat().st_size
+        manifest_sha = _sha256_path(manifest_path)
+        manifest_size = manifest_path.stat().st_size
+
+        notes = f"EPIC020 Candidate 1 bundle for {bundle_key}"
+        tokens = [bundle_key]
+
+        entries.append(
+            {
+                "artifact_key": bundle_key,
+                "discovered_physical_path": bundle_path_rel,
+                "epic_id": epic_id,
+                "record_type": "epic020_bundle",
+                "schema_version": schema_version,
+                "produced_at_utc": produced_at,
+                "sha256": bundle_sha,
+                "size_bytes": bundle_size,
+                "tokens": tokens,
+                "notes": notes,
+            }
+        )
+
+        entries.append(
+            {
+                "artifact_key": bundle_key,
+                "discovered_physical_path": manifest_rel,
+                "epic_id": epic_id,
+                "record_type": "epic020_bundle_manifest",
+                "schema_version": schema_version,
+                "produced_at_utc": produced_at,
+                "sha256": manifest_sha,
+                "size_bytes": manifest_size,
+                "tokens": tokens,
+                "notes": f"EPIC020 Candidate 1 manifest for {bundle_key}",
+            }
+        )
+
+    return _dedupe_entries(entries)
+
+
 def _render_mirror(
     entries: Iterable[Mapping[str, str]], *, produced_default: str, check: bool
 ) -> tuple[bytes, dict[str, object]]:
@@ -200,6 +318,7 @@ def _render_mirror(
 
     raise_on_duplicate: set[tuple[str, str]] = set()
     records: list[dict[str, object]] = []
+    roles = _load_mirror_roles()
 
     for entry in entries:
         path = entry["discovered_physical_path"]
@@ -209,15 +328,14 @@ def _render_mirror(
             raise SystemExit(f"DUPLICATE_MIRROR_KEY:{key}")
         raise_on_duplicate.add(key)
 
-        record: dict[str, object] = {
-            "artifact_key": entry["artifact_key"],
-            "discovered_physical_path": path,
-            "produced_at_utc": None,
-            "proof_anchor": f"{path}.path_proof.txt",
-            "role": _role_for(entry, {}),
-            "sha256": None,
-            "size_bytes": None,
-        }
+        record: dict[str, object] = dict(entry)
+        record.setdefault("artifact_key", entry["artifact_key"])
+        record.setdefault("discovered_physical_path", path)
+        record.setdefault("produced_at_utc", None)
+        record.setdefault("proof_anchor", f"{path}.path_proof.txt")
+        record.setdefault("role", _role_for(entry, roles))
+        record.setdefault("sha256", None)
+        record.setdefault("size_bytes", None)
 
         if rel_path == MIRROR_PATH:
             record["role"] = "self_record"
@@ -231,7 +349,7 @@ def _render_mirror(
             sha256=sha,
             size_bytes=stat.st_size,
             mtime_utc=_isoformat_from_timestamp(stat.st_mtime) if not check else None,
-            produced_at=None,
+            produced_at=str(entry.get("produced_at_utc")) if entry.get("produced_at_utc") else None,
             default_produced_at=produced_default,
             check=check,
             stat_mtime=stat.st_mtime,
@@ -289,6 +407,12 @@ def _write_if_changed(path: Path, content: bytes, *, check: bool) -> None:
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description="Maintain the evidence index and mirror")
     parser.add_argument("--check", action="store_true", help="Fail if files would change")
+    parser.add_argument(
+        "--epic-id",
+        action="append",
+        default=[],
+        help="Integrate epic-specific governed artifacts (e.g. HDE-EPIC020)",
+    )
     args = parser.parse_args(argv)
 
     produced_default = _isoformat(_dt.datetime.now(tz=_dt.timezone.utc))
@@ -298,6 +422,12 @@ def main(argv: list[str] | None = None) -> None:
         produced_default = mirror_proof_existing["produced_at_utc"]
 
     entries = _load_human_index()
+
+    epic_ids = set(args.epic_id)
+    if "HDE-EPIC020" in epic_ids:
+        epic020_tokens = _load_epic020_tokens("HDE-EPIC020")
+        entries = _dedupe_entries(entries + _load_epic020_bundle_entries("HDE-EPIC020", epic020_tokens))
+
     index_bytes = _render_human_index(entries)
     _write_if_changed(HUMAN_INDEX, index_bytes, check=args.check)
 

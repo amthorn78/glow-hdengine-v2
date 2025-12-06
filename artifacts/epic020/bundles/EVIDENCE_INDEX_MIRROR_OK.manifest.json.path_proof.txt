@@ -1,0 +1,5 @@
+path: artifacts/epic020/bundles/EVIDENCE_INDEX_MIRROR_OK.manifest.json
+size_bytes: 578
+sha256: 2999a8d9746378dd535fe34b6297a04dd48bd556e9e71fb9e197274ab95bdafe
+mtime_utc: 2025-12-06T04:12:03Z
+produced_at_utc: 2025-12-06T04:11:16Z

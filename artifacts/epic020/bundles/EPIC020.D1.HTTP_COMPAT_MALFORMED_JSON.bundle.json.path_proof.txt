@@ -1,0 +1,5 @@
+path: artifacts/epic020/bundles/EPIC020.D1.HTTP_COMPAT_MALFORMED_JSON.bundle.json
+size_bytes: 822
+sha256: 3db5f0bacb78200a5fe9b401636fba949d8dc268783de060299f806ba2343313
+mtime_utc: 2025-12-06T04:12:03Z
+produced_at_utc: 2025-12-06T04:11:16Z
