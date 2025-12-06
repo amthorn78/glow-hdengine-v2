@@ -16,6 +16,7 @@ if str(ROOT) not in sys.path:
 from tools.evidence.update_evidence_index import (  # noqa: E402
     MIRROR_PATH,
     ROOT as EVIDENCE_ROOT,
+    _sha256_bytes,
     _load_existing_proof,
     _load_human_index,
 )
@@ -39,12 +40,36 @@ def _load_mirror_records() -> list[dict[str, object]]:
     return records
 
 
-def _validate(entries: Iterable[dict[str, str]], records: Iterable[dict[str, object]]) -> tuple[list[str], int]:
+def _canonical_mirror_body_sha(mirror_lines: list[str]) -> str:
+    self_index = None
+    for i, raw in enumerate(mirror_lines):
+        if not raw.strip():
+            continue
+        obj = json.loads(raw)
+        if obj.get("artifact_key") == "index.machine_mirror":
+            self_index = i
+            break
+    if self_index is None:  # pragma: no cover - defensive
+        raise SystemExit("MISSING_SELF_RECORD")
+
+    body_lines = [line for j, line in enumerate(mirror_lines) if j != self_index]
+    body_text = "".join(body_lines)
+    return _sha256_bytes(body_text.encode("utf-8"))
+
+
+def _validate(
+    entries: Iterable[dict[str, str]],
+    records: Iterable[dict[str, object]],
+    *,
+    mirror_lines: list[str],
+) -> tuple[list[str], int]:
     messages: list[str] = []
     record_map = {
         (rec["artifact_key"], rec["discovered_physical_path"]): rec for rec in records
     }
     total = 0
+    canonical_body_sha = _canonical_mirror_body_sha(mirror_lines)
+
     for entry in entries:
         total += 1
         key = (entry["artifact_key"], entry["discovered_physical_path"])
@@ -72,10 +97,32 @@ def _validate(entries: Iterable[dict[str, str]], records: Iterable[dict[str, obj
                 _dt.datetime.fromisoformat(mtime.replace("Z", "+00:00"))
             except ValueError:
                 messages.append(f"PROOF_MTIME_FORMAT {key[0]} {mtime}")
+        artifact_bytes = artifact_path.read_bytes()
+        artifact_sha = _sha256_bytes(artifact_bytes)
+        artifact_size = len(artifact_bytes)
+        if key[0] == "index.machine_mirror":
+            if sha != canonical_body_sha:
+                messages.append(f"SHA_MISMATCH {key[0]} {sha}!={canonical_body_sha}")
+            if rec.get("sha256") != canonical_body_sha:
+                messages.append(
+                    f"SHA_MIRROR_MISMATCH {key[0]} {rec.get('sha256')}!={canonical_body_sha}"
+                )
+            if size is None or int(size) != artifact_size:
+                messages.append(f"SIZE_MISMATCH {key[0]} {size}!={artifact_size}")
+            if rec.get("size_bytes") != artifact_size:
+                messages.append(
+                    f"SIZE_MIRROR_MISMATCH {key[0]} {rec.get('size_bytes')}!={artifact_size}"
+                )
+            continue
+
+        if sha != artifact_sha:
+            messages.append(f"SHA_MISMATCH {key[0]} {sha}!={artifact_sha}")
+        if size is None or int(size) != artifact_size:
+            messages.append(f"SIZE_MISMATCH {key[0]} {size}!={artifact_size}")
         if sha != rec.get("sha256"):
-            messages.append(f"SHA_MISMATCH {key[0]} {sha}!={rec.get('sha256')}")
-        if size is None or int(size) != rec.get("size_bytes"):
-            messages.append(f"SIZE_MISMATCH {key[0]} {size}!={rec.get('size_bytes')}")
+            messages.append(f"SHA_MIRROR_MISMATCH {key[0]} {sha}!={rec.get('sha256')}")
+        if rec.get("size_bytes") != artifact_size:
+            messages.append(f"SIZE_MIRROR_MISMATCH {key[0]} {rec.get('size_bytes')}!={artifact_size}")
 
     return messages, total
 
@@ -96,8 +143,9 @@ def _render_report(messages: list[str], total: int) -> str:
 
 def generate_orientation(check: bool = False) -> None:
     entries = _load_human_index()
+    mirror_lines = MIRROR_PATH.read_text(encoding="utf-8").splitlines(True)
     records = _load_mirror_records()
-    messages, total = _validate(entries, records)
+    messages, total = _validate(entries, records, mirror_lines=mirror_lines)
     text = _render_report(messages, total)
     # Note: ORIENTATION_DRIFT means the evidence skeleton is coherent (messages empty)
     # but the committed orientation_demo.txt is stale relative to the newly rendered

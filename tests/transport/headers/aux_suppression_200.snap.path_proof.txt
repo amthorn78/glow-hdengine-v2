@@ -1,5 +1,5 @@
 path: tests/transport/headers/aux_suppression_200.snap
 size_bytes: 307
 sha256: 081db8bc7d95e041f5dba5b62cf93f883f6763f6dccdbae55138d693bec9fa22
-mtime_utc: 2025-12-04T22:19:39Z
+mtime_utc: 2025-12-05T22:23:49Z
 produced_at_utc: 2025-11-22T02:27:04Z
