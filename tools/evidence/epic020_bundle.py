@@ -123,6 +123,12 @@ def _discover_artifacts(
             if not path_value:
                 raise Epic020BundleError(f"Artifact entry for token {token} is missing physical path")
             rel_path = Path(str(path_value))
+            if rel_path.name.endswith((".bundle.json", ".manifest.json")) and Path(
+                "artifacts/epic020/bundles"
+            ) in rel_path.parents:
+                # Skip generated bundle/manifest outputs listed in acceptance map inputs
+                continue
+
             physical_path = base_dir / rel_path
             if not physical_path.is_file():
                 raise Epic020BundleError(f"Artifact path {physical_path} not found for {artifact_key}")
