@@ -1,0 +1,9 @@
+HTTP/1.1 400 BAD REQUEST
+Server: Werkzeug/3.1.4 Python/3.11.14
+Date: Sat, 06 Dec 2025 22:30:40 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 140
+Cache-Control: no-store
+Connection: close
+
+{"code":"ERR_COMPAT_INVALID_JSON","error":"malformed or mixed id/payload: supply either a_id/b_id or a/b objects","ok":false,"schema":"v1"}
