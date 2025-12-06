@@ -93,6 +93,31 @@ jobs:
           python -m pytest \
             tests/adapter/test_compat_http_dev.py \
             tests/adapter/test_compat_http_parity.py
+  epic020-evidence-bundles:
+    name: EPIC020 evidence bundles and index (closed rails)
+    runs-on: ubuntu-latest
+    env:
+      LC_ALL: C
+      LANG: C
+      TZ: UTC
+      SAFE_MODE: "1"
+      ALLOW_NETWORK: "0"
+      APP_ENV: ci
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -U pip
+      - run: test -f requirements.txt && python -m pip install -r requirements.txt || true
+      - run: test -f requirements-dev.txt && python -m pip install -r requirements-dev.txt || true
+      - run: python -m pip install -e .
+      - run: python -m pip install pytest
+      - run: ci/checks/check_env_pins.sh
+      - run: python -m tools.evidence.epic020_bundle build --epic-id HDE-EPIC020
+      - run: python tools/evidence/update_evidence_index.py --epic-id HDE-EPIC020
+      - run: ci/checks/check_mirror_schema.sh
+      - run: python -m pytest tests/evidence/test_epic020_bundle_index_integration.py
   sanity-pipeline:
     runs-on: ubuntu-latest
     env:

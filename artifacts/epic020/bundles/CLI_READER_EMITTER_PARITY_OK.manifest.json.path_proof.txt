@@ -1,0 +1,5 @@
+path: artifacts/epic020/bundles/CLI_READER_EMITTER_PARITY_OK.manifest.json
+size_bytes: 2712
+sha256: b0f2edcc064ccd27fd2af67f52bcb7446ed6aa1290427063aa0b50fe486e162b
+mtime_utc: 2025-12-06T04:12:03Z
+produced_at_utc: 2025-12-06T04:11:16Z

@@ -1,0 +1,5 @@
+path: artifacts/epic020/bundles/COMPOSITE_ABBA_IDENTITY_OK.bundle.json
+size_bytes: 1163
+sha256: 3772feeb0bb3732b258cfbc460d9a035ec93f9eb1427226e135057867ce22ce7
+mtime_utc: 2025-12-06T04:12:03Z
+produced_at_utc: 2025-12-06T04:11:16Z

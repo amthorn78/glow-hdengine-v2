@@ -1,0 +1,5 @@
+path: artifacts/epic020/bundles/ERROR_JSON_CANON_OK.bundle.json
+size_bytes: 1195
+sha256: 3ad6520e2950702abaa3e9cd2ccf8af63a67ad546e37e6cd80bbff0ce59b806e
+mtime_utc: 2025-12-06T04:12:03Z
+produced_at_utc: 2025-12-06T04:11:16Z

@@ -1,5 +1,5 @@
 path: artifacts/db/migrations/rollback_verify.log
 size_bytes: 178
 sha256: 913864dd9824aae8bb4a041d3cefc409185ebd0661711eb9067f1861be2c8322
-mtime_utc: 2025-12-05T22:23:48Z
+mtime_utc: 2025-12-06T04:06:36Z
 produced_at_utc: 2025-11-22T02:27:04Z

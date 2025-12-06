@@ -1,0 +1,5 @@
+path: artifacts/epic020/bundles/ERROR_TOKEN_MAP_OK.manifest.json
+size_bytes: 561
+sha256: c908f581d3e42e526c24dfea085ed2a7352f69ac7631a2c2172eca5cc3c01821
+mtime_utc: 2025-12-06T04:12:03Z
+produced_at_utc: 2025-12-06T04:11:16Z

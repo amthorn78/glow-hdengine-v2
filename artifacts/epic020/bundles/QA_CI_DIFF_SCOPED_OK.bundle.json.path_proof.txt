@@ -1,0 +1,5 @@
+path: artifacts/epic020/bundles/QA_CI_DIFF_SCOPED_OK.bundle.json
+size_bytes: 436
+sha256: 1f403b5dde27928c1d86f91ad0f04f003312786ef566206f0c7af0664f708f0d
+mtime_utc: 2025-12-06T04:12:03Z
+produced_at_utc: 2025-12-06T04:11:16Z
