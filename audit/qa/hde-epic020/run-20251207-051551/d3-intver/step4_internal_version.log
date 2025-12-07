@@ -1,0 +1,36 @@
+check_id=EPIC020_D3_INTERNAL_VERSION
+command=curl GET/HEAD http://127.0.0.1:8000/internal/version (two GETs + one HEAD)
+rails=APP_ENV=dev;LC_ALL=C;LANG=C;TZ=UTC;SAFE_MODE=1;ALLOW_NETWORK=0
+pf_refs=PF20 EPIC020 D3;PF14 internal ops;PF09 internal checklist;PF10 EPIC020 D3 addenda;PF19 §4.4
+tokens=INTVER_200_CTYPE_JSON_UTF8_OK,INTVER_HEAD_PARITY_OK
+status=PENDING
+]633;E;echo;3e40388d-276b-461e-80df-352afba4d83b]633;C
+--- internal_version_get1.headers ---
+HTTP/1.1 200 OK
+Server: Werkzeug/3.1.4 Python/3.11.14
+Date: Sun, 07 Dec 2025 05:39:03 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 347
+Cache-Control: no-store
+Connection: close
+
+
+--- internal_version_get2.headers ---
+HTTP/1.1 200 OK
+Server: Werkzeug/3.1.4 Python/3.11.14
+Date: Sun, 07 Dec 2025 05:39:12 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 347
+Cache-Control: no-store
+Connection: close
+
+
+--- internal_version_head.headers ---
+HTTP/1.1 200 OK
+Server: Werkzeug/3.1.4 Python/3.11.14
+Date: Sun, 07 Dec 2025 05:39:46 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 347
+Cache-Control: no-store
+Connection: close
+

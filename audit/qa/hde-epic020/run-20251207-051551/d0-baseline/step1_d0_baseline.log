@@ -1,0 +1,17 @@
+check_id=EPIC020_D0_ENV_BASELINE
+command=start adapter.http_reader; env snapshot; hdctl presence + help
+rails=APP_ENV=dev;LC_ALL=C;LANG=C;TZ=UTC;SAFE_MODE=1;ALLOW_NETWORK=0
+pf_refs=PF20 EPIC020 D0;PF19 §4.4;PF09 D0 discovery baseline;PF10 EPIC020 notes;PF07 dev harness
+tokens=ENV_RAILS_POLICY_OK
+status=PENDING
+
+--- env_rails_snapshot.log ---
+ALLOW_NETWORK=0
+APP_ENV=dev
+LANG=C
+LC_ALL=C
+SAFE_MODE=1
+TZ=UTC
+
+--- hdctl_presence.log ---
+/workspaces/glow-hdengine-v2/.venv/bin/hdctl

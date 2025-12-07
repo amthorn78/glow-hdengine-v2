@@ -1,0 +1,22 @@
+check_id=EPIC020_D1_HTTP_COMPAT_MALFORMED_JSON
+command=curl -sS -D http_compat_error.headers -o http_compat_error.body -H "Content-Type: application/json" -X POST http://127.0.0.1:8000/api/compat/v1 --data 'not json'
+rails=APP_ENV=dev;LC_ALL=C;LANG=C;TZ=UTC;SAFE_MODE=1;ALLOW_NETWORK=0
+pf_refs=PF20 EPIC020 D1;PF05 compat v1;PF14 Dev HTTP harness;PF19 §4.4 & compat QA token;PF10 EPIC020 compat addenda;PF12 HTTP_COMPAT_DEV_MALFORMED_LIVE_QA_V1
+tokens=EPIC020.D1.HTTP_COMPAT_MALFORMED_JSON
+status=PENDING
+]633;E;echo;3e40388d-276b-461e-80df-352afba4d83b]633;C
+--- compat_malformed_qa_http.txt (truncated preview) ---
+]633;E;echo "=== http_compat_error.headers ===";3e40388d-276b-461e-80df-352afba4d83b]633;C=== http_compat_error.headers ===
+HTTP/1.1 400 BAD REQUEST
+Server: Werkzeug/3.1.4 Python/3.11.14
+Date: Sun, 07 Dec 2025 05:29:50 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 140
+Cache-Control: no-store
+Connection: close
+
+
+=== http_compat_error.body ===
+{"code":"ERR_COMPAT_INVALID_JSON","error":"malformed or mixed id/payload: supply either a_id/b_id or a/b objects","ok":false,"schema":"v1"}
+
+=== curl stderr ===

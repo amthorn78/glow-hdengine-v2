@@ -1,0 +1,14 @@
+]633;E;echo "=== http_compat_error.headers ===";3e40388d-276b-461e-80df-352afba4d83b]633;C=== http_compat_error.headers ===
+HTTP/1.1 400 BAD REQUEST
+Server: Werkzeug/3.1.4 Python/3.11.14
+Date: Sun, 07 Dec 2025 05:29:50 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 140
+Cache-Control: no-store
+Connection: close
+
+
+=== http_compat_error.body ===
+{"code":"ERR_COMPAT_INVALID_JSON","error":"malformed or mixed id/payload: supply either a_id/b_id or a/b objects","ok":false,"schema":"v1"}
+
+=== curl stderr ===

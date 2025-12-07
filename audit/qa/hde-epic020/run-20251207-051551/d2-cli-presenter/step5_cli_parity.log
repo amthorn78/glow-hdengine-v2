@@ -1,0 +1,14 @@
+check_id=EPIC020_D2_CLI_PRESENTER_PARITY
+command=pytest -q tests/cli/test_showcompat_parity_and_identity.py && pytest -q tests/cli/test_cli_canonical_bytes.py && pytest -q tests/cli/test_serializer_guards.py
+rails=APP_ENV=dev;LC_ALL=C;LANG=C;TZ=UTC;SAFE_MODE=1;ALLOW_NETWORK=0
+pf_refs=PF20 EPIC020 D2;PF14 presenter/emitter;PF09 D2 tests;PF10 EPIC020 D2 addenda;PF19 §4.4
+tokens=CLI_SHOWCOMPAT_CANON_OK,CLI_READER_EMITTER_PARITY_OK
+status=PENDING
+pytest showcompat_parity exit_code=0
+pytest cli_canonical_bytes exit_code=0
+pytest serializer_guards exit_code=0
+]633;E;echo;3e40388d-276b-461e-80df-352afba4d83b]633;C
+--- pytest summaries ---
+audit/qa/hde-epic020/run-20251207-051551/d2-cli-presenter/cli_canonical_bytes_pytest.log:3 passed in 0.47s
+audit/qa/hde-epic020/run-20251207-051551/d2-cli-presenter/serializer_guards_pytest.log:3 passed in 0.41s
+audit/qa/hde-epic020/run-20251207-051551/d2-cli-presenter/showcompat_parity_pytest.log:4 passed in 0.60s
