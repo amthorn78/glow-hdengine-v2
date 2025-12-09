@@ -4,5 +4,17 @@ check pytest tests/cli/test_cli_canonical_bytes.py:OK
 check pytest tests/cli/test_showcompat_parity_and_identity.py:OK
 check pytest tests/invariance/test_bytes_identity.py:OK
 check ci/checks/check_env_pins.sh:OK
-check python tools/evidence/generate_sampler_evidence.py:FAIL
-summary:FAIL
+check python tools/evidence/generate_sampler_evidence.py:OK
+check python tools/evidence/generate_engine_core_evidence.py:OK
+check pytest tests/invariance/test_locale_tz.py:OK
+check python tools/cli/serializer_grep_guard.py:OK
+check python tools/cli/emitter_symbol_proof.py:OK
+check pytest tests/cli/test_serializer_guards.py:OK
+check python tools/order/generate_ordering_artifacts.py:OK
+check python tools/evidence/update_evidence_index.py:OK
+check python tools/order/generate_ordering_artifacts.py --check:OK
+check python tools/evidence/update_evidence_index.py --check:OK
+check python tools/evidence/orientation_demo.py:OK
+check python tools/evidence/orientation_demo.py --check:OK
+check update_evidence_index.post:OK
+summary:PASS
