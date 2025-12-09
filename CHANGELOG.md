@@ -1,5 +1,16 @@
 # CHANGELOG
 
+2025-12-29 — EPIC-021: Calcination evidence pass (registry, sanity, QA harness)
+
+### Added
+- Serializer consolidation: canonical serializer and presenter remain the single source for Reader/CLI bytes; closed-rails pins documented for CLI suites.
+- Evidence posture: `tools/generate_registry_report.py` emits `artifacts/registry/registry_report.json`; `tools/evidence/run_sanity_pipeline.py` captures `artifacts/sanity/sanity.log` with path proofs; `tools/evidence/update_evidence_index.py` refreshes Index/Mirror bindings for registry/sanity artifacts.
+- QA harness: `tools/qa/epic021_qa.py` writes QA_ROOT logs under `audit/qa/hde-epic021/` (bootstrap log, per-step logs, QA step manifest, acceptance-map viability log) and references `docs/acceptance_map_epic021.json` plus `audit/qa/hde-epic021/token_evidence_matrix.md`.
+
+### Changed / Fixed
+- README/AGENTS/docs refreshed to align with EPIC021 deterministic rails, registry report governance, sanity pipeline, and QA harness workflows; PF-Canon titles are used for authoritative references.
+- EPIC021 is a Calcination evidence pass; no breaking changes to the public Reader/CLI API, but QA artifacts and evidence indices were updated.
+
 2025-12-22 — EPIC-020: Separation Pass 1 — Error & Identity Surfaces
 
 ### Added

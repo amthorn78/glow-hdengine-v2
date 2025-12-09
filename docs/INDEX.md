@@ -1,17 +1,19 @@
-# HD Engine Repo Docs — Index (EPIC020 aligned)
+# HD Engine Repo Docs — Index (EPIC021 aligned)
 
 ## Acceptance & evidence
+- EPIC021 evidence: registry report (`artifacts/registry/registry_report.json`), sanity pipeline logs (`artifacts/sanity/sanity.log` + `.path_proof.txt`), Evidence Index/Mirror updates (`docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl`), QA_ROOT logs (`audit/qa/hde-epic021/`), acceptance map (`docs/acceptance_map_epic021.json`), and token evidence matrix (`audit/qa/hde-epic021/token_evidence_matrix.md`).
 - EPIC020 separation: acceptance map bindings cover `ERROR_*`, `PRESENTER_*`, and `INTVER_*` families tied to canonical error envelopes, shared presenter/emitter, and `/internal/version` identity artifacts. QA checklist: `docs/QA_CHECKLIST_EPIC020.md`.
 - EPIC019 close-out: sampler/core acceptance map (`docs/acceptance_map_epic019.json` + path proof) and consolidated acceptance map roster (`docs/acceptance_maps.json`) capture tokens for HDE-DISS003/004; entries are governed and indexed.
 - EPIC018 references remain for Calcination: manifest (`audit/EPIC-018_MANIFEST.json`), close report (`audit/EPIC-018_close_report.md`), and config acceptance map (`audit/EPIC-018_config_acceptance_map.json`). All are governed with path proofs and mirrored in PF-Canon (see PF20 — Phased Epics, PF19 — QA Guide).
 - Evidence Index (human): `docs/evidence/INDEX.json`
 - Evidence Index (machine): `artifacts/evidence_index.jsonl`
-- Orientation demo and sanity pipeline: `tools/evidence/orientation_demo.py`, `tools/evidence/run_sanity_pipeline.py` (closed rails enforced by the determinism helper; pipeline runs sampler/core generators).
+- Registry report generator: `tools/generate_registry_report.py`
+- Orientation demo and sanity pipeline: `tools/evidence/orientation_demo.py`, `tools/evidence/run_sanity_pipeline.py` (closed rails enforced by the determinism helper).
+- Evidence index updater: `tools/evidence/update_evidence_index.py` (refreshes Index/Mirror, including registry_report and sanity entries).
 - Sampler evidence generator: `tools/evidence/generate_sampler_evidence.py` (dev sampler CLI + HTTP harness runs, seed replay/diversity/ABBA/two-run logs).
 - Engine Core evidence generator: `tools/evidence/generate_engine_core_evidence.py` (purity/ABBA/two-run/JSON compare logs).
-- Dev sampler QA harnesses: `scripts/qa/dev_sampler_healthcheck.py` (closed-rails gating check) and `scripts/qa/dev_sampler_live_qa.py` (closed-rails Live QA across APP_ENV permutations).
-- D6 vendor QA harness: `scripts/qa/d6_live_vendor_qa.py` (open-rails vendor Live QA with governed logs under `audit/qa/hde-epic019/d6-vendor-live-qa/`).
-- Env pins gate: `ci/checks/check_env_pins.sh` validates `LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0` for docs/tests; EPIC020 CI runs with these pins.
+- QA harnesses: EPIC021 harness `tools/qa/epic021_qa.py` (QA_ROOT logs, acceptance-map viability); legacy dev sampler healthchecks (`scripts/qa/dev_sampler_healthcheck.py`, `scripts/qa/dev_sampler_live_qa.py`) and D6 vendor Live QA (`scripts/qa/d6_live_vendor_qa.py`).
+- Env pins gate: `ci/checks/check_env_pins.sh` validates `LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0` for docs/tests; closed rails apply to CLI and harnesses.
 - CLI guard rails: `tools/cli/serializer_grep_guard.py`, `tools/cli/emitter_symbol_proof.py` (outputs under `artifacts/cli/guards/`).
 - Error/presenter/identity evidence families: `errors/`, `parity/`, `artifacts/presenter/`, `artifacts/ops/internal_version/`, and `artifacts/math/` are mirrored in Index/Mirror.
 - Config governance: `tools/config/generate_config_artifacts.py`, `tools/config/generate_bundles.py`, and schemas in `docs/schemas/`.
