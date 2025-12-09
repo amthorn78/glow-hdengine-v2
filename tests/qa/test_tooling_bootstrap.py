@@ -66,6 +66,23 @@ def test_epic021_qa_run_emits_manifest_and_viability(monkeypatch):
     assert "token" in viability_content
 
 
+def test_epic021_manifest_dedupes_run_id(monkeypatch):
+    monkeypatch.setenv("EPIC021_QA_RUN_ID", "dedupe-run")
+    artifacts = run_epic021_qa_run()
+
+    manifest_path = artifacts["manifest"]
+    first_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    first_runs = [run for run in first_manifest["runs"] if run["run_id"] == "dedupe-run"]
+    assert len(first_runs) == 1
+
+    run_epic021_qa_run()
+
+    manifest_data = json.loads(manifest_path.read_text(encoding="utf-8"))
+    runs = [run for run in manifest_data["runs"] if run["run_id"] == "dedupe-run"]
+
+    assert len(runs) == 1, "manifest should keep only the latest entry per run id"
+
+
 @pytest.mark.parametrize(
     "checks,expected",
     [

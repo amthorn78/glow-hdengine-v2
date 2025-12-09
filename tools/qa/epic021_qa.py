@@ -241,6 +241,9 @@ def update_manifest(run_id: str, steps: List[Tuple[str, Path, str]]) -> Path:
     }
 
     manifest.setdefault("runs", [])
+    manifest["runs"] = [
+        run for run in manifest["runs"] if run.get("run_id") != run_id
+    ]
     manifest["epic_id"] = "HDE-EPIC021"
     manifest["runs"].append(run_entry)
 
