@@ -1,0 +1,28 @@
+{
+  "epic_id": "HDE-EPIC021",
+  "tokens": [
+    {"name": "PR_OPENED_OK", "owner_pf": "PF20 — HDE-Phased Epics (EPIC021 record)", "status": "planned", "evidence_titles": []},
+    {"name": "TESTS_PASS_OK", "owner_pf": "PF19 — Glow QA Guide §9A", "status": "planned", "evidence_titles": []},
+    {"name": "DOC_DELTA_PRESENT_OK", "owner_pf": "PF03 — Technical Writing §Single-home", "status": "planned", "evidence_titles": []},
+    {"name": "EVIDENCE_INDEX_UPDATED_OK", "owner_pf": "PF12 — HDE-Schemas and Artifacts §Evidence Index", "status": "planned", "evidence_titles": []},
+    {"name": "MACHINE_MIRROR_UPDATED_OK", "owner_pf": "PF12 — HDE-Schemas and Artifacts §Evidence Mirror", "status": "planned", "evidence_titles": []},
+    {"name": "EVIDENCE_INDEX_HASH_OK", "owner_pf": "PF12 — HDE-Schemas and Artifacts §Evidence Hashing", "status": "planned", "evidence_titles": []},
+    {"name": "QA_PRECOMMIT_CHECKLIST_OK", "owner_pf": "PF19 — Glow QA Guide §QA Rails", "status": "planned", "evidence_titles": []},
+    {"name": "QA_POSTCOMMIT_CHECKLIST_OK", "owner_pf": "PF19 — Glow QA Guide §QA Rails", "status": "planned", "evidence_titles": []},
+    {"name": "ENV_RAILS_POLICY_OK", "owner_pf": "PF19 — Glow QA Guide §Env Pins", "status": "planned", "evidence_titles": []},
+    {"name": "EVIDENCE_INDEX_MIRROR_OK", "owner_pf": "PF12 — HDE-Schemas and Artifacts §Evidence Mirror", "status": "planned", "evidence_titles": []},
+    {"name": "EVIDENCE_PATHS_VALIDATED_OK", "owner_pf": "PF12 — HDE-Schemas and Artifacts §Path Proofs", "status": "planned", "evidence_titles": []},
+    {"name": "DETERMINISM_ENV_PINS_OK", "owner_pf": "PF19 — Glow QA Guide §Env Pins", "status": "planned", "evidence_titles": []},
+    {"name": "SANITY_PIPELINE_OK", "owner_pf": "PF19 — Glow QA Guide §Sanity Pipeline", "status": "planned", "evidence_titles": []},
+    {"name": "CLI_READER_EMITTER_PARITY_OK", "owner_pf": "PF20 — HDE-Phased Epics (EPIC021 record)", "status": "planned", "evidence_titles": []},
+    {"name": "CLI_NO_ALT_JSON_OK", "owner_pf": "PF20 — HDE-Phased Epics (EPIC021 record)", "status": "planned", "evidence_titles": []},
+    {"name": "JSON_CANONICAL_CHECK_OK", "owner_pf": "PF19 — Glow QA Guide §Emitter Canon", "status": "planned", "evidence_titles": []},
+    {"name": "ERROR_JSON_CANON_OK", "owner_pf": "PF19 — Glow QA Guide §Emitter Canon", "status": "planned", "evidence_titles": []},
+    {"name": "CLI_SERIALIZER_GUARD_OK", "owner_pf": "PF19 — Glow QA Guide §Serializer Guards", "status": "planned", "evidence_titles": []},
+    {"name": "CI_CHECK_MIRROR_SCHEMA_OK", "owner_pf": "PF12 — HDE-Schemas and Artifacts §Evidence Mirror", "status": "planned", "evidence_titles": []},
+    {"name": "SANITY_PIPELINE_LOGGED_OK", "owner_pf": "PF19 — Glow QA Guide §Sanity Pipeline", "status": "planned", "evidence_titles": []},
+    {"name": "QA_STEP_LOGS_CONSOLIDATED_OK", "owner_pf": "PF19 — Glow QA Guide §QA Logs", "status": "planned", "evidence_titles": []},
+    {"name": "PF04-DD-QA-BOOTSTRAP-TOKENS", "owner_pf": "PF04 — Governance Docs (Doc Delta)", "status": "token_incomplete", "evidence_titles": []},
+    {"name": "PF19-DD-QA-PLAN-VIABILITY-TOKENS", "owner_pf": "PF19 — Glow QA Guide (Doc Delta)", "status": "token_incomplete", "evidence_titles": []}
+  ]
+}
