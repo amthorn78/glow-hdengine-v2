@@ -98,15 +98,20 @@ def run_pipeline(
             exit_code = proc.returncode or 1
             break
 
+    # Write the initial log before refreshing the index so the refresh uses the
+    # artifacts from this run instead of the previous one.
+    summary = "PASS" if exit_code == 0 else "FAIL"
+    _write_log(log_path, results, summary)
+
     post_index_status: str | None = None
     if refresh_index and log_path == SANITY_LOG:
         post_index_status = _run_post_index_refresh()
         results.append(("update_evidence_index.post", post_index_status))
         if post_index_status != "OK" and exit_code == 0:
             exit_code = 1
-
-    summary = "PASS" if exit_code == 0 else "FAIL"
-    _write_log(log_path, results, summary)
+        summary = "PASS" if exit_code == 0 else "FAIL"
+        _write_log(log_path, results, summary)
+        _run_post_index_refresh()
     return exit_code
 
 
