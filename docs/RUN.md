@@ -1,4 +1,4 @@
-# RUN — Developer flight checks (EPIC019)
+# RUN — Developer flight checks (EPIC021)
 
 ## Rails
 - Pin determinism env: `LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0` (or call `engine.runtime.determinism_env.ensure_determinism_env`).
@@ -7,6 +7,7 @@
 ## Quick checks
 - Env pins: `python scripts/ensure_env.py` → expect `[ENV] OK` with rails above; CI mirrors this via `ci/checks/check_env_pins.sh`.
 - Serializer parity: `pytest -q tests/test_sercanon.py` (runs under pinned locale/timezone).
+- Registry report spot-check: `python tools/generate_registry_report.py --check` to validate catalog inputs and serializer wiring.
 
 ## Evidence and guard workflow
 ```bash
@@ -14,16 +15,19 @@
 python tools/cli/serializer_grep_guard.py
 python tools/cli/emitter_symbol_proof.py
 
+# Registry report (EPIC021)
+python tools/generate_registry_report.py
+
 # Sampler / Engine Core evidence (DISS003/DISS004)
 python tools/evidence/generate_sampler_evidence.py
 python tools/evidence/generate_engine_core_evidence.py
 
-# Evidence skeleton updates (D4)
+# Evidence skeleton updates (D4) and sanity pipeline (EPIC021 wiring)
 python tools/evidence/update_evidence_index.py
 python tools/evidence/orientation_demo.py
 python tools/evidence/run_sanity_pipeline.py
 ```
-Outputs are governed and require `.path_proof.txt` plus INDEX/mirror updates; the sanity pipeline runs the sampler and Engine Core generators under closed rails.
+Outputs are governed and require `.path_proof.txt` plus INDEX/mirror updates; the sanity pipeline runs under closed rails and mirrors registry_report/sanity artifacts into Index/Mirror when combined with the index updater.
 
 ## Config & bundles (D5/D6)
 ```bash
@@ -49,9 +53,13 @@ LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 DEV_SAMPLER_URL="$DEV_SAMPLER
 
 # D6 vendor Live QA (open rails; vendor test identity, governed logs only)
 ALLOW_NETWORK=1 scripts/qa/d6_live_vendor_qa.py
+
+# EPIC021 QA harness (closed rails; optional EPIC021_QA_RUN_ID to group artifacts)
+SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/qa/epic021_qa.py
 ```
 
 Logs:
 - Dev sampler healthcheck → `notes/dev-sampler/dev_sampler_healthcheck.log`
 - Dev sampler Live QA → `audit/qa/hde-epic019/dev_sampler_http/`
 - D6 vendor Live QA → `audit/qa/hde-epic019/d6-vendor-live-qa/`
+- EPIC021 QA harness → `audit/qa/hde-epic021/` (bootstrap log, step logs, acceptance-map viability, manifest)

@@ -1,4 +1,4 @@
-# CLI commands — Compat v1 and dev/admin harnesses (EPIC020)
+# CLI commands — Compat v1 and dev/admin harnesses (EPIC021)
 
 The CLI shares the canonical presenter/emitter and serializer with the Reader harness. Run public commands under closed rails (`LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0`), enforced by `engine.runtime.determinism_env.ensure_determinism_env`.
 
@@ -6,10 +6,12 @@ The CLI shares the canonical presenter/emitter and serializer with the Reader ha
 - `hdctl showcompat --pair-file <pair.json>`
 - `hdctl showcompat --a-file <A.json> --b-file <B.json>`
 - `hdctl showcompat` (reads one pair from stdin)
+- `hdctl aux-preview --pair-file <compat.json> --category <slug> --band <band> --perspective <perspective> [--show-narrative] [--admin-out <ids.json>]`
+- `hdctl bg:resolve --user <user> [--source auto|db|vendor] [--birthdate YYYY-MM-DD --birthtime HH:MM --location <place>]`
 - Dev-only sampler CLI (APP_ENV=dev, QA only): `hdctl dev:sampler --viewer <viewer_id> --candidates-file <candidates.json> [--seed <seed>]`
 - Flags for QA sidecars: `--dump-reader <out.json> --dump-admin-dir <dir>`
 
-Exit codes: 0 success, 64 usage error, 2 typed failure. Success bytes are LF-terminated canonical JSON printed to stdout. Error envelopes use `error_v1` with typed tokens and are printed to stderr only (LF-terminated JSON). CLI output is numeric-free and matches Reader bytes (AB↔BA identity, two-run identity, preimage recompute preserved).
+Exit codes: 0 success, 64 usage error, 2 typed failure. Success bytes are LF-terminated canonical JSON printed to stdout. Error envelopes use `error_v1` with typed tokens and are printed to stderr only (LF-terminated JSON). CLI output is numeric-free and matches Reader bytes (AB↔BA identity, two-run identity, preimage recompute preserved). Aux preview emits ids-only JSON unless `--show-narrative` is set.
 
 ## Guards
 - Serializer grep guard: `python tools/cli/serializer_grep_guard.py` → `artifacts/cli/guards/serializer_grep_guard.log`
@@ -18,9 +20,11 @@ Both guards fail fast if determinism rails are not pinned and protect the allow-
 
 ## Evidence discipline
 - Guard outputs, QA dumps, and other governed artifacts must have `.path_proof.txt` siblings plus entries in `docs/evidence/INDEX.json` and `artifacts/evidence_index.jsonl`. Use `python tools/evidence/update_evidence_index.py` to refresh.
-- Orientation and sanity checks: `python tools/evidence/orientation_demo.py` and `python tools/evidence/run_sanity_pipeline.py` (pipeline invokes sampler + Engine Core evidence generators).
+- Registry report: `python tools/generate_registry_report.py` writes `artifacts/registry/registry_report.json` (canonical serializer) with a `.path_proof.txt` sidecar.
+- Orientation and sanity checks: `python tools/evidence/orientation_demo.py` and `python tools/evidence/run_sanity_pipeline.py` (pipeline emits `artifacts/sanity/sanity.log` under closed rails).
 - Sampler evidence harness: `python tools/evidence/generate_sampler_evidence.py` runs dev sampler CLI + HTTP harnesses and captures seed replay, diversity, ABBA, and two-run identity logs.
 - Engine Core evidence harness: `python tools/evidence/generate_engine_core_evidence.py` captures purity, JSON compare, ABBA, and two-run identity logs.
+- Evidence index updater: `python tools/evidence/update_evidence_index.py` mirrors registry_report and sanity artifacts into Index/Mirror (`docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl`).
 
 ## Dev/admin harnesses (dev/test/local only)
 
@@ -28,5 +32,6 @@ Both guards fail fast if determinism rails are not pinned and protect the allow-
 - Dev sampler healthcheck (closed rails): `APP_ENV=dev DEV_SAMPLER_URL="$DEV_SAMPLER_URL" SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC scripts/qa/dev_sampler_healthcheck.py`
 - Dev sampler Live QA (closed rails; APP_ENV permutations): `DEV_SAMPLER_URL="$DEV_SAMPLER_URL" SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC scripts/qa/dev_sampler_live_qa.py`
 - D6 vendor Live QA (open rails vendor harness, governed): `scripts/qa/d6_live_vendor_qa.py` (allows `ALLOW_NETWORK=1`; SAFE_MODE may be 0/1; runs under controlled vendor test identity only).
+- EPIC021 QA harness (closed rails): `python tools/qa/epic021_qa.py` writes QA_ROOT logs under `audit/qa/hde-epic021/` (bootstrap, step logs, acceptance-map viability, manifest).
 
 See PF05 — CLI/API/Vendor Ref and PF12 — Schemas & Artifacts for canonical rules (title references only).
