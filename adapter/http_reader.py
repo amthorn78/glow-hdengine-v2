@@ -225,7 +225,7 @@ def _persist_idempotence_db(
                 (
                     digest,
                     canonical_preimage_text,
-                    json.dumps(canonical_json, separators=(",", ":"), ensure_ascii=False),
+                    canon.sercanon(canonical_json, sort_keys=True).decode("utf-8"),
                 ),
             )
             inserted = cur.fetchone()

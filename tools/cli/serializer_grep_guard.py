@@ -15,7 +15,7 @@ if str(ROOT) not in sys.path:
 
 from engine.runtime.determinism_env import DeterminismEnvError, ensure_determinism_env
 
-DEFAULT_SCOPE = (Path("engine/cli"),)
+DEFAULT_SCOPE = (Path("engine/cli"), Path("adapter/http_reader.py"))
 DISALLOWED_ATTRS = {"dumps", "dump"}
 
 
