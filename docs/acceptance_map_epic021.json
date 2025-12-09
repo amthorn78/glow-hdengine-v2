@@ -3,34 +3,44 @@
   "tokens": [
     {
       "name": "PR_OPENED_OK",
-      "owner_pf": "PF20 \u2014 HDE-Phased Epics (EPIC021 record)",
-      "status": "planned",
-      "evidence_titles": []
+      "owner_pf": "PF20 — HDE-Phased Epics (EPIC021 record)",
+      "status": "implemented",
+      "evidence_titles": [
+        "EPIC021 QA bootstrap canonical log (audit/qa/hde-epic021/test_tooling_bootstrap.log)",
+        "Per-run QA bootstrap log (D0_bootstrap.log)"
+      ]
     },
     {
       "name": "TESTS_PASS_OK",
-      "owner_pf": "PF19 \u2014 Glow QA Guide \u00a79A",
-      "status": "planned",
-      "evidence_titles": []
+      "owner_pf": "PF19 — Glow QA Guide §QA Rails",
+      "status": "implemented",
+      "evidence_titles": [
+        "EPIC021 QA step logs manifest",
+        "Per-run QA step logs for serializer/evidence/sanity runs"
+      ]
     },
     {
       "name": "DOC_DELTA_PRESENT_OK",
-      "owner_pf": "PF03 \u2014 Technical Writing \u00a7Single-home",
-      "status": "planned",
-      "evidence_titles": []
+      "owner_pf": "PF03 — Technical Writing §Single-home",
+      "status": "implemented",
+      "evidence_titles": [
+        "Doc-delta readiness note (audit/qa/hde-epic021/doc_delta_readiness_epic021.md)",
+        "Acceptance-map viability log"
+      ]
     },
     {
       "name": "EVIDENCE_INDEX_UPDATED_OK",
-      "owner_pf": "PF12 \u2014 HDE-Schemas and Artifacts \u00a7Evidence Index",
+      "owner_pf": "PF12 — HDE-Schemas and Artifacts §Evidence Index",
       "status": "implemented",
       "evidence_titles": [
         "Evidence Index with registry_report + sanity entries (docs/evidence/INDEX.json)",
-        "INDEX.sha256 sentinel hash"
+        "INDEX.sha256 sentinel hash",
+        "Machine mirror JSONL (artifacts/evidence_index.jsonl)"
       ]
     },
     {
       "name": "MACHINE_MIRROR_UPDATED_OK",
-      "owner_pf": "PF12 \u2014 HDE-Schemas and Artifacts \u00a7Evidence Mirror",
+      "owner_pf": "PF12 — HDE-Schemas and Artifacts §Evidence Mirror",
       "status": "implemented",
       "evidence_titles": [
         "Machine mirror JSONL with registry_report + sanity rows (artifacts/evidence_index.jsonl)",
@@ -39,120 +49,138 @@
     },
     {
       "name": "EVIDENCE_INDEX_HASH_OK",
-      "owner_pf": "PF12 \u2014 HDE-Schemas and Artifacts \u00a7Evidence Hashing",
+      "owner_pf": "PF12 — HDE-Schemas and Artifacts §Evidence Hashing",
       "status": "implemented",
       "evidence_titles": [
-        "INDEX.sha256 produced by update_evidence_index"
+        "INDEX.sha256 produced by update_evidence_index",
+        "QA_ROOT evidence step log"
       ]
     },
     {
       "name": "QA_PRECOMMIT_CHECKLIST_OK",
-      "owner_pf": "PF19 \u2014 Glow QA Guide \u00a7QA Rails",
-      "status": "planned",
-      "evidence_titles": []
+      "owner_pf": "PF19 — Glow QA Guide §QA Rails",
+      "status": "implemented",
+      "evidence_titles": [
+        "QA bootstrap summary under closed rails",
+        "Per-run D0_bootstrap.log env pins"
+      ]
     },
     {
       "name": "QA_POSTCOMMIT_CHECKLIST_OK",
-      "owner_pf": "PF19 \u2014 Glow QA Guide \u00a7QA Rails",
-      "status": "planned",
-      "evidence_titles": []
+      "owner_pf": "PF19 — Glow QA Guide §QA Rails",
+      "status": "implemented",
+      "evidence_titles": [
+        "QA step logs manifest",
+        "Acceptance-map viability log"
+      ]
     },
     {
       "name": "ENV_RAILS_POLICY_OK",
-      "owner_pf": "PF19 \u2014 Glow QA Guide \u00a7Env Pins",
+      "owner_pf": "PF19 — Glow QA Guide §Env Pins",
       "status": "implemented",
       "evidence_titles": [
-        "Env pins gate ci/checks/check_env_pins.sh"
+        "Env pins gate ci/checks/check_env_pins.sh",
+        "QA_ROOT viability log confirming closed rails"
       ]
     },
     {
       "name": "EVIDENCE_INDEX_MIRROR_OK",
-      "owner_pf": "PF12 \u2014 HDE-Schemas and Artifacts \u00a7Evidence Mirror",
+      "owner_pf": "PF12 — HDE-Schemas and Artifacts §Evidence Mirror",
       "status": "implemented",
       "evidence_titles": [
-        "Mirror rows for registry_report and sanity.log"
+        "Mirror rows for registry_report and sanity.log",
+        "QA evidence step log"
       ]
     },
     {
       "name": "EVIDENCE_PATHS_VALIDATED_OK",
-      "owner_pf": "PF12 \u2014 HDE-Schemas and Artifacts \u00a7Path Proofs",
+      "owner_pf": "PF12 — HDE-Schemas and Artifacts §Path Proofs",
       "status": "implemented",
       "evidence_titles": [
-        "Path proofs for registry_report and sanity.log"
+        "Path proofs for registry_report and sanity.log",
+        "QA evidence step log"
       ]
     },
     {
       "name": "DETERMINISM_ENV_PINS_OK",
-      "owner_pf": "PF19 \u2014 Glow QA Guide \u00a7Env Pins",
+      "owner_pf": "PF19 — Glow QA Guide §Env Pins",
       "status": "implemented",
       "evidence_titles": [
-        "Evidence tooling enforces SAFE_MODE/ALLOW_NETWORK/locale pins"
+        "Evidence tooling enforces SAFE_MODE/ALLOW_NETWORK/locale pins",
+        "QA bootstrap log with env pins"
       ]
     },
     {
       "name": "SANITY_PIPELINE_OK",
-      "owner_pf": "PF19 \u2014 Glow QA Guide \u00a7Sanity Pipeline",
+      "owner_pf": "PF19 — Glow QA Guide §Sanity Pipeline",
       "status": "implemented",
       "evidence_titles": [
-        "Sanity pipeline log and path proof (artifacts/sanity/sanity.log)"
+        "Sanity pipeline log and path proof (artifacts/sanity/sanity.log)",
+        "QA step log for sanity pipeline"
       ]
     },
     {
       "name": "CLI_READER_EMITTER_PARITY_OK",
-      "owner_pf": "PF20 \u2014 HDE-Phased Epics (EPIC021 record)",
+      "owner_pf": "PF20 — HDE-Phased Epics (EPIC021 record)",
       "status": "implemented",
       "evidence_titles": [
         "EPIC021 CLI/Reader parity tests (showcompat + bg:resolve)",
-        "Presenter parity artifacts for showcompat/reader"
+        "Presenter parity artifacts for showcompat/reader",
+        "QA serializer step log"
       ]
     },
     {
       "name": "CLI_NO_ALT_JSON_OK",
-      "owner_pf": "PF20 \u2014 HDE-Phased Epics (EPIC021 record)",
+      "owner_pf": "PF20 — HDE-Phased Epics (EPIC021 record)",
       "status": "implemented",
       "evidence_titles": [
         "Canonical stdout/admin dumps for showcompat and aux-preview",
-        "BG:resolve canonical emitter assertions"
+        "BG:resolve canonical emitter assertions",
+        "QA serializer step log"
       ]
     },
     {
       "name": "JSON_CANONICAL_CHECK_OK",
-      "owner_pf": "PF19 \u2014 Glow QA Guide \u00a7Emitter Canon",
+      "owner_pf": "PF19 — Glow QA Guide §Emitter Canon",
       "status": "implemented",
       "evidence_titles": [
         "CLI canonical serializer identity checks (showcompat/bg:resolve)",
-        "Sercanon re-emit assertions in canonical CLI suites"
+        "Sercanon re-emit assertions in canonical CLI suites",
+        "QA serializer step log"
       ]
     },
     {
       "name": "ERROR_JSON_CANON_OK",
-      "owner_pf": "PF19 \u2014 Glow QA Guide \u00a7Emitter Canon",
+      "owner_pf": "PF19 — Glow QA Guide §Emitter Canon",
       "status": "implemented",
       "evidence_titles": [
-        "BG:resolve vendor error canonical JSON checks"
+        "BG:resolve vendor error canonical JSON checks",
+        "QA serializer step log"
       ]
     },
     {
       "name": "CLI_SERIALIZER_GUARD_OK",
-      "owner_pf": "PF19 \u2014 Glow QA Guide \u00a7Serializer Guards",
+      "owner_pf": "PF19 — Glow QA Guide §Serializer Guards",
       "status": "implemented",
       "evidence_titles": [
         "Serializer grep guard log (CLI + Reader scope)",
         "Emitter symbol proof for governed handlers",
-        "Guard coverage test suite"
+        "Guard coverage test suite",
+        "QA serializer step log"
       ]
     },
     {
       "name": "CI_CHECK_MIRROR_SCHEMA_OK",
-      "owner_pf": "PF12 \u2014 HDE-Schemas and Artifacts \u00a7Evidence Mirror",
+      "owner_pf": "PF12 — HDE-Schemas and Artifacts §Evidence Mirror",
       "status": "implemented",
       "evidence_titles": [
-        "ci/checks/check_mirror_schema.sh and mirror schema tests"
+        "ci/checks/check_mirror_schema.sh and mirror schema tests",
+        "QA evidence step log"
       ]
     },
     {
       "name": "SANITY_PIPELINE_LOGGED_OK",
-      "owner_pf": "PF19 \u2014 Glow QA Guide \u00a7Sanity Pipeline",
+      "owner_pf": "PF19 — Glow QA Guide §Sanity Pipeline",
       "status": "implemented",
       "evidence_titles": [
         "EPIC021 QA tooling bootstrap log",
@@ -161,7 +189,7 @@
     },
     {
       "name": "QA_STEP_LOGS_CONSOLIDATED_OK",
-      "owner_pf": "PF19 \u2014 Glow QA Guide \u00a7QA Logs",
+      "owner_pf": "PF19 — Glow QA Guide §QA Logs",
       "status": "implemented",
       "evidence_titles": [
         "EPIC021 QA step logs manifest",
@@ -170,7 +198,7 @@
     },
     {
       "name": "PF04-DD-QA-BOOTSTRAP-TOKENS",
-      "owner_pf": "PF04 \u2014 Governance Docs (Doc Delta)",
+      "owner_pf": "PF04 — Governance Docs (Doc Delta)",
       "status": "token_incomplete",
       "evidence_titles": [
         "EPIC021 QA tooling bootstrap log",
@@ -179,7 +207,7 @@
     },
     {
       "name": "PF19-DD-QA-PLAN-VIABILITY-TOKENS",
-      "owner_pf": "PF19 \u2014 Glow QA Guide (Doc Delta)",
+      "owner_pf": "PF19 — Glow QA Guide (Doc Delta)",
       "status": "token_incomplete",
       "evidence_titles": [
         "EPIC021 acceptance-map viability log",

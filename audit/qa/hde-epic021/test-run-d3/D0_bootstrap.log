@@ -1,4 +1,4 @@
-run:dedupe-run
+run:test-run-d3
 env:{'SAFE_MODE': '1', 'ALLOW_NETWORK': '0', 'LC_ALL': 'C', 'LANG': 'C', 'TZ': 'UTC'}
 check import:OK
 check pytest-collect:OK
