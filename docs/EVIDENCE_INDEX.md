@@ -13,7 +13,7 @@
 
 ## QA harness (EPIC021)
 * QA_ROOT bootstrap: `audit/qa/hde-epic021/test_tooling_bootstrap.log`
-* Per-run bootstrap log: `audit/qa/hde-epic021/D0_bootstrap.log`
+* Per-run bootstrap log: `audit/qa/hde-epic021/<run-id>/D0_bootstrap.log`
 * QA step manifest: `audit/qa/hde-epic021/qa_step_logs_manifest.json`
 * Acceptance-map viability: `audit/qa/hde-epic021/acceptance_map_viability.log`
 * Token evidence matrix: `audit/qa/hde-epic021/token_evidence_matrix.md`
