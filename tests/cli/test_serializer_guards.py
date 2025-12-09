@@ -44,6 +44,7 @@ def test_guards_pass_on_repo_state(tmp_path: Path) -> None:
     proof_body = proof_log.read_text(encoding="utf-8")
     assert "summary: PASS" in serializer_body
     assert "summary:PASS" in proof_body
+    assert "adapter/http_reader.py" in serializer_body
     assert "canonical_emitters:emit_reader_public_envelope,emitter.emit_public" in proof_body
     assert "showcompat:showcompat:emit_reader_public_envelope,emitter.emit_public" in proof_body
 

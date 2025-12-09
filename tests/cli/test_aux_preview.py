@@ -1,7 +1,24 @@
+import pytest
+
 from adapter.http_reader import app
 from engine.cli import main as cli_main
 from engine.narratives import emit_public_aux, get_pack
 from engine.narratives.router import route_keys
+
+
+DETERMINISM_PINS = {
+    "LC_ALL": "C",
+    "LANG": "C",
+    "TZ": "UTC",
+    "SAFE_MODE": "1",
+    "ALLOW_NETWORK": "0",
+}
+
+
+@pytest.fixture(autouse=True)
+def _rails(monkeypatch: pytest.MonkeyPatch) -> None:
+    for key, value in DETERMINISM_PINS.items():
+        monkeypatch.setenv(key, value)
 
 
 def _find_suppressed_tuple():
