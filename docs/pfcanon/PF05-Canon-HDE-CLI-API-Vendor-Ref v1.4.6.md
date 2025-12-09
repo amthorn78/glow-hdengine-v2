@@ -4,13 +4,13 @@
 
 **Title:** PF05-Canon-HDE-CLI-API-Vendor-Ref
 
-**Version:** v1.4.5
+**Version:** v1.4.6
 
 **Status:** Canon
 
-**Effective date:** 2025-12-04
+**Effective date:** 2025-12-07
 
-**Last Update Gate:** BN 8.0.7 Drain A8
+**Last Update Gate:** BN 81.9 Drain A2/A3
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -1600,30 +1600,72 @@ AB↔BA identity, two-run identity, and Reader↔CLI parity for Reader v1 envelo
 
 ---
 
-## **5.2 Errors \[Required-Now\]**
+## **5.2 Errors Required−NowRequired-NowRequired−Now**
 
-* **Typed, numeric-free.** Error body is a typed JSON object, serialized by the same canonical emitter (§6.1/§6.2) and LF-terminated. **Shape:**  
-   `{"ok": false, "code": "<string>", "error": "<string>"}`.  
-   *(Optional)* `retry_after_ms` (**int ≥ 0**) appears **only** for deterministic **429** mappings; otherwise **omit**. No PII, no payload echoes, no SR/XR numerics.
+* **Typed, numeric-free error\_v1 envelope.** All governed error surfaces (Reader errors, diagnostic writer errors, CLI typed failures, and internal health/ready/not-found error responses) **MUST** emit the **error\_v1** JSON envelope, serialized by the single canonical emitter (§6.1/§6.2) and LF-terminated. The **minimum** shape is:
+
+   `{"schema": "v1", "ok": false, "code": "<ERR_*>", "error": "<non-PII message>"}`
+
+  * `schema` — fixed string `"v1"` for this error envelope.
+
+  * `ok` — boolean, always `false` for error\_v1.
+
+  * `code` — canonical **UPPER\_SNAKE** error token from the governed **error token map** (see below).
+
+  * `error` — human-readable, non-PII, non-secret message.
+
+* Optional fields are defined in the schema owned by **HDE-Schemas & Artifacts** (titles-only). Today this includes:
+
+  * `retry_after_ms` — integer ≥ 0, **only** when the transport policy explicitly permits it (e.g. deterministic 429 handling for vendor rate limits).
+
+  * `details` — optional object for additional structured context; the allowed fields and structure are governed by the error\_v1 schema and must remain numeric-free on public surfaces.
+
+* No other fields may appear in the public error\_v1 envelope.
+
+* **Canonical error token map (`ERR_*`) and aliases.**
+
+  * Canonical error tokens are defined in a governed **error token map** (for example `ERROR_TOKEN_MAP` in the engine) and are emitted as **UPPER\_SNAKE** strings in the `code` field, such as:
+
+    * `ERR_COMPAT_INVALID_JSON`
+
+    * `ERR_INVALID_VIEWER_PREFS`
+
+    * `ERR_MISSING_NARRATIVE_KEY`
+
+    * `ERR_READER_INVALID_VERSION`, `ERR_READER_FORBIDDEN`, `ERR_READER_MISSING_PARAM`, `ERR_READER_INVALID_CHART`, `ERR_READER_INVALID_PATH`, `ERR_READER_MISSING_TZ_A`, `ERR_READER_MISSING_TZ_B`
+
+    * `ERR_WRITER_INVALID_CONTENT_TYPE`, `ERR_WRITER_INVALID_JSON`, `ERR_WRITER_INVALID_INPUT`, `ERR_WRITER_UNKNOWN_KEY`, `ERR_WRITER_REQUEST_TOO_LARGE`, `ERR_WRITER_UNAUTHORIZED`, `ERR_WRITER_FORBIDDEN`
+
+    * `ERR_NOT_FOUND` for canonical 404/405 mappings.
+
+  * Legacy lowercase strings such as `"invalid_json"`, `"invalid_prefs"`, `"missing_narrative_key"`, and `"forbidden"` are retained as **input aliases** inside the engine code (for example for older tests or call sites), but **are not emitted** in the public `code` field. They resolve via a canonicalization helper (for example `canonical_token_for`) to the corresponding `ERR_*` token before the error\_v1 envelope is serialized.
+
+  * Any new error condition added in future work **must** be represented by a canonical `ERR_*` token in the map first, and only then wired into Reader, writer, and CLI surfaces.
 
 * **Headers (normative).**  
-   `Content-Type: application/json; charset=utf-8` · `Cache-Control: no-store` · **no `ETag`**. A7 conditional rules live in §5.3.
+   `Content-Type: application/json; charset=utf-8` · `Cache-Control: no-store` · **no `ETag`** on error and writer responses. A7 conditional rules for success responses live in §5.3.
 
-* **Streams.** Errors travel on **stderr** in the CLI; Reader uses **HTTP status** with the headers above. Public bytes are canonical JSON: UTF-8 (no BOM), ASCII-sorted keys, compact, exactly one trailing LF; checks run under `LC_ALL=C`, `TZ=UTC`.
+* **Streams.** Errors travel on **stderr** in the CLI; HTTP consumers receive error\_v1 in the response body. Public bytes are canonical JSON: UTF-8 (no BOM), ASCII-sorted keys, compact, exactly one trailing LF; checks run under `LC_ALL=C`, `TZ=UTC`.
 
-* **Determinism & parity.** Given the same inputs/environment, error bodies are **byte-identical**; **AB vs BA** has no effect. **CLI stderr** and **Reader body** are byte-equal for the same error condition.
+* **Determinism & parity.** Given the same inputs/environment, error bodies are **byte-identical**; **AB vs BA** does not change the error. CLI stderr and Reader error bodies are **byte-identical** for the same error condition (including `schema`, `ok`, `code`, `error`, and any optional fields required by the error\_v1 schema).
 
-* **Refusal vs 429 (policy note).** **Refusal** (rails closed) is an **ops surface**, **not** an A7 proof surface. Transport invariants on refusal: `Cache-Control: no-store`, `Content-Type: application/json; charset=utf-8`, **no `ETag`**, **no `Vary`**, **no `Content-Encoding`**. **429** is an **A7 transport outcome** and **may** include `retry_after_ms`. Keys-only log allow-lists and token names are owned in **HDE-Governance** (titles only).  
-* **DB availability (non‑dev).** If no database connection can be established (and no dev fallback applies), respond with a **typed, deterministic JSON error** (numeric‑free envelope; headers per §5.2). CLI exit code is **2**. No raw driver exceptions or stack traces surface.
+* **Refusal vs 429 (policy note).** **Refusal** (rails closed) is an **ops surface**, **not** an A7 proof surface. Transport invariants on refusal: `Cache-Control: no-store`, `Content-Type: application/json; charset=utf-8`, **no `ETag`**, **no `Vary`**, **no `Content-Encoding`**. **429** is an A7 transport outcome and **may** include `retry_after_ms`. Keys-only log allow-lists and error token semantics are owned in **HDE-Governance** (titles-only).
+
+* **DB availability (non-dev).** If no database connection can be established (and no dev fallback applies), respond with a **typed, deterministic error\_v1 envelope** (numeric-free, LF-terminated) and CLI exit code **2**. No raw driver exceptions or stack traces may surface in public bytes.
 
 ### **Validation (binary)**
 
-1. **Schema gate:** object contains `ok:false`, `code`, `error` (strings); optional `retry_after_ms` is integer ≥ 0 (**429 only**); **no other keys**.  
-2. **Canonicalization:** re-serialize canonically and **byte-compare** (must match); one LF; UTF-8; no BOM/ANSI.  
-3. **Parity:** CLI **stderr** vs Reader **error body** byte-compare (must match).  
-4. **A7 checks:** `Content-Type` present; `Cache-Control: no-store` present; **no `ETag`**.
+1. **Schema gate:** object contains `schema:"v1"`, `ok:false`, `code`, `error` (strings), plus only those optional fields allowed by the error\_v1 schema (for example `retry_after_ms` integer ≥ 0, optional `details` object). No other keys.
 
-**Routing (titles-only).** A7 policy and acceptance tokens live in **HDE-Governance** (§2.0 and A7). Canonical JSON rules live in **HDE-Schemas & Artifacts** (§4).
+2. **Canonicalization:** re-serialize canonically and **byte-compare** (must match); one LF; UTF-8; no BOM/ANSI.
+
+3. **Token map:** emitted `code` values are canonical `ERR_*` tokens from the governed error token map; no lowercase aliases appear in public error\_v1 envelopes.
+
+4. **Parity:** CLI **stderr** vs Reader **error\_v1 body** byte-compare (must match).
+
+5. **A7 checks:** `Content-Type` present; `Cache-Control: no-store`; **no `ETag`** on writers/errors.
+
+**Routing (titles-only).** The error\_v1 schema and error token map are owned by **HDE-Schemas & Artifacts** and **HDE-Governance** (titles-only). Canonical JSON rules live in **HDE-Schemas & Artifacts (§4)**. Governance tokens covering error behavior live in **HDE-Governance (§2.0 Acceptance Tokens)**.
 
 ---
 
@@ -1733,7 +1775,15 @@ These transport bytes are owned here; PF05 owns **Reader bytes only** and keeps 
   * `viewer_prefs` with `top_category` and `weights` covering all 10 Magic-10 IDs as ints `0..100` (missing/non-integer ⇒ `invalid_prefs`).  
 * **Success body (dev/internal).** Returns the §7A pair contract (`10 × {id, score:int 0..100, band ∈ {Cool,Open,Warm,Glow}, personal_key, shared_key}`) plus `meta.{engine_tag, release_id}`. This is an internal/admin testing surface — **not** the public Reader v1 payload.
 
-* **Error body.** Typed, numeric-free `{"ok": false, "code": "…", "error": "…"}`; never echo request/vendor payload text; **no PII** (e.g., `invalid_json`, `invalid_prefs`, `missing_narrative_key`).
+**Error body.** Typed, numeric-free **error\_v1** envelope as defined in §5.2: `{"schema":"v1","ok":false,"code":"<ERR_*>", "error":"<message>", ...}`. For this route, the canonical codes include:
+
+* `ERR_COMPAT_INVALID_JSON` for malformed or mixed `a`/`b` payloads (for example mixing `*_id` and full person payload for the same party),
+
+* `ERR_INVALID_VIEWER_PREFS` for missing/non-integer or incomplete viewer preference weights,
+
+* `ERR_MISSING_NARRATIVE_KEY` when a required narrative key is absent or unresolvable for a compat category.
+
+Legacy lowercase strings such as `"invalid_json"`, `"invalid_prefs"`, and `"missing_narrative_key"` remain accepted **aliases** internally, but are resolved via the error token map into their canonical `ERR_*` equivalents before error\_v1 is emitted. The public `code` field on this route **MUST** carry the canonical `ERR_*` tokens, not the aliases.
 
 ### **Headers & conditionals (normative)**
 

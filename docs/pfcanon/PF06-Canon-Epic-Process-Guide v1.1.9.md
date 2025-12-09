@@ -2,13 +2,13 @@
 
 **Title:** PF06-Canon-Epic-Process-Guide 
 
-**Version:** v1.1.4
+**Version:** v1.1.9
 
 **Status:** Canon
 
-**Effective date**: 2025-12-03
+**Effective date**: 2025-12-07
 
-**Last Update Gate:**  Audit 2025-12-03
+**Last Update Gate:**  BN 8.1.9 Drain A14/15
 
 **tag:** INV-f2ac55d77ce9aacc
 
@@ -770,6 +770,251 @@ Plans that:
 * omit the CI vs open-rails distinction for guard steps,
 
 are **non-conforming** and **MUST** be corrected so that D3 acceptance is clearly anchored in CI/closed-rails runs, with open-rails guard runs documented as optional env-enforcement checks only.
+
+### **1.1.8 CLI commands in QA Plans (canon-backed only)**
+
+Live QA Plans frequently use `hdctl` or other CLI commands as entrypoints (for example D0 “CLI presence” checks, D1 error-stream checks, or vendor-facing steps).
+
+To keep those steps aligned with PF-Canon and avoid inventing new CLI requirements, the following rules apply:
+
+* **CLI bytes live in the CLI spec.**
+
+  * All CLI commands, flags, and subcommands used in QA Plans **MUST** be traceable to at least one of:
+
+    * *HDE-CLI-API-Vendor-Ref* (the single home for CLI/Reader bytes),
+
+    * a governed CLI test harness or script in the repo, or
+
+    * a CodEx audit snippet that lists the CLI shape as discovered behavior for this repo.
+
+  * QA Plans **MUST NOT** introduce new CLI spellings or flags “by habit” (for example a generic `--version` check) that are not present in those sources.
+
+* **D0 CLI presence checks: minimal and spec-backed.**
+
+  * When D0 includes a “CLI presence” or “CLI baseline” step, that step **MUST**:
+
+    * use command shapes that are explicitly documented as supported (for example a shell-level presence check or a help/usage invocation taken from the CLI spec or CodEx audit), and
+
+    * phrase the Expected Outcome in terms of **what PF-Canon actually requires** (for example “CLI is installed and runnable under the pinned rails for later steps”), not in terms of extra behavior that is not a canonical requirement.
+
+  * D0 steps **MUST NOT** assert stronger expectations (for example “must print a version string” or a particular banner) unless those behaviors are **explicitly tied** to PF-Canon requirements or epic acceptance tokens **by title**.
+
+* **Plan authors: copy, do not invent, CLI shapes.**
+
+  * Implementation Agents and QA Plan authors **MUST** derive every CLI command used in a QA Plan from:
+
+    * the CLI spec,
+
+    * an existing test or harness, or
+
+    * a CodEx audit report for this repo,  
+       and **MUST** copy those shapes exactly (command name, flags, argument structure), adjusting only concrete values like file paths or epic IDs.
+
+  * Any time a Plan adds a new CLI usage that is not already present in those sources, the Plan **MUST** treat that as a **spec gap** and either:
+
+    * update the CLI spec first, or
+
+    * remove or replace the command with a canon-backed equivalent.
+
+* **Plan reviewers: non-traceable CLI commands are blocking.**
+
+  * During PLAN/CRD review for epics that include CLI steps (especially Live QA epics), Lead Dev and QA reviewers **MUST**:
+
+    * spot-check CLI commands in the Plan against *HDE-CLI-API-Vendor-Ref*, tests, or CodEx audit output, and
+
+    * treat any CLI command or flag that **cannot be traced** to one of those sources as a **blocking issue**.
+
+  * Plans with non-traceable CLI commands **MUST** be corrected before approval:
+
+    * either by replacing the command with a canon-backed usage, or
+
+    * by first adding the missing behavior to the CLI spec and tests, and then updating the Plan to match.
+
+* **Interaction with other sections.**
+
+  * This section refines §0.6.1 “Canon-first planning” for CLI usage: CLI behavior in QA Plans must come from the CLI spec, tests, or CodEx audit, not from generic assumptions.
+
+  * It complements §1.1.5–§1.1.7 by ensuring that:
+
+    * CLI steps used for behavior runs and artifact capture follow **documented** command shapes, and
+
+    * D3 CLI guard runs in Live QA (when present) still respect the CI vs open-rails distinction while using canon-backed commands.
+
+Plans that:
+
+* rely on CLI commands or flags that are not present in any PF-Canon CLI spec, test harness, or CodEx audit, or
+
+* assert Expected Outcomes that go beyond PF-Canon requirements without naming the corresponding tokens or docs by title,
+
+are **non-conforming** and **MUST** be revised before PLAN/CRD approval or Live QA scheduling.
+
+### **1.1.9 Token fidelity rails for QA tokens and evidence**
+
+This section defines **process rails for QA tokens** in epic planning and review. It applies to any:
+
+* Implementation Plan
+
+* QA Plan
+
+* epic record (including acceptance maps and manifests)
+
+that **introduces or consumes QA Acceptance Tokens**.
+
+It does **not** redefine token semantics or schema; those remain in:
+
+* *Glow QA Guide* (QA Acceptance Tokens registry and usage),
+
+* *HDE-Governance* (token semantics and ops policy),
+
+* *HDE-Schemas & Artifacts* (evidence schemas and mirror), and
+
+* *HDE-Phased Epics* (epic-level D-goals and token rosters).
+
+PF06’s role is to define how plans and reviews **must use and enforce** those single homes.
+
+#### **1.1.9.1 PF23 audits vs PF19 token semantics**
+
+* PF23 reality audits are **optional per-epic surfaces**; their scope is decided per epic or plan.
+
+* Decisions to **waive, narrow, or skip** PF23 audits for a plan or epic are **local to that plan** and **MUST NOT** be interpreted as:
+
+  * relaxing PF19 QA token semantics or names,
+
+  * relaxing PF12 evidence or mirror rules, or
+
+  * relaxing PF20 D-goal/token roster requirements.
+
+* QA token names and semantics **MUST** still come from the QA Acceptance Tokens registry in *Glow QA Guide* and related PF docs (titles only), regardless of PF23 audit scope.
+
+Any plan text that implies “PF23 is out of scope, so token/evidence strictness is optional” is **non-conforming** and must be corrected.
+
+#### **1.1.9.2 Token/evidence matrix (mandatory for token-touching work)**
+
+For any Implementation Plan, QA Plan, or epic record that **adds or consumes QA tokens**, reviewers **MUST** ensure a **token/evidence matrix** exists before approval.
+
+At minimum, this matrix has one row per token in scope and the following fields (titles and paths only):
+
+* **`pf19_token_name`** — the QA Acceptance Token name as defined in the *Glow QA Guide* registry.
+
+* **`acceptance_map_name`** — the token name used in the epic’s acceptance map/manifest; **MUST match** `pf19_token_name` (no local aliases).
+
+* **`tests`** — unit/integration tests that exercise the token’s behavior (by module or test id).
+
+* **`ci_jobs`** — CI jobs that enforce the token under closed rails, when applicable.
+
+* **`live_qa_steps`** — Live QA steps that demonstrate the token (if any), by step id/name, pointing to `audit/qa/<epic-id>/...`.
+
+* **`evidence_artifacts`** — governed artifacts paths produced by those tests/steps (for example under `artifacts/**` or `audit/qa/<epic-id>/...`).
+
+* **`index_and_mirror_entries`** — how those artifacts appear in the Evidence Index and machine mirror (artifact keys and token tags only).
+
+Token-touching plans **MUST NOT** be approved while any token row is:
+
+* missing,
+
+* marked as “e.g.”, “TBD”, or similar placeholder, or
+
+* only implicitly described in prose without a concrete row.
+
+Such gaps are **blocking** for PLAN/CRD approval and must be resolved or explicitly scoped into new epics **before** proceeding.
+
+#### **1.1.9.3 PF19 as single home for QA token names; epics only consume them**
+
+* QA Acceptance Tokens are **centrally defined** in the QA Acceptance Tokens registry in *Glow QA Guide* and related PF docs (titles only).
+
+* Epic-level artifacts (for example *HDE-Phased Epics* records, acceptance maps, manifests, PF10 addenda, and implementation plans):
+
+  * **MUST reference tokens by their PF19 names only**, and
+
+  * **MUST NOT invent local token names or synonyms** for the same semantics.
+
+* If an epic requires a **new token**:
+
+  * The need **MUST** be recorded as a PF19 doc delta (NEW CANON or CANON UPDATE, titles only).
+
+  * That doc delta **MUST** be accepted and the token added to the PF19 registry **before** the epic is considered token-complete.
+
+If an epic-specific remediation guide or approval has already chosen a token name for a behavior, plans and maps **MUST** use that name and treat PF19 as the drainage target; they may not introduce competing names for the same behavior.
+
+#### **1.1.9.4 No silent downgrade of token/evidence blockers**
+
+Once a reviewer has identified any of the following as **blocking**:
+
+* open “e.g.” or “TBD” token names,
+
+* use of tokens not present in the PF19 registry (or in approved PF19 doc deltas),
+
+* missing rows in the token/evidence matrix, or
+
+* incomplete wiring from tokens to tests/CI/Live QA/evidence/index/mirror,
+
+that blocker:
+
+* **MAY NOT** be downgraded to “non-blocking” in a later review for the **same** plan text or epic record, and
+
+* **MAY ONLY** be cleared when:
+
+  * the plan or epic text has been updated to resolve the issue (for example, names made normative, matrix completed), **or**
+
+  * PF-Canon has been updated (for example, PF19 adding or changing the token definition).
+
+Any downgrade of such a blocker **MUST** reference the specific change (plan diff or PF doc change) that resolved it. A change in reviewer interpretation or time alone is not sufficient.
+
+#### **1.1.9.5 Scope waivers are explicit and non-transitive**
+
+When the Product Owner or governance chooses to **waive or narrow** a canon requirement for a particular plan (for example, “PF23 audits are out of scope for this plan”):
+
+* The waiver **MUST** be recorded in that plan as a **local scope directive** (for example “PF23 audits are not part of this plan’s workflow”), and
+
+* The plan **MUST** state explicitly that other rails remain fully in force, including:
+
+  * PF19 QA tokens,
+
+  * PF12 evidence rules and mirror schema,
+
+  * PF20 D-goals and token rosters, and
+
+  * PF09 CI/QA rails that apply.
+
+Such waivers **MUST NOT** be interpreted as permission to relax token naming, acceptance mapping, or evidence wiring. PF19/PF12/PF20/PF09 rules still apply unless they, too, are explicitly and locally waived by title.
+
+#### **1.1.9.6 Re-ground before asserting “no canonical token name”**
+
+Before any reviewer or plan text asserts that “no canonical token name exists yet” for a QA behavior, they **MUST**:
+
+1. Re-check the QA Acceptance Tokens registry in *Glow QA Guide* for an existing token that covers that behavior.
+
+2. Re-read any epic-specific approvals or remediation guides (for example, compat defect remediation guides for EPIC020) that might already have **chosen a token name and semantics** for that behavior.
+
+If such an approval defines a token name, plans and acceptance maps **MUST**:
+
+* treat that name as authoritative for the epic, and
+
+* route future PF19 updates to add or refine that token, instead of inventing a new name.
+
+#### **1.1.9.7 Plan and epic approval require token fidelity to be resolved**
+
+For any plan or epic that touches QA tokens:
+
+* Token names **MUST** be final (either existing PF19 names or names backed by explicit PF19 doc deltas).
+
+* The token/evidence matrix **MUST** be complete, with each token wired to its tests, CI jobs, Live QA steps (if applicable), evidence artifacts, and index/mirror entries.
+
+* Any recognized token gaps (missing PF19 entries, unclear semantics, or incomplete matrix fields) **MUST** be:
+
+  * captured as PF19/PF20 doc deltas (titles only), and
+
+  * treated as part of the epic’s scope and work, **not** as detached “future governance work.”
+
+Plans or epic records that still contain open questions like:
+
+* “which token name do we use here?”
+
+* “these tokens are examples only,” or
+
+* “token wiring TBD later”
+
+are **not ready** and **MUST** be returned for revision. They **MUST NOT** be marked approved at PLAN/CRD or at Close Gate until token fidelity is fully resolved and reflected in the epic’s acceptance and evidence.
 
 ## ---
 
@@ -1759,6 +2004,132 @@ Cross-doc references (titles only):
 * **Build.** IA provides instructions \+ verbatim materials. CodEx does **not** read PF docs directly.  
 * **PR & Commit.** **CodEx opens the PR automatically**; no new code exchange beyond what CodEx built. PO performs **squash merge** after Lead Dev gate passes.  
 * **Escalation.** PO may direct CodEx to inspect code/processes at any time. IA keeps docs synchronized (Doc-Delta \+ indices).
+
+# **6\) PHASE EXIT DISCIPLINE (ALCHEMICAL PHASES)**
+
+This section defines **how** the Product Owner and Lead Developer decide that an alchemical phase is ready to “exit” for planning purposes.
+
+It does not redefine what the phases are; that remains in *Glow Development Philosophy* and *7 Phases of Alchemical Engineering* (titles only). It does not move epic records, issues, or task status out of *HDE Phased Epics* or *HDE-Build Checklist*; those remain the single homes for phase and epic data.
+
+## **6.1 When this section applies**
+
+Use this section whenever the PO and Lead Dev are asking:
+
+* “Are we done enough with this phase to move the next epics into the next phase?”
+
+* “Can we stop opening new epics tagged with this phase and carry the remaining work forward as debt?”
+
+If the checks below cannot be evaluated from PF-Canon and governed evidence, the phase exit decision is **blocked-by-spec**, per §0.6.5. Do not treat “gut feel” or informal summaries as sufficient.
+
+## **6.2 Phase exit is canon-first and evidence-backed**
+
+Before declaring a phase exit-ready, the PO and Lead Dev **MUST** perform a canon inventory, exactly as in §1.1.1, with explicit attention to:
+
+* *HDE Phased Epics* — phase, epics, D-goals, exclusions, tracked issues, and cross-epic issues.
+
+* *HDE-Build Checklist* — phase tasks and statuses (Done / Partial / Consolidation pending / Not done / Won’t Do).
+
+* *HDE-Schemas & Artifacts* and *HDE-Build Checklist* — Evidence Index, machine mirror, close packs, and governed roots only.
+
+If any of the later checks (close-out epic, foundations, Partial/Consolidation rows, tracked issues) cannot be evaluated from this canon inventory, the phase **MUST NOT** be treated as exit-ready.
+
+## **6.3 Close-out epic required**
+
+Each phase **MUST** have at least one **close-out epic** in that phase that satisfies **all** of the following:
+
+1. The epic is **Status: Done** in *HDE Phased Epics* for that phase, with D-goals and exclusions clearly recorded.
+
+2. Its **tokens and evidence roster** for D-goals is complete in *HDE Phased Epics* and is consistent with the epic’s acceptance map and manifest.
+
+3. The epic’s **close pack**:
+
+   * lives under governed roots (for example `audit/EPIC-<ID>_close_report.md` and `audit/EPIC-<ID>_MANIFEST.json`), and
+
+   * is indexed in both:
+
+     * the human Evidence Index `docs/evidence/INDEX.json`, and
+
+     * the machine mirror `artifacts/evidence_index.jsonl`,
+
+4. per *HDE-Schemas & Artifacts* and *HDE-Build Checklist* (titles only).
+
+If no epic in the phase meets these conditions, the phase **MUST NOT** be considered exit-ready.
+
+## **6.4 Foundation tasks: “Not done” vs explicit decisions**
+
+*HDE-Build Checklist* is the single home for phase tasks.
+
+For the phase under review:
+
+* All **foundation tasks** defined for that phase in *HDE-Build Checklist* **MUST** be:
+
+  * marked **Done**, **or**
+
+  * explicitly re-scoped or dropped, as below.
+
+* Any **Not done** rows for that phase **MUST** be resolved one of two ways:
+
+  * **Re-scoped:** the work is moved into a later phase by recording it explicitly in one or more future epics in *HDE Phased Epics* (new scope).
+
+  * **Won’t Do:** the work is not going to be done and is recorded as **Won’t Do** in *HDE Phased Epics* with a short rationale and reflected in *HDE-Build Checklist*.
+
+A phase **MUST NOT** be treated as exit-ready if there are foundation rows that are still Not done in *HDE-Build Checklist* without a matching re-scope or Won’t Do decision in *HDE Phased Epics*.
+
+## **6.5 Partial / Consolidation pending rows as controlled debt**
+
+For the phase under review, **Partial** and **Consolidation pending** rows in *HDE-Build Checklist* are treated as **debt, not blockers**, **only if**:
+
+1. The notes for those rows show that the remaining work is **enhancement, tuning, or consolidation**, not missing foundational behavior.
+
+2. Each such row is explicitly carried by one of:
+
+   * a cross-epic **Outstanding Issue** or similar issue entry in *HDE Phased Epics* for that phase, **or**
+
+   * a future epic record in *HDE Phased Epics* that names the work as “Existing work / Debt to absorb” in its scope.
+
+If a Partial or Consolidation pending row has no such carrier, treat it like a missing foundation task: resolve it or re-scope it before calling the phase exit-ready.
+
+## **6.6 Tracked issues must be disposed of, not dropped**
+
+Before treating a phase as exit-ready:
+
+* Every **Done** epic in that phase in *HDE Phased Epics* **MUST** list its tracked issues.
+
+* Every tracked issue for those epics **MUST** record one of:
+
+  * **Completed under \<EPIC\>** — resolved within that epic.
+
+  * **Carried forward to \<EPIC\>** — moved into a later epic’s scope.
+
+  * **Promoted to ISSUE-XXX** — promoted to a cross-epic or cross-phase issue with its own identifier.
+
+  * **Explicitly dropped (with rationale)** — intentionally not carried forward, with a short explanation.
+
+If a Done epic has real, unresolved issues that are not covered by one of these dispositions, phase exit is **not** allowed. Treat that as a spec gap and resolve it before re-evaluating.
+
+## **6.7 Phase exit as a planning decision**
+
+When §6.3–§6.6 are satisfied:
+
+* Phase exit is treated as a **planning decision only**:
+
+  * It says “the core aim of this phase has been achieved and its remaining work is tracked as debt,”
+
+  * It does **not** say “all work tagged with this phase is finished forever.”
+
+* Any remaining work that properly “belongs” to this phase **MUST** be handled as:
+
+  * cross-epic or cross-phase issues recorded in *HDE Phased Epics*, **or**
+
+  * explicit **inputs to the next phase’s epics** (for example, “carry sampler tuning from Dissolution into Separation error-envelope work”).
+
+Once a phase is declared exit-ready under this section:
+
+* New epics **MUST** be opened in the **next** phase, not the old phase.
+
+* Those new epics **MUST** name the carried-forward work in their scope, so that acceptance and evidence for that work live entirely in the new phase.
+
+This follows the instruction in *Glow Development Philosophy* to avoid over-tuning and silent drift and the expectation in *7 Phases of Alchemical Engineering* that phases do not mix: once a phase’s core aim is achieved and its debt is explicit, planning moves forward, and that phase stops accumulating new epics.
 
 # Appendices
 

@@ -1,13 +1,16 @@
-# 0\. Document Control \[Required-Now\] 
+# 0\. Document Control \[Required-Now\]
 
 ## 0.1 Header
 
- **Title:** PF12-Canon-HDE-Schemas and Artifacts  
- **Version:** v1.5.4
+**Title:** PF12-Canon-HDE-Schemas and Artifacts
 
- **Status:** Canon  
- **Effective date:** 2025-12-04  
- **Last Update Gate:** BN 8.0.7 Drain A9/10
+**Version:** v1.5.8
+
+**Status:** Canon
+
+**Effective date:** 2025-12-08
+
+**Last Update Gate:** BN 8.1.9 Drain A17-19
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -72,6 +75,55 @@ Mirror discipline (detailed in §8.3):
 * Transient generator paths (e.g. `codex/out/**`) are not authoritative and **MUST NOT** be indexed.
 
 * Governed evidence families include, at minimum, the Endpoint Catalog proofs, CLI parity set, `/internal/version` ops proofs, DB posture snapshots, BodyGraph artifacts, **stateless QA export artifacts (BodyGraph export JSON, compat export JSON, run bundles)**, and other families enumerated in §8.6.
+
+**Evidence bundles & manifests (ledger-centric evidence).**  
+ PF12 assumes a **ledger-centric, text-based evidence posture** for the HD Engine:
+
+* Certain governed evidence families MAY be represented as **evidence bundles** instead of many small files. An **evidence bundle** is a textual artifact (typically JSON or JSONL) under `artifacts/**` or `docs/evidence/**` that aggregates multiple logical evidence members into a single file.
+
+* Each bundle MUST have a companion **bundle manifest** (also textual JSON/JSONL under governed paths) that, for each logical member, records at least:
+
+  * a member or logical `artifact_key`,
+
+  * a `sha256` hash (lowercase 64-hex) of the member’s canonical bytes, and
+
+  * `size_bytes` for that member,
+
+* plus any additional descriptors owned by local schemas and tests.
+
+* For bundle-based families, PF12 treats the **bundle file and its manifest** as the governed artifacts. They are indexed in `docs/evidence/INDEX.json` and mirrored in `artifacts/evidence_index.jsonl` under the standard Evidence Index / Machine Evidence Mirror discipline (§8.3). Individual members inside the bundle MAY, but need not, appear as separate rows in the Human Index or Machine Mirror.
+
+* Baseline HD Engine evidence that supports PF19 QA tokens and PF23 reality audits MUST remain **per-PR inspectable via text artifacts**: Human Index, Machine Mirror, bundle manifests, and key QA logs. Binary or compressed artifacts (for example, archives) MAY exist as supplementary files but MUST NOT be the sole governed evidence for any acceptance token that Codex/ChatGPT-class agents are expected to reason about.
+
+* In the rest of this document, the term **artifact** includes both single-file artifacts (for example, a single log or JSON snapshot) and **bundle artifacts** (bundle file \+ manifest) unless otherwise specified. The Evidence Catalog in §8.6 enumerates which families use bundles and which remain single-file artifacts.
+
+**Candidate 1 bundle behavior (EPIC020 transitional rules).**
+
+During the EPIC020 Candidate 1 migration, PF12 adopts the following **transitional**, EPIC-scoped constraints for the EPIC020 evidence bundle generator:
+
+* **Mixed artifact entry forms (acceptance map compatibility).**
+
+  * The EPIC020 bundle/manifest generator **MUST** be able to consume both:
+
+    * structured artifact entries (objects with `artifact_key`/`bundle_artifact_key`/`path` or `discovered_physical_path`), and
+
+    * legacy string entries (where an artifact is named only by its path string)
+
+  * in `docs/acceptance_map_epic020.json` without requiring the acceptance map to be rewritten.
+
+  * For string entries, the generator **MAY** infer a logical `artifact_key` and `bundle_artifact_key` from the token and path (for example, using the token name as `bundle_artifact_key` and the path as `artifact_key`), but this inference is **transitional** and **EPIC020-only**: canonical artifact and bundle keys remain governed by PF-Canon and may be pinned explicitly in future Doc-Deltas. PF12 continues to treat acceptance maps as sources of **paths and tokens**, not as canonical homes for bundle key naming.
+
+* **No self-referential bundling.**
+
+  * Evidence bundles and their manifests are themselves governed artifacts with their own Index/Mirror records. They **MUST NOT** be treated as bundle members, even if they appear as governed artifacts for tokens in acceptance maps.
+
+  * Bundle generators **MUST** restrict membership to the underlying evidence files (for example, compat logs, JSON snapshots, headers, QA checklists) and **MUST** skip any acceptance-map entries whose discovered physical path points at their own outputs (for example `artifacts/epic020/bundles/*.bundle.json` or `*.manifest.json` for EPIC020).
+
+  * This rule prevents self-referential bundles that cannot pass check-mode invariants and aligns with Candidate 1’s design: bundles/manifests are logical families *over* existing EPIC020 evidence, not members of themselves or other bundles.
+
+* **Scope.**
+
+  * These behaviors are **transitional and scoped to EPIC020 Candidate 1**. They do not change the general Evidence Catalog model: PF12 still expects acceptance maps and manifests to remain names-only inputs, with canonical bundle key naming and membership semantics owned by PF12/PF14/PF19/PF20 via future Doc-Deltas.
 
 **Evidence Catalog (single home).**  
  PF12 §8.x and §8.6 together form the **Evidence Catalog**: the single home for governed evidence artifact **families** and their titles/paths. Other PF documents (PF04/PF05/PF09/PF14/PF20) must refer to these families by name and **must not** maintain parallel path lists.
@@ -355,6 +407,20 @@ This section records unresolved items that require confirmation. Each remains \[
    Severity: medium  
    Affects: §2.7 (new), §3, §6  
    Next: add catalog \+ schema; include in manifest; any byte change recomputes `release_id`.
+
+* **EVIDENCE-BUNDLES-HASH-MODELS**
+
+  Status: OPEN
+
+  Decision: Candidate 1 (“Evidence Bundles with Manifests”) is adopted as the baseline evidence architecture: evidence MAY be grouped into textual bundles with textual manifests, and the bundle \+ manifest are treated as governed artifacts under the existing Evidence Index / Machine Mirror discipline. Current canon still expects **per-artifact path proofs**, where “artifact” may be a single file or a bundle artifact/manifest file; no hash-only or index-only families are permitted yet. Any future move to hash-only or index-only evidence (no on-disk member payloads) MUST land with a Doc-Delta that reconciles §8.3 path-proof semantics and Mirror schema, and must be coordinated with HDE-Mechanics Guide, HDE-Build Checklist, Glow QA Guide, and Reality Audits before implementation.
+
+  Owner: audit
+
+Severity: medium
+
+Affects: §8.3 (Machine Evidence Mirror and bundle semantics), PF14 evidence tooling, PF09 evidence gates, PF19 QA tokens, PF23 Reality Audits
+
+Next: Design and agree a hash-only/index-only model (Candidate 4\) and update PF12 \+ dependent PF docs via Doc-Delta before any such evidence families appear in the repo.
 
 ---
 
@@ -1820,6 +1886,88 @@ Each line in the mirror uses at least the following schema; unknown keys are rej
  "proof\_anchor": ""  
  }
 
+**Bundle-aware extension (evidence bundles, manifests, and epic metadata).**
+
+The minimum record schema above remains normative for **all** Mirror records. This section extends it to cover bundle artifacts, their manifests, and per-epic metadata without changing the core field set or canonical JSONL discipline:
+
+* **Allowed top-level keys and unknown-key rejection.**
+
+   The Mirror still **rejects unknown keys**. The only allowed top-level keys for any record are:
+
+  * **Core keys** (required for every record):
+
+    * `artifact_key`
+
+    * `role`
+
+    * `sha256`
+
+    * `size_bytes`
+
+    * `produced_at_utc`
+
+    * `discovered_physical_path`
+
+    * `proof_anchor`
+
+  * **Metadata keys** (optional; may appear on any record):
+
+    * `epic_id` — a short identifier for the owning epic (for example, `"HDE-EPIC020"`); semantics live in **HDE-Phased Epics** and **Glow QA Guide** (titles-only).
+
+    * `record_type` — a short type label for this record (for example, `"epic020_bundle"` or `"epic020_bundle_manifest"`); names are governed by local schemas and tests.
+
+    * `schema_version` — a version string for the record schema (for example, `"1.0"`).
+
+    * `notes` — free-form, names-only commentary to aid audits; contents are out of scope for PF12 beyond canonical JSON constraints.
+
+    * `tokens` — an array-as-set of acceptance token names (strings) associated with this record; semantics and ownership of token names remain in **HDE-Governance** and **Glow QA Guide** (titles-only). Arrays treated as sets MUST be deduped and ASCII-sorted.
+
+  * **Bundle-specific keys** (optional; **bundle rows only**):
+
+    * `bundle_key` — a stable logical identifier for the bundle’s member family (for example, `"ordering_evidence"`, `"sampler_pool_snapshots"`, `"config_bundles"`, or an epic-specific family such as `"epic020_bundles"`); names are governed by local schemas and tests, not by PF12.
+
+    * `bundle_manifest_path` — the repo-relative path to the bundle’s manifest JSON/JSONL file if the current record represents the **bundle file** (the manifest itself is a separate governed artifact with its own Mirror record).
+
+    * `bundle_member_count` — an integer counting the number of logical members recorded in the manifest for this bundle.
+
+* Non-bundle artifacts (most rows) MUST NOT include any bundle-specific keys. For those rows, the allowed key set is exactly the **core keys** plus any applicable **metadata keys** above; the minimum record schema from the preceding block applies unchanged.
+
+* **Bundle artifacts and manifests.**
+
+  * A **bundle artifact** is a textual file (JSON/JSONL) that groups multiple logical evidence members. Its Mirror record’s `artifact_key` identifies the governed bundle family (for example, `"config_bundle.fe"` or a future bundle family defined in §8.6), and `discovered_physical_path` points to the bundle file under `artifacts/**` or `docs/evidence/**`.
+
+  * A **bundle manifest** is a textual file (JSON/JSONL) that enumerates the bundle’s members (logical `artifact_key`, member `sha256`, `size_bytes`, and optional descriptors) and is treated as a separate governed artifact. The manifest has its own Mirror record with its own `artifact_key` and `discovered_physical_path`; it **MAY** use `bundle_key` to associate itself with the corresponding bundle artifact.
+
+  * For selected bundle-based families (as defined in §8.6 and in their per-family subsections), the Human Evidence Index and Machine Evidence Mirror **track the bundle file and its manifest as the governed artifacts instead of listing every internal member file as a separate row**. Internal member content is addressed by the manifest, not directly by additional Mirror rows.
+
+* **EPIC-scale example (EPIC020 Candidate 1 bundles).**
+
+   EPIC020 Candidate 1 evidence bundles follow this pattern:
+
+  * Each EPIC020 bundle and manifest has a Mirror record whose `artifact_key` is the relevant EPIC020 token (for example, `"EPIC020.D1.HTTP_COMPAT_MALFORMED_JSON"` or `CLI_SHOWCOMPAT_CANON_OK`).
+
+  * `record_type` is `"epic020_bundle"` for bundle artifacts and `"epic020_bundle_manifest"` for manifests.
+
+  * `epic_id` is `"HDE-EPIC020"`.
+
+  * `tokens` is a non-empty array of token names tied to the EPIC020 acceptance roster; schema and ownership of token names live in **HDE-Governance** and **Glow QA Guide**.
+
+* Other epics may introduce similar patterns with different `record_type` and `epic_id` values; PF12 remains the single home for the allowed key set and canonical JSONL constraints, while per-epic meaning is defined by PF04/PF19/PF20.
+
+* **Path-proof semantics for bundles.**
+
+  * Each bundle artifact and its manifest MUST have a governed path-proof transcript (`*.path_proof.txt` or equivalent) under `artifacts/path_proofs/...` whose `path`, `sha256`, and `size_bytes` match the bundle/manifest file and the corresponding Mirror record values.
+
+  * For bundle-based families, “per-artifact path proofs” in PF12 are interpreted as “per governed artifact,” where a **governed artifact** may be either:
+
+    * a single artifact file (e.g., a log or JSON snapshot), or
+
+    * a bundle artifact or bundle manifest file.
+
+  * This extension does **not** introduce hash-only or index-only families. Any future move toward hash-only evidence (no on-disk member payloads) remains out of scope here and requires an explicit reconciliation Doc-Delta (tracked as an OPEN decision in §0.5).
+
+All other Mirror rules remain unchanged: canonical JSONL per §4, single mirror file at `artifacts/evidence_index.jsonl`, sort-before-write by `(artifact_key, discovered_physical_path)`, uniqueness of that pair, strict governed-paths rule, and 1:1 parity with the Human Evidence Index.
+
 **Self-record semantics (index.machine\_mirror).**
 
 * The mirror **MAY** include a single record whose `artifact_key` identifies the Machine Evidence Mirror itself (for example, `"index.machine_mirror"`). This is the **self-record** for `artifacts/evidence_index.jsonl`.
@@ -2891,34 +3039,145 @@ These artifacts form the topology.orientation\_demo family and serve as the exem
 
   ---
 
-  #### Internal-ops surface
+#### **Internal-ops surface — `/internal/version` identity artifacts (INTVER\_\*)**
 
-* `/internal/version` headers/body proofs  
-   Titles/paths for header/body evidence artifacts are defined by HDE-Governance in the internal ops appendix; PF12 records them here as part of the Evidence Catalog, not as a transport spec.
+These entries register the `/internal/version` identity artifacts required by Governance as governed Evidence Catalog families. `/internal/version` is an ops-only identity surface (non-A7); PF12 records its evidence artifacts, artifact\_keys, and Index/Mirror discipline, while transport bytes and token semantics remain in HDE-Governance and HDE-CLI-API-Vendor-Ref by title.
 
-  ---
+* **INTVER\_BODY\_GET\_V1 — GET body snapshot**
 
-  #### CLI parity and determinism
+  * Artifact path (example): `artifacts/ops/internal_version/body_get.json` — canonical JSON body for a successful `GET /internal/version` (six provenance fields, no extras, LF-terminated).
 
-* `artifacts/cli/showcompat/stdout.json`
+  * Schema path: a JSON Schema under `docs/schemas/**` that captures the frozen six-field identity envelope for `/internal/version`.
 
-* `artifacts/cli/showcompat/two_run_identity.log`
+  * Mirror: records use `artifact_key:"INTVER_BODY_GET_V1"` and `role:"snapshot"`; Human Index entries use the same artifact\_key and the `body_get.json` path as `discovered_physical_path`.
 
-* `artifacts/cli/showcompat/abba.diff`
+* **INTVER\_BODY\_GET\_SHA256\_V1 — GET body hash record**
 
-* `artifacts/cli/showcompat/reader_cli_parity.diff`
+  * Artifact path (example): `artifacts/ops/internal_version/body_get.sha256` — small JSON or text artifact recording the sha256 and size of `body_get.json` as governed in Governance.
 
-* `sanity.pipeline.log` — Sanity pipeline run log (closed-rails orchestrator over serializer determinism, env pins, CLI guards, and evidence skeleton checks).
+  * Mirror: records use `artifact_key:"INTVER_BODY_GET_SHA256_V1"` and `role:"snapshot"`; Human Index entries use the same artifact\_key and the hash file path.
 
-   Path: `artifacts/sanity/sanity.log`  
-   Path-proof: `artifacts/sanity/sanity.log.path_proof.txt`
+* **INTVER\_HEADERS\_GET\_V1 — GET headers snapshot**
 
-   Mirror record:  
-   `artifact_key:"sanity.pipeline.log", role:"log", discovered_physical_path:"artifacts/sanity/sanity.log"`, with `sha256`, `size_bytes`, `produced_at_utc`, and `proof_anchor` matching the log bytes and path-proof as required by §8.3 (“Sanity pipeline log (sanity.pipeline.log)”) and the general Mirror/path-proof rules in §8.3.
+  * Artifact path (example): `artifacts/ops/internal_version/headers_get.txt` — raw `GET /internal/version` response headers (proving `Cache-Control: no-store`, absence of `ETag`/`Last-Modified`, correct `Content-Type`).
 
-  ---
+  * Mirror: records use `artifact_key:"INTVER_HEADERS_GET_V1"` and `role:"snapshot"`; Human Index entries use the same artifact\_key and headers file path.
 
-  #### Sampler evidence (D4 — HDE-EPIC019)
+* **INTVER\_HEADERS\_HEAD\_V1 — HEAD headers snapshot**
+
+  * Artifact path (example): `artifacts/ops/internal_version/headers_head.txt` — raw `HEAD /internal/version` response headers (200, `Content-Length == len(identity GET body)`, `Content-Type == GET`, no body).
+
+  * Mirror: records use `artifact_key:"INTVER_HEADERS_HEAD_V1"` and `role:"snapshot"`; Human Index entries use the same artifact\_key and headers file path.
+
+* **INTVER\_TWO\_RUN\_IDENTITY\_V1 — two-run identity log**
+
+  * Artifact path (example): `artifacts/ops/internal_version/two_run_identity.log` — log showing two successive `GET /internal/version` calls under closed rails produce byte-identical bodies and consistent headers.
+
+  * Mirror: records use `artifact_key:"INTVER_TWO_RUN_IDENTITY_V1"` and `role:"log"`; Human Index entries use the same artifact\_key and log path.
+
+**Indexing and Mirror discipline.**  
+ For each INTVER\_\* family above, the Human Evidence Index (`docs/evidence/INDEX.json`) MUST contain at least one entry with the appropriate artifact\_key and a `discovered_physical_path` pointing to the governed artifact under `artifacts/ops/internal_version/**`; `docs/evidence/INDEX.sha256` MUST be updated in the same PR when adding or changing any `/internal/version` artifact. The Machine Evidence Mirror (`artifacts/evidence_index.jsonl`) MUST contain canonical JSONL records for each governed `/internal/version` artifact and schema, using the artifact\_key names exactly as above and the minimum Mirror record schema in §8.3 (artifact\_key, role, sha256, size\_bytes, produced\_at\_utc, discovered\_physical\_path, proof\_anchor).
+
+**Acceptance hints (names-only).**  
+ These INTVER\_\* families are the governed surfaces for the `/internal/version` identity tokens defined in HDE-Governance (for example, `INTERNAL_VERSION_200_CTYPE_JSON_UTF8_OK`, `INTERNAL_VERSION_HEAD_PARITY_OK`, `INTERNAL_VERSION_CONDITIONALS_IGNORED_OK`, `INTERNAL_VERSION_NO_ETAG_OK`, `INTERNAL_VERSION_NO_STORE_OK`) and for any epic-specific identity tokens in HDE-Phased Epics. PF12 does not redefine token semantics; it binds those tokens to these artifact families by **name and path**. 
+
+#### **Presenter evidence (EPIC020 D2 — presenter/emitter identity)**
+
+These entries register the presenter evidence families introduced by HDE-EPIC020 D2 as governed members of the Evidence Catalog. They follow the same canonical JSON and Evidence Index/Mirror discipline as other families in this section (UTF-8, sorted keys, compact separators, exactly one trailing LF for JSON artifacts; governed paths only; path-proofs and Index/Mirror parity per §8.3–§8.6). PF12 binds these families to D2 tokens by artifact\_key and path only; token semantics remain in HDE-Governance and Glow QA Guide by title.
+
+* Presenter identity summary — canonical JSON summary for showcompat identity
+
+  * Example path: a JSON file under `artifacts/presenter/` (for example, `artifacts/presenter/showcompat_identity_summary.json`); schema owned by an `engine/presenter` presenter evidence schema in `docs/schemas/**`.
+
+  * Family name: **`PRESENTER_IDENTITY_SUMMARY_V1`** — Machine Mirror records for this family use `artifact_key:"PRESENTER_IDENTITY_SUMMARY_V1"` and a role such as `"snapshot"`; Human Index entries use the same artifact\_key as the title and the concrete summary file path as `discovered_physical_path`.
+
+* Presenter preimage recompute log — preimage recompute evidence for presenter/Reader envelopes
+
+  * Example path: a log file under `artifacts/presenter/` (for example, `artifacts/presenter/preimage_recompute.log`).
+
+  * Family name: **`PRESENTER_PREIMAGE_RECOMPUTE_V1`** — Mirror records use `artifact_key:"PRESENTER_PREIMAGE_RECOMPUTE_V1"` and `role:"log"`; Human Index entries use that artifact\_key and the log path as `discovered_physical_path`.
+
+* Presenter Reader/CLI parity bytes — Reader vs CLI presenter parity sample
+
+  * Example path: a bytes or JSON artifact under `artifacts/presenter/` capturing a presenter-level Reader/CLI parity proof (for example, `artifacts/presenter/reader_cli_parity.bytes`).
+
+  * Family name: **`PRESENTER_READER_CLI_PARITY_V1`** — Mirror records use `artifact_key:"PRESENTER_READER_CLI_PARITY_V1"` and `role:"snapshot"` (or `"log"` depending on implementation); Human Index entries use the same artifact\_key and the parity artifact path.
+
+* Presenter AB/BA identity bytes — showcompat AB/BA presenter bytes
+
+  * Example paths: bytes artifacts under `artifacts/presenter/` capturing AB and BA showcompat presenter bytes (for example, `artifacts/presenter/showcompat_ab.bytes` and `artifacts/presenter/showcompat_ba.bytes`).
+
+  * Family names: **`PRESENTER_SHOWCOMPAT_AB_BYTES_V1`** and **`PRESENTER_SHOWCOMPAT_BA_BYTES_V1`** — Mirror records use these artifact\_keys and `role:"snapshot"`; Human Index entries use the same artifact\_keys and their corresponding AB/BA presenter byte paths as `discovered_physical_path` values.
+
+**Indexing and Mirror discipline.**  
+ For each of the presenter families above, the Human Evidence Index (`docs/evidence/INDEX.json`) MUST contain at least one entry per artifact\_key (for example, `"PRESENTER_IDENTITY_SUMMARY_V1"`) with a `discovered_physical_path` pointing to the governed artifact path under `artifacts/presenter/**`; `docs/evidence/INDEX.sha256` MUST be updated in the same PR when adding or changing any presenter artifact. The Machine Evidence Mirror (`artifacts/evidence_index.jsonl`) MUST contain canonical JSONL records for each governed presenter artifact and schema, using the artifact\_key names exactly as above and the minimum Mirror record schema in §8.3 (artifact\_key, role, sha256, size\_bytes, produced\_at\_utc, discovered\_physical\_path, proof\_anchor).
+
+**Acceptance hints (names-only).**  
+ These families support the EPIC020 D2 presenter tokens (for example, `CLI_SHOWCOMPAT_CANON_OK`, `TWO_RUN_IDENTITY_OK`, `COMPOSITE_ABBA_IDENTITY_OK`, `PREIMAGE_RECOMPUTE_OK`) by providing governed artifacts and Index/Mirror records; PF12 binds tokens to artifacts by **name and path** only and does not redefine token semantics. 
+
+#### 
+
+#### **Error evidence (EPIC020 D1 — Reader/CLI parity, schema, token map)**
+
+These entries register the error evidence families introduced by HDE-EPIC020 D1 as governed members of the Evidence Catalog. They follow the same canonical JSON and Evidence Index/Mirror discipline as other families in this section (UTF-8, sorted keys, compact separators, exactly one trailing LF where JSON is used; governed paths only; path-proofs and Index/Mirror parity per §8.3–§8.6).
+
+* `parity/errors_reader_cli.*.http.json`
+
+* `parity/errors_reader_cli.*.cli.txt`
+
+   Closed-rails error parity artifacts for EPIC020 D1. Each scenario captures a typed error envelope from the HTTP surface and a matching CLI stderr/text log, used together to prove Reader↔CLI parity for error codes and messages under closed rails. These files form the **`ERRORS_READER_CLI_PARITY_V1`** evidence family. Machine Mirror records for this family use `artifact_key:"ERRORS_READER_CLI_PARITY_V1"` and `role:"log"`; Human Index entries use the same artifact\_key as the title and the concrete parity file paths as `discovered_physical_path` values. Token semantics (for example, `CLI_READER_PARITY_OK` and related parity tokens) remain owned by HDE-Governance and Glow QA Guide; PF12 binds them to this family by **name and path only**.
+
+* `errors/schema_check/error_envelope_invalid_*.log`
+
+   Error-envelope schema-check logs for selected invalid-error scenarios (for example, invalid JSON payloads or invalid viewer\_prefs). Each log records at minimum the scenario name, HTTP status, canonical error `code`, and schema validation result under the governed error envelope schema. These files form the **`ERROR_SCHEMA_CHECK_V1`** evidence family. Machine Mirror records use `artifact_key:"ERROR_SCHEMA_CHECK_V1"` and `role:"log"`; Human Index entries use the same artifact\_key and the concrete log paths under `errors/schema_check/`. These artifacts support error-envelope schema tokens such as `ERROR_JSON_CANON_OK` and `JSON_CANONICAL_CHECK_OK` (names-only; semantics live in Governance).
+
+* `errors/token_map/token_map.json`
+
+   Canonical JSON snapshot of the typed error token map, listing each error `code` with its aliases and message text for the current error envelope set. This file forms the **`ERROR_TOKEN_MAP_V1`** evidence family. Machine Mirror records use `artifact_key:"ERROR_TOKEN_MAP_V1"` and `role:"snapshot"`; the Human Index entry uses the same artifact\_key and `discovered_physical_path:"errors/token_map/token_map.json"`. This artifact underpins the `ERROR_TOKEN_MAP_OK` token (names-only), ensuring that the runtime error token map matches the governed snapshot used in tests and CLI/HTTP error behavior.
+
+**Indexing and path-proofs.**
+
+All three error evidence families **MUST** participate in the standard Evidence Index/Mirror discipline:
+
+* **Human Index** (`docs/evidence/INDEX.json`):
+
+  * For every concrete parity artifact (`parity/errors_reader_cli.*.http.json` or `parity/errors_reader_cli.*.cli.txt`), there **MUST** be an entry whose `artifact_key` is `"ERRORS_READER_CLI_PARITY_V1"` and whose `discovered_physical_path` equals that file’s repo-relative path.
+
+  * For every schema-check log under `errors/schema_check/error_envelope_invalid_*.log`, there **MUST** be an entry whose `artifact_key` is `"ERROR_SCHEMA_CHECK_V1"` and whose `discovered_physical_path` equals that log’s path.
+
+  * For the token-map snapshot, there **MUST** be an entry with `artifact_key:"ERROR_TOKEN_MAP_V1"` and `discovered_physical_path:"errors/token_map/token_map.json"`.
+
+  * `docs/evidence/INDEX.sha256` **MUST** be updated in the same PR as any change to these artifacts or their indexing.
+
+* **Machine mirror** (`artifacts/evidence_index.jsonl`):
+
+  * **MUST** contain canonical JSONL records for each governed error artifact above with:
+
+    * `artifact_key` set to `"ERRORS_READER_CLI_PARITY_V1"`, `"ERROR_SCHEMA_CHECK_V1"`, or `"ERROR_TOKEN_MAP_V1"` as appropriate,
+
+    * `role` set to `"log"` for parity and schema-check artifacts and `"snapshot"` for the token map,
+
+    * `discovered_physical_path` equal to the path recorded in the Human Index,
+
+    * `sha256` and `size_bytes` matching the artifact’s canonical bytes,
+
+    * `produced_at_utc` reflecting the evidence refresh time, and
+
+    * `proof_anchor` pointing to the matching `.path_proof.txt` transcript alongside each artifact.
+
+  * Mirror records **MUST** obey all §8.3 rules (field set, ASCII field order, sort-before-write, single mirror file, unknown-key rejection).
+
+* **Path-proofs**:
+
+  * Each concrete parity artifact and schema-check log **MUST** have a sibling path-proof transcript under `artifacts/path_proofs/.../*.path_proof.txt` whose `path`, `sha256`, `size_bytes`, `mtime_utc`, and `produced_at_utc` match the artifact’s canonical bytes and its Mirror record.
+
+  * `errors/token_map/token_map.json` **MUST** have a sibling `errors/token_map/token_map.json.path_proof.txt` transcript with the same constraints.
+
+Acceptance hints for these families are **names-only** and include error/parity and schema tokens such as `CLI_READER_PARITY_OK` (and its legacy alias `CLI_READER_EMITTER_PARITY_OK`), `ERROR_JSON_CANON_OK`, `JSON_CANONICAL_CHECK_OK`, and `ERROR_TOKEN_MAP_OK`. PF12 does not change token semantics; it binds these tokens to the governed error evidence families by artifact\_key and path so that Governance, QA, and PF09 can route by title only.
+
+---
+
+#### Sampler evidence (D4 — HDE-EPIC019)
 
 These entries register the sampler/ranker evidence families introduced by HDE-EPIC019 D4 as governed members of the Evidence Catalog. They follow the same canonical JSON and Evidence Index/Mirror discipline as other families in this section (UTF-8, sorted keys, compact, exactly one LF; governed paths only; path-proofs and Index/Mirror parity per §8.3–§8.6).
 

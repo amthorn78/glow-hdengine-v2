@@ -3,11 +3,11 @@
 ## 0.1 Header
 
  **Title:** PF04-Canon-HDE-Governance  
- **Version:** v1.5.8  
+ **Version:** v1.6  
  **Status:** Canon  
-**Effective date:** 2025-12-04
+**Effective date:** 2025-12-08
 
-**Last Update Gate:** BN 8.0.7 Drain A9/10
+**Last Update Gate:** BN 8.1.9 Drain A14/15
 
 **Invocation tag:** `INV-f2ac55d77ce9aacc`
 
@@ -625,6 +625,40 @@ These tokens apply whenever SAFE rails are opened for vendor calls in any enviro
 
 * **CLI\_ADMIN\_BUNDLE\_PARITY\_OK** — The canonical **CLI admin bundle command** and the **HTTP admin bundle route** both use the same internal admin bundle builder and canonical emitter and, given the same logical inputs and environment, produce **byte-identical** admin bundle JSON (including the single trailing LF). Pre-Glow, both surfaces target the Railway production engine and DB using the configuration names defined in **Glow Infrastructure** and **HDE-CLI-API-Vendor-Ref** (titles-only) rather than hard-coded hosts; any host with the same config and network reachability can exercise the CLI. Evidence includes: (a) governed parity runs that call CLI and HTTP admin surfaces with the same inputs and byte-compare the resulting bundles, and (b) machine-mirror entries for those parity captures. Ownership: Governance (parity semantics); **HDE-CLI-API-Vendor-Ref** (CLI/HTTP contracts); **HDE-Mechanics Guide** (builder wiring); **Glow QA Guide** and **HDE-Build Checklist** (tests and tasks); **HDE-Schemas & Artifacts** (evidence mapping).  
 * **ADMIN\_AUTH\_REQUIRED\_OK** — All admin bundle surfaces are **authentication- and authorization-guarded**: neither the CLI admin bundle command nor the HTTP admin bundle route may return the admin bundle without a valid admin credential. Pre-Glow, this means a high-entropy admin secret (or equivalent credential) stored as a secret in Railway (names-only in Glow Infrastructure), not checked into the repo, and required on every admin-bundle request via a transport mechanism pinned in **HDE-CLI-API-Vendor-Ref** (for example, a single admin header). Missing or invalid credentials must produce a typed, numeric-free error; they must never return the bundle. The admin credential must be **rotatable** and **revocable** by configuration or secret management only (no code changes), and rotation must immediately invalidate prior values. Evidence for this token consists of: (a) QA harness runs that show unauthenticated and mis-authenticated CLI/HTTP admin-bundle calls fail closed with typed errors and do not emit bundles; (b) a governed description of the active admin credential source (titles-only; no secret values); and (c) machine-mirror entries linking these proofs to this token. Ownership: Governance (auth/rails semantics); **Glow Infrastructure** (secret names and storage, titles-only); **HDE-CLI-API-Vendor-Ref** (auth carrier and error mapping); **Glow QA Guide** and **HDE-Build Checklist** (QA playbook “Live QA via CLI and HTTP admin bundle”).
+
+### **2.0.18 QA Acceptance Tokens & PF23 scope**
+
+**PF04 vs Glow QA Guide vs Reality Audits.**
+
+* PF04 §2.0 remains the **single home for governance acceptance tokens**. Token names and semantics are defined here once.
+
+* **Glow QA Guide** maintains a **QA Acceptance Tokens library** that organizes these tokens for QA use. For QA Acceptance Tokens, PF19 acts as the **operational registry** and must:
+
+  * reference token names exactly as they are defined in this section, and
+
+  * record QA-facing semantics and wiring without introducing new or divergent meanings.
+
+* **HDE-Build Checklist** and **HDE-Phased Epics** are **consumers only**. They group and schedule tokens for phases and epics but must not introduce new token names, aliases, or synonyms for the same behavior.
+
+* **Reality Audits** (PF23) are a **separate axis**. Decisions to run, waive, or narrow a PF23 audit for a specific plan or epic:
+
+  * do **not** change which QA tokens exist,
+
+  * do **not** change how those tokens must be named, and
+
+  * do **not** relax the required wiring from tokens to tests, CI jobs, Live QA steps, or evidence.
+
+* PF23 scope is local to the audited epic or plan and must never weaken the semantics or governance posture of tokens defined in this section or in the Glow QA Guide’s QA Acceptance Tokens library.
+
+**Single-home restatement.**
+
+* PF04 §2.0 is the **governance single home**: every acceptance token (including QA Acceptance Tokens) is introduced here first and is mirrored by **HDE-Schemas & Artifacts**, **Glow QA Guide**, and **HDE-Build Checklist** by title only.
+
+* Glow QA Guide is the **QA single home** for the QA Acceptance Tokens library: it must list every QA token used in acceptance maps and manifests, with semantics aligned to this section, and may not introduce new QA Acceptance Tokens that are absent from PF04. Any new QA Acceptance Token requires:
+
+  * a PF04 Doc-Delta entry in §9 that adds the token to this roster, and
+
+  * corresponding updates in Glow QA Guide, HDE-Schemas & Artifacts, and HDE-Build Checklist in the same change.
 
 ---
 
@@ -1926,6 +1960,120 @@ A7 transport proofs **must** run on a **Catalog JSON success** route (not `/inte
 * **Catalog snapshot** (titles-only)  
 * **Headers-only env-gate** capture proving non-prod entries are
 
+## **9.7 Token fidelity & plan approval rails Required−NowRequired-NowRequired−Now**
+
+### **9.7.1 Scope**
+
+These rails apply to any **implementation plan**, **QA plan**, or **epic record** that:
+
+* introduces new QA Acceptance Tokens, or
+
+* consumes existing QA Acceptance Tokens in acceptance maps, manifests, CI jobs, Live QA steps, or evidence artifacts.
+
+They bind **reviewers** (including governance and QA) when deciding whether a plan is ready to mark **ASK OK** or to promote to Epic-level acceptance.
+
+### **9.7.2 Token/evidence matrix (required for approval)**
+
+Before any such plan, QA plan, or epic record is approved, reviewers **MUST** ensure there is a **token/evidence matrix** for every QA token in scope. The matrix may be an attached artifact or a clearly identified section, but it **must** contain, per token:
+
+1. The **governance token name** as defined in PF04 §2.0.
+
+2. The corresponding **QA Acceptance Token entry** in **Glow QA Guide** (same name; no aliases).
+
+3. The **epic-level acceptance map name** or map entry where the token appears (must match the QA token name; no local synonyms).
+
+4. The **tests** (unit or integration) that exercise the token’s behavior.
+
+5. The **CI jobs** that enforce the token under closed rails.
+
+6. Any **Live QA steps** that demonstrate the token (if applicable).
+
+7. The **evidence artifacts** and paths produced by those tests and steps.
+
+8. The matching **Evidence Index and machine mirror entries** (artifact\_key, epic identifier, token list, and proof\_anchor).
+
+Approval rules:
+
+* No cell in this matrix may be marked `"e.g."`, `"TBD"`, `"example"`, or left implicit at approval time.
+
+* If any cell for a token is missing or unresolved, the plan **MUST NOT** be marked approved for that token, and **ASK OK** for the plan or epic as a whole **MUST** be withheld until the matrix is complete.
+
+### **9.7.3 Token naming and single-name usage**
+
+For QA Acceptance Tokens:
+
+* Any token used in an acceptance map, manifest, or epic record **MUST** be defined in the Glow QA Guide’s QA Acceptance Tokens library and **MUST** use the exact governance name from PF04 §2.0.
+
+* Epic-level documents **MUST NOT** invent epic-local token names or synonyms for the same semantics. References must use the PF04/PF19 token name only.
+
+* When an epic needs a new QA token, the need **MUST** be recorded as a Doc-Delta against:
+
+  * PF04 §2.0 (to add the token to the governance roster), and
+
+  * Glow QA Guide (to add the token to the QA Acceptance Tokens library),
+
+* and those Doc-Deltas **MUST** land before the epic is considered token-complete.
+
+### **9.7.4 Blocking status and downgrades**
+
+Once a reviewer has identified any of the following as a **blocking** issue for a plan or epic:
+
+* open `"e.g."` or `"TBD"` token names,
+
+* use of a QA token that is not defined in the Glow QA Guide’s QA Acceptance Tokens library,
+
+* missing or incomplete token/evidence matrix entries, or
+
+* missing or inconsistent Evidence Index / mirror entries for a token’s artifacts,
+
+that blocker **MUST NOT** be downgraded to non-blocking unless:
+
+1. the plan or QA document has been updated to resolve the issue (for example, token names made normative, matrix completed, evidence wired and indexed), or
+
+2. PF-Canon has been explicitly updated (for example, PF04 and Glow QA Guide have been revised to add or change the token).
+
+Any downgrade **MUST** reference the specific change (plan diff, Doc-Delta, or PF doc change) that resolved the blocker. A change in reviewer interpretation alone is **not** sufficient.
+
+### **9.7.5 PF23 scope waivers (local, non-transitive)**
+
+If the Product Owner or governance decides to waive or narrow **Reality Audits** (PF23) for a particular plan or epic (for example, declaring PF23 audits out of scope for that workflow), reviewers **MUST**:
+
+* record that decision as a **local scope directive** in the plan or epic record, and
+
+* explicitly state that other rails remain fully in force, including:
+
+  * the QA token semantics and library in Glow QA Guide,
+
+  * the evidence and indexing rules in HDE-Schemas & Artifacts,
+
+  * the D-goals and token rosters in HDE-Phased Epics, and
+
+  * the CI and acceptance rails in HDE-Build Checklist.
+
+Such PF23 scope waivers **MUST NOT** be interpreted as permission to relax token naming, acceptance mapping, evidence wiring, or any other canon-backed rails.
+
+### **9.7.6 Re-grounding before asserting “no canonical token name”**
+
+Before any reviewer asserts that “no canonical token name exists yet” for a QA behavior, they **MUST**:
+
+1. re-check the QA Acceptance Tokens library in **Glow QA Guide**, and
+
+2. re-read any epic-specific approvals or remediation guides that apply to the epic or defect in question, especially where those documents already chose a token name and semantics for that behavior.
+
+If any such approval or remediation guide defines a token name and semantics for a behavior that is in scope for the current plan, that name is treated as **canonical for review purposes** until it is drained into PF04 and Glow QA Guide via Doc-Delta. Reviewers **must not** introduce competing or temporary names for the same behavior while that drainage is pending.
+
+### **9.7.7 Plan approval gate (token fidelity resolved, not deferred)**
+
+For any plan, QA plan, or epic record that touches QA Acceptance Tokens:
+
+* **Token names MUST be final**: either aligned to existing PF04 tokens and the Glow QA Guide library, or paired with active Doc-Deltas that will add them there.
+
+* The **token/evidence matrix MUST be complete** for all QA tokens in scope.
+
+* Any recognized token gaps (missing entries in PF04 or Glow QA Guide, unclear semantics, or incomplete evidence wiring) **MUST** be captured as Doc-Deltas and treated as part of the epic’s scope, not as “future governance work” detached from the implementation.
+
+A plan that still contains open questions such as “which token name do we use here?” or that labels tokens as “examples only” **MUST** be treated as **not ready** and returned for revision. Reviewers **MUST NOT** mark such a plan approved or claim **ASK OK** for an epic until token fidelity is fully resolved.
+
 # 10\. Transport Governance (Reader) \[Required-Now\]
 
 ## 10.1 Success (200) matrix \[Required-Now\]
@@ -2047,7 +2195,7 @@ Got it — here’s your **§10.3 Writers and errors** cleaned up for clarity an
 
 ---
 
-## 10.5 `/internal/version` ops surface (identity only; non-A7) \[Required-Now\]
+## **10.5 `/internal/version` ops surface (identity only; non-A7) Required−NowRequired-NowRequired−Now**
 
 #### **Intent and scope**
 
@@ -2101,13 +2249,15 @@ The JSON body is a **frozen minimal identity envelope**. It exposes exactly **si
 
 * `release_id`
 
-The body must be canonical JSON:
+The body is emitted via the **canonical JSON serializer** and must satisfy:
 
-* UTF-8 (no BOM).
+* UTF-8 encoding (no BOM).
 
-* Sorted keys; compact separators.
+* **Fixed key order:** the six fields **must appear in the order listed above**, with no additional top-level keys. For `/internal/version` this fixed ordering is **normative** and is the sole exception to the global “sorted keys” rule for canonical JSON.
 
-* Exactly one trailing `\n` (LF).
+* Compact separators and exactly one trailing `\n` (LF).
+
+All other canonical JSON rules (no BOM, LF-termination, deterministic bytes under closed rails) still apply; only the general “ASCII-sorted keys” requirement is relaxed here in favor of this fixed identity field order.
 
 ---
 
@@ -2134,9 +2284,9 @@ Names-only; token semantics live in this document, bytes and tests live elsewher
 
 #### **Evidence and A7 separation**
 
-`/internal/version` is **not** an A7 proof surface. A7 transport proofs run only on the Endpoint Catalog JSON success route owned by HDE-CLI-API-Vendor-Ref and indexed in HDE-Schemas and Artifacts.
+`/internal/version` is **not** an A7 proof surface. A7 transport proofs run only on the Endpoint Catalog JSON success route owned by **HDE-CLI-API-Vendor-Ref** and indexed in **HDE-Schemas and Artifacts**.
 
-Evidence for `/internal/version` is records-only and titles-only at this level; bytes and schemas live in HDE-Schemas and Artifacts and Glow QA Guide.
+Evidence for `/internal/version` is records-only and titles-only at this level; bytes and schemas live in **HDE-Schemas and Artifacts** and **Glow QA Guide**.
 
 Evidence artifacts (names-only):
 
@@ -2144,7 +2294,7 @@ Evidence artifacts (names-only):
 
 * `intver/headers_head` — raw `HEAD /internal/version` response headers (200, `Content-Length == identity GET body`, `Content-Type == GET`).
 
-* `intver/body_get` — exact `GET` body bytes (LF-terminated; six keys; stable order) \+ sha256 record.
+* `intver/body_get` — exact `GET` body bytes (LF-terminated; six keys; fixed identity-field order) plus a sha256 record.
 
 * `intver/cond_if_none_match` — `GET` with `If-None-Match` (still 200).
 
@@ -2170,7 +2320,7 @@ Indexing requirements:
 
     * `role`, `sha256`, `size_bytes`.
 
-* Mirror rules (single file, canonical JSONL, sorted keys, unknown-key rejection) and path-proof schema are defined in HDE-Schemas and Artifacts; PF04 governs only the token and routing semantics.
+* Mirror rules (single file, canonical JSONL, sorted keys, unknown-key rejection) and path-proof schema are defined in **HDE-Schemas and Artifacts**; PF04 governs only the token and routing semantics.
 
 ---
 
@@ -2198,13 +2348,9 @@ In production, `/internal/version`:
 
 * Ensures `HEAD` 200 mirrors GET validators and may carry `Content-Length == len(identity GET body)` with an empty body.
 
-This surface is operator-only, is not a JSON success route for clients, and remains **outside A7**.
+  # **11\. Vendor Ingest Governance (HDAPI) \[Required-Now\] / \[Speculative\]**
 
----
-
-# **11\. Vendor Ingest Governance (HDAPI) \[Required-Now\] / \[Speculative\]**
-
-## **11.1 Request shaping (owned here) \[Required-Now\]**
+  ## **11.1 Request shaping (owned here) \[Required-Now\]**
 
 **Scope (normative).** This section pins the bytes used to construct HDAPI requests and to remap provider outcomes into typed, numeric-free errors. Rails posture (open/closed) is governed in §3; live-call behavior (timeouts/retries/backoff) is in §11.2.
 

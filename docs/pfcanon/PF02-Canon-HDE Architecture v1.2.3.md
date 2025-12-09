@@ -1,11 +1,11 @@
 # **0\. Front Matter**
 
 **Title:** PF02-Canon-HDE Architecture  
- **Version:** v1.2.1  
+ **Version:** v1.2.3  
  **Status:** Canon  
-**Effective date:** 2025-12-04
+**Effective date:** 2025-12-08
 
- **Last Update Gate:** BN 8.0.7 Drain A9/10
+ **Last Update Gate:** BN 8.1.9 Drain A16
 
 ---
 
@@ -219,8 +219,6 @@ All runtime surfaces and offline pipelines that need sampler or Engine Core beha
 * Canonical JSON, pack/manifest, and the machine mirror → HDE-Schemas & Artifacts.
 
 Architecture remains contract-free.
-
-# **2\. System Overview (Blocks & Flows) \[Required-Now\]**
 
 # **2\. System Overview (Blocks & Flows) \[Required-Now\]**
 
@@ -909,7 +907,8 @@ Engine outputs are keys and structured metrics; narratives never live in `engine
 * In any dev/QA console that plans to exercise Reader or other HTTP runtime surfaces, the adapter/Reader process **must** be started explicitly using the canonical start command and environment described in **Glow Infrastructure** and the **HDE-Mechanics Guide**. Live QA **must not** rely on guessing hostnames or ports.
 
 * PF02 does not introduce service names, ports, or commands. Those details are single-home in **Glow Infrastructure**, the **HDE-Mechanics Guide**, and any field guides that describe running the adapter and Reader inside a dev container (including Codespaces). This document only records the responsibility that HTTP-based tests must target a known, running Reader instance.  
-* In dev/QA, the adapter/Reader stack is hosted by a concrete framework development HTTP server (currently a Flask dev server) that exposes the same Reader and internal/dev sampler routes as the production adapter. Architecture treats this dev server as part of the adapter and dev harness component: it is a real, required piece of the system in dev/QA, but the choice of framework and all start commands, ports, and environment wiring remain the responsibility of **Glow Infrastructure** and **HDE-Mechanics Guide**, not PF02.
+* In dev/QA, the adapter/Reader stack is hosted by a concrete framework development HTTP server (currently a Flask dev server) that exposes the same Reader and internal/dev sampler routes as the production adapter. Architecture treats this dev server as part of the adapter and dev harness component: it is a real, required piece of the system in dev/QA, but the choice of framework and all start commands, ports, and environment wiring remain the responsibility of **Glow Infrastructure** and **HDE-Mechanics Guide**, not PF02.  
+* The dev Reader harness used in dev/QA consoles (including Codespaces) MUST expose the canonically required dev/internal HTTP surfaces for QA, using the same Presenter emitter and error-handling semantics as the production/stable adapter app. In particular, the harness is responsible for mounting the compat HTTP surface (`/api/compat/v1`) as defined in **HDE-CLI-API-Vendor-Ref** and **HDE-Mechanics Guide** by title. This requirement applies to the set of dev/internal HTTP routes needed for QA; it does not require the dev harness to expose every production-only surface. PF02 records this responsibility at the architectural level and continues to route all concrete route shapes and error envelopes by title to their single-home documents.
 
   ### **3.8.2 QA entrypoints (concept-only)**
 
@@ -1057,56 +1056,67 @@ HTTP QA against “Reader” or dev harness surfaces is considered misconfigured
 
 ---
 
-## 5.3 Evidence posture (titles/paths only)
+## **5.3 Evidence posture (titles/paths only)**
 
-**Where proofs live (titles/paths only).**  
- Architecture records ownership and posture; concrete bytes and repository paths are maintained in their single homes and are not duplicated here. Reference by **title** (no version numbers), with paths only where a single canonical location is part of the contract:
+**Ledger-centric evidence surfaces (titles/paths only).**  
+ Architecture records ownership and posture; concrete bytes and repository paths are maintained in their single homes and are not duplicated here. Reference by **title** (no version numbers), with paths only where a single canonical location is part of the contract. For the HD Engine, the primary evidence “ledger” surfaces are:
+
+* The **Human Evidence Index** at `docs/evidence/INDEX.json` (plus its `.sha256` sentinel), which lists governed evidence artifacts (including bundles) in a human-readable, text-based form.
+
+* The **Machine Evidence Index** at `artifacts/evidence_index.jsonl`, a records-only, canonical JSONL mirror of the ledger, which includes per-record `proof_anchor` fields pointing to path proofs maintained alongside governed artifacts.
+
+* **Evidence bundles and bundle manifests** (textual, typically JSON/JSONL) under governed paths (for example, `artifacts/**`, `docs/evidence/**`, `audit/**`) that group related evidence members and enumerate them by logical artifact key, hash, and size. Architecture treats bundles and manifests as governed artifacts in their own right; PF02 routes all schema/field details by title to other PF documents and stays contract-free.
+
+These surfaces together form the **ledger-centric, deterministic, text-based evidence posture** for the Engine: any acceptance decision for an epic must ultimately be justified by entries in the Human Index and Machine Mirror (and, where used, bundle manifests) that a human operator or a ChatGPT-class agent can inspect per PR. Detailed schema and tokenisation remain single-home elsewhere.
+
+**Where proofs live (titles/paths only).**
 
 * **HDE-Math-Spec** — Determinism & evidence (two-run identity, AB↔BA parity, preimage/identity recipe).
 
-* **HDE-Governance** — Transport/ops evidence posture and acceptance tokens (A7 success-route proofs; writers/errors no-store/no-ETag; ops `/internal/version` behaviour).
+* **HDE-Governance** — Transport/ops evidence posture and acceptance tokens (A7 success-route proofs; writers/errors `no-store`/no ETag; ops `/internal/version` behaviour).
 
 * **HDE-CLI-API-Vendor-Ref** — Endpoint Catalog (JSON success) ownership; public Reader/CLI envelope (titles only) and header semantics (contract lives here).
 
-* **HDE-Schemas & Artifacts** — Human Evidence Index (`docs/evidence/INDEX.json`) and machine Evidence Index (`artifacts/evidence_index.jsonl`) as single homes for artifact listings and mirror schema; optional human-index hash sentinel.
+* **HDE-Schemas & Artifacts** — Human Evidence Index (`docs/evidence/INDEX.json`) and Machine Evidence Index (`artifacts/evidence_index.jsonl`) as single homes for ledger listings and mirror schema; optional human-index hash sentinel; bundle and bundle-manifest schemas; and path-proof semantics for governed artifacts and bundles.
 
 * **Epic-Process-Guide** — PR-first cadence (CodEx opens PR), required same-PR updates for Doc-Delta \+ indices, and CI parity/guardrails.
 
 * **HDE-Build Notes** — Current-epic evidence requirements and token sets (append-only; later lettered addenda supersede earlier).
 
+* **Glow QA Guide / HDE-Phased Epics / PF23 Reality-Audits** — QA tokens, D-goals, and Reality Audit posture that consume the ledger; PF02 routes by title only and does not define tokens or audit scripts.
+
 **Discipline & hygiene (contract-free posture).**
 
-* **Same-PR parity.** Whenever proofs/artifacts change, the human index and the machine JSONL mirror must be updated **in the same PR** that carries the code/evidence change.
+* **Same-PR parity.** Whenever proofs or governed artifacts (including bundles and manifests) change, the Human Evidence Index and the Machine Evidence Index MUST be updated **in the same PR** that carries the code/evidence change.
 
-* **Canonical serialization.** Evidence artifacts are LF-terminated and key-ordered; comparisons are on raw bytes. Header snapshots follow Governance CI normalization (lower-cased header names, compact separators, exactly one trailing LF).
+* **Canonical serialization.** The Machine Evidence Index is canonical JSONL: UTF-8, ASCII-sorted keys, compact separators, exactly one trailing LF, and unknown-key rejection. Bundle manifests and other governed JSON/JSONL artifacts referenced from the ledger follow the same canonical discipline (owned by HDE-Schemas & Artifacts).
 
-* **Mirror hygiene.** The machine JSONL mirror is records-only, canonical JSONL (UTF-8, sorted keys, compact, one trailing LF) and **rejects unknown keys**; each record includes a `proof_anchor` that points to a path-proof stored alongside the artifact (file name and location owned by **HDE-Schemas & Artifacts**).
+* **Bundle-level path proofs.** Path proofs live at the governed artifact level, which includes bundles. Each Machine Evidence Index record includes a `proof_anchor` that points to a bundle-level (or artifact-level) path-proof stored alongside the governed file; file name and location for these proofs are owned by HDE-Schemas & Artifacts.
 
-**A7 success-route evidence (routing note).**
+* **Agent-readability.** Governed evidence for the HD Engine that Codex/ChatGPT is expected to reason about MUST remain text-based and PR-local: Human Index entries, Machine Mirror records, bundle manifests, and key QA logs are all plain-text artifacts under governed paths. Binary or compressed bundles may exist as supplemental artifacts, but they MUST NOT be the sole governed evidence for any acceptance token that expects automated review.
 
-For epics that deliver or modify Reader success routes, capture GET/HEAD/304 headers on the **cataloged JSON success route** (not `/internal/version`), including:
+**A7 success-route evidence (routing note).**  
+ For epics that deliver or modify Reader success routes, capture GET/HEAD/304 headers on the **cataloged JSON success route** (not `/internal/version`), including:
 
-* Strong ETag on 200
+* Strong ETag on 200\.
 
-* HEAD 200 parity
+* HEAD 200 parity.
 
-* 304 with both `Content-Type` and `Content-Length` omitted
+* 304 with both `Content-Type` and `Content-Length` omitted.
 
-* `Vary: Authorization, Accept-Encoding`
+* `Vary: Authorization, Accept-Encoding`.
 
-* Encoding-invariance of ETag and effective `Content-Length`
+* Encoding-invariance of ETag and effective `Content-Length`.
 
-* Headers-only env-gate proof that non-prod entries are unreachable in prod
+* Headers-only env-gate proof that non-prod entries are unreachable in prod.
 
-Concrete artifact names/paths and tokenisation are maintained in **HDE-Governance**, **HDE-Schemas & Artifacts**, and **HDE-Build Notes** (titles only).
+Concrete artifact names/paths, bundle usage for A7 families, and tokenisation are maintained in **HDE-Governance**, **HDE-Schemas & Artifacts**, **HDE-Build Checklist**, and **HDE-Build Notes** (titles only). PF02 remains contract-free.
 
 **Contract-free reminder.**
 
-* No matrices, token rosters, or byte-level details appear in PF02.
+* No matrices, token rosters, schemas, bundle field lists, or byte-level details appear in PF02.
 
-* Where needed, route by title (and, for indices, by canonical path) to the owning document.
-
----
+* PF02 describes **which evidence surfaces exist and how they connect to the architecture**, but always routes concrete shapes, schemas, and tokens by **document title** to their single-home PF documents.
 
 ## 5.4 Evidence & determinism flows (concept only)
 

@@ -3,11 +3,11 @@
 ## 0.1 **Header**
 
  **Title:** PF14-Canon-HDE-Mechanics Guide  
- **Version:** v2.2.2  
+ **Version:** v2.2.5  
  **Status:** Canon  
-**Effective date:** 2025-12-04
+**Effective date:** 2025-12-08
 
-**Last Update Gate:** BN 8.0.7 Drain A14/15  
+**Last Update Gate:** BN 8.1.9 Drain A16  
  **Invocation tag:** INV-f2ac55d77ce9aacc
 
 ---
@@ -259,18 +259,44 @@ Acceptance (names-only): `ENV_LC_ALL_C_OK`.
 
 **Routing (titles‑only).** Manifest and release identity and the mirror schema ownership live in **HDE‑Schemas & Artifacts**. Transport A7 proofs and `/internal/version` evidence live in **HDE‑CLI‑API‑Vendor Ref** and **HDE‑Governance**.
 
-**Governed locations (normative).** All QA/audit proofs **MUST** reside under governed paths: `artifacts/**`, `audit/**`, and `docs/evidence/**`. Files under transient generators (e.g., `codex/out/**`) **MUST NOT** be indexed. Human Index and machine mirror updates **MUST** occur in the **same PR**; mirror is **records‑only canonical JSONL** (UTF‑8, ASCII‑sorted keys, compact, exactly one LF), rejects **unknown keys**, and carries a `proof_anchor` to a path‑proof file in the same dir. Gate on `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`, and `EVIDENCE_INDEX_HASH_OK`. (Routing by title to **HDE‑Schemas & Artifacts / HDE‑Governance**.) 
+**Governed locations (normative).**
+
+All QA/audit proofs **MUST** reside under governed paths:
+
+* `artifacts/**`
+
+* `audit/**`
+
+* `docs/evidence/**`
+
+Files under transient generators (for example, `codex/out/**`) **MUST NOT** be indexed. Human Index and Machine Mirror updates **MUST** occur in the **same PR**; the mirror is **records-only canonical JSONL** (UTF-8, ASCII-sorted keys, compact, exactly one LF), rejects **unknown keys**, and carries a `proof_anchor` to a path-proof file in the same directory. Mechanics must gate on `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`, and `EVIDENCE_INDEX_HASH_OK` (schema and token semantics routed by title to **HDE-Schemas & Artifacts** and **HDE-Governance**).
+
+**Core evidence must remain text-based and agent-readable.**
+
+Core governed evidence for the HD Engine — including:
+
+* the Human Evidence Index (`docs/evidence/INDEX.json`),
+
+* the Machine Mirror (`artifacts/evidence_index.jsonl`),
+
+* any evidence **bundles** and their **manifests**, and
+
+* key QA logs and summary artifacts referenced by this guide —
+
+**MUST** be stored as plain-text, UTF-8 files under these governed paths and remain suitable for inspection by humans and Codex/ChatGPT-class agents at the PR level. Binary or compressed bundles (for example, `.zip`, `.tar.gz`) MAY be produced as supplementary artifacts for local convenience, but **MUST NOT** serve as the only governed evidence for any acceptance token that relies on Engine evidence; there must always be at least one text-based bundle manifest, log, or summary file under a governed path that covers the token’s evidence needs.
+
+This posture ensures that the ledger-centric evidence model (Human Index, Machine Mirror, bundle manifests, and QA logs) remains readable and auditable by both humans and automated agents, and it aligns Mechanics with the evidence and Reality Audit guidance in **HDE-Schemas & Artifacts**, **Glow QA Guide**, and the Reality Audits PF by title.
 
 ### **1.3.1 Evidence jobs (single-writer tools)**
 
 **Scope (normative).**  
- Only a **small set of evidence tools** may write governed evidence artifacts (ordering artifacts, Evidence Index, Machine Mirror, and path-proofs). All other code — including tests and ad-hoc scripts — **MUST NOT** modify governed evidence directly.
+ Only a **small set of evidence tools** may write governed evidence artifacts (ordering artifacts, Evidence Index, Machine Mirror, bundles/manifests, and path-proofs). All other code — including tests and ad-hoc scripts — **MUST NOT** modify governed evidence directly.
 
 **Evidence tools (titles-only).**
 
 * **Ordering generator.**
 
-  * `tools/order/generate_ordering_artifacts.py` is the **single writer** for ordering artifacts under `artifacts/engine/order/**` (for example, sorted snapshots, ordering logs, ABBA evidence).
+  * A single ordering generator tool (for example, `tools/order/generate_ordering_artifacts.py`) is the **single writer** for ordering artifacts under `artifacts/engine/order/**` (for example, sorted snapshots, ordering logs, ABBA evidence).
 
 * **Evidence skeleton tools.**
 
@@ -284,9 +310,45 @@ Acceptance (names-only): `ENV_LC_ALL_C_OK`.
 
     * governed `*.path_proof.txt` transcripts for artifacts listed in this guide.
 
+  * In addition to per-artifact entries, `tools/evidence/update_evidence_index.py` **MUST**:
+
+    * ingest one or more **bundle manifests** emitted by the bundle generator (see below),
+
+    * compute hashes for bundle files and manifests under the same determinism pins as other evidence (§1.2),
+
+    * write **bundle-level** Machine Mirror rows and bundle path-proofs for those bundles, and
+
+    * preserve behaviour for non-bundled evidence families (backwards-compatible for legacy rows).
+
+  * Index \+ Mirror parity checks (§1.3) **MUST** treat bundle rows and manifests as first-class governed artifacts: manifests must be valid JSON/JSONL, conform to the PF12 bundle manifest schema, contain no unknown keys, and obey any bundle-level invariants (for example, member count and deterministic ordering) defined there.
+
   * `tools/evidence/orientation_demo.py` owns the topology orientation demo artifact (`audit/gates/topology/orientation_demo.txt`) and its path-proof and **MUST NOT** be bypassed by ad-hoc edits.
 
-Mechanics **MUST NOT** hand-edit governed evidence artifacts (ordering artifacts, Index, mirror, path-proofs, topology orientation demo). Manual editing is reserved for canonical Doc-Delta work in PF documents; repository artifacts are **tool-generated** only.
+* **Evidence bundle generator.**
+
+  * A dedicated **bundle generator tool** (titles-only here; concrete name and path live in the repo) is responsible for:
+
+    * collecting raw evidence outputs for one or more high-churn families (for example, ordering logs, sampler/core outputs, complex config dumps),
+
+    * building a **textual bundle** (for example, JSONL, one logical artifact per line) under a governed path (`artifacts/**` or `docs/evidence/**`), and
+
+    * emitting a **bundle manifest** (JSON/JSONL) that lists, for each member, at least: logical `artifact_key`, `sha256`, `size_bytes`, and any additional descriptors defined in PF12.
+
+  * The bundle generator **MUST** run under the same determinism pins as other evidence tools (`LC_ALL=C`, `LANG=C`, `TZ=UTC`, plus any rails pins from §1.2) and **MUST NOT** hand-edit existing governed artifacts. Its outputs (bundles and manifests) are consumed by `tools/evidence/update_evidence_index.py` as described above.
+
+**Orientation demo and evidence skeleton coupling (normative).**
+
+Mechanics treats the topology orientation demo as part of the same **evidence skeleton** as the Human Evidence Index and Machine Mirror. The following coupling rules apply:
+
+* Any PR that runs `tools/evidence/update_evidence_index.py` in **write mode** to change governed evidence under `docs/evidence/**`, `artifacts/**`, or `audit/**` **MUST** also run `tools/evidence/orientation_demo.py` in **write mode** in the same PR and commit the updated `audit/gates/topology/orientation_demo.txt` and its `*.path_proof.txt` before invoking either tool’s `--check` mode.
+
+* Index/Mirror changes without a matching, freshly generated orientation demo are **out of spec** and **MUST** be treated as drift: `tools/evidence/orientation_demo.py --check` is expected to fail with an orientation-drift error in such cases, and CI **MUST NOT** be forced green by skipping or bypassing the orientation demo.
+
+* Evidence harnesses and scripts that wrap `tools/evidence/update_evidence_index.py` as a single job (for example, error evidence generators, sampler/core evidence generators, bundle generators, or combined evidence pipelines) **MUST** treat `tools/evidence/orientation_demo.py` as part of the **same single-writer chain** for the evidence skeleton: when they refresh governed artifacts and the Index/Mirror, they **MUST** also refresh the orientation demo in that same job and PR.
+
+This clarification does not change which tools are allowed to write governed evidence; it makes explicit that `tools/evidence/update_evidence_index.py`, the bundle generator, and `tools/evidence/orientation_demo.py` together own the evidence skeleton for both per-artifact and bundle-level families, so that the topology orientation demo always reflects the current governed evidence skeleton and orientation-drift is caught and fixed in the same change that expands or shrinks the skeleton.
+
+Mechanics **MUST NOT** hand-edit governed evidence artifacts (ordering artifacts, bundles, manifests, Index, mirror, path-proofs, topology orientation demo). Manual editing is reserved for canonical Doc-Delta work in PF documents; repository artifacts are **tool-generated only**.
 
 ### **1.3.2 Evidence change workflow**
 
@@ -4017,53 +4079,62 @@ Client libraries use the allow-listed presenter-emitter and enforce transport ru
 * `conditionalGetHelper` sends `If-None-Match` and handles `304` semantics exactly (no body, omit `Content-Type`, `Content-Length 0/absent`).  
 * Python SDK parity tests pass for bytes and ordering across all three calls.
 
-# 34\) Dev HTTP Harness (single home)
+# **34\) Dev HTTP Harness (single home)**
 
 Dev-only; bound to `127.0.0.1`; not public; CORS disabled; `APP_ENV=dev`; debug reloader **off** during captures. Emits canonical JSON via the allow-listed presenter-emitter (§4/§8).
 
 **Routes**
 
-* `GET|POST /api/reader` (person)  
-* `GET|POST /api/compat/v1` (pair; ids-only `GET`)  
+* `GET|POST /api/reader` (person)
+
+* `GET|POST /api/compat/v1` (pair; ids-only `GET`)
+
 * `POST /api/sample/v1`
 
 **Method posture**
 
-* `GET` **MUST NOT** include a body.  
+* `GET` **MUST NOT** include a body.
+
 * `POST` is **non-conditional** (no validators; never returns `304`).
 
 **Dev error posture (Reader & Compat)**
 
-* `Content-Type: application/json; charset=utf-8`  
-* `Cache-Control: no-store`  
+* `Content-Type: application/json; charset=utf-8`
+
+* `Cache-Control: no-store`
+
 * **No `ETag`**
 
-**Runner**
+**Runner (local example only)**
 
-* Start locally with the canonical runner:  
+* For local-only experimentation on a developer machine, you may start a dev Reader process with an example runner such as:
+
    `python -m adapter.http_reader --bind 127.0.0.1:5000`
 
-**Quick start (curl)**
+   This command is an **illustrative local sample**, not an infra-canonical binding. Mechanics does **not** pin a specific port for the dev Reader harness; environment-specific start commands and host/port bindings (for example, Codespaces vs local dev) are infra-owned and are defined in **Glow Infrastructure** and related PF-Canon by title. QA plans and docs **must not** treat this 5000 example as authoritative for any environment; they must derive actual base URLs and ports from infra-owned configuration.
+
+**Quick start (curl — local 5000 example)**
+
+For local-only runs using the example runner above:
 
 export APP\_ENV=dev
 
-\# Pair (POST)
+\# Pair (POST, invalid JSON/body as needed for tests)
 
-curl \-s http://127.0.0.1:5000/api/compat/v1 \-H 'Content-Type: application/json' \\
-
-  \-X POST \-d '{"a":{…},"b":{…},"viewer\_prefs":{…}}' | jq .
+curl \-s [http://127.0.0.1:5000/api/compat/v1](http://127.0.0.1:5000/api/compat/v1) \-H 'Content-Type: application/json'  
+ \-X POST \-d '{"a":{…},"b":{…},"viewer\_prefs":{…}}' | jq .
 
 \# Reader (POST body form)
 
-curl \-s http://127.0.0.1:5000/api/reader \-H 'Content-Type: application/json' \\
-
-  \-X POST \-d '{"id":"…"}' | jq .
+curl \-s [http://127.0.0.1:5000/api/reader](http://127.0.0.1:5000/api/reader) \-H 'Content-Type: application/json'  
+ \-X POST \-d '{"id":"…"}' | jq .
 
 \# Sample with seed (POST)
 
-curl \-s http://127.0.0.1:5000/api/sample/v1 \-H 'Content-Type: application/json' \\
+curl \-s [http://127.0.0.1:5000/api/sample/v1](http://127.0.0.1:5000/api/sample/v1) \-H 'Content-Type: application/json'  
+ \-X POST \-d '{"viewer\_prefs":{…},"seed":12345}' | jq .
 
-  \-X POST \-d '{"viewer\_prefs":{…},"seed":12345}' | jq .
+For Codespaces and other shared environments, Mechanics requires that QA and docs use the **infra-provided dev start commands and URLs** (for example, values exposed via devcontainer or environment keys described in **Glow Infrastructure** and **HDE-Build Checklist** by title) instead of hard-coding hostnames or ports in plans or scripts.
 
 # 35\) Runbooks (Operations)
 

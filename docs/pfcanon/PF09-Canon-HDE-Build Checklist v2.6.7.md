@@ -4,13 +4,13 @@
 
 **Title:** PF09-Canon-HDE-Build Checklist
 
-**Version:** v2.6.1
+**Version:** v2.6.7
 
 **Status:** Canon
 
-**Effective date:** 2025-12-04
+**Effective date:** 2025-12-08
 
-**Last Update Gate:** BN 8.0.7 Drain A14/15
+**Last Update Gate:** HDE-EPIC020 Dev Retro 
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -177,6 +177,38 @@ All mirror/index checks and governed byte comparisons run with:
 
 `TZ=UTC`
 
+### **0.3.10 Evidence bundles and manifests (ledger-centric evidence)**
+
+For some high-churn evidence families, the HD Engine now uses a **bundle-centric evidence model** instead of writing and indexing every member artifact as its own file:
+
+* An **evidence bundle** is a **textual file** (typically JSON or JSONL) under `artifacts/**` or `docs/evidence/**` that groups related evidence records (for example, ordering artifacts, sampler runs, or config dumps) into a single governed artifact.
+
+* Each bundle has a companion **bundle manifest** (JSON/JSONL) that lists, for each logical member, at minimum: `artifact_key`, `sha256`, `size_bytes`, and any additional descriptors defined in HDE-Schemas & Artifacts by title.
+
+For these families:
+
+* The **governed artifacts** are the **bundle file and its manifest**, not each internal member file.
+
+* The Human Evidence Index (`docs/evidence/INDEX.json`) and Machine Mirror (`artifacts/evidence_index.jsonl`) track **bundles and manifests** under the existing discipline:
+
+  * Each bundle or manifest appears as a **single row** in the Mirror (one row per governed artifact or bundle, as defined in HDE-Schemas & Artifacts).
+
+  * Each bundle or manifest has a co-located path-proof transcript referenced by `proof_anchor`, exactly as for discrete artifacts.
+
+Bundle invariants:
+
+* Bundles and manifests are **text-based and agent-readable** (UTF-8; canonical JSON/JSONL where applicable; LF-terminated); they live only under governed paths (`artifacts/**`, `audit/**`, `docs/evidence/**`).
+
+* Bundle manifests must be valid JSON/JSONL, obey the Mirror schema (no unknown keys), and use deterministic ordering as defined in HDE-Schemas & Artifacts and HDE-Mechanics Guide (titles-only).
+
+Impact on this checklist:
+
+* All generic Index/Mirror rules in §0.3 and §0.5 apply equally to **discrete artifacts and bundle artifacts**.
+
+* Checklist rows that consume tokens such as `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_INDEX_HASH_OK`, `MACHINE_MIRROR_UPDATED_OK`, and `EVIDENCE_PATHS_VALIDATED_OK` now implicitly cover **“governed artifact or bundle”** (as defined in HDE-Schemas & Artifacts), not only individual files.
+
+PF09 still treats Evidence Index and Machine Mirror as **consumer-only** surfaces: schema, bundle-vs-member policy, and detailed token semantics remain single-homed in HDE-Schemas & Artifacts and HDE-Governance by title.
+
 ---
 
 ## **0.4 A7 proof surface (titles-only pointers)**
@@ -285,35 +317,71 @@ A7/Catalog gating uses the following Governance tokens (names-only):
 
 ## **0.5 Index & mirror discipline**
 
-Update the Human Evidence Index (`docs/evidence/INDEX.json`) and the Machine Mirror (`artifacts/evidence_index.jsonl`) in the **same PR** whenever governed artifacts are added, moved, or removed. Mirror rules:
+Update the Human Evidence Index (`docs/evidence/INDEX.json`) and the Machine Mirror (`artifacts/evidence_index.jsonl`) in the **same PR** whenever governed evidence changes. Governed evidence includes:
 
-Records-only canonical JSONL (UTF-8; ASCII-sorted keys; compact; one LF).
+* **Discrete artifacts** (for example individual JSON/LOG files under `artifacts/**`, `audit/**`, `docs/evidence/**`), and
 
-Unknown keys rejected.
+* **Evidence bundles and their manifests** as defined in HDE-Schemas & Artifacts (see §0.3.10 for bundle semantics).
 
-Each record includes `sha256`, `size_bytes`, `produced_at_utc`, `discovered_physical_path`, and a `proof_anchor` to a co-located path-proof file.
+Mirror rules (for all governed artifacts and bundles):
 
-Locale pins apply to all byte checks: `LC_ALL=C`, `LANG=C`, `TZ=UTC`.
+* Records-only canonical JSONL (UTF-8; ASCII-sorted keys; compact; one LF).
+
+* Unknown keys rejected.
+
+* Each record includes at least:
+
+  * `artifact_key`,
+
+  * `discovered_physical_path`,
+
+  * `produced_at_utc`,
+
+  * `proof_anchor`,
+
+  * `role`,
+
+  * `sha256`,
+
+  * `size_bytes`.
+
+* The tuple `(artifact_key, discovered_physical_path)` is unique across the mirror.
+
+* There is exactly one Machine Mirror file at `artifacts/evidence_index.jsonl`.
+
+* `proof_anchor` always points to a co-located path-proof transcript for the governed object:
+
+  * For **discrete artifacts**, the path-proof describes that specific file.
+
+  * For **bundles**, the path-proof describes the bundle file; the bundle manifest is the canonical mapping from logical member IDs to hashes/sizes.
+
+Locale pins apply to all byte checks and evidence tools that read or write these files:
+
+* `LC_ALL=C`
+
+* `LANG=C`
+
+* `TZ=UTC`
 
 **Index/mirror acceptance (titles-only; tokens live in HDE-Governance / HDE-Schemas & Artifacts):**
 
-`EVIDENCE_INDEX_UPDATED_OK`
+These tokens now apply to **both** discrete artifacts and bundle-based families (bundles \+ manifests) and gate that Index, Mirror, and path-proofs are in sync for all governed evidence:
 
-`EVIDENCE_INDEX_MIRROR_OK`
+* `EVIDENCE_INDEX_UPDATED_OK` — Human Index updated for all governed artifacts **and bundles** affected in this PR.
 
-`EVIDENCE_INDEX_HASH_OK`
+* `EVIDENCE_INDEX_MIRROR_OK` — Machine Mirror rows present and consistent (one row per governed artifact or bundle).
 
-`EVIDENCE_PATHS_VALIDATED_OK`
+* `EVIDENCE_INDEX_HASH_OK` — `docs/evidence/INDEX.sha256` matches the canonical bytes of `INDEX.json`.
 
-`EVIDENCE_PATH_PROOFS_OK`
+* `EVIDENCE_PATHS_VALIDATED_OK` — every `discovered_physical_path` in the Mirror points to a real governed artifact or bundle.
 
-`CI_CHECK_MIRROR_SCHEMA_OK`
+* `EVIDENCE_PATH_PROOFS_OK` — each Mirror row has a valid `proof_anchor` to a co-located path-proof transcript for that artifact or bundle.
 
-`CI_CHECK_FINAL_LF_OK`
+* `CI_CHECK_MIRROR_SCHEMA_OK` — CI schema checks enforce the Mirror’s field set, ordering, and unknown-key rejection, including bundle-specific fields defined in HDE-Schemas & Artifacts.
 
-`ENV_LC_ALL_C_OK`
+* `CI_CHECK_FINAL_LF_OK` — governed JSON/JSONL artifacts (including bundles/manifests) are LF-terminated and free of extra trailing bytes.
 
-PF09 remains a **consumer** of these tokens and artifact definitions; token semantics and mirror schema live in HDE-Governance and HDE-Schemas & Artifacts.
+PF09 remains a **consumer** of these tokens and artifact definitions: token semantics, Mirror schema (including any bundle-specific fields), and the precise list of governed bundles and families are single-homed in HDE-Governance and HDE-Schemas & Artifacts by title.
 
 ---
 
@@ -1250,12 +1318,12 @@ Determinism env evidence artifacts (titles/paths only):
 **Notes:**  
  CLI entrypoint for local developer sanity runs.
 
-### Subtask HDE-CALC003.10 — Indexing & parity gates
+### **Subtask HDE-CALC003.10 — Indexing & parity CI gates**
 
 **Subtask name/label:** Indexing & parity CI gates
 
 **Subtask description:**  
- Update Human Index and Machine Mirror in the same PR (records-only; with path-proofs); ensure governed locations only (`artifacts/**`, `audit/**`, `docs/evidence/**`); reject ungoverned `codex/out/**`; CI fails if Index/Mirror miss entries, violate canonical JSONL, have unknown keys, missing path-proofs, wrong field order, or are unsorted.
+ Update the Human Evidence Index and Machine Mirror in the same PR (records-only; with path-proofs); ensure governed locations only (`artifacts/**`, `audit/**`, `docs/evidence/**`); reject ungoverned `codex/out/**`; and fail CI if Index/Mirror miss entries, violate canonical JSONL, have unknown keys, missing path-proofs, wrong field order, or are unsorted.
 
 **Subtask status:** **Partial**
 
@@ -1289,84 +1357,102 @@ CI evidence skeleton jobs and checks (titles-only):
 
 `python -m pytest tests/evidence tests/ops/test_evidence_index.py`
 
+`epic020-evidence-bundles` (CI job in `.github/workflows/ci.yml`) — closed-rails EPIC020 Candidate 1 pipeline that runs the EPIC020 bundle/manifest generator, calls `python tools/evidence/update_evidence_index.py --epic-id HDE-EPIC020` followed by `python tools/evidence/update_evidence_index.py --check`, invokes the hardened mirror schema checker, and executes `python -m pytest tests/evidence/test_epic020_bundle_index_integration.py` under `SAFE_MODE=1`, `ALLOW_NETWORK=0`, `LC_ALL=C`, `LANG=C`, `TZ=UTC`, `APP_ENV=ci`.
+
 Hardened artifacts:
 
 `docs/evidence/INDEX.json` / `docs/evidence/INDEX.sha256`
 
 `artifacts/evidence_index.jsonl`
 
-`*.path_proof.txt` for governed artifacts (including topology.orientation\_demo).
+`*.path_proof.txt` for governed artifacts (including `audit/gates/topology/orientation_demo.txt.path_proof.txt`).
+
+EPIC020 bundle generator invariants and tests (titles-only):
+
+`tools/evidence/epic020_bundle.py` — EPIC020 Candidate 1 bundle/manifest generator used by the `epic020-evidence-bundles` job; must support both mapping and string artifact entries from `docs/acceptance_map_epic020.json`, honor `discovered_physical_path` for member discovery, and skip any acceptance-map entry whose `discovered_physical_path` points under `artifacts/epic020/bundles/**` with `.bundle.json` or `.manifest.json` suffixes.
+
+`tests/tools/test_epic020_bundle_tool.py::test_epic020_bundle_handles_string_artifact_entries` — regression test that runs the bundle tool against the real `docs/acceptance_map_epic020.json` / `audit/EPIC020_MANIFEST.json` pairing and asserts that string-valued `artifacts` entries are handled correctly and produce deterministic bundles without failures.
+
+`tests/tools/test_epic020_bundle_tool.py::test_epic020_bundle_ignores_outputs_listed_as_artifacts` — regression test that writes a synthetic acceptance map where EPIC020 token `EPIC020.D1.HTTP_COMPAT_HTTP_BUNDLE` has both a real member and entries pointing at `artifacts/epic020/bundles/EPIC020.D1.HTTP_COMPAT_HTTP_BUNDLE.bundle.json` and `.manifest.json`, then asserts successful bundle build with exactly one member and no `discovered_physical_path` under `/epic020/bundles/`, codifying that bundle/manifest outputs are never re-ingested as members even when listed as governed artifacts.
+
+`tests/evidence/test_epic020_bundle_index_integration.py` — EPIC020 bundle/manifest integration test that verifies running the bundle tool followed by the Index updater produces correct EPIC020 bundle/manifest records in both the Human Evidence Index and Machine Mirror (hashes, sizes, timestamps, and `tokens` lists matched to EPIC020 acceptance tokens and acceptance map `token_status` keys).
 
 **Notes:**  
- EPIC017 PR02 wires Index/Mirror/Orientation gating into CI and closes a large part of this subtask. Additional CI integration (e.g., full sanity pipeline covering pack identity, A7 proofs, DB posture, BodyGraph gates) remains to be implemented in later Distillation tasks.
+ EPIC017 PR02 wired the baseline Index/Mirror/Orientation evidence skeleton into CI under closed rails and satisfied a large part of this subtask by enforcing canonical JSONL, path-proof presence, and mirror schema across registry/config artifacts and FE/BE bundles. EPIC020 Candidate 1 extends the same discipline to error/presenter/internal-version evidence by introducing the `epic020-evidence-bundles` CI job and EPIC020 bundle/manifest records in the Index/Mirror, so that EPIC020 D1–D3 and QA/rails tokens can be proved from EPIC020 bundle artifacts rather than per-member rows.
+
+This subtask remains **Partial**: the EPIC020-specific bundles and CI job are now part of the standard evidence skeleton, but broader sanity-pipeline integration (for example pack identity and A7 proofs, DB posture, BodyGraph evidence families, and extension of these patterns beyond EPIC020) is still owned by later Distillation tasks and future epics.
 
 ### **Subtask HDE-CALC003.11 — Evidence index touch discipline**
 
 **Subtask name/label:** Evidence Index/Mirror touch discipline
 
 **Subtask description:**  
- For any change that touches the Human Index, its sentinel, or the Machine Mirror, enforce a standard tool chain under closed rails in the same PR so that the index, mirror, and path-proofs stay in lockstep:
+ For any change that touches the Human Index, its sentinel, or the Machine Mirror, enforce a standard tool chain under closed rails in the same PR so that the Index, Mirror, and path-proofs stay in lockstep:
 
-**Scope.** This discipline applies to any PR that adds, removes, or edits:
+**Scope.**  
+ This discipline applies to any PR that:
 
-`docs/evidence/INDEX.json`
+* Adds, removes, or edits:
 
-`docs/evidence/INDEX.sha256`
+  * `docs/evidence/INDEX.json`
 
-`artifacts/evidence_index.jsonl`
+  * `docs/evidence/INDEX.sha256`
+
+  * `artifacts/evidence_index.jsonl`
+
+* Or calls `python tools/evidence/update_evidence_index.py` in **write mode** (directly or via an evidence generator such as `tools/errors/generate_error_artifacts.py`) and expects governed artifacts under `docs/evidence/**`, `artifacts/**`, or `audit/**` to change.
 
 **Required commands (closed-rails env).**
 
-Run `python tools/evidence/update_evidence_index.py` in write mode to regenerate the Human Index (`INDEX.json` and `INDEX.sha256`) and the Machine Mirror (`artifacts/evidence_index.jsonl`) according to PF12 semantics.
+1. Run `python tools/evidence/update_evidence_index.py` in **write** mode to regenerate the Human Index (`INDEX.json` and `INDEX.sha256`) and the Machine Mirror (`artifacts/evidence_index.jsonl`) according to PF12 semantics.
 
-Then run `python tools/evidence/update_evidence_index.py --check` to validate the regenerated index and mirror against the committed artifacts (including the mirror body hash and hash sentinel) under closed rails (`SAFE_MODE=1`, `ALLOW_NETWORK=0`, `LC_ALL=C`, `LANG=C`, `TZ=UTC`).
+2. Then run `python tools/evidence/update_evidence_index.py --check` to validate the regenerated Index and Mirror against the committed artifacts (including the mirror body hash and hash sentinel) under closed rails (`SAFE_MODE=1`, `ALLOW_NETWORK=0`, `LC_ALL=C`, `LANG=C`, `TZ=UTC`).
 
-Run `python tools/evidence/orientation_demo.py` to regenerate the topology orientation report and any associated mirror-coherence evidence.
+3. Run `python tools/evidence/orientation_demo.py` in **write** mode to regenerate the topology orientation report (`audit/gates/topology/orientation_demo.txt`) and any associated mirror-coherence evidence (including its path-proof transcript).
 
-Then run `python tools/evidence/orientation_demo.py --check` to verify that index entries, mirror records, and path-proofs are coherent (including the `index.machine_mirror` self-record) under the same closed-rails env.
+4. Then run `python tools/evidence/orientation_demo.py --check` to verify that Index entries, Mirror records, and path-proofs are coherent (including the `index.machine_mirror` self-record) under the same closed-rails env.
 
-**Same-PR rule.** All of the above commands MUST be run, and their outputs committed, in the **same PR** that changes the Human Index, sentinel, or Machine Mirror so that:
+**Same-PR rule.**  
+ All of the above commands MUST be run, and their outputs committed, in the **same PR** that changes the Human Index, sentinel, Machine Mirror, or governed artifacts referenced by the Index so that:
 
-`docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl`, and `*.path_proof.txt` remain consistent, and
+* `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl`, and `*.path_proof.txt` remain consistent, and
 
-the acceptance tokens `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_HASH_OK`, and `MACHINE_MIRROR_UPDATED_OK` continue to be satisfied for the current mirror body and index.
+* acceptance tokens `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_HASH_OK`, and `MACHINE_MIRROR_UPDATED_OK` continue to be satisfied for the current mirror body and Index.
 
-**Subtask status:** Not done
+**Subtask status:** **Not done**
 
 **Epic or card:** EPIC-018 (D4 evidence skeleton & mirror)
 
 **Tokens:**
 
-`EVIDENCE_INDEX_UPDATED_OK`
-
-`EVIDENCE_INDEX_HASH_OK`
-
-`MACHINE_MIRROR_UPDATED_OK`
+`EVIDENCE_INDEX_UPDATED_OK`  
+ `EVIDENCE_INDEX_HASH_OK`  
+ `MACHINE_MIRROR_UPDATED_OK`
 
 **Evidence / artifacts:**
 
 CI and local run logs for:
 
-`python tools/evidence/update_evidence_index.py` (write mode)
+* `python tools/evidence/update_evidence_index.py` (write mode)
 
-`python tools/evidence/update_evidence_index.py --check`
+* `python tools/evidence/update_evidence_index.py --check`
 
-`python tools/evidence/orientation_demo.py`
+* `python tools/evidence/orientation_demo.py` (write mode)
 
-`python tools/evidence/orientation_demo.py --check`
+* `python tools/evidence/orientation_demo.py --check`
 
-Hardened artifacts (unchanged; governed by other subtasks):
+plus Index, sentinel, Mirror, and topology orientation artifacts:
 
-`docs/evidence/INDEX.json`
+* `docs/evidence/INDEX.json` / `docs/evidence/INDEX.sha256`
 
-`docs/evidence/INDEX.sha256`
+* `artifacts/evidence_index.jsonl`
 
-`artifacts/evidence_index.jsonl`
+* `audit/gates/topology/orientation_demo.txt`
 
-`artifacts/evidence_index.jsonl.path_proof.txt` and other `*.path_proof.txt` for governed artifacts
+* `audit/gates/topology/orientation_demo.txt.path_proof.txt`
 
 **Notes:**  
- EPIC018 PR01 (“machine mirror self-proof fix”) is a completed example of this discipline: it only touched `artifacts/evidence_index.jsonl` and `artifacts/evidence_index.jsonl.path_proof.txt` to repair stale SHA/size metadata for the `index.machine_mirror` self-record and its path-proof and passed the full evidence skeleton CI (update\_evidence\_index and orientation demo write/--check under closed rails). This subtask records that **future** changes to Index/sentinel/Mirror MUST follow the same tool-driven process rather than hand-editing metadata.
+ Addendum 4 for HDE-EPIC020 PR 2b showed a real failure of this discipline: `update_evidence_index.py --check` passed after adding EPIC020 D1 error artifacts under `errors/*` and `parity/*`, but `orientation_demo.py --check` then failed with `ORIENTATION_DRIFT` because `orientation_demo.txt` and its path proof still reflected the pre-PR evidence skeleton. Going forward, any PR that uses `update_evidence_index.py` in write mode for governed artifacts (including error evidence generators such as `tools/errors/generate_error_artifacts.py`) is out of spec unless it also refreshes orientation demo in the same PR before CI. A future harness (tracked under EPIC018 D4 and EPIC020 follow-on work) is expected to wrap the error evidence generator, Index writer, and orientation demo into a single closed-rails job that runs `generate_error_artifacts`, `update_evidence_index.py` (write \+ `--check`), and `orientation_demo.py` (write \+ `--check`) as one atomic evidence step.
 
 ### **Subtask HDE-CALC003.12 — QA test tooling bootstrap (all QA Plans)**
 
@@ -1532,7 +1618,72 @@ Epic behavior tokens remain pending until tooling is repaired and tests or CLI c
 **Notes:**  
  Added from EPIC019 Live QA Addendum 11 and Addendum 14 and the HDE-Mechanics Guide “Live QA harness” section. This subtask generalizes sampler-specific lessons (bootstrap tooling, CANDIDATES\_FILE derivation, viewer-001, seeds 111/222, empty JSON outputs) into global QA harness requirements and now also requires that **each QA Plan step** have a single, consolidated step log under QA\_ROOT that carries the step header and all evidence for that step. The D4 sampler Step 5 run is a compliant example; the subtask remains **Not done** until this pattern is applied consistently across all epics and QA steps.
 
-## **Task HDE-CALC004 — Programmatic Configuration System**
+### **Subtask HDE-CALC003.15 — Acceptance map & QA harness viability check**
+
+**Subtask name/label:** Acceptance map & QA harness viability check
+
+**Subtask description:**  
+ Add a **cross-epic viability gate** so Phase III/IV “acceptance maps and QA harnesses” rows are not marked **Done** until the epic’s acceptance scaffolding has been proven to reference only **real** assets:
+
+*Scope — which rows this gates.*
+
+This subtask applies to all Phase III/IV checklist rows that describe **acceptance maps**, **QA harnesses**, or **Live QA scaffolding** for a specific epic (for example rows that reference `docs/acceptance_map_<epic>.json`, epic manifests, or `audit/qa/<epic>/...` harness directories). Before any such row can move to **Done**, the following viability checks MUST be satisfied.
+
+*Viability check — scripts/tests/paths exist.*
+
+For each epic that has an acceptance map and QA harness:
+
+* Every script path referenced in the epic’s acceptance map or QA Plan (for example `./scripts/qa_capture_compat_dev.sh`, `scripts/qa/*.sh`, `tools/qa/*.py`) MUST exist in the repo and be executable in the intended environment.
+
+* Every test node referenced in `test_names` (or equivalent) in the acceptance map (for example `tests/cli/test_*.py::test_*`) MUST correspond to a real, importable test in the test tree (pytest node discovery passes).
+
+* Every QA\_ROOT directory referenced in the plan (for example `audit/qa/hde-epic020/...`) MUST exist or be created as part of the plan before Live QA, and harness steps MUST write under that tree instead of to ad-hoc locations.
+
+If any script, test, or QA\_ROOT path is missing or broken, the epic’s “acceptance maps and QA harnesses” rows remain **Not done** and the deficiency is treated as a **tooling/infra issue**, not as a green D-goal.
+
+*Repo-level audit (manual or tool-assisted).*
+
+Repository owners MUST run a **repo-level audit** (manual or tool-assisted) before Live QA for each epic that claims acceptance scaffolding is complete. That audit MUST, at minimum:
+
+* Walk each epic’s acceptance map(s) (for example `docs/acceptance_map_epic020.json`) and manifest(s) and resolve all referenced `script_names` / `test_names` / QA\_ROOT paths.
+
+* Confirm that every referenced script/test path exists on disk, is addressable in the current branch, and is runnable in the environment where QA will execute (for example Codespaces dev, CI).
+
+* Emit a deterministic viability report that identifies any missing or broken references and classifies them as **tooling failures** that block Live QA until fixed.
+
+The viability report itself is a QA artifact governed under PF19 and PF06; PF09 requires that, for Phase III/IV acceptance/QA scaffolding rows, such a report exists and shows **no unresolved references** at the time those rows are marked Done.
+
+**Subtask status:** **Not done**
+
+**Epic or card:** **Unknown** (future QA/acceptance-map epic; PF09 records the requirement; implementation details live in PF19 / PF20 / PF06 by title)
+
+**Tokens:**
+
+Tokens for “QA Plan/acceptance map viability” will be defined in Governance and Glow QA Guide (for example a future `QA_PLAN_VIABILITY_CHECK_OK` family); PF09 is consumer-only and records that Phase III/IV acceptance/QA scaffolding rows participate in those tokens once minted. Existing QA harness tokens such as `QA_STEP_LOGS_CONSOLIDATED_OK`, `DISCOVERY_BASELINE_OK`, and tooling/bootstrap tokens remain single-homed in PF19 and PF20 and are referenced by title.
+
+**Evidence / artifacts:**
+
+(Title/paths only; schemas live in HDE-Schemas & Artifacts and Glow QA Guide.)
+
+* Epic acceptance maps and manifests, for example:
+
+  * `docs/acceptance_map_epic020.json` — EPIC020 acceptance map (tokens/tests/artifact\_keys).
+
+  * `audit/EPIC020_MANIFEST.json` — EPIC020 manifest tying tokens to evidence families.
+
+* Acceptance-map viability tests and tools (to be implemented under PF19/PF06), for example:
+
+  * `tests/config/test_config_acceptance_map.py` — existing config acceptance map tests (pattern for verifying `artifact_key` and `test_names` references).
+
+  * `tools/qa/check_qa_plan_assets.py` or `scripts/qa/check_qa_plan_assets.sh` (placeholder names; exact tool paths and schemas will be defined in PF19/PF06) — repo-level audit that resolves all scripts/tests/QA\_ROOT paths referenced by an epic’s acceptance map/QA Plan and emits a canonical viability report.
+
+* QA viability reports (once governed), for example:
+
+  * `audit/qa/<epic>/acceptance_map_viability.log` — canonical text or JSON log recording verified scripts/tests/paths and any missing assets, with clear `tooling_failure` vs `ok` classification.
+
+* Evidence Index & Mirror entries for acceptance-map viability artifacts, once they are governed and indexed in the same PR (`docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl`), following the global Evidence Index discipline in §0.3–§0.5. PF09 does not restate mirror schemas here.
+
+  ## **Task HDE-CALC004 — Programmatic Configuration System**
 
 **Task name/label:** Programmatic Configuration System
 
@@ -3762,41 +3913,59 @@ Update `artifacts/evidence_index.jsonl` (records-only canonical JSONL; UTF‑8, 
 
 ---
 
-## Task HDE-SEPA002 — Error Envelope & Token Set
+## **Task HDE-SEPA002 — Error Envelope & Token Set**
 
 **Task ID:** HDE-SEPA002
 
 **Task name/label:** Error Envelope & Token Set
 
 **Task description:**  
- Provide a central typed, numeric‑free error envelope with canonical JSON, validated token map, Reader↔CLI parity, CLI stream discipline, and evidence indexed in the Evidence Index and Machine Mirror.
+ Provide a central typed, numeric-free error envelope with canonical JSON, validated token map, Reader↔CLI parity, CLI stream discipline, and evidence indexed in the Evidence Index and Machine Mirror.
 
-**Task status:** **Not done**
+**Task status:** **Partial**
 
 **Task notes:**
 
-Audit v1 (2025‑11‑17): missing `CLI_STDERR_ONLY_ON_ERROR_OK`, `CLI_STDOUT_LF_OK`, `JSON_CANONICAL_CHECK_OK`; writers/errors header posture is not yet proven on a Catalog success route; no passing evidence artifacts recorded.
+Audit v1 (2025-11-17) originally called out missing `CLI_STDERR_ONLY_ON_ERROR_OK`, `CLI_STDOUT_LF_OK`, and `JSON_CANONICAL_CHECK_OK`, plus the lack of hardened writers/errors header posture and error-envelope evidence families.
 
-Behavior is well‑specified but tokens/evidence are incomplete.
+EPIC020 PR 1 and PR 2a introduced the governed error token map and `error_v1` envelope, routed writer and reader error surfaces (including 404/405) through a shared `error_envelope` helper and the canonical serializer, and normalized CLI error handling so that usage errors exit 64, success writes only to stdout, and errors write only to stderr, with EPIC020 D1 tokens initially marked **PARTIAL**.
 
-### Subtask HDE-SEPA002.1 — Error envelope shape & numeric-free body
+EPIC020 PR 2b completes the D1 slice by:
+
+* adding a governed error parity harness (`tools/errors/generate_error_artifacts.py` \+ `tests/cli/test_errors_parity.py`) under closed rails,
+
+* generating deterministic error artifacts under `parity/errors_reader_cli.*`, `errors/schema_check/error_envelope_invalid_*.log`, and `errors/token_map/token_map.json` (with governed path-proofs and artifact keys such as `ERRORS_READER_CLI_PARITY_V1`, `ERROR_SCHEMA_CHECK_V1`, and `ERROR_TOKEN_MAP_V1`), and
+
+* wiring these artifacts into the Human Evidence Index and Machine Mirror with EPIC020 metadata and determinism pins.
+
+The EPIC020 D1 tokens `ERROR_JSON_CANON_OK`, `JSON_CANONICAL_CHECK_OK`, `ERROR_TOKEN_MAP_OK`, `CLI_READER_EMITTER_PARITY_OK`, `CLI_STDOUT_LF_OK`, `CLI_STDERR_ONLY_ON_ERROR_OK`, `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`, and `EVIDENCE_PATHS_VALIDATED_OK` are now recorded as **DONE** in `docs/acceptance_map_epic020.json` and `audit/EPIC020_MANIFEST.json`, each bound to specific tests and error evidence artifacts.
+
+From PF09’s perspective, HDE-SEPA002 is **complete for the EPIC020 D1 error envelope & token set slice** (envelope shape, token map, CLI error discipline, header posture for the governed writer route, and error evidence families and Index/Mirror entries). The task remains **Partial** at the phase level because:
+
+* Reader↔CLI error parity and two-run identity for a broader set of error scenarios (for example DB-unavailable and vendor errors mentioned in PF19) are tracked under HDE-SEPA002.5 and future epics.
+
+* Distillation and Coagulation tasks still own broader A7 behavior, rails posture, and future error scenarios; those will consume the error evidence families defined here.
+
+### **Subtask HDE-SEPA002.1 — Error envelope shape & numeric-free body**
 
 **Subtask ID:** HDE-SEPA002.1
 
-**Subtask name/label:** Typed, numeric‑free error envelope
+**Subtask name/label:** Typed, numeric-free error envelope
 
 **Subtask description:**  
- Emit error bodies as typed, numeric‑free JSON:
+ Emit error bodies as typed, numeric-free JSON in the governed `error_v1` shape:
 
-Shape: `{"ok": false, "code": "…", "error": "…“}` only.
+* Envelope shape: `{"schema": "v1", "ok": false, "code": "<ERR_*>", "error": "<message>"}` with an optional `details` field for bounded diagnostics when required.
 
-LF‑terminated, serialized by the single presenter/emitter.
+* The allowed key set is fixed by the `error_v1` schema; error bodies do **not** introduce numeric fields, stack traces, or SR/XR numerics in public or admin responses.
 
-No PII, no payload echoes, no SR/XR numerics.
+* Error envelopes are LF-terminated and serialized by the single presenter/emitter via a shared `error_envelope` helper; governed error surfaces must call this helper rather than ad-hoc serializers.
 
-**Subtask status:** **Not done / evidence missing** (spec is present, but package is marked Not done)
+* Error payloads do not echo request bodies or secrets and do not include PII.
 
-**Epic or card:** Unknown
+**Subtask status:** **Done**
+
+**Epic or card:** **HDE-EPIC020 (D1 — error envelope & token set, PR 1–2b)**
 
 **Tokens:**
 
@@ -3804,52 +3973,72 @@ No PII, no payload echoes, no SR/XR numerics.
 
 **Evidence / artifacts:**
 
-`errors/schema_check` (envelope shape; see 002.8)
+`engine/compat/errors.py` — `error_envelope` helper that canonicalizes tokens and emits `error_v1` bodies via the shared serializer (no ad-hoc JSON).
 
-### Subtask HDE-SEPA002.2 — Error transport headers (writers/errors)
+`engine/compat/error_tokens.py` — governed error token map used by `error_envelope` (see HDE-SEPA002.3).
+
+`tests/adapter/test_jsonschema.py::test_error_envelope_schema_on_unauthorized_prod` — JSON-schema validation for `error_v1` envelopes on governed writer/error surfaces.
+
+`tests/adapter/test_jsonschema.py::test_notfound_uses_error_schema` — verifies that `/nope` 404 responses use `error_v1` and match the error schema, with LF-terminated bodies.
+
+`errors/schema_check/error_envelope_invalid_json.log` and `errors/schema_check/error_envelope_invalid_viewer_prefs.log` — schema-check logs for representative error scenarios, with governed path-proofs and artifact keys (for example `ERROR_SCHEMA_CHECK_V1`) single-homed in PF12.
+
+`docs/acceptance_map_epic020.json` / `audit/EPIC020_MANIFEST.json` — EPIC020 D1 entries marking `ERROR_JSON_CANON_OK` as **DONE** and binding it to the schema tests and error schema logs above.
+
+**Notes:**  
+ This row is treated as Done for the EPIC020 D1 slice: all governed D1 error surfaces (writer diagnostic route, reader error cases in scope, and 404\) now emit `error_v1` envelopes via the shared helper, are schema-checked, and satisfy `ERROR_JSON_CANON_OK` in the EPIC020 acceptance map and manifest. Future error scenarios and surfaces use the same envelope but are owned by later epics and Distillation tasks.
+
+#### **Subtask HDE-SEPA002.2 — Error transport headers (writers/errors)**
 
 **Subtask ID:** HDE-SEPA002.2
 
 **Subtask name/label:** Error transport headers (no-store, no ETag)
 
 **Subtask description:**  
- For error responses, enforce:
+ For error responses on writers/errors routes (which are **not** Catalog-eligible; A7 success proofs stay bound to Catalog success routes only), enforce:
 
-`Content-Type: application/json; charset=utf-8`
+* `Content-Type: application/json; charset=utf-8`
 
-`Cache-Control: no-store`
+* `Cache-Control: no-store`
 
-No `ETag` header  
- on writers/errors routes, which are **not** Catalog‑eligible; A7 success proofs stay bound to Catalog success routes only.
+* No `ETag` header
 
-**Subtask status:** **Not done**
+**Subtask status:** **Done**
 
-**Epic or card:** Unknown
+**Epic or card:** **HDE-EPIC020 (D1 — writers/errors header posture, PR 2b)**
 
 **Tokens:**
 
-Header‑posture tokens (names live in Governance; not restated here).
+Header posture tokens (names live in Governance; not restated here).
 
 **Evidence / artifacts:**
 
-`tests/transport/headers/no_store_writers_errors.snap`
+`tests/transport/headers/no_store_writers_errors.snap` — canonical writer/error header snapshot with `[success]` and `[error]` sections capturing expected status and headers (no-store, UTF-8 JSON, no `ETag`, and `WWW-Authenticate` on 401).
 
-### Subtask HDE-SEPA002.3 — Error token map & casing
+`tests/transport/test_writers_errors_headers.py` — closed-rails header test that loads the snapshot, calls `/ops/writer/diagnostic` with correct vs wrong admin tokens, and asserts that actual headers match the snapshot sections and that `etag` is absent.
+
+`docs/acceptance_map_epic020.json` / `audit/EPIC020_MANIFEST.json` — EPIC020 D1 entries that bind the writer/error header tokens to these snapshot tests.
+
+### **Subtask HDE-SEPA002.3 — Error token map & casing**
 
 **Subtask ID:** HDE-SEPA002.3
 
-**Subtask name/label:** Token map & lower\_snake casing
+**Subtask name/label:** Token map & canonical codes
 
 **Subtask description:**  
- Maintain a canonical error token→message table that:
+ Maintain a canonical governed error token→message table and alias layer that:
 
-Matches a golden map byte‑for‑byte.
+* Uses **UPPER\_SNAKE** tokens of the form `ERR_*` as the canonical codes that appear in `error_v1.code` for governed Reader and writer/error surfaces.
 
-Uses lower\_snake casing for all tokens.
+* Preserves existing lower-snake names (for example `"invalid_json"`, `"invalid_prefs"`, `"forbidden"`) as internal aliases only; aliases are resolved via a helper (for example `canonical_token_for`) and are **not** emitted as `code` values in `error_v1` envelopes.
 
-**Subtask status:** **Not done**
+* Matches a golden token→message map byte-for-byte; any change to the token set or messages must go through a governed update (Doc-Delta \+ acceptance map changes), not ad-hoc edits.
 
-**Epic or card:** Unknown
+* Clearly separates reader tokens (`ERR_READER_*`), writer/diagnostic tokens (`ERR_WRITER_*`), and generic tokens (for example `ERR_NOT_FOUND`), with semantics single-homed in HDE-CLI-API-Vendor-Ref and HDE-Mechanics Guide (titles-only).
+
+**Subtask status:** **Done**
+
+**Epic or card:** **HDE-EPIC020 (D1 — error envelope & token set, PR 1–2b)**
 
 **Tokens:**
 
@@ -3857,43 +4046,71 @@ Uses lower\_snake casing for all tokens.
 
 **Evidence / artifacts:**
 
-`errors/token_map` — canonical token→message snapshot (golden).
+`engine/compat/error_tokens.py` — canonical `ERROR_TOKEN_MAP` defining reader (`ERR_READER_*`), writer (`ERR_WRITER_*`), and generic (`ERR_NOT_FOUND`) tokens plus legacy alias mappings.
 
-### Subtask HDE-SEPA002.4 — Canonical JSON for error envelopes
+`engine/compat/errors.py` — `canonical_token_for` helper that resolves legacy aliases into canonical `ERR_*` tokens before emitting `error_v1` envelopes.
+
+`errors/token_map/token_map.json` — governed token map snapshot (JSON array of `{aliases, code, message}` records) with path-proof transcript; artifact key `ERROR_TOKEN_MAP_V1` (record-type semantics single-homed in PF12).
+
+`tests/cli/test_errors_parity.py::test_token_map_snapshot_matches_canonical` — asserts that `errors/token_map/token_map.json` equals `render_token_map()` and that every `code` in the snapshot appears in `ERROR_TOKEN_MAP`.
+
+`tests/adapter/test_diagnostic_writer.py` — diagnostic writer tests asserting canonical `ERR_WRITER_*` codes and messages for invalid content type, invalid JSON, invalid input shape, unknown keys, and oversized payloads.
+
+`docs/acceptance_map_epic020.json` — EPIC020 D1 acceptance map listing `ERROR_TOKEN_MAP_OK` as **DONE** and binding it to the token map snapshot and diagnostic writer/parity tests.
+
+`audit/EPIC020_MANIFEST.json` — EPIC020 manifest entries mapping `ERROR_TOKEN_MAP_OK` to the same tests and artifacts.
+
+**Notes:**  
+ For the D1 slice, the governed error token map is now fully implemented, snapshotted, and indexed: `ERROR_TOKEN_MAP_OK` is satisfied by the combination of `ERROR_TOKEN_MAP`, the on-disk snapshot, and tests that prove equality and coverage. Reader/CLI parity for specific error scenarios is exercised via the parity harness (HDE-SEPA002.5); the semantics of individual `ERR_*` codes remain single-homed in Governance and Mechanics.
+
+### **Subtask HDE-SEPA002.4 — Canonical JSON for error envelopes**
 
 **Subtask ID:** HDE-SEPA002.4
 
-**Subtask name/label:** Canonical JSON & re‑serialization check
+**Subtask name/label:** Canonical JSON & re-serialization check
 
 **Subtask description:**  
- Ensure error responses are canonical JSON:
+ Ensure that governed error responses are canonical JSON and pass re-serialization checks:
 
-UTF‑8 (no BOM).
+* UTF-8 (no BOM).
 
-ASCII‑sorted keys.
+* ASCII-sorted keys.
 
-Compact; exactly one trailing LF.
+* Compact separators; exactly one trailing LF.
 
-Arrays‑as‑sets deduped and ASCII‑sorted.  
- Prove canonicality via re‑serialization compare (expected empty diff).
+* Arrays that function as sets are deduped and ASCII-sorted before hashing or comparison.
 
-**Subtask status:** **Not done**
+* Re-serializing an `error_v1` envelope via the canonical serializer must produce the same bytes (expected empty diff).
 
-**Epic or card:** Unknown
+**Subtask status:** **Done**
+
+**Epic or card:** **HDE-EPIC020 (D1 — error envelope & token set, PR 1–2b)**
 
 **Tokens:**
 
-`ERROR_JSON_CANON_OK`
-
-`JSON_CANONICAL_CHECK_OK`
+`ERROR_JSON_CANON_OK`  
+ `JSON_CANONICAL_CHECK_OK`
 
 **Evidence / artifacts:**
 
-`artifacts/cli/canonical/json_canon_compare.log`
+`tests/adapter/test_jsonschema.py::test_error_envelope_schema_on_unauthorized_prod` — asserts that unauthorized writer responses emit canonical `error_v1` JSON bodies that satisfy the error schema.
 
-`errors/canonical_check` — encoding/key‑order/compact/LF proof
+`tests/adapter/test_jsonschema.py::test_notfound_uses_error_schema` — asserts that 404 `/nope` responses emit LF-terminated `error_v1` bodies matching the JSON schema.
 
-### Subtask HDE-SEPA002.5 — Reader↔CLI error parity & two-run identity
+`tests/cli/test_cli_usage_and_errors.py` — CLI error usage and runtime tests confirming that success cases write canonical JSON to stdout (LF-terminated) with empty stderr and that error cases write LF-terminated JSON error envelopes to stderr with no stdout output.
+
+`tests/cli/test_errors_parity.py::test_http_and_cli_parity` — closed-rails parity tests that assert HTTP and CLI error envelopes for EPIC020 scenarios are schema-valid, numeric-free, and exactly match stored artifacts.
+
+`artifacts/cli/canonical/json_canon_compare.log` — canonical JSON compare log for error envelopes (encoding/key-order/compact/LF proof).
+
+`errors/canonical_check/error_envelope_invalid_*.log` — canonicalization check artifacts for representative error scenarios (invalid JSON, invalid viewer prefs), each with governed path-proofs and artifact key `ERROR_SCHEMA_CHECK_V1` or equivalent (record-type semantics single-homed in PF12).
+
+`docs/acceptance_map_epic020.json` / `audit/EPIC020_MANIFEST.json` — EPIC020 D1 entries marking `ERROR_JSON_CANON_OK` and `JSON_CANONICAL_CHECK_OK` as **DONE** and binding them to the schema, parity, and canonicalization artifacts above.
+
+**Notes:**  
+ For EPIC020 D1, canonical JSON behavior is now implemented and evidenced for the writer, reader, health/not-found, and CLI error surfaces in scope, and the error canonicalization tokens are green in the acceptance map. Future epics may add additional error scenarios and flows (for example DB/vendor errors), but those will build on the same canonicalization infrastructure and are not required for this subtask’s D1 acceptance.
+
+### **Subtask HDE-SEPA002.5 — Reader↔CLI error parity & two-run identity**
 
 **Subtask ID:** HDE-SEPA002.5
 
@@ -3902,23 +4119,37 @@ Arrays‑as‑sets deduped and ASCII‑sorted.
 **Subtask description:**  
  Ensure that for the same error condition:
 
-Reader and CLI emit **byte‑identical** error envelopes.
+* Reader and CLI emit **byte-identical** error envelopes.
 
-Re‑emitting the same error twice produces bitwise‑identical bytes.
+* Re-emitting the same error twice produces bitwise-identical bytes.
 
-**Subtask status:** **Not done**
+**Subtask status:** **Partial**
 
-**Epic or card:** Unknown
+**Epic or card:** **HDE-EPIC020 (D1 — error parity harness, PR 2b)**
 
 **Tokens:**
 
-`CLI_READER_EMITTER_PARITY_OK`
-
-`TWO_RUN_IDENTITY_OK`
+`CLI_READER_EMITTER_PARITY_OK`  
+ `TWO_RUN_IDENTITY_OK`
 
 **Evidence / artifacts:**
 
-`parity/errors_reader_cli` — byte‑equality proofs
+`parity/errors_reader_cli.{scenario}.http.json` — stored HTTP error envelopes for D1 scenarios, produced under closed rails by the error parity harness.
+
+`parity/errors_reader_cli.{scenario}.cli.txt` — stored CLI error outputs for the same scenarios.
+
+`errors/schema_check/error_envelope_invalid_*.log` — schema logs confirming that parity scenarios use valid `error_v1` envelopes.
+
+`tests/cli/test_errors_parity.py::test_http_and_cli_parity` — closed-rails parity tests (marked `pytest.mark.epic020`) that:
+
+* read the stored HTTP artifacts, call `capture_http`, assert that `body.code == scenario.token` and that the token is in `ERROR_TOKEN_MAP`, and check exact equality with the stored JSON; and
+
+* read the stored CLI artifacts, call `capture_cli`, assert non-zero return code, empty stdout, an appropriate stderr line, and exact equality with the stored CLI text.
+
+`docs/acceptance_map_epic020.json` / `audit/EPIC020_MANIFEST.json` — EPIC020 D1 entries marking `CLI_READER_EMITTER_PARITY_OK` as **DONE** and binding it to the parity artifacts and tests above.
+
+**Notes:**  
+ This subtask is **Partial**: EPIC020 PR 2b closes `CLI_READER_EMITTER_PARITY_OK` for the current D1 error scenarios under closed rails, but `TWO_RUN_IDENTITY_OK` for error envelopes and parity coverage for additional scenarios (such as DB-unavailable and vendor errors referenced in PF19) remain future work. PF09 records the D1 parity harness and artifacts here and leaves broader error determinism to later epics.
 
 ### **Subtask HDE-SEPA002.6 — CLI stderr/stdout discipline & usage exit 64**
 
@@ -3930,43 +4161,49 @@ Enforce CLI stream and exit-code discipline for all CLI commands in alignment wi
 
 **Streams:**
 
-Successful runs write **only** the public JSON body to `stdout`, LF-terminated, with no ANSI escapes and no extra bytes.
+* Successful runs write **only** the public JSON body to `stdout`, LF-terminated, with no ANSI escapes and no extra bytes.
 
-Error runs write typed, numeric-free JSON error envelopes to `stderr` only; successful runs **never** write to `stderr`.
+* Error runs write typed, numeric-free JSON error envelopes to `stderr` only; successful runs **never** write to `stderr`.
 
-No mixed streams: a run is either stdout-only success or stderr-only failure.
+* No mixed streams: a run is either stdout-only success or stderr-only failure.
 
 **Exit codes:**
 
-`0` on success (canonical JSON body on stdout; stderr empty).
+* `0` on success (canonical JSON body on stdout; stderr empty).
 
-`64` on usage errors (bad flags/arguments or invalid invocation); on usage error, stdout is empty and diagnostics appear only as a typed error envelope on stderr.
+* `64` on usage errors (bad flags/arguments or invalid invocation); on usage error, stdout is empty and diagnostics appear only as a typed error envelope on stderr.
 
-Other failures use non-zero codes as defined in Governance/CLI specs; stdout remains empty on failure.
+* Other failures use non-zero codes as defined in Governance/CLI specs; stdout remains empty on failure.
 
-*Subtask status:* Not done (behavior specified; evidence pending)
+*Subtask status:* **Done**
 
-*Epic or card:* Unknown
+*Epic or card:* **HDE-EPIC020 (D1 — error envelope & token set, PR 1–2b)**
 
 *Tokens (titles-only; tokens live in HDE-Governance / HDE Phased Epics):*
 
-`CLI_USAGE_ERR_EXIT64_OK`
-
-`CLI_STDERR_ONLY_ON_ERROR_OK`
-
-`CLI_STDOUT_LF_OK`
+`CLI_USAGE_ERR_EXIT64_OK`  
+ `CLI_STDERR_ONLY_ON_ERROR_OK`  
+ `CLI_STDOUT_LF_OK`
 
 *Evidence / artifacts (titles/paths only):*
 
-CLI harness logs and tests that cover:
+`tests/cli/test_cli_usage_and_errors.py` — CLI error suite that:
 
-A successful command with canonical JSON on stdout and empty stderr.
+* exercises success paths with LF-terminated JSON on stdout and empty stderr,
 
-A usage-error case (exit code 64\) with empty stdout and an error envelope on stderr.
+* covers usage-error cases (missing args, invalid flags) that exit 64 with empty stdout and usage/error text on stderr, and
 
-Indexing of these artifacts follows the global Evidence Index & Machine Mirror discipline (front matter 0.3–0.5); PF09 does not restate mirror schemas.
+* covers engine/file/JSON error cases that exit non-zero, write LF-terminated error envelopes to stderr, and leave stdout empty.
 
-### Subtask HDE-SEPA002.7 — Writers/errors headers posture validation
+`tests/cli/test_errors_parity.py::test_http_and_cli_parity` — parity tests that confirm CLI error envelopes for EPIC020 scenarios are aligned with HTTP error envelopes and remain numeric-free under closed rails.
+
+`docs/acceptance_map_epic020.json` — EPIC020 D1 acceptance map marking `CLI_USAGE_ERR_EXIT64_OK`, `CLI_STDERR_ONLY_ON_ERROR_OK`, and `CLI_STDOUT_LF_OK` as **DONE** and binding them to the tests above.
+
+`audit/EPIC020_MANIFEST.json` — EPIC020 manifest entries mapping CLI error tokens to their bound tests.
+
+Notes: This row is now Done for the EPIC020 D1 CLI slice: stream and exit-code discipline is implemented, tested, and wired into the D1 acceptance map and manifest under closed rails. Broader CLI behavior remains governed by Conjunction and Distillation tasks that build on this discipline.
+
+### **Subtask HDE-SEPA002.7 — Writers/errors headers posture validation**
 
 **Subtask ID:** HDE-SEPA002.7
 
@@ -3975,13 +4212,13 @@ Indexing of these artifacts follows the global Evidence Index & Machine Mirror d
 **Subtask description:**  
  Prove that when the error envelope appears on writers/errors routes, response headers match Governance:
 
-`Cache-Control: no-store`
+* `Cache-Control: no-store`
 
-No `ETag`
+* No `ETag`
 
-**Subtask status:** **Not done**
+**Subtask status:** **Done**
 
-**Epic or card:** Unknown
+**Epic or card:** **HDE-EPIC020 (D1 — writers/errors header posture, PR 2b)**
 
 **Tokens:**
 
@@ -3989,9 +4226,16 @@ Header posture tokens (names live in Governance).
 
 **Evidence / artifacts:**
 
-`tests/transport/headers/no_store_writers_errors.snap`
+`tests/transport/headers/no_store_writers_errors.snap` — governed snapshot for writer/error success and error cases.
 
-### Subtask HDE-SEPA002.8 — Error-envelope evidence & indexing
+`tests/transport/test_writers_errors_headers.py` — enforcement test wiring the snapshot to the diagnostic writer route under closed rails.
+
+`docs/acceptance_map_epic020.json` / `audit/EPIC020_MANIFEST.json` — EPIC020 D1 acceptance entries that reference the snapshot and tests as header posture evidence.
+
+**Notes:**  
+ This row is now Done for the EPIC020 D1 writer diagnostic route; broader A7 transport behavior and other success routes remain governed by A7/Catalog and Distillation tasks.
+
+### **Subtask HDE-SEPA002.8 — Error-envelope evidence & indexing**
 
 **Subtask ID:** HDE-SEPA002.8
 
@@ -4000,172 +4244,256 @@ Header posture tokens (names live in Governance).
 **Subtask description:**  
  Maintain and index error-envelope evidence families:
 
-`errors/token_map` — canonical token→message snapshot (golden).
+* `errors/token_map` — canonical token→message snapshot (golden).
 
-`errors/schema_check` — JSON-Schema validation for error-envelope shape.
+* `errors/schema_check` — JSON-Schema validation logs for error-envelope shape.
 
-`errors/canonical_check` — encoding/key‑order/compact/LF proof.
+* `errors/canonical_check` — encoding/key-order/compact/LF proof for error envelopes.
 
-`parity/errors_reader_cli` — Reader↔CLI byte‑equality proofs.  
- List all in `docs/evidence/INDEX.json` and mirror them in `artifacts/evidence_index.jsonl` in the same PR (records‑only canonical JSONL; one LF; unknown‑key reject; fixed field order; each record includes a `proof_anchor` to a co‑located path\_proof transcript).
+* `parity/errors_reader_cli` — Reader↔CLI byte-equality and parity proofs for governed error scenarios.
 
-**Subtask status:** **Not done**
+List all in `docs/evidence/INDEX.json` and mirror them in `artifacts/evidence_index.jsonl` in the same PR (records-only canonical JSONL; one LF; unknown-key reject; fixed field order; each record includes a `proof_anchor` to a co-located path\_proof transcript).
 
-**Epic or card:** Unknown
+**Subtask status:** **Done**
+
+**Epic or card:** **HDE-EPIC020 (D1 — error envelope & token set, PR 2b)**
 
 **Tokens:**
 
-`EVIDENCE_INDEX_UPDATED_OK`
-
-`EVIDENCE_INDEX_MIRROR_OK`
-
-`EVIDENCE_PATHS_VALIDATED_OK`
+`EVIDENCE_INDEX_UPDATED_OK`  
+ `EVIDENCE_INDEX_MIRROR_OK`  
+ `EVIDENCE_PATHS_VALIDATED_OK`
 
 **Evidence / artifacts:**
 
-`docs/evidence/INDEX.json`
+`errors/token_map/token_map.json` — error token map snapshot with governed path proof; artifact key `ERROR_TOKEN_MAP_V1` in the Evidence Index/Mirror.
 
-`artifacts/evidence_index.jsonl`
+`errors/schema_check/error_envelope_invalid_*.log` — error envelope schema-check logs with governed path proofs; artifact key family `ERROR_SCHEMA_CHECK_V1`.
 
-`errors/*` evidence artifacts listed above
+`errors/canonical_check/error_envelope_*` — canonicalization logs for error envelopes (encoding/key-order/compact/LF), referenced by the EPIC020 acceptance map.
 
----
+`parity/errors_reader_cli.{scenario}.http.json` and `.cli.txt` — HTTP and CLI parity artifacts for D1 error scenarios, each with governed path-proofs; artifact key family `ERRORS_READER_CLI_PARITY_V1`.
 
-## Task HDE-SEPA003 — Public Presenter / Emitter
+`docs/evidence/INDEX.json` / `docs/evidence/INDEX.sha256` — Human Index and hash sentinel entries for the error evidence families above.
+
+`artifacts/evidence_index.jsonl` — Machine Mirror records for the error artifact keys, including `proof_anchor` references to their path-proofs.
+
+`tests/evidence/test_evidence_skeleton.py` / `tests/ops/test_evidence_index.py` — skeleton and Index/Mirror tests that exercise the new error artifact keys.
+
+`docs/acceptance_map_epic020.json` / `audit/EPIC020_MANIFEST.json` — EPIC020 D1 entries marking `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`, and `EVIDENCE_PATHS_VALIDATED_OK` as **DONE** for the error evidence slice and binding them to the error skeleton tests and artifacts.
+
+**Notes:**  
+ This subtask is now Done for the EPIC020 D1 error evidence slice: the governed error artifacts live in the same Evidence Index/Mirror skeleton as sampler/core artifacts, have path-proofs, and are covered by skeleton tests. Future error evidence families (for new scenarios or epics) will extend, not replace, these entries and are tracked by their owning epics and PF12.
+
+## **Task HDE-SEPA003 — Public Presenter / Emitter**
 
 **Task ID:** HDE-SEPA003
 
 **Task name/label:** Public Presenter / Emitter
 
 **Task description:**  
- Ensure Reader and CLI share a single allow‑listed presenter/emitter symbol, emit canonical JSON, enforce stream discipline, satisfy ABBA/two‑run identity, and prove the preimage flow with indexed evidence.
+ Ensure Reader and CLI share a single allow-listed presenter/emitter symbol, emit canonical JSON, enforce stream discipline, satisfy ABBA/two-run identity, and prove the preimage flow with indexed evidence.
 
-**Task status:** **Not done**
+**Task status:** **Partial**
 
 **Task notes:**
 
-Audit (2025‑11‑18): Reader↔CLI parity fails under rails‑closed in at least one case (`Warm/alpha` vs `Open/dev`); CLI `showcompat` sometimes produced empty or non‑matching output.
+EPIC017/EPIC018 D1 established the canonical serializer, determinism harness, and CLI serializer guards (AB↔BA and two-run identity, Reader↔CLI parity, preimage recompute, and AST-based serializer/ emitter guards under `artifacts/cli/guards/**`). EPIC020 D2 (“Public Presenter / Emitter”) extends this by:
 
-A shared emitter path is specified in canon but not yet proven in evidence.
+* Centralizing governed public JSON emission behind `engine.presenter.emitter` so that Reader/compat HTTP routes and `hdctl showcompat` all call a single allow-listed emitter and canonical serializer, with no remaining ad-hoc `json.dumps` paths on governed surfaces.
 
-### Subtask HDE-SEPA003.1 — Single shared presenter/emitter symbol
+* Adding a presenter harness (`tools/presenter/generate_presenter_artifacts.py`) that runs under closed rails and writes deterministic presenter artifacts under `artifacts/presenter/**` (AB/BA showcompat bytes, Reader/CLI parity bytes, preimage recompute logs, and a showcompat identity summary), registered via PRESENTER\_\* artifact\_keys in the Evidence Index and Machine Mirror.
+
+* Wiring EPIC020 D2 tokens (`CLI_SHOWCOMPAT_CANON_OK`, `TWO_RUN_IDENTITY_OK`, `COMPOSITE_ABBA_IDENTITY_OK`, `PREIMAGE_RECOMPUTE_OK`) to CLI presenter tests and presenter artifacts in `docs/acceptance_map_epic020.json` and `audit/EPIC020_MANIFEST.json`, where they are now marked **DONE**.
+
+From PF09’s perspective, the presenter/emitter slice for Reader and `hdctl showcompat` is now fully wired and evidenced. The row remains **Partial** because compat/app-level test flows and any future presenter surfaces are still tracked under Conjunction-phase tasks (`HDE-CONJ002`, `HDE-CONJ003`); PF09 treats those as separate jobs to be closed before the overall presenter story is fully Done.
+
+---
+
+### **Subtask HDE-SEPA003.1 — Single shared presenter/emitter symbol**
 
 **Subtask ID:** HDE-SEPA003.1
 
 **Subtask name/label:** Shared emitter entrypoint
 
 **Subtask description:**  
- Ensure Reader and CLI both call the **same** presenter/emitter entrypoint symbol, enforced via a CI allow‑list.
+ Ensure Reader and CLI both call the **same** presenter/emitter entrypoint symbol, enforced via a CI allow-list and guard tools, so test harnesses and production both use the canonical presenter/emitter for public bytes.
 
-**Subtask status:** **Not done**
+**Subtask status:** **Done**
 
-**Epic or card:** Unknown
+**Epic or card:**  
+ HDE-EPIC020 (D2 — Public Presenter / Emitter, PR 3\)  
+ EPIC-017 / EPIC-018 (D1 canonical serializer \+ D3 CLI guards, context only)
 
 **Tokens:**
 
-`CLI_READER_EMITTER_PARITY_OK`
+`CLI_READER_EMITTER_PARITY_OK`  
+ `CLI_NO_ALT_JSON_OK`
 
 **Evidence / artifacts:**
 
-`artifacts/cli/guards/emitter_symbol_proof.txt` — import‑graph/symbol proof
+Guard tools and tests (titles-only; single home in Calcination subtasks):
 
-`artifacts/cli/guards/serializer_grep_guard.log` — grep guard for ad‑hoc serializers
+* `tools/cli/serializer_grep_guard.py` — AST/grep guard for disallowed serializers on governed CLI paths.
 
-### Subtask HDE-SEPA003.2 — Canonical JSON & non-empty showcompat
+* `tools/cli/emitter_symbol_proof.py` — emitter symbol proof for governed CLI handlers (including `showcompat`), listing handler→emitter mappings.
+
+* `tests/cli/test_serializer_guards.py` — guard test module exercising both tools in clean and synthetic violation scenarios.
+
+Guard artifacts (governed homes):
+
+* `artifacts/cli/guards/serializer_grep_guard.log`
+
+* `artifacts/cli/guards/emitter_symbol_proof.txt`
+
+* Co-located `*.path_proof.txt` transcripts for both guard logs.
+
+Index/Mirror records:
+
+* `docs/evidence/INDEX.json` / `docs/evidence/INDEX.sha256` — Human Index entries for CLI guard artifacts.
+
+* `artifacts/evidence_index.jsonl` — Machine Mirror records for CLI guard artifacts with `proof_anchor` set to the corresponding path-proofs (mirror discipline per PF09 front matter and PF12).
+
+EPIC020 acceptance wiring (titles-only):
+
+* `docs/acceptance_map_epic020.json` / `audit/EPIC020_MANIFEST.json` — D2 entries recording `CLI_READER_EMITTER_PARITY_OK` and `CLI_NO_ALT_JSON_OK` as **DONE** for the presenter slice, listing serializer guard tests and guard artifacts as evidence.
+
+Notes:  
+ This subtask is scoped to ensuring that governed Reader/compat HTTP routes and `hdctl showcompat` all use the same allow-listed presenter/emitter symbol as production, enforced by guard tools and tests. Compat-surface AB/BA parity and identity hashing (HDE-CONJ002) remain separate rows.
+
+---
+
+### **Subtask HDE-SEPA003.2 — Canonical JSON & non-empty showcompat**
 
 **Subtask ID:** HDE-SEPA003.2
 
 **Subtask name/label:** Canonical showcompat output
 
 **Subtask description:**  
- Prove that `showcompat` emits non‑empty, LF‑terminated canonical JSON:
+ Prove that `showcompat` emits non-empty, LF-terminated canonical JSON via the presenter/emitter:
 
-UTF‑8 (no BOM).
+* UTF-8 (no BOM).
 
-ASCII‑sorted keys.
+* Compact JSON with exactly one trailing LF.
 
-Compact; one trailing LF.
+* Canonical key ordering and arrays-as-sets semantics enforced by the canonical serializer.
 
-**Subtask status:** **Not done**
+* Bytes on stdout exactly match `engine.presenter.emitter.emit_public` for the same payload.
 
-**Epic or card:** Unknown
+**Subtask status:** **Done**
+
+**Epic or card:**  
+ HDE-EPIC020 (D2 — Public Presenter / Emitter)
 
 **Tokens:**
 
-`CLI_SHOWCOMPAT_CANON_OK`
-
-`JSON_CANONICAL_CHECK_OK`
+`CLI_SHOWCOMPAT_CANON_OK`  
+ `JSON_CANONICAL_CHECK_OK`
 
 **Evidence / artifacts:**
 
-`artifacts/presenter/preimage_recompute.log` (preimage & canonical checks)
+CLI presenter tests (titles-only):
 
-### Subtask HDE-SEPA003.3 — Streams discipline for presenter flows
+* `tests/cli/test_cli_canonical_bytes.py` — proves `hdctl showcompat` stdout is canonical JSON, LF-terminated, non-empty, and byte-identical to `emitter.emit_public(...)`.
+
+* `tests/cli/test_showcompat_parity_and_identity.py` — AB/BA and two-run identity tests for presenter/CLI showcompat, building on the canonical serializer harness.
+
+Presenter harness and artifacts:
+
+* `tools/presenter/generate_presenter_artifacts.py` — closed-rails presenter harness that writes deterministic presenter artifacts under `artifacts/presenter/**` (AB/BA showcompat bytes, Reader/CLI parity bytes, preimage recompute logs, identity summary).
+
+* Presenter artifact families indexed via PRESENTER\_\* artifact\_keys in the Evidence Index and Machine Mirror (titles-only), referenced by EPIC020 D2 acceptance metadata.
+
+EPIC020 acceptance wiring:
+
+* `docs/acceptance_map_epic020.json` / `audit/EPIC020_MANIFEST.json` — D2 entries marking `CLI_SHOWCOMPAT_CANON_OK` as **DONE** with the canonical-bytes and identity tests above and the presenter artifacts listed as evidence.
+
+---
+
+### **Subtask HDE-SEPA003.3 — Streams discipline for presenter flows**
 
 **Subtask ID:** HDE-SEPA003.3
 
 **Subtask name/label:** stdout/stderr discipline for public flows
 
 **Subtask description:**  
- Enforce stream discipline:
+ Enforce stream discipline for presenter-driven CLI flows:
 
-Success → `stdout` with exactly one LF.
+* Success: public JSON body on `stdout` with exactly one LF; `stderr` empty.
 
-Errors → `stderr` only.
+* Errors: typed, numeric-free error envelopes on `stderr` only; `stdout` empty.
 
 **Subtask status:** **Not done**
 
-**Epic or card:** Unknown
+**Epic or card:** **Unknown** (presently covered piecemeal via EPIC017/018 D1 error flows and EPIC020 D2 presenter work)
 
 **Tokens:**
 
-`CLI_STDOUT_LF_OK`
-
-`CLI_STDERR_ONLY_ON_ERROR_OK`
+`CLI_STDOUT_LF_OK`  
+ `CLI_STDERR_ONLY_ON_ERROR_OK`
 
 **Evidence / artifacts:**
 
-CLI harness logs (paths not pinned here).
+Evidence for error flows and showcompat streams is captured under HDE-SEPA002.6 and Calcination subtasks (CLI usage/error tests and canonical bytes tests), but PF09 has no dedicated presenter-specific stream harness yet for all public CLI/presenter surfaces. This row remains Not done until stream discipline is consolidated and proven for the full presenter slice; evidence is tracked via HDE-SEPA002.6 and future presenter/admin tasks rather than here.
 
-### Subtask HDE-SEPA003.4 — AB↔BA and two-run identity for presenter
+---
+
+### **Subtask HDE-SEPA003.4 — AB↔BA and two-run identity for presenter**
 
 **Subtask ID:** HDE-SEPA003.4
 
 **Subtask name/label:** ABBA/two-run parity for presenter surfaces
 
 **Subtask description:**  
- Re‑prove that on parity flows:
+ Re-prove that on presenter parity flows:
 
-`(A,B)` vs `(B,A)` produce identical bytes (AB↔BA).
+* `(A,B)` vs `(B,A)` produce identical public bytes (AB↔BA).
 
-Two runs with identical inputs produce bitwise‑identical public bytes.
+* Two runs with identical inputs produce bitwise-identical public bytes for showcompat and presenter parity samples.
 
-**Subtask status:** **Not done**
+**Subtask status:** **Done**
 
-**Epic or card:** Unknown
+**Epic or card:**  
+ HDE-EPIC020 (D2 — Public Presenter / Emitter)
 
 **Tokens:**
 
-`TWO_RUN_IDENTITY_OK`
-
-`COMPOSITE_ABBA_IDENTITY_OK`
+`TWO_RUN_IDENTITY_OK`  
+ `COMPOSITE_ABBA_IDENTITY_OK`
 
 **Evidence / artifacts:**
 
-`artifacts/presenter/reader_cli_parity.bytes` — Reader↔CLI parity sample
+Presenter/CLI identity tests:
 
-### Subtask HDE-SEPA003.5 — Preimage recompute & identity coupling
+* `tests/cli/test_showcompat_parity_and_identity.py` — AB/BA parity and two-run identity checks for showcompat under closed rails.
+
+* `tests/cli/test_cli_canonical_bytes.py` — canonical bytes assertions reused for identity proofs.
+
+Presenter artifacts (titles-only):
+
+* AB and BA presenter bytes for showcompat and Reader/CLI parity cases under `artifacts/presenter/**`, as recorded in the Evidence Index and Machine Mirror.
+
+* Presenter identity summary artifact capturing AB↔BA and two-run hashes for showcompat runs.
+
+EPIC020 acceptance metadata:
+
+* `docs/acceptance_map_epic020.json` / `audit/EPIC020_MANIFEST.json` — D2 entries marking `TWO_RUN_IDENTITY_OK` and `COMPOSITE_ABBA_IDENTITY_OK` as **DONE** for the presenter slice, binding them to the parity/identity tests and presenter artifacts above.
+
+---
+
+### **Subtask HDE-SEPA003.5 — Preimage recompute & identity coupling**
 
 **Subtask ID:** HDE-SEPA003.5
 
 **Subtask name/label:** Preimage recompute & identity proof
 
 **Subtask description:**  
- Prove that preimage hashing (`idempotence_hash`) and identity coupling (e.g., `release_id`) are correct by recomputing preimage/digests and comparing against emitted bytes.
+ Prove that preimage hashing (`idempotence_hash`) and identity coupling (for example `release_id`) are correct by recomputing preimage/digests from the presenter preimage logs and comparing against emitted bytes.
 
-**Subtask status:** **Not done**
+**Subtask status:** **Done**
 
-**Epic or card:** Unknown
+**Epic or card:**  
+ HDE-EPIC020 (D2 — Public Presenter / Emitter)
 
 **Tokens:**
 
@@ -4173,57 +4501,76 @@ Two runs with identical inputs produce bitwise‑identical public bytes.
 
 **Evidence / artifacts:**
 
-`artifacts/presenter/preimage_recompute.log`
+* Presenter preimage recompute logs under `artifacts/presenter/**` written by the presenter harness.
 
-### Subtask HDE-SEPA003.6 — Presenter evidence indexing
+* CLI/Reader preimage recompute checks in `tests/cli/test_showcompat_parity_and_identity.py` that recompute hashes and compare against stored digests and envelopes.
+
+* EPIC020 D2 acceptance entries associating `PREIMAGE_RECOMPUTE_OK` with the presenter preimage logs and identity tests.
+
+---
+
+### **Subtask HDE-SEPA003.6 — Presenter evidence indexing**
 
 **Subtask ID:** HDE-SEPA003.6
 
 **Subtask name/label:** Presenter evidence & indexing
 
 **Subtask description:**  
- Index presenter/emitter evidence artifacts in the Human Evidence Index and Machine Mirror in the same PR (records‑only; with path‑proofs), following global Evidence Index & mirror rules.
+ Index presenter/emitter evidence artifacts in the Human Evidence Index and Machine Mirror in the same PR (records-only; with path-proofs), following global Evidence Index & mirror rules.
 
-**Subtask status:** **Not done**
+**Subtask status:** **Done**
 
-**Epic or card:** Unknown
+**Epic or card:**  
+ HDE-EPIC020 (D2 — Public Presenter / Emitter)
 
 **Tokens:**
 
-`EVIDENCE_INDEX_UPDATED_OK`
-
-`EVIDENCE_INDEX_MIRROR_OK`
-
-`EVIDENCE_PATHS_VALIDATED_OK`
+`EVIDENCE_INDEX_UPDATED_OK`  
+ `EVIDENCE_INDEX_MIRROR_OK`  
+ `EVIDENCE_PATHS_VALIDATED_OK`
 
 **Evidence / artifacts:**
 
-`artifacts/presenter/preimage_recompute.log`
+* Presenter artifact families under PRESENTER\_\* artifact\_keys in `docs/evidence/INDEX.json` and `artifacts/evidence_index.jsonl` (titles-only), with `proof_anchor` values pointing to co-located `*.path_proof.txt` files.
 
-`artifacts/presenter/reader_cli_parity.bytes`
+* Evidence skeleton tests (`tests/evidence/test_evidence_skeleton.py`, `tests/ops/test_evidence_index.py`) extended to cover the presenter artifact families for EPIC020 D2.
 
-`artifacts/cli/guards/serializer_grep_guard.log`
-
-`artifacts/cli/guards/emitter_symbol_proof.txt`
+* `docs/acceptance_map_epic020.json` / `audit/EPIC020_MANIFEST.json` — D2 entries marking `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`, and `EVIDENCE_PATHS_VALIDATED_OK` as **DONE** for the presenter slice, binding them to the presenter artifact skeleton and tests.
 
 ---
 
-## Task HDE-SEPA004 — Internal Ops Surface /internal/version
+## **Task HDE-SEPA004 — Internal Ops Surface /internal/version**
 
 **Task ID:** HDE-SEPA004
 
 **Task name/label:** Internal Ops Surface /internal/version
 
 **Task description:**  
- Provide an operator‑only, side‑effect‑free `/internal/version` endpoint that exposes engine identity, with no‑store/no‑ETag headers, HEAD parity, conditionals ignored, and fully indexed evidence.
+ Provide an operator-only, side-effect-free `/internal/version` endpoint that exposes engine identity, with no-store/no-ETag headers, HEAD parity, conditionals ignored, and fully indexed evidence.
 
-**Task status:** **Not done**
+**Task status:** **Partial**
 
 **Task notes:**
 
-Audit v1 (2025‑11‑17) lists missing `INTVER_200_CTYPE_JSON_UTF8_OK`, `INTVER_HEAD_PARITY_OK`, `INTVER_CONDITIONALS_IGNORED_OK`, `INTVER_200_NO_ETAG_OK`; headers/body proofs are incomplete and no full GET/HEAD/conditional/identity proof set exists.
+Audit v1 (2025-11-17) originally listed missing `INTVER_200_CTYPE_JSON_UTF8_OK`, `INTVER_HEAD_PARITY_OK`, `INTVER_CONDITIONALS_IGNORED_OK`, and `INTVER_200_NO_ETAG_OK`, and noted that headers/body proofs were incomplete and no full GET/HEAD/conditional/identity proof set existed. Subsequent work updates that posture:
 
-### Subtask HDE-SEPA004.1 — GET/HEAD 200 parity
+* EPIC017/EPIC018 QA (see Subtasks HDE-SEPA004.2 and HDE-SEPA004.3) proved conditional-ignore behavior and no-store/no-ETag headers for `/internal/version` on Railway prod, with governed logs under `audit/qa/hde-epic017/logs/**` and tokens `INTVER_CONDITIONALS_IGNORED_OK` and `INTVER_200_NO_ETAG_OK` marked **Done**.
+
+* EPIC020 D3 (“Internal-ops identity”) adds dev-harness GET/HEAD identity and JSON content-type proofs for `/internal/version`, wiring tokens `INTVER_200_CTYPE_JSON_UTF8_OK` and `INTVER_HEAD_PARITY_OK` to header/body artifacts and Live QA Step 4 logs under `audit/qa/hde-epic020/**` and capturing those identity records in EPIC020 Candidate 1 bundles/manifests integrated into the Evidence Index and Machine Mirror.
+
+From PF09’s perspective, the `/internal/version` ops surface now has:
+
+* no-store/no-ETag posture and conditional-ignore behavior evidenced and indexed (EPIC017/EPIC018), and
+
+* GET/HEAD 200 parity plus JSON content-type identity for the engine/Reader dev harness evidenced and indexed (EPIC020 D3).
+
+The task remains **Partial** because:
+
+* two-run identity and identity/provenance coupling for `/internal/version` across environments (body-shape contract, identity fields vs frozen identity artifacts) are explicitly tracked under **Subtask HDE-SEPA004.4** and EPIC018/prospective Reality Audit work, not EPIC020, and
+
+* future cross-env `/internal/version` audits (e.g., staging/prod replays via PF23 Reality Audits) are intentionally deferred to later epics.
+
+### **Subtask HDE-SEPA004.1 — GET/HEAD 200 parity**
 
 **Subtask ID:** HDE-SEPA004.1
 
@@ -4236,9 +4583,9 @@ Audit v1 (2025‑11‑17) lists missing `INTVER_200_CTYPE_JSON_UTF8_OK`, `INTVER
 
 `HEAD` returns 200, mirrors GET validators (including `Content-Type`), has no body, and `Content-Length == len(identity GET body)`.
 
-**Subtask status:** **Not done**
+**Subtask status:** **Done**
 
-**Epic or card:** Unknown
+**Epic or card:** **HDE-EPIC020 (D3 — `/internal/version` identity)**
 
 **Tokens:**
 
@@ -4248,13 +4595,17 @@ Audit v1 (2025‑11‑17) lists missing `INTVER_200_CTYPE_JSON_UTF8_OK`, `INTVER
 
 **Evidence / artifacts:**
 
-`artifacts/ops/internal_version/headers_get.txt`
+`artifacts/ops/internal_version/headers_get.txt` — headers \+ status for `/internal/version` GET under pinned rails (JSON content type, no-store, no ETag).
 
-`artifacts/ops/internal_version/headers_head.txt`
+`artifacts/ops/internal_version/headers_head.txt` — headers \+ status for `/internal/version` HEAD under pinned rails (200, matching validators including `Content-Type`, no body, `Content-Length == len(identity GET body)`).
 
-`artifacts/ops/internal_version/body_get.json`
+`artifacts/ops/internal_version/body_get.json` — canonical JSON body for `/internal/version` GET under determinism pins (UTF-8, sorted keys, compact, one LF).
 
-`artifacts/ops/internal_version/body_get.sha256`
+`artifacts/ops/internal_version/body_get.sha256` — sha256 over canonical `body_get.json` bytes for identity coupling.
+
+EPIC020 D3 Live QA Step 4 logs under `audit/qa/hde-epic020/**` (titles-only) — dev-harness `/internal/version` GET/HEAD captures showing the same content-type and validator parity as the ops proofs, run under `APP_ENV=dev` with SAFE rails and env pins, as described in PF10 EPIC020 D3 QA addenda and the Dev Retrospective.
+
+EPIC020 Candidate 1 bundles/manifests in `artifacts/epic020/bundles/*.bundle.json` / `*.manifest.json` — identity records tying `/internal/version` JSON to ops identity families and EPIC020 D3 tokens, integrated into the Evidence Index and Machine Mirror per PF12/PF09 evidence-bundle rules (titles-only).
 
 ### **Subtask HDE-SEPA004.2 — Conditionals ignored (never 304\)**
 
@@ -4328,73 +4679,23 @@ Subtask name/label: Two-run identity and identity coupling
 
 Subtask description:
 
- Prove two-run identity for `/internal/version` bodies and ensure they are consistent with identity and provenance artifacts:
+Prove two-run identity for `/internal/version` bodies and ensure they are consistent with identity and provenance artifacts:
 
-Two consecutive GET requests to `/internal/version` on the same environment produce byte-identical, LF-terminated JSON bodies when captured under pinned env (LC\_ALL=C, LANG=C, TZ=UTC).
+Two consecutive GET requests to `/internal/version` on the same environment produce byte-identical, LF-terminated JSON bodies when captured under pinned env (`LC_ALL=C`, `LANG=C`, `TZ=UTC`).
 
-The body values for engine\_tag, release\_id, invocation\_tag, build\_commit, emitter\_sha256, and any additional identity fields required by the Identity and Provenance module match the frozen identity artifacts for this release (pack manifest, release\_id artifacts, emitter hash, and service identity snapshot).
+The body values for `engine_tag`, `release_id`, `invocation_tag`, `build_commit`, `emitter_sha256`, and any additional identity fields required by the Identity and Provenance module match the frozen identity artifacts for this release (pack manifest, `release_id` artifacts, emitter hash, and service identity snapshot).
 
 Subtask status: Not done
 
-Epic or card: EPIC-018 (D2 env/prod handshake and identity snapshot for /internal/version)
+Epic or card: EPIC-018 (D2 env/prod handshake and identity snapshot for `/internal/version`)
 
 Tokens:
 
-Supports TWO\_RUN\_IDENTITY\_OK for identity components (token semantics live in Governance and Mechanics; PF09 is consumer-only).
+Supports `TWO_RUN_IDENTITY_OK` for identity components (token semantics live in Governance and Mechanics; PF09 is consumer-only).
 
 Evidence / artifacts:
 
-Planned canonical ops and identity artifacts (governed artifacts; paths and schemas owned by HDE-Schemas & Artifacts and Mechanics):
-
-artifacts/ops/internal\_version/two\_run\_identity.log — two-run identity log for `/internal/version` showing byte-identical LF-terminated bodies across runs on the same environment.
-
-artifacts/ops/internal\_version/body\_get.json — canonical JSON body for a representative GET `/internal/version` call, emitted via the Identity and Provenance helper, with fixed key order and all required identity fields, including invocation\_sha256 once implemented.
-
-artifacts/math/freeze\_pack\_manifest.json — freeze pack manifest snapshot used to derive release\_id.
-
-artifacts/math/release\_id.txt — release\_id derived as the lowercase 64-hex sha256 of canonical catalog/manifest.json bytes.
-
-artifacts/math/release\_id\_recompute.log — recompute proof that sha256(canonical manifest bytes) equals the stored release\_id for this cut.
-
-artifacts/identity/emitter\_sha256.txt — hash of the allow-listed presenter/emitter source for this release.
-
-EPIC018 QA03 env/prod handshake artifacts (Codespaces → Railway prod, context evidence):
-
-audit/qa/hde-epic018/d2-env/d2-env-prod-handshake-001.json — raw JSON body from a curl GET of the Railway prod `/internal/version` endpoint, captured from the D2 env/prod handshake step, showing:
-
-engine\_tag: "hdengine@prod"
-
-release\_id: a lowercase 64-hex value corresponding to the current prod release.
-
-invocation\_tag: "INV-f2ac55d77ce9aacc"
-
-build\_commit: "9479d28"
-
-emitter\_sha256: a lowercase 64-hex hash for the emitter.
-
-(The body currently has only these five fields; the missing invocation\_sha256 field and non-canonical key order are a known bug tracked elsewhere and are out of scope for this handshake.)
-
-audit/qa/hde-epic018/d2-env/d2-env-prod-handshake-001.pretty.json — pretty-printed version of the same JSON, used only to confirm parseability and human readability; contents identical in value to the raw JSON.
-
-audit/qa/hde-epic018/d2-env/d2-env-prod-handshake-001.stderr — curl stderr from the handshake run, present and empty, confirming that the request completed without network or protocol errors when using \-sS.
-
-Notes:
-
-SoT: canon for this subtask is that `/internal/version` acts as the operator-only identity surface for the engine and must eventually satisfy both two-run identity (stable bytes under pinned env) and identity coupling (body values aligned with the frozen manifest- and identity-module artifacts for the release). HDE-SEPA004.4 remains Not done because there is no committed canonical two-run identity log under artifacts/ops/internal\_version, the body shape still lacks invocation\_sha256 and frozen key order, and the coupling to pack/manifest and identity artifacts has not yet been proven and indexed.
-
-EPIC017 QA01 (already recorded under HDE-SEPA004.2 and HDE-SEPA004.3) validated header posture and conditional-ignore behavior for `/internal/version` on Railway prod (no-store, no ETag, conditionals ignored). EPIC018 QA01 later normalized QA directory casing so that all EPIC017 logs live under audit/qa/hde-epic017/logs. These QA slices do not change the identity fields themselves.
-
-EPIC018 QA03 (D2 env/prod handshake, Addendum 15\) adds a successful Codespaces → Railway prod handshake for `/internal/version` and confirms that the prod identity snapshot matches PF-canon expectations for the current deployment (engine\_tag, release\_id, invocation\_tag, build\_commit, emitter\_sha256), with evidence under audit/qa/hde-epic018/d2-env. This handshake establishes that the Codespace can reach Railway prod and that `/internal/version` returns valid JSON with the expected identity fields; it does not, by itself, satisfy two-run identity, fix the known body-shape bug (missing invocation\_sha256, non-canonical key order), or complete the coupling to manifest and identity artifacts required for TWO\_RUN\_IDENTITY\_OK at the ops surface.
-
-Future EPIC018 slices for identity and provenance will need to:
-
-Add invocation\_sha256 to the `/internal/version` body and freeze the key order to match the identity and provenance spec before recomputing body\_get.json.
-
-Capture two\_run\_identity.log under artifacts/ops/internal\_version with two successive GETs on Railway prod that are byte-identical under pinned env.
-
-Cross-check `/internal/version` identity fields against artifacts/math/freeze\_pack\_manifest.json, artifacts/math/release\_id.txt, artifacts/math/release\_id\_recompute.log, and artifacts/identity/emitter\_sha256.txt, and index all of these artifacts and path-proofs in the Human Index and Machine Mirror in the same PR.
-
-\[END TEXT TO PASTE\]
+Planned canonical ops and identity artifacts (governed artifacts; paths and schemas owned by HDE-Schemas & Artifacts and Mechanics).
 
 ### Subtask HDE-SEPA004.5 — Internal ops evidence indexing
 
