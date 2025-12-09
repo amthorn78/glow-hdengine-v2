@@ -1,0 +1,129 @@
+{
+  "epic_id": "HDE-EPIC021",
+  "runs": [
+    {
+      "run_id": "epic021-d3",
+      "produced_at_utc": "2025-12-09T02:58:48.267825+00:00",
+      "steps": [
+        {
+          "name": "bootstrap",
+          "status": "PASS",
+          "log_path": "audit/qa/hde-epic021/epic021-d3/step_bootstrap.log"
+        },
+        {
+          "name": "serializer_cli_d1",
+          "status": "PASS",
+          "log_path": "audit/qa/hde-epic021/epic021-d3/step_serializer_cli_d1.log"
+        },
+        {
+          "name": "evidence_d2",
+          "status": "PASS",
+          "log_path": "audit/qa/hde-epic021/epic021-d3/step_evidence_d2.log"
+        },
+        {
+          "name": "sanity_d2",
+          "status": "PASS",
+          "log_path": "audit/qa/hde-epic021/epic021-d3/step_sanity_d2.log"
+        },
+        {
+          "name": "acceptance_map_d3",
+          "status": "FAIL",
+          "log_path": "audit/qa/hde-epic021/epic021-d3/step_acceptance_map_d3.log"
+        }
+      ]
+    },
+    {
+      "run_id": "epic021-d3",
+      "produced_at_utc": "2025-12-09T02:59:34.289831+00:00",
+      "steps": [
+        {
+          "name": "bootstrap",
+          "status": "PASS",
+          "log_path": "audit/qa/hde-epic021/epic021-d3/step_bootstrap.log"
+        },
+        {
+          "name": "serializer_cli_d1",
+          "status": "PASS",
+          "log_path": "audit/qa/hde-epic021/epic021-d3/step_serializer_cli_d1.log"
+        },
+        {
+          "name": "evidence_d2",
+          "status": "PASS",
+          "log_path": "audit/qa/hde-epic021/epic021-d3/step_evidence_d2.log"
+        },
+        {
+          "name": "sanity_d2",
+          "status": "PASS",
+          "log_path": "audit/qa/hde-epic021/epic021-d3/step_sanity_d2.log"
+        },
+        {
+          "name": "acceptance_map_d3",
+          "status": "PASS",
+          "log_path": "audit/qa/hde-epic021/epic021-d3/step_acceptance_map_d3.log"
+        }
+      ]
+    },
+    {
+      "run_id": "test-run",
+      "produced_at_utc": "2025-12-09T02:59:45.447223+00:00",
+      "steps": [
+        {
+          "name": "bootstrap",
+          "status": "PASS",
+          "log_path": "audit/qa/hde-epic021/test-run/step_bootstrap.log"
+        },
+        {
+          "name": "serializer_cli_d1",
+          "status": "PASS",
+          "log_path": "audit/qa/hde-epic021/test-run/step_serializer_cli_d1.log"
+        },
+        {
+          "name": "evidence_d2",
+          "status": "PASS",
+          "log_path": "audit/qa/hde-epic021/test-run/step_evidence_d2.log"
+        },
+        {
+          "name": "sanity_d2",
+          "status": "PASS",
+          "log_path": "audit/qa/hde-epic021/test-run/step_sanity_d2.log"
+        },
+        {
+          "name": "acceptance_map_d3",
+          "status": "PASS",
+          "log_path": "audit/qa/hde-epic021/test-run/step_acceptance_map_d3.log"
+        }
+      ]
+    },
+    {
+      "run_id": "test-run-d3",
+      "produced_at_utc": "2025-12-09T02:59:45.612278+00:00",
+      "steps": [
+        {
+          "name": "bootstrap",
+          "status": "PASS",
+          "log_path": "audit/qa/hde-epic021/test-run-d3/step_bootstrap.log"
+        },
+        {
+          "name": "serializer_cli_d1",
+          "status": "PASS",
+          "log_path": "audit/qa/hde-epic021/test-run-d3/step_serializer_cli_d1.log"
+        },
+        {
+          "name": "evidence_d2",
+          "status": "PASS",
+          "log_path": "audit/qa/hde-epic021/test-run-d3/step_evidence_d2.log"
+        },
+        {
+          "name": "sanity_d2",
+          "status": "PASS",
+          "log_path": "audit/qa/hde-epic021/test-run-d3/step_sanity_d2.log"
+        },
+        {
+          "name": "acceptance_map_d3",
+          "status": "PASS",
+          "log_path": "audit/qa/hde-epic021/test-run-d3/step_acceptance_map_d3.log"
+        }
+      ]
+    }
+  ]
+}
