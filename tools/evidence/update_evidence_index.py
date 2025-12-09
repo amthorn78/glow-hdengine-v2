@@ -16,6 +16,7 @@ import argparse
 import datetime as _dt
 import hashlib
 import json
+import sys
 from pathlib import Path
 from typing import Iterable, Mapping, Sequence
 
@@ -26,6 +27,24 @@ MIRROR_PATH = ROOT / "artifacts/evidence_index.jsonl"
 MIRROR_REL = MIRROR_PATH.relative_to(ROOT).as_posix()
 EPIC020_BUNDLE_DIR = ROOT / "artifacts" / "epic020" / "bundles"
 EPIC020_ACCEPTANCE_MAP = ROOT / "docs" / "acceptance_map_epic020.json"
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from engine.runtime.determinism_env import DETERMINISM_ENV_PINS, ensure_determinism_env
+BASELINE_ENTRIES: list[dict[str, object]] = [
+    {
+        "artifact_key": "registry.registry_report",
+        "discovered_physical_path": "artifacts/registry/registry_report.json",
+        "record_type": "registry_report",
+        "schema_version": "1.0",
+    },
+    {
+        "artifact_key": "sanity.pipeline.log",
+        "discovered_physical_path": "artifacts/sanity/sanity.log",
+        "record_type": "sanity_log",
+        "schema_version": "1.0",
+    },
+]
 
 
 def _sha256_bytes(data: bytes) -> str:
@@ -34,6 +53,11 @@ def _sha256_bytes(data: bytes) -> str:
 
 def _sha256_path(path: Path) -> str:
     return _sha256_bytes(path.read_bytes())
+
+
+def _render_env_pins() -> str:
+    ordered = [f"{key}={DETERMINISM_ENV_PINS[key]}" for key in sorted(DETERMINISM_ENV_PINS)]
+    return ",".join(ordered)
 
 
 def _isoformat(dt: _dt.datetime) -> str:
@@ -134,7 +158,8 @@ def _write_path_proof(
             raise SystemExit(f"PROOF_MTIME_FUTURE:{proof_rel}")
         return proof_rel, produced
 
-    mtime = mtime_utc or stat_mtime_iso
+    existing_mtime = existing.get("mtime_utc")
+    mtime = mtime_utc or existing_mtime or stat_mtime_iso
     proof_lines = [
         f"path: {rel}",
         f"size_bytes: {size_bytes}",
@@ -200,7 +225,7 @@ def _dedupe_entries(entries: Iterable[Mapping[str, object]]) -> list[dict[str, o
 
 def _load_human_index() -> list[dict[str, object]]:
     payload = json.loads(HUMAN_INDEX.read_text(encoding="utf-8"))
-    return _dedupe_entries(payload)
+    return _dedupe_entries([*payload, *BASELINE_ENTRIES])
 
 
 def _render_human_index(entries: Iterable[Mapping[str, object]]) -> bytes:
@@ -348,7 +373,7 @@ def _render_mirror(
             path,
             sha256=sha,
             size_bytes=stat.st_size,
-            mtime_utc=_isoformat_from_timestamp(stat.st_mtime) if not check else None,
+            mtime_utc=None,
             produced_at=str(entry.get("produced_at_utc")) if entry.get("produced_at_utc") else None,
             default_produced_at=produced_default,
             check=check,
@@ -414,6 +439,9 @@ def main(argv: list[str] | None = None) -> None:
         help="Integrate epic-specific governed artifacts (e.g. HDE-EPIC020)",
     )
     args = parser.parse_args(argv)
+
+    ensure_determinism_env()
+    print(f"[evidence-index] env pins: {_render_env_pins()}")
 
     produced_default = _isoformat(_dt.datetime.now(tz=_dt.timezone.utc))
     mirror_proof_path = MIRROR_PATH.with_suffix(".jsonl.path_proof.txt")

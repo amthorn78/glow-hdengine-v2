@@ -64,7 +64,26 @@ def default_steps() -> List[SanityStep]:
     ]
 
 
-def run_pipeline(*, log_path: Path = SANITY_LOG, steps: Sequence[SanityStep] | None = None) -> int:
+def _run_post_index_refresh() -> str:
+    """Refresh the evidence index after writing the sanity log."""
+
+    try:
+        from tools.evidence import update_evidence_index
+
+        update_evidence_index.main([])
+    except SystemExit as exc:  # pragma: no cover - defensive
+        return "FAIL" if exc.code else "OK"
+    except Exception:  # pragma: no cover - defensive
+        return "FAIL"
+    return "OK"
+
+
+def run_pipeline(
+    *,
+    log_path: Path = SANITY_LOG,
+    steps: Sequence[SanityStep] | None = None,
+    refresh_index: bool = True,
+) -> int:
     ensure_determinism_env()
 
     resolved_steps = list(steps) if steps is not None else default_steps()
@@ -79,8 +98,20 @@ def run_pipeline(*, log_path: Path = SANITY_LOG, steps: Sequence[SanityStep] | N
             exit_code = proc.returncode or 1
             break
 
+    # Write the initial log before refreshing the index so the refresh uses the
+    # artifacts from this run instead of the previous one.
     summary = "PASS" if exit_code == 0 else "FAIL"
     _write_log(log_path, results, summary)
+
+    post_index_status: str | None = None
+    if refresh_index and log_path == SANITY_LOG:
+        post_index_status = _run_post_index_refresh()
+        results.append(("update_evidence_index.post", post_index_status))
+        if post_index_status != "OK" and exit_code == 0:
+            exit_code = 1
+        summary = "PASS" if exit_code == 0 else "FAIL"
+        _write_log(log_path, results, summary)
+        _run_post_index_refresh()
     return exit_code
 
 

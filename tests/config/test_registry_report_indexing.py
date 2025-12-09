@@ -41,6 +41,16 @@ def test_registry_report_index_entries_match_artifact() -> None:
     assert rec["sha256"] == sha
     assert int(rec["size_bytes"]) == size
     assert rec.get("proof_anchor") == "artifacts/registry/registry_report.json.path_proof.txt"
+    assert rec.get("produced_at_utc")
+    assert set(rec) >= {
+        "artifact_key",
+        "discovered_physical_path",
+        "produced_at_utc",
+        "proof_anchor",
+        "role",
+        "sha256",
+        "size_bytes",
+    }
     assert proof_lines.get("sha256") == sha
     assert proof_lines.get("size_bytes") == str(size)
 
