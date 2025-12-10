@@ -7,6 +7,7 @@ import pytest
 from tools.qa.epic021_qa import (
     QA_ROOT,
     CheckResult,
+    determine_run_id,
     generate_acceptance_map_viability,
     run_bootstrap_checks,
     run_epic021_qa_run,
@@ -81,6 +82,34 @@ def test_epic021_manifest_dedupes_run_id(monkeypatch):
     runs = [run for run in manifest_data["runs"] if run["run_id"] == "dedupe-run"]
 
     assert len(runs) == 1, "manifest should keep only the latest entry per run id"
+
+
+def test_determine_run_id_prefers_env(monkeypatch):
+    monkeypatch.setenv("EPIC021_QA_RUN_ID", "live-qa-1")
+    assert determine_run_id() == "live-qa-1"
+
+
+def test_determine_run_id_uses_git_sha(monkeypatch):
+    monkeypatch.delenv("EPIC021_QA_RUN_ID", raising=False)
+
+    def fake_check_output(args):
+        assert args == ["git", "rev-parse", "--short", "HEAD"]
+        return b"abc123"
+
+    monkeypatch.setattr("tools.qa.epic021_qa.subprocess.check_output", fake_check_output)
+
+    assert determine_run_id() == "epic021-abc123"
+
+
+def test_determine_run_id_falls_back_to_local(monkeypatch):
+    monkeypatch.delenv("EPIC021_QA_RUN_ID", raising=False)
+
+    def raise_exc(*_args, **_kwargs):  # pragma: no cover - exercised by logic
+        raise RuntimeError("git not available")
+
+    monkeypatch.setattr("tools.qa.epic021_qa.subprocess.check_output", raise_exc)
+
+    assert determine_run_id() == "epic021-local"
 
 
 @pytest.mark.parametrize(

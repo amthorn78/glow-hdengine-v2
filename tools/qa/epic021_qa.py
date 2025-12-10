@@ -10,9 +10,15 @@ from __future__ import annotations
 import json
 import os
 import subprocess
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, Iterable, List, Tuple
+
+from engine.runtime.determinism_env import (
+    DeterminismEnvError,
+    ensure_determinism_env,
+)
 
 QA_ROOT = Path("audit/qa/hde-epic021")
 
@@ -297,3 +303,27 @@ def run_epic021_qa_run(run_id: str | None = None) -> Dict[str, Path]:
         "viability_log": viability_log,
     }
     return artifacts
+
+
+def main() -> int:
+    try:
+        ensure_determinism_env()
+    except DeterminismEnvError as exc:  # pragma: no cover - CLI exit path
+        sys.stderr.write(str(exc) + "\n")
+        return 1
+
+    run_id = determine_run_id()
+    artifacts = run_epic021_qa_run(run_id=run_id)
+    manifest_path = artifacts["manifest"]
+    manifest_data = json.loads(manifest_path.read_text(encoding="utf-8"))
+    runs = [run for run in manifest_data.get("runs", []) if run.get("run_id") == run_id]
+    if not runs:
+        return 1
+    latest = runs[-1]
+    if all(step.get("status") == "PASS" for step in latest.get("steps", [])):
+        return 0
+    return 1
+
+
+if __name__ == "__main__":  # pragma: no cover - CLI entrypoint
+    raise SystemExit(main())
