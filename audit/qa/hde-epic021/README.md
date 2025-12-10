@@ -1,13 +1,31 @@
-# HDE-EPIC021 QA_ROOT
+# HDE-EPIC021 QA harness usage (QA_ROOT discipline)
 
-This directory is the EPIC021 QA_ROOT discipline home. It anchors calcination QA runs and related artifacts without changing PF12-governed evidence paths. QA runs may create subdirectories under `audit/qa/hde-epic021/<run-id>/`, where `<run-id>` is a deterministic, timestamp-free identifier (for example, derived from a git commit or CI job id consistent with existing QA tools). Epic-level, run-agnostic artifacts that live directly under this directory include:
+This directory is the QA_ROOT home for EPIC021 calcination QA runs. All runs must execute under closed rails using the determinism pins enforced by the harness: `SAFE_MODE`, `ALLOW_NETWORK`, `LC_ALL`, `LANG`, and `TZ`. Live QA operators should run the harness via the entrypoint and provide a deterministic run id.
 
-- `token_evidence_matrix.md`
-- `test_tooling_bootstrap.log` (planned in later PRs)
-- `acceptance_map_viability.log` (planned in later PRs)
-- Other QA manifests or summary files that demonstrate PF19/PF20 tokens for HDE-EPIC021
+## Live QA command (closed rails)
 
-Notes:
+Run the harness with explicit pins and a Live QA run id:
 
-- QA_ROOT is a layout discipline, not a PF12 Evidence Catalog path; PF12-governed indexing remains under `docs/evidence/INDEX.json` and `artifacts/evidence_index.jsonl` in later PRs.
-- Existing QA_ROOT directories (e.g., `audit/qa/hde-epic020/`) remain intact and are not modified by this scaffold.
+```bash
+SAFE_MODE=1 \
+ALLOW_NETWORK=0 \
+LC_ALL=C \
+LANG=C \
+TZ=UTC \
+EPIC021_QA_RUN_ID=live-qa-1 \
+python tools/qa/epic021_qa.py
+```
+
+- `EPIC021_QA_RUN_ID` should be set to a Live QA identifier such as `live-qa-1`, `live-qa-2`, etc.
+- CI uses a separate namespace (for example, `ci-selftest-epic021`) to keep Live QA evidence distinct. CI runs are not part of Live QA acceptance.
+
+## Expected artifacts for a successful run
+
+After a successful Live QA run, QA_ROOT contains the following under `audit/qa/hde-epic021/<run-id>/`:
+
+- `D0_bootstrap.log` with environment summary and harness bootstrap details.
+- Per-step logs (`step_bootstrap.log`, `step_serializer_cli_d1.log`, `step_evidence_d2.log`, `step_sanity_d2.log`, `step_acceptance_map_d3.log`).
+- `qa_step_logs_manifest.json` updated with one entry for `<run-id>` containing all PASS statuses and log paths.
+- `acceptance_map_viability.log` updated to reflect the run.
+
+QA_ROOT is a layout discipline for QA evidence; PF-Canon governs formal evidence catalog paths.
