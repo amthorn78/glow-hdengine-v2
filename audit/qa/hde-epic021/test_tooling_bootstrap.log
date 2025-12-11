@@ -1,5 +1,5 @@
 run:dedupe-run
-env:{'SAFE_MODE': '1', 'ALLOW_NETWORK': '0', 'LC_ALL': 'C', 'LANG': 'C', 'TZ': 'UTC'}
+env:{'LC_ALL': 'C', 'LANG': 'C', 'TZ': 'UTC', 'SAFE_MODE': '1', 'ALLOW_NETWORK': '0'}
 check import:OK
 check pytest-collect:OK
 check sample-tests:OK

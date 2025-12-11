@@ -1,0 +1,37 @@
+{
+  "epic_id": "HDE-EPIC021",
+  "matching_runs": [
+    {
+      "produced_at_utc": "2025-12-11T17:00:06.256411+00:00",
+      "run_id": "live-qa-1",
+      "steps": [
+        {
+          "log_path": "audit/qa/hde-epic021/live-qa-1/step_bootstrap.log",
+          "name": "bootstrap",
+          "status": "PASS"
+        },
+        {
+          "log_path": "audit/qa/hde-epic021/live-qa-1/step_serializer_cli_d1.log",
+          "name": "serializer_cli_d1",
+          "status": "PASS"
+        },
+        {
+          "log_path": "audit/qa/hde-epic021/live-qa-1/step_evidence_d2.log",
+          "name": "evidence_d2",
+          "status": "PASS"
+        },
+        {
+          "log_path": "audit/qa/hde-epic021/live-qa-1/step_sanity_d2.log",
+          "name": "sanity_d2",
+          "status": "PASS"
+        },
+        {
+          "log_path": "audit/qa/hde-epic021/live-qa-1/step_acceptance_map_d3.log",
+          "name": "acceptance_map_d3",
+          "status": "PASS"
+        }
+      ]
+    }
+  ],
+  "run_id": "live-qa-1"
+}

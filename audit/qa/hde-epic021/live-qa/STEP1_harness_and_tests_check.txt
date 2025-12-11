@@ -1,0 +1,4 @@
+tests/qa/test_epic021_acceptance_alignment.py
+tests/qa/test_epic021_harness_entrypoint.py
+tests/qa/test_tooling_bootstrap.py
+tools/qa/epic021_qa.py

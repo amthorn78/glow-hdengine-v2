@@ -1,0 +1,91 @@
+{
+  "epic_id": "HDE-EPIC021",
+  "manifest_runs_count": 5,
+  "run_ids": [
+    "dedupe-run",
+    "epic021-d3",
+    "live-qa",
+    "live-qa-1",
+    "selftest-run",
+    "test-run",
+    "test-run-d3"
+  ],
+  "runs": [
+    {
+      "logs": [
+        "D0_bootstrap.log",
+        "step_acceptance_map_d3.log",
+        "step_bootstrap.log",
+        "step_evidence_d2.log",
+        "step_sanity_d2.log",
+        "step_serializer_cli_d1.log"
+      ],
+      "run_id": "dedupe-run"
+    },
+    {
+      "logs": [
+        "D0_bootstrap.log",
+        "step_acceptance_map_d3.log",
+        "step_bootstrap.log",
+        "step_evidence_d2.log",
+        "step_sanity_d2.log",
+        "step_serializer_cli_d1.log"
+      ],
+      "run_id": "epic021-d3"
+    },
+    {
+      "logs": [
+        "STEP3_test_epic021_harness_entrypoint.log",
+        "STEP4_test_generic_qa_harness.log",
+        "STEP5_test_epic021_acceptance_alignment.log",
+        "STEP5_test_tooling_bootstrap.log"
+      ],
+      "run_id": "live-qa"
+    },
+    {
+      "logs": [
+        "D0_bootstrap.log",
+        "step_acceptance_map_d3.log",
+        "step_bootstrap.log",
+        "step_evidence_d2.log",
+        "step_sanity_d2.log",
+        "step_serializer_cli_d1.log"
+      ],
+      "run_id": "live-qa-1"
+    },
+    {
+      "logs": [
+        "D0_bootstrap.log",
+        "step_acceptance_map_d3.log",
+        "step_bootstrap.log",
+        "step_evidence_d2.log",
+        "step_sanity_d2.log",
+        "step_serializer_cli_d1.log"
+      ],
+      "run_id": "selftest-run"
+    },
+    {
+      "logs": [
+        "D0_bootstrap.log",
+        "step_acceptance_map_d3.log",
+        "step_bootstrap.log",
+        "step_evidence_d2.log",
+        "step_sanity_d2.log",
+        "step_serializer_cli_d1.log"
+      ],
+      "run_id": "test-run"
+    },
+    {
+      "logs": [
+        "D0_bootstrap.log",
+        "step_acceptance_map_d3.log",
+        "step_bootstrap.log",
+        "step_evidence_d2.log",
+        "step_sanity_d2.log",
+        "step_serializer_cli_d1.log"
+      ],
+      "run_id": "test-run-d3"
+    }
+  ],
+  "viability_summary_line": "summary: COVERED=21 PLANNED=2 MISSING=0"
+}
