@@ -1,3 +1,4 @@
+run:live-qa-1
 env:{'LC_ALL': 'C', 'LANG': 'C', 'TZ': 'UTC', 'SAFE_MODE': '1', 'ALLOW_NETWORK': '0'}
-check not-exercised:OK placeholder
+check import:OK pytest-9.0.2
 summary:PASS

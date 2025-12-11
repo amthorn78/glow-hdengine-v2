@@ -1,3 +1,6 @@
+run:selftest-run
 env:{'LC_ALL': 'C', 'LANG': 'C', 'TZ': 'UTC', 'SAFE_MODE': '1', 'ALLOW_NETWORK': '0'}
-check not-exercised:OK placeholder
+check import:OK
+check pytest-collect:OK
+check sample-tests:OK
 summary:PASS
