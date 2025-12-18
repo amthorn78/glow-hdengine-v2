@@ -1,5 +1,5 @@
 from __future__ import annotations
-import hashlib, json, os
+import hashlib, json, os, tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 from flask import Blueprint, Response, request, Flask, g
@@ -12,6 +12,8 @@ from engine.sampler.core import CandidateFeatures, ViewerProfile, sample_and_ran
 from adapter.no_io_guard import NoIoGuard
 from engine.compat.errors import error_envelope
 from engine.http.compat_handler import compat_blueprint
+from engine.db import DBAccess
+from engine.db.errors import AdapterError, PrimaryUnavailable
 
 _PROCESS_STARTED_AT = datetime.now(timezone.utc)
 _PROCESS_PID = os.getpid()
@@ -420,6 +422,10 @@ def get_reader_bp(emit_fn=None):
         allow_network = os.getenv("ALLOW_NETWORK", "0")
         return "open" if safe_mode == "0" and allow_network == "1" else "closed"
 
+    def _db_snapshot_path() -> str:
+        with tempfile.NamedTemporaryFile(delete=False) as handle:
+            return handle.name
+
     def _rails_env_snapshot() -> dict[str, str]:
         def _value(key: str) -> str:
             value = os.getenv(key)
@@ -433,6 +439,42 @@ def get_reader_bp(emit_fn=None):
 
     def _rails_refusal_response() -> Response:
         return _writer_error("rails_closed", status=503, sort_keys=False)
+
+    @bp.route("/ops/db/unavailable", methods=["GET"])
+    def ops_db_unavailable():
+        g._log_override = {"route": "ops.db.unavailable"}
+        with NoIoGuard() as guard:
+            snapshot_path = _db_snapshot_path()
+            original_dsn = os.environ.get("DATABASE_URL")
+            os.environ["DATABASE_URL"] = os.environ.get("DATABASE_URL", "db://unavailable")
+            def _raise_primary(_: str):
+                raise PrimaryUnavailable(
+                    "forced_db_unavailable",
+                    attempts=["forced_db_unavailable"],
+                    code="forced_db_unavailable",
+                )
+            try:
+                DBAccess.for_current_env(
+                    snapshot_path=snapshot_path,
+                    psycopg_factory=_raise_primary,
+                    bridge_factory=lambda value: _raise_primary(value),
+                )
+            except AdapterError as exc:
+                details = {"adapter_code": getattr(exc, "code", "adapter_error")}
+                env = error_envelope("ERR_WRITER_RAILS_CLOSED", details=details)
+                resp = _emit_writer_response(env, status=503, sort_keys=False)
+            else:
+                env = error_envelope(
+                    "ERR_WRITER_RAILS_CLOSED", details={"adapter_code": "unexpected_db_available"}
+                )
+                resp = _emit_writer_response(env, status=503, sort_keys=False)
+            Path(snapshot_path).unlink(missing_ok=True)
+            if original_dsn is None:
+                os.environ.pop("DATABASE_URL", None)
+            else:
+                os.environ["DATABASE_URL"] = original_dsn
+        g._no_io_attempts = guard.attempts
+        return resp
 
     @bp.route("/ops/rails/refusal", methods=["GET", "POST"])
     def ops_rails_refusal():

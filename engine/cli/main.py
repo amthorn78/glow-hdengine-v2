@@ -333,6 +333,8 @@ def _party_from_normalized(payload: Dict[str, Any]) -> Tuple[Dict[str, Any], Dic
 
 def _fetch_db_bodygraph(user_id: str, db_access: DBAccess | None = None) -> Tuple[Mapping[str, Any], str]:
     normalized = resolve_db_user_id(user_id)
+    if os.environ.get("HDE_FORCE_DB_UNAVAILABLE") == "1":
+        raise CliError("DB_QUERY_FAILED")
     db = db_access or DBAccess.for_current_env()
     try:
         rows = db.query(

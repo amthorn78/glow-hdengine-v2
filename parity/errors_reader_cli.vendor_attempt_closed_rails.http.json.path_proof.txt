@@ -1,0 +1,5 @@
+path: parity/errors_reader_cli.vendor_attempt_closed_rails.http.json
+size_bytes: 252
+sha256: 714c087b3fca500f7466fad44f866d85bdcd3490ff26d4668fbdfae78b880896
+mtime_utc: 2025-12-18T23:29:51Z
+produced_at_utc: 2025-11-30T03:58:47Z

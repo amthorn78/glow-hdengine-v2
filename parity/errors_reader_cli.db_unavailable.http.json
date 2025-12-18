@@ -1,0 +1,16 @@
+{
+  "body": {
+    "code": "ERR_WRITER_RAILS_CLOSED",
+    "details": {
+      "adapter_code": "forced_db_unavailable"
+    },
+    "error": "rails are closed",
+    "ok": false,
+    "schema": "v1"
+  },
+  "headers": {
+    "cache-control": "no-store",
+    "content-type": "application/json; charset=utf-8"
+  },
+  "status": 503
+}
