@@ -1,0 +1,193 @@
+{
+  "epic_id": "HDE-EPIC022",
+  "schema": "epic_manifest.v1",
+  "tokens": [
+    {
+      "token_name": "PR_OPENED_OK",
+      "status": "expected_pending",
+      "evidence_artifacts": [],
+      "tests": []
+    },
+    {
+      "token_name": "TESTS_PASS_OK",
+      "status": "expected_pending",
+      "evidence_artifacts": [],
+      "tests": []
+    },
+    {
+      "token_name": "DOC_DELTA_PRESENT_OK",
+      "status": "expected_pending",
+      "evidence_artifacts": [],
+      "tests": []
+    },
+    {
+      "token_name": "EVIDENCE_INDEX_UPDATED_OK",
+      "status": "expected_pending",
+      "evidence_artifacts": [],
+      "tests": []
+    },
+    {
+      "token_name": "EVIDENCE_INDEX_HASH_OK",
+      "status": "expected_pending",
+      "evidence_artifacts": [],
+      "tests": []
+    },
+    {
+      "token_name": "EVIDENCE_INDEX_MIRROR_OK",
+      "status": "expected_pending",
+      "evidence_artifacts": [],
+      "tests": []
+    },
+    {
+      "token_name": "EVIDENCE_PATHS_VALIDATED_OK",
+      "status": "expected_pending",
+      "evidence_artifacts": [],
+      "tests": []
+    },
+    {
+      "token_name": "MACHINE_MIRROR_UPDATED_OK",
+      "status": "expected_pending",
+      "evidence_artifacts": [],
+      "tests": []
+    },
+    {
+      "token_name": "QA_PRECOMMIT_CHECKLIST_OK",
+      "status": "expected_pending",
+      "evidence_artifacts": [],
+      "tests": []
+    },
+    {
+      "token_name": "QA_POSTCOMMIT_CHECKLIST_OK",
+      "status": "expected_pending",
+      "evidence_artifacts": [],
+      "tests": []
+    },
+    {
+      "token_name": "ENV_RAILS_POLICY_OK",
+      "status": "expected_pending",
+      "evidence_artifacts": [],
+      "tests": []
+    },
+    {
+      "token_name": "DETERMINISM_ENV_PINS_OK",
+      "status": "expected_pending",
+      "evidence_artifacts": [
+        "audit/gates/determinism/env_pins.log",
+        "audit/gates/determinism/env_pins.log.path_proof.txt"
+      ],
+      "tests": []
+    },
+    {
+      "token_name": "SANITY_PIPELINE_OK",
+      "status": "expected_pending",
+      "evidence_artifacts": [],
+      "tests": []
+    },
+    {
+      "token_name": "CLOSE_PACK_FILES_PRESENT_OK",
+      "status": "expected_pending",
+      "evidence_artifacts": [
+        "audit/qa/hde-epic022/token_evidence_matrix.md",
+        "docs/acceptance_map_epic022.json",
+        "audit/EPIC-022_close_report.md",
+        "audit/EPIC-022_MANIFEST.json"
+      ],
+      "tests": []
+    },
+    {
+      "token_name": "ERROR_JSON_CANON_OK",
+      "status": "expected_pending",
+      "evidence_artifacts": [
+        "parity/errors_reader_cli.{scenario}.http.json"
+      ],
+      "tests": []
+    },
+    {
+      "token_name": "ERROR_TOKEN_MAP_OK",
+      "status": "expected_pending",
+      "evidence_artifacts": [],
+      "tests": []
+    },
+    {
+      "token_name": "CLI_READER_PARITY_OK",
+      "status": "expected_pending",
+      "evidence_artifacts": [
+        "parity/errors_reader_cli.{scenario}.http.json",
+        "parity/errors_reader_cli.{scenario}.cli.txt"
+      ],
+      "tests": []
+    },
+    {
+      "token_name": "TWO_RUN_IDENTITY_OK",
+      "status": "expected_pending",
+      "evidence_artifacts": [
+        "artifacts/ops/internal_version/two_run_identity.log"
+      ],
+      "tests": []
+    },
+    {
+      "token_name": "CLI_STDOUT_LF_OK",
+      "status": "expected_pending",
+      "evidence_artifacts": [],
+      "tests": []
+    },
+    {
+      "token_name": "INTERNAL_VERSION_200_CTYPE_JSON_UTF8_OK",
+      "status": "expected_pending",
+      "evidence_artifacts": [
+        "artifacts/ops/internal_version/body_get.json"
+      ],
+      "tests": []
+    },
+    {
+      "token_name": "INTERNAL_VERSION_HEAD_PARITY_OK",
+      "status": "expected_pending",
+      "evidence_artifacts": [
+        "artifacts/ops/internal_version/headers_head.txt"
+      ],
+      "tests": []
+    },
+    {
+      "token_name": "INTERNAL_VERSION_CONDITIONALS_IGNORED_OK",
+      "status": "expected_pending",
+      "evidence_artifacts": [
+        "artifacts/ops/internal_version/cond_if_none_match_headers.txt",
+        "artifacts/ops/internal_version/cond_if_modified_since_headers.txt"
+      ],
+      "tests": []
+    },
+    {
+      "token_name": "INTERNAL_VERSION_NO_ETAG_OK",
+      "status": "expected_pending",
+      "evidence_artifacts": [
+        "artifacts/ops/internal_version/headers_get.txt"
+      ],
+      "tests": []
+    },
+    {
+      "token_name": "INTERNAL_VERSION_NO_STORE_OK",
+      "status": "expected_pending",
+      "evidence_artifacts": [
+        "artifacts/ops/internal_version/headers_get.txt"
+      ],
+      "tests": []
+    },
+    {
+      "token_name": "RELEASE_ID_RECOMPUTE_OK",
+      "status": "expected_pending",
+      "evidence_artifacts": [
+        "artifacts/math/release_id_recompute.log"
+      ],
+      "tests": []
+    },
+    {
+      "token_name": "RELEASE_ID_FROM_MANIFEST_OK",
+      "status": "expected_pending",
+      "evidence_artifacts": [
+        "artifacts/math/release_id.txt",
+        "artifacts/math/freeze_pack_manifest.json"
+      ],
+      "tests": []
+    }
+  ]
+}
