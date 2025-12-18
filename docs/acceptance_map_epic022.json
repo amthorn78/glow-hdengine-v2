@@ -1,0 +1,220 @@
+{
+  "epic_id": "HDE-EPIC022",
+  "tokens": [
+    {
+      "name": "PR_OPENED_OK",
+      "owner_pf": "PF20 — HDE-Phased Epics (EPIC022 record)",
+      "status": "pending",
+      "evidence_titles": [
+        "TBD (PR1 scaffold)"
+      ]
+    },
+    {
+      "name": "TESTS_PASS_OK",
+      "owner_pf": "PF19 — Glow QA Guide §QA Rails",
+      "status": "pending",
+      "evidence_titles": [
+        "TBD (PR1 scaffold)"
+      ]
+    },
+    {
+      "name": "DOC_DELTA_PRESENT_OK",
+      "owner_pf": "PF03 — Technical Writing §Single-home",
+      "status": "pending",
+      "evidence_titles": [
+        "TBD (PR1 scaffold)"
+      ]
+    },
+    {
+      "name": "EVIDENCE_INDEX_UPDATED_OK",
+      "owner_pf": "PF12 — HDE-Schemas and Artifacts §Evidence Index",
+      "status": "pending",
+      "evidence_titles": [
+        "TBD (PR1 scaffold)"
+      ]
+    },
+    {
+      "name": "EVIDENCE_INDEX_HASH_OK",
+      "owner_pf": "PF12 — HDE-Schemas and Artifacts §Evidence Hashing",
+      "status": "pending",
+      "evidence_titles": [
+        "TBD (PR1 scaffold)"
+      ]
+    },
+    {
+      "name": "EVIDENCE_INDEX_MIRROR_OK",
+      "owner_pf": "PF12 — HDE-Schemas and Artifacts §Evidence Mirror",
+      "status": "pending",
+      "evidence_titles": [
+        "TBD (PR1 scaffold)"
+      ]
+    },
+    {
+      "name": "EVIDENCE_PATHS_VALIDATED_OK",
+      "owner_pf": "PF12 — HDE-Schemas and Artifacts §Path Proofs",
+      "status": "pending",
+      "evidence_titles": [
+        "TBD (PR1 scaffold)"
+      ]
+    },
+    {
+      "name": "MACHINE_MIRROR_UPDATED_OK",
+      "owner_pf": "PF12 — HDE-Schemas and Artifacts §Evidence Mirror",
+      "status": "pending",
+      "evidence_titles": [
+        "TBD (PR1 scaffold)"
+      ]
+    },
+    {
+      "name": "QA_PRECOMMIT_CHECKLIST_OK",
+      "owner_pf": "PF19 — Glow QA Guide §QA Rails",
+      "status": "pending",
+      "evidence_titles": [
+        "TBD (PR1 scaffold)"
+      ]
+    },
+    {
+      "name": "QA_POSTCOMMIT_CHECKLIST_OK",
+      "owner_pf": "PF19 — Glow QA Guide §QA Rails",
+      "status": "pending",
+      "evidence_titles": [
+        "TBD (PR1 scaffold)"
+      ]
+    },
+    {
+      "name": "ENV_RAILS_POLICY_OK",
+      "owner_pf": "PF19 — Glow QA Guide §Env Pins",
+      "status": "pending",
+      "evidence_titles": [
+        "TBD (PR1 scaffold)"
+      ]
+    },
+    {
+      "name": "DETERMINISM_ENV_PINS_OK",
+      "owner_pf": "PF19 — Glow QA Guide §Env Pins",
+      "status": "pending",
+      "evidence_titles": [
+        "audit/gates/determinism/env_pins.log",
+        "audit/gates/determinism/env_pins.log.path_proof.txt"
+      ]
+    },
+    {
+      "name": "SANITY_PIPELINE_OK",
+      "owner_pf": "PF19 — Glow QA Guide §Sanity Pipeline",
+      "status": "pending",
+      "evidence_titles": [
+        "TBD (PR1 scaffold)"
+      ]
+    },
+    {
+      "name": "CLOSE_PACK_FILES_PRESENT_OK",
+      "owner_pf": "PF20 — HDE-Phased Epics (EPIC022 record)",
+      "status": "pending",
+      "evidence_titles": [
+        "audit/qa/hde-epic022/token_evidence_matrix.md",
+        "docs/acceptance_map_epic022.json",
+        "audit/EPIC-022_close_report.md",
+        "audit/EPIC-022_MANIFEST.json"
+      ]
+    },
+    {
+      "name": "ERROR_JSON_CANON_OK",
+      "owner_pf": "PF20 — HDE-Phased Epics (HDE-SEPA002)",
+      "status": "pending",
+      "evidence_titles": [
+        "parity/errors_reader_cli.{scenario}.http.json"
+      ]
+    },
+    {
+      "name": "ERROR_TOKEN_MAP_OK",
+      "owner_pf": "PF20 — HDE-Phased Epics (HDE-SEPA002)",
+      "status": "pending",
+      "evidence_titles": [
+        "TBD (PR1 scaffold)"
+      ]
+    },
+    {
+      "name": "CLI_READER_PARITY_OK",
+      "owner_pf": "PF20 — HDE-Phased Epics (HDE-SEPA002.5)",
+      "status": "pending",
+      "evidence_titles": [
+        "parity/errors_reader_cli.{scenario}.http.json",
+        "parity/errors_reader_cli.{scenario}.cli.txt"
+      ]
+    },
+    {
+      "name": "TWO_RUN_IDENTITY_OK",
+      "owner_pf": "PF20 — HDE-Phased Epics (HDE-SEPA002.5; HDE-SEPA004.4)",
+      "status": "pending",
+      "evidence_titles": [
+        "artifacts/ops/internal_version/two_run_identity.log"
+      ]
+    },
+    {
+      "name": "CLI_STDOUT_LF_OK",
+      "owner_pf": "PF20 — HDE-Phased Epics (HDE-SEPA003.3)",
+      "status": "pending",
+      "evidence_titles": [
+        "TBD (PR1 scaffold)"
+      ]
+    },
+    {
+      "name": "INTERNAL_VERSION_200_CTYPE_JSON_UTF8_OK",
+      "owner_pf": "PF04 — Canon-HDE-Governance §/internal/version tokens",
+      "status": "pending",
+      "evidence_titles": [
+        "artifacts/ops/internal_version/body_get.json"
+      ]
+    },
+    {
+      "name": "INTERNAL_VERSION_HEAD_PARITY_OK",
+      "owner_pf": "PF04 — Canon-HDE-Governance §/internal/version tokens",
+      "status": "pending",
+      "evidence_titles": [
+        "artifacts/ops/internal_version/headers_head.txt"
+      ]
+    },
+    {
+      "name": "INTERNAL_VERSION_CONDITIONALS_IGNORED_OK",
+      "owner_pf": "PF04 — Canon-HDE-Governance §/internal/version tokens",
+      "status": "pending",
+      "evidence_titles": [
+        "artifacts/ops/internal_version/cond_if_none_match_headers.txt",
+        "artifacts/ops/internal_version/cond_if_modified_since_headers.txt"
+      ]
+    },
+    {
+      "name": "INTERNAL_VERSION_NO_ETAG_OK",
+      "owner_pf": "PF04 — Canon-HDE-Governance §/internal/version tokens",
+      "status": "pending",
+      "evidence_titles": [
+        "artifacts/ops/internal_version/headers_get.txt"
+      ]
+    },
+    {
+      "name": "INTERNAL_VERSION_NO_STORE_OK",
+      "owner_pf": "PF04 — Canon-HDE-Governance §/internal/version tokens",
+      "status": "pending",
+      "evidence_titles": [
+        "artifacts/ops/internal_version/headers_get.txt"
+      ]
+    },
+    {
+      "name": "RELEASE_ID_RECOMPUTE_OK",
+      "owner_pf": "PF04 — Canon-HDE-Governance §Pack identity tokens",
+      "status": "pending",
+      "evidence_titles": [
+        "artifacts/math/release_id_recompute.log"
+      ]
+    },
+    {
+      "name": "RELEASE_ID_FROM_MANIFEST_OK",
+      "owner_pf": "PF04 — Canon-HDE-Governance §Pack identity tokens",
+      "status": "pending",
+      "evidence_titles": [
+        "artifacts/math/release_id.txt",
+        "artifacts/math/freeze_pack_manifest.json"
+      ]
+    }
+  ]
+}
