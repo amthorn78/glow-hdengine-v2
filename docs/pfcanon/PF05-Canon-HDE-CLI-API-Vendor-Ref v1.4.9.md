@@ -4,13 +4,13 @@
 
 **Title:** PF05-Canon-HDE-CLI-API-Vendor-Ref
 
-**Version:** v1.4.6
+**Version:** v1.4.9
 
 **Status:** Canon
 
-**Effective date:** 2025-12-07
+**Effective date:** 2025-12-17
 
-**Last Update Gate:** BN 81.9 Drain A2/A3
+**Last Update Gate:** BN 8.3.4 Drain A1-5
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -28,11 +28,7 @@
 
 * **Endpoint Catalog (JSON success): proof surface (A7).** The Catalog is **internal-only** and **env-gated** per entry; entries not gated for prod are **unreachable in production**. A7 transport proofs **must** run on a **§5.6 Endpoint Catalog (JSON success)** route (titles only; path-agnostic). Internal-ops `/internal/version` is **excluded** and governed by **HDE-Governance §10.5**. A7 **byte rules** are owned in **§5.3** of this document.
 
-* **Single homes (routing by title only).**  
-   • **Math/algorithms** (composite, scoring, banding, preimage, constants): **HDE-Math-Spec**.  
-   • **Schemas and pack/manifest/canonical rules** (including `catalog/manifest.json` for `release_id`) and the **machine JSONL mirror** schema & parity rules: **HDE-Schemas & Artifacts**.  
-   • **Governance & acceptance policy** (A-gates, evidence, SAFE rails, numeric-free covenant, internal-ops exception): **HDE-Governance**.  
-   PF05 does not duplicate rules, token rosters, or evidence paths; it points to single homes.
+* **Single homes.** PF05 is the bytes/contract home for its CLI \+ transport surfaces; it does not own global token semantics or the canonical token roster (those are single-homed in **HDE-Governance**). PF05 may **reference** token names only where needed to pin acceptance claims for PF05 surfaces. PF05 also does not own the global Evidence Index: **HDE-Schemas & Artifacts (PF12)** is the single home; PF05 may list surface-specific artifact paths only when a byte-level contract or proof anchor requires an explicit file reference.
 
 * **Evidence discipline (PF12 single home).** Evidence indexing (titles/paths only), the human Evidence Index and its hash sentinel, and the machine JSONL mirror are governed in **PF12** and must update **in the same PR** as artifact changes. CI enforces: 1:1 join equality (human↔machine), unknown-key rejection, ASCII field order, sort-before-write, **single mirror file**, and required `proof_anchor` path-proofs, per PF12.
 
@@ -144,8 +140,6 @@
 
 * **Routing by title only.** When needed, reference **Architecture** and **Math** **by title only** (no duplicated rules/bytes).
 
-# 
-
   # **3\) CLI Overview & Conventions \[Required-Now\]**
 
 **QA status note (informative).** The CLI is installable and \`--help\` / \`--version\` behave as expected. A known issue remains: in some runs \`hdctl showcompat\` emits empty stdout, which violates the non-empty compat JSON requirement and blocks the determinism/parity tokens (\`CLI\_SHOWCOMPAT\_CANON\_OK\`, \`CLI\_STDOUT\_LF\_OK\`, \`PARITY\_AB\_BA\_OK\`, \`TWO\_RUN\_IDENTITY\_OK\`, \`CLI\_READER\_PARITY\_OK\`, \`JSON\_CANONICAL\_CHECK\_OK\`). Until this is fixed and re-proven, those tokens remain pending. All success output must come from the single canonical emitter, use UTF‑8 with ASCII-sorted keys and exactly one trailing LF, and be validated under \`LC\_ALL=C\` and \`TZ=UTC\`.
@@ -206,7 +200,7 @@ Input methods for commands that compare or display charts. Titles-only pointers;
 
 **Routing (titles-only).** Canonical JSON rules & chart schemas: **HDE-Schemas & Artifacts**. Governance tokens: **HDE-Governance** (§2.0).
 
-## 3.3 Streams discipline (stdout / stderr) Required‑NowRequired‑NowRequired‑Now
+## 3.3 Streams discipline (stdout / stderr) \[Required‑Now\]
 
 **Rules for command output streams.** Transport acceptance (A7) lives in HDE‑Governance; do not restate it here. Serialization rules are in §6.1/§6.2.
 
@@ -416,7 +410,7 @@ Exit codes are exhaustive for the public surface. **Non‑zero** exits must **no
 
 ---
 
-## 4.1 hdctl showcompat Implemented;Required‑NowImplemented; Required‑NowImplemented;Required‑Now
+## 4.1 hdctl showcompat \[Implemented; Required‑Now\]
 
 ### 4.1.1 Purpose and posture (normative)
 
@@ -496,8 +490,6 @@ Before invoking compat math, `showcompat` **must normalize the pair** into a can
 * Rails resolution uses the same `_resolver_env()` mechanism as `bg:resolve` (SAFE rails and env policy are titles‑only in Governance/Mechanics).
 
 ### 4.1.3 Output surfaces and shapes (normative)
-
-### **4.1.3 Output surfaces and shapes (normative)**
 
 `showcompat` has **two** primary byte surfaces and optional admin sidecars:
 
@@ -798,7 +790,7 @@ Compat stdout behaviour for the general case remains as in §4.1.3: compat JSON 
 
 ---
 
-## 4.2 hdctl read singlebg SpeculativeSpeculativeSpeculative
+## 4.2 hdctl read singlebg \[Speculative\]
 
 *(Unchanged in spirit; shown here only for completeness with minor wording aligned to Option B. No new semantics were invented.)*
 
@@ -811,25 +803,25 @@ Implementation status (audit v1): **Not implemented**; see existing PF05 languag
 
 ---
 
-## 4.3 hdctl list people SpeculativeSpeculativeSpeculative
+## 4.3 hdctl list people \[Speculative\]
 
-*(Unchanged; still speculative developer convenience for local people store listing.)*
-
----
-
-## 4.4 Fetch commands (person/batch) Speculative;disabledinAlphaSpeculative; disabled in AlphaSpeculative;disabledinAlpha
-
-*(Unchanged; still disabled by design; rails, privacy, and determinism constraints remain as previously specified.)*
+Needs development.
 
 ---
 
-## 4.5 CLI Admin Preview (narrative) Required‑NowRequired‑NowRequired‑Now
+## 4.4 Fetch commands (person/batch) \[Speculative\]
 
-*(Unchanged in substance.)* `hdctl aux-preview` remains the admin preview surface for Aux narrative text and IDs, reading compat JSON from `--pair-file` and calling the Aux emitter. It must **not** change Reader 200 bytes; it is admin‑only and LF‑only.
+Needs development.
 
 ---
 
-## 4.6 hdctl bg:resolve Required-NowRequired-NowRequired-Now
+## 4.5 CLI Admin Preview (narrative) \[Required‑Now\]
+
+`hdctl aux-preview` remains the admin preview surface for Aux narrative text and IDs, reading compat JSON from `--pair-file` and calling the Aux emitter. It must **not** change Reader 200 bytes; it is admin‑only and LF‑only. Needs further development.
+
+---
+
+## 4.6 hdctl bg:resolve \[Required-Now\]
 
 `hdctl bg:resolve` is the operator command for resolving a single BodyGraph for a given key and data source.
 
@@ -1429,9 +1421,9 @@ Serialization and determinism:
 
 ---
 
-# 5\. Reader Transport (public bytes) Required‑NowRequired‑NowRequired‑Now
+# 5\. Reader Transport (public bytes) \[Required‑Now\]
 
-## 5.1 Success envelope Required‑NowRequired‑NowRequired‑Now
+## 5.1 Success envelope \[Required‑Now\]
 
 **Body shape (six keys).**  
  The Reader v1 success body contains exactly these six top‑level keys — no extras:
@@ -1600,7 +1592,7 @@ AB↔BA identity, two-run identity, and Reader↔CLI parity for Reader v1 envelo
 
 ---
 
-## **5.2 Errors Required−NowRequired-NowRequired−Now**
+## **5.2 Errors \[Required-Now\]**
 
 * **Typed, numeric-free error\_v1 envelope.** All governed error surfaces (Reader errors, diagnostic writer errors, CLI typed failures, and internal health/ready/not-found error responses) **MUST** emit the **error\_v1** JSON envelope, serialized by the single canonical emitter (§6.1/§6.2) and LF-terminated. The **minimum** shape is:
 
@@ -1851,49 +1843,81 @@ Legacy lowercase strings such as `"invalid_json"`, `"invalid_prefs"`, and `"miss
 * Transport validators live in **§5.3** and **Appendix A** of this document.  
 * Evidence artifacts and snapshots are listed in **Appendix D: Evidence Index**.
 
-Here’s the updated section, aligned with the prior edits to §§0.2, 5.2, and 5.3 and the plan item to keep the catalog gated and status-noted until EPIC-012 ships.
+## **5.6 Endpoint Catalog (JSON success) \[Required−Now\]**
 
-## **5.6 Endpoint Catalog (JSON success) \[Required-Now\]**
+**Purpose and scope.** Define the set of **Reader JSON success** routes on which **A7 proofs must run**. This Catalog is **internal-only**, **titles-only**, and **not a client contract**. It is the A7 proof surface for success routes. Internal-ops `/internal/version` is excluded.
 
-**Purpose and scope.** Define the set of **JSON success** routes on which **A7 proofs must run**. PF05 owns **Reader bytes only**; writers/errors posture is governed in **HDE-Governance** (titles only). Internal-ops `/internal/version` is **excluded**.
+**Status (current).** The Catalog is defined but not yet populated for production. Populate entries as success routes ship. Until then, any non-prod entries remain env-gated and unreachable in production.
 
-**Status (current).** The Catalog is defined but not yet populated for production. Populate entries as **EPIC-012** ships success routes. Until then, any non-prod entries remain **env-gated** and **unreachable in production**.
+### **Scope and rules**
 
-**Catalog ownership.**
+* **Single home (A7 success routes).** This subsection is the only place in PF05 that lists **JSON success routes** eligible for A7 proofs.
 
-* The Catalog is **internal-only** and **env-gated per entry** (titles-only; path-agnostic).  
-* The Catalog file **bytes** are defined in **Appendix B** (this spec).  
-* Schemas and records-only artifacts (snapshot, Catalog file, proof captures) live in **HDE-Schemas & Artifacts** (PF12). PF05 specifies the **transport bytes and proof rules**.
+* **Internal-only.** FE or third-party clients must not couple to the Catalog.
 
-**Transport invariants (apply to every cataloged route).**
+* **Env-gated.** Each entry declares an environment gate (`dev`, `staging`, `prod`). Entries not gated for `prod` must be unreachable in production.
 
-* **GET 200:** strong, **quoted `ETag`** over the **LF-terminated canonical body** (pre-compression); `Content-Type: application/json; charset=utf-8`; `Cache-Control: private, max-age=0, must-revalidate`; `Vary: Authorization, Accept-Encoding`.  
-* **HEAD 200:** **no body**; validators mirror GET; `Content-Length == len(identity 200 body)` (LF-terminated, pre-compression); `Content-Type == GET`.  
-* **304 Not Modified:** allowed **only after** a prior 200 for the same identity; **no body**; **omit both** `Content-Type` and `Content-Length`; validators mirror cached GET.  
-* **No `ETag` on writers/errors.** Writers and error responses use `Cache-Control: no-store` and **omit `ETag`** (see §5.2 and §5.3).  
-* **Encoding invariance:** for the same canonical body, `ETag` and **HEAD identity length** are stable across accepted encodings.
+* **Titles-only.** List by route title. Do not include URLs, literal paths, payload bytes, or example bodies.
 
-**Population and change policy.**
+* **Exclusions.** `/internal/version` is operator-only and excluded from A7 proofs.
 
-* Add or modify Catalog entries **by title only**; do **not** embed literal URLs.  
-* When the Catalog changes, follow PF12’s **same-PR indexing discipline** (update the human index and hash sentinel and the machine mirror in the same PR) and record the Doc-Delta in the local **Change Log** (§0.4). Titles-only; PF12 is the **single home** for evidence/indexing.  
-* Each non-prod entry **must** include an **env gate**; entries not gated for prod must be proven **unreachable** in production (headers-only env-gate proof).
+* **Empty allowed.** The catalog may be empty until a qualifying success route ships. In that case, catalog presence can pass while A7 proofing remains unmet.
 
-**Evidence (titles-only pointers).**
+* **Terminology disambiguation (important).**
 
-* **Snapshot & Catalog file:** governed in PF12 (records-only artifacts; titles-only listing; `proof_anchor` path-proofs present).  
-* **Env-gate proof and A7 proof artifacts:** governed in PF12; **A7 proofs run only on cataloged JSON success routes** (headers-only/env-gate; composite success proof JSON that validates against PF12’s composite proof schema — see §8.12). PF05 references these by title only.
+  * “Endpoint Catalog (JSON success)” in PF05 means “the titles-only list of **Reader JSON success routes** eligible for A7 proofs.”
 
-### **Validation (binary)**
+  * A separate, repo-wide **endpoints inventory** artifact (for example a file that lists *all* endpoints across public, ops, and dev harness classes, plus module pointers or classifications) is **not specified in PF05** and is not part of the A7 success-route Catalog contract. If such an inventory exists, it must not be treated as a client contract and must be governed in its owning document (titles-only).
 
-1. **Catalog posture:** snapshot present and env-gated; production excludes entries not explicitly opened.  
-2. **GET 200 invariants:** strong quoted `ETag`; `Content-Type` and `Cache-Control` as specified; required `Vary`.  
-3. **304 after 200:** returned only after a prior body-ful 200 for the same identity; **no body**; `Content-Type` and `Content-Length` **omitted**.  
-4. **HEAD parity:** status 200; **no body**; validators mirror GET; `Content-Length == len(identity 200 body)`; `Content-Type == GET`.  
-5. **Writers/errors posture:** `Cache-Control: no-store`; **no `ETag`**.  
-6. **Encoding invariance:** for the same canonical body, `ETag` and **HEAD identity length** are unchanged across accepted encodings.
+### **Transport invariants (apply to every cataloged route)**
 
-**Routing (titles-only).** Transport governance and acceptance tokens live in **HDE-Governance (§2.0)**. Snapshot/mirror schemas live in **HDE-Schemas & Artifacts**. Proof files and admin artifacts are indexed in **PF12**. **EPIC-012** owns delivery of concrete success routes that will populate this Catalog.
+* **GET 200:** strong, quoted `ETag` over the LF-terminated canonical body (pre-compression); `Content-Type: application/json; charset=utf-8`; `Cache-Control: private, max-age=0, must-revalidate`; `Vary: Authorization, Accept-Encoding`.
+
+* **HEAD 200:** no body; validators mirror GET; `Content-Length == len(identity 200 body)` (LF-terminated, pre-compression); `Content-Type == GET`.
+
+* **304 Not Modified:** allowed only after a prior 200 for the same identity; no body; omit both `Content-Type` and `Content-Length`; validators mirror cached GET.
+
+* **No `ETag` on writers/errors.** Writers and error responses use `Cache-Control: no-store` and omit `ETag` (see §5.2 and §5.3).
+
+* **Encoding invariance:** for the same canonical body, `ETag` and HEAD identity length are stable across accepted encodings.
+
+### **Population and change policy**
+
+* Add or modify Catalog entries by title only. Do not embed literal URLs.
+
+* When the Catalog changes, follow PF12’s same-PR indexing discipline (update the human index and hash sentinel and the machine mirror in the same PR) and record the Doc-Delta in the local Change Log (§0.4). Titles-only; PF12 is the single home for evidence and indexing.
+
+* Each non-prod entry must include an env gate. Entries not gated for prod must be proven unreachable in production (headers-only env-gate proof).
+
+### **Catalog (titles only)**
+
+* (no entries yet)
+
+### **Evidence artifacts (titles-only)**
+
+* `artifacts/reader/endpoints_snapshot.json` — Endpoint-Catalog snapshot (records-only; route titles and envelope keys; single trailing LF).
+
+* `artifacts/proofs/endpoints_env_gate_proof.log` — Env-gating proof (headers-only; shows non-prod entries are unreachable in `prod`; single trailing LF).
+
+* *(Optional, informative)* `docs/ENDPOINTS_CATALOG.json` — helper list of **success routes by title only**. This helper list is not a client contract and does not define module pointers or cross-surface classifications. Keep it aligned with Appendix D and the machine mirror.
+
+### **Acceptance (binary)**
+
+* **ENDPOINTS\_CATALOG\_INTERNAL\_OK.** Catalog posture is internal-only, not a client contract.
+
+* **ENDPOINTS\_CATALOG\_ENV\_GATE\_OK.** Each entry declares an env gate and non-prod entries are unreachable in `prod`.
+
+* **ENDPOINTS\_CATALOG\_OK.** Catalog subsection exists, is current, and lists success routes by title only. An empty list is permitted until a route ships.
+
+* **A7\_TRANSPORT\_PROOF\_OK.** At least one cataloged success route has a complete A7 proof set (see §5.3 and Appendix A). This remains unmet until a cataloged route is proven.
+
+### **Routing (titles only)**
+
+* Governance token names live in **HDE-Governance §2.0**.
+
+* Transport validators live in **§5.3** and **Appendix A** of this document.
+
+* Evidence artifacts and snapshots are listed in **Appendix D: Evidence Index**.
 
 ---
 
@@ -2872,53 +2896,53 @@ If you want, I can also append the required **titles** for those BodyGraph artif
 
 ## **8.1 Typed public error object (numeric-free) \[Required-Now\]**
 
-**Shape (minimum). The CLI/Reader typed error is a numeric-free JSON object serialized by the single emitter (UTF-8, sorted keys, compact, one LF):**
+Shape (minimum). The CLI/Reader typed error is a numeric-free JSON object serialized by the single emitter (UTF-8, sorted keys, compact, one LF):
 
-**{"ok": false, "code": "\<token\>", "error": "\<non-PII message\>"}**
+{"ok": false, "code": "\<token\>", "error": "\<non-PII message\>"}
 
-* **`ok:false` (boolean)**
+* `ok:false` (boolean)
 
-* **`code` (short machine token; closed vocabulary)**
+* `code` (short machine token; closed vocabulary)
 
-* **`error` (human-readable, non-PII, non-secret)**
+* `error` (human-readable, non-PII, non-secret)
 
-* **Optional: `retry_after_ms` (integer ≥ 0\) when the transport policy explicitly permits it (e.g., vendor 429).**
+* Optional: `retry_after_ms` (integer ≥ 0\) when the transport policy explicitly permits it (e.g., vendor 429).
 
-* **No other fields. Do not echo payloads, secrets, stack traces, or vendor bodies.**
+* No other fields. Do not echo payloads, secrets, stack traces, or vendor bodies.
 
-* **LF termination: emitter must append exactly one trailing `\n`.**
+* LF termination: emitter must append exactly one trailing `\n`.
 
-## **8.2 Streams discipline \[Required-Now\]**
+## 8.2 Streams discipline \[Required-Now\]
 
-* **Success → `stdout`. Print the Reader v1 success body (six keys; LF-terminated).**
+* Success → `stdout`. Print the Reader v1 success body (six keys; LF-terminated).
 
-* **Errors & usage → `stderr`.**
+* Errors & usage → `stderr`.
 
-  * **Usage prints a short synopsis; stdout is empty.**
+  * Usage prints a short synopsis; stdout is empty.
 
-  * **Typed failures print the error object above; stdout is empty.**
+  * Typed failures print the error object above; stdout is empty.
 
-* **No mixed streams. Never interleave diagnostics with public bytes.**
+* No mixed streams. Never interleave diagnostics with public bytes.
 
-## **8.3 Exit codes (taxonomy) \[Required-Now\]**
+## 8.3 Exit codes (taxonomy) \[Required-Now\]
 
-* **`0` — Success. Public body on stdout (LF-terminated).**
+* `0` — Success. Public body on stdout (LF-terminated).
 
-* **`64` — Usage error. Synopsis on stderr; stdout empty.**
+* `64` — Usage error. Synopsis on stderr; stdout empty.
 
-* **`2` — Typed failure. Typed error object on stderr; stdout empty.**
+* `2` — Typed failure. Typed error object on stderr; stdout empty.
 
-**These codes are exhaustive for the public surface. OS/runtime failures must not print partial payloads to `stdout`.**
+These codes are exhaustive for the public surface. OS/runtime failures must not print partial payloads to `stdout`.
 
-## **8.4 Determinism & hygiene gates \[Required-Now\]**
+## 8.4 Determinism & hygiene gates \[Required-Now\]
 
-* **Canonical emitter. All error/usage outputs follow the same emitter rules as success (UTF-8, sorted keys, compact, one LF).**
+* Canonical emitter. All error/usage outputs follow the same emitter rules as success (UTF-8, sorted keys, compact, one LF).
 
-* **No ad-hoc dumps. Forbid `json.dumps` and alternate serializers on public paths.**
+* No ad-hoc dumps. Forbid `json.dumps` and alternate serializers on public paths.
 
-* **Idempotence posture. Typed errors are not part of the success preimage; success preimage/idempotence checks remain unchanged.**
+* Idempotence posture. Typed errors are not part of the success preimage; success preimage/idempotence checks remain unchanged.
 
-* **Parity expectations. CLI error serialization must be stable across runs (two-run identity) and deterministic across AB/BA inputs where applicable.**
+* Parity expectations. CLI error serialization must be stable across runs (two-run identity) and deterministic across AB/BA inputs where applicable.
 
 # 9\. Acceptance & Evidence \[Required-Now\]
 
@@ -3333,9 +3357,10 @@ Keep this index synchronized with repo changes. When any golden or artifact path
 * `tests/transport/headers/aux_304.snap`  
 * `tests/transport/headers/aux_suppression.snap`
 
-**Catalog example (informative; titles-only)**
+**Catalog helper list (informative; titles-only)**
 
-* `docs/ENDPOINTS_CATALOG.json` — list of success routes by title; keep aligned with Appendix D and the machine mirror. *(Populate entries as EPIC-012 ships; until then, keep success proofs/capture files absent or marked pending.)*  
+* `docs/ENDPOINTS_CATALOG.json` — helper list of **Cataloged JSON success routes** by title only (A7 proof surface). This file is **not** a client contract and does not define module pointers or cross-surface endpoint classifications. Keep aligned with Appendix D and the machine mirror. (Populate entries as success routes ship. Until then, keep success proofs and capture files absent or marked pending.)
+
 * `docs/ENDPOINTS_CATALOG.json.sha256`
 
 ### **D.5 Error headers and writer posture**

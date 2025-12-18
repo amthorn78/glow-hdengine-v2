@@ -3,16 +3,17 @@
 ## 0.1 **Header**
 
  **Title:** PF14-Canon-HDE-Mechanics Guide  
- **Version:** v2.2.5  
+ **Version:** v2.3  
  **Status:** Canon  
-**Effective date:** 2025-12-08
+**Effective date:** 2025-12-17
 
-**Last Update Gate:** BN 8.1.9 Drain A16  
+**Last Update Gate:** BN 8.3.4 Drain A1-5  
  **Invocation tag:** INV-f2ac55d77ce9aacc
 
 ---
 
-0.2 Purpose — Components & build tasks (mechanics scope)  
+## 0.2 Purpose — Components & build tasks (mechanics scope)
+
  Mechanics is the **mechanical schematic** for the HD Engine and its tooling. This guide is the single place where we enumerate and describe **every component and build task that must exist in the engine repo** so that the Engine can run, be tested, and be proven for production.
 
 This guide:
@@ -80,7 +81,7 @@ This document should be read as the **full mechanical schematic** of the HD Engi
 
 ---
 
-0.3 Preamble — Product scope
+## 0.3 Preamble — Product scope
 
 Viewer inputs & presets.  
  Viewer presets are optional templates. Each viewer:
@@ -169,12 +170,6 @@ The HD Engine computes per-category compatibility and drives which copy lines ap
 * No public UI; the engine sits behind the app.  
 * No direct Internet exposure.  
 * No business policy beyond inputs; app controls product flow.
-
-## 0.5 Section Update Log
-
-### HDE-EPIC018 Updates
-
-37.6, 18.5, 17.8, 3.8, 17.11, 17.12
 
 ---
 
@@ -435,8 +430,7 @@ Mechanics does **not** redefine these semantics here; it routes to HDE-Schemas &
 * **Evidence & indices:** `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`  
 * **Determinism:** `TWO_RUN_IDENTITY_OK`, `COMPOSITE_ABBA_IDENTITY_OK`, `JSON_CANONICAL_CHECK_OK`  
 * **Rails posture:** `ENV_RAILS_POLICY_OK`  
-* **Ops start-command:** `SERVICE_START_CMD_CAPTURED_OK`, `GUNICORN_APP_FACTORY_OK`, `ENV_PORT_REQUIRED_OK`  
-* 
+* **Ops start-command:** `SERVICE_START_CMD_CAPTURED_OK`, `GUNICORN_APP_FACTORY_OK`, `ENV_PORT_REQUIRED_OK`
 
 ## **1.6 QA tooling bootstrap & Live QA harness (mechanics)**
 
@@ -486,7 +480,7 @@ The QA tooling bootstrap harness **MUST**:
 
   * When any bootstrap check fails, the log **MUST** mark the run as a **tooling failure** and identify which check failed; QA plans and tokens may then treat this as a **tooling/infra blocker**, not as an epic behavior failure.
 
-Mechanics does **not** pin the exact file name or JSON schema for the bootstrap log; those live in **Glow QA Guide** and **HDE-Schemas & Artifacts** by title. It requires that such a log exist under governed audit paths and that it clearly distinguishes tooling failures from behavior failures for any QA session that uses the Engine.
+Mechanics does **not** pin the exact file name or JSON schema for the bootstrap log; those live in **Glow QA Guide** and **HDE-Schemas & Artifacts** by title. This non-pinning applies only to the bootstrap log’s exact naming and schema, not to the existence of concrete QA run artifacts: the QA tooling bootstrap harness and Live QA harness ecosystem **MUST** still produce governed, non-empty evidence under `audit/qa/**` suitable for use by the QA plans, manifests, and viability checks routed by title to the QA and schemas documents.
 
 **Preferred pytest invocation (Codespaces and similar dev environments).**
 
@@ -559,7 +553,82 @@ Mechanics does **not** define the token names or acceptance rules associated wit
 
 Mechanics records the existence and behavior of the QA tooling bootstrap and Live QA harness here so that they are treated as first-class components of the HD Engine’s tooling skeleton, on par with the sanity pipeline, env-pins checks, and evidence tools.
 
-# 2\) Canonical Enumerations Registry
+### **1.6.3 Generic epic QA harness entrypoint (run directory, logs, manifest, viability)**
+
+**Purpose (normative).**  
+ Provide a single reusable **epic QA harness entrypoint** that can be invoked for any epic to execute a Live QA run under pinned rails and to reliably produce governed QA evidence under `audit/qa/**` without relying on hand-edited commands or ad-hoc shell state.
+
+This component exists because “a harness that exits 0 but produces no run artifacts” is mechanically useless and must be prevented by construction.
+
+**Behavior (minimum, normative).**  
+ The epic QA harness entrypoint **MUST**:
+
+* **Determine an epic id and run id.**
+
+  * Accept an epic identifier and a run identifier via a documented interface (CLI args or environment override).
+
+  * When a run id is not explicitly provided, derive a deterministic default (for example, a stable slug for “live-qa-1” or an equivalent policy owned by Glow QA Guide).
+
+* **Create a run-scoped QA\_ROOT directory.**
+
+  * Create a run directory under the governed audit root of the form:
+
+    * `audit/qa/<epic-id>/<run-id>/`
+
+  * Exact naming and lifecycle rules for `<epic-id>` and `<run-id>` are routed by title to Glow QA Guide and HDE-Schemas & Artifacts; Mechanics requires that a single run directory exists and is used consistently for that run.
+
+* **Emit a per-run bootstrap log and step logs.**
+
+  * Write a per-run bootstrap log (D0) inside the run directory.
+
+  * Write the canonical sequence of per-step logs for the epic’s Live QA steps inside the same run directory.
+
+  * Each step log **MUST** be non-empty, include a rails snapshot (at minimum SAFE\_MODE, ALLOW\_NETWORK, LC\_ALL, LANG, TZ, APP\_ENV), include the commands executed, capture exit codes, and end with an explicit step outcome classification (tooling vs behavior).
+
+* **Maintain per-epic run manifest and viability outputs.**
+
+  * Maintain a per-epic “step logs manifest” file under `audit/qa/<epic-id>/` that enumerates known runs and the paths to their run directories and primary step logs.
+
+  * Maintain a per-epic “acceptance map viability” log under `audit/qa/<epic-id>/` that appends a summary line for each run, aligned to:
+
+    * the epic’s acceptance map, and
+
+    * the token to evidence matrix (titles-only; owned elsewhere).
+
+  * Mechanics does not define the token names or viability semantics here; it requires that the harness update these per-epic artifacts so that QA reviewers can audit whether a run is viable and complete.
+
+* **Fail closed on missing outputs.**
+
+  * If the harness completes without creating the run directory, without producing non-empty step logs, or without updating the per-epic manifest and viability outputs, it **MUST** exit non-zero and record the reason as a tooling/harness failure.
+
+* **Be reusable across epics.**
+
+  * Epic-specific harness entrypoints may exist as thin wrappers for convenience, but they **MUST** delegate to the generic harness entrypoint and must not re-implement logging, QA\_ROOT layout, manifest updates, or viability updates in bespoke per-epic code.
+
+**CI self-test (normative).**  
+ The repo **MUST** include a CI test that executes the epic QA harness entrypoint under closed rails with a synthetic run id and asserts, at minimum:
+
+* the run directory exists,
+
+* the per-run bootstrap log exists and is non-empty,
+
+* at least one step log exists and is non-empty,
+
+* the per-epic step logs manifest is updated with an entry for the synthetic run id, and
+
+* the per-epic acceptance map viability log contains a new summary line for the synthetic run id.
+
+This self-test is required to prevent regressions where the harness exits successfully but produces no governed evidence.
+
+**Routing (titles-only).**
+
+* QA plan step sequences, deliverables, and token semantics: Glow QA Guide, HDE-Build Checklist, HDE Phased Epics.
+
+* QA\_ROOT naming conventions and any governed schemas for QA artifacts: HDE-Schemas & Artifacts.
+
+* Environment rails posture for CI and Codespaces: Glow Infrastructure.
+
+  # 2\) Canonical Enumerations Registry
 
 **Purpose.** Wire and prove the frozen domain registries (centers, gates, channels, categories) used by the engine. Mechanics validates and snapshots the domains; **HDE-Schemas and Artifacts** is the single home for authoritative catalogs and schemas. Developer notes in this repo are informative only (never authoritative).
 
@@ -718,12 +787,11 @@ Mechanics does not carry alias ledger content or catalog values; it only enforce
 
 **Routing (titles-only).**
 
-* Catalog/manifest schemas and the full `registry_report.v1` JSON shape: **HDE-Schemas and Artifacts**.
+* Catalog/manifest schemas and the token→evidence matrix: **HDE-Schemas and Artifacts**
 
-* Loader error semantics and alias policy: **Programmatic Configuration System** (§3.1) and **HDE-Schemas and Artifacts**.
+* Loader error envelope \+ canonical JSON serialization rules: **HDE-Mechanics Guide**
 
-* Evidence skeleton tokens and CI posture: **HDE-Governance**, **HDE-Build Checklist**, and **HDE Phased Epics**.  
-* 
+* Evidence skeleton tokens and CI posture: **HDE-Governance**, **HDE-Build Checklist**, and **HDE-Phased Epics**.
 
 ## 3.4 Validation (binary)
 
@@ -1631,49 +1699,104 @@ This section governs **mechanics only**; all concrete bytes, tokens, and schemas
 
 # 9\) Reader & Compat endpoints
 
-## 9.1 Endpoint Catalog (JSON success) \[Required-Now\]
+## **9.1 Endpoint Catalog (JSON success) \[Required-Now\]**
 
-**Purpose (normative).** Name the Reader **JSON success** routes eligible for A7 proofs. Entries are **titles-only**; bytes/examples live elsewhere.
+**Purpose (normative).**  
+ Provide a **canonical machine-readable inventory** of HTTP endpoints in the Engine repo and, within that inventory, clearly identify which endpoints are **JSON success routes eligible for A7 proofs**. Entries are titles-only; bytes/examples and detailed contract semantics remain in their single homes.
+
+This catalog exists to prevent drift between code, QA plans, and audits by making endpoint classification explicit and testable.
 
 **Scope & rules**
 
-* **Single home.** This Catalog is the only place that lists success endpoints eligible for A7 proofs.  
-* **Posture.** Catalog is **internal-only** and **env-gated per entry**; entries not gated for prod are unreachable in production.  
-* **Proof surface.** A7 proofs **must** run on a route listed in this Catalog.  
-* **Exclusions.** All `/internal/*` routes are excluded; `/internal/version` is operator-only and not A7-eligible (see HDE-Governance §10.5).
+* **Single home (inventory).** `docs/ENDPOINTS_CATALOG.json` is the only machine-readable inventory of HTTP endpoints for this repo. It must include, at minimum:
 
-**Invariants to prove (titles-only)**
+  * public Reader endpoints,
 
-* **200:** quoted, strong `ETag`; `Vary: Authorization, Accept-Encoding`; success cache headers.  
-* **HEAD:** status 200; validators mirror 200 (including `Content-Type`); `Content-Length == len(identity 200 body)`.  
-* **304:** only after prior 200-with-body; **omit** `Content-Type` and **omit** `Content-Length`; validators mirror cached 200\.  
-* **Encoding invariance:** for the same canonical LF-terminated body, `ETag` identity and effective `Content-Length` are stable across accepted `Accept-Encoding` (identity/gzip/br).  
-* **Writers/errors posture:** non-success writers and error routes carry `Cache-Control: no-store` (recorded as headers-only evidence).
+  * compat endpoints (internal/admin as applicable),
+
+  * internal identity endpoints (for example, `/internal/version`),
+
+  * ops probe endpoints (health/ready/diagnostics), and
+
+  * dev harness endpoints (for example, `/internal/dev/sampler`).
+
+* **A7-eligible subset.** A7 proofs apply only to endpoints explicitly marked as **A7-eligible JSON success routes** in this catalog. `/internal/*` endpoints are **never** A7-eligible; `/internal/version` is operator-only and not A7-eligible (see HDE-Governance §10.5).
+
+* **Classification is mandatory.** Every catalog entry MUST be classified into one of the following endpoint classes (names are for catalog entries; PF docs still route by title):
+
+  * `public_reader`
+
+  * `internal_admin` (includes internal/admin compat surfaces)
+
+  * `internal_identity`
+
+  * `ops`
+
+  * `dev_harness`
+
+* **Mixing responsibilities is permitted but discouraged.** Implementations may mix endpoint classes in one Python module, but the catalog must still carry per-endpoint classification so CI and QA can enforce distinct rails and posture per class.
+
+**Catalog entry minimum fields (titles-only; schema owned elsewhere)**
+
+Each entry in `docs/ENDPOINTS_CATALOG.json` MUST include, at minimum:
+
+* `path` — for example `/reader`, `/api/compat/v1`, `/internal/version`, `/ops/health`, `/internal/dev/sampler`
+
+* `method` — `GET`, `POST`, `HEAD` (or a list if an endpoint supports multiple methods)
+
+* `classification` — one of the endpoint classes above
+
+* `blueprint_module` — titles-only pointer to the owning module (for example `adapter/http_reader.py`, `engine/http/compat_handler.py`)
+
+* `rails_profile` — short, names-only summary of rails and gating expectations (for example “requires APP\_ENV=dev”, “ops-only”, “A7 success posture”, “writer no-store posture”)
+
+* `a7_eligible` — boolean (true only for JSON success routes eligible for A7 proofs)
+
+* `env_gate` — for entries where reachability is env-gated (titles-only; exact gating semantics are routed to Governance/Infrastructure)
+
+Field-level schema and validation for this catalog are owned by HDE-Schemas & Artifacts (titles-only). This guide defines the mechanical requirement that the catalog exists, is complete, and is used as the single inventory source.
+
+**A7 invariants to prove (titles-only; for `a7_eligible=true` entries only)**
+
+* **200:** quoted, strong `ETag`; `Vary: Authorization, Accept-Encoding`; success cache headers
+
+* **HEAD:** status 200; validators mirror 200 (including `Content-Type`); `Content-Length == len(identity 200 body)`
+
+* **304:** only after prior 200-with-body; **omit** `Content-Type` and **omit** `Content-Length`; validators mirror cached 200
+
+* **Encoding invariance:** for the same canonical LF-terminated body, `ETag` identity and effective `Content-Length` are stable across accepted `Accept-Encoding` (identity/gzip/br)
+
+* **Writers/errors posture:** non-success writers and error routes carry `Cache-Control: no-store` (recorded as headers-only evidence)
 
 **Catalog files (single home)**
 
-* `docs/ENDPOINTS_CATALOG.json` (canonical JSON; one LF) — lists **JSON success routes only**, each with an env-gate; `/internal/` is excluded.  
-* `docs/ENDPOINTS_CATALOG.json.sha256` — sidecar hash of the canonical bytes.
+* `docs/ENDPOINTS_CATALOG.json` (canonical JSON; one LF) — machine-readable endpoint inventory with mandatory classification and A7 eligibility flags
 
-**Proof artifacts (headers-only; one LF each)**
+* `docs/ENDPOINTS_CATALOG.json.sha256` — sidecar hash of the canonical bytes
 
-* `artifacts/proofs/endpoints_env_gate_proof.log` — proves non-prod entries are unreachable in prod.  
-* `artifacts/proofs/success_get.txt` — GET 200 proof (quoted strong ETag, Vary).  
-* `artifacts/proofs/success_head.txt` — HEAD parity with GET 200\.  
-* `artifacts/proofs/success_304.txt` — 304 omission proof (CT/CL omitted; validators mirror).  
-* `artifacts/proofs/success_encoding_invariance.txt` — identity/gzip/br invariance proof.  
-* `artifacts/proofs/success_writers_errors.txt` — writers/errors no-store posture.
+**Proof artifacts (headers-only; one LF each; for A7-eligible entries)**
 
-**Indexing (human \+ machine, same PR)**
+* `artifacts/proofs/endpoints_env_gate_proof.log` — proves non-prod entries are unreachable in prod
 
-* Update the **human Evidence Index** and mirror 1:1 in `artifacts/evidence_index.jsonl`.  
-* The machine mirror is **records-only canonical JSONL** (UTF-8; ASCII-sorted keys; compact; **one LF**); **unknown keys are rejected**.  
-* Each record includes: `sha256`, `size_bytes`, `produced_at_utc`, `discovered_physical_path`, and a **`proof_anchor`** to a co-located path-proof file.
+* `artifacts/proofs/success_get.txt` — GET 200 proof (quoted strong ETag, Vary)
 
-* **Mirror schema pins.** The machine mirror follows the **exact field order** and CI tokens defined in **§1.3** (PF12/PF10): `artifact_key, discovered_physical_path, produced_at_utc, proof_anchor, role, sha256, size_bytes`; **sort‑before‑write**, **unknown‑key reject**, **one LF**.
+* `artifacts/proofs/success_head.txt` — HEAD parity with GET 200
 
-**Acceptance (titles-only; tokens live in HDE-Governance §2.0)**  
- `ENDPOINTS_CATALOG_OK`, `ENDPOINTS_CATALOG_INTERNAL_OK`, `ENDPOINTS_CATALOG_ENV_GATE_OK`, `A7_GET_QUOTED_ETAG_OK`, `A7_HEAD_PARITY_OK`, `A7_304_OMITS_CT_CL_OK`, `A7_VARY_AUTH_AE_OK`, `A7_ENCODING_INVARIANCE_OK`, `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`.
+* `artifacts/proofs/success_304.txt` — 304 omission proof (CT/CL omitted; validators mirror)
+
+* `artifacts/proofs/success_encoding_invariance.txt` — identity/gzip/br invariance proof
+
+* `artifacts/proofs/success_writers_errors.txt` — writers/errors no-store posture
+
+**Test expectations (mechanics only; titles-only routing for tokens).**
+
+Mechanics requires that:
+
+* Endpoints classified as `public_reader` (and any A7-eligible entries) have tests that verify canonical emitter usage and the expected status/header/body posture for their class.
+
+* Endpoints classified as `dev_harness` or `ops` have explicit gating tests (APP\_ENV or equivalent) and are not treated as public transport surfaces.
+
+Token semantics and acceptance are owned by HDE-Governance and Glow QA Guide (titles-only); PF14 records only that classification and tests must exist to keep endpoint posture enforceable and non-ambiguous.
 
 ---
 
@@ -3021,6 +3144,30 @@ If audit/gates/guards/\*\* copies of the guard artifacts are present for interna
 
 * **SAFE rails.** SAFE rails apply in all environments; rails posture and acceptance tokens are owned by **HDE-Governance** (titles-only).
 
+**BodyGraph I/O seam (normative).**
+
+Mechanics treats BodyGraph resolution and ingest as a **sanctioned I/O seam** that is distinct from deterministic core compute:
+
+* **Canonical seam location (implementation boundary).** BodyGraph vendor and DB I/O is permitted only within the BodyGraph seam (currently implemented under `engine/bodygraph/` in this repo). This seam is not part of the deterministic Engine Core or sampler core.
+
+* **What may occur in the seam.** Code inside the BodyGraph seam MAY perform:
+
+  * network I/O to vendor services (through a vendor client abstraction), and
+
+  * DB reads/writes for BodyGraph storage (through a DB access abstraction).
+
+* **Rails requirements for all I/O.** Any network or DB I/O in the BodyGraph seam MUST:
+
+  * respect SAFE\_MODE and ALLOW\_NETWORK rails (no vendor calls when network rails are closed; fail-closed refusals when misconfigured),
+
+  * use a small, well-defined set of seam abstractions (for example, vendor client and DBAccess-like components), and
+
+  * keep logs and artifacts secret-free (keys-only posture; no credentials and no vendor payload bodies in governed artifacts).
+
+* **Purity preserved elsewhere.** Deterministic decisions (eligibility, banding, compat math, narrative key selection, canonical JSON emission) MUST remain in the pure compute modules (core/sampler/compat/presenter/runtime) and MUST NOT be implemented inside the BodyGraph seam. The BodyGraph seam orchestrates I/O and normalization around those pure decisions.
+
+This subsection does not redefine transport bytes, retry policy, or token semantics; it records the mechanical I/O boundary so audits and tests can enforce “no network/DB I/O leaks into core compute” while allowing BodyGraph resolution and ingest to operate under explicit rails.
+
 **Per-call selection (explicit)**
 
 * Source is chosen **per call** on operator surfaces (CLI flag / ops param); there are no engine “modes.”
@@ -3065,8 +3212,7 @@ Proofs live under `artifacts/bodygraph/source_invariance/` as at least:
 
 * `ba.json` — vendor body for the same inputs
 
-* `summary.json` — summary (attempts, `sha256` digests, `ab_ba_equal: true` on success)  
-* 
+* `summary.json` — summary (attempts, `sha256` digests, `ab_ba_equal: true` on success)
 
 **Live vendor transport proofs (open-rails QA vs offline tests).**
 

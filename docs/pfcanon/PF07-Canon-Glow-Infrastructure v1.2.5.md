@@ -1,12 +1,12 @@
 # **0\. Front Matter**
 
 **Title:** PF07-Canon-Glow-Infrastructure  
- **Version:** v1.2.4
+**Version:** v1.2.5
 
 **Status:** Canon  
-**Effective date:** 2025-12-03
+**Effective date:** 2025-12-17
 
-**Last Update Gate:** BN 8.0.7 Drain A8
+**Last Update Gate:** BN 8.3.4 Drain A1-5
 
 **Invocation tag:** `INV-f2ac55d77ce9aacc`
 
@@ -158,10 +158,6 @@ Names and pinned infra reference values in PF07 are authoritative for infrastruc
 | HD Engine | TBD | **Shared production DB instance** *(schema **`hde`**)* |
 
 *Inventory only. These are **observed names/locations**, not policy; replace **TBD** with facts as they are confirmed.*
-
----
-
-**UPDATED BLOCK (paste-ready)**
 
 ## **2.3 Routing (titles-only)**
 
@@ -494,7 +490,7 @@ The detailed classification and handling of such cases (for example, `FAIL_TOOLI
   * **Glow Backend:** **TBD** · default branch **TBD**  
   * **Glow Frontend:** **TBD** · default branch **TBD**
 
-*Names-only; no paths/tokens. Evidence indexing lives in §36 / HDE-Schemas and Artifacts.*
+*Names-only; no paths/tokens. Evidence indexing lives in component specific canonical evidence docs.*
 
 ---
 
@@ -687,7 +683,7 @@ PF07 records these paths as part of the HD Engine repo **inventory** only. It do
 
   ---
 
-  ## **5.2 Glow Backend repo**
+## **5.2 Glow Backend repo**
 
 * **Repository:** `amthorn78/glow-backend-v4`  
 * **Primary service code paths:** **TBD**  
@@ -696,7 +692,7 @@ PF07 records these paths as part of the HD Engine repo **inventory** only. It do
   * **Railway service:** `glow-backend-v4`  
     ---
 
-    ## **5.3 Glow Frontend repo**
+## **5.3 Glow Frontend repo**
 
 * **Repository:** `amthorn78/glow-frontend-v2`  
 * **Primary app code paths:** **TBD**  
@@ -712,8 +708,7 @@ PF07 records these paths as part of the HD Engine repo **inventory** only. It do
 
 ## 6.1 Intent & scope (inventory-only)
 
-This section lists **domain names** and **DNS roles** in use. It is **names-only** (no policy, no header/TTL/cert bytes). Transport/A7 policy and acceptance live in **HDE-Governance**; public envelope and request/response shapes live in **HDE-CLI-API-Vendor-Ref**. Evidence indexing and mirror parity live in **§36 Documentation Artifacts & Registry** and **§1.3 Evidence & CI coupling**.  
- Supersession note. PF07 follows the latest PF10 addenda (later letter wins) and routes by **title only**.
+This section lists **domain names and DNS roles in use across Glow**. It is **names-only** (no policy, no header/TTL/cert bytes). Behavioral semantics are owned by the relevant product-level canonical documents and referenced by title. Evidence indexing and mirror parity are routed via §10.5 **“Evidence & indexing”** (titles-only).
 
 ## 6.2 Root domains used by Glow
 
@@ -741,21 +736,31 @@ This section lists **domain names** and **DNS roles** in use. It is **names-only
 * **Backend:** **TBD**  
 * **HD Engine:** **TBD**
 
-## 6.4 DNS provider & record types (names-only)
+  ## **6.4 DNS provider & record types (names-only)**
 
-* **Provider:** **Vercel DNS** (zone: `glowme.io`)  
-* **Record types in use:** `A` / `AAAA`, `CNAME` *(confirm exact hostnames as we populate)*; `TXT` *(verification, if required — OPEN/TBD)*
+**Provider:** Vercel DNS (zone: `glowme.io`)
 
-### **6.5 Routing (titles-only)**
+**Record types in use (names-only):**
 
-* **Transport & A7 policy / acceptance:** **HDE-Governance**  
-* **Public envelope & request/response shapes:** **HDE-CLI-API-Vendor-Ref**  
-* **Evidence registry & mirror discipline:** **§36 Documentation Artifacts & Registry** and **§1.3 Evidence & CI coupling**
+* A / AAAA
+
+* CNAME *(confirm exact hostnames as we populate)*
+
+* TXT *(verification, if required — OPEN/TBD)*
+
+  ## **6.5 Routing (titles-only)**
+
+* **Transport & A7 policy / acceptance:** owned by the relevant product’s governance and transport policy documents (titles-only).
+
+* **Public envelope & request/response shapes:** owned by the relevant product’s API/contract documents (titles-only).
+
+* **Evidence registry & mirror discipline:** §10.5 “Evidence & indexing” (titles-only; ownership in the canonical Schemas & Artifacts documents).
 
 **Notes (inventory-only).**
 
-* Use **OPEN/TBD** when not confirmed (no guessing).  
-* PF07 records **names** only; values, TTLs, cert details, and policy live by **title** in their single homes.
+* Use **OPEN/TBD** when not confirmed (no guessing).
+
+* PF07 records names only; values, TTLs, cert details, and policy live by title in their single homes.
 
 ---
 
@@ -784,31 +789,35 @@ This section lists **domain names** and **DNS roles** in use. It is **names-only
 * **Acceptance (routing only)**  
    Governed in **HDE-Governance §2.0**. PF07 does not enumerate tokens.
 
-  ## **7.1 Instances**
+## **7.1 Instances**
 
-**Single database instance (current posture, names-only)**  
- Production runs on one Postgres instance; staging/dev connect to the same physical instance via direct DATABASE\_URL or DB\_BRIDGE\_URL (per §7.0 precedence). Future separation of instances for staging/dev is OPEN/TBD and will be recorded here when facts are confirmed.
+Production runs on one Postgres instance; staging/dev connect to the same physical instance via direct `DATABASE_URL` or `DB_BRIDGE_URL` (per §7.0 precedence). Future separation of staging/dev DB instances is **OPEN/TBD**; do not assume.
 
-**Production (Railway)**
+**Environment instances**
 
-* Provider: Railway (names-only)  
-* Database (shared): Postgres — instance `ample-illumination/production/postgres` *(observed; confirm)* — used by `glow-hdengine-v2` and `glow-backend-v4`  
-* Schemas: HD Engine: `hde` · Backend: **TBD**  
-* Engine & version floor: Postgres ≥ 14 *(refine from build evidence)*
+* Production (Railway)
 
-**Staging/QA (GitHub Codespaces)**
+  * Database (shared): Postgres — instance `ample-illumination/production/postgres` *(via DB proxy; confirm)* — used by the HD Engine (schema `hde`) and Glow Backend (schema TBD)
 
-* Provider: GitHub Codespaces  
-* Instance: **OPEN/TBD** *(do not assume shared prod; confirm bridge vs direct)*  
-* Schemas: HD Engine: `hde` · Backend: **TBD**  
-* Engine & version floor: **TBA**
+  * Engine: Postgres
 
-**Development (CodEx)**
+  * Version floor: ≥ 14
 
-* Provider: CodEx  
-* Instance: **OPEN/TBD** *(do not assume shared prod; confirm bridge vs direct)*  
-* Schemas: HD Engine: `hde` · Backend: **TBD**  
-* Engine & version floor: **TBA**
+* Staging/QA (GitHub Codespaces)
+
+  * Database (shared): same physical instance as Production — `ample-illumination/production/postgres` *(via DB proxy; confirm)*
+
+  * Engine: Postgres
+
+  * Version floor: ≥ 14
+
+* Development (OpenAI Codex)
+
+  * Database (shared): same physical instance as Production — `ample-illumination/production/postgres` *(via DB proxy; confirm)*
+
+  * Engine: Postgres
+
+  * Version floor: ≥ 14
 
   ## **7.2 Application schema map (per application)**
 
@@ -1010,69 +1019,61 @@ PF07 records this as an infra responsibility only. The meaning of each `APP_ENV`
 
   ## **8.2 Component-specific keys**
 
-### **8.2.1 HD Engine**
+  ### **8.2.1 HD Engine**
 
 **Port**  
- • Dev (CodEx): 8000  
- • QA (Codespaces): 8000  
- • Prod (Railway): 8000
+• Dev (CodEx): 8000  
+• QA (Codespaces): 8000  
+• Prod (Railway): 8000
 
 **Dev harness URLs (internal/dev HTTP; names-only)**
 
 **`DEV_SAMPLER_URL` — dev sampler HTTP harness base URL**
 
 *Dev/CodEx (local dev):* **OPEN/TBD** (must follow the `<base_url>/internal/dev/sampler` pattern; base URL derived from the local dev Reader wiring once confirmed).  
- *QA (Codespaces):* `http://127.0.0.1:8000/internal/dev/sampler`  
- *Prod (Railway):* not set / not applicable (internal/dev sampler HTTP harness is dev-only).
+*QA (Codespaces):* `http://127.0.0.1:8000/internal/dev/sampler`  
+*Prod (Railway):* not set / not applicable (internal/dev sampler HTTP harness is dev-only).
 
 **Binding ownership and pattern (names-only).**
 
-* `DEV_SAMPLER_URL` is an **infra-owned config key** for the **dev-only sampler HTTP harness** base URL (for routes such as `POST /internal/dev/sampler`) in dev/Codespaces/local-dev environments.
-
-* The value MUST be derived from the **actual dev Reader process wiring** (host and port) for that environment, not guessed or reconstructed inside QA harnesses or docs.
-
-* Across environments, the invariant **pattern** is:
-
-   `DEV_SAMPLER_URL = <base_url>/internal/dev/sampler`
-
-   where `<base_url>` is the reachable base URL for the dev Reader HTTP service in that environment.
+* `DEV_SAMPLER_URL` is an **infra-owned config key** for the **dev-only sampler HTTP harness** base URL (for routes such as `POST /internal/dev/sampler`) in dev/Codespaces/local-dev environments.  
+* The value MUST be derived from the **actual dev Reader process wiring** (host and port) for that environment, not guessed or reconstructed inside QA harnesses or docs.  
+* Across environments, the invariant **pattern** is:  
+  `DEV_SAMPLER_URL = <base_url>/internal/dev/sampler`  
+  where `<base_url>` is the reachable base URL for the dev Reader HTTP service in that environment.
 
 **Codespaces home for DEV\_SAMPLER\_URL (names-only).**
 
 In the HD Engine GitHub Codespaces environment for `amthorn78/glow-hdengine-v2`:
 
-* The **canonical home** for the DEV\_SAMPLER\_URL binding is the devcontainer configuration. `.devcontainer/devcontainer.json` MUST define:
-
-   `DEV_SAMPLER_URL=http://127.0.0.1:8000/internal/dev/sampler`
-
-   under a container environment block (for example, `containerEnv`), so that every shell in the Codespace sees the same value without manual export.
-
+* The **canonical home** for the DEV\_SAMPLER\_URL binding is the devcontainer configuration. `.devcontainer/devcontainer.json` MUST define:  
+  `DEV_SAMPLER_URL=http://127.0.0.1:8000/internal/dev/sampler`  
+  under a container environment block (for example, `containerEnv`), so that every shell in the Codespace sees the same value without manual export.  
 * Shell-level `export DEV_SAMPLER_URL=...` MAY be used for one-off debugging, but the devcontainer environment is the **authoritative infra binding** for this environment.
 
 **Harness expectations (routing-only).**
 
-* Dev sampler HTTP QA tools in this repo (for example, healthcheck and D3 Live QA harnesses) are expected to **read DEV\_SAMPLER\_URL from the environment** and treat it as a required input; they MUST NOT hardcode host/port or recompute `<base_url>` internally.
-
+* Dev sampler HTTP QA tools in this repo (for example, healthcheck and D3 Live QA harnesses) are expected to **read DEV\_SAMPLER\_URL from the environment** and treat it as a required input; they MUST NOT hardcode host/port or recompute `<base_url>` internally.  
 * Missing or mismatched DEV\_SAMPLER\_URL for a given environment is classified here as an **infra/tooling misconfiguration** for dev sampler HTTP harnesses, not as an HD Engine behavior failure. Detailed classification (for example, FAIL\_TOOLING vs behavior), preconditions, and token semantics live by title in **Glow QA Guide**, **HDE-Governance**, **HDE-Mechanics Guide**, and **HDE-Build Checklist**.
 
 PF07 records the **key name**, the **per-environment binding locations**, and the **URL pattern** as infrastructure facts. It does **not** define HTTP behavior, header/body contracts, or acceptance tokens for the dev sampler HTTP harness; those remain owned by **HDE-CLI-API-Vendor-Ref**, **HDE-Mechanics Guide**, **Glow QA Guide**, **HDE-Governance**, and **HDE-Build Checklist** (titles-only).
 
 **LOG\_LEVEL**  
- • OPEN/TBD (all envs)
+• OPEN/TBD (all envs)
 
 **Loader selector**  
- • `PACK_SHA`: OPEN/TBD (active narratives pack identity; file-backed runtime)
+• `PACK_SHA`: OPEN/TBD (active narratives pack identity; file-backed runtime)
 
 **Vendor-ingest keys (present where noted; secrets redacted)**  
- • `HDAPI_BASE_URL`: [https://api.humandesignapi.nl/v1](https://api.humandesignapi.nl/v1) (where configured)  
- • `HD_API_KEY`  
- • `GEO_API_KEY`
+• `HDAPI_BASE_URL`: `https://api.humandesignapi.nl/v1` (where configured)  
+• `HD_API_KEY`  
+• `GEO_API_KEY`
 
 **Notes (inventory-only).**
 
-* PF07 names the HD Engine port mapping and the `DEV_SAMPLER_URL` key as part of the infrastructure inventory. It does **not** pin the actual `DEV_SAMPLER_URL` value, define how the dev harness is started, or specify QA procedures; those details (start commands, curl patterns, acceptance tokens) live by title in **HDE-Mechanics Guide**, **HDE-CLI-API-Vendor-Ref**, **Glow QA Guide**, and **HDE-Build Checklist**.
-
-* Requiredness, defaults, and validation rules for these keys are not defined here: ownership/requiredness → **HDE-Schemas & Artifacts**; rails/policy (including dev-harness validation and rails posture) → **HDE-Governance** and **Glow QA Guide** (titles-only).
+* PF07 names the HD Engine port mapping and the `DEV_SAMPLER_URL` key as part of the infrastructure inventory. PF07 pins the **Codespaces container-local** `DEV_SAMPLER_URL` binding (`http://127.0.0.1:8000/internal/dev/sampler`) because it is a stable infra fact for the governed dev sampler harnesses; other environments may use a different `<base_url>` and remain **OPEN/TBD** until confirmed. PF07 does not define how the dev harness is started or specify QA procedures; those details (start commands, curl patterns, acceptance tokens) live by title in **HDE-Mechanics Guide**, **HDE-CLI-API-Vendor-Ref**, **Glow QA Guide**, and **HDE-Build Checklist**.  
+* Requiredness, defaults, and validation rules for these keys are not defined here: ownership/requiredness → **HDE-Schemas & Artifacts**; rails/policy (including dev-harness validation and rails posture) → **HDE-Governance** and **Glow QA Guide** (titles-only).  
+* 
 
   ### **8.2.2 Glow Backend — TBD (names-only)**
 
@@ -1161,32 +1162,42 @@ Keep verbatim — this is the source of truth as configured in Railway.
 * If the command or any parameter changes (flags, worker/thread counts, entrypoint), **update this section and the canonical evidence** in the **same change** (see 10.5).  
 * PR-first via CodEx: the **Doc-Delta**, **human Evidence Index**, and **machine JSONL mirror** must update **in the same PR** when the command or env-pins change.
 
-  ## **10.5 Evidence & indexing (titles-only)**
+## **10.5 Evidence & indexing (titles-only)**
 
-* **Single home (entries & types).** The authoritative listing of artifact **titles/paths** lives in **PF12 §8.6 “Evidence Index entries”**; governed record types live in **PF12 Appendix C**. PF07 is **names-only** and does not pin file paths. If this document contains “§36 Documentation Artifacts & Registry,” treat it as a **pointer only** to PF12 (not a second source of truth).
+**Single home (entries & types).**  
+ The authoritative listing of evidence artifacts (titles/paths) and governed record types is owned by the canonical **Schemas & Artifacts** document (titles-only). PF07 is names-only: it does not define evidence schemas or acceptance rules; it inventories the stable evidence index and mirror file locations used by the repo.
 
-* **Indexing discipline (same-PR rule).** Whenever evidence changes, update in the **same PR**:
+**Indexing discipline (same-PR rule).**  
+ Whenever evidence changes, update in the same PR:
 
-  * Human Evidence Index: `docs/evidence/INDEX.json`  
-  * **Evidence Index hash sentinel:** `docs/evidence/INDEX.sha256`  
-  * Machine mirror (records-only): `artifacts/evidence_index.jsonl`  
-     CI enforces **1:1 parity** (human ↔ machine).  
-* **Mirror hygiene (records-only JSONL).** Canonical JSONL (UTF-8, sorted keys, compact, **one trailing `\n`**), unknown-keys rejected. Each record includes:
+* Human Evidence Index: `docs/evidence/INDEX.json`
 
-  * `artifact_key`, **`role`** (`proof|golden|snapshot|script|log`), `sha256`, `size_bytes`, `produced_at_utc`, `discovered_physical_path`, `proof_anchor` (points to a path-proof stored alongside the artifact).  
-* **Write discipline (merge-blocking).**
+* Evidence Index hash sentinel: `docs/evidence/INDEX.sha256`
 
-  * **Field order (ASCII, exact):** `artifact_key`, `discovered_physical_path`, `produced_at_utc`, `proof_anchor`, `role`, `sha256`, `size_bytes`.  
-  * **Sort-before-write:** by (`artifact_key`, `discovered_physical_path`).  
-  * **Single mirror file:** exactly one `artifacts/evidence_index.jsonl`.  
-  * **Uniqueness:** (`artifact_key`, `discovered_physical_path`) must be unique.  
-  * **Path-proofs:** a `path_proof.txt` (or equivalent) must exist beside each artifact; the record’s `proof_anchor` must match it exactly.
+* Machine mirror (records-only): `artifacts/evidence_index.jsonl`
 
-  ---
+* CI enforces 1:1 parity (human ↔ machine).
 
-  ## **10.6 Acceptance (titles-only; tokens live in HDE-Governance §2.0)**
+**Mirror hygiene (records-only JSONL).**  
+ Canonical JSONL (UTF-8, sorted keys, compact, one trailing `\n`), unknown keys rejected. Each record includes:
 
-Acceptance for **start-command capture**, **app-factory binding to `$PORT`**, and **required `PORT` at runtime** is governed in **HDE-Governance**. This document **routes by title** and **does not enumerate token names**.
+`artifact_key`, `role` (`proof|golden|snapshot|script|log`), `sha256`, `size_bytes`, `produced_at_utc`, `discovered_physical_path`, `proof_anchor` (points to a path-proof stored alongside the artifact).
+
+**Write discipline (merge-blocking).**
+
+* **Field order (ASCII, exact):** `artifact_key`, `discovered_physical_path`, `produced_at_utc`, `proof_anchor`, `role`, `sha256`, `size_bytes`.
+
+* **Sort-before-write:** by (`artifact_key`, `discovered_physical_path`).
+
+* **Single mirror file:** exactly one `artifacts/evidence_index.jsonl`.
+
+* **Uniqueness:** (`artifact_key`, `discovered_physical_path`) must be unique.
+
+* **Path-proofs:** a `path_proof.txt` (or equivalent) must exist beside each artifact; the record’s `proof_anchor` must match it exactly.
+
+## **10.6 Acceptance (titles-only)**
+
+Acceptance requirements for environment and runtime wiring (for example, start-command capture, app-factory binding to `$PORT`, and required `PORT` at runtime) are governed by the relevant product’s canonical governance and QA documents (titles-only). PF07 routes by title and does not enumerate token names.
 
 # **11\) Change log & ownership**
 

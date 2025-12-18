@@ -3,11 +3,11 @@
 ## 0.1 Header
 
  **Title:** PF04-Canon-HDE-Governance  
- **Version:** v1.6  
+ **Version:** v1.6.4  
  **Status:** Canon  
-**Effective date:** 2025-12-08
+**Effective date:** 2025-12-13
 
-**Last Update Gate:** BN 8.1.9 Drain A14/15
+**Last Update Gate:** BN 8.3.4 Drain A1-5
 
 **Invocation tag:** `INV-f2ac55d77ce9aacc`
 
@@ -196,7 +196,7 @@ This document owns:
 
   * Mandates that every normative change updates the Evidence Index in the same commit.
 
-  ## **1.2 Single homes & routing Required−NowRequired-NowRequired−Now**
+  ## **1.2 Single homes & routing \[Required−Now\]**
 
 **Ownership (this document).**  
  Governance owns **operational and transport policy** for the HD Engine:
@@ -270,6 +270,8 @@ EPIC-011 introduced a **preservation guard** over key public and admin surfaces.
 
 ---
 
+## 
+
 ## **2.0 Acceptance Tokens (single-home roster) \[Required-Now\]**
 
 **Single home for governance tokens.** This roster centralizes token semantics; the bytes and tests live elsewhere and are referenced by title only. Other sections must reference §2.0 and must not restate token lists. Supersession: PF10 uses numbered addenda; the later number governs. All token names are case-sensitive.
@@ -277,6 +279,26 @@ EPIC-011 introduced a **preservation guard** over key public and admin surfaces.
 **Token Registry.** This section is the **Token Registry** for HDE acceptance tokens. Token names and semantics are **owned here**. **HDE-Schemas and Artifacts** mirrors these names and attaches acceptance hints to concrete artifacts; it does **not** change semantics. **HDE-Build Checklist** is strictly **consumer-only**: it lists and groups tokens by phase and Epic but may not introduce new token names. Any new acceptance token must be defined in this section first and then mirrored into **HDE-Schemas and Artifacts** and **HDE-Build Checklist** by title.
 
 ---
+
+### **2.0.0 Token admission & lifecycle (value-only)**
+
+Acceptance tokens are high-signal claims. They must earn existence; they are not workflow/status markers.
+
+**Token admission (PASS/FAIL).** A new acceptance token MUST NOT be added unless it:
+
+1. encodes a non-trivial acceptance invariant (not a project-management checkpoint),
+
+2. is provable via deterministic artifacts (tests, CI gates, Live QA outputs) that can be linked in the token/evidence matrix (§9.7.2),
+
+3. is not already implied by existing rails or required deliverables (avoid duplicative “status” tokens), and
+
+4. has a clear retirement path (what “deprecated” means and how the token is removed from rosters and acceptance maps).
+
+**Non-token metadata.** Workflow facts and platform metadata (e.g., “a PR is open”, “CI ran”, “review completed”) MUST NOT be minted as acceptance tokens. Represent them as checklist items, CI status, or other metadata; they are not part of the acceptance-token system.
+
+**Token budgets (planning posture).** Default: 0 new acceptance tokens. Target: ≤3 new in-scope tokens per epic, and only if necessary. Beyond this requires explicit ADR justification and a Doc-Delta plan.
+
+**Registry enforcement.** A token name is invalid for acceptance maps/manifests/evidence until it is registered here (§2.0) via Doc-Delta. Plans may request new tokens via Doc-Delta/ADR, but those names must be clearly marked as requests until the registry update lands.
 
 ### **2.0.1 Determinism & identity**
 
@@ -659,6 +681,194 @@ These tokens apply whenever SAFE rails are opened for vendor calls in any enviro
   * a PF04 Doc-Delta entry in §9 that adds the token to this roster, and
 
   * corresponding updates in Glow QA Guide, HDE-Schemas & Artifacts, and HDE-Build Checklist in the same change.
+
+### **2.0.19 QA bootstrap & harness (EPIC021+)**
+
+These tokens govern **QA tooling bootstrap**, **QA\_ROOT harness discipline**, and **acceptance-map / QA-plan viability** for epics. They are QA Acceptance Tokens in the sense of §2.0.18: PF04 owns their names and governance semantics; **Glow QA Guide** owns the QA library entries and detailed harness procedures; **HDE-Build Checklist** and **HDE-Phased Epics** consume them in phase tasks and epic records.
+
+* **QA\_LIVE\_QA\_RUN\_OK** — An epic cannot close until it has executed at least one **Live QA run** via the canonical QA harness and checked the resulting evidence into the repo under QA\_ROOT.
+
+   **Scope.**
+
+  * Epic-level token. This is a **closeout gate** and is required for every epic record in **HDE-Phased Epics** unless an explicit governance scope directive says otherwise.
+
+* **Governance semantics.**
+
+  * The epic must have a Live QA plan in **Glow QA Guide** (titles-only) that specifies:
+
+    * the harness invocation (including the epic identifier and a run identifier),
+
+    * closed-rails posture (env pins),
+
+    * expected evidence under `audit/qa/<epic-id>/...` (QA\_ROOT).
+
+  * The Live QA run must be executed via the harness in an environment consistent with the Live QA plan (for example, GitHub Codespaces attached to the canonical repo; exact operator posture is owned by **Glow QA Guide**).
+
+  * Live QA evidence must be checked in under QA\_ROOT as governed artifacts and must be linkable via the token/evidence matrix rules in §9.7.2.
+
+* **Acceptance.**
+
+  * `QA_LIVE_QA_RUN_OK` is satisfied only when:
+
+    * at least one run directory exists under `audit/qa/<epic-id>/<run-id>/` containing the expected QA\_ROOT outputs described by the Live QA plan (for example, per-run logs and any required run manifests and viability updates as owned by Glow QA Guide and Mechanics), and
+
+    * the plan’s step-level Deliverables lists (see §9.8) cover the Live QA run outputs with fully-qualified paths, and
+
+    * the epic’s token/evidence matrix row for this token enumerates the CI jobs/tests, QA steps, QA\_ROOT artifacts, and Evidence Index/mirror entries that prove the token under closed rails.
+
+* Ownership: Governance (closeout gate semantics); **Glow QA Guide** (Live QA plan format and harness usage); **HDE-Mechanics Guide** (QA harness and QA\_ROOT mechanics); **HDE-Build Checklist** (phase tasks); **HDE-Schemas & Artifacts** (evidence families and indexing); **HDE-Phased Epics** (epic record requirement).
+
+---
+
+* **QA\_HARNESS\_ENTRYPOINT\_SELFTEST\_OK** — Any harness entrypoint command documented in a Live QA plan must have a corresponding CI test that proves the entrypoint actually produces the expected QA\_ROOT outputs under the canonical env pins.
+
+   **Scope.**
+
+  * Epic-level token. Required whenever an epic is subject to Live QA via harness (see `QA_LIVE_QA_RUN_OK`).
+
+* **Governance semantics.**
+
+  * For the harness entrypoint command documented in the epic’s Live QA plan, the repo must include a CI test that:
+
+    * runs the entrypoint (or an equivalent invocation) under the canonical env pins, and
+
+    * asserts that the expected QA\_ROOT outputs are created and non-empty, and
+
+    * fails closed if harness behavior regresses (no “exit 0 but produced nothing” posture).
+
+* **Acceptance.**
+
+  * `QA_HARNESS_ENTRYPOINT_SELFTEST_OK` is satisfied only when:
+
+    * the epic’s token/evidence matrix row lists the concrete CI test(s) and CI job(s) that exercise the documented harness entrypoint under closed rails, and
+
+    * those tests are wired and evidenced as governed artifacts per §9.7.2 (tests, CI jobs, evidence paths, Index/mirror linkage).
+
+* Ownership: Governance (gate semantics); **Glow QA Guide** (entrypoint naming and Live QA patterns); **HDE-Mechanics Guide** (harness mechanics); **HDE-Build Checklist** (CI/QA enforcement tasks); **HDE-Schemas & Artifacts** (evidence indexing).
+
+---
+
+* **QA\_BOOTSTRAP\_OK** — A closed-rails QA tooling bootstrap run for the epic has completed successfully and established that the **QA tooling is ready** (pytest/CLI/tooling) before deeper QA or Live QA steps proceed.
+
+   **Scope.**
+
+  * Epic-level token: claimed at epic close or when an epic’s QA plan is declared viable, not per PR.
+
+  * Applies to the epic’s canonical **QA\_ROOT** discipline (`audit/qa/<epic-id>/…`), not to ad-hoc local runs.
+
+* **Governance semantics.**
+
+  * A canonical QA bootstrap harness exists for the epic (for example, `tools/qa/epic021_qa.py` as documented in Build Notes) and is wired under **closed rails** (`SAFE_MODE=1`, `ALLOW_NETWORK=0`, `LC_ALL=C`, `LANG=C`, `TZ=UTC`) using the same determinism env-pins discipline as `DETERMINISM_ENV_PINS_OK`.
+
+  * The harness runs a **bootstrap suite** (at minimum, pytest collection and a sample test over the epic’s QA scaffolding) and writes a per-run bootstrap log under `audit/qa/<epic-id>/<run-id>/D0_bootstrap.log` plus an epic-level canonical bootstrap log (for example, `audit/qa/<epic-id>/test_tooling_bootstrap.log`) that summarizes the latest successful run.
+
+  * Bootstrap logs are PF19-style: they carry a `run:` header, an `env:` line describing the closed-rails env, one or more `check …` lines, and a final `summary:PASS` line for a successful run. Exact header and field requirements live in **Glow QA Guide**; PF04 requires that they exist and that they are stable, records-only, and LF-terminated.
+
+* **Acceptance.**
+
+  * `QA_BOOTSTRAP_OK` is **satisfied** only when:
+
+    * the closed-rails bootstrap harness has been run for the epic and produced a successful run (summary `PASS`),
+
+    * the canonical epic-level bootstrap log exists under `audit/qa/<epic-id>/…` and is non-empty, and
+
+    * Evidence Index and machine-mirror entries (PF12 single home) link the bootstrap log(s) and harness run to this token by name, using the token/evidence matrix rules in §9.7.2 (token row, artifacts, CI jobs/tests, QA\_ROOT logs, and proof\_anchor).
+
+* Ownership: Governance (bootstrap semantics); **Glow QA Guide** (bootstrap harness procedure & log schema); **HDE-Build Checklist** (phase tasks); **HDE-Schemas & Artifacts** (artifact families, Index/mirror mapping).
+
+---
+
+* **QA\_BOOTSTRAP\_TOOLING\_FAIL** — The QA bootstrap harness can distinguish **tooling failures** from **behavioral failures** and classifies bootstrap step results accordingly, so that blocked QA due to broken tools is visible as tooling debt rather than silently conflated with engine behavior.
+
+   **Scope.**
+
+  * Epic-level structural token: it does **not** assert that a particular run passed or failed, only that the harness and log format support distinct `FAIL_TOOLING` vs `FAIL_BEHAVIOR` classifications and that evidence of such classifications exists.
+
+* **Governance semantics.**
+
+  * The QA bootstrap harness uses a PF19-defined status classification (for example, `OK` / `FAIL` / `FAIL_TOOLING` in a `status` field per check) and emits those statuses into bootstrap logs under QA\_ROOT.
+
+  * When the harness encounters a tooling-level failure (for example, pytest import error, missing dependency, or infrastructure misconfiguration), the corresponding log entries mark the step as tooling failure (e.g. `summary:FAIL_TOOLING` or equivalent PF19 encoding), and this is reflected in the epic’s token/evidence matrix and acceptance map notes rather than being treated as a behavior failure of the engine.
+
+* **Acceptance.**
+
+  * `QA_BOOTSTRAP_TOOLING_FAIL` is **satisfied** when:
+
+    * the bootstrap harness and QA\_ROOT logs demonstrate distinct tooling vs behavior classifications in at least one controlled failure case (for example, a deliberate broken test in a harness run, as described in Build Notes), and
+
+    * the epic’s token/evidence matrix row for this token enumerates the bootstrap evidence artifacts, CI job(s), and QA\_ROOT logs that show the classification semantics in action, even if the **current** epic run is green.
+
+* Ownership: Governance (classification semantics at policy level); **Glow QA Guide** (exact statuses and log fields); **HDE-Build Checklist** (tasks that exercise FAIL\_TOOLING path); **PF10 — Glow HD Engine Build Notes** (per-epic harness implementation details).
+
+---
+
+* **QA\_HARNESS\_DISCIPLINE\_OK** — The epic’s **QA\_ROOT harness discipline** is in place: QA\_ROOT layout, per-step logs, and QA step classifications follow the PF19 patterns and PF12/PF09 evidence routing, with no stray or ambiguous QA artifacts.
+
+   **Scope.**
+
+  * Epic-level token for the epic’s QA\_ROOT directory (for example, `audit/qa/hde-epic021/`); not per-branch.
+
+* **Governance semantics.**
+
+  * The epic has a canonical QA\_ROOT README (for example, `audit/qa/hde-epic021/README.md`) that:
+
+    * identifies the directory as the epic’s QA\_ROOT discipline home,
+
+    * lists the expected epic-level artifacts (at minimum: `token_evidence_matrix` artifact, tooling bootstrap log, and acceptance-map viability log), and
+
+    * clearly distinguishes QA\_ROOT paths from PF12-governed Evidence Index paths (`docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl`).
+
+  * QA step logs under QA\_ROOT follow PF19 header and classification rules: deterministic, timestamp-free records with PF19-style headers (run id, env, rails), per-step result lines, and a single `summary:` line per log; empty or partially written logs are treated as failures in PF19 semantics, not ignored.
+
+  * QA\_ROOT layout is **non-destructive**: new runs create subdirectories (for example, `audit/qa/<epic-id>/<run-id>/…`) with deterministic, timestamp-free run IDs; existing QA\_ROOT dirs from prior epics (e.g. EPIC020) remain intact.
+
+* **Acceptance.**
+
+  * `QA_HARNESS_DISCIPLINE_OK` is **satisfied** only when:
+
+    * QA\_ROOT README and directory structure exist and match the discipline described above,
+
+    * QA step logs for the epic (including bootstrap, sanity, and viability steps) are present, non-empty, and follow PF19 header/summary rules, and
+
+    * the epic’s token/evidence matrix includes rows for this token that identify the QA\_ROOT logs, CI jobs/tests, and any QA harness scripts responsible for maintaining this discipline.
+
+* Ownership: Governance (discipline semantics and token coupling to QA\_ROOT); **Glow QA Guide** (log shapes, header schemas, and QA patterns); **HDE-Build Checklist** (Calcination tasks HDE-CALC003.12–.15); **HDE-Schemas & Artifacts** (Index/mirror treatment of QA\_ROOT-linked artifacts, where applicable).
+
+---
+
+* **QA\_ACCEPTANCE\_MAP\_VIABILITY\_OK** — The epic’s **acceptance map and QA plan are viable**: for the epic, there is a governed acceptance map, a token/evidence matrix, and a viability check that proves coverage and coherent failure-mode semantics for all tokens in scope.
+
+   **Scope.**
+
+  * Epic-level token for the epic’s acceptance artifacts (for example, `docs/acceptance_map_epic021.json` and its token/evidence matrix under `audit/qa/<epic-id>/token_evidence_matrix.*`).
+
+* **Governance semantics.**
+
+  * A **governed acceptance map** for the epic exists (for example, `docs/acceptance_map_epic021.json`) with:
+
+    * `epic_id` matching the epic id, and
+
+    * a `tokens` array whose `name` fields are PF04 §2.0 token names and whose `owner_pf` fields route to the proper PF homes.
+
+  * A **token/evidence matrix** artifact exists for the epic under the PF12-designated path (for EPIC021: `audit/qa/hde-epic021/token_evidence_matrix.md`), and satisfies the per-token fields required by §9.7.2 (PF owner, artifacts, CI jobs/tests, QA\_ROOT logs, status, notes).
+
+  * A viability check/harness (for example, `generate_acceptance_map_viability` as described in Build Notes) parses the matrix and acceptance map together and writes a viability log under QA\_ROOT (for example, `audit/qa/<epic-id>/acceptance_map_viability.log`) that:
+
+    * reports at least one classification line per token, and
+
+    * summarizes overall viability (for example, `summary:PASS` when all tokens in scope are wired and have evidence, or PF19-defined failure codes when gaps exist).
+
+* **Acceptance.**
+
+  * `QA_ACCEPTANCE_MAP_VIABILITY_OK` is **satisfied** only when:
+
+    * every token listed in the epic’s acceptance map appears as a row in the token/evidence matrix, and vice versa, with no “orphan” tokens,
+
+    * the matrix rows for the epic’s QA Acceptance Tokens have no `"e.g."`/`"TBD"` placeholders and enumerate tests, CI jobs, QA\_ROOT logs, and evidence artifacts, as required by §9.7.2, and
+
+    * the viability log for the epic under QA\_ROOT exists, is non-empty, and indicates that all tokens in scope are wired and evidenced (PF19 owns the detailed viability thresholds and failure patterns).
+
+* Ownership: Governance (viability semantics and coupling to tokens/acceptance maps); **Glow QA Guide** (viability harness behavior and log format); **HDE-Schemas & Artifacts** (artifact family and Index/mirror mapping for token/evidence matrix and viability logs); **HDE-Build Checklist** (Calcination and later-phase tasks that wire acceptance maps and matrix artifacts); **HDE-Phased Epics** (D-goals and epic-level acceptance maps referencing this token).
 
 ---
 
@@ -1261,7 +1471,7 @@ See **§2.0 Acceptance Tokens**: `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MI
 * Integration degree check. Gates **10/20/34/57** ⇒ degree 3; all other gates ⇒ degree 1\.  
 * Center-pair multiplicity. Unordered center-pair counts sum to **36**.
 
-### **4.3.8 Environment pins Required−NowRequired-NowRequired−Now**
+### **4.3.8 Environment pins \[Required−Now\]**
 
 Record **LC\_ALL=C, LANG=C, TZ=UTC** for all determinism, transport, and evidence jobs and **fail** CI if any pin is missing.
 
@@ -1653,7 +1863,7 @@ Carrier name, precise header casing, and where/when it is set are defined in **H
 * Storage locations and DB names: **Glow Infrastructure** (names-only).  
 * Transport and A7 policy: **HDE-Governance** (this document) and **HDE-CLI-API-Vendor-Ref** for endpoint bytes.
 
-### **7.4 Admin bundle audit logging (admin-only) Required−NowRequired-NowRequired−Now**
+### **7.4 Admin bundle audit logging (admin-only) \[Required−Now\]**
 
 **Principle (normative).**  
  Every **admin bundle** request (CLI or HTTP) that successfully returns a bundle **must** produce a single, bounded **audit log record** that is keys-only, numeric-free, and secret-free, consistent with §7.1 and §8.2. Audit logs are ops-only and are never exposed on public surfaces.
@@ -1771,7 +1981,7 @@ Math and scoring details are defined in **PF-Canon-HDE-Math-Spec**. The public e
 
 **Routing.** This section governs ops logging only. Public payload rules remain in §8.1. Transport specifics and vendor behaviors are referenced by title only in the **PF-Canon-HDE-CLI-API-Vendor-Ref**.
 
-## **8.3 Admin surfaces authentication & authorization Required−NowRequired-NowRequired−Now**
+## **8.3 Admin surfaces authentication & authorization \[Required−Now\]**
 
 **Principle (normative).**  
  Any surface that exposes the **full product payload** (admin bundle) is **admin-only** and **must be authentication- and authorization-gated**. An unauthenticated or unauthorized caller **MUST NOT** be able to obtain an admin bundle, regardless of network location or environment. Admin surfaces are not governed by the numeric-free public covenant in §8.1, but they remain subject to all logging and privacy rules in §7 and §8.
@@ -1958,121 +2168,186 @@ When any golden/evidence path changes, update **in the same PR**:
 A7 transport proofs **must** run on a **Catalog JSON success** route (not `/internal/version`). Pair the **composite A7 proof JSON** (PF12 schema) with:
 
 * **Catalog snapshot** (titles-only)  
-* **Headers-only env-gate** capture proving non-prod entries are
+* **Headers-only env-gate** capture proving non-prod entries are unreachable in prod.
 
-## **9.7 Token fidelity & plan approval rails Required−NowRequired-NowRequired−Now**
+## **9.7 Token fidelity & plan approval rails \[Required−Now\]**
 
 ### **9.7.1 Scope**
 
-These rails apply to any **implementation plan**, **QA plan**, or **epic record** that:
+These rails apply to any implementation plan, Epic Plan, QA plan, or epic record that introduces or consumes QA Acceptance Tokens (including tokens referenced in acceptance maps, manifests, tests, CI jobs, Live QA steps, or evidence artifacts).
 
-* introduces new QA Acceptance Tokens, or
+They bind reviewers at two distinct decision points:
 
-* consumes existing QA Acceptance Tokens in acceptance maps, manifests, CI jobs, Live QA steps, or evidence artifacts.
+* **Stage A — Plan Approval (ASK OK):** governs whether a plan is approved to begin implementation. At this stage, plans are execution indexes (pointers) and must not rebuild canonical token libraries, evidence schemas, or QA playbooks. Titles-only references are sufficient.
 
-They bind **reviewers** (including governance and QA) when deciding whether a plan is ready to mark **ASK OK** or to promote to Epic-level acceptance.
+* **Stage B — QA Ledger Completion (token fidelity \+ evidence wiring):** governs whether the epic is token-complete and ready for epic-level acceptance / close gates. At this stage, token naming, evidence wiring, indexing, and proofs must be complete and non-placeholder.
 
-### **9.7.2 Token/evidence matrix (required for approval)**
+Stage A plan approval MUST NOT be blocked on PF19/PF19-adjacent registry drainage work (Glow QA Guide token library updates), nor on post-implementation QA execution artifacts; those requirements are enforced at Stage B.
 
-Before any such plan, QA plan, or epic record is approved, reviewers **MUST** ensure there is a **token/evidence matrix** for every QA token in scope. The matrix may be an attached artifact or a clearly identified section, but it **must** contain, per token:
+*Important:* PF23 reality-audit scope is an independent axis from QA token strictness. Waiving or narrowing a PF23 audit does not relax token naming, acceptance mapping, evidence wiring, or other canon-backed rails.
 
-1. The **governance token name** as defined in PF04 §2.0.
+### **9.7.2 Token/evidence matrix (QA ledger; not embedded in the plan)**
 
-2. The corresponding **QA Acceptance Token entry** in **Glow QA Guide** (same name; no aliases).
+A token/evidence matrix is a per-epic QA ledger artifact used to demonstrate (and later audit) how each in-scope QA Acceptance Token is enforced and proven end-to-end.
 
-3. The **epic-level acceptance map name** or map entry where the token appears (must match the QA token name; no local synonyms).
+* The matrix is a standalone artifact and MUST NOT be embedded inside an Epic Plan. Plans may include a single pointer line to the matrix location, but MUST NOT duplicate the matrix content.
 
-4. The **tests** (unit or integration) that exercise the token’s behavior.
+* **Stage A (ASK OK):** Plan approval MUST NOT be blocked on the absence of an in-plan matrix. If a matrix is expected for this epic, the plan may include a placeholder pointer line (example: `Token/Evidence Matrix: audit/qa/<epic-id>/token_evidence_matrix.md`) indicating where it will be authored during implementation/QA/closeout.
 
-5. The **CI jobs** that enforce the token under closed rails.
+* **Stage B (QA Ledger Completion):** Before an epic is considered token-complete (and before any reviewer asserts epic-level acceptance for in-scope QA tokens), reviewers MUST verify that the matrix exists and is complete for all in-scope QA tokens. No token row may contain placeholder cells (“e.g.”, “TBD”, or implicit gaps).
 
-6. Any **Live QA steps** that demonstrate the token (if applicable).
+For each in-scope token row, the matrix MUST include, at minimum:
 
-7. The **evidence artifacts** and paths produced by those tests and steps.
+* governance token name as defined in PF04 §2.0 (verbatim),
 
-8. The matching **Evidence Index and machine mirror entries** (artifact\_key, epic identifier, token list, and proof\_anchor).
+* corresponding QA Acceptance Token entry in Glow QA Guide (same name; no aliases),
 
-Approval rules:
+* acceptance map name (must match; no local aliases),
 
-* No cell in this matrix may be marked `"e.g."`, `"TBD"`, `"example"`, or left implicit at approval time.
+* tests that exercise the token’s behavior (unit/integration),
 
-* If any cell for a token is missing or unresolved, the plan **MUST NOT** be marked approved for that token, and **ASK OK** for the plan or epic as a whole **MUST** be withheld until the matrix is complete.
+* CI jobs that enforce it under closed rails,
+
+* Live QA steps that demonstrate it (if applicable),
+
+* evidence artifacts (repo-relative paths) generated by those tests/steps, and
+
+* Evidence Index and Machine Mirror entries (artifact\_key, epic\_id, tokens, proof\_anchor), as required by the evidence schema.
+
+If any required cell is missing at Stage B, the epic is not token-complete and MUST NOT be closed as accepted.
 
 ### **9.7.3 Token naming and single-name usage**
 
-For QA Acceptance Tokens:
+Token names are governance artifacts. Plans and proofs MUST consume a single canonical spelling for each token, and MUST NOT mint local synonyms.
 
-* Any token used in an acceptance map, manifest, or epic record **MUST** be defined in the Glow QA Guide’s QA Acceptance Tokens library and **MUST** use the exact governance name from PF04 §2.0.
+* Any token used in an acceptance map, manifest, evidence artifact, or epic record MUST use the exact governance name from PF04 §2.0 (or, during drainage, the single chosen spelling from an applicable epic-specific approval/remediation guide; see §9.7.6).
 
-* Epic-level documents **MUST NOT** invent epic-local token names or synonyms for the same semantics. References must use the PF04/PF19 token name only.
+* Epic plans and epic records MUST NOT invent epic-local token names or synonyms for the same semantics.
 
-* When an epic needs a new QA token, the need **MUST** be recorded as a Doc-Delta against:
+* If an epic needs a new QA Acceptance Token, that need MUST be recorded as a Doc-Delta against PF04 §2.0 and the Glow QA Guide token library (and any other dependent single-homes), and treated as part of the epic’s scoped work. The token is not considered “live for acceptance” until the Doc-Delta lands and the corresponding registry/evidence wiring updates are completed (Stage B).
 
-  * PF04 §2.0 (to add the token to the governance roster), and
+### **9.7.4 Blocking status and downgrades (stage-aware; no silent relaxation)**
 
-  * Glow QA Guide (to add the token to the QA Acceptance Tokens library),
+Blocking posture is stage-specific:
 
-* and those Doc-Deltas **MUST** land before the epic is considered token-complete.
+**Stage A — Plan Approval (ASK OK) blockers include:**
 
-### **9.7.4 Blocking status and downgrades**
+* an in-scope acceptance roster containing placeholder token names (“e.g.”, “TBD”, or open questions like “which token name do we use?”),
 
-Once a reviewer has identified any of the following as a **blocking** issue for a plan or epic:
+* token naming/mapping disputes left unresolved in the plan (the plan MUST either choose a single token spelling for the epic via ADR, or defer the token),
 
-* open `"e.g."` or `"TBD"` token names,
+* in-scope token claims that cannot be plausibly proven without guessing (if evidence wiring cannot be sketched without invention, defer the token or reduce scope).
 
-* use of a QA token that is not defined in the Glow QA Guide’s QA Acceptance Tokens library,
+**Stage B — QA Ledger Completion blockers include:**
 
-* missing or incomplete token/evidence matrix entries, or
+* missing or incomplete token/evidence matrix for any in-scope token,
 
-* missing or inconsistent Evidence Index / mirror entries for a token’s artifacts,
+* any matrix cell left implicit or placeholder (“e.g.”, “TBD”),
 
-that blocker **MUST NOT** be downgraded to non-blocking unless:
+* tokens used in acceptance maps/manifests/evidence that are not registered in PF04 §2.0 (or whose registration Doc-Delta has not landed),
 
-1. the plan or QA document has been updated to resolve the issue (for example, token names made normative, matrix completed, evidence wired and indexed), or
+* missing required Evidence Index / Machine Mirror entries for in-scope token artifacts.
 
-2. PF-Canon has been explicitly updated (for example, PF04 and Glow QA Guide have been revised to add or change the token).
+Once a reviewer has identified a token naming, token scope, or token→evidence wiring issue as blocking at the relevant stage, that blocker MUST NOT be downgraded to “non-blocking” in a later review unless:
 
-Any downgrade **MUST** reference the specific change (plan diff, Doc-Delta, or PF doc change) that resolved the blocker. A change in reviewer interpretation alone is **not** sufficient.
+* the plan/ledger artifacts have been updated to resolve the issue, or
+
+* PF-Canon has been explicitly updated (e.g., PF04 updated to add/clarify the token).
+
+Any downgrade MUST reference the specific change (plan diff or PF doc change) that resolved the blocker; changes in reviewer interpretation or scope alone are not sufficient.
 
 ### **9.7.5 PF23 scope waivers (local, non-transitive)**
 
-If the Product Owner or governance decides to waive or narrow **Reality Audits** (PF23) for a particular plan or epic (for example, declaring PF23 audits out of scope for that workflow), reviewers **MUST**:
+If the Product Owner or governance chooses to waive or narrow a canon requirement for a particular plan (for example, deciding that PF23 audits are out of scope for a given implementation plan), reviewers MUST:
 
-* record that decision as a **local scope directive** in the plan or epic record, and
+* record that as a local scope directive (e.g., “PF23 audits are not part of this plan’s workflow”), and
 
-* explicitly state that other rails remain fully in force, including:
+* explicitly state that other rails (PF04/PF19 token governance, evidence rules, epic D-goals, build rails) remain fully in force.
 
-  * the QA token semantics and library in Glow QA Guide,
-
-  * the evidence and indexing rules in HDE-Schemas & Artifacts,
-
-  * the D-goals and token rosters in HDE-Phased Epics, and
-
-  * the CI and acceptance rails in HDE-Build Checklist.
-
-Such PF23 scope waivers **MUST NOT** be interpreted as permission to relax token naming, acceptance mapping, evidence wiring, or any other canon-backed rails.
+Such PF23 scope waivers MUST NOT be interpreted as permission to relax token naming, acceptance mapping, evidence wiring, or any other canon-backed rails.
 
 ### **9.7.6 Re-grounding before asserting “no canonical token name”**
 
-Before any reviewer asserts that “no canonical token name exists yet” for a QA behavior, they **MUST**:
+Before any reviewer asserts that “no canonical token name exists yet” for a QA behavior, they MUST:
 
-1. re-check the QA Acceptance Tokens library in **Glow QA Guide**, and
+1. re-check the QA Acceptance Tokens library in Glow QA Guide, and
 
 2. re-read any epic-specific approvals or remediation guides that apply to the epic or defect in question, especially where those documents already chose a token name and semantics for that behavior.
 
-If any such approval or remediation guide defines a token name and semantics for a behavior that is in scope for the current plan, that name is treated as **canonical for review purposes** until it is drained into PF04 and Glow QA Guide via Doc-Delta. Reviewers **must not** introduce competing or temporary names for the same behavior while that drainage is pending.
+If any such approval or remediation guide defines a token name and semantics for a behavior in scope for the current plan, that spelling is treated as the canonical spelling for this epic’s planning and review purposes. It MUST be used consistently across the plan and any acceptance maps/manifests/evidence authored under the plan, until the naming is drained into PF04 and Glow QA Guide via Doc-Delta.
 
-### **9.7.7 Plan approval gate (token fidelity resolved, not deferred)**
+### **9.7.7 Plan approval gate (anti-thrash; token scope disciplined)**
 
-For any plan, QA plan, or epic record that touches QA Acceptance Tokens:
+For Stage A (ASK OK) plan approval on any plan that touches QA Acceptance Tokens, reviewers MUST verify:
 
-* **Token names MUST be final**: either aligned to existing PF04 tokens and the Glow QA Guide library, or paired with active Doc-Deltas that will add them there.
+* **Plans are pointers.** The plan is an execution index. Reviewers MUST accept titles-only references to canonical docs and MUST NOT demand that the plan restate token libraries, evidence schemas, or QA playbooks.
 
-* The **token/evidence matrix MUST be complete** for all QA tokens in scope.
+* **Token scope is explicit.** Any token mentioned by name in the plan MUST be classified as one of:
 
-* Any recognized token gaps (missing entries in PF04 or Glow QA Guide, unclear semantics, or incomplete evidence wiring) **MUST** be captured as Doc-Deltas and treated as part of the epic’s scope, not as “future governance work” detached from the implementation.
+  * **In-scope (gating)** — appears in the acceptance roster for this epic.
 
-A plan that still contains open questions such as “which token name do we use here?” or that labels tokens as “examples only” **MUST** be treated as **not ready** and returned for revision. Reviewers **MUST NOT** mark such a plan approved or claim **ASK OK** for an epic until token fidelity is fully resolved.
+  * **Deferred** — explicitly out of scope for this epic; MUST NOT appear in the acceptance roster or token/evidence matrix for this epic. The plan MUST record the deferral with the token name, owning PF doc title, a brief reason, and (if known) the intended follow-on epic.
+
+  * **Informative reference** — named only as context; MUST NOT be treated as an acceptance claim.
+
+* **Token naming disputes do not stall planning.** If the only remaining disputes are token naming/mapping or doc-ownership semantics (not mechanics), reviewers MUST NOT block plan approval. The plan MUST capture the dispute as an ADR and choose a single token spelling for the epic’s documents (or explicitly defer the token).
+
+* **No matrix-in-plan requirement.** Plan approval MUST NOT be blocked on the absence of a token/evidence matrix at planning time, and the matrix MUST NOT be embedded inside the plan. If a matrix is expected, the plan may include a placeholder pointer line indicating where it will be authored during implementation/QA/closeout.
+
+* **QA planning is post-implementation.** Epic Plans MUST NOT include detailed QA phases/step-by-step execution beyond basic acceptance statements. Detailed QA steps (and their Deliverables) are authored after implementation under the QA rails.
+
+* **Token value and budget discipline.** Default: 0 new acceptance tokens. Target: ≤3 new in-scope tokens per epic, and only if necessary. Any request to exceed this MUST be justified via ADR and must satisfy the token admission rubric in §2.0.0.
+
+Stage B token fidelity (matrix completeness, evidence indexing, and registry drainage) is enforced before claiming token-complete / epic-level acceptance, per §9.7.2–§9.7.4.
+
+## **9.8 QA plans — step-level Deliverables (no screen-only acceptance) \[Required−Now\]**
+
+### **9.8.1 Scope**
+
+These rails apply to any document that defines **stepwise QA execution**, including:
+
+* QA Implementation Plans
+
+* Live QA Guides
+
+* QA addenda that include explicit step lists (including PF10 QA addenda)
+
+This section governs **approval posture** and **minimum evidence hygiene** for QA steps. Detailed QA playbooks, log schemas, and token libraries live in **Glow QA Guide** (titles-only).
+
+### **9.8.2 Rule — Deliverables are mandatory per step**
+
+For every QA step that appears in-scope (§9.8.1), the plan **MUST** include a **Deliverables** subsection that lists the minimal evidence set created or updated by that step.
+
+Requirements (binary):
+
+1. **Fully-qualified paths.** Every deliverable **MUST** be listed with a fully-qualified repo-relative path (for example: `audit/qa/hde-epic021/live-qa-1/D0_bootstrap.log`).
+
+2. **No vague phrases.** Phrases such as “everything in this folder,” “all logs from this run,” or “whatever the harness wrote” are forbidden in Deliverables sections.
+
+3. **Minimal evidence set.** The Deliverables list **MUST** be the minimal set required to judge PASS/FAIL for that step. Each deliverable **MUST** include a short, concrete description of what it contains.
+
+4. **No screen-only acceptance.** PASS/FAIL criteria for the step **MUST** be expressed solely in terms of:
+
+   * existence and non-emptiness of the Deliverables files, and
+
+   * simple, checkable conditions on their contents (for example: grep/diff predicates),  
+      not terminal output or “what you see in the console.”
+
+5. **Steps that create no new files.** If a step genuinely creates no new files, the Deliverables subsection **MUST** say so explicitly and must name the exact existing files it inspects.
+
+### **9.8.3 Review gate (blocking)**
+
+If a plan includes QA steps but omits step-level Deliverables, it is **non-conforming**; reviewers MUST NOT mark such a plan **ASK OK**.
+
+This rail is orthogonal to token fidelity (§9.7): a plan may have a complete token/evidence matrix artifact and still be non-conforming if step-level Deliverables are missing.
+
+### **9.8.4 Interaction with existing evidence rails (titles-only)**
+
+* For steps intended for external AI review, Deliverables lists must still respect any existing evidence batching constraints defined in the QA process and evidence policy (titles-only in **Glow QA Guide** and **HDE Epic-Process Guide**).
+
+* For HTTP-centric steps, any required derived review artifacts (for example, AI-readable summaries) must be explicitly listed in Deliverables alongside canonical local evidence.
+
+* Any environment or rails verification step (pins, refusal posture, gating proofs) **MUST** write its result to named files under `audit/qa/**` and those files must appear in the Deliverables list for the step.
 
 # 10\. Transport Governance (Reader) \[Required-Now\]
 
@@ -2132,8 +2407,6 @@ A plan that still contains open questions such as “which token name do we use 
 4. **No misuse.** 304 is **never** used for writers/errors; those responses are governed by `no-store` and **no `ETag`**.
 
 **Tokens:** see §2.0 **Reader A7** tokens.
-
-Got it — here’s your **§10.3 Writers and errors** cleaned up for clarity and consistency, without changing any substance.
 
 ---
 
@@ -2195,7 +2468,7 @@ Got it — here’s your **§10.3 Writers and errors** cleaned up for clarity an
 
 ---
 
-## **10.5 `/internal/version` ops surface (identity only; non-A7) Required−NowRequired-NowRequired−Now**
+## **10.5 `/internal/version` ops surface (identity only; non-A7) \[Required−Now\]**
 
 #### **Intent and scope**
 
@@ -2911,17 +3184,7 @@ Titles/paths only — no payload bytes. This runbook defines how to run the benc
 
 * **No schema drift.** Bench harness must not alter public bytes or schemas.  
 * **Keys-only logs.** Never log payloads or header values; secrets always redacted (see §7.1, §8.2).  
-* **Pointer discipline.** Promotions/rollbacks are pointer flips to `release_id`; record outcomes in the Change Log and update Appendix D.  
-  ---
-
-Absolutely—here’s a clean, merged, and *logically ordered* **Appendix D** that applies your deltas to the current version. I’ve:
-
-* Kept your existing intent and language style.  
-* Applied the delta structure (D.0 → D.11), with your prior content merged where appropriate.  
-* Removed duplicates (e.g., DB posture split across two places; refusal/A7 items repeated).  
-* Preserved extra evidence families you already had (Bands/Pack/Topology) by moving them after the new D.11, so nothing is lost.
-
-Paste this over your current Appendix D.
+* **Pointer discipline.** Promotions/rollbacks are pointer flips to `release_id`; record outcomes in the Change Log and update Appendix D.
 
 ---
 

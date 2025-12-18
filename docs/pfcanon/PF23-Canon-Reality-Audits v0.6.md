@@ -2,13 +2,13 @@
 
 **Title:** PF23-Canon-Reality-Audits
 
-**Version:** v0.4
+**Version:** v0.6
 
 **Status:** Canon
 
-**Effective date:** 2025-12-07
+**Effective date:** 2025-12-11
 
-**Last Update Gate:** HDE-EPIC020
+**Last Update Gate:** HDE-EPIC021-2
 
 ---
 
@@ -341,231 +341,170 @@ Within each section, prefer **bullet lists** and **short paragraphs**. Avoid spe
 
 ## 1.2 \- Current Audit 
 
-**Date: 2025-12-07**
+**Date: 2025-12-11**
 
-**Last Epic: HDE-020**
+**Last Epic: HDE-021**
 
 **Repo map**
 
-* `engine/` — Present. Core Python package with compatibility math, sampler, presenter/emitter, runtime helpers, BodyGraph ingest/resolver, CLI, serializer, and supporting modules.
+* **`engine/`** — Present. Core computation (compatibility logic, sampler/core, runtime helpers), presenter/emitter, serializer, CLI, HTTP helpers, DB access, narratives, and validation utilities are under this package.
 
-* `adapter/` — Present. Flask HTTP layer with reader/aux/admin/writer/dev sampler routes plus app factory and compat blueprint registration.
+* **`adapter/`** — Present. Flask application wiring, reader/aux/sampler/internal routes, compat blueprint registration, environment guards, and logging filters live here.
 
-* `presenter/` — Present (separate top-level package) housing Reader v1 emitter and JSON compare helper.
+* **`presenter/`** — Present at repository root for legacy utilities (e.g., `reader_v1` emitter), with the canonical emitter living in `engine/presenter`.
 
-* `engine/presenter/` — Present (inside `engine`) providing the canonical JSON emitter for public envelopes.
+* **`cli/`** — Present as `engine/cli` package; contains `hdctl` CLI entrypoints and subcommands.
 
-* **CLI package** — Present under `engine/cli` with argparse-based `hdctl` commands.
+* **`docs/`** — Present with PF-canon references, acceptance maps, and evidence indexes (e.g., `docs/evidence/INDEX.json`).
 
-* `docs/` — Present with evidence index/checksums and runtime endpoint data.
+* **`artifacts/`** — Present. Houses governed artifacts, evidence index JSONL, QA proofs, and bundle assets.
 
-* `artifacts/` — Present with evidence index mirror and core artifact families (`abba` / `json_compare` / `purity` / `two_run`).
+* **`scripts/`** — Present for helper scripts (not inspected in depth).
 
-* `scripts/` — Present with helper scripts (listed at top level).
+* **`audit/qa/`** — `audit/` directory present (QA subfolders exist but not reviewed here).
 
-* `audit/` — Present with audit materials (and nested `AGENTS`).
+**Expected directories (observed):**
 
-* Other top-level roots (`adapter` HTTP schemas, `ci/`, `tests/`, `tools/`, `fixtures/`, etc.) are present, reflecting QA and support assets.
+* `engine/` (Present)
+
+* `adapter/` (Present)
+
+* `presenter/` (Present at root and under `engine/`)
+
+* CLI package (Present under `engine/cli`)
+
+* `docs/` (Present)
+
+* `artifacts/` (Present)
+
+* `scripts/` (Present)
+
+* `audit/qa/` (Present under `audit/`)
 
 ---
 
 ## **Engine modules**
 
-**Sampler (`engine/sampler/core.py`).**  
- Defines data classes (`ViewerProfile`, `CandidateFeatures`, `SamplerConfig`) and deterministic pool/ranking helpers (`build_candidate_pool`, `rank_candidates`, `sample_and_rank`) that filter zero-weight/ineligible candidates and sort by weight, compat score, band priority, and ID tie-breakers.
+* **Sampler**  
+   `engine/sampler/core.py` defines dataclasses for viewer/candidate inputs, configuration, pool building, deterministic ranking, and a `sample_and_rank` helper combining pool formation and ranking.
 
-**Engine Core (`engine/core/core.py`).**  
- Provides pure-compute metrics via `compute_core`, with participant state structures, AB/BA-neutral ordering, band priority handling, shared trait canonicalization, and perspective breakdown.
+* **Core**  
+   `engine/core/core.py` offers pure-compute compatibility metrics with `ParticipantState` / `CoreConfig`, parity-preserving ordering, shared trait extraction, and `compute_core` for deterministic results.
 
 ---
 
 ## **Adapter / HTTP surfaces**
 
-**Reader dev harness (`adapter/http_reader.py`).**
+* **App factory & health endpoints**  
+   `adapter/wsgi.py` creates the Flask app, installs logging/env guards, registers reader and compat blueprints, and exposes `/internal/healthz` and `/internal/readyz` along with `404/405` handlers applying common headers.
 
-* Blueprint exposes `GET/HEAD /reader` (dev-gated) returning canonical Reader bytes from `emit_reader_public_bytes`, including ETag handling.
+* **Reader blueprint**  
+   `adapter/http_reader.py`’s `get_reader_bp` builds a blueprint exposing `GET/HEAD /reader` (dev-gated file-based harness) that loads charts, calls `emit_reader_public_bytes`, and handles ETag/HEAD semantics.
 
-**Aux narrative.**
+* **Aux \+ ops \+ sampler routes**  
+   The same blueprint includes:
 
-* Same blueprint handles `GET /api/aux/narrative` and `/aux/narrative`, emitting `text/plain` narratives or suppressed responses with provenance headers.
+  * `/api/aux/narrative` (text aux output), and
 
-**Rails/admin probes.**
+  * ops probes (`/ops/rails/refusal`, `/ops/probe/env`) plus `/internal/dev/sampler` (dev-only sampler harness using `sampler.core`).
 
-* `/ops/rails/refusal` and `/ops/probe/env` return writer-style envelopes or environment snapshots, gating via `NoIoGuard` and environment state.
-
-**Dev sampler harness.**
-
-* `POST /internal/dev/sampler` (`APP_ENV` dev/test/local) validates payload, builds sampler inputs, calls `sample_and_rank`, and returns ranked candidate IDs in JSON.
-
-**Internal version.**
-
-* `/internal/version` `GET/HEAD` emits engine identity JSON without ETag.
-
-**Diagnostic writer.**
-
-* `/ops/writer/diagnostic` `POST/HEAD/OPTIONS` provides admin-idempotent writer surface with JSON envelope and cache/length rules.
-
-**Compat routes (`engine/http/compat_handler.py`).**
-
-* Registers `compat_blueprint` at `/api/compat/v1`, offering `GET` ids-only and `POST` JSON compatibility responses with writer-style transport guards and `HEAD/OPTIONS` handling.
-
-**App factory.**
-
-* `create_app()` in `adapter/http_reader.py` mounts reader/internal/admin routes and compat blueprint, plus scoped `404/405` handlers.
+* **Compat blueprint**  
+   `engine/http/compat_handler.py` defines `compat_blueprint` at `/api/compat/v1` with `GET/POST` routes producing `compat_public` outputs and writer-style transport responses (HEAD/OPTIONS handling).
 
 ---
 
 ## **Presenter / emitter**
 
-**Canonical emitter (`engine/presenter/emitter.py`).**
+* **Canonical emitter**  
+   `engine/presenter/emitter.py` emits canonical JSON bytes using `serializer.canon` with optional envelope helpers; used across HTTP and CLI surfaces.
 
-* Serializes public envelopes via canonical serializer, optionally returning envelope along with bytes.
+* **Reader emitter**  
+   `presenter/reader_v1/emitter.py` builds Reader v1 envelopes, enforces category uniqueness, adds `idempotence_hash`, and returns canonical bytes; `engine/runtime/public` delegates here.
 
-* Used across HTTP, CLI, and vendor ingest paths.
-
-**Reader-specific emitter (`presenter/reader_v1/emitter.py`).**
-
-* Builds Reader preimage, computes idempotence hash, and emits canonical bytes, invoked by runtime public helper.
-
-**Shared usage.**
-
-* HTTP Reader route uses `emit_reader_public_bytes` → Reader emitter.
-
-* CLI `showcompat` writes compat JSON via `engine.presenter.emitter.emit_public` and Reader envelope via runtime helper.
-
-* Vendor ingest uses `emit_public_with_envelope` for payloads and DB parity.
+* **Shared emitter usage**  
+   HTTP adapters and CLI both call the shared emitter stack via `engine/runtime/public` or directly through `engine/presenter/emitter` for compat outputs.
 
 ---
 
 ## **CLI surfaces**
 
-**Entry script (`engine/cli/main.py`, `hdctl`).**
+* **Entry point**  
+   `hdctl` (`engine/cli/main.py`) defines subcommands:
 
-Defines subcommands:
+  * `showcompat` (computes `compat_public` and Reader envelopes, optional dumps)
 
-* `showcompat`
+  * `aux-preview` (narrative preview)
 
-  * Loads payloads from files/DB/vendor, computes compat via `compat_public`, emits Reader envelope via `emit_reader_public_envelope`, optionally dumps admin artifacts, and writes compat JSON to stdout.
+  * `bg:resolve` (BodyGraph resolution)
 
-* `aux-preview`
+  * `dev:sampler` (deterministic sampler harness)
 
-  * Previews narrative text for compat outputs using `emit_public_aux` (definition not shown but imported).
+* **Command chain**
 
-* `bg:resolve`
+  * `showcompat` loads inputs (files/DB/vendor), normalizes parties, computes `compat_public`, emits Reader bytes via `emit_reader_public_envelope`, writes admin dumps if requested, and outputs compat bytes to stdout.
 
-  * Resolves BodyGraphs through resolver or vendor ingestion (with dry-run support).
-
-* `dev:sampler`
-
-  * Dev/admin-only harness that loads candidate payloads, normalizes categories, runs `sample_and_rank`, and emits JSON via presenter emitter.
-
-**Dispatcher.**
-
-* `engine/cli/__main__.py` dispatches to `main` (present but not detailed).
-
-* Entry advertised via pyproject console script (per instructions in `AGENTS`, not re-opened here).
+  * `dev:sampler` reuses `sampler.core` via `CandidateFeatures` / `ViewerProfile` normalization for CLI parity with the internal sampler route.
 
 ---
 
 ## **Vendor seam & BodyGraph storage**
 
-**Vendor client (`engine/bodygraph/vendor_client.py`).**
+* **Vendor HTTP client**  
+   `engine/bodygraph/vendor_client.py` implements `HdApiClient` with HTTPS validation, request construction from birth tuple, retries/timeouts, and typed `VendorError` mapping for external vendor calls.
 
-* Constructs HTTPS requests, validates inputs, and performs retries/timeouts for HD API calls (dataclasses `VendorRequest` / `Result` / `RetryConfig` / `Timeouts`) — invoked by ingest.
-
-**Ingest path (`engine/bodygraph/ingest.py`).**
-
-* Gathers inputs, checks SAFE/ALLOW rails, builds request via `HdApiClient.from_env`, fetches vendor payload, computes idempotency keys, optionally writes to DB via `DBAccess` with row counts and parity checks, and logs success/canon-compare records.
-
-**Storage.**
-
-* `_persist_bodygraph` / `_fetch_payload` (not shown in snippet) operate through `DBAccess`.
-
-* Parity between vendor bytes and DB-emitted bytes is verified before returning `IngestOutcome`.
-
-**Resolver/CLI.**
-
-* `showcompat` uses `ingest_vendor_bodygraph(..., dry_run=True)` when `--source=vendor`, passing payloads to compat/presenter without DB writes.
+* **BodyGraph source selection**  
+   `engine/cli/main.py`’s `showcompat` sources BodyGraphs from DB (`resolve_db_user_id` / `DBAccess`) or vendor via `ingest_vendor_bodygraph` depending on CLI flags, keeping vendor logic outside engine core.
 
 ---
 
 ## **Evidence & catalogs**
 
-**Evidence index.**
+* `docs/evidence/INDEX.json`, `INDEX.sha256`, and path proofs present; they mirror governed evidence entries.
 
-* `docs/evidence/INDEX.json` and checksum/path proofs exist; mirror index at `artifacts/evidence_index.jsonl`.
+* `artifacts/evidence_index.jsonl` with path proof exists, listing epic artifacts and bundles (e.g., EPIC020 CLI and identity bundles).
 
-**Core artifacts.**
-
-* `artifacts/core/abba/ab_ba_parity.json`,
-
-* `artifacts/core/json_compare/`,
-
-* `artifacts/core/purity/`,
-
-* `artifacts/core/two_run/` directories are present as parity/purity/two-run evidence families (names imply scope).
-
-**Endpoint catalog.**
-
-* `docs/run/PROD_ENDPOINTS.json` lists production base URL/provider with path proof sidecar.
+* No `docs/ENDPOINTS_CATALOG.json` observed (`grep` returned none).
 
 ---
 
 ## **Flows & call chains**
 
-**Reader success (dev harness).**
+* **Reader success (dev harness)**  
+   HTTP `GET /reader` (`adapter/http_reader.py:reader_v1`)  
+   → `engine/runtime/public.emit_reader_public_bytes` computes band via `ts_v0` and builds enriched envelope  
+   → `presenter/reader_v1/emitter.emit_reader_v1` adds `idempotence_hash` using `engine/presenter/emitter` for canonical bytes  
+   → Flask response with ETag.
 
-* HTTP `GET /reader` in `adapter/http_reader.py`  
-   → validates query/`APP_ENV`  
-   → loads charts  
-   → calls `emit_reader_public_bytes` from `engine.runtime.public`  
-   → computes band via `ts_v0`  
-   → delegates to `presenter.reader_v1.emit_reader_v1`  
-   → canonical emitter  
-   → response with ETag/headers.
+* **CLI compatibility flow**  
+   `hdctl showcompat`  
+   → loads parties (files/DB/vendor)  
+   → `compat_public` computation  
+   → `emit_reader_public_envelope` for Reader bytes  
+   → `emitter.emit_public` writes compat payload to stdout; optional dumps via helper functions.
 
-**CLI compatibility (`hdctl showcompat`).**
-
-* `engine/cli/main.py:showcompat`  
-   → loads inputs (files/DB/vendor)  
-   → canonicalizes pair  
-   → computes compat via `compat_public`  
-   → emits compat JSON via canonical emitter  
-   → generates Reader bytes via `emit_reader_public_envelope` (runtime → Reader emitter)  
-   → writes outputs/dumps.
-
-**Vendor ingest/acquisition.**
-
-* CLI `showcompat --source=vendor`  
-   → `_vendor_inputs_from_args`  
-   → `ingest_vendor_bodygraph` (rails checks, `HdApiClient.build_request`/fetch, payload emission/idempotency)  
-   → returns payload to CLI  
-   → CLI converts to person/chart and feeds compat/runtime emitters.
-
-**Dev sampler HTTP harness.**
-
-* `POST /internal/dev/sampler`  
-   → validates viewer/candidate IDs  
+* **Internal sampler dev flow**  
+   `POST /internal/dev/sampler` (`adapter/http_reader.py`)  
+   → payload validation/gating  
    → constructs `ViewerProfile` / `CandidateFeatures`  
-   → calls `sample_and_rank` (sampler core)  
-   → emits ranked IDs with canonical emitter.
+   → calls `sampler.core.sample_and_rank` for deterministic ordering  
+   → emits JSON via `emit_public`.
+
+* **Vendor acquisition (CLI path)**  
+   `showcompat` with vendor source builds `VendorInputs` and calls `ingest_vendor_bodygraph` (uses `vendor_client`), then maps outcomes into person/chart normalization before compat/Reader emission; DB alternative uses `resolve_db_user_id` and `DBAccess` to fetch stored BodyGraphs.
 
 ---
 
 ## **Reality vs Expectations (drift summary)**
 
-* `engine/` present and pure-compute sampler/core align with expectations (no I/O, deterministic ordering).
+* **Engine/adapter/presenter split** — Aligned; deterministic sampler/core modules are pure compute, adapters host HTTP, and emitters centralize serialization.
 
-* `adapter/` HTTP layer present with reader/aux/admin/dev/writer endpoints plus compat blueprint; aligns with adapter role, though writer/admin/dev surfaces are co-located in the same module.
+* **Single canonical emitter** — Aligned; `engine/presenter/emitter` underpins `reader_v1` emitter, HTTP responses, and CLI outputs.
 
-* `presenter/` emitter split exists, with canonical emitter shared across HTTP/CLI/ingest; additional reader-specific emitter under `presenter/reader_v1` maintains a shared path — aligned.
+* **Vendor seam outside engine core** — Aligned; `vendor_client` and `ingest` are separate from sampler/core, invoked by CLI paths before compat/Reader computation.
 
-* CLI surface is present; it uses engine runtime/presenter and vendor ingest/DB access directly, consistent with expected `hdctl` behaviour.
+* **Evidence layout** — Present but complex; evidence index lives under `docs/evidence` and `artifacts/evidence_index.jsonl` with path proofs; endpoint catalog not found (partial alignment).
 
-* Vendor seam lives outside engine core via ingest \+ `HdApiClient` with DB persistence; relies on environment rails for network, which matches separation expectations.
+* **HTTP surfaces** — Adapter includes Reader, compat, aux, ops, and sampler dev endpoints; Reader is dev-gated and uses runtime emitter; compat blueprint uses writer transport style (aligned with adapter expectation).
 
-* Evidence structure present (`INDEX` and `artifacts/core`) with mirrors/checksums; endpoint catalog exists but under `docs/run` rather than a top-level catalog filename — partial alignment.
+* **Engine purity** — Core and sampler avoid I/O/time randomness (aligned); adapter handles I/O/DB/vendor guards. No notable red flags observed in reviewed files.
 
-* Architecture expectations are largely met; minor drift: Reader dev harness only (`APP_ENV` dev), admin/writer endpoints co-located with Reader blueprint, and vendor ingest includes DB writes within ingest module rather than a separate adapter layer.
-
-   

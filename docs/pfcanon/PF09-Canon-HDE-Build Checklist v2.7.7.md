@@ -4,26 +4,29 @@
 
 **Title:** PF09-Canon-HDE-Build Checklist
 
-**Version:** v2.6.7
+**Version:** v2.7.7
 
 **Status:** Canon
 
-**Effective date:** 2025-12-08
+**Effective date:** 2025-12-17
 
-**Last Update Gate:** HDE-EPIC020 Dev Retro 
+**Last Update Gate:** HDE-EPIC021 Close
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
-## 0.1 Scope
+## **0.1 Scope**
 
 Build-only, dependency-ordered checklist of HD Engine components and concrete implementation tasks required to reach a stable production run. This list excludes documentation and process chores and focuses on shipping code, wiring transport, enforcing determinism, and proving behavior with runnable evidence. Checklist items are organized by seven alchemical phases (Calcination, Dissolution, Separation, Conjunction, Fermentation, Distillation, Coagulation), and each task/subtask is tagged with a tracking ID of the form `HDE-<PHASE><NNN>` or `HDE-<PHASE><NNN>.<m>` (for example, `HDE-CALC001`, `HDE-CALC001.1`). These IDs are for traceability only and do not imply priority or status.
 
-This document MUST include “jobs to be done”, including;
+This document MUST include “jobs to be done”, including:
 
-\- Development  
-\- Design  
-\- Implementation  
-\- Operations
+* Development
+
+* Design
+
+* Implementation
+
+* Operations
 
 ## **0.2 Conventions**
 
@@ -62,6 +65,20 @@ PF09 expresses this sequencing via tasks and subtasks; the underlying math, tran
 **QA acceptance tokens and ownership:**
 
 PF09 is a **consumer of token names only**. It does **not** define token semantics.
+
+PF09 uses **QA acceptance tokens** to bind build/CI evidence to specific acceptance commitments. These tokens are **not defined here**. They are owned by the canonical token library and its associated QA/spec owners.
+
+**Important rule:** this doc is a **consumer of token names only**. Token spelling, meaning, and acceptance constraints live in the token library and its owner PF docs (routing varies by token family).
+
+**Plan posture note (excerpt-aligned):** Epic plans are **execution indexes**, not single-source re-statements of canon. Do **not** reproduce canon checklists or re-embed governed QA ledger artifacts inside plans. In particular, the per-epic **token↔evidence matrix** is a governed QA ledger artifact and should be referenced by location/title rather than duplicated in plan documents. “Required evidence” rules must be expressed as **canonical checks/workflows** (CI gates, scripts, harness outputs), not as plan-time documentation burdens.
+
+Ownership routing (titles-only; do not duplicate definitions here):
+
+* Token spelling \+ registry posture: **HDE-QA Token Library**
+
+* Token semantics / constraints: token owner PF doc (e.g., Spec / QA Guide / Schemas & Artifacts)
+
+* Evidence index writer workflow \+ topology coupling: **HDE-Mechanics Guide** \+ **HDE-Build Checklist**
 
 Normative definitions and evidence mappings for QA acceptance tokens live in the **QA Acceptance Tokens Library** described in the Glow QA Guide (PF19), with individual tokens owned by Governance, Schemas & Artifacts, Mechanics, and Epics (PF04/PF12/PF14/PF20 and related PF-docs) as appropriate.
 
@@ -209,21 +226,55 @@ Impact on this checklist:
 
 PF09 still treats Evidence Index and Machine Mirror as **consumer-only** surfaces: schema, bundle-vs-member policy, and detailed token semantics remain single-homed in HDE-Schemas & Artifacts and HDE-Governance by title.
 
----
-
 ## **0.4 A7 proof surface (titles-only pointers)**
 
 ### **0.4.1 Single home (location & scope)**
 
 **Catalog file.** `docs/ENDPOINTS_CATALOG.json` (canonical JSON; one LF) with `docs/ENDPOINTS_CATALOG.json.sha256`.
 
-**Scope.** List **JSON success routes only**, each with an env-gate; **exclude all `/internal/*`**.
+**Scope.** The Endpoints Catalog is the canonical, machine-readable inventory of **HTTP endpoints** that are reachable in any environment, including, at minimum:
 
-**Proof surface.** A7 proofs run **only** on a route listed in the Catalog.
+* `public_reader` (e.g. `/reader`)
+
+* `internal_admin` (internal/admin compat and admin-only surfaces, e.g. `/api/compat/v1`)
+
+* `internal_identity` (e.g. `/internal/version`)
+
+* `ops` (e.g. `/ops/health` or equivalent probes)
+
+* `dev_harness` (e.g. `/internal/dev/sampler`)
+
+**Classification is mandatory.** Implementations may colocate multiple endpoint classes in one Python module, but the Catalog MUST still carry **per-endpoint** classification so CI and QA can enforce distinct rails and posture per class.
+
+**Catalog entry minimum fields (titles-only; schema owned elsewhere).**  
+ Each entry in `docs/ENDPOINTS_CATALOG.json` MUST include, at minimum:
+
+* `path` — for example `/reader`, `/api/compat/v1`, `/internal/version`, `/ops/health`, `/internal/dev/sampler`
+
+* `method` — `GET`, `POST`, `HEAD` (or a list if the endpoint supports multiple methods)
+
+* `classification ∈ {public_reader, internal_admin, internal_identity, ops, dev_harness}`
+
+* `blueprint_module` — titles-only pointer to owning module (for example `adapter/http_reader.py`, `engine/http/compat_handler.py`)
+
+* `rails_profile` — short, names-only summary of rails and gating expectations (for example “requires APP\_ENV=dev”, “ops-only”, “A7 success posture”, “writer no-store posture”)
+
+* `a7_eligible` — boolean (true only for JSON success routes eligible for A7 proofs)
+
+* `env_gate` — for entries where reachability is env-gated (titles-only; exact gating semantics routed to Governance/Infrastructure)
+
+**A7-eligible subset (explicit flag).**  
+ A7 proofs apply only to endpoints explicitly marked as **A7-eligible JSON success routes** in this Catalog:
+
+* A7 proofs run **only** on entries where `a7_eligible == true`.
+
+* `/internal/*` endpoints are never A7-eligible; `/internal/version` is operator-only and MUST have `a7_eligible == false` (policy owned by Governance; referenced here by title only).
+
+**Proof surface.** A7 proofs run **only** on an A7-eligible route listed in the Catalog.
 
 ### **0.4.2 Env-gating proof (headers-only)**
 
-`artifacts/proofs/endpoints_env_gate_proof.log` shows that non-prod entries are unreachable in prod.
+`artifacts/proofs/endpoints_env_gate_proof.log` shows that non-prod and dev-harness entries are unreachable in prod (or otherwise blocked by the declared env gate for each entry).
 
 Index in Human \+ Machine evidence in the same PR.
 
@@ -279,17 +330,17 @@ Writers and error routes carry `Cache-Control: no-store`.
 
 `artifacts/proofs/success_writers_errors.txt`
 
-Capture on a Catalog route; index Human+Machine in the same PR. The machine mirror remains records-only canonical JSONL (unknown-key rejection; each record has a `proof_anchor`).
+Capture on an A7-eligible Catalog route; index Human+Machine in the same PR. The machine mirror remains records-only canonical JSONL (unknown-key rejection; each record has a `proof_anchor`).
 
 ### **0.4.5 Transport guidance — A7 rows & Catalog tie-in**
 
-A7 rows apply **only** to routes declared in `docs/ENDPOINTS_CATALOG.json`.
+A7 rows apply **only** to endpoints declared in `docs/ENDPOINTS_CATALOG.json` that have `a7_eligible == true`.
 
-`/internal/*` routes (including `/internal/version`) are never Catalog-eligible and are verified under ops posture: `Cache-Control: no-store`, no `ETag`, HEAD 200 parity, conditionals ignored.
+`/internal/*` routes (including `/internal/version`) may appear in the Endpoints Catalog for inventory and audit, but they are never A7-eligible and are verified under ops posture: `Cache-Control: no-store`, no `ETag`, HEAD 200 parity, conditionals ignored.
 
 When capturing A7 proofs:
 
-Always cite the Catalog entry used.
+Always cite the Catalog entry used (path, method, classification, `a7_eligible`, `blueprint_module`).
 
 Include the env-gate proof in the same PR.
 
@@ -570,11 +621,11 @@ Canonical JSON checks on registry artifacts (via shared canonical JSON evidence)
 
 ---
 
-## Task HDE-CALC002 — Canonical Serialization Package
+## **Task HDE-CALC002 — Canonical Serialization Package**
 
 **Task name/label:** Canonical Serialization Package
 
-**Task status:** **Partial**
+**Task status:** **Done**
 
 **Task ID:** HDE-CALC002
 
@@ -583,11 +634,19 @@ Canonical JSON checks on registry artifacts (via shared canonical JSON evidence)
 
 **Task notes:**
 
-Audit (v1 — 2025-11-17) identified missing tokens and gaps across multiple surfaces; EPIC017 PR01 (D1) centralized the canonical JSON serializer (`engine/stable/sercanon.py` \+ `engine/serializer/canon.sercanon`), routed Reader v1 and `hdctl showcompat` through the shared emitter path, and added the first AB↔BA/two-run/Reader↔CLI/parity and preimage-recompute harness for CLI compat under closed rails.
+EPIC017 established the canonical JSON serializer and the first closed-rails determinism/parity harness for `hdctl showcompat` (AB↔BA parity, two-run identity, Reader↔CLI parity, preimage recompute), plus canonical guard artifacts for serializer/emitter discipline.
 
-D1 evidence includes CLI showcompat harness artifacts (`artifacts/cli/ab.json`, `artifacts/cli/ba.json`, `artifacts/cli/summary.json`, `artifacts/cli/reader_dump.json`, `artifacts/cli/reader_cli_parity.bytes`, `artifacts/cli/preimage_recompute.log`) and serializer guard logs (`artifacts/cli/guards/serializer_grep_guard.log`, `artifacts/cli/guards/emitter_symbol_proof.txt`), indexed under the Evidence Index/Mirror discipline.
+EPIC021 (D1; Addendum 6\) completes the Calcination-owned serializer consolidation across the EPIC021 surface set by extending and proving the same canonical emission and guard discipline for:
 
-Task remains **Partial** until later slices (D2–D4) extend canonical serialization and determinism coverage to all required surfaces and tokens.
+* `bg:resolve` canonical JSON output and canonical error envelopes under pinned env rails.
+
+* Aux narratives CLI/Reader parity checks under pinned env rails (aux remains text on the public surface; parity is asserted across CLI and Reader).
+
+* Serializer guards that now cover Reader adapter code as well as CLI, preventing ad-hoc JSON serializers on governed surfaces.
+
+EPIC021 acceptance artifacts (token↔evidence matrix and acceptance map) now mark the D1 token family as implemented with explicit test and evidence wiring for: `CLI_READER_EMITTER_PARITY_OK`, `CLI_NO_ALT_JSON_OK`, `JSON_CANONICAL_CHECK_OK`, `ERROR_JSON_CANON_OK`, and `CLI_SERIALIZER_GUARD_OK`.
+
+This row is considered Done at the Calcination foundation level: canonical serializer, shared emitter discipline, and D1 canonical JSON/error proofs are present and exercised under closed rails for the EPIC021 surface set. Later-phase transport proofs (A7 success route proofs, prod transport parity, and non-Calcination identity work) remain governed elsewhere in this checklist.
 
 ### Subtask HDE-CALC002.1 — Shared presenter/emitter
 
@@ -596,7 +655,7 @@ Task remains **Partial** until later slices (D2–D4) extend canonical serializa
 **Subtask description:**  
  Ensure a single presenter/emitter entrypoint symbol is shared between Reader and CLI for public JSON emission.
 
-**Subtask status: Consolidation Pending** (harness and guards exist but not fully proven)
+**Subtask status: Consolidation pending** (harness and guards exist but not fully proven)
 
 **Epic or card:** EPIC-017 (D1)
 
@@ -622,7 +681,7 @@ Task remains **Partial** until later slices (D2–D4) extend canonical serializa
 **Subtask description:**  
  Enforce canonical JSON: UTF-8 (no BOM), ASCII-sorted keys, compact separators, exactly one trailing LF; arrays-as-sets deduped and ASCII-sorted.
 
-**Subtask status: Consolidation Pending**
+**Subtask status: Consolidation pending**
 
 **Epic or card:** EPIC-017 (D1)
 
@@ -650,7 +709,7 @@ Task remains **Partial** until later slices (D2–D4) extend canonical serializa
 **Subtask description:**  
  Deduplicate and ASCII-sort arrays that function as sets before hashing or comparison.
 
-**Subtask status: Consolidation Pending**
+**Subtask status: Consolidation pending**
 
 **Epic or card:** EPIC-017 (D1)
 
@@ -670,7 +729,7 @@ Shared canonical JSON compare logs (as above).
 **Subtask description:**  
  Run all dumps/compares under `LC_ALL=C`, `LANG=C`, `TZ=UTC`.
 
-**Subtask status: Consolidation Pending**
+**Subtask status: Consolidation pending**
 
 **Epic or card:** EPIC-017 (D1)
 
@@ -1154,16 +1213,16 @@ CI evidence (titles-only):
 **Notes:**  
  PF12 remains the single home for mirror schema; PF09 now reflects that mirror discipline is enforced and CI-gated via the EPIC017 D2 work.
 
-### Subtask HDE-CALC003.6 — Registry report (per-run)
+### **Subtask HDE-CALC003.6 — Registry report (per-run)**
 
 **Subtask name/label:** Registry report generation (names-only)
 
 **Subtask description:**  
  Produce `artifacts/registry/registry_report.json` (canonical JSON) on every run.
 
-**Subtask status:** **Unknown**
+**Subtask status:** **Done**
 
-**Epic or card:** **Unknown**
+**Epic or card:** **HDE-EPIC021 (D2 — evidence skeleton)**
 
 **Tokens:**
 
@@ -1173,10 +1232,26 @@ CI evidence (titles-only):
 
 **Evidence / artifacts:**
 
-`artifacts/registry/registry_report.json`
+`artifacts/registry/registry_report.json` — governed registry report (canonical JSON).
+
+`artifacts/registry/registry_report.json.path_proof.txt` — path proof transcript for the governed report.
+
+Index/Mirror entries (titles-only; governed by Evidence Index discipline):
+
+`docs/evidence/INDEX.json` includes `registry.registry_report` with expected discovered path and metadata.
+
+`artifacts/evidence_index.jsonl` has a corresponding Machine Mirror record (sha256/size/proof\_anchor) for the same artifact.
+
+Tests (titles-only; closed rails):
+
+`tests/config/test_registry_report.py`
+
+`tests/config/test_registry_report_determinism.py`
+
+`tests/config/test_registry_report_indexing.py`
 
 **Notes:**  
- High-level behavioral requirement; detailed schema is governed by PF12.
+ EPIC021 D2 makes `registry_report` a first-class governed artifact and proves canonical bytes, two-run identity, and Index/Mirror/path-proof coupling under closed rails as part of the evidence skeleton completion.
 
 ### **Subtask HDE-CALC003.7 — Locale pins (repo-wide)**
 
@@ -1197,72 +1272,38 @@ All lint/test/artifact jobs that produce or compare governed bytes SHOULD run un
 
 PF09 does not enumerate every job; it requires that the CI configuration and scripts make these pins explicit and keep them stable for determinism-sensitive work.
 
-**Determinism suites (EPIC017 D2 / EPIC018 D2).**
+**Determinism suites (Calcination evidence jobs).**
 
-Determinism-sensitive suites (evidence skeleton, orientation, invariance) MUST run under closed rails:
+Determinism-sensitive suites (evidence skeleton, orientation, invariance, registry\_report, sanity pipeline) MUST run under closed rails:
 
 `LC_ALL=C`, `LANG=C`, `TZ=UTC`
 
 `SAFE_MODE=1`, `ALLOW_NETWORK=0`
 
-The canonical implementation of these pins lives in:
+**Subtask status:** **Done**
 
-`engine/runtime/determinism_env.py` — defines `DETERMINISM_ENV_PINS` and helper functions (e.g., `ensure_determinism_env`, `render_env_log`, `record_env_log`).
-
-CI job env in `.github/workflows/ci.yml` for determinism jobs.
-
-`ci/checks/check_env_pins.sh` — asserts the determinism env pins and fails if they deviate.
-
-**Determinism env evidence.**
-
-Capture a governed determinism env log under:
-
-`audit/gates/determinism/env_pins.log` — single-line canonical JSON (UTF-8; sorted keys; compact; one LF) recording the determinism env pins and the suite set (e.g., `ci:determinism-rails`, `tests:invariance`, `tests:evidence-ordering`, `orientation:demo`).
-
-`audit/gates/determinism/env_pins.log.path_proof.txt` — path proof for the env pins log (path, size\_bytes, sha256, mtime\_utc, produced\_at\_utc).
-
-Index the env pins artifact under the Evidence Index discipline:
-
-Add an entry to `docs/evidence/INDEX.json` with `artifact_key` (for example `audit.determinism.env_pins`) and `discovered_physical_path: "audit/gates/determinism/env_pins.log"`.
-
-Ensure `artifacts/evidence_index.jsonl` contains a corresponding mirror record with matching `sha256`, `size_bytes`, `proof_anchor` pointing to `audit/gates/determinism/env_pins.log.path_proof.txt`, and canonical JSONL shape.
-
-**Subtask status:** **Partial**
-
-**Epic or card:** **EPIC-017 (D2); EPIC-018 (D2 determinism env rails)**
+**Epic or card:** **HDE-EPIC021 (D2 — evidence skeleton env-pin enforcement)**
 
 **Tokens:**
 
-`ENV_LC_ALL_C_OK`
+`DETERMINISM_ENV_PINS_OK` (token semantics live in Governance/QA canon; PF09 is consumer-only)
 
 **Evidence / artifacts:**
 
-CI workflow environment for determinism/evidence jobs (titles-only):
+Canonical implementation (titles-only):
 
-`.github/workflows/ci.yml` — sets `SAFE_MODE=1`, `ALLOW_NETWORK=0`, `LC_ALL=C`, `LANG=C`, `TZ=UTC` for determinism and evidence skeleton runs.
+`engine/runtime/determinism_env.py` — defines the pin set and helper functions (e.g., `ensure_determinism_env`, `render_env_log`, `record_env_log`).
 
-CI checks:
+`ci/checks/check_env_pins.sh` — asserts the determinism env pins and fails if they deviate.
 
-`ci/checks/check_env_pins.sh` — asserts determinism env pins and fails on mismatch.
+Evidence that determinism pins are enforced for evidence jobs:
 
-`python tools/evidence/update_evidence_index.py --check` — evidence skeleton checks under closed rails.
+`tools/evidence/update_evidence_index.py` validates closed-rails env pins at startup via `ensure_determinism_env` (SAFE\_MODE, ALLOW\_NETWORK, and locale pins), preventing evidence jobs from running under unpinned envs.
 
-`python tools/evidence/orientation_demo.py --check` — orientation/mirror coherence checks under closed rails.
-
-`python -m pytest tests/invariance/test_locale_tz.py tests/invariance/test_bytes_identity.py tests/invariance/test_determinism_env_helper.py` — invariance tests that import and exercise `DETERMINISM_ENV_PINS` and `ensure_determinism_env`.
-
-Determinism env evidence artifacts (titles/paths only):
-
-`audit/gates/determinism/env_pins.log`
-
-`audit/gates/determinism/env_pins.log.path_proof.txt`
-
-`docs/evidence/INDEX.json` / `docs/evidence/INDEX.sha256`
-
-`artifacts/evidence_index.jsonl`
+`tests/evidence/test_evidence_index_env.py` — enforces env-pin posture for evidence-index jobs under closed rails (green in EPIC021 PR5 runs).
 
 **Notes:**  
- EPIC017 D2 established the initial evidence skeleton pins for the Index/Mirror harness. EPIC018 PR02 (“Evidence Index Self-Proof Coherence — determinism env rails”) extends this by introducing the canonical determinism env helper and env pins log, pinning CI env and rails for determinism suites, and wiring `ci/checks/check_env_pins.sh` into the CI pipeline. This subtask remains **Partial** because extending these pins to **all** lint/test/artifact jobs (beyond the determinism/evidence suites) is still outstanding work and will be completed in future slices; PF09 records both the current determinism env discipline and the broader repo-wide intent.
+ EPIC021 D2 closes env-pin enforcement for evidence jobs by making the evidence-index updater fail closed unless the determinism env pins are satisfied. This provides a repo-level “pins are real” guarantee for governed evidence operations without relying solely on operator discipline.
 
 ### Subtask HDE-CALC003.8 — Topology orientation demo
 
@@ -1481,22 +1522,33 @@ If any of these checks fail, the QA tooling bootstrap harness MUST:
 
 Epic behavior tokens remain pending until tooling is repaired and tests or CLI commands run under a healthy environment and updated bootstrap log.
 
-**Subtask status:** **Not done**
+**Subtask status:** **Done**
 
-**Epic or card:** **Unknown** (future QA/bootstrap epic)
+**Epic or card:** **HDE-EPIC021 (D3 — QA bootstrap and viability logging)**
 
-**Tokens:** **Unknown** (tooling-bootstrap tokens will be defined in Governance/QA canon; PF09 is consumer-only)
+**Tokens:**
+
+`QA_BOOTSTRAP_OK`  
+ `QA_BOOTSTRAP_TOOLING_FAIL`
 
 **Evidence / artifacts:**
 
-* QA bootstrap scripts or helpers (titles-only) for each epic (for example `tools/qa/bootstrap_tooling.py` or `scripts/qa/bootstrap_tooling.sh`).
+Harness (titles-only):
 
-* `audit/qa/<epic>/test_tooling_bootstrap.log` — canonical text or JSON capturing venv/Python activation, `python -m pytest --version`, `command -v hdctl`, `command -v jq`, exit codes, and a `tooling_failure`\-style classification field.
+`tools/qa/epic021_qa.py` — closed-rails QA harness that performs bootstrap checks and writes both per-run and epic-level bootstrap logs.
 
-* Evidence Index/Mirror entries for bootstrap logs once governed (titles/paths only).
+Bootstrap evidence (QA\_ROOT):
+
+`audit/qa/hde-epic021/test_tooling_bootstrap.log` — canonical EPIC-level bootstrap pointer log.
+
+`audit/qa/hde-epic021/<run-id>/D0_bootstrap.log` — per-run bootstrap log with env pins and summary PASS/FAIL.
+
+Tests (titles-only; closed rails):
+
+`tests/qa/test_tooling_bootstrap.py` — exercises the EPIC021 QA harness bootstrap/log emission and validates log formats and rails posture.
 
 **Notes:**  
- Added from EPIC019 Live QA Addendum 11 and HDE-Mechanics Guide’s QA tooling bootstrap harness section. This subtask ensures that missing pytest/CLI tools block QA as a tooling issue with explicit, classified evidence instead of silently appearing as engine test failures, and that the bootstrap harness is a first-class component of the repository/tooling skeleton.
+ EPIC021 provides the first end-to-end implemented instance of the PF09 bootstrap discipline: a closed-rails harness writes canonical bootstrap evidence under QA\_ROOT and keeps it refreshed as part of the epic’s D3 close workflow. Token semantics are governance/QA-owned; PF09 uses the canonical bootstrap tokens by name only.
 
 ---
 
@@ -1555,10 +1607,22 @@ Epic behavior tokens remain pending until tooling is repaired and tests or CLI c
 
     * includes a header with at least `check_id`, `command`, `rails`, `pf_refs`, `tokens`, and `status`, and
 
-    * appends the full output of the tests and evidence checks for that step (for example pytest output, greps over INDEX/mirror/manifest) to the **same file**, not split across multiple primary logs.
+    * appends the full output of the tests and evidence checks for that step (for example pytest output, greps over INDEX/mirror/manifest) to the **same file**, not split across multiple primary logs.  
+    * The `rails` header MUST record, at minimum: `SAFE_MODE`, `ALLOW_NETWORK`, `LC_ALL`, `LANG`, `TZ`, and `APP_ENV` (keys-only; values as seen for that step).
 
   * Temporary/helper files for a step (for example request bodies or sorted candidate lists) MAY exist, but the per-step log at QA\_ROOT is the canonical evidence entry point; QA harnesses MUST NOT scatter primary step logs across ad-hoc subdirectories without a clear pointer from QA\_ROOT.
 
+* **Deliverables list per QA step (no screen-only acceptance).**  
+  * Every QA step described in a QA Implementation Plan, Live QA Guide, or QA addendum MUST include a **Deliverables** subsection that names the minimal evidence set required to judge PASS/FAIL for that step.  
+     
+
+  * Deliverables MUST be listed as fully qualified repo-relative paths (for example `audit/qa/<epic>/<run-id>/D0_bootstrap.log`, `audit/qa/<epic>/<run-id>/step_<name>.log`, `audit/qa/<epic>/qa_step_logs_manifest.json`). “Everything in this folder” and similar phrases are forbidden.  
+     
+
+  * PASS/FAIL criteria for the step MUST be expressed only in terms of: (1) existence and non-emptiness of these files, and (2) simple, checkable conditions on their content (grep/diff style), not terminal-only output.  
+     
+
+  * If a step creates no new files, the Deliverables subsection MUST state “No new files” and list the existing files it inspects (by fully qualified path).   
 * **Copy/paste-ready PO commands (no hand edits).**
 
   * All PO-facing QA commands MUST be concrete, copy/paste-ready (no `<PO: ...>` placeholders or “fill in this value” instructions).
@@ -1618,72 +1682,170 @@ Epic behavior tokens remain pending until tooling is repaired and tests or CLI c
 **Notes:**  
  Added from EPIC019 Live QA Addendum 11 and Addendum 14 and the HDE-Mechanics Guide “Live QA harness” section. This subtask generalizes sampler-specific lessons (bootstrap tooling, CANDIDATES\_FILE derivation, viewer-001, seeds 111/222, empty JSON outputs) into global QA harness requirements and now also requires that **each QA Plan step** have a single, consolidated step log under QA\_ROOT that carries the step header and all evidence for that step. The D4 sampler Step 5 run is a compliant example; the subtask remains **Not done** until this pattern is applied consistently across all epics and QA steps.
 
+### **Subtask HDE-CALC003.16 — QA harness entrypoint repair & CI self-test (EPIC021 baseline)**
+
+**Subtask name/label:** QA harness entrypoint repair & CI self-test
+
+**Subtask description:**  
+ Ensure the EPIC-level QA harness entrypoint behaves as a real, runnable command under closed rails and produces governed QA\_ROOT outputs.
+
+Under closed rails (`SAFE_MODE=1`, `ALLOW_NETWORK=0`, `LC_ALL=C`, `LANG=C`, `TZ=UTC`), `python tools/qa/epic021_qa.py` (with optional `EPIC021_QA_RUN_ID`) MUST:
+
+* determine a `run_id` (default policy or from `EPIC021_QA_RUN_ID`),
+
+* create `audit/qa/hde-epic021/<run-id>/`,
+
+* emit `D0_bootstrap.log` plus the canonical `step_*.log` sequence for the EPIC021 D3 QA steps,
+
+* append/update `audit/qa/hde-epic021/qa_step_logs_manifest.json` with a manifest entry for `<run-id>`,
+
+* append/update `audit/qa/hde-epic021/acceptance_map_viability.log` with a summary aligned to the EPIC021 acceptance map and token↔evidence matrix.
+
+Fail-closed behavior: if the entrypoint completes without creating the run directory, without producing non-empty `D0_bootstrap.log` and expected `step_*.log` files, or without updating the per-epic manifest and viability outputs, it MUST exit non-zero and record the reason as a tooling/harness failure.
+
+A CI test in the QA suite MUST exercise the entrypoint with a synthetic run\_id and assert:
+
+* the run directory exists and is non-empty,
+
+* `D0_bootstrap.log` exists and is non-empty,
+
+* all expected `step_*.log` files exist and are non-empty,
+
+* the manifest contains an entry for the synthetic run\_id,
+
+* the viability log is updated and non-empty.
+
+**Subtask status:** **Done**
+
+**Epic or card:** **HDE-EPIC021 (D3 — QA bootstrap and viability logging)**
+
+**Tokens:** **Unknown** (entrypoint self-test token family is governance/QA-owned; PF09 is consumer-only)
+
+**Evidence / artifacts:**
+
+Entrypoint implementation (titles-only):
+
+`tools/qa/epic021_qa.py` — script entrypoint; validates determinism env pins via `ensure_determinism_env` and exits non-zero on missing pins, without producing QA\_ROOT artifacts for the failing run id.
+
+Operator-observable QA\_ROOT artifacts:
+
+`audit/qa/hde-epic021/<run-id>/D0_bootstrap.log`  
+ `audit/qa/hde-epic021/<run-id>/step_*.log`  
+ `audit/qa/hde-epic021/qa_step_logs_manifest.json`  
+ `audit/qa/hde-epic021/acceptance_map_viability.log`
+
+Tests (titles-only; closed rails):
+
+`tests/qa/test_epic021_harness_entrypoint.py` — subprocess test: asserts exit 0 and QA\_ROOT artifacts on `selftest-run`, and asserts non-zero exit plus no run directory/manifest entry when `SAFE_MODE` is missing.
+
+`tests/qa/test_tooling_bootstrap.py` — includes run-id selection coverage (env override, git SHA fallback, local fallback).
+
+CI gate (titles-only):
+
+`.github/workflows/ci.yml` includes a closed-rails step that sets `EPIC021_QA_RUN_ID=ci-selftest-epic021` and runs `python -m pytest tests/qa/test_epic021_harness_entrypoint.py`, so CI fails if the harness stops producing the expected QA\_ROOT artifacts.
+
+**Notes:**  
+ Added from Live QA escalation; remediated by PR1 and wired into CI by PR3 so this behavior fails closed if it regresses.
+
+---
+
+### **Subtask HDE-CALC003.17 — Generic QA harness module (all epics; config-driven)**
+
+**Subtask name/label:** Generic QA harness (config-driven, reusable)
+
+**Subtask description:**  
+ Provide a generic epic QA harness module that centralizes env-pin capture, bootstrap/step logging, manifest management, and acceptance-map viability generation, so future epics do not create bespoke harness logic per epic.
+
+Epic-specific QA harness behavior MUST be provided by configuration (epic id, QA\_ROOT, acceptance map path, token matrix path, step sequence), not by writing new per-epic harness modules.
+
+Epic-specific harness entrypoints may exist as thin wrappers for convenience, but they MUST delegate to the generic harness module and must not re-implement logging, QA\_ROOT layout, manifest updates, or viability updates in bespoke per-epic code.
+
+**Subtask status:** **Done**
+
+**Epic or card:** **HDE-EPIC021 (D3 — QA bootstrap and viability logging)**
+
+**Tokens:** **Unknown** (generic harness token family is governance/QA-owned; PF09 is consumer-only)
+
+**Evidence / artifacts:**
+
+Generic harness module (titles-only):
+
+`tools/qa/qa_harness.py` — shared harness helpers and config (`HarnessConfig`, step logging, manifest de-dupe, acceptance-map viability generation).
+
+EPIC021 wrapper delegates to generic harness (titles-only):
+
+`tools/qa/epic021_qa.py` — constructs HARNESS\_CONFIG (epic\_id, qa\_root, acceptance\_map\_path, token\_matrix\_path, step\_names) and uses generic harness helpers to write logs and update manifest/viability.
+
+Tests (titles-only; closed rails):
+
+`tests/qa/test_generic_qa_harness.py` — tests generic harness helpers (env-pin failure behavior, env logging \+ D0 log write, manifest de-duplication by run\_id, viability formatting).
+
+**Notes:**  
+ The generic harness exists and EPIC021 is the first client. No other epics are wired into the generic harness ye
+
+---
+
 ### **Subtask HDE-CALC003.15 — Acceptance map & QA harness viability check**
 
 **Subtask name/label:** Acceptance map & QA harness viability check
 
 **Subtask description:**  
- Add a **cross-epic viability gate** so Phase III/IV “acceptance maps and QA harnesses” rows are not marked **Done** until the epic’s acceptance scaffolding has been proven to reference only **real** assets:
+ Add a **cross-epic viability gate** so “acceptance maps and QA harnesses” cannot be treated as complete unless the epic’s acceptance scaffolding is proven to reference only **real** assets (tests, scripts, QA\_ROOT logs) and the acceptance artifacts are internally consistent.
 
 *Scope — which rows this gates.*
 
-This subtask applies to all Phase III/IV checklist rows that describe **acceptance maps**, **QA harnesses**, or **Live QA scaffolding** for a specific epic (for example rows that reference `docs/acceptance_map_<epic>.json`, epic manifests, or `audit/qa/<epic>/...` harness directories). Before any such row can move to **Done**, the following viability checks MUST be satisfied.
+This subtask applies to any checklist row that relies on an epic acceptance map and epic QA harness artifacts (for example `docs/acceptance_map_<epic>.json` and `audit/qa/<epic>/...`).
 
-*Viability check — scripts/tests/paths exist.*
+*Viability check — acceptance artifacts are aligned and exercised.*
 
-For each epic that has an acceptance map and QA harness:
+For an epic to treat its acceptance scaffolding as viable:
 
-* Every script path referenced in the epic’s acceptance map or QA Plan (for example `./scripts/qa_capture_compat_dev.sh`, `scripts/qa/*.sh`, `tools/qa/*.py`) MUST exist in the repo and be executable in the intended environment.
+* The epic’s acceptance map and token↔evidence matrix must be in set and status alignment (no missing tokens, no mismatched statuses).
 
-* Every test node referenced in `test_names` (or equivalent) in the acceptance map (for example `tests/cli/test_*.py::test_*`) MUST correspond to a real, importable test in the test tree (pytest node discovery passes).
+* Implemented tokens must have non-empty evidence references (evidence titles in the acceptance map and concrete evidence columns in the matrix).
 
-* Every QA\_ROOT directory referenced in the plan (for example `audit/qa/hde-epic020/...`) MUST exist or be created as part of the plan before Live QA, and harness steps MUST write under that tree instead of to ad-hoc locations.
+* A deterministic viability report must classify each token as COVERED / PLANNED / MISSING and end with a summary line.
 
-If any script, test, or QA\_ROOT path is missing or broken, the epic’s “acceptance maps and QA harnesses” rows remain **Not done** and the deficiency is treated as a **tooling/infra issue**, not as a green D-goal.
+* QA harness logs must demonstrate that the viability check ran under closed rails (env pins present and recorded).
 
-*Repo-level audit (manual or tool-assisted).*
+**Subtask status:** **Done**
 
-Repository owners MUST run a **repo-level audit** (manual or tool-assisted) before Live QA for each epic that claims acceptance scaffolding is complete. That audit MUST, at minimum:
-
-* Walk each epic’s acceptance map(s) (for example `docs/acceptance_map_epic020.json`) and manifest(s) and resolve all referenced `script_names` / `test_names` / QA\_ROOT paths.
-
-* Confirm that every referenced script/test path exists on disk, is addressable in the current branch, and is runnable in the environment where QA will execute (for example Codespaces dev, CI).
-
-* Emit a deterministic viability report that identifies any missing or broken references and classifies them as **tooling failures** that block Live QA until fixed.
-
-The viability report itself is a QA artifact governed under PF19 and PF06; PF09 requires that, for Phase III/IV acceptance/QA scaffolding rows, such a report exists and shows **no unresolved references** at the time those rows are marked Done.
-
-**Subtask status:** **Not done**
-
-**Epic or card:** **Unknown** (future QA/acceptance-map epic; PF09 records the requirement; implementation details live in PF19 / PF20 / PF06 by title)
+**Epic or card:** **HDE-EPIC021 (D3 — QA bootstrap and viability logging)**
 
 **Tokens:**
 
-Tokens for “QA Plan/acceptance map viability” will be defined in Governance and Glow QA Guide (for example a future `QA_PLAN_VIABILITY_CHECK_OK` family); PF09 is consumer-only and records that Phase III/IV acceptance/QA scaffolding rows participate in those tokens once minted. Existing QA harness tokens such as `QA_STEP_LOGS_CONSOLIDATED_OK`, `DISCOVERY_BASELINE_OK`, and tooling/bootstrap tokens remain single-homed in PF19 and PF20 and are referenced by title.
+`QA_ACCEPTANCE_MAP_VIABILITY_OK`
 
 **Evidence / artifacts:**
 
-(Title/paths only; schemas live in HDE-Schemas & Artifacts and Glow QA Guide.)
+EPIC021 acceptance artifacts:
 
-* Epic acceptance maps and manifests, for example:
+`docs/acceptance_map_epic021.json` — EPIC021 acceptance map.  
+ `audit/qa/hde-epic021/token_evidence_matrix.md` — EPIC021 token↔evidence matrix.  
+ `tests/qa/test_epic021_acceptance_alignment.py` — meta-test enforcing that the EPIC021 matrix and acceptance map remain in lockstep for token set, status normalization, and evidence presence on implemented tokens.
 
-  * `docs/acceptance_map_epic020.json` — EPIC020 acceptance map (tokens/tests/artifact\_keys).
+EPIC021 QA harness and viability evidence (implemented and CI-enforced for EPIC021):
 
-  * `audit/EPIC020_MANIFEST.json` — EPIC020 manifest tying tokens to evidence families.
+`tools/qa/epic021_qa.py` — EPIC021 QA harness entrypoint.
 
-* Acceptance-map viability tests and tools (to be implemented under PF19/PF06), for example:
+`tools/qa/qa_harness.py` — shared generic harness module used by EPIC021 (HarnessConfig \+ helpers).
 
-  * `tests/config/test_config_acceptance_map.py` — existing config acceptance map tests (pattern for verifying `artifact_key` and `test_names` references).
+`audit/qa/hde-epic021/qa_step_logs_manifest.json` — per-epic manifest listing runs and step logs.  
+ `audit/qa/hde-epic021/acceptance_map_viability.log` — acceptance-map viability report.  
+ `audit/qa/hde-epic021/<run-id>/step_acceptance_map_d3.log` — per-run step log for the viability run (env pins \+ summary line).
 
-  * `tools/qa/check_qa_plan_assets.py` or `scripts/qa/check_qa_plan_assets.sh` (placeholder names; exact tool paths and schemas will be defined in PF19/PF06) — repo-level audit that resolves all scripts/tests/QA\_ROOT paths referenced by an epic’s acceptance map/QA Plan and emits a canonical viability report.
+`tests/qa/test_epic021_harness_entrypoint.py` — subprocess entrypoint test proving a synthetic run creates QA\_ROOT artifacts and that missing pins fails closed with no artifacts.
 
-* QA viability reports (once governed), for example:
+`tests/qa/test_generic_qa_harness.py` — generic harness unit tests (env-pin failure, manifest de-dupe, viability formatting).
 
-  * `audit/qa/<epic>/acceptance_map_viability.log` — canonical text or JSON log recording verified scripts/tests/paths and any missing assets, with clear `tooling_failure` vs `ok` classification.
+CI gate (titles-only):
 
-* Evidence Index & Mirror entries for acceptance-map viability artifacts, once they are governed and indexed in the same PR (`docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl`), following the global Evidence Index discipline in §0.3–§0.5. PF09 does not restate mirror schemas here.
+`.github/workflows/ci.yml` runs the entrypoint self-test under closed rails with a deterministic CI run id, so the harness cannot regress silently.
 
-  ## **Task HDE-CALC004 — Programmatic Configuration System**
+**Notes:**  
+ SoT: canon — acceptance-map viability and QA harness viability are required gates. EPIC021 provides the first working implementation and CI enforcement of the viability check and its governed logs. Future epics must execute the same viability step as part of Live QA closeout.
+
+## **Task HDE-CALC004 — Programmatic Configuration System**
 
 **Task name/label:** Programmatic Configuration System
 
@@ -2063,7 +2225,7 @@ With registry report, D5 config artifacts, EPIC018 config acceptance map, and D6
 
 **Task name/label:** Deterministic Tie-Break & Total-Order Module
 
-**Task status:** Partial
+**Task status:** Done
 
 **Task ID:** HDE-CALC005
 
@@ -3618,35 +3780,24 @@ This subtask is now considered **Done** for Engine Core evidence; future Engine 
 
 ---
 
-## **Task HDE-DISS006 — Category Framework (internal)**
+### **Subtask HDE-DISS006.1 — Per-category calculators & precedence hooks**
 
-**Task ID:** HDE-DISS006
+* **Subtask name/label:** Category calculators & precedence
 
-**Task name/label:** Category Framework (internal)
+* **Subtask description:**  
+   Implement per-category calculators and precedence hooks; use total-order utilities (§5) for any ordered emission.
 
-**Task status:** **Done**
+* **Subtask status:** **Done (history-only; satisfied under HDE-EPIC007)**
 
-**Task description:**  
- Implement per-category calculators and precedence hooks over Magic-10, enforce frozen category order and AB↔BA/two-run identity, and integrate per-channel mechanics for category-level behavior, with canonical JSON evidence and indexing.
+* **Epic or card:** **HDE-EPIC007 — Magic-10 Category Engine (Signals)**
 
-**Task notes:**
+* **Tokens:**
 
-**Status lock (HDE-EPIC007 — Magic-10 Category Engine (Signals)):**  
- PF09 Phase-II “Category framework” is satisfied under **HDE-EPIC007**; this checklist row is history-only and does not carry forward to remaining epics.
+  * `CATEGORY_FRAMEWORK_OK`
 
-**Status (Audit v1 — 2025-11-17):**  
- Previously marked *Not done* and called out missing `CATEGORY_FRAMEWORK_OK`, `AB_BA_PARITY_OK`, `JSON_CANONICAL_CHECK_OK`, and `TWO_RUN_IDENTITY_OK` tokens, as well as missing Magic-10 key table and compat parity evidence.  
- These audit notes are now historical context only; acceptance lives in the EPIC-007 exit set and associated manifest/acceptance maps.
+* **Evidence / artifacts:**
 
-**Task-level tokens (titles-only):**
-
-`CATEGORY_FRAMEWORK_OK`
-
-`JSON_CANONICAL_CHECK_OK`
-
-`AB_BA_PARITY_OK` (category layer)
-
-`TWO_RUN_IDENTITY_OK`
+  * `artifacts/category/calculators.snapshot.json` — governed calculators snapshot (schema single-home: PF12)
 
 ---
 
@@ -3766,7 +3917,7 @@ Canonical-compare logs (paths owned by Evidence Index)
 **Task description:**  
  Persist public results and provenance with canonical bytes, an explicit link to `release_id`, idempotent DB writes, and integrity checks that stored bodies equal emitted bodies, under least‑privilege DB posture and without logging secrets/PII.
 
-**Task status:** **Done** (marked “Done”)
+**Task status:** Done 
 
 **Task notes:**
 
@@ -3988,7 +4139,7 @@ From PF09’s perspective, HDE-SEPA002 is **complete for the EPIC020 D1 error en
 **Notes:**  
  This row is treated as Done for the EPIC020 D1 slice: all governed D1 error surfaces (writer diagnostic route, reader error cases in scope, and 404\) now emit `error_v1` envelopes via the shared helper, are schema-checked, and satisfy `ERROR_JSON_CANON_OK` in the EPIC020 acceptance map and manifest. Future error scenarios and surfaces use the same envelope but are owned by later epics and Distillation tasks.
 
-#### **Subtask HDE-SEPA002.2 — Error transport headers (writers/errors)**
+### Subtask HDE-SEPA002.2 — Error transport headers (writers/errors)
 
 **Subtask ID:** HDE-SEPA002.2
 
@@ -5622,12 +5773,55 @@ Catalog \+ GET/HEAD/304/encoding proofs are absent.
 
 `artifacts/proofs/success_get.txt` (body \+ headers)
 
-### Subtask HDE-CONJ005.2 — Endpoint Catalog & env-gates
+### **Subtask HDE-CONJ005.2 — Endpoint Catalog & env-gates**
 
 **Subtask name/label:** Endpoint Catalog entries & env gating
 
 **Subtask description:**  
- Maintain `docs/ENDPOINTS_CATALOG.json` as the single home for JSON success routes eligible for A7 proofs, with env-gates per entry; non-prod entries must be unreachable in prod.
+ Maintain `docs/ENDPOINTS_CATALOG.json` as the canonical, machine-readable inventory of HTTP endpoints in the repo, and within that inventory clearly identify which endpoints are JSON success routes eligible for A7 proofs. Entries are titles-only; bytes/examples and detailed contract semantics remain routed to their single homes by title only.
+
+**Classification is mandatory.** Each Catalog entry MUST carry a per-endpoint class so CI and QA can enforce distinct rails and posture per class.
+
+**Catalog entry minimum fields (titles-only; schema owned elsewhere).**  
+ Each entry in `docs/ENDPOINTS_CATALOG.json` MUST include, at minimum:
+
+* `path`
+
+* `method` (`GET`/`POST`/`HEAD`, or a list if multiple methods are supported)
+
+* `classification ∈ {public_reader, internal_admin, internal_identity, ops, dev_harness}`
+
+* `blueprint_module` (titles-only pointer to owning module)
+
+* `rails_profile` (short, names-only rails/gating summary)
+
+* `a7_eligible` (boolean; true only for JSON success routes eligible for A7 proofs)
+
+* `env_gate` (for entries where reachability is env-gated; titles-only pointer)
+
+**A7 tie-in (explicit flag).**  
+ A7 proofs apply only to endpoints explicitly marked as A7-eligible JSON success routes:
+
+* A7 proofs run **only** on entries where `a7_eligible == true`.
+
+* `/internal/*` endpoints are never A7-eligible; `/internal/version` is operator-only and must have `a7_eligible == false` (policy owned by Governance; referenced here by title only).
+
+**Test expectations (mechanics only; tokens routed by title).**
+
+Mechanics requires that:
+
+* Endpoints classified as `public_reader` (and any entries where `a7_eligible == true`) have tests that verify canonical emitter usage and the expected status/header/body posture for their class.
+
+* Endpoints classified as `dev_harness` or `ops` have explicit gating tests (APP\_ENV or equivalent) and are not treated as public transport surfaces.
+
+**CI schema and completeness check (fail-closed).**  
+ CI MUST fail if `docs/ENDPOINTS_CATALOG.json` is missing or malformed, including:
+
+* missing required fields (especially `classification` and `a7_eligible`),
+
+* invalid `classification` values, or
+
+* invalid `a7_eligible` type/value (must be boolean).
 
 **Subtask status:** **Not done**
 
@@ -5646,6 +5840,10 @@ Catalog \+ GET/HEAD/304/encoding proofs are absent.
 `docs/ENDPOINTS_CATALOG.json.sha256`
 
 `artifacts/proofs/endpoints_env_gate_proof.log`
+
+CI logs (titles-only) showing the Catalog schema/completeness check failing on missing/malformed entries and passing when required fields are present and validated.
+
+Tests (titles-only) showing per-class requirements are exercised (public\_reader canonical emitter/posture tests; dev\_harness/ops gating tests; A7-eligible entries have A7 posture tests as owned by the A7 tasks).
 
 ### Subtask HDE-CONJ005.3 — A7 transport invariants (Reader)
 
@@ -6170,23 +6368,19 @@ Canonical-compare logs across phases (various `canonical_json/*.log` and `json_c
 
 `artifacts/evidence_index.jsonl`
 
----
+# **Phase V — Fermentation (Narratives & external bridges)**
 
-# 
-
-# Phase V — Fermentation (Narratives & external bridges)
-
-**Phase master status:** Not Done
+**Phase master status:** **Not done**
 
 ---
 
-## **Task FERM001 — SAFE rails & provider gate**
+## **Task HDE-FERM001 — SAFE rails & provider gate**
 
-**Task ID:** FERM001
+**Task ID:** HDE-FERM001
 
 **Task name/label:** SAFE rails & provider gate
 
-**Task status:** Not done (Audit v1 — 2025-11-17)
+**Task status:** Not done
 
 **Task description:**  
  Establish and prove SAFE rails posture and provider gating for vendor HTTP, including closed-rails refusal behavior, pinned open-rails policy (timeouts, retries, backoff, 429 handling), observability, and evidence/indexing discipline.
@@ -6237,7 +6431,7 @@ Mechanics (request shaping, SAFE rails hooks): **HDE-Mechanics Guide** (§7.1/§
 
 ---
 
-### **Subtask FERM001.1 — SAFE rails closed posture & refusal path**
+### **Subtask HDE-FERM001.1 — SAFE rails closed posture & refusal path**
 
 **Subtask name/label:** Closed-rails refusal posture & log discipline
 
@@ -6281,7 +6475,7 @@ Rails closed-posture snapshot and refusal fixtures (titles/paths single-homed in
 
 ---
 
-### **Subtask FERM001.2 — SAFE rails open posture & policy (integration gate)**
+### **Subtask HDE-FERM001.2 — SAFE rails open posture & policy (integration gate)**
 
 **Subtask name/label:** Open-rails policy (timeouts, retries, backoff, 429\)
 
@@ -6347,7 +6541,7 @@ Determinism and AB↔BA coherence remain satisfied under this policy (canonical 
 
 ---
 
-### **Subtask FERM001.3 — Observability & log posture (SAFE rails)**
+### **Subtask HDE-FERM001.3 — Observability & log posture (SAFE rails)**
 
 **Subtask name/label:** SAFE rails observability & redaction
 
@@ -6385,7 +6579,7 @@ Observability dashboard snapshots or logs (titles/paths single-homed in Governan
 
 ---
 
-### **Subtask FERM001.4 — SAFE rails evidence & indexing**
+### **Subtask HDE-FERM001.4 — SAFE rails evidence & indexing**
 
 **Subtask name/label:** SAFE rails evidence & Evidence Index discipline
 
@@ -6455,7 +6649,7 @@ Treat **HDE-Schemas & Artifacts** §8.6 as the single home for the evidence list
 
 SAFE-rails artifacts listed above, plus their `*.path_proof.txt` transcripts.
 
-### **Subtask FERM001.5 — D0 discovery baseline (env, CLI, services)**
+### **Subtask HDE-FERM001.5 — D0 discovery baseline (env, CLI, services)**
 
 **Subtask name/label:** D0 discovery baseline (env, CLI, services)
 
@@ -6541,7 +6735,7 @@ SAFE-rails artifacts listed above, plus their `*.path_proof.txt` transcripts.
 
 ---
 
-## **Task FERM002 — Narrative Selection Router (keys only)**
+## **Task HDE-FERM002 — Narrative Selection Router (keys only)**
 
 **Task ID:** FERM002
 
@@ -6582,11 +6776,11 @@ Category framework & mechanics: **HDE-Mechanics Guide** (§7).
 
 Banding & category semantics: **HDE-Math-Spec**.
 
-Narrative Key Registry & pack identity: **FERM003** / **Narratives Guide** (titles-only).
+Narrative Key Registry & pack identity: **HDE-FERM003** / **Narratives Guide** (titles-only).
 
 ---
 
-### **Subtask FERM002.1 — Deterministic router implementation**
+### **Subtask HDE-FERM002.1 — Deterministic router implementation**
 
 **Subtask name/label:** Implement deterministic keys-only router
 
@@ -6616,7 +6810,7 @@ No `datetime.now()` or equivalent.
 
 No calls to filesystem, network, DB, or vendor adapters in the selection path.
 
-Router decisions must be a pure function of its inputs plus the pinned registry content (titles-only to FERM003).
+Router decisions must be a pure function of its inputs plus the pinned registry content (titles-only to HDE-FERM003).
 
 **Keys-only behavior:**
 
@@ -6648,11 +6842,11 @@ A router-specific keys-only token (for example `NARR_ROUTER_KEYS_ONLY_OK`) may b
 
 `tests/narratives/test_router.py` — implementation-level tests and edge cases for router behavior (no RNG, no fallbacks, missing mappings).
 
-Implementation wiring evidence is captured indirectly via the parity and coverage artifacts in Subtask FERM002.2.
+Implementation wiring evidence is captured indirectly via the parity and coverage artifacts in Subtask HDE-FERM002.2.
 
 ---
 
-### **Subtask FERM002.2 — Router tests, parity, and evidence indexing**
+### **Subtask HDE-FERM002.2 — Router tests, parity, and evidence indexing**
 
 **Subtask name/label:** Router tests, coverage, and Evidence Index discipline
 
@@ -6758,9 +6952,9 @@ Each record includes a `proof_anchor` pointing to a co-located `*.path_proof.txt
 
 ---
 
-## **Task FERM003 — Narrative Key Registry & Manifests**
+## **Task HDE-FERM003 — Narrative Key Registry & Manifests**
 
-**Task ID:** FERM003
+**Task ID:** HDE-FERM003
 
 **Task name/label:** Narrative Key Registry & Manifests
 
@@ -6787,7 +6981,7 @@ Exporter and loader behavior for packs is owned by **HDE-Mechanics Guide** and t
 
 ---
 
-### **Subtask FERM003.1 — Manifest shape & closure validation**
+### **Subtask HDE-FERM003.1 — Manifest shape & closure validation**
 
 *Subtask name/label:* Manifest shape & registry closure
 
@@ -6847,7 +7041,7 @@ Ensure that all narrative key usage routes through these manifests; other compon
 
 ---
 
-### **Subtask FERM003.2 — Diffing, Doc-Delta wiring, identity, and indexing**
+### **Subtask HDE-FERM003.2 — Diffing, Doc-Delta wiring, identity, and indexing**
 
 *Subtask name/label:* Manifests diffing, Doc-Delta, pack identity, and Evidence Index
 
@@ -6885,7 +7079,7 @@ Swapping inputs in compat/narrative selection flows does not change pack identit
 
 **Evidence & diff artifacts (titles/paths only):**
 
-`artifacts/narratives/registry/*.json` — canonical manifests (see FERM003.1).
+`artifacts/narratives/registry/*.json` — canonical manifests (see HDE-FERM003.1).
 
 `audit/gates/narratives/registry.diff.json` — compact diff of manifest changes.
 
@@ -6955,9 +7149,9 @@ Each record includes a `proof_anchor` pointing to a co-located `*.path_proof.txt
 
 ---
 
-## **Task FERM004 — Database Runtime Posture**
+## **Task HDE-FERM004 — Database Runtime Posture**
 
-**Task ID:** FERM004
+**Task ID:** HDE-FERM004
 
 **Task name/label:** Database Runtime Posture
 
@@ -6993,7 +7187,7 @@ PF09 expresses only **which tokens gate DB posture** for this phase; token seman
 
 ---
 
-### Subtask FERM004.1 — Adapter façade, runtime search\_path, and structural posture
+### Subtask HDE-FERM004.1 — Adapter façade, runtime search\_path, and structural posture
 
 *Subtask name/label:* Adapter façade, search\_path, and structural posture
 
@@ -7057,7 +7251,7 @@ The boundary-view proof path and schema remain single-homed in **HDE-Schemas & A
 
 ---
 
-### **Subtask FERM004.2 — Dev fallback & bridge capability / provider parity**
+### **Subtask HDE-FERM004.2 — Dev fallback & bridge capability / provider parity**
 
 **Subtask name/label:** Dev fallback, bridge caps, and provider parity
 
@@ -7111,7 +7305,7 @@ Use a normalized output format for comparison and store parity results under gov
 
 ---
 
-### **Subtask FERM004.3 — Non-dev total failure behavior and typed errors**
+### **Subtask HDE-FERM004.3 — Non-dev total failure behavior and typed errors**
 
 **Subtask name/label:** Non-dev presence-order selection & failure posture
 
@@ -7157,7 +7351,7 @@ Error payloads must remain numeric-free in user-visible text; traceability goes 
 
 ---
 
-### Subtask FERM004.4 — DB posture acceptance, capture discipline, and Evidence Index/Mirror
+### Subtask HDE-FERM004.4 — DB posture acceptance, capture discipline, and Evidence Index/Mirror
 
 *Subtask name/label:* DB posture gating, capture discipline, and evidence indexing
 
@@ -7279,9 +7473,9 @@ Index artifacts:
 
 ---
 
-## **Task FERM005 — CLI Aux preview story (admin surface & evidence)**
+## **Task HDE-FERM005 — CLI Aux preview story (admin surface & evidence)**
 
-*Task ID:* FERM005
+*Task ID:* HDE-FERM005
 
 *Task name/label:* CLI Aux preview story (admin surface & evidence)
 
@@ -7302,7 +7496,7 @@ Produce a minimal admin JSON selector with `composition_id`, `pack_sha`, `pair` 
 
 ---
 
-### **Subtask FERM005.1 — CLI Aux preview posture (enabled, indexed, and evidenced)**
+### **Subtask HDE-FERM005.1 — CLI Aux preview posture (enabled, indexed, and evidenced)**
 
 *Subtask name/label:* CLI Aux preview posture (Enabled and Indexed)
 
@@ -7663,23 +7857,23 @@ Rails posture log and refusal fixture for closed rails (titles/paths owned by HD
 
 ### 
 
-### **Subtask HDE-DIST001.4 — DB posture & runtime checks (harness for FERM004)**
+### **Subtask HDE-DIST001.4 — DB posture & runtime checks (harness for HDE-FERM004)**
 
-*Subtask name/label:* DB posture & runtime checks (FERM004 harness)
+*Subtask name/label:* DB posture & runtime checks (HDE-FERM004 harness)
 
 *Subtask description:*
 
-Use the Distillation harness to **prove and exercise** the DB runtime posture defined in **Task FERM004 — Database Runtime Posture** for this phase, without redefining posture semantics:
+Use the Distillation harness to **prove and exercise** the DB runtime posture defined in **Task HDE-FERM004 — Database Runtime Posture** for this phase, without redefining posture semantics:
 
 **Semantic home**
 
-DB runtime posture semantics (adapter façade, search\_path, grants, DDL fingerprint, constraints, boundary view posture, bridge fallback, provider parity, and total-failure behavior) are owned by **FERM004** in Phase V — Fermentation.
+DB runtime posture semantics (adapter façade, search\_path, grants, DDL fingerprint, constraints, boundary view posture, bridge fallback, provider parity, and total-failure behavior) are owned by **HDE-FERM004** in Phase V — Fermentation.
 
 This subtask adopts those semantics and focuses on **where** they are proved in the Distillation harness, not on re-specifying behavior.
 
 **Posture artifacts to capture in this harness**
 
-Produce and index the same governed DB posture artifacts required by FERM004, at minimum:
+Produce and index the same governed DB posture artifacts required by HDE-FERM004, at minimum:
 
 `artifacts/db/ddl_fingerprint.json` — normalized DDL snapshot of the runtime schema with stable ordering.
 
@@ -7693,9 +7887,9 @@ Produce and index the same governed DB posture artifacts required by FERM004, at
 
 `artifacts/runtime/env_connectivity.snapshot.json` — names-only snapshot of how DB connectivity was resolved (dev-only), with schema owned by HDE-Schemas & Artifacts.
 
-When possible, reuse the same scripts and adapter façade entrypoints used for FERM004 posture captures so that evidence remains consistent across phases.
+When possible, reuse the same scripts and adapter façade entrypoints used for HDE-FERM004 posture captures so that evidence remains consistent across phases.
 
-**Capture discipline (aligned with FERM004.4)**
+**Capture discipline (aligned with HDE-FERM004.4)**
 
 Run posture captures under deterministic env pins:
 
@@ -7935,6 +8129,17 @@ PF09 does not redefine token semantics for determinism, A7, `/internal/version`,
   * no outbound vendor HTTP occurs for BodyGraph flows; and
 
   * vendor-bound attempts yield typed refusal envelopes and keys-only logs (no payload bodies or secret values), consistent with SAFE-rails refusal posture described elsewhere in PF09 and Governance.
+
+**BodyGraph I/O seam boundaries (engine/bodygraph).**
+
+* Network calls for BodyGraph resolution and ingest MUST occur only within the `engine/bodygraph/` seam and only under open network rails (no vendor calls when rails are closed).  
+   
+
+* No network I/O occurs in deterministic core modules (`core`, `sampler`, `compat`, `presenter`); vendor/DB I/O is confined to the BodyGraph seam by design.  
+   
+
+* Tests exist that assert SAFE\_MODE/ALLOW\_NETWORK gating in the BodyGraph resolver/ingest flows for `source ∈ {vendor, db, auto}` (fail-closed under closed rails; vendor path permitted only when rails are open).  
+   
 
 **Acceptance and gating posture.**
 
@@ -8882,9 +9087,7 @@ New or clarified artifact paths mentioned:
 
 Schemas and exact field shapes remain routed to PF‑Canon‑HDE‑Schemas & Artifacts / PF14 Mechanics.
 
-# ---
-
-#  Phase VII — Coagulation (SDKs & runtime packaging) 
+# Phase VII — Coagulation (SDKs & runtime packaging) 
 
 **Phase description:**  
  Ship a hardened runtime and minimal client SDKs that emit the six-key public envelope and typed errors, and lock evidence/ops practices to Governance, with no contract bytes or schemas defined here (titles-only routing to canon).
@@ -9927,7 +10130,7 @@ DB posture tokens (e.g., `DB_RUNTIME_SEARCH_PATH_OK`, `DB_ROLE_OK`, `DB_SCHEMA_F
 
 ## Task HDE-COAG004— Stateless JSON QA mode (non-gating tracker)
 
-*Task ID:* HDE-COAG00X  
+*Task ID:* HDE-COAG004  
  *Task name/label:* Stateless JSON QA mode (non-gating tracker)  
  *Task status:* Not done
 

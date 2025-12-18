@@ -4,13 +4,13 @@
 
 **Title:** PF12-Canon-HDE-Schemas and Artifacts
 
-**Version:** v1.5.8
+**Version:** v1.6.4
 
 **Status:** Canon
 
-**Effective date:** 2025-12-08
+**Effective date:** 2025-12-17
 
-**Last Update Gate:** BN 8.1.9 Drain A17-19
+**Last Update Gate:** BN 8.3.4 Drain A1-5 pass 2
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -532,7 +532,7 @@ Master list items only. Titles and paths only. No payload bytes in this doc.
 
     ---
 
-    ## **2.2 Identity & profile catalogs \[Required-Now\]**
+## **2.2 Identity & profile catalogs \[Required-Now\]**
 
 Master list items only. Titles and paths only. No payload bytes in this doc.
 
@@ -1113,8 +1113,6 @@ All artifacts covered by §4 **MUST** be encoded as canonical JSON. The same sem
 
 Example shape:  
  {"a":1,"b":\[true,false\],"c":{"d":2}}
-
-* 
 
 ### **Strings**
 
@@ -1841,8 +1839,6 @@ This document routes by **title only**. Do not restate or duplicate content from
 
 **Acceptance hints (names-only)**  
  `TOPOLOGY_NO_ORPHANS_OK`, `TOPOLOGY_CHANNEL_DEGREE_2_OK`, `TOPOLOGY_GATE_CENTER_OK`, `DEGREE_VECTORS_MATCH_OK` (when declared), `ARR_SET_IDENTITY_DECLARED_OK`, `ARR_SET_NO_CONFLICTS_OK`, `ARR_SET_ASCII_SORT_OK`, `FILE_EQ_CANON_BYTES_OK`, `ENV_LC_ALL_C_OK`.
-
-## ---
 
 ## **8.3 Machine Evidence Index — JSONL mirror (records-only) \[Required-Now\]**
 
@@ -2885,15 +2881,9 @@ In any PR that changes governed evidence artifacts or their indexing, you **MUST
 
 And you **MUST** assert the mirror/index tokens named in §8.3 (for example, `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_HASH_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`, etc.) on every change.
 
----
-
 ### **8.6.3 Entries (authoritative list; titles/paths only)**
 
-Human Index entries are **titles/paths only**. Machine Mirror records include at least artifact\_key, role, sha256, size\_bytes, produced\_at\_utc, discovered\_physical\_path, and proof\_anchor. Every artifact listed below must have exactly one Human Index entry and one Machine Mirror record, plus a single governed \*.path\_proof.txt transcript, all kept in lockstep.
-
-**Entries (authoritative list; titles/paths only)**
-
-Human Index entries are titles/paths only. Machine Mirror records include at least artifact\_key, role, sha256, size\_bytes, produced\_at\_utc, discovered\_physical\_path, and proof\_anchor. Every artifact listed below must have exactly one Human Index entry and one Machine Mirror record, plus a single governed `*.path_proof.txt` transcript, all kept in lockstep.
+Human Index entries are **titles/paths only**. Machine Mirror records include at least `artifact_key`, `role`, `sha256`, `size_bytes`, `produced_at_utc`, `discovered_physical_path`, and `proof_anchor`. Every artifact listed below MUST have exactly one Human Index entry and one Machine Mirror record, plus exactly one governed `*.path_proof.txt` transcript, all kept in lockstep.
 
 ---
 
@@ -3443,10 +3433,113 @@ Engine Core evidence families participate in the existing Mirror/Index tokens re
 
 * `artifacts/ops/admin_vendor_calls.jsonl`
 
+  #### **Epic QA harness ledger artifacts (per-epic; names-only)**
 
-  ---
+These entries register per-epic QA harness ledger files that summarize Live QA runs without requiring every per-run log to be individually indexed.
 
-  ### **8.6.4 Discipline reminder**
+* `audit/qa/<epic-id>/qa_step_logs_manifest.json`  
+   Per-epic manifest enumerating run IDs and primary per-run log paths. Records-only canonical JSON (UTF-8, ASCII-sorted keys, compact, exactly one trailing LF).
+
+* `audit/qa/<epic-id>/acceptance_map_viability.log`  
+   Per-epic text log summarizing acceptance-map viability results for one or more runs. LF-terminated text; no ANSI.
+
+Indexing discipline for both files is the standard §8.6 rule set: exactly one Human Evidence Index entry, exactly one Machine Evidence Mirror record, and exactly one governed path-proof transcript per file. PF12 governs the paths and canonical format only; token semantics remain owned elsewhere.
+
+#### **Epic token/evidence matrix (per-epic QA ledger)**
+
+These entries register per-epic Token/Evidence Matrix artifacts as governed members of the Evidence Catalog. Each matrix provides a single, human-readable ledger mapping QA tokens to evidence and execution surfaces for one epic.
+
+**Family description.**
+
+Each epic MAY define exactly one Token/Evidence Matrix artifact under its QA root.
+
+* Path pattern (single home per epic; choose exactly one format per epic):
+
+  * Markdown: `audit/qa/<epic-id>/token_evidence_matrix.md`
+
+  * JSON: `audit/qa/<epic-id>/token_evidence_matrix.json`
+
+  * JSONL: `audit/qa/<epic-id>/token_evidence_matrix.jsonl`
+
+* where `<epic-id>` is the repository directory name (lowercase hyphenated; for example, `hde-epic021`) consistent with Live QA layout rules.
+
+   If the semantic epic identifier differs (for example, `HDE-EPIC021`), it may be recorded in Mirror metadata via the `epic_id` field.
+
+The matrix is a textual artifact (Markdown or JSON/JSONL) that is intended to be read by humans and QA agents; it does not carry any secrets.
+
+This matrix is a governed QA ledger artifact and the single home for the epic’s token→evidence mapping. It is not required to be reproduced inside plans; plans may reference it by path (titles-only).
+
+**Row set (binding discipline; names-only).**
+
+Matrix rows are reserved for the set of QA tokens that this epic explicitly claims as **in-scope**.
+
+* Tokens explicitly deferred or out-of-scope for this epic MUST NOT appear as matrix rows.
+
+* Token names MAY be mentioned outside the table as informative context, but MUST be clearly labeled as **informative only** and MUST NOT be used to claim token satisfaction for this epic.
+
+**Minimum content (names-only).**
+
+For each token row in the matrix, the artifact MUST record at least:
+
+* `token_name` — the QA token’s canonical name, as defined in HDE-Governance / Glow QA Guide or an approved Doc-Delta (titles-only).
+
+* `owner_pf` — the PF document (and optionally section) that owns the token’s semantics (for example, HDE-Governance, Glow QA Guide, HDE-Build Checklist, HDE-Phased Epics, HDE-Schemas and Artifacts).
+
+* `evidence_artifacts` — one or more governed artifacts associated with the token (artifact\_keys and/or discovered\_physical\_path entries), drawn from families listed in §8.6 and other PF12 sections.
+
+* `qa_root_logs` — QA\_ROOT log paths (under `audit/qa/<epic-id>/…`) that demonstrate QA harness runs relevant to this token.
+
+* `ci_tests_jobs` — the CI test modules and/or jobs that enforce this token under closed rails (names only; implementation lives in build tooling and QA).
+
+Additional columns such as Status or Notes MAY be present for human use; their contents are not governed by PF12 beyond canonical text formatting and governed-path rules.
+
+**Canonical format.**
+
+When the matrix is Markdown, it MUST remain plain UTF-8 text with LF line endings and no ANSI sequences; when JSON/JSONL is used instead of Markdown, canonical JSON rules from §4 apply.
+
+The concrete Markdown table layout is not governed here; only the presence of the required fields above is.
+
+**Indexing (titles/paths only).**
+
+Let `<matrix-file>` be the chosen single-home Token/Evidence Matrix path for this epic (one of the three paths listed above).
+
+**Human Evidence Index (docs/evidence/INDEX.json).**
+
+For each epic that defines a Token/Evidence Matrix, there MUST be exactly one Index entry with:
+
+* `artifact_key` set to a stable, epic-scoped key chosen by that epic’s acceptance map (for example, a name that clearly identifies the epic’s token/evidence matrix), and
+
+* `discovered_physical_path` pointing to `<matrix-file>`.
+
+docs/evidence/INDEX.sha256 MUST be updated in the same PR whenever a new epic matrix is added or its path changes.
+
+**Machine Evidence Mirror (artifacts/evidence\_index.jsonl).**
+
+Each epic Token/Evidence Matrix MUST have a corresponding Mirror record with:
+
+* `artifact_key` equal to the key used in the Human Index entry,
+
+* `role:"qa_ledger"` (or an equivalent role string agreed in QA tools),
+
+* `discovered_physical_path` pointing to `<matrix-file>`,
+
+* `sha256`, `size_bytes`, `produced_at_utc`, and `proof_anchor` matching the governed path-proof transcript for this artifact.
+
+Mirror records MUST obey all §8.3 rules (canonical JSONL, allowed key set, ASCII field order, sort-before-write, unknown-key rejection, single mirror file).
+
+Exactly one Mirror record per epic is allowed for this family; additional QA tables or notes under the same directory are treated as separate, non-matrix artifacts and MUST NOT reuse the same artifact\_key.
+
+**Path-proofs.**
+
+Each `<matrix-file>` artifact MUST have a sibling path-proof transcript (for example, `<matrix-file>.path_proof.txt`) that satisfies the path-proof schema in §8.3 (matching path, sha256, size\_bytes, mtime\_utc, and produced\_at\_utc) and is referenced from the Mirror record via proof\_anchor.
+
+**Acceptance hints (names-only).**
+
+PF12 does not own token semantics. For epic Token/Evidence Matrices, PF12 binds the matrix family to existing QA tokens by name and path only (for example, baseline evidence tokens such as EVIDENCE\_INDEX\_UPDATED\_OK, MACHINE\_MIRROR\_UPDATED\_OK, EVIDENCE\_PATHS\_VALIDATED\_OK, and any epic-specific QA discipline tokens defined in Governance and Glow QA Guide). Epics and QA plans use the matrix as a ledger; PF12 governs only its existence, location, and indexing.
+
+---
+
+### **8.6.4 Discipline reminder**
 
 * Every entry above **must** have:
 
@@ -3545,6 +3638,46 @@ For EPIC-011, tokens such as `DB_SCHEMA_FINGERPRINT_OK` and `DB_ROLE_OK` are def
 }
 
 **Related governed files (titles only).** The authoritative Catalog file lives at `docs/ENDPOINTS_CATALOG.json` with checksum sidecar `docs/ENDPOINTS_CATALOG.json.sha256` and **MUST** be indexed like other records-only artifacts (see §8.6, Appendix C).
+
+**Authoritative Endpoint Catalog file (records-only; names-only fields).**
+
+The authoritative Catalog file lives at:
+
+* `docs/ENDPOINTS_CATALOG.json` (records-only; canonical JSON), and
+
+* `docs/ENDPOINTS_CATALOG.json.sha256` (checksum sidecar; computed over the catalog’s canonical bytes).
+
+This Catalog is a machine-readable inventory of HTTP endpoints (public surfaces and key internal/ops/dev endpoints) used to support QA, audits, and transport reasoning. It contains **names-only metadata** and MUST NOT embed secrets or example payload bytes.
+
+**Minimum required fields (per endpoint record).**  
+ Each endpoint entry in `docs/ENDPOINTS_CATALOG.json` MUST include at least:
+
+* `path` — route path (e.g., `/reader`, `/api/compat/v1`, `/internal/version`) as a string.
+
+* `method` — HTTP method as a string (e.g., `GET`, `POST`, `HEAD`).
+
+* `classification` — one of:  
+   `public_reader`, `public_compat`, `internal_identity`, `ops`, `dev_harness`.
+
+* `blueprint_module` — owning module path (names-only) such as `adapter/http_reader.py` or `engine/http/compat_handler.py`.
+
+* `rails_profile` — a short names-only description of expected rails posture (e.g., “closed rails”, “APP\_ENV-gated dev harness”, “ops no-store”), without secrets.
+
+Additional fields MAY exist, but they MUST remain names-only and MUST remain compatible with the owning schema/checks.
+
+**Suggested minimal schema (example).**  
+ {  
+ "generated\_at\_utc": "YYYY-MM-DDThh:mm:ssZ",  
+ "endpoints": \[  
+ {  
+ "path": "\<route-path\>",  
+ "method": "\<METHOD\>",  
+ "classification": "\<one-of: public\_reader|public\_compat|internal\_identity|ops|dev\_harness\>",  
+ "blueprint\_module": "\<module-path\>",  
+ "rails\_profile": "\<names-only rails summary\>"  
+ }  
+ \]  
+ }
 
 **Indexing.**  
  Human Index: add a titles/paths-only entry in `docs/evidence/INDEX.json` and update the hash sentinel `docs/evidence/INDEX.sha256` in the same PR.  
@@ -3726,7 +3859,7 @@ For EPIC-011, tokens such as `DB_SCHEMA_FINGERPRINT_OK` and `DB_ROLE_OK` are def
  `ENDPOINTS_CATALOG_OK`, `ENDPOINTS_CATALOG_INTERNAL_OK`, `ENDPOINTS_CATALOG_ENV_GATE_OK`,  
  `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_HASH_OK`, `EVIDENCE_INDEX_MIRROR_OK`.
 
-## **8.13 Stateless QA export families (no-DB JSON mode) Required−NowRequired-NowRequired−Now**
+## **8.13 Stateless QA export families (no-DB JSON mode) \[Required−Now\]**
 
 **Purpose.**  
  Record the governed evidence families used to exercise the engine in a **stateless/no-DB QA mode**, using only CLI \+ files. These families do not replace existing DB-bound evidence; they provide a complementary way to prove engine math and Reader/CLI parity when no app user model or persistent BodyGraph records are available.
@@ -3807,7 +3940,7 @@ For EPIC-011, tokens such as `DB_SCHEMA_FINGERPRINT_OK` and `DB_ROLE_OK` are def
 
 Governance and QA docs (PF04, PF09, PF19, PF20) refer to these families by name (`qa.bodygraph_export.stateless`, `qa.compat_export.stateless`, `qa.run_bundle.stateless`) and must not define parallel path lists.
 
-## **8.14 Config artifacts & acceptance map (D5) Required−NowRequired-NowRequired−Now**
+## **8.14 Config artifacts & acceptance map (D5) \[Required−Now\]**
 
 **Purpose.**  
  Record the governed **config artifact families** and the **config acceptance map** introduced in D5 of HDE-EPIC018 and tie them into the Evidence Catalog and Machine Mirror. These artifacts are generated under closed rails using the hardened registry loader and canonical serializer, and they provide the concrete evidence surfaces for config-related acceptance tokens (names-only; semantics live in Glow QA Guide and HDE-Governance).
@@ -4235,7 +4368,7 @@ PF12 does not own token semantics, but these bundles are the governed surface fo
 
 Tokens and detailed CI policy live in Glow QA Guide and HDE-Governance; PF12 binds these tokens to the `config_bundle.fe` and `config_bundle.be` families by **artifact key, directory, and sources linkage**, not by test names.
 
-## **8.16 Repo implementation docs (non-canonical) Required−NowRequired-NowRequired−Now**
+## **8.16 Repo implementation docs (non-canonical) \[Required−Now\]**
 
 **Purpose.**  
  Record the role and limits of **repo-level implementation documents** that describe PF12-owned artifacts and rails (for example, README, AGENTS, and selected `./docs/**` files) so that they remain consistent with this document without becoming parallel sources of truth.
@@ -4327,7 +4460,7 @@ Repo docs themselves do **not** require a Doc-Delta when they change wording or 
 
   * the new or updated repo docs (by path) as **implementation references only**.
 
-## **8.17 Live QA evidence layout (audit/qa/\<epic-id\>/\<run-id\>/…) Required−NowRequired-NowRequired−Now**
+## **8.17 Live QA evidence layout (audit/qa/\<epic-id\>/\<run-id\>/…) \[Required−Now\]**
 
 **Purpose.**  
  Standardize the layout and naming of Live QA evidence under the governed `audit/**` root so that:
@@ -4354,6 +4487,18 @@ This section does **not** define:
 * Live QA rails posture, D-goal semantics, or QA tokens (titles-only routing to Glow QA Guide, HDE-Phased Epics, HDE-Governance, and HDE-Build Checklist).
 
 * Which specific Live QA artifacts must be indexed in the Evidence Index/Mirror; that remains governed by Glow QA Guide, HDE-Build Checklist, HDE-Phased Epics, and epic-specific plans.
+
+**Harness run directories vs QA evidence buckets**
+
+Under `audit/qa/<epic-id>/`, an epic MAY contain both:
+
+* **Harness run directories** (`<run-id>/`): directories representing a harness run. These are the directories that appear in the per-epic run ledger `audit/qa/<epic-id>/qa_step_logs_manifest.json` and are expected to contain the epic’s bootstrap and step logs. Filenames and step semantics are owned by the epic’s QA tooling and QA plan.
+
+* **QA evidence bucket directories** (for example, `live-qa/`): directories that hold step-level QA review evidence such as pytest logs, snapshots, and summaries generated while running the QA plan. QA evidence buckets are not harness runs and are not required to contain bootstrap or step logs. They are not required to appear as runs in `qa_step_logs_manifest.json`.
+
+Some summary tooling MAY enumerate all immediate subdirectories under `audit/qa/<epic-id>/` as `run_ids` for reporting. In that case, it is valid for `run_ids` to include both harness run directory names and evidence bucket directory names. Any `manifest_runs_count` field is expected to count only harness runs tracked by the epic’s manifest or run ledger, not evidence buckets.
+
+This section standardizes layout and naming only. Whether a given file inside an evidence bucket is governed and must be indexed/mirrored remains determined by the Evidence Catalog and epic-specific acceptance wiring.
 
 ### **8.17.1 Root and step directories**
 
@@ -5331,7 +5476,7 @@ Titles and paths only. One-line purpose each. Bytes live outside PF12; this appe
 
 * narratives\_coverage\_10x4 — Router coverage table (10 categories × 4 bands). (path: `audit/gates/narratives/keys_10x4.table.json`)
 
-# **Appendix D — Stateless JSON QA artifacts SpeculativeSpeculativeSpeculative**
+# **Appendix D — Stateless JSON QA artifacts \[Speculative\]**
 
 **Status:** SpeculativeSpeculativeSpeculative — accepted future design, not yet wired.  
  This appendix canonically defines stateless JSON artifact *families* for a future no-DB QA mode, as described in **HDE-Build Notes Addendum 11**.  

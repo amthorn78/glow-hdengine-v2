@@ -1,11 +1,11 @@
 # **0\. Front Matter**
 
 **Title:** PF02-Canon-HDE Architecture  
- **Version:** v1.2.3  
+ **Version:** v1.2.5  
  **Status:** Canon  
-**Effective date:** 2025-12-08
+**Effective date:** 2025-12-13
 
- **Last Update Gate:** BN 8.1.9 Drain A16
+ **Last Update Gate:** BN 8.3 Drain A10-14
 
 ---
 
@@ -226,9 +226,9 @@ Architecture remains contract-free.
 
 **engine/** (deterministic core). Computes compatibility and related math in process with no time, network, file I/O, or randomness. Accepts normalized inputs and returns normalized structures.
 
-**adapter/** (single HTTP home). Hosts runtime surfaces and guards. Performs lightweight input validation, then calls the Engine synchronously. It never hand crafts public JSON. Routing (titles only): service start-command symbol, exposure posture, and infrastructure locations live in PF07-Canon-Glow-Infrastructure; operational policy and evidence ownership live in PF04-Canon-HDE-Governance.
+**adapter/** (single HTTP home). Hosts runtime surfaces and guards. Performs lightweight input validation, then calls the Engine synchronously. It never hand crafts public JSON. Routing (titles only): service start-command symbol, exposure posture, and infrastructure locations live in **Glow Infrastructure**; operational policy and evidence ownership live in **HDE-Governance**.
 
-**presenter/** (canonical emitter). Provides the one serializer and emitter used by all surfaces (CLI and HTTP). Ensures canonical formatting, idempotence preimage discipline, and AB↔BA parity at the byte level. Routing (titles only): emitter invocation/validation runs and infrastructure locations live in PF07-Canon-Glow-Infrastructure; operational policy and evidence ownership live in PF04-Canon-HDE-Governance.
+**presenter/** (canonical emitter). Provides the one serializer and emitter used by all surfaces (CLI and HTTP). Ensures canonical formatting, idempotence preimage discipline, and AB↔BA parity at the byte level. Routing (titles only): emitter invocation/validation runs and infrastructure locations live in **Glow Infrastructure**; operational policy and evidence ownership live in **HDE-Governance**.
 
 **database** (persistent BodyGraph cache). An external store for BodyGraphs enabling reuse of previously computed results. The Adapter reads from and writes to this database (on BodyGraph fetches) so that subsequent requests can retrieve the cached BodyGraph instead of calling the vendor. The Engine remains stateless – it simply consumes whatever BodyGraph data the Adapter provides from this cache or a live call.
 
@@ -284,7 +284,7 @@ Only the presenter’s emitter entrypoint MAY serialize public bytes. All other 
 
 ### **Routing (titles only)**
 
-Concrete guard checks and scripts live in **PF-Canon — Mechanics Guide to the HD Engine (Build Guide)**, and process/PR workflow (CodEx staging, PR-first merging, repo-docs/Evidence Index updates) lives in **PF06-Canon-Epic-Process-Guide**.
+Concrete guard checks and scripts live in **HDE-Mechanics Guide**, and process/PR workflow (CodEx staging, PR-first merging, repo-docs/Evidence Index updates) lives in **Epic-Process-Guide**.
 
 ---
 
@@ -966,9 +966,35 @@ HTTP QA against “Reader” or dev harness surfaces is considered misconfigured
 
 * 
 
-  # **4\. Boundaries & Contracts (Conceptual) Required−NowRequired-NowRequired−Now**
+### **3.8.4 Discovery vs guessing**
+
+Environment and service discovery for dev/QA is **canon-first**. Before designing high-stakes HTTP QA steps, implementers and QA must consult:
+
+* **HDE Architecture**
+
+* **Glow Infrastructure**
+
+* **HDE-Mechanics Guide**
+
+* “GitHub Codespaces in a QA Workflow” (where relevant)
+
+to determine how to start and reach Reader and other services.
+
+HTTP QA against “Reader” or dev harness surfaces is considered misconfigured if there is **no running adapter/Reader process** discoverable through the documented commands and ports. Attempts to hit guessed URLs or ports are a plan defect, not a property of the Engine or Presenter.
+
+**Routing (titles-only).**
+
+* Service start commands, ports, and environment wiring for dev/QA consoles → **Glow Infrastructure**, **HDE-Mechanics Guide**
+
+* Live QA process, discovery baselines, and rails posture (for example, `SAFE_MODE`, `ALLOW_NETWORK`, `APP_ENV`) → **Epic-Process-Guide**, **Glow QA Guide**
+
+* CLI and Reader surface bytes, request/response shapes, and admin surfaces used for Live QA → **HDE-CLI-API-Vendor-Ref**
+
+  # **4\. Boundaries & Contracts (Conceptual) \[Required−Now\]**
 
   ## **4.1 Boundary guarantees (no bytes)**
+
+## 
 
 * **Engine → Adapter.**
 
@@ -1014,9 +1040,9 @@ HTTP QA against “Reader” or dev harness surfaces is considered misconfigured
 
 **Routing (titles only).**
 
-* Carrier name, exact casing, format bounds, and generation/validation rules live in **PF05-Canon-HDE-CLI-API-Vendor-Ref**.
+* Carrier name, exact casing, format bounds, and generation/validation rules live in **HDE-CLI-API-Vendor-Ref**.
 
-* Logging posture, redaction rules, metrics cardinality, and evidence live in **PF04-Canon-HDE-Governance**.
+* Logging posture, redaction rules, metrics cardinality, and evidence live in **HDE-Governance**.
 
   ## **4.3 Non-goals (kept out of Architecture)**
 
@@ -1222,6 +1248,10 @@ Resolver semantics, connection details, and evidence live in **Glow Infrastructu
 
 * Engine Core and sampler core receive only normalised data structures; they never see vendor transport details or directly open sockets or database connections.
 
+**Repo-local seam location (names-only).**
+
+The BodyGraph ingest/resolution seam MAY be implemented under `engine/bodygraph/`. Even though this path sits under the top-level `engine/` package, Architecture treats `engine/bodygraph/` as a **non-core I/O seam component**, not part of Engine Core or sampler core “pure compute.” The seam is allowed to orchestrate vendor HTTP and BodyGraph cache DB reads/writes (subject to rails and policy owned elsewhere), while all deterministic compute remains in the pure modules (Engine Core and sampler core) and all public bytes remain emitted by the single Presenter emitter.
+
 **Engine purity preserved.**  
  Engine Core and sampler core remain in-proc, deterministic, and free of network/time/IO concerns and environment-based behaviour:
 
@@ -1273,82 +1303,43 @@ This section names **responsibilities, posture, and component boundaries only**.
 
 ## **7.1 Public surfaces: no PII; keys-only logs**
 
-* **No PII in public outputs.** Public envelopes expose only approved fields; no free-text narratives or user-identifying data.
+No PII in public outputs. Public envelopes expose only approved fields. They must not contain free-text narratives or user-identifying data.
 
-* **Keys-only logging.** Logs may record route names, timings, and opaque identifiers (e.g., correlation id), but **never** payload contents or derived personal attributes.  
-* **BodyGraph ingest logs & metrics (routing only).** Logs are **keys‑only** (no raw birth data; no vendor payloads; secrets never logged). Metrics cover refresh outcomes, rate‑limit throttles, circuit‑breaker trips, vendor latency histograms, and staleness gauges. Governance/Schemas own evidence/indexing; Infrastructure owns providers/secrets posture.
+Keys-only logging. Logs (including offline evidence pipelines and BodyGraph ingest flows) may record route names, step IDs, evidence family names, timings, and opaque identifiers (for example, a correlation id). Logs must never record payload contents, raw birth data, vendor payloads, derived personal attributes, or secrets.
+
+BodyGraph ingest logs & metrics (routing only). BodyGraph ingest and refresh logs are keys-only (no raw birth data; no vendor payloads; secrets never logged). Metrics cover refresh outcomes, rate-limit throttles, circuit-breaker trips, vendor latency histograms, and staleness gauges. Governance and Schemas & Artifacts own evidence/indexing. Glow Infrastructure owns providers/secrets posture. See §2.4 **BodyGraph ingest & durability** and §5 **Determinism & identity proofs** for how these flows are wired.
 
 ## **7.2 Secrets & side effects: strict hygiene**
 
-* **No secrets in logs/artifacts.** API keys, tokens, and credentials must not appear in logs, artifacts, or error messages.
+No secrets in logs/artifacts. API keys, tokens, credentials, and other secrets must not appear in logs, artifacts, or error messages. This applies equally to runtime surfaces and to offline evidence and determinism jobs.
 
-* **No import-time I/O in engine math.** Engine code performs **no** file/network/time access (and no randomness) at import or compute time; computations are pure and deterministic.
-
-# **8\. Repository & Ownership Routing \[Required-Now\]**
-
-## **8.1 Ownership of “bytes” (route by title)**
-
-**PF02 is contract-free.** Use **titles only** for cross-doc references; do **not** copy headers, schemas, status matrices, tokens, or paths here. Concrete bytes and locations live in their single homes below.
-
-* **Math & scoring** (arithmetic, banding, presets, extractors, preimage/idempotence, ordering) → **HDE-Math-Spec**.  
-* **Pack catalogs & manifest** (freeze-pack identity, checksums, canonical JSON policy, human `docs/evidence/INDEX.json`, machine `artifacts/evidence_index.jsonl` schema/parity) → **HDE-Schemas & Artifacts**.  
-* **CLI / Reader / vendor route bytes** (public six-key envelope, request/response shapes & examples, streams/exits, **Endpoint Catalog (JSON success) ownership and route titles**, CLI admin preview, vendor request shaping, parity rules) → **HDE-CLI-API-Vendor-Ref**.  
-* **A7 transport & ops policy** (ETag/200, **304 header omissions**, **HEAD parity**, **`Vary: Authorization, Accept-Encoding`**, **encoding-invariance**, writers `no-store`/no ETag, **`/internal/version` ops-only** posture, acceptance tokens) → **HDE-Governance**.  
-* **Guards & ops how-to / CI** (capture scripts, serializer path allow-lists/denylists, dev-harness ops posture, PR-first workflow with **CodEx-opened PR** and **same-PR Evidence Index updates**) → **Epic-Process-Guide** and **HDE-Mechanics Guide**.  
-* **Infrastructure names/locations** (providers, projects, services, repos, domains, DB schemas) → **HDE-Glow-Infrastructure**.  
-* **Narratives surface** (Aux route & Composer), **suppression rule** (200 with no body, no ETag), and A7 posture for Aux → **PF17-Canon-HDE-Narratives Guide** (and **HDE-Governance** for policy).  
-* **Invocation tag / covenant text** → **PF-Invocation**.  
-* **Endpoint Catalog (JSON success) single home & env‑gate proof** → **HDE‑CLI‑API‑Vendor‑Ref** (route titles) and **HDE‑Schemas & Artifacts** (path `docs/ENDPOINTS_CATALOG.json` \+ `.sha256`, env‑gate proof indexing). PF02 pins this location only.  
-* **BodyGraph evidence families** (source‑selection snapshot, source‑invariance proofs, refresh‑policy snapshot, ingest metrics/log samples) → **HDE‑Mechanics Guide / HDE‑Build Checklist** (what to capture, when), **HDE‑Schemas & Artifacts** (indices/mirror discipline). **Schema names** for durability live in **Glow Infrastructure** (names‑only).
-
-Here’s a revised version of the sections, aligned to the current PF02 canon and the v2 Refresh plan. I’m keeping the existing numbering (no new §8).
-
----
-
-# **7\. Security & Privacy Principles Required−NowRequired-NowRequired−Now**
-
-## **7.1 Public surfaces: no PII; keys-only logs**
-
-* **No PII in public outputs.** Public envelopes expose only approved fields; no free-text narratives or user-identifying data.
-
-* **Keys-only logging.** Logs (including offline evidence pipelines and BodyGraph ingest flows) may record route names, step IDs, evidence family names, timings, and opaque identifiers (e.g., correlation id), but **never** payload contents, raw birth data, vendor payloads, or derived personal attributes.
-
-* **BodyGraph ingest logs & metrics (routing only).** BodyGraph ingest and refresh logs are **keys‑only** (no raw birth data; no vendor payloads; secrets never logged). Metrics cover refresh outcomes, rate‑limit throttles, circuit‑breaker trips, vendor latency histograms, and staleness gauges. Governance and Schemas & Artifacts own evidence/indexing; Glow Infrastructure owns providers/secrets posture. See §2.4 **BodyGraph ingest & durability** and §5 **Determinism & identity proofs** for how these flows are wired.
-
-  ## **7.2 Secrets & side effects: strict hygiene**
-
-* **No secrets in logs/artifacts.** API keys, tokens, credentials, and other secrets must not appear in logs, artifacts, or error messages. This applies equally to runtime surfaces and to offline evidence and determinism jobs.
-
-* **No import-time I/O in engine math.** Engine code performs **no** file, network, or time access (and no randomness) at import or compute time; computations are pure and deterministic. Offline evidence generators invoke the same pure Engine and sampler behavior with pinned fixtures; they do not introduce new side effects.  
-* 
-
----
+No import-time I/O in engine math. Engine code performs no file, network, or time access (and no randomness) at import or compute time. Computations are pure and deterministic. Offline evidence generators invoke the same pure Engine and sampler behavior with pinned fixtures and do not introduce new side effects.
 
 # **8\. Repository & Ownership Routing \[Required-Now\]**
 
 ## **8.1 Ownership of “bytes” (route by title)**
 
-* **PF02 is contract-free.** Use **titles only** for cross-doc references; do **not** copy headers, schemas, status matrices, tokens, or paths here. Concrete bytes and locations live in their single homes below.
+PF02 is contract-free. Use titles only for cross-doc references. Do not copy headers, schemas, status matrices, tokens, or paths here. Concrete bytes and locations live in their single homes below.
 
-* **Math & scoring** (arithmetic, banding, presets, extractors, preimage/idempotence, ordering) → **HDE-Math-Spec**.
+Math & scoring (arithmetic, banding, presets, extractors, preimage/idempotence, ordering) → **HDE-Math-Spec**.
 
-* **Pack catalogs & manifest** (freeze-pack identity, checksums, canonical JSON policy, human `docs/evidence/INDEX.json`, machine `artifacts/evidence_index.jsonl` schema/parity) → **HDE-Schemas & Artifacts**.
+Pack catalogs & manifest (freeze-pack identity, checksums, canonical JSON policy, human `docs/evidence/INDEX.json`, machine `artifacts/evidence_index.jsonl` schema/parity) → **HDE-Schemas & Artifacts**.
 
-* **CLI / Reader / vendor route bytes** (public six-key envelope, request/response shapes & examples, streams/exits, **Endpoint Catalog (JSON success) ownership and route titles**, CLI admin preview, vendor request shaping, parity rules) → **HDE-CLI-API-Vendor-Ref**.
+CLI / Reader / vendor route bytes (public six-key envelope, request/response shapes & examples, streams/exits, Endpoint Catalog (JSON success) ownership and route titles, CLI admin preview, vendor request shaping, parity rules) → **HDE-CLI-API-Vendor-Ref**.
 
-* **A7 transport & ops policy** (ETag/200, **304 header omissions**, **HEAD parity**, `Vary: Authorization, Accept-Encoding`, **encoding-invariance**, writers `no-store`/no ETag, `/internal/version` ops-only posture, acceptance tokens) → **HDE-Governance**.
+A7 transport & ops policy (ETag/200, 304 header omissions, HEAD parity, Vary: Authorization, Accept-Encoding, encoding-invariance, writers no-store/no ETag, /internal/version ops-only posture, acceptance tokens) → **HDE-Governance**.
 
-* **QA tokens & D-goals** (Live QA token semantics, rails posture, and per-epic D-goal records and acceptance conditions) → **Glow QA Guide** and **HDE-Phased Epics**.
+QA tokens & D-goals (Live QA token semantics, rails posture, and per-epic D-goal records and acceptance conditions) → **Glow QA Guide** and **HDE-Phased Epics**.
 
-* **Guards & ops how-to / CI** (capture scripts, serializer path allow-lists/denylists, dev-harness ops posture, PR-first workflow with CodEx-opened PR and same-PR Evidence Index updates) → **Epic-Process-Guide** and **HDE-Mechanics Guide**.
+Guards & ops how-to / CI (capture scripts, serializer path allow-lists/denylists, dev-harness ops posture, PR-first workflow with CodEx-opened PR and same-PR Evidence Index updates) → **Epic-Process-Guide** and **HDE-Mechanics Guide**.
 
-* **Infrastructure names/locations** (providers, projects, services, repos, domains, DB schemas) → **HDE-Glow-Infrastructure**.
+Infrastructure names/locations (providers, projects, services, repos, domains, DB schemas) → **Glow Infrastructure**.
 
-* **Narratives surface** (Aux route & Composer), suppression rule (200 with no body, no ETag), and A7 posture for Aux → **PF17-Canon-HDE-Narratives Guide** (and **HDE-Governance** for policy).
+Narratives surface (Aux route & Composer), suppression rule (200 with no body, no ETag), and A7 posture for Aux → **HDE Narratives Guide** (and **HDE-Governance** for policy).
 
-* **Invocation tag / covenant text** → **PF-Invocation**.
+Invocation tag / covenant text → **PF-Invocation**.
 
-* **Endpoint Catalog (JSON success) single home & env‑gate proof** → **HDE‑CLI-API‑Vendor‑Ref** (route titles) and **HDE‑Schemas & Artifacts** (path `docs/ENDPOINTS_CATALOG.json` \+ `.sha256`, env‑gate proof indexing). PF02 pins this location only.
+Endpoint Catalog (JSON success) single home & env-gate proof → **HDE-CLI-API-Vendor-Ref** (route titles) and **HDE-Schemas & Artifacts** (path `docs/ENDPOINTS_CATALOG.json` \+ `.sha256`, env-gate proof indexing). PF02 pins this location only.
 
-* **BodyGraph evidence families** (source‑selection snapshot, source‑invariance proofs, refresh‑policy snapshot, ingest metrics/log samples) → **HDE‑Mechanics Guide / HDE‑Build Checklist** (what to capture, when), **HDE‑Schemas & Artifacts** (indices/mirror discipline). Schema names for durability live in **Glow Infrastructure** (names‑only).
+BodyGraph evidence families (source-selection snapshot, source-invariance proofs, refresh-policy snapshot, ingest metrics/log samples) → **HDE-Mechanics Guide** / **HDE-Build Checklist** (what to capture, when), **HDE-Schemas & Artifacts** (indices/mirror discipline). Schema names for durability live in **Glow Infrastructure** (names-only).
 
