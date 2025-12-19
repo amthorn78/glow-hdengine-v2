@@ -34,6 +34,73 @@ CLI_STDOUT_EXPECTED_ARTIFACTS = {
     Path("artifacts/cli/showcompat/stdout.json.sha256"),
     Path("artifacts/cli/showcompat/args.json"),
 }
+INTERNAL_VERSION_CONTRACT_TEST = "tests/transport/test_internal_version_contract.py::test_internal_version_invariants_and_artifacts"
+SHOWCOMPAT_TWO_RUN_TEST = "tests/cli/test_showcompat_parity_and_identity.py::test_two_run_identity_and_reemit"
+D3_TOKEN_EXPECTATIONS = {
+    "INTERNAL_VERSION_200_CTYPE_JSON_UTF8_OK": {
+        "artifacts": {
+            "artifacts/ops/internal_version/body_get.json",
+            "artifacts/ops/internal_version/headers_get.txt",
+        },
+        "tests": {INTERNAL_VERSION_CONTRACT_TEST},
+    },
+    "INTERNAL_VERSION_HEAD_PARITY_OK": {
+        "artifacts": {
+            "artifacts/ops/internal_version/headers_get.txt",
+            "artifacts/ops/internal_version/headers_head.txt",
+        },
+        "tests": {INTERNAL_VERSION_CONTRACT_TEST},
+    },
+    "INTERNAL_VERSION_CONDITIONALS_IGNORED_OK": {
+        "artifacts": {
+            "artifacts/ops/internal_version/cond_if_none_match_headers.txt",
+            "artifacts/ops/internal_version/cond_if_modified_since_headers.txt",
+        },
+        "tests": {INTERNAL_VERSION_CONTRACT_TEST},
+    },
+    "INTERNAL_VERSION_NO_ETAG_OK": {
+        "artifacts": {
+            "artifacts/ops/internal_version/headers_get.txt",
+            "artifacts/ops/internal_version/headers_head.txt",
+            "artifacts/ops/internal_version/cond_if_none_match_headers.txt",
+            "artifacts/ops/internal_version/cond_if_modified_since_headers.txt",
+        },
+        "tests": {INTERNAL_VERSION_CONTRACT_TEST},
+    },
+    "INTERNAL_VERSION_NO_STORE_OK": {
+        "artifacts": {
+            "artifacts/ops/internal_version/headers_get.txt",
+            "artifacts/ops/internal_version/headers_head.txt",
+            "artifacts/ops/internal_version/cond_if_none_match_headers.txt",
+            "artifacts/ops/internal_version/cond_if_modified_since_headers.txt",
+        },
+        "tests": {INTERNAL_VERSION_CONTRACT_TEST},
+    },
+    "TWO_RUN_IDENTITY_OK": {
+        "artifacts": {
+            "artifacts/audit/cli/two_run_identity.log",
+            "artifacts/ops/internal_version/two_run_identity.log",
+        },
+        "tests": {INTERNAL_VERSION_CONTRACT_TEST, SHOWCOMPAT_TWO_RUN_TEST},
+    },
+    "RELEASE_ID_RECOMPUTE_OK": {
+        "artifacts": {
+            "artifacts/math/release_id_recompute.log",
+            "artifacts/math/freeze_pack_manifest.json",
+            "artifacts/math/release_id.txt",
+            "artifacts/ops/internal_version/two_run_identity.log",
+        },
+        "tests": {INTERNAL_VERSION_CONTRACT_TEST},
+    },
+    "RELEASE_ID_FROM_MANIFEST_OK": {
+        "artifacts": {
+            "artifacts/math/freeze_pack_manifest.json",
+            "artifacts/math/release_id.txt",
+            "artifacts/ops/internal_version/two_run_identity.log",
+        },
+        "tests": {INTERNAL_VERSION_CONTRACT_TEST},
+    },
+}
 
 
 def test_epic022_scaffold_files_exist():
@@ -82,6 +149,14 @@ def _parse_matrix_rows():
         if len(cells) == len(header):
             rows.append(dict(zip(header, cells)))
     return rows
+
+
+def _load_acceptance_map_tokens():
+    data = json.loads(ACCEPTANCE_MAP.read_text(encoding="utf-8"))
+    token_map = {}
+    for token in data.get("tokens", []):
+        token_map.setdefault(token.get("name"), []).append(token)
+    return token_map
 
 
 def test_env_rails_policy_matrix_is_unique_and_concrete():
@@ -136,3 +211,47 @@ def test_cli_stdout_lf_acceptance_map_is_unique_and_artifacts_exist():
 
     for path in CLI_STDOUT_EXPECTED_ARTIFACTS:
         assert path.is_file(), f"Expected CLI stdout artifact to exist: {path}"
+
+
+def test_internal_version_and_identity_tokens_are_unique_and_concrete():
+    rows = _parse_matrix_rows()
+    matrix_index = {}
+    for row in rows:
+        matrix_index.setdefault(row.get("Token name"), []).append(row)
+
+    acceptance_index = _load_acceptance_map_tokens()
+
+    for token_name, expectation in D3_TOKEN_EXPECTATIONS.items():
+        matrix_rows = matrix_index.get(token_name, [])
+        assert len(matrix_rows) == 1, f"{token_name} should have exactly one row in the token matrix"
+        matrix_row = matrix_rows[0]
+
+        evidence_cells = {
+            part.strip()
+            for part in matrix_row["Evidence artifacts (titles / paths / artifact_keys)"].split(";")
+            if part.strip()
+        }
+        assert evidence_cells == expectation["artifacts"], f"{token_name} evidence artifacts should be concrete and unique"
+        assert not any("TBD" in cell or "{" in cell or "}" in cell for cell in evidence_cells), (
+            f"{token_name} matrix evidence must not contain placeholders"
+        )
+
+        test_cells = {
+            part.strip() for part in matrix_row["CI jobs / tests (names or node ids)"].split(";") if part.strip()
+        }
+        assert test_cells == expectation["tests"], f"{token_name} should list the expected contract tests"
+
+        acceptance_rows = acceptance_index.get(token_name, [])
+        assert len(acceptance_rows) == 1, f"{token_name} should appear exactly once in the acceptance map"
+        acceptance_entry = acceptance_rows[0]
+
+        evidence_titles = set(acceptance_entry.get("evidence_titles", []))
+        expected_titles = expectation["artifacts"] | expectation["tests"]
+        assert evidence_titles == expected_titles, f"{token_name} acceptance evidence should align with the token matrix"
+        assert not any("TBD" in title or "{" in title or "}" in title for title in evidence_titles), (
+            f"{token_name} acceptance evidence must not contain placeholders"
+        )
+
+        for artifact in expectation["artifacts"]:
+            path = Path(artifact)
+            assert path.is_file(), f"Expected artifact for {token_name} to exist: {path}"
