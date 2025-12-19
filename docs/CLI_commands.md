@@ -1,4 +1,4 @@
-# CLI commands — Compat v1 and dev/admin harnesses (EPIC021)
+# CLI commands — Compat v1 and dev/admin harnesses (post-EPIC022)
 
 The CLI shares the canonical presenter/emitter and serializer with the Reader harness. Run public commands under closed rails (`LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0`), enforced by `engine.runtime.determinism_env.ensure_determinism_env`.
 
@@ -22,9 +22,10 @@ Both guards fail fast if determinism rails are not pinned and protect the allow-
 - Guard outputs, QA dumps, and other governed artifacts must have `.path_proof.txt` siblings plus entries in `docs/evidence/INDEX.json` and `artifacts/evidence_index.jsonl`. Use `python tools/evidence/update_evidence_index.py` to refresh.
 - Registry report: `python tools/generate_registry_report.py` writes `artifacts/registry/registry_report.json` (canonical serializer) with a `.path_proof.txt` sidecar.
 - Orientation and sanity checks: `python tools/evidence/orientation_demo.py` and `python tools/evidence/run_sanity_pipeline.py` (pipeline emits `artifacts/sanity/sanity.log` under closed rails).
+- Showcompat deterministic capture (EPIC022 D2): `python tools/cli/generate_showcompat_artifacts.py` records `artifacts/cli/showcompat/stdout.json`, `artifacts/cli/showcompat/stdout.json.sha256`, and `artifacts/cli/showcompat/args.json` with env-pin metadata; governed via `.path_proof.txt` siblings and the Evidence Index/Mirror.
 - Sampler evidence harness: `python tools/evidence/generate_sampler_evidence.py` runs dev sampler CLI + HTTP harnesses and captures seed replay, diversity, ABBA, and two-run identity logs.
 - Engine Core evidence harness: `python tools/evidence/generate_engine_core_evidence.py` captures purity, JSON compare, ABBA, and two-run identity logs.
-- Evidence index updater: `python tools/evidence/update_evidence_index.py` mirrors registry_report and sanity artifacts into Index/Mirror (`docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl`).
+- Evidence index updater: `python tools/evidence/update_evidence_index.py` mirrors registry_report, sanity, showcompat captures, and other governed artifacts into Index/Mirror (`docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl`).
 
 ## Dev/admin harnesses (dev/test/local only)
 
