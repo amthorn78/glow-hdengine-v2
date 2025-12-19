@@ -1,0 +1,5 @@
+path: parity/errors_reader_cli.db_unavailable.cli.txt
+size_bytes: 47
+sha256: 0c9dd685c61688e1b0441f29f8bfe590d6aea9599a53d52b02a0a012d7271eb8
+mtime_utc: 2025-12-18T23:29:50Z
+produced_at_utc: 2025-11-30T03:58:47Z

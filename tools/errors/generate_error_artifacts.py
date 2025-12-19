@@ -35,37 +35,14 @@ class ParityScenario:
     stderr_expectation: str
 
 
-SCENARIOS: tuple[ParityScenario, ...] = (
-    ParityScenario(
-        name="invalid_json",
-        token="ERR_COMPAT_INVALID_JSON",
-        http_call=lambda client: client.get("/api/compat/v1"),
-        cli_args=lambda tmpdir: _cli_args_invalid_json(tmpdir),
-        stderr_expectation="INVALID_JSON",
-    ),
-    ParityScenario(
-        name="invalid_viewer_prefs",
-        token="ERR_INVALID_VIEWER_PREFS",
-        http_call=lambda client: client.post(
-            "/api/compat/v1",
-            json={
-                "a": {"person_uid": "A"},
-                "b": {"person_uid": "B"},
-                "viewer_prefs": {"top_category": "not_a_category"},
-            },
-        ),
-        cli_args=lambda tmpdir: _cli_args_invalid_viewer_prefs(tmpdir),
-        stderr_expectation="INVALID_VIEWER_PREFS",
-    ),
-)
-
-
 def _cli_env() -> dict[str, str]:
     env = dict(os.environ)
     ensure_determinism_env(environ=env, apply=True)
     env.update({
         "PYTHONPATH": str(ROOT),
         "APP_ENV": env.get("APP_ENV", "dev"),
+        "DB_FORCE_PG": "1",
+        "HDE_FORCE_DB_UNAVAILABLE": "1",
     })
     return env
 
@@ -108,6 +85,91 @@ def _cli_args_invalid_viewer_prefs(tmpdir: Path) -> list[str]:
         "--viewer-prefs-file",
         str(prefs),
     ]
+
+
+def _cli_args_db_unavailable() -> list[str]:
+    return [
+        sys.executable,
+        "-m",
+        "engine.cli",
+        "showcompat",
+        "--source",
+        "db",
+        "--user-a",
+        "db-user-a",
+        "--user-b",
+        "db-user-b",
+    ]
+
+
+def _cli_args_vendor_closed_rails() -> list[str]:
+    return [
+        sys.executable,
+        "-m",
+        "engine.cli",
+        "showcompat",
+        "--source",
+        "vendor",
+        "--birthdate-a",
+        "2000-01-01",
+        "--birthtime-a",
+        "00:00",
+        "--location-a",
+        "Moon",
+        "--birthdate-b",
+        "2000-02-02",
+        "--birthtime-b",
+        "01:01",
+        "--location-b",
+        "Sun",
+    ]
+
+
+def _http_db_unavailable(client) -> object:
+    return client.get("/ops/db/unavailable")
+
+
+def _http_vendor_closed_rails(client) -> object:
+    return client.post("/ops/rails/refusal")
+
+
+SCENARIOS: tuple[ParityScenario, ...] = (
+    ParityScenario(
+        name="invalid_json",
+        token="ERR_COMPAT_INVALID_JSON",
+        http_call=lambda client: client.get("/api/compat/v1"),
+        cli_args=lambda tmpdir: _cli_args_invalid_json(tmpdir),
+        stderr_expectation="INVALID_JSON",
+    ),
+    ParityScenario(
+        name="invalid_viewer_prefs",
+        token="ERR_INVALID_VIEWER_PREFS",
+        http_call=lambda client: client.post(
+            "/api/compat/v1",
+            json={
+                "a": {"person_uid": "A"},
+                "b": {"person_uid": "B"},
+                "viewer_prefs": {"top_category": "not_a_category"},
+            },
+        ),
+        cli_args=lambda tmpdir: _cli_args_invalid_viewer_prefs(tmpdir),
+        stderr_expectation="INVALID_VIEWER_PREFS",
+    ),
+    ParityScenario(
+        name="db_unavailable",
+        token="ERR_WRITER_RAILS_CLOSED",
+        http_call=_http_db_unavailable,
+        cli_args=lambda tmpdir: _cli_args_db_unavailable(),
+        stderr_expectation="DB_QUERY_FAILED",
+    ),
+    ParityScenario(
+        name="vendor_attempt_closed_rails",
+        token="ERR_WRITER_RAILS_CLOSED",
+        http_call=_http_vendor_closed_rails,
+        cli_args=lambda tmpdir: _cli_args_vendor_closed_rails(),
+        stderr_expectation="PROVIDER_REFUSED",
+    ),
+)
 
 
 def _minimal_validate(instance: Mapping[str, object], schema: Mapping[str, object]) -> None:
@@ -229,9 +291,10 @@ def write_parity_artifacts() -> None:
     generate_schema_logs(http_results)
     _write_json(ROOT / "errors/token_map/token_map.json", render_token_map())
 
+    scenario_list = ", ".join(s.name for s in SCENARIOS)
     readme = (
         "Error parity artifacts between HTTP Reader/Compat endpoints and CLI error handling.\n"
-        "Scenarios: invalid_json (compat GET without ids) and invalid_viewer_prefs (compat POST with invalid prefs).\n"
+        f"Scenarios: {scenario_list}.\n"
         "Artifacts include HTTP error envelopes, CLI stderr snapshots, schema validation logs, and token map snapshot.\n"
     )
     (parity_dir / "README.md").write_text(readme, encoding="utf-8")

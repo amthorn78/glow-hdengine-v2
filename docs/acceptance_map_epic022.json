@@ -122,7 +122,11 @@
       "owner_pf": "PF20 — HDE-Phased Epics (HDE-SEPA002)",
       "status": "pending",
       "evidence_titles": [
-        "parity/errors_reader_cli.{scenario}.http.json"
+        "tests/cli/test_errors_parity.py::test_http_and_cli_parity",
+        "parity/errors_reader_cli.invalid_json.http.json",
+        "parity/errors_reader_cli.invalid_viewer_prefs.http.json",
+        "parity/errors_reader_cli.db_unavailable.http.json",
+        "parity/errors_reader_cli.vendor_attempt_closed_rails.http.json"
       ]
     },
     {
@@ -130,7 +134,8 @@
       "owner_pf": "PF20 — HDE-Phased Epics (HDE-SEPA002)",
       "status": "pending",
       "evidence_titles": [
-        "TBD (PR1 scaffold)"
+        "tests/cli/test_errors_parity.py::test_http_and_cli_parity",
+        "errors/token_map/token_map.json"
       ]
     },
     {
@@ -138,8 +143,15 @@
       "owner_pf": "PF20 — HDE-Phased Epics (HDE-SEPA002.5)",
       "status": "pending",
       "evidence_titles": [
-        "parity/errors_reader_cli.{scenario}.http.json",
-        "parity/errors_reader_cli.{scenario}.cli.txt"
+        "tests/cli/test_errors_parity.py::test_http_and_cli_parity",
+        "parity/errors_reader_cli.invalid_json.http.json",
+        "parity/errors_reader_cli.invalid_json.cli.txt",
+        "parity/errors_reader_cli.invalid_viewer_prefs.http.json",
+        "parity/errors_reader_cli.invalid_viewer_prefs.cli.txt",
+        "parity/errors_reader_cli.db_unavailable.http.json",
+        "parity/errors_reader_cli.db_unavailable.cli.txt",
+        "parity/errors_reader_cli.vendor_attempt_closed_rails.http.json",
+        "parity/errors_reader_cli.vendor_attempt_closed_rails.cli.txt"
       ]
     },
     {
@@ -147,7 +159,15 @@
       "owner_pf": "PF20 — HDE-Phased Epics (HDE-SEPA002.5; HDE-SEPA004.4)",
       "status": "pending",
       "evidence_titles": [
-        "artifacts/ops/internal_version/two_run_identity.log"
+        "tests/cli/test_errors_parity.py::test_http_and_cli_parity",
+        "parity/errors_reader_cli.invalid_json.http.json",
+        "parity/errors_reader_cli.invalid_json.cli.txt",
+        "parity/errors_reader_cli.invalid_viewer_prefs.http.json",
+        "parity/errors_reader_cli.invalid_viewer_prefs.cli.txt",
+        "parity/errors_reader_cli.db_unavailable.http.json",
+        "parity/errors_reader_cli.db_unavailable.cli.txt",
+        "parity/errors_reader_cli.vendor_attempt_closed_rails.http.json",
+        "parity/errors_reader_cli.vendor_attempt_closed_rails.cli.txt"
       ]
     },
     {

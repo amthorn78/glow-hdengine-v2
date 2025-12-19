@@ -1,0 +1,5 @@
+path: errors/schema_check/error_envelope_vendor_attempt_closed_rails.log
+size_bytes: 91
+sha256: 86b946838aba947baceda3d71e961da00c01f08bc10932676e7099185cc2ffc5
+mtime_utc: 2025-12-18T23:29:51Z
+produced_at_utc: 2025-11-30T03:58:47Z
