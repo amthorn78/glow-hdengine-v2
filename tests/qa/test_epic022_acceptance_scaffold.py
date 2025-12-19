@@ -19,6 +19,21 @@ ENV_EXPECTED_TESTS = {
     "ci/checks/check_env_pins.sh",
     "tests/cli/test_errors_parity.py::test_http_and_cli_parity",
 }
+CLI_STDOUT_TOKEN = "CLI_STDOUT_LF_OK"
+CLI_STDOUT_EXPECTED_EVIDENCE = {
+    "tests/cli/test_cli_canonical_bytes.py::test_showcompat_stdout_is_canonical",
+    "artifacts/cli/showcompat/stdout.json",
+    "artifacts/cli/showcompat/stdout.json.sha256",
+    "artifacts/cli/showcompat/args.json",
+}
+CLI_STDOUT_EXPECTED_TESTS = {
+    "tests/cli/test_cli_canonical_bytes.py::test_showcompat_stdout_is_canonical",
+}
+CLI_STDOUT_EXPECTED_ARTIFACTS = {
+    Path("artifacts/cli/showcompat/stdout.json"),
+    Path("artifacts/cli/showcompat/stdout.json.sha256"),
+    Path("artifacts/cli/showcompat/args.json"),
+}
 
 
 def test_epic022_scaffold_files_exist():
@@ -93,3 +108,31 @@ def test_env_rails_policy_acceptance_map_binding_is_concrete():
     evidence_titles = set(env_entry.get("evidence_titles", []))
     assert evidence_titles == ENV_EXPECTED_EVIDENCE, "Acceptance map should bind ENV_RAILS_POLICY_OK to concrete rails and closed-rails parity evidence"
     assert not any("TBD" in title or "{" in title or "}" in title for title in evidence_titles), "Acceptance map should not contain placeholder evidence for ENV_RAILS_POLICY_OK"
+
+
+def test_cli_stdout_lf_token_is_unique_and_concrete():
+    rows = _parse_matrix_rows()
+    cli_rows = [row for row in rows if row.get("Token name") == CLI_STDOUT_TOKEN]
+    assert len(cli_rows) == 1, "CLI_STDOUT_LF_OK should have exactly one row in the token matrix"
+    row = cli_rows[0]
+
+    evidence_cells = {part.strip() for part in row["Evidence artifacts (titles / paths / artifact_keys)"].split(";") if part.strip()}
+    assert evidence_cells == CLI_STDOUT_EXPECTED_EVIDENCE, "CLI_STDOUT_LF_OK evidence should reference the canonical-bytes test and showcompat stdout artifacts"
+    assert not any("TBD" in entry or "{" in entry or "}" in entry for entry in evidence_cells), "CLI_STDOUT_LF_OK evidence must not contain placeholders"
+
+    test_cells = {part.strip() for part in row["CI jobs / tests (names or node ids)"].split(";") if part.strip()}
+    assert CLI_STDOUT_EXPECTED_TESTS.issubset(test_cells), "CLI_STDOUT_LF_OK should anchor to the canonical-bytes test"
+
+
+def test_cli_stdout_lf_acceptance_map_is_unique_and_artifacts_exist():
+    data = json.loads(ACCEPTANCE_MAP.read_text(encoding="utf-8"))
+    tokens = [token for token in data.get("tokens", []) if token.get("name") == CLI_STDOUT_TOKEN]
+    assert len(tokens) == 1, "CLI_STDOUT_LF_OK should appear exactly once in the acceptance map"
+    entry = tokens[0]
+
+    evidence_titles = set(entry.get("evidence_titles", []))
+    assert evidence_titles == CLI_STDOUT_EXPECTED_EVIDENCE, "Acceptance map should bind CLI_STDOUT_LF_OK to the canonical-bytes test and showcompat stdout artifacts"
+    assert not any("TBD" in title or "{" in title or "}" in title for title in evidence_titles), "CLI_STDOUT_LF_OK acceptance evidence must not contain placeholders"
+
+    for path in CLI_STDOUT_EXPECTED_ARTIFACTS:
+        assert path.is_file(), f"Expected CLI stdout artifact to exist: {path}"
