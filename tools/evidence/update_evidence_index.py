@@ -111,6 +111,7 @@ def _write_path_proof(
     default_produced_at: str,
     check: bool,
     stat_mtime: float,
+    extra_fields: Mapping[str, str] | None = None,
 ) -> tuple[str, str]:
     """Write or validate a path-proof for the given relative path.
 
@@ -127,6 +128,7 @@ def _write_path_proof(
     existing = _load_existing_proof(proof_path)
     produced = produced_at or existing.get("produced_at_utc") or default_produced_at
     stat_mtime_iso = _isoformat_from_timestamp(stat_mtime)
+    extra_fields = dict(extra_fields or {})
 
     if check:
         if not proof_path.exists():
@@ -142,6 +144,9 @@ def _write_path_proof(
             raise SystemExit(f"PROOF_SIZE:{proof_rel}") from exc
         if recorded_size != size_bytes:
             raise SystemExit(f"PROOF_SIZE:{proof_rel}")
+        for key, value in extra_fields.items():
+            if proof.get(key) != value:
+                raise SystemExit(f"PROOF_FIELD:{proof_rel}:{key}")
 
         mtime_raw = proof.get("mtime_utc")
         produced_raw = proof.get("produced_at_utc")
@@ -164,10 +169,16 @@ def _write_path_proof(
         f"path: {rel}",
         f"size_bytes: {size_bytes}",
         f"sha256: {sha256}",
+    ]
+    for key, value in extra_fields.items():
+        proof_lines.append(f"{key}: {value}")
+    proof_lines.extend(
+        [
         f"mtime_utc: {mtime}",
         f"produced_at_utc: {produced}",
         "",
-    ]
+        ]
+    )
     proof_text = "\n".join(proof_lines)
     if proof_path.exists():
         existing_text = proof_path.read_text(encoding="utf-8")
@@ -468,15 +479,18 @@ def main(argv: list[str] | None = None) -> None:
     _write_if_changed(MIRROR_PATH, mirror_bytes, check=args.check)
 
     mirror_stat = MIRROR_PATH.stat()
+    mirror_file_sha = _sha256_path(MIRROR_PATH)
+    mirror_body_sha = str(mirror_rec["sha256"])
     proof_anchor, produced_at = _write_path_proof(
         MIRROR_REL,
-        sha256=str(mirror_rec["sha256"]),
-        size_bytes=mirror_size,
+        sha256=mirror_file_sha,
+        size_bytes=mirror_stat.st_size,
         mtime_utc=mirror_proof_existing.get("mtime_utc"),
         produced_at=str(mirror_rec.get("produced_at_utc")),
         default_produced_at=produced_default,
         check=args.check,
         stat_mtime=mirror_stat.st_mtime,
+        extra_fields={"mirror_body_sha256": mirror_body_sha},
     )
     if proof_anchor != mirror_rec["proof_anchor"]:
         mirror_rec["proof_anchor"] = proof_anchor

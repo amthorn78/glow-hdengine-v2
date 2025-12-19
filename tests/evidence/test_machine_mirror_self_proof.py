@@ -32,10 +32,15 @@ def test_machine_mirror_self_proof_matches_canonical_digest():
         and rec["discovered_physical_path"] == mirror_rel
     )
 
+    mirror_file_sha = uei._sha256_path(uei.MIRROR_PATH)
+    mirror_body_sha = rendered_rec["sha256"]
+    mirror_size = uei.MIRROR_PATH.stat().st_size
+
     assert mirror_bytes.decode("utf-8") == mirror_text
-    assert rendered_rec["sha256"] == live_rec["sha256"] == proof["sha256"]
-    assert int(rendered_rec["size_bytes"]) == int(live_rec["size_bytes"]) == int(
-        proof["size_bytes"]
-    )
+    assert rendered_rec["sha256"] == live_rec["sha256"] == mirror_body_sha
+    assert proof["sha256"] == mirror_file_sha
+    assert proof["mirror_body_sha256"] == mirror_body_sha
+    assert int(rendered_rec["size_bytes"]) == int(live_rec["size_bytes"]) == int(mirror_size)
+    assert int(proof["size_bytes"]) == int(mirror_size)
     assert proof.get("path") == mirror_rel
     assert proof.get("produced_at_utc") == rendered_rec["produced_at_utc"]
