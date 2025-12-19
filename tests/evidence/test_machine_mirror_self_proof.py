@@ -19,6 +19,7 @@ def test_machine_mirror_self_proof_matches_canonical_digest():
     )
 
     mirror_text = uei.MIRROR_PATH.read_text(encoding="utf-8")
+    mirror_file_sha = uei._sha256_bytes(uei.MIRROR_PATH.read_bytes())
     live_records = [
         json.loads(line)
         for line in mirror_text.splitlines()
@@ -33,7 +34,9 @@ def test_machine_mirror_self_proof_matches_canonical_digest():
     )
 
     assert mirror_bytes.decode("utf-8") == mirror_text
-    assert rendered_rec["sha256"] == live_rec["sha256"] == proof["sha256"]
+    assert proof["sha256"] == mirror_file_sha
+    assert proof["mirror_body_sha256"] == rendered_rec["sha256"]
+    assert rendered_rec["sha256"] == live_rec["sha256"]
     assert int(rendered_rec["size_bytes"]) == int(live_rec["size_bytes"]) == int(
         proof["size_bytes"]
     )

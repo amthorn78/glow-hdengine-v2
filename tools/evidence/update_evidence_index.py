@@ -106,6 +106,7 @@ def _write_path_proof(
     *,
     sha256: str,
     size_bytes: int,
+    extra_fields: Mapping[str, str] | None = None,
     mtime_utc: str | None,
     produced_at: str | None,
     default_produced_at: str,
@@ -125,6 +126,7 @@ def _write_path_proof(
     proof_path.parent.mkdir(parents=True, exist_ok=True)
 
     existing = _load_existing_proof(proof_path)
+    extra_fields = dict(extra_fields or {})
     produced = produced_at or existing.get("produced_at_utc") or default_produced_at
     stat_mtime_iso = _isoformat_from_timestamp(stat_mtime)
 
@@ -136,6 +138,9 @@ def _write_path_proof(
             raise SystemExit(f"PROOF_PATH:{proof_rel}")
         if proof.get("sha256") != sha256:
             raise SystemExit(f"PROOF_SHA:{proof_rel}")
+        for key, value in sorted(extra_fields.items()):
+            if proof.get(key) != value:
+                raise SystemExit(f"PROOF_{key.upper()}:{proof_rel}")
         try:
             recorded_size = int(proof.get("size_bytes", ""))
         except ValueError as exc:  # pragma: no cover - defensive
@@ -164,10 +169,15 @@ def _write_path_proof(
         f"path: {rel}",
         f"size_bytes: {size_bytes}",
         f"sha256: {sha256}",
-        f"mtime_utc: {mtime}",
-        f"produced_at_utc: {produced}",
-        "",
     ]
+    proof_lines.extend(f"{key}: {value}" for key, value in sorted(extra_fields.items()))
+    proof_lines.extend(
+        [
+            f"mtime_utc: {mtime}",
+            f"produced_at_utc: {produced}",
+            "",
+        ]
+    )
     proof_text = "\n".join(proof_lines)
     if proof_path.exists():
         existing_text = proof_path.read_text(encoding="utf-8")
@@ -467,11 +477,13 @@ def main(argv: list[str] | None = None) -> None:
     mirror_rec["size_bytes"] = mirror_size
     _write_if_changed(MIRROR_PATH, mirror_bytes, check=args.check)
 
+    mirror_file_sha = _sha256_path(MIRROR_PATH)
     mirror_stat = MIRROR_PATH.stat()
     proof_anchor, produced_at = _write_path_proof(
         MIRROR_REL,
-        sha256=str(mirror_rec["sha256"]),
+        sha256=mirror_file_sha,
         size_bytes=mirror_size,
+        extra_fields={"mirror_body_sha256": str(mirror_rec["sha256"])},
         mtime_utc=mirror_proof_existing.get("mtime_utc"),
         produced_at=str(mirror_rec.get("produced_at_utc")),
         default_produced_at=produced_default,
