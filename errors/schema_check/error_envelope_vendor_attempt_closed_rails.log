@@ -1,0 +1,4 @@
+scenario: vendor_attempt_closed_rails
+status: 503
+code: ERR_WRITER_RAILS_CLOSED
+schema: ok

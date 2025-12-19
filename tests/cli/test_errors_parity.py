@@ -42,6 +42,16 @@ def _load_cli_artifact(path: Path) -> dict[str, object]:
     return payload
 
 
+def test_parity_scenarios_are_bound():
+    names = [scenario.name for scenario in SCENARIOS]
+    assert names == [
+        "invalid_json",
+        "invalid_viewer_prefs",
+        "db_unavailable",
+        "vendor_attempt_closed_rails",
+    ]
+
+
 @pytest.mark.parametrize("scenario", SCENARIOS)
 def test_http_and_cli_parity(monkeypatch, scenario):
     stored_http = json.loads(

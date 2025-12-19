@@ -1,0 +1,5 @@
+path: errors/schema_check/error_envelope_db_unavailable.log
+size_bytes: 78
+sha256: 0fb4f4479777be65bcb885f0df50dc52f555b801634fa059959b8407954ae461
+mtime_utc: 2025-12-18T23:29:51Z
+produced_at_utc: 2025-11-30T03:58:47Z
