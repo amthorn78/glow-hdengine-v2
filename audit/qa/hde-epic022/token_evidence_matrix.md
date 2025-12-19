@@ -12,7 +12,7 @@
 | MACHINE_MIRROR_UPDATED_OK | PF12 — HDE-Schemas and Artifacts §Evidence Mirror | TBD | TBD | TBD | Pending | Baseline token; scaffolded in PR1 |
 | QA_PRECOMMIT_CHECKLIST_OK | PF19 — Glow QA Guide §QA Rails | TBD | TBD | TBD | Pending | Baseline token; scaffolded in PR1 |
 | QA_POSTCOMMIT_CHECKLIST_OK | PF19 — Glow QA Guide §QA Rails | TBD | TBD | TBD | Pending | Baseline token; scaffolded in PR1 |
-| ENV_RAILS_POLICY_OK | PF19 — Glow QA Guide §Env Pins | audit/gates/determinism/env_pins.log; audit/gates/determinism/env_pins.log.path_proof.txt | ci/checks/check_env_pins.sh | audit/gates/determinism/env_pins.log | Pending | Closed rails enforced for EPIC022 parity runs |
+| ENV_RAILS_POLICY_OK | PF19 — Glow QA Guide §Env Pins | audit/gates/determinism/env_pins.log; audit/gates/determinism/env_pins.log.path_proof.txt | ci/checks/check_env_pins.sh | audit/gates/determinism/env_pins.log; audit/gates/determinism/env_pins.log.path_proof.txt | Pending | Authoritative D1 rails binding (placeholder row removed) |
 | DETERMINISM_ENV_PINS_OK | PF19 — Glow QA Guide §Env Pins | audit/gates/determinism/env_pins.log; audit/gates/determinism/env_pins.log.path_proof.txt | TBD | TBD | Pending | Baseline token; scaffolded in PR1 |
 | SANITY_PIPELINE_OK | PF19 — Glow QA Guide §Sanity Pipeline | TBD | TBD | TBD | Pending | Baseline token; scaffolded in PR1 |
 | CLOSE_PACK_FILES_PRESENT_OK | PF20 — HDE-Phased Epics (EPIC022 record) | audit/EPIC-022_close_report.md; audit/EPIC-022_MANIFEST.json; audit/qa/hde-epic022/token_evidence_matrix.md; docs/acceptance_map_epic022.json | TBD | TBD | Pending | Baseline token; scaffolded in PR1 |
