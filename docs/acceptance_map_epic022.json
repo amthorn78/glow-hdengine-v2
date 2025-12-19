@@ -86,7 +86,9 @@
       "owner_pf": "PF19 — Glow QA Guide §Env Pins",
       "status": "pending",
       "evidence_titles": [
-        "TBD (PR1 scaffold)"
+        "ci/checks/check_env_pins.sh (rails gate)",
+        "audit/gates/determinism/env_pins.log",
+        "audit/gates/determinism/env_pins.log.path_proof.txt"
       ]
     },
     {
