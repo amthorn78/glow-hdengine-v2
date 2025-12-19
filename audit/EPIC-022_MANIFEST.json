@@ -5,163 +5,306 @@
     {
       "token_name": "PR_OPENED_OK",
       "status": "expected_green",
-      "evidence_artifacts": [],
-      "tests": []
-    },
-    {
-      "token_name": "TESTS_PASS_OK",
-      "status": "expected_green",
-      "evidence_artifacts": [],
-      "tests": []
-    },
-    {
-      "token_name": "DOC_DELTA_PRESENT_OK",
-      "status": "expected_green",
-      "evidence_artifacts": [],
-      "tests": []
-    },
-    {
-      "token_name": "EVIDENCE_INDEX_UPDATED_OK",
-      "status": "expected_green",
-      "evidence_artifacts": [],
-      "tests": []
-    },
-    {
-      "token_name": "EVIDENCE_INDEX_HASH_OK",
-      "status": "expected_green",
-      "evidence_artifacts": [],
-      "tests": []
-    },
-    {
-      "token_name": "EVIDENCE_INDEX_MIRROR_OK",
-      "status": "expected_green",
-      "evidence_artifacts": [],
-      "tests": []
-    },
-    {
-      "token_name": "EVIDENCE_PATHS_VALIDATED_OK",
-      "status": "expected_green",
-      "evidence_artifacts": [],
-      "tests": []
-    },
-    {
-      "token_name": "MACHINE_MIRROR_UPDATED_OK",
-      "status": "expected_green",
-      "evidence_artifacts": [],
-      "tests": []
-    },
-    {
-      "token_name": "QA_PRECOMMIT_CHECKLIST_OK",
-      "status": "expected_green",
-      "evidence_artifacts": [],
-      "tests": []
-    },
-    {
-      "token_name": "QA_POSTCOMMIT_CHECKLIST_OK",
-      "status": "expected_green",
-      "evidence_artifacts": [],
-      "tests": []
-    },
-    {
-      "token_name": "ENV_RAILS_POLICY_OK",
-      "status": "expected_green",
-      "evidence_artifacts": [],
-      "tests": []
-    },
-    {
-      "token_name": "DETERMINISM_ENV_PINS_OK",
-      "status": "expected_green",
-      "evidence_artifacts": [],
-      "tests": []
-    },
-    {
-      "token_name": "SANITY_PIPELINE_OK",
-      "status": "expected_green",
-      "evidence_artifacts": [],
-      "tests": []
-    },
-    {
-      "token_name": "CLOSE_PACK_FILES_PRESENT_OK",
-      "status": "expected_green",
       "evidence_artifacts": [
-        "audit/qa/hde-epic022/token_evidence_matrix.md",
-        "docs/acceptance_map_epic022.json",
         "audit/EPIC-022_close_report.md",
         "audit/EPIC-022_MANIFEST.json"
       ],
       "tests": []
     },
     {
+      "token_name": "TESTS_PASS_OK",
+      "status": "expected_green",
+      "evidence_artifacts": [
+        "sanity.pipeline.log"
+      ],
+      "tests": [
+        "tests/qa/test_epic022_acceptance_scaffold.py",
+        "tests/qa/test_epic022_close_pack_ready.py",
+        "tests/cli/test_errors_parity.py::test_http_and_cli_parity",
+        "tests/cli/test_cli_canonical_bytes.py::test_showcompat_stdout_is_canonical",
+        "tests/cli/test_cli_usage_and_errors.py",
+        "tests/transport/test_internal_version_contract.py::test_internal_version_invariants_and_artifacts",
+        "tests/cli/test_showcompat_parity_and_identity.py::test_two_run_identity_and_reemit"
+      ]
+    },
+    {
+      "token_name": "DOC_DELTA_PRESENT_OK",
+      "status": "expected_green",
+      "evidence_artifacts": [
+        "audit/EPIC-022_close_report.md",
+        "audit/qa/hde-epic022/token_evidence_matrix.md",
+        "docs/acceptance_map_epic022.json"
+      ],
+      "tests": []
+    },
+    {
+      "token_name": "EVIDENCE_INDEX_UPDATED_OK",
+      "status": "expected_green",
+      "evidence_artifacts": [
+        "docs/evidence/INDEX.json",
+        "index.machine_mirror"
+      ],
+      "tests": [
+        "python tools/evidence/update_evidence_index.py --check",
+        "python tools/evidence/orientation_demo.py --check",
+        "bash ci/checks/check_mirror_schema.sh"
+      ]
+    },
+    {
+      "token_name": "EVIDENCE_INDEX_HASH_OK",
+      "status": "expected_green",
+      "evidence_artifacts": [
+        "docs/evidence/INDEX.sha256"
+      ],
+      "tests": [
+        "python tools/evidence/update_evidence_index.py --check"
+      ]
+    },
+    {
+      "token_name": "EVIDENCE_INDEX_MIRROR_OK",
+      "status": "expected_green",
+      "evidence_artifacts": [
+        "index.machine_mirror"
+      ],
+      "tests": [
+        "bash ci/checks/check_mirror_schema.sh"
+      ]
+    },
+    {
+      "token_name": "EVIDENCE_PATHS_VALIDATED_OK",
+      "status": "expected_green",
+      "evidence_artifacts": [
+        "artifacts/evidence_index.jsonl.path_proof.txt",
+        "audit/gates/determinism/env_pins.log.path_proof.txt",
+        "artifacts/sanity/sanity.log.path_proof.txt",
+        "artifacts/cli/showcompat/stdout.json.path_proof.txt",
+        "artifacts/ops/internal_version/body_get.json.path_proof.txt"
+      ],
+      "tests": [
+        "bash ci/checks/check_mirror_schema.sh"
+      ]
+    },
+    {
+      "token_name": "MACHINE_MIRROR_UPDATED_OK",
+      "status": "expected_green",
+      "evidence_artifacts": [
+        "index.machine_mirror"
+      ],
+      "tests": [
+        "bash ci/checks/check_mirror_schema.sh"
+      ]
+    },
+    {
+      "token_name": "QA_PRECOMMIT_CHECKLIST_OK",
+      "status": "expected_green",
+      "evidence_artifacts": [
+        "artifacts/sanity/sanity.log",
+        "audit/gates/determinism/env_pins.log"
+      ],
+      "tests": [
+        "python tools/evidence/run_sanity_pipeline.py"
+      ]
+    },
+    {
+      "token_name": "QA_POSTCOMMIT_CHECKLIST_OK",
+      "status": "expected_green",
+      "evidence_artifacts": [
+        "audit/EPIC-022_close_report.md",
+        "docs/acceptance_map_epic022.json"
+      ],
+      "tests": [
+        "tests/qa/test_epic022_close_pack_ready.py::test_token_roster_matches_required_set"
+      ]
+    },
+    {
+      "token_name": "ENV_RAILS_POLICY_OK",
+      "status": "expected_green",
+      "evidence_artifacts": [
+        "audit/gates/determinism/env_pins.log",
+        "parity/errors_reader_cli.vendor_attempt_closed_rails.http.json",
+        "parity/errors_reader_cli.vendor_attempt_closed_rails.cli.txt"
+      ],
+      "tests": [
+        "ci/checks/check_env_pins.sh",
+        "tests/cli/test_errors_parity.py::test_http_and_cli_parity"
+      ]
+    },
+    {
+      "token_name": "DETERMINISM_ENV_PINS_OK",
+      "status": "expected_green",
+      "evidence_artifacts": [
+        "audit/gates/determinism/env_pins.log",
+        "audit/gates/determinism/env_pins.log.path_proof.txt"
+      ],
+      "tests": [
+        "ci/checks/check_env_pins.sh",
+        "tests/qa/test_epic022_close_pack_ready.py::test_determinism_env_pins_binding"
+      ]
+    },
+    {
+      "token_name": "SANITY_PIPELINE_OK",
+      "status": "expected_green",
+      "evidence_artifacts": [
+        "sanity.pipeline.log",
+        "artifacts/sanity/sanity.log.path_proof.txt"
+      ],
+      "tests": [
+        "python tools/evidence/run_sanity_pipeline.py",
+        "python tools/evidence/update_evidence_index.py --check",
+        "python tools/evidence/orientation_demo.py --check"
+      ]
+    },
+    {
+      "token_name": "CLOSE_PACK_FILES_PRESENT_OK",
+      "status": "expected_green",
+      "evidence_artifacts": [
+        "audit/EPIC-022_close_report.md",
+        "audit/EPIC-022_MANIFEST.json",
+        "audit/qa/hde-epic022/token_evidence_matrix.md",
+        "docs/acceptance_map_epic022.json"
+      ],
+      "tests": [
+        "tests/qa/test_epic022_close_pack_ready.py::test_close_pack_files_exist"
+      ]
+    },
+    {
       "token_name": "ERROR_JSON_CANON_OK",
       "status": "expected_green",
-      "evidence_artifacts": [],
-      "tests": []
+      "evidence_artifacts": [
+        "ERRORS_READER_CLI_PARITY_V1"
+      ],
+      "tests": [
+        "tests/cli/test_errors_parity.py::test_http_and_cli_parity"
+      ]
     },
     {
       "token_name": "ERROR_TOKEN_MAP_OK",
       "status": "expected_green",
-      "evidence_artifacts": [],
-      "tests": []
+      "evidence_artifacts": [
+        "ERROR_TOKEN_MAP_V1"
+      ],
+      "tests": [
+        "tests/cli/test_errors_parity.py::test_http_and_cli_parity"
+      ]
     },
     {
       "token_name": "CLI_READER_PARITY_OK",
       "status": "expected_green",
-      "evidence_artifacts": [],
-      "tests": []
+      "evidence_artifacts": [
+        "ERRORS_READER_CLI_PARITY_V1"
+      ],
+      "tests": [
+        "tests/cli/test_errors_parity.py::test_http_and_cli_parity"
+      ]
     },
     {
       "token_name": "TWO_RUN_IDENTITY_OK",
       "status": "expected_green",
-      "evidence_artifacts": [],
-      "tests": []
+      "evidence_artifacts": [
+        "INTVER_TWO_RUN_IDENTITY_V1",
+        "artifacts/audit/cli/two_run_identity.log"
+      ],
+      "tests": [
+        "tests/cli/test_showcompat_parity_and_identity.py::test_two_run_identity_and_reemit",
+        "tests/transport/test_internal_version_contract.py::test_internal_version_invariants_and_artifacts"
+      ]
     },
     {
       "token_name": "CLI_STDOUT_LF_OK",
       "status": "expected_green",
-      "evidence_artifacts": [],
-      "tests": []
+      "evidence_artifacts": [
+        "cli.showcompat.stdout",
+        "cli.showcompat.stdout_sha256",
+        "cli.showcompat.args"
+      ],
+      "tests": [
+        "tests/cli/test_cli_canonical_bytes.py::test_showcompat_stdout_is_canonical",
+        "tests/cli/test_cli_usage_and_errors.py"
+      ]
     },
     {
       "token_name": "INTERNAL_VERSION_200_CTYPE_JSON_UTF8_OK",
       "status": "expected_green",
-      "evidence_artifacts": [],
-      "tests": []
+      "evidence_artifacts": [
+        "INTVER_BODY_GET_V1",
+        "INTVER_HEADERS_GET_V1"
+      ],
+      "tests": [
+        "tests/transport/test_internal_version_contract.py::test_internal_version_invariants_and_artifacts"
+      ]
     },
     {
       "token_name": "INTERNAL_VERSION_HEAD_PARITY_OK",
       "status": "expected_green",
-      "evidence_artifacts": [],
-      "tests": []
+      "evidence_artifacts": [
+        "INTVER_HEADERS_GET_V1",
+        "INTVER_HEADERS_HEAD_V1"
+      ],
+      "tests": [
+        "tests/transport/test_internal_version_contract.py::test_internal_version_invariants_and_artifacts"
+      ]
     },
     {
       "token_name": "INTERNAL_VERSION_CONDITIONALS_IGNORED_OK",
       "status": "expected_green",
-      "evidence_artifacts": [],
-      "tests": []
+      "evidence_artifacts": [
+        "INTVER_HEADERS_COND_IF_NONE_MATCH_V1",
+        "INTVER_HEADERS_COND_IF_MODIFIED_SINCE_V1"
+      ],
+      "tests": [
+        "tests/transport/test_internal_version_contract.py::test_internal_version_invariants_and_artifacts"
+      ]
     },
     {
       "token_name": "INTERNAL_VERSION_NO_ETAG_OK",
       "status": "expected_green",
-      "evidence_artifacts": [],
-      "tests": []
+      "evidence_artifacts": [
+        "INTVER_HEADERS_GET_V1",
+        "INTVER_HEADERS_HEAD_V1",
+        "INTVER_HEADERS_COND_IF_NONE_MATCH_V1",
+        "INTVER_HEADERS_COND_IF_MODIFIED_SINCE_V1"
+      ],
+      "tests": [
+        "tests/transport/test_internal_version_contract.py::test_internal_version_invariants_and_artifacts"
+      ]
     },
     {
       "token_name": "INTERNAL_VERSION_NO_STORE_OK",
       "status": "expected_green",
-      "evidence_artifacts": [],
-      "tests": []
+      "evidence_artifacts": [
+        "INTVER_HEADERS_GET_V1",
+        "INTVER_HEADERS_HEAD_V1",
+        "INTVER_HEADERS_COND_IF_NONE_MATCH_V1",
+        "INTVER_HEADERS_COND_IF_MODIFIED_SINCE_V1"
+      ],
+      "tests": [
+        "tests/transport/test_internal_version_contract.py::test_internal_version_invariants_and_artifacts"
+      ]
     },
     {
       "token_name": "RELEASE_ID_RECOMPUTE_OK",
       "status": "expected_green",
-      "evidence_artifacts": [],
-      "tests": []
+      "evidence_artifacts": [
+        "artifacts/math/release_id_recompute.log",
+        "artifacts/math/freeze_pack_manifest.json",
+        "artifacts/math/release_id.txt",
+        "artifacts/ops/internal_version/two_run_identity.log"
+      ],
+      "tests": [
+        "tests/transport/test_internal_version_contract.py::test_internal_version_invariants_and_artifacts"
+      ]
     },
     {
       "token_name": "RELEASE_ID_FROM_MANIFEST_OK",
       "status": "expected_green",
-      "evidence_artifacts": [],
-      "tests": []
+      "evidence_artifacts": [
+        "artifacts/math/freeze_pack_manifest.json",
+        "artifacts/math/release_id.txt",
+        "artifacts/ops/internal_version/two_run_identity.log"
+      ],
+      "tests": [
+        "tests/transport/test_internal_version_contract.py::test_internal_version_invariants_and_artifacts"
+      ]
     }
   ]
 }
