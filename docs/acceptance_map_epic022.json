@@ -180,7 +180,10 @@
       "owner_pf": "PF20 — HDE-Phased Epics (HDE-SEPA003.3)",
       "status": "pending",
       "evidence_titles": [
-        "TBD (PR1 scaffold)"
+        "tests/cli/test_cli_canonical_bytes.py::test_showcompat_stdout_is_canonical",
+        "artifacts/cli/showcompat/stdout.json",
+        "artifacts/cli/showcompat/stdout.json.sha256",
+        "artifacts/cli/showcompat/args.json"
       ]
     },
     {
