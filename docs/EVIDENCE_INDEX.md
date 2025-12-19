@@ -5,7 +5,7 @@
 # Appendix-D — Evidence Index (EPIC-022)
 
 ## Close-pack and acceptance bindings
-* Close-pack artifacts are present: `audit/EPIC-022_MANIFEST.json`, `audit/EPIC-022_close_report.md`, `audit/qa/hde-epic022/token_evidence_matrix.md`, `docs/acceptance_map_epic022.json`.
+* Close-pack artifacts are complete: `audit/EPIC-022_MANIFEST.json`, `audit/EPIC-022_close_report.md`, `audit/qa/hde-epic022/token_evidence_matrix.md`, `docs/acceptance_map_epic022.json`.
 * Env pins and sanity pipeline: `audit/gates/determinism/env_pins.log` (+ `.path_proof.txt`), `artifacts/sanity/sanity.log` (+ `.path_proof.txt`).
 
 ## CLI stream discipline and showcompat capture (D2)
