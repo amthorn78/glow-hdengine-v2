@@ -1,7 +1,12 @@
 > **Note:** The canonical human Evidence Index lives at `docs/evidence/INDEX.json`.
 > Add new entries there first, then mirror key pointers here for quick navigation.
+> Refresh order: run `python tools/evidence/update_evidence_index.py` (write) before `python tools/evidence/orientation_demo.py` (write), then their `--check` variants. Mirror path proofs include both `sha256` and `mirror_body_sha256` for the self-record entry in `artifacts/evidence_index.jsonl`.
 
 # Appendix-D — Evidence Index (EPIC-022)
+
+## Close-pack and acceptance bindings
+* Close-pack artifacts are present: `audit/EPIC-022_MANIFEST.json`, `audit/EPIC-022_close_report.md`, `audit/qa/hde-epic022/token_evidence_matrix.md`, `docs/acceptance_map_epic022.json`.
+* Env pins and sanity pipeline: `audit/gates/determinism/env_pins.log` (+ `.path_proof.txt`), `artifacts/sanity/sanity.log` (+ `.path_proof.txt`).
 
 ## CLI stream discipline and showcompat capture (D2)
 * Deterministic capture generator: `tools/cli/generate_showcompat_artifacts.py`
@@ -16,6 +21,13 @@
 * Closed-rails refusal parity: `parity/errors_reader_cli.vendor_attempt_closed_rails.cli.txt`, `parity/errors_reader_cli.vendor_attempt_closed_rails.http.json`
 * CLI/Reader error parity harness: `tests/cli/test_errors_parity.py::test_http_and_cli_parity`
 * Acceptance scaffolding: `docs/acceptance_map_epic022.json`, `audit/qa/hde-epic022/token_evidence_matrix.md`, `audit/EPIC-022_MANIFEST.json`, `audit/EPIC-022_close_report.md`
+
+## /internal/version identity bundle (D3)
+* Body and sha sidecar: `artifacts/ops/internal_version/body_get.json`, `artifacts/ops/internal_version/body_get.sha256`
+* Headers: `artifacts/ops/internal_version/headers_get.txt`, `artifacts/ops/internal_version/headers_head.txt`, `artifacts/ops/internal_version/cond_if_none_match_headers.txt`, `artifacts/ops/internal_version/cond_if_modified_since_headers.txt`
+* Two-run identity log: `artifacts/ops/internal_version/two_run_identity.log`
+* Supporting identity artifacts: `artifacts/math/release_id.txt`, `artifacts/math/release_id_recompute.log`, `artifacts/math/freeze_pack_manifest.json`
+* All governed with `.path_proof.txt` siblings and indexed in `docs/evidence/INDEX.json` / `artifacts/evidence_index.jsonl`
 
 # Appendix-D — Evidence Index (EPIC-021)
 

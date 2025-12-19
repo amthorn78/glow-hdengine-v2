@@ -17,10 +17,10 @@
 - Read-first, then edit: inspect acceptance bindings, evidence indexes, and QA harness expectations before changing docs/code/evidence.
 - Governed evidence rules:
   - Use only repo tools to regenerate governed artifacts. Examples: CLI guards (`python tools/cli/serializer_grep_guard.py`, `python tools/cli/emitter_symbol_proof.py`), registry report (`python tools/generate_registry_report.py`), showcompat D2 capture (`python tools/cli/generate_showcompat_artifacts.py`), orientation demo (`python tools/evidence/orientation_demo.py`), sanity pipeline (`python tools/evidence/run_sanity_pipeline.py`), Evidence Index updater (`python tools/evidence/update_evidence_index.py`).
-  - Refresh Index/Mirror pairs (`docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl`) and confirm `.path_proof.txt` siblings exist for every governed artifact.
+  - Refresh Index/Mirror pairs (`docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl`) and confirm `.path_proof.txt` siblings exist for every governed artifact. Run `update_evidence_index.py` (write) before `orientation_demo.py` (write), then their `--check` variants. Mirror path proofs include `mirror_body_sha256` for the self-record; do not hand-edit or drop the self-record row.
   - Verify acceptance bindings: EPIC018 manifest/close report under `audit/`; EPIC019/EPIC020/EPIC021/EPIC022 acceptance maps under `docs/`; token matrices under `audit/qa/hde-epic021/` and `audit/qa/hde-epic022/`.
 - **No manual edits** to evidence indexes, path proofs, manifests, close reports, acceptance maps, or orientation artifacts.
 
 ## EPIC022 lessons (anti-drift)
 - Deterministic scenarios first: parity/error envelopes and showcompat captures must run under pinned rails (no “environment roulette”) with stdout/stderr separation proven by tests and governed artifacts.
-- Acceptance artifacts stay single-source: token matrices and acceptance maps must bind to concrete evidence/tests (no duplicate rows or placeholder evidence once concrete artifacts exist); showcompat D2 captures stay indexed with sha256 sidecars and path proofs.
+- Acceptance artifacts stay single-source: token matrices and acceptance maps must bind to concrete evidence/tests (no duplicate rows or placeholder evidence once concrete artifacts exist); showcompat D2 captures stay indexed with sha256 sidecars and path proofs; `/internal/version` D3 bundles and the close-pack (manifest + close report + sanity log) are present and must not be claimed as missing.
