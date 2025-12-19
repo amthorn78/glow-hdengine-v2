@@ -12,7 +12,7 @@
 | MACHINE_MIRROR_UPDATED_OK | PF12 — HDE-Schemas and Artifacts §Evidence Mirror | TBD | TBD | TBD | Pending | Baseline token; scaffolded in PR1 |
 | QA_PRECOMMIT_CHECKLIST_OK | PF19 — Glow QA Guide §QA Rails | TBD | TBD | TBD | Pending | Baseline token; scaffolded in PR1 |
 | QA_POSTCOMMIT_CHECKLIST_OK | PF19 — Glow QA Guide §QA Rails | TBD | TBD | TBD | Pending | Baseline token; scaffolded in PR1 |
-| ENV_RAILS_POLICY_OK | PF19 — Glow QA Guide §Env Pins | TBD | TBD | TBD | Pending | Baseline token; scaffolded in PR1 |
+| ENV_RAILS_POLICY_OK | PF19 — Glow QA Guide §Env Pins | audit/gates/determinism/env_pins.log; audit/gates/determinism/env_pins.log.path_proof.txt; parity/errors_reader_cli.vendor_attempt_closed_rails.http.json; parity/errors_reader_cli.vendor_attempt_closed_rails.cli.txt | ci/checks/check_env_pins.sh; tests/cli/test_errors_parity.py::test_http_and_cli_parity | audit/gates/determinism/env_pins.log; audit/gates/determinism/env_pins.log.path_proof.txt | Pending | D1 rails binding to env pins evidence and closed-rails refusal parity scenario |
 | DETERMINISM_ENV_PINS_OK | PF19 — Glow QA Guide §Env Pins | audit/gates/determinism/env_pins.log; audit/gates/determinism/env_pins.log.path_proof.txt | TBD | TBD | Pending | Baseline token; scaffolded in PR1 |
 | SANITY_PIPELINE_OK | PF19 — Glow QA Guide §Sanity Pipeline | TBD | TBD | TBD | Pending | Baseline token; scaffolded in PR1 |
 | CLOSE_PACK_FILES_PRESENT_OK | PF20 — HDE-Phased Epics (EPIC022 record) | audit/EPIC-022_close_report.md; audit/EPIC-022_MANIFEST.json; audit/qa/hde-epic022/token_evidence_matrix.md; docs/acceptance_map_epic022.json | TBD | TBD | Pending | Baseline token; scaffolded in PR1 |
