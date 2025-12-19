@@ -3,88 +3,112 @@
   "tokens": [
     {
       "name": "PR_OPENED_OK",
-      "owner_pf": "PF20 \u2014 HDE-Phased Epics (EPIC022 record)",
-      "status": "pending",
+      "owner_pf": "PF20 — HDE-Phased Epics (EPIC022 record)",
+      "status": "implemented",
       "evidence_titles": [
-        "TBD (PR1 scaffold)"
+        "audit/EPIC-022_close_report.md",
+        "audit/EPIC-022_MANIFEST.json"
       ]
     },
     {
       "name": "TESTS_PASS_OK",
-      "owner_pf": "PF19 \u2014 Glow QA Guide \u00a7QA Rails",
-      "status": "pending",
+      "owner_pf": "PF19 — Glow QA Guide §QA Rails",
+      "status": "implemented",
       "evidence_titles": [
-        "TBD (PR1 scaffold)"
+        "tests/qa/test_epic022_acceptance_scaffold.py",
+        "tests/qa/test_epic022_close_pack_ready.py",
+        "tests/cli/test_errors_parity.py::test_http_and_cli_parity",
+        "tests/cli/test_cli_canonical_bytes.py::test_showcompat_stdout_is_canonical",
+        "tests/cli/test_cli_usage_and_errors.py",
+        "tests/transport/test_internal_version_contract.py::test_internal_version_invariants_and_artifacts",
+        "tests/cli/test_showcompat_parity_and_identity.py::test_two_run_identity_and_reemit"
       ]
     },
     {
       "name": "DOC_DELTA_PRESENT_OK",
-      "owner_pf": "PF03 \u2014 Technical Writing \u00a7Single-home",
-      "status": "pending",
+      "owner_pf": "PF03 — Technical Writing §Single-home",
+      "status": "implemented",
       "evidence_titles": [
-        "TBD (PR1 scaffold)"
+        "audit/EPIC-022_close_report.md",
+        "audit/qa/hde-epic022/token_evidence_matrix.md",
+        "docs/acceptance_map_epic022.json"
       ]
     },
     {
       "name": "EVIDENCE_INDEX_UPDATED_OK",
-      "owner_pf": "PF12 \u2014 HDE-Schemas and Artifacts \u00a7Evidence Index",
-      "status": "pending",
+      "owner_pf": "PF12 — HDE-Schemas and Artifacts §Evidence Index",
+      "status": "implemented",
       "evidence_titles": [
-        "TBD (PR1 scaffold)"
+        "docs/evidence/INDEX.json",
+        "artifacts/evidence_index.jsonl",
+        "python tools/evidence/update_evidence_index.py"
       ]
     },
     {
       "name": "EVIDENCE_INDEX_HASH_OK",
-      "owner_pf": "PF12 \u2014 HDE-Schemas and Artifacts \u00a7Evidence Hashing",
-      "status": "pending",
+      "owner_pf": "PF12 — HDE-Schemas and Artifacts §Evidence Hashing",
+      "status": "implemented",
       "evidence_titles": [
-        "TBD (PR1 scaffold)"
+        "docs/evidence/INDEX.sha256",
+        "python tools/evidence/update_evidence_index.py --check"
       ]
     },
     {
       "name": "EVIDENCE_INDEX_MIRROR_OK",
-      "owner_pf": "PF12 \u2014 HDE-Schemas and Artifacts \u00a7Evidence Mirror",
-      "status": "pending",
+      "owner_pf": "PF12 — HDE-Schemas and Artifacts §Evidence Mirror",
+      "status": "implemented",
       "evidence_titles": [
-        "TBD (PR1 scaffold)"
+        "artifacts/evidence_index.jsonl",
+        "artifacts/evidence_index.jsonl.path_proof.txt",
+        "ci/checks/check_mirror_schema.sh"
       ]
     },
     {
       "name": "EVIDENCE_PATHS_VALIDATED_OK",
-      "owner_pf": "PF12 \u2014 HDE-Schemas and Artifacts \u00a7Path Proofs",
-      "status": "pending",
+      "owner_pf": "PF12 — HDE-Schemas and Artifacts §Path Proofs",
+      "status": "implemented",
       "evidence_titles": [
-        "TBD (PR1 scaffold)"
+        "artifacts/evidence_index.jsonl.path_proof.txt",
+        "audit/gates/determinism/env_pins.log.path_proof.txt",
+        "artifacts/sanity/sanity.log.path_proof.txt",
+        "artifacts/cli/showcompat/stdout.json.path_proof.txt",
+        "artifacts/ops/internal_version/body_get.json.path_proof.txt"
       ]
     },
     {
       "name": "MACHINE_MIRROR_UPDATED_OK",
-      "owner_pf": "PF12 \u2014 HDE-Schemas and Artifacts \u00a7Evidence Mirror",
-      "status": "pending",
+      "owner_pf": "PF12 — HDE-Schemas and Artifacts §Evidence Mirror",
+      "status": "implemented",
       "evidence_titles": [
-        "TBD (PR1 scaffold)"
+        "artifacts/evidence_index.jsonl",
+        "artifacts/evidence_index.jsonl.path_proof.txt",
+        "ci/checks/check_mirror_schema.sh"
       ]
     },
     {
       "name": "QA_PRECOMMIT_CHECKLIST_OK",
-      "owner_pf": "PF19 \u2014 Glow QA Guide \u00a7QA Rails",
-      "status": "pending",
+      "owner_pf": "PF19 — Glow QA Guide §QA Rails",
+      "status": "implemented",
       "evidence_titles": [
-        "TBD (PR1 scaffold)"
+        "python tools/evidence/run_sanity_pipeline.py",
+        "artifacts/sanity/sanity.log",
+        "audit/gates/determinism/env_pins.log"
       ]
     },
     {
       "name": "QA_POSTCOMMIT_CHECKLIST_OK",
-      "owner_pf": "PF19 \u2014 Glow QA Guide \u00a7QA Rails",
-      "status": "pending",
+      "owner_pf": "PF19 — Glow QA Guide §QA Rails",
+      "status": "implemented",
       "evidence_titles": [
-        "TBD (PR1 scaffold)"
+        "audit/EPIC-022_close_report.md",
+        "tests/qa/test_epic022_close_pack_ready.py",
+        "docs/acceptance_map_epic022.json"
       ]
     },
     {
       "name": "ENV_RAILS_POLICY_OK",
-      "owner_pf": "PF19 \u2014 Glow QA Guide \u00a7Env Pins",
-      "status": "pending",
+      "owner_pf": "PF19 — Glow QA Guide §Env Pins",
+      "status": "implemented",
       "evidence_titles": [
         "ci/checks/check_env_pins.sh (rails gate)",
         "audit/gates/determinism/env_pins.log",
@@ -96,8 +120,8 @@
     },
     {
       "name": "DETERMINISM_ENV_PINS_OK",
-      "owner_pf": "PF19 \u2014 Glow QA Guide \u00a7Env Pins",
-      "status": "pending",
+      "owner_pf": "PF19 — Glow QA Guide §Env Pins",
+      "status": "implemented",
       "evidence_titles": [
         "audit/gates/determinism/env_pins.log",
         "audit/gates/determinism/env_pins.log.path_proof.txt"
@@ -105,27 +129,30 @@
     },
     {
       "name": "SANITY_PIPELINE_OK",
-      "owner_pf": "PF19 \u2014 Glow QA Guide \u00a7Sanity Pipeline",
-      "status": "pending",
+      "owner_pf": "PF19 — Glow QA Guide §Sanity Pipeline",
+      "status": "implemented",
       "evidence_titles": [
-        "TBD (PR1 scaffold)"
+        "python tools/evidence/run_sanity_pipeline.py",
+        "artifacts/sanity/sanity.log",
+        "artifacts/sanity/sanity.log.path_proof.txt"
       ]
     },
     {
       "name": "CLOSE_PACK_FILES_PRESENT_OK",
-      "owner_pf": "PF20 \u2014 HDE-Phased Epics (EPIC022 record)",
-      "status": "pending",
+      "owner_pf": "PF20 — HDE-Phased Epics (EPIC022 record)",
+      "status": "implemented",
       "evidence_titles": [
         "audit/qa/hde-epic022/token_evidence_matrix.md",
         "docs/acceptance_map_epic022.json",
         "audit/EPIC-022_close_report.md",
-        "audit/EPIC-022_MANIFEST.json"
+        "audit/EPIC-022_MANIFEST.json",
+        "tests/qa/test_epic022_close_pack_ready.py::test_close_pack_files_exist"
       ]
     },
     {
       "name": "ERROR_JSON_CANON_OK",
-      "owner_pf": "PF20 \u2014 HDE-Phased Epics (HDE-SEPA002)",
-      "status": "pending",
+      "owner_pf": "PF20 — HDE-Phased Epics (HDE-SEPA002)",
+      "status": "implemented",
       "evidence_titles": [
         "tests/cli/test_errors_parity.py::test_http_and_cli_parity",
         "parity/errors_reader_cli.invalid_json.http.json",
@@ -136,8 +163,8 @@
     },
     {
       "name": "ERROR_TOKEN_MAP_OK",
-      "owner_pf": "PF20 \u2014 HDE-Phased Epics (HDE-SEPA002)",
-      "status": "pending",
+      "owner_pf": "PF20 — HDE-Phased Epics (HDE-SEPA002)",
+      "status": "implemented",
       "evidence_titles": [
         "tests/cli/test_errors_parity.py::test_http_and_cli_parity",
         "errors/token_map/token_map.json"
@@ -145,8 +172,8 @@
     },
     {
       "name": "CLI_READER_PARITY_OK",
-      "owner_pf": "PF20 \u2014 HDE-Phased Epics (HDE-SEPA002.5)",
-      "status": "pending",
+      "owner_pf": "PF20 — HDE-Phased Epics (HDE-SEPA002.5)",
+      "status": "implemented",
       "evidence_titles": [
         "tests/cli/test_errors_parity.py::test_http_and_cli_parity",
         "parity/errors_reader_cli.invalid_json.http.json",
@@ -161,8 +188,8 @@
     },
     {
       "name": "TWO_RUN_IDENTITY_OK",
-      "owner_pf": "PF20 \u2014 HDE-Phased Epics (HDE-SEPA002.5; HDE-SEPA004.4)",
-      "status": "pending",
+      "owner_pf": "PF20 — HDE-Phased Epics (HDE-SEPA002.5; HDE-SEPA004.4)",
+      "status": "implemented",
       "evidence_titles": [
         "tests/cli/test_showcompat_parity_and_identity.py::test_two_run_identity_and_reemit",
         "artifacts/audit/cli/two_run_identity.log",
@@ -172,8 +199,8 @@
     },
     {
       "name": "CLI_STDOUT_LF_OK",
-      "owner_pf": "PF20 \u2014 HDE-Phased Epics (HDE-SEPA003.3)",
-      "status": "pending",
+      "owner_pf": "PF20 — HDE-Phased Epics (HDE-SEPA003.3)",
+      "status": "implemented",
       "evidence_titles": [
         "tests/cli/test_cli_canonical_bytes.py::test_showcompat_stdout_is_canonical",
         "artifacts/cli/showcompat/stdout.json",
@@ -183,8 +210,8 @@
     },
     {
       "name": "INTERNAL_VERSION_200_CTYPE_JSON_UTF8_OK",
-      "owner_pf": "PF04 \u2014 Canon-HDE-Governance \u00a7/internal/version tokens",
-      "status": "pending",
+      "owner_pf": "PF04 — Canon-HDE-Governance §/internal/version tokens",
+      "status": "implemented",
       "evidence_titles": [
         "tests/transport/test_internal_version_contract.py::test_internal_version_invariants_and_artifacts",
         "artifacts/ops/internal_version/body_get.json",
@@ -193,8 +220,8 @@
     },
     {
       "name": "INTERNAL_VERSION_HEAD_PARITY_OK",
-      "owner_pf": "PF04 \u2014 Canon-HDE-Governance \u00a7/internal/version tokens",
-      "status": "pending",
+      "owner_pf": "PF04 — Canon-HDE-Governance §/internal/version tokens",
+      "status": "implemented",
       "evidence_titles": [
         "tests/transport/test_internal_version_contract.py::test_internal_version_invariants_and_artifacts",
         "artifacts/ops/internal_version/headers_get.txt",
@@ -203,8 +230,8 @@
     },
     {
       "name": "INTERNAL_VERSION_CONDITIONALS_IGNORED_OK",
-      "owner_pf": "PF04 \u2014 Canon-HDE-Governance \u00a7/internal/version tokens",
-      "status": "pending",
+      "owner_pf": "PF04 — Canon-HDE-Governance §/internal/version tokens",
+      "status": "implemented",
       "evidence_titles": [
         "tests/transport/test_internal_version_contract.py::test_internal_version_invariants_and_artifacts",
         "artifacts/ops/internal_version/cond_if_none_match_headers.txt",
@@ -213,8 +240,8 @@
     },
     {
       "name": "INTERNAL_VERSION_NO_ETAG_OK",
-      "owner_pf": "PF04 \u2014 Canon-HDE-Governance \u00a7/internal/version tokens",
-      "status": "pending",
+      "owner_pf": "PF04 — Canon-HDE-Governance §/internal/version tokens",
+      "status": "implemented",
       "evidence_titles": [
         "tests/transport/test_internal_version_contract.py::test_internal_version_invariants_and_artifacts",
         "artifacts/ops/internal_version/headers_get.txt",
@@ -225,8 +252,8 @@
     },
     {
       "name": "INTERNAL_VERSION_NO_STORE_OK",
-      "owner_pf": "PF04 \u2014 Canon-HDE-Governance \u00a7/internal/version tokens",
-      "status": "pending",
+      "owner_pf": "PF04 — Canon-HDE-Governance §/internal/version tokens",
+      "status": "implemented",
       "evidence_titles": [
         "tests/transport/test_internal_version_contract.py::test_internal_version_invariants_and_artifacts",
         "artifacts/ops/internal_version/headers_get.txt",
@@ -237,8 +264,8 @@
     },
     {
       "name": "RELEASE_ID_RECOMPUTE_OK",
-      "owner_pf": "PF04 \u2014 Canon-HDE-Governance \u00a7Pack identity tokens",
-      "status": "pending",
+      "owner_pf": "PF04 — Canon-HDE-Governance §Pack identity tokens",
+      "status": "implemented",
       "evidence_titles": [
         "tests/transport/test_internal_version_contract.py::test_internal_version_invariants_and_artifacts",
         "artifacts/math/release_id_recompute.log",
@@ -249,8 +276,8 @@
     },
     {
       "name": "RELEASE_ID_FROM_MANIFEST_OK",
-      "owner_pf": "PF04 \u2014 Canon-HDE-Governance \u00a7Pack identity tokens",
-      "status": "pending",
+      "owner_pf": "PF04 — Canon-HDE-Governance §Pack identity tokens",
+      "status": "implemented",
       "evidence_titles": [
         "tests/transport/test_internal_version_contract.py::test_internal_version_invariants_and_artifacts",
         "artifacts/math/freeze_pack_manifest.json",
