@@ -160,15 +160,20 @@ def main():
             body_lines = [line for j, line in enumerate(lines, 1) if j != i]
             body_text = "".join(body_lines)
             canonical_sha = hashlib.sha256(body_text.encode()).hexdigest()
-            expected_size = len(index_path.read_bytes())
+            actual_sha = sha256(index_path)
+            expected_size = index_path.stat().st_size
             if obj.get("sha256") != canonical_sha:
                 print(f"SELF_SHA:{i}:{obj.get('sha256')}!={canonical_sha}", file=sys.stderr)
                 ok = False
             if obj.get("size_bytes") != expected_size:
                 print(f"SELF_SIZE:{i}:{obj.get('size_bytes')}!={expected_size}", file=sys.stderr)
                 ok = False
-            if proof_data.get("sha256") != canonical_sha:
-                print(f"PROOF_SHA:{i}:{proof_data.get('sha256')}!={canonical_sha}", file=sys.stderr)
+            if proof_data.get("sha256") != actual_sha:
+                print(f"PROOF_SHA:{i}:{proof_data.get('sha256')}!={actual_sha}", file=sys.stderr)
+                ok = False
+            mirror_body_sha = proof_data.get("mirror_body_sha256")
+            if mirror_body_sha != canonical_sha:
+                print(f"PROOF_MIRROR_BODY_SHA:{i}:{mirror_body_sha}!={canonical_sha}", file=sys.stderr)
                 ok = False
             proof_size_val = proof_data.get("size_bytes")
             if proof_size_val is None or int(proof_size_val) != expected_size:
