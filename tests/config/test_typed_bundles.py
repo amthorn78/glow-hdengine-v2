@@ -4,10 +4,15 @@ import subprocess
 import sys
 from pathlib import Path
 
-import jsonschema
 import pytest
 
 from tests.config.helpers import closed_rails_env
+
+
+jsonschema = pytest.importorskip(
+    "jsonschema",
+    reason="jsonschema is required for config bundle schema validation; install from requirements-dev.txt",
+)
 
 
 ROOT = Path(__file__).resolve().parents[1].parent
