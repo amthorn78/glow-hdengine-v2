@@ -36,7 +36,8 @@ SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC hdctl aux-preview --pair-file
 
 - Entry point: `hdctl` (or `python -m engine.cli`).
 - Subcommands: `showcompat`, `aux-preview`, `bg:resolve`, and dev-only `dev:sampler` (APP_ENV=dev).
-- `showcompat` accepts `--pair-file`, `--a-file/--b-file` (aliases `--a/--b`), stdin, or birth arguments; success prints LF-terminated canonical JSON to stdout, errors print `error_v1` envelopes to stderr. Sidecars: `--dump-reader`, `--dump-admin-dir`.
+- Exit codes: 0 on success, 64 on usage errors, and 1 on typed engine/vendor failures (per CLI error-path tests).
+- `showcompat` accepts `--pair-file`, `--a-file/--b-file` (aliases `--a/--b`), stdin, or birth arguments; success prints LF-terminated canonical compat payload to stdout (includes numeric scores/weights captured in EPIC022 D2), errors print `error_v1` envelopes to stderr. Sidecars: `--dump-reader` (Reader v1 bytes), `--dump-admin-dir`.
 - Deterministic artifact generator: `python tools/cli/generate_showcompat_artifacts.py` captures `artifacts/cli/showcompat/stdout.json`, `artifacts/cli/showcompat/stdout.json.sha256`, and `artifacts/cli/showcompat/args.json` under closed rails.
 - `aux-preview` previews Aux narrative ids/text for compat tuples using the sealed narrative pack.
 - `bg:resolve` is a Phase S8a stub for BodyGraph resolution with `--source {db,vendor,auto}` under closed rails.
