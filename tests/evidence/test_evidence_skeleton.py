@@ -65,8 +65,14 @@ def test_mirror_schema_and_parity():
         assert proof_path.exists()
         proof = update_evidence_index._load_existing_proof(proof_path)
         assert proof.get("path") == rec["discovered_physical_path"]
-        assert proof.get("sha256") == rec["sha256"]
-        assert int(proof.get("size_bytes")) == rec["size_bytes"]
+        if rec["artifact_key"] == "index.machine_mirror":
+            # Self-record: mirror sha256 is the canonical body digest; proof sha256 is the file digest.
+            mirror_file_sha = hashlib.sha256(Path(rec["discovered_physical_path"]).read_bytes()).hexdigest()
+            assert proof.get("sha256") == mirror_file_sha, f"file sha mismatch for {rec['artifact_key']}"
+            assert proof.get("mirror_body_sha256") == rec["sha256"], f"body sha mismatch for {rec['artifact_key']}"
+        else:
+            assert proof.get("sha256") == rec["sha256"], f"sha mismatch for {rec['artifact_key']}"
+        assert int(proof.get("size_bytes")) == rec["size_bytes"], f"size mismatch for {rec['artifact_key']}"
         assert "mtime_utc" in proof
         assert "produced_at_utc" in proof
         parsed_mtime = _dt.datetime.fromisoformat(proof["mtime_utc"].replace("Z", "+00:00"))
@@ -116,7 +122,12 @@ def test_index_entries_have_mirrors_and_path_proofs():
         assert proof_path.exists(), f"missing path proof for {key}"
         proof = update_evidence_index._load_existing_proof(proof_path)
         assert proof.get("path") == entry["discovered_physical_path"]
-        assert proof.get("sha256") == rec["sha256"]
-        assert int(proof.get("size_bytes", "0")) == rec["size_bytes"]
+        if rec["artifact_key"] == "index.machine_mirror":
+            mirror_file_sha = hashlib.sha256(Path(rec["discovered_physical_path"]).read_bytes()).hexdigest()
+            assert proof.get("sha256") == mirror_file_sha, f"file sha mismatch for {key}"
+            assert proof.get("mirror_body_sha256") == rec["sha256"], f"body sha mismatch for {key}"
+        else:
+            assert proof.get("sha256") == rec["sha256"], f"sha mismatch for {key}"
+        assert int(proof.get("size_bytes", "0")) == rec["size_bytes"], f"size mismatch for {key}"
         assert proof.get("mtime_utc")
         assert proof.get("produced_at_utc")

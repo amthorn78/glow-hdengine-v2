@@ -101,8 +101,13 @@ def _validate(
         artifact_sha = _sha256_bytes(artifact_bytes)
         artifact_size = len(artifact_bytes)
         if key[0] == "index.machine_mirror":
-            if sha != canonical_body_sha:
-                messages.append(f"SHA_MISMATCH {key[0]} {sha}!={canonical_body_sha}")
+            mirror_body_sha = proof.get("mirror_body_sha256")
+            if sha != artifact_sha:
+                messages.append(f"SHA_MISMATCH {key[0]} {sha}!={artifact_sha}")
+            if mirror_body_sha != canonical_body_sha:
+                messages.append(
+                    f"MIRROR_BODY_SHA_MISMATCH {key[0]} {mirror_body_sha}!={canonical_body_sha}"
+                )
             if rec.get("sha256") != canonical_body_sha:
                 messages.append(
                     f"SHA_MIRROR_MISMATCH {key[0]} {rec.get('sha256')}!={canonical_body_sha}"
