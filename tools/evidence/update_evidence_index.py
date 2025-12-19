@@ -468,9 +468,10 @@ def main(argv: list[str] | None = None) -> None:
     _write_if_changed(MIRROR_PATH, mirror_bytes, check=args.check)
 
     mirror_stat = MIRROR_PATH.stat()
+    mirror_sha = _sha256_bytes(mirror_bytes)
     proof_anchor, produced_at = _write_path_proof(
         MIRROR_REL,
-        sha256=str(mirror_rec["sha256"]),
+        sha256=str(mirror_sha),
         size_bytes=mirror_size,
         mtime_utc=mirror_proof_existing.get("mtime_utc"),
         produced_at=str(mirror_rec.get("produced_at_utc")),
