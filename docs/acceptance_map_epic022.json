@@ -164,6 +164,8 @@
       "owner_pf": "PF20 \u2014 HDE-Phased Epics (HDE-SEPA002.5; HDE-SEPA004.4)",
       "status": "pending",
       "evidence_titles": [
+        "tests/cli/test_showcompat_parity_and_identity.py::test_two_run_identity_and_reemit",
+        "artifacts/audit/cli/two_run_identity.log",
         "tests/transport/test_internal_version_contract.py::test_internal_version_invariants_and_artifacts",
         "artifacts/ops/internal_version/two_run_identity.log"
       ]
