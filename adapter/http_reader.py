@@ -446,7 +446,9 @@ def get_reader_bp(emit_fn=None):
         with NoIoGuard() as guard:
             snapshot_path = _db_snapshot_path()
             original_dsn = os.environ.get("DATABASE_URL")
+            original_force_pg = os.environ.get("DB_FORCE_PG")
             os.environ["DATABASE_URL"] = os.environ.get("DATABASE_URL", "db://unavailable")
+            os.environ["DB_FORCE_PG"] = "1"
             def _raise_primary(_: str):
                 raise PrimaryUnavailable(
                     "forced_db_unavailable",
@@ -473,6 +475,10 @@ def get_reader_bp(emit_fn=None):
                 os.environ.pop("DATABASE_URL", None)
             else:
                 os.environ["DATABASE_URL"] = original_dsn
+            if original_force_pg is None:
+                os.environ.pop("DB_FORCE_PG", None)
+            else:
+                os.environ["DB_FORCE_PG"] = original_force_pg
         g._no_io_attempts = guard.attempts
         return resp
 
@@ -785,4 +791,3 @@ if __name__ == "__main__":
     # dev runner (Railway uses gunicorn via Procfile)
     import os
     create_app().run(host="0.0.0.0", port=int(os.environ.get("PORT","8000")))
-
