@@ -1,6 +1,22 @@
 > **Note:** The canonical human Evidence Index lives at `docs/evidence/INDEX.json`.
 > Add new entries there first, then mirror key pointers here for quick navigation.
 
+# Appendix-D — Evidence Index (EPIC-022)
+
+## CLI stream discipline and showcompat capture (D2)
+* Deterministic capture generator: `tools/cli/generate_showcompat_artifacts.py`
+* Stdout bytes: `artifacts/cli/showcompat/stdout.json`
+* Stdout sha256 sidecar: `artifacts/cli/showcompat/stdout.json.sha256`
+* Args/env record: `artifacts/cli/showcompat/args.json`
+* Evidence Index + sentinel: `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`
+* Machine mirror: `artifacts/evidence_index.jsonl`
+
+## Error-envelope parity and env pins (D1)
+* Env pins gate: `ci/checks/check_env_pins.sh`; log and proof under `audit/gates/determinism/env_pins.log` and `.path_proof.txt`
+* Closed-rails refusal parity: `parity/errors_reader_cli.vendor_attempt_closed_rails.cli.txt`, `parity/errors_reader_cli.vendor_attempt_closed_rails.http.json`
+* CLI/Reader error parity harness: `tests/cli/test_errors_parity.py::test_http_and_cli_parity`
+* Acceptance scaffolding: `docs/acceptance_map_epic022.json`, `audit/qa/hde-epic022/token_evidence_matrix.md`, `audit/EPIC-022_MANIFEST.json`, `audit/EPIC-022_close_report.md`
+
 # Appendix-D — Evidence Index (EPIC-021)
 
 ## Registry report and sanity pipeline
