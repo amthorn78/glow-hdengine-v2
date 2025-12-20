@@ -1,6 +1,6 @@
 > **Note:** The canonical human Evidence Index lives at `docs/evidence/INDEX.json`.
 > Add new entries there first, then mirror key pointers here for quick navigation.
-> Refresh order: run `python tools/evidence/update_evidence_index.py` (write) before `python tools/evidence/orientation_demo.py` (write), then their `--check` variants. Mirror path proofs include both `sha256` and `mirror_body_sha256` for the self-record entry in `artifacts/evidence_index.jsonl`.
+> Refresh order: run `python tools/evidence/update_evidence_index.py` (write) before `python tools/evidence/orientation_demo.py` (write), then their `--check` variants, and finish with `python ci/checks/check_mirror_schema.sh` (Python entrypoint despite `.sh`). Mirror path proofs include both `sha256` and `mirror_body_sha256` for the self-record entry in `artifacts/evidence_index.jsonl`.
 
 # Appendix-D — Evidence Index (EPIC-022)
 
@@ -18,8 +18,8 @@
 
 ## Error-envelope parity and env pins (D1)
 * Env pins gate: `ci/checks/check_env_pins.sh`; log and proof under `audit/gates/determinism/env_pins.log` and `.path_proof.txt`
-* Closed-rails refusal parity: `parity/errors_reader_cli.vendor_attempt_closed_rails.cli.txt`, `parity/errors_reader_cli.vendor_attempt_closed_rails.http.json`
-* CLI/Reader error parity harness: `tests/cli/test_errors_parity.py::test_http_and_cli_parity`
+* Closed-rails refusal parity: `parity/errors_reader_cli.db_unavailable.{cli.txt,http.json}` and `parity/errors_reader_cli.vendor_attempt_closed_rails.{cli.txt,http.json}` (all with `.path_proof.txt` siblings)
+* CLI/Reader error parity harness: `tests/cli/test_errors_parity.py::test_http_and_cli_parity` validates both scenarios
 * Acceptance scaffolding: `docs/acceptance_map_epic022.json`, `audit/qa/hde-epic022/token_evidence_matrix.md`, `audit/EPIC-022_MANIFEST.json`, `audit/EPIC-022_close_report.md`
 
 ## /internal/version identity bundle (D3)
@@ -28,6 +28,7 @@
 * Two-run identity log: `artifacts/ops/internal_version/two_run_identity.log`
 * Supporting identity artifacts: `artifacts/math/release_id.txt`, `artifacts/math/release_id_recompute.log`, `artifacts/math/freeze_pack_manifest.json`
 * All governed with `.path_proof.txt` siblings and indexed in `docs/evidence/INDEX.json` / `artifacts/evidence_index.jsonl`
+* Known canon mismatch: PF20 references a provenance note for D3, while implementation follows the PF10 posture via the governed two-run/coupling log as the provenance proof.
 
 # Appendix-D — Evidence Index (EPIC-021)
 
