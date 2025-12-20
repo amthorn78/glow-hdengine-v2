@@ -39,7 +39,7 @@ SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC hdctl aux-preview --pair-file
 
 - Entry point: `hdctl` (or `python -m engine.cli`).
 - Subcommands: `showcompat`, `aux-preview`, `bg:resolve`, and dev-only `dev:sampler` (APP_ENV=dev).
-- Exit codes: 0 on success; 64 for usage/validation/IO errors surfaced via `CliError`; typed failures (including vendor/engine errors) follow the PF05 (CLI/API/Vendor Ref) typed-error exit-code contract with stderr-only JSON; unexpected exceptions remain non-zero.
+- Exit codes: 0 on success; 64 for usage/validation/IO errors surfaced via `CliError`; showcompat vendor/engine failures return exit 1 as enforced by the CLI error-path tests; other non-zero codes are command-specific. PF05 (CLI/API/Vendor Ref) remains the canonical exit-code taxonomy; current vendor/engine numeric mapping is documented here until implementation aligns. Errors emit stderr-only JSON envelopes.
 - `showcompat` accepts `--pair-file`, `--a-file/--b-file` (aliases `--a/--b`), stdin, or birth arguments; success prints LF-terminated canonical compat payload to stdout (includes numeric scores/weights captured in EPIC022 D2). Errors print `error_v1` envelopes to stderr. Sidecars: `--dump-reader` (Reader v1 bytes via the presenter path), `--dump-admin-dir`.
 - Deterministic artifact generator: `python tools/cli/generate_showcompat_artifacts.py` captures `artifacts/cli/showcompat/stdout.json`, `artifacts/cli/showcompat/stdout.json.sha256`, and `artifacts/cli/showcompat/args.json` under closed rails.
 - `aux-preview` previews Aux narrative ids/text for compat tuples using the sealed narrative pack.
