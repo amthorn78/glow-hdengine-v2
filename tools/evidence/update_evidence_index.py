@@ -45,6 +45,33 @@ BASELINE_ENTRIES: list[dict[str, object]] = [
         "schema_version": "1.0",
     },
 ]
+EPIC022_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "epic022.close_report",
+        "discovered_physical_path": "audit/EPIC-022_close_report.md",
+        "epic_id": "HDE-EPIC022",
+    },
+    {
+        "artifact_key": "epic022.manifest",
+        "discovered_physical_path": "audit/EPIC-022_MANIFEST.json",
+        "epic_id": "HDE-EPIC022",
+    },
+    {
+        "artifact_key": "epic022.token_matrix",
+        "discovered_physical_path": "audit/qa/hde-epic022/token_evidence_matrix.md",
+        "epic_id": "HDE-EPIC022",
+    },
+    {
+        "artifact_key": "epic022.acceptance_map",
+        "discovered_physical_path": "docs/acceptance_map_epic022.json",
+        "epic_id": "HDE-EPIC022",
+    },
+    {
+        "artifact_key": "audit.cli.two_run_identity",
+        "discovered_physical_path": "artifacts/audit/cli/two_run_identity.log",
+        "record_type": "audit_cli_log",
+    },
+]
 
 
 def _sha256_bytes(data: bytes) -> str:
@@ -236,7 +263,7 @@ def _dedupe_entries(entries: Iterable[Mapping[str, object]]) -> list[dict[str, o
 
 def _load_human_index() -> list[dict[str, object]]:
     payload = json.loads(HUMAN_INDEX.read_text(encoding="utf-8"))
-    return _dedupe_entries([*payload, *BASELINE_ENTRIES])
+    return _dedupe_entries([*payload, *BASELINE_ENTRIES, *EPIC022_PRIMARY_ARTIFACTS])
 
 
 def _render_human_index(entries: Iterable[Mapping[str, object]]) -> bytes:

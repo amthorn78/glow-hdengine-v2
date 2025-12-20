@@ -10,7 +10,6 @@ ENV_TOKEN = "ENV_RAILS_POLICY_OK"
 ENV_EXPECTED_EVIDENCE = {
     "ci/checks/check_env_pins.sh (rails gate)",
     "audit/gates/determinism/env_pins.log",
-    "audit/gates/determinism/env_pins.log.path_proof.txt",
     "parity/errors_reader_cli.vendor_attempt_closed_rails.http.json",
     "parity/errors_reader_cli.vendor_attempt_closed_rails.cli.txt",
     "tests/cli/test_errors_parity.py::test_http_and_cli_parity",

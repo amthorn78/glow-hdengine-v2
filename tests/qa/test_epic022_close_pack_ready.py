@@ -47,7 +47,7 @@ FORBIDDEN_TOKENS = {"CLI_STDERR_ONLY_ON_ERROR_OK"}
 REQUIRED_BUNDLE_ARTIFACTS = {
     Path("artifacts/sanity/sanity.log"),
     Path("artifacts/ops/internal_version/two_run_identity.log"),
-    Path("artifacts/cli/showcompat/stdout.json"),
+    Path("artifacts/audit/cli/two_run_identity.log"),
 }
 
 
@@ -108,14 +108,13 @@ def test_determinism_env_pins_binding():
         for part in det_rows[0]["Evidence artifacts (titles / paths / artifact_keys)"].split(";")
         if part.strip()
     }
-    expected = {
-        "audit/gates/determinism/env_pins.log",
-        "audit/gates/determinism/env_pins.log.path_proof.txt",
-    }
-    assert evidence_cells == expected, "Determinism pins evidence must use canonical log + path proof"
+    expected = {"audit/gates/determinism/env_pins.log"}
+    assert evidence_cells == expected, "Determinism pins evidence must use canonical determinism log only"
 
     acceptance_entries = _load_acceptance_tokens()
     matching = [entry for entry in acceptance_entries if entry.get("name") == "DETERMINISM_ENV_PINS_OK"]
     assert len(matching) == 1, "DETERMINISM_ENV_PINS_OK should appear once in acceptance map"
     acceptance_evidence = set(matching[0].get("evidence_titles", []))
     assert acceptance_evidence == expected, "Acceptance binding must use canonical determinism pins artifacts"
+    for evidence in acceptance_evidence | evidence_cells:
+        assert ".path_proof" not in evidence, "Determinism bindings must not reference proof files"

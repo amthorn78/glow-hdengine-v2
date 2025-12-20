@@ -41,7 +41,8 @@
       "evidence_titles": [
         "docs/evidence/INDEX.json",
         "artifacts/evidence_index.jsonl",
-        "python tools/evidence/update_evidence_index.py"
+        "python tools/evidence/update_evidence_index.py",
+        "python tools/evidence/orientation_demo.py"
       ]
     },
     {
@@ -59,7 +60,6 @@
       "status": "implemented",
       "evidence_titles": [
         "artifacts/evidence_index.jsonl",
-        "artifacts/evidence_index.jsonl.path_proof.txt",
         "ci/checks/check_mirror_schema.sh"
       ]
     },
@@ -68,11 +68,15 @@
       "owner_pf": "PF12 — HDE-Schemas and Artifacts §Path Proofs",
       "status": "implemented",
       "evidence_titles": [
-        "artifacts/evidence_index.jsonl.path_proof.txt",
-        "audit/gates/determinism/env_pins.log.path_proof.txt",
-        "artifacts/sanity/sanity.log.path_proof.txt",
-        "artifacts/cli/showcompat/stdout.json.path_proof.txt",
-        "artifacts/ops/internal_version/body_get.json.path_proof.txt"
+        "docs/evidence/INDEX.json",
+        "artifacts/evidence_index.jsonl",
+        "audit/gates/determinism/env_pins.log",
+        "artifacts/sanity/sanity.log",
+        "artifacts/cli/showcompat/stdout.json",
+        "artifacts/ops/internal_version/body_get.json",
+        "python tools/evidence/update_evidence_index.py --check",
+        "python tools/evidence/orientation_demo.py --check",
+        "bash ci/checks/check_mirror_schema.sh"
       ]
     },
     {
@@ -81,7 +85,6 @@
       "status": "implemented",
       "evidence_titles": [
         "artifacts/evidence_index.jsonl",
-        "artifacts/evidence_index.jsonl.path_proof.txt",
         "ci/checks/check_mirror_schema.sh"
       ]
     },
@@ -112,7 +115,6 @@
       "evidence_titles": [
         "ci/checks/check_env_pins.sh (rails gate)",
         "audit/gates/determinism/env_pins.log",
-        "audit/gates/determinism/env_pins.log.path_proof.txt",
         "parity/errors_reader_cli.vendor_attempt_closed_rails.http.json",
         "parity/errors_reader_cli.vendor_attempt_closed_rails.cli.txt",
         "tests/cli/test_errors_parity.py::test_http_and_cli_parity"
@@ -123,8 +125,7 @@
       "owner_pf": "PF19 — Glow QA Guide §Env Pins",
       "status": "implemented",
       "evidence_titles": [
-        "audit/gates/determinism/env_pins.log",
-        "audit/gates/determinism/env_pins.log.path_proof.txt"
+        "audit/gates/determinism/env_pins.log"
       ]
     },
     {
@@ -133,8 +134,7 @@
       "status": "implemented",
       "evidence_titles": [
         "python tools/evidence/run_sanity_pipeline.py",
-        "artifacts/sanity/sanity.log",
-        "artifacts/sanity/sanity.log.path_proof.txt"
+        "artifacts/sanity/sanity.log"
       ]
     },
     {
