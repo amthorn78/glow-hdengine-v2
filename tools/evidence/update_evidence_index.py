@@ -467,6 +467,22 @@ def _write_if_changed(path: Path, content: bytes, *, check: bool) -> None:
     path.write_bytes(content)
 
 
+def _refresh_path_proof(path: Path, *, default_produced_at: str, check: bool) -> None:
+    rel = path.relative_to(ROOT).as_posix()
+    proof_existing = _load_existing_proof(ROOT / f"{rel}.path_proof.txt")
+    stat = path.stat()
+    _write_path_proof(
+        rel,
+        sha256=_sha256_path(path),
+        size_bytes=stat.st_size,
+        mtime_utc=proof_existing.get("mtime_utc"),
+        produced_at=proof_existing.get("produced_at_utc"),
+        default_produced_at=default_produced_at,
+        check=check,
+        stat_mtime=stat.st_mtime,
+    )
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description="Maintain the evidence index and mirror")
     parser.add_argument("--check", action="store_true", help="Fail if files would change")
@@ -499,6 +515,8 @@ def main(argv: list[str] | None = None) -> None:
 
     hash_line = f"{_sha256_bytes(index_bytes)}  docs/evidence/INDEX.json\n".encode("utf-8")
     _write_if_changed(HASH_SENTINEL, hash_line, check=args.check)
+    _refresh_path_proof(HUMAN_INDEX, default_produced_at=produced_default, check=args.check)
+    _refresh_path_proof(HASH_SENTINEL, default_produced_at=produced_default, check=args.check)
 
     mirror_bytes, mirror_rec = _render_mirror(entries, produced_default=produced_default, check=args.check)
     mirror_size = len(mirror_bytes)
