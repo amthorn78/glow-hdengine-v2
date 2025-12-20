@@ -11,7 +11,7 @@ The Glow HD Engine is a deterministic Human Design engine and CLI that emits gov
   - D1: error-envelope parity scenarios remain closed-rails first, with deterministic refusal coverage and env-pin gating.
   - D2: showcompat canonical stdout capture is generated deterministically with indexed artifacts and sha256 sidecars.
   - D3: `/internal/version` identity bundle (body, headers, conditional headers, two-run identity, release-id recompute) is indexed with path proofs.
-  - Acceptance scaffolding now anchors EPIC022 token matrix and acceptance map bindings to concrete evidence and tests (manifest + close report are present, not stubs).
+  - Acceptance scaffolding now anchors EPIC022 token matrix and acceptance map bindings to concrete evidence and tests (close-pack artifacts — manifest + close report + acceptance map + token matrix — are present and finalized).
 
 ## Quickstart (closed rails default)
 
@@ -27,8 +27,10 @@ SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python -m engine.cli --help
 SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC hdctl showcompat --a-file fixtures/charts/alice.json --b-file fixtures/charts/bob.json
 
 # Aux narrative preview for a compat tuple (admin/test)
-SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC hdctl aux-preview --pair-file artifacts/presenter/showcompat_identity_summary.json --category undefined --band Cool --perspective shared --show-narrative
+SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC hdctl aux-preview --pair-file artifacts/presenter/showcompat_identity_summary.json --category <category_slug> --band Cool --perspective shared --show-narrative
 ```
+
+- Replace `<category_slug>` with a narrative category slug from the sealed Aux pack; `--band` remains sealed to `{Cool,Open,Warm,Glow}` and `--perspective` to `{shared,a_to_b,b_to_a}`.
 
 - Dev Reader helper (`scripts/dev_start_reader.sh`) remains available for dev/test/local harnessing; APP_ENV gating applies.
 - Use the determinism helper (`engine.runtime.determinism_env.ensure_determinism_env`) or `ci/checks/check_env_pins.sh` to confirm pins.
@@ -37,7 +39,7 @@ SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC hdctl aux-preview --pair-file
 
 - Entry point: `hdctl` (or `python -m engine.cli`).
 - Subcommands: `showcompat`, `aux-preview`, `bg:resolve`, and dev-only `dev:sampler` (APP_ENV=dev).
-- Exit codes: 0 on success; 64 for usage/validation/IO errors surfaced via `CliError`; 1 for vendor/engine failures (for example `VendorError` in `--source vendor` flows) and unexpected exceptions (per CLI error-path tests).
+- Exit codes: 0 on success; 64 for usage/validation/IO errors surfaced via `CliError`; typed failures (including vendor/engine errors) follow the PF05 (CLI/API/Vendor Ref) typed-error exit-code contract with stderr-only JSON; unexpected exceptions remain non-zero.
 - `showcompat` accepts `--pair-file`, `--a-file/--b-file` (aliases `--a/--b`), stdin, or birth arguments; success prints LF-terminated canonical compat payload to stdout (includes numeric scores/weights captured in EPIC022 D2). Errors print `error_v1` envelopes to stderr. Sidecars: `--dump-reader` (Reader v1 bytes via the presenter path), `--dump-admin-dir`.
 - Deterministic artifact generator: `python tools/cli/generate_showcompat_artifacts.py` captures `artifacts/cli/showcompat/stdout.json`, `artifacts/cli/showcompat/stdout.json.sha256`, and `artifacts/cli/showcompat/args.json` under closed rails.
 - `aux-preview` previews Aux narrative ids/text for compat tuples using the sealed narrative pack.
