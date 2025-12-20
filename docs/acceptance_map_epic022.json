@@ -76,7 +76,7 @@
         "artifacts/ops/internal_version/body_get.json",
         "python tools/evidence/update_evidence_index.py --check",
         "python tools/evidence/orientation_demo.py --check",
-        "bash ci/checks/check_mirror_schema.sh"
+        "python ci/checks/check_mirror_schema.sh"
       ]
     },
     {
