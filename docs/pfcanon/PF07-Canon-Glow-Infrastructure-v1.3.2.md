@@ -1,12 +1,12 @@
 # **0\. Front Matter**
 
 **Title:** PF07-Canon-Glow-Infrastructure  
-**Version:** v1.2.5
+**Version:** v1.3.2
 
 **Status:** Canon  
-**Effective date:** 2025-12-17
+**Effective date:** 2025-12-24
 
-**Last Update Gate:** BN 8.3.4 Drain A1-5
+**Last Update Gate:** BN 8.5.3 Drain 26-29
 
 **Invocation tag:** `INV-f2ac55d77ce9aacc`
 
@@ -32,15 +32,19 @@ PF07 does **not** define operations policy, runbooks, transport rules, byte cont
 
 **Routing (titles-only)**
 
-* Rails/transport policy, acceptance tokens, and ops posture → **HDE-Governance**.
+PF07 is an infrastructure inventory. Behavioral semantics, contracts, tokens, and procedures are owned by the relevant product’s canonical documents and are referenced by title only. At a minimum, PF07 routes:
 
-* Public envelope, request/response shapes, and Endpoint Catalog (JSON success) → **HDE-CLI-API-Vendor-Ref**.
+* **Rails/transport policy, acceptance tokens, and ops posture** → the relevant product’s **Governance** document (titles-only).
 
-* Canonical JSON, pack/manifest, and the machine Evidence Index → **HDE-Schemas & Artifacts**.
+* **Public envelope, request/response shapes, and any success-route catalog** → the relevant product’s **API/contract** document (titles-only).
 
-* Jobs/guards and evidence procedures → **HDE-Mechanics Guide**.
+* **Canonical JSON, pack/manifest, and evidence catalog/indexing rules** → the relevant product’s **Schemas & Artifacts** document (titles-only).
 
-* Process & PR workflow (PR-first; human index \+ machine mirror updated in the same PR) → **Epic-Process-Guide**.
+* **Jobs/guards and evidence procedures** → the relevant product’s **Mechanics/operations** guide (titles-only).
+
+* **Process & PR workflow** (PR-first; human index \+ machine mirror updated in the same PR) → **Epic-Process-Guide** (titles-only).
+
+Where a single shared canonical home exists for a given capability across multiple products, PF07 may name that document by title. Where products differ, PF07 records only the infra names/locations and routes semantics to each product’s owning canonical docs.
 
 **Narratives persistence (names \+ locations).**  
  PF07 records only DB/schema locations, service names, and any canonical infra keys used for narratives persistence. Field/length constraints and JSON shapes live in **HDE-Schemas & Artifacts**; logging/privacy (keys-only; never log text) lives in **HDE-Governance**; Aux/CLI endpoint bytes live in **HDE-CLI-API-Vendor-Ref**.
@@ -49,7 +53,7 @@ PF07 does **not** define operations policy, runbooks, transport rules, byte cont
 
 * **Supersession rule (PF10 addenda).** When PF10 contains multiple lettered addenda on the same topic, the later letter supersedes the earlier. Route all references by title only.
 
-* **PR-first via CodEx.** CodEx opens the PR automatically (one PR per epic or slice). Whenever proofs or artifacts change, update in the same PR: Doc-Delta, the human Evidence Index (`docs/evidence/INDEX.json`), the Evidence Index hash sentinel (`docs/evidence/INDEX.sha256`), and the machine JSONL mirror (`artifacts/evidence_index.jsonl`).
+* **PR-first via CodEx.** CodEx opens the PR automatically (one PR per epic or slice). Whenever proofs or artifacts change, update in the same PR: Doc-Delta, the human Evidence Index (`docs/evidence/INDEX.json`) and its path-proof (`docs/evidence/INDEX.json.path_proof.txt`), the Evidence Index hash sentinel (`docs/evidence/INDEX.sha256`) and its path-proof (`docs/evidence/INDEX.sha256.path_proof.txt`), and the machine JSONL mirror (`artifacts/evidence_index.jsonl`).
 
 * **Machine mirror hygiene.** The mirror is records-only, canonical JSONL (UTF-8, sorted keys, compact, exactly one trailing `\n`), unknown-keys rejected. Each record includes `artifact_key`, `role`, `sha256`, `size_bytes`, `produced_at_utc`, `discovered_physical_path`, and a `proof_anchor` to a path-proof stored alongside the artifact. Keep 1:1 parity with the human index.
 
@@ -57,7 +61,9 @@ PF07 does **not** define operations policy, runbooks, transport rules, byte cont
 
 * **Capture environment pins (titles-only).** Snapshot/canonicalization jobs run with `LC_ALL=C`, `LANG=C`, `TZ=UTC` to guarantee deterministic bytes. Enforcement and gates live in **HDE-Build Checklist** and **HDE-Schemas & Artifacts**; PF07 records only which environments/components are expected to use these pins.
 
-**Primary homes (by title):**
+**Primary homes referenced in this document (titles-only).**
+
+PF07 routes semantics to each product’s owning canonical documents. The current Glow stack references these primary homes by title (HD Engine plus shared process and evidence homes):
 
 * **PF04 — HDE-Governance**
 
@@ -70,6 +76,8 @@ PF07 does **not** define operations policy, runbooks, transport rules, byte cont
 * **PF06 — Epic-Process-Guide**
 
 * **PF12 — HDE-Schemas & Artifacts**
+
+Other Glow products may add additional governance, contract, QA, or schemas documents. PF07 will reference those by title when they exist.
 
 ---
 
@@ -101,17 +109,19 @@ Where an infra fact must be pinned (like a production base URL or shared DB inst
 
 * Detailed schema fields or math.
 
-Those live by title only in:
+Those live by title only in the **relevant product’s** canonical documents (governance, contracts, schemas, mechanics, QA, and process), referenced by title only.
+
+For the **HD Engine** surfaces recorded in this document, the currently referenced primary homes include:
 
 * **PF04 — HDE-Governance** (transport/A7, ops policy, acceptance)
 
-* **PF05 — HDE-CLI-API-Vendor-Ref** (public bytes & API contracts)
+* **PF05 — HDE-CLI-API-Vendor-Ref** (public bytes and API contracts)
 
 * **PF12 — HDE-Schemas & Artifacts** (canonical JSON, pack/manifest, machine mirror)
 
-* **PF02 — HDE Architecture** (system design; topology)
+* **PF02 — HDE Architecture** (system design and topology)
 
-* **PF06 — Epic-Process-Guide** (process/change control)
+* **PF06 — Epic-Process-Guide** (process and change control)
 
 Names and pinned infra reference values in PF07 are authoritative for infrastructure. Semantics, tokens, and procedures are routed by title to their single homes above.
 
@@ -172,13 +182,9 @@ Reader (and Aux) success-route proofs are catalog-driven via the Endpoint Catalo
 **Catalog posture.**  
  The Catalog is internal-only and env-gated; non-prod entries MUST be unreachable in production. Capture a headers-only env-gate proof showing this behavior. Architecture stays contract-free and routes bytes by title only.
 
-**A7 invariants (routing only).** On a cataloged JSON success route, proofs MUST satisfy:
+**A7 invariants (routing only).**
 
-* GET/200 with a strong, quoted ETag over the LF-terminated canonical body.  
-* HEAD/200 validator parity; Content-Type \== GET; no body; Content-Length \== len(identity 200 body).  
-* 304 only after a prior 200; no body; omit both Content-Type and Content-Length; validators mirror the cached 200\.  
-* `Vary: Authorization, Accept-Encoding` present.  
-* Encoding invariance of identity (ETag) and effective Content-Length across accepted encodings. Token semantics and concrete header bytes live in HDE-Governance and HDE-CLI-API-Vendor-Ref; Architecture cites them by title only.
+A7 invariants for proofs on a cataloged JSON success route are defined by title in **HDE-Governance** and **HDE-CLI-API-Vendor-Ref**. PF07 does not restate header/body bytes, validator rules, or acceptance semantics here; it records only that proofs target a cataloged JSON success route and that evidence is captured/indexed under governed roots.
 
 **Scope note (names-only).** Under **EPIC-010**, **Aux** evidence consists of **two header snapshots only** (Text 200 and Suppressed 200). **Aux HEAD/304** are **out of scope**; **A7 (GET/HEAD/304, Vary, encoding-invariance)** proofs run **only** on a **Catalog JSON success** route (see §4.1 entry for the route name). Bytes live in **HDE-CLI-API-Vendor-Ref**; policy lives in **HDE-Governance**; capture/indexing discipline lives in **HDE-Schemas & Artifacts**.
 
@@ -188,9 +194,7 @@ Reader (and Aux) success-route proofs are catalog-driven via the Endpoint Catalo
 
 ### **2.3.3 Ops-only identity**
 
-`/internal/version` is **operator-only** and **not A7-eligible**. Its posture is governed in **HDE-Governance**: `Cache-Control: no-store`, **no ETag**, **HEAD 200 parity**, and **conditionals ignored** (always 200). Architecture remains contract-free and routes these rules **by title**.
-
----
+`/internal/version` is **operator-only** and **not A7-eligible**. Its transport posture (cache behavior, validator/HEAD handling, and conditional semantics) is defined by title in the owning governance/contract documents. PF07 records only the infra fact that this surface is ops-only and where its governed evidence bundle lives (see §10.5).
 
 ### **2.3.4 Canonical bytes & evidence**
 
@@ -376,61 +380,25 @@ In other words, **terminal CLI access** is a named, supported admin-facing produ
 ## **2.8 GitHub Codespaces / local dev environments (names-only)**
 
 **Scope.**  
- This subsection records **names-only expectations** for the HD Engine project’s GitHub Codespaces and other local dev environments. PF07 names providers, repositories, and key tools; it does **not** define QA procedures or test plans. QA rails, tooling checks, and behavior vs tooling classification live in:
+ This subsection is infrastructure inventory only. PF07 records:
 
-* **Glow QA Guide** (QA rails, environment setup, tooling vs behavior semantics),
+* Codespaces role and boundaries (QA console \+ artifact sink; not prod).
 
-* **HDE-Build Checklist** (build/CI tasks and blockers), and
+* The canonical QA evidence root pattern used by Live QA: `audit/qa/<epic-id>/...` (paths and per-epic subtrees remain names-only here).
 
-* **Epic-Process-Guide** (epic lifecycle, Live QA planning),
+* Canonical infra key names referenced by Codespaces runs (see §8), and canonical repo/devcontainer locations where infra binds those keys (names-only; no secrets).
 
-all referenced by title only.
+**Canonical home for Codespaces configuration (routing-only).**  
+ The **Glow QA Guide** is the single canonical home for Codespaces QA configuration and requirements (titles-only). PF07 does not enumerate the full Codespaces prerequisites checklist, required secret mappings, or step-by-step runbook content. Any change to Codespaces/devcontainer requirements, required env var names, or Live QA prerequisites MUST be reflected in the Glow QA Guide in the same change-set that introduces the new requirement.
 
-**Project Codespaces expectations (HD Engine).**
+**Codespaces snapshot step (routing-only).**  
+ Every Live QA plan executed in Codespaces MUST include a mechanical “Codespaces snapshot” step at the beginning of the run that captures the full, run-relevant environment context into the epic QA root under `audit/qa/<epic-id>/...` (including tool versions, rails variables, and presence/absence of required secrets, but never secret values). This is evidence, not prose, and is generated by commands. The exact artifact schema/path convention and capture commands are owned by title in the **Glow QA Guide** (and in **HDE-Schemas & Artifacts** if the snapshot becomes a governed evidence family).
 
-For the repository `amthorn78/glow-hdengine-v2`, a **project Codespace** is expected to provide, at minimum:
+**Live QA is gitless (routing-only).**  
+ Live QA runbooks MUST NOT include git operations and MUST NOT gate PASS/FAIL on working-tree cleanliness. Evidence gating is artifact-based under `audit/qa/<epic-id>/...`. The execution rail and any explicit non-blocking Codespaces workspace artifacts are governed by title in **Epic-Process-Guide** and **Glow QA Guide**.
 
-* A working Python virtual environment rooted at `.venv/` for the Engine repo.
-
-* `pytest` installed in that virtual environment and callable via `python -m pytest` when the venv is active.
-
-* A shell prompt from which Engine tests and QA commands can be run under the env pins described in §2.4 (for example, `LC_ALL=C`, `LANG=C`, `TZ=UTC`), and with HD Engine-specific env vars (SAFE\_MODE, ALLOW\_NETWORK, APP\_ENV) set via the usual configuration mechanisms.
-
-PF07 does **not** prescribe how the venv is created or how `pytest` is installed; those steps and any required bootstrap scripts are owned by **Glow QA Guide**, **HDE-Build Checklist**, and **Epic-Process-Guide**.
-
-**Tooling failure vs behavior failure (names-only classification).**
-
-Within this infrastructure map:
-
-* A missing or non-executable `pytest` entrypoint in `.venv/bin/pytest` is treated as an **infra/tooling misconfiguration** for the Codespace or local dev environment, not as an HD Engine ingest or behavior failure.
-
-* The canonical expectation is that tests can be run via `python -m pytest` in an activated venv; if that pattern cannot run the ingest test suite (for example, `tests/bodygraph/test_ingest.py`), this is a **tooling blocker** for QA and CI, not a data- or math-level defect in the Engine.
-
-Log format, evidence paths (for example, `audit/qa/hde-epic019/live-qa-<date>/D0-vendor-ingest.log`), and how tooling failures are captured and escalated are specified by title in **Glow QA Guide** and **HDE-Build Checklist**.
-
-**Dev Reader HTTP harness expectations (names-only).**
-
-For internal/dev HTTP harnesses on the HD Engine (including but not limited to `POST /internal/dev/sampler`), Codespaces and other local dev environments are expected to provide:
-
-* A **running dev Reader HTTP service** in APP\_ENV=dev that exposes the internal/dev routes defined in the Engine adapter (for example, `/internal/dev/sampler`), reachable from the Codespaces shell.
-
-* A configured **base URL** for that service, exposed via an infra-owned config key such as `DEV_SAMPLER_URL` (see §8.2.1 for the key name), whose value (host and port) is derived from the actual Reader process wiring and **not guessed** by PO, QA, or documentation agents.
-
-* Network reachability from the Codespace (or local dev shell) to that base URL under the appropriate rails posture (for example, APP\_ENV=dev with ALLOW\_NETWORK=1 for HTTP dev harness checks, as defined by Governance and QA guides by title).
-
-Within this infrastructure map:
-
-* The existence of a dev Reader HTTP harness and its base URL/port are treated as **infra readiness** for internal/dev HTTP QA; PF07 records the **names** of the keys and services only.
-
-* If the configured `DEV_SAMPLER_URL` (or equivalent dev harness URL) is not reachable from the Codespace shell, or responds with the wrong protocol (for example, HTTP/0.9 errors or `HTTP_STATUS:000`), this is classified here as a **tooling/infra blocker** for the HTTP dev harness, not an HD Engine behavior failure.
-
-The detailed classification and handling of such cases (for example, `FAIL_TOOLING` vs behavior-failure statuses in QA logs, preconditions such as “dev Reader HTTP ready” before behavior tests, and D-goal blocking semantics) are specified by title in **Glow QA Guide**, **HDE-Build Checklist**, and **Epic-Process-Guide**. PF07 remains **inventory-only**: it names the environments, keys (such as `DEV_SAMPLER_URL`), and components that those documents rely on, without prescribing runbooks or acceptance rules.
-
-**Routing note (names-only).**
-
-* Requirements that QA plans include an explicit “env/tooling bootstrap” step (for example, a small health check for `python -m pytest` before running ingest tests) are owned by **Glow QA Guide** and **HDE-Build Checklist**; PF07 only names the expected tools and locations.
-
-* Any future changes to the canonical test runner (for example, a different module entrypoint) must be reflected here as names-only updates and fully specified in the owning PF documents.
+**Where PF07 fits (names-only reminder).**  
+ PF07 remains the single home for provider/project/service names, stable base URLs, canonical QA root patterns, and infra key names. It routes Codespaces configuration, Live QA runbooks, and acceptance semantics by title to their owning documents.
 
 ---
 
@@ -458,7 +426,7 @@ The detailed classification and handling of such cases (for example, `FAIL_TOOLI
 
   * **Glow Backend:** **TBD**
 
-*Names-only; no policy, runbooks, or tokens here. Transport/A7 policy → HDE-Governance (titles-only).*
+*Names-only; no policy, runbooks, or tokens here. Transport/A7 policy is routed by title to the relevant product’s governance and contract documents.*
 
 **Connectivity from Codespaces (names-only).**
 
@@ -467,28 +435,35 @@ The detailed classification and handling of such cases (for example, `FAIL_TOOLI
 * Live QA connectivity checks described in **Glow QA Guide** (for example, curl or CLI commands that prove reachability to production HD Engine or Backend services, or to the shared Postgres instance listed in §2.2/§7.1) are expected to rely on the names in this section; authentication, rails posture (SAFE\_MODE/ALLOW\_NETWORK, APP\_ENV, credentials), and acceptance semantics are governed by **HDE-Governance**, **Glow QA Guide**, **HDE-Build Checklist**, and **HDE-Mechanics Guide** (titles-only).
 
 * PF07 does **not** define how connectivity tests are run or which D-goals or QA tokens they satisfy; it records only the provider, project, service, base-URL, and instance names that those tests and tokens depend on.  
-    
   ---
 
-  ## 3.2 Vercel
+  ## **3.2 Vercel**
 
-* **Team / org:** **TBD**  
-* **Projects & aliases:**  
-  * **Glow Frontend:** project **TBD** · production alias `glowme.io` · preview alias pattern **TBD**  
-* **Domains:** primary `glowme.io`; additional **TBD**  
+* **Team / org:** **TBD**
+
+* **Projects & aliases:**
+
+  * **Glow Frontend:** project **TBD** · production alias `glowme.io` · preview alias pattern **TBD**
+
+* **Domains:** primary `glowme.io`; additional **TBD**
+
 * **Preview policy (names-only):** **TBD**
 
 *Names-only; policy/headers/acceptance routed by title.*
 
 ---
 
-## 3.3 GitHub
+## **3.3 GitHub**
 
-* **Organization / user:** `amthorn78` *(for HD Engine repo)*  
-* **Repositories by component:**  
-  * **HD Engine:** `amthorn78/glow-hdengine-v2` · default branch `main`  
-  * **Glow Backend:** **TBD** · default branch **TBD**  
-  * **Glow Frontend:** **TBD** · default branch **TBD**
+* **Organization / user:** `amthorn78` *(for HD Engine repo)*
+
+* **Repositories by component:**
+
+  * **HD Engine:** `amthorn78/glow-hdengine-v2` · default branch `main`
+
+  * **Glow Backend:** `amthorn78/glow-backend-v4` · default branch **TBD**
+
+  * **Glow Frontend:** `amthorn78/glow-frontend-v2` · default branch **TBD**
 
 *Names-only; no paths/tokens. Evidence indexing lives in component specific canonical evidence docs.*
 
@@ -524,8 +499,7 @@ The detailed classification and handling of such cases (for example, `FAIL_TOOLI
 * **Linked cache/datastore:** **Redis (Railway)** — instance **TBD** (connected to the backend)  
 * **Bridged access (names-only):** **pg-bridge (Railway)** — see **§9 Resource catalog**; `DB_BRIDGE_URL` mapping per env lives in **§8 Config keys** (values **OPEN/TBD**)  
 * **Start command (inventory):** see **§10** (canonical Railway command kept verbatim)  
-* **External surfaces (titles-only):** Backend API surfaces — contract/fields/status/headers live in **HDE-CLI-API-Vendor-Ref** (PF07 records names only)  
-  * **Aux Narrative (public, names-only):** canonical route `GET /api/aux/narrative?v=1` · BC alias: `/aux/narrative` · bytes live in **HDE-CLI-API-Vendor-Ref** · canon/alias parity and transport header posture are governed by title there. (Aux is **not** Catalog/A7; see §2.3.2 scope note.)
+* **External surfaces (titles-only):** Backend API surfaces — contract/fields/status/headers live in the owning **Glow Backend API/contract** document (titles-only; doc title TBD). PF07 records names and locations only.
 
 *Names-only; schema/policy/bytes routed by title; no token lists or pinned evidence paths.*
 
@@ -538,7 +512,7 @@ The detailed classification and handling of such cases (for example, `FAIL_TOOLI
 * **Runtime config:** public config key **names TBD** (values **OPEN/TBD**)  
 * **Upstream targets:** Backend base URL **TBD** · HD Engine base URL **TBD** (names-only; see **§6 Domains & DNS** and **§4.1**)
 
-*Names-only; routing by title to **HDE-CLI-API-Vendor-Ref** (public envelope & request/response), **HDE-Governance** (A7/transport), **HDE-Schemas & Artifacts** (canonical JSON & mirror).*
+*Names-only; routing by title to the owning Frontend governance, contract, and schemas documents (public envelope and request/response shapes; transport policy; canonical JSON and evidence catalog/indexing).*
 
 # **5\) Repositories**
 
@@ -576,6 +550,11 @@ These top-level roots are part of the HD Engine repo inventory and are infra- an
 * `audit/` — QA and audit logs, including trees rooted at `audit/qa/<epic-id>/...` referenced by title in QA guides.
 
 PF07 records this repo structure as an infra inventory only. Transport behavior, governance, QA policy, schemas, and evidence acceptance are routed by title to their owning PF documents (for example, **HDE-Governance**, **HDE-CLI API Vendor Ref**, **HDE-Schemas & Artifacts**, **Glow QA Guide**, **HDE-Mechanics Guide**).
+
+**Directory naming (repo-wide; names-only).**  
+ All directories in the repository and application codebase MUST use **lowercase ASCII** names. Mixed-case or upper-case directory names are non-conforming and must not be introduced. If mixed-case directories exist, treat them as legacy drift and normalize them to lowercase rather than copying them forward.
+
+This applies to all governed roots listed above (for example, `docs/`, `artifacts/`, `audit/`, `catalog/`, `schemas/`, and per-epic QA trees under `audit/qa/<epic-id>/...`).
 
 ---
 
@@ -933,21 +912,24 @@ Each of the above artifacts has a corresponding path‑proof sidecar:
 
 PF07 records this as an infra responsibility only. The meaning of each `APP_ENV` variant (such as `dev`, `prod`, empty, or unset) and the expected HTTP/rails behavior per value are defined by title in **HDE-Mechanics Guide**, **HDE-Phased Epics**, **HDE-Governance**, and **Glow QA Guide**. PF07 stays names-only and does not restate those semantics; it pins the key name and the requirement that infra helpers faithfully forward `APP_ENV` so that QA harnesses can exercise the configured gating behavior.
 
-**SAFE\_MODE** (rails posture; observation only)
+**SAFE\_MODE** (rails posture; default, names-only)
 
-* Dev (CodEx): 1
+* Dev (CodEx): 0 (open)
 
-* QA (Codespaces): 1
+* QA (Codespaces): 0 (open)
 
-* Prod (Railway): 0
+* Prod (Railway): 1 (closed)
 
-**ALLOW\_NETWORK** (rails posture; observation only)
+**ALLOW\_NETWORK** (rails posture; default, names-only)
 
-* Dev (CodEx): 0
+* Dev (CodEx): 1 (open)
 
-* QA (Codespaces): 0
+* QA (Codespaces): 1 (open)
 
-* Prod (Railway): 1
+* Prod (Railway): 0 (closed)
+
+**Note (rails windows).**  
+ During a PO-approved rails-open prod QA window (see §2.5), production may temporarily run with `SAFE_MODE=0` and `ALLOW_NETWORK=1`. PF07 treats §2.4 as the default posture and §2.5 as the named exception window; do not treat window overrides as the baseline.
 
 **Environment pins** (names-only)
 
@@ -1072,14 +1054,13 @@ PF07 records the **key name**, the **per-environment binding locations**, and th
 **Notes (inventory-only).**
 
 * PF07 names the HD Engine port mapping and the `DEV_SAMPLER_URL` key as part of the infrastructure inventory. PF07 pins the **Codespaces container-local** `DEV_SAMPLER_URL` binding (`http://127.0.0.1:8000/internal/dev/sampler`) because it is a stable infra fact for the governed dev sampler harnesses; other environments may use a different `<base_url>` and remain **OPEN/TBD** until confirmed. PF07 does not define how the dev harness is started or specify QA procedures; those details (start commands, curl patterns, acceptance tokens) live by title in **HDE-Mechanics Guide**, **HDE-CLI-API-Vendor-Ref**, **Glow QA Guide**, and **HDE-Build Checklist**.  
-* Requiredness, defaults, and validation rules for these keys are not defined here: ownership/requiredness → **HDE-Schemas & Artifacts**; rails/policy (including dev-harness validation and rails posture) → **HDE-Governance** and **Glow QA Guide** (titles-only).  
-* 
+* Requiredness, defaults, and validation rules for these keys are not defined here: ownership/requiredness → **HDE-Schemas & Artifacts**; rails/policy (including dev-harness validation and rails posture) → **HDE-Governance** and **Glow QA Guide** (titles-only).
 
-  ### **8.2.2 Glow Backend — TBD (names-only)**
+### **8.2.2 Glow Backend — TBD (names-only)**
 
 * `PORT`, `LOG_LEVEL`, `SECRET_KEY`, `REDIS_URL`, `MAILGUN_API_KEY`, `MAILGUN_DOMAIN`, `SESSION_SECRET`, `CSRF_SECRET`, `TZ`, \[TBD additional names\] — **OPEN/TBD** (all values)
 
-  ### **8.2.3 Glow Frontend — TBD (names-only)**
+### **8.2.3 Glow Frontend — TBD (names-only)**
 
 * \[TBD public config names\], \[TBD additional names\] — **OPEN/TBD** (all values)
 
@@ -1104,14 +1085,14 @@ PF07 records the **key name**, the **per-environment binding locations**, and th
   * **Team:** **TBD**  
   * **Glow Frontend project:** **TBD**
 
-  ## **9.2 Services**
+## **9.2 Services**
 
 * **HD Engine (Railway)** — service `glow-hdengine-v2` · base URL `https://glow-hdengine-v2-production.up.railway.app`  
 * **Glow Backend (Railway)** — service `glow-backend-v4` · base URL **TBD**  
 * **PG bridge (Railway)** — service `pg-bridge` · host `https://illustrious-freedom-production.up.railway.app` *(names-only; `DB_BRIDGE_URL` values map per environment in §8; PF07 lists names only)*  
 * **Glow Frontend (Vercel)** — site `glowme.io` (production) · previews **TBD**
 
-**Notes (names-only).** No secrets or policy here; endpoints/bytes live by title in **HDE-CLI-API-Vendor-Ref**; governance/policy lives by title in **HDE-Governance**.
+**Notes (names-only).** No secrets or policy here. Endpoint bytes, request/response contracts, and governance/policy are routed by title to the owning product’s canonical contract and governance documents. For the HD Engine surfaces recorded in this section, the current contract home is **HDE-CLI-API-Vendor-Ref** and the current governance home is **HDE-Governance** (titles-only).
 
 ### **9.2.1 Object storage (narratives pack store)**
 
@@ -1162,38 +1143,148 @@ Keep verbatim — this is the source of truth as configured in Railway.
 * If the command or any parameter changes (flags, worker/thread counts, entrypoint), **update this section and the canonical evidence** in the **same change** (see 10.5).  
 * PR-first via CodEx: the **Doc-Delta**, **human Evidence Index**, and **machine JSONL mirror** must update **in the same PR** when the command or env-pins change.
 
-## **10.5 Evidence & indexing (titles-only)**
+  ## **10.5 Evidence & indexing (titles-only)**
 
-**Single home (entries & types).**  
- The authoritative listing of evidence artifacts (titles/paths) and governed record types is owned by the canonical **Schemas & Artifacts** document (titles-only). PF07 is names-only: it does not define evidence schemas or acceptance rules; it inventories the stable evidence index and mirror file locations used by the repo.
+  ### **Single home (entries & types)**
 
-**Indexing discipline (same-PR rule).**  
- Whenever evidence changes, update in the same PR:
+The authoritative listing of evidence artifacts (titles/paths) and governed record types is owned by the canonical Schemas & Artifacts document (titles-only). PF07 is names-only: it does not define evidence schemas or acceptance rules; it inventories the stable evidence index and mirror file locations used by the repo.
+
+### **Indexing discipline (same-PR rule)**
+
+Whenever evidence changes, update in the same PR:
 
 * Human Evidence Index: `docs/evidence/INDEX.json`
 
+* Human Evidence Index path-proof: `docs/evidence/INDEX.json.path_proof.txt`
+
 * Evidence Index hash sentinel: `docs/evidence/INDEX.sha256`
+
+* Evidence Index hash sentinel path-proof: `docs/evidence/INDEX.sha256.path_proof.txt`
 
 * Machine mirror (records-only): `artifacts/evidence_index.jsonl`
 
-* CI enforces 1:1 parity (human ↔ machine).
+**Proof freshness requirement (governed artifacts).** If `docs/evidence/INDEX.json` or `docs/evidence/INDEX.sha256` changes bytes, its co-located `*.path_proof.txt` transcript MUST be refreshed in the same PR. Treat stale INDEX path-proofs as a hard evidence integrity failure.
 
-**Mirror hygiene (records-only JSONL).**  
- Canonical JSONL (UTF-8, sorted keys, compact, one trailing `\n`), unknown keys rejected. Each record includes:
+CI enforces 1:1 parity (human ↔ machine).
 
-`artifact_key`, `role` (`proof|golden|snapshot|script|log`), `sha256`, `size_bytes`, `produced_at_utc`, `discovered_physical_path`, `proof_anchor` (points to a path-proof stored alongside the artifact).
+---
 
-**Write discipline (merge-blocking).**
+### **Fixed-path evidence surfaces (names-only; binding correctness)**
 
-* **Field order (ASCII, exact):** `artifact_key`, `discovered_physical_path`, `produced_at_utc`, `proof_anchor`, `role`, `sha256`, `size_bytes`.
+Some acceptance claims are path-sensitive and have a single canonical governed evidence surface. Where a fixed canonical path exists, any plan/matrix/index/mirror binding to a different path is a mechanical blocker and must be corrected (not interpreted).
 
-* **Sort-before-write:** by (`artifact_key`, `discovered_physical_path`).
+#### **Determinism env pins (canonical surface)**
 
-* **Single mirror file:** exactly one `artifacts/evidence_index.jsonl`.
+The only valid governed evidence surface for determinism env pins is:
 
-* **Uniqueness:** (`artifact_key`, `discovered_physical_path`) must be unique.
+* `audit/gates/determinism/env_pins.log`  
+* `audit/gates/determinism/env_pins.log.path_proof.txt`
 
-* **Path-proofs:** a `path_proof.txt` (or equivalent) must exist beside each artifact; the record’s `proof_anchor` must match it exactly.
+Bindings for determinism env pins MUST NOT reference `artifacts/proofs/env_pins.txt` (or any other similarly named file) when the determinism env pins acceptance claim is being made.
+
+#### **/internal/version evidence bundle (canonical root; names-only)**
+
+The governed evidence bundle for `/internal/version` is rooted at:
+
+* `artifacts/ops/internal_version/`
+
+Canonical bundle artifacts under this root include:
+
+* `artifacts/ops/internal_version/body_get.json`  
+* `artifacts/ops/internal_version/body_get.sha256`  
+* `artifacts/ops/internal_version/headers_get.txt`  
+* `artifacts/ops/internal_version/headers_head.txt`  
+* `artifacts/ops/internal_version/cond_if_none_match_headers.txt`  
+* `artifacts/ops/internal_version/cond_if_modified_since_headers.txt`  
+* `artifacts/ops/internal_version/two_run_identity.log`
+
+Each governed artifact is expected to have a corresponding `*.path_proof.txt` sidecar where applicable. PF07 records these as “where it lives” facts only. Evidence schemas, required content, and token semantics live by title in the owning governance, QA, and schemas documents.
+
+---
+
+### **Epic close-pack filenames and QA root normalization (names-only)**
+
+To prevent naming ambiguity and parallel spellings, governed epic close-pack artifacts and QA roots use canonical path patterns.
+
+#### **Epic close-pack artifacts (canonical filenames)**
+
+Epic close-pack artifacts MUST use:
+
+* `audit/EPIC-<NNN>_close_report.md`  
+* `audit/EPIC-<NNN>_MANIFEST.json`
+
+where `<NNN>` is a zero-padded 3-digit epic number (example: 022).
+
+#### **Epic QA root directory (canonical pattern)**
+
+Epic QA roots MUST be lower-case and MUST use:
+
+* `audit/qa/hde-epic<NNN>/` (example: `audit/qa/hde-epic022/`)
+
+Plans and implementations MUST NOT introduce alternate spellings for the same epic in paths (examples of disallowed alternates include: EPIC022, EPIC\_022, audit/QA/..., audit/qa/HDE-EPIC022/...). If legacy artifacts exist under non-canonical names, treat them as deprecated and do not create new artifacts under the deprecated pattern.
+
+**Live QA evidence is mechanical (routing-only).**
+
+Artifacts treated as Live QA evidence under `audit/qa/<epic-id>/...` MUST be produced by commands (shell/scripts/tools), not by hand-editing prose files in an editor. Placeholder fields such as “(fill PASS/FAIL)” are non-conforming for approved QA evidence artifacts. Detailed requirements and the canonical “generated summary” pattern are governed by title in **Epic-Process-Guide** and **Glow QA Guide**; PF07 records this as an infra constraint on how QA evidence roots are populated.
+
+#### **Epic acceptance-ledger artifacts (canonical paths; names-only)**
+
+In addition to the close-pack artifacts, epics may carry governed acceptance-ledger artifacts at canonical paths.
+
+**Token↔Evidence matrix (per epic):**
+
+* `audit/qa/hde-epic<NNN>/token_evidence_matrix.md`
+
+**Acceptance map (per epic):**
+
+* `docs/acceptance_map_epic<NNN>.json`
+
+Where `<NNN>` is a zero-padded 3-digit epic number (example: 022). These are “where it lives” infra facts only. Semantics, required fields, and token rules live by title in the owning governance, QA, and schemas documents.
+
+---
+
+### **Evidence skeleton artifact (canonical path; names-only)**
+
+When governed evidence changes (Index, mirror, or governed artifacts), the evidence skeleton includes the canonical topology orientation demo artifact:
+
+* `audit/gates/topology/orientation_demo.txt`  
+* `audit/gates/topology/orientation_demo.txt.path_proof.txt`  
+  ---
+
+  ### **Canonical path binding validation (routing-only)**
+
+When acceptance tokens are bound to evidence artifacts (for example, in an Epic Plan, a token/evidence matrix, or an acceptance map), those bindings MUST be validated against the canonical evidence catalog before approval or merge. If the catalog defines a fixed canonical path for a token’s evidence surface, the plan/matrix MUST bind to that exact path. Any binding to a non-canonical path is a mechanical blocker and must be corrected (or routed via explicit ADR and drained into the appropriate canonical home).
+
+Minimum agreement set when a token is claimed (titles-only):
+
+* Epic Plan required evidence list  
+* token/evidence matrix row  
+* human Evidence Index entry  
+* machine mirror record  
+* corresponding path-proof referenced by `proof_anchor`  
+  ---
+
+### **Mirror hygiene (records-only JSONL)**
+
+Canonical JSONL (UTF-8, sorted keys, compact, one trailing \\n), unknown keys rejected. Each record includes:
+
+* artifact\_key  
+* role (proof|golden|snapshot|script|log)  
+* sha256  
+* size\_bytes  
+* produced\_at\_utc  
+* discovered\_physical\_path  
+* proof\_anchor (points to a path-proof stored alongside the artifact)  
+  ---
+
+  ### **Write discipline (merge-blocking)**
+
+* Field order (ASCII, exact): artifact\_key, discovered\_physical\_path, produced\_at\_utc, proof\_anchor, role, sha256, size\_bytes.  
+* Sort-before-write: by (artifact\_key, discovered\_physical\_path).  
+* Single mirror file: exactly one `artifacts/evidence_index.jsonl`.  
+* **No alternate mirror files (anti-drift).** The canonical machine mirror is `artifacts/evidence_index.jsonl` only. Any other mirror-like path (for example, `docs/evidence/INDEX.machine_mirror.jsonl`) is non-canonical unless explicitly introduced via a doc delta in the owning Schemas & Artifacts home. Do not bind acceptance artifacts or indexing to alternate mirror file paths.  
+* Uniqueness: (artifact\_key, discovered\_physical\_path) must be unique.  
+* Path-proofs: a `path_proof.txt` (or equivalent) must exist beside each artifact; the record’s proof\_anchor must match it exactly.
 
 ## **10.6 Acceptance (titles-only)**
 
@@ -1205,7 +1296,7 @@ Acceptance requirements for environment and runtime wiring (for example, start-c
 
 * **When:** this document is reviewed and updated **after each EPIC**, or earlier if discovery is needed to unblock an EPIC.  
 * **Flow:** Lead Dev or CodeX proposes **names-only infra** changes (providers, projects, services, repos, domains, database names). The **PO (human)** reviews/approves, then updates the canonical copy.  
-* **Scope discipline:** this guide records **where things live**; **operations/policy** (headers, acceptance, runbooks) continue to live **by title only** in **PF04 — Canon-HDE-Governance**.
+* **Scope discipline:** this guide records **where things live** (providers, projects, services, repos, domains, database names, stable base URLs/ports, and governed root paths). **Operations/policy** (headers, acceptance, runbooks, and procedural gates) live by title only in the relevant product’s canonical governance, QA, and process documents. PF07 remains an infrastructure map and does not restate policy or token semantics.
 
   ## **Content owner for this document**
 
@@ -1213,107 +1304,202 @@ Acceptance requirements for environment and runtime wiring (for example, start-c
 
   ## **Routing note**
 
-* Any ops changes (headers, acceptance, runbooks) remain in **PF04 — Canon-HDE-Governance** by title only. This document is an **infrastructure map**.  
+* Any ops changes (headers, acceptance, runbooks) remain in the relevant product’s canonical governance and QA documents by title only. For HD Engine ops policy, the current governance home is **PF04 — HDE-Governance**. PF07 remains an infrastructure map.  
   ---
 
-  {  
-    "production": {  
-      "hd\_engine": {  
-        "provider": "Railway",  
-        "project": "ample-illumination",  
-        "service": "glow-hdengine-v2",  
-        "repo": "amthorn78/glow-hdengine-v2",  
-        "base\_url": "https://glow-hdengine-v2-production.up.railway.app",  
-        "db\_instance": "ample-illumination/production/postgres",  
-        "db\_schema": "hde"  
-      },  
-      "backend": {  
-        "provider": "Railway",  
-        "project": "ample-illumination",  
-        "service": "glow-backend-v4",  
-        "repo": "amthorn78/glow-backend-v4",  
-        "base\_url": "TBD",  
-        "db\_instance": "ample-illumination/production/postgres",  
-        "db\_schema": "hde"  
-      },  
-      "pg\_bridge": {  
-        "provider": "Railway",  
-        "project": "ample-illumination",  
-        "service": "pg-bridge",  
-        "repo": "TBD",  
-        "base\_url": "https://illustrious-freedom-production.up.railway.app",  
-        "db\_instance": null,  
-        "db\_schema": null  
-      },  
-      "frontend": {  
-        "provider": "Vercel",  
-        "project": "TBD",  
-        "service": "TBD",  
-        "repo": "amthorn78/glow-frontend-v2",  
-        "base\_url": "glowme.io",  
-        "db\_instance": null,  
-        "db\_schema": null  
-      }  
-    },  
-    "staging": {  
-      "hd\_engine": {  
-        "provider": "GitHub Codespaces",  
-        "project": "TBD",  
-        "service": "TBD",  
-        "repo": "amthorn78/glow-hdengine-v2",  
-        "base\_url": "TBD",  
-        "db\_instance": "TBD",  
-        "db\_schema": "hde"  
-      },  
-      "backend": {  
-        "provider": "GitHub Codespaces",  
-        "project": "TBD",  
-        "service": "TBD",  
-        "repo": "TBD",  
-        "base\_url": "TBD",  
-        "db\_instance": "TBD",  
-        "db\_schema": "TBD"  
-      },  
-      "frontend": {  
-        "provider": "GitHub Codespaces",  
-        "project": "TBD",  
-        "service": "TBD",  
-        "repo": "TBD",  
-        "base\_url": "TBD",  
-        "db\_instance": null,  
-        "db\_schema": null  
-      }  
-    },  
-    "development": {  
-      "hd\_engine": {  
-        "provider": "OpenAI Codex",  
-        "project": "TBD",  
-        "service": "TBD",  
-        "repo": "amthorn78/glow-hdengine-v2",  
-        "base\_url": "TBD",  
-        "db\_instance": "TBD",  
-        "db\_schema": "hde"  
-      },  
-      "backend": {  
-        "provider": "OpenAI Codex",  
-        "project": "TBD",  
-        "service": "TBD",  
-        "repo": "TBD",  
-        "base\_url": "TBD",  
-        "db\_instance": "TBD",  
-        "db\_schema": "TBD"  
-      },  
-      "frontend": {  
-        "provider": "OpenAI Codex",  
-        "project": "TBD",  
-        "service": "TBD",  
-        "repo": "TBD",  
-        "base\_url": "TBD",  
-        "db\_instance": null,  
-        "db\_schema": null  
-      }  
-    }  
-  }  
-  
+{
 
+"production": {
+
+"hd\_engine": {
+
+"provider": "Railway",
+
+"project": "ample-illumination",
+
+"service": "glow-hdengine-v2",
+
+"repo": "amthorn78/glow-hdengine-v2",
+
+"base\_url": "[https://glow-hdengine-v2-production.up.railway.app](https://glow-hdengine-v2-production.up.railway.app)",
+
+"db\_instance": "ample-illumination/production/postgres",
+
+"db\_schema": "hde"
+
+},
+
+"backend": {
+
+"provider": "Railway",
+
+"project": "ample-illumination",
+
+"service": "glow-backend-v4",
+
+"repo": "amthorn78/glow-backend-v4",
+
+"base\_url": "TBD",
+
+"db\_instance": "ample-illumination/production/postgres",
+
+"db\_schema": "TBD"
+
+},
+
+"pg\_bridge": {
+
+"provider": "Railway",
+
+"project": "ample-illumination",
+
+"service": "pg-bridge",
+
+"repo": "TBD",
+
+"base\_url": "[https://illustrious-freedom-production.up.railway.app](https://illustrious-freedom-production.up.railway.app)",
+
+"db\_instance": null,
+
+"db\_schema": null
+
+},
+
+"frontend": {
+
+"provider": "Vercel",
+
+"project": "TBD",
+
+"service": "TBD",
+
+"repo": "amthorn78/glow-frontend-v2",
+
+"base\_url": "glowme.io",
+
+"db\_instance": null,
+
+"db\_schema": null
+
+}
+
+},
+
+"staging": {
+
+"hd\_engine": {
+
+"provider": "GitHub Codespaces",
+
+"project": "TBD",
+
+"service": "TBD",
+
+"repo": "amthorn78/glow-hdengine-v2",
+
+"base\_url": "TBD",
+
+"db\_instance": "ample-illumination/production/postgres",
+
+"db\_schema": "hde"
+
+},
+
+"backend": {
+
+"provider": "GitHub Codespaces",
+
+"project": "TBD",
+
+"service": "TBD",
+
+"repo": "amthorn78/glow-backend-v4",
+
+"base\_url": "TBD",
+
+"db\_instance": "ample-illumination/production/postgres",
+
+"db\_schema": "TBD"
+
+},
+
+"frontend": {
+
+"provider": "GitHub Codespaces",
+
+"project": "TBD",
+
+"service": "TBD",
+
+"repo": "amthorn78/glow-frontend-v2",
+
+"base\_url": "TBD",
+
+"db\_instance": null,
+
+"db\_schema": null
+
+}
+
+},
+
+"development": {
+
+"hd\_engine": {
+
+"provider": "OpenAI Codex",
+
+"project": "TBD",
+
+"service": "TBD",
+
+"repo": "amthorn78/glow-hdengine-v2",
+
+"base\_url": "TBD",
+
+"db\_instance": "ample-illumination/production/postgres",
+
+"db\_schema": "hde"
+
+},
+
+"backend": {
+
+"provider": "OpenAI Codex",
+
+"project": "TBD",
+
+"service": "TBD",
+
+"repo": "amthorn78/glow-backend-v4",
+
+"base\_url": "TBD",
+
+"db\_instance": "ample-illumination/production/postgres",
+
+"db\_schema": "TBD"
+
+},
+
+"frontend": {
+
+"provider": "OpenAI Codex",
+
+"project": "TBD",
+
+"service": "TBD",
+
+"repo": "amthorn78/glow-frontend-v2",
+
+"base\_url": "TBD",
+
+"db\_instance": null,
+
+"db\_schema": null
+
+}
+
+}
+
+}
 

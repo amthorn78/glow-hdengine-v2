@@ -4,13 +4,13 @@
 
 **Title:** PF09-Canon-HDE-Build Checklist
 
-**Version:** v2.7.7
+**Version:** v2.8.2
 
 **Status:** Canon
 
-**Effective date:** 2025-12-17
+**Effective date:** 2025-12-23
 
-**Last Update Gate:** HDE-EPIC021 Close
+**Last Update Gate:** BN Drain 8.5.3 A26-29
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -94,9 +94,19 @@ Checklist rows in PF09 refer to tokens by name (for example `JSON_CANONICAL_CHEC
 
 **Human Index hash sentinel.** `docs/evidence/INDEX.sha256` — sha256 over the exact bytes of `INDEX.json`. Update in the same PR as the Human Index. **Gate:** `EVIDENCE_INDEX_HASH_OK`.
 
+**Human Index path-proofs (governed; merge-blocking).**
+
+`docs/evidence/INDEX.json.path_proof.txt` — path-proof transcript for the Human Index. MUST be refreshed whenever `docs/evidence/INDEX.json` bytes change (same PR). A stale proof is a merge-blocking evidence integrity failure.
+
+`docs/evidence/INDEX.sha256.path_proof.txt` — path-proof transcript for the hash sentinel. MUST be refreshed whenever `docs/evidence/INDEX.sha256` bytes change (same PR). A stale proof is a merge-blocking evidence integrity failure.
+
+The canonical updater (`tools/evidence/update_evidence_index.py`) is responsible for refreshing these path-proofs during normal write runs, and `tools/evidence/update_evidence_index.py --check` MUST fail if either proof is stale.
+
 ### **0.3.2 Machine Mirror (records-only)**
 
 **Machine mirror.** `artifacts/evidence_index.jsonl` — one JSON object per line; canonical JSON (UTF-8, no BOM; ASCII-sorted keys; compact; exactly one trailing `\n`). Unknown keys are rejected. Keep **1:1 parity** with the Human Index; provide path-proofs.
+
+**Non-canonical mirror paths are invalid.** Any path like `docs/evidence/INDEX.machine_mirror.jsonl` is not a canonical mirror artifact. There MUST be exactly one machine mirror file at `artifacts/evidence_index.jsonl`. If any tool, test, or CI output references an alternate mirror path, treat it as a tooling/config bug and fix it before merge.
 
 ### **0.3.3 Mirror discipline (normative)**
 
@@ -118,7 +128,7 @@ Unknown keys **rejected**.
 
 **Exact field order** (per PF12/PF10):
 
- `artifact_key, discovered_physical_path, produced_at_utc, proof_anchor, role, sha256, size_bytes`.
+`artifact_key, discovered_physical_path, produced_at_utc, proof_anchor, role, sha256, size_bytes`.
 
 ### **0.3.4 Minimum mirror record fields (reject unknown keys)**
 
@@ -413,6 +423,34 @@ Locale pins apply to all byte checks and evidence tools that read or write these
 * `LANG=C`
 
 * `TZ=UTC`
+
+**Pre-approval evidence binding checks (pass/fail, checklist-level)**
+
+These checks are required whenever an epic plan and/or token matrix claims acceptance tokens that bind to governed evidence.
+
+**Filesystem naming (directories).**  
+ All directories in the repository and application codebase MUST use lowercase ASCII names. Under governed roots (at minimum `audit/**`, `docs/**`, `artifacts/**`, and `schemas/**`), introducing any mixed-case or upper-case directory name is a QA failure. Any remaining mixed-case directories are treated as legacy drift and MUST be normalized to lowercase, not copied forward. If a rename affects governed evidence paths, update the Human Evidence Index, Machine Mirror, and path-proofs in the same PR.
+
+**Canonical evidence path binding validation (acceptance integrity).**  
+ Every acceptance token to evidence-path binding that appears in an Epic Plan and in `token_evidence_matrix` MUST be validated against the canonical evidence catalog before approval or merge.
+
+* If the evidence catalog defines a fixed canonical path for a token’s evidence surface, the Epic Plan required-evidence list and the token matrix MUST bind to that exact path.
+
+* For deliverables that claim a local bundle directory of governed artifacts, the required-evidence list MUST still explicitly name any shared or global governed artifacts required for acceptance that live outside the local bundle root (with canonical paths).
+
+* When a token is claimed, the following MUST agree on the canonical path and identity of the bound artifact:
+
+  * Epic Plan required-evidence list (per deliverable)
+
+  * `token_evidence_matrix` row for the token
+
+  * `docs/evidence/INDEX.json` entry for the bound artifact
+
+  * `artifacts/evidence_index.jsonl` mirror record (`artifact_key` and `discovered_physical_path`)
+
+  * the referenced path-proof file (`proof_anchor` and the corresponding `*.path_proof.txt`)
+
+* Any binding to a non-canonical path is a mechanical blocker and MUST be corrected before approval. If a non-canonical path is truly required, it MUST be routed as an explicit ADR and drained into the governing canon before approval.
 
 **Index/mirror acceptance (titles-only; tokens live in HDE-Governance / HDE-Schemas & Artifacts):**
 
@@ -1296,6 +1334,20 @@ Canonical implementation (titles-only):
 
 `ci/checks/check_env_pins.sh` — asserts the determinism env pins and fails if they deviate.
 
+**Canonical governed evidence surface for `DETERMINISM_ENV_PINS_OK` (single valid binding):**
+
+`audit/gates/determinism/env_pins.log`
+
+`audit/gates/determinism/env_pins.log.path_proof.txt`
+
+Ledger/index/mirror parity (titles-only; required when the token is claimed):
+
+`token_evidence_matrix` binds `DETERMINISM_ENV_PINS_OK` to `audit/gates/determinism/env_pins.log`.
+
+`docs/evidence/INDEX.json` points the determinism env pins artifact key to `audit/gates/determinism/env_pins.log`.
+
+`artifacts/evidence_index.jsonl` mirrors the exact `discovered_physical_path` and uses `audit/gates/determinism/env_pins.log.path_proof.txt` as `proof_anchor`.
+
 Evidence that determinism pins are enforced for evidence jobs:
 
 `tools/evidence/update_evidence_index.py` validates closed-rails env pins at startup via `ensure_determinism_env` (SAFE\_MODE, ALLOW\_NETWORK, and locale pins), preventing evidence jobs from running under unpinned envs.
@@ -1303,7 +1355,8 @@ Evidence that determinism pins are enforced for evidence jobs:
 `tests/evidence/test_evidence_index_env.py` — enforces env-pin posture for evidence-index jobs under closed rails (green in EPIC021 PR5 runs).
 
 **Notes:**  
- EPIC021 D2 closes env-pin enforcement for evidence jobs by making the evidence-index updater fail closed unless the determinism env pins are satisfied. This provides a repo-level “pins are real” guarantee for governed evidence operations without relying solely on operator discipline.
+ SoT: canon — `DETERMINISM_ENV_PINS_OK` MUST be satisfied only by `audit/gates/determinism/env_pins.log` (with its `.path_proof.txt`) and MUST NOT be bound to `artifacts/proofs/env_pins.txt` (or any similarly named file). Any deviation is a mechanical blocker; correct the binding, do not interpret it.  
+ EPIC021 D2 closes env-pin enforcement for evidence jobs by making the evidence-index updater fail closed unless the determinism env pins are satisfied.
 
 ### Subtask HDE-CALC003.8 — Topology orientation demo
 
@@ -1350,7 +1403,7 @@ Evidence that determinism pins are enforced for evidence jobs:
 
 **Epic or card:** **Unknown**
 
-**Tokens:** **Unknown**
+**Tokens:** **Not done**
 
 **Evidence / artifacts:**
 
@@ -1394,7 +1447,9 @@ CI evidence skeleton jobs and checks (titles-only):
 
 `python tools/evidence/orientation_demo.py --check`
 
-`ci/checks/check_mirror_schema.sh`
+`python ci/checks/check_mirror_schema.sh`
+
+NOTE: ci/checks/check\_mirror\_schema.sh is a Python entrypoint. **Never** invoke it via bash …. Direct exec is allowed only if the executable bit is guaranteed by the environment; otherwise use the canonical python … invocation.
 
 `python -m pytest tests/evidence tests/ops/test_evidence_index.py`
 
@@ -1412,7 +1467,7 @@ EPIC020 bundle generator invariants and tests (titles-only):
 
 `tools/evidence/epic020_bundle.py` — EPIC020 Candidate 1 bundle/manifest generator used by the `epic020-evidence-bundles` job; must support both mapping and string artifact entries from `docs/acceptance_map_epic020.json`, honor `discovered_physical_path` for member discovery, and skip any acceptance-map entry whose `discovered_physical_path` points under `artifacts/epic020/bundles/**` with `.bundle.json` or `.manifest.json` suffixes.
 
-`tests/tools/test_epic020_bundle_tool.py::test_epic020_bundle_handles_string_artifact_entries` — regression test that runs the bundle tool against the real `docs/acceptance_map_epic020.json` / `audit/EPIC020_MANIFEST.json` pairing and asserts that string-valued `artifacts` entries are handled correctly and produce deterministic bundles without failures.
+`tests/tools/test_epic020_bundle_tool.py::test_epic020_bundle_handles_string_artifact_entries` — regression test that runs the bundle tool against the real `docs/acceptance_map_epic020.json` / `audit/EPIC-020_MANIFEST.json` pairing and asserts that string-valued `artifacts` entries are handled correctly and produce deterministic bundles without failures.
 
 `tests/tools/test_epic020_bundle_tool.py::test_epic020_bundle_ignores_outputs_listed_as_artifacts` — regression test that writes a synthetic acceptance map where EPIC020 token `EPIC020.D1.HTTP_COMPAT_HTTP_BUNDLE` has both a real member and entries pointing at `artifacts/epic020/bundles/EPIC020.D1.HTTP_COMPAT_HTTP_BUNDLE.bundle.json` and `.manifest.json`, then asserts successful bundle build with exactly one member and no `discovered_physical_path` under `/epic020/bundles/`, codifying that bundle/manifest outputs are never re-ingested as members even when listed as governed artifacts.
 
@@ -1453,6 +1508,8 @@ This subtask remains **Partial**: the EPIC020-specific bundles and CI job are no
 
 4. Then run `python tools/evidence/orientation_demo.py --check` to verify that Index entries, Mirror records, and path-proofs are coherent (including the `index.machine_mirror` self-record) under the same closed-rails env.
 
+5. Run the machine-mirror self-record regression test(s) under the same closed-rails env (for example `python -m pytest -q tests/evidence/test_machine_mirror_self_proof.py`) to ensure self-proof hashing/proof semantics are still valid after any evidence-tooling change.
+
 **Same-PR rule.**  
  All of the above commands MUST be run, and their outputs committed, in the **same PR** that changes the Human Index, sentinel, Machine Mirror, or governed artifacts referenced by the Index so that:
 
@@ -1481,6 +1538,8 @@ CI and local run logs for:
 * `python tools/evidence/orientation_demo.py` (write mode)
 
 * `python tools/evidence/orientation_demo.py --check`
+
+* `python -m pytest -q tests/evidence/test_machine_mirror_self_proof.py`
 
 plus Index, sentinel, Mirror, and topology orientation artifacts:
 
@@ -1610,7 +1669,16 @@ Tests (titles-only; closed rails):
     * appends the full output of the tests and evidence checks for that step (for example pytest output, greps over INDEX/mirror/manifest) to the **same file**, not split across multiple primary logs.  
     * The `rails` header MUST record, at minimum: `SAFE_MODE`, `ALLOW_NETWORK`, `LC_ALL`, `LANG`, `TZ`, and `APP_ENV` (keys-only; values as seen for that step).
 
-  * Temporary/helper files for a step (for example request bodies or sorted candidate lists) MAY exist, but the per-step log at QA\_ROOT is the canonical evidence entry point; QA harnesses MUST NOT scatter primary step logs across ad-hoc subdirectories without a clear pointer from QA\_ROOT.
+  * Temporary/helper files for a step (for example request bodies or sorted candidate lists) MAY exist, but the per-step log at QA\_ROOT is the canonical evidence entry point; QA harnesses MUST NOT scatter primary step logs across ad-hoc subdirectories without a clear pointer from QA\_ROOT.  
+* **Codespaces snapshot (Step 0, mechanical; Codespaces runs).**  
+  * Every Live QA plan executed in Codespaces MUST begin with a mechanical “Codespaces snapshot” step that captures the full, run-relevant environment context into the QA root under `audit/qa/<epic-id>/<run-id>/...` (including tool versions, rails variables, and presence/absence of required secrets, but never secret values). This is evidence, not prose, and is generated by commands.  
+  * Live QA runs in Codespaces are non-conforming for approval if they do not have both: (a) an authoritative Glow QA Guide Codespaces configuration reference, and (b) the mechanical Codespaces snapshot artifact captured at the start of the run.  
+  * If the Codespaces snapshot is governed/indexed as a formal evidence family, use the canonical `codespaces_snapshot.json` artifact family naming and indexing expectations owned by HDE Schemas & Artifacts (titles-only).  
+* **Live QA is gitless (no working-tree gates).**  
+  * Live QA runbooks MUST NOT include git operations (including but not limited to: `git checkout -b`, git-status gating, `git add`, `git commit`, `git push`, PR creation). Live QA PASS/FAIL MUST NOT be determined by working-tree cleanliness.  
+  * If git information is captured at all, it is traceability-only and cannot block execution.  
+  * Known Codespaces packaging artifacts MUST be explicitly non-blocking and left untouched. Specifically: `glow_hdengine.egg-info/PKG-INFO` (and the containing `glow_hdengine.egg-info/` directory) MUST NOT be deleted, restored, or used as a QA gating signal.  
+  * The only write-scope rail for Live QA evidence remains: `audit/qa/...`. Required deliverables and step PASS/FAIL must be validated by presence/contents of the mechanically generated artifacts under `audit/qa/...` (and, where used, step event logs / exit code files), without inspecting or gating on git status.
 
 * **Deliverables list per QA step (no screen-only acceptance).**  
   * Every QA step described in a QA Implementation Plan, Live QA Guide, or QA addendum MUST include a **Deliverables** subsection that names the minimal evidence set required to judge PASS/FAIL for that step.  
@@ -1653,6 +1721,16 @@ Tests (titles-only; closed rails):
 
   * A zero-byte file where JSON or test output is expected MUST be surfaced explicitly as a tooling or behavior failure (using the classification field above), not left ambiguous.
 
+**Generated QA notes and summaries (mechanical; no manual fill).**
+
+* Live QA evidence artifacts under `audit/qa/<epic-id>/...` MUST be produced by commands (shell/scripts/tools). Manual editing in an editor is prohibited for any artifact treated as QA evidence.
+
+* Any required “notes” artifacts (for example `d0_discovery.md` and `qa_rca_and_doc_delta.md`) MUST be generated from command outputs (baseline snapshots, file listings, exit codes, step logs). These files SHOULD include a header such as: `AUTO-GENERATED. DO NOT EDIT. Re-run the generator commands to update.`
+
+* Any required Live QA summary document (for example `QA_SUMMARY.md`) MUST be generated mechanically from machine-readable inputs (exit codes, step logs, existence checks), not filled by humans. Placeholder fields like “(fill PASS/FAIL)” are forbidden in approved QA plan templates.
+
+* Recommended mechanical pattern (example): store a run event log at `audit/qa/<epic-id>/<run-id>/00_meta/run_events.tsv` (or JSONL). Each step appends one line per check: UTC timestamp, check id (D0/D1/etc), command label, PASS/FAIL, primary evidence file path, exit code. A generator command then reads `run_events.tsv`, verifies referenced evidence files exist, and writes `QA_SUMMARY.md` with PASS/FAIL filled mechanically.
+
 **Subtask status:** **Not done**
 
 **Epic or card:** **Unknown**
@@ -1681,6 +1759,70 @@ Tests (titles-only; closed rails):
 
 **Notes:**  
  Added from EPIC019 Live QA Addendum 11 and Addendum 14 and the HDE-Mechanics Guide “Live QA harness” section. This subtask generalizes sampler-specific lessons (bootstrap tooling, CANDIDATES\_FILE derivation, viewer-001, seeds 111/222, empty JSON outputs) into global QA harness requirements and now also requires that **each QA Plan step** have a single, consolidated step log under QA\_ROOT that carries the step header and all evidence for that step. The D4 sampler Step 5 run is a compliant example; the subtask remains **Not done** until this pattern is applied consistently across all epics and QA steps.
+
+### **Subtask HDE-CALC003.15 — Acceptance map & QA harness viability check**
+
+**Subtask name/label:** Acceptance map & QA harness viability check
+
+**Subtask description:**  
+Add a **cross-epic viability gate** so “acceptance maps and QA harnesses” cannot be treated as complete unless the epic’s acceptance scaffolding is proven to reference only **real** assets (tests, scripts, QA\_ROOT logs) and the acceptance artifacts are internally consistent.
+
+*Scope — which rows this gates.*
+
+This subtask applies to any checklist row that relies on an epic acceptance map and epic QA harness artifacts (for example `docs/acceptance_map_<epic>.json` and `audit/qa/<epic>/...`).
+
+*Viability check — acceptance artifacts are aligned and exercised.*
+
+For an epic to treat its acceptance scaffolding as viable:
+
+* The epic’s acceptance map and token↔evidence matrix must be in set and status alignment (no missing tokens, no mismatched statuses).  
+* **Uniqueness (no duplicate token rows).** Each token appears **exactly once** in the token↔evidence matrix and **exactly once** in the acceptance map. Duplicate rows are treated as drift and fail the viability gate.  
+* **No placeholders once evidence exists.** Placeholders are allowed only in **D0 scaffolding** (for example `{scenario}` patterns or `TBD` evidence markers). Once a token’s status is implemented/COVERED and evidence exists, the acceptance map and token↔evidence matrix MUST bind to **concrete, canonical artifact paths and test node ids** (no placeholders).  
+* Implemented tokens must have non-empty evidence references (evidence titles in the acceptance map and concrete evidence columns in the matrix).  
+* A deterministic viability report must classify each token as COVERED / PLANNED / MISSING and end with a summary line.  
+* QA harness logs must demonstrate that the viability check ran under closed rails (env pins present and recorded).
+
+*CI-safe scaffold/guard test (allowed and recommended).*
+
+A CI-safe acceptance scaffold test MAY enforce this gate mechanically (file existence \+ JSON parse \+ minimal key checks), including: required D0 scaffold files exist at canonical paths, token uniqueness holds, and placeholder evidence is not present for implemented tokens. EPIC022 provides a concrete example of this pattern via a dedicated `tests/qa/` scaffold test.
+
+**Subtask status:** **Done**
+
+**Epic or card:** **HDE-EPIC021 (D3 — QA bootstrap and viability logging)**
+
+**Tokens:**
+
+`QA_ACCEPTANCE_MAP_VIABILITY_OK`
+
+**Evidence / artifacts:**
+
+EPIC021 acceptance artifacts:
+
+`docs/acceptance_map_epic021.json` — EPIC021 acceptance map.  
+`audit/qa/hde-epic021/token_evidence_matrix.md` — EPIC021 token↔evidence matrix.  
+`tests/qa/test_epic021_acceptance_alignment.py` — meta-test enforcing that the EPIC021 matrix and acceptance map remain in lockstep for token set, status normalization, and evidence presence on implemented tokens.
+
+Cross-epic precedent (example; titles/paths only):
+
+EPIC022 D0 scaffold demonstrates canonical close-pack/acceptance stub artifacts at the canonical paths and a CI-safe scaffold test; placeholders are allowed in D0 but must be replaced in PR2+ once evidence exists.
+
+EPIC021 QA harness and viability evidence (implemented and CI-enforced for EPIC021):
+
+`tools/qa/epic021_qa.py` — EPIC021 QA harness entrypoint.
+
+`tools/qa/qa_harness.py` — shared generic harness module used by EPIC021 (HarnessConfig \+ helpers).
+
+`audit/qa/hde-epic021/qa_step_logs_manifest.json` — per-epic manifest listing runs and step logs.  
+`audit/qa/hde-epic021/acceptance_map_viability.log` — acceptance-map viability report.  
+`audit/qa/hde-epic021/<run-id>/step_acceptance_map_d3.log` — per-run step log for the viability run (env pins \+ summary line).
+
+`tests/qa/test_epic021_harness_entrypoint.py` — subprocess entrypoint test proving a synthetic run creates QA\_ROOT artifacts and that missing pins fails closed with no artifacts.
+
+`tests/qa/test_generic_qa_harness.py` — generic harness unit tests (env-pin failure, manifest de-dupe, viability formatting).
+
+CI gate (titles-only):
+
+`.github/workflows/ci.yml` runs the entrypoint self-test under closed rails with a deterministic CI run id, so the harness cannot regress silently.
 
 ### **Subtask HDE-CALC003.16 — QA harness entrypoint repair & CI self-test (EPIC021 baseline)**
 
@@ -1784,66 +1926,6 @@ Tests (titles-only; closed rails):
  The generic harness exists and EPIC021 is the first client. No other epics are wired into the generic harness ye
 
 ---
-
-### **Subtask HDE-CALC003.15 — Acceptance map & QA harness viability check**
-
-**Subtask name/label:** Acceptance map & QA harness viability check
-
-**Subtask description:**  
- Add a **cross-epic viability gate** so “acceptance maps and QA harnesses” cannot be treated as complete unless the epic’s acceptance scaffolding is proven to reference only **real** assets (tests, scripts, QA\_ROOT logs) and the acceptance artifacts are internally consistent.
-
-*Scope — which rows this gates.*
-
-This subtask applies to any checklist row that relies on an epic acceptance map and epic QA harness artifacts (for example `docs/acceptance_map_<epic>.json` and `audit/qa/<epic>/...`).
-
-*Viability check — acceptance artifacts are aligned and exercised.*
-
-For an epic to treat its acceptance scaffolding as viable:
-
-* The epic’s acceptance map and token↔evidence matrix must be in set and status alignment (no missing tokens, no mismatched statuses).
-
-* Implemented tokens must have non-empty evidence references (evidence titles in the acceptance map and concrete evidence columns in the matrix).
-
-* A deterministic viability report must classify each token as COVERED / PLANNED / MISSING and end with a summary line.
-
-* QA harness logs must demonstrate that the viability check ran under closed rails (env pins present and recorded).
-
-**Subtask status:** **Done**
-
-**Epic or card:** **HDE-EPIC021 (D3 — QA bootstrap and viability logging)**
-
-**Tokens:**
-
-`QA_ACCEPTANCE_MAP_VIABILITY_OK`
-
-**Evidence / artifacts:**
-
-EPIC021 acceptance artifacts:
-
-`docs/acceptance_map_epic021.json` — EPIC021 acceptance map.  
- `audit/qa/hde-epic021/token_evidence_matrix.md` — EPIC021 token↔evidence matrix.  
- `tests/qa/test_epic021_acceptance_alignment.py` — meta-test enforcing that the EPIC021 matrix and acceptance map remain in lockstep for token set, status normalization, and evidence presence on implemented tokens.
-
-EPIC021 QA harness and viability evidence (implemented and CI-enforced for EPIC021):
-
-`tools/qa/epic021_qa.py` — EPIC021 QA harness entrypoint.
-
-`tools/qa/qa_harness.py` — shared generic harness module used by EPIC021 (HarnessConfig \+ helpers).
-
-`audit/qa/hde-epic021/qa_step_logs_manifest.json` — per-epic manifest listing runs and step logs.  
- `audit/qa/hde-epic021/acceptance_map_viability.log` — acceptance-map viability report.  
- `audit/qa/hde-epic021/<run-id>/step_acceptance_map_d3.log` — per-run step log for the viability run (env pins \+ summary line).
-
-`tests/qa/test_epic021_harness_entrypoint.py` — subprocess entrypoint test proving a synthetic run creates QA\_ROOT artifacts and that missing pins fails closed with no artifacts.
-
-`tests/qa/test_generic_qa_harness.py` — generic harness unit tests (env-pin failure, manifest de-dupe, viability formatting).
-
-CI gate (titles-only):
-
-`.github/workflows/ci.yml` runs the entrypoint self-test under closed rails with a deterministic CI run id, so the harness cannot regress silently.
-
-**Notes:**  
- SoT: canon — acceptance-map viability and QA harness viability are required gates. EPIC021 provides the first working implementation and CI enforcement of the viability check and its governed logs. Future epics must execute the same viability step as part of Live QA closeout.
 
 ## **Task HDE-CALC004 — Programmatic Configuration System**
 
@@ -2513,6 +2595,8 @@ PF09 does not define ordering schemas or comparator math; those remain single-ho
 `tests/ops/test_evidence_index.py` — Index/mirror consistency tests (now green for `mtime_utc` semantics).
 
 **Notes:**
+
+Common failure mode (merge-blocking): governed artifact drift. Never assume artifact sizes or hashes; do not hand-edit `*.path_proof.txt`. If a governed artifact’s on-disk bytes disagree with its path-proof and/or Machine Mirror record (`sha256` / `size_bytes`), treat it as a hard stop and regenerate proofs/records via `tools/evidence/update_evidence_index.py` (then rerun `tools/evidence/update_evidence_index.py --check`).
 
 WS-D4 established the ordering layer, generator, and initial evidence plumbing. WS-D4b finalized the `mtime_utc` semantics for governed path-proofs (refresh-time, monotone, UTC ISO) and regenerated ABBA and path-proof artifacts so that artifact bytes, Mirror records, and `*.path_proof.txt` contents all agree.
 
@@ -3897,14 +3981,20 @@ Canonical-compare logs (paths owned by Evidence Index)
 
 ---
 
-# Phase III — Separation (Public shape, identity, guardrails)
+# **Phase III — Separation (Public shape, identity, guardrails)**
 
 **Phase description:**  
- Wire persistence, public presenter/emitter, error envelope, and internal ops identity surfaces so that public and operator-visible bytes are canonical, deterministic, and backed by indexed evidence.
+Wire persistence, public presenter/emitter, error envelope, and internal ops identity surfaces so that public and operator-visible bytes are canonical, deterministic, and backed by indexed evidence.
 
 **Phase master status:** **Partial**
 
 **Notes:**
+
+* This phase remains Partial primarily due to remaining closure work for `/internal/version` identity coupling and evidence-indexing (see HDE-SEPA004.4 and HDE-SEPA004.5).  
+* EPIC022 PR4 (D3) introduced a governed `/internal/version` evidence bundle under `artifacts/ops/internal_version/` and updated acceptance bindings (token matrix \+ acceptance map) and Index/Mirror entries. Verify final CI results and confirm `two_run_identity.log` content meets the required coupling checks before treating the D3 slice as Done.  
+  Addendum 16-18 BN Drain 8.5.3  
+  Addendum 16-18 BN Drain 8.5.3  
+* Evidence/index parity must use the canonical Machine Mirror path `artifacts/evidence_index.jsonl` only; any alternate mirror path in tooling output is a blocker and must be corrected before merge.
 
 ---
 
@@ -4077,7 +4167,7 @@ Update `artifacts/evidence_index.jsonl` (records-only canonical JSONL; UTF‑8, 
 
 **Task notes:**
 
-Audit v1 (2025-11-17) originally called out missing `CLI_STDERR_ONLY_ON_ERROR_OK`, `CLI_STDOUT_LF_OK`, and `JSON_CANONICAL_CHECK_OK`, plus the lack of hardened writers/errors header posture and error-envelope evidence families.
+Audit v1 (2025-11-17) originally called out missing CLI stream discipline and canonical JSON proof for the governed error/CLI surfaces (success stdout-only with one LF; errors stderr-only; usage exit 64; numeric-free, canonical JSON envelopes), plus the lack of hardened writers/errors header posture and error-envelope evidence families.
 
 EPIC020 PR 1 and PR 2a introduced the governed error token map and `error_v1` envelope, routed writer and reader error surfaces (including 404/405) through a shared `error_envelope` helper and the canonical serializer, and normalized CLI error handling so that usage errors exit 64, success writes only to stdout, and errors write only to stderr, with EPIC020 D1 tokens initially marked **PARTIAL**.
 
@@ -4089,13 +4179,7 @@ EPIC020 PR 2b completes the D1 slice by:
 
 * wiring these artifacts into the Human Evidence Index and Machine Mirror with EPIC020 metadata and determinism pins.
 
-The EPIC020 D1 tokens `ERROR_JSON_CANON_OK`, `JSON_CANONICAL_CHECK_OK`, `ERROR_TOKEN_MAP_OK`, `CLI_READER_EMITTER_PARITY_OK`, `CLI_STDOUT_LF_OK`, `CLI_STDERR_ONLY_ON_ERROR_OK`, `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`, and `EVIDENCE_PATHS_VALIDATED_OK` are now recorded as **DONE** in `docs/acceptance_map_epic020.json` and `audit/EPIC020_MANIFEST.json`, each bound to specific tests and error evidence artifacts.
-
-From PF09’s perspective, HDE-SEPA002 is **complete for the EPIC020 D1 error envelope & token set slice** (envelope shape, token map, CLI error discipline, header posture for the governed writer route, and error evidence families and Index/Mirror entries). The task remains **Partial** at the phase level because:
-
-* Reader↔CLI error parity and two-run identity for a broader set of error scenarios (for example DB-unavailable and vendor errors mentioned in PF19) are tracked under HDE-SEPA002.5 and future epics.
-
-* Distillation and Coagulation tasks still own broader A7 behavior, rails posture, and future error scenarios; those will consume the error evidence families defined here.
+The EPIC020 D1 tokens `ERROR_JSON_CANON_OK`, `JSON_CANONICAL_CHECK_OK`, `ERROR_TOKEN_MAP_OK`, `CLI_READER_EMITTER_PARITY_OK`, , `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`, and `EVIDENCE_PATHS_VALIDATED_OK` are recorded as **DONE** in `docs/acceptance_map_epic020.json` and `audit/EPIC-020_MANIFEST.json`, each bound to specific tests and error evidence artifacts. PF09 does not mint or list unrostered tokens; stderr-only stream discipline is tracked as a behavioral requirement (tested and evidenced) and must not be represented by a non-roster token in PF09.
 
 ### **Subtask HDE-SEPA002.1 — Error envelope shape & numeric-free body**
 
@@ -4134,7 +4218,7 @@ From PF09’s perspective, HDE-SEPA002 is **complete for the EPIC020 D1 error en
 
 `errors/schema_check/error_envelope_invalid_json.log` and `errors/schema_check/error_envelope_invalid_viewer_prefs.log` — schema-check logs for representative error scenarios, with governed path-proofs and artifact keys (for example `ERROR_SCHEMA_CHECK_V1`) single-homed in PF12.
 
-`docs/acceptance_map_epic020.json` / `audit/EPIC020_MANIFEST.json` — EPIC020 D1 entries marking `ERROR_JSON_CANON_OK` as **DONE** and binding it to the schema tests and error schema logs above.
+`docs/acceptance_map_epic020.json` / `audit/EPIC-020_MANIFEST.json` — EPIC020 D1 entries marking `ERROR_JSON_CANON_OK` as **DONE** and binding it to the schema tests and error schema logs above.
 
 **Notes:**  
  This row is treated as Done for the EPIC020 D1 slice: all governed D1 error surfaces (writer diagnostic route, reader error cases in scope, and 404\) now emit `error_v1` envelopes via the shared helper, are schema-checked, and satisfy `ERROR_JSON_CANON_OK` in the EPIC020 acceptance map and manifest. Future error scenarios and surfaces use the same envelope but are owned by later epics and Distillation tasks.
@@ -4168,7 +4252,7 @@ Header posture tokens (names live in Governance; not restated here).
 
 `tests/transport/test_writers_errors_headers.py` — closed-rails header test that loads the snapshot, calls `/ops/writer/diagnostic` with correct vs wrong admin tokens, and asserts that actual headers match the snapshot sections and that `etag` is absent.
 
-`docs/acceptance_map_epic020.json` / `audit/EPIC020_MANIFEST.json` — EPIC020 D1 entries that bind the writer/error header tokens to these snapshot tests.
+`docs/acceptance_map_epic020.json` / `audit/EPIC-020_MANIFEST.json` — EPIC020 D1 entries that bind the writer/error header tokens to these snapshot tests.
 
 ### **Subtask HDE-SEPA002.3 — Error token map & casing**
 
@@ -4209,7 +4293,7 @@ Header posture tokens (names live in Governance; not restated here).
 
 `docs/acceptance_map_epic020.json` — EPIC020 D1 acceptance map listing `ERROR_TOKEN_MAP_OK` as **DONE** and binding it to the token map snapshot and diagnostic writer/parity tests.
 
-`audit/EPIC020_MANIFEST.json` — EPIC020 manifest entries mapping `ERROR_TOKEN_MAP_OK` to the same tests and artifacts.
+`audit/EPIC-020_MANIFEST.json` — EPIC020 manifest entries mapping `ERROR_TOKEN_MAP_OK` to the same tests and artifacts.
 
 **Notes:**  
  For the D1 slice, the governed error token map is now fully implemented, snapshotted, and indexed: `ERROR_TOKEN_MAP_OK` is satisfied by the combination of `ERROR_TOKEN_MAP`, the on-disk snapshot, and tests that prove equality and coverage. Reader/CLI parity for specific error scenarios is exercised via the parity harness (HDE-SEPA002.5); the semantics of individual `ERR_*` codes remain single-homed in Governance and Mechanics.
@@ -4256,7 +4340,7 @@ Header posture tokens (names live in Governance; not restated here).
 
 `errors/canonical_check/error_envelope_invalid_*.log` — canonicalization check artifacts for representative error scenarios (invalid JSON, invalid viewer prefs), each with governed path-proofs and artifact key `ERROR_SCHEMA_CHECK_V1` or equivalent (record-type semantics single-homed in PF12).
 
-`docs/acceptance_map_epic020.json` / `audit/EPIC020_MANIFEST.json` — EPIC020 D1 entries marking `ERROR_JSON_CANON_OK` and `JSON_CANONICAL_CHECK_OK` as **DONE** and binding them to the schema, parity, and canonicalization artifacts above.
+`docs/acceptance_map_epic020.json` / `audit/EPIC-020_MANIFEST.json` — EPIC020 D1 entries marking `ERROR_JSON_CANON_OK` and `JSON_CANONICAL_CHECK_OK` as **DONE** and binding them to the schema, parity, and canonicalization artifacts above.
 
 **Notes:**  
  For EPIC020 D1, canonical JSON behavior is now implemented and evidenced for the writer, reader, health/not-found, and CLI error surfaces in scope, and the error canonicalization tokens are green in the acceptance map. Future epics may add additional error scenarios and flows (for example DB/vendor errors), but those will build on the same canonicalization infrastructure and are not required for this subtask’s D1 acceptance.
@@ -4268,39 +4352,52 @@ Header posture tokens (names live in Governance; not restated here).
 **Subtask name/label:** Error parity & determinism
 
 **Subtask description:**  
- Ensure that for the same error condition:
+Ensure that for the same error condition:
 
-* Reader and CLI emit **byte-identical** error envelopes.
-
+* Reader and CLI emit **byte-identical** error envelopes.  
 * Re-emitting the same error twice produces bitwise-identical bytes.
 
-**Subtask status:** **Partial**
+**Subtask status:** **Done**
 
-**Epic or card:** **HDE-EPIC020 (D1 — error parity harness, PR 2b)**
+**Epic or card:**  
+**HDE-EPIC020 (D1 — baseline error parity harness, PR 2b)**  
+**HDE-EPIC022 (D1 — required scenario expansion and concrete acceptance bindings)**
 
 **Tokens:**
 
 `CLI_READER_EMITTER_PARITY_OK`  
- `TWO_RUN_IDENTITY_OK`
+`TWO_RUN_IDENTITY_OK`
 
 **Evidence / artifacts:**
 
-`parity/errors_reader_cli.{scenario}.http.json` — stored HTTP error envelopes for D1 scenarios, produced under closed rails by the error parity harness.
+Parity artifacts (stored under closed rails by the parity generator; concrete files must exist once evidence is present):
 
-`parity/errors_reader_cli.{scenario}.cli.txt` — stored CLI error outputs for the same scenarios.
+`parity/errors_reader_cli.invalid_json.http.json` / `.cli.txt`  
+`parity/errors_reader_cli.invalid_viewer_prefs.http.json` / `.cli.txt`
 
-`errors/schema_check/error_envelope_invalid_*.log` — schema logs confirming that parity scenarios use valid `error_v1` envelopes.
+EPIC022 D1 adds the two missing required scenarios and stores their parity artifacts (no placeholders once evidence exists):
 
-`tests/cli/test_errors_parity.py::test_http_and_cli_parity` — closed-rails parity tests (marked `pytest.mark.epic020`) that:
+`parity/errors_reader_cli.db_unavailable.http.json` / `.cli.txt`  
+`parity/errors_reader_cli.vendor_attempt_closed_rails.http.json` / `.cli.txt`
 
-* read the stored HTTP artifacts, call `capture_http`, assert that `body.code == scenario.token` and that the token is in `ERROR_TOKEN_MAP`, and check exact equality with the stored JSON; and
+Schema logs confirming parity scenarios use valid `error_v1` envelopes:
 
-* read the stored CLI artifacts, call `capture_cli`, assert non-zero return code, empty stdout, an appropriate stderr line, and exact equality with the stored CLI text.
+`errors/schema_check/error_envelope_invalid_*.log`  
+`errors/schema_check/error_envelope_db_unavailable.log`  
+`errors/schema_check/error_envelope_vendor_attempt_closed_rails.log`
 
-`docs/acceptance_map_epic020.json` / `audit/EPIC020_MANIFEST.json` — EPIC020 D1 entries marking `CLI_READER_EMITTER_PARITY_OK` as **DONE** and binding it to the parity artifacts and tests above.
+Parity enforcement test (strict equality vs stored artifacts; scenario roster enforced by test logic):
+
+`tests/cli/test_errors_parity.py::test_http_and_cli_parity`
+
+Acceptance wiring (titles-only; canonical close-pack filenames):
+
+`docs/acceptance_map_epic020.json` / `audit/EPIC-020_MANIFEST.json` — EPIC020 D1 entries for the baseline parity slice.
+
+`docs/acceptance_map_epic022.json` / `audit/EPIC-022_MANIFEST.json` — EPIC022 acceptance artifacts, updated in PR2+ to bind D1 tokens to concrete tests/artifacts (no placeholders once evidence exists).
 
 **Notes:**  
- This subtask is **Partial**: EPIC020 PR 2b closes `CLI_READER_EMITTER_PARITY_OK` for the current D1 error scenarios under closed rails, but `TWO_RUN_IDENTITY_OK` for error envelopes and parity coverage for additional scenarios (such as DB-unavailable and vendor errors referenced in PF19) remain future work. PF09 records the D1 parity harness and artifacts here and leaves broader error determinism to later epics.
+EPIC020 established the baseline parity harness and storage model; EPIC022 D1 closes the remaining required scenario coverage by adding **db\_unavailable** and **vendor\_attempt\_closed\_rails** and binding those scenarios to concrete parity artifacts and tests. D0 scaffolding may contain placeholders, but PR2+ acceptance bindings must be concrete once evidence exists, to avoid “pattern treated as evidence” drift.
 
 ### **Subtask HDE-SEPA002.6 — CLI stderr/stdout discipline & usage exit 64**
 
@@ -4332,9 +4429,7 @@ Enforce CLI stream and exit-code discipline for all CLI commands in alignment wi
 
 *Tokens (titles-only; tokens live in HDE-Governance / HDE Phased Epics):*
 
-`CLI_USAGE_ERR_EXIT64_OK`  
- `CLI_STDERR_ONLY_ON_ERROR_OK`  
- `CLI_STDOUT_LF_OK`
+ 
 
 *Evidence / artifacts (titles/paths only):*
 
@@ -4348,11 +4443,11 @@ Enforce CLI stream and exit-code discipline for all CLI commands in alignment wi
 
 `tests/cli/test_errors_parity.py::test_http_and_cli_parity` — parity tests that confirm CLI error envelopes for EPIC020 scenarios are aligned with HTTP error envelopes and remain numeric-free under closed rails.
 
-`docs/acceptance_map_epic020.json` — EPIC020 D1 acceptance map marking `CLI_USAGE_ERR_EXIT64_OK`, `CLI_STDERR_ONLY_ON_ERROR_OK`, and `CLI_STDOUT_LF_OK` as **DONE** and binding them to the tests above.
+`docs/acceptance_map_epic020.json` — EPIC020 D1 acceptance map binding the tests above to the D1 CLI error slice (token roster validation applies).
 
-`audit/EPIC020_MANIFEST.json` — EPIC020 manifest entries mapping CLI error tokens to their bound tests.
+`audit/EPIC-020_MANIFEST.json` — EPIC020 manifest entries binding the D1 CLI error slice to the tests above.
 
-Notes: This row is now Done for the EPIC020 D1 CLI slice: stream and exit-code discipline is implemented, tested, and wired into the D1 acceptance map and manifest under closed rails. Broader CLI behavior remains governed by Conjunction and Distillation tasks that build on this discipline.
+Notes: This row is now Done for the EPIC020 D1 CLI slice: stream and exit-code discipline is implemented and tested under closed rails. PF09 does not mint or list unrostered tokens; stderr-only discipline is a behavioral requirement and must not be represented by a non-roster token in PF09.
 
 ### **Subtask HDE-SEPA002.7 — Writers/errors headers posture validation**
 
@@ -4381,7 +4476,7 @@ Header posture tokens (names live in Governance).
 
 `tests/transport/test_writers_errors_headers.py` — enforcement test wiring the snapshot to the diagnostic writer route under closed rails.
 
-`docs/acceptance_map_epic020.json` / `audit/EPIC020_MANIFEST.json` — EPIC020 D1 acceptance entries that reference the snapshot and tests as header posture evidence.
+`docs/acceptance_map_epic020.json` / `audit/EPIC-020_MANIFEST.json` — EPIC020 D1 acceptance entries that reference the snapshot and tests as header posture evidence.
 
 **Notes:**  
  This row is now Done for the EPIC020 D1 writer diagnostic route; broader A7 transport behavior and other success routes remain governed by A7/Catalog and Distillation tasks.
@@ -4431,7 +4526,7 @@ List all in `docs/evidence/INDEX.json` and mirror them in `artifacts/evidence_in
 
 `tests/evidence/test_evidence_skeleton.py` / `tests/ops/test_evidence_index.py` — skeleton and Index/Mirror tests that exercise the new error artifact keys.
 
-`docs/acceptance_map_epic020.json` / `audit/EPIC020_MANIFEST.json` — EPIC020 D1 entries marking `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`, and `EVIDENCE_PATHS_VALIDATED_OK` as **DONE** for the error evidence slice and binding them to the error skeleton tests and artifacts.
+`docs/acceptance_map_epic020.json` / `audit/EPIC-020_MANIFEST.json` — EPIC020 D1 entries marking `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`, and `EVIDENCE_PATHS_VALIDATED_OK` as **DONE** for the error evidence slice and binding them to the error skeleton tests and artifacts.
 
 **Notes:**  
  This subtask is now Done for the EPIC020 D1 error evidence slice: the governed error artifacts live in the same Evidence Index/Mirror skeleton as sampler/core artifacts, have path-proofs, and are covered by skeleton tests. Future error evidence families (for new scenarios or epics) will extend, not replace, these entries and are tracked by their owning epics and PF12.
@@ -4455,7 +4550,7 @@ EPIC017/EPIC018 D1 established the canonical serializer, determinism harness, an
 
 * Adding a presenter harness (`tools/presenter/generate_presenter_artifacts.py`) that runs under closed rails and writes deterministic presenter artifacts under `artifacts/presenter/**` (AB/BA showcompat bytes, Reader/CLI parity bytes, preimage recompute logs, and a showcompat identity summary), registered via PRESENTER\_\* artifact\_keys in the Evidence Index and Machine Mirror.
 
-* Wiring EPIC020 D2 tokens (`CLI_SHOWCOMPAT_CANON_OK`, `TWO_RUN_IDENTITY_OK`, `COMPOSITE_ABBA_IDENTITY_OK`, `PREIMAGE_RECOMPUTE_OK`) to CLI presenter tests and presenter artifacts in `docs/acceptance_map_epic020.json` and `audit/EPIC020_MANIFEST.json`, where they are now marked **DONE**.
+* Wiring EPIC020 D2 tokens (`CLI_SHOWCOMPAT_CANON_OK`, `TWO_RUN_IDENTITY_OK`, `COMPOSITE_ABBA_IDENTITY_OK`, `PREIMAGE_RECOMPUTE_OK`) to CLI presenter tests and presenter artifacts in `docs/acceptance_map_epic020.json` and `audit/EPIC-020_MANIFEST.json`, where they are now marked **DONE**.
 
 From PF09’s perspective, the presenter/emitter slice for Reader and `hdctl showcompat` is now fully wired and evidenced. The row remains **Partial** because compat/app-level test flows and any future presenter surfaces are still tracked under Conjunction-phase tasks (`HDE-CONJ002`, `HDE-CONJ003`); PF09 treats those as separate jobs to be closed before the overall presenter story is fully Done.
 
@@ -4507,7 +4602,7 @@ Index/Mirror records:
 
 EPIC020 acceptance wiring (titles-only):
 
-* `docs/acceptance_map_epic020.json` / `audit/EPIC020_MANIFEST.json` — D2 entries recording `CLI_READER_EMITTER_PARITY_OK` and `CLI_NO_ALT_JSON_OK` as **DONE** for the presenter slice, listing serializer guard tests and guard artifacts as evidence.
+* `docs/acceptance_map_epic020.json` / `audit/EPIC-020_MANIFEST.json` — D2 entries recording `CLI_READER_EMITTER_PARITY_OK` and `CLI_NO_ALT_JSON_OK` as **DONE** for the presenter slice, listing serializer guard tests and guard artifacts as evidence.
 
 Notes:  
  This subtask is scoped to ensuring that governed Reader/compat HTTP routes and `hdctl showcompat` all use the same allow-listed presenter/emitter symbol as production, enforced by guard tools and tests. Compat-surface AB/BA parity and identity hashing (HDE-CONJ002) remain separate rows.
@@ -4557,7 +4652,7 @@ Presenter harness and artifacts:
 
 EPIC020 acceptance wiring:
 
-* `docs/acceptance_map_epic020.json` / `audit/EPIC020_MANIFEST.json` — D2 entries marking `CLI_SHOWCOMPAT_CANON_OK` as **DONE** with the canonical-bytes and identity tests above and the presenter artifacts listed as evidence.
+* `docs/acceptance_map_epic020.json` / `audit/EPIC-020_MANIFEST.json` — D2 entries marking `CLI_SHOWCOMPAT_CANON_OK` as **DONE** with the canonical-bytes and identity tests above and the presenter artifacts listed as evidence.
 
 ---
 
@@ -4568,24 +4663,50 @@ EPIC020 acceptance wiring:
 **Subtask name/label:** stdout/stderr discipline for public flows
 
 **Subtask description:**  
- Enforce stream discipline for presenter-driven CLI flows:
+Enforce stream discipline for presenter-driven CLI flows:
 
-* Success: public JSON body on `stdout` with exactly one LF; `stderr` empty.
-
+* Success: public JSON body on `stdout` with exactly one LF; `stderr` empty.  
 * Errors: typed, numeric-free error envelopes on `stderr` only; `stdout` empty.
 
-**Subtask status:** **Not done**
+**Subtask status:** **Partial**
 
-**Epic or card:** **Unknown** (presently covered piecemeal via EPIC017/018 D1 error flows and EPIC020 D2 presenter work)
+**Epic or card:**  
+HDE-EPIC020 (D2 — presenter canonical bytes baseline)  
+HDE-EPIC022 (D2 — deterministic showcompat stdout capture artifacts and concrete stdout-LF evidence)
+
+Addendum 13-15 BN Drain 8.5.3
 
 **Tokens:**
 
-`CLI_STDOUT_LF_OK`  
- `CLI_STDERR_ONLY_ON_ERROR_OK`
+`CLI_STDOUT_LF_OK`
 
 **Evidence / artifacts:**
 
-Evidence for error flows and showcompat streams is captured under HDE-SEPA002.6 and Calcination subtasks (CLI usage/error tests and canonical bytes tests), but PF09 has no dedicated presenter-specific stream harness yet for all public CLI/presenter surfaces. This row remains Not done until stream discipline is consolidated and proven for the full presenter slice; evidence is tracked via HDE-SEPA002.6 and future presenter/admin tasks rather than here.
+**Concrete evidence for the `CLI_STDOUT_LF_OK` portion (EPIC022 PR3, D2):**  
+EPIC022 PR3 produces deterministic, closed-rails showcompat stdout capture artifacts and binds `CLI_STDOUT_LF_OK` to concrete evidence (canonical-bytes test \+ the new governed showcompat artifacts).
+
+Addendum 13-15 BN Drain 8.5.3
+
+Addendum 13-15 BN Drain 8.5.3
+
+Canonical-bytes test (titles-only; exact test node referenced by EPIC022 PR3 follow-up):
+
+`tests/cli/test_cli_canonical_bytes.py::test_showcompat_stdout_is_canonical`
+
+Governed showcompat stdout capture artifacts (titles/paths only; each has a sibling `*.path_proof.txt` and is indexed/mirrored in the same PR as required by the evidence skeleton discipline):
+
+Addendum 13-15 BN Drain 8.5.3
+
+Addendum 13-15 BN Drain 8.5.3
+
+`artifacts/cli/showcompat/stdout.json`  
+`artifacts/cli/showcompat/stdout.json.sha256`  
+`artifacts/cli/showcompat/args.json`  
+Producer tool (titles-only): `tools/cli/generate_showcompat_artifacts.py`
+
+**Notes:**  
+EPIC022 PR3 provides concrete evidence for the **stdout LF \+ empty stderr on success** portion of stream discipline via the canonical-bytes test and the governed showcompat stdout capture artifacts. The **broader stream discipline** (especially stderr-only failure across the full CLI/presenter surface set) remains an open consolidation item for this subtask and is still tracked via the existing CLI stream/error tests and future presenter/admin work.  
+Stderr-only error output remains a behavioral requirement and must **not** be represented by the forbidden token `CLI_STDERR_ONLY_ON_ERROR_OK` for this epic slice.
 
 ---
 
@@ -4628,7 +4749,7 @@ Presenter artifacts (titles-only):
 
 EPIC020 acceptance metadata:
 
-* `docs/acceptance_map_epic020.json` / `audit/EPIC020_MANIFEST.json` — D2 entries marking `TWO_RUN_IDENTITY_OK` and `COMPOSITE_ABBA_IDENTITY_OK` as **DONE** for the presenter slice, binding them to the parity/identity tests and presenter artifacts above.
+* `docs/acceptance_map_epic020.json` / `audit/EPIC-020_MANIFEST.json` — D2 entries marking `TWO_RUN_IDENTITY_OK` and `COMPOSITE_ABBA_IDENTITY_OK` as **DONE** for the presenter slice, binding them to the parity/identity tests and presenter artifacts above.
 
 ---
 
@@ -4686,7 +4807,7 @@ EPIC020 acceptance metadata:
 
 * Evidence skeleton tests (`tests/evidence/test_evidence_skeleton.py`, `tests/ops/test_evidence_index.py`) extended to cover the presenter artifact families for EPIC020 D2.
 
-* `docs/acceptance_map_epic020.json` / `audit/EPIC020_MANIFEST.json` — D2 entries marking `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`, and `EVIDENCE_PATHS_VALIDATED_OK` as **DONE** for the presenter slice, binding them to the presenter artifact skeleton and tests.
+* `docs/acceptance_map_epic020.json` / `audit/EPIC-020_MANIFEST.json` — D2 entries marking `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`, and `EVIDENCE_PATHS_VALIDATED_OK` as **DONE** for the presenter slice, binding them to the presenter artifact skeleton and tests.
 
 ---
 
@@ -4836,9 +4957,9 @@ Two consecutive GET requests to `/internal/version` on the same environment prod
 
 The body values for `engine_tag`, `release_id`, `invocation_tag`, `build_commit`, `emitter_sha256`, and any additional identity fields required by the Identity and Provenance module match the frozen identity artifacts for this release (pack manifest, `release_id` artifacts, emitter hash, and service identity snapshot).
 
-Subtask status: Not done
+Subtask status: Partial
 
-Epic or card: EPIC-018 (D2 env/prod handshake and identity snapshot for `/internal/version`)
+Epic or card: HDE-EPIC022 (D3 — `/internal/version` coupling proof \+ evidence bundle)
 
 Tokens:
 
@@ -4846,32 +4967,77 @@ Supports `TWO_RUN_IDENTITY_OK` for identity components (token semantics live in 
 
 Evidence / artifacts:
 
-Planned canonical ops and identity artifacts (governed artifacts; paths and schemas owned by HDE-Schemas & Artifacts and Mechanics).
+`artifacts/ops/internal_version/two_run_identity.log` — governed coupling \+ two-run identity proof log (D3 proof artifact).
 
-### Subtask HDE-SEPA004.5 — Internal ops evidence indexing
+Internal\_version bundle artifacts (governed):
+
+`artifacts/ops/internal_version/body_get.json`  
+ `artifacts/ops/internal_version/body_get.sha256`  
+ `artifacts/ops/internal_version/headers_get.txt`  
+ `artifacts/ops/internal_version/headers_head.txt`  
+ `artifacts/ops/internal_version/cond_if_none_match_headers.txt`  
+ `artifacts/ops/internal_version/cond_if_modified_since_headers.txt`  
+ plus the corresponding `*.path_proof.txt` files for governed bundle artifacts (where present).
+
+Acceptance binding surfaces (names-only; content governed elsewhere):
+
+`audit/qa/hde-epic022/token_evidence_matrix.md`  
+ `docs/acceptance_map_epic022.json`
+
+Evidence Index \+ Machine Mirror (same-PR parity; paths pinned in PF09 §0.3):
+
+`docs/evidence/INDEX.json`  
+ `docs/evidence/INDEX.sha256`  
+ `artifacts/evidence_index.jsonl`
+
+Notes:
+
+The excerpt evidence indicates these artifacts and bindings were generated/committed in EPIC022 PR4, but the final in-session transcript does not fully show the last `two_run_identity.log` contents. Confirm that the committed log includes explicit two-run identity pass/fail plus explicit coupling pass/fail checks to governed sources before marking this row Done.
+
+### **Subtask HDE-SEPA004.5 — Internal ops evidence indexing**
 
 **Subtask ID:** HDE-SEPA004.5
 
 **Subtask name/label:** /internal/version evidence & indexing
 
 **Subtask description:**  
- Index all `/internal/version` artifacts and related identity artifacts in `docs/evidence/INDEX.json` and `artifacts/evidence_index.jsonl` in the same PR (records‑only canonical JSONL; one LF; unknown‑key reject; fixed field order; with path‑proofs).
+Index all `/internal/version` artifacts and related identity artifacts in `docs/evidence/INDEX.json` and `artifacts/evidence_index.jsonl` in the same PR (records-only canonical JSONL; one LF; unknown-key reject; fixed field order; with path-proofs).
 
-**Subtask status:** **Not done**
+**Subtask status:** **Partial**
 
-**Epic or card:** Unknown
+**Epic or card:** HDE-EPIC022 (D3 — `/internal/version` evidence bundle indexing \+ validator hardening)
 
 **Tokens:**
 
-`EVIDENCE_INDEX_UPDATED_OK`
-
-`EVIDENCE_INDEX_MIRROR_OK`
-
+`EVIDENCE_INDEX_UPDATED_OK`  
+`EVIDENCE_INDEX_MIRROR_OK`  
+`EVIDENCE_INDEX_HASH_OK`  
+`MACHINE_MIRROR_UPDATED_OK`  
 `EVIDENCE_PATHS_VALIDATED_OK`
 
 **Evidence / artifacts:**
 
-All artifacts listed in 004.1–004.4, plus their `path_proof` transcripts.
+Index \+ mirror updates (same PR):
+
+`docs/evidence/INDEX.json`  
+`docs/evidence/INDEX.sha256`  
+`artifacts/evidence_index.jsonl`  
+plus path-proof transcripts (`*.path_proof.txt`) for all governed `/internal/version` bundle artifacts and for the Machine Mirror self-record.
+
+Acceptance binding surfaces:
+
+`audit/qa/hde-epic022/token_evidence_matrix.md`  
+`docs/acceptance_map_epic022.json`
+
+Validator hardening evidence (titles-only; canonical homes elsewhere):
+
+A dedicated self-record regression test exists and is run as part of the evidence-validation posture (for example `tests/evidence/test_machine_mirror_self_proof.py`).
+
+Addendum 16-18 BN Drain 8.5.3
+
+**Notes:**
+
+The excerpt reports a prior CI failure caused by mirror self-record proof SHA mismatches and indicates this was addressed by tooling \+ validator updates. Any tooling output that references a non-canonical mirror path (for example `docs/evidence/INDEX.machine_mirror.jsonl`) conflicts with PF09 §0.3 and must be treated as a blocker until corrected.
 
 ---
 
@@ -5681,8 +5847,6 @@ CLI conformance:
 
 `CLI_HELP_STDOUT_OK`
 
-`CLI_STDERR_ONLY_ON_ERROR_OK`
-
 `CLI_IMPLEMENTED_SET_OK`
 
 *Evidence / artifacts (titles/paths only):*
@@ -6073,8 +6237,6 @@ Keep merge-blocking until parity/determinism tokens pass.
 
 `JSON_CANONICAL_CHECK_OK`
 
-`CLI_STDOUT_LF_OK`
-
 `CLI_AB_BA_PARITY_OK`
 
 `CLI_TWO_RUN_IDENTITY_OK`
@@ -6134,8 +6296,6 @@ CLI conformance:
 `CLI_HELP_EXIT_0_OK`
 
 `CLI_HELP_STDOUT_OK`
-
-`CLI_STDERR_ONLY_ON_ERROR_OK`
 
 Parity harness:
 
@@ -6737,7 +6897,7 @@ SAFE-rails artifacts listed above, plus their `*.path_proof.txt` transcripts.
 
 ## **Task HDE-FERM002 — Narrative Selection Router (keys only)**
 
-**Task ID:** FERM002
+**Task ID:** HDE-FERM002
 
 **Task name/label:** Narrative Selection Router (keys only)
 
@@ -9288,13 +9448,25 @@ Values are sourced via `identity_admin()` from the Identity & Provenance module 
 
 `artifacts/ops/internal_version/body_get.json` — exact LF-terminated GET body (`intver/body_get`)
 
-`artifacts/ops/internal_version/cond_if_none_match.txt` — GET with `If-None-Match` still returning 200 (`intver/cond_if_none_match`)
+`artifacts/ops/internal_version/cond_if_none_match_headers.txt` — GET with `If-None-Match` still returning 200 (`intver/cond_if_none_match`)
 
-`artifacts/ops/internal_version/cond_if_modified_since.txt` — GET with `If-Modified-Since` still returning 200 (`intver/cond_if_modified_since`)
+`artifacts/ops/internal_version/cond_if_modified_since_headers.txt` — GET with `If-Modified-Since` still returning 200 (`intver/cond_if_modified_since`)
 
 `artifacts/ops/internal_version/two_run_identity.log` — two-run identity log for `/internal/version` (`intver/two_run_identity`)
 
-`artifacts/ops/internal_version/provenance_note.json` (or `.md`) — operator note capturing `release_id`, `invocation_tag`, optional `build_commit`, capture timestamp (`intver/provenance_note`)
+**Artifacts impact**
+
+New or refined artifact paths:
+
+`artifacts/ops/internal_version/body_get.json` (canonical body; replaces generic `body.json` naming)
+
+`artifacts/ops/internal_version/cond_if_none_match_headers.txt`
+
+`artifacts/ops/internal_version/cond_if_modified_since_headers.txt`
+
+`artifacts/ops/internal_version/two_run_identity.log`
+
+These correspond to PF14’s `intver/*` artifact keys; schemas remain routed to PF-Canon-HDE-Schemas & Artifacts.
 
 *Notes:*
 
@@ -9323,6 +9495,17 @@ New or refined artifact paths:
 `artifacts/ops/internal_version/provenance_note.json`
 
 These correspond to PF14’s `intver/*` artifact keys; schemas remain routed to PF‑Canon‑HDE‑Schemas & Artifacts.
+
+**Canon note (proof artifact is single-home):**  
+ `artifacts/ops/internal_version/two_run_identity.log` is the **single governed proof artifact** for `/internal/version` coupling \+ two-run identity. It MUST include:
+
+* Two-run identity result (explicit byte-identity pass/fail for two consecutive captures, with compared digests/identifiers).
+
+* Coupling verification result (explicit pass/fail checks that `/internal/version` fields match their governing identity sources, including `release_id` coupling).
+
+* Rails posture reference and determinism pins reference (names-only pointers; determinism pins themselves remain proven by their canonical governed log).
+
+No new acceptance tokens are introduced for “coupling proof”; bind this proof under the existing identity/internal-version token set.
 
 ### **Subtask HDE-COAG001.5 — Optional production caching**
 

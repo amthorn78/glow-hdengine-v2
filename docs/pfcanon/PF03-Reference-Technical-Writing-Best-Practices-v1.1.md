@@ -1,16 +1,14 @@
 ## **0\. Front Matter — Document Control**
 
-## **0\. Front Matter — Document Control**
+**Title:** PF03-Reference-Technical-Writing-Best-Practices
 
-**Title:** PF03-Reference-Technical Writing Best Practices
-
-**Version**: v1.0.7
+**Version**: v1.1
 
 **Status:** Reference
 
-**Effective date:** 2025-12-01
+**Effective date:** 2025-12-24
 
-**Last Update Gate:** BN 7.9.7 Drain A17
+**Last Update Gate:** BN 8.5.3 Drain
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -31,7 +29,7 @@ Paste-safe & canonicalization notes
  • Sections must be Google-Docs-safe (no outer bold wrappers; blank line after headings; no empty bullets).  
  • Governed JSON artifacts referenced from PF03 comply with §4 (UTF-8, sorted keys, compact, single LF).  
  • Markdown headings only. Emit H1/H2 using `#` and `##`. Place one blank line after each heading. Do not wrap headings in bold.  
- • No code fences unless requested. Return paste-ready body text without triple‑backtick fences unless the PO explicitly asks for code blocks.
+ • No code fences unless requested. Return paste-ready body text without triple-backtick fences unless the PO explicitly asks for code blocks.
 
 *Provenance:* Front matter synced to PF03 baseline and updated per “PF03: Editorial Quality Controls for Canonical Redlines” addendum.
 
@@ -53,7 +51,7 @@ Primary audience. AI technical writers (Cyrano lineage) and the PO who pastes ou
 
 Readers. Lead Devs (AI, read only), human SMEs, and the PO.
 
-Maintainers. The PO is the source of truth for approvals and version bumps; Cyrano maintains paste-safe edits, deltas, and Evidence Index entries.
+Maintainers. The PO is the source of truth for approvals and version bumps; TW sessions maintain paste-safe edits, deltas, and Evidence Index entries.
 
 Consumers. Other PF docs and build tooling that rely on PF03 for redline style, placement precision, and acceptance tokens.
 
@@ -135,8 +133,6 @@ When multiple versions compete, resolve in this order:
 Applied rule. While a \[SUPERCEDES\] addendum is merge-ready and approved, it temporarily overrides prior guidance until merged; the change must update the human Evidence Index and the machine JSONL mirror in the same PR.
 
 Clarifications. Cross-doc references are titles-only (no version numbers); precedence is decided at the document level, not by quoting older text from another PF.
-
-# 
 
 ## **7\) Change workflow for docs (writer view)**
 
@@ -362,6 +358,40 @@ Clear separation from discovery — SHOULD. When discovery is required (for exam
 
 These rules make QA plans executable without guesswork, align them with Codespaces as the default operator environment, and ensure each command is tied to explicit evidence and outcomes instead of informal expectations.
 
+### **12.4 QA runbooks & evidence documentation (Live QA)**
+
+Live QA plans and Live QA runbooks are engineering docs. They must be runnable, auditable, and free of hand-edited evidence.
+
+Apply these rules in addition to §12.1–§12.3 and §13.1:
+
+* Step-level Deliverables — MUST. Every step in a QA plan or Live QA runbook MUST include a **Deliverables** list that names the minimal evidence set for that step using fully qualified file paths (for example, under `audit/qa/...`).
+
+  * If the step creates new evidence, Deliverables MUST name the files that will be created.
+
+  * If the step only reads existing artifacts, Deliverables MUST still name the files being read and state that no new files are created.
+
+* PASS/FAIL defined by files — MUST. Each step’s PASS/FAIL criteria MUST be defined in terms of its Deliverables (existence, non-emptiness, and simple content checks). Avoid vague criteria like “looks good” or “works”; the step verdict must be reviewable from the listed files.
+
+* Script-generated Live QA README — MUST. A Live QA sequence MUST end with a **script-generated** summary README (for example, `audit/qa/<epic-id>/live-qa/README.md`). The README is an evidence artifact and MUST be produced by a command or tool, not by manual editing.
+
+   The script-generated README MUST include, at minimum:
+
+  * Run metadata: date/time (prefer UTC), branch, and commit SHA.
+
+  * Rails posture summary (env pins and any deviations) as captured by the run.
+
+  * Per-step commands and the per-step Deliverables (paths only).
+
+  * Evidence file index (a list of the evidence files under the Live QA directory tree).
+
+  * PF references (document titles and § anchors only; no version numbers).
+
+  * Verdict and deviations/issues (including any FAIL\_TOOLING outcomes and what was escalated).
+
+* No manual edits to QA evidence — MUST NOT. QA plans and runbooks MUST NOT instruct an operator to open evidence files (logs, manifests, READMEs) in an editor and type changes by hand. If a summary must change, the correct procedure is to re-run the generator so the result remains reproducible.
+
+These are documentation rules only. They do not redefine token ownership or evidence semantics owned by other PF documents; they define how QA instructions and QA summaries must be written to remain auditable and reproducible.
+
 ## **13\) Security & privacy for writing**
 
 * No secrets in examples — MUST. Redact or use obvious placeholders; never paste API keys, cookies, or bearer tokens.  
@@ -438,6 +468,36 @@ Acceptance impact: \<TOKENS\_ADDED | TOKENS\_CHANGED | TOKENS\_REMOVED\>
 
 See §9 for the Build Notes Addenda template and usage.
 
+---
+
+### **15.4 Live QA step template (Deliverables-first)**
+
+Use this structure for any QA plan or Live QA runbook step that includes executable commands. This template enforces §12.4.
+
+Step \<N\> — \<short step title\>
+
+Check ID: \<stable id for this step\>  
+ PF refs: \<PF document title § anchor list\>  
+ Tokens (names only): \<token list, if applicable\>
+
+Command: \<single copy/paste-ready command string\>
+
+Deliverables (paths only):
+
+* \<fully qualified path 1\> — \<one-line description\>
+
+* \<fully qualified path 2\> — \<one-line description\>
+
+PASS criteria (file-based):
+
+* \<what must be true in the Deliverables, stated in terms of existence/non-emptiness/simple checks\>
+
+FAIL criteria (file-based):
+
+* \<what would constitute failure, stated in terms of Deliverables and their content\>
+
+Final status marker: `PENDING` → `PASS` | `FAIL` | `FAIL_TOOLING` (recorded in the primary step log)
+
 ## 
 
 ## **16\) Changelog**
@@ -448,19 +508,21 @@ v1.0.2 \- 2025-11-01 Standardized header and provenance; adopted Appendix A (Ful
 
 v1.0.0 \- 2025-10-09 Initial comprehensive, AI-first best-practices: single-home doctrine, Build Notes append-only blocks, precise § anchors, registry governance, acceptance tokens, and paste-ready templates.
 
-## Appendix A — Full Document Assessment Protocol (Technical Writing)
+## **Appendix A — Full Document Assessment Protocol (Technical Writing)**
 
-Purpose & Scope
-
-Ensure every edit starts from the complete document, preserves heading structure, and keeps cross-document references synchronized by title only.
-
-Applies to all Glow documentation families (PF Canon, Review, Living). PF03 remains titles-only and process-owned; bytes live in their single homes.
-
-Policy (normative)
+### **Policy (normative)**
 
 Full-document requirement — MUST. Obtain and read the complete source before editing. If only a fragment is available, pause and request the full doc; proceed in partial mode only with explicit PO approval and label outputs as Partial.
 
-H1/H2 invariance — MUST. Do not add, remove, or renumber H1 or H2. New sections require PO approval and must not shift existing numbering.
+**Heading numbering stability — MUST.** Existing H1/H2 numbering is immutable. New content SHOULD be added as H3/H4 within an existing H2 whenever possible. If a new H1/H2 is truly required, it MAY be added, but it MUST take the next available number and MUST NOT alter any existing numbering.
+
+Practical guardrails (optional):
+
+* Prefer H3/H4 for in-between additions (for example, add `### 12.4` under `## 12 …`) so you do not need new H2s.
+
+* Never reuse an existing number for a different section.
+
+* If you add a new H1/H2, update any structure map or cross-reference lists so they include the new number, but do not change old ones.
 
 Titles-only cross-references — MUST. Use stable document titles only; do not include version numbers in cross-doc prose. Section names are allowed.
 
@@ -470,85 +532,29 @@ Style and naming hygiene — SHOULD. Plain English; avoid em dashes; keep headin
 
 Evidence discipline — MUST. Provide acceptance evidence and maintain parity between the human Evidence Index and the machine JSONL mirror in the same PR.
 
-Workflow
+---
 
-Intake → Structure map → Cross-reference sweep → Dependency-ordered update plan → Edit → Verification → Doc-delta and index → Closeout.
+### **Workflow**
 
-1\. Intake and inventory: confirm family and status; record invocation tag, date, and source path.
+2. Structure map extraction: list all H1 and H2 in order (H3 if relevant); attach as evidence. **If new H1/H2 sections are added, ensure the structure map includes them and that all existing numbering remains unchanged.**
 
-2\. Structure map extraction: list all H1 and H2 in order (H3 if relevant); attach as evidence.
+3. Editing: use the requested authoring surface; **preserve existing H1/H2 numbering, titles, and order exactly;** keep changes minimal and localized. Prefer adding content under existing H2s as H3/H4. If a new H1/H2 is required, append it using the next available number and do not shift any existing numbering.
 
-3\. Cross-reference sweep: locate all cross-doc pointers; convert to titles-only; note corrections.
+4. Verification: confirm **existing H1/H2 numbering and order are unchanged;** confirm titles-only cross-refs; confirm no duplicated bytes.
 
-4\. Dependency-ordered update plan: list sections to update with a one-line rationale each; get PO approval.
+---
 
-5\. Editing: use the requested authoring surface; preserve H1/H2 exactly; keep changes minimal and localized.
+### **Acceptance & Evidence**
 
-6\. Verification: confirm H1/H2 preserved; confirm titles-only cross-refs; confirm no duplicated bytes.
+H1H2\_PRESERVED\_OK — **Existing** H1 and H2 numbering, titles, and order verified unchanged. If any new H1/H2 sections were added, they use the next available number and do not alter existing numbering.
 
-7\. Doc delta and index upkeep: produce a doc-delta snippet; update the registry and both Evidence Indexes in the same PR.
+---
 
-8\. Closeout: provide artifacts, hashes where applicable, and a one-paragraph summary of changes and risks.
+### **Verification checklist**
 
-Acceptance & Evidence
-
-To accept an edit for this protocol, the writer provides:
-
-DOC\_STRUCTURE\_MAP\_OK — structure map captured and attached.
-
-H1H2\_PRESERVED\_OK — H1 and H2 text and order verified unchanged.
-
-CROSSREF\_TITLES\_ONLY\_OK — all cross-doc references are titles-only.
-
-NO\_DUPLICATED\_BYTES\_OK — no contract bytes duplicated across documents.
-
-DOC\_SECTION\_DELTAS\_OK — dependency-ordered section deltas provided.
-
-DOC\_RISKS\_NOTED\_OK — risks and open issues recorded.
-
-Templates
-
-Structure Map
-
-Document: \<Title\>
-
-Collected: \<YYYY-MM-DD\>
-
-H1
-
-1\. \<Title\>  
-
-2\. \<Title\>
-
-
-H2
-
-1.1 \<Title\>
-
-1.2 \<Title\>
-
-2.1 \<Title\>
-
-2.2 \<Title\>
-
-Dependency-ordered update plan
-
-1\. \<Section anchor\> — \<Change summary\>  
-
-2\. \<Section anchor\> — \<Change summary\>
-
-
-Rationale: \<Why this order\>
-
-Verification checklist
-
-\[ \] H1/H2 preserved
-
-\[ \] Titles-only cross-refs
-
-\[ \] No duplicated bytes
-
-\[ \] Doc delta prepared
-
-\[ \] Registry and Evidence Index updated
+\[ \] Existing H1/H2 preserved (numbering, titles, order unchanged; any new H1/H2 uses next available number)  
+ \[ \] Titles-only cross-refs  
+ \[ \] No duplicated bytes  
+ \[ \] Doc delta prepared  
+ \[ \] Registry and Evidence Index updated
 

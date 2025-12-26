@@ -1,11 +1,13 @@
 # **0\. Front Matter**
 
-**Title:** PF02-Canon-HDE Architecture  
- **Version:** v1.2.5  
+**Title:** PF02-Canon-HDE-Architecture  
+ **Version:** v1.3.3  
  **Status:** Canon  
-**Effective date:** 2025-12-13
+**Effective date:** 2025-12-24
 
- **Last Update Gate:** BN 8.3 Drain A10-14
+ **Last Update Gate:** BN 8.5.3 Drain A26-29
+
+**Invocation tag:** INV-f2ac55d77ce9aacc
 
 ---
 
@@ -85,6 +87,10 @@ Evidence (headers/records only) is owned by HDE-Mechanics Guide and HDE-Build Ch
 
 **Mirror hygiene (titles-only).**  
  The machine mirror is records-only, canonical JSONL (UTF-8, sorted keys, compact, one trailing LF), rejects unknown keys, and each record includes a `proof_anchor` to a path-proof stored alongside the artifact. A human-index hash sentinel may be enforced (see HDE-Schemas & Artifacts).
+
+**Proof-anchor semantics (acceptance bindings).**
+
+`proof_anchor` points to the governed path-proof transcript for the primary artifact (or bundle) listed in the ledger. Acceptance bindings (for example, token-evidence matrices and acceptance maps) MUST bind tokens to the primary governed artifacts and/or tests, not to the path-proof transcript itself. Proof transcripts are referenced indirectly via the ledger (Human Index entry \+ Machine Evidence Index `proof_anchor`) unless a dedicated evidence family explicitly treats proof transcripts as first-class governed artifacts.
 
 **Math semantics.**  
  Idempotence (preimage recipe), ordering, banding, and scoring live in HDE-Math-Spec.
@@ -170,8 +176,9 @@ All runtime surfaces and offline pipelines that need sampler or Engine Core beha
 **Single emitter entrypoint.**  
  CLI and Adapter call the same Presenter emitter symbol; Architecture forbids alternate public-byte code paths (no ad-hoc serializers on public paths).
 
-**Reader↔CLI parity.**  
- For mirrored surfaces where the CLI emits Reader v1 bytes (stdout or reader-dump, per HDE-CLI-API-Vendor-Ref), those CLI bytes are byte-identical to the Reader 200 body (single emitter).
+**Reader↔CLI parity.**
+
+For mirrored surfaces, the CLI emits Reader v1 bytes only via a dedicated reader-dump sidecar output (titles-only; see **HDE-CLI-API-Vendor-Ref**). When the CLI emits Reader v1 bytes in that mode, those bytes MUST be byte-identical to the Reader 200 body for the same normalized inputs (single emitter). CLI stdout is not assumed to be Reader v1 bytes; admin and test compat payloads (for example `showcompat`) may be emitted on stdout and may include numeric scores and weights.
 
 **AB↔BA parity.**  
  For the same pair of inputs in either order, the public bytes are identical (pair normalization).
@@ -292,13 +299,13 @@ Concrete guard checks and scripts live in **HDE-Mechanics Guide**, and process/P
 
 This subsection defines the **generic architecture template** for how requests move through the Engine. It is the pattern specialised later by:
 
-* BodyGraph lifecycle (§2.3)
+* BodyGraph lifecycle (§2.4)
 
-* Compat requests (§2.4)
+* Compat requests (§3.1–§3.3)
 
-* Offline determinism/evidence flows (§2.x)
+* Offline determinism/evidence flows (§5.3–§5.4)
 
-* Narratives (§3.5–§3.7)
+* Narratives (§3.6–§3.7)
 
 It remains **contract-free** and routes bytes and schemas by **title only**.
 
@@ -330,8 +337,7 @@ It remains **contract-free** and routes bytes and schemas by **title only**.
 
    * This persistence is part of the **canonical flow in all environments**, not a toggle.
 
-   * Detailed BodyGraph behaviour is described in §2.3 and in **HDE-Schemas & Artifacts** and **HDE-Governance** by title.
-
+   * Detailed BodyGraph behaviour is described in §2.4 and in **HDE-Schemas & Artifacts** and **HDE-Governance** by title.  
 4. **Emit via Presenter (single emitter)**
 
     Presenter uses the **single canonical emitter** shared by Adapter and CLI.
@@ -370,14 +376,14 @@ It remains **contract-free** and routes bytes and schemas by **title only**.
 
    * `TZ=UTC`
 
-8. **Return response (streams discipline)**
-
+8. **Return response (streams discipline)**  
    * **CLI:**
 
-     * Write the public envelope to **stdout** (exact bytes; one LF).
+     * Write the command’s **success payload** to **stdout** (exact bytes; one LF).
 
-     * Typed JSON errors go to **stderr**; a successful command never writes to stderr.
+     * If the CLI is configured to emit **Reader v1 bytes** for parity, those Reader bytes are written to a dedicated **dump sidecar output** (titles-only; see **HDE-CLI-API-Vendor-Ref**). Stdout remains the command’s success payload.
 
+     * Typed JSON errors go to **stderr**; a successful command never writes to stderr.  
    * **Adapter:**
 
      * Return the same bytes to the client.
@@ -388,21 +394,21 @@ It remains **contract-free** and routes bytes and schemas by **title only**.
 
 ---
 
-### **2.2.5 Alpha surfaces**
+### **2.2.1 Alpha surfaces**
 
 Compat v1 via Adapter, plus `showcompat` in CLI, both use the same Presenter emitter path over Engine Core outputs.
 
 For mirrored compat surfaces:
 
-* Output must be non-empty canonical JSON.
-
-* Reader and CLI bytes must be identical for the same normalized inputs (single-emitter rule).
-
+* Output must be non-empty canonical JSON.  
+* `showcompat` stdout is a compat payload (admin/test surface) and may include numeric scores and weights.  
+* Reader v1 bytes are the numeric-free public success envelope and are emitted by the Reader success route. When the CLI emits Reader v1 bytes for parity, it does so via a dedicated dump sidecar output (titles-only; see **HDE-CLI-API-Vendor-Ref**).  
+* Byte identity for “Reader↔CLI parity” refers to the Reader 200 body vs the CLI’s dumped Reader v1 bytes for the same normalized inputs (single-emitter rule). It does not refer to `showcompat` stdout.  
 * The compat request flow is detailed in §2.4 (Reader/CLI → Engine Core → Presenter) and remains contract-free; concrete shapes and tokens live in **HDE-CLI-API-Vendor-Ref**, **HDE-Math-Spec**, and **HDE-Schemas & Artifacts** by title.
 
 ---
 
-### **2.2.6 Proofs & routing (titles-only)**
+### **2.2.3 Proofs & routing (titles-only)**
 
 **Policy.**  
  PF02 describes **where** and **how** proofs attach to the architecture but keeps all proof bytes out of Architecture. A7 and other transport-level proofs are routed by **title only** to their single homes; PF02 remains contract-free.
@@ -447,7 +453,7 @@ Concrete header matrices, status tables, and validator implementations live in *
 
 **Public envelope construction & schemas.**
 
-* The public envelope (six-key Reader/CLI envelope, bands-only, numeric-free) and its schema live in **HDE-CLI-API-Vendor-Ref** and **HDE-Schemas & Artifacts**.
+* The public envelope (six-key **Reader v1** envelope, bands-only, numeric-free) and its schema live in **HDE-CLI-API-Vendor-Ref** and **HDE-Schemas & Artifacts**. When the CLI emits Reader v1 bytes for parity, it does so via a dedicated dump sidecar output (titles-only; see **HDE-CLI-API-Vendor-Ref**).
 
 * PF02 treats them as contract surfaces and refers to them by title only.
 
@@ -455,33 +461,22 @@ Concrete header matrices, status tables, and validator implementations live in *
 
 * The idempotence preimage recipe, ordering, banding, and scoring semantics live in **HDE-Math-Spec**.
 
-* Architecture requires that all public bytes emitted by Presenter honor those semantics; it does **not** redefine them here.
-
+* Architecture requires that all public bytes emitted by Presenter honor those semantics; it does **not** redefine them here.  
 ---
 
 ## **2.3 What this document does not contain (route by title)**
 
-PF02 is **intentionally contract-free**. It names components, flows, and invariants, but it does **not** define transport or policy bytes. It does **not** carry:
+PF02 is **intentionally contract-free**. It names components, flows, and invariants, but it does **not** define transport or policy bytes.
+
+This section is a short reminder only. The complete non-goals list and titles-only routing for those topics is consolidated in §2.5.
+
+PF02 does **not** carry:
 
 * HTTP header matrices, caching or writers rules, conditional delivery (200/304/HEAD), error envelope schemas, or auth policy.
 
 * CLI command bytes, exit codes or streams, admin sidecar formats, or payload field examples.
 
 * Vendor request or response shapes, timeouts or retries, or rate-limit behaviour.
-
-All such details are owned elsewhere and are referenced by **title only** from this document.
-
-Even in the scenario flows above (and those that follow for BodyGraph, compat, offline pipelines, and narratives), PF02 deliberately omits specific payload schemas, evidence schemas, QA tokens, and SLAs. Those live in:
-
-* **HDE-CLI-API-Vendor-Ref**
-
-* **HDE-Schemas & Artifacts**
-
-* **Glow QA Guide**
-
-* **HDE-Phased Epics**
-
-by title only.
 
 ---
 
@@ -718,7 +713,7 @@ See §2.4 for the compat request flow, including how BodyGraph, Engine Core, and
 
 * Canonical JSON policy, pack/manifest, and machine mirror discipline → **HDE-Schemas & Artifacts**
 
-Reader’s public success route uses the same Engine Core \+ Presenter flow as compat v1. **HDE-CLI-API-Vendor-Ref** and **HDE-Governance** own success envelope bytes and A7 posture by title, and Reader obtains BodyGraphs via the DB-backed lifecycle described in §2.3.
+Reader’s public success route uses the same Engine Core \+ Presenter flow as compat v1. **HDE-CLI-API-Vendor-Ref** and **HDE-Governance** own success envelope bytes and A7 posture by title, and Reader obtains BodyGraphs via the DB-backed lifecycle described in §2.4.
 
 ---
 
@@ -812,6 +807,8 @@ These routes do not touch Engine Core, sampler core, or vendor; they are livenes
 
 **Evidence & indexing (titles-only).**  
  Proof artifacts and success-endpoint snapshots are indexed per **HDE-Governance** / **HDE-Schemas & Artifacts**; the human Evidence Index and the machine JSONL mirror must remain 1:1 (updated in the same PR).
+
+For `/internal/version` **coupling \+ two-run identity**, the governed proof surface is a **single** log artifact at `artifacts/ops/internal_version/two_run_identity.log`. This log records (at a minimum) the two-run identity result and the coupling verification outcome, along with the rails/pins posture by titles-only reference. PF02 names this evidence surface for architectural traceability and continues to route all token semantics and detailed proof formats by title to their single-home documents.
 
 **Non-goals.**  
  No public contract bytes, no payload schemas, no alternate emitters, no persistence, and no vendor/network calls from this surface.
@@ -914,10 +911,8 @@ Engine outputs are keys and structured metrics; narratives never live in `engine
 
 For epics whose D-goals involve Reader/HTTP behaviour, compat behaviour, or dev sampler behaviour, Live QA uses canonical entrypoints only:
 
-* **Reader v1** (public success route) for HTTP-level compat envelopes.
-
-* **Compat CLI surfaces** (as described in **HDE-CLI-API-Vendor-Ref**) for terminal-based compat flows that emit Reader-identical bytes.
-
+* **Reader v1** (public success route) for HTTP-level compat envelopes.  
+* **Compat CLI surfaces** (as described in **HDE-CLI-API-Vendor-Ref**) for terminal-based compat flows. CLI stdout may be an admin/test compat payload (for example `showcompat`). When Reader-identical bytes are required for parity proofs, the CLI emits Reader v1 bytes via a dedicated dump sidecar output (titles-only; see **HDE-CLI-API-Vendor-Ref**).  
 * **Dev sampler harnesses** (CLI and HTTP) for sampler-specific behaviour, always through Engine Core and the single Presenter emitter.
 
 All of these entrypoints:
@@ -950,31 +945,7 @@ Environment and service discovery for dev/QA is **canon-first**. Before designin
 
 * **HDE-Mechanics Guide**
 
-* “GitHub Codespaces in a QA Workflow” (where relevant)
-
-to determine how to start and reach Reader and other services.
-
-HTTP QA against “Reader” or dev harness surfaces is considered misconfigured if there is **no running adapter/Reader process** discoverable through the documented commands and ports. Attempts to hit guessed URLs or ports are a plan defect, not a property of the Engine or Presenter.
-
-**Routing (titles-only).**
-
-* Service start commands, ports, and environment wiring for dev/QA consoles → **Glow Infrastructure**, **HDE-Mechanics Guide**
-
-* Live QA process, discovery baselines, and rails posture (for example, `SAFE_MODE`, `ALLOW_NETWORK`, `APP_ENV`) → **Epic-Process-Guide**, **Glow QA Guide**
-
-* CLI and Reader surface bytes, request/response shapes, and admin surfaces used for Live QA → **HDE-CLI-API-Vendor-Ref**
-
-* 
-
-### **3.8.4 Discovery vs guessing**
-
-Environment and service discovery for dev/QA is **canon-first**. Before designing high-stakes HTTP QA steps, implementers and QA must consult:
-
-* **HDE Architecture**
-
-* **Glow Infrastructure**
-
-* **HDE-Mechanics Guide**
+* **Glow QA Guide** (Codespaces QA configuration and execution rails)
 
 * “GitHub Codespaces in a QA Workflow” (where relevant)
 
@@ -982,19 +953,25 @@ to determine how to start and reach Reader and other services.
 
 HTTP QA against “Reader” or dev harness surfaces is considered misconfigured if there is **no running adapter/Reader process** discoverable through the documented commands and ports. Attempts to hit guessed URLs or ports are a plan defect, not a property of the Engine or Presenter.
 
+**Codespaces Live QA posture (routing note).**
+
+* Codespaces QA configuration and requirements are single-home in the **Glow QA Guide** (names-only; secrets recorded as presence-only, never values). Live QA plans executed in Codespaces MUST include a mechanical Step-0 “Codespaces snapshot” capture under `audit/qa/<epic-id>/...` (generated by commands; evidence, not prose).
+
+* Live QA execution runbooks are **gitless**. Runbooks MUST NOT include git operations and MUST NOT gate PASS/FAIL on working-tree cleanliness. Evidence gating is based on the presence/contents of mechanically generated artifacts under `audit/qa/...`.
+
 **Routing (titles-only).**
+
+* Codespaces QA configuration, required pins/variables (names-only), Step-0 snapshot requirement, and gitless execution rails → **Glow QA Guide**
 
 * Service start commands, ports, and environment wiring for dev/QA consoles → **Glow Infrastructure**, **HDE-Mechanics Guide**
 
-* Live QA process, discovery baselines, and rails posture (for example, `SAFE_MODE`, `ALLOW_NETWORK`, `APP_ENV`) → **Epic-Process-Guide**, **Glow QA Guide**
+* Live QA process, discovery baselines, and rails posture → **Epic-Process-Guide**, **Glow QA Guide**
 
 * CLI and Reader surface bytes, request/response shapes, and admin surfaces used for Live QA → **HDE-CLI-API-Vendor-Ref**
 
-  # **4\. Boundaries & Contracts (Conceptual) \[Required−Now\]**
+# **4\. Boundaries & Contracts (Conceptual) \[Required−Now\]**
 
-  ## **4.1 Boundary guarantees (no bytes)**
-
-## 
+## **4.1 Boundary guarantees (no bytes)**
 
 * **Engine → Adapter.**
 
@@ -1021,7 +998,7 @@ HTTP QA against “Reader” or dev harness surfaces is considered misconfigured
 **Adapter → BodyGraph source (env-aware).**  
  **Prod:** request path **does not** call vendor; BodyGraph comes from **DB**; refresh is **out-of-band** (policy by title).  
  **Dev:** direct vendor allowed; on success, **upsert** to DB.  
- Adapter and CLI follow the **BodyGraph lifecycle** in §2.3 to decide when to read from DB vs call vendor and refresh; Engine remains stateless with respect to source and always consumes normalized BodyGraph inputs. Offline determinism and evidence pipelines respect the same boundary: they work with DB-backed or fixture BodyGraphs and never call vendor directly; rails/guards, evidence families, and indices live in their single homes (PF04/PF12/PF14/PF19/PF20 by title).
+ Adapter and CLI follow the **BodyGraph lifecycle** in §2.4 to decide when to read from DB vs call vendor and refresh. Engine remains stateless with respect to source and always consumes normalized BodyGraph inputs. Offline determinism and evidence pipelines respect the same boundary: they work with DB-backed or fixture BodyGraphs and never call vendor directly; rails/guards, evidence families, and indices live in their single homes (**HDE-Governance**, **HDE-Schemas & Artifacts**, **HDE-Mechanics Guide**, **Glow QA Guide**, **HDE-Phased Epics** by title).
 
 * **Internal ops signals → Ops tooling.**  
    Liveness/readiness/version are side-effect-free; no compat math, no vendor calls, no PII, no secrets.
@@ -1113,8 +1090,8 @@ These surfaces together form the **ledger-centric, deterministic, text-based evi
 
 **Discipline & hygiene (contract-free posture).**
 
-* **Same-PR parity.** Whenever proofs or governed artifacts (including bundles and manifests) change, the Human Evidence Index and the Machine Evidence Index MUST be updated **in the same PR** that carries the code/evidence change.
-
+* **Same-PR parity.** Whenever proofs or governed artifacts (including bundles and manifests) change, the Human Evidence Index and the Machine Evidence Index MUST be updated **in the same PR** that carries the code/evidence change.  
+* Human index proof freshness. The Human Evidence Index (docs/evidence/INDEX.json) and its hash sentinel (docs/evidence/INDEX.sha256) are governed artifacts. Each MUST have a co-located, governed path-proof transcript, and those transcripts MUST be refreshed whenever the index/sentinel bytes change (in the same PR). PF02 records this requirement at the architecture level; concrete proof file naming and the canonical updater/validator behavior are owned by HDE-Schemas & Artifacts and HDE-Mechanics Guide by title.  
 * **Canonical serialization.** The Machine Evidence Index is canonical JSONL: UTF-8, ASCII-sorted keys, compact separators, exactly one trailing LF, and unknown-key rejection. Bundle manifests and other governed JSON/JSONL artifacts referenced from the ledger follow the same canonical discipline (owned by HDE-Schemas & Artifacts).
 
 * **Bundle-level path proofs.** Path proofs live at the governed artifact level, which includes bundles. Each Machine Evidence Index record includes a `proof_anchor` that points to a bundle-level (or artifact-level) path-proof stored alongside the governed file; file name and location for these proofs are owned by HDE-Schemas & Artifacts.
@@ -1270,8 +1247,7 @@ Even if vendor seam modules live in the same top-level package as Engine Core, A
 
 * Rails must be explicitly open before any live HTTP is attempted.
 
-* Fail-closed behaviour on misconfiguration or closed rails (typed refusal, no network touch) is enforced at the seam; PF02 records the existence of this boundary but does not define error bytes or token semantics.  
-* 
+* Fail-closed behaviour on misconfiguration or closed rails (typed refusal, no network touch) is enforced at the seam; PF02 records the existence of this boundary but does not define error bytes or token semantics.
 
 ---
 

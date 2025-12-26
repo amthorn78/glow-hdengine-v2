@@ -3,11 +3,11 @@
 ## 0.1 Header
 
  **Title:** PF04-Canon-HDE-Governance  
- **Version:** v1.6.4  
+ **Version:** v1.7.1  
  **Status:** Canon  
-**Effective date:** 2025-12-13
+**Effective date:** 2025-12-23
 
-**Last Update Gate:** BN 8.3.4 Drain A1-5
+**Last Update Gate:** BN 8.5.3 Drain A26-29
 
 **Invocation tag:** `INV-f2ac55d77ce9aacc`
 
@@ -90,6 +90,15 @@ Each section is tagged to show implementation status:
  Evidence must live under governed repo paths (`artifacts/**`, `docs/**`, `audit/**`).  
  Transient generator paths (for example, `codex/out/**`) are not authoritative and **MUST NOT** be indexed. Mirror entries pointing to non-governed paths fail CI.
 
+**Lowercase directories (ASCII only).**  
+ All directories in the repository and application codebase **MUST** use **lowercase ASCII** names. Introducing any mixed-case or upper-case directory name is **non-conforming**. Under governed roots (`docs/**`, `artifacts/**`, `audit/**`), mixed-case directories are a **QA failure**, not cosmetic drift.
+
+**Remediation posture.**  
+ If mixed-case directories exist, treat them as legacy drift and **normalize to lowercase**. Do not copy mixed-case names forward into new work.
+
+**Evidence coupling (same-PR).**  
+ Any directory rename that affects governed artifact paths **MUST** be accompanied by the required Evidence Index and machine mirror updates (and any affected path-proofs) in the **same PR/commit** as the rename.
+
 **Determinism first.**  
  Any change that affects byte identity (serializer path, schema keys, A7 headers, `/internal/version` headers) must include updated parity and idempotence evidence.
 
@@ -118,7 +127,7 @@ This governance document defines **how the HD Engine is built, validated, and re
 
 * Governance, validation, and operations are inseparable: an Epic **closes** only when its governance and evidence gates pass.
 
-* Supersession rule: where lettered addenda conflict, the later addendum supersedes the earlier; this document integrates the latest positions from PF10 and the HDE Phased Epics map.
+* Supersession rule: where **numbered addenda** conflict, the later-numbered addendum supersedes the earlier; this document integrates the latest positions from PF10 and the HDE Phased Epics map.
 
 This document owns:
 
@@ -196,7 +205,7 @@ This document owns:
 
   * Mandates that every normative change updates the Evidence Index in the same commit.
 
-  ## **1.2 Single homes & routing \[Required−Now\]**
+## **1.2 Single homes & routing \[Required−Now\]**
 
 **Ownership (this document).**  
  Governance owns **operational and transport policy** for the HD Engine:
@@ -270,8 +279,6 @@ EPIC-011 introduced a **preservation guard** over key public and admin surfaces.
 
 ---
 
-## 
-
 ## **2.0 Acceptance Tokens (single-home roster) \[Required-Now\]**
 
 **Single home for governance tokens.** This roster centralizes token semantics; the bytes and tests live elsewhere and are referenced by title only. Other sections must reference §2.0 and must not restate token lists. Supersession: PF10 uses numbered addenda; the later number governs. All token names are case-sensitive.
@@ -304,15 +311,34 @@ Acceptance tokens are high-signal claims. They must earn existence; they are not
 
 * **TWO\_RUN\_IDENTITY\_OK** — Two serializations of the same inputs produce identical bytes. (Owned: HDE-Math-Spec; HDE-Mechanics Guide; Evidence & Artifacts)
 
-* **COMPOSITE\_ABBA\_IDENTITY\_OK** — AB↔BA fingerprint byte-equality (no vendor flags in composite). (Owned: HDE-Math-Spec; Evidence & Artifacts)
+* **COMPOSITE\_ABBA\_IDENTITY\_OK** — AB↔BA fingerprint byte-equality (no vendor flags in composite). (Owned: HDE-Math-Spec; Evidence & Artifacts) **Canonical name.** This is the only canonical acceptance token name for AB/BA composite identity. Any alternate spellings or legacy variants are non-canonical and MUST NOT appear as acceptance tokens in Epic Plans, acceptance maps, or token/evidence matrices. If an epic inherits legacy wording from a doc, the plan may include a one-line clarification (“legacy name → canonical COMPOSITE\_ABBA\_IDENTITY\_OK”), but the claimed token name remains canonical. Any proposal to introduce a new AB/BA identity token name is prohibited unless routed through ADR \+ conflict check \+ Governance Doc-Delta.
 
 * **JSON\_CANONICAL\_CHECK\_OK** — Canonical JSON everywhere: UTF-8 (no BOM), ASCII-sorted keys, compact separators, exactly one trailing LF; arrays-as-sets deduped and ASCII-sorted wherever required. (Owned: HDE-Mechanics Guide; Evidence & Artifacts)
 
 * **PREIMAGE\_RECOMPUTE\_OK** — Strip `idempotence_hash`, canonicalize the preimage (as defined in HDE-Math-Spec), recompute `sha256(preimage_bytes)`, and match the published hash; evidence includes recompute logs/scripts and mirror records under determinism pins. (Owned: HDE-Math-Spec; Evidence & Artifacts)
 
-* **DETERMINISM\_ENV\_PINS\_OK** — All **determinism-sensitive suites** (at minimum: serializer/idempotence proofs, AB↔BA identity, evidence ordering/orientation demos, and other invariance tests named in HDE-Mechanics Guide and Glow QA Guide) run under the **closed determinism env pins**  
-   `SAFE_MODE=1`, `ALLOW_NETWORK=0`, `LC_ALL=C`, `LANG=C`, `TZ=UTC`  
-   as enforced by the canonical determinism env helper and CI rails harness. The helper (`engine/runtime/determinism_env.py`) owns the pinned env map and exposes a single abstraction for checking/applying pins and rendering an env-pins log; CI wires this via job-level env in `.github/workflows/ci.yml` and a dedicated check script (for example `ci/checks/check_env_pins.sh`) that fails closed on any deviation. Evidence for this token consists of a governed **determinism env-pins log** (records-only, canonical JSON; LF-terminated) plus its path-proof and corresponding Evidence Index/mirror entries, with schemas and catalog entries owned by **HDE-Schemas & Artifacts** and QA semantics owned by **Glow QA Guide**. (Owned: Governance; HDE-Mechanics Guide; HDE-Schemas & Artifacts; Glow QA Guide; HDE-Build Checklist)
+**DETERMINISM\_ENV\_PINS\_OK** — All **determinism-sensitive suites** (at minimum: serializer/idempotence proofs, AB↔BA identity, evidence ordering/orientation demos, and other invariance tests named in HDE-Mechanics Guide and Glow QA Guide) MUST run under the **closed determinism env pins**  
+ `SAFE_MODE=1`, `ALLOW_NETWORK=0`, `LC_ALL=C`, `LANG=C`, `TZ=UTC`  
+ as enforced by the canonical determinism env helper and CI rails harness.
+
+**Canonical evidence surface (single valid binding).**  
+ `DETERMINISM_ENV_PINS_OK` MUST be satisfied only by the canonical governed log:
+
+* `audit/gates/determinism/env_pins.log`
+
+* `audit/gates/determinism/env_pins.log.path_proof.txt`
+
+`DETERMINISM_ENV_PINS_OK` MUST NOT be bound to `artifacts/proofs/env_pins.txt` (or any other similarly named env-pins artifact).
+
+**Ledger \+ indexing parity (mechanical).** When this token is claimed, all acceptance ledgers MUST reference `audit/gates/determinism/env_pins.log`, and parity MUST be correct:
+
+* token\_evidence\_matrix references `audit/gates/determinism/env_pins.log`
+
+* `docs/evidence/INDEX.json` points the determinism env pins artifact\_key to `audit/gates/determinism/env_pins.log`
+
+* `artifacts/evidence_index.jsonl` mirrors that exact discovered\_physical\_path and uses `audit/gates/determinism/env_pins.log.path_proof.txt` as proof\_anchor
+
+Any deviation is a mechanical blocker. The binding must be corrected, not interpreted.
 
 ---
 
@@ -430,12 +456,30 @@ Acceptance tokens are high-signal claims. They must earn existence; they are not
 
 * **CI\_CHECK\_FINAL\_LF\_OK** — All evidence artifacts & mirror lines are LF-terminated (exactly one). (Owned: Evidence & Artifacts; Build Notes)
 
-* **CI\_CHECK\_MIRROR\_SCHEMA\_OK** — Mirror records pass schema/role/field-order checks (unknown-key rejection). (Owned: Evidence & Artifacts; Build Notes)
+* **CI\_CHECK\_MIRROR\_SCHEMA\_OK** — Mirror records pass schema/role/field-order checks (unknown-key rejection). The canonical validator entrypoint is `ci/checks/check_mirror_schema.sh`, which is a **Python** program; operator and acceptance artifacts MUST invoke it as `python ci/checks/check_mirror_schema.sh` (or via direct exec only if the executable bit is guaranteed). Invoking it via `bash ci/checks/check_mirror_schema.sh` is non-conforming. (Owned: Evidence & Artifacts; Build Notes)
 
 * **EVIDENCE\_INDEX\_HASH\_OK** — Human index hash sentinel present and gating merges. (Owned: Governance; Evidence & Artifacts)
 
 * **SNAPSHOT\_HEADER\_LOWERCASE\_OK** — Stored header snapshots use lower-case header names; norm enforced by schema rules in HDE-Schemas and Artifacts. (Owned: HDE-Schemas and Artifacts)  
 * **SANITY\_PIPELINE\_OK** — A closed-rails sanity pipeline entrypoint (`tools/evidence/run_sanity_pipeline.py`) **must** run and succeed as a single, deterministic orchestration of core governance checks (at minimum: serializer/idempotence invariants, determinism env pins checks, CLI serializer guards, evidence ordering/orientation checks, and PF12 evidence skeleton checks) under the canonical env tuple `SAFE_MODE=1, ALLOW_NETWORK=0, LC_ALL=C, LANG=C, TZ=UTC`. The pipeline writes a governed sanity log at `artifacts/sanity/sanity.log` with a stable, canonical shape (single-line header, one `env:` line with sorted pins, one `check <name>:OK|FAIL` line per step in a fixed order, and a final `summary:PASS|FAIL` line; no timestamps or env-dependent noise) and exits non-zero on the first failure. Evidence for this token consists of: (a) the sanity log and its co-located path-proof, (b) matching entries in `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, and `artifacts/evidence_index.jsonl` keyed by a reserved `artifact_key` for the sanity pipeline, and (c) a CI job that invokes the sanity pipeline under closed rails and is merge-gating for engine releases. PF04 owns the governance semantics and token; schemas, artifact field sets, and the QA token wiring live in **HDE-Schemas & Artifacts**, **Glow QA Guide**, and **HDE-Build Checklist** (titles-only).
+
+**Clarifications (evidence integrity; BN 8.5.3 Drain A19-22).**  
+ These clarifications do not introduce new tokens. They make existing evidence tokens concrete for common drift failures.
+
+1. **Human index and hash sentinel are governed artifacts with governed path-proofs.**  
+    The following files are governed and MUST each have a co-located path-proof transcript:
+
+   * `docs/evidence/INDEX.json` and `docs/evidence/INDEX.json.path_proof.txt`
+
+   * `docs/evidence/INDEX.sha256` and `docs/evidence/INDEX.sha256.path_proof.txt`
+
+2. When either `INDEX.json` or `INDEX.sha256` changes bytes, its `*.path_proof.txt` MUST be regenerated in the same PR as the byte change. Stale or mismatched `INDEX.*.path_proof.txt` is a hard failure under the existing evidence/path-proof tokens in this section.
+
+3. **Machine mirror self-record must reflect the whole mirror file bytes.**  
+    The `index.machine_mirror` self-record must represent the current `artifacts/evidence_index.jsonl` file, and its `sha256` and `size_bytes` must match the canonical bytes of the whole mirror file (file-bytes basis, not a “row-body” basis). Its `proof_anchor` must point to a co-located path-proof for the mirror file.
+
+4. **Remediation posture for evidence drift (merge-blocking).**  
+    If any governed artifact’s `*.path_proof.txt` (including the INDEX path-proofs above) disagrees with the on-disk artifact bytes (sha256 or size), treat it as a mechanical blocker. Remediation is to regenerate evidence via the canonical evidence tooling (for example `tools/evidence/update_evidence_index.py` and its `--check` mode), not to hand-edit path proofs or machine mirror rows.
 
 ---
 
@@ -461,8 +505,9 @@ Acceptance tokens are high-signal claims. They must earn existence; they are not
 
 ### **2.0.8 CLI/SDK parity harness**
 
-* **CLI\_READER\_PARITY\_OK** — CLI `showcompat` parity with Reader public envelope is maintained: same emitter, same bytes for the same normalized inputs. (Owned: Governance; CLI/API Vendor Ref)  
-* **CLI\_NO\_ALT\_JSON\_OK** — `hdctl showcompat` emits only the canonical JSON compatibility envelope on stdout; legacy or alternative JSON shapes are disabled on this path. (Owned: Governance; CLI/API Vendor Ref)
+* **CLI\_READER\_PARITY\_OK** — When CLI produces **Reader v1 parity bytes** (the numeric-free Reader v1 success envelope), those bytes MUST be byte-identical to the Reader v1 HTTP body for the same normalized inputs and environment (single emitter; exactly one trailing LF). Reader v1 parity bytes are produced via the CLI’s `--dump-reader` sidecar (bytes and sidecar contract live in **HDE-CLI-API-Vendor-Ref**). This token does **not** assert that `showcompat` stdout equals Reader v1 bytes. (Owned: Governance; CLI/API Vendor Ref)
+
+* **CLI\_NO\_ALT\_JSON\_OK** — `hdctl showcompat` emits only the canonical JSON compatibility envelope on stdout; legacy or alternative JSON shapes are disabled on this path. The compatibility envelope is an admin/test surface and may include numeric scores/weights. (Owned: Governance; CLI/API Vendor Ref)
 
 * **CLI\_SHOWCOMPAT\_CANON\_OK** — `hdctl showcompat` uses the same canonical emitter as Reader/aux for compatibility outputs; no ad-hoc serializers are permitted on this path. (Owned: Governance; CLI/API Vendor Ref)
 
@@ -568,7 +613,7 @@ These tokens apply whenever SAFE rails are opened for vendor calls in any enviro
 * **BAND\_MAX\_INCLUSIVE\_OK** — Bands use inclusive-high thresholds. (Owned: HDE Math Spec)  
 * **BAND\_EDGE\_GOLDENS\_OK** — Goldens at 24/49/74/100 pass. (Owned: HDE Math Spec; Evidence & Artifacts)  
 * **PREFS\_KEYSET\_10\_OK** — Preference keyset is the canonical 10\. (Owned: HDE Math Spec; Governance)  
-* **RESONANCE\_PUBLIC\_POSTURE\_OK** — Reader v1 and CLI **public** surfaces obey the **numeric-free, narrative-free public covenant**: success payloads expose exactly six top-level keys (`reader_version, eligible, categories, meta, release_id, idempotence_hash`); `categories[*]` items are exactly `{ "id", "band" }` with `band ∈ {"Cool","Open","Warm","Glow"}`; no SR/XR or other numerics appear in public bodies; typed error envelopes are numeric-free (except optional `retry_after_ms` under governed vendor-rate-limit policy); and no prompts or narratives are emitted on **public** Reader/CLI surfaces. This token does **not** govern admin-only surfaces such as the admin bundle; those surfaces may include numeric scores and narrative text but must remain non-public and are covered by the admin-surface tokens in §2.0.17 and the logging/security rules in §7–§8. (Owned: Governance; HDE-Math-Spec; HDE-Schemas & Artifacts; Glow QA Guide)  
+* **RESONANCE\_PUBLIC\_POSTURE\_OK** — Reader v1 and CLI **public** surfaces obey the **numeric-free, narrative-free public covenant**: success payloads expose exactly six top-level keys (`reader_version, eligible, categories, meta, release_id, idempotence_hash`); `categories[*]` items are exactly `{ "id", "band" }` with `band ∈ {"Cool","Open","Warm","Glow"}`; no SR/XR or other numerics appear in public bodies; typed error envelopes are numeric-free (except optional `retry_after_ms` under governed vendor-rate-limit policy); and no prompts or narratives are emitted on **public** Reader/CLI surfaces. This token covers CLI output only when the CLI is emitting the **Reader v1 success envelope** (for example, via `--dump-reader` sidecars). This token does **not** govern `hdctl showcompat` stdout (the compatibility payload), which may include numeric scores/weights. This token also does **not** govern admin-only surfaces such as the admin bundle; those surfaces may include numeric scores and narrative text but must remain non-public and are covered by the admin-surface tokens in §2.0.17 and the logging/security rules in §7–§8. (Owned: Governance; HDE-Math-Spec; HDE-Schemas & Artifacts; Glow QA Guide)  
 * **MAGIC10\_DOMAIN\_CLOSED\_OK** — The public category `id` domain is the **closed Magic-10 set with pinned order**: public `categories[*].id` values are drawn only from the canonical Magic-10 identifiers; no extras or omissions are allowed, and internal math (including viewer prefs and presets) uses the same closed id domain. Evidence includes schema and validation tests that enforce the Magic-10 keyset, plus fixtures demonstrating that unknown ids fail closed. (Owned: HDE-Math-Spec; Governance; Glow QA Guide; Evidence & Artifacts)
 
 ---
@@ -686,6 +731,13 @@ These tokens apply whenever SAFE rails are opened for vendor calls in any enviro
 
 These tokens govern **QA tooling bootstrap**, **QA\_ROOT harness discipline**, and **acceptance-map / QA-plan viability** for epics. They are QA Acceptance Tokens in the sense of §2.0.18: PF04 owns their names and governance semantics; **Glow QA Guide** owns the QA library entries and detailed harness procedures; **HDE-Build Checklist** and **HDE-Phased Epics** consume them in phase tasks and epic records.
 
+**Canonical QA\_ROOT naming (normative).**  
+ Within §2.0.19, `<epic-id>` refers to the canonical epic QA root slug `hde-epic<NNN>`, where `<NNN>` is the zero-padded 3-digit epic number. Epic QA root directories MUST be lower-case and MUST use this canonical pattern:
+
+* `audit/qa/hde-epic<NNN>/`
+
+Plans and implementations MUST NOT introduce parallel alternate spellings for the same epic (examples of disallowed alternates include: `EPIC022`, `EPIC_022`, `audit/QA/...`, `audit/qa/HDE-EPIC022/...`). If legacy artifacts exist under non-canonical names, they are treated as deprecated; do not create new ones under the deprecated pattern.
+
 * **QA\_LIVE\_QA\_RUN\_OK** — An epic cannot close until it has executed at least one **Live QA run** via the canonical QA harness and checked the resulting evidence into the repo under QA\_ROOT.
 
    **Scope.**
@@ -696,24 +748,23 @@ These tokens govern **QA tooling bootstrap**, **QA\_ROOT harness discipline**, a
 
   * The epic must have a Live QA plan in **Glow QA Guide** (titles-only) that specifies:
 
-    * the harness invocation (including the epic identifier and a run identifier),
-
-    * closed-rails posture (env pins),
-
-    * expected evidence under `audit/qa/<epic-id>/...` (QA\_ROOT).
+    * the harness invocation (including the epic identifier and a run identifier),  
+    * closed-rails posture (env pins),  
+    * expected evidence under `audit/qa/<epic-id>/...` (QA\_ROOT).  
+    * for Live QA runs executed in GitHub Codespaces: a **mechanical Step-0 “Codespaces snapshot” step** that writes a run-relevant environment snapshot under QA\_ROOT (tool versions, rails variables, and presence/absence of required secrets; **never secret values**). This snapshot is evidence (command-generated), not prose. The exact snapshot schema and the canonical variable-name list are owned by **Glow QA Guide** (titles-only); if the snapshot is treated as a governed evidence family, its schema and indexing expectations are owned by **HDE-Schemas & Artifacts** (titles-only).
 
   * The Live QA run must be executed via the harness in an environment consistent with the Live QA plan (for example, GitHub Codespaces attached to the canonical repo; exact operator posture is owned by **Glow QA Guide**).
 
-  * Live QA evidence must be checked in under QA\_ROOT as governed artifacts and must be linkable via the token/evidence matrix rules in §9.7.2.
+  * Live QA evidence must be checked in under QA\_ROOT as governed artifacts and must be linkable via the token/evidence matrix rules in §9.7.2,  
+* **Workflow placement (Close Gate).** The detailed Live QA plan/runbook is a Close Gate work product governed by **Glow QA Guide**. It MUST NOT be treated as an Epic Plan or implementation-plan prerequisite. Epic Plans may include only a single “Live QA required for close” statement (titles-only) and must not embed Live QA runbooks.
 
 * **Acceptance.**
 
   * `QA_LIVE_QA_RUN_OK` is satisfied only when:
 
-    * at least one run directory exists under `audit/qa/<epic-id>/<run-id>/` containing the expected QA\_ROOT outputs described by the Live QA plan (for example, per-run logs and any required run manifests and viability updates as owned by Glow QA Guide and Mechanics), and
-
-    * the plan’s step-level Deliverables lists (see §9.8) cover the Live QA run outputs with fully-qualified paths, and
-
+    * at least one run directory exists under `audit/qa/<epic-id>/<run-id>/` containing the expected QA\_ROOT outputs described by the Live QA plan (for example, per-run logs and any required run manifests and viability updates as owned by Glow QA Guide and Mechanics), and  
+    * for Live QA runs executed in GitHub Codespaces, the run directory includes the Step-0 “Codespaces snapshot” deliverable described by the Live QA plan, and  
+    * the plan’s step-level Deliverables lists (see §9.8) cover the Live QA run outputs with fully-qualified paths, and  
     * the epic’s token/evidence matrix row for this token enumerates the CI jobs/tests, QA steps, QA\_ROOT artifacts, and Evidence Index/mirror entries that prove the token under closed rails.
 
 * Ownership: Governance (closeout gate semantics); **Glow QA Guide** (Live QA plan format and harness usage); **HDE-Mechanics Guide** (QA harness and QA\_ROOT mechanics); **HDE-Build Checklist** (phase tasks); **HDE-Schemas & Artifacts** (evidence families and indexing); **HDE-Phased Epics** (epic record requirement).
@@ -901,23 +952,31 @@ These tokens govern **QA tooling bootstrap**, **QA\_ROOT harness discipline**, a
 
 ---
 
-## **2.2 A4 — Reader↔CLI parity \[Required-Now\]**
+## **2.2 A4 — Reader↔CLI parity \[Required−Now\]**
 
-* **Single presenter/emitter.** Reader and CLI MUST call the same emitter to produce success and error bodies; no ad-hoc dumps or parallel “mini-emitters.”  
-* **Byte equality.** For identical inputs/environment, CLI stdout and Reader body MUST be byte-identical (including the single LF).  
-* **Canonical JSON.** Public bytes are serialized with the canonical serializer (PF-Schemas & Artifacts §4): UTF-8 (no BOM), sorted keys (ASCII), compact, exactly one trailing LF; arrays used as sets are deduped and ASCII-sorted. All checks run under `LC_ALL=C`.  
-* **Public resonance posture (v1).** No SR/XR numerics appear on Reader 200\. v1 ships SR-only (alpha \= 1.0); hysteresis \= 1 is armed for future XR and not exposed.
+* **Scope.** A4 parity applies to the **Reader v1 public success envelope** (`200`) and **typed error envelopes**. The CLI participates in this gate only when it is emitting **Reader v1 bytes** (for example via `--dump-reader` sidecars; byte/sidecar contract lives by title in **HDE-CLI-API-Vendor-Ref**). This gate does **not** compare `hdctl showcompat` stdout (compatibility payload) to Reader v1 bytes.
+
+* **Single presenter/emitter.** Reader and CLI MUST call the same emitter to produce Reader v1 success and typed error bodies; no ad-hoc dumps or parallel “mini-emitters.”
+
+* **Byte equality.** For identical inputs/environment, the Reader HTTP body MUST be byte-identical to the CLI-emitted Reader v1 body bytes (including the single LF). For this gate, “CLI-emitted Reader v1 body bytes” means the exact bytes captured via the CLI `--dump-reader` output (not `showcompat` stdout).
+
+* **Canonical JSON.** Public bytes are serialized with the canonical serializer (PF-Schemas & Artifacts §4): UTF-8 (no BOM), sorted keys (ASCII), compact, exactly one trailing LF; arrays used as sets are deduped and ASCII-sorted. All checks run under `LC_ALL=C`.
+
+* **Public resonance posture (v1).** No SR/XR numerics appear on Reader `200`. v1 ships SR-only (alpha \= 1.0); hysteresis \= 1 is armed for future XR and not exposed.
 
 **Schema/shape gates**
 
-1. Success: exactly the six keys (`reader_version`, `eligible`, `categories`, `meta`, `release_id`, `idempotence_hash`); `categories[*]` are exactly `{ "id", "band" }` (numeric-free; `band ∈ {"Cool","Open","Warm","Glow"}`).  
-2. Errors: typed, numeric-free JSON; LF-terminated; no PII.
+1. **Success:** exactly the six keys (`reader_version`, `eligible`, `categories`, `meta`, `release_id`, `idempotence_hash`); `categories[*]` are exactly `{ "id", "band" }` (numeric-free; `band ∈ {"Cool","Open","Warm","Glow"}`).
+
+2. **Errors:** typed, numeric-free JSON; LF-terminated; no PII.
 
 **Validation gates (binary)**
 
-1. Reader↔CLI compare: byte-compare outputs (must match).  
-2. Shape checks: enforce success/error schemas above (reject extras, numerics, or missing fields).  
-3. Emitter proof: CI/allowlist shows both surfaces invoke the same emitter symbol.
+1. **Reader↔CLI compare:** byte-compare the Reader HTTP body against the CLI-emitted Reader v1 body bytes (captured via `--dump-reader`). Compare both success bodies and typed error bodies where the CLI emits Reader v1 bytes. All comparisons MUST include the single trailing LF.
+
+2. **Shape checks:** enforce success/error schemas above (reject extras, numerics, or missing fields).
+
+3. **Emitter proof:** CI/allowlist shows both surfaces invoke the same emitter symbol.
 
 *Tokens: see §2.0 Acceptance Tokens (A-gates roster).*
 
@@ -988,7 +1047,7 @@ SAFE rails for **vendor HTTP** are **default closed** in all environments. Openi
 
   ---
 
-  ## **3.2 Refusal semantics (rails closed) \[Required-Now\]**
+## **3.2 Refusal semantics (rails closed) \[Required-Now\]**
 
 When rails are closed (i.e., `SAFE_MODE≠0` or `ALLOW_NETWORK≠1`), vendor paths **MUST NOT** open sockets, resolve DNS, or attempt HTTP (no external I/O). This applies to **all** vendor invocations, including manual or CLI requests that explicitly set `source="vendor"`; such attempts **MUST** produce a deterministic typed refusal and **MUST NOT** perform any upstream call.
 
@@ -1042,8 +1101,6 @@ Routing (titles-only).
  Transport matrix & writers posture: §10 of this document.  
  Evidence/mirror hygiene (same-PR, canonical JSONL, unknown-key reject, `proof_anchor`): **HDE-Schemas & Artifacts** / **Epic-Process-Guide**.  
  Infrastructure names for admin credentials/rails: **Glow Infrastructure** (names-only).
-
-* 
 
 ---
 
@@ -1112,67 +1169,64 @@ What must be proved for every cut (**binary gates; no partial**). Index all arti
 **Closed rails (default).**  
  SAFE rails for vendor HTTP are **closed by default** in all environments. When rails are closed (`SAFE_MODE≠0` or `ALLOW_NETWORK≠1`):
 
-* Vendor paths **MUST NOT** open sockets, resolve DNS, or attempt HTTP (no external I/O).
-
-* All attempts to call vendor, including explicit `source="vendor"` flows, **MUST** return a deterministic, numeric-free refusal body and **MUST NOT** perform upstream calls.
-
-* Refusal responses **MUST** use `Cache-Control: no-store`, `Content-Type: application/json; charset=utf-8`, and include **no** `ETag`, `Vary`, or `Content-Encoding`; the body is LF-terminated, numeric-free JSON.
-
+* Vendor paths **MUST NOT** open sockets, resolve DNS, or attempt HTTP (no external I/O).  
+* All attempts to call vendor, including explicit `source="vendor"` flows, **MUST** return a deterministic, numeric-free refusal body and **MUST NOT** perform upstream calls.  
+* Refusal responses **MUST** use `Cache-Control: no-store`, `Content-Type: application/json; charset=utf-8`, and include **no** `ETag`, `Vary`, or `Content-Encoding`; the body is LF-terminated, numeric-free JSON.  
 * Logs for refusal paths are **keys-only**, secret-free, and bounded (`route`, `outcome`, `rails_state`, etc.), with secrets redacted. (Tokens: `NO_EXTERNAL_IO_ON_REFUSAL_OK`, `VENDOR_NO_PAYLOAD_LOGGING_OK`, `LOGS_KEYS_ONLY_OK`, `BG_PRIVACY_REDACTION_OK`)
 
 **Open rails (controlled).**  
  Opening rails (`SAFE_MODE=0` and `ALLOW_NETWORK=1`) is an **explicit, governed action**:
 
-* Network policy (timeouts, retries, backoff, 429 behavior) is pinned by Governance and **must** remain deterministic and keys-only in logs.
-
-* Live vendor calls **must not** change Reader↔CLI parity, A7 conformance, or idempotence proofs.
-
+* Network policy (timeouts, retries, backoff, 429 behavior) is pinned by Governance and **must** remain deterministic and keys-only in logs.  
+* Live vendor calls **must not** change Reader↔CLI parity, A7 conformance, or idempotence proofs.  
 * Evidence includes a governed **open-rails conformance** run (vendor success, retry, 429 paths) captured as records-only artifacts and indexed in the Evidence Index and machine mirror under the tokens listed in §2.0 (for example, `VENDOR_RETRY_BACKOFF_OK`, `PROVIDER_429_TYPED_OK`, `RETRY_AFTER_PARSE_OK`, `VENDOR_NO_PAYLOAD_LOGGING_OK`).
 
-**Dev/admin APP\_ENV gating (dev/test/local only) NEWCANONNEW CANONNEWCANON.**
+**Dev/admin APP\_ENV gating (dev/test/local only) NEW CANON.**
 
 Dev/admin-only surfaces that exercise engine internals under controlled rails (for example, CLI dev harnesses, internal/dev HTTP sampler routes, and similar tools called out in **HDE-CLI-API-Vendor-Ref** and **HDE-Mechanics Guide**) **MUST** enforce strict `APP_ENV` gating:
 
-* Allowed `APP_ENV` values for these dev/admin surfaces are exactly `{"dev","test","local"}`.
-
-* If `APP_ENV` is **missing**, **empty**, or any other value (including `"prod"` or any unrecognized string):
-
-  * The surface **MUST** treat this as a **rails violation**,
-
-  * **MUST** fail closed with a typed, numeric-free error (for CLI) or a writer-style refusal envelope (for HTTP),
-
-  * **MUST NOT** assume a default (for example, treating missing/empty as `"dev"`), and
-
+* Allowed `APP_ENV` values for these dev/admin surfaces are exactly `{"dev","test","local"}`.  
+* If `APP_ENV` is **missing**, **empty**, or any other value (including `"prod"` or any unrecognized string):  
+  * The surface **MUST** treat this as a **rails violation**,  
+  * **MUST** fail closed with a typed, numeric-free error (for CLI) or a writer-style refusal envelope (for HTTP),  
+  * **MUST NOT** assume a default (for example, treating missing/empty as `"dev"`), and  
   * **MUST NOT** perform sampler/core/vendor work on that invocation.
 
 * Gating behavior is part of the rails contract: tests and QA harnesses (named by title in Glow QA Guide and HDE-Build Checklist) **MUST** prove that dev/admin-only surfaces cannot be invoked successfully when `APP_ENV` is missing, empty, or outside the allowed set.
 
 This `APP_ENV` gating is a precondition for treating any dev/admin-only surface as “on-rails”; it couples to `ENV_RAILS_POLICY_OK` in §2.0.10 and applies regardless of whether vendor rails are open or closed.
 
-**Determinism env pins harness (EPIC018 D2).**
+**Determinism env pins harness (EPIC018 D2)**
 
-For **determinism-sensitive suites** (serializer identity, AB↔BA, evidence ordering/orientation, and other invariance tests named in **HDE-Mechanics Guide** and **Glow QA Guide**), rails policy is further constrained:
+For determinism-sensitive suites (serializer identity, AB↔BA, evidence ordering/orientation, and other invariance tests named in HDE-Mechanics Guide and Glow QA Guide), rails policy is further constrained.
 
-* **Canonical determinism env pins.** Determinism suites **MUST** run under the closed-rails env tuple  
-   `SAFE_MODE=1`, `ALLOW_NETWORK=0`, `LC_ALL=C`, `LANG=C`, `TZ=UTC`,  
-   with these pins treated as **mandatory** for any job that produces or verifies governed determinism evidence (including `engine/order` identity proofs and topology orientation demos). This tuple extends the EPIC017 default for CLI/evidence/ordering/registry jobs called out in §2.0.10.
+Canonical determinism env pins. Determinism suites MUST run under the closed-rails env tuple:
 
-* **Canonical implementation (helper \+ CI).** The env pins are implemented by a single helper module (`engine/runtime/determinism_env.py`) that defines the pinned env map and exposes a typed API for checking/applying pins and rendering an env-pins log. CI wires this helper into determinism suites via job-level env in `.github/workflows/ci.yml` and a dedicated env-check script (for example `ci/checks/check_env_pins.sh`) that fails closed when pins are missing, mismatched, or unset. Mechanics and tests for this helper live in **HDE-Mechanics Guide** and the repo’s invariance test suite; PF04 owns only the policy and token semantics.
+* SAFE\_MODE=1  
+* ALLOW\_NETWORK=0  
+* LC\_ALL=C  
+* LANG=C  
+* TZ=UTC
 
-* **Evidence surfaces (titles-only).** Determinism env pins produce a governed **env-pins evidence artifact family**, consisting of:
+These pins are mandatory for any job that produces or verifies governed determinism evidence (including engine/order identity proofs and topology orientation demos). This tuple extends the EPIC017 default for CLI/evidence/ordering/registry jobs called out in §2.0.10.
 
-  * a single-line, canonical JSON env-pins log (records the env map and determinism suite set), and
+Canonical implementation (helper \+ CI). The env pins are implemented by a single helper module (`engine/runtime/determinism_env.py`) that defines the pinned env map and exposes a typed API for checking/applying pins and rendering an env-pins log. CI wires this helper into determinism suites via job-level env in `.github/workflows/ci.yml` and a dedicated env-check script (for example `ci/checks/check_env_pins.sh`) that fails closed when pins are missing, mismatched, or unset. Mechanics and tests for this helper live in HDE-Mechanics Guide and the repo’s invariance test suite; PF04 owns only the policy and token semantics.
 
-  * a co-located path-proof plus human Index/mirror entries keyed by an `artifact_key` reserved for determinism env rails.
+Evidence surfaces (single canonical surface). Determinism env pins produce a governed env-pins evidence artifact family. The only valid evidence surface for DETERMINISM\_ENV\_PINS\_OK is:
 
-* The schema, artifact path, and Index/mirror mapping for this family live in **HDE-Schemas & Artifacts** and **Glow QA Guide**; PF04 references them by title only and treats them as the normative evidence surfaces for determinism env rails.
+* `audit/gates/determinism/env_pins.log` (records-only; canonical JSON; LF-terminated; records the env map and determinism suite set), and  
+* `audit/gates/determinism/env_pins.log.path_proof.txt` (proof\_anchor path-proof).
 
-**Tokens and coupling.**
+Other env pins snapshots may exist for other proof contexts. They do not satisfy DETERMINISM\_ENV\_PINS\_OK unless they are the canonical governed log surface above. Any binding to another path (for example, `artifacts/proofs/env_pins.txt`) is a mechanical blocker.
 
-* `ENV_RAILS_POLICY_OK` and `ENV_LC_ALL_C_OK` (see §2.0.10) together assert that the closed-rails tuple is enforced for determinism suites and that dev/admin APP\_ENV gating is in place for the relevant surfaces.
+The evidence catalog entry (artifact\_key), schema, and Index/mirror mapping are owned by HDE-Schemas & Artifacts. PF04 pins the allowed binding and requires ledgers and indexes to reference it exactly (see §9.7.9).
 
-* Determinism env-pins artifacts and their mirror records couple to `DETERMINISM_ENV_PINS_OK` in §2.0.1, which remains the single determinism-env token for A-gates.  
-* 
+The schema, artifact path, and Index/mirror mapping for this family live in HDE-Schemas & Artifacts and Glow QA Guide; PF04 references them by title only and treats them as the normative evidence surfaces for determinism env rails.
+
+Tokens and coupling.
+
+* ENV\_RAILS\_POLICY\_OK and ENV\_LC\_ALL\_C\_OK (see §2.0.10) together assert that the closed-rails tuple is enforced for determinism suites and that dev/admin APP\_ENV gating is in place for the relevant surfaces.  
+* Determinism env-pins artifacts and their mirror records couple to DETERMINISM\_ENV\_PINS\_OK in §2.0.1, which remains the single determinism-env token for A-gates.
 
 ### **4.1.5 Bands — inclusive-high thresholds (by preset)**
 
@@ -2214,6 +2268,8 @@ For each in-scope token row, the matrix MUST include, at minimum:
 
 * Evidence Index and Machine Mirror entries (artifact\_key, epic\_id, tokens, proof\_anchor), as required by the evidence schema.
 
+**Binding posture (proof anchors; acceptance artifacts).** In the token/evidence matrix and acceptance maps, tokens MUST bind to the **primary governed artifacts** and the **validator runs/tests** that produce or verify them. Tokens MUST NOT bind directly to `*.path_proof.txt` files as primary evidence surfaces. Path proofs are still required and merge-gating, but they are referenced via the machine mirror record’s `proof_anchor` for the bound artifact and are validated by the evidence index/mirror checks.
+
 If any required cell is missing at Stage B, the epic is not token-complete and MUST NOT be closed as accepted.
 
 ### **9.7.3 Token naming and single-name usage**
@@ -2280,7 +2336,8 @@ If any such approval or remediation guide defines a token name and semantics for
 
 For Stage A (ASK OK) plan approval on any plan that touches QA Acceptance Tokens, reviewers MUST verify:
 
-* **Plans are pointers.** The plan is an execution index. Reviewers MUST accept titles-only references to canonical docs and MUST NOT demand that the plan restate token libraries, evidence schemas, or QA playbooks.
+* **Plans are pointers.** The plan is an execution index. Reviewers MUST accept titles-only references to canonical docs and MUST NOT demand that the plan restate token libraries, evidence schemas, or QA playbooks.  
+* **PF14 is not governance.** Token names, token semantics, and acceptance bindings MUST NOT be sourced from **HDE-Mechanics Guide**. If any document implies a token set, token alias, or acceptance requirement not registered in §2.0, treat it as a routing bug: resolve via ADR selection of an existing registered token, or defer the token. Do not mint plan-local token names.
 
 * **Token scope is explicit.** Any token mentioned by name in the plan MUST be classified as one of:
 
@@ -2294,11 +2351,116 @@ For Stage A (ASK OK) plan approval on any plan that touches QA Acceptance Tokens
 
 * **No matrix-in-plan requirement.** Plan approval MUST NOT be blocked on the absence of a token/evidence matrix at planning time, and the matrix MUST NOT be embedded inside the plan. If a matrix is expected, the plan may include a placeholder pointer line indicating where it will be authored during implementation/QA/closeout.
 
-* **QA planning is post-implementation.** Epic Plans MUST NOT include detailed QA phases/step-by-step execution beyond basic acceptance statements. Detailed QA steps (and their Deliverables) are authored after implementation under the QA rails.
+* **QA planning is post-implementation.** Epic Plans MUST NOT include detailed QA phases or step-by-step QA execution beyond basic acceptance statements. Detailed QA steps (and their Deliverables) are authored after implementation under the QA rails. **Live QA runbooks are Close Gate work products**: an Epic Plan MUST only state that Live QA is required for eventual epic close (titles-only), and reviewers MUST NOT block Epic Plan approval for lacking a detailed Live QA runbook.
 
 * **Token value and budget discipline.** Default: 0 new acceptance tokens. Target: ≤3 new in-scope tokens per epic, and only if necessary. Any request to exceed this MUST be justified via ADR and must satisfy the token admission rubric in §2.0.0.
 
 Stage B token fidelity (matrix completeness, evidence indexing, and registry drainage) is enforced before claiming token-complete / epic-level acceptance, per §9.7.2–§9.7.4.
+
+### **9.7.8 Evidence bundle cross-check for local-bundle deliverables**
+
+When a deliverable claims a **local bundle** of governed artifacts under a specific directory (example: `artifacts/ops/internal_version/*`), the Epic Plan **MUST** explicitly state:
+
+* the complete required bundle paths (titles-only, full paths, no byte restatement), sourced from the canonical bundle definition, and
+
+* any shared/global governed artifacts required for acceptance (example: determinism env pins), including their canonical paths, when they do not live under the local bundle root.
+
+**No implicit dependencies.** If any required evidence lives outside the deliverable’s local bundle directory, the plan MUST name that evidence explicitly and give its canonical path.
+
+**Titles-only references allowed, but completeness remains required.** If the plan references a canonical bundle definition section by title instead of listing all paths, it MUST still list:
+
+* any overrides, exclusions, or additions, and
+
+* any shared/global evidence required outside the local bundle root.
+
+**Consistency requirement.** The token\_evidence\_matrix, Evidence Index, machine mirror, and path-proofs MUST reflect the same canonical paths for any evidence referenced by acceptance.
+
+### **9.7.9 Canonical evidence-path binding validation (acceptance integrity)**
+
+Every acceptance token to artifact binding that appears in an Epic Plan and in a token\_evidence\_matrix **MUST** be validated against the canonical evidence catalog (titles-only; owned by **HDE-Schemas & Artifacts**) before approval or merge.
+
+* If the evidence catalog defines a fixed canonical path for a token’s evidence surface, the plan and matrix MUST bind to that exact path.
+
+* Any binding to a non-canonical path is a **mechanical blocker** and MUST be corrected before approval. If a non-canonical path is truly required, it MUST be routed as an explicit ADR and drained into the correct canonical home.
+
+**Minimum consistency set (all must agree when a token is claimed):**
+
+* Epic Plan required evidence list (per deliverable)
+
+* token\_evidence\_matrix row for the token
+
+* `docs/evidence/INDEX.json` entry for the bound artifact
+
+* `artifacts/evidence_index.jsonl` mirror record for the same `artifact_key` and `discovered_physical_path`
+
+* the corresponding path-proof file referenced by the mirror record (`proof_anchor`)
+
+**Enforcement posture.** A human review checklist line MUST exist and be treated as pass/fail. An automated validator MAY be added, but the rule does not depend on automation.
+
+### **9.7.10 Token roster validation (preflight) and no midflight additions**
+
+**Token roster validation (hard preflight gate).**  
+ Before a plan can be submitted for approval (and again before it can be approved), every token name listed in:
+
+* the plan’s acceptance roster (Stage A), and
+
+* the token/evidence matrix (Stage B, when present), and
+
+* any epic record token list that the plan is claiming against (titles-only),
+
+MUST be validated against the canonical token roster in §2.0. Token name validation is case- and spelling-exact. Aliases and near-matches are not permitted.
+
+**Mechanical blocker.**  
+ If any token in the plan’s acceptance roster or matrix is not present in the canonical roster, that token is mechanically invalid for acceptance. The plan MUST be corrected. Reviewers must not “interpret” the intent.
+
+**No midflight token additions (revise/resubmit discipline).**  
+ During an Epic planning revise/resubmit loop, the plan MUST NOT introduce new **acceptance tokens** (in-scope gating tokens) unless:
+
+1. explicitly requested by Lead review, or
+
+2. required due to a clearly identified canon gap.
+
+Default posture when a behavior must be enforced but no token exists: state it as a **non-token mechanical requirement** under the deliverable and prove it via tests/evidence, rather than tokenizing it.
+
+**If a new token is genuinely required, it must be routed, not invented.**  
+ A plan may propose a new token only when all of the following are true:
+
+* An ADR is present in the plan’s ADR list stating: token name, one-sentence semantics, intended evidence surface(s), and drain targets.
+
+* A conflict check is performed against existing canonical tokens (no duplicates, synonyms, or near matches).
+
+* The token is registered via Doc-Delta in §2.0 before it can be required as an acceptance claim (i.e., before it can appear as an in-scope gating token). Until then, it must be treated as deferred or as a request, not as a claimed acceptance token.
+
+### **9.7.11 Acceptance artifact hygiene (no placeholders; no duplicate rows)**
+
+This subsection governs the **acceptance artifacts** themselves (acceptance maps and token/evidence matrices), independent of whether the Epic Plan embeds them (it must not; see §9.7.2).
+
+**No placeholders once evidence exists (Stage B).**  
+ When a token is **in-scope (gating)** for an epic (Stage B readiness), the acceptance artifacts MUST NOT contain placeholder evidence references. Treat any of the following as placeholders and therefore non-conforming for in-scope tokens:
+
+* `"TBD"`, `"pending"`, `"PR1 scaffold"`, `"{}"` (or empty object markers)
+
+* template variables such as `{scenario}` or any other pattern that is not a concrete path or artifact key
+
+* implicit “it exists somewhere” references without explicit paths
+
+For in-scope tokens, evidence lists MUST contain only **concrete, repo-relative paths** (and, where applicable, the canonical `artifact_key` bindings governed by HDE-Schemas & Artifacts).
+
+**Uniqueness (single-authoritative rows).**  
+ Each acceptance token name MUST appear **at most once** in:
+
+* the token/evidence matrix for the epic, and
+
+* the acceptance map for the epic.
+
+Duplicate rows for the same token are a mechanical blocker because they create ambiguity about which row governs closeout.
+
+**CI-safe guard posture (allowed).**  
+ It is permitted (and recommended) to enforce these rules with CI-safe scaffold tests that assert:
+
+* token names are unique in each acceptance artifact, and
+
+* in-scope tokens have no placeholders and point only to concrete artifacts that exist on disk.
 
 ## **9.8 QA plans — step-level Deliverables (no screen-only acceptance) \[Required−Now\]**
 
@@ -2333,11 +2495,18 @@ Requirements (binary):
    * simple, checkable conditions on their contents (for example: grep/diff predicates),  
       not terminal output or “what you see in the console.”
 
-5. **Steps that create no new files.** If a step genuinely creates no new files, the Deliverables subsection **MUST** say so explicitly and must name the exact existing files it inspects.
+5. **Steps that create no new files.** If a step genuinely creates no new files, the Deliverables subsection **MUST** say so explicitly and must name the exact existing files it inspects.  
+6. **Mechanical evidence only (no manual fill).** Any deliverable treated as QA evidence MUST be produced by commands (harness/scripts/tools), not hand-edited in an editor. Templates that require humans to fill fields such as “(fill PASS/FAIL)” are non-conforming for approved QA plans. If a QA plan requires a summary or RCA artifact, it MUST be generated mechanically from machine-readable inputs (for example: exit codes, step logs, existence checks), not written by hand as acceptance evidence.
+
+7\. **Live QA is gitless (no working-tree gating).** Live QA runbooks MUST NOT include git operations (including `git status` gating, checkout/branch creation, add/commit/push, or PR creation). Live QA PASS/FAIL MUST NOT be determined by working-tree cleanliness. If git information is captured at all, it is traceability-only and cannot block execution. PASS/FAIL is determined by the mechanically generated Deliverables under `audit/qa/<epic-id>/...` and by the behavior outputs the run is meant to prove. Known Codespaces packaging artifacts (for example, `glow_hdengine.egg-info/PKG-INFO` and the containing `glow_hdengine.egg-info/` directory) MUST be treated as non-blocking and MUST NOT be deleted, restored, or used as a QA gating signal.
+
+8. **Codespaces Step-0 snapshot (required for Codespaces runs).** Any Live QA plan executed in GitHub Codespaces MUST include a Step-0 “Codespaces snapshot” step that writes a machine-generated environment snapshot under `audit/qa/<epic-id>/<run-id>/...` (tool versions, rails variables, and presence/absence of required secrets; never secret values). The snapshot deliverable MUST be listed in the Step-0 Deliverables and is used for later auditability and drift prevention.
 
 ### **9.8.3 Review gate (blocking)**
 
 If a plan includes QA steps but omits step-level Deliverables, it is **non-conforming**; reviewers MUST NOT mark such a plan **ASK OK**.
+
+Plans are also **non-conforming** (blockers) if they include any git operations or if they use working-tree cleanliness as a PASS/FAIL criterion for Live QA. For Live QA plans executed in GitHub Codespaces, omission of the Step-0 “Codespaces snapshot” deliverable required by §9.8.2 is also a blocker for approval.
 
 This rail is orthogonal to token fidelity (§9.7): a plan may have a complete token/evidence matrix artifact and still be non-conforming if step-level Deliverables are missing.
 
@@ -2561,19 +2730,23 @@ Names-only; token semantics live in this document, bytes and tests live elsewher
 
 Evidence for `/internal/version` is records-only and titles-only at this level; bytes and schemas live in **HDE-Schemas and Artifacts** and **Glow QA Guide**.
 
-Evidence artifacts (names-only):
+**No extra governed narrative artifacts.** The governed `/internal/version` evidence surface is exactly the canonical bundle enumerated below plus its required indexing and path proofs. Do not introduce additional governed narrative artifacts for this surface (for example, a `provenance_note.md`) unless a Doc-Delta explicitly registers the new evidence surface and the evidence catalog defines it.
 
-* `intver/headers_get` — raw `GET /internal/version` response headers (proves `Cache-Control: no-store`, absence of `ETag`/`Last-Modified`, correct `Content-Type`).
+Evidence artifacts (canonical paths; records-only):
 
-* `intver/headers_head` — raw `HEAD /internal/version` response headers (200, `Content-Length == identity GET body`, `Content-Type == GET`).
+* `artifacts/ops/internal_version/body_get.json` — exact `GET` body bytes (LF-terminated; six keys; fixed identity-field order).
 
-* `intver/body_get` — exact `GET` body bytes (LF-terminated; six keys; fixed identity-field order) plus a sha256 record.
+* `artifacts/ops/internal_version/body_get.sha256` — SHA-256 sidecar for the exact `body_get.json` bytes.
 
-* `intver/cond_if_none_match` — `GET` with `If-None-Match` (still 200).
+* `artifacts/ops/internal_version/headers_get.txt` — raw `GET /internal/version` response headers (proves `Cache-Control: no-store`, absence of `ETag`/`Last-Modified`, correct `Content-Type`).
 
-* `intver/cond_if_modified_since` — `GET` with `If-Modified-Since` (still 200).
+* `artifacts/ops/internal_version/headers_head.txt` — raw `HEAD /internal/version` response headers (200, `Content-Length == identity GET body`, `Content-Type == GET`).
 
-* `intver/two_run_identity` — two-run byte identity log for the body.
+* `artifacts/ops/internal_version/cond_if_none_match_headers.txt` — `GET` with `If-None-Match` (still 200; conditionals ignored).
+
+* `artifacts/ops/internal_version/cond_if_modified_since_headers.txt` — `GET` with `If-Modified-Since` (still 200; conditionals ignored).
+
+* `artifacts/ops/internal_version/two_run_identity.log` — two-run byte identity log for the body, including the coupling verification result described in this section.
 
 Indexing requirements:
 
@@ -2605,6 +2778,24 @@ Indexing requirements:
 
 * Evidence artifacts and their indexing rules live in **HDE-Schemas and Artifacts** and **Glow QA Guide** (names-only at this level).
 
+#### **Coupling proof (two-run identity \+ identity coupling) \[Required−Now\]**
+
+For any epic that claims `/internal/version` identity coupling and/or two-run identity closure, the governed proof artifact is a single log:
+
+* `artifacts/ops/internal_version/two_run_identity.log`
+
+* `artifacts/ops/internal_version/two_run_identity.log.path_proof.txt`
+
+This log MUST include, at minimum:
+
+* **Two-run identity result:** an explicit statement that two consecutive invocations produce byte-identical identity output (or not), including the compared digests/byte identifiers.
+
+* **Coupling verification result:** explicit pass/fail checks that the `/internal/version` identity is coupled to the required identity sources by title/path reference, including release identity coupling where applicable.
+
+* **Rails posture \+ determinism pins reference:** names-only pointers to the applicable rails posture and determinism pins evidence surfaces (the determinism pins themselves remain proven by their canonical log).
+
+No new acceptance tokens are introduced for “coupling proof.” This evidence is bound under the existing internal-version acceptance posture. Acceptance artifacts MUST bind coupling claims to this log (and other required governed identity artifacts) rather than inventing new token names or alternate proof artifacts.
+
 ---
 
 #### **Prod QA note**
@@ -2621,9 +2812,9 @@ In production, `/internal/version`:
 
 * Ensures `HEAD` 200 mirrors GET validators and may carry `Content-Length == len(identity GET body)` with an empty body.
 
-  # **11\. Vendor Ingest Governance (HDAPI) \[Required-Now\] / \[Speculative\]**
+# **11\. Vendor Ingest Governance (HDAPI) \[Required-Now\] / \[Speculative\]**
 
-  ## **11.1 Request shaping (owned here) \[Required-Now\]**
+## **11.1 Request shaping (owned here) \[Required-Now\]**
 
 **Scope (normative).** This section pins the bytes used to construct HDAPI requests and to remap provider outcomes into typed, numeric-free errors. Rails posture (open/closed) is governed in §3; live-call behavior (timeouts/retries/backoff) is in §11.2.
 
@@ -2783,6 +2974,7 @@ Any change to selected timeouts/retries/backoff/429 settings, observability labe
 
 * **Success body:** six keys exactly (`reader_version`, `eligible`, `categories`, `meta`, `release_id`, `idempotence_hash`); `categories[*] == {id, band}` only (numeric-free).  
 * **Errors:** typed, numeric-free JSON; canonical emission; one LF; no PII.  
+* **Error parity scenarios (deterministic acceptance).** Any new or expanded error parity scenario used for acceptance (including DB-unavailable and closed-rails vendor-attempt cases) MUST be reproducible under determinism pins and closed rails, without reliance on external network or a live database. Preferred posture: exercise the real codepath using a deterministic failure trigger (controlled injection or harness-level deterministic failure), producing stable envelopes and stable stored artifacts. Allowed fallback: a deterministic stub only to the extent required to produce the canonical error envelope (no live I/O). The acceptance proof MUST consist of stored parity artifacts for both sides of the parity claim (Reader/HTTP and CLI) with a stable scenario identifier, and Evidence Index \+ machine mirror MUST be updated in the same PR as any new parity artifacts.  
 * **Reader↔CLI parity:** bytes equal for identical inputs/environment (same emitter).  
 * **A7 hooks present:**  
   * 200 has strong, quoted `ETag`; **Cache-Control: private, max-age=0, must-revalidate**; **Vary: Authorization, Accept-Encoding**.  
@@ -2829,7 +3021,7 @@ Any change to selected timeouts/retries/backoff/429 settings, observability labe
    `tests/transport/headers/cond_304.snap`,  
    `tests/transport/headers/head_parity.snap`,  
    `tests/transport/headers/no_store_writers_errors.snap`  
-* For internal-ops transport evidence of `/internal/version`, see **Appendix D: D.8** (titles only).
+* For internal-ops transport evidence of `/internal/version`, see **Appendix D: D.6** (titles only).
 
 ### **GATE:CORE-MATCH — Compat math posture**
 
@@ -2841,8 +3033,6 @@ Any change to selected timeouts/retries/backoff/429 settings, observability labe
 **Maintenance rule.** Whenever a golden, snapshot, or script path changes, **Appendix D: Evidence Index** **MUST** be updated in the same commit/PR, and add a one-line entry to **§9 Change Management: Doc-Delta Hooks**.
 
 ---
-
-* 
 
 # **13\. Versioning & Compatibility \[Required-Now\]**
 
@@ -2919,9 +3109,9 @@ These changes still require a **Doc-Delta** and updated evidence; if they alter 
 * **No Reader version bump** is required for preset changes that keep the v1 public covenant intact (they still yield a new `release_id`).  
 * **Reader version bump (v2+)** is required **only** if preset behavior would change the **public** contract (e.g., exposing additional public categories or public numerics). Such proposals must define the new version and land via Doc-Delta with full evidence (see §13.1).
 
-  # **14\. Retired Features \[Normative Notice\]**
+# **14\. Retired Features \[Normative Notice\]**
 
-  ## **14.1 Prompt \[Required-Now\]**
+## **14.1 Prompt \[Required-Now\]**
 
 * **Status:** Removed from the public contract.  
 * **Scope of removal:** The `prompt` field is **disallowed** in all public payloads and **must not** be preserved or injected by the Presenter. Any prior optional `categories[*].prompt` schema property is **deleted**; public items remain exactly `{id, band}`.  
@@ -2929,7 +3119,7 @@ These changes still require a **Doc-Delta** and updated evidence; if they alter 
 * **Rationale (one line):** Reader v1 is numeric-free and narrative-free; `prompt` risks drift without advancing the math contract.  
 * **Effective date:** **2025-10-19**; first removed in the **Math & Technical Spec** (review) and retained through subsequent cuts (titles-only reference).
 
-  ## **14.2 Uncertainty \[Required-Now\]**
+## **14.2 Uncertainty \[Required-Now\]**
 
 * **Status:** Never shipped; any references are **excised** from this governance and related specs.  
 * **Scope:** No uncertainty fields, tokens, or narratives are defined or permitted on public or admin surfaces.  
@@ -3198,8 +3388,9 @@ Titles/paths only — no payload bytes. This runbook defines how to run the benc
 
 ### **D.0 Close-pack & release manifests (admin)**
 
-* `audit/EPIC-009_close_report.md`  
-* `audit/EPIC-009_MANIFEST.json`
+* `audit/EPIC-<NNN>_close_report.md`  
+* `audit/EPIC-<NNN>_MANIFEST.json`  
+   `(Where <NNN> is the zero-padded 3-digit epic number, e.g., 009, 022.)`
 
 ---
 
@@ -3279,7 +3470,17 @@ Titles/paths only — no payload bytes. This runbook defines how to run the benc
 
 ### **D.6 Internal-ops surface: `/internal/version`**
 
-* GET/HEAD headers/body capture — `artifacts/proofs/internal_version/get_head.json` *(or equivalent titles-only proof; ops-only, `no-store`, no `ETag`; conditionals ignored — **never 304**; HEAD mirrors GET with no body and equal identity length).*
+* GET body capture — `artifacts/ops/internal_version/body_get.json` and `artifacts/ops/internal_version/body_get.sha256`
+
+* GET headers capture — `artifacts/ops/internal_version/headers_get.txt`
+
+* HEAD headers capture — `artifacts/ops/internal_version/headers_head.txt`
+
+* Conditional header captures (conditionals ignored; still 200\) — `artifacts/ops/internal_version/cond_if_none_match_headers.txt` and `artifacts/ops/internal_version/cond_if_modified_since_headers.txt`
+
+* Coupling \+ two-run identity proof log (single governed surface) — `artifacts/ops/internal_version/two_run_identity.log` and `artifacts/ops/internal_version/two_run_identity.log.path_proof.txt`
+
+* Path proofs — each artifact above MUST have a co-located `*.path_proof.txt` file referenced by the machine mirror’s `proof_anchor`.
 
 ---
 
@@ -3332,7 +3533,8 @@ Env snapshot — `artifacts/runtime/env_matrix.snapshot.json` (singleton; one fi
 
 * Orientation demo: `audit/gates/topology/orientation_demo.txt` (before/after high–low → min→max NN-NN; arrays-as-sets deduped and ASCII-sorted)  
 * Integration degree check: `audit/gates/topology/degree_check.log` (verifies 10/20/34/57 ⇒ degree 3; all other gates ⇒ degree 1\)  
-* Center-pair multiplicity: `audit/gates/topology/multiplicity_vector.log` (unordered center-pair counts sum to 36\)
+* Center-pair multiplicity: `audit/gates/topology/multiplicity_vector.log` (unordered center-pair counts sum to 36\)  
+* **Coupling rule (merge-blocking).** If any governed evidence changes that require updates to `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, or `artifacts/evidence_index.jsonl`, the topology orientation demo artifact MUST be refreshed and remain coherent in the same PR. CI is expected to fail with an ORIENTATION\_DRIFT-class error if Index/Mirror changes without a matching orientation demo refresh.
 
 ---
 
