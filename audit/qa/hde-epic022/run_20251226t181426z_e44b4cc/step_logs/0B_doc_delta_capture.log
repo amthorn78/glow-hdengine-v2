@@ -1,0 +1,30 @@
+check_id: 0B
+status: PASS
+started_at_utc: 2025-12-26T18:41:55Z
+ended_at_utc: 2025-12-26T18:41:55Z
+rails: SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC PYTHONHASHSEED=0
+pf_refs: PF10 — HDE-Build Notes, §2.3; PF10 — HDE-Build Notes, §2.7
+tokens: DOC_DELTA_PRESENT_OK
+command: set -euo pipefail
+    OUT="audit/qa/hde-epic022/run_20251226t181426z_e44b4cc/00_meta/doc_deltas.md"
+    {
+      echo "# Doc Delta Capture — HDE-EPIC022"
+      echo
+      echo "run_id: run_20251226t181426z_e44b4cc"
+      echo "captured_at_utc: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+      echo
+      echo "## Known items (from plan review; must be reconciled)"
+      echo
+      echo "- Token registry drift posture applies (PF10 — HDE-Build Notes, §2.7). Step 0D records concrete PF04 validation results."
+      echo "- /internal/version conditional headers filename conflict exists across canon homes; see ADR-001 in this resubmission."
+      echo "- showcompat checksum sidecar normalization for EPIC022 applies (PF10 — HDE-Build Notes, §2.5)."
+      echo
+      echo "## No other deltas captured at this step."
+    } > "${OUT}"
+  
+stdout_sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+stderr_sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+exit_code: 0
+--- stdout ---
+
+--- stderr ---

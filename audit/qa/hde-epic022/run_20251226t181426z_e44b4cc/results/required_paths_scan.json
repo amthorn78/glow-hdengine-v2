@@ -1,0 +1,83 @@
+{
+  "captured_at_utc": "2025-12-26T20:43:36Z",
+  "missing_count": 3,
+  "missing_paths": [
+    "tools/qa/emit_env_pins.sh",
+    "tests/ops/test_machine_mirror_record.py",
+    "tests/ops/test_mirror_schema.py"
+  ],
+  "paths": [
+    {
+      "exists": true,
+      "path": "docs/acceptance_map_epic022.json"
+    },
+    {
+      "exists": true,
+      "path": "audit/qa/hde-epic022/token_evidence_matrix.md"
+    },
+    {
+      "exists": true,
+      "path": "tools/evidence/update_evidence_index.py"
+    },
+    {
+      "exists": true,
+      "path": "tools/evidence/run_sanity_pipeline.py"
+    },
+    {
+      "exists": false,
+      "path": "tools/qa/emit_env_pins.sh"
+    },
+    {
+      "exists": true,
+      "path": "tools/cli/generate_showcompat_artifacts.py"
+    },
+    {
+      "exists": true,
+      "path": "tests/cli/test_errors_parity.py"
+    },
+    {
+      "exists": true,
+      "path": "tests/cli/test_cli_canonical_bytes.py"
+    },
+    {
+      "exists": true,
+      "path": "tests/cli/test_cli_usage_and_errors.py"
+    },
+    {
+      "exists": true,
+      "path": "tests/ops/test_evidence_index.py"
+    },
+    {
+      "exists": false,
+      "path": "tests/ops/test_machine_mirror_record.py"
+    },
+    {
+      "exists": false,
+      "path": "tests/ops/test_mirror_schema.py"
+    },
+    {
+      "exists": true,
+      "path": "ci/checks/check_mirror_schema.sh"
+    },
+    {
+      "exists": true,
+      "path": "artifacts/math/freeze_pack_manifest.json"
+    },
+    {
+      "exists": true,
+      "path": "artifacts/math/release_id.txt"
+    },
+    {
+      "exists": true,
+      "path": "artifacts/math/release_id_recompute.log"
+    },
+    {
+      "exists": true,
+      "path": "artifacts/identity/service_identity.json"
+    },
+    {
+      "exists": true,
+      "path": "artifacts/identity/emitter_sha256.txt"
+    }
+  ]
+}

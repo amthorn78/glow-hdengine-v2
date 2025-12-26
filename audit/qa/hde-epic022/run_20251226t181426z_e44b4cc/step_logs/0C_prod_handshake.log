@@ -1,0 +1,30 @@
+check_id: 0C
+status: PASS
+started_at_utc: 2025-12-26T19:11:10Z
+ended_at_utc: 2025-12-26T19:11:10Z
+rails: SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=prod LC_ALL=C LANG=C TZ=UTC PYTHONHASHSEED=0
+pf_refs: PF19 — Glow QA Guide, §2.3
+tokens:
+command: set -euo pipefail
+    mkdir -p "audit/qa/hde-epic022/run_20251226t181426z_e44b4cc/results"
+    curl -sS -o /dev/null -D "audit/qa/hde-epic022/run_20251226t181426z_e44b4cc/results/prod_handshake.headers" \
+      --connect-timeout 5 --max-time 15 --retry 0 \
+      "https://glow-backend-v4-production.up.railway.app/internal/version" || true
+    python - <<PY
+import json, pathlib, time
+p = pathlib.Path("audit/qa/hde-epic022/run_20251226t181426z_e44b4cc/results") / "prod_handshake.json"
+hdr = pathlib.Path("audit/qa/hde-epic022/run_20251226t181426z_e44b4cc/results") / "prod_handshake.headers"
+p.write_text(json.dumps({
+  "captured_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+  "target": "HDE_BASE_URL/internal/version",
+  "headers_file": str(hdr),
+  "note": "Connectivity probe only; contract validated in D3.1"
+}, indent=2, sort_keys=True) + "\n")
+PY
+  
+stdout_sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+stderr_sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+exit_code: 0
+--- stdout ---
+
+--- stderr ---

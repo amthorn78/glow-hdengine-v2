@@ -1,0 +1,14 @@
+check_id: 0D
+status: TOOLING_BLOCKED
+started_at_utc: 2025-12-26T19:52:27Z
+ended_at_utc: 2025-12-26T19:52:27Z
+rails: SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC PYTHONHASHSEED=0
+pf_refs: PF04 — HDE-Governance, §2.0; PF10 — HDE-Build Notes, §2.7
+tokens:
+command: python 'audit/qa/hde-epic022/run_20251226t181426z_e44b4cc/tools/token_roster_validate_pf04.py' --roster 'audit/qa/hde-epic022/run_20251226t181426z_e44b4cc/results/token_roster_pf20.txt' --out-json 'audit/qa/hde-epic022/run_20251226t181426z_e44b4cc/results/token_registry_validation.json' --out-summary-md 'audit/qa/hde-epic022/run_20251226t181426z_e44b4cc/results/token_registry_validation.summary.md'
+stdout_sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+stderr_sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+exit_code: 2
+--- stdout ---
+
+--- stderr ---

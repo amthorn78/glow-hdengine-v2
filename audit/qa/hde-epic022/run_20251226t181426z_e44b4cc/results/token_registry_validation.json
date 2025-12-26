@@ -1,0 +1,114 @@
+{
+  "captured_at_utc": "2025-12-26T19:52:27Z",
+  "pf04_validation_model": "EPIC022 plan-time PF04 presence check; absent tokens treated as UNREGISTERED_ACCEPTANCE_TOKEN per PF10 \u00a72.7",
+  "results": [
+    {
+      "pf04_registered": true,
+      "token": "TESTS_PASS_OK"
+    },
+    {
+      "pf04_registered": true,
+      "token": "DOC_DELTA_PRESENT_OK"
+    },
+    {
+      "pf04_registered": true,
+      "token": "EVIDENCE_INDEX_UPDATED_OK"
+    },
+    {
+      "pf04_registered": true,
+      "token": "EVIDENCE_INDEX_HASH_OK"
+    },
+    {
+      "pf04_registered": true,
+      "token": "EVIDENCE_INDEX_MIRROR_OK"
+    },
+    {
+      "pf04_registered": true,
+      "token": "EVIDENCE_PATHS_VALIDATED_OK"
+    },
+    {
+      "pf04_registered": true,
+      "token": "MACHINE_MIRROR_UPDATED_OK"
+    },
+    {
+      "pf04_registered": false,
+      "token": "QA_PRECOMMIT_CHECKLIST_OK"
+    },
+    {
+      "pf04_registered": false,
+      "token": "QA_POSTCOMMIT_CHECKLIST_OK"
+    },
+    {
+      "pf04_registered": true,
+      "token": "ENV_RAILS_POLICY_OK"
+    },
+    {
+      "pf04_registered": true,
+      "token": "DETERMINISM_ENV_PINS_OK"
+    },
+    {
+      "pf04_registered": true,
+      "token": "SANITY_PIPELINE_OK"
+    },
+    {
+      "pf04_registered": false,
+      "token": "CLOSE_PACK_FILES_PRESENT_OK"
+    },
+    {
+      "pf04_registered": false,
+      "token": "ERROR_JSON_CANON_OK"
+    },
+    {
+      "pf04_registered": false,
+      "token": "ERROR_TOKEN_MAP_OK"
+    },
+    {
+      "pf04_registered": true,
+      "token": "CLI_READER_PARITY_OK"
+    },
+    {
+      "pf04_registered": true,
+      "token": "TWO_RUN_IDENTITY_OK"
+    },
+    {
+      "pf04_registered": true,
+      "token": "CLI_STDOUT_LF_OK"
+    },
+    {
+      "pf04_registered": true,
+      "token": "INTERNAL_VERSION_200_CTYPE_JSON_UTF8_OK"
+    },
+    {
+      "pf04_registered": true,
+      "token": "INTERNAL_VERSION_HEAD_PARITY_OK"
+    },
+    {
+      "pf04_registered": true,
+      "token": "INTERNAL_VERSION_CONDITIONALS_IGNORED_OK"
+    },
+    {
+      "pf04_registered": true,
+      "token": "INTERNAL_VERSION_NO_ETAG_OK"
+    },
+    {
+      "pf04_registered": true,
+      "token": "INTERNAL_VERSION_NO_STORE_OK"
+    },
+    {
+      "pf04_registered": true,
+      "token": "RELEASE_ID_RECOMPUTE_OK"
+    },
+    {
+      "pf04_registered": true,
+      "token": "RELEASE_ID_FROM_MANIFEST_OK"
+    }
+  ],
+  "source_roster": "audit/qa/hde-epic022/run_20251226t181426z_e44b4cc/results/token_roster_pf20.txt",
+  "unregistered_tokens": [
+    "QA_PRECOMMIT_CHECKLIST_OK",
+    "QA_POSTCOMMIT_CHECKLIST_OK",
+    "CLOSE_PACK_FILES_PRESENT_OK",
+    "ERROR_JSON_CANON_OK",
+    "ERROR_TOKEN_MAP_OK"
+  ]
+}

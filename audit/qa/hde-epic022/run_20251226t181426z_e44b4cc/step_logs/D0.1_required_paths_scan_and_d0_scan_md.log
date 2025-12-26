@@ -1,0 +1,14 @@
+check_id: D0.1
+status: FAIL_BEHAVIOR
+started_at_utc: 2025-12-26T20:43:36Z
+ended_at_utc: 2025-12-26T20:43:36Z
+rails: SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC PYTHONHASHSEED=0
+pf_refs: PF20 — HDE-Phased Epics, §2.7.5.A2
+tokens:
+command: bash 'audit/qa/hde-epic022/run_20251226t181426z_e44b4cc/tools/run_d0_1.sh'
+stdout_sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+stderr_sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+exit_code: 10
+--- stdout ---
+
+--- stderr ---

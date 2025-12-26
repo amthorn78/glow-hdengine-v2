@@ -1,0 +1,26 @@
+{
+  "captured_at_utc": "2025-12-26T18:16:15Z",
+  "epic_id": "hde-epic022",
+  "prod_target_selector_names_only": {
+    "HDE_BASE_URL_is_set": false,
+    "HDE_BASE_URL_name": "HDE_BASE_URL"
+  },
+  "qa_manifest_path": "audit/qa/hde-epic022/qa_step_logs_manifest.json",
+  "rails_and_pins_names_only": {
+    "ALLOW_NETWORK": "0",
+    "APP_ENV": "dev",
+    "LANG": "C",
+    "LC_ALL": "C",
+    "SAFE_MODE": "1",
+    "TZ": "UTC"
+  },
+  "run_id": "run_20251226t181426z_e44b4cc",
+  "secrets_presence_only": {
+    "INTERNAL_VERSION_AUTH_HEADER": false
+  },
+  "tool_versions": {
+    "git": "git version 2.52.0",
+    "jq": "jq-1.7",
+    "python": "Python 3.11.14"
+  }
+}
