@@ -102,6 +102,40 @@ def _write_env_pins(env_pins_path: Path) -> None:
     _write_text(env_pins_path, "\n".join(lines) + "\n")
 
 
+def _collect_artifact_problems(
+    *,
+    canonical_bytes: bytes,
+    manifest_obj: Manifest | None,
+    freeze_path: Path,
+    release_id_path: Path,
+    expected_release_id: str,
+) -> tuple[list[str], str | None, str | None]:
+    freeze_bytes = freeze_path.read_bytes() if freeze_path.exists() else None
+    freeze_digest = hashlib.sha256(freeze_bytes).hexdigest() if freeze_bytes is not None else None
+
+    release_id_value = None
+    problems: list[str] = []
+
+    if freeze_bytes is None:
+        problems.append("freeze_pack_manifest_missing")
+    elif freeze_bytes != canonical_bytes:
+        problems.append("freeze_pack_manifest_not_equal")
+
+    if release_id_path.exists():
+        release_id_value = release_id_path.read_text(encoding="utf-8").strip()
+        if not _hex64(release_id_value):
+            problems.append("release_id_txt_invalid")
+        elif release_id_value != expected_release_id:
+            problems.append("release_id_mismatch")
+    else:
+        problems.append("release_id_txt_missing")
+
+    if manifest_obj is None:
+        problems.append("manifest_unvalidated")
+
+    return problems, freeze_digest, release_id_value
+
+
 def recompute(
     *,
     manifest_path: Path | str = Path("catalog/manifest.json"),
@@ -134,27 +168,15 @@ def recompute(
     else:
         expected_release_id = hashlib.sha256(canonical_bytes).hexdigest()
 
-    freeze_bytes = freeze_path.read_bytes() if freeze_path.exists() else None
-    freeze_digest = hashlib.sha256(freeze_bytes).hexdigest() if freeze_bytes is not None else None
+    artifact_problems, freeze_digest, release_id_value = _collect_artifact_problems(
+        canonical_bytes=canonical_bytes,
+        manifest_obj=manifest_obj,
+        freeze_path=freeze_path,
+        release_id_path=release_id_path,
+        expected_release_id=expected_release_id,
+    )
+    problems.extend(artifact_problems)
     manifest_digest = hashlib.sha256(canonical_bytes).hexdigest()
-
-    if freeze_bytes is None:
-        problems.append("freeze_pack_manifest_missing")
-    elif freeze_bytes != canonical_bytes:
-        problems.append("freeze_pack_manifest_not_equal")
-
-    release_id_value = None
-    if release_id_path.exists():
-        release_id_value = release_id_path.read_text(encoding="utf-8").strip()
-        if not _hex64(release_id_value):
-            problems.append("release_id_txt_invalid")
-        elif release_id_value != expected_release_id:
-            problems.append("release_id_mismatch")
-    else:
-        problems.append("release_id_txt_missing")
-
-    if manifest_obj is None:
-        problems.append("manifest_unvalidated")
 
     if not check:
         _write_bytes(freeze_path, canonical_bytes)
@@ -181,6 +203,18 @@ def recompute(
         if schema_report_path:
             schema_payload = {"ok": not parse_problems, "issues": parse_problems}
             _write_text(schema_report_path, json.dumps(schema_payload, separators=(",", ":"), ensure_ascii=False) + "\n")
+
+        manifest_obj, _, canonical_bytes, parse_problems = _compute_manifest_bytes(manifest_path)
+        expected_release_id = hashlib.sha256(canonical_bytes).hexdigest()
+        artifact_problems, freeze_digest, release_id_value = _collect_artifact_problems(
+            canonical_bytes=canonical_bytes,
+            manifest_obj=manifest_obj,
+            freeze_path=freeze_path,
+            release_id_path=release_id_path,
+            expected_release_id=expected_release_id,
+        )
+        problems = parse_problems + artifact_problems
+        manifest_digest = hashlib.sha256(canonical_bytes).hexdigest()
 
     log_lines = [
         "release_id_recompute",
