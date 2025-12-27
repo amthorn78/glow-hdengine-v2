@@ -13,6 +13,14 @@ The Glow HD Engine is a deterministic Human Design engine and CLI that emits gov
   - D3: `/internal/version` identity bundle (body, headers, conditional headers, two-run identity, release-id recompute) is indexed with path proofs and the governed coupling log.
   - Acceptance scaffolding now anchors EPIC022 token matrix and acceptance map bindings to concrete evidence and tests (close-pack artifacts — manifest + close report + acceptance map + token matrix — are present and finalized).
 
+### Release identity (EPIC022 Remediation 1)
+
+- Freeze-Pack source of truth is the checked-in `catalog/manifest.json` (single contract; no alternates). Top-level keys are exactly `root`, `version`, `built_at_utc`, `files`; the manifest must not list itself.
+- Canonical bytes rule: UTF-8, ASCII-sorted keys (recursively), compact separators, and exactly one trailing `\n`. `release_id = sha256(canonical_bytes(catalog/manifest.json))` (lowercase hex).
+- Evidence copy: `artifacts/math/freeze_pack_manifest.json` is a byte-identical copy of `catalog/manifest.json` (no schema translation or subsets); `manifest_snapshot.json` and similar summaries are evidence-only and are not identity inputs. Alternate manifest-like artifacts must use different names/paths.
+- Governed evidence set (must exist and be non-empty): `artifacts/math/release_id.txt`, `artifacts/math/release_id_recompute.log`, `artifacts/math/checksums_audit.log`, `artifacts/math/manifest_snapshot.json`, and `artifacts/proofs/env_pins.txt`.
+- Canonical validation entrypoints: `python scripts/release_id_recompute.py --check` (fail-closed recompute), `python ci/checks/check_release_identity.sh` (identity gate; Python entrypoint), and the closed-rails sanity pipeline (`python tools/evidence/run_sanity_pipeline.py`) that wires the gate alongside other deterministic checks. The recompute/gate `--check` path writes the recompute log/sha sidecar; run in a clean workspace or discard local changes.
+
 ## Quickstart (closed rails default)
 
 Closed rails are required for CLI and evidence runs: `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC`.
@@ -34,6 +42,7 @@ SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC hdctl aux-preview --pair-file
 
 - Dev Reader helper (`scripts/dev_start_reader.sh`) remains available for dev/test/local harnessing; APP_ENV gating applies.
 - Use the determinism helper (`engine.runtime.determinism_env.ensure_determinism_env`) or `ci/checks/check_env_pins.sh` to confirm pins.
+- Release identity validation (closed rails): `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python scripts/release_id_recompute.py --check` (canonical bytes + fail-closed recompute), `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python ci/checks/check_release_identity.sh` (identity gate; Python entrypoint in CI), and `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/run_sanity_pipeline.py` (runs the gate plus deterministic suites). Evidence outputs: `artifacts/math/release_id.txt` (release_id), `artifacts/math/release_id_recompute.log` (recompute trace), `artifacts/math/checksums_audit.log` (manifest file audit), `artifacts/math/manifest_snapshot.json` (evidence-only summary), and `artifacts/proofs/env_pins.txt` (rails proof). `--check` writes the recompute log/sha sidecar; keep a clean workspace for governed artifacts.
 
 ## CLI usage (verified)
 

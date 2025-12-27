@@ -1,7 +1,7 @@
 # AGENTS.md — Glow HD Engine (agent rules)
 
 ## Scope and hierarchy
-- This file governs all agents in the repo; PF-Canon remains the source of truth (see `docs/pfcanon/`, titles such as PF05 — CLI/API/Vendor Ref, PF10 — Provenance & Coupling (precedence where PF10 speaks), PF12 — Schemas & Artifacts, PF14 — Mechanics Guide, PF19 — QA Guide, PF20 — Phased Epics). Where this file and PF-Canon diverge, PF-Canon wins, with PF10 precedence applying wherever PF10 speaks.
+- This file governs all agents in the repo; PF-Canon remains the source of truth (see `docs/pfcanon/`, titles such as PF05 — CLI/API/Vendor Ref, PF10 — HDE-Build Notes (precedence where PF10 speaks), PF12 — Schemas & Artifacts, PF14 — Mechanics Guide, PF19 — QA Guide, PF20 — Phased Epics). Where this file and PF-Canon diverge, PF-Canon wins, with PF10 precedence applying wherever PF10 speaks.
 - Governed evidence (INDEX/mirror/path proofs/orientation/manifest/close report/config acceptance map) must be produced only by the canonical tools. **Never hand-edit governed artifacts.**
 
 ## Agent roster (repo-facing)
@@ -20,6 +20,12 @@
   - Refresh Index/Mirror pairs (`docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl`) and confirm `.path_proof.txt` siblings exist for every governed artifact. Run `update_evidence_index.py` (write) before `orientation_demo.py` (write), then their `--check` variants, and finish with the mirror schema check. Mirror path proofs include `mirror_body_sha256` for the self-record; do not hand-edit or drop the self-record row.
   - Verify acceptance bindings: EPIC018 manifest/close report under `audit/`; EPIC019/EPIC020/EPIC021/EPIC022 acceptance maps under `docs/`; token matrices under `audit/qa/hde-epic021/` and `audit/qa/hde-epic022/`.
 - **No manual edits** to evidence indexes, path proofs, manifests, close reports, acceptance maps, or orientation artifacts.
+
+## Release identity (EPIC022 Remediation 1; PF10 precedence where it speaks)
+- Single Freeze-Pack SoT: checked-in `catalog/manifest.json` with top-level keys exactly `{root,version,built_at_utc,files}` (no self-listing). Canonical bytes rule applies (UTF-8, ASCII-sorted keys, compact separators, one trailing `\n`); `release_id = sha256(canonical_bytes(catalog/manifest.json))`.
+- Evidence-copy semantics: `artifacts/math/freeze_pack_manifest.json` must be byte-identical to `catalog/manifest.json`; `manifest_snapshot.json` and other summaries are evidence-only and not identity inputs. No alternate artifacts may reuse `artifacts/math/freeze_pack_manifest.json`.
+- Governed evidence set (must exist, non-empty): `artifacts/math/release_id.txt`, `artifacts/math/release_id_recompute.log`, `artifacts/math/checksums_audit.log`, `artifacts/math/manifest_snapshot.json`, `artifacts/proofs/env_pins.txt`. Do not hand-edit these artifacts or their path proofs.
+- Closed-rails validation commands (Python entrypoints in CI): `python scripts/release_id_recompute.py --check` (fail-closed recompute), `python ci/checks/check_release_identity.sh` (identity gate), and `python tools/evidence/run_sanity_pipeline.py` (runs the gate alongside other deterministic checks). `--check` writes the recompute log and sha sidecar; run in a clean workspace or discard local changes if invoking locally.
 
 ## EPIC022 lessons (anti-drift)
 - Deterministic scenarios first: parity/error envelopes and showcompat captures must run under pinned rails (no “environment roulette”) with stdout/stderr separation proven by tests and governed artifacts.
