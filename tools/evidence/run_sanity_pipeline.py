@@ -49,6 +49,7 @@ def default_steps() -> List[SanityStep]:
         SanityStep("pytest tests/cli/test_showcompat_parity_and_identity.py", ["python", "-m", "pytest", "tests/cli/test_showcompat_parity_and_identity.py"]),
         SanityStep("pytest tests/invariance/test_bytes_identity.py", ["python", "-m", "pytest", "tests/invariance/test_bytes_identity.py"]),
         SanityStep("ci/checks/check_env_pins.sh", ["ci/checks/check_env_pins.sh"]),
+        SanityStep("python ci/checks/check_release_identity.sh", ["python", "ci/checks/check_release_identity.sh"]),
         SanityStep("python tools/evidence/generate_sampler_evidence.py", ["python", "tools/evidence/generate_sampler_evidence.py"]),
         SanityStep("python tools/evidence/generate_engine_core_evidence.py", ["python", "tools/evidence/generate_engine_core_evidence.py"]),
         SanityStep("pytest tests/invariance/test_locale_tz.py", ["python", "-m", "pytest", "tests/invariance/test_locale_tz.py"]),
