@@ -73,6 +73,14 @@ def test_recompute_rewrites_and_succeeds_after_fix(tmp_path, monkeypatch):
     assert exit_code_write == 0
     assert freeze_path.read_bytes() == canonical_bytes
     assert release_id_path.read_text(encoding="utf-8").strip() == expected_release_id
+    for required_path in (
+        manifest_snapshot_path,
+        checksums_path,
+        env_pins_path,
+        log_path,
+    ):
+        assert required_path.is_file()
+        assert required_path.stat().st_size > 0
 
     # A follow-up --check run should now be clean.
     exit_code_clean_check = recompute(
