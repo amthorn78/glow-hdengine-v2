@@ -5,6 +5,8 @@ from pathlib import Path
 
 import pytest
 
+from engine.serializer import canon
+
 os.environ.setdefault("DATABASE_URL", "postgresql://example")
 os.environ.setdefault("SAFE_MODE", "1")
 os.environ.setdefault("ALLOW_NETWORK", "0")
@@ -131,7 +133,13 @@ def test_internal_version_invariants_and_artifacts():
     service_identity = json.loads(Path("artifacts/identity/service_identity.json").read_text(encoding="utf-8"))
     invocation = json.loads(Path("artifacts/invocation.json").read_text(encoding="utf-8")).get("invocation", {})
     release_id_file = Path("artifacts/math/release_id.txt").read_text(encoding="utf-8").strip()
-    freeze_manifest = json.loads(Path("artifacts/math/freeze_pack_manifest.json").read_text(encoding="utf-8"))
+    manifest_bytes = Path("catalog/manifest.json").read_bytes()
+    manifest_obj = json.loads(manifest_bytes.decode("utf-8"))
+    canonical_manifest_bytes = canon.sercanon(manifest_obj, sort_keys=True)
+    expected_release_id = hashlib.sha256(canonical_manifest_bytes).hexdigest()
+    freeze_manifest_path = Path("artifacts/math/freeze_pack_manifest.json")
+    freeze_manifest = json.loads(freeze_manifest_path.read_text(encoding="utf-8"))
+    assert freeze_manifest_path.read_bytes() == canonical_manifest_bytes
     emitter_sha256 = Path("artifacts/identity/emitter_sha256.txt").read_text(encoding="utf-8").strip()
 
     assert payload1["engine_tag"] == service_identity.get("engine_tag")
@@ -139,7 +147,7 @@ def test_internal_version_invariants_and_artifacts():
     assert payload1["invocation_tag"] == invocation.get("tag")
     assert payload1["invocation_sha256"] == invocation.get("sha256")
     assert payload1["emitter_sha256"] == emitter_sha256
-    assert payload1["release_id"] == release_id_file == service_identity.get("release_id") == freeze_manifest.get("release_id")
+    assert payload1["release_id"] == release_id_file == service_identity.get("release_id") == expected_release_id
 
     computed_invocation_hash = hashlib.sha256(invocation.get("tag", "").encode("utf-8")).hexdigest()
     assert computed_invocation_hash == payload1["invocation_sha256"]
@@ -182,5 +190,5 @@ def test_internal_version_invariants_and_artifacts():
             "emitter_sha256": ("artifacts/identity/emitter_sha256.txt", emitter_sha256),
             "release_id": ("artifacts/math/release_id.txt", release_id_file),
         },
-        release_id_manifest=("artifacts/math/freeze_pack_manifest.json", freeze_manifest.get("release_id", "")),
+        release_id_manifest=("catalog/manifest.json", expected_release_id),
     )

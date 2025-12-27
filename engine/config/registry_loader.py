@@ -81,6 +81,14 @@ class ManifestEntry:
 
 
 @dataclass(frozen=True)
+class Manifest:
+    root: str
+    version: str
+    built_at_utc: str
+    files: tuple[ManifestEntry, ...]
+
+
+@dataclass(frozen=True)
 class RegistryConfig:
     gates: dict[int, Gate]
     channels: dict[str, Channel]
@@ -88,7 +96,7 @@ class RegistryConfig:
     magic10_order: tuple[str, ...]
     magic10_caps: dict[str, Magic10Caps]
     magic10_seeds: dict[str, Magic10Seed]
-    manifest_entries: tuple[ManifestEntry, ...]
+    manifest: Manifest
     centers: tuple[str, ...]
     domains: tuple[str, ...]
 
@@ -298,29 +306,73 @@ def _load_magic10(root: Path) -> tuple[tuple[str, ...], dict[str, Magic10Caps], 
     return magic_order, caps, seeds
 
 
-def _load_manifest(root: Path) -> tuple[ManifestEntry, ...]:
-    raw = _load_json(root / "catalog" / "manifest.json")
-    if not isinstance(raw, dict) or "entries" not in raw:
-        raise SchemaValidationError("INVALID_MANIFEST", "manifest.json must contain entries array")
-    entries_raw = raw["entries"]
-    if not isinstance(entries_raw, list):
-        raise SchemaValidationError("INVALID_MANIFEST", "manifest entries must be a list")
+def _parse_manifest(raw: object) -> Manifest:
+    if not isinstance(raw, dict):
+        raise SchemaValidationError("INVALID_MANIFEST", "manifest.json must be an object")
+    expected_keys = {"root", "version", "built_at_utc", "files"}
+    if set(raw.keys()) != expected_keys:
+        raise SchemaValidationError(
+            "INVALID_MANIFEST_KEYS",
+            "manifest.json must contain exactly root, version, built_at_utc, files",
+        )
+
+    root = raw.get("root")
+    version = raw.get("version")
+    built_at_utc = raw.get("built_at_utc")
+    files_raw = raw.get("files")
+
+    if root != "catalog/":
+        raise SchemaValidationError("INVALID_MANIFEST_ROOT", "manifest root must be 'catalog/'")
+    if not isinstance(version, str) or not version:
+        raise SchemaValidationError("INVALID_MANIFEST_VERSION", "manifest version must be a non-empty string")
+    if not isinstance(built_at_utc, str) or not re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", built_at_utc):
+        raise SchemaValidationError(
+            "INVALID_MANIFEST_TIMESTAMP", "built_at_utc must be an ISO-8601 UTC timestamp ending with Z"
+        )
+    if not isinstance(files_raw, list):
+        raise SchemaValidationError("INVALID_MANIFEST", "manifest files must be a list")
+
     manifest_entries: list[ManifestEntry] = []
     seen_paths: set[str] = set()
-    for entry in entries_raw:
+    last_path: str | None = None
+    for entry in files_raw:
         if not isinstance(entry, dict):
-            raise SchemaValidationError("INVALID_MANIFEST", "manifest entry must be an object")
+            raise SchemaValidationError("INVALID_MANIFEST", "manifest file entry must be an object")
+        if set(entry.keys()) != {"path", "sha256", "size"}:
+            raise SchemaValidationError("INVALID_MANIFEST", "manifest file entry must contain path, sha256, size only")
+
         path = entry.get("path")
         sha = entry.get("sha256")
         size = entry.get("size")
-        if not isinstance(path, str) or not isinstance(sha, str) or not isinstance(size, int):
-            raise SchemaValidationError("INVALID_MANIFEST", "manifest entry requires path, sha256, size")
+        if not isinstance(path, str) or not path:
+            raise SchemaValidationError("INVALID_MANIFEST", "manifest file path must be a non-empty string")
+        if path == "catalog/manifest.json":
+            raise SchemaValidationError("SELF_LISTING_MANIFEST_FORBIDDEN", "manifest.json must not list itself")
+        if not isinstance(sha, str) or not re.fullmatch(r"[0-9a-f]{64}", sha):
+            raise SchemaValidationError("INVALID_MANIFEST", f"manifest sha256 invalid for {path}")
+        if not isinstance(size, int) or size < 0:
+            raise SchemaValidationError("INVALID_MANIFEST", f"manifest size invalid for {path}")
         if path in seen_paths:
             raise DuplicateIdError("DUPLICATE_MANIFEST_ENTRY", f"duplicate manifest path {path}")
+        if last_path is not None and path <= last_path:
+            raise SchemaValidationError("INVALID_MANIFEST_ORDER", "manifest files must be ASCII-sorted and deduped by path")
+
         seen_paths.add(path)
+        last_path = path
         manifest_entries.append(ManifestEntry(path=path, sha256=sha, size=size))
-    manifest_entries.sort(key=lambda e: e.path)
-    return tuple(manifest_entries)
+
+    return Manifest(
+        root=str(root),
+        version=str(version),
+        built_at_utc=str(built_at_utc),
+        files=tuple(manifest_entries),
+    )
+
+
+def load_manifest(root: Path | str | None = None) -> Manifest:
+    base = Path(root) if root is not None else Path.cwd()
+    raw = _load_json(base / "catalog" / "manifest.json")
+    return _parse_manifest(raw)
 
 
 def load_registry_config(
@@ -339,7 +391,7 @@ def load_registry_config(
         alias_ledger=alias_ledger,
     )
     magic10_order, magic10_caps, magic10_seeds = _load_magic10(base)
-    manifest_entries = _load_manifest(base)
+    manifest = load_manifest(base)
 
     return RegistryConfig(
         gates=gates,
@@ -348,8 +400,7 @@ def load_registry_config(
         magic10_order=magic10_order,
         magic10_caps=magic10_caps,
         magic10_seeds=magic10_seeds,
-        manifest_entries=manifest_entries,
+        manifest=manifest,
         centers=centers,
         domains=domains,
     )
-
