@@ -77,7 +77,7 @@ def _build_registry_inputs(config: RegistryConfig) -> Mapping[str, object]:
     manifest_path = catalog_root / "manifest.json"
     manifest_entries = [
         {"path": entry.path, "sha256": entry.sha256, "size_bytes": entry.size}
-        for entry in config.manifest_entries
+        for entry in config.manifest.files
     ]
     return {
         "catalogs": {
@@ -102,6 +102,9 @@ def _build_registry_inputs(config: RegistryConfig) -> Mapping[str, object]:
             "sha256": _sha256_path(manifest_path),
             "entries": manifest_entries,
             "count": len(manifest_entries),
+            "root": config.manifest.root,
+            "version": config.manifest.version,
+            "built_at_utc": config.manifest.built_at_utc,
         },
     }
 
@@ -187,4 +190,3 @@ def _main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":  # pragma: no cover
     raise SystemExit(_main())
-

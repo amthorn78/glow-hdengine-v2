@@ -1,1 +1,1 @@
-{"env":{"ALLOW_NETWORK":"0","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"produced_at_utc":"2025-12-26T23:25:01Z","status":"success","suites":["liveqa:epic022:d0.2"]}
+{"env":{"ALLOW_NETWORK":"0","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"status":"success","suites":["ci:determinism-rails","tests:invariance","tests:evidence-ordering","evidence:sampler","evidence:engine-core","orientation:demo"]}
