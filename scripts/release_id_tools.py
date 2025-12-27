@@ -1,37 +1,45 @@
 #!/usr/bin/env python3
-import argparse, hashlib, json, os, sys
-def lowerhex64(s): return isinstance(s,str) and len(s)==64 and all(c in "0123456789abcdef" for c in s)
-def read_bytes(p): 
-    with open(p,"rb") as f: return f.read()
-def validate_manifest(obj):
-    issues=[]; 
-    if not isinstance(obj,dict) or not isinstance(obj.get("entries"),list):
-        return {"ok":False,"issues":["manifest must be an object with `entries` array"]}
-    for i,ent in enumerate(obj["entries"]):
-        if not isinstance(ent,dict): issues.append(f"entries[{i}] not an object"); continue
-        p,h,z = ent.get("path"), ent.get("sha256"), ent.get("size")
-        if not isinstance(p,str) or not p: issues.append(f"entries[{i}].path invalid")
-        if not lowerhex64(h or ""):       issues.append(f"entries[{i}].sha256 invalid")
-        if not isinstance(z,int) or z<0:  issues.append(f"entries[{i}].size invalid")
-    return {"ok": not issues, "issues": issues}
-def main():
-    ap=argparse.ArgumentParser(); ap.add_argument("--manifest",required=True); ap.add_argument("--out",default="artifacts/math"); a=ap.parse_args()
-    os.makedirs(a.out,exist_ok=True)
-    b=read_bytes(a.manifest)
-    open(os.path.join(a.out,"freeze_pack_manifest.json"),"wb").write(b)
-    rid=hashlib.sha256(b).hexdigest()
-    open(os.path.join(a.out,"release_id.txt"),"w",encoding="utf-8").write(rid+"\n")
-    b2=read_bytes(a.manifest); rid2=hashlib.sha256(b2).hexdigest()
-    open(os.path.join(a.out,"release_id_recompute.log"),"w",encoding="utf-8").write(rid+"\n"+rid2+"\n"+("EQUAL\n" if rid==rid2 else "MISMATCH\n"))
-    try:
-        obj=json.loads(b.decode("utf-8")); rep=validate_manifest(obj); audit=[]
-        for ent in obj.get("entries",[]):
-            p,h,z = ent["path"], ent["sha256"], ent["size"]
-            if not os.path.exists(p): audit.append(f"MISSING {p}"); continue
-            fb=read_bytes(p); sh=hashlib.sha256(fb).hexdigest(); sz=len(fb)
-            audit.append("PASS "+p if (sh==h and sz==z) else f"BAD {p} expected {h}:{z} got {sh}:{sz}")
-    except Exception as e:
-        rep={"ok":False,"issues":[f"json parse error: {e}"]}; audit=["MISSING entries (manifest unreadable)"]
-    open(os.path.join(a.out,"manifest_schema_report.json"),"w",encoding="utf-8").write(json.dumps(rep,separators=(",",":"),ensure_ascii=False)+"\n")
-    open(os.path.join(a.out,"checksums_audit.log"),"w",encoding="utf-8").write("\n".join(audit or ["EMPTY"])+"\n")
-if __name__=="__main__": sys.exit(main())
+from __future__ import annotations
+
+import argparse
+from pathlib import Path
+import sys
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from scripts import release_id_recompute  # noqa: E402
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description="Generate freeze-pack manifest evidence and release_id")
+    parser.add_argument("--manifest", default="catalog/manifest.json", help="Path to the source-of-truth manifest")
+    parser.add_argument("--out", default="artifacts/math", help="Output directory for freeze-pack artifacts")
+    args = parser.parse_args(argv)
+
+    manifest_path = Path(args.manifest)
+    out_dir = Path(args.out)
+    freeze_path = out_dir / "freeze_pack_manifest.json"
+    release_id_path = out_dir / "release_id.txt"
+    schema_report_path = out_dir / "manifest_schema_report.json"
+    snapshot_path = out_dir / "manifest_snapshot.json"
+    checksums_path = out_dir / "checksums_audit.log"
+    log_path = out_dir / "release_id_recompute.log"
+    env_pins_path = ROOT / "artifacts" / "proofs" / "env_pins.txt"
+
+    return release_id_recompute.recompute(
+        manifest_path=manifest_path,
+        freeze_path=freeze_path,
+        release_id_path=release_id_path,
+        manifest_snapshot_path=snapshot_path,
+        checksums_path=checksums_path,
+        env_pins_path=env_pins_path,
+        log_path=log_path,
+        schema_report_path=schema_report_path,
+        check=False,
+    )
+
+
+if __name__ == "__main__":  # pragma: no cover
+    raise SystemExit(main())

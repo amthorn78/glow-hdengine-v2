@@ -615,8 +615,10 @@ def _read_release_id() -> str:
     try:
         return _RELEASE_ID_PATH.read_text(encoding="utf-8").strip()
     except FileNotFoundError:
-        manifest = Path("catalog/manifest.json").read_bytes()
-        return hashlib.sha256(manifest).hexdigest()
+        manifest_path = Path("catalog/manifest.json")
+        manifest_obj = json.loads(manifest_path.read_text(encoding="utf-8"))
+        canonical_manifest = canon.sercanon(manifest_obj, sort_keys=True)
+        return hashlib.sha256(canonical_manifest).hexdigest()
 
 
 def _load_service_identity() -> dict[str, str]:
