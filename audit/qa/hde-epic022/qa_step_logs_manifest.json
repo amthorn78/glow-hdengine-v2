@@ -1,95 +1,34 @@
-[
-  {
-    "check_id": "0A",
-    "ended_at_utc": "2025-12-26T18:16:15Z",
-    "exit_code": 0,
-    "log_path": "audit/qa/hde-epic022/run_20251226t181426z_e44b4cc/step_logs/0A_bootstrap_and_codespaces_snapshot.log",
-    "pf_refs": "PF19 \u2014 Glow QA Guide, \u00a714.4.3; PF27 \u2014 Plan Templates, \u00a74.2",
-    "rails": "SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC PYTHONHASHSEED=0",
-    "started_at_utc": "2025-12-26T18:16:15Z",
-    "status": "PASS",
-    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "stdout_sha256": "0710287ebdc583a08974ea6b7205269a34d81b0c4edfb69fdf3d471cda1d4b98",
-    "tokens": []
-  },
-  {
-    "check_id": "0B",
-    "ended_at_utc": "2025-12-26T18:41:55Z",
-    "exit_code": 0,
-    "log_path": "audit/qa/hde-epic022/run_20251226t181426z_e44b4cc/step_logs/0B_doc_delta_capture.log",
-    "pf_refs": "PF10 \u2014 HDE-Build Notes, \u00a72.3; PF10 \u2014 HDE-Build Notes, \u00a72.7",
-    "rails": "SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC PYTHONHASHSEED=0",
-    "started_at_utc": "2025-12-26T18:41:55Z",
-    "status": "PASS",
-    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "tokens": [
-      "DOC_DELTA_PRESENT_OK"
-    ]
-  },
-  {
-    "check_id": "0C",
-    "ended_at_utc": "2025-12-26T19:11:10Z",
-    "exit_code": 0,
-    "log_path": "audit/qa/hde-epic022/run_20251226t181426z_e44b4cc/step_logs/0C_prod_handshake.log",
-    "pf_refs": "PF19 \u2014 Glow QA Guide, \u00a72.3",
-    "rails": "SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=prod LC_ALL=C LANG=C TZ=UTC PYTHONHASHSEED=0",
-    "started_at_utc": "2025-12-26T19:11:10Z",
-    "status": "PASS",
-    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "tokens": []
-  },
-  {
-    "check_id": "0D",
-    "ended_at_utc": "2025-12-26T19:44:11Z",
-    "exit_code": 2,
-    "log_path": "audit/qa/hde-epic022/run_20251226t181426z_e44b4cc/step_logs/0D_token_roster_validate_pf04.log",
-    "pf_refs": "PF04 \u2014 HDE-Governance, \u00a72.0; PF10 \u2014 HDE-Build Notes, \u00a72.7",
-    "rails": "SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC PYTHONHASHSEED=0",
-    "started_at_utc": "2025-12-26T19:44:11Z",
-    "status": "TOOLING_BLOCKED",
-    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "tokens": []
-  },
-  {
-    "check_id": "0D",
-    "ended_at_utc": "2025-12-26T19:52:27Z",
-    "exit_code": 2,
-    "log_path": "audit/qa/hde-epic022/run_20251226t181426z_e44b4cc/step_logs/0D_token_roster_validate_pf04.log",
-    "pf_refs": "PF04 \u2014 HDE-Governance, \u00a72.0; PF10 \u2014 HDE-Build Notes, \u00a72.7",
-    "rails": "SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC PYTHONHASHSEED=0",
-    "started_at_utc": "2025-12-26T19:52:27Z",
-    "status": "TOOLING_BLOCKED",
-    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "tokens": []
-  },
-  {
-    "check_id": "D0.1",
-    "ended_at_utc": "2025-12-26T20:38:07Z",
-    "exit_code": 10,
-    "log_path": "audit/qa/hde-epic022/run_20251226t181426z_e44b4cc/step_logs/D0.1_required_paths_scan_and_d0_scan_md.log",
-    "pf_refs": "PF20 \u2014 HDE-Phased Epics, \u00a72.7.5.A2",
-    "rails": "SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC PYTHONHASHSEED=0",
-    "started_at_utc": "2025-12-26T20:38:07Z",
-    "status": "FAIL_BEHAVIOR",
-    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "tokens": []
-  },
-  {
-    "check_id": "D0.1",
-    "ended_at_utc": "2025-12-26T20:43:36Z",
-    "exit_code": 10,
-    "log_path": "audit/qa/hde-epic022/run_20251226t181426z_e44b4cc/step_logs/D0.1_required_paths_scan_and_d0_scan_md.log",
-    "pf_refs": "PF20 \u2014 HDE-Phased Epics, \u00a72.7.5.A2",
-    "rails": "SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC PYTHONHASHSEED=0",
-    "started_at_utc": "2025-12-26T20:43:36Z",
-    "status": "FAIL_BEHAVIOR",
-    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "tokens": []
-  }
-]
+{
+  "steps": [
+    {
+      "check_id": "D0.1",
+      "log_path": "audit/qa/hde-epic022/run_20251226t181426z_e44b4cc/step_logs/D0.1_required_paths_scan_and_d0_scan_md.log",
+      "recorded_at_utc": "2025-12-26T22:51:25Z",
+      "status": "PASS"
+    },
+    {
+      "check_id": "D0.1",
+      "log_path": "audit/qa/hde-epic022/run_20251226t181426z_e44b4cc/step_logs/D0.1_required_paths_scan_and_d0_scan_md.log",
+      "recorded_at_utc": "2025-12-26T23:01:49Z",
+      "status": "PASS"
+    },
+    {
+      "check_id": "D0.1",
+      "log_path": "audit/qa/hde-epic022/run_20251226t181426z_e44b4cc/step_logs/D0.1_required_paths_scan_and_d0_scan_md.log",
+      "recorded_at_utc": "2025-12-26T23:07:36Z",
+      "status": "PASS"
+    },
+    {
+      "check_id": "D0.2",
+      "log_path": "audit/qa/hde-epic022/run_20251226t181426z_e44b4cc/step_logs/D0.2_determinism_env_pins_emit.log",
+      "recorded_at_utc": "2025-12-26T23:25:46Z",
+      "status": "PASS"
+    },
+    {
+      "check_id": "D0.3",
+      "log_path": "audit/qa/hde-epic022/run_20251226t181426z_e44b4cc/step_logs/D0.3_release_id_recompute_and_manifest_check.log",
+      "recorded_at_utc": "2025-12-26T23:55:51Z",
+      "status": "FAIL_BEHAVIOR"
+    }
+  ]
+}

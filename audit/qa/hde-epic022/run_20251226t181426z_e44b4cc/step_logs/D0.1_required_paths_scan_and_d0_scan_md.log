@@ -1,14 +1,59 @@
-check_id: D0.1
-status: FAIL_BEHAVIOR
-started_at_utc: 2025-12-26T20:43:36Z
-ended_at_utc: 2025-12-26T20:43:36Z
-rails: SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC PYTHONHASHSEED=0
-pf_refs: PF20 — HDE-Phased Epics, §2.7.5.A2
-tokens:
-command: bash 'audit/qa/hde-epic022/run_20251226t181426z_e44b4cc/tools/run_d0_1.sh'
-stdout_sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
-stderr_sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
-exit_code: 10
---- stdout ---
+{"check_id": "D0.1", "command": "D0.1 inline required-path scan + d0_scan renderer (codespaces-safe; no exit)", "exit_code": 0, "pf_refs": [], "produced_at_utc": "2025-12-26T23:07:27Z", "rails": "SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC PYTHONHASHSEED=0", "status": "PASS", "tokens": []}
 
---- stderr ---
+=== required_paths_scan.json ===
+{
+  "captured_at_utc": "2025-12-26T23:07:02Z",
+  "missing_count": 0,
+  "missing_paths": [],
+  "paths": [
+    {
+      "exists": true,
+      "path": "docs/acceptance_map_epic022.json"
+    },
+    {
+      "exists": true,
+      "path": "audit/qa/hde-epic022/token_evidence_matrix.md"
+    },
+    {
+      "exists": true,
+      "path": "tools/evidence/update_evidence_index.py"
+    },
+    {
+      "exists": true,
+      "path": "tools/evidence/run_sanity_pipeline.py"
+    },
+    {
+      "exists": true,
+      "path": "tools/cli/generate_showcompat_artifacts.py"
+    },
+    {
+      "exists": true,
+      "path": "tests/cli/test_errors_parity.py"
+    },
+    {
+      "exists": true,
+      "path": "tests/cli/test_cli_canonical_bytes.py"
+    },
+    {
+      "exists": true,
+      "path": "tests/cli/test_cli_usage_and_errors.py"
+    },
+    {
+      "exists": true,
+      "path": "tests/ops/test_evidence_index.py"
+    },
+    {
+      "exists": true,
+      "path": "ci/checks/check_mirror_schema.sh"
+    }
+  ]
+}
+
+
+=== d0_scan_md (stable path) ===
+audit/qa/hde-epic022/d0_scan.md
+
+=== deviations (stable path) ===
+# STEP D0.1 deviations
+
+None. Step executed via inline commands (no wrapper script).
