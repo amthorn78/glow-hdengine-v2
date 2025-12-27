@@ -1,7 +1,7 @@
 # AGENTS.md — Glow HD Engine (agent rules)
 
 ## Scope and hierarchy
-- This file governs all agents in the repo; PF-Canon remains the source of truth (see `docs/pfcanon/`, titles such as PF05 — CLI/API/Vendor Ref, PF10 — Provenance & Coupling (precedence where PF10 speaks), PF12 — Schemas & Artifacts, PF14 — Mechanics Guide, PF19 — QA Guide, PF20 — Phased Epics). Where this file and PF-Canon diverge, PF-Canon wins, with PF10 precedence applying wherever PF10 speaks.
+- This file governs all agents in the repo; PF-Canon remains the source of truth (see `docs/pfcanon/`, titles such as PF05 — CLI/API/Vendor Ref, PF10 — HDE-Build Notes (precedence where PF10 speaks), PF12 — Schemas & Artifacts, PF14 — Mechanics Guide, PF19 — QA Guide, PF20 — Phased Epics). Where this file and PF-Canon diverge, PF-Canon wins, with PF10 precedence applying wherever PF10 speaks.
 - Governed evidence (INDEX/mirror/path proofs/orientation/manifest/close report/config acceptance map) must be produced only by the canonical tools. **Never hand-edit governed artifacts.**
 
 ## Agent roster (repo-facing)
