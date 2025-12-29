@@ -1,10 +1,12 @@
 # Internal version probe (runtime) — runbook snippet
 
-Use the existing `internal_version_probe.py` harness to capture `/internal/version` evidence against the selected runtime base URL, then seal the deterministic request-chain manifest and its path proof.
+Use the existing `internal_version_probe.py` harness to capture `/internal/version` evidence against the selected runtime base URL, then seal the deterministic request-chain manifest and its path proof. `/internal/version` auth posture is not yet canonized (PF10 §2.32); if your deployment does not require auth, you may use a harmless placeholder header value.
 
 ```bash
 export BASE_URL="$(cat audit/qa/hde-epic022/remediation/s1_host_matrix/selected_base_url.txt)"
-export ENGINE_INTERNAL_VERSION_AUTH_HEADER="Authorization: Bearer ${ENGINE_SERVICE_TOKEN:?set auth token}"
+# If auth is required, set ENGINE_SERVICE_TOKEN to a real bearer token.
+# If auth is not required, provide a non-secret placeholder header so the probe runs deterministically.
+export ENGINE_INTERNAL_VERSION_AUTH_HEADER="Authorization: Bearer ${ENGINE_SERVICE_TOKEN:-placeholder}"
 
 env SAFE_MODE=0 ALLOW_NETWORK=1 LC_ALL=C LANG=C TZ=UTC \
 python audit/qa/hde-epic022/run_20251226t181426z_e44b4cc/tools/internal_version_probe.py \
