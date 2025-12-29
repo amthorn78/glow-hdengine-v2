@@ -1,8 +1,7 @@
-
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version:** v8.6.4  
+**Version:** v8.7.2  
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -80,7 +79,31 @@ TEMPLATE Addendum Entry (do not edit/remove)
    20. 2.20 \- Revised STEP D0.2 is acceptable: the determinism pins evidence file exists  
    21. 2.21 \- Live QA Rails: No Non-Canonical Env Pins (PYTHONHASHSEED is not a required pin)  
    22. 2.22 \- QA Revised STEP D0.2 is acceptable with caveats.  
-   23. 2.23 — EPIC022 — Freeze-Pack Manifest evidence-copy semantics \+ release\_id recompute contract (no dual semantics)
+   23. 2.23 — EPIC022 — Freeze-Pack Manifest evidence-copy semantics \+ release\_id recompute contract (no dual semantics)  
+   24. 2.24 \- HDE-EPIC022 Remedial PR1
+
+   25. 2.25 \- HDE-EPIC022 Remedial PR2
+
+   26. 2.26- HDE-EPIC022 Remedial Docs PR  
+   27. 2.27 \- QA Revised STEP D0.3 is acceptable:  
+   28. 2.28 \- QA STEP D2.1 meets the Approved Plan requirements and passes  
+   29. 2.29 \- Ops tasks: PO-only execution (IA-guided), not Codex PRs  
+   30. 2.30 — Remediation Implementation Guides are DEV/OPS-only (verification embedded)  
+   31. 2.31 — Canonical Remediation Implementation Guide template (dependency-line rule locked)
+
+   32. 2.32 — ADR-003 deferred: /internal/version auth posture is not yet canonized
+
+   33. 2.33 — `/internal/version` acceptance token names are canonical and non-aliasable
+
+   34. 2.34 — /internal/version proof surface: invariant checklist must be explicit and gated before “OK” tokens
+
+   35. 2.35 — Planning MUST consult PF23 Reality Audits (components \+ pathnames)
+
+   36. 2.36 — Canonical Remediation Task Plan Template \+ “Execution-Ready” Gate.
+
+   37. 2.37 — Remediation Plan “Exact Filenames” Rule for Evidence Index \+ Path Proof Artifacts
+
+   38. 2.38 — Portability vs Provenance: How to Reference Non-PF Evidence Without Creating Execution Dependencies
 
 # 2\) Numbered Addendum List
 
@@ -1002,4 +1025,735 @@ Timestamp: 122725 00:00
 **Evidence**
 
 * None (policy addendum)
+
+## 2.24 \- HDE-EPIC022 Remedial PR1
+
+### Review Summary
+
+* Remedial PR addresses the two remaining correctness gaps called out post-CI: `/internal/version` release\_id fallback hashing semantics and missing regression coverage for the recompute CLI’s exit-code behavior.  
+* It preserves the Implementation Doc’s core contract: SoT manifest schema posture, freeze-pack evidence-copy semantics, and `release_id = sha256(canonical_bytes(catalog/manifest.json))` with a fail-closed recompute check.  
+* It resolves the original PR’s mismatch signatures by driving `release_id_recompute.log` to `match=true` with `problems_count=0`.  
+* It adds a focused regression test (`tests/scripts/test_release_id_recompute.py`) and demonstrates passing runs under closed rails for: the new test, `scripts/release_id_recompute.py --check`, and the `/internal/version` contract test.  
+* Evidence posture looks sufficient for the failure modes actually encountered (mismatch \+ exit-code bug \+ untested fallback), but the PR does touch a larger set of governed evidence/index artifacts than the narrow change would suggest, which increases audit surface.
+
+### Findings
+
+1. **Implementation Doc scope/acceptance appears satisfied for PR-01’s core contract.**  
+   * Observed: The required PR-01 contract is explicitly “canonical schema \+ byte-identical evidence copy \+ release\_id derived from canonical bytes \+ recompute check must succeed/fail closed,” with required evidence outputs listed.  
+   * Why it matters: This is the authoritative acceptance surface; deviations would reintroduce the exact determinism/identity drift the remediation is meant to eliminate.  
+2. **Original PR failure signature is materially resolved in the Remedial PR evidence.**  
+   * Observed: Earlier `release_id_recompute` state showed `match=false` and problem markers; the later entry shows `match=true` and `problems_count=0`.  
+   * Why it matters: This is the direct signal that freeze-pack evidence-copy, manifest schema posture, and release\_id derivation are now internally consistent.  
+3. **Bug Fix Report’s P1 issue (recompute exits 1 after self-healing) is addressed, and the Remedial PR adds the missing regression coverage.**  
+   * Observed: Bug Fix Report describes the defect: recompute returned failure even after rewriting stale artifacts, requiring a second run.  
+   * Observed: Remedial PR claims and demonstrates a new regression test \+ passing run, and refactors recompute to re-evaluate state after writes so the final logged state is clean.  
+   * Why it matters: Without the regression test, this failure mode is highly likely to recur because it is a subtle “state recomputed after mutation” bug class.  
+4. **`/internal/version` coupling posture is protected by strengthening the release\_id fallback semantics (within scope).**  
+   * Observed: Remedial PR explicitly targets correcting fallback hashing to use canonical manifest bytes (serializer-backed), avoiding raw-byte hashing drift.  
+   * Why it matters: Even if the normal path reads `artifacts/math/release_id.txt`, the fallback path must not create a second definition of release identity. This aligns with the Implementation Doc’s “no branching semantics” posture.  
+5. **Tests run are narrowly targeted and appropriate for the remediated defect set.**  
+   * Observed: Remedial PR runs: `tests/scripts/test_release_id_recompute.py`, `python scripts/release_id_recompute.py --check`, and `tests/transport/test_internal_version_contract.py` under closed rails.  
+   * Why it matters: These three checks map directly to the corrected behavior: recompute CLI semantics, recompute check posture, and `/internal/version` contract.  
+6. **Notable review risk: broad governed-evidence churn in the Remedial PR bundle.**  
+   * Observed: The Remedial PR file list includes many governed artifacts beyond the immediate release\_id surfaces (evidence index \+ multiple core artifacts/path proofs).  
+   * Why it matters: Even if generated by canonical tooling, this increases merge-review complexity and can hide accidental drift. However, no concrete contract break is evidenced in the provided artifacts.
+
+### Doc Deltas (PF-Canon only)
+
+* Doc: PF12 — HDE-Schemas and Artifacts  
+  Section: §6.4 “Evidence and CI hooks”  
+  Delta: Clarify recompute script exit-code semantics across modes (NEW CANON PROPOSAL if not already stated):  
+  * `--check` must be fail-closed (non-zero on any mismatch) and must not “self-heal” artifacts,  
+  * non-`--check` mode may rewrite governed artifacts to the canonical state and must exit 0 when the post-write state is clean,  
+  * recommend/require a regression test that covers both modes (pattern: isolated temp workspace so repo state is not mutated).
+
+DECISION: PR ACCEPTABLE
+
+## 2.25 \- HDE-EPIC022 Remedial PR2
+
+### Review Summary
+
+* PR-02 adds a fail-closed release identity gate as a new CI check (`ci/checks/check_release_identity.sh`) that enforces closed rails, runs the canonical `scripts/release_id_recompute.py --check`, validates manifest schema \+ canonical bytes posture, asserts freeze-pack byte equality, and requires the governed recompute evidence set to exist and be non-empty.  
+* PR-02 wires the new gate into the closed-rails sanity pipeline (`tools/evidence/run_sanity_pipeline.py`) so it runs alongside existing determinism/evidence checks under CI posture.  
+* PR-02 strengthens the existing recompute regression test (`tests/scripts/test_release_id_recompute.py`) to also assert evidence completeness after write-mode recovery, while preserving the controlled negative scenario for `--check` fail-closed behavior.  
+* The PR aligns to the Approved Plan’s PR-02 scope: identity gate under closed rails, Guardrail 1 (byte-equality), Guardrail 2 (no alternate semantics at the freeze path), and evidence completeness enforcement, without modifying manifest contents.  
+* Notable risk: running the gate locally can rewrite `artifacts/math/release_id_recompute.log` as a side effect of invoking the recompute script; CI is still safe, but operator guidance should be explicit that this is a gated, tool-driven surface.
+
+### Findings
+
+1. **Plan alignment: PR-02 implements the required fail-closed identity gate and keeps scope within “gating/tests/check wiring.”**  
+   * Observed: Approved Plan requires a CI-level fail-closed identity gate that enforces closed schema rules, byte-equality between SoT and freeze evidence copy, `release_id` correctness, and evidence completeness, with no manifest re-authoring.  
+   * Observed in PR Artifacts: new `ci/checks/check_release_identity.sh` \+ wiring into the sanity pipeline \+ test extension fits that intent.  
+   * Why it matters: This is exactly the “prevent recurrence” layer; without it, PR-01 can silently regress.  
+2. **Guardrail 1 (byte-equality) is enforced in a strict, byte-level way (not schema-only).**  
+   * Observed: The gate canonicalizes `catalog/manifest.json` bytes and asserts `artifacts/math/freeze_pack_manifest.json` bytes match exactly; mismatch fails the gate.  
+   * Why it matters: This directly addresses the documented failure mode where artifacts could be schema-valid but not byte-identical (PF10 precedence where it speaks; PF12 canonical bytes posture). PF12 — HDE-Schemas and Artifacts, §6.2–§6.4.  
+3. **Guardrail 2 (no alternate semantics at the freeze path) is enforced by closed key-set \+ byte-equality.**  
+   * Observed: The gate asserts the freeze-pack JSON top-level keys are exactly `{root, version, built_at_utc, files}` and also enforces byte equality to canonical bytes of SoT; any derived/alternate schema or embedded extras will fail.  
+   * Why it matters: This prevents path reuse drift at the governed freeze evidence path (PF10 — HDE-Build Notes, §2.23; PF12 — HDE-Schemas and Artifacts, §6.4).  
+4. **Evidence completeness is explicitly enforced (prevents “partial pass”).**  
+   * Observed: The gate checks existence and non-emptiness of the governed recompute evidence set and core identity inputs (manifest, freeze copy, release\_id).  
+   * Observed: The recompute regression test now also asserts that the key evidence outputs are created and non-empty in write-mode recovery in a temp workspace.  
+   * Why it matters: This satisfies the Approved Plan’s “verification completeness gate” requirement and prevents CI from going green without the evidence surface present.  
+5. **Verification posture is sufficient for PR-02’s scope and matches the plan.**  
+   * Observed: PR Artifacts show closed-rails runs of:  
+     * `python scripts/release_id_recompute.py --check`  
+     * `python ci/checks/check_release_identity.sh`  
+     * `pytest -q tests/scripts/test_release_id_recompute.py` (pass)  
+   * Why it matters: These checks are the minimal, directly relevant ones for a gating PR: recompute check correctness, gate correctness, and regression coverage.  
+6. **Residual operational risk (non-blocking): recompute check writes a governed log even in `--check` mode.**  
+   * Observed: PR Artifacts acknowledge that running the gate can rewrite `artifacts/math/release_id_recompute.log` and require reverting when trying to keep the working tree clean.  
+   * Why it matters: This is not a correctness failure for CI (CI workspaces are ephemeral), but it should be documented as operator behavior so devs don’t accidentally commit unintended log churn. This is best handled as a PF-Canon doc delta, not a code change in this PR.
+
+### Doc Deltas (PF-Canon only)
+
+* Doc: PF12 — HDE-Schemas and Artifacts  
+  Section: §6.4 “Release identity recompute evidence set”  
+  Delta: Document the existence of a fail-closed CI identity gate entrypoint (`ci/checks/check_release_identity.sh`) that (a) enforces closed rails, (b) runs `scripts/release_id_recompute.py --check`, and (c) asserts presence/non-emptiness of the governed recompute evidence outputs. Clarify that the gate is a Python entrypoint (invoke via `python …`) and that `--check` may rewrite the recompute log in CI workspaces.  
+* Doc: PF19 — Glow QA Guide  
+  Section: §9.2.3 “Closed rails CI gates” (or closest section covering sanity pipeline \+ CI checks)  
+  Delta: Add the release identity gate as a required closed-rails CI step (either explicitly in the sanity pipeline sequence or as a sibling gate), and note operator implications of recompute-log regeneration in ephemeral CI vs local repos.
+
+## 2.26- HDE-EPIC022 Remedial Docs PR
+
+### Review Summary
+
+* Remedial PR is a narrow docs-only remediation that fixes the canon-pointer defect identified in Original PR: AGENTS now references PF10 by the correct titles-only name (“PF10 — HDE-Build Notes”), replacing the incorrect “PF10 — Provenance & Coupling.”  
+* The remediation is real (not superficial): it is an actual content change in AGENTS, and the bundle includes a repo-wide search confirming no remaining incorrect “PF10 — …” references in the repo docs set.  
+* Remedial PR preserves Original PR’s doc sweep substance (README/CHANGELOG/docs updates that describe the EPIC022 remediation identity posture); it does not rewrite or expand scope beyond the docs correction.  
+* This aligns with the Implementation Doc’s intent for the epic at the docs layer: accurate canon pointers, with PF10 precedence where PF10 speaks, and no invented canon titles.  
+* Tests are still “not run (docs-only change)” which is acceptable here; the key risk was factual drift in canon references, and that is addressed by the remediation.
+
+### Findings
+
+1. **Observed:** Original PR’s AGENTS canon-title list included “PF10 — Provenance & Coupling”; Remedial PR replaces it with “PF10 — HDE-Build Notes.”  
+   * **Why it matters:** This workspace uses titles-only canon references. A wrong PF title is a traceability break that can misroute readers to the wrong authority source, which is exactly the kind of drift docs must prevent.  
+2. **Observed:** Remedial PR evidence includes a repo-wide search for `PF10 —` references showing the corrected AGENTS line and no remaining incorrect PF10 title usage in the repo docs scope.  
+   * **Why it matters:** This closes the defect fully (not just in the one file), which prevents recurrence by leaving the repo in a clean “titles-only pointer” state.  
+3. **Observed:** Remedial PR is minimal in scope: it changes only AGENTS to correct the PF10 title reference; the rest of the documentation sweep remains intact.  
+   * **Why it matters:** Minimizing the remediation diff reduces the chance of introducing new doc drift or accidental contract changes.
+
+## 2.27 \- QA Revised STEP D0.3 is acceptable: 
+
+Review Summary
+
+* Revised STEP D0.3 is **acceptable**: the recompute log reports `match=true` with `problems_count=0`, and the step log records `status: PASS` with `exit_code: 0`.  
+* Rails alignment is correct for this step (closed rails / deterministic pins recorded in the step log).  
+* Evidence posture is complete: governed recompute log and snapshots exist, and the per-epic step-log manifest records the PASS outcome (with a note about a prior FAIL entry for the same check).
+
+Findings
+
+1. **Release ID recompute passed with zero problems.**  
+   `artifacts/math/release_id_recompute.log` shows `manifest_sha256` equals `release_id_txt`, with `match=true` and `problems_count=0`.  
+2. **Step log confirms PASS and closed-rails posture.**  
+   `audit/qa/hde-epic022/run_20251226t181426z_e44b4cc/step_logs/D0.3_release_id_recompute_and_manifest_check.log` records `status: PASS`, `exit_code: 0`, and closed rails pins (`SAFE_MODE=1`, `ALLOW_NETWORK=0`, `APP_ENV=dev`, locale/TZ pins). It also records the PF anchors used by the step (`PF12 — HDE-Schemas and Artifacts, §6.4` plus PF10 references).  
+3. **Required artifacts for review exist under audit/qa snapshots.**  
+   The run snapshot includes: `snapshots/release_id/release_id.txt`, `snapshots/release_id/release_id_recompute.log`, and `snapshots/release_id/freeze_pack_manifest.json` (and they are consistent with the recompute PASS).  
+4. **Step manifest records both a historical FAIL and a later PASS for D0.3.**  
+   `audit/qa/hde-epic022/qa_step_logs_manifest.json` contains two D0.3 entries: one `FAIL_BEHAVIOR` (earlier) and one `PASS` (later).
+
+ADRs — Deviations (QA Step D0.3)
+
+ADR-DEV-01 — Step-log manifest contains two D0.3 entries pointing to the same log path
+
+* What changed: `qa_step_logs_manifest.json` records both a FAIL\_BEHAVIOR and a PASS for D0.3, both referencing the same `log_path`.  
+* Why it changed: likely the step was re-run and the step log file was overwritten in-place.  
+* Plan reference: Approved QA Plan — Revised STEP D0.3 (step log \+ manifest recording).  
+* What was actually run: the current on-disk step log is the PASS version (`exit_code: 0`, `status: PASS`).  
+* Evidence impact: the earlier failing log content is not preserved as a distinct artifact in this packet; only the manifest record remains.  
+* Canon impact: None observed.  
+* Decision: **Accepted for this step** (verification goal for the current run is met; trace ambiguity is bounded to historical attempt evidence).
+
+Doc Deltas (PF-Canon only)
+
+* None required for this step based on the current PASS evidence.
+
+QA Verdict and Optional Follow-ups
+
+Verdict line: PASS
+
+* This run satisfies the D0.3 coherence requirement: `release_id_txt` matches the recomputed `manifest_sha256` and no validator problems were reported.  
+* The step log records PASS under closed rails with the expected PF anchors, supporting auditability.  
+* The manifest shows an earlier FAIL and later PASS for the same check; the earlier log content is not separately preserved in this evidence bundle.
+
+## 2.28 \- QA STEP D2.1 meets the Approved Plan requirements and passes:
+
+Review Summary
+
+* STEP D2.1 **meets the Approved Plan requirements and passes**: governed showcompat artifacts exist, both checksum sidecars exist and match, and the two required pytest runs passed under closed rails.  
+* Evidence posture is complete: required logs live under `audit/qa/.../results/`, a primary step log exists under `audit/qa/.../step_logs/`, snapshot copies exist under `audit/qa/.../snapshots/showcompat/`, and the per-epic step-log manifest records the D2.1 PASS.  
+* No deviations were provided or indicated for this step.
+
+Findings
+
+1. **Governed showcompat artifacts present and consistent.**  
+   * `artifacts/cli/showcompat/stdout.json` and `artifacts/cli/showcompat/args.json` exist.  
+   * Both checksum sidecars exist and match:  
+     * `artifacts/cli/showcompat/stdout.json.sha256`  
+     * `artifacts/cli/showcompat/stdout.sha256`  
+       The sha lines are identical (`affb9ce0…`), indicating the legacy alias is a direct copy of the canonical sidecar (PF10 — HDE-Build Notes, §2.5 posture).  
+2. **Required tests ran and passed (as required by the Approved Plan).**  
+   * Canonical-bytes test: `1 passed` (`tests/cli/test_cli_canonical_bytes.py::test_showcompat_stdout_is_canonical`).  
+   * Usage/errors suite: `5 passed` (`tests/cli/test_cli_usage_and_errors.py`).  
+3. **Rails alignment confirmed (closed rails).**  
+   The step log records `SAFE_MODE=1`, `ALLOW_NETWORK=0`, `APP_ENV=dev`, and determinism pins (`LC_ALL=C`, `LANG=C`, `TZ=UTC`, `PYTHONHASHSEED=0`).  
+4. **Evidence posture complete and correctly located under `audit/qa/...`.**  
+   * Results logs exist under `audit/qa/hde-epic022/<run-id>/results/` (generator \+ both pytest logs).  
+   * Primary step log exists at `audit/qa/hde-epic022/<run-id>/step_logs/D2.1_showcompat_artifacts_and_tests.log` with `status: PASS` and `exit_code: 0`, embedding generator \+ pytest outputs.  
+   * Snapshot copies exist under `audit/qa/hde-epic022/<run-id>/snapshots/showcompat/` (including path-proof files).  
+5. **Per-epic step-log manifest updated for D2.1.**  
+   `audit/qa/hde-epic022/qa_step_logs_manifest.json` contains a D2.1 entry with `status: PASS`.
+
+Doc Deltas (PF-Canon only)
+
+* None required for this step based on the produced evidence.
+
+QA Verdict and Optional Follow-ups
+
+Verdict line: PASS
+
+* The dual-write checksum sidecar requirement is satisfied (canonical \+ legacy alias) and consistent with the plan’s PF10 reference.  
+* Both required pytest validations passed, supporting the “canonical bytes \+ usage/errors discipline” intent of Step D2.1.  
+* Generator stdout/stderr capture file exists but is empty in this run; this is not a blocker since the generator succeeded and downstream artifacts/tests are present.
+
+## **2.29 \- Ops tasks: PO-only execution (IA-guided), not Codex PRs**
+
+Timestamp: 122825 00:00
+
+**Decision statement (normative)**
+
+1. **Definition**  
+    An **Ops task** is any work item that requires privileged access to systems **outside the repository** and therefore cannot be performed by automated agents. This includes (non-exhaustive): service configuration, secrets and env var changes, deploy/runtime settings, infrastructure console actions, and certain database operations (creation, grants, production migrations, and other privileged state changes).  
+    A **DevOps task** is treated as an Ops task whenever it requires any of the above human-only access.
+
+2. **Execution authority**  
+    Ops tasks MUST be executed by the **PO (human operator)** only. Automated agents (including Codex-driven agents) MUST NOT attempt to perform them, MUST NOT claim completion, and MUST NOT simulate external state changes.
+
+3. **IA facilitation posture**  
+    Ops tasks MAY be part of an EPIC. When included, they are facilitated by the **Implementation Agent (IA)**, who MUST guide the PO through execution. The IA’s job is to specify intent, constraints, verification, and evidence requirements in a **what-not-how** manner, then work directly with the PO during execution.
+
+4. **Not a PR**  
+    Ops tasks are **not Codex PRs**. They MUST NOT be represented as “implementable PR work.” Any implementation/remediation document MUST separate Ops tasks from PR work and clearly label them as: **PO-only execution, IA-guided**.
+
+5. **Ops task spec format (what-not-how, required fields)**  
+    Every Ops task record MUST include:
+
+* **Task ID** (stable, referenced consistently)
+
+* **Owner:** PO
+
+* **Facilitator:** IA
+
+* **Target system/service** (name only, no secrets)
+
+* **Intent / desired end state** (what changes, and what “done” looks like)
+
+* **Constraints / safety rails** (what must remain true while executing)
+
+* **Success criteria** (observable outcomes, not assumptions)
+
+* **Evidence to capture** (what artifact(s) will prove the change, and where stored)
+
+* **Rollback intent** (what “revert” means at a high level)
+
+* **Secret handling note** (explicitly: no plaintext secrets in docs or evidence)
+
+6. **Evidence posture (required)**  
+    Completion of an Ops task MUST produce a repo-stored evidence artifact (text-first) under a lowercase path such as:
+
+* `audit/ops/<epic-id>/...` for Ops execution evidence, or
+
+* `audit/qa/<epic-id>/...` when the evidence is part of QA execution.
+
+Evidence MUST NOT include secrets. If a setting/value is sensitive, evidence MUST be presence-only, redacted, or hashed, while still being sufficient to verify that the intended state was reached.
+
+7. **Mechanics Guide tracking requirement**  
+    Any Ops task included in an EPIC MUST be represented as a **subtask** in the **HDE-Mechanics Guide** so it can be tracked and reused. The Mechanics Guide entry MUST use the same Task ID and MUST carry the same required fields listed above.
+
+8. **No governance drift**  
+    Ops tasks MUST NOT create new acceptance tokens or redefine acceptance semantics. If an Ops task affects acceptance, it MUST map to existing governance-defined acceptance posture and be proven via evidence artifacts.
+
+**Clarifications**
+
+* If a change is fully achievable as code (including tests and deterministic artifacts), it is PR work. If any step requires human console/config action, that step is an Ops task (even if adjacent code changes exist).
+
+* Ops tasks can be prerequisites for EPIC completion, but they are proven by evidence artifacts, not by agent execution claims.
+
+**Drain targets (titles-only)**
+
+* HDE-Mechanics Guide
+
+* Plan Templates
+
+* Epic Process Guide
+
+* HDE-Phased Epics
+
+* HDE-Schemas & Artifacts
+
+* Glow QA Guide
+
+**Evidence**  
+ None (policy addendum)
+
+## **2.30 — Remediation Implementation Guides are DEV/OPS-only (verification embedded)**
+
+Timestamp: 122825 00:00
+
+**Decision statement (normative)**
+
+1. **Scope**  
+   This addendum applies to **Remediation Implementation Guides** produced for escalations and remediation execution. It does not change Live QA plan formats.  
+2. **Permitted step types (only)**  
+   A Remediation Implementation Guide MUST use only two step types: **DEV** and **OPS**. No other step types are permitted (no QA, DOC, REVIEW, or “verification-only” steps).  
+3. **Verification embedding requirement**  
+   All verification MUST be embedded inside the owning DEV or OPS step. Verification MUST produce concrete, repo-stored evidence outputs (paths and filenames specified in the step).  
+4. **OPS posture linkage**  
+   OPS steps in remediation guides MUST follow the OPS posture defined in PF10 — HDE-Build Notes, §2.29 (PO-executed, IA-guided, not Codex PR work, secret-free evidence, lowercase audit paths).  
+5. **Strict lane separation**  
+   A step labeled DEV MUST contain only DEV actions. A step labeled OPS MUST contain only OPS actions. If a DEV action depends on an OPS output (or vice versa), the producing step MUST come first and the dependent step MUST declare its dependency explicitly (see §2.31).
+
+**Clarifications**
+
+* “DEV” includes code changes, repo-local tooling changes, and repo-local updates required to integrate outputs produced by OPS steps.  
+* “OPS” includes PO-only execution tasks that require external system access, per PF10 — HDE-Build Notes, §2.29.  
+* A remediation guide may include tests and evidence capture, but only as verification embedded inside a DEV/OPS step.
+
+**Drain targets (titles-only)**
+
+* HDE-Mechanics Guide  
+* Glow QA Guide  
+* Epic Process Guide  
+* Plan Templates
+
+**Evidence**  
+None (policy addendum)
+
+---
+
+## **2.31 — Canonical Remediation Implementation Guide template (dependency-line rule locked)**
+
+Timestamp: 122825 00:00
+
+**Decision statement (normative)**
+
+1. **Template is canonical for remediation guides**  
+   All Remediation Implementation Guides MUST follow the canonical section ordering and step schema defined in this addendum.  
+2. **Step Overview is mandatory**  
+   The guide MUST include a Step Overview table listing: `Step ID`, `Step name`, `Step type (DEV/OPS)`, `Step intent (DISCOVERY/CHANGE)`, `Owner/role`, `Depends on`, `Cross-lane dependency`, `Outputs`.  
+3. **Step Details schema is mandatory**  
+   Each step MUST include a Step Details block with, at minimum:  
+   `Step ID`, `Step name`, `Step type (DEV/OPS)`, `Step intent (DISCOVERY/CHANGE)`, `Owner/role`, `Preconditions`, `Inputs`, `Canon constraints (PF references)`, `Actions (what-not-how)`, `Outputs (required)`, `Verification (embedded)`, `In-flight determinations (optional)`.  
+4. **Dependency-line rule (the required modification)**  
+   If a step depends on outputs produced by a prior step in the other lane, the dependent step MUST include exactly **one** cross-lane dependency line in this exact form:
+
+`Inputs needed from Step S<N> during implementation: <exact items>`
+
+Rules for this line:
+
+* `S<N>` MUST be the actual producing step ID (no placeholders such as `Sx`).  
+* The line MUST appear exactly once in the dependent step. It MUST NOT be duplicated, nested, or prefixed by a placeholder field label.  
+* If there is no cross-lane dependency, the line MUST be omitted (do not include placeholders).  
+5. **OPS posture reminder**  
+   Any step labeled OPS MUST comply with PF10 — HDE-Build Notes, §2.29.
+
+**Canonical template skeleton (paste-ready)**
+
+Artifact Map  
+\- \<inputs...\>  
+\- Output: Remediation Implementation Guide (for approval)
+
+\#\# Executive Summary  
+\- ...
+
+\#\# Canon Frame (What “Correct” Means)  
+1\. \<testable statement\> — PFxx — Title, §X.Y
+
+\#\# Observed Evidence Snapshot (Self-Contained; non-PF)  
+\#\#\# Evidence inventory reviewed (non-PF)  
+\- \<paths or quoted excerpts brought into this guide\>  
+\#\#\# Primary failure signatures  
+\- \<short quotes / exact status lines / exact headers\>
+
+\#\# Root Cause Analysis (RCA)  
+\#\#\# What went wrong  
+\#\#\# How it manifested  
+\#\#\# Root causes  
+\#\#\#\# Documentation ignored  
+\#\#\#\# Documentation incorrect  
+\#\#\#\# Documentation missing
+
+\#\# Remediation Implementation Plan (Stepwise, DEV/OPS only)  
+\#\#\# Step Overview  
+| Step ID | Step name | Step type | Step intent | Owner/role | Depends on | Cross-lane dependency | Outputs |  
+| \--- | \--- | \--- | \--- | \--- | \--- | \--- | \--- |
+
+\#\#\# Step Details  
+Step ID:  
+Step name:  
+Step type (DEV or OPS):  
+Step intent (DISCOVERY or CHANGE):  
+Owner/role:  
+Preconditions:  
+Inputs:  
+Canon constraints (PF references):  
+Actions (complete but scoped; what-not-how):  
+Outputs (required):  
+Verification (required, embedded; not a separate step):  
+In-flight determinations (only if needed; must not be mechanical blockers):  
+ADR linkage (if applicable):
+
+\#\# PF Docs Consulted  
+\- PFxx — Title  
+\- ...
+
+\#\# ADRs Requiring Approval (Canon and External Task Creation)  
+ADR-001...
+
+**Drain targets (titles-only)**
+
+* Plan Templates  
+* Epic Process Guide  
+* Glow QA Guide  
+* HDE-Mechanics Guide
+
+**Evidence**  
+None (policy addendum)
+
+---
+
+## **2.32 — ADR-003 deferred: /internal/version auth posture is not yet canonized**
+
+Timestamp: 122825 00:00
+
+**Decision statement (normative)**
+
+1. **Canon gap recorded**  
+   PF canon defines the `/internal/version` transport and content contract, but does not canonize its **auth posture** (public vs operator-network gated vs auth-header required) or the expected failure mode when access is missing/invalid.  
+   PF touchpoints: PF04 — HDE-Governance, §10.5; PF14 — HDE-Mechanics Guide, §14.2–§14.4.  
+2. **Non-invention rule for auth posture**  
+   Until canonized, remediation guides and operational tooling MUST NOT state auth requirements for `/internal/version` as canon. Any statement about auth posture MUST be explicitly labeled as **Observed Evidence (non-PF)**.  
+3. **What evidence is required to canonize auth posture**  
+   A canon decision for `/internal/version` auth posture is deferred until OPS discovery captures **status line and headers** for the canonical deployment context(s) under two conditions:  
+* with no auth header, and  
+* with the expected auth header present (value redacted or presence-only noted).
+
+The captured evidence MUST be secret-free and stored in-repo under a lowercase audit path, consistent with PF10 — HDE-Build Notes, §2.29.
+
+4. **Decision inputs to be resolved by the evidence**  
+   The evidence must be sufficient to decide whether `/internal/version` is intended to be:  
+* (a) unauthenticated public,  
+* (b) operator-network gated without auth, or  
+* (c) auth-header required,
+
+and what the expected response is for missing/invalid access (status code and headers).
+
+**Clarifications**
+
+* This addendum does not change the governed transport/content contract for `/internal/version`; it only records that access-control semantics are not yet canonized.  
+* Once canonized, the decision MUST be drained to the owning canon homes for mechanics/governance (titles-only: HDE-Governance, HDE-Mechanics Guide).
+
+**Drain targets (titles-only)**
+
+* HDE-Governance  
+* HDE-Mechanics Guide  
+* Glow QA Guide
+
+**Evidence**  
+None (policy addendum)
+
+Below are **paste-ready PF10 Build Notes addenda** that directly reinforce the two recurring blockers: (1) **acceptance token name drift** for `/internal/version` conditionals, and (2) **verification checklist incompleteness** (missing explicit checks for “No ETag / No Last-Modified” and canonical-bytes constraints).
+
+---
+
+## **2.33 — `/internal/version` acceptance token names are canonical and non-aliasable**
+
+Timestamp: 122825 00:00
+
+**Decision statement (normative)**
+
+1. **Token registry is authoritative**  
+   Acceptance token names for `/internal/version` MUST match the names defined in PF04 — HDE-Governance, §2.0.2. Tools, guides, matrices, and acceptance maps MUST NOT invent aliases.  
+2. **Canonical conditional semantics token name**  
+   The canonical token name for the conditional semantics invariant is:  
+* `INTERNAL_VERSION_CONDITIONALS_IGNORED_OK`
+
+Any other name intended to mean “conditionals return 200 and never 304” (including `INTERNAL_VERSION_COND_200_NO_304_OK`) is **non-canon** and MUST NOT be emitted or required in acceptance artifacts.
+
+3. **Remediation and QA escalation guides**  
+   All remediation implementation guides and QA escalation remediation plans MUST use canonical token names. If a tool currently emits a non-canon alias, remediation MUST treat that as a defect and plan to converge to the canonical name.
+
+**Clarifications**
+
+* This addendum does not expand the token registry. It forbids aliasing and forces convergence to PF04 naming.  
+* If a team believes a new token is required, it MUST be proposed as governance work (not invented in guides/tools).
+
+**Drain targets (PF references)**
+
+* PF04 — HDE-Governance, §2.0.2  
+* PF14 — HDE-Mechanics-Guide, §14.7
+
+**Evidence**  
+None (policy addendum)
+
+---
+
+## **2.34 — `/internal/version` proof surface: invariant checklist must be explicit and gated before “OK” tokens**
+
+Timestamp: 122825 00:00
+
+**Decision statement (normative)**
+
+1. **Explicit invariant checklist requirement**  
+   Any remediation guide, QA step, or probe tool that produces `/internal/version` governed evidence MUST explicitly enumerate and verify the canon-critical invariants listed below. It is not acceptable to imply these checks by referencing PF sections only.  
+2. **Canon-critical invariants (minimum set)**  
+   For the canonical `/internal/version` identity response:
+
+A. **Transport**
+
+* GET MUST return `200`  
+* HEAD MUST return `200` and satisfy parity expectations  
+* Conditional requests (`If-None-Match`, `If-Modified-Since`) MUST NOT yield `304`; they MUST return `200`
+
+B. **Headers**
+
+* `Cache-Control: no-store` MUST be present  
+* `Content-Type: application/json; charset=utf-8` MUST be present  
+* `ETag` MUST be absent  
+* `Last-Modified` MUST be absent
+
+C. **Body (identity payload)**
+
+* Body MUST be fixed-schema JSON with exactly these keys (no extras):  
+  `engine_tag`, `build_commit`, `invocation_tag`, `invocation_sha256`, `emitter_sha256`, `release_id`  
+* Body bytes MUST satisfy the canon “identity bytes” posture (canonical bytes, including LF termination) where applicable to the proof surface.  
+3. **Token emission gating (no “false OK”)**  
+   A tool MUST NOT emit any `*_OK` token unless the corresponding invariant has been verified **against the same captured bytes** that are being written as governed artifacts for that run.  
+4. **FAIL\_TOOLING semantics**  
+   If the run status is `FAIL_TOOLING` (or equivalent failure), the tool MUST NOT emit `*_OK` tokens for invariants that did not pass. In particular, it MUST NOT emit “integrity success” tokens (for example path-proof match or two-run identity) unless those checks demonstrably passed on the produced artifacts.  
+5. **Coupling requirement (anti-mixed-target / anti-redirect drift)**  
+   For each probe run, the evidence must be coupled such that the emitted tokens, captured headers, captured body, and any two-run identity digest refer to the same resolved target/response chain. If coupling cannot be established, the run MUST fail and MUST NOT emit `*_OK` tokens.
+
+**Clarifications**
+
+* This addendum is intentionally **implementation-neutral**: it defines what MUST be verified and how tokens MUST relate to bytes and artifacts, not how to implement the probe.  
+* This addendum applies equally to DEV and OPS steps when they produce governed `/internal/version` evidence.
+
+**Drain targets (PF references)**
+
+* PF04 — HDE-Governance, §10.5  
+* PF14 — HDE-Mechanics-Guide, §14.2; PF14 — HDE-Mechanics-Guide, §14.3; PF14 — HDE-Mechanics-Guide, §14.4; PF14 — HDE-Mechanics-Guide, §14.7  
+* PF12 — HDE-Schemas-and-Artifacts, §8.3; PF12 — HDE-Schemas-and-Artifacts, §8.4
+
+**Evidence**  
+None (policy addendum)
+
+## **2.35 — Planning MUST consult PF23 Reality Audits (components \+ pathnames)**
+
+Timestamp: 122925 00:00
+
+### **Decision statement (normative)**
+
+1. **Applicability**  
+   This addendum applies to all planning artifacts, including (non-exhaustive): QA plans, remediation guides, implementation guides, EPIC records, and any stepwise runbooks produced in support of an EPIC.  
+2. **Mandatory PF23 consult**  
+   When planning for QA, remediation, development, or any other execution work, agents MUST consult **PF23 — Reality Audits** as a primary input for:  
+* component boundaries (what the “thing” is),  
+* canonical pathnames and repo loci (where the “thing” lives),  
+* audit-provided component metadata needed to avoid drift.  
+3. **Freshness posture**  
+   PF23 is updated at the end of each EPIC for every product component. Plans MUST treat PF23 as the freshest source for component/pathname reality at the time of planning.  
+4. **How to use PF23 in plans (what-not-how)**  
+   Planning documents SHOULD include a short “PF23 Anchors” subsection that lists:  
+* the component(s) used from PF23, and  
+* the key pathnames/loci pulled from PF23 that the plan will touch.
+
+This is a traceability anchor only; it must not duplicate PF23 contents.
+
+5. **Ownership**  
+   PF23 is PO-maintained. Planning documents MUST NOT create tasks that assign PF23 updates. If PF23 appears stale or missing required component coverage, the plan MAY note that as an observation, but must not assign it as agent work.
+
+### **Drain targets (PF references)**
+
+* PF23 — Reality Audits  
+* PF20 — HDE-Phased Epics (planning posture)  
+* PF19 — Glow QA Guide (QA plan posture)  
+* PF06 — Epic Process Guide (planning conventions)
+
+### **Evidence**
+
+None (policy addendum)
+
+## **2.36 — Canonical Remediation Task Plan Template \+ “Execution-Ready” Gate**
+
+Timestamp: 122925 00:00
+
+Decision statement:
+
+* A remediation **task plan** (DEV PRs \+ OPS tasks) that is submitted for approval MUST be execution-ready: every task is runnable as written by its assigned actor (PO for OPS; Codex for DEV PRs) with no missing inputs, no missing outputs, and no ambiguous success criteria.
+
+* The plan MUST contain only two task types:
+
+  * **DEV** tasks are PRs only and MUST be enumerated as `PR-01..` (no mixed-task steps).
+
+  * **OPS** tasks are PO-run procedures only and MUST be enumerated as `OPS-01..` (no mixed-task steps).
+
+* Discovery is allowed but MUST be explicit per task as **DISCOVERY** vs **CHANGE**.
+
+* Cross-lane dependencies MUST be explicitly declared in the dependent task using the exact line:
+
+  * `Inputs needed from Task <ID> during implementation: <exact items>`
+
+  * Placeholders (e.g., “Sx”, “TBD”, “to be determined”) in this line are a mechanical blocker.
+
+Mechanical blockers (auto-reject if present anywhere in the plan):
+
+* Any `PR-xx` task missing a **paste-ready Codex Prompt** embedded inside that task.
+
+* Any `OPS-xx` task missing ALL of the following: working directory assumptions, exact command lines (or explicit non-command actions), expected outputs/success criteria, and failure-handling capture instructions.
+
+* Any deliverable that is specified only as a directory (must be a concrete lowercase file path including filename, e.g., `audit/qa/<epic>/<task_id>/<filename>`).
+
+* Any cross-lane dependency missing the exact dependency line above, or using non-concrete “exact items.”
+
+* Any task that mixes DEV \+ OPS work in a single task.
+
+Clarifications:
+
+* The plan is permitted to include a short “evidence inventory reviewed” list for provenance, but MUST inline any non-PF facts required to execute downstream tasks (quotes or precise paraphrases) rather than requiring access to external bundles.
+
+* Remediation-only diagnostics/manifests MUST NOT be introduced under governed artifact surfaces unless explicitly framed as an ADR-worthy governance change. Default posture: remediation-only artifacts live under remediation audit paths (e.g., `audit/qa/.../remediation/...`) and do not enter governed evidence indices/mirror. (See PF04 — HDE-Governance, §10.5; PF12 — HDE-Schemas-and-Artifacts, §8.3–§8.4 for governed indexing posture.)
+
+Drain targets (titles-only):
+
+* PF10 — HDE-Build-Notes, §2.31
+
+* PF12 — HDE-Schemas-and-Artifacts, §8.3
+
+* PF12 — HDE-Schemas-and-Artifacts, §8.4
+
+* PF04 — HDE-Governance, §10.5
+
+Evidence: None.
+
+---
+
+## **2.37 — Remediation Plan “Exact Filenames” Rule for Evidence Index \+ Path Proof Artifacts**
+
+Timestamp: 122925 00:00
+
+Decision statement:
+
+* Any remediation plan that includes tasks touching governed evidence indices/mirrors MUST explicitly name the exact index \+ path-proof filenames as task outputs and as embedded verification checks (inside OPS/DEV tasks; not as standalone verification-only tasks).
+
+* Canonical placement is co-located “sibling” path proofs: `<file>.path_proof.txt` MUST sit next to `<file>` and MUST NOT be placed in an alternate directory (e.g., `docs/evidence/path_proofs/...` is non-canon).
+
+Canonical quick reference (must be used verbatim in plans where applicable):
+
+* Evidence index (human-readable):
+
+  * `docs/evidence/INDEX.json`
+
+  * `docs/evidence/INDEX.sha256`
+
+  * `docs/evidence/INDEX.json.path_proof.txt`
+
+  * `docs/evidence/INDEX.sha256.path_proof.txt`  
+     (PF12 — HDE-Schemas-and-Artifacts, §8.4)
+
+* Evidence index mirror (machine-readable):
+
+  * `artifacts/evidence_index.jsonl`
+
+  * `artifacts/evidence_index.jsonl.path_proof.txt`  
+     (PF12 — HDE-Schemas-and-Artifacts, §8.3)
+
+Clarifications:
+
+* Plans MUST treat path-proof artifacts as first-class deliverables: if a task edits an index/mirror file, the sibling `.path_proof.txt` update is part of the same task’s outputs \+ verification.
+
+* If a plan proposes a new file under governed surfaces, it MUST state whether it is intended to appear in the indices/mirror; absence of that statement is a blocker.
+
+Drain targets (titles-only):
+
+* PF12 — HDE-Schemas-and-Artifacts, §8.3
+
+* PF12 — HDE-Schemas-and-Artifacts, §8.4
+
+Evidence: None.
+
+---
+
+## **2.38 — Portability vs Provenance: How to Reference Non-PF Evidence Without Creating Execution Dependencies**
+
+Timestamp: 122925 00:00
+
+Decision statement:
+
+* Remediation guides and task plans may include a short **Evidence inventory reviewed (non-PF)** list for provenance, but MUST NOT require the reader/executor to open external files to perform the work.
+
+* If a remediation plan depends on any non-PF fact (command outputs, headers, error strings, file paths observed, specific status lines), the plan MUST embed that fact directly in the document as a short quote or precise paraphrase inside an “Observed Evidence Snapshot” section.
+
+Clarifications:
+
+* If an Artifact Map (or equivalent) is included, it MUST explicitly label non-PF inputs as:
+
+  * “provenance only; not required to execute”  
+     Otherwise it is treated as an execution dependency and becomes a portability blocker.
+
+* When a non-PF observation drives a branching decision, the plan MUST include:
+
+  * the observation to look for (exact string/status/shape),
+
+  * the decision rule,
+
+  * the output artifact path where the observation is captured (lowercase file path including filename).
+
+Drain targets (titles-only):
+
+* PF10 — HDE-Build-Notes, §2.31
+
+Evidence: None.
+
+## **2.39 — Remediation Task Plans: Commands and Failure Handling Are Not Plan-Approval Gates**
+
+Timestamp: 122925 00:00
+
+**Decision statement (normative)**
+
+1. **Approval gate scope (tight):** For remediation **task plans** (DEV PRs \+ OPS tasks), approval MUST focus on:  
+   * correct task model (OPS vs DEV; DISCOVERY vs CHANGE; no mixed tasks),  
+   * correct sequencing and explicit cross-lane dependencies,  
+   * concrete deliverables (lowercase paths \+ filenames),  
+   * concrete verification success criteria (what “done” means).  
+     Detailed command lines and step-by-step failure handling are **not** required as a plan-approval condition.  
+2. **In-flight operational detail is allowed:** OPS command selection, exact CLI flags, and procedural failure handling MAY be developed **in flight** during execution, using repo reality and operator judgment, as long as the evidence posture remains intact.  
+3. **Evidence posture remains non-negotiable:** Even when commands/failure handling are developed in flight, OPS execution MUST still capture:  
+   * the exact commands actually run (verbatim),  
+   * stdout/stderr \+ exit code (or equivalent output),  
+   * the produced artifacts at the declared output paths,  
+   * and any deviation notes needed to explain why a different command/flag was used.  
+     This evidence MUST land under `audit/qa/...` (lowercase) with explicit filenames sufficient for later audit.  
+4. **No drift on governed surfaces:** In-flight command flexibility does not permit:  
+   * changing governed artifact locations or filenames,  
+   * introducing new governed files without explicit statement of indexing/mirror intent,  
+   * or indexing remediation-only diagnostics into governed indices/mirror.  
+     Governed evidence surfaces and index/mirror rules remain enforced by the relevant addenda.
+
+**Clarifications**
+
+* This addendum is a **PO decision** to end repeated approval thrash and allow execution to proceed without further plan-roundtrip on command mechanics.  
+* This addendum does **not** waive the requirement for concrete deliverables and verification criteria in the plan. It only removes “exact commands” and “failure handling scripts” as approval blockers.
+
+**Supersedes / modifies**
+
+* Modifies the “execution-ready” interpretation for remediation task plans introduced in Addendum 2.36 by removing “exact commands” and “failure handling” as approval gates, while keeping task model, deliverables, and verification gates intact.
+
+**Drain targets (titles-only)**
+
+* Glow QA Guide  
+* Plan Templates
+
+**Evidence**  
+None.
 
