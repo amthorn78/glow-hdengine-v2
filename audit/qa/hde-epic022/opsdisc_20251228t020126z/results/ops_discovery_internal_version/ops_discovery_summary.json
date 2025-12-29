@@ -1,0 +1,84 @@
+{
+  "probes": [
+    {
+      "body_bytes": 207,
+      "headers_path": "audit/qa/hde-epic022/opsdisc_20251228t020126z/results/ops_discovery_internal_version/root.get.noauth.headers",
+      "label": "root.get.noauth",
+      "rc": 0,
+      "status_line": "HTTP/2 404",
+      "stderr_tail": null
+    },
+    {
+      "body_bytes": null,
+      "headers_path": "audit/qa/hde-epic022/opsdisc_20251228t020126z/results/ops_discovery_internal_version/root.head.noauth.headers",
+      "label": "root.head.noauth",
+      "rc": 18,
+      "status_line": "HTTP/2 404",
+      "stderr_tail": "curl: (18) end of response with 207 bytes missing"
+    },
+    {
+      "body_bytes": 347,
+      "headers_path": "audit/qa/hde-epic022/opsdisc_20251228t020126z/results/ops_discovery_internal_version/internal_version.get.noauth.headers",
+      "label": "internal_version.get.noauth",
+      "rc": 0,
+      "status_line": "HTTP/2 200",
+      "stderr_tail": null
+    },
+    {
+      "body_bytes": null,
+      "headers_path": "audit/qa/hde-epic022/opsdisc_20251228t020126z/results/ops_discovery_internal_version/internal_version.head.noauth.headers",
+      "label": "internal_version.head.noauth",
+      "rc": 18,
+      "status_line": "HTTP/2 200",
+      "stderr_tail": "curl: (18) end of response with 347 bytes missing"
+    },
+    {
+      "body_bytes": 347,
+      "headers_path": "audit/qa/hde-epic022/opsdisc_20251228t020126z/results/ops_discovery_internal_version/internal_version.get.auth.headers",
+      "label": "internal_version.get.auth",
+      "rc": 0,
+      "status_line": "HTTP/2 200",
+      "stderr_tail": null
+    },
+    {
+      "body_bytes": null,
+      "headers_path": "audit/qa/hde-epic022/opsdisc_20251228t020126z/results/ops_discovery_internal_version/internal_version.head.auth.headers",
+      "label": "internal_version.head.auth",
+      "rc": 18,
+      "status_line": "HTTP/2 200",
+      "stderr_tail": "curl: (18) end of response with 347 bytes missing"
+    },
+    {
+      "body_bytes": 347,
+      "headers_path": "audit/qa/hde-epic022/opsdisc_20251228t020126z/results/ops_discovery_internal_version/internal_version.cond_inm.noauth.headers",
+      "label": "internal_version.cond_inm.noauth",
+      "rc": 0,
+      "status_line": "HTTP/2 200",
+      "stderr_tail": null
+    },
+    {
+      "body_bytes": 347,
+      "headers_path": "audit/qa/hde-epic022/opsdisc_20251228t020126z/results/ops_discovery_internal_version/internal_version.cond_ims.noauth.headers",
+      "label": "internal_version.cond_ims.noauth",
+      "rc": 0,
+      "status_line": "HTTP/2 200",
+      "stderr_tail": null
+    },
+    {
+      "body_bytes": 347,
+      "headers_path": "audit/qa/hde-epic022/opsdisc_20251228t020126z/results/ops_discovery_internal_version/internal_version.get.noauth.http1.headers",
+      "label": "internal_version.get.noauth.http1",
+      "rc": 0,
+      "status_line": "HTTP/1.1 200 OK",
+      "stderr_tail": null
+    },
+    {
+      "body_bytes": null,
+      "headers_path": "audit/qa/hde-epic022/opsdisc_20251228t020126z/results/ops_discovery_internal_version/internal_version.head.noauth.http1.headers",
+      "label": "internal_version.head.noauth.http1",
+      "rc": 28,
+      "status_line": "HTTP/1.1 200 OK",
+      "stderr_tail": "curl: (28) Operation timed out after 30002 milliseconds with 0 out of 347 bytes received"
+    }
+  ]
+}

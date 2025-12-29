@@ -1,0 +1,13 @@
+{"check_id": "D2.1", "command": "D2.1 generate_showcompat_artifacts + sha sidecars + pytest canonical bytes + pytest stream discipline", "exit_code": 0, "pf_refs": ["PF12 \u2014 HDE-Schemas and Artifacts, \u00a78.6.3", "PF10 \u2014 HDE-Build Notes, \u00a72.5"], "produced_at_utc": "2025-12-27T22:49:25Z", "rails": "SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC PYTHONHASHSEED=0", "status": "PASS", "tokens": ["CLI_STDOUT_LF_OK"]}
+
+=== generator log ===
+
+
+=== pytest: test_cli_canonical_bytes.py::test_showcompat_stdout_is_canonical ===
+.                                                                        [100%]
+1 passed in 0.12s
+
+
+=== pytest: tests/cli/test_cli_usage_and_errors.py ===
+.....                                                                    [100%]
+5 passed in 11.29s
