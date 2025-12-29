@@ -40,6 +40,7 @@ D3_TOKEN_EXPECTATIONS = {
         "artifacts": {
             "artifacts/ops/internal_version/body_get.json",
             "artifacts/ops/internal_version/headers_get.txt",
+            "artifacts/ops/internal_version/request_chain_manifest.json",
         },
         "tests": {INTERNAL_VERSION_CONTRACT_TEST},
     },
@@ -47,6 +48,7 @@ D3_TOKEN_EXPECTATIONS = {
         "artifacts": {
             "artifacts/ops/internal_version/headers_get.txt",
             "artifacts/ops/internal_version/headers_head.txt",
+            "artifacts/ops/internal_version/request_chain_manifest.json",
         },
         "tests": {INTERNAL_VERSION_CONTRACT_TEST},
     },
@@ -54,6 +56,7 @@ D3_TOKEN_EXPECTATIONS = {
         "artifacts": {
             "artifacts/ops/internal_version/cond_if_none_match_headers.txt",
             "artifacts/ops/internal_version/cond_if_modified_since_headers.txt",
+            "artifacts/ops/internal_version/request_chain_manifest.json",
         },
         "tests": {INTERNAL_VERSION_CONTRACT_TEST},
     },
@@ -63,6 +66,7 @@ D3_TOKEN_EXPECTATIONS = {
             "artifacts/ops/internal_version/headers_head.txt",
             "artifacts/ops/internal_version/cond_if_none_match_headers.txt",
             "artifacts/ops/internal_version/cond_if_modified_since_headers.txt",
+            "artifacts/ops/internal_version/request_chain_manifest.json",
         },
         "tests": {INTERNAL_VERSION_CONTRACT_TEST},
     },
@@ -72,6 +76,7 @@ D3_TOKEN_EXPECTATIONS = {
             "artifacts/ops/internal_version/headers_head.txt",
             "artifacts/ops/internal_version/cond_if_none_match_headers.txt",
             "artifacts/ops/internal_version/cond_if_modified_since_headers.txt",
+            "artifacts/ops/internal_version/request_chain_manifest.json",
         },
         "tests": {INTERNAL_VERSION_CONTRACT_TEST},
     },

@@ -6,6 +6,8 @@ from pathlib import Path
 import pytest
 
 from engine.serializer import canon
+from tools.evidence import update_evidence_index
+from tools.ops.internal_version_artifacts import MANIFEST_NAME, ensure_request_chain_manifest
 
 os.environ.setdefault("DATABASE_URL", "postgresql://example")
 os.environ.setdefault("SAFE_MODE", "1")
@@ -192,3 +194,28 @@ def test_internal_version_invariants_and_artifacts():
         },
         release_id_manifest=("catalog/manifest.json", expected_release_id),
     )
+
+    manifest_path, proof_path, manifest_sha = ensure_request_chain_manifest(_ARTIFACT_DIR, allow_create=False)
+    manifest_rel = manifest_path.relative_to(Path(".").resolve()).as_posix()
+    manifest_obj = json.loads(manifest_path.read_text(encoding="utf-8"))
+    assert manifest_obj.get("artifact_root") == _ARTIFACT_DIR.as_posix()
+    assert manifest_obj.get("manifest_version") == 1
+    expected_steps = ["get", "head", "conditional_if_none_match", "conditional_if_modified_since"]
+    steps = manifest_obj.get("steps", [])
+    assert [step.get("name") for step in steps] == expected_steps
+    for step in steps:
+        artifacts = step.get("artifacts", {})
+        for filename in artifacts.values():
+            path = _ARTIFACT_DIR / filename
+            assert path.is_file(), f"Manifest references missing artifact: {path}"
+    two_run_entry = manifest_obj.get("two_run_identity", {})
+    assert two_run_entry == {"log": "two_run_identity.log"}
+
+    manifest_bytes = canon.sercanon(manifest_obj, sort_keys=True)
+    assert manifest_path.read_bytes() == manifest_bytes
+    assert hashlib.sha256(manifest_bytes).hexdigest() == manifest_sha
+
+    proof_data = update_evidence_index._load_existing_proof(proof_path)
+    assert proof_data.get("path") == manifest_rel
+    assert proof_data.get("sha256") == manifest_sha
+    assert int(proof_data.get("size_bytes", "-1")) == manifest_path.stat().st_size
