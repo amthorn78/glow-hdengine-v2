@@ -215,7 +215,9 @@
       "evidence_titles": [
         "tests/transport/test_internal_version_contract.py::test_internal_version_invariants_and_artifacts",
         "artifacts/ops/internal_version/body_get.json",
-        "artifacts/ops/internal_version/headers_get.txt"
+        "artifacts/ops/internal_version/headers_get.txt",
+        "artifacts/ops/internal_version/request_chain_manifest.json",
+        "artifacts/ops/internal_version/request_chain_manifest.json.path_proof.txt"
       ]
     },
     {
@@ -225,7 +227,9 @@
       "evidence_titles": [
         "tests/transport/test_internal_version_contract.py::test_internal_version_invariants_and_artifacts",
         "artifacts/ops/internal_version/headers_get.txt",
-        "artifacts/ops/internal_version/headers_head.txt"
+        "artifacts/ops/internal_version/headers_head.txt",
+        "artifacts/ops/internal_version/request_chain_manifest.json",
+        "artifacts/ops/internal_version/request_chain_manifest.json.path_proof.txt"
       ]
     },
     {
@@ -235,7 +239,9 @@
       "evidence_titles": [
         "tests/transport/test_internal_version_contract.py::test_internal_version_invariants_and_artifacts",
         "artifacts/ops/internal_version/cond_if_none_match_headers.txt",
-        "artifacts/ops/internal_version/cond_if_modified_since_headers.txt"
+        "artifacts/ops/internal_version/cond_if_modified_since_headers.txt",
+        "artifacts/ops/internal_version/request_chain_manifest.json",
+        "artifacts/ops/internal_version/request_chain_manifest.json.path_proof.txt"
       ]
     },
     {
@@ -247,7 +253,9 @@
         "artifacts/ops/internal_version/headers_get.txt",
         "artifacts/ops/internal_version/headers_head.txt",
         "artifacts/ops/internal_version/cond_if_none_match_headers.txt",
-        "artifacts/ops/internal_version/cond_if_modified_since_headers.txt"
+        "artifacts/ops/internal_version/cond_if_modified_since_headers.txt",
+        "artifacts/ops/internal_version/request_chain_manifest.json",
+        "artifacts/ops/internal_version/request_chain_manifest.json.path_proof.txt"
       ]
     },
     {
@@ -259,7 +267,9 @@
         "artifacts/ops/internal_version/headers_get.txt",
         "artifacts/ops/internal_version/headers_head.txt",
         "artifacts/ops/internal_version/cond_if_none_match_headers.txt",
-        "artifacts/ops/internal_version/cond_if_modified_since_headers.txt"
+        "artifacts/ops/internal_version/cond_if_modified_since_headers.txt",
+        "artifacts/ops/internal_version/request_chain_manifest.json",
+        "artifacts/ops/internal_version/request_chain_manifest.json.path_proof.txt"
       ]
     },
     {
