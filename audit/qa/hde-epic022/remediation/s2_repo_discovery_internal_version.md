@@ -21,7 +21,7 @@
 ## C. Request-chain manifest presence and intended location
 
 - No `request_chain_manifest.json` file exists in the repo (no hits from ripgrep or evidence indices).
-- Based on existing ops-level governed artifacts (`artifacts/ops/internal_version/*`, `artifacts/ops/rails_open_scope.txt`, `artifacts/ops/no_io_guard.txt`) and the evidence index convention, a future request-chain manifest would fit at `artifacts/ops/request_chain_manifest.json` with a sibling `artifacts/ops/request_chain_manifest.json.path_proof.txt` and an entry in `docs/evidence/INDEX.json` so that `tools/evidence/update_evidence_index.py` can mirror it.
+- Observed placement pattern for governed ops artifacts: `artifacts/ops/internal_version/*` (internal_version family, enforced by `tests/transport/test_internal_version_contract.py::test_internal_version_invariants_and_artifacts` and the EPIC022 QA scaffold) and other ops proofs like `artifacts/ops/rails_open_scope.txt` and `artifacts/ops/no_io_guard.txt` (both indexed via `docs/evidence/INDEX.json`). A request-chain manifest location is therefore **TBD**; the minimal constrained options are either co-locating with the internal_version family under `artifacts/ops/internal_version/` or a parallel ops-level file under `artifacts/ops/`. Follow-up should decide based on how the manifest is coupled to `/internal/version` evidence and update the index accordingly.
 
 ## D. Path-proof mechanism (production and validation)
 
@@ -33,7 +33,7 @@
 
 ## E. Governed evidence index/mirror toolchain (update + validation entrypoints)
 
-- Update (write): `env SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/update_evidence_index.py --epic-id HDE-EPIC020` (include `--epic-id` when refreshing EPIC020 bundles; omit for default scope). Regenerates `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl`, and all `.path_proof.txt` siblings.
+- Update (write): `env SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/update_evidence_index.py` (default scope; add `--epic-id HDE-EPIC020` only when explicitly refreshing EPIC020 bundles). Regenerates `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl`, and all `.path_proof.txt` siblings.
 - Orientation check/write: `env SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/orientation_demo.py` (write) and `... --check` (fail on drift or missing proofs); must run after the index update because it consumes the refreshed skeleton.
 - Mirror schema check: `env SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python ci/checks/check_mirror_schema.sh` (despite the `.sh` suffix, the shebang is Python); validates ordering, required fields, proof anchors, sha/size, and the mirror self-record.
 - Recommended refresh order (per `docs/EVIDENCE_INDEX.md` and in-tool comments): `update_evidence_index.py` (write) → `orientation_demo.py` (write) → `update_evidence_index.py --check` → `orientation_demo.py --check` → `ci/checks/check_mirror_schema.sh`.
