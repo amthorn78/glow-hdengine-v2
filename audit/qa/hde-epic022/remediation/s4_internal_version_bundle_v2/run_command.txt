@@ -1,0 +1,15 @@
+export BASE_URL="$(cat audit/qa/hde-epic022/remediation/s1_host_matrix/selected_base_url.txt)"
+# If auth is required, set ENGINE_SERVICE_TOKEN to a real bearer token.
+# If auth is not required, provide a non-secret placeholder header so the probe runs deterministically.
+export ENGINE_INTERNAL_VERSION_AUTH_HEADER="Authorization: Bearer ${ENGINE_SERVICE_TOKEN:-placeholder}"
+
+env SAFE_MODE=0 ALLOW_NETWORK=1 LC_ALL=C LANG=C TZ=UTC \
+python audit/qa/hde-epic022/run_20251226t181426z_e44b4cc/tools/internal_version_probe.py \
+  --base-url "$BASE_URL" \
+  --out-dir artifacts/ops/internal_version \
+  --auth-header-env ENGINE_INTERNAL_VERSION_AUTH_HEADER && \
+python - <<'PY'
+from tools.ops.internal_version_artifacts import ensure_request_chain_manifest
+
+ensure_request_chain_manifest("artifacts/ops/internal_version", allow_create=True)
+PY
