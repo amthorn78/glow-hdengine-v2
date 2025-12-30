@@ -1,19 +1,9 @@
-{"check_id": "D3.1", "command": "D3.1 internal_version_probe (plan-local) -> artifacts/ops/internal_version bundle + coupling proof", "exit_code": 3, "pf_refs": ["PF04 \u2014 HDE-Governance, \u00a710.5", "PF20 \u2014 HDE-Phased Epics, \u00a72.7.5.B6", "PF12 \u2014 HDE-Schemas and Artifacts, \u00a78.6.3"], "produced_at_utc": "2025-12-28T02:00:01Z", "rails": "SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=prod LC_ALL=C LANG=C TZ=UTC PYTHONHASHSEED=0", "run_id": "run_20251226t181426z_e44b4cc", "status": "FAIL_TOOLING", "tokens": ["INTERNAL_VERSION_200_CTYPE_JSON_UTF8_OK", "INTERNAL_VERSION_HEAD_PARITY_OK", "INTERNAL_VERSION_CONDITIONALS_IGNORED_OK", "INTERNAL_VERSION_NO_ETAG_OK", "INTERNAL_VERSION_NO_STORE_OK", "TWO_RUN_IDENTITY_OK"]}
+{"check_id": "D3.1", "command": "D3.1 inline /internal/version probe (no wrapper deps)", "exit_code": 0, "pf_refs": ["PF04 \u2014 HDE-Governance, \u00a710.5", "PF14 \u2014 HDE-Mechanics-Guide, \u00a714.2\u2013\u00a714.4", "PF12 \u2014 HDE-Schemas and Artifacts, \u00a78.6.3", "PF10 \u2014 HDE-Build Notes, \u00a72.21", "PF10 \u2014 HDE-Build Notes, \u00a72.32", "PF10 \u2014 HDE-Build Notes, \u00a72.34"], "produced_at_utc": "2025-12-30T02:32:42Z", "rails": "SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=prod LC_ALL=C LANG=C TZ=UTC", "run_id": "run_20251226t181426z_e44b4cc", "status": "PASS", "tokens": []}
 
-=== artifacts/ops/internal_version listing ===
-- artifacts/ops/internal_version/body_get.json
-- artifacts/ops/internal_version/body_get.json.path_proof.txt
-- artifacts/ops/internal_version/body_get.sha256
-- artifacts/ops/internal_version/body_get.sha256.path_proof.txt
-- artifacts/ops/internal_version/cond_if_modified_since_headers.txt
-- artifacts/ops/internal_version/cond_if_modified_since_headers.txt.path_proof.txt
-- artifacts/ops/internal_version/cond_if_none_match_headers.txt
-- artifacts/ops/internal_version/cond_if_none_match_headers.txt.path_proof.txt
-- artifacts/ops/internal_version/headers_cond_if_modified_since.txt
-- artifacts/ops/internal_version/headers_cond_if_none_match.txt
-- artifacts/ops/internal_version/headers_get.txt
-- artifacts/ops/internal_version/headers_get.txt.path_proof.txt
-- artifacts/ops/internal_version/headers_head.txt
-- artifacts/ops/internal_version/headers_head.txt.path_proof.txt
-- artifacts/ops/internal_version/two_run_identity.log
-- artifacts/ops/internal_version/two_run_identity.log.path_proof.txt
+=== summary ===
+status=PASS rc=0
+note: Probe executed without authentication (endpoint returned 200)
+note: All predicates passed: status codes 200, Content-Type with charset, Cache-Control no-store, no ETag/Last-Modified
+note: Body canonical bytes verified: six keys in fixed order, LF-terminated
+note: Two-run identity: PASS (identical responses)
+note: Coupling check: PASS (release_id matches artifacts/math/release_id.txt)

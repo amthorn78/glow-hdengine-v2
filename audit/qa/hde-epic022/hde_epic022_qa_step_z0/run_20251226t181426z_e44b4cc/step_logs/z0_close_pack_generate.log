@@ -1,0 +1,8 @@
+{"check_id": "Z0", "command": "Z0 inline close pack generator (canonical close report + manifest + qa closeout summaries)", "exit_code": 0, "pf_refs": ["PF20 \u2014 HDE-Phased Epics, \u00a72.7.6"], "produced_at_utc": "2025-12-30T06:19:00Z", "rails": "SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC PYTHONHASHSEED=0", "run_id": "run_20251226t181426z_e44b4cc", "status": "PASS", "tokens": []}
+
+=== outputs presence (governed + working) ===
+- close_report_exists=True
+- close_manifest_exists=True
+- qa_run_summary_exists=True
+- qa_rca_doc_delta_summary_exists=True
+- qa_manifest_exists=True

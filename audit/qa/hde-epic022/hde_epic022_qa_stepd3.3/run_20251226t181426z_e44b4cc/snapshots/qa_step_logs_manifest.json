@@ -1,0 +1,64 @@
+{
+  "steps": [
+    {
+      "check_id": "D0.1",
+      "log_path": "audit/qa/hde-epic022/run_20251226t181426z_e44b4cc/step_logs/D0.1_required_paths_scan_and_d0_scan_md.log",
+      "recorded_at_utc": "2025-12-26T22:51:25Z",
+      "status": "PASS"
+    },
+    {
+      "check_id": "D0.1",
+      "log_path": "audit/qa/hde-epic022/run_20251226t181426z_e44b4cc/step_logs/D0.1_required_paths_scan_and_d0_scan_md.log",
+      "recorded_at_utc": "2025-12-26T23:01:49Z",
+      "status": "PASS"
+    },
+    {
+      "check_id": "D0.1",
+      "log_path": "audit/qa/hde-epic022/run_20251226t181426z_e44b4cc/step_logs/D0.1_required_paths_scan_and_d0_scan_md.log",
+      "recorded_at_utc": "2025-12-26T23:07:36Z",
+      "status": "PASS"
+    },
+    {
+      "check_id": "D0.2",
+      "log_path": "audit/qa/hde-epic022/run_20251226t181426z_e44b4cc/step_logs/D0.2_determinism_env_pins_emit.log",
+      "recorded_at_utc": "2025-12-26T23:25:46Z",
+      "status": "PASS"
+    },
+    {
+      "check_id": "D0.3",
+      "log_path": "audit/qa/hde-epic022/run_20251226t181426z_e44b4cc/step_logs/D0.3_release_id_recompute_and_manifest_check.log",
+      "recorded_at_utc": "2025-12-26T23:55:51Z",
+      "status": "FAIL_BEHAVIOR"
+    },
+    {
+      "check_id": "D0.3",
+      "log_path": "audit/qa/hde-epic022/run_20251226t181426z_e44b4cc/step_logs/D0.3_release_id_recompute_and_manifest_check.log",
+      "recorded_at_utc": "2025-12-27T22:16:48Z",
+      "status": "PASS"
+    },
+    {
+      "check_id": "D2.1",
+      "log_path": "audit/qa/hde-epic022/run_20251226t181426z_e44b4cc/step_logs/D2.1_showcompat_artifacts_and_tests.log",
+      "recorded_at_utc": "2025-12-27T22:49:41Z",
+      "status": "PASS"
+    },
+    {
+      "check_id": "D3.1",
+      "log_path": "audit/qa/hde-epic022/run_20251226t181426z_e44b4cc/step_logs/D3.1_internal_version_bundle.log",
+      "recorded_at_utc": "2025-12-30T02:32:42Z",
+      "status": "PASS"
+    },
+    {
+      "check_id": "D3.2",
+      "log_path": "audit/qa/hde-epic022/hde_epic022_qa_step_d3.2/run_20251226t181426z_e44b4cc/step_logs/d3.2_evidence_index_update_and_validate.log",
+      "recorded_at_utc": "2025-12-30T04:27:36Z",
+      "status": "PASS"
+    },
+    {
+      "check_id": "D3.3",
+      "log_path": "audit/qa/hde-epic022/hde_epic022_qa_stepd3.3/run_20251226t181426z_e44b4cc/step_logs/d3_3_sanity_pipeline.log",
+      "recorded_at_utc": "2025-12-30T05:07:47Z",
+      "status": "FAIL_BEHAVIOR"
+    }
+  ]
+}

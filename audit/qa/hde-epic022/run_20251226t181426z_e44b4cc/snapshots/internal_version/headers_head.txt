@@ -1,10 +1,12 @@
-HTTP/1.1 301 Moved Permanently
-content-type: text/html; charset=utf-8
-location: https://glow-hdengine-v2-production.up.railway.app/internal/version
+HTTP/2 200 
+cache-control: no-store
+content-type: application/json; charset=utf-8
+date: Tue, 30 Dec 2025 02:32:15 GMT
 server: railway-edge
 x-railway-edge: railway/europe-west4-drams3a
-x-railway-request-id: u0Oapb8bS5iOCo8PN8N_Fg
-date: Sun, 28 Dec 2025 01:59:31 GMT
+x-railway-request-id: C9b9haeATnyRDgCNm3z_FQ
+content-length: 347
 
 
-curl: (28) Operation timed out after 30002 milliseconds with 0 bytes received
+curl: (18) end of response with 347 bytes missing
+

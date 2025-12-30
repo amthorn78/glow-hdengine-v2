@@ -1,0 +1,21 @@
+{"check_id": "D3.2", "command": "python tools/evidence/update_evidence_index.py ; python tools/evidence/update_evidence_index.py --check ; pytest -q tests/evidence/test_evidence_skeleton.py ; pytest -q tests/ops/test_evidence_index.py ; python ci/checks/check_mirror_schema.sh artifacts/evidence_index.jsonl ; env_pins proof check ; index_required_paths_check.py ; canonical conditional headers check (canonical only)", "exit_code": 0, "pf_refs": ["PF12 \u2014 HDE-Schemas and Artifacts, \u00a78.6.2", "PF20 \u2014 HDE-Phased Epics, \u00a72.7.5.A4"], "produced_at_utc": "2025-12-30T04:27:05Z", "rails": "SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC PYTHONHASHSEED=0", "status": "PASS", "tokens": ["EVIDENCE_INDEX_UPDATED_OK", "EVIDENCE_INDEX_HASH_OK", "EVIDENCE_INDEX_MIRROR_OK", "EVIDENCE_PATHS_VALIDATED_OK", "MACHINE_MIRROR_UPDATED_OK"]}
+
+results_files:
+- update_evidence_index_write.log
+- update_evidence_index_check.log
+- pytest_evidence_skeleton.log
+- pytest_ops_evidence_index.log
+- mirror_schema_check.log
+- env_pins_path_proof_check.log
+- index_required_paths_check.json
+- index_required_paths_check.stdout.log
+- canonical_conditionals_in_index_check.json
+
+snapshots_files:
+- docs_evidence_index.json
+- docs_evidence_index.sha256
+- artifacts_evidence_index.jsonl
+- artifacts_evidence_index.jsonl.sha256 (if present)
+- env_pins.log
+- env_pins.log.path_proof.txt
+- qa_step_logs_manifest.json

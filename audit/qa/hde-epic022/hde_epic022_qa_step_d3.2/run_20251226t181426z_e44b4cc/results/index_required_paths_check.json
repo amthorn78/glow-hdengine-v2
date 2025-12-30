@@ -1,0 +1,11 @@
+{
+  "captured_at_utc": "2025-12-30T04:24:18Z",
+  "conditional_index_missing": [],
+  "conditional_index_ok": {
+    "if_modified_since": true,
+    "if_none_match": true
+  },
+  "index_json": "docs/evidence/INDEX.json",
+  "missing_paths": [],
+  "pass": true
+}

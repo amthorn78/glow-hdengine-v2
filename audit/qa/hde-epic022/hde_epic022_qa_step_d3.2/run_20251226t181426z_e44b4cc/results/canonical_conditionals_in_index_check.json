@@ -1,0 +1,9 @@
+{
+  "captured_at_utc": "2025-12-30T04:24:18Z",
+  "missing": [],
+  "pass": true,
+  "required_canonical_conditionals": [
+    "artifacts/ops/internal_version/headers_cond_if_none_match.txt",
+    "artifacts/ops/internal_version/headers_cond_if_modified_since.txt"
+  ]
+}

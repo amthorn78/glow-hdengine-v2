@@ -1,0 +1,22 @@
+{
+  "captured_at_utc": "2025-12-30T06:17:57Z",
+  "epic_id": "hde-epic022",
+  "failing_steps": [
+    {
+      "check_id": "D0.3",
+      "log_path": "audit/qa/hde-epic022/run_20251226t181426z_e44b4cc/step_logs/D0.3_release_id_recompute_and_manifest_check.log",
+      "recorded_at_utc": "2025-12-26T23:55:51Z",
+      "status": "FAIL_BEHAVIOR"
+    },
+    {
+      "check_id": "D3.3",
+      "log_path": "audit/qa/hde-epic022/hde_epic022_qa_stepd3.3/run_20251226t181426z_e44b4cc/step_logs/d3_3_sanity_pipeline.log",
+      "recorded_at_utc": "2025-12-30T05:07:47Z",
+      "status": "FAIL_BEHAVIOR"
+    }
+  ],
+  "qa_epic_root": "audit/qa/hde-epic022",
+  "qa_root": "audit/qa/hde-epic022/run_20251226t181426z_e44b4cc",
+  "qa_step_manifest_path": "audit/qa/hde-epic022/qa_step_logs_manifest.json",
+  "run_id": "run_20251226t181426z_e44b4cc"
+}

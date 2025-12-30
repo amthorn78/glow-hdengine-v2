@@ -1,8 +1,10 @@
-HTTP/1.1 301 Moved Permanently
-content-type: text/html; charset=utf-8
-location: https://glow-hdengine-v2-production.up.railway.app/internal/version
+HTTP/2 200 
+cache-control: no-store
+content-type: application/json; charset=utf-8
+date: Tue, 30 Dec 2025 02:32:15 GMT
 server: railway-edge
 x-railway-edge: railway/europe-west4-drams3a
-x-railway-request-id: DRe01Vv4Tc-OPEwaw9P4nw
-date: Sun, 28 Dec 2025 01:59:31 GMT
-content-length: 102
+x-railway-request-id: OWEJxyQ7ScuRCUvnss7a6g
+content-length: 347
+
+

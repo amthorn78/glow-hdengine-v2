@@ -1,5 +1,5 @@
 path: artifacts/ops/internal_version/cond_if_none_match_headers.txt
-size_bytes: 144
-sha256: 902c2e17138d4bb4d0c67469d1fcc63dbdb25bbd5390abe513163cdd65d95e59
-mtime_utc: 2025-12-19T16:30:01Z
+size_bytes: 251
+sha256: 185eb0c5cfa9e4d96a0d8c66c888c1d0f46c365564f54df352407ba37c231612
+mtime_utc: 2025-12-30T02:32:16Z
 produced_at_utc: 2025-11-30T03:58:47Z
