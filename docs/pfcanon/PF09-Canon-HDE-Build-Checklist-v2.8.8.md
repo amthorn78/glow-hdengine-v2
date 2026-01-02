@@ -4,13 +4,13 @@
 
 **Title:** PF09-Canon-HDE-Build Checklist
 
-**Version:** v2.8.2
+**Version:** v2.8.8
 
 **Status:** Canon
 
-**Effective date:** 2025-12-23
+**Effective date:** 2026-01-01
 
-**Last Update Gate:** BN Drain 8.5.3 A26-29
+**Last Update Gate:** BN Drain 8.7.7 A50-51
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -66,23 +66,80 @@ PF09 expresses this sequencing via tasks and subtasks; the underlying math, tran
 
 PF09 is a **consumer of token names only**. It does **not** define token semantics.
 
-PF09 uses **QA acceptance tokens** to bind build/CI evidence to specific acceptance commitments. These tokens are **not defined here**. They are owned by the canonical token library and its associated QA/spec owners.
+**Ops tasks (PO-only execution; evidence required):**
 
-**Important rule:** this doc is a **consumer of token names only**. Token spelling, meaning, and acceptance constraints live in the token library and its owner PF docs (routing varies by token family).
+An Ops task is any work item that requires privileged access outside the repository and cannot be executed by automated agents (examples: service configuration, secrets/env var changes, deploy/runtime settings, infrastructure console actions, privileged database operations).
+
+Ops tasks MUST be executed by the PO (human operator) only. Automated agents MUST NOT attempt to perform them, MUST NOT claim completion, and MUST NOT simulate external state changes.
+
+When an Ops task is required by an epic or checklist row:
+
+* It MUST be treated as PO-only execution, IA-guided (not PR work).
+
+* It MUST specify success criteria and evidence to capture.
+
+* Completion MUST produce a repo-stored evidence artifact under a lowercase audit path such as `audit/ops/<epic-id>/...` (or `audit/qa/<epic-id>/...` when captured during QA).
+
+* Evidence MUST be secret-free. If a setting/value is sensitive, evidence must be presence-only, redacted, or hashed while still proving the intended state.
+
+**/internal/version auth posture is not canonized (non-invention rule):**
+
+PF canon defines the /internal/version transport and content contract, but does not canonize its auth posture (public vs operator-network gated vs auth-header required) or the expected failure mode when access is missing/invalid.
+
+Until canonized:
+
+* Do not state auth requirements for /internal/version as canon.
+
+* Any statement about auth posture MUST be explicitly labeled as Observed Evidence (non-PF).  
+* Runbooks MUST treat any auth header for `/internal/version` as **optional** (never required) unless and until auth is implemented and canonized. Any doc language that implies “auth required” must be treated as non-canonical unless/until the implementation exists.
+
+Canonization requires OPS discovery evidence in the canonical deployment context(s):
+
+* status line and headers with no auth header, and
+
+* status line and headers with the expected auth header present (value redacted or presence-only noted),
+
+stored under a lowercase audit path and kept secret-free per the Ops-task posture above.
+
+**Single source of truth (names \+ semantics).**  
+ Acceptance token names and semantics live only in the Token Registry in **HDE-Governance §2.0**. Any token name used in PF09, epics, acceptance artifacts, or QA evidence logs MUST exist in that registry and match spelling exactly (no aliases or near-matches). New tokens must be registered in Governance (via ADR \+ registry update) before they may appear as required tokens anywhere.
+
+**QA operational token library (non-governance).**  
+ The **Glow QA Guide** is the canonical home for QA operational token guidance (metadata, wiring, runbook mapping, evidence expectations). It MUST reference token names exactly as defined in the Governance Token Registry and MUST NOT introduce new token names or divergent meanings.
+
+**Epic acceptance rosters (names-only, validated view).**  
+ **HDE-Phased Epics** acceptance token rosters are names-only planning consumers and MUST be a validated view of the Governance Token Registry (exact-name validation; no aliases). If a roster references a token that is absent from the registry, record it as token drift and do not claim it for acceptance until registry drain.
+
+**EPIC022 Live QA bridge rule (token validity vs evidence collection).**  
+ For EPIC022 Live QA planning and evidence: the acceptance roster remains in HDE-Phased Epics, but token claim validity is gated by the Governance Token Registry. Any rosters-only token that is absent from the registry is `UNREGISTERED_ACCEPTANCE_TOKEN`: evidence collection may proceed, but step logs MUST NOT claim the token for acceptance until registry drain; record the gap in Doc Delta Capture (no substitution/renaming).
 
 **Plan posture note (excerpt-aligned):** Epic plans are **execution indexes**, not single-source re-statements of canon. Do **not** reproduce canon checklists or re-embed governed QA ledger artifacts inside plans. In particular, the per-epic **token↔evidence matrix** is a governed QA ledger artifact and should be referenced by location/title rather than duplicated in plan documents. “Required evidence” rules must be expressed as **canonical checks/workflows** (CI gates, scripts, harness outputs), not as plan-time documentation burdens.
 
+**PF23 consult (mandatory for planning artifacts):**  
+ When planning for QA, remediation, development, or any other execution work, agents MUST consult **PF23 — Reality Audits** as a primary input for component boundaries and canonical repo pathnames. Planning documents SHOULD include a short **“PF23 Anchors”** subsection listing the PF23 component(s) used and the key pathnames/loci the plan will touch. PF23 is PO-maintained; plans MUST NOT create tasks that assign PF23 updates. If PF23 appears stale or missing coverage, note it as an observation only.
+
+**Remediation task plans (approval gate scope):**  
+ For remediation task plans (DEV PRs \+ OPS tasks), approval MUST focus on: (1) correct task model (DEV PRs only; OPS tasks only; explicit DISCOVERY vs CHANGE; no mixed tasks), (2) correct sequencing and explicit cross-lane dependencies, (3) concrete deliverables (lowercase paths \+ filenames), and (4) concrete verification success criteria. Detailed command lines and step-by-step failure handling are not required as a plan-approval condition; they MAY be developed in flight during execution, but evidence posture remains non-negotiable.
+
+**Portability vs provenance (non-PF evidence references):**  
+ Plans may include a short “Evidence inventory reviewed (non-PF)” list for provenance, but MUST NOT require the reader/executor to open external files to perform the work. If a plan depends on any non-PF fact, the plan MUST embed that fact directly in the document as a short quote or precise paraphrase inside an “Observed Evidence Snapshot” section. If an Artifact Map is included, it MUST label non-PF inputs as: **“provenance only; not required to execute”**.
+
+**Index/Mirror exact filenames in plans (when touched):**  
+ Any plan that includes tasks touching governed Evidence Index/Mirror files MUST treat sibling `.path_proof.txt` artifacts as first-class outputs and embedded verification checks inside the same task, using the exact filenames pinned in §0.3. If a plan proposes a new file under governed surfaces, it MUST state whether it is intended to appear in the indices/mirror; absence of that statement is a blocker
+
 Ownership routing (titles-only; do not duplicate definitions here):
 
-* Token spelling \+ registry posture: **HDE-QA Token Library**
+* Acceptance token registry (names \+ semantics; single SoT): **HDE-Governance**
 
-* Token semantics / constraints: token owner PF doc (e.g., Spec / QA Guide / Schemas & Artifacts)
+* QA operational token library (wiring/runbook/evidence expectations): **Glow QA Guide**
+
+* Epic acceptance rosters (names-only; validated view): **HDE-Phased Epics**
+
+* Evidence catalog record types \+ canonical filenames: **HDE-Schemas & Artifacts**
 
 * Evidence index writer workflow \+ topology coupling: **HDE-Mechanics Guide** \+ **HDE-Build Checklist**
 
-Normative definitions and evidence mappings for QA acceptance tokens live in the **QA Acceptance Tokens Library** described in the Glow QA Guide (PF19), with individual tokens owned by Governance, Schemas & Artifacts, Mechanics, and Epics (PF04/PF12/PF14/PF20 and related PF-docs) as appropriate.
-
-Checklist rows in PF09 refer to tokens by name (for example `JSON_CANONICAL_CHECK_OK`, `TWO_RUN_IDENTITY_OK`, `EVIDENCE_INDEX_UPDATED_OK`) to indicate which acceptance gates they participate in; meaning, scope, and proof requirements for each token are taken from the QA token library and its owning PF-docs, not from PF09 itself.
+Checklist rows in PF09 refer to tokens by name (for example `JSON_CANONICAL_CHECK_OK`, `TWO_RUN_IDENTITY_OK`, `EVIDENCE_INDEX_UPDATED_OK`) to indicate which acceptance gates they participate in; meaning and acceptance constraints are taken from the Governance Token Registry and the owning PF-docs for each token family, and operational execution guidance is taken from the Glow QA Guide, not from PF09 itself.
 
 ---
 
@@ -104,7 +161,9 @@ The canonical updater (`tools/evidence/update_evidence_index.py`) is responsible
 
 ### **0.3.2 Machine Mirror (records-only)**
 
-**Machine mirror.** `artifacts/evidence_index.jsonl` — one JSON object per line; canonical JSON (UTF-8, no BOM; ASCII-sorted keys; compact; exactly one trailing `\n`). Unknown keys are rejected. Keep **1:1 parity** with the Human Index; provide path-proofs.
+**Machine mirror path-proof (governed; merge-blocking).**
+
+`artifacts/evidence_index.jsonl.path_proof.txt` — path-proof transcript for the Machine Mirror. MUST be refreshed whenever `artifacts/evidence_index.jsonl` bytes change (same PR). A stale proof is a merge-blocking evidence integrity failure. The canonical updater (`tools/evidence/update_evidence_index.py`) is responsible for refreshing this proof during normal write runs, and `tools/evidence/update_evidence_index.py --check` MUST fail if the mirror proof is stale.
 
 **Non-canonical mirror paths are invalid.** Any path like `docs/evidence/INDEX.machine_mirror.jsonl` is not a canonical mirror artifact. There MUST be exactly one machine mirror file at `artifacts/evidence_index.jsonl`. If any tool, test, or CI output references an alternate mirror path, treat it as a tooling/config bug and fix it before merge.
 
@@ -278,7 +337,7 @@ PF09 still treats Evidence Index and Machine Mirror as **consumer-only** surface
 
 * A7 proofs run **only** on entries where `a7_eligible == true`.
 
-* `/internal/*` endpoints are never A7-eligible; `/internal/version` is operator-only and MUST have `a7_eligible == false` (policy owned by Governance; referenced here by title only).
+* `/internal/*` endpoints are never A7-eligible; `/internal/version` MUST have `a7_eligible == false` (policy owned by Governance; referenced here by title only). Access-control semantics for `/internal/version` are not yet canonized; see Conventions.
 
 **Proof surface.** A7 proofs run **only** on an A7-eligible route listed in the Catalog.
 
@@ -451,6 +510,10 @@ These checks are required whenever an epic plan and/or token matrix claims accep
   * the referenced path-proof file (`proof_anchor` and the corresponding `*.path_proof.txt`)
 
 * Any binding to a non-canonical path is a mechanical blocker and MUST be corrected before approval. If a non-canonical path is truly required, it MUST be routed as an explicit ADR and drained into the governing canon before approval.
+
+**Identity checksum sidecars (helper artifacts, unless explicitly required).**
+
+For identity artifacts under `audit/qa/<epic-id>/artifacts/identity/`, `.sha256` sidecars for JSON files are optional helper artifacts unless the epic acceptance section explicitly lists them as required. If produced, checksum sidecars MUST be generated mechanically (e.g., `sha256sum`) and may be indexed as helper artifacts, but MUST NOT be treated as gating by default.
 
 **Index/mirror acceptance (titles-only; tokens live in HDE-Governance / HDE-Schemas & Artifacts):**
 
@@ -1027,6 +1090,8 @@ Evidence skeleton CI now runs under rails-closed env (`SAFE_MODE=1`, `ALLOW_NETW
 
 `ci/checks/check_mirror_schema.sh`
 
+`python ci/checks/check_release_identity.sh`
+
 `python -m pytest tests/evidence tests/ops/test_evidence_index.py`
 
 ensuring INDEX/sentinel/mirror/path-proofs/orientation demo are canonical and drift-free.
@@ -1399,11 +1464,11 @@ Evidence that determinism pins are enforced for evidence jobs:
 **Subtask description:**  
  Keep `scripts/make_sanity.sh` current and wired to the ordered sanity pipeline.
 
-**Subtask status:** **Unknown** (script may exist; audit only calls for keeping it current)
+**Subtask status:** Not done
 
 **Epic or card:** **Unknown**
 
-**Tokens:** **Not done**
+**Tokens:** **Unknown**
 
 **Evidence / artifacts:**
 
@@ -1667,30 +1732,65 @@ Tests (titles-only; closed rails):
     * includes a header with at least `check_id`, `command`, `rails`, `pf_refs`, `tokens`, and `status`, and
 
     * appends the full output of the tests and evidence checks for that step (for example pytest output, greps over INDEX/mirror/manifest) to the **same file**, not split across multiple primary logs.  
-    * The `rails` header MUST record, at minimum: `SAFE_MODE`, `ALLOW_NETWORK`, `LC_ALL`, `LANG`, `TZ`, and `APP_ENV` (keys-only; values as seen for that step).
+    * The `rails` header MUST record, at minimum: `SAFE_MODE`, `ALLOW_NETWORK`, `LC_ALL`, `LANG`, `TZ`, and `APP_ENV` (keys-only; values as seen for that step).  
+    * **Non-canonical env pins are forbidden as required rails.** `PYTHONHASHSEED` MUST NOT be added as a required rail/pin for Live QA plan approval or execution. It is not part of the canonical determinism pins set. If `PYTHONHASHSEED` is used for one-off diagnostics, it MUST be explicitly labeled diagnostic-only and MUST NOT be interpreted as satisfying or extending the determinism pins evidence surface.
 
   * Temporary/helper files for a step (for example request bodies or sorted candidate lists) MAY exist, but the per-step log at QA\_ROOT is the canonical evidence entry point; QA harnesses MUST NOT scatter primary step logs across ad-hoc subdirectories without a clear pointer from QA\_ROOT.  
+* **Rerun discipline (preserve evidence; manifest uniqueness).**  
+  * Step log files MUST be preserved. A step MUST NOT rerun in a way that overwrites a prior attempt’s step log file. If a step is rerun, write to a **new** log filename (for example by appending an attempt suffix) so the prior attempt remains on disk.  
+  * The per-epic step-log manifest (`qa_step_logs_manifest.json`) MUST contain **at most one** record per `(run_id, check_id)` (no duplicates). On rerun, update/overwrite the existing manifest record for that `(run_id, check_id)` to point to the new `log_path` (do not append a second record for the same `(run_id, check_id)`).  
+  * After writing/updating the manifest, the harness MUST validate uniqueness: **no duplicate `(run_id, check_id)` entries**. If duplicates exist, classify the affected step (and any downstream close-pack generation that consumes the manifest) as **FAIL\_TOOLING** until the manifest is repaired.  
+  * Close-pack generators (for example Z0) MUST NOT produce a closure-consistent close-pack from a manifest that fails uniqueness validation. If any remediation run changes a step from `FAIL_*` to `PASS`, Z0 (or any close-pack generator) MUST be rerun against the updated manifest to produce a closure-consistent close-pack.  
+* **Token claim semantics (claims vs rosters).**  
+  * The `tokens` field in step logs and close-pack artifacts is a **claim set**, not a roster.  
+  * On `PASS`: allowed to claim `*_OK` tokens.  
+  * On `FAIL` / `FAIL_TOOLING` / `TOOLING_BLOCKED` / `FAIL_BEHAVIOR`: MUST NOT claim any `*_OK` token.  
+  * If a step needs to record “intended tokens,” it MUST use a separate field name (for example `intended_tokens`) and MUST NOT overload `tokens`.  
+* **Interactive-terminal safety (copy/paste blocks).**  
+  * QA Plan/runbook command blocks intended to be pasted into an interactive terminal MUST NOT include `exit` (or other shell-terminating control flow).  
+  * If exit semantics are required, run the enforcement in a subshell (for example `bash -lc '…'`) or write rc/status files and print a PASS/FAIL line without terminating the operator’s shell.  
+* **HTTP capture hygiene (stderr separation).**  
+  * Header/body evidence artifacts MUST NOT mix curl warnings/stderr lines into header files. Capture stderr separately (or filter non-header lines) so downstream parsers can be strict without producing false FAIL\_TOOLING.  
+* **Deferred-auth surfaces (token sourcing \+ classification).**  
+  * If a prod/internal endpoint is unreachable and operational enablement is not established, classify as `TOOLING_BLOCKED` and record the issue as an operational gap (not a code regression) until ops readiness is confirmed.  
+  * If an auth header/token is referenced in a plan, it must either be explicitly sourced (where/how the PO obtains it) or marked optional and only used if 401/403 is observed.  
 * **Codespaces snapshot (Step 0, mechanical; Codespaces runs).**  
   * Every Live QA plan executed in Codespaces MUST begin with a mechanical “Codespaces snapshot” step that captures the full, run-relevant environment context into the QA root under `audit/qa/<epic-id>/<run-id>/...` (including tool versions, rails variables, and presence/absence of required secrets, but never secret values). This is evidence, not prose, and is generated by commands.  
   * Live QA runs in Codespaces are non-conforming for approval if they do not have both: (a) an authoritative Glow QA Guide Codespaces configuration reference, and (b) the mechanical Codespaces snapshot artifact captured at the start of the run.  
   * If the Codespaces snapshot is governed/indexed as a formal evidence family, use the canonical `codespaces_snapshot.json` artifact family naming and indexing expectations owned by HDE Schemas & Artifacts (titles-only).  
+* **EPIC-level preflight steps (Step 0 and D0 pattern; mechanical).**  
+  * **Step 0A (Codespaces snapshot).**  
+     Produce a canonical Codespaces snapshot JSON at the epic meta path `audit/qa/<epic-id>/00_meta/codespaces_snapshot.json`, and (when a run\_id exists) a per-run copy under the run’s `00_meta/`. The corresponding step log MUST record status PASS, exit\_code 0, and closed-rails posture for this step.  
+  * **Step 0B (Doc delta capture).**  
+     Produce `audit/qa/<epic-id>/00_meta/doc_deltas.md` (and per-run copy if the plan requires) and record the step as PASS only when the required “no other deltas captured” line is present (plan-defined mechanical predicate). Step log MUST record the token claim(s) explicitly and MUST NOT claim unregistered tokens.  
+  * **Step 0C (Prod handshake).**  
+     Produce a connectivity-probe JSON artifact plus a headers capture containing an HTTP status line. PASS criteria must be mechanical and must not rely on placeholder JSON alone (see connectivity-probe rule above). HTTP 404 on `/internal/version` is not a mechanical blocker for the probe step if the plan defines PASS as “artifacts present,” but it MUST be recorded as a material signal for later `/internal/version` validation steps.  
+  * **Step 0D (Token roster validator, PF20 vs PF04).**  
+     Run a token roster validator that compares the epic’s PF20 acceptance roster against the PF04 token registry.  
+     Required artifacts (titles/paths may vary by epic, but must be under `audit/qa/<epic-id>/<run-id>/...`):  
+    * a roster text export (PF20 roster),  
+    * a machine JSON report listing `unregistered_tokens`,  
+    * a human summary derived from the JSON report,and a step log that records status PASS when `unregistered_tokens: []`, otherwise status TOOLING\_BLOCKED (exit 2\) when registry drift exists.  
+       When TOOLING\_BLOCKED, evidence collection may proceed, but step logs MUST NOT claim the unregistered tokens; they must be recorded as a blocking canon gap (no substitution/renaming).  
+  * **D0.1 (Required paths scan).**  
+     Produce a required-paths scan JSON with `missing_count` and `missing_paths`, plus a stable `d0_scan.md` summary and a per-run copy. PASS only when `missing_count: 0` and the step log records exit\_code 0 under closed rails.  
+  * **D0.2 (Determinism pins evidence).**  
+     Ensure determinism pins evidence exists at the canonical governed location (`audit/gates/determinism/env_pins.log` with its `*.path_proof.txt`), and that the step log embeds or references the governed evidence (snapshot copies may exist under the run). PASS only when the pins evidence reports status success and matches the canonical tuple (SAFE\_MODE/ALLOW\_NETWORK plus locale/TZ pins). Deviations files are optional; absence is not a blocker unless the plan explicitly requires a deviations file for every run.  
 * **Live QA is gitless (no working-tree gates).**  
   * Live QA runbooks MUST NOT include git operations (including but not limited to: `git checkout -b`, git-status gating, `git add`, `git commit`, `git push`, PR creation). Live QA PASS/FAIL MUST NOT be determined by working-tree cleanliness.  
   * If git information is captured at all, it is traceability-only and cannot block execution.  
   * Known Codespaces packaging artifacts MUST be explicitly non-blocking and left untouched. Specifically: `glow_hdengine.egg-info/PKG-INFO` (and the containing `glow_hdengine.egg-info/` directory) MUST NOT be deleted, restored, or used as a QA gating signal.  
-  * The only write-scope rail for Live QA evidence remains: `audit/qa/...`. Required deliverables and step PASS/FAIL must be validated by presence/contents of the mechanically generated artifacts under `audit/qa/...` (and, where used, step event logs / exit code files), without inspecting or gating on git status.
-
+  * The only write-scope rail for Live QA evidence remains: `audit/qa/...`. Required deliverables and step PASS/FAIL must be validated by presence/contents of the mechanically generated artifacts under `audit/qa/...` (and, where used, step event logs / exit code files), without inspecting or gating on git status.  
 * **Deliverables list per QA step (no screen-only acceptance).**  
   * Every QA step described in a QA Implementation Plan, Live QA Guide, or QA addendum MUST include a **Deliverables** subsection that names the minimal evidence set required to judge PASS/FAIL for that step.  
-     
-
   * Deliverables MUST be listed as fully qualified repo-relative paths (for example `audit/qa/<epic>/<run-id>/D0_bootstrap.log`, `audit/qa/<epic>/<run-id>/step_<name>.log`, `audit/qa/<epic>/qa_step_logs_manifest.json`). “Everything in this folder” and similar phrases are forbidden.  
-     
-
   * PASS/FAIL criteria for the step MUST be expressed only in terms of: (1) existence and non-emptiness of these files, and (2) simple, checkable conditions on their content (grep/diff style), not terminal-only output.  
-     
-
   * If a step creates no new files, the Deliverables subsection MUST state “No new files” and list the existing files it inspects (by fully qualified path).   
+* **Connectivity probes (open rails) must be mechanically meaningful.**  
+  * If a QA step performs a connectivity probe (for example a prod handshake), PASS criteria MUST include:  
+    * a headers capture file that contains an HTTP status line, and  
+    * a recorded command exit code.  
+  * A step MUST NOT treat “JSON artifact exists” as sufficient PASS if the underlying probe command may fail and still proceed (for example via `|| true`). If the probe fails to produce an HTTP status line, the step MUST be classified as a tooling failure (for example FAIL\_TOOLING / TOOLING\_BLOCKED per the plan’s taxonomy), not PASS.  
 * **Copy/paste-ready PO commands (no hand edits).**
 
   * All PO-facing QA commands MUST be concrete, copy/paste-ready (no `<PO: ...>` placeholders or “fill in this value” instructions).
@@ -1701,8 +1801,16 @@ Tests (titles-only; closed rails):
 
     * hard-code values that mirror test fixtures.
 
-  * QA Plans MUST NOT require the PO to hand-edit commands; QA harnesses own variable discovery and payload construction.
+  * QA Plans MUST NOT require the PO to hand-edit commands; QA harnesses own variable discovery and payload construction.  
+* **No non-canonical QA scripts or wrappers in Live QA plans (baseline commands only).**  
+  * Live QA plans MUST NOT depend on helper/wrapper scripts unless the script path is explicitly canon-named in PF canon.  
+  * If a step needs “tooling,” it MUST be either:
 
+  * a canon-named entrypoint by explicit path (for example the evidence index updater, env pins checks, release-id recompute), or
+
+  * an inline tool whose full source is embedded in the plan step and written into a run-local QA tools directory (no hidden dependencies).
+
+* Any plan that references a non-canon script path as a “required surface” is out of spec and must be revised to validate the governed artifact surface directly using baseline commands (explicit shell/Python one-liners and explicit file writes with no opaque runners).  
 * **Reuse test semantics instead of scraping arguments.**
 
   * When tests construct data dynamically (for example writing candidates to a temp file via `_write_candidates(tmp_path)` and passing that path into `engine.cli dev:sampler`), the Live QA harness MUST mirror that logic directly (for example by writing the same payload under `audit/qa/...`) rather than scraping argument strings from test source.
@@ -1757,8 +1865,9 @@ Tests (titles-only; closed rails):
 
 * Updated QA Plans or runbooks (titles-only) that implement these harness rules, including per-step QA ROOT logs, and clearly separate tooling failures from behavior failures.
 
-**Notes:**  
- Added from EPIC019 Live QA Addendum 11 and Addendum 14 and the HDE-Mechanics Guide “Live QA harness” section. This subtask generalizes sampler-specific lessons (bootstrap tooling, CANDIDATES\_FILE derivation, viewer-001, seeds 111/222, empty JSON outputs) into global QA harness requirements and now also requires that **each QA Plan step** have a single, consolidated step log under QA\_ROOT that carries the step header and all evidence for that step. The D4 sampler Step 5 run is a compliant example; the subtask remains **Not done** until this pattern is applied consistently across all epics and QA steps.
+**Notes:**
+
+Added from EPIC019 Live QA Addendum 11 and Addendum 14 and the HDE-Mechanics Guide “Live QA harness” section. This subtask generalizes sampler-specific lessons (bootstrap tooling, CANDIDATES\_FILE derivation, viewer-001, seeds 111/222, empty JSON outputs) into global QA harness requirements and now also requires that **each QA Plan step** have a single, consolidated step log under QA\_ROOT that carries the step header and all evidence for that step. The D4 sampler Step 5 run is a compliant example; the subtask remains **Not done** until this pattern is applied consistently across all epics and QA steps. Addendum 50-51 further clarifies cross-epic failure modes (token claims vs rosters, manifest dedupe/uniqueness, close-pack sequencing, interactive-shell safety, and HTTP capture hygiene) that must be enforced by the harness for this row to be treated as complete.
 
 ### **Subtask HDE-CALC003.15 — Acceptance map & QA harness viability check**
 
@@ -3984,16 +4093,21 @@ Canonical-compare logs (paths owned by Evidence Index)
 # **Phase III — Separation (Public shape, identity, guardrails)**
 
 **Phase description:**  
-Wire persistence, public presenter/emitter, error envelope, and internal ops identity surfaces so that public and operator-visible bytes are canonical, deterministic, and backed by indexed evidence.
+ Wire persistence, public presenter/emitter, error envelope, and internal ops identity surfaces so that public and operator-visible bytes are canonical, deterministic, and backed by indexed evidence.
 
 **Phase master status:** **Partial**
 
 **Notes:**
 
-* This phase remains Partial primarily due to remaining closure work for `/internal/version` identity coupling and evidence-indexing (see HDE-SEPA004.4 and HDE-SEPA004.5).  
-* EPIC022 PR4 (D3) introduced a governed `/internal/version` evidence bundle under `artifacts/ops/internal_version/` and updated acceptance bindings (token matrix \+ acceptance map) and Index/Mirror entries. Verify final CI results and confirm `two_run_identity.log` content meets the required coupling checks before treating the D3 slice as Done.  
-  Addendum 16-18 BN Drain 8.5.3  
-  Addendum 16-18 BN Drain 8.5.3  
+* This phase remains Partial due to remaining Phase III closure work outside `/internal/version` (see remaining Partial/Not done rows in this phase).
+
+* EPIC022 D3 is now fully evidenced as PASS for the `/internal/version` closure slice:
+
+  * D3.1 internal\_version\_bundle captured and validated the prod `/internal/version` surface with governed artifacts under `artifacts/ops/internal_version/`.
+
+  * D3.2 evidence\_index\_update\_and\_validate completed index/mirror regeneration and validation under closed rails, including explicit checks that the PF12-canonical conditional-header filenames (`headers_cond_if_*`) are present in the governed indices.  
+     Update Subtasks HDE-SEPA004.4 and HDE-SEPA004.5 to reflect this closure.
+
 * Evidence/index parity must use the canonical Machine Mirror path `artifacts/evidence_index.jsonl` only; any alternate mirror path in tooling output is a blocker and must be corrected before merge.
 
 ---
@@ -4685,22 +4799,16 @@ Addendum 13-15 BN Drain 8.5.3
 **Concrete evidence for the `CLI_STDOUT_LF_OK` portion (EPIC022 PR3, D2):**  
 EPIC022 PR3 produces deterministic, closed-rails showcompat stdout capture artifacts and binds `CLI_STDOUT_LF_OK` to concrete evidence (canonical-bytes test \+ the new governed showcompat artifacts).
 
-Addendum 13-15 BN Drain 8.5.3
-
-Addendum 13-15 BN Drain 8.5.3
-
 Canonical-bytes test (titles-only; exact test node referenced by EPIC022 PR3 follow-up):
 
 `tests/cli/test_cli_canonical_bytes.py::test_showcompat_stdout_is_canonical`
 
 Governed showcompat stdout capture artifacts (titles/paths only; each has a sibling `*.path_proof.txt` and is indexed/mirrored in the same PR as required by the evidence skeleton discipline):
 
-Addendum 13-15 BN Drain 8.5.3
-
-Addendum 13-15 BN Drain 8.5.3
-
 `artifacts/cli/showcompat/stdout.json`  
-`artifacts/cli/showcompat/stdout.json.sha256`  
+`artifacts/cli/showcompat/stdout.json.sha256`
+
+`artifacts/cli/showcompat/stdout.sha256 — legacy alias checksum sidecar (compatibility-only for EPIC022 acceptance binding). MUST be mechanically derived from the same stdout.json bytes as stdout.json.sha256. Evidence indexing MUST reference stdout.json.sha256 as the canonical sidecar name.`  
 `artifacts/cli/showcompat/args.json`  
 Producer tool (titles-only): `tools/cli/generate_showcompat_artifacts.py`
 
@@ -4824,9 +4932,9 @@ EPIC020 acceptance metadata:
 
 **Task notes:**
 
-Audit v1 (2025-11-17) originally listed missing `INTVER_200_CTYPE_JSON_UTF8_OK`, `INTVER_HEAD_PARITY_OK`, `INTVER_CONDITIONALS_IGNORED_OK`, and `INTVER_200_NO_ETAG_OK`, and noted that headers/body proofs were incomplete and no full GET/HEAD/conditional/identity proof set existed. Subsequent work updates that posture:
+Audit v1 (2025-11-17) originally listed missing `INTVER_200_CTYPE_JSON_UTF8_OK`, `INTVER_HEAD_PARITY_OK`, `INTERNAL_VERSION_CONDITIONALS_IGNORED_OK`, and `INTVER_200_NO_ETAG_OK`, and noted that headers/body proofs were incomplete and no full GET/HEAD/conditional/identity proof set existed. Subsequent work updates that posture:
 
-* EPIC017/EPIC018 QA (see Subtasks HDE-SEPA004.2 and HDE-SEPA004.3) proved conditional-ignore behavior and no-store/no-ETag headers for `/internal/version` on Railway prod, with governed logs under `audit/qa/hde-epic017/logs/**` and tokens `INTVER_CONDITIONALS_IGNORED_OK` and `INTVER_200_NO_ETAG_OK` marked **Done**.
+* EPIC017/EPIC018 QA (see Subtasks HDE-SEPA004.2 and HDE-SEPA004.3) proved conditional-ignore behavior and no-store/no-ETag headers for `/internal/version` on Railway prod, with governed logs under `audit/qa/hde-epic017/logs/**` and tokens `INTERNAL_VERSION_CONDITIONALS_IGNORED_OK` and `INTVER_200_NO_ETAG_OK` marked **Done**.
 
 * EPIC020 D3 (“Internal-ops identity”) adds dev-harness GET/HEAD identity and JSON content-type proofs for `/internal/version`, wiring tokens `INTVER_200_CTYPE_JSON_UTF8_OK` and `INTVER_HEAD_PARITY_OK` to header/body artifacts and Live QA Step 4 logs under `audit/qa/hde-epic020/**` and capturing those identity records in EPIC020 Candidate 1 bundles/manifests integrated into the Evidence Index and Machine Mirror.
 
@@ -4896,7 +5004,7 @@ Epic or card: EPIC-017 (QA01 conditional GET verification)
 
 Tokens:
 
-INTVER\_CONDITIONALS\_IGNORED\_OK
+INTERNAL\_VERSION\_CONDITIONALS\_IGNORED\_OK
 
 Evidence / artifacts:
 
@@ -4945,21 +5053,11 @@ Notes:
 
 ### **Subtask HDE-SEPA004.4 — Two-run identity & identity coupling**
 
-Subtask ID: HDE-SEPA004.4
-
-Subtask name/label: Two-run identity and identity coupling
-
-Subtask description:
-
-Prove two-run identity for `/internal/version` bodies and ensure they are consistent with identity and provenance artifacts:
-
-Two consecutive GET requests to `/internal/version` on the same environment produce byte-identical, LF-terminated JSON bodies when captured under pinned env (`LC_ALL=C`, `LANG=C`, `TZ=UTC`).
-
 The body values for `engine_tag`, `release_id`, `invocation_tag`, `build_commit`, `emitter_sha256`, and any additional identity fields required by the Identity and Provenance module match the frozen identity artifacts for this release (pack manifest, `release_id` artifacts, emitter hash, and service identity snapshot).
 
-Subtask status: Partial
+Subtask status: **Done**
 
-Epic or card: HDE-EPIC022 (D3 — `/internal/version` coupling proof \+ evidence bundle)
+Epic or card: **HDE-EPIC022** (D3 — `/internal/version` coupling proof \+ evidence bundle)
 
 Tokens:
 
@@ -4975,8 +5073,9 @@ Internal\_version bundle artifacts (governed):
  `artifacts/ops/internal_version/body_get.sha256`  
  `artifacts/ops/internal_version/headers_get.txt`  
  `artifacts/ops/internal_version/headers_head.txt`  
- `artifacts/ops/internal_version/cond_if_none_match_headers.txt`  
- `artifacts/ops/internal_version/cond_if_modified_since_headers.txt`  
+ `artifacts/ops/internal_version/headers_cond_if_none_match.txt`  
+ `artifacts/ops/internal_version/headers_cond_if_modified_since.txt`  
+ `artifacts/ops/internal_version/request_chain_manifest.json`  
  plus the corresponding `*.path_proof.txt` files for governed bundle artifacts (where present).
 
 Acceptance binding surfaces (names-only; content governed elsewhere):
@@ -4992,7 +5091,11 @@ Evidence Index \+ Machine Mirror (same-PR parity; paths pinned in PF09 §0.3):
 
 Notes:
 
-The excerpt evidence indicates these artifacts and bindings were generated/committed in EPIC022 PR4, but the final in-session transcript does not fully show the last `two_run_identity.log` contents. Confirm that the committed log includes explicit two-run identity pass/fail plus explicit coupling pass/fail checks to governed sources before marking this row Done.
+* EPIC022 D3.1 is recorded as PASS with required predicates satisfied, including two-run identity and explicit coupling verification (including `release_id` coupling to `artifacts/math/release_id.txt`).
+
+* Conditional header filenames are PF12-canonical (`headers_cond_if_*`) and are the indexed targets.
+
+* Non-blocking caveat: `headers_head.txt` may contain a curl warning line; any parser/verifier must ignore non-header lines (non `key: value` lines).
 
 ### **Subtask HDE-SEPA004.5 — Internal ops evidence indexing**
 
@@ -5001,43 +5104,61 @@ The excerpt evidence indicates these artifacts and bindings were generated/commi
 **Subtask name/label:** /internal/version evidence & indexing
 
 **Subtask description:**  
-Index all `/internal/version` artifacts and related identity artifacts in `docs/evidence/INDEX.json` and `artifacts/evidence_index.jsonl` in the same PR (records-only canonical JSONL; one LF; unknown-key reject; fixed field order; with path-proofs).
+ Index all `/internal/version` artifacts and related identity artifacts in `docs/evidence/INDEX.json` and `artifacts/evidence_index.jsonl` in the same PR (records-only canonical JSONL; one LF; unknown-key reject; fixed field order; with path-proofs).
 
-**Subtask status:** **Partial**
+**Subtask status:** **Done**
 
 **Epic or card:** HDE-EPIC022 (D3 — `/internal/version` evidence bundle indexing \+ validator hardening)
 
 **Tokens:**
 
 `EVIDENCE_INDEX_UPDATED_OK`  
-`EVIDENCE_INDEX_MIRROR_OK`  
-`EVIDENCE_INDEX_HASH_OK`  
-`MACHINE_MIRROR_UPDATED_OK`  
-`EVIDENCE_PATHS_VALIDATED_OK`
+ `EVIDENCE_INDEX_MIRROR_OK`  
+ `EVIDENCE_INDEX_HASH_OK`  
+ `MACHINE_MIRROR_UPDATED_OK`  
+ `EVIDENCE_PATHS_VALIDATED_OK`
 
 **Evidence / artifacts:**
 
 Index \+ mirror updates (same PR):
 
 `docs/evidence/INDEX.json`  
-`docs/evidence/INDEX.sha256`  
-`artifacts/evidence_index.jsonl`  
-plus path-proof transcripts (`*.path_proof.txt`) for all governed `/internal/version` bundle artifacts and for the Machine Mirror self-record.
+ `docs/evidence/INDEX.sha256`  
+ `docs/evidence/INDEX.json.path_proof.txt`  
+ `docs/evidence/INDEX.sha256.path_proof.txt`  
+ `artifacts/evidence_index.jsonl`  
+ `artifacts/evidence_index.jsonl.path_proof.txt`
+
+Internal\_version governed artifacts that must be indexed/mirrored (canonical filenames):
+
+`artifacts/ops/internal_version/body_get.json`  
+ `artifacts/ops/internal_version/body_get.sha256`  
+ `artifacts/ops/internal_version/headers_get.txt`  
+ `artifacts/ops/internal_version/headers_head.txt`  
+ `artifacts/ops/internal_version/headers_cond_if_none_match.txt`  
+ `artifacts/ops/internal_version/headers_cond_if_modified_since.txt`  
+ `artifacts/ops/internal_version/two_run_identity.log`  
+ `artifacts/ops/internal_version/request_chain_manifest.json`  
+ plus co-located `*.path_proof.txt` files for the governed artifacts above (where present).
 
 Acceptance binding surfaces:
 
 `audit/qa/hde-epic022/token_evidence_matrix.md`  
-`docs/acceptance_map_epic022.json`
+ `docs/acceptance_map_epic022.json`
 
 Validator hardening evidence (titles-only; canonical homes elsewhere):
 
-A dedicated self-record regression test exists and is run as part of the evidence-validation posture (for example `tests/evidence/test_machine_mirror_self_proof.py`).
-
-Addendum 16-18 BN Drain 8.5.3
+* Evidence-index update \+ `--check` outputs and pytest logs produced by the D3.2 step bundle under `audit/qa/hde-epic022/...` (step log \+ results \+ snapshots).
 
 **Notes:**
 
-The excerpt reports a prior CI failure caused by mirror self-record proof SHA mismatches and indicates this was addressed by tooling \+ validator updates. Any tooling output that references a non-canonical mirror path (for example `docs/evidence/INDEX.machine_mirror.jsonl`) conflicts with PF09 §0.3 and must be treated as a blocker until corrected.
+* EPIC022 D3.2 is recorded as PASS and includes explicit validation outputs (index write, index check, pytest suites, and mirror schema check).
+
+* D3.2 includes an explicit “canonical conditionals present” check confirming `headers_cond_if_none_match.txt` and `headers_cond_if_modified_since.txt` are present in the governed evidence indices (missing: \[\]).
+
+* PR03 ensures `request_chain_manifest.json` is tracked in the Machine Mirror with a `proof_anchor` pointing to `request_chain_manifest.json.path_proof.txt`.
+
+* Governance reminder (evidence binding hygiene): `*.path_proof.txt` files are required deliverables and must be validated via `proof_anchor`/mirror discipline, but token/evidence bindings must not cite `*.path_proof.txt` as primary evidence titles.
 
 ---
 
@@ -7787,7 +7908,11 @@ audit/qa/hde-epic017/logs/step\_aux\_preview1\_admin.json — EPIC-017 QA07 Aux 
 
 **Notes:**
 
-Harness and gates are specified in canon and PF09, but pack/manifest, environment snapshot, and the integrated evidence harness remain pending.
+Harness and gates are specified in canon and PF09.
+
+Release identity core for Freeze-Pack (canonical manifest SoT, byte-identical freeze evidence copy, release\_id recompute proof, and fail-closed identity gate) is now implemented and exercised for the EPIC022 remediation slice (see HDE-DIST002.1–.3).
+
+Environment snapshot, integrated one-button evidence harness coverage beyond release identity, and remaining Phase VI indexing and performance work remain pending.
 
 ---
 
@@ -8553,20 +8678,22 @@ Architecture snapshot artifact (titles-only; schema & path in HDE-Schemas & Arti
 
 ---
 
-## Task HDE-DIST002 — Pack/manifest & release identity
+## **Task HDE-DIST002 — Pack/manifest & release identity**
 
 **Task ID:** HDE-DIST002
 
 **Task name/label:** Pack/manifest & release identity
 
-**Task status:** **Not done**
+**Task status:** **Partial**
 
 **Task description:**  
- Canonicalize `catalog/manifest.json`, compute and recompute `release_id` as `sha256(canonical_bytes("catalog/manifest.json"))`, ensure manifest structure invariants, and index pack/manifest identity artifacts.
+ Canonicalize `catalog/manifest.json`, compute and recompute `release_id` as `sha256(canonical_bytes("catalog/manifest.json"))`, enforce manifest structure invariants, and maintain pack/manifest identity artifacts.
 
 **Task notes:**
 
-**Status (Audit v1 — 2025-11-17):** Not done; manifest freeze and release\_id recompute not run; no pack identity artifacts indexed.
+**Status (Audit v1 — 2025-11-17):** Not done (historical audit note; superseded for EPIC022 identity remediation slice).
+
+**Status (EPIC022 remediation slice):** Core release identity contract is implemented and gated (canonical manifest SoT, byte-identical freeze evidence copy, recompute proof, and fail-closed CI gate). Indexing of identity artifacts in Evidence Index and Machine Mirror remains tracked under HDE-DIST002.4.
 
 ### **Subtask HDE-DIST002.1 — Canonical `catalog/manifest.json`**
 
@@ -8578,6 +8705,10 @@ Architecture snapshot artifact (titles-only; schema & path in HDE-Schemas & Arti
 **Canonical JSON.**
 
 `catalog/manifest.json` MUST be canonical JSON (UTF-8, no BOM; ASCII-sorted keys; compact; exactly one trailing LF), as defined in HDE-Schemas & Artifacts (titles-only).
+
+**Top-level key set is closed (no extras).**
+
+`catalog/manifest.json` top-level MUST contain exactly: `root`, `version`, `built_at_utc`, `files` (and no other keys).
 
 **File list invariants.**
 
@@ -8601,9 +8732,9 @@ Per-entry `{path, sha256, size_bytes}` identity is verified via the manifest che
 
 All manifest checks MUST run under `LC_ALL=C`, `LANG=C`, `TZ=UTC` using canonical JSON rules shared with the rest of the Evidence Index discipline.
 
-**Subtask status:** **Not done**
+**Subtask status:** **Done**
 
-**Epic or card:** **Unknown**
+**Epic or card:** **HDE-EPIC022**
 
 **Tokens:**
 
@@ -8622,11 +8753,11 @@ All manifest checks MUST run under `LC_ALL=C`, `LANG=C`, `TZ=UTC` using canonica
 `artifacts/math/freeze_pack_manifest.json`
 
 **Notes:**  
- Detailed manifest shape and per-entry schema remain single-homed in HDE-Schemas & Artifacts; PF09 requires that the canonicalized manifest and its file list invariants are enforced and evidenced.
+ `catalog/manifest.json` is the single source of truth for Freeze-Pack membership and release identity. `artifacts/math/freeze_pack_manifest.json` is the evidence copy and MUST be byte-identical to `catalog/manifest.json` on canonical bytes (not JSON-equivalent). No derived schema, subset manifest, or alternate contract is permitted at the freeze evidence-copy path.
 
-### 
+Any `manifest_snapshot.json` (or similar summary artifacts) are evidence-only and MUST NOT be used as identity inputs or substituted for the Freeze-Pack Manifest.
 
-### Subtask HDE-DIST002.2 — release\_id compute & recompute
+### **Subtask HDE-DIST002.2 — release\_id compute & recompute**
 
 **Subtask name/label:** release\_id computation & recompute proof
 
@@ -8634,11 +8765,11 @@ All manifest checks MUST run under `LC_ALL=C`, `LANG=C`, `TZ=UTC` using canonica
 
 Compute `release_id` as lowercase hex-64 `sha256(canonical_bytes("catalog/manifest.json"))`.
 
-Capture recompute logs showing recomputation equals the on-disk `release_id`.
+Capture recompute logs showing recomputation equals the on-disk `release_id`, and fail closed on any mismatch.
 
-**Subtask status:** **Not done**
+**Subtask status:** **Done**
 
-**Epic or card:** **Unknown**
+**Epic or card:** **HDE-EPIC022**
 
 **Tokens:**
 
@@ -8652,22 +8783,97 @@ Capture recompute logs showing recomputation equals the on-disk `release_id`.
 
 `artifacts/math/release_id_recompute.log`
 
-### Subtask HDE-DIST002.3 — Checksums audit
+`tests/scripts/test_release_id_recompute.py`
+
+`tests/transport/test_internal_version_contract.py`
+
+**Notes:**
+
+EPIC022 release-id evidence is canonical at `artifacts/math/release_id.txt` and `artifacts/math/release_id_recompute.log`. Any reference to `audit/gates/release/release_id.txt` is deprecated and MUST NOT be used for evidence indexing or close-pack checks. If a transitional `audit/gates/release/...` file is required, it MUST be produced as a mechanically generated copy sourced from `artifacts/math/...`, and indexing/binding remains on the canonical `artifacts/math/...` paths.
+
+Fail-closed CI gate (identity recurrence prevention):
+
+* `python scripts/release_id_recompute.py --check` MUST fail closed (non-zero) on any mismatch and MUST NOT introduce alternate release identity semantics.
+
+* `python ci/checks/check_release_identity.sh` is the fail-closed CI identity gate. It enforces closed rails, validates manifest key-set and canonical-bytes posture, asserts byte-equality between `catalog/manifest.json` and `artifacts/math/freeze_pack_manifest.json`, and requires the governed recompute evidence set to exist and be non-empty.
+
+No dual semantics:
+
+* No “branching” semantics are recognized for release identity. Fallback code paths (including /internal/version fallback) MUST derive `release_id` from canonical manifest bytes and MUST NOT hash raw/uncanonical bytes or substitute other manifest-like inputs.
+
+Operator note:
+
+* Running the identity gate or `--check` locally may rewrite `artifacts/math/release_id_recompute.log` as a tool-driven artifact update. In local repos, revert unintended log churn before committing.
+
+### **Subtask HDE-DIST002.2 — release\_id compute & recompute**
+
+**Subtask name/label:** release\_id computation & recompute proof
+
+**Subtask description:**
+
+Compute `release_id` as lowercase hex-64 `sha256(canonical_bytes("catalog/manifest.json"))`.
+
+Capture recompute logs showing recomputation equals the on-disk `release_id`, and fail closed on any mismatch.
+
+**Subtask status:** **Done**
+
+**Epic or card:** **HDE-EPIC022**
+
+**Tokens:**
+
+`RELEASE_ID_RECOMPUTE_OK`
+
+`MANIFEST_SHA256_HEX64_OK`
+
+**Evidence / artifacts:**
+
+`artifacts/math/release_id.txt`
+
+`artifacts/math/release_id_recompute.log`
+
+`tests/scripts/test_release_id_recompute.py`
+
+`tests/transport/test_internal_version_contract.py`
+
+**Notes:**
+
+EPIC022 release-id evidence is canonical at `artifacts/math/release_id.txt` and `artifacts/math/release_id_recompute.log`. Any reference to `audit/gates/release/release_id.txt` is deprecated and MUST NOT be used for evidence indexing or close-pack checks. If a transitional `audit/gates/release/...` file is required, it MUST be produced as a mechanically generated copy sourced from `artifacts/math/...`, and indexing/binding remains on the canonical `artifacts/math/...` paths.
+
+Fail-closed CI gate (identity recurrence prevention):
+
+* `python scripts/release_id_recompute.py --check` MUST fail closed (non-zero) on any mismatch and MUST NOT introduce alternate release identity semantics.
+
+* `python ci/checks/check_release_identity.sh` is the fail-closed CI identity gate. It enforces closed rails, validates manifest key-set and canonical-bytes posture, asserts byte-equality between `catalog/manifest.json` and `artifacts/math/freeze_pack_manifest.json`, and requires the governed recompute evidence set to exist and be non-empty.
+
+No dual semantics:
+
+* No “branching” semantics are recognized for release identity. Fallback code paths (including /internal/version fallback) MUST derive `release_id` from canonical manifest bytes and MUST NOT hash raw/uncanonical bytes or substitute other manifest-like inputs.
+
+Operator note:
+
+* Running the identity gate or `--check` locally may rewrite `artifacts/math/release_id_recompute.log` as a tool-driven artifact update. In local repos, revert unintended log churn before committing.
+
+### **Subtask HDE-DIST002.3 — Checksums audit**
 
 **Subtask name/label:** Manifest checksums audit
 
 **Subtask description:**  
- Run a checksums audit over manifest-listed artifacts and capture its log.
+ Run a checksums audit over manifest-listed artifacts and capture its log. Audit operates on manifest-listed entries and is part of the governed release identity evidence surface.
 
-**Subtask status:** **Not done**
+**Subtask status:** **Done**
 
-**Epic or card:** **Unknown**
+**Epic or card:** **HDE-EPIC022**
 
 **Tokens:** **Unknown** (audit behavior; semantics live in canon)
 
 **Evidence / artifacts:**
 
 `artifacts/math/checksums_audit.log`
+
+**Notes:**  
+ This log is treated as part of the governed release identity recompute evidence set. It supports the “no drift between manifest-declared identity and on-disk bytes” posture and is expected to be present and non-empty when the release identity gate is claimed as passing.
+
+### 
 
 ### Subtask HDE-DIST002.4 — Pack/manifest indexing
 
@@ -9418,6 +9624,12 @@ Key order is **frozen** and matches the Identity & Provenance / Internal Meta sp
 
 Values are sourced via `identity_admin()` from the Identity & Provenance module (no direct env reads at emit time; no mutation after freeze).
 
+Token emission gating (no “false OK”):  
+ A tool MUST NOT emit any \*\_OK token for `/internal/version` unless the corresponding invariant has been verified against the same captured bytes that are being written as governed artifacts for that run. If the run status is FAIL\_TOOLING (or equivalent), the tool MUST NOT emit \*\_OK tokens for invariants that did not pass (including integrity-success claims such as path-proof match or two-run identity).
+
+Coupling requirement (anti-mixed-target / anti-redirect drift):  
+ For each probe run, the evidence must be coupled such that emitted tokens, captured headers, captured body, and any two-run identity digest refer to the same resolved target and response chain. If coupling cannot be established, the run MUST fail and MUST NOT emit \*\_OK tokens.
+
 *Subtask status:* Not done
 
 *Epic or card:* Unknown
@@ -9428,7 +9640,7 @@ Values are sourced via `identity_admin()` from the Identity & Provenance module 
 
 `INTVER_HEAD_PARITY_OK`
 
-`INTVER_CONDITIONALS_IGNORED_OK`
+`INTERNAL_VERSION_CONDITIONALS_IGNORED_OK`
 
 `INTVER_200_NO_ETAG_OK`
 
@@ -9456,9 +9668,15 @@ Values are sourced via `identity_admin()` from the Identity & Provenance module 
 
 **Artifacts impact**
 
-New or refined artifact paths:
+New or refined artifact paths (canonical filename set; single home):
 
 `artifacts/ops/internal_version/body_get.json` (canonical body; replaces generic `body.json` naming)
+
+`artifacts/ops/internal_version/body_get.sha256`
+
+`artifacts/ops/internal_version/headers_get.txt`
+
+`artifacts/ops/internal_version/headers_head.txt`
 
 `artifacts/ops/internal_version/cond_if_none_match_headers.txt`
 
@@ -9466,17 +9684,25 @@ New or refined artifact paths:
 
 `artifacts/ops/internal_version/two_run_identity.log`
 
-These correspond to PF14’s `intver/*` artifact keys; schemas remain routed to PF-Canon-HDE-Schemas & Artifacts.
+**Permitted alias copies (compatibility-only; conditional snapshot files only):**
 
-*Notes:*
+`artifacts/ops/internal_version/cond_if_none_match.txt`
 
-For all `intver/*` artifacts, list titles/paths in `docs/evidence/INDEX.json` and mirror 1:1 in `artifacts/evidence_index.jsonl` (canonical JSONL, one LF; unknown keys rejected). The mirror records include `artifact_key`, `sha256`, `size_bytes`, `produced_at_utc`, `discovered_physical_path`, and `proof_anchor` pointing to a co-located path-proof file.
+`artifacts/ops/internal_version/cond_if_modified_since.txt`
+
+**Rules (EPIC022 bridge):**
+
+* EPIC022 Live QA MUST produce the internal\_version evidence bundle using the canonical filename set above.
+
+* EPIC022 Live QA MAY additionally emit the two alias copies above to satisfy acceptance binding naming drift. No other filename variants are permitted.
+
+* Evidence indexing keys MUST map to the canonical filenames; alias files are compatibility-only.
 
 **Acceptance impact**
 
 Tokens referenced here:
 
-`INTVER_200_CTYPE_JSON_UTF8_OK`, `INTVER_HEAD_PARITY_OK`, `INTVER_CONDITIONALS_IGNORED_OK`, `INTVER_200_NO_ETAG_OK`, `TWO_RUN_IDENTITY_OK`, `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`.
+`INTVER_200_CTYPE_JSON_UTF8_OK`, `INTVER_HEAD_PARITY_OK`, `INTERNAL_VERSION_CONDITIONALS_IGNORED_OK`, `INTVER_200_NO_ETAG_OK`, `TWO_RUN_IDENTITY_OK`, `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`.
 
 All tokens already exist in Governance / PF14; we only clarify which artifacts and checks satisfy them for `/internal/version`.
 
@@ -9545,7 +9771,7 @@ HEAD: status 200; no body; validators mirror 200; `Content-Type == GET`; `Conten
 
 Writers and errors **bypass** the cache and continue to send `Cache-Control: no-store` with **no ETag**; cached paths must not alter typed error envelopes.
 
-`/internal/version` remains operator-only and is never cached.
+`/internal/version` is never cached.
 
 **Deterministic invalidation.**
 
@@ -10257,7 +10483,7 @@ PF09 does not redefine A7, writers/error, INTVER, or DB token semantics; those r
 
 `INTVER_HEAD_PARITY_OK`
 
-`INTVER_CONDITIONALS_IGNORED_OK`
+`INTERNAL_VERSION_CONDITIONALS_IGNORED_OK`
 
 `INTVER_200_NO_ETAG_OK`
 
@@ -10344,8 +10570,47 @@ When the stateless JSON QA epic is created, reference it in this row by title on
 *Tokens:*  
  None yet; PF14 §17.9 explicitly forbids gating on stateless JSON QA artifacts until a future epic defines tokens. PF09 records the non-gating constraint only.
 
-*Evidence / artifacts:*  
- None; PF09 does not require stateless JSON QA artifacts until the future epic is live.
+**Evidence / artifacts:**
+
+`artifacts/proofs/success_get.txt`
+
+`artifacts/proofs/success_head.txt`
+
+`artifacts/proofs/success_304.txt`
+
+`artifacts/proofs/success_writers_errors.txt`
+
+`artifacts/ops/internal_version/headers_get.txt`
+
+`artifacts/ops/internal_version/headers_head.txt`
+
+`artifacts/ops/internal_version/headers_cond_if_none_match.txt`
+
+`artifacts/ops/internal_version/headers_cond_if_modified_since.txt`
+
+`artifacts/ops/internal_version/body_get.json`
+
+`artifacts/ops/internal_version/body_get.sha256`
+
+`artifacts/ops/internal_version/provenance_note.md`
+
+`artifacts/db/ddl_fingerprint.json`
+
+`artifacts/db/grants.txt`
+
+`artifacts/db/check_schema.txt`
+
+`artifacts/db/check_constraints.txt`
+
+`artifacts/db/partition_plan.txt` (if used)
+
+`artifacts/db/db_rw_smoke.log` (optional)
+
+`artifacts/proofs/env_pins.txt`
+
+`docs/evidence/INDEX.json` / `docs/evidence/INDEX.sha256`
+
+`artifacts/evidence_index.jsonl`
 
 **Acceptance impact**
 

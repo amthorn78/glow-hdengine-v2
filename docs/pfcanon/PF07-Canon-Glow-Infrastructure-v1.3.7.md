@@ -1,12 +1,12 @@
 # **0\. Front Matter**
 
 **Title:** PF07-Canon-Glow-Infrastructure  
-**Version:** v1.3.2
+**Version:** v1.3.7
 
 **Status:** Canon  
-**Effective date:** 2025-12-24
+**Effective date:** 2026-01-01
 
-**Last Update Gate:** BN 8.5.3 Drain 26-29
+**Last Update Gate:** BN 8.7.7 Drain 50-51
 
 **Invocation tag:** `INV-f2ac55d77ce9aacc`
 
@@ -51,7 +51,7 @@ Where a single shared canonical home exists for a given capability across multip
 
 **Change control (titles-only cross-refs)**
 
-* **Supersession rule (PF10 addenda).** When PF10 contains multiple lettered addenda on the same topic, the later letter supersedes the earlier. Route all references by title only.
+* **Supersession rule (PF10 addenda).** PF10 Build Notes are living canon. Do not reference PF10 by version strings, and do not treat PF10 section numbers as durable anchors. Prefer referencing PF10 by **addendum number \+ addendum title**. When multiple PF10 addenda cover the same topic, the later addendum supersedes the earlier; the superseding addendum should explicitly name what it supersedes (by addendum number/title).
 
 * **PR-first via CodEx.** CodEx opens the PR automatically (one PR per epic or slice). Whenever proofs or artifacts change, update in the same PR: Doc-Delta, the human Evidence Index (`docs/evidence/INDEX.json`) and its path-proof (`docs/evidence/INDEX.json.path_proof.txt`), the Evidence Index hash sentinel (`docs/evidence/INDEX.sha256`) and its path-proof (`docs/evidence/INDEX.sha256.path_proof.txt`), and the machine JSONL mirror (`artifacts/evidence_index.jsonl`).
 
@@ -190,11 +190,26 @@ A7 invariants for proofs on a cataloged JSON success route are defined by title 
 
 **Evidence pointers (titles-only).** Keep success-route artifacts indexed in the human Evidence Index and mirrored 1:1 in the machine JSONL mirror (records-only; canonical; single LF; unknown-key rejection; each record carries a proof\_anchor). See HDE-Schemas & Artifacts for mirror ownership and CI hygiene.
 
----
-
 ### **2.3.3 Ops-only identity**
 
 `/internal/version` is **operator-only** and **not A7-eligible**. Its transport posture (cache behavior, validator/HEAD handling, and conditional semantics) is defined by title in the owning governance/contract documents. PF07 records only the infra fact that this surface is ops-only and where its governed evidence bundle lives (see §10.5).
+
+**Auth posture (non-invention; routing-only).**  
+ PF canon does not yet canonize `/internal/version` auth posture (public vs operator-network gated vs auth-header required) or the expected failure mode for missing/invalid access. Until canonized, remediation guides and operational tooling MUST NOT state auth requirements as canon, and MUST NOT treat an auth header as required input for plan execution.
+
+If a run uses an auth header (for example, `Authorization: Bearer …`), it is **optional until canonized** and MUST be treated as **Observed Evidence** only. Runbooks/plans that include an auth header MUST state the header’s source as a concrete input (presence-only; never the value) or they risk creating a false “ops gap” blocker.
+
+Any statement about auth posture MUST be explicitly labeled as **Observed Evidence** (non-PF) and MUST be supported by secret-free status-line \+ headers captures for both conditions:
+
+* **No auth header present**, and
+
+* **Auth header present** *(presence-only noted; value redacted)*.
+
+Store the captured evidence in-repo under a lowercase audit path (see the Ops/QA audit roots in §10.5).
+
+---
+
+ 
 
 ### **2.3.4 Canonical bytes & evidence**
 
@@ -230,9 +245,9 @@ PF07 is **names-only**. Admin-only narratives persistence **DB/schema locations*
 **Proof surface (titles-only).**  
  Source-selection snapshots and refresh-policy snapshots are stored under governed `artifacts/**` with path-proofs and are indexed in the **machine JSONL mirror** (records-only; canonical; single LF; unknown-key reject).
 
-## **2.4 Env Deployment Inventory \[Required-Now\]**
+## **2.4 Env Deployment Inventory Required−NowRequired-NowRequired−Now**
 
-**Names-only (policy lives in Governance).** This matrix records the default rails posture and determinism pins per environment. Transport policy, refusal semantics, and acceptance tokens live in **HDE-Governance**; PF07 remains names-only and routes by title.
+**Names-only (policy lives in Governance).** This matrix records the default rails posture and the canonical determinism pins per environment. Transport policy, refusal semantics, and acceptance tokens live in **HDE-Governance**; PF07 remains names-only and routes by title.
 
 | env | SAFE\_MODE (default) | ALLOW\_NETWORK (default) | determinism pins (must) | owner | change path |
 | ----- | ----- | ----- | ----- | ----- | ----- |
@@ -244,6 +259,7 @@ PF07 is **names-only**. Admin-only narratives persistence **DB/schema locations*
 **Notes.**  
  • Rails “open” permits network I/O *subject to policy*; “closed” forbids it (typed refusal).  
  • Determinism pins are required for all evidence/canonicalization jobs.  
+ • **No non-canonical pins.** Live QA plans and evidence steps MUST use only the canonical determinism pins listed here. `PYTHONHASHSEED` MUST NOT be added as a required determinism pin for plan approval or execution. If used for one-off diagnostics, it is non-governed and does not extend the canonical pins set.  
  • Details/tokens: see **HDE-Governance**; jobs/proofs: **HDE-Schemas & Artifacts**; process: **Epic-Process-Guide**.
 
 ## **2.5 QA windows (names‑only)**
@@ -386,16 +402,19 @@ In other words, **terminal CLI access** is a named, supported admin-facing produ
 
 * The canonical QA evidence root pattern used by Live QA: `audit/qa/<epic-id>/...` (paths and per-epic subtrees remain names-only here).
 
-* Canonical infra key names referenced by Codespaces runs (see §8), and canonical repo/devcontainer locations where infra binds those keys (names-only; no secrets).
+* Canonical infra key names referenced by Codespaces runs (see §8), and canonical repo/devcontainer locations where infra binds those key names (names-only; no secrets).
 
 **Canonical home for Codespaces configuration (routing-only).**  
- The **Glow QA Guide** is the single canonical home for Codespaces QA configuration and requirements (titles-only). PF07 does not enumerate the full Codespaces prerequisites checklist, required secret mappings, or step-by-step runbook content. Any change to Codespaces/devcontainer requirements, required env var names, or Live QA prerequisites MUST be reflected in the Glow QA Guide in the same change-set that introduces the new requirement.
+ The **Glow QA Guide** is the single canonical home for Codespaces QA configuration and requirements (titles-only). PF07 does not enumerate the full prerequisites checklist, required secret mappings, or step-by-step runbook content. Any change to Codespaces/devcontainer requirements, required env-var names, or Live QA prerequisites MUST be reflected in the Glow QA Guide in the same change-set that introduces the new requirement.
 
 **Codespaces snapshot step (routing-only).**  
- Every Live QA plan executed in Codespaces MUST include a mechanical “Codespaces snapshot” step at the beginning of the run that captures the full, run-relevant environment context into the epic QA root under `audit/qa/<epic-id>/...` (including tool versions, rails variables, and presence/absence of required secrets, but never secret values). This is evidence, not prose, and is generated by commands. The exact artifact schema/path convention and capture commands are owned by title in the **Glow QA Guide** (and in **HDE-Schemas & Artifacts** if the snapshot becomes a governed evidence family).
+ Every Live QA plan executed in Codespaces MUST include a mechanical “Codespaces snapshot” step at the beginning of the run that captures the run-relevant environment context into the epic QA root under `audit/qa/<epic-id>/...` (including tool versions, rails variables, and presence/absence of required secrets, but never secret values). Canonical artifact locations and filenames for the snapshot are recorded in §10.5 (names-only); schema and capture commands are owned by title in **Glow QA Guide** (and in **HDE-Schemas & Artifacts** if the snapshot is a governed evidence family).
 
 **Live QA is gitless (routing-only).**  
- Live QA runbooks MUST NOT include git operations and MUST NOT gate PASS/FAIL on working-tree cleanliness. Evidence gating is artifact-based under `audit/qa/<epic-id>/...`. The execution rail and any explicit non-blocking Codespaces workspace artifacts are governed by title in **Epic-Process-Guide** and **Glow QA Guide**.
+ Live QA runbooks MUST NOT include git operations and MUST NOT gate PASS/FAIL on working-tree cleanliness. Evidence gating is artifact-based under `audit/qa/<epic-id>/...`. The execution rail is governed by title in **Epic-Process-Guide** and **Glow QA Guide**.
+
+**No non-canonical wrappers (routing-only).**  
+ Live QA plans MUST NOT depend on helper/wrapper scripts unless the script is a canon-named entrypoint by explicit path. Where canon requires an artifact surface but does not name a tool, the plan must validate or produce the governed artifact surface directly using baseline commands (see §10.5 “Live QA evidence is mechanical”).
 
 **Where PF07 fits (names-only reminder).**  
  PF07 remains the single home for provider/project/service names, stable base URLs, canonical QA root patterns, and infra key names. It routes Codespaces configuration, Live QA runbooks, and acceptance semantics by title to their owning documents.
@@ -843,7 +862,7 @@ Inventory-only. List schema names and key objects per application. No DDL, types
 ## **7.3 Evidence & indexing (titles-only)**
 
 * **Records-only mirror (HDE-Schemas & Artifacts).** Canonical DDL dump \+ fingerprint; roles/grants snapshot; connection echo, `search_path` echo; optional RW-smoke log when DB is in scope; **env-selection proof** and **env-matrix snapshot/failure envelopes** are indexed there by title.  
-* **Same-PR rule.** Update the human Evidence Index, its **hash sentinel** (`docs/evidence/INDEX.sha256`), and the machine mirror in the **same PR**; CI enforces 1:1 parity, canonical JSONL (one LF), unknown-key rejection, and presence of `proof_anchor` path-proofs.  
+* **Same-PR rule.** Update the human Evidence Index, its hash sentinel, and the machine mirror in the same PR; CI enforces 1:1 parity and requires sibling `*.path_proof.txt` artifacts for governed index/mirror files. For the exact canonical filenames, see §10.5 “Indexing discipline (same-PR rule)”.  
 * **Routing.** Canonical bytes & mirror schema: **HDE-Schemas & Artifacts**; governance/evidence policy: **HDE-Governance**.
 
 ### **7.3.1 DB lifecycle evidence (OPS‑managed; names‑only)**
@@ -1163,7 +1182,9 @@ Whenever evidence changes, update in the same PR:
 
 * Machine mirror (records-only): `artifacts/evidence_index.jsonl`
 
-**Proof freshness requirement (governed artifacts).** If `docs/evidence/INDEX.json` or `docs/evidence/INDEX.sha256` changes bytes, its co-located `*.path_proof.txt` transcript MUST be refreshed in the same PR. Treat stale INDEX path-proofs as a hard evidence integrity failure.
+* Machine mirror path-proof: `artifacts/evidence_index.jsonl.path_proof.txt`
+
+**Proof freshness requirement (governed artifacts).** If any file above changes bytes, its co-located `*.path_proof.txt` transcript MUST be refreshed in the same PR. Treat stale INDEX or mirror path-proofs as a hard evidence integrity failure.
 
 CI enforces 1:1 parity (human ↔ machine).
 
@@ -1180,27 +1201,68 @@ The only valid governed evidence surface for determinism env pins is:
 * `audit/gates/determinism/env_pins.log`  
 * `audit/gates/determinism/env_pins.log.path_proof.txt`
 
-Bindings for determinism env pins MUST NOT reference `artifacts/proofs/env_pins.txt` (or any other similarly named file) when the determinism env pins acceptance claim is being made.
+Bindings for determinism env pins MUST reference this governed surface only. Do not bind determinism env pins evidence to:
+
+* `artifacts/proofs/env_pins.txt` (or any other similarly named file), or  
+* snapshot copies under epic QA run trees (for example, `audit/qa/hde-epic<NNN>/<run-id>/snapshots/env_pins/...`). Snapshot copies are allowed as run-local convenience, but the canonical evidence surface and index binding remain the governed `audit/gates/determinism/...` path above.
+
+Note (pins): canonical determinism pins are the locale/timezone pins listed in §2.4 and §8.1 (and rails where applicable). `PYTHONHASHSEED` is not part of the canonical pins set and must not be required for plan approval or execution.
 
 #### **/internal/version evidence bundle (canonical root; names-only)**
 
-The governed evidence bundle for `/internal/version` is rooted at:
+The governed evidence bundle for `/internal/version` is rooted at: `artifacts/ops/internal_version/`
 
-* `artifacts/ops/internal_version/`
-
-Canonical bundle artifacts under this root include:
+Canonical artifact family under this root (EPIC022 canonical; names-only):
 
 * `artifacts/ops/internal_version/body_get.json`  
 * `artifacts/ops/internal_version/body_get.sha256`  
 * `artifacts/ops/internal_version/headers_get.txt`  
 * `artifacts/ops/internal_version/headers_head.txt`  
-* `artifacts/ops/internal_version/cond_if_none_match_headers.txt`  
-* `artifacts/ops/internal_version/cond_if_modified_since_headers.txt`  
+* `artifacts/ops/internal_version/headers_cond_if_none_match.txt`  
+* `artifacts/ops/internal_version/headers_cond_if_modified_since.txt`  
+* `artifacts/ops/internal_version/request_chain_manifest.json`
+
+Identity / verification artifact(s) (names-only):
+
 * `artifacts/ops/internal_version/two_run_identity.log`
 
-Each governed artifact is expected to have a corresponding `*.path_proof.txt` sidecar where applicable. PF07 records these as “where it lives” facts only. Evidence schemas, required content, and token semantics live by title in the owning governance, QA, and schemas documents.
+Sidecar discipline (names-only):
 
----
+* Canonical artifacts above MUST have co-located sibling path-proofs: `<file>.path_proof.txt`.  
+* Where checksum sidecars exist (example: `body_get.sha256`), they also require sibling path-proofs.  
+* `request_chain_manifest.json` MUST have `request_chain_manifest.json.path_proof.txt` as a sibling.
+
+Deprecated / legacy internal\_version variants (compat-only; MUST NOT be treated as canonical EPIC022 evidence surfaces):
+
+* `artifacts/ops/internal_version/conditional_headers.json`  
+* `artifacts/ops/internal_version/conditional_headers.sha256`  
+* `artifacts/ops/internal_version/cond_if_none_match_headers.txt`  
+* `artifacts/ops/internal_version/cond_if_modified_since_headers.txt`
+
+Indexing note (titles-only):
+
+* Evidence indexing is single-homed elsewhere; index entries must reference only the canonical artifact family listed above. Deprecated variants are transition-only and are not second sources of truth.
+
+  #### **Release identity (EPIC022; canonical surfaces)**
+
+Release identity evidence surfaces (names-only; canonical paths):
+
+* `artifacts/math/release_id.txt`
+
+* `artifacts/math/release_id_recompute.log`
+
+Freeze-Pack evidence-copy surface (names-only; canonical path):
+
+* `artifacts/math/freeze_pack_manifest.json`
+
+**Notes (routing-only).**
+
+* The Freeze-Pack Manifest single source of truth remains `catalog/manifest.json`; `artifacts/math/freeze_pack_manifest.json` is an evidence copy and MUST NOT act as an alternate manifest contract.
+
+* `manifest_snapshot.json` (and similar evidence-only summaries) are evidence only and MUST NOT be used as identity inputs.
+
+* Canonical bytes rules, manifest schema closure, and recompute semantics are owned by title in **HDE-Schemas & Artifacts** and **HDE-Build Checklist**; PF07 records only these canonical evidence paths as infra facts.  
+  ---
 
 ### **Epic close-pack filenames and QA root normalization (names-only)**
 
@@ -1221,11 +1283,76 @@ Epic QA roots MUST be lower-case and MUST use:
 
 * `audit/qa/hde-epic<NNN>/` (example: `audit/qa/hde-epic022/`)
 
-Plans and implementations MUST NOT introduce alternate spellings for the same epic in paths (examples of disallowed alternates include: EPIC022, EPIC\_022, audit/QA/..., audit/qa/HDE-EPIC022/...). If legacy artifacts exist under non-canonical names, treat them as deprecated and do not create new artifacts under the deprecated pattern.
+Plans and implementations MUST NOT introduce alternate spellings for the same epic in paths. If legacy artifacts exist under non-canonical names, treat them as deprecated and do not create new artifacts under deprecated patterns.
+
+#### **Epic OPS evidence root directory (canonical pattern)**
+
+Ops execution evidence (PO-only, IA-guided; names-only) MUST be stored under a lowercase audit root such as:
+
+* `audit/ops/<epic-id>/...`
+
+When Ops execution evidence is captured as part of Live QA execution, it MAY instead live under the epic QA root:
+
+* `audit/qa/<epic-id>/...`
+
+For HD Engine epics, `<epic-id>` is typically `hde-epic<NNN>` (example: `audit/ops/hde-epic022/...`). PF07 records these as infra path patterns only; ops task definitions and required fields are owned by title in the relevant process/governance documents.
+
+#### **Epic QA meta and run layout (names-only)**
+
+Under the epic QA root, EPIC-level meta artifacts and run artifacts follow canonical layout patterns (names-only):
+
+* **Epic meta directory (stable):** `audit/qa/hde-epic<NNN>/00_meta/`
+
+  * `audit/qa/hde-epic<NNN>/00_meta/codespaces_snapshot.json`
+
+  * `audit/qa/hde-epic<NNN>/00_meta/doc_deltas.md`
+
+* **Per-epic step-log manifest (stable):** `audit/qa/hde-epic<NNN>/qa_step_logs_manifest.json`
+
+* **Per-run subtree (direct):** `audit/qa/hde-epic<NNN>/<run-id>/...`  
+   Common subdirectories (names-only; exact schemas owned elsewhere):
+
+  * `00_meta/` (may include a run-local copy of the Codespaces snapshot)
+
+  * `step_logs/` (per-step logs)
+
+  * `results/` (step outputs and verdict artifacts)
+
+  * `snapshots/` (run-local copies of governed artifacts and headers)
+
+  * `closeout/` (run-local close summaries)
+
+* **Per-step bucket subtree (observed pattern; names-only):** `audit/qa/hde-epic<NNN>/<step_bucket>/<run-id>/...`  
+   Examples of `<step_bucket>` observed for EPIC022 include:
+
+  * `hde_epic022_qa_step_d3.2`
+
+  * `hde_epic022_qa_stepd3.3`
+
+  * `hde_epic022_qa_step_z0`
+
+* **Remediation subtree (EPIC022; names-only):** `audit/qa/hde-epic<NNN>/remediation/`  
+   Remediation-stage locations observed for EPIC022:
+
+  * `audit/qa/hde-epic022/remediation/s1_host_matrix/` (OPS-01 deliverables)
+
+  * `audit/qa/hde-epic022/remediation/s2_repo_discovery_internal_version.md` (PR01 discovery report)
+
+  * `audit/qa/hde-epic022/remediation/s4_internal_version_bundle_v2/` (OPS-02 runtime bundle; may include `remediation_only/`)
+
+  * `audit/qa/hde-epic022/remediation/s5_integration_summary.md` (PR03 integration summary)
+
+* **Indexing note (routing-only).** `remediation_only/` content inside remediation bundles is excluded from the governed Evidence Index and machine mirror; governed artifacts remain under their canonical `artifacts/**` roots.
+
+PF07 records these as “where it lives” facts only. Manifest schemas, step-log header formats, per-step naming conventions, and indexing inclusion/exclusion rules are owned by title in **Glow QA Guide** and **HDE-Schemas & Artifacts**.
 
 **Live QA evidence is mechanical (routing-only).**
 
-Artifacts treated as Live QA evidence under `audit/qa/<epic-id>/...` MUST be produced by commands (shell/scripts/tools), not by hand-editing prose files in an editor. Placeholder fields such as “(fill PASS/FAIL)” are non-conforming for approved QA evidence artifacts. Detailed requirements and the canonical “generated summary” pattern are governed by title in **Epic-Process-Guide** and **Glow QA Guide**; PF07 records this as an infra constraint on how QA evidence roots are populated.
+Artifacts treated as Live QA evidence under `audit/qa/<epic-id>/...` MUST be produced by commands (shell/scripts/tools), not by hand-editing prose files in an editor. Placeholder fields such as “(fill PASS/FAIL)” are non-conforming for approved QA evidence artifacts.
+
+Live QA plans MUST NOT depend on helper/wrapper scripts unless the script is a canon-named entrypoint by explicit path. Where canon requires an artifact surface but is silent on an entrypoint, the plan must validate or produce the governed artifact surface directly using baseline commands (explicit shell/Python one-liners, direct invocation of canon tools, explicit file writes), with no opaque runners.
+
+Detailed requirements and the canonical “generated summary” pattern are governed by title in **Epic-Process-Guide** and **Glow QA Guide**; PF07 records this as an infra constraint on how QA evidence roots are populated.
 
 #### **Epic acceptance-ledger artifacts (canonical paths; names-only)**
 
@@ -1255,13 +1382,19 @@ When governed evidence changes (Index, mirror, or governed artifacts), the evide
 
 When acceptance tokens are bound to evidence artifacts (for example, in an Epic Plan, a token/evidence matrix, or an acceptance map), those bindings MUST be validated against the canonical evidence catalog before approval or merge. If the catalog defines a fixed canonical path for a token’s evidence surface, the plan/matrix MUST bind to that exact path. Any binding to a non-canonical path is a mechanical blocker and must be corrected (or routed via explicit ADR and drained into the appropriate canonical home).
 
+**Path-proof transcripts are not primary evidence titles.**  
+ Path-proofs (`*.path_proof.txt`) are required mechanical companions, but token/evidence binding surfaces MUST NOT list `*.path_proof.txt` as primary evidence entries. Proofs are referenced via `proof_anchor` in the machine mirror and validated through the index/mirror integrity checks (titles-only routing).
+
 Minimum agreement set when a token is claimed (titles-only):
 
-* Epic Plan required evidence list  
-* token/evidence matrix row  
-* human Evidence Index entry  
+* Epic Plan required evidence list
+
+* token/evidence matrix row
+
+* human Evidence Index entry
+
 * machine mirror record  
-* corresponding path-proof referenced by `proof_anchor`  
+* **corresponding path-proof referenced by `proof_anchor`**  
   ---
 
 ### **Mirror hygiene (records-only JSONL)**

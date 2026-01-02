@@ -1,11 +1,11 @@
 # **0\. Front Matter**
 
 **Title:** PF02-Canon-HDE-Architecture  
- **Version:** v1.3.3  
+ **Version:** v1.3.9  
  **Status:** Canon  
-**Effective date:** 2025-12-24
+**Effective date:** 2025-01-01
 
- **Last Update Gate:** BN 8.5.3 Drain A26-29
+ **Last Update Gate:** BN 8.7.7 Drain A50-51
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -40,8 +40,9 @@
 
 * the BodyGraph cache — the persistent store for Engine inputs (DB; not owned here in detail)
 
-**Supersession rule (PF10 addenda).**  
- Where PF10 includes multiple numbered addenda on the same topic, the later number supersedes earlier guidance. PF02 reflects the latest position and routes work to canonical homes by title only (no version numbers).
+**Supersession rule (PF10 addenda).**
+
+Where PF10 includes multiple numbered addenda on the same topic, the later number supersedes earlier guidance. Reference PF10 addenda by **addendum number \+ addendum title** (do not anchor to PF10 file versions or PF10 section numbers). PF02 reflects the latest position and routes work to canonical homes by title only (no version numbers).
 
 **Contract-free.**  
  PF02 never carries headers, payload schemas, status matrices, exit codes, SLAs, or acceptance tables. It describes wiring and flows only; bytes, tokens, and schemas are always owned by other PF documents.
@@ -56,7 +57,7 @@
  Canonical JSON policy, pack/manifest, and the machine Evidence Index (JSONL mirror schema and parity) are owned outside Architecture and cited by title, primarily in HDE-Schemas & Artifacts and HDE-Mechanics Guide.
 
 **Endpoint Catalog (single home; routing note).**  
- Success-endpoint discovery and A7 proofs are catalog-driven. The single home is `docs/ENDPOINTS_CATALOG.json` (canonical JSON; one LF) with `docs/ENDPOINTS_CATALOG.json.sha256` sidecar. The Catalog is internal-only and env-gated; non-prod entries are unreachable in prod (headers-only env-gate proofs). A7 proofs run only on a cataloged JSON success route; `/internal/version` is ops-only and excluded. Titles-only details live in HDE-CLI-API-Vendor-Ref and HDE-Governance; indexing discipline lives in HDE-Schemas & Artifacts. If a given repo state does not yet contain `docs/ENDPOINTS_CATALOG.json`, treat this path as reserved and required; its creation and wiring to A7 proofs are tracked via HDE-Build Checklist and HDE-Phased Epics, not by changing PF02.
+Success-endpoint discovery and A7 proofs are catalog-driven. The single home is `docs/ENDPOINTS_CATALOG.json` (canonical JSON; one LF) with `docs/ENDPOINTS_CATALOG.json.sha256` sidecar. The Catalog is internal-only and env-gated; non-prod entries are unreachable in prod (headers-only env-gate proofs). A7 proofs run only on a cataloged JSON success route; `/internal/version` is excluded from A7 proofs, and PF02 does not define its access-control posture. Titles-only details live in HDE-CLI-API-Vendor-Ref and HDE-Governance; indexing discipline lives in HDE-Schemas & Artifacts. If a given repo state does not yet contain `docs/ENDPOINTS_CATALOG.json`, treat this path as reserved and required; its creation and wiring to A7 proofs are tracked via HDE-Build Checklist and HDE-Phased Epics, not by changing PF02.
 
 **A7 invariants (routing note).**  
  Success proofs require `Vary: Authorization, Accept-Encoding`, strong quoted ETag on 200, HEAD 200 parity (`Content-Type == GET`, `Content-Length == len(identity 200 body)`), and 304 (after prior 200\) omitting both `Content-Type` and `Content-Length`. Encoding-invariance holds: for the same canonical LF-terminated body, the ETag identity and effective `Content-Length` are stable across accepted encodings. Concrete contracts remain in HDE-Governance and HDE-CLI-API-Vendor-Ref.
@@ -76,8 +77,9 @@ Evidence (headers/records only) is owned by HDE-Mechanics Guide and HDE-Build Ch
 
 **PF02 owns wiring and flows only; all contract bytes, schemas, and tokens are routed by title to their single-home PF documents.**
 
-**Transport / contract bytes.**  
- Owned outside Architecture: HDE-Governance and HDE-CLI-API-Vendor-Ref. Acceptance tokens are single-home in HDE-Governance §2.0; PF02 never enumerates tokens.
+**Transport / contract bytes.**
+
+Owned outside Architecture: HDE-Governance and HDE-CLI-API-Vendor-Ref. Acceptance tokens are single-home in HDE-Governance §2.0; any token name used outside that registry MUST match spelling exactly (no aliases). PF02 never enumerates tokens.
 
 **Canonical JSON / pack / mirror.**  
  Policies, manifest shape, and the Evidence Index/mirror live in HDE-Schemas & Artifacts.
@@ -90,7 +92,7 @@ Evidence (headers/records only) is owned by HDE-Mechanics Guide and HDE-Build Ch
 
 **Proof-anchor semantics (acceptance bindings).**
 
-`proof_anchor` points to the governed path-proof transcript for the primary artifact (or bundle) listed in the ledger. Acceptance bindings (for example, token-evidence matrices and acceptance maps) MUST bind tokens to the primary governed artifacts and/or tests, not to the path-proof transcript itself. Proof transcripts are referenced indirectly via the ledger (Human Index entry \+ Machine Evidence Index `proof_anchor`) unless a dedicated evidence family explicitly treats proof transcripts as first-class governed artifacts.
+`proof_anchor` points to the governed path-proof transcript for the primary artifact (or bundle) listed in the ledger. Acceptance bindings (for example, token-evidence matrices and acceptance maps) MUST bind tokens to the primary governed artifacts and/or tests, not to the path-proof transcript itself (for example, `*.path_proof.txt`). Proof transcripts are referenced indirectly via the ledger (Human Index entry \+ Machine Evidence Index `proof_anchor`) unless a dedicated evidence family explicitly treats proof transcripts as first-class governed artifacts.
 
 **Math semantics.**  
  Idempotence (preimage recipe), ordering, banding, and scoring live in HDE-Math-Spec.
@@ -104,11 +106,12 @@ Evidence (headers/records only) is owned by HDE-Mechanics Guide and HDE-Build Ch
 **Process & PR workflow.**  
  Epic-Process-Guide governs PR-first cadence; Appendix D (human) and the machine mirror must be updated in the same PR.
 
-**Freeze-pack linkage (release identity).**  
- Release identity is pack-derived; any change to frozen constants, the direct Motor→Throat set, thresholds, or catalog membership/order requires an HDE-Schemas & Artifacts manifest update and yields a new `release_id` (titles-only).
+**Freeze-pack linkage (release identity).**
+
+Release identity is pack-derived from the Freeze-Pack Manifest SoT at `catalog/manifest.json` (canonical bytes). `artifacts/math/freeze_pack_manifest.json` is a governed evidence copy of that manifest and MUST be byte-identical; it MUST NOT be treated as an alternate manifest contract or as a separate identity input. Any change to frozen constants, the direct Motor→Throat set, thresholds, or catalog membership/order requires an HDE-Schemas & Artifacts manifest update and yields a new `release_id` (titles-only).
 
 **Endpoint proofs & ops exclusion (routing).**  
- A7 proofs run only on a cataloged Endpoint Catalog (JSON success) route (HDE-CLI-API-Vendor-Ref); `/internal/version` is ops-only and not A7-eligible (titles-only to HDE-Governance).
+A7 proofs run only on a cataloged Endpoint Catalog (JSON success) route (HDE-CLI-API-Vendor-Ref); `/internal/version` is excluded from A7 proofs and is not A7-eligible, and PF02 does not define its access-control posture (titles-only to HDE-Governance).
 
 **Narratives routing (titles-only).**  
  Reader remains narrative-free. Narrative bytes are carried via Aux/CLI and live in HDE-CLI-API-Vendor-Ref; suppression/A7 policy for Aux lives in HDE-Governance. PF02 stays contract-free.
@@ -187,7 +190,7 @@ For mirrored surfaces, the CLI emits Reader v1 bytes only via a dedicated reader
  Re-emitting the same logical representation produces byte-identical output.
 
 **Locale pins (required).**  
- All canonicalization and compares run with `LC_ALL=C`, `LANG=C`, `TZ=UTC`.
+All canonicalization and compares run with `LC_ALL=C`, `LANG=C`, `TZ=UTC`. These are the canonical determinism pins for governed bytes and evidence. Do not add non-canonical environment variables (for example, `PYTHONHASHSEED`) as required rails or determinism pins for Live QA plan approval or execution. If any QA step or repo tool produces nondeterministic output due to hash-order dependence, fix ordering explicitly (sort keys, sort lists, avoid unordered set iteration) rather than relying on interpreter knobs. If `PYTHONHASHSEED` is ever used, treat it as diagnostic-only and non-governed.
 
 **Offline pipelines & evidence generators.**  
  Offline pipelines and evidence generators (for example, determinism jobs and evidence-family generators) MUST invoke Engine Core and sampler core modules with pinned fixtures and MUST honor the same canonical JSON, idempotence, AB↔BA, two-run identity, and locale pins as runtime requests. They produce governed artifacts into evidence families and update the human Evidence Index and machine mirror in the same PR as the code changes; schemas, artifact families, and gating rules live in HDE-Schemas & Artifacts, HDE-Mechanics Guide, HDE-Build Checklist, and Epic-Process-Guide.
@@ -415,13 +418,10 @@ For mirrored compat surfaces:
 
 **Success-endpoint proofs (A7).**
 
-* A7 proofs run only on a **cataloged JSON success route** named in the Endpoint Catalog (`docs/ENDPOINTS_CATALOG.json` and its `.sha256` sidecar).
-
-* The Catalog is internal-only and env-gated; evidence must show that non-prod entries are **unreachable in prod** (headers-only env-gate proof).
-
-* `/internal/version` is operator-only and **not A7-eligible**.
-
-* Endpoint naming, exposure posture, and validator details live in **HDE-CLI-API-Vendor-Ref** and **HDE-Governance**.
+* A7 proofs run only on a **cataloged JSON success route** named in the Endpoint Catalog (`docs/ENDPOINTS_CATALOG.json` and its `.sha256` sidecar).  
+* The Catalog is internal-only and env-gated; evidence must show that non-prod entries are **unreachable in prod** (headers-only env-gate proof).  
+* `/internal/version` is **not A7-eligible**. PF02 does not define its access-control posture (public vs operator-network gated vs auth-header required) **or** the expected failure mode when access is missing/invalid.  
+* Endpoint naming, exposure posture, and validator details live in **HDE-CLI-API-Vendor-Ref** and **HDE-Governance**
 
 **A7 invariants (route-only).**
 
@@ -447,8 +447,7 @@ Concrete header matrices, status tables, and validator implementations live in *
 
 **Ops exclusion.**
 
-* `/internal/version` is operator-only and explicitly **excluded** from A7 proofs.
-
+* `/internal/version` is excluded from A7 proofs and is not A7-eligible; PF02 does not define its access-control posture.  
 * Ops behaviour and headers are governed in **HDE-Governance §10.5**.
 
 **Public envelope construction & schemas.**
@@ -703,7 +702,7 @@ See §2.4 for the compat request flow, including how BodyGraph, Engine Core, and
   * 304 only after prior 200, with no body and omitting both `Content-Type` and `Content-Length`
 
 * **Ops exclusion.**  
-   `/internal/version` is ops-only and not A7-eligible.
+   `/internal/version` is excluded from A7 proofs and is not A7-eligible; PF02 does not define its access-control posture.
 
 **Routing (titles-only).**
 
@@ -803,19 +802,19 @@ These routes do not touch Engine Core, sampler core, or vendor; they are livenes
  Behaviour, headers, and acceptance tokens are governed by **HDE-Governance**. PF02 remains contract-free and does not restate header/body rules.
 
 **Contract posture (titles-only).**  
- **HDE-Governance** governs invariants for the identity surface (for example, no-store, no ETag, HEAD 200 with `Content-Type` parity and `Content-Length == identity GET`, conditionals ignored / never 304\) and owns A7 evidence. PF02 points by title only.
+HDE-Governance governs invariants for the identity surface (for example, no-store, no ETag, HEAD 200 with `Content-Type` parity and `Content-Length == identity GET`, conditionals ignored / never 304\) and owns the identity-surface acceptance/evidence posture. PF02 points by title only.
 
 **Evidence & indexing (titles-only).**  
  Proof artifacts and success-endpoint snapshots are indexed per **HDE-Governance** / **HDE-Schemas & Artifacts**; the human Evidence Index and the machine JSONL mirror must remain 1:1 (updated in the same PR).
 
-For `/internal/version` **coupling \+ two-run identity**, the governed proof surface is a **single** log artifact at `artifacts/ops/internal_version/two_run_identity.log`. This log records (at a minimum) the two-run identity result and the coupling verification outcome, along with the rails/pins posture by titles-only reference. PF02 names this evidence surface for architectural traceability and continues to route all token semantics and detailed proof formats by title to their single-home documents.
+For `/internal/version` coupling \+ two-run identity, the governed proof surface is the internal\_version evidence bundle under `artifacts/ops/internal_version/`. Canonical member filenames (and any explicitly permitted alias files) are owned by HDE-Schemas & Artifacts and governed by HDE-Governance; ad-hoc filename variants are prohibited. PF02 names this evidence surface for architectural traceability and continues to route all token semantics and detailed proof formats by title to their single-home documents.
 
 **Non-goals.**  
  No public contract bytes, no payload schemas, no alternate emitters, no persistence, and no vendor/network calls from this surface.
 
 **Routing (titles-only).**
 
-* Identity invariants, acceptance, A7 evidence → **HDE-Governance**
+* Identity invariants, acceptance, and evidence posture **→ HDE-Governance**
 
 * Endpoint Catalog / success JSON → **HDE-CLI-API-Vendor-Ref**
 
@@ -823,7 +822,7 @@ For `/internal/version` **coupling \+ two-run identity**, the governed proof sur
 
   ---
 
-  ## **3.6 Aux Narrative (concept-only, route-only) \[Speculative\]**
+## **3.6 Aux Narrative (concept-only, route-only) \[Speculative\]**
 
 **Role.**  
  Serve deterministic narrative text **outside** the public Reader surface. No narratives appear on Reader 200\.
@@ -848,7 +847,7 @@ For `/internal/version` **coupling \+ two-run identity**, the governed proof sur
    When suppressed, Aux returns 200 with no body and no ETag (policy header optional).
 
 * **Ops exclusion.**  
-   `/internal/version` is ops-only and not A7-eligible.
+  `/internal/version` is excluded from A7 proofs and is not A7-eligible; PF02 does not define its access-control posture.
 
 **Routing (titles-only).**
 
@@ -939,14 +938,11 @@ Reader and CLI surfaces are **peers** with respect to the single-emitter rule: b
 
 Environment and service discovery for dev/QA is **canon-first**. Before designing high-stakes HTTP QA steps, implementers and QA must consult:
 
-* **HDE Architecture**
-
-* **Glow Infrastructure**
-
-* **HDE-Mechanics Guide**
-
-* **Glow QA Guide** (Codespaces QA configuration and execution rails)
-
+* **HDE Architecture**  
+* **Glow Infrastructure**  
+* **HDE-Mechanics Guide**  
+* **Reality Audits (components \+ canonical pathnames/loci; planning input)**  
+* **Glow QA Guide** (Codespaces QA configuration and execution rails)  
 * “GitHub Codespaces in a QA Workflow” (where relevant)
 
 to determine how to start and reach Reader and other services.
@@ -955,9 +951,9 @@ HTTP QA against “Reader” or dev harness surfaces is considered misconfigured
 
 **Codespaces Live QA posture (routing note).**
 
-* Codespaces QA configuration and requirements are single-home in the **Glow QA Guide** (names-only; secrets recorded as presence-only, never values). Live QA plans executed in Codespaces MUST include a mechanical Step-0 “Codespaces snapshot” capture under `audit/qa/<epic-id>/...` (generated by commands; evidence, not prose).
-
-* Live QA execution runbooks are **gitless**. Runbooks MUST NOT include git operations and MUST NOT gate PASS/FAIL on working-tree cleanliness. Evidence gating is based on the presence/contents of mechanically generated artifacts under `audit/qa/...`.
+* Codespaces QA configuration and requirements are single-home in the **Glow QA Guide** (names-only; secrets recorded as presence-only, never values). Live QA plans executed in Codespaces MUST include a mechanical Step-0 “Codespaces snapshot” capture under `audit/qa/<epic-id>/...` (generated by commands; evidence, not prose).  
+* Live QA execution runbooks are **gitless**. Runbooks MUST NOT include git operations and MUST NOT gate PASS/FAIL on working-tree cleanliness. Evidence gating is based on the presence/contents of mechanically generated artifacts under `audit/qa/...`.  
+* Live QA plans MUST NOT depend on helper or wrapper scripts unless the script is canon-named by explicit path. If a step needs tooling, it MUST either invoke a canon-named tool by explicit path, or embed the full tool source in the plan step and write it into the run-local QA tools directory. When validating an artifact surface, prefer baseline commands (explicit shell or Python one-liners, direct invocation of canon tools, tee for logs, explicit file writes) over opaque runners.
 
 **Routing (titles-only).**
 
@@ -1090,6 +1086,8 @@ These surfaces together form the **ledger-centric, deterministic, text-based evi
 
 **Discipline & hygiene (contract-free posture).**
 
+* **Index exclusion (remediation-only run-bundle copies).** Any “remediation-only” directory copies captured under `audit/qa/**` for runtime/remediation portability (for example, a `remediation_only/` subtree inside a run bundle) MUST NOT be indexed in `docs/evidence/INDEX.json` or `artifacts/evidence_index.jsonl`. The ledger indexes the primary governed artifacts (and their `proof_anchor`s), not remediation-only bundle copies.  
+* **Mechanical-only evidence.** Any file treated as QA evidence (including close artifacts) MUST be mechanically produced from commands and MUST NOT contain manual-fill placeholders (for example, “fill in PASS/FAIL”). If a result is “no deltas,” the artifact MUST say so explicitly (as a produced output).  
 * **Same-PR parity.** Whenever proofs or governed artifacts (including bundles and manifests) change, the Human Evidence Index and the Machine Evidence Index MUST be updated **in the same PR** that carries the code/evidence change.  
 * Human index proof freshness. The Human Evidence Index (docs/evidence/INDEX.json) and its hash sentinel (docs/evidence/INDEX.sha256) are governed artifacts. Each MUST have a co-located, governed path-proof transcript, and those transcripts MUST be refreshed whenever the index/sentinel bytes change (in the same PR). PF02 records this requirement at the architecture level; concrete proof file naming and the canonical updater/validator behavior are owned by HDE-Schemas & Artifacts and HDE-Mechanics Guide by title.  
 * **Canonical serialization.** The Machine Evidence Index is canonical JSONL: UTF-8, ASCII-sorted keys, compact separators, exactly one trailing LF, and unknown-key rejection. Bundle manifests and other governed JSON/JSONL artifacts referenced from the ledger follow the same canonical discipline (owned by HDE-Schemas & Artifacts).
@@ -1303,7 +1301,7 @@ Pack catalogs & manifest (freeze-pack identity, checksums, canonical JSON policy
 
 CLI / Reader / vendor route bytes (public six-key envelope, request/response shapes & examples, streams/exits, Endpoint Catalog (JSON success) ownership and route titles, CLI admin preview, vendor request shaping, parity rules) → **HDE-CLI-API-Vendor-Ref**.
 
-A7 transport & ops policy (ETag/200, 304 header omissions, HEAD parity, Vary: Authorization, Accept-Encoding, encoding-invariance, writers no-store/no ETag, /internal/version ops-only posture, acceptance tokens) → **HDE-Governance**.
+A7 transport & ops policy (ETag/200, 304 header omissions, HEAD parity, Vary: Authorization, Accept-Encoding, encoding-invariance, writers no-store/no ETag, /internal/version identity endpoint posture (excluded from A7 proofs), acceptance tokens) → **HDE-Governance**.
 
 QA tokens & D-goals (Live QA token semantics, rails posture, and per-epic D-goal records and acceptance conditions) → **Glow QA Guide** and **HDE-Phased Epics**.
 

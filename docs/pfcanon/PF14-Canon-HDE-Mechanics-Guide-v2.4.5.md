@@ -2,13 +2,14 @@
 
 ## 0.1 **Header**
 
- **Title:** PF14-Canon-HDE-Mechanics-Guide  
- **Version:** v2.3.9  
- **Status:** Canon  
-**Effective date:** 2025-12-24
+**Title:** PF14-Canon-HDE-Mechanics-Guide  
+**Version:** v2.4.5
 
-**Last Update Gate:** BN 8.5.3 Drain A26-29  
- **Invocation tag:** INV-f2ac55d77ce9aacc
+**Status:** Canon  
+**Effective date:** 2026-01-01
+
+**Last Update Gate:** BN 8.7.7 Drain A50-51  
+**Invocation tag:** INV-f2ac55d77ce9aacc
 
 ---
 
@@ -221,6 +222,15 @@ The HD Engine computes per-category compatibility and drives which copy lines ap
 * `LANG=C`
 
 * `TZ=UTC`
+
+**Live QA rails: no non-canonical determinism env pins (normative).**  
+ Canonical determinism pins are limited to the canon set. Live QA steps that produce governed bytes or governed evidence MUST NOT add additional required env pins beyond the canonical pins defined here (locale and timezone pins, plus rails variables where applicable).
+
+In particular:
+
+* `PYTHONHASHSEED` MUST NOT be added as a required rail/pin for Live QA plan approval or execution. It is not part of the canonical determinism env pins set.
+
+Determinism must be achieved by explicit ordering in code and tools (sorted keys, sorted lists, no unordered set/map iteration on governed bytes), not by interpreter hash-order controls. If `PYTHONHASHSEED` is used for one-off diagnostics, it MUST be explicitly labeled diagnostic-only and MUST NOT be interpreted as satisfying or extending the canonical determinism env pins evidence surface.
 
 Acceptance for determinism pins is governed by **HDE-Governance** and proven via governed evidence and QA checks (titles-only). This guide does not list token names.
 
@@ -640,6 +650,13 @@ The Live QA harness **MUST**:
   * All PO-facing QA commands exposed by the harness **MUST** be fully concrete and copy/paste-ready (no `<PO: ...>` placeholders).
 
   * When commands require values that are present in tests or configs (for example, fixed VIEWER\_IDs, seeds, or candidate payloads), the harness **MUST** discover or construct those values programmatically by mirroring test semantics (for example, calling the same helpers that write candidate payloads) instead of asking the PO to hand-edit commands.  
+* **No non-canonical helper/wrapper scripts in Live QA plans (baseline commands only).**  
+  * Live QA plans MUST NOT depend on helper/wrapper scripts unless the script is explicitly canon-named by path in PF canon (titles-only).  
+  * If a step needs “tooling,” it MUST be either:  
+    * a canon-named entrypoint by explicit path, or  
+    * an inline tool whose full source is embedded in the plan step and written into the run-local QA tools directory (no hidden dependencies).  
+  * When canon is silent on an entrypoint but requires an artifact surface, the plan MUST validate or generate the governed artifact surface directly using baseline commands, rather than inventing a new repo script path.  
+  * “Baseline commands” means: explicit shell/Python one-liners, direct invocation of canon tools, `tee` for logs, and explicit file writes, with no reliance on opaque runners.  
 * **Gitless execution rails (normative).**  
   * Live QA runbooks and harness steps **MUST NOT** include git operations (including but not limited to: `git checkout`, `git status` gating, `git add`, `git commit`, `git push`, or PR creation).  
   * Live QA PASS/FAIL **MUST NOT** be determined by working-tree cleanliness. Evidence gating is artifact-based: required deliverables and step PASS/FAIL are validated by presence and contents of mechanically generated artifacts under `audit/qa/...` and the observed behavior outputs the epic is meant to prove.  
@@ -700,12 +717,12 @@ This component exists because “a harness that exits 0 but produces no run arti
 
 The epic QA harness entrypoint MUST:
 
-##### Determine an epic id and run id
+Determine an epic id and run id
 
 * Accept an epic identifier and a run identifier via a documented interface (CLI args or environment override).  
 * When a run id is not explicitly provided, derive a deterministic default (for example, a stable slug for “live-qa-1” or an equivalent policy owned by Glow QA Guide).
 
-##### Create a run-scoped QA\_ROOT directory
+Create a run-scoped QA\_ROOT directory
 
 Create a run directory under the governed audit root of the form:
 
@@ -727,7 +744,7 @@ Implementations MUST NOT introduce alternate epic directory spellings for the sa
 
 Exact lifecycle rules and any governed schemas inside the run directory are routed by title; Mechanics requires that a single run directory exists and is used consistently for that run.
 
-##### Maintain per-epic manifest and viability outputs
+Maintain per-epic manifest and viability outputs
 
 * Maintain a per-epic “step logs manifest” file under `audit/qa/hde-epic<NNN>/` that enumerates known runs and the paths to their run directories and primary step logs.  
 * Maintain a per-epic “acceptance map viability” log under `audit/qa/hde-epic<NNN>/` that appends a summary line for each run, aligned to:  
@@ -736,7 +753,7 @@ Exact lifecycle rules and any governed schemas inside the run directory are rout
 
 Mechanics does not define the token names or viability semantics here; it requires that the harness update these per-epic artifacts so that QA reviewers can audit whether a run is viable and complete.
 
-##### Emit a per-run bootstrap log and step logs
+Emit a per-run bootstrap log and step logs
 
 * Write a per-run bootstrap log (D0) inside the run directory.  
 * Write the canonical sequence of per-step logs for the epic’s Live QA steps inside the same run directory.
@@ -747,25 +764,21 @@ Each step log MUST:
 * Include a rails snapshot (at minimum SAFE\_MODE, ALLOW\_NETWORK, LC\_ALL, LANG, TZ, APP\_ENV).  
 * Include the commands executed.  
 * Capture exit codes.  
-* End with an explicit step outcome classification (tooling vs behavior).
+* End with an explicit step outcome classification (tooling vs behavior).  
+* Use the canonical status vocabulary defined in **Glow QA Guide** (titles-only); do not introduce ad-hoc statuses for core execution state.
 
-##### **Step-0 Codespaces snapshot (mechanical; generated)**
+**Rerun hygiene (normative; do not overwrite evidence).**  
+ If a step/check id is executed more than once for the same run (a rerun):
 
-##### At the beginning of the run, the harness MUST generate a machine-readable Codespaces environment snapshot under the run directory:
+* The harness MUST NOT overwrite the prior step log file. Each attempt MUST write to a new log filename/path under the run directory (for example by adding an explicit attempt suffix such as `_attempt2`, or an equivalent stable scheme).  
+* The per-epic step logs manifest MUST be **idempotent** at the tuple level (run id, check id). For any given run, there MUST be at most one manifest entry for a given check id (no duplicates).  
+* On rerun, the harness MUST update (replace) the existing manifest entry for that (run id, check id) to point to the newest attempt’s `log_path`. Older attempt logs may remain on disk for traceability, but the manifest’s authoritative row MUST reflect the latest attempt.  
+* After writing the manifest, the harness MUST validate uniqueness: no duplicate entries for the same (run id, check id). If duplicates exist, treat this as a tooling failure and downstream close-pack generation MUST NOT proceed.
 
-* ##### `00_meta/codespaces_snapshot.json` 
+**Non-canonical env pins in logs (normative).**  
+ Step logs MAY record additional env fields for traceability, but only the canonical determinism pins defined in §1.2 are required for governed bytes and governed evidence. `PYTHONHASHSEED` MUST NOT be treated as a required pin; if present, it is diagnostic-only.
 
-##### This snapshot is evidence, not prose, and MUST be generated by commands (no manual editing). It MUST:
-
-* ##### capture tool versions relevant to the run (names and versions), 
-
-* ##### capture rails and determinism pins (for example SAFE rails variables, locale/time pins), and 
-
-* ##### record presence or absence of required secrets **by name only** (presence-only booleans), never secret values. 
-
-##### The required variable names, secret names, and any additional required fields for this snapshot are single-homed in **Glow QA Guide** (titles-only). If a governing schema exists for this snapshot, it is owned by **HDE-Schemas & Artifacts** (titles-only); Mechanics requires only that the harness produces the snapshot at the canonical location above and that it is non-empty and machine-readable.
-
-##### **Emit a machine-readable run event log and generated summary (normative)**
+Emit a machine-readable run event log and generated summary (normative)
 
 In addition to per-step logs, the harness MUST produce a machine-readable run event log under the run directory, and MUST generate any required summary/RCA artifacts from that log and the captured evidence files.
 
@@ -813,7 +826,7 @@ Each generated summary/notes artifact MUST begin with a clear header such as:
 
 AUTO-GENERATED. DO NOT EDIT. Re-run the harness/generator to update.
 
-##### Fail closed on missing outputs
+Fail closed on missing outputs
 
 If the harness completes without:
 
@@ -823,7 +836,7 @@ If the harness completes without:
 
 it MUST exit non-zero and record the reason as a tooling/harness failure.
 
-##### Be reusable across epics
+Be reusable across epics
 
 Epic-specific harness entrypoints may exist as thin wrappers for convenience, but they MUST delegate to the generic harness entrypoint and must not re-implement logging, QA\_ROOT layout, manifest updates, or viability updates in bespoke per-epic code.
 
@@ -836,7 +849,8 @@ The repo MUST include a CI test that executes the epic QA harness entrypoint und
 * the run directory exists,  
 * the per-run bootstrap log exists and is non-empty,  
 * at least one step log exists and is non-empty,  
-* the Codespaces snapshot exists under the run directory (`00_meta/codespaces_snapshot.json`) and is non-empty,  
+* the epic-level Codespaces snapshot exists at `audit/qa/hde-epic<NNN>/00_meta/codespaces_snapshot.json` and is non-empty,  
+* the run-local Codespaces snapshot copy exists under the run directory (`00_meta/codespaces_snapshot.json`) and is non-empty,  
 * the run event log exists under the run directory (`00_meta/run_events.tsv` or `00_meta/run_events.jsonl`) and contains at least one record (non-empty), and  
 * any required generated summary artifact for that harness (for example `QA_SUMMARY.md`, when present in the plan scaffold for that epic) exists, is non-empty, and contains no manual-fill placeholder strings (for example “(fill PASS/FAIL)”).  
 * the per-epic step logs manifest is updated with an entry for the synthetic run id, and  
@@ -2091,23 +2105,24 @@ Acceptance is governed by **HDE-Governance** (titles-only). This section does no
 * **Conditionals ignored.** Requests with `If-None-Match` / `If-Modified-Since` are ignored; **never 304**.  
 * **Pins.** All captures/compares run with `LC_ALL=C`, `LANG=C`, `TZ=UTC`.
 
-**Evidence (records-only; machine mirror)**
+ **Evidence (records-only; machine mirror)**
 
 * `artifacts/ops/internal_version/headers_get.txt` — raw GET headers (proves no-store, no ETag, correct `Content-Type`).  
-* `artifacts/ops/internal_version/headers_head.txt` — raw HEAD headers (HEAD 200; `Content-Type == GET`; `Content-Length ==` identity GET).  
+* `artifacts/ops/internal_version/headers_head.txt` — raw HEAD headers (HEAD 200; Content-Type==GET; Content-Length \== identity GET). Non-header diagnostic lines (if present) MUST be ignored by parsers.  
 * `artifacts/ops/internal_version/body_get.json` — exact LF-terminated GET body (six keys in frozen order) \+ `artifacts/ops/internal_version/body_get.sha256`.  
-* `artifacts/ops/internal_version/cond_if_none_match_headers.txt` — GET with `If-None-Match` (still 200).  
-* `artifacts/ops/internal_version/cond_if_modified_since_headers.txt` — GET with `If-Modified-Since` (still 200).  
-* `artifacts/ops/internal_version/two_run_identity.log` — governed `/internal/version` coupling \+ two-run identity proof log. It MUST include (a) an explicit two-run byte-identity result (with the compared digests) and (b) explicit coupling verification that the six `/internal/version` fields match their governing identity sources described in §13/§14.
+* `artifacts/ops/internal_version/headers_cond_if_none_match.txt` — GET with `If-None-Match` (still 200).  
+* `artifacts/ops/internal_version/headers_cond_if_modified_since.txt` — GET with `If-Modified-Since` (still 200).  
+* `artifacts/ops/internal_version/request_chain_manifest.json` — deterministic request-chain manifest for this capture run (secret-free; indexable).  
+* `artifacts/ops/internal_version/two_run_identity.log` — two-run identity \+ coupling proof (release\_id matches artifacts/math/release\_id.txt) and env pins reference.
 
 **Acceptance (routing only)**  
  Acceptance is governed by **HDE-Governance** (titles-only). This section does not list token names. `/internal/version` must have acceptance proofs for:
 
-* ops posture headers (no-store, no validators),
-
-* HEAD parity (status and validator parity; identity Content-Length rules), and
-
-* conditionals ignored (never 304).
+* GET 200 and HEAD 200 parity (no body; `Content-Type == GET`; `Content-Length == len(identity GET body)`),  
+* conditionals ignored (never 304; conditionals still return 200),  
+* required headers present (`Cache-Control: no-store`, `Content-Type: application/json; charset=utf-8`),  
+* forbidden headers absent (`ETag` absent, `Last-Modified` absent), and  
+* identity body posture (exact six-key schema, no extras; frozen key order; UTF-8/no BOM; compact; exactly one trailing LF).
 
 **Routing (titles-only).** Policy lives in **HDE-Governance §10.5**; transport matrices for success routes live in **HDE-CLI-API-Vendor Ref** (A7 not applicable here).
 
@@ -2412,6 +2427,7 @@ Expose and persist **exactly** these fields; **no extras**:
   ## 13.4 Prohibited
 
 * **No recomputation of `release_id`** during request handling.  
+* **No branching semantics for release identity.** If any operator surface implements a fallback path (for example, when a precomputed release-id artifact is unavailable), that fallback MUST still use the single definition: `release_id = sha256(canonical_bytes(catalog/manifest.json))`. The hash input MUST be canonical manifest bytes (serializer-backed), not raw or non-canonical bytes, and MUST NOT create an alternate release identity semantics.  
 * **No mutation** of identity fields after freeze.  
 * **No alternative sources** (env vars, flags) on public paths.  
 * **No request-time hashing** for `emitter_sha256` or `invocation_sha256` — compute at **build only**.
@@ -2483,7 +2499,11 @@ Expose **exactly six** provenance fields — **no extras** — in this **frozen 
 
 * Operator-only; minimal payload; no secrets; no side effects.  
 * Body is **canonical JSON** (UTF-8/no BOM, compact, **exactly one LF**).  
-* **Key order is frozen as in §14.2** (do **not** re-sort keys for this endpoint).
+* **Key order is frozen as in §14.2** (do **not** re-sort keys for this endpoint).  
+* **Auth posture is not yet canonized (normative constraint).** PF canon does not yet define whether `/internal/version` is unauthenticated public, operator-network gated without auth, or auth-header required, nor the expected failure mode when access is missing or invalid. Until canonized:  
+  * remediation guides and operational tooling MUST NOT state auth requirements for `/internal/version` as canon, and  
+  * any statement about auth posture MUST be explicitly labeled as Observed Evidence (non-PF).  
+* Canonization requires OPS discovery evidence that captures status line and headers for the canonical deployment context(s) under two conditions: (a) with no auth header, and (b) with the expected auth header present (value redacted or presence-only noted). Evidence MUST be secret-free and stored in-repo under a lowercase audit path consistent with the Ops posture in this guide.
 
 ## 14.5 Example (informative)
 
@@ -2512,6 +2532,50 @@ Acceptance is governed by **HDE-Governance** (titles-only). This section does no
 * `intver/cond_if_none_match` — conditional GET (`If-None-Match` ignored → 200\)  
 * `intver/cond_if_modified_since` — conditional GET (`If-Modified-Since` ignored → 200\)  
 * `intver/two_run_identity` — governed coupling \+ two-run identity log for `/internal/version`. It MUST include (a) an explicit two-run byte-identity result (with the compared digests) and (b) explicit coupling verification that the six `/internal/version` fields match their governing identity sources described in §13/§14. It MUST also include a rails/determinism pins reference (names-only) and remain secret-free.
+
+**Token naming (normative; non-aliasable).**  
+ Acceptance token names for `/internal/version` MUST match the names defined in **HDE-Governance** (titles-only). Tools, guides, matrices, and acceptance maps MUST NOT invent aliases.
+
+To prevent recurring alias drift, this guide names one token explicitly:
+
+* Canonical conditional-semantics token name (conditionals return 200 and never 304): `INTERNAL_VERSION_CONDITIONALS_IGNORED_OK`
+
+Any other name intended to mean the same invariant (including `INTERNAL_VERSION_COND_200_NO_304_OK`) is non-canon and MUST NOT be emitted or required in acceptance artifacts.
+
+**/internal/version proof surface checklist (normative; MUST be explicit in probes).**  
+ Any remediation guide, QA step, or probe tool that produces governed `/internal/version` evidence MUST explicitly enumerate and verify the canon-critical invariants below against the same captured bytes that are written as governed artifacts for that run. It is not acceptable to imply these checks by referencing PF sections only.
+
+A. **Transport**
+
+* GET MUST return 200\.
+
+* HEAD MUST return 200 and satisfy parity expectations (no body; `Content-Type == GET`; `Content-Length == len(identity GET body)`).
+
+* Conditionals MUST be ignored: `If-None-Match` and `If-Modified-Since` MUST NOT yield 304; they MUST return 200\.
+
+B. **Headers**
+
+* `Cache-Control: no-store` MUST be present.
+
+* `Content-Type: application/json; charset=utf-8` MUST be present.
+
+* `ETag` MUST be absent.
+
+* `Last-Modified` MUST be absent.
+
+C. **Body (identity payload)**
+
+* Body MUST be fixed-schema JSON with exactly these keys (no extras): `engine_tag`, `build_commit`, `invocation_tag`, `invocation_sha256`, `emitter_sha256`, `release_id`.
+
+* Body bytes MUST satisfy the identity-bytes posture for this endpoint: UTF-8 (no BOM), compact JSON, exactly one trailing LF, and frozen key order as defined by §14.2 (do not re-sort keys).
+
+**Token emission gating (no “false OK”).**  
+ A tool MUST NOT emit any `*_OK` token unless the corresponding invariant above has been verified against the same captured bytes written as governed artifacts for that run.
+
+If the run status is `FAIL_TOOLING` (or equivalent), the tool MUST NOT emit `*_OK` tokens for invariants that did not pass. In particular, it MUST NOT emit “integrity success” tokens (for example, path-proof match or two-run identity) unless those checks demonstrably passed on the produced artifacts.
+
+**Coupling requirement (anti-mixed-target / anti-redirect drift).**  
+ For each probe run, the emitted tokens, captured headers, captured body, and any two-run identity digest MUST refer to the same resolved target/response chain. If coupling cannot be established, the run MUST fail and MUST NOT emit `*_OK` tokens.
 
 Each mirror record includes `artifact_key`, `sha256`, `size_bytes`, `produced_at_utc`, `discovered_physical_path`, `proof_anchor`. Update the human Evidence Index in the **same change**; CI enforces **1:1 parity** and **path-proofs**.
 
@@ -4068,6 +4132,8 @@ Load tests for Reader, Compat, and Narrative Selection Router (keys-only). Micro
 
 ## 27.1 Manifest integrity checks
 
+**Top-level key set is closed (no extras).** `catalog/manifest.json` top-level MUST contain exactly: `root`, `version`, `built_at_utc`, `files` (and no other keys).
+
 * **Canonical bytes.** The on-disk `catalog/manifest.json` **equals** its canonical serialization (UTF-8, no BOM; ASCII-sorted keys; compact separators; exactly one trailing `\n`).  
 * **`files[]` order.** Entries are **ASCII-ascending by `path`**; **no duplicates** by `path`.  
 * **No self-listing.** `catalog/manifest.json` **MUST NOT** appear in `files[]`.  
@@ -4087,6 +4153,11 @@ Load tests for Reader, Compat, and Narrative Selection Router (keys-only). Micro
 List by **title/path** in **Appendix D: Evidence Index** and mirror **1:1** in `artifacts/evidence_index.jsonl` (each record includes `artifact_key`, `sha256`, `size_bytes`, `produced_at_utc`, `discovered_physical_path`, `proof_anchor`; canonical JSONL; one LF). Update human Index and mirror **in the same commit/PR**; CI fails on mismatch or missing path-proofs.
 
 * `artifacts/math/freeze_pack_manifest.json` — evidence copy of `catalog/manifest.json`  
+  * **Freeze-Pack evidence-copy semantics (normative; no dual semantics).**  
+  * **Single SoT.** The Freeze-Pack Manifest SoT is `catalog/manifest.json`. No other file is permitted to act as the SoT for Freeze-Pack membership or release identity.  
+  * **Evidence copy meaning is fixed.** `artifacts/math/freeze_pack_manifest.json` is a **byte-identical evidence copy** of the canonical bytes of `catalog/manifest.json` (canonical JSON: UTF-8, no BOM, ASCII-sorted keys recursively, compact separators, exactly one trailing LF). It MUST NOT be a derived schema, subset manifest, or alternate contract.  
+  * **Equality checks are byte-equal.** When tooling checks “equal” between the SoT and the evidence copy, “equal” means **byte-equal on canonical bytes**, not “JSON-equivalent.”  
+  * **No path reuse.** Any alternate manifest-like artifacts (for example, summaries) MUST be quarantined under a different name/path and MUST NOT reuse `artifacts/math/freeze_pack_manifest.json`. Evidence-only summaries (for example, `manifest_snapshot.json`) MUST NOT be used as identity inputs or substituted for the Freeze-Pack Manifest.  
 * `artifacts/math/release_id.txt` — recorded `release_id`  
 * `artifacts/math/release_id_recompute.log` — recompute trace  
 * `artifacts/math/checksums_audit.log` — per-entry verification (path/sha256/size)
@@ -4108,6 +4179,30 @@ Acceptance is governed by **HDE-Governance** and pack/manifest rules in **HDE-Sc
 ## 27.5 Sanity pipeline (release & provenance) \[Required-Now\]
 
 **Purpose (normative).** Provide a single, scriptable pipeline that verifies the release **end-to-end** and **fails closed** on any drift. It finishes by updating the human index and the machine mirror with **1:1 parity** and **path-proofs**.
+
+**Release identity gate (fail-closed; CI posture).**  
+ The sanity pipeline MUST include a fail-closed release identity gate that enforces the “no dual semantics” posture for Freeze-Pack identity:
+
+* Entry point: `ci/checks/check_release_identity.sh`
+
+* Invocation: `python ci/checks/check_release_identity.sh` (Python entrypoint; do not invoke via `bash ...`).
+
+* Posture: closed rails and determinism pins as required by §1.2 and §27 (SAFE\_MODE=1, ALLOW\_NETWORK=0, LC\_ALL=C, LANG=C, TZ=UTC).
+
+* Minimum checks (mechanics):
+
+  * validate manifest schema posture (including the closed top-level key set),
+
+  * validate canonical bytes posture for `catalog/manifest.json`,
+
+  * assert byte-equality on canonical bytes between `catalog/manifest.json` and `artifacts/math/freeze_pack_manifest.json`,
+
+  * assert `release_id` correctness as `sha256(canonical_bytes(catalog/manifest.json))`, and
+
+  * assert the governed recompute evidence set exists and is non-empty.
+
+**Operator note (non-gating; mechanics awareness).**  
+ In ephemeral CI workspaces, the gate may regenerate or rewrite governed recompute log outputs as part of producing a clean evidence state. This is acceptable for CI workspaces. In a local working tree, treat these outputs as tool-generated evidence surfaces and avoid committing unintended churn.
 
 **Ordered steps (minimal sequence)**
 
@@ -4221,9 +4316,10 @@ List by **title/path** in **Appendix D: Evidence Index** and mirror **1:1** in `
 
 * `artifacts/ops/internal_version/headers_get.txt`  
 * `artifacts/ops/internal_version/headers_head.txt`  
-* `artifacts/ops/internal_version/cond_if_none_match_headers.txt`  
-* `artifacts/ops/internal_version/cond_if_modified_since_headers.txt`  
+* `artifacts/ops/internal_version/headers_cond_if_none_match.txt`  
+* `artifacts/ops/internal_version/headers_cond_if_modified_since.txt`  
 * `artifacts/ops/internal_version/body_get.json` \+ `artifacts/ops/internal_version/body_get.sha256`  
+* `artifacts/ops/internal_version/request_chain_manifest.json`  
 * `artifacts/ops/internal_version/two_run_identity.log`
 
 **DB posture**
@@ -4492,8 +4588,63 @@ For Codespaces and other shared environments, Mechanics requires that QA and doc
 
 # 35\) Runbooks (Operations)
 
-Runbooks for elevated 5xx, slow Reader/Compat, stuck queue, DB lag. Fast rollback \+ data safety notes.  
- **Pointers:** rollback uses pointer-flip to last known-good `release_id` (titles only).
+**Ops tasks (PO-only execution; IA-guided; not PR work).**
+
+**Definition.** An Ops task is any work item that requires privileged access to systems outside the repository and therefore cannot be performed by automated agents. This includes (non-exhaustive): service configuration, secrets and env var changes, deploy/runtime settings, infrastructure console actions, and certain database operations (creation, grants, production migrations, and other privileged state changes). A DevOps task is treated as an Ops task whenever it requires any of the above human-only access.
+
+**Execution authority (hard).**
+
+* Ops tasks MUST be executed by the PO (human operator) only.
+
+* Automated agents MUST NOT attempt to perform Ops tasks, MUST NOT claim completion, and MUST NOT simulate external state changes.
+
+**IA facilitation posture (required).**  
+ When Ops tasks are part of an epic, they are facilitated by the Implementation Agent (IA). The IA MUST specify intent, constraints, verification, and evidence requirements in a what-not-how manner, then work directly with the PO during execution.
+
+**Not a PR (required).**  
+ Ops tasks are not Codex PRs. Any implementation or remediation guide MUST separate Ops tasks from PR work and clearly label Ops steps as: PO-only execution, IA-guided.
+
+**Ops task record format (what-not-how; required fields).**  
+ Every Ops task record MUST include:
+
+* Task ID (stable, referenced consistently)
+
+* Owner: PO
+
+* Facilitator: IA
+
+* Target system/service (name only, no secrets)
+
+* Intent / desired end state (what changes, and what “done” looks like)
+
+* Constraints / safety rails (what must remain true while executing)
+
+* Success criteria (observable outcomes, not assumptions)
+
+* Evidence to capture (what artifact(s) will prove the change, and where stored)
+
+* Rollback intent (what “revert” means at a high level)
+
+* Secret handling note (explicitly: no plaintext secrets in docs or evidence)
+
+**Evidence posture (required).**
+
+* Completion of an Ops task MUST produce a repo-stored evidence artifact (text-first) under a lowercase path such as:
+
+  * `audit/ops/<epic-id>/...` for Ops execution evidence, or
+
+  * `audit/qa/<epic-id>/...` when the evidence is part of QA execution.
+
+* Evidence MUST NOT include secrets. If a setting/value is sensitive, evidence MUST be presence-only, redacted, or hashed, while still being sufficient to verify the intended state.
+
+**Mechanics Guide tracking requirement (normative).**  
+ Any Ops task included in an epic MUST be represented as a subtask record in this Mechanics Guide so it can be tracked and reused. The Mechanics Guide entry MUST use the same Task ID and MUST carry the same required fields listed above.
+
+**No governance drift (hard).**  
+ Ops tasks MUST NOT create new acceptance tokens or redefine acceptance semantics. If an Ops task affects acceptance, it MUST map to existing governance-defined acceptance posture and be proven via evidence artifacts.
+
+**Clarification.**  
+ If a change is fully achievable as code (including tests and deterministic artifacts), it is PR work. If any step requires human console or config action, that step is an Ops task (even if adjacent code changes exist). Ops tasks can be prerequisites for epic completion, but they are proven by evidence artifacts, not by agent execution claims.
 
 # 36\) Dashboards and Alerts
 
@@ -4551,7 +4702,11 @@ The repo SHOULD include CI-safe tests that validate, at minimum:
 
 * the epic-scoped close-pack and acceptance scaffold files exist at the canonical paths above, and  
 * the acceptance artifacts are structurally coherent (parseable, no duplicate token ids/rows).  
-* the acceptance map and token-to-evidence matrix are mutually consistent (no duplicate rows across artifacts, no placeholder bindings once concrete evidence exists, and no map/matrix misalignment that would require a reviewer to “interpret” intent). PF14 does not enumerate token names; this is a structural consistency requirement only.
+* the acceptance map and token-to-evidence matrix are mutually consistent (no duplicate rows across artifacts, no placeholder bindings once concrete evidence exists, and no map/matrix misalignment that would require a reviewer to “interpret” intent). PF14 does not enumerate token names; this is a structural consistency requirement only.  
+* token-to-evidence bindings MUST reference primary evidence artifacts (not their `*.path_proof.txt` transcripts). Path-proofs are required, but MUST be referenced via the machine mirror `proof_anchor` (and/or mirror checks), not treated as primary evidence titles/bindings.
+
+**Token name validity (names-only).**  
+ Any acceptance token name referenced by these acceptance scaffolds MUST match the **HDE-Governance** Token Registry exactly (titles-only). Aliases and near-matches are prohibited; correct the scaffold artifacts to the canonical registry name. This guide does not list token names.
 
 Placeholder evidence strings are permitted only for D0 scaffolding; once an epic writes concrete governed evidence files, acceptance scaffolds must not retain placeholder bindings.
 
@@ -4844,7 +4999,10 @@ Mechanics records this distinction so that PF-Canon and QA plans can treat open-
 
 * `artifacts/cli/showcompat/stdout.json`  
 * `artifacts/cli/showcompat/stdout.json.sha256`  
-* `artifacts/cli/showcompat/args.json`
+* `artifacts/cli/showcompat/args.json`  
+* *(Compatibility-only alias; when required for backward compatibility)* `artifacts/cli/showcompat/stdout.sha256`
+
+`stdout.json.sha256` is the canonical checksum sidecar name (JSON-filename-qualified). If the alias `stdout.sha256` is produced, it MUST be mechanically derived from the exact bytes of `stdout.json`, and evidence indexing MUST continue to reference `stdout.json.sha256` as the canonical checksum artifact.
 
 These showcompat capture artifacts are deterministic fixtures used to prove stdout canonical bytes (single trailing LF, stderr empty on success) and to support acceptance artifact binding hygiene. They are not release identity proofs; release identity remains governed by the pack manifest and the `/internal/version` evidence surfaces.
 
@@ -4884,11 +5042,11 @@ Both **must** be indexed in the Human Index and Machine Mirror in the same PR.
 
 ---
 
-## 37.11 Pack identity & provenance
+## **37.11 Pack identity & provenance**
 
 * **Evidence copy of manifest**
 
-  * `artifacts/math/freeze_pack_manifest.json`
+  * `artifacts/math/freeze_pack_manifest.json` (Evidence-copy semantics are locked: artifacts/math/freeze\_pack\_manifest.json is a byte-identical evidence copy of the canonical bytes of catalog/manifest.json. It is not a derived manifest or alternate contract. See §27.3 for the normative semantics.)
 
 * **Recomputed release\_id**
 
@@ -4898,14 +5056,21 @@ Both **must** be indexed in the Human Index and Machine Mirror in the same PR.
 
   * `artifacts/math/release_id_recompute.log`
 
+**Release-id evidence path canonicalization (normative).**  
+ Release-id evidence is canonical at:
+
+* `artifacts/math/release_id.txt`  
+* `artifacts/math/release_id_recompute.log`
+
+Any references to `audit/gates/release/release_id.txt` (or similar `audit/gates/release/**` paths) are deprecated and MUST NOT be used for evidence indexing or close-pack checks. If a transitional copy is required, it MUST be mechanically generated from the canonical `artifacts/math/**` source (no manual editing), and indexing MUST reference the canonical `artifacts/math/**` paths.
+
 * **Checksums audit**
 
   * `artifacts/math/checksums_audit.log`
 
 * *(Optional) SBOM (CycloneDX) \+ hash*
 
-  * `sbom/cyclonedx.json`
-
+  * `sbom/cyclonedx.json`  
   * `sbom/cyclonedx.json.sha256`
 
 ---
@@ -4922,30 +5087,26 @@ Both **must** be indexed in the Human Index and Machine Mirror in the same PR.
 
 ---
 
-## 37.13 Internal-ops `/internal/version` snapshots
+## **37.13 Internal-ops `/internal/version` snapshots**
 
-* **GET headers**
-
-  * `artifacts/ops/internal_version/headers_get.txt`
-
-* **HEAD headers**
-
-  * `artifacts/ops/internal_version/headers_head.txt`
-
-* **Conditional headers**
-
-  * `artifacts/ops/internal_version/cond_if_none_match_headers.txt`
-
-  * `artifacts/ops/internal_version/cond_if_modified_since_headers.txt`
-
+* **GET headers**  
+  * `artifacts/ops/internal_version/headers_get.txt`  
+* **HEAD headers**  
+  * `artifacts/ops/internal_version/headers_head.txt`  
+* **Conditional headers**  
+  * `artifacts/ops/internal_version/headers_cond_if_none_match.txt`  
+  * `artifacts/ops/internal_version/headers_cond_if_modified_since.txt`  
 * **Body & hash**
 
-  * `artifacts/ops/internal_version/body_get.json`
-
-  * `artifacts/ops/internal_version/body_get.sha256`
-
+  * `artifacts/ops/internal_version/body_get.json`  
+  * `artifacts/ops/internal_version/body_get.sha256`  
 * **Two-run identity & coupling proof**  
-  * `artifacts/ops/internal_version/two_run_identity.log`
+  * `artifacts/ops/internal_version/two_run_identity.log`  
+* **Request-chain manifest**  
+  * `artifacts/ops/internal_version/request_chain_manifest.jso`
+
+**Filename aliases (compatibility-only; no ad-hoc variants).**  
+ If an epic’s acceptance bindings require legacy names for the conditional header snapshot files (specifically, `artifacts/ops/internal_version/cond_if_none_match_headers.txt` and/or `artifacts/ops/internal_version/cond_if_modified_since_headers.txt`), the Live QA harness MAY emit explicitly defined alias copies as compatibility-only artifacts. Any such alias MUST be mechanically generated from the canonical files above (no manual edits), and evidence indexing MUST continue to reference the canonical filenames listed in this section. No other filename variants are permitted beyond the canonical set plus any explicitly defined aliases governed elsewhere (titles-only).
 
 ---
 

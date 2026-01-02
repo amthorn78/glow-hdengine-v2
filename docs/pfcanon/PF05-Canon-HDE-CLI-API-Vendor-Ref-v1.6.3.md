@@ -4,13 +4,13 @@
 
 **Title:** PF05-Canon-HDE-CLI-API-Vendor-Ref
 
-**Version:** v1.6
+**Version:** v1.6.3
 
 **Status:** Canon
 
-**Effective date:** 2025-12-23
+**Effective date:** 2026-01-01
 
-**Last Update Gate:** BN 8.5.3 Drain A26-29
+**Last Update Gate:** BN 8.7.7 Drain A40-49
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -18,7 +18,7 @@
 
 ## **0.2 Scope \[Required-Now\]**
 
-* **Supersession (PF10 addenda).** PF10 is living; when multiple **numbered** addenda exist, the later number supersedes earlier guidance. PF05 integrates the latest addenda and routes **by title only** to single homes (no version numbers).
+* **Supersession (PF10 addenda).** PF10 is living; when multiple **numbered** addenda exist, the later number supersedes earlier guidance. PF05 integrates the latest addenda and routes **by title only** to single homes (no version numbers). Build Notes reference posture: when citing PF10, reference by **addendum number \+ addendum title**; do not use PF10 version strings or PF10 section numbers as durable anchors.
 
 * **Ownership.** This document owns the **bytes** for CLI, Reader transport, and Vendor ingest (HDAPI): payload shapes, validators, headers & conditional delivery, typed error mapping, and exit-code/stream rules. It is authoritative for CLI and Reader wire bytes. **Appendix A** transport matrices are kept in lockstep with **HDE-Governance §10** (titles only). Writers/errors posture is policy-owned in Governance; PF05 references it by title.
 
@@ -3334,11 +3334,14 @@ Keep this index synchronized with repo changes. When any golden or artifact path
   ### **D.8 showcompat seam (non-empty canonical JSON \+ parity)**
 
 * `artifacts/cli/showcompat/stdout.json` *(LF-terminated, non-empty)*  
-* `artifacts/cli/showcompat/stdout.sha256` *(sha256 of stdout.json bytes)*  
+* `artifacts/cli/showcompat/stdout.json.sha256` *(sha256 of stdout.json bytes; canonical)*  
+* `artifacts/cli/showcompat/stdout.sha256` *(legacy alias; same bytes as stdout.json.sha256)*  
 * `artifacts/cli/showcompat/args.json` *(deterministic capture context; test fixture only, not a release identity proof)*  
 * `artifacts/cli/showcompat/two_run_identity.log`  
 * `artifacts/cli/showcompat/abba.diff` *(expected empty)*  
-* `artifacts/cli/showcompat/reader_cli_parity.diff` *(expected empty)*
+* `artifacts/cli/showcompat/reader_cli_parity.diff` *(expected empty)*  
+* `tests/cli/test_cli_canonical_bytes.py` *(showcompat stdout canonical-bytes validation)*  
+* `tests/cli/test_cli_usage_and_errors.py` *(showcompat usage/errors validation)*
 
 ### **D.9 Vendor rails (closed refusal and open conformance)**
 
@@ -3381,13 +3384,19 @@ Keep this index synchronized with repo changes. When any golden or artifact path
 
 * `artifacts/ops/internal_version/headers_head.txt`
 
-* `artifacts/ops/internal_version/cond_if_none_match_headers.txt`
+* `artifacts/ops/internal_version/headers_cond_if_none_match.txt`
 
-* `artifacts/ops/internal_version/cond_if_modified_since_headers.txt`
+* `artifacts/ops/internal_version/headers_cond_if_modified_since.txt`
+
+* `artifacts/ops/internal_version/request_chain_manifest.json`
 
 * `artifacts/ops/internal_version/two_run_identity.log`
 
 * `artifacts/ops/internal_version/*.path_proof.txt`
+
+**Capture note (raw headers).** `headers_get.txt` and `headers_head.txt` are raw capture files. If capture tooling emits non-header warning lines, validators should ignore non–`key: value` lines while still requiring the HTTP status line and the required header fields.
+
+**Filenames rule (canonical \+ permitted aliases only).** The filenames listed above are the canonical internal\_version evidence bundle filenames. If an epic acceptance binding requires legacy alias filenames, emit alias copies mechanically sourced from these canonical files, and continue to index the canonical filenames. Permitted legacy aliases include `cond_if_none_match_headers.txt` and `cond_if_modified_since_headers.txt` (legacy), which are aliases for the canonical `headers_cond_if_*` captures. Do not introduce ad-hoc filename variants outside the canonical set plus explicitly defined aliases.
 
 ---
 

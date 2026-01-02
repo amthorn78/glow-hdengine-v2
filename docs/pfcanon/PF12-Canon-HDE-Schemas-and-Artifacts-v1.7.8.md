@@ -4,13 +4,13 @@
 
 **Title:** PF12-Canon-HDE-Schemas and Artifacts
 
-**Version:** v1.7.2
+**Version:** v1.7.8
 
 **Status:** Canon
 
-**Effective date:** 2025-12-23
+**Effective date:** 2025-01-01
 
-**Last Update Gate:** BN 8.5.3 A26-29
+**Last Update Gate:** BN 8.7.7 A50-51
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -1308,10 +1308,6 @@ Deduplicate by identity. Sort ASCII. On value conflict, fail closed.
 
 # **5\. Freeze-Pack Manifest (catalog/manifest.json) \[Required-Now\]**
 
-Got it. Here’s a single, paste-ready merged section that keeps everything from your **ORIGINAL** and the **NEW** refinement, without duplication or drift.
-
----
-
 ## **5.1 Manifest file shape \[Required-Now\]**
 
 **Purpose.** Canonical JSON document that lists **every frozen input** with `{path, sha256, size}` and top-level metadata. The canonical bytes of this file determine `release_id` (see §6).
@@ -1691,14 +1687,44 @@ Any **byte change** to a **frozen input** or to the **manifest** produces a **ne
 
 ### **Required artifacts**
 
-* **Recompute script** — reads the finalized manifest, verifies canonical form, recomputes `release_id`, exits non-zero on any mismatch.  
-  * path: `scripts/release_id_recompute.py`  
-  * recompute log (evidence): `artifacts/math/release_id_recompute.log`  
-* **Checksum verification report** — per-entry results for `path`, recomputed `sha256`, `size`, and any failures.  
-  * path: `artifacts/math/checksums_audit.log`  
-* **Manifest snapshot** — small JSON with `release_id`, manifest file path, manifest `sha256`, entry count, CI timestamp. Evidence only, not an input.  
-  * path: `artifacts/math/manifest_snapshot.json`  
-* **Environment pins** — text file recording `LC_ALL=C`, `LANG=C`, `TZ=UTC` used during checks.  
+* **Freeze-Pack Manifest evidence copy (no alternate semantics)**
+
+  * path: `artifacts/math/freeze_pack_manifest.json`
+
+  * MUST be a **byte-identical copy** of the canonical on-disk `catalog/manifest.json` (identity is on canonical bytes; no derived schemas or alternate contracts).
+
+  * MUST NOT be repurposed for any other manifest-like payload (see “no branching semantics” posture in Build Notes by title only).
+
+* **Recompute script** — reads the finalized manifest, verifies canonical form, recomputes `release_id`, and proves the freeze-pack identity surfaces are coherent.
+
+  * path: `scripts/release_id_recompute.py`
+
+  * recompute log (evidence): `artifacts/math/release_id_recompute.log`
+
+  * **Mode semantics (normative):**
+
+    * `--check` MUST be fail-closed (non-zero on any mismatch) and MUST NOT “self-heal” or rewrite governed artifacts.
+
+    * Non-`--check` mode MAY rewrite governed artifacts to the canonical state and MUST exit 0 when the post-write state is clean.
+
+    * A regression test MUST cover both modes using an isolated temp workspace (so the repo working tree is not mutated).
+
+* **Release ID file (canonical)** — one-line `release_id` \+ LF; must be treated as the canonical recorded value for tooling and closeout wiring.
+
+  * path: `artifacts/math/release_id.txt`
+
+  * `audit/gates/release/release_id.txt` is deprecated and MUST NOT be used.
+
+* **Checksum verification report** — per-entry results for `path`, recomputed `sha256`, `size`, and any failures.
+
+  * path: `artifacts/math/checksums_audit.log`
+
+* **Manifest snapshot** — small JSON with `release_id`, manifest file path, manifest `sha256`, entry count, CI timestamp. Evidence only, not an input.
+
+  * path: `artifacts/math/manifest_snapshot.json`
+
+* **Environment pins** — text file recording `LC_ALL=C`, `LANG=C`, `TZ=UTC` used during checks.
+
   * path: `artifacts/proofs/env_pins.txt`
 
 ### **Normative behavior**
@@ -1721,8 +1747,18 @@ Any **byte change** to a **frozen input** or to the **manifest** produces a **ne
    * Run under `LC_ALL=C`, `LANG=C`, `TZ=UTC` with **no** wall-clock dependence, **no** randomness, and **no** floating-point nondeterminism (§4).  
    * Prove **two-run identity** of the recompute step (same inputs → identical outputs).
 
-### **CI hooks (minimum)**
+   ### **CI hooks (minimum)**
 
+* **Release identity gate (fail-closed, closed rails)** — CI MUST run the dedicated identity gate entrypoint:  
+  * path: `ci/checks/check_release_identity.sh`  
+  * invocation posture (names-only): invoke as a Python entrypoint (for example `python ci/checks/check_release_identity.sh`).  
+  * minimum behavior (normative):  
+    * enforce closed rails,  
+    * run `python scripts/release_id_recompute.py --check`,  
+      assert manifest schema \+ canonical bytes posture,  
+    * assert byte-equality between `catalog/manifest.json` (canonical bytes) and `artifacts/math/freeze_pack_manifest.json`, and  
+    * assert the governed recompute evidence outputs exist and are non-empty.  
+  * operator note (non-blocking): running the gate may rewrite `artifacts/math/release_id_recompute.log` even in `--check` mode in ephemeral CI workspaces; local operators MUST treat this as tool-driven churn and avoid committing unintended log rewrites.  
 * **Pre-merge job** runs the recompute script and checksum verification; any failure is a **hard stop**.  
 * **Manifest-change gate** requires updating, in the **same commit/PR**:  
   * the **human Evidence Index**: `docs/evidence/INDEX.json`,  
@@ -1734,19 +1770,20 @@ Any **byte change** to a **frozen input** or to the **manifest** produces a **ne
 ### **Evidence Index entries (titles and paths only)**
 
 * Freeze-Pack Manifest (bytes copied for evidence) — `artifacts/math/freeze_pack_manifest.json`  
+* Release ID file (canonical) — `artifacts/math/release_id.txt`  
 * Recompute `release_id` script — `scripts/release_id_recompute.py`  
-* Recompute `release_id` log — `artifacts/math/release_id_recompute.log`  
+  Recompute `release_id` log — `artifacts/math/release_id_recompute.log`  
 * Checksum verification report — `artifacts/math/checksums_audit.log`  
 * Manifest snapshot (release\_id, manifest sha256, count) — `artifacts/math/manifest_snapshot.json`  
 * Environment pins (LC\_ALL, LANG, TZ) — `artifacts/proofs/env_pins.txt`  
 * Evidence Index hash sentinel — `docs/evidence/INDEX.sha256`
 
-### **Acceptance hints (titles only; token names live in HDE-Governance §2.0)**
+### **Acceptance hints (titles only; acceptance token names live in PF04; semantics in HDE-Governance)**
 
 `RELEASE_ID_RECOMPUTE_OK`, `RELEASE_ID_FROM_MANIFEST_OK`, `PACK_MANIFEST_NO_SELF_LISTING_OK`, `MANIFEST_SHA256_HEX64_OK`,  
  `JSON_CANONICAL_CHECK_OK`, `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_HASH_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`, `TWO_RUN_IDENTITY_OK`.
 
-#  **7\. Interfaces to Other Specs (titles-only) \[Required-Now\]**
+**7\. Interfaces to Other Specs (titles-only) \[Required-Now\]**
 
 This document routes by **title only**. Do not restate or duplicate content from other specs. Do not include version numbers in prose.
 
@@ -1899,7 +1936,7 @@ artifacts/evidence\_index.jsonl (there must be exactly one mirror file in the re
 Every evidence file referenced by the mirror MUST live under governed repo paths (for example, artifacts/**, docs/**). Transient generator paths (scratch/temp) are disallowed; mirror entries pointing to non-governed paths fail CI.
 
 **Tracked files (no .gitignore for governed artifacts).**  
-Governed evidence artifacts and their artifacts/path\_proofs/... files MUST NOT be ignored by .gitignore. Governed locations are expected to be tracked; using .gitignore to hide governed artifacts or path-proofs is invalid and should be treated as a QA failure.
+Governed evidence artifacts and their sibling path-proof transcripts (`<artifact>.path_proof.txt`) MUST NOT be ignored by .gitignore. Governed locations are expected to be tracked; using .gitignore to hide governed artifacts or their path-proofs is invalid and should be treated as a QA failure.
 
 ---
 
@@ -1966,7 +2003,8 @@ The Mirror still rejects unknown keys. The only allowed top-level keys for any r
 * record\_type — a short type label for this record (for example, "epic020\_bundle" or "epic020\_bundle\_manifest"); names are governed by local schemas and tests.  
 * schema\_version — a version string for the record schema (for example, "1.0").  
 * notes — free-form, names-only commentary to aid audits; contents are out of scope for PF12 beyond canonical JSON constraints.  
-* tokens — an array-as-set of acceptance token names (strings) associated with this record; semantics and ownership of token names remain in HDE-Governance and Glow QA Guide (titles-only). Arrays treated as sets MUST be deduped and ASCII-sorted.
+* `tokens` — an array-as-set of acceptance token names (strings) associated with this record; acceptance token names (titles-only) are defined in PF04, while token semantics and gate meaning remain in HDE-Governance and Glow QA Guide. Arrays treated as sets MUST be deduped and ASCII-sorted.  
+* `tokens` is a non-empty array of token names tied to the EPIC020 acceptance roster; acceptance token names (titles-only) are defined in PF04, while token semantics and gate meaning remain in HDE-Governance and Glow QA Guide.
 
 **Bundle-specific keys (optional; bundle rows only):**
 
@@ -1998,7 +2036,7 @@ Other epics may introduce similar patterns with different record\_type and epic\
 
 #### **Path-proof semantics for bundles**
 
-Each bundle artifact and its manifest MUST have a governed path-proof transcript (\*.path\_proof.txt or equivalent) under artifacts/path\_proofs/... whose path, sha256, and size\_bytes match the bundle/manifest file and the corresponding Mirror record values.
+Each bundle artifact and its manifest MUST have governed sibling path-proof transcripts (`<bundle_file>.path_proof.txt` and `<manifest_file>.path_proof.txt`) stored alongside each file, whose `path`, `sha256`, and `size_bytes` match the bundle/manifest file and the corresponding Mirror record values.
 
 For bundle-based families, “per-artifact path proofs” in PF12 are interpreted as “per governed artifact,” where a governed artifact may be either:
 
@@ -2042,7 +2080,7 @@ artifact\_key, discovered\_physical\_path, produced\_at\_utc, proof\_anchor, rol
 
 produced\_at\_utc records when the evidence was logically produced (the event time). It is part of the mirror record and is used to reason about when posture snapshots and QA runs occurred.
 
-mtime\_utc is recorded in the per-artifact path-proof (artifacts/path\_proofs/...) as the filesystem modification time for the artifact.
+mtime\_utc is recorded in the per-artifact sibling path-proof transcript (`<artifact>.path_proof.txt`) as the filesystem modification time for the artifact.
 
 Differences between produced\_at\_utc and mtime\_utc are allowed but must be truthful — no “backdating” or forward-dating to distort ordering. QA may rely on produced\_at\_utc as the primary ordering key for evidence; disagreements should be rare and explainable in the PR.
 
@@ -2050,7 +2088,7 @@ Differences between produced\_at\_utc and mtime\_utc are allowed but must be tru
 
 ### **Path-proof transcript schema (governed artifacts)**
 
-For every governed artifact in §8.6, the file artifacts/path\_proofs/.../\*.path\_proof.txt MUST describe exactly one artifact and follow a stable, line-oriented schema.
+For every governed artifact in §8.6, the path-proof transcript MUST be a co-located sibling file named `<artifact>.path_proof.txt`. It MUST describe exactly one artifact and follow a stable, line-oriented schema.
 
 #### **Required fields (exactly one record per file)**
 
@@ -2155,7 +2193,7 @@ Each artifact’s directory contains a stored path-proof (for example, path\_pro
 For every governed artifact in §8.6, any change to the artifact MUST update, in the same PR:
 
 * The artifact bytes on disk under a governed path.  
-* Its artifacts/path\_proofs/... path-proof file (proof\_anchor target).  
+* Its sibling `<artifact>.path_proof.txt` path-proof transcript (the `proof_anchor` target).  
 * The corresponding machine mirror record in artifacts/evidence\_index.jsonl.  
 * The Human Evidence Index entry in docs/evidence/INDEX.json and its hash sentinel docs/evidence/INDEX.sha256.
 
@@ -2202,6 +2240,14 @@ JSONL records are canonical and LF-terminated (exactly one \\n per record).
 ### **Header snapshots in artifacts (normative)**
 
 For artifacts that capture headers, header names MUST be lower-case and values MUST be verbatim; exact checks apply to values.
+
+**Capture hygiene (normative).**
+
+* Header snapshot artifacts MUST contain header lines only.
+
+* Tool warnings or stderr output (for example, curl warnings) MUST NOT be mixed into header snapshot bytes.
+
+* If the capture command can emit warnings, capture stderr separately (for example, to a sibling `*.stderr.txt` or a step log) or filter non-header lines before writing the governed artifact.
 
 Wire casing may differ and is validated by transport owners.
 
@@ -2531,6 +2577,7 @@ audit/gates/determinism/env\_pins.log MUST be a single-line JSON object with at 
 Normative rules:
 
 * env is an object with exactly the five keys LC\_ALL, LANG, TZ, SAFE\_MODE, ALLOW\_NETWORK.  
+* No additional “determinism pins” are permitted in this evidence surface (for example, `PYTHONHASHSEED` MUST NOT appear and MUST NOT be required).  
 * LC\_ALL and LANG are strings; determinism mode requires "C".  
 * TZ is a string; determinism mode requires "UTC".  
 * SAFE\_MODE and ALLOW\_NETWORK are integers or booleans whose effective values must reflect the closed-rails posture (typically SAFE\_MODE \= 1, ALLOW\_NETWORK \= 0 for CI determinism suites).  
@@ -2922,6 +2969,13 @@ When any acceptance token is claimed as satisfied (in an Epic Plan, acceptance m
 
 * Any binding to a non-canonical path is a **mechanical blocker** and **MUST** be corrected before approval/merge. If a non-canonical path is truly required, it MUST be routed via an explicit decision process and drained into the correct canonical home; do not silently substitute paths.
 
+**Primary evidence vs path-proof transcripts (clarification).**
+
+Acceptance artifacts (Epic Plans, acceptance maps/manifests, token/evidence matrices) MUST bind tokens to the primary governed artifact paths listed in the Evidence Catalog.
+
+* `*.path_proof.txt` files are required integrity transcripts. They MUST exist and stay in sync, but they are not primary evidence targets.  
+* Therefore, acceptance artifacts MUST NOT bind tokens directly to `*.path_proof.txt` as their evidence surface. The only approved linkage to a path-proof is via the Machine Mirror `proof_anchor` for the primary artifact.
+
 **Minimum required artifacts that MUST agree when a token is claimed**
 
 For every claimed token, the following **MUST** be mutually consistent (same `artifact_key` / same `discovered_physical_path`, and the same bytes-hash and size at the Index/Mirror/proof level):
@@ -2939,6 +2993,30 @@ For every claimed token, the following **MUST** be mutually consistent (same `ar
 **Shared/global evidence dependencies (do not assume implicit).**
 
 Some governed evidence surfaces are shared across many deliverables and may live outside a deliverable’s “local bundle” directory. When a deliverable’s acceptance depends on shared/global evidence surfaces, they must be **explicitly listed and bound by canonical path** rather than assumed to be “implicitly available.” PF12’s role is to define canonical paths and evidence families; workflow enforcement and review gates are routed by title to the Epic-Process-Guide and Glow QA Guide.
+
+**Remediation-only artifacts (MUST).**
+
+Remediation-only diagnostics and manifests MUST NOT be introduced under governed Evidence Index / Machine Mirror surfaces unless explicitly adopted via a PF12 Doc-Delta into the Evidence Catalog. Default posture: remediation-only artifacts live under remediation audit paths (for example, `audit/qa/.../remediation/...`) and do not enter the Human Evidence Index or Machine Evidence Mirror.
+
+**Index and mirror fixed filenames (for plans/tasks that touch governed indices/mirrors).**
+
+Evidence index (human-readable):
+
+* `docs/evidence/INDEX.json`
+
+* `docs/evidence/INDEX.sha256`
+
+* `docs/evidence/INDEX.json.path_proof.txt`
+
+* `docs/evidence/INDEX.sha256.path_proof.txt`
+
+Evidence index mirror (machine-readable):
+
+* `artifacts/evidence_index.jsonl`
+
+* `artifacts/evidence_index.jsonl.path_proof.txt`
+
+Plans and tasks that touch any file above MUST treat the sibling `.path_proof.txt` as a first-class deliverable. If a plan proposes a new file under governed roots, it MUST state whether the file is intended to appear in the indices/mirror; absence of that statement is a mechanical blocker.
 
 ### **8.6.2 Parity rule (MUST)**
 
@@ -3015,11 +3093,13 @@ These artifacts form the topology.orientation\_demo family and serve as the exem
 
 #### **CLI showcompat (deterministic capture) — evidence (EPIC022 D2)**
 
-* #### `artifacts/cli/showcompat/stdout.json`    Deterministic capture of `hdctl showcompat` stdout bytes (LF-terminated; success has empty stderr; emitted via canonical serializer as required by CLI evidence posture). 
+* #### `artifacts/cli/showcompat/stdout.json`    Deterministic capture of `hdctl showcompat` stdout bytes (LF-terminated; success has empty stderr; emitted via canonical serializer as required by CLI evidence posture).
 
-* #### `artifacts/cli/showcompat/stdout.json.sha256`    SHA-256 sidecar for `stdout.json` capture bytes. 
+* #### `artifacts/cli/showcompat/stdout.json.sha256`    SHA-256 sidecar for `stdout.json` capture bytes.
 
-* #### `artifacts/cli/showcompat/args.json`    Names-only arguments/env snapshot used for deterministic capture (no secrets; canonical JSON). 
+* #### `artifacts/cli/showcompat/stdout.sha256` — allowed legacy alias of `stdout.json.sha256` (EPIC022 D2). Evidence wiring MUST normalize this alias to `stdout.json.sha256`; new producers MUST NOT emit `stdout.sha256`. If both are present they MUST match.
+
+* #### `artifacts/cli/showcompat/args.json`    Names-only arguments/env snapshot used for deterministic capture (no secrets; canonical JSON).
 
 * #### `tools/cli/generate_showcompat_artifacts.py`    Deterministic producer tool used to generate the EPIC022 D2 showcompat capture artifacts under closed rails.
 
@@ -3062,6 +3142,60 @@ These artifacts form the topology.orientation\_demo family and serve as the exem
 
 These entries register the /internal/version identity artifacts required by Governance as governed Evidence Catalog families. /internal/version is an ops-only identity surface (non-A7); PF12 records its evidence artifacts, artifact\_keys, and Index/Mirror discipline, while transport bytes and token semantics remain in HDE-Governance and HDE-CLI-API-Vendor-Ref by title.
 
+##### **Auth posture (not canonized; discovery evidence required)**
+
+PF-Canon defines the `/internal/version` transport/content contract and its governed identity artifacts, but **does not canonize** the auth posture (public vs operator-network gated vs auth-header required) or the expected failure mode when access is missing/invalid.
+
+* Until canonized, remediation guides and operational tooling MUST NOT state auth requirements for `/internal/version` as canon. Any statement about auth posture MUST be explicitly labeled as **Observed Evidence (non-PF)**.
+
+* Until an auth-gated posture is both implemented and canonized, runbooks MUST NOT require an auth header for `/internal/version`. If an auth header is used in a probe, it MUST be treated as optional and recorded as presence-only (never the raw value) in any associated request-chain or run logs.
+
+* Canonization of auth posture requires OPS discovery evidence that captures **status line and headers** for the canonical deployment context(s) under two conditions:
+
+  * with **no auth header**, and
+
+  * with the expected auth header **present** (value redacted or presence-only noted).
+
+* This discovery evidence MUST be secret-free and stored in-repo under a lowercase audit path (titles-only: HDE-Build Notes OPS posture). PF12 governs only that any such evidence, when promoted, must live under governed roots and follow the Evidence Index/Mirror discipline.
+
+Checksum sidecars in this family (INTVER\_\*\_SHA256\_\*) are optional unless explicitly required by an acceptance roster; if present, each checksum file MUST be the sha256 hex \+ LF of the corresponding artifact bytes.
+
+##### **/internal/version invariant checklist (minimum set; MUST be explicit)**
+
+##### Any remediation guide, QA step, or probe tool that produces governed `/internal/version` evidence artifacts (INTVER\_\*) MUST explicitly enumerate and verify the canon-critical invariants below. It is not acceptable to imply these checks by referencing PF sections only.
+
+##### **A. Transport**
+
+* ##### GET MUST return 200\. 
+
+* ##### HEAD MUST return 200 and satisfy parity expectations. 
+
+* ##### Conditional requests (If-None-Match, If-Modified-Since) MUST NOT yield 304\. They MUST return 200\. 
+
+##### **B. Headers**
+
+* ##### Cache-Control: no-store MUST be present. 
+
+* ##### Content-Type: application/json; charset=utf-8 MUST be present. 
+
+* ##### ETag MUST be absent. 
+
+* ##### Last-Modified MUST be absent. 
+
+##### **C. Body (identity payload)**
+
+* ##### Body MUST be fixed-schema JSON with exactly these keys (no extras): `engine_tag`, `build_commit`, `invocation_tag`, `invocation_sha256`, `emitter_sha256`, `release_id`. 
+
+* ##### Body bytes MUST satisfy the canon identity bytes posture where applicable: canonical JSON per §4, including LF termination. 
+
+##### **D. Coupling and fail-closed behavior**
+
+* ##### Verification MUST be performed against the same captured bytes that are written as governed artifacts for that run (headers snapshots, body snapshot, and any two-run identity digest/log). 
+
+* ##### If coupling cannot be established (mixed target or redirect drift) or verification cannot be completed (tooling failure), the run MUST fail closed for evidence purposes and MUST NOT be recorded as satisfying the corresponding invariants. 
+
+##### This checklist does not canonize auth posture. Auth posture remains not canonized until OPS discovery evidence is captured (see the Auth posture subsection above).
+
 ##### **INTVER\_BODY\_GET\_V1 — GET body snapshot**
 
 * Artifact path (example): artifacts/ops/internal\_version/body\_get.json — canonical JSON body for a successful GET /internal/version (six provenance fields, no extras, LF-terminated).  
@@ -3076,7 +3210,10 @@ These entries register the /internal/version identity artifacts required by Gove
 ##### **INTVER\_HEADERS\_GET\_V1 — GET headers snapshot**
 
 * Artifact path (example): artifacts/ops/internal\_version/headers\_get.txt — raw GET /internal/version response headers (proving Cache-Control: no-store, absence of ETag/Last-Modified, correct Content-Type).  
-* Mirror: records use artifact\_key:"INTVER\_HEADERS\_GET\_V1" and role:"snapshot"; Human Index entries use the same artifact\_key and headers file path.**INTVER\_HEADERS\_COND\_IF\_NONE\_MATCH\_V1 — conditional headers snapshot (If-None-Match)**  
+* Mirror: records use artifact\_key:"INTVER\_HEADERS\_GET\_V1" and role:"snapshot"; Human Index entries use the same artifact\_key and headers file path.
+
+##### INTVER\_HEADERS\_COND\_IF\_NONE\_MATCH\_V1 — conditional headers snapshot (If-None-Match)
+
 * Artifact path (canonical): `artifacts/ops/internal_version/headers_cond_if_none_match.txt` — raw response headers captured from a conditional request to `/internal/version` with `If-None-Match` present.  
    Purpose: provide governed evidence that `/internal/version` ignores conditional delivery for its ops-only identity contract (names-only; no body bytes in this artifact).
 
@@ -3109,13 +3246,33 @@ These entries register the /internal/version identity artifacts required by Gove
   * Rails posture reference: names-only reference to closed-rails posture and the determinism pins evidence surface (audit/gates/determinism/env\_pins.log).  
 * Mirror: records use artifact\_key:"INTVER\_TWO\_RUN\_IDENTITY\_V1" and role:"log"; Human Index entries use the same artifact\_key and log path.
 
+##### **INTVER\_REQUEST\_CHAIN\_MANIFEST\_V1 — request-chain manifest (deterministic)**
+
+* ##### Artifact path (canonical): `artifacts/ops/internal_version/request_chain_manifest.json`    Deterministic request-chain manifest associated with `/internal/version` evidence capture runs.
+
+* ##### Requirements (normative):
+
+  * ##### MUST be secret-free. If an auth header is used by a probe or harness, the manifest MUST NOT record the raw value (presence-only or redacted placeholder only).
+
+  * ##### MUST have a co-located sibling path-proof transcript:     `artifacts/ops/internal_version/request_chain_manifest.json.path_proof.txt`
+
+* ##### Mirror/Index linkage (names-only):
+
+  * ##### Mirror: records use `artifact_key:"INTVER_REQUEST_CHAIN_MANIFEST_V1"` and `role:"snapshot"`.
+
+  * ##### Human Index: entries use the same `artifact_key` and the manifest path as `discovered_physical_path`.
+
+  * ##### `proof_anchor` MUST point to `artifacts/ops/internal_version/request_chain_manifest.json.path_proof.txt`.
+
+##### 
+
 ##### **Indexing and Mirror discipline**
 
 For each INTVER\_\* family above, the Human Evidence Index (docs/evidence/INDEX.json) MUST contain at least one entry with the appropriate artifact\_key and a discovered\_physical\_path pointing to the governed artifact under artifacts/ops/internal\_version/\*\*; docs/evidence/INDEX.sha256 MUST be updated in the same PR when adding or changing any /internal/version artifact. The Machine Evidence Mirror (artifacts/evidence\_index.jsonl) MUST contain canonical JSONL records for each governed /internal/version artifact and schema, using the artifact\_key names exactly as above and the minimum Mirror record schema in §8.3 (artifact\_key, role, sha256, size\_bytes, produced\_at\_utc, discovered\_physical\_path, proof\_anchor).
 
 ##### **Acceptance hints (names-only)**
 
-These INTVER\_\* families are the governed surfaces for the /internal/version identity tokens defined in HDE-Governance (for example, INTERNAL\_VERSION\_200\_CTYPE\_JSON\_UTF8\_OK, INTERNAL\_VERSION\_HEAD\_PARITY\_OK, INTERNAL\_VERSION\_CONDITIONALS\_IGNORED\_OK, INTERNAL\_VERSION\_NO\_ETAG\_OK, INTERNAL\_VERSION\_NO\_STORE\_OK) and for any epic-specific identity tokens in HDE-Phased Epics. PF12 does not redefine token semantics; it binds those tokens to these artifact families by name and path.
+These INTVER\_\* families are the governed surfaces for the /internal/version identity token titles defined in PF04 (and the relevant EPIC acceptance roster), e.g.: INTERNAL\_VERSION\_200\_CTYPE\_JSON\_UTF8\_OK, INTERNAL\_VERSION\_200\_CTYPE\_JSON\_UTF8\_NOTOK, INTERNAL\_VERSION\_200\_CTYPE\_HTML\_NOTOK, INTERNAL\_VERSION\_404\_NOTOK.
 
 ---
 
@@ -3200,7 +3357,7 @@ Machine mirror (artifacts/evidence\_index.jsonl):
 
 Path-proofs:
 
-* Each concrete parity artifact and schema-check log MUST have a sibling path-proof transcript under artifacts/path\_proofs/.../\*.path\_proof.txt whose path, sha256, size\_bytes, mtime\_utc, and produced\_at\_utc match the artifact’s canonical bytes and its Mirror record.  
+* Each concrete parity artifact and schema-check log MUST have a sibling path-proof transcript (`<file>.path_proof.txt`) stored alongside the artifact, whose `path`, `sha256`, `size_bytes`, `mtime_utc`, and `produced_at_utc` match the artifact’s canonical bytes and its Mirror record.  
 * errors/token\_map/token\_map.json MUST have a sibling errors/token\_map/token\_map.json.path\_proof.txt transcript with the same constraints.
 
 Acceptance hints for these families are names-only and include error/parity and schema tokens such as CLI\_READER\_PARITY\_OK (and its legacy alias CLI\_READER\_EMITTER\_PARITY\_OK), ERROR\_JSON\_CANON\_OK, JSON\_CANONICAL\_CHECK\_OK, and ERROR\_TOKEN\_MAP\_OK. PF12 does not change token semantics; it binds these tokens to the governed error evidence families by artifact\_key and path so that Governance, QA, and PF09 can route by title only.
@@ -3345,7 +3502,7 @@ Engine Core evidence families participate in the existing Mirror/Index tokens re
   * Mirror record: artifact\_key:"config\_bundle.fe", role:"snapshot", discovered\_physical\_path equal to the bundle path, with sha256, size\_bytes, produced\_at\_utc, and proof\_anchor matching the bundle’s canonical bytes and path-proof as required by §8.3 and §8.15.  
 * config\_bundle.be — Typed backend config bundle (names-only projection of governed Magic-10 config, band-edges config, full channels/centers/domains/alias policy, and registry-derived topology for engine/internal use; canonical JSON; includes a sources block keyed to the underlying config artifacts and registry report).  
   * Path: JSON file under artifacts/config\_bundles/ (exact filename pinned by the bundle generator and tests).  
-  * Path-proof: sibling .path\_proof.txt transcript under artifacts/path\_proofs/... for the same path.  
+  * Path-proof: a sibling `<bundle_file>.path_proof.txt` transcript stored alongside the bundle file (same directory).  
   * Mirror record: artifact\_key:"config\_bundle.be", role:"snapshot", discovered\_physical\_path equal to the bundle path, with sha256, size\_bytes, produced\_at\_utc, and proof\_anchor matching the bundle’s canonical bytes and path-proof as required by §8.3 and §8.15.
 
 #### **BodyGraph adapter data-source and invariance**
@@ -3378,14 +3535,17 @@ Engine Core evidence families participate in the existing Mirror/Index tokens re
 
 These entries register QA harness ledger files that summarize Live QA runs without requiring every per-run log to be individually indexed.
 
-* `audit/qa/\<epic-id\>/qa_step_logs_manifest.json`  
+* `audit/qa/<epic-id>/qa_step_logs_manifest.json`  
    Per-epic manifest enumerating run IDs and primary per-run log paths. Records-only canonical JSON (UTF-8, ASCII-sorted keys, compact, exactly one trailing LF).
 
-* `audit/qa/\<epic-id\>/acceptance_map_viability.log`  
+* `audit/qa/<epic-id>/acceptance_map_viability.log`  
    Per-epic text log summarizing acceptance-map viability results for one or more runs. LF-terminated text; no ANSI.
 
-* `audit/qa/\<epic-id\>/\<run-id\>/D0_codespaces_snapshot.json`  
+* `audit/qa/<epic-id>/<run-id>/00_meta/codespaces_snapshot.json`  
    Step-0 Codespaces environment snapshot for a specific run (tool versions, rails pins, presence-only secrets context). Canonical JSON; schema and indexing posture are defined in §8.17.5.
+
+* `audit/qa/<epic-id>/<run-id>/00_meta/doc_deltas.md`  
+   Mechanically produced doc delta capture for a run (names-only; no secrets). If no deltas exist, the artifact MUST explicitly say so (produced output, not an instruction).
 
 Indexing discipline for all files above is the standard §8.6 rule set: exactly one Human Evidence Index entry per concrete file path, exactly one Machine Evidence Mirror record per concrete file path, and exactly one governed path-proof transcript per concrete file, all kept in lockstep.
 
@@ -4294,7 +4454,7 @@ Both bundle families **MUST** participate in the standard Evidence Index/Mirror 
 
 * **Path-proofs**:
 
-  * Each concrete frontend bundle file MUST have a sibling path-proof transcript under `artifacts/path_proofs/.../*.path_proof.txt` whose `path`, `sha256`, `size_bytes`, `mtime_utc`, and `produced_at_utc` match the bundle’s canonical bytes and mirror record.
+  * Each concrete frontend bundle file MUST have a sibling path-proof transcript named `<bundle_file>.path_proof.txt` stored alongside the bundle file, whose `path`, `sha256`, `size_bytes`, `mtime_utc`, and `produced_at_utc` match the bundle’s canonical bytes and mirror record.
 
   * The same requirement applies to backend bundle files.
 
@@ -4440,13 +4600,45 @@ This section standardizes layout and naming only. Whether a given file inside an
 
 ### **8.17.1 Root and step directories**
 
-**Root.**
+**Epic QA root (per epic).**
 
-* All Live QA artifacts for a single run of an epic **MUST** live under a single root:
+* Each epic’s Live QA area lives under:
+
+  * `EPIC_QA_ROOT = audit/qa/<epic-id>/`
+
+* `EPIC_QA_ROOT` may contain:
+
+  * harness run directories (`<run-id>/`) and evidence buckets (e.g., `live-qa/`) per the section preface, and
+
+  * a reserved epic meta directory:
+
+    * `audit/qa/<epic-id>/00_meta/`
+
+  * used for stable, mechanically produced epic-level QA metadata (for example, a Codespaces snapshot or planning-time doc delta capture). Epic meta files may be copied into each run under `QA_ROOT/00_meta/` for run packaging and later review.
+
+**Run root (per run).**
+
+* All run-scoped Live QA artifacts for a single run of an epic **MUST** live under a single run root:
 
   * `QA_ROOT = audit/qa/<epic-id>/<run-id>/`
 
-* Directory names created directly under `QA_ROOT` **MUST** be lower-case and use `-` as the separator (for example `d0-planning`, `d3-cli-guards`, `d5-vendor`, `logs`).
+**Reserved directories under `QA_ROOT`.**
+
+* Directory names created directly under `QA_ROOT` **MUST** be lower-case ASCII.
+
+* The default separator for new step directories is `-` (e.g., `d0-planning`, `d5-vendor`, `logs`).
+
+* The following reserved directory names are permitted even though they contain `_`:
+
+  * `00_meta/` — run-local copies of epic meta files (e.g., Codespaces snapshot, doc delta capture, run events)
+
+  * `step_logs/` — primary step logs (when a plan uses a dedicated log directory)
+
+  * `results/` — step result artifacts (names-only; plan-owned)
+
+  * `snapshots/` — snapshot copies of governed evidence (names-only; plan-owned)
+
+  * `closeout/` — per-run closeout artifacts (names-only; plan-owned)
 
 **Step directories (optional but recommended).**
 
@@ -4612,11 +4804,13 @@ without leaking secret values.
 This is **evidence**, not prose. It MUST be generated by commands and MUST NOT be hand-edited (see §8.17.2).
 
 **Canonical path (per run).**  
- `audit/qa/\<epic-id\>/\<run-id\>/D0_codespaces_snapshot.json`
+ `audit/qa/<epic-id>/<run-id>/00_meta/codespaces_snapshot.json`
 
-* `\<epic-id\>` follows §8.17 (lower-case ASCII, hyphenated; for example `hde-epic021`).
+* `<epic-id>` follows §8.17 (lower-case ASCII, hyphenated; e.g., `hde-epic022`).
 
-* `\<run-id\>` follows §8.17 (stable slug for the run).
+* `<run-id>` follows §8.17 (stable slug for the run).
+
+* A stable epic meta copy MAY also exist at `audit/qa/<epic-id>/00_meta/codespaces_snapshot.json`. If both exist for a run, they MUST be byte-identical.
 
 **Canonical JSON (required).**
 
@@ -4632,13 +4826,13 @@ This is **evidence**, not prose. It MUST be generated by commands and MUST NOT b
 
 **Schema (minimum; reject unknown keys).**
 
-`D0_codespaces_snapshot.json` MUST be a JSON object with exactly the keys below:
+`codespaces_snapshot.json` MUST be a JSON object with exactly the keys below:
 
 * `schema` — string, MUST equal `"codespaces_snapshot.v1"`.
 
 * `captured_at_utc` — string, UTC ISO-8601 (`YYYY-MM-DDThh:mm:ssZ`).
 
-* `epic_id` — string (for example `hde-epic021`).
+* `epic_id` — string (for example `hde-epic022`).
 
 * `run_id` — string (for example `run-20251221-a`).
 
@@ -4660,7 +4854,7 @@ This is **evidence**, not prose. It MUST be generated by commands and MUST NOT b
 
   * each item MUST be `{ "tool": <string>, "version": <string> }`
 
-  * examples of `tool` values (non-normative): `"python"`, `"pip"`, `"poetry"`, `"os"`.
+  * examples (non-normative): `"python"`, `"pip"`, `"poetry"`, `"os"`.
 
 * `env_presence` — array of objects treated as a set (dedupe \+ ASCII-sort by `name`):
 
@@ -4668,19 +4862,19 @@ This is **evidence**, not prose. It MUST be generated by commands and MUST NOT b
 
   * **Values MUST NOT be recorded.** Only `name` and presence boolean.
 
-  * The list of names to include is owned by the Live QA plan and/or QA harness (titles-only routing to Glow QA Guide).
+  * The list of names to include is owned by the Live QA plan (titles-only routing to Glow QA Guide).
 
 * `notes` — array of strings (optional; names-only; no secrets).
 
 **Indexing (when used as governed evidence).**
 
-When a Live QA run is promoted to governed evidence (for example, referenced by acceptance artifacts), the Codespaces snapshot MUST be indexed like other governed Live QA evidence:
+When a Live QA run is promoted to governed evidence (for example, referenced by acceptance artifacts), the Codespaces snapshot MUST be indexed like other governed Live QA evidence using the per-run path above:
 
 * Human Index (`docs/evidence/INDEX.json`) entry with:
 
   * `artifact_key: "qa.codespaces_snapshot"`
 
-  * `discovered_physical_path` equal to the concrete snapshot path for the run.
+  * `discovered_physical_path` equal to the concrete per-run snapshot path.
 
 * Machine Mirror (`artifacts/evidence_index.jsonl`) record with:
 
@@ -4688,13 +4882,13 @@ When a Live QA run is promoted to governed evidence (for example, referenced by 
 
   * `role: "snapshot"`
 
-  * `discovered_physical_path` equal to the concrete snapshot path for the run,
+  * `discovered_physical_path` equal to the concrete per-run snapshot path,
 
   * `sha256`, `size_bytes`, `produced_at_utc`, and `proof_anchor` per §8.3.
 
 * Path-proof transcript:
 
-  * `audit/qa/\<epic-id\>/\<run-id\>/D0_codespaces_snapshot.json.path_proof.txt` (sibling),
+  * `audit/qa/<epic-id>/<run-id>/00_meta/codespaces_snapshot.json.path_proof.txt` (sibling),
 
   * referenced by `proof_anchor`,
 
