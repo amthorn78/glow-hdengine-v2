@@ -1,0 +1,87 @@
+{
+  "epic_id": "HDE-EPIC022",
+  "runs": [
+    {
+      "created_at_utc": "2026-01-03T01:56:53Z",
+      "run_id": "20260103T015609Z",
+      "steps": [
+        {
+          "check_id": "STEP-01",
+          "claimed_tokens": [],
+          "created_at_utc": "2026-01-03T01:56:53Z",
+          "ended_at_utc": "2026-01-03T01:56:53Z",
+          "exit_code": 0,
+          "intended_tokens": [],
+          "log_path": "audit/qa/hde-epic022/hde_epic022_step01_qapass6/run_20260103_015545_utc/step_logs/STEP-01.log",
+          "pf_refs": [
+            "PF10 — HDE-Build Notes §2.4",
+            "PF10 — HDE-Build Notes §2.5",
+            "PF10 — HDE-Build Notes §2.10",
+            "PF10 — HDE-Build Notes §2.13"
+          ],
+          "started_at_utc": "2026-01-03T01:56:53Z",
+          "status": "PASS",
+          "step_name": "bootstrap_scaffold",
+          "updated_at_utc": "2026-01-03T01:56:53Z"
+        },
+        {
+          "check_id": "STEP-02",
+          "claimed_tokens": [],
+          "created_at_utc": "2026-01-03T04:29:24Z",
+          "ended_at_utc": "2026-01-03T04:29:23Z",
+          "exit_code": 0,
+          "intended_tokens": [],
+          "log_path": "audit/qa/hde-epic022/hde_epic022_step01_qapass6/run_20260103_015545_utc/step_logs/STEP-02.log",
+          "pf_refs": [
+            "PF10 — HDE-Build Notes §2.12",
+            "PF10 — HDE-Build Notes §2.16",
+            "PF10 — HDE-Build Notes §2.13",
+            "PF10 — HDE-Build Notes §2.5"
+          ],
+          "started_at_utc": "2026-01-03T04:29:23Z",
+          "status": "PASS",
+          "step_name": "internal_version_capture",
+          "updated_at_utc": "2026-01-03T04:29:24Z"
+        },
+        {
+          "check_id": "STEP-03",
+          "claimed_tokens": [],
+          "ended_at_utc": "2026-01-03T05:15:41Z",
+          "exit_code": 5,
+          "intended_tokens": [],
+          "log_path": "audit/qa/hde-epic022/hde_epic022_step01_qapass6/run_20260103_015545_utc/step_logs/STEP-03.log",
+          "pf_refs": [
+            "PF10 — HDE-Build Notes §2.4",
+            "PF10 — HDE-Build Notes §2.5",
+            "PF10 — HDE-Build Notes §2.13",
+            "PF10 — HDE-Build Notes §2.18"
+          ],
+          "started_at_utc": "2026-01-03T05:15:40Z",
+          "status": "FAIL_TOOLING",
+          "step_name": "internal_version_bundle",
+          "updated_at_utc": "2026-01-03T05:15:41Z"
+        },
+        {
+          "check_id": "STEP-04",
+          "claimed_tokens": [],
+          "created_at_utc": "2026-01-03T05:57:41Z",
+          "ended_at_utc": "2026-01-03T05:57:41Z",
+          "exit_code": 2,
+          "intended_tokens": [],
+          "log_path": "audit/qa/hde-epic022/hde_epic022_step01_qapass6/run_20260103_015545_utc/step_logs/STEP-04.log",
+          "pf_refs": [
+            "PF10 — HDE-Build Notes §2.10",
+            "PF10 — HDE-Build Notes §2.11",
+            "PF10 — HDE-Build Notes §2.13",
+            "PF10 — HDE-Build Notes §2.5"
+          ],
+          "started_at_utc": "2026-01-03T05:57:40Z",
+          "status": "FAIL_TOOLING",
+          "step_name": "evidence_index_and_manifest_validate",
+          "updated_at_utc": "2026-01-03T05:57:41Z"
+        }
+      ],
+      "updated_at_utc": "2026-01-03T05:57:41Z"
+    }
+  ]
+}

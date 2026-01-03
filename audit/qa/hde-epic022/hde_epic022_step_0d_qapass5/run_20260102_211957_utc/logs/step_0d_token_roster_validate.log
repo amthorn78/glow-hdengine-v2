@@ -1,0 +1,7 @@
+{"check_id": "STEP-0D", "step_name": "token_roster_validate", "epic_id": "HDE-EPIC022", "run_id": "run_20260102_211957_utc", "command": "python tools/qa/token_roster_validate.py --epic \"HDE-EPIC022\" --pf04 <resolved> --pf20 <resolved>", "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "local", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "rails": "SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=local LC_ALL=C LANG=C TZ=UTC", "pf_refs": ["PF04 — HDE-Governance, §2.0", "PF20 — HDE-Phased Epics, §2.7", "PF19 — Glow QA Guide, §4.4", "PF19 — Glow QA Guide, §3.5.11"], "intended_tokens": [], "claimed_tokens": [], "tokens": [], "status": "TOOLING_BLOCKED", "exit_code": 0, "started_at_utc": "2026-01-02T21:19:57Z", "ended_at_utc": "2026-01-02T21:19:58Z", "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"}
+
+---- STDOUT ----
+
+
+---- STDERR ----
+

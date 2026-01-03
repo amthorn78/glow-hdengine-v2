@@ -1,0 +1,7 @@
+{
+  "status": "TOOLING_BLOCKED",
+  "exit_code": 0,
+  "pf04_matches_count": 1,
+  "pf20_matches_count": 1,
+  "tooling_blocked_reason": "missing_validator:tools/qa/token_roster_validate.py"
+}

@@ -77,6 +77,24 @@
       "log_path": "audit/qa/hde-epic022/hde_epic022_qa_step_z0/run_20251226t181426z_e44b4cc/step_logs/z0_close_pack_generate.log",
       "recorded_at_utc": "2025-12-30T06:19:15Z",
       "status": "PASS"
+    },
+    {
+      "check_id": "STEP-0D",
+      "step_name": "token_roster_validate",
+      "run_id": "run_20251226t181426z_e44b4cc",
+      "log_path": "audit/qa/hde-epic022/runs/run_20251226t181426z_e44b4cc/step_logs/STEP-0D_token_roster_validate.log",
+      "status": "FAIL_TOOLING",
+      "recorded_at_utc": "2026-01-02T21:49:17Z",
+      "exit_code": 1
+    },
+    {
+      "check_id": "STEP-0D",
+      "step_name": "token_roster_validate",
+      "run_id": "run_20251226t181426z_e44b4cc",
+      "log_path": "audit/qa/hde-epic022/runs/run_20251226t181426z_e44b4cc/step_logs/STEP-0D_token_roster_validate.log",
+      "status": "FAIL_TOOLING",
+      "recorded_at_utc": "2026-01-02T21:49:53Z",
+      "exit_code": 10
     }
   ]
 }

@@ -1,0 +1,9 @@
+{"epic_id": "HDE-EPIC022", "run_id": "20260103T015609Z", "check_id": "STEP-01", "step_name": "bootstrap_scaffold", "command": "(bootstrap scaffold; created tools/qa_record_step.py, env.sh, run_context.md, release_id snapshot)", "captured_env": {"LC_ALL": "C", "LANG": "C", "TZ": "UTC", "PYTHONHASHSEED": "0"}, "rails": "LC_ALL=C LANG=C TZ=UTC PYTHONHASHSEED=0", "pf_refs": ["PF10 — HDE-Build Notes §2.4", "PF10 — HDE-Build Notes §2.5", "PF10 — HDE-Build Notes §2.10", "PF10 — HDE-Build Notes §2.13"], "intended_tokens": [], "claimed_tokens": [], "status": "PASS", "exit_code": 0, "started_at_utc": "2026-01-03T01:56:53Z", "ended_at_utc": "2026-01-03T01:56:53Z"}
+
+---- STDOUT ----
+[STEP-01] EPIC_ID=HDE-EPIC022
+[STEP-01] RUN_ID=20260103T015609Z
+[STEP-01] EVIDENCE_ROOT=audit/qa/hde-epic022/hde_epic022_step01_qapass6/run_20260103_015545_utc
+
+---- STDERR ----
+

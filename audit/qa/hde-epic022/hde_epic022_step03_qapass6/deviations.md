@@ -1,0 +1,6 @@
+DEV-01
+- What changed: STEP-03 halted with FAIL_TOOLING (exit_code=2) because the plan command could not open tools/ops/internal_version_bundle.py; bundle artifacts were not generated and BUNDLE_FILE_COUNT remained 0.
+- Why: Repository reality lacks the required tool (tools/ops/internal_version_bundle.py), so the Approved Plan command failed immediately when invoked.
+- Original plan reference: Approved Plan — Step ID: STEP-03
+- Commands actually run: see run_20260103_045723_utc stdout/step-03.stdout.txt (empty) and stderr/step-03.stderr.txt (missing tool message); full command captured in run_20260103_045723_utc/step_logs/step-03.log.
+- Evidence files impacted: run_20260103_045723_utc/results/step-03.result.env (STATUS=FAIL_TOOLING, EXIT_CODE=2, BUNDLE_FILE_COUNT=0), run_20260103_045723_utc/step_logs/step-03.log, run_20260103_045723_utc/stdout/step-03.stdout.txt, run_20260103_045723_utc/stderr/step-03.stderr.txt; artifacts/internal_version_bundle/file_list.txt is absent because the tool failed to run.
