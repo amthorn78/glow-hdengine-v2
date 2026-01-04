@@ -1,0 +1,24 @@
+{
+  "captured_at_utc": "2026-01-04T20:59:34Z",
+  "epic_id": "HDE-EPIC023",
+  "artifacts": [
+    {
+      "path": "docs/evidence/INDEX.json",
+      "sha256": "3a8cae19e35dccd151412c0c4bae04e47cd53b3967b8dd78fedab91dd2401631",
+      "size_bytes": 42657,
+      "proof": "docs/evidence/INDEX.json.path_proof.txt"
+    },
+    {
+      "path": "docs/evidence/INDEX.sha256",
+      "sha256": "5c69a68a52045b741308fbb29b7a49977227dea9eec0b72a9343ffe3d3676add",
+      "size_bytes": 91,
+      "proof": "docs/evidence/INDEX.sha256.path_proof.txt"
+    },
+    {
+      "path": "artifacts/evidence_index.jsonl",
+      "sha256": "dcceecb5ebc8b39478c5ffa83fe26039b326a47a66ab3a2e24c9bbd90209436a",
+      "size_bytes": 93312,
+      "proof": "artifacts/evidence_index.jsonl.path_proof.txt"
+    }
+  ]
+}
