@@ -1,0 +1,81 @@
+{
+  "epic_id": "HDE-EPIC023",
+  "tokens": [
+    {
+      "name": "QA_ACCEPTANCE_MAP_VIABILITY_OK",
+      "owner_pf": "PF04 \u2014 Canon-HDE-Governance \u00a7Acceptance tokens",
+      "status": "planned",
+      "evidence_titles": [
+        "audit/qa/hde-epic023/token_evidence_matrix.md",
+        "audit/qa/hde-epic023/qa_step_logs_manifest.json",
+        "audit/qa/hde-epic023/evidence_index_snapshot.json"
+      ]
+    },
+    {
+      "name": "EVIDENCE_INDEX_MIRROR_OK",
+      "owner_pf": "PF12 \u2014 HDE-Schemas and Artifacts \u00a7Evidence Mirror",
+      "status": "planned",
+      "evidence_titles": [
+        "docs/evidence/INDEX.json",
+        "artifacts/evidence_index.jsonl",
+        "python ci/checks/check_mirror_schema.sh"
+      ]
+    },
+    {
+      "name": "EVIDENCE_PATHS_VALIDATED_OK",
+      "owner_pf": "PF12 \u2014 HDE-Schemas and Artifacts \u00a7Path Proofs",
+      "status": "planned",
+      "evidence_titles": [
+        "docs/evidence/INDEX.json",
+        "artifacts/evidence_index.jsonl",
+        "python tools/evidence/update_evidence_index.py --check",
+        "python ci/checks/check_mirror_schema.sh"
+      ]
+    },
+    {
+      "name": "SANITY_PIPELINE_OK",
+      "owner_pf": "PF19 \u2014 Glow QA Guide \u00a7Sanity Pipeline",
+      "status": "planned",
+      "evidence_titles": [
+        "python tools/evidence/run_sanity_pipeline.py",
+        "artifacts/sanity/sanity.log",
+        "audit/qa/hde-epic023/qa_step_logs_manifest.json"
+      ]
+    },
+    {
+      "name": "DETERMINISM_ENV_PINS_OK",
+      "owner_pf": "PF19 \u2014 Glow QA Guide \u00a7Env Pins",
+      "status": "planned",
+      "evidence_titles": [
+        "audit/gates/determinism/env_pins.log",
+        "ci/checks/check_env_pins.sh"
+      ]
+    },
+    {
+      "name": "JSON_CANONICAL_CHECK_OK",
+      "owner_pf": "PF04 \u2014 Canon-HDE-Governance \u00a7Canonical JSON",
+      "status": "planned",
+      "evidence_titles": [
+        "tests/cli/test_cli_canonical_bytes.py::test_showcompat_stdout_is_canonical",
+        "artifacts/cli/showcompat/stdout.json"
+      ]
+    },
+    {
+      "name": "DOC_DELTA_PRESENT_OK",
+      "owner_pf": "PF10 \u2014 HDE-Build Notes \u00a72.5",
+      "status": "planned",
+      "evidence_titles": [
+        "audit/docdeltas/hde-epic023_doc_deltas.md"
+      ]
+    },
+    {
+      "name": "TWO_RUN_IDENTITY_OK",
+      "owner_pf": "PF20 \u2014 HDE-Phased Epics (HDE-SEPA002.5; HDE-SEPA004.4)",
+      "status": "planned",
+      "evidence_titles": [
+        "tests/cli/test_showcompat_parity_and_identity.py::test_two_run_identity_and_reemit",
+        "artifacts/ops/internal_version/two_run_identity.log"
+      ]
+    }
+  ]
+}

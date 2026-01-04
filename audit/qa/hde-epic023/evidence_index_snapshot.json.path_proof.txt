@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic023/evidence_index_snapshot.json
+size_bytes: 779
+sha256: 82000d3cee5397f4d49dedf8f9fef8bb973a5084b98c3e03375173d4e1f94688
+mtime_utc: 2026-01-04T20:09:57Z
+produced_at_utc: 2025-11-30T03:58:47Z
