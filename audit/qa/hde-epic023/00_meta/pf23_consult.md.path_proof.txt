@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic023/00_meta/pf23_consult.md
+size_bytes: 577
+sha256: 3c265e664251db4077d1dbfd87c34f070b37ff1ea16e0e685cdd88aaa7f91b77
+mtime_utc: 2026-01-04T23:22:55Z
+produced_at_utc: 2026-01-04T23:21:44Z
