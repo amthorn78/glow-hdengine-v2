@@ -16,8 +16,8 @@
     },
     {
       "path": "artifacts/evidence_index.jsonl",
-      "sha256": "7391d0e676ccf20fe3c93cd093a59f210903797f2e5dac9e413af829553244e1",
-      "size_bytes": 93699,
+      "sha256": "efd2ae90919fd0c6938477238c01587915573b00af700162fe8e5bdf70a8b8e2",
+      "size_bytes": 93700,
       "proof": "artifacts/evidence_index.jsonl.path_proof.txt"
     }
   ]
