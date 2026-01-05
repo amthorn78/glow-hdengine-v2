@@ -56,6 +56,7 @@
       "owner_pf": "PF04 \u2014 Canon-HDE-Governance \u00a7Canonical JSON",
       "status": "planned",
       "evidence_titles": [
+        "artifacts/cli/showcompat/stdout.json",
         "audit/gates/canonical_json/json_canonical_check.log",
         "audit/gates/canonical_json/json_canon_compare.log",
         "audit/gates/canonical_json/canonical_json.gate.json",
