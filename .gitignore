@@ -17,6 +17,15 @@ audit/gates/*
 audit/gates/determinism/*
 !audit/gates/determinism/*.log
 !audit/gates/determinism/*.path_proof.txt
+!audit/gates/canonical_json/
+audit/gates/canonical_json/*
+!audit/gates/canonical_json/*.json
+!audit/gates/canonical_json/*.log
+!audit/gates/canonical_json/*.path_proof.txt
+!audit/gates/topology/
+audit/gates/topology/*
+!audit/gates/topology/*.txt
+!audit/gates/topology/*.path_proof.txt
 !audit/gates/aux/
 audit/gates/aux/*
 !audit/gates/aux/*.path_proof.txt

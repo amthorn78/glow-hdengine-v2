@@ -25,6 +25,8 @@ jobs:
       # D3 (HDE-EPIC018): CLI serializer/emitter guards (PF09/PF19 rails)
       - run: python tools/cli/serializer_grep_guard.py
       - run: python tools/cli/emitter_symbol_proof.py
+      - name: Run canonical JSON gate (closed rails)
+        run: python tools/evidence/run_canonical_json_gate.py
       - run: python tools/order/generate_ordering_artifacts.py
       - run: python tools/evidence/update_evidence_index.py
       - run: python tools/order/generate_ordering_artifacts.py --check
