@@ -30,7 +30,7 @@
                 "docs/evidence/INDEX.json",
                 "artifacts/evidence_index.jsonl",
                 "python tools/evidence/update_evidence_index.py --check",
-                "python ci/checks/check_mirror_schema.sh"
+                "SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC ci/checks/check_mirror_schema.sh"
             ]
         },
         {

@@ -1,6 +1,24 @@
 > **Note:** The canonical human Evidence Index lives at `docs/evidence/INDEX.json`.
-> Add new entries there first, then mirror key pointers here for quick navigation.
-> Refresh order: run `python tools/evidence/update_evidence_index.py` (write) before `python tools/evidence/orientation_demo.py` (write), then their `--check` variants, and finish with `python ci/checks/check_mirror_schema.sh` (Python entrypoint despite `.sh`). Mirror path proofs include both `sha256` and `mirror_body_sha256` for the self-record entry in `artifacts/evidence_index.jsonl`.
+> Add new entries there first, then mirror key pointers here for quick navigation. Update the skeleton (`docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl` + `.path_proof.txt`) in the same PR whenever governed bytes change.
+> Refresh order: run `python tools/evidence/update_evidence_index.py` (write) before `python tools/evidence/orientation_demo.py` (write), then their `--check` variants, and finish with `ci/checks/check_mirror_schema.sh`. Mirror path proofs include both `sha256` and `mirror_body_sha256` for the self-record entry in `artifacts/evidence_index.jsonl`.
+
+# Appendix-D — Evidence Index (EPIC-023)
+
+## Acceptance map, ledger, and doc deltas
+* Acceptance roster (canonical 8-token set: `QA_ACCEPTANCE_MAP_VIABILITY_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`, `SANITY_PIPELINE_OK`, `DETERMINISM_ENV_PINS_OK`, `JSON_CANONICAL_CHECK_OK`, `DOC_DELTA_PRESENT_OK`, `TWO_RUN_IDENTITY_OK`): `docs/acceptance_map_epic023.json`
+* Token evidence matrix: `audit/qa/hde-epic023/token_evidence_matrix.md`
+* Viability log: `audit/qa/hde-epic023/acceptance_map_viability.log`
+* QA step manifest + snapshot: `audit/qa/hde-epic023/qa_step_logs_manifest.json`, `audit/qa/hde-epic023/evidence_index_snapshot.json`
+* Doc deltas + PF23 consult: `audit/docdeltas/hde-epic023_doc_deltas.md`, `audit/qa/hde-epic023/00_meta/doc_deltas.md`, `audit/qa/hde-epic023/00_meta/pf23_consult.md`
+* Acceptance alignment test (closed rails): `python -m pytest tests/qa/test_epic023_acceptance_alignment.py` enforces token registry membership, map ↔ matrix parity, governed roots, Index + Mirror coverage with proof anchors, and forbids `.path_proof.txt` as primary evidence.
+* Close-pack artifacts: `audit/EPIC-023_MANIFEST.json`, `audit/EPIC-023_close_report.md`
+
+## Canonical JSON gate (closed rails)
+* Gate runner: `python tools/evidence/run_canonical_json_gate.py` (`--check-only` available for read-only validation)
+* Check log: `audit/gates/canonical_json/json_canonical_check.log`
+* Compare log: `audit/gates/canonical_json/json_canon_compare.log`
+* Gate summary: `audit/gates/canonical_json/canonical_json.gate.json`
+* All gate artifacts have co-located `.path_proof.txt` siblings and are enforced in CI (see `.github/workflows/ci.yml` step “Run canonical JSON gate (closed rails)”).
 
 # Appendix-D — Evidence Index (EPIC-022)
 

@@ -19,5 +19,19 @@
     "path": "docs/acceptance_map_epic020.json",
     "acceptance_map_path": "docs/acceptance_map_epic020.json",
     "manifest_path": "audit/EPIC020_MANIFEST.json"
+  },
+  {
+    "epic_id": "HDE-EPIC022",
+    "epic_name": "Separation Pass 2 — Evidence discipline",
+    "path": "docs/acceptance_map_epic022.json",
+    "acceptance_map_path": "docs/acceptance_map_epic022.json",
+    "manifest_path": "audit/EPIC-022_MANIFEST.json"
+  },
+  {
+    "epic_id": "HDE-EPIC023",
+    "epic_name": "Acceptance alignment & canonical JSON gate",
+    "path": "docs/acceptance_map_epic023.json",
+    "acceptance_map_path": "docs/acceptance_map_epic023.json",
+    "manifest_path": "audit/EPIC-023_MANIFEST.json"
   }
 ]

@@ -1,6 +1,18 @@
 # CHANGELOG
 
-Unreleased — HDE-EPIC022 Remediation 1 (Freeze-Pack identity contract hardening)
+Unreleased — HDE-EPIC023: Acceptance alignment and canonical JSON gate (docs sweep)
+
+### Added
+- Documented EPIC023 acceptance scaffolds and QA ledger: `docs/acceptance_map_epic023.json`, `audit/qa/hde-epic023/token_evidence_matrix.md`, `audit/qa/hde-epic023/acceptance_map_viability.log`, `audit/qa/hde-epic023/qa_step_logs_manifest.json`, and the doc-delta + PF23 consult evidence pair (`audit/docdeltas/hde-epic023_doc_deltas.md`, `audit/qa/hde-epic023/00_meta/pf23_consult.md`).
+- Canonical JSON gate home is now explicitly documented: `python tools/evidence/run_canonical_json_gate.py` emits `audit/gates/canonical_json/json_canonical_check.log`, `audit/gates/canonical_json/json_canon_compare.log`, and `audit/gates/canonical_json/canonical_json.gate.json` (with `.path_proof.txt` siblings); CI runs the closed-rails gate step.
+- Acceptance alignment test coverage recorded: `tests/qa/test_epic023_acceptance_alignment.py` enforces the canonical 8-token roster, map ↔ matrix parity, governed roots, Index/Mirror proof anchors, and rejection of `.path_proof.txt` as primary evidence.
+
+### Changed / Fixed
+- README/AGENTS/docs refreshed to reflect EPIC023 evidence posture, canonical JSON gate enforcement, and the close-pack artifacts (`audit/EPIC-023_MANIFEST.json`, `audit/EPIC-023_close_report.md`).
+- Evidence skeleton discipline clarified: governed bytes require same-PR updates to `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, and `artifacts/evidence_index.jsonl`, with explicit regeneration order and mirror schema checks.
+- Documented viability log generation for EPIC023 and highlighted the bug-fix class around stale path-proof timestamps and mirror self-record coherence when regenerating governed artifacts.
+
+2026-01-05 — HDE-EPIC022 Remediation 1 (Freeze-Pack identity contract hardening)
 
 ### Added
 - Freeze-Pack manifest contract clarified: single SoT at `catalog/manifest.json` (top-level keys exactly `root`, `version`, `built_at_utc`, `files`, no self-listing) with canonical JSON bytes; `release_id = sha256(canonical_bytes(catalog/manifest.json))` (lowercase hex). Evidence copy is `artifacts/math/freeze_pack_manifest.json` (byte-identical), and evidence-only summaries (e.g., `manifest_snapshot.json`) are not identity inputs.
