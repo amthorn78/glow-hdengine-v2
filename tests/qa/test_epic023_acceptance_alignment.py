@@ -164,10 +164,9 @@ def test_epic023_acceptance_alignment_and_bindings() -> None:
             assert parts, f"invalid evidence path for {token_name}: {evidence}"
             assert parts[0] in GOVERNED_ROOTS, f"evidence path outside governed roots for {token_name}: {evidence}"
 
-            if evidence in index_by_path or evidence in mirror_by_path:
-                entries = index_by_path.get(evidence, [])
-                mirrors = mirror_by_path.get(evidence, [])
-                assert entries, f"expected {evidence} in docs/evidence/INDEX.json"
-                assert mirrors, f"expected {evidence} in artifacts/evidence_index.jsonl"
-                for rec in mirrors:
-                    assert rec.get("proof_anchor"), f"mirror record missing proof_anchor for {evidence}"
+            entries = index_by_path.get(evidence, [])
+            mirrors = mirror_by_path.get(evidence, [])
+            assert entries, f"expected {evidence} in docs/evidence/INDEX.json"
+            assert mirrors, f"expected {evidence} in artifacts/evidence_index.jsonl"
+            for rec in mirrors:
+                assert rec.get("proof_anchor"), f"mirror record missing proof_anchor for {evidence}"
