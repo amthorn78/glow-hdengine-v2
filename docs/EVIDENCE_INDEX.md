@@ -1,6 +1,6 @@
 > **Note:** The canonical human Evidence Index lives at `docs/evidence/INDEX.json`.
 > Add new entries there first, then mirror key pointers here for quick navigation. Update the skeleton (`docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl` + `.path_proof.txt`) in the same PR whenever governed bytes change.
-> Refresh order: run `python tools/evidence/update_evidence_index.py` (write) before `python tools/evidence/orientation_demo.py` (write), then their `--check` variants, and finish with `python ci/checks/check_mirror_schema.sh` (Python entrypoint despite `.sh`). Mirror path proofs include both `sha256` and `mirror_body_sha256` for the self-record entry in `artifacts/evidence_index.jsonl`.
+> Refresh order: run `python tools/evidence/update_evidence_index.py` (write) before `python tools/evidence/orientation_demo.py` (write), then their `--check` variants, and finish with `ci/checks/check_mirror_schema.sh`. Mirror path proofs include both `sha256` and `mirror_body_sha256` for the self-record entry in `artifacts/evidence_index.jsonl`.
 
 # Appendix-D — Evidence Index (EPIC-023)
 

@@ -14,7 +14,7 @@
 - Evidence Index (machine): `artifacts/evidence_index.jsonl` (self-record path proof includes `mirror_body_sha256`)
 - Registry report generator: `tools/generate_registry_report.py`
 - Orientation demo and sanity pipeline: `tools/evidence/orientation_demo.py`, `tools/evidence/run_sanity_pipeline.py` (closed rails enforced by the determinism helper).
-- Evidence index updater: `tools/evidence/update_evidence_index.py` (refreshes Index/Mirror, including registry_report, sanity, and showcompat entries); mirror schema check: `python ci/checks/check_mirror_schema.sh` (Python entrypoint; validates self-record/mirror path proofs).
+- Evidence index updater: `tools/evidence/update_evidence_index.py` (refreshes Index/Mirror, including registry_report, sanity, and showcompat entries); mirror schema check: `ci/checks/check_mirror_schema.sh` (validates self-record/mirror path proofs).
 - Sampler evidence generator: `tools/evidence/generate_sampler_evidence.py` (dev sampler CLI + HTTP harness runs, seed replay/diversity/ABBA/two-run logs).
 - Engine Core evidence generator: `tools/evidence/generate_engine_core_evidence.py` (purity/ABBA/two-run/JSON compare logs).
 - QA harnesses: EPIC021 harness `tools/qa/epic021_qa.py` (QA_ROOT logs, acceptance-map viability); legacy dev sampler healthchecks (`scripts/qa/dev_sampler_healthcheck.py`, `scripts/qa/dev_sampler_live_qa.py`) and D6 vendor Live QA (`scripts/qa/d6_live_vendor_qa.py`).
