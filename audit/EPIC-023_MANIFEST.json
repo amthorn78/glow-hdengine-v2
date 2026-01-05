@@ -1,0 +1,18 @@
+{
+  "captured_at_utc": "2026-01-05T05:15:31Z",
+  "closeout_dir": "audit/qa/hde-epic023",
+  "epic_id": "HDE-EPIC023",
+  "key_outputs": {
+    "acceptance_map": "docs/acceptance_map_epic023.json",
+    "token_matrix": "audit/qa/hde-epic023/token_evidence_matrix.md",
+    "acceptance_map_viability": "audit/qa/hde-epic023/acceptance_map_viability.log",
+    "doc_deltas": "audit/docdeltas/hde-epic023_doc_deltas.md",
+    "qa_step_manifest": "audit/qa/hde-epic023/qa_step_logs_manifest.json",
+    "close_report": "audit/EPIC-023_close_report.md",
+    "close_manifest": "audit/EPIC-023_MANIFEST.json"
+  },
+  "qa_epic_root": "audit/qa/hde-epic023",
+  "qa_root": "audit/qa/hde-epic023",
+  "qa_step_manifest_path": "audit/qa/hde-epic023/qa_step_logs_manifest.json",
+  "run_id": "viability-check"
+}
