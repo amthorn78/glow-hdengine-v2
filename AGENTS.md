@@ -3,6 +3,7 @@
 ## Scope and hierarchy
 - This file governs all agents in the repo; PF-Canon remains the source of truth (see `docs/pfcanon/`, titles such as PF05 — CLI/API/Vendor Ref, PF10 — HDE-Build Notes (precedence where PF10 speaks), PF12 — Schemas & Artifacts, PF14 — Mechanics Guide, PF19 — QA Guide, PF20 — Phased Epics). Where this file and PF-Canon diverge, PF-Canon wins, with PF10 precedence applying wherever PF10 speaks.
 - Governed evidence (INDEX/mirror/path proofs/orientation/manifest/close report/config acceptance map) must be produced only by the canonical tools. **Never hand-edit governed artifacts.**
+- `docs/pfcanon/**` is read-only for Codex/dev agents; cite PF canon by title/§ only.
 
 ## Agent roster (repo-facing)
 - **Lead Dev / Product Owner:** approves epic scopes and evidence plans; owns acceptance maps/manifests and public/ops surface sign-off. Touches docs and governance bindings (acceptance maps, manifests, close reports).
@@ -15,10 +16,13 @@
 ## Operating workflow (closed rails, evidence discipline)
 - Closed rails default: `LC_ALL=C`, `LANG=C`, `TZ=UTC`, `SAFE_MODE=1`, `ALLOW_NETWORK=0` enforced by `engine.runtime.determinism_env.ensure_determinism_env` and checked via `ci/checks/check_env_pins.sh`. No network access for public/QA surfaces unless explicitly allowed for a governed harness.
 - Read-first, then edit: inspect acceptance bindings, evidence indexes, and QA harness expectations before changing docs/code/evidence.
+- Docs-only PR posture: do not make behavioral claims without proof. Evidence must come from repo-governed artifacts, enforced tests/CI steps, or PF canon references (titles/§ only). Keep statements scoped to current repo state.
 - Governed evidence rules:
   - Use only repo tools to regenerate governed artifacts. Examples: CLI guards (`python tools/cli/serializer_grep_guard.py`, `python tools/cli/emitter_symbol_proof.py`), registry report (`python tools/generate_registry_report.py`), showcompat D2 capture (`python tools/cli/generate_showcompat_artifacts.py`), orientation demo (`python tools/evidence/orientation_demo.py`), sanity pipeline (`python tools/evidence/run_sanity_pipeline.py`), Evidence Index updater (`python tools/evidence/update_evidence_index.py`), mirror schema check (`python ci/checks/check_mirror_schema.sh`).
   - Refresh Index/Mirror pairs (`docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl`) and confirm `.path_proof.txt` siblings exist for every governed artifact. Run `update_evidence_index.py` (write) before `orientation_demo.py` (write), then their `--check` variants, and finish with the mirror schema check. Mirror path proofs include `mirror_body_sha256` for the self-record; do not hand-edit or drop the self-record row.
-  - Verify acceptance bindings: EPIC018 manifest/close report under `audit/`; EPIC019/EPIC020/EPIC021/EPIC022 acceptance maps under `docs/`; token matrices under `audit/qa/hde-epic021/` and `audit/qa/hde-epic022/`.
+  - Canonical JSON gate home is `audit/gates/canonical_json/` (logs + gate summary + `.path_proof.txt` siblings) produced by `python tools/evidence/run_canonical_json_gate.py` (CI step: “Run canonical JSON gate (closed rails)”).
+  - Verify acceptance bindings: EPIC018 manifest/close report under `audit/`; EPIC019/EPIC020/EPIC021/EPIC022/EPIC023 acceptance maps under `docs/`; token matrices under `audit/qa/hde-epic021/`, `audit/qa/hde-epic022/`, and `audit/qa/hde-epic023/`.
+  - EPIC023 acceptance discipline: governed acceptance artifacts live in `docs/acceptance_map_epic023.json` and `audit/qa/hde-epic023/` (token matrix, viability log, QA step manifest, doc deltas, PF23 consult). The canonical token roster is `{QA_ACCEPTANCE_MAP_VIABILITY_OK, EVIDENCE_INDEX_MIRROR_OK, EVIDENCE_PATHS_VALIDATED_OK, SANITY_PIPELINE_OK, DETERMINISM_ENV_PINS_OK, JSON_CANONICAL_CHECK_OK, DOC_DELTA_PRESENT_OK, TWO_RUN_IDENTITY_OK}`; keep acceptance map, matrix, and Index/Mirror entries in lockstep and never treat `.path_proof.txt` as primary evidence. Close-pack artifacts are governed at `audit/EPIC-023_MANIFEST.json` and `audit/EPIC-023_close_report.md`.
 - **No manual edits** to evidence indexes, path proofs, manifests, close reports, acceptance maps, or orientation artifacts.
 
 ## Release identity (EPIC022 Remediation 1; PF10 precedence where it speaks)
