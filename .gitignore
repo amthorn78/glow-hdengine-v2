@@ -2,37 +2,6 @@
 __pycache__/
 *.pyc
 *.zip
-audit/*
-!audit/qa/
-audit/qa/*
-!audit/qa/compat/
-audit/qa/compat/*
-!audit/qa/compat/lints_samples/
-audit/qa/compat/lints_samples/*
-!audit/qa/compat/lints_samples/*.path_proof.txt
-!audit/qa/compat/**/*.path_proof.txt
-!audit/gates/
-audit/gates/*
-!audit/gates/determinism/
-audit/gates/determinism/*
-!audit/gates/determinism/*.log
-!audit/gates/determinism/*.path_proof.txt
-!audit/gates/canonical_json/
-audit/gates/canonical_json/*
-!audit/gates/canonical_json/*.json
-!audit/gates/canonical_json/*.log
-!audit/gates/canonical_json/*.path_proof.txt
-!audit/gates/topology/
-audit/gates/topology/*
-!audit/gates/topology/*.txt
-!audit/gates/topology/*.path_proof.txt
-!audit/gates/aux/
-audit/gates/aux/*
-!audit/gates/aux/*.path_proof.txt
-!audit/gates/narratives/
-audit/gates/narratives/*
-!audit/gates/narratives/*.path_proof.txt
-!audit/adr_body_graphs_adr.path_proof.txt
 # Verification artifacts
 h200*.txt
 h304*.txt
@@ -50,6 +19,3 @@ VERIFY.out
 server_backup.tar
 EPIC1_PATCH_PACKET_*/
 artifacts/bodygraph/refresh_state.json
-
-# Allow QA evidence under audit/qa (canonical QA root)
-!audit/qa/**
