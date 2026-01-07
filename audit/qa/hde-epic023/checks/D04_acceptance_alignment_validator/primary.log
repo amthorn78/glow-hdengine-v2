@@ -1,0 +1,34 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"D04_acceptance_alignment_validator","claimed_tokens":[],"command":"python -m pytest tests/qa/test_epic023_acceptance_alignment.py (no bytecode) + extract intended tokens","intended_tokens":[],"pf_refs":["PF14 \u2014 HDE-Mechanics Guide, \u00a737.2","PF04 \u2014 HDE-Governance (token registry invariants) (titles-only)"],"status":"FAIL_BEHAVIOR"}
+============================= test session starts ==============================
+platform linux -- Python 3.11.14, pytest-9.0.2, pluggy-1.6.0
+rootdir: /workspaces/glow-hdengine-v2
+configfile: pytest.ini
+collected 1 item
+
+tests/qa/test_epic023_acceptance_alignment.py F                          [100%]
+
+=================================== FAILURES ===================================
+________________ test_epic023_acceptance_alignment_and_bindings ________________
+
+    def test_epic023_acceptance_alignment_and_bindings() -> None:
+        matrix_tokens, matrix_duplicates = _parse_matrix()
+        acceptance_tokens, acceptance_duplicates = _parse_acceptance_map()
+        registry_tokens = _load_registry_tokens()
+    
+        assert matrix_tokens, "expected token matrix entries"
+        assert acceptance_tokens, "expected acceptance map entries"
+        assert not matrix_duplicates, f"duplicate matrix tokens: {sorted(matrix_duplicates)}"
+        assert not acceptance_duplicates, f"duplicate acceptance map tokens: {sorted(acceptance_duplicates)}"
+>       assert set(matrix_tokens) == set(acceptance_tokens), "matrix and acceptance map token sets must match"
+E       AssertionError: matrix and acceptance map token sets must match
+E       assert {'DETERMINISM...LITY_OK', ...} == {'DETERMINISM...LITY_OK', ...}
+E         
+E         Extra items in the left set:
+E         'token_name'
+E         Use -v to get more diff
+
+tests/qa/test_epic023_acceptance_alignment.py:127: AssertionError
+=========================== short test summary info ============================
+FAILED tests/qa/test_epic023_acceptance_alignment.py::test_epic023_acceptance_alignment_and_bindings
+============================== 1 failed in 0.12s ===============================
+manifest_upsert: check_id=D04_acceptance_alignment_validator status=FAIL_BEHAVIOR log_path=audit/qa/hde-epic023/checks/D04_acceptance_alignment_validator/primary.log steps_count=5

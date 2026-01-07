@@ -1,0 +1,2 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"D03_acceptance_viability","claimed_tokens":[],"command":"python (embedded) validate audit/qa/hde-epic023/acceptance_map_viability.log (+ path proof)","intended_tokens":[],"pf_refs":[],"status":"PASS"}
+PASS: viability summary indicates MISSING=0. (summary='summary: COVERED=8 PLANNED=0 MISSING=0')

@@ -1,0 +1,3 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","PYTHONDONTWRITEBYTECODE":"1","PYTHONHASHSEED":"0","SAFE_MODE":"1","TZ":"UTC"},"check_id":"D07_codespaces_snapshot","claimed_tokens":[],"command":"python (embedded) generate codespaces_snapshot.json + path proof","intended_tokens":[],"pf_refs":["PF12 \u2014 HDE-Schemas and Artifacts, \u00a78.17.5","PF12 \u2014 HDE-Schemas and Artifacts, \u00a78.3","PF19 \u2014 Glow QA Guide, \u00a714.4.3"],"status":"PASS"}
+PASS: codespaces_snapshot.json + path proof written.
+manifest_upsert: check_id=D07_codespaces_snapshot status=PASS log_path=audit/qa/hde-epic023/checks/D07_codespaces_snapshot/primary.log steps_count=1

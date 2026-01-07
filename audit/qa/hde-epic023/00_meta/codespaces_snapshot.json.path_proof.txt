@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic023/00_meta/codespaces_snapshot.json
+sha256: 0afca92724a91a312cd736ad2c076330e94cf0eec3f700495047f57f87aca902
+size_bytes: 724
+mtime_utc: 2026-01-07T15:39:45Z
+produced_at_utc: 2026-01-07T15:39:45Z

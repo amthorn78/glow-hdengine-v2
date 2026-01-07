@@ -1,0 +1,2 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"D01_acceptance_map","claimed_tokens":[],"command":"python (embedded) validate docs/acceptance_map_epic023.json (+ path proof)","intended_tokens":[],"pf_refs":[],"status":"PASS"}
+PASS: acceptance map OK (tokens_count=8).

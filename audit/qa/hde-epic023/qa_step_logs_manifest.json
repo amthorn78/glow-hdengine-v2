@@ -1,17 +1,1 @@
-{
-  "steps": [],
-  "runs": [
-    {
-      "run_id": "viability-check",
-      "produced_at_utc": "2026-01-05T03:49:38.236980+00:00",
-      "steps": [
-        {
-          "name": "acceptance_map_viability",
-          "status": "PASS",
-          "log_path": "audit/qa/hde-epic023/acceptance_map_viability.log"
-        }
-      ]
-    }
-  ],
-  "epic_id": "HDE-EPIC023"
-}
+{"epic_id":"HDE-EPIC023","runs":[{"produced_at_utc":"2026-01-05T03:49:38.236980+00:00","run_id":"viability-check","steps":[{"log_path":"audit/qa/hde-epic023/acceptance_map_viability.log","name":"acceptance_map_viability","status":"PASS"}]}],"steps":[{"check_id":"D02_token_evidence_matrix","log_path":"audit/qa/hde-epic023/checks/D02_token_evidence_matrix/primary.log","status":"PASS"},{"check_id":"D04_acceptance_alignment_validator","log_path":"audit/qa/hde-epic023/checks/D04_acceptance_alignment_validator/primary.log","status":"FAIL_BEHAVIOR"},{"check_id":"D05_step_logs_manifest","log_path":"audit/qa/hde-epic023/checks/D05_step_logs_manifest/primary.log","status":"PASS"},{"check_id":"D07_codespaces_snapshot","log_path":"audit/qa/hde-epic023/checks/D07_codespaces_snapshot/primary.log","status":"PASS"},{"check_id":"D08_qa_doc_deltas_capture","log_path":"audit/qa/hde-epic023/checks/D08_qa_doc_deltas_capture/primary.log","status":"PASS"}]}

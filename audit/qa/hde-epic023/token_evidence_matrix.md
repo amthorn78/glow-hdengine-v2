@@ -1,6 +1,6 @@
 # HDE-EPIC023 Token ↔ Evidence Matrix
 
-| Token name | PF owner (doc + section title only) | Evidence artifacts (titles / paths / artifact_keys) | CI jobs / tests (names or node ids) | QA_ROOT logs (audit/qa/hde-epic023/...) | Status | Notes |
+| token_name | owner_pf | evidence_artifacts | ci_tests_jobs | qa_root_logs | status | notes |
 | --- | --- | --- | --- | --- | --- | --- |
 | QA_ACCEPTANCE_MAP_VIABILITY_OK | PF04 — Canon-HDE-Governance §Acceptance tokens | docs/acceptance_map_epic023.json; audit/qa/hde-epic023/token_evidence_matrix.md; audit/qa/hde-epic023/acceptance_map_viability.log; audit/qa/hde-epic023/qa_step_logs_manifest.json | python -m pytest tests/qa/test_epic023_acceptance_alignment.py | acceptance_map_viability.log | Implemented | Viability log captured under closed rails |
 | EVIDENCE_INDEX_MIRROR_OK | PF12 — HDE-Schemas and Artifacts §Evidence Mirror | docs/evidence/INDEX.json; artifacts/evidence_index.jsonl; SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC ci/checks/check_mirror_schema.sh | SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/update_evidence_index.py --check; SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC ci/checks/check_mirror_schema.sh | qa_step_logs_manifest.json | Implemented | Index and mirror refreshed with path proofs |

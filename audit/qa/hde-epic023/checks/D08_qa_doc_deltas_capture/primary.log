@@ -1,0 +1,3 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"D08_qa_doc_deltas_capture","claimed_tokens":[],"command":"python (embedded) generate+prove+validate audit/qa/hde-epic023/00_meta/doc_deltas.md","intended_tokens":[],"pf_refs":["PF19 \u2014 Glow QA Guide, \u00a714.4.4","PF27 \u2014 Plan Templates (Step\u20110B posture) (titles-only)"],"status":"PASS"}
+PASS: doc_deltas.md + path proof generated and validated.
+manifest_upsert: check_id=D08_qa_doc_deltas_capture status=PASS log_path=audit/qa/hde-epic023/checks/D08_qa_doc_deltas_capture/primary.log steps_count=2

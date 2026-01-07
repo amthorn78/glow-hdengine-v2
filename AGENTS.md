@@ -16,6 +16,7 @@
 ## Operating workflow (closed rails, evidence discipline)
 - Closed rails default: `LC_ALL=C`, `LANG=C`, `TZ=UTC`, `SAFE_MODE=1`, `ALLOW_NETWORK=0` enforced by `engine.runtime.determinism_env.ensure_determinism_env` and checked via `ci/checks/check_env_pins.sh`. No network access for public/QA surfaces unless explicitly allowed for a governed harness.
 - Read-first, then edit: inspect acceptance bindings, evidence indexes, and QA harness expectations before changing docs/code/evidence.
+- QA output placement: **do not create QA artifacts in the repo root**. Write QA outputs only under the active evidence directory (e.g., `audit/qa/<epic-id>/...`) unless a PF-canon/governed tool explicitly specifies otherwise.
 - Docs-only PR posture: do not make behavioral claims without proof. Evidence must come from repo-governed artifacts, enforced tests/CI steps, or PF canon references (titles/§ only). Keep statements scoped to current repo state.
 - Governed evidence rules:
   - Use only repo tools to regenerate governed artifacts. Examples: CLI guards (`python tools/cli/serializer_grep_guard.py`, `python tools/cli/emitter_symbol_proof.py`), registry report (`python tools/generate_registry_report.py`), showcompat D2 capture (`python tools/cli/generate_showcompat_artifacts.py`), orientation demo (`python tools/evidence/orientation_demo.py`), sanity pipeline (`python tools/evidence/run_sanity_pipeline.py`), Evidence Index updater (`python tools/evidence/update_evidence_index.py`), mirror schema check (`ci/checks/check_mirror_schema.sh`).
