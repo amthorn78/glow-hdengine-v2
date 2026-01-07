@@ -1,8 +1,0 @@
-ERR: missing required artifact(s):
- - audit/qa/hde-epic023/00_meta/doc_deltas_meta.md
- - audit/qa/hde-epic023/00_meta/pf20_update.md
- - audit/index/evidence_index.jsonl
- - audit/index/evidence_index.hashes.json
- - audit/hashes/evidence_hash_sentinel.json
- - audit/evidence_index_mirror.md
- - artifacts/sanity/sanity_pipeline_evidence.md

@@ -1,9 +1,0 @@
-{"captured_env": {"ALLOW_NETWORK": "0", "LANG": "C", "LC_ALL": "C", "SAFE_MODE": "1", "TZ": "UTC"}, "check_id": "p02_env_rails", "check_name": "P02 \u2014 Environment Rails Are Enforced", "claimed_tokens": [], "command": "python - <<'PY'\\nimport os, sys\\nreq = {\\n  \"SAFE_MODE\":\"1\",\\n  \"ALLOW_NETWORK\":\"0\",\\n  \"APP_ENV\":\"dev\",\\n  \"LC_ALL\":\"C\",\\n  \"LANG\":\"C\",\\n  \"TZ\":\"UTC\",\\n}\\nbad=[]\\nfor k,v in req.items():\\n    if os.environ.get(k) != v:\\n        bad.append((k, os.environ.get(k), v))\\nif bad:\\n    print(\"ERR: env rails mismatch:\", bad)\\n    sys.exit(3)\\nprint(\"OK: env rails enforced\")\\nPY", "end_time_utc": "2026-01-06T02:17:05Z", "exit_code": 0, "intended_tokens": [], "pf_refs": ["PF19"], "start_time_utc": "2026-01-06T02:17:05Z", "status": "PASS", "surface": "env"}
-
-== STDOUT ==
-OK: env rails enforced
-
-== STDERR ==
-
-== RC ==
-0

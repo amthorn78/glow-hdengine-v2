@@ -1,9 +1,0 @@
-{"captured_env": {"ALLOW_NETWORK": "0", "LANG": "C", "LC_ALL": "C", "SAFE_MODE": "1", "TZ": "UTC"}, "check_id": "p03_no_network", "check_name": "P03 \u2014 Network Must Be Disabled", "claimed_tokens": [], "command": "python - <<'PY'\\nimport os, sys\\nif os.environ.get(\"ALLOW_NETWORK\") != \"0\":\\n    print(\"ERR: ALLOW_NETWORK must be 0\")\\n    sys.exit(3)\\nprint(\"OK: ALLOW_NETWORK=0\")\\nPY", "end_time_utc": "2026-01-06T02:17:18Z", "exit_code": 0, "intended_tokens": [], "pf_refs": ["PF19"], "start_time_utc": "2026-01-06T02:17:18Z", "status": "PASS", "surface": "env"}
-
-== STDOUT ==
-OK: ALLOW_NETWORK=0
-
-== STDERR ==
-
-== RC ==
-0
