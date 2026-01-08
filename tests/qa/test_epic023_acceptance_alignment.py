@@ -36,7 +36,12 @@ def _parse_matrix() -> tuple[dict[str, dict[str, object]], set[str]]:
         if not line.startswith("|"):
             continue
         parts = [part.strip() for part in line.strip().split("|") if part.strip()]
-        if len(parts) < 6 or parts[0] in {"Token name", "---"}:
+        if len(parts) < 6:
+            continue
+        first_cell = " ".join(parts[0].split()).lower()
+        if first_cell in {"token name", "token_name"} or first_cell.replace(" ", "_") == "token_name":
+            continue
+        if all(not cell.strip() or set(cell.strip()) <= {"-", ":"} for cell in parts):
             continue
         token = parts[0]
         entry = {
