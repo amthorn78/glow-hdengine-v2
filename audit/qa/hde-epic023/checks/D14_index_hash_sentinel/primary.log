@@ -1,0 +1,2 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"D14_index_hash_sentinel","claimed_tokens":[],"command":"python (embedded) sha256 compare docs/evidence/INDEX.json vs docs/evidence/INDEX.sha256","intended_tokens":[],"pf_refs":[],"status":"PASS"}
+PASS: INDEX.sha256 matches computed sha256(INDEX.json).

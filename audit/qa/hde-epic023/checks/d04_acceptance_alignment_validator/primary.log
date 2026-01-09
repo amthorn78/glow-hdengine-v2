@@ -1,0 +1,4 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"d04_acceptance_alignment_validator","claimed_tokens":["DETERMINISM_ENV_PINS_OK","DOC_DELTA_PRESENT_OK","EVIDENCE_INDEX_MIRROR_OK","EVIDENCE_PATHS_VALIDATED_OK","JSON_CANONICAL_CHECK_OK","QA_ACCEPTANCE_MAP_VIABILITY_OK","SANITY_PIPELINE_OK","TWO_RUN_IDENTITY_OK"],"command":"python -m pytest -q tests/qa/test_epic023_acceptance_alignment.py","intended_tokens":["DETERMINISM_ENV_PINS_OK","DOC_DELTA_PRESENT_OK","EVIDENCE_INDEX_MIRROR_OK","EVIDENCE_PATHS_VALIDATED_OK","JSON_CANONICAL_CHECK_OK","QA_ACCEPTANCE_MAP_VIABILITY_OK","SANITY_PIPELINE_OK","TWO_RUN_IDENTITY_OK"],"pf_refs":[],"status":"PASS"}
+== D04: acceptance alignment validator ==
+.                                                                        [100%]
+1 passed in 0.04s

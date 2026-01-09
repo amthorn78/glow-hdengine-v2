@@ -18,6 +18,7 @@ EPIC023 completes the acceptance-alignment and evidence-governance closure by an
 - audit/qa/hde-epic023/token_evidence_matrix.md
 - audit/qa/hde-epic023/acceptance_map_viability.log
 - audit/docdeltas/hde-epic023_doc_deltas.md
+- audit/qa/hde-epic023/qa_step_logs_manifest.json
 
 ## Canonical close-pack files
 - Close report: audit/EPIC-023_close_report.md

@@ -1,0 +1,2 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"D10_doc_delta_draft","command":"python (embedded) verify audit/docdeltas/hde-epic023_doc_deltas.md","status":"PASS"}
+PASS: doc-delta draft exists and is non-empty.

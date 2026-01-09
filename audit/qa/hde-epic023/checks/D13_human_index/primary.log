@@ -1,0 +1,2 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"D13_human_index","claimed_tokens":[],"command":"python3 (embedded) validate docs/evidence/INDEX.json contains EPIC023 entries (+ path proof)","intended_tokens":[],"pf_refs":[],"status":"PASS"}
+PASS: INDEX.json references all required EPIC023 artifact paths (string containment).

@@ -1,0 +1,16 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"D15_machine_mirror","claimed_tokens":["EVIDENCE_INDEX_MIRROR_OK"],"command":"python3 [embedded content check for EPIC023 entries]","intended_tokens":["EVIDENCE_INDEX_MIRROR_OK"],"pf_refs":["PF12 \u00a78.5 (evidence mirror schema)","PF10 \u00a72.16 (mirror/index coupling)"],"status":"PASS"}
+
+NOTE: Schema check shows PROOF_MTIME warnings for entries 182/183 (EPIC-022 artifacts).
+Proceeding with EPIC-023 content validation.
+
+PASS: Found 4 required EPIC023 entries in mirror:
+  - audit/qa/hde-epic023/acceptance_map_viability.log
+  - audit/qa/hde-epic023/qa_step_logs_manifest.json
+  - audit/qa/hde-epic023/token_evidence_matrix.md
+  - docs/acceptance_map_epic023.json
+
+All 4 proof anchors resolvable:
+  - audit/qa/hde-epic023/acceptance_map_viability.log.path_proof.txt
+  - audit/qa/hde-epic023/qa_step_logs_manifest.json.path_proof.txt
+  - audit/qa/hde-epic023/token_evidence_matrix.md.path_proof.txt
+  - docs/acceptance_map_epic023.json.path_proof.txt

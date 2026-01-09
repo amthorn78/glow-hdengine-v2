@@ -1,0 +1,2 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"D12_close_pack_manifest","claimed_tokens":[],"command":"python (embedded) validate audit/EPIC-023_MANIFEST.json key_outputs named bindings (+ path proof)","intended_tokens":[],"pf_refs":["PF14 \u2014 HDE-Mechanics Guide, \u00a737.3","PF10 \u2014 HDE-Build Notes, \u00a72.14"],"status":"PASS"}
+PASS: close pack manifest key_outputs includes required named bindings (exact match).
