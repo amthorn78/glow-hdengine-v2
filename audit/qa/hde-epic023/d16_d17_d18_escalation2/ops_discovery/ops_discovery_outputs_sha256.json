@@ -1,0 +1,47 @@
+[
+  {
+    "path": "audit/qa/hde-epic023/d16_d17_d18_escalation2/ops_discovery/env_pins_log_excerpt.txt",
+    "sha256": "14e14ad8b4f09dc8e953059f21c3f6ee432b62dc01d1c7f6e9d1488c844e4326",
+    "size_bytes": 407
+  },
+  {
+    "path": "audit/qa/hde-epic023/d16_d17_d18_escalation2/ops_discovery/env_snapshot.json",
+    "sha256": "4a4b79be7ed86d3caf54ae83e97fd77417a85b1683caefb65c9987ff642e260b",
+    "size_bytes": 151
+  },
+  {
+    "path": "audit/qa/hde-epic023/d16_d17_d18_escalation2/ops_discovery/file_inventory.json",
+    "sha256": "eb7e693cbc85b92d39d3fc55e163a044099f01368f3ab7a87ac3123c52e7ea58",
+    "size_bytes": 2324
+  },
+  {
+    "path": "audit/qa/hde-epic023/d16_d17_d18_escalation2/ops_discovery/ops_discovery_outputs_sha256.json",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "size_bytes": 0
+  },
+  {
+    "path": "audit/qa/hde-epic023/d16_d17_d18_escalation2/ops_discovery/orientation_demo_report_excerpt.txt",
+    "sha256": "4eb23ec8009d27ed565a04c7d6e1fd4283b67927044c1bf801eb4f3ecbd56ba0",
+    "size_bytes": 77
+  },
+  {
+    "path": "audit/qa/hde-epic023/d16_d17_d18_escalation2/ops_discovery/primary_logs_excerpts.txt",
+    "sha256": "2266bf4d3189bf0b40401cea5ca4e391bcc673c9b410526e6a371cd5cb4deb53",
+    "size_bytes": 1332
+  },
+  {
+    "path": "audit/qa/hde-epic023/d16_d17_d18_escalation2/ops_discovery/qa_step_logs_manifest.json",
+    "sha256": "c5faad028e391036db1d195d250fc69891cc62792b78cd5cd7c21d18463c6fd3",
+    "size_bytes": 1150
+  },
+  {
+    "path": "audit/qa/hde-epic023/d16_d17_d18_escalation2/ops_discovery/qa_step_logs_manifest_placeholders.txt",
+    "sha256": "d286db8220aad1c923f747d34508d002b68ce218394c445617c4d5be829360e7",
+    "size_bytes": 64
+  },
+  {
+    "path": "audit/qa/hde-epic023/d16_d17_d18_escalation2/ops_discovery/sanity_log_excerpt.txt",
+    "sha256": "0b9c63ac8ef5c45aff081d5d2f10ed0005bda18b6472c5763c436742f9e768a3",
+    "size_bytes": 194
+  }
+]

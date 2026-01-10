@@ -1,0 +1,9 @@
+lf_terminated: True
+line_count: 1
+first_line_raw: {"env":{"ALLOW_NETWORK":"0","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"status":"success","suites":["ci:determinism-rails","tests:invariance","tests:evidence-ordering","evidence:sampler","evidence:engine-core","orientation:demo"]}
+json_type: dict
+json_keys: ['env', 'status', 'suites']
+schema: None
+schema_id: None
+rails_type: NoneType
+rails: None

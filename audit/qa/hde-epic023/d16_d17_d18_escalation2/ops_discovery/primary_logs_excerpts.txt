@@ -1,0 +1,12 @@
+== D16 audit/qa/hde-epic023/checks/D16_orientation_demo/primary.log ==
+header_line: {"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"D16_orientation_demo","claimed_tokens":[],"command":"python tools/evidence/orientation_demo.py --check + python (embedded) validate required artifacts","intended_tokens":[],"pf_refs":["PF12 \u2014 HDE-Schemas and Artifacts, \u00a78.5 (titles-only)"],"status":"FAIL_BEHAVIOR"}
+signal: FAIL_BEHAVIOR: missing report artifacts/hde-epic023_orientation_demo/orientation_demo_report.json
+
+== D17 audit/qa/hde-epic023/checks/D17_env_pins/primary.log ==
+header_line: {"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"D17_env_pins","command":"python (embedded) validate audit/gates/determinism/env_pins.log (+ path proof)","status":"FAIL_BEHAVIOR"}
+signal: FAIL_BEHAVIOR: schema mismatch: None
+
+== D18 audit/qa/hde-epic023/checks/D18_sanity_log/primary.log ==
+header_line: {"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"D18_sanity_log","command":"python (embedded) validate artifacts/sanity/sanity.log (+ path proof)","status":"FAIL_BEHAVIOR"}
+signal: FAIL_BEHAVIOR: sanity.log missing required lines:
+

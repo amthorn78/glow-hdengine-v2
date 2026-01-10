@@ -1,0 +1,6 @@
+lf_terminated: True
+run:sanity-pipeline => MISSING
+env_pins: audit/gates/determinism/env_pins.log => MISSING
+summary:PASS => FOUND
+--- emitted lines (run/env_pins/summary only) ---
+summary:PASS

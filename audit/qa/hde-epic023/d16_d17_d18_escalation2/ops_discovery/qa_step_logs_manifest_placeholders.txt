@@ -1,0 +1,1 @@
+placeholders_found: ['${CHECK_ID}', '${LOG_PATH}', '${STATUS}']

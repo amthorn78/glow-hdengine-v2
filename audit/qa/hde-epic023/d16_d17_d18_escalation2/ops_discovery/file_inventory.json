@@ -1,0 +1,74 @@
+[
+  {
+    "exists": false,
+    "path": "artifacts/hde-epic023_orientation_demo/orientation_demo_report.json"
+  },
+  {
+    "exists": false,
+    "path": "artifacts/hde-epic023_orientation_demo/sample_result.json"
+  },
+  {
+    "exists": true,
+    "lf_terminated": true,
+    "mtime_utc": "2026-01-09T06:29:11Z",
+    "path": "audit/gates/determinism/env_pins.log",
+    "sha256": "6360e83eb1945e4b45bdb6327f4087c0b30ea58932fb6a07783bc79fb25f6b59",
+    "size_bytes": 240
+  },
+  {
+    "exists": true,
+    "lf_terminated": true,
+    "mtime_utc": "2026-01-09T06:29:11Z",
+    "path": "audit/gates/determinism/env_pins.log.path_proof.txt",
+    "sha256": "ac792e4a2f2812051c284228bc512b774e00b70de368beecf7e2e51bd234afc4",
+    "size_bytes": 202
+  },
+  {
+    "exists": true,
+    "lf_terminated": true,
+    "mtime_utc": "2026-01-09T06:29:11Z",
+    "path": "artifacts/sanity/sanity.log",
+    "sha256": "13013763f93d0afab5a8bf1111c8bae3db016ee52045ed599004a79b0c52bc14",
+    "size_bytes": 1068
+  },
+  {
+    "exists": true,
+    "lf_terminated": true,
+    "mtime_utc": "2026-01-09T06:29:11Z",
+    "path": "artifacts/sanity/sanity.log.path_proof.txt",
+    "sha256": "d3c428eab85bb1518a2f429edb610e65be734566959554c3dc55579fb59d516d",
+    "size_bytes": 194
+  },
+  {
+    "exists": true,
+    "lf_terminated": true,
+    "mtime_utc": "2026-01-09T06:29:11Z",
+    "path": "audit/qa/hde-epic023/checks/D16_orientation_demo/primary.log",
+    "sha256": "4af457eb929458dea683362ef4178f16bba9205fc21e54966fb22ac410cebb87",
+    "size_bytes": 581
+  },
+  {
+    "exists": true,
+    "lf_terminated": true,
+    "mtime_utc": "2026-01-09T06:29:11Z",
+    "path": "audit/qa/hde-epic023/checks/D17_env_pins/primary.log",
+    "sha256": "3f41d47784dee3784a949db13f09c3106ccfe997d7bc227b7544720b792b6da1",
+    "size_bytes": 285
+  },
+  {
+    "exists": true,
+    "lf_terminated": true,
+    "mtime_utc": "2026-01-09T06:29:11Z",
+    "path": "audit/qa/hde-epic023/checks/D18_sanity_log/primary.log",
+    "sha256": "069e29fce4cd3406c948f7026555f00d1961451ff8db9592187ae3a8024f981d",
+    "size_bytes": 366
+  },
+  {
+    "exists": true,
+    "lf_terminated": true,
+    "mtime_utc": "2026-01-09T06:29:11Z",
+    "path": "audit/qa/hde-epic023/qa_step_logs_manifest.json",
+    "sha256": "c5faad028e391036db1d195d250fc69891cc62792b78cd5cd7c21d18463c6fd3",
+    "size_bytes": 1150
+  }
+]

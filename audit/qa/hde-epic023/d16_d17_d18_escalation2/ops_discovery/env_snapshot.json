@@ -1,0 +1,9 @@
+{
+  "ALLOW_NETWORK": "0",
+  "APP_ENV": "local",
+  "EVIDENCE_ROOT": null,
+  "LANG": "en_US.UTF-8",
+  "LC_ALL": "1",
+  "SAFE_MODE": "1",
+  "TZ": "UTC"
+}
