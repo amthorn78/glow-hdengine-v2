@@ -152,10 +152,23 @@ def _write_path_proof(
     proof_path = ROOT / proof_rel
     proof_path.parent.mkdir(parents=True, exist_ok=True)
 
+    def _normalize_utc(raw: str | None) -> str | None:
+        if not raw:
+            return None
+        try:
+            _parse_utc_iso8601(raw)
+        except Exception:  # noqa: BLE001
+            return None
+        return raw
+
     existing = _load_existing_proof(proof_path)
-    produced = produced_at or existing.get("produced_at_utc") or default_produced_at
     stat_mtime_iso = _isoformat_from_timestamp(stat_mtime)
     extra_fields = dict(extra_fields or {})
+    existing_produced = _normalize_utc(existing.get("produced_at_utc"))
+    existing_mtime = _normalize_utc(existing.get("mtime_utc"))
+    requested_produced = _normalize_utc(produced_at)
+    requested_mtime = _normalize_utc(mtime_utc)
+    produced = requested_produced or existing_produced or default_produced_at
 
     if check:
         if not proof_path.exists():
@@ -190,8 +203,7 @@ def _write_path_proof(
             raise SystemExit(f"PROOF_MTIME_FUTURE:{proof_rel}")
         return proof_rel, produced
 
-    existing_mtime = existing.get("mtime_utc")
-    mtime = mtime_utc or existing_mtime or stat_mtime_iso
+    mtime = requested_mtime or existing_mtime or stat_mtime_iso
     proof_lines = [
         f"path: {rel}",
         f"size_bytes: {size_bytes}",
@@ -500,8 +512,14 @@ def main(argv: list[str] | None = None) -> None:
     produced_default = _isoformat(_dt.datetime.now(tz=_dt.timezone.utc))
     mirror_proof_path = MIRROR_PATH.with_suffix(".jsonl.path_proof.txt")
     mirror_proof_existing = _load_existing_proof(mirror_proof_path)
-    if mirror_proof_existing.get("produced_at_utc"):
-        produced_default = mirror_proof_existing["produced_at_utc"]
+    mirror_produced = mirror_proof_existing.get("produced_at_utc")
+    if mirror_produced:
+        try:
+            _parse_utc_iso8601(mirror_produced)
+        except Exception:  # noqa: BLE001
+            mirror_produced = None
+    if mirror_produced:
+        produced_default = mirror_produced
 
     entries = _load_human_index()
 
