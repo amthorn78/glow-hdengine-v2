@@ -1,0 +1,2 @@
+command: rg "orientation_demo_report.json|determinism_env_pins.v1|run:sanity-pipeline|env_pins:" "audit/qa/hde-epic023/r6 v2 QA Plan HDE-EPIC023.md"
+exit_code: 1
