@@ -1,0 +1,123 @@
+================================================================================
+EVIDENCE FILES INVENTORY - QUICK REFERENCE
+Generated: 2026-01-10T22:56:05Z
+Repository: glow-hdengine-v2 (main branch)
+================================================================================
+
+TOTALS
+------
+Path Proof Files (.path_proof.txt):    322
+SHA256 Sidecar Files (.sha256):         107
+Evidence-related files:                  62
+INDEX.json files:                         4
+
+CANONICAL EVIDENCE INDEX
+------------------------
+✅ docs/evidence/INDEX.json              (44K)  Human-readable index
+✅ docs/evidence/INDEX.sha256            (91B)  Integrity proof
+✅ artifacts/evidence_index.jsonl        (95K)  Machine-readable mirror
+
+EPIC-023 STATUS (Remediation 2)
+-------------------------------
+Acceptance Map:       ✅ docs/acceptance_map_epic023.json (3.9K + proof)
+Manifest:             ✅ audit/EPIC-023_MANIFEST.json (787B + proof)
+Close Report:         ✅ audit/EPIC-023_close_report.md (1.6K + proof)
+Token Matrix:         ✅ token_evidence_matrix.md (3.8K + proof)
+
+QA Checks D01-D15:    ✅ Primary logs present
+QA Checks D16-D18:    ⚠️  Check modules missing (OPS-01 blocked)
+
+Remediation Evidence:
+  - ops-01/ops_transcript.log (1.5K) - S1 failure capture
+
+TOP EVIDENCE CATEGORIES (by path proof count)
+----------------------------------------------
+audit/           44 proofs  EPIC manifests, close reports, acceptance maps
+epic020/         40 proofs  Determinism bundles and manifests
+db/              21 proofs  Database migrations, partitions, introspection
+cli/             14 proofs  CLI guards, showcompat captures, parity proofs
+ops/             14 proofs  /internal/version bundles, rails refusal proofs
+bodygraph/        9 proofs  Source invariance, AB/BA parity
+engine/           7 proofs  DB adapter fingerprints, order proofs
+presenter/        6 proofs  JSON canon compare, preimage recompute
+db_bridge/        6 proofs  Provider parity, health checks
+sampler/          5 proofs  ABBA, diversity, two-run identity
+
+GATES EVIDENCE
+--------------
+Canonical JSON:  audit/gates/canonical_json/  (4 artifacts + proofs)
+Determinism:     audit/gates/determinism/     env_pins.log (D17 target)
+Topology:        audit/gates/topology/        orientation_demo.txt (D16 target)
+Auxiliary:       audit/gates/aux/             (8 check artifacts)
+
+MATH ARTIFACTS (EPIC-022 Release Identity)
+------------------------------------------
+artifacts/math/release_id.txt              ✅ SHA256 sidecar, ❌ No path proof
+artifacts/math/release_id_recompute.log    ✅ SHA256 sidecar, ❌ No path proof
+artifacts/math/checksums_audit.log         ✅ SHA256 sidecar, ❌ No path proof
+artifacts/math/freeze_pack_manifest.json   ✅ SHA256 sidecar, ❌ No path proof
+
+Canonical SoT: catalog/manifest.json
+
+SANITY PIPELINE (D18 target)
+----------------------------
+artifacts/sanity/sanity.log (1.1K + path proof)
+Tool: python tools/evidence/run_sanity_pipeline.py
+
+QA EVIDENCE BY EPIC
+-------------------
+hde-epic017/    Step logs, admin artifacts
+hde-epic018/    Config QA artifacts
+hde-epic019/    Vendor live QA, dev sampler HTTP
+hde-epic020/    Determinism bundles (40 path proofs)
+hde-epic021/    Token matrix, dedupe runs
+hde-epic022/    D3.2 evidence updates, showcompat captures
+hde-epic023/    54 files - D01-D18 check logs, token matrix, remediation
+
+EVIDENCE GENERATION TOOLS
+--------------------------
+tools/evidence/update_evidence_index.py          Index/Mirror updater
+tools/evidence/orientation_demo.py               Topology gate (D16)
+tools/evidence/run_sanity_pipeline.py            Determinism checks (D18)
+tools/generate_registry_report.py                Registry report
+tools/cli/generate_showcompat_artifacts.py       Showcompat D2 captures
+
+EVIDENCE VALIDATION TOOLS
+--------------------------
+ci/checks/check_mirror_schema.sh                 Mirror schema validation
+ci/checks/check_release_identity.sh              Release identity gate
+ci/checks/check_env_pins.sh                      Env pins gate (D17)
+tools/evidence/run_canonical_json_gate.py        JSON canon gate
+
+CURRENT BLOCKERS
+----------------
+❌ OPS-01 FAILED AT S1 - Missing check modules:
+   - hde.qa.check_d16_orientation_demo
+   - hde.qa.check_d17_env_pins
+   - hde.qa.check_d18_sanity_log
+
+Evidence: audit/qa/hde-epic023/remediation/ops-01/ops_transcript.log
+
+NEXT STEPS: DEV must create check modules before OPS-01 can proceed.
+
+COMPLIANCE STATUS
+-----------------
+✅ Evidence Index/Mirror present and governed
+✅ Path proofs present for governed artifacts
+✅ No hand-edited evidence detected
+✅ Canonical tools used for evidence generation
+⚠️  EPIC023 D16/D17/D18 checks pending (modules missing)
+
+EVIDENCE DIRECTORIES
+--------------------
+./docs/evidence                              (canonical)
+./tools/evidence                             (tooling)
+./tests/evidence                             (test fixtures)
+./audit/codex/epic011_r17c/evidence         (archived)
+./audit/docs_snapshot/docs/evidence         (snapshot)
+./codex/out/docs_snapshots/docs/evidence    (codex output)
+
+================================================================================
+END OF SUMMARY
+See EVIDENCE_INVENTORY_REPORT.md for full details.
+================================================================================
