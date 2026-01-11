@@ -1,0 +1,15 @@
+{"schema": "qa_check_log.v1", "check_id": "D21_internal_version", "timestamp": "2026-01-11T06:10:45Z", "status": "PASS"}
+PASS: Evidence family validated (8 artifacts, no ETag headers, body/SHA256 verified)
+PASS: Endpoint Catalog contains /internal/version with a7_eligible=false
+============================= test session starts ==============================
+platform linux -- Python 3.11.14, pytest-9.0.2, pluggy-1.6.0 -- /workspaces/glow-hdengine-v2/.venv/bin/python3
+cachedir: .pytest_cache
+rootdir: /workspaces/glow-hdengine-v2
+configfile: pytest.ini
+collecting ... collected 1 item
+
+tests/transport/test_internal_version_contract.py::test_internal_version_invariants_and_artifacts PASSED [100%]
+
+============================== 1 passed in 0.12s ===============================
+{"status":"PASS"}
+PASS: All D21 validators passed (evidence family, endpoint catalog, contract test)

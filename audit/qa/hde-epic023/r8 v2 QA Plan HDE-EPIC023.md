@@ -6,7 +6,7 @@ Epic ID: HDE-EPIC023
 Plan type: Live QA Plan / Runbook  
 Execution venue: Codespaces (or Other: \_\_\_\_)  
 Target environment: dev (Codespaces)  
-Plan revision: r6
+Plan revision: r8
 
 Date (UTC): 2026-01-07  
 Operators (names-only): PO, IA, (optional) QA agent, (optional) Codex
@@ -953,12 +953,7 @@ hdr \= {
     "LC\_ALL": os.environ.get("LC\_ALL"),  
     "LANG": os.environ.get("LANG"),  
     "TZ": os.environ.get("TZ"),  
-  },  
-  "pf\_refs": \[  
-    "PF12 — HDE-Schemas and Artifacts, §8.3.3 (titles-only)"  
-  \],  
-  "intended\_tokens": \[\],  
-  "claimed\_tokens": \[\],  
+  }  
 }  
 print(json.dumps(hdr, sort\_keys=True, separators=(",", ":")))  
 PY  
@@ -1089,12 +1084,7 @@ hdr \= {
     "LC\_ALL": os.environ.get("LC\_ALL"),  
     "LANG": os.environ.get("LANG"),  
     "TZ": os.environ.get("TZ"),  
-  },  
-  "pf\_refs": \[  
-    "PF12 — HDE-Schemas and Artifacts, §8.3.4 (titles-only)"  
-  \],  
-  "intended\_tokens": \[\],  
-  "claimed\_tokens": \[\],  
+  }  
 }  
 print(json.dumps(hdr, sort\_keys=True, separators=(",", ":")))  
 PY  
@@ -1538,12 +1528,7 @@ hdr \= {
     "LC\_ALL": os.environ.get("LC\_ALL"),  
     "LANG": os.environ.get("LANG"),  
     "TZ": os.environ.get("TZ"),  
-  },  
-  "pf\_refs": \[  
-    "PF12 — HDE-Schemas and Artifacts, §8.3.3 (titles-only)"  
-  \],  
-  "intended\_tokens": \[\],  
-  "claimed\_tokens": \[\],  
+  }  
 }  
 print(json.dumps(hdr, sort\_keys=True, separators=(",", ":")))  
 PY  
@@ -2518,12 +2503,7 @@ hdr \= {
     "LC\_ALL": os.environ.get("LC\_ALL"),  
     "LANG": os.environ.get("LANG"),  
     "TZ": os.environ.get("TZ"),  
-  },  
-  "pf\_refs": \[  
-    "PF12 — HDE-Schemas and Artifacts, §8.3.4 (titles-only)"  
-  \],  
-  "intended\_tokens": \[\],  
-  "claimed\_tokens": \[\],  
+  }  
 }  
 print(json.dumps(hdr, sort\_keys=True, separators=(",", ":")))  
 PY  
@@ -2632,12 +2612,7 @@ hdr \= {
     "LC\_ALL": os.environ.get("LC\_ALL"),  
     "LANG": os.environ.get("LANG"),  
     "TZ": os.environ.get("TZ"),  
-  },  
-  "pf\_refs": \[  
-    "PF12 — HDE-Schemas and Artifacts, §8.3.3 (titles-only)"  
-  \],  
-  "intended\_tokens": \[\],  
-  "claimed\_tokens": \[\],  
+  }  
 }  
 print(json.dumps(hdr, sort\_keys=True, separators=(",", ":")))  
 PY  
@@ -2674,126 +2649,145 @@ TOOLING\_BLOCKED if:
 
 ---
 
-#### **CHECK D12\_close\_pack\_manifest: D12 — EPIC023 Close Pack Manifest**
+#### CHECK D12\_close\_pack\_manifest: D12 — EPIC023 Close Pack Manifest
 
-Surface / D-goal mapping: D12 \+ close pack manifest shape \+ key\_outputs pointers  
-Rails: SAFE\_MODE=1 ALLOW\_NETWORK=0 APP\_ENV=dev  
-Pins (when producing governed bytes): LC\_ALL=C LANG=C TZ=UTC  
-PF anchors: PF14 — HDE-Mechanics Guide, §37.3; PF10 — HDE-Build Notes, Addendum 2.13/2.14 (titles-only)
+ Surface / D-goal mapping: D12 \+ close pack manifest shape \+ key\_outputs pointers  
+ Rails: SAFE\_MODE=1 ALLOW\_NETWORK=0 APP\_ENV=dev  
+ Pins (when producing governed bytes): LC\_ALL=C LANG=C TZ=UTC  
+ PF anchors: PF14 — HDE-Mechanics Guide, §37.3; PF10 — HDE-Build Notes, §2.14  
+ Goal: Verify the close pack manifest parses and includes required key\_outputs bindings (named pointers).  
+ Preconditions: none.
 
-Goal: Verify the close pack manifest parses and includes required key\_outputs pointers.  
-Preconditions: none.
+PO command(s) (copy/paste)
 
-**PO command(s) (copy/paste)**
+`CHECK_ID="D12_close_pack_manifest"`  
+`LOG_DIR="${EVIDENCE_ROOT:?}/checks/${CHECK_ID}"`  
+`LOG_PATH="${LOG_DIR}/primary.log"`  
+`TMP_OUT="${LOG_DIR}/tmp.out"`  
+`mkdir -p "${LOG_DIR}"`
 
-CHECK\_ID="D12\_close\_pack\_manifest"  
-LOG\_DIR="${EVIDENCE\_ROOT:?}/checks/${CHECK\_ID}"  
-LOG\_PATH="${LOG\_DIR}/primary.log"  
-TMP\_OUT="${LOG\_DIR}/tmp.out"  
-mkdir \-p "${LOG\_DIR}"
+`python - <<'PY' >"${TMP_OUT}" 2>&1`  
+`import json, sys, pathlib`
 
-python \- \<\<'PY' \>"${TMP\_OUT}" 2\>&1  
-import json, sys, pathlib  
-p \= pathlib.Path("audit/EPIC-023\_MANIFEST.json")  
-pp \= pathlib.Path(str(p) \+ ".path\_proof.txt")
+`p = pathlib.Path("audit/EPIC-023_MANIFEST.json")`  
+`pp = pathlib.Path(str(p) + ".path_proof.txt")`
 
-required\_paths \= \[  
-  "docs/acceptance\_map\_epic023.json",  
-  "audit/qa/hde-epic023/token\_evidence\_matrix.md",  
-  "audit/qa/hde-epic023/acceptance\_map\_viability.log",  
-  "audit/qa/hde-epic023/qa\_step\_logs\_manifest.json",  
-  "audit/docdeltas/hde-epic023\_doc\_deltas.md",  
-\]
+`required_bindings = {`  
+  `"acceptance_map": "docs/acceptance_map_epic023.json",`  
+  `"token_matrix": "audit/qa/hde-epic023/token_evidence_matrix.md",`  
+  `"acceptance_map_viability": "audit/qa/hde-epic023/acceptance_map_viability.log",`  
+  `"qa_step_manifest": "audit/qa/hde-epic023/qa_step_logs_manifest.json",`  
+  `"doc_deltas": "audit/docdeltas/hde-epic023_doc_deltas.md",`  
+  `"close_report": "audit/EPIC-023_close_report.md",`  
+  `"close_manifest": "audit/EPIC-023_MANIFEST.json",`  
+`}`
 
-if not p.exists():  
-    print(f"TOOLING\_BLOCKED: missing {p}")  
-    sys.exit(3)  
-if not pp.exists():  
-    print(f"FAIL\_BEHAVIOR: missing path proof {pp}")  
-    sys.exit(2)
+`if not p.exists():`  
+    `print(f"TOOLING_BLOCKED: missing {p}")`  
+    `sys.exit(3)`  
+`if not pp.exists():`  
+    `print(f"FAIL_BEHAVIOR: missing path proof {pp}")`  
+    `sys.exit(2)`
 
-obj \= json.loads(p.read\_text(encoding="utf-8"))  
-if obj.get("epic\_id") \!= "HDE-EPIC023":  
-    print(f"FAIL\_BEHAVIOR: epic\_id mismatch: {obj.get('epic\_id')}")  
-    sys.exit(2)
+`obj = json.loads(p.read_text(encoding="utf-8"))`  
+`if obj.get("epic_id") != "HDE-EPIC023":`  
+    `print(f"FAIL_BEHAVIOR: epic_id mismatch: {obj.get('epic_id')}")`  
+    `sys.exit(2)`
 
-ko \= obj.get("key\_outputs")  
-if not isinstance(ko, list):  
-    print("FAIL\_BEHAVIOR: key\_outputs must be a list")  
-    sys.exit(2)
+`ko = obj.get("key_outputs")`  
+`if not isinstance(ko, dict):`  
+    `print("FAIL_BEHAVIOR: key_outputs must be an object (dict) of named pointers to paths")`  
+    `sys.exit(2)`
 
-missing \= \[rp for rp in required\_paths if rp not in ko\]  
-if missing:  
-    print("FAIL\_BEHAVIOR: key\_outputs missing required path entries (exact-match check):")  
-    for m in missing:  
-        print(f"  \- {m}")  
-    print("\\nObserved key\_outputs entries:")  
-    for x in ko:  
-        print(f"  \- {x}")  
-    sys.exit(2)
+`non_str = [k for k,v in ko.items() if not isinstance(v, str)]`  
+`if non_str:`  
+    `print("FAIL_BEHAVIOR: key_outputs values must all be strings; non-string keys:")`  
+    `for k in sorted(non_str):`  
+        `print(f"  - {k}: {type(ko[k]).__name__}")`  
+    `sys.exit(2)`
 
-print("PASS: close pack manifest includes all required key\_outputs paths (exact match).")  
-PY  
-RC=$?
+`missing_keys = [k for k in required_bindings.keys() if k not in ko]`  
+`wrong_vals = [k for k, exp in required_bindings.items() if k in ko and ko[k] != exp]`
 
-STATUS="PASS"  
-case "${RC}" in  
-  0\) STATUS="PASS" ;;  
-  2\) STATUS="FAIL\_BEHAVIOR" ;;  
-  3\) STATUS="TOOLING\_BLOCKED" ;;  
-  \*) STATUS="FAIL\_TOOLING" ;;  
-esac
+`if missing_keys or wrong_vals:`  
+    `print("FAIL_BEHAVIOR: key_outputs bindings mismatch")`  
+    `if missing_keys:`  
+        `print("Missing required key_outputs keys:")`  
+        `for k in missing_keys:`  
+            `print(f"  - {k}")`  
+    `if wrong_vals:`  
+        `print("Wrong key_outputs values (expected exact-match paths):")`  
+        `for k in wrong_vals:`  
+            `print(f"  - {k}: expected={required_bindings[k]} observed={ko.get(k)}")`  
+    `print("\nObserved key_outputs mapping:")`  
+    `for k in sorted(ko.keys()):`  
+        `print(f"  - {k}: {ko[k]}")`  
+    `sys.exit(2)`
 
-python \- \<\<PY \>"${LOG\_PATH}"  
-import json, os  
-hdr \= {  
-  "check\_id": "${CHECK\_ID}",  
-  "status": "${STATUS}",  
-  "command": "python (embedded) validate audit/EPIC-023\_MANIFEST.json key\_outputs membership (+ path proof)",  
-  "captured\_env": {  
-    "SAFE\_MODE": os.environ.get("SAFE\_MODE"),  
-    "ALLOW\_NETWORK": os.environ.get("ALLOW\_NETWORK"),  
-    "APP\_ENV": os.environ.get("APP\_ENV"),  
-    "LC\_ALL": os.environ.get("LC\_ALL"),  
-    "LANG": os.environ.get("LANG"),  
-    "TZ": os.environ.get("TZ"),  
-  },  
-  "pf\_refs": \[  
-    "PF12 — HDE-Schemas and Artifacts, §8.3.4 (titles-only)"  
-  \],  
-  "intended\_tokens": \[\],  
-  "claimed\_tokens": \[\],  
-}  
-print(json.dumps(hdr, sort\_keys=True, separators=(",", ":")))  
-PY  
-cat "${TMP\_OUT}" \>\>"${LOG\_PATH}"  
-rm \-f "${TMP\_OUT}"
+`print("PASS: close pack manifest key_outputs includes required named bindings (exact match).")`  
+`PY`  
+`RC=$?`
 
-echo "${CHECK\_ID} \=\> ${STATUS}"
+`STATUS="PASS"`  
+`case "${RC}" in`  
+  `0) STATUS="PASS" ;;`  
+  `2) STATUS="FAIL_BEHAVIOR" ;;`  
+  `3) STATUS="TOOLING_BLOCKED" ;;`  
+  `*) STATUS="FAIL_TOOLING" ;;`  
+`esac`
 
-**Expected result (PASS/FAIL predicates)**
+`python - <<PY >"${LOG_PATH}"`  
+`import json, os`  
+`hdr = {`  
+  `"check_id": "${CHECK_ID}",`  
+  `"status": "${STATUS}",`  
+  `"command": "python (embedded) validate audit/EPIC-023_MANIFEST.json key_outputs named bindings (+ path proof)",`  
+  `"captured_env": {`  
+    `"SAFE_MODE": os.environ.get("SAFE_MODE"),`  
+    `"ALLOW_NETWORK": os.environ.get("ALLOW_NETWORK"),`  
+    `"APP_ENV": os.environ.get("APP_ENV"),`  
+    `"LC_ALL": os.environ.get("LC_ALL"),`  
+    `"LANG": os.environ.get("LANG"),`  
+    `"TZ": os.environ.get("TZ"),`  
+  `}`  
+`}`  
+`print(json.dumps(hdr, sort_keys=True, separators=(",", ":")))`  
+`PY`  
+`cat "${TMP_OUT}" >>"${LOG_PATH}"`  
+`rm -f "${TMP_OUT}"`
+
+`echo "${CHECK_ID} => ${STATUS}"`
+
+Expected result (PASS/FAIL predicates)
 
 PASS if:
 
-* `audit/EPIC-023_MANIFEST.json` exists and parses  
-* `key_outputs` is a list and includes (exact string match) all required path pointers listed in the command
+* `audit/EPIC-023_MANIFEST.json` exists and parses
+
+* `audit/EPIC-023_MANIFEST.json.path_proof.txt` exists
+
+* `epic_id` is exactly `"HDE-EPIC023"`
+
+* `key_outputs` is an object (dict) whose required keys exist and whose values exactly match the required binding paths
 
 FAIL\_BEHAVIOR if:
 
-* any required path pointer is absent from `key_outputs`, or manifest shape is incorrect
+* any required key is missing, any required value path mismatches, or `key_outputs` is not a dict
 
 TOOLING\_BLOCKED if:
 
-* manifest missing
+* manifest is missing
 
-**Primary evidence artifact (required)**
+Primary evidence artifact (required)
 
 * `audit/qa/hde-epic023/checks/D12_close_pack_manifest/primary.log`
 
-**Deliverables (minimal evidence set; fully-qualified paths)**
+Deliverables (minimal evidence set; fully-qualified paths)
 
-* `audit/EPIC-023_MANIFEST.json`  
-* `audit/EPIC-023_MANIFEST.json.path_proof.txt`  
+* `audit/EPIC-023_MANIFEST.json`
+
+* `audit/EPIC-023_MANIFEST.json.path_proof.txt`
+
 * `audit/qa/hde-epic023/checks/D12_close_pack_manifest/primary.log`
 
 ---
@@ -2874,12 +2868,7 @@ hdr \= {
     "LC\_ALL": os.environ.get("LC\_ALL"),  
     "LANG": os.environ.get("LANG"),  
     "TZ": os.environ.get("TZ"),  
-  },  
-  "pf_refs": [  
-    "PF12 — HDE-Schemas and Artifacts, §8.3.3 (titles-only)"  
-  ],  
-  "intended_tokens": [],  
-  "claimed_tokens": [],  
+  }  
 }  
 print(json.dumps(hdr, sort\_keys=True, separators=(",", ":")))  
 PY  
@@ -2988,12 +2977,7 @@ hdr \= {
     "LC\_ALL": os.environ.get("LC\_ALL"),  
     "LANG": os.environ.get("LANG"),  
     "TZ": os.environ.get("TZ"),  
-  },  
-  "pf_refs": [  
-    "PF12 — HDE-Schemas and Artifacts, §8.3.4 (titles-only)"  
-  ],  
-  "intended_tokens": [],  
-  "claimed_tokens": [],  
+  }  
 }  
 print(json.dumps(hdr, sort\_keys=True, separators=(",", ":")))  
 PY  
@@ -3369,22 +3353,25 @@ Goal: Verify the orientation demo evidence outputs exist and are valid per the d
 `RC_SCRIPT=$?`
 
 `python - <<'PY' >>"${TMP_OUT}" 2>&1`  
-`import sys, pathlib`
+`import sys, json, pathlib`
 
-`report = pathlib.Path("audit/gates/topology/orientation_demo.txt")`  
-`proof = pathlib.Path(str(report) + ".path_proof.txt")`
+`report = pathlib.Path("artifacts/hde-epic023_orientation_demo/orientation_demo_report.json")`  
+`sample = pathlib.Path("artifacts/hde-epic023_orientation_demo/sample_result.json")`
 
 `if not report.exists():`  
     `print(f"FAIL_BEHAVIOR: missing report {report}")`  
     `sys.exit(2)`  
-`if report.stat().st_size == 0:`  
-    `print("FAIL_BEHAVIOR: orientation_demo.txt is empty")`  
-    `sys.exit(2)`  
-`if not proof.exists():`  
-    `print(f"FAIL_BEHAVIOR: missing path proof {proof}")`  
+`if not sample.exists():`  
+    `print(f"FAIL_BEHAVIOR: missing sample {sample}")`  
     `sys.exit(2)`
 
-`print("PASS: orientation_demo.txt exists and is path-proofed.")`  
+`obj = json.loads(report.read_text(encoding="utf-8"))`  
+`status = obj.get("status")`  
+`if status != "ok":`  
+    `print(f"FAIL_BEHAVIOR: orientation_demo_report.json status != ok (status={status})")`  
+    `sys.exit(2)`
+
+`print("PASS: orientation demo report/sample exist and report status is ok.")`  
 `sys.exit(0)`  
 `PY`  
 `RC_FILES=$?`
@@ -3398,9 +3385,34 @@ Goal: Verify the orientation demo evidence outputs exist and are valid per the d
   `STATUS="PASS"`  
 `fi`
 
+`python - <<PY >"${LOG_PATH}"`  
+`import json, os`  
+`hdr = {`  
+  `"check_id": "${CHECK_ID}",`  
+  `"status": "${STATUS}",`  
+  `"command": "python tools/evidence/orientation_demo.py --check + python (embedded) validate required artifacts",`  
+  `"captured_env": {`  
+    `"SAFE_MODE": os.environ.get("SAFE_MODE"),`  
+    `"ALLOW_NETWORK": os.environ.get("ALLOW_NETWORK"),`  
+    `"APP_ENV": os.environ.get("APP_ENV"),`  
+    `"LC_ALL": os.environ.get("LC_ALL"),`  
+    `"LANG": os.environ.get("LANG"),`  
+    `"TZ": os.environ.get("TZ"),`  
+  `},`  
+  `"pf_refs": [`  
+    `"PF12 — HDE-Schemas and Artifacts, §8.5 (titles-only)"`  
+  `],`  
+  `"intended_tokens": [],`  
+  `"claimed_tokens": [],`  
+`}`  
+`print(json.dumps(hdr, sort_keys=True, separators=(",", ":")))`  
+`PY`  
+`cat "${TMP_OUT}" >>"${LOG_PATH}"`  
+`rm -f "${TMP_OUT}"`
+
 `# Upsert this check into the step-logs manifest (PF19 §4.4.3)`  
-`python - <<PY >>"${TMP_OUT}" 2>&1`  
-`import json, os, hashlib, datetime, sys`  
+`python - <<PY >>"${LOG_PATH}" 2>&1`  
+`import json, os, hashlib, datetime`  
 `from pathlib import Path`
 
 `def utc_now_z():`  
@@ -3432,18 +3444,8 @@ Goal: Verify the orientation demo evidence outputs exist and are valid per the d
 `steps = obj.get("steps")`  
 `if not isinstance(steps, list):`  
     `steps = []`  
-`steps = [s for s in steps if not (isinstance(s, dict) and s.get("check_id") == check_id)]`
-
-`entry = {"check_id": check_id, "status": status, "log_path": log_path}`  
-`entry_text = json.dumps(entry, sort_keys=True)`  
-`placeholders = ("${CHECK_ID}", "${LOG_PATH}", "${STATUS}")`  
-`placeholder_hit = any(ph in entry_text for ph in placeholders)`  
-`if placeholder_hit:`  
-    `entry["status"] = "FAIL_BEHAVIOR"`  
-    `status = "FAIL_BEHAVIOR"`  
-    `print("FAIL_BEHAVIOR: placeholder corruption detected in qa_step_logs_manifest entry")`
-
-`steps.append(entry)`  
+`steps = [s for s in steps if not (isinstance(s, dict) and s.get("check_id") == check_id)]`  
+`steps.append({"check_id": check_id, "status": status, "log_path": log_path})`  
 `steps.sort(key=lambda s: s.get("check_id",""))`  
 `obj["steps"] = steps`
 
@@ -3464,38 +3466,7 @@ Goal: Verify the orientation demo evidence outputs exist and are valid per the d
 `proof.write_text("\n".join(proof_lines) + "\n", encoding="utf-8")`
 
 `print(f"manifest_upsert: check_id={check_id} status={status} log_path={log_path} steps_count={len(steps)}")`  
-`sys.exit(4 if placeholder_hit else 0)`  
 `PY`
-
-`RC_MANIFEST=$?`  
-`if [ "${RC_MANIFEST}" -eq 4 ]; then`  
-  `STATUS="FAIL_BEHAVIOR"`  
-`fi`
-
-`python - <<PY >"${LOG_PATH}"`  
-`import json, os`  
-`hdr = {`  
-  `"check_id": "${CHECK_ID}",`  
-  `"status": "${STATUS}",`  
-  `"command": "python tools/evidence/orientation_demo.py --check + python (embedded) validate required artifacts",`  
-  `"captured_env": {`  
-    `"SAFE_MODE": os.environ.get("SAFE_MODE"),`  
-    `"ALLOW_NETWORK": os.environ.get("ALLOW_NETWORK"),`  
-    `"APP_ENV": os.environ.get("APP_ENV"),`  
-    `"LC_ALL": os.environ.get("LC_ALL"),`  
-    `"LANG": os.environ.get("LANG"),`  
-    `"TZ": os.environ.get("TZ"),`  
-  `},`  
-  `"pf_refs": [`  
-    `"PF12 — HDE-Schemas and Artifacts, §8.5 (titles-only)"`  
-  `],`  
-  `"intended_tokens": [],`  
-  `"claimed_tokens": [],`  
-`}`  
-`print(json.dumps(hdr, sort_keys=True, separators=(",", ":")))`  
-`PY`  
-`cat "${TMP_OUT}" >>"${LOG_PATH}"`  
-`rm -f "${TMP_OUT}"`
 
 `echo "${CHECK_ID} => ${STATUS}"`
 
@@ -3505,9 +3476,9 @@ PASS if:
 
 * `python tools/evidence/orientation_demo.py --check` returns 0
 
-* `audit/gates/topology/orientation_demo.txt` exists and is non-empty
+* `artifacts/hde-epic023_orientation_demo/orientation_demo_report.json` exists and has `status: ok`
 
-* `audit/gates/topology/orientation_demo.txt.path_proof.txt` exists
+* `artifacts/hde-epic023_orientation_demo/sample_result.json` exists
 
 FAIL\_BEHAVIOR if:
 
@@ -3523,9 +3494,9 @@ FAIL\_TOOLING if:
 
 **Deliverables (minimal evidence set; fully-qualified paths)**
 
-* `audit/gates/topology/orientation_demo.txt`
+* `artifacts/hde-epic023_orientation_demo/orientation_demo_report.json`
 
-* `audit/gates/topology/orientation_demo.txt.path_proof.txt`
+* `artifacts/hde-epic023_orientation_demo/sample_result.json`
 
 * `audit/qa/hde-epic023/checks/D16_orientation_demo/primary.log`
 
@@ -3542,7 +3513,7 @@ Rails: SAFE\_MODE=1 ALLOW\_NETWORK=0 APP\_ENV=dev
 Pins (when producing governed bytes): LC\_ALL=C LANG=C TZ=UTC  
 PF anchors: PF12 — HDE-Schemas and Artifacts, §8.3.3 (titles-only)
 
-Goal: Validate `env_pins.log` is valid determinism pins JSON.  
+Goal: Validate `env_pins.log` is valid determinism pins JSON and reflects closed rails \+ pins.  
 Preconditions: none.
 
 **PO command(s) (copy/paste)**
@@ -3565,32 +3536,38 @@ if not pp.exists():
     print(f"FAIL\_BEHAVIOR: missing path proof {pp}")  
     sys.exit(2)
 
-text \= p.read\_text(encoding="utf-8")  
-obj \= None  
-try:  
-    obj \= json.loads(text)  
-except json.JSONDecodeError:  
-    lines \= \[line for line in text.splitlines() if line.strip()\]  
-    if len(lines) \== 1:  
-        obj \= json.loads(lines\[0\])  
-    else:  
-        print("FAIL\_BEHAVIOR: env\_pins.log must be JSON or a single JSON line")  
+lines \= p.read\_text(encoding="utf-8").splitlines()  
+if len(lines) \!= 1:  
+    print(f"FAIL\_BEHAVIOR: env\_pins.log must be exactly one JSON line; got {len(lines)} lines")  
+    sys.exit(2)
+
+obj \= json.loads(lines\[0\])  
+if obj.get("schema") \!= "determinism\_env\_pins.v1":  
+    print(f"FAIL\_BEHAVIOR: schema mismatch: {obj.get('schema')}")  
+    sys.exit(2)
+
+rails \= obj.get("rails")  
+if not isinstance(rails, dict):  
+    print("FAIL\_BEHAVIOR: rails must be an object")  
+    sys.exit(2)
+
+\# minimal pinned expectations  
+req \= {  
+  "SAFE\_MODE": 1,  
+  "ALLOW\_NETWORK": 0,  
+  "LC\_ALL": "C",  
+  "LANG": "C",  
+  "TZ": "UTC",  
+}  
+for k,v in req.items():  
+    if k not in rails:  
+        print(f"FAIL\_BEHAVIOR: rails missing key {k}")  
+        sys.exit(2)  
+    if str(rails\[k\]) \!= str(v):  
+        print(f"FAIL\_BEHAVIOR: rails\[{k}\] mismatch: got={rails\[k\]} expected={v}")  
         sys.exit(2)
 
-if not isinstance(obj, dict):  
-    print("FAIL\_BEHAVIOR: env\_pins.log must be a JSON object")  
-    sys.exit(2)
-if not isinstance(obj.get("env"), dict):  
-    print("FAIL\_BEHAVIOR: env\_pins.log missing env object")  
-    sys.exit(2)
-if not isinstance(obj.get("status"), str):  
-    print("FAIL\_BEHAVIOR: env\_pins.log missing status string")  
-    sys.exit(2)
-if not isinstance(obj.get("suites"), list):  
-    print("FAIL\_BEHAVIOR: env\_pins.log missing suites list")  
-    sys.exit(2)
-
-print("PASS: env\_pins.log contains env/status/suites fields.")  
+print("PASS: env\_pins.log schema OK and rails/pins match expected closed posture.")  
 PY  
 RC=$?
 
@@ -3615,12 +3592,7 @@ hdr \= {
     "LC\_ALL": os.environ.get("LC\_ALL"),  
     "LANG": os.environ.get("LANG"),  
     "TZ": os.environ.get("TZ"),  
-  },  
-  "pf_refs": [  
-    "PF12 — HDE-Schemas and Artifacts, §8.3.3 (titles-only)"  
-  ],  
-  "intended_tokens": [],  
-  "claimed_tokens": [],  
+  }  
 }  
 print(json.dumps(hdr, sort\_keys=True, separators=(",", ":")))  
 PY  
@@ -3633,12 +3605,12 @@ echo "${CHECK\_ID} \=\> ${STATUS}"
 
 PASS if:
 
-* env\_pins.log is parseable JSON  
-* env\_pins.log includes `env` (object), `status` (string), and `suites` (list)
+* env\_pins.log is exactly one JSON line with schema `determinism_env_pins.v1`  
+* rails reflect SAFE\_MODE=1, ALLOW\_NETWORK=0, LC\_ALL=C, LANG=C, TZ=UTC
 
 FAIL\_BEHAVIOR if:
 
-* env\_pins.log is not JSON or missing required fields
+* schema mismatch, wrong line count, or pinned values mismatch
 
 TOOLING\_BLOCKED if:
 
@@ -3692,6 +3664,8 @@ if not lines:
     sys.exit(2)
 
 need \= \[  
+  "run:sanity-pipeline",  
+  "env\_pins: audit/gates/determinism/env\_pins.log",  
   "summary:PASS",  
 \]  
 missing \= \[s for s in need if not any(s in ln for ln in lines)\]  
@@ -3701,20 +3675,7 @@ if missing:
         print(f"  \- {m}")  
     sys.exit(2)
 
-has\_pipeline \= any(ln.startswith("sanity\_pipeline") or ln.strip() \== "sanity\_pipeline" for ln in lines)  
-has\_env \= any(ln.startswith("env:") for ln in lines)  
-has\_check \= any(ln.startswith("check ") for ln in lines)  
-if not has\_pipeline:  
-    print("FAIL\_BEHAVIOR: sanity.log missing sanity\_pipeline line")  
-    sys.exit(2)  
-if not has\_env:  
-    print("FAIL\_BEHAVIOR: sanity.log missing env: line")  
-    sys.exit(2)  
-if not has\_check:  
-    print("FAIL\_BEHAVIOR: sanity.log missing check line")  
-    sys.exit(2)
-
-print("PASS: sanity.log contains sanity\_pipeline, env, check lines, and summary:PASS.")  
+print("PASS: sanity.log contains required run/env\_pins/summary lines.")  
 PY  
 RC=$?
 
@@ -3739,12 +3700,7 @@ hdr \= {
     "LC\_ALL": os.environ.get("LC\_ALL"),  
     "LANG": os.environ.get("LANG"),  
     "TZ": os.environ.get("TZ"),  
-  },  
-  "pf_refs": [  
-    "PF12 — HDE-Schemas and Artifacts, §8.3.4 (titles-only)"  
-  ],  
-  "intended_tokens": [],  
-  "claimed_tokens": [],  
+  }  
 }  
 print(json.dumps(hdr, sort\_keys=True, separators=(",", ":")))  
 PY  
@@ -3757,9 +3713,8 @@ echo "${CHECK\_ID} \=\> ${STATUS}"
 
 PASS if:
 
-* sanity.log includes `sanity_pipeline` (line equals or begins with it)  
-* includes at least one `env:` line  
-* includes at least one `check ` line  
+* sanity.log includes `run:sanity-pipeline`  
+* includes `env_pins: audit/gates/determinism/env_pins.log`  
 * includes `summary:PASS`
 
 FAIL\_BEHAVIOR if:
@@ -4794,3 +4749,4 @@ Caveats (allowed, must be mechanically logged):
 * ENV\_DRIFT — environment differs from baseline; capture mechanically; do not invent new rails.
 
 ASK OK?
+

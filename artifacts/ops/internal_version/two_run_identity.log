@@ -1,11 +1,38 @@
-captured_at_utc: 2025-12-30T02:32:16Z
-two_run_identity.identical: true
-two_run_identity.sha256_run1: 9b5117886c1b1c9066b8099223fa1bb6420e7ea5150b4a815c7feb2b71ce833a
-two_run_identity.sha256_run2: 9b5117886c1b1c9066b8099223fa1bb6420e7ea5150b4a815c7feb2b71ce833a
-coupling.overall_pass: true
-coupling.checks:
-- ok=true label=release_id matches artifacts/math/release_id.txt source=artifacts/math/release_id.txt
-  expected=077bcb55b30c5384be754567c388c210ca3004f2fd9f9187d6861e2faffe58f5
-  got=077bcb55b30c5384be754567c388c210ca3004f2fd9f9187d6861e2faffe58f5
-rails_reference: SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=prod (open rails) + pins LC_ALL=C LANG=C TZ=UTC
-determinism_pins_reference: (step-local pins)
+TWO_RUN_IDENTITY
+run1_sha256=9b5117886c1b1c9066b8099223fa1bb6420e7ea5150b4a815c7feb2b71ce833a
+run2_sha256=9b5117886c1b1c9066b8099223fa1bb6420e7ea5150b4a815c7feb2b71ce833a
+artifact_sha256=9b5117886c1b1c9066b8099223fa1bb6420e7ea5150b4a815c7feb2b71ce833a
+identical=true
+
+COUPLING_CHECKS
+engine_tag.source=artifacts/identity/service_identity.json
+engine_tag.expected=hdengine@prod
+engine_tag.observed=hdengine@prod
+engine_tag.status=PASS
+build_commit.source=artifacts/identity/service_identity.json
+build_commit.expected=9479d28
+build_commit.observed=9479d28
+build_commit.status=PASS
+invocation_tag.source=artifacts/invocation.json
+invocation_tag.expected=INV-f2ac55d77ce9aacc
+invocation_tag.observed=INV-f2ac55d77ce9aacc
+invocation_tag.status=PASS
+invocation_sha256.source=artifacts/invocation.json
+invocation_sha256.expected=3f119e727a2a1f8a5332fe8f159321ea5274988e6a05633103fe0a5ae42c6e69
+invocation_sha256.observed=3f119e727a2a1f8a5332fe8f159321ea5274988e6a05633103fe0a5ae42c6e69
+invocation_sha256.status=PASS
+emitter_sha256.source=artifacts/identity/emitter_sha256.txt
+emitter_sha256.expected=c828effe645deae150593adbc90589f67141ab20fab1e719171cd8effad9bc19
+emitter_sha256.observed=c828effe645deae150593adbc90589f67141ab20fab1e719171cd8effad9bc19
+emitter_sha256.status=PASS
+release_id.source=artifacts/math/release_id.txt
+release_id.expected=077bcb55b30c5384be754567c388c210ca3004f2fd9f9187d6861e2faffe58f5
+release_id.observed=077bcb55b30c5384be754567c388c210ca3004f2fd9f9187d6861e2faffe58f5
+release_id.status=PASS
+release_id_manifest.source=catalog/manifest.json
+release_id_manifest.expected=077bcb55b30c5384be754567c388c210ca3004f2fd9f9187d6861e2faffe58f5
+release_id_manifest.observed=077bcb55b30c5384be754567c388c210ca3004f2fd9f9187d6861e2faffe58f5
+release_id_manifest.status=PASS
+
+RAILS_PINS
+audit/gates/determinism/env_pins.log (names-only reference)

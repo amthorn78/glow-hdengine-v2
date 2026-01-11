@@ -1,0 +1,3 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"D23_evidence_index_snapshot_artifact","claimed_tokens":[],"command":"UNPROVEN/TOOLING_BLOCKED: record posture only (no required deliverable paths asserted)","intended_tokens":[],"pf_refs":["(guide-only; UNPROVEN/TOOLING_BLOCKED pending confirmation)"],"status":"TOOLING_BLOCKED"}
+UNPROVEN/TOOLING_BLOCKED: This surface requires repo/tooling confirmation before a governed artifact path and PASS/FAIL predicate can be asserted. This plan revision records posture only.
+Updated qa_step_logs_manifest.json + path proof.

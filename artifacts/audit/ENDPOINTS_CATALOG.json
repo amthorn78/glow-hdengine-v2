@@ -1,1 +1,1 @@
-{"success_endpoints":[]}
+{"success_endpoints":[],"endpoints":[{"path":"/internal/version","a7_eligible":false,"description":"Internal version endpoint for ops evidence","methods":["GET","HEAD"]}]}

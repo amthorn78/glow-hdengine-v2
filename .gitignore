@@ -19,3 +19,33 @@ VERIFY.out
 server_backup.tar
 EPIC1_PATCH_PACKET_*/
 artifacts/bodygraph/refresh_state.json
+
+# Python runtime
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+*.whl
+
+# IDE
+.vscode/settings.json
+.idea/
+
+# Testing
+.coverage
+.pytest_cache/
+htmlcov/
+
+# Runtime logs (excluding evidence logs in audit/artifacts/errors)
+/probe_test.log
+/run_output.log
+/server.log
+/runner.log
+
+# OS
+.DS_Store
+Thumbs.db

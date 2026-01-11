@@ -1,12 +1,6 @@
-HTTP/2 200 
-cache-control: no-store
-content-type: application/json; charset=utf-8
-date: Tue, 30 Dec 2025 02:32:15 GMT
-server: railway-edge
-x-railway-edge: railway/europe-west4-drams3a
-x-railway-request-id: C9b9haeATnyRDgCNm3z_FQ
-content-length: 347
+HTTP/1.0 200 OK
+Cache-Control: no-store
+Content-Length: 347
+Content-Type: application/json; charset=utf-8
 
-
-curl: (18) end of response with 347 bytes missing
-
+Body-Length: 0 bytes

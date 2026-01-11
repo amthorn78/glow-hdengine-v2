@@ -1,0 +1,1 @@
+{"description":"Sample orientation demo result structure","note":"This is a sample structure demonstrating the orientation demo validation pattern","sample_artifact_key":"example.artifact","sample_checks":["sha256_match","size_match","proof_exists","mtime_captured"],"schema":"orientation_demo_sample","version":"1.0"}

@@ -56,8 +56,16 @@ def ensure_determinism_env(
 
 
 def render_env_log(env: Mapping[str, str], suites: Iterable[str], status: str) -> str:
+    # Schema v1: Use "rails" and "schema" fields for EPIC023+ acceptance
     payload = {
-        "env": {key: env[key] for key in sorted(DETERMINISM_ENV_PINS)},
+        "rails": {
+            "SAFE_MODE": int(env["SAFE_MODE"]),
+            "ALLOW_NETWORK": int(env["ALLOW_NETWORK"]),
+            "LC_ALL": env["LC_ALL"],
+            "LANG": env["LANG"],
+            "TZ": env["TZ"],
+        },
+        "schema": "determinism_env_pins.v1",
         "status": _validate_status(status),
         "suites": list(suites),
     }

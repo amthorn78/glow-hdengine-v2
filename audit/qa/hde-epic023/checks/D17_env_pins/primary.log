@@ -1,2 +1,2 @@
-{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"D17_env_pins","command":"python (embedded) validate audit/gates/determinism/env_pins.log (+ path proof)","status":"FAIL_BEHAVIOR"}
-FAIL_BEHAVIOR: schema mismatch: None
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"D17_env_pins","command":"python (embedded) validate audit/gates/determinism/env_pins.log (+ path proof)","status":"PASS"}
+PASS: env_pins.log schema OK and rails/pins match expected closed posture.

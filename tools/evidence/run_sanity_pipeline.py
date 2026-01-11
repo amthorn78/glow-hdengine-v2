@@ -30,7 +30,12 @@ def _render_env_line() -> str:
 
 
 def _write_log(log_path: Path, steps: Iterable[tuple[str, str]], summary: str) -> None:
-    lines = ["sanity_pipeline", f"env:{_render_env_line()}"]
+    # EPIC023 format: Use "run:" prefix and add env_pins reference
+    lines = [
+        "run:sanity-pipeline",
+        f"env:{_render_env_line()}",
+        "env_pins: audit/gates/determinism/env_pins.log",
+    ]
     for name, status in steps:
         lines.append(f"check {name}:{status}")
     lines.append(f"summary:{summary}")

@@ -1,0 +1,2 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"D19_json_gate_check_log","command":"python (embedded) parse audit/gates/canonical_json/json_canonical_check.log (+ path proof) for status=pass","status":"PASS"}
+PASS: parsed 6 JSON records; status=pass observed.
