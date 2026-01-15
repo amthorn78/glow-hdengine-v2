@@ -1,181 +1,134 @@
-**Title**: PF20-Canon-HDE-Phased Epics
+**Title**: PF20-Reference-HDE-Phased Epics
 
-**Status:** Canon
+**Status:** Reference
 
-**Version:** v1.7.2
+**Version:** v1.7.6
 
-**Effective date:** 2026-01-03
+**Effective date:** 2026-01-12
 
-**Last Update Gate:** BN 8.8.4
+**Last Update Gate:** HDE-EPIC023 Closure
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
 ## **0\. Purpose & Scope**
 
-This document is the **single PF home** for:
+**Historical reference only. Not for planning.**
 
-* Mapping each **HDE epic** to an **alchemical phase** (Calcination → Coagulation) as defined in **7 Phases of Alchemical Engineering** (PF21, titles-only).
+PF20 is a **reference ledger** of historical epic records and their trace pointers. It is not an epic planning document and must not be used to derive requirements, gates, or “what to do next.”
 
-* Tracking **per-epic intent, deliverables, PF references, acceptance tokens, and evidence pointers**, in a form that can be mirrored on JSON boards and JIRA.
+This document is the single PF home for:
 
-* Recording **cross-epic “Outstanding issues”** that must be explicitly carried forward or closed.
+* **Mapping** each HDE epic to an alchemical phase (Calcination → Coagulation) as defined in **7 Phases of Alchemical Engineering** (titles-only).
 
-This document does **not** redefine:
+* **Recording** per-epic historical intent, deliverables, PF references, acceptance token names, and evidence pointers **as they existed for that epic**.
 
-* Governance primitives, token registry, or token semantics (PF04).
+* **Recording** cross-epic “Outstanding issues” as a **historical index** of known gaps and carry-forward decisions.
 
-* Math mechanics (PF01).
+**Historicals only. Not to be used for planning of any kind:**
 
-* Epic execution flow (PF06).
+* PF20 MUST NOT be used to plan new epics, define acceptance rosters, choose tokens, design QA, design evidence capture, or decide rails posture.
 
-* Build/CI wiring and checklist status semantics (PF09).
+* PF20 MUST NOT be used as a source of “baseline token rosters” or “required now” requirements.
 
-* QA playbooks, QA planning, or Live QA runbooks (PF19).
+* If a reader needs planning guidance, they MUST consult the owning PF documents (titles-only). PF20 may point to those documents, but PF20 itself is not authoritative for planning rules.
 
-* Evidence schemas and artifact conventions (PF12).
+This document does not redefine:
 
-* Templates (PF27).
+* Governance primitives, token registry, or token semantics (titles-only).
 
-Those remain single homes; PF20 only **names and tracks** epics, phases, and evidence outcomes.
+* Math mechanics (titles-only).
 
-**Token naming discipline (names-only; no aliases):**
+* Epic execution flow (titles-only).
 
-Acceptance token names referenced by PF20 epic records and their acceptance artifacts (acceptance maps, token→evidence matrices, manifests) MUST match the canonical names in the Token Registry in **HDE Governance** (titles-only). Tools, guides, matrices, and acceptance maps MUST NOT invent token aliases.
+* Build/CI wiring and checklist status semantics (titles-only).
 
-For `/internal/version` specifically:
+* QA playbooks, QA planning, or Live QA runbooks (titles-only).
 
-* The canonical conditional semantics token name is `INTERNAL_VERSION_CONDITIONALS_IGNORED_OK`.
+* Evidence schemas and artifact conventions (titles-only).
 
-* Any alias intended to mean “conditionals return 200 and never 304” (including `INTERNAL_VERSION_COND_200_NO_304_OK`) is non-canon and MUST NOT be emitted or required in acceptance artifacts.
+* Templates (titles-only).
 
-* If tooling emits a non-canon alias, remediation MUST treat that as a defect and plan convergence to canonical naming.
+Those remain single homes. PF20 only records what an epic **claimed/used/produced**, plus where evidence was stored, for historical traceability.
 
-* Older epic records may contain legacy `INTVER_*` alias tokens as historical artifacts; do not copy them forward into new epic acceptance rosters.
+### **Token naming discipline (historical recording rules)**
 
-**PF23 consult (planning posture; mandatory):**
+PF20 may contain token names as they were recorded in historical epic artifacts. Token names in PF20 are **not** authoritative requirements.
 
-When planning for QA, remediation, development, or any other execution work, agents MUST consult **PF23 — Reality Audits** as a primary input for:
+* When interpreting any token name in PF20, the canonical source of truth is the Token Registry in **HDE Governance** (titles-only).
 
-* component boundaries (what the “thing” is), and
+* PF20 must not introduce token aliases. If a historical epic record contains a token alias, it must be treated as **historical drift**, not something to copy forward.
 
-* canonical pathnames/repo loci (where the “thing” lives).
+* For `/internal/version` specifically:
 
-Planning documents SHOULD include a short “PF23 Anchors” subsection that lists:
+  * The canonical conditional semantics token name is `INTERNAL_VERSION_CONDITIONALS_IGNORED_OK`.
 
-* the component(s) used from PF23, and
+  * Any alias intended to mean “conditionals return 200 and never 304” (including `INTERNAL_VERSION_COND_200_NO_304_OK`) is non-canon and must be treated as drift if present in historical artifacts.
 
-* the key pathnames/loci pulled from PF23 that the plan will touch.
+  * Older epic records may contain legacy `INTVER_*` alias tokens as historical artifacts. Do not copy them forward into new acceptance rosters.
 
-This is a traceability anchor only; it must not duplicate PF23 contents. PF23 is PO-maintained. Planning documents MUST NOT create tasks that assign PF23 updates. If PF23 appears stale or missing required component coverage, the plan MAY note that as an observation, but must not assign it as agent work.
+### **PF23 consult (planning is out of scope here)**
 
-**Portability vs provenance (non-PF evidence):**
+PF20 does not define planning posture. Planning rules that require PF23 consultation live in the owning canon (titles-only). PF20 may cite PF23 anchors as provenance for how an epic was scoped, but PF20 does not restate PF23 contents and must not be used as a substitute for PF23 in any plan.
 
-Plans and remediation guides may include a short “Evidence inventory reviewed (non-PF)” list for provenance, but MUST NOT require the reader/executor to open external files to perform the work.
+### **Portability vs provenance (historical references)**
 
-If a plan depends on any non-PF fact (command outputs, headers, error strings, file paths observed, specific status lines), the plan MUST embed that fact directly in the document as a short quote or precise paraphrase inside an “Observed Evidence Snapshot” section.
+PF20 may reference non-PF artifacts (reports, logs, step outputs) as provenance. These references are historical pointers only.
 
-If an Artifact Map (or equivalent) is included, it MUST explicitly label non-PF inputs as “provenance only; not required to execute.” Otherwise it is treated as an execution dependency and becomes a portability blocker.
+* Historical epic records may cite external artifacts. Those citations must not be treated as execution dependencies for new work.
 
-**Hard rail (scope): PF20 is not a QA planning or runbook document.**
+* Any portability/provenance rules for plans, remediation guides, or QA execution are governed elsewhere (titles-only). PF20 does not restate them.
 
-PF20 MUST NOT embed QA runbooks or step-level QA planning (commands, procedures, operator walkthroughs, step sequences, QA\_ROOT design, evidence directory naming conventions, README generator rules, or “do X then Y” execution scripts).
+### **QA and runbook exclusion (hard rail)**
 
-PF20 may only:
+PF20 is not a QA planning or runbook document.
 
-* state whether Live QA is required for epic close, and
+* PF20 MUST NOT embed QA runbooks or step-level QA planning (commands, procedures, operator walkthroughs, step sequences, QA\_ROOT design, evidence directory naming conventions, README generator rules, or “do X then Y” execution scripts).
 
-* name the governing documents by title (for example: **Glow QA Guide**, **Epic Process Guide**), and
+* PF20 may record (historically) whether Live QA was required for an epic close and may name governing documents by title.
 
-* stage QA configuration as **planning-level constraints** (names-only tokens, titles-only evidence families/paths, rails posture expectations) without prescribing execution steps.
+### **OPS and remediation posture (historical references only)**
 
-**Tooling posture (Live QA plans; hard rule):**
+PF20 may mention OPS tasks and remediation guides as part of historical epic records. The execution rules, templates, and verification discipline for OPS and remediation are governed elsewhere (titles-only). PF20 does not restate those rules and must not be used as an OPS/remediation planning guide.
 
-Live QA plans and plan-adjacent acceptance text MUST NOT depend on non-canonical helper/wrapper scripts as “required surfaces.”
+### **Template posture**
 
-If a step needs tooling, it MUST be either:
+PF27 is the canonical home for Epic Plan and QA Plan templates. PF20 MUST NOT embed or duplicate templates.
 
-* a canon-named entrypoint by explicit path (for example `scripts/release_id_recompute.py`, `ci/checks/check_env_pins.sh`), or
+### **Drain posture (maintenance rules for this reference ledger)**
 
-* an inline tool whose full source is embedded in the plan step and written into the run-local QA tools directory (no hidden dependencies).
+* During drains, do not mass-edit historical epic records.
 
-If canon is silent on an entrypoint but requires an artifact surface, the plan MUST validate or generate the governed artifact surface directly using baseline commands (explicit shell/Python one-liners, `tee` for logs, explicit file writes), rather than inventing a new repo script path.
+* Closed epics (Status: Done) do not need to be updated during Build Notes drains.
 
-**OPS task posture (PO-only execution; hard rule):**
+* Only update a prior epic record when the change prevents future reader confusion (for example: a wrong token name, a wrong canonical evidence filename/path, or a broken cross-reference that would mislead interpretation). Otherwise, treat prior epic records as historical snapshots.
 
-An OPS task is any work item that requires privileged access to systems outside the repository (service configuration, secrets/env vars, deploy/runtime settings, infrastructure console actions, privileged database operations). OPS tasks MUST be executed by the **PO (human operator)** only.
+### **Build Notes posture (historical context)**
 
-* OPS tasks are **not** Codex PR work. They MUST NOT be represented as “implementable PR work.”
+PF10 Build Notes are living context. When PF10 is referenced inside PF20, avoid BN version strings and brittle section anchoring. Prefer the relevant Addendum entry (number \+ title) when available.
 
-* When OPS tasks are part of an epic, they are facilitated by the **Implementation Agent (IA)**, who specifies intent, constraints, verification, and evidence requirements (what-not-how) and guides the PO during execution.
+### **Scope note — epics not yet recorded in PF20**
 
-* OPS task records MUST include, at minimum (names-only; no secrets):  
-   Task ID; Owner: PO; Facilitator: IA; Target system/service (name only); Intent; Constraints/safety rails; Success criteria; Evidence to capture (paths); Rollback intent; Secret-handling note (no plaintext secrets).
+If an epic does not yet have a PF20 “Epic Record,” PF20 has nothing to say about its planning or acceptance. Do not infer requirements from PF20. Planning artifacts must use the owning canon and templates (titles-only).
 
-* OPS completion MUST produce a repo-stored evidence artifact (text-first) under a lowercase audit path (for example `audit/ops/<epic-id>/...`, or `audit/qa/<epic-id>/...` when the OPS evidence is part of QA execution). Evidence MUST NOT include secrets; sensitive values must be presence-only, redacted, or hashed.
+---
 
-* OPS tasks MUST NOT create new acceptance tokens or redefine acceptance semantics. If OPS affects acceptance, it must map to existing governance-defined acceptance posture and be proven via evidence artifacts.
+## **Phase Exit Criteria (planning rule)**
 
-* Any OPS task included in an epic MUST be represented as a subtask in **HDE-Mechanics Guide** (titles-only), using the same Task ID and required fields.
+**Historical interpretation only. Not a planning gate.**
 
-**Remediation guide posture (DEV/OPS only; verification embedded):**
+PF20 records phases and epic outcomes historically. Any “phase exit” language in PF20 is a retrospective description of what was treated as “exit-ready” at the time, not a rule to plan against.
 
-When an epic uses a Remediation Implementation Guide, the guide MUST use only DEV and OPS steps (no QA/DOC/REVIEW step types) and MUST embed verification inside the owning DEV/OPS step. OPS steps in remediation guides MUST comply with the OPS task posture above. Canonical remediation-guide templates live in **Plan Templates** (PF27); PF20 MUST NOT embed or duplicate templates.
+When PF20 records that a phase was treated as exit-ready, the historical basis typically included:
 
-**Template posture (PF27):**
+* At least one epic in that phase recorded as Status: Done with its D-goals accepted and a completed “Tokens and Evidence (Acceptance)” roster for that epic record.
 
-PF27 is the canonical home for Epic Plan / QA Plan templates. PF20 MUST NOT embed or restore templates. PF20 epic records may follow PF27 templates operationally, but PF20 remains a tracking ledger.
+* A close pack (manifest, close report, acceptance map) with required evidence indexed under the evidence discipline recorded for that phase.
 
-**Drain posture (historical epic records):**
+* No “Not done” foundation rows left for that phase in the build checklist, or explicit disposition of remaining items (rescoped, carried forward, or explicitly dropped with rationale).
 
-During drains, do not mass-edit historical epic records.
+* Tracked issues for Done epics explicitly disposed (completed, carried forward, promoted to cross-epic issue, or explicitly dropped).
 
-Only update a prior epic record when the change prevents future planning errors (for example: a wrong token name, a wrong canonical evidence filename/path, or a broken cross-reference that would mislead new epics). Otherwise, treat prior epic records as historical snapshots.
-
-**Build Notes posture (PF10):**
-
-PF10 Build Notes are treated as living context. When PF10 is referenced in PF20, avoid BN version strings and PF10 section anchoring; prefer the relevant Addendum entry (number \+ title) when available.
-
-**Scope note — epics not yet recorded in PF20:**
-
-If an epic does not yet have a PF20 “Epic Record,” its Epic Plan **MUST NOT** import or claim PF20 baseline token rosters as plan obligations. Instead, the plan **MUST** define an epic-local **in-scope acceptance roster** (token names \+ owner PF) and explicitly list any **deferred tokens** (short reason \+ intended future epic).
-
-When the epic is later added to PF20, the plan’s in-scope roster becomes the seed for that epic record’s acceptance roster; deferred tokens should be migrated into that epic’s **Tracked Issues**.
-
-### **Phase Exit Criteria (planning rule)**
-
-For alchemical phases (Calcination → Coagulation) as defined in **7 Phases of Alchemical Engineering** (PF21, titles-only), PF20 treats **phase exit** as a planning decision, not as an assertion that all work in that phase is finished. A phase may be treated as **exit-ready** for planning when all of the following are true:
-
-* **At least one close-out epic in that phase is Done:**
-
-  * The phase has at least one epic whose PF20 record shows **Status: Done**, with all of its D-goals accepted and a completed “Tokens and Evidence (Acceptance)” roster in that epic record.
-
-  * That epic has a close pack (manifest, close report, acceptance map) whose required evidence is indexed in the human Evidence Index and Machine Mirror under the PF09/PF12 discipline for that phase.
-
-* **No “Not done” foundation rows remain for that phase in PF09:**
-
-  * In **PF09 — HDE-Build Checklist**, the **foundation tasks** for that phase (for example, Calcination foundations or phase-defining Dissolution/Separation tasks) have no `Not done` status.
-
-  * Any remaining `Not done` rows in that phase must be either:
-
-    * explicitly re-scoped into later phases (and reflected as such in PF09), or
-
-    * marked as `Won’t Do` in PF20 via epic records or cross-epic issues, rather than left ambiguous.
-
-* **Partial / Consolidation pending rows are explicit debt, not silent blockers:**
-
-  * Remaining `Partial` or `Consolidation pending` rows in PF09 for that phase are understood as **tuning or consolidation debt**, not missing foundational behavior, only if their notes clearly indicate this and they are either:
-
-    * linked to an **Outstanding Issue** record in PF20 §1, or
-
-    * explicitly called out in one or more future epic records as “Existing work / Debt to absorb,” so the next epic’s scope and acceptance can take them on.
-
-* **Tracked issues are fully disposed of for Done epics in that phase:**
-
-  * For every epic in that phase that reaches **Status: Done** in PF20, the epic record’s **Tracked Issues** subsection is populated and each issue is marked as **Completed under \<EPIC\>**, **Carried forward to \<EPIC\>**, **Promoted to ISSUE-XXX** (cross-epic), or **Explicitly dropped (with rationale)**.
-
-  * A phase is not considered exit-ready if any epic in that phase is `Done` while still harboring unresolved, undocumented issues in reality; known issues must be explicitly disposed of in that epic record.
-
-When these criteria are satisfied, PF20 treats the phase as **complete for planning**: new work that would previously have lived in that phase should be captured as cross-epic issues in §1 or as scope for epics in the next phase, rather than by reopening more epics in the now-exited phase. This formalizes the pattern already applied when leaving earlier phases and keeps phase boundaries aligned with PF13’s “controlled change” and PF21’s phase-discipline guidance, while leaving detailed execution flow and CI/QA rails to PF06, PF09, and PF19.
+PF20 does not enforce these criteria for new work. For current planning and phase discipline, consult the owning canon and templates (titles-only).
 
 ---
 
@@ -4346,4 +4299,372 @@ Posture: Deferred.
 Issue: Acceptance rosters and artifacts must not claim tokens that are not registered in the canonical token registry.  
 Why it matters: Token registry mismatch must block claiming acceptance for those tokens (but must not block evidence capture).  
 Posture: Deferred; do not maintain “known unregistered tokens” lists in this epic record—treat registry validation output as the authoritative evidence.
+
+### **2.8 HDE-EPIC023 Epic Plan**
+
+#### **2.8.1 Meta**
+
+**Epic ID:** HDE-EPIC023  
+ **Epic title:** HDE Calcination Pass 5  
+ **Status:** Done (closure approved via override)  
+ **Date started:** 2026-01-04  
+ **Date completed:** 2026-01-11  
+ **Alchemical phase:** Calcination (phase numbering Unknown (not present in inputs))  
+ **Primary location(s):** `audit/qa/hde-epic023/`; `audit/gates/`; `audit/EPIC-023_close_report.md`; `audit/EPIC-023_MANIFEST.json`; `docs/acceptance_map_epic023.json`  
+ **Branch:** Unknown (not present in inputs)  
+ **Primary intent (CRD statement):** Close out Calcination Pass 5 by establishing governed acceptance/evidence scaffolding, resolving evidence-index snapshot discipline \+ schema hygiene, ensuring canonical JSON gate artifacts exist at canonical loci, capturing PF23 consult evidence, pinning acceptance-alignment validator rails, and producing a governed close-pack \+ docs surfaces (planned: r2 Implementation Plan; actual: PF10 execution \+ closure override).
+
+**Outcome posture (PF10):** “Outcome label: Closure approved (override)” with accepted gaps \+ drain targets recorded in PF10 — HDE Build Notes, §2.55.
+
+**PF09 scope pointers (as provided in r2 Implementation Plan; ownership Unknown (not present in inputs)):**
+
+* **HDE-CALC003.1**
+
+* **HDE-CALC003.2**
+
+* **HDE-CALC003.9**
+
+* **HDE-CALC003.10**
+
+* **HDE-CALC003.11**
+
+* **HDE-CALC003.13**
+
+* **HDE-CALC003.15**
+
+* **HDE-SEPA004.4**
+
+* **HDE-SEPA004.5**
+
+**Out of scope (explicit):** Unknown (not present in inputs)
+
+Plan revision note (mismatch): PF10 references “r4 Epic Plan HDE-EPIC023” (PF10 — HDE Build Notes, §2.2), but the provided Implementation Guide input is “r2 Implementation Plan HDE-EPIC023.md”; r4 content is Unknown (not present in inputs).
+
+#### **2.8.2 Existing Work Check**
+
+**Planned (r2 Implementation Plan — Brief recap of scope):**
+
+* Epic framed as a closure \+ evidence-discipline pass: tighten governed evidence surfaces, avoid fabricated paths, and make acceptance artifacts canonical and checkable (r2 Implementation Plan HDE-EPIC023 — “Brief recap of scope (EPIC023)”).
+
+* Canonical directory policy for canonical JSON gate artifacts: `audit/gates/canonical_json/` (decision reinforced in PF10 — HDE Build Notes, §2.2).
+
+* Evidence registry / index surfaces are assumed to exist and must be validated without introducing ad-hoc lockfiles (r2 plan PR-05 intent; details in PR-05 section).
+
+**Actual baseline condition observed during execution (PF10 anchors):**
+
+* Canonical JSON gate directory policy explicitly set: “canonical directory for JSON canonicalization is `audit/gates/canonical_json/`” (PF10 — HDE Build Notes, §2.2).
+
+* Revalidation sweep expanded scope to include EPIC-022 close-pack proof files due to evidence tooling encountering missing proofs (PF10 — HDE Build Notes, §2.16; proof files cited there, e.g., `audit/EPIC-022_close_report.md.path_proof.txt`, `audit/EPIC-022_MANIFEST.json.path_proof.txt`).
+
+* Evidence-index snapshot discipline identified as tooling-blocked posture, later accepted as an override gap with a drain target (PF10 — HDE Build Notes, §2.53 and §2.55).
+
+Existing-work uncertainty: What specifically existed in-repo before 2026-01-04 beyond the above decisions is Unknown (not present in inputs).
+
+#### **2.8.3 Deliverables (Jobs-to-be-done) — Planned vs Actual Reconciliation**
+
+##### **D0 — Epic close-pack readiness and evidence discipline (supporting deliverable)**
+
+**Planned (r2 Implementation Plan — Crosswalk \+ PR-01):**
+
+* Intent/scope: “Epic close-pack readiness and evidence discipline (supporting deliverable).”
+
+* Planned implementation emphasis: acceptance scaffolds \+ doc-delta surfaces \+ evidence-index mirror/paths validity (PR-01).
+
+* Planned acceptance tokens (PR-01): `DOC_DELTA_PRESENT_OK`, `QA_ACCEPTANCE_MAP_VIABILITY_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`.
+
+* Planned evidence outputs include (PR-01 “Evidence outputs”): `audit/qa/hde-epic023/doc_deltas.md`, `audit/qa/hde-epic023/doc_delta.mirror.json`, `audit/qa/hde-epic023/evidence_index_snapshot.json`, `audit/qa/hde-epic023/token_evidence_matrix.md`, `audit/qa/hde-epic023/qa_step_logs_manifest.json`, `audit/qa/hde-epic023/qa_step_log_header.json`, and `audit/qa/hde-epic023/00_meta/codespaces_snapshot.json` (plus conditional `artifacts/...` updates if governed bytes change).
+
+**Actual (PF10):**
+
+* PR01 executed as remediation-heavy review stream (PF10 — HDE Build Notes, §2.9) with evidence tooling checks referenced (names-only; detailed command lines omitted here).
+
+* QA decision stream includes (PASS):
+
+  * `CHECK D07_codespaces_snapshot` and `CHECK D08_qa_doc_deltas_capture` with evidence pointers `audit/qa/hde-epic023/00_meta/codespaces_snapshot.json` and `audit/qa/hde-epic023/00_meta/doc_deltas.md` (PF10 — HDE Build Notes, §2.22).
+
+  * `CHECK D10_doc_delta_draft` with evidence pointer `audit/docdeltas/hde-epic023_doc_deltas.md` (PF10 — HDE Build Notes, §2.32).
+
+* Doc-delta canonical posture decision recorded separately: doc deltas live at `audit/docdeltas/*.md` and epic-scoped mirrors may exist under `audit/qa/...` (PF10 — HDE Build Notes, §2.5).
+
+Disposition: Partially satisfied; doc-delta evidence exists and is checked, but planned vs actual paths differ across stages (`audit/qa/hde-epic023/doc_deltas.md` vs `audit/qa/hde-epic023/00_meta/doc_deltas.md` vs `audit/docdeltas/hde-epic023_doc_deltas.md`). The planned artifact `audit/qa/hde-epic023/qa_step_log_header.json` is Unknown (not present in inputs) in PF10, and must not be assumed.
+
+##### **D1 — Determinism pins posture for governed bytes (no ad-hoc env-pins lock artifacts)**
+
+**Planned (r2 Implementation Plan — Crosswalk \+ PR-05):**
+
+* Intent/scope: “Determinism pins posture for governed bytes (no ad-hoc env-pins lock artifacts).”
+
+* Planned acceptance tokens (PR-05): `QA_ACCEPTANCE_MAP_VIABILITY_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`, `SANITY_PIPELINE_OK`, `DETERMINISM_ENV_PINS_OK`, `JSON_CANONICAL_CHECK_OK`, `DOC_DELTA_PRESENT_OK`, `TWO_RUN_IDENTITY_OK`.
+
+**Actual (PF10):**
+
+* Determinism policy and ADR framing recorded: ADR-001 (PF10 — HDE Build Notes, §2.40, §2.41, §2.42) and explicit constraints on determinism checks and entrypoints (PF10 — HDE Build Notes, §2.44, §2.45).
+
+* QA decision stream (PASS):
+
+  * `CHECK D17_env_pins` with evidence pointers `audit/qa/hde-epic023/checks/D17_env_pins/primary.log` and `audit/qa/hde-epic023/checks/D17_env_pins/structured_record.json` (PF10 — HDE Build Notes, §2.47).
+
+  * `CHECK D18_sanity_log` with evidence pointers `audit/qa/hde-epic023/checks/D18_sanity_log/primary.log` and `audit/qa/hde-epic023/checks/D18_sanity_log/structured_record.json` (PF10 — HDE Build Notes, §2.48).
+
+* Additional determinism-related evidence surfaces referenced: `artifacts/ops/internal_version/` and `docs/ENDPOINTS_CATALOG.json` (PF10 — HDE Build Notes, §2.51). Specific header file names under `artifacts/ops/internal_version/` are prefixes only (e.g., `artifacts/ops/internal_version/headers_`); full filenames are Unknown (not present in inputs).
+
+Disposition: Satisfied with recorded ADR posture and PASS checks; no ad-hoc env-pin lockfile artifacts are evidenced in PF10 beyond the governed check outputs cited above.
+
+D2 — Canonical JSON artifacts exist at canonical loci \+ include path-proofs; compare is evidence under canonical token
+
+**Planned (r2 Implementation Plan — Crosswalk \+ PR-03):**
+
+* Intent/scope: “Canonical JSON artifacts must exist at canonical loci \+ include path-proofs; compare is evidence under the canonical token.”
+
+* Planned acceptance tokens (PR-03): `JSON_CANONICAL_CHECK_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`.
+
+* Planned evidence outputs (PR-03 “Evidence outputs”): `audit/gates/canonical_json/json_canon_compare.log`, `audit/gates/canonical_json/canonical_json_gate.json`, `audit/gates/canonical_json/canonical_json_gate.sha256` plus corresponding `.path_proof.txt` files.
+
+**Actual (PF10):**
+
+* Canonical directory decision reaffirmed: `audit/gates/canonical_json/` is canonical (PF10 — HDE Build Notes, §2.2).
+
+* QA decision stream (PASS):
+
+  * `CHECK D20_json_gate_compare_log` with evidence pointer `audit/gates/canonical_json/json_canon_compare.log` (PF10 — HDE Build Notes, §2.50).
+
+  * `CHECK D22_canonical_json_gate_structured_record` with evidence pointer `audit/qa/hde-epic023/checks/D22_canonical_json_gate_structured_record/primary.log` (PF10 — HDE Build Notes, §2.52).
+
+  * `CHECK D19_json_gate_check_log` with evidence pointers `audit/qa/hde-epic023/checks/D19_json_gate_check_log/primary.log` and `audit/qa/hde-epic023/checks/D19_json_gate_check_log/structured_record.json` (PF10 — HDE Build Notes, §2.49).
+
+* **Recorded mismatch accepted at close:** Closure override notes canonical JSON gate directory drift, citing additional surfaces under `audit/gates/json_gate/canonical/` (PF10 — HDE Build Notes, §2.55).
+
+Disposition: Satisfied with PASS checks, with an explicit accepted mismatch: dual-family reporting (`audit/gates/canonical_json/` vs `audit/gates/json_gate/canonical/`) recorded as a closure-override gap (PF10 — HDE Build Notes, §2.55).
+
+##### **D3 — Acceptance-alignment validator rails pinned, and test exists**
+
+**Planned (r2 Implementation Plan — Crosswalk \+ PR-04):**
+
+* Intent/scope: “Acceptance alignment validator rails must be pinned, and test must exist.”
+
+* Planned acceptance token (PR-04): `QA_ACCEPTANCE_MAP_VIABILITY_OK`.
+
+* Planned evidence outputs (PR-04 “Evidence outputs”): `tests/qa/test_epic023_acceptance_alignment.py`, `audit/qa/hde-epic023/qa_step_logs_manifest.json`, `audit/qa/hde-epic023/qa_step_log_header.json`.
+
+**Actual (PF10):**
+
+* Test creation/rails alignment recorded: `tests/qa/test_epic023_acceptance_alignment.py` (PF10 — HDE Build Notes, §2.11 and §2.12).
+
+* Remediation loop recorded: token evidence matrix parsing updated to align r2/r3/r4 drift, supporting the validator (PF10 — HDE Build Notes, §2.28) with transcript evidence `audit/qa/hde-epic023/remediation/s1_dev_fix_d04_parser/pytest_epic023_acceptance_alignment.txt`.
+
+* Closed-rails rerun evidence recorded for D04 validator: `audit/qa/hde-epic023/checks/d04_acceptance_alignment_validator/primary.log` and manifest correction note (PF10 — HDE Build Notes, §2.29).
+
+Disposition: Satisfied; planned test exists and remediation/rerun evidence is recorded. Planned `audit/qa/hde-epic023/qa_step_log_header.json` remains Unknown (not present in inputs) in PF10 and must not be assumed.
+
+##### **D4 — PF23 consult note exists (non-token deliverable)**
+
+**Planned (r2 Implementation Plan — Crosswalk \+ PR-02):**
+
+* Intent/scope: “PF23 consult note must exist but is non-token.”
+
+* Planned evidence outputs (PR-02 “Evidence outputs”): `audit/qa/hde-epic023/pf23_consult_note.md` (plus doc-delta updates if changed).
+
+**Actual (PF10):**
+
+* PF23 consult capture check (PASS): `CHECK D09_pf23_consult_capture` with evidence pointer `audit/qa/hde-epic023/00_meta/pf23_consult.md` (PF10 — HDE Build Notes, §2.25).
+
+* PR02 references consult-note artifact: `audit/qa/hde-epic023/pf23_consult_note.md` (PF10 — HDE Build Notes, §2.10).
+
+Disposition: Satisfied, with a naming/location mismatch that must be archived: planned/PR02 artifact `audit/qa/hde-epic023/pf23_consult_note.md` vs check-evidenced `audit/qa/hde-epic023/00_meta/pf23_consult.md` (PF10 — HDE Build Notes, §2.25 and §2.10).
+
+##### **D5 — All jobs-to-be-done: close-pack \+ docs PR**
+
+**Planned (r2 Implementation Plan — Crosswalk \+ PR-06):**
+
+* Intent/scope: “All jobs-to-be-done; close-pack \+ docs PR.”
+
+* Planned acceptance tokens (PR-06): `QA_ACCEPTANCE_MAP_VIABILITY_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`, `SANITY_PIPELINE_OK`, `DETERMINISM_ENV_PINS_OK`, `JSON_CANONICAL_CHECK_OK`, `DOC_DELTA_PRESENT_OK`, `TWO_RUN_IDENTITY_OK`.
+
+* Planned evidence outputs (PR-06 “Evidence outputs” includes): `audit/EPIC-023_close_report.md`, `audit/EPIC-023_MANIFEST.json`, `docs/acceptance_map_epic023.json`, `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256` (plus `.path_proof.txt` variants).
+
+**Actual (PF10):**
+
+* Close pack artifacts produced and referenced: `audit/EPIC-023_close_report.md` and `audit/EPIC-023_MANIFEST.json` (PF10 — HDE Build Notes, §2.14; and closure-override references in §2.55).
+
+* Acceptance map and docs surfaces referenced: `docs/acceptance_map_epic023.json` and `docs/evidence/INDEX.json` and `docs/evidence/INDEX.sha256` (PF10 — HDE Build Notes, §2.15 and §2.37).
+
+* Evidence-index mirror/registry checks (PASS): `CHECK D13_human_index`, `CHECK D14_index_hash_sentinel`, `CHECK D15_machine_mirror` with evidence pointers `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.mirror.json` (PF10 — HDE Build Notes, §2.37).
+
+* Evidence-index snapshot posture (PASS but tooling-blocked posture): `CHECK D23_evidence_index_snapshot_artifact` with evidence pointers `audit/qa/hde-epic023/checks/D23_evidence_index_snapshot_artifact/primary.log` and `audit/qa/hde-epic023/checks/D23_evidence_index_snapshot_artifact/structured_record.json`; closure override also cites `audit/gates/evidence_index_snapshot/evidence_index_snapshot.json` (PF10 — HDE Build Notes, §2.53 and §2.55).
+
+* Final closure posture recorded as override with gaps and drain targets (PF10 — HDE Build Notes, §2.55).
+
+Disposition: Satisfied for close-pack \+ docs surfaces with an explicit override posture; accepted gaps include doc updates to PF12/PF19 and canonical JSON \+ evidence-index snapshot gate-family drift (PF10 — HDE Build Notes, §2.55).
+
+#### **2.8.4 PF Reference Map**
+
+* PF10 — HDE Build Notes, §2.2 (canonical JSON gate directory decision)
+
+* PF10 — HDE Build Notes, §2.5 (doc-delta canonical posture)
+
+* PF10 — HDE Build Notes, §2.9–§2.15 (EPIC023 PR review stream \+ docs PR)
+
+* PF10 — HDE Build Notes, §2.16 (revalidation sweep; scope expansion to EPIC-022 proof files)
+
+* PF10 — HDE Build Notes, §2.22, §2.25, §2.26, §2.29, §2.30, §2.32, §2.34, §2.35, §2.37, §2.46–§2.53 (closure check stream decisions \+ evidence pointers)
+
+* PF10 — HDE Build Notes, §2.40–§2.45 (ADR-001 determinism \+ entrypoint policy)
+
+* PF10 — HDE Build Notes, §2.55 (closure override; accepted gaps \+ drain targets)
+
+* PF27 — Canon Plan Templates, §Epic Record Template (Normative)
+
+* r2 Implementation Plan HDE-EPIC023.md — §Brief recap of scope (EPIC023); §Crosswalk: IG items → Plan tasks; §PR-01…§PR-06
+
+---
+
+#### **2.8.5 Tokens and Evidence (Acceptance)**
+
+##### **A. Baseline (required for epic close)**
+
+**A1. Planned baseline tokens (r2 plan PR-06):**
+
+* `QA_ACCEPTANCE_MAP_VIABILITY_OK`
+
+* `EVIDENCE_INDEX_MIRROR_OK`
+
+* `EVIDENCE_PATHS_VALIDATED_OK`
+
+* `SANITY_PIPELINE_OK`
+
+* `DETERMINISM_ENV_PINS_OK`
+
+* `JSON_CANONICAL_CHECK_OK`
+
+* `DOC_DELTA_PRESENT_OK`
+
+* `TWO_RUN_IDENTITY_OK`
+
+**A2. Actual token coverage posture (PF10):**
+
+* PF10 records an explicit 8-token set as “Key proof facts” and ties it to evidence pointers `audit/qa/hde-epic023/token_evidence_matrix.md` and `audit/qa/hde-epic023/acceptance_map_viability.log` (PF10 — HDE Build Notes, §2.13).
+
+##### **B. Deliverable tokens (this epic)**
+
+* **D0:** Planned tokens `DOC_DELTA_PRESENT_OK`, `QA_ACCEPTANCE_MAP_VIABILITY_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`; actual evidence includes `audit/docdeltas/hde-epic023_doc_deltas.md` (PF10 §2.32) and `audit/qa/hde-epic023/acceptance_map_viability.log` \+ `audit/qa/hde-epic023/token_evidence_matrix.md` (PF10 §2.26 / §2.13).
+
+* **D1:** Planned determinism tokens `SANITY_PIPELINE_OK`, `DETERMINISM_ENV_PINS_OK`; actual checks include `audit/qa/hde-epic023/checks/D17_env_pins/...` and `audit/qa/hde-epic023/checks/D18_sanity_log/...` (PF10 §2.47 / §2.48).
+
+* **D2:** Planned `JSON_CANONICAL_CHECK_OK`; actual gate evidence includes `audit/gates/canonical_json/json_canon_compare.log` (PF10 §2.50) and `audit/qa/hde-epic023/checks/D19_json_gate_check_log/...` (PF10 §2.49).
+
+* **D3:** Planned validator posture supports `QA_ACCEPTANCE_MAP_VIABILITY_OK`; actual includes `tests/qa/test_epic023_acceptance_alignment.py` (PF10 §2.11 / §2.12) and `audit/qa/hde-epic023/checks/d04_acceptance_alignment_validator/primary.log` (PF10 §2.29).
+
+* **D4:** Non-token; actual includes `audit/qa/hde-epic023/00_meta/pf23_consult.md` (PF10 §2.25) and PR02 consult-note reference `audit/qa/hde-epic023/pf23_consult_note.md` (PF10 §2.10).
+
+* **D5:** Close pack \+ docs; actual includes `audit/EPIC-023_close_report.md`, `audit/EPIC-023_MANIFEST.json`, `docs/acceptance_map_epic023.json`, `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256` (PF10 §2.14 / §2.15 / §2.37).
+
+##### **C. Evidence pointers (titles-only; non-exhaustive; verbatim paths only)**
+
+* `audit/qa/hde-epic023/token_evidence_matrix.md`
+
+* `audit/qa/hde-epic023/acceptance_map_viability.log`
+
+* `audit/EPIC-023_close_report.md`
+
+* `audit/EPIC-023_MANIFEST.json`
+
+* `docs/acceptance_map_epic023.json`
+
+* `docs/evidence/INDEX.json`
+
+* `docs/evidence/INDEX.sha256`
+
+* `audit/gates/canonical_json/json_canon_compare.log`
+
+* `audit/gates/topology/orientation_demo.txt`
+
+* `audit/qa/hde-epic023/checks/D23_evidence_index_snapshot_artifact/primary.log`
+
+* `audit/gates/evidence_index_snapshot/evidence_index_snapshot.json` (cited in PF10 closure override)
+
+---
+
+#### **2.8.6 QA Rails — Open/Close (Final PR)**
+
+##### **A. QA check stream executed (PF10 decision series; outcomes)**
+
+* PASS: `CHECK D07_codespaces_snapshot` and `CHECK D08_qa_doc_deltas_capture` → `audit/qa/hde-epic023/00_meta/codespaces_snapshot.json`, `audit/qa/hde-epic023/00_meta/doc_deltas.md` (PF10 — HDE Build Notes, §2.22).
+
+* PASS: `CHECK D09_pf23_consult_capture` and `CHECK D01_acceptance_map` → `audit/qa/hde-epic023/00_meta/pf23_consult.md`, `docs/acceptance_map_epic023.json` (PF10 — HDE Build Notes, §2.25).
+
+* PASS: `CHECK D02_token_evidence_matrix` and `CHECK D03_acceptance_viability` → `audit/qa/hde-epic023/token_evidence_matrix.md`, `audit/qa/hde-epic023/acceptance_map_viability.log` (PF10 — HDE Build Notes, §2.26).
+
+* PASS: `CHECK D05_step_logs_manifest` and `CHECK D06_primary_step_logs` → `audit/qa/hde-epic023/qa_step_logs_manifest.json` and `audit/qa/hde-epic023/checks/` (PF10 — HDE Build Notes, §2.30).
+
+* PASS: `CHECK D10_doc_delta_draft` and `CHECK D11_close_report` → `audit/docdeltas/hde-epic023_doc_deltas.md` and close-pack references (PF10 — HDE Build Notes, §2.32 and §2.34).
+
+* PASS: `CHECK D12_close_pack_manifest` → `audit/EPIC-023_MANIFEST.json` (PF10 — HDE Build Notes, §2.35).
+
+* PASS: `CHECK D13_human_index`, `CHECK D14_index_hash_sentinel`, `CHECK D15_machine_mirror` → `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.mirror.json` (PF10 — HDE Build Notes, §2.37).
+
+* PASS: `CHECK D16_orientation_demo` → `audit/gates/topology/orientation_demo.txt`, `audit/qa/hde-epic023/checks/D16_orientation_demo/...` (PF10 — HDE Build Notes, §2.46).
+
+* PASS: `CHECK D17_env_pins` → `audit/qa/hde-epic023/checks/D17_env_pins/...` (PF10 — HDE Build Notes, §2.47).
+
+* PASS: `CHECK D18_sanity_log` → `audit/qa/hde-epic023/checks/D18_sanity_log/...` (PF10 — HDE Build Notes, §2.48).
+
+* PASS: `CHECK D19_json_gate_check_log` and `CHECK D20_json_gate_compare_log` → `audit/qa/hde-epic023/checks/D19_json_gate_check_log/...`, `audit/gates/canonical_json/json_canon_compare.log` (PF10 — HDE Build Notes, §2.49 and §2.50).
+
+* PASS: `CHECK D22_canonical_json_gate_structured_record` → `audit/qa/hde-epic023/checks/D22_canonical_json_gate_structured_record/primary.log` (PF10 — HDE Build Notes, §2.52).
+
+* PASS (posture-only; tooling-blocked acceptance recorded): `CHECK D23_evidence_index_snapshot_artifact` → `audit/qa/hde-epic023/checks/D23_evidence_index_snapshot_artifact/primary.log` (PF10 — HDE Build Notes, §2.53).
+
+##### **B. Reruns / remediations explicitly recorded**
+
+* Closed-rails rerun recorded for acceptance-alignment validator: `audit/qa/hde-epic023/checks/d04_acceptance_alignment_validator/primary.log` and related manifest correction note (PF10 — HDE Build Notes, §2.29).
+
+* Parsing remediation to align r2/r3/r4 token evidence matrix for validator: `audit/qa/hde-epic023/remediation/s1_dev_fix_d04_parser/pytest_epic023_acceptance_alignment.txt` (PF10 — HDE Build Notes, §2.28).
+
+##### **C. Close posture (override) and non-blocking gaps**
+
+* Closure override accepted gaps include:
+
+  * Evidence-index snapshot pointer recorded at `audit/gates/evidence_index_snapshot/evidence_index_snapshot.json` while D23 remains tooling-blocked posture; drain targets recorded (PF10 — HDE Build Notes, §2.55).
+
+  * Canonical JSON gate directory drift noted (`audit/gates/canonical_json/` vs `audit/gates/json_gate/canonical/`), to be converged later (PF10 — HDE Build Notes, §2.55).
+
+  * PF12 and PF19 updates explicitly listed as drain targets (PF10 — HDE Build Notes, §2.55).
+
+---
+
+#### **2.8.7 Tracked Issues (if applicable; EPIC023 posture)**
+
+**Tracked issues referenced in r2 plan:** `TI-023-01`, `TI-023-02`, `TI-023-03` (r2 Implementation Plan HDE-EPIC023.md — PR-06 “Tracked issues \+ disposition”).
+
+**Actual disposition detail:** PF10 notes that the close report contains TI dispositions, but does not include the per-TI outcomes verbatim in the build notes; therefore per-TI outcomes are Unknown (not present in inputs). Evidence pointer: `audit/EPIC-023_close_report.md` (PF10 — HDE Build Notes, §2.14).
+
+**Accepted closure gaps tracked as drain targets (PF10):**
+
+* “PF12 updates to align canonical JSON gate artifacts and evidence-index snapshot discipline” (PF10 — HDE Build Notes, §2.55).
+
+* “PF19 update for Live QA Plan template overlap with EPIC closure record” (PF10 — HDE Build Notes, §2.55).
+
+* “Converge canonical JSON gate reporting under a single gate family” (PF10 — HDE Build Notes, §2.55).
+
+---
+
+#### **2.8.8 Plan Preflight (MUST)**
+
+**Normative preflight items (PF27 — Canon Plan Templates, §Epic Record Template (Normative) → “Plan Preflight (MUST)”):**
+
+* Confirm plan uses canonical naming and does not invent evidence paths.
+
+  * Actual enforcement signal: PF10 records anti-fabrication posture (“forbid invented entrypoints and fabricated path proof usage”) (PF10 — HDE Build Notes, §2.44; also reinforced in PR03 review notes in §2.11).
+
+* Confirm acceptance tokens are explicitly listed and evidence pointers are enumerated.
+
+  * Planned: explicit token lists in r2 plan PR-01/PR-03/PR-05/PR-06.
+
+  * Actual: PF10 records an 8-token set tied to `audit/qa/hde-epic023/token_evidence_matrix.md` (PF10 — HDE Build Notes, §2.13).
+
+* Confirm closure posture expectations vs tooling constraints are surfaced before “Done.”
+
+  * Actual: D23 posture recorded as tooling-blocked and accepted via closure override with drain targets (PF10 — HDE Build Notes, §2.53 and §2.55).
+
+Preflight completion record: Unknown (not present in inputs) beyond the enforcement signals and closure-override documentation cited above.
 

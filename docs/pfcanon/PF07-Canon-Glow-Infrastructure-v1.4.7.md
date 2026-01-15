@@ -1,12 +1,12 @@
 # **0\. Front Matter**
 
 **Title:** PF07-Canon-Glow-Infrastructure  
-**Version:** v1.3.8
+**Version:** v1.4.7
 
 **Status:** Canon  
-**Effective date:** 2026-01-03
+**Effective date:** 2026-01-13
 
-**Last Update Gate:** BN 8.8.4
+**Last Update Gate:** BN 9.3.4 Drain A54-57
 
 **Invocation tag:** `INV-f2ac55d77ce9aacc`
 
@@ -1187,6 +1187,28 @@ Whenever governed evidence bytes change, update in the same change-set:
 
 Some acceptance claims are path-sensitive and have a single canonical governed evidence surface. Where a fixed canonical path exists, any plan/matrix/index/mirror binding to a different path is a mechanical blocker and must be corrected (not interpreted).
 
+### **Evidence index snapshot (canonical surface)**
+
+The only valid governed evidence surface for evidence index snapshot artifacts is:
+
+* `audit/gates/evidence_index_snapshot/evidence_index_snapshot.json`
+
+* `audit/gates/evidence_index_snapshot/evidence_index_snapshot.json.path_proof.txt`
+
+Bindings for evidence index snapshot evidence MUST reference this governed surface only. The EPIC-local variant under `audit/qa/hde-epic<NNN>/.../evidence_index_snapshot.json` is not a closure-required canonical surface; snapshot copies may exist as run-local convenience, but the canonical evidence surface and index binding remain the governed `audit/gates/evidence_index_snapshot/...` path above.
+
+### **Determinism predicate surfaces lock (routing-only)**
+
+Determinism remediation predicates for D16–D18 MUST validate the canonical emitted evidence surfaces recorded in this section (D16: topology orientation demo; D17: determinism env pins log; D18: sanity log) and MUST NOT require wrapper bundles or extra non-canon marker lines.
+
+**D17 env pins log predicate shape (routing-only).** The first JSON record MUST be a compact object with keys: `env` (object), `status` (string), `suites` (array). Validators MUST NOT require schema, rails, or other wrapper fields.
+
+**D18 sanity log predicate markers (routing-only).** Validators MUST accept the canonical structure (header `sanity_pipeline`, then `env:`, then one-or-more `check ...`, ending with `summary:PASS`) and MUST NOT require `run:sanity-pipeline` or `env_pins:` marker lines.
+
+**Path-proof naming is locked.** For these canonical surfaces, the path-proof MUST be the full filename plus `.path_proof.txt` (including the original extension), for example `env_pins.log.path_proof.txt` (not `env_pins.path_proof.txt`).
+
+**Citation posture (routing-only).** PF20 — HDE-Phased-Epics MUST NOT be cited to define evidence surface paths, evidence shapes, or remediation predicate targets. Plans/remediations MUST cite PF10 — HDE-Build Notes, PF09 — HDE-Build Checklist, PF06 — Epic-Process-Guide, PF12 — HDE-Schemas & Artifacts, PF19 — Glow QA Guide, and PF04 — HDE-Governance (as applicable) for those requirements.
+
 ### Determinism env pins (canonical surface)
 
 The only valid governed evidence surface for determinism env pins is:
@@ -1198,9 +1220,53 @@ Bindings for determinism env pins MUST reference this governed surface only. Sna
 
 **Note (pins).** Canonical determinism pins are the locale/timezone pins listed in the governing sections referenced by the QA posture. PYTHONHASHSEED is not part of the canonical pins set and must not be required for plan approval or execution.
 
+### **Sanity log (canonical surface)**
+
+The only valid governed evidence surface for sanity log artifacts is:
+
+* `artifacts/sanity/sanity.log`
+
+* `artifacts/sanity/sanity.log.path_proof.txt`
+
+Bindings for sanity log evidence MUST reference this governed surface only. Snapshot copies under epic QA trees are allowed as run-local convenience, but the canonical evidence surface and index binding remain the governed `artifacts/sanity/...` path above.
+
+### **Canonical JSON gates (canonical surface)**
+
+The only valid governed evidence surface for canonical JSON gate artifacts is:
+
+* `audit/gates/json_gate/canonical/`
+
+Legacy / non-authoritative (MUST NOT be treated as the canonical evidence surface for acceptance binding or indexing):
+
+* `audit/gates/canonical_json/`
+
+* `audit/gates/canonical/`
+
+Implementation Plan legacy record (non-authoritative; MUST NOT be required for future Implementation Plans or Live QA Plans unless canon explicitly reinstates it via Schemas & Artifacts):
+
+* `audit/gates/canonical_json/canonical_json.gate.json`
+
+* `audit/gates/canonical_json/canonical_json.gate.json.path_proof.txt`
+
+No dual-home binding: acceptance maps, token/evidence matrices, close-pack manifests, and Evidence Index/Mirror entries MUST reference only `audit/gates/json_gate/canonical/` for canonical JSON gate evidence.
+
+Canonical artifacts under this root (names-only; minimum family):
+
+* `audit/gates/json_gate/canonical/json_gate_check_log.ndjson`
+
+* `audit/gates/json_gate/canonical/json_gate_compare_log.ndjson`
+
+* `audit/gates/json_gate/canonical/json_gate_structured_record.json`
+
+* (plus corresponding path proofs as defined by the owning canon)
+
 ### `/internal/version` evidence bundle (canonical root; names-only)
 
 The governed evidence bundle for `/internal/version` is rooted at: `artifacts/ops/internal_version/`
+
+Endpoint Catalog inventory file (names-only; symlink surface):
+
+* `docs/ENDPOINTS_CATALOG.json`
 
 Canonical artifact family under this root (names-only):
 
@@ -1243,7 +1309,15 @@ To prevent naming ambiguity and parallel spellings, governed epic close-pack art
 * `audit/EPIC-<NNN>_close_report.md`  
 * `audit/EPIC-<NNN>_MANIFEST.json`
 
+**Close-pack path proofs (names-only).** Each close-pack artifact above has a sibling path-proof file:
+
+* `audit/EPIC-<NNN>_close_report.md.path_proof.txt`
+
+* `audit/EPIC-<NNN>_MANIFEST.json.path_proof.txt`
+
 where `<NNN>` is a zero-padded 3-digit epic number (example: 022).
+
+These two files are the deterministic path-of-record for epic close-pack. Do not relocate them under other trees (for example `audit/qa/**` or `artifacts/**`). Additional copies elsewhere are convenience-only and MUST NOT be used for acceptance binding.
 
 **Epic QA root directory (canonical pattern).** Epic QA roots MUST be lower-case and MUST use:
 
@@ -1269,12 +1343,32 @@ Under the epic QA root, EPIC-level meta artifacts and run artifacts follow canon
 
 **Epic meta directory (stable):** `audit/qa/hde-epic<NNN>/00_meta/`
 
-* `audit/qa/hde-epic<NNN>/00_meta/codespaces_snapshot.json`  
+* `audit/qa/hde-epic<NNN>/00_meta/codespaces_snapshot.json (optional; non-mandatory)`
+
+* `audit/qa/hde-epic<NNN>/00_meta/codespaces_snapshot.json.path_proof.txt (optional; non-mandatory)`
+
 * `audit/qa/hde-epic<NNN>/00_meta/doc_deltas.md`
+
+* `audit/qa/hde-epic<NNN>/00_meta/doc_deltas.md.path_proof.txt`
+
+* `audit/qa/hde-epic<NNN>/00_meta/pf23_consult.md`
+
+**Doc-delta two-surface pair (names-only).** Doc-deltas are recorded in two distinct surfaces:
+
+* **Draft/staging path-proof (names-only):** `audit/docdeltas/hde-epic<NNN>_doc_deltas.md.path_proof.txt`
+
+* **Epic-scoped capture (QA record surface):** `audit/qa/hde-epic<NNN>/00_meta/doc_deltas.md`
+
+Placeholders like `audit/docdeltas/<doc-delta>.md` are nonconforming. The draft/staging surface MUST be a concrete filename.
 
 **Per-epic step-log manifest (stable; current-state):**
 
-* `audit/qa/hde-epic<NNN>/qa_step_logs_manifest.json`
+* `audit/qa/hde-epic<NNN>/qa_step_logs_manifest.json`  
+* `audit/qa/hde-epic<NNN>/qa_step_logs_manifest.json.path_proof.txt`
+
+**Per-check primary logs (stable; one per check):**
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/primary.log`
 
 **Optional per-run subtree (non-canon; history only):**
 
@@ -1300,7 +1394,11 @@ Live QA plans MUST NOT depend on helper/wrapper scripts unless the script is a c
 In addition to the close-pack artifacts, epics may carry governed acceptance-ledger artifacts at canonical paths:
 
 * Token↔Evidence matrix (per epic): `audit/qa/hde-epic<NNN>/token_evidence_matrix.md`  
-* Acceptance map (per epic): `docs/acceptance_map_epic<NNN>.json`
+* Acceptance map (per epic): `docs/acceptance_map_epic<NNN>.json`  
+* Acceptance map path-proof (per epic): `docs/acceptance_map_epic<NNN>.json.path_proof.txt`  
+* Acceptance map viability log (per epic): `audit/qa/hde-epic<NNN>/acceptance_map_viability.log`  
+* Token↔Evidence matrix path-proof (per epic): `audit/qa/hde-epic<NNN>/token_evidence_matrix.md.path_proof.txt`  
+* Acceptance map viability log path-proof (per epic): `audit/qa/hde-epic<NNN>/acceptance_map_viability.log.path_proof.txt`
 
 These are “where it lives” infra facts only. Semantics, required fields, and token rules live by title in the owning governance, QA, and schemas documents.
 
@@ -1310,6 +1408,14 @@ When governed evidence changes (Index, mirror, or governed artifacts), the evide
 
 * `audit/gates/topology/orientation_demo.txt`  
 * `audit/gates/topology/orientation_demo.txt.path_proof.txt`
+
+**EPIC023 orientation demo derived artifacts (names-only).** The D16 orientation demo check references an EPIC023 artifact directory under `artifacts/hde-epic023_orientation_demo/` derived from the canonical topology orientation demo surface listed above:
+
+* `artifacts/hde-epic023_orientation_demo/orientation_demo_report.json`
+
+* `artifacts/hde-epic023_orientation_demo/sample_result.json`
+
+Generator helper (names-only): `tools/evidence/generate_epic023_orientation_artifacts.py`
 
 ### Canonical path binding validation (routing-only)
 

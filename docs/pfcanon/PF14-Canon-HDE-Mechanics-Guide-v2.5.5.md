@@ -3,12 +3,12 @@
 ## 0.1 **Header**
 
 **Title:** PF14-Canon-HDE-Mechanics-Guide  
-**Version:** v2.4.5
+**Version:** v2.5.5
 
 **Status:** Canon  
-**Effective date:** 2026-01-01
+**Effective date:** 2026-01-15
 
-**Last Update Gate:** BN 8.7.7 Drain A50-51  
+**Last Update Gate:** Heading Adjustment  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
 ---
@@ -450,11 +450,11 @@ If the Index or sentinel path-proofs are stale or do not match the on-disk bytes
 
 Run `python tools/evidence/orientation_demo.py --check` to validate that the on-disk orientation report (`audit/gates/topology/orientation_demo.txt`) is coherent with the current Index/Mirror state and not stale.
 
-##### Mirror schema and path-proofs
+##### **Mirror schema and path-proofs**
 
 Run `python ci/checks/check_mirror_schema.sh` to enforce:
 
-*(This file is a Python entrypoint. `bash ci/checks/check_mirror_schema.sh` is invalid and MUST NOT be used. Direct execution is permitted only if the repo guarantees the executable bit and correct shebang.)*
+*(Canonical invocation: `python ci/checks/check_mirror_schema.sh`. `bash ci/checks/check_mirror_schema.sh` is invalid and MUST NOT be used.)*
 
 * the canonical mirror schema (field set, field order, canonical JSONL)  
 * uniqueness of `(artifact_key, discovered_physical_path)`  
@@ -515,6 +515,10 @@ The canonical governed evidence surface for determinism env pins is:
 
 * `audit/gates/determinism/env_pins.log`  
 * `audit/gates/determinism/env_pins.log.path_proof.txt`
+
+**Validator posture (normative; minimal predicate surface).**
+
+The `env_pins.log` predicate surface MUST be a **single-line JSON object** that is schema-valid as `determinism_env_pins.v1` and includes a `rails` object capturing the pinned run posture (at minimum: `ALLOW_NETWORK`, `SAFE_MODE`, `LC_ALL`, `LANG`, `TZ`).
 
 This is the only acceptable binding for determinism env pins in acceptance ledgers and indexing:
 
@@ -654,12 +658,21 @@ The Live QA harness **MUST**:
   * Live QA plans MUST NOT depend on helper/wrapper scripts unless the script is explicitly canon-named by path in PF canon (titles-only).  
   * If a step needs “tooling,” it MUST be either:  
     * a canon-named entrypoint by explicit path, or  
-    * an inline tool whose full source is embedded in the plan step and written into the run-local QA tools directory (no hidden dependencies).  
+    * an inline tool whose full source is embedded in the plan step and written ephemerally (for example under `/tmp`) before execution (no hidden dependencies).  
+  * Every plan step that claims a repo-provided entrypoint (script/module/CLI) MUST include a preflight existence check that demonstrates the entrypoint is present and runnable **before** attempting to run it (examples: `test -x …`, `python -c "import …"`, `command -v …`).  
+    * If the entrypoint is missing, the step outcome is **TOOLING\_BLOCKED**, the run MUST stop, and the transcript of the preflight check MUST be captured in the step log.  
+  * Evidence roots are not code roots: `audit/**` and `artifacts/**` are evidence/output roots. A Live QA plan MUST NOT treat files under these prefixes as pre-existing runnable code.  
+  * QA vs remediation separation: remediation steps may instruct reruns of QA checks, but they MUST use the approved QA plan’s canonical commands (or existing repo harness entrypoints). They MUST NOT mint new “shadow” QA runner entrypoints purely to mirror check IDs unless introduced by a normal dev change and canonized.  
   * When canon is silent on an entrypoint but requires an artifact surface, the plan MUST validate or generate the governed artifact surface directly using baseline commands, rather than inventing a new repo script path.  
   * “Baseline commands” means: explicit shell/Python one-liners, direct invocation of canon tools, `tee` for logs, and explicit file writes, with no reliance on opaque runners.  
-* **Gitless execution rails (normative).**  
-  * Live QA runbooks and harness steps **MUST NOT** include git operations (including but not limited to: `git checkout`, `git status` gating, `git add`, `git commit`, `git push`, or PR creation).  
-  * Live QA PASS/FAIL **MUST NOT** be determined by working-tree cleanliness. Evidence gating is artifact-based: required deliverables and step PASS/FAIL are validated by presence and contents of mechanically generated artifacts under `audit/qa/...` and the observed behavior outputs the epic is meant to prove.  
+* **No VCS workflow content; optional non-gating repo-root sanity checks allowed (normative).**  
+  * Live QA runbooks and harness steps **MUST NOT** instruct or discuss branches, commits, PRs, or any other VCS workflow steps. VCS workflow is handled manually by the PO.  
+  * Live QA PASS/FAIL **MUST NOT** be gated on VCS state (for example: “working tree clean,” “on correct branch,” “commit matches expected,” or any similar VCS-derived condition).  
+  * Limited git commands are allowed only as **optional** non-gating sanity checks, and only if all are true:  
+    * Read-only and non-mutating (no checkout/reset/commit/push/pull).  
+    * Do not print or rely on branch names, commit SHAs, or PR identifiers.  
+    * Used only to confirm “this is a repo” / “repo root exists” (sanity), never as evidence or acceptance criteria.  
+  * If the sanity check fails, the check outcome is **TOOLING\_BLOCKED** (tooling), not **FAIL\_BEHAVIOR** (behavior).  
   * If git information is captured at all, it is **traceability-only** and **MUST NOT** block execution.  
   * Known Codespaces packaging artifacts (including `glow_hdengine.egg-info/PKG-INFO` and the containing `glow_hdengine.egg-info/` directory) are explicitly **non-blocking** and **MUST NOT** be deleted, restored, or used as a QA gating signal.  
   * The only write-scope rail for Live QA evidence remains: `audit/qa/...`.  
@@ -689,7 +702,22 @@ The Live QA harness **MUST**:
 
     * a **behavior failure** (tests assertions failing, CLI returning incorrect JSON or exit codes).
 
-  * This classification **MUST** be visible in the QA logs written under `audit/qa/**` (for example, through a `status` field or `tooling_failure: true/false`), so that Governance/QA documents and tokens can distinguish infra/tooling problems from Engine behavior problems.
+  * This classification **MUST** be visible in the QA logs written under `audit/qa/**` (for example, through a `status` field or `tooling_failure: true/false`), so that Governance/QA documents and tokens can distinguish infra/tooling problems from Engine behavior problems.  
+* **Moon Loop (minimal in-session remediation to unblock Live QA; normative; bounded).**  
+  * If a Live QA step fails due to a tooling/expectation mismatch (for example: missing entrypoint, wrong path, wrong surface binding, or a non-canon validator expectation), an in-session Moon Loop is permitted to restore canon-aligned execution and re-run the step to produce the canonical evidence surface.  
+  * Allowed actions in the Moon Loop are strictly limited to:  
+    * creating ephemeral helper code under `/tmp` (never under `audit/**` or `artifacts/**`) to compute or verify an already-canonized artifact surface;  
+    * adjusting a QA check/harness procedure to validate the canonical emitted surface already owned by canon; and/or  
+    * applying the smallest code change necessary for the failing check to execute correctly when the failure is attributable to a tooling/expectation mismatch (not new scope).  
+  * Evidence posture (minimum):  
+    * The failing check’s `primary.log` MUST include a clear failure signature excerpt.  
+    * A one-line remediation note MUST be recorded in the same log or the session transcript, naming the changed file path(s) and the reason for the change (names-only; no VCS workflow).  
+    * The rerun output showing the restored PASS MUST be captured in the log.  
+    * If any repo files were changed, capture a minimal delta under `audit/qa/hde-epic<NNN>/remediation/moon_loop/`:  
+      * `patch.diff` (names-only; minimal diff), and  
+      * `changed_files.txt` containing the changed file path(s) and `sha256` of the final contents.  
+    * Stop condition: if unblocking requires more than a minimal change, involves unclear root cause, or expands beyond the failing surface, stop the Moon Loop and route to normal remediation planning (no in-session escalation).  
+    * Moon Loop changes do not change token semantics, acceptance rules, or plan approval structure; they only allow minimal execution remediation to produce the governed evidence surface.
 
 Mechanics does **not** define the token names or acceptance rules associated with these logs; those remain single-homed in **Glow QA Guide**, **HDE-Build Checklist**, **HDE Phased Epics**, and **Glow Infrastructure** by title. This section requires that the QA bootstrap harness and Live QA harness exist as concrete components, that they enforce the behaviors listed above, and that their logs live under governed audit locations and are suitable for use by those documents.
 
@@ -703,9 +731,9 @@ Mechanics does **not** define the token names or acceptance rules associated wit
 
 Mechanics records the existence and behavior of the QA tooling bootstrap and Live QA harness here so that they are treated as first-class components of the HD Engine’s tooling skeleton, on par with the sanity pipeline, env-pins checks, and evidence tools.
 
-### 1.6.3 Generic epic QA harness entrypoint (run directory, logs, manifest, viability)
+### **1.6.3 Generic epic QA harness entrypoint (per-check primary logs, manifest, viability)**
 
-#### Purpose (normative)
+#### **Purpose (normative)**
 
 Provide a single reusable epic QA harness entrypoint that can be invoked for any epic to execute a Live QA run under pinned rails and to reliably produce governed QA evidence under `audit/qa/**` without relying on hand-edited commands or ad-hoc shell state.
 
@@ -713,112 +741,95 @@ This component exists because “a harness that exits 0 but produces no run arti
 
 ---
 
-#### Behavior (minimum, normative)
+#### **Behavior (minimum, normative)**
 
 The epic QA harness entrypoint MUST:
 
-Determine an epic id and run id
+**Determine an epic id (names-only)**
 
-* Accept an epic identifier and a run identifier via a documented interface (CLI args or environment override).  
-* When a run id is not explicitly provided, derive a deterministic default (for example, a stable slug for “live-qa-1” or an equivalent policy owned by Glow QA Guide).
+* Accept an epic identifier via a documented interface (CLI args or environment override).
 
-Create a run-scoped QA\_ROOT directory
+**Create or reuse the canonical epic QA root**
 
-Create a run directory under the governed audit root of the form:
+* Create or reuse the governed epic QA root directory of the form:
 
-* `audit/qa/hde-epic<NNN>/<run-id>/`
+   `audit/qa/hde-epic<NNN>/`
 
 **Canonical epic QA root (normative).**
 
-* `hde-epic<NNN>` where `<NNN>` is a zero-padded 3-digit epic number (example: `hde-epic022`).  
+* `hde-epic<NNN>` where `<NNN>` is a zero-padded 3-digit epic number (example: `hde-epic022`).
+
 * Epic QA root directories MUST be lower-case ASCII.
-
-**Run id (normative).**
-
-* `<run-id>` MUST be a lower-case ASCII slug (no spaces).  
-* When a run id is not explicitly provided, the harness MAY derive a deterministic default (policy owned by Glow QA Guide, titles-only).
 
 **No parallel spellings.**
 
-Implementations MUST NOT introduce alternate epic directory spellings for the same epic/run (examples: `audit/QA/...`, `audit/qa/HDE-EPIC022/...`, `audit/qa/EPIC022/...`). Legacy paths may exist; do not create new ones.
+* Implementations MUST NOT introduce alternate epic directory spellings for the same epic (examples: `audit/QA/...`, `audit/qa/HDE-EPIC022/...`, `audit/qa/EPIC022/...`). Legacy paths may exist; do not create new ones.
 
-Exact lifecycle rules and any governed schemas inside the run directory are routed by title; Mechanics requires that a single run directory exists and is used consistently for that run.
+**KISS evidence posture for Live QA (normative; minimal required outputs)**
 
-Maintain per-epic manifest and viability outputs
+Live QA harness outputs MUST default to this invariant set (no per-run history constructs):
 
-* Maintain a per-epic “step logs manifest” file under `audit/qa/hde-epic<NNN>/` that enumerates known runs and the paths to their run directories and primary step logs.  
-* Maintain a per-epic “acceptance map viability” log under `audit/qa/hde-epic<NNN>/` that appends a summary line for each run, aligned to:  
-  * the epic’s acceptance map, and  
-  * the token to evidence matrix (titles-only; owned elsewhere).
+* Per-check primary log (one file per check) under:  
+   `audit/qa/hde-epic<NNN>/checks/<check_id>/primary.log`  
+* A per-epic “step logs manifest” at `audit/qa/hde-epic<NNN>/qa_step_logs_manifest.json` that lists each check’s status and primary log path as a current-state ledger (not per-run history). The harness MUST also update `audit/qa/hde-epic<NNN>/qa_step_logs_manifest.json.path_proof.txt` when the manifest is written.  
+* Nothing else is mechanically required unless canon explicitly pins an additional governed evidence family/path (titles-only; owned elsewhere).
 
-Mechanics does not define the token names or viability semantics here; it requires that the harness update these per-epic artifacts so that QA reviewers can audit whether a run is viable and complete.
+**Maintain per-epic step logs manifest (current-state)**
 
-Emit a per-run bootstrap log and step logs
+The harness MUST update the per-epic step logs manifest so that for each executed check id there is exactly one manifest row that includes, at minimum: `check_id`, `status`, `log_path`.
 
-* Write a per-run bootstrap log (D0) inside the run directory.  
-* Write the canonical sequence of per-step logs for the epic’s Live QA steps inside the same run directory.
+* The manifest MUST point to the check’s `primary.log` path under `checks/<check_id>/`.
 
-Each step log MUST:
+* The manifest MUST be idempotent per `check_id` (no duplicates). On rerun, the harness MUST replace the prior row for that check id so the manifest reflects the latest `status` and `log_path`.
+
+**Emit per-check primary logs**
+
+For each check/step executed by the harness, it MUST:
+
+* Ensure the check directory exists at `audit/qa/hde-epic<NNN>/checks/<check_id>/`.
+
+* Write the check’s primary log to `primary.log` in that directory.
+
+Each primary log MUST:
 
 * Be non-empty.  
-* Include a rails snapshot (at minimum SAFE\_MODE, ALLOW\_NETWORK, LC\_ALL, LANG, TZ, APP\_ENV).  
-* Include the commands executed.  
+* Begin with a JSON header object whose fields follow the Plan Templates Live QA step-log header schema (titles-only), with this gating posture:  
+  * **Required header fields (hard):** `check_id`, `status`, `command`, `captured_env`  
+  * **Defaultable header fields (non-blocking):** `pf_refs`, `intended_tokens`, `claimed_tokens`  
+    * If any of these three fields are missing, they MUST be interpreted as empty lists for review purposes: `[]`.  
+    * A QA reviewer-of-record MAY mechanically normalize a non-conforming header by inserting missing defaultable fields and re-serializing the header as canonical JSON (evidence-format repair only; no rerun required).  
+      Token claims are never inferred: if `claimed_tokens` is missing or empty, treat claims as none; reviewers MUST NOT infer token claims from transcript text, other artifacts, or filenames.  
+* `captured_env` MUST include a rails snapshot (at minimum `SAFE_MODE`, `ALLOW_NETWORK`, `LC_ALL`, `LANG`, `TZ`, `APP_ENV`).  
+* Status vocabulary is gating (names-only): `PASS`, `FAIL_BEHAVIOR`, `FAIL_TOOLING`, `TOOLING_BLOCKED`, `PARKED`.  
+  Implementations MUST NOT introduce ad-hoc statuses for core execution state.  
+  * If `status` is outside this set, normalization MAY set it only when the transcript unambiguously indicates the correct status (for example, contains a single definitive `PASS:` line and no `FAIL_` lines). Otherwise status remains `Unclear` and the step is not acceptable.  
+* If token names appear, they MUST be names-only and MUST NOT be invented or aliased (token registry is single-homed in HDE-Governance by title).  
+* `claimed_tokens` (if present) MUST be empty unless `status=PASS`.  
+* Any additional header fields beyond this minimum are allowed, but MUST NOT be required as a plan-approval condition unless Plan Templates is updated to require them.  
+  Include the commands executed (copy/paste-ready; no placeholders).  
+* When a command depends on a repo-provided entrypoint (script/module/CLI), include a preflight existence check transcript proving the entrypoint is present and runnable before execution. If the preflight fails, set `status=TOOLING_BLOCKED`, capture the transcript, and MUST NOT attempt the failing command.  
 * Capture exit codes.  
-* End with an explicit step outcome classification (tooling vs behavior).  
-* Use the canonical status vocabulary defined in **Glow QA Guide** (titles-only); do not introduce ad-hoc statuses for core execution state.
+* End with an explicit step outcome classification (tooling vs behavior).
 
-**Rerun hygiene (normative; do not overwrite evidence).**  
- If a step/check id is executed more than once for the same run (a rerun):
+**Rerun posture (normative; current-state)**
 
-* The harness MUST NOT overwrite the prior step log file. Each attempt MUST write to a new log filename/path under the run directory (for example by adding an explicit attempt suffix such as `_attempt2`, or an equivalent stable scheme).  
-* The per-epic step logs manifest MUST be **idempotent** at the tuple level (run id, check id). For any given run, there MUST be at most one manifest entry for a given check id (no duplicates).  
-* On rerun, the harness MUST update (replace) the existing manifest entry for that (run id, check id) to point to the newest attempt’s `log_path`. Older attempt logs may remain on disk for traceability, but the manifest’s authoritative row MUST reflect the latest attempt.  
-* After writing the manifest, the harness MUST validate uniqueness: no duplicate entries for the same (run id, check id). If duplicates exist, treat this as a tooling failure and downstream close-pack generation MUST NOT proceed.
+If a check id is executed more than once (a rerun):
 
-**Non-canonical env pins in logs (normative).**  
- Step logs MAY record additional env fields for traceability, but only the canonical determinism pins defined in §1.2 are required for governed bytes and governed evidence. `PYTHONHASHSEED` MUST NOT be treated as a required pin; if present, it is diagnostic-only.
+* The harness MUST treat `checks/<check_id>/primary.log` as the current-state primary artifact and MAY overwrite it on rerun.  
+* If the harness also preserves prior attempts for traceability (for example, `attempt2.log`), those artifacts MUST NOT be treated as required outputs and MUST NOT be used as plan gating surfaces.  
+* After a rerun, the step logs manifest MUST reflect the latest status and primary log path for that check id.
 
-Emit a machine-readable run event log and generated summary (normative)
+**Non-canonical env pins in logs (normative).**
 
-In addition to per-step logs, the harness MUST produce a machine-readable run event log under the run directory, and MUST generate any required summary/RCA artifacts from that log and the captured evidence files.
+Step logs MAY record additional env fields for traceability, but only the canonical determinism pins defined in §1.2 are required for governed bytes and governed evidence. `PYTHONHASHSEED` MUST NOT be treated as a required pin; if present, it is diagnostic-only.
 
-**Run event log (minimum).**
+**Optional generated artifacts (only when canonized by the owning docs)**
 
-* Location (canonical within the run directory): `00_meta/run_events.tsv` \*(TSV) or `00_meta/run_events.jsonl` *(JSONL)*.
-
-* The log MUST append exactly one record per check/step (including D0 bootstrap).
-
-* Each record MUST include, at minimum:
-
-  * UTC timestamp,
-
-  * check id (for example D0/D1/etc),
-
-  * command label (names-only),
-
-  * PASS/FAIL (derived mechanically),
-
-  * primary evidence file path,
-
-  * exit code.
-
-**Generated summary (minimum).**
-
-* If the QA plan requires a summary file (for example `QA_SUMMARY.md`), the harness MUST generate it mechanically from the run event log and evidence files:
-
-  * read the run event log,
-
-  * verify referenced evidence files exist and are non-empty where required,
-
-  * render PASS/FAIL in the summary without placeholders.
-
-**Generated notes/RCA (minimum).**
-
-* If the QA plan requires “notes” artifacts (for example D0 discovery or QA RCA/doc-delta summaries), the harness MUST generate them mechanically from command outputs (baseline snapshots, file listings, exit codes, step logs), not by manual editing.
+Mechanics does not require run-scoped event logs, per-run folders, or history-retention outputs. If a specific epic’s QA plan (single-homed by title) requires generated artifacts such as summaries or notes, the harness MUST generate them mechanically from command outputs and captured logs (no manual editing), and MUST place them under `audit/qa/**` using governed paths/schemas owned by the relevant PF documents (titles-only).
 
 **No manual-fill placeholders (hard rule).**
 
-* Any placeholder fields such as “(fill PASS/FAIL)” or “fill manually” are forbidden in generated evidence artifacts. Generated artifacts MUST be complete at write time.
+Any placeholder fields such as “(fill PASS/FAIL)” or “fill manually” are forbidden in generated evidence artifacts. Generated artifacts MUST be complete at write time.
 
 **Generated-artifact header (required).**
 
@@ -826,47 +837,75 @@ Each generated summary/notes artifact MUST begin with a clear header such as:
 
 AUTO-GENERATED. DO NOT EDIT. Re-run the harness/generator to update.
 
-Fail closed on missing outputs
+**Fail closed on missing outputs**
 
 If the harness completes without:
 
-* creating the run directory,  
-* producing non-empty step logs, or  
-* updating the per-epic manifest and viability outputs,
+* producing at least one non-empty per-check `primary.log` under `audit/qa/hde-epic<NNN>/checks/`, or
+
+* updating the per-epic step logs manifest,
 
 it MUST exit non-zero and record the reason as a tooling/harness failure.
 
-Be reusable across epics
+**Be reusable across epics**
 
-Epic-specific harness entrypoints may exist as thin wrappers for convenience, but they MUST delegate to the generic harness entrypoint and must not re-implement logging, QA\_ROOT layout, manifest updates, or viability updates in bespoke per-epic code.
+Epic-specific harness entrypoints may exist as thin wrappers for convenience, but they MUST delegate to the generic harness entrypoint and must not re-implement logging, QA\_ROOT layout, or manifest updates in bespoke per-epic code.
 
 ---
 
-#### CI self-test (normative)
+#### **CI self-test (normative)**
 
-The repo MUST include a CI test that executes the epic QA harness entrypoint under closed rails with a synthetic run id and asserts, at minimum:
+The repo MUST include a CI test that executes the epic QA harness entrypoint under closed rails and asserts, at minimum:
 
-* the run directory exists,  
-* the per-run bootstrap log exists and is non-empty,  
-* at least one step log exists and is non-empty,  
-* the epic-level Codespaces snapshot exists at `audit/qa/hde-epic<NNN>/00_meta/codespaces_snapshot.json` and is non-empty,  
-* the run-local Codespaces snapshot copy exists under the run directory (`00_meta/codespaces_snapshot.json`) and is non-empty,  
-* the run event log exists under the run directory (`00_meta/run_events.tsv` or `00_meta/run_events.jsonl`) and contains at least one record (non-empty), and  
-* any required generated summary artifact for that harness (for example `QA_SUMMARY.md`, when present in the plan scaffold for that epic) exists, is non-empty, and contains no manual-fill placeholder strings (for example “(fill PASS/FAIL)”).  
-* the per-epic step logs manifest is updated with an entry for the synthetic run id, and  
-* the per-epic acceptance map viability log contains a new summary line for the synthetic run id.  
-* the epic-scoped close-pack and acceptance scaffold artifacts exist at their canonical paths (see §37.2) and are minimally parseable (CI-safe structural checks only; token semantics are owned elsewhere).
+* the epic QA root exists under `audit/qa/hde-epic<NNN>/`,
+
+* at least one check primary log exists at `audit/qa/hde-epic<NNN>/checks/<check_id>/primary.log` and is non-empty,
+
+* the per-epic step logs manifest exists under `audit/qa/hde-epic<NNN>/` and contains current-state entries that point to the primary log path(s), and
+
+* the epic-scoped close-pack and acceptance scaffold artifacts (when required by the invoked harness mode) exist at their canonical paths (see §37.2) and are minimally parseable (CI-safe structural checks only; token semantics are owned elsewhere).
+
+Codespaces snapshot artifacts are optional and non-gating. CI self-tests MUST NOT require, validate, or gate on any Step-0A “Codespaces snapshot” file.
 
 This self-test is required to prevent regressions where the harness exits successfully but produces no governed evidence.
 
 ---
 
-#### Routing (titles-only)
+#### **Routing (titles-only)**
 
-* QA plan step sequences, deliverables, and token semantics: Glow QA Guide, HDE-Build Checklist, HDE Phased Epics.  
-* QA\_ROOT naming conventions and any governed schemas for QA artifacts: HDE-Schemas & Artifacts.  
-* Codespaces QA configuration and requirements: Glow QA Guide.  
-* Services and base URL inventory for targets reached from Codespaces: Glow Infrastructure.
+* Live QA plan template structure and the minimum step-log header schema \+ status vocabulary: Plan Templates.
+
+* QA plan step sequences, deliverables, and token semantics: Glow QA Guide, HDE-Build Checklist, HDE Phased Epics.
+
+* QA\_ROOT naming conventions and any governed schemas for QA artifacts: HDE-Schemas & Artifacts.
+
+* Codespaces QA configuration and requirements: Glow QA Guide.
+
+* Services and base URL inventory for targets reached from Codespaces: Glow Infrastructure.  
+  ---
+
+  #### **CI self-test (normative)**
+
+The repo MUST include a CI test that executes the epic QA harness entrypoint under closed rails and asserts, at minimum:
+
+* the epic QA root exists under `audit/qa/hde-epic<NNN>/`,  
+* at least one check primary log exists at `audit/qa/hde-epic<NNN>/checks/<check_id>/primary.log` and is non-empty,  
+* the per-epic step logs manifest exists under `audit/qa/hde-epic<NNN>/` and contains current-state entries that point to the primary log path(s), and  
+* the epic-scoped close-pack and acceptance scaffold artifacts (when required by the invoked harness mode) exist at their canonical paths (see §37.2) and are minimally parseable (CI-safe structural checks only; token semantics are owned elsewhere).
+
+Codespaces snapshot artifacts are optional and non-gating. CI self-tests MUST NOT require, validate, or gate on any Step-0A “Codespaces snapshot” file.
+
+This self-test is required to prevent regressions where the harness exits successfully but produces no governed evidence.
+
+---
+
+#### **Routing (titles-only)**
+
+* Live QA plan template structure and the minimum step-log header schema plus status vocabulary: **Plan Templates**.  
+* QA plan step sequences, deliverables, and token semantics: **Glow QA Guide**, **HDE-Build Checklist**, **HDE Phased Epics**.  
+* QA\_ROOT naming conventions and any governed schemas for QA artifacts: **HDE-Schemas & Artifacts**.  
+* Codespaces QA configuration and requirements: **Glow QA Guide**.  
+* Services and base URL inventory for targets reached from Codespaces: **Glow Infrastructure**.
 
 # 2\) Canonical Enumerations Registry
 
@@ -949,7 +988,7 @@ In the current Engine repo, the typed loader behavior described in this section 
 * **BE enums & constants bundle.** A generated artifact that exposes the same **frozen domains** to backend code (enums, discriminated unions), typed and **immutable**.  
    *(The exact filenames/locations are implementation-defined; Mechanics only requires that both bundles exist and are **consistent, typed, and deterministic**.)*
 
-  ## 3.3 Registry report (records-only; machine-readable)
+## 3.3 Registry report (records-only; machine-readable)
 
 **Purpose (normative).** Emit a **registry report** that documents the **effective configuration** for this build: which catalogs and manifest were used, what domains and Magic-10 categories are present, and what alias policy is in effect. The report is **names-only** (no payload values) and is consumed by CI and auditors as a summary of the registry state.
 
@@ -1327,7 +1366,7 @@ Transport and HTTP behavior (headers, conditional delivery, caching) and CLI str
 * **Arrays-as-sets discipline.** When an array is used as a set: **dedupe by identity**, then **ASCII-sort** with the appropriate comparator; never rely on map/set iteration order.  
 * **No clocks/RNG.** Tie-breaks never consult time or randomness.
 
-  ## 5.2 Domain comparators (exact)
+## 5.2 Domain comparators (exact)
 
 * **IDs (general strings).** `cmp_id(a,b)` → ASCII bytewise comparison.  
 * **Magic-10 categories.** `cmp_category(a,b)` → compare by **frozen Magic-10 rank** (titles-only to **HDE-Schemas and Artifacts §2.6** / **HDE-Math-Spec §5.1**); if still equal (should not occur), fall back to `cmp_id`.  
@@ -1338,14 +1377,14 @@ Transport and HTTP behavior (headers, conditional delivery, caching) and CLI str
   2. break ties with `cmp_id` (stability preserved).  
       *Descending variants* use an explicit **descending numeric comparator** (do not negate and re-sort), then the same `cmp_id` tie-break.
 
-  ## 5.3 Helpers (reusable)
+## 5.3 Helpers (reusable)
 
 * **`dedupe_sort(set_like, cmp)`** → returns unique, ASCII-sorted array using `cmp`.  
 * **`sort_pairs(pairs, key_cmp, val_cmp)`** → stable sort over `(key,val)` with `key_cmp` then `val_cmp`.  
 * **`ensure_total_order(cmp, generator)`** → property-test harness asserting antisymmetry, transitivity, and totality for domain samples.  
 * **`canonicalize_array(arr, cmp)`** → enforce set discipline (**dedupe \+ ASCII sort**) prior to canonical JSON emission.
 
-  ## 5.4 Engine call-sites (must use)
+## 5.4 Engine call-sites (must use)
 
 * **Composite surfaces.** Ordering of `channels_defined`, `channels_em`, `centers_defined` **must** use `cmp_channel` / `cmp_center` before emission/evidence (see **Appendix E — Composite fingerprint**).  
 * **Category iteration.** All multi-category passes **must** iterate in the **frozen Magic-10 order** (titles-only **HDE-Schemas and Artifacts §2.6**); never rely on hash iteration.  
@@ -1366,7 +1405,7 @@ Transport and HTTP behavior (headers, conditional delivery, caching) and CLI str
 5. **ABBA / two-run:** byte-compare outputs for `(A,B)` vs `(B,A)` and across two identical runs (must match).  
 6. **Serializer cross-check:** canonical re-serialization byte-compare (UTF-8, no BOM, one LF).
 
-   ## 5.7 Evidence (records-only; path-agnostic; indexed via the machine mirror)
+## 5.7 Evidence (records-only; path-agnostic; indexed via the machine mirror)
 
 List by **title/path** in **Appendix D: Evidence Index** and mirror **1:1** in `artifacts/evidence_index.jsonl` (**records-only JSONL**; UTF-8 no BOM; sorted keys; compact; exactly one LF). Each mirror record includes:  
  `artifact_key`, `sha256`, `size_bytes`, `produced_at_utc`, `discovered_physical_path`, `proof_anchor`. Update human Index and mirror **in the same PR**; CI enforces 1:1 parity and **path-proofs**.
@@ -1383,7 +1422,7 @@ List by **title/path** in **Appendix D: Evidence Index** and mirror **1:1** in `
 * Canonical JSON rules & fingerprint shape: **HDE-Schemas and Artifacts §4**, **HDE-Math-Spec Appendix E**.  
 * Governance tokens roster: **HDE-Governance §2.0 Acceptance Tokens**.
 
-  ## **5.8 Dev sampler HTTP harness (internal/dev-only)**
+## **5.8 Dev sampler HTTP harness (internal/dev-only)**
 
 **Purpose.**  
  Provide a dev/admin-only HTTP harness for the sampler core that mirrors the dev sampler CLI semantics while remaining a strictly internal surface. This harness is for local and dev/admin use; it is not part of the public API, is not listed in the Endpoint Catalog, and is not an A7 proof surface.
@@ -1598,7 +1637,7 @@ The CLI dev sampler remains the primary sampler harness; this HTTP dev harness i
 4. **Serializer check** (if core emits JSON artifacts): canonical re-serialization byte-compare (UTF-8, no BOM, **one LF**).  
 5. **No I/O/clocks/globals:** static/grep-guard \+ import-graph proof show **no file/env/time** access in core modules.
 
-   ## 6.6 Evidence (records-only; path-agnostic; indexed via PF-12 machine mirror)
+## 6.6 Evidence (records-only; path-agnostic; indexed via PF-12 machine mirror)
 
 * **artifact\_key:** `engine/tworun_identity` — two-run proof.  
 * **artifact\_key:** `engine/abba_identity` — ABBA compare.  
@@ -2234,7 +2273,7 @@ Acceptance is governed by **HDE-Governance** and the public-byte contracts in **
 * Normalization **MUST** produce **identical normalized forms** for `(A,B)` and `(B,A)`.  
   ---
 
-  ## 11.2 Validation (binary)
+## 11.2 Validation (binary)
 
 1. **Completeness.** `weights` includes **all ten** category keys; each value is **int `0..100`**.  
 2. **Invalid shapes.** Malformed/missing keys or floats ⇒ **`invalid_prefs`** (typed error).  
@@ -2250,7 +2289,7 @@ Acceptance is governed by **HDE-Governance** and the public-byte contracts in **
 * Governance tokens: **PF-04 — §2.0 Acceptance Tokens**.  
   ---
 
-  ## 11.3 Swipe Sampler & Ranker
+## 11.3 Swipe Sampler & Ranker
 
 **Purpose.** Build a candidate pool that respects viewer weights (including the **zero-weight rule**) and then **rank deterministically**. Deterministic \= **order-neutral (AB↔BA)** and **seedable** (when used in **dev/admin** flows); **seeds never affect public bytes**.
 
@@ -2259,27 +2298,27 @@ Acceptance is governed by **HDE-Governance** and the public-byte contracts in **
 * **Zero-weight rule.** Exclude any candidate whose **\#1** equals a viewer weight of **0**.  
 * **Pool formation.** Apply viewer **eligibility filters** (titles-only), then enforce **diversity** (§11.3.3) **before** ranking.
 
-  ### 11.3.2 Scoring & ranking (deterministic)
+### 11.3.2 Scoring & ranking (deterministic)
 
 * **Score function.** Deterministic **fixed-point** combination across the ten categories (integer path), consistent with **PF-01** rounding/banding (titles-only).  
 * **\#1 influence.** The other party’s **\#1** may serve as a **stable tie-break** (integer/priority rule); the rule **must be pinned** and **stable**.  
 * **Total order.** Sort by the specified **numeric** direction, then break ties by **ID comparator (ASCII)** to guarantee a **stable total order** (§5).  
 * **Seedability.** Any stochastic element (if used in **non-public** flows) **must be seedable & isolated**; the seed does **not** alter public bytes.
 
-  ### 11.3.3 Diversity acceptance (deterministic)
+### 11.3.3 Diversity acceptance (deterministic)
 
 * **Sliding window:** `K = 50`.  
 * **Cardinality bound:** at most `N = 2` share the same **design fingerprint** within the window.  
 * **No recent repeats:** none repeat from the last `R = 20`.  
 * **Fingerprint.** A **deterministic** function (titles-only to PF-Math/PF-Spec) used **only** for diversity checks (**never exposed**).
 
-  ### 11.3.4 Dev-only sampling endpoint (optional harness)
+### 11.3.4 Dev-only sampling endpoint (optional harness)
 
 * **Endpoint (dev-only).** `POST /api/sample/v1` with body containing `viewer_prefs{…}` and optional `seed:int`.  
 * **Response.** List of **candidate IDs only**; the app hydrates details. If a seed was provided, **echo it in `meta`**.  
 * **Determinism.** With the same inputs/seed, the output is **byte-identical**; **AB↔BA** has no effect on ordering.
 
-  ### 11.3.5 Validation & evidence (binary; path-agnostic)
+### 11.3.5 Validation & evidence (binary; path-agnostic)
 
 * **Zero-weight exclusion** demonstrably enforced.  
 * **Stable order:** ABBA and two-run proofs; **comparator laws** honored (see §5).  
@@ -2352,7 +2391,7 @@ These rules must be applied by `rank_candidates` and any helper that produces a 
 * Evidence and acceptance tokens for sampler behavior and sampler evidence families remain single-homed in **HDE-Schemas & Artifacts**, **HDE-Build Checklist**, **Glow QA Guide**, and **HDE Phased Epics** by title; this section records only that the sampler core behavior in §11.3 is implemented by the canonical `engine.sampler.core` module and its entrypoints and that all harnesses and evidence generators must call into that module under the determinism and closed-rails posture described elsewhere in this guide.  
   ---
 
-  # 12\) Error Envelope & Token Set \[Required-Now\]
+# 12\) Error Envelope & Token Set \[Required-Now\]
 
 **Purpose.** Provide a **central formatter** for typed, numeric-free errors. Public error transport (writers/errors `no-store`, headers) lives in **PF-Canon-HDE-Governance** and **PF-Canon-HDE-CLI-API-Vendor-Ref** (titles-only). **Identity/Meta** content has been moved to **§13 (Identity & Provenance Module)** and **§14 (Internal Meta Surface)** to avoid duplication.
 
@@ -2363,7 +2402,7 @@ These rules must be applied by `rank_candidates` and any helper that produces a 
 * **Numeric-free & secret-free:** never include stack traces, payload excerpts, header values, or secrets; keys-only logs (redacted).  
 * **Deterministic mapping:** the same condition always yields the same `{code,error}` pair; **byte-stable** across Reader and CLI.
 
-  ## 12.2 Token set (lower\_snake; examples)
+## 12.2 Token set (lower\_snake; examples)
 
 The error-code set and the canonical token→message map are owned by **HDE-CLI-API-Vendor-Ref** (titles-only). This guide does not enumerate error codes. Mechanics requires only that error codes are lower\_snake, stable, and emitted deterministically through the shared presenter/emitter and canonical serializer.
 
@@ -2372,7 +2411,7 @@ The error-code set and the canonical token→message map are owned by **HDE-CLI-
 * **Writers & errors posture:** `Cache-Control: no-store`; **no `ETag`**; `Content-Type: application/json; charset=utf-8` (PF-04).  
 * **A7 success rules** are **not** restated here (see PF-04/PF-05).
 
-  ## 12.4 Acceptance (binary; tokens & evidence are titles-only)
+## 12.4 Acceptance (binary; tokens & evidence are titles-only)
 
 1. **Schema:** envelope has **exactly** `ok=false`, `code`, `error`; no extras; LF-terminated, canonical JSON.  
 2. **Casing & map:** all tokens are **lower\_snake**; the **token→message** table matches the golden map (**exact bytes**).  
@@ -2380,7 +2419,7 @@ The error-code set and the canonical token→message map are owned by **HDE-CLI-
 4. **Two-run identity:** re-emitting the same error twice produces **bitwise-identical** bytes.  
 5. **Transport coupling:** when the envelope appears in writers/errors, headers match PF-04 (no-store; no `ETag`).
 
-   ## 12.5 Evidence (records-only; path-agnostic; indexed via PF-12 machine mirror)
+## 12.5 Evidence (records-only; path-agnostic; indexed via PF-12 machine mirror)
 
 * **artifact\_key:** `errors/token_map` — canonical token→message snapshot (golden).  
 * **artifact\_key:** `errors/schema_check` — JSON-Schema check for the envelope.  
@@ -2418,13 +2457,13 @@ Expose and persist **exactly** these fields; **no extras**:
 * **`identity_meta()` →** `{"engine_tag","invocation_tag"}` — inserted into the **public** envelope **before** idempotence hashing (**PF-01 §3.2**).  
 * **`identity_admin()` →** `{"engine_tag","release_id","invocation_tag","invocation_sha256","build_commit","emitter_sha256"}` — for **internal/admin** surfaces (e.g., **/internal/version**, evidence capture).
 
-  ## 13.3 Flow & constraints
+## 13.3 Flow & constraints
 
 * **Fetch-only module.** Presenter (Reader) and CLI call this module’s helpers; **no direct env reads** at emit time; **no mutation** after freeze.  
 * **Preimage coupling.** `identity_meta()` enters the **five-key preimage** (public path) **before** `idempotence_hash` is computed (PF-01 §3.2).  
 * **Evidence coupling.** The same values flow into artifacts and audit evidence (titles-only); **do not duplicate** identity bytes in prose or ad-hoc files.
 
-  ## 13.4 Prohibited
+## 13.4 Prohibited
 
 * **No recomputation of `release_id`** during request handling.  
 * **No branching semantics for release identity.** If any operator surface implements a fallback path (for example, when a precomputed release-id artifact is unavailable), that fallback MUST still use the single definition: `release_id = sha256(canonical_bytes(catalog/manifest.json))`. The hash input MUST be canonical manifest bytes (serializer-backed), not raw or non-canonical bytes, and MUST NOT create an alternate release identity semantics.  
@@ -2432,7 +2471,7 @@ Expose and persist **exactly** these fields; **no extras**:
 * **No alternative sources** (env vars, flags) on public paths.  
 * **No request-time hashing** for `emitter_sha256` or `invocation_sha256` — compute at **build only**.
 
-  ## 13.5 Acceptance (binary; titles-only)
+## 13.5 Acceptance (binary; titles-only)
 
 1. **Two-run identity:** repeated emits with identical inputs yield **bitwise-identical** bytes (**one LF**).  
 2. **`release_id` recompute:** equals **sha256(canonical manifest bytes)**; recompute job passes.  
@@ -2641,7 +2680,7 @@ Each mirror record includes `artifact_key`, `sha256`, `size_bytes`, `produced_at
 
   ---
 
-  ## 16.1 Command catalog (titles-only; PF05 governs)
+## 16.1 Command catalog (titles-only; PF05 governs)
 
 **Single home for commands.**  
  The complete CLI command/flag catalog and their status live in PF05 (for example, “Commands (by status)”, “CLI Overview & Conventions”). This guide does not enumerate all commands.
@@ -2671,7 +2710,7 @@ Each mirror record includes `artifact_key`, `sha256`, `size_bytes`, `produced_at
 
   ---
 
-  ## 16.3 Determinism & parity
+## 16.3 Determinism & parity
 
 * **Reader↔CLI parity.** CLI stdout is byte-identical to the Reader 200 body for mirrored surfaces (single emitter).
 
@@ -2684,7 +2723,7 @@ Each mirror record includes `artifact_key`, `sha256`, `size_bytes`, `produced_at
 * **Merge-blocking status.** `showcompat` remains merge-blocking until the governing parity and determinism acceptance checks pass (titles-only; acceptance token registry and semantics live in **HDE-Governance**).  
   ---
 
-  ## 16.4 Inputs & schemas (titles-only)
+## 16.4 Inputs & schemas (titles-only)
 
 * **IDs & catalogs.** Validate against **HDE-Schemas & Artifacts** (§2.1/§2.6).
 
@@ -2694,7 +2733,7 @@ Each mirror record includes `artifact_key`, `sha256`, `size_bytes`, `produced_at
 
   ---
 
-  ## 16.5 Installability & entrypoints
+## 16.5 Installability & entrypoints
 
 * **Console script.** `pyproject` console-script `hdctl` present and installable.
 
@@ -2704,7 +2743,7 @@ Each mirror record includes `artifact_key`, `sha256`, `size_bytes`, `produced_at
 
   ---
 
-  ## 16.6 Environment pins (runtime)
+## 16.6 Environment pins (runtime)
 
 * **Pins.** `LC_ALL=C`, `LANG=C`, `TZ=UTC`; keys-only logs; no ANSI.
 
@@ -2712,7 +2751,7 @@ Each mirror record includes `artifact_key`, `sha256`, `size_bytes`, `produced_at
 
   ---
 
-  ## 16.7 Acceptance (titles-only; token names live in HDE-Governance §2.0)
+## 16.7 Acceptance (titles-only; token names live in HDE-Governance §2.0)
 
 Acceptance is governed by **HDE-Governance** and CLI contracts in **HDE-CLI-API-Vendor-Ref** (titles-only). This section does not list token names. CLI tooling must have acceptance proofs for:
 
@@ -2727,7 +2766,7 @@ Acceptance is governed by **HDE-Governance** and CLI contracts in **HDE-CLI-API-
 * evidence/index discipline for CLI proof artifacts.  
   ---
 
-  ## 16.8 Evidence (records-only; machine mirror; same-PR rule)
+## 16.8 Evidence (records-only; machine mirror; same-PR rule)
 
 List by title/path in **Appendix D: Evidence Index** and mirror 1:1 in `artifacts/evidence_index.jsonl` (record fields as per §1.3). The machine mirror is canonical JSONL (UTF-8; ASCII-sorted keys; compact; one LF), rejects unknown keys, and each record includes a `proof_anchor` to a co-located path-proof file. Update the human Index and machine mirror in the same PR.
 
@@ -2742,9 +2781,11 @@ Required artifacts:
 * `artifacts/cli/guards/emitter_symbol_proof.txt` — single-emitter guard (presenter symbol)  
 * `artifacts/cli/guards/serializer_grep_guard.log` — grep-guard proving there are no ad-hoc serializers on public paths
 
-* `audit/gates/canonical/json_canonical_check.log` — canonical JSON checks
+* `audit/gates/json_gate/canonical/json_gate_check_log.ndjson` — canonical JSON policy checks for CLI and evidence output.
 
-* `audit/gates/canonical/json_canon_compare.log` — canonical output comparisons
+* `audit/gates/json_gate/canonical/json_gate_compare_log.ndjson` — canonical output comparisons
+
+* `audit/gates/json_gate/canonical/json_gate_structured_record.json` — structured canonical JSON gate record
 
 (Index human+machine in the same PR; mirror canonical JSONL; one LF; `proof_anchor` present.)
 
@@ -2858,9 +2899,9 @@ Required artifacts for the CLI parity and serializer-coupling harness include:
 
 * Canonical JSON policy and compare logs
 
-  * audit/gates/canonical/json\_canonical\_check.log — canonical JSON checks for CLI and related artifacts.
+  * audit/gates/canonical\_json/json\_canonical\_check.log — canonical JSON checks for CLI and related artifacts.
 
-  * audit/gates/canonical/json\_canon\_compare.log — canonical re-serialization compare for public bytes and parity harness outputs.
+  * audit/gates/canonical\_json/json\_canon\_compare.log — canonical re-serialization compare for public bytes and parity harness outputs.
 
 Copies of the guard artifacts under audit/gates/guards/\*\* may exist for internal audit workflows, but those paths are secondary. Mechanics treats artifacts/cli/guards/\*\* as the canonical homes for CLI serializer/emitter guards; indexing and mirror records must use those canonical paths as discovered\_physical\_path, consistent with §37.6 and §1.3.
 
@@ -3313,7 +3354,7 @@ Mechanics treats the admin bundle surfaces in §17.11 as the preferred way to st
 
 * Epic-level planning and acceptance tokens for “CLI terminal access to full product payload” remain single-homed in HDE-Governance, HDE-Build Checklist, Glow QA Guide, and HDE Phased Epics. PF14 records the mechanical requirement that the CLI is a required admin product surface in pre-Glow and that its existing mechanics must support full product payload flows from any eligible terminal.
 
-  # 18\) CLI Serializer Coupling \[Required-Now\]
+# 18\) CLI Serializer Coupling \[Required-Now\]
 
 **Scope.** Force all CLI public bytes through the **same allow-listed presenter/emitter** entrypoint used by Reader. Tests must not bypass the unified entrypoint.
 
@@ -3325,16 +3366,16 @@ Mechanics treats the admin bundle surfaces in §17.11 as the preferred way to st
   * `/api/compat/v1`: CLI stdout is **byte-identical** to the Reader 200 body.  
   * `/api/sample/v1`: CLI stdout uses the **same deterministic selection \+ ordering** as Reader.
 
-  ## 18.2 Prohibited (hard fail)
+## 18.2 Prohibited (hard fail)
 
 * Any ad-hoc JSON on public paths: **no** `json.dumps(`, **no** `jsonify(`, **no** templating, **no** manual string building, **no** pretty/indented output.
 
-  ## 18.3 Guards (CI)
+## 18.3 Guards (CI)
 
 * **Symbol allow-list.** Maintain a code/CI allow-list of presenter/emitter symbols; only these may serialize public bytes.  
 * **Grep-guard.** CI **fails** on public paths if ad-hoc serialization is detected (regex for `\bjson\.dumps\(` and known alternates).
 
-  ## 18.4 Acceptance (titles-only; token names live in HDE-Governance §2.0)
+## 18.4 Acceptance (titles-only; token names live in HDE-Governance §2.0)
 
 Acceptance is governed by **HDE-Governance** (titles-only). This section does not list token names. CLI serializer coupling must have acceptance proofs for:
 
@@ -3346,7 +3387,7 @@ Acceptance is governed by **HDE-Governance** (titles-only). This section does no
 
 * evidence/index discipline for guard artifacts and parity proofs.
 
-  ## **18.5 Evidence (records-only; machine mirror; same-PR rule)**
+## **18.5 Evidence (records-only; machine mirror; same-PR rule)**
 
 CLI serializer coupling evidence must demonstrate:
 
@@ -3378,7 +3419,7 @@ Required artifacts for CLI serializer coupling:
 
   * audit/gates/canonical/json\_canonical\_check.log — canonical JSON policy checks for CLI and evidence output.
 
-  * audit/gates/canonical/json\_canon\_compare.log — canonical re-serialization compares for CLI parity and serializer coupling.
+  * audit/gates/canonical\_json/json\_canon\_compare.log — canonical re-serialization compares for CLI parity and serializer coupling.
 
 If audit/gates/guards/\*\* copies of the guard artifacts are present for internal audit workflows, they are secondary only. The artifacts/cli/guards/\*\* paths are the canonical locations for serializer/emitter guards; the Evidence Index and Machine Mirror must use those canonical paths as discovered\_physical\_path.
 
@@ -3392,7 +3433,7 @@ If audit/gates/guards/\*\* copies of the guard artifacts are present for interna
   
 
 
-  # 19\) Vendor Ingest Pipeline — source policy & proofs (normative)
+# 19\) Vendor Ingest Pipeline — source policy & proofs (normative)
 
 ## **19.1 Policy (normative)**
 
@@ -3560,7 +3601,7 @@ For epics whose D-goals or QA acceptance explicitly require **live vendor activi
 * evidence/index discipline for vendor ingest proof artifacts.  
   ---
 
-  ## 19.2 Refresh, TTL & SWR (out‑of‑band; normative)
+## 19.2 Refresh, TTL & SWR (out‑of‑band; normative)
 
 **Purpose.** Pin the invariants for the BodyGraph refresh worker (EPIC‑011), its policy, and the governed refresh policy snapshot. Mechanics, ADR values, and detailed schema live in the ADR, Build Notes, and HDE‑Schemas & Artifacts; this section states the mechanical invariants only.
 
@@ -3640,7 +3681,7 @@ The refresh worker runs under the same determinism pins and SAFE‑rails posture
 
   ---
 
-  # 20\) Persistence Layer (DB posture, partition & bridge) \[Required‑Now\]
+# 20\) Persistence Layer (DB posture, partition & bridge) \[Required‑Now\]
 
 **Scope (normative).** Database mechanics for schema identity, runtime posture, partition stance, and bridge parity. Artifact schemas and indexing live in HDE‑Schemas & Artifacts; governance tokens live in HDE‑Governance and the Build Notes. PF14 owns the mechanics that produce and prove the posture.
 
@@ -3680,7 +3721,7 @@ All posture captures MUST:
 
 * Remain secret‑free; logs and artifacts contain no credentials.
 
-  ## 20.2 Partition mechanics (EPIC‑011)
+## 20.2 Partition mechanics (EPIC‑011)
 
 **Objective.** Enforce EPIC‑011’s non‑deferred partition stance under standard artifact paths.
 
@@ -3806,7 +3847,7 @@ Policy, SAFE‑rails tokens, and vendor transport matrices remain single‑homed
 * **No conditionals.** Do **not** implement **304** or **HEAD** in alpha; do **not** attach validators; skip CDN ceremony.  
 * **Determinism.** Canonical JSON (UTF-8 no BOM, sorted keys, compact, exactly one LF); AB↔BA and two-run identity hold (see §10.1 / §4).
 
-  ## 24.2 Production posture (Reader / Compat)
+## 24.2 Production posture (Reader / Compat)
 
 **Scope (normative).** Mechanics wires and verifies runtime transport behavior for **JSON success routes** and companion surfaces. Full matrices live in **HDE-CLI-API-Vendor Ref (Appendix A)**; **A7 proofs run on a Catalog JSON success route** (not `/internal/version`).
 
@@ -3829,19 +3870,19 @@ Acceptance is governed by **HDE-Governance** (titles-only). This section does no
 * **Ops exclusion.** `/internal/version` is operator-only and **not** A7-eligible (see §14 / HDE-Governance §10.5).  
 * **Matrices & bytes.** Owned by **HDE-Governance** / **HDE-CLI-API-Vendor Ref** (titles-only). This guide enforces wiring and evidence.
 
-  ## 24.4 Acceptance (titles-only; token names live in HDE-Governance §2.0)
+## 24.4 Acceptance (titles-only; token names live in HDE-Governance §2.0)
 
 * **A7 success.** Governed by the **A7 token family** (200 `ETag`, HEAD parity, 304 omission, success cache/`Vary`).  
 * **Writers/errors.** Governed by the **writers/error token family** (no-store, no `ETag`, error `Content-Type`).  
 * **POST posture & invariance.** Governed by Governance tokens for **non-conditional POST** and **encoding/header invariance**.
 
-  ## 24.5 Evidence (records-only; path-agnostic; indexed via the machine mirror)
+## 24.5 Evidence (records-only; path-agnostic; indexed via the machine mirror)
 
 * **Single home for titles/paths.** §36 **Documentation Artifacts and Registry** (“Reader success catalog & A7 proofs”).  
 * **Indexing.** List titles/paths in **Appendix D: Evidence Index** and mirror **1:1** in `artifacts/evidence_index.jsonl` (canonical JSONL; one LF; each record includes `artifact_key`, `sha256`, `size_bytes`, `produced_at_utc`, `discovered_physical_path`, `proof_anchor`).  
 * **Same-PR rule.** Update human Index and mirror **in the same commit/PR**; CI enforces parity and path-proofs.
 
-  ## 24.6 Routing (titles-only)
+## 24.6 Routing (titles-only)
 
 * **Transport matrices & header rules.** **HDE-Governance** / **HDE-CLI-API-Vendor Ref**.  
 * **Evidence registry & mirror discipline.** §1.3 and §36.
@@ -4224,36 +4265,27 @@ Acceptance is governed by **HDE-Governance** and pack/manifest rules in **HDE-Sc
 
 **Evidence (records-only; machine mirror; same-PR rule)**
 
+* `artifacts/sanity/sanity.log` — canonical compact sanity surface (required predicate target for determinism-related QA checks).  
+  * Validators MUST confirm `sanity.log` contains `run:sanity-pipeline`, contains `env_pins: audit/gates/determinism/env_pins.log`, and contains `summary:PASS`.  
+* artifacts/sanity/sanity.log.path\_proof.txt  
 * `artifacts/proofs/sanity_pipeline.transcript.log` — pipeline transcript (ordered steps \+ pass/fail summary)  
 * Existing artifacts produced in step 6 (see 26.3, §27, §20, §36) must also be indexed and mirrored **in this run**
 
 When the sanity pipeline script (for example, `python tools/evidence/run_sanity_pipeline.py`) is invoked **from a Live QA harness** rather than as part of the release CI, Mechanics requires additional behavior on top of the release pipeline rules in this section:
 
-* **Explicit QA log capture.**
-
-  * Any QA step that invokes the sanity pipeline **MUST** capture a primary QA log under `audit/qa/hde-epic<NNN>/<run-id>/` (for example, `stepN_sanity_pipeline.log`), treated as the canonical evidence for that step.
-
-  * The sanity pipeline script **MUST** emit a clear, parseable **pass/fail summary** suitable for inclusion in this log, either:
-
-    * directly on stdout (so the harness can tee it into the QA log), or
-
-    * to a deterministic, harness-readable log file that the QA harness then copies into `audit/qa/hde-epic<NNN>/...`.
-
-  * The summary **MUST** include, at minimum, an overall status line (for example, a `status_final` value or equivalent) that allows QA and auditors to determine whether the pipeline completed successfully in that QA environment.
-
-* **Classification of QA pipeline failures.**
-
-  * If the QA harness invokes the sanity pipeline but **no output is captured** in the primary QA log (for example, the log remains empty or contains only a header with no pipeline summary), that QA step **MUST** be classified as a **tooling/harness failure** rather than as a behavioral failure of the engine or the sanity pipeline itself.
-
-  * In that case, PF14 treats the step as **FAIL\_TOOLING** from a mechanics perspective: the harness or environment prevented the pipeline’s output from being captured, and the step remains blocked until the harness is fixed.
-
-  * The semantics and exact vocabulary for `FAIL_TOOLING` vs `FAIL_BEHAVIOR` or `PASS` remain single-homed in **Glow QA Guide** and **HDE-Build Checklist**; this guide only requires that QA steps distinguish “pipeline could not be observed” (tooling) from “pipeline ran and failed tests” (behavior).
-
-* **Routing to tokens and QA docs (titles-only).**
-
-  * The acceptance tokens that depend on the sanity pipeline and their evidence requirements are defined in **Glow QA Guide**, **HDE-Build Checklist**, and **HDE Phased Epics** (titles-only). PF14 does not list token names.
-
-  * PF14 records that, for QA-invoked runs, those tokens **must not** be treated as proven unless there is a captured sanity pipeline QA log with a clear pass/fail summary; if QA runs the pipeline and captures no output, that run is mechanics-wise a **tooling/harness issue** and cannot be used as evidence for those tokens.
+* **Explicit QA log capture.**  
+  * Any QA step that invokes the sanity pipeline **MUST** capture a primary QA log under `audit/qa/hde-epic<NNN>/checks/<check_id>/primary.log`, treated as the canonical evidence for that step.  
+  * The sanity pipeline script **MUST** emit a clear, parseable **pass/fail summary** suitable for inclusion in this log, either:  
+    * directly on stdout (so the harness can tee it into the QA log), or  
+    * to a deterministic, harness-readable log file that the QA harness then copies alongside the check’s primary log under `audit/qa/hde-epic<NNN>/checks/<check_id>/...`.  
+  * The summary **MUST** include, at minimum, an overall status line (for example, a `status_final` value or equivalent) that allows QA and auditors to determine whether the pipeline completed successfully in that QA environment.  
+* **Classification of QA pipeline failures.**  
+  * If the QA harness invokes the sanity pipeline but **no output is captured** in the primary QA log (for example, the log remains empty or contains only a header with no pipeline summary), that QA step **MUST** be classified as a **tooling/harness failure** rather than as a behavioral failure of the engine or the sanity pipeline itself.  
+  * In that case, PF14 treats the step as **FAIL\_TOOLING** from a mechanics perspective: the harness or environment prevented the pipeline’s output from being captured, and the step remains blocked until the harness is fixed.  
+  * The semantics and exact vocabulary for `FAIL_TOOLING` vs `FAIL_BEHAVIOR` or `PASS` remain single-homed in **Glow QA Guide** and **HDE-Build Checklist**; this guide only requires that QA steps distinguish “pipeline could not be observed” (tooling) from “pipeline ran and failed tests” (behavior).  
+* **Routing to tokens and QA docs (titles-only).**  
+  * The acceptance tokens that depend on the sanity pipeline and their evidence requirements are defined in **Glow QA Guide**, **HDE-Build Checklist**, and **HDE Phased Epics** (titles-only). PF14 does not list token names.  
+    PF14 records that, for QA-invoked runs, those tokens **must not** be treated as proven unless there is a captured sanity pipeline QA log with a clear pass/fail summary; if QA runs the pipeline and captures no output, that run is mechanics-wise a **tooling/harness issue** and cannot be used as evidence for those tokens.
 
 These QA-specific requirements do **not** change the release/CI semantics of the sanity pipeline described earlier in this section. Release acceptance and the canonical pipeline transcript remain governed by the closed-rails CI posture; QA invocations add a second usage of the same pipeline script, with additional logging and classification requirements so that Live QA evidence is unambiguous and mechanics-complete.
 
@@ -4703,7 +4735,8 @@ The repo SHOULD include CI-safe tests that validate, at minimum:
 * the epic-scoped close-pack and acceptance scaffold files exist at the canonical paths above, and  
 * the acceptance artifacts are structurally coherent (parseable, no duplicate token ids/rows).  
 * the acceptance map and token-to-evidence matrix are mutually consistent (no duplicate rows across artifacts, no placeholder bindings once concrete evidence exists, and no map/matrix misalignment that would require a reviewer to “interpret” intent). PF14 does not enumerate token names; this is a structural consistency requirement only.  
-* token-to-evidence bindings MUST reference primary evidence artifacts (not their `*.path_proof.txt` transcripts). Path-proofs are required, but MUST be referenced via the machine mirror `proof_anchor` (and/or mirror checks), not treated as primary evidence titles/bindings.
+* token-to-evidence bindings that reference non-placeholder evidence paths MUST be Index/Mirror backed: each referenced path MUST exist in `docs/evidence/INDEX.json`, and MUST have a corresponding Machine Mirror record in `artifacts/evidence_index.jsonl` with a non-empty `proof_anchor` (validators MUST NOT skip this check when a path is absent from both registries).  
+  token-to-evidence bindings MUST reference primary evidence artifacts (not their `*.path_proof.txt` transcripts). Path-proofs are required, but MUST be referenced via the machine mirror `proof_anchor` (and/or mirror checks), not treated as primary evidence titles/bindings.
 
 **Token name validity (names-only).**  
  Any acceptance token name referenced by these acceptance scaffolds MUST match the **HDE-Governance** Token Registry exactly (titles-only). Aliases and near-matches are prohibited; correct the scaffold artifacts to the canonical registry name. This guide does not list token names.
@@ -4745,7 +4778,21 @@ Placeholder evidence strings are permitted only for D0 scaffolding; once an epic
 
 * `.bytes` files mirror the exact body bytes (including the body’s own trailing LF, if present).
 
-* Header snapshots follow §4.3 normalization (lower-cased keys, compact, one LF).
+* Header snapshots follow §4.3 normalization (lower-cased keys, compact, one LF).  
+* Close-pack manifest `key_outputs` is a named binding map (normative):  
+  * `audit/EPIC-<NNN>_MANIFEST.json` MUST include `key_outputs` as a JSON object (map) where each key is a stable pointer name (string) and each value is a repo-relative artifact path (string).  
+  * `key_outputs` MUST NOT be a list.  
+  * For EPIC023, `key_outputs` MUST include these bindings (keys \+ exact values):  
+    * `acceptance_map`: `docs/acceptance_map_epic023.json`  
+    * `token_matrix`: `audit/qa/hde-epic023/token_evidence_matrix.md`  
+    * `acceptance_map_viability`: `audit/qa/hde-epic023/acceptance_map_viability.log`  
+    * `qa_step_manifest`: `audit/qa/hde-epic023/qa_step_logs_manifest.json`  
+    * `doc_deltas`: `audit/docdeltas/hde-epic023_doc_deltas.md`  
+    * `close_report`: `audit/EPIC-023_close_report.md`  
+    * `close_manifest`: `audit/EPIC-023_MANIFEST.json`
+
+* Additional `key_outputs` entries are allowed, but these bindings are the closure minimum for EPIC023.  
+* Close-pack validation checks MUST validate the named bindings (keys \+ exact path values), not list membership.
 
 ---
 
@@ -4836,7 +4883,7 @@ Serializer and emitter guards are the mechanical enforcement layer for CLI seria
 
 * governed CLI handlers call the allow-listed presenter/emitter symbols.
 
-  ### **37.6.1 Guard tools (closed-rails, deterministic)**
+### **37.6.1 Guard tools (closed-rails, deterministic)**
 
 Mechanics defines two canonical CLI guard tools:
 
@@ -4975,7 +5022,10 @@ Mechanics records this distinction so that PF-Canon and QA plans can treat open-
 
 ### **Canonical compare**
 
-* `audit/gates/canonical/json_canon_compare.log`
+* `audit/gates/json_gate/canonical/json_gate_compare_log.ndjson`
+
+**Canonical surface (normative).**  
+ Canonical JSON compare evidence MUST bind to this canonical path as the canonical acceptance surface for canonical JSON gate evidenc
 
 ---
 
@@ -5016,17 +5066,32 @@ These showcompat capture artifacts are deterministic fixtures used to prove stdo
 
 Both **must** be indexed in the Human Index and Machine Mirror in the same PR.
 
----
+## **37.9 Canonical JSON checks**
 
-## 37.9 Canonical JSON checks
+* **Canonical family root (normative)**
+
+  * `audit/gates/json_gate/canonical/`
 
 * **Policy check**
 
-  * `audit/gates/canonical/json_canonical_check.log`
+  * `audit/gates/json_gate/canonical/json_gate_check_log.ndjson`
 
-* **Canonical re-serialization compare**
+* **Canonical compare**
 
-  * `audit/gates/canonical/json_canon_compare.log`
+  * `audit/gates/json_gate/canonical/json_gate_compare_log.ndjson`
+
+* **Structured record**
+
+  * `audit/gates/json_gate/canonical/json_gate_structured_record.json`
+
+**Path proofs (normative).**  
+ Each artifact above MUST have a co-located `.path_proof.txt` transcript and MUST be indexed/mirrored under the Evidence Index \+ Machine Mirror.
+
+**No alternate filenames (normative).**  
+ Future plans MUST validate these canonical surfaces and MUST NOT invent wrapper bundles or alternate filenames for canonical JSON gate evidence.
+
+**Legacy naming (non-authoritative).**  
+ `audit/gates/canonical_json/**` is legacy naming and MUST NOT be introduced or required by future plans unless canon explicitly reinstates it (via PF12).
 
 ---
 
@@ -5199,13 +5264,16 @@ Any references to `audit/gates/release/release_id.txt` (or similar `audit/gates/
 
 ## 37.18 Index & synchronization
 
-* **Human Index**
+* **Human Index**  
+  * `docs/evidence/INDEX.json` — titles/paths only.  
+* **Machine Mirror**  
+  * `artifacts/evidence_index.jsonl` — records-only JSONL.  
+* **Evidence index snapshot (gate-family; canonical)**  
+  * `audit/gates/evidence_index_snapshot/evidence_index_snapshot.json`  
+  * `audit/gates/evidence_index_snapshot/evidence_index_snapshot.json.path_proof.txt`
 
-  * `docs/evidence/INDEX.json` — titles/paths only.
-
-* **Machine Mirror**
-
-  * `artifacts/evidence_index.jsonl` — records-only JSONL.
+**Non-canonical epic-local variant (normative).**  
+ `audit/qa/hde-epic<NNN>/evidence_index_snapshot.json` is non-authoritative and MUST NOT be required by future plans as a closure deliverable
 
 * **Same-PR rule**
 

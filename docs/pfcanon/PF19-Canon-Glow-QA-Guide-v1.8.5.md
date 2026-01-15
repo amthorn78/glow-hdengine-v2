@@ -6,11 +6,11 @@
 
 **Status:** Canon
 
-**Version:** v1.7.6
+**Version:** v1.8.5
 
-**Effective date:** 2026-01-03
+**Effective date:** 2026-01-13
 
-**Last Update Gate:** BN 8.8.4
+**Last Update Gate:** BN 9.3.4 Drain 54-57
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -39,11 +39,11 @@
 * PF17 — HDE Narratives Guide
 
 **Epics and phased planning (titles-only).**  
- PF19 treats epic planning and phase mapping as outside its scope. For HD Engine epics, the single home is **HDE Phased Epics**. **HDE Epics Map** is maintained as historical context only and must not be used as the source of truth for new work. In particular:
+ PF19 treats epic planning and phase mapping as outside its scope. For HD Engine epic history, **HDE Phased Epics** is **historical-only**: it MUST contain only **completed** epic records (formally closed per **Epic-Process-Guide**, titles-only) and is updated only at epic close (no in-flight placeholders). **HDE Epics Map** is maintained as historical context only and must not be used as the source of truth for new work. In particular:
 
 * **HDE-EPIC011 — Vendor Ingest & Data Durability** is recorded as a **failed epic**; its acceptance roster (DB posture, ingest idempotence, evidence discipline, partition plan, SAFE rails, BodyGraph invariance) did not reach a fully green, production-ready state.
 
-* **HDE-EPIC012–HDE-EPIC014** are preserved as “won’t do” (historical design), and any residual work they described must be captured as recorded debt or re-scoped into new epics in **HDE Phased Epics**, not treated as open acceptance here.
+* **HDE-EPIC012–HDE-EPIC014** are preserved as “won’t do” (historical design), and any residual work they described must be captured as recorded debt or re-scoped into a future epic, not treated as open acceptance here.
 
 **Role boundary (normative; no governance / no tokens / no planning).**  
  PF14 is a mechanics/components reference only. It:
@@ -54,7 +54,7 @@
 
 * When PF14 needs to mention governance or acceptance, it MUST route to the governing document by **title** (and section if needed) and remain descriptive about component fields and mechanical responsibilities only.
 
-PF19 may reference these epics by title when describing QA history or preservation surfaces, but any **new** epic-level QA decision (for example, where to land future PK, partition, or Catalog/A7 work) **must be routed by title to HDE Phased Epics**, not to HDE Epics Map.
+PF19 may reference these epics by title when describing QA history or preservation surfaces, but any **new** epic-level QA decision (for example, where to land future PK, partition, or Catalog/A7 work) MUST be captured in the epic’s in-flight planning and QA ledger artifacts and then reflected in the archived epic record at close. HDE Epics Map is historical-only and MUST NOT be treated as a home for new decisions. HDE Phased Epics is historical-only and MUST NOT be treated as an in-flight tracker.
 
 PF19 owns QA principles, checklists, and cross-component playbooks; it routes all transport, math, schema, and token details to those single homes.
 
@@ -88,8 +88,8 @@ PF23 scope choices are local to a plan or epic and must be recorded there (for e
 
   * the key pathnames/loci pulled from PF23 that the plan will touch.
 
-* This is a traceability anchor only. It MUST NOT duplicate PF23 contents.
-
+* This is a traceability anchor only. It MUST NOT duplicate PF23 contents.  
+* **PF23 consult is planning-time only (no Live QA deliverables).** Live QA plans MUST NOT require any PF23 consult capture artifact (e.g., `pf23_consult.md`) and MUST NOT include PF23 operator commands as execution steps. If present, the “PF23 Anchors” note is informational only (names-only) and MUST be non-gating.  
 * **Ownership (normative).** PF23 is PO-maintained. Planning documents MUST NOT create tasks that assign PF23 updates. If PF23 appears stale or missing required component coverage, the plan MAY note that as an observation, but must not assign it as agent work.
 
 ## **0.3 Acceptance tokens (names-only; initial)**
@@ -219,12 +219,7 @@ HDE PF docs apply **only** to the Engine’s surfaces and their direct callers: 
 
   * All other Engine details: HDE-titled PF docs by title only.
 
-  * **Epics map (historical vs current).**  
-     For HD Engine epics, **HDE Epics Map** is **historical-only**; it records past epic allocations, including **HDE-EPIC011** as a failed epic and **HDE-EPIC012–HDE-EPIC014** as “won’t do”. The current source of truth for epic planning, phase mapping, and epic-level acceptance rosters is **HDE Phased Epics**. QA must:
-
-    * treat any epic references in HDE Epics Map as **historical context only**, and
-
-    * route new epic-level QA decisions and open work to **HDE Phased Epics**, not to HDE Epics Map.
+  * **Epics map (historical-only).** For HD Engine epics, **HDE Epics Map** is **historical-only**; it records past epic allocations, including **HDE-EPIC011** as a failed epic and **HDE-EPIC012–HDE-EPIC014** as “won’t do”. **HDE Phased Epics** is also **historical-only**: it contains only completed epic records and is updated only at epic close (no in-flight records). QA must treat these documents as historical context and MUST NOT use them for in-flight tracking or as a planning gate.
 
 * **Admin bundle CLI surface (admin-only).**  
    CLI entrypoint that calls the admin bundle builder and returns the full product payload for a single match as a single canonical JSON object.
@@ -514,31 +509,31 @@ PF19 defines the required sequence at the QA level; PF09 — HDE-Build Checklist
 
 ## **2.3 Rails & environment posture — PO/epic mandated rails**
 
-PF19’s default posture is **CLOSED rails** for CI and determinism-sensitive work (`SAFE_MODE=1`, `ALLOW_NETWORK=0` with env pins; see §0.4.3 and §2.2). For Live QA and epic-specific acceptance, **PO/epic-mandated rails are binding**:
+Every EPIC’s PO specifies what rails posture must be used to accept the epic (open rails vs closed rails). This posture is non-negotiable: it informs which tests must be run and how results are interpreted.
 
-* When a **PO or epic acceptance roster** explicitly mandates a rails posture for some or all QA steps (for example “open-rails Live QA only for vendor flows” or “all Live QA behavior tests must run with `APP_ENV=prod` and `ALLOW_NETWORK=1`”), those rails become the **acceptance rails** for the affected D-goals.
+* If an EPIC requires open-rails testing (SAFE\_MODE=0; ALLOW\_NETWORK=1), then QA MUST confirm those rails are actually in effect for any Live QA run used for acceptance.
 
-* In that case:
+* If only closed-rails tests are run (SAFE\_MODE=1; ALLOW\_NETWORK=0) when open rails are required, then the run cannot be used as open-rails acceptance evidence. The step’s primary log (and any token claims) MUST record this explicitly via its `status` and a clear reason (in the header or at the top of the log body).
 
-  * QA plans **MUST** design steps so that the mandated rails are actually in effect when the behavior is exercised (for example, vendor behavior steps must show `ALLOW_NETWORK=1` and the expected `APP_ENV` in their step logs, not just in planning notes).
+**Rails evidence (normative):**
 
-  * If only closed-rails tests are run where open-rails behavior was mandated, the affected D-goals **MUST** be treated as **not satisfied**. The step’s primary log in QA\_ROOT (see §4.4) should record this explicitly via its `status` and `reason` fields (for example `status: FAIL_TOOLING` or `status: TOOLING_BLOCKED` with `reason: mandated open rails not available`).
+* Each Live QA step’s primary log **MUST** include a `captured_env` header field as described in §4.4, capturing at least:
 
-  * Ignoring a mandated rails posture (for example running only closed-rails tests and treating them as equivalent to open-rails Live QA) is a **QA planning/execution failure**, not a benign variation. Any waiver or change in rails must be recorded explicitly in the epic’s acceptance roster (HDE Phased Epics) and in PF10/PF19 doc deltas, not inferred from ad-hoc deviations.
+  * SAFE\_MODE
 
-* Each Live QA step’s primary log **MUST** include a `rails` header field as described in §4.4, capturing at least:
+  * ALLOW\_NETWORK
 
-  * `SAFE_MODE`, `ALLOW_NETWORK`, `APP_ENV`, `LC_ALL`, `LANG`, `TZ`.
+  * APP\_ENV
 
-* This is the canonical evidence of which rails were actually in effect when the step ran; acceptance for rails-sensitive tokens (for example `OPEN_RAILS_ENV_OK`, `LIVE_VENDOR_TRANSPORT_OK`) is based on these logged rails, not on assumed defaults.
+  * LC\_ALL
 
-* When mandated rails **cannot** be met in the current environment (for example vendor connectivity or dev harness not available under open rails), QA must:
+  * LANG
 
-  * mark the affected steps as **TOOLING\_BLOCKED / FAIL\_TOOLING** in their headers with a clear `reason` (see §2.2.5 and §3.5.11), and
+  * TZ
 
-  * treat the corresponding D-goals as **blocked by tooling/infra**, not as silently passed.
+This is canonical evidence of which rails were actually in effect for that step. It must be present even when Rails posture is “obvious” from context, because reviewers cannot accept implicit environment assumptions.
 
-This section aligns rails semantics across PF19: CI defaults to closed rails; Live QA may open rails where explicitly allowed; and PO/epic-mandated rails are binding acceptance rails that must be honored, logged, or explicitly blocked and remediated.
+* When mandated rails cannot be met due to environment constraints (e.g., SAFE\_MODE is enforced on CI runners), the QA plan must either (a) route that step to a compatible environment, or (b) mark the affected steps as TOOLING\_BLOCKED / FAIL\_TOOLING in their headers with a clear reason (in the header or log body) (see §7.2), referencing the rail mismatch.
 
 # 3\. Post-commit QA (staging/prod)
 
@@ -722,16 +717,39 @@ This section describes a **manual Live QA execution pattern** that is generalize
 
 Each manual Live QA check consists of:
 
-* one CLI command, or  
-* one HTTP command, or  
+* one CLI command, or
+
+* one HTTP command, or
+
 * a very small, self-contained inline script (embedded in the step and written under the epic QA root before execution),
 
 run from a Codespace attached to the engine repo.
 
 Each check MUST identify:
 
-* one **primary artifact** under `audit/qa/<epic-id>/…` that is mechanically produced, and  
-* clear PASS/FAIL predicates expressed only in terms of the existence/content of that primary artifact (no screen-only acceptance).
+* one **primary artifact** under `audit/qa/<epic-id>/…` that is mechanically produced, and
+
+* clear PASS/FAIL predicates expressed only in terms of the bytes/content of that primary artifact (no screen-only acceptance).
+
+* Determinism predicate targets (normative; ADR-001 surfaces lock; no wrappers/markers): determinism remediation predicates for D16–D18 MUST validate the canonical emitted surfaces below and MUST NOT require wrapper bundles or extra non-canon marker lines. Canonical predicate targets (required surfaces \+ required sibling path-proofs) include:
+
+  * D16 orientation demo: `audit/gates/topology/orientation_demo.txt` (+ `audit/gates/topology/orientation_demo.txt.path_proof.txt`)  
+    * If a plan requires EPIC-scoped orientation demo artifacts, they MUST be treated as **supporting artifacts** (not replacement predicate surfaces) and MUST be derived from `audit/gates/topology/orientation_demo.txt` (example: `artifacts/hde-epic023_orientation_demo/orientation_demo_report.json`, `artifacts/hde-epic023_orientation_demo/sample_result.json`).
+
+  * D17 env pins: `audit/gates/determinism/env_pins.log` (+ `audit/gates/determinism/env_pins.log.path_proof.txt`)
+
+    * The first JSON record MUST be a compact object with keys: `env` (object), `status` (string), `suites` (array). Validators MUST NOT require schema, rails, or other wrapper fields.
+
+  * D18 sanity: `artifacts/sanity/sanity.log` (+ `artifacts/sanity/sanity.log.path_proof.txt`)
+
+    * Validators MUST accept the canonical structure (header `sanity_pipeline`, then `env:`, then one-or-more check …, ending with `summary:PASS`) and MUST NOT require `run:sanity-pipeline` or `env_pins:` marker lines.  
+  * D19 canonical JSON gate check log: `audit/gates/canonical_json/json_canonical_check.log` (+ `audit/gates/canonical_json/json_canonical_check.log.path_proof.txt`)  
+    * Minimal predicate: the file parses as **JSON-per-line** and contains **at least one** record with `status: "pass"` (do not tighten beyond “pass observed”).  
+  * D20 canonical JSON gate compare log: `audit/gates/canonical_json/json_canon_compare.log` (+ `audit/gates/canonical_json/json_canon_compare.log.path_proof.txt`)  
+    * Minimal predicate: the file parses as **JSON-per-line** and contains **at least one** record with `status: "pass"`. Additional compare facts MAY be logged, but MUST NOT be required by validators.  
+  * Path-proof naming is locked: for these canonical surfaces, the path-proof MUST be the full filename plus `.path_proof.txt` (including the original extension), e.g., `env_pins.log.path_proof.txt` (not `env_pins.path_proof.txt`).
+
+  * **HDE Phased Epics** MUST NOT be cited to define evidence surface paths, evidence shapes, or remediation predicate targets. Plans/remediations MUST cite the governing single homes (for example: **HDE Build Notes**, **HDE-Build Checklist**, **Epic-Process-Guide**, **HDE-Schemas & Artifacts**, **Glow QA Guide**, **HDE-Governance**) as applicable.
 
 If a check needs more than one primary artifact, it is not a single check; split it.
 
@@ -739,14 +757,35 @@ If a check needs more than one primary artifact, it is not a single check; split
 
 Live QA plans MUST NOT depend on helper/wrapper scripts unless the script is explicitly canon-named by repo path (titles-only routing here; the plan must provide the explicit path).
 
+**No invented entrypoints (normative).** A plan MUST NOT require an executable entrypoint (examples: `python -m <module>`, `bash <script.sh>`, `./<tool>`) unless one of the following is true:
+
+* **Repo-proven:** the entrypoint is a real, versioned repo surface (module/script) that exists at the specified path/module name at execution time, or
+
+* **Canon-defined:** the entrypoint is explicitly defined by PF canon as a required tool surface, or
+
+* **Explicitly created:** the plan includes explicit creation instructions for the entrypoint (either as a prior DEV PR task that adds it to the repo, or as an OPS step that creates an ephemeral helper under `/tmp`).
+
+**Evidence roots are not code roots (normative).** `audit/**` and `artifacts/**` are evidence/output roots. A plan MUST NOT treat files under `audit/**` or `artifacts/**` as pre-existing runnable code (scripts/modules). If an OPS procedure needs helper code, it MUST be created ephemerally under `/tmp`, and only the resulting evidence outputs are written under `audit/**` or `artifacts/**`.
+
 If a check needs tooling beyond baseline CLI/HTTP commands, it MUST be either:
 
-* a canon-named entrypoint by explicit path, or  
+* a canon-named entrypoint by explicit path, or
+
 * an inline tool whose full source is embedded in the step and written under `audit/qa/<epic-id>/…` before execution (no hidden dependencies).
+
+**QA vs remediation separation (normative).** Remediation plans MAY instruct reruns of QA checks, but they MUST use the approved QA plan’s canonical command(s) or an existing repo harness. Remediation plans MUST NOT mint new “QA runner” entrypoints purely to mirror check IDs (for example `python -m …check_<id>…`) unless a DEV PR explicitly introduces those entrypoints as versioned repo code.
+
+**Preflight existence check (normative).** Any OPS step that invokes a repo-provided entrypoint MUST include a preflight check that proves it exists before attempting the run. Examples:
+
+* For Python modules: `python -c "import <module>; print('OK')"`
+
+* For scripts: `test -f <path> && test -x <path> || (echo "MISSING"; exit 2)`
+
+If the entrypoint does not exist, the run is `TOOLING_BLOCKED` and the operator MUST stop and capture the transcript as evidence.
 
 Plans that reference non-canon script paths as “required tooling” are non-conforming and MUST be rewritten to avoid the dependency (prefer baseline commands).
 
-This rule does not forbid canon tooling already in-repo; it forbids invented harness scripts and unproven helper paths.
+This rule does not forbid canon tooling already in-repo; it forbids invented harness scripts, unproven helper paths, and non-existent entrypoints.
 
 ### **3.4.3 Evidence layout: current-state first (new posture)**
 
@@ -756,7 +795,10 @@ Run-id discipline is not a correctness mechanism. The canonical evidence posture
 
 Each check’s canonical primary evidence is a single primary log/artifact referenced by the epic-level step-log manifest:
 
-* `audit/qa/<epic-id>/qa_step_logs_manifest.json`
+* `audit/qa/<epic-id>/qa_step_logs_manifest.json`  
+* `audit/qa/<epic-id>/checks/<check_id>/primary.log (one canonical primary log per check_id; referenced by the manifest)`
+
+**KISS evidence posture (normative).** Live QA plans MUST minimize required outputs to the per-check primary log and the step-logs manifest. Nothing else is auto-required unless canon explicitly pins a governed evidence family/path. Any additional required artifact must be explicitly justified as acceptance-decisive and must be canonized (PF10 or PF-canon) as a governed evidence family/path.
 
 Optional per-run directories MAY exist for history retention:
 
@@ -782,81 +824,143 @@ Each check MUST capture a command transcript at minimum:
 
 Transcripts MUST be stored under `audit/qa/<epic-id>/…` and referenced by the primary artifact (or be the primary artifact when the check is log-based).
 
-For commands that may be noisy or long-running, tee stdout/stderr to a log file under the epic QA root (example pattern: `audit/qa/<epic-id>/step_logs/<check_id>_stdout.log`), but keep the primary artifact definition unchanged.
+For commands that may be noisy or long-running, tee stdout/stderr to a log file under the epic QA root (example pattern: `audit/qa/<epic-id>/checks/<check_id>/stdout.log`), but keep the primary artifact definition unchanged.
 
 ### **3.4.6 Step-level Deliverables (no screen-only acceptance)**
 
 For any QA guide, runbook, or PF10 QA addendum that defines stepwise QA execution, each check MUST include a Deliverables subsection naming the **minimal evidence set** created or updated by that check.
 
-Requirements (normative):
+**Requirements (normative):**
 
-* **Fully-qualified paths:** Every deliverable MUST be listed with a repo-relative, fully-qualified path (for example `audit/qa/hde-epic021/step_logs/d3_internal_version.log`).  
-* **No vague phrases:** Phrases such as “everything in this folder,” “all logs from this run,” or “whatever the harness wrote” are forbidden.  
-* **Minimal evidence set:** Deliverables MUST be the minimal set required to judge PASS/FAIL for that check.  
-* **No screen-only acceptance:** PASS/FAIL criteria MUST be expressed solely in terms of existence/non-emptiness of deliverables and simple, checkable predicates on contents (grep/diff predicates), not “what you see in the console.”  
-* **No new files case:** If a check creates no new files, Deliverables MUST say so explicitly and list the files it inspects.
+* **Fully-qualified paths:** Every deliverable MUST be listed with a repo-relative, fully-qualified path (for example `audit/qa/hde-epic021/checks/d3_internal_version/primary.log`).  
+* **Presence rules:** A deliverable is either required to exist, required to be absent, or required to have a specific content signature. Vague phrasing ("should", "nice-to-have") is forbidden.  
+* **Primary artifact discipline:** Each step MUST define exactly one primary artifact (the canonical evidence surface) and may optionally define supporting artifacts.  
+* **No screen-only acceptance:** Screenshots are allowed as supporting evidence, but MUST NOT be the sole basis for PASS/FAIL.
 
 ### **3.4.7 Command formatting (copy/paste-ready)**
 
-Live QA instructions presented to a human operator MUST:
+* All shell commands MUST be presented in copy/paste-ready form. A reviewer must be able to run the command(s) without reconstructing punctuation, flags, or paths.
 
-* present commands in copy/paste-ready form (one full command or fenced block),  
-* avoid mixing narrative and shell on the same line,  
-* avoid line wrapping that changes semantics,  
-* clearly mark variable segments and how to substitute them,  
-* avoid pseudo-shell prose.
+  * Fenced code blocks are OPTIONAL and MUST NOT be treated as an approval gate.
 
-If commands cannot be copied and run as-is on a canonical QA console, the plan is defective and must be corrected before execution.
+  * If the plan may be consumed in a plain-text venue (or rendering is unknown), avoid markup that breaks copy/paste (e.g., do not wrap every line in backticks).
+
+* Commands MUST avoid placeholders like `<...>`. If a path varies, provide the exact expected path shape and at least one fully-qualified concrete example.
+
+* If a command is destructive (writes to governed artifacts), include an explicit “STOP if output contains …” line before it, describing what would invalidate the step.
 
 ### **3.4.8 Rails posture for manual Live QA (EPIC017 example; generalized rule)**
 
 Manual Live QA steps that touch production endpoints run with open rails as required by the command (for example `ALLOW_NETWORK=1`, `SAFE_MODE=0`).
 
-Manual Live QA must not modify code or configuration and must not write outside `audit/qa/**` for evidence.
+Manual Live QA MUST NOT modify code or configuration **except** for minimal, in-session remediation under the **Moon Loop** policy below. Evidence outputs MUST still be written under `audit/qa/**` for governed evidence.
+
+**Moon Loop (allowed; minimal in-session remediation to unblock QA):**
+
+Live QA may include a small remediation loop when a check fails due to an execution-blocking mismatch, only to the extent required to produce a PASS-grade proof for the already-approved scope.
+
+The only goal is to unblock the existing QA check and prove the existing implementation works.
+
+**Hard boundary: no scope expansion.** In-session remediation MUST NOT:
+
+* add new features or acceptance criteria
+
+* change public contracts
+
+* mint new tokens
+
+* introduce new evidence families
+
+* turn QA into a second remediation plan
+
+**Allowed remediation actions (minimum set):**
+
+* Create small helper scripts under `/tmp` for parsing or glue (strictly ephemeral; never treated as evidence).
+
+* Adjust the QA check procedure to use the canonical emitted surfaces (paths and shapes) already required by canon and implementation.
+
+* Apply the smallest code or script change that is required for the check to execute and validate behavior, when the failure is clearly a tooling or expectation mismatch (not a new feature).
+
+* Re-run the affected check(s) and capture the PASS-grade evidence artifacts.
+
+**Evidence posture for in-session remediation.** If remediation occurs inside a QA session, the existing primary evidence artifacts MUST make it auditable without additional documents:
+
+* The failing check’s primary log MUST include the failure signature (short excerpt).
+
+* The same log (or the session transcript) MUST include a one-line remediation note that names exactly what changed (file paths) and why.
+
+* The rerun output showing PASS MUST be captured in the same evidence stream.
+
+* If any repo files were changed, capture a minimal delta artifact under a lowercase governed path, for example:
+
+  * `audit/qa/<epic-id>/remediation/moon_loop/patch.diff` (or equivalent)
+
+  * `audit/qa/<epic-id>/remediation/moon_loop/changed_files.txt` (paths \+ sha256)
+
+  * This delta capture must not discuss branches, commits, or PR workflow.
+
+**Stop condition.** If the remediation required is not “minimal” (multiple files, unclear root cause, or changes beyond the failing surface), stop the Moon Loop and escalate to a normal remediation plan.
+
+**/tmp helper scripts (allowed; execution-only; non-evidence):**
+
+QA agents MAY create ephemeral helper scripts under `/tmp` during Live QA execution.
+
+These scripts are execution-only and MUST NOT be treated as deliverables or governed evidence.
+
+* Outputs under `/tmp` MUST NOT be indexed, mirrored, path-proofed, or referenced as acceptance binding surfaces.
+
+* Any evidence artifacts produced by a step MUST still be written under the epic QA root (for example under `audit/qa/<epic-id>/…` as used throughout this guide).
+
+* `/tmp` helper scripts MUST NOT print or persist secrets.
 
 Closed-rails testing (`SAFE_MODE=1`, `ALLOW_NETWORK=0`) remains the responsibility of:
 
-* CI jobs wired in the repo, and  
+* CI jobs wired in the repo, and
+
 * pre-merge QA on PRs implementing the epic.
 
-Manual Live QA does not attempt to replicate the full closed-rails suite; it focuses on proving real production behavior of key surfaces via open-rails commands from Codespaces into Railway.
+Manual Live QA does not attempt to replicate the full closed-rails surfaces via open-rails commands from Codespaces into Railway.
 
-### **3.4.9 Gitless Live QA (normative; artifact-based PASS/FAIL)**
+### **3.4.9 No VCS workflow content (normative; artifact-based PASS/FAIL)**
 
-Live QA runbooks MUST NOT include git operations (including but not limited to checkout, status gating, add/commit/push, PR creation).
+Live QA Plans MUST be artifact- and evidence-driven. They MUST NOT embed version-control workflow steps.
 
-Live QA PASS/FAIL MUST NOT be determined by working-tree cleanliness. If git information is captured at all, it is traceability-only and cannot block execution.
+* **No VCS workflow content (hard).** A Live QA Plan MUST NOT instruct on, assume, or require any version-control workflow, including:
 
-Known Codespaces packaging artifacts MUST be explicitly non-blocking and left untouched. The only write-scope rail for Live QA evidence remains: `audit/qa/<epic-id>/…`.
+  * branches, commits, pushes, PR creation/updates, merges/rebases, conflict resolution, or “git workflow” steps  
+  * requirements about “what branch to be on” or “what commit SHA to record”
 
-Any step definition that currently requires “working tree is clean” MUST be updated to instead:
+* **No PASS/FAIL gated on VCS state (hard).** PASS/FAIL MUST NOT be determined by working-tree cleanliness, branch name, commit hash, or any other VCS state. These are not behavioral evidence and can vary between execution environments.  
+* **Optional non-gating repo-root sanity checks (allowed).** A plan MAY include a small read-only sanity check to confirm it is running in a repository (e.g., `git rev-parse --show-toplevel`). If such a sanity check fails:
 
-* verify that expected `audit/qa/<epic-id>/…` artifacts exist and are non-empty, and  
-* verify step status and predicates via the primary artifact contents.
+  * classify the affected check as `TOOLING_BLOCKED` (not `FAIL_BEHAVIOR`)  
+  * continue with other non-dependent steps when possible  
+     A plan using a sanity check MUST NOT mutate repo state (`git checkout`, `git commit`, `git clean`, etc) and MUST NOT require PR metadata or a specific branch/commit.
+
+* **Known Codespaces packaging artifacts.** Codespaces sometimes includes `.codespaces/.persistedshare` and/or `*.tar` artifacts that can trigger `git status` noise. These are non-blocking for QA; do not gate on them.
+
+If a plan currently requires “clean git status” as a precondition, update it. The plan should focus on the artifacts it produces and the behavior it verifies.
 
 ### **3.4.10 Plan validity lint (blockers-only; deterministic)**
 
-Apply this lint before Live QA execution.
+Before execution, QA reviewers MUST treat the following as hard blockers (plan is not valid until corrected):
 
-Blockers (reject for approval/execution):
+* References acceptance tokens that are undefined or not present in the canonical registry.
 
-* Manual result placeholders (“fill PASS/FAIL/SKIPPED”, “operator summary”, etc.).  
-* Git commands/operations in PO runbook steps.  
-  * Exception: inspection-only git commands are allowed in a read-only Codex planning prompt only and must not gate PASS/FAIL.  
-* Depends on helper/wrapper scripts or opaque runners that are not canon-named by explicit path and not embedded inline under `audit/qa/<epic-id>/…`.  
-* Gates PASS/FAIL on working-tree cleanliness.  
-* Lacks Step-0 mechanical artifacts required by the plan’s own posture (codespaces snapshot, baseline env capture, manifest update).  
-* Invents CLI flags/subcommands not present in `--help`.  
-* Asks PO/operator to write prose acceptance summaries during execution (evidence is mechanical artifacts).
+* Contains unverifiable claims (“works”, “should”, “looks good”) without an artifact path or exact command to reproduce.
 
-Caveats (allowed but must be labeled in plan \+ logged in step evidence):
+* Depends on helper scripts or harnesses outside the canonical harness directory without a pinned version/path reference.
 
-* DOC\_DRIFT — repo snapshot differs from PF canon (paths, flags, tools). Capture drift mechanically (help outputs, file trees) and state how the plan adapts without inventing new requirements.  
-* MANIFEST\_FORMAT — manifest shape differs from canonical; capture the manifest bytes and record why it remains safe for this run (no token claims derived from ambiguous manifest).  
-* ENV\_DRIFT — environment differs from expected profile; capture differences mechanically; do not “fix” by adding new rails.  
-* DOC\_DELTA\_PRESENT — a doc delta exists and is explicitly non-blocking for this run; capture it and drain later.
+* Requires writing outside the governed QA write roots (`audit/**` or `artifacts/**`).
 
-Review source-retrieval guard (normative). Reviewers MUST NOT make excerpt-based mismatch claims for token rosters, rails, or governed evidence expectations. Before asserting a mismatch, retrieve the full governing passage(s) and the full roster/registry entries involved. If full source cannot be retrieved, record DOC\_DRIFT instead of asserting a mismatch.
+* Contains VCS workflow content (branches/commits/PRs) or gates PASS/FAIL on VCS state.
+
+  * Exception: an optional read-only repo-root sanity check is allowed if it is explicitly non-gating; if it fails, the outcome MUST be `TOOLING_BLOCKED`, not `FAIL_BEHAVIOR`.
+
+* References required artifact/file paths that are not canon-defined and are not explicitly created by the plan under the governed QA write roots (no fabricated paths).  
+* Requires any PF23 consult capture deliverable (e.g., `pf23_consult.md`) or includes PF23 operator commands as execution steps (PF23 consult is planning-time only; any trace belongs in plan text only and MUST be non-gating).  
+* Declares Step-0 artifacts as required but does not specify how/where they are produced and recorded (see PF27 — Plan Templates and, for Codespaces runs, §14.6).  
+* Assigns PASS to a step without any evidence capture (log path, output file, or deterministic command output).
 
 ### **3.4.11 Vendor and DB safety constraints (names-only)**
 
@@ -871,6 +975,18 @@ For doc-alignment Live QA steps:
 
 * Steps MUST rely on mechanical commands (ls, grep, find, python tooling) that generate tree listings, filtered file lists, or diffs.  
 * Outputs MUST be written under `audit/qa/<epic-id>/…` as primary or helper artifacts.  
+* Close report requirements (validator-bound; mechanical): epic close reports (for example `audit/EPIC-023_close_report.md`) MUST include:  
+  * the heading `QA Rails — Open/Close (Final PR)` (verbatim), and  
+  * an “Acceptance and evidence pointers” list containing the epic’s canonical pointer strings (exact text). Example (EPIC-023):  
+    * `docs/acceptance_map_epic023.json`  
+    * `audit/qa/hde-epic023/token_evidence_matrix.md`
+
+  * `audit/qa/hde-epic023/acceptance_map_viability.log`
+
+  * `audit/qa/hde-epic023/qa_step_logs_manifest.json`
+
+* The close report check validates required pointer strings as literal substrings; missing any required pointer is a mechanical FAIL for the close report check.  
+*   
 * PO/operator must not be required to write prose summaries as part of execution. Narrative synthesis belongs in the close report and canon updates (titles-only routing).
 
 ## **3.5 Live QA via Codespaces → Railway (cross-epic crib)**
@@ -962,7 +1078,8 @@ B) Headers
 
 * `Content-Type: application/json; charset=utf-8` MUST be present.
 
-* `ETag` MUST be absent.
+* `ETag` MUST be absent.  
+* `docs/ENDPOINTS_CATALOG.json` MUST include `/internal/version`, and the catalog entry MUST set `a7_eligible: false` (inventory posture; `/internal/version` is not an A7 surface).
 
 * `Last-Modified` MUST be absent.
 
@@ -1006,7 +1123,7 @@ Where possible, it should also prescribe how to **capture outputs** on that envi
 
 #### **2\) Artifact capture and analysis (Codespaces / QA console)**
 
-The QA plan **MUST** then describe how artifacts from the behavior environment are brought into the canonical QA tree under `audit/qa/<epic-id>/…` and analyzed. At minimum, Live QA instructions **MUST** include fenced or clearly reproducible commands that:
+The QA plan **MUST** then describe how artifacts from the behavior environment are brought into the canonical QA tree under `audit/qa/<epic-id>/…` and analyzed. At minimum, Live QA instructions **MUST** include copy/paste-ready commands (fenced blocks optional) that:
 
 * create any needed subdirectories under `audit/qa/<epic-id>/…` (all lower-case directories; see §8),
 
@@ -1655,7 +1772,8 @@ QA needs to distinguish **when evidence was produced** from **when files were la
 
   * On any evidence run or CI check, QA must ensure that `mtime_utc` parses as UTC and that the parsed time is **not later than** the artifact’s current filesystem `stat().st_mtime` (monotone semantics).
 
-  * `mtime_utc` is **not required** to equal `stat().st_mtime` in later runs or on other machines; it may be earlier (for example, when a proof is carried forward after a no-op run), but it MUST NEVER lie in the future relative to the current filesystem mtime.
+  * `mtime_utc` is **not required** to equal `stat().st_mtime` in later runs or on other machines; it may be earlier (for example, when a proof is carried forward after a no-op run), but it MUST NEVER lie in the future relative to the current filesystem mtime.  
+  * **Stale timestamp drift after a byte-changing refresh is blocking.** If a governed artifact’s bytes change (regenerated or refreshed) but its corresponding `*.path_proof.txt` (or the Mirror/Index record for that path) still reports older carried-forward `produced_at_utc` / `mtime_utc`, treat this as a provenance/audit-trail defect and rerun the evidence tooling in write mode to regenerate proofs and refresh Index/Mirror entries. Do not hand-edit timestamps. This does not apply to no-op runs where the underlying bytes did not change.
 
 * QA checks for lifecycle or OPS-managed artifacts should always examine both:
 
@@ -1777,47 +1895,51 @@ Tools and reviewers MUST NOT infer run history or current status by enumerating 
 
 ### **4.4.3 Per-epic QA step logs manifest (qa\_step\_logs\_manifest.json)**
 
-**Canonical path:**  
-`audit/qa/<epic-id>/qa_step_logs_manifest.json`
+**Canonical path:** `audit/qa/<epic-id>/qa_step_logs_manifest.json`
 
-**Purpose:**  
-A compact current-state index of QA checks and their canonical evidence pointers, supporting:
+**Purpose:** A machine-readable index of all per-check “primary logs” under the epic’s QA root, used by review tooling and by the QA acceptance map to link checks → evidence.
 
-* reviewer navigation of QA evidence, and  
-* tokens that depend on consolidated QA step evidence.
+**Routing (normative):** Live QA runbook template structure and step-log header schema are owned by PF27 — Plan Templates; this guide does not define alternate header schemas.
 
 **Requirements (normative):**
 
-* The manifest MUST be a records-only canonical JSON (UTF-8, ASCII-sorted keys, compact, exactly one trailing LF).  
-* The manifest MUST be keyed by **check\_id** (current-state).  
-* The manifest MUST contain at most one entry per `check_id`.  
-* Each entry MUST include at minimum:  
-  * `check_id`  
-  * `status`  
-  * `log_path` (must point to the canonical primary log for that check under the epic QA root)  
-* `log_path` MUST NOT point outside the epic QA root.  
-* If a check is re-run, the manifest entry for that `check_id` MUST be updated in place to point to the latest canonical primary log (do not append a second entry).
+* The manifest MUST be valid JSON and MUST be an object keyed by `check_id`.
 
-**Uniqueness post-check (normative; closeout tooling gate):**  
-Any tool or harness that writes `qa_step_logs_manifest.json` MUST perform a deterministic uniqueness validation immediately after writing the file:
+* There MUST be at most one entry per `check_id`.
 
-* No duplicate `check_id` entries.
+* Each entry MUST include:
 
-If uniqueness validation fails:
+  * `check_id`
 
-* the producing step MUST be classified as FAIL\_TOOLING / TOOLING\_BLOCKED, and  
-* downstream closeout tooling (including close-pack generation) MUST NOT consume the manifest until it is regenerated into a unique, canonical state.
+  * `log_path` (relative path from `audit/qa/<epic-id>/` to the canonical primary log)
 
-This is an evidence integrity gate, not a style preference.
+* `log_path` MUST be a relative path within the epic QA root and MUST NOT point outside `audit/qa/<epic-id>/…`.
+
+* **No fabricated paths (normative):**
+
+  * Plans and runbooks MUST NOT mint required artifact paths. A `log_path` entry MUST point to a real canonical primary log produced by the corresponding check, under the governed QA root.
+
+  * If a required log path is missing at evaluation time, it MUST be treated as a tooling/prerequisite failure (e.g., `TOOLING_BLOCKED` for missing prerequisite inputs/artifacts, or `FAIL_TOOLING` when the harness/tooling fails), not `FAIL_BEHAVIOR`.
+
+* Plans MUST distinguish pre-existing inputs (which may be presence-checked before running a step) from QA-produced artifacts (which MUST NOT be required to exist prior to the step that produces them).
+
+* This manifest is current-state only. Old run logs may be retained under `runs/<run_id>/…`, but are non-canonical and MUST NOT be referenced by `log_path`.
+
+* A uniqueness validation failure (duplicate `check_id` keys) is a FAIL\_TOOLING / TOOLING\_BLOCKED condition. Downstream tools MUST NOT consume a manifest that violates uniqueness.
 
 ### **4.4.4 Primary step logs (one per check\_id; canonical)**
 
 **One primary log per check.**  
 For each QA check that produces evidence, there MUST be exactly one **canonical primary log** referenced by the manifest for that `check_id`.
 
-**Canonical location (recommended default):**
+**Canonical path (normative; KISS default for Live QA checks)`:`**
 
-* `audit/qa/<epic-id>/step_logs/<check_id>_<slug>.log`
+* `audit/qa/<epic-id>/checks/<check_id>/primary.log`  
+* This `primary.log` \+ `qa_step_logs_manifest.json` requirement applies even when a step is posture-only / `TOOLING_BLOCKED` (for example when validation logic is not yet implemented): the canonical `primary.log` MUST still be emitted and the manifest MUST still be updated.  
+* For posture-only / `TOOLING_BLOCKED` steps, `intended_tokens` and `claimed_tokens` MUST be empty (or omitted) and MUST NOT claim acceptance tokens.  
+* Examples of posture-only check\_ids: `D22_canonical_json_gate_structured_record`, `D23_evidence_index_snapshot_artifact`.
+
+For Live QA checks, the manifest log\_path MUST point to checks/\<check\_id\>/primary.log. If a canon-governed evidence family defines a different primary-log location, treat that location as the canonical log path and point the manifest to it.
 
 A plan MAY store primary logs in another stable location under the epic QA root, but the manifest must point to the canonical log path.
 
@@ -1839,34 +1961,94 @@ Exception: clearly marked sentinel markers MAY be empty but MUST NOT be referenc
 
 ### **4.4.5 Step log header (required fields; token semantics are claims-safe)**
 
+**Header normalization (allowed; reviewer-of-record; no rerun required).**  
+ If a primary step-log header is missing any *defaultable* fields, a QA reviewer-of-record MAY mechanically normalize the header by adding the missing fields with empty defaults and re-serializing the header as canonical JSON.
+
+Defaultable header fields (non-blocking; default to empty when omitted): `pf_refs`, `intended_tokens`, `claimed_tokens`.
+
+Token-claim safety (normative): token claims MUST NOT be inferred. If `claimed_tokens` is missing or empty, treat the step as claiming **no** tokens. Normalization MAY include moving an explicitly stated claim into the correct header field (example: ensuring a stated token claim appears in `claimed_tokens`), but MUST NOT introduce new claims beyond what the log already asserts.
+
+Status vocabulary (normative): `status` MUST be one of `PASS`, `FAIL_BEHAVIOR`, `FAIL_TOOLING`, `TOOLING_BLOCKED`, `PARKED`. Non-conforming status values MUST be normalized (or the step is not audit-usable).
+
 Each per-check primary log MUST begin with a machine-readable header block on the first line, followed by the human-readable body.
 
-**Required header fields (minimum):**
+**Routing (normative):** Live QA runbook template structure, the minimum step-log header schema, and the status vocabulary are owned by PF27 — Plan Templates. This guide does not define alternate header schemas.
 
-* `check_id` — stable identifier for the check.  
-* `command` — the full shell command (or entrypoint) executed for this check. If multiple commands are required, the header MUST either:  
-  * list the primary command and explicitly note that helper commands appear in the log body, or  
-  * include a small array of commands.  
-* `captured_env` — structured snapshot of the rails/pins for this check, including at minimum:  
-  * SAFE\_MODE, ALLOW\_NETWORK, APP\_ENV, LC\_ALL, LANG, TZ  
-* `pf_refs` — titles-only references to relevant PF docs or sections.  
-* `status` — one of the stable statuses below.  
-* `intended_tokens` — tokens the check is designed to support (names-only). Allowed on any status.  
-* `claimed_tokens` — tokens actually satisfied by verified evidence. This field is a claim:  
-  * On PASS, `claimed_tokens` MAY include `*_OK` tokens.  
-  * On FAIL\_BEHAVIOR, FAIL\_TOOLING, TOOLING\_BLOCKED, or PARKED, `claimed_tokens` MUST be empty or omitted and MUST NOT include any `*_OK` token names.  
-* `tokens` — if present, it is a legacy alias for `intended_tokens` only and MUST NOT be interpreted as claimed/satisfied tokens.
+**Minimum header fields (Plan Templates; required):**
 
-**Status semantics (stable set):**
+* `check_id` — stable identifier for the check.
 
-* `PENDING` — check defined but not yet run or reviewed.  
-* `PASS` — check executed, evidence present, and behavior meets expectations.  
-* `FAIL_BEHAVIOR` — behavior failure: the harness ran and the surface was exercised, but observed outputs contradict the owning PF expectations.  
-* `FAIL_TOOLING` — check could not be executed or evaluated because required tooling/inputs/services were not available or a tool failed.  
-* `TOOLING_BLOCKED` — check cannot proceed due to missing declared prerequisites (missing required inputs/files).  
-* `PARKED` — check intentionally deferred; no tokens may be claimed.
+* `status` — a Plan Templates status value.
 
-Steps may define additional more granular status fields, but MUST NOT overload PASS or FAIL\_BEHAVIOR to mean tooling problems. If legacy logs use `FAIL`, treat it as FAIL\_BEHAVIOR unless the log explicitly states a tooling block.
+* `command` — the complete command/entrypoint executed for this check (copy/paste-ready).
+
+* `captured_env` — structured snapshot of the rails/pins in effect for this check. At minimum, this MUST capture:
+
+  * SAFE\_MODE
+
+  * ALLOW\_NETWORK
+
+  * APP\_ENV
+
+  * LC\_ALL
+
+  * LANG
+
+  * TZ
+
+**Token fields (optional; token-relevant only):**
+
+Token lists are optional in runbooks and logs. Plans and reviewers MUST NOT gate approval on token-list completeness. If token fields are present, they MUST be names-only and MUST match canonical token spellings (no aliases, no near-matches).
+
+* `intended_tokens` — tokens the check is designed to support (names-only; optional).
+
+* `claimed_tokens` — tokens actually satisfied by verified evidence (names-only).
+
+  * `claimed_tokens` MUST be present only when `status` is `PASS`.
+
+  * If `status` is not `PASS`, `claimed_tokens` MUST be omitted (or present but empty).
+
+  * When both are present, `claimed_tokens` MUST be a subset of `intended_tokens`.
+
+* `tokens` — legacy alias for `intended_tokens` only. It MUST NOT be interpreted as claimed/satisfied tokens.
+
+**Acceptance map — token identity and shape (normative):**
+
+* The acceptance-map artifact MUST include a top-level `tokens` array.
+
+* Each entry in `tokens` MUST be an object with a required `name` string field.
+
+* `tokens[].name` is the authoritative token identity. It is case-sensitive and MUST match the token registry entry exactly.
+
+* QA plans, validators, and token-evidence tooling MUST derive token identity from `tokens[].name` and MUST NOT infer token identity from matrix header labels or other non-registry aliases (for example `token_name`).
+
+**Additional fields (allowed; non-gating):**
+
+Additional header fields (e.g., `pf_refs`, a human `reason`, or other traceability fields) are allowed, but MUST NOT be required as a plan-approval condition unless PF27 — Plan Templates is updated to require them.
+
+**Evidence-only guard proofs (normative):**
+
+If a step claims PASS but its evidence depends on an assumption that could be false (e.g., “no output means success”), the step MUST include an explicit guard proof in the log body (e.g., a command that would have produced output on failure).
+
+**Unregistered token handling (normative):**
+
+If a step lists a token in `intended_tokens` or `claimed_tokens` that is not present in the registry:
+
+* treat it as an invalid claim
+
+* do not translate it into a “close” token name
+
+* require the plan/PR to add the token to the registry (or to remove the claim)
+
+**Status usage for missing paths vs wrong behavior (PF19 interpretation):**
+
+When selecting a status value, use PF27 — Plan Templates vocabulary. PF19 relies on these distinctions when interpreting step logs and token claims:
+
+* Missing declared prerequisites or missing required inputs/artifacts ⇒ `TOOLING_BLOCKED` (not `FAIL_BEHAVIOR`)
+
+* Tool/harness failure that prevents running or evaluating the check ⇒ `FAIL_TOOLING`
+
+* The check ran, but behavior contradicted the expected result ⇒ `FAIL_BEHAVIOR`
 
 ### **4.4.6 Log body and supporting artifacts**
 
@@ -3874,6 +4056,12 @@ A token MAY be added to this PF19 registry only if all of the following are true
 
 Tokens that fail this rubric MUST be captured as checklist items, step-log metadata, or process rails in their owning PF docs, and MUST NOT be minted as new QA Acceptance Tokens in this registry.
 
+**Explicit non-token examples (normative).**
+
+* **Guard proofs** are evidence-only deliverables unless and until HDE-Governance registers an acceptance token. Do not mint, request, or claim ad hoc “guard tokens.”
+
+* **PF23 consult completion** is not an acceptance token. Plans and implementations MUST NOT mint, claim, or reference `REALITY_AUDIT_OK` (or any similar “PF23 consult completion” token) unless and until HDE-Governance registers such a token.
+
 **Admission test (shortcut).**  
  If the answer to either question is “no”, the thing is not a QA Acceptance Token:
 
@@ -4054,53 +4242,39 @@ As with other tokens in this section, concrete schemas, bundle mechanics, and CI
 
 * the pipeline log shows a PASS outcome (for example a `summary:PASS` line) for all configured steps, with any failure treated as a CI failure that blocks tokens such as `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_HASH_OK`, `MACHINE_MIRROR_UPDATED_OK`, `EVIDENCE_PATHS_VALIDATED_OK`, and `CI_CHECK_MIRROR_SCHEMA_OK` until the skeleton is brought back into coherence.
 
-### **SANITY\_PIPELINE\_LOGGED\_OK**
+  ### **SANITY\_PIPELINE\_LOGGED\_OK**
 
-**Owner PF:** HDE-Build Checklist / HDE Phased Epics  
-**Scope:** Post-commit / Live QA (QA observability for sanity pipeline)
+* **Meaning:** The epic’s current-state QA logs and manifest are present, and are sufficient for a reviewer to find and read evidence.
 
-**QA definition:**  
-`SANITY_PIPELINE_LOGGED_OK` proves that sanity pipeline runs are **logged and reviewable** under the epic QA root (**current-state, check\_id-indexed posture**) and are wired into the epic’s acceptance artifacts (acceptance map and token/evidence matrix). This token is about **QA traceability and evidence navigability**. It does not replace the CI PASS requirement of `SANITY_PIPELINE_OK`.
+* **Evidence:**
 
-**Evidence (names-only; current posture):** Proof that, for the epic under test:
+  * `audit/qa/<epic-id>/qa_step_logs_manifest.json` exists and is valid JSON.
 
-1. **Canonical epic QA root exists (current-state):**  
-   Evidence is organized under: `audit/qa/<epic-id>/`  
-2. **Canonical step-log manifest points to current-state step evidence:**  
-   `audit/qa/<epic-id>/qa_step_logs_manifest.json` includes a check entry for the sanity pipeline check (check\_id owned by the plan/harness), with:  
-   * `status: PASS`, and  
-   * `log_path` pointing to the canonical primary log for that check under the epic QA root.  
-3. **Primary logs exist for the relevant current-state checks:**  
-   The epic QA tree contains non-empty, LF-terminated primary logs (one per check\_id) for:  
-   * the bootstrap/tooling readiness check (example category: D0 bootstrap), and  
-   * the sanity pipeline check (example category: sanity step).  
-     Each primary log begins with the PF19-required header (machine-readable), includes `command` and `captured_env`, and has a clear status line in the header.  
-4. **Token/evidence matrix binds the token to the canonical evidence surfaces:**  
-   `audit/qa/<epic-id>/token_evidence_matrix.md` includes a row for `SANITY_PIPELINE_LOGGED_OK` that references:  
-   * the canonical step-log manifest entry (by check\_id and/or log\_path), and  
-   * the canonical primary log(s) for the bootstrap and sanity checks, and  
-   * the CI/tests/harness step(s) responsible for producing or validating them (names-only).  
-5. **Acceptance map references the canonical token name and has non-empty evidence pointers:**  
-   The epic acceptance map references `SANITY_PIPELINE_LOGGED_OK` by the canonical token name (no local aliases) and includes non-empty evidence pointers for implemented status, consistent with the token/evidence matrix.
+  * `audit/qa/<epic-id>/qa_step_logs_manifest.json` is keyed by `check_id` and points via `log_path` to each check’s canonical primary log under `audit/qa/<epic-id>/…`.
 
-**Notes (non-normative):**
+  * Each primary log is non-empty.
 
-* Optional per-run retention directories under `audit/qa/<epic-id>/runs/<run_id>/…` may exist, but they are not required for satisfying `SANITY_PIPELINE_LOGGED_OK`. The authoritative pointers are the epic-level manifest and the canonical primary logs under the epic QA root.
+  * Each primary log begins with a Plan Templates step-log header as routed by §4.4.5 (including a complete `command` and `captured_env`), and has a clear status line in the header.
 
-#### **QA\_STEP\_LOGS\_CONSOLIDATED\_OK**
+  #### **QA\_STEP\_LOGS\_CONSOLIDATED\_OK**
 
-**Owner PF:** HDE-Governance / HDE Phased Epics / HDE-Build Checklist  
- **Scope:** Post-commit / Live QA (QA harness log consolidation)  
- **QA definition:** QA\_STEP\_LOGS\_CONSOLIDATED\_OK proves that QA step logs are consolidated and discoverable for the epic: per-run QA\_ROOT directories exist, each QA plan step has exactly one primary log, and a per-epic step-log manifest indexes runs and points to those step logs. This token exists to prevent “scattered or ambiguous QA evidence” and to keep QA harness runs reviewable.  
- **Evidence:** Proof that:
+* **Meaning:** The epic’s QA evidence is consolidated to current-state canonical logs, with a manifest that provides deterministic pointers from checks → primary logs.
 
-* per-run QA\_ROOT directories and per-step primary logs exist and satisfy §4.4 (one primary log per step, PF19 header fields, status vocabulary, non-empty logs);
+* **QA definition (strict):**
 
-* the epic maintains `audit/qa/<epic-id>/qa_step_logs_manifest.json` as the per-epic index of run IDs and step logs (see §4.4);
+  * For each check required by the epic’s QA posture, there exists exactly one canonical primary log under `audit/qa/<epic-id>/…` (one per `check_id`), and it is referenced from the per-epic manifest.
 
-* the manifest is deduplicated by `run_id` (at most one entry per `run_id`; reruns replace the prior entry) and its `log_path` fields point to canonical QA\_ROOT logs; and
+  * The manifest is current-state only. Any per-run retention logs under `runs/<run_id>/…` are optional and non-canonical, and MUST NOT be referenced by `log_path`.
 
-* the epic’s acceptance map and token/evidence matrix bind QA\_STEP\_LOGS\_CONSOLIDATED\_OK to the manifest and the underlying QA\_ROOT step logs (no `e.g.` or implicit evidence).
+  * The step-log header schema and status vocabulary used in primary logs follow Plan Templates (routed by §4.4.5).
+
+* **Evidence:**
+
+  * The epic maintains `audit/qa/<epic-id>/qa_step_logs_manifest.json` as a per-epic index keyed by `check_id`, mapping each required check to its canonical primary log via `log_path`.
+
+  * The manifest is deduplicated by `check_id` (at most one entry per `check_id`), and its `log_path` values all point within the epic QA root.
+
+  * The acceptance map and token matrix bind required tokens to checks and reference the manifest \+ primary logs as the authoritative evidence surfaces.
 
 **Live QA note (mechanics smoke tests).**  
  When the sanity pipeline (or its component scripts) are run in Live QA (for example from an open-rails Codespace during an epic’s D3/D4 steps), those invocations are treated as mechanics smoke tests, not as the canonical satisfaction of SANITY\_PIPELINE\_OK.
@@ -4418,6 +4592,11 @@ PF19 treats epic manifests and epic acceptance maps as complementary views of th
 
   * binds tokens to the concrete governed artifacts and tests that have actually been run.
 
+**Close-pack manifest `key_outputs` bindings (normative; validator-bound).**  
+ Epic close-pack manifests MUST represent their primary outputs via `key_outputs` as a dictionary of named bindings to exact path strings (not as a list or “membership” set). Validators are permitted to validate both the required binding keys and the exact bound path values.
+
+Required binding keys (names-only; stable): `acceptance_map`, `token_matrix`, `acceptance_viability`, `step_logs_manifest`, `qa_doc_deltas`, `close_report`, `close_manifest`.
+
 **Registry-level binding rule (normative).**  
  For each epic, the epic manifest MUST bind each QA token to artifacts that belong to the evidence families named for that token in the epic’s acceptance map (or in a PF-Canon section that the acceptance map points to by title). It is not acceptable to bind tokens to “generic” artifacts (for example a random sanity log or the Machine Mirror) when the acceptance map declares a different evidence family as the canonical home.
 
@@ -4465,66 +4644,33 @@ These tokens cover live vendor transport, open-rails env posture, and discovery 
 
 #### **LIVE\_VENDOR\_TRANSPORT\_OK**
 
-**Owner PF:** HDE-Governance / HDE-CLI-API-Vendor-Ref / HDE-Mechanics Guide / HDE Phased Epics  
- **Scope:** Post-commit / Live QA (vendor-focused epics)  
- **QA definition:** For a given epic that claims live vendor behavior in prod or prod-like environments, LIVE\_VENDOR\_TRANSPORT\_OK asserts that there is at least one concrete, governed proof of live vendor transport under open rails. At minimum, QA must show that:
+* **Meaning:** For a Live QA run, the set of vendor-facing transport behaviors required by the epic are exercised and produce evidence (API calls, logs, or side-effects) consistent with success.
 
-* a vendor-focused behavior step (class 3 under §3.5.6) ran under open rails (`ALLOW_NETWORK=1` with rails logged per §4.4), and
+* **Evidence:**
 
-* a CLI or HTTP surface invoked a real vendor endpoint (as defined in PF05/PF14) and received a non-mocked response (success or controlled failure), with the request and response captured as governed evidence.
+  * A declared list of vendor transport steps in the QA plan (each with a `check_id`).
 
-**Evidence:**
+  * For each such step, a canonical primary log exists under `audit/qa/<epic-id>/…` and is referenced by `qa_step_logs_manifest.json`.
 
-* A vendor-focused step log in QA\_ROOT (for example `D_vendor-001.log` or `stepV1_vendor_compat.log`) with header fields:
+  * Each such primary log includes the Plan Templates step-log header (routed by §4.4.5), and includes whatever evidence is required by the step (requests/responses, timestamps, outputs, etc).
 
-  * `check_id` pointing to the vendor behavior step,
+  #### **OPEN\_RAILS\_ENV\_OK**
 
-  * `command` showing the CLI or HTTP call used (for example `hdctl showcompat --source=vendor ...` or a curl call to an HDE adapter route that triggers vendor transport),
+* **Meaning:** When open rails are required by the epic, the Live QA run’s evidence demonstrates that open rails were actually in effect for the acceptance-relevant checks.
 
-  * `rails` including `SAFE_MODE`, `ALLOW_NETWORK`, `APP_ENV`, `LC_ALL`, `LANG`, `TZ`,
+* **Satisfied iff (strict):**
 
-  * `pf_refs` referencing vendor mechanics and transport docs by title, and
+  * For each vendor-focused step that contributes to LIVE\_VENDOR\_TRANSPORT\_OK, the step’s primary log header `captured_env` shows:
 
-  * `status: PASS` once reviewed.
+    * SAFE\_MODE \= 0
 
-* Supporting artifacts under `audit/qa/<epic-id>/vendor/…` or an equivalent vendor-specific subtree, including:
+    * ALLOW\_NETWORK \= 1
 
-  * a request description file (for example `vendor-step-001-request.txt`) naming the CLI/HTTP surface, environment, and inputs;
+  * No step that claims open-rails acceptance may have contradictory rails values recorded in `captured_env`.
 
-  * raw or header-stripped HTTP/CLI logs showing:
+**Notes (non-normative):**
 
-    * the vendor host or URL (names-only),
-
-    * HTTP status code(s), and
-
-    * any vendor response envelope that policy allows to be recorded (keys-only, no secrets);
-
-  * a rails snapshot (either in the step log header or as a separate env snapshot referenced from the log) confirming open rails were in effect at the time of the vendor call.
-
-* Indexing of any governed vendor proof artifacts (for example JSON/summary logs under `artifacts/**` or `docs/**`) in `docs/evidence/INDEX.json` (+ `.sha256`) and `artifacts/evidence_index.jsonl`, with path-proofs and Mirror records aligned, where the epic’s acceptance map and manifest bind LIVE\_VENDOR\_TRANSPORT\_OK to these families.
-
-#### **OPEN\_RAILS\_ENV\_OK**
-
-**Owner PF:** HDE-Governance / HDE-Build Checklist / HDE Phased Epics  
- **Scope:** Pre-commit / Live QA (rails posture for vendor epics)  
- **QA definition:** For epics that mandate open rails for certain Live QA steps (for example vendor-first PO Live QA), OPEN\_RAILS\_ENV\_OK asserts that the open-rails environment was real, documented, and actually used for the vendor-focused steps:
-
-* there is a D0 or early Session env snapshot that records the intended rails posture (for example “Codespaces open-rails: `SAFE_MODE=0`, `ALLOW_NETWORK=1`, `APP_ENV=dev`”), and
-
-* each vendor-focused step’s log in QA\_ROOT shows rails consistent with that mandate in its `rails` header field at the time of the behavior run.
-
-**Evidence:**
-
-* A discovery or env-rails planning artifact under `audit/qa/<epic-id>/d0-planning/` (for example `d0-env-rails.txt`) that records the intended rails posture for the session, as produced by commands such as `env | sort | grep -E 'SAFE_MODE|ALLOW_NETWORK|APP_ENV|HDE_BASE_URL'` per §3.6.
-
-* For each vendor-focused step that contributes to LIVE\_VENDOR\_TRANSPORT\_OK, a primary step log in QA\_ROOT whose header `rails` field shows:
-
-  * `ALLOW_NETWORK=1` (or equivalent open-network posture), and
-
-  * the intended `APP_ENV` (for example `APP_ENV=prod` or `APP_ENV=dev` per epic design),  
-     aligned with the mandated rails in the epic’s acceptance roster.
-
-* Optional end-of-session env snapshot logs (for example `…/env_rails_end.log`) confirming rails were restored to the correct closed posture after Live QA.
+* A deterministic rails snapshot MUST be present in the step log header `captured_env`. If an additional environment snapshot file is produced and referenced, it is optional and non-gating; it MUST NOT be the sole source of rails evidence.
 
 #### **DISCOVERY\_BASELINE\_OK**
 
@@ -4545,81 +4691,53 @@ Index/Mirror records and path-proofs for any of these `d0-*` artifacts that are 
 
 #### **QA\_BOOTSTRAP\_OK**
 
-**Owner PF:** HDE-Governance / HDE-Build Checklist / HDE-Mechanics Guide  
- **Scope:** Pre-run / planning (epic QA harness readiness)  
- **QA definition:** A closed-rails QA tooling bootstrap step has been executed for the epic, and the QA console environment is able to run the plan’s required harness commands (pytest invocation and any required QA harness entrypoints). Bootstrap is treated as a prerequisite for subsequent Live QA or harness-driven steps that depend on pytest/tooling.  
- **Evidence:**
+* **Meaning:** The QA harness bootstraps successfully, producing the expected governed folder structure and at least one valid primary log for the bootstrap step.
 
-* A primary bootstrap log under the epic QA tree (for example `audit/qa/<epic-id>/d0-planning/d0_tooling_bootstrap.log` or a run-scoped bootstrap log under QA\_ROOT) that includes, at minimum:
+* **Evidence:**
 
-  * `qa_root` (the intended or actual QA\_ROOT path),
+  * The harness creates the canonical epic QA root under `audit/qa/<epic-id>/…`.
 
-  * `command`,
+  * The bootstrap step’s primary log exists under `audit/qa/<epic-id>/bootstrap/logs/bootstrap.primary.log` and begins with a valid Plan Templates step-log header as routed by §4.4.5 (including at minimum: `check_id`, `status`, `command`, `captured_env`).
 
-  * `rails`, and
-
-  * `status: PASS`,  
-     plus the captured outputs of the bootstrap checks.
-
-* If the bootstrap is run as part of CI, an associated CI log excerpt or test output that shows the bootstrap step ran under closed rails (tokens and wiring remain defined in HDE-Build Checklist).
+  * The log body includes the bootstrap outputs (paths created, environment notes, and any relevant diagnostics).
 
 #### **QA\_BOOTSTRAP\_TOOLING\_FAIL**
 
-**Owner PF:** HDE-Governance / HDE-Build Checklist / HDE-Mechanics Guide  
- **Scope:** Pre-run / planning (tooling failure classification)  
- **QA definition:** When the QA tooling bootstrap step cannot be completed due to missing or broken tooling (for example pytest is not runnable, required harness entrypoints are missing), the failure is captured and classified explicitly as tooling blocked, not as a behavior failure. This token exists to make “bootstrap failure is tooling” a repeatable, auditable rule for epics.  
- **Evidence:**
+* **Meaning:** The harness attempted to bootstrap but failed due to tooling/environment issues (not behavior), and recorded an explicit blocked/tooling-failure status with evidence.
 
-* A primary bootstrap log under the epic QA tree (same location expectations as QA\_BOOTSTRAP\_OK) whose header includes:
+* **Evidence:**
 
-  * `qa_root`, `command`, `rails`, and
+  * The bootstrap step’s primary log exists and begins with a Plan Templates step-log header as routed by §4.4.5.
 
-  * `status: FAIL_TOOLING` (or `status: TOOLING_BLOCKED`),  
-     and whose body shows the tooling failure symptom (for example pytest invocation failing to start).
-
-This token does not grant acceptance for any epic D-goals. It records correct classification and evidence capture of a tooling block.
+  * The bootstrap log records `status` as a tooling/prerequisite failure (e.g., `FAIL_TOOLING` or `TOOLING_BLOCKED`) and includes a clear reason in the header (if present) or at the top of the log body.
 
 #### **QA\_HARNESS\_DISCIPLINE\_OK**
 
-**Owner PF:** HDE-Governance / HDE-Build Checklist / HDE-Schemas & Artifacts  
- **Scope:** Post-commit / Live QA (harness discipline)  
- **QA definition:** The epic’s QA harness discipline is in force:
+* **Meaning:** The plan/harness adheres to governed evidence discipline: canonical primary logs, manifest pointers, and token claims that are names-only and evidence-backed.
 
-* QA\_ROOT is defined per run under `audit/qa/<epic-id>/...`,
+* **Evidence:**
 
-* each QA Plan step has exactly one primary log under QA\_ROOT,
+  * The top-level epic QA output folder contains:
 
-* primary logs include the PF19 header fields from §4.4, and
+    * a consolidated step logs manifest (`audit/qa/<epic-id>/qa_step_logs_manifest.json`)
 
-* step outcomes are classified consistently using `PASS`, `FAIL_BEHAVIOR`, `FAIL_TOOLING` / `TOOLING_BLOCKED`, and `PARKED`.
+    * a canonical primary log per `check_id` (as referenced by the manifest)
 
-**Evidence:**
+    * an indexed evidence bundle via governed INDEX/Mirror (where applicable)
 
-* A run directory under `audit/qa/<epic-id>/...` acting as QA\_ROOT containing the per-step primary logs, each non-empty and reviewable.
+  * Each invoked step’s primary log begins with a Plan Templates step-log header as routed by §4.4.5 and includes:
 
-* Each step log includes the header fields required by §4.4 (`check_id`, `command`, `rails`, `pf_refs`, `tokens`, `status`) and uses the standard status vocabulary.
+    * a complete `command`
 
-* Any epic-level QA README (for example `audit/qa/<epic-id>/README.md`) describing the harness discipline and pointing to the run roots and key harness artifacts (optional but recommended for discoverability).
+    * `captured_env` sufficient to prove rails posture for that step
 
-  #### QA\_ACCEPTANCE\_MAP\_VIABILITY\_OK (updated to current QA posture)
+    * a `status` value consistent with the evidence
 
-**Owner PF:** HDE-Governance / HDE-Build Checklist / HDE Phased Epics  
-**Scope:** Pre-run / planning (acceptance scaffolding viability)
+  * If token fields are present in headers, they are names-only and use canonical spellings (`intended_tokens`, `claimed_tokens`, or legacy `tokens` as an alias for intended tokens only).
 
-**QA definition:**  
-`QA_ACCEPTANCE_MAP_VIABILITY_OK` proves the epic’s acceptance scaffolding is viable: the acceptance map (and any acceptance-ledger artifacts it relies on) reference only real, resolvable artifacts in the branch under test, including:
+  ---
 
-* real governed paths under the epic QA root (`audit/qa/<epic-id>/…`),  
-* real tests/nodes that exist in the repo,  
-* real canonical evidence surfaces (where fixed paths are required).
-
-A passing viability check is required **before** Live QA proceeds and **before** acceptance scaffolding is treated as complete.
-
-This is a **tooling viability** token: failures are classified as TOOLING\_BLOCKED / FAIL\_TOOLING (not FAIL\_BEHAVIOR).
-
----
-
-##### Evidence (names-only; current posture)
+  ##### Evidence (names-only; current posture)
 
 1. **Deterministic viability report (current-state; epic-level):**  
    A mechanically generated report exists at:  
@@ -4733,6 +4851,14 @@ At QA ledger completion / closeout readiness and at epic close, for tokens that 
   * the token MUST appear at most once in each acceptance artifact (token/evidence matrix, acceptance map, manifest token roster); duplicate rows/entries are treated as ambiguous evidence and block closeout readiness;  
   * evidence lists MUST NOT contain placeholders or patterns (for example `{scenario}`, “TBD”, “pending”, or template strings) for any token whose concrete evidence is present; and  
   * CI-safe scaffold tests MAY enforce: (a) exactly one token row/entry exists per token, and (b) every listed evidence path resolves to a real file (existence \+ minimal parse checks) to prevent drift regressions.  
+* **Acceptance-alignment validator (CI-safe; recommended).** CI-safe validator tests SHOULD enforce the following invariants to prevent drift regressions:  
+  * **Map ↔ matrix ↔ manifest lockstep:** token rosters match exactly across acceptance map, token/evidence matrix, and manifest token roster (no extras/missing).  
+  * **Token registry membership:** every token referenced by acceptance artifacts exists in the PF19 token registry.  
+  * **Duplicate-free rosters:** acceptance map, matrix, and manifests must not contain duplicate token entries.  
+  * **Implemented/covered evidence binding:** for tokens marked implemented/covered, every claimed governed evidence path MUST exist in both the Human Evidence Index (`docs/evidence/INDEX.json`) and the Machine Mirror (`artifacts/evidence_index.jsonl`), and the Mirror record MUST include a `proof_anchor` pointing to the corresponding `*.path_proof.txt`.  
+  * **Proof transcripts not primary evidence:** enforce “Proof transcripts are not primary evidence (normative)” (see §9.2.14.1).  
+  * **Determinism posture:** validator tests MUST be CI-safe (no network) and enforce determinism env pins/rails as required elsewhere in PF19 (SAFE\_MODE, ALLOW\_NETWORK, LC\_ALL, LANG, TZ).  
+     Planned tokens may skip the implemented/covered evidence-binding assertions, but they must still participate in roster/registry/duplicate checks. When a token flips to implemented/covered, the evidence-binding checks become mandatory.  
 * A QA ledger / closeout record that contains any in-scope token with:
 
   * `e.g.` or `TBD` token names,
@@ -5069,6 +5195,17 @@ Rules for this line:
 
 * an “ADRs Requiring Approval” list for any canon decisions or external task creation required by the remediation.
 
+**ADR discipline (normative; no restate / no drift).**  
+ When a remediation guide includes an “ADRs Requiring Approval” list:
+
+* Each ADR MUST be a canon-resolution instruction and MUST include explicit drain targets (which PF canon doc(s) will be updated).
+
+* ADRs MUST NOT be created to restate topics already canonized in **PF10 — HDE Build Notes** (or other PF canon).
+
+* ADRs MUST NOT cite **PF20 — HDE Phased Epics** to define/justify evidence surfaces, acceptance tokens, QA log/schema requirements, plan template structure, or canon superseding rules.
+
+* **PF20 — HDE Phased Epics** is a tracking ledger (scope/status/history) only; it is not an implementation/remediation planning authority.
+
 **Anchor.** “Machine mirror schema quick-check”  
  **Purpose.** A small tool or CI step that:
 
@@ -5088,9 +5225,13 @@ Rules for this line:
  PF19 names the required checks. The mirror record schema and field-order rules are defined in **HDE-Schemas & Artifacts** (titles-only). The repo provides the quick-check implementation.
 
 **Invocation rule (normative; operator-facing).**  
- In the engine repo, `ci/checks/check_mirror_schema.sh` is a Python entrypoint. It MUST be invoked as Python (or via direct exec only if the executable bit and shebang are guaranteed), for example:
+ In the engine repo, `ci/checks/check_mirror_schema.sh` is an executable Python entrypoint (Python shebang). CI invokes it directly; use the same shape for operator runs. For example:
 
-* `python ci/checks/check_mirror_schema.sh`
+* `ci/checks/check_mirror_schema.sh artifacts/evidence_index.jsonl`
+
+If direct execution is not guaranteed in the environment (missing executable bit / shebang handling), the Python invocation is acceptable:
+
+* `python ci/checks/check_mirror_schema.sh artifacts/evidence_index.jsonl`
 
 It MUST NOT be invoked via `bash ci/checks/check_mirror_schema.sh`. If acceptance artifacts or QA plans include the bash invocation, treat that as operator-doc drift and correct it before running QA.
 
@@ -5250,6 +5391,19 @@ Evidence index mirror (machine-readable):
 * `artifacts/evidence_index.jsonl`
 
 * `artifacts/evidence_index.jsonl.path_proof.txt`
+
+**Evidence Index Refresh Flow reference lock (normative).**  
+ Plans/remediations that invoke or reference the Evidence Index Refresh Flow MUST cite **PF12 — HDE-Schemas & Artifacts** — “Refresh sequence (normative)” (titles-only) and MUST NOT cite non-verifiable PF12 section numbers for this topic.
+
+The plan MUST explicitly bind the refresh outputs (do not hand-wave): `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl`, and all governed `*.path_proof.txt` transcripts regenerated by the refresh tooling run (including Index/Mirror path proofs when applicable).
+
+Canonical invocations (plans MUST call out explicitly):
+
+* Regeneration: `python tools/evidence/update_evidence_index.py` (write mode).
+
+* Validation-only: `python tools/evidence/update_evidence_index.py --check`.
+
+* Mirror schema check (when applicable): `python ci/checks/check_mirror_schema.sh` (NOT `bash ...`).
 
 Plans MUST treat path-proof artifacts as first-class deliverables: if a task edits an index/mirror file, the sibling `.path_proof.txt` update is part of the same task’s outputs \+ verification.
 
@@ -5800,31 +5954,19 @@ After D3, EPIC022 required narrowly scoped follow-up repairs to restore trust in
 
 ## **14.1 Intent**
 
-This section is the **single canonical home** for **Codespaces QA configuration and requirements** used by Glow teams (including the Kronos \+ PO Codespaces execution loop).
+Codespaces is a supported Live QA execution environment, but it introduces pitfalls: ephemeral state, container drift, and unclear prerequisite documentation. This section defines the canonical requirements for Codespaces-based Live QA, including:
 
-It exists to prevent Live QA planning and execution from stalling due to scattered, implicit, or inconsistent Codespaces assumptions. If a required Codespaces detail is missing or contradictory, QA MUST mark affected steps as **blocked by spec ambiguity** rather than inventing values.
+**Minimum required content (normative):**
 
-**Minimum required content (names-only; secrets redacted).**  
- “Codespaces QA configuration and requirements” MUST include, at minimum:
+* A stable, documented Codespaces/devcontainer configuration and required secrets/env var names (names-only; no values).
 
-* Codespaces role and boundaries (QA console \+ artifact sink; not prod).
+* A reference to the authoritative environment profile in this PF (see §14.5) for the epic being tested.
 
-* Canonical prod target reference (titles-only pointer to **Glow Infrastructure**) and a names-only description of how the QA console reaches that target.
+* A Step-0 Doc Delta Capture posture for missing/ambiguous prerequisites discovered during planning (see §14.6).
 
-* Closed-rails and open-rails posture (required env pins and rails variables) and which plan steps are permitted to open rails.
+* A maintenance rule: changes to prerequisites must be reflected in this PF in the same change-set as the code change.
 
-* Required environment variables and secrets **by name**, with a canonical mapping (names-only). Values MUST NOT be recorded in PF19.
-
-* Required repo and devcontainer assumptions needed to run QA commands without guessing (shell expectations, Python entrypoint pattern, expected tooling availability).
-
-* A mandatory, mechanical **Codespaces snapshot** step at the start of every Live QA run executed in Codespaces (see §14.4).
-
-* A maintenance rule that changes to Codespaces/devcontainer prerequisites or required env var names must update this section in the same change-set (see §14.6).
-
-**Conformance rule (normative).**  
- Live QA runs executed in Codespaces that do not have (a) an authoritative PF19 Codespaces configuration reference and (b) the required mechanical Codespaces snapshot step are **non-conforming for approval**.
-
-This section does not restate transport bytes, schemas, token semantics, or infra canon. Those remain in their owning PF docs (titles-only).
+**Conformance note (normative):** Codespaces conformance is evaluated using the Codespaces-specific requirements in §14.6; reviewers MUST NOT treat any optional snapshot artifacts as an approval gate.
 
 ## **14.2 Definitions (codespaces vs prod vs QA console)**
 
@@ -5874,27 +6016,37 @@ Any job that produces governed snapshots or evidence MUST export:
 
 * Live QA steps MUST NOT write outside `audit/qa/<epic-id>/…` for evidence.
 
-### **14.4.3 Step-0 “Codespaces snapshot” (required; mechanical evidence)**
+### **14.4.3 Step-0 “Codespaces snapshot” (optional; non-gating evidence)**
 
-Every Live QA plan executed in Codespaces MUST begin with a mechanical “Codespaces snapshot” step that writes a run-relevant environment snapshot under the epic QA tree.
+A Codespaces “snapshot” artifact may be useful for debugging and reviewer context, but it is **NOT** a required Live QA deliverable.
 
-**Minimum contents (names-only; never secret values).** The snapshot MUST capture, at minimum:
+**Non-gating rule (normative):**
 
-* tool versions relevant to the run (for example Python, Node if used, and git if used)
+* Plans MUST NOT require, validate, or gate approval on a Codespaces snapshot artifact.
 
-* env pins and rails variables used for the run (at minimum `LC_ALL`, `LANG`, `TZ`, `SAFE_MODE`, `ALLOW_NETWORK`, `APP_ENV`)
+* Reviewers MUST NOT use the presence/absence/contents of a snapshot to decide PASS vs REMEDIATION.
 
-* the prod target selector names used by the run (for example `HDE_BASE_URL` or other base-URL selectors, names-only)
+**If produced (optional guidance):**
 
-* presence or absence for each required secret name declared in the relevant §14.5 profile (presence-only booleans; no values)
+**Minimum contents:**
 
-**Output location (normative).**
+* codespace/repo identifier (names-only)
 
-* The snapshot step MUST write one primary snapshot artifact under: `audit/qa/<epic-id>/00_meta/`
+* devcontainer image hash (if available)
 
-* The primary snapshot filename SHOULD be: `codespaces_snapshot.json` (preferred) or `codespaces_snapshot.txt` (fallback if JSON tooling is unavailable)
+* `uname -a`
 
-The snapshot is evidence generated by commands. It MUST NOT be hand-edited.
+* `node -v`, `pnpm -v`, `python --version` (as applicable)
+
+* key env var names present (names-only; no secret values)
+
+* timestamp
+
+**Output location (if produced):**
+
+* `audit/qa/<epic-id>/step0/codespaces_snapshot.md`
+
+This file is separate from (and MUST NOT replace) the Step-0 Doc Delta Capture output.
 
 ## **14.5 Environment profiles (Codespaces config \+ minimum checks)**
 
@@ -6106,11 +6258,17 @@ Any change to Codespaces/devcontainer requirements, required env var names, requ
 
 Live QA planning is allowed even when Codespaces prerequisites are incomplete or unclear, but plans MUST NOT assume or invent missing details.
 
+**Routing (normative):** Mandatory Step-0 artifacts (including Doc Delta Capture posture) are governed by PF27 — Plan Templates. This section adds Codespaces-specific requirements for how doc deltas are recorded.
+
 Every Live QA plan executed in Codespaces MUST include a Step-0 **Doc Delta Capture** step that:
 
-* lists each missing or ambiguous prerequisite discovered during planning
+* lists each missing or ambiguous prerequisite discovered during planning, separated into:
 
-* names the intended fix location (either §14.5 profile fields, or an owning PF doc by title only)
+  * **BLOCKERS** (execution cannot proceed without resolution)
+
+  * **CAVEATS** (execution can proceed with constrained scope or reduced confidence)
+
+* names the intended fix location for each item (either §14.5 profile fields, or an owning PF doc by title only)
 
 * records a resolution status for each item (for example: unresolved, resolved by doc update, resolved by existing canonical reference)
 
@@ -6122,8 +6280,7 @@ A Live QA run executed in Codespaces is non-conforming for approval if any of th
 
 * the relevant environment profile in §14.5 is not defined (REQUIRED fields remain unpopulated or contradictory), or
 
-* the Live QA run did not include the required mechanical Codespaces snapshot step defined in §14.4, or
-
 * the plan did not include (and the run did not produce) the required Step-0 Doc Delta Capture output defined above
 
 Environment details MUST be kept current so that QA plans do not rely on guessing. Missing or contradictory prerequisites MUST be captured as doc deltas during planning, and execution steps that depend on unresolved prerequisites MUST be treated as blocked until the prerequisites are resolved by canonical documentation.
+
