@@ -31,7 +31,7 @@ def test_pipeline_success(tmp_path, monkeypatch):
     exit_code = run_sanity_pipeline.run_pipeline(log_path=log_path, steps=steps)
     assert exit_code == 0
     log_text = log_path.read_text(encoding="utf-8")
-    assert log_text.startswith("sanity_pipeline\n")
+    assert log_text.startswith("run:sanity-pipeline\n")
     assert "env:ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC" in log_text
     assert "summary:PASS" in log_text
     assert "check step-one:OK" in log_text
