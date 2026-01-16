@@ -58,6 +58,8 @@ def _load_mirror_keys(path: Path) -> set[str]:
         if not line.strip():
             continue
         entry = json.loads(line)
+        if not isinstance(entry, dict):
+            raise ValueError("evidence_index.jsonl entry must be an object")
         key = entry.get("artifact_key")
         if not isinstance(key, str) or not key:
             raise ValueError("evidence_index.jsonl entry missing artifact_key")
@@ -146,8 +148,14 @@ def _validate_snapshot(inputs: Inputs, snapshot_path: Path) -> list[str]:
 
     if payload.get("schema_version") != "1":
         issues.append("SCHEMA_VERSION")
-    if not isinstance(payload.get("generated_at_utc"), str):
+    generated_at = payload.get("generated_at_utc")
+    if not isinstance(generated_at, str):
         issues.append("GENERATED_AT")
+    else:
+        try:
+            update_evidence_index._parse_utc_iso8601(generated_at)
+        except ValueError:
+            issues.append("GENERATED_AT_FORMAT")
 
     inputs_obj = payload.get("inputs")
     if not isinstance(inputs_obj, dict):
