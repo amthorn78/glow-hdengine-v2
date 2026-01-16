@@ -217,15 +217,8 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     return parser.parse_args(argv)
 
 
-def main(argv: list[str] | None = None) -> int:
-    args = _parse_args(argv)
+def run_snapshot(inputs: Inputs, *, check_only: bool) -> tuple[str, int]:
     ensure_determinism_env(apply=True)
-
-    inputs = Inputs(
-        human_path=ROOT / HUMAN_INDEX_REL,
-        mirror_path=ROOT / MIRROR_REL,
-        snapshot_path=ROOT / SNAPSHOT_REL,
-    )
 
     missing_inputs = [
         rel
@@ -233,30 +226,46 @@ def main(argv: list[str] | None = None) -> int:
         if not path.exists()
     ]
     if missing_inputs:
-        print(f"STATUS: TOOLING_BLOCKED missing_inputs={','.join(missing_inputs)}")
-        return 2
+        status = f"STATUS: TOOLING_BLOCKED missing_inputs={','.join(missing_inputs)}"
+        print(status)
+        return status, 2
 
-    if not args.check:
+    if not check_only:
         generated_at = _utc_now()
         try:
             snapshot_payload = _build_snapshot(inputs, generated_at=generated_at)
         except (OSError, ValueError, json.JSONDecodeError) as exc:
-            print(f"STATUS: FAIL_BEHAVIOR build_error={exc.__class__.__name__}")
-            return 1
+            status = f"STATUS: FAIL_BEHAVIOR build_error={exc.__class__.__name__}"
+            print(status)
+            return status, 1
         _write_snapshot(inputs.snapshot_path, snapshot_payload)
         _write_path_proof(inputs.snapshot_path, produced_at=generated_at)
 
     if not inputs.snapshot_path.exists():
-        print("STATUS: TOOLING_BLOCKED missing_snapshot")
-        return 2
+        status = "STATUS: TOOLING_BLOCKED missing_snapshot"
+        print(status)
+        return status, 2
 
     issues = _validate_snapshot(inputs, inputs.snapshot_path)
     if issues:
-        print(f"STATUS: FAIL_BEHAVIOR issues={','.join(issues)}")
-        return 1
+        status = f"STATUS: FAIL_BEHAVIOR issues={','.join(issues)}"
+        print(status)
+        return status, 1
 
-    print("STATUS: PASS")
-    return 0
+    status = "STATUS: PASS"
+    print(status)
+    return status, 0
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = _parse_args(argv)
+    inputs = Inputs(
+        human_path=ROOT / HUMAN_INDEX_REL,
+        mirror_path=ROOT / MIRROR_REL,
+        snapshot_path=ROOT / SNAPSHOT_REL,
+    )
+    _status, exit_code = run_snapshot(inputs, check_only=args.check)
+    return exit_code
 
 
 if __name__ == "__main__":  # pragma: no cover - CLI entrypoint

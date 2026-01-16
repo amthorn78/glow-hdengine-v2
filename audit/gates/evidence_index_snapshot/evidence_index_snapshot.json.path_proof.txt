@@ -1,5 +1,5 @@
 path: audit/gates/evidence_index_snapshot/evidence_index_snapshot.json
 size_bytes: 394
-sha256: 033f6643093547dea3fb7af204b8fddc473e200b688d9e73318d2f6536cc1f1c
-mtime_utc: 2026-01-16T15:19:10Z
-produced_at_utc: 2026-01-16T15:19:10Z
+sha256: 9381edd0de237d43c5f71e809d1ae12b715b25f1294f508a0678c69b2258d184
+mtime_utc: 2026-01-16T15:30:56Z
+produced_at_utc: 2026-01-16T15:30:56Z
