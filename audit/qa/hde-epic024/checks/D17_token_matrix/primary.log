@@ -1,0 +1,2 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"D17_token_matrix","claimed_tokens":[],"command":"python (embedded) write audit/qa/hde-epic024/token_evidence_matrix.md","evidence_outputs":["audit/qa/hde-epic024/token_evidence_matrix.md"],"exit_code":0,"intended_tokens":[],"pf_refs":[],"status":"PASS"}
+PASS: token matrix generated.
