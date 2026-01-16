@@ -15,10 +15,10 @@
 
 ## Canonical JSON gate (closed rails)
 * Gate runner: `python tools/evidence/run_canonical_json_gate.py` (`--check-only` available for read-only validation)
-* Check log: `audit/gates/canonical_json/json_canonical_check.log`
-* Compare log: `audit/gates/canonical_json/json_canon_compare.log`
-* Gate summary: `audit/gates/canonical_json/canonical_json.gate.json`
-* All gate artifacts have co-located `.path_proof.txt` siblings and are enforced in CI (see `.github/workflows/ci.yml` step “Run canonical JSON gate (closed rails)”).
+* Check log: `audit/gates/json_gate/canonical/json_gate_check_log.ndjson`
+* Compare log: `audit/gates/json_gate/canonical/json_gate_compare_log.ndjson`
+* Structured record: `audit/gates/json_gate/canonical/json_gate_structured_record.json`
+* All gate artifacts have co-located `.path_proof.txt` siblings and are enforced in CI (see `.github/workflows/ci.yml` step “Run canonical JSON gate (closed rails)”). The legacy catalog check report remains at `audit/gates/canonical_json/json_canonical_check.log`.
 
 # Appendix-D — Evidence Index (EPIC-022)
 

@@ -17,8 +17,10 @@ if str(ROOT) not in sys.path:
 
 from engine.runtime.determinism_env import ensure_determinism_env
 from engine.serializer.canon import sercanon
+from tools.evidence import update_evidence_index
 
 CANON_DIR = ROOT / "audit" / "gates" / "canonical_json"
+JSON_GATE_DIR = ROOT / "audit" / "gates" / "json_gate" / "canonical"
 
 
 @dataclass(frozen=True)
@@ -50,6 +52,21 @@ def _write_if_changed(path: Path, content: bytes) -> None:
     if path.exists() and path.read_bytes() == content:
         return
     path.write_bytes(content)
+
+
+def _write_path_proof(rel_path: str, *, produced_at: str) -> None:
+    path = ROOT / rel_path
+    stat = path.stat()
+    update_evidence_index._write_path_proof(
+        rel=rel_path,
+        sha256=_sha256(path.read_bytes()),
+        size_bytes=stat.st_size,
+        mtime_utc=update_evidence_index._isoformat_from_timestamp(stat.st_mtime),
+        produced_at=produced_at,
+        default_produced_at=produced_at,
+        check=False,
+        stat_mtime=stat.st_mtime,
+    )
 
 
 def _load_gate_timestamp() -> str | None:
@@ -171,9 +188,35 @@ def _run_gate(targets: Sequence[Target], *, check_only: bool = False) -> int:
             "failures": failures,
         }
 
+        json_gate_payload = {
+            "schema": "canonical_json.gate.v1",
+            "generated_at_utc": generated_at,
+            "status": "pass" if not failures else "fail",
+            "checked_targets": [target.rel_path for target in sorted(targets, key=lambda t: t.rel_path)],
+            "env": env,
+            "outputs": {
+                "check_log": "audit/gates/json_gate/canonical/json_gate_check_log.ndjson",
+                "compare_log": "audit/gates/json_gate/canonical/json_gate_compare_log.ndjson",
+                "structured_record": "audit/gates/json_gate/canonical/json_gate_structured_record.json",
+            },
+            "failures": failures,
+        }
+
         _write_if_changed(CANON_DIR / "json_canonical_check.log", check_bytes)
         _write_if_changed(CANON_DIR / "json_canon_compare.log", compare_bytes)
         _write_if_changed(CANON_DIR / "canonical_json.gate.json", sercanon(gate_payload, sort_keys=True))
+        _write_if_changed(JSON_GATE_DIR / "json_gate_check_log.ndjson", check_bytes)
+        _write_if_changed(JSON_GATE_DIR / "json_gate_compare_log.ndjson", compare_bytes)
+        _write_if_changed(
+            JSON_GATE_DIR / "json_gate_structured_record.json",
+            sercanon(json_gate_payload, sort_keys=True),
+        )
+        _write_path_proof("audit/gates/json_gate/canonical/json_gate_check_log.ndjson", produced_at=generated_at)
+        _write_path_proof("audit/gates/json_gate/canonical/json_gate_compare_log.ndjson", produced_at=generated_at)
+        _write_path_proof(
+            "audit/gates/json_gate/canonical/json_gate_structured_record.json",
+            produced_at=generated_at,
+        )
 
     if failures:
         return 1
