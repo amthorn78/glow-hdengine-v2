@@ -1,0 +1,15 @@
+arrays-as-sets report v1
+surface: registry.catalog.channels_v1
+source: catalog/channels_v1.json
+
+case: channel_id=02-14 field=centers
+path: catalog/channels_v1.json:channels[id=02-14].centers
+normalizer: engine.mech.helpers.canonicalize_array
+raw: ["sacral", "g"]
+normalized: ["g", "sacral"]
+
+case: channel_id=11-56 field=domains
+path: catalog/channels_v1.json:channels[id=11-56].domains
+normalizer: engine.mech.helpers.canonicalize_array
+raw: ["talk", "narrative"]
+normalized: ["narrative", "talk"]
