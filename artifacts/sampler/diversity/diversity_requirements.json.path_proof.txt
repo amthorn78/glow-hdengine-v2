@@ -1,5 +1,5 @@
 path: artifacts/sampler/diversity/diversity_requirements.json
 size_bytes: 1440
-sha256: 428b8c80fc5a17284809d085f1e565f8a981cad63d09d76c79db6ffbdbc2e6a0
+sha256: 368a44c65e21883774278e4ee672ba3976f64c93f7fc669bebd25c29ffda9945
 mtime_utc: 2025-12-06T04:06:36Z
 produced_at_utc: 2025-11-30T03:58:47Z

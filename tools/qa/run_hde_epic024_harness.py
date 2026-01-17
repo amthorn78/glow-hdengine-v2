@@ -97,6 +97,8 @@ def _command_to_str(command: Sequence[str]) -> str:
 def _status_from_exit(exit_code: int) -> str:
     if exit_code == 0:
         return "PASS"
+    if exit_code == 1:
+        return "FAIL_BEHAVIOR"
     if exit_code == 2:
         return "TOOLING_BLOCKED"
     if exit_code == 3:
@@ -269,8 +271,10 @@ def _write_close_pack() -> tuple[Path, Path]:
     return close_report, close_manifest
 
 
-def _write_token_matrix() -> Path:
+def _write_token_matrix(*, bootstrap_status: str) -> Path:
     matrix_path = QA_ROOT / "token_evidence_matrix.md"
+    bootstrap_ok = bootstrap_status == "PASS"
+    bootstrap_tooling_fail = bootstrap_status in {"FAIL_TOOLING", "TOOLING_BLOCKED"}
     rows = [
         {
             "token_name": "TESTS_PASS_OK",
@@ -359,8 +363,8 @@ def _write_token_matrix() -> Path:
             "evidence": "audit/qa/hde-epic024/checks/D00_bootstrap_pytest/primary.log",
             "ci": "python -m pytest --version",
             "qa_logs": "checks/D00_bootstrap_pytest/primary.log",
-            "status": "Implemented",
-            "notes": "checks: D00_bootstrap_pytest",
+            "status": "Implemented" if bootstrap_ok else "Token-incomplete",
+            "notes": "checks: D00_bootstrap_pytest" if bootstrap_ok else "Not observed; bootstrap did not succeed.",
         },
         {
             "token_name": "QA_BOOTSTRAP_TOOLING_FAIL",
@@ -368,8 +372,8 @@ def _write_token_matrix() -> Path:
             "evidence": "audit/qa/hde-epic024/checks/D00_bootstrap_pytest/primary.log",
             "ci": "python -m pytest --version",
             "qa_logs": "checks/D00_bootstrap_pytest/primary.log",
-            "status": "Token-incomplete",
-            "notes": "Not observed; bootstrap succeeded under closed rails (checks: D00_bootstrap_pytest).",
+            "status": "Implemented" if bootstrap_tooling_fail else "Token-incomplete",
+            "notes": "Observed tooling failure during bootstrap." if bootstrap_tooling_fail else "Not observed; bootstrap succeeded under closed rails (checks: D00_bootstrap_pytest).",
         },
         {
             "token_name": "QA_HARNESS_DISCIPLINE_OK",
@@ -523,7 +527,9 @@ def _write_token_matrix() -> Path:
     return matrix_path
 
 
-def _write_acceptance_map() -> Path:
+def _write_acceptance_map(*, bootstrap_status: str) -> Path:
+    bootstrap_ok = bootstrap_status == "PASS"
+    bootstrap_tooling_fail = bootstrap_status in {"FAIL_TOOLING", "TOOLING_BLOCKED"}
     tokens = [
         {
             "name": "TESTS_PASS_OK",
@@ -605,7 +611,7 @@ def _write_acceptance_map() -> Path:
         {
             "name": "QA_BOOTSTRAP_OK",
             "owner_pf": "PF14 — HDE-Mechanics Guide §1.6.1",
-            "status": "implemented",
+            "status": "implemented" if bootstrap_ok else "token_incomplete",
             "evidence_titles": [
                 "audit/qa/hde-epic024/checks/D00_bootstrap_pytest/primary.log",
             ],
@@ -613,7 +619,7 @@ def _write_acceptance_map() -> Path:
         {
             "name": "QA_BOOTSTRAP_TOOLING_FAIL",
             "owner_pf": "PF14 — HDE-Mechanics Guide §1.6.1",
-            "status": "implemented",
+            "status": "implemented" if bootstrap_tooling_fail else "token_incomplete",
             "evidence_titles": [
                 "audit/qa/hde-epic024/checks/D00_bootstrap_pytest/primary.log",
             ],
@@ -861,19 +867,22 @@ def _write_close_pack_check_log() -> Path:
     return log_path
 
 
-def _write_acceptance_map_viability_check_log() -> Path:
+def _write_acceptance_map_viability_check_log(*, status: str, exit_code: int, issues: Sequence[str]) -> Path:
     log_path = QA_ROOT / "checks/D13_acceptance_map_viability/primary.log"
     header = create_header(
         check_id="D13_acceptance_map_viability",
         command="python (embedded) validate acceptance map evidence paths",
-        status="PASS",
+        status=status,
     )
-    header["exit_code"] = 0
+    header["exit_code"] = exit_code
     header["evidence_outputs"] = [
         "audit/qa/hde-epic024/acceptance_map_viability.log",
     ]
     write_header(log_path, header)
-    append_output(log_path, "PASS: acceptance map viability log generated.")
+    if status == "PASS":
+        append_output(log_path, "PASS: acceptance map viability log generated.")
+    else:
+        append_output(log_path, "FAIL_BEHAVIOR: acceptance map viability issues detected.\n" + "\n".join(issues))
     return log_path
 
 
@@ -895,42 +904,6 @@ def _write_manifest_check_log() -> Path:
 
 def _check_specs() -> list[CheckSpec]:
     return [
-        CheckSpec(
-            check_id="D17_token_matrix",
-            command=None,
-            description="python (embedded) write audit/qa/hde-epic024/token_evidence_matrix.md",
-            evidence_outputs=["audit/qa/hde-epic024/token_evidence_matrix.md"],
-        ),
-        CheckSpec(
-            check_id="D18_acceptance_map",
-            command=None,
-            description="python (embedded) write docs/acceptance_map_epic024.json",
-            evidence_outputs=["docs/acceptance_map_epic024.json"],
-        ),
-        CheckSpec(
-            check_id="D15_doc_deltas",
-            command=None,
-            description="python (embedded) write EPIC024 doc deltas",
-            evidence_outputs=[
-                "audit/docdeltas/hde-epic024_doc_deltas.md",
-                "audit/qa/hde-epic024/00_meta/doc_deltas.md",
-            ],
-        ),
-        CheckSpec(
-            check_id="D16_close_pack",
-            command=None,
-            description="python (embedded) write EPIC024 close pack",
-            evidence_outputs=[
-                "audit/EPIC-024_close_report.md",
-                "audit/EPIC-024_MANIFEST.json",
-            ],
-        ),
-        CheckSpec(
-            check_id="D19_step_logs_manifest",
-            command=None,
-            description="python (embedded) write qa_step_logs_manifest.json",
-            evidence_outputs=["audit/qa/hde-epic024/qa_step_logs_manifest.json"],
-        ),
         CheckSpec(
             check_id="D00_bootstrap_pytest",
             command=["python", "-m", "pytest", "--version"],
@@ -994,25 +967,6 @@ def _check_specs() -> list[CheckSpec]:
             evidence_outputs=["artifacts/sanity/sanity.log"],
         ),
         CheckSpec(
-            check_id="D13_acceptance_map_viability",
-            command=None,
-            description="python (embedded) validate acceptance map evidence paths",
-            evidence_outputs=["audit/qa/hde-epic024/acceptance_map_viability.log"],
-        ),
-        CheckSpec(
-            check_id="D14_harness_selftest",
-            command=None,
-            description="python (embedded) validate EPIC024 harness outputs",
-            evidence_outputs=[
-                "audit/qa/hde-epic024/token_evidence_matrix.md",
-                "docs/acceptance_map_epic024.json",
-                "audit/qa/hde-epic024/acceptance_map_viability.log",
-                "audit/docdeltas/hde-epic024_doc_deltas.md",
-                "audit/EPIC-024_close_report.md",
-                "audit/EPIC-024_MANIFEST.json",
-            ],
-        ),
-        CheckSpec(
             check_id="D08_update_evidence_index",
             command=["python", "tools/evidence/update_evidence_index.py"],
             description="python tools/evidence/update_evidence_index.py",
@@ -1046,6 +1000,61 @@ def _check_specs() -> list[CheckSpec]:
             description="ci/checks/check_final_lf.sh",
             evidence_outputs=[],
         ),
+        CheckSpec(
+            check_id="D17_token_matrix",
+            command=None,
+            description="python (embedded) write audit/qa/hde-epic024/token_evidence_matrix.md",
+            evidence_outputs=["audit/qa/hde-epic024/token_evidence_matrix.md"],
+        ),
+        CheckSpec(
+            check_id="D18_acceptance_map",
+            command=None,
+            description="python (embedded) write docs/acceptance_map_epic024.json",
+            evidence_outputs=["docs/acceptance_map_epic024.json"],
+        ),
+        CheckSpec(
+            check_id="D15_doc_deltas",
+            command=None,
+            description="python (embedded) write EPIC024 doc deltas",
+            evidence_outputs=[
+                "audit/docdeltas/hde-epic024_doc_deltas.md",
+                "audit/qa/hde-epic024/00_meta/doc_deltas.md",
+            ],
+        ),
+        CheckSpec(
+            check_id="D16_close_pack",
+            command=None,
+            description="python (embedded) write EPIC024 close pack",
+            evidence_outputs=[
+                "audit/EPIC-024_close_report.md",
+                "audit/EPIC-024_MANIFEST.json",
+            ],
+        ),
+        CheckSpec(
+            check_id="D19_step_logs_manifest",
+            command=None,
+            description="python (embedded) write qa_step_logs_manifest.json",
+            evidence_outputs=["audit/qa/hde-epic024/qa_step_logs_manifest.json"],
+        ),
+        CheckSpec(
+            check_id="D13_acceptance_map_viability",
+            command=None,
+            description="python (embedded) validate acceptance map evidence paths",
+            evidence_outputs=["audit/qa/hde-epic024/acceptance_map_viability.log"],
+        ),
+        CheckSpec(
+            check_id="D14_harness_selftest",
+            command=None,
+            description="python (embedded) validate EPIC024 harness outputs",
+            evidence_outputs=[
+                "audit/qa/hde-epic024/token_evidence_matrix.md",
+                "docs/acceptance_map_epic024.json",
+                "audit/qa/hde-epic024/acceptance_map_viability.log",
+                "audit/docdeltas/hde-epic024_doc_deltas.md",
+                "audit/EPIC-024_close_report.md",
+                "audit/EPIC-024_MANIFEST.json",
+            ],
+        ),
     ]
 
 
@@ -1059,14 +1068,15 @@ def main() -> int:
 
     status_by_check: dict[str, str] = {}
 
+    bootstrap_status = "UNKNOWN"
     for check in checks:
         if check.check_id == "D17_token_matrix":
-            _write_token_matrix()
+            _write_token_matrix(bootstrap_status=bootstrap_status)
             _write_token_matrix_check_log()
             status_by_check[check.check_id] = "PASS"
             continue
         if check.check_id == "D18_acceptance_map":
-            _write_acceptance_map()
+            _write_acceptance_map(bootstrap_status=bootstrap_status)
             _write_acceptance_map_check_log()
             status_by_check[check.check_id] = "PASS"
             continue
@@ -1081,9 +1091,11 @@ def main() -> int:
             status_by_check[check.check_id] = "PASS"
             continue
         if check.check_id == "D13_acceptance_map_viability":
-            _write_acceptance_map_viability()
-            _write_acceptance_map_viability_check_log()
-            status_by_check[check.check_id] = "PASS"
+            _, issues = _write_acceptance_map_viability()
+            status = "PASS" if not issues else "FAIL_BEHAVIOR"
+            exit_code = 0 if not issues else 3
+            _write_acceptance_map_viability_check_log(status=status, exit_code=exit_code, issues=issues)
+            status_by_check[check.check_id] = status
             continue
         if check.check_id == "D14_harness_selftest":
             required = [
@@ -1105,6 +1117,8 @@ def main() -> int:
 
         status, _, _ = _run_command(check, env)
         status_by_check[check.check_id] = status
+        if check.check_id == "D00_bootstrap_pytest":
+            bootstrap_status = status
 
     failures = [name for name, status in status_by_check.items() if status != "PASS"]
     return 1 if failures else 0

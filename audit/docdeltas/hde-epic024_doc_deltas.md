@@ -1,6 +1,6 @@
 # HDE-EPIC024 Doc Delta Draft (PR-04)
 
-captured_at_utc: 2026-01-16T16:44:40Z
+captured_at_utc: 2026-01-17T05:32:18Z
 
 ## EPIC024 scaffolds introduced
 
