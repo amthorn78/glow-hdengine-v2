@@ -106,6 +106,21 @@ def _status_from_exit(exit_code: int) -> str:
     return "FAIL_TOOLING"
 
 
+def _is_missing_pytest(stderr: str) -> bool:
+    lowered = stderr.lower()
+    if "no module named" in lowered and "pytest" in lowered:
+        return True
+    if "modulenotfounderror" in lowered and "pytest" in lowered:
+        return True
+    return False
+
+
+def _status_from_bootstrap(exit_code: int, stderr: str) -> str:
+    if exit_code != 0 and _is_missing_pytest(stderr):
+        return "FAIL_TOOLING"
+    return _status_from_exit(exit_code)
+
+
 def _write_primary_log(
     *,
     check_id: str,
@@ -156,7 +171,10 @@ def _run_command(check: CheckSpec, env: Mapping[str, str]) -> tuple[str, int, Pa
         text=True,
         env=dict(env),
     )
-    status = _status_from_exit(proc.returncode)
+    if check.check_id == "D00_bootstrap_pytest":
+        status = _status_from_bootstrap(proc.returncode, proc.stderr)
+    else:
+        status = _status_from_exit(proc.returncode)
     log_path = _write_primary_log(
         check_id=check.check_id,
         command=command_str,
