@@ -72,6 +72,48 @@ EPIC022_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
         "record_type": "audit_cli_log",
     },
 ]
+EPIC024_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "epic024.acceptance_map",
+        "discovered_physical_path": "docs/acceptance_map_epic024.json",
+        "epic_id": "HDE-EPIC024",
+    },
+    {
+        "artifact_key": "epic024.token_matrix",
+        "discovered_physical_path": "audit/qa/hde-epic024/token_evidence_matrix.md",
+        "epic_id": "HDE-EPIC024",
+    },
+    {
+        "artifact_key": "epic024.acceptance_map_viability",
+        "discovered_physical_path": "audit/qa/hde-epic024/acceptance_map_viability.log",
+        "epic_id": "HDE-EPIC024",
+    },
+    {
+        "artifact_key": "epic024.qa_step_logs_manifest",
+        "discovered_physical_path": "audit/qa/hde-epic024/qa_step_logs_manifest.json",
+        "epic_id": "HDE-EPIC024",
+    },
+    {
+        "artifact_key": "epic024.qa_meta_doc_deltas",
+        "discovered_physical_path": "audit/qa/hde-epic024/00_meta/doc_deltas.md",
+        "epic_id": "HDE-EPIC024",
+    },
+    {
+        "artifact_key": "epic024.doc_deltas",
+        "discovered_physical_path": "audit/docdeltas/hde-epic024_doc_deltas.md",
+        "epic_id": "HDE-EPIC024",
+    },
+    {
+        "artifact_key": "epic024.close_report",
+        "discovered_physical_path": "audit/EPIC-024_close_report.md",
+        "epic_id": "HDE-EPIC024",
+    },
+    {
+        "artifact_key": "epic024.manifest",
+        "discovered_physical_path": "audit/EPIC-024_MANIFEST.json",
+        "epic_id": "HDE-EPIC024",
+    },
+]
 
 
 def _sha256_bytes(data: bytes) -> str:
@@ -275,7 +317,7 @@ def _dedupe_entries(entries: Iterable[Mapping[str, object]]) -> list[dict[str, o
 
 def _load_human_index() -> list[dict[str, object]]:
     payload = json.loads(HUMAN_INDEX.read_text(encoding="utf-8"))
-    return _dedupe_entries([*payload, *BASELINE_ENTRIES, *EPIC022_PRIMARY_ARTIFACTS])
+    return _dedupe_entries([*payload, *BASELINE_ENTRIES, *EPIC022_PRIMARY_ARTIFACTS, *EPIC024_PRIMARY_ARTIFACTS])
 
 
 def _render_human_index(entries: Iterable[Mapping[str, object]]) -> bytes:

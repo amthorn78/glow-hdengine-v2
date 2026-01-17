@@ -1,0 +1,5 @@
+path: audit/EPIC-024_MANIFEST.json
+size_bytes: 707
+sha256: 7eb1f14384556be869b5b5142436338970144aa05456b678233055533ebbc5f0
+mtime_utc: 2026-01-16T16:41:56Z
+produced_at_utc: 2026-01-05T05:39:56Z
