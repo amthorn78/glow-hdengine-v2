@@ -302,6 +302,8 @@ def run_report_mode(args: argparse.Namespace) -> int:
     except DeterminismEnvError as exc:
         determinism_ok = False
         determinism_error = str(exc)
+    if not determinism_ok:
+        return 2
 
     token_sets = load_token_sets(Path(args.token_sets))
     acceptance_tokens = extract_acceptance_map_tokens(Path(args.acceptance_map))
