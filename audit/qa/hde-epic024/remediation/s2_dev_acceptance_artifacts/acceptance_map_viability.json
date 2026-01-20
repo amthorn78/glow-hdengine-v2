@@ -1,0 +1,1 @@
+{"determinism_env":{"error":null,"ok":true},"inputs":{"acceptance_map":"docs/acceptance_map_epic024.json"},"issues":[],"schema":"epic024.acceptance_map_viability.v1","status":"PASS","summary":{"duplicate_tokens":[],"evidence_title_count":39,"issue_count":0,"token_count":25},"token_issues":{}}
