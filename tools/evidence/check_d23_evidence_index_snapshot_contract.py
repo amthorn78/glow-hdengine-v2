@@ -213,6 +213,14 @@ def _write_primary_log(
     append_output(log_path, summary)
 
 
+def _status_exit_code(status: str) -> int:
+    if status == "PASS":
+        return 0
+    if status == "TOOLING_BLOCKED":
+        return 2
+    return 1
+
+
 def run_check_mode(args: argparse.Namespace) -> int:
     determinism_ok = True
     determinism_error = None
@@ -244,12 +252,12 @@ def run_check_mode(args: argparse.Namespace) -> int:
         issues = _validate_report(report_path, report_bytes)
         if issues:
             status = "FAIL_BEHAVIOR"
-        return 0 if status == "PASS" else 1
+        return _status_exit_code(status)
 
     _write_report(report_path, report)
     evidence_outputs = [_relative(report_path, ROOT)]
     summary = f"status: {status}\nissues: {len(report['issues'])}\n"
-    exit_code = 0 if status == "PASS" else 1
+    exit_code = _status_exit_code(status)
     _write_primary_log(
         report_path.parent,
         status=status,

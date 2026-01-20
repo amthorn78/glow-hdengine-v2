@@ -65,3 +65,24 @@ def test_snapshot_contract_report_passes(tmp_path: Path) -> None:
 
     assert status == "PASS"
     assert report["issues"] == []
+
+
+def test_missing_snapshot_is_tooling_blocked(tmp_path: Path) -> None:
+    root = tmp_path
+    human_index = root / "docs/evidence/INDEX.json"
+    mirror = root / "artifacts/evidence_index.jsonl"
+    snapshot_path = root / "audit/gates/evidence_index_snapshot/evidence_index_snapshot.json"
+
+    report, status = tool.build_report(
+        root=root,
+        snapshot_path=snapshot_path,
+        human_index_path=human_index,
+        mirror_path=mirror,
+        determinism_ok=True,
+        determinism_error=None,
+        check_path_proof=False,
+    )
+
+    assert status == "TOOLING_BLOCKED"
+    assert "MISSING_SNAPSHOT" in report["issues"]
+    assert tool._status_exit_code(status) == 2
