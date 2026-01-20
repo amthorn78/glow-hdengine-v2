@@ -18,7 +18,7 @@
      - `tests_and_ci` (array of `{path, summary}` objects)
      - `evidence_artifacts` (array of `{path, summary}` objects)
      - `notes` (string, optional)
-   - **Status:** Used as a local registry export; not the canonical authority but explicitly referenced as the registry locus in EPIC024 QA planning and checks.
+   - **Status:** Used as a local registry export and consumer-facing registry list; it is **not** the canonical authority and may not fully reflect the PF04 roster.
 
 **Acceptance artifacts (not registries, but token consumers):**
 - `docs/acceptance_map_epic024.json` (JSON object with `epic_id` and `tokens[]` entries containing `name`, `owner_pf`, `status`, `evidence_titles`).
@@ -30,11 +30,11 @@
 - **Repo validation logic:** `tests/qa/test_epic023_acceptance_alignment.py` loads tokens from PF04 (via regex extraction) and merges in tokens from `reports/qa_acceptance_tokens.json` if present; it then validates that acceptance map and token matrix tokens are registry-valid.
 - **Acceptance-map generation (EPIC024):** `tools/qa/run_hde_epic024_harness.py` is the harness that writes `docs/acceptance_map_epic024.json` and the token matrix as governed outputs.
 
-**Authority chain summary:** PF04 defines canonical names → acceptance maps/token matrices must use those names (PF10 §2.1) → repo QA validations (e.g., EPIC023 acceptance alignment test) treat PF04 + `reports/qa_acceptance_tokens.json` as registry sources for validation.
+**Authority chain summary:** PF04 defines canonical names → acceptance maps/token matrices must use those names (PF10 §2.1) → repo QA validations (e.g., EPIC023 acceptance alignment test) treat PF04 as the authority and use `reports/qa_acceptance_tokens.json` as a supplemental, derived list when present.
 
 ## 3. Canonical tokens and deprecated spellings (and alias mappings)
 
-**Canonical token universe (registry export / repo-local registry list):**
+**Canonical token universe (PF04 authority + derived registry export union for this discovery set):**
 ```
 AB_BA_PARITY_OK
 BYTES_OK
@@ -62,6 +62,7 @@ LF_OK
 MACHINE_MIRROR_UPDATED_OK
 MODULE_HELP_OK
 PARTITION_PLAN_OK
+QA_HARNESS_DISCIPLINE_OK
 READER_CLI_BYTE_IDENTITY_OK
 SECRETS_OK
 SIDE_OK
@@ -74,7 +75,7 @@ UNKNOWN_IDS_FAIL_CLOSED_OK
 VENDOR_NO_PAYLOAD_LOGGING_OK
 VENDOR_RETRY_BACKOFF_OK
 ```
-Source: `reports/qa_acceptance_tokens.json`.
+Source: `reports/qa_acceptance_tokens.json` plus PF04-only canonical inclusion for `QA_HARNESS_DISCIPLINE_OK` (alias target).
 
 **Deprecated / alternate spellings (explicit from PF10 §2.1):**
 - `QA_STEP_LOGS_CONSOLIDATED_OK` (deprecated doc-only alias) → canonical `QA_HARNESS_DISCIPLINE_OK`.
