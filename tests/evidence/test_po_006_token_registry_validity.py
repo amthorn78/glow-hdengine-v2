@@ -9,6 +9,7 @@ from tools.evidence.check_po_006_token_registry_validity import (
     build_report,
     extract_acceptance_map_tokens,
     extract_registry_tokens,
+    run_report_mode,
 )
 
 
@@ -114,3 +115,24 @@ def test_report_detects_missing_registry_tokens(tmp_path: Path) -> None:
     comparison = report["comparison"]
     assert status == "FAIL_BEHAVIOR"
     assert comparison["missing_in_registry"] == ["MISSING_OK"]
+
+
+def test_report_mode_skips_outputs_when_determinism_open(
+    tmp_path: Path, monkeypatch
+) -> None:
+    monkeypatch.setenv("SAFE_MODE", "0")
+    review_dir = tmp_path / "review"
+    args = type(
+        "Args",
+        (),
+        {
+            "acceptance_map": tmp_path / "missing_map.json",
+            "registry_export": tmp_path / "missing_registry.json",
+            "token_sets": tmp_path / "missing_token_sets.json",
+            "review_dir": review_dir,
+        },
+    )
+    exit_code = run_report_mode(args)
+    assert exit_code == 2
+    assert not (review_dir / "po_006_token_registry_validity_report.json").exists()
+    assert not (review_dir / "po_006_token_registry_validity_summary.md").exists()
