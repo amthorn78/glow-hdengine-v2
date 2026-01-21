@@ -14,6 +14,7 @@ def _write_json(path: Path, payload: object) -> None:
 def test_acceptance_map_viability_flags_path_issues(tmp_path: Path) -> None:
     root = tmp_path
     acceptance_map = root / "docs/acceptance_map_epic024.json"
+    token_sets_path = root / "audit/qa/hde-epic024/remediation/s1_token_registry_discovery/token_sets.json"
     evidence_path = root / "audit/qa/hde-epic024/viability.log"
     proof_path = root / "audit/qa/hde-epic024/viability.log.path_proof.txt"
     evidence_path.parent.mkdir(parents=True, exist_ok=True)
@@ -37,9 +38,18 @@ def test_acceptance_map_viability_flags_path_issues(tmp_path: Path) -> None:
             ],
         },
     )
+    _write_json(
+        token_sets_path,
+        {
+            "canonical_tokens": ["TOKEN_OK"],
+            "deprecated_spellings": [],
+            "alias_map": {},
+        },
+    )
 
     report, status = tool.build_report(
         acceptance_map_path=acceptance_map,
+        token_sets_path=token_sets_path,
         root=root,
         determinism_ok=True,
         determinism_error=None,
@@ -49,3 +59,69 @@ def test_acceptance_map_viability_flags_path_issues(tmp_path: Path) -> None:
     assert "PATH_PROOF_USED:TOKEN_OK:audit/qa/hde-epic024/viability.log.path_proof.txt" in report["issues"]
     assert "ABSOLUTE_PATH:TOKEN_OK:/abs/bad.log" in report["issues"]
     assert "PARENT_PATH:TOKEN_OK:../bad.log" in report["issues"]
+
+
+def test_acceptance_map_viability_flags_unknown_token(tmp_path: Path) -> None:
+    root = tmp_path
+    acceptance_map = root / "docs/acceptance_map_epic024.json"
+    token_sets_path = root / "audit/qa/hde-epic024/remediation/s1_token_registry_discovery/token_sets.json"
+    _write_json(
+        acceptance_map,
+        {
+            "epic_id": "HDE-EPIC024",
+            "tokens": [{"name": "QA_STEP_LOGS_CONSOLIDATED_OK"}],
+        },
+    )
+    _write_json(
+        token_sets_path,
+        {
+            "canonical_tokens": ["QA_HARNESS_DISCIPLINE_OK"],
+            "deprecated_spellings": ["QA_STEP_LOGS_CONSOLIDATED_OK"],
+            "alias_map": {"QA_STEP_LOGS_CONSOLIDATED_OK": "QA_HARNESS_DISCIPLINE_OK"},
+        },
+    )
+
+    report, status = tool.build_report(
+        acceptance_map_path=acceptance_map,
+        token_sets_path=token_sets_path,
+        root=root,
+        determinism_ok=True,
+        determinism_error=None,
+    )
+
+    assert status == "FAIL_BEHAVIOR"
+    assert report["comparison"]["deprecated_spellings_used"] == [
+        "QA_STEP_LOGS_CONSOLIDATED_OK"
+    ]
+
+
+def test_check_mode_blocks_missing_token_sets(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setenv("SAFE_MODE", "1")
+    monkeypatch.setenv("ALLOW_NETWORK", "0")
+    monkeypatch.setenv("TZ", "UTC")
+    monkeypatch.setenv("LANG", "C")
+    monkeypatch.setenv("LC_ALL", "C")
+
+    acceptance_map = tmp_path / "docs/acceptance_map_epic024.json"
+    _write_json(
+        acceptance_map,
+        {
+            "epic_id": "HDE-EPIC024",
+            "tokens": [{"name": "TOKEN_OK"}],
+        },
+    )
+
+    args = type(
+        "Args",
+        (),
+        {
+            "acceptance_map": acceptance_map,
+            "token_sets": tmp_path / "missing_token_sets.json",
+            "output_dir": tmp_path / "output",
+            "check": True,
+            "command": "python tools/evidence/check_epic024_acceptance_map_viability.py check",
+        },
+    )
+
+    exit_code = tool.run_check_mode(args)
+    assert exit_code == 2

@@ -6,6 +6,7 @@ import argparse
 import datetime as _dt
 import sys
 from pathlib import Path
+from dataclasses import dataclass
 from typing import Iterable
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -19,33 +20,55 @@ DEFAULT_QA_ROOT = ROOT / "audit/qa/hde-epic024"
 DEFAULT_MANIFEST = DEFAULT_QA_ROOT / "qa_step_logs_manifest.json"
 
 
+@dataclass(frozen=True)
+class CheckEntry:
+    check_id: str
+    log_path: str
+    transcript_path: str | None
+
+
 def _utc_now() -> str:
     return _dt.datetime.now(_dt.timezone.utc).replace(microsecond=0).isoformat().replace(
         "+00:00", "Z"
     )
 
 
-def collect_check_ids(checks_root: Path) -> list[str]:
-    check_ids: list[str] = []
+def collect_check_entries(checks_root: Path) -> list[CheckEntry]:
+    entries: list[CheckEntry] = []
     if not checks_root.exists():
-        return check_ids
+        return entries
     for entry in checks_root.iterdir():
         if not entry.is_dir():
             continue
-        if not (entry / "primary.log").exists():
+        primary_log = entry / "primary.log"
+        if not primary_log.exists():
             continue
-        check_ids.append(entry.name)
-    return sorted(check_ids)
+        transcript = entry / "transcript.txt"
+        transcript_path = None
+        if transcript.exists():
+            transcript_path = f"checks/{entry.name}/transcript.txt"
+        entries.append(
+            CheckEntry(
+                check_id=entry.name,
+                log_path=f"checks/{entry.name}/primary.log",
+                transcript_path=transcript_path,
+            )
+        )
+    return sorted(entries, key=lambda item: item.check_id)
 
 
-def build_manifest_payload(check_ids: Iterable[str]) -> dict[str, dict[str, str]]:
-    return {
-        check_id: {
-            "check_id": check_id,
-            "log_path": f"checks/{check_id}/primary.log",
-        }
-        for check_id in check_ids
-    }
+def collect_check_ids(checks_root: Path) -> list[str]:
+    return [entry.check_id for entry in collect_check_entries(checks_root)]
+
+
+def build_manifest_payload(check_entries: Iterable[CheckEntry]) -> dict[str, dict[str, str]]:
+    payload: dict[str, dict[str, str]] = {}
+    for entry in check_entries:
+        item = {"check_id": entry.check_id, "log_path": entry.log_path}
+        if entry.transcript_path:
+            item["transcript_path"] = entry.transcript_path
+        payload[entry.check_id] = item
+    return payload
 
 
 def render_manifest(payload: dict[str, dict[str, str]]) -> bytes:
@@ -91,11 +114,11 @@ def run_refresh(args: argparse.Namespace) -> int:
     qa_root = Path(args.qa_root)
     manifest_path = Path(args.manifest)
     checks_root = qa_root / "checks"
-    check_ids = collect_check_ids(checks_root)
-    if not check_ids:
+    check_entries = collect_check_entries(checks_root)
+    if not check_entries:
         return 2
 
-    payload = build_manifest_payload(check_ids)
+    payload = build_manifest_payload(check_entries)
     rendered = render_manifest(payload)
 
     if args.check:
@@ -103,11 +126,29 @@ def run_refresh(args: argparse.Namespace) -> int:
             return 2
         if manifest_path.read_bytes() != rendered:
             return 1
+        for entry in check_entries:
+            log_path = qa_root / entry.log_path
+            try:
+                _write_path_proof(log_path, produced_at=produced_at, check=True)
+            except SystemExit:
+                return 1
+            if entry.transcript_path:
+                transcript_path = qa_root / entry.transcript_path
+                try:
+                    _write_path_proof(transcript_path, produced_at=produced_at, check=True)
+                except SystemExit:
+                    return 1
         _write_path_proof(manifest_path, produced_at=produced_at, check=True)
         return 0
 
     write_manifest(manifest_path, payload)
     _write_path_proof(manifest_path, produced_at=produced_at, check=False)
+    for entry in check_entries:
+        log_path = qa_root / entry.log_path
+        _write_path_proof(log_path, produced_at=produced_at, check=False)
+        if entry.transcript_path:
+            transcript_path = qa_root / entry.transcript_path
+            _write_path_proof(transcript_path, produced_at=produced_at, check=False)
     return 0
 
 

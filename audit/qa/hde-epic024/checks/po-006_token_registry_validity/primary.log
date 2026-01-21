@@ -1,10 +1,11 @@
-{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"po-006_token_registry_validity","claimed_tokens":[],"command":"python tools/evidence/check_po_006_token_registry_validity.py check","evidence_outputs":["audit/qa/hde-epic024/checks/po-006_token_registry_validity/rg_acceptance_map_output.txt","audit/qa/hde-epic024/checks/po-006_token_registry_validity/rg_registry_output.txt","audit/qa/hde-epic024/checks/po-006_token_registry_validity/token_registry_validity_report.json"],"exit_code":0,"intended_tokens":[],"pf_refs":["PF10 Addendum 2.8","PF19 \u00a73.4.6"],"status":"PASS"}
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"po-006_token_registry_validity","claimed_tokens":[],"command":"python tools/evidence/check_po_006_token_registry_validity.py check --write","evidence_outputs":["audit/qa/hde-epic024/checks/po-006_token_registry_validity/rg_acceptance_map_output.txt","audit/qa/hde-epic024/checks/po-006_token_registry_validity/rg_registry_output.txt","audit/qa/hde-epic024/checks/po-006_token_registry_validity/token_comparison.json"],"exit_code":0,"intended_tokens":[],"pf_refs":["PF10 Addendum 2.8","PF19 \u00a73.4.6"],"status":"PASS"}
 status: PASS
 acceptance_tokens: 25
 registry_tokens: 48
 missing_in_registry: 0
+missing_in_canonical: 0
 deprecated_spellings_used: 0
 captures:
 - rg_acceptance_map_output.txt
 - rg_registry_output.txt
-- token_registry_validity_report.json
+- token_comparison.json

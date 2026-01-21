@@ -40,6 +40,23 @@ def _load_snapshot(path: Path) -> object:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def _extract_generated_at(snapshot_path: Path) -> str | None:
+    try:
+        payload = _load_snapshot(snapshot_path)
+    except (OSError, json.JSONDecodeError):
+        return None
+    if not isinstance(payload, dict):
+        return None
+    generated_at = payload.get("generated_at_utc")
+    if not isinstance(generated_at, str):
+        return None
+    try:
+        snapshot.update_evidence_index._parse_utc_iso8601(generated_at)
+    except ValueError:
+        return None
+    return generated_at
+
+
 def _looks_like_repo_path(value: str) -> bool:
     if not value or value.startswith("/") or value.startswith("~"):
         return False
@@ -232,6 +249,8 @@ def run_check_mode(args: argparse.Namespace) -> int:
 
     if not determinism_ok:
         return 2
+    if args.check and args.repair:
+        return 2
 
     snapshot_path = Path(args.snapshot)
     human_index_path = Path(args.human_index)
@@ -245,6 +264,22 @@ def run_check_mode(args: argparse.Namespace) -> int:
         determinism_error=determinism_error,
         check_path_proof=True,
     )
+    if status != "PASS" and args.repair:
+        inputs = snapshot.Inputs(
+            human_path=human_index_path,
+            mirror_path=mirror_path,
+            snapshot_path=snapshot_path,
+        )
+        snapshot.run_snapshot(inputs, check_only=False)
+        report, status = build_report(
+            root=ROOT,
+            snapshot_path=snapshot_path,
+            human_index_path=human_index_path,
+            mirror_path=mirror_path,
+            determinism_ok=determinism_ok,
+            determinism_error=determinism_error,
+            check_path_proof=True,
+        )
     report_bytes = sercanon(report, sort_keys=True)
     report_path = Path(args.output_dir) / REPORT_NAME
 
@@ -255,6 +290,9 @@ def run_check_mode(args: argparse.Namespace) -> int:
         return _status_exit_code(status)
 
     _write_report(report_path, report)
+    produced_at = _extract_generated_at(snapshot_path)
+    if produced_at is not None:
+        snapshot._write_path_proof(snapshot_path, produced_at=produced_at)
     evidence_outputs = [_relative(report_path, ROOT)]
     summary = f"status: {status}\nissues: {len(report['issues'])}\n"
     exit_code = _status_exit_code(status)
@@ -278,6 +316,7 @@ def main() -> int:
     parser.add_argument("--mirror", default=DEFAULT_MIRROR)
     parser.add_argument("--output-dir", default=DEFAULT_CHECK_DIR)
     parser.add_argument("--check", action="store_true", help="validate outputs only")
+    parser.add_argument("--repair", action="store_true", help="repair snapshot when invalid")
     parser.add_argument(
         "--command",
         default="python tools/evidence/check_d23_evidence_index_snapshot_contract.py",
