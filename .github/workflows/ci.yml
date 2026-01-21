@@ -20,8 +20,8 @@ jobs:
       - run: test -f requirements-dev.txt && python -m pip install -r requirements-dev.txt || true
       - run: python -m pip install -e .
       - run: python -m pip install pytest
-      - run: ci/checks/check_env_pins.sh
-      - run: ci/checks/check_cli_help.sh
+      - run: bash -ex ci/checks/check_env_pins.sh
+      - run: bash -ex ci/checks/check_cli_help.sh
       # D3 (HDE-EPIC018): CLI serializer/emitter guards (PF09/PF19 rails)
       - run: python tools/cli/serializer_grep_guard.py
       - run: python tools/cli/emitter_symbol_proof.py
@@ -32,6 +32,8 @@ jobs:
       - run: python tools/order/generate_ordering_artifacts.py --check
       - run: python tools/evidence/update_evidence_index.py --check
       - run: python tools/evidence/orientation_demo.py --check
+      - run: python tools/evidence/check_po_006_token_registry_validity.py --report-only
+      - run: python tools/evidence/refresh_step_logs_manifest.py --check
       - run: ci/checks/check_evidence_index_hash.sh
       - run: python ci/checks/check_bridge_consistency.py
       - run: ci/checks/check_mirror_schema.sh
