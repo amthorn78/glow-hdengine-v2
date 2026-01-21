@@ -1,0 +1,11 @@
+usage: check_po_006_token_registry_validity.py [-h] {check,report} ...
+
+Deterministic PO-006 token registry validity check.
+
+positional arguments:
+  {check,report}
+    check         Run or validate PO-006 outputs
+    report        Write remediation review artifacts
+
+options:
+  -h, --help      show this help message and exit

@@ -1,0 +1,10 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"D07_sanity_pipeline","claimed_tokens":[],"command":"python tools/evidence/run_sanity_pipeline.py","evidence_outputs":["artifacts/sanity/sanity.log"],"exit_code":0,"intended_tokens":[],"pf_refs":[],"status":"PASS"}
+== STDOUT ==
+[evidence-index] env pins: ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC
+[evidence-index] env pins: ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC
+
+== STDERR ==
+
+
+== RC ==
+0

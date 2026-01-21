@@ -1,0 +1,1 @@
+{"determinism_env":{"error":null,"ok":true},"inputs":{"human_index_path":"docs/evidence/INDEX.json","mirror_path":"artifacts/evidence_index.jsonl","snapshot_path":"audit/gates/evidence_index_snapshot/evidence_index_snapshot.json"},"issues":[],"schema":"epic024.evidence_index_snapshot_contract.v1","status":"PASS"}

@@ -1,0 +1,29 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"D06_tests_pass","claimed_tokens":[],"command":"python -m pytest tests/evidence tests/ops/test_evidence_index.py","evidence_outputs":[],"exit_code":0,"intended_tokens":[],"pf_refs":[],"status":"PASS"}
+== STDOUT ==
+============================= test session starts ==============================
+platform linux -- Python 3.10.19, pytest-9.0.2, pluggy-1.6.0
+rootdir: /workspace/glow-hdengine-v2
+configfile: pytest.ini
+collected 23 items
+
+tests/evidence/test_engine_core_evidence.py ..                           [  8%]
+tests/evidence/test_epic018_manifest.py ..                               [ 17%]
+tests/evidence/test_epic020_bundle_index_integration.py .                [ 21%]
+tests/evidence/test_evidence_index_env.py .                              [ 26%]
+tests/evidence/test_evidence_index_snapshot.py ...                       [ 39%]
+tests/evidence/test_evidence_skeleton.py ...                             [ 52%]
+tests/evidence/test_machine_mirror_self_proof.py .                       [ 56%]
+tests/evidence/test_orientation_demo.py ..                               [ 65%]
+tests/evidence/test_refresh_policy_snapshot.py .                         [ 69%]
+tests/evidence/test_sampler_evidence.py ..                               [ 78%]
+tests/evidence/test_sanity_evidence_index.py .                           [ 82%]
+tests/evidence/test_sanity_pipeline.py ...                               [ 95%]
+tests/ops/test_evidence_index.py .                                       [100%]
+
+============================== 23 passed in 0.71s ==============================
+
+== STDERR ==
+
+
+== RC ==
+0

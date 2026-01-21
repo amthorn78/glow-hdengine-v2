@@ -1,5 +1,5 @@
 path: audit/qa/hde-epic024/checks/po-006_token_registry_validity/primary.log
-size_bytes: 859
-sha256: 4170e257c3b4663589fc1cb4051564af445708c363c52c64f1b8fd895d432b2f
-mtime_utc: 2026-01-21T12:08:49Z
-produced_at_utc: 2026-01-21T12:09:08Z
+size_bytes: 1035
+sha256: e770c173cc205afa85daa818d20a35c7c9e65d203f208c3aa8cbe4dae61e0b81
+mtime_utc: 2026-01-21T14:11:23Z
+produced_at_utc: 2026-01-21T15:00:53Z

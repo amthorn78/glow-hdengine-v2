@@ -1,0 +1,9 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"D04_sampler_evidence","claimed_tokens":[],"command":"python tools/evidence/generate_sampler_evidence.py","evidence_outputs":["artifacts/sampler/seed_replay/cli_http_seed_replay.json","artifacts/sampler/two_run/identity.json","artifacts/sampler/abba/ab_ba_parity.json","artifacts/sampler/pool_snapshots/baseline.json","artifacts/sampler/diversity/diversity_requirements.json"],"exit_code":0,"intended_tokens":[],"pf_refs":[],"status":"PASS"}
+== STDOUT ==
+
+
+== STDERR ==
+
+
+== RC ==
+0

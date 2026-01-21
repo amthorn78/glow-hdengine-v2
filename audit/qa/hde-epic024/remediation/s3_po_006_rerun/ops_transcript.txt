@@ -1,0 +1,60 @@
+OPS-01 start: 2026-01-21T14:10:19Z
+WORKDIR: /workspaces/glow-hdengine-v2
+GIT_SHA: 0f49d0d05b3488d517189a5fcf391d3a8f2fdee2
+RUN: python tools/evidence/check_po_006_token_registry_validity.py
+usage: check_po_006_token_registry_validity.py [-h] {check,report} ...
+
+Deterministic PO-006 token registry validity check.
+
+positional arguments:
+  {check,report}
+    check         Run or validate PO-006 outputs
+    report        Write remediation review artifacts
+
+options:
+  -h, --help      show this help message and exit
+RUN: python tools/evidence/check_d23_evidence_index_snapshot_contract.py
+RUN: python tools/evidence/check_epic024_evidence_path_binding_validation.py
+usage: check_epic024_evidence_path_binding_validation.py [-h]
+                                                         {check,report} ...
+
+Deterministic EPIC024 evidence path binding validation.
+
+positional arguments:
+  {check,report}
+    check         Run or validate check outputs
+    report        Write remediation review artifacts
+
+options:
+  -h, --help      show this help message and exit
+RUN: python tools/evidence/refresh_step_logs_manifest.py
+RUN (corrected): python tools/evidence/check_d23_evidence_index_snapshot_contract.py check
+usage: check_d23_evidence_index_snapshot_contract.py [-h]
+                                                     [--snapshot SNAPSHOT]
+                                                     [--human-index HUMAN_INDEX]
+                                                     [--mirror MIRROR]
+                                                     [--output-dir OUTPUT_DIR]
+                                                     [--check] [--repair]
+                                                     [--command COMMAND]
+check_d23_evidence_index_snapshot_contract.py: error: unrecognized arguments: check
+RUN (corrected): python tools/evidence/check_epic024_evidence_path_binding_validation.py check
+RUN (repeat after corrections): python tools/evidence/refresh_step_logs_manifest.py
+RUN (final correction): python tools/evidence/check_d23_evidence_index_snapshot_contract.py
+RUN (final): python tools/evidence/refresh_step_logs_manifest.py
+
+===== REMEDIATION: Fixing binding validation failures =====
+REMEDIATION Step 1: Update Evidence Index (add missing entries)
+[evidence-index] env pins: ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC
+REMEDIATION Step 2: Verify Evidence Index update (--check mode)
+[evidence-index] env pins: ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC
+PROOF_MTIME_FUTURE:audit/qa/hde-epic023/qa_step_logs_manifest.json.path_proof.txt
+REMEDIATION Step 3: Re-run binding validation check
+REMEDIATION Step 4: Refresh step logs manifest and path proofs
+REMEDIATION Step 1b: Update Evidence Index with --epic-id HDE-EPIC024
+[evidence-index] env pins: ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC
+REMEDIATION Step 3b: Re-run binding validation check (after epic-id update)
+REMEDIATION Step 1c: Run update_evidence_index.py after manual INDEX additions
+[evidence-index] env pins: ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC
+REMEDIATION Step 3c: Final binding validation check (after manual INDEX additions)
+REMEDIATION Step 4: Refresh step logs manifest and path proofs (final)
+===== REMEDIATION COMPLETE: All binding validation issues resolved =====

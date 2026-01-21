@@ -1,5 +1,5 @@
 path: audit/qa/hde-epic024/checks/D13_acceptance_map_viability/primary.log
 size_bytes: 420
 sha256: 837850be33d0684b1aa3051d98375a690247b5a7870e652fd7d8e4ac0524627c
-mtime_utc: 2026-01-21T11:56:07Z
-produced_at_utc: 2026-01-21T12:09:08Z
+mtime_utc: 2026-01-17T09:05:21Z
+produced_at_utc: 2026-01-21T15:00:53Z

@@ -1,5 +1,5 @@
 path: docs/acceptance_map_epic024.json
-size_bytes: 5311
-sha256: 1073f58e7d0a550ea4b491c8b7b18023845dd3597c853d9eccdce00c11824e97
+size_bytes: 5316
+sha256: 8ad392f991644c5f1899d361650190b2240f9d9a940b2c0d2126aaf972da00fe
 mtime_utc: 2026-01-16T16:41:56Z
 produced_at_utc: 2026-01-05T05:39:56Z
