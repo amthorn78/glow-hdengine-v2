@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic024/checks/D18_acceptance_map/primary.log
+size_bytes: 379
+sha256: 6652ffd1c688fd64220eae283a8a76a17560501979da91e556e1e12e65e26200
+mtime_utc: 2026-01-21T11:56:07Z
+produced_at_utc: 2026-01-21T12:09:08Z

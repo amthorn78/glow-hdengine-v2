@@ -86,3 +86,22 @@ def test_missing_snapshot_is_tooling_blocked(tmp_path: Path) -> None:
     assert status == "TOOLING_BLOCKED"
     assert "MISSING_SNAPSHOT" in report["issues"]
     assert tool._status_exit_code(status) == 2
+
+
+def test_extract_generated_at_from_snapshot(tmp_path: Path) -> None:
+    snapshot_path = tmp_path / "audit/gates/evidence_index_snapshot/evidence_index_snapshot.json"
+    snapshot_path.parent.mkdir(parents=True, exist_ok=True)
+    snapshot_payload = {
+        "generated_at_utc": "2026-01-19T08:49:41Z",
+        "inputs": {
+            "human_index_path": snapshot.HUMAN_INDEX_REL,
+            "human_index_sha256": "deadbeef",
+            "machine_mirror_path": snapshot.MIRROR_REL,
+            "machine_mirror_sha256": "beadfeed",
+        },
+        "parity": {"artifact_keys_match": True},
+        "schema_version": "1",
+    }
+    snapshot_path.write_bytes(snapshot._render_snapshot(snapshot_payload))
+
+    assert tool._extract_generated_at(snapshot_path) == "2026-01-19T08:49:41Z"
