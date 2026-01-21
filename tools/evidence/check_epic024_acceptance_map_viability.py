@@ -23,6 +23,7 @@ DEFAULT_REVIEW_DIR = (
     ROOT / "audit/qa/hde-epic024/remediation/s2_dev_acceptance_artifacts"
 )
 REPORT_NAME = "acceptance_map_viability.json"
+SUMMARY_NAME = "acceptance_map_viability_summary.md"
 
 
 @dataclass(frozen=True)
@@ -155,6 +156,12 @@ def _write_report(path: Path, report: dict[str, object]) -> None:
     path.write_bytes(sercanon(report, sort_keys=True))
 
 
+def _write_summary(path: Path, report: dict[str, object], status: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    summary = f"status: {status}\nissues: {len(report['issues'])}\n"
+    path.write_text(summary, encoding="utf-8")
+
+
 def _validate_report(path: Path, expected: bytes) -> list[str]:
     if not path.exists():
         return [f"missing_output:{path}"]
@@ -201,6 +208,7 @@ def run_report_mode(args: argparse.Namespace) -> int:
     )
     review_dir = Path(args.review_dir)
     _write_report(review_dir / REPORT_NAME, report)
+    _write_summary(review_dir / SUMMARY_NAME, report, status)
     return 0 if status == "PASS" else 1
 
 

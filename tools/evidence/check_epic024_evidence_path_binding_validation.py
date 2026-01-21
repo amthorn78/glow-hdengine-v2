@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import datetime as _dt
 import json
 import sys
 from dataclasses import dataclass
@@ -15,6 +16,7 @@ if str(ROOT) not in sys.path:
 
 from engine.runtime.determinism_env import DeterminismEnvError, ensure_determinism_env
 from engine.serializer.canon import sercanon
+from tools.evidence import update_evidence_index
 from tools.qa.step_log_header import append_output, create_header, write_header
 
 DEFAULT_ACCEPTANCE_MAP = ROOT / "docs/acceptance_map_epic024.json"
@@ -277,6 +279,12 @@ def render_scope(matrix_tokens: dict[str, MatrixEntry], *, matrix_path: Path, ro
     return "\n".join(lines) + "\n"
 
 
+def _utc_now() -> str:
+    return _dt.datetime.now(_dt.timezone.utc).replace(microsecond=0).isoformat().replace(
+        "+00:00", "Z"
+    )
+
+
 def _write_report(path: Path, report: dict[str, object]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(sercanon(report, sort_keys=True))
@@ -285,6 +293,25 @@ def _write_report(path: Path, report: dict[str, object]) -> None:
 def _write_text(path: Path, content: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(content, encoding="utf-8")
+
+
+def _sha256_path(path: Path) -> str:
+    return update_evidence_index._sha256_path(path)
+
+
+def _write_path_proof(path: Path, *, produced_at: str) -> None:
+    rel = path.relative_to(ROOT).as_posix()
+    stat = path.stat()
+    update_evidence_index._write_path_proof(
+        rel=rel,
+        sha256=_sha256_path(path),
+        size_bytes=stat.st_size,
+        mtime_utc=update_evidence_index._isoformat_from_timestamp(stat.st_mtime),
+        produced_at=produced_at,
+        default_produced_at=produced_at,
+        check=False,
+        stat_mtime=stat.st_mtime,
+    )
 
 
 def _validate_report(path: Path, expected: bytes) -> list[str]:
@@ -325,10 +352,13 @@ def run_report_mode(args: argparse.Namespace) -> int:
     except DeterminismEnvError:
         return 2
 
+    produced_at = _utc_now()
     matrix_tokens, _ = _parse_matrix(Path(args.matrix))
     scope = render_scope(matrix_tokens, matrix_path=Path(args.matrix), root=ROOT)
     review_dir = Path(args.review_dir)
-    _write_text(review_dir / SCOPE_NAME, scope)
+    scope_path = review_dir / SCOPE_NAME
+    _write_text(scope_path, scope)
+    _write_path_proof(scope_path, produced_at=produced_at)
     return 0
 
 
