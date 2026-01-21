@@ -81,3 +81,55 @@ def test_evidence_path_binding_validation_passes_with_index_entries(tmp_path: Pa
 
     assert status == "PASS"
     assert report["issues"] == []
+
+
+def test_scope_renders_acceptance_tokens(tmp_path: Path) -> None:
+    root = tmp_path
+    acceptance_map = root / "docs/acceptance_map_epic024.json"
+    matrix_path = root / "audit/qa/hde-epic024/token_evidence_matrix.md"
+    registry_path = root / "reports/qa_acceptance_tokens.json"
+    token_sets_path = root / "audit/qa/hde-epic024/remediation/s1_token_registry_discovery/token_sets.json"
+    _write_json(
+        acceptance_map,
+        {
+            "epic_id": "HDE-EPIC024",
+            "tokens": [{"name": "QA_STEP_LOGS_CONSOLIDATED_OK"}],
+        },
+    )
+    matrix_path.parent.mkdir(parents=True, exist_ok=True)
+    matrix_path.write_text(
+        "\n".join(
+            [
+                "| token_name | owner_pf | evidence_artifacts | ci_tests_jobs | qa_root_logs | status | notes |",
+                "| --- | --- | --- | --- | --- | --- | --- |",
+                "| QA_HARNESS_DISCIPLINE_OK | PF19 | audit/qa/hde-epic024/viability.log | pytest | acceptance_map_viability.log | Implemented | |",
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
+    _write_json(
+        registry_path,
+        {"tokens": [{"name": "QA_HARNESS_DISCIPLINE_OK"}]},
+    )
+    _write_json(
+        token_sets_path,
+        {
+            "canonical_tokens": ["QA_HARNESS_DISCIPLINE_OK"],
+            "deprecated_spellings": ["QA_STEP_LOGS_CONSOLIDATED_OK"],
+            "alias_map": {"QA_STEP_LOGS_CONSOLIDATED_OK": "QA_HARNESS_DISCIPLINE_OK"},
+        },
+    )
+
+    matrix_tokens, _ = tool._parse_matrix(matrix_path)
+    scope = tool.render_scope(
+        matrix_tokens,
+        acceptance_map_path=acceptance_map,
+        registry_export_path=registry_path,
+        token_sets_path=token_sets_path,
+        matrix_path=matrix_path,
+        root=root,
+    )
+
+    assert "| QA_HARNESS_DISCIPLINE_OK | yes | yes |" in scope
+    assert "QA_STEP_LOGS_CONSOLIDATED_OK -> QA_HARNESS_DISCIPLINE_OK" in scope

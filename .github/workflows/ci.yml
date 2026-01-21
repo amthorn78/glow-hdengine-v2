@@ -43,7 +43,7 @@ jobs:
           cat audit/qa/hde-epic024/remediation/s2_dev_acceptance_artifacts/po_006_token_registry_validity_summary.md || true
           cat audit/qa/hde-epic024/remediation/s2_dev_acceptance_artifacts/po_006_token_registry_validity_report.json || true
           cat audit/qa/hde-epic024/checks/po-006_token_registry_validity/primary.log || true
-          cat audit/qa/hde-epic024/checks/po-006_token_registry_validity/token_registry_validity_report.json || true
+          cat audit/qa/hde-epic024/checks/po-006_token_registry_validity/token_comparison.json || true
           if [ "$check_status" -ne 0 ]; then
             exit "$check_status"
           fi
