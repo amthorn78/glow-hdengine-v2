@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic024/checks/D04_sampler_evidence/primary.log
+size_bytes: 599
+sha256: 7d1a10d7b9768ef3d46c0c281f4aa83a959b63331cf5c9f43aa78973a1198958
+mtime_utc: 2026-01-21T11:00:56Z
+produced_at_utc: 2026-01-21T11:11:41Z

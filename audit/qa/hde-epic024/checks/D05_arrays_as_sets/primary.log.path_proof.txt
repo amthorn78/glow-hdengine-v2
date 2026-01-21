@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic024/checks/D05_arrays_as_sets/primary.log
+size_bytes: 732
+sha256: 6b679ef17d843c48531c811ffd1d614ae5dcada2c8a9540a1737dff4c6626fe6
+mtime_utc: 2026-01-21T11:00:56Z
+produced_at_utc: 2026-01-21T11:11:41Z

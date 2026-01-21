@@ -81,3 +81,43 @@ def test_evidence_path_binding_validation_passes_with_index_entries(tmp_path: Pa
 
     assert status == "PASS"
     assert report["issues"] == []
+
+
+def test_render_scope_reports_canonicalized_tokens(tmp_path: Path) -> None:
+    root = tmp_path
+    acceptance_map = root / "docs/acceptance_map_epic024.json"
+    registry_path = root / "reports/qa_acceptance_tokens.json"
+    token_sets_path = (
+        root
+        / "audit/qa/hde-epic024/remediation/s1_token_registry_discovery/token_sets.json"
+    )
+
+    _write_json(
+        acceptance_map,
+        {"epic_id": "HDE-EPIC024", "tokens": [{"name": "OLD_OK"}]},
+    )
+    _write_json(
+        registry_path,
+        {"tokens": [{"name": "CANON_OK"}]},
+    )
+    _write_json(
+        token_sets_path,
+        {
+            "canonical_tokens": ["CANON_OK"],
+            "deprecated_spellings": ["OLD_OK"],
+            "alias_map": {"OLD_OK": "CANON_OK"},
+        },
+    )
+
+    scope = tool.render_scope(
+        acceptance_tokens=["OLD_OK"],
+        registry_tokens=["CANON_OK"],
+        token_sets=tool.load_token_sets(token_sets_path),
+        acceptance_map_path=acceptance_map,
+        registry_path=registry_path,
+        token_sets_path=token_sets_path,
+        root=root,
+    )
+
+    assert "cleanup_scope: only docs/acceptance_map_epic024.json cleaned" in scope
+    assert "| CANON_OK | yes | yes |" in scope

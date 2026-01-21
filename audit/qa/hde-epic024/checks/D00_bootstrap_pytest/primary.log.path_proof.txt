@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic024/checks/D00_bootstrap_pytest/primary.log
+size_bytes: 338
+sha256: 5c0407c23eda814649298cd4bb71712fd2770944252bd997c411830db1a2196a
+mtime_utc: 2026-01-21T11:00:56Z
+produced_at_utc: 2026-01-21T11:11:41Z

@@ -1,5 +1,5 @@
 path: audit/qa/hde-epic024/remediation/s2_dev_acceptance_artifacts/token_evidence_matrix_scope.md
-size_bytes: 779
-sha256: ce9747eb803a964df05a40b005f05003d05607e9e9f02753b559da076ef06e54
-mtime_utc: 2026-01-20T17:40:18Z
-produced_at_utc: 2026-01-20T17:40:18Z
+size_bytes: 1497
+sha256: 98e448a841993acf176dbaf120b8ee1fb771d263c28c29f607bef0ad5cd8ec10
+mtime_utc: 2026-01-21T11:11:39Z
+produced_at_utc: 2026-01-21T11:11:39Z

@@ -6,7 +6,8 @@ import argparse
 import datetime as _dt
 import sys
 from pathlib import Path
-from typing import Iterable
+from dataclasses import dataclass
+from typing import Iterable, Sequence
 
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
@@ -17,6 +18,15 @@ from engine.serializer.canon import sercanon
 from tools.evidence import update_evidence_index
 DEFAULT_QA_ROOT = ROOT / "audit/qa/hde-epic024"
 DEFAULT_MANIFEST = DEFAULT_QA_ROOT / "qa_step_logs_manifest.json"
+PRIMARY_LOG_NAME = "primary.log"
+TRANSCRIPT_NAME = "transcript.txt"
+
+
+@dataclass(frozen=True)
+class CheckEntry:
+    check_id: str
+    log_path: str
+    transcript_path: str | None = None
 
 
 def _utc_now() -> str:
@@ -25,27 +35,38 @@ def _utc_now() -> str:
     )
 
 
-def collect_check_ids(checks_root: Path) -> list[str]:
-    check_ids: list[str] = []
+def collect_check_entries(checks_root: Path) -> list[CheckEntry]:
+    entries: list[CheckEntry] = []
     if not checks_root.exists():
-        return check_ids
+        return entries
     for entry in checks_root.iterdir():
         if not entry.is_dir():
             continue
-        if not (entry / "primary.log").exists():
+        primary_log = entry / PRIMARY_LOG_NAME
+        if not primary_log.exists():
             continue
-        check_ids.append(entry.name)
-    return sorted(check_ids)
+        transcript = entry / TRANSCRIPT_NAME
+        transcript_path = (
+            f"checks/{entry.name}/{TRANSCRIPT_NAME}" if transcript.exists() else None
+        )
+        entries.append(
+            CheckEntry(
+                check_id=entry.name,
+                log_path=f"checks/{entry.name}/{PRIMARY_LOG_NAME}",
+                transcript_path=transcript_path,
+            )
+        )
+    return sorted(entries, key=lambda item: item.check_id)
 
 
-def build_manifest_payload(check_ids: Iterable[str]) -> dict[str, dict[str, str]]:
-    return {
-        check_id: {
-            "check_id": check_id,
-            "log_path": f"checks/{check_id}/primary.log",
-        }
-        for check_id in check_ids
-    }
+def build_manifest_payload(entries: Iterable[CheckEntry]) -> dict[str, dict[str, str]]:
+    payload: dict[str, dict[str, str]] = {}
+    for entry in entries:
+        item: dict[str, str] = {"check_id": entry.check_id, "log_path": entry.log_path}
+        if entry.transcript_path:
+            item["transcript_path"] = entry.transcript_path
+        payload[entry.check_id] = item
+    return payload
 
 
 def render_manifest(payload: dict[str, dict[str, str]]) -> bytes:
@@ -81,6 +102,29 @@ def write_manifest(path: Path, payload: dict[str, dict[str, str]]) -> None:
     path.write_bytes(rendered)
 
 
+def _refresh_log_path_proofs(
+    qa_root: Path,
+    entries: Sequence[CheckEntry],
+    *,
+    produced_at: str,
+    check: bool,
+) -> None:
+    for entry in entries:
+        log_path = qa_root / entry.log_path
+        if not log_path.exists():
+            if check:
+                raise SystemExit(f"MISSING_LOG:{entry.log_path}")
+            continue
+        _write_path_proof(log_path, produced_at=produced_at, check=check)
+        if entry.transcript_path:
+            transcript_path = qa_root / entry.transcript_path
+            if not transcript_path.exists():
+                if check:
+                    raise SystemExit(f"MISSING_TRANSCRIPT:{entry.transcript_path}")
+                continue
+            _write_path_proof(transcript_path, produced_at=produced_at, check=check)
+
+
 def run_refresh(args: argparse.Namespace) -> int:
     produced_at = args.produced_at or _utc_now()
     try:
@@ -91,11 +135,11 @@ def run_refresh(args: argparse.Namespace) -> int:
     qa_root = Path(args.qa_root)
     manifest_path = Path(args.manifest)
     checks_root = qa_root / "checks"
-    check_ids = collect_check_ids(checks_root)
-    if not check_ids:
+    entries = collect_check_entries(checks_root)
+    if not entries:
         return 2
 
-    payload = build_manifest_payload(check_ids)
+    payload = build_manifest_payload(entries)
     rendered = render_manifest(payload)
 
     if args.check:
@@ -103,11 +147,26 @@ def run_refresh(args: argparse.Namespace) -> int:
             return 2
         if manifest_path.read_bytes() != rendered:
             return 1
-        _write_path_proof(manifest_path, produced_at=produced_at, check=True)
+        try:
+            _write_path_proof(manifest_path, produced_at=produced_at, check=True)
+            _refresh_log_path_proofs(
+                qa_root,
+                entries,
+                produced_at=produced_at,
+                check=True,
+            )
+        except SystemExit:
+            return 1
         return 0
 
     write_manifest(manifest_path, payload)
     _write_path_proof(manifest_path, produced_at=produced_at, check=False)
+    _refresh_log_path_proofs(
+        qa_root,
+        entries,
+        produced_at=produced_at,
+        check=False,
+    )
     return 0
 
 

@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+import datetime as _dt
 from pathlib import Path
 from typing import Iterable, Sequence
 
@@ -15,6 +16,7 @@ if str(ROOT) not in sys.path:
 from engine.runtime.determinism_env import DeterminismEnvError, ensure_determinism_env
 from engine.serializer.canon import sercanon
 from tools.evidence import generate_evidence_index_snapshot as snapshot
+from tools.evidence import update_evidence_index
 from tools.qa.step_log_header import append_output, create_header, write_header
 
 DEFAULT_SNAPSHOT = ROOT / "audit/gates/evidence_index_snapshot/evidence_index_snapshot.json"
@@ -38,6 +40,29 @@ def _unique_sorted(items: Iterable[str]) -> list[str]:
 
 def _load_snapshot(path: Path) -> object:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _utc_now() -> str:
+    return _dt.datetime.now(_dt.timezone.utc).replace(microsecond=0).isoformat().replace(
+        "+00:00", "Z"
+    )
+
+
+def _write_path_proof(path: Path, *, produced_at: str, check: bool) -> None:
+    rel = path.relative_to(ROOT).as_posix()
+    stat = path.stat()
+    update_evidence_index._write_path_proof(
+        rel=rel,
+        sha256=snapshot._sha256_path(path),
+        size_bytes=stat.st_size,
+        mtime_utc=update_evidence_index._isoformat_from_timestamp(stat.st_mtime)
+        if not check
+        else None,
+        produced_at=produced_at if not check else None,
+        default_produced_at=produced_at,
+        check=check,
+        stat_mtime=stat.st_mtime,
+    )
 
 
 def _looks_like_repo_path(value: str) -> bool:
@@ -243,8 +268,34 @@ def run_check_mode(args: argparse.Namespace) -> int:
         mirror_path=mirror_path,
         determinism_ok=determinism_ok,
         determinism_error=determinism_error,
-        check_path_proof=True,
+        check_path_proof=False,
     )
+    if status == "FAIL_BEHAVIOR" and not args.check:
+        inputs = snapshot.Inputs(
+            human_path=human_index_path,
+            mirror_path=mirror_path,
+            snapshot_path=snapshot_path,
+        )
+        snapshot.run_snapshot(inputs, check_only=False)
+        report, status = build_report(
+            root=ROOT,
+            snapshot_path=snapshot_path,
+            human_index_path=human_index_path,
+            mirror_path=mirror_path,
+            determinism_ok=determinism_ok,
+            determinism_error=determinism_error,
+            check_path_proof=False,
+        )
+
+    if snapshot_path.exists():
+        produced_at = _utc_now()
+        try:
+            _write_path_proof(snapshot_path, produced_at=produced_at, check=args.check)
+        except SystemExit as exc:
+            report["issues"] = _unique_sorted([*report["issues"], f"PATH_PROOF:{exc}"])
+            status = "FAIL_BEHAVIOR"
+            report["status"] = status
+
     report_bytes = sercanon(report, sort_keys=True)
     report_path = Path(args.output_dir) / REPORT_NAME
 

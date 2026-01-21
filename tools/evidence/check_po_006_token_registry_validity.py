@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 import sys
 from dataclasses import dataclass
@@ -30,6 +31,7 @@ DEFAULT_REVIEW_DIR = (
 )
 
 CHECK_REPORT_NAME = "token_registry_validity_report.json"
+COMPARISON_NAME = "token_comparison.json"
 REVIEW_REPORT_NAME = "po_006_token_registry_validity_report.json"
 REVIEW_SUMMARY_NAME = "po_006_token_registry_validity_summary.md"
 
@@ -146,6 +148,9 @@ def build_report(
 ) -> tuple[dict[str, object], str]:
     acceptance_unique = _unique_sorted(acceptance_tokens.tokens)
     registry_unique = _unique_sorted(registry_tokens.tokens)
+    normalized_registry = _unique_sorted(
+        normalize_tokens(registry_tokens.tokens, token_sets.alias_map)
+    )
     deprecated_used = sorted(
         token for token in acceptance_unique if token in token_sets.deprecated_spellings
     )
@@ -158,7 +163,7 @@ def build_report(
         normalize_tokens(acceptance_tokens.tokens, token_sets.alias_map)
     )
     missing_in_registry = sorted(
-        token for token in normalized_acceptance if token not in registry_unique
+        token for token in normalized_acceptance if token not in normalized_registry
     )
     missing_in_canonical = sorted(
         token for token in normalized_acceptance if token not in token_sets.canonical_tokens
@@ -167,7 +172,7 @@ def build_report(
     status = "PASS"
     if not determinism_ok:
         status = "TOOLING_BLOCKED"
-    elif missing_in_registry or deprecated_used:
+    elif missing_in_registry or missing_in_canonical or deprecated_used:
         status = "FAIL_BEHAVIOR"
 
     report: dict[str, object] = {
@@ -200,16 +205,35 @@ def build_report(
         },
         "comparison": {
             "normalized_acceptance_tokens": normalized_acceptance,
+            "normalized_registry_tokens": normalized_registry,
             "missing_in_registry": missing_in_registry,
             "missing_in_canonical": missing_in_canonical,
             "deprecated_spellings_used": deprecated_used,
             "alias_hits": alias_hits,
             "extra_registry_tokens": sorted(
-                token for token in registry_unique if token not in normalized_acceptance
+                token for token in normalized_registry if token not in normalized_acceptance
             ),
         },
     }
     return report, status
+
+
+def build_comparison_payload(report: dict[str, object]) -> dict[str, object]:
+    return {
+        "schema": "po-006.token_comparison.v1",
+        "status": report["status"],
+        "inputs": report["inputs"],
+        "comparison": report["comparison"],
+    }
+
+
+def sanitize_report_for_remediation(report: dict[str, object]) -> dict[str, object]:
+    sanitized = copy.deepcopy(report)
+    canonical_registry = sanitized.get("canonical_registry")
+    if isinstance(canonical_registry, dict):
+        canonical_registry.pop("deprecated_spellings", None)
+        canonical_registry.pop("alias_map", None)
+    return sanitized
 
 
 def render_token_list(tokens: Sequence[str]) -> str:
@@ -225,11 +249,15 @@ def render_summary(report: dict[str, object]) -> str:
         f"acceptance_tokens: {acceptance['token_count']}",
         f"registry_tokens: {registry['token_count']}",
         f"missing_in_registry: {len(comparison['missing_in_registry'])}",
+        f"missing_in_canonical: {len(comparison['missing_in_canonical'])}",
         f"deprecated_spellings_used: {len(comparison['deprecated_spellings_used'])}",
     ]
     if comparison["missing_in_registry"]:
         lines.append("missing_tokens:")
         lines.extend(f"- {token}" for token in comparison["missing_in_registry"])
+    if comparison["missing_in_canonical"]:
+        lines.append("missing_in_canonical:")
+        lines.extend(f"- {token}" for token in comparison["missing_in_canonical"])
     if comparison["deprecated_spellings_used"]:
         lines.append("deprecated_spellings:")
         lines.extend(
@@ -290,7 +318,7 @@ def _write_primary_log(
     append_output(
         log_path,
         "captures:\n- rg_acceptance_map_output.txt\n- rg_registry_output.txt\n- "
-        f"{CHECK_REPORT_NAME}\n",
+        f"{CHECK_REPORT_NAME}\n- {COMPARISON_NAME}\n",
     )
 
 
@@ -318,9 +346,10 @@ def run_report_mode(args: argparse.Namespace) -> int:
         determinism_ok=determinism_ok,
         determinism_error=determinism_error,
     )
+    remediation_report = sanitize_report_for_remediation(report)
 
     review_dir = Path(args.review_dir)
-    _write_report(review_dir / REVIEW_REPORT_NAME, report)
+    _write_report(review_dir / REVIEW_REPORT_NAME, remediation_report)
     _write_text(review_dir / REVIEW_SUMMARY_NAME, render_summary(report))
 
     return 0 if status == "PASS" else (2 if status == "TOOLING_BLOCKED" else 1)
@@ -334,13 +363,19 @@ def run_check_mode(args: argparse.Namespace) -> int:
     except DeterminismEnvError as exc:
         determinism_ok = False
         determinism_error = str(exc)
+    if not determinism_ok:
+        return 2
 
     acceptance_map_path = Path(args.acceptance_map)
     registry_export_path = Path(args.registry_export)
     token_sets_path = Path(args.token_sets)
     output_dir = Path(args.output_dir)
 
-    if not acceptance_map_path.exists() or not registry_export_path.exists():
+    if (
+        not acceptance_map_path.exists()
+        or not registry_export_path.exists()
+        or not token_sets_path.exists()
+    ):
         status = "TOOLING_BLOCKED"
         summary = "missing_inputs\n"
         if args.check:
@@ -374,11 +409,14 @@ def run_check_mode(args: argparse.Namespace) -> int:
     acceptance_capture = render_token_list(_unique_sorted(acceptance_tokens.tokens))
     registry_capture = render_token_list(_unique_sorted(registry_tokens.tokens))
     report_bytes = sercanon(report, sort_keys=True)
+    comparison_payload = build_comparison_payload(report)
+    comparison_bytes = sercanon(comparison_payload, sort_keys=True)
 
     capture_paths = [
         output_dir / "rg_acceptance_map_output.txt",
         output_dir / "rg_registry_output.txt",
         output_dir / CHECK_REPORT_NAME,
+        output_dir / COMPARISON_NAME,
     ]
 
     issues: list[str] = []
@@ -386,16 +424,16 @@ def run_check_mode(args: argparse.Namespace) -> int:
         issues.extend(_validate_output(capture_paths[0], acceptance_capture))
         issues.extend(_validate_output(capture_paths[1], registry_capture))
         issues.extend(_validate_report(capture_paths[2], report_bytes))
+        issues.extend(_validate_report(capture_paths[3], comparison_bytes))
         if issues:
             status = "FAIL_BEHAVIOR"
-        if not determinism_ok:
-            status = "TOOLING_BLOCKED"
         return 0 if status == "PASS" else (2 if status == "TOOLING_BLOCKED" else 1)
 
     output_dir.mkdir(parents=True, exist_ok=True)
     _write_text(capture_paths[0], acceptance_capture)
     _write_text(capture_paths[1], registry_capture)
     _write_report(capture_paths[2], report)
+    _write_report(capture_paths[3], comparison_payload)
 
     evidence_outputs = [
         _relative(path) for path in capture_paths

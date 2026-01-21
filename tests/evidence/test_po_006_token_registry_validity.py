@@ -117,6 +117,57 @@ def test_report_detects_missing_registry_tokens(tmp_path: Path) -> None:
     assert comparison["missing_in_registry"] == ["MISSING_OK"]
 
 
+def test_report_normalizes_registry_tokens(tmp_path: Path) -> None:
+    token_sets_path = tmp_path / "token_sets.json"
+    acceptance_map_path = tmp_path / "acceptance_map.json"
+    registry_path = tmp_path / "registry.json"
+
+    _write_json(
+        token_sets_path,
+        {
+            "canonical_tokens": ["QA_HARNESS_DISCIPLINE_OK"],
+            "deprecated_spellings": ["QA_STEP_LOGS_CONSOLIDATED_OK"],
+            "alias_map": {
+                "QA_STEP_LOGS_CONSOLIDATED_OK": "QA_HARNESS_DISCIPLINE_OK"
+            },
+        },
+    )
+    _write_json(
+        acceptance_map_path,
+        {
+            "epic_id": "HDE-EPIC024",
+            "tokens": [{"name": "QA_HARNESS_DISCIPLINE_OK"}],
+        },
+    )
+    _write_json(
+        registry_path,
+        {"tokens": [{"name": "QA_STEP_LOGS_CONSOLIDATED_OK"}]},
+    )
+
+    token_sets = TokenSets(
+        canonical_tokens={"QA_HARNESS_DISCIPLINE_OK"},
+        deprecated_spellings={"QA_STEP_LOGS_CONSOLIDATED_OK"},
+        alias_map={"QA_STEP_LOGS_CONSOLIDATED_OK": "QA_HARNESS_DISCIPLINE_OK"},
+    )
+    acceptance_tokens = extract_acceptance_map_tokens(acceptance_map_path)
+    registry_tokens = extract_registry_tokens(registry_path)
+
+    report, status = build_report(
+        acceptance_tokens=acceptance_tokens,
+        registry_tokens=registry_tokens,
+        token_sets=token_sets,
+        acceptance_map_path=acceptance_map_path,
+        registry_export_path=registry_path,
+        token_sets_path=token_sets_path,
+        determinism_ok=True,
+        determinism_error=None,
+    )
+
+    comparison = report["comparison"]
+    assert status == "PASS"
+    assert comparison["missing_in_registry"] == []
+
+
 def test_report_mode_skips_outputs_when_determinism_open(
     tmp_path: Path, monkeypatch
 ) -> None:

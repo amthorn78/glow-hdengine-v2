@@ -16,6 +16,13 @@ if str(ROOT) not in sys.path:
 
 from engine.runtime.determinism_env import DeterminismEnvError, ensure_determinism_env
 from engine.serializer.canon import sercanon
+from tools.evidence.check_po_006_token_registry_validity import (
+    TokenSets,
+    extract_acceptance_map_tokens,
+    extract_registry_tokens,
+    load_token_sets,
+    normalize_tokens,
+)
 from tools.evidence import update_evidence_index
 from tools.qa.step_log_header import append_output, create_header, write_header
 
@@ -23,6 +30,11 @@ DEFAULT_ACCEPTANCE_MAP = ROOT / "docs/acceptance_map_epic024.json"
 DEFAULT_MATRIX = ROOT / "audit/qa/hde-epic024/token_evidence_matrix.md"
 DEFAULT_INDEX = ROOT / "docs/evidence/INDEX.json"
 DEFAULT_MIRROR = ROOT / "artifacts/evidence_index.jsonl"
+DEFAULT_REGISTRY_EXPORT = ROOT / "reports/qa_acceptance_tokens.json"
+DEFAULT_TOKEN_SETS = (
+    ROOT
+    / "audit/qa/hde-epic024/remediation/s1_token_registry_discovery/token_sets.json"
+)
 DEFAULT_CHECK_DIR = ROOT / "audit/qa/hde-epic024/checks/epic024_evidence_path_binding_validation"
 DEFAULT_REVIEW_DIR = (
     ROOT / "audit/qa/hde-epic024/remediation/s2_dev_acceptance_artifacts"
@@ -261,21 +273,67 @@ def build_report(
     return report, status
 
 
-def render_scope(matrix_tokens: dict[str, MatrixEntry], *, matrix_path: Path, root: Path) -> str:
-    tokens = sorted(matrix_tokens)
-    unique_evidence: set[str] = set()
-    for entry in matrix_tokens.values():
-        unique_evidence.update(entry.evidence)
+def _canonicalize_tokens(tokens: Iterable[str], token_sets: TokenSets) -> list[str]:
+    return _unique_sorted(normalize_tokens(tokens, token_sets.alias_map))
+
+
+def render_scope(
+    *,
+    acceptance_tokens: Sequence[str],
+    registry_tokens: Sequence[str],
+    token_sets: TokenSets,
+    acceptance_map_path: Path,
+    registry_path: Path,
+    token_sets_path: Path,
+    root: Path,
+) -> str:
+    canonical_acceptance = _canonicalize_tokens(acceptance_tokens, token_sets)
+    canonical_registry = _canonicalize_tokens(registry_tokens, token_sets)
+    deprecated_used = sorted(
+        token for token in acceptance_tokens if token in token_sets.deprecated_spellings
+    )
+    alias_replacements = {
+        token: token_sets.alias_map[token]
+        for token in deprecated_used
+        if token in token_sets.alias_map
+    }
+
     lines = [
         "# HDE-EPIC024 token evidence matrix scope",
         "",
-        f"- matrix_path: {_relative(matrix_path, root)}",
-        f"- token_count: {len(tokens)}",
-        f"- evidence_artifact_count: {len(unique_evidence)}",
+        "## Scope",
+        "- cleanup_scope: only docs/acceptance_map_epic024.json cleaned",
+        f"- acceptance_map: {_relative(acceptance_map_path, root)}",
+        f"- registry_export: {_relative(registry_path, root)}",
+        f"- token_sets: {_relative(token_sets_path, root)}",
         "",
-        "## Tokens",
+        "## Deprecated spellings",
     ]
-    lines.extend(f"- {token}" for token in tokens)
+    if deprecated_used:
+        lines.append("- deprecated_spellings_found:")
+        lines.extend(f"  - {token}" for token in deprecated_used)
+        lines.append("- canonical_replacements:")
+        for token, replacement in sorted(alias_replacements.items()):
+            lines.append(f"  - {token} -> {replacement}")
+    else:
+        lines.append("- deprecated_spellings_found: none")
+        lines.append("- canonical_replacements: none")
+
+    lines.extend(
+        [
+            "",
+            "## Acceptance tokens (canonicalized)",
+            f"- token_count: {len(canonical_acceptance)}",
+            "",
+            "| token | in_registry_export | in_canonical_tokens |",
+            "| --- | --- | --- |",
+        ]
+    )
+    for token in canonical_acceptance:
+        in_registry = "yes" if token in canonical_registry else "no"
+        in_canonical = "yes" if token in token_sets.canonical_tokens else "no"
+        lines.append(f"| {token} | {in_registry} | {in_canonical} |")
+
     return "\n".join(lines) + "\n"
 
 
@@ -353,8 +411,19 @@ def run_report_mode(args: argparse.Namespace) -> int:
         return 2
 
     produced_at = _utc_now()
-    matrix_tokens, _ = _parse_matrix(Path(args.matrix))
-    scope = render_scope(matrix_tokens, matrix_path=Path(args.matrix), root=ROOT)
+    token_sets_path = Path(args.token_sets)
+    token_sets = load_token_sets(token_sets_path)
+    acceptance_tokens = extract_acceptance_map_tokens(Path(args.acceptance_map))
+    registry_tokens = extract_registry_tokens(Path(args.registry_export))
+    scope = render_scope(
+        acceptance_tokens=acceptance_tokens.tokens,
+        registry_tokens=registry_tokens.tokens,
+        token_sets=token_sets,
+        acceptance_map_path=Path(args.acceptance_map),
+        registry_path=Path(args.registry_export),
+        token_sets_path=token_sets_path,
+        root=ROOT,
+    )
     review_dir = Path(args.review_dir)
     scope_path = review_dir / SCOPE_NAME
     _write_text(scope_path, scope)
@@ -429,7 +498,9 @@ def main() -> int:
     report_parser = subparsers.add_parser(
         "report", help="Write remediation review artifacts"
     )
-    report_parser.add_argument("--matrix", default=DEFAULT_MATRIX)
+    report_parser.add_argument("--acceptance-map", default=DEFAULT_ACCEPTANCE_MAP)
+    report_parser.add_argument("--registry-export", default=DEFAULT_REGISTRY_EXPORT)
+    report_parser.add_argument("--token-sets", default=DEFAULT_TOKEN_SETS)
     report_parser.add_argument("--review-dir", default=DEFAULT_REVIEW_DIR)
     report_parser.set_defaults(func=run_report_mode)
 
