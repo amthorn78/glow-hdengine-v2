@@ -29,7 +29,7 @@ DEFAULT_REVIEW_DIR = (
     / "audit/qa/hde-epic024/remediation/s2_dev_acceptance_artifacts"
 )
 
-CHECK_REPORT_NAME = "token_registry_validity_report.json"
+CHECK_REPORT_NAME = "token_comparison.json"
 REVIEW_REPORT_NAME = "po_006_token_registry_validity_report.json"
 REVIEW_SUMMARY_NAME = "po_006_token_registry_validity_summary.md"
 
@@ -167,7 +167,7 @@ def build_report(
     status = "PASS"
     if not determinism_ok:
         status = "TOOLING_BLOCKED"
-    elif missing_in_registry or deprecated_used:
+    elif missing_in_registry or missing_in_canonical or deprecated_used:
         status = "FAIL_BEHAVIOR"
 
     report: dict[str, object] = {
@@ -195,8 +195,6 @@ def build_report(
         "canonical_registry": {
             "token_count": len(token_sets.canonical_tokens),
             "tokens": sorted(token_sets.canonical_tokens),
-            "deprecated_spellings": sorted(token_sets.deprecated_spellings),
-            "alias_map": dict(sorted(token_sets.alias_map.items())),
         },
         "comparison": {
             "normalized_acceptance_tokens": normalized_acceptance,
@@ -225,6 +223,7 @@ def render_summary(report: dict[str, object]) -> str:
         f"acceptance_tokens: {acceptance['token_count']}",
         f"registry_tokens: {registry['token_count']}",
         f"missing_in_registry: {len(comparison['missing_in_registry'])}",
+        f"missing_in_canonical: {len(comparison['missing_in_canonical'])}",
         f"deprecated_spellings_used: {len(comparison['deprecated_spellings_used'])}",
     ]
     if comparison["missing_in_registry"]:
@@ -327,23 +326,28 @@ def run_report_mode(args: argparse.Namespace) -> int:
 
 
 def run_check_mode(args: argparse.Namespace) -> int:
-    determinism_ok = True
-    determinism_error = None
     try:
         ensure_determinism_env()
-    except DeterminismEnvError as exc:
-        determinism_ok = False
-        determinism_error = str(exc)
+    except DeterminismEnvError:
+        return 2
+    if args.check and args.write:
+        return 2
+    determinism_ok = True
+    determinism_error = None
 
     acceptance_map_path = Path(args.acceptance_map)
     registry_export_path = Path(args.registry_export)
     token_sets_path = Path(args.token_sets)
     output_dir = Path(args.output_dir)
 
-    if not acceptance_map_path.exists() or not registry_export_path.exists():
+    if (
+        not acceptance_map_path.exists()
+        or not registry_export_path.exists()
+        or not token_sets_path.exists()
+    ):
         status = "TOOLING_BLOCKED"
         summary = "missing_inputs\n"
-        if args.check:
+        if not args.write:
             return 2
         _write_primary_log(
             output_dir,
@@ -382,14 +386,12 @@ def run_check_mode(args: argparse.Namespace) -> int:
     ]
 
     issues: list[str] = []
-    if args.check:
+    if not args.write:
         issues.extend(_validate_output(capture_paths[0], acceptance_capture))
         issues.extend(_validate_output(capture_paths[1], registry_capture))
         issues.extend(_validate_report(capture_paths[2], report_bytes))
         if issues:
             status = "FAIL_BEHAVIOR"
-        if not determinism_ok:
-            status = "TOOLING_BLOCKED"
         return 0 if status == "PASS" else (2 if status == "TOOLING_BLOCKED" else 1)
 
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -426,9 +428,10 @@ def main() -> int:
     check_parser.add_argument("--token-sets", default=DEFAULT_TOKEN_SETS)
     check_parser.add_argument("--output-dir", default=DEFAULT_CHECK_DIR)
     check_parser.add_argument("--check", action="store_true", help="validate outputs only")
+    check_parser.add_argument("--write", action="store_true", help="write outputs")
     check_parser.add_argument(
         "--command",
-        default="python tools/evidence/check_po_006_token_registry_validity.py check",
+        default="python tools/evidence/check_po_006_token_registry_validity.py check --write",
     )
     check_parser.set_defaults(func=run_check_mode)
 

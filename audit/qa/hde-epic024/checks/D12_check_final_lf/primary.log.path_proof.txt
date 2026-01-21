@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic024/checks/D12_check_final_lf/primary.log
+size_bytes: 325
+sha256: f674460760fd24e6c6ed5c19d2a4f6efe0ef193a896305988220ef4988139465
+mtime_utc: 2026-01-21T11:56:07Z
+produced_at_utc: 2026-01-21T12:09:08Z

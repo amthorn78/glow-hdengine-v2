@@ -18,6 +18,10 @@ from engine.serializer.canon import sercanon
 from tools.qa.step_log_header import append_output, create_header, write_header
 
 DEFAULT_ACCEPTANCE_MAP = ROOT / "docs/acceptance_map_epic024.json"
+DEFAULT_TOKEN_SETS = (
+    ROOT
+    / "audit/qa/hde-epic024/remediation/s1_token_registry_discovery/token_sets.json"
+)
 DEFAULT_CHECK_DIR = ROOT / "audit/qa/hde-epic024/checks/epic024_acceptance_map_viability"
 DEFAULT_REVIEW_DIR = (
     ROOT / "audit/qa/hde-epic024/remediation/s2_dev_acceptance_artifacts"
@@ -32,6 +36,13 @@ class TokenIssue:
     issues: Sequence[str]
 
 
+@dataclass(frozen=True)
+class TokenSets:
+    canonical_tokens: set[str]
+    deprecated_spellings: set[str]
+    alias_map: dict[str, str]
+
+
 def _read_json(path: Path) -> object:
     return json.loads(path.read_text(encoding="utf-8"))
 
@@ -44,6 +55,26 @@ def _relative(path: Path, root: Path) -> str:
 
 def _unique_sorted(items: Iterable[str]) -> list[str]:
     return sorted(set(items))
+
+
+def load_token_sets(path: Path) -> TokenSets:
+    payload = _read_json(path)
+    if not isinstance(payload, dict):
+        raise ValueError("token_sets must be a JSON object")
+    alias_map = payload.get("alias_map")
+    canonical_tokens = payload.get("canonical_tokens")
+    deprecated_spellings = payload.get("deprecated_spellings")
+    if not isinstance(alias_map, dict):
+        raise ValueError("token_sets.alias_map must be an object")
+    if not isinstance(canonical_tokens, list):
+        raise ValueError("token_sets.canonical_tokens must be a list")
+    if not isinstance(deprecated_spellings, list):
+        raise ValueError("token_sets.deprecated_spellings must be a list")
+    return TokenSets(
+        canonical_tokens={str(token) for token in canonical_tokens if token},
+        deprecated_spellings={str(token) for token in deprecated_spellings if token},
+        alias_map={str(key): str(value) for key, value in alias_map.items()},
+    )
 
 
 def _looks_relative(path: str) -> bool:
@@ -77,10 +108,12 @@ def _collect_token_issues(
 def build_report(
     *,
     acceptance_map_path: Path,
+    token_sets_path: Path,
     root: Path,
     determinism_ok: bool,
     determinism_error: str | None,
 ) -> tuple[dict[str, object], str]:
+    token_sets = load_token_sets(token_sets_path)
     payload = _read_json(acceptance_map_path)
     if not isinstance(payload, dict):
         raise ValueError("acceptance map payload must be a JSON object")
@@ -95,6 +128,10 @@ def build_report(
     token_entries: list[TokenIssue] = []
     evidence_count = 0
 
+    missing_in_canonical: list[str] = []
+    deprecated_tokens: list[str] = []
+    alias_hits: dict[str, str] = {}
+
     for entry in tokens:
         if not isinstance(entry, dict):
             continue
@@ -108,11 +145,21 @@ def build_report(
         evidence_titles = entry.get("evidence_titles") or []
         if isinstance(evidence_titles, list):
             evidence_count += len([item for item in evidence_titles if isinstance(item, str)])
-        token_issues = (
-            _collect_token_issues(name, evidence_titles, root=root)
-            if isinstance(evidence_titles, list)
-            else [f"EVIDENCE_TITLES_INVALID:{name}"]
-        )
+        token_issues = []
+        if name in token_sets.deprecated_spellings:
+            deprecated_tokens.append(name)
+            token_issues.append(f"DEPRECATED_TOKEN:{name}")
+        canonical_name = token_sets.alias_map.get(name, name)
+        if canonical_name != name:
+            alias_hits[name] = canonical_name
+            token_issues.append(f"ALIAS_CANONICALIZED:{name}:{canonical_name}")
+        if canonical_name not in token_sets.canonical_tokens:
+            missing_in_canonical.append(canonical_name)
+            token_issues.append(f"MISSING_CANONICAL_TOKEN:{canonical_name}")
+        if isinstance(evidence_titles, list):
+            token_issues.extend(_collect_token_issues(name, evidence_titles, root=root))
+        else:
+            token_issues.append(f"EVIDENCE_TITLES_INVALID:{name}")
         issues.extend(token_issues)
         token_entries.append(TokenIssue(name=name, issues=token_issues))
 
@@ -130,6 +177,7 @@ def build_report(
         "status": status,
         "inputs": {
             "acceptance_map": _relative(acceptance_map_path, root),
+            "token_sets": _relative(token_sets_path, root),
         },
         "determinism_env": {
             "ok": determinism_ok,
@@ -140,6 +188,16 @@ def build_report(
             "evidence_title_count": evidence_count,
             "issue_count": len(_unique_sorted(issues)),
             "duplicate_tokens": sorted(duplicates),
+            "missing_canonical_tokens": _unique_sorted(missing_in_canonical),
+            "deprecated_spellings_used": _unique_sorted(deprecated_tokens),
+        },
+        "token_sets": {
+            "canonical_token_count": len(token_sets.canonical_tokens),
+        },
+        "comparison": {
+            "missing_in_canonical": _unique_sorted(missing_in_canonical),
+            "deprecated_spellings_used": _unique_sorted(deprecated_tokens),
+            "alias_hits": dict(sorted(alias_hits.items())),
         },
         "token_issues": {
             entry.name: list(entry.issues)
@@ -202,6 +260,7 @@ def run_report_mode(args: argparse.Namespace) -> int:
 
     report, status = build_report(
         acceptance_map_path=Path(args.acceptance_map),
+        token_sets_path=Path(args.token_sets),
         root=ROOT,
         determinism_ok=True,
         determinism_error=None,
@@ -230,6 +289,7 @@ def run_check_mode(args: argparse.Namespace) -> int:
 
     report, status = build_report(
         acceptance_map_path=acceptance_map_path,
+        token_sets_path=Path(args.token_sets),
         root=ROOT,
         determinism_ok=determinism_ok,
         determinism_error=determinism_error,
@@ -267,6 +327,7 @@ def main() -> int:
 
     check_parser = subparsers.add_parser("check", help="Run or validate check outputs")
     check_parser.add_argument("--acceptance-map", default=DEFAULT_ACCEPTANCE_MAP)
+    check_parser.add_argument("--token-sets", default=DEFAULT_TOKEN_SETS)
     check_parser.add_argument("--output-dir", default=DEFAULT_CHECK_DIR)
     check_parser.add_argument("--check", action="store_true", help="validate outputs only")
     check_parser.add_argument(
@@ -279,6 +340,7 @@ def main() -> int:
         "report", help="Write remediation review artifacts"
     )
     report_parser.add_argument("--acceptance-map", default=DEFAULT_ACCEPTANCE_MAP)
+    report_parser.add_argument("--token-sets", default=DEFAULT_TOKEN_SETS)
     report_parser.add_argument("--review-dir", default=DEFAULT_REVIEW_DIR)
     report_parser.set_defaults(func=run_report_mode)
 
