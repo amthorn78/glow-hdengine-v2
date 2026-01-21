@@ -1,17 +1,5 @@
-status: FAIL_BEHAVIOR
+status: PASS
 acceptance_tokens: 25
-registry_tokens: 37
-missing_in_registry: 11
+registry_tokens: 48
+missing_in_registry: 0
 deprecated_spellings_used: 0
-missing_tokens:
-- DETERMINISM_ENV_PINS_OK
-- ENV_LC_ALL_C_OK
-- EVIDENCE_INDEX_MIRROR_OK
-- QA_BOOTSTRAP_OK
-- QA_BOOTSTRAP_TOOLING_FAIL
-- QA_HARNESS_DISCIPLINE_OK
-- QA_HARNESS_ENTRYPOINT_SELFTEST_OK
-- QA_LIVE_QA_RUN_OK
-- QA_POSTCOMMIT_CHECKLIST_OK
-- QA_PRECOMMIT_CHECKLIST_OK
-- SANITY_PIPELINE_OK
