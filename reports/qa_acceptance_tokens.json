@@ -874,6 +874,296 @@
       ]
     },
     {
+      "name": "DETERMINISM_ENV_PINS_OK",
+      "scope": "qa_rails",
+      "feature_label": "Determinism rails env pins validated",
+      "code_locations": [
+        {
+          "path": "ci/checks/check_env_pins.sh",
+          "summary": "Checks closed-rails env pins"
+        },
+        {
+          "path": "tools/qa/run_hde_epic024_harness.py",
+          "summary": "Harness records determinism env pins token"
+        }
+      ],
+      "tests_and_ci": [
+        {
+          "path": "ci/checks/check_env_pins.sh",
+          "summary": "CI gate for determinism env pins"
+        }
+      ],
+      "evidence_artifacts": [
+        {
+          "path": "audit/gates/determinism/env_pins.log",
+          "summary": "Determinism env pins log"
+        }
+      ]
+    },
+    {
+      "name": "ENV_LC_ALL_C_OK",
+      "scope": "qa_rails",
+      "feature_label": "LC_ALL=C rail recorded for closed rails",
+      "code_locations": [
+        {
+          "path": "ci/checks/check_env_pins.sh",
+          "summary": "Validates LC_ALL env pin"
+        },
+        {
+          "path": "tools/qa/run_hde_epic024_harness.py",
+          "summary": "Harness records LC_ALL pin token"
+        }
+      ],
+      "tests_and_ci": [
+        {
+          "path": "ci/checks/check_env_pins.sh",
+          "summary": "CI gate for LC_ALL pin"
+        }
+      ],
+      "evidence_artifacts": [
+        {
+          "path": "audit/gates/determinism/env_pins.log",
+          "summary": "Determinism env pins log"
+        }
+      ]
+    },
+    {
+      "name": "EVIDENCE_INDEX_MIRROR_OK",
+      "scope": "evidence_index",
+      "feature_label": "Evidence index mirror schema validated",
+      "code_locations": [
+        {
+          "path": "ci/checks/check_mirror_schema.sh",
+          "summary": "Checks evidence index mirror schema"
+        },
+        {
+          "path": "tools/qa/run_hde_epic024_harness.py",
+          "summary": "Harness records mirror schema token"
+        }
+      ],
+      "tests_and_ci": [
+        {
+          "path": "ci/checks/check_mirror_schema.sh",
+          "summary": "CI mirror schema gate"
+        }
+      ],
+      "evidence_artifacts": [
+        {
+          "path": "docs/evidence/INDEX.json",
+          "summary": "Evidence index for mirror validation"
+        },
+        {
+          "path": "artifacts/evidence_index.jsonl",
+          "summary": "Mirror index payload"
+        }
+      ]
+    },
+    {
+      "name": "QA_BOOTSTRAP_OK",
+      "scope": "qa_rails",
+      "feature_label": "QA bootstrap preflight succeeded",
+      "code_locations": [
+        {
+          "path": "tools/qa/run_hde_epic024_harness.py",
+          "summary": "Harness emits QA bootstrap tokens"
+        }
+      ],
+      "tests_and_ci": [
+        {
+          "path": "tools/qa/run_hde_epic024_harness.py",
+          "summary": "Runs bootstrap preflight checks"
+        }
+      ],
+      "evidence_artifacts": [
+        {
+          "path": "audit/qa/hde-epic024/checks/D00_bootstrap_pytest/primary.log",
+          "summary": "Bootstrap preflight log"
+        }
+      ]
+    },
+    {
+      "name": "QA_BOOTSTRAP_TOOLING_FAIL",
+      "scope": "qa_rails",
+      "feature_label": "QA bootstrap tooling failure tracked",
+      "code_locations": [
+        {
+          "path": "tools/qa/run_hde_epic024_harness.py",
+          "summary": "Harness records bootstrap tooling failures"
+        }
+      ],
+      "tests_and_ci": [
+        {
+          "path": "tools/qa/run_hde_epic024_harness.py",
+          "summary": "Runs bootstrap preflight checks"
+        }
+      ],
+      "evidence_artifacts": [
+        {
+          "path": "audit/qa/hde-epic024/checks/D00_bootstrap_pytest/primary.log",
+          "summary": "Bootstrap preflight log"
+        }
+      ],
+      "notes": "Token is expected when bootstrap tooling fails; current runs record success."
+    },
+    {
+      "name": "QA_HARNESS_DISCIPLINE_OK",
+      "scope": "qa_rails",
+      "feature_label": "QA harness step-log discipline enforced",
+      "code_locations": [
+        {
+          "path": "tools/qa/run_hde_epic024_harness.py",
+          "summary": "Harness records discipline token"
+        }
+      ],
+      "tests_and_ci": [
+        {
+          "path": "tools/qa/run_hde_epic024_harness.py",
+          "summary": "Runs QA harness with discipline checks"
+        }
+      ],
+      "evidence_artifacts": [
+        {
+          "path": "audit/qa/hde-epic024/qa_step_logs_manifest.json",
+          "summary": "QA step logs manifest"
+        },
+        {
+          "path": "audit/qa/hde-epic024/acceptance_map_viability.log",
+          "summary": "Acceptance map viability log"
+        }
+      ]
+    },
+    {
+      "name": "QA_HARNESS_ENTRYPOINT_SELFTEST_OK",
+      "scope": "qa_rails",
+      "feature_label": "QA harness entrypoint self-test passes",
+      "code_locations": [
+        {
+          "path": "tools/qa/run_hde_epic024_harness.py",
+          "summary": "Harness records entrypoint self-test token"
+        }
+      ],
+      "tests_and_ci": [
+        {
+          "path": "tools/qa/run_hde_epic024_harness.py",
+          "summary": "Runs harness entrypoint self-test"
+        }
+      ],
+      "evidence_artifacts": [
+        {
+          "path": "audit/qa/hde-epic024/checks/D14_harness_selftest/primary.log",
+          "summary": "Harness entrypoint self-test log"
+        }
+      ]
+    },
+    {
+      "name": "QA_LIVE_QA_RUN_OK",
+      "scope": "qa_rails",
+      "feature_label": "Live QA run artifacts captured",
+      "code_locations": [
+        {
+          "path": "tools/evidence/generate_sampler_evidence.py",
+          "summary": "Generates sampler evidence for live QA runs"
+        },
+        {
+          "path": "tools/qa/run_hde_epic024_harness.py",
+          "summary": "Harness records live QA run token"
+        }
+      ],
+      "tests_and_ci": [
+        {
+          "path": "tools/evidence/generate_sampler_evidence.py",
+          "summary": "Sampler evidence generation"
+        }
+      ],
+      "evidence_artifacts": [
+        {
+          "path": "artifacts/sampler/seed_replay/cli_http_seed_replay.json",
+          "summary": "Sampler seed replay evidence"
+        },
+        {
+          "path": "artifacts/sampler/two_run/identity.json",
+          "summary": "Sampler two-run identity evidence"
+        }
+      ]
+    },
+    {
+      "name": "QA_POSTCOMMIT_CHECKLIST_OK",
+      "scope": "qa_rails",
+      "feature_label": "QA post-commit checklist completed",
+      "code_locations": [
+        {
+          "path": "tools/qa/run_hde_epic024_harness.py",
+          "summary": "Harness records post-commit checklist token"
+        }
+      ],
+      "tests_and_ci": [
+        {
+          "path": "tools/qa/run_hde_epic024_harness.py",
+          "summary": "Runs QA harness post-commit checks"
+        }
+      ],
+      "evidence_artifacts": [
+        {
+          "path": "audit/qa/hde-epic024/qa_step_logs_manifest.json",
+          "summary": "QA step logs manifest"
+        },
+        {
+          "path": "audit/qa/hde-epic024/acceptance_map_viability.log",
+          "summary": "Acceptance map viability log"
+        }
+      ]
+    },
+    {
+      "name": "QA_PRECOMMIT_CHECKLIST_OK",
+      "scope": "qa_rails",
+      "feature_label": "QA pre-commit checklist completed",
+      "code_locations": [
+        {
+          "path": "tools/qa/run_hde_epic024_harness.py",
+          "summary": "Harness records pre-commit checklist token"
+        }
+      ],
+      "tests_and_ci": [
+        {
+          "path": "ci/checks/check_env_pins.sh",
+          "summary": "Env pins gate for closed rails"
+        }
+      ],
+      "evidence_artifacts": [
+        {
+          "path": "audit/qa/hde-epic024/checks/D00_bootstrap_pytest/primary.log",
+          "summary": "Bootstrap preflight log"
+        },
+        {
+          "path": "audit/gates/determinism/env_pins.log",
+          "summary": "Determinism env pins log"
+        }
+      ]
+    },
+    {
+      "name": "SANITY_PIPELINE_OK",
+      "scope": "qa_rails",
+      "feature_label": "Sanity pipeline completed under closed rails",
+      "code_locations": [
+        {
+          "path": "tools/evidence/run_sanity_pipeline.py",
+          "summary": "Runs sanity pipeline and records token"
+        }
+      ],
+      "tests_and_ci": [
+        {
+          "path": "tools/evidence/run_sanity_pipeline.py",
+          "summary": "Sanity pipeline execution"
+        }
+      ],
+      "evidence_artifacts": [
+        {
+          "path": "artifacts/sanity/sanity.log",
+          "summary": "Sanity pipeline log"
+        }
+      ]
+    },
+    {
       "name": "TESTS_PASS_OK",
       "scope": "pre_commit_ci",
       "feature_label": "Automated test suite recorded as passing for EPIC017",

@@ -32,7 +32,22 @@ jobs:
       - run: python tools/order/generate_ordering_artifacts.py --check
       - run: python tools/evidence/update_evidence_index.py --check
       - run: python tools/evidence/orientation_demo.py --check
-      - run: python tools/evidence/check_po_006_token_registry_validity.py check --check
+      - name: Run PO-006 token registry validity check + report (gated)
+        run: |
+          set +e
+          python tools/evidence/check_po_006_token_registry_validity.py check --check
+          check_status=$?
+          python tools/evidence/check_po_006_token_registry_validity.py report
+          report_status=$?
+          set -e
+          cat audit/qa/hde-epic024/remediation/s2_dev_acceptance_artifacts/po_006_token_registry_validity_summary.md || true
+          cat audit/qa/hde-epic024/remediation/s2_dev_acceptance_artifacts/po_006_token_registry_validity_report.json || true
+          cat audit/qa/hde-epic024/checks/po-006_token_registry_validity/primary.log || true
+          cat audit/qa/hde-epic024/checks/po-006_token_registry_validity/token_registry_validity_report.json || true
+          if [ "$check_status" -ne 0 ]; then
+            exit "$check_status"
+          fi
+          exit "$report_status"
       - run: python tools/evidence/refresh_step_logs_manifest.py --check
       - run: ci/checks/check_evidence_index_hash.sh
       - run: python ci/checks/check_bridge_consistency.py
