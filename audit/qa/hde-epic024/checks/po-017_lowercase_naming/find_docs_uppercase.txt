@@ -1,0 +1,1 @@
+OUT OF SCOPE: docs/ is not scanned by PO-017 in this plan (QA-created files under docs/ are forbidden by this plan).

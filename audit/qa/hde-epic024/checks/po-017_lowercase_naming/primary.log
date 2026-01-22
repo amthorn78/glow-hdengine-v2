@@ -1,0 +1,5 @@
+{"check_id":"po-017_lowercase_naming","status":"PASS","fail_status":"","command":"N/A","command_provenance":"PO posture-only scan; see find_* outputs","captured_env":{},"pf_refs":["PF19 §3.4.17"],"intended_tokens":[],"claimed_tokens":[]}
+captures:
+- audit/qa/hde-epic024/checks/po-017_lowercase_naming/find_audit_uppercase.txt
+- audit/qa/hde-epic024/checks/po-017_lowercase_naming/find_docs_uppercase.txt
+- audit/qa/hde-epic024/checks/po-017_lowercase_naming/find_artifacts_uppercase.txt

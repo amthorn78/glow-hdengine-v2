@@ -1,5 +1,0 @@
-path: audit/qa/hde-epic024/checks/D14_harness_selftest/primary.log
-size_bytes: 758
-sha256: 1b89f27b752c683ac030c311c09db79d32689064442dc23aace70e906607ee01
-mtime_utc: 2026-01-17T09:05:21Z
-produced_at_utc: 2026-01-21T15:00:53Z

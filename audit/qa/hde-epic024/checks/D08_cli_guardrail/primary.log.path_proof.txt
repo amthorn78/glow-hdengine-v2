@@ -1,5 +1,0 @@
-path: audit/qa/hde-epic024/checks/D08_cli_guardrail/primary.log
-size_bytes: 386
-sha256: 6c2e8be47fb03952e8914ec986e6e7c02f523ced584b0327d164a5c37a4c4026
-mtime_utc: 2026-01-21T20:18:09Z
-produced_at_utc: 2026-01-21T20:18:09Z

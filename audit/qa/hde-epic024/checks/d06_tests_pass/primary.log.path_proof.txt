@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic024/checks/d06_tests_pass/primary.log
+size_bytes: 414
+sha256: 1c704516c24eeb9d756ef8907057e1c61cb32047db6caacd7968e14f2a22cdce
+mtime_utc: 2026-01-22T10:38:25Z
+produced_at_utc: 2026-01-22T15:13:46Z
