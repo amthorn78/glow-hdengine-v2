@@ -1,0 +1,4 @@
+{"check_id":"po-011_doc_delta_capture","status":"PASS","fail_status":"","command":"N/A","command_provenance":"Copy/paste from plan","captured_env":{"MODO_AI_BUNDLE":"","MODO_AI_VERBOSE":"","MODO_RAILS":"","LC_ALL":"1","LANG":"en_US.UTF-8","TZ":"UTC"},"pf_refs":["PF27 \u00a74.2","PF19 \u00a73.4.11"],"intended_tokens":[],"claimed_tokens":[]}
+-rw-rw-rw- 1 vscode vscode 344 Jan 21 17:25 audit/docdeltas/hde-epic024_doc_deltas.md
+-rw-rw-rw- 1 vscode vscode 344 Jan 21 17:25 audit/qa/hde-epic024/00_meta/doc_deltas.md
+

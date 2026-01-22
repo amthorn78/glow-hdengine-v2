@@ -1,2 +1,2 @@
-{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"D18_acceptance_map","claimed_tokens":[],"command":"python (embedded) write docs/acceptance_map_epic024.json","evidence_outputs":["docs/acceptance_map_epic024.json"],"exit_code":0,"intended_tokens":[],"pf_refs":[],"status":"PASS"}
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"local","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"D18_acceptance_map","claimed_tokens":[],"command":"python (embedded) write docs/acceptance_map_epic024.json","evidence_outputs":["docs/acceptance_map_epic024.json"],"exit_code":0,"intended_tokens":[],"pf_refs":[],"status":"PASS"}
 PASS: acceptance map generated.

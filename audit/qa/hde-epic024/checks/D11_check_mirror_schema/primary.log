@@ -1,9 +1,13 @@
-{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"D11_check_mirror_schema","claimed_tokens":[],"command":"ci/checks/check_mirror_schema.sh","evidence_outputs":["artifacts/evidence_index.jsonl"],"exit_code":0,"intended_tokens":[],"pf_refs":[],"status":"PASS"}
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"local","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"D11_check_mirror_schema","claimed_tokens":[],"command":"ci/checks/check_mirror_schema.sh","evidence_outputs":["artifacts/evidence_index.jsonl"],"exit_code":1,"intended_tokens":[],"pf_refs":[],"status":"FAIL_BEHAVIOR"}
 == STDOUT ==
 
 
 == STDERR ==
-
+SHA_MISMATCH:85:7a2a18ecf951164f7fcafa55ad96eb7bfba9b7c006392d8dc5e76b7837bc0bc5!=bd244360565b54967cf06495b99f8c76ae81a4379ee2fc576b9676c9cce52848
+SIZE_MISMATCH:85:516!=518
+PROOF_SHA:85:7a2a18ecf951164f7fcafa55ad96eb7bfba9b7c006392d8dc5e76b7837bc0bc5!=bd244360565b54967cf06495b99f8c76ae81a4379ee2fc576b9676c9cce52848
+PROOF_SIZE:85:516!=518
+PROOF_MTIME:202:2026-01-16T16:28:20Z
 
 == RC ==
-0
+1

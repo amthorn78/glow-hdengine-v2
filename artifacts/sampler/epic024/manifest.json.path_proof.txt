@@ -1,0 +1,5 @@
+path: artifacts/sampler/epic024/manifest.json
+size_bytes: 355
+sha256: 290197fbeb8654fa8c9677376af8dedbd6530ffcfd5655b91df36dd75ecb5af3
+mtime_utc: 2026-01-21T20:55:39Z
+produced_at_utc: 2026-01-21T20:55:39Z

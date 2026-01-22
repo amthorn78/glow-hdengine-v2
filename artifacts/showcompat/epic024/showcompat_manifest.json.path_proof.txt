@@ -1,0 +1,5 @@
+path: artifacts/showcompat/epic024/showcompat_manifest.json
+size_bytes: 951
+sha256: 4887f9dda8065f0fe2c0a6e3f1cf55cea2955313fd5f7777ef52ab54abc1e613
+mtime_utc: 2026-01-21T19:41:57Z
+produced_at_utc: 2026-01-21T19:41:57Z

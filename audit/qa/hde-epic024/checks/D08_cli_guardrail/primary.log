@@ -1,0 +1,9 @@
+{"check_id":"D08_cli_guardrail","status":"PASS","exit_code":0,"command":"python tools/cli/serializer_grep_guard.py","evidence_outputs":["artifacts/cli/guards/serializer_grep_guard.log"],"captured_env":{"APP_ENV":"dev","SAFE_MODE":"1","ALLOW_NETWORK":"0","LANG":"C","LC_ALL":"C","TZ":"UTC"},"claimed_tokens":[],"intended_tokens":[],"pf_refs":[]}
+== STDOUT ==
+
+
+== STDERR ==
+
+
+== RC ==
+0

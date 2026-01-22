@@ -1,4 +1,4 @@
-{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"D03_showcompat_artifacts","claimed_tokens":[],"command":"python tools/cli/generate_showcompat_artifacts.py","evidence_outputs":["artifacts/cli/showcompat/stdout.json","artifacts/cli/showcompat/stdout.json.sha256","artifacts/cli/showcompat/args.json"],"exit_code":0,"intended_tokens":[],"pf_refs":[],"status":"PASS"}
+{"check_id":"D03_showcompat_artifacts","status":"PASS","exit_code":0,"command":"python tools/cli/generate_showcompat_artifacts.py","evidence_outputs":["artifacts/showcompat/epic024/showcompat_manifest.json","artifacts/showcompat/epic024/showcompat_symbols.json"],"captured_env":{"APP_ENV":"dev","SAFE_MODE":"1","ALLOW_NETWORK":"0","LANG":"C","LC_ALL":"C","TZ":"UTC"},"claimed_tokens":[],"intended_tokens":[],"pf_refs":[]}
 == STDOUT ==
 
 

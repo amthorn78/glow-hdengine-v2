@@ -1,5 +1,5 @@
 path: audit/qa/hde-epic024/checks/D07_sanity_pipeline/primary.log
-size_bytes: 527
-sha256: 66809519f3a96a7a20a016e0b8dbcbb71d8efb5cb610207e90c37c8b22255b4d
-mtime_utc: 2026-01-17T09:05:21Z
-produced_at_utc: 2026-01-21T15:00:53Z
+size_bytes: 392
+sha256: 08ed03411865edab964457a155aba9058002c080060203f408349b2f44939b22
+mtime_utc: 2026-01-21T21:32:02Z
+produced_at_utc: 2026-01-21T21:32:02Z

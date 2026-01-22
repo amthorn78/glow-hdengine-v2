@@ -1,2 +1,2 @@
-{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"D19_step_logs_manifest","claimed_tokens":[],"command":"python (embedded) write qa_step_logs_manifest.json","evidence_outputs":["audit/qa/hde-epic024/qa_step_logs_manifest.json"],"exit_code":0,"intended_tokens":[],"pf_refs":[],"status":"PASS"}
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"local","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"D19_step_logs_manifest","claimed_tokens":[],"command":"python (embedded) write qa_step_logs_manifest.json","evidence_outputs":["audit/qa/hde-epic024/qa_step_logs_manifest.json"],"exit_code":0,"intended_tokens":[],"pf_refs":[],"status":"PASS"}
 PASS: step logs manifest written.
