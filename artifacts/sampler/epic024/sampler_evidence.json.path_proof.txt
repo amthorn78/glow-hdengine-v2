@@ -1,0 +1,5 @@
+path: artifacts/sampler/epic024/sampler_evidence.json
+size_bytes: 1163
+sha256: 9b14f503a815f69863bffcc920b7f3622a461447a9812d510ad0478b819f4f31
+mtime_utc: 2026-01-21T20:55:39Z
+produced_at_utc: 2026-01-21T20:55:39Z

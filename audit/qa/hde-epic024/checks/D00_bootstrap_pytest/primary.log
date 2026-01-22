@@ -1,9 +1,9 @@
-{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"D00_bootstrap_pytest","claimed_tokens":[],"command":"python -m pytest --version","evidence_outputs":[],"exit_code":0,"intended_tokens":[],"pf_refs":[],"status":"PASS"}
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"local","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"D00_bootstrap_pytest","claimed_tokens":[],"command":"python -m pytest --version","evidence_outputs":[],"exit_code":1,"intended_tokens":[],"pf_refs":[],"status":"FAIL_TOOLING"}
 == STDOUT ==
-pytest 9.0.2
+
 
 == STDERR ==
-
+/usr/local/bin/python: No module named pytest
 
 == RC ==
-0
+1

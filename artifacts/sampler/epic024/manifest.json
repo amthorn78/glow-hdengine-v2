@@ -1,0 +1,1 @@
+{"artifacts":{"manifest":"artifacts/sampler/epic024/manifest.json","sampler_evidence":"artifacts/sampler/epic024/sampler_evidence.json"},"epic":"HDE-EPIC024","generated_at_utc":"2026-01-21T20:55:39Z","generator":"tools/evidence/run_sampler_evidence.py","referenced_artifacts":["seed_replay","two_run_identity","abba_parity","pool_snapshots","diversity"]}

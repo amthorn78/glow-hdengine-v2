@@ -1,0 +1,5 @@
+path: artifacts/showcompat/epic024/showcompat_symbols.json
+size_bytes: 133
+sha256: 1fc75d3b78673be4496381898710693beae585c18fecbb797765d15d6b33d354
+mtime_utc: 2026-01-21T19:41:57Z
+produced_at_utc: 2026-01-21T19:41:57Z

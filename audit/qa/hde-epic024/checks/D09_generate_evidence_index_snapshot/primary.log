@@ -1,4 +1,4 @@
-{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"D09_generate_evidence_index_snapshot","claimed_tokens":[],"command":"python tools/evidence/generate_evidence_index_snapshot.py","evidence_outputs":["audit/gates/evidence_index_snapshot/evidence_index_snapshot.json"],"exit_code":0,"intended_tokens":[],"pf_refs":[],"status":"PASS"}
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"local","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"D09_generate_evidence_index_snapshot","claimed_tokens":[],"command":"python tools/evidence/generate_evidence_index_snapshot.py","evidence_outputs":["audit/gates/evidence_index_snapshot/evidence_index_snapshot.json"],"exit_code":0,"intended_tokens":[],"pf_refs":[],"status":"PASS"}
 == STDOUT ==
 STATUS: PASS
 

@@ -1,0 +1,1 @@
+{"command":"scripts/hdctl.py showcompat","has_bands":false,"output_keys":["a","b","compat","viewer_prefs"],"output_size_bytes":1902}

@@ -1,4 +1,4 @@
-{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"D12_check_final_lf","claimed_tokens":[],"command":"ci/checks/check_final_lf.sh","evidence_outputs":[],"exit_code":0,"intended_tokens":[],"pf_refs":[],"status":"PASS"}
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"local","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"D12_check_final_lf","claimed_tokens":[],"command":"ci/checks/check_final_lf.sh","evidence_outputs":[],"exit_code":0,"intended_tokens":[],"pf_refs":[],"status":"PASS"}
 == STDOUT ==
 
 
