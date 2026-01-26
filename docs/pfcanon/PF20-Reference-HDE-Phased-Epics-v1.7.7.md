@@ -2,11 +2,11 @@
 
 **Status:** Reference
 
-**Version:** v1.7.6
+**Version:** v1.7.7
 
-**Effective date:** 2026-01-12
+**Effective date:** 2026-01-23
 
-**Last Update Gate:** HDE-EPIC023 Closure
+**Last Update Gate:** HDE-EPIC024 Closure
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -4667,4 +4667,420 @@ Disposition: Satisfied for close-pack \+ docs surfaces with an explicit override
   * Actual: D23 posture recorded as tooling-blocked and accepted via closure override with drain targets (PF10 — HDE Build Notes, §2.53 and §2.55).
 
 Preflight completion record: Unknown (not present in inputs) beyond the enforcement signals and closure-override documentation cited above.
+
+### **2.9 HDE-EPIC024 Epic Plan**
+
+#### **2.9.1 Meta**
+
+**Epic ID:** HDE-EPIC024  
+**Epic name:** HDE Pre-Conjunction Pass 1  
+**Phase:** Pre-Conjunction (Calcination)  
+**Status:** Done (PF10 — HDE Build Notes, §2.30 “Verdict: READY WITH CAVEATS”; PF10 — HDE Build Notes, §2.31 “Closure decision: SATISFIED (close the epic now)”)  
+**Start date:** 2026-01-13  
+**Date completed:** 2026-01-21  
+**Owner:** PO
+
+**Stakeholders (roles-only):** HDE Lead Dev; QA Reviewer-of-Record; Governance Reviewer-of-Record; CI/Infra owner (as needed for merge-gating scripts)  
+**Scope canonical anchor:** PF09 — HDE Build Checklist, §Subtask HDE-CALC002.1 (Pre-Conjunction Pass scaffolding and gates)  
+**Epic intent (one line; planned):** Produce a repo-first, deterministic “Pre-Conjunction Pass” gate family: canonical JSON, arrays-as-sets, env pins, evidence index snapshot/binding, CLI stream discipline, sampler evidence, and QA harness discipline, such that closure artifacts can be generated without ad-hoc runbooks.
+
+Plan revision note (mismatch): PF10 execution repeatedly references `r5 Live QA Plan HDE-EPIC024.md` as the “Approved Plan” for checks (not present in inputs). Planned scope source for this archive record is `r3 Epic Plan HDE-EPIC024.md`; PF10 remains authoritative for actual results/outcomes.
+
+#### **2.9.2 Existing Work Check**
+
+**Planned (r3 Epic Plan HDE-EPIC024.md):**
+
+* **In-scope checklist items (PF09 citations):**  
+  * **HDE-CALC002.1** — One serializer and one emitter for all public bytes  
+  * **HDE-CALC002.2** — Canonical JSON rules across all surfaces  
+  * **HDE-CALC002.3** — Arrays-as-sets semantics (registry \+ topology)  
+  * **HDE-CALC002.4** — Determinism environment pins (LC\_ALL, LANG, TZ)  
+  * **HDE-CALC003.9** — Local run targets for sanity pipeline  
+  * **HDE-CALC003.10** — Indexing & parity CI gates  
+  * **HDE-CALC003.11** — Evidence index touch discipline  
+  * **HDE-CALC003.13** — Canonical pytest invocation (python \-m pytest)  
+  * **HDE-CALC003.14** — QA harness discipline (step logs \+ manifest) — skeleton  
+  * **HDE-CALC003.19** — D23 Evidence Index snapshot artifact exists  
+  * **HDE-DISS003.2** — Pool formation & eligibility filters  
+  * **HDE-SEPA003.3** — Consolidate stream discipline for presenter-driven CLI flows  
+* **Explicitly out-of-scope (planned):** any full pass on “Conjunction” or “Separation” scope beyond the subset above.  
+* **Existing governed evidence surfaces expected before EPIC024 (carry-forward posture):**  
+  * Evidence Index (human): `docs/evidence/INDEX.json` \+ `docs/evidence/INDEX.sha256`  
+  * Evidence Index (machine): `artifacts/evidence_index.jsonl` \+ `artifacts/evidence_index.jsonl.sha256`  
+  * EPIC023 acceptance map: `docs/acceptance_map_epic023.json`  
+  * EPIC023 close pack: `audit/EPIC-023_MANIFEST.json` \+ `audit/EPIC-023_close_report.md`  
+* **Known drift/ambiguity risks (planned):**  
+  * Token registry authority / aliasing: PF10 addenda “Token authority \+ acceptance artifact normalization” (plan cites PF10 §2.1; section not present in PF10 v9.4.4 inputs)  
+  * Evidence path binding authority: PF10 addenda “Evidence path binding authority order” (plan cites PF10 §2.2; section not present in PF10 v9.4.4 inputs)  
+  * Acceptance map path-of-record: PF10 addenda “Acceptance map path-of-record for EPIC024” (plan cites PF10 §2.3; section not present in PF10 v9.4.4 inputs)  
+  * Evidence Index snapshot contract (D23) mechanical PASS/FAIL: PF10 addenda “Evidence Index snapshot (D23) mechanical PASS/FAIL contract” (plan cites PF10 §2-4; section not present in PF10 v9.4.4 inputs)
+
+**Actual baseline condition observed (PF10):**
+
+* EPIC024 produced a dedicated QA root: `audit/qa/hde-epic024/` with check receipts written under `audit/qa/hde-epic024/checks/` (PF10 — HDE Build Notes, §2.11–§2.29).  
+* The “known drift/ambiguity risks” manifested as explicit ADR notes and remediation loops during execution (examples):  
+  * Canonical gate runner \+ evidence artifacts required remediation / reruns before “PASS” receipts stabilized (PF10 — HDE Build Notes, §2.12, §2.18–§2.20).  
+  * Token registry validity required remediation and an OPS rerun stream (PF10 — HDE Build Notes, §2.18–§2.21).  
+  * Evidence index snapshot contract / binding validation was executed and archived via remediation rerun artifacts (PF10 — HDE Build Notes, §2.20).  
+* Carry-forward surfaces were referenced as baseline (PF10 — HDE Build Notes, §2.31 cites `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl`, `artifacts/evidence_index.jsonl.sha256`).
+
+#### **2.9.3 Deliverables (Jobs-to-be-done) — Planned vs Actual Reconciliation**
+
+##### **D1 — Public-bytes emitter consolidation across CLI / reader\_v1 / mirror / evidence\_index**
+
+* **Planned:** Ensure “one serializer and one emitter for all public bytes” by consolidating emission behavior across reader\_v1 and CLI, with parity discipline and a D00 check receipt.  
+* **Planned evidence required (verbatim list items from r3 plan):**  
+  * `artifacts/mirror/hde/all/v1/main.json`  
+  * `artifacts/evidence_index.jsonl`  
+  * `tools/reader_v1/emit_public_bytes.py`  
+  * `tools/cli/emit_public_bytes.py`  
+  * `audit/gates/canonical_json/json_canonical_check.log`  
+  * `audit/gates/canonical_json/json_canonical_check.sha256`  
+  * `audit/qa/hde-epic024/checks/D00_public_bytes_parity/primary.log`  
+* **Actual (PF10):** Unknown (not present in inputs)  
+  * PF10 does not include a `CHECK D00_public_bytes_parity` receipt or any reference to `tools/reader_v1/emit_public_bytes.py` / `tools/cli/emit_public_bytes.py`.  
+* **Disposition:** Unclear
+
+##### **D2 — Canonical JSON rules across all surfaces (gate \+ artifacts)**
+
+* **Planned:** Canonical JSON gate is repo-present, deterministic, and emits an auditable check log for closure.  
+* **Planned evidence required (verbatim list items from r3 plan):**  
+  * `tools/evidence/run_canonical_json_gate.py`  
+  * `audit/gates/json_gate/canonical/json_gate_check_log.ndjson`  
+  * `audit/gates/json_gate/canonical/json_gate_check_log.sha256`  
+  * `audit/qa/hde-epic024/checks/D02_canonical_json_gate/primary.log`  
+* **Actual (PF10):** PASS — PF10 — HDE Build Notes, §2.12 (“**Decision:** PASS for CHECK D02\_canonical\_json\_gate”).  
+  * Evidence pointers: `tools/evidence/run_canonical_json_gate.py`; `audit/gates/json_gate/canonical/json_gate_check_log.ndjson`; `audit/qa/hde-epic024/checks/D02_canonical_json_gate/primary.log`; `audit/gates/json_gate/canonical/json_gate_check_log.ndjson.path_proof.txt`.  
+  * Planned artifact `audit/gates/json_gate/canonical/json_gate_check_log.sha256`: Unknown (not present in inputs)  
+* **Disposition:** Satisfied (PASS receipt recorded; one planned artifact not referenced in PF10)
+
+##### **D3 — Arrays-as-sets semantics (determinism gate)**
+
+* **Planned:** Arrays-as-sets determinism gate exists and produces deterministic audit logs.  
+* **Planned evidence required (verbatim list items from r3 plan):**  
+  * `tools/evidence/run_arrays_as_sets_gate.py`  
+  * `audit/gates/determinism/arrays_as_sets.log`  
+  * `audit/gates/determinism/arrays_as_sets.sha256`  
+  * `audit/qa/hde-epic024/checks/D05_arrays_as_sets/primary.log`  
+* **Actual (PF10):** PASS — PF10 — HDE Build Notes, §2.13 (“**Decision:** PASS for CHECK D05\_arrays\_as\_sets”).  
+  * Evidence pointers: `tools/evidence/run_arrays_as_sets_gate.py`; `audit/gates/determinism/arrays_as_sets.log`; `audit/gates/determinism/arrays_as_sets.sha256`; `audit/qa/hde-epic024/checks/D05_arrays_as_sets/primary.log`.  
+* **Disposition:** Satisfied
+
+##### **D4 — Determinism environment pins (LC\_ALL, LANG, TZ)**
+
+* **Planned:** Determinism environment pins are gated and recorded, specifically including LC\_ALL=C.  
+* **Planned evidence required (verbatim list items from r3 plan):**  
+  * `tools/evidence/run_env_pins_gate.py`  
+  * `audit/gates/determinism/env_pins.log`  
+  * `audit/gates/determinism/env_pins.sha256`  
+  * `audit/qa/hde-epic024/checks/D01_env_pins_gate/primary.log`  
+* **Actual (PF10):** PASS — PF10 — HDE Build Notes, §2.24 (“**Decision:** PASS for CHECK D01\_env\_pins\_gate”).  
+  * Evidence pointers: `tools/evidence/run_env_pins_gate.py`; `audit/gates/determinism/env_pins.log`; `audit/gates/determinism/env_pins.sha256`; `audit/qa/hde-epic024/checks/D01_env_pins_gate/primary.log`.  
+* **Disposition:** Satisfied
+
+##### **D5 — Sanity pipeline (local run target and gating posture)**
+
+* **Planned:** Provide and validate a sanity pipeline run target sufficient for “canary” posture.  
+* **Planned evidence required (verbatim list items from r3 plan):**  
+  * `audit/qa/hde-epic024/checks/D07_sanity_pipeline/primary.log`  
+* **Actual (PF10):** PASS — PF10 — HDE Build Notes, §2.28 (“**Decision:** PASS for CHECK D07\_sanity\_pipeline”).  
+  * Evidence pointer: `audit/qa/hde-epic024/checks/D07_sanity_pipeline/primary.log`.  
+* **Disposition:** Satisfied
+
+##### **D6 — Evidence index / mirror parity CI gates implemented (CI gating)**
+
+* **Planned:** Provide CI checks for evidence index and machine mirror parity, including schema checks and a declared audit trail when these surfaces change.  
+* **Planned evidence required (verbatim list items from r3 plan):**  
+  * `docs/evidence/INDEX.json.path_proof.txt`  
+  * `docs/evidence/INDEX.sha256.path_proof.txt`  
+  * `artifacts/evidence_index.jsonl`  
+  * `artifacts/evidence_index.jsonl.sha256`  
+  * `ci/checks/check_evidence_index.sh`  
+  * `ci/checks/check_machine_mirror_index.sh`  
+  * `ci/checks/check_machine_mirror.sh`  
+  * `ci/checks/check_machine_mirror_index_schema.sh`  
+  * `audit/qa/hde-epic024/checks/<check_id>/primary.log`  
+* **Actual (PF10):** Unknown (not present in inputs)  
+  * PF10 contains limited adjacent evidence: evidence index snapshot contract checks and binding validation reruns (PF10 — HDE Build Notes, §2.14 and §2.20), and CI workflow wiring is referenced as added in a remedial PR (`.github/workflows/ci.yml`) (PF10 — HDE Build Notes, §2.19).  
+  * Planned CI check scripts under `ci/checks/`: Unknown (not present in inputs)  
+  * Planned path-proof artifacts for `docs/evidence/INDEX.*`: Unknown (not present in inputs)  
+* **Disposition:** Unclear
+
+##### **D7 — Evidence index touch discipline & manifest enforcement**
+
+* **Planned:** Enforce “touch discipline” such that PRs that modify evidence index / mirror declare and regenerate the required snapshot/binding artifacts, with auditable receipts under QA root.  
+* **Planned evidence required (verbatim planning notes):** “QA step logs demonstrating check-mode enforcement for evidence index touches; binding validation receipts for evidence-path mapping.”  
+* **Actual (PF10):** Evidence index contract and validation artifacts exist:  
+  * Evidence index snapshot receipt: PF10 — HDE Build Notes, §2.14 (“**Decision:** PASS for CHECK D09\_evidence\_index\_snapshot”) with `audit/gates/evidence_index_snapshot/evidence_index_snapshot.json` \+ `.sha256` and `audit/qa/hde-epic024/checks/D09_evidence_index_snapshot/primary.log`.  
+  * Binding validation artifacts were produced during OPS rerun: `audit/qa/hde-epic024/remediation/s3_po_006_rerun/evidence_path_binding_validation.ndjson` \+ `.sha256` (PF10 — HDE Build Notes, §2.20).  
+* **Disposition:** Unclear  
+  * Core validations exist, but the full “touch discipline” enforcement surface is not fully enumerated in PF10.
+
+##### **D8 — QA harness discipline (repo-first) \+ canonical pytest invocation**
+
+* **Planned:** Establish repo-first QA harness discipline: per-check receipts (`primary.log`), a step logs manifest, and a harness selftest entrypoint; canonical pytest invocation via `python -m pytest`.  
+* **Planned evidence required (verbatim list items from r3 plan):**  
+  * `tools/qa_harness/selftest_ci_entrypoint.sh`  
+  * `audit/qa/hde-epic024/selftest/run1/selftest_report.json`  
+  * `audit/qa/hde-epic024/checks/D14_harness_selftest/primary.log`  
+  * `audit/qa/hde-epic024/checks/D19_step_logs_manifest/primary.log`  
+* **Actual (PF10):** PASS — harness selftest and step logs manifest both recorded PASS receipts:  
+  * PF10 — HDE Build Notes, §2.16 (“**Decision:** PASS for CHECK D14\_harness\_selftest”) with `tools/qa_harness/selftest_ci_entrypoint.sh`, `audit/qa/hde-epic024/selftest/run1/selftest_report.json`, and `audit/qa/hde-epic024/checks/D14_harness_selftest/primary.log`.  
+  * PF10 — HDE Build Notes, §2.17 (“**Decision:** PASS for CHECK D19\_step\_logs\_manifest”) with `tools/qa_harness/generate_step_logs_manifest.py`, `audit/qa/hde-epic024/qa_step_logs_manifest.json`, `audit/qa/hde-epic024/qa_step_logs_manifest.json.path_proof.txt`, and `audit/qa/hde-epic024/checks/D19_step_logs_manifest/primary.log`.  
+  * Canonical pytest invocation (`python -m pytest`): Unknown (not present in inputs)  
+    * PF10 does not record a distinct receipt for this invocation form.  
+* **Disposition:** Satisfied (core harness discipline receipts PASS; pytest-invocation evidence not explicitly recorded)
+
+##### **D9 — Evidence Index snapshot artifact exists (D23 contract \+ binding)**
+
+* **Planned:** Provide the D23 “Evidence Index snapshot” contract and binding validation artifacts and receipts.  
+* **Planned evidence required (verbatim list items from r3 plan):**  
+  * `audit/gates/evidence_index_snapshot/evidence_index_snapshot.json`  
+  * `audit/gates/evidence_index_snapshot/evidence_index_snapshot.sha256`  
+  * `audit/gates/evidence_index_snapshot/evidence_index_snapshot.json.path_proof.txt`  
+  * `audit/gates/evidence_index_snapshot/evidence_path_binding_validation.ndjson`  
+  * `audit/gates/evidence_index_snapshot/evidence_path_binding_validation.sha256`  
+  * `audit/qa/hde-epic024/checks/D23_evidence_index_snapshot_contract/primary.log`  
+* **Actual (PF10):** PASS (with path deviations for some planned artifacts).  
+  * Snapshot artifact exists and is validated via PASS receipt for D09: PF10 — HDE Build Notes, §2.14 with `audit/gates/evidence_index_snapshot/evidence_index_snapshot.json` \+ `.sha256`, plus `audit/gates/evidence_index_snapshot/evidence_index_snapshot.json.path_proof.txt`.  
+  * D23 contract rerun and binding validation outputs were archived under remediation during OPS rerun (PF10 — HDE Build Notes, §2.20): `audit/qa/hde-epic024/remediation/s3_po_006_rerun/d23_evidence_index_snapshot_contract_rerun.ndjson`, `audit/qa/hde-epic024/remediation/s3_po_006_rerun/evidence_path_binding_validation.ndjson`, `audit/qa/hde-epic024/remediation/s3_po_006_rerun/evidence_path_binding_validation.sha256`.  
+  * Planned path `audit/gates/evidence_index_snapshot/evidence_path_binding_validation.*`: Unknown (not present in inputs)  
+  * Planned receipt `audit/qa/hde-epic024/checks/D23_evidence_index_snapshot_contract/primary.log`: Unknown (not present in inputs)  
+* **Disposition:** Satisfied (artifact family present and validated; some outputs recorded at different loci than planned)
+
+##### **D10 — Sampler pool formation & eligibility filters (evidence family)**
+
+* **Planned:** Provide deterministic sampler pool snapshots and related evidence surfaces.  
+* **Planned evidence required (verbatim list items from r3 plan):**  
+  * `tools/sampler/emit_pool_snapshot.py`  
+  * `artifacts/sampler/pool_snapshots/**`  
+  * `audit/qa/hde-epic024/checks/D04_sampler_evidence/primary.log`  
+* **Actual (PF10):** PASS receipt exists for sampler evidence, but planned sampler artifacts are not referenced in PF10.  
+  * PF10 — HDE Build Notes, §2.27 (“**Decision:** PASS for CHECK D04\_sampler\_evidence”) with `audit/qa/hde-epic024/checks/D04_sampler_evidence/primary.log`.  
+  * Planned evidence `tools/sampler/emit_pool_snapshot.py` and `artifacts/sampler/pool_snapshots/**`: Unknown (not present in inputs)  
+* **Disposition:** Unclear  
+  * PASS receipt exists, but planned artifact family is not evidenced in PF10.
+
+##### **D11 — Consolidate stream discipline for presenter-driven CLI flows**
+
+* **Planned:** Consolidate and validate stream discipline for presenter-driven CLI flows, including showcompat capture artifacts and CLI guardrails.  
+* **Planned evidence required (verbatim list items from r3 plan):**  
+  * `tools/evidence/generate_showcompat_artifacts.py`  
+  * `artifacts/cli/showcompat/hde/all/v1/main.json`  
+  * `artifacts/cli/showcompat/hde/all/v1/main.json.sha256`  
+  * `audit/qa/hde-epic024/checks/D08_cli_guardrail/primary.log`  
+  * `audit/qa/hde-epic024/checks/D03_showcompat_artifacts/primary.log`  
+* **Actual (PF10):** PASS — showcompat artifacts and CLI guardrail both have PASS receipts.  
+  * PF10 — HDE Build Notes, §2.25 (“**Decision:** PASS for CHECK D03\_showcompat\_artifacts”) with `tools/evidence/generate_showcompat_artifacts.py`, `artifacts/cli/showcompat/hde/all/v1/main.json`, `artifacts/cli/showcompat/hde/all/v1/main.json.sha256`, and `audit/qa/hde-epic024/checks/D03_showcompat_artifacts/primary.log`.  
+  * PF10 — HDE Build Notes, §2.26 (“**Decision:** PASS for CHECK D08\_cli\_guardrail”) with `audit/qa/hde-epic024/checks/D08_cli_guardrail/primary.log` and CLI enforcement loci (`tools/cli/run_shim.py`, `tools/cli/__main__.py`, `tools/cli/guardrail.py`).  
+* **Disposition:** Satisfied
+
+Deliverables register mismatch note: PF10’s closure review includes a separate “deliverables register” (DEL-01..DEL-10) keyed to check receipts and closure artifacts; this does not 1:1 match the r3 plan’s D1–D11 list (PF10 — HDE Build Notes, §2.31). This record preserves the mismatch rather than reconciling it.
+
+#### **2.9.4 PF Reference Map**
+
+**Planned PF reference map (r3 Epic Plan HDE-EPIC024.md; selection):**
+
+* PF27 — Canon Plan Templates, §2 HDE-EPIC-Plan (template-of-record for this plan structure)  
+* PF09 — HDE Build Checklist, §Subtasks HDE-CALC002.1–HDE-CALC003.19; HDE-DISS003.2; HDE-SEPA003.3  
+* PF04 — HDE Governance, §2.0.1 Determinism; §2.0.2 Canonical JSON; §2.0.6 Evidence tokens; §2.0.8 CLI/SDK parity harness; §2.0.10 Env/rails/infra; §2.0.19 QA harness tokens; §4.1.8 Sanity pipeline  
+* PF12 — HDE Schemas and Artifacts, §4 Canonical JSON \+ arrays-as-sets; §8 Evidence Index \+ Mirror \+ path-proof discipline; showcompat deterministic capture evidence family; sampler evidence families; evidence index snapshot artifact family  
+* PF14 — HDE Mechanics Guide, §1.1 / §1.3 / §1.6.x / §4.x / §5.1 / §11.3.x / §16.1–§16.2 (titles-only references)  
+* PF19 — Glow QA Guide, §4.4 QA log discipline (qa\_step\_logs\_manifest.json, per-check primary.log, QA\_ROOT rules)  
+* PF23 — Reality Audits, §1.2 Current Audit (presenter/emitter layering notes; evidence layout notes; showcompat capture tool references)  
+* Epic Process Guide, §0.4 Execution posture; §3.5 Close Gate
+
+**Execution and results sources used for this archive record:**
+
+* PF10 — HDE Build Notes, §2.6–§2.31 (PR review stream, QA checks, remediation loops, closeout summary, closure review)  
+* `r3 Epic Plan HDE-EPIC024.md` (planned deliverables/tokens/rails; several PF10 section pointers in this plan do not exist in PF10 v9.4.4 inputs)  
+* PF20 — HDE-Phased Epics, §2.8 (adjacent epic-record style model \+ carry-forward context)
+
+#### **2.9.5 Tokens and Evidence (Acceptance)**
+
+##### **A) Acceptance tokens (names-only; planned roster)**
+
+* **Base tokens (planned):**  
+  * `ENV_LC_ALL_C_OK`  
+  * `CANONICAL_JSON_GATE_OK`  
+  * `ARRAYS_AS_SETS_OK`  
+  * `SANITY_PIPELINE_OK`  
+  * `EVIDENCE_INDEX_SNAPSHOT_CONTRACT_OK`  
+  * `EVIDENCE_INDEX_PATH_BINDING_OK`  
+  * `CLI_STREAM_DISCIPLINE_OK`  
+  * `SAMPLER_POOL_OK`  
+  * `QA_HARNESS_SELFTEST_OK`  
+  * `QA_STEP_LOGS_MANIFEST_OK`  
+  * `ACCEPTANCE_MAP_VIABILITY_OK`  
+  * `TOKEN_REGISTRY_VALIDITY_OK`  
+  * `LOWERCASE_NAMING_OK`  
+  * `CLOSE_PACK_OK`  
+* **QA check receipts (planned; PASS/FAIL contract):**  
+  * `CHECK_D01_PASS` / `CHECK_D01_FAIL`  
+  * `CHECK_D02_PASS` / `CHECK_D02_FAIL`  
+  * `CHECK_D03_PASS` / `CHECK_D03_FAIL`  
+  * `CHECK_D04_PASS` / `CHECK_D04_FAIL`  
+  * `CHECK_D05_PASS` / `CHECK_D05_FAIL`  
+  * `CHECK_D07_PASS` / `CHECK_D07_FAIL`  
+  * `CHECK_D08_PASS` / `CHECK_D08_FAIL`  
+  * `CHECK_D09_PASS` / `CHECK_D09_FAIL`  
+  * `CHECK_D13_PASS` / `CHECK_D13_FAIL`  
+  * `CHECK_D14_PASS` / `CHECK_D14_FAIL`  
+  * `CHECK_D16_PASS` / `CHECK_D16_FAIL`  
+  * `CHECK_D19_PASS` / `CHECK_D19_FAIL`  
+  * `CHECK_PO_011_PASS` / `CHECK_PO_011_FAIL`  
+  * `CHECK_PO_006_PASS` / `CHECK_PO_006_FAIL`  
+  * `CHECK_PO_017_PASS` / `CHECK_PO_017_FAIL`  
+  * `CHECK_D23_PASS` / `CHECK_D23_FAIL`  
+  * `CHECK_STEP_0B_PASS` / `CHECK_STEP_0B_FAIL`  
+  * `CHECK_CLOSEOUT_SUMMARY_PRESENT_OK`  
+  * `CHECK_EPIC_CLOSURE_DECISION_PRESENT_OK`  
+* **Close gate tokens (planned):**  
+  * `CLOSE_PACK_PRESENT_OK`  
+  * `EPIC_MANIFEST_VALID_OK`  
+  * `DOC_DELTAS_CAPTURED_OK`  
+  * `ACCEPTANCE_ARTIFACTS_PRESENT_OK`
+
+##### **B) Evidence outputs required for close (planned; titles-only set)**
+
+* Acceptance map path-of-record: `docs/acceptance_map_epic024.json`  
+* QA root: `audit/qa/hde-epic024/` and per-check receipts at `audit/qa/hde-epic024/checks/<check_id>/primary.log`  
+* Canonical JSON gate family: `audit/gates/json_gate/canonical/json_gate_check_log.ndjson`  
+* Arrays-as-sets gate family: `audit/gates/determinism/arrays_as_sets.log` \+ `.sha256`  
+* Env pins gate family: `audit/gates/determinism/env_pins.log` \+ `.sha256`  
+* Evidence index snapshot family: `audit/gates/evidence_index_snapshot/evidence_index_snapshot.json` \+ `.sha256`  
+* Close pack endpoints (planned): `audit/EPIC-024_close_report.md` and `audit/EPIC-024_MANIFEST.json`  
+* Doc deltas path-of-record (planned): `audit/docdeltas/hde-epic024_doc_deltas.md`
+
+##### **C) Actual token/evidence posture recorded (PF10)**
+
+* **Check receipts recorded as PASS (PF10):**  
+  * `CHECK_STEP_0B_PASS`: PF10 — HDE Build Notes, §2.11 with `audit/qa/hde-epic024/checks/Step-0B_doc_delta_capture/primary.log`  
+  * `CHECK_D02_PASS`: PF10 — HDE Build Notes, §2.12 with `audit/qa/hde-epic024/checks/D02_canonical_json_gate/primary.log`  
+  * `CHECK_D05_PASS`: PF10 — HDE Build Notes, §2.13 with `audit/qa/hde-epic024/checks/D05_arrays_as_sets/primary.log`  
+  * `CHECK_D09_PASS`: PF10 — HDE Build Notes, §2.14 with `audit/qa/hde-epic024/checks/D09_evidence_index_snapshot/primary.log`  
+  * `CHECK_D13_PASS`: PF10 — HDE Build Notes, §2.15 with `audit/qa/hde-epic024/checks/D13_acceptance_map_viability/primary.log`  
+  * `CHECK_D14_PASS`: PF10 — HDE Build Notes, §2.16 with `audit/qa/hde-epic024/checks/D14_harness_selftest/primary.log`  
+  * `CHECK_D19_PASS`: PF10 — HDE Build Notes, §2.17 with `audit/qa/hde-epic024/checks/D19_step_logs_manifest/primary.log`  
+  * `CHECK_PO_006_PASS`: PF10 — HDE Build Notes, §2.21 with `audit/qa/hde-epic024/checks/po-006_token_registry_validity/primary.log`  
+  * `CHECK_D16_PASS`: PF10 — HDE Build Notes, §2.22 with `audit/qa/hde-epic024/checks/D16_close_pack/primary.log`  
+  * `CHECK_PO_011_PASS`: PF10 — HDE Build Notes, §2.23 with `audit/qa/hde-epic024/checks/po-011_doc_delta_capture/primary.log`  
+  * `CHECK_D01_PASS`: PF10 — HDE Build Notes, §2.24 with `audit/qa/hde-epic024/checks/D01_env_pins_gate/primary.log`  
+  * `CHECK_D03_PASS`: PF10 — HDE Build Notes, §2.25 with `audit/qa/hde-epic024/checks/D03_showcompat_artifacts/primary.log`  
+  * `CHECK_D08_PASS`: PF10 — HDE Build Notes, §2.26 with `audit/qa/hde-epic024/checks/D08_cli_guardrail/primary.log`  
+  * `CHECK_D04_PASS`: PF10 — HDE Build Notes, §2.27 with `audit/qa/hde-epic024/checks/D04_sampler_evidence/primary.log`  
+  * `CHECK_D07_PASS`: PF10 — HDE Build Notes, §2.28 with `audit/qa/hde-epic024/checks/D07_sanity_pipeline/primary.log`  
+  * `CHECK_PO_017_PASS`: PF10 — HDE Build Notes, §2.29 with `audit/qa/hde-epic024/checks/po-017_lowercase_naming/primary.log`  
+* **Close pack artifacts recorded (PF10):**  
+  * `audit/EPIC-024_MANIFEST.json`, `audit/EPIC-024_hash_manifest.json`, `audit/EPIC-024_close_report.md` (PF10 — HDE Build Notes, §2.22 and §2.31)  
+  * Planned close pack endpoints in r3 plan (`audit/EPIC-024_close_report.md` \+ `audit/EPIC-024_MANIFEST.json`) are present; PF10 adds `audit/EPIC-024_hash_manifest.json` beyond the planned list.  
+* **Acceptance artifacts recorded (PF10):**  
+  * `docs/acceptance_map_epic024.json` and sibling `docs/acceptance_map_epic024.json.path_proof.txt` (PF10 — HDE Build Notes, §2.15 and §2.31)  
+  * `audit/qa/hde-epic024/acceptance_map_viability.log` (PF10 — HDE Build Notes, §2.15)  
+  * `audit/qa/hde-epic024/token_evidence_matrix.md` (PF10 — HDE Build Notes, §2.16; includes a “token evidence matrix” with 25 tokens documented)  
+* **Evidence index snapshot \+ binding validation (PF10):**  
+  * Snapshot: `audit/gates/evidence_index_snapshot/evidence_index_snapshot.json` \+ `.sha256` \+ `audit/gates/evidence_index_snapshot/evidence_index_snapshot.json.path_proof.txt` (PF10 — HDE Build Notes, §2.14 and §2.20)  
+  * Binding validation outputs recorded under remediation (PF10 — HDE Build Notes, §2.20): `audit/qa/hde-epic024/remediation/s3_po_006_rerun/evidence_path_binding_validation.ndjson` \+ `.sha256`
+
+#### **2.9.6 QA Rails — Open/Close (Final PR)**
+
+##### **A) Planned rails posture (r3 Epic Plan HDE-EPIC024.md)**
+
+* **Open rails (planned):**  
+  * No aliases in tokens; names-only roster.  
+  * Acceptance map viability must PASS.  
+  * QA harness discipline must be repo-first: per-check `primary.log` receipts; step logs manifest exists.  
+  * Determinism gates (canonical JSON, arrays-as-sets, env pins) emit deterministic audit artifacts.  
+* **Close rails (planned):**  
+  * Close pack endpoints are present at `audit/EPIC-024_close_report.md` and `audit/EPIC-024_MANIFEST.json`.  
+  * Doc deltas are captured at `audit/docdeltas/hde-epic024_doc_deltas.md`.  
+  * Evidence index snapshot contract and binding validation artifacts exist.  
+  * “PF20 has no step-by-step runbooks” posture: execution belongs in PF10 logs \+ harness scripts.
+
+##### **B) Actual QA event stream (PF10; executed checks \+ outcomes)**
+
+* PR review stream preceding QA receipts (PF10 — HDE Build Notes, §2.6–§2.10): PR01..PR05 reviews (including a Docs PR) recorded issues and deltas feeding later remediation.  
+* Step-0B preflight doc delta capture (PF10 — HDE Build Notes, §2.11): PASS receipt and doc delta artifact creation — `audit/docdeltas/hde-epic024_doc_deltas.md`.  
+* Determinism/evidence gates executed and recorded as PASS receipts:  
+  * D02 canonical JSON (PF10 — HDE Build Notes, §2.12): `audit/gates/json_gate/canonical/json_gate_check_log.ndjson` \+ `audit/qa/hde-epic024/checks/D02_canonical_json_gate/primary.log`  
+  * D05 arrays-as-sets (PF10 — HDE Build Notes, §2.13): `audit/gates/determinism/arrays_as_sets.log` \+ `.sha256`  
+  * D09 evidence index snapshot (PF10 — HDE Build Notes, §2.14): `audit/gates/evidence_index_snapshot/evidence_index_snapshot.json` \+ `.sha256`  
+  * D01 env pins (PF10 — HDE Build Notes, §2.24): `audit/gates/determinism/env_pins.log` \+ `.sha256`  
+* Acceptance and harness discipline rails executed and recorded as PASS receipts:  
+  * D13 acceptance map viability (PF10 — HDE Build Notes, §2.15): `docs/acceptance_map_epic024.json` \+ `audit/qa/hde-epic024/acceptance_map_viability.log`  
+  * D14 harness selftest (PF10 — HDE Build Notes, §2.16): `tools/qa_harness/selftest_ci_entrypoint.sh` \+ `audit/qa/hde-epic024/selftest/run1/selftest_report.json`  
+  * D19 step logs manifest (PF10 — HDE Build Notes, §2.17): `audit/qa/hde-epic024/qa_step_logs_manifest.json` \+ `.json.path_proof.txt`  
+* Stream discipline and sampling rails executed and recorded as PASS receipts:  
+  * D03 showcompat artifacts (PF10 — HDE Build Notes, §2.25): `artifacts/cli/showcompat/hde/all/v1/main.json` \+ `.sha256`  
+  * D08 CLI guardrail (PF10 — HDE Build Notes, §2.26): enforcement loci under `tools/cli/` and receipt `audit/qa/hde-epic024/checks/D08_cli_guardrail/primary.log`  
+  * D04 sampler evidence (PF10 — HDE Build Notes, §2.27): receipt `audit/qa/hde-epic024/checks/D04_sampler_evidence/primary.log`  
+  * D07 sanity pipeline (PF10 — HDE Build Notes, §2.28): receipt `audit/qa/hde-epic024/checks/D07_sanity_pipeline/primary.log`  
+* Governance/registry rails executed and recorded:  
+  * po-006 token registry validity (PF10 — HDE Build Notes, §2.21): PASS receipt and comparison artifact `audit/qa/hde-epic024/checks/po-006_token_registry_validity/token_comparison.json`  
+  * po-017 lowercase naming (PF10 — HDE Build Notes, §2.29): PASS receipt `audit/qa/hde-epic024/checks/po-017_lowercase_naming/primary.log`  
+* Close rails executed and recorded:  
+  * D16 close pack (PF10 — HDE Build Notes, §2.22): PASS receipt \+ close artifacts (`audit/EPIC-024_MANIFEST.json`, `audit/EPIC-024_hash_manifest.json`, `audit/EPIC-024_close_report.md`)  
+  * po-011 doc delta capture (PF10 — HDE Build Notes, §2.23): PASS receipt (distinct from Step-0B capture) — `audit/qa/hde-epic024/checks/po-011_doc_delta_capture/primary.log`
+
+##### **C) Remediation loops (PF10; PR and OPS actions recorded)**
+
+* Remedial PR01 (PF10 — HDE Build Notes, §2.18): token registry discovery \+ consistency fixes; evidence: `audit/qa/hde-epic024/remediation/s1_token_registry_discovery/codex_report.md`, `audit/qa/hde-epic024/remediation/s1_token_registry_discovery/token_sets.json`.  
+* Remedial PR02 (PF10 — HDE Build Notes, §2.19): CI wiring and acceptance artifact adjustments; evidence: `.github/workflows/ci.yml`, `audit/qa/hde-epic024/remediation/s2_dev_acceptance_artifacts/acceptance_map_viability.json`, `audit/qa/hde-epic024/remediation/s2_dev_acceptance_artifacts/token_registry_export.csv`.  
+* Remedial OPS01 (PF10 — HDE Build Notes, §2.20): reruns for po-006 and evidence index snapshot/binding validation; evidence: `audit/qa/hde-epic024/remediation/s3_po_006_rerun/ops_transcript.txt`, `audit/qa/hde-epic024/remediation/s3_po_006_rerun/po-006_token_registry_validity_rerun.md`, `audit/qa/hde-epic024/remediation/s3_po_006_rerun/d23_evidence_index_snapshot_contract_rerun.ndjson`, `audit/qa/hde-epic024/remediation/s3_po_006_rerun/evidence_path_binding_validation.ndjson`.
+
+##### **D) Closeout posture (PF10)**
+
+* PF10 closeout summary: “Verdict: READY WITH CAVEATS” (PF10 — HDE Build Notes, §2.30).  
+* PF10 closure review: “Closure decision: SATISFIED (close the epic now)” with deferrals noted in that snapshot (PF10 — HDE Build Notes, §2.31). Later remediation/OPS rerun sections record PASS receipts for items earlier flagged as blocked (see §2.9.7).
+
+#### **2.9.7 Tracked Issues**
+
+**Planned (r3 Epic Plan HDE-EPIC024.md):**
+
+* “Tracked Issues: None. Items drained to PF10 v9.3.6 §2.1–§2.4.”  
+  * Note: This plan’s PF10 pointers reference v9.3.6 sections not present in PF10 v9.4.4 inputs; status is not recoverable from the provided PF10 inputs.  
+  * Status: Unknown (not present in inputs)
+
+**Actual issues / deferrals recorded (PF10):**
+
+* **Plan vs execution drift (systemic):** PF10 check receipts record multiple ADR-DEV deviations (runner/script names, artifact loci, wrapper scripts, receipt formats) while still closing with PASS outcomes (PF10 — HDE Build Notes, §2.12–§2.29).  
+* **Closure-review snapshot mismatch:** PF10 closure review (timestamped 2026-01-17 UTC) flags PO-006 and acceptance map viability as blocked/buggy, but later PF10 sections record PASS receipts after remediation/OPS rerun (PF10 — HDE Build Notes, §2.19–§2.21 vs §2.31). This record preserves the timeline mismatch.  
+* **PO-006 token registry validity (deferral noted in snapshot):** PF10 closure review records `FAIL_BEHAVIOR` for po-006 because the token evidence matrix has 25 tokens while the token registry export has 14 (“missing 11 tokens”); later PF10 records `PASS` for CHECK po-006 after remediation/OPS rerun (PF10 — HDE Build Notes, §2.19–§2.21 vs §2.31).  
+* **Acceptance map viability phantom pass bug (deferral noted in snapshot):** PF10 closure review records `FAIL_BEHAVIOR` for D13 due to a “phantom pass bug”; PF10 later records `PASS` for CHECK D13\_acceptance\_map\_viability (PF10 — HDE Build Notes, §2.15 vs §2.31).  
+* **Token alias deprecation noted in snapshot:** PF10 closure review notes `QA_STEP_LOGS_CONSOLIDATED_OK` is deprecated and canonical is `QA_HARNESS_DISCIPLINE_OK` (PF10 — HDE Build Notes, §2.31).  
+* **Evidence-path binding outputs locus drift:** r3 plan expects binding validation outputs under `audit/gates/evidence_index_snapshot/`; PF10 records binding validation outputs under remediation (`audit/qa/hde-epic024/remediation/s3_po_006_rerun/`) (PF10 — HDE Build Notes, §2.20).
+
+#### **2.9.8 Plan Preflight (MUST)**
+
+**Planned preflight gates (r3 Epic Plan HDE-EPIC024.md):**
+
+* **A) Existing Work Check complete** (scope anchors and out-of-scope defined)  
+* **B) Deliverables enumerated** (D1–D11 list complete with evidence required)  
+* **C) Token roster present** (names-only; no aliases; PASS/FAIL receipts defined)  
+* **D) QA rails defined** (open/close rails posture; no PF20 runbooks)  
+* **E) Close pack baseline declared** (planned): `audit/EPIC-024_close_report.md` \+ `audit/EPIC-024_MANIFEST.json` (plus doc deltas, acceptance artifacts, and QA root requirements)
+
+**Actual close gates observed (PF10; manual results for EPIC024 close):**
+
+* Step receipts recorded as PASS for the planned receipt set (subset where PF10 provides receipts):  
+  * Step-0B doc deltas: PF10 — HDE Build Notes, §2.11 (`audit/qa/hde-epic024/checks/Step-0B_doc_delta_capture/primary.log`)  
+  * D01 env pins: PF10 — HDE Build Notes, §2.24  
+  * D02 canonical JSON: PF10 — HDE Build Notes, §2.12  
+  * D03 showcompat artifacts: PF10 — HDE Build Notes, §2.25  
+  * D04 sampler evidence: PF10 — HDE Build Notes, §2.27  
+  * D05 arrays-as-sets: PF10 — HDE Build Notes, §2.13  
+  * D07 sanity pipeline: PF10 — HDE Build Notes, §2.28  
+  * D08 CLI guardrail: PF10 — HDE Build Notes, §2.26  
+  * D09 evidence index snapshot: PF10 — HDE Build Notes, §2.14  
+  * D13 acceptance map viability: PF10 — HDE Build Notes, §2.15  
+  * D14 harness selftest: PF10 — HDE Build Notes, §2.16  
+  * D16 close pack: PF10 — HDE Build Notes, §2.22  
+  * D19 step logs manifest: PF10 — HDE Build Notes, §2.17  
+  * po-006 token registry validity: PF10 — HDE Build Notes, §2.21  
+  * po-011 doc delta capture: PF10 — HDE Build Notes, §2.23  
+  * po-017 lowercase naming: PF10 — HDE Build Notes, §2.29  
+* Close pack baseline declared in the plan is satisfied and expanded in PF10:  
+  * Present: `audit/EPIC-024_close_report.md`, `audit/EPIC-024_MANIFEST.json` (PF10 — HDE Build Notes, §2.22)  
+  * Additional PF10 artifact: `audit/EPIC-024_hash_manifest.json` (PF10 — HDE Build Notes, §2.22)  
+* Plan “ASK OK?” placeholder: present in `r3 Epic Plan HDE-EPIC024.md` preflight section; approval disposition is not recorded in that plan file. PF10 nonetheless records closure (“SATISFIED”) (PF10 — HDE Build Notes, §2.31).
 

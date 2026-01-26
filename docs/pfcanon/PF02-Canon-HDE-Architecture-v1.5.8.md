@@ -1,12 +1,12 @@
 # **0\. Front Matter**
 
 **Title:** PF02-Canon-HDE-Architecture  
- **Version:** v1.4.8
+ **Version:** v1.5.8
 
  **Status:** Canon  
-**Effective date:** 2026-01-13
+**Effective date:** 2026-01-24
 
- **Last Update Gate:** BN 9.3.4 Drain A54-57
+ **Last Update Gate:** BN 9.4.4 Drain A30-31
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -81,17 +81,33 @@ Evidence (headers/records only) is owned by HDE-Mechanics Guide and HDE-Build Ch
 **Transport / contract bytes.**  
  Owned outside Architecture: HDE-Governance and HDE-CLI-API-Vendor-Ref. Acceptance tokens are single-home in HDE-Governance §2.0. Plans, acceptance artifacts, and step logs MUST NOT mint, invent, or claim unregistered token names. If a token is desired, it MUST be registered first (with semantics) and only then adopted by plans and evidence bindings. Any token name used outside the registry MUST match spelling exactly (no aliases). Evidence-only deliverables (for example, guard proofs or consult records) may be required and evidenced without becoming tokens unless and until Governance registers them as tokens.
 
+**Legacy spelling / alias handling:** any token-like string not present in the HDE-Governance acceptance token roster is non-canonical drift until registered or drained. In particular, `QA_STEP_LOGS_CONSOLIDATED_OK` is a deprecated doc-only alias and MUST NOT be minted; for closure treat it as `QA_HARNESS_DISCIPLINE_OK`. Plans, acceptance maps, and acceptance matrices MUST claim `QA_HARNESS_DISCIPLINE_OK` (exact spelling) and MUST NOT claim `QA_STEP_LOGS_CONSOLIDATED_OK`. If an epic’s evidence mentions the deprecated alias, acceptance artifacts MUST normalize to `QA_HARNESS_DISCIPLINE_OK` and record a doc-delta note per HDE-Governance.
+
 **Canonical JSON / pack / mirror.**  
  Policies, manifest shape, and the Evidence Index/mirror live in HDE-Schemas & Artifacts.
 
-**PR-first posture.**  
- Epic-Process-Guide governs PR-first cadence. CodEx opens the PR automatically (one PR per epic/slice). Doc-Delta, Appendix D (human), the human Evidence Index (`docs/evidence/INDEX.json`), and the machine JSONL mirror (`artifacts/evidence_index.jsonl`) must update in the same PR whenever proofs/artifacts change.
+**PR-first posture.**
 
-**Mirror hygiene (titles-only).**  
- The machine mirror is records-only, canonical JSONL (UTF-8, sorted keys, compact, one trailing LF), rejects unknown keys, and each record includes a proof\_anchor to a path-proof stored alongside the artifact. A human-index hash sentinel may be enforced (see HDE-Schemas & Artifacts).
+Epic-Process-Guide governs PR-first cadence. CodEx opens the PR automatically (one PR per epic/slice). Doc-Delta, Appendix D (human), the human Evidence Index (`docs/evidence/INDEX.json`), and the machine mirror (`artifacts/evidence_index.jsonl`) must update in the same PR whenever proofs/artifacts change. When the machine mirror changes, its governed companion files (`artifacts/evidence_index.jsonl.sha256` and `artifacts/evidence_index.jsonl.path_proof.txt`) MUST update in that same PR.
 
-**Proof-anchor semantics (acceptance bindings).**  
+**Doc-Delta artifacts (EPIC024; fixed paths).**  
+ For EPIC024, Doc-Delta capture uses two fixed-path artifacts:
+
+* `audit/docdeltas/hde-epic024_doc_deltas.md` (fixed location; governed candidate)
+
+* `audit/qa/hde-epic024/00_meta/doc_deltas.md` (fixed location; governed under epic QA root)
+
+When a Live QA plan includes Step-0B “Doc Delta Capture” (CHECK po-011\_doc\_delta\_capture: PO-011), the step MUST treat these exact paths as the required deliverables and MUST NOT invent alternates. For EPIC024, plan-defined PASS predicates include byte-identity (no diff) and content completeness per the plan’s manual validation obligations (each entry includes PF refs, or explicitly states “no deltas”); the step’s governed primary log is captured at `audit/qa/hde-epic024/checks/po-011_doc_delta_capture/primary.log` (titles-only; detailed criteria remain owned outside PF02).
+
+**Mirror hygiene (titles-only).**
+
+The machine mirror is records-only, canonical JSONL (UTF-8, sorted keys, compact, one trailing LF), rejects unknown keys, and each record includes a proof\_anchor to a path-proof stored alongside the artifact. The canonical mirror home is `artifacts/evidence_index.jsonl` with companion `artifacts/evidence_index.jsonl.sha256` and sibling path proof `artifacts/evidence_index.jsonl.path_proof.txt`; any other mirror path strings are non-canonical drift until drained. A human-index hash sentinel may be enforced (see HDE-Schemas & Artifacts).
+
+**Proof-anchor semantics (acceptance bindings).**
+
  `proof_anchor` points to the governed path-proof transcript for the primary artifact (or bundle) listed in the ledger. Acceptance bindings (for example, token-evidence matrices and acceptance maps) MUST bind tokens to the primary governed artifacts and/or tests, not to the path-proof transcript itself (for example, `*.path_proof.txt`). Proof transcripts are referenced indirectly via the ledger (Human Index entry \+ Machine Evidence Index `proof_anchor`) unless a dedicated evidence family explicitly treats proof transcripts as first-class governed artifacts.
+
+Acceptance maps (when required) are governed artifacts and MUST use the canonical path-of-record `docs/acceptance_map_epic<NNN>.json` with sibling path proof `docs/acceptance_map_epic<NNN>.json.path_proof.txt` (titles-only; see Glow Infrastructure). Alternate acceptance-map filenames/locations are non-canonical drift until drained. For EPIC024, the canonical acceptance map file is `docs/acceptance_map_epic024.json`.
 
 **Math semantics.**  
  Idempotence (preimage recipe), ordering, banding, and scoring live in HDE-Math-Spec.
@@ -141,6 +157,10 @@ Delta capture MUST NOT include VCS workflow content (branches/commits/PR mechani
 **Cross-doc referencing.**  
  Use titles only; do not include version numbers.
 
+**Ellipsis prohibition (canonical docs and plans).**
+
+Canonical documents and plans MUST NOT contain three consecutive period characters, nor the Unicode ellipsis character (U+2026). When omitted content must be represented, use explicit markers like `[OMITTED]`, `[SNIP]`, `[LIST CONTINUES]`, or `<PLACEHOLDER_NAME>`. For file paths, prefer `<REPO_ROOT>` and explicit placeholders; do not abbreviate paths. Review posture: if a reviewer sees three consecutive periods or U+2026 in canonical text, treat it as a tooling failure until the full content is provided.
+
 **No contract bytes here.**  
  Any change that would introduce contract bytes or duplicate content is rejected; instead, add or update a titles-only reference to the owning document.
 
@@ -174,7 +194,7 @@ All runtime surfaces and offline pipelines that need sampler or Engine Core beha
 
 * Deny-list legacy trees: `core/`, `server/`, `adapters/` (plural) and any alternate HTTP homes; CI must fail on imports from these paths.  
 * Single-emitter allow-list: only the Presenter’s emitter entrypoint may serialize public bytes; all other serializers are forbidden on public paths.  
-* No ad-hoc serialization on public paths: forbid direct `json.dumps(...)`, `jsonify(...)`, templating, or string-built JSON.  
+* No ad-hoc serialization on public paths: forbid direct `json.dumps(<ARGS>)`, `jsonify(<ARGS>)`, templating, or string-built JSON.  
 * Role boundaries: Adapter owns route registration and vendor/DB wiring; Presenter owns emission; Engine (including sampler core and Engine Core modules) owns math and pure-compute behavior. No cross-role leakage.  
 * **Repo layout note (HTTP surfaces).** Implementation may temporarily host some HTTP handlers in modules outside the `adapter/` directory, but Architecture still treats all HTTP entrypoints as belonging to the adapter component. There MUST NOT be a second HTTP home: new or refactored HTTP surfaces must converge under adapter responsibilities and must not bypass adapter-level guards or the single Presenter emitter.
 
@@ -312,7 +332,7 @@ The following paths MUST NOT exist or be imported on public paths: `core/`, `ser
 
 ### **Emitter rule (normative)**
 
-Only the presenter’s emitter entrypoint MAY serialize public bytes. All other serializers and any ad hoc `json.dumps(...)`, `jsonify(...)`, templating, or string-built JSON on public paths are FORBIDDEN.
+Only the presenter’s emitter entrypoint MAY serialize public bytes. All other serializers and any ad hoc `json.dumps(<ARGS>)`, `jsonify(<ARGS>)`, templating, or string-built JSON on public paths are FORBIDDEN.
 
 ### **Routing (titles only)**
 
@@ -893,7 +913,7 @@ For `/internal/version` coupling \+ two-run identity, the governed proof surface
 
 * Manifest-driven identity: `pack_sha = sha256(canonical manifest bytes)`.
 
-* Authoritative path: object storage at `/narratives/<pack_sha>/…`; the repo carries the manifest \+ evidence.
+* Authoritative path: object storage at `/narratives/<pack_sha>/<OBJECT_KEY>`; the repo carries the manifest \+ evidence.
 
 * Loader: fetch → verify → atomic symlink swap → load; on any verify mismatch, fail-closed (keep previous pack); keys-only logs.
 
@@ -974,7 +994,7 @@ HTTP QA against “Reader” or dev harness surfaces is considered misconfigured
 * **Codespaces Live QA posture (routing note).** Codespaces QA configuration and requirements are single-home in the **Glow QA Guide** (names-only; secrets recorded as presence-only, never values). A standalone Step-0 “Codespaces snapshot” artifact is **not required** and MUST be treated as optional and non-gating; plans MUST NOT require, validate, or gate approval on it.   
 * **KISS required outputs (Live QA).** Live QA Plans MUST minimize required outputs to:  
   * one primary step log per check under `audit/qa/<epic-id>/checks/<check_id>/primary.log`, and  
-  * the QA step-logs manifest at `audit/qa/<epic-id>/qa_step_logs_manifest.json` listing check IDs, status, and primary log paths, plus its sibling path proof `audit/qa/<epic-id>/qa_step_logs_manifest.json.path_proof.tx`  
+  * the QA step-logs manifest at `audit/qa/<epic-id>/qa_step_logs_manifest.json` listing check IDs, status, and primary log paths (every referenced primary log path MUST exist under `audit/qa/<epic-id>/` at review time), plus its sibling path proof `audit/qa/<epic-id>/qa_step_logs_manifest.json.path_proof.txt`  
   * Nothing else is auto-required unless canon explicitly pins a governed evidence family/path. Any additional required artifact MUST be acceptance-decisive and MUST be canonized (PF10 or PF-Canon) as a governed evidence family/path.  
   * **Step-log header normalization (KISS).** Every `primary.log` MUST begin with a JSON header object that includes: `check_id`, `status`, `command`, `captured_env`, `pf_refs`, `intended_tokens`, `claimed_tokens`. The three list fields MUST be present; empty lists (`[]`) are allowed and SHOULD be used when no refs/tokens are in play. If any required list field is missing, treat it as an evidence-format gap; a reviewer-of-record MAY mechanically normalize the header by inserting missing empty lists and re-serializing the header as canonical JSON (no step rerun required). Token claims are never inferred: if `claimed_tokens` is missing or empty, token claims are treated as none. Status vocabulary remains gating (PASS, FAIL\_BEHAVIOR, FAIL\_TOOLING, TOOLING\_BLOCKED, PARKED).  
   * **Prefer validating canon evidence over generating QA artifacts.** By default, if PF10/PF-canon already establishes an artifact family/path, the Live QA plan validates it (exists \+ minimal posture checks) and records PASS/FAIL in the check’s `primary.log`. QA creates new artifacts only when the check itself is about QA-run outputs (primary logs, step-logs manifest) or when canon explicitly requires a generated QA artifact. If a plan requires an EPIC-scoped derived artifact path to satisfy a predicate, the artifact MUST be mechanically derived from the canonical surface and MUST be treated as evidence-only (not a new governed evidence family/path) unless and until canon explicitly pins it.  
@@ -1087,7 +1107,7 @@ HTTP QA against “Reader” or dev harness surfaces is considered misconfigured
 
 * The **Human Evidence Index** at `docs/evidence/INDEX.json` (plus its `.sha256` sentinel), which lists governed evidence artifacts (including bundles) in a human-readable, text-based form.
 
-* The **Machine Evidence Index** at `artifacts/evidence_index.jsonl`, a records-only, canonical JSONL mirror of the ledger, which includes per-record `proof_anchor` fields pointing to path proofs maintained alongside governed artifacts.
+* The **Machine Evidence Index** at `artifacts/evidence_index.jsonl`, a records-only, canonical JSONL mirror of the ledger. The mirror has a companion sha256 sentinel at `artifacts/evidence_index.jsonl.sha256` and a sibling path-proof transcript at `artifacts/evidence_index.jsonl.path_proof.txt`. Each record includes a `proof_anchor` field pointing to a path-proof transcript maintained alongside the governed primary artifact. Any other mirror path strings are non-canonical drift until drained.
 
 * **Evidence bundles and bundle manifests** (textual, typically JSON/JSONL) under governed paths (for example, `artifacts/**`, `docs/evidence/**`, `audit/**`) that group related evidence members and enumerate them by logical artifact key, hash, and size. Architecture treats bundles and manifests as governed artifacts in their own right; PF02 routes all schema/field details by title to other PF documents and stays contract-free.
 
@@ -1111,12 +1131,48 @@ These surfaces together form the **ledger-centric, deterministic, text-based evi
 
 **Discipline & hygiene (contract-free posture).**
 
-* **Evidence index snapshot artifact family (gates-only).** Canonical evidence index snapshot artifacts MUST use the gate-family path(s) below (see **HDE-Build Notes** addendum 2.56). The EPIC-local variant under `audit/qa/hde-epic<NNN>/…/evidence_index_snapshot.json` is not a closure-required canonical surface.  
+* **EPIC024 QA runner provenance notes (addenda 14–29).** The following runner/path mismatches were observed in PASS-grade EPIC024 Live QA evidence and are recorded here to prevent plan drift:.  
+  * **D09\_generate\_evidence\_index\_snapshot** — plan-named runner `python tools/evidence/run_evidence_index_snapshot.py`; observed runner `python tools/evidence/run_evidence_index_snapshot_gate.py`.  
+  * **D13\_acceptance\_map\_viability** — plan-named runner `python tools/evidence/run_acceptance_map_viability.py`; observed runner `python tools/evidence/run_acceptance_map_viability_gate.py`.  
+  * **D14\_harness\_selftest** — plan-named runner `python tools/evidence/run_harness_selftest.py`; observed runner `python tools/evidence/run_harness_selftest_gate.py`.  
+  * **D16\_close\_pack** — plan-named runner `python tools/evidence/run_close_pack.py`; observed runner `python tools/evidence/run_close_pack_gate.py`.  
+  * **D04\_sampler\_evidence** — plan posture is review-only ("Commands: None required"), but PASS-grade evidence includes generation via `python tools/evidence/run_sampler_evidence.py`. Plan-required fixed outputs: `artifacts/sampler/epic024/sampler_evidence.json`, `artifacts/sampler/epic024/manifest.json`; primary log: `audit/qa/hde-epic024/checks/D04_sampler_evidence/primary.log`  
+  * **D07\_sanity\_pipeline** — plan command `python tools/evidence/run_sanity_pipeline.py`; observed operator entrypoint `python tools/evidence/run_sanity_pipeline_gate.py` (wrapper). Gate surface: `audit/gates/sanity_pipeline/sanity_pipeline.log`; primary log: `audit/qa/hde-epic024/checks/D07_sanity_pipeline/primary.log`..  
+  * **D08\_cli\_guardrail** — plan-required deliverable `cli/main.py` was validated at repo path `engine/cli/main.py` (architectural alias). An extra wrapper script `tools/evidence/run_cli_guardrail.py` was created to match EPIC024 evidence patterns (not a plan-required deliverable). Primary log: `audit/qa/hde-epic024/checks/D08_cli_guardrail/primary.log`.  
+* **EPIC024 validator/check family surfaces & named-report drift (addenda 19–31).** The following check-family directories and fixed-path outputs are part of the EPIC024 governed evidence surface (paths only; no schemas):  
+  * **PO-006 token registry validity (`PO-006`; plan step: `po-006_token_registry_validity`).** Closeout posture: recorded as FAIL\_BEHAVIOR (deferred blocker) when acceptance-map tokens are missing from the registry. Report-only folder surfaces observed in EPIC024: `audit/qa/hde-epic024/checks/PO-006_mirror_compliance/` and `audit/qa/hde-epic024/checks/PO-006_mirror_compliance_reports/` (folder naming drift; do not infer semantics from the directory label).  
+  * **`D23 evidence index snapshot.`** `Check dir: audit/qa/hde-epic024/checks/D23_evidence_index_snapshot/ (primary log and evidence_index_snapshot.json).`  
+  * **Evidence path binding validation.** Check dir: `audit/qa/hde-epic024/checks/evidence_path_binding_validation/` and fixed report output path: `audit/qa/hde-epic024/00_meta/evidence_path_binding_report.json`.  
+  * **QA step-logs manifest refresh.** Check dir: `audit/qa/hde-epic024/checks/qa_step_logs_manifest_refresh/` and fixed output path: `audit/qa/hde-epic024/00_meta/qa_step_logs_manifest.json`.  
+  * **D01 env pins gate (`D01_env_pins_gate`).** Plan-required runner `python tools/evidence/run_env_pins_gate.py`; fixed output paths: `audit/gates/env_pins/env_pins_report.json` \+ `audit/gates/env_pins/env_pins_report.path_proof.json`.  
+  * **D03 showcompat artifacts (`D03_showcompat_artifacts`).** Plan-required runner: `python tools/evidence/run_showcompat_artifacts.py`; fixed output paths: `artifacts/showcompat/epic024/showcompat_manifest.json` \+ `artifacts/showcompat/epic024/showcompat_symbols.json` and check primary log: `audit/qa/hde-epic024/checks/D03_showcompat_artifacts/primary.log`.  
+  * **D04 sampler evidence (`D04_sampler_evidence`).** Fixed outputs: `artifacts/sampler/epic024/sampler_evidence.json`, `artifacts/sampler/epic024/manifest.json`. Check primary log: `audit/qa/hde-epic024/checks/D04_sampler_evidence/primary.log`.  
+  * **D07 sanity pipeline (`D07_sanity_pipeline`).** Plan command: `python tools/evidence/run_sanity_pipeline.py` (operator entrypoint may be a wrapper; see runner provenance notes above). Gate surface: `audit/gates/sanity_pipeline/sanity_pipeline.log`. Check primary log: `audit/qa/hde-epic024/checks/D07_sanity_pipeline/primary.log`.  
+  * **D08 CLI guardrail (`D08_cli_guardrail`).** Plan command: `python tools/cli/serializer_grep_guard.py`. Guard output log: `artifacts/cli/guards/serializer_grep_guard.log`. Check primary log: `audit/qa/hde-epic024/checks/D08_cli_guardrail/primary.log`.  
+  * **OPS rerun transcript (remedial OPS-01).** Check dir: `audit/qa/hde-epic024/checks/OPS-01_rerun_transcript/` and fixed transcript path: `audit/qa/hde-epic024/00_meta/OPS_rerun_transcript.json`.  
+  * **PO-017 lowercase directory naming (`po-017_lowercase_naming`).** Check dir: `audit/qa/hde-epic024/checks/po-017_lowercase_naming/` (includes `primary.log`, `find_audit_uppercase.txt`, `find_artifacts_uppercase.txt`, `find_docs_uppercase.txt`). Scan posture refinement (EPIC024 evidence): directory names only (`find <value> -type d`); uppercase filenames are allowed unless separately forbidden by canon.  
+* **Binding authority order (titles-only).** Canonical artifact paths and sibling naming (including the machine mirror and the path-proof transcript suffix) are owned by HDE-Schemas & Artifacts (SoT). HDE-Mechanics Guide defines CI mechanics and evidence gating but MUST NOT introduce alternate canonical paths that conflict with Schemas & Artifacts. Glow QA Guide defines validator execution semantics and status vocabulary. HDE-Build Checklist defines which checks are required for closure, but it binds to the canonical surfaces defined above.  
+* **Validator failure posture (path binding).** If a validator runs and finds the required evidence but at a non-canonical path, classify as FAIL\_BEHAVIOR. If required canonical inputs are missing, classify as TOOLING\_BLOCKED. (Status vocabulary is owned by **Glow QA Guide**.)  
+* **EPIC024 closeout caveats and deferred hardening (addenda 30–31).** Closure decision was recorded as SATISFIED with explicit deferral of QA determinism hardening. The items below are recorded here because they impact architecture-level evidence binding and validator determinism (titles/paths only):  
+  * **OI-001 — PO-006 token registry validity (blocker-grade).** Recorded FAIL\_BEHAVIOR due to 11 acceptance tokens referenced by the acceptance map not present in the registry. Deferred focus: reconcile acceptance-map token set to the registry and make the validator deterministic.  
+  * **OI-002 — Remove rg dependency.** Replace text-grep evidence capture with deterministic parsers (avoid rg missing or grep substitution).  
+  * **OI-003 — Acceptance map viability enforcement.** Correct the "phantom pass" bug and ensure the check is harness-correct and gating.  
+  * **OI-004 — Evidence index snapshot contract and deprecated-path cleanup.** Enforce the single canonical gate path and reject deprecated snapshot files.  
+  * **OI-005 — Evidence path binding validation enforcement.** Add automated validation to enforce PF10 authority order and fail early on deprecated path usage.  
+  * **OI-006 — Acceptance-token alias cleanup.** Normalize to canonical token spellings and forbid deprecated aliases in acceptance maps and registries (ties directly to PO-006).  
+  * **OI-007 — Re-audit PF23 evidence surfaces.** Capture PF23 audit outputs deterministically (evidence index, machine mirror, catalogs) under governed `audit/qa/hde-epic<NNN>/` paths in the next epic.  
+* **Evidence index snapshot artifact family (gates-only; tokenless).** The Evidence Index snapshot is a mechanical PASS/FAIL validator artifact used as closure-proof evidence for D23. It MUST NOT mint or claim an acceptance token unless **HDE-Governance** registers one. The schema and PASS/FAIL predicate are owned by **HDE-Schemas & Artifacts** and **Glow QA Guide**; PF02 records only the surface and routing. Status posture: PASS when the predicate holds; FAIL\_BEHAVIOR when the predicate fails; TOOLING\_BLOCKED when required inputs are missing. Any EPIC-local copies (for example under `audit/qa/hde-epic<NNN>/<RUN_SUBDIR>/evidence_index_snapshot.json`) and deprecated snapshot file paths recorded in PF10 (for example `artifacts/INDEX_SNAPSHOT.json` and `audit/evidence_index_snapshot/evidence_index_snapshot.json`) are non-canonical and MUST NOT be treated as alternate contract surfaces.  
   * **Evidence index snapshot** — Canon surface: `audit/gates/evidence_index_snapshot/evidence_index_snapshot.json` / Path proof: `audit/gates/evidence_index_snapshot/evidence_index_snapshot.json.path_proof.txt`  
-* **Canonical JSON gate artifacts (gates-only).** Canonical JSON gate artifacts MUST use the `audit/gates/json_gate/canonical/` family (see **HDE-Build Notes** addendum 2.57), plus their corresponding sibling path proofs per the owning canon. The legacy naming under `audit/gates/canonical_json/…` MUST NOT be required by future plans unless canon explicitly reinstates it (via **HDE-Schemas & Artifacts**).  
+* **Canonical JSON gate artifacts (gates-only).** Canonical JSON gate artifacts MUST use the `audit/gates/json_gate/canonical/` family (see **HDE-Mechanics Guide**, **Glow QA Guide**, **HDE-Schemas & Artifacts**). The legacy naming under `audit/gates/canonical_json/<LEGACY_SUBPATH>` MUST NOT be treated as a canonical surface unless explicitly re-registered as such. The legacy catalog check report remains at `audit/gates/canonical_json/json_canonical_check.log` (legacy; not a canonical predicate surface).  
   * **Gate check log** — Canon surface: `audit/gates/json_gate/canonical/json_gate_check_log.ndjson`  
+    * Path proof: `audit/gates/json_gate/canonical/json_gate_check_log.ndjson.path_proof.txt`  
   * **Gate compare log** — Canon surface: `audit/gates/json_gate/canonical/json_gate_compare_log.ndjson`  
+    * Path proof: `audit/gates/json_gate/canonical/json_gate_compare_log.ndjson.path_proof.txt`  
   * **Gate structured record** — Canon surface: `audit/gates/json_gate/canonical/json_gate_structured_record.json`  
+    * Path proof: `audit/gates/json_gate/canonical/json_gate_structured_record.json.path_proof.txt`  
+* **Arrays-as-sets report artifact surface (gates-only; tokenless).** Codespaces Live QA evidence shows the arrays-as-sets check produces a stable report artifact at `artifacts/canonical/arrays_as_sets_report.log` (log format). The plan-named report path `audit/gates/arrays_as_sets/arrays_as_sets_report.md` was observed as missing and MUST NOT be treated as a governed predicate surface unless explicitly canonized.  
+  * Observed runner (recorded in the D05 `primary.log` header): `python -m pytest tests/compare/test_arrays_as_sets.py`  
+  * Plan-named runner (observed missing): `python tools/evidence/run_arrays_as_sets_check.py`  
 * **Determinism predicate surfaces lock (ADR-001).** Determinism remediation predicates for **D16–D18** MUST validate the **canonical emitted evidence surfaces** and their sibling **path proofs**, and MUST NOT require wrapper bundles, wrapper schemas, or additional non-canon marker lines.  
   * **D16 (orientation demo)** — Canon surface: `audit/gates/topology/orientation_demo.txt`  
      Path proof: `audit/gates/topology/orientation_demo.txt.path_proof.txt`  
@@ -1124,7 +1180,7 @@ These surfaces together form the **ledger-centric, deterministic, text-based evi
      Path proof: `audit/gates/determinism/env_pins.log.path_proof.txt`  
   * **D18 (sanity log)** — Canon surface: `artifacts/sanity/sanity.log`  
      Path proof: `artifacts/sanity/sanity.log.path_proof.txt`  
-* **Path-proof naming is locked.** For canonical surfaces, the path proof filename MUST preserve the full surface filename and append `.path_proof.txt` (example: `env_pins.log.path_proof.txt`, not `env_pins.path_proof.txt`).  
+* **Path-proof naming is locked.** Canonical sibling transcript naming is `<artifact_filename>.path_proof.txt` (the path proof filename MUST preserve the full surface filename and append `.path_proof.txt`; example: `env_pins.log.path_proof.txt`, not `env_pins.path_proof.txt`). Any mention of `<artifact_filename>.path_proof.json` is non-canonical.  
 * **Routing constraint (evidence surfaces & predicate targets).** **HDE-Phased Epics** MUST NOT be cited to define evidence surface paths, evidence shapes, or remediation predicate targets. Plans/remediations MUST cite the owning canon documents by **title** (e.g., **HDE-Build Notes**, **HDE-Build Checklist**, **Epic Process Guide**, **HDE-Schemas & Artifacts**, **Glow QA Guide**, **HDE-Governance**) as applicable.  
 * **Ledger-backed evidence bindings.** When an acceptance artifact binds a token to a governed evidence path, that governed path MUST exist in both the Human Evidence Index (`docs/evidence/INDEX.json`) and the Machine Evidence Index (`artifacts/evidence_index.jsonl`), and the mirror record MUST include `proof_anchor`. A governed evidence binding is invalid if the path is missing from either registry.  
 * **Guard proofs (evidence-only by default).** Serializer/emitter guard checks MUST emit mechanically produced guard-proof artifacts with a single primary artifact per guard check and an explicit PASS or FAIL classification. Guard proofs do not create new acceptance token obligations unless and until Governance registers tokens and defines semantics. If a guard proof is used for closure wiring (for example referenced by an acceptance map, token-evidence matrix, or close pack), it MUST follow normal governed-evidence discipline (stable path, index/mirror parity, and sibling path-proof transcripts where required).  
@@ -1181,7 +1237,7 @@ using deterministic fixtures and **closed rails** (no network, no clocks, no env
 
 **Artifact families.**
 
-* Outputs are written into governed evidence families under `artifacts/...`, registered in **HDE-Schemas & Artifacts** and **HDE-Mechanics Guide** (titles only).
+* Outputs are written into governed evidence families under `artifacts/<EVIDENCE_FAMILY_SUBPATH>`, registered in **HDE-Schemas & Artifacts** and **HDE-Mechanics Guide** (titles only).
 
 * Family names, schema shapes, and path patterns are defined there, not in Architecture.
 
@@ -1189,7 +1245,7 @@ using deterministic fixtures and **closed rails** (no network, no clocks, no env
 
 Whenever these pipelines produce or regenerate artifacts:
 
-* The human Evidence Index and the machine JSONL mirror must be updated in the **same PR**, per **HDE-Schemas & Artifacts** and **Epic-Process-Guide**.
+* The human Evidence Index and the machine mirror must be updated in the **same PR**. When the machine mirror changes, its governed companion files (`artifacts/evidence_index.jsonl.sha256` and `artifacts/evidence_index.jsonl.path_proof.txt`) MUST update in that same PR, per **HDE-Schemas & Artifacts** and **Epic-Process-Guide**.
 
 PF02’s role is to assert that:
 

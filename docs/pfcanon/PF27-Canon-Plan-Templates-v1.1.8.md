@@ -4,13 +4,13 @@
 
 **Title:** PF27-Canon-Plan-Templates
 
-**Version:** v1.1
+**Version:** v1.1.8
 
 **Status:** Canon
 
-**Effective date:** 2026-01-13
+**Effective date:** 2026-01-24
 
-**Last Update Gate:** BN 9.3.4 Drain A54-57
+**Last Update Gate:** BN 9.4.4 Drain A30-31
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -41,6 +41,30 @@ PF27 is the single PF home for **plan and runbook templates** used in the Glow p
   * rails and determinism pins declarations (when capturing governed bytes),  
   * evidence root normalization and per-run `QA_ROOT`,  
   * runbook check matrices and per-step blocks with explicit PASS/FAIL predicates.
+
+ **Template-safe placeholders and ellipsis prohibition (hard).**
+
+* Canonical documents and plan records MUST NOT contain either of:
+
+  * the ASCII triple-dot sequence, or
+
+  * the Unicode ellipsis character.
+
+* Only the following template replacement markers are permitted in canonical documents and plans:
+
+  * `<PLACEHOLDER_NAME>`
+
+  * `[OMITTED]`
+
+  * `[LIST CONTINUES]`
+
+  * `[SNIP: <n> lines omitted]`
+
+  * `[INTENTIONALLY LEFT BLANK]`
+
+* Prohibited placeholders include informal stand-ins such as curly-brace placeholders or the word “TBD” (unless the word “TBD” is part of a formal decision-bounded rule as defined in the Remediation Implementation Guide template).
+
+* Review handling: if an ellipsis is observed in a canonical doc or plan during review, treat it as a hard defect to be corrected (replace with a permitted marker). If the ellipsis appears because a viewer cut text, treat it as a tooling/read failure and re-open until the full source text is visible.
 
 **Scope (out).**
 
@@ -80,40 +104,45 @@ Operators (names-only): PO, IA, (optional) QA agent, (optional) Codex
 
 “PF10 supersedes all other PF docs where it speaks; otherwise follow PF-Canon.”
 
-#### Canon set (explicit; stable references only)
+#### **Canon set (explicit; stable references only)**
 
-List the governing sources as PF ID \+ Title \+ Section (no filenames/versions).
+Canon set (titles-only, names-only, no version numbers in prose):
 
-* PF10 — HDE-Build Notes (relevant addenda: list addendum numbers \+ titles)  
-* PF04 — HDE-Governance, §… (token registry \+ relevant invariants)  
-* PF06 — Epic Process Guide, §0.4.1 (Discovery \+ QA RCA/Doc Delta)  
-* PF09 — HDE Build Checklist, §4.9 (evidence index refresh \+ path-proof regeneration in close-pack)  
-* PF12 — HDE Schemas & Artifacts, §Refresh sequence (normative) (evidence index refresh flow: canonical filenames \+ refresh order)  
-* PF19 — Glow QA Guide, §… (rails/evidence/step logs)  
-* PF27 — Canon Plan Templates, §… (template obligations)
+* PF10 — HDE-Build Notes (relevant addenda: list addendum numbers and titles)
 
-**PF20 note (historical-only; non-governing):** PF20 MUST NOT be cited as an implementation/remediation planning source. Do not cite it for requirements, rails, acceptance semantics, or evidence-surface definitions.
+* PF04 — HDE-Governance, §\<SECTION\> (token registry and acceptance invariants)
 
----
+* PF06 — Epic Process Guide, §0.4.1 (Discovery \+ QA RCA/Doc Delta)
 
-### Scope statement
+* PF09 — HDE Build Checklist, §4.9 (evidence index refresh \+ path-proof regeneration in close-pack)
 
-#### Epic intent and boundaries (names-only; PF-anchored)
+* PF12 — HDE Schemas & Artifacts, §\<SECTION\> (evidence index refresh flow: canonical filenames \+ refresh order)
 
-Epic plan anchor(s): \<in-flight epic plan reference(s)\> (titles-only; do not paste plan prose here)
+* PF19 — Glow QA Guide, §\<SECTION\> (rails, evidence, step logs)
 
-Optional (historical-only): \<PF20 reference(s)\> (titles-only) — include only when the epic is already closed and archived
+* PF27 — Canon Plan Templates, §\<SECTION\> (template obligations)
 
-**In-scope surfaces / checks (names-only):**
+Note: PF20 may be cited only for historical record context, never as a source of requirements.
 
-* D0 …  
-* D1 …  
-* D2 …  
-* D3 …
+### **Scope statement**
 
-**Out-of-scope surfaces / checks (names-only):**
+This plan evaluates the following in-scope surfaces / checks:
 
-* …
+* D0 \<SURFACE\_OR\_CHECK\_NAME\>
+
+* D1 \<SURFACE\_OR\_CHECK\_NAME\>
+
+* D2 \<SURFACE\_OR\_CHECK\_NAME\>
+
+* D3 \<SURFACE\_OR\_CHECK\_NAME\>
+
+* \[LIST CONTINUES\]
+
+This plan explicitly excludes:
+
+* \<SURFACE\_OR\_CHECK\_NAME\>
+
+* \[LIST CONTINUES\]
 
 #### PF10 overrides / conflicts (if any)
 
@@ -180,7 +209,7 @@ Live QA Plans exist to execute checks and produce evidence. VCS workflow (branch
 
 * Live QA Plans MUST NOT gate PASS/FAIL on VCS state (“working tree clean”, branch name, commit SHA, PR identifiers, etc.).
 
-* Limited `git …` commands are allowed only as optional *non-gating* sanity checks, and only when all are true:
+* Limited `git <READ_ONLY_COMMAND>` commands are allowed only as optional *non-gating* sanity checks, and only when all are true:
 
   * Read-only / non-mutating intent (no checkout/reset/commit/push/pull).
 
@@ -245,13 +274,18 @@ Use this layout unless an owning PF document defines a fixed canonical path for 
 Within each `checks/<check_id>/`:
 
 * Primary step log (required): `primary.log`  
+* Structured report sidecars (optional; but if listed in the plan’s required deliverables, filenames MUST match the produced outputs):  
+  * D23 evidence index snapshot contract: `evidence_index_snapshot_contract_report.json` (canonical; replaces plan-listed `snapshot_contract_validation.json`)  
+  * Evidence-path binding validation: `evidence_path_binding_validation_report.json` (canonical; replaces plan-listed `binding_validation_report.json`)  
+* Captured CLI output snapshots (optional; REQUIRED when stdout/stderr is treated as the proof payload for a check):  
+  * Token registry validity checks (e.g., `po-006_token_registry_validity`): `rg_acceptance_map_output.txt`, `rg_registry_output.txt`  
 * Supporting artifacts (optional): `tmp_*` files, `.sha256` sidecars where required, etc.
 
 Optional (non-canon) history retention:
 
-* `audit/qa/hde-epic<NNN>/runs/<attempt_label>/...`  
-  Where `<attempt_label>` is a UTC timestamp label (git-free).  
-  If you keep run-local copies here, they MUST be treated as convenience copies, not canonical acceptance binding surfaces.
+* `audit/qa/hde-epic<NNN>/runs/<attempt_label>/<RUN_LOCAL_SUBTREE>/`  
+* where `<attempt_label>` is a UTC timestamp label (git-free).  
+  * If you keep run-local copies here, they MUST be treated as convenience copies, not canonical acceptance binding surfaces.
 
   #### **Step-log header schema expectations (minimum; required)**
 
@@ -397,11 +431,12 @@ Canonical output (current-state; epic-level):
 
 Requirements:
 
-* Separate findings into BLOCKERS and CAVEATS with stable IDs.
-
-* Output “no deltas” when empty.
-
-* MUST be generated by commands (no manual fill placeholders).
+* Separate findings into BLOCKERS and CAVEATS with stable IDs.  
+* Output “no deltas” when empty.  
+* MUST be generated by commands (no manual fill placeholders).  
+* MUST record plan-vs-execution drift for any runner/command mismatch (including missing scripts replaced by `python (embedded)` harness execution), with an evidence pointer to the step `primary.log` showing the executed command.  
+* If a plan-listed mismatch is filename-only (for example, a report JSON name differs) but an equivalent artifact exists and supports the same PASS/FAIL predicate, treat it as a **CAVEAT** (not a **BLOCKER**). Record expected → actual filenames. Do not mark **PASS** unless the predicate can be evaluated from the actual artifact(s).  
+* Evidence hygiene follow-ups that are not plan-required deliverables (for example, path-proof refreshes, Evidence Index entry additions) MUST be recorded as **CAVEATS** / follow-ups and MUST NOT be treated as blockers unless explicitly made plan-required.
 
 #### Step‑0C — Prod handshake (identity-only) when target is prod-like
 
@@ -417,28 +452,26 @@ If using `/internal/version` as part of Step‑0C:
 
 ### Runbook Check Matrix
 
-### **Runbook Check Matrix**
+| check\_id | check\_name | D-goal | rails posture | commands (PO-only) | expected result | primary evidence | deliverables | tokens (optional) | PF anchors |
+| ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- |
+| D0\_discovery | Discovery posture | D0 | SAFE\_MODE=; ALLOW\_NETWORK=; APP\_ENV= | `<COMMANDS>` | PASS if ; FAIL\_BEHAVIOR if ; TOOLING\_BLOCKED if | `audit/qa/<epic-id>/checks/D0_discovery/primary.log` | `<DELIVERABLE_PATHS>` | \[INTENTIONALLY LEFT BLANK\] | PF27 — Canon Plan Templates, § |
+| \<check\_id\> | \<check\_name\> | \<D\_GOAL\> | \<RAILS\_POSTURE\> | `<COMMANDS>` | \<PASS\_FAIL\_PREDICATES\> | `<PRIMARY_EVIDENCE_PATH>` | `<DELIVERABLE_PATHS>` | `<TOKEN_NAME_1>, <TOKEN_NAME_2>` | \<PF\_ANCHORS\> |
 
 Every row MUST have a corresponding Check Block (below).
 
-| check\_id | check\_name | surface / D-goal mapping | rails posture | PO command(s) | PASS/FAIL predicates | primary evidence path | deliverables (minimal set) | tokens (optional) | PF anchors |
-| ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- |
-| D0\_discovery | Discovery posture | D0 / discovery | SAFE\_MODE=?, ALLOW\_NETWORK=? | … | … | `audit/qa/<epic-id>/checks/D0_discovery/primary.log` | `audit/qa/<epic-id>/checks/D0_discovery/primary.log` | (optional) | PF… |
-| … | … | … | … | … | … | … | … | … | … |
+Matrix rules:
 
-Matrix rules (normative):
+* Every check\_id in the matrix MUST be accompanied by a CHECK block below.
 
-* Commands must be copy/paste-ready.
+* PASS/FAIL predicates MUST be mechanical and audit-ready.
 
-* Fenced code blocks are optional; a plan MUST NOT be rejected solely because it does not use fenced code blocks.
+* Tokens (optional):
 
-* If the execution venue is not guaranteed to render Markdown, do not include formatting characters that would become literal (e.g., do not wrap every command line in backticks).
+  * MUST be names-only and MUST match the PF04 acceptance token roster exactly (case-sensitive).
 
-* PASS/FAIL predicates must be explicit and mechanically checkable.
+  * Do not claim aliases or legacy spellings. The deprecated alias `QA_STEP_LOGS_CONSOLIDATED_OK` MUST be normalized to `QA_HARNESS_DISCIPLINE_OK`.
 
-* No fabricated paths: every required path referenced by a check MUST carry a Path provenance label (Canon-defined | Audit-proven | QA-created) and conform to the Deliverables rules in the owning Check Block.
-
-* Tokens are optional; if present, use names-only from governed acceptance artifacts; no invention/aliases.
+  * D23 evidence index snapshot is tokenless (do not claim acceptance tokens from it).
 
 ---
 
@@ -446,17 +479,60 @@ Matrix rules (normative):
 
 Repeat one block per matrix row.
 
+#### **Embedded harness checks (pattern; use when no standalone script exists)**
+
+Use this pattern when a check is executed by invoking an existing harness runner that performs the check internally (no dedicated script exists for the check).
+
+* In the matrix row, set **commands (PO-only)** to the exact `python (embedded)` invocation you will run (include the harness runner repo path).
+
+* In the CHECK block, record the same `python (embedded)` invocation under **PO command(s)**.
+
+* Evidence outputs MUST still be concrete, governed paths. Include the check `primary.log` plus any check-specific governed output(s) produced by the embedded harness (example: `audit/qa/<epic-id>/checks/<check_id>/token_matrix.json`).
+
+* If the Approved Plan named a runner script or auxiliary artifact that does not exist or is not produced, record it as `DOC_DRIFT` in Step-0B (Doc Delta Capture) and proceed only if the governed evidence outputs exist and are verified.
+
+#### **Canon check clarifications (addenda-driven; locked)**
+
+Use this section only when the Live QA Plan includes the referenced check ID.
+
+**D07\_sanity\_pipeline — log evidence surface \+ pytest posture**
+
+* The sanity pipeline log evidence surface is fixed: `audit/gates/sanity_pipeline/sanity_pipeline.log`.  
+  * If a plan requires a path-proof transcript for this log, the canonical path-proof is the sibling file `audit/gates/sanity_pipeline/sanity_pipeline.log.path_proof.txt`.   
+  * If a path-proof transcript is not required, the plan MUST NOT list any `*.path_proof.txt` for this log.
+
+* Plans MUST NOT introduce alternate/duplicate locations (example: `artifacts/sanity_pipeline/...`) for the same run.
+
+* Plans MUST NOT assume `pytest` is installed. If `pytest` is missing at execution time, mark the step `TOOLING_BLOCKED` (not `FAIL`) until the dependency is available (or is unblocked via an explicit Moon Loop change captured as DOC\_DRIFT in Step-0B).
+
+**PO-017\_lowercase\_naming — scope and predicate**
+
+* This rail scans **directory names only** (not filenames).
+
+* Scope is limited to QA-created loci: `audit/qa/<epic-id>/` and `artifacts/`.
+
+* `docs/` is out of scope for this rail.
+
+* Uppercase filenames under QA bundles do not violate this rail unless they appear in directory names.
+
+**D08\_cli\_guardrail — CLI main module path reference**
+
+* If the check asserts/inspects the CLI main module path, the expected path is `engine/cli/main.py` (not `cli/main.py`).
+
+* If a plan references a different path, treat the discrepancy as DOC\_DRIFT and capture it in Step-0B (Doc Delta Capture), while ensuring the check predicate is evaluated against the correct on-disk path.
+
 #### CHECK \<check\_id\>: \<check\_name\>
 
 Surface / D-goal mapping: \<D\# \+ surface\>  
-Rails: SAFE\_MODE=… ALLOW\_NETWORK=… APP\_ENV=…  
+Rails: SAFE\_MODE=\<value\> ALLOW\_NETWORK=\<value\> APP\_ENV=\<value\>  
 Pins (when producing governed bytes): LC\_ALL=C LANG=C TZ=UTC  
 PF anchors: PFxx — Title, §X.Y (titles-only)
 
 **PO command(s) (copy/paste)**
 
 * One command or a tight, explicit pipeline.  
-* If multiple commands are required, list them explicitly and capture them in the step log header `command`.
+* If multiple commands are required, list them explicitly and capture them in the step log header `command`.  
+* If no command is required (manual review only), set the step log header `command: N/A` **and** ensure every required deliverable is Audit-proven (pre-existing at review time). If any required deliverable must be generated during QA (including via a helper script), commands MUST be listed explicitly (no “None required”).
 
 **Expected result (PASS/FAIL predicates)**
 
@@ -572,7 +648,11 @@ It is a closure-oriented summary artifact that:
 
 * states what Live QA found (or explicitly states “no new deltas found”),  
 * maps any substantive findings to PF-Canon doc delta intents by PF title, and  
-* records deferrals (if any) as deferrals (not as “unknowns”).
+* records deferrals (if any) as deferrals (not as “unknowns”).  
+* includes an explicit readiness / closeout recommendation that is justified with evidence pointers to the QA event stream and named artifacts; missing required tokens/evidence MUST be labeled as **Unknown** (no inference).  
+* if a Live QA Plan exists/was used, includes explicit coverage mapping vs the QA Plan step requirements and Findings (no silent drops); any mismatches must be called out explicitly (plan vs execution reality).  
+* summarizes remediation actions (including any Moon Loop work) as: what changed, why, which check(s) were unblocked / re-verified, and where the supporting evidence lives (diff/log paths).  
+* enumerates known open issues and deferred work with disposition (waive / defer / follow-up) and the evidence impact.
 
 Location:
 
@@ -580,36 +660,20 @@ Location:
 
 ---
 
-### **Review guardrails**
+## **Review guardrails**
 
-Hard blockers for plan approval/execution:
+### **Hard blockers for plan approval/execution**
 
-* Manual result placeholders (“fill PASS/FAIL”, “operator summary”, etc.).
-
-* VCS workflow content in the Live QA Plan (branches/commits/PR steps), or PASS/FAIL gating on VCS state (“working tree clean”, branch name, commit SHA, PR identifiers, etc.).
-
-* Any mutating VCS command (checkout/reset/commit/push/pull). Read-only `git` commands are only allowed as optional non-gating repo-root sanity checks (see “No VCS workflow content”).
-
-* Any required path that is not Canon-defined, Audit-proven, or explicitly QA-created by this plan with inline create+validate mechanics (no fabricated paths).
-
-* New recurring artifact families/paths introduced ad hoc in a plan (must be introduced via PF10 addendum, then drained into the owning PF before plans may require them).  
-* Helper/wrapper scripts not canon-named by explicit path (unless the full tool source is embedded and written under `audit/qa/<epic-id>/...` before execution).  
-  * Exception (execution convenience; not governed): QA agents MAY create ephemeral helper scripts under `/tmp` during Live QA execution.  
-* `/tmp` helpers are execution-only and MUST NOT be treated as deliverables or evidence.
-
-* `/tmp` outputs are never governed evidence and MUST NOT be indexed, mirrored, or referenced as acceptance binding surfaces.
-
-* Any evidence artifact used to decide PASS/FAIL MUST be written under a concrete lowercase path under `audit/**` (preferred) or `artifacts/**`.
-
-* `/tmp` helper scripts MUST NOT print or persist secrets. If they handle sensitive env vars, logs must remain presence-only or redacted.  
-*   
-* Missing required Step-0 mechanical artifacts (Doc Delta Capture; plus any Step-0C Prod handshake identity evidence when the plan declares prod behavior).
-
-* Any check listed in the matrix without a corresponding Check Block (or vice versa).
-
-* Closure-scoped checks MUST be proven mechanically and MUST declare concrete deliverables (files or canon-defined inspected paths). A check that is expected to be `TOOLING_BLOCKED` or is otherwise posture-only MUST NOT be used as closure proof and MUST NOT be recorded as `PASS`; closure scope MUST be downgraded or resolved via an explicit ADR override.
-
-* Any Live QA plan that treats PF23 consult as an execution-time deliverable (for example: required `pf23_consult.md`, a required “PF23 capture” step, or operator commands intended to “prove PF23 consult”). PF23 is planning-time only.
+* All inputs and paths MUST be explicit and reproducible. Any required path that is not canon-defined, audit-proven, or explicitly QA-created by this plan with inline create \+ validate mechanics is blocked. No fabricated paths.  
+* No interactive steps. The plan must be runnable headlessly (and must log all commands).  
+* Command entrypoints must resolve. Any plan-provided command that names a repo file by path MUST either:  
+  * (a) point to an existing repo file at review time, OR  
+  * (b) be explicitly QA-created by this plan with inline create \+ validate mechanics before execution (and recorded as `DOC_DRIFT` in Step-0B).  
+* If the step is executed via an embedded harness function (no standalone script exists), the plan MUST use `python (embedded)` and cite the harness runner repo path.  
+* New recurring artifact families/paths introduced ad hoc in a plan (not already governed by PF10) are blocked until introduced via PF10 addendum.  
+* Helper/wrapper scripts are blocked unless canon-named by explicit path (for example, `tools/evidence/run_<check>.py`) OR the full tool source is embedded and written under `audit/qa/...` before execution.  
+* All evidence artifacts must be under `audit/` and be hashed or proven as required.  
+* `/tmp` helper scripts MUST NOT print or persist secrets.
 
  **ADR discipline (canon-resolution only; drain targets required):**
 
@@ -667,13 +731,19 @@ For every epic, fill out the following fields as the **Epic Plan record**. At ep
 
 #### **Meta**
 
-* **Epic ID:** `HDE-EPICXXX`  
-* **Epic name (short):**  
-* **Alchemical phase:** (exact phase name per PF21, e.g. `Calcination`, `Dissolution`, …)  
-* **Phase rationale (1–3 sentences):** Why this epic belongs in this phase.  
-* **Status:** `Planned | In Progress | Blocked | Pending Review | Done | Won’t Do | Superseded`  
-* **Date started:** `YYYY‑MM‑DD`  
-* **Date completed:** `YYYY‑MM‑DD` (or `TBD`)
+* **Epic ID:** `HDE-EPICXXX`
+
+* **Epic name (short):**
+
+* **Alchemical phase:** (exact phase name per PF21, e.g. `Calcination`, `Dissolution`)
+
+* **Phase rationale (1–3 sentences):** Why this epic belongs in this phase.
+
+* **Status:** `Planned | In Progress | Blocked | Pending Review | Done | Won’t Do | Superseded`
+
+* **Date started:** `YYYY‑MM‑DD`
+
+* **Date completed:** `YYYY‑MM‑DD` (or \[INTENTIONALLY LEFT BLANK\])
 
 #### **Existing Work Check (MUST)**
 
@@ -703,7 +773,7 @@ If any deliverable includes **Ops tasks** (human console/config actions or other
 
 * Each OPS task MUST be specified using the required Ops Task record fields defined in PF27 §3, including: Task ID, intent, constraints/rails, success criteria, evidence to capture (repo path), rollback intent, and secret handling note.
 
-* Ops-task completion MUST be proven by secret-free, repo-stored evidence under a lowercase `audit/ops/<epic-id>/...` path (or `audit/qa/<epic-id>/...` when part of QA execution).
+* Ops-task completion MUST be proven by evidence in `audit/ops/<epic-id>/<task_id>/` with a corresponding QA evidence pointer in `audit/qa/<epic-id>/<task_id>/`
 
 * Any Ops task included in the epic MUST also be represented as a tracked subtask in **HDE Build Checklist** (titles-only), using the same Task ID and fields.
 
@@ -724,7 +794,7 @@ List **concrete, observable deliverables**; each should be testable:
   * *Evidence required:* (artifact titles, mirror records, snapshots; titles-only)  
   * *PF references:* (PF titles \+ sections, e.g. “PF14 — HDE Mechanics Guide §1.3 Evidence & CI coupling”)
 
-Repeat D2, D3, … as needed.
+Repeat D2, D3, and additional deliverables as needed.
 
 These deliverables should map cleanly to PF06 PR plans, PF09 CI jobs, and PF19 QA playbooks (titles-only).
 
@@ -813,32 +883,44 @@ These facts may be recorded as metadata, but they are **not** acceptance tokens:
 
 ##### **C. Evidence pointers (titles-only)**
 
-* Human Evidence Index: `docs/evidence/INDEX.json` record titles
-
-* Hash sentinel: `docs/evidence/INDEX.sha256`
-
-* Machine Mirror: `artifacts/evidence_index.jsonl` records (artifact\_key \+ proof\_anchor)
+The Epic Plan MUST list evidence pointers to governed artifacts and demonstrate explicit binding to canonical paths defined in “HDE Schemas & Artifacts.”
 
 **Evidence Index Refresh Flow (reference lock; required when a plan claims index/mirror refresh):**
 
-* Citation lock: the plan MUST cite PF12 — HDE Schemas & Artifacts, §Refresh sequence (normative). Do not freehand the ordering, and do not cite non-verifiable PF12 section numbers.  
-* The canonical refresh set MUST be treated as the exact filenames below, including sibling `*.path_proof.txt` files (same directory, same basename) when governed/required in the close-pack:  
-  * `docs/evidence/INDEX.json`  
-  * `docs/evidence/INDEX.sha256`  
-  * `artifacts/evidence_index.jsonl`  
-* Canonical tool invocation (must be named as-written in the plan when this flow is required):  
-  * `python tools/evidence/update_evidence_index.py` (write mode)  
-  * `python ci/checks/check_mirror_schema.sh` (NOT `bash ci/checks/check_mirror_schema.sh`)  
-* Close-pack coupling: when refresh outputs are part of a close-pack, couple the work to PF09 — HDE Build Checklist, §4.9 (regenerate indices \+ governed sibling path proofs in close-pack).  
-* Close pack (canonical; lowercase path): `audit/qa/hde-epic<NNN>/...` (epic-specific close report \+ manifest outputs live under the epic QA root and must be declared explicitly in the Epic Record)
+* The plan MUST cite the canonical refresh sequence defined in PF12.
 
-**CLI serializer/emitter guard evidence (when used as acceptance):**  
- If an epic uses CLI serializer/emitter guards as part of its acceptance, the canonical evidence paths MUST be:
+* The plan MUST state that the refresh updates the canonical refresh set:
 
-* `artifacts/cli/guards/serializer_grep_guard.log`  
-* `artifacts/cli/guards/emitter_symbol_proof.txt`
+  * `docs/evidence/INDEX.json`
 
-Any `audit/gates/guards/...` copies are legacy/auxiliary and not required for epic acceptance.
+  * `docs/evidence/INDEX.sha256`
+
+  * `artifacts/evidence_index.jsonl`
+
+  * `artifacts/evidence_index.jsonl.sha256`
+
+  * and any required sibling path-proof transcripts using the suffix `<artifact>.path_proof.txt` (for example: `docs/evidence/INDEX.json.path_proof.txt` and `artifacts/evidence_index.jsonl.path_proof.txt`).
+
+* The plan SHOULD include the canonical tool invocation and filename set from the Addenda (PF10).
+
+* The plan MUST bind evidence index and mirror operations to canonical paths (no alternate evidence index locations; no alternate mirror homes).
+
+Evidence pointers MUST cite the following canon:
+
+* Epic QA root (canonical; lowercase path): `audit/qa/hde-epic<NNN>/`  
+   This is the epic QA root for step logs and run artifacts and must be declared explicitly in the Epic Record.
+
+* Evidence Index (canonical): `docs/evidence/INDEX.json` and `docs/evidence/INDEX.sha256`
+
+* Machine Mirror (canonical mirror home): `artifacts/evidence_index.jsonl` with companion `artifacts/evidence_index.jsonl.sha256` and sibling path-proof transcript `artifacts/evidence_index.jsonl.path_proof.txt`
+
+* Evidence index snapshot (if produced by D23): `audit/gates/evidence_index_snapshot/evidence_index_snapshot.json` and `audit/gates/evidence_index_snapshot/evidence_index_snapshot.json.path_proof.txt`
+
+**CLI serializer/emitter guard evidence:** If the epic uses a canonical serializer/emitter pipeline:
+
+* The plan MUST cite the exact check IDs that prove serializer equivalence and unmodified output.
+
+* Any `audit/gates/guards/<SUBTREE>/` copies used to support the plan MUST be mentioned in the “Evidence pointers” block.
 
 ##### D. Normative completion rule
 
@@ -866,7 +948,7 @@ MUST NOT relocate these close-pack artifacts into alternative directory trees (e
 
 **QA evidence roots remain separate.**
 
-* QA evidence roots (example: `audit/qa/...`) may be used for QA execution evidence.
+* QA evidence roots (example: `audit/qa/<epic-id>/`) remain separate. Do not merge or co-locate artifact families:
 
 * Close-pack path-of-record is the `audit/EPIC-###_*` pair above and must not be dual-homed for acceptance binding.
 
@@ -1041,29 +1123,34 @@ Before an Epic Record is treated as **ready for approval** (or promoted to “In
 
 * Any runbook, QA plan, QA checklist, or QA execution rail belongs in its single home (titles-only), not in PF20.
 
-##### .**A. Token registry validation (planning gate)**
+  ##### **A. Token registry validation (planning gate)**
 
-* Every acceptance token name listed in the Epic Record (including the Epic Record’s “Tokens and Evidence (Acceptance)” section and the epic-specific acceptance roster) MUST be validated against the canonical token registry in “HDE Governance” (titles-only).
+Acceptance token names used anywhere in the plan (including acceptance artifacts and acceptance-token claims in step logs) MUST match the canonical acceptance token roster in “HDE Governance” (PF04).  
+ Tokens are case-sensitive and names-only (no embedding semantics).  
+ If any token name is unregistered or misspelled: do not claim it; normalize to a registered name (if applicable); record DOC\_DRIFT rather than copying the legacy string forward. Plan approval is mechanically blocked until the plan’s token set is registry-valid.
 
-* Token lists in epic records are names-only planning rosters and MUST be treated as a validated view of the token registry, not as an authority.
+* Token sources:
 
-* Unregistered token names MUST NOT be used in any PF20 acceptance roster or in any acceptance artifacts referenced by the epic (for example: acceptance maps, manifests, token→evidence matrices).
+  * Primary source (spellings): PF04 acceptance token roster.
 
-* If a new token is required, it MUST be routed via an explicit ADR and drained into the governing doc before PF20 may list it.
+  * Secondary sources: PF09 check definitions only (may reference tokens but MUST NOT mint new token names or alternate spellings).
 
-* Until drift is cleared, track token registry drift under the cross-epic issue record reserved in HDE Phased Epics §1 (titles-only); do not create competing local token lists.
+* Deprecated alias handling (hard):
 
-**Token hygiene examples (normative; no aliases):**
+  * `QA_STEP_LOGS_CONSOLIDATED_OK` is a deprecated alias for `QA_HARNESS_DISCIPLINE_OK`.
 
-* Canonical JSON token spelling: use `JSON_CANONICAL_CHECK_OK` (do not use `CANON_JSON_OK`).
+  * All acceptance artifacts and step logs MUST claim `QA_HARNESS_DISCIPLINE_OK` (not the alias).
 
-* Doc-delta token spelling: use `DOC_DELTA_PRESENT_OK` (do not use `DOC_DELTA_CAPTURED_OK`).
+  * If the alias is encountered in source PF text, interpret it as `QA_HARNESS_DISCIPLINE_OK` and record DOC\_DRIFT for drain.
 
-* Close-pack presence is baseline artifacts by default, not a token: do not introduce or require `CLOSE_PACK_FILES_PRESENT_OK` unless Governance registers it.
+Token hygiene examples:
 
-* PF23 consult is not an acceptance token: do not mint, claim, or reference `REALITY_AUDIT_OK` unless Governance registers it.
+* Registry-valid: `QA_HARNESS_DISCIPLINE_OK`
 
-* Guard proofs are evidence-only by default: do not mint “guard tokens” unless Governance registers them.
+* Not valid: `qa_harness_discipline_ok` (wrong case)
+
+* Not valid in new plan text: `QA_STEP_LOGS_CONSOLIDATED_OK` (deprecated alias; use `QA_HARNESS_DISCIPLINE_OK`)  
+* 
 
 ##### **B. Close-pack baseline declared (planning gate)**
 
@@ -1123,51 +1210,67 @@ When a deliverable claims a “local bundle” directory (example: `artifacts/op
 
 * If any required evidence lives outside the local bundle directory, the plan MUST name it explicitly and give its canonical path (titles/paths only), rather than assuming it is implicitly available.
 
-##### **D. Canonical evidence-path binding validation (planning gate)**
+  ##### **D. Canonical evidence-path binding validation (planning gate)**
 
-Every acceptance token → evidence binding that appears in any of the following MUST be validated against the canonical evidence catalog in “HDE Schemas & Artifacts” (titles-only):
+Authority order (hard):
 
-* the Epic Plan’s “Evidence required” lists, and
+* Canonical artifact paths and sibling path-proof transcript naming are defined by PF12.
 
-* the token→evidence matrix, and
+* PF09 defines required checks/gates but MUST bind to PF12-defined canonical paths and filenames (no alternate path strings).
 
-* the Human Evidence Index, and
+* Status vocabulary for PASS/FAIL and tooling states is defined in PF19; do not invent new status strings.
 
-* the Machine Mirror, and
+* Any legacy path string encountered in other PF text is treated as DOC\_DRIFT: plans MUST bind to PF12 canonical paths and record a Doc Delta rather than copying the legacy string forward.
 
-* the mirror proof anchors (path-proofs).
+The Epic Plan MUST validate each named evidence pointer is bound to a canonical surface in the “HDE Schemas & Artifacts” evidence catalog (exact path string, including case).  
+ Any non-canonical binding is a mechanical blocker unless it is explicitly routed via an ADR.
 
-If the evidence catalog defines a fixed canonical path for a token’s evidence surface, the plan and all acceptance artifacts MUST bind to that exact path. Any non-canonical binding is a mechanical blocker unless routed via ADR.
+**Minimum required evidence pointers (stable contract):**
 
-Minimum artifacts that MUST agree when a token is claimed as satisfied:
+* Close-pack pair:
 
-* Epic Plan required evidence list (per deliverable)
+  * `audit/EPIC-###_close_report.md`
 
-* token→evidence matrix row for the token
+  * `audit/EPIC-###_MANIFEST.json`
 
-* `docs/evidence/INDEX.json` entry for the bound artifact
+* Evidence Index:
 
-* `artifacts/evidence_index.jsonl` mirror record for the same artifact key and discovered path
+  * `docs/evidence/INDEX.json`
 
-* the corresponding path-proof file referenced by the mirror record (`proof_anchor`)
+  * `docs/evidence/INDEX.sha256`
 
- **Proof metadata freshness (normative).**
+* Machine Mirror (canonical mirror home):
 
-When a governed artifact’s bytes are regenerated/refreshed, the associated Human Evidence Index entry, Machine Mirror record, and referenced path-proof metadata MUST be refreshed to reflect the regeneration run.
+  * `artifacts/evidence_index.jsonl`
 
-Stale/backdated proof timestamps or produced-at fields (for example `mtime_utc`, `produced_at_utc`) on refreshed artifacts are non-conforming and MUST be corrected before a token is claimed as satisfied against that evidence surface.
+  * `artifacts/evidence_index.jsonl.sha256`
+
+  * `artifacts/evidence_index.jsonl.path_proof.txt`
+
+* Evidence index snapshot (only if the plan includes D23):
+
+  * `audit/gates/evidence_index_snapshot/evidence_index_snapshot.json`
+
+  * `audit/gates/evidence_index_snapshot/evidence_index_snapshot.json.path_proof.txt`
+
+Validator failure posture (execution-time status mapping):
+
+* If validator can run and detects evidence exists but bindings do not match PF12 canonical paths, status is FAIL\_BEHAVIOR.
+
+* If missing required canonical inputs (evidence does not exist or not readable), status is TOOLING\_BLOCKED.
 
 Acceptance artifact hygiene (mechanical, plan-gate rule):
 
-* The token→evidence matrix and acceptance map MUST NOT contain duplicate rows/entries for the same token.
+* Token names in acceptance artifacts MUST pass PF04 token registry validation; no legacy spellings or aliases.
 
-* Placeholders are allowed only for scaffold-stage planning (example: D0 scaffold PR), and only for tokens that are not yet claimed as satisfied.
+* `audit/EPIC-###_MANIFEST.json` MUST reference canonical paths and include path-proof transcript pointers where required.
 
-  * Once a token is claimed as satisfied, acceptance artifacts MUST bind to concrete, canonical evidence paths and MUST NOT contain placeholder evidence references (examples of prohibited placeholders: `TBD`, `{scenario}`, `{...}`).
+* Any path-proof transcript MUST use the canonical suffix `<artifact>.path_proof.txt`.
 
-* Acceptance artifacts (token→evidence matrix, acceptance map) MUST bind tokens to primary canonical artifacts and/or tests.
+* The plan MUST explicitly list each path-proof transcript file that will be included in close-pack using explicit filenames such as `<ARTIFACT_NAME>.path_proof.txt` (no pattern placeholders).
 
-  * `*.path_proof.txt` files are proof anchors referenced via the Machine Mirror `proof_anchor` field and MUST NOT be bound as primary evidence unless the evidence catalog explicitly defines them as standalone evidence families.
+Prohibited placeholders: informal stand-ins such as curly-brace placeholders or the word “TBD” (unless the word “TBD” is part of a formal decision-bounded rule as defined in the Remediation Implementation Guide template).  
+ Use `<PLACEHOLDER_NAME>`, `[OMITTED]`, `[LIST CONTINUES]`, `[SNIP: <n> lines omitted]`, or `[INTENTIONALLY LEFT BLANK]`.
 
 **Canonical JSON gates (directory binding rule; normative).**
 
@@ -1185,19 +1288,77 @@ Acceptance artifact hygiene (mechanical, plan-gate rule):
 
 * Plans and acceptance artifacts MUST NOT require, invent, or dual-home canonical JSON gate bindings across multiple families. The following are legacy/compat-only and MUST NOT be treated as canonical acceptance surfaces unless canon explicitly reinstates them (via PF12):
 
-  * `audit/gates/canonical_json/*`
-
+  * `audit/gates/canonical_json/*`  
+  * `audit/gates/canonical_json/json_canonical_check.log (legacy catalog check report; compat-only; do not bind new plans to this path)`  
   * `audit/gates/canonical/*`
 
 **Evidence index snapshot artifacts (directory binding rule; normative).**
 
-* Canonical evidence index snapshot artifacts MUST bind to the gate-family path:
+* Canonical generator command (repo-local; copy/paste): `python tools/evidence/generate_evidence_index_snapshot.py` (not `run_evidence_index_snapshot.py`).
 
-  * `audit/gates/evidence_index_snapshot/evidence_index_snapshot.json`
+When an epic produces an evidence index snapshot as part of QA execution (D23 Evidence Index Snapshot):
 
-  * `audit/gates/evidence_index_snapshot/evidence_index_snapshot.json.path_proof.txt`
+* Canonical artifact surfaces (already governed):
 
-* The EPIC-local variant under `audit/qa/hde-epic<NNN>/<...>/evidence_index_snapshot.json` is not a closure-required canonical surface and MUST NOT be required as a closure deliverable.
+  * Snapshot JSON: `audit/gates/evidence_index_snapshot/evidence_index_snapshot.json`
+
+  * Snapshot path proof: `audit/gates/evidence_index_snapshot/evidence_index_snapshot.json.path_proof.txt`
+
+* Snapshot JSON schema (must match exactly):
+
+  * `schema_version` is `1`
+
+  * `generated_at_utc` is a valid RFC3339 UTC timestamp
+
+  * `inputs` (object):
+
+    * `human_index_path` (string; must be `docs/evidence/INDEX.json`)
+
+    * `human_index_sha256` (string; lowercase hex SHA256)
+
+    * `machine_mirror_path` (string; must be `artifacts/evidence_index.jsonl`)
+
+    * `machine_mirror_sha256` (string; lowercase hex SHA256)
+
+  * `parity` (object):
+
+    * `artifact_keys_match` (boolean)
+
+* PASS predicate (mechanical; tokenless):
+
+  * `schema_version` is `1`
+
+  * `inputs.human_index_path` equals `docs/evidence/INDEX.json`
+
+  * `inputs.machine_mirror_path` equals `artifacts/evidence_index.jsonl`
+
+  * `inputs.human_index_sha256` matches SHA256(raw bytes of `docs/evidence/INDEX.json`)
+
+  * `inputs.machine_mirror_sha256` matches SHA256(raw bytes of `artifacts/evidence_index.jsonl`)
+
+  * `parity.artifact_keys_match` is true
+
+* Status mapping:
+
+  * If required canonical inputs are missing or unreadable (for example: the index or mirror does not exist at the canonical path), status is TOOLING\_BLOCKED.
+
+  * If any predicate condition fails (schema mismatch, hash mismatch, parity false), status is FAIL\_BEHAVIOR.
+
+* Token posture:
+
+  * This check is tokenless. Do not claim acceptance tokens from this snapshot.
+
+* Epic-local variants:
+
+  * An epic may carry a non-canonical copy under `audit/qa/hde-epic<NNN>/` for convenience, but it MUST NOT be treated as a closure-required canonical surface and MUST NOT replace the canonical evidence index pair.
+
+**Canon-defined compare artifact surfaces (current; non-exhaustive).**
+
+* Arrays-as-sets compare report (CHECK `D05_arrays_as_sets`): `artifacts/canonical/arrays_as_sets_report.log`
+
+* The owning check’s `primary.log` MUST (a) capture the exact command executed that produced this report (verbatim) and (b) point to the stored report artifact path above (no prose-only assertions).
+
+* Plans MUST NOT bind acceptance to a different arrays-as-sets report path (example: `audit/gates/arrays_as_sets/arrays_as_sets_report.md`) unless introduced via ADR \+ doc-delta and drained into PF-Canon.
 
 **Canonical compare artifacts (no epic-local paths; normative).**
 
@@ -1271,27 +1432,20 @@ Every Ops task record **MUST** include:
 
 ### **Evidence posture (required)**
 
-Completion of an Ops task **MUST** produce a repo-stored evidence artifact bundle (text-first) under a lowercase path such as:
+Ops tasks are required to capture evidence in governed paths and include path-proof transcripts where applicable.
 
-* `audit/ops/<epic-id>/...` for Ops execution evidence, or
+`Evidence posture:`
 
-* `audit/qa/<epic-id>/...` when the evidence is part of QA execution.
+`Artifacts:`
 
-The Ops evidence bundle **MUST** include a command transcript sufficient to reproduce and audit what happened, secret-free:
+``* `audit/ops/<epic-id>/<task_id>/` — Task work products for this ops task.``
 
-* exact command(s) executed (verbatim)
+``* `audit/qa/<epic-id>/<task_id>/` — QA evidence for this ops task (only if the task produces QA evidence).``
 
-* stdout capture
+`Path proofs:`
 
-* stderr capture (separate from stdout where possible)
+``* For any governed artifact path included in acceptance or close-pack, include the sibling path-proof transcript using the suffix `<artifact>.path_proof.txt`.``
 
-* exit status / return code
-
-If the Ops task asserts any checksum verification (example: “OK”), the evidence **MUST** include the verifier output (or the exact verifier command plus its captured stdout/stderr) that produced the “OK” determination. Prose-only assertions are non-auditable.
-
-If any file contents are embedded inside a report, embed the exact file contents as stored. Avoid terminal control sequences in embedded excerpts. If control sequences appear, record a **CAVEAT** and preserve a clean, copy/paste-safe representation alongside the raw file.
-
-Evidence **MUST NOT** include secrets. If a setting/value is sensitive, evidence **MUST** be presence-only, redacted, or hashed, while still being sufficient to verify that the intended state was reached.
 
 ### **Build Checklist tracking requirement (normative)**
 
@@ -1436,7 +1590,7 @@ Captured headers, captured body, and any token claims **MUST** refer to the same
  Output: Remediation Implementation Guide (for approval)
 
 **Executive Summary**  
- ...
+ \<EXECUTIVE\_SUMMARY\>
 
 **Canon Frame (What “Correct” Means)**  
  `<testable statement> — PFxx — Title, §X.Y`
@@ -1500,7 +1654,7 @@ Captured headers, captured body, and any token claims **MUST** refer to the same
 
 * PFxx — Title
 
-* ...
+* \[LIST CONTINUES\]
 
 **ADRs Requiring Approval (Canon and External Task Creation)**  
 ADR-001 — \<short title\>

@@ -2,13 +2,13 @@
 
 **Title:** PF03-Reference-Technical-Writing-Best-Practices
 
-**Version**: v1.1.6
+**Version**: v1.1.7
 
 **Status:** Reference
 
-**Effective date:** 2026-01-01
+**Effective date:** 2026-01-23
 
-**Last Update Gate:** BN 8.7.7 Drain 50-51
+**Last Update Gate:** BN 9.4.4 Drain A1-5
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -53,35 +53,39 @@ Consumers. Other PF docs and build tooling that rely on PF03 for redline style, 
 
 ## **3\) Governing doctrine (what never changes)**
 
-Single home per truth — MUST. Each rule lives in exactly one PF doc; other docs link by title only. Do not include version numbers in cross-doc prose.
+Single home per truth — MUST. Every rule or schema has one canonical home. Other documents may reference it, but must not restate or fork it.
 
-AI-first granularity — SHOULD. Prefer small, purpose-built docs to a single omnibus; keep drift low and routing clear.
+No duplicated bytes — MUST. Do not copy architecture, transport, headers, or schema bytes across documents. Route by title to the single home.
 
-Deterministic artifacts — MUST. Every doc cut includes version, date, status, changelog, invocation tag, and provenance. Paste-safe formatting is required.
+Titles-only cross references — MUST. When referencing another PF document, refer to it by title only (no version numbers, no deep links unless the target doc defines them as stable).
 
-Evidence parity — MUST. Update the human Evidence Index and the machine JSONL mirror in the same PR; maintain 1:1 parity.
+Heading numbering stability — MUST. Heading numbers are immutable. New content should be added as H3/H4 within an existing H2 whenever possible. If a new H1 or H2 is truly required, it must take the next available number and must not renumber existing headings.
+
+Acceptance tokens (name \+ semantics) single source of truth — MUST. Acceptance token names and their semantics are defined once in the Governance & Process Handbook token registry. Any token name used in epic acceptance rosters, QA token libraries, acceptance maps, or evidence logs MUST match registry spelling exactly.
+
+Legacy spelling / alias handling (acceptance tokens) — MUST. If any PF consumer doc contains legacy spellings for a token family, the epic must normalize to the token registry spelling and record the normalization as a doc delta. Effective immediately: `QA_STEP_LOGS_CONSOLIDATED_OK` is treated as a deprecated doc-only alias for `QA_HARNESS_DISCIPLINE_OK`; acceptance artifacts MUST claim `QA_HARNESS_DISCIPLINE_OK` and MUST NOT claim `QA_STEP_LOGS_CONSOLIDATED_OK`.
+
+Ellipsis prohibition in canonical docs and plans — MUST. Canonical documents and plans MUST NOT contain the ASCII triple-dot sequence or the Unicode ellipsis character. Use one of these approved replacement markers instead: `[OMITTED]`, `[OMITTED: <short reason>]`, `[SNIP: <n> lines omitted]`, `[REPEAT BLOCK]`, `[LIST CONTINUES]`, or `<PLACEHOLDER_NAME>`.
+
+Evidence path binding authority order — MUST. HDE Schemas and Artifacts is the source of truth for canonical artifact paths and governed artifact naming for evidence families. HDE Mechanics Guide must not introduce alternate canonical paths. Glow QA Guide defines check execution semantics and status vocabulary. HDE Build Checklist declares which checks and gates are required, but those checks must bind to the canonical surfaces and paths.
+
+Machine Evidence Index mirror home (names-only) — MUST. The canonical Machine Evidence Index mirror is `artifacts/evidence_index.jsonl` with companion `artifacts/evidence_index.jsonl.sha256`. Governed path-proof transcripts are sibling files using the suffix `.path_proof.txt` (do not use `.path_proof.json`). Any other mirror path strings (including `artifacts/evidence/machine_mirror.json` or any `docs/evidence/` path that includes `machine_mirror` in its filename) are non-canonical and must be treated as doc drift until drained.
+
+Acceptance map path-of-record (names-only) — MUST. Epic acceptance maps are bound to `docs/acceptance_map_epic<NNN>.json` with a sibling `docs/acceptance_map_epic<NNN>.json.path_proof.txt`.
+
+Evidence Index snapshot (D23) is tokenless — MUST. The D23 Evidence Index snapshot is a mechanical PASS or FAIL contract suitable for QA closure proof. It MUST NOT be represented as an acceptance token claim.
+
+Planning MUST consult PF23 and tie QA plan milestones back to epic gates.
+
+Canonical references — MUST. When a PF doc references another PF doc, it must point to title (and stable section if defined as stable). Do not point to commit hashes, PR numbers, or mutable URLs as canonical references.
+
+Whole-block fidelity — MUST. When proposing redlines, replace or insert whole blocks. Avoid partial-sentence edits that change meaning.
 
 Full-document requirement — MUST. Obtain and read the complete source before editing; proceed in partial mode only with explicit PO approval and label outputs as Partial.
 
-Planning MUST consult PF23 — MUST. For planning artifacts (non-exhaustive: QA plans, remediation guides, implementation guides, EPIC records, stepwise runbooks), consult PF23 — Reality Audits as a primary input for component boundaries and canonical pathnames/loci. Plans SHOULD include a short “PF23 Anchors” subsection listing: (a) the component(s) used from PF23 and (b) the key pathnames/loci the plan will touch. This is traceability only; it MUST NOT duplicate PF23 contents. PF23 is PO-maintained; plans MUST NOT create tasks that assign PF23 updates.
+Paste-safe formatting is required. Use markdown that can be copy-pasted and renders correctly.
 
-Heading numbering stability — MUST. Existing H1/H2 numbering is immutable. New content SHOULD be added as H3/H4 within an existing H2 whenever possible. If a new H1/H2 is truly required, it MAY be added, but it MUST take the next available number and MUST NOT alter any existing numbering.
-
-Acceptance tokens (name \+ semantics) single source of truth — MUST. Acceptance token names and their semantics are defined once in the Governance & Process Handbook token registry. Any token name used in epic acceptance rosters, QA token libraries, acceptance maps, or evidence logs MUST match registry spelling exactly. Aliases and near-matches are prohibited. If a needed token is missing from the registry, record token drift and route it through governance registration before claiming it as a required acceptance token.
-
-Review source-retrieval guard — MUST. Do not claim a mismatch for token rosters, rails/evidence posture, or byte/contract expectations unless you have retrieved the governing canonical passages for both sides of the claim (for example, the epic roster and the token registry entry; the rails rule; the contract section). If retrieval is incomplete, mark the item **\[OPEN\]** and request the missing passage instead of asserting.
-
-Whole-block fidelity — MUST. When a section (or contiguous range) is supplied for revision, return the complete revised block, including all subordinate headings and content, preserving order and anchors. Do not omit or truncate sub-sections.
-
-No duplicated bytes — MUST. Do not copy architecture, transport, headers, or schema bytes across documents; route by title to the single home.
-
-No shelf assumptions — MUST. Work only from attached files or canvas outputs in this chat; a website may mirror for humans, not as source of truth.
-
-Section precision — MUST. Always cite Doc §Section numbers and exact anchors for placement.
-
-Canonical references — MUST. Serialization, arrays-as-sets, and locale pins route to §4; generate and validate under `LC_ALL=C`.
-
-Titles-only routing — MUST. PF05 (transport/CLI/vendor), PF04 (governance), PF01 (math), PF02 (architecture) are owners; PF03 does not duplicate their content.
+Evidence parity — MUST. Update the human Evidence Index and the machine JSONL mirror in the same PR; maintain 1:1 parity.
 
 ---
 
@@ -210,7 +214,7 @@ Delete-on-merge — MUST. After the PF target is updated, the PO **deletes** the
 
 No in-doc edits by AI — MUST. AI lead devs are **read-only** for Build Notes; edits occur in the target PF.
 
-PF10 reference posture — MUST. When referencing Build Notes from other documents or reviews, reference Build Notes by **addendum number \+ addendum title** (for example, “Build Notes Addendum 2.10 — Token Load Reduction…”). Do not reference PF10 by version strings or PF10 section numbers as durable anchors; the stable unit is the addendum entry itself.
+PF10 reference posture — MUST. When referencing Build Notes from other documents or reviews, reference Build Notes by **addendum number \+ addendum title** (for example, “Build Notes Addendum 2.10 — Token Load Reduction \[OMITTED\]”). Do not reference PF10 by version strings or PF10 section numbers as durable anchors; the stable unit is the addendum entry itself.
 
 Addenda Block (template)
 
@@ -351,33 +355,19 @@ These conventions keep Live QA plans mechanical, fair to the operator, and hones
 
 ### **12.3 Command and procedure style (QA plans)**
 
-Commands in QA plans are not suggestions or templates; they are the exact procedures the operator will run, usually in a Codespaces shell at the repo root. Extend §12.1 and §12.2 as follows:
+* Prefer repo-integrated commands that can be copy-pasted and run deterministically.
 
-Fully concrete commands — MUST. Every QA plan command MUST be fully concrete and free of placeholders (no `<PO: …>`, `<path>`, or “TODO” markers). If a value is variable, compute or derive it in a prior step so that the command line itself requires no manual editing.
+* Each procedure block must name: preconditions, commands, expected outputs, and where evidence is written.
 
-Copy/paste-ready for Codespaces — MUST. Commands MUST be usable as-is in the intended environment (typically a Bash shell in Codespaces at the repo root). The operator SHOULD be able to select the command line and paste it directly into the shell without adding flags, editing paths, or guessing environment variables.
+* Use inline shell (as code spans) for each step. If multi-line commands are required, use fenced code blocks with explicit shell (`bash`) and a single copy-paste block.
 
-Interactive-shell safety — MUST NOT. Command blocks intended for copy/paste into an interactive shell MUST NOT include `exit`, `return`, or other shell-terminating control flow that can close the operator’s session. If strict enforcement requires nonzero exit codes, run the enforcement inside a subshell (for example, `bash -lc '…'`) or write rc/status files and print a PASS/FAIL line without terminating the shell.
+* Avoid “run this somewhere” prose. Specify repo-root relative paths and exact files.
 
-Scope-safe defaults — MUST. The primary copy/paste command in a plan MUST be correct for the current epic/run context. If a flag is only relevant to a different epic or context (for example, `--epic-id`), it MUST NOT appear in the primary command. If such a flag is useful, present it as an explicitly optional, non-default variant and state when it should be used.
+* Do not use “\<PO\_INPUT\>” placeholders for procedure steps. If you need PO input, put it in a dedicated “PO inputs” section and do not gate mechanical steps on unstructured PO text.
 
-Evidence paths and outcomes — MUST. For each command, the plan MUST name one or more concrete evidence paths (for example, specific log files or artifacts under `audit/qa/...`) and state the expected high-level outcome (for example, “2 passed, 0 failed” or “HTTP 200 from Reader”). This pairs the procedure with what the operator should see if the step succeeds.
+* If the procedure requires environment bootstrapping, explicitly reference the standard bootstrap script and run the enforcement inside a subshell (for example, `bash -lc "<SUBSHELL_COMMAND>"`).
 
-No deferred decisions to the PO — MUST NOT. QA plans MUST NOT offload key decisions (paths, ports, env vars) to the PO in prose. If a value cannot be hard-coded, the plan MUST either provide a discovery command to obtain it or delegate the derivation to a canon-named entrypoint or inline tool (see “No non-canonical QA scripts or wrappers” below), with an invocation that is itself concrete and copy/paste-ready.
-
-Clear separation from discovery — SHOULD. When discovery is required (for example, to locate a file, determine a port, or resolve a base URL), the plan SHOULD separate the discovery step(s) from the execution/verification step(s). Discovery outputs MUST be written to evidence files (for example, `selected_base_url.txt`) and then referenced by subsequent steps.
-
-No non-canonical QA scripts or wrappers — MUST NOT. Live QA plans MUST NOT depend on repo scripts that are not canon-named entrypoints. Acceptable patterns are:
-
-1. A canon-named entrypoint invoked by explicit path, or
-
-2. An inline tool whose full source is embedded in the plan step and written into the run-local QA tools directory (no hidden dependencies).
-
-When canon is silent on an entrypoint but requires an artifact surface, the plan SHOULD implement the artifact generation/validation directly using baseline commands (explicit shell/Python one-liners, direct invocation of canon tools, `tee` for logs, explicit file writes), rather than inventing a new repo script path.
-
-No non-canonical env pins — MUST NOT. Live QA plans MUST NOT introduce additional “required pins” beyond the canonical determinism pins and rails posture. In particular, plans MUST NOT require `PYTHONHASHSEED` as a rail/pin. Determinism must be achieved by explicit ordering and canonical serialization; if output is nondeterministic due to unordered iteration or unstable ordering, treat it as a code or harness defect to fix, not a QA-plan knob to enforce.
-
-These rules make QA plans executable without guesswork, align them with Codespaces as the default operator environment, and prevent plans from smuggling non-canonical dependencies (scripts or env pins) into “required” execution posture.
+* If evidence is generated, specify `audit/qa/<epic-id>/<run>/` and list exact files created.
 
 ### **12.4 QA runbooks & evidence documentation (Live QA)**
 
@@ -419,31 +409,19 @@ These are documentation rules only. They do not redefine token ownership or evid
 
 ### **12.5 Live QA plan approval reviews (BLOCKERS vs CAVEATS)**
 
-When reviewing a Live QA plan for approval, findings MUST be separated into two lists:
+For any review / approval step in Live QA plans:
 
-* **BLOCKERS** (`BLK-01`, `BLK-02`, …): issues that prevent the operator from executing the plan as written in Codespaces **or** prevent reviewers from determining PASS/FAIL for the in-scope feature behavior with confidence.  
-   Examples: missing required PO inputs (base URL/auth); commands not runnable or not copy/paste-ready; evidence capture paths not specified; PASS/FAIL criteria not defined in terms of evidence files; plan depends on manual-fill placeholders; plan matrix references step IDs that have no corresponding executable step definition; plan requires production code changes.
+* **BLOCKERS** (`BLK-01`, `BLK-02`, \[LIST CONTINUES\]): any item that prevents execution of the plan or invalidates the run.
 
-* **CAVEATS** (`CAV-01`, `CAV-02`, …): everything else. Any issue that does not block execution or verification MUST be recorded as a CAVEAT, not a Blocker.  
-   Examples: incomplete token rosters; token registry mismatch that does not affect test interpretation; documentation drift that can be captured via doc-delta; formatting imperfections that do not obstruct execution; requests for additional “failure choreography” or extra enforcement beyond what is required for execution and file-based PASS/FAIL.
-
-Review outcome rule:
-
-* If and only if BLOCKERS exist → plan is rejected for revision.
-
-* If no BLOCKERS exist → plan is approved even if CAVEATS exist.
-
-No excerpt-based blockers — MUST. A reviewer MUST NOT assert a token/rails/bytes mismatch as a Blocker unless they have retrieved the governing canonical passages for both sides of the claim (see §3, Review source-retrieval guard).
+* **CAVEATS** (`CAV-01`, `CAV-02`, \[LIST CONTINUES\]): risks, uncertainties, assumptions, or optional improvements that do not block execution.
 
 ### **12.6 Tokens in Live QA plans (load reduction \+ registry validity)**
 
-Token handling SHOULD be reduced by default in Live QA plans. Plans SHOULD map steps to in-scope surfaces/flows and D-goals and define evidence capture and pass/fail criteria. Plans MAY omit a full token roster and MAY omit per-step token claims unless a token is required to interpret pass/fail for a specific check.
+* Keep token usage minimal in Live QA plans. Prefer evidence artifacts \+ explicit checks over token proliferation.
 
-If tokens are listed or claimed for acceptance:
+* If a token string is referenced in a consumer doc but is absent from the Governance & Process Handbook token registry, it MUST NOT be claimed as a requirement. Record CAVEAT: `UNREGISTERED_TOKEN` and treat as doc drift until drained.
 
-* Token names MUST be exact matches to the Governance & Process Handbook token registry. Do not introduce aliases, synonyms, or near-matches.
-
-* If an epic roster or QA doc references a token name that is absent from the registry, record a CAVEAT: `UNREGISTERED_TOKEN` and do not claim that token as satisfied until it is registered. Do not invent substitute token names.
+* Legacy alias exception (temporary; do not mint a new token): `QA_STEP_LOGS_CONSOLIDATED_OK` is treated as a deprecated doc-only alias for `QA_HARNESS_DISCIPLINE_OK`. Acceptance artifacts MUST claim `QA_HARNESS_DISCIPLINE_OK` and MUST NOT claim `QA_STEP_LOGS_CONSOLIDATED_OK`. If the alias appears in PF text, interpret it as `QA_HARNESS_DISCIPLINE_OK`, normalize to the registry spelling in acceptance artifacts, and record the normalization as a doc delta.
 
 ### **12.7 Repo reality execution posture (DOC\_DRIFT capture)**
 
@@ -502,30 +480,47 @@ These rules do not change how sampler/core or other tests are written; they set 
 
 ## **15\) Templates**
 
-### **15.1 Standard PF header**
+### **`15.1 Standard PF header`**
 
-Title:  
- Version: vX.Y.Z  
- Status: \<Final | Approved | Review | Living\>  
- Effective date:  
- Last Update Gate: \<Epic/Decision ID\>  
- Invocation tag: \<INV-…\>
+`Title:`  
+ `Version: vX.Y.Z`  
+ `Status: <Final | Approved | Review | Living>`  
+ `Effective date:`  
+ `Last Update Gate: <Epic/Decision ID>`  
+ `Invocation tag: <INV_TAG>`
 
-**Provenance (machine-checkable)**  
- `{"author":"","sources":"","invocation_tag":"<INV-…>"}`
+**`Provenance (machine-checkable)`**  
+ `{"author":"","sources":"","invocation_tag":"<INV_TAG>"}`
 
 ---
 
 ### **15.2 Redline block**
 
-Place: § → \<relative anchor, e.g., after “Binary markers …”\>  
- Operation: `ADD` | `REPLACE` | `DELETE` \<§ or heading\>
+**Always** redline with:
 
-Text: *(Paste-ready; include the target section’s headings in Markdown `#`/`##`; one blank line after headings; no code fences unless requested.)*
+* Change type: NEW CANON / CANON UPDATE / CLARIFICATION / CONSISTENCY / DOC HYGIENE / DELETION
 
-**Note:** For contiguous-range edits, include the **entire** revised range (all sub-sections), preserving order and anchors.
+* Evidence basis: cite the source blob
 
-Acceptance impact: \<TOKENS\_ADDED | TOKENS\_CHANGED | TOKENS\_REMOVED\>
+* Placement: section anchor \+ operation \+ text to paste
+
+**Example redline block**
+
+Redline N —  
+ Change type: CLARIFICATION  
+ Reason: clarify placement mechanics
+
+Placement:  
+ Doc: PFxx  
+ Section anchor: “\<exact line from PFxx\>”  
+ Operation: INSERT AFTER “\<exact line\>”
+
+Text to paste:  
+ (paste verbatim)
+
+**Example anchor**
+
+Use: “after `Binary markers`” not “after the binary markers section”.
 
 ---
 
@@ -565,31 +560,29 @@ Final status marker: `PENDING` → `PASS` | `FAIL` | `FAIL_TOOLING` (recorded in
 
 ### **15.5 OPS task record template (PO-only; IA-guided; not PR work)**
 
-Use this record whenever a plan, remediation guide, or epic execution includes an OPS task (any step requiring privileged access outside the repo).
+**OPS task record:**
 
-Task ID: \<stable ID\>  
- Owner: PO  
- Facilitator: IA  
- Target system/service (name only): \<no secrets\>  
- Intent / desired end state: \<what changes; what “done” looks like\>  
- Constraints / safety rails: \<what must remain true while executing\>  
- Success criteria: \<observable outcomes\>  
- Evidence to capture (minimum): exact commands actually run (verbatim) \+ stdout \+ stderr \+ exit code \+ produced artifacts \+ verification outputs for any integrity claims (for example, checksum validation output)  
- Evidence storage path (lowercase): `audit/ops/<epic-id>/...` or `audit/qa/<epic-id>/...`  
- Rollback intent: \<what “revert” means at a high level\>  
- Secret handling note: no plaintext secrets in docs or evidence (presence-only/redacted/hashed allowed)
+* Task title:
 
-Rules (normative):
+* Owner:
 
-* OPS tasks MUST be executed by the PO only; agents MUST NOT claim execution or completion.
+* Date:
 
-* OPS tasks MUST NOT be represented as implementable PR work.
+* Scope:
 
-* Command transcript required — MUST. OPS evidence MUST include the exact commands run (verbatim) and their stdout/stderr and exit status, captured as repo-stored artifacts under the declared evidence storage path.
+* Preconditions:
 
-* No asserted verification — MUST. If the OPS record includes any “OK” integrity claim (for example, checksum verified), the proving command output line(s) MUST be captured as evidence and referenced by path.
+* Procedure:
 
-* Evidence MUST be sufficient to verify the intended state and MUST be secret-free.
+* Evidence to capture:
+
+* Evidence storage path:
+
+  * `audit/ops/<epic-id>/<relative_path>/` or `audit/qa/<epic-id>/<relative_path>/`
+
+* Rollback plan:
+
+* Completion criteria:
 
 ---
 
@@ -628,33 +621,23 @@ PF23 Anchors
 
 ### **15.8 Evidence inventory reviewed \+ Observed Evidence Snapshot (non-PF portability)**
 
-Use these blocks when a plan or guide reviewed non-PF inputs.
+Use this template when you need to record evidence review in non-PF docs without copying full evidence logs.
 
-Evidence inventory reviewed (non-PF)  
- Label: provenance only; not required to execute
+Evidence inventory reviewed: YES/NO
 
-* \<name of non-PF input\> — \<why it was reviewed\>
+Observed Evidence Snapshot:
 
-* \<name of non-PF input\> — \<why it was reviewed\>
+* Claim: \<what you observed\>
 
-Observed Evidence Snapshot (non-PF)  
- Embed any non-PF fact required to execute downstream steps as a short quote or precise paraphrase. Do not require the executor to open external files to find the fact.
+* Source: \<repo file path\>
 
-* Observation: \<exact string/status/shape\>
+* Capture path (lowercase, includes filename): \<CAPTURE\_PATH\> (for example, `audit/qa/<epic-id>/<run>/<file>.txt`)
 
-* Context: \<where it was observed\>
+* Verification step: \<command or check used\>
 
-* Decision rule: \<how this observation changes actions\>
+* Result: PASS/FAIL/UNKNOWN
 
-* Capture path (lowercase, includes filename): \<audit/qa/.../file.txt\>
-
-Excerpt hygiene (normative):
-
-* No terminal control sequences — MUST. If an observation includes terminal output or a log excerpt copied from a terminal, it MUST be plain text and free of terminal control sequences (ANSI escapes, OSC codes). Prefer capturing the underlying file bytes directly rather than copying terminal-rendered output.
-
-* Verification outputs must be embedded — MUST. If a decision rule relies on a verification claim (for example, a checksum match or a schema validation pass), embed the exact command and the exact output line(s) that substantiate the claim, and capture that verification output under the declared capture path.
-
-Artifact Map labeling rule (normative): If an Artifact Map (or equivalent) is included, it MUST explicitly label non-PF inputs as “provenance only; not required to execute” or it becomes an execution dependency (portability blocker).
+* Notes: \<brief\>
 
 ---
 
@@ -678,13 +661,29 @@ Evidence index mirror (machine-readable):
 
 * `artifacts/evidence_index.jsonl.path_proof.txt`
 
+* `artifacts/evidence_index.jsonl.sha256`
+
+* `artifacts/evidence_index.jsonl.sha256.path_proof.txt`
+
+Evidence Index snapshot (D23) artifacts (QA closure proof; tokenless):
+
+* Snapshot JSON: `audit/gates/evidence_index_snapshot/evidence_index_snapshot.json`
+
+* Snapshot path-proof transcript: `audit/gates/evidence_index_snapshot/evidence_index_snapshot.json.path_proof.txt`
+
 Rules (normative):
 
 * If a task edits any index/mirror file, the sibling `.path_proof.txt` update is part of the same task’s outputs and embedded verification.
 
+* Governed path-proof transcript suffix is `.path_proof.txt` and the transcript is a sibling of the governed artifact. `.path_proof.json` is non-canonical and MUST NOT be used.
+
+* Machine Evidence Index mirror home is `artifacts/evidence_index.jsonl`. Any other mirror path strings (including `artifacts/evidence/machine_mirror.json` or any `docs/evidence/` path that includes `machine_mirror` in its filename) are non-canonical and must be treated as doc drift until drained.
+
+* D23 is a mechanical PASS or FAIL contract. It MUST NOT be represented as an acceptance token claim. When documenting D23 statuses, use Glow QA Guide status vocabulary for tool gating (for example: missing canonical inputs is `TOOLING_BLOCKED`; evaluated predicate fails is `FAIL_BEHAVIOR`).
+
 * If a plan proposes a new file under governed surfaces, it MUST state whether the file is intended to appear in the indices/mirror; absence of that statement is a mechanical blocker.
 
-* Remediation-only diagnostics/manifests MUST NOT be introduced under governed artifact surfaces unless explicitly framed as an ADR-worthy governance change; default is remediation audit paths (for example, `audit/qa/.../remediation/...`) and not indexed.
+* Remediation-only diagnostics/manifests MUST NOT be introduced under governed artifact surfaces unless explicitly framed as an ADR-worthy governance change; default is remediation audit paths (for example, `audit/qa/<epic-id>/<run>/remediation/<relative_path>`) and not indexed.
 
 ---
 
@@ -740,85 +739,86 @@ Token emission gating (normative):
 * Evidence coupling is required: emitted tokens, captured headers, captured body, and any digest MUST refer to the same resolved target/response chain. If coupling cannot be established, the run fails and MUST NOT emit `*_OK` tokens.
 
 
----
-
 ### **15.11 Remediation Task Plan template (DEV PRs \+ OPS tasks)**
 
-Use this template for remediation task plans submitted for approval. It is distinct from the stepwise Remediation Implementation Guide format.
+Use this template for remediation tasks during epics.
 
-Approval gate scope (tight): Plan approval MUST focus on: correct task model (OPS vs DEV; DISCOVERY vs CHANGE; no mixed tasks), correct sequencing and explicit cross-lane dependencies, concrete deliverables (lowercase paths \+ filenames), and concrete verification success criteria (what “done” means). Detailed command lines and step-by-step failure handling are not required as approval blockers, but evidence posture remains non-negotiable.
+Task summary:
 
-Required sections (minimum):
+* Goal:
 
-1. Overview  
-    Intent:  
-    Constraints / safety rails:  
-    Verification definition (what “done” means):
+* Scope:
 
-2. PF23 Anchors  
-    (Use §15.7)
+* Out of scope:
 
-3. Tasks (only two types; enumerated)  
-    DEV tasks — PRs only: `PR-01`, `PR-02`, …  
-    OPS tasks — PO-run procedures only: `OPS-01`, `OPS-02`, …
+* Risk level:
 
-Each task MUST include:
+Task list:
 
-* Task ID: `PR-01` or `OPS-01`
+DEV tasks — PRs only: `PR-01`, `PR-02`, \[LIST CONTINUES\]  
+ OPS tasks — PO-run procedures only: `OPS-01`, `OPS-02`, \[LIST CONTINUES\]
 
-* Task type: DEV or OPS
+For each task:
 
-* Task intent: DISCOVERY or CHANGE
+* Task ID: \<PR-01 | PR-02 | \[LIST CONTINUES\] | OPS-01 | OPS-02 | \[LIST CONTINUES\]\>
 
-* Owner: Codex (for PR) or PO (for OPS)
+* Owner:
 
-* Inputs (concrete):
+* Steps:
 
-* Outputs / Deliverables (concrete lowercase file paths including filename; not directories):
+* Evidence to capture:
 
-* Embedded verification (must produce evidence at declared paths):
+* Acceptance tokens impacted (if any; must be registry-valid):
 
-DEV task rule (normative): Each `PR-xx` task MUST embed a paste-ready Codex Prompt inside the task. A PR task missing its Codex Prompt is a mechanical blocker.
+Outputs / Deliverables:
 
-OPS task rule (normative): OPS tasks are PO-only execution. Exact command selection and failure-handling MAY be developed in flight during execution, but OPS execution MUST still capture and store, under a lowercase audit path with explicit filenames: (a) exact commands actually run (verbatim), (b) stdout/stderr \+ exit code (or equivalent output), (c) produced artifacts at the declared output paths, and (d) deviation notes explaining any change in command/flag. Evidence MUST be secret-free (presence-only/redacted/hashed allowed).
+* PR links (if any):
 
-Cross-lane dependency line (locked; task-level): If a task depends on outputs from a prior task in the other lane, the dependent task MUST include exactly one dependency line in this exact form (omit if not needed):  
- Inputs needed from Task \<ID\> during implementation: \<exact items\>  
- Placeholders in this line are a mechanical blocker.
+* Files created:
 
-4. Evidence portability blocks (non-PF)  
-    (Use §15.8 if any non-PF inputs were reviewed or any non-PF fact is required for execution.)
+* Evidence paths:
 
-5. Governed index/mirror touchpoints (only if applicable)  
-    If any task touches governed evidence indices/mirrors, include the exact filenames list and sibling path-proof rule (use §15.9) as task outputs and embedded verification checks.
+* Notes:
 
-6. /internal/version proof checklist (only if applicable)  
-    If any task produces governed /internal/version evidence, include the explicit checklist (use §15.10) inside the relevant task’s embedded verification.
+* If an acceptance map is produced or updated, bind it to `docs/acceptance_map_epic<NNN>.json` with a sibling `docs/acceptance_map_epic<NNN>.json.path_proof.txt` (example: EPIC024 → `docs/acceptance_map_epic024.json`).
+
+Governed index/mirror touchpoints:
+
+* Evidence Index updated? YES/NO
+
+* Machine mirror updated? YES/NO
+
+* Path proof updated? YES/NO
+
+Close-out checklist:
+
+* Preconditions satisfied:
+
+* Evidence captured:
+
+* Acceptance updated:
+
+* Review complete:
+
+---
+
+## 
 
 ## **Appendix A — Full Document Assessment Protocol (Technical Writing)**
 
 ### **Policy (normative)**
 
-Full-document requirement — MUST. Obtain and read the complete source before editing. If only a fragment is available, pause and request the full doc; proceed in partial mode only with explicit PO approval and label outputs as Partial.
+1. Never alter document control fields, title, version, status, effective date, or update gate. If drift exists, report it, but do not redline it.
 
-**Heading numbering stability — MUST.** Existing H1/H2 numbering is immutable. New content SHOULD be added as H3/H4 within an existing H2 whenever possible. If a new H1/H2 is truly required, it MAY be added, but it MUST take the next available number and MUST NOT alter any existing numbering.
+2. Use “placement anchors” copied verbatim from the target PF doc, not the source blob.
 
-Practical guardrails (optional):
+3. If any relied-on passage appears truncated or incomplete, stop and re-open until complete.
 
-* Prefer H3/H4 for in-between additions (for example, add `### 12.4` under `## 12 …`) so you do not need new H2s.
+4. Prefer H3/H4 for in-between additions (for example, add `### 12.4` under `## 12 <SECTION_TITLE>`) so you do not need new H2s.
 
-* Never reuse an existing number for a different section.
+5. Never renumber headings.
 
-* If you add a new H1/H2, update any structure map or cross-reference lists so they include the new number, but do not change old ones.
-
-Titles-only cross-references — MUST. Use stable document titles only; do not include version numbers in cross-doc prose. Section names are allowed.
-
-No duplicated bytes — MUST. Do not copy architecture, transport, headers, or schema bytes across docs; route by title to the single home.
-
-Style and naming hygiene — SHOULD. Plain English; avoid em dashes; keep heading formatting consistent; always spell the brand as Glow; use RFC 2119 terms carefully.
-
-Evidence discipline — MUST. Provide acceptance evidence and maintain parity between the human Evidence Index and the machine JSONL mirror in the same PR.
-
+6. If a change is too large, propose it as a bounded task plan with stepwise acceptance.  
 ---
 
 ### **Workflow**
