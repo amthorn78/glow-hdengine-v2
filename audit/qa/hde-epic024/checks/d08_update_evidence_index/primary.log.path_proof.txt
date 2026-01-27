@@ -1,4 +1,4 @@
-path: audit/qa/hde-epic024/checks/d08_update_evidence_index/primary.log
+path: audit/qa/hde-epic024/checks/D08_update_evidence_index/primary.log
 size_bytes: 518
 sha256: bd244360565b54967cf06495b99f8c76ae81a4379ee2fc576b9676c9cce52848
 mtime_utc: 2026-01-22T10:38:25Z

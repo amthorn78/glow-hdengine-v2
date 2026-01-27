@@ -1,4 +1,4 @@
-path: audit/qa/hde-epic024/checks/d11_check_mirror_schema/primary.log
+path: audit/qa/hde-epic024/checks/D11_check_mirror_schema/primary.log
 size_bytes: 754
 sha256: e354b30958d38db9b88f605d3def702ae155892b7b7e6794bb31e769ce7f1db5
 mtime_utc: 2026-01-22T10:38:25Z

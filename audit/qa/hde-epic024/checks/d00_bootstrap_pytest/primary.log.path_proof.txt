@@ -1,4 +1,4 @@
-path: audit/qa/hde-epic024/checks/d00_bootstrap_pytest/primary.log
+path: audit/qa/hde-epic024/checks/D00_bootstrap_pytest/primary.log
 size_bytes: 381
 sha256: db836003941b23f7cc814fee499310c2f31138e6903c23312af0382bb9230cd9
 mtime_utc: 2026-01-22T10:38:25Z

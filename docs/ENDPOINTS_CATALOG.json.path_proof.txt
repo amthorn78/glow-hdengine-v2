@@ -1,0 +1,5 @@
+path: docs/ENDPOINTS_CATALOG.json
+size_bytes: 594
+sha256: 7457e33dfb23ca178af0295920df95b0c17543b0b8ad99ae0be5713dcd0d5f9d
+mtime_utc: 2026-01-27T17:32:34Z
+produced_at_utc: 2026-01-27T17:32:58Z
