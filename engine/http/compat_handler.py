@@ -82,25 +82,6 @@ def get_ids_only():
     if request.data:  # reject GET with body
         env = error_envelope("invalid_json")
         return _writer_payload(env, status=400)
-    a_id = request.args.get("a_id")
-    b_id = request.args.get("b_id")
-    if a_id and b_id:
-        a = _resolve_person_by_id(a_id)
-        b = _resolve_person_by_id(b_id)
-        from engine.compat.categories import CATEGORIES_ORDER_V1
-        weights = {k: 50 for k in CATEGORIES_ORDER_V1}
-        body = compat_public(
-            a,
-            b,
-            CATEGORIES_ORDER_V1[0],
-            weights,
-            engine_tag="dev",
-            release_id="dev",
-            invocation_tag="INV-DEV",
-        )
-        body = dict(body)
-        body["keys"] = _collect_keys_list(body)
-        return _writer_payload(body, status=200)
     body = {"ok": True, "schema": "v1"}
     return _writer_payload(body, status=200)
 
