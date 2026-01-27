@@ -1,4 +1,5 @@
 from __future__ import annotations
+import os
 from typing import Dict, Any
 from flask import Blueprint, request, Response
 from engine.presenter import emit_public
@@ -87,15 +88,22 @@ def get_ids_only():
 
 @compat_blueprint.route("", methods=["POST"], provide_automatic_options=False)
 def post_json():
+    if (os.environ.get("APP_ENV") or "").lower() == "prod":
+        env = error_envelope("ERR_NOT_FOUND")
+        return _writer_payload(env, status=404)
     data = request.get_json(silent=True) or {}
     a, b = data.get("a"), data.get("b")
     a_id, b_id = data.get("a_id"), data.get("b_id")
     # Reject mixing id+payload per party
-    if (a and a_id) or (b and b_id):
+    if (a and a_id) or (b and b_id) or ((a_id or b_id) and (a or b)):
         env = error_envelope("invalid_json")
         return _writer_payload(env, status=400)
-    if a_id: a = _resolve_person_by_id(a_id)
-    if b_id: b = _resolve_person_by_id(b_id)
+    if a_id or b_id:
+        if not isinstance(a_id, str) or not isinstance(b_id, str):
+            env = error_envelope("invalid_json")
+            return _writer_payload(env, status=400)
+        a = _resolve_person_by_id(a_id)
+        b = _resolve_person_by_id(b_id)
     if not isinstance(a, dict) or not isinstance(b, dict) or "person_uid" not in a or "person_uid" not in b:
         env = error_envelope("invalid_json")
         return _writer_payload(env, status=400)
