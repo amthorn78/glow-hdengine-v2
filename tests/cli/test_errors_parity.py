@@ -51,9 +51,7 @@ def test_parity_scenarios_are_bound():
         "vendor_attempt_closed_rails",
     ]
 
-
-@pytest.mark.parametrize("scenario", SCENARIOS)
-def test_http_and_cli_parity(monkeypatch, scenario):
+def _assert_http_and_cli_parity(scenario):
     stored_http = json.loads(
         Path(f"parity/errors_reader_cli.{scenario.name}.http.json").read_text(encoding="utf-8")
     )
@@ -72,6 +70,16 @@ def test_http_and_cli_parity(monkeypatch, scenario):
     assert cli_result["stdout"] == ""
     assert scenario.stderr_expectation in cli_result["stderr"]
     assert cli_result == stored_cli
+
+
+@pytest.mark.parametrize("scenario", SCENARIOS)
+def test_http_and_cli_parity(monkeypatch, scenario):
+    _assert_http_and_cli_parity(scenario)
+
+
+def test_known_errors_parity(monkeypatch):
+    for scenario in SCENARIOS:
+        _assert_http_and_cli_parity(scenario)
 
 
 def test_token_map_snapshot_matches_canonical():
