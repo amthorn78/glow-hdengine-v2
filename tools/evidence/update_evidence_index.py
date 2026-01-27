@@ -289,6 +289,16 @@ def _normalize_index_entry(entry: Mapping[str, object]) -> dict[str, object]:
     if not isinstance(key, str) or not isinstance(path, str):
         raise ValueError(f"Invalid entry: {entry!r}")
 
+    if "audit/qa/hde-epic024/checks/" in path:
+        parts = path.split("/")
+        normalized_parts = []
+        for part in parts:
+            if part.startswith("D") and len(part) > 1 and part[1].isdigit():
+                normalized_parts.append(part.lower())
+            else:
+                normalized_parts.append(part)
+        path = "/".join(normalized_parts)
+
     normalized: dict[str, object] = {
         "artifact_key": key,
         "discovered_physical_path": path,
