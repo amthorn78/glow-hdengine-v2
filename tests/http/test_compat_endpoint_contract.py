@@ -64,3 +64,27 @@ def test_compat_post_contract_and_catalog_entry():
     assert entry.get("a7_eligible") is False
     assert isinstance(entry.get("env_gate"), str)
     assert entry.get("env_gate")
+
+
+def test_compat_get_probe_only_ignores_ids():
+    client = _client()
+    resp = client.get("/api/compat/v1?a_id=alice&b_id=bob")
+
+    assert resp.status_code == 200
+    payload = json.loads(resp.data.decode("utf-8"))
+    assert payload == {"ok": True, "schema": "v1"}
+    assert "categories" not in payload
+    assert "keys" not in payload
+
+
+def test_compat_get_rejects_body():
+    client = _client()
+    resp = client.get(
+        "/api/compat/v1",
+        data=json.dumps(_payload(), sort_keys=True),
+        headers={"Content-Type": "application/json; charset=utf-8"},
+    )
+
+    assert resp.status_code == 400
+    payload = json.loads(resp.data.decode("utf-8"))
+    assert payload.get("ok") is False
