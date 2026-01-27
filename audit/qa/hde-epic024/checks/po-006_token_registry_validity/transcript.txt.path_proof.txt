@@ -1,5 +1,5 @@
 path: audit/qa/hde-epic024/checks/po-006_token_registry_validity/transcript.txt
 size_bytes: 326
 sha256: a19cb802812ad96426ee59e8cb6f3bb1c0adb547619f6753fc782d97cd488d28
-mtime_utc: 2026-01-22T10:38:25Z
-produced_at_utc: 2026-01-22T15:13:46Z
+mtime_utc: 2026-01-27T18:55:15Z
+produced_at_utc: 2026-01-27T18:57:32Z
