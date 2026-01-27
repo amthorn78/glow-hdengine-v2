@@ -137,7 +137,11 @@ SCENARIOS: tuple[ParityScenario, ...] = (
     ParityScenario(
         name="invalid_json",
         token="ERR_COMPAT_INVALID_JSON",
-        http_call=lambda client: client.get("/api/compat/v1"),
+        http_call=lambda client: client.post(
+            "/api/compat/v1",
+            data=b"{bad",
+            headers={"Content-Type": "application/json; charset=utf-8"},
+        ),
         cli_args=lambda tmpdir: _cli_args_invalid_json(tmpdir),
         stderr_expectation="INVALID_JSON",
     ),

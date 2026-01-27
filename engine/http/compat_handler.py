@@ -51,6 +51,18 @@ def _writer_options_response() -> Response:
     return resp
 
 
+def _collect_keys_list(body: Dict[str, Any]) -> list[str]:
+    keys: list[str] = []
+    for cat in body.get("categories", []):
+        if not isinstance(cat, dict):
+            continue
+        for key_name in ("personal_key", "shared_key"):
+            value = cat.get(key_name)
+            if isinstance(value, str) and value and not value.isdigit():
+                keys.append(value)
+    return keys
+
+
 @compat_blueprint.before_app_request
 def _compat_writer_transport_guard():
     if request.path.rstrip("/") != "/api/compat/v1":
@@ -67,19 +79,10 @@ def _resolve_person_by_id(pid: str) -> Dict[str,Any]:
 
 @compat_blueprint.get("")
 def get_ids_only():
-    a_id = request.args.get("a_id"); b_id = request.args.get("b_id")
     if request.data:  # reject GET with body
         env = error_envelope("invalid_json")
         return _writer_payload(env, status=400)
-    if not a_id or not b_id:
-        env = error_envelope("invalid_json")
-        return _writer_payload(env, status=400)
-    a = _resolve_person_by_id(a_id); b = _resolve_person_by_id(b_id)
-    # viewer prefs defaults (equal weights)
-    from engine.compat.categories import CATEGORIES_ORDER_V1
-    w = {k:50 for k in CATEGORIES_ORDER_V1}
-    body = compat_public(a,b, CATEGORIES_ORDER_V1[0], w,
-                         engine_tag="dev", release_id="dev", invocation_tag="INV-DEV")
+    body = {"ok": True, "schema": "v1"}
     return _writer_payload(body, status=200)
 
 @compat_blueprint.route("", methods=["POST"], provide_automatic_options=False)
@@ -104,6 +107,8 @@ def post_json():
         a, b, vp["top_category"], vp["weights"],
         engine_tag="dev", release_id="dev", invocation_tag="INV-DEV",
     )
+    body = dict(body)
+    body["keys"] = _collect_keys_list(body)
     return _writer_payload(body, status=200)
 
 

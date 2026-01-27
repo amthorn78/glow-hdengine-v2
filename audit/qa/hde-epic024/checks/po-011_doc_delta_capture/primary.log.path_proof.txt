@@ -1,5 +1,5 @@
 path: audit/qa/hde-epic024/checks/po-011_doc_delta_capture/primary.log
 size_bytes: 516
 sha256: adc102acda135719fbdd5651da95b95e8e060e122b4c01164e40c1b3c376bdf0
-mtime_utc: 2026-01-22T10:38:25Z
-produced_at_utc: 2026-01-22T15:13:46Z
+mtime_utc: 2026-01-27T18:35:45Z
+produced_at_utc: 2026-01-27T18:36:32Z
