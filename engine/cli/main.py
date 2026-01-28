@@ -506,6 +506,14 @@ def _dump_reader_bytes(path: str, payload: bytes) -> None:
     target.write_bytes(payload)
 
 
+def _emit_stdout_bytes(payload: bytes) -> None:
+    if not payload.endswith(b"\n"):
+        raise CliError("STDOUT_MISSING_LF")
+    if b"\r\n" in payload:
+        raise CliError("STDOUT_CRLF")
+    sys.stdout.buffer.write(payload)
+
+
 def _emit_admin_dumps(
     args: argparse.Namespace,
     case_name: str,
@@ -724,7 +732,7 @@ def showcompat(_: argparse.Namespace) -> int:
         viewer_prefs["weights"],
     )
 
-    sys.stdout.buffer.write(compat_bytes)
+    _emit_stdout_bytes(compat_bytes)
     return 0
 
 
