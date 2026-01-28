@@ -1,0 +1,4 @@
+command: python tools/evidence/check_lf_endings.py
+status: 0
+output:
+

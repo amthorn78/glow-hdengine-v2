@@ -1,0 +1,6 @@
+command: python tools/evidence/run_canonical_json_gate.py
+status: 0
+outputs:
+audit/gates/json_gate/canonical/json_gate_check_log.ndjson
+audit/gates/json_gate/canonical/json_gate_compare_log.ndjson
+audit/gates/json_gate/canonical/json_gate_structured_record.json
