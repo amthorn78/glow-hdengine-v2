@@ -35,6 +35,7 @@ def _cli_env() -> dict[str, str]:
 
 def _assert_canonical_bytes(data: bytes) -> dict:
     assert data.endswith(b"\n") and b"\n\n" not in data
+    assert b"\r\n" not in data
     payload = json.loads(data)
     assert sercanon(payload) == data
     return payload
