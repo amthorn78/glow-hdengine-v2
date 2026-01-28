@@ -1,0 +1,5 @@
+path: artifacts/proofs/encoding_invariance.txt
+size_bytes: 189
+sha256: 7c44577d5bfd1d5d95c638be1b5730ed42eea7c06733d70dea7c866dfb6c6bf5
+mtime_utc: 2026-01-28T12:06:29Z
+produced_at_utc: 2026-01-05T05:39:56Z

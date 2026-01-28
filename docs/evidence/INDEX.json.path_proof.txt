@@ -1,5 +1,5 @@
 path: docs/evidence/INDEX.json
-size_bytes: 47415
-sha256: 52ff630cbbaaf178e3abf329a39885b302d18a946047f64ad51b3f33a0d9472d
+size_bytes: 48259
+sha256: 5766d38860fb70c0822355e7e0ff41281382142d11e63d1879262771abdd6855
 mtime_utc: 2026-01-05T05:37:16Z
 produced_at_utc: 2026-01-05T05:39:56Z
