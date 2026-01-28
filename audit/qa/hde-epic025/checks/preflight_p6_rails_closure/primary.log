@@ -1,0 +1,3 @@
+posture: closed_rails
+env_pins: ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC
+gates: run_canonical_json_gate, update_evidence_index, validate_evidence_paths, check_mirror_schema, check_lf_endings

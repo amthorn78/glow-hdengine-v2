@@ -1,0 +1,4 @@
+command: python tools/evidence/validate_evidence_paths.py
+status: 0
+output:
+
