@@ -1,0 +1,4 @@
+command: ci/checks/check_mirror_schema.sh
+status: 0
+output:
+

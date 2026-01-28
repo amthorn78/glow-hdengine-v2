@@ -1,0 +1,4 @@
+source: docs/ENDPOINTS_CATALOG.json
+/internal/version: found
+/api/compat/v1: found
+/reader: found
