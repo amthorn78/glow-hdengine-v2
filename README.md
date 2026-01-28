@@ -1,4 +1,4 @@
-# Glow HD Engine — EPIC024 documentation sweep
+# Glow HD Engine — EPIC025 documentation sweep
 
 The Glow HD Engine is a deterministic Human Design engine and CLI that emits governed, canonically serialized bytes. PF-Canon remains authoritative (titles only: PF05 — CLI/API/Vendor Ref, PF12 — Schemas & Artifacts, PF14 — Mechanics Guide, PF19 — QA Guide, PF20 — Phased Epics).
 
@@ -7,6 +7,12 @@ The Glow HD Engine is a deterministic Human Design engine and CLI that emits gov
 - Public Reader v1 and CLI share the canonical emitter and serializer; AB↔BA and two-run identity proofs cover public bytes.
 - Error responses use the canonical `error_v1` envelope with typed error tokens and JSON discipline under closed rails.
 - Evidence posture is governed: human Evidence Index under `docs/evidence/INDEX.json`, machine mirror under `artifacts/evidence_index.jsonl`, and `.path_proof.txt` siblings for governed artifacts.
+- What EPIC025 tightens:
+  - `/api/compat/v1` contract: GET is probe-only (no request body; fixed probe payload) and ignores ids; POST is the compat computation surface and enforces request-shape rules (reject mixed id+payload patterns) plus strict id validation against `UID_RE` (invalid IDs return `invalid_json` 400). In prod, `APP_ENV=prod` returns 404 with `ERR_NOT_FOUND`. Endpoint catalog entry is POST-only, `internal_admin`, `a7_eligible: false`, and `env_gate` is non-empty (`docs/ENDPOINTS_CATALOG.json` + `.sha256`).
+  - CLI `showcompat` is coupled to the canonical JSON emitter for deterministic serialization. Stdout must end with exactly one LF; CRLF is rejected with explicit error codes (`STDOUT_MISSING_LF`, `STDOUT_CRLF`).
+  - `/reader` A7 transport invariants are covered by `tests/http/test_reader_a7_transport.py` and can emit proof artifacts under `artifacts/proofs/` when `HDE_WRITE_A7_PROOFS=1` (success headers, 304/HEAD parity, encoding invariance, writer-error posture, and env-gate proof).
+  - Evidence index + mirror discipline now has a normalized QA evidence root for EPIC025: `audit/qa/hde-epic025/qa_step_logs_manifest.json` with per-check logs under `audit/qa/hde-epic025/checks/<check_id>/primary.log` covering preflight and gate checks.
+  - EPIC025 close-pack artifacts live at `audit/EPIC-025_MANIFEST.json`, `audit/EPIC-025_close_report.md`, and doc deltas at `audit/docdeltas/hde-epic025_doc_deltas.md`.
 - What EPIC022 tightened:
   - D1: error-envelope parity scenarios remain closed-rails first, with deterministic refusal coverage and env-pin gating for `db_unavailable` and `vendor_attempt_closed_rails` parity fixtures plus their validators.
   - D2: showcompat canonical stdout capture is generated deterministically with indexed artifacts and sha256 sidecars (stdout/args) and LF-discipline tests.
@@ -49,22 +55,22 @@ SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC hdctl aux-preview --pair-file
 - Use the determinism helper (`engine.runtime.determinism_env.ensure_determinism_env`) or `ci/checks/check_env_pins.sh` to confirm pins.
 - Release identity validation (closed rails): `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python scripts/release_id_recompute.py --check` (canonical bytes + fail-closed recompute), `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python ci/checks/check_release_identity.sh` (identity gate; Python entrypoint in CI), and `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/run_sanity_pipeline.py` (runs the gate plus deterministic suites). Evidence outputs: `artifacts/math/release_id.txt` (release_id), `artifacts/math/release_id_recompute.log` (recompute trace), `artifacts/math/checksums_audit.log` (manifest file audit), `artifacts/math/manifest_snapshot.json` (evidence-only summary), and `artifacts/proofs/env_pins.txt` (rails proof). `--check` writes the recompute log/sha sidecar; keep a clean workspace for governed artifacts.
 
-## Evidence & CI (EPIC024)
+## Evidence & QA (EPIC025)
 
 - Evidence skeleton (update in the same PR whenever governed bytes change): `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl` (+ `.path_proof.txt` siblings). Refresh with `python tools/evidence/update_evidence_index.py` → `python tools/evidence/orientation_demo.py` → their `--check` variants → `ci/checks/check_mirror_schema.sh`.
 - Canonical JSON gate (closed rails, enforced in CI): `python tools/evidence/run_canonical_json_gate.py` emits `audit/gates/json_gate/canonical/json_gate_check_log.ndjson`, `audit/gates/json_gate/canonical/json_gate_compare_log.ndjson`, and `audit/gates/json_gate/canonical/json_gate_structured_record.json` with co-located path proofs; CI runs this as “Run canonical JSON gate (closed rails)” in `.github/workflows/ci.yml`. The legacy catalog check report remains at `audit/gates/canonical_json/json_canonical_check.log`.
 - Evidence index snapshot gate (closed rails): `python tools/evidence/generate_evidence_index_snapshot.py` writes `audit/gates/evidence_index_snapshot/evidence_index_snapshot.json` plus `.path_proof.txt` (validator enforces RFC3339 UTC `generated_at_utc` and fails on non-object mirror JSONL lines). Validation coverage: `python -m pytest tests/evidence/test_evidence_index_snapshot.py`.
 - Arrays-as-sets proof (closed rails): `python tools/evidence/generate_arrays_as_sets_report.py` writes `artifacts/canonical/arrays_as_sets_report.log`, with proof coverage in `python -m pytest tests/compare/test_arrays_as_sets.py`.
-- EPIC024 acceptance + QA ledger: `docs/acceptance_map_epic024.json`, `audit/qa/hde-epic024/token_evidence_matrix.md`, `audit/qa/hde-epic024/acceptance_map_viability.log`, `audit/qa/hde-epic024/qa_step_logs_manifest.json`, and per-check logs under `audit/qa/hde-epic024/checks/<check_id>/primary.log`. Doc deltas live at `audit/docdeltas/hde-epic024_doc_deltas.md` and `audit/qa/hde-epic024/00_meta/doc_deltas.md`.
-- EPIC024 QA harness entrypoint: `python tools/qa/run_hde_epic024_harness.py` (viability gate status affects the harness exit status).
-- Close-pack (EPIC024): `audit/EPIC-024_MANIFEST.json`, `audit/EPIC-024_close_report.md`.
+- EPIC025 QA evidence root: `audit/qa/hde-epic025/qa_step_logs_manifest.json` with per-check logs under `audit/qa/hde-epic025/checks/<check_id>/primary.log`. Preflight checks include compat contract, endpoint catalog, CLI entrypoint, emitter coupling, `/reader` A7 transport invariants, and evidence index mirror; gate checks include canonical JSON, evidence index update, evidence paths validation, LF endings, and mirror schema.
+- Evidence path validation and LF endings gates: `python tools/evidence/validate_evidence_paths.py` and `python tools/evidence/check_lf_endings.py` (logs captured under the EPIC025 QA root).
+- EPIC025 close pack: `python tools/qa/generate_epic025_close_pack.py` writes `audit/EPIC-025_MANIFEST.json`, `audit/EPIC-025_close_report.md`, and `audit/docdeltas/hde-epic025_doc_deltas.md` with QA step manifest and path proofs already present under `audit/qa/hde-epic025/`.
 
 ## CLI usage (verified)
 
 - Entry point: `hdctl` (or `python -m engine.cli`).
 - Subcommands: `showcompat`, `aux-preview`, `bg:resolve`, and dev-only `dev:sampler` (APP_ENV=dev).
 - Exit codes: 0 on success; 64 for usage/validation/IO errors surfaced via `CliError`; showcompat vendor/engine failures return exit 1 as enforced by the CLI error-path tests; other non-zero codes are command-specific. PF05 (CLI/API/Vendor Ref) remains the canonical exit-code taxonomy; current vendor/engine numeric mapping is documented here until implementation aligns (known canon mismatch until PF05 alignment). Errors emit stderr-only JSON envelopes.
-- `showcompat` accepts `--pair-file`, `--a-file/--b-file` (aliases `--a/--b`), stdin, or birth arguments; success prints LF-terminated canonical compat payload to stdout (includes numeric scores/weights captured in EPIC022 D2). Errors print `error_v1` envelopes to stderr. Sidecars: `--dump-reader` (Reader v1 bytes via the presenter path), `--dump-admin-dir`.
+- `showcompat` accepts `--pair-file`, `--a-file/--b-file` (aliases `--a/--b`), stdin, or birth arguments; success prints LF-terminated canonical compat payload to stdout (includes numeric scores/weights captured in EPIC022 D2). Errors print `error_v1` envelopes to stderr. Stdout must end with exactly one LF; CRLF is rejected with error codes `STDOUT_MISSING_LF` and `STDOUT_CRLF`. Sidecars: `--dump-reader` (Reader v1 bytes via the presenter path), `--dump-admin-dir`.
 - Deterministic artifact generator: `python tools/cli/generate_showcompat_artifacts.py` captures `artifacts/cli/showcompat/stdout.json`, `artifacts/cli/showcompat/stdout.json.sha256`, and `artifacts/cli/showcompat/args.json` under closed rails.
 - `aux-preview` previews Aux narrative ids/text for compat tuples using the sealed narrative pack.
 - `bg:resolve` is a Phase S8a stub for BodyGraph resolution with `--source {db,vendor,auto}` under closed rails.
@@ -86,6 +92,8 @@ SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC hdctl aux-preview --pair-file
 
 - Showcompat canonical bytes and LF discipline: `tests/cli/test_cli_canonical_bytes.py::test_showcompat_stdout_is_canonical`.
 - Stream discipline (stdout-only success; stderr-only failures): `tests/cli/test_cli_usage_and_errors.py`.
+- Compat endpoint contract + catalog tests: `tests/http/test_compat_endpoint_contract.py`, `tests/http/test_endpoint_catalog.py`.
+- Reader A7 transport invariants: `tests/http/test_reader_a7_transport.py`.
 - EPIC024 bootstrap classification: `tests/qa/test_epic024_bootstrap_status.py` (missing pytest → FAIL_TOOLING, nonzero test failures → FAIL_BEHAVIOR).
 - Evidence index snapshot validation: `tests/evidence/test_evidence_index_snapshot.py` (RFC3339 UTC validation and mirror JSONL parsing behavior).
 - Arrays-as-sets proof: `tests/compare/test_arrays_as_sets.py`.
