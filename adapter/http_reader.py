@@ -347,7 +347,8 @@ def get_reader_bp(emit_fn=None):
             resp.headers["ETag"] = etag
             _set_reader_200_headers(resp)
             resp.headers.pop("Content-Type", None)
-            resp.headers["Content-Length"] = "0"
+            resp.headers.pop("Content-Length", None)
+            resp.automatically_set_content_length = False
             return resp, 304
 
         # HEAD parity
@@ -355,13 +356,14 @@ def get_reader_bp(emit_fn=None):
             resp = Response(b"", status=200)
             resp.headers["ETag"] = etag
             _set_reader_200_headers(resp)
-            resp.content_length = len(body)
+            resp.headers["Content-Length"] = str(len(body))
             return resp, 200
 
         # 200 OK
         resp = Response(body, status=200)
         resp.headers["ETag"] = etag
         _set_reader_200_headers(resp)
+        resp.headers["Content-Length"] = str(len(body))
         return resp, 200
 
     @bp.get("/api/aux/narrative")
