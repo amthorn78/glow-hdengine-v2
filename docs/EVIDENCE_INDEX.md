@@ -17,6 +17,7 @@
 * 304 posture: `artifacts/proofs/success_304.txt`
 * Writer/error posture: `artifacts/proofs/success_writers_errors.txt`
 * Encoding invariance: `artifacts/proofs/encoding_invariance.txt`
+* Proof generator: `tests/http/test_reader_a7_transport.py` (set `HDE_WRITE_A7_PROOFS=1` to emit artifacts under `artifacts/proofs/`).
 
 ## CLI showcompat capture + guards
 * Showcompat stdout bytes: `artifacts/cli/showcompat/stdout.json`
