@@ -10,7 +10,7 @@
 - `HTTP_HEAD_CL_AND_CT_OK` — HEAD includes Content-Type; **no body**; `Content-Length == len(identity bytes)`; validators equal 200.
 - `HTTP_ERRORS_NOSTORE_NOETAG_OK` — Errors/writers are JSON, **no-store**, **no ETag**.
 - `HTTP_POST_METHOD_POSTURE_OK` — Reader POST ⇒ 405 typed JSON (`no-store`, no ETag); Compat POST ⇒ 200 non-conditional.
-- `COMPAT_GET_BODY_400_OK` — Compat GET with body ⇒ 400 typed `{"error":"body_not_allowed"}`, `no-store`, no ETag.
+- `COMPAT_GET_BODY_400_OK` — Compat GET with body ⇒ 400 typed `invalid_json`, `no-store`, no ETag (GET remains probe-only with a fixed payload).
 
 ## Evidence shape
 Header goldens are canonical JSON: **lowercased keys**, sorted, compact, **exactly one trailing LF**.

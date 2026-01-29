@@ -1,4 +1,4 @@
-# CLI commands — Compat v1 and dev/admin harnesses (post-EPIC022)
+# CLI commands — Compat v1 and dev/admin harnesses (post-EPIC025)
 
 The CLI shares the canonical presenter/emitter and serializer with the Reader harness. Run public commands under closed rails (`LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0`), enforced by `engine.runtime.determinism_env.ensure_determinism_env`.
 
@@ -11,7 +11,7 @@ The CLI shares the canonical presenter/emitter and serializer with the Reader ha
 - Dev-only sampler CLI (APP_ENV=dev, QA only): `hdctl dev:sampler --viewer <viewer_id> --candidates-file <candidates.json> [--seed <seed>]`
 - Flags for QA sidecars: `--dump-reader <out.json> --dump-admin-dir <dir>`
 
-Exit codes: 0 success; 64 for usage/validation/IO errors surfaced via `CliError`; showcompat vendor/engine failures return exit 1 as enforced by the CLI error-path tests; other non-zero codes are command-specific. PF05 (CLI/API/Vendor Ref) is the canonical home for the exit-code taxonomy; the current vendor/engine mapping is documented here until implementation aligns (known mismatch until PF05 parity). Success bytes are LF-terminated canonical JSON printed to stdout. Showcompat stdout is the canonical emitter output for the compat payload (AB↔BA identity, two-run identity, preimage recompute preserved) and may include numeric scores/weights as captured in the EPIC022 D2 evidence. Reader v1 bytes are emitted via `--dump-reader` sidecar files and align with the Reader harness. Error envelopes use `error_v1` with typed tokens, are numeric-free, and are printed to stderr only (LF-terminated JSON). Aux preview emits ids-only JSON unless `--show-narrative` is set.
+Exit codes: 0 success; 64 for usage/validation/IO errors surfaced via `CliError`; showcompat vendor/engine failures return exit 1 as enforced by the CLI error-path tests; other non-zero codes are command-specific. PF05 (CLI/API/Vendor Ref) is the canonical home for the exit-code taxonomy; the current vendor/engine mapping is documented here until implementation aligns (known mismatch until PF05 parity). Success bytes are LF-terminated canonical JSON printed to stdout; stdout must end with exactly one LF and CRLF is rejected with `STDOUT_MISSING_LF` / `STDOUT_CRLF`. Showcompat stdout is the canonical emitter output for the compat payload (AB↔BA identity, two-run identity, preimage recompute preserved) and may include numeric scores/weights as captured in the EPIC022 D2 evidence. Reader v1 bytes are emitted via `--dump-reader` sidecar files and align with the Reader harness. Error envelopes use `error_v1` with typed tokens, are numeric-free, and are printed to stderr only (LF-terminated JSON). Aux preview emits ids-only JSON unless `--show-narrative` is set.
 
 ## Guards
 - Serializer grep guard: `python tools/cli/serializer_grep_guard.py` → `artifacts/cli/guards/serializer_grep_guard.log`

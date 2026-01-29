@@ -2,16 +2,27 @@
 > Add new entries there first, then mirror key pointers here for quick navigation. Update the skeleton (`docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl` + `.path_proof.txt`) in the same PR whenever governed bytes change.
 > Refresh order: run `python tools/evidence/update_evidence_index.py` (write) before `python tools/evidence/orientation_demo.py` (write), then their `--check` variants, and finish with `ci/checks/check_mirror_schema.sh`. Mirror path proofs include both `sha256` and `mirror_body_sha256` for the self-record entry in `artifacts/evidence_index.jsonl`.
 
-# Appendix-D — Evidence Index (EPIC-024)
+# Appendix-D — Evidence Index (EPIC-025)
 
-## Acceptance map, ledger, and doc deltas
-* Acceptance map: `docs/acceptance_map_epic024.json`
-* Token evidence matrix: `audit/qa/hde-epic024/token_evidence_matrix.md`
-* Viability log: `audit/qa/hde-epic024/acceptance_map_viability.log` (hard gate in the EPIC024 harness)
-* QA step manifest: `audit/qa/hde-epic024/qa_step_logs_manifest.json`
-* Per-check logs: `audit/qa/hde-epic024/checks/<check_id>/primary.log`
-* Doc deltas: `audit/docdeltas/hde-epic024_doc_deltas.md`, `audit/qa/hde-epic024/00_meta/doc_deltas.md`
-* Close-pack artifacts: `audit/EPIC-024_MANIFEST.json`, `audit/EPIC-024_close_report.md`
+## QA ledger and close-pack
+* QA step manifest: `audit/qa/hde-epic025/qa_step_logs_manifest.json`
+* Per-check logs: `audit/qa/hde-epic025/checks/<check_id>/primary.log`
+* Close-pack artifacts: `audit/EPIC-025_MANIFEST.json`, `audit/EPIC-025_close_report.md`
+* Doc deltas: `audit/docdeltas/hde-epic025_doc_deltas.md`
+
+## Endpoint catalog + A7 proofs (/reader)
+* Endpoint catalog: `docs/ENDPOINTS_CATALOG.json`, `docs/ENDPOINTS_CATALOG.json.sha256`
+* Env-gate proof: `artifacts/proofs/endpoints_env_gate_proof.log`
+* Success headers: `artifacts/proofs/success_get.txt`, `artifacts/proofs/success_head.txt`
+* 304 posture: `artifacts/proofs/success_304.txt`
+* Writer/error posture: `artifacts/proofs/success_writers_errors.txt`
+* Encoding invariance: `artifacts/proofs/encoding_invariance.txt`
+
+## CLI showcompat capture + guards
+* Showcompat stdout bytes: `artifacts/cli/showcompat/stdout.json`
+* Showcompat stdout sha256: `artifacts/cli/showcompat/stdout.json.sha256`
+* Showcompat args/env record: `artifacts/cli/showcompat/args.json`
+* Serializer guard log: `artifacts/cli/guards/serializer_grep_guard.log`
 
 ## Canonical JSON gate (closed rails)
 * Gate runner: `python tools/evidence/run_canonical_json_gate.py` (`--check-only` available for read-only validation)
@@ -25,6 +36,11 @@
 * Snapshot artifact: `audit/gates/evidence_index_snapshot/evidence_index_snapshot.json`
 * Path proof: `audit/gates/evidence_index_snapshot/evidence_index_snapshot.json.path_proof.txt`
 * Validation behavior: RFC3339 UTC validation for `generated_at_utc`, and non-object JSONL lines in the mirror fail validation (see `python -m pytest tests/evidence/test_evidence_index_snapshot.py`).
+
+## Evidence-paths + LF endings gates
+* Path validation runner: `python tools/evidence/validate_evidence_paths.py`
+* LF endings runner: `python tools/evidence/check_lf_endings.py`
+* QA logs: `audit/qa/hde-epic025/checks/gate_evidence_paths_validation/primary.log`, `audit/qa/hde-epic025/checks/gate_lf_endings/primary.log`
 
 ## Arrays-as-sets evidence
 * Report artifact: `artifacts/canonical/arrays_as_sets_report.log`
