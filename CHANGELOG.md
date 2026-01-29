@@ -3,7 +3,7 @@
 Unreleased — HDE-EPIC025: Repo Docs Sweep (README/CHANGELOG/AGENTS/docs/)
 
 ### Added
-- Documented the EPIC025 compat contract and endpoint catalog posture (probe-only GET, POST-only internal admin surface, env-gate + catalog entry) alongside the updated CLI stdout discipline and deterministic emitter coupling.
+- Documented the EPIC025 compat contract and endpoint catalog posture (probe-only GET, POST-only internal admin surface, env-gate + catalog entry) alongside CLI stdout LF discipline and deterministic emitter coupling.
 - Documented `/reader` A7 transport proofs and the proof artifacts emitted under `artifacts/proofs/` when `HDE_WRITE_A7_PROOFS=1`, plus the env-gate proof for `/reader`.
 - Added EPIC025 QA evidence root and close-pack documentation: `audit/qa/hde-epic025/qa_step_logs_manifest.json`, per-check logs under `audit/qa/hde-epic025/checks/<check_id>/primary.log`, and close-pack outputs (`audit/EPIC-025_MANIFEST.json`, `audit/EPIC-025_close_report.md`, `audit/docdeltas/hde-epic025_doc_deltas.md`).
 - Added documentation for the evidence-paths validation and LF-endings gates (`tools/evidence/validate_evidence_paths.py`, `tools/evidence/check_lf_endings.py`) and their QA logs in the EPIC025 root.
