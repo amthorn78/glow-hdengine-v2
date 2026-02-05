@@ -1,0 +1,29 @@
+]633;E;{   echo "$ env_probe: APP_ENV ALLOW_NETWORK GEO_API_KEY HDAPI_BASE_URL HD_API_KEY SAFE_MODE"\x3b   for v in APP_ENV ALLOW_NETWORK GEO_API_KEY HDAPI_BASE_URL HD_API_KEY SAFE_MODE\x3b do     if [ "$v" = "GEO_API_KEY" ] || [ "$v" = "HDAPI_BASE_URL" ] || [ "$v" = "HD_API_KEY" ]\x3b then       if [ -n "${!v-}" ]\x3b then         printf '%s=%s\\n' "$v" "REDACTED"\x3b       else         printf '%s=UNSET\\n' "$v"\x3b       fi\x3b     else       printf '%s=%s\\n' "$v" "${!v-}"\x3b     fi\x3b   done\x3b   echo\x3b    echo "$ rm -f ${artifact_json}"\x3b   rm -f "${artifact_json}"\x3b   echo\x3b    echo "$ /workspaces/glow-hdengine-v2/.venv/bin/python scripts/hdctl.py showcompat --birthdate-a 1990-01-10 --birthtime-a 14:05 --location-a 'Chicago, US' --birthdate-b 1992-03-04 --birthtime-b 08:15 --location-b 'Berlin, DE' --source vendor > ${artifact_json}"\x3b   /workspaces/glow-hdengine-v2/.venv/bin/python scripts/hdctl.py showcompat     --birthdate-a 1990-01-10 --birthtime-a 14:05 --location-a "Chicago, US"     --birthdate-b 1992-03-04 --birthtime-b 08:15 --location-b "Berlin, DE"     --source vendor > "${artifact_json}" 2> "${tmp_body}"\x3b   rc=$?\x3b   echo\x3b   echo "showcompat exit code: ${rc}"\x3b   if [ "${rc}" -ne 0 ]\x3b then     pass_fail="FAIL"\x3b   fi\x3b   if [ -s "${tmp_body}" ]\x3b then     echo "showcompat stderr:"\x3b     cat "${tmp_body}"\x3b   fi\x3b   echo\x3b    echo "$ test -s ${artifact_json}"\x3b   if [ ! -s "${artifact_json}" ]\x3b then     echo "missing or empty: ${artifact_json}"\x3b     pass_fail="FAIL"\x3b   fi\x3b   echo\x3b    echo "$ /workspaces/glow-hdengine-v2/.venv/bin/python -c \\"import json\x3b json.load(open('${artifact_json}'))\x3b print('ok')\\""\x3b   /workspaces/glow-hdengine-v2/.venv/bin/python -c "import json\x3b json.load(open('${artifact_json}'))\x3b print('ok')"\x3b   echo\x3b    echo "$ cp -f ${artifact_json} ${check_dir}/showcompat_stdout.json"\x3b   cp -f "${artifact_json}" "${check_dir}/showcompat_stdout.json"\x3b   echo\x3b    echo "$ shasum -a 256 ${check_dir}/showcompat_stdout.json | awk '{print $1}' > ${check_dir}/showcompat_stdout.sha256"\x3b   shasum -a 256 "${check_dir}/showcompat_stdout.json" | awk '{print $1}' > "${check_dir}/showcompat_stdout.sha256"\x3b   echo\x3b    echo "PLAN DEFECT OVERRIDE: PF05 requires birth-arg showcompat with --source vendor and open rails\x3b applied here."\x3b } >> "${body}";841ae37f-63f3-434e-a898-70618d2a790c]633;C$ env_probe: APP_ENV ALLOW_NETWORK GEO_API_KEY HDAPI_BASE_URL HD_API_KEY SAFE_MODE
+APP_ENV=dev
+ALLOW_NETWORK=1
+GEO_API_KEY=REDACTED
+HDAPI_BASE_URL=REDACTED
+HD_API_KEY=REDACTED
+SAFE_MODE=0
+
+$ rm -f artifacts/cli/showcompat/stdout.json
+
+$ /workspaces/glow-hdengine-v2/.venv/bin/python scripts/hdctl.py showcompat --birthdate-a 1990-01-10 --birthtime-a 14:05 --location-a 'Chicago, US' --birthdate-b 1992-03-04 --birthtime-b 08:15 --location-b 'Berlin, DE' --source vendor > artifacts/cli/showcompat/stdout.json
+
+showcompat exit code: 0
+
+$ test -s artifacts/cli/showcompat/stdout.json
+
+$ /workspaces/glow-hdengine-v2/.venv/bin/python -c "import json; json.load(open('artifacts/cli/showcompat/stdout.json')); print('ok')"
+ok
+
+$ cp -f artifacts/cli/showcompat/stdout.json audit/qa/hde-epic025/checks/po-005/showcompat_stdout.json
+
+$ shasum -a 256 audit/qa/hde-epic025/checks/po-005/showcompat_stdout.json | awk '{print }' > audit/qa/hde-epic025/checks/po-005/showcompat_stdout.sha256
+
+PLAN DEFECT OVERRIDE: PF05 requires birth-arg showcompat with --source vendor and open rails; applied here.
+]633;E;{   echo "$ /workspaces/glow-hdengine-v2/.venv/bin/python -m pytest -q tests/cli/test_showcompat_parity_and_identity.py"\x3b   /workspaces/glow-hdengine-v2/.venv/bin/python -m pytest -q tests/cli/test_showcompat_parity_and_identity.py 2>&1 | tee -a "${tmp_body}"\x3b   rc=${PIPESTATUS[0]}\x3b   echo\x3b   echo "pytest exit code: ${rc}"\x3b   if [ "${rc}" -ne 0 ]\x3b then     pass_fail="FAIL"\x3b   fi\x3b } >> "${body}";841ae37f-63f3-434e-a898-70618d2a790c]633;C$ /workspaces/glow-hdengine-v2/.venv/bin/python -m pytest -q tests/cli/test_showcompat_parity_and_identity.py
+...s                                                                     [100%]
+3 passed, 1 skipped in 2.09s
+
+pytest exit code: 0

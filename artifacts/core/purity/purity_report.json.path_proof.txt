@@ -1,5 +1,5 @@
 path: artifacts/core/purity/purity_report.json
 size_bytes: 487
-sha256: 9412b54946266dea04452c786b9198ac419787d7c5ae73035cec85b312fc3b92
+sha256: eb0e28f0e6ed557080c180a9733e1866f8c5eb683af1fb2bcfd92094c2678bf2
 mtime_utc: 2025-12-06T04:06:36Z
 produced_at_utc: 2025-11-30T03:58:47Z

@@ -1,0 +1,23 @@
+{"artifacts": ["audit/qa/hde-epic025/checks/po-004/primary.log"], "captured_env": {"LANG": "en_US.UTF-8", "LC_ALL": "C", "MODO_AI_BUNDLE": "", "MODO_AI_VERBOSE": "", "MODO_RAILS": "", "TZ": "UTC"}, "check_id": "po-004", "check_name": "po-004 endpoint catalog entries and mirror", "claimed_tokens": [], "command": "python -m pytest -q -vv tests/http/test_endpoint_catalog.py\ncp -f docs/ENDPOINTS_CATALOG.json ${EVIDENCE_ROOT}/checks/po-004/endpoints_catalog.json\ncp -f artifacts/audit/ENDPOINTS_CATALOG.json ${EVIDENCE_ROOT}/checks/po-004/endpoints_catalog_internal_audit.json\nshasum -a 256 ${EVIDENCE_ROOT}/checks/po-004/endpoints_catalog.json | awk '{print $1}' > ${EVIDENCE_ROOT}/checks/po-004/endpoints_catalog.sha256", "command_provenance": "Copy/paste from plan", "fail_status": "", "intended_tokens": [], "pf_refs": [], "status": "PASS", "timestamp_utc": "2026-02-03T01:54:35Z"}
+]633;E;{   echo "$ python -m pytest -q tests/http/test_compat_endpoint_contract.py"\x3b   echo "$ python -m pytest -q tests/http/test_compat_endpoint_contract.py"\x3b   echo\x3b   echo "$ python -m pytest -q tests/http/test_endpoint_catalog.py"\x3b   /workspaces/glow-hdengine-v2/.venv/bin/python -m pytest -q -vv tests/http/test_endpoint_catalog.py 2>&1 | tee "${tmp_body}"\x3b   rc=${PIPESTATUS[0]}\x3b   echo\x3b   echo "pytest exit code: ${rc}"\x3b   if [ "${rc}" -ne 0 ]\x3b   then     pass_fail="FAIL"\x3b   fi\x3b   echo\x3b   echo "$ cp -f docs/ENDPOINTS_CATALOG.json ${check_dir}/endpoints_catalog.json"\x3b   cp -f "docs/ENDPOINTS_CATALOG.json" "${check_dir}/endpoints_catalog.json"\x3b   echo\x3b   echo "$ cp -f artifacts/audit/ENDPOINTS_CATALOG.json ${check_dir}/endpoints_catalog_internal_audit.json"\x3b   cp -f "artifacts/audit/ENDPOINTS_CATALOG.json" "${check_dir}/endpoints_catalog_internal_audit.json"\x3b   echo\x3b   echo "$ shasum -a 256 ${check_dir}/endpoints_catalog.json | awk '{print $1}' > ${check_dir}/endpoints_catalog.sha256"\x3b   shasum -a 256 "${check_dir}/endpoints_catalog.json" | awk '{print $1}' > "${check_dir}/endpoints_catalog.sha256"\x3b } >> "${body}";7ec85fe4-677d-452d-9d9d-a959d9f1f0c7]633;C$ python -m pytest -q tests/http/test_compat_endpoint_contract.py
+$ python -m pytest -q tests/http/test_compat_endpoint_contract.py
+
+$ python -m pytest -q tests/http/test_endpoint_catalog.py
+============================= test session starts ==============================
+platform linux -- Python 3.11.14, pytest-9.0.2, pluggy-1.6.0 -- /workspaces/glow-hdengine-v2/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /workspaces/glow-hdengine-v2
+configfile: pytest.ini
+collecting ... collected 1 item
+
+tests/http/test_endpoint_catalog.py::test_compat_endpoint_catalog_entry_is_internal_post_only PASSED [100%]
+
+============================== 1 passed in 0.11s ===============================
+
+pytest exit code: 0
+
+$ cp -f docs/ENDPOINTS_CATALOG.json audit/qa/hde-epic025/checks/po-004/endpoints_catalog.json
+
+$ cp -f artifacts/audit/ENDPOINTS_CATALOG.json audit/qa/hde-epic025/checks/po-004/endpoints_catalog_internal_audit.json
+
+$ shasum -a 256 audit/qa/hde-epic025/checks/po-004/endpoints_catalog.json | awk '{print }' > audit/qa/hde-epic025/checks/po-004/endpoints_catalog.sha256

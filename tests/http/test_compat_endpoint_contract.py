@@ -97,3 +97,31 @@ def test_compat_get_rejects_body():
     assert resp.status_code == 400
     payload = json.loads(resp.data.decode("utf-8"))
     assert payload.get("ok") is False
+
+
+def test_compat_post_rejects_empty_ids():
+    client = _client()
+    resp = client.post(
+        "/api/compat/v1",
+        data=json.dumps({"a_id": "", "b_id": ""}, sort_keys=True),
+        headers={"Content-Type": "application/json; charset=utf-8"},
+    )
+
+    assert resp.status_code == 400
+    payload = json.loads(resp.data.decode("utf-8"))
+    assert payload.get("ok") is False
+    assert payload.get("code") == "ERR_COMPAT_INVALID_JSON"
+
+
+def test_compat_post_rejects_malformed_ids():
+    client = _client()
+    resp = client.post(
+        "/api/compat/v1",
+        data=json.dumps({"a_id": "bad id!", "b_id": "bob"}, sort_keys=True),
+        headers={"Content-Type": "application/json; charset=utf-8"},
+    )
+
+    assert resp.status_code == 400
+    payload = json.loads(resp.data.decode("utf-8"))
+    assert payload.get("ok") is False
+    assert payload.get("code") == "ERR_COMPAT_INVALID_JSON"

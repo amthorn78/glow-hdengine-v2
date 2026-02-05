@@ -1,0 +1,51 @@
+# HDE-EPIC025 — po-007 Step Report
+
+## Step summary
+- **Epic:** HDE-EPIC025
+- **Step:** po-007
+- **Primary evidence:** [audit/qa/hde-epic025/checks/po-007/primary.log](audit/qa/hde-epic025/checks/po-007/primary.log)
+- **Status:** PASS
+
+## Evidence files produced
+- [audit/qa/hde-epic025/checks/po-007/primary.log](audit/qa/hde-epic025/checks/po-007/primary.log)
+
+## Full evidence contents
+
+### audit/qa/hde-epic025/checks/po-007/primary.log
+```log
+{"artifacts": ["audit/qa/hde-epic025/checks/po-007/primary.log"], "captured_env": {"LANG": "en_US.UTF-8", "LC_ALL": "C", "MODO_AI_BUNDLE": "", "MODO_AI_VERBOSE": "", "MODO_RAILS": "", "TZ": "UTC"}, "check_id": "po-007", "check_name": "po-007", "claimed_tokens": [], "command": "python -m pytest tests/http/test_reader_a7_transport.py\ncat artifacts/proofs/success_head.txt\ncat artifacts/proofs/success_get.txt", "command_provenance": "Copy/paste from plan", "fail_status": "", "intended_tokens": [], "pf_refs": [], "status": "PASS", "timestamp_utc": "2026-02-03T22:47:33Z"}
+$ python -m pytest tests/http/test_reader_a7_transport.py
+============================= test session starts ==============================
+platform linux -- Python 3.11.14, pytest-9.0.2, pluggy-1.6.0
+rootdir: /workspaces/glow-hdengine-v2
+configfile: pytest.ini
+collected 1 item
+
+tests/http/test_reader_a7_transport.py .                                 [100%]
+
+============================== 1 passed in 1.07s ===============================
+
+pytest exit code: 0
+
+pass_fail=pass
+
+----- artifacts/proofs/success_head.txt -----
+$ cat artifacts/proofs/success_head.txt
+HTTP/1.0 200 OK
+etag: "1cbd848103ac56efd7bc284db333bd70e879a963ddb0c12a570fc05354291fac"
+content-type: application/json; charset=utf-8
+cache-control: private, max-age=0, must-revalidate
+vary: Authorization, Accept-Encoding
+content-length: 314
+
+----- artifacts/proofs/success_get.txt -----
+$ cat artifacts/proofs/success_get.txt
+HTTP/1.0 200 OK
+etag: "1cbd848103ac56efd7bc284db333bd70e879a963ddb0c12a570fc05354291fac"
+content-type: application/json; charset=utf-8
+cache-control: private, max-age=0, must-revalidate
+vary: Authorization, Accept-Encoding
+content-length: 314
+
+
+```

@@ -1,0 +1,9 @@
+]633;E;{   echo "timestamp_utc: $(/workspaces/glow-hdengine-v2/.venv/bin/python -c 'import datetime\x3b print(datetime.datetime.utcnow().replace(microsecond=0).isoformat()+"Z")')"\x3b   echo "git_rev_parse_head:"\x3b   git rev-parse HEAD\x3b   echo "git_status_porcelain:"\x3b   git status --porcelain\x3b } > "${EVIDENCE_ROOT}/00_meta/repo_baseline.txt";b8f1d155-bfa1-4a57-a6f9-98edc0f57ec0]633;Ctimestamp_utc: 2026-02-02T15:20:48Z
+git_rev_parse_head:
+6fdf0d809d34b19c15eae5d56a89c05c1f24fc37
+git_status_porcelain:
+ M audit/qa/hde-epic025/qa_step_logs_manifest.json
+ M audit/qa/hde-epic025/qa_step_logs_manifest.json.path_proof.txt
+?? audit/qa/hde-epic025/00_meta/
+?? audit/qa/hde-epic025/checks/d0_discovery/
+?? "audit/qa/hde-epic025/r43 Live QA Plan HDE-EPIC025.md"

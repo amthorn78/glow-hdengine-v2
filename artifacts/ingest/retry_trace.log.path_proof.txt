@@ -1,5 +1,5 @@
 path: artifacts/ingest/retry_trace.log
-size_bytes: 2436
-sha256: 9df98b976de91b1fd13ac2bdc82f4e2726ba6f9243ec24068d50ff8ba8626649
+size_bytes: 10202
+sha256: 1eb5754a572509bf1676bd7c071568447553be147bcff455bd093d03505d4c25
 mtime_utc: 2025-12-06T04:06:36Z
 produced_at_utc: 2025-11-22T02:27:04Z

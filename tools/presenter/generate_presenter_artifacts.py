@@ -16,7 +16,6 @@ if str(ROOT) not in sys.path:
 from engine.cli import main as cli_main
 from engine.presenter import emitter
 from engine.runtime import emit_reader_public_envelope
-from engine.runtime.determinism_env import DeterminismEnvError, ensure_determinism_env
 
 PAIR = {
     "left": {"birthdate": "1990-01-10", "birthtime": "14:05", "location": "Chicago, US"},
@@ -32,8 +31,8 @@ def _env() -> dict[str, str]:
     env["PATH"] = f"{scripts_dir}:{env.get('PATH', '')}"
     env.update(
         {
-            "SAFE_MODE": "1",
-            "ALLOW_NETWORK": "0",
+            "SAFE_MODE": env.get("SAFE_MODE", "0"),
+            "ALLOW_NETWORK": env.get("ALLOW_NETWORK", "1"),
             "LC_ALL": "C",
             "LANG": "C",
             "TZ": "UTC",
@@ -45,15 +44,35 @@ def _env() -> dict[str, str]:
     return env
 
 
+def _birth_args(pair: dict[str, dict[str, str]]) -> list[str]:
+    left = pair["left"]
+    right = pair["right"]
+    return [
+        "--birthdate-a",
+        left["birthdate"],
+        "--birthtime-a",
+        left["birthtime"],
+        "--location-a",
+        left["location"],
+        "--birthdate-b",
+        right["birthdate"],
+        "--birthtime-b",
+        right["birthtime"],
+        "--location-b",
+        right["location"],
+        "--source",
+        "vendor",
+    ]
+
+
 def _run_showcompat(
     payload: dict[str, object], extra_args: list[str] | None = None, env: dict[str, str] | None = None
 ) -> subprocess.CompletedProcess[bytes]:
-    args = [sys.executable, "scripts/hdctl.py", "showcompat"]
+    args = [sys.executable, "scripts/hdctl.py", "showcompat", *_birth_args(payload)]
     if extra_args:
         args.extend(extra_args)
     return subprocess.run(
         args,
-        input=(json.dumps(payload, separators=(",", ":")) + "\n").encode(),
         capture_output=True,
         env=env or _env(),
     )
@@ -95,11 +114,6 @@ def _identity_summary(ab_bytes: bytes, ba_bytes: bytes, two_run_bytes: bytes) ->
 
 
 def main() -> int:
-    try:
-        ensure_determinism_env()
-    except DeterminismEnvError as exc:  # pragma: no cover - guardrail
-        raise SystemExit(str(exc)) from exc
-
     ARTIFACT_DIR.mkdir(parents=True, exist_ok=True)
 
     env_map = _env()

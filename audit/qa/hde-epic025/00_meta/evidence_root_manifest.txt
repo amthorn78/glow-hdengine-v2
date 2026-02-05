@@ -1,0 +1,4 @@
+evidence_root_manifest
+- all qa-created artifacts for this run live under EVIDENCE_ROOT
+- repo files under docs/ and artifacts/ may be read and copied into EVIDENCE_ROOT
+- no qa-created files under docs/

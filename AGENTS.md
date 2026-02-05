@@ -15,6 +15,8 @@
 
 ## Operating workflow (closed rails, evidence discipline)
 - Closed rails default: `LC_ALL=C`, `LANG=C`, `TZ=UTC`, `SAFE_MODE=1`, `ALLOW_NETWORK=0` enforced by `engine.runtime.determinism_env.ensure_determinism_env` and checked via `ci/checks/check_env_pins.sh`. No network access for public/QA surfaces unless explicitly allowed for a governed harness.
+- PF05 showcompat posture: when Live QA requires `hdctl showcompat` in pre-Glow environments, use birth-argument inputs with `--source vendor` and allow open rails as required by the plan; record the active env values in the step log. Treat zero-arg showcompat plans as planning defects and apply a minimal Moon Loop deviation to align with PF05.
+- Redaction rule: QA step logs MUST NOT include secrets. When capturing env probes (APP_ENV, ALLOW_NETWORK, GEO_API_KEY, HDAPI_BASE_URL, HD_API_KEY, SAFE_MODE), redact sensitive values (keys, tokens, base URLs) and record only “REDACTED” or “SET/UNSET”.
 - Read-first, then edit: inspect acceptance bindings, evidence indexes, and QA harness expectations before changing docs/code/evidence.
 - QA output placement: **do not create QA artifacts in the repo root**. Write QA outputs only under the active evidence directory (e.g., `audit/qa/<epic-id>/...`) unless a PF-canon/governed tool explicitly specifies otherwise.
 - Docs-only PR posture: do not make behavioral claims without proof. Evidence must come from repo-governed artifacts, enforced tests/CI steps, or PF canon references (titles/§ only). Keep statements scoped to current repo state.

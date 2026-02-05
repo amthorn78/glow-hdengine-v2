@@ -1,0 +1,38 @@
+$ cp "audit/gates/determinism/env_pins.log" "audit/qa/hde-epic025/checks/po-010/env_pins.log"
+exit code: 0
+
+$ sha256sum "audit/qa/hde-epic025/checks/po-010/env_pins.log" > "audit/qa/hde-epic025/checks/po-010/env_pins.log.sha256"
+exit code: 0
+
+$ cat "audit/qa/hde-epic025/checks/po-010/env_pins.log.sha256"
+1d0df551f8e0510a5292cb5c97fbd32fe22b4b35eb9854352b71eefe15614690  audit/qa/hde-epic025/checks/po-010/env_pins.log
+exit code: 0
+
+$ bash ci/checks/check_env_pins.sh > "audit/qa/hde-epic025/checks/po-010/env_pins_check_stdout.txt"
+exit code: 0
+
+$ cat "audit/qa/hde-epic025/checks/po-010/env_pins_check_stdout.txt"
+exit code: 0
+
+$ sha256sum "audit/qa/hde-epic025/checks/po-010/env_pins_check_stdout.txt" > "audit/qa/hde-epic025/checks/po-010/env_pins_check_stdout.txt.sha256"
+exit code: 0
+
+$ cat "audit/qa/hde-epic025/checks/po-010/env_pins_check_stdout.txt.sha256"
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  audit/qa/hde-epic025/checks/po-010/env_pins_check_stdout.txt
+exit code: 0
+
+$ /workspaces/glow-hdengine-v2/.venv/bin/python tools/evidence/run_sanity_pipeline.py > "audit/qa/hde-epic025/checks/po-010/sanity_pipeline_stdout.txt"
+exit code: 0
+
+$ cat "audit/qa/hde-epic025/checks/po-010/sanity_pipeline_stdout.txt"
+[evidence-index] env pins: ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC
+[evidence-index] env pins: ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC
+exit code: 0
+
+$ sha256sum "audit/qa/hde-epic025/checks/po-010/sanity_pipeline_stdout.txt" > "audit/qa/hde-epic025/checks/po-010/sanity_pipeline_stdout.txt.sha256"
+exit code: 0
+
+$ cat "audit/qa/hde-epic025/checks/po-010/sanity_pipeline_stdout.txt.sha256"
+cbea364f8431d5bb4d8ed36cb6cda0fa8cdfee9cdc0569900ec6a0c6c3db945a  audit/qa/hde-epic025/checks/po-010/sanity_pipeline_stdout.txt
+exit code: 0
+
