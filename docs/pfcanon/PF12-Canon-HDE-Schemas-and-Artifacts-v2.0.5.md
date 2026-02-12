@@ -4,13 +4,13 @@
 
 **Title:** PF12-Canon-HDE-Schemas-and-Artifacts
 
-**Version:** v1.9.6
+**Version:** v2.0.5
 
 **Status:** Canon
 
-**Effective date:** 2026-01-24
+**Effective date:** 2026-02-09
 
-**Last Update Gate:** BN 9.4.4 Drain A30-31
+**Last Update Gate:** BN 9.8.2 Drain A49-51
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -572,7 +572,29 @@ The close-pack baseline artifacts MUST be located under audit/ using the EPIC-\#
 
 * audit/EPIC-\#\#\#\_QA\_RCA.md
 
+The close report at `audit/EPIC-###_close_report.md` MUST:
+
+* Summarize shipped deliverables and the closure-minimum evidence artifacts produced by the epic.  
+* Enumerate explicit deferrals (if any) by ID (for example, `TI-002`) in a dedicated section.  
+* Point to the corresponding close-pack manifest’s `key_outputs` map as the binding authority for primary artifacts and their canonical paths-of-record.
+
 These are baseline closure artifacts (required artifacts), not acceptance tokens by default. They MUST NOT be relocated into alternate directory trees (for example audit/qa/\*\* or artifacts/\*\*) without an explicit canon change.
+
+Generator (titles-only; EPIC-025). The EPIC-025 close-pack baseline artifacts are generated mechanically by `tools/qa/generate_epic025_close_pack.py`. Outputs include:
+
+* `audit/EPIC-025_MANIFEST.json`
+
+* `audit/EPIC-025_MANIFEST.json.path_proof.txt`
+
+* `audit/EPIC-025_close_report.md`
+
+* `audit/EPIC-025_close_report.md.path_proof.txt`
+
+* `audit/docdeltas/hde-epic025_doc_deltas.md`
+
+* `audit/qa/hde-epic025/qa_step_logs_manifest.json`
+
+* `audit/qa/hde-epic025/qa_step_logs_manifest.json.path_proof.txt`
 
 Close-pack manifest key\_outputs (named binding map; normative)
 
@@ -609,6 +631,11 @@ For EPIC024, key\_outputs MUST include at least these keys and exact values:
 * doc\_deltas: audit/docdeltas/hde-epic024\_doc\_deltas.md
 
 Additional key\_outputs entries are allowed, but these bindings are the closure minimum.
+
+EPIC-025 binding authority note.
+
+* The authoritative binding set for EPIC-025 is recorded in `audit/EPIC-025_MANIFEST.json`.  
+* For EPIC-025, the close-pack manifest’s `key_outputs` map is the primary binding index for closure artifacts (what ships) and their evidence locations (where the evidence lives).
 
 Titles-only routing rule
 
@@ -2420,6 +2447,20 @@ The mirror has a governed checksum sidecar at `artifacts/evidence_index.jsonl.sh
 
 Every evidence file referenced by the mirror MUST live under governed repo paths (for example, artifacts/, docs/). Transient generator paths (scratch/temp) are disallowed; mirror entries pointing to non-governed paths fail CI.
 
+#### **Evidence-path safety invariants (mirror discovered\_physical\_path).**
+
+For every mirror record:
+
+* `discovered_physical_path` MUST be a repo-relative path (no absolute paths).  
+* `discovered_physical_path` MUST NOT contain parent-directory segments (`..`) and MUST NOT escape the repository root after normalization and resolution.  
+* `discovered_physical_path` MUST resolve to an existing file at validation time.  
+* Mirror entries that violate these invariants MUST fail CI.
+
+Implementation notes (titles-only; mechanics live outside PF12).
+
+* Evidence path validation: `tools/evidence/validate_evidence_paths.py`  
+* Final-LF endings check wrapper: `tools/evidence/check_lf_endings.py`
+
 #### **Tracked files (no .gitignore for governed artifacts).**
 
 Governed evidence artifacts and their sibling path-proof transcripts (\<artifact\>.path\_proof.txt) MUST NOT be ignored by .gitignore. Governed locations are expected to be tracked; using .gitignore to hide governed artifacts or their path-proofs is invalid and should be treated as a QA failure.
@@ -3693,6 +3734,12 @@ Update both the Human Index and the Machine Mirror in the same PR:
 
 * Machine Mirror: artifacts/evidence\_index.jsonl
 
+Governed path-proof transcripts (required). The Human Index and its hash sentinel MUST each have a sibling `.path_proof.txt` transcript:
+
+* `docs/evidence/INDEX.json.path_proof.txt`
+
+* `docs/evidence/INDEX.sha256.path_proof.txt`
+
 Machine Mirror discipline:
 
 * Records-only JSONL
@@ -3781,6 +3828,16 @@ Evidence index mirror (machine-readable):
 
 Plans and tasks that touch any file above MUST treat the sibling .path\_proof.txt as a first-class deliverable. If a plan proposes a new file under governed roots, it MUST state whether the file is intended to appear in the indices/mirror; absence of that statement is a mechanical blocker.
 
+Evidence-output naming discipline (plans and token claims; normative).
+
+Plans and acceptance artifacts MUST name the primary governed evidence outputs that will be committed and indexed for the epic or PR.
+
+Token-claim evidence outputs MUST be concrete, filename-specific, and indexable. Therefore, acceptance artifacts MUST NOT bind tokens to directory families, wildcard patterns, or vague family phrases such as “plus step logs”.
+
+Plans SHOULD avoid wildcards in required-evidence lines even when a canon-defined path-pattern exists for discovery. If a path-pattern exists for discovery or enumeration, the plan SHOULD still bind the token to the concrete primary artifact instance(s) (exact path and filename) that will appear as records in the Human Evidence Index and Machine Evidence Mirror for the PR or QA run.
+
+If a tool produces a high-churn set of member logs, the plan MAY treat the governed output as a single primary artifact (for example, a manifest or bundle) and state that member files are referenced by that primary artifact, provided the plan names the primary governed artifact by exact path and filename and keeps evidence binding deterministic. Member files SHOULD be referenced by the manifest/bundle rather than being individually required in the plan’s evidence-output lines unless the Evidence Catalog explicitly promotes them as primary governed evidence surfaces.
+
 Acceptance map — token identity and shape (clarification).
 
 This section clarifies how acceptance tokens are identified inside acceptance-map artifacts. This prevents token identity drift when acceptance maps are rendered as tables.
@@ -3818,6 +3875,16 @@ In any PR that changes governed evidence artifacts or their indexing, you MUST u
 And you MUST assert the mirror/index tokens named in §8.3 (for example, EVIDENCE\_INDEX\_UPDATED\_OK, EVIDENCE\_INDEX\_HASH\_OK, EVIDENCE\_INDEX\_MIRROR\_OK, EVIDENCE\_PATHS\_VALIDATED\_OK, etc.) on every change.
 
 ### **8.6.3 Entries (authoritative list; titles/paths only)**
+
+Note (normative). The Evidence Catalog is intentionally multi-root: governed evidence artifacts are expected to exist under multiple repo roots (for example, audit/, artifacts/, docs/, catalog/, narratives/). In evidence terms, the “single-home” constraint means PF12 is the single authoritative home for evidence family naming and canonical path bindings, plus the Index and Mirror discipline that binds those paths (Human Evidence Index \+ Machine Evidence Mirror). It does not mean evidence must live under a single directory.
+
+Multi-root storage is not, by itself, evidence drift. Drift occurs when a root or artifact is treated as governed evidence or a “truth home” output but is not cataloged here and is not indexed and mirrored with exactly one governed \*.path\_proof.txt transcript.
+
+Classification note (normative). If any additional top-level root is treated as governed evidence (for example, scripts/, tools/), its evidence outputs MUST either:
+
+* be cataloged in §8.6 as explicit evidence families (titles and canonical paths) and indexed and mirrored per §8.3, or
+
+* be treated as non-governed tooling outputs and excluded from “truth home” claims (not indexed, not mirrored, not accepted as evidence).
 
 Human Index entries are titles/paths only. Machine Mirror records include at least artifact\_key, role, sha256, size\_bytes, produced\_at\_utc, discovered\_physical\_path, and proof\_anchor. Every artifact listed below MUST have exactly one Human Index entry and one Machine Mirror record, plus exactly one governed \*.path\_proof.txt transcript, all kept in lockstep.
 
@@ -3914,6 +3981,20 @@ These artifacts form the topology.orientation\_demo family and serve as the exem
 * artifacts/cli/showcompat/args.json: Names-only arguments/env snapshot used for deterministic capture (no secrets; canonical JSON).
 
 * tools/cli/generate\_showcompat\_artifacts.py: Deterministic producer tool used to generate the EPIC022 D2 showcompat capture artifacts under closed rails.
+
+Functional showcompat QA posture (vendor dependency; current limitation).
+
+* The deterministic showcompat capture artifacts above are byte-determinism evidence and do not imply that functional showcompat runs can be executed under closed rails.
+
+* Until BodyGraph storage or replay exists for QA, functional showcompat runs cannot rely on precomputed BodyGraph inputs being available locally.
+
+* Any Live QA step that executes showcompat in a context where BodyGraph data is not already available MUST run that step with vendor rails open (open network rails). Closed rails (network disabled) MUST be treated as an expected blocker for functional showcompat runs under this limitation.
+
+* The rails change MUST be explicit and step-scoped. After the showcompat step, restore the default rails posture.
+
+* showcompat MUST NOT be executed as a zero-argument command in QA plans or QA runs. The authoritative command or argument contract is owned by HDE-CLI-API-Vendor-Ref.
+
+* If showcompat is attempted under closed rails or without required arguments, classify the outcome as a tooling/environment or usage defect for that step, not a product behavior failure. Record the rails posture used (names-only) and the failure signature in the step log.
 
   #### **Showcompat artifacts (EPIC024 D03)**
 
@@ -4499,7 +4580,8 @@ These entries register QA harness ledger files that summarize Live QA results as
 
 ### **Invariant required outputs (current-state; canonical paths)**
 
-* `audit/qa/<epic-id>/qa_step_logs_manifest.json`: Per-epic manifest acting as a current-state index keyed by check\_id, pointing to (at minimum) each check’s status and the canonical path to its primary log. Records-only canonical JSON (UTF-8, ASCII-sorted keys, compact, exactly one trailing LF).
+* `audit/qa/<epic-id>/qa_step_logs_manifest.json`: Per-epic manifest acting as a current-state index keyed by check\_id, pointing to (at minimum) each check’s status and the canonical path to its primary log. Records-only canonical JSON (UTF-8, ASCII-sorted keys, compact, exactly one trailing LF).  
+* `audit/qa/<epic-id>/qa_step_logs_manifest.json.path_proof.txt`: Required governed path-proof transcript for the manifest file (format per §8.3 Path-proof transcript). This transcript MUST be updated in the same PR whenever the manifest bytes change.
 
 * `audit/qa/<epic-id>/checks/<check_id>/primary.log`: Per-check primary log (one per check\_id) containing the authoritative run output and verdict context for that check. LF-terminated, non-empty text. This file is referenced by qa\_step\_logs\_manifest.json.
 
@@ -4507,24 +4589,63 @@ These entries register QA harness ledger files that summarize Live QA results as
 
 * `audit/qa/<epic-id>/checks/<check_id>/transcript.txt`: Optional per-check execution transcript (non-empty UTF-8 text). If treated as governed evidence, it MUST have a sibling `transcript.txt.path_proof.txt`.
 
+* `audit/qa/<epic-id>/checks/<check_id>/success_head.txt`: Optional per-check copy of `artifacts/proofs/success_head.txt` (HTTP A7 proof snapshot). If present, it MUST be byte-identical to `artifacts/proofs/success_head.txt` and MUST have a sibling `success_head.txt.sha256`.
+
+* `audit/qa/<epic-id>/checks/<check_id>/success_get.txt`: Optional per-check copy of `artifacts/proofs/success_get.txt` (HTTP A7 proof snapshot). If present, it MUST be byte-identical to `artifacts/proofs/success_get.txt` and MUST have a sibling `success_get.txt.sha256`.
+
+* `audit/qa/<epic-id>/checks/<check_id>/canonical_json_gate_stdout.txt`: Optional per-check stdout capture for a canonical-JSON gate runner. If present, it MUST have a sibling `canonical_json_gate_stdout.txt.sha256`.
+
+* `audit/qa/<epic-id>/checks/<check_id>/env_pins.log`: Optional per-check copy of `audit/gates/determinism/env_pins.log`. If present, it MUST be byte-identical to `audit/gates/determinism/env_pins.log` and MUST have a sibling `env_pins.log.sha256`.
+
+* `audit/qa/<epic-id>/checks/<check_id>/env_pins_check_stdout.txt`: Optional per-check stdout capture for an env pins check runner. If present, it MUST have a sibling `env_pins_check_stdout.txt.sha256`.
+
+* `audit/qa/<epic-id>/checks/<check_id>/sanity_pipeline_stdout.txt`: Optional per-check stdout capture for `ci/pipeline/run_sanity_pipeline.py`. If present, it MUST have a sibling `sanity_pipeline_stdout.txt.sha256`.
+
+* `audit/qa/<epic-id>/checks/<check_id>/endpoints_catalog.json`: Optional per-check endpoint catalog snapshot used for the step’s validation. If present, it MUST have a sibling `endpoints_catalog.json.sha256`.
+
+* `audit/qa/<epic-id>/checks/<check_id>/index.sha256`: Optional per-check snapshot of an index checksum file used by the step. If present, the snapshot MAY have an integrity sidecar `index.sha256.sha256` (sha256 of the snapshot file).
+
 * `audit/qa/<epic-id>/checks/po-006_token_registry_validity/token_comparison.json`: Structured output for PO-006 token registry validity. Canonical JSON (schema: `po-006.token_registry_validity.v1`) with, at minimum, summary fields: `schema`, `status`, `missing_in_registry`, `missing_in_canonical`, `deprecated_spellings_used`. If treated as governed evidence, it MUST have a sibling `token_comparison.json.path_proof.txt`.
 
-### **Optional ledger artifacts (non-required for closure; current-state if present)**
+  ### **Optional ledger artifacts (non-required for closure; current-state if present)**
 
 * `audit/qa/<epic-id>/acceptance_map_viability.log`: Per-epic text log summarizing acceptance-map viability results for the current-state (and optionally noting any retained history). Produced mechanically by the epic QA harness entrypoint (titles-only). LF-terminated text.
 
+* `audit/qa/<epic-id>/epic_closure_record.md`: Optional per-epic closure record (non-empty UTF-8 markdown). If present, it MUST have a sibling `epic_closure_record.md.sha256`.  
+  * Deferred and Not Run listing constraint (normative).  
+    * If `epic_closure_record.md` is present and it lists any checks as Deferred or Not Run for the current run, it MUST NOT present those checks’ artifact paths (including `primary.log` paths) as required primary evidence paths for the current run. Deferred or Not Run artifacts MAY be listed only under an explicitly labeled Deferred or Not Run section and MUST be clearly marked non-binding.
+
 * `audit/qa/<epic-id>/00_meta/codespaces_snapshot.json`: Optional Step-0 Codespaces environment snapshot (tool versions, rails pins, presence-only env context). Canonical JSON; schema and indexing posture are defined in §8.17.5. Live QA Plans MUST NOT require this artifact for closure by default.
 
-* `audit/docdeltas/<epic-id>_doc_deltas.md`: Mechanically produced doc delta draft/capture (names-only; no secrets). If no deltas exist, the artifact MUST explicitly say so (produced output, not an instruction). This artifact may be referenced by QA ledger artifacts and or close-pack key\_outputs pointers, but it is not required to live under the epic QA root.  
+* `audit/qa/<epic-id>/00_meta/deferred_scope_posture.md`: Optional per-epic deferred scope posture record (non-empty UTF-8 markdown).
+
+* `audit/qa/<epic-id>/checks/<check_id>/deferred_scope_posture.md.sha256`: Optional integrity proof for `audit/qa/<epic-id>/00_meta/deferred_scope_posture.md` produced by the check that generated the posture record.
+
+* `audit/docdeltas/<epic-id>_doc_deltas.md`: Mechanically produced doc delta draft/capture (names-only; no secrets). If no deltas exist, the artifact MUST explicitly say so (produced output, not an instruction). This artifact may be referenced by QA ledger artifacts and or close-pack key\_outputs pointers, but it is not required to live under the epic QA root.
+
 * `audit/qa/<epic-id>/00_meta/doc_deltas.md`: Optional QA-root copy of `audit/docdeltas/<epic-id>_doc_deltas.md`. If both exist, they MUST be byte-identical (diff exit code 0).
 
 ### **Optional per-run retention (non-canon; allowed)**
 
-A retained copy MAY exist under `audit/qa/<epic-id>/runs/<run_id>/<RUN_SUBPATH>` (including run-scoped copies of check logs, snapshots, or debugging outputs). If present, run copies MUST NOT be required for closure, and MUST NOT be used for manifest keying. They may be indexed only if explicitly promoted as governed evidence by acceptance wiring.
+A retained copy MAY exist under `audit/qa/<epic-id>/runs/<run_id>/<RUN_SUBPATH>` (including run-scoped copies of check logs, snapshots, or debugging outputs). If present, run copies MUST NOT be required for closure, and MUST NOT be used for manifest keying.
+
+run\_id (or RUN\_ID) MUST NOT be introduced or required as an operator input, a step-log header field, a governed manifest field, or a correctness key. Per-run retention MUST remain non-canonical and non-gating.
+
+Run copies may be indexed only if explicitly promoted as governed evidence by acceptance wiring.
 
 ### **Indexing discipline (governed artifacts)**
 
 Indexing follows the standard §8.6 rule set: exactly one Human Evidence Index entry per concrete file path, exactly one Machine Evidence Mirror record per concrete file path, and exactly one governed path-proof transcript per concrete file path, kept in lockstep.
+
+Acceptance hints (titles-only; evidence is via per-check `primary.log` under the epic QA root).
+
+* EVIDENCE\_INDEX\_UPDATED\_OK  
+* EVIDENCE\_INDEX\_HASH\_OK  
+* EVIDENCE\_INDEX\_MIRROR\_OK  
+* EVIDENCE\_PATHS\_VALIDATED\_OK  
+* CI\_CHECK\_MIRROR\_SCHEMA\_OK  
+* CI\_CHECK\_FINAL\_LF\_OK  
+* JSON\_CANONICAL\_CHECK\_OK
 
 ## **Epic token/evidence matrix (per-epic QA ledger; current-state)**
 
@@ -4672,29 +4793,45 @@ Related governed files (titles only). The authoritative Catalog file lives at `d
 
 The authoritative Catalog file lives at:
 
-* `docs/ENDPOINTS_CATALOG.json` (records-only; canonical JSON)
+* `docs/ENDPOINTS_CATALOG.json` (records-only; canonical JSON)  
+* docs/ENDPOINTS\_CATALOG.json.sha256 (checksum sidecar; sha256sum \-c compatible; MUST reference docs/ENDPOINTS\_CATALOG.json)  
+* docs/ENDPOINTS\_CATALOG.json.path\_proof.txt (path proof transcript for the catalog file)
 
-* `docs/ENDPOINTS_CATALOG.json.sha256` (checksum sidecar; computed over the catalog’s canonical bytes)
+Checksum verification expectation. `sha256sum -c docs/ENDPOINTS_CATALOG.json.sha256` MUST succeed when run from repo root.
+
+Some workflows also emit an audit copy of the catalog under `artifacts/audit/ENDPOINTS_CATALOG.json`.
 
 This Catalog is a machine-readable inventory of HTTP endpoints (public surfaces and key internal/ops/dev endpoints) used to support QA, audits, and transport reasoning. It contains names-only metadata and MUST NOT embed secrets or example payload bytes.
 
+Reader surface canonical routes (normative).
+
+Canonical Reader route: GET /reader. Reader v1 is selected via query parameter v=1 on this route (the route path does not change).
+
+API-mount alias posture: when the Reader blueprint is mounted under an /api prefix, /api/reader is an alias of the same Reader surface. It is not a distinct contract or a separate proof surface.
+
+Forbidden invented route: /api/reader-proof/v1 MUST NOT appear in the Endpoint Catalog, in endpoint snapshot artifacts, or in any proof-surface references. Proofs that depend on a Reader success route MUST target the actual reachable mounted Reader route for the target environment. When this Catalog is used for selection, select only from Catalog entries that correspond to real mounted routes (no invented proof routes).
+
 Minimum required fields (per endpoint record). Each endpoint entry in `docs/ENDPOINTS_CATALOG.json` MUST include at least:
 
-* path: route path (e.g., /reader, /api/compat/v1, /internal/version) as a string
+* `path`: HTTP path as a string (e.g., /api/compat/v1).
 
-* method: HTTP method as a string (e.g., GET, POST, HEAD)
+* `method`: HTTP method as a string (e.g., GET, POST).
 
-* classification: one of public\_reader, public\_compat, internal\_identity, ops, dev\_harness
+* `internal`: Boolean. True indicates the endpoint is non-public (internal/ops/dev surface).
 
-* blueprint\_module: owning module path (names-only) such as adapter/http\_reader.py or engine/http/compat\_handler.py
+* `classification`: One of public\_reader, public\_compat, internal\_identity, internal\_admin, ops, dev\_harness.
 
-* rails\_profile: a short names-only description of expected rails posture (e.g., “closed rails”, “APP\_ENV-gated dev harness”, “ops no-store”), without secrets
+* `env_gate`: Env-gate metadata for non-public endpoints. Value MUST be either (a) a string expression (example: `APP_ENV!=prod`) or (b) an object mapping env var names to required values (example: `{"APP_ENV":"dev"}`).
 
-Additional fields MAY exist, but they MUST remain names-only and MUST remain compatible with the owning schema and checks.
+* `a7_eligible`: Boolean. True indicates the endpoint is eligible to be selected by the A7 proof harness.
 
-Suggested minimal schema (example).
+* `blueprint_module`: The owning blueprint module (names-only).
 
-* {"generated\_at\_utc":"YYYY-MM-DDThh:mm:ssZ","endpoints":\[{"path":"\<route-path\>","method":"\<METHOD\>","classification":"\<one-of: public\_reader|public\_compat|internal\_identity|ops|dev\_harness\>","blueprint\_module":"\<module-path\>","rails\_profile":"\<names-only rails summary\>"}\]}
+* `rails_profile`: A names-only summary of rails mode. Use a short string, no secrets.
+
+Minimum schema (records-only):
+
+* {"generated\_at\_utc":"YYYY-MM-DDThh:mm:ssZ","endpoints":\[{"path":"\<route-path\>","method":"\<METHOD\>","internal":true,"classification":"\<one-of: public\_reader|public\_compat|internal\_identity|internal\_admin|ops|dev\_harness\>","env\_gate":"\<string-or-map\>","a7\_eligible":false,"blueprint\_module":"\<module-path\>","rails\_profile":"\<names-only rails summary\>"}\]}
 
 ### **Indexing**
 
@@ -4774,6 +4911,8 @@ Routing (titles-only). Provenance policy and release workflow: Epic-Process-Guid
 
 Purpose. Provide a single, machine-checkable JSON artifact that proves the A7 suite on a cataloged JSON success route (GET, HEAD, 304; quoted strong ETag; Vary; encoding-invariance). The /internal/version ops surface is excluded.
 
+Alternate artifact example (same schema): `artifacts/proofs/reader_route_proof.json`.
+
 Schema (single home). Schema path: `schemas/proofs.reader_success.v1.json` (owned by PF12). Artifact (example): `artifacts/proofs/reader_success_get_head_304.json` (records-only). Routing: Tokens live in Governance; transport bytes live in Vendor Ref. This section governs only the artifact’s shape and validation. Always pair this artifact with the Catalog snapshot and the env-gate proof (see Indexing).
 
 Minimum required fields (reject unknown keys).
@@ -4783,6 +4922,10 @@ Minimum required fields (reject unknown keys).
 Field notes (normative): route\_path references the Catalog route by title (no URL). env\_gate.proof\_path points to the headers-only env-gate artifact; gated\_ok: true asserts non-prod entries are unreachable in prod. get\_200.body\_sha256 is the SHA-256 of the LF-terminated canonical body used for identity. head\_200.content\_length\_equals\_identity compares to the GET identity body length (pre-compression). after\_304 proves the 304 invariants (only after prior 200; omits both Content-Type and Content-Length; no body). vary\_flags must assert both authorization and accept\_encoding. etag.encoding\_invariance\_ok: true affirms identity (ETag) and effective length are stable across accepted encodings.
 
 Validation & CI (merge-blocking). The proof JSON MUST validate against `schemas/proofs.reader_success.v1.json` before indexing. Unknown keys are rejected (mirror enforces). Canonical JSON: UTF-8 (no BOM), sorted keys, compact, exactly one trailing \\n. Determinism: all captures and derivations run with LC\_ALL=C, TZ=UTC. Governed locations only: artifact under artifacts/; schema under schemas/.
+
+Artifact write gating (normative). Proof artifacts under `artifacts/proofs/` MUST be written only when `HDE_WRITE_A7_PROOFS=1` is set. Default test runs MUST NOT create or modify these files.
+
+When proof artifacts are updated, check in the governed proof artifacts plus their sibling `.path_proof.txt` transcripts in the same PR.
 
 Indexing (titles/paths only). Human Index: add a titles/paths entry in docs/evidence/INDEX.json and update docs/evidence/INDEX.sha256 in the same PR. Machine mirror: add a records-only line to artifacts/evidence\_index.jsonl (see §8.3) with artifact\_key, role:"proof", discovered\_physical\_path, sha256, size\_bytes, produced\_at\_utc, and a proof\_anchor to a path\_proof.txt stored alongside the JSON file. Pair with `artifacts/reader/endpoints_snapshot.json` (Catalog snapshot) and `artifacts/proofs/endpoints_env_gate_proof.log` (env-gate headers).
 
@@ -5470,6 +5613,46 @@ The primary log filename is fixed: primary.log.
 
 The log’s header (format owned by QA source-of-truth documents) MUST include the true check\_id used for manifest keying.
 
+JSON header posture (current-state).
+
+* `audit/qa/<epic-id>/checks/<check_id>/primary.log` MUST begin with exactly one machine-readable JSON object header line (first line), followed by the transcript body.
+
+* Header regeneration or Moon Loop header repair MUST result in exactly one header line. If a prior header line exists, it MUST be removed before writing the corrected header.
+
+* The header line SHOULD include a schema\_version value to support validation and downstream parsing.
+
+Plan-scoped header writer inputs (names-only).
+
+If a Live QA plan uses a step-log header writer that reads per-check metadata from environment variables, the plan MUST export the complete required set immediately before header generation for each check and MUST NOT rely on prior step state. Minimum per-check exports (names must match the header writer contract):
+
+* CHECK\_ID
+
+* CHECK\_NAME
+
+* PASS\_FAIL
+
+* COMMANDS\_JSON
+
+* ARTIFACTS\_JSON
+
+* PF\_REFS\_JSON
+
+Artifact list invariants (normative).
+
+* The per-check artifacts list (exported via `ARTIFACTS_JSON` and recorded in the `primary.log` JSON header) MUST include the canonical primary log path for the current `check_id`: `audit/qa/<epic-id>/checks/<check_id>/primary.log`.
+
+* For PASS results (`PASS_FAIL=PASS`), omission of the primary log path from that artifacts list is an evidence hygiene defect and MUST be remediated (header repair or rerun) before the step can be treated as closed PASS.
+
+Live QA handling (discovered mid-run).
+
+If a check ran successfully but primary.log is missing or has a wrong JSON header due to missing exports, a minimal header-only remediation MAY:
+
+* export the required header env vars for the check, and
+
+* regenerate the JSON header and reassemble primary.log by writing the corrected header plus the existing body bytes verbatim
+
+This remediation is evidence-capture only and MUST NOT modify product behavior, test assertions, or acceptance criteria.
+
 Non-empty requirement.
 
 The primary log for a check MUST be a non-empty, LF-terminated text file. It MUST NOT be zero bytes.
@@ -5481,6 +5664,18 @@ If a step fails to complete or tooling fails, the primary log MUST STILL be writ
 * a terse failure description and/or final status line consistent with Live QA status semantics (for example, PASS/FAIL\_BEHAVIOR/FAIL\_TOOLING/TOOLING\_BLOCKED)
 
 It is an error for a planned check to have no primary log at all.
+
+Minimum command transcript capture (current-state).
+
+Each per-check primary log MUST include an execution transcript sufficient to reconstruct what actually ran. At minimum, it MUST capture:
+
+* the exact command line(s) invoked (as executed)
+
+* an explicit exit code (per-command or final)
+
+* stdout/stderr output, or explicit references to captured output files
+
+The primary log is the authoritative run record for exact command(s) executed; plan prose is not a substitute for the execution transcript.
 
 Empty files.
 
@@ -5537,6 +5732,18 @@ Each snapshot (whether embedded in a primary log header or stored as a standalon
 * TZ
 
 in a machine-parsable form consistent with the QA rails pins.
+
+Environment variable discipline (governed interface; QA-time minting prohibited).
+
+* Environment variable names used in Live QA plans and Live QA evidence artifacts are governed interface surfaces, not free text.
+
+* The list above is the minimum required env/rails snapshot set. Plans MAY capture additional environment variables, but MUST NOT treat additional names as required correctness gates unless the names are explicitly canon-approved.
+
+* No QA-time env var minting: new environment variable names MUST NOT be introduced during Live QA execution (including Moon Loop execution). If a plan/tooling flow would require a new environment variable name to function, that is a development change and the name MUST be defined and documented in canon before any plan relies on it.
+
+* MODO\_\* variables are non-canonical and meaningless for Glow/HDE. Any environment variable name beginning with MODO\_ MUST NOT be introduced, required, or depended on for PASS/FAIL or for required evidence structure (including required header fields, required manifest fields, or required evidence schema keys).
+
+* EPIC025 exception (grandfathered; non-binding only): existing approved EPIC025 plan materials may contain MODO\_\* references due to iteration churn. These placeholders MUST be treated as inert and MUST NOT be replicated.
 
 D-goal/token references (titles-only).
 
@@ -6550,13 +6757,15 @@ validator\_outputs — Validator outputs proving config sanity. (path: artifacts
 
 internal\_version\_get\_head — /internal/version ops identity proof (headers/body/conditionals). (path: artifacts/proofs/internal\_version\_get\_head.json)
 
-cli\_showcompat\_stdout — Exact showcompat stdout capture (LF-terminated; non-empty on success). (path: artifacts/cli/showcompat/stdout.json)
+cli.showcompat.stdout — Canonical stdout capture for `hde showcompat` (LF-terminated; no CRLF; non-empty on success; success has empty stderr). (path: artifacts/cli/showcompat/stdout.json)
 
-cli\_showcompat\_stdout\_sha256 — SHA-256 sidecar for the showcompat stdout capture bytes. (path: artifacts/cli/showcompat/stdout.json.sha256)
+cli.showcompat.stdout\_sha256 — SHA-256 sidecar for the showcompat stdout capture bytes. (path: artifacts/cli/showcompat/stdout.json.sha256)
 
 cli\_showcompat\_args — Names-only capture arguments/env snapshot used by the deterministic generator (no secrets). (path: artifacts/cli/showcompat/args.json)
 
 cli\_showcompat\_generator — Deterministic producer tool for EPIC022 D2 showcompat capture artifacts. (path: tools/cli/generate\_showcompat\_artifacts.py)
+
+cli.guards.serializer\_grep\_guard — Serializer grep guard output log for CLI serialization guardrails. (path: artifacts/cli/guards/serializer\_grep\_guard.log)
 
 cli\_showcompat\_two\_run — Two-run identity log for showcompat. (path: artifacts/cli/showcompat/two\_run\_identity.log)
 

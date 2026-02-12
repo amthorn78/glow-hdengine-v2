@@ -4,13 +4,13 @@
 
 **Title:** PF27-Canon-Plan-Templates
 
-**Version:** v1.1.8
+**Version:** v1.2.6
 
 **Status:** Canon
 
-**Effective date:** 2026-01-24
+**Effective date:** 2026-02-11
 
-**Last Update Gate:** BN 9.4.4 Drain A30-31
+**Last Update Gate:** BN 9.8.2 Drain A49-51
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -23,10 +23,36 @@ PF27 is the single PF home for **plan and runbook templates** used in the Glow p
 
 **Scope (in).**
 
-**PF23 consult (required for planning).**
+**PF23 consult (epic planning only).**
 
-* When planning remediation, development, or QA execution, the guide author MUST consult **PF23 — Reality Audits** as a primary input for component boundaries and canonical pathnames/loci.  
-* Guides SHOULD include a short “PF23 Anchors” subsection listing the component(s) consulted and the key pathnames/loci the plan will touch (traceability only; do not duplicate PF23).
+* Reality Audits (PF23) are post-epic audits. They are updated at the end of an epic and reflect a latest closed-epic snapshot, not an in-flight PR truth source.
+
+* PF23 consult is allowed/required only during Epic planning (Epic Plan creation or revision).
+
+* In this context, PF23 MAY be used to ground component boundaries and canonical loci and to prevent fabricated repo paths and surfaces.
+
+* PF23 consult MUST NOT be consulted for QA planning or QA execution (including Live QA plans and runbooks).
+
+* PF23 consult MUST NOT appear as a required deliverable, a required check, or an acceptance token in implementation plans, QA plans, reviews, or acceptance artifacts.
+
+* Disallowed use: PF23 MUST NOT be consulted for PR analysis, including PR review, remediation review, and diff-first approval loops. PR analysis must rely on the owning PF canon homes and repo reality for the PR under review, without using PF23 as a blocker source.
+
+* PR analysis routing: reviewers MUST rely on the owning PF homes by title (examples: HDE Architecture, HDE Governance, HDE CLI/API reference, HDE Schemas and Artifacts, HDE Build Checklist, HDE Mechanics Guide, Glow QA Guide, Epic Process Guide).
+
+* Drift assessment trigger: if any PF23 Reality Audit statement contradicts PF canon, that contradiction MUST be treated as development drift requiring evaluation, not as an automatic correction in either direction.
+
+* Drift assessment protocol (stub; required posture, not full process): when PF23 contradicts canon during planning:
+
+  * Record the contradiction as a drift item in Tracked Issues with: PF23 claim (quote or precise paraphrase), the conflicting PF canon claim (quote or precise paraphrase), and the impacted epic/surface.
+
+  * Classify the drift into exactly one bucket (tentative): canon defect, implementation drift, or necessary reality shift.
+
+  * Do not fix by assumption, and do not treat the contradiction as resolved unless the PO explicitly adjudicates the resolution path.
+
+  * Resolution routing is PO-owned. The PO decides whether the fix is a canon update, an implementation remediation, or a formalized exception with canon follow-up.
+
+* Epic Plans SHOULD include a short “PF23 Anchors” subsection listing the component(s) consulted and the key pathnames/loci the plan will touch (traceability only; do not duplicate PF23).
+
 
 **Portability vs provenance (normative).**
 
@@ -42,29 +68,73 @@ PF27 is the single PF home for **plan and runbook templates** used in the Glow p
   * evidence root normalization and per-run `QA_ROOT`,  
   * runbook check matrices and per-step blocks with explicit PASS/FAIL predicates.
 
- **Template-safe placeholders and ellipsis prohibition (hard).**
+ **Repository locus validation and file minting posture (hard).**
 
-* Canonical documents and plan records MUST NOT contain either of:
+* Validated references only. Plans MUST NOT include any repository path, module home, command, or uniqueness claim (for example, “only create\_app factory”) that cannot be confirmed via canon or repo inspection.
 
-  * the ASCII triple-dot sequence, or
+* Every asserted file path or “where this lives” claim in a plan MUST be validated using exactly one method:
 
-  * the Unicode ellipsis character.
+  * Canon-cited: cite the PF canon line(s) that assert the path or locus.
 
-* Only the following template replacement markers are permitted in canonical documents and plans:
+  * CA vetted: include a quoted repo inspection command and its output in “Observed Evidence Snapshot” (portable, attachment-free).
 
-  * `<PLACEHOLDER_NAME>`
+  * IG Approved: quote the locus from the Implementation Guide Inventory (or other IG canon section) inside the plan.
 
-  * `[OMITTED]`
+* CA vetted and IG Approved evidence MUST NOT be referenced as external attachments in downstream Codex prompts. If a plan needs the information, embed the quoted evidence in the plan and reference the plan section.
 
-  * `[LIST CONTINUES]`
+* File minting is allowed. When a plan mints new files or new evidence outputs, it MUST name the exact repository paths and filenames that will be created and the exact primary evidence files that will be produced.
 
-  * `[SNIP: <n> lines omitted]`
+* New roots and second homes are prohibited by default. Plans MUST NOT propose new top-level roots or alternate/duplicate locations for existing artifacts unless an ADR explicitly authorizes the new home and the PO approves the change.
 
-  * `[INTENTIONALLY LEFT BLANK]`
+* Evidence is intentionally multi-root across established governed roots. Plans MUST NOT treat multi-root as drift by default. “Single-home” in evidence terms means a single authoritative catalog or index plus canonical path bindings (titles-only: PF12 — HDE-Schemas and Artifacts), not a single directory root.
 
-* Prohibited placeholders include informal stand-ins such as curly-brace placeholders or the word “TBD” (unless the word “TBD” is part of a formal decision-bounded rule as defined in the Remediation Implementation Guide template).
+* Classification note: if a plan treats additional roots as governed evidence (for example, `scripts/` or `tools/`), the plan MUST either (a) bind them to an evidence family cataloged in PF12 — HDE-Schemas and Artifacts, or (b) treat them as non-governed tooling output and exclude them from acceptance and any “truth home” claims.
 
-* Review handling: if an ellipsis is observed in a canonical doc or plan during review, treat it as a hard defect to be corrected (replace with a permitted marker). If the ellipsis appears because a viewer cut text, treat it as a tooling/read failure and re-open until the full source text is visible.
+* Evidence output naming: plans must avoid wildcard or implied file path patterns and must state concrete filenames for primary governed evidence outputs. For high-churn logs, provide a manifest file path and a bundling rule that yields a stable evidence bundle.
+
+* Example (architecture audit incident): do not assume a new top-level `src/` root. If a plan claims a new root, it must be validated. In EPIC025 audits, HTTP adapter code was asserted to live under `adapter/` as the single home, and `src/` claims were treated as drift until proven.
+
+Template-safe placeholders and ellipsis prohibition (hard).
+
+Allowed placeholder markers: \[REQUIRED\], \[REQUIRED−NOW\], \[OPTIONAL\], \<PLACEHOLDER\>, \<PLACEHOLDER\_ONE\_PER\_LINE\>.
+
+Prohibited placeholder styles: plain TBD, TODO, ???, FIXME, or free-text “fill in later”.
+
+Prohibited characters and sequences (outside code spans where the token is part of literal code under discussion):
+
+the Unicode ellipsis character (U+2026),
+
+any sequence of three consecutive period characters outside code spans,
+
+fenced code blocks (triple-backtick fences).
+
+Mandatory truncation response (NO OUTS): if an ellipsis token (or three-period sequence used as an omission signal) appears in any relied-on passage:
+
+treat the passage as potentially incomplete,
+
+re-open or re-retrieve the source until the full, uncut text is visible, and
+
+redo any dependent work after full retrieval.
+
+If the token can be proven to be present in the true source text (not a viewer artifact), it MUST be removed and replaced with an approved omission marker.
+
+Approved replacements (standard placeholders). When omission or continuity must be expressed, use only:
+
+\[OMITTED\]
+
+\[OMITTED: short reason\]
+
+\[SNIP: n lines omitted\]
+
+\[LIST CONTINUES\]
+
+\[REPEAT BLOCK\]
+
+Code spans exception (narrow): ellipses may appear inside code spans only when they are part of literal code under discussion. Even then, reviewers MUST prefer rewriting examples to avoid ellipses where possible. If a literal code example would require ellipses and cannot be rewritten safely, move the snippet into a repo source file or governed evidence artifact and reference it by path (do not embed the ellipsis in the plan text).
+
+Mechanical blocker posture: any prohibited ellipsis or any fenced code block in planning or QA documents is a mechanical blocker until removed, because it is indistinguishable from viewer truncation and degrades auditability.
+
+\[TBD\] is prohibited unless it is explicitly decision-bounded and appears only inside the Remediation Implementation Guide template under “Open Decisions.”
 
 **Scope (out).**
 
@@ -260,7 +330,10 @@ This runbook is written for the check-centric posture:
 
 * Canonical evidence outputs are organized by **check\_id** under EPIC\_QA\_ROOT as **current-state evidence**.  
 * Per-run directory nesting MAY exist for convenience/history, but it is optional and non-canon.  
-* No “latest\_run\_id” pointer files or “run-id as correctness key.”
+* No “latest\_run\_id” pointer files or “run-id as correctness key.”  
+* Uppercase characters are allowed in filenames. The lowercase naming rail applies to directory segments and to explicitly-lowercase identifiers (for example, `check_id`).
+
+* `run_id` (or `RUN_ID`) is prohibited as an operator input, plan header field, step-log header field, manifest field, or correctness key. If per-execution history is kept, it remains optional and non-canon and MUST NOT introduce a run-id identity requirement.
 
 #### Recommended canonical layout (default for new plans)
 
@@ -287,105 +360,110 @@ Optional (non-canon) history retention:
 * where `<attempt_label>` is a UTC timestamp label (git-free).  
   * If you keep run-local copies here, they MUST be treated as convenience copies, not canonical acceptance binding surfaces.
 
-  #### **Step-log header schema expectations (minimum; required)**
+#### **Step-log header schema expectations (minimum; required)**
 
 Header MUST include, at minimum:
 
-* `check_id`: stable check ID (must match the matrix `check_id`).
+* `schema_version`: the canonical schema label for this header (example: `pf27.step_log_header.v1`).
 
-* `status`: `PASS` | `FAIL_BEHAVIOR` | `FAIL_TOOLING` | `TOOLING_BLOCKED` | `SKIPPED` | `WARN`.
+* `timestamp_utc`: ISO-8601 UTC timestamp with a `Z`suffix.
 
-* `fail_status`: required; MUST be `""` when `status: PASS`; otherwise MUST equal `status`.
+* `check_id`: string identifier (matches the Check Block ID).
 
-* `command`: the exact command string executed (or `N/A` if no command applies).
+* `check_name`: string identifier (matches the Check Block name).
 
-* `command_provenance`: `Codex Prompt` | `Copy/paste from plan` | `Explicitly created`.
+* `status`: one of `PASS`, `FAIL_BEHAVIOR`, `FAIL_TOOLING`, `TOOLING_BLOCKED`, `SKIPPED`, `WARN`.
 
-* `captured_env`: object with `MODO_AI_BUNDLE` / `MODO_AI_VERBOSE` / `MODO_RAILS` / `LC_ALL` / `LANG` / `TZ` (values may be blank).
+* `fail_status`: MUST be `""`when `status`is `PASS`, else MUST equal `status`.
 
-* `pf_refs`: array (may be empty; MUST be present).
+* `command`: the exact command line executed for this check step (the actual string, not a paraphrase). If multiple commands were executed, `command`MUST be an explicit pipeline or an explicit `;`\-joined sequence that preserves the execution order.
 
-* `intended_tokens`: array (may be empty; MUST be present).
+* `command_provenance`: one of `Codex prompt`, `Copy/paste from plan`, or `Explicitly created`.
 
-* `claimed_tokens`: array (may be empty; MUST be present).
+* evidence\_artifacts: array of one or more paths to evidence artifacts produced for this check (example: the check's `primary.log` path).
+
+* Invariant (PASS): `evidence_artifacts` MUST include the check's `primary.log` path. If a PASS step omits `primary.log` from the artifacts list or manifest, it is an evidence hygiene defect and the step MUST NOT be closed as PASS until remediated.
+
+* captured\_env: JSON object containing the actual env vars for the run (not inferred), limited to canon-defined names.
+
+* `pf_refs`: array of PF document titles consulted (titles-only).
+
+* `intended_tokens`: array of intended acceptance tokens (may be empty).
+
+* `claimed_tokens`: array of claimed acceptance tokens (may be empty).
 
 Notes:
 
-* record both the command and the creation mechanics (Codex prompt vs copy/paste vs manual).
+* Step templates MUST generate the header via the canonical header-writer snippet below (or a repo-defined canonical helper that emits the same keys).
 
-* `captured_env` MUST include `MODO_AI_BUNDLE` / `MODO_AI_VERBOSE` / `MODO_RAILS` / `LC_ALL` / `LANG` / `TZ`.
+* `captured_env`MUST include only canon-defined env var names. Environment variable names are governed interface surfaces (like repo loci and CLI surfaces) and MUST NOT be invented ad hoc for QA convenience.
 
-* **No ad-hoc header JSON:** plans MUST NOT instruct operators to hand-type or hand-edit a header JSON object. Step templates MUST generate the header via the canonical header-writer snippet below (or a repo-defined canonical helper that emits the same keys), so required keys cannot drift or be omitted when the schema evolves.
+  * Mechanical blocker: any `MODO_*`environment variables are non-canonical and MUST NOT appear as plan inputs, required exports, required schema keys, or required step-log capture keys.
 
-* If a script is required, prefer ephemeral helpers under `/tmp` and write only evidence outputs under `audit/**` or `artifacts/**`.
+  * No QA-time env var minting: if a QA plan, runbook, or tool would require a new env var name, that is a development change that requires PO approval and canon documentation before any QA plan can rely on it.
 
-* If the evidence format is missing required fields (including `pf_refs`, `intended_tokens`, `claimed_tokens`, or `fail_status`), the check MUST record a CAVEAT and MUST NOT be treated as closure-proof until the format is corrected.
+  * Grandfathered exception (HDE-EPIC025 only): `MODO_*`references in the already-approved EPIC025 plan are inert placeholders and MUST NOT be treated as required inputs or copied into new plans.
 
-* Avoid escaping/control sequences in embedded excerpts, and ensure copy/paste-safe representations.
+* `command_provenance`MUST reflect how the exact `command`string was obtained. The plan may provide a directive or a suggested command, but the step log MUST record the exact command(s) executed.
+
+* `pf_refs`MUST contain titles only (no versions).
+
+* Authors MUST NOT add novel env vars or CLI switches to plans or execution artifacts for convenience. Any env var name (and its semantics) is a governed interface surface and can only be introduced via a documented canonical change.
 
 **Canonical step-log header writer (paste-ready; emits header JSON with all required keys):**
 
-`# Writes a single-line JSON header to stdout.`
+This writes a single-line JSON header to stdout. Paste it into `primary.log`as the first line.
 
-`# Set these environment variables before running:`
+The `python - <<`form is part of canon. Do not replace it with `python file.py`.
 
-`#   CHECK_ID, STATUS, COMMAND, COMMAND_PROVENANCE`
+The plan MUST export the required header-writer inputs for each check immediately before header generation. Do not rely on prior step state.
 
-`# Optional (defaults are empty/[]):`
+Anti-drift: a Live QA Plan MUST use one header-writer contract consistently across check blocks (do not mix patterns).
 
-`#   FAIL_STATUS, PF_REFS_JSON, INTENDED_TOKENS_JSON, CLAIMED_TOKENS_JSON`
+Minimum per-check exports (names must match the header writer contract):
 
-`python - <<'PY'`
+* `CHECK_ID`
 
-`import json, os`
+* `CHECK_NAME`
 
-`def get(k, default=""):`
+* `PASS_FAIL`
 
-    `v = os.environ.get(k)`
+* `COMMANDS_JSON`(JSON array of exact command string(s) executed, in order)
 
-    `return v if v is not None else default`
+* `ARTIFACTS_JSON`(JSON array of evidence artifact paths)
 
-`header = {`
+* `PF_REFS_JSON`(JSON array of PF titles)
 
-    `"check_id": get("CHECK_ID"),`
+Optional exports:
 
-    `"status": get("STATUS"),`
+* `COMMAND_PROVENANCE`(defaults to `Explicitly created`)
 
-    `"fail_status": get("FAIL_STATUS", ""),`
+* `INTENDED_TOKENS_JSON`(JSON array)
 
-    `"command": get("COMMAND"),`
+* `CLAIMED_TOKENS_JSON`(JSON array)
 
-    `"command_provenance": get("COMMAND_PROVENANCE"),`
+If a header is missing or incorrect due to missing exports, a minimal Moon Loop deviation is allowed to export the missing inputs and regenerate the header. Evidence-capture-only correction MUST reassemble `primary.log`by prepending the corrected JSON header while preserving the existing body verbatim.
 
-    `"captured_env": {`
-
-        `"MODO_AI_BUNDLE": get("MODO_AI_BUNDLE"),`
-
-        `"MODO_AI_VERBOSE": get("MODO_AI_VERBOSE"),`
-
-        `"MODO_RAILS": get("MODO_RAILS"),`
-
-        `"LC_ALL": get("LC_ALL"),`
-
-        `"LANG": get("LANG"),`
-
-        `"TZ": get("TZ"),`
-
-    `},`
-
-    `"pf_refs": json.loads(get("PF_REFS_JSON", "[]")),`
-
-    `"intended_tokens": json.loads(get("INTENDED_TOKENS_JSON", "[]")),`
-
-    `"claimed_tokens": json.loads(get("CLAIMED_TOKENS_JSON", "[]")),`
-
-`}`
-
-`print(json.dumps(header, ensure_ascii=False))`
-
-`PY`
-
-* 
+`python - << 'PY'`  
+ `import datetime`  
+ `import json`  
+ `import os`  
+ `` `def env(name: str, default: str = "") -> str:` ` value = os.environ.get(name)` ` return value if value is not None else default` ``  
+ `def env_json(name: str, default):`  
+ `raw = os.environ.get(name)`  
+ `if raw is None or raw == "":`  
+ `return default`  
+ `return json.loads(raw)`  
+ `` `schema_version = "pf27.step_log_header.v1"` `timestamp_utc = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "Z"` ``  
+ `status = env("PASS_FAIL")`  
+ `fail_status = "" if status == "PASS" else status`  
+ `commands = env_json("COMMANDS_JSON", [])`  
+ `if isinstance(commands, str):`  
+ `commands = [commands]`  
+ `command = "; ".join(commands) if commands else "N/A"`  
+ `` `header = {` ` "schema_version": schema_version,` ` "timestamp_utc": timestamp_utc,` ` "check_id": env("CHECK_ID"),` ` "check_name": env("CHECK_NAME"),` ` "status": status,` ` "fail_status": fail_status,` ` "command": command,` ` "command_provenance": env("COMMAND_PROVENANCE", "Explicitly created"),` ` "evidence_artifacts": env_json("ARTIFACTS_JSON", []),` ` "captured_env": {` ` "SAFE_MODE": env("SAFE_MODE"),` ` "ALLOW_NETWORK": env("ALLOW_NETWORK"),` ` "APP_ENV": env("APP_ENV"),` ` "LC_ALL": env("LC_ALL"),` ` "LANG": env("LANG"),` ` "TZ": env("TZ"),` ` },` ` "pf_refs": env_json("PF_REFS_JSON", []),` ` "intended_tokens": env_json("INTENDED_TOKENS_JSON", []),` ` "claimed_tokens": env_json("CLAIMED_TOKENS_JSON", []),` `}` ``  
+ `print(json.dumps(header, ensure_ascii=False))`  
+ `PY`
 
 ### Mandatory Step‑0 artifacts
 
@@ -473,6 +551,23 @@ Matrix rules:
 
   * D23 evidence index snapshot is tokenless (do not claim acceptance tokens from it).
 
+#### **Token coverage and evidence binding (required)**
+
+* Every check block in §2.2.3.A MUST satisfy exactly one of the following:
+
+  * Token-attached check: `intended_tokens` contains one or more acceptance tokens, and the check’s PASS predicate produces evidence sufficient to claim some or all of those tokens in `claimed_tokens`.
+
+  * Tokenless evidence check: `intended_tokens` and `claimed_tokens` are empty, and the check is explicitly justified as a non-token evidence requirement with an explicit PASS predicate and captured artifact.
+
+* A Live QA Plan MUST NOT include any step or check that is neither token-attached nor an explicit non-token evidence requirement. No “for good measure” checks are allowed.
+
+* Token coverage requirement: every acceptance token in the epic’s acceptance roster MUST appear in `intended_tokens` of at least one check block in this Live QA Plan.  
+* Functional proof requirement (when functional changes exist): the Live QA Plan MUST include at least one named functional proof check per functional seam touched by the epic (including vendor seams where applicable). A functional proof check MUST exercise the runtime path and capture an observable result in evidence (not only static artifact checks).  
+  * If the change set is purely non-functional (for example: docs-only or formatting-only), this requirement does not apply.  
+  * When in doubt, include at least one minimal functional proof check and keep its rails and proof outputs explicit.
+
+* If a check implements a PF19 standard playbook, the check block MUST cite the playbook (PF19 section or heading) in its `PF_anchors` and MUST follow the playbook steps without ad-hoc rewrites.
+
 ---
 
 ### Check Blocks
@@ -521,18 +616,46 @@ Use this section only when the Live QA Plan includes the referenced check ID.
 
 * If a plan references a different path, treat the discrepancy as DOC\_DRIFT and capture it in Step-0B (Doc Delta Capture), while ensuring the check predicate is evaluated against the correct on-disk path.
 
-#### CHECK \<check\_id\>: \<check\_name\>
+**Reader proof-surface lint (canonical routes and proof selection; addenda-driven; locked)**
+
+* Canonical Reader route is `GET /reader`.
+
+* Reader v1 is selected via `v=1` query parameter on the Reader route (not a distinct path).
+
+* `/api/reader` may exist only as an environment-specific mount alias when the service is mounted under an `/api` prefix; it is not a separate contract surface.
+
+* Forbidden invented route: `/api/reader-proof/v1` MUST NOT be referenced in plans, runbooks, or endpoint catalogs. Treat any occurrence as DOC\_DRIFT and correct the proof route selection to a real mounted surface before evaluating the check predicate.
+
+* Aux narrative surfaces (example: `/aux/narrative`) are separate from Reader and MUST NOT be substituted for Reader proof unless the check explicitly targets Aux narrative.
+
+* Proof-surface selection posture: choose the proof route from known mounted surfaces (or from an Endpoint Catalog entry that is itself sourced from real mounted surfaces). Do not invent “proof routes.”
+
+#### **CHECK \<check\_id\>: \<check\_name\>**
 
 Surface / D-goal mapping: \<D\# \+ surface\>  
-Rails: SAFE\_MODE=\<value\> ALLOW\_NETWORK=\<value\> APP\_ENV=\<value\>  
-Pins (when producing governed bytes): LC\_ALL=C LANG=C TZ=UTC  
-PF anchors: PFxx — Title, §X.Y (titles-only)
+ Rails: SAFE\_MODE=\<value\> ALLOW\_NETWORK=\<value\> APP\_ENV=\<value\>  
+ Pins (when producing governed bytes): LC\_ALL=C LANG=C TZ=UTC  
+ PF anchors: PFxx — Title, §XY (titles-only)
+
+Vendor-dependent steps (rails-scoped):
+
+* If the step requires vendor IO (example: `showcompat` when the required BodyGraph bytes are not already locally available), set rails for this step only (typically `ALLOW_NETWORK=1`) and restore the default rails posture immediately after the step.
+
+* Rails posture mismatch is a plan defect: if the plan declares SAFE rails for this step (example: `ALLOW_NETWORK=0`) but execution requires network or vendor IO in practice, the plan MUST be corrected before declaring it stable. The plan MUST either (a) scope the step to allow network for this step (example: `ALLOW_NETWORK=1`), or (b) provide an offline proof mode that can execute with `ALLOW_NETWORK=0`.
+
+* `showcompat` MUST NOT be executed as a zero-argument command. The invocation MUST supply the required argument set defined by HDE-CLI-API-Vendor-Ref.
+
+* If an `showcompat` attempt fails only because rails were closed or required args were missing, classify this step as `FAIL_TOOLING`or `TOOLING_BLOCKED`(not `FAIL_BEHAVIOR`) and record the rails posture used plus the failure signature in the step log.
 
 **PO command(s) (copy/paste)**
 
-* One command or a tight, explicit pipeline.  
-* If multiple commands are required, list them explicitly and capture them in the step log header `command`.  
-* If no command is required (manual review only), set the step log header `command: N/A` **and** ensure every required deliverable is Audit-proven (pre-existing at review time). If any required deliverable must be generated during QA (including via a helper script), commands MUST be listed explicitly (no “None required”).
+* Provide objective-first directives (what to run and what proof to capture). The plan MUST NOT require verbatim, syntax-perfect commands for approval.
+
+* During execution, resolve and run the semantically correct command(s). The exact command string(s) executed MUST be recorded in the step log header `command`(and MUST match the transcript).
+
+* If a directive must name a repo locus (script, file path, route, or entrypoint), that locus MUST be canon-defined or audit-proven at review time. Prefer execution-time discovery where possible to minimize brittle locus strings.
+
+* If no command is required (manual review only), set the step log header `command: N/A`and ensure every required deliverable is Audit-proven (pre-existing at review time). If any required deliverable must be generated during QA (including via a helper script), the directive MUST be explicit enough to produce a runnable command and the executed command(s) MUST be recorded.
 
 **Expected result (PASS/FAIL predicates)**
 
@@ -664,15 +787,42 @@ Location:
 
 ### **Hard blockers for plan approval/execution**
 
-* All inputs and paths MUST be explicit and reproducible. Any required path that is not canon-defined, audit-proven, or explicitly QA-created by this plan with inline create \+ validate mechanics is blocked. No fabricated paths.  
+* All inputs, loci, and paths MUST be explicit and reproducible. Any required executable locus (script, check entrypoint, endpoint/route, or command) that is not canon-defined or audit-proven is blocked. No fabricated loci.
+
 * No interactive steps. The plan must be runnable headlessly (and must log all commands).  
-* Command entrypoints must resolve. Any plan-provided command that names a repo file by path MUST either:  
-  * (a) point to an existing repo file at review time, OR  
-  * (b) be explicitly QA-created by this plan with inline create \+ validate mechanics before execution (and recorded as `DOC_DRIFT` in Step-0B).  
-* If the step is executed via an embedded harness function (no standalone script exists), the plan MUST use `python (embedded)` and cite the harness runner repo path.  
-* New recurring artifact families/paths introduced ad hoc in a plan (not already governed by PF10) are blocked until introduced via PF10 addendum.  
-* Helper/wrapper scripts are blocked unless canon-named by explicit path (for example, `tools/evidence/run_<check>.py`) OR the full tool source is embedded and written under `audit/qa/...` before execution.  
+* Prompt-family separation (mode boundary; required):  
+  * Every QA prompt MUST declare its mode as one of: `AUTHORING` or `REVIEW`.
+
+  * The agent MUST output only the declared mode’s required structure.
+
+  * If mode is `REVIEW`, the agent MUST NOT produce new runbooks or new commands.
+
+  * Review-mode remediation exception: if a command must be suggested, it MUST be copied verbatim from the approved plan and include the plan’s caveats.  
+* Workflow recommendation (non-canon; strongly advised): enforce mode with a mechanical gate (mode header token plus a required section list). If the required sections do not match the declared mode, fail fast.
+
+* Command entrypoints must resolve. Any command that references a repository script or file by path MUST point to an existing repo file at review time. Live QA Plans MUST NOT create new scripts at run time. If a helper tool is required and does not exist, the plan is blocked until the tool is added as PR work (and then referenced by explicit path).
+
+* If the step is executed via an embedded harness function (no standalone script exists), the plan MUST use `python (embedded)` and cite the harness runner repo path.
+
+* New recurring artifact families/paths introduced ad hoc in a plan (not already governed by PF10) are blocked until introduced via PF10 addendum.
+
+* Helper or wrapper scripts are blocked unless they already exist as canon-named, repo-resident tools referenced by explicit path (for example, `tools/evidence/run_<check>.py`). Plans MUST NOT embed full tool source and write it into the repo tree as part of execution.
+
 * All evidence artifacts must be under `audit/` and be hashed or proven as required.  
+* Future-step artifacts and deferrals (template semantics; required):  
+  * Any plan template that enumerates step-scoped evidence paths MUST label future-step artifacts as `NOT RUN` or `DEFERRED` until the producing step has executed.
+
+  * `NOT RUN` / `DEFERRED` MUST NOT be treated as a missing-evidence failure.
+
+  * Missing-evidence is reserved for cases where the producing step has executed and the artifact it should emit is absent or unproven.
+
+  * Closure and rollup steps MUST separate these states explicitly:  
+    * `PRESENT`: the producing step has executed and the artifact exists and is referenced by path.
+
+    * `MISSING`: the producing step has executed and the artifact is absent or unproven.
+
+    * `NOT RUN` / `DEFERRED`: the producing step has not executed yet, so no artifact is expected yet.
+
 * `/tmp` helper scripts MUST NOT print or persist secrets.
 
  **ADR discipline (canon-resolution only; drain targets required):**
@@ -684,6 +834,22 @@ Location:
 * Every ADR MUST declare explicit drain targets (owning PF docs \+ intended doc-delta updates required to canonize the decision).
 
 * ADRs MUST NOT cite PF20 as a source of requirements, rails, acceptance semantics, or evidence-surface definitions (PF20 is historical-only).
+
+**QoS escalation stop-rule (iteration churn; required):**
+
+* If more than 3 plan↔evidence mismatches occur in a single epic QA run, QA MUST pause execution and repair the plan or template layer before continuing. Continuing without repair is treated as a process defect.
+
+* A plan↔evidence mismatch is a structural remediation required to make plan claims match produced evidence (example: correcting rails posture declarations, or moving future-step artifacts out of required primary evidence pointers for the current run).
+
+* If an epic QA plan requires repeated structural remediation for the same failure mode, escalate from incremental plan edits to systems RCA \+ template or Canon drain.
+
+* Canon drain MUST target the class of failure, not only the incident.
+
+* When escalation is triggered, record the rationale and intended drains in the plan’s QA RCA & Doc Delta summary deliverable.
+
+* Drain targets (titles-only): PF10 and PF27.
+
+* If a plan validity lint exists, extend it to detect the failure mode and fail fast (example: fail artifact generation when a PASS step does not list its `primary.log` in the artifacts list or manifest).
 
 KISS evidence posture for Live QA (normative):
 
@@ -703,9 +869,23 @@ KISS evidence posture for Live QA (normative):
 
 Explicit non-blockers (do not gate approval):
 
-* A plan MUST NOT be rejected solely because it does not use fenced code blocks. The gate is copy/paste safety \+ mechanical evidence, not Markdown rendering.
+* Review gates are about execution safety, evidence posture, canon alignment, and mechanical paste safety. Reviewers MUST NOT gate approval on Markdown rendering choices or other presentation-only formatting.
 
-* Optional environment snapshots (including any “Codespaces snapshot”) MUST NOT be required deliverables and MUST NOT be used to decide PASS vs REMEDIATION NEEDED.
+* Copy/paste perfection MUST NOT be an approval gate. Whitespace-only issues (indentation, alignment, wrapping) and minor quoting defects in embedded snippets are non-blocking if command identity and loci are unambiguous. During execution, run the semantically correct command and capture the exact executed command in the step log header and in Moon Loop (if used). If a formatting defect makes command identity or loci ambiguous, it is gating.
+
+* Command syntax latitude: approval binds to command identity and bounded proof outputs, not to exact shell syntax. JSON-carrying environment variable assignments are treated as intent carriers; do not reject solely on whitespace or quoting style. Plans MAY define plan-level Command Snippets once and reference them by local IDs, provided each executed step log records the resolved command. This latitude MUST NOT be used to accept invented commands or unproven loci.
+
+* Markdown sanitation rule (analysis-only): when quoting a plan for review notes, remove only presentation escapes that exist solely for Markdown rendering. Do not remove semantic escapes used by shell, JSON, regex, or paths, and do not rewrite commands based on sanitized excerpts.
+
+* Optional environment snapshots may be omitted if the plan otherwise references stable loci.
+
+* Minor formatting variance is not a blocker if semantic meaning is preserved (whitespace, blank lines, heading choice, punctuation, Markdown escapes for underscores).
+
+* Headings and levels need not match a reviewer’s preferences; only required headings and required template blocks are gating.
+
+* A plan MAY cite upstream scripts or previously-approved plan steps (for example, reused remediation steps), provided it cites exact repo paths and captures the necessary evidence outputs under `audit/`.
+
+* Reviewers MUST NOT request changes solely to make a plan easier for LLM parsing. If a change is requested, it must be justified by execution safety, evidence posture, canon alignment, or mechanical paste safety requirements, and should be the smallest viable edit.
 
 Caveats (allowed, must be mechanically logged):
 
@@ -715,7 +895,52 @@ Caveats (allowed, must be mechanically logged):
 
 * UNREGISTERED\_TOKEN — registry mismatch is evidenced mechanically (validator output); do not maintain narrative lists.
 
-  ## **2\) HDE-EPIC-Plan**
+### **QA planning QoS guardrails — templates, deferred steps, and prompt-family separation**
+
+**Status:** Addendum (process fix)
+
+These guardrails exist to prevent high-iteration QA loops driven by template mismatch and false missing-evidence outcomes.
+
+#### **Template semantics: future-step artifacts**
+
+Plans and "normative" closure templates can enumerate artifacts for steps that have not executed yet. When a plan template enumerates step-scoped evidence paths, it MUST explicitly label future-step artifacts as `NOT RUN` (or `DEFERRED`) until the producing step has executed.
+
+Rules:
+
+* Plans/templates may list deferred-step artifacts only under an explicitly labeled `Deferred/Not Run` section. Deferred-step artifacts MUST NOT be presented as required primary evidence paths for the current run.  
+* `NOT RUN` / `DEFERRED` is not a missing-evidence failure.
+
+* Missing-evidence failures are reserved for cases where the producing step executed but the artifact is absent or unproven.
+
+Closure and rollup steps MUST separate these states clearly for any listed artifact paths:
+
+* PRESENT
+
+* MISSING
+
+* NOT RUN / DEFERRED
+
+#### **Prompt-family separation: AUTHORING vs REVIEW modes for QA prompts**
+
+Every QA prompt MUST declare a mode: `AUTHORING` or `REVIEW`.
+
+* In `AUTHORING` mode, prompts may generate or revise plans, runbooks, and command sequences.
+
+* In `REVIEW` mode, prompts MUST be restricted to evidence review and verdict outputs. In `REVIEW` mode, prompts MUST NOT instruct the agent to create new runbooks or new command sequences, except when issuing remediation in `REVIEW` mode (commands copied verbatim from the plan and its caveats).
+
+* The agent MUST output only the required structure for the declared mode.
+
+Workflow and harness recommendation (non-canon, strongly advised):
+
+* Enforce mode with a mechanical gate (a header token and required section list). If required sections do not match the declared mode, fail fast.
+
+#### **QoS stop-rule: iteration churn escalation**
+
+If a QA plan or closure record exhibits repeated structural remediation for the same failure mode (for example, templates listing future-step artifacts as required now, or producer-step and artifact mismatch), escalate from incremental plan edits to a systems RCA plus a template and canon drain.
+
+The drain MUST target the class of failure (template semantics, artifact map source-of-truth, prompt-family separation), not the individual incident.
+
+## **2\) HDE-EPIC-Plan**
 
 This section defines the **Epic Plan** template used for in-flight planning and close preparation.
 
@@ -869,7 +1094,31 @@ List any additional acceptance tokens required by this epic’s design (names-on
 
 * Epic Plans MUST NOT introduce new acceptance tokens as a convenience for describing behavior. If PF05/PF09 already specify a behavioral constraint (example: stream discipline), represent it as a non-token requirement under the relevant deliverable and prove it via tests/evidence, unless governance explicitly requires a token.
 
-* Unregistered token names are mechanical blockers. If a new token is genuinely required, it MUST be routed via ADR \+ conflict check \+ Governance Doc-Delta before it can appear as a required acceptance token in §2.1.5, acceptance maps, or token→evidence matrices.
+* Unregistered token names are mechanical blockers. If a new token is genuinely required, it MUST be routed via ADR \+ conflict check \+ Governance Doc-Delta before it can appear as a required acceptance token in §2.1.5, acceptance maps, or token→evidence matrices.  
+* Canonical tokens only for acceptance. Epic Plans and QA plans MUST express acceptance criteria using canonical token names (from PF04 — HDE Governance, or PF10 if newly minted). Plans MUST NOT use freeform acceptance statements, and MUST NOT invent local terms or aliases.  
+* Names-only. Token lists in these templates are pointers to canon; plans MUST NOT redefine token semantics, strength, or pass conditions inside plan text.  
+* Canon sources for token claims. A token MAY be listed in `claimed_tokens` only if it exists verbatim in PF04 or PF10.  
+* Epic Plan token inventory (required): Epic Plans MUST include a Token Inventory subsection that lists every acceptance token referenced by the epic and confirms each token exists in PF04 or PF10 with exact canonical spelling (and cites the PF anchor for each).  
+* No plan-local minting. If an acceptance requirement is not represented by an existing token, record it as a non-token obligation (commands, artifacts, PASS predicate), and route token creation through ADR \+ conflict check \+ Governance Doc-Delta before any plan can claim it as an acceptance token.  
+* Token minting workflow (planning gate):  
+  * Open an ADR proposing the token and its meaning (owner: PO), including a conflict check against PF04.  
+  * Open an ADR proposing the token and its meaning (owner: PO), including a conflict check against PF04.  
+  * Only after minting may downstream plans claim the token by name.  
+* Token spelling reconciliation. Token spellings in all plans MUST match the Governance registry exactly. If a legacy string appears, treat it as DOC\_DRIFT and normalize before claiming.  
+* Known legacy token spellings (normalize; do not claim these legacy strings as acceptance tokens):  
+  * CLI\_READER\_EMITTER\_PARITY\_OK → CLI\_IO\_CONFORMANCE\_OK  
+  * CLI\_READER\_EMITTER\_STACK\_OK → CLI\_IO\_CONFORMANCE\_OK  
+  * TOKEN\_CLI\_CONFORMANCE\_OK → CLI\_IO\_CONFORMANCE\_OK  
+  * CLI\_READER\_EMITTER\_PROBE\_OK → CLI\_IO\_CONFORMANCE\_OK  
+  * CLI\_READER\_EMITTER\_PROXY\_OK → CLI\_IO\_CONFORMANCE\_OK  
+  * CLI\_READER\_EMITTER\_CODEC\_OK → CLI\_IO\_CONFORMANCE\_OK  
+  * CLI\_READER\_EMITTER\_FORMAT\_OK → CLI\_IO\_CONFORMANCE\_OK  
+  * CLI\_HYGIENE\_OK → CLI\_IMPLEMENTATION\_HYGIENE\_OK  
+  * IFACE\_AGGREGATOR\_P1\_COMPAT\_OK → IFACE\_CONJ\_P1\_COMPAT\_OK  
+  * AGGREGATOR\_P1\_COMPAT\_OK → IFACE\_CONJ\_P1\_COMPAT\_OK  
+  * IFACE\_P1\_COMPAT\_KEYSET\_OK → (non-token evidence requirement; do not mint as a new token)  
+* Compatibility keyset contract posture: keyset-level compatibility is an evidence requirement, not a token. It MUST NOT be minted as a new acceptance token in plan text.  
+* Ownership posture. For token-addition ADR stubs and any Tracked Issues created for token drift or token minting, the accountable owner is the PO.
 
 ##### B. Non-token workflow metadata (do not model as acceptance tokens)
 

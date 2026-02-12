@@ -2,11 +2,11 @@
 
 **Status:** Reference
 
-**Version:** v1.7.7
+**Version:** v1.7.8
 
-**Effective date:** 2026-01-23
+**Effective date:** 2026-02-06
 
-**Last Update Gate:** HDE-EPIC024 Closure
+**Last Update Gate:** HDE-EPIC025 Closure
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -5083,4 +5083,287 @@ Deliverables register mismatch note: PF10’s closure review includes a separate
   * Present: `audit/EPIC-024_close_report.md`, `audit/EPIC-024_MANIFEST.json` (PF10 — HDE Build Notes, §2.22)  
   * Additional PF10 artifact: `audit/EPIC-024_hash_manifest.json` (PF10 — HDE Build Notes, §2.22)  
 * Plan “ASK OK?” placeholder: present in `r3 Epic Plan HDE-EPIC024.md` preflight section; approval disposition is not recorded in that plan file. PF10 nonetheless records closure (“SATISFIED”) (PF10 — HDE Build Notes, §2.31).
+
+### **2.10 HDE-EPIC025 Epic Plan**
+
+#### **2.10.1 Meta**
+
+**Status:** Done  
+**Phase:** Conjunction (PF21)  
+**Priority:** P0  
+**Owner:** PO  
+**Epic name (short):** Conjunction Pass 1  
+**Date started:** 2026-01-23  
+**Date completed:** 2026-02-06  
+**Epic outcome (per PF10):** “Overall readiness: Ready with caveats” (PF10 — HDE Build Notes, §2.50)
+
+**Active PRs:** Unknown (not present in inputs)
+
+**Depends on:**
+
+* HDE-EPIC024  
+* HDE-EPIC023  
+* PF20 — HDE-Phased Epics  
+* PF10 — HDE Build Notes  
+* PF12 — HDE Schemas & Artifacts  
+* PF19 — Glow QA Guide  
+* PF09 — HDE Build Checklist  
+* PF04 — HDE Governance
+
+#### **2.10.2 Existing Work Check**
+
+**Planned (from r7 Epic Plan HDE-EPIC025.md):**
+
+* Compatibility surface internal contract and endpoint catalog discipline.  
+* CLI showcompat contract truth and serializer coupling.  
+* Reader bytes and transport invariants (A7) existing proof surface check.  
+* Canonical bytes and canonical JSON gating surfaces check.  
+* Evidence index and mirror parity check.  
+* Close pack pair and docdeltas surfaces check.  
+* If gaps are found, capture as TI-\#\#\# and/or cross-epic ISSUE-\#\#\#, and defer.
+
+**Actual (from PF10):**
+
+* Baseline discovery executed and logged as `d0_discovery` (PF10 — HDE Build Notes, §2.30) with evidence pointer `checks/d0_discovery/primary.log`.  
+* Endpoint catalog/internal-only/env-gate posture is explicitly evidenced (PF10 — HDE Build Notes, §2.11): token evidence recorded as `ENDPOINTS_CATALOG_OK`, `ENDPOINTS_CATALOG_INTERNAL_OK`, `ENDPOINTS_CATALOG_ENV_GATE_OK`, with evidence pointer `artifacts/audit/compat_endpoints_catalog.json`.  
+* Reader A7 proof surface is captured (PF10 — HDE Build Notes, §2.13): evidence pointers include `artifacts/proofs/bytes_for_reader_a7.json` and `artifacts/proofs/reader_a7_invariants_report.json`.  
+* Close-pack and global gates executed/recorded during close (PF10 — HDE Build Notes, §2.14): evidence pointers include `"audit/EPIC-025_MANIFEST.json"`, `"audit/EPIC-025_close_report.md"`, `audit/qa/hde-epic025/run.json`, and `audit/qa/hde-epic025/checks/gate_evidence_paths_validation/primary.log`.
+
+#### **2.10.3 Deliverables (Jobs-to-be-done) — Planned vs Actual Reconciliation**
+
+**Planned deliverables (from r7 Epic Plan HDE-EPIC025.md):**
+
+##### **D1 — Compat surface contract and endpoint catalog discipline**
+
+* **Plan statement:** “Compatibility surface internal contract is explicit and enforced.”  
+* **Planned acceptance tokens (names-only):** `HTTP_COMPAT_ENDPOINT_CATALOG_OK`, `HTTP_COMPAT_INTERNAL_ADMIN_OK`, `HTTP_COMPAT_GET_IS_PROBE_ONLY_OK`, `HTTP_COMPAT_POST_ONLY_OK`, `HTTP_COMPAT_ENV_GATE_PRESENT_OK`.  
+* **Actual (PF10):** PR01 delivered catalog \+ internal-only \+ env-gate posture (PF10 — HDE Build Notes, §2.11) with token evidence recorded as `ENDPOINTS_CATALOG_OK`, `ENDPOINTS_CATALOG_INTERNAL_OK`, `ENDPOINTS_CATALOG_ENV_GATE_OK` and evidence pointer `artifacts/audit/compat_endpoints_catalog.json` (PF10 — HDE Build Notes, §2.11 “Evidence Print”).  
+* **Disposition:** Satisfied (evidence present; planned token names are not the token names recorded in PF10).
+
+##### **D2 — CLI contract truth is serializer-coupled**
+
+* **Plan statement:** “CLI contract truth is serializer-coupled and no longer needs the HTTP compat endpoint.”  
+* **Planned acceptance token (names-only):** `CLI_SHOWCOMPAT_OUTPUT_EQUALS_SERIALIZER_OK`.  
+* **Actual (PF10):** PR02 added parity coverage across CLI+HTTP (`tests/http/test_compat_contract_parity.py`, `tests/cli/test_show_compat.py`) with local proof PASS (“3 passed”) (PF10 — HDE Build Notes, §2.12).  
+* **Disposition:** Satisfied (evidence indicates behavior; token not explicitly claimed by this name in PF10).
+
+##### **D3 — CLI conformance and tooling is tightened**
+
+* **Plan statement:** “CLI conformance and tooling is tightened; errors parity and return code behavior is locked.”  
+* **Planned acceptance tokens (names-only):** `CLI_SHOWCOMPAT_RETURNS_0_OK`, `CLI_ERRORS_PARITY_OK`, `CLI_SHOWCOMPAT_CONTRACT_OK`, `COMPAT_TRUTH_SER_IS_WIRED_OK`.  
+* **Actual (PF10):**  
+  * CLI showcompat and contract parity tests exercised with local proof PASS (`tests/cli/test_show_compat.py`, `tests/http/test_compat_contract_parity.py`) (PF10 — HDE Build Notes, §2.12).  
+  * CLI errors parity baseline test exists and passed locally (`tests/cli/test_cli_errors_parity.py` with local proof “3 passed”) (PF10 — HDE Build Notes, §2.11).  
+* **Disposition:** Satisfied (evidence present; tokens not explicitly claimed by these names in PF10).
+
+##### **D4 — Reader surface and transport invariants are locked**
+
+* **Plan statement:** “Reader surface and transport invariants are locked.”  
+* **Planned acceptance tokens (names-only):** `HTTP_COMPAT_ENDPOINT_IS_INTERNAL_OK`, `READER_SURFACE_A7_INVARIANTS_OK`, `HTTP_READER_BYTES_CANONICAL_OK`, `READER_MANDATORY_JSON_GATE_OK`.  
+* **Actual (PF10):** PR03 produced reader A7 proof artifacts (PF10 — HDE Build Notes, §2.13), including `artifacts/proofs/bytes_for_reader_a7.json`, `artifacts/proofs/bytes_for_reader_a7.json.sha256`, and `artifacts/proofs/reader_a7_invariants_report.json`.  
+* **Disposition:** Satisfied (proof artifacts present; tokens not explicitly claimed by these names in PF10).
+
+##### **D5 — Global discipline: canonical JSON and evidence indexing is locked**
+
+* **Plan statement:** “Global discipline — canonical JSON and evidence indexing is locked.”  
+* **Planned acceptance tokens (names-only):** `CANONICAL_JSON_GATE_OK`, `EVIDENCE_PATHS_VALIDATED_OK`, `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_MIRROR_PARITY_OK`, `STEP_LOGS_MANIFEST_OK`.  
+* **Actual (PF10):** PR04 recorded token satisfaction for `EVIDENCE_PATHS_VALIDATED_OK`, `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_MIRROR_PARITY_OK` (PF10 — HDE Build Notes, §2.14). Evidence pointers include:  
+  * `audit/qa/hde-epic025/checks/gate_canonical_json/primary.log` and `audit/gates/json_gate/canonical/json_gate_check_log.ndjson`  
+  * `audit/qa/hde-epic025/checks/gate_evidence_index_snapshot/primary.log` and `audit/gates/evidence_index_snapshot/evidence_index_snapshot.json`  
+  * `audit/qa/hde-epic025/checks/gate_evidence_paths_validation/primary.log` and `audit/qa/hde-epic025/checks/gate_evidence_paths_validation/evidence_paths_validation.ndjson`  
+  * `audit/qa/hde-epic025/step_log_manifest.json` (file present; token `STEP_LOGS_MANIFEST_OK` is not explicitly claimed by this name in PF10)  
+* **Disposition:** Satisfied for evidence-path validation, evidence index update, mirror parity; partial on token-name coverage (some planned token names not explicitly used in PF10).
+
+##### **D6 — Close pack is canonical and complete**
+
+* **Plan statement:** “Close report and manifest are canonical, evidence-rooted, and self-describing.”  
+* **Planned acceptance tokens (names-only):** `CLOSE_PACK_PAIR_OK`, `CLOSE_REPORT_KEY_OUTPUTS_BOUND_OK`, `TOKEN_EVIDENCE_MATRIX_OK`, `QA_EVIDENCE_ROOT_OK`, `EPIC_CLOSE_PACK_OK`.  
+* **Actual (PF10):** PR04 recorded token satisfaction for `QA_EVIDENCE_ROOT_OK`, `CLOSE_PACK_PAIR_OK`, `CLOSE_REPORT_KEY_OUTPUTS_BOUND_OK` (PF10 — HDE Build Notes, §2.14) with evidence pointers including `"audit/EPIC-025_MANIFEST.json"`, `"audit/EPIC-025_close_report.md"`, and `audit/qa/hde-epic025/run.json`.  
+* **Disposition:** Mostly satisfied (close-pack pair \+ key outputs binding \+ QA evidence root). `TOKEN_EVIDENCE_MATRIX_OK` is **Unknown (not present in inputs)**: PF10 does not reference `audit/qa/hde-epic025/token_evidence_matrix.md` (planned), nor cite an alternate token→evidence matrix artifact.
+
+##### **Docs sweep (planned; out-of-band)**
+
+* **Planned:** “Docs sweep PR (out-of-band, as needed).” (r7 Epic Plan HDE-EPIC025.md)  
+* **Actual (PF10):** Docs PR executed (PF10 — HDE Build Notes, §2.15) with evidence pointer `audit/docdeltas/hde-epic025_doc_deltas.md`.
+
+**Planned vs actual notes (non-silent mismatches):**
+
+* Planned token naming uses `HTTP_COMPAT_*` tokens; PF10 records `ENDPOINTS_CATALOG_*` token evidence and does not explicitly claim the `HTTP_COMPAT_*` token names (PF10 — HDE Build Notes, §2.11).  
+* Planned QA check log naming in r7 uses long-form check directories (example: `audit/qa/hde-epic025/checks/po-001_selected_route_a7_invariants/primary.log`), while PF10 records check logs under short IDs (example: `audit/qa/hde-epic025/checks/po-001/primary.log`) (PF10 — HDE Build Notes, §2.31).  
+* r7 plan expects `audit/qa/hde-epic025/closeout_summary.md`; PF10 does not reference this artifact (**Unknown (not present in inputs)**).
+
+#### **2.10.4 PF Reference Map**
+
+**Planned PF references (from r7 Epic Plan HDE-EPIC025.md “Depends on”):**
+
+* HDE-EPIC024  
+* HDE-EPIC023  
+* PF20 — HDE-Phased Epics  
+* PF10 — HDE Build Notes  
+* PF12 — HDE Schemas & Artifacts  
+* PF19 — Glow QA Guide  
+* PF09 — HDE Build Checklist  
+* PF04 — HDE Governance
+
+**Execution and results sources used for this archive record:**
+
+* PF10 — HDE Build Notes, §2.11 (PR01), §2.12 (PR02), §2.13 (PR03), §2.14 (PR04), §2.15 (Docs PR), §2.16 (Retrospective), §2.17 (PF23 Updated), §2.18 (Audit Report), §2.19 (ADR-EPIC025-ARCH-001), §2.30–§2.46 (QA step logs), §2.50 (Final QA Closeout Review \+ QA RCA).  
+* r7 Epic Plan HDE-EPIC025.md (planned scope, acceptance tokens, planned evidence outputs).  
+* PF27 — Plan Templates, §2.4.3 Epic Record Template (Normative).
+
+#### **2.10.5 Tokens and Evidence (Acceptance)**
+
+**Planned tokens (from r7 Epic Plan HDE-EPIC025.md; names-only; no aliases):**
+
+* Baseline tokens: `INTERNAL_VERSION_CONDITIONALS_IGNORED_OK`, `HTTP_COMPAT_ENDPOINT_CATALOG_OK`, `CLI_SHOWCOMPAT_CONTRACT_OK`, `READER_SURFACE_A7_INVARIANTS_OK`, `CANONICAL_JSON_GATE_OK`  
+* Deliverable-specific tokens: `HTTP_COMPAT_INTERNAL_ADMIN_OK`, `HTTP_COMPAT_GET_IS_PROBE_ONLY_OK`, `HTTP_COMPAT_POST_ONLY_OK`, `HTTP_COMPAT_ENV_GATE_PRESENT_OK`, `CLI_SHOWCOMPAT_OUTPUT_EQUALS_SERIALIZER_OK`, `CLI_SHOWCOMPAT_RETURNS_0_OK`, `CLI_ERRORS_PARITY_OK`, `COMPAT_TRUTH_SER_IS_WIRED_OK`, `HTTP_COMPAT_ENDPOINT_IS_INTERNAL_OK`, `HTTP_READER_BYTES_CANONICAL_OK`, `READER_MANDATORY_JSON_GATE_OK`, `EVIDENCE_PATHS_VALIDATED_OK`, `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_MIRROR_PARITY_OK`, `STEP_LOGS_MANIFEST_OK`  
+* Close gate token set: `QA_EVIDENCE_ROOT_OK`, `EPIC_CLOSE_PACK_OK`, `CLOSE_PACK_PAIR_OK`, `CLOSE_REPORT_KEY_OUTPUTS_BOUND_OK`, `TOKEN_EVIDENCE_MATRIX_OK`
+
+**Planned evidence outputs (from r7 Epic Plan HDE-EPIC025.md; verbatim paths):**
+
+* `audit/qa/hde-epic025/` root populated with step logs and check logs.  
+* `audit/qa/hde-epic025/checks/d0_discovery/primary.log`  
+* `audit/qa/hde-epic025/checks/po-001_selected_route_a7_invariants/primary.log`  
+* `audit/qa/hde-epic025/checks/po-002_capture_a7_bytes/primary.log`  
+* `audit/qa/hde-epic025/checks/po-003_cli_showcompat_contract/primary.log`  
+* `audit/qa/hde-epic025/checks/po-004_cli_error_parity/primary.log`  
+* `audit/qa/hde-epic025/checks/po-005_cli_showcompat_output_parity/primary.log`  
+* `audit/qa/hde-epic025/checks/po-006_check_http_compat_mandatory_gate/primary.log`  
+* `audit/qa/hde-epic025/checks/po-007_check_http_compat_internal/primary.log`  
+* `audit/qa/hde-epic025/checks/po-008_check_http_compat_get_is_probe_only/primary.log`  
+* `audit/qa/hde-epic025/checks/po-009_check_http_compat_post_only/primary.log`  
+* `audit/qa/hde-epic025/checks/po-010_check_http_compat_env_gate/primary.log`  
+* `audit/qa/hde-epic025/checks/po-011_gate_canonical_json/primary.log`  
+* `audit/qa/hde-epic025/checks/po-012_gate_arrays_as_sets/primary.log`  
+* `audit/qa/hde-epic025/checks/po-013_gate_env_pins/primary.log`  
+* `audit/qa/hde-epic025/checks/po-014_gate_evidence_paths/primary.log`  
+* `audit/EPIC-025_close_report.md`  
+* `audit/EPIC-025_MANIFEST.json`  
+* `audit/qa/hde-epic025/token_evidence_matrix.md`  
+* `docs/evidence/INDEX.json` \+ `docs/evidence/INDEX.sha256`  
+* `artifacts/evidence_index.jsonl`  
+* `artifacts/audit/ENDPOINTS_CATALOG.json` \+ `docs/ENDPOINTS_CATALOG.json.sha256`  
+* `artifacts/proofs/*` (reader bytes, invariants reports, parity proofs)  
+* `audit/gates/json_gate/canonical/json_gate_check_log.ndjson` \+ `.sha256`  
+* `audit/gates/determinism/arrays_as_sets.log` \+ `.sha256`  
+* `audit/gates/determinism/env_pins.log` \+ `.sha256`  
+* `audit/gates/evidence_index_snapshot/evidence_index_snapshot.json` \+ `.sha256`  
+* `docs/acceptance_map_epic025.json`  
+* `docs/acceptance_map_epic025.json.path_proof.txt`  
+* `audit/docdeltas/hde-epic025_doc_deltas.md`  
+* `audit/qa/hde-epic025/step_log_manifest.json`  
+* `audit/qa/hde-epic025/run.json`  
+* `audit/qa/hde-epic025/closeout_summary.md`
+
+**Actual token claims and evidence pointers (from PF10):**
+
+* PF10 §2.11 token evidence recorded (names-only): `ENDPOINTS_CATALOG_OK`, `ENDPOINTS_CATALOG_INTERNAL_OK`, `ENDPOINTS_CATALOG_ENV_GATE_OK`.  
+* PF10 §2.14 tokens satisfied (names-only): `QA_EVIDENCE_ROOT_OK`, `EVIDENCE_PATHS_VALIDATED_OK`, `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_MIRROR_PARITY_OK`, `CLOSE_PACK_PAIR_OK`, `CLOSE_REPORT_KEY_OUTPUTS_BOUND_OK`.
+
+**Evidence pointers (verbatim; PF10 §2.14 unless otherwise stated):**
+
+* `"audit/EPIC-025_MANIFEST.json"` (normalized: `audit/epic-025_manifest.json`)  
+* `"audit/EPIC-025_close_report.md"` (normalized: `audit/epic-025_close_report.md`)  
+* `audit/qa/hde-epic025/run.json`  
+* `audit/qa/hde-epic025/step_log_manifest.json`  
+* `docs/acceptance_map_epic025.json`  
+* `docs/acceptance_map_epic025.json.path_proof.txt`  
+* `docs/evidence/INDEX.json`  
+* `docs/evidence/INDEX.sha256`  
+* `artifacts/evidence_index.jsonl`  
+* `audit/qa/hde-epic025/checks/gate_evidence_paths_validation/primary.log`  
+* `audit/qa/hde-epic025/checks/gate_evidence_paths_validation/evidence_paths_validation.ndjson`  
+* `audit/qa/hde-epic025/checks/gate_evidence_paths_validation/evidence_paths_validation.ndjson.sha256`  
+* `artifacts/evidence_index.jsonl.path_proof.txt`  
+* `docs/evidence/INDEX.json.path_proof.txt`  
+* `audit/qa/hde-epic025/checks/gate_evidence_index_snapshot/primary.log`  
+* `audit/gates/evidence_index_snapshot/evidence_index_snapshot.json`  
+* `audit/gates/evidence_index_snapshot/evidence_index_snapshot.json.sha256`  
+* `audit/gates/evidence_index_snapshot/evidence_index_snapshot.json.path_proof.txt`  
+* `audit/qa/hde-epic025/checks/gate_evidence_index_snapshot/evidence_index_snapshot.log`  
+* `audit/qa/hde-epic025/checks/gate_canonical_json/primary.log`  
+* `audit/gates/json_gate/canonical/json_gate_check_log.ndjson`  
+* `audit/gates/json_gate/canonical/json_gate_check_log.ndjson.sha256`  
+* `audit/qa/hde-epic025/checks/gate_canonical_json/json_gate_check_summary.txt`  
+* `audit/qa/hde-epic025/checks/gate_arrays_as_sets/primary.log`  
+* `audit/gates/determinism/arrays_as_sets.log`  
+* `audit/gates/determinism/arrays_as_sets.log.sha256`  
+* `audit/qa/hde-epic025/checks/gate_env_pins/primary.log`  
+* `audit/gates/determinism/env_pins.log`  
+* `audit/gates/determinism/env_pins.log.sha256`  
+* `audit/docdeltas/hde-epic025_doc_deltas.md`  
+* `artifacts/audit/compat_endpoints_catalog.json` (PF10 — HDE Build Notes, §2.11)  
+* `"artifacts/audit/ENDPOINTS_CATALOG.json"` (normalized: `artifacts/audit/endpoints_catalog.json`) (PF10 — HDE Build Notes, §2.13)  
+* `"docs/ENDPOINTS_CATALOG.json.sha256"` (normalized: `docs/endpoints_catalog.json.sha256`) (PF10 — HDE Build Notes, §2.13)  
+* `artifacts/proofs/bytes_for_reader_a7.json` (PF10 — HDE Build Notes, §2.13)  
+* `artifacts/proofs/reader_a7_invariants_report.json` (PF10 — HDE Build Notes, §2.13)
+
+**Gaps / unknowns (from planned vs PF10-cited artifacts):**
+
+* `audit/qa/hde-epic025/token_evidence_matrix.md` is **Unknown (not present in inputs)** (planned by r7; not referenced in PF10).  
+* `audit/qa/hde-epic025/closeout_summary.md` is **Unknown (not present in inputs)** (planned by r7; not referenced in PF10).  
+* Planned check-log directory names in r7 (e.g., `po-001_selected_route_a7_invariants`) do not match PF10-cited check-log paths (e.g., `audit/qa/hde-epic025/checks/po-001/primary.log`) (PF10 — HDE Build Notes, §2.31).
+
+#### **2.10.6 QA Rails — Open/Close (Final PR)**
+
+**Planned QA rails posture (from r7 Epic Plan HDE-EPIC025.md):** Unknown (not present in inputs).
+
+**Actual QA execution posture (PF10):**
+
+* PF10 records all step-level verdicts PASS for the QA run step set (PF10 — HDE Build Notes, §2.50 “What passed: PF10 §§2.30–2.46 show all step-level verdicts PASS.”).  
+* Step set executed (PF10 section anchors): `d0_discovery` (PF10 §2.30) and `po-001` through `po-014` (PF10 §§2.31–2.46).  
+* Core QA evidence pointers (PF10 — HDE Build Notes, §2.14 and §§2.30–2.46): `audit/qa/hde-epic025/run.json`, `audit/qa/hde-epic025/step_log_manifest.json`.  
+* Example per-check evidence pointers (PF10 — HDE Build Notes, §§2.31–2.46):  
+  * `audit/qa/hde-epic025/checks/po-001/primary.log`  
+  * `audit/qa/hde-epic025/checks/po-005/primary.log`  
+  * `audit/qa/hde-epic025/checks/po-014/primary.log`
+
+**Recorded QA deviations / ADRs (PF10):**
+
+* Rails posture mismatch recorded for `po-005` with “open rails” deviation (`ALLOW_NETWORK=1 SAFE_MODE=0`) and logged as `ADR-DEV-01` (PF10 — HDE Build Notes, §2.38; also summarized in PF10 §2.50).  
+* Additional QA execution ADRs recorded in the step logs: `ADR-DEV-02` and `ADR-DEV-03` (PF10 — HDE Build Notes, §2.38–§2.46; summarized in PF10 §2.50).  
+* QA closeout process caveat recorded: PF10 notes the run did not have a discrete QA plan document and relied on inlined plan steps \+ manual logging (PF10 — HDE Build Notes, §2.50 “Process caveat”).
+
+#### **2.10.7 Tracked Issues**
+
+**Planned deferrals and issues tracked by this epic (from r7 Epic Plan HDE-EPIC025.md):**
+
+* **TI-001:** “Legacy endpoints table is not fully stable; some mismatch between docs and actual surface remains.”  
+  * Disposition: Unknown (not present in inputs).  
+* **TI-002:** “Dev HTTP Harness and Writer Surfaces are still missing; deferred.”  
+  * Disposition: Carried forward — PF10 records: “TI-002: defers Dev HTTP Harness and Writer Surfaces to HDE-EPIC026.” (PF10 — HDE Build Notes, §2.14).  
+* **TI-003:** “Determine whether evidence index should embed per-run summary (future).”  
+  * Disposition: Unknown (not present in inputs).  
+* **TI-004:** “Normalize internal endpoint error responses (if needed) — deferred.”  
+  * Disposition: Unknown (not present in inputs).
+
+**Planned cross-epic issues (from r7 Epic Plan HDE-EPIC025.md):**
+
+* ISSUE-QA-ROOT-NAMING — Unknown (not present in inputs).  
+* ISSUE-CLOSEPACK-PAIR — Unknown (not present in inputs).  
+* ISSUE-EVIDENCE-ENDPOINTS — Unknown (not present in inputs).  
+* ISSUE-EVIDENCE-PATHS-VALIDATOR — Unknown (not present in inputs).
+
+**Additional PF10-recorded gaps (not explicitly listed in r7 plan):**
+
+* “Tooling audit requested: ensure evidence tooling auto-enumerates all required artifacts; avoid manual omissions.” (PF10 — HDE Build Notes, §2.16 “Gaps and follow-ups”).  
+* “Need official link to reality audit endpoints and helper surfaces; reduce ambiguity.” (PF10 — HDE Build Notes, §2.16 “Gaps and follow-ups”).
+
+#### **2.10.8 Plan Preflight (MUST)**
+
+**Planned preflight rails (from r7 Epic Plan HDE-EPIC025.md):**
+
+* P1 Token registry validation: planned token names must match canonical registry names; no aliases.  
+* P2 Close pack baseline: close report \+ manifest must exist as a pair (`audit/EPIC-025_close_report.md`, `audit/EPIC-025_MANIFEST.json`).  
+* P3 Evidence bundle completeness: required evidence artifacts must be produced and path-proofed.  
+* P4 Canonical evidence-path binding validator: run evidence-path binding validator; treat missing/unknown paths as defects.  
+* P5 Acceptance artifact hygiene: acceptance map and evidence index must have `.sha256` and `.path_proof.txt` where required.  
+* P6 Lowercase directory naming: audit/qa evidence root must be lowercase and consistent.
+
+**Actual (PF10):**
+
+* Close pack pair exists and is cited as evidence pointers: `"audit/EPIC-025_close_report.md"`, `"audit/EPIC-025_MANIFEST.json"` (PF10 — HDE Build Notes, §2.14).  
+* Evidence-path binding validation is explicitly recorded: `audit/qa/hde-epic025/checks/gate_evidence_paths_validation/primary.log` and `audit/qa/hde-epic025/checks/gate_evidence_paths_validation/evidence_paths_validation.ndjson` (PF10 — HDE Build Notes, §2.14).  
+* Acceptance map and evidence index artifacts are cited with path proofs/hashes (PF10 — HDE Build Notes, §2.14): `docs/acceptance_map_epic025.json.path_proof.txt`, `docs/evidence/INDEX.sha256`, `docs/evidence/INDEX.json.path_proof.txt`.  
+* Planned `audit/qa/hde-epic025/token_evidence_matrix.md` remains Unknown (not present in inputs): not referenced by PF10.
 
