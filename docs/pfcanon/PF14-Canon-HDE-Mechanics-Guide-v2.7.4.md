@@ -3,12 +3,12 @@
 ## 0.1 **Header**
 
 **Title:** PF14-Canon-HDE-Mechanics-Guide  
-**Version:** v2.6.3
+**Version:** v2.7.4
 
 **Status:** Canon  
-**Effective date:** 2026-01-24
+**Effective date:** 2026-02-09
 
-**Last Update Gate:** BN 9.4.4 Drain A30-31  
+**Last Update Gate:** BN 9.8.2 Drain A49-51  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
 ---
@@ -24,11 +24,14 @@ This guide:
 * Does not restate math formulas or public transport bytes; those live in their single-home PF documents and are referenced here by title only. When a mechanic depends on math or transport, this guide names the component and its responsibilities and routes the details to the owning PF doc.
 
 Scope boundary (normative).  
-This guide is a mechanics/components reference. It MUST NOT function as governance, a token registry, or an epic-planning authority.
+ This guide is a mechanics/components reference. It MUST NOT function as governance, a token registry, or an epic-planning authority.
 
-* Acceptance token registry, token naming, and token semantics are owned by HDE-Governance (titles-only). This guide MUST NOT list or curate acceptance tokens.  
-* Epic planning structure and baseline close requirements are owned by HDE-Phased Epics and Epic-Process-Guide (titles-only). This guide MUST NOT add planning prerequisites or planning checklists.  
-* Evidence families, the Evidence Index, the machine mirror schema, and canonical evidence-path governance are owned by HDE-Schemas & Artifacts and Glow QA Guide (titles-only). This guide describes required mechanics; it does not define acceptance bindings.  
+* Acceptance token registry, token naming, and token semantics are owned by HDE-Governance (titles-only). Newly minted tokens are canonical in HDE-Build Notes (titles-only) until drained into HDE-Governance. This guide MUST NOT list or curate acceptance tokens.
+
+* Epic planning structure and baseline close requirements are owned by Glow QA Guide, HDE-Phased Epics, and HDE-Build Checklist (titles-only). This guide MUST NOT add planning prerequisites or planning checklists.
+
+* Evidence families and acceptance token mapping are owned by Glow QA Guide and HDE-Build Checklist (titles-only). This guide MUST NOT redefine acceptance criteria.
+
 * Live QA runbooks are not epic-plan prerequisites. This guide may describe Live QA harness mechanics, but Live QA runbook planning lives in QA artifacts governed by Glow QA Guide (titles-only) and must not be treated as a prerequisite for epic planning.
 
 Directory naming (normative).  
@@ -184,6 +187,16 @@ Env allow-list.
 
 * Defined by title (HDE-Schemas & Artifacts / HDE-Governance). CI fails on unknown or missing required keys; secrets are never printed (keys-only logs with redaction).
 
+MODO\_ prefix (non-canonical).
+
+* Any environment variable name beginning with MODO\_ is non-canonical and MUST NOT be required or interpreted as meaningful by repo components, QA harness entrypoints, step-log schemas, or governed evidence.
+
+* If MODO\_ variables appear in captured\_env due to legacy scripts or wrapper state, they MUST be treated as inert traceability-only values (not required keys, not rails proof, and not acceptance gating).
+
+No QA-time env var minting.
+
+* QA execution and Moon Loop evidence repair MUST NOT mint new environment variable names at runtime. If an execution flow requires a new environment variable name, it must be defined in the env allow-list (titles-only) before any governed QA artifact depends on it.
+
 Rails posture (derives from PF07).
 
 * Rails defaults follow the Env Deployment Inventory (titles-only): dev & stage OPEN, prod CLOSED, CI CLOSED. This guide does not restate the table; it defers to Infrastructure.
@@ -299,7 +312,10 @@ This posture ensures that the ledger-centric evidence model (Human Index, Machin
 ### 1.3.1 Evidence jobs (single-writer tools)
 
 Scope (normative).  
-Only a small set of evidence tools may write governed evidence artifacts (ordering artifacts, Evidence Index, Machine Mirror, bundles/manifests, and path-proofs). All other code — including tests and ad-hoc scripts — MUST NOT modify governed evidence directly.
+Only a small set of evidence writers may write governed evidence artifacts (ordering artifacts, Evidence Index, Machine Mirror, bundles/manifests, and path-proofs). All other code — including tests and ad-hoc scripts — MUST NOT modify governed evidence directly.
+
+Exception (narrow, explicit).  
+A7 proof artifacts under artifacts/proofs/ may be emitted only by the focused A7 transport test harness when `HDE_WRITE_A7_PROOFS=1`. Default test runs MUST NOT write these files. The harness MUST NOT update the Evidence Index, Machine Mirror, ordering artifacts, or path-proofs; those remain single-writer outputs of the evidence tools.
 
 Evidence tools (titles-only).  
 Ordering generator.
@@ -313,6 +329,16 @@ tools/evidence/update\_evidence\_index.py is the single writer for:
 * docs/evidence/INDEX.sha256 (hash sentinel),  
 * artifacts/evidence\_index.jsonl (Machine Mirror), and  
 * governed \*.path\_proof.txt transcripts for artifacts listed in this guide.
+
+Additional evidence-discipline tools (normative):
+
+* `tools/evidence/validate_evidence_paths.py` is the evidence-index path validator. It MUST load `artifacts/evidence_index.jsonl` and verify that each record’s `discovered_physical_path` is safe and exists on disk.
+
+* Minimum rails include: reject absolute paths; reject traversal segments (`..`); resolve the candidate path and enforce repo-root containment via `resolved.relative_to(root)`.
+
+* It MUST fail closed if any JSONL line is not a JSON object (dict), and MUST exit non-zero via `SystemExit` for invalid input.
+
+* `tools/evidence/check_lf_endings.py` is the LF-ending gate wrapper. It MUST run `ci/checks/check_final_lf.sh` under determinism environment pins and MUST exit non-zero on failure.
 
 Index and sentinel path-proofs (normative).  
 docs/evidence/INDEX.json and docs/evidence/INDEX.sha256 are governed artifacts and MUST each have an up-to-date \*.path\_proof.txt. tools/evidence/update\_evidence\_index.py MUST refresh the path-proofs for the Human Evidence Index and its hash sentinel during both write and check passes, so their proofs cannot be left stale after regeneration.
@@ -561,6 +587,8 @@ Preferred pytest invocation (Codespaces and similar dev environments): In enviro
 * QA plans and CI jobs SHOULD standardize on python \-m pytest for all test steps rather than calling pytest via a venv shim, to avoid “broken shim” failures where .venv/bin/pytest exists but is not executable.  
 * Any failure of python \-m pytest \--version in the bootstrap harness MUST be recorded and classified as a tooling failure in the bootstrap log; epic acceptance and behavior tokens MUST NOT be marked failed solely because pytest is missing or misconfigured.
 
+Pytest mark registry (normative). Any pytest mark used by governed test suites MUST be registered in the repo’s pytest mark registry (implementation-defined) to avoid mark warnings in strict CI postures.
+
 ### **1.6.2 Live QA harness (commands, classification, and logs)**
 
 Purpose (normative): Provide a reusable Live QA harness that runs CLI and other Engine-facing commands for QA (including PO-run Live QA sessions) in a way that is deterministic, copy/paste-ready, and distinguishable between tooling failures and behavior failures.
@@ -579,16 +607,23 @@ Provide copy/paste-ready commands (no hand-editing):
 
 No non-canonical helper/wrapper scripts in Live QA plans (baseline commands only):
 
-* Live QA plans MUST NOT depend on helper/wrapper scripts unless the script is explicitly canon-named by path in PF canon (titles-only).  
-* If a step needs “tooling,” it MUST be either:  
-  * a canon-named entrypoint by explicit path, or  
-  * an inline tool whose full source is embedded in the plan step and written ephemerally (for example under /tmp) before execution (no hidden dependencies)  
-* Every plan step that claims a repo-provided entrypoint (script/module/CLI) MUST include a preflight existence check that demonstrates the entrypoint is present and runnable before attempting to run it (examples: test \-x , python \-c "import ", command \-v ).  
-* If the entrypoint is missing, the step outcome is TOOLING\_BLOCKED and the transcript of the preflight check MUST be captured in the step log; the harness MUST NOT attempt the missing entrypoint. Under Moon Loop, QA MAY proceed by invoking an existing repo entrypoint that performs the same check and produces the canon-governed evidence surface, and MUST record the plan drift in the step log and the step logs manifest.  
-* Evidence roots are not code roots: audit/\*\* and artifacts/\*\* are evidence/output roots. A Live QA plan MUST NOT treat files under these prefixes as pre-existing runnable code.  
-* QA vs remediation separation: remediation steps may instruct reruns of QA checks, but they MUST use the approved QA plan’s canonical commands (or existing repo harness entrypoints). They MUST NOT mint new “shadow” QA runner entrypoints purely to mirror check IDs unless introduced by a normal dev change and canonized.  
-* When canon is silent on an entrypoint but requires an artifact surface, the plan MUST validate or generate the governed artifact surface directly using baseline commands, rather than inventing a new repo script path.  
-* “Baseline commands” means: explicit shell/Python one-liners, direct invocation of canon tools, tee for logs, and explicit file writes, with no reliance on opaque runners.
+* Live QA plans MUST NOT depend on helper/wrapper scripts unless the script is explicitly canon-named by path in PF canon (titles-only).
+
+* Mechanics owns the set of repo-provided QA harness entrypoints. QA plans may reference only those entrypoints that exist (prove existence before invocation). QA plans MUST NOT mint new harness paths.
+
+* If a step needs “tooling,” it MUST be either:
+
+  * a canon-named entrypoint by explicit path (preferred), or
+
+  * a baseline command sequence that does not create a new executable script file and does not rely on opaque runners.
+
+* Plans and runbooks MUST NOT include instructions that create a new executable script (repo or temporary) and then execute it.
+
+* This does not forbid writing non-executable inputs (for example JSON fixtures) or writing evidence artifacts (logs, manifests, and close artifacts) as required by canon.
+
+* Any plan step that references a non-existent repo locus MUST be treated as a tooling gap (TOOLING\_BLOCKED), not as an instruction to improvise or synthesize missing tooling.
+
+* “Baseline commands” means: explicit shell/Python one-liners, direct invocation of canon tools, and explicit file writes for non-executable inputs and evidence artifacts, with no reliance on opaque runners.
 
 No VCS workflow content; optional non-gating repo-root sanity checks allowed (normative):
 
@@ -664,15 +699,37 @@ This component exists because “a harness that exits 0 but produces no run arti
 
 Behavior (minimum, normative): The epic QA harness entrypoint MUST:
 
-* Determine an epic id (names-only) by accepting an epic identifier via a documented interface (CLI args or environment override).  
-* Create or reuse the canonical epic QA root by creating or reusing the governed epic QA root directory of the form audit/qa/hde-epic/.  
-* Use the canonical epic QA root (normative): hde-epic where is a zero-padded 3-digit epic number (example: hde-epic022), and epic QA root directories MUST be lower-case ASCII.  
+* Determine an epic id (names-only) by accepting an epic identifier via a documented interface (CLI args or environment override).
+
+* Create or reuse the canonical epic QA root by creating or reusing the governed epic QA root directory of the form `audit/qa/hde-epic<NNN>/`.
+
+* Use the canonical epic QA root (normative): `hde-epic<NNN>` where `<NNN>` is a zero-padded 3-digit epic number (example: `hde-epic022`), and epic QA root directories MUST be lower-case ASCII.
+
 * Enforce no parallel spellings: implementations MUST NOT introduce alternate epic directory spellings for the same epic (examples: audit/QA/, audit/qa/HDE-EPIC022/, audit/qa/EPIC022/). Legacy paths may exist; do not create new ones.
 
-KISS evidence posture for Live QA (normative; minimal required outputs): Live QA harness outputs MUST default to this invariant set (no per-run history constructs).
+KISS evidence posture for Live QA (no per-run history constructs):
 
-* Per-check primary log (one file per check) under audit/qa/hde-epic/checks/\<check\_id\>/primary.log.  
-* A per-epic “step logs manifest” at audit/qa/hde-epic/qa\_step\_logs\_manifest.json that lists each check’s status and primary log path as a current-state ledger (not per-run history). The harness MUST also update audit/qa/hde-epic/qa\_step\_logs\_manifest.json.path\_proof.txt when the manifest is written.
+* Within an epic, check IDs are the stable handle. There is no additional “run identity” dimension in mechanics.  
+* A per-epic “step logs manifest” (see §1.6.3) MAY be emitted to map check IDs to the current canonical log filenames. This is a convenience index for reviewers; it is not required for correctness and MUST be current-state only, not per-run history.
+
+* run\_id is prohibited: Live QA plans and artifacts MUST NOT introduce or require run\_id (or RUN\_ID) as an operator input, step-log header field, manifest field, or correctness key.  
+* History retention MUST NOT become a correctness dimension. Any optional per-execution history nesting must remain non-canonical and non-gating; acceptance binds only to canonical check-centric evidence surfaces.
+
+**Template semantics for future-step evidence references (NOT RUN / DEFERRED):**
+
+* Any plan template that enumerates step-scoped evidence paths MUST explicitly label future-step artifacts as NOT RUN (or DEFERRED) until the producing step has executed.
+
+* Templates and closure/rollup artifacts MUST separate these states:
+
+  * Present: the artifact exists and is referenced by path.
+
+  * Missing evidence: the producing step executed, but the required artifact is absent or unproven.
+
+  * NOT RUN / DEFERRED: the producing step has not executed yet (so the artifact is not expected to exist yet).
+
+NOT RUN / DEFERRED MUST NOT be treated as missing evidence, and MUST NOT block closure until the producing step has actually executed. Forward references for NOT RUN / DEFERRED steps are informational only and MUST NOT be placed in any required-artifacts list or missing-evidence list.
+
+* If forward references are included, they MUST be grouped under a clearly labeled section such as “Deferred checks” or “Expected in future run” and MUST be explicitly excluded from any “missing evidence” counts.
 
 EPIC024 fixed paths (normative):
 
@@ -684,32 +741,135 @@ EPIC024 refresh/check entrypoint (records-only):
 
 * `python tools/evidence/refresh_step_logs_manifest.py --check`
 
+EPIC025 fixed check-log paths (records-only):
+
+* `audit/qa/hde-epic025/checks/gate_evidence_index_update/primary.log`
+
+* `audit/qa/hde-epic025/checks/gate_mirror_schema/primary.log`
+
+* `audit/qa/hde-epic025/checks/gate_evidence_paths_validation/primary.log`
+
+* `audit/qa/hde-epic025/checks/gate_lf_endings/primary.log`
+
+* `audit/qa/hde-epic025/checks/gate_canonical_json/primary.log`
+
+* `audit/qa/hde-epic025/checks/preflight_p4_evidence_endpoints/primary.log`
+
+* `audit/qa/hde-epic025/checks/preflight_e1_http_compat/primary.log`
+
+* `audit/qa/hde-epic025/checks/preflight_e3_cli_entrypoint/primary.log`
+
+* `audit/qa/hde-epic025/checks/preflight_e5_a7_transport_invariants/primary.log`
+
+* `audit/qa/hde-epic025/checks/preflight_e6_evidence_index_mirror/primary.log`
+
 Nothing else is mechanically required unless canon explicitly pins an additional governed evidence family/path (titles-only; owned elsewhere).
+
+EPIC025 additional Live QA evidence paths observed (records-only; plan-defined):
+
+* checks/d0\_discovery:
+
+  * `audit/qa/hde-epic025/checks/d0_discovery/primary.log`
+
+* checks/po-008:
+
+  * `audit/qa/hde-epic025/checks/po-008/primary.log`
+
+  * `audit/qa/hde-epic025/checks/po-008/success_head.txt`
+
+  * `audit/qa/hde-epic025/checks/po-008/success_head.txt.sha256`
+
+  * `audit/qa/hde-epic025/checks/po-008/success_get.txt`
+
+  * `audit/qa/hde-epic025/checks/po-008/success_get.txt.sha256`
+
+* checks/po-009:
+
+  * `audit/qa/hde-epic025/checks/po-009/primary.log`
+
+  * `audit/qa/hde-epic025/checks/po-009/canonical_json_gate_stdout.txt`
+
+  * `audit/qa/hde-epic025/checks/po-009/canonical_json_gate_stdout.txt.sha256`
+
+* checks/po-010:
+
+  * `audit/qa/hde-epic025/checks/po-010/primary.log`
+
+  * `audit/qa/hde-epic025/checks/po-010/env_pins.log`
+
+  * `audit/qa/hde-epic025/checks/po-010/env_pins.log.sha256`
+
+  * `audit/qa/hde-epic025/checks/po-010/env_pins_check_stdout.txt`
+
+  * `audit/qa/hde-epic025/checks/po-010/env_pins_check_stdout.txt.sha256`
+
+  * `audit/qa/hde-epic025/checks/po-010/sanity_pipeline_stdout.txt`
+
+  * `audit/qa/hde-epic025/checks/po-010/sanity_pipeline_stdout.txt.sha256`
+
+* checks/po-011:
+
+  * `audit/qa/hde-epic025/checks/po-011/primary.log`
+
+  * `audit/qa/hde-epic025/epic_closure_record.md`
+
+  * `audit/qa/hde-epic025/epic_closure_record.md.sha256`
+
+* checks/po-012:
+
+  * `audit/qa/hde-epic025/checks/po-012/primary.log`
+
+  * `audit/qa/hde-epic025/checks/po-012/endpoints_catalog.json`
+
+  * `audit/qa/hde-epic025/checks/po-012/endpoints_catalog.json.sha256`
+
+  * `audit/qa/hde-epic025/checks/po-012/index.sha256`
+
+  * `audit/qa/hde-epic025/checks/po-012/index.sha256.sha256`
+
+* checks/po-013:
+
+  * `audit/qa/hde-epic025/checks/po-013/primary.log`
+
+  * `audit/qa/hde-epic025/00_meta/deferred_scope_posture.md`
+
+  * `audit/qa/hde-epic025/checks/po-013/deferred_scope_posture.md.sha256` (hash line targets `audit/qa/hde-epic025/00_meta/deferred_scope_posture.md`)
+
+* checks/po-014 (referenced as deferred; expected path only until executed):
+
+  * `audit/qa/hde-epic025/checks/po-014/primary.log`
 
 Maintain per-epic step logs manifest (current-state):
 
-* The harness MUST update the per-epic step logs manifest so that for each executed check id there is exactly one manifest row that includes, at minimum: check\_id, status, log\_path.  
-* The manifest MUST point to the check’s primary.log path under checks/\<check\_id\>/.  
-* The manifest MUST be idempotent per check\_id (no duplicates). On rerun, the harness MUST replace the prior row for that check id so the manifest reflects the latest status and log\_path.
+* The harness MUST update the per-epic step logs manifest so that it provides a mapping from check\_id to (at minimum) status and log\_path, and MUST enforce uniqueness of check\_id.
+
+* The manifest MUST point to the check’s primary.log path under audit/qa/hde-epic\<NNN\>/checks/\<check\_id\>/.
+
+* The manifest MUST be idempotent per check\_id (no duplicates). On rerun, the harness MUST replace the prior record for that check id so the manifest reflects the latest status and log\_path.
 
 Emit per-check primary logs:
 
-* For each check/step executed by the harness, ensure the check directory exists at audit/qa/hde-epic/checks/\<check\_id\>/ and write the check’s primary log to primary.log in that directory.
+* For each check/step executed by the harness, ensure the check directory exists at audit/qa/hde-epic\<NNN\>/checks/\<check\_id\>/ and write the check’s primary log to primary.log in that directory.
 
 Each primary log MUST:
 
 * Be non-empty.  
 * Begin with a JSON header object whose fields follow the Plan Templates Live QA step-log header schema (titles-only), with this gating posture:  
-  * Required header fields (hard): check\_id, status, command, captured\_env  
+  * Required header fields (hard): check\_id, status, command, captured\_env, artifacts  
+  * Artifacts list invariant (hard): artifacts MUST be a JSON array of step-directory relative filenames, MUST include primary.log, and MUST NOT list files that are absent in the step directory.  
   * Defaultable header fields (non-blocking): pf\_refs, intended\_tokens, claimed\_tokens  
   * If any of these three fields are missing, they MUST be interpreted as empty lists for review purposes: \[\].  
-  * A QA reviewer-of-record MAY mechanically normalize a non-conforming header by inserting missing defaultable fields and re-serializing the header as canonical JSON (evidence-format repair only; no rerun required).  
+  * A QA reviewer-of-record MAY mechanically normalize a non-conforming header by inserting missing defaultable fields and re-serializing the header as canonical JSON (evidence-format repair only; no rerun required). If artifacts is missing, normalization MAY insert an artifacts list containing at minimum primary.log, plus any other step-directory files that are present and unambiguously part of the check output.  
   * Token claims are never inferred: if claimed\_tokens is missing or empty, treat claims as none; reviewers MUST NOT infer token claims from transcript text, other artifacts, or filenames.  
+  * Header rebuild may occur as evidence-format repair (including Moon Loop deviations). If a primary.log header is rebuilt by prepending a corrected JSON header line, the resulting file MAY contain more than one JSON header line.  
+  * Downstream parsers and reviewers MUST treat only the first line of primary.log as the governed header and MUST NOT assume that the file contains a single header line.  
 * Require captured\_env to include a rails snapshot (at minimum SAFE\_MODE, ALLOW\_NETWORK, LC\_ALL, LANG, TZ, APP\_ENV).  
 * Enforce status vocabulary as gating (names-only): PASS, FAIL\_BEHAVIOR, FAIL\_TOOLING, TOOLING\_BLOCKED, PARKED.  
 * Prohibit ad-hoc statuses for core execution state; if status is outside this set, normalization MAY set it only when the transcript unambiguously indicates the correct status (for example, contains a single definitive PASS: line and no FAIL\_ lines). Otherwise status remains Unclear and the step is not acceptable.  
 * Require that if token names appear, they are names-only and not invented or aliased (token registry is single-homed in HDE-Governance by title), and claimed\_tokens (if present) MUST be empty unless status=PASS.  
 * Allow additional header fields beyond this minimum, but they MUST NOT be required as a plan-approval condition unless Plan Templates is updated to require them.  
+* Header-writer input discipline (normative). If the harness uses a step-log header writer that reads per-check metadata from env vars, the harness MUST export the complete required set immediately before header generation for each check and MUST NOT rely on prior step state. Minimum per-check exports (names must match the header writer contract): CHECK\_ID, CHECK\_NAME, PASS\_FAIL, COMMANDS\_JSON, ARTIFACTS\_JSON, PF\_REFS\_JSON.  
+* Moon Loop header regeneration (evidence-format repair only). If the JSON header is missing or contains incorrect per-check metadata due to missing exports, a reviewer-of-record MAY export the required env vars and regenerate the header, then reassemble primary.log by writing the corrected JSON header as the first line and appending the existing body transcript verbatim. This MUST NOT change the executed commands and MUST NOT rerun the check.  
 * Include the commands executed (copy/paste-ready; no placeholders).  
 * When a command depends on a repo-provided entrypoint (script/module/CLI), include a preflight existence check transcript proving the entrypoint is present and runnable before execution. If the preflight fails, set status=TOOLING\_BLOCKED, capture the transcript, and MUST NOT attempt the failing command.  
 * Capture exit codes.  
@@ -1198,7 +1358,9 @@ One serializer and one emitter MUST serve all public bytes (Reader, CLI, evidenc
 
 ## **4.1 Policy (normative)**
 
-Single presenter/emitter. All public JSON bytes MUST be produced by one presenter/emitter entrypoint symbol. Reader and CLI MUST call this exact symbol (titles-only allow-list; no alternates). See §10.2 for the unified entrypoint and §10.1 for canonicalization; the preimage recipe is in §3.2.
+Single presenter/emitter (byte-authoritative). All public JSON bytes MUST be produced by one presenter/emitter entrypoint symbol. Reader and CLI MUST delegate byte emission to this exact symbol (titles-only allow-list; no alternate byte emitters). Wrapper envelope builders MAY exist, but they MUST NOT serialize public bytes outside the allow-listed entrypoint.
+
+See §10.2 for the unified entrypoint and §10.1 for canonicalization; the preimage recipe is in §3.2.
 
 Canonical JSON. UTF-8 (no BOM); ASCII-sorted keys; compact separators (, and : only); exactly one trailing LF (\\n). Arrays that function as sets are deduplicated and ASCII-sorted by identity.
 
@@ -1608,9 +1770,9 @@ Responsible for:
 
 ## **8.2 Policy — Emitter & serializer**
 
-Single emitter. Reader and CLI MUST call the same presenter–emitter entrypoint symbol to build the public body.
+Single emitter (byte-authoritative). Reader and CLI public bytes MUST be emitted via the same presenter–emitter entrypoint symbol.
 
-CI maintains a symbol allow-list; no alternate emitters are allowed.
+CI maintains a symbol allow-list of byte-emitter symbols; no alternate byte emitters are allowed. Wrapper envelope builders MAY exist, but they MUST delegate byte emission to the allow-listed emitter and MUST NOT introduce alternate serializers on public paths.
 
 Canonical serializer. The presenter MUST use the Canonical Serialization Package (§4):
 
@@ -1794,47 +1956,44 @@ Field-level schema and validation for this catalog are owned by HDE-Schemas & Ar
 
 A7 invariants to prove (titles-only; for a7\_eligible=true entries only):
 
-* 200: quoted, strong ETag; Vary: Authorization, Accept-Encoding; success cache headers
-
-* HEAD: status 200; validators mirror 200 (including Content-Type); Content-Length \== len(identity 200 body)
-
-* 304: only after prior 200-with-body; omit Content-Type and omit Content-Length; validators mirror cached 200
-
-* Encoding invariance: for the same canonical LF-terminated body, ETag identity and effective Content-Length are stable across accepted Accept-Encoding (identity/gzip/br)
-
+* 200: quoted, strong ETag; Vary: Authorization, Accept-Encoding; success cache headers  
+* HEAD: status 200; validators mirror 200 (including Content-Type); Content-Length \== len(identity 200 body)  
+* 304: only after prior 200-with-body; omit Content-Type and omit Content-Length; validators mirror cached 200  
+* Encoding invariance: for the same canonical LF-terminated body, ETag identity and effective Content-Length are stable across Accept-Encoding identity and gzip. If br is supported for the same route, it MUST also be invariant and proven.  
 * Writers/errors posture: non-success writers and error routes carry Cache-Control: no-store (recorded as headers-only evidence)
 
 Catalog files (single home):
 
-* docs/ENDPOINTS\_CATALOG.json (canonical JSON; one LF) — machine-readable endpoint inventory with mandatory classification and A7 eligibility flags
-
-* docs/ENDPOINTS\_CATALOG.json.sha256 — sidecar hash of the canonical bytes
+* docs/ENDPOINTS\_CATALOG.json (canonical JSON; one LF) — machine-readable endpoint inventory with mandatory classification and A7 eligibility flags  
+* docs/ENDPOINTS\_CATALOG.json.sha256 — sidecar hash of the canonical bytes; MUST reference docs/ENDPOINTS\_CATALOG.json for `sha256sum -c docs/ENDPOINTS_CATALOG.json.sha256` verification from repo root  
+* artifacts/audit/ENDPOINTS\_CATALOG.json — governed audit snapshot of the catalog (generated; not a second home); MUST be byte-identical to docs/ENDPOINTS\_CATALOG.json
 
 Proof artifacts (headers-only; one LF each; for A7-eligible entries):
 
-* artifacts/proofs/endpoints\_env\_gate\_proof.log — proves non-prod entries are unreachable in prod
-
-* artifacts/proofs/success\_get.txt — GET 200 proof (quoted strong ETag, Vary)
-
-* artifacts/proofs/success\_head.txt — HEAD parity with GET 200
-
-* artifacts/proofs/success\_304.txt — 304 omission proof (CT/CL omitted; validators mirror)
-
-* artifacts/proofs/success\_encoding\_invariance.txt — identity/gzip/br invariance proof
-
+* artifacts/proofs/endpoints\_env\_gate\_proof.log — proves non-prod entries are unreachable in prod  
+* artifacts/proofs/success\_get.txt — GET 200 proof (quoted strong ETag, Vary)  
+* artifacts/proofs/success\_head.txt — HEAD parity with GET 200  
+* artifacts/proofs/success\_304.txt — 304 omission proof (CT/CL omitted; validators mirror)  
+* artifacts/proofs/encoding\_invariance.txt — encoding-invariance proof (identity and gzip; include br only when supported)  
 * artifacts/proofs/success\_writers\_errors.txt — writers/errors no-store posture
+
+Proof generation (normative). Proof artifacts under artifacts/proofs/ are checked-in evidence outputs and MUST be generated, not hand-edited. Writing these files is allowed only in explicit write mode (`HDE_WRITE_A7_PROOFS=1`); default test runs MUST NOT write proof artifacts.
 
 Test expectations (mechanics only; titles-only routing for tokens). Mechanics requires that:
 
-* endpoints classified as public\_reader (and any A7-eligible entries) have tests that verify canonical emitter usage and the expected status/header/body posture for their class
+* endpoints classified as dev\_harness include an allow-listed proof route and a deterministic “success proof” capture path (A7), and include a negative proof for the closed-rails posture (A7).
 
-* endpoints classified as dev\_harness or ops have explicit gating tests (APP\_ENV or equivalent) and are not treated as public transport surfaces
+* endpoints classified as internal\_health, internal\_version, and ops\_health have explicit proof routes and proofs, including “no body on GET” checks where applicable.
+
+Forbidden invented Reader proof route (drift guard). There is no /api/reader-proof/v1 route. Plans, endpoint catalogs, and runbooks MUST NOT reference /api/reader-proof/v1.
+
+Proof-surface selection posture. Any QA proof that depends on a Reader success route MUST reference the actual reachable Reader route for the target environment. Do not invent alternate “proof” routes.
 
 Token semantics and acceptance are owned by HDE-Governance and Glow QA Guide (titles-only); PF14 records only that classification and tests must exist to keep endpoint posture enforceable and non-ambiguous.
 
 ## **9.2 Reader (dev harness only) \[Implemented (dev-only)\]**
 
-Route (dev-only). GET|POST /api/reader?v=1 is a dev harness enabled only when APP\_ENV=dev; rails remain closed (SAFE\_MODE=1, ALLOW\_NETWORK=0; no vendor I/O).
+Route (dev-only). GET /reader?v=1 is a dev harness enabled only when APP\_ENV=dev; rails remain closed (SAFE\_MODE=1, ALLOW\_NETWORK=0; no vendor I/O).
 
 Emitter. Uses the allow-listed shared presenter/emitter (see §4 / §10.2); tests must not bypass the shared emitter.
 
@@ -1888,17 +2047,15 @@ Routing (titles-only):
 
 Route. POST /api/compat/v1 (pair) — internal/admin surface (not public).
 
-POST non-conditional. POST carries no validators and never returns 304\.
+Probe-only route. GET /api/compat/v1 — fixed OK payload for local health probing; rejects request bodies; does not compute compatibility.
 
-GET (health). Any GET used for probing carries no body.
+Prod gate (hard). If APP\_ENV=prod, /api/compat/v1 MUST return 404 (Not Found).
 
-Emitter. Same shared presenter/emitter as Reader (§4 / §10.2). Public JSON is canonical: UTF-8 (no BOM), sorted keys, compact, one LF; arrays-as-sets deduped & ASCII-sorted; run with LC\_ALL=C, LANG=C, TZ=UTC.
+Input validation (POST; required). The compat handler MUST validate the provided pair IDs (a\_id/b\_id) against UID\_RE (compat handler UID regex) before resolution, and MUST return a typed 400 (Bad Request) on invalid or empty IDs (no 500 on empty IDs).
 
-Determinism. AB↔BA parity and two-run identity hold; category iteration follows the frozen Magic-10 order.
+CORS disabled on dev harness.
 
-Acceptance (routing only). Acceptance is governed by HDE-Governance (titles-only). This section does not list token names. Compatibility surfaces must have acceptance proofs for canonical JSON discipline, determinism (AB↔BA and two-run identity), and shared presenter/emitter coupling.
-
-Ownership (titles-only). Production transport matrices and public payload bytes are owned by HDE-CLI-API-Vendor Ref and HDE-Governance. Mechanics enforces wiring/determinism (single emitter, canonical JSON, AB↔BA/two-run) and does not duplicate public schemas or bytes.
+Ownership (titles-only). Production transport matrices and public payload bytes are owned by HDE-CLI-API-Vendor Ref / HDE-Governance. Mechanics enforces wiring/determinism (single emitter, canonical JSON, AB↔BA/two-run) and does not duplicate public schemas or bytes.
 
 ## **9.4 Internal ops: /internal/version (ops-only) \[Required-Now\]**
 
@@ -2562,13 +2719,14 @@ Examples (non-exhaustive):
 
 ## **16.2 Streams & exits**
 
-* stdout (success): public JSON body only, LF-terminated, no ANSI, no extra bytes.
-
-* stderr (failure): typed JSON errors only; diagnostics without secrets/PII; success never writes to stderr.
-
-* Exit codes: 0 is success; 64 is usage/validation/I/O via the CLI’s typed usage-error path. Other non-zero exit codes are command-specific and are defined in HDE-CLI-API-Vendor-Ref (titles-only). PF14 does not define the exit-code taxonomy.
-
-* No mixed streams. A run is either stdout-only success or stderr-only failure.
+* stdout (success): public JSON body only, LF-terminated, no ANSI, no extra bytes.  
+  * LF is required: success bytes MUST end with a single \\n and MUST NOT emit a payload that is missing the trailing LF.  
+  * CRLF is forbidden: success bytes MUST NOT contain `\r\n`.  
+  * No blank-line padding: success bytes MUST NOT contain `\n\n`.  
+  * Stdout emission MUST be centralized through a single enforcement helper (for example `_emit_stdout_bytes`) that validates bytes before writing, to prevent bypass and double-write drift. Formatting violations MUST raise a typed CLI error (for example `STDOUT_MISSING_LF` or `STDOUT_CRLF`) and MUST exit non-zero.  
+* stderr (failure): typed JSON errors only; diagnostics without secrets or PII; successful runs never write to stderr.  
+* Exit code. MUST be non-zero on failure and MUST be consistent with the error envelope.  
+* No mixed streams. A run is either stdout-only success or stderr-only failure; commands must not interleave diagnostics with public bytes.
 
 ## **16.3 Determinism & parity**
 
@@ -2854,7 +3012,12 @@ Assumptions (pre-Glow prod).
 
 For Live QA in pre-Glow prod:
 
-* hdctl showcompat MUST be exercised with birth arguments only (for example, \--birthdate-a/-b, \--birthtime-a/-b, \--location-a/-b).
+* hdctl showcompat MUST be exercised with birth arguments only (for example, \--birthdate-a/-b, \--birthtime-a/-b, \--location-a/-b).  
+* Rails posture for functional showcompat runs. Any Live QA step that executes showcompat in a context where BodyGraph data is not already available MUST run that step with vendor rails open so the vendor can be called. Closed rails must be treated as an expected blocker for functional showcompat runs under this limitation. This constraint applies until the Engine can store and replay BodyGraphs locally without vendor calls.
+
+* The rails change MUST be explicit and scoped to only the showcompat step(s). After the step, restore the default rails posture.
+
+* showcompat requires arguments. hdctl showcompat MUST NOT be executed as a zero-argument command in QA runs. If showcompat is attempted under closed rails or without required arguments, classify the outcome as FAIL\_TOOLING or TOOLING\_BLOCKED for that step, not FAIL\_BEHAVIOR, and record the rails posture and failure signature in primary.log. The authoritative command and argument contract is owned by HDE-CLI-API-Vendor-Ref.
 
 * \--user-a/--user-b and \--source=db MUST NOT be used in production QA flows while the app user model is absent.
 
@@ -4420,40 +4583,32 @@ Dev-only; bound to 127.0.0.1; not public; CORS disabled; APP\_ENV=dev; debug rel
 
 Routes:
 
-* GET|POST /api/reader (person)
-
-* GET|POST /api/compat/v1 (pair; ids-only GET)
-
+* GET /reader?v=1 (Reader; dev-only; canonical v1 dev/proof surface)  
+* GET /api/reader?v=1 (Reader alias when mounted under /api prefix)  
+* GET|POST /api/compat/v1 (pair; ids-only GET)  
 * POST /api/sample/v1
+
+Aux route (context). The Aux narrative surface is served at `/aux/narrative` from the same adapter HTTP surface family.
 
 Method posture:
 
+* All /api routes are dev-only unless explicitly stated otherwise. The harness binds to 127.0.0.1:5000 by default and MUST NOT be exposed as a public interface.  
 * GET MUST NOT include a body.
 
-* POST is non-conditional (no validators; never returns 304).
+Error posture:
 
-Dev error posture (Reader & Compat):
+* Errors return JSON `{"error": "<MSG>"}` and MUST include a non-2xx HTTP status. (The harness is for dev; this is not a public error contract.)
 
-* Content-Type: application/json; charset=utf-8
+Runner:
 
-* Cache-Control: no-store
+* The harness is implemented by `python -m adapter.http_dev_harness`.
 
-* No ETag
+Quick start (curl — local 5000):
 
-Runner (local example only)
-
-For local-only experimentation on a developer machine, you may start a dev Reader process with an example runner such as: `python -m adapter.http_reader --bind 127.0.0.1:5000`.
-
-This command is an illustrative local sample, not an infra-canonical binding. Mechanics does not pin a specific port for the dev Reader harness; environment-specific start commands and host/port bindings (for example, Codespaces vs local dev) are infra-owned and are defined in Glow Infrastructure and related PF-Canon by title. QA plans and docs must not treat this 5000 example as authoritative for any environment; they must derive actual base URLs and ports from infra-owned configuration.
-
-Quick start (curl — local 5000 example)
-
-For local-only runs using the example runner above: `export APP_ENV=dev`.
-
-* Pair (POST, invalid JSON/body as needed for tests): `curl -s http://127.0.0.1:5000/api/compat/v1 -H 'Content-Type: application/json' -X POST -d '{"a":{}, "b":{}, "viewer_prefs":{}}' | jq .`
-
-* Reader (POST body form): `curl -s http://127.0.0.1:5000/api/reader -H 'Content-Type: application/json' -X POST -d '{"id":"<USER_ID>"}' | jq .`
-
+* Pair (POST): `curl -s http://127.0.0.1:5000/api/compat/v1 -H 'Content-Type: application/json' -X POST -d '{"a":{}, "b":{}, "viewer_prefs":{}}' | jq .`  
+* Pair (GET): `curl -s http://127.0.0.1:5000/api/compat/v1?id=<A_ID>&id=<B_ID>&viewer_prefs=<VP_JSON_URLENCODED> | jq .`  
+* Sample with seed (POST): `curl -s http://127.0.0.1:5000/api/sample/v1 -H 'Content-Type: application/json' -X POST -d '{"seed": 1}' | jq.`  
+  Reader (GET; v1): `curl -s http://127.0.0.1:5000/reader?v=1 | jq .`  
 * Sample with seed (POST): `curl -s http://127.0.0.1:5000/api/sample/v1 -H 'Content-Type: application/json' -X POST -d '{"viewer_prefs":{}, "seed":12345}' | jq .`
 
 For Codespaces and other shared environments, Mechanics requires that QA and docs use the infra-provided dev start commands and URLs (for example, values exposed via devcontainer or environment keys described in Glow Infrastructure and HDE-Build Checklist by title) instead of hard-coding hostnames or ports in plans or scripts.
@@ -4557,7 +4712,25 @@ Close-pack artifacts (epic-scoped; canonical filenames):
 
 * audit/EPIC-\<NNN\>\_QA\_RCA.md
 
+* audit/docdeltas/hde-epic\<NNN\>\_doc\_deltas.md
+
+Close-pack path-proof transcripts (minimum required):
+
+* audit/EPIC-\<NNN\>\_close\_report.md.path\_proof.txt
+
+* audit/EPIC-\<NNN\>\_MANIFEST.json.path\_proof.txt
+
+These path-proof siblings MUST be produced alongside the close-pack artifacts above and are treated as placement transcripts (CI-safe scaffold checks), not as primary evidence.
+
 Where \<NNN\> is a zero-padded 3-digit epic number (example: 022). These are governed artifacts and must not be duplicated under alternate spellings.
+
+Close-pack generator (mechanics; single-writer; normative): A deterministic generator entrypoint MUST exist to write the close-pack artifacts above (and any required path proofs) at their canonical paths. For EPIC-025, the close-pack generator entrypoint is `tools/qa/generate_epic025_close_pack.py`.
+
+Close report (minimum content; generated): The close report MUST summarize deliverables, enumerate explicit deferrals (if any), and include a titled "Key outputs" section that points reviewers to the close-pack manifest’s key outputs bindings.
+
+Doc deltas capture file (minimum content; generated): The doc deltas capture file MUST enumerate canon deltas found during the run. If none exist, it MUST state: "Doc Deltas: None".
+
+Close-pack manifest (minimum binding responsibilities; generated): The manifest MUST include a pointer to the close report and MUST expose a machine-discoverable set of key outputs bindings for primary artifacts. The manifest schema is owned by PF12-Canon-HDE-Schemas-and-Artifacts.
 
 QA closeout summary (RCA) minimum structure (when required by the epic QA plan). The QA closeout summary MUST include, at minimum, the following titled sections:
 
@@ -4567,7 +4740,10 @@ QA closeout summary (RCA) minimum structure (when required by the epic QA plan).
 
 * Closeout decision trace
 
-* Moon Loop stop-condition assessment
+* Moon Loop stop-condition assessment  
+* Minimum stop-rule (QoS): If more than three (3) structural plan-to-evidence mismatches are discovered during a single closeout attempt, stop and repair the plan/templates and evidence-indexing artifacts before executing additional QA steps. Structural mismatches include: a required artifact is declared but absent; a required artifact path is spelled differently than the produced file; a closure record places NOT RUN / DEFERRED forward pointers under required artifacts; a primary.log header artifacts list omits primary.log.
+
+* The assessment MUST state the mismatch count, the first mismatch signature, and the remediation action taken (or state "not remediated; closeout halted").
 
 * Token and evidence posture (required tokens must be proven with explicit evidence pointers; missing required tokens must not be inferred)
 
@@ -4589,7 +4765,8 @@ The repo SHOULD include CI-safe tests that validate, at minimum:
 
 * the epic-scoped close-pack and acceptance scaffold files exist at the canonical paths above
 
-* the acceptance artifacts are structurally coherent (parseable, no duplicate token ids/rows)
+* the acceptance artifacts are structurally coherent (parseable, no duplicate token ids/rows)  
+* the acceptance artifacts contain no Unicode ellipsis character (U+2026) and no sequences of three consecutive U+002E FULL STOP characters
 
 * the acceptance map and token-to-evidence matrix are mutually consistent (no duplicate rows across artifacts, no placeholder bindings once concrete evidence exists, and no map/matrix misalignment that would require a reviewer to “interpret” intent). PF14 does not enumerate token names; this is a structural consistency requirement only.
 
@@ -4597,7 +4774,7 @@ The repo SHOULD include CI-safe tests that validate, at minimum:
 
 * token-to-evidence bindings MUST reference primary evidence artifacts (not their \*.path\_proof.txt transcripts). Path-proofs are required, but MUST be referenced via the machine mirror proof\_anchor (and/or mirror checks), not treated as primary evidence titles/bindings.
 
-Token name validity (names-only). Any acceptance token name referenced by these acceptance scaffolds MUST match the HDE-Governance Token Registry exactly (titles-only). Aliases and near-matches are prohibited; correct the scaffold artifacts to the canonical registry name. This guide does not list token names.
+Token name validity (names-only). Any acceptance token name referenced by these acceptance scaffolds MUST match the HDE-Governance Token Registry exactly (titles-only) or, if newly minted and not yet drained, the canonical token spelling in HDE-Build Notes (titles-only). Aliases and near-matches are prohibited; correct the scaffold artifacts to the canonical token spelling. This guide does not list token names.
 
 EPIC024 token-registry validity check (PO-006) fixed outputs (records-only):
 
@@ -4960,6 +5137,8 @@ Showcompat stdout capture (closed rails; deterministic fixture):
 * artifacts/cli/showcompat/args.json
 
 * (Compatibility-only alias; when required for backward compatibility) artifacts/cli/showcompat/stdout.sha256
+
+Generation tool (normative). The showcompat stdout capture artifacts above MUST be generated (not hand-edited). Canonical entrypoint: `python tools/cli/generate_showcompat_artifacts.py`. The generator MUST enforce the stdout byte constraints in §16.2 and MUST update checksum sidecars from the exact emitted stdout.json bytes.
 
 stdout.json.sha256 is the canonical checksum sidecar name (JSON-filename-qualified). If the alias stdout.sha256 is produced, it MUST be mechanically derived from the exact bytes of stdout.json, and evidence indexing MUST continue to reference stdout.json.sha256 as the canonical checksum artifact.
 

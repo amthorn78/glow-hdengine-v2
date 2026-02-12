@@ -4,28 +4,34 @@
 
 **Title:** PF09-Canon-HDE-Build-Checklist
 
-**Version:** v3.1.8
+**Version:** v3.3.2
 
 **Status:** Canon
 
-**Effective date:** 2026-01-23
+**Effective date:** 2026-02-11
 
-**Last Update Gate:** BN 9.4.4 Drain A30-31
+**Last Update Gate:** BN 9.8.2 Drain A49-51
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
 ## **0.1 Scope**
 
-Build-only, dependency-ordered checklist of HD Engine components and concrete implementation tasks required to reach a stable production run. This list excludes documentation and process chores and focuses on shipping code, wiring transport, enforcing determinism, and proving behavior with runnable evidence. Checklist items are organized by seven alchemical phases (Calcination, Dissolution, Separation, Conjunction, Fermentation, Distillation, Coagulation), and each task/subtask is tagged with a tracking ID of the form `HDE-<PHASE><NNN>` or `HDE-<PHASE><NNN>.<m>` (for example, `HDE-CALC001`, `HDE-CALC001.1`). These IDs are for traceability only and do not imply priority or status.
+Build-only, dependency-ordered checklist of **development and operations work** required to reach and maintain a stable production run of the HD Engine. PF09 tracks only tasks and subtasks that require **dev or ops engagement**, meaning they produce or change at least one of the following:
 
-This document MUST include “jobs to be done”, including:
+* Code (engine, CLI, transport, harnesses, tooling)  
+* Tests (unit, integration, transport proofs, determinism checks)  
+* Runtime configuration or deployment behavior  
+* Infrastructure or operator actions (secrets, environment provisioning, migrations, access controls)  
+* Required runnable evidence captures that are necessary to validate the above changes
 
-* Development
+PF09 explicitly excludes **documentation-only** and **process-only** work, including templates, prompt guidance, playbooks, ledgers of already-completed checks, historical reports, and canon alignment text changes that do not require corresponding dev or ops work. Evidence is recorded only as acceptance artifacts for in-scope tasks. PF09 MUST NOT contain standalone “evidence ledger” rows.
 
-* Design
+Checklist items are organized by seven alchemical phases (Calcination, Dissolution, Separation, Conjunction, Fermentation, Distillation, Coagulation). Each task/subtask is tagged with a tracking ID of the form `HDE-<PHASE><NNN>` or `HDE-<PHASE><NNN>.<m>` (for example, `HDE-CALC001`, `HDE-CALC001.1`). These IDs are for traceability only and do not imply priority or status.
 
-* Implementation
+This document MUST include “jobs to be done” that require dev or ops engagement, including:
 
+* Development  
+* Implementation  
 * Operations
 
 ## **0.2 Conventions**
@@ -59,6 +65,14 @@ Tasks use `HDE-<PHASE><NNN>` (for example, `HDE-CALC001`, `HDE-DISS003`).
 Subtasks use `HDE-<PHASE><NNN>.<m>` (for example, `HDE-CALC001.1`).
 
 IDs are stable labels only and do **not** imply priority or status.
+
+**Task heading hygiene:**
+
+Task headings MUST NOT include U+2026 or any instance of three consecutive U+002E FULL STOP characters.
+
+Ellipses are prohibited in PF09 and related planning artifacts. If you must indicate omission, use `[SNIP: lines omitted]` and keep the omitted span explicitly labeled.
+
+Any excerpt containing an ellipsis or an omission marker that obscures verbatim text should be treated as a retrieval failure and re-pulled before review or merge.
 
 **“SoT: canon” usage:**
 
@@ -109,8 +123,9 @@ Canonization requires OPS discovery evidence in the canonical deployment context
 
 stored under a lowercase audit path and kept secret-free per the Ops-task posture above.
 
-**Single source of truth (names \+ semantics).**  
- Acceptance token names and semantics live only in the Token Registry in **HDE-Governance §2.0**. Any token name used in PF09, epics, acceptance artifacts, or QA evidence logs MUST exist in that registry and match spelling exactly (no aliases or near-matches). New tokens must be registered in Governance (via ADR \+ registry update) before they may appear as required tokens anywhere.
+**Single source of truth (names \+ semantics).**
+
+Acceptance token names and semantics live in the Token Registry in **HDE-Governance §2.0** (PF04) and, when newly minted and not yet drained, in PF10 Build Notes addenda. Token spellings used in PF09, epics, acceptance artifacts, or QA evidence logs MUST match the canonical spelling in PF04 or PF10 exactly (no aliases or near-matches). Alias spellings (for example `CANON_JSON_OK`) MUST NOT be claimed; use the canonical token name instead (for example `JSON_CANONICAL_CHECK_OK`).
 
 **QA operational token library (non-governance).**  
  The **Glow QA Guide** is the canonical home for QA operational token guidance (metadata, wiring, runbook mapping, evidence expectations). It MUST reference token names exactly as defined in the Governance Token Registry and MUST NOT introduce new token names or divergent meanings.
@@ -179,15 +194,51 @@ The same addenda notes internal-consistency verification: manifest `key_outputs`
 
 These are baseline close-pack artifacts (required closure artifacts), not acceptance tokens by default. Do not relocate these artifacts into alternative directory trees (for example `audit/qa/**` or `artifacts/**`) without an explicit canon change. Epic plans SHOULD cite PF12 path patterns at the point the close-pack baseline is declared so the path-of-record is not discretionary.
 
+EPIC025 close-pack artifacts (titles-only; PR04 close-pack tooling): Addenda 14-16 HDE-EPIC025 records these artifacts and generator path:
+
+* `audit/EPIC-025_MANIFEST.json` — canonical EPIC025 close-pack manifest.
+
+* `audit/EPIC-025_close_report.md` — EPIC025 close report.
+
+* `audit/docdeltas/hde-epic025_doc_deltas.md` — EPIC025 doc delta ledger (close-pack adjacency).
+
+* `audit/qa/run.json` — gate run summary.
+
+* `audit/qa/epic025_close_pack.md` — QA close pack narrative.
+
+* `audit/qa/evidence_index/index.jsonl` — QA evidence index.
+
+* `audit/qa/evidence_index/index.sha256` — sha256 for QA evidence index.
+
+* `audit/qa/gates/canonical_json_summary.json` — canonical JSON summary output.
+
+* `audit/qa/gates/canonical_json_summary.sha256` — sha256 for canonical JSON summary output.
+
+* `tools/qa/generate_epic025_close_pack.py` — EPIC025 close-pack generator (produces the close-pack pair and supporting closure artifacts).
+
 **PF23 consult (mandatory for planning artifacts; planning-time trace only):**
 
-When planning for QA, remediation, development, or any other execution work, agents MUST consult PF23 — Reality Audits as a primary input for component boundaries and canonical repo pathnames.
+Reality Audits (PF23) are post-epic audits updated at end of epic and reflect the latest closed-epic snapshot, not a PR-diff view.
 
-Plans MUST NOT mint, claim, or reference REALITY\_AUDIT\_OK (or any similar “PF23 consult completion” acceptance token) unless and until Governance explicitly registers such a token in the canonical token registry.
+Consult scope (allowed and required): PF23 MUST be consulted during:
+
+* Epic planning (Epic Plan creation or revision).
+
+* Implementation planning (PR and OPS scope and acceptance posture definition).
+
+* QA planning (including Live QA plans and runbooks).
+
+Consult scope (disallowed): PF23 MUST NOT be consulted for PR analysis, including PR review, remediation review, or diff-first approval loops.
+
+Non-token posture: Plans MUST NOT mint, claim, or reference REALITY\_AUDIT\_OK (or any similar “PF23 consult completion” acceptance token) unless and until Governance explicitly registers such a token in the canonical token registry.
 
 PF23 consult is planning-time only. Live QA Plans MUST NOT include any required deliverable, required check, or operator command whose purpose is “PF23 consult capture,” “PF23 note,” or similar.
 
 If a trace anchor is desired, it lives in the plan text only (names-only). A plan MAY include a single “PF23 Anchors” note (components consulted \+ loci touched), but it is informational only and MUST NOT appear as a required evidence output.
+
+Drift assessment trigger: If any PF23 Reality Audit statement contradicts PF canon, that contradiction MUST be treated as development drift requiring evaluation, not as an automatic correction in either direction.
+
+Drift assessment protocol (stub): record the contradiction as a drift item with the PF23 claim, the conflicting PF canon claim, and the impacted epic or surface; classify into exactly one bucket (canon defect, implementation drift, or necessary reality shift); do not fix by assumption; resolution routing is PO-owned.
 
 PF23 is PO-maintained; plans MUST NOT create tasks that assign PF23 updates. If PF23 appears stale or missing coverage, note it as an observation only.
 
@@ -213,6 +264,46 @@ Ownership routing (titles-only; do not duplicate definitions here):
 * Evidence index writer workflow \+ topology coupling: **HDE-Mechanics Guide** \+ **HDE-Build Checklist**
 
 Checklist rows in PF09 refer to tokens by name (for example `JSON_CANONICAL_CHECK_OK`, `TWO_RUN_IDENTITY_OK`, `EVIDENCE_INDEX_UPDATED_OK`) to indicate which acceptance gates they participate in; meaning and acceptance constraints are taken from the Governance Token Registry and the owning PF-docs for each token family, and operational execution guidance is taken from the Glow QA Guide, not from PF09 itself.
+
+Live QA plan and evidence discipline (Addenda 33-41 / EPIC025 scope clarifications):
+
+* Environment variable discipline:
+
+  * QA plans and runbooks MUST NOT introduce, require, or depend on `MODO_*`variables.
+
+  * Environment variables are allowed only when they are real, canonically scoped, and documented.
+
+  * If an env var must be used, it MUST be listed explicitly in the plan and default behavior MUST be specified.
+
+  * Reviewer gate: block any plan that introduces a new env var without canon or depends on ad-hoc/local shell state.
+
+  * EPIC025 exception: `MODO_*`values ​​are permitted only as placeholders so long as they are not required inputs.
+
+* Step-log header writer discipline:
+
+  * When a check uses the step-log header writer, required header inputs MUST be explicitly exported per check: CHECK\_ID, CHECK\_NAME, PASS\_FAIL, COMMANDS\_JSON, ARTIFACTS\_JSON, PF\_REFS\_JSON.
+
+  * If the header is written after-the-fact by Moon Loop, the underlying captured\_env MUST still reflect the exports used during execution.
+
+* Objective-first Live QA plans:
+
+  * Live QA Plans MUST be objective-first: specify QA objectives and proof obligations, not syntax-perfect command strings.
+
+  * Steps SHOULD use general command-line directives rather than exact syntax.
+
+  * Step logs MUST record exact commands executed and their stdout/stderr, along with exit codes.
+
+* Minimum evidence trust (transcript shape):
+
+  * Governed evidence under `audit/qa/**`MUST include transcript elements (command line invoked, exit code, stdout/stderr) sufficient to meet PF-Canon evidence trust constraints.
+
+* Showcompat Live QA constraints:
+
+  * Until the product implements local storage and replay for BodyGraph QA inputs, Live QA cannot rely on precomputed BodyGraph inputs being available for showcompat runs.
+
+  * Such showcompat runs MUST use vendor rails open; this is a controlled exception to SAFE\_MODE discipline and MUST be scoped and restored in the plan.
+
+  * Live QA MUST treat a no-argument `hdctl showcompat`invocation as invalid usage and reject it at the plan level.
 
 ---
 
@@ -382,17 +473,19 @@ PF09 still treats Evidence Index and Machine Mirror as **consumer-only** surface
 
 **Catalog file.** `docs/ENDPOINTS_CATALOG.json` (canonical JSON; one LF) with `docs/ENDPOINTS_CATALOG.json.sha256`.
 
+Validation: `python -m pytest -q tests/http/test_endpoint_catalog.py`.
+
 **Scope.** The Endpoints Catalog is the canonical, machine-readable inventory of **HTTP endpoints** that are reachable in any environment, including, at minimum:
 
-* `public_reader` (e.g. `/reader`)
+* `public_reader` (e.g. `/reader`; canonical Reader v1 success route is `GET /reader` selected by query parameter `v=1`; do not mint `/api/reader-proof/v1`; if the router is mounted under `/api`, an alias `GET /api/reader` is allowed but MUST be treated as the same route)
 
-* `internal_admin` (internal/admin compat and admin-only surfaces, e.g. `/api/compat/v1`)
+* `internal_admin` (e.g. `/api/compat/v1`)
 
 * `internal_identity` (e.g. `/internal/version`)
 
-* `ops` (e.g. `/ops/health` or equivalent probes)
+* `ops` (e.g. `/ops/health`)
 
-* `dev_harness` (e.g. `/internal/dev/sampler`)
+* `dev_harness` (e.g. `/internal/dev/sampler`, `/aux/narrative`)
 
 **Classification is mandatory.** Implementations may colocate multiple endpoint classes in one Python module, but the Catalog MUST still carry **per-endpoint** classification so CI and QA can enforce distinct rails and posture per class.
 
@@ -569,7 +662,7 @@ Locale pins apply to all byte checks and evidence tools that read or write these
 These checks are required whenever an epic plan and/or token matrix claims acceptance tokens that bind to governed evidence.
 
 **Filesystem naming (directories).**  
- All directories in the repository and application codebase MUST use lowercase ASCII names. Under governed roots (at minimum `audit/**`, `docs/**`, `artifacts/**`, and `schemas/**`), introducing any mixed-case or upper-case directory name is a QA failure. Any remaining mixed-case directories are treated as legacy drift and MUST be normalized to lowercase, not copied forward. If a rename affects governed evidence paths, update the Human Evidence Index, Machine Mirror, and path-proofs in the same PR.
+All directories in the repository and application codebase MUST use lowercase ASCII names. Uppercase characters in filenames are allowed; the lowercase ASCII naming rail applies to directory names and explicitly defined identifier classes, not to arbitrary filenames. Under governed roots (e.g. `audit/qa/`, `audit/gates/`), new mixed-case directories are forbidden.
 
 **Canonical evidence path binding validation (acceptance integrity).**  
  Every acceptance token to evidence-path binding that appears in an Epic Plan and in `token_evidence_matrix` MUST be validated against the canonical evidence catalog before approval or merge.
@@ -591,6 +684,14 @@ These checks are required whenever an epic plan and/or token matrix claims accep
   * the referenced path-proof file (`proof_anchor` and the corresponding `*.path_proof.txt`)
 
 * Any binding to a non-canonical path is a mechanical blocker and MUST be corrected before approval. If a non-canonical path is truly required, it MUST be routed as an explicit ADR and drained into the governing canon before approval.
+
+**Evidence discipline gate anchors (implementation references; EPIC025 PR04 baseline).**
+
+* LF-ending gate wrapper: `tools/evidence/check_lf_endings.py` (planned output example: `audit/qa/hde-epic025/checks/gate_lf_endings/primary.log`).
+
+* Evidence-path validation wrapper: `tools/evidence/validate_evidence_paths.py` (planned output example: `audit/qa/hde-epic025/checks/gate_evidence_paths_validation/primary.log`).
+
+* Evidence-path validation MUST reject absolute paths, any `..` traversal segments, and any resolved paths that escape the governed root (out-of-root resolution is invalid even if the original string is relative).
 
 **Identity checksum sidecars (helper artifacts, unless explicitly required).**
 
@@ -615,6 +716,8 @@ These tokens now apply to **both** discrete artifacts and bundle-based families 
 * `CI_CHECK_FINAL_LF_OK` — governed JSON/JSONL artifacts (including bundles/manifests) are LF-terminated and free of extra trailing bytes.
 
 PF09 remains a **consumer** of these tokens and artifact definitions: token semantics, Mirror schema (including any bundle-specific fields), and the precise list of governed bundles and families are single-homed in HDE-Governance and HDE-Schemas & Artifacts by title.
+
+Note: EPIC025 closure notes may also use summary tokens such as `EVIDENCE_INDEX_OK`, `MIRROR_DISCIPLINE_OK`, `QA_EVIDENCE_ROOT_OK`, `CANONICAL_JSON_GATE_OUTPUTS_OK`, and `EPIC025_CLOSE_PACK_OK`. Treat these as summary labels; PF09 acceptance relies on the granular tokens listed above.
 
 ---
 
@@ -826,7 +929,7 @@ EPIC021 (D1; Addendum 6\) completes the Calcination-owned serializer consolidati
 
 * Serializer guards that now cover Reader adapter code as well as CLI, preventing ad-hoc JSON serializers on governed surfaces.
 
-EPIC021 acceptance artifacts (token↔evidence matrix and acceptance map) now mark the D1 canonical JSON/parity token family as implemented with explicit test and evidence wiring for: `CLI_READER_EMITTER_PARITY_OK`, `CLI_NO_ALT_JSON_OK`, `JSON_CANONICAL_CHECK_OK`, and `ERROR_JSON_CANON_OK`. Serializer/emitter guard proofs are still required, but per current posture they are treated as reviewable evidence artifacts (and governed evidence when promoted), not as automatically tokenized acceptance, unless and until Governance registers explicit guard tokens and semantics.
+EPIC021 acceptance artifacts (token↔evidence matrix and acceptance map) now mark the D1 canonical JSON/parity token family as implemented with explicit test and evidence wiring for: `CLI_READER_PARITY_OK`, `CLI_NO_ALT_JSON_OK`, `JSON_CANONICAL_CHECK_OK`, and `ERROR_JSON_CANON_OK`. Serializer/emitter guard proofs are still required, but per current posture they are treated as reviewable evidence artifacts (and governed evidence when promoted), not as automatically tokenized acceptance, unless and until Governance registers explicit guard tokens and semantics.
 
 This row is considered Done at the Calcination foundation level: canonical serializer, shared emitter discipline, and D1 canonical JSON/error proofs are present and exercised under closed rails for the EPIC021 surface set. Later-phase transport proofs (A7 success route proofs, prod transport parity, and non-Calcination identity work) remain governed elsewhere in this checklist.
 
@@ -843,7 +946,7 @@ This row is considered Done at the Calcination foundation level: canonical seria
 
 **Tokens:**
 
-`CLI_READER_EMITTER_PARITY_OK`
+`CLI_READER_PARITY_OK`
 
 `CLI_NO_ALT_JSON_OK`
 
@@ -1007,6 +1110,20 @@ artifacts/showcompat/epic024/showcompat\_manifest.json — governed showcompat m
  audit/qa/hde-epic024/checks/D03\_showcompat\_artifacts/primary.log.path\_proof.txt — path-proof for D03 primary log.  
  tools/evidence/run\_showcompat\_artifacts.py — runner created in-step to match plan spec; wraps scripts/hdctl.py showcompat and writes artifacts above.
 
+EPIC025 showcompat CLI artifacts (args capture \+ evidence-index keys):
+
+* `artifacts/cli/showcompat/args.json`
+
+* `artifacts/cli/showcompat/args.json.path_proof.txt`
+
+EPIC025 evidence\_index.jsonl keys (PR02):
+
+* `cli.showcompat.stdout`
+
+* `cli.showcompat.stdout_sha256`
+
+* `cli.guards.serializer_grep_guard`
+
 Serializer guard artifacts (shared with HDE-CALC002.6):  
  audit/qa/hde-epic018/d3-serializer/serializer\_grep\_guard.log — serializer grep guard output.  
  audit/qa/hde-epic018/d3-serializer/serializer\_grep\_guard.proof.txt — file hash and deterministic proof for serializer guard.  
@@ -1149,15 +1266,16 @@ Audit (v1 — 2025-11-17) originally flagged missing mirror/index and canonicali
 
 Evidence skeleton CI now runs under rails-closed env (`SAFE_MODE=1`, `ALLOW_NETWORK=0`, `LC_ALL=C`, `LANG=C`, `TZ=UTC`) and includes:
 
-`python tools/evidence/update_evidence_index.py --check`
+* `python tools/evidence/update_evidence_index.py --check`
 
-`python tools/evidence/orientation_demo.py --check`
+* `SAFE_MODE=1 python tools/evidence/refresh_step_logs_manifest.py --check`
 
-`ci/checks/check_mirror_schema.sh`
+* `python tools/evidence/orientation_demo.py (write mode)`
 
-`python ci/checks/check_release_identity.sh`
+* `ci/checks/check_mirror_schema.sh`  
+* `python ci/checks/check_release_identity.sh`
 
-`python -m pytest tests/evidence tests/ops/test_evidence_index.py`
+* `python -m pytest tests/evidence tests/ops/test_evidence_index.py`
 
 ensuring INDEX/sentinel/mirror/path-proofs/orientation demo are canonical and drift-free.
 
@@ -1758,31 +1876,29 @@ Tests (titles-only; closed rails):
 
 ### **Subtask HDE-CALC003.13 — Canonical pytest invocation for QA & CI**
 
-**Subtask name/label:** Canonical pytest invocation (`python -m pytest`)
+**Subtask status:** **Partial**  
+ **Owner:** Unassigned  
+ **Epic or card:** HDE-EPIC019, HDE-EPIC025
 
-**Subtask description:**  
- In Codespaces and similar environments, require that QA Plans and CI jobs use **`python -m pytest`** as the canonical pattern for running tests, to avoid brittle `.venv/bin/pytest` shims:
+**Intent:** Ensure all QA plans and CI jobs invoke pytest using `python -m pytest` (not `pytest`) to guarantee module resolution and consistent plugin discovery.
 
-* Test entries SHOULD use `python -m pytest <PYTEST_ARGS>` and/or `./scripts/run-tests` (if present) to avoid split brain between docs and automation.
+**Acceptance criteria:**
 
-* A failure of `python -m pytest --version` or an import error for pytest MUST be treated and logged as a **tooling failure**, not a behavior failure.
+* Each QA Plan step that runs pytest uses `python -m pytest` with an explicit working directory and deterministic env pins where required.
 
-* When a `.venv/bin/pytest` shim exists but is broken, that failure MUST be captured in a tooling log and worked around by running the suite via `python -m pytest` once tooling is repaired; epic behavior tokens remain pending until tests run successfully under the canonical pattern.
-
-**Subtask status:** **Not done**
-
-**Epic or card:** **Unknown**
-
-**Tokens:** **Unknown** (pytest/tooling tokens will be minted in Governance/QA canon)
+* CI scripts and local QA harness scripts that run pytest use the same invocation form (`python -m pytest`) and do not shell out to a bare `pytest`.
 
 **Evidence / artifacts:**
 
-* CI job and QA Plan snippets (titles-only) showing `python -m pytest` used consistently for ingest, sampler, and other test suites.
+* Source excerpt PR breakdown shows canonical invocation with passing results:
 
-* QA logs demonstrating broken `.venv/bin/pytest` shims being classified as tooling failures and successful reruns via `python -m pytest` under closed rails.
+  * `python -m pytest -q tests/http/test_compat_endpoints.py` (pass)
 
-**Notes:**  
- EPIC019 Live QA showed that a broken `.venv/bin/pytest` shim can masquerade as “tests failed” without clear tooling classification; this subtask codifies `python -m pytest` as the canonical pattern and treats shim failures as infra/CI defects.
+  * `python -m pytest -q tests/cli/test_showcompat_cli.py` (pass)
+
+**Notes:**
+
+* EPIC019 Live QA showed that the CI containers can pick up an installed entrypoint vs. local invocation; this rule prevents direct calls to `pytest` from bypassing module resolution.
 
 ### **Subtask HDE-CALC003.14 — QA harness discipline (tooling vs behavior, commands, emptiness)**
 
@@ -1800,7 +1916,7 @@ Tests (titles-only; closed rails):
 
 * QA steps emit governed logs under a stable root: `audit/qa/<epic-id>/checks/<step-name>/primary.log`
 
-* Each log includes: `run_id`, `check_id`, `status` from the allowed vocabulary, and defaultable “emptiness” fields.
+* Each log includes: `check_id`, `check_name`, `status` from the allowed vocabulary, and defaultable “emptiness” fields (do not introduce or require `run_id` or `RUN_ID`).
 
 * A manifest exists (or is produced) that enumerates all QA step logs, with stable paths.
 
@@ -1812,11 +1928,27 @@ Tests (titles-only; closed rails):
 
 **Implementation notes / constraints:**
 
-* Status vocabulary is strict: `PASS` / `FAIL` / `WARN` / `BLOCKED` (and the PF09 allowed status vocabulary for tasks).
+* Status vocabulary is strict: `PASS` / `FAIL` / `WARN` / `BLOCKED` (even if check passes overall, items within may be flagged).
 
 * “Governed paths” means the artifact path itself is part of the proof; avoid ad hoc locations.
 
-* Evidence roots are not code roots. A log path like `audit/qa/...` must not be treated as a code path.
+* Evidence roots are not code roots. A log path like `audit/qa/<epic-id>/checks/<check-id>/primary.log` must not be treated as a code path.
+
+* `run_id` is prohibited. Live QA Plans MUST NOT introduce or require `run_id` (or `RUN_ID`) as an operator input, step-log header field, manifest field, or correctness key.
+
+* History retention must not become a correctness dimension. Optional per-execution nesting is allowed, but it must be noncanonical and non-gating.
+
+* Whitespace syntax issues MUST NOT block plan approval. Treat them as a Nit only; remediate in flight and capture the successful re-run evidence.
+
+* Copy/paste perfection MUST NOT be treated as a blocker. Do not require plan revision solely to fix formatting drift.
+
+* Avoid markdown triple-backtick fences in planning artifacts; they are high-risk for copy/paste damage.
+
+* Approval binds to command identity, not command syntax. Equivalent quoting and syntax forms must not be treated as blockers when semantics match.
+
+* JSON-carrying environment variables are allowed; preserve JSON payloads verbatim in plans and step logs.
+
+* Functional feature changes require functional Live QA proof; artifacts alone are insufficient.
 
 **How to pass the proof gate and earn the token:**
 
@@ -1843,13 +1975,31 @@ Tests (titles-only; closed rails):
 
   * `audit/qa/hde-epic024/checks/po-017_lowercase_naming/find_artifacts_uppercase.txt` — empty scan output (no uppercase directory names under `artifacts/**`).
 
-  * `audit/qa/hde-epic024/checks/po-017_lowercase_naming/find_docs_uppercase.txt` — out-of-scope note (docs scanning not required for PO-017).
+  * `audit/qa/hde-epic024/checks/po-017_lowercase_naming/find_docs_uppercase.txt` — out-of-scope note (docs scanning not required for PO-017).  
+  * audit/qa/hde-epic025/checks/gate\_evidence\_paths\_validation/primary.log — EPIC025 evidence-path validation gate log.  
+  * audit/qa/hde-epic025/checks/gate\_evidence\_paths\_validation/gate\_evidence\_paths\_validation.path\_proof.txt — EPIC025 path proof for the gate log path.  
+  * audit/qa/hde-epic025/checks/gate\_mirror\_schema/primary.log — EPIC025 mirror schema validation gate log.  
+  * audit/qa/hde-epic025/checks/gate\_mirror\_schema/gate\_mirror\_schema.path\_proof.txt — EPIC025 path proof for the gate log path.  
+  * audit/qa/hde-epic025/checks/gate\_lf\_endings/primary.log — EPIC025 final-LF check gate log.  
+  * audit/qa/hde-epic025/checks/gate\_lf\_endings/gate\_lf\_endings.path\_proof.txt — EPIC025 path proof for the gate log path.  
+  * audit/qa/hde-epic025/checks/preflight\_e1\_http\_compat/primary.log — EPIC025 preflight log (E1 HTTP compat).  
+  * audit/qa/hde-epic025/checks/preflight\_e3\_cli\_entrypoint/primary.log — EPIC025 preflight log (E3 CLI entrypoint).  
+  * audit/qa/hde-epic025/checks/preflight\_e5\_a7\_transport\_invariants/primary.log — EPIC025 preflight log (E5 A7 transport invariants).  
+  * audit/qa/hde-epic025/checks/preflight\_p4\_evidence\_endpoints/primary.log — EPIC025 preflight log (P4 evidence endpoints).  
+  * audit/qa/hde-epic025/checks/preflight\_p4\_evidence\_endpoints/primary.log — EPIC025 preflight log (P4 evidence endpoints).
+
+  * audit/qa/hde-epic025/checks/d0\_discovery/primary.log — EPIC025 step log (d0\_discovery decision and transcript).
+
+  * audit/qa/hde-epic025/00\_meta/doc\_deltas.md — EPIC025 Step-0 artifact (doc deltas).
+
+  * audit/qa/hde-epic025/00\_meta/repo\_baseline.txt — EPIC025 Step-0 artifact (repo baseline).
 
 * Manifest presence / linkage examples:
 
-  * `audit/qa/hde-epic023/qa_step_logs_manifest.json` — required step logs manifest (see Addenda 10-13 BN 9.4.4: D05 proof).
-
-  * `audit/qa/hde-epic023/qa_step_logs_manifest.json.path_proof.txt` — path proof used for audit-friendly verification of governed artifact location.
+  * `audit/qa/hde-epic023/qa_step_logs_manifest.json` — required step logs manifest (see Addenda 10-13 BN 9.4.4: D05 proof).  
+  * `audit/qa/hde-epic023/qa_step_logs_manifest.json.path_proof.txt` — path proof used for audit-friendly verification of governed artifact location.  
+  * `audit/qa/hde-epic025/qa_step_logs_manifest.json` — EPIC025 governed QA step logs manifest (root manifest for step log paths).  
+  * `audit/qa/hde-epic025/qa_step_logs_manifest.json.path_proof.txt` — EPIC025 path proof used for audit-friendly verification of governed artifact location.
 
 * Command/entrypoint provenance (no invented executables; evidence roots are not code roots):
 
@@ -2042,7 +2192,8 @@ QA closure logs (titles-only):
 
 * `audit/qa/hde-epic023/qa_step_logs_manifest.json`
 
-* `audit/qa/hde-epic024/checks/D02_canonical_json_gate/primary.log`
+* `audit/qa/hde-epic024/checks/D02_canonical_json_gate/primary.log`  
+* `audit/qa/hde-epic025/checks/gate_canonical_json/primary.log`
 
 Legacy report surfaces (titles-only; non-authoritative):
 
@@ -2065,55 +2216,58 @@ Accepted closure gaps/drain targets recorded in EPIC023 Epic Record that remain 
 
 * Canonical companion log families (authoritative; present): `audit/gates/json_gate/canonical/json_gate_check_log.ndjson` and `audit/gates/json_gate/canonical/json_gate_compare_log.ndjson` (plus their `.path_proof.txt` siblings).
 
-* Legacy report family (present): `audit/gates/canonical_json/json_canonical_check.log` (non-authoritative; MUST NOT be required as the canonical family).  
-* 
+* Legacy report family (present): `audit/gates/canonical_json/json_canonical_check.log` (non-authoritative; MUST NOT be required as the canonical family)
 
-  ### **Subtask HDE-CALC003.19 — EPIC023 D23: Evidence Index snapshot artifact (governed pointer)**
+### **Subtask HDE-CALC003.19 — D23 Evidence index snapshots (append-only update \+ hash \+ mirror validation).**
 
-**Subtask status:** **Partial**
+**Subtask status:** **Done**  
+ **Owner:** Unassigned  
+ **Epic:** EPIC023 baseline, extended through EPIC025
 
-**What this does:** Ensures the governed D23 Evidence Index Snapshot artifacts exist and that their validation is mechanical (PASS / FAIL\_BEHAVIOR / TOOLING\_BLOCKED), tokenless, and schema-bound.
+**Intent:** Maintain an append-only evidence index, derive a deterministic hash, and validate the machine mirror before treating the index update as accepted.
 
-**Tokens / gates:** None (tokenless check)
-
-**Governed artifacts (required):**
+**Expected gates and governed artifacts are:**
 
 * `audit/gates/evidence_index_snapshot/evidence_index_snapshot.json`
 
-* `audit/gates/evidence_index_snapshot/evidence_index_snapshot.json.path_proof.txt`
+* `audit/gates/evidence_index_snapshot/evidence_index_snapshot.gate.json`
 
-**D23 status mapping (QA vocabulary; tokenless):**
+* `audit/gates/evidence_index_snapshot/evidence_index_snapshot.gate.log`
 
-* `PASS` — snapshot artifacts exist and all mechanical predicates hold
+* `audit/gates/evidence_index_snapshot/evidence_index_snapshot.gate.md`
 
-* `FAIL_BEHAVIOR` — snapshot artifacts exist, but the predicate fails (schema invalid, binding mismatch, parity false, etc.)
+* `audit/gates/evidence_index_snapshot/evidence_index_snapshot.path_proof.txt`
 
-* `TOOLING_BLOCKED` — required snapshot artifacts are missing, unreadable, or path-proof missing
+* The snapshot json MUST include:
 
-**Snapshot schema (minimal required fields; schema\_version "1"):** `evidence_index_snapshot.json` MUST be a canonical JSON object with:
+  * `sha256_docs_evidence_index_json` field (sha256 over `docs/evidence/INDEX.json`)
 
-* `schema_version` (string; current: `"1"`)
+  * `mirror_snapshot` field (mirror snapshot payload)
 
-* `generated_at_utc` (string; RFC3339 UTC; parses; MUST NOT be in the future)
+**PASS predicate:**
 
-* `inputs` (object) with:
+* Gate json indicates pass and includes resolved paths within governance.
 
-  * `human_index_path` (string; MUST equal `docs/evidence/INDEX.json`)
+* Mirror discipline check passes (schema validation and path validation).
 
-  * `human_index_sha256` (string; 64 lowercase hex; MUST equal sha256 of `docs/evidence/INDEX.json`)
+**Evidence / artifacts:**
 
-  * `machine_mirror_path` (string; MUST equal `artifacts/evidence_index.jsonl`)
+* `audit/qa/hde-epic023/checks/D23_generate_evidence_index_snapshot/primary.log`
 
-  * `machine_mirror_sha256` (string; 64 lowercase hex; MUST equal sha256 of `artifacts/evidence_index.jsonl`)
+* `audit/qa/hde-epic024/checks/D09_generate_evidence_index_snapshot/primary.log`
 
-* `parity` (object) with:
+* EPIC025 closure-grade gate evidence:
 
-  * `artifact_keys_match` (boolean; MUST be `true` for `PASS`)
+  * `audit/qa/hde-epic025/checks/gate_evidence_index_update/primary.log`
 
-**PASS predicate (mechanical):** `PASS` iff snapshot \+ path-proof exist and match, schema fields validate, `inputs.*_path` bindings are exact, `inputs.*_sha256` values match computed sha256, `parity.artifact_keys_match` is `true`, and `generated_at_utc` parses and is not in the future.
+  * `audit/qa/hde-epic025/checks/gate_evidence_index_update/gate_evidence_index_update.path_proof.txt`
 
-**Notes:**  
- Addenda 30-31 BN 9.4.4 records this deliverable as not closed for the epic: "Status: Ambiguous (contract/path drift documented; final contract not closed here)". Treat this subtask as Partial until the contract is deterministic and closure-grade proof is produced.
+  * `audit/qa/hde-epic025/checks/preflight_e6_evidence_index_mirror/primary.log`
+
+**Notes:**
+
+* Source excerpt Addenda 14-16 HDE-EPIC025 reports a passing evidence index update gate and provides governed logs plus path proofs under `audit/qa/hde-epic025/checks/`, satisfying closure-grade evidence for this row.
+
 
 ### **Subtask HDE-CALC003.20 — EPIC024 PO-006: Token registry validity check**
 
@@ -3080,7 +3234,7 @@ Must not mix ID vs payload for the same party (mixed shape ⇒ `invalid_json`).
 
 `JSON_CANONICAL_CHECK_OK`
 
-`AB_BA_PARITY_OK` (including Integration cases)
+`COMPOSITE_ABBA_IDENTITY_OK` (including Integration cases)
 
 `TWO_RUN_IDENTITY_OK`
 
@@ -3135,7 +3289,7 @@ Implied via compat identity hash (`artifacts/compat/identity_hash.txt`) and AB�
 
 **Tokens:**
 
-`AB_BA_PARITY_OK` (including Integration cases)
+`COMPOSITE_ABBA_IDENTITY_OK` (including Integration cases)
 
 **Evidence / artifacts:**
 
@@ -3796,7 +3950,7 @@ With the pure-compute Engine Core module, dedicated core tests, and the four Eng
 
 `TWO_RUN_IDENTITY_OK`
 
-`AB_BA_PARITY_OK`
+`COMPOSITE_ABBA_IDENTITY_OK`
 
 `JSON_CANONICAL_CHECK_OK`
 
@@ -3854,7 +4008,7 @@ Evidence tokens (Engine Core slice): `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDE
 
 `TWO_RUN_IDENTITY_OK`
 
-`AB_BA_PARITY_OK`
+`COMPOSITE_ABBA_IDENTITY_OK`
 
 **Evidence / artifacts:**
 
@@ -4091,16 +4245,16 @@ This subtask is now considered **Done** for Engine Core evidence; future Engine 
  PF09 Phase-II “Category framework” is satisfied under **HDE-EPIC007**; this checklist row is history-only and does not carry forward to remaining epics.
 
 **Status (Audit v1 — 2025-11-17):**  
- Previously marked *Not done* and called out missing `CATEGORY_FRAMEWORK_OK`, `AB_BA_PARITY_OK`, `JSON_CANONICAL_CHECK_OK`, and `TWO_RUN_IDENTITY_OK` tokens, as well as missing Magic-10 key table and compat parity evidence.  
+ Previously marked *Not done* and called out missing `MAGIC10_DOMAIN_CLOSED_OK`, `COMPOSITE_ABBA_IDENTITY_OK`, `JSON_CANONICAL_CHECK_OK`, and `TWO_RUN_IDENTITY_OK` tokens, as well as missing Magic-10 key table and compat parity evidence.  
  These audit notes are now historical context only; acceptance lives in the EPIC-007 exit set and associated manifest/acceptance maps.
 
 **Task-level tokens (titles-only):**
 
-`CATEGORY_FRAMEWORK_OK`
+`MAGIC10_DOMAIN_CLOSED_OK`
 
 `JSON_CANONICAL_CHECK_OK`
 
-`AB_BA_PARITY_OK` (category layer)
+`COMPOSITE_ABBA_IDENTITY_OK` (category layer)
 
 `TWO_RUN_IDENTITY_OK`
 
@@ -4119,7 +4273,7 @@ This subtask is now considered **Done** for Engine Core evidence; future Engine 
 
 * **Tokens:**
 
-  * `CATEGORY_FRAMEWORK_OK`
+  * `MAGIC10_DOMAIN_CLOSED_OK`
 
 * **Evidence / artifacts:**
 
@@ -4140,7 +4294,7 @@ This subtask is now considered **Done** for Engine Core evidence; future Engine 
 
 **Tokens:**
 
-`AB_BA_PARITY_OK` (category layer)
+`COMPOSITE_ABBA_IDENTITY_OK` (category layer)
 
 `TWO_RUN_IDENTITY_OK`
 
@@ -4169,7 +4323,7 @@ Treat circuit as channel-scoped, with optional bridge/timing analytics for inter
 
 **Tokens:**
 
-`CATEGORY_FRAMEWORK_OK`
+`MAGIC10_DOMAIN_CLOSED_OK`
 
 **Evidence / artifacts:**
 
@@ -4426,7 +4580,7 @@ EPIC020 PR 2b completes the D1 slice by:
 
 * wiring these artifacts into the Human Evidence Index and Machine Mirror with EPIC020 metadata and determinism pins.
 
-The EPIC020 D1 tokens `ERROR_JSON_CANON_OK`, `JSON_CANONICAL_CHECK_OK`, `ERROR_TOKEN_MAP_OK`, `CLI_READER_EMITTER_PARITY_OK`, , `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`, and `EVIDENCE_PATHS_VALIDATED_OK` are recorded as **DONE** in `docs/acceptance_map_epic020.json` and `audit/EPIC-020_MANIFEST.json`, each bound to specific tests and error evidence artifacts. PF09 does not mint or list unrostered tokens; stderr-only stream discipline is tracked as a behavioral requirement (tested and evidenced) and must not be represented by a non-roster token in PF09.
+The EPIC020 D1 tokens `ERROR_JSON_CANON_OK`, `JSON_CANONICAL_CHECK_OK`, `ERROR_TOKEN_MAP_OK`, `CLI_READER_PARITY_OK`, , `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`, and `EVIDENCE_PATHS_VALIDATED_OK` are recorded as **DONE** in `docs/acceptance_map_epic020.json` and `audit/EPIC-020_MANIFEST.json`, each bound to specific tests and error evidence artifacts. PF09 does not mint or list unrostered tokens; stderr-only stream discipline is tracked as a behavioral requirement (tested and evidenced) and must not be represented by a non-roster token in PF09.
 
 ### **Subtask HDE-SEPA002.1 — Error envelope shape & numeric-free body**
 
@@ -4612,7 +4766,7 @@ Ensure that for the same error condition:
 
 **Tokens:**
 
-`CLI_READER_EMITTER_PARITY_OK`  
+`CLI_READER_PARITY_OK`  
 `TWO_RUN_IDENTITY_OK`
 
 **Evidence / artifacts:**
@@ -4822,7 +4976,7 @@ From PF09’s perspective, the presenter/emitter slice for Reader and `hdctl sho
 
 **Tokens:**
 
-`CLI_READER_EMITTER_PARITY_OK`  
+`CLI_READER_PARITY_OK`  
  `CLI_NO_ALT_JSON_OK`
 
 **Evidence / artifacts:**
@@ -4851,7 +5005,7 @@ Index/Mirror records:
 
 EPIC020 acceptance wiring (titles-only):
 
-* `docs/acceptance_map_epic020.json` / `audit/EPIC-020_MANIFEST.json` — D2 entries recording `CLI_READER_EMITTER_PARITY_OK` and `CLI_NO_ALT_JSON_OK` as **DONE** for the presenter slice, listing serializer guard tests and guard artifacts as evidence.
+* `docs/acceptance_map_epic020.json` / `audit/EPIC-020_MANIFEST.json` — D2 entries recording `CLI_READER_PARITY_OK` and `CLI_NO_ALT_JSON_OK` as **DONE** for the presenter slice, listing serializer guard tests and guard artifacts as evidence.
 
 Notes:  
  This subtask is scoped to ensuring that governed Reader/compat HTTP routes and `hdctl showcompat` all use the same allow-listed presenter/emitter symbol as production, enforced by guard tools and tests. Compat-surface AB/BA parity and identity hashing (HDE-CONJ002) remain separate rows.
@@ -5305,6 +5459,10 @@ Validator hardening evidence (titles-only; canonical homes elsewhere):
 
 Many tasks in this phase share artifacts and tokens (especially CLI and Reader A7/A8 surfaces). This structure keeps them trackable as separate checklist rows while acknowledging shared evidence.
 
+Conjunction Pass 1 planning slices: HDE-CONJ001.1 through HDE-CONJ001.4 and HDE-CONJ008.1 through HDE-CONJ008.4 are tracked as deferred to HDE-EPIC026 and must not be claimed in-scope when deferred.
+
+Internal compat keyset contract posture does not mint a new acceptance token for Conjunction Pass 1; the required posture must be proven as evidence under existing tokens.
+
 ---
 
 ## Task HDE-CONJ001 — Dev HTTP Harness (single home)
@@ -5557,9 +5715,9 @@ Passes canonicalization checks (canonical JSON, LF-termination, sorted keys, arr
 
 **Task ID:** HDE-CONJ002
 
-**Task name/label:** Compat Surface (internal)
+**Task name/label: Compat Surface (internal)**
 
-**Task status:** **Not done**
+**Task status: Partial**
 
 **Task description:**  
  Implement an internal-only compat surface using the shared presenter/emitter, with canonical JSON, AB↔BA parity (including Integration channels), and identity\_hash capture, and index its evidence.
@@ -5570,9 +5728,9 @@ Passes canonicalization checks (canonical JSON, LF-termination, sorted keys, arr
 
 Missing tokens (titles-only; tokens live in Governance/Schemas):
 
-`CATEGORY_FRAMEWORK_OK`
+`MAGIC10_DOMAIN_CLOSED_OK`
 
-`AB_BA_PARITY_OK`
+`COMPOSITE_ABBA_IDENTITY_OK`
 
 `JSON_CANONICAL_CHECK_OK`
 
@@ -5590,24 +5748,41 @@ Never exposes SR/XR numerics on Reader; any CLI-only diagnostic sidecar is flag-
 
 **Subtask name/label:** Internal compat endpoint behavior
 
-**Subtask description:**  
- Maintain an internal endpoint for pair-compat emission and QA that:
+Serve `/api/compat/v1` as internal-only endpoint (not exposed via public API). Computation is POST-only; GET is probe-only.
 
-Uses the shared presenter/emitter.
+* If a\_id or b\_id invalid or empty: 400 `invalid_json`
 
-Is not a public product surface.
+* If a\_id or b\_id not found: 404 `ERR_NOT_FOUND`
 
-Never exposes SR/XR numerics on Reader; CLI diagnostics (if any) are flag-guarded and admin-only.
+* If `APP_ENV == "prod"`: 404 `ERR_NOT_FOUND` (gate internal endpoint away from prod)
 
-**Subtask status:** **Not done**
+* GET (probe): if request has a body, reject with `invalid_json`; otherwise return fixed probe payload (no compute)
+
+* POST (compute): validate against `UID_RE`; then compute
+
+Ensure the endpoint is recorded in `docs/ENDPOINTS_CATALOG.json` as a POST-only entry with `internal: true`, `classification: A7`, `auth: internal_admin`, `schema` `CompatV1Out`, `a7_eligible` true, `a7_contract_version` 1, and non-empty `env_gate` field.
+
+**Subtask status:** **Done**
+
+**Subtask status notes:**
+
+* **Status (Audit v1 — 2025-11-17):** Not done.
+
+* **Status (Addenda 10-13 HDE-EPIC025):** Done (Remediation 3 status Satisfied; `python -m pytest -q tests/http/test_compat_endpoint_contract.py` → `4 passed in 0.82s`).
 
 **Epic or card:** **Unknown**
 
-**Tokens:** **Unknown**
+**Tokens:** Unknown
 
 **Evidence / artifacts:**
 
-Endpoint implementation and tests (paths not pinned here).
+`engine/http/compat_handler.py`
+
+`tests/http/test_compat_endpoint_contract.py`
+
+`docs/compat/compat_http_contract.md`
+
+`docs/ENDPOINTS_CATALOG.json` (entry for `/api/compat/v1`)
 
 ### Subtask HDE-CONJ002.2 — Canonical compat JSON & parity
 
@@ -5626,9 +5801,9 @@ Obey AB↔BA parity on the full compat body, including Integration channel cases
 
 **Tokens:**
 
-`CATEGORY_FRAMEWORK_OK`
+`MAGIC10_DOMAIN_CLOSED_OK`
 
-`AB_BA_PARITY_OK`
+ 
 
 `JSON_CANONICAL_CHECK_OK`
 
@@ -5651,7 +5826,7 @@ Obey AB↔BA parity on the full compat body, including Integration channel cases
 
 **Tokens:**
 
-`AB_BA_PARITY_OK`
+`COMPOSITE_ABBA_IDENTITY_OK`
 
 `TWO_RUN_IDENTITY_OK`
 
@@ -5709,7 +5884,7 @@ Maintain an explicit allow-list of presenter/emitter symbols; CI must enforce it
 
 Missing tokens (titles-only):
 
-`CLI_READER_EMITTER_PARITY_OK`
+`CLI_READER_PARITY_OK`
 
 `CLI_NO_ALT_JSON_OK`
 
@@ -5738,7 +5913,7 @@ No ad-hoc serializers on public paths; guarded via grep and import-graph symbol 
 
 **Tokens:**
 
-`CLI_READER_EMITTER_PARITY_OK`
+`CLI_READER_PARITY_OK`
 
 `CLI_NO_ALT_JSON_OK`
 
@@ -5780,7 +5955,7 @@ No ad-hoc serializers on public paths; guarded via grep and import-graph symbol 
 
 **Tokens:**
 
-`CLI_READER_EMITTER_PARITY_OK`
+`CLI_READER_PARITY_OK`
 
 `CLI_SHOWCOMPAT_CANON_OK`
 
@@ -6005,9 +6180,9 @@ integration of these artifacts into the global Distillation gates and Index/Mirr
 
 **Tokens:**
 
-`CLI_READER_EMITTER_PARITY_OK`
+`CLI_READER_PARITY_OK`
 
-`CLI_AB_BA_PARITY_OK`
+`COMPOSITE_ABBA_IDENTITY_OK`
 
 `CLI_TWO_RUN_IDENTITY_OK`
 
@@ -6334,113 +6509,97 @@ Encoding invariance: ETag and effective Content-Length stable across accepted en
 
 ---
 
-## Task HDE-CONJ006 — Caching & Transport Wiring (Reader)
+## **Task HDE-CONJ006 — Caching & Transport Wiring (Reader)**
 
 **Task ID:** HDE-CONJ006
 
 **Task name/label:** Caching & Transport Wiring (Reader)
 
-**Task status:** **Not done**
-
-**Task description:**  
- Explicitly tie A7 proofs to the Catalog JSON success route and capture GET/HEAD/304/encoding/headers evidence with env-gate proof for Reader transport.
+**Task status:** **Done**
 
 **Task notes:**
 
-**Status (Audit v1 — 2025-11-17):** Not done.
+* Addenda 10-13 HDE-EPIC025: `HDE_WRITE_A7_PROOFS=1 python -m pytest -q tests/http/test_reader_a7_transport.py` → `1 passed in 0.21s`
 
-A7 matrix not proven on a cataloged JSON success route; encoding invariance and env-gate evidence missing.
+**Task status notes:**
 
-### Subtask HDE-CONJ006.1 — Enforce A7 matrix on Catalog route
+* **Status (Audit v1 — 2025-11-17):** Not done.
 
-**Subtask name/label:** A7 matrix enforcement on Catalog route
+**Status (Addenda 10-13 HDE-EPIC025):** Done.
 
-**Subtask description:**  
- Enforce the A7 matrix on the Catalog JSON success route:
+A7 matrix proven on a cataloged JSON success route; encoding invariance and env-gate evidence captured; evidence index \+ mirror updated.
 
-ETag on 200 (over canonical LF-terminated body).
+### **Subtask HDE-CONJ006.1 — Enforce A7 matrix on Catalog route**
 
-304 omits `Content-Type` and `Content-Length`; no body.
+**Subtask name/label:** Enforce A7 matrix on Catalog route
 
-HEAD 200 parity.
+**Subtask description:** Ensure Reader returns A7 headers and caching invariants on cataloged /reader routes.
 
-POST non-conditional.
+**Subtask status:** **Done**
 
-Writers/errors: `Cache-Control: no-store`.
+**Epic or card: HDE-EPIC025**
 
-**Subtask status:** **Not done**
+**Tokens:** A7\_GET\_QUOTED\_ETAG\_OK / A7\_HEAD\_PARITY\_OK / A7\_304\_NO\_CONTENT\_TYPE\_OK / A7\_VARY\_AUTH\_AE\_OK / A7\_ENCODING\_INVARIANCE\_OK / A7\_ENV\_GATE\_REJECT\_OK
 
-**Epic or card:** **Unknown**
+**Acceptance artifacts:**
 
-**Tokens:**
+* `tests/http/test_reader_a7_transport.py` passes with `HDE_WRITE_A7_PROOFS=1`.
 
-`A7_GET_QUOTED_ETAG_OK`
+* `artifacts/proofs/` contains:
 
-`A7_HEAD_PARITY_OK`
+  * `success\_get.txt`
 
-`A7_304_OMITS_CT_CL_OK`
+  * `success\_head.txt`
 
-`A7_VARY_AUTH_AE_OK`
+  * `success\_304.txt`
 
-`A7_TRANSPORT_PROOF_OK`
+  * `writers\_errors.txt`
 
-**Evidence / artifacts:**
+  * `success\_encoding\_invariance.txt`
 
-`artifacts/proofs/success_get.txt`
+* `artifacts/proofs/endpoints_env_gate_proof.log` proves env gate rejects in prod.
 
-`artifacts/proofs/success_head.txt`
+### **Subtask HDE-CONJ006.2 — Preserve cache behavior**
 
-`artifacts/proofs/success_304.txt`
+**Subtask name/label:** Preserve cache behavior
 
-`artifacts/proofs/success_writers_errors.txt`
+**Subtask description:** Ensure ETag and Vary semantics remain correct when adding transport enforcement.
 
-### Subtask HDE-CONJ006.2 — Encoding invariance & env-gate
+**Subtask status:** **Done**
 
-**Subtask name/label:** Encoding invariance & env-gate proof
+**Epic or card:** **HDE-EPIC025**
 
-**Subtask description:**  
- Prove encoding invariance across accepted `Accept-Encoding` values and provide env-gate proof for the Catalog route.
+**Tokens:** A7\_GET\_QUOTED\_ETAG\_OK / A7\_HEAD\_PARITY\_OK / A7\_304\_NO\_CONTENT\_TYPE\_OK / A7\_VARY\_AUTH\_AE\_OK / A7\_ENCODING\_INVARIANCE\_OK
 
-**Subtask status:** **Not done**
+**Acceptance artifacts:**
 
-**Epic or card:** **Unknown**
+* `artifacts/proofs/success\_get.txt` contains quoted ETag and correct Content-Type.
 
-**Tokens:**
+* `artifacts/proofs/success\_head.txt` matches GET ETag and Vary.
 
-`A7_ENCODING_INVARIANCE_OK`
+* `artifacts/proofs/success\_304.txt` omits Content-Type and body, retains ETag and Vary.
 
-`A7_VARY_AUTH_AE_OK`
+* `artifacts/proofs/success\_encoding\_invariance.txt` shows identical body hash across gzip/no-gzip.
 
-**Evidence / artifacts:**
+### **Subtask HDE-CONJ006.3 — Update evidence index \+ mirror for A7 proofs**
 
-`artifacts/proofs/success_encoding_invariance.txt`
+**Subtask name/label:** Update evidence index \+ mirror for A7 proofs
 
-`artifacts/proofs/endpoints_env_gate_proof.log`
+**Subtask description:** Ensure proofs are indexed and mirrored with stable schema.
 
-### Subtask HDE-CONJ006.3 — Caching & transport evidence indexing
+**Subtask status:** **Done**
 
-**Subtask name/label:** Reader transport Evidence Index & mirror
+**Epic or card:** **HDE-EPIC025**
 
-**Subtask description:**  
- Update Human Index and mirror in the same PR for Reader transport proofs (success\_get/head/304, encoding\_invariance, writers\_errors, env\_gate).
+**Tokens:** EVIDENCE\_INDEX\_UPDATED\_OK / MIRROR\_SCHEMA\_OK / A7\_PROOFS\_INDEXED\_OK
 
-**Subtask status:** **Not done**
+**Acceptance artifacts:**
 
-**Epic or card:** **Unknown**
+* `docs/evidence/INDEX.json` / `docs/evidence/MIRROR_SCHEMA.json` updated.
 
-**Tokens:**
+* `artifacts/evidence_index.jsonl` includes new A7 proof entries and passes check.
 
-`EVIDENCE_INDEX_UPDATED_OK`
-
-`EVIDENCE_INDEX_MIRROR_OK`
-
-`EVIDENCE_PATHS_VALIDATED_OK`
-
-**Evidence / artifacts:**
-
-`docs/evidence/INDEX.json` / `docs/evidence/INDEX.sha256`
-
-`artifacts/evidence_index.jsonl`
+* `ci/checks/check_mirror_schema.sh` passes.
 
 ---
 
@@ -6480,13 +6639,13 @@ Keep merge-blocking until parity/determinism tokens pass.
 
 **Tokens:**
 
-`CLI_READER_EMITTER_PARITY_OK`
+`CLI_READER_PARITY_OK`
 
 `PREIMAGE_RECOMPUTE_OK`
 
 `JSON_CANONICAL_CHECK_OK`
 
-`CLI_AB_BA_PARITY_OK`
+`COMPOSITE_ABBA_IDENTITY_OK`
 
 `CLI_TWO_RUN_IDENTITY_OK`
 
@@ -7524,7 +7683,7 @@ Each record includes a `proof_anchor` pointing to a co-located `*.path_proof.txt
 
 `JSON_CANONICAL_CHECK_OK` — canonical JSON checks for manifests and diff artifacts.
 
-`AB_BA_PARITY_OK` — AB↔BA parity remains satisfied after registry changes (where applicable).
+`COMPOSITE_ABBA_IDENTITY_OK` — AB↔BA parity remains satisfied after registry changes (where applicable).
 
 `TWO_RUN_IDENTITY_OK` — two-run identity holds for pack identity and related proofs.
 
@@ -8084,9 +8243,9 @@ PF09 is consumer-only for tokens; semantics live in Governance/CLI/Schemas/Mecha
 
 `PREIMAGE_RECOMPUTE_OK`
 
-`CLI_READER_EMITTER_PARITY_OK`
+`CLI_READER_PARITY_OK`
 
-`CLI_AB_BA_PARITY_OK`
+`COMPOSITE_ABBA_IDENTITY_OK`
 
 `TWO_RUN_IDENTITY_OK`
 
@@ -9413,7 +9572,7 @@ Identity fields are not mutated after freeze and are not overridden by env vars,
 
 `TWO_RUN_IDENTITY_OK`
 
-`CLI_READER_EMITTER_PARITY_OK`
+`CLI_READER_PARITY_OK`
 
 `EVIDENCE_INDEX_UPDATED_OK`
 
@@ -9449,7 +9608,7 @@ Demonstrate CLI↔Reader parity on identity\_meta: the same inputs yield byte-id
 
 *Tokens (titles-only):*
 
-`CLI_READER_EMITTER_PARITY_OK`
+`CLI_READER_PARITY_OK`
 
 `TWO_RUN_IDENTITY_OK`
 
@@ -9509,7 +9668,7 @@ Each record includes a `proof_anchor` path-proof stored alongside the artifact.
 
 Tokens referenced (all already defined in PF14 / Governance; no new tokens):
 
-`RELEASE_ID_RECOMPUTE_OK`, `TWO_RUN_IDENTITY_OK`, `CLI_READER_EMITTER_PARITY_OK`, `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`.
+`RELEASE_ID_RECOMPUTE_OK`, `TWO_RUN_IDENTITY_OK`, `CLI_READER_PARITY_OK`, `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`.
 
 These are being **bound** more concretely to identity-module evidence; no new token definitions are introduced.
 
@@ -10802,7 +10961,7 @@ Until that epic is live, QA requirements that assume “existing users in prod�
 
 Rails and env pins: SAFE\_RAILS\_DEFAULT\_OK, ENV\_LC\_ALL\_C\_OK, ENV\_TZ\_UTC\_OK.
 
-Canonical JSON and parity: JSON\_CANONICAL\_CHECK\_OK, CLI\_AB\_BA\_PARITY\_OK, CLI\_TWO\_RUN\_IDENTITY\_OK, CLI\_READER\_EMITTER\_PARITY\_OK.
+Canonical JSON and parity: JSON\_CANONICAL\_CHECK\_OK, COMPOSITE\_ABBA\_IDENTITY\_OK, CLI\_TWO\_RUN\_IDENTITY\_OK, CLI\_READER\_PARITY\_OK.
 
 Evidence discipline: EVIDENCE\_INDEX\_UPDATED\_OK, EVIDENCE\_INDEX\_MIRROR\_OK, EVIDENCE\_PATHS\_VALIDATED\_OK.
 
@@ -11149,4 +11308,172 @@ Evidence Index and Machine Mirror entries for admin auth and audit artifacts, wi
 
 Notes:  
  This subtask binds ADMIN\_AUTH\_REQUIRED\_OK to a concrete set of expectations for admin bundle surfaces. Authentication and authorization semantics, header formats, and storage details remain single-homed in Governance, infra, and QA docs by title; PF09 records that there is explicit checklisted work and evidence for these rails and that admin surfaces are no longer permitted to remain open or unauthenticated under canon.
+
+## **Task HDE-COAG007 — EPIC025 post-close remediation (dev and ops only)**
+
+Task ID: HDE-COAG007
+
+Task name/label: EPIC025 post-close remediation (dev and ops only)
+
+Task status: Not done
+
+Task description:
+
+Implement the EPIC025 post-close follow-ups that require dev or ops engagement to prevent repeat build drift, repeat QA churn, and repeat evidence-trust failures surfaced in Addenda 49-51. This task explicitly excludes documentation-only and process-only tracking work, including canon wording alignment, template prose updates, audit narrative deltas, and PASS-decision ledgers.
+
+Task notes:
+
+* Primary drivers are the Live QA execution failure modes and guardrail gaps called out in:
+
+  * Addenda 33-41 HDE-EPIC025 (environment variable discipline; step-log header writer export discipline; objective-first plan posture)
+
+  * Addenda 42-48 HDE-EPIC025 (template semantics for deferred steps; prompt-family separation; QoS escalation; lint enforcement recommendation)
+
+  * Addenda 49-51 HDE-EPIC025 (QoS stop-rule proposal; rails-posture mismatch; closure artifact deferral semantics; artifacts-list primary.log invariant)
+
+* Subtasks below capture the mechanical gates and harness or tooling hardening required to prevent recurrence. PF09 does not track the associated narrative doc updates or PF-canon wording deltas.
+
+### **Subtask HDE-COAG007.1 — Implement QA plan validity lint and mechanical gate enforcement (env vars, deferrals, prompt-family separation, rails truthfulness, QoS stop-rule, artifacts list integrity)**
+
+Subtask name/label: Implement QA plan validity lint and mechanical gate enforcement
+
+Subtask description: Add or extend a mechanical validation gate for Live QA plans, plan revisions, and closure or rollup artifacts that enforces all of the following as hard failures:
+
+* Environment variable discipline:
+
+  * Reject any plan or evidence schema that introduces, requires, or depends on `MODO_*` variables as required inputs or required schema keys.
+
+  * Reject any plan that mints new environment variable names during Live QA as a remediation step.
+
+* Rails posture truthfulness:
+
+  * If a step requires network I/O or vendor compute, the plan MUST declare OPEN rails (or provide an offline deterministic proof alternative under SAFE rails).
+
+  * Reject any plan that declares SAFE rails for a step but then executes vendor calls or other non-deterministic I/O during that step.
+
+* Deferral and future-step semantics:
+
+  * Enforce that future-step artifacts are labeled NOT RUN (or DEFERRED) until the producing step has executed.
+
+  * Enforce that NOT RUN or DEFERRED are not treated as missing evidence.
+
+  * Enforce that closure or rollup artifacts do not present deferred-step artifacts as required evidence for the current run.
+
+* Evidence listing integrity:
+
+  * Every PASS step MUST list its `primary.log` in the declared artifacts list; omission is not allowed.
+
+* QoS stop-rule:
+
+  * If more than 3 plan-to-evidence structural mismatches (for example plan↔evidence mismatch) occur in a single Live QA run, halt and escalate to RCA plus a template or tooling fix before continuing.
+
+  * Treat continuing past the threshold as a process defect, not an execution tactic.
+
+* Prompt-family separation:
+
+  * Require an explicit mode declaration (AUTHORING vs REVIEW) for QA prompts and artifacts intended to be validated.
+
+  * Enforce that REVIEW mode does not generate new runbooks or command recipes, except for remediation commands copied verbatim from plan caveats.
+
+Subtask status: Not done
+
+Epic or card: HDE-EPIC025
+
+Tokens:
+
+None
+
+Evidence / artifacts:
+
+Addenda 33-41 HDE-EPIC025 (2.33, 2.35)
+
+Addenda 42-48 HDE-EPIC025 (template semantics, prompt-family separation, QoS escalation; PF19 plan validity lint drain)
+
+Addenda 49-51 HDE-EPIC025 (2.50: QoS stop-rule, rails truthfulness, closure template deferral semantics, primary.log listing invariant)
+
+### **Subtask HDE-COAG007.2 — Harden step-log header writer contract and validation (per-check exports, single JSON header, trust fields)**
+
+Subtask name/label: Step-log header writer contract and validation (per-check exports, single JSON header, trust fields)
+
+Subtask description:
+
+Implement tooling and validation so per-check primary.log artifacts do not require ad hoc header rebuild deviations to be treated as trustworthy evidence. This includes:
+
+* Enforce that any step-log header writer reads a complete, explicitly exported per-check variable set immediately before header generation for each check.  
+* Enforce that each primary.log begins with exactly one JSON header line and that the header contains the check identity fields required for evidence trust.  
+* Enforce that the command transcript requirements are satisfied (command line invoked and exit code recorded) and that primary.log is written under the canonical epic QA root and check root posture.
+
+Subtask status: Not done
+
+Epic or card: EPIC025 (post-close remediation; PO-owned)
+
+Tokens:
+
+None
+
+Evidence / artifacts:
+
+Addenda 33-41 HDE-EPIC025 (2.35 step-log header writer export defect; primary.log header rebuild deviation details)
+
+Addenda 42-48 HDE-EPIC025 (evidence trust framing for governed primary.log JSON header and command transcript)
+
+Acceptance impact:
+
+No new acceptance tokens are introduced by this task. If any new required gate or acceptance token is proposed as part of these mechanical validations, it must be defined and governed outside PF09 before PF09 can treat it as a required acceptance condition.
+
+Artifacts impact:
+
+This task may add or modify build or QA tooling outputs. Any such outputs must remain within canon-allowed evidence roots and must not introduce new evidence roots as an ungoverned side effect.
+
+### **Subtask HDE-COAG007.3 — Enforce PF07 close-pack path-proof adjacency (close report \+ manifest)**
+
+Subtask name/label: PF07 close-pack path-proof adjacency enforcement
+
+Subtask description: Implement tooling and validation so the epic close-pack pair always includes adjacent PF07 path proofs and closure fails closed when they are missing.
+
+* Require that the close-pack pair includes these siblings adjacent to the close-pack artifacts:
+
+  * `audit/EPIC-025_close_report.md.path_proof.txt`
+
+  * `audit/EPIC-025_MANIFEST.json.path_proof.txt`
+
+* Ensure any close-pack generator emits these path proofs as part of close-pack creation and that verification fails closed if absent.
+
+* Generalize the rule for `audit/EPIC-<NNN>_close_report.md` and `audit/EPIC-<NNN>_MANIFEST.json` close-pack families.
+
+Subtask status: Not done
+
+Epic or card: HDE-EPIC025
+
+Tokens:
+
+None
+
+Evidence / artifacts:
+
+Addenda 49-51 HDE-EPIC025 (2.51 closure decision: PF07 close-pack pair path-proof adjacency risk)
+
+### **Subtask HDE-COAG007.4 — Root directory creation lint (new top-level directory requires ADR)**
+
+Subtask name/label: Root directory creation lint requiring ADR
+
+Subtask description: Add a lint rule that fails closed when a new repository top-level directory is introduced without an explicit ADR, to prevent root sprawl and protect governed evidence roots.
+
+* Detect new top-level directory names that are not already governed.
+
+* Require an explicit ADR before permitting a new top-level directory name.
+
+* Ensure the lint does not introduce new evidence roots and does not mutate existing evidence roots.
+
+Subtask status: Not done
+
+Epic or card: HDE-EPIC025
+
+Tokens:
+
+None
+
+Evidence / artifacts:
+
+Addenda 49-51 HDE-EPIC025 (2.51 PF-canon delta: root directory creation lint requiring ADR)
 
