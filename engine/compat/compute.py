@@ -1,6 +1,9 @@
 from __future__ import annotations
 import hashlib, math
 from typing import Any, Dict, List, Mapping, Tuple
+from engine.bodygraph.ingest import resolve_db_user_id
+from engine.bodygraph.resolver import resolve_bodygraph
+from engine.bodygraph.vendor_client import VendorError
 from engine.compat.categories import CATEGORIES_ORDER_V1
 from engine.compat.thresholds import THRESHOLDS_V1, BANDS
 from engine.compat.ordering import normalize_pair, pair_key
@@ -84,3 +87,109 @@ def conjunction_public(
             "compat": compat,
         }
     }
+
+
+def _conjunction_user_id(raw: object) -> str | None:
+    if isinstance(raw, str) and raw.strip():
+        return raw.strip()
+    if not isinstance(raw, Mapping):
+        return None
+    direct = raw.get("user_id")
+    if isinstance(direct, str) and direct.strip():
+        return direct.strip()
+    person = raw.get("person")
+    if isinstance(person, Mapping):
+        nested = person.get("user_id")
+        if isinstance(nested, str) and nested.strip():
+            return nested.strip()
+    return None
+
+
+def _birth_fields(raw: object) -> Tuple[str | None, str | None, str | None]:
+    if not isinstance(raw, Mapping):
+        return None, None, None
+    birthdate = raw.get("birthdate")
+    birthtime = raw.get("birthtime")
+    location = raw.get("location")
+    values: list[str | None] = []
+    for value in (birthdate, birthtime, location):
+        if isinstance(value, str) and value.strip():
+            values.append(value.strip())
+        else:
+            values.append(None)
+    return values[0], values[1], values[2]
+
+
+def conjunction_public_resolved(
+    left: Mapping[str, Any] | str,
+    right: Mapping[str, Any] | str,
+    *,
+    viewer_top: str,
+    viewer_weights: Dict[str, int],
+    engine_tag: str,
+    release_id: str,
+    invocation_tag: str,
+    env: Mapping[str, object] | None = None,
+    local_lookup: Any | None = None,
+) -> Dict[str, object]:
+    """Resolve unresolved conjunction inputs via the bodygraph resolver, then emit deterministic payload."""
+
+    def _lookup(user_id: str) -> Mapping[str, Any] | None:
+        if local_lookup is None:
+            return None
+        entry = local_lookup(user_id)
+        if isinstance(entry, Mapping):
+            return entry
+        return None
+
+    def _resolve_party(raw: Mapping[str, Any] | str) -> Mapping[str, Any]:
+        if isinstance(raw, Mapping):
+            try:
+                _person_from_resolved(raw)
+                return raw
+            except ValueError:
+                pass
+        user_id = _conjunction_user_id(raw)
+        if not user_id:
+            raise ValueError("conjunction input must be resolved bodygraph or include user_id")
+        normalized = resolve_db_user_id(user_id)
+        local = _lookup(normalized)
+        if local is not None:
+            return local
+        birthdate, birthtime, location = _birth_fields(raw)
+        outcome = resolve_bodygraph(
+            normalized,
+            source="vendor",
+            upsert=True,
+            dry_run=False,
+            env=env,
+            birthdate=birthdate,
+            birthtime=birthtime,
+            location=location,
+        )
+        if outcome.status != "ok":
+            error = outcome.payload.get("error") if isinstance(outcome.payload, Mapping) else None
+            if isinstance(error, Mapping):
+                code = str(error.get("code") or "PROVIDER_UNAVAILABLE")
+                message = str(error.get("message") or "resolver unavailable")
+                details = error.get("details")
+                if isinstance(details, Mapping):
+                    raise VendorError(code, message, details=details)
+                raise VendorError(code, message)
+            raise VendorError("PROVIDER_UNAVAILABLE", "resolver unavailable")
+        local_after = _lookup(normalized)
+        if local_after is not None:
+            return local_after
+        raise VendorError("PROVIDER_UNAVAILABLE", "resolved bodygraph unavailable in local cache")
+
+    left_resolved = _resolve_party(left)
+    right_resolved = _resolve_party(right)
+    return conjunction_public(
+        left_resolved,
+        right_resolved,
+        viewer_top=viewer_top,
+        viewer_weights=viewer_weights,
+        engine_tag=engine_tag,
+        release_id=release_id,
+        invocation_tag=invocation_tag,
+    )
