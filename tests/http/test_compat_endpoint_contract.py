@@ -53,11 +53,22 @@ def test_conjunction_contract_emits_stable_canonical_bytes():
         release_id="dev",
         invocation_tag="INV-DEV",
     )
+    swapped = conjunction_public(
+        right,
+        left,
+        viewer_top=CATEGORIES_ORDER_V1[0],
+        viewer_weights=weights,
+        engine_tag="dev",
+        release_id="dev",
+        invocation_tag="INV-DEV",
+    )
 
     first_bytes = emit_public(first)
     second_bytes = emit_public(second)
+    swapped_bytes = emit_public(swapped)
 
     assert first_bytes == second_bytes
+    assert first_bytes == swapped_bytes
     assert first_bytes.endswith(b"\n")
 
 def test_compat_post_contract_and_catalog_entry():
