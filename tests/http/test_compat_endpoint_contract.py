@@ -1,10 +1,14 @@
 import json
+
+import pytest
 from pathlib import Path
 
 from adapter.http_reader import create_app
 from engine.compat.categories import CATEGORIES_ORDER_V1
 
-from engine.compat.compute import conjunction_public
+from engine.bodygraph.ingest import resolve_db_user_id
+from engine.bodygraph.vendor_client import VendorError
+from engine.compat.compute import conjunction_public, conjunction_public_resolved
 from engine.presenter import emit_public
 
 
@@ -171,3 +175,157 @@ def test_compat_post_rejects_malformed_ids():
     payload = json.loads(resp.data.decode("utf-8"))
     assert payload.get("ok") is False
     assert payload.get("code") == "ERR_COMPAT_INVALID_JSON"
+
+
+def test_conjunction_resolved_closed_rails_missing_refuses_without_provider(monkeypatch):
+    weights = {cat: 10 for cat in CATEGORIES_ORDER_V1}
+    calls = []
+
+    class _Outcome:
+        status = "error"
+        payload = {
+            "error": {
+                "code": "PROVIDER_REFUSED",
+                "message": "Vendor source is refused under SAFE rails (SAFE_MODE=1).",
+            }
+        }
+
+    def _resolver(*args, **kwargs):
+        calls.append((args, kwargs))
+        return _Outcome()
+
+    monkeypatch.setattr("engine.compat.compute.resolve_bodygraph", _resolver)
+
+    with pytest.raises(VendorError) as exc:
+        conjunction_public_resolved(
+            {"user_id": "missing-left"},
+            {"person_uid": "bob"},
+            viewer_top=CATEGORIES_ORDER_V1[0],
+            viewer_weights=weights,
+            engine_tag="dev",
+            release_id="dev",
+            invocation_tag="INV-DEV",
+            env={"SAFE_MODE": "1", "ALLOW_NETWORK": "0"},
+            local_lookup=lambda *_: None,
+        )
+
+    assert exc.value.code == "PROVIDER_REFUSED"
+    assert len(calls) == 1
+
+
+def test_conjunction_resolved_open_rails_acquires_and_persists(monkeypatch):
+    weights = {cat: 10 for cat in CATEGORIES_ORDER_V1}
+    store = {}
+    calls = []
+
+    def _lookup(user_id):
+        return store.get(user_id)
+
+    def _resolver(user_id, **kwargs):
+        calls.append({"user_id": user_id, **kwargs})
+        store[user_id] = {"person_uid": user_id}
+
+        class _Outcome:
+            status = "ok"
+            payload = {"status": "ok"}
+
+        return _Outcome()
+
+    monkeypatch.setattr("engine.compat.compute.resolve_bodygraph", _resolver)
+
+    payload = conjunction_public_resolved(
+        {"user_id": "left-user", "birthdate": "1990-01-01", "birthtime": "08:30", "location": "Amsterdam"},
+        {"user_id": "right-user", "birthdate": "1991-02-02", "birthtime": "09:45", "location": "Berlin"},
+        viewer_top=CATEGORIES_ORDER_V1[0],
+        viewer_weights=weights,
+        engine_tag="dev",
+        release_id="dev",
+        invocation_tag="INV-DEV",
+        env={"SAFE_MODE": "0", "ALLOW_NETWORK": "1"},
+        local_lookup=_lookup,
+    )
+
+    assert len(calls) == 2
+    assert payload["conjunction"]["left"]["person_uid"] in store
+    assert payload["conjunction"]["right"]["person_uid"] in store
+
+
+def test_conjunction_resolved_close_back_uses_local_without_provider(monkeypatch):
+    weights = {cat: 10 for cat in CATEGORIES_ORDER_V1}
+    store = {}
+
+    def _lookup(user_id):
+        return store.get(user_id)
+
+    def _resolver_open(user_id, **kwargs):
+        store[user_id] = {"person_uid": user_id}
+
+        class _Outcome:
+            status = "ok"
+            payload = {"status": "ok"}
+
+        return _Outcome()
+
+    monkeypatch.setattr("engine.compat.compute.resolve_bodygraph", _resolver_open)
+
+    conjunction_public_resolved(
+        {"user_id": "left-user"},
+        {"user_id": "right-user"},
+        viewer_top=CATEGORIES_ORDER_V1[0],
+        viewer_weights=weights,
+        engine_tag="dev",
+        release_id="dev",
+        invocation_tag="INV-DEV",
+        env={"SAFE_MODE": "0", "ALLOW_NETWORK": "1"},
+        local_lookup=_lookup,
+    )
+
+    def _resolver_closed(*args, **kwargs):
+        raise AssertionError("provider path must not run once local cache is populated")
+
+    monkeypatch.setattr("engine.compat.compute.resolve_bodygraph", _resolver_closed)
+
+    payload = conjunction_public_resolved(
+        {"user_id": "left-user"},
+        {"user_id": "right-user"},
+        viewer_top=CATEGORIES_ORDER_V1[0],
+        viewer_weights=weights,
+        engine_tag="dev",
+        release_id="dev",
+        invocation_tag="INV-DEV",
+        env={"SAFE_MODE": "1", "ALLOW_NETWORK": "0"},
+        local_lookup=_lookup,
+    )
+
+    assert payload["conjunction"]["left"]["person_uid"]
+    assert payload["conjunction"]["right"]["person_uid"]
+
+
+def test_conjunction_resolved_local_vendor_payload_uses_user_id_hint():
+    weights = {cat: 10 for cat in CATEGORIES_ORDER_V1}
+
+    def _lookup(user_id):
+        return {
+            "id": user_id,
+            "mechanics": {"type": "generator"},
+            "birth": {"date": "1990-01-01", "time": "08:30", "location": "Amsterdam"},
+        }
+
+    payload = conjunction_public_resolved(
+        {"user_id": "left-user"},
+        {"user_id": "right-user"},
+        viewer_top=CATEGORIES_ORDER_V1[0],
+        viewer_weights=weights,
+        engine_tag="dev",
+        release_id="dev",
+        invocation_tag="INV-DEV",
+        env={"SAFE_MODE": "1", "ALLOW_NETWORK": "0"},
+        local_lookup=_lookup,
+    )
+
+    observed = {
+        payload["conjunction"]["left"]["person_uid"],
+        payload["conjunction"]["right"]["person_uid"],
+    }
+    expected = {resolve_db_user_id("left-user"), resolve_db_user_id("right-user")}
+    assert observed == expected
