@@ -4,6 +4,9 @@ from pathlib import Path
 from adapter.http_reader import create_app
 from engine.compat.categories import CATEGORIES_ORDER_V1
 
+from engine.compat.compute import conjunction_public
+from engine.presenter import emit_public
+
 
 def _client():
     app = create_app()
@@ -24,6 +27,49 @@ def _catalog_entries():
     catalog = json.loads(Path("docs/ENDPOINTS_CATALOG.json").read_text(encoding="utf-8"))
     return catalog.get("endpoints", [])
 
+
+
+
+def test_conjunction_contract_emits_stable_canonical_bytes():
+    weights = {cat: 10 for cat in CATEGORIES_ORDER_V1}
+    left = {"person_uid": "alice", "chart": {"type": "resolved"}}
+    right = {"person": {"person_uid": "bob"}, "chart": {"type": "resolved"}}
+
+    first = conjunction_public(
+        left,
+        right,
+        viewer_top=CATEGORIES_ORDER_V1[0],
+        viewer_weights=weights,
+        engine_tag="dev",
+        release_id="dev",
+        invocation_tag="INV-DEV",
+    )
+    second = conjunction_public(
+        left,
+        right,
+        viewer_top=CATEGORIES_ORDER_V1[0],
+        viewer_weights=weights,
+        engine_tag="dev",
+        release_id="dev",
+        invocation_tag="INV-DEV",
+    )
+    swapped = conjunction_public(
+        right,
+        left,
+        viewer_top=CATEGORIES_ORDER_V1[0],
+        viewer_weights=weights,
+        engine_tag="dev",
+        release_id="dev",
+        invocation_tag="INV-DEV",
+    )
+
+    first_bytes = emit_public(first)
+    second_bytes = emit_public(second)
+    swapped_bytes = emit_public(swapped)
+
+    assert first_bytes == second_bytes
+    assert first_bytes == swapped_bytes
+    assert first_bytes.endswith(b"\n")
 
 def test_compat_post_contract_and_catalog_entry():
     client = _client()
