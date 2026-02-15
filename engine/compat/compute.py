@@ -1,6 +1,6 @@
 from __future__ import annotations
 import hashlib, math
-from typing import Dict, List, Tuple
+from typing import Any, Dict, List, Mapping, Tuple
 from engine.compat.categories import CATEGORIES_ORDER_V1
 from engine.compat.thresholds import THRESHOLDS_V1, BANDS
 from engine.compat.ordering import normalize_pair, pair_key
@@ -43,3 +43,44 @@ def compat_public(a: Dict[str,object], b: Dict[str,object],
         pk, sk = _keys_for(cat, bd)
         cats.append({"id":cat, "score":sc, "band":bd, "personal_key":pk, "shared_key":sk})
     return {"categories": cats, "meta":{"engine_tag":engine_tag,"release_id":release_id,"invocation_tag":invocation_tag}}
+
+
+def _person_from_resolved(resolved: Mapping[str, Any]) -> Dict[str, str]:
+    if "person_uid" in resolved and isinstance(resolved["person_uid"], str):
+        return {"person_uid": resolved["person_uid"]}
+    person = resolved.get("person")
+    if isinstance(person, Mapping) and isinstance(person.get("person_uid"), str):
+        return {"person_uid": person["person_uid"]}
+    raise ValueError("resolved bodygraph must include person_uid")
+
+
+def conjunction_public(
+    left_resolved: Mapping[str, Any],
+    right_resolved: Mapping[str, Any],
+    *,
+    viewer_top: str,
+    viewer_weights: Dict[str, int],
+    engine_tag: str,
+    release_id: str,
+    invocation_tag: str,
+) -> Dict[str, object]:
+    """Build a deterministic conjunction contract payload for canonical emission."""
+    left = _person_from_resolved(left_resolved)
+    right = _person_from_resolved(right_resolved)
+    left, right = normalize_pair(left, right)
+    compat = compat_public(
+        left,
+        right,
+        viewer_top,
+        viewer_weights,
+        engine_tag=engine_tag,
+        release_id=release_id,
+        invocation_tag=invocation_tag,
+    )
+    return {
+        "conjunction": {
+            "left": left,
+            "right": right,
+            "compat": compat,
+        }
+    }
