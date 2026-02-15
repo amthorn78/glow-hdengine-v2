@@ -57,6 +57,15 @@ def _person_from_resolved(resolved: Mapping[str, Any]) -> Dict[str, str]:
     raise ValueError("resolved bodygraph must include person_uid")
 
 
+def _resolved_person_with_hint(raw: Mapping[str, Any], *, uid_hint: str | None = None) -> Dict[str, str] | None:
+    try:
+        return _person_from_resolved(raw)
+    except ValueError:
+        if isinstance(uid_hint, str) and uid_hint.strip():
+            return {"person_uid": uid_hint.strip()}
+    return None
+
+
 def conjunction_public(
     left_resolved: Mapping[str, Any],
     right_resolved: Mapping[str, Any],
@@ -144,18 +153,18 @@ def conjunction_public_resolved(
 
     def _resolve_party(raw: Mapping[str, Any] | str) -> Mapping[str, Any]:
         if isinstance(raw, Mapping):
-            try:
-                _person_from_resolved(raw)
-                return raw
-            except ValueError:
-                pass
+            hinted = _resolved_person_with_hint(raw)
+            if hinted is not None:
+                return hinted
         user_id = _conjunction_user_id(raw)
         if not user_id:
             raise ValueError("conjunction input must be resolved bodygraph or include user_id")
         normalized = resolve_db_user_id(user_id)
         local = _lookup(normalized)
         if local is not None:
-            return local
+            hinted = _resolved_person_with_hint(local, uid_hint=normalized)
+            if hinted is not None:
+                return hinted
         birthdate, birthtime, location = _birth_fields(raw)
         outcome = resolve_bodygraph(
             normalized,
@@ -179,7 +188,9 @@ def conjunction_public_resolved(
             raise VendorError("PROVIDER_UNAVAILABLE", "resolver unavailable")
         local_after = _lookup(normalized)
         if local_after is not None:
-            return local_after
+            hinted = _resolved_person_with_hint(local_after, uid_hint=normalized)
+            if hinted is not None:
+                return hinted
         raise VendorError("PROVIDER_UNAVAILABLE", "resolved bodygraph unavailable in local cache")
 
     left_resolved = _resolve_party(left)

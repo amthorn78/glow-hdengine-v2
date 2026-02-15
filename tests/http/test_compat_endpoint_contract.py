@@ -6,6 +6,7 @@ from pathlib import Path
 from adapter.http_reader import create_app
 from engine.compat.categories import CATEGORIES_ORDER_V1
 
+from engine.bodygraph.ingest import resolve_db_user_id
 from engine.bodygraph.vendor_client import VendorError
 from engine.compat.compute import conjunction_public, conjunction_public_resolved
 from engine.presenter import emit_public
@@ -298,3 +299,33 @@ def test_conjunction_resolved_close_back_uses_local_without_provider(monkeypatch
 
     assert payload["conjunction"]["left"]["person_uid"]
     assert payload["conjunction"]["right"]["person_uid"]
+
+
+def test_conjunction_resolved_local_vendor_payload_uses_user_id_hint():
+    weights = {cat: 10 for cat in CATEGORIES_ORDER_V1}
+
+    def _lookup(user_id):
+        return {
+            "id": user_id,
+            "mechanics": {"type": "generator"},
+            "birth": {"date": "1990-01-01", "time": "08:30", "location": "Amsterdam"},
+        }
+
+    payload = conjunction_public_resolved(
+        {"user_id": "left-user"},
+        {"user_id": "right-user"},
+        viewer_top=CATEGORIES_ORDER_V1[0],
+        viewer_weights=weights,
+        engine_tag="dev",
+        release_id="dev",
+        invocation_tag="INV-DEV",
+        env={"SAFE_MODE": "1", "ALLOW_NETWORK": "0"},
+        local_lookup=_lookup,
+    )
+
+    observed = {
+        payload["conjunction"]["left"]["person_uid"],
+        payload["conjunction"]["right"]["person_uid"],
+    }
+    expected = {resolve_db_user_id("left-user"), resolve_db_user_id("right-user")}
+    assert observed == expected
