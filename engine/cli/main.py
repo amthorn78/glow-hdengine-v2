@@ -18,6 +18,7 @@ from engine.bodygraph.ingest import (
 from engine.compat import ts_v0
 from engine.compat.categories import CATEGORIES_ORDER_V1
 from engine.compat.compute import compat_public, band_for
+from engine.compat.compute import conjunction_public_resolved
 from engine.compat.ordering import normalize_pair, pair_key
 from engine.compat.thresholds import THRESHOLDS_V1
 from engine.db import DBAccess
@@ -90,6 +91,14 @@ def _build_parser() -> argparse.ArgumentParser:
         "--source",
         choices=("db", "vendor", "auto"),
         help="Explicit BodyGraph source (db, vendor, or auto)",
+    )
+    show.add_argument(
+        "--conjunction",
+        action="store_true",
+        help=(
+            "Emit conjunction contract JSON (requires --user-a/--user-b or conjunction pair input; "
+            "uses SAFE rails resolver gating)"
+        ),
     )
     show.add_argument(
         "--viewer-prefs-file",
@@ -335,8 +344,8 @@ def _fetch_db_bodygraph(user_id: str, db_access: DBAccess | None = None) -> Tupl
     normalized = resolve_db_user_id(user_id)
     if os.environ.get("HDE_FORCE_DB_UNAVAILABLE") == "1":
         raise CliError("DB_QUERY_FAILED")
-    db = db_access or DBAccess.for_current_env()
     try:
+        db = db_access or DBAccess.for_current_env()
         rows = db.query(
             """
             SELECT payload::text
@@ -373,6 +382,24 @@ def _vendor_inputs_from_args(args: argparse.Namespace, prefix: str) -> VendorInp
         birthtime=base["birthtime"],
         location=base["location"],
     )
+
+
+def _conjunction_party_from_payload(raw: Any, label: str) -> Dict[str, str]:
+    if not isinstance(raw, Mapping):
+        raise CliError(f"MISSING_CONJUNCTION_{label.upper()}")
+    party: Dict[str, str] = {}
+    person_uid = raw.get("person_uid")
+    user_id = raw.get("user_id")
+    if isinstance(person_uid, str) and person_uid.strip():
+        party["person_uid"] = person_uid.strip()
+    elif isinstance(user_id, str) and user_id.strip():
+        party["user_id"] = user_id.strip()
+    else:
+        raise CliError(f"MISSING_CONJUNCTION_{label.upper()}")
+    for key, value in _birth_fields_from_payload(raw).items():
+        if key in ("birthdate", "birthtime", "location"):
+            party[key] = value
+    return party
 
 
 def _chart_for(uid: str) -> Dict[str, Any]:
@@ -625,6 +652,74 @@ def showcompat(_: argparse.Namespace) -> int:
     viewer_prefs = _load_viewer_prefs(getattr(_, "viewer_prefs_file", None))
     engine_tag, release_id, invocation_tag = _engine_identity()
 
+    def _party_from_user_args(prefix: str) -> Dict[str, str] | None:
+        user = getattr(_, f"user_{prefix}", None)
+        if not isinstance(user, str) or not user.strip():
+            return None
+        party: Dict[str, str] = {"user_id": user.strip()}
+        birthdate = getattr(_, f"birthdate_{prefix}", None)
+        birthtime = getattr(_, f"birthtime_{prefix}", None)
+        location = getattr(_, f"location_{prefix}", None)
+        if isinstance(birthdate, str) and birthdate.strip():
+            party["birthdate"] = birthdate.strip()
+        if isinstance(birthtime, str) and birthtime.strip():
+            party["birthtime"] = birthtime.strip()
+        if isinstance(location, str) and location.strip():
+            party["location"] = location.strip()
+        return party
+
+    def _conjunction_from_files_or_stdin() -> Tuple[Dict[str, str], Dict[str, str]]:
+        if _.pair_file:
+            if _.a_file or _.b_file:
+                raise CliError("CONFLICTING_FILE_ARGS")
+            raw = _read_file(_.pair_file)
+            data = _parse_input(raw)
+            left = _conjunction_party_from_payload(data.get("left"), "left")
+            right = _conjunction_party_from_payload(data.get("right"), "right")
+            return left, right
+        if _.a_file or _.b_file:
+            if not (_.a_file and _.b_file):
+                raise CliError("MISSING_PARTY_FILE")
+            left = _conjunction_party_from_payload(_load_party_file(_.a_file, "left"), "left")
+            right = _conjunction_party_from_payload(_load_party_file(_.b_file, "right"), "right")
+            return left, right
+        raw = sys.stdin.read()
+        data = _parse_input(raw)
+        left = _conjunction_party_from_payload(data.get("left"), "left")
+        right = _conjunction_party_from_payload(data.get("right"), "right")
+        return left, right
+
+    def _conjunction_inputs() -> Tuple[Dict[str, str], Dict[str, str]]:
+        source = getattr(_, "source", None)
+        left_from_args = _party_from_user_args("a")
+        right_from_args = _party_from_user_args("b")
+        if source in ("db", "vendor"):
+            if left_from_args is None or right_from_args is None:
+                raise CliError("MISSING_DB_USER")
+            return left_from_args, right_from_args
+        if source == "auto":
+            if left_from_args is not None and right_from_args is not None:
+                return left_from_args, right_from_args
+            raise CliError("AUTO_SOURCE_UNRESOLVED")
+        if source:
+            raise CliError("UNSUPPORTED_SOURCE")
+        if left_from_args is not None or right_from_args is not None:
+            if left_from_args is None or right_from_args is None:
+                raise CliError("MISSING_DB_USER")
+            if _.pair_file or _.a_file or _.b_file:
+                raise CliError("CONFLICTING_FILE_ARGS")
+            return left_from_args, right_from_args
+        return _conjunction_from_files_or_stdin()
+
+    def _lookup_local_conjunction(user_id: str) -> Mapping[str, Any] | None:
+        try:
+            payload, _ = _fetch_db_bodygraph(user_id)
+            return payload
+        except CliError as exc:
+            if exc.code == "BODYGRAPH_NOT_FOUND":
+                return None
+            raise
+
     def _load_from_source() -> Tuple[Dict[str, Any], Dict[str, Any], Dict[str, Any], Dict[str, Any]]:
         source = getattr(_, "source", None)
         if not source:
@@ -683,6 +778,27 @@ def showcompat(_: argparse.Namespace) -> int:
         left_person, left_chart = _party_from_normalized(left_payload)
         right_person, right_chart = _party_from_normalized(right_payload)
         return left_person, right_person, left_chart, right_chart
+
+    if getattr(_, "conjunction", False):
+        if getattr(_, "dump_reader", None) or getattr(_, "dump_admin_dir", None):
+            raise CliError("CONJUNCTION_DUMPS_UNSUPPORTED")
+        left, right = _conjunction_inputs()
+        try:
+            conjunction_payload = conjunction_public_resolved(
+                left,
+                right,
+                viewer_top=viewer_prefs["top_category"],
+                viewer_weights=viewer_prefs["weights"],
+                engine_tag=engine_tag,
+                release_id=release_id,
+                invocation_tag=invocation_tag,
+                env=_resolver_env(),
+                local_lookup=_lookup_local_conjunction,
+            )
+        except VendorError as exc:
+            raise CliError(exc.code, exit_code=1) from exc
+        _emit_stdout_bytes(emitter.emit_public(conjunction_payload))
+        return 0
 
     left_person, right_person, a_chart, b_chart = _load_from_source()
     left_person, right_person, a_chart, b_chart = _canonical_pair(
