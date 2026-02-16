@@ -23,3 +23,19 @@ def test_compat_endpoint_catalog_entry_is_internal_post_only():
     assert entry.get("a7_eligible") is False
     assert isinstance(entry.get("env_gate"), str)
     assert entry.get("env_gate")
+
+
+def test_dev_conjunction_endpoints_catalog_entries_are_dev_only():
+    entries = _catalog_entries()
+    for endpoint in ("/dev/sampler/conjunction", "/dev/reader/conjunction"):
+        entry = next((item for item in entries if item.get("path") == endpoint), None)
+        assert entry is not None
+        method = entry.get("method")
+        if isinstance(method, list):
+            assert method == ["GET"]
+        else:
+            assert method == "GET"
+        assert entry.get("classification") == "dev_harness"
+        assert entry.get("a7_eligible") is False
+        assert isinstance(entry.get("env_gate"), str)
+        assert entry.get("env_gate")

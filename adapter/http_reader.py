@@ -8,9 +8,13 @@ from engine.presenter.emitter import emit_public
 from engine.serializer import canon
 from engine.runtime import emit_reader_public_bytes
 from engine.narratives import emit_public_aux, get_pack
+from engine.compat.categories import CATEGORIES_ORDER_V1
+from engine.compat.compute import conjunction_public_resolved
 from engine.sampler.core import CandidateFeatures, ViewerProfile, sample_and_rank
 from adapter.no_io_guard import NoIoGuard
 from engine.compat.errors import error_envelope
+from engine.bodygraph.ingest import resolve_db_user_id
+from engine.bodygraph.vendor_client import VendorError
 from engine.http.compat_handler import compat_blueprint
 from engine.db import DBAccess
 from engine.db.errors import AdapterError, PrimaryUnavailable
@@ -523,6 +527,74 @@ def get_reader_bp(emit_fn=None):
         # Preserve writer-style error envelopes for internal/dev surfaces.
         return _writer_error("ERR_WRITER_FORBIDDEN", status=403)
 
+    def _default_viewer_weights() -> dict[str, int]:
+        return {category: 10 for category in CATEGORIES_ORDER_V1}
+
+    def _conjunction_part(prefix: str) -> dict[str, str] | None:
+        user_id = (request.args.get(f"{prefix}_user_id") or "").strip()
+        if not user_id:
+            return None
+        part: dict[str, str] = {"user_id": user_id}
+        for field in ("birthdate", "birthtime", "location"):
+            value = (request.args.get(f"{prefix}_{field}") or "").strip()
+            if value:
+                part[field] = value
+        return part
+
+    def _emit_conjunction_response() -> Response:
+        left = _conjunction_part("a")
+        right = _conjunction_part("b")
+        if left is None or right is None:
+            return _writer_error("ERR_WRITER_INVALID_INPUT", status=422)
+
+        rails_env = {
+            "SAFE_MODE": os.getenv("SAFE_MODE", "1"),
+            "ALLOW_NETWORK": os.getenv("ALLOW_NETWORK", "0"),
+        }
+        local_people: dict[str, dict[str, str]] = {}
+        if rails_env["SAFE_MODE"] == "0" and rails_env["ALLOW_NETWORK"] == "1":
+            left_uid = resolve_db_user_id(left["user_id"])
+            right_uid = resolve_db_user_id(right["user_id"])
+            local_people[left_uid] = {"person_uid": left_uid}
+            local_people[right_uid] = {"person_uid": right_uid}
+
+        def _local_lookup(user_id: str) -> dict[str, str] | None:
+            return local_people.get(user_id)
+
+        try:
+            payload = conjunction_public_resolved(
+                left,
+                right,
+                viewer_top=CATEGORIES_ORDER_V1[0],
+                viewer_weights=_default_viewer_weights(),
+                engine_tag=os.environ.get("ENGINE_TAG", "hdengine-alpha"),
+                release_id=os.environ.get("RELEASE_ID", "0" * 64),
+                invocation_tag=os.environ.get("PRODUCT_INVOCATION_TAG", "INV-UNKNOWN"),
+                env=rails_env,
+                local_lookup=_local_lookup,
+            )
+        except VendorError as exc:
+            details = {
+                "provider_code": exc.code,
+                "provider_message": exc.message,
+                "rails": rails_env,
+            }
+            if exc.details is not None:
+                details["provider_details"] = exc.details
+            return _emit_writer_response(
+                error_envelope("ERR_WRITER_RAILS_CLOSED", details=details),
+                status=503,
+                sort_keys=False,
+            )
+        except ValueError:
+            return _writer_error("ERR_WRITER_INVALID_INPUT", status=422)
+
+        body = emit_public(payload, sort_keys=True)
+        resp = Response(body, status=200, mimetype="application/json; charset=utf-8")
+        resp.headers["Cache-Control"] = "no-store"
+        resp.headers.pop("ETag", None)
+        return resp
+
     @bp.route("/internal/dev/sampler", methods=["POST"], provide_automatic_options=False)
     def dev_sampler_internal():
         """
@@ -590,6 +662,22 @@ def get_reader_bp(emit_fn=None):
         resp.headers["Cache-Control"] = "no-store"
         resp.headers.pop("ETag", None)
         return resp
+
+    @bp.get("/dev/sampler/conjunction")
+    def dev_sampler_conjunction():
+        g._log_override = {"route": "dev.sampler.conjunction"}
+        gate = _dev_admin_gate()
+        if gate is not None:
+            return gate
+        return _emit_conjunction_response()
+
+    @bp.get("/dev/reader/conjunction")
+    def dev_reader_conjunction():
+        g._log_override = {"route": "dev.reader.conjunction"}
+        gate = _dev_admin_gate()
+        if gate is not None:
+            return gate
+        return _emit_conjunction_response()
 
     def _error(token: str, code: int = 400):
         envelope = error_envelope(token)
