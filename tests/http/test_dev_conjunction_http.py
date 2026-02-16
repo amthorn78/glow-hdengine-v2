@@ -13,7 +13,7 @@ def _client(monkeypatch, app_env: str):
 def test_dev_conjunction_endpoints_gate_in_prod(monkeypatch):
     client = _client(monkeypatch, "prod")
 
-    for route in ("/dev/sampler/conjunction", "/dev/reader/conjunction"):
+    for route in ("/dev/sampler/conjunction", "/dev/reader/conjunction", "/dev/writer/conjunction"):
         resp = client.get(route, query_string={"a_user_id": "left", "b_user_id": "right"})
         assert resp.status_code == 403
         assert json.loads(resp.data) == {
@@ -29,7 +29,7 @@ def test_dev_conjunction_endpoints_closed_rails_refusal(monkeypatch):
     monkeypatch.setenv("ALLOW_NETWORK", "0")
     client = _client(monkeypatch, "dev")
 
-    for route in ("/dev/sampler/conjunction", "/dev/reader/conjunction"):
+    for route in ("/dev/sampler/conjunction", "/dev/reader/conjunction", "/dev/writer/conjunction"):
         resp = client.get(route, query_string={"a_user_id": "left", "b_user_id": "right"})
         assert resp.status_code == 503
         payload = json.loads(resp.data)
@@ -52,10 +52,41 @@ def test_dev_conjunction_endpoints_open_rails_success(monkeypatch):
         "b_birthtime": "09:45",
         "b_location": "Berlin",
     }
-    for route in ("/dev/sampler/conjunction", "/dev/reader/conjunction"):
+    for route in ("/dev/sampler/conjunction", "/dev/reader/conjunction", "/dev/writer/conjunction"):
         resp = client.get(route, query_string=query)
         assert resp.status_code == 200
         payload = json.loads(resp.data)
-        assert "conjunction" in payload
-        assert payload["conjunction"]["left"]["person_uid"]
-        assert payload["conjunction"]["right"]["person_uid"]
+        conjunction_payload = payload.get("result", payload)
+        assert "conjunction" in conjunction_payload
+        assert conjunction_payload["conjunction"]["left"]["person_uid"]
+        assert conjunction_payload["conjunction"]["right"]["person_uid"]
+
+
+def test_dev_writer_conjunction_is_idempotent_bytes(monkeypatch):
+    monkeypatch.setenv("SAFE_MODE", "0")
+    monkeypatch.setenv("ALLOW_NETWORK", "1")
+    client = _client(monkeypatch, "dev")
+
+    query = {
+        "a_user_id": "left",
+        "b_user_id": "right",
+        "a_birthdate": "1990-01-01",
+        "a_birthtime": "08:30",
+        "a_location": "Amsterdam",
+        "b_birthdate": "1991-02-02",
+        "b_birthtime": "09:45",
+        "b_location": "Berlin",
+    }
+
+    resp_one = client.get("/dev/writer/conjunction", query_string=query)
+    resp_two = client.get("/dev/writer/conjunction", query_string=query)
+
+    assert resp_one.status_code == 200
+    assert resp_two.status_code == 200
+    assert resp_one.data == resp_two.data
+
+    payload_one = json.loads(resp_one.data)
+    payload_two = json.loads(resp_two.data)
+    assert payload_one["writer"] == payload_two["writer"]
+    assert payload_one["writer"]["writer_route_id"] == "dev.writer.conjunction.v1"
+    assert payload_one["writer"]["idempotence_hash"]
