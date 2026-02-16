@@ -43,6 +43,7 @@ def _collect_query_values(name: str) -> list[str]:
 
 _MAX_WRITER_BYTES = 32_768
 _DIAGNOSTIC_ROUTE_ID = "ops.writer.diagnostic.v1"
+_DEV_WRITER_CONJUNCTION_ROUTE_ID = "dev.writer.conjunction.v1"
 
 _IDEMPOTENCE_CACHE: dict[str, dict[str, object]] = {}
 _IDEMPOTENCE_CACHE_LOCK = Lock()
@@ -189,18 +190,31 @@ def _parse_if_none_match(header: str | None) -> set[str]:
     return tokens
 
 
-def _build_diagnostic_preimage(payload: dict[str, object]) -> tuple[str, str, dict[str, object]]:
+def _build_writer_request_preimage(
+    *,
+    payload: dict[str, object],
+    method: str,
+    writer_route_id: str,
+) -> tuple[str, str, dict[str, object]]:
     canonical_body_bytes = canon.sercanon(payload, sort_keys=True)
     canonical_body_text = canonical_body_bytes.decode("utf-8")
     preimage_envelope = {
         "canonical_request_body": canonical_body_text,
-        "method": "POST",
-        "writer_route_id": _DIAGNOSTIC_ROUTE_ID,
+        "method": method,
+        "writer_route_id": writer_route_id,
     }
     preimage_bytes = canon.sercanon(preimage_envelope, sort_keys=True)
     digest = hashlib.sha256(preimage_bytes).hexdigest()
     canonical_json = json.loads(canonical_body_text)
     return digest, preimage_bytes.decode("utf-8"), canonical_json
+
+
+def _build_diagnostic_preimage(payload: dict[str, object]) -> tuple[str, str, dict[str, object]]:
+    return _build_writer_request_preimage(
+        payload=payload,
+        method="POST",
+        writer_route_id=_DIAGNOSTIC_ROUTE_ID,
+    )
 
 
 def _persist_idempotence_db(
@@ -541,9 +555,60 @@ def get_reader_bp(emit_fn=None):
                 part[field] = value
         return part
 
-    def _emit_conjunction_response() -> Response:
+    def _canonical_conjunction_request(left: dict[str, str], right: dict[str, str]) -> dict[str, object]:
+        return {
+            "a": left,
+            "b": right,
+            "query": {
+                "a_birthdate": left.get("birthdate", ""),
+                "a_birthtime": left.get("birthtime", ""),
+                "a_location": left.get("location", ""),
+                "a_user_id": left["user_id"],
+                "b_birthdate": right.get("birthdate", ""),
+                "b_birthtime": right.get("birthtime", ""),
+                "b_location": right.get("location", ""),
+                "b_user_id": right["user_id"],
+            },
+        }
+
+    def _emit_dev_writer_conjunction_response() -> Response:
         left = _conjunction_part("a")
         right = _conjunction_part("b")
+        if left is None or right is None:
+            return _writer_error("ERR_WRITER_INVALID_INPUT", status=422)
+
+        request_payload = _canonical_conjunction_request(left, right)
+        digest, canonical_preimage_text, canonical_json = _build_writer_request_preimage(
+            payload=request_payload,
+            method="GET",
+            writer_route_id=_DEV_WRITER_CONJUNCTION_ROUTE_ID,
+        )
+        g._idempotence_hash = digest
+        _persist_idempotence_record(digest, canonical_preimage_text, canonical_json)
+
+        response = _emit_conjunction_response(left=left, right=right)
+        if response.status_code != 200:
+            return response
+
+        try:
+            conjunction_payload = json.loads(response.get_data(as_text=True))
+        except json.JSONDecodeError:
+            return _writer_error("ERR_WRITER_INVALID_INPUT", status=422)
+
+        writer_payload = {
+            "ok": True,
+            "writer": {
+                "idempotence_hash": digest,
+                "method": "GET",
+                "writer_route_id": _DEV_WRITER_CONJUNCTION_ROUTE_ID,
+            },
+            "result": conjunction_payload,
+        }
+        return _emit_writer_response(writer_payload, status=200)
+
+    def _emit_conjunction_response(*, left: dict[str, str] | None = None, right: dict[str, str] | None = None) -> Response:
+        left = left if left is not None else _conjunction_part("a")
+        right = right if right is not None else _conjunction_part("b")
         if left is None or right is None:
             return _writer_error("ERR_WRITER_INVALID_INPUT", status=422)
 
@@ -678,6 +743,14 @@ def get_reader_bp(emit_fn=None):
         if gate is not None:
             return gate
         return _emit_conjunction_response()
+
+    @bp.get("/dev/writer/conjunction")
+    def dev_writer_conjunction():
+        g._log_override = {"route": "dev.writer.conjunction"}
+        gate = _dev_admin_gate()
+        if gate is not None:
+            return gate
+        return _emit_dev_writer_conjunction_response()
 
     def _error(token: str, code: int = 400):
         envelope = error_envelope(token)

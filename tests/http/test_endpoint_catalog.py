@@ -27,7 +27,7 @@ def test_compat_endpoint_catalog_entry_is_internal_post_only():
 
 def test_dev_conjunction_endpoints_catalog_entries_are_dev_only():
     entries = _catalog_entries()
-    for endpoint in ("/dev/sampler/conjunction", "/dev/reader/conjunction"):
+    for endpoint in ("/dev/sampler/conjunction", "/dev/reader/conjunction", "/dev/writer/conjunction"):
         entry = next((item for item in entries if item.get("path") == endpoint), None)
         assert entry is not None
         method = entry.get("method")
