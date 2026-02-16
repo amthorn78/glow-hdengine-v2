@@ -716,7 +716,7 @@ def showcompat(_: argparse.Namespace) -> int:
             payload, _ = _fetch_db_bodygraph(user_id)
             return payload
         except CliError as exc:
-            if exc.code in {"BODYGRAPH_NOT_FOUND", "DB_QUERY_FAILED", "INVALID_BODYGRAPH_PAYLOAD"}:
+            if exc.code == "BODYGRAPH_NOT_FOUND":
                 return None
             raise
 

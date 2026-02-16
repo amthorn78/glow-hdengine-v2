@@ -8,6 +8,7 @@ import pytest
 
 from engine.serializer.canon import sercanon
 from engine.presenter import emitter
+from engine.cli.main import cli
 
 pytestmark = pytest.mark.epic006
 
@@ -126,8 +127,19 @@ def test_showcompat_conjunction_stdout_is_canonical():
     assert set(payload["conjunction"]) == {"left", "right", "compat"}
 
 
-def test_showcompat_conjunction_closed_rails_refuses_when_local_missing():
-    result = _run_hdctl(["showcompat", "--conjunction", "--user-a", "missing-left", "--user-b", "missing-right"])
-    assert result.returncode == 1
-    assert result.stdout == b""
-    assert result.stderr == b"PROVIDER_REFUSED\n"
+def test_showcompat_conjunction_closed_rails_refuses_when_local_missing(monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]):
+    class _DB:
+        def query(self, sql: str, params):
+            assert "body_graphs_current" in sql
+            return []
+
+    monkeypatch.setenv("SAFE_MODE", "1")
+    monkeypatch.setenv("ALLOW_NETWORK", "0")
+    monkeypatch.setattr("engine.cli.main.DBAccess.for_current_env", lambda: _DB())
+
+    exit_code = cli(["showcompat", "--conjunction", "--user-a", "missing-left", "--user-b", "missing-right"])
+
+    captured = capsys.readouterr()
+    assert exit_code == 1
+    assert captured.out == ""
+    assert captured.err == "PROVIDER_REFUSED\n"
