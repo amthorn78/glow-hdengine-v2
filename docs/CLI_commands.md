@@ -6,10 +6,16 @@ The CLI shares the canonical presenter/emitter and serializer with the Reader ha
 - `hdctl showcompat --pair-file <pair.json>`
 - `hdctl showcompat --a-file <A.json> --b-file <B.json>`
 - `hdctl showcompat` (reads one pair from stdin)
+- Conjunction compatibility check:
+  - `hdctl showcompat --conjunction --pair-file <pair.json>`
+  - `hdctl showcompat --conjunction --a-file <A.json> --b-file <B.json>`
+  - `hdctl showcompat --conjunction --user-a <user_a> --user-b <user_b> [--source db|vendor|auto]`
 - `hdctl aux-preview --pair-file <compat.json> --category <slug> --band <band> --perspective <perspective> [--show-narrative] [--admin-out <ids.json>]`
 - `hdctl bg:resolve --user <user> [--source auto|db|vendor] [--birthdate YYYY-MM-DD --birthtime HH:MM --location <place>]`
 - Dev-only sampler CLI (APP_ENV=dev, QA only): `hdctl dev:sampler --viewer <viewer_id> --candidates-file <candidates.json> [--seed <seed>]`
 - Flags for QA sidecars: `--dump-reader <out.json> --dump-admin-dir <dir>`
+
+`showcompat --conjunction` is a read-only compatibility check: it emits canonical JSON to stdout and does not write state. Required conjunction inputs must be present for both parties, either through `--user-a/--user-b` or through payload input (`--pair-file`, `--a-file` + `--b-file`, or stdin with `left`/`right`). Single-party file input (only `--a-file` or only `--b-file`), mixed file modes, or unresolved auto source paths fail with CLI usage errors; `--dump-reader`/`--dump-admin-dir` are not supported with `--conjunction`.
 
 Exit codes: 0 success; 64 for usage/validation/IO errors surfaced via `CliError`; showcompat vendor/engine failures return exit 1 as enforced by the CLI error-path tests; other non-zero codes are command-specific. PF05 (CLI/API/Vendor Ref) is the canonical home for the exit-code taxonomy; the current vendor/engine mapping is documented here until implementation aligns (known mismatch until PF05 parity). Success bytes are LF-terminated canonical JSON printed to stdout; stdout must end with exactly one LF and CRLF is rejected with `STDOUT_MISSING_LF` / `STDOUT_CRLF`. Showcompat stdout is the canonical emitter output for the compat payload and may include numeric scores/weights as captured in the EPIC022 D2 evidence. Reader v1 bytes are emitted via `--dump-reader` sidecar files (shared `emit_reader_public_envelope` path) and align with the Reader harness. CLI errors are emitted as stderr code strings (not JSON envelopes). Aux preview emits ids-only JSON unless `--show-narrative` is set.
 
