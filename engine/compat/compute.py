@@ -141,7 +141,16 @@ def conjunction_public_resolved(
     env: Mapping[str, object] | None = None,
     local_lookup: Any | None = None,
 ) -> Dict[str, object]:
-    """Resolve unresolved conjunction inputs via the bodygraph resolver, then emit deterministic payload."""
+    """Resolve unresolved conjunction inputs through local lookup first, then resolver acquisition when rails allow.
+
+    Call-site gating semantics:
+    * Local lookup is always attempted first.
+    * Closed rails refuse provider acquisition when local data is missing.
+    * Open rails allow resolver acquisition only after a local miss.
+    * After open-rails acquisition persists locally, later closed-rails calls read local data only.
+    """
+
+    resolver_env: Mapping[str, object] = env or {"SAFE_MODE": "1", "ALLOW_NETWORK": "0"}
 
     def _lookup(user_id: str) -> Mapping[str, Any] | None:
         if local_lookup is None:
@@ -171,7 +180,7 @@ def conjunction_public_resolved(
             source="vendor",
             upsert=True,
             dry_run=False,
-            env=env,
+            env=resolver_env,
             birthdate=birthdate,
             birthtime=birthtime,
             location=location,

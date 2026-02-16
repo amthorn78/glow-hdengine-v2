@@ -213,6 +213,44 @@ def test_conjunction_resolved_closed_rails_missing_refuses_without_provider(monk
     assert len(calls) == 1
 
 
+def test_conjunction_resolved_defaults_to_closed_rails_when_env_none(monkeypatch):
+    weights = {cat: 10 for cat in CATEGORIES_ORDER_V1}
+    calls = []
+
+    class _Outcome:
+        status = "error"
+        payload = {
+            "error": {
+                "code": "PROVIDER_REFUSED",
+                "message": "Vendor source is refused under SAFE rails (SAFE_MODE=1).",
+            }
+        }
+
+    def _resolver(*args, **kwargs):
+        calls.append((args, kwargs))
+        return _Outcome()
+
+    monkeypatch.setattr("engine.compat.compute.resolve_bodygraph", _resolver)
+
+    with pytest.raises(VendorError) as exc:
+        conjunction_public_resolved(
+            {"user_id": "missing-left"},
+            {"person_uid": "bob"},
+            viewer_top=CATEGORIES_ORDER_V1[0],
+            viewer_weights=weights,
+            engine_tag="dev",
+            release_id="dev",
+            invocation_tag="INV-DEV",
+            env=None,
+            local_lookup=lambda *_: None,
+        )
+
+    assert exc.value.code == "PROVIDER_REFUSED"
+    assert len(calls) == 1
+    _, kwargs = calls[0]
+    assert kwargs["env"] == {"SAFE_MODE": "1", "ALLOW_NETWORK": "0"}
+
+
 def test_conjunction_resolved_open_rails_acquires_and_persists(monkeypatch):
     weights = {cat: 10 for cat in CATEGORIES_ORDER_V1}
     store = {}
