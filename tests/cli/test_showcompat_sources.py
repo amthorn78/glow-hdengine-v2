@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from engine.cli.main import cli
+from engine.cli.main import CliError, cli
 
 
 def test_showcompat_vendor_dry_run(monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
@@ -77,3 +77,43 @@ def test_showcompat_db_source(monkeypatch: pytest.MonkeyPatch, capsys: pytest.Ca
     assert compat["categories"]
     assert compat["meta"]["release_id"]
     assert compat["meta"]["invocation_tag"]
+
+
+def test_showcompat_conjunction_surfaces_db_query_failed(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    monkeypatch.setenv("SAFE_MODE", "1")
+    monkeypatch.setenv("ALLOW_NETWORK", "0")
+
+    def _fail_db(*_args, **_kwargs):
+        raise CliError("DB_QUERY_FAILED")
+
+    monkeypatch.setattr("engine.cli.main._fetch_db_bodygraph", _fail_db)
+
+    exit_code = cli(["showcompat", "--conjunction", "--user-a", "user-1", "--user-b", "user-2"])
+
+    captured = capsys.readouterr()
+    assert exit_code == 64
+    assert captured.out == ""
+    assert captured.err == "DB_QUERY_FAILED\n"
+
+
+def test_showcompat_conjunction_surfaces_invalid_bodygraph_payload(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    monkeypatch.setenv("SAFE_MODE", "1")
+    monkeypatch.setenv("ALLOW_NETWORK", "0")
+
+    def _invalid_db(*_args, **_kwargs):
+        raise CliError("INVALID_BODYGRAPH_PAYLOAD")
+
+    monkeypatch.setattr("engine.cli.main._fetch_db_bodygraph", _invalid_db)
+
+    exit_code = cli(["showcompat", "--conjunction", "--user-a", "user-1", "--user-b", "user-2"])
+
+    captured = capsys.readouterr()
+    assert exit_code == 64
+    assert captured.out == ""
+    assert captured.err == "INVALID_BODYGRAPH_PAYLOAD\n"
