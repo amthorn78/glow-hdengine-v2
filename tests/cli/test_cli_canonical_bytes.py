@@ -14,6 +14,9 @@ pytestmark = pytest.mark.epic006
 PAIR = '{"left":{"birthdate":"1990-01-10","birthtime":"14:05","location":"Chicago, US"},"right":{"birthdate":"1992-03-04","birthtime":"08:15","location":"Berlin, DE"}}'
 
 
+CONJUNCTION_PAIR = '{"left":{"person_uid":"left-user"},"right":{"person_uid":"right-user"}}'
+
+
 def _cli_env() -> dict[str, str]:
     env = os.environ.copy()
     scripts_dir = sysconfig.get_paths()["scripts"]
@@ -111,3 +114,20 @@ def test_aux_preview_admin_out_is_canonical(tmp_path: os.PathLike[str]):
     assert result.returncode == 0
     assert result.stderr == b""
     _assert_canonical_bytes(admin_out.read_bytes())
+
+
+def test_showcompat_conjunction_stdout_is_canonical():
+    result = _run_hdctl(["showcompat", "--conjunction"], stdin=(CONJUNCTION_PAIR + "\n").encode())
+    assert result.returncode == 0
+    assert result.stderr == b""
+    payload = _assert_canonical_bytes(result.stdout)
+    assert result.stdout == emitter.emit_public(payload)
+    assert set(payload) == {"conjunction"}
+    assert set(payload["conjunction"]) == {"left", "right", "compat"}
+
+
+def test_showcompat_conjunction_closed_rails_refuses_when_local_missing():
+    result = _run_hdctl(["showcompat", "--conjunction", "--user-a", "missing-left", "--user-b", "missing-right"])
+    assert result.returncode == 1
+    assert result.stdout == b""
+    assert result.stderr == b"PROVIDER_REFUSED\n"
