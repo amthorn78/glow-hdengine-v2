@@ -39,6 +39,10 @@ python tools/evidence/update_evidence_index.py  # index generated artifacts unde
 ```
 The config acceptance map lives at `audit/EPIC-018_config_acceptance_map.json` (governed). Sampler/core acceptance for EPIC019 is tracked in `docs/acceptance_map_epic019.json` with a path proof.
 
+## Dev-only conjunction endpoints (do not enable in production)
+
+The conjunction preview routes `/dev/sampler/conjunction`, `/dev/reader/conjunction`, and `/dev/writer/conjunction` are dev-harness surfaces only. Runtime gating is enforced by `APP_ENV`: requests are allowed only when `APP_ENV` is `dev`, `test`, or `local`; all other values (including prod) are rejected with a forbidden writer-style envelope. Keep these endpoints limited to local/dev/test workflows under SAFE rails and never expose them on production surfaces.
+
 ## Dev/admin harnesses
 
 Closed rails unless noted; APP_ENV gating applies for `/internal/dev/sampler`.
