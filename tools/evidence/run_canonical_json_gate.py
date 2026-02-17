@@ -36,6 +36,13 @@ TARGETS: Sequence[Target] = (
     Target("cli_summary", "artifacts/cli/summary.json"),
     Target("cli_ab_stdout", "artifacts/cli/ab.json"),
     Target("cli_ba_stdout", "artifacts/cli/ba.json"),
+    Target("cli_conjunction_output_ab", "artifacts/cli/out.json"),
+    Target("cli_conjunction_output_ba", "artifacts/cli/out_ba.json"),
+    Target("cli_conjunction_selection_trace", "artifacts/cli/abba_sidecar.json"),
+    Target("cli_conjunction_pair_ab", "artifacts/audit/cli/pair.json"),
+    Target("cli_conjunction_pair_ba", "artifacts/audit/cli/pair_ba.json"),
+    Target("cli_conjunction_showcompat_ab", "artifacts/audit/cli/showcompat_ab.json"),
+    Target("cli_conjunction_showcompat_ba", "artifacts/audit/cli/showcompat_ba.json"),
 )
 
 
