@@ -1,0 +1,5 @@
+path: artifacts/cli/out.json
+size_bytes: 326
+sha256: 98e8b6534c03c5ec9fcd6ea0b77b49e17fba6758ff1dc3a7930ee8d7e355af21
+mtime_utc: 2026-02-16T23:57:03Z
+produced_at_utc: 2026-01-05T05:39:56Z

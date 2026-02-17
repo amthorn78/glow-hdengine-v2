@@ -1,5 +1,5 @@
 path: audit/gates/canonical_json/json_canonical_check.log
-size_bytes: 2304
-sha256: 7b1822cd17c2fc3c84e398e3268d913ac12f7c015875e8df4a034ce4435091e4
+size_bytes: 5083
+sha256: 7d1679c6c22f74938da8856f9c69bd880a8a46f9d9bc1b60dc3b8aca79d8e51b
 mtime_utc: 2026-01-05T01:22:11Z
 produced_at_utc: 2026-01-05T00:42:35Z

@@ -1,1 +1,5 @@
--rw-r--r-- 222 artifacts/audit/cli/pair_ba.json
+path: artifacts/audit/cli/pair_ba.json
+size_bytes: 222
+sha256: ad2d8222b8b66a676a0d060da46b16b8c7202d54d648db322d017ce790c70719
+mtime_utc: 2026-02-16T23:57:03Z
+produced_at_utc: 2026-01-05T05:39:56Z
