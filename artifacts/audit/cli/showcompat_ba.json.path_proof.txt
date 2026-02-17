@@ -1,1 +1,5 @@
--rw-r--r-- 318 artifacts/audit/cli/showcompat_ba.json
+path: artifacts/audit/cli/showcompat_ba.json
+size_bytes: 318
+sha256: e47d50bb1db574ab3273864b25cc9e106ac5cf606c06d9479f8eca95090ac1a3
+mtime_utc: 2026-02-16T23:57:03Z
+produced_at_utc: 2026-01-05T05:39:56Z
