@@ -35,9 +35,15 @@ def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def _announce_write(path: Path) -> None:
+    rel = path.relative_to(ROOT).as_posix()
+    print(f"WROTE {rel}")
+
+
 def _write_text(path: Path, content: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(content, encoding="utf-8")
+    _announce_write(path)
 
 
 def _write_json(path: Path, payload: object) -> None:
@@ -57,28 +63,41 @@ def _write_path_proof(path: Path, produced_at: str) -> None:
         check=False,
         stat_mtime=stat.st_mtime,
     )
+    _announce_write(ROOT / f"{rel}.path_proof.txt")
 
 
-def _discover_qa_step_logs() -> dict[str, dict[str, str]]:
-    entries: dict[str, dict[str, str]] = {}
+def _discover_qa_step_logs() -> list[dict[str, object]]:
+    entries: list[dict[str, object]] = []
     for primary in sorted(QA_CHECKS_ROOT.glob("**/primary.log")):
         rel = primary.relative_to(QA_ROOT).as_posix()
         parts = rel.split("/")
         if len(parts) < 3:
             continue
         check_id = parts[1]
-        record: dict[str, str] = {"check_id": check_id, "log_path": rel}
+        record: dict[str, object] = {
+            "check_id": check_id,
+            "log_path": rel,
+            "sha256": _sha256(primary),
+            "size_bytes": primary.stat().st_size,
+        }
         transcript = primary.parent / "transcript.txt"
         if transcript.exists():
             record["transcript_path"] = transcript.relative_to(QA_ROOT).as_posix()
-        entries[check_id] = record
+            record["transcript_sha256"] = _sha256(transcript)
+            record["transcript_size_bytes"] = transcript.stat().st_size
+        entries.append(record)
     return entries
 
 
 def write_step_manifest(produced_at: str) -> None:
     QA_ROOT.mkdir(parents=True, exist_ok=True)
     QA_CHECKS_ROOT.mkdir(parents=True, exist_ok=True)
-    _write_json(QA_STEP_MANIFEST_PATH, _discover_qa_step_logs())
+    payload = {
+        "epic_id": EPIC_SLUG,
+        "generated_utc": produced_at,
+        "checks": _discover_qa_step_logs(),
+    }
+    _write_json(QA_STEP_MANIFEST_PATH, payload)
     _write_path_proof(QA_STEP_MANIFEST_PATH, produced_at)
 
 
