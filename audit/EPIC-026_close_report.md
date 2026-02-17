@@ -4,7 +4,7 @@
 HDE-EPIC026 close-pack scaffolds canonical closure outputs by summarizing currently-governed evidence and QA/gate artifacts already present in-repo, without changing product behavior.
 
 ## Capture timestamp
-- `2026-02-17T17:49:44Z`
+- `2026-02-17T20:43:09Z`
 
 ## Key Outputs
 - Canonical manifest: `audit/EPIC-026_MANIFEST.json`
@@ -69,6 +69,19 @@ HDE-EPIC026 close-pack scaffolds canonical closure outputs by summarizing curren
 ### PF23 §9.1 excerpt (minimal)
 > * docs/\*\*
 > * artifacts/\*\*
+
+
+## TI-002 PF09 baseline mapping
+- HDE-FERM001.3
+  - `audit/qa/hde-epic026/qa_step_logs_manifest.json`
+  - `audit/qa/hde-epic026/00_meta/doc_deltas.md`
+- HDE-COAG007.3
+  - `audit/EPIC-026_close_report.md`
+  - `audit/EPIC-026_MANIFEST.json`
+  - `audit/docdeltas/hde-epic026_doc_deltas.md`
+
+## TI-002 ADR status
+- ADR-TI002-EPIC026-001: Not required for PR08 baseline; supplied PF09 pointers cover committed close-pack baseline artifacts.
 
 ## Manifest reference
 All paths and closure outputs above are bound in `audit/EPIC-026_MANIFEST.json` under `key_outputs`.

@@ -102,8 +102,17 @@ def write_step_manifest(produced_at: str) -> None:
 
 
 def write_doc_deltas() -> None:
-    _write_text(DOC_DELTAS_PATH, "Doc Deltas: None\n")
-    _write_text(QA_META_DOC_DELTAS_PATH, "Doc Deltas: None\n")
+    content = """# HDE-EPIC026 Doc Delta Ledger
+
+## TI-002 PF09 coverage mapping
+- HDE-FERM001.3: `audit/qa/hde-epic026/qa_step_logs_manifest.json`, `audit/qa/hde-epic026/00_meta/doc_deltas.md`
+- HDE-COAG007.3: `audit/EPIC-026_close_report.md`, `audit/EPIC-026_MANIFEST.json`, `audit/docdeltas/hde-epic026_doc_deltas.md`
+
+## ADR status
+- ADR-TI002-EPIC026-001: Not required for PR08 baseline; supplied PF09 pointers cover committed close-pack baseline artifacts.
+"""
+    _write_text(DOC_DELTAS_PATH, content)
+    _write_text(QA_META_DOC_DELTAS_PATH, content)
 
 
 def _load_pf23_excerpt() -> tuple[str, list[str]]:
@@ -262,6 +271,19 @@ HDE-EPIC026 close-pack scaffolds canonical closure outputs by summarizing curren
 ### PF23 §9.1 excerpt (minimal)
 > {pf23_excerpt[0]}
 > {pf23_excerpt[1]}
+
+
+## TI-002 PF09 baseline mapping
+- HDE-FERM001.3
+  - `audit/qa/hde-epic026/qa_step_logs_manifest.json`
+  - `audit/qa/hde-epic026/00_meta/doc_deltas.md`
+- HDE-COAG007.3
+  - `audit/EPIC-026_close_report.md`
+  - `audit/EPIC-026_MANIFEST.json`
+  - `audit/docdeltas/hde-epic026_doc_deltas.md`
+
+## TI-002 ADR status
+- ADR-TI002-EPIC026-001: Not required for PR08 baseline; supplied PF09 pointers cover committed close-pack baseline artifacts.
 
 ## Manifest reference
 All paths and closure outputs above are bound in `audit/EPIC-026_MANIFEST.json` under `key_outputs`.
