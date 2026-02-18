@@ -1,4 +1,4 @@
-# CLI commands — Compat v1 and dev/admin harnesses (post-EPIC025)
+# CLI commands — Compat v1 and conjunction/dev harnesses (HDE-EPIC026)
 
 The CLI shares the canonical presenter/emitter and serializer with the Reader harness. Run public commands under closed rails (`LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0`), enforced by `engine.runtime.determinism_env.ensure_determinism_env`.
 
@@ -10,6 +10,7 @@ The CLI shares the canonical presenter/emitter and serializer with the Reader ha
   - `hdctl showcompat --conjunction --pair-file <pair.json>`
   - `hdctl showcompat --conjunction --a-file <A.json> --b-file <B.json>`
   - `hdctl showcompat --conjunction --user-a <user_a> --user-b <user_b> [--source db|vendor|auto]`
+  - `hdctl showcompat --conjunction` (reads one conjunction pair payload from stdin)
 - `hdctl aux-preview --pair-file <compat.json> --category <slug> --band <band> --perspective <perspective> [--show-narrative] [--admin-out <ids.json>]`
 - `hdctl bg:resolve --user <user> [--source auto|db|vendor] [--birthdate YYYY-MM-DD --birthtime HH:MM --location <place>]`
 - Dev-only sampler CLI (APP_ENV=dev, QA only): `hdctl dev:sampler --viewer <viewer_id> --candidates-file <candidates.json> [--seed <seed>]`
@@ -17,7 +18,7 @@ The CLI shares the canonical presenter/emitter and serializer with the Reader ha
 
 `showcompat --conjunction` emits canonical JSON to stdout. Side effects depend on input mode and rails: payload-based invocation (`--pair-file`, `--a-file` + `--b-file`, or stdin with `left`/`right`) is computation-only, while unresolved `--user-a/--user-b` inputs can trigger bodygraph resolution and vendor ingest under open rails (for example with `--source vendor`), which may persist resolved records. Required conjunction inputs must be present for both parties, either through `--user-a/--user-b` or through payload input. Single-party file input (only `--a-file` or only `--b-file`), mixed file modes, or unresolved auto source paths fail with CLI usage errors; `--dump-reader`/`--dump-admin-dir` are not supported with `--conjunction`.
 
-Exit codes: 0 success; 64 for usage/validation/IO errors surfaced via `CliError`; showcompat vendor/engine failures return exit 1 as enforced by the CLI error-path tests; other non-zero codes are command-specific. PF05 (CLI/API/Vendor Ref) is the canonical home for the exit-code taxonomy; the current vendor/engine mapping is documented here until implementation aligns (known mismatch until PF05 parity). Success bytes are LF-terminated canonical JSON printed to stdout; stdout must end with exactly one LF and CRLF is rejected with `STDOUT_MISSING_LF` / `STDOUT_CRLF`. Showcompat stdout is the canonical emitter output for the compat payload and may include numeric scores/weights as captured in the EPIC022 D2 evidence. Reader v1 bytes are emitted via `--dump-reader` sidecar files (shared `emit_reader_public_envelope` path) and align with the Reader harness. CLI errors are emitted as stderr code strings (not JSON envelopes). Aux preview emits ids-only JSON unless `--show-narrative` is set.
+Exit codes: 0 success; 64 for usage/validation/IO errors surfaced via `CliError`; showcompat vendor/engine failures return exit 1 as enforced by the CLI error-path tests; other non-zero codes are command-specific. PF05 (CLI/API/Vendor Ref) is the canonical home for the exit-code taxonomy; the current vendor/engine mapping is documented here until implementation aligns (known mismatch until PF05 parity). Success bytes are LF-terminated canonical JSON printed to stdout; stdout must end with exactly one LF and CRLF is rejected with `STDOUT_MISSING_LF` / `STDOUT_CRLF`. Showcompat stdout is the canonical emitter output for compat or conjunction payloads and may include numeric scores/weights as captured in governed evidence. Reader v1 bytes are emitted via `--dump-reader` sidecar files (shared `emit_reader_public_envelope` path) and align with the Reader harness. CLI errors are emitted as stderr code strings (not JSON envelopes). Aux preview emits ids-only JSON unless `--show-narrative` is set.
 
 ## Guards
 - Serializer grep guard: `python tools/cli/serializer_grep_guard.py` → `artifacts/cli/guards/serializer_grep_guard.log`
@@ -25,6 +26,7 @@ Exit codes: 0 success; 64 for usage/validation/IO errors surfaced via `CliError`
 Both guards fail fast if determinism rails are not pinned and protect the allow-listed presenter/emitter.
 
 ## Evidence discipline
+- Conjunction evidence artifacts: `artifacts/audit/cli/pair.json`, `artifacts/audit/cli/pair_ba.json`, `artifacts/audit/cli/showcompat_ab.json`, `artifacts/audit/cli/showcompat_ba.json`, compare logs under `artifacts/audit/cli/`, and ABBA sidecar artifacts under `artifacts/cli/abba_sidecar.json` (with `.sha256` + `.path_proof.txt`).
 - Guard outputs, QA dumps, and other governed artifacts must have `.path_proof.txt` siblings plus entries in `docs/evidence/INDEX.json` and `artifacts/evidence_index.jsonl`. Use `python tools/evidence/update_evidence_index.py` to refresh.
 - Registry report: `python tools/generate_registry_report.py` writes `artifacts/registry/registry_report.json` (canonical serializer) with a `.path_proof.txt` sidecar.
 - Orientation and sanity checks: `python tools/evidence/orientation_demo.py` and `python tools/evidence/run_sanity_pipeline.py` (pipeline emits `artifacts/sanity/sanity.log` under closed rails). Run `ci/checks/check_mirror_schema.sh` to validate mirror schema/self-record/path-proof discipline.

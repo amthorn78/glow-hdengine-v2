@@ -1,5 +1,17 @@
 # CHANGELOG
 
+Unreleased — HDE-EPIC026: final repo docs sweep (README/CHANGELOG/AGENTS/docs/)
+
+### Added
+- Documented conjunction compute as a shipped internal compat surface (`conjunction_public` / `conjunction_public_resolved`) with deterministic canonical-byte output expectations and AB↔BA contract-test posture.
+- Documented `hdctl showcompat --conjunction` with verified input modes: `--user-a/--user-b`, `--pair-file`, `--a-file/--b-file`, or stdin pair payloads; documented closed-rails refusal behavior (`PROVIDER_REFUSED`) when unresolved users require provider acquisition under `SAFE_MODE=1` / `ALLOW_NETWORK=0`.
+- Documented dev-only conjunction endpoints (`/dev/sampler/conjunction`, `/dev/reader/conjunction`, `/dev/writer/conjunction`) and APP_ENV gating (`dev|test|local` only), aligned to the in-repo endpoint catalog.
+- Documented HDE-EPIC026 close-pack generator/outputs: `tools/qa/generate_epic026_close_pack.py`, `audit/EPIC-026_MANIFEST.json`, `audit/EPIC-026_close_report.md`, `audit/qa/hde-epic026/qa_step_logs_manifest.json`, and `audit/docdeltas/hde-epic026_doc_deltas.md`.
+
+### Changed / Fixed
+- Refreshed README/AGENTS/docs to treat `docs/ENDPOINTS_CATALOG.json` as endpoint source-of-truth (with docs integrity companions and audit mirror), and to reflect canonical JSON gate dual-home posture (`audit/gates/canonical_json/` legacy + `audit/gates/json_gate/canonical/` active) including conjunction CLI targets.
+- Refreshed evidence-index documentation to include machine-index integrity companions (`artifacts/evidence_index.jsonl.path_proof.txt` with `mirror_body_sha256`) and conjunction artifact coverage expectations.
+
 Unreleased — HDE-EPIC025: Repo Docs Sweep (README/CHANGELOG/AGENTS/docs/)
 
 ### Added

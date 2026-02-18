@@ -1,4 +1,4 @@
-# RUN — Developer flight checks (EPIC021)
+# RUN — Developer flight checks (HDE-EPIC026)
 
 ## Rails
 - Pin determinism env: `LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0` (or call `engine.runtime.determinism_env.ensure_determinism_env`).
@@ -42,6 +42,8 @@ The config acceptance map lives at `audit/EPIC-018_config_acceptance_map.json` (
 ## Dev-only conjunction endpoints (do not enable in production)
 
 The conjunction preview routes `/dev/sampler/conjunction`, `/dev/reader/conjunction`, and `/dev/writer/conjunction` are dev-harness surfaces only. Runtime gating is enforced by `APP_ENV`: requests are allowed only when `APP_ENV` is `dev`, `test`, or `local`; all other values (including prod) are rejected with a forbidden writer-style envelope. Keep these endpoints limited to local/dev/test workflows under SAFE rails and never expose them on production surfaces.
+
+For CLI conjunction flows, use `hdctl showcompat --conjunction` with either `--user-a/--user-b`, `--pair-file`, `--a-file/--b-file`, or stdin pair payload input. Provider acquisition for unresolved user inputs is closed by default and only opens when both `SAFE_MODE=0` and `ALLOW_NETWORK=1`; closed rails may emit explicit refusal codes (for example `PROVIDER_REFUSED`).
 
 ## Dev/admin harnesses
 
