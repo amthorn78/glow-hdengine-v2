@@ -1,14 +1,14 @@
 > **Note:** The canonical human Evidence Index lives at `docs/evidence/INDEX.json`.
-> Add new entries there first, then mirror key pointers here for quick navigation. Update the skeleton (`docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl` + `.path_proof.txt`) in the same PR whenever governed bytes change.
+> Add new entries there first, then mirror key pointers here for quick navigation. Update the skeleton (`docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl`, `artifacts/evidence_index.sha256` + `.path_proof.txt` companions) in the same PR whenever governed bytes change.
 > Refresh order: run `python tools/evidence/update_evidence_index.py` (write) before `python tools/evidence/orientation_demo.py` (write), then their `--check` variants, and finish with `ci/checks/check_mirror_schema.sh`. Mirror path proofs include both `sha256` and `mirror_body_sha256` for the self-record entry in `artifacts/evidence_index.jsonl`.
 
 # Appendix-D — Evidence Index (EPIC-025)
 
 ## QA ledger and close-pack
-* QA step manifest: `audit/qa/hde-epic025/qa_step_logs_manifest.json`
-* Per-check logs: `audit/qa/hde-epic025/checks/<check_id>/primary.log`
-* Close-pack artifacts: `audit/EPIC-025_MANIFEST.json`, `audit/EPIC-025_close_report.md`
-* Doc deltas: `audit/docdeltas/hde-epic025_doc_deltas.md`
+* QA step manifest: `audit/qa/hde-epic026/qa_step_logs_manifest.json`
+* Per-check logs: `audit/qa/hde-epic026/checks/<check_id>/primary.log`
+* Close-pack artifacts: `audit/EPIC-026_MANIFEST.json`, `audit/EPIC-026_close_report.md`
+* Doc deltas: `audit/docdeltas/hde-epic026_doc_deltas.md`
 
 ## Endpoint catalog + A7 proofs (/reader)
 * Endpoint catalog: `docs/ENDPOINTS_CATALOG.json`, `docs/ENDPOINTS_CATALOG.json.sha256`
@@ -18,6 +18,11 @@
 * Writer/error posture: `artifacts/proofs/success_writers_errors.txt`
 * Encoding invariance: `artifacts/proofs/encoding_invariance.txt`
 * Proof generator: `tests/http/test_reader_a7_transport.py` (set `HDE_WRITE_A7_PROOFS=1` to emit artifacts under `artifacts/proofs/`).
+
+## Conjunction CLI artifacts (EPIC026)
+* Pair fixtures and captures: `artifacts/audit/cli/pair.json`, `artifacts/audit/cli/pair_ba.json`, `artifacts/audit/cli/showcompat_ab.json`, `artifacts/audit/cli/showcompat_ba.json`
+* Determinism/parity logs: `artifacts/audit/cli/ab_ba_compare.log`, `artifacts/audit/cli/two_run_identity.log`, `artifacts/audit/cli/det1_compare.log`
+* Sidecar artifact: `artifacts/cli/abba_sidecar.json` (plus `.sha256` + `.path_proof.txt`)
 
 ## CLI showcompat capture + guards
 * Showcompat stdout bytes: `artifacts/cli/showcompat/stdout.json`
@@ -41,7 +46,7 @@
 ## Evidence-paths + LF endings gates
 * Path validation runner: `python tools/evidence/validate_evidence_paths.py`
 * LF endings runner: `python tools/evidence/check_lf_endings.py`
-* QA logs: `audit/qa/hde-epic025/checks/gate_evidence_paths_validation/primary.log`, `audit/qa/hde-epic025/checks/gate_lf_endings/primary.log`
+* QA logs: `audit/qa/hde-epic026/checks/gate_evidence_paths_validation/primary.log`, `audit/qa/hde-epic026/checks/gate_lf_endings/primary.log`
 
 ## Arrays-as-sets evidence
 * Report artifact: `artifacts/canonical/arrays_as_sets_report.log`
