@@ -10,7 +10,7 @@ Unreleased — HDE-EPIC026: final repo docs sweep (README/CHANGELOG/AGENTS/docs/
 
 ### Changed / Fixed
 - Refreshed README/AGENTS/docs to treat `docs/ENDPOINTS_CATALOG.json` as endpoint source-of-truth (with docs integrity companions and audit mirror), and to reflect canonical JSON gate dual-home posture (`audit/gates/canonical_json/` legacy + `audit/gates/json_gate/canonical/` active) including conjunction CLI targets.
-- Refreshed evidence-index documentation to include machine-index integrity companions (`artifacts/evidence_index.sha256` plus path proofs) and conjunction artifact coverage expectations.
+- Refreshed evidence-index documentation to include machine-index integrity companions (`artifacts/evidence_index.jsonl.path_proof.txt` with `mirror_body_sha256`) and conjunction artifact coverage expectations.
 
 Unreleased — HDE-EPIC025: Repo Docs Sweep (README/CHANGELOG/AGENTS/docs/)
 
