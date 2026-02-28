@@ -4,13 +4,13 @@
 HDE-EPIC026 close-pack scaffolds canonical closure outputs by summarizing currently-governed evidence and QA/gate artifacts already present in-repo, without changing product behavior.
 
 ## Capture timestamp
-- `2026-02-17T20:43:09Z`
+- `2026-02-27T21:41:18Z`
 
 ## Key Outputs
 - Canonical manifest: `audit/EPIC-026_MANIFEST.json`
 - Canonical step log manifest: `audit/qa/hde-epic026/qa_step_logs_manifest.json`
 - Canonical doc delta ledgers: `audit/docdeltas/hde-epic026_doc_deltas.md`, `audit/qa/hde-epic026/00_meta/doc_deltas.md`
-- Manifest-backed outputs (43 paths):
+- Manifest-backed outputs (129 paths):
 - `artifacts/audit/cli/ab_ba_compare.log`
 - `artifacts/audit/cli/det1_compare.log`
 - `artifacts/audit/cli/error_exitcode.txt`
@@ -50,7 +50,93 @@ HDE-EPIC026 close-pack scaffolds canonical closure outputs by summarizing curren
 - `audit/gates/json_gate/canonical/json_gate_structured_record.json`
 - `audit/gates/topology/orientation_demo.txt`
 - `audit/qa/hde-epic026/00_meta/doc_deltas.md`
+- `audit/qa/hde-epic026/00_meta/qa_helpers.sh`
+- `audit/qa/hde-epic026/checks/po-000/_po000_po001_inventory_and_sha256.txt`
+- `audit/qa/hde-epic026/checks/po-000/doc_deltas.md`
+- `audit/qa/hde-epic026/checks/po-000/po-000_po-001_full_report.md`
+- `audit/qa/hde-epic026/checks/po-000/qa_helpers.sh`
+- `audit/qa/hde-epic026/checks/po-000/qa_step_logs_manifest.json`
+- `audit/qa/hde-epic026/checks/po-001/body.log`
+- `audit/qa/hde-epic026/checks/po-001/primary.log`
+- `audit/qa/hde-epic026/checks/po-001/pytest_rc.txt`
+- `audit/qa/hde-epic026/checks/po-001/pytest_stderr.log`
+- `audit/qa/hde-epic026/checks/po-001/pytest_stdout.log`
+- `audit/qa/hde-epic026/checks/po-002/body.log`
+- `audit/qa/hde-epic026/checks/po-002/catalog_api_compat_entry.json`
+- `audit/qa/hde-epic026/checks/po-002/po-002_full_report.md`
+- `audit/qa/hde-epic026/checks/po-002/primary.log`
+- `audit/qa/hde-epic026/checks/po-002/pytest_rc.txt`
+- `audit/qa/hde-epic026/checks/po-002/pytest_stderr.log`
+- `audit/qa/hde-epic026/checks/po-002/pytest_stdout.log`
+- `audit/qa/hde-epic026/checks/po-003/po-003_full_report.md`
+- `audit/qa/hde-epic026/checks/po-003/po-003_full_report_v2.md`
+- `audit/qa/hde-epic026/checks/po-003/primary.log`
+- `audit/qa/hde-epic026/checks/po-003/pytest_rc.txt`
+- `audit/qa/hde-epic026/checks/po-003/pytest_stderr.log`
+- `audit/qa/hde-epic026/checks/po-003/pytest_stdout.log`
+- `audit/qa/hde-epic026/checks/po-004/po-004_full_report.md`
+- `audit/qa/hde-epic026/checks/po-004/primary.log`
+- `audit/qa/hde-epic026/checks/po-004/pytest_rc.txt`
+- `audit/qa/hde-epic026/checks/po-004/pytest_stderr.log`
+- `audit/qa/hde-epic026/checks/po-004/pytest_stdout.log`
+- `audit/qa/hde-epic026/checks/po-005/po-005_full_report.md`
+- `audit/qa/hde-epic026/checks/po-005/primary.log`
+- `audit/qa/hde-epic026/checks/po-005/pytest_rc.txt`
+- `audit/qa/hde-epic026/checks/po-005/pytest_stderr.log`
+- `audit/qa/hde-epic026/checks/po-005/pytest_stdout.log`
+- `audit/qa/hde-epic026/checks/po-005/route_proof.txt`
+- `audit/qa/hde-epic026/checks/po-006/po-006_full_report.md`
+- `audit/qa/hde-epic026/checks/po-006/po-006_full_report_v2.md`
+- `audit/qa/hde-epic026/checks/po-006/po-006_full_report_v3.md`
+- `audit/qa/hde-epic026/checks/po-006/primary.log`
+- `audit/qa/hde-epic026/checks/po-006/pytest_rc.txt`
+- `audit/qa/hde-epic026/checks/po-006/pytest_stderr.log`
+- `audit/qa/hde-epic026/checks/po-006/pytest_stdout.log`
+- `audit/qa/hde-epic026/checks/po-006/route_proof.txt`
+- `audit/qa/hde-epic026/checks/po-007/body.log`
+- `audit/qa/hde-epic026/checks/po-007/catalog_extract_dev_endpoints.json`
+- `audit/qa/hde-epic026/checks/po-007/catalog_sha256_check.txt`
+- `audit/qa/hde-epic026/checks/po-007/po-007_full_report.md`
+- `audit/qa/hde-epic026/checks/po-007/primary.log`
+- `audit/qa/hde-epic026/checks/po-007/primary.log.sha256`
+- `audit/qa/hde-epic026/checks/po-007/pytest_rc.txt`
+- `audit/qa/hde-epic026/checks/po-007/pytest_stderr.log`
+- `audit/qa/hde-epic026/checks/po-007/pytest_stdout.log`
+- `audit/qa/hde-epic026/checks/po-008/body.log`
+- `audit/qa/hde-epic026/checks/po-008/cli_help.err`
+- `audit/qa/hde-epic026/checks/po-008/cli_help.txt`
+- `audit/qa/hde-epic026/checks/po-008/po-008_full_report.md`
+- `audit/qa/hde-epic026/checks/po-008/primary.log`
+- `audit/qa/hde-epic026/checks/po-008/primary.log.sha256`
+- `audit/qa/hde-epic026/checks/po-008/reject_nonjson_rc.txt`
+- `audit/qa/hde-epic026/checks/po-008/reject_nonjson_stderr.log`
+- `audit/qa/hde-epic026/checks/po-008/reject_nonjson_stdout.log`
+- `audit/qa/hde-epic026/checks/po-008/showcompat_help.err`
+- `audit/qa/hde-epic026/checks/po-008/showcompat_help.txt`
+- `audit/qa/hde-epic026/checks/po-009/body.log`
+- `audit/qa/hde-epic026/checks/po-009/open_rails_note.txt`
+- `audit/qa/hde-epic026/checks/po-009/po-009_all_in_one.md`
+- `audit/qa/hde-epic026/checks/po-009/po-009_full_report.md`
+- `audit/qa/hde-epic026/checks/po-009/po-009_input_constraint.log`
+- `audit/qa/hde-epic026/checks/po-009/primary.log`
+- `audit/qa/hde-epic026/checks/po-010/artifacts.json`
+- `audit/qa/hde-epic026/checks/po-010/catalog_extract_dev_endpoints.json`
+- `audit/qa/hde-epic026/checks/po-010/po-010_all_in_one.md`
+- `audit/qa/hde-epic026/checks/po-010/primary.log`
+- `audit/qa/hde-epic026/checks/po-010/showcompat_help.err`
+- `audit/qa/hde-epic026/checks/po-010/showcompat_help.txt`
+- `audit/qa/hde-epic026/checks/po-011/canonical_json_gate_rc.txt`
+- `audit/qa/hde-epic026/checks/po-011/canonical_json_gate_stderr.log`
+- `audit/qa/hde-epic026/checks/po-011/canonical_json_gate_stdout.log`
+- `audit/qa/hde-epic026/checks/po-011/po-011_all_in_one.md`
+- `audit/qa/hde-epic026/checks/po-011/primary.log`
+- `audit/qa/hde-epic026/checks/po-011/update_evidence_index_rc.txt`
+- `audit/qa/hde-epic026/checks/po-011/update_evidence_index_stderr.log`
+- `audit/qa/hde-epic026/checks/po-011/update_evidence_index_stdout.log`
+- `audit/qa/hde-epic026/checks/po-012/generator_stderr.log`
+- `audit/qa/hde-epic026/checks/po-012/generator_stdout.log`
 - `audit/qa/hde-epic026/qa_step_logs_manifest.json`
+- `audit/qa/hde-epic026/r11 Live QA Plan HDE-EPIC026.md`
 - `docs/evidence/INDEX.json`
 - `docs/evidence/INDEX.sha256`
 - `docs/pfcanon/PF23-Canon-Reality-Audits-v1.0.3.md`

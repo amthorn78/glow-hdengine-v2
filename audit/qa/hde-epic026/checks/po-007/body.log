@@ -1,0 +1,8 @@
+rails=SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev
+determinism=LC_ALL=C LANG=C TZ=UTC PYTHONHASHSEED=0
+computed_sha256=4b766ec46b69df75136611a47d03fd7268fbfed1b8b18cbb44d9b3296874d143
+expected_sha256=4b766ec46b69df75136611a47d03fd7268fbfed1b8b18cbb44d9b3296874d143
+match=YES
+
+pytest_rc=0
+pass_fail=PASS

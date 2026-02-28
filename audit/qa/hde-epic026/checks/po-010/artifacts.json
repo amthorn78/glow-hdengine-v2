@@ -1,0 +1,5 @@
+[
+  {"path":"audit/qa/hde-epic026/checks/po-010/primary.log","type":"log","role":"primary"},
+  {"path":"audit/qa/hde-epic026/checks/po-010/showcompat_help.txt","type":"text","role":"open_rails_help"},
+  {"path":"audit/qa/hde-epic026/checks/po-010/catalog_extract_dev_endpoints.json","type":"json","role":"catalog_extract"}
+]

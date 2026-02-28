@@ -1,0 +1,5 @@
+hdctl_help_rc=0
+showcompat_help_rc=0
+reject_nonjson_rc=64
+conjunction_run=SKIPPED_NO_USER_IDS
+pass_fail=PASS

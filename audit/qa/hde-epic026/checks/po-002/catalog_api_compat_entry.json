@@ -1,0 +1,15 @@
+{
+  "target": "/api/compat/v1",
+  "matches": [
+    {
+      "a7_eligible": false,
+      "blueprint_module": "engine.http.compat_handler",
+      "classification": "internal_admin",
+      "description": "Compat pair endpoint (internal admin)",
+      "env_gate": "APP_ENV!=prod",
+      "method": "POST",
+      "path": "/api/compat/v1",
+      "rails_profile": "internal-admin writer no-store"
+    }
+  ]
+}

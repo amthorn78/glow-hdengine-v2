@@ -1,0 +1,7 @@
+timestamp_utc=2026-02-26T05:46:41Z
+check_id=po-009
+status=BLOCKED_MISSING_INPUTS
+statement=USER_A_ID/USER_B_ID are not available as valid product inputs at this time and should not be expected for this run.
+action=po-009 execution deferred until valid IDs are available.
+evidence_primary_log=audit/qa/hde-epic026/checks/po-009/primary.log
+evidence_note=audit/qa/hde-epic026/checks/po-009/open_rails_note.txt

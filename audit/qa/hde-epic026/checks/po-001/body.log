@@ -1,0 +1,2 @@
+]633;E;{   echo "RUN: ${PY} -m pytest -q tests/http/test_compat_endpoint_contract.py"\x3b   echo "ENV: LC_ALL=${LC_ALL} LANG=${LANG} TZ=${TZ} SAFE_MODE=${SAFE_MODE} ALLOW_NETWORK=${ALLOW_NETWORK} APP_ENV=${APP_ENV}"\x3b } >> "${body}";8480ddf9-b2b1-4465-bfcb-3f5e23d9070b]633;CRUN: /workspaces/glow-hdengine-v2/.venv/bin/python -m pytest -q tests/http/test_compat_endpoint_contract.py
+ENV: LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev

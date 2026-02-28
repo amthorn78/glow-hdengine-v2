@@ -1,0 +1,16 @@
+usage: hdctl [-h] {showcompat,aux-preview,bg:resolve,dev:sampler} ...
+
+Glow HD Engine compatibility CLI
+
+positional arguments:
+  {showcompat,aux-preview,bg:resolve,dev:sampler}
+    showcompat          Emit canonical Reader v1 bytes from vendor JSON (stdin
+                        or files)
+    aux-preview         Preview Aux narrative text for a public tuple
+    bg:resolve          Resolve BodyGraphs from db/vendor sources (Phase S8a
+                        stub)
+    dev:sampler         DEV/ADMIN ONLY: deterministic sampler harness
+                        (seedable)
+
+options:
+  -h, --help            show this help message and exit

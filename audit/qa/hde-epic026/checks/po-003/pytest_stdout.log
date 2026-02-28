@@ -1,0 +1,9 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.14, pytest-9.0.2, pluggy-1.6.0
+rootdir: /workspaces/glow-hdengine-v2
+configfile: pytest.ini
+collected 12 items / 9 deselected / 3 selected
+
+tests/http/test_compat_endpoint_contract.py ...                          [100%]
+
+======================= 3 passed, 9 deselected in 0.58s ========================

@@ -1,0 +1,39 @@
+{
+  "matches": [
+    {
+      "a7_eligible": false,
+      "blueprint_module": "adapter.http_reader",
+      "classification": "dev_harness",
+      "description": "Conjunction reader preview route (dev-only)",
+      "env_gate": "APP_ENV in {dev,test,local}",
+      "method": "GET",
+      "path": "/dev/reader/conjunction",
+      "rails_profile": "dev-harness closed-by-default SAFE rails"
+    },
+    {
+      "a7_eligible": false,
+      "blueprint_module": "adapter.http_reader",
+      "classification": "dev_harness",
+      "description": "Conjunction writer preview route (dev-only)",
+      "env_gate": "APP_ENV in {dev,test,local}",
+      "method": "GET",
+      "path": "/dev/writer/conjunction",
+      "rails_profile": "dev-harness closed-by-default SAFE rails"
+    },
+    {
+      "a7_eligible": false,
+      "blueprint_module": "adapter.http_reader",
+      "classification": "dev_harness",
+      "description": "Conjunction sampler preview route (dev-only)",
+      "env_gate": "APP_ENV in {dev,test,local}",
+      "method": "GET",
+      "path": "/dev/sampler/conjunction",
+      "rails_profile": "dev-harness closed-by-default SAFE rails"
+    }
+  ],
+  "targets": [
+    "/dev/reader/conjunction",
+    "/dev/sampler/conjunction",
+    "/dev/writer/conjunction"
+  ]
+}

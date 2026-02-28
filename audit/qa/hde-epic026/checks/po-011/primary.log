@@ -1,0 +1,6 @@
+{"schema": "pf27-step-log-header-v1", "schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-02-27T04:32:32Z", "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "check_id": "po-011", "check_name": "PO-011 — Governance scripts pass (no drift failures)", "pass_fail": "PASS", "fail_status": "", "intended_tokens": [], "claimed_tokens": [], "commands": ["python tools/evidence/run_canonical_json_gate.py", "python tools/evidence/update_evidence_index.py --check"], "artifacts": [{"path": "canonical_json_gate_stdout.log", "type": "log", "desc": "canonical json gate stdout"}, {"path": "canonical_json_gate_stderr.log", "type": "log", "desc": "canonical json gate stderr"}, {"path": "canonical_json_gate_rc.txt", "type": "text", "desc": "canonical json gate exit code"}, {"path": "update_evidence_index_stdout.log", "type": "log", "desc": "update evidence index stdout"}, {"path": "update_evidence_index_stderr.log", "type": "log", "desc": "update evidence index stderr"}, {"path": "update_evidence_index_rc.txt", "type": "text", "desc": "update evidence index exit code"}], "pf_refs": ["PF27 §Step-log header schema expectations (minimum; required)"]}
+
+###
+rc_canonical_json_gate=0
+rc_update_evidence_index=0
+rc_check_evidence_bindings=0

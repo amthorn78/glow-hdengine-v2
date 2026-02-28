@@ -1,0 +1,139 @@
+{
+  "schema_version": "pf27.qa_step_logs_manifest.v1",
+  "generated_utc": "2026-02-24T03:30:30Z",
+  "checks": [
+    {
+      "timestamp_utc": "2026-02-24T03:30:31Z",
+      "check_id": "po-001",
+      "status": "PASS",
+      "log_path": "checks/po-001/primary.log",
+      "sha256": "18cdf88824df9681a8e06442422cce06f0a8f110b3dbc46286609c6d3b1e0a07"
+    },
+    {
+      "timestamp_utc": "2026-02-24T17:59:47Z",
+      "check_id": "po-002",
+      "status": "PASS",
+      "log_path": "checks/po-002/primary.log",
+      "sha256": "0547fa4ca7b730b12439aee264d481206f50541f0db7800b086cffd166ae9bfd"
+    },
+    {
+      "timestamp_utc": "2026-02-24T19:55:53Z",
+      "check_id": "po-003",
+      "status": "FAIL",
+      "log_path": "checks/po-003/primary.log",
+      "sha256": "38b6867a7e1703a8b1343b101166385142eff68e9212fdb634b5cbc3cdef9f7b"
+    },
+    {
+      "timestamp_utc": "2026-02-24T19:59:41Z",
+      "check_id": "po-003",
+      "status": "PASS",
+      "log_path": "checks/po-003/primary.log",
+      "sha256": "c981ceb7f84d41c928b35aaae4a48a14dad7886dc62fd684322d937050f06e12"
+    },
+    {
+      "timestamp_utc": "2026-02-24T20:58:49Z",
+      "check_id": "po-003",
+      "status": "PASS",
+      "log_path": "checks/po-003/primary.log",
+      "sha256": "9fc6188660f8f6bd92e861953d234899d23aac287748f7c076f2dafafb700888"
+    },
+    {
+      "timestamp_utc": "2026-02-24T22:06:54Z",
+      "check_id": "po-004",
+      "status": "PASS",
+      "log_path": "checks/po-004/primary.log",
+      "sha256": "cf545563f658a1c33e4adae763264212158e4b9d8667e9669c7241ef64a80542"
+    },
+    {
+      "timestamp_utc": "2026-02-25T02:22:15Z",
+      "check_id": "po-005",
+      "status": "FAIL",
+      "log_path": "checks/po-005/primary.log",
+      "sha256": "e4ff67f6978740f1776d72415e0da1414ea422f9ddbed37f930255e677e97467"
+    },
+    {
+      "timestamp_utc": "2026-02-25T02:26:29Z",
+      "check_id": "po-005",
+      "status": "FAIL",
+      "log_path": "checks/po-005/primary.log",
+      "sha256": "517e4a03409ee94fef722a332f0aa115db059c55f287ca36e50ca9ff176a5dbc"
+    },
+    {
+      "timestamp_utc": "2026-02-25T02:35:23Z",
+      "check_id": "po-005",
+      "status": "PASS",
+      "log_path": "checks/po-005/primary.log",
+      "sha256": "b1a9d07d48fd33674034a39aee9c3f81aed2f04015a917fb89065de603e6dd29"
+    },
+    {
+      "timestamp_utc": "2026-02-25T05:19:25Z",
+      "check_id": "po-006",
+      "status": "PASS",
+      "log_path": "checks/po-006/primary.log",
+      "sha256": "3f9c0ed4834b01d37cd097d3052f938ce6fefbb6fd17da1e72f1d4f20b1d47cc"
+    },
+    {
+      "timestamp_utc": "2026-02-25T05:20:03Z",
+      "check_id": "po-006",
+      "status": "PASS",
+      "log_path": "checks/po-006/primary.log",
+      "sha256": "50ebdea390633ae36461f50b09306980ed696d996363c6439b396f81e6cca4b5"
+    },
+    {
+      "timestamp_utc": "2026-02-25T17:19:35Z",
+      "check_id": "po-007",
+      "status": "PASS",
+      "log_path": "checks/po-007/primary.log",
+      "sha256": "dfae1ce84644092a01d05d11348641944afa0235f15b06249ab7f69eaf751b69"
+    },
+    {
+      "timestamp_utc": "2026-02-25T17:20:28Z",
+      "check_id": "po-007",
+      "status": "PASS",
+      "log_path": "checks/po-007/primary.log",
+      "sha256": "58688bfedeaf1b2e4955c0a14468c26581aa592c3e0380f526233bb39e55d2d2"
+    },
+    {
+      "timestamp_utc": "2026-02-26T02:21:43Z",
+      "check_id": "po-008",
+      "status": "PASS",
+      "log_path": "checks/po-008/primary.log",
+      "sha256": "ee5da4fb490ac1f651811ce0024efc60aef6707035ce0e014f9b0bed752eca57"
+    },
+    {
+      "timestamp_utc": "2026-02-26T05:46:41Z",
+      "check_id": "po-009",
+      "status": "FAIL",
+      "log_path": "checks/po-009/primary.log",
+      "sha256": "4ee70c9c5063af0a97c846edaeb04c7dc2f350770b4296a440b56d14b3e26c8b"
+    },
+    {
+      "timestamp_utc": "2026-02-26T21:42:01Z",
+      "check_id": "po-010",
+      "status": "audit/qa/hde-epic026/checks/po-010/primary.log",
+      "log_path": "a798c6af6076827455a86c630ffe56f5c7a634edd0aeea0894659665e6b9d4ab",
+      "sha256": "audit/qa/hde-epic026/checks/po-010/artifacts.json"
+    },
+    {
+      "timestamp_utc": "2026-02-26T21:52:36Z",
+      "check_id": "po-010",
+      "status": "PASS",
+      "log_path": "checks/po-010/primary.log",
+      "sha256": "c42dc1684d02d48a20b095240ea4e5eb90011a82cc2f55867d73bd634fe988ad"
+    },
+    {
+      "timestamp_utc": "2026-02-27T04:32:33Z",
+      "check_id": "po-011",
+      "status": "PASS",
+      "log_path": "checks/po-011/primary.log",
+      "sha256": "d78ec8902e79cf74971c6e2197f676e95152b43fce2c1e777eb2801fcebed74a"
+    },
+    {
+      "timestamp_utc": "2026-02-27T21:41:20Z",
+      "check_id": "po-012",
+      "status": "PASS",
+      "log_path": "checks/po-012/primary.log",
+      "sha256": "7f402e26085b7063d643520ef0cd91b58330cb37553483933087a7f30aefab93"
+    }
+  ]
+}

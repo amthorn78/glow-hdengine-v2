@@ -1,0 +1,96 @@
+{"schema": "pf27-step-log-header-v1", "schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-02-26T21:42:01Z", "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "check_id": "po-010", "check_name": "CHECK po-010", "pass_fail": "PASS", "fail_status": "NONE", "intended_tokens": [], "claimed_tokens": [], "commands": [{"cmd": "hdctl showcompat --help"}], "artifacts": [], "pf_refs": []}
+
+###
+]633;E;{   printf "showcompat_help_rc=%s\\n" "${rc_help}"\x3b   printf "\\n--- catalog_extract_dev_endpoints.json ---\\n"\x3b   cat "${check_dir}/catalog_extract_dev_endpoints.json"\x3b   printf "\\n--- showcompat_help.txt ---\\n"\x3b   cat "${check_dir}/showcompat_help.txt" || true\x3b   printf "\\n--- showcompat_help.err ---\\n"\x3b   cat "${check_dir}/showcompat_help.err" || true\x3b } >> "${primary}";a7f3eb75-4c44-4fd5-a9e4-0ead9dec7883]633;Cshowcompat_help_rc=0
+
+--- catalog_extract_dev_endpoints.json ---
+{
+  "matches": [
+    {
+      "a7_eligible": false,
+      "blueprint_module": "adapter.http_reader",
+      "classification": "dev_harness",
+      "description": "Conjunction reader preview route (dev-only)",
+      "env_gate": "APP_ENV in {dev,test,local}",
+      "method": "GET",
+      "path": "/dev/reader/conjunction",
+      "rails_profile": "dev-harness closed-by-default SAFE rails"
+    },
+    {
+      "a7_eligible": false,
+      "blueprint_module": "adapter.http_reader",
+      "classification": "dev_harness",
+      "description": "Conjunction writer preview route (dev-only)",
+      "env_gate": "APP_ENV in {dev,test,local}",
+      "method": "GET",
+      "path": "/dev/writer/conjunction",
+      "rails_profile": "dev-harness closed-by-default SAFE rails"
+    },
+    {
+      "a7_eligible": false,
+      "blueprint_module": "adapter.http_reader",
+      "classification": "dev_harness",
+      "description": "Conjunction sampler preview route (dev-only)",
+      "env_gate": "APP_ENV in {dev,test,local}",
+      "method": "GET",
+      "path": "/dev/sampler/conjunction",
+      "rails_profile": "dev-harness closed-by-default SAFE rails"
+    }
+  ],
+  "targets": [
+    "/dev/reader/conjunction",
+    "/dev/sampler/conjunction",
+    "/dev/writer/conjunction"
+  ]
+}
+
+--- showcompat_help.txt ---
+usage: hdctl showcompat [-h] [--pair-file PAIR_FILE] [--a-file A_FILE]
+                        [--b-file B_FILE] [--a A_FILE] [--b B_FILE]
+                        [--dump-reader DUMP_READER]
+                        [--dump-admin-dir DUMP_ADMIN_DIR]
+                        [--source {db,vendor,auto}] [--conjunction]
+                        [--viewer-prefs-file VIEWER_PREFS_FILE]
+                        [--user-a USER_A] [--user-b USER_B]
+                        [--birthdate-a BIRTHDATE_A]
+                        [--birthtime-a BIRTHTIME_A] [--location-a LOCATION_A]
+                        [--birthdate-b BIRTHDATE_B]
+                        [--birthtime-b BIRTHTIME_B] [--location-b LOCATION_B]
+
+options:
+  -h, --help            show this help message and exit
+  --pair-file PAIR_FILE
+                        Path to JSON with left/right payloads
+  --a-file A_FILE       Path to JSON file containing the left payload
+  --b-file B_FILE       Path to JSON file containing the right payload
+  --a A_FILE            Alias for --a-file
+  --b B_FILE            Alias for --b-file
+  --dump-reader DUMP_READER
+                        Optional path to write public Reader JSON (canonical
+                        bytes)
+  --dump-admin-dir DUMP_ADMIN_DIR
+                        Directory for admin proofs (writes 0600 JSON + .sha256
+                        sidecars)
+  --source {db,vendor,auto}
+                        Explicit BodyGraph source (db, vendor, or auto)
+  --conjunction         Emit conjunction contract JSON (requires
+                        --user-a/--user-b or conjunction pair input; uses SAFE
+                        rails resolver gating)
+  --viewer-prefs-file VIEWER_PREFS_FILE
+                        Path to JSON viewer prefs (top_category + weights)
+  --user-a USER_A       DB user identifier for party A
+  --user-b USER_B       DB user identifier for party B
+  --birthdate-a BIRTHDATE_A
+                        Birthdate for party A (YYYY-MM-DD)
+  --birthtime-a BIRTHTIME_A
+                        Birth time for party A (HH:MM)
+  --location-a LOCATION_A
+                        Location for party A
+  --birthdate-b BIRTHDATE_B
+                        Birthdate for party B (YYYY-MM-DD)
+  --birthtime-b BIRTHTIME_B
+                        Birth time for party B (HH:MM)
+  --location-b LOCATION_B
+                        Location for party B
+
+--- showcompat_help.err ---

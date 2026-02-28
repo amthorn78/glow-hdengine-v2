@@ -1,0 +1,47 @@
+usage: hdctl showcompat [-h] [--pair-file PAIR_FILE] [--a-file A_FILE]
+                        [--b-file B_FILE] [--a A_FILE] [--b B_FILE]
+                        [--dump-reader DUMP_READER]
+                        [--dump-admin-dir DUMP_ADMIN_DIR]
+                        [--source {db,vendor,auto}] [--conjunction]
+                        [--viewer-prefs-file VIEWER_PREFS_FILE]
+                        [--user-a USER_A] [--user-b USER_B]
+                        [--birthdate-a BIRTHDATE_A]
+                        [--birthtime-a BIRTHTIME_A] [--location-a LOCATION_A]
+                        [--birthdate-b BIRTHDATE_B]
+                        [--birthtime-b BIRTHTIME_B] [--location-b LOCATION_B]
+
+options:
+  -h, --help            show this help message and exit
+  --pair-file PAIR_FILE
+                        Path to JSON with left/right payloads
+  --a-file A_FILE       Path to JSON file containing the left payload
+  --b-file B_FILE       Path to JSON file containing the right payload
+  --a A_FILE            Alias for --a-file
+  --b B_FILE            Alias for --b-file
+  --dump-reader DUMP_READER
+                        Optional path to write public Reader JSON (canonical
+                        bytes)
+  --dump-admin-dir DUMP_ADMIN_DIR
+                        Directory for admin proofs (writes 0600 JSON + .sha256
+                        sidecars)
+  --source {db,vendor,auto}
+                        Explicit BodyGraph source (db, vendor, or auto)
+  --conjunction         Emit conjunction contract JSON (requires
+                        --user-a/--user-b or conjunction pair input; uses SAFE
+                        rails resolver gating)
+  --viewer-prefs-file VIEWER_PREFS_FILE
+                        Path to JSON viewer prefs (top_category + weights)
+  --user-a USER_A       DB user identifier for party A
+  --user-b USER_B       DB user identifier for party B
+  --birthdate-a BIRTHDATE_A
+                        Birthdate for party A (YYYY-MM-DD)
+  --birthtime-a BIRTHTIME_A
+                        Birth time for party A (HH:MM)
+  --location-a LOCATION_A
+                        Location for party A
+  --birthdate-b BIRTHDATE_B
+                        Birthdate for party B (YYYY-MM-DD)
+  --birthtime-b BIRTHTIME_B
+                        Birth time for party B (HH:MM)
+  --location-b LOCATION_B
+                        Location for party B
