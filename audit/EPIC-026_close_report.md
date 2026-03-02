@@ -4,13 +4,13 @@
 HDE-EPIC026 close-pack scaffolds canonical closure outputs by summarizing currently-governed evidence and QA/gate artifacts already present in-repo, without changing product behavior.
 
 ## Capture timestamp
-- `2026-02-27T21:41:18Z`
+- `2026-03-01T02:35:26Z`
 
 ## Key Outputs
 - Canonical manifest: `audit/EPIC-026_MANIFEST.json`
 - Canonical step log manifest: `audit/qa/hde-epic026/qa_step_logs_manifest.json`
 - Canonical doc delta ledgers: `audit/docdeltas/hde-epic026_doc_deltas.md`, `audit/qa/hde-epic026/00_meta/doc_deltas.md`
-- Manifest-backed outputs (129 paths):
+- Manifest-backed outputs (157 paths):
 - `artifacts/audit/cli/ab_ba_compare.log`
 - `artifacts/audit/cli/det1_compare.log`
 - `artifacts/audit/cli/error_exitcode.txt`
@@ -113,12 +113,33 @@ HDE-EPIC026 close-pack scaffolds canonical closure outputs by summarizing curren
 - `audit/qa/hde-epic026/checks/po-008/reject_nonjson_stdout.log`
 - `audit/qa/hde-epic026/checks/po-008/showcompat_help.err`
 - `audit/qa/hde-epic026/checks/po-008/showcompat_help.txt`
+- `audit/qa/hde-epic026/checks/po-009/_pair_ab.json`
+- `audit/qa/hde-epic026/checks/po-009/_pair_ba.json`
+- `audit/qa/hde-epic026/checks/po-009/abba_identity_check.txt`
 - `audit/qa/hde-epic026/checks/po-009/body.log`
-- `audit/qa/hde-epic026/checks/po-009/open_rails_note.txt`
+- `audit/qa/hde-epic026/checks/po-009/closed_rails_classification.txt`
+- `audit/qa/hde-epic026/checks/po-009/closed_rails_rc.txt`
+- `audit/qa/hde-epic026/checks/po-009/closed_rails_stderr.log`
+- `audit/qa/hde-epic026/checks/po-009/closed_rails_stdout.log`
+- `audit/qa/hde-epic026/checks/po-009/command_used.txt`
+- `audit/qa/hde-epic026/checks/po-009/epic026_close_pack_stderr.log`
+- `audit/qa/hde-epic026/checks/po-009/epic026_close_pack_stdout.log`
+- `audit/qa/hde-epic026/checks/po-009/help_rc.txt`
+- `audit/qa/hde-epic026/checks/po-009/open_rails_ab_canonical_json_check.txt`
+- `audit/qa/hde-epic026/checks/po-009/open_rails_ab_rc.txt`
+- `audit/qa/hde-epic026/checks/po-009/open_rails_ab_sha256.txt`
+- `audit/qa/hde-epic026/checks/po-009/open_rails_ab_stderr.log`
+- `audit/qa/hde-epic026/checks/po-009/open_rails_ab_stdout.log`
+- `audit/qa/hde-epic026/checks/po-009/open_rails_ba_canonical_json_check.txt`
+- `audit/qa/hde-epic026/checks/po-009/open_rails_ba_rc.txt`
+- `audit/qa/hde-epic026/checks/po-009/open_rails_ba_sha256.txt`
+- `audit/qa/hde-epic026/checks/po-009/open_rails_ba_stderr.log`
+- `audit/qa/hde-epic026/checks/po-009/open_rails_ba_stdout.log`
 - `audit/qa/hde-epic026/checks/po-009/po-009_all_in_one.md`
 - `audit/qa/hde-epic026/checks/po-009/po-009_full_report.md`
 - `audit/qa/hde-epic026/checks/po-009/po-009_input_constraint.log`
 - `audit/qa/hde-epic026/checks/po-009/primary.log`
+- `audit/qa/hde-epic026/checks/po-009/showcompat_help.txt`
 - `audit/qa/hde-epic026/checks/po-010/artifacts.json`
 - `audit/qa/hde-epic026/checks/po-010/catalog_extract_dev_endpoints.json`
 - `audit/qa/hde-epic026/checks/po-010/po-010_all_in_one.md`
@@ -133,8 +154,15 @@ HDE-EPIC026 close-pack scaffolds canonical closure outputs by summarizing curren
 - `audit/qa/hde-epic026/checks/po-011/update_evidence_index_rc.txt`
 - `audit/qa/hde-epic026/checks/po-011/update_evidence_index_stderr.log`
 - `audit/qa/hde-epic026/checks/po-011/update_evidence_index_stdout.log`
+- `audit/qa/hde-epic026/checks/po-012/close_pack_copy/endpoints_catalog.json`
+- `audit/qa/hde-epic026/checks/po-012/close_pack_copy/endpoints_catalog.json.sha256`
+- `audit/qa/hde-epic026/checks/po-012/close_pack_copy/epic-026_evidence_index.json`
+- `audit/qa/hde-epic026/checks/po-012/close_pack_copy/epic-026_manifest.json`
+- `audit/qa/hde-epic026/checks/po-012/generator_rc.txt`
 - `audit/qa/hde-epic026/checks/po-012/generator_stderr.log`
 - `audit/qa/hde-epic026/checks/po-012/generator_stdout.log`
+- `audit/qa/hde-epic026/checks/po-012/po-012_all_in_one.md`
+- `audit/qa/hde-epic026/checks/po-012/primary.log`
 - `audit/qa/hde-epic026/qa_step_logs_manifest.json`
 - `audit/qa/hde-epic026/r11 Live QA Plan HDE-EPIC026.md`
 - `docs/evidence/INDEX.json`

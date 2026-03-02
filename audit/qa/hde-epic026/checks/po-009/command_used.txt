@@ -1,0 +1,3 @@
+]633;E;{   echo "HELP_RC=${HELP_RC}"\x3b   printf "AB: "\x3b printf "%q " "${SHOWCOMPAT_AB[@]}"\x3b echo\x3b   printf "BA: "\x3b printf "%q " "${SHOWCOMPAT_BA[@]}"\x3b echo\x3b } > "${CHECK_DIR}/command_used.txt";42581545-4658-4b99-82af-63b548da3eca]633;CHELP_RC=0
+AB: /workspaces/glow-hdengine-v2/.venv/bin/python -m engine.cli showcompat --conjunction --pair-file audit/qa/hde-epic026/checks/po-009/_pair_ab.json 
+BA: /workspaces/glow-hdengine-v2/.venv/bin/python -m engine.cli showcompat --conjunction --pair-file audit/qa/hde-epic026/checks/po-009/_pair_ba.json 

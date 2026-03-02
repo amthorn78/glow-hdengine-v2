@@ -1,3 +1,30 @@
-{"schema": "pf27-step-log-header-v1", "schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-02-26T05:46:40Z", "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "check_id": "po-009", "check_name": "PO-009 — CLI rails: closed refusal, open success", "pass_fail": "FAIL", "fail_status": "BLOCKED_MISSING_INPUTS", "intended_tokens": [], "claimed_tokens": [], "commands": [], "artifacts": [{"path": "open_rails_note.txt", "type": "text", "desc": "missing USER_A_ID/USER_B_ID"}], "pf_refs": ["PF27 §Step-log header schema expectations (minimum; required)"]}
+]633;E;{   echo "check_id=po-009"\x3b   echo "check_name=CHECK po-009 — Remedial replacement (no-user, vendor-first)"\x3b   echo "timestamp_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)"\x3b   echo ""\x3b   echo "captured_env:"\x3b   echo "  SAFE_MODE=${SAFE_MODE-}"\x3b   echo "  ALLOW_NETWORK=${ALLOW_NETWORK-}"\x3b   echo "  APP_ENV=${APP_ENV-}"\x3b   echo "  LC_ALL=${LC_ALL-}"\x3b   echo "  LANG=${LANG-}"\x3b   echo "  TZ=${TZ-}"\x3b   echo ""\x3b   echo "artifacts:"\x3b   echo "  showcompat_help.txt"\x3b   echo "  command_used.txt"\x3b   echo "  closed_rails_stdout.log / closed_rails_stderr.log / closed_rails_rc.txt / closed_rails_classification.txt"\x3b   echo "  open_rails_ab_stdout.log / open_rails_ab_stderr.log / open_rails_ab_rc.txt / open_rails_ab_sha256.txt / open_rails_ab_canonical_json_check.txt"\x3b   echo "  open_rails_ba_stdout.log / open_rails_ba_stderr.log / open_rails_ba_rc.txt / open_rails_ba_sha256.txt / open_rails_ba_canonical_json_check.txt"\x3b   echo "  abba_identity_check.txt"\x3b   if [ -f "${CHECK_DIR}/open_rails_note.txt" ]\x3b then echo "  open_rails_note.txt"\x3b fi\x3b   echo ""\x3b   echo "key_results:"\x3b   echo "  closed_rails_rc=$(cat "${CHECK_DIR}/closed_rails_rc.txt")"\x3b   echo "  closed_rails_classification=$(cat "${CHECK_DIR}/closed_rails_classification.txt")"\x3b   echo "  open_rails_ab_rc=$(cat "${CHECK_DIR}/open_rails_ab_rc.txt")"\x3b   echo "  open_rails_ba_rc=$(cat "${CHECK_DIR}/open_rails_ba_rc.txt")"\x3b   echo "  open_rails_ab_sha256=$(tr -d '\\n' < "${CHECK_DIR}/open_rails_ab_sha256.txt")"\x3b   echo "  open_rails_ba_sha256=$(tr -d '\\n' < "${CHECK_DIR}/open_rails_ba_sha256.txt")"\x3b   echo "  open_rails_ab_canonical=$(tr -d '\\n' < "${CHECK_DIR}/open_rails_ab_canonical_json_check.txt")"\x3b   echo "  open_rails_ba_canonical=$(tr -d '\\n' < "${CHECK_DIR}/open_rails_ba_canonical_json_check.txt")"\x3b   echo "  abba_identity=$(tr -d '\\n' < "${CHECK_DIR}/abba_identity_check.txt")"\x3b } > "${CHECK_DIR}/primary.log";42581545-4658-4b99-82af-63b548da3eca]633;Ccheck_id=po-009
+check_name=CHECK po-009 — Remedial replacement (no-user, vendor-first)
+timestamp_utc=2026-03-01T02:32:37Z
 
-###
+captured_env:
+  SAFE_MODE=0
+  ALLOW_NETWORK=1
+  APP_ENV=dev
+  LC_ALL=C
+  LANG=C
+  TZ=UTC
+
+artifacts:
+  showcompat_help.txt
+  command_used.txt
+  closed_rails_stdout.log / closed_rails_stderr.log / closed_rails_rc.txt / closed_rails_classification.txt
+  open_rails_ab_stdout.log / open_rails_ab_stderr.log / open_rails_ab_rc.txt / open_rails_ab_sha256.txt / open_rails_ab_canonical_json_check.txt
+  open_rails_ba_stdout.log / open_rails_ba_stderr.log / open_rails_ba_rc.txt / open_rails_ba_sha256.txt / open_rails_ba_canonical_json_check.txt
+  abba_identity_check.txt
+
+key_results:
+  closed_rails_rc=1
+  closed_rails_classification=REFUSED_TYPED
+  open_rails_ab_rc=0
+  open_rails_ba_rc=0
+  open_rails_ab_sha256=2b5b684c246ebce8e8b7df05ec868f3d7ffd6d4f8ef8139fbad95adfae0e211c
+  open_rails_ba_sha256=2b5b684c246ebce8e8b7df05ec868f3d7ffd6d4f8ef8139fbad95adfae0e211c
+  open_rails_ab_canonical=OK canonical-json
+  open_rails_ba_canonical=OK canonical-json
+  abba_identity=SAME sha256_match
