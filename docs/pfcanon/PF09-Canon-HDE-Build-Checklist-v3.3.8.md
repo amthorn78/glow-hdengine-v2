@@ -4,13 +4,13 @@
 
 **Title:** PF09-Canon-HDE-Build-Checklist
 
-**Version:** v3.3.2
+**Version:** v3.3.8
 
 **Status:** Canon
 
-**Effective date:** 2026-02-11
+**Effective date:** 2026-03-07
 
-**Last Update Gate:** BN 9.8.2 Drain A49-51
+**Last Update Gate:** BN 10.0.5 Drain A16-22
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -100,7 +100,9 @@ When an Ops task is required by an epic or checklist row:
 
 * It MUST specify success criteria and evidence to capture.
 
-* Completion MUST produce a repo-stored evidence artifact under a lowercase audit path such as `audit/ops/<epic-id>/` (or `audit/qa/<epic-id>/` when captured during QA).
+* Completion MUST produce a repo-stored evidence artifact under a lowercase audit path such as `audit/ops/<epic-id>/`. If captured during QA execution, it MUST still be stored under the Ops evidence root and referenced from QA artifacts as dependency evidence, not as QA evidence.
+
+* Ops tasks are not QA tasks. Ops evidence is not a substitute for QA evidence.
 
 * Evidence MUST be secret-free. If a setting/value is sensitive, evidence must be presence-only, redacted, or hashed while still proving the intended state.
 
@@ -242,8 +244,60 @@ Drift assessment protocol (stub): record the contradiction as a drift item with 
 
 PF23 is PO-maintained; plans MUST NOT create tasks that assign PF23 updates. If PF23 appears stale or missing coverage, note it as an observation only.
 
+Plan deliverable boundary (PF documents):
+
+* Plans MAY check PF documents (including Reality Audits) during planning and plan review to confirm what PF currently states.
+
+* Plans MUST NOT mandate PF document updates as part of PR or OPS deliverables, acceptance posture, tracked issues, confirming artifacts, or completion criteria.
+
+* Reality Audits updates are a manual PO operation only. PR scope MUST NOT include Reality Audits edits, and plans MUST NOT mandate or schedule Reality Audits updates inside PR or OPS work.
+
+* Plans MAY include a “Doc deltas capture” or “Doc delta candidates” note. These notes MUST be explicitly non-mandatory and MUST NOT be expressed as a required PR or OPS task. Any PF doc maintenance implied by those notes is PO-owned and out of plan scope.
+
+* If a plan requires confirming whether a component, route, contract, or locus exists, confirmation MUST be expressed in an allowed form: PF check (read-only) or repo-local evidence capture when PF is silent or insufficient. The plan MUST NOT require turning that result into a PF update.
+
+* Review posture (blocking condition): any plan that mandates a PF document update (including Reality Audits) as part of PR or OPS deliverables MUST be treated as non-portable and returned for revision.
+
+Non-goal note: this does not prohibit PF doc maintenance; it prohibits making PF doc edits a mandated output of plans or PR or OPS work.
+
 **Remediation task plans (approval gate scope):**  
- For remediation task plans (DEV PRs \+ OPS tasks), approval MUST focus on: (1) correct task model (DEV PRs only; OPS tasks only; explicit DISCOVERY vs CHANGE; no mixed tasks), (2) correct sequencing and explicit cross-lane dependencies, (3) concrete deliverables (lowercase paths \+ filenames), and (4) concrete verification success criteria. Detailed command lines and step-by-step failure handling are not required as a plan-approval condition; they MAY be developed in flight during execution, but evidence posture remains non-negotiable.
+ For remediation task plans (DEV PRs \+ OPS tasks), approval MUST focus on executable substance and structural completeness.
+
+Template adherence is structural only: required sections present, required end marker present, required gates present. Header styling and heading level choices are non-substantive and MUST NOT be requested as approval conditions when they do not change meaning, obligations, portability, or evidence posture.
+
+Plan approval MUST NOT be blocked on minor formatting artifacts. Minor formatting artifacts MUST be recorded as Nits (or ignored), not Blockers, and MUST NOT change the binary approval outcome when they are plainly cosmetic, for example:
+
+* Escaped Markdown list markers (for example a leading `\*` that renders as a bullet)
+
+* Backslashes inserted only for Markdown rendering or escaping
+
+* Cosmetic whitespace differences (blank lines, indentation, alignment)
+
+* Bold/italic marker differences that do not change the underlying words
+
+* Bullet style differences that do not change meaning (hyphen versus asterisk)
+
+Boundary: formatting that changes meaning is not minor. A formatting issue MAY be a blocker under the normal gates if it affects commands that must run as written, evidence outputs, filenames, required lowercase ASCII paths, portability rules, quoted-carryover blocks that must be verbatim, or any statement of obligation (MUST/SHOULD) or acceptance posture.
+
+Approval MUST focus on:
+
+* Correct task model (DEV PRs only; OPS tasks only; explicit DISCOVERY vs CHANGE; no mixed tasks).
+
+* Correct sequencing and explicit cross-lane dependencies.
+
+* Concrete deliverables (lowercase paths \+ filenames).
+
+* Concrete verification success criteria and evidence posture.
+
+* Category separation: implementation work (DEV PRs), ops tasks, QA planning, and QA execution MUST remain distinct. Epic Implementation Plans and Implementation Guides MUST NOT embed a full QA runbook or require that QA evidence be generated as part of implementation planning. QA planning is a separate deliverable owned by Live QA Plans and QA execution artifacts.
+
+Non-goals:
+
+* This posture does not change the template-required section set or required end marker.
+
+* This posture does not weaken existence-claim citation rules or evidence posture requirements.
+
+* This posture does not relax portability, evidence, or canon alignment requirements.
 
 **Portability vs provenance (non-PF evidence references):**  
  Plans may include a short “Evidence inventory reviewed (non-PF)” list for provenance, but MUST NOT require the reader/executor to open external files to perform the work. If a plan depends on any non-PF fact, the plan MUST embed that fact directly in the document as a short quote or precise paraphrase inside an “Observed Evidence Snapshot” section. If an Artifact Map is included, it MUST label non-PF inputs as: **“provenance only; not required to execute”**.
@@ -1264,6 +1318,8 @@ Broader CLI/Reader parity and A7 transport behavior remain the responsibility of
 
 Audit (v1 — 2025-11-17) originally flagged missing mirror/index and canonicalization tokens. EPIC017 PR02 (D2) implemented the **evidence skeleton**: `tools/evidence/update_evidence_index.py` now owns `docs/evidence/INDEX.json` and `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl` is the single Machine Mirror, `.path_proof.txt` files are generated consistently, and the **topology orientation demo** (`audit/gates/topology/orientation_demo.txt`) is wired into CI.
 
+Addendum 09-12 PR07 (HDE-EPIC026) updates governed Evidence Index entries and proof anchors for the topology orientation demo artifacts (`audit/gates/topology/orientation_demo.txt`, `audit/gates/topology/orientation_demo.txt.sha256`, `docs/evidence/audit.gates.topology.orientation_demo.txt.path_proof.txt`) as part of the broader governed evidence refresh for conjunction outputs.
+
 Evidence skeleton CI now runs under rails-closed env (`SAFE_MODE=1`, `ALLOW_NETWORK=0`, `LC_ALL=C`, `LANG=C`, `TZ=UTC`) and includes:
 
 * `python tools/evidence/update_evidence_index.py --check`
@@ -1914,21 +1970,27 @@ Tests (titles-only; closed rails):
 
 **Acceptance criteria (what “Done” looks like):**
 
-* QA steps emit governed logs under a stable root: `audit/qa/<epic-id>/checks/<step-name>/primary.log`
+* QA steps emit governed logs and other required deliverables only under a stable epic-scoped QA root with check-scoped subdirectories: `audit/qa/<epic-id>/checks/<check-id>/...`
 
-* Each log includes: `check_id`, `check_name`, `status` from the allowed vocabulary, and defaultable “emptiness” fields (do not introduce or require `run_id` or `RUN_ID`).
+* Live QA Plans, QA prompts, and QA reviews do not introduce per-run nesting, timestamped roots, or operator-set per-run root variables.
 
-* A manifest exists (or is produced) that enumerates all QA step logs, with stable paths.
+* Each log includes: `check_id`, `check_name`, `status` from the allowed vocabulary, and defaultable emptiness fields (do not introduce or require `run_id` or `RUN_ID`).
 
-* Logs do not invent executables; they reference real repo paths and commands.
+* QA planning consults PF23 read-only when repo-resident loci are named; PF23 updates are never required outputs of planning or execution.
 
-* Empty or absent artifacts are labeled explicitly (e.g., `NOT_FOUND`) and do not get silently “filled in”.
+* Any repo-resident locus string used in a plan is copied verbatim from an allowed provenance source: PF10, PF-Canon, or the initial QA Audit. Unproven loci are handled by discovery, not inference.
+
+* Plan-created artifacts and plan-created scripts are allowed only when the plan names the exact repo-relative path and filename, provides runnable creation instructions, states why the output is required, and makes evidence-bearing outputs reproducible and unambiguous.
+
+* Logs do not invent executables; plans do not over-specify unproven command strings; the exact commands actually used are recorded into check evidence at runtime.
+
+* Empty or absent artifacts are labeled explicitly (for example `NOT_FOUND`, `NOT RUN`, `DEFERRED`, or `BLOCKED` as appropriate) and do not get silently “filled in”.
 
 * Token claims in logs are present where applicable and remain non-gating unless explicitly required by policy.
 
 **Implementation notes / constraints:**
 
-* Status vocabulary is strict: `PASS` / `FAIL` / `WARN` / `BLOCKED` (even if check passes overall, items within may be flagged).
+* Status vocabulary is strict: `PASS` / `FAIL` / `WARN` / `BLOCKED` (even if a check passes overall, items within may still be flagged).
 
 * “Governed paths” means the artifact path itself is part of the proof; avoid ad hoc locations.
 
@@ -1936,15 +1998,25 @@ Tests (titles-only; closed rails):
 
 * `run_id` is prohibited. Live QA Plans MUST NOT introduce or require `run_id` (or `RUN_ID`) as an operator input, step-log header field, manifest field, or correctness key.
 
-* History retention must not become a correctness dimension. Optional per-execution nesting is allowed, but it must be noncanonical and non-gating.
+* Per-run nesting is disallowed. Live QA evidence MUST be checks-only under the epic-scoped QA root, and plan-created deliverables MUST live under stable check directories.
 
-* Whitespace syntax issues MUST NOT block plan approval. Treat them as a Nit only; remediate in flight and capture the successful re-run evidence.
+* PF23 consult is required during QA planning and QA plan review whenever repo-resident loci are named. Consultation is read-only; PF23 updates remain PO-only and are never required outputs of planning or execution.
 
-* Copy/paste perfection MUST NOT be treated as a blocker. Do not require plan revision solely to fix formatting drift.
+* Allowed provenance sources for repo-resident loci are exclusive: PF10, PF-Canon, and the initial QA Audit. No invention, no inference, no memory, and no “equivalent” substitutions are allowed for repo-resident locus strings.
 
-* Avoid markdown triple-backtick fences in planning artifacts; they are high-risk for copy/paste damage.
+* If a required locus is not proven at planning time, the plan MUST handle it as discovery: state the discovery intent, state the discovery acceptance, record the discovered locus verbatim into check evidence before using it, and provide PASS, FAIL, and BLOCKED postures for discovery itself.
 
-* Approval binds to command identity, not command syntax. Equivalent quoting and syntax forms must not be treated as blockers when semantics match.
+* Command-line minimalism is required. Approval binds to command identity, not command syntax. Exact command strings belong in plans only when they are proven by an allowed provenance source; otherwise the plan should specify intent, observable outputs, and required evidence, and execution must record the exact command strings actually used.
+
+* Plan-created scripts are permitted only when a required deliverable cannot be produced without one. The plan MUST name the exact repo-relative path and filename, include runnable creation instructions, state why the script is required, and keep the script minimal and purpose-bound.
+
+* Provenance labeling is non-blocking when unambiguous. A missing repo-resident versus plan-created label is not, by itself, a blocker when the file is clearly a run-produced deliverable and the plan provides the required how and why.
+
+* Ambiguous directives such as “create a helper script”, “write a manifest”, or “generate a report” are blockers unless they also provide the exact creation process and the reason the file is required.
+
+* Whitespace syntax issues and minor formatting artifacts are Nits, not blockers, when they do not change meaning, portability, evidence posture, or required outputs.
+
+* Avoid markdown triple-backtick fences in planning artifacts; they are high-risk for copy and paste damage.
 
 * JSON-carrying environment variables are allowed; preserve JSON payloads verbatim in plans and step logs.
 
@@ -1952,68 +2024,57 @@ Tests (titles-only; closed rails):
 
 **How to pass the proof gate and earn the token:**
 
-* QA ROOT step logs for QA Plan steps (titles/paths only), such as:
+* QA ROOT step logs and related deliverables under stable check directories, such as:
 
-  * `audit/qa/hde-epic023/checks/D03_acceptance_map_viability/primary.log` — governed QA check log for `D03_acceptance_map_viability` (PASS; validates `audit/qa/hde-epic023/acceptance_map_viability.log`).
+  * `audit/qa/hde-epic026/checks/po-000/qa_step_logs_manifest.json`
 
-  * `audit/qa/hde-epic023/checks/D05_step_logs_manifest/primary.log` — governed QA check log for `D05_step_logs_manifest` (PASS; writes `audit/qa/hde-epic023/qa_step_logs_manifest.json`).
+  * `audit/qa/hde-epic026/checks/po-000/qa_step_logs_manifest.json.path_proof.txt`
 
-  * `audit/qa/hde-epic024/checks/D19_step_logs_manifest/primary.log` — governed QA check log for `D19_step_logs_manifest` (PASS; validates `audit/qa/hde-epic024/qa_step_logs_manifest.json`).
+  * `audit/qa/hde-epic026/checks/po-000/doc_deltas.md`
 
-  * `audit/qa/hde-epic024/checks/D14_harness_selftest/primary.log` — governed QA check log for `D14_harness_selftest` (PASS; plan-required `audit/gates/harness_selftest/harness_selftest.log` was missing).
+  * `audit/qa/hde-epic026/checks/po-000/qa_helpers.sh`
 
-  * `audit/qa/hde-epic024/checks/D09_generate_evidence_index_snapshot/primary.log` — governed QA check log for `D09_generate_evidence_index_snapshot` (PASS; validates `audit/gates/evidence_index_snapshot/evidence_index_snapshot.json`).
+  * `audit/qa/hde-epic026/checks/po-001/primary.log`
 
-  * `audit/qa/hde-epic023/checks/D06_grounding_pack/primary.log` — governed QA check log for `D06_grounding_pack` (PASS; writes `audit/qa/hde-epic023/grounding_pack.json`).
+  * `audit/qa/hde-epic026/checks/po-001/pytest_stdout.log`
 
-  * `audit/qa/hde-epic023/checks/D09_pf23_consult_capture/primary.log` — governed QA check log for `D09_pf23_consult_capture` (PASS; validates `audit/qa/hde-epic023/consult_capture.md`).
+  * `audit/qa/hde-epic026/checks/po-001/pytest_stderr.log`
 
-  * `audit/qa/hde-epic023/checks/D12_close_pack/primary.log` — governed QA check log for `D12_close_pack` (PASS; validates `audit/qa/hde-epic023/close_pack.md`).  
-  * `audit/qa/hde-epic024/checks/po-017_lowercase_naming/primary.log` — governed QA check log for `po-017_lowercase_naming` (PASS; directory-name casing scan).
+  * `audit/qa/hde-epic026/checks/po-001/pytest_rc.txt`
 
-  * `audit/qa/hde-epic024/checks/po-017_lowercase_naming/find_audit_uppercase.txt` — empty scan output (no uppercase directory names under `audit/qa/**`).
+  * `audit/qa/hde-epic026/checks/po-002/catalog_api_compat_entry.json`
 
-  * `audit/qa/hde-epic024/checks/po-017_lowercase_naming/find_artifacts_uppercase.txt` — empty scan output (no uppercase directory names under `artifacts/**`).
+  * `audit/qa/hde-epic026/checks/po-003/primary.log`
 
-  * `audit/qa/hde-epic024/checks/po-017_lowercase_naming/find_docs_uppercase.txt` — out-of-scope note (docs scanning not required for PO-017).  
-  * audit/qa/hde-epic025/checks/gate\_evidence\_paths\_validation/primary.log — EPIC025 evidence-path validation gate log.  
-  * audit/qa/hde-epic025/checks/gate\_evidence\_paths\_validation/gate\_evidence\_paths\_validation.path\_proof.txt — EPIC025 path proof for the gate log path.  
-  * audit/qa/hde-epic025/checks/gate\_mirror\_schema/primary.log — EPIC025 mirror schema validation gate log.  
-  * audit/qa/hde-epic025/checks/gate\_mirror\_schema/gate\_mirror\_schema.path\_proof.txt — EPIC025 path proof for the gate log path.  
-  * audit/qa/hde-epic025/checks/gate\_lf\_endings/primary.log — EPIC025 final-LF check gate log.  
-  * audit/qa/hde-epic025/checks/gate\_lf\_endings/gate\_lf\_endings.path\_proof.txt — EPIC025 path proof for the gate log path.  
-  * audit/qa/hde-epic025/checks/preflight\_e1\_http\_compat/primary.log — EPIC025 preflight log (E1 HTTP compat).  
-  * audit/qa/hde-epic025/checks/preflight\_e3\_cli\_entrypoint/primary.log — EPIC025 preflight log (E3 CLI entrypoint).  
-  * audit/qa/hde-epic025/checks/preflight\_e5\_a7\_transport\_invariants/primary.log — EPIC025 preflight log (E5 A7 transport invariants).  
-  * audit/qa/hde-epic025/checks/preflight\_p4\_evidence\_endpoints/primary.log — EPIC025 preflight log (P4 evidence endpoints).  
-  * audit/qa/hde-epic025/checks/preflight\_p4\_evidence\_endpoints/primary.log — EPIC025 preflight log (P4 evidence endpoints).
+  * `audit/qa/hde-epic026/checks/po-004/primary.log`
 
-  * audit/qa/hde-epic025/checks/d0\_discovery/primary.log — EPIC025 step log (d0\_discovery decision and transcript).
+* Check-scoped manifest and linkage examples:
 
-  * audit/qa/hde-epic025/00\_meta/doc\_deltas.md — EPIC025 Step-0 artifact (doc deltas).
+  * a Step-0 or Step-setup manifest pair under its designated check directory, not at a legacy root-level location
 
-  * audit/qa/hde-epic025/00\_meta/repo\_baseline.txt — EPIC025 Step-0 artifact (repo baseline).
+  * plan-created artifacts written at exact plan-named paths under stable check directories
 
-* Manifest presence / linkage examples:
+* Command and entrypoint provenance:
 
-  * `audit/qa/hde-epic023/qa_step_logs_manifest.json` — required step logs manifest (see Addenda 10-13 BN 9.4.4: D05 proof).  
-  * `audit/qa/hde-epic023/qa_step_logs_manifest.json.path_proof.txt` — path proof used for audit-friendly verification of governed artifact location.  
-  * `audit/qa/hde-epic025/qa_step_logs_manifest.json` — EPIC025 governed QA step logs manifest (root manifest for step log paths).  
-  * `audit/qa/hde-epic025/qa_step_logs_manifest.json.path_proof.txt` — EPIC025 path proof used for audit-friendly verification of governed artifact location.
+  * every referenced command path must exist in repo
 
-* Command/entrypoint provenance (no invented executables; evidence roots are not code roots):
-
-  * Every referenced command path must exist in repo.
-
-  * Preflight: `rg -n "python tools/qa/" docs/` and confirm each referenced script exists.
-
-  * Preflight: `rg -n "audit/qa/" tools/` and confirm logs are not treated as source.
+  * helper commands or scripts must be either repo-resident and provenance-proven, or plan-created with exact path, creation instructions, and purpose
 
 **Notes:**
 
-Added from EPIC019 Live QA Addendum 11 and Addendum 14 and the HDE-Mechanics Guide “Live QA harness” section. This subtask is directly related to Token: QA\_HARNESS\_DISCIPLINE\_OK (EPIC024 PR-01 discovery treats QA\_STEP\_LOGS\_CONSOLIDATED\_OK as a deprecated alias for QA\_HARNESS\_DISCIPLINE\_OK). This subtask remains **Partial** until the discipline is applied consistently across all QA Plan steps and epics (minimum header \+ defaultable fields, status vocabulary, emptiness conventions, manifest linkage, and log path governance).
+Added from EPIC019 Live QA Addendum 11 and Addendum 14, the HDE-Mechanics Guide “Live QA harness” section, and addendum 16-22 bn drain 10.0.3. This subtask is directly related to Token: QA\_HARNESS\_DISCIPLINE\_OK (EPIC024 PR-01 discovery treats QA\_STEP\_LOGS\_CONSOLIDATED\_OK as a deprecated alias for QA\_HARNESS\_DISCIPLINE\_OK). This subtask remains **Partial** until the discipline is applied consistently across all QA Plan steps and epics.
 
-This subtask has been partially demonstrated by EPIC023’s governed QA logs and manifests (see Addenda 10-13 BN 9.4.4), but the discipline remains incomplete until the same shape is consistently produced across all required QA Plan steps and epics.
+EPIC026 provides partial proof of the updated discipline:
+
+* CHECK po-000 and CHECK po-001 show stable checks-only layout under `audit/qa/hde-epic026/checks/`, with the required Step-0 manifest pair and step artifacts under `checks/po-000/` and the required pytest artifacts under `checks/po-001/`.
+
+* CHECK po-002 shows that plan-defined PASS criteria can be evaluated from check-scoped artifacts alone, using `pytest_rc.txt` and `catalog_api_compat_entry.json` under `checks/po-002/`.
+
+* CHECK po-003 shows that `primary.log` under the canonical check directory carries the required rails provenance in `captured_env`.
+
+* CHECK po-004 shows that adapted execution is acceptable only when the actual executed command, required deliverables, and PASS predicate are still recorded under the canonical check directory.
+
+Legacy leftovers such as a harmless root-level manifest pair or non-canonical appendix artifacts are non-blocking only when the canonical check-scoped artifacts exist and the decision-driving proof remains under `audit/qa/<epic-id>/checks/<check-id>/`. The discipline remains incomplete until stale patterns and helper mismatches are eliminated across required Live QA steps and epics.
 
 ### **Subtask HDE-CALC003.15 — Acceptance map & QA harness viability check**
 
@@ -5724,6 +5785,10 @@ Passes canonicalization checks (canonical JSON, LF-termination, sorted keys, arr
 
 **Task notes:**
 
+Addendum 05-08 PR01 (HDE-EPIC026): adds conjunction contract canonical bytes checks (newline-terminated), AB and BA byte identity, and two-run determinism in `tests/http/test_compat_endpoint_contract.py`.
+
+Pass indicator: `python -m pytest -q tests/http/test_compat_endpoint_contract.py` shows 8 passed.
+
 **Status (Audit v1 — 2025-11-17):** Not done.
 
 Missing tokens (titles-only; tokens live in Governance/Schemas):
@@ -6009,23 +6074,15 @@ No ad-hoc serializers on public paths; guarded via grep and import-graph symbol 
 
 **Task notes:**
 
-**Status (Audit v1 — 2025-11-17):** Not done.
+**Task notes:**
 
-No CLI conformance artifacts recorded for `ab.json` / `ba.json` / `summary.json`.
+**Status (Audit v1 — 2025-11-17):** Not done.
 
 CLI parity/determinism harness exists as a plan; acceptance tokens not yet proven or indexed.
 
-Goal:
+Addendum 23-28 HDE-EPIC026 Live QA CHECK po-008 provides governed proof that `hdctl --help` and `hdctl showcompat --help` return 0 with stdout captured, that a non-JSON conjunction modifier invocation is rejected with a non-zero exit, and that optional conjunction-output artifacts are correctly skipped when `USER_A_ID` and `USER_B_ID` are intentionally absent.
 
-`showcompat` present and wired.
-
-CLI outputs LF-terminated canonical JSON.
-
-Reader↔CLI parity established.
-
-AB↔BA & two-run identity proven for CLI compat flows.
-
-Installation and help flows exit cleanly.
+Addendum 23-28 HDE-EPIC026 Live QA CHECK po-009 is blocked by product-input availability: `USER_A_ID` and `USER_B_ID` are not valid product inputs for that run, so the plan’s open-rails PASS path is currently unreachable. Treat this as an input-availability gate and planning defect, not as a demonstrated behavior defect; rerun only when valid product IDs exist. Task status remains Partial because full showcompat parity and determinism proof is still incomplete.
 
 ### **Subtask HDE-CONJ004.1 — CLI install and entrypoints**
 
@@ -6293,34 +6350,13 @@ Indexing of these artifacts follows the global Evidence Index & Machine Mirror d
 
 **Task name/label:** Reader Surface (API)
 
-**Task status:** **Not done**
+**Task status:** **Partial**
 
 **Task description:**  
  Provide a six-key Reader v1 envelope on a Catalog JSON success route via the shared presenter/emitter, prove A7 transport invariants (200/HEAD/304, ETag, Vary, encoding invariance), maintain an Endpoint Catalog, and index proofs.
 
-**Task notes:**
-
-**Status (Audit v1 — 2025-11-17):** Not done.
-
-Missing tokens:
-
-`ENDPOINTS_CATALOG_OK`
-
-`ENDPOINTS_CATALOG_ENV_GATE_OK`
-
-`A7_GET_QUOTED_ETAG_OK`
-
-`A7_HEAD_PARITY_OK`
-
-`A7_304_OMITS_CT_CL_OK`
-
-`A7_VARY_AUTH_AE_OK`
-
-`A7_ENCODING_INVARIANCE_OK`
-
-`READER_200_CTYPE_JSON_UTF8_OK`
-
-Catalog \+ GET/HEAD/304/encoding proofs are absent.
+**Task notes:**  
+ Addendum 05-08 PR03 HDE-EPIC026 adds dev-only HTTP GET endpoints for conjunction preview (/dev/sampler/conjunction, /dev/reader/conjunction), gates them via APP\_ENV (dev/test/local), updates the endpoint catalog entries, adds minimal catalog and dev-gating tests, and regenerates endpoint-catalog checksum/path-proof sidecars after catalog byte changes.
 
 ### Subtask HDE-CONJ005.1 — Reader success body & canonical JSON
 
@@ -6609,7 +6645,7 @@ A7 matrix proven on a cataloged JSON success route; encoding invariance and env-
 
 **Task name/label:** CLI Tooling (showcompat, sample)
 
-**Task status:** **Not done**
+**Task status:** Partial
 
 **Task description:**  
  Provide showcompat and sample CLI tooling with deterministic, canonical JSON outputs, diversity constraints, parity/determinism harness, and indexed artifacts.
@@ -6750,6 +6786,26 @@ Parity harness:
 
 `artifacts/evidence_index.jsonl`
 
+### **Subtask HDE-CONJ007.5 — showcompat conjunction execution path**
+
+**Subtask name/label:** showcompat conjunction mode
+
+**Subtask description:**  
+ Implement the `--conjunction` execution path in showcompat with strict argument checks, SAFE rails resolver usage, deterministic refusal when local inputs are missing under rails-closed execution, canonical pair normalization, stable A/B ordering, and canonical JSON emission to stdout.
+
+**Subtask status:** **Done**
+
+**Epic or card:** HDE-EPIC026 (Addendum 09-12 PR05)
+
+**Tokens:** None
+
+**Evidence / artifacts:**  
+ `engine/cli/main.py`  
+ `tests/cli/test_cli_canonical_bytes.py`  
+ `tests/cli/test_showcompat_sources.py`  
+ `python -m pytest tests/cli/test_cli_canonical_bytes.py -q`  
+ `python -m pytest tests/cli/test_showcompat_sources.py -q`
+
 ---
 
 ## Task HDE-CONJ008 — Writer Surfaces (API)
@@ -6758,16 +6814,24 @@ Parity harness:
 
 **Task name/label:** Writer Surfaces (API)
 
-**Task status:** **Not done**
+**EPIC**: HDE-EPIC026
 
-**Task description:**  
- Implement writer APIs with typed numeric-free envelopes, idempotent write paths, correct headers (no-store, no ETag), canonical JSON output (if any), and indexed writer evidence, while keeping A7 tokens scoped to success routes.
+**Task status:** **Partial**
 
-**Task notes:**
+**Task description:**
 
-Writers: `Cache-Control: no-store`, never 304\.
+* Implement writer APIs for conjunction that produce a stable writer envelope and persistence contract.
+
+* Ensure writers are idempotent on identical request inputs (no hidden time-based mutations).
+
+* Enforce no-store caching and correct refusal semantics.
+
+**Task notes:**  
+ Writers create state. Ensure all writer surfaces are optional until core read-only surfaces are stable and audited.
 
 Writers are not A7 proof surfaces; A7 tokens (`A7_*`, `READER_*`) remain bound to Catalog success routes.
+
+Addendum 05-08 PR04 adds a dev-only writer endpoint `/dev/writer/conjunction` (route\_id `dev.writer.conjunction.v1`) returning an idempotent writer-style envelope for conjunction results, gated by the existing dev admin gate and covered by `tests/http/test_dev_conjunction_http.py`.
 
 ### Subtask HDE-CONJ008.1 — Writer envelope & posture
 
@@ -6865,12 +6929,24 @@ Governance configuration and test plans (titles-only in PF docs).
 
 **Task name/label:** Global discipline (single-emitter canonical JSON & Index updates)
 
-**Task status:** **Not done** (tracked as ongoing global requirement)
+**Task status:** **Partial** (tracked as ongoing global requirement)
 
 **Task description:**  
  Enforce single-emitter canonical JSON rules across all surfaces and require Evidence Index/Mirror updates whenever artifacts change.
 
 **Task notes:**
+
+Addendum 09-12 PR07 (HDE-EPIC026) refreshes governed evidence posture for conjunction outputs, including:
+
+* Canonical JSON gate runner updates: `tools/evidence/run_canonical_json_gate.py` target set extended to conjunction-related CLI artifacts, with refreshed gate outputs and logs under `audit/gates/json_gate/canonical/`.
+
+* Evidence Index and proof refresh: evidence index rows updated and extended to include conjunction-related CLI artifact keys and proof anchors, including refreshed path-proof records for `artifacts/evidence_index.jsonl`.
+
+* Governed path proofs refreshed for `artifacts/cli/pair.json`, `artifacts/cli/pair_ba.json`, `artifacts/cli/showcompat_ab.json`, `artifacts/cli/showcompat_ba.json`, plus new path-proof artifacts for `artifacts/cli/abba_sidecar.json`, `artifacts/cli/out.json`, and `artifacts/cli/out_ba.json`.
+
+* Path proofs refreshed for `docs/ENDPOINTS_CATALOG.json` and `docs/ENDPOINTS_CATALOG.json.sha256`, plus Evidence Index snapshot artifacts (`docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`) and their path proofs.
+
+Tokens satisfied in PR07 evidence print: `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`, `CANONICAL_JSON_GATE_UPDATED_OK`, `CANONICAL_JSON_GATE_PASSED_OK`.
 
 All surfaces honor single-emitter, canonical JSON rules:
 
@@ -6948,26 +7024,25 @@ Canonical-compare logs across phases (various `canonical_json/*.log` and `json_c
 
 **Task name/label:** SAFE rails & provider gate
 
-**Task status:** Not done
+**Task status:** Partial
 
-**Task description:**  
- Establish and prove SAFE rails posture and provider gating for vendor HTTP, including closed-rails refusal behavior, pinned open-rails policy (timeouts, retries, backoff, 429 handling), observability, and evidence/indexing discipline.
+**Task description:**
+
+* Define and enforce the SAFE rails contract that prevents unintended vendor HTTP calls and unsafe provider behavior.
+
+* Establish explicit rail-open allowlists for dev/test/local, while remaining closed by default in all other envs.
+
+* Provide deterministic refusal behavior and traceable proofs of no-outbound-I/O when rails are closed.
 
 **Task notes:**
 
-SAFE rails tokens are **missing** and not yet wired as acceptance gates (titles-only; token semantics live in HDE-Governance):
+* The SAFE rails tokens are defined in Governance; they remain missing here because enforcement is only partially implemented and is not yet wired as an acceptance gate across all provider and vendor surfaces.
 
-`SAFE_RAILS_CLOSED_OK`
+* Default posture must be "closed rails"; allow local/test open rails only behind explicit flags.
 
-`SAFE_RAILS_OPEN_OK`
+* No network I/O in closed rails (including provider and BodyGraph flows).
 
-`SAFE_LOG_REDACTION_OK`
-
-`SAFE_RETRY_BACKOFF_OK`
-
-`SAFE_429_TYPED_REFUSAL_OK`
-
-No SAFE-rails evidence has been captured yet.
+Addendum 05-08 PR02 (HDE-EPIC026) provides passing tests for default-closed rails when env is missing or empty on the conjunction provider acquisition path. Vendor HTTP policy coverage, typed refusals, and log redaction proofs remain pending for this task.
 
 Rails are **closed by default**; vendor HTTP is allowed only when **both** gates are open:
 
@@ -7222,79 +7297,89 @@ SAFE-rails artifacts listed above, plus their `*.path_proof.txt` transcripts.
 **Subtask name/label:** D0 discovery baseline (env, CLI, services)
 
 **Subtask description:**  
- Add a mandatory **D0 discovery gate** for Live QA epics so that environment, rails, CLI health, and basic services/ports are understood and evidenced **before** any high-stakes Live QA steps (including vendor tests) are treated as complete:
+ Add a mandatory **D0 discovery gate** for Live QA epics so that environment, rails, CLI health, and basic services and ports are understood and evidenced **before** any high-stakes Live QA steps (including vendor tests) are treated as complete.
 
-**D0 env & rails baseline (open-rails posture).**
+**D0 evidence layout (checks-only).**
 
-* For any Live QA session that intends to exercise vendor or other open-rails behavior, capture a **D0 environment baseline log** under the run’s QA root (for example `audit/qa/<epic>/live-qa-YYYYMMDD/D0_env_baseline.log`) that records, at minimum:
+* D0 artifacts are plan-created deliverables and MUST live under the stable epic-scoped QA root in check-scoped directories.
 
-  * `SAFE_MODE`, `ALLOW_NETWORK`, `APP_ENV`, `LC_ALL`, `LANG`, and `TZ` values for the intended **open-rails** posture for the session.
+* The Live QA Plan MUST name the exact repo-relative path and filename for each D0 artifact.
 
-  * A brief explanation of how these rails differ from the default closed-rails posture (titles-only to Glow QA Guide and SAFE rails canon).
+* Per-run directories, timestamped roots, and operator-set per-run root variables are not allowed.
 
-* This env baseline log is part of the evidence for the QA acceptance token `OPEN_RAILS_ENV_OK`; it proves that any later “open-rails” vendor tests really ran under the mandated rails, not under the default closed-rails posture.
+**D0 env and rails baseline (open-rails posture).**
+
+* For any Live QA step that intends to exercise vendor or other open-rails behavior, capture a D0 environment baseline artifact under a stable check directory at the exact plan-named path.
+
+* This artifact MUST record at minimum `SAFE_MODE`, `ALLOW_NETWORK`, `APP_ENV`, `LC_ALL`, `LANG`, and `TZ`, plus a short explanation of why open rails are required for the planned step.
+
+* This env baseline artifact is part of the evidence for `OPEN_RAILS_ENV_OK`; it proves that later vendor-facing steps actually ran under the declared rails posture.
 
 **D0 CLI health check.**
 
-* Before running epic-level tests, produce a **CLI health check log** under QA root (for example `audit/qa/<epic>/live-qa-YYYYMMDD/D0_cli_health.log`) that shows, at minimum:
+* Before epic-level tests, produce a D0 CLI health artifact under a stable check directory at the exact plan-named path.
 
-  * `python -m pytest --version` succeeded under the intended environment (matching the QA bootstrap harness in HDE-CALC003.12).
+* It MUST show, at minimum:
 
-  * `command -v hdctl` (and any other primary CLI tools such as `jq`) succeeded and reported usable entrypoints.
+  * `python -m pytest --version` succeeded under the intended environment
 
-  * A short summary line indicating whether CLI tools and pytest are **ready for use** or whether there are tooling failures that must be addressed before Live QA can continue.
+  * `command -v hdctl` and any other required CLI tools succeeded and reported usable entrypoints
 
-* Failures captured here are treated as tooling/infra blockers under the QA tooling bootstrap and harness subtasks (HDE-CALC003.12–.14); D-goals that depend on CLI behavior remain pending until CLI health is restored.
+  * a short readiness summary that distinguishes “ready for use” from tooling failures that must be addressed before Live QA can continue
 
-**D0 services & ports discovery (Reader/HTTP and vendor connectivity).**
+* Failures captured here are tooling or infra blockers under the QA tooling bootstrap and harness subtasks; dependent D-goals remain pending until CLI health is restored.
 
-* Produce a **services and ports discovery log** under QA root (for example `audit/qa/<epic>/live-qa-YYYYMMDD/D0_services_and_ports.log`) that records, at minimum:
+**D0 services and ports discovery (Reader/HTTP and vendor connectivity).**
 
-  * For internal/dev HTTP harnesses (such as `/internal/dev/sampler`), the canonical dev Reader start command and the base URL/port in this environment, preferably leveraging infra-owned bindings such as `DEV_SAMPLER_URL` defined under HDE-CONJ001.4 (titles-only).
+* Produce a D0 services and ports discovery artifact under a stable check directory at the exact plan-named path.
 
-  * Any known production or stage URLs/hostnames for Railway or equivalent vendor endpoints that are expected to be used in this session (hostnames and ports only; no secrets).
+* If any service, port, route, script, or command locus needed by the check is not proven at planning time, the plan MUST treat it as discovery rather than guessing. The plan MUST state the discovery intent, state the discovery acceptance, require the discovered locus string to be recorded verbatim into check evidence before later use, and provide PASS, FAIL, and BLOCKED postures for discovery itself.
 
-  * Simple connectivity checks (for example `curl` or CLI “ping” commands) against these endpoints that distinguish “no service / wrong protocol” from “reachable but behavior to be tested later,” without embedding payloads or secrets in logs.
+* Discovery evidence may include simple connectivity checks that distinguish “no service” or “wrong protocol” from “reachable but behavior to be tested later,” without embedding secrets or payloads in logs.
 
-* Missing or inconclusive D0 services/ports evidence MUST be treated as a **discovery gap**: Live vendor D-goals (for example `LIVE_VENDOR_TRANSPORT_OK` in the QA token library) cannot be marked satisfied until D0 services/ports discovery is complete and shows that the relevant services are actually reachable.
+* Missing or inconclusive D0 services and ports evidence is a discovery gap. Live vendor D-goals cannot be marked satisfied until D0 discovery is complete and shows that the relevant services are actually reachable.
 
 **Acceptance and gating posture.**
 
-* This subtask is gated by the QA acceptance token `DISCOVERY_BASELINE_OK` (semantics single-homed in Glow QA Guide and HDE-Phased Epics by title). For any Live QA epic that claims vendor-related D-goals, `DISCOVERY_BASELINE_OK` MUST be satisfied via:
+* This subtask is gated by `DISCOVERY_BASELINE_OK`.
 
-  * a non-empty D0 env baseline log,
+* For any Live QA epic that claims vendor-related D-goals, `DISCOVERY_BASELINE_OK` MUST be satisfied via:
 
-  * a non-empty D0 CLI health log, and
+  * a non-empty D0 env baseline artifact
 
-  * a non-empty D0 services and ports discovery log,
+  * a non-empty D0 CLI health artifact
 
-* all captured under the run’s QA root and stored as governed QA artifacts.
+  * a non-empty D0 services and ports discovery artifact
 
-* If any of the D0 logs are missing or empty, Live QA steps that depend on them MUST be classified as **FAIL\_TOOLING** (or the equivalent tooling failure state defined in PF19) rather than as behavior failures or silent passes; subsequent QA runs for the same epic MUST fix discovery/harness issues first.
+* All three artifacts MUST live under stable check directories inside the epic-scoped QA root.
+
+* If any D0 artifact is missing or empty, dependent Live QA steps MUST be classified as `FAIL_TOOLING` (or the equivalent tooling failure state defined in PF19) rather than as behavior failures or silent passes.
 
 **Subtask status:** **Not done**
 
-**Epic or card:** **Unknown** (future Live QA / vendor-rails epic to wire D0 discovery into harness and evidence)
+**Epic or card:** **Unknown** (future Live QA or vendor-rails epic to wire D0 discovery into harness and evidence)
 
 **Tokens (titles-only; semantics live in Glow QA Guide / Governance / HDE-Phased Epics):**
 
-`DISCOVERY_BASELINE_OK` — D0 discovery baseline satisfied (env/rails, CLI health, services & ports).
+`DISCOVERY_BASELINE_OK` — D0 discovery baseline satisfied (env and rails, CLI health, services and ports).
 
-`OPEN_RAILS_ENV_OK` — open-rails env baseline log captured for Live QA steps that require ALLOW\_NETWORK=1.
+`OPEN_RAILS_ENV_OK` — open-rails env baseline artifact captured for Live QA steps that require `ALLOW_NETWORK=1`.
 
 **Evidence / artifacts (titles/paths only):**
 
-* D0 env & rails baseline log(s):
+* D0 env and rails baseline artifact(s):
 
-  * `audit/qa/<epic>/live-qa-YYYYMMDD/D0_env_baseline.log` — open-rails env snapshot and commentary for the session.
+  * `audit/qa/<epic>/checks/<check-id>/D0_env_baseline.log`
 
-* D0 CLI health log(s):
+* D0 CLI health artifact(s):
 
-  * `audit/qa/<epic>/live-qa-YYYYMMDD/D0_cli_health.log` — CLI and pytest health checks, including exit codes and short readiness summary.
+  * `audit/qa/<epic>/checks/<check-id>/D0_cli_health.log`
 
-* D0 services & ports discovery log(s):
+* D0 services and ports discovery artifact(s):
 
-  * `audit/qa/<epic>/live-qa-YYYYMMDD/D0_services_and_ports.log` — Reader/HTTP dev harness start command and base URL/port, Railway/vendored endpoints discovered, and basic connectivity checks.
+  * `audit/qa/<epic>/checks/<check-id>/D0_services_and_ports.log`
+
+* Any required manifest or path-proof artifacts for these D0 outputs, when the Live QA Plan explicitly requires them under the designated check directory.
 
 * Evidence Index & Machine Mirror entries for these D0 logs, once governed, via the global Evidence Index discipline (front matter §0.3–§0.5; PF09 does not restate mirror schemas).
 
@@ -11315,7 +11400,7 @@ Task ID: HDE-COAG007
 
 Task name/label: EPIC025 post-close remediation (dev and ops only)
 
-Task status: Not done
+Task status: Partial
 
 Task description:
 
@@ -11452,6 +11537,10 @@ None
 Evidence / artifacts:
 
 Addenda 49-51 HDE-EPIC025 (2.51 closure decision: PF07 close-pack pair path-proof adjacency risk)
+
+addendum 10-15 bn drain 10.0.3 (2.13 PR08 HDE-EPIC026: `tools/qa/generate_epic026_close_pack.py` emits EPIC026 close-pack path-proof siblings `audit/EPIC-026_MANIFEST.json.path_proof.txt` and `audit/EPIC-026_close_report.md.path_proof.txt`)
+
+Observed scope note: this is an EPIC026-specific implementation slice; the row remains open until the adjacency rule is enforced generically for `audit/EPIC-<NNN>_close_report.md` and `audit/EPIC-<NNN>_MANIFEST.json`.
 
 ### **Subtask HDE-COAG007.4 — Root directory creation lint (new top-level directory requires ADR)**
 
