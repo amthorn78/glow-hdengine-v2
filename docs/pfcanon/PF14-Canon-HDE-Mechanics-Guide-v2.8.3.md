@@ -3,12 +3,12 @@
 ## 0.1 **Header**
 
 **Title:** PF14-Canon-HDE-Mechanics-Guide  
-**Version:** v2.7.4
+**Version:** v2.8.3
 
 **Status:** Canon  
-**Effective date:** 2026-02-09
+**Effective date:** 2026-03-07
 
-**Last Update Gate:** BN 9.8.2 Drain A49-51  
+**Last Update Gate:** BN 10.0.5 Drain A29-31  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
 ---
@@ -605,26 +605,6 @@ Provide copy/paste-ready commands (no hand-editing):
 * All PO-facing QA commands exposed by the harness MUST be fully concrete and copy/paste-ready (no \<PO: FILL\_ME\> placeholders).  
 * When commands require values that are present in tests or configs (for example, fixed VIEWER\_IDs, seeds, or candidate payloads), the harness MUST discover or construct those values programmatically by mirroring test semantics (for example, calling the same helpers that write candidate payloads) instead of asking the PO to hand-edit commands.
 
-No non-canonical helper/wrapper scripts in Live QA plans (baseline commands only):
-
-* Live QA plans MUST NOT depend on helper/wrapper scripts unless the script is explicitly canon-named by path in PF canon (titles-only).
-
-* Mechanics owns the set of repo-provided QA harness entrypoints. QA plans may reference only those entrypoints that exist (prove existence before invocation). QA plans MUST NOT mint new harness paths.
-
-* If a step needs “tooling,” it MUST be either:
-
-  * a canon-named entrypoint by explicit path (preferred), or
-
-  * a baseline command sequence that does not create a new executable script file and does not rely on opaque runners.
-
-* Plans and runbooks MUST NOT include instructions that create a new executable script (repo or temporary) and then execute it.
-
-* This does not forbid writing non-executable inputs (for example JSON fixtures) or writing evidence artifacts (logs, manifests, and close artifacts) as required by canon.
-
-* Any plan step that references a non-existent repo locus MUST be treated as a tooling gap (TOOLING\_BLOCKED), not as an instruction to improvise or synthesize missing tooling.
-
-* “Baseline commands” means: explicit shell/Python one-liners, direct invocation of canon tools, and explicit file writes for non-executable inputs and evidence artifacts, with no reliance on opaque runners.
-
 No VCS workflow content; optional non-gating repo-root sanity checks allowed (normative):
 
 * Live QA runbooks and harness steps MUST NOT instruct or discuss branches, commits, PRs, or any other VCS workflow steps. VCS workflow is handled manually by the PO.  
@@ -838,6 +818,172 @@ EPIC025 additional Live QA evidence paths observed (records-only; plan-defined):
 * checks/po-014 (referenced as deferred; expected path only until executed):
 
   * `audit/qa/hde-epic025/checks/po-014/primary.log`
+
+EPIC026 early Live QA evidence paths observed (records-only):
+
+* checks/po-000:
+
+  * `audit/qa/hde-epic026/checks/po-000/primary.log`
+
+  * `audit/qa/hde-epic026/checks/po-000/qa_step_logs_manifest.json`
+
+  * `audit/qa/hde-epic026/checks/po-000/qa_step_logs_manifest.json.path_proof.txt`
+
+  * `audit/qa/hde-epic026/checks/po-000/doc_deltas.md`
+
+  * `audit/qa/hde-epic026/checks/po-000/qa_helpers.sh`
+
+* checks/po-001:
+
+  * `audit/qa/hde-epic026/checks/po-001/primary.log`
+
+  * `audit/qa/hde-epic026/checks/po-001/pytest_stdout.log`
+
+  * `audit/qa/hde-epic026/checks/po-001/pytest_stderr.log`
+
+  * `audit/qa/hde-epic026/checks/po-001/pytest_rc.txt`
+
+* checks/po-002:
+
+  * `audit/qa/hde-epic026/checks/po-002/primary.log`
+
+  * `audit/qa/hde-epic026/checks/po-002/pytest_stdout.log`
+
+  * `audit/qa/hde-epic026/checks/po-002/pytest_stderr.log`
+
+  * `audit/qa/hde-epic026/checks/po-002/pytest_rc.txt`
+
+  * `audit/qa/hde-epic026/checks/po-002/catalog_api_compat_entry.json`
+
+* checks/po-003:
+
+  * `audit/qa/hde-epic026/checks/po-003/primary.log`
+
+  * `audit/qa/hde-epic026/checks/po-003/pytest_stdout.log`
+
+  * `audit/qa/hde-epic026/checks/po-003/pytest_stderr.log`
+
+  * `audit/qa/hde-epic026/checks/po-003/pytest_rc.txt`
+
+* checks/po-004:
+
+  * `audit/qa/hde-epic026/checks/po-004/primary.log`
+
+  * `audit/qa/hde-epic026/checks/po-004/pytest_stdout.log`
+
+  * `audit/qa/hde-epic026/checks/po-004/pytest_stderr.log`
+
+  * `audit/qa/hde-epic026/checks/po-004/pytest_rc.txt`  
+* `checks/po-005:`  
+  * `audit/qa/hde-epic026/checks/po-005/primary.log`
+
+  * `audit/qa/hde-epic026/checks/po-005/route_proof.txt`
+
+  * `audit/qa/hde-epic026/checks/po-005/pytest_stdout.log`
+
+  * `audit/qa/hde-epic026/checks/po-005/pytest_stderr.log`
+
+  * `audit/qa/hde-epic026/checks/po-005/pytest_rc.txt`  
+* `checks/po-006:`  
+  * `audit/qa/hde-epic026/checks/po-006/primary.log`
+
+  * `audit/qa/hde-epic026/checks/po-006/route_proof.txt`
+
+  * `audit/qa/hde-epic026/checks/po-006/pytest_stdout.log`
+
+  * `audit/qa/hde-epic026/checks/po-006/pytest_stderr.log`
+
+  * `audit/qa/hde-epic026/checks/po-006/pytest_rc.txt`  
+* `checks/po-007:`  
+  * `audit/qa/hde-epic026/checks/po-007/primary.log`
+
+  * `audit/qa/hde-epic026/checks/po-007/catalog_extract_dev_endpoints.json`
+
+  * `audit/qa/hde-epic026/checks/po-007/catalog_sha256_check.txt`
+
+  * `audit/qa/hde-epic026/checks/po-007/pytest_stdout.log`
+
+  * `audit/qa/hde-epic026/checks/po-007/pytest_stderr.log`
+
+  * `audit/qa/hde-epic026/checks/po-007/pytest_rc.txt`  
+* `checks/po-008:`  
+  * `audit/qa/hde-epic026/checks/po-008/primary.log`
+
+  * `audit/qa/hde-epic026/checks/po-008/cli_help.txt`
+
+  * `audit/qa/hde-epic026/checks/po-008/showcompat_help.txt`
+
+  * `audit/qa/hde-epic026/checks/po-008/reject_nonjson_stdout.log`
+
+  * `audit/qa/hde-epic026/checks/po-008/reject_nonjson_stderr.log`
+
+  * `audit/qa/hde-epic026/checks/po-008/reject_nonjson_rc.txt`
+
+  * `Conditional when valid USER_A_ID and USER_B_ID inputs are supplied for the step:`  
+    * `audit/qa/hde-epic026/checks/po-008/concat_output.json`
+
+    * `audit/qa/hde-epic026/checks/po-008/concat_output_order_check.txt`  
+* `checks/po-009 (blocked input-availability family):`  
+  * `audit/qa/hde-epic026/checks/po-009/primary.log`
+
+  * `audit/qa/hde-epic026/checks/po-009/open_rails_note.txt`  
+  * `checks/po-009 (rails verification family):`  
+    * `audit/qa/hde-epic026/checks/po-009/primary.log`
+
+    * `audit/qa/hde-epic026/checks/po-009/open_rails_ab_rc.txt`
+
+    * `audit/qa/hde-epic026/checks/po-009/open_rails_ba_rc.txt`
+
+    * `audit/qa/hde-epic026/checks/po-009/closed_rails_classification.txt`
+
+    * `audit/qa/hde-epic026/checks/po-009/open_rails_ab_canonical_json_check.txt`
+
+    * `audit/qa/hde-epic026/checks/po-009/open_rails_ba_canonical_json_check.txt`
+
+    * `audit/qa/hde-epic026/checks/po-009/abba_identity_check.txt`
+
+    * `Conditional-only when the open-rails lane cannot run due to provider or gate:`  
+      * `audit/qa/hde-epic026/checks/po-009/open_rails_note.txt`
+
+  * `audit/qa/hde-epic026/checks/po-009/po-009_input_constraint.log`
+
+EPIC026 later Live QA evidence paths observed (records-only):
+
+* `checks/po-010:`
+
+  * `audit/qa/hde-epic026/checks/po-010/primary.log`
+
+  * `audit/qa/hde-epic026/checks/po-010/showcompat_help.txt`
+
+  * `audit/qa/hde-epic026/checks/po-010/catalog_extract_dev_endpoints.json`
+
+  * `audit/qa/hde-epic026/checks/po-010/po-010_manifest.json`
+
+* `checks/po-011:`
+
+  * `audit/qa/hde-epic026/checks/po-011/primary.log`
+
+  * `audit/qa/hde-epic026/checks/po-011/canonical_json_gate_stdout.log`
+
+  * `audit/qa/hde-epic026/checks/po-011/canonical_json_gate_stderr.log`
+
+  * `audit/qa/hde-epic026/checks/po-011/canonical_json_gate_rc.txt`
+
+  * `audit/qa/hde-epic026/checks/po-011/update_evidence_index_stdout.log`
+
+  * `audit/qa/hde-epic026/checks/po-011/update_evidence_index_stderr.log`
+
+  * `audit/qa/hde-epic026/checks/po-011/update_evidence_index_rc.txt`
+
+EPIC026 step-scope and non-canonical-path posture (normative for the observed families above):
+
+* For the Step-0 family above, the check-scoped manifest pair under `audit/qa/hde-epic026/checks/po-000/` is the plan-required step artifact pair.
+
+* This does not replace any separately governed per-epic or close-pack manifest surface recorded elsewhere in this guide.
+
+* If a legacy root-level pair also exists under `audit/qa/hde-epic026/qa_step_logs_manifest.json` and `audit/qa/hde-epic026/qa_step_logs_manifest.json.path_proof.txt`, treat that pair as legacy traceability for the Step-0 family unless the owning QA canon explicitly binds it as the authoritative surface for the step in question.
+
+* Earlier-attempt or appendix artifacts under `artifacts/hde-epic026/checks/**` are non-canonical for these Live QA step families and MUST NOT replace the canonical audit/qa paths above.
 
 Maintain per-epic step logs manifest (current-state):
 
@@ -1952,6 +2098,12 @@ Catalog entry minimum fields (titles-only; schema owned elsewhere). Each entry i
 
 * env\_gate — for entries where reachability is env-gated (titles-only; exact gating semantics are routed to Governance/Infrastructure)
 
+Route identifiers in the endpoint catalog (required). Where an endpoint has a stable route identifier (including dev-harness writer endpoints), the corresponding docs/ENDPOINTS\_CATALOG.json entry MUST include route\_id.
+
+* /dev/writer/conjunction MUST be present in the catalog as a dev\_harness endpoint with route\_id \= dev.writer.conjunction.v1.
+
+Tests (required). tests/http/test\_endpoint\_catalog.py MUST enforce that writer-path entries include their expected route\_id values.
+
 Field-level schema and validation for this catalog are owned by HDE-Schemas & Artifacts (titles-only). This guide defines the mechanical requirement that the catalog exists, is complete, and is used as the single inventory source.
 
 A7 invariants to prove (titles-only; for a7\_eligible=true entries only):
@@ -1967,6 +2119,22 @@ Catalog files (single home):
 * docs/ENDPOINTS\_CATALOG.json (canonical JSON; one LF) — machine-readable endpoint inventory with mandatory classification and A7 eligibility flags  
 * docs/ENDPOINTS\_CATALOG.json.sha256 — sidecar hash of the canonical bytes; MUST reference docs/ENDPOINTS\_CATALOG.json for `sha256sum -c docs/ENDPOINTS_CATALOG.json.sha256` verification from repo root  
 * artifacts/audit/ENDPOINTS\_CATALOG.json — governed audit snapshot of the catalog (generated; not a second home); MUST be byte-identical to docs/ENDPOINTS\_CATALOG.json
+
+Endpoint catalog updates for dev conjunction preview endpoints (required). The dev conjunction preview endpoints (/dev/reader/conjunction and /dev/sampler/conjunction) MUST be registered in docs/ENDPOINTS\_CATALOG.json as dev\_harness endpoints, and MUST be marked as not A7-eligible.
+
+Integrity sidecars (required). Any change to docs/ENDPOINTS\_CATALOG.json bytes MUST be accompanied by regeneration of the integrity artifacts for the catalog in the same change-set:
+
+* docs/ENDPOINTS\_CATALOG.json.sha256
+
+* docs/ENDPOINTS\_CATALOG.json.path\_proof.txt
+
+* docs/ENDPOINTS\_CATALOG.json.sha256.path\_proof.txt
+
+* artifacts/audit/ENDPOINTS\_CATALOG.json (byte-identical mirror)
+
+* artifacts/audit/ENDPOINTS\_CATALOG.json.sha256
+
+Do not hand-edit checksums or path\_proof transcripts. Regenerate them via the approved integrity tooling so they match the updated catalog bytes.
 
 Proof artifacts (headers-only; one LF each; for A7-eligible entries):
 
@@ -2043,6 +2211,34 @@ Routing (titles-only):
 
 * Domains, catalogs, canonical JSON rules: HDE-Schemas & Artifacts
 
+Dev conjunction preview endpoints (dev harness only).
+
+Routes (GET; dev harness):
+
+* /dev/reader/conjunction
+
+* /dev/sampler/conjunction
+
+Gate (required). These endpoints MUST only be enabled when APP\_ENV is one of dev, test, or local, and they MUST be protected by the shared dev-admin gate.
+
+Behavior (required).
+
+* The endpoints MUST compute conjunction via the same resolved conjunction surface used by compat (conjunction\_public\_resolved), so that preview behavior matches the compat computation path.
+
+* The endpoints MUST pass a rails environment derived from SAFE rails env vars (SAFE\_MODE and ALLOW\_NETWORK) into the conjunction resolution surface.
+
+* When rails are closed and resolution would require network I/O, the endpoints MUST refuse (writer-style) and MUST not emit partial conjunction results.
+
+* On success, the endpoints MUST emit canonical JSON using the standard emitter and MUST include a trailing newline.
+
+Tests (required). tests/http/test\_dev\_conjunction\_endpoints.py MUST cover:
+
+* 403 when APP\_ENV is outside the allow-list or when the dev-admin gate fails.
+
+* 503 when rails are closed and resolution would require network I/O.
+
+* 200 when rails are open and conjunction can be computed.
+
 ## **9.3 Compat (pair; internal/admin) \[Implemented (dev/admin)\]**
 
 Route. POST /api/compat/v1 (pair) — internal/admin surface (not public).
@@ -2056,6 +2252,24 @@ Input validation (POST; required). The compat handler MUST validate the provided
 CORS disabled on dev harness.
 
 Ownership (titles-only). Production transport matrices and public payload bytes are owned by HDE-CLI-API-Vendor Ref / HDE-Governance. Mechanics enforces wiring/determinism (single emitter, canonical JSON, AB↔BA/two-run) and does not duplicate public schemas or bytes.
+
+Conjunction compute contract (internal; required). The engine MUST provide an internal conjunction computation surface (conjunction\_public) that produces a deterministic JSON envelope suitable for canonical emission.
+
+* Canonicalization: conjunction\_public output MUST be emitted using the existing compat canonical JSON emitter path, not ad hoc JSON formatting.
+
+* Determinism: repeated invocations over the same resolved inputs MUST yield byte-identical canonical JSON output.
+
+* Pair normalization: the computation MUST normalize pair ordering so AB and BA inputs produce byte-identical canonical output after emission (AB↔BA identity).
+
+* No new public transport: this is an internal surface. It does not introduce a new public endpoint or new public byte contract.
+
+Contract tests (required). tests/http/test\_compat\_endpoint\_contract.py MUST include a conjunction contract test that asserts:
+
+* Same inputs, same bytes across two runs.
+
+* Swapped-order inputs produce the same bytes (AB↔BA identity).
+
+* The emitted bytes include a trailing newline (canonical JSON emission discipline).
 
 ## **9.4 Internal ops: /internal/version (ops-only) \[Required-Now\]**
 
@@ -2190,6 +2404,30 @@ Routing (titles-only):
 * Error shapes & public bytes: PF-Canon-HDE-CLI-API-Vendor-Ref.
 
 * Schemas & canonical JSON: PF-Canon-HDE-Schemas & Artifacts.
+
+Dev writer conjunction endpoint (dev harness only).
+
+Route (GET; dev harness): /dev/writer/conjunction
+
+Gate (required). This endpoint MUST only be enabled when APP\_ENV is one of dev, test, or local, and it MUST be protected by the shared dev-admin gate.
+
+Behavior (required).
+
+* The endpoint MUST compute conjunction via the resolved conjunction surface (conjunction\_public\_resolved).
+
+* Pass-through on non-200: if the conjunction computation returns a non-200 response, the endpoint MUST return that response as-is, without wrapping it in a writer envelope.
+
+* Writer envelope on success: if conjunction computation returns 200, the endpoint MUST wrap the conjunction result into a writer envelope with ok: true and writer metadata (including hash and route\_id).
+
+* Route id constant: the writer metadata MUST include writer.route\_id \= dev.writer.conjunction.v1.
+
+* Idempotence (required). The endpoint MUST build a request preimage using stable key ordering before hashing, so identical inputs yield the same writer hash across invocations.
+
+Tests (required).
+
+* tests/http/test\_dev\_conjunction\_http.py MUST cover /dev/writer/conjunction and include an idempotence check comparing repeated identical requests.
+
+* tests/http/test\_endpoint\_catalog.py MUST assert that /dev/writer/conjunction and route\_id dev.writer.conjunction.v1 are present in the endpoint catalog.
 
 # 11\) Input Normalization & Validation Layer
 
@@ -2849,6 +3087,28 @@ Additional commands (for example, read singlebg, list people, bg:resolve, and di
 * Viewer prefs. \--viewer-prefs-file / \--prefs flags must carry the closed 10-key weight map with top\_category ∈ Magic-10 and weights for all ten Magic-10 categories (see HDE-Math-Spec §2.2/§5.x). PF05 owns the exact CLI flag shapes.
 
 * Rails. CLI runs under SAFE rails by default and must not open vendor rails on its own. Any command that can reach vendor or external HTTP must honor the rails and override semantics defined in PF04/PF07/PF05 (§7.1/§7.3 here, and the rails sections in Governance/Infrastructure).
+
+### **17.4.1 showcompat conjunction mode (mechanics only)**
+
+PF05 owns the exact flag spellings, accepted payload shapes, and CLI bytes for conjunction mode. PF14 records the mechanics requirements for the conjunction execution branch only.
+
+* `hdctl showcompat` MUST provide a conjunction branch that delegates to the resolved conjunction surface (`conjunction_public_resolved`) rather than introducing a parallel compute path.
+
+* The conjunction branch MUST accept exactly one complete conjunction input family per invocation, using the existing showcompat input families routed by PF05. Mixed, incomplete, or mutually incompatible conjunction inputs MUST fail deterministically on the normal CLI failure path, with non-zero exit, stderr-only failure output, and empty stdout.
+
+* Before emission, the conjunction branch MUST canonicalize pair ordering so equivalent A/B and B/A inputs produce byte-identical success output under the determinism pins in this guide.
+
+* When required local BodyGraph inputs are missing, the conjunction branch MUST honor SAFE rails. Closed rails MUST refuse deterministically, without network I/O and without partial conjunction output. Open rails MAY resolve through the existing resolver path under the policy owned by HDE-Governance and HDE-CLI-API-Vendor-Ref.
+
+* Source-resolution and payload-normalization failures in the conjunction branch MUST surface as deterministic typed CLI failure classes via the standard CLI error path. The conjunction branch MUST NOT leak unexpected exceptions or configuration-specific stderr.
+
+* On success, the conjunction branch MUST emit canonical JSON through the shared presenter/emitter, with exactly one trailing LF and no stderr bytes.
+
+Required tests.
+
+* `tests/cli/test_cli_canonical_bytes.py` MUST cover conjunction-mode canonical stdout emission and deterministic closed-rails refusal when local inputs are missing.
+
+* `tests/cli/test_showcompat_sources.py` MUST cover deterministic conjunction-mode failure surfacing for DB/query and invalid-payload classes.
 
 ## **17.5 Installability & entrypoints**
 
@@ -3752,6 +4012,34 @@ Refuse outbound/vendor work unless explicitly enabled. Provide open/close hooks 
 * Evidence. Posture check log (rails closed) and at least one refusal fixture (typed, numeric-free).
 
 * Policy, SAFE-rails tokens, and vendor transport matrices remain single-homed in HDE-Governance and HDE-CLI-API-Vendor-Ref (titles-only).
+
+Conjunction resolution surfaces (SAFE rails; required). A higher-level conjunction surface (conjunction\_public\_resolved) MAY accept unresolved inputs and MUST resolve them to person\_uid-bearing records before delegating to conjunction\_public.
+
+Resolution and rails rules:
+
+* Local-first: if an input can be satisfied from local lookup, it MUST be used without network I/O.
+
+* Open acquisition: if local lookup misses and SAFE rails are explicitly open, the surface MAY acquire via resolver (resolve\_db\_user\_id and resolve\_bodygraph) and MUST treat that acquisition as a controlled exception.
+
+* Close-back: after any open acquisition step, the surface MUST re-check local lookup and proceed under closed posture for subsequent steps.
+
+* Default closed: if the provided rails environment is missing or empty, the surface MUST behave as if rails are closed.
+
+* Explicit open: rails MUST only be considered open when an explicit rails environment indicates SAFE\_MODE=0 and ALLOW\_NETWORK=1.
+
+Cache normalization rule (bug-class prevention; required). Local lookup can return a vendor-shaped record that lacks person\_uid. If a user\_id hint is available for that record, the surface MUST normalize the record into the resolved shape instead of raising. If no hint is available, the surface MUST return a deterministic refusal response rather than crashing.
+
+Tests (required). The conjunction\_public\_resolved contract tests MUST cover:
+
+* Rails closed refusal when resolution would require network I/O.
+
+* Rails open acquisition success.
+
+* Close-back behavior after open acquisition.
+
+* rails\_env missing or empty defaults to closed.
+
+* Vendor-shaped local cache hit normalization with a user\_id hint.
 
 # 23\) Rate Limit and Backoff Component (429)
 
@@ -4892,6 +5180,67 @@ EPIC024 close-pack validation check (D16) primary log (records-only):
 
 * audit/qa/hde-epic024/checks/D16\_close\_pack/primary.log
 
+EPIC026 close-pack generator (fixed outputs):
+
+* tools/qa/generate\_epic026\_close\_pack.py
+
+Generated close-pack outputs (records-only where applicable):
+
+* audit/EPIC-026\_MANIFEST.json
+
+* audit/EPIC-026\_MANIFEST.json.path\_proof.txt
+
+* audit/EPIC-026\_close\_report.md
+
+* audit/EPIC-026\_close\_report.md.path\_proof.txt
+
+* audit/docdeltas/hde-epic026\_doc\_deltas.md  
+* audit/EPIC-026\_close\_report.md.path\_proof.txt
+
+* audit/EPIC-026\_close\_pack.md
+
+* audit/docdeltas/hde-epic026\_doc\_deltas.md
+
+* audit/docdeltas/hde-epic026\_drain\_targets.md
+
+* audit/qa/hde-epic026/00\_meta/doc\_deltas.md
+
+* audit/qa/hde-epic026/qa\_step\_logs\_manifest.json
+
+* audit/qa/hde-epic026/qa\_step\_logs\_manifest.json.path\_proof.txt
+
+Generator posture (normative):
+
+* The generator MUST run under closed rails for governed close-pack regeneration:
+
+  * SAFE\_MODE \= 1
+
+  * ALLOW\_NETWORK \= 0
+
+* The generator MUST regenerate the governed close-pack artifacts above as tool-produced outputs. Do not hand-edit the generated manifest, close report, doc-delta ledger outputs, or companion path-proof transcripts.
+
+* Where the close-pack enumerates named output bindings, close-pack validation MUST validate named bindings and exact path values rather than list membership.
+
+EPIC026 close-pack validation check (po-012) observed step outputs (records-only):
+
+* `audit/qa/hde-epic026/checks/po-012/primary.log`
+
+* `audit/qa/hde-epic026/checks/po-012/generator_stdout.log`
+
+* `audit/qa/hde-epic026/checks/po-012/generator_stderr.log`
+
+* `audit/qa/hde-epic026/checks/po-012/generator_rc.txt`
+
+* `audit/qa/hde-epic026/checks/po-012/close_pack_copy/epic-026_manifest.json`
+
+* `audit/qa/hde-epic026/checks/po-012/close_pack_copy/epic-026_evidence_index.json`
+
+* `audit/qa/hde-epic026/checks/po-012/close_pack_copy/endpoints_catalog.json`
+
+* `audit/qa/hde-epic026/checks/po-012/close_pack_copy/endpoints_catalog.json.sha256`
+
+Validation posture (records-only). This check uses step-scoped stdout, stderr, and rc captures to verify the close-pack generator entrypoint `python tools/qa/generate_epic026_close_pack.py`. The `close_pack_copy/` family is a validation copy set and does not replace the governed close-pack outputs listed above.
+
 ## **37.4 Machine Mirror (records-only)**
 
 Every artifact listed in this registry MUST have a 1:1 record in artifacts/evidence\_index.jsonl.
@@ -4939,6 +5288,30 @@ Discipline:
 * Update the Human Index and Machine Mirror in the same commit/PR.
 
 Acceptance (routing only). Acceptance token naming and semantics are owned by HDE-Governance (titles-only). This guide does not list token names. CI must enforce machine mirror canonical JSONL discipline, unknown-key rejection, fixed field set/order as defined by the mirror schema, and strict 1:1 parity with the Human Evidence Index, with path-proofs required.
+
+### **37.4.1 CLI help and argument-policing captures for conjunction-mode evidence**
+
+When a governed review, QA step, or docs-evidence update depends on the shipped CLI syntax or CLI rejection behavior for conjunction flows, governed capture artifacts MUST be recorded for:
+
+* `hdctl --help`
+
+* `hdctl showcompat --help`
+
+* any intentionally rejected unsupported conjunction-modifier invocation exercised by the step
+
+The capture family MUST:
+
+* record the exact command invoked
+
+* capture stdout, stderr, and exit code as produced by the command
+
+* live under a governed repo path
+
+* be listed in the Human Index and mirrored 1:1 in the Machine Mirror with a co-located path-proof
+
+* be refreshed in the same PR whenever the shipped help text, accepted conjunction modifiers, or CLI rejection behavior changes
+
+Help captures are evidence of the shipped CLI help surfaces only. Rejection captures are evidence of CLI argument-policing behavior only. PF05 remains the single home for CLI contract bytes, flag semantics, and exit-code mappings.
 
 ## **37.5 Required captures — Reader success catalog & A7 proofs**
 
@@ -5144,6 +5517,28 @@ stdout.json.sha256 is the canonical checksum sidecar name (JSON-filename-qualifi
 
 These showcompat capture artifacts are deterministic fixtures used to prove stdout canonical bytes (single trailing LF, stderr empty on success) and to support acceptance artifact binding hygiene. They are not release identity proofs; release identity remains governed by the pack manifest and the /internal/version evidence surfaces.
 
+### **37.7.1 Conjunction CLI governed artifacts**
+
+Conjunction CLI artifacts (required). When conjunction-mode CLI evidence is captured, the governed artifact family includes:
+
+* `artifacts/audit/cli/pair.json`
+
+* `artifacts/audit/cli/pair_ba.json`
+
+* `artifacts/audit/cli/showcompat_ab.json`
+
+* `artifacts/audit/cli/showcompat_ba.json`
+
+* `artifacts/cli/abba_sidecar.json`
+
+* `artifacts/cli/out.json`
+
+* `artifacts/cli/out_ba.json`
+
+Path-proofs (normative). Each artifact above MUST have a co-located `.path_proof.txt` transcript and MUST be listed in the Human Evidence Index and mirrored 1:1 in `artifacts/evidence_index.jsonl` in the same PR as any byte change.
+
+Canonical JSON gate coverage (normative). `tools/evidence/run_canonical_json_gate.py` MUST include the conjunction CLI artifact family above in its checked target set whenever those artifacts are part of the governed evidence surface for the PR. Any change to that checked target set MUST refresh the canonical JSON gate outputs under `audit/gates/json_gate/canonical/` and the corresponding `.path_proof.txt` transcripts in the same PR.
+
 EPIC024 showcompat artifacts capture (D03) fixed outputs (records-only):
 
 * `python tools/evidence/run_showcompat_artifacts.py` (command entrypoint)
@@ -5188,7 +5583,15 @@ Path proofs (normative). Each artifact above MUST have a co-located .path\_proof
 
 No alternate filenames (normative). Future plans MUST validate these canonical surfaces and MUST NOT invent wrapper bundles or alternate filenames for canonical JSON gate evidence.
 
-Legacy naming (non-authoritative). audit/gates/canonical\_json/\*\* is legacy naming and MUST NOT be introduced or required by future plans unless canon explicitly reinstates it (via PF12). A compatibility-only legacy policy report may exist at audit/gates/canonical\_json/json\_canonical\_check.log, but plans, indexing, and close-pack checks MUST bind to audit/gates/json\_gate/canonical/.
+Legacy compatibility surfaces (non-authoritative). Until the migration away from audit/gates/canonical\_json/ is complete, the following compatibility-only legacy artifacts MAY continue to be emitted from the same canonical JSON gate run:
+
+* audit/gates/canonical\_json/canonical\_json.gate.json
+
+* audit/gates/canonical\_json/json\_canon\_compare.log
+
+* audit/gates/canonical\_json/json\_canonical\_check.log
+
+If these legacy artifacts are emitted, each MUST have a co-located .path\_proof.txt transcript and MAY remain indexed/mirrored as compatibility-only outputs during migration. Plans, acceptance binding, and close-pack checks MUST continue to bind to audit/gates/json\_gate/canonical/ as the canonical surface, and the legacy family MUST NOT be treated as permission to invent additional legacy filenames.
 
 ### 37.9.1 Arrays-as-sets check (EPIC024)
 

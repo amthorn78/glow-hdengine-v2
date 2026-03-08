@@ -3,12 +3,12 @@
 ## 0.1 Header
 
  **Title:** PF04-Canon-HDE-Governance  
- **Version:** v2.0.3
+ **Version:** v2.1.1
 
 **Status:** Canon  
-**Effective date:** 2026-02-09
+**Effective date:** 2026-03-06
 
-**Last Update Gate:** BN 9.8.2 Drain A49-51
+**Last Update Gate:** BN 10.0.5 A32-33
 
 **Invocation tag:** `INV-f2ac55d77ce9aacc`
 
@@ -517,7 +517,22 @@ Any deviation is a mechanical blocker. The binding must be corrected, not interp
   * resolving the path against the repo root MUST NOT escape the root (out-of-root resolved paths are rejected),  
   * the validator runs under the closed-rails determinism env tuple (SAFE\_MODE=1, ALLOW\_NETWORK=0, LC\_ALL=C, LANG=C, TZ=UTC); missing pins are a validation failure.  
   * Human↔machine parity remains 1:1, and each governed record remains coupled to a co-located path-proof transcript (see `EVIDENCE_PATH_PROOFS_OK`). (Owned: Governance; Evidence & Artifacts)  
-* **EVIDENCE\_PATH\_PROOFS\_OK** — For every governed artifact indexed in the machine mirror, a co-located path-proof file exists and validates: each mirror record’s `proof_anchor` resolves to a `*.path_proof.txt` stored alongside the artifact, and the proof’s contents (path, size, sha256, timestamps and any required orientation metadata) match the indexed artifact’s canonical bytes. Missing, mismatched, or stale path-proofs **fail CI**. (Owned: Evidence & Artifacts; Governance)
+* **CANONICAL\_JSON\_GATE\_UPDATED\_OK —** The canonical JSON gate coverage has been updated when the governed JSON surface changes. At minimum: the gate’s canonical outputs under `audit/gates/json_gate/canonical/` are refreshed to reflect the current checked target set, and any legacy-named summary outputs under `audit/gates/canonical_json/` that are still produced are also refreshed. (Owned: Governance; Evidence & Artifacts)
+
+* **CANONICAL\_JSON\_GATE\_PASSED\_OK —** The canonical JSON gate run passes for the current build, producing the canonical outputs under `audit/gates/json_gate/canonical/` and recording pass status for each checked target in the gate logs and structured record. (Owned: Governance; Evidence & Artifacts)  
+* **EVIDENCE\_PATH\_PROOFS\_OK** — For every governed artifact indexed in the machine mirror, a co-located path-proof file exists and validates: each mirror record’s `proof_anchor` resolves to a `*.path_proof.txt` stored alongside the artifact, and the proof’s structured fields match the indexed artifact’s canonical bytes.  
+  * Minimum required fields in each `.path_proof.txt`:  
+    * `path` (repo-relative path to the artifact)
+
+    * `size_bytes` (byte length)
+
+    * `sha256` (hex digest of artifact bytes)
+
+    * `mtime_utc` (artifact mtime in UTC)
+
+    * `produced_at_utc` (proof capture time in UTC)  
+  * Additional fields MAY appear when required for provenance (for example orientation metadata), but MUST be deterministic and MUST NOT contradict the required fields.  
+  * Missing, mismatched, or stale path-proofs **fail CI**. (Owned: Evidence & Artifacts; Governance)
 
 * **`CI_CHECK_FINAL_LF_OK`** — All governed evidence artifacts and mirror lines are LF-terminated (exactly one trailing LF). The canonical gate wrapper is `tools/evidence/check_lf_endings.py`, which MUST run `ci/checks/check_final_lf.sh` under the closed-rails determinism env tuple (SAFE\_MODE=1, ALLOW\_NETWORK=0, LC\_ALL=C, LANG=C, TZ=UTC) and exit non-zero on the first violation. Operator and acceptance artifacts MUST invoke it either:  
   * as direct execution: `tools/evidence/check_lf_endings.py`, or as an explicit interpreter invocation: `python tools/evidence/check_lf_endings.py`. (Owned: Evidence & Artifacts; Build Notes)  
@@ -895,6 +910,7 @@ Plans and implementations MUST NOT introduce parallel alternate spellings for th
 
     * for each required Live QA check, the work MUST write a primary step log at `audit/qa/<epic-id>/checks/<check_id>/primary.log` (one primary log per check).  
     * the work MUST maintain a step-logs manifest at `audit/qa/<epic-id>/qa_step_logs_manifest.json` that lists each check id, its status, and the path to its primary step log. This file is **current-state** (not per-run history).  
+    * if the epic is not claiming \*\*QA\_LIVE\_QA\_RUN\_OK\*\*, the manifest MAY set \`checks: \[\]\` to explicitly declare that no Live QA checks are being claimed. When \*\*QA\_LIVE\_QA\_RUN\_OK\*\* is claimed, \`checks\` MUST enumerate the required Live QA checks and MUST NOT be empty.    
     * the step-logs manifest MUST have a co-located path-proof transcript: `audit/qa/<epic-id>/qa_step_logs_manifest.json.path_proof.txt`. The path-proof MUST record at minimum the manifest’s `path`, `size_bytes`, and `sha256`, and MUST match the current-state manifest bytes.  
     * nothing else is auto-required unless Governance explicitly pins a governed evidence family/path for the epic.
 
@@ -1094,26 +1110,54 @@ Ownership: Governance (classification semantics at policy level); **Glow QA Guid
   * the epic’s token/evidence matrix row links that log (and any required Index/mirror entries) to this token.
 
 * Ownership: Governance (token semantics); **Glow QA Guide** (procedure/log shape); **HDE-Schemas & Artifacts** (index/mirror mapping); **HDE-Build Checklist** (phase consumption).  
----
+* Close-pack baseline artifacts (non-token; deterministic path-of-record). Close-pack presence is a baseline closure artifact requirement, not an acceptance token by default.  
+  * Path-of-record (normative):  
+    * `audit/EPIC-###_close_report.md`
 
-* **Close-pack baseline artifacts (non-token; deterministic path-of-record).**  
-   Close-pack presence is a baseline closure artifact requirement, not an acceptance token by default.  
-  * **Path-of-record (normative):**  
-    * `audit/EPIC-###_close_report.md`  
     * `audit/EPIC-###_MANIFEST.json`  
        (Where `###` is the zero-padded 3-digit epic number.)  
-* **Close report minimal content (normative):** `audit/EPIC-###_close_report.md` MUST be a human-readable closure summary and MUST include:  
-  * a brief delivered-work summary (what shipped in the epic),  
-  * an explicit deferrals list (including deferred item IDs when available),  
-  * a pointer to the close-pack manifest `key_outputs` bindings in `audit/EPIC-###_MANIFEST.json` (so reviewers can locate the canonical evidence quickly).  
-* **Close-pack manifest `key_outputs` shape (normative):**  
-  * `audit/EPIC-###_MANIFEST.json` MUST include `key_outputs` as a JSON object (map) from stable names → repo-relative artifact paths.  
-  * `key_outputs` MUST NOT be a list.  
-  * Additional `key_outputs` entries are allowed.  
-  * All `key_outputs` entries MUST resolve to existing, non-empty files at closure time (no dangling references). Missing or dangling `key_outputs` targets are closure-blocking.  
-  * **No tokenization by default.** Plans, acceptance maps, token/evidence matrices, and step logs MUST NOT mint, claim, or require a `CLOSE_PACK_FILES_PRESENT_OK` token (or any similar close-pack presence token) unless Governance explicitly registers it as a token in §2.0 (which this drain explicitly does not do).  
-  * **No relocation.** Do not relocate the close-pack pair into `audit/qa/**` or `artifacts/**` without an explicit canon change. Any extra copies elsewhere are convenience-only and MUST NOT be used for acceptance binding.  
-  * **Verification posture.** Close-pack presence is verified mechanically by artifact existence \+ binding to the canonical filenames (see Appendix D.0) and by the closeout review process (titles-only).
+  * **Closeout companion ledgers (recommended; may declare `None`).** When the epic closeout produces doc-delta and doc-drain planning ledgers, they SHOULD live under `audit/docdeltas/` using epic-scoped filenames, for example:  
+    * `audit/docdeltas/<epic-id>_doc_deltas.md`
+
+    * `audit/docdeltas/<epic-id>_drain_targets.md`  
+  * **Close report minimal content (normative).** `audit/EPIC-###_close_report.md` MUST be a human-readable closure summary and MUST include:  
+    * a brief delivered-work summary (what shipped in the epic),
+
+    * an explicit deferrals list (including deferred item IDs when available),
+
+    * a pointer to the close-pack manifest `key_outputs` bindings in `audit/EPIC-###_MANIFEST.json`,
+
+    * pointers to any closeout companion ledgers used for the epic (including their canonical paths under `audit/docdeltas/`),
+
+    * explicit “canon pointer” fields when closing TI-002 (or other TI items) as satisfied in the closeout, including:  
+      * a `PF09 pointers:` line listing the relevant PF09 pointer IDs,
+
+      * a `TI-002 pointers:` line listing the canon pointers used to evidence TI-002 (or a `TI-<id> pointers:` line for other TI items), and
+
+      * an `ADR status line:` line identifying the ADR governing the TI claim,  
+    * **Coverage vs QA Plan accounting (required when the epic has a Live QA Plan or claims `QA_LIVE_QA_RUN_OK`).** The closeout record MUST include an explicit, step-by-step, complete, and auditable coverage ledger. It MUST list every planned QA step in plan order with a stable step identifier, a coverage status (`PASS`, `FAIL`, `BLOCKED`, or `NOT_RUN`), and the closeout impact for that step,
+
+    * **Step evidence rule for closeout.** For any step recorded as `PASS`, the closeout record MUST point to at least one step-scoped evidence artifact under the governed QA root for that exact step, or to an explicitly equivalent step-scoped evidence pointer line preserved in the epic’s primary QA record. Heading-only or summary-only PASS statements are insufficient,
+
+    * **Token/evidence matrix pointer (required when in-scope QA tokens exist).** The closeout record MUST point to the epic’s token/evidence matrix artifact and MUST identify any in-scope QA token rows that remain blocked, incomplete, or not applicable.  
+  * Close-pack manifest `key_outputs` shape (normative):  
+    * `audit/EPIC-###_MANIFEST.json` MUST include `key_outputs` as a JSON object (map) from stable names → repo-relative artifact paths.
+
+    * `key_outputs` MUST NOT be a list.
+
+    * Additional `key_outputs` entries are allowed.
+
+    * All `key_outputs` entries MUST resolve to existing, non-empty files at closure time (no dangling references). Missing or dangling `key_outputs` targets are closure-blocking.
+
+    * When closeout companion ledgers exist under `audit/docdeltas/`, the close-pack SHOULD make them discoverable via either (a) `key_outputs` bindings or (b) explicit close-report pointers to their canonical paths.
+
+    * **Structural self-check (recommended).** The repo SHOULD maintain an automated guard (test or checklist input) that asserts the close-pack path-of-record exists and that every referenced `key_outputs` path resolves to a non-empty file, to catch partial applies or missing hunks before closeout.
+
+    * **No tokenization by default.** Plans, acceptance maps, token/evidence matrices, and step logs MUST NOT mint, claim, or require a `CLOSE_PACK_FILES_PRESENT_OK` token (or any similar close-pack presence token) unless Governance explicitly registers it as a token in §2.0 (which this drain explicitly does not do).
+
+    * **No relocation.** Do not relocate the close-pack pair into `audit/qa/**` or `artifacts/**` without an explicit canon change. Any extra copies elsewhere are convenience-only and MUST NOT be used for acceptance binding.
+
+    * **Verification posture.** Close-pack presence is verified mechanically by artifact existence \+ binding to the canonical filenames (see Appendix D.0) and by the closeout review process (titles-only).
 
 ---
 
@@ -2593,8 +2637,18 @@ Plan acceptance is a governance act. It must not thrash on low-signal edits, and
 
 * **Token value and budget discipline.** Plans should use only meaningful acceptance tokens. Do not add tokens "just in case."
 
-* **QA planning is post-implementation.** Stage A plans should not attempt to specify the entire QA script. They should specify what must be proven (tokens), and which evidence artifacts will be generated, with pointers to playbooks where relevant.
+* **QA planning is post-implementation.** Stage A plans should not attempt to specify the entire QA script. They should specify what must be proven (tokens), and which evidence artifacts will be generated, with pointers to playbooks where relevant.  
+* **Implementation planning must not require extensive QA evidence.** Epic Implementation Plans and Implementation Guides MUST NOT require the production of extensive QA evidence artifacts. These planning artifacts MAY state QA objectives and closeout proof obligations, but they MUST NOT embed a full QA runbook or require that QA evidence be generated as part of implementation planning.
 
+* **QA planning is separate.** QA planning and QA evidence production are owned by the Live QA Plan and QA execution artifacts. The Live QA Plan is where step intents, evidence expectations, and PASS/FAIL posture are specified and where governed QA evidence is produced and indexed.
+
+* **Ops tasks are not QA tasks.** Ops tasks are implementation tasks that change the runtime environment and cannot be performed by code changes alone (for example: service configuration, environment variable changes, secrets management, privileged infrastructure actions). Ops tasks MUST be tracked and evidenced as implementation work, not as QA work.  
+  * Ops task completion evidence may be required for a feature to function, but it does not satisfy QA verification. QA verification still requires functional proof and the required QA evidence outputs defined in QA planning.  
+* **Separation rule (no category mixing).** Planning artifacts MUST keep these categories distinct:  
+  * Implementation work and deliverables (code and implementation changes)  
+  * Ops tasks (environment changes)  
+  * QA planning (verification plan and evidence posture)  
+  * QA execution (functional runs and governed QA evidence)  
 * **No hidden acceptance.** Plans must not embed ungoverned acceptance claims in prose. All acceptance claims must be surfaced as tokens.
 
 * **No scope laundering.** Plans must not offload difficult decisions to "implementation" while still claiming Stage B acceptance closure.
@@ -2603,11 +2657,41 @@ Plan acceptance is a governance act. It must not thrash on low-signal edits, and
 
 * **No "proof by intent."** Plans must not treat "we will test" or "we will validate" as evidence. Plans must name evidence artifacts and where they will live.
 
+* **Template adherence is structural only.** For all planning artifacts that use PF templates (including Epic Plans and QA Plans), reviewers MUST evaluate template adherence only for structural completeness: required sections present, required end marker present, and required gates present. Header styling is not part of structural adherence.  
+  * Header formatting is a Nit. Reviewers MUST NOT request redlines that only change heading levels, add or remove bold or italics in headings, or reformat headings for aesthetic alignment.  
+  * Header formatting is a Nit. Reviewers MUST NOT request redlines that only change heading levels, add or remove bold or italics in headings, or reformat headings for aesthetic alignment.  
+  * This rule does not relax structural requirements, existence-claim citation rules, canon-precedence rules, or QA and evidence obligations. Missing required sections, missing required end markers, missing required canonical pointers where required (including required HDE Build Checklist and HDE Mechanics Guide pointers), invalid non-PF references, or ungrounded existence claims remain valid blockers under the normal gates.  
+  * **Business Case section required (Epic Plans).** Epic Plans MUST include a Business Case section that states the product goal and justification in product terms.  
+    * Minimum required contents (all MUST be present):  
+      * Product goal: what ships.
+
+      * Why this work exists: the user pain or opportunity it addresses.
+
+      * Who benefits: the target users and scope.
+
+      * What changes if it ships: concrete user-level outcome.
+
+      * Why now: timing justification.
+
+      * If not done: expected consequence or risk.
+
+      * Non-goals: what will not be done in this epic.  
+    * Content constraints:  
+      * The Business Case MUST be written in overall Glow product terms. It MUST NOT be replaced by a restatement of implementation tasks, tickets, file-level diffs, or subsystem-only justification.
+
+      * The Business Case is not a marketing pitch or ROI report; it SHOULD remain practical and falsifiable.  
+    * Review posture:  
+      * If the Business Case section is missing, empty, or placeholder-only (for example "TBD" or "N/A"), reviewers MUST return the plan for revision and MUST NOT approve it.  
 * **Non-blocking presentation variance (including heading levels).** During planning review, presentation-only differences MUST NOT be treated as blockers to plan approval. Reviewers MAY request these as non-blocking "Nits" only.
 
-  * Examples (non-blocking): bullet marker choice, whitespace-only changes, italics or bold emphasis, section ordering that preserves meaning, Markdown heading levels.
+  * Examples (non-blocking): bullet marker choice (hyphen vs asterisk), escaped Markdown list markers (for example a leading \* that renders as a bullet), backslashes inserted only for Markdown rendering or escaping, cosmetic whitespace differences (blank lines, indentation, alignment), bold or italic marker differences that do not change the underlying words, section ordering that preserves meaning, and Markdown heading levels.
 
-* **Formatting exceptions (still blocking).** This non-blocking posture does not apply to formatting or text that changes meaning, breaks execution, prevents verification, or violates prohibited-character rules (see §9.7.4).
+* **Formatting exceptions (still blocking).** This non-blocking posture does not apply to formatting or text that changes meaning, breaks execution, prevents verification, violates prohibited-character rules (see §9.7.4), or affects any of the following:  
+  * Commands or code that must run as written.  
+  * Evidence outputs, filenames, or required lowercase ASCII paths.  
+  * Portability rules (for example references to external attachments).  
+  * Quoted-carryover blocks that must be verbatim (for example “IG Approved” or “CA vetted” quote lines).  
+  * Any statement of obligation (MUST/SHOULD) or acceptance posture.
 
 * **Evidence-bound QA steps (Live QA Plans).** Every required acceptance token MUST have at least one explicit QA step that produces evidence for that token, and each QA step MUST either map to a required token or be explicitly labeled as non-blocking informational only.
 
@@ -2716,9 +2800,57 @@ This authority order determines the path-of-record; it does **not** permit requi
 
 **Canonical JSON gate directory (single home; no dual-home binding).**
 
-Canonical JSON gate artifacts MUST use the single canonical family:
+Canonical governed artifact family (fixed paths):
 
-* `audit/gates/json_gate/canonical/`
+* `audit/gates/json_gate/canonical/json_gate_check_log.ndjson`
+
+* `audit/gates/json_gate/canonical/json_gate_compare_log.ndjson`
+
+* `audit/gates/json_gate/canonical/json_gate_structured_record.json`
+
+* `audit/gates/json_gate/canonical/json_gate_check_log.ndjson.path_proof.txt`
+
+* `audit/gates/json_gate/canonical/json_gate_compare_log.ndjson.path_proof.txt`
+
+* `audit/gates/json_gate/canonical/json_gate_structured_record.json.path_proof.txt`
+
+Canonical runner entrypoint (Live QA / CI; do not invent alternate runner paths):
+
+* `python tools/evidence/canonical_json_gate.py`
+
+Observed baseline implementations (allowed):
+
+* `make canonical_json_gate` (via Makefile)
+
+* `python tools/evidence/canonical_json_gate.py --emit` (direct invocation)
+
+Live QA binding note (example check id: `D02_canonical_json_gate`). When this gate is exercised as a Live QA check, plan-level PASS predicates may bind to runner exit code `0` \+ the governed canonical-json artifacts above \+ the per-check primary log under QA root (for example `audit/qa/<epic-id>/checks/D02_canonical_json_gate/primary.log`) recording a header `status:"PASS"`.
+
+Conjunction CLI targets (canonical JSON gate coverage; required when present):
+
+* The canonical JSON gate target list and comparisons MUST include conjunction-related CLI artifacts (including BA variants where applicable) when they are part of the governed evidence surface for the build.
+
+* Conjunction-related artifact paths surfaced in this build note series include:
+
+  * `artifacts/audit/cli/pair.json` and `artifacts/audit/cli/pair_ba.json`
+
+  * `artifacts/audit/cli/showcompat_ab.json` and `artifacts/audit/cli/showcompat_ba.json`
+
+  * `artifacts/cli/out.json` and `artifacts/cli/out_ba.json`
+
+  * `artifacts/cli/abba_sidecar.json`
+
+* Evidence Index keys for this family include: `cli.conjunction.pair_ab`, `cli.conjunction.pair_ba`, `cli.conjunction.showcompat_ab`, `cli.conjunction.showcompat_ba`, `cli.conjunction.output_ab`, `cli.conjunction.output_ba`. The Evidence Index remains authoritative for the exact key set and path mapping.
+
+* Each artifact above MUST have a co-located `.path_proof.txt` transcript and MUST satisfy `EVIDENCE_PATH_PROOFS_OK` and `EVIDENCE_PATHS_VALIDATED_OK`.
+
+Legacy naming (do not require in Live QA plans):
+
+* `audit/gates/canonical_json/json_canonical_check.log is a legacy catalog-check report path preserved for backward compatibility; it MUST NOT be required by Live QA Plans and MUST NOT be treated as the canonical gate-family output (use audit/gates/json_gate/canonical/).`
+
+* `audit/gates/canonical_json/canonical_json.gate.json` and `audit/gates/canonical_json/canonical_json.gate.json.path_proof.txt` are legacy-named supplemental summaries. They MAY be produced, indexed, and path-proved, but MUST NOT be used as the plan-binding gate-family output. Live QA plans MUST NOT require this legacy family unless canon explicitly reinstates it via PF12.
+
+* `audit/gates/canonical/` remains legacy/compat-only; do not create new canonical outputs there.
 
 Minimum canonical artifact set (fixed filenames):
 
@@ -2797,6 +2929,25 @@ Canonical runner entrypoint (Live QA / CI; do not invent alternate runner paths)
 
 **Arguments required (no zero-arg invocation).**  
  showcompat MUST NOT be executed as a zero-argument command in QA plans or QA runs. Required arguments are defined in **HDE-CLI-API-Vendor-Ref**.
+
+**Conjunction mode (showcompat \--conjunction).**  
+ showcompat conjunction mode MUST be treated as a read-only compatibility check for two parties. It MUST NOT write or mutate stored user state.
+
+* **Inputs (both parties required).** Conjunction mode MUST be provided two parties via one supported input form (as defined by the CLI contract):
+
+  * `--user-a <id>` and `--user-b <id>`
+
+  * `--pair-file <path>` (pair JSON)
+
+  * `--a-file <path>` and `--b-file <path>` (sidecar JSON)
+
+  * stdin payload containing both parties in left/right form
+
+* **Deterministic failure contract.** Missing or invalid inputs MUST fail deterministically with stable error code semantics (for example `INVALID_ARGUMENT`), MUST write the diagnostic to stderr, and MUST emit empty stdout.
+
+* **SAFE rails contract (closed rails).** Under closed rails, conjunction mode MUST NOT attempt vendor acquisition. If `--source vendor` or `--source auto` would require vendor data and the required BodyGraphs are not locally available, it MUST deterministically refuse with error code `PROVIDER_REFUSED`, MUST emit empty stdout, and MUST NOT create partial outputs. When this refusal occurs, classify the run as BLOCKED per the rule below.
+
+* **Open-rails posture.** Under open rails, conjunction mode MAY access vendor data as defined by the CLI contract, but governed JSON outputs (when emitted as governed artifacts) MUST remain deterministic and canonicalized.
 
 **QA classification and evidence posture.**  
  If showcompat is attempted under closed rails or without required arguments, classify the outcome as a tooling/environment or usage defect for that step, not a product behavior failure. Record the rails posture used (names-only) and the failure signature in the step log.
@@ -2929,7 +3080,22 @@ Duplicate rows for the same token are a mechanical blocker because they create a
   * the key pathnames/loci pulled from those audits that the plan will touch.  
      This is a traceability anchor only; it must not duplicate audit contents.
 
-* Reality Audits are PO-maintained. Planning documents MUST NOT create tasks that assign Reality Audits updates. If an audit appears stale or missing required component coverage, the plan MAY note that as an observation, but must not assign it as agent work.
+* Reality Audits are PO-maintained. Planning documents MUST NOT create tasks that assign Reality Audits updates. If an audit appears stale or missing required component coverage, the plan MAY note that as an observation, but must not assign it as agent work.  
+* Plans MAY check PF documents during planning and review, including read-only checks against Reality Audits, to confirm what PF currently states.
+
+* Plans MUST NOT mandate PF document updates. Planning artifacts MUST NOT require updates to any PF documents as part of PR or OPS deliverables, acceptance posture, tracked issues, “confirming artifacts,” or completion criteria.
+
+* Updates to Reality Audits are a manual PO operation only. PR scope MUST NOT include Reality Audits edits, and plans MUST NOT mandate or schedule Reality Audits updates inside PR or OPS work.
+
+* Plans MAY include a “Doc deltas capture” or “Doc delta candidates” note, but these notes MUST be explicitly non-mandatory and MUST NOT be expressed as required PR or OPS tasks. Any PF doc maintenance implied by those notes is PO-owned and out of plan scope.
+
+* How plans MUST express “reality/existence confirmation.” If a plan requires confirming whether a component, route, contract, or locus exists, the plan MUST express confirmation in one of these allowed forms:  
+  * PF check (allowed): “Check Reality Audits for the current recorded existence/locus statement.” This is a read-only check and MUST NOT imply an update.
+
+  * Repo-local evidence (required when PF is silent or insufficient): capture confirmation as repo-local evidence (for example deterministic command output recorded into an audit artifact, a governed gate log, a QA step-log entry, or a test or probe result). The plan MUST NOT require turning that result into a PF update.  
+* PF check (allowed): “Check Reality Audits for the current recorded existence/locus statement.” This is a read-only check and MUST NOT imply an update.
+
+* Repo-local evidence (required when PF is silent or insufficient): capture confirmation as repo-local evidence (for example deterministic command output recorded into an audit artifact, a governed gate log, a QA step-log entry, or a test or probe result). The plan MUST NOT require turning that result into a PF update.
 
 ---
 
@@ -3090,6 +3256,80 @@ Steps MUST use general command-line directives, not literal command strings. A p
 
 Plans SHOULD minimize locus strings in step text. Avoid naming specific script paths or test file paths unless they are canon-defined or are fixed-path obligations. If a step must name a repo locus string, the repo loci proof gate still applies.
 
+**QA planning reality posture (repo-locus lock; narrower than §9.7.9).**
+
+* In Live QA planning artifacts (plans, prompts, reviews, runbooks, and checklists), the ONLY allowed provenance sources for repo-reality claims are:
+
+  * PF10 — HDE Build Notes
+
+  * PF canon
+
+  * the initial QA Audit for the epic (repo reality and readiness proof)
+
+* PF23 — Reality Audits MUST still be consulted during QA planning as a read-only input for repo-reality context and existence or locus framing, but PF23 does not by itself authorize a repo-resident locus claim unless that claim is also grounded in the allowed provenance sources above.
+
+* This QA-specific provenance rule applies to repo-resident or repo-reality strings, including:
+
+  * file and directory paths
+
+  * endpoint names and routes
+
+  * module and component identifiers
+
+  * script names, runbook names, and command strings
+
+  * check and test identifiers, CI job names
+
+  * environment variable names when treated as already-existing
+
+  * fixed output locations when treated as already-existing
+
+  * negative existence claims
+
+* No invention, no inference, no memory. A Live QA planning artifact MUST NOT introduce, guess, infer, paraphrase, normalize, or fill in any repo-resident locus string. If the exact locus string does not appear verbatim in an allowed provenance source, it MUST NOT appear as a repo-resident claim in the plan.
+
+* Verbatim-only requirement. When a repo-resident locus string is used, it MUST be copied character-for-character from an allowed provenance source. No renaming, case folding, wildcard expansion, or invented variants.
+
+* Conflict posture. If PF10, PF canon, the initial QA Audit, or PF23 appear inconsistent, treat the situation as a reality ambiguity. The plan MUST NOT assert a reconciled locus as fact; it MUST either route the uncertainty to a discovery step or return for revision.
+
+**Discovery-first posture (mandatory).**
+
+* Live QA Plans MUST assume that any repo detail not proven is unknown until discovered during the run. Plans MUST prefer real-time discovery and observation over pre-specifying implementation guesses.
+
+* When a step depends on a repo-resident locus that is not proven at planning time, the plan MUST:
+
+  * state the discovery intent (what must be located or verified),
+
+  * state the discovery acceptance (what counts as sufficient proof),
+
+  * require recording the discovered locus string verbatim in the check evidence before use, and
+
+  * define PASS, FAIL, and BLOCKED outcomes for the discovery itself.
+
+* Command-line minimalism is required. Live QA Plans SHOULD describe the goal of the action, the observable outputs that matter, and the evidence that must be captured. The executor MUST record the exact commands actually used into the check evidence at runtime. If a plan includes an exact command string, that string MUST be proven by an allowed provenance source.
+
+* Blocking posture. Any Live QA plan that includes a repo-resident locus string not proven verbatim by an allowed provenance source, a speculative topology claim, a placeholder locus, or an invented script MUST be returned for revision.
+
+**Plan-created artifacts are allowed, but MUST be explicit.**
+
+* The repo-locus provenance lock applies only to loci asserted to already exist in the repo. It does not prohibit plan-created deliverables or evidence outputs.
+
+* If a QA plan requires creating a file, it MUST include:
+
+  * the exact repo-relative path and filename,
+
+  * runnable creation instructions that produce the file at that path, creating parent directories if needed, and
+
+  * one sentence stating why the file is required.
+
+* The plan SHOULD label each mentioned file path as repo-resident or plan-created. Missing labels are non-blocking only when the file is clearly a run-produced deliverable and the plan already provides the required how and why.
+
+* A plan MUST NOT say “create a helper script”, “write a manifest”, or “generate a report” without also providing the exact creation path, the creation process, and the reason it is created.
+
+* If a plan-created file is evidence-bearing, the creation instructions MUST be deterministic enough to reproduce the file unambiguously.
+
+* Live QA Plans MUST NOT invent or assume helper scripts exist. A plan-created script is permitted only when a required deliverable cannot be produced without one. In that case the plan MUST name the exact repo-relative path and filename, include runnable creation instructions, state why the script is required, and keep the script minimal and purpose-bound to the deliverable.
+
 This posture does not relax existing requirements for functional Live QA, evidence capture, SAFE rails, or explicit pass/fail criteria.
 
 **Functional Live QA is mandatory for functional changes.**  
@@ -3109,10 +3349,61 @@ If a functional change touches a vendor seam, the functional Live QA step MUST e
 
 Binary means: If a required deliverable is missing, the check is mechanically invalid.
 
+**Deliverables list authority (step-local artifact obligations).**
+
+* Only artifacts explicitly named in the step’s Deliverables list, or explicitly bound by the step’s PASS or FAIL criteria, are required deliverables for that step.
+
+* An artifact path that appears only inside a source excerpt, example command, shell redirection, or operator note does not become a required deliverable unless the plan also names it in the Deliverables list or explicitly binds PASS or FAIL to it.
+
+* Such artifacts MAY still be produced as auxiliary provenance artifacts. If present, they MAY be reviewed as supplemental evidence. If absent, their absence is non-blocking unless the plan expressly made them required.
+
+* Reviewers MUST evaluate step completeness against the step’s stated Deliverables and PASS or FAIL rules, not against every incidental artifact mentioned inside example commands or source excerpts.
+
+**Conditional deliverables and branch-specific evidence.**
+
+* A Live QA plan MAY declare a deliverable as conditional only when the triggering condition is named explicitly in the step.
+
+* A deliverable gated behind a named condition is required only when that condition is met.
+
+* If the condition is met and the deliverable is absent, the step has a required-evidence failure for that branch.
+
+* If the condition is not met, the plan MUST require an explicit branch artifact or note that records the unmet condition and the resulting posture (not applicable, skipped, or blocked, as appropriate). That branch artifact becomes the required evidence for the unmet branch.
+
+* Reviewers MUST NOT treat absent conditional outputs as missing evidence when the unmet condition is explicitly recorded and the plan defines the conditional branch correctly.
+
+* Plans MUST NOT hide unconditional evidence behind vague or implicit conditionals.
+
 **Reconciliation rules and guardrails (non-negotiable):**
 
 * **Repo reality precedence.** If a plan expects a deliverable or shape that does not match the repo’s reality, the repo wins. Do not block approval unless the mismatch prevents pass/fail evaluation. Document the mismatch as a caveat and update the plan or code accordingly.  
-* **Step logs status posture.** Status is `PASS` / `FAIL` / `BLOCKED` and is a claim. If status is `PASS`, required deliverables must exist and show the required evidence.
+* **Product-input availability gate.** When a Live QA step’s PASS path depends on current-product inputs or identifiers, the plan MUST establish that those inputs are valid and currently obtainable in the product surface, or MUST frame the step as an explicit input-availability gate.
+
+* If authoritative run evidence shows the required inputs are not valid product inputs for the current surface, or should not be expected for the run, the outcome MUST be classified as `BLOCKED` due to input availability or planning defect, not as a product behavior failure.
+
+* In that posture, artifacts from the unexecuted branch are not actionable remediation targets. Their absence is an expected consequence of the blocked precondition and MUST be recorded as such in the step evidence.
+
+* Review posture. A plan whose PASS criteria depend on unavailable or non-product inputs, without declaring an input-availability gate, MUST be returned for revision because its PASS path is structurally unreachable.
+
+* Re-run posture. Re-run only when valid product inputs become available or the plan is revised to use a supported and currently obtainable input form.  
+* **Step logs status posture.** Status is `PASS` / `FAIL` / `BLOCKED` and is a claim. If status is `PASS`, required deliverables must exist and show the required evidence.  
+* **PASS requires step-scoped evidence.** A Live QA step MUST NOT be marked `PASS` unless the step record includes at least one step-scoped evidence pointer under the governed QA root for that exact step, or an explicitly equivalent step-scoped evidence pointer line preserved in the epic’s primary QA record.
+
+* **Record-integrity rule for PASS.** The step identifier in the heading, decision summary, primary-log path, and any step-scoped evidence pointer MUST agree. If a step record is mislabeled, duplicated, or contaminated with unrelated content such that the step-to-evidence mapping is ambiguous, the step MUST NOT be treated as `PASS` until corrected.
+
+* **Blocked-step minimum fields.** When a step is recorded as `BLOCKED`, or when a review uses `UNEXECUTABLE` as a narrative label for the blocked posture, the canonical status remains `BLOCKED` and the step record MUST include:  
+  * the blocking precondition,
+
+  * why it cannot currently be satisfied,
+
+  * whether the blockage is closeout-blocking, and
+
+  * the required follow-up, classified as plan change, implementation change, or input-availability follow-up.  
+* **Document-structure remediation evidence.** When remediation corrects a mislabeled, duplicated, or contaminated step record, the remediation evidence MUST include:  
+  * the incorrect snippet,
+
+  * the correction rationale, and
+
+  * a post-fix verification artifact or log line showing that the step id, heading, and evidence pointers now align.
 
 * **Step-log header writer env exports (per-check; required when used).** If a Live QA plan uses a step-log header writer that reads per-check metadata from environment variables, the plan MUST export the complete required set immediately before header generation for each check and MUST NOT rely on prior step state.  
   * Minimum per-check exports (names must match the header writer contract): `CHECK_ID`, `CHECK_NAME`, `PASS_FAIL`, `COMMANDS_JSON`, `ARTIFACTS_JSON`, `PF_REFS_JSON`.  
@@ -3120,8 +3411,8 @@ Binary means: If a required deliverable is missing, the check is mechanically in
   * If the defect is discovered mid-run (for example a check already executed but `primary.log` is missing the canonical header or has the wrong check ID), a Moon Loop deviation is allowed to export the required header vars for that check, regenerate the JSON header, and reassemble `primary.log` by prepending the corrected header while preserving the existing body verbatim.  
   * Record the deviation as evidence-capture only. Do not modify product behavior, test assertions, or acceptance criteria to compensate for missing header metadata.  
   * Anti-drift: if the plan uses the header writer, the export contract above is required for every check that uses it. Do not rely on global state from prior steps.  
-* **History is not correctness.** Deliverables and step logs are canonical by check and by named artifact. Plans MUST NOT introduce `run_id` (or `RUN_ID`) as an input, step header field, evidence selector, or correctness dimension. Optional per-execution nesting is allowed only as non-canonical convenience and must not gate acceptance.
-
+* **Checks-only evidence layout (hard).** Check-scoped Live QA evidence MUST live under a single epic-scoped QA root and be organized by `check_id`. Evidence paths MUST be stable across re-runs. Re-running QA MUST NOT create a new run root, timestamped run directory, or any parallel per-run evidence tree.  
+* **History is not correctness.** Deliverables and step logs are canonical by check and by named artifact. Plans MUST NOT introduce `run_id` (or `RUN_ID`) as an input, step header field, evidence selector, correctness dimension, or directory discriminator. Optional per-execution nesting is disallowed. Check-scoped plan-created outputs MUST live under the stable check directory unless Governance explicitly pins a different canonical home.  
 * **No invented executable surfaces (baseline commands only).** Live QA plans, runbooks, and reviews MUST NOT invent scripts, modules, tests, harnesses, endpoints, CI jobs, or helper commands. If a plan mentions an executable locus, it MUST name the repo-resident locus and it MUST exist at review time. If the locus does not exist, the plan MUST mark it as a deliverable ("needs creation") and the plan MUST NOT proceed as if it already exists.
 
   * Evidence roots are not code roots: do not treat `audit/**` or `artifacts/**` as pre-existing runnable toolchains.
@@ -3189,7 +3480,7 @@ A plan MUST be rejected (and returned for revision) if any of the following hold
 * the plan contains prohibited truncation markers or prohibited characters (see §9.7.4), including the Unicode ellipsis character (U+2026) and three consecutive U+002E FULL STOP characters
 
 * the plan uses fenced code blocks anywhere (planning documents, reviews, or plan-derived excerpts)  
-* the plan introduces `run_id` or `RUN_ID` as a required input, step header field, evidence selector, or acceptance key  
+* the plan introduces `run_id` or `RUN_ID` as a required input, step header field, evidence selector, acceptance key, per-run directory discriminator, or operator-set per-run evidence root, or otherwise introduces per-run directory nesting, timestamped run directories, or any “fresh directory for this run” posture for Live QA evidence  
 * the plan introduces or depends on unapproved environment variable names as required inputs, required evidence schema keys, or required step-log header writer inputs (including any `MODO_*` name). Environment variable names are governed interface. A plan MUST NOT mint new environment variable names during Live QA or Moon Loop. If a new env var is required, treat it as a development change and revise the plan only after the variable is canon-approved.  
   * Legacy exception (HDE-EPIC025 only): the already-approved HDE-EPIC025 Live QA Plan contains inert `MODO_*` placeholders. They MUST NOT be required for PASS/FAIL, treated as required evidence schema keys, or used as proof of rails posture or execution configuration. They MUST be removed from the plan/template at the next revision. This exception MUST NOT be replicated.  
 * commands are semantically ambiguous (cannot be tied to a real baseline tool \+ a repo-proven locus) or are unsafe/destructive without an explicit authorized token
@@ -4298,9 +4589,23 @@ Titles/paths only — no payload bytes. This runbook defines how to run the benc
 * `tests/transport/headers/aux_304.snap`  
 * `tests/transport/headers/aux_suppression.snap`
 
-**Catalog example (informative; titles-only).**
+**Catalog source and integrity (titles-only).**
+
+Note: When Endpoint Catalog JSON bytes change, regenerate the checksum and path-proof sidecars in the same change. Any mismatch indicates stale sidecars and is a mechanical blocker.
 
 * `docs/ENDPOINTS_CATALOG.json`
+
+* `docs/ENDPOINTS_CATALOG.json.sha256`
+
+* `docs/ENDPOINTS_CATALOG.json.path_proof.txt`
+
+* `docs/ENDPOINTS_CATALOG.json.sha256.path_proof.txt`
+
+* `artifacts/audit/ENDPOINTS_CATALOG.json`
+
+* `artifacts/audit/ENDPOINTS_CATALOG.json.sha256`
+
+* `tests/http/test_endpoint_catalog.py`
 
 **Writer/error posture (headers-only).**
 

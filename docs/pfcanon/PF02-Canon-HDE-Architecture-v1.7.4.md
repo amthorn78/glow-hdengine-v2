@@ -1,12 +1,12 @@
 # **0\. Front Matter**
 
 **Title:** PF02-Canon-HDE-Architecture  
- **Version:** v1.6.6
+ **Version:** v1.7.4
 
  **Status:** Canon  
-**Effective date:** 2026-02-09
+**Effective date:** 2026-03-07
 
- **Last Update Gate:** BN 9.8.2 Drain A49-51
+ **Last Update Gate:** BN 10.0.5 A32-33
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -58,7 +58,7 @@ Where PF10 includes multiple numbered addenda on the same topic, the later numbe
  Canonical JSON policy, pack/manifest, and the machine Evidence Index (JSONL mirror schema and parity) are owned outside Architecture and cited by title, primarily in HDE-Schemas & Artifacts and HDE-Mechanics Guide.
 
 **Endpoint Catalog (single home; routing note).**  
-Success-endpoint discovery and A7 proofs are catalog-driven. The single home is `docs/ENDPOINTS_CATALOG.json` (canonical JSON; one LF) with `docs/ENDPOINTS_CATALOG.json.sha256` sidecar. The Catalog is internal-only and env-gated; non-prod entries are unreachable in prod (headers-only env-gate proofs). A7 proofs run only on a cataloged JSON success route; `/internal/version` is excluded from A7 proofs, and PF02 does not define its access-control posture. Titles-only details live in HDE-CLI-API-Vendor-Ref and HDE-Governance; indexing discipline lives in HDE-Schemas & Artifacts. If a given repo state does not yet contain `docs/ENDPOINTS_CATALOG.json`, treat this path as reserved and required; its creation and wiring to A7 proofs are tracked via HDE-Build Checklist and HDE-Phased Epics, not by changing PF02.
+Success-endpoint discovery and A7 proofs are catalog-driven. The Endpoint Catalog is the single home for the canon set of client-callable endpoints and their coarse operational metadata. It is an internal artifact (not user-facing), and PF02 documents it only as a wiring map. It does not define its access-control posture or its exact request/response contracts. The single home is `docs/ENDPOINTS_CATALOG.json` (canonical JSON; one LF) with `docs/ENDPOINTS_CATALOG.json.sha256` sidecar and sibling path-proof transcripts at `docs/ENDPOINTS_CATALOG.json.path_proof.txt` and `docs/ENDPOINTS_CATALOG.json.sha256.path_proof.txt`. All other endpoint inventories are derived artifacts and MUST be regenerated from this home, not independently edited. If the catalog shape or ownership changes, it must be corrected at the single home (and the sha256 sidecar regenerated), not by changing PF02.
 
 **A7 invariants (routing note).**  
  Success proofs require `Vary: Authorization, Accept-Encoding`, strong quoted ETag on 200, HEAD 200 parity (`Content-Type == GET`, `Content-Length == len(identity 200 body)`), and 304 (after prior 200\) omitting both `Content-Type` and `Content-Length`. Encoding-invariance holds: for the same canonical LF-terminated body, the ETag identity and effective `Content-Length` are stable across accepted encodings. Concrete contracts remain in HDE-Governance and HDE-CLI-API-Vendor-Ref.
@@ -553,8 +553,8 @@ It ties together the DB cache, vendor seam, and Engine’s stateless contract.
 
 * **Dev:**
 
-  * Direct vendor calls are allowed on request paths under SAFE rails.
-
+  * Direct vendor calls are allowed on request paths under SAFE rails.  
+  * SAFE rails are closed by default. Open rails requires explicit env (for example, `SAFE_MODE=0`, `ALLOW_NETWORK=1`). If rails env is missing or empty, it MUST be treated as closed rails.  
   * On successful vendor fetch and Engine computation, the Adapter **upserts** the resulting BodyGraph and metadata into the DB cache for repeatability.
 
 In all environments, this persistent caching is **canonical**, not a feature toggle.
@@ -692,6 +692,18 @@ Titles only; **no bytes restated here**.
 **Presenter rule.**  
  The adapter never hand-crafts public JSON. Only the Presenter’s single emitter serializes public bytes for **all** callers (HTTP and CLI).
 
+**Conjunction compute contract (internal).**
+
+Conjunction computation is an internal Engine surface. It does not create a new production HTTP endpoint and it emits public bytes via the same Presenter emitter used everywhere else.
+
+* Location: `engine/compat/compute.py`
+
+* Entry points (names-only):
+
+  * `conjunction_public` (pure compute over resolved BodyGraphs)
+
+  * `conjunction_public_resolved` (local-first resolution via the existing BodyGraph resolver path, then compute; SAFE rails apply)
+
 **Parity expectations.**
 
 * For identical inputs, public bytes match CLI output (byte identity).
@@ -804,25 +816,36 @@ Reader’s public success route uses the same Engine Core \+ Presenter flow as c
 
 * No public availability.
 
-* No vendor/network calls.
-
-* No persistence of user data.
-
 * No narrative text.
 
 * No transport or policy bytes are defined in PF02.
+
+* No uncontrolled vendor/network calls. Rails are closed by default; acquisition is permitted only when explicitly enabled under SAFE rails, and only through the existing BodyGraph resolver seam described in §2.4.
+
+* No new persistence surfaces. Any writes are limited to the existing BodyGraph cache upsert described in §2.4.
 
 **Gating & posture (dev-only; titles-only routing).**
 
 * Harness is dev-only; never mounted in production.
 
-* Rails closed by default (for example, `SAFE_MODE=1`, `ALLOW_NETWORK=0`); no vendor I/O.
+* Harness routes are gated via the dev admin gate (`_dev_admin_gate()`), and MUST deny when `APP_ENV` is not one of: `dev`, `test`, `local`.
 
-* Optional GET/HEAD/304 captures may be used for local evidence, but authoritative A7 proofs do **not** run here; they run on a cataloged JSON success route (Endpoint Catalog).
+* Dev-only conjunction preview endpoints (HTTP GET; names-only):
 
-* All checks run with `LC_ALL=C`, `LANG=C`, `TZ=UTC`; LF-terminated canonical JSON via the shared emitter.
+  * `GET /dev/sampler/conjunction`
 
-Sample harness uses the same Presenter emitter and Engine Core behaviour as compat v1 but runs under closed rails and is never used for A7 proofs; see §2.4 and §5 for compat flow and evidence-plane details.
+  * `GET /dev/reader/conjunction`  
+* Dev-only conjunction writer endpoint (HTTP POST; names-only):  
+  * `POST /dev/writer/conjunction` (route\_id `dev.writer.conjunction.v1`; writer-style idempotent envelope, see §5.1)  
+* Endpoint Catalog entries for these dev conjunction endpoints are classified as `dev_harness` and are not A7-eligible.
+
+* Rails are closed by default (for example, `SAFE_MODE=1`, `ALLOW_NETWORK=0`). Dev-only conjunction endpoints MAY run under open rails only when explicitly enabled (for example, `SAFE_MODE=0`, `ALLOW_NETWORK=1`).
+
+* Optional GET/HEAD/304 captures are allowed for the GET dev harness endpoints, but A7 proofs are not run here. A7 proofs run on the cataloged JSON success route (Endpoint Catalog) and are driven by the Catalog.
+
+* Locale is optional; when present, it is advisory only and does not affect canonical JSON bytes.
+
+Sample harness uses the same Presenter emitter and Engine Core behaviour as compat v1. Dev-only conjunction preview endpoints emit canonical JSON bytes; rails are closed by default unless explicitly opened. Sample harness is never used for A7 proofs; see §2.4 and §5 for compat flow and evidence-plane details.
 
 **Routing (titles-only).**
 
@@ -973,12 +996,13 @@ Engine outputs are keys and structured metrics; narratives never live in `engine
 * In dev/QA, the adapter/Reader stack is hosted by a concrete framework development HTTP server (currently a Flask dev server) that exposes the same Reader and internal/dev sampler routes as the production adapter. Architecture treats this dev server as part of the adapter and dev harness component: it is a real, required piece of the system in dev/QA, but the choice of framework and all start commands, ports, and environment wiring remain the responsibility of **Glow Infrastructure** and **HDE-Mechanics Guide**, not PF02.  
 * The dev Reader harness used in dev/QA consoles (including Codespaces) MUST expose the canonically required dev/internal HTTP surfaces for QA, using the same Presenter emitter and error-handling semantics as the production/stable adapter app. In particular, the harness is responsible for mounting the compat HTTP surface (`/api/compat/v1`) as defined in **HDE-CLI-API-Vendor-Ref** and **HDE-Mechanics Guide** by title. This requirement applies to the set of dev/internal HTTP routes needed for QA; it does not require the dev harness to expose every production-only surface. PF02 records this responsibility at the architectural level and continues to route all concrete route shapes and error envelopes by title to their single-home documents.
 
-  ### **3.8.2 QA entrypoints (concept-only)**
+### **3.8.2 QA entrypoints (concept-only)**
 
 For epics whose D-goals involve Reader/HTTP behaviour, compat behaviour, or dev sampler behaviour, Live QA uses canonical entrypoints only:
 
 * **Reader v1** (public success route) for HTTP-level compat envelopes.  
 * **Compat CLI surfaces** (as described in **HDE-CLI-API-Vendor-Ref**) for terminal-based compat flows. CLI stdout may be an admin/test compat payload (for example `showcompat`). When Reader-identical bytes are required for parity proofs, the CLI emits Reader v1 bytes via a dedicated dump sidecar output (titles-only; see **HDE-CLI-API-Vendor-Ref**).  
+* **CLI entrypoint wiring (repo surface; names-only).** `pyproject.toml` exposes `hdctl = engine.cli.main:cli`, and `engine/cli/main.py` is the repo-local wiring surface used for conjunction-oriented `showcompat` flows. Architecture treats this as the stable CLI entrypoint surface while continuing to route CLI bytes and argument contract by title to **HDE-CLI-API-Vendor-Ref**.  
 * **Dev sampler harnesses** (CLI and HTTP) for sampler-specific behaviour, always through Engine Core and the single Presenter emitter.
 
 All of these entrypoints:
@@ -1022,9 +1046,10 @@ HTTP QA against “Reader” or dev harness surfaces is considered misconfigured
   * **Review posture (mechanical blocker).** Any unapproved environment variable name used as a required input, required header key, required manifest key, or required evidence schema key is a mechanical blocker for plan approval. Fix by removing it or replacing it with canon-approved variables only.  
   * **EPIC025 exception (grandfathered; non-binding only).** If the already-approved EPIC025 Live QA Plan references `MODO_*` keys, treat those keys as inert placeholders: they MUST NOT be required for PASS or FAIL, MUST NOT be required evidence keys, and MUST NOT be used as proof of rails posture or execution configuration. This exception MUST NOT be replicated in new plans.  
 * **KISS required outputs (Live QA).** Live QA Plans MUST minimize required outputs to:  
-  * one primary step log per check under `audit/qa/<epic-id>/checks/<check_id>/primary.log`, and  
-  * the QA step-logs manifest at `audit/qa/<epic-id>/qa_step_logs_manifest.json` listing check IDs, status, and primary log paths (every referenced primary log path MUST exist under `audit/qa/<epic-id>/` at review time), plus its sibling path proof `audit/qa/<epic-id>/qa_step_logs_manifest.json.path_proof.txt`  
-  * Nothing else is auto-required unless canon explicitly pins a governed evidence family/path. Any additional required artifact MUST be acceptance-decisive and MUST be canonized (PF10 or PF-Canon) as a governed evidence family/path.  
+  * one primary step log per check under `audit/qa/<epic-id>/checks/<check_id>/primary.log`,  
+  * checks-only evidence layout under a single epic-scoped QA root, with no per-run nesting, no run-id directories, and no operator-set “fresh directory” posture for reruns,  
+  * any required QA step-logs manifest and sibling path proof at a stable check-scoped location under `audit/qa/<epic-id>/checks/<check_id>/`, with every referenced primary log path existing under `audit/qa/<epic-id>/` at review time, and  
+  * Nothing else is auto-required unless canon explicitly pins a governed evidence family or path. Any additional required artifact MUST be acceptance-decisive and MUST be canonized (PF10 or PF-Canon) as a governed evidence family or path.  
   * **Step-log header normalization (KISS).** Every `primary.log` MUST begin with a JSON header object that includes: `check_id`, `status`, `command`, `captured_env`, `pf_refs`, `intended_tokens`, `claimed_tokens`. The three list fields MUST be present; empty lists (`[]`) are allowed and SHOULD be used when no refs/tokens are in play. If any required list field is missing, treat it as an evidence-format gap; a reviewer-of-record MAY mechanically normalize the header by inserting missing empty lists and re-serializing the header as canonical JSON (no step rerun required). Token claims are never inferred: if `claimed_tokens` is missing or empty, token claims are treated as none. Status vocabulary remains gating (PASS, FAIL\_BEHAVIOR, FAIL\_TOOLING, TOOLING\_BLOCKED, PARKED).  
   * **Step-log header writer exports (per-check).** If a Live QA plan uses a step-log header writer that reads per-check metadata from environment variables, the plan MUST export the complete required set immediately before header generation for each check and MUST NOT rely on prior step state.  
     * Minimum per-check exports (names are governed by the writer contract): `CHECK_ID`, `CHECK_NAME`, `PASS_FAIL`, `COMMANDS_JSON`, `ARTIFACTS_JSON`, `PF_REFS_JSON`.  
@@ -1033,39 +1058,78 @@ HTTP QA against “Reader” or dev harness surfaces is considered misconfigured
   * **Prefer validating canon evidence over generating QA artifacts.** By default, if PF10/PF-canon already establishes an artifact family/path, the Live QA plan validates it (exists \+ minimal posture checks) and records PASS/FAIL in the check’s `primary.log`. QA creates new artifacts only when the check itself is about QA-run outputs (primary logs, step-logs manifest) or when canon explicitly requires a generated QA artifact. If a plan requires an EPIC-scoped derived artifact path to satisfy a predicate, the artifact MUST be mechanically derived from the canonical surface and MUST be treated as evidence-only (not a new governed evidence family/path) unless and until canon explicitly pins it.  
   * **Showcompat QA: vendor rails and arguments.** Current limitation: `showcompat` requires vendor-sourced BodyGraph data to compute compatibility. When a Live QA step executes `showcompat` and BodyGraph data is not already available, that step MUST run with vendor rails open (network allowed) so the vendor seam can be called. Treat closed network rails as an expected blocker for functional `showcompat` runs under this limitation.  
     * The rails change MUST be explicit and scoped only to the `showcompat` step(s); restore default rails posture after the step.  
+    * In conjunction mode, \`showcompat\` is local-first and uses the same resolved-BodyGraph path as \`conjunction\_public\_resolved\`, respecting SAFE rails. If either party’s BodyGraph is missing locally, open rails are required to fetch; if rails are closed, the step MUST refuse deterministically and MUST NOT attempt network.  
+    * When conjunction-mode \`showcompat\` succeeds, it MUST emit deterministic canonical JSON to stdout (byte-stable for identical inputs), enabling gated comparisons and traceable evidence artifacts.  
     * `showcompat` MUST NOT be executed as a zero-argument command in QA plans or QA runs. Follow the authoritative command and argument contract in **HDE-CLI-API-Vendor-Ref**.  
-  * **No planning-trace deliverables (PF23).** Reality Audits (PF23) are post-epic audits (a closed-epic snapshot), not an in-flight PR truth source. PF23 MAY be consulted during epic planning, implementation planning, and QA planning to ground component boundaries and canonical loci, but plans and reviews MUST NOT treat PF23 consult as a required deliverable, a required check, or an acceptance token. Do not instruct the operator to run commands solely to “prove PF23 consult.”  
-    * A plan MAY include a single “PF23 Anchors” note (components consulted and loci touched), but it is informational only and MUST NOT appear as a required check or required evidence output.  
-    * If any PF23 Reality Audit statement contradicts PF canon, record it as an explicit drift item requiring adjudication. Do not resolve contradictions by assumption.  
+  * **PF23 consult is required in QA planning (read-only).** Reality Audits (PF23) MUST be consulted during QA planning and QA plan review as a primary input for repo-reality context and existence or locus framing. Plans and reviews MUST NOT treat PF23 consult as a required deliverable, a required check, or an acceptance token. Do not instruct the operator to run commands solely to “prove PF23 consult.”  
+    * If a plan names repo-resident loci, reviewers SHOULD consult PF23 before approval to reduce fabricated or stale locus assumptions.
+
+    * Consultation is read-only; PF23 updates remain PO-only, and QA execution MUST NOT include PF23 updates as a required output.
+
+    * A plan MAY include a single “PF23 Anchors” note (components consulted and loci touched), but it is informational only and MUST NOT appear as a required check or required evidence output.
+
+    * If any PF23 Reality Audit statement contradicts PF canon, or appears inconsistent with other allowed repo-reality sources, record it as an explicit drift item requiring adjudication and treat the situation as reality ambiguity. Do not resolve contradictions by assumption or assert a reconciled locus as fact inside the plan.
+
     * Record each contradiction as a set:  
-      * PF23 claim (verbatim quote)  
-      * Canon claim (verbatim quote plus PF canon citation)  
+      * PF23 claim (verbatim quote)
+
+      * Canon claim (verbatim quote plus PF canon citation)
+
       * Impacted epic or surface  
-    * Classify each contradiction into exactly one bucket pending adjudication:  
-      * Canon defect (PF canon is wrong or incomplete)  
-      * Implementation drift (repo or runtime deviates from canon)  
+    * PF23 claim (verbatim quote)
+
+    * Canon claim (verbatim quote plus PF canon citation)
+
+    * Impacted epic or surface  
+      * Canon defect (PF canon is wrong or incomplete)
+
+      * Implementation drift (repo or runtime deviates from canon)
+
       * Necessary reality shift (PF canon must be updated to reflect ground truth)  
     * Adjudication is owned by the PO, who decides whether the resolution path is a canon update, implementation remediation, or a formalized exception with a canon follow-up.  
   * **No VCS workflow content (hard).** Live QA Plans MUST NOT instruct or discuss branches, commits, PRs, or any other VCS workflow steps, and MUST NOT gate PASS/FAIL on VCS state (for example “working tree clean” or “on correct branch”). Read-only, non-mutating git commands are allowed only as optional, non-gating repo-root sanity checks and must not rely on branch names, commit SHAs, or PR identifiers.  
-  * **Objective-first Live QA plans.** Live QA Plans MUST specify objectives and proof obligations per step (required evidence outputs and explicit PASS or FAIL predicates) and MUST NOT require syntax-perfect command strings.  
-    * Steps SHOULD use general command-line directives rather than brittle verbatim command text; execution-time command resolution and the recorded command transcript in `primary.log` are authoritative.  
-    * Reduce plan brittleness by minimizing locus strings (paths, test filenames, long command fragments) unless the locus is canon-defined or is a fixed-path obligation; when a plan must assert a locus, the repo-loci proof gate still applies.  
+  * **Discovery-first, objective-first Live QA plans.** Live QA Plans MUST specify intent and proof obligations per step and MUST treat any repo detail not proven at planning time as unknown until discovered during the run.  
+    * Steps SHOULD use general command-line directives rather than brittle verbatim command text; execution-time command resolution and the recorded command transcript in `primary.log` are authoritative.
+
+    * The plan SHOULD describe the goal of the action, the observable outputs that matter, and the evidence that must be captured.
+
+    * Reduce plan brittleness by minimizing locus strings unless the locus is canon-defined or is a fixed-path obligation.
+
+    * If a plan must include an exact command string, it MUST be proven by an allowed provenance source.
+
+    * When a check requires interacting with a repo-resident locus that is not proven at planning time, the plan MUST state the discovery intent, state the discovery acceptance, require recording the discovered locus string verbatim into check evidence before using it, and provide PASS, FAIL, and BLOCKED outcomes for discovery itself.
+
+    * Each check MUST be expressible as: Intent; Discovery step (only if needed); Minimal test step; Required evidence; PASS criteria; FAIL criteria; BLOCKED criteria when discovery cannot proceed without guessing.
+
+    * Loci discovered during execution are valid for that run only and MUST NOT be treated as planning-time proof for future plans unless they are incorporated into an allowed provenance source.
+
     * Moon Loop may be used to remediate syntax and quoting mismatches, but MUST NOT change objectives, loci exercised, required outputs, or PASS or FAIL predicates.  
-  * **No fabricated paths (MUST).** Planning documents and plans MUST NOT fabricate repo file paths, directory roots, or module loci, whether the path is asserted as required evidence or as an “expected locus” in narrative text.  
-    * Every asserted path or “where this lives” statement in a plan MUST be validated using exactly one of the following methods:  
-      * direct PF canon citation (preferred)  
-      * `CA vetted`: a verbatim quote from the planning Codex audit included inline in the plan  
-      * `IG Approved`: a verbatim quote from the Implementation Guide included inline in the plan  
-    * If a plan uses `CA vetted` or `IG Approved`, the supporting quote MUST be verbatim. Paraphrase is not permitted for these labels. Review gate: any unvalidated locus claim is a mechanical blocker until corrected  
-    * Mandatory consult before asserting implementation loci (paths, surface roots, directories): consult HDE Architecture and Reality Audits at minimum. Plans MUST align expected loci to these touchpoints and MUST NOT introduce alternate roots by assumption (example: do not assume a `src/` tree exists).  
-    * File minting is allowed and expected: new files and directories MAY be created under canon-defined homes once the locus is validated. New roots and second homes MUST NOT be assumed; they require explicit justification aligned to single-home constraints.  
-    * Planning Codex audit portability: a planning Codex audit may be referenced inside plan narrative only via verbatim quotes; it MUST NOT be referenced in the final instructions given to Codex for implementation. Implementation prompts MUST be self-contained, relying only on PF canon references and repo paths.  
-    * Evidence output clarity: plans SHOULD name primary governed evidence outputs by exact path and filename and SHOULD avoid vague family phrases or wildcards in evidence-output lines. If a tool produces a high-churn set of member logs, prefer a single primary governed artifact (for example, a manifest or bundle) that enumerates or references members, provided canon supports the surface and the evidence binding remains deterministic.  
-    * A plan MUST NOT reference a file path as required unless it is canon-defined, audit-proven (for example via a governed manifest, Evidence Index/Mirror entry, or canonized proof transcript family), or explicitly QA-created by the plan with exact mkdir/write instructions, a one-line purpose, and explicit PASS and FAIL predicates tied to file contents.  
-    * Governed evidence artifacts used to decide PASS/FAIL MUST be written under a concrete lowercase path under `audit/**` (preferred) or `artifacts/**`.  
-    * QA agents MAY create ephemeral helper scripts under `/tmp` during Live QA execution, but `/tmp` scripts and outputs are execution-only: they MUST NOT be treated as deliverables or evidence, MUST NOT be indexed/mirrored, and MUST NOT be referenced as acceptance binding surfaces. `/tmp` helpers must not print or persist secrets (presence-only or redacted where applicable).  
-    * Plans MUST separate pre-existing artifacts (required to exist before execution) from QA-run artifacts (created during execution); preflight presence checks may gate only on pre-existing artifacts.  
-    * If a deliverable family/path is not canonized, the plan MUST treat it as non-gating posture-only (for example, log `UNPROVEN` / `TOOLING_BLOCKED`) and MUST NOT introduce new required paths to simulate it.
+  * **Repo-locus provenance lock (MUST).** Planning documents and plans MUST NOT invent, guess, infer, paraphrase, normalize, or fill in any repo-resident locus string.  
+    * The only allowed provenance sources for repo-reality claims are PF10 — HDE Build Notes, PF-Canon, and the initial QA Audit for the epic.
+
+    * This rule applies to file paths, directory paths, endpoint names, routes, module and component identifiers, script names, runbook names, command strings, check and test identifiers, CI job names, environment variable names treated as already-existing, fixed output locations treated as already-existing, and negative existence claims.
+
+    * When a repo-resident locus string is used, it MUST be copied character-for-character from an allowed provenance source. No renaming, no case folding, no “equivalent” substitutions, no wildcard expansions, and no invented variants.
+
+    * Placeholder routes, placeholder file paths, placeholder module names, placeholder commands, invented scripts, and any statement that implies app topology certainty without proof are vetoed.
+
+    * Review gate: any unvalidated or inferred locus claim is a mechanical blocker until corrected.
+
+    * File minting is allowed and expected only for plan-created outputs. New files and directories MAY be created under canon-defined homes once the locus is validated. New roots and second homes MUST NOT be assumed.
+
+    * Evidence output clarity: plans SHOULD name primary governed evidence outputs by exact path and filename and SHOULD avoid vague family phrases or wildcards in evidence-output lines.
+
+    * A plan MUST NOT reference a file path as required unless it is canon-defined, audit-proven, or explicitly QA-created by the plan with exact repo-relative path and filename, runnable creation instructions, a one-line purpose, reproducible creation detail, and explicit PASS and FAIL predicates tied to file contents.
+
+    * Governed evidence artifacts used to decide PASS or FAIL MUST be written under a concrete lowercase path under `audit/**` (preferred) or `artifacts/**`.
+
+    * Plans MUST separate pre-existing artifacts (required to exist before execution) from QA-run artifacts (created during execution); preflight presence checks may gate only on pre-existing artifacts.
+
+    * If a deliverable family or path is not canonized, the plan MUST treat it as non-gating posture-only (for example, log `UNPROVEN` or `TOOLING_BLOCKED`) and MUST NOT introduce new required paths to simulate it.  
+  * **Plan-created scripts and helpers.** Live QA Plans MUST NOT invent or assume helper scripts exist. Plan-created scripts are permitted only when a required deliverable cannot be produced without one.  
+    * A plan-created script MUST name the exact repo-relative path and filename where it will be created, include runnable creation instructions, state why the script is required, and keep the script minimal and purpose-bound to the deliverable.
+
+    * QA agents MAY create ephemeral helper scripts under `/tmp` during Live QA execution, but `/tmp` scripts and outputs are execution-only: they MUST NOT be treated as deliverables or evidence, MUST NOT be indexed or mirrored, and MUST NOT be referenced as acceptance binding surfaces. `/tmp` helpers must not print or persist secrets (presence-only or redacted where applicable).
 
 **Routing (titles-only).**
 
@@ -1214,9 +1278,61 @@ These surfaces together form the **ledger-centric, deterministic, text-based evi
   * Close-pack pair: `audit/EPIC-025_MANIFEST.json` and `audit/EPIC-025_close_report.md`.  
   * Close-pack pair path-proof siblings: audit/EPIC-025\_close\_report.md.path\_proof.txt and audit/EPIC-025\_MANIFEST.json.path\_proof.txt (required siblings; titles-only; see Glow Infrastructure).  
   * Doc-delta closeout artifact: `audit/docdeltas/hde-epic025_doc_deltas.md`.  
-  * Canonical JSON gate output path proofs live under `audit/gates/json_gate/canonical/` with sibling `.path_proof.txt` transcripts.
+  * Canonical JSON gate output path proofs live under `audit/gates/json_gate/canonical/` with sibling `.path_proof.txt` transcripts.  
+* EPIC026 evidence posture surfaces (addendum 10–15, 23–31)  
+  * `audit/qa/hde-epic026/topology/topology_conjunction_demo.json` (topology demo output; governed evidence)  
+    * Conjunction route-proof checks (examples): `audit/qa/hde-epic026/checks/po-005/route_proof.txt`, `audit/qa/hde-epic026/checks/po-005/pytest_stdout.log`, `audit/qa/hde-epic026/checks/po-005/pytest_stderr.log`, `audit/qa/hde-epic026/checks/po-005/pytest_rc.txt`; `audit/qa/hde-epic026/checks/po-006/route_proof.txt`, `audit/qa/hde-epic026/checks/po-006/pytest_stdout.log`, `audit/qa/hde-epic026/checks/po-006/pytest_stderr.log`, `audit/qa/hde-epic026/checks/po-006/pytest_rc.txt`.
 
+    * Endpoint Catalog dev-endpoint verification (example): `audit/qa/hde-epic026/checks/po-007/catalog_extract_dev_endpoints.json`, `audit/qa/hde-epic026/checks/po-007/catalog_sha256_check.txt`, `audit/qa/hde-epic026/checks/po-007/pytest_stdout.log`, `audit/qa/hde-epic026/checks/po-007/pytest_stderr.log`, `audit/qa/hde-epic026/checks/po-007/pytest_rc.txt`.
 
+    * CLI help and modifier-validation captures (example): `audit/qa/hde-epic026/checks/po-008/cli_help.txt`, `audit/qa/hde-epic026/checks/po-008/showcompat_help.txt`, `audit/qa/hde-epic026/checks/po-008/reject_nonjson_stdout.log`, `audit/qa/hde-epic026/checks/po-008/reject_nonjson_stderr.log`, `audit/qa/hde-epic026/checks/po-008/reject_nonjson_rc.txt`.
+
+    * Conditional conjunction-output captures (example; only when runtime IDs are provided): `audit/qa/hde-epic026/checks/po-008/concat_output.json`, `audit/qa/hde-epic026/checks/po-008/concat_output_order_check.txt`.
+
+    * Blocked-input conjunction captures (example): `audit/qa/hde-epic026/checks/po-009/open_rails_note.txt`, `audit/qa/hde-epic026/checks/po-009/po-009_input_constraint.log`.
+
+    * Conjunction-help and dev-endpoint confirmation captures (example): `audit/qa/hde-epic026/checks/po-010/showcompat_help.txt`, `audit/qa/hde-epic026/checks/po-010/catalog_extract_dev_endpoints.json`.
+
+    * Canonical-JSON gate and evidence-index refresh captures (example): `audit/qa/hde-epic026/checks/po-011/canonical_json_gate_stdout.log`, `audit/qa/hde-epic026/checks/po-011/canonical_json_gate_stderr.log`, `audit/qa/hde-epic026/checks/po-011/canonical_json_gate_rc.txt`, `audit/qa/hde-epic026/checks/po-011/update_evidence_index_stdout.log`, `audit/qa/hde-epic026/checks/po-011/update_evidence_index_stderr.log`, `audit/qa/hde-epic026/checks/po-011/update_evidence_index_rc.txt`.  
+  * Conjunction route-proof checks (examples): `audit/qa/hde-epic026/checks/po-005/route_proof.txt`, `audit/qa/hde-epic026/checks/po-005/pytest_stdout.log`, `audit/qa/hde-epic026/checks/po-005/pytest_stderr.log`, `audit/qa/hde-epic026/checks/po-005/pytest_rc.txt`; `audit/qa/hde-epic026/checks/po-006/route_proof.txt`, `audit/qa/hde-epic026/checks/po-006/pytest_stdout.log`, `audit/qa/hde-epic026/checks/po-006/pytest_stderr.log`, `audit/qa/hde-epic026/checks/po-006/pytest_rc.txt`.
+
+  * Endpoint Catalog dev-endpoint verification (example): `audit/qa/hde-epic026/checks/po-007/catalog_extract_dev_endpoints.json`, `audit/qa/hde-epic026/checks/po-007/catalog_sha256_check.txt`, `audit/qa/hde-epic026/checks/po-007/pytest_stdout.log`, `audit/qa/hde-epic026/checks/po-007/pytest_stderr.log`, `audit/qa/hde-epic026/checks/po-007/pytest_rc.txt`.
+
+  * CLI help and modifier-validation captures (example): `audit/qa/hde-epic026/checks/po-008/cli_help.txt`, `audit/qa/hde-epic026/checks/po-008/showcompat_help.txt`, `audit/qa/hde-epic026/checks/po-008/reject_nonjson_stdout.log`, `audit/qa/hde-epic026/checks/po-008/reject_nonjson_stderr.log`, `audit/qa/hde-epic026/checks/po-008/reject_nonjson_rc.txt`.
+
+  * Conditional conjunction-output captures (example; only when runtime IDs are provided): `audit/qa/hde-epic026/checks/po-008/concat_output.json`, `audit/qa/hde-epic026/checks/po-008/concat_output_order_check.txt`.
+
+  * Blocked-input conjunction captures (example): `audit/qa/hde-epic026/checks/po-009/open_rails_note.txt`, `audit/qa/hde-epic026/checks/po-009/po-009_input_constraint.log`.
+
+  * Conjunction-help and dev-endpoint confirmation captures (example): `audit/qa/hde-epic026/checks/po-010/showcompat_help.txt`, `audit/qa/hde-epic026/checks/po-010/catalog_extract_dev_endpoints.json`.
+
+  * Canonical-JSON gate and evidence-index refresh captures (example): `audit/qa/hde-epic026/checks/po-011/canonical_json_gate_stdout.log`, `audit/qa/hde-epic026/checks/po-011/canonical_json_gate_stderr.log`, `audit/qa/hde-epic026/checks/po-011/canonical_json_gate_rc.txt`, `audit/qa/hde-epic026/checks/po-011/update_evidence_index_stdout.log`, `audit/qa/hde-epic026/checks/po-011/update_evidence_index_stderr.log`, `audit/qa/hde-epic026/checks/po-011/update_evidence_index_rc.txt`..  
+  * Plan check step directories are organized under `audit/qa/hde-epic026/checks/po-0NN/` (for example: `po-005`, `po-006`, `po-007`, `po-008`, `po-009`, `po-010`, `po-011`, `po-012`) with a per-step `primary.log` plus step-specific artifacts (names and paths only).
+
+* EPIC026 close-pack artifacts (mechanically generated)  
+  * `tools/qa/generate_epic026_close_pack.py` (generator; emits close pack at fixed paths)
+
+  * `audit/EPIC-026_MANIFEST.json` (enumerates key outputs \+ includes `pf23_sha256` for the PF23 anchor)
+
+  * `audit/EPIC-026_close_report.md` (close report, ADR/TI mapping)
+
+  * `audit/EPIC-026_MANIFEST.json.path_proof.txt` (path proof transcript; created by QA harness)
+
+  * `audit/EPIC-026_close_report.md.path_proof.txt` (path proof transcript; created by QA harness)
+
+  * `audit/qa/hde-epic026/checks/po-000/qa_step_logs_manifest.json` (plan-required Step-0 manifest pair; stable check-scoped location)
+
+  * `audit/qa/hde-epic026/checks/po-000/qa_step_logs_manifest.json.path_proof.txt` (path proof transcript; stable check-scoped location)
+
+  * `audit/qa/hde-epic026/qa_step_logs_manifest.json` and `audit/qa/hde-epic026/qa_step_logs_manifest.json.path_proof.txt` may exist as legacy traceability artifacts, but they are non-canonical for the Step-0 close-out deliverable surface.
+
+  * Check-scoped close-pack verification copies (example; CHECK `po-012`): `audit/qa/hde-epic026/checks/po-012/generator_stdout.log`, `audit/qa/hde-epic026/checks/po-012/generator_stderr.log`, `audit/qa/hde-epic026/checks/po-012/generator_rc.txt`, `audit/qa/hde-epic026/checks/po-012/close_pack_copy/epic-026_manifest.json`, `audit/qa/hde-epic026/checks/po-012/close_pack_copy/epic-026_evidence_index.json`, `audit/qa/hde-epic026/checks/po-012/close_pack_copy/endpoints_catalog.json`, `audit/qa/hde-epic026/checks/po-012/close_pack_copy/endpoints_catalog.json.sha256`.
+
+  * `audit/docdeltas/hde-epic026_doc_deltas.md` (doc delta ledger for epic; governed artifact)
+
+  * `audit/docdeltas/hde-epic026_drain_targets.md` (doc delta drain targets)
+
+  * `audit/qa/hde-epic026/00_meta/doc_deltas.md` (QA-meta doc delta ledger artifact)  
 * **EPIC024 QA runner provenance notes (addenda 14–29).** The following runner/path mismatches were observed in PASS-grade EPIC024 Live QA evidence and are recorded here to prevent plan drift:.  
   * **D09\_generate\_evidence\_index\_snapshot** — plan-named runner `python tools/evidence/run_evidence_index_snapshot.py`; observed runner `python tools/evidence/run_evidence_index_snapshot_gate.py`.  
   * **D13\_acceptance\_map\_viability** — plan-named runner `python tools/evidence/run_acceptance_map_viability.py`; observed runner `python tools/evidence/run_acceptance_map_viability_gate.py`.  
@@ -1250,6 +1366,25 @@ These surfaces together form the **ledger-centric, deterministic, text-based evi
 * **Evidence index snapshot artifact family (gates-only; tokenless).** The Evidence Index snapshot is a mechanical PASS/FAIL validator artifact used as closure-proof evidence for D23. It MUST NOT mint or claim an acceptance token unless **HDE-Governance** registers one. The schema and PASS/FAIL predicate are owned by **HDE-Schemas & Artifacts** and **Glow QA Guide**; PF02 records only the surface and routing. Status posture: PASS when the predicate holds; FAIL\_BEHAVIOR when the predicate fails; TOOLING\_BLOCKED when required inputs are missing. Any EPIC-local copies (for example under `audit/qa/hde-epic<NNN>/<RUN_SUBDIR>/evidence_index_snapshot.json`) and deprecated snapshot file paths recorded in PF10 (for example `artifacts/INDEX_SNAPSHOT.json` and `audit/evidence_index_snapshot/evidence_index_snapshot.json`) are non-canonical and MUST NOT be treated as alternate contract surfaces.  
   * **Evidence index snapshot** — Canon surface: `audit/gates/evidence_index_snapshot/evidence_index_snapshot.json` / Path proof: `audit/gates/evidence_index_snapshot/evidence_index_snapshot.json.path_proof.txt`  
 * **Canonical JSON gate artifacts (gates-only).** Canonical JSON gate artifacts MUST use the `audit/gates/json_gate/canonical/` family (see **HDE-Mechanics Guide**, **Glow QA Guide**, **HDE-Schemas & Artifacts**). The legacy naming under `audit/gates/canonical_json/<LEGACY_SUBPATH>` MUST NOT be treated as a canonical surface unless explicitly re-registered as such. The legacy catalog check report remains at `audit/gates/canonical_json/json_canonical_check.log` (legacy; not a canonical predicate surface).  
+  * **Gate checked-target coverage includes conjunction CLI artifacts (names and paths only).** The Canonical JSON gate target surface includes the conjunction-related CLI artifacts below.  
+    * `artifacts/audit/cli/pair.json`
+
+    * `artifacts/audit/cli/pair_ba.json`
+
+    * `artifacts/audit/cli/showcompat_ab.json`
+
+    * `artifacts/audit/cli/showcompat_ba.json`
+
+    * `artifacts/cli/out.json`
+
+    * `artifacts/cli/out_ba.json`
+
+    * `artifacts/cli/abba_sidecar.json`
+
+    * Each listed artifact MUST have a sibling `.path_proof.txt` transcript and corresponding entries in both Evidence Indexes (`docs/evidence/INDEX.json` and `artifacts/evidence_index.jsonl`).
+
+    * Runner target definitions and artifact-key naming are owned by HDE-Mechanics Guide and HDE-Schemas & Artifacts by title.
+
   * **Gate check log** — Canon surface: `audit/gates/json_gate/canonical/json_gate_check_log.ndjson`  
     * Path proof: `audit/gates/json_gate/canonical/json_gate_check_log.ndjson.path_proof.txt`  
   * **Gate compare log** — Canon surface: `audit/gates/json_gate/canonical/json_gate_compare_log.ndjson`  

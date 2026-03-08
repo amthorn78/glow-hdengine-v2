@@ -4,13 +4,13 @@
 
 **Title:** PF05-Canon-HDE-CLI-API-Vendor-Ref
 
-**Version:** v1.7.1
+**Version:** v1.7.9
 
 **Status:** Canon
 
-**Effective date:** 2026-02-11
+**Effective date:** 2026-03-07
 
-**Last Update Gate:** BN 9.8.2 Drain A49-51
+**Last Update Gate:** BN 10.0.5 drain A32-33
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -42,7 +42,7 @@
 
 * **Single homes; no duplication.** Do not restate Architecture/Math rules; keep CLI/Reader/Vendor **bytes here** and reference other documents **by title only**.
 
-* **Governed paths only.** Evidence and acceptance artifacts must live under governed repo roots: `docs/**`, `artifacts/**`, and `audit/**`. For Live QA runs executed in Codespaces, the run folder (mechanical evidence) is under `audit/qa/<epic-id>/<run-id>/` (titles-only; execution rails live in **Glow QA Guide** and **Epic-Process-Guide**). Transient generator paths (scratch/temp) are disallowed. Root sprawl is drift: any new top-level directory is nonconforming unless explicitly authorized by an ADR; enforce via lint or CI guard (fail the PR).
+* **Governed paths only.** Evidence and acceptance artifacts must live under governed repo roots: `docs/**`, `artifacts/**`, and `audit/**`. For Live QA runs executed in Codespaces, mechanical evidence is check-scoped under the stable epic root `audit/qa/<epic-id>/checks/<check-id>/`; per-run nesting is disallowed. Transient generator paths (scratch/temp) are disallowed. Root sprawl is drift: any new top-level directory is nonconforming unless explicitly authorized by an ADR; enforce via lint or CI guard (fail the PR).
 
 * **Lowercase directories (ASCII) only.** Don’t create mixed-case directories.
 
@@ -402,6 +402,12 @@ It is an admin/QA tool, not a public API. It is **implemented** in the CLI but r
 
 **Input requirement (normative).** `hdctl showcompat` MUST be invoked with explicit inputs for the pair. A zero-argument invocation is a usage error (exit 64\) and cannot be treated as a functional proof.
 
+**Help-surface compatibility aliases (informative).**
+
+* CLI help may expose `--user-a-id` and `--user-b-id` as long-form aliases for the DB-backed user input family. Canonical PF05 prose continues to use `--user-a` / `--a-user` and `--user-b` / `--b-user`.
+
+* CLI help may expose `--format {json}` as a JSON-only compat-output selector. This does not widen the byte contract beyond canonical JSON.
+
 **A. DB-backed users**
 
 `hdctl showcompat --user-a <idA> --user-b <idB> [--source {db|vendor|auto}]`
@@ -442,6 +448,36 @@ It is an admin/QA tool, not a public API. It is **implemented** in the CLI but r
 * Reads BodyGraphs and metadata for the pair from STDIN.
 
 * No DB or vendor access occurs in this mode.
+
+**Conjunction mode (`--conjunction`).**
+
+* Mode: `--conjunction`.
+
+* When `--conjunction` is used, both parties (A and B) are required. Missing either MUST produce a usage error.
+
+* When `--conjunction` is used, the input sources are:
+
+  * Two user IDs (A and B) from either `db` or `vendor` (via `--a-user` \+ `--b-user`).
+
+  * File-based BodyGraph fixtures (does not require user IDs), via either:
+
+    * `--pair-file <path>` (legacy alias: `--file <path>`).
+
+    * `--a-file <path>` \+ `--b-file <path>`.
+
+  * Stdin-based BodyGraph fixtures (does not require user IDs), via `--stdin` (payload MUST include both `left` and `right`).
+
+* `--conjunction` is a read-only computation and MUST NOT mutate state.
+
+* `--conjunction` emits a public conjunction payload under stable top-level key `conjunction`.
+
+* When `--conjunction` is used, `--viewer-prefs` is ignored. (Conjunction output does not use viewer prefs.)
+
+* When `--conjunction` is used, `--compat-format` is ignored. (Conjunction output is not a compat report.)
+
+* When `--conjunction` is used, dump and sidecar flags are disallowed. This includes `--dump-reader`, `--dump-admin-dir`, and `--admin-sidecar` (or equivalent aliases). Invalid conjunction flag combinations follow the usage-error rules in §4.1.4.
+
+* `--conjunction` does not change `--source` legality: `--source` remains limited to `db`, `vendor`, or `auto`.
 
 **Normalization (AB↔BA).**
 
@@ -587,22 +623,16 @@ Admin sidecars:
 
 Exit codes follow §3.4. The mapping for `showcompat`:
 
-* `0`: Success; stdout is canonical JSON (plus exactly one trailing LF); stderr empty.
-
-* `64`: Usage; stderr is a short human synopsis; stdout empty.
-
-* `1`: Failure; stdout empty. `stderr` contains exactly one line: a single code string token, LF-terminated (no JSON envelope).
-
-  * For CLI stdout invariants, the stderr code string MUST be one of:
-
-    * `STDOUT_MISSING_LF` indicates missing final LF on emitted stdout bytes.
-
-    * `STDOUT_CRLF` indicates CRLF was detected in emitted stdout bytes.
-
-    * `STDOUT_NOT_CANONICAL_V1` indicates stdout parses as JSON but is not canonical under `serializer_v1` (does not round-trip through canonicalization).
-
-  * For engine/internal/vendor failures, the stderr code string MUST be the canonical `ERR_*` token that would appear in `error_v1.code` for the same failure on HTTP surfaces.
-
+* `0`: Success; stdout is canonical JSON (plus exactly one trailing LF); stderr empty.  
+* `64`: Usage; stderr is a short human synopsis; stdout empty.  
+* If a `--format` selector is supplied with a non-JSON value (for example `--format yaml`), the invocation MUST fail as a usage error with exit code `64`, empty stdout, and parser rejection text on stderr. This includes conjunction-mode invocations.  
+* `1`: Failure; stdout empty. `stderr` contains exactly one line: a single code string token, LF-terminated (no JSON envelope).  
+  * For CLI stdout invariants, the stderr code string MUST be one of:  
+    * `STDOUT_MISSING_LF` indicates missing final LF on emitted stdout bytes.  
+    * `STDOUT_CRLF` indicates CRLF was detected in emitted stdout bytes.  
+    * `STDOUT_NOT_CANONICAL_V1` indicates stdout parses as JSON but is not canonical under `serializer_v1` (does not round-trip through canonicalization).  
+  * For engine/internal/vendor failures, the stderr code string MUST match the canonical `error_v1.code` that would appear for the same failure on HTTP surfaces.  
+  * Conjunction closed-rail data refusal: if `--conjunction` is set and a required local BodyGraph is missing while the needed access path is unavailable due to rails being closed, `stderr` MUST be `PROVIDER_REFUSED` and `stdout` MUST be empty.  
 * Other non-zero codes are reserved; in all cases stdout remains empty.
 
 Streams follow §3.3/§3.4. HTTP error envelopes follow §5.2.
@@ -1848,31 +1878,44 @@ Legacy lowercase strings such as `"invalid_json"`, `"invalid_prefs"`, and `"miss
 
 * Internal admin/dev-only routes (example: compat admin) must be declared POST-only when applicable and must not be `a7_eligible`.
 
-  ### **Catalog entries (normative; minimal)**
+### **Catalog entries (normative; minimal)**
 
-* **Reader success route (dev harness):** `/reader`
-
-  * `allowed_methods`: \[`GET`, `HEAD`\]
-
-  * `internal`: true
-
-  * `class`: `dev_harness`
-
-  * `env_gate`: {"APP\_ENV":"dev"}
-
-  * `a7_eligible`: true
-
-* **Compat v1 (internal admin, dev-only):** `/api/compat/v1`
-
-  * `allowed_methods`: \[`POST`\]
-
-  * `internal`: true
-
-  * `class`: `internal_admin`
-
-  * `env_gate`: non-empty (must gate out production)
-
-  * `a7_eligible`: false
+* **Reader success route (dev harness):** `/reader`  
+  * path: `/reader`  
+  * allowed\_methods: \[`GET`, `HEAD`\]  
+  * internal: true  
+  * class: `dev_harness`  
+  * env\_gate: `{"APP_ENV":"dev"}`  
+  * a7\_eligible: true  
+* **Dev sampler conjunction (dev-only):** `/dev/sampler/conjunction`  
+  * path: `/dev/sampler/conjunction`  
+  * allowed\_methods: \[`GET`\]  
+  * internal: true  
+  * class: `dev_harness`  
+  * env\_gate: `{"APP_ENV":["dev","test","local"]}`  
+  * a7\_eligible: false  
+* **Dev reader conjunction (dev-only):** `/dev/reader/conjunction`  
+  * path: `/dev/reader/conjunction`  
+  * allowed\_methods: \[`GET`\]  
+  * internal: true  
+  * class: `dev_harness`  
+  * env\_gate: `{"APP_ENV":["dev","test","local"]}`  
+  * a7\_eligible: false  
+* **`Dev writer conjunction (dev-only):`** `/dev/writer/conjunction`  
+  * path: `/dev/writer/conjunction`  
+  * route\_id: `dev.writer.conjunction.v1`  
+  * allowed\_methods: ‘POST‘\`POST\`‘POST‘  
+  * internal: true  
+  * class: `dev_harness`  
+  * env\_gate: `{"APP_ENV":["dev","test","local"]}`  
+  * a7\_eligible: false  
+* **Compat v1 (internal admin, dev-only):** `/api/compat/v1`  
+  * path: `/api/compat/v1`  
+  * allowed\_methods: \[`POST`\]  
+  * internal: true  
+  * class: `internal_admin`  
+  * env\_gate: non-empty (must gate out production)  
+  * a7\_eligible: false
 
 ### **Evidence artifacts**
 
@@ -2373,6 +2416,54 @@ Evidence and tests (titles-only):
   * verify canonical JSON (UTF-8, sorted keys, compact, one LF).
 
 * Any governed evidence artifacts and test transcripts for this route are indexed in the Evidence Index and machine mirror per PF12 (titles/paths only); PF05 does not duplicate those paths.
+
+  ## **5.12 Dev conjunction endpoints \[Implemented (dev-only)\]**
+
+* **Purpose.** Provide dev-only HTTP routes for conjunction preview and harness evaluation without coupling to the internal sampler harness.
+
+* **Environment gating (normative).**
+
+  * These routes MUST be gated by `APP_ENV` in `{dev, test, local}` and MUST NOT be available in production.
+
+  * If env-gating fails, requests to these routes MUST be forbidden using the Writer-style error envelope in §5.2 (not a raw HTTP 403 payload).
+
+  * These routes are not eligible for A7 proof selection; they MUST be registered with `a7_eligible=false` in the Endpoint Catalog.
+
+* **Input contract (normative).**
+
+  * Inputs are supplied as query-string keys in the `a_*` and `b_*` namespace.
+
+  * At minimum, `a_id` and `b_id` MUST be accepted as pair identifiers.
+
+  * Request validation MUST fail closed for missing or malformed required identifiers, and MUST use canonical typed error mapping (no ad-hoc string errors).
+
+* **Resolver acquisition and SAFE rails posture (normative).**
+
+  * Provider acquisition MUST be performed through resolver acquisition (not raw cache reads), so cache hits are normalized into a resolved shape and resolved detection remains correct even when a cached record is vendor-shaped.
+
+  * SAFE rails posture is closed by default. When an explicit environment configuration enables open-rails acquisition, acquisition MAY open rails only long enough to acquire missing data and MUST close back before compute and emission.
+
+* **Output canon (normative).**
+
+  * Any success payload emitted by these routes MUST be serialized by the canonical public emitter, producing deterministic JSON bytes with ASCII-sorted keys and exactly one trailing LF.
+
+  * AB↔BA parity MUST hold for conjunction evaluation: swapping A and B MUST NOT change emitted bytes after canonical emission.
+
+* **Endpoints (dev-only).**
+
+  * `GET /dev/sampler/conjunction`
+
+    * Dev-only conjunction preview route for sampler evaluation.
+
+  * `GET /dev/reader/conjunction`
+
+    * Dev-only conjunction preview route for Reader-style response emission and VendorError mapping.
+
+  * `POST /dev/writer/conjunction`
+
+    * Dev-only conjunction preview route returning an idempotent writer-style envelope (not the public Reader v1 envelope).
+
+    * The Endpoint Catalog route id for this endpoint is `dev.writer.conjunction.v1`.
 
   ---
 
@@ -2878,11 +2969,11 @@ Acceptance impact.
 
 # **8\. Error Model & Exit Codes \[Required-Now\]**
 
-## **8.1 Typed public error object (numeric-free) \[Required−Now\]**
+## 8.1 Typed public error object (numeric-free) \[Required−Now\]
 
-**Primary home:** §5.2 “Errors” (tagged **\[Required-Now\]**). This section is a short cross-surface summary; if any drift occurs, §5.2 wins.
+**Primary home:** §5.2 “Errors” (tagged **Required−NowRequired-NowRequired−Now**). This section is a short cross-surface summary; if any drift occurs, §5.2 wins.
 
-**Shape (minimum).** The CLI/Reader typed error is the **error\_v1** envelope, serialized by the single emitter (UTF-8, sorted keys, compact, one LF):
+**Shape (minimum).** HTTP typed errors use the **error\_v1** envelope, serialized by the single emitter (UTF-8, sorted keys, compact, one LF):
 
 `{"schema":"v1","ok":false,"code":"<ERR_*>","error":"<non-PII message>"}`
 
@@ -2896,7 +2987,9 @@ Acceptance impact.
 
 Optional fields are schema-owned and must remain numeric-free (for example `retry_after_ms` integer ≥ 0 when transport policy explicitly permits it, and optional `details` object when permitted by the error\_v1 schema).
 
-**No other fields.** Do not echo payloads, secrets, stack traces, or vendor bodies. Always LF-terminate with exactly one trailing `\n`.
+**CLI note.** CLI typed failures do **not** emit `error_v1` on stderr. CLI failures emit a single LF-terminated code string token; when the same failure maps to an HTTP surface, that token MUST equal the HTTP `error_v1.code` value for the same condition.
+
+**No other fields.** HTTP error envelopes must not echo payloads, secrets, stack traces, or vendor bodies. Always LF-terminate canonical public JSON with exactly one trailing `\n`.
 
 **Routing (titles-only).** Schema constraints live in **HDE-Schemas & Artifacts**. Token naming/semantics live in **HDE-Governance**.
 
@@ -2912,35 +3005,37 @@ Optional fields are schema-owned and must remain numeric-free (for example `retr
 
 * **Usage (exit 64\) → stderr.** Print a short synopsis to `stderr`; `stdout` empty.
 
-* **Typed failures and internal failures (non-zero; command-specific) → stderr.** Print error\_v1 (§5.2 / §8.1) to `stderr`, LF-terminated; `stdout` empty. The exact non-usage failure exit code is pinned by the command contract (see §3.4 and the command section).
+* **Typed failures and internal failures (non-zero; command-specific) → stderr.** Print a single LF-terminated code string token to `stderr`; `stdout` empty. Where the same failure maps to an HTTP `error_v1`, the CLI token MUST equal the HTTP `error_v1.code` value. The exact non-usage failure exit code is pinned by the command contract (see §3.4 and the command section).
 
 * **No mixed streams.** Never interleave diagnostics with public bytes.
 
 ## **8.3 Exit codes (taxonomy) \[Required−Now\]**
 
-**Primary home:** §3.4 “Exit codes taxonomy \[Required-Now\]”. This section is a short summary.
+**Primary home:** §3.4 “Exit codes taxonomy Required−NowRequired-NowRequired−Now”. This section is a short summary.
 
 * `0` — Success. Canonical success payload on stdout (LF-terminated); stderr empty.
 
 * `64` — Usage/config/input error. Synopsis on stderr; stdout empty.
 
-* Other non-zero exit codes — command-specific. The exact non-usage failure exit code(s) are pinned by the command contract (see §3.4 and the command section, for example §4.1.4 for `showcompat`). For all such failures, stderr contains a single LF-terminated error\_v1 JSON object and stdout remains empty.
+* Other non-zero exit codes — command-specific. The exact non-usage failure exit code(s) are pinned by the command contract (see §3.4 and the command section, for example §4.1.4 for `showcompat`). For all such failures, stderr contains a single LF-terminated code string token and stdout remains empty.
 
-These codes are exhaustive for the CLI public surface in the sense that success is `0` and usage is `64`, while all other outcomes are non-zero failures that must follow the stderr-only, error\_v1 envelope discipline.
+These codes are exhaustive for the CLI public surface in the sense that success is `0` and usage is `64`, while all other outcomes are non-zero failures that must follow the stderr-only, single-token discipline.
 
-## 8.4 Determinism & hygiene gates \[Required-Now\]
+## **8.4 Determinism & hygiene gates \[Required−Now\]**
 
-* Canonical emitter. All error/usage outputs follow the same emitter rules as success (UTF-8, sorted keys, compact, one LF).
+* Canonical emitter. Success stdout and HTTP `error_v1` bodies follow the single-emitter rules (UTF-8, sorted keys, compact, one LF).
+
+* CLI stderr discipline. CLI stderr code strings and usage synopses are plain UTF-8 text, LF-terminated, and must not be wrapped in JSON envelopes.
 
 * No ad-hoc dumps. Forbid `json.dumps` and alternate serializers on public paths.
 
 * Idempotence posture. Typed errors are not part of the success preimage; success preimage/idempotence checks remain unchanged.
 
-* Parity expectations. CLI error serialization must be stable across runs (two-run identity) and deterministic across AB/BA inputs where applicable.
+* Parity expectations. CLI error token serialization must be stable across runs (two-run identity) and deterministic across AB/BA inputs where applicable. When the same failure maps to an HTTP surface, the CLI token MUST equal the HTTP `error_v1.code` value for that failure.
 
-# 9\. Acceptance & Evidence \[Required-Now\]
+  # 9\. Acceptance & Evidence \[Required-Now\]
 
-## 9.1 Parity (binary)
+  ## 9.1 Parity (binary)
 
 * **Reader↔CLI byte-equality.** For identical inputs/environment, Reader response bytes and CLI stdout **MUST** be byte-identical (including the single trailing LF).  
 * **AB↔BA identity.** Swapping pair order produces **bit-for-bit identical** bytes (pair normalization in effect).  
@@ -3380,6 +3475,28 @@ Keep this index synchronized with repo changes. When any golden or artifact path
 * `tests/cli/test_cli_canonical_bytes.py` *(showcompat stdout canonical-bytes validation)*  
 * `tests/cli/test_cli_usage_and_errors.py` *(showcompat usage/errors validation)*
 
+### **D.8a showcompat conjunction fixtures (AB / BA \+ sidecar)**
+
+* Pair fixtures (direct `a` / `b` ordering):
+
+  * `artifacts/cli/pair.json` (AB)
+
+  * `artifacts/cli/pair_ba.json` (BA)
+
+* showcompat output fixtures (success, AB / BA):
+
+  * `artifacts/cli/showcompat_ab.json` (AB)
+
+  * `artifacts/cli/showcompat_ba.json` (BA)
+
+* `--conjunction` output fixtures (success, AB / BA) and sidecar:
+
+  * `artifacts/cli/out.json` (AB)
+
+  * `artifacts/cli/out_ba.json` (BA)
+
+  * `artifacts/cli/abba_sidecar.json` (sidecar)
+
 ### **D.9 Vendor rails (closed refusal and open conformance)**
 
 * Closed-rails refusal proof (single-file canonical; headers → blank line → body): `artifacts/proofs/ops_refusal_proof.txt`  
@@ -3392,11 +3509,20 @@ Keep this index synchronized with repo changes. When any golden or artifact path
 * Failure envelope (guarded selection-only bytes): `artifacts/runtime/env_matrix.failure.json`  
 * **Dev resolver snapshot (rails evidence):** `artifacts/runtime/env_connectivity.snapshot.json`
 
-### **D.11 QA artifacts namespace (transient captures)**
+  ### **D.11 QA artifacts namespace (transient captures)**
 
-* **Live QA run root (write-scope):** `audit/qa/<epic-id>/...` (mechanical artifacts only; runbook rails and “gitless/no git-status gating” live in Glow QA Guide and Epic-Process-Guide by title)
+* **Live QA root (write-scope):** `audit/qa/<epic-id>/` (mechanical artifacts only; runbook rails and “gitless/no git-status gating” live in Glow QA Guide and Epic-Process-Guide by title)
 
-* **Transient captures (test-only; non-gating):** `artifacts/qa/` (allowed for local/test captures; not the Live QA run root)  
+* **Checks-only evidence layout.** Live QA evidence MUST be organized only by `check_id` under stable check directories: `audit/qa/<epic-id>/checks/<check-id>/`. Re-running QA MUST reuse the same epic-scoped root and stable check directories.
+
+* **Per-run nesting is disallowed.** Do not create run-id directories, timestamped run directories, or other per-run subroots under the Live QA root.
+
+* **Per-run root variables are vetoed.** Plans and reviews MUST NOT require operator-selected “fresh directory for this run” postures; evidence writes to the stable check directories.
+
+* **Plan-created deliverables under checks.** When Live QA requires plan-created deliverables, they MUST be written under the stable check directory, not under per-run directories or ad-hoc run roots.
+
+* **Transient captures (test-only; non-gating):** `artifacts/qa/` (allowed for local/test captures; not the Live QA run root)
+
 * **Filename case posture.** Uppercase letters in filenames are allowed. The lowercase ASCII naming rail applies to directory names (and to identifier classes explicitly defined as lowercase-only, such as check IDs). Reviewers and lint MUST NOT treat uppercase filename segments as a lowercase-rule violation.
 
 * **No run\_id correctness key.** Live QA plans and governed evidence artifacts MUST NOT require `run_id` (or `RUN_ID`) as an operator input, step-log header field, manifest field, or correctness key; acceptance is check-centric and stable across reruns.

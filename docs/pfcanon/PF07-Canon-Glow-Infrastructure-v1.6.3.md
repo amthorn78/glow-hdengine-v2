@@ -1,12 +1,12 @@
 # **0\. Front Matter**
 
 **Title:** PF07-Canon-Glow-Infrastructure  
-**Version:** v1.4.7
+**Version:** v1.6.3
 
 **Status:** Canon  
-**Effective date:** 2026-01-13
+**Effective date:** 2026-03-07
 
-**Last Update Gate:** BN 9.3.4 Drain A54-57
+**Last Update Gate:** BN 10.0.5 Drain A32-33
 
 **Invocation tag:** `INV-f2ac55d77ce9aacc`
 
@@ -256,11 +256,13 @@ PF07 is **names-only**. Admin-only narratives persistence **DB/schema locations*
 | prod | 1 (closed) | 0 (closed) | LC\_ALL=C · LANG=C · TZ=UTC | PO | PR \+ Epic-Process-Guide |
 | CI | 1 (closed) | 0 (closed) | LC\_ALL=C · LANG=C · TZ=UTC | PO | PR \+ Epic-Process-Guide |
 
-**Notes.**  
- • Rails “open” permits network I/O *subject to policy*; “closed” forbids it (typed refusal).  
- • Determinism pins are required for all evidence/canonicalization jobs.  
- • **No non-canonical pins.** Live QA plans and evidence steps MUST use only the canonical determinism pins listed here. `PYTHONHASHSEED` MUST NOT be added as a required determinism pin for plan approval or execution. If used for one-off diagnostics, it is non-governed and does not extend the canonical pins set.  
- • Details/tokens: see **HDE-Governance**; jobs/proofs: **HDE-Schemas & Artifacts**; process: **Epic-Process-Guide**.
+**Notes.**
+
+* Rails “open” permits network I/O *subject to policy*; “closed” forbids it (typed refusal).  
+* Determinism pins are required for all evidence/canonicalization jobs.  
+*  **No non-canonical pins.** Live QA plans and evidence steps MUST use only the canonical determinism pins listed here. `PYTHONHASHSEED` MUST NOT be added as a required determinism pin for plan approval or execution. If used for one-off diagnostics, it is non-governed and does not extend the canonical pins set.  
+* **No QA-time env var minting; `MODO_*` is non-canonical.** Environment variable names are governed interface surfaces. Live QA plans, runbooks, and evidence schemas MUST use only canon-approved environment variable names recorded in PF07 (§8) and MUST NOT introduce or require `MODO_*` variables (including `MODO_RAILS`, `MODO_AI_BUNDLE`, and `MODO_AI_VERBOSE`) as inputs, required evidence keys, or proof of rails posture or execution configuration. Any plan revision that introduces an unapproved env var name (including any `MODO_*`) as a required input or required evidence key is a mechanical blocker; the fix is removal or replacement with canon-approved key names only. New env var names MUST NOT be introduced during Live QA execution (including Moon Loop remediation); if a new env var name is required, it must be introduced via development work under PO approval and documented in canon (including PF07) before any plan relies on it. **EPIC025 exception:** the already-approved HDE-EPIC025 Live QA Plan may contain inert `MODO_*` placeholders due to iteration churn; these placeholders are non-binding for closure, MUST NOT be required for PASS/FAIL or required evidence keys, and MUST NOT be replicated.  
+* Details/tokens: see **HDE-Governance**; jobs/proofs: **HDE-Schemas & Artifacts**; process: **Epic-Process-Guide**.
 
 ## **2.5 QA windows (names‑only)**
 
@@ -414,7 +416,7 @@ In other words, **terminal CLI access** is a named, supported admin-facing produ
  Live QA runbooks MUST NOT include git operations and MUST NOT gate PASS/FAIL on working-tree cleanliness. Evidence gating is artifact-based under `audit/qa/<epic-id>/...`. The execution rail is governed by title in **Epic-Process-Guide** and **Glow QA Guide**.
 
 **No non-canonical wrappers (routing-only).**  
- Live QA plans MUST NOT depend on helper/wrapper scripts unless the script is a canon-named entrypoint by explicit path. Where canon requires an artifact surface but does not name a tool, the plan must validate or produce the governed artifact surface directly using baseline commands (see §10.5 “Live QA evidence is mechanical”).
+Live QA Plans, QA reviews, and any QA runbooks MUST NOT invent or mint new repo loci (scripts, modules, checks, test files, endpoints, or commands). Any executable locus MUST be audit-proven to exist as a repo locus or explicitly canon-defined as a fixed entrypoint by explicit path, and QA plans MUST NOT create new scripts at run time; missing tooling is a repo gap to be resolved by PR work rather than QA-time script creation. Where canon requires an artifact surface but does not name a tool, the plan must validate or produce the governed artifact surface directly using baseline commands (see §10.5 “Live QA evidence is mechanical”).
 
 **Where PF07 fits (names-only reminder).**  
  PF07 remains the single home for provider/project/service names, stable base URLs, canonical QA root patterns, and infra key names. It routes Codespaces configuration, Live QA runbooks, and acceptance semantics by title to their owning documents.
@@ -502,7 +504,13 @@ In other words, **terminal CLI access** is a named, supported admin-facing produ
 * **External surfaces (titles-only):**  
   * **Endpoint Catalog (JSON success)** — discovery/proofs live in **HDE-CLI-API-Vendor-Ref** (A7 success routes); Catalog is **internal-only** and **env-gated**; capture headers-only **env-gate** proof (routing only).  
   * **Ops identity** — `/internal/version` (ops-only; posture in **HDE-Governance**).  
-  * **Catalog JSON success route (names-only):** `/reader` (env-gated; currently **dev**). The Endpoint Catalog is **internal-only** and **env-gated**; proofs target this **cataloged JSON success** route only. Bytes live in **HDE-CLI-API-Vendor-Ref**; A7 policy & invariants live in **HDE-Governance**.  
+  * **Catalog JSON success route (names-only):** `GET /reader` (env-gated; currently **dev**; Reader v1 is selected via query parameter `v=1`, with no route-path change). When the Reader blueprint is mounted under an `/api` prefix in a given runtime configuration, `/api/reader` is an alias of the same Reader surface (not a distinct contract and not a separate proof surface). There is no `/api/reader-proof/v1` route and it MUST NOT be referenced. The Endpoint Catalog is **internal-only** and **env-gated**; proofs target the cataloged JSON success route for the configured mount (`/reader`, or `/api/reader` only when that is the configured mount). Bytes live in **HDE-CLI-API-Vendor-Ref**; A7 policy & invariants live in **HDE-Governance**.  
+  * Aux narrative surface (names-only): /aux/narrative (served from the same adapter HTTP surface family as Reader).  
+  * **Compat HTTP surface (internal/admin; names-only):** `/api/compat/v1` (cataloged as internal/admin and env-gated; contract details live by title in **HDE-CLI-API-Vendor-Ref** and **HDE-Governance**).  
+  * Dev-only conjunction endpoints (names-only; dev/test/local only):  
+    * `GET /dev/sampler/conjunction` (dev-harness; env-gated via APP\_ENV allowlist dev,test,local)  
+    * `GET /dev/reader/conjunction` (dev-harness; env-gated via APP\_ENV allowlist dev,test,local)  
+    * `GET /dev/writer/conjunction` (dev-harness; gated via dev admin gate)  
   * *(If used) Endpoint Catalog host (internal-only):* **TBD** (non-prod unreachable in prod; names-only)
 
 *Names-only; policy/bytes/tokens are routed by title (HDE-Governance / HDE-CLI-API-Vendor-Ref).*
@@ -570,8 +578,9 @@ These top-level roots are part of the HD Engine repo inventory and are infra- an
 
 PF07 records this repo structure as an infra inventory only. Transport behavior, governance, QA policy, schemas, and evidence acceptance are routed by title to their owning PF documents (for example, **HDE-Governance**, **HDE-CLI API Vendor Ref**, **HDE-Schemas & Artifacts**, **Glow QA Guide**, **HDE-Mechanics Guide**).
 
-**Directory naming (repo-wide; names-only).**  
- All directories in the repository and application codebase MUST use **lowercase ASCII** names. Mixed-case or upper-case directory names are non-conforming and must not be introduced. If mixed-case directories exist, treat them as legacy drift and normalize them to lowercase rather than copying them forward.
+**Directory naming (repo-wide; names-only).**
+
+All directories in the repository and application codebase MUST use **lowercase ASCII** names. Mixed-case or upper-case directory names are non-conforming and must not be introduced. If mixed-case directories exist, treat them as legacy drift and normalize them to lowercase rather than copying them forward. Uppercase characters in filename segments are allowed and MUST NOT be treated as a lowercase-rule violation. Identifier classes explicitly defined as lowercase-only elsewhere (for example check IDs and test IDs) remain lowercase-only.
 
 This applies to all governed roots listed above (for example, `docs/`, `artifacts/`, `audit/`, `catalog/`, `schemas/`, and per-epic QA trees under `audit/qa/<epic-id>/...`).
 
@@ -958,6 +967,16 @@ PF07 records this as an infra responsibility only. The meaning of each `APP_ENV`
 
 * `TZ` — UTC
 
+**EVIDENCE\_ROOT** (QA evidence root; names-only)
+
+* Pattern: `audit/qa/<epic-id>`
+
+* Example (EPIC025): `audit/qa/hde-epic025`
+
+* Usage: Live QA plans may declare required evidence artifacts relative to `${EVIDENCE_ROOT}`.
+
+  * Common relative paths include `checks/po-000/qa_step_logs_manifest.json`, `checks/po-000/qa_step_logs_manifest.json.path_proof.txt`, `checks/po-000/doc_deltas.md`, and `checks/<check_id>/primary.log`.
+
 **Railway metadata** (names-only)  
  `RAILWAY_PROJECT_ID`, `RAILWAY_PROJECT_NAME`, `RAILWAY_SERVICE_ID`, `RAILWAY_SERVICE_NAME`, `RAILWAY_ENVIRONMENT`, `RAILWAY_ENVIRONMENT_NAME`, `RAILWAY_PUBLIC_DOMAIN`, `RAILWAY_PRIVATE_DOMAIN` — OPEN/TBD
 
@@ -1026,6 +1045,12 @@ PF07 records this as an infra responsibility only. The meaning of each `APP_ENV`
 • Dev (CodEx): 8000  
 • QA (Codespaces): 8000  
 • Prod (Railway): 8000
+
+**`HDE_WRITE_A7_PROOFS` — A7 proof artifact emission gate (names-only)**
+
+* **Observed behavior (routing-only):** when this key is set for a run, A7 proof artifacts are written; default test runs do not write proof files.
+
+* **Observed usage:** `HDE_WRITE_A7_PROOFS=1` (value and binding are run-scoped; per-environment bindings are **OPEN/TBD**).
 
 **Dev harness URLs (internal/dev HTTP; names-only)**
 
@@ -1168,6 +1193,10 @@ Keep verbatim — this is the source of truth as configured in Railway.
 
 The authoritative listing of evidence artifacts (titles/paths) and governed record types is owned by the canonical **Schemas & Artifacts** document (titles-only). **Glow Infrastructure** is names-only: it inventories stable evidence index and mirror file locations used by the repo, but does not define evidence schemas, acceptance rules, or token semantics.
 
+**Multi-root evidence posture (clarification; names-only).** The EPIC025 audit observes governed or evidence-like outputs stored across multiple roots (for example: `audit/`, `artifacts/`, `docs/`, `proofs/`, `parity/`, `reports/`, `scan_reports/`, `validation/`, `catalog/`, `narratives/`, `internal/`, `scripts/`, `tools/`). In PF07, “single home” in evidence terms means the single authoritative Evidence Index plus machine mirror parity and the fixed-path governed evidence surfaces enumerated below, not that all evidence bytes must live under one directory root.
+
+**Classification note (routing-only).** PF07 records root names and stable paths only. Evidence-family classification and any decision to treat a root as governed evidence vs tooling output is owned by the canonical Schemas & Artifacts document (titles-only).
+
 ### Indexing discipline (same-change-set rule)
 
 Whenever governed evidence bytes change, update in the same change-set:
@@ -1176,8 +1205,26 @@ Whenever governed evidence bytes change, update in the same change-set:
 * Human Evidence Index path-proof: `docs/evidence/INDEX.json.path_proof.txt`  
 * Evidence Index hash sentinel: `docs/evidence/INDEX.sha256`  
 * Evidence Index hash sentinel path-proof: `docs/evidence/INDEX.sha256.path_proof.txt`  
+* Human Evidence Index page (docs-side): `docs/evidence/INDEX.md`  
+* Human path-proof anchors root (docs-side): `docs/evidence/path_proof/`  
 * Machine mirror (records-only): `artifacts/evidence_index.jsonl`  
-* Machine mirror path-proof: `artifacts/evidence_index.jsonl.path_proof.txt`
+* Machine mirror path-proof: `artifacts/evidence_index.jsonl.path_proof.txt`  
+* Machine mirror hash sentinel (docs-side companion): `artifacts/evidence_index.sha256`  
+* Docs evidence index snapshot (JSON): `docs/evidence_index_snapshot/index.json`
+
+* Docs evidence index snapshot path-proof: `docs/evidence_index_snapshot/index.json.path_proof.txt`
+
+* Docs evidence index snapshot hash sentinel: `docs/evidence_index_snapshot/index.sha256`
+
+* Docs evidence index snapshot hash path-proof: `docs/evidence_index_snapshot/index.sha256.path_proof.txt`
+
+* Mirror schema (JSON): `ci/checks/mirror_schema.json`
+
+* Mirror schema path-proof: `ci/checks/mirror_schema.json.path_proof.txt`
+
+* Mirror schema hash sentinel: `ci/checks/mirror_schema.json.sha`
+
+* Mirror schema hash path-proof: `ci/checks/mirror_schema.json.sha.path_proof.txt`
 
 **Proof freshness (governed artifacts).** If any file above changes bytes, its co-located `*.path_proof.txt` transcript MUST be refreshed in the same change-set. Stale index or mirror path-proofs are a hard evidence integrity failure.
 
@@ -1232,23 +1279,35 @@ Bindings for sanity log evidence MUST reference this governed surface only. Snap
 
 ### **Canonical JSON gates (canonical surface)**
 
-The only valid governed evidence surface for canonical JSON gate artifacts is:
+The authoritative governed evidence surface for canonical JSON gate acceptance binding is:
 
 * `audit/gates/json_gate/canonical/`
 
-Legacy / non-authoritative (MUST NOT be treated as the canonical evidence surface for acceptance binding or indexing):
+Legacy / transition-only variants (non-binding; retained for backward compatibility):
 
-* `audit/gates/canonical_json/`
+* `audit/gates/canonical_json/` (legacy family; evidence index / governed outputs may still include this family during transition)
 
-* `audit/gates/canonical/`
+* `audit/gates/canonical/` (legacy folder; retained for backward compatibility)
 
-Implementation Plan legacy record (non-authoritative; MUST NOT be required for future Implementation Plans or Live QA Plans unless canon explicitly reinstates it via Schemas & Artifacts):
+Legacy canonical\_json gate records and logs (names-only; non-binding):
 
 * `audit/gates/canonical_json/canonical_json.gate.json`
 
 * `audit/gates/canonical_json/canonical_json.gate.json.path_proof.txt`
 
-No dual-home binding: acceptance maps, token/evidence matrices, close-pack manifests, and Evidence Index/Mirror entries MUST reference only `audit/gates/json_gate/canonical/` for canonical JSON gate evidence.
+* `audit/gates/canonical_json/json_canon_compare.log`
+
+* `audit/gates/canonical_json/json_canon_compare.log.path_proof.txt`
+
+* `audit/gates/canonical_json/json_canonical_check.log`
+
+* `audit/gates/canonical_json/json_canonical_check.log.path_proof.txt`
+
+Flat canonical JSON gate snapshot (names-only; transition/non-binding):
+
+* `audit/gates/canonical_json_gate.json`
+
+No dual-home acceptance binding: acceptance maps, token/evidence matrices, and close-pack manifests MUST bind only to `audit/gates/json_gate/canonical/` for canonical JSON gate evidence. Evidence Index/Mirror entries may also track legacy `audit/gates/canonical_json/` artifacts during transition, but they are non-binding and MUST NOT be treated as a second source of truth.
 
 Canonical artifacts under this root (names-only; minimum family):
 
@@ -1267,6 +1326,42 @@ The governed evidence bundle for `/internal/version` is rooted at: `artifacts/op
 Endpoint Catalog inventory file (names-only; symlink surface):
 
 * `docs/ENDPOINTS_CATALOG.json`
+
+* `artifacts/audit/ENDPOINTS_CATALOG.json`
+
+* `artifacts/audit/ENDPOINTS_CATALOG.json.sha256`
+
+* `docs/ENDPOINTS_CATALOG.json.sha256`
+
+* `docs/ENDPOINTS_CATALOG.json.sha256.path_proof.txt`
+
+* `docs/ENDPOINTS_CATALOG.json.path_proof.txt`
+
+Additional Endpoint Catalog surfaces (names-only):
+
+* `docs/endpoint_catalog.json`
+
+* `docs/endpoint_catalog.json.sha256`
+
+* `docs/endpoint_catalog.json.path_proof.txt`
+
+* `docs/endpoint_catalog.json.sha256.path_proof.txt`
+
+* `artifacts/endpoint_catalog.json`
+
+* `artifacts/endpoint_catalog.json.sha256`
+
+* `artifacts/endpoint_catalog.json.path_proof.txt`
+
+* `artifacts/endpoint_catalog.json.sha256.path_proof.txt`
+
+Additional EPIC026 Endpoint Catalog source surfaces (names-only):
+
+* `docs/ENDPOINTS_CATALOG.md`
+
+* `audit/ENDPOINTS_CATALOG.json`
+
+* `audit/ENDPOINTS_CATALOG.sha256`
 
 Canonical artifact family under this root (names-only):
 
@@ -1289,6 +1384,65 @@ Canonical artifact family under this root (names-only):
 * `artifacts/ops/internal_version/cond_if_modified_since_headers.txt`
 
 **Indexing note (titles-only).** Evidence indexing is single-homed elsewhere; index entries must reference only the canonical artifact family listed above. Deprecated variants are transition-only and are not second sources of truth.
+
+### **Endpoint Catalog checksum sidecar note (names-only)**
+
+The checksum sidecar `docs/ENDPOINTS_CATALOG.json.sha256` records the checksum line against the `docs/ENDPOINTS_CATALOG.json` relative path (not a repo-root path).
+
+### **`/reader` A7 proof artifacts (EPIC025; names-only)**
+
+Canonical proof artifacts under `artifacts/proofs/` (plus sibling path-proofs `<file>.path_proof.txt`):
+
+* `artifacts/proofs/endpoints_env_gate_proof.log`
+
+* `artifacts/proofs/success_get.txt`
+
+* `artifacts/proofs/success_head.txt`
+
+* `artifacts/proofs/success_304.txt`
+
+* `artifacts/proofs/success_writers_errors.txt`
+
+* `artifacts/proofs/reader_route_proof.json`  
+* `artifacts/proofs/encoding_invariance.txt`
+
+### **CLI showcompat artifacts (EPIC025; names-only)**
+
+* `artifacts/cli/showcompat/args.json`
+
+* `artifacts/cli/showcompat/args.json.path_proof.txt`
+
+* `artifacts/cli/showcompat/stdout.json`
+
+### **CLI conjunction artifacts (EPIC026; names-only)**
+
+* `artifacts/audit/cli/pair.json`
+
+* `artifacts/audit/cli/pair.json.path_proof.txt`
+
+* `artifacts/audit/cli/pair_ba.json`
+
+* `artifacts/audit/cli/pair_ba.json.path_proof.txt`
+
+* `artifacts/audit/cli/showcompat_ab.json`
+
+* `artifacts/audit/cli/showcompat_ab.json.path_proof.txt`
+
+* `artifacts/audit/cli/showcompat_ba.json`
+
+* `artifacts/audit/cli/showcompat_ba.json.path_proof.txt`
+
+* `artifacts/cli/abba_sidecar.json`
+
+* `artifacts/cli/abba_sidecar.json.path_proof.txt`
+
+* `artifacts/cli/out.json`
+
+* `artifacts/cli/out.json.path_proof.txt`
+
+* `artifacts/cli/out_ba.json`
+
+* `artifacts/cli/out_ba.json.path_proof.txt`
 
 ### Release identity (EPIC022; canonical surfaces)
 
@@ -1317,7 +1471,25 @@ To prevent naming ambiguity and parallel spellings, governed epic close-pack art
 
 where `<NNN>` is a zero-padded 3-digit epic number (example: 022).
 
+**Close-pack proof completeness (clarification).** When a plan, deliverables report, or closure review asserts the close-pack pair exists, it MUST also explicitly assert the existence of the two `.path_proof.txt` siblings listed above. A close-pack pair without these two path proofs is not a complete close-pack proof.
+
 These two files are the deterministic path-of-record for epic close-pack. Do not relocate them under other trees (for example `audit/qa/**` or `artifacts/**`). Additional copies elsewhere are convenience-only and MUST NOT be used for acceptance binding.
+
+Examples of convenience-only close-pack support artifacts (names-only; MUST NOT be used for acceptance binding):
+
+* `docs/epic025_close_pack/endpoint_catalog_sha256.txt`
+
+* `docs/epic025_close_pack/endpoint_catalog_sha256.txt.path_proof.txt`
+
+* `docs/epic025_close_pack/generate_close_pack.stdout.txt`
+
+* `docs/epic025_close_pack/generate_close_pack.stdout.txt.path_proof.txt`
+
+Additional convenience-only close-pack surfaces (names-only; MUST NOT be used for acceptance binding):
+
+* `audit/EPIC-<NNN>_close_pack.md`
+
+* `audit/qa/hde-epic<NNN>/close_pack/`
 
 **Epic QA root directory (canonical pattern).** Epic QA roots MUST be lower-case and MUST use:
 
@@ -1327,15 +1499,31 @@ Plans and implementations MUST NOT introduce alternate spellings for the same ep
 
 **Run-id discipline (updated posture).** Run-id discipline is not a correctness mechanism. Per-run directory nesting MAY exist for convenience/history, but it is optional and non-canon. The canonical evidence posture is epic-level current-state indexing by `check_id` under the epic QA root.
 
+### **QA root summary artifacts (optional; names-only)**
+
+Some workflows may also emit top-level QA summary artifacts under `audit/qa/` (outside the epic-scoped QA root). These artifacts are convenience-only and MUST NOT replace canonical close-pack artifacts under `audit/EPIC-<NNN>_*` or canonical gate outputs under `audit/gates/`.
+
+* `audit/qa/run.json`
+
+* `audit/qa/epic025_close_pack.md`
+
+* `audit/qa/evidence_index/index.jsonl`
+
+* `audit/qa/evidence_index/index.sha256`
+
+* `audit/qa/gates/canonical_json_summary.json`
+
+* `audit/qa/gates/canonical_json_summary.sha256`
+
 ### Epic OPS evidence root directory (canonical pattern)
 
 Ops execution evidence (PO-only, IA-guided; names-only) MUST be stored under a lowercase audit root such as:
 
-* `audit/ops/<epic-id>/...`
+* `audit/ops/<epic-id>/`
 
 When ops execution evidence is captured as part of Live QA execution, it MAY instead live under the epic QA root:
 
-* `audit/qa/<epic-id>/...`
+* `audit/qa/<epic-id>/`
 
 ### Epic QA meta and layout (names-only; updated)
 
@@ -1345,39 +1533,188 @@ Under the epic QA root, EPIC-level meta artifacts and run artifacts follow canon
 
 * `audit/qa/hde-epic<NNN>/00_meta/codespaces_snapshot.json (optional; non-mandatory)`
 
-* `audit/qa/hde-epic<NNN>/00_meta/codespaces_snapshot.json.path_proof.txt (optional; non-mandatory)`
-
+* `audit/qa/hde-epic<NNN>/00_meta/codespaces_snapshot.json.path_proof.txt (optional; non-mandatory)`  
+* `audit/qa/hde-epic<NNN>/00_meta/repo_baseline.txt`  
 * `audit/qa/hde-epic<NNN>/00_meta/doc_deltas.md`
 
 * `audit/qa/hde-epic<NNN>/00_meta/doc_deltas.md.path_proof.txt`
 
-* `audit/qa/hde-epic<NNN>/00_meta/pf23_consult.md`
+* `audit/qa/hde-epic<NNN>/00_meta/pf23_consult.md`  
+* `audit/qa/hde-epic<NNN>/00_meta/deferred_scope_posture.md`
+
+**Meta sha sidecar capture (EPIC025; names-only).** If a meta file requires a governed sha256 sidecar, the sha256 file MAY be stored under the producing check directory using the meta file basename, for example:
+
+* audit/qa/hde-epic\<NNN\>/checks/\<check\_id\>/deferred\_scope\_posture.md.sha256
+
+	
 
 **Doc-delta two-surface pair (names-only).** Doc-deltas are recorded in two distinct surfaces:
 
+* **Draft/staging path-proof (names-only):** `audit/docdeltas/hde-epic<NNN>_doc_deltas.md`  
 * **Draft/staging path-proof (names-only):** `audit/docdeltas/hde-epic<NNN>_doc_deltas.md.path_proof.txt`
 
 * **Epic-scoped capture (QA record surface):** `audit/qa/hde-epic<NNN>/00_meta/doc_deltas.md`
 
 Placeholders like `audit/docdeltas/<doc-delta>.md` are nonconforming. The draft/staging surface MUST be a concrete filename.
 
-**Per-epic step-log manifest (stable; current-state):**
+**Close-pack drain-target ledger (names-only).** When an epic close-pack includes an explicit drain-target planning artifact, use:
 
-* `audit/qa/hde-epic<NNN>/qa_step_logs_manifest.json`  
+* `audit/docdeltas/hde-epic<NNN>_drain_targets.md`
+
+**Step-0 check manifest pair (stable; current-state; checks-only):**
+
+* `audit/qa/hde-epic<NNN>/checks/po-000/qa_step_logs_manifest.json`
+
+* `audit/qa/hde-epic<NNN>/checks/po-000/qa_step_logs_manifest.json.path_proof.txt`
+
+**Legacy epic-root manifest pair (transition-only; non-binding):**
+
+* `audit/qa/hde-epic<NNN>/qa_step_logs_manifest.json`
+
 * `audit/qa/hde-epic<NNN>/qa_step_logs_manifest.json.path_proof.txt`
+
+When both locations exist, Live QA bindings and reviews MUST treat the check-scoped pair above as the active surface.
+
+**Epic closure record (EPIC025; names-only).** Some epics may include an epic-scoped closure record at the epic QA root:
+
+* `audit/qa/hde-epic<NNN>/epic_closure_record.md`
+
+* `audit/qa/hde-epic<NNN>/epic_closure_record.md.sha256`
+
+**Epic topology demo artifact (EPIC026; names-only).** Some epics may include epic-scoped topology demo evidence under:
+
+* `audit/qa/hde-epic<NNN>/topology/topology_conjunction_demo.json`
+
+**Step-0 check support artifacts (EPIC026; names-only).** Some epics may create additional Step-0 support outputs under the stable check directory:
+
+* `audit/qa/hde-epic<NNN>/checks/po-000/doc_deltas.md`
+
+* `audit/qa/hde-epic<NNN>/checks/po-000/qa_helpers.sh`
 
 **Per-check primary logs (stable; one per check):**
 
 * `audit/qa/hde-epic<NNN>/checks/<check_id>/primary.log`
 
-**Optional per-run subtree (non-canon; history only):**
+**Per-check deliverables reports (EPIC026; names-only; step-specific).** Some checks may write:
 
-* `audit/qa/hde-epic<NNN>/runs/<run_id>/...`  
-  Common subdirectories (names-only; exact schemas owned elsewhere):  
-* `snapshots/` (run-local copies of governed artifacts and headers)  
-* `step_logs/` (per-step logs)  
-* `results/` (step outputs and verdict artifacts)  
-* `closeout/` (run-local close summaries)
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/deliverables_report.md`
+
+**Per-check route-proof artifacts (EPIC026; names-only; step-specific). Some checks may write:**
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/route_proof.txt`
+
+**Per-check step artifacts (EPIC025; names-only; step-specific).** In addition to `primary.log`, checks MAY write step-specific artifacts under `audit/qa/hde-epic<NNN>/checks/<check_id>/`. Examples observed in EPIC025 include:
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/success_head.txt`
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/success_head.txt.sha256`
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/success_get.txt`
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/success_get.txt.sha256`
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/canonical_json_gate_stdout.txt`
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/canonical_json_gate_stdout.txt.sha256`
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/env_pins.log`
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/env_pins.log.sha256`
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/env_pins_check_stdout.txt`
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/env_pins_check_stdout.txt.sha256`
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/sanity_pipeline_stdout.txt`
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/sanity_pipeline_stdout.txt.sha256`
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/endpoints_catalog.json`
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/endpoints_catalog.json.sha256`
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/index.sha256`
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/index.sha256.sha256`
+
+**Per-check pytest and catalog artifacts (EPIC026; names-only; step-specific).** Some checks may write:
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/pytest_stdout.log`  
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/pytest_stderr.log`  
+  `audit/qa/hde-epic<NNN>/checks/<check_id>/pytest_rc.txt`  
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/catalog_extract_dev_endpoints.json`  
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/<check_id>_manifest.json`  
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/catalog_api_compat_entry.json`
+
+**Per-check canonical JSON gate and evidence-index update artifacts (EPIC026; names-only; step-specific).** Some checks may write:
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/canonical_json_gate_stdout.log`
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/canonical_json_gate_stderr.log`
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/canonical_json_gate_rc.txt`
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/update_evidence_index_stdout.log`
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/update_evidence_index_stderr.log`
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/update_evidence_index_rc.txt`
+
+**Per-check CLI help, rejection, and conditional conjunction-output artifacts (EPIC026; names-only; step-specific).** Some checks may write:
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/cli_help.txt`
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/showcompat_help.txt`
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/reject_nonjson_stdout.log`
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/reject_nonjson_stderr.log`
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/reject_nonjson_rc.txt`
+
+When `USER_A_ID` and `USER_B_ID` are provided, some checks may also write:
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/concat_output.json`
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/concat_output_order_check.txt`
+
+**Per-check CLI rails proof artifacts (EPIC026; names-only; step-specific).** Some checks may write:
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/closed_rails_classification.txt`
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/open_rails_ab_rc.txt`
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/open_rails_ba_rc.txt`
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/open_rails_ab_canonical_json_check.txt`
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/open_rails_ba_canonical_json_check.txt`
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/abba_identity_check.txt`
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/open_rails_note.txt` (conditional; when the open-rails lane cannot run)
+
+**Per-check close-pack generator and copied close-pack artifacts (EPIC026; names-only; step-specific).** Some checks may write:
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/generator_stdout.log`
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/generator_stderr.log`
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/generator_rc.txt`
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/close_pack_copy/epic-<NNN>_manifest.json`
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/close_pack_copy/epic-<NNN>_evidence_index.json`
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/close_pack_copy/endpoints_catalog.json`
+
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/close_pack_copy/endpoints_catalog.json.sha256`
+
+**Per-run nesting is disallowed (checks-only):**
+
+Live QA evidence MUST NOT use `audit/qa/hde-epic<NNN>/runs/`, timestamped run directories, or operator-selected fresh run roots. Canonical Live QA evidence lives under stable `audit/qa/hde-epic<NNN>/checks/<check_id>/` directories.
+
+`run_id` (or `RUN_ID`) is prohibited: Live QA Plans MUST NOT introduce or require it as an operator input, step-log header field, manifest field, or correctness key. Operator-set per-run root selection is also prohibited. Plan-created outputs MUST be written under the stable check directory.
 
 **Remediation subtree (names-only):** `audit/qa/hde-epic<NNN>/remediation/`
 
@@ -1388,6 +1725,25 @@ Placeholders like `audit/docdeltas/<doc-delta>.md` are nonconforming. The draft/
 Artifacts treated as Live QA evidence under `audit/qa/<epic-id>/...` MUST be produced by commands (shell/scripts/tools), not by hand-editing prose files in an editor. Placeholder fields such as “(fill PASS/FAIL)” are non-conforming.
 
 Live QA plans MUST NOT depend on helper/wrapper scripts unless the script is a canon-named entrypoint by explicit path. Where canon requires an artifact surface but is silent on an entrypoint, the plan must validate or produce the governed artifact surface directly using baseline commands (explicit shell/Python one-liners, direct invocation of canon tools, explicit file writes), with no opaque runners.
+
+### **Canonical evidence tooling entrypoints (EPIC025; names-only)**
+
+When canon requires an explicit repo-local entrypoint script for evidence discipline, use the following canon-named paths:
+
+* LF endings check wrapper: `tools/evidence/check_lf_endings.py` (wraps `ci/checks/check_final_lf.sh`)
+
+* Evidence-path validation gate: `tools/evidence/validate_evidence_paths.py` (validates `artifacts/evidence_index.jsonl` paths)
+
+* EPIC025 close-pack generator: `tools/qa/generate_epic025_close_pack.py`  
+* EPIC026 close-pack generator: `tools/qa/generate_epic026_close_pack.py`  
+* Deliverables report generator: `tools/qa/generate_deliverables_report.py`  
+* Canonical JSON gate runner: `tools/evidence/run_canonical_json_gate.py`  
+* Evidence index updater/checker: `tools/evidence/update_evidence_index.py`  
+* Evidence index refresh helper: `tools/evidence/refresh_evidence_index.py`  
+* Audit/QA path validator: `tools/evidence/validate_audit_qa_paths.py`  
+* Evidence bindings checker: `tools/evidence/check_evidence_bindings.py` (source-excerpt-captured outputs, when written, use `audit/qa/hde-epic<NNN>/checks/<check_id>/check_evidence_bindings_stdout.log`, `audit/qa/hde-epic<NNN>/checks/<check_id>/check_evidence_bindings_stderr.log`, and `audit/qa/hde-epic<NNN>/checks/<check_id>/check_evidence_bindings_rc.txt`; these outputs are non-required unless explicitly listed as deliverables)  
+* Topology orientation demo check: `tools/evidence/orientation_demo.py`  
+* Mirror schema check: `ci/checks/check_mirror_schema.sh`
 
 ### Epic acceptance-ledger artifacts (canonical paths; names-only)
 
@@ -1436,6 +1792,10 @@ Canonical JSONL (UTF-8, sorted keys, compact, one trailing `\n`), unknown keys r
 * produced\_at\_utc  
 * discovered\_physical\_path  
 * proof\_anchor (points to a path-proof stored alongside the artifact)
+
+Record shape invariant (names-only). Each evidence-index JSONL line MUST be a single JSON object record (not an array or primitive value).
+
+Path safety invariant (names-only). discovered\_physical\_path MUST be repo-root-relative and MUST resolve within the repository root; absolute paths and traversal segments (for example ..) are invalid.
 
 **Single mirror file (anti-drift).** Exactly one canonical machine mirror exists:
 

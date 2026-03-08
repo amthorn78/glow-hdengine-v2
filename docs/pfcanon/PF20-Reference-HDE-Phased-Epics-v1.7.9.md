@@ -2,11 +2,11 @@
 
 **Status:** Reference
 
-**Version:** v1.7.8
+**Version:** v1.7.9
 
-**Effective date:** 2026-02-06
+**Effective date:** 2026-03-03
 
-**Last Update Gate:** HDE-EPIC025 Closure
+**Last Update Gate:** HDE-EPIC026 Closure
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -5366,4 +5366,231 @@ Deliverables register mismatch note: PF10’s closure review includes a separate
 * Evidence-path binding validation is explicitly recorded: `audit/qa/hde-epic025/checks/gate_evidence_paths_validation/primary.log` and `audit/qa/hde-epic025/checks/gate_evidence_paths_validation/evidence_paths_validation.ndjson` (PF10 — HDE Build Notes, §2.14).  
 * Acceptance map and evidence index artifacts are cited with path proofs/hashes (PF10 — HDE Build Notes, §2.14): `docs/acceptance_map_epic025.json.path_proof.txt`, `docs/evidence/INDEX.sha256`, `docs/evidence/INDEX.json.path_proof.txt`.  
 * Planned `audit/qa/hde-epic025/token_evidence_matrix.md` remains Unknown (not present in inputs): not referenced by PF10.
+
+### **2.11 HDE-EPIC026 Epic Plan**
+
+#### **2.11.1 Meta**
+
+**Epic ID:** HDE-EPIC026  
+**Epic title (Implementation Guide):** Conjunction Pass 2 (r8 epic plan HDE-EPIC026.md, header)  
+**Epic name (short):** HDE Conjunction Pass 2  
+**Phase:** Conjunction (PF21)  
+**Status:** Archived  
+**Owner:** Unknown (not present in inputs)  
+**Priority:** Unknown (not present in inputs)  
+**Date started:** 2026-02-07 (PF10 — HDE Build Notes, §2.5 PR01 HDE-EPIC026 2026-02-07)  
+**Date completed:** 2026-03-03 (task input; PF10 close date not explicitly stated)  
+**Epic outcome (per PF10):** “Overall readiness (PF10-evidence-grounded): Not ready” (PF10 — HDE Build Notes, §2.32 HDE-EPIC026 QA Closeout Summary)
+
+**Epic intent (planned; one paragraph):** Objective: extend the HDE Engine and Glow `/v1` API to support Conjunction as a first-class result surface with deterministic outputs, including provider acquisition posture, dev harness endpoints (sampler/reader/writer), showcompat/CLI support, evidence/index hygiene, and a close-pack generator for archival closeout artifacts. (r8 epic plan HDE-EPIC026.md, §2 Epic intent; §4 Deliverables)
+
+**Scope anchor (PF13):** Unknown (not present in inputs)  
+**Stakeholders:** Unknown (not present in inputs)
+
+**PR stream (PF10):** PR01–PR08 \+ Docs PR (PF10 — HDE Build Notes, §2.5–§2.14)  
+**QA log stream (PF10):** CHECK `po-000` through CHECK `po-012` (PF10 — HDE Build Notes, §2.19–§2.31)
+
+#### **2.11.2 Existing Work Check (MUST)**
+
+**Planned existing-work posture (Implementation Guide):**
+
+* Existing showcompat already had a Conjunction placeholder; this epic extends it to emit canonical Conjunction outputs. (r8 epic plan HDE-EPIC026.md, §3 Existing Work Check)  
+* Existing `/dev/sampler` and `/dev/reader` endpoints exist for other surfaces; this epic adds Conjunction variants. (r8 epic plan HDE-EPIC026.md, §3 Existing Work Check)  
+* Existing evidence/index and close-pack generator patterns exist; this epic extends them for EPIC026 close artifacts. (r8 epic plan HDE-EPIC026.md, §3 Existing Work Check; §4.8 Deliverable D-008)
+
+**Actual reuse and delta (PF10):**
+
+* showcompat/CLI Conjunction support changes are recorded in PR05 and validated in CHECK `po-008` and CHECK `po-009` (PF10 — HDE Build Notes, §2.9 PR05 HDE-EPIC026; §2.26; §2.28), with closeout caveat that CHECK `po-009` is treated as “not executable as intended” and “REMEDIATION DEFERRED DUE TO PLANNING DEFECT” (PF10 — HDE Build Notes, §2.32).  
+* Dev harness endpoints are recorded in PR03 and PR04 and validated in CHECK `po-005` / `po-006` / `po-007` (PF10 — HDE Build Notes, §2.7 PR03; §2.8 PR04; §2.23–§2.25), with closeout caveat that CHECK `po-005` is treated as “Contaminated (not auditable from PF10)” and cited as a reason overall readiness is “Not ready” (PF10 — HDE Build Notes, §2.32).  
+* Close-pack generator and close-pack artifacts are recorded under PR08 (including remediation attempts) and validated in CHECK `po-012` (PF10 — HDE Build Notes, §2.13 PR08; §2.31).
+
+#### **2.11.3 Deliverables (Jobs-to-be-done) — Planned vs Actual Reconciliation**
+
+##### **D1 — Conjunction output contract and deterministic envelope**
+
+* **Planned (Implementation Guide):** Deliverable D-001 — “Define and land the canonical Conjunction output contract (bytes/canonical form), including deterministic preimage rules and ABBA identity invariants.” (r8 epic plan HDE-EPIC026.md, §4.1 Deliverable D-001)  
+* **Actual (PF10):** PR01 records token evidence print including `JSON_CANONICAL_CHECK_OK`, `PREIMAGE_RECOMPUTE_OK`, `COMPOSITE_ABBA_IDENTITY_OK` (PF10 — HDE Build Notes, §2.5). Live QA CHECK `po-000` and CHECK `po-001` are recorded as PASS, with evidence under `audit/qa/hde-epic026/checks/po-001/primary.log` (PF10 — HDE Build Notes, §2.19).  
+* **Disposition (archive):** Satisfied — PASS for `po-000`/`po-001` is not cited as a closeout blocker (PF10 — HDE Build Notes, §2.32).
+
+##### **D2 — Provider acquisition posture for Conjunction inputs**
+
+* **Planned (Implementation Guide):** Deliverable D-002 — “Establish provider acquisition posture (local-first), including deterministic handling of missing providers and explicit error semantics surfaced through the `/v1` Conjunction result lane.” (r8 epic plan HDE-EPIC026.md, §4.2 Deliverable D-002)  
+* **Actual (PF10):** PR02 records provider acquisition changes (PF10 — HDE Build Notes, §2.6). Live QA CHECK `po-002` is recorded as PASS (PF10 — HDE Build Notes, §2.20). CHECK `po-003`/`po-004` are recorded as PASS with ADR-DEV-01 and ADR-DEV-02 deviations recorded (PF10 — HDE Build Notes, §2.21).  
+* **Disposition (archive):** Satisfied — PASS for `po-002`–`po-004` is not cited as a closeout blocker (PF10 — HDE Build Notes, §2.32).
+
+##### **D3 — Dev HTTP harness: sampler \+ reader Conjunction preview endpoints**
+
+* **Planned (Implementation Guide):** Deliverable D-003 — “Add dev-only HTTP harness endpoints for Conjunction preview (`/dev/sampler/conjunction`, `/dev/reader/conjunction`) and ensure they are rails-gated and deterministic.” (r8 epic plan HDE-EPIC026.md, §4.3 Deliverable D-003)  
+* **Actual (PF10):** PR03 records endpoints added (`/dev/sampler/conjunction`, `/dev/reader/conjunction`) and catalog updates (PF10 — HDE Build Notes, §2.7). Live QA CHECK `po-005` and CHECK `po-006` are recorded as PASS with evidence pointers including `audit/qa/hde-epic026/checks/po-005/primary.log` and `audit/qa/hde-epic026/checks/po-005/route_proof.txt` (PF10 — HDE Build Notes, §2.23) and the `po-006` evidence directory (`audit/qa/hde-epic026/checks/po-006/`) (PF10 — HDE Build Notes, §2.24).  
+* **Disposition (archive):** Not satisfied for closeout — PF10’s QA Closeout Summary treats CHECK `po-005` as “Contaminated (not auditable from PF10)” and cites it as a direct reason overall readiness is “Not ready” (PF10 — HDE Build Notes, §2.32), even though §2.23 records a PASS.
+
+##### **D4 — Dev writer harness: Conjunction preview writer endpoint**
+
+* **Planned (Implementation Guide):** Deliverable D-004 — “Add dev-only writer endpoint for Conjunction preview (`/dev/writer/conjunction`) and ensure rails gating and deterministic behavior.” (r8 epic plan HDE-EPIC026.md, §4.4 Deliverable D-004)  
+* **Actual (PF10):** PR04 records `/dev/writer/conjunction` plus endpoint catalog updates (PF10 — HDE Build Notes, §2.8). Live QA CHECK `po-007` is recorded as PASS with evidence pointers including `audit/qa/hde-epic026/checks/po-007/primary.log` (PF10 — HDE Build Notes, §2.25).  
+* **Disposition (archive):** Satisfied — PASS for `po-007` is not cited as a closeout blocker (PF10 — HDE Build Notes, §2.32).
+
+##### **D5 — Governed evidence posture for Conjunction outputs**
+
+* **Planned (Implementation Guide):** Deliverable D-005 — “Bind Conjunction outputs to governed evidence posture: evidence index entries, path proofs, and close-pack artifacts suitable for audit.” (r8 epic plan HDE-EPIC026.md, §4.5 Deliverable D-005)  
+* **Actual (PF10):** PR07 records evidence/index updates and governance surfaces (PF10 — HDE Build Notes, §2.12). Live QA CHECK `po-011` is recorded as PASS (PF10 — HDE Build Notes, §2.30). CHECK `po-012` close pack includes an evidence index file `audit/qa/hde-epic026/checks/po-012/close_pack_copy/epic-026_evidence_index.json` (PF10 — HDE Build Notes, §2.31).  
+* **Disposition (archive):** Partial — evidence/index artifacts exist (e.g., `epic-026_evidence_index.json` in the `po-012` close pack), but PF10’s QA Closeout Summary diagnoses “evidence hygiene \+ plan-to-evidence traceability drift,” and overall readiness remains “Not ready” due to `po-005`/`po-009` (PF10 — HDE Build Notes, §2.32).
+
+##### **D6 — showcompat: Conjunction support \+ rails-safe CLI behavior**
+
+* **Planned (Implementation Guide):** Deliverable D-006 — “Extend showcompat for Conjunction, ensure deterministic rendering, and enforce rails refusal (closed) versus open-rails acquisition semantics.” (r8 epic plan HDE-EPIC026.md, §4.6 Deliverable D-006)  
+* **Actual (PF10):** PR05 records showcompat changes (PF10 — HDE Build Notes, §2.9). Live QA CHECK `po-008` is recorded as PASS (PF10 — HDE Build Notes, §2.26). CHECK `po-009` is recorded, with evidence pointers including `audit/qa/hde-epic026/checks/po-009/primary.log` (PF10 — HDE Build Notes, §2.28), but the QA Closeout Summary states CHECK `po-009` is “not executable as intended” and its decision is “REMEDIATION DEFERRED DUE TO PLANNING DEFECT,” and cites `po-009` as a reason overall readiness is “Not ready” (PF10 — HDE Build Notes, §2.32).  
+* **Disposition (archive):** Not satisfied for closeout — Conjunction showcompat exists and `po-008` passes, but `po-009` is not accepted as executed-as-intended at close (PF10 — HDE Build Notes, §2.32).
+
+##### **D7 — Documentation \+ endpoints catalog alignment**
+
+* **Planned (Implementation Guide):** Deliverable D-007 — “Update docs and public-facing catalogs to include Conjunction surfaces, endpoints, and deterministic behavior notes.” (r8 epic plan HDE-EPIC026.md, §4.7 Deliverable D-007)  
+* **Actual (PF10):** PR06 (docs alignment) and the Docs PR are recorded (PF10 — HDE Build Notes, §2.11 PR06; §2.14). Live QA CHECK `po-010` is recorded as PASS (PF10 — HDE Build Notes, §2.29). The close pack includes `audit/qa/hde-epic026/checks/po-012/close_pack_copy/endpoints_catalog.json` and its hash `endpoints_catalog.json.sha256` (PF10 — HDE Build Notes, §2.31).  
+* **Disposition (archive):** Satisfied — doc step `po-010` is PASS and the endpoints catalog artifact is present in the close pack (PF10 — HDE Build Notes, §2.31), though overall readiness remains “Not ready” for unrelated blockers (PF10 — HDE Build Notes, §2.32).
+
+##### **D8 — Close posture: Live QA close \+ close-pack generator**
+
+* **Planned (Implementation Guide):** Deliverable D-008 — “Generate a deterministic close-pack for EPIC026 using `tools/qa/generate_epic026_close_pack.py` (manifest, close report, acceptance map, and supporting evidence pointers).” (r8 epic plan HDE-EPIC026.md, §4.8 Deliverable D-008)  
+* **Actual (PF10):** PR08 records the close-pack generator and remediation loops (PF10 — HDE Build Notes, §2.13 PR08). CHECK `po-012` is recorded as PASS (PF10 — HDE Build Notes, §2.31) and produces a close pack copy including `audit/qa/hde-epic026/checks/po-012/close_pack_copy/epic-026_manifest.json`, `epic-026_close_report.md`, and `epic-026_acceptance_map.md` (PF10 — HDE Build Notes, §2.31). PF10 also records additional close-pack artifacts in remediation outputs, including `"audit/EPIC-026_MANIFEST.json"` (normalized: `audit/epic-026_manifest.json`) (PF10 — HDE Build Notes, §2.13 Remediation 2 evidence print).  
+* **Disposition (archive):** Satisfied for close-pack generation — close-pack artifacts are present and `po-012` is PASS, but overall readiness remains “Not ready” due to the `po-005`/`po-009` blockers cited in the QA Closeout Summary (PF10 — HDE Build Notes, §2.32).
+
+#### **2.11.4 PF Reference Map**
+
+**Primary PF references (Implementation Guide PF map):**
+
+* PF04 — HDE Governance (tokens, rails, acceptance posture) (r8 epic plan HDE-EPIC026.md, §4 PF Reference Map)  
+* PF09 — HDE Build Checklist (close pack mapping, baseline artifacts) (r8 epic plan HDE-EPIC026.md, §4 PF Reference Map)  
+* PF14 — HDE Mechanics Guide (Conjunction semantics; showcompat surfaces) (r8 epic plan HDE-EPIC026.md, §4 PF Reference Map)  
+* PF10 — HDE Build Notes (execution \+ results archive) (r8 epic plan HDE-EPIC026.md, §4 PF Reference Map)
+
+**Execution \+ results sources used for this archive entry:**
+
+* PF10 — HDE Build Notes, §2.5–§2.14 (HDE-EPIC026 PR01–PR08 \+ Docs PR)  
+* PF10 — HDE Build Notes, §2.19–§2.32 (HDE-EPIC026 QA step logs \+ QA Closeout Summary)  
+* r8 epic plan HDE-EPIC026.md, §2–§9 (planned intent, deliverables, tokens/evidence claims, QA rails, tracked issues, plan preflight)  
+* PF27 — Plan Templates, §6.4 Epic Record Template (Normative) (required fields/sections)
+
+#### **2.11.5 Tokens and Evidence (Acceptance)**
+
+**Planned acceptance tokens (in-scope):**
+
+* `JSON_CANONICAL_CHECK_OK` (r8 epic plan HDE-EPIC026.md, §5.1)  
+* `COMPOSITE_ABBA_IDENTITY_OK` (r8 epic plan HDE-EPIC026.md, §5.1)  
+* `PREIMAGE_RECOMPUTE_OK` (r8 epic plan HDE-EPIC026.md, §5.1)  
+* `DETERMINISM_ENV_PINS_OK` (r8 epic plan HDE-EPIC026.md, §5.1)  
+* `EVIDENCE_INDEX_UPDATED_OK` (r8 epic plan HDE-EPIC026.md, §5.1)  
+* `EVIDENCE_INDEX_MIRROR_OK` (r8 epic plan HDE-EPIC026.md, §5.1)  
+* `EVIDENCE_PATHS_VALIDATED_OK` (r8 epic plan HDE-EPIC026.md, §5.1)  
+* `CLOSE_PACK_COMPLETE_OK` (r8 epic plan HDE-EPIC026.md, §5.1)  
+* `QA_CLOSE_REPORT_GENERATED_OK` (r8 epic plan HDE-EPIC026.md, §5.1)  
+* `MANIFEST_GENERATED_OK` (r8 epic plan HDE-EPIC026.md, §5.1)  
+* `ACCEPTANCE_MAP_GENERATED_OK` (r8 epic plan HDE-EPIC026.md, §5.1)
+
+**Planned evidence claims (titles-only):**
+
+* “Canonical JSON gate result” (r8 epic plan HDE-EPIC026.md, §5.2)  
+* “Composite ABBA identity verification” (r8 epic plan HDE-EPIC026.md, §5.2)  
+* “Determinism environment pin verification” (r8 epic plan HDE-EPIC026.md, §5.2)  
+* “Evidence index updated entry for EPIC026” (r8 epic plan HDE-EPIC026.md, §5.2)  
+* “Evidence index mirror updated (if applicable)” (r8 epic plan HDE-EPIC026.md, §5.2)  
+* “Evidence paths validated” (r8 epic plan HDE-EPIC026.md, §5.2)  
+* “Close pack manifest \+ close report \+ acceptance map generated” (r8 epic plan HDE-EPIC026.md, §5.2)
+
+**Actual token claims and evidence pointers (PF10):**
+
+* `JSON_CANONICAL_CHECK_OK`, `PREIMAGE_RECOMPUTE_OK`, `COMPOSITE_ABBA_IDENTITY_OK` are explicitly listed in the PR01 token evidence print (PF10 — HDE Build Notes, §2.5), and Live QA CHECK `po-000` / `po-001` evidence is captured under `audit/qa/hde-epic026/checks/po-001/primary.log` (PF10 — HDE Build Notes, §2.19).  
+* Environment pins are evidenced via captured rails/env headers in Live QA logs (e.g., PF10 explicitly cites primary.log headers for CHECK `po-003` including `captured_env` keys SAFE\_MODE / ALLOW\_NETWORK / PYTHONHASHSEED / LANG / LC\_ALL) (PF10 — HDE Build Notes, §2.21; §2.32), but the specific token name `DETERMINISM_ENV_PINS_OK` is **not** explicitly claimed as a token string in PF10.  
+  * Disposition for token-name claim: Unknown (not present in inputs).  
+* Evidence index \+ close pack artifacts are present in CHECK `po-012` close pack copy, including:  
+  * `audit/qa/hde-epic026/checks/po-012/close_pack_copy/epic-026_manifest.json`  
+  * `audit/qa/hde-epic026/checks/po-012/close_pack_copy/epic-026_close_report.md`  
+  * `audit/qa/hde-epic026/checks/po-012/close_pack_copy/epic-026_acceptance_map.md`  
+  * `audit/qa/hde-epic026/checks/po-012/close_pack_copy/epic-026_evidence_index.json`  
+  * `audit/qa/hde-epic026/checks/po-012/close_pack_copy/endpoints_catalog.json.sha256`  
+    (PF10 — HDE Build Notes, §2.31)  
+* Additional close-pack artifacts are recorded as outputs in PR08 Remediation 2 evidence print, including `"audit/EPIC-026_MANIFEST.json"` (normalized: `audit/epic-026_manifest.json`) and `"audit/EPIC-026_close_report.md"` (normalized: `audit/epic-026_close_report.md`) (PF10 — HDE Build Notes, §2.13 Remediation 2 evidence print).
+
+**Planned vs actual acceptance mismatch (token-name traceability):**
+
+* PF10’s QA Closeout Summary diagnoses “evidence hygiene \+ plan-to-evidence traceability drift” and does not assert satisfaction of all planned token names as token strings (notably `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`, and the close-pack token names) even where related artifacts exist (PF10 — HDE Build Notes, §2.32).  
+  * Disposition for those token-name claims: Unknown (not present in inputs).
+
+#### **2.11.6 QA Rails — Open/Close (Final PR)**
+
+**Planned QA rails posture (Implementation Guide):**
+
+* Live QA is required for epic close; the plan is recorded as checks `po-000` through `po-012` and requires audited evidence capture under the canonical `audit/qa/...` root. (r8 epic plan HDE-EPIC026.md, §8.1)  
+* Rails posture: “Closed rails” should refuse provider acquisition; “open rails” permits provider acquisition where required by the step. (r8 epic plan HDE-EPIC026.md, §6)
+
+**Actual QA execution (PF10 — step log stream):**
+
+* CHECK `po-000` \+ `po-001` — PASS (PF10 — HDE Build Notes, §2.19)  
+* CHECK `po-002` — PASS (PF10 — HDE Build Notes, §2.20)  
+* CHECK `po-003` \+ `po-004` — PASS; ADR-DEV-01 / ADR-DEV-02 captured as deviations (PF10 — HDE Build Notes, §2.21)  
+* CHECK `po-005` — PASS (PF10 — HDE Build Notes, §2.23)  
+  * Closeout caveat: treated as “Contaminated (not auditable from PF10)” and cited as a reason overall readiness is “Not ready” (PF10 — HDE Build Notes, §2.32).  
+* CHECK `po-006` — PASS (PF10 — HDE Build Notes, §2.24)  
+* CHECK `po-007` — PASS (PF10 — HDE Build Notes, §2.25)  
+* CHECK `po-008` — PASS (PF10 — HDE Build Notes, §2.26)  
+* CHECK `po-009` — recorded with evidence pointers under `audit/qa/hde-epic026/checks/po-009/` (PF10 — HDE Build Notes, §2.28)  
+  * Closeout caveat: decision treated as “REMEDIATION DEFERRED DUE TO PLANNING DEFECT,” “not executable as intended,” and cited as a reason overall readiness is “Not ready” (PF10 — HDE Build Notes, §2.32).  
+* CHECK `po-010` — PASS (PF10 — HDE Build Notes, §2.29)  
+* CHECK `po-011` — PASS (PF10 — HDE Build Notes, §2.30)  
+* CHECK `po-012` — PASS; close pack copy created under `audit/qa/hde-epic026/checks/po-012/close_pack_copy/` (PF10 — HDE Build Notes, §2.31)
+
+**Closeout posture (PF10):**
+
+* “Overall readiness (PF10-evidence-grounded): Not ready” because: (1) CHECK `po-005` is “not auditable” from PF10 as recorded, and (2) CHECK `po-009` “is not executable as intended” with remediation deferred due to a planning defect. (PF10 — HDE Build Notes, §2.32)
+
+#### **2.11.7 Tracked Issues**
+
+**Tracked issues (Implementation Guide):**
+
+* TI-001 — “Provider acquisition semantics: enforce local-first; explicit error surfaces when provider missing.” (r8 epic plan HDE-EPIC026.md, §8.2)  
+* TI-002 — “Close-pack baseline artifacts need explicit PF09 mapping (step logs, acceptance map, manifest, drift summary, doc deltas).” (r8 epic plan HDE-EPIC026.md, §8.2)  
+* TI-003 — “Evidence mirror posture may be optional; decide whether to ship mirror update this pass.” (r8 epic plan HDE-EPIC026.md, §8.2)  
+* TI-004 — “Open rails lane: ensure showcompat can exercise provider-acquisition path when explicitly allowed.” (r8 epic plan HDE-EPIC026.md, §8.2)
+
+**Disposition (PF10):**
+
+* TI-001: Unknown (not present in inputs) — PF10 does not reference TI-001 by label.  
+* TI-002: Addressed in remediation loop — PR08 Remediation 2 records “ADR status line: ADR-TI002-EPIC026-001” and adds explicit mapping for TI-002 / PF09 baseline artifacts (PF10 — HDE Build Notes, §2.13 Remediation 2; evidence outputs include `"audit/EPIC-026_step_logs_manifest.json"` (normalized: `audit/epic-026_step_logs_manifest.json`)).  
+* TI-003: Unknown (not present in inputs) — PF10 does not reference TI-003 by label.  
+* TI-004: Not satisfied for closeout — PF10 closeout posture cites CHECK `po-009` as “not executable as intended” and defers remediation due to a planning defect (PF10 — HDE Build Notes, §2.32).
+
+**ADRs / recorded deviations (PF10):**
+
+* ADR-DEV-01 and ADR-DEV-02 recorded in the `po-003`/`po-004` QA block (PF10 — HDE Build Notes, §2.21) as deviations related to QA helper/header and evidence posture.
+
+#### **2.11.8 Plan Preflight (MUST)**
+
+* Planned preflight posture: “No additional preflight gates beyond deliverables above.” (r8 epic plan HDE-EPIC026.md, §9 Plan Preflight)
+
+**A. Token registry validation (names-only):**
+
+* Planned tokens list is explicit (r8 epic plan HDE-EPIC026.md, §5.1).  
+* PF10 explicitly claims a subset of planned token names (e.g., PR01 token evidence print lists `JSON_CANONICAL_CHECK_OK`, `PREIMAGE_RECOMPUTE_OK`, `COMPOSITE_ABBA_IDENTITY_OK`) (PF10 — HDE Build Notes, §2.5), but PF10 does not explicitly claim all planned token names as token strings (PF10 — HDE Build Notes, §2.32).  
+  * Validation result: Partial (PF10-evidenced subset) / Unknown (not present in inputs) for the remainder.
+
+**B. Close-pack completeness (manifest \+ close report \+ acceptance map):**
+
+* CHECK `po-012` close pack copy contains:  
+  * `audit/qa/hde-epic026/checks/po-012/close_pack_copy/epic-026_manifest.json`  
+  * `audit/qa/hde-epic026/checks/po-012/close_pack_copy/epic-026_close_report.md`  
+  * `audit/qa/hde-epic026/checks/po-012/close_pack_copy/epic-026_acceptance_map.md`  
+    (PF10 — HDE Build Notes, §2.31)  
+* PF10 also records additional close-pack artifacts under mixed-case naming in PR08 remediation outputs (example: `"audit/EPIC-026_MANIFEST.json"` (normalized: `audit/epic-026_manifest.json`)) (PF10 — HDE Build Notes, §2.13 Remediation 2 evidence print).
+
+**C. Evidence bundle completeness for local-bundle deliverables:**
+
+* Unknown (not present in inputs) — the Implementation Guide does not define local-bundle deliverables for this epic beyond the close pack, and PF10 does not declare an explicit local-bundle completeness gate for EPIC026.
+
+**D. Canonical evidence-path binding validation:**
+
+* Canonical evidence roots and step logs are captured under `audit/qa/hde-epic026/checks/...` for Live QA (e.g., `audit/qa/hde-epic026/checks/po-001/primary.log`, `audit/qa/hde-epic026/checks/po-012/primary.log`) (PF10 — HDE Build Notes, §2.19; §2.31).  
+* Closeout caveat: PF10 QA Closeout Summary diagnoses “plan-to-evidence traceability drift,” and treats CHECK `po-005` as contaminated/not auditable and CHECK `po-009` as not executable-as-intended (PF10 — HDE Build Notes, §2.32).
+
+**E. Roll-forward integrity:**
+
+* PF10 closeout posture sets overall readiness to “Not ready” pending resolution of the `po-005` auditability defect and the `po-009` planning-defect remediation deferral (PF10 — HDE Build Notes, §2.32).
 
