@@ -1,0 +1,5 @@
+path: artifacts/compat/identity_hash.txt
+size_bytes: 65
+sha256: a38ed320e4f20ca59e80d5a6919a394b35676f64c6ccf4b92136825e1e46cc40
+mtime_utc: 2026-03-11T07:11:47Z
+produced_at_utc: 2026-01-05T05:39:56Z

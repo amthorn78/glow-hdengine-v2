@@ -25,6 +25,7 @@ HUMAN_INDEX = ROOT / "docs/evidence/INDEX.json"
 HASH_SENTINEL = ROOT / "docs/evidence/INDEX.sha256"
 MIRROR_PATH = ROOT / "artifacts/evidence_index.jsonl"
 MIRROR_REL = MIRROR_PATH.relative_to(ROOT).as_posix()
+MIRROR_SHA_PATH = ROOT / "artifacts/evidence_index.jsonl.sha256"
 EPIC020_BUNDLE_DIR = ROOT / "artifacts" / "epic020" / "bundles"
 EPIC020_ACCEPTANCE_MAP = ROOT / "docs" / "acceptance_map_epic020.json"
 if str(ROOT) not in sys.path:
@@ -113,6 +114,14 @@ EPIC024_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
         "discovered_physical_path": "audit/EPIC-024_MANIFEST.json",
         "epic_id": "HDE-EPIC024",
     },
+]
+COMPAT_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "compat.conjunction.identity_hash",
+        "discovered_physical_path": "artifacts/compat/identity_hash.txt",
+        "record_type": "compat_identity_hash",
+        "schema_version": "1.0",
+    }
 ]
 
 
@@ -327,7 +336,9 @@ def _dedupe_entries(entries: Iterable[Mapping[str, object]]) -> list[dict[str, o
 
 def _load_human_index() -> list[dict[str, object]]:
     payload = json.loads(HUMAN_INDEX.read_text(encoding="utf-8"))
-    return _dedupe_entries([*payload, *BASELINE_ENTRIES, *EPIC022_PRIMARY_ARTIFACTS, *EPIC024_PRIMARY_ARTIFACTS])
+    return _dedupe_entries(
+        [*payload, *BASELINE_ENTRIES, *EPIC022_PRIMARY_ARTIFACTS, *EPIC024_PRIMARY_ARTIFACTS, *COMPAT_PRIMARY_ARTIFACTS]
+    )
 
 
 def _render_human_index(entries: Iterable[Mapping[str, object]]) -> bytes:
@@ -595,6 +606,10 @@ def main(argv: list[str] | None = None) -> None:
 
     mirror_stat = MIRROR_PATH.stat()
     mirror_file_sha = _sha256_path(MIRROR_PATH)
+    mirror_sha_line = f"{mirror_file_sha}  {MIRROR_REL}\n".encode("utf-8")
+    _write_if_changed(MIRROR_SHA_PATH, mirror_sha_line, check=args.check)
+    _refresh_path_proof(MIRROR_SHA_PATH, default_produced_at=produced_default, check=args.check)
+
     mirror_body_sha = str(mirror_rec["sha256"])
     proof_anchor, produced_at = _write_path_proof(
         MIRROR_REL,
