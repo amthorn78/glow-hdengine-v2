@@ -1,4 +1,5 @@
 import json
+import hashlib
 
 import pytest
 from pathlib import Path
@@ -74,6 +75,23 @@ def test_conjunction_contract_emits_stable_canonical_bytes():
     assert first_bytes == second_bytes
     assert first_bytes == swapped_bytes
     assert first_bytes.endswith(b"\n")
+
+
+def test_conjunction_identity_hash_artifact_matches_canonical_bytes():
+    weights = {cat: 10 for cat in CATEGORIES_ORDER_V1}
+    payload = conjunction_public(
+        {"person_uid": "alice", "chart": {"type": "resolved"}},
+        {"person": {"person_uid": "bob"}, "chart": {"type": "resolved"}},
+        viewer_top=CATEGORIES_ORDER_V1[0],
+        viewer_weights=weights,
+        engine_tag="dev",
+        release_id="dev",
+        invocation_tag="INV-DEV",
+    )
+    canonical_bytes = emit_public(payload)
+    observed_hash = hashlib.sha256(canonical_bytes).hexdigest()
+    artifact_hash = Path("artifacts/compat/identity_hash.txt").read_text(encoding="utf-8").strip()
+    assert observed_hash == artifact_hash
 
 def test_compat_post_contract_and_catalog_entry():
     client = _client()
