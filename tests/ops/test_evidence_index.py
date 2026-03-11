@@ -4,6 +4,8 @@ import hashlib
 import datetime as _dt
 import hashlib
 import json
+
+import pytest
 from pathlib import Path
 
 from tools.evidence import update_evidence_index
@@ -63,3 +65,10 @@ def test_evidence_index_has_required_artifacts():
         sha = hashlib.sha256(Path(path).read_bytes()).hexdigest()
         assert rec.get("sha256") == sha
         assert rec.get("size_bytes") == Path(path).stat().st_size
+
+
+def test_write_if_changed_check_mode_fails_closed_for_missing_target(tmp_path: Path):
+    target = tmp_path / "missing.sha256"
+    with pytest.raises(SystemExit, match=rf"^STALE:{target}$"):
+        update_evidence_index._write_if_changed(target, b"abc\n", check=True)
+    assert not target.exists()

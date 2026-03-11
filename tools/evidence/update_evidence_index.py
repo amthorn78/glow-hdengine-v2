@@ -538,6 +538,8 @@ def _write_if_changed(path: Path, content: bytes, *, check: bool) -> None:
             return
         if check:
             raise SystemExit(f"STALE:{path}")
+    elif check:
+        raise SystemExit(f"STALE:{path}")
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(content)
 
