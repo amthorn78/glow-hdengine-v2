@@ -32,14 +32,17 @@ def main() -> None:
     ab = serialize(pab)
     ba = serialize(pba)
 
+    assert ab == ba, "AB and BA public bytes must be identical"
+    assert ab.endswith(b"\n") and not ab.startswith(b"\xef\xbb\xbf")
+
     existing_ab = outdir / "AB.json"
     existing_ba = outdir / "BA.json"
     if existing_ab.exists() and existing_ba.exists():
-        ab = existing_ab.read_bytes()
-        ba = existing_ba.read_bytes()
-
-    assert ab == ba, "AB and BA public bytes must be identical"
-    assert ab.endswith(b"\n") and not ab.startswith(b"\xef\xbb\xbf")
+        stored_ab = existing_ab.read_bytes()
+        stored_ba = existing_ba.read_bytes()
+        assert stored_ab == stored_ba, "Stored AB and BA artifacts must be identical"
+        assert stored_ab == ab, "Stored AB artifact diverged from computed compat output"
+        assert stored_ba == ba, "Stored BA artifact diverged from computed compat output"
 
     identity_hash = hashlib.sha256(ab).hexdigest()
     (outdir / "identity_hash.txt").write_text(identity_hash + "\n", encoding="utf-8")
