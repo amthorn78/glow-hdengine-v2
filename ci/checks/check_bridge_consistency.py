@@ -52,8 +52,6 @@ def main() -> None:
     _require_schema("adapter_selection", adapter, allowed_prefixes=("v2", "v1"))
     _require_schema("env_connectivity", env)
     _require_schema("provider_parity", parity)
-    adapter_schema = adapter.get("schema")
-
     if "selection_result" not in env:
         sys.exit("env_connectivity snapshot missing selection_result field")
 
@@ -61,6 +59,7 @@ def main() -> None:
         sys.exit("env_connectivity snapshot must be dev-only")
 
     adapter_selected = adapter.get("selected")
+    adapter_attempts = adapter.get("attempts") or []
     env_selected, env_attempts = _selection(env)
     parity_selected = parity.get("selected")
     parity_attempts = parity.get("attempts") or []
@@ -68,15 +67,8 @@ def main() -> None:
     if adapter_selected is None:
         sys.exit("adapter_selection snapshot missing selected provider")
 
-    if isinstance(adapter_schema, str) and adapter_schema.startswith("v1"):
-        if env_selected != parity_selected:
-            sys.exit(
-                f"legacy adapter snapshot present; env_connectivity selected {env_selected!r} "
-                f"but provider_parity selected {parity_selected!r}"
-            )
-        return
-
     if adapter_selected == "none":
+        _require_all_errors("adapter_selection", adapter_attempts)
         _require_all_errors("env_connectivity", env_attempts)
         _require_all_errors("provider_parity", parity_attempts)
         if env_selected not in {None, "none"}:
