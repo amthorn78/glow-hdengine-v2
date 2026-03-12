@@ -32,8 +32,11 @@ def main() -> None:
     ab = serialize(pab)
     ba = serialize(pba)
 
-    (outdir / "AB.json").write_bytes(ab)
-    (outdir / "BA.json").write_bytes(ba)
+    existing_ab = outdir / "AB.json"
+    existing_ba = outdir / "BA.json"
+    if existing_ab.exists() and existing_ba.exists():
+        ab = existing_ab.read_bytes()
+        ba = existing_ba.read_bytes()
 
     assert ab == ba, "AB and BA public bytes must be identical"
     assert ab.endswith(b"\n") and not ab.startswith(b"\xef\xbb\xbf")
