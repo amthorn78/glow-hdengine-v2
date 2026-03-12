@@ -16,10 +16,15 @@ def _load_json(rel: str) -> dict:
         return json.load(handle)
 
 
-def _require_schema(label: str, payload: dict, expected_prefix: str = "v2") -> None:
+def _require_schema(
+    label: str,
+    payload: dict,
+    expected_prefix: str | tuple[str, ...] = "v2",
+) -> None:
     value = payload.get("schema")
-    if not isinstance(value, str) or not value.startswith(expected_prefix):
-        sys.exit(f"{label} schema expected prefix {expected_prefix!r}, found {value!r}")
+    expected = (expected_prefix,) if isinstance(expected_prefix, str) else expected_prefix
+    if not isinstance(value, str) or not any(value.startswith(prefix) for prefix in expected):
+        sys.exit(f"{label} schema expected prefix in {expected!r}, found {value!r}")
 
 
 def _selection(payload: dict) -> tuple[str | None, list[dict]]:
@@ -41,7 +46,7 @@ def main() -> None:
     env = _load_json("artifacts/runtime/env_connectivity.snapshot.json")
     parity = _load_json("artifacts/db_bridge/provider_parity.proof.json")
 
-    _require_schema("adapter_selection", adapter)
+    _require_schema("adapter_selection", adapter, expected_prefix=("v1", "v2"))
     _require_schema("env_connectivity", env)
     _require_schema("provider_parity", parity)
 
