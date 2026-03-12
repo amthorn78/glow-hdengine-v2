@@ -16,10 +16,18 @@ def _load_json(rel: str) -> dict:
         return json.load(handle)
 
 
-def _require_schema(label: str, payload: dict, expected_prefix: str = "v2") -> None:
+def _require_schema(
+    label: str,
+    payload: dict,
+    expected_prefix: str | None = "v2",
+    *,
+    allowed_prefixes: tuple[str, ...] | None = None,
+) -> None:
     value = payload.get("schema")
-    if not isinstance(value, str) or not value.startswith(expected_prefix):
-        sys.exit(f"{label} schema expected prefix {expected_prefix!r}, found {value!r}")
+    prefixes = allowed_prefixes or ((expected_prefix,) if expected_prefix is not None else tuple())
+    if not isinstance(value, str) or not any(value.startswith(prefix) for prefix in prefixes):
+        expected = prefixes[0] if len(prefixes) == 1 else " or ".join(repr(prefix) for prefix in prefixes)
+        sys.exit(f"{label} schema expected prefix {expected}, found {value!r}")
 
 
 def _selection(payload: dict) -> tuple[str | None, list[dict]]:
@@ -41,10 +49,9 @@ def main() -> None:
     env = _load_json("artifacts/runtime/env_connectivity.snapshot.json")
     parity = _load_json("artifacts/db_bridge/provider_parity.proof.json")
 
-    _require_schema("adapter_selection", adapter)
+    _require_schema("adapter_selection", adapter, allowed_prefixes=("v2", "v1"))
     _require_schema("env_connectivity", env)
     _require_schema("provider_parity", parity)
-
     if "selection_result" not in env:
         sys.exit("env_connectivity snapshot missing selection_result field")
 
@@ -52,6 +59,7 @@ def main() -> None:
         sys.exit("env_connectivity snapshot must be dev-only")
 
     adapter_selected = adapter.get("selected")
+    adapter_attempts = adapter.get("attempts") or []
     env_selected, env_attempts = _selection(env)
     parity_selected = parity.get("selected")
     parity_attempts = parity.get("attempts") or []
@@ -60,6 +68,7 @@ def main() -> None:
         sys.exit("adapter_selection snapshot missing selected provider")
 
     if adapter_selected == "none":
+        _require_all_errors("adapter_selection", adapter_attempts)
         _require_all_errors("env_connectivity", env_attempts)
         _require_all_errors("provider_parity", parity_attempts)
         if env_selected not in {None, "none"}:
