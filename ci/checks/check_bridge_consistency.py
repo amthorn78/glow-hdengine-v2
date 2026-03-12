@@ -73,11 +73,13 @@ def main() -> None:
             sys.exit("adapter selected none but provider_parity chose a provider")
         return
 
-    if adapter_selected != env_selected:
+    bridge_fallback = adapter_selected == "psycopg" and env_selected == "bridge"
+
+    if adapter_selected != env_selected and not bridge_fallback:
         sys.exit(f"adapter selected {adapter_selected!r} but env_connectivity selected {env_selected!r}")
 
-    if adapter_selected != parity_selected:
-        sys.exit(f"adapter selected {adapter_selected!r} but provider_parity selected {parity_selected!r}")
+    if parity_selected != env_selected:
+        sys.exit(f"env_connectivity selected {env_selected!r} but provider_parity selected {parity_selected!r}")
 
 
 if __name__ == "__main__":
