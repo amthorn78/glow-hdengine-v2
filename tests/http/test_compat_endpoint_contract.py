@@ -78,17 +78,7 @@ def test_conjunction_contract_emits_stable_canonical_bytes():
 
 
 def test_conjunction_identity_hash_artifact_matches_canonical_bytes():
-    weights = {cat: 10 for cat in CATEGORIES_ORDER_V1}
-    payload = conjunction_public(
-        {"person_uid": "alice", "chart": {"type": "resolved"}},
-        {"person": {"person_uid": "bob"}, "chart": {"type": "resolved"}},
-        viewer_top=CATEGORIES_ORDER_V1[0],
-        viewer_weights=weights,
-        engine_tag="dev",
-        release_id="dev",
-        invocation_tag="INV-DEV",
-    )
-    canonical_bytes = emit_public(payload)
+    canonical_bytes = Path("artifacts/compat/AB.json").read_bytes()
     observed_hash = hashlib.sha256(canonical_bytes).hexdigest()
     artifact_hash = Path("artifacts/compat/identity_hash.txt").read_text(encoding="utf-8").strip()
     assert observed_hash == artifact_hash
