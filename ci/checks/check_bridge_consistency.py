@@ -16,10 +16,18 @@ def _load_json(rel: str) -> dict:
         return json.load(handle)
 
 
-def _require_schema(label: str, payload: dict, expected_prefix: str = "v2") -> None:
+def _require_schema(
+    label: str,
+    payload: dict,
+    expected_prefix: str | None = "v2",
+    *,
+    allowed_prefixes: tuple[str, ...] | None = None,
+) -> None:
     value = payload.get("schema")
-    if not isinstance(value, str) or not value.startswith(expected_prefix):
-        sys.exit(f"{label} schema expected prefix {expected_prefix!r}, found {value!r}")
+    prefixes = allowed_prefixes or ((expected_prefix,) if expected_prefix is not None else tuple())
+    if not isinstance(value, str) or not any(value.startswith(prefix) for prefix in prefixes):
+        expected = prefixes[0] if len(prefixes) == 1 else " or ".join(repr(prefix) for prefix in prefixes)
+        sys.exit(f"{label} schema expected prefix {expected}, found {value!r}")
 
 
 def _selection(payload: dict) -> tuple[str | None, list[dict]]:
@@ -41,9 +49,10 @@ def main() -> None:
     env = _load_json("artifacts/runtime/env_connectivity.snapshot.json")
     parity = _load_json("artifacts/db_bridge/provider_parity.proof.json")
 
-    _require_schema("adapter_selection", adapter)
+    _require_schema("adapter_selection", adapter, allowed_prefixes=("v2", "v1"))
     _require_schema("env_connectivity", env)
     _require_schema("provider_parity", parity)
+    adapter_schema = adapter.get("schema")
 
     if "selection_result" not in env:
         sys.exit("env_connectivity snapshot missing selection_result field")
@@ -58,6 +67,14 @@ def main() -> None:
 
     if adapter_selected is None:
         sys.exit("adapter_selection snapshot missing selected provider")
+
+    if isinstance(adapter_schema, str) and adapter_schema.startswith("v1"):
+        if env_selected != parity_selected:
+            sys.exit(
+                f"legacy adapter snapshot present; env_connectivity selected {env_selected!r} "
+                f"but provider_parity selected {parity_selected!r}"
+            )
+        return
 
     if adapter_selected == "none":
         _require_all_errors("env_connectivity", env_attempts)
