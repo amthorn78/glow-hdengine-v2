@@ -5,14 +5,11 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
 import sysconfig
-if sys.version_info >= (3, 11):
-    import tomllib
-else:
-    import tomli as tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -106,8 +103,23 @@ def _stdin_pair(payload: dict[str, object]) -> bytes:
 
 
 def _load_entrypoint() -> str:
-    pyproject = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
-    return str(pyproject["project"]["scripts"]["hdctl"])
+    pyproject = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
+    section_match = re.search(
+        r"^\[project\.scripts\]\s*(?P<body>(?:\n(?!\[).*)*)",
+        pyproject,
+        flags=re.MULTILINE,
+    )
+    if section_match is None:
+        raise SystemExit("[project.scripts] missing in pyproject.toml")
+
+    entrypoint_match = re.search(
+        r'^hdctl\s*=\s*"(?P<entrypoint>[^"]+)"\s*$',
+        section_match.group("body"),
+        flags=re.MULTILINE,
+    )
+    if entrypoint_match is None:
+        raise SystemExit("hdctl entrypoint missing in [project.scripts]")
+    return entrypoint_match.group("entrypoint")
 
 
 def main() -> int:
