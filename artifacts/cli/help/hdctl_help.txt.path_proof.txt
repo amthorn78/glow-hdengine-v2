@@ -1,5 +1,5 @@
 path: artifacts/cli/help/hdctl_help.txt
-size_bytes: 638
-sha256: 07a8d7cfccf832a24f81af0a569885c9a4449b487ccef7d3d3edc474dd16516d
+size_bytes: 717
+sha256: 3dfb564807a9a2bc0358c6f4db4edb20d9c454ef476e33161cce9c92629fba6a
 mtime_utc: 2026-03-13T04:25:26Z
 produced_at_utc: 2026-01-05T05:39:56Z
