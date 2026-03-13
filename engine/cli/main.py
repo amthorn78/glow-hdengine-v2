@@ -61,13 +61,16 @@ class CliError(Exception):
         self.exit_code = exit_code
 
 
-def _build_parser() -> argparse.ArgumentParser:
+def _cli_version_text() -> str:
     engine_tag, release_id, _ = _engine_identity()
     try:
         package_version = importlib.metadata.version("glow-hdengine")
     except importlib.metadata.PackageNotFoundError:
         package_version = "0.0.0"
+    return f"hdctl {package_version} ({engine_tag};{release_id})"
 
+
+def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="hdctl",
         description="Glow HD Engine compatibility CLI",
@@ -75,8 +78,8 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--version",
-        action="version",
-        version=f"hdctl {package_version} ({engine_tag}; {release_id})",
+        action="store_true",
+        help="show program version and exit",
     )
     sub = parser.add_subparsers(dest="command", required=True)
     show = sub.add_parser(
@@ -234,6 +237,14 @@ def bg_resolve(args: argparse.Namespace) -> int:
 
 
 def cli(argv: list[str] | None = None) -> int:
+    argv = list(sys.argv[1:] if argv is None else argv)
+    if "--version" in argv:
+        if len(argv) == 1:
+            sys.stdout.write(f"{_cli_version_text()}\n")
+            return 0
+        sys.stderr.write("VERSION_FLAG_WITH_COMMAND\n")
+        return 64
+
     parser = _build_parser()
     try:
         args = parser.parse_args(argv)
