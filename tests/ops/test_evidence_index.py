@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import hashlib
 import datetime as _dt
-import hashlib
 import json
 
 import pytest
@@ -11,7 +10,11 @@ from pathlib import Path
 from tools.evidence import update_evidence_index
 
 
-TARGETS = [
+COMPAT_TARGETS = [
+    ("compat.conjunction.identity_hash", "artifacts/compat/identity_hash.txt"),
+]
+
+REPO_TARGETS = [
     ("db_bridge.adapter_selection.snapshot", "artifacts/db_bridge/adapter_selection.snapshot.json"),
     ("db_bridge.health", "artifacts/db_bridge/health.json"),
     ("db_bridge.root", "artifacts/db_bridge/root.json"),
@@ -27,14 +30,14 @@ TARGETS = [
 ]
 
 
-def test_evidence_index_has_required_artifacts():
+def _assert_targets_present(targets):
     idx_path = Path("docs/evidence/INDEX.json")
     idx_entries = json.loads(idx_path.read_text(encoding="utf-8"))
     assert isinstance(idx_entries, list)
 
     entries_by_path = {entry["discovered_physical_path"]: entry for entry in idx_entries}
 
-    for key, path in TARGETS:
+    for key, path in targets:
         assert path in entries_by_path, f"missing {path} in INDEX.json"
         entry = entries_by_path[path]
         assert entry.get("artifact_key") == key
@@ -57,7 +60,7 @@ def test_evidence_index_has_required_artifacts():
         rec = json.loads(line)
         records[(rec["artifact_key"], rec["discovered_physical_path"])] = rec
 
-    for key, path in TARGETS:
+    for key, path in targets:
         assert (key, path) in records, f"missing {key} in evidence_index.jsonl"
         rec = records[(key, path)]
         expected_proof = f"{path}.path_proof.txt"
@@ -65,6 +68,14 @@ def test_evidence_index_has_required_artifacts():
         sha = hashlib.sha256(Path(path).read_bytes()).hexdigest()
         assert rec.get("sha256") == sha
         assert rec.get("size_bytes") == Path(path).stat().st_size
+
+
+def test_evidence_index_has_required_compat_artifacts():
+    _assert_targets_present(COMPAT_TARGETS)
+
+
+def test_evidence_index_has_required_repo_artifacts():
+    _assert_targets_present(REPO_TARGETS)
 
 
 def test_write_if_changed_check_mode_fails_closed_for_missing_target(tmp_path: Path):
