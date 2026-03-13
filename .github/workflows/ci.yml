@@ -57,7 +57,11 @@ jobs:
         env:
           EPIC021_QA_RUN_ID: ci-selftest-epic021
         run: python -m pytest tests/qa/test_epic021_harness_entrypoint.py
-      - run: python -m pytest tests/evidence tests/ops/test_evidence_index.py
+      - name: Run compat-only evidence index closure checks
+        run: |
+          python -m pytest -q tests/http/test_compat_endpoint_contract.py::test_conjunction_identity_hash_artifact_matches_canonical_bytes
+          python -m pytest -q tests/ops/test_evidence_index.py::test_evidence_index_has_required_compat_artifacts
+      - run: python -m pytest tests/evidence tests/ops/test_evidence_index.py::test_evidence_index_has_required_repo_artifacts
       - run: python -m pytest tests/order tests/mech/test_order_properties.py
       - run: python -m pytest tests/cli/test_serializer_guards.py
   epic020:
