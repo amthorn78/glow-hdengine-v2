@@ -81,6 +81,7 @@ def _env() -> dict[str, str]:
             "ENGINE_TAG": "hdengine-dev",
             "RELEASE_ID": "0" * 64,
             "PRODUCT_INVOCATION_TAG": "INV-CLI-CONFORMANCE",
+            "PIP_NO_INDEX": "1",
         }
     )
     ensure_determinism_env(environ=env)
@@ -146,12 +147,18 @@ def main() -> int:
     env = _env()
     module_cmd = [sys.executable, "-m", "engine.cli"]
     script_cmd = [sys.executable, "scripts/hdctl.py"]
-    console_path = str(Path(env["PATH"]) / "hdctl")
-    console_cmd = [console_path]
-
-    install_proc = _run([sys.executable, "-m", "pip", "install", "-e", "."], env=env)
+    install_proc = _run(
+        [sys.executable, "-m", "pip", "install", "--no-deps", "--no-build-isolation", "-e", "."],
+        env=env,
+    )
     if install_proc.returncode != 0:
         raise SystemExit(f"pip install -e . failed rc={install_proc.returncode}: {install_proc.stderr!r}")
+
+    console_path = str(Path(env["PATH"]) / "hdctl")
+    console_cmd = [console_path]
+    console_available = Path(console_path).is_file() and os.access(console_path, os.X_OK)
+    if not console_available:
+        raise SystemExit(f"hdctl console entrypoint unavailable after editable install: {console_path}")
 
     help_stdout = _assert_text_output("module help", _run([*module_cmd, "--help"], env=env))
     showcompat_help_stdout = _assert_text_output(
@@ -180,46 +187,28 @@ def main() -> int:
     _write_bytes(AB_PATH, ab_bytes)
     _write_bytes(BA_PATH, ba_bytes)
 
-    console_available = Path(console_path).is_file() and os.access(console_path, os.X_OK)
-    console_path = shutil.which("hdctl", path=env.get("PATH"))
-    console_available = bool(console_path)
-    if not console_available:
-        raise SystemExit("hdctl console entrypoint unavailable after editable install")
-
     version_cmd = [*module_cmd, "--version"]
     version_proc = _run(version_cmd, env=env)
     version_stdout = _assert_text_output("module version", version_proc)
 
-    console_version_cmd = [*console_cmd, "--version"]
-    console_help_record: dict[str, object] = {"cmd": [*console_cmd, "--help"], "skipped": not console_available}
-    console_version_record: dict[str, object] = {"cmd": console_version_cmd, "skipped": not console_available}
-    if console_available:
-        console_help_proc = _run([*console_cmd, "--help"], env=env)
-        console_help_stdout = _assert_text_output("console help", console_help_proc)
-        if console_help_stdout != help_stdout:
-            raise SystemExit("console help output mismatch against module help")
-        console_help_record["returncode"] = console_help_proc.returncode
-
-        console_version_proc = _run(console_version_cmd, env=env)
-        console_version_stdout = _assert_text_output("console version", console_version_proc)
-        console_version_record.update(
-            {
-                "returncode": console_version_proc.returncode,
-                "stdout": console_version_stdout.decode("utf-8"),
-                "stderr": console_version_proc.stderr.decode("utf-8", errors="replace"),
-            }
-        )
-    else:
-        console_help_record["reason"] = "hdctl not found in interpreter scripts dir; offline conformance run does not inspect ambient PATH"
-        console_version_record["reason"] = "hdctl not found in interpreter scripts dir; offline conformance run does not inspect ambient PATH"
     console_help_proc = _run([*console_cmd, "--help"], env=env)
     console_help_stdout = _assert_text_output("console help", console_help_proc)
     if console_help_stdout != help_stdout:
         raise SystemExit("console help output mismatch against module help")
+    console_help_record = {
+        "cmd": [*console_cmd, "--help"],
+        "returncode": console_help_proc.returncode,
+    }
 
     console_version_cmd = [*console_cmd, "--version"]
     console_version_proc = _run(console_version_cmd, env=env)
     console_version_stdout = _assert_text_output("console version", console_version_proc)
+    console_version_record = {
+        "cmd": console_version_cmd,
+        "returncode": console_version_proc.returncode,
+        "stdout": console_version_stdout.decode("utf-8"),
+        "stderr": console_version_proc.stderr.decode("utf-8", errors="replace"),
+    }
 
     entrypoint_decl = _load_entrypoint()
     entrypoints_text = (
@@ -229,9 +218,9 @@ def main() -> int:
         f"script_help_cmd={' '.join(script_cmd + ['--help'])}\n"
         f"console_help_cmd={' '.join(console_cmd + ['--help'])}\n"
         f"console_version_cmd={' '.join(console_version_cmd)}\n"
-        "install_step=SKIPPED (offline-safe; no pip install attempted)\n"
+        "install_step=SUCCESS (pip install -e . --no-deps --no-build-isolation with PIP_NO_INDEX=1)\n"
         f"console_entrypoint_available={str(console_available).lower()}\n"
-        f"console_entrypoint_path={console_path if console_available else 'UNAVAILABLE'}\n"
+        f"console_entrypoint_path={console_path}\n"
     )
     _write_bytes(ENTRYPOINTS_PATH, entrypoints_text.encode("utf-8"))
 
@@ -286,17 +275,7 @@ def main() -> int:
             "console_help": {
                 **console_help_record,
             },
-            "console_version": {
-                **console_version_record,
-                "cmd": [*console_cmd, "--help"],
-                "returncode": console_help_proc.returncode,
-            },
-            "console_version": {
-                "cmd": console_version_cmd,
-                "returncode": console_version_proc.returncode,
-                "stdout": console_version_stdout.decode("utf-8"),
-                "stderr": console_version_proc.stderr.decode("utf-8", errors="replace"),
-            },
+            "console_version": console_version_record,
         },
         "sampler_semantics": {
             "cmd": [*module_cmd, "dev:sampler", "--viewer", "viewer-cli-conformance", "--candidates-file", "<tempfile>", "--seed", sampler_seed],
@@ -331,16 +310,6 @@ def main() -> int:
         },
         "console_help": console_help_record,
         "console_version": console_version_record,
-        "console_help": {
-            "cmd": [*console_cmd, "--help"],
-            "returncode": console_help_proc.returncode,
-        },
-        "console_version": {
-            "cmd": console_version_cmd,
-            "returncode": console_version_proc.returncode,
-            "stdout": console_version_stdout.decode("utf-8"),
-            "stderr": console_version_proc.stderr.decode("utf-8", errors="replace"),
-        },
         "reject_nonjson": {
             "cmd": [*module_cmd, "showcompat", "--conjunction"],
             "stdin": "not-json\\n",
