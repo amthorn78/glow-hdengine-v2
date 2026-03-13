@@ -29,6 +29,12 @@ QUERY = {
     "b_location": "Berlin",
 }
 
+CONJUNCTION_ENV_PINS = {
+    "ENGINE_TAG": "hdengine-alpha",
+    "RELEASE_ID": "0" * 64,
+    "PRODUCT_INVOCATION_TAG": "INV-UNKNOWN",
+}
+
 
 def _as_json_bytes(payload: dict[str, object]) -> bytes:
     return canon.sercanon(payload, sort_keys=True)
@@ -38,6 +44,8 @@ def main() -> int:
     os.environ["APP_ENV"] = "dev"
     os.environ["SAFE_MODE"] = "0"
     os.environ["ALLOW_NETWORK"] = "1"
+    for key, value in CONJUNCTION_ENV_PINS.items():
+        os.environ[key] = value
 
     app = create_app()
     app.config.update(TESTING=True)
