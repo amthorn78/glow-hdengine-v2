@@ -6,7 +6,6 @@ import hashlib
 import json
 import os
 import re
-import shutil
 import subprocess
 import sys
 import sysconfig
@@ -70,7 +69,7 @@ ENV_KEYS = (
 def _env() -> dict[str, str]:
     env = os.environ.copy()
     scripts_dir = sysconfig.get_paths()["scripts"]
-    env["PATH"] = f"{scripts_dir}:{env.get('PATH', '')}"
+    env["PATH"] = scripts_dir
     env.update(
         {
             "SAFE_MODE": "1",
@@ -147,7 +146,8 @@ def main() -> int:
     env = _env()
     module_cmd = [sys.executable, "-m", "engine.cli"]
     script_cmd = [sys.executable, "scripts/hdctl.py"]
-    console_cmd = ["hdctl"]
+    console_path = str(Path(env["PATH"]) / "hdctl")
+    console_cmd = [console_path]
 
     help_stdout = _assert_text_output("module help", _run([*module_cmd, "--help"], env=env))
     showcompat_help_stdout = _assert_text_output(
@@ -176,8 +176,7 @@ def main() -> int:
     _write_bytes(AB_PATH, ab_bytes)
     _write_bytes(BA_PATH, ba_bytes)
 
-    console_path = shutil.which("hdctl", path=env.get("PATH"))
-    console_available = bool(console_path)
+    console_available = Path(console_path).is_file() and os.access(console_path, os.X_OK)
 
     version_cmd = [*module_cmd, "--version"]
     version_proc = _run(version_cmd, env=env)
@@ -203,8 +202,8 @@ def main() -> int:
             }
         )
     else:
-        console_help_record["reason"] = "hdctl not found on PATH; offline conformance run does not install packages"
-        console_version_record["reason"] = "hdctl not found on PATH; offline conformance run does not install packages"
+        console_help_record["reason"] = "hdctl not found in interpreter scripts dir; offline conformance run does not inspect ambient PATH"
+        console_version_record["reason"] = "hdctl not found in interpreter scripts dir; offline conformance run does not inspect ambient PATH"
 
     entrypoint_decl = _load_entrypoint()
     entrypoints_text = (
@@ -216,7 +215,7 @@ def main() -> int:
         f"console_version_cmd={' '.join(console_version_cmd)}\n"
         "install_step=SKIPPED (offline-safe; no pip install attempted)\n"
         f"console_entrypoint_available={str(console_available).lower()}\n"
-        f"console_entrypoint_path={console_path or 'UNAVAILABLE'}\n"
+        f"console_entrypoint_path={console_path if console_available else 'UNAVAILABLE'}\n"
     )
     _write_bytes(ENTRYPOINTS_PATH, entrypoints_text.encode("utf-8"))
 
