@@ -136,6 +136,21 @@ COMPAT_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     }
 ]
 
+CONJUNCTION_WRITER_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "conjunction.writer.write_readback",
+        "discovered_physical_path": "artifacts/writer/conjunction_write_readback.log",
+        "record_type": "writer_log",
+        "schema_version": "1.0",
+    },
+    {
+        "artifact_key": "conjunction.writer.summary",
+        "discovered_physical_path": "artifacts/writer/conjunction_writer_summary.json",
+        "record_type": "writer_summary",
+        "schema_version": "1.0",
+    },
+]
+
 
 def _sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
@@ -349,7 +364,15 @@ def _dedupe_entries(entries: Iterable[Mapping[str, object]]) -> list[dict[str, o
 def _load_human_index() -> list[dict[str, object]]:
     payload = json.loads(HUMAN_INDEX.read_text(encoding="utf-8"))
     return _dedupe_entries(
-        [*payload, *BASELINE_ENTRIES, *EPIC022_PRIMARY_ARTIFACTS, *EPIC024_PRIMARY_ARTIFACTS, *COMPAT_PRIMARY_ARTIFACTS, *CLI_CONFORMANCE_ARTIFACTS]
+        [
+            *payload,
+            *BASELINE_ENTRIES,
+            *EPIC022_PRIMARY_ARTIFACTS,
+            *EPIC024_PRIMARY_ARTIFACTS,
+            *COMPAT_PRIMARY_ARTIFACTS,
+            *CLI_CONFORMANCE_ARTIFACTS,
+            *CONJUNCTION_WRITER_ARTIFACTS,
+        ]
     )
 
 

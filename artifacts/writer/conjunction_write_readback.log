@@ -1,0 +1,13 @@
+schema=conjunction_write_readback.log.v1
+route=/dev/writer/conjunction
+reader_route=/dev/reader/conjunction
+writer_first_status=200
+writer_second_status=200
+reader_status=200
+writer_route_id=dev.writer.conjunction.v1
+idempotence_hash=1bc39db508c9c84f20728d0d657fdd7b6e144f0832055de7c134991f19b9c07e
+writer_bytes_two_run_equal=true
+writer_payload_two_run_equal=true
+writer_result_reader_readback_equal=true
+writer_payload_sha256=65b2c7fcff36efc72ab5e87f12b23d54ed0b897ae64d92a7c0ec4d0c1f924cd2
+reader_payload_sha256=02476e8ccede9610ef2eebb920ef5bb855bb8a87a4166baa2f6a22cac1e69989
