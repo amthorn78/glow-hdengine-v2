@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib.metadata
 import json
 import math
 import os
@@ -61,10 +62,21 @@ class CliError(Exception):
 
 
 def _build_parser() -> argparse.ArgumentParser:
+    engine_tag, release_id, _ = _engine_identity()
+    try:
+        package_version = importlib.metadata.version("glow-hdengine")
+    except importlib.metadata.PackageNotFoundError:
+        package_version = "0.0.0"
+
     parser = argparse.ArgumentParser(
         prog="hdctl",
         description="Glow HD Engine compatibility CLI",
         allow_abbrev=False,
+    )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"hdctl {package_version} ({engine_tag}; {release_id})",
     )
     sub = parser.add_subparsers(dest="command", required=True)
     show = sub.add_parser(

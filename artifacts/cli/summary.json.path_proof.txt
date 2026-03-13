@@ -1,5 +1,5 @@
 path: artifacts/cli/summary.json
-size_bytes: 1908
-sha256: acbd66c7a6c9b0500305601f0ba42e8c5986f9c7dff598ae97d6b62549f4b02f
+size_bytes: 2537
+sha256: 5d083548e49e007f6ff94945f06244ee06df5b0e93038862ca6a24ca8065ce2e
 mtime_utc: 2025-12-06T04:06:36Z
 produced_at_utc: 2025-11-22T02:27:04Z

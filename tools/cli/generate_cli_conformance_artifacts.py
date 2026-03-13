@@ -10,6 +10,7 @@ import shutil
 import subprocess
 import sys
 import sysconfig
+import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -46,6 +47,13 @@ CONJUNCTION_AB = {
     },
 }
 CONJUNCTION_BA = {"left": CONJUNCTION_AB["right"], "right": CONJUNCTION_AB["left"]}
+SAMPLER_CANDIDATES = {
+    "candidates": [
+        {"person_uid": "cand-a", "weight": 0.8, "compat_score": 91, "band": "Warm", "diversity_key": "G"},
+        {"person_uid": "cand-b", "weight": 0.6, "compat_score": 78, "band": "Cool", "diversity_key": "P"},
+        {"person_uid": "cand-c", "weight": 0.9, "compat_score": 88, "band": "Warm", "diversity_key": "M"},
+    ]
+}
 
 ENV_KEYS = (
     "SAFE_MODE",
@@ -70,6 +78,7 @@ def _env() -> dict[str, str]:
             "LC_ALL": "C",
             "LANG": "C",
             "TZ": "UTC",
+            "APP_ENV": "test",
             "ENGINE_TAG": "hdengine-dev",
             "RELEASE_ID": "0" * 64,
             "PRODUCT_INVOCATION_TAG": "INV-CLI-CONFORMANCE",
@@ -104,22 +113,34 @@ def _stdin_pair(payload: dict[str, object]) -> bytes:
 
 def _load_entrypoint() -> str:
     pyproject = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
-    section_match = re.search(
-        r"^\[project\.scripts\]\s*(?P<body>(?:\n(?!\[).*)*)",
-        pyproject,
-        flags=re.MULTILINE,
-    )
-    if section_match is None:
-        raise SystemExit("[project.scripts] missing in pyproject.toml")
+    in_scripts = False
+    for raw in pyproject.splitlines():
+        line = raw.strip()
+        if line.startswith("[") and line.endswith("]"):
+            in_scripts = line == "[project.scripts]"
+            continue
+        if not in_scripts or not line or line.startswith("#"):
+            continue
+        entrypoint_match = re.match(r'^hdctl\s*=\s*"(?P<entrypoint>[^"]+)"\s*$', line)
+        if entrypoint_match is not None:
+            return entrypoint_match.group("entrypoint")
+    raise SystemExit("hdctl entrypoint missing in [project.scripts]")
 
-    entrypoint_match = re.search(
-        r'^hdctl\s*=\s*"(?P<entrypoint>[^"]+)"\s*$',
-        section_match.group("body"),
-        flags=re.MULTILINE,
+
+def _run_sampler(module_cmd: list[str], env: dict[str, str], candidates_file: Path, seed: str) -> subprocess.CompletedProcess[bytes]:
+    return _run(
+        [
+            *module_cmd,
+            "dev:sampler",
+            "--viewer",
+            "viewer-cli-conformance",
+            "--candidates-file",
+            str(candidates_file),
+            "--seed",
+            seed,
+        ],
+        env=env,
     )
-    if entrypoint_match is None:
-        raise SystemExit("hdctl entrypoint missing in [project.scripts]")
-    return entrypoint_match.group("entrypoint")
 
 
 def main() -> int:
@@ -127,6 +148,10 @@ def main() -> int:
     module_cmd = [sys.executable, "-m", "engine.cli"]
     script_cmd = [sys.executable, "scripts/hdctl.py"]
     console_cmd = ["hdctl"]
+
+    install_proc = _run([sys.executable, "-m", "pip", "install", "-e", "."], env=env)
+    if install_proc.returncode != 0:
+        raise SystemExit(f"pip install -e . failed rc={install_proc.returncode}: {install_proc.stderr!r}")
 
     help_stdout = _assert_text_output("module help", _run([*module_cmd, "--help"], env=env))
     showcompat_help_stdout = _assert_text_output(
@@ -157,8 +182,21 @@ def main() -> int:
 
     console_path = shutil.which("hdctl", path=env.get("PATH"))
     console_available = bool(console_path)
+    if not console_available:
+        raise SystemExit("hdctl console entrypoint unavailable after editable install")
+
     version_cmd = [*module_cmd, "--version"]
     version_proc = _run(version_cmd, env=env)
+    version_stdout = _assert_text_output("module version", version_proc)
+
+    console_help_proc = _run([*console_cmd, "--help"], env=env)
+    console_help_stdout = _assert_text_output("console help", console_help_proc)
+    if console_help_stdout != help_stdout:
+        raise SystemExit("console help output mismatch against module help")
+
+    console_version_cmd = [*console_cmd, "--version"]
+    console_version_proc = _run(console_version_cmd, env=env)
+    console_version_stdout = _assert_text_output("console version", console_version_proc)
 
     entrypoint_decl = _load_entrypoint()
     entrypoints_text = (
@@ -166,10 +204,25 @@ def main() -> int:
         f"declared_entrypoint={entrypoint_decl}\n"
         f"module_help_cmd={' '.join(module_cmd + ['--help'])}\n"
         f"script_help_cmd={' '.join(script_cmd + ['--help'])}\n"
+        f"console_help_cmd={' '.join(console_cmd + ['--help'])}\n"
+        f"console_version_cmd={' '.join(console_version_cmd)}\n"
         f"console_entrypoint_available={str(console_available).lower()}\n"
         f"console_entrypoint_path={console_path or 'UNAVAILABLE'}\n"
     )
     _write_bytes(ENTRYPOINTS_PATH, entrypoints_text.encode("utf-8"))
+
+    with tempfile.NamedTemporaryFile(mode="wb", suffix=".json", delete=False) as handle:
+        handle.write(emitter.emit_public(SAMPLER_CANDIDATES))
+        candidates_path = Path(handle.name)
+
+    sampler_seed = "seed-cli-conformance"
+    sampler_proc_1 = _run_sampler(module_cmd, env, candidates_path, sampler_seed)
+    sampler_proc_2 = _run_sampler(module_cmd, env, candidates_path, sampler_seed)
+    candidates_path.unlink(missing_ok=True)
+    sampler_bytes_1 = _assert_text_output("sampler run 1", sampler_proc_1)
+    sampler_bytes_2 = _assert_text_output("sampler run 2", sampler_proc_2)
+    sampler_output = json.loads(sampler_bytes_1)
+    ordered_ids = [row["person_uid"] for row in sampler_output.get("candidates", [])]
 
     summary_payload = {
         "ab_sha256": hashlib.sha256(ab_bytes).hexdigest(),
@@ -195,7 +248,7 @@ def main() -> int:
             "module_version": {
                 "cmd": version_cmd,
                 "returncode": version_proc.returncode,
-                "stdout": version_proc.stdout.decode("utf-8", errors="replace"),
+                "stdout": version_stdout.decode("utf-8"),
                 "stderr": version_proc.stderr.decode("utf-8", errors="replace"),
             },
             "script_help": {
@@ -206,10 +259,27 @@ def main() -> int:
                 "available": console_available,
                 "path": console_path,
             },
+            "console_help": {
+                "cmd": [*console_cmd, "--help"],
+                "returncode": console_help_proc.returncode,
+            },
+            "console_version": {
+                "cmd": console_version_cmd,
+                "returncode": console_version_proc.returncode,
+                "stdout": console_version_stdout.decode("utf-8"),
+                "stderr": console_version_proc.stderr.decode("utf-8", errors="replace"),
+            },
+        },
+        "sampler_semantics": {
+            "cmd": [*module_cmd, "dev:sampler", "--viewer", "viewer-cli-conformance", "--candidates-file", "<tempfile>", "--seed", sampler_seed],
+            "seed": sampler_seed,
+            "two_run_equal": sampler_bytes_1 == sampler_bytes_2,
+            "sha256": hashlib.sha256(sampler_bytes_1).hexdigest(),
+            "candidate_order": ordered_ids,
         },
         "pf05_command_catalog": {
             "implemented_commands": ["showcompat", "aux-preview", "bg:resolve", "dev:sampler"],
-            "global_flags_checked": ["--help"],
+            "global_flags_checked": ["--help", "--version"],
             "showcompat_help_capture": SHOWCOMPAT_HELP_PATH.relative_to(ROOT).as_posix(),
             "argument_policing_capture": REJECT_NONJSON_PATH.relative_to(ROOT).as_posix(),
             "streams_checked": {"help_stderr_empty": True, "reject_stdout_empty": True},
@@ -228,8 +298,18 @@ def main() -> int:
         "module_version": {
             "cmd": version_cmd,
             "returncode": version_proc.returncode,
-            "stdout": version_proc.stdout.decode("utf-8", errors="replace"),
+            "stdout": version_stdout.decode("utf-8"),
             "stderr": version_proc.stderr.decode("utf-8", errors="replace"),
+        },
+        "console_help": {
+            "cmd": [*console_cmd, "--help"],
+            "returncode": console_help_proc.returncode,
+        },
+        "console_version": {
+            "cmd": console_version_cmd,
+            "returncode": console_version_proc.returncode,
+            "stdout": console_version_stdout.decode("utf-8"),
+            "stderr": console_version_proc.stderr.decode("utf-8", errors="replace"),
         },
         "reject_nonjson": {
             "cmd": [*module_cmd, "showcompat", "--conjunction"],
