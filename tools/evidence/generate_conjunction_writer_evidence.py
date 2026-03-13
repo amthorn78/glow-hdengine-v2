@@ -4,9 +4,8 @@ from __future__ import annotations
 import hashlib
 import json
 import os
-from pathlib import Path
-
 import sys
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
@@ -40,10 +39,19 @@ def _as_json_bytes(payload: dict[str, object]) -> bytes:
     return canon.sercanon(payload, sort_keys=True)
 
 
+def _require_open_rails() -> None:
+    safe_mode = os.environ.get("SAFE_MODE", "1")
+    allow_network = os.environ.get("ALLOW_NETWORK", "0")
+    if safe_mode != "0" or allow_network != "1":
+        raise SystemExit(
+            "generate_conjunction_writer_evidence requires explicit open rails from caller "
+            "(set SAFE_MODE=0 and ALLOW_NETWORK=1) for /dev/*/conjunction resolver acquisition"
+        )
+
+
 def main() -> int:
-    os.environ["APP_ENV"] = "dev"
-    os.environ["SAFE_MODE"] = "0"
-    os.environ["ALLOW_NETWORK"] = "1"
+    os.environ.setdefault("APP_ENV", "dev")
+    _require_open_rails()
     for key, value in CONJUNCTION_ENV_PINS.items():
         os.environ[key] = value
 
@@ -93,8 +101,8 @@ def main() -> int:
         "\n".join(
             [
                 "schema=conjunction_write_readback.log.v1",
-                f"route=/dev/writer/conjunction",
-                f"reader_route=/dev/reader/conjunction",
+                "route=/dev/writer/conjunction",
+                "reader_route=/dev/reader/conjunction",
                 "writer_first_status=200",
                 "writer_second_status=200",
                 "reader_status=200",
