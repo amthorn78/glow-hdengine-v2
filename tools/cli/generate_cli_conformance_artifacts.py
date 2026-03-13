@@ -149,6 +149,10 @@ def main() -> int:
     console_path = str(Path(env["PATH"]) / "hdctl")
     console_cmd = [console_path]
 
+    install_proc = _run([sys.executable, "-m", "pip", "install", "-e", "."], env=env)
+    if install_proc.returncode != 0:
+        raise SystemExit(f"pip install -e . failed rc={install_proc.returncode}: {install_proc.stderr!r}")
+
     help_stdout = _assert_text_output("module help", _run([*module_cmd, "--help"], env=env))
     showcompat_help_stdout = _assert_text_output(
         "showcompat help", _run([*module_cmd, "showcompat", "--help"], env=env)
@@ -177,6 +181,10 @@ def main() -> int:
     _write_bytes(BA_PATH, ba_bytes)
 
     console_available = Path(console_path).is_file() and os.access(console_path, os.X_OK)
+    console_path = shutil.which("hdctl", path=env.get("PATH"))
+    console_available = bool(console_path)
+    if not console_available:
+        raise SystemExit("hdctl console entrypoint unavailable after editable install")
 
     version_cmd = [*module_cmd, "--version"]
     version_proc = _run(version_cmd, env=env)
@@ -204,6 +212,14 @@ def main() -> int:
     else:
         console_help_record["reason"] = "hdctl not found in interpreter scripts dir; offline conformance run does not inspect ambient PATH"
         console_version_record["reason"] = "hdctl not found in interpreter scripts dir; offline conformance run does not inspect ambient PATH"
+    console_help_proc = _run([*console_cmd, "--help"], env=env)
+    console_help_stdout = _assert_text_output("console help", console_help_proc)
+    if console_help_stdout != help_stdout:
+        raise SystemExit("console help output mismatch against module help")
+
+    console_version_cmd = [*console_cmd, "--version"]
+    console_version_proc = _run(console_version_cmd, env=env)
+    console_version_stdout = _assert_text_output("console version", console_version_proc)
 
     entrypoint_decl = _load_entrypoint()
     entrypoints_text = (
@@ -272,6 +288,14 @@ def main() -> int:
             },
             "console_version": {
                 **console_version_record,
+                "cmd": [*console_cmd, "--help"],
+                "returncode": console_help_proc.returncode,
+            },
+            "console_version": {
+                "cmd": console_version_cmd,
+                "returncode": console_version_proc.returncode,
+                "stdout": console_version_stdout.decode("utf-8"),
+                "stderr": console_version_proc.stderr.decode("utf-8", errors="replace"),
             },
         },
         "sampler_semantics": {
@@ -307,6 +331,16 @@ def main() -> int:
         },
         "console_help": console_help_record,
         "console_version": console_version_record,
+        "console_help": {
+            "cmd": [*console_cmd, "--help"],
+            "returncode": console_help_proc.returncode,
+        },
+        "console_version": {
+            "cmd": console_version_cmd,
+            "returncode": console_version_proc.returncode,
+            "stdout": console_version_stdout.decode("utf-8"),
+            "stderr": console_version_proc.stderr.decode("utf-8", errors="replace"),
+        },
         "reject_nonjson": {
             "cmd": [*module_cmd, "showcompat", "--conjunction"],
             "stdin": "not-json\\n",
