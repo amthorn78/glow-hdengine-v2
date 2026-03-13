@@ -1,7 +1,5 @@
 path: artifacts/cli/install/entrypoints.txt
-size_bytes: 508
-sha256: afde0da6ade2b6e63e2a17557ebfd1e5a6c36263d1f811a655ac2606655bab29
-size_bytes: 405
-sha256: 29eefd15bfedd984998ac2a3db2cc7e4fddaab3b850c2d74bc10ab85b3f2124a
+size_bytes: 564
+sha256: 05d63f8d1b16bc63e38b4e299fbf567c5baeab19c087027082f328fb3195f515
 mtime_utc: 2026-03-13T04:25:27Z
 produced_at_utc: 2026-01-05T05:39:56Z
