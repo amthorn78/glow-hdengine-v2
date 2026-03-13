@@ -1,0 +1,5 @@
+path: artifacts/cli/help/showcompat_help.txt
+size_bytes: 2361
+sha256: f9cdc8861dee7e3fb5f34c244e56a66f4660f679f29e6cd0badf28690ea82035
+mtime_utc: 2026-03-13T04:25:26Z
+produced_at_utc: 2026-01-05T05:39:56Z

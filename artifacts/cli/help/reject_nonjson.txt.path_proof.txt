@@ -1,0 +1,5 @@
+path: artifacts/cli/help/reject_nonjson.txt
+size_bytes: 13
+sha256: 0a51d40addd8810b3c0a3d9e8fab0784a05cdee4c2d6ff58c8a198be3b9b9288
+mtime_utc: 2026-03-13T04:25:26Z
+produced_at_utc: 2026-01-05T05:39:56Z

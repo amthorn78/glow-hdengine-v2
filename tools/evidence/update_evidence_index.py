@@ -115,6 +115,18 @@ EPIC024_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
         "epic_id": "HDE-EPIC024",
     },
 ]
+
+CLI_CONFORMANCE_ARTIFACTS: list[dict[str, object]] = [
+    {"artifact_key": "cli.help.hdctl", "discovered_physical_path": "artifacts/cli/help/hdctl_help.txt"},
+    {"artifact_key": "cli.help.showcompat", "discovered_physical_path": "artifacts/cli/help/showcompat_help.txt"},
+    {"artifact_key": "cli.help.reject_nonjson", "discovered_physical_path": "artifacts/cli/help/reject_nonjson.txt"},
+    {"artifact_key": "cli.install.entrypoints", "discovered_physical_path": "artifacts/cli/install/entrypoints.txt"},
+    {"artifact_key": "cli.install.installability_summary", "discovered_physical_path": "artifacts/cli/install/installability_summary.json"},
+    {"artifact_key": "cli.showcompat.ab", "discovered_physical_path": "artifacts/cli/ab.json"},
+    {"artifact_key": "cli.showcompat.ba", "discovered_physical_path": "artifacts/cli/ba.json"},
+    {"artifact_key": "cli.showcompat.summary", "discovered_physical_path": "artifacts/cli/summary.json"},
+]
+
 COMPAT_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
         "artifact_key": "compat.conjunction.identity_hash",
@@ -337,7 +349,7 @@ def _dedupe_entries(entries: Iterable[Mapping[str, object]]) -> list[dict[str, o
 def _load_human_index() -> list[dict[str, object]]:
     payload = json.loads(HUMAN_INDEX.read_text(encoding="utf-8"))
     return _dedupe_entries(
-        [*payload, *BASELINE_ENTRIES, *EPIC022_PRIMARY_ARTIFACTS, *EPIC024_PRIMARY_ARTIFACTS, *COMPAT_PRIMARY_ARTIFACTS]
+        [*payload, *BASELINE_ENTRIES, *EPIC022_PRIMARY_ARTIFACTS, *EPIC024_PRIMARY_ARTIFACTS, *COMPAT_PRIMARY_ARTIFACTS, *CLI_CONFORMANCE_ARTIFACTS]
     )
 
 

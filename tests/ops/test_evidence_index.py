@@ -27,6 +27,14 @@ REPO_TARGETS = [
     ("engine.db_adapter.fingerprint", "artifacts/engine/db_adapter.fingerprint.json"),
     ("logs.keys_only.sample", "artifacts/logs/keys_only.sample.jsonl"),
     ("ops.rails_open_scope", "artifacts/ops/rails_open_scope.txt"),
+    ("cli.showcompat.ab", "artifacts/cli/ab.json"),
+    ("cli.showcompat.ba", "artifacts/cli/ba.json"),
+    ("cli.showcompat.summary", "artifacts/cli/summary.json"),
+    ("cli.help.hdctl", "artifacts/cli/help/hdctl_help.txt"),
+    ("cli.help.showcompat", "artifacts/cli/help/showcompat_help.txt"),
+    ("cli.help.reject_nonjson", "artifacts/cli/help/reject_nonjson.txt"),
+    ("cli.install.entrypoints", "artifacts/cli/install/entrypoints.txt"),
+    ("cli.install.installability_summary", "artifacts/cli/install/installability_summary.json"),
 ]
 
 

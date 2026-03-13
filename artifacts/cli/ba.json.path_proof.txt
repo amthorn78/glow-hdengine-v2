@@ -1,5 +1,5 @@
 path: artifacts/cli/ba.json
-size_bytes: 1739
-sha256: e8113dbdf48316075f04b78aaaa82613cf7f1e3af8a010715495a4eccdb7c810
+size_bytes: 1524
+sha256: 39dedb9f950184179a9f4614ce6072cdd2c29206e7ed489ef023467b6f231e13
 mtime_utc: 2025-12-06T04:06:36Z
 produced_at_utc: 2025-11-22T02:27:04Z
