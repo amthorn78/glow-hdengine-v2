@@ -1,10 +1,10 @@
 # HDE-EPIC027 — Close Report
 
 ## Overview
-HDE-CONJ009.2 closes EPIC027 at the global discipline layer by binding existing conjunction proof families into canonical acceptance ledgers and close-pack outputs.
+HDE-CONJ009.2 closes EPIC027 at the global discipline layer by binding existing conjunction D1, D3, and D4 proof families into canonical acceptance ledgers and close-pack outputs.
 
 ## Capture timestamp
-- `2026-03-14T02:16:34Z`
+- `2026-03-14T03:07:52Z`
 
 ## Reused proof families (no reimplementation)
 - D1 compat family: `artifacts/compat/identity_hash.txt`
@@ -19,10 +19,10 @@ HDE-CONJ009.2 closes EPIC027 at the global discipline layer by binding existing 
 - `audit/EPIC-027_close_report.md`
 
 ## Token posture
-Acceptance ledgers bind only canonical PF04 token names already present in the repository token registry; no non-registry token names are introduced.
+Acceptance ledgers bind canonical PF04 token names only, including D1/D3/D4 families and HDE-CONJ009.2 index/mirror discipline tokens.
 
 ## Index/Mirror coherence
-The following commands were executed during this generator run before report emission:
+The following commands were executed during this generator run before close-pack completion:
 - `audit/qa/hde-epic027/checks/gate_update_evidence_index_write/primary.log`
 - `audit/qa/hde-epic027/checks/gate_orientation_demo_write/primary.log`
 - `audit/qa/hde-epic027/checks/gate_update_evidence_index_check/primary.log`

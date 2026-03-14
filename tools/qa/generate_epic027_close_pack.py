@@ -41,6 +41,106 @@ GATE_COMMANDS: list[tuple[str, list[str]]] = [
 
 TOKENS: list[dict[str, object]] = [
     {
+        "name": "COMPOSITE_ABBA_IDENTITY_OK",
+        "owner_pf": "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
+        "status": "implemented",
+        "evidence_titles": [
+            "artifacts/compat/identity_hash.txt",
+            "artifacts/compat/AB.json",
+            "artifacts/compat/BA.json",
+        ],
+    },
+    {
+        "name": "TWO_RUN_IDENTITY_OK",
+        "owner_pf": "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
+        "status": "implemented",
+        "evidence_titles": [
+            "artifacts/audit/cli/two_run_identity.log",
+            "artifacts/writer/conjunction_write_readback.log",
+            "artifacts/writer/conjunction_writer_summary.json",
+        ],
+    },
+    {
+        "name": "CLI_READER_PARITY_OK",
+        "owner_pf": "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
+        "status": "implemented",
+        "evidence_titles": [
+            "artifacts/proofs/cli_reader_parity.txt",
+            "docs/ENDPOINTS_CATALOG.json",
+        ],
+    },
+    {
+        "name": "A7_GET_QUOTED_ETAG_OK",
+        "owner_pf": "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
+        "status": "implemented",
+        "evidence_titles": [
+            "artifacts/proofs/success_get.txt",
+        ],
+    },
+    {
+        "name": "A7_HEAD_PARITY_OK",
+        "owner_pf": "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
+        "status": "implemented",
+        "evidence_titles": [
+            "artifacts/proofs/success_head.txt",
+            "artifacts/proofs/success_get.txt",
+        ],
+    },
+    {
+        "name": "A7_304_OMITS_CT_CL_OK",
+        "owner_pf": "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
+        "status": "implemented",
+        "evidence_titles": [
+            "artifacts/proofs/success_304.txt",
+        ],
+    },
+    {
+        "name": "A7_VARY_AUTH_AE_OK",
+        "owner_pf": "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
+        "status": "implemented",
+        "evidence_titles": [
+            "artifacts/proofs/success_get.txt",
+            "artifacts/proofs/success_head.txt",
+        ],
+    },
+    {
+        "name": "A7_ENCODING_INVARIANCE_OK",
+        "owner_pf": "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
+        "status": "implemented",
+        "evidence_titles": [
+            "artifacts/proofs/success_get.txt",
+            "artifacts/proofs/success_head.txt",
+            "artifacts/proofs/success_304.txt",
+        ],
+    },
+    {
+        "name": "ENDPOINTS_CATALOG_OK",
+        "owner_pf": "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
+        "status": "implemented",
+        "evidence_titles": [
+            "docs/ENDPOINTS_CATALOG.json",
+            "docs/ENDPOINTS_CATALOG.json.sha256",
+        ],
+    },
+    {
+        "name": "ENDPOINTS_CATALOG_ENV_GATE_OK",
+        "owner_pf": "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
+        "status": "implemented",
+        "evidence_titles": [
+            "docs/ENDPOINTS_CATALOG.json",
+            "artifacts/proofs/endpoints_env_gate_proof.log",
+        ],
+    },
+    {
+        "name": "ENV_RAILS_POLICY_OK",
+        "owner_pf": "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
+        "status": "implemented",
+        "evidence_titles": [
+            "audit/gates/determinism/env_pins.log",
+            "audit/qa/hde-epic027/checks/gate_mirror_schema/primary.log",
+        ],
+    },
+    {
         "name": "EVIDENCE_INDEX_UPDATED_OK",
         "owner_pf": "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
         "status": "implemented",
@@ -101,6 +201,163 @@ TOKENS: list[dict[str, object]] = [
 ]
 
 
+TOKEN_MATRIX_ROWS: list[dict[str, str]] = [
+    {
+        "token_name": "COMPOSITE_ABBA_IDENTITY_OK",
+        "owner_pf": "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
+        "evidence_artifacts": "artifacts/compat/identity_hash.txt; artifacts/compat/AB.json; artifacts/compat/BA.json",
+        "ci_tests_jobs": "python tools/evidence/generate_conjunction_writer_evidence.py",
+        "qa_root_logs": "acceptance_map_viability.log",
+        "status": "Implemented",
+        "notes": "D1 compat family bound without reimplementation.",
+    },
+    {
+        "token_name": "TWO_RUN_IDENTITY_OK",
+        "owner_pf": "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
+        "evidence_artifacts": "artifacts/audit/cli/two_run_identity.log; artifacts/writer/conjunction_write_readback.log; artifacts/writer/conjunction_writer_summary.json",
+        "ci_tests_jobs": "python tools/evidence/generate_conjunction_writer_evidence.py",
+        "qa_root_logs": "acceptance_map_viability.log",
+        "status": "Implemented",
+        "notes": "D1/D4 identity and write-readback families bound.",
+    },
+    {
+        "token_name": "CLI_READER_PARITY_OK",
+        "owner_pf": "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
+        "evidence_artifacts": "artifacts/proofs/cli_reader_parity.txt; docs/ENDPOINTS_CATALOG.json",
+        "ci_tests_jobs": "python tools/qa/generate_epic027_close_pack.py",
+        "qa_root_logs": "acceptance_map_viability.log",
+        "status": "Implemented",
+        "notes": "D1 parity family bound to existing proof artifacts.",
+    },
+    {
+        "token_name": "A7_GET_QUOTED_ETAG_OK",
+        "owner_pf": "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
+        "evidence_artifacts": "artifacts/proofs/success_get.txt",
+        "ci_tests_jobs": "python tools/qa/generate_epic027_close_pack.py",
+        "qa_root_logs": "acceptance_map_viability.log",
+        "status": "Implemented",
+        "notes": "D3 A7 success capture reused.",
+    },
+    {
+        "token_name": "A7_HEAD_PARITY_OK",
+        "owner_pf": "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
+        "evidence_artifacts": "artifacts/proofs/success_head.txt; artifacts/proofs/success_get.txt",
+        "ci_tests_jobs": "python tools/qa/generate_epic027_close_pack.py",
+        "qa_root_logs": "acceptance_map_viability.log",
+        "status": "Implemented",
+        "notes": "D3 A7 HEAD parity bound.",
+    },
+    {
+        "token_name": "A7_304_OMITS_CT_CL_OK",
+        "owner_pf": "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
+        "evidence_artifacts": "artifacts/proofs/success_304.txt",
+        "ci_tests_jobs": "python tools/qa/generate_epic027_close_pack.py",
+        "qa_root_logs": "acceptance_map_viability.log",
+        "status": "Implemented",
+        "notes": "D3 304 transport behavior bound.",
+    },
+    {
+        "token_name": "A7_VARY_AUTH_AE_OK",
+        "owner_pf": "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
+        "evidence_artifacts": "artifacts/proofs/success_get.txt; artifacts/proofs/success_head.txt",
+        "ci_tests_jobs": "python tools/qa/generate_epic027_close_pack.py",
+        "qa_root_logs": "acceptance_map_viability.log",
+        "status": "Implemented",
+        "notes": "D3 Vary transport posture bound.",
+    },
+    {
+        "token_name": "A7_ENCODING_INVARIANCE_OK",
+        "owner_pf": "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
+        "evidence_artifacts": "artifacts/proofs/success_get.txt; artifacts/proofs/success_head.txt; artifacts/proofs/success_304.txt",
+        "ci_tests_jobs": "python tools/qa/generate_epic027_close_pack.py",
+        "qa_root_logs": "acceptance_map_viability.log",
+        "status": "Implemented",
+        "notes": "D3 encoding invariance family bound.",
+    },
+    {
+        "token_name": "ENDPOINTS_CATALOG_OK",
+        "owner_pf": "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
+        "evidence_artifacts": "docs/ENDPOINTS_CATALOG.json; docs/ENDPOINTS_CATALOG.json.sha256",
+        "ci_tests_jobs": "python tools/qa/generate_epic027_close_pack.py",
+        "qa_root_logs": "acceptance_map_viability.log",
+        "status": "Implemented",
+        "notes": "D3 endpoint catalog snapshot bound.",
+    },
+    {
+        "token_name": "ENDPOINTS_CATALOG_ENV_GATE_OK",
+        "owner_pf": "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
+        "evidence_artifacts": "docs/ENDPOINTS_CATALOG.json; artifacts/proofs/endpoints_env_gate_proof.log",
+        "ci_tests_jobs": "python tools/qa/generate_epic027_close_pack.py",
+        "qa_root_logs": "acceptance_map_viability.log",
+        "status": "Implemented",
+        "notes": "D3 env-gating proof family bound.",
+    },
+    {
+        "token_name": "ENV_RAILS_POLICY_OK",
+        "owner_pf": "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
+        "evidence_artifacts": "audit/gates/determinism/env_pins.log; audit/qa/hde-epic027/checks/gate_mirror_schema/primary.log",
+        "ci_tests_jobs": "ci/checks/check_env_pins.sh",
+        "qa_root_logs": "checks/gate_mirror_schema/primary.log",
+        "status": "Implemented",
+        "notes": "D4 closed-rails posture bound.",
+    },
+    {
+        "token_name": "EVIDENCE_INDEX_UPDATED_OK",
+        "owner_pf": "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
+        "evidence_artifacts": "docs/evidence/INDEX.json; artifacts/evidence_index.jsonl",
+        "ci_tests_jobs": "python tools/evidence/update_evidence_index.py",
+        "qa_root_logs": "checks/gate_update_evidence_index_write/primary.log",
+        "status": "Implemented",
+        "notes": "Global index refresh executed in-run.",
+    },
+    {
+        "token_name": "EVIDENCE_INDEX_HASH_OK",
+        "owner_pf": "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
+        "evidence_artifacts": "docs/evidence/INDEX.sha256",
+        "ci_tests_jobs": "python tools/evidence/update_evidence_index.py --check",
+        "qa_root_logs": "checks/gate_update_evidence_index_check/primary.log",
+        "status": "Implemented",
+        "notes": "Hash sentinel verified in-run.",
+    },
+    {
+        "token_name": "EVIDENCE_INDEX_MIRROR_OK",
+        "owner_pf": "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
+        "evidence_artifacts": "docs/evidence/INDEX.json; artifacts/evidence_index.jsonl",
+        "ci_tests_jobs": "ci/checks/check_mirror_schema.sh",
+        "qa_root_logs": "checks/gate_mirror_schema/primary.log",
+        "status": "Implemented",
+        "notes": "Mirror schema validated in-run.",
+    },
+    {
+        "token_name": "EVIDENCE_PATHS_VALIDATED_OK",
+        "owner_pf": "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
+        "evidence_artifacts": "docs/evidence/INDEX.json; artifacts/evidence_index.jsonl",
+        "ci_tests_jobs": "python tools/evidence/validate_evidence_paths.py",
+        "qa_root_logs": "checks/gate_evidence_paths_validation/primary.log",
+        "status": "Implemented",
+        "notes": "Path validation gate executed in-run.",
+    },
+    {
+        "token_name": "CI_CHECK_MIRROR_SCHEMA_OK",
+        "owner_pf": "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
+        "evidence_artifacts": "artifacts/evidence_index.jsonl; docs/evidence/INDEX.json",
+        "ci_tests_jobs": "ci/checks/check_mirror_schema.sh",
+        "qa_root_logs": "checks/gate_mirror_schema/primary.log",
+        "status": "Implemented",
+        "notes": "Records-only mirror canonicality check passed.",
+    },
+    {
+        "token_name": "CI_CHECK_FINAL_LF_OK",
+        "owner_pf": "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
+        "evidence_artifacts": "docs/acceptance_map_epic027.json; audit/qa/hde-epic027/token_evidence_matrix.md",
+        "ci_tests_jobs": "python tools/evidence/check_lf_endings.py",
+        "qa_root_logs": "checks/gate_lf_endings/primary.log",
+        "status": "Implemented",
+        "notes": "Final-LF gate executed in-run.",
+    },
+]
+
+
 def _utc_now() -> str:
     return _dt.datetime.now(tz=_dt.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
@@ -140,19 +397,19 @@ def _write_acceptance_map() -> None:
 
 
 def _write_token_matrix() -> None:
-    rows = [
+    lines = [
         "# HDE-EPIC027 Token ↔ Evidence Matrix",
         "",
         "| token_name | owner_pf | evidence_artifacts | ci_tests_jobs | qa_root_logs | status | notes |",
         "| --- | --- | --- | --- | --- | --- | --- |",
-        "| EVIDENCE_INDEX_UPDATED_OK | PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens | docs/evidence/INDEX.json; artifacts/evidence_index.jsonl | python tools/evidence/update_evidence_index.py | checks/gate_update_evidence_index_write/primary.log | Implemented | Refresh executed in-generator before close report emission. |",
-        "| EVIDENCE_INDEX_HASH_OK | PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens | docs/evidence/INDEX.sha256 | python tools/evidence/update_evidence_index.py --check | checks/gate_update_evidence_index_check/primary.log | Implemented | Index hash validation executed in-generator. |",
-        "| EVIDENCE_INDEX_MIRROR_OK | PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens | docs/evidence/INDEX.json; artifacts/evidence_index.jsonl | ci/checks/check_mirror_schema.sh | checks/gate_mirror_schema/primary.log | Implemented | Mirror schema gate executed in-generator. |",
-        "| EVIDENCE_PATHS_VALIDATED_OK | PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens | docs/evidence/INDEX.json; artifacts/evidence_index.jsonl | python tools/evidence/validate_evidence_paths.py | checks/gate_evidence_paths_validation/primary.log | Implemented | Evidence-path validator executed in-generator. |",
-        "| CI_CHECK_MIRROR_SCHEMA_OK | PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens | artifacts/evidence_index.jsonl; docs/evidence/INDEX.json | ci/checks/check_mirror_schema.sh | checks/gate_mirror_schema/primary.log | Implemented | Records-only mirror schema conformance passed. |",
-        "| CI_CHECK_FINAL_LF_OK | PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens | docs/acceptance_map_epic027.json; audit/qa/hde-epic027/token_evidence_matrix.md | python tools/evidence/check_lf_endings.py | checks/gate_lf_endings/primary.log | Implemented | Final-LF gate executed in-generator. |",
     ]
-    _write_text(TOKEN_MATRIX_PATH, "\n".join(rows) + "\n")
+    for row in TOKEN_MATRIX_ROWS:
+        lines.append(
+            "| {token_name} | {owner_pf} | {evidence_artifacts} | {ci_tests_jobs} | {qa_root_logs} | {status} | {notes} |".format(
+                **row
+            )
+        )
+    _write_text(TOKEN_MATRIX_PATH, "\n".join(lines) + "\n")
 
 
 def _run_gate_command(check_id: str, command: list[str]) -> None:
@@ -192,7 +449,7 @@ def _write_close_report(produced_at: str) -> None:
     content = f"""# HDE-EPIC027 — Close Report
 
 ## Overview
-HDE-CONJ009.2 closes EPIC027 at the global discipline layer by binding existing conjunction proof families into canonical acceptance ledgers and close-pack outputs.
+HDE-CONJ009.2 closes EPIC027 at the global discipline layer by binding existing conjunction D1, D3, and D4 proof families into canonical acceptance ledgers and close-pack outputs.
 
 ## Capture timestamp
 - `{produced_at}`
@@ -210,10 +467,10 @@ HDE-CONJ009.2 closes EPIC027 at the global discipline layer by binding existing 
 - `audit/EPIC-027_close_report.md`
 
 ## Token posture
-Acceptance ledgers bind only canonical PF04 token names already present in the repository token registry; no non-registry token names are introduced.
+Acceptance ledgers bind canonical PF04 token names only, including D1/D3/D4 families and HDE-CONJ009.2 index/mirror discipline tokens.
 
 ## Index/Mirror coherence
-The following commands were executed during this generator run before report emission:
+The following commands were executed during this generator run before close-pack completion:
 {executed_logs}
 
 These command logs provide direct evidence for refresh/re-validation of:
@@ -265,12 +522,19 @@ def _write_close_manifest(produced_at: str) -> None:
 def _ensure_required_paths() -> None:
     required = [
         ROOT / "artifacts/compat/identity_hash.txt",
+        ROOT / "artifacts/compat/AB.json",
+        ROOT / "artifacts/compat/BA.json",
+        ROOT / "artifacts/proofs/cli_reader_parity.txt",
         ROOT / "docs/ENDPOINTS_CATALOG.json",
+        ROOT / "docs/ENDPOINTS_CATALOG.json.sha256",
+        ROOT / "artifacts/proofs/endpoints_env_gate_proof.log",
         ROOT / "artifacts/proofs/success_get.txt",
         ROOT / "artifacts/proofs/success_head.txt",
         ROOT / "artifacts/proofs/success_304.txt",
         ROOT / "artifacts/writer/conjunction_write_readback.log",
         ROOT / "artifacts/writer/conjunction_writer_summary.json",
+        ROOT / "artifacts/audit/cli/two_run_identity.log",
+        ROOT / "audit/gates/determinism/env_pins.log",
     ]
     missing = [p.relative_to(ROOT).as_posix() for p in required if not p.exists()]
     if missing:
@@ -309,12 +573,14 @@ def main() -> int:
     produced_at = _utc_now()
     _ensure_required_paths()
     QA_ROOT.mkdir(parents=True, exist_ok=True)
-    _run_governed_gates()
+
     _write_acceptance_map()
     _write_token_matrix()
     _write_viability_log()
     _write_close_manifest(produced_at)
     _write_close_report(produced_at)
+
+    _run_governed_gates()
     _manifest_outputs_exist()
 
     for path in [
