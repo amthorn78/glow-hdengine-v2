@@ -1,4 +1,4 @@
-# CLI commands — Compat v1 and conjunction/dev harnesses (HDE-EPIC026)
+# CLI commands — Compat v1 and conjunction/dev harnesses (HDE-EPIC027)
 
 The CLI shares the canonical presenter/emitter and serializer with the Reader harness. Run public commands under closed rails (`LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0`), enforced by `engine.runtime.determinism_env.ensure_determinism_env`.
 
@@ -13,7 +13,7 @@ The CLI shares the canonical presenter/emitter and serializer with the Reader ha
   - `hdctl showcompat --conjunction` (reads one conjunction pair payload from stdin)
 - `hdctl aux-preview --pair-file <compat.json> --category <slug> --band <band> --perspective <perspective> [--show-narrative] [--admin-out <ids.json>]`
 - `hdctl bg:resolve --user <user> [--source auto|db|vendor] [--birthdate YYYY-MM-DD --birthtime HH:MM --location <place>]`
-- Dev-only sampler CLI (APP_ENV=dev, QA only): `hdctl dev:sampler --viewer <viewer_id> --candidates-file <candidates.json> [--seed <seed>]`
+- Dev-only sampler CLI (APP_ENV in `dev|test|local`, QA only): `hdctl dev:sampler --viewer <viewer_id> --candidates-file <candidates.json> [--seed <seed>]`
 - Flags for QA sidecars: `--dump-reader <out.json> --dump-admin-dir <dir>`
 
 `showcompat --conjunction` emits canonical JSON to stdout. Side effects depend on input mode and rails: payload-based invocation (`--pair-file`, `--a-file` + `--b-file`, or stdin with `left`/`right`) is computation-only, while unresolved `--user-a/--user-b` inputs can trigger bodygraph resolution and vendor ingest under open rails (for example with `--source vendor`), which may persist resolved records. Required conjunction inputs must be present for both parties, either through `--user-a/--user-b` or through payload input. Single-party file input (only `--a-file` or only `--b-file`), mixed file modes, or unresolved auto source paths fail with CLI usage errors; `--dump-reader`/`--dump-admin-dir` are not supported with `--conjunction`.
@@ -32,6 +32,7 @@ Both guards fail fast if determinism rails are not pinned and protect the allow-
 - Orientation and sanity checks: `python tools/evidence/orientation_demo.py` and `python tools/evidence/run_sanity_pipeline.py` (pipeline emits `artifacts/sanity/sanity.log` under closed rails). Run `ci/checks/check_mirror_schema.sh` to validate mirror schema/self-record/path-proof discipline.
 - Canonical JSON gate (closed rails): `python tools/evidence/run_canonical_json_gate.py` (CI step “Run canonical JSON gate (closed rails)”) writes `audit/gates/json_gate/canonical/json_gate_check_log.ndjson`, `audit/gates/json_gate/canonical/json_gate_compare_log.ndjson`, and `audit/gates/json_gate/canonical/json_gate_structured_record.json` with `.path_proof.txt` siblings (`--check-only` available for read-only validation). The legacy catalog check report remains at `audit/gates/canonical_json/json_canonical_check.log`.
 - Showcompat deterministic capture (EPIC022 D2): `python tools/cli/generate_showcompat_artifacts.py` records `artifacts/cli/showcompat/stdout.json`, `artifacts/cli/showcompat/stdout.json.sha256`, and `artifacts/cli/showcompat/args.json` with env-pin metadata; governed via `.path_proof.txt` siblings and the Evidence Index/Mirror.
+- CLI installability/help/version conformance artifacts: `python tools/cli/generate_cli_conformance_artifacts.py` writes `artifacts/cli/install/installability_summary.json`, `artifacts/cli/install/entrypoints.txt`, `artifacts/cli/help/hdctl_help.txt`, and `artifacts/cli/help/showcompat_help.txt`.
 - Sampler evidence harness: `python tools/evidence/generate_sampler_evidence.py` runs dev sampler CLI + HTTP harnesses and captures seed replay, diversity, ABBA, and two-run identity logs.
 - Engine Core evidence harness: `python tools/evidence/generate_engine_core_evidence.py` captures purity, JSON compare, ABBA, and two-run identity logs.
 - Evidence index updater: `python tools/evidence/update_evidence_index.py` mirrors registry_report, sanity, showcompat captures, and other governed artifacts into Index/Mirror (`docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl`). Update the skeleton in the same PR when governed bytes change, and follow the refresh order: update_evidence_index (write) → orientation_demo (write) → `--check` variants → `ci/checks/check_mirror_schema.sh`.
