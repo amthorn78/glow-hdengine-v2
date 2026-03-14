@@ -1,0 +1,6 @@
+check_id:gate_orientation_demo_check
+status:PASS
+command:python tools/evidence/orientation_demo.py --check
+stdout_log:audit/qa/hde-epic027/checks/gate_orientation_demo_check/stdout.log
+stderr_log:audit/qa/hde-epic027/checks/gate_orientation_demo_check/stderr.log
+rc:0

@@ -1,0 +1,1 @@
+python tools/evidence/validate_evidence_paths.py

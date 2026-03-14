@@ -1,0 +1,6 @@
+check_id:gate_mirror_schema
+status:PASS
+command:ci/checks/check_mirror_schema.sh
+stdout_log:audit/qa/hde-epic027/checks/gate_mirror_schema/stdout.log
+stderr_log:audit/qa/hde-epic027/checks/gate_mirror_schema/stderr.log
+rc:0

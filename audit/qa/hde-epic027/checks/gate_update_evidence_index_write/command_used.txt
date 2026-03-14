@@ -1,0 +1,1 @@
+python tools/evidence/update_evidence_index.py
