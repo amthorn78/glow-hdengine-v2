@@ -33,5 +33,19 @@
     "path": "docs/acceptance_map_epic023.json",
     "acceptance_map_path": "docs/acceptance_map_epic023.json",
     "manifest_path": "audit/EPIC-023_MANIFEST.json"
+  },
+  {
+    "epic_id": "HDE-EPIC024",
+    "epic_name": "Acceptance viability + canonical JSON gate hardening",
+    "path": "docs/acceptance_map_epic024.json",
+    "acceptance_map_path": "docs/acceptance_map_epic024.json",
+    "manifest_path": "audit/EPIC-024_MANIFEST.json"
+  },
+  {
+    "epic_id": "HDE-EPIC027",
+    "epic_name": "Conjunction identity-hash, CLI conformance, and writer evidence alignment",
+    "path": "docs/acceptance_map_epic027.json",
+    "acceptance_map_path": "docs/acceptance_map_epic027.json",
+    "manifest_path": "audit/EPIC-027_MANIFEST.json"
   }
 ]
