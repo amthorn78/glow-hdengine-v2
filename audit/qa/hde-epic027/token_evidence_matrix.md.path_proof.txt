@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic027/token_evidence_matrix.md
+size_bytes: 1913
+sha256: 816924fc1618eeab64c974865f1c12c0019549b84fc9db41ddcb4c638685da32
+mtime_utc: 2026-03-14T00:46:07Z
+produced_at_utc: 2026-03-14T00:46:07Z
