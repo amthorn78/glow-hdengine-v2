@@ -1,5 +1,5 @@
 path: audit/EPIC-027_close_report.md
-size_bytes: 1267
-sha256: 7438c1a3b4aa6814d69336aac8259ad5aabf89ba866d2298b3f3b4fbb3051c76
-mtime_utc: 2026-03-14T00:46:07Z
-produced_at_utc: 2026-03-14T00:46:07Z
+size_bytes: 1879
+sha256: 24b28f975f336f426b1732ee7658e15d8582d528e9601b99d3b271c0ec02abfd
+mtime_utc: 2026-03-14T02:16:35Z
+produced_at_utc: 2026-03-14T02:16:34Z

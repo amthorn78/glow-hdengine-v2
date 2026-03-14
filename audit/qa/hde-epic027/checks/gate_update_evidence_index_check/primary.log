@@ -1,0 +1,6 @@
+check_id:gate_update_evidence_index_check
+status:PASS
+command:python tools/evidence/update_evidence_index.py --check
+stdout_log:audit/qa/hde-epic027/checks/gate_update_evidence_index_check/stdout.log
+stderr_log:audit/qa/hde-epic027/checks/gate_update_evidence_index_check/stderr.log
+rc:0

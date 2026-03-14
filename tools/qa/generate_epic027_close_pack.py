@@ -5,6 +5,7 @@ from __future__ import annotations
 import datetime as _dt
 import hashlib
 import json
+import subprocess
 import sys
 from pathlib import Path
 
@@ -20,11 +21,23 @@ EPIC_ID = "HDE-EPIC027"
 EPIC_SLUG = "hde-epic027"
 RUN_ID = "epic027-close"
 
+QA_ROOT = ROOT / "audit" / "qa" / EPIC_SLUG
+QA_CHECKS_ROOT = QA_ROOT / "checks"
 ACCEPTANCE_MAP_PATH = ROOT / "docs" / "acceptance_map_epic027.json"
-TOKEN_MATRIX_PATH = ROOT / "audit" / "qa" / EPIC_SLUG / "token_evidence_matrix.md"
-VIABILITY_LOG_PATH = ROOT / "audit" / "qa" / EPIC_SLUG / "acceptance_map_viability.log"
+TOKEN_MATRIX_PATH = QA_ROOT / "token_evidence_matrix.md"
+VIABILITY_LOG_PATH = QA_ROOT / "acceptance_map_viability.log"
 CLOSE_REPORT_PATH = ROOT / "audit" / "EPIC-027_close_report.md"
 CLOSE_MANIFEST_PATH = ROOT / "audit" / "EPIC-027_MANIFEST.json"
+
+GATE_COMMANDS: list[tuple[str, list[str]]] = [
+    ("gate_update_evidence_index_write", ["python", "tools/evidence/update_evidence_index.py"]),
+    ("gate_orientation_demo_write", ["python", "tools/evidence/orientation_demo.py"]),
+    ("gate_update_evidence_index_check", ["python", "tools/evidence/update_evidence_index.py", "--check"]),
+    ("gate_orientation_demo_check", ["python", "tools/evidence/orientation_demo.py", "--check"]),
+    ("gate_evidence_paths_validation", ["python", "tools/evidence/validate_evidence_paths.py"]),
+    ("gate_lf_endings", ["python", "tools/evidence/check_lf_endings.py"]),
+    ("gate_mirror_schema", ["ci/checks/check_mirror_schema.sh"]),
+]
 
 TOKENS: list[dict[str, object]] = [
     {
@@ -34,7 +47,7 @@ TOKENS: list[dict[str, object]] = [
         "evidence_titles": [
             "docs/evidence/INDEX.json",
             "artifacts/evidence_index.jsonl",
-            "python tools/evidence/update_evidence_index.py",
+            "audit/qa/hde-epic027/checks/gate_update_evidence_index_write/primary.log",
         ],
     },
     {
@@ -43,7 +56,7 @@ TOKENS: list[dict[str, object]] = [
         "status": "implemented",
         "evidence_titles": [
             "docs/evidence/INDEX.sha256",
-            "python tools/evidence/update_evidence_index.py --check",
+            "audit/qa/hde-epic027/checks/gate_update_evidence_index_check/primary.log",
         ],
     },
     {
@@ -53,7 +66,7 @@ TOKENS: list[dict[str, object]] = [
         "evidence_titles": [
             "docs/evidence/INDEX.json",
             "artifacts/evidence_index.jsonl",
-            "ci/checks/check_mirror_schema.sh",
+            "audit/qa/hde-epic027/checks/gate_mirror_schema/primary.log",
         ],
     },
     {
@@ -63,7 +76,7 @@ TOKENS: list[dict[str, object]] = [
         "evidence_titles": [
             "docs/evidence/INDEX.json",
             "artifacts/evidence_index.jsonl",
-            "python tools/evidence/validate_evidence_paths.py",
+            "audit/qa/hde-epic027/checks/gate_evidence_paths_validation/primary.log",
         ],
     },
     {
@@ -71,7 +84,7 @@ TOKENS: list[dict[str, object]] = [
         "owner_pf": "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
         "status": "implemented",
         "evidence_titles": [
-            "ci/checks/check_mirror_schema.sh",
+            "audit/qa/hde-epic027/checks/gate_mirror_schema/primary.log",
             "docs/evidence/INDEX.json",
             "artifacts/evidence_index.jsonl",
         ],
@@ -81,7 +94,7 @@ TOKENS: list[dict[str, object]] = [
         "owner_pf": "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
         "status": "implemented",
         "evidence_titles": [
-            "python tools/evidence/check_lf_endings.py --check",
+            "audit/qa/hde-epic027/checks/gate_lf_endings/primary.log",
             "audit/qa/hde-epic027/acceptance_map_viability.log",
         ],
     },
@@ -123,11 +136,7 @@ def _write_path_proof(path: Path, produced_at: str) -> None:
 
 
 def _write_acceptance_map() -> None:
-    payload = {
-        "epic_id": EPIC_ID,
-        "tokens": TOKENS,
-    }
-    _write_json(ACCEPTANCE_MAP_PATH, payload)
+    _write_json(ACCEPTANCE_MAP_PATH, {"epic_id": EPIC_ID, "tokens": TOKENS})
 
 
 def _write_token_matrix() -> None:
@@ -136,17 +145,50 @@ def _write_token_matrix() -> None:
         "",
         "| token_name | owner_pf | evidence_artifacts | ci_tests_jobs | qa_root_logs | status | notes |",
         "| --- | --- | --- | --- | --- | --- | --- |",
-        "| EVIDENCE_INDEX_UPDATED_OK | PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens | docs/evidence/INDEX.json; artifacts/evidence_index.jsonl | python tools/evidence/update_evidence_index.py | acceptance_map_viability.log | Implemented | D4 global index/mirror refresh and hash sentinel update. |",
-        "| EVIDENCE_INDEX_HASH_OK | PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens | docs/evidence/INDEX.sha256 | python tools/evidence/update_evidence_index.py --check | acceptance_map_viability.log | Implemented | Hash sentinel refreshed with index update. |",
-        "| EVIDENCE_INDEX_MIRROR_OK | PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens | docs/evidence/INDEX.json; artifacts/evidence_index.jsonl | ci/checks/check_mirror_schema.sh | acceptance_map_viability.log | Implemented | Human index and machine mirror refreshed in one close slice. |",
-        "| EVIDENCE_PATHS_VALIDATED_OK | PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens | docs/evidence/INDEX.json; artifacts/evidence_index.jsonl | python tools/evidence/validate_evidence_paths.py | acceptance_map_viability.log | Implemented | Path-proof coherence validated on governed outputs. |",
-        "| CI_CHECK_MIRROR_SCHEMA_OK | PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens | artifacts/evidence_index.jsonl; docs/evidence/INDEX.json | ci/checks/check_mirror_schema.sh | acceptance_map_viability.log | Implemented | Mirror schema remains records-only and sorted. |",
-        "| CI_CHECK_FINAL_LF_OK | PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens | docs/acceptance_map_epic027.json; audit/qa/hde-epic027/token_evidence_matrix.md | python tools/evidence/check_lf_endings.py --check | acceptance_map_viability.log | Implemented | Final-LF discipline enforced on new close-pack ledgers. |",
+        "| EVIDENCE_INDEX_UPDATED_OK | PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens | docs/evidence/INDEX.json; artifacts/evidence_index.jsonl | python tools/evidence/update_evidence_index.py | checks/gate_update_evidence_index_write/primary.log | Implemented | Refresh executed in-generator before close report emission. |",
+        "| EVIDENCE_INDEX_HASH_OK | PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens | docs/evidence/INDEX.sha256 | python tools/evidence/update_evidence_index.py --check | checks/gate_update_evidence_index_check/primary.log | Implemented | Index hash validation executed in-generator. |",
+        "| EVIDENCE_INDEX_MIRROR_OK | PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens | docs/evidence/INDEX.json; artifacts/evidence_index.jsonl | ci/checks/check_mirror_schema.sh | checks/gate_mirror_schema/primary.log | Implemented | Mirror schema gate executed in-generator. |",
+        "| EVIDENCE_PATHS_VALIDATED_OK | PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens | docs/evidence/INDEX.json; artifacts/evidence_index.jsonl | python tools/evidence/validate_evidence_paths.py | checks/gate_evidence_paths_validation/primary.log | Implemented | Evidence-path validator executed in-generator. |",
+        "| CI_CHECK_MIRROR_SCHEMA_OK | PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens | artifacts/evidence_index.jsonl; docs/evidence/INDEX.json | ci/checks/check_mirror_schema.sh | checks/gate_mirror_schema/primary.log | Implemented | Records-only mirror schema conformance passed. |",
+        "| CI_CHECK_FINAL_LF_OK | PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens | docs/acceptance_map_epic027.json; audit/qa/hde-epic027/token_evidence_matrix.md | python tools/evidence/check_lf_endings.py | checks/gate_lf_endings/primary.log | Implemented | Final-LF gate executed in-generator. |",
     ]
     _write_text(TOKEN_MATRIX_PATH, "\n".join(rows) + "\n")
 
 
+def _run_gate_command(check_id: str, command: list[str]) -> None:
+    check_dir = QA_CHECKS_ROOT / check_id
+    check_dir.mkdir(parents=True, exist_ok=True)
+    cmd_text = " ".join(command)
+    (check_dir / "command_used.txt").write_text(cmd_text + "\n", encoding="utf-8")
+
+    proc = subprocess.run(command, cwd=ROOT, text=True, capture_output=True)
+    (check_dir / "stdout.log").write_text(proc.stdout, encoding="utf-8")
+    (check_dir / "stderr.log").write_text(proc.stderr, encoding="utf-8")
+    (check_dir / "rc.txt").write_text(f"{proc.returncode}\n", encoding="utf-8")
+
+    status = "PASS" if proc.returncode == 0 else "FAIL"
+    primary = [
+        f"check_id:{check_id}",
+        f"status:{status}",
+        f"command:{cmd_text}",
+        f"stdout_log:audit/qa/{EPIC_SLUG}/checks/{check_id}/stdout.log",
+        f"stderr_log:audit/qa/{EPIC_SLUG}/checks/{check_id}/stderr.log",
+        f"rc:{proc.returncode}",
+    ]
+    (check_dir / "primary.log").write_text("\n".join(primary) + "\n", encoding="utf-8")
+    print(f"WROTE audit/qa/{EPIC_SLUG}/checks/{check_id}/primary.log")
+
+    if proc.returncode != 0:
+        raise SystemExit(f"GATE_FAILED:{check_id}")
+
+
+def _run_governed_gates() -> None:
+    for check_id, command in GATE_COMMANDS:
+        _run_gate_command(check_id, command)
+
+
 def _write_close_report(produced_at: str) -> None:
+    executed_logs = "\n".join(f"- `audit/qa/{EPIC_SLUG}/checks/{check_id}/primary.log`" for check_id, _ in GATE_COMMANDS)
     content = f"""# HDE-EPIC027 — Close Report
 
 ## Overview
@@ -171,7 +213,10 @@ HDE-CONJ009.2 closes EPIC027 at the global discipline layer by binding existing 
 Acceptance ledgers bind only canonical PF04 token names already present in the repository token registry; no non-registry token names are introduced.
 
 ## Index/Mirror coherence
-This close slice refreshes and re-validates:
+The following commands were executed during this generator run before report emission:
+{executed_logs}
+
+These command logs provide direct evidence for refresh/re-validation of:
 - `docs/evidence/INDEX.json`
 - `docs/evidence/INDEX.sha256`
 - `artifacts/evidence_index.jsonl`
@@ -181,34 +226,40 @@ This close slice refreshes and re-validates:
 
 
 def _write_close_manifest(produced_at: str) -> None:
-    payload = {
-        "captured_at_utc": produced_at,
-        "closeout_dir": "audit/qa/hde-epic027",
-        "epic_id": EPIC_ID,
-        "key_outputs": {
-            "acceptance_map": "docs/acceptance_map_epic027.json",
-            "token_matrix": "audit/qa/hde-epic027/token_evidence_matrix.md",
-            "acceptance_map_viability": "audit/qa/hde-epic027/acceptance_map_viability.log",
-            "close_report": "audit/EPIC-027_close_report.md",
-            "close_manifest": "audit/EPIC-027_MANIFEST.json",
-            "d1_compat_identity_hash": "artifacts/compat/identity_hash.txt",
-            "d3_endpoints_catalog": "docs/ENDPOINTS_CATALOG.json",
-            "d3_success_get": "artifacts/proofs/success_get.txt",
-            "d3_success_head": "artifacts/proofs/success_head.txt",
-            "d3_success_304": "artifacts/proofs/success_304.txt",
-            "d4_writer_readback": "artifacts/writer/conjunction_write_readback.log",
-            "d4_writer_summary": "artifacts/writer/conjunction_writer_summary.json",
-            "index_human": "docs/evidence/INDEX.json",
-            "index_human_sha256": "docs/evidence/INDEX.sha256",
-            "index_mirror": "artifacts/evidence_index.jsonl",
-            "index_mirror_sha256": "artifacts/evidence_index.jsonl.sha256",
-        },
-        "qa_epic_root": "audit/qa/hde-epic027",
-        "run_id": RUN_ID,
-        "subtask_id": "HDE-CONJ009.2",
-        "task_id": "HDE-CONJ009",
+    key_outputs = {
+        "acceptance_map": "docs/acceptance_map_epic027.json",
+        "token_matrix": "audit/qa/hde-epic027/token_evidence_matrix.md",
+        "acceptance_map_viability": "audit/qa/hde-epic027/acceptance_map_viability.log",
+        "close_report": "audit/EPIC-027_close_report.md",
+        "close_manifest": "audit/EPIC-027_MANIFEST.json",
+        "d1_compat_identity_hash": "artifacts/compat/identity_hash.txt",
+        "d3_endpoints_catalog": "docs/ENDPOINTS_CATALOG.json",
+        "d3_success_get": "artifacts/proofs/success_get.txt",
+        "d3_success_head": "artifacts/proofs/success_head.txt",
+        "d3_success_304": "artifacts/proofs/success_304.txt",
+        "d4_writer_readback": "artifacts/writer/conjunction_write_readback.log",
+        "d4_writer_summary": "artifacts/writer/conjunction_writer_summary.json",
+        "index_human": "docs/evidence/INDEX.json",
+        "index_human_sha256": "docs/evidence/INDEX.sha256",
+        "index_mirror": "artifacts/evidence_index.jsonl",
+        "index_mirror_sha256": "artifacts/evidence_index.jsonl.sha256",
     }
-    _write_json(CLOSE_MANIFEST_PATH, payload)
+    for check_id, _ in GATE_COMMANDS:
+        key_outputs[f"qa_log_{check_id}"] = f"audit/qa/{EPIC_SLUG}/checks/{check_id}/primary.log"
+
+    _write_json(
+        CLOSE_MANIFEST_PATH,
+        {
+            "captured_at_utc": produced_at,
+            "closeout_dir": f"audit/qa/{EPIC_SLUG}",
+            "epic_id": EPIC_ID,
+            "key_outputs": key_outputs,
+            "qa_epic_root": f"audit/qa/{EPIC_SLUG}",
+            "run_id": RUN_ID,
+            "subtask_id": "HDE-CONJ009.2",
+            "task_id": "HDE-CONJ009",
+        },
+    )
 
 
 def _ensure_required_paths() -> None:
@@ -238,6 +289,16 @@ def _write_viability_log() -> None:
     print(f"WROTE {VIABILITY_LOG_PATH.relative_to(ROOT).as_posix()}")
 
 
+def _manifest_outputs_exist() -> None:
+    payload = json.loads(CLOSE_MANIFEST_PATH.read_text(encoding="utf-8"))
+    missing: list[str] = []
+    for rel in sorted(set(payload["key_outputs"].values())):
+        if not (ROOT / rel).exists():
+            missing.append(rel)
+    if missing:
+        raise SystemExit(f"DANGLING_MANIFEST_PATHS:{','.join(missing)}")
+
+
 def main() -> int:
     try:
         ensure_determinism_env(apply=True)
@@ -247,11 +308,14 @@ def main() -> int:
 
     produced_at = _utc_now()
     _ensure_required_paths()
+    QA_ROOT.mkdir(parents=True, exist_ok=True)
+    _run_governed_gates()
     _write_acceptance_map()
     _write_token_matrix()
     _write_viability_log()
     _write_close_manifest(produced_at)
     _write_close_report(produced_at)
+    _manifest_outputs_exist()
 
     for path in [
         ACCEPTANCE_MAP_PATH,

@@ -1,0 +1,1 @@
+ci/checks/check_mirror_schema.sh

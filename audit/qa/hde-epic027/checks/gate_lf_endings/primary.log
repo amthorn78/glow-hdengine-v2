@@ -1,0 +1,6 @@
+check_id:gate_lf_endings
+status:PASS
+command:python tools/evidence/check_lf_endings.py
+stdout_log:audit/qa/hde-epic027/checks/gate_lf_endings/stdout.log
+stderr_log:audit/qa/hde-epic027/checks/gate_lf_endings/stderr.log
+rc:0

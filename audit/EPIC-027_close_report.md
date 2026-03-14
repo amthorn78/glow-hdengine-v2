@@ -4,7 +4,7 @@
 HDE-CONJ009.2 closes EPIC027 at the global discipline layer by binding existing conjunction proof families into canonical acceptance ledgers and close-pack outputs.
 
 ## Capture timestamp
-- `2026-03-14T00:46:07Z`
+- `2026-03-14T02:16:34Z`
 
 ## Reused proof families (no reimplementation)
 - D1 compat family: `artifacts/compat/identity_hash.txt`
@@ -22,7 +22,16 @@ HDE-CONJ009.2 closes EPIC027 at the global discipline layer by binding existing 
 Acceptance ledgers bind only canonical PF04 token names already present in the repository token registry; no non-registry token names are introduced.
 
 ## Index/Mirror coherence
-This close slice refreshes and re-validates:
+The following commands were executed during this generator run before report emission:
+- `audit/qa/hde-epic027/checks/gate_update_evidence_index_write/primary.log`
+- `audit/qa/hde-epic027/checks/gate_orientation_demo_write/primary.log`
+- `audit/qa/hde-epic027/checks/gate_update_evidence_index_check/primary.log`
+- `audit/qa/hde-epic027/checks/gate_orientation_demo_check/primary.log`
+- `audit/qa/hde-epic027/checks/gate_evidence_paths_validation/primary.log`
+- `audit/qa/hde-epic027/checks/gate_lf_endings/primary.log`
+- `audit/qa/hde-epic027/checks/gate_mirror_schema/primary.log`
+
+These command logs provide direct evidence for refresh/re-validation of:
 - `docs/evidence/INDEX.json`
 - `docs/evidence/INDEX.sha256`
 - `artifacts/evidence_index.jsonl`
