@@ -1,0 +1,11 @@
+62:        "discovered_physical_path": "audit/qa/hde-epic022/token_evidence_matrix.md",
+84:        "discovered_physical_path": "audit/qa/hde-epic024/token_evidence_matrix.md",
+88:        "artifact_key": "epic024.acceptance_map_viability",
+89:        "discovered_physical_path": "audit/qa/hde-epic024/acceptance_map_viability.log",
+127:        "discovered_physical_path": "audit/qa/hde-epic027/token_evidence_matrix.md",
+131:        "artifact_key": "epic027.acceptance_map_viability",
+132:        "discovered_physical_path": "audit/qa/hde-epic027/acceptance_map_viability.log",
+160:        "artifact_key": "compat.conjunction.identity_hash",
+139:{"artifact_key":"compat.conjunction.identity_hash","discovered_physical_path":"artifacts/compat/identity_hash.txt","produced_at_utc":"2026-01-05T05:39:56Z","proof_anchor":"artifacts/compat/identity_hash.txt.path_proof.txt","record_type":"compat_identity_hash","role":"snapshot","schema_version":"1.0","sha256":"dd7143f67d9c99f6e8f9b4bc547dad74c85be79353f1e3a39046baa520f9f647","size_bytes":65}
+237:{"artifact_key":"epic027.acceptance_map_viability","discovered_physical_path":"audit/qa/hde-epic027/acceptance_map_viability.log","epic_id":"HDE-EPIC027","produced_at_utc":"2026-03-14T03:07:52Z","proof_anchor":"audit/qa/hde-epic027/acceptance_map_viability.log.path_proof.txt","role":"log","sha256":"6aa7ccdf8ea5a47c9f2c51809eeb31499eabb4dc9ffa57a817c8ab733b054cb7","size_bytes":745}
+240:{"artifact_key":"epic027.token_matrix","discovered_physical_path":"audit/qa/hde-epic027/token_evidence_matrix.md","epic_id":"HDE-EPIC027","produced_at_utc":"2026-03-14T03:07:52Z","proof_anchor":"audit/qa/hde-epic027/token_evidence_matrix.md.path_proof.txt","role":"snapshot","sha256":"a0e57d7cda72682f917133575046a7bc68af189b525a67b2c037b610cff61040","size_bytes":5146}

@@ -1,0 +1,9 @@
+663:    @bp.route("/internal/dev/sampler", methods=["POST"], provide_automatic_options=False)
+731:    @bp.get("/dev/sampler/conjunction")
+739:    @bp.get("/dev/reader/conjunction")
+747:    @bp.get("/dev/writer/conjunction")
+adapter/http_reader.py:913:        app.register_blueprint(bp, url_prefix="")
+adapter/http_reader.py:919:    app.register_blueprint(compat_blueprint)
+adapter/factory.py:6:    app.register_blueprint(bp, url_prefix="")  # mount at /
+adapter/wsgi.py:24:    app.register_blueprint(compat_blueprint)
+11:compat_blueprint = Blueprint("compat", __name__, url_prefix="/api/compat/v1")

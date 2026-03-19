@@ -1,0 +1,16 @@
+usage: hdctl bg:resolve [-h] --user USER [--source {auto,db,vendor}]
+                        [--upsert] [--dry-run] [--birthdate BIRTHDATE]
+                        [--birthtime BIRTHTIME] [--location LOCATION]
+
+options:
+  -h, --help            show this help message and exit
+  --user USER           BodyGraph user identifier
+  --source {auto,db,vendor}
+                        Source to consult (default: auto)
+  --upsert              Request durability upsert once implemented
+  --dry-run             Emit planning envelope without performing writes
+  --birthdate BIRTHDATE
+                        Birthdate (YYYY-MM-DD) for vendor source
+  --birthtime BIRTHTIME
+                        Birth time (HH:MM) for vendor source
+  --location LOCATION   Location string for vendor source

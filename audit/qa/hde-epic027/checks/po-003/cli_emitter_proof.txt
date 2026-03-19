@@ -1,0 +1,3 @@
+561:        raise CliError("STDOUT_MISSING_LF")
+563:        raise CliError("STDOUT_CRLF")
+823:        _emit_stdout_bytes(emitter.emit_public(conjunction_payload))

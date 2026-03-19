@@ -1,0 +1,20 @@
+# runtime_surface_inventory.txt
+# po-010: same-run runtime surface inventory
+# Generated under closed rails: SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC
+# Timestamp: 2026-03-19T05:20:29Z
+# SURFACE_COUNT=5
+# MISSING_SURFACE_COUNT=0
+
+# CLI surfaces:
+OK  po-003  status=PASS  surface_category=cli-showcompat  surface_label=CLI showcompat parity and identity surface  test_files=tests/cli/test_showcompat_parity_and_identity.py
+OK  po-004  status=PASS  surface_category=cli-entrypoint  surface_label=CLI install help / bg:resolve entrypoint surface  test_files=tests/cli/test_cli_install_help.py,tests/cli/test_bg_resolve.py
+
+# Dev HTTP conjunction surfaces:
+OK  po-001  status=PASS  surface_category=dev-http-conjunction  surface_label=dev HTTP conjunction endpoint surface  test_files=tests/http/test_dev_conjunction_http.py,tests/http/test_endpoint_catalog.py
+OK  po-006  status=PASS  surface_category=dev-writer-conjunction  surface_label=dev writer/conjunction HTTP surface  test_files=tests/http/test_dev_conjunction_http.py
+
+# Reader A7 surface:
+OK  po-005  status=PASS  surface_category=reader-a7  surface_label=Reader A7 transport surface  test_files=tests/http/test_reader_a7_transport.py
+
+# SURFACE_SUMMARY: CLI=PRESENT dev-http-conjunction=PRESENT reader-a7=PRESENT
+# RUNTIME_SURFACE_INVENTORY_RESULT=PASS

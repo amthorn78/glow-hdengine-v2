@@ -1,0 +1,38 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"po-010","check_name":"PO-010","claimed_tokens":[],"command":"SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC cat audit/qa/hde-epic027/checks/po-010/runtime_log_presence.txt; SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC cat audit/qa/hde-epic027/checks/po-010/runtime_surface_inventory.txt","command_provenance":"Explicitly created","evidence_artifacts":["audit/qa/hde-epic027/checks/po-010/runtime_log_presence.txt","audit/qa/hde-epic027/checks/po-010/runtime_surface_inventory.txt","audit/qa/hde-epic027/checks/po-010/primary.log","audit/qa/hde-epic027/qa_step_logs_manifest.json","audit/qa/hde-epic027/qa_step_logs_manifest.json.path_proof.txt"],"fail_status":"","intended_tokens":[],"pf_refs":["PF10 - HDE-Build Notes","PF05 - HDE-CLI-API-Vendor-Ref","PF02 - Canon-HDE-Core","PF27 - Canon Plan Templates"],"schema_version":"pf27.step_log_header.v1","status":"PASS","timestamp_utc":"2026-03-19T07:32:00Z"}
+$ SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC cat audit/qa/hde-epic027/checks/po-010/runtime_log_presence.txt
+# runtime_log_presence.txt
+# po-010: same-run runtime proof log presence inventory
+# Generated under closed rails: SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC
+# Timestamp: 2026-03-19T05:20:29Z
+# OVERALL_RESULT=PASS
+# PRESENT_COUNT=5
+# MISSING_COUNT=0
+
+PRESENT  audit/qa/hde-epic027/checks/po-001/primary.log  check_id=po-001  status=PASS  timestamp_utc=2026-03-17T04:08:10Z  size_bytes=2891
+PRESENT  audit/qa/hde-epic027/checks/po-003/primary.log  check_id=po-003  status=PASS  timestamp_utc=2026-03-17T08:53:35Z  size_bytes=4156
+PRESENT  audit/qa/hde-epic027/checks/po-004/primary.log  check_id=po-004  status=PASS  timestamp_utc=2026-03-18T00:42:31Z  size_bytes=2606
+PRESENT  audit/qa/hde-epic027/checks/po-005/primary.log  check_id=po-005  status=PASS  timestamp_utc=2026-03-18T03:02:07Z  size_bytes=3456
+PRESENT  audit/qa/hde-epic027/checks/po-006/primary.log  check_id=po-006  status=PASS  timestamp_utc=2026-03-18T04:03:29Z  size_bytes=4120
+$ SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC cat audit/qa/hde-epic027/checks/po-010/runtime_surface_inventory.txt
+# runtime_surface_inventory.txt
+# po-010: same-run runtime surface inventory
+# Generated under closed rails: SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC
+# Timestamp: 2026-03-19T05:20:29Z
+# SURFACE_COUNT=5
+# MISSING_SURFACE_COUNT=0
+
+# CLI surfaces:
+OK  po-003  status=PASS  surface_category=cli-showcompat  surface_label=CLI showcompat parity and identity surface  test_files=tests/cli/test_showcompat_parity_and_identity.py
+OK  po-004  status=PASS  surface_category=cli-entrypoint  surface_label=CLI install help / bg:resolve entrypoint surface  test_files=tests/cli/test_cli_install_help.py,tests/cli/test_bg_resolve.py
+
+# Dev HTTP conjunction surfaces:
+OK  po-001  status=PASS  surface_category=dev-http-conjunction  surface_label=dev HTTP conjunction endpoint surface  test_files=tests/http/test_dev_conjunction_http.py,tests/http/test_endpoint_catalog.py
+OK  po-006  status=PASS  surface_category=dev-writer-conjunction  surface_label=dev writer/conjunction HTTP surface  test_files=tests/http/test_dev_conjunction_http.py
+
+# Reader A7 surface:
+OK  po-005  status=PASS  surface_category=reader-a7  surface_label=Reader A7 transport surface  test_files=tests/http/test_reader_a7_transport.py
+
+# SURFACE_SUMMARY: CLI=PRESENT dev-http-conjunction=PRESENT reader-a7=PRESENT
+# RUNTIME_SURFACE_INVENTORY_RESULT=PASS
+
+rc=0

@@ -1,0 +1,4 @@
+11:compat_blueprint = Blueprint("compat", __name__, url_prefix="/api/compat/v1")
+82:@compat_blueprint.get("")
+90:@compat_blueprint.route("", methods=["POST"], provide_automatic_options=False)
+92:    if (os.environ.get("APP_ENV") or "").lower() == "prod":

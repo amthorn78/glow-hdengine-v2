@@ -1,0 +1,2 @@
+13:[project.scripts]
+14:hdctl = "engine.cli.main:cli"

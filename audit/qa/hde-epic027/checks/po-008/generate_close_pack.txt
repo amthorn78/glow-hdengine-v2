@@ -1,0 +1,17 @@
+WROTE docs/acceptance_map_epic027.json
+WROTE audit/qa/hde-epic027/token_evidence_matrix.md
+WROTE audit/qa/hde-epic027/acceptance_map_viability.log
+WROTE audit/EPIC-027_MANIFEST.json
+WROTE audit/EPIC-027_close_report.md
+WROTE audit/qa/hde-epic027/checks/gate_update_evidence_index_write/primary.log
+WROTE audit/qa/hde-epic027/checks/gate_orientation_demo_write/primary.log
+WROTE audit/qa/hde-epic027/checks/gate_update_evidence_index_check/primary.log
+WROTE audit/qa/hde-epic027/checks/gate_orientation_demo_check/primary.log
+WROTE audit/qa/hde-epic027/checks/gate_evidence_paths_validation/primary.log
+WROTE audit/qa/hde-epic027/checks/gate_lf_endings/primary.log
+WROTE audit/qa/hde-epic027/checks/gate_mirror_schema/primary.log
+WROTE docs/acceptance_map_epic027.json.path_proof.txt
+WROTE audit/qa/hde-epic027/token_evidence_matrix.md.path_proof.txt
+WROTE audit/qa/hde-epic027/acceptance_map_viability.log.path_proof.txt
+WROTE audit/EPIC-027_close_report.md.path_proof.txt
+WROTE audit/EPIC-027_MANIFEST.json.path_proof.txt

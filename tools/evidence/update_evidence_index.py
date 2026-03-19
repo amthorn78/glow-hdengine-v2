@@ -133,6 +133,11 @@ EPIC027_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
         "epic_id": "HDE-EPIC027",
     },
     {
+        "artifact_key": "epic027.qa_step_logs_manifest",
+        "discovered_physical_path": "audit/qa/hde-epic027/qa_step_logs_manifest.json",
+        "epic_id": "HDE-EPIC027",
+    },
+    {
         "artifact_key": "epic027.close_report",
         "discovered_physical_path": "audit/EPIC-027_close_report.md",
         "epic_id": "HDE-EPIC027",
@@ -257,6 +262,11 @@ def _write_path_proof(
     proof_rel = f"{rel}.path_proof.txt"
     proof_path = ROOT / proof_rel
     proof_path.parent.mkdir(parents=True, exist_ok=True)
+    {
+        "artifact_key": "epic027.qa_step_logs_manifest",
+        "discovered_physical_path": "audit/qa/hde-epic027/qa_step_logs_manifest.json",
+        "epic_id": "HDE-EPIC027",
+    },
 
     def _normalize_utc(raw: str | None) -> str | None:
         if not raw:

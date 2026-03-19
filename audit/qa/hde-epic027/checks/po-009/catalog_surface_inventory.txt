@@ -1,0 +1,26 @@
+check_id:po-009
+artifact:catalog_surface_inventory
+catalog_path:docs/ENDPOINTS_CATALOG.json
+known_family:
+- /api/compat/v1
+- /reader
+- /internal/version
+- /dev/sampler/conjunction
+- /dev/reader/conjunction
+- /dev/writer/conjunction
+
+discovered_surface_subset:
+- /api/compat/v1
+- /dev/reader/conjunction
+- /dev/sampler/conjunction
+- /dev/writer/conjunction
+- /internal/version
+- /reader
+
+missing_known_surface:
+- (none)
+
+unexpected_surface:
+- (none)
+
+result: PASS

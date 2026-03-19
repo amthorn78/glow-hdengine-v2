@@ -4,7 +4,7 @@
 HDE-CONJ009.2 closes EPIC027 at the global discipline layer by binding existing conjunction D1, D3, and D4 proof families into canonical acceptance ledgers and close-pack outputs.
 
 ## Capture timestamp
-- `2026-03-14T03:07:52Z`
+- `2026-03-18T07:47:24Z`
 
 ## Reused proof families (no reimplementation)
 - D1 compat family: `artifacts/compat/identity_hash.txt`

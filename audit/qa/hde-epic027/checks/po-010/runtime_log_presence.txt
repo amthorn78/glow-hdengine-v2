@@ -1,0 +1,13 @@
+# runtime_log_presence.txt
+# po-010: same-run runtime proof log presence inventory
+# Generated under closed rails: SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC
+# Timestamp: 2026-03-19T05:20:29Z
+# OVERALL_RESULT=PASS
+# PRESENT_COUNT=5
+# MISSING_COUNT=0
+
+PRESENT  audit/qa/hde-epic027/checks/po-001/primary.log  check_id=po-001  status=PASS  timestamp_utc=2026-03-17T04:08:10Z  size_bytes=2891
+PRESENT  audit/qa/hde-epic027/checks/po-003/primary.log  check_id=po-003  status=PASS  timestamp_utc=2026-03-17T08:53:35Z  size_bytes=4156
+PRESENT  audit/qa/hde-epic027/checks/po-004/primary.log  check_id=po-004  status=PASS  timestamp_utc=2026-03-18T00:42:31Z  size_bytes=2606
+PRESENT  audit/qa/hde-epic027/checks/po-005/primary.log  check_id=po-005  status=PASS  timestamp_utc=2026-03-18T03:02:07Z  size_bytes=3456
+PRESENT  audit/qa/hde-epic027/checks/po-006/primary.log  check_id=po-006  status=PASS  timestamp_utc=2026-03-18T04:03:29Z  size_bytes=4120
