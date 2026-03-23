@@ -1,12 +1,12 @@
 # **0\. Front Matter**
 
 **Title:** PF02-Canon-HDE-Architecture  
- **Version:** v1.7.4
+ **Version:** v1.8.3
 
  **Status:** Canon  
-**Effective date:** 2026-03-07
+**Effective date:** 2026-03-22
 
- **Last Update Gate:** BN 10.0.5 A32-33
+ **Last Update Gate:** BN 10.1.5 A23-24
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -826,23 +826,18 @@ Reader’s public success route uses the same Engine Core \+ Presenter flow as c
 
 **Gating & posture (dev-only; titles-only routing).**
 
-* Harness is dev-only; never mounted in production.
-
-* Harness routes are gated via the dev admin gate (`_dev_admin_gate()`), and MUST deny when `APP_ENV` is not one of: `dev`, `test`, `local`.
-
-* Dev-only conjunction preview endpoints (HTTP GET; names-only):
-
-  * `GET /dev/sampler/conjunction`
-
+* Harness is dev-only; never mounted in production.  
+* Harness routes are gated via the dev admin gate (`_dev_admin_gate()`), and MUST deny when `APP_ENV` is not one of: `dev`, `test`, `local`.  
+* Canonical internal/dev sampler route (HTTP POST; names-only):  
+  * POST /internal/dev/sampler  
+* Dev-only conjunction routes (HTTP GET; names-only):  
+  * `GET /dev/sampler/conjunction`  
   * `GET /dev/reader/conjunction`  
-* Dev-only conjunction writer endpoint (HTTP POST; names-only):  
-  * `POST /dev/writer/conjunction` (route\_id `dev.writer.conjunction.v1`; writer-style idempotent envelope, see §5.1)  
-* Endpoint Catalog entries for these dev conjunction endpoints are classified as `dev_harness` and are not A7-eligible.
-
-* Rails are closed by default (for example, `SAFE_MODE=1`, `ALLOW_NETWORK=0`). Dev-only conjunction endpoints MAY run under open rails only when explicitly enabled (for example, `SAFE_MODE=0`, `ALLOW_NETWORK=1`).
-
-* Optional GET/HEAD/304 captures are allowed for the GET dev harness endpoints, but A7 proofs are not run here. A7 proofs run on the cataloged JSON success route (Endpoint Catalog) and are driven by the Catalog.
-
+  * `GET /dev/writer/conjunction`  
+* **Writer readback parity flow (names-only).** The dev conjunction writer/readback proof path remains inside the dev harness surface family, using `GET /dev/writer/conjunction` together with `GET /dev/reader/conjunction`. PF02 records only the route names and adapter ownership here; writer/readback bytes and proof artifacts remain out of scope here.  
+  Endpoint Catalog entries for these dev conjunction endpoints are classified as `dev_harness` and are not A7-eligible.  
+* Rails are closed by default (for example, `SAFE_MODE=1`, `ALLOW_NETWORK=0`). Dev-only conjunction endpoints MAY run under open rails only when explicitly enabled (for example, `SAFE_MODE=0`, `ALLOW_NETWORK=1`).  
+* Optional GET/HEAD/304 captures are allowed for the GET dev harness endpoints, but A7 proofs are not run here. A7 proofs run on the cataloged JSON success route (Endpoint Catalog) and are driven by the Catalog.  
 * Locale is optional; when present, it is advisory only and does not affect canonical JSON bytes.
 
 Sample harness uses the same Presenter emitter and Engine Core behaviour as compat v1. Dev-only conjunction preview endpoints emit canonical JSON bytes; rails are closed by default unless explicitly opened. Sample harness is never used for A7 proofs; see §2.4 and §5 for compat flow and evidence-plane details.
@@ -1002,7 +997,8 @@ For epics whose D-goals involve Reader/HTTP behaviour, compat behaviour, or dev 
 
 * **Reader v1** (public success route) for HTTP-level compat envelopes.  
 * **Compat CLI surfaces** (as described in **HDE-CLI-API-Vendor-Ref**) for terminal-based compat flows. CLI stdout may be an admin/test compat payload (for example `showcompat`). When Reader-identical bytes are required for parity proofs, the CLI emits Reader v1 bytes via a dedicated dump sidecar output (titles-only; see **HDE-CLI-API-Vendor-Ref**).  
-* **CLI entrypoint wiring (repo surface; names-only).** `pyproject.toml` exposes `hdctl = engine.cli.main:cli`, and `engine/cli/main.py` is the repo-local wiring surface used for conjunction-oriented `showcompat` flows. Architecture treats this as the stable CLI entrypoint surface while continuing to route CLI bytes and argument contract by title to **HDE-CLI-API-Vendor-Ref**.  
+* **Repo-local script launcher surface (names-only).** `scripts/hdctl.py` is a repo-local launcher over the same CLI family and is used for subcommand help and invocation flows such as `bg:resolve`. Architecture treats this launcher as part of the existing emitter-backed CLI entrypoint family, not as a second serializer, second contract, or distinct runtime surface.  
+* **CLI entrypoint wiring (repo surface; names-only).** `pyproject.toml` exposes `hdctl = engine.cli.main:cli`, `engine/cli/main.py` is the repo-local wiring surface, and `python -m engine.cli` is the module-runner surface over the same CLI entrypoint family for conjunction-oriented `showcompat` flows. Architecture treats console-script and module-runner invocation as one emitter-backed CLI surface and keeps CLI bytes and argument contract out of scope here.  
 * **Dev sampler harnesses** (CLI and HTTP) for sampler-specific behaviour, always through Engine Core and the single Presenter emitter.
 
 All of these entrypoints:
@@ -1048,7 +1044,7 @@ HTTP QA against “Reader” or dev harness surfaces is considered misconfigured
 * **KISS required outputs (Live QA).** Live QA Plans MUST minimize required outputs to:  
   * one primary step log per check under `audit/qa/<epic-id>/checks/<check_id>/primary.log`,  
   * checks-only evidence layout under a single epic-scoped QA root, with no per-run nesting, no run-id directories, and no operator-set “fresh directory” posture for reruns,  
-  * any required QA step-logs manifest and sibling path proof at a stable check-scoped location under `audit/qa/<epic-id>/checks/<check_id>/`, with every referenced primary log path existing under `audit/qa/<epic-id>/` at review time, and  
+  * any required QA step-logs manifest and sibling path proof at the epic-scoped QA root (`audit/qa/<epic-id>/qa_step_logs_manifest.json` and `audit/qa/<epic-id>/qa_step_logs_manifest.json.path_proof.txt`), with each manifest entry mapping a `check_id` to its `checks/<check_id>/primary.log` path and with the manifest itself expected to be discoverable through the governed updater and the human and machine evidence ledgers when canon requires it,  
   * Nothing else is auto-required unless canon explicitly pins a governed evidence family or path. Any additional required artifact MUST be acceptance-decisive and MUST be canonized (PF10 or PF-Canon) as a governed evidence family or path.  
   * **Step-log header normalization (KISS).** Every `primary.log` MUST begin with a JSON header object that includes: `check_id`, `status`, `command`, `captured_env`, `pf_refs`, `intended_tokens`, `claimed_tokens`. The three list fields MUST be present; empty lists (`[]`) are allowed and SHOULD be used when no refs/tokens are in play. If any required list field is missing, treat it as an evidence-format gap; a reviewer-of-record MAY mechanically normalize the header by inserting missing empty lists and re-serializing the header as canonical JSON (no step rerun required). Token claims are never inferred: if `claimed_tokens` is missing or empty, token claims are treated as none. Status vocabulary remains gating (PASS, FAIL\_BEHAVIOR, FAIL\_TOOLING, TOOLING\_BLOCKED, PARKED).  
   * **Step-log header writer exports (per-check).** If a Live QA plan uses a step-log header writer that reads per-check metadata from environment variables, the plan MUST export the complete required set immediately before header generation for each check and MUST NOT rely on prior step state.  
@@ -1442,9 +1438,17 @@ Concrete artifact names/paths, bundle usage for A7 families, and tokenisation ar
 
 **Offline plane.**
 
-* Determinism and evidence pipelines run **offline**, in a plane parallel to runtime requests.
+* Determinism and evidence pipelines run **offline**, in a plane parallel to runtime requests.  
+* They do not introduce new runtime surfaces or alter Reader/CLI behaviour; they only exercise existing Engine behaviour under controlled conditions.  
+* Epic-close and acceptance-ledger generators belong to this same offline evidence plane. They consume and bind already-existing proof families from runtime surfaces rather than introducing new runtime routes, alternate emitter paths, or replacement transport surfaces.  
+* **Reuse-baseline posture.** When an epic treats already-implemented runtime surfaces as inherited baseline, later close-pack and evidence work continues to consume those existing surfaces rather than re-planning them as new architectural homes or new public surfaces.  
+* **Closeout proof posture.** Same-run QA gate logs and close-pack ledgers belong to this same offline evidence plane. They bind and prove existing runtime-surface behaviour, but they do not create new runtime routes, new Presenter paths, or alternate truth homes for runtime behaviour.  
+* **Same-run runtime-surface inventory posture.** When closeout or QA synthesis proves changed runtime behaviour, it does so by inventorying already-declared runtime surface families from the same run rather than by creating a proof-only surface. Architecture-level runtime synthesis may therefore bind the existing CLI surface, the dev conjunction route family, and the cataloged Reader success route when those are the changed surfaces under review.
 
-* They do not introduce new runtime surfaces or alter Reader/CLI behaviour; they only exercise existing Engine behaviour under controlled conditions.
+* **No new public-surface inference from closeout inventory.** Catalog-surface and runtime-surface inventories are confirmatory only. They may show that no unexpected public success surface has appeared beyond the declared PF02 runtime surface set, but they do not create, widen, or rename that set.  
+* **Epic QA step-manifest surface (names-only).** Within this same offline evidence plane, the current-state epic QA ledger uses a `qa_step_logs_manifest.json` manifest with a sibling `qa_step_logs_manifest.json.path_proof.txt`, together with check-scoped `primary.log` files under the epic QA `checks/` subtree.  
+* **EPIC027 acceptance-ledger close-pack surfaces (names-only).** The EPIC027 close-pack binds existing runtime proof families through governed offline artifacts at `docs/acceptance_map_epic027.json`, `audit/qa/hde-epic027/token_evidence_matrix.md`, `audit/qa/hde-epic027/acceptance_map_viability.log`, `audit/EPIC-027_close_report.md`, and `audit/EPIC-027_MANIFEST.json`. These are offline ledger surfaces only and do not create new runtime routes, new Presenter paths, or new public transport surfaces.  
+* **Ledger discoverability posture.** Close-pack and evidence-discipline jobs consume this manifest family as governed offline evidence only when it is discoverable through the Human Evidence Index and the Machine Evidence Index. PF02 records that names-and-paths linkage only; updater logic, record fields, and token claims remain out of scope here
 
 **Behaviour source.**
 
@@ -1514,10 +1518,9 @@ In dev and similar non-prod environments:
 
 Adapter uses an environment-aware resolver to decide how to connect to the BodyGraph store:
 
-* **Non-dev:** selection by presence only, in order:  
-   `DATABASE_URL → DB_BRIDGE_URL →` typed error (no connectivity probe).
-
 * **Dev:** when `APP_ENV=dev` and `DATABASE_URL` is present but unusable, the resolver may fall back to `DB_BRIDGE_URL` and proceed with keys-only diagnostics (no secrets in logs).
+
+* **Sanctioned dev bridge-fallback shape (architecture only).** When this fallback is taken, adapter-side selection may still present as `psycopg` while runtime connectivity resolves through `bridge`. PF02 treats that as an allowed resolver outcome inside the existing dev fallback path, not as a second canonical BodyGraph store, a new request-path mode, or a production-path exception.
 
 Resolver semantics, connection details, and evidence live in **Glow Infrastructure**, **HDE-Governance**, and **HDE-Mechanics Guide**. PF02 only records that such a resolver exists, that the database is the canonical BodyGraph source, and that vendor calls do not bypass it in production.
 

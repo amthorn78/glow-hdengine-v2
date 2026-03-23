@@ -2,12 +2,12 @@
 
 **Title:** PF06-Canon-Epic-Process-Guide 
 
-**Version:** v1.7.2
+**Version:** v1.8
 
 **Status:** Canon
 
-**Effective date**: 2026-03-07  
-**Last Update Gate:**  BN 10.0.5 A31-33
+**Effective date**: 2026-03-23  
+**Last Update Gate:**  BN drain 10.1.4 A23-24
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -381,9 +381,18 @@ At minimum, the summary MUST:
 * When a step is blocked because the approved plan depends on unavailable or non-product inputs, the summary MUST classify the outcome as TOOLING\_BLOCKED with a planning-defect or input-availability reason, not as FAIL\_BEHAVIOR.  
 * In that case the summary MUST name which expected artifacts were not produced because the blocking precondition was not met, and it MUST state that those artifacts were not expected for that run.  
 * The summary MUST record the precise rerun condition for the blocked step, for example that rerun is deferred until valid product inputs become available.  
+* When a check includes more than one attempt in the same governed step directory, the summary MUST distinguish attempt history from the final governing outcome.  
+* If an earlier attempt failed but a later rerun under the required rails and determinism posture produced the complete governed evidence set and satisfied the approved PASS criteria, the later rerun MAY govern the step outcome.  
+* In that case the summary MUST name the superseded earlier attempt, classify why it failed, and state plainly which later attempt produced the final accepted evidence.
+
+* The earlier failed attempt remains part of the record and MUST NOT be hidden, but it is not a close blocker by itself once the later rerun is clearly evidenced and the approved criteria are met.  
 * Provide minimal evidence pointers for each substantive finding (step log(s), artifact(s), validator outputs). (Titles-only here; concrete paths are owned by the QA plan template.)  
 * Map each substantive finding that implies a change in behavior, infrastructure, or process to explicit PF-Canon doc deltas by title (examples: HDE Phased Epics, HDE-Build Checklist, Glow QA Guide, HDE-Mechanics Guide, Glow Infrastructure, HDE-Schemas & Artifacts).  
-* Identify follow-on epics/cards expected to carry those PF updates when they are deferred.
+* Identify follow-on epics/cards expected to carry those PF updates when they are deferred.  
+* When the QA RCA & Doc Delta summary is used to support epic-close readiness, it MUST state the source-of-truth posture for the review. The summary MUST name the primary epic-specific execution source, the canon homes used for closeout interpretation, and any Implementation Guide or QA Plan inputs that were used only for framing.  
+* When a Live QA Plan exists, the summary MUST include explicit Coverage vs QA Plan accounting in plan order using stable step identifiers. For each planned step, it MUST record whether the step is Fully evidenced, Partially evidenced, or Not evidenced, whether governed evidence pointers exist, any material mismatch between the planned step and the recorded step, and the closeout impact.  
+* When closeout depends on runtime functional proof, the summary MUST state whether same-run runtime proof exists across the changed runtime surfaces required by the approved plan, and it MUST name the governed artifacts that prove presence or absence of those runtime surfaces.  
+* The summary MUST include an explicit closeout-readiness recommendation. This recommendation is a closure-oriented review result and MUST remain distinct from the final SATISFIED or NOT SATISFIED decision recorded in the close report.
 
 Location (normative)  
 The QA RCA & Doc Delta summary MAY live as a section of the epic close report, or as a separate governed artifact referenced from the close report.
@@ -1087,6 +1096,14 @@ Token claims in step logs (claims-only semantics). If a step log includes any \*
 * On PASS, the step log may claim one or more \*\_OK tokens that the step actually verified.  
 * On any non-PASS status, the step log MUST NOT claim any \*\_OK tokens.  
 * If a step needs to record intended tokens without claiming them, list them under a distinct label (for example “intended tokens”) rather than using the claim token list.  
+* When a PASS-grade step log records both intended tokens and claimed tokens, reviewers MUST compare those sets as part of token-fidelity review.  
+* If the intended-token set and claimed-token set match in the governed step evidence, the step MAY be treated as token-aligned for those tokens.  
+* If the claimed-token set is narrower or wider than the intended-token set, the QA review MUST say so explicitly rather than implying exact alignment.  
+* A narrative QA review does not need to restate every matching token proof line when that alignment is already explicit in the governed step evidence and the step’s approved PASS criteria are otherwise satisfied.  
+* When a Live QA plan includes intended tokens in a matrix or rollup view, but the step’s approved Deliverables and PASS/FAIL blocks are deliverable-based, the step block is the decisive contract for the step.  
+* If the step’s required deliverables are present and the approved step-level PASS criteria are satisfied, absence of token-by-token proof lines in the narrative review or deliverables report is a reporting caveat, not an automatic blocker, unless token alignment itself is explicitly required by the step block or by governed step evidence.  
+* If a QA review states that token-level proof lines were not surfaced, the review MUST record the exact search basis used to reach that conclusion, including the searched token names, searched fields, or searched report sections.  
+* Matrix-only intended tokens remain planning metadata unless the step block or the governed step evidence makes token alignment acceptance-decisive for that step.  
 * This is intentionally schematic; see the canonical token registry and per-check token semantics for details.
 
 For each step log MUST:
@@ -1126,6 +1143,23 @@ Live QA plan approval, review findings MUST be separated into exactly two sets:
 * CAVEATS — issues that do not prevent execution or confident verification. Examples: partial token lists, token registry drift discovered during planning, documentation drift that can be captured via doc delta, presentation-only formatting variance (including markdown heading depth, list marker choice, and whitespace), template/formatting imperfections that do not obstruct execution (including omission of fenced code blocks when commands remain copy/paste-ready and no markup that breaks copy/paste in plain-text venues), omission of optional diagnostic artifacts (for example a “Codespaces snapshot”).
 
 Token/evidence matrix is a QA ledger artifact. When a token/evidence matrix is required for an epic, it is maintained as a governed QA ledger under the epic’s QA root (see §1.1.9). The PLAN may contain a one-line pointer; it must not embed the matrix. The QA root will be filled in during implementation.
+
+### **0.6.10 Redline bundle construction discipline**
+
+Redline bundles for plans, QA plans, and review artifacts MUST be built as one-pass, non-overlapping edits against the unchanged base document.
+
+* Original-document anchor space only. Resolve all placement anchors against the unchanged base document only. Do not anchor later edits against text that would exist only after an earlier edit is applied.  
+* Non-overlap invariant. No two redlines in the same bundle may target intersecting base-document spans. No INSERT may land inside a span already covered by a REPLACE, and no REPLACE may partially or fully cover a span already targeted by another REPLACE.  
+* One strategy per affected region. For any contiguous affected region, choose exactly one strategy: one consolidated REPLACE for the whole region, or multiple smaller redlines whose target spans are pairwise non-overlapping.  
+* Parent-child prohibition. If one redline replaces a parent block, no later redline may target any line inside that parent region. Fold all child edits into the parent replacement.  
+* No second-pass layering. Do not emit a broad structural redline and then follow it with repair redlines inside the same replaced region. Rebuild the affected region as one consolidated replacement or as a new non-overlapping set.  
+* Repeated-anchor safeguard. If a target line or boundary line repeats in the base document, widen the target to the nearest unique enclosing heading or other unique boundary before emitting the redline.  
+* Coverage-before-emission rule. Before outputting redlines, map each required review item to the exact base-document target region that will implement it.  
+* Merge-on-conflict rule. If two or more required changes touch the same region, merge them into one consolidated redline.  
+* One-pass apply simulation required. A redline bundle is valid only if it can be applied once from the original base document without anchor collision, span overlap, parent-child nesting conflict, or re-anchoring later redlines after earlier edits.  
+* Mechanical blocker posture. If the requested changes cannot be represented as a non-overlapping one-pass bundle, do not emit a self-conflicting redline set. Rebuild the region as one consolidated replacement.  
+* Bundle validity gate. A redline bundle is mechanically valid only if every required item is mapped to at least one redline, no target spans overlap, no parent-child targeting conflict exists, every placement anchor is unique after disambiguation, and the bundle can be applied once from the original base document without reinterpretation.  
+* Failure classification. Any violation of this discipline is a mechanical redline-construction failure and MUST be treated as Revise and Resubmit.
 
 ## **0.7 QA branches posture**
 
@@ -1332,7 +1366,16 @@ QA Plan posture (execution-time). For each Live QA step, the QA Plan MUST specif
 * Any required context (env assumptions, flags discovered in D0, required fixtures), expressed as concrete preconditions.  
 * If a Live QA step depends on product-managed IDs, fixtures, or other runtime inputs that may be unavailable, the plan MUST state how availability is proven before execution and MUST define BLOCKED as the outcome when those inputs are absent or are not valid product inputs.
 
-* Any deliverable that is only expected when such a precondition is met MUST be labeled conditional in the plan. When the condition is not met, the plan MUST require a governed blocked-note or equivalent artifact and MUST treat the omitted conditional outputs as not expected for that run rather than as missing evidence.
+* Any deliverable that is only expected when such a precondition is met MUST be labeled conditional in the plan. When the condition is not met, the plan MUST require a governed blocked-note or equivalent artifact and MUST treat the omitted conditional outputs as not expected for that run rather than as missing evidence.  
+* If a step is expected to be TOOLING\_BLOCKED unless a named evidence-ledger or manifest-coverage gap is first resolved, the plan MUST name the exact lookup or proof artifact that decides that branch and MUST name the exact loci that artifact must confirm.
+
+* If the same run later proves that the required coverage is present in all of those plan-named loci, the step MAY be evaluated for PASS using its approved PASS criteria and MUST NOT remain blocked by the superseded gap alone.
+
+* File existence is not sufficient when the plan requires coverage in specific updater sources, ledgers, or indexes. The deciding lookup artifact MUST show the required mapping or binding in each named locus.
+
+* When PASS is taken under this resolved-gap branch, the review MUST name the deciding lookup artifact and MUST state plainly that the blocked branch did not trigger because the required coverage was confirmed.
+
+* If the lookup does not prove all required loci, the step MUST remain TOOLING\_BLOCKED or FAIL\_TOOLING exactly as the approved plan defines, and the review MUST NOT over-claim ledger coherence.
 
 * A plan MUST NOT define PASS criteria that become structurally unreachable when the required inputs are outside the current product surface. If that dependency exists, the plan MUST label it as a planning defect or deferred input-availability gate and must state the rerun condition.
 
@@ -1479,6 +1522,18 @@ If a step needs “tooling,” it MUST be either:
 * an inline tool whose full source is embedded in the plan step and written into the run-local QA tools directory for that run (no hidden dependencies)
 
 Any plan that references a non-canon script path as a “required surface” is non-conforming and must be revised to validate the governed artifact surface directly using baseline commands.
+
+A Live QA step does not require a dedicated per-check helper or wrapper when the governed result can be produced and reviewed through baseline commands plus an already-governed workflow.
+
+When a step reuses the same governed header or manifest workflow already used by earlier checks, the plan or report MUST make that reuse explicit enough to verify:
+
+* the exact commands or writer path used for the update
+
+* the specific governed artifacts refreshed for that step
+
+* that the step’s manifest entry and sibling path-proof were refreshed for that step
+
+Absence of a dedicated helper is a planning or convenience gap, not an automatic blocker, when the approved PASS or FAIL predicates and the governed artifact updates can still be confirmed directly from the recorded workflow.
 
 “Baseline commands” means explicit shell/Python one-liners, direct invocation of canon tools, tee for logs, and explicit file writes, with no reliance on opaque runners.
 
@@ -2143,6 +2198,26 @@ Scope
 Template adherence is structural only. When a planning artifact uses a PF template, reviewers MUST evaluate template adherence only for structural completeness: required sections present, required gates present, required end marker present.
 
 Header styling is not part of structural adherence. Reviewers MUST NOT request revisions solely to change heading levels, heading bold/italics, or other presentation-only formatting. If noted, record as a Nit (suggestion only) and do not block approval.
+
+Review stability and no-moving-target discipline applies to diff-first approval loops for Epic Plans, Implementation Plans, Live QA Plans, remediation plans, and closeout reviews.
+
+* Full-gate first pass is required. Before issuing the first approval decision on an artifact, apply the full active review gate set to the full artifact, not a partial subset.
+
+* Gate freeze across the same review loop. After the first review on a given artifact line, do not introduce a new blocker from already-visible unchanged text unless the later blocker is caused by newly added or materially changed text, a newly supplied authoritative input changes the review basis, PF canon changed after the prior review, or a prior tooling or read failure prevented the text from being fully visible.
+
+* Coupled-constraint rule. If a reviewer requires more explicitness, the same review MUST also declare the coupled constraints that the added explicitness triggers, including provenance, command-string, path and locus, creation-ownership, schema or header, lowercase or naming, and portability constraints.
+
+* Unchanged-text blocker rule. Any blocker first raised against unchanged text in a later revision MUST state the trigger that makes it newly raisable. If no valid trigger exists, classify the issue as Review Drift.
+
+* Review Drift handling. When a blocker was already visible in an earlier reviewed revision, label it Review Drift, state plainly that it was visible earlier, and consolidate any other same-scope pre-existing blockers in that same review.
+
+* Contradictory review prohibition. Do not alternate between too implicit and too explicit on the same requirement family unless the supporting canon constraint was already cited earlier or the later problem was created by newly changed text.
+
+* Read-failure and truncation handling. If an issue was missed because of truncation, partial retrieval, or other read failure, treat it as reviewer-side or tooling-side failure. Re-run the full sweep after full retrieval before issuing a new decision.
+
+* Non-author penalty rule. Do not frame omitted earlier blockers from unchanged text as author-created churn or as a fresh author-side defect cycle.
+
+* Approval integrity. This discipline does not require approving a real blocker. It requires that review be stable, complete, and non-contradictory, and that any later-discovered blocker be handled under the rules above.
 
 This does not relax structural requirements. Missing required sections, missing required end markers, missing required gates, missing required pointers to HDE-Build Checklist or HDE-Mechanics Guide when required by this guide or the template, invalid/non-PF references, and ungrounded existence claims remain valid blockers.
 
@@ -2847,6 +2922,20 @@ Also required in the close PR (titles-only; as applicable):
 
 * Doc-Delta note (if applicable)
 
+If the close PR includes generated acceptance-ledger artifacts or generated close-pack artifacts, reviewability requires more than path presence. The close PR MUST make all of the following explicit and auditable in the same PR:
+
+* whether the acceptance map, token-evidence matrix, and viability log bind the full intended proof-family roster for the slice or only a reduced subset
+
+* whether any reused proof families are explicitly named as reused bindings rather than implied by narrative summary
+
+* whether the close report and manifest describe only work that was actually executed in that run
+
+If a close report, manifest, or generated review artifact claims that the Human Evidence Index, hash sentinel, Machine Mirror, path-proofs, or validator or gate outputs were refreshed or re-validated, that claim MUST be backed by same-run governed execution evidence in the PR. Narrative assertions of execution are non-conforming unless the executed workflow evidence is present.
+
+When changed governed artifacts require checksum, index, mirror, or path-proof companions, those companions MUST be refreshed coherently in the same PR and MUST carry chronology that is current for that refresh. Stale or backdated companion chronology is a close-blocking evidence defect until regenerated with canonical tooling.
+
+When the close-pack slice reuses previously completed proof families rather than re-implementing those slices, the close-pack bindings MUST identify that reuse explicitly and MUST point to the same-run gate or QA-log anchors used to prove the close workflow actually ran.
+
 #### **3.5.2.5 A7 tokens (when A7 is in scope — Catalog success route)**
 
 When A7 is in scope for the epic, the close PR MUST satisfy the relevant A7 tokens (titles only), including:
@@ -3032,6 +3121,26 @@ CI tests MUST NOT be treated as a source of governed evidence and MUST NOT requi
 No QA-only epics that only test themselves. QA-heavy epics must deliver shared value. If an epic’s QA work does not upgrade shared QA tools or harnesses and does not strengthen Live QA coverage across multiple existing surfaces, the PLAN/CRD MUST be returned as non-conforming and re-scoped before approval.
 
 Close Gate check. The close PR MUST confirm that Live QA evidence exists under governed roots and is indexed (Human Evidence Index \+ hash sentinel \+ Machine Mirror), and it must ensure the epic’s close-pack references the existence of this Live QA evidence by title and path (no URLs required).
+
+Post-QA documentation drainage ordering (normative).
+
+* All required QA tasks, remediation loops, runtime-proof checks, and close-gate QA reviews MUST be completed before documentation drainage begins.
+
+* If a canon delta, checklist delta, guide delta, summary correction, or other documentation correction is known but not yet drained, PF10 is the controlling temporary source of truth for that item until drainage occurs.
+
+* Undrained documentation changes MUST NOT be used as blockers for finishing QA execution, issuing step verdicts, issuing epic QA closeout review, or deciding epic close posture, provided PF10 explicitly records the truth of what happened and the required QA proof is otherwise complete.
+
+* Allowed close blockers remain limited to QA truth and proof failures, including incomplete required QA steps, missing required deliverables, untrusted or non-governed evidence, unresolved FAIL\_BEHAVIOR, FAIL\_TOOLING, or TOOLING\_BLOCKED conditions that affect acceptance, or missing required close-gate QA artifacts.
+
+* When a documentation mismatch or canon delta is found during QA or closeout, it MUST be recorded in PF10 as a follow-up, implementation gap, ADR note, or doc-delta item. It MUST NOT be converted into a pre-drain closure blocker solely because the destination PF document has not yet been updated.
+
+* Post-QA drain ordering is mandatory. Drainage into canon, checklist rows, guides, or other document homes occurs only after all QA tasks for the epic are complete.
+
+* This rule changes timing, not honesty requirements. PF10 MUST still state open doc deltas, remaining follow-ups, and any caveats plainly and explicitly.
+
+* Reviewers and closeout authors MUST NOT treat an undrained documentation delta by itself as proof that the epic is not ready. A not-ready posture is justified only when the undrained item also reveals a real QA truth or proof failure.
+
+* If QA evidence is complete and trustworthy and all required QA tasks are complete, the epic MAY be recommended as ready for closeout even when undrained documentation deltas remain. Undrained documentation deltas alone do not justify a not-ready verdict.
 
 ### **3.5.3 Repo docs sweep (major epics)**
 
@@ -3480,7 +3589,30 @@ Rules:
 
 * Doc Deltas is ALWAYS INCLUDED (PF-Canon only).
 
-* Evidence Print is REQUIRED.
+* Evidence Print is REQUIRED.  
+* Full-gate first pass is required. Before issuing the first approval decision on the artifact, apply the full active review gate set to the full artifact, not a partial subset.
+
+* After the first review on a given artifact line, do not introduce a new blocker from unchanged text unless the later blocker is caused by newly added or materially changed text, a newly supplied authoritative input changes the review basis, PF canon changed after the prior review, or a prior read failure or truncation prevented full visibility.
+
+* Any blocker or caveat raised against unchanged text MUST state the trigger that makes it newly raisable.
+
+For close-pack or acceptance-ledger remediation sequences, the review MUST distinguish all of the following separately:
+
+* canonical file existence
+
+* content completeness of the acceptance ledger
+
+* truthfulness of any claimed write or check workflow
+
+* chronology freshness of changed governed companions
+
+An acceptance-ledger slice is not satisfied merely because the acceptance map, token-evidence matrix, or viability log exists. If the reviewed outcome binds only a reduced global subset when the approved slice depends on reused proof families, the review MUST mark that requirement as not yet satisfied until the binding model is expanded or the missing families are explicitly handled as non-claims.
+
+If the final recommendation depends on a combined Original plus Remedial outcome, the review MUST state what earlier drift or blocker was reversed, what net-effective shipped state remains after remediation, and why that final combined outcome supports the status recommendation.
+
+When the review supports a PF09 task or subtask status move, the review SHOULD state the exact impacted PF09 row or rows, the current PF09 status posture, the recommended status move, and the specific final evidence basis for that recommendation.
+
+If a review identifies a remaining canon delta whose correct home is another PF document, the review pack MUST route that delta to the correct home and MUST NOT silently convert it into a PF06 process delta.
 
 ### **PR Review Pack — \<PR ID\> (EPIC-\<ID\>)**
 
@@ -3504,19 +3636,16 @@ Fill the sections below. Use DR-\#\#\#, F-\#\#\#, and RCA-\#\#\# numbering as ne
 
 * Attempt record (repeat per attempt):
 
-  * Attempt label: \<Attempt 0 | Remediation 1 | Remediation 2 | Remediation 3\>
-
-  * Change summary: \<what changed in this attempt\>
-
-  * CI status summary: \<PASS/FAIL, and what failed if not PASS\>
-
-  * Tests run summary: \<what was run and why it is the right suite\>
-
-  * Evidence artifacts changed: \<what artifacts were created or updated\>
-
-  * Source: \<Implementation Plan section or other governing input\>
-
-  * Evidence pointer: \<PR comment, commit, diff hunk, artifact path\>
+  * Attempt label: \<Attempt 0 | Remediation 1 | Remediation 2 | Remediation 3\>  
+  * Change summary: \<what changed in this attempt\>  
+  * CI status summary: \<PASS/FAIL, and what failed if not PASS\>  
+  * Tests run summary: \<what was run and why it is the right suite\>  
+  * Evidence artifacts changed: \<what artifacts were created or updated\>  
+  * Source: \<Implementation Plan section or other governing input\>  
+  * Evidence pointer: \<PR comment, commit, diff hunk, artifact path\>  
+  * Net-effective shipped state (required for remediation sequences): after listing attempts, add a short block that states what remains in the final combined outcome after the last remediation. If the review depends on a combined Original plus Remedial result, say so explicitly.  
+  * Reversed or canceled drift: if an earlier attempt introduced risky or out-of-scope changes that were later undone, name them and state plainly that they do not remain in the final shipped change-set.  
+  * Final approval basis: state which requirements were already satisfied before remediation, which blocker or blockers were resolved later, and why the final review is based on the combined outcome rather than on any single intermediate attempt.
 
 ### **Diff Review (REQUIRED; primary technical review)**
 
@@ -3540,21 +3669,37 @@ Common DR checks (Lead Dev gate):
 
 * File-list integrity: if the PR review pack includes a "File list:" section, every listed repo path MUST appear as a changed path in the PR diff, unless it is explicitly labeled as non-diff evidence (CI log URL) or as a runtime-generated artifact that is not committed.
 
-* Duplicate patch blocks: if the PR diff contains duplicate `diff --git` blocks for the same path, treat this as a packaging or review artifact error and resolve it before approval.
-
-* Output-claim integrity: if the PR review pack enumerates expected outputs, verify that committed outputs have corresponding diffs and that runtime-only outputs are labeled as such.
+* Duplicate patch blocks: if the PR diff contains duplicate `diff --git` blocks for the same path, treat this as a packaging or review artifact error and resolve it before approval.  
+* Intermediate vs final posture: when a review bundle contains an early risky hunk and a later corrective hunk for the same logical area, reviewers MUST call out both and MUST state which hunk reflects the final shipped posture.  
+* Scoped proof lane guard: a PR may introduce a narrow closure lane or scoped assertion set only if the main lane retains the broader fail-closed safeguards it previously carried. Dropping those safeguards without an explicit approved scope change is a blocker.  
+* Duplicate diff distinction: duplicate `diff --git` blocks in the actual PR diff remain a packaging error and must be resolved before approval. Duplicate diff excerpts inside the review bundle, when they refer to the same already-reviewed patch and do not correspond to extra changed paths, are a reviewability caveat and MUST NOT be counted as additional shipped behavior.  
+* Output-claim integrity: if the PR review pack enumerates expected outputs, verify that committed outputs have corresponding diffs and that runtime-only outputs are labeled as such.  
+* Positive installability proof: when a PR claims shipped installability, entrypoint readiness, or console or module availability, the review MUST prefer positive proof of the shipped entrypoint or module path. Skipped or negative placeholder artifacts do not satisfy that claim unless the approved plan explicitly allows a non-installability posture.  
+* Fail-closed entrypoint posture: if the claimed shipped entrypoint is missing during proof generation, the proof MUST fail closed or report the missing entrypoint as a blocker. It MUST NOT silently downgrade the artifact to a pseudo-pass.  
+* Ambient environment guard: installability or conformance proof MUST NOT depend on ambient host PATH or other unstated shell state. The generator or captured commands MUST pin or derive the environment they rely on, and the review pack MUST state what path or env basis the proof used.  
+* Single-source proof metadata: when a PR emits installability, help, version, or entrypoint metadata in more than one artifact, the review MUST verify those artifacts agree or identify which artifact is authoritative. Duplicate or conflicting proof metadata is a blocker until reconciled.
 
 ### **Findings**
 
 F-001
 
-* Observed: \<what was observed\>
+* Observed: state what was observed.
 
-* Why it matters: \<why it matters\>
+* Why it matters: state why it matters.
 
-* Source: \<where the observation originates\>
+* Source: state where the observation originates.
 
-* Evidence pointer: \<diff hunk, log, test output, artifact path\>
+* Evidence pointer: state the diff hunk, log, test output, or artifact path.
+
+* Review provenance: state exactly one of Introduced by current revision, Previously raised and still unresolved, or Review Drift.
+
+* Trigger if based on unchanged text: state the trigger that makes the issue newly raisable, or state Not applicable.
+
+* Impacted PF09 task ID(s), if proven: list only task IDs directly supported by this finding, or state No proven PF09 impact.
+
+* Impacted PF09 subtask ID(s), if proven: list only subtasks directly supported by this finding, or state No proven PF09 impact.
+
+* Supported PF09 status posture: when the finding supports a PF09 status move, state the exact posture supported by this finding. Otherwise state No proven PF09 impact.
 
 Repeat F-\#\#\# as needed.
 
@@ -3576,13 +3721,15 @@ RCA-001
 
 Common RCA checks:
 
-* If the PR introduces or modifies an evidence-path validator (any code that loads `artifacts/evidence_index.jsonl` or interprets `discovered_physical_path`), verify it rejects absolute paths, traversal segments like `..`, and any resolved out-of-root path. It MUST also enforce that each JSONL line parses to a JSON object (dict) and that the resulting `discovered_physical_path` exists under repo root.
-
-* If your tests emit governed artifacts, artifact emission MUST be gated behind an explicit flag (no default emission on normal runs).
-
-* If a PR updates evidence/INDEX.jsonl, it MUST also update evidence/INDEX.sha256 and preserve canonical JSONL formatting and stable ordering.
-
-* If a .sha256 sidecar is updated, verify it references the correct repo-relative target path and that `sha256sum -c <sidecar>` works from repo root.
+* If the PR introduces or modifies an evidence-path validator (any code that loads `artifacts/evidence_index.jsonl` or interprets `discovered_physical_path`), verify it rejects absolute paths, traversal segments like `..`, and any resolved out-of-root path. It MUST also enforce that each JSONL line parses to a JSON object (dict) and that the resulting `discovered_physical_path` exists under repo root.  
+* If your tests emit governed artifacts, artifact emission MUST be gated behind an explicit flag (no default emission on normal runs).  
+* If a PR updates evidence/INDEX.jsonl, it MUST also update evidence/INDEX.sha256 and preserve canonical JSONL formatting and stable ordering.  
+* If a .sha256 sidecar is updated, verify it references the correct repo-relative target path and that `sha256sum -c <sidecar>` works from repo root.  
+* If a remediation review identifies more than one distinct cause, record each root cause separately with its own evidence pointer rather than collapsing them into one narrative.  
+* If a PR adds or regenerates governed artifacts, reviewers MUST verify that changed artifacts, path-proofs, index rows, mirror rows, and checksum sidecars carry current and internally coherent chronology for the changed bytes. Stale or backdated produced\_at\_utc or mtime\_utc evidence is a blocker until the evidence family is regenerated with canonical tooling.  
+* If a proof generator or evidence harness needs open rails, it MUST require explicit caller-provided open rails and MUST NOT silently force SAFE\_MODE=0, ALLOW\_NETWORK=1, or equivalent. The invocation used for the proof must make the rails posture explicit.  
+* If emitted or summarized bytes depend on specific env fields beyond the standard deterministic pins, the generator or harness MUST pin or otherwise prove those env inputs explicitly. Missing byte-affecting env pins leave the proof nondeterministic and non-accepting.  
+* When a remediation changes only evidence tooling, generators, or governed artifacts, the review MUST state explicitly whether any public contract, route family, or A7 scope changed. If none changed, say so plainly.
 
 ### **Requirement Satisfaction Crosswalk (REQUIRED for remediation sequences)**
 
@@ -3593,6 +3740,32 @@ Common RCA checks:
 * Evidence pointer: \<where the requirement is proven\>
 
 Repeat per requirement.
+
+For remediation sequences, each requirement row SHOULD also record:
+
+* Original or earlier blocking state: summarize the state before the successful remediation.
+
+* Remediation change that addresses it: identify the later change that resolves the blocker.
+
+* Current status after remediation: state whether the requirement is Satisfied, Not satisfied, or still mixed after the final attempt.
+
+* Notes: record any earlier drift or intermediate change that was reversed and therefore does not remain in the final shipped state.
+
+### **PF09 Impact & Status Posture (include when the PR review is used to support PF09 closeout)**
+
+* PF09 task ID: record the exact task ID supported by the review.
+
+* PF09 subtask ID(s): record the exact subtask IDs supported by the review.
+
+* Current PF09 status: quote the current task and subtask status lines from PF09.
+
+* Status recommendation: state the exact status move supported by the reviewed evidence, or state No status change supported.
+
+* Why this status posture is supported: tie the recommendation to the approved plan, the final remediated evidence, and the blocker or blockers that were resolved or remain open.
+
+* Evidence pointer(s): point to the governing plan and the final review evidence.
+
+* PF proof excerpt(s) when PF09 is relied on: quote the exact PF09 task and subtask status lines used for the recommendation.
 
 ### **Doc Deltas (PF-Canon only; ALWAYS INCLUDED)**
 
@@ -3617,6 +3790,24 @@ A) Tokens satisfied (names-only; do not invent)
 * \<TOKEN\_NAME\_2\>
 
 If no PASS tokens are claimed by name in this PR artifact, state: No PASS tokens claimed by name in this PR artifact.
+
+When no PASS tokens are claimed by name, the review pack MUST:
+
+* record the search method used to confirm that no token names are claimed in the PR artifact
+
+* state that the PR is proved through concrete tests/checks and governed artifact evidence rather than through named token claims
+
+* add an Acceptance coverage evidence subsection that groups the core requirement labels, the evidence pointers that prove satisfaction, and the key proof facts for the whole PR outcome
+
+A1) Acceptance coverage evidence (required for remediation sequences; recommended whenever the review supports PF09 closeout even if tokens are claimed)
+
+* Requirement label: state the core requirement or closure claim being proved.
+
+* Evidence pointer(s): point to the exact diff, artifact, test, or review line that proves the requirement.
+
+* Key proof facts: quote the minimal facts that show the requirement is satisfied in the final reviewed outcome.
+
+* Final posture: state whether the requirement is Satisfied, Not satisfied, or Mixed in the final combined outcome.
 
 B) Evidence artifacts produced or updated (repo-relative paths)
 
@@ -3672,12 +3863,14 @@ Use this variant when a PR changes repo docs only (no runtime code changes). Thi
 
 Rules:
 
-* Docs-only does not mean evidence-free. If the docs assert contract or behavior (CLI semantics, tokens, governed artifacts, evidence routes), the review pack MUST cite the evidence basis (canon pointer, governed artifact, or new test/proof output).
-
-* If no CI or test proof is present in the PR bundle, the review pack MUST state that verification was diff-only and record the search method used to look for pass indicators.  
+* Docs-only does not mean evidence-free. If the docs assert contract or behavior (CLI semantics, tokens, governed artifacts, evidence routes), the review pack MUST cite the evidence basis (canon pointer, governed artifact, or new test/proof output).  
+  If no CI or test proof is present in the PR bundle, the review pack MUST state that verification was diff-only and record the search method used to look for pass indicators.  
 * "Verified locally" statements MUST be paired with an evidence pointer to captured output (CI log URL or committed evidence artifact). For CLI help checks (example: `hdctl showcompat --help`), include an excerpt and pointer in the Evidence Print.
 
-* Docs-only PRs that change docs MUST include a recorded docs-lint or markdown validation proof (CI log URL or committed evidence artifact). If such tooling does not exist, record the gap as a repo issue and treat it as a blocker or as an explicit closure override (with rationale).
+* Docs-only PRs that change docs MUST include a recorded docs-lint or markdown validation proof (CI log URL or committed evidence artifact). If such tooling does not exist, record the gap as a repo issue and treat it as a blocker or as an explicit closure override (with rationale).  
+* Full-gate first pass is required. Before issuing the first approval decision on the artifact, apply the full active review gate set to the full artifact, not a partial subset.  
+* After the first review on a given artifact line, do not introduce a new blocker from unchanged text unless the later blocker is caused by newly added or materially changed text, a newly supplied authoritative input changes the review basis, PF canon changed after the prior review, or a prior read failure or truncation prevented full visibility.  
+* Any blocker or caveat raised against unchanged text MUST state the trigger that makes it newly raisable.
 
 Template:
 
@@ -3717,7 +3910,9 @@ Approved Plan linkage: \<if applicable\>
 
 ### **Findings (required)**
 
-* \<List doc correctness risks, contradictions, missing evidence links, and any required follow-ups\>
+* List doc correctness risks, contradictions, missing evidence links, and any required follow-ups.  
+* For each blocker or caveat, state review provenance using exactly one of Introduced by current revision, Previously raised and still unresolved, or Review Drift.  
+* If a blocker or caveat is raised against unchanged text, state the trigger that makes it newly raisable. Otherwise state Not applicable.
 
 ### **Evidence Print (PASS PROOF; required)**
 
@@ -3897,37 +4092,116 @@ This is not a replacement for the epic close report. Use it as an input to the c
 
 Template:
 
-### **Implementation Report (what happened in the repo)**
+### **Executive Summary**
 
-* PR or step breakdown: \<PR01, PR02, PR03, PR04, or equivalent steps; 1 to 3 bullets each\>
+* Scope statement: state whether the epic is hardening and completion work, contract expansion, or another posture, and name the boundaries that remained unchanged.
 
-* Major surfaces affected: \<CLI | API | DB | evidence | QA harness | docs | other\>
+* Biggest wins: summarize the most important completed slices or proof improvements.
 
-* Evidence inventory (what exists): \<list the concrete governed artifacts and where they live\>
+* Biggest remaining risks or gaps: list only the risks or gaps that still matter for closure or follow-up drainage.
 
-### **Evidence gaps (if any; label Unknown if you cannot verify)**
+  ### **Implementation Report (what happened in the repo)**
+
+* If the epic reuses already-implemented scope, record that reuse explicitly as Step 0 or Approved reuse baseline and state that it is inherited scope rather than new implementation.
+
+* For each PR or step, record:
+
+  * Purpose
+
+  * Key changes, high level
+
+  * Key surfaces touched
+
+  * Tests or evidence produced
+
+  * Outcome
+
+* Major surfaces affected: list the runtime, tooling, evidence, and documentation surfaces materially touched by the epic.
+
+* Evidence inventory (what exists): list the concrete governed artifacts and where they live.
+
+  ### **Evidence gaps (if any; label Unknown if you cannot verify)**
 
 For each gap, record:
 
-* Gap: \<what is missing or not verified\>
+* Gap: state what is missing or not verified.
 
-* Status: \<Unknown | Missing | Ambiguous\>
+* Status: use Unknown, Missing, or Ambiguous.
 
-* What would prove it: \<the minimal test, proof, or artifact that would close the gap\>
+* What would prove it: state the minimal test, proof, or artifact that would close the gap.
 
-### **Retrospective (Process)**
+* Where that proof should exist, if known: name the expected canon or governed artifact home.
 
-* What went well: \<process wins\>
+  ### **Retrospective (Process)**
 
-* What did not go well: \<process gaps, including evidence posture gaps\>
+* What went well: process wins.
 
-* What we learned (Process): \<actionable changes to make next time\>
+* What did not go well: process gaps, including evidence posture gaps.
 
-### **Retrospective (Application/System) (optional)**
+* What we learned (Process): actionable changes to make next time.
 
-* What we learned about the system: \<technical insights\>
+  ### **Retrospective (Application/System) (optional)**
 
-* Known remaining risks or debt: \<explicit list\>
+* What we learned about the system: technical insights.
+
+* Known remaining risks or debt: explicit list.
+
+  ### **Canon Alignment and Documentation Outcomes**
+
+* Canon references used: list only the canon homes that materially informed the closeout analysis.
+
+* Proposed addenda or live deltas: record any still-live canon deltas, their intended drain homes, and whether they are implementation work, documentation work, or unresolved analysis.
+
+* Uncertain drain targets: state None when there are none. Otherwise record the uncertainty explicitly.
+
+* Token and evidence semantics, if applicable: distinguish registry or semantics drift from binding or completeness drift, and state whether the issue is resolved, unresolved, or observational only.
+
+### **Final QA Closeout Review \+ QA RCA (recommended)**
+
+Use this review when closeout depends on synthesizing step-level QA outcomes, remediation history, and canon-alignment posture. It may live inside the close report or as a governed artifact referenced by it.
+
+Minimum structure
+
+* Artifact Map. Name the epic reviewed, the primary epic-specific source of truth, the canon homes used for closeout interpretation, and any framing inputs such as the Implementation Guide or QA Plan.
+
+* Source-of-Truth Posture. State which artifact is primary for epic-specific events, which sources are framing only, and any internal mismatch that affects trust or traceability.  
+* Closure Registers. When the review is used as a closure-oriented decision aid, include compact registers that separate:  
+  * Deliverables register. Record each closure-critical deliverable, its source, the anchor quote or governing claim, and any exact evidence, path, or token strings that matter.
+
+  * QA verification register. Record each QA step or verification item, its source, and the required evidence outputs or pass/fail posture.
+
+  * Execution results register. Record the governing execution or remediation claims the review relies on and the outcome labels those claims carry.
+
+  * Current-reality register. Record any repo-reality or surface-existence confirmations used to support closure, the relevant path or surface strings when they matter, and whether each confirmation supports, contradicts, or does not address closure.  
+* Closure Trace Ledger. For each closure-critical deliverable or slice, map the deliverable to the QA verification item or items that validate it, the governing execution result or results that claim completion, whether current-reality confirmation was used, a status line (Satisfied | Not satisfied | Caveat), and a short why statement grounded in those inputs.
+
+* Path and Surface Reality Ledger. When closure depends on named routes, entrypoints, governed ledgers, or close-pack files, list each required path or surface string verbatim, its source or sources, whether it is proven in current reality or only by execution record, whether it is required for closure, and a short note explaining its closure role.
+
+* QA Closeout Summary. State the step-level QA outcome, the overall readiness recommendation, the main blocker or non-blocker themes, and the highest-impact closure risks or gaps that remain.
+
+* Canonical RCA Requirement Basis. List the canon sections that justify the review method.
+
+* Required elements checklist. Confirm the presence or absence of the D0 Discovery artifact, runtime functional proof when required, governed current-state QA evidence under the epic QA root, the QA RCA summary, Coverage vs QA Plan accounting, a readiness recommendation, at least one Codespaces harness run, and indexed evidence.
+
+* QA Timeline. Summarize the major remediation loops, ADR or audit events, and QA step outcomes in a stable chronology. If the governing source is append-only, the review MAY use source order as the canonical chronology and MUST say so explicitly.
+
+* Coverage vs QA Plan. List every planned QA step in plan order, record whether it is Fully evidenced, Partially evidenced, or Not evidenced, note any material mismatch, and state the closeout impact for each step.
+
+* Findings. Record each substantive finding with what happened, why it matters, classification, PF touchpoints when needed, and evidence-pointer posture.
+
+* Root Cause Analysis. State the primary root cause, contributing factors, what made the issue hard to detect or hard to close, and the role of any remediation loops in reducing or preserving uncertainty.
+
+* Implementation Gaps and Proposed Fixes. For each remaining gap, state the symptom, the expected behavior, the likely locus, a high-level fix, and a verification hook.
+
+* Doc Deltas. State whether PF06 has any delta from the review. If the correct home is another PF document, route the delta there and say why PF06 is not the correct home.
+
+Guidance on evidence-light decision records
+
+* If a guidance record, ADR set, or other closeout decision note is used but does not carry explicit evidence-pointer lines, the review MUST label it as evidence-light guidance.
+
+* Evidence-light guidance MAY inform decision framing, but it MUST NOT be treated as stronger than the evidence-backed implementation, QA-pass, or close-pack records around it.
+
+* When possible, the review SHOULD pair each evidence-light guidance item with the governing evidence-backed lines that make the decision auditable.
 
 ### **Closure Evidence Snapshot (for Lead decision)**
 

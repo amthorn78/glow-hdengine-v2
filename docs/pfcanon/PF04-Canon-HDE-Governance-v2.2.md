@@ -3,12 +3,12 @@
 ## 0.1 Header
 
  **Title:** PF04-Canon-HDE-Governance  
- **Version:** v2.1.1
+ **Version:** v2.2
 
 **Status:** Canon  
-**Effective date:** 2026-03-06
+**Effective date:** 2026-03-23
 
-**Last Update Gate:** BN 10.0.5 A32-33
+**Last Update Gate:** BN 10.1.4 A23-24
 
 **Invocation tag:** `INV-f2ac55d77ce9aacc`
 
@@ -599,8 +599,13 @@ Any deviation is a mechanical blocker. The binding must be corrected, not interp
 
 * **CLI\_SHOWCOMPAT\_CANON\_OK** — `hdctl showcompat` uses the same canonical emitter as Reader/aux for compatibility outputs; no ad-hoc serializers are permitted on this path. (Owned: Governance; CLI/API Vendor Ref)
 
-* **CLI\_STDOUT\_LF\_OK** — `hdctl showcompat` stdout is canonical: UTF-8, BOM-free, and terminated with exactly one LF. (Owned: Governance; Evidence & Artifacts)
-
+* **CLI\_STDOUT\_LF\_OK** — `hdctl showcompat` stdout is canonical: UTF-8, BOM-free, and terminated with exactly one LF. (Owned: Governance; Evidence & Artifacts)  
+  * **CLI installability and conformance proof (normative).**  
+    * When CLI installability or CLI help and version conformance is used as acceptance evidence, the proof posture MUST be positive and deterministic. Skipped, negative, or placeholder-only console-entrypoint posture does not satisfy installability proof.  
+    * Governed CLI conformance evidence MAY cover module and console version or help surfaces, help and argument-policing captures, and deterministic sample semantics when those surfaces are in scope for acceptance. When such surfaces are claimed, the emitted proof and any derived metadata MUST be mutually coherent.  
+    * Installability and console proof MUST NOT depend on ambient host `PATH` or other unpinned host-shell state. Any claimed console proof MUST resolve from the governed execution context used to produce the evidence.  
+    * When both module and console surfaces are claimed, their captured version and help posture MUST remain single-sourced in meaning and MUST NOT be internally conflicting across the governed evidence family.  
+    * If sample or sampler semantics are part of the governed CLI conformance surface, the emitted proof MUST preserve stable seed semantics, stable candidate-order semantics, and two-run equality when those properties are claimed.  
 * **CLI\_PREVIEW\_ENABLED\_OK** — CLI admin preview (for Aux narratives) is enabled only for admins and uses the same emitter as Aux. (Owned: Governance; CLI/API Vendor Ref)
 
 * **CLI\_PREVIEW\_INDEXED\_OK** — CLI admin preview outputs are captured and indexed as governed artifacts (stdout text \+ ids-only JSON). (Owned: Governance; Evidence & Artifacts)  
@@ -910,6 +915,9 @@ Plans and implementations MUST NOT introduce parallel alternate spellings for th
 
     * for each required Live QA check, the work MUST write a primary step log at `audit/qa/<epic-id>/checks/<check_id>/primary.log` (one primary log per check).  
     * the work MUST maintain a step-logs manifest at `audit/qa/<epic-id>/qa_step_logs_manifest.json` that lists each check id, its status, and the path to its primary step log. This file is **current-state** (not per-run history).  
+    * when a check updates or refreshes the step-logs manifest for itself, the manifest entry for that check MUST be derived from that check’s governed \`primary.log\` header.  
+    * the refresh MUST NOT be sourced from paraphrased summaries, copied verdict prose, or unguided manual transcription.  
+    *  if the manifest bytes change as part of that refresh, the co-located \`audit/qa/\<epic-id\>/qa\_step\_logs\_manifest.json.path\_proof.txt\` MUST be refreshed from the new manifest bytes before the step is treated as complete.  
     * if the epic is not claiming \*\*QA\_LIVE\_QA\_RUN\_OK\*\*, the manifest MAY set \`checks: \[\]\` to explicitly declare that no Live QA checks are being claimed. When \*\*QA\_LIVE\_QA\_RUN\_OK\*\* is claimed, \`checks\` MUST enumerate the required Live QA checks and MUST NOT be empty.    
     * the step-logs manifest MUST have a co-located path-proof transcript: `audit/qa/<epic-id>/qa_step_logs_manifest.json.path_proof.txt`. The path-proof MUST record at minimum the manifest’s `path`, `size_bytes`, and `sha256`, and MUST match the current-state manifest bytes.  
     * nothing else is auto-required unless Governance explicitly pins a governed evidence family/path for the epic.
@@ -1121,25 +1129,40 @@ Ownership: Governance (classification semantics at policy level); **Glow QA Guid
 
     * `audit/docdeltas/<epic-id>_drain_targets.md`  
   * **Close report minimal content (normative).** `audit/EPIC-###_close_report.md` MUST be a human-readable closure summary and MUST include:  
-    * a brief delivered-work summary (what shipped in the epic),
-
-    * an explicit deferrals list (including deferred item IDs when available),
-
-    * a pointer to the close-pack manifest `key_outputs` bindings in `audit/EPIC-###_MANIFEST.json`,
-
-    * pointers to any closeout companion ledgers used for the epic (including their canonical paths under `audit/docdeltas/`),
-
+    * a brief delivered-work summary (what shipped in the epic),  
+    * when the epic closes by reusing already-implemented governed scope, a reuse-boundary summary identifying which proof families or deliverable groups were inherited baseline versus newly closed in the epic,  
+    * when closure is distributed across bounded PR or work slices, a PR-to-deliverable allocation summary that states which slice closed which governed deliverable family or acceptance-bound proof family,  
+    * an explicit deferrals list (including deferred item IDs when available),  
+    * a pointer to the close-pack manifest `key_outputs` bindings in `audit/EPIC-###_MANIFEST.json`,  
+    * pointers to any closeout companion ledgers used for the epic (including their canonical paths under `audit/docdeltas/`),  
     * explicit “canon pointer” fields when closing TI-002 (or other TI items) as satisfied in the closeout, including:  
-      * a `PF09 pointers:` line listing the relevant PF09 pointer IDs,
-
-      * a `TI-002 pointers:` line listing the canon pointers used to evidence TI-002 (or a `TI-<id> pointers:` line for other TI items), and
-
+      * a `PF09 pointers:` line listing the relevant PF09 pointer IDs,  
+      * a `TI-002 pointers:` line listing the canon pointers used to evidence TI-002 (or a `TI-<id> pointers:` line for other TI items), and  
       * an `ADR status line:` line identifying the ADR governing the TI claim,  
-    * **Coverage vs QA Plan accounting (required when the epic has a Live QA Plan or claims `QA_LIVE_QA_RUN_OK`).** The closeout record MUST include an explicit, step-by-step, complete, and auditable coverage ledger. It MUST list every planned QA step in plan order with a stable step identifier, a coverage status (`PASS`, `FAIL`, `BLOCKED`, or `NOT_RUN`), and the closeout impact for that step,
-
-    * **Step evidence rule for closeout.** For any step recorded as `PASS`, the closeout record MUST point to at least one step-scoped evidence artifact under the governed QA root for that exact step, or to an explicitly equivalent step-scoped evidence pointer line preserved in the epic’s primary QA record. Heading-only or summary-only PASS statements are insufficient,
-
+    * **Coverage vs QA Plan accounting (required when the epic has a Live QA Plan or claims `QA_LIVE_QA_RUN_OK`).** The closeout record MUST include an explicit, step-by-step, complete, and auditable coverage ledger. It MUST list every planned QA step in plan order with a stable step identifier, a coverage status (`PASS`, `FAIL`, `BLOCKED`, or `NOT_RUN`), and the closeout impact for that step,  
+    * **Step evidence rule for closeout.** For any step recorded as `PASS`, the closeout record MUST point to at least one step-scoped evidence artifact under the governed QA root for that exact step, or to an explicitly equivalent step-scoped evidence pointer line preserved in the epic’s primary QA record. Heading-only or summary-only PASS statements are insufficient,  
     * **Token/evidence matrix pointer (required when in-scope QA tokens exist).** The closeout record MUST point to the epic’s token/evidence matrix artifact and MUST identify any in-scope QA token rows that remain blocked, incomplete, or not applicable.  
+    * **Closeout review inputs posture (required).** When a closeout recommendation is issued, the closeout record MUST state the source-of-truth posture used for that recommendation. At minimum:   
+      * PF10 is primary for epic-specific recorded implementation, remediation, QA execution, closeout, and documented supersession of earlier closeout wording.  
+      * PF23 is required for current-reality alignment of surfaces, entrypoints, evidence homes, and repo structure.   
+      * PF-Canon is normative where PF10 is silent.    
+      * The Implementation Guide is used for intended scope framing only.  
+      * The QA Plan is used for intended QA requirement framing only.   
+    * **Readiness / closeout recommendation (required).** The closeout record MUST state an explicit overall recommendation, such as \`Ready\` or \`Not ready\`.  
+    * **Blocker accounting for recommendation.** The closeout record MUST identify the unresolved blocker set that drives that recommendation, including any must-fix canon delta, stale closeout-blocking checklist state, or other unresolved governance blocker.  
+    * **Readiness / closeout recommendation (required).** The closeout record MUST state an explicit overall recommendation, such as \`Ready\` or \`Not ready\`.    
+    * **QA-first closeout ordering.** All required QA tasks, remediation loops, runtime-proof checks, and close-gate QA reviews MUST be completed before documentation drainage begins.    
+    * **PF10 temporary truth home for undrained documentation deltas.** If a canon delta, checklist delta, guide delta, or other documentation correction is known but not yet drained, PF10 is the controlling temporary source of truth for that item until drainage occurs  
+    * **Documentation drainage is non-blocking.** Undrained changes to canon, checklist rows, guides, summaries, or other documentation MUST NOT be used as a blocker for finishing QA execution, issuing step verdicts, issuing epic QA closeout review, or deciding epic close posture, provided PF10 explicitly records the truth of what happened and the required QA proof is otherwise complete.  
+    * **Allowed blockers remain limited to QA truth and proof.** The closeout record MUST identify the unresolved blocker set that drives the recommendation. Allowed closeout blockers are limited to incomplete required QA steps, missing required deliverables, untrusted or non-governed evidence, unresolved \`FAIL\_BEHAVIOR\` / \`FAIL\_TOOLING\` / \`TOOLING\_BLOCKED\` conditions that affect acceptance, or missing required close-gate QA artifacts. Documentation drainage itself is not an allowed blocker.  
+    * **Record, then drain later.** When a documentation mismatch or canon delta is found during QA or closeout, it MUST be recorded in PF10 as a follow-up, implementation gap, ADR note, or doc-delta item. It MUST NOT be converted into a pre-drain closure blocker solely because the destination PF document has not yet been updated.    
+    * **Post-QA drain ordering is mandatory.** Drainage into canon, checklist rows, guides, or other document homes occurs only after all QA tasks for the epic are complete.   
+    * **Truthfulness still applies.** This rule changes timing, not honesty requirements. PF10 MUST still state open doc deltas, remaining follow-ups, and any caveats plainly and explicitly.  
+    * **QA-pass is necessary but not sufficient.** A positive step-level QA record does not by itself authorize epic closeout when the closeout record still identifies unresolved allowed blockers. If QA evidence is complete and trustworthy and all required QA tasks are complete, the epic MAY be recommended \`Ready\` even when undrained documentation deltas remain. Undrained documentation deltas alone do not justify a \`Not ready\` verdict.    
+    * Truthfulness rule for workflow claims.  
+      * If a close report states that governed evidence artifacts were refreshed, re-validated, or gate-checked, that statement MUST be backed by same-run governed execution evidence produced by the cited workflow. Template-generated or unconditional claims are non-conforming.  
+    * Same-run evidence pointer rule.  
+      * When the close slice touches the Evidence Index, hash sentinel, machine mirror, or their required proof companions, the close report MUST point directly, or via the manifest \`key\_outputs\` or token/evidence matrix, to the same-run gate or QA log evidence that proves the write/check workflow actually executed and passed.  
   * Close-pack manifest `key_outputs` shape (normative):  
     * `audit/EPIC-###_MANIFEST.json` MUST include `key_outputs` as a JSON object (map) from stable names → repo-relative artifact paths.
 
@@ -1748,6 +1771,22 @@ See **§2.0 Acceptance Tokens**: `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MI
 * Two-run identity (repeat run produces identical bytes).  
 * Idempotence re-check. Recompute `sha256(preimage_bytes)` (preimage fields per HDE Math Spec) equals published `idempotence_hash`.
 
+**Scoped closure lanes (bounded remediation; truthful CI).**
+
+* When a bounded remediation or cleanup PR has already restored its approved in-scope net diff, but a residual merge-gating check outside that slice still blocks closure, CI MAY add a dedicated scoped closure lane that proves only the in-scope slice.
+
+* A scoped closure lane is additive only. It MUST NOT narrow, replace, or weaken the main lane that preserves repo-wide safeguards, fail-closed coverage, and global evidence validation.
+
+* If the main lane previously executed full-module or guard coverage, the final shipped posture MUST preserve that coverage in the main lane. The scoped lane MAY prove only the bounded slice, but it MUST NOT become the sole lane carrying global truthfulness checks.
+
+* A scoped closure lane MUST keep the net effective change-set scope-clean. It MUST NOT resolve a residual blocker by introducing governed artifact churn or state changes from an adjacent surface outside the bounded slice.
+
+* Final validation posture for such a remediation requires both:
+
+  * the scoped closure lane proves the bounded slice, and
+
+  * the preserved main lane remains green on the repo-wide safeguards that were in force before the scoped split.
+
 ### **4.3.5 A7 transport checks (Catalog success endpoint)**
 
 * **200\.** Strong, quoted ETag present; `Content-Type: application/json; charset=utf-8`; `Cache-Control: private, max-age=0, must-revalidate`; `Vary: Authorization, Accept-Encoding`.  
@@ -1987,6 +2026,20 @@ Evidence/index shapes and merge‑gating sentinel: PF12. Process/PR flow: Epic�
 
 **Fallback rule (dev-only).**  
  If `APP_ENV=dev` and `DATABASE_URL` is present but not usable, the resolver **falls back to `DB_BRIDGE_URL`**. If neither `DATABASE_URL` nor `DB_BRIDGE_URL` is usable, the resolver must **refuse with a typed error** (numeric-free JSON envelope), not a raw exception.
+
+**Consistency gate posture for sanctioned dev fallback.**
+
+* When dev DB fallback is allowed, Governance permits a narrow sanctioned consistency outcome where the checked adapter posture remains `psycopg` while runtime connectivity resolves to `bridge`.
+
+* This sanctioned fallback is limited to the dev bridge-fallback posture defined in this section. It MUST NOT be generalized into a blanket relaxation of provider-parity or environment-consistency checks.
+
+* Outside the sanctioned fallback case, provider-parity mismatches remain failures and MUST continue to fail the consistency gate.
+
+* Any merge-gating checker that encodes this sanctioned fallback MUST carry direct targeted test coverage for:
+
+  * at least one passing allowed-fallback case, and
+
+  * at least one failing mismatch case that proves the gate still rejects non-sanctioned divergence.
 
 **Diagnostics.**  
  Diagnostics for dev fallback are **keys-only**:
@@ -2541,6 +2594,16 @@ For each in-scope token row, the matrix MUST include, at minimum:
 * Evidence Index and Machine Mirror entries (artifact\_key, epic\_id, tokens, proof\_anchor), as required by the evidence schema.
 
 **Binding posture (proof anchors; acceptance artifacts).** In the token/evidence matrix and acceptance maps, tokens MUST bind to the **primary governed artifacts** and the **validator runs/tests** that produce or verify them. Tokens MUST NOT bind directly to `*.path_proof.txt` files as primary evidence surfaces. Path proofs are still required and merge-gating, but they are referenced via the machine mirror record’s `proof_anchor` for the bound artifact and are validated by the evidence index/mirror checks.
+
+**Reuse-first acceptance-ledger binding.**
+
+* If an epic acceptance or close slice depends on already-governed proof families, the acceptance map and token/evidence matrix MUST bind those reused proof families directly.
+
+* Binding only global evidence-skeleton or index-discipline tokens is insufficient when additional in-scope governed proof families materially support the claimed close slice.
+
+* The token/evidence matrix MUST identify the reused primary governed artifacts and the validator runs/tests or QA\_ROOT log anchors that establish each reused token, rather than replacing the reused family with slice-local substitute proofs.
+
+* The viability log MUST count those reused tokens as in scope and MUST NOT report full coverage while omitting them from the acceptance map or token/evidence matrix.
 
 If any required cell is missing at Stage B, the epic is not token-complete and MUST NOT be closed as accepted.
 
@@ -3227,6 +3290,14 @@ Minimum required primary step log header keys (each step `primary.log`; empty li
 
 When a step claims no tokens, both `intended_tokens` and `claimed_tokens` MUST still appear as empty lists (`[]`).
 
+**Intended vs claimed token alignment.**
+
+* When `claimed_tokens` is non-empty, every token in `claimed_tokens` MUST also appear in `intended_tokens`.
+
+* A step MUST NOT introduce unplanned token claims.
+
+* If `intended_tokens` and `claimed_tokens` differ, the step record MUST explicitly explain the delta. Without that explanation, the step MUST NOT be treated as a clean `PASS`.
+
 If any of the required keys above are omitted, that omission MUST be recorded explicitly as an evidence-format deviation (do not treat omission as “implicitly empty”).
 
 These rails apply to any document that defines **stepwise QA execution**, including:
@@ -3359,6 +3430,18 @@ Binary means: If a required deliverable is missing, the check is mechanically in
 
 * Reviewers MUST evaluate step completeness against the step’s stated Deliverables and PASS or FAIL rules, not against every incidental artifact mentioned inside example commands or source excerpts.
 
+**Plan-level intended-token rosters vs step-local proof obligations.**
+
+* A Runbook Check Matrix or similar plan-level intended-token roster MAY list intended tokens for a step without making token-by-token proof lines mandatory in the step report.
+
+* When a step’s Deliverables list and PASS or FAIL criteria are deliverable-based, reviewers MUST judge the step using those step-local obligations and the governed step evidence actually captured for that step.
+
+* In that posture, the absence of token-by-token proof lines in the step report is a documentation clarity issue and is non-blocking.
+
+* If the step report or the step’s PASS or FAIL criteria explicitly require token-by-token proof lines, those lines become required evidence for that step.
+
+* This rule does not relax the governed `intended_tokens` and `claimed_tokens` alignment rules for step records.
+
 **Conditional deliverables and branch-specific evidence.**
 
 * A Live QA plan MAY declare a deliverable as conditional only when the triggering condition is named explicitly in the step.
@@ -3407,6 +3490,8 @@ Binary means: If a required deliverable is missing, the check is mechanically in
 
 * **Step-log header writer env exports (per-check; required when used).** If a Live QA plan uses a step-log header writer that reads per-check metadata from environment variables, the plan MUST export the complete required set immediately before header generation for each check and MUST NOT rely on prior step state.  
   * Minimum per-check exports (names must match the header writer contract): `CHECK_ID`, `CHECK_NAME`, `PASS_FAIL`, `COMMANDS_JSON`, `ARTIFACTS_JSON`, `PF_REFS_JSON`.  
+  * Command-sequence fidelity. If a check executes multiple commands, the governed step record MUST preserve the exact ordered multi-command sequence that was actually run. When represented in a single field, the sequence MUST be captured as an explicit pipeline or explicit joined sequence that preserves execution order. Paraphrased command summaries are non-conforming.  
+  * Command provenance vocabulary. If a governed step record includes a command provenance value, it MUST use one of: Codex prompt, Copy/paste from plan, or Explicitly created.  
   * Artifact self-listing invariant: when `PASS_FAIL` is `PASS`, `ARTIFACTS_JSON` MUST include the on-disk path to that check's `primary.log` under the audit roots. If missing, treat as an evidence-schema defect and remediate via the allowed Moon Loop header regeneration before asserting `PASS`.  
   * If the defect is discovered mid-run (for example a check already executed but `primary.log` is missing the canonical header or has the wrong check ID), a Moon Loop deviation is allowed to export the required header vars for that check, regenerate the JSON header, and reassemble `primary.log` by prepending the corrected header while preserving the existing body verbatim.  
   * Record the deviation as evidence-capture only. Do not modify product behavior, test assertions, or acceptance criteria to compensate for missing header metadata.  
@@ -3471,38 +3556,28 @@ A Blocker is only an issue that prevents the operator from executing the plan in
 
 A plan MUST be rejected (and returned for revision) if any of the following hold:
 
-* required operator inputs are missing from the plan header (see §9.8.1)
-
-* pass/fail criteria are missing or not checkable from Deliverables
-
-* the Deliverables list is missing required evidence paths or uses vague artifact language
-
-* the plan contains prohibited truncation markers or prohibited characters (see §9.7.4), including the Unicode ellipsis character (U+2026) and three consecutive U+002E FULL STOP characters
-
+* required operator inputs are missing from the plan header (see §9.8.1)  
+* pass/fail criteria are missing or not checkable from Deliverables  
+* the Deliverables list is missing required evidence paths or uses vague artifact language  
+* the plan contains prohibited truncation markers or prohibited characters (see §9.7.4), including the Unicode ellipsis character (U+2026) and three consecutive U+002E FULL STOP characters  
 * the plan uses fenced code blocks anywhere (planning documents, reviews, or plan-derived excerpts)  
 * the plan introduces `run_id` or `RUN_ID` as a required input, step header field, evidence selector, acceptance key, per-run directory discriminator, or operator-set per-run evidence root, or otherwise introduces per-run directory nesting, timestamped run directories, or any “fresh directory for this run” posture for Live QA evidence  
 * the plan introduces or depends on unapproved environment variable names as required inputs, required evidence schema keys, or required step-log header writer inputs (including any `MODO_*` name). Environment variable names are governed interface. A plan MUST NOT mint new environment variable names during Live QA or Moon Loop. If a new env var is required, treat it as a development change and revise the plan only after the variable is canon-approved.  
   * Legacy exception (HDE-EPIC025 only): the already-approved HDE-EPIC025 Live QA Plan contains inert `MODO_*` placeholders. They MUST NOT be required for PASS/FAIL, treated as required evidence schema keys, or used as proof of rails posture or execution configuration. They MUST be removed from the plan/template at the next revision. This exception MUST NOT be replicated.  
-* commands are semantically ambiguous (cannot be tied to a real baseline tool \+ a repo-proven locus) or are unsafe/destructive without an explicit authorized token
-
-* the plan relies on unproven repo file paths (not present in repo; see §9.7.9) or names an invented endpoint route
-
-* the plan proposes VCS workflow as a QA step (branch/commit/PR chatter)
-
-* the plan includes paths that are neither known canon roots nor explicitly QA-created evidence outputs with creation instructions \+ purpose \+ pass/fail (see §9.7.9)
-
+* commands are semantically ambiguous (cannot be tied to a real baseline tool \+ a repo-proven locus) or are unsafe/destructive without an explicit authorized token  
+* the plan relies on unproven repo file paths (not present in repo; see §9.7.9) or names an invented endpoint route  
+* the plan proposes VCS workflow as a QA step (branch/commit/PR chatter)  
+* the plan includes paths that are neither known canon roots nor explicitly QA-created evidence outputs with creation instructions \+ purpose \+ pass/fail (see §9.7.9)  
 * the plan requires forbidden rails behavior (for example secrets-in-logs) or violates SAFE rails posture
 
-* omission of the Doc-Delta capture deliverable required by §9.8.2 (when applicable)
-
+* omission of the Doc-Delta capture deliverable required by §9.8.2 (when applicable)  
 * the plan depends on a helper/wrapper script or harness as a required step entrypoint unless the script is repo-proven and explicitly named in the plan; plans MUST NOT instruct writing a new repo script during QA execution
 
 **Formatting is not an approval gate, except for explicit prohibitions.**
 
 Reviewers MUST NOT block approval based on line wrapping, indentation, bullet styling, or whitespace-only issues, as long as command identity, loci, and pass/fail are clear. The explicit formatting prohibitions are:
 
-* prohibited characters that signal truncation or corruption (see §9.7.4)
-
+* prohibited characters that signal truncation or corruption (see §9.7.4)  
 * fenced code blocks (prohibited)
 
 Everything else is a Caveat. Caveats must be recorded in the plan header or the step log (as applicable), but do not block approval.
@@ -3667,6 +3742,18 @@ If any template/checklist/process language causes non-execution issues to be tre
 ## 10.3 Writers and errors \[Required-Now\]
 
  **Purpose (normative).** Govern headers and body shape for writer and error responses. Governance rules live here; transport bytes live by title in **HDE-CLI-API-Vendor-Ref**. Writers/errors are **no-store** and **not** part of A7 success proofs.
+
+**Acceptance-bound writer proof families (normative).**
+
+* When writer-surface completion is claimed for acceptance, the governed proof family MAY include writer envelope proof, writer idempotence proof, write and readback parity proof, writer evidence-indexing proof, and explicit confirmation that writer surfaces remain outside A7 success proofs.
+
+* Any writer proof generator or harness MUST NOT silently force open rails. If open rails are required for a writer proof path, they MUST be supplied explicitly by the caller and treated as part of the declared proof posture for that run.
+
+* Any writer proof generator or harness MUST pin every environment field that can influence emitted writer bytes. Omitting byte-affecting env fields is non-conforming.
+
+* Writer-surface proof generation MUST NOT widen the writer contract or widen the A7 proof surface. A writer proof path may validate writer behavior, but it does not convert writer surfaces into A7 success routes.
+
+* When writer evidence-indexing proof is part of acceptance, the writer proof family and its governed index or path-proof companions MUST remain internally coherent as one acceptance-bound evidence family.
 
 ### **Headers — required**
 

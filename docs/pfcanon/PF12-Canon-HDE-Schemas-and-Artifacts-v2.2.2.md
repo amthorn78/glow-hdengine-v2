@@ -4,13 +4,13 @@
 
 **Title:** PF12-Canon-HDE-Schemas-and-Artifacts
 
-**Version:** v2.1.4
+**Version:** v2.2.2
 
 **Status:** Canon
 
-**Effective date:** 2026-03-08
+**Effective date:** 2026-03-23
 
-**Last Update Gate:** BN 10.0.5 Drain A32-33
+**Last Update Gate:** BN 10.1.4 Drain A22-24
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -241,6 +241,8 @@ Governed records-only artifacts in §8, including (titles/paths only):
 * Reader A7 composite proof JSON: artifacts/proofs/reader\_success\_get\_head\_304.json.  
 * Dev connectivity snapshot: artifacts/runtime/env\_connectivity.snapshot.json.  
 * CLI parity artifacts: artifacts/cli/ab.json, artifacts/cli/ba.json, artifacts/cli/summary.json.  
+* CLI help artifacts: artifacts/cli/help/hdctl\_help.txt, artifacts/cli/help/showcompat\_help.txt, artifacts/cli/help/reject\_nonjson.txt.  
+* CLI installability artifacts: artifacts/cli/install/entrypoints.txt, artifacts/cli/install/installability\_summary.json.  
 * /internal/version ops proofs (headers/body snapshots) as enumerated in §8.6.  
 * Registry report, DB fingerprint, start-command capture, environment inventories and validator outputs (names as in §8.6).  
 * BodyGraph release bindings: artifacts/bodygraph/release\_bindings.json.  
@@ -602,7 +604,11 @@ The close-pack baseline artifacts MUST be located under audit/ using the EPIC-\#
 
 * audit/EPIC-\#\#\#\_close\_report.md
 
+* audit/EPIC-\#\#\#\_close\_report.md.path\_proof.txt
+
 * audit/EPIC-\#\#\#\_MANIFEST.json
+
+* audit/EPIC-\#\#\#\_MANIFEST.json.path\_proof.txt
 
 * audit/EPIC-\#\#\#\_QA\_RCA.md
 
@@ -711,6 +717,39 @@ EPIC-025 binding authority note.
 
 * The authoritative binding set for EPIC-025 is recorded in `audit/EPIC-025_MANIFEST.json`.  
 * For EPIC-025, the close-pack manifest’s `key_outputs` map is the primary binding index for closure artifacts (what ships) and their evidence locations (where the evidence lives).
+
+EPIC-027 binding authority note.
+
+* The authoritative binding set for EPIC-027 is recorded in `audit/EPIC-027_MANIFEST.json`.
+
+* For EPIC-027, the close-pack manifest’s `key_outputs` map is the primary binding index for closure artifacts, their canonical paths-of-record, and the canonical EPIC027 QA root linkage.
+
+* For EPIC-027, `key_outputs` MUST include at least these keys and exact values:
+
+  * `acceptance_map`: `docs/acceptance_map_epic027.json`
+
+  * `token_matrix`: `audit/qa/hde-epic027/token_evidence_matrix.md`
+
+  * `acceptance_map_viability`: `audit/qa/hde-epic027/acceptance_map_viability.log`
+
+  * `qa_step_manifest`: `audit/qa/hde-epic027/qa_step_logs_manifest.json`
+
+  * `close_report`: `audit/EPIC-027_close_report.md`
+
+  * `close_manifest`: `audit/EPIC-027_MANIFEST.json`
+
+* For EPIC-027, the `qa_step_manifest` binding is closure-required and MUST identify the governed QA-root manifest at `audit/qa/hde-epic027/qa_step_logs_manifest.json`, not merely an unbound file present on disk.  
+* For EPIC-027, the token matrix is the governed ledger that binds the EPIC027 acceptance roster to the reused D1, D3, and D4 evidence families and to the relevant EPIC027 QA-root step logs.
+
+* For EPIC-027, the acceptance-map viability log is the governed viability ledger for the EPIC027 acceptance map and token matrix.
+
+* The Machine Evidence Mirror bindings for the EPIC027 close-pack acceptance-ledger family are:  
+  * `epic027.acceptance_map` — `docs/acceptance_map_epic027.json`  
+  * `epic027.token_matrix` — `audit/qa/hde-epic027/token_evidence_matrix.md`  
+  * `epic027.acceptance_map_viability` — `audit/qa/hde-epic027/acceptance_map_viability.log`  
+  * `epic027.qa_step_logs_manifest` — `audit/qa/hde-epic027/qa_step_logs_manifest.json`  
+  * `epic027.close_report` — `audit/EPIC-027_close_report.md`  
+  * `epic027.manifest` — `audit/EPIC-027_MANIFEST.json`
 
 Titles-only routing rule
 
@@ -3899,9 +3938,13 @@ Evidence index mirror (machine-readable):
 
 * artifacts/evidence\_index.jsonl
 
+* artifacts/evidence\_index.jsonl.sha256
+
 * artifacts/evidence\_index.jsonl.path\_proof.txt
 
-Plans and tasks that touch any file above MUST treat the sibling .path\_proof.txt as a first-class deliverable. If a plan proposes a new file under governed roots, it MUST state whether the file is intended to appear in the indices/mirror; absence of that statement is a mechanical blocker.
+* artifacts/evidence\_index.jsonl.sha256.path\_proof.txt
+
+Plans and tasks that touch any file above MUST treat the mirror checksum sidecar and both sibling .path\_proof.txt transcripts as first-class deliverables. If a plan proposes a new file under governed roots, it MUST state whether the file is intended to appear in the indices/mirror; absence of that statement is a mechanical blocker.
 
 Evidence-output naming discipline (plans and token claims; normative).
 
@@ -3947,701 +3990,581 @@ In any PR that changes governed evidence artifacts or their indexing, you MUST u
 
 * artifacts/evidence\_index.jsonl (Machine Evidence Mirror)
 
+* artifacts/evidence\_index.jsonl.sha256 (Machine Evidence Mirror checksum sidecar)
+
+* The governed sibling \*.path\_proof.txt transcripts for every changed index/mirror file above
+
 And you MUST assert the mirror/index tokens named in §8.3 (for example, EVIDENCE\_INDEX\_UPDATED\_OK, EVIDENCE\_INDEX\_HASH\_OK, EVIDENCE\_INDEX\_MIRROR\_OK, EVIDENCE\_PATHS\_VALIDATED\_OK, etc.) on every change.
 
 ### **8.6.3 Entries (authoritative list; titles/paths only)**
 
-Note (normative). The Evidence Catalog is intentionally multi-root: governed evidence artifacts are expected to exist under multiple repo roots (for example, audit/, artifacts/, docs/, catalog/, narratives/). In evidence terms, the “single-home” constraint means PF12 is the single authoritative home for evidence family naming and canonical path bindings, plus the Index and Mirror discipline that binds those paths (Human Evidence Index \+ Machine Evidence Mirror). It does not mean evidence must live under a single directory.
+Note (normative). The Evidence Catalog is intentionally multi-root: governed evidence artifacts are expected to exist under multiple repo roots, for example audit/, artifacts/, docs/, catalog/, and narratives/. In evidence terms, the single-home constraint means PF12 is the single authoritative home for evidence family naming, canonical path bindings, and the Index and Mirror discipline that binds those paths. It does not mean evidence must live under a single directory.
 
-Multi-root storage is not, by itself, evidence drift. Drift occurs when a root or artifact is treated as governed evidence or a “truth home” output but is not cataloged here and is not indexed and mirrored with exactly one governed \*.path\_proof.txt transcript.
+Multi-root storage is not, by itself, evidence drift. Drift occurs when a root or artifact is treated as governed evidence or a truth-home output but is not cataloged here and is not indexed and mirrored with exactly one governed \*.path\_proof.txt transcript.
 
-Classification note (normative). If any additional top-level root is treated as governed evidence (for example, scripts/, tools/), its evidence outputs MUST either:
+Classification note (normative). If any additional top-level root is treated as governed evidence, for example scripts/ or tools/, its evidence outputs MUST either:
 
-* be cataloged in §8.6 as explicit evidence families (titles and canonical paths) and indexed and mirrored per §8.3, or
+* be cataloged in §8.6 as explicit evidence families with titles and canonical paths, and indexed and mirrored per §8.3, or  
+* be treated as non-governed tooling outputs and excluded from truth-home claims, meaning not indexed, not mirrored, and not accepted as evidence.
 
-* be treated as non-governed tooling outputs and excluded from “truth home” claims (not indexed, not mirrored, not accepted as evidence).
+Observed multi-root distribution across existing governed roots does not, by itself, expand the Evidence Catalog or create a new governed root.
 
-Human Index entries are titles/paths only. Machine Mirror records include at least artifact\_key, role, sha256, size\_bytes, produced\_at\_utc, discovered\_physical\_path, and proof\_anchor. Every artifact listed below MUST have exactly one Human Index entry and one Machine Mirror record, plus exactly one governed \*.path\_proof.txt transcript, all kept in lockstep.
+Revisit evidence-root classification or root-proliferation only when future work proposes either:
 
-#### **Freeze-pack and math**
+* a new governed root, or  
+* a second truth home for an existing governed evidence family.
 
-* artifacts/math/freeze\_pack\_manifest.json
+Absent one of those proposals, observed multi-root distribution is handled under the classification rule above and is not, by itself, a canon-change trigger.
 
-* artifacts/math/release\_id.txt
+Human Index entries are titles and paths only. Machine Mirror records include at least artifact\_key, role, sha256, size\_bytes, produced\_at\_utc, discovered\_physical\_path, and proof\_anchor. Unless a family-specific note narrows the rule, every artifact listed below MUST have exactly one Human Index entry, one Machine Mirror record, and one governed sibling \*.path\_proof.txt transcript, all kept in lockstep.
 
-* artifacts/math/release\_id\_recompute.log
+#### **A. Core pack, canonical JSON, topology, and deterministic order**
 
-* artifacts/math/checksums\_audit.log
+##### **Freeze-pack and math**
 
+* artifacts/math/freeze\_pack\_manifest.json  
+* artifacts/math/release\_id.txt  
+* artifacts/math/release\_id\_recompute.log  
+* artifacts/math/checksums\_audit.log  
 * artifacts/math/manifest\_snapshot.json
 
-  #### **Canonical JSON and topology**
+  ##### **Canonical JSON and topology**
 
-* artifacts/canonical/arrays\_as\_sets\_report.log
-
-* audit/gates/json\_gate/canonical/json\_gate\_check\_log.ndjson
-
-* audit/gates/json\_gate/canonical/json\_gate\_compare\_log.ndjson
-
-* audit/gates/json\_gate/canonical/json\_gate\_structured\_record.json (optional)
-
+* artifacts/canonical/arrays\_as\_sets\_report.log  
+* audit/gates/json\_gate/canonical/json\_gate\_check\_log.ndjson  
+* audit/gates/json\_gate/canonical/json\_gate\_compare\_log.ndjson  
+* audit/gates/json\_gate/canonical/json\_gate\_structured\_record.json (optional)  
 * artifacts/topology/topology\_coherence.log
 
-  #### **Evidence Index snapshot (gate family)**
+  ##### **Evidence Index snapshot (gate family)**
 
 * audit/gates/evidence\_index\_snapshot/evidence\_index\_snapshot.json
 
-  #### **Topology orientation demo**
+  ##### **Topology orientation demo**
 
-* audit/gates/topology/orientation\_demo.txt
-
-* audit/gates/topology/degree\_check.log
-
+* audit/gates/topology/orientation\_demo.txt  
+* audit/gates/topology/degree\_check.log  
 * audit/gates/topology/multiplicity\_vector.log
 
-Each artifact above MUST have a co-located sibling path-proof transcript named \<artifact\>.path\_proof.txt (example: audit/gates/topology/orientation\_demo.txt.path\_proof.txt).
+Each artifact above MUST have a co-located sibling path-proof transcript named .path\_proof.txt, for example audit/gates/topology/orientation\_demo.txt.path\_proof.txt.
 
 Canonical predicate targets (D16) are audit/gates/topology/orientation\_demo.txt and audit/gates/topology/orientation\_demo.txt.path\_proof.txt.
 
-These artifacts form the topology.orientation\_demo family and serve as the exemplar for path-proof validation and topology invariants; each MUST be indexed in both the Human Evidence Index and the Machine Evidence Mirror with matching path-proofs.
+These artifacts form the topology.orientation\_demo family and serve as the exemplar for path-proof validation and topology invariants. Each MUST be indexed in both the Human Evidence Index and the Machine Evidence Mirror with matching path-proofs.
 
-#### **Deterministic order & comparators \[Required-Now\]**
+##### **Deterministic order and comparators \[Required-Now\]**
 
-* artifacts/engine/order/props\_total\_order.log: Log of ordering properties and invariants (antisymmetry, transitivity, totality) for the canonical comparators.
+* artifacts/engine/order/props\_total\_order.log: log of ordering properties and invariants, including antisymmetry, transitivity, and totality, for the canonical comparators.  
+* artifacts/engine/order/channels\_sorted.snapshot.json: canonical JSON snapshot of channels in comparator order.  
+* artifacts/engine/order/categories\_iter.snapshot.json: canonical JSON snapshot of categories in comparator order.  
+* artifacts/engine/order/abba\_identity.bytes: binary AB↔BA identity sample for comparator behavior, governed by the same Mirror and path-proof discipline as other artifacts in this section, including abba\_identity.bytes.path\_proof.txt.
 
-* artifacts/engine/order/channels\_sorted.snapshot.json: Canonical JSON snapshot of channels in comparator order.
+  #### **B. Reader, CLI, compat, and conjunction evidence**
 
-* artifacts/engine/order/categories\_iter.snapshot.json: Canonical JSON snapshot of categories in comparator order.
+  ##### **Endpoint Catalog and A7 proofs**
 
-* artifacts/engine/order/abba\_identity.bytes: Binary AB↔BA identity sample for comparator behavior, governed by the same Mirror and path-proof discipline (abba\_identity.bytes.path\_proof.txt) as other artifacts in this section.
+* artifacts/reader/endpoints\_snapshot.json  
+* artifacts/proofs/endpoints\_env\_gate\_proof.log  
+* artifacts/proofs/success\_get.txt  
+* artifacts/proofs/success\_head.txt  
+* artifacts/proofs/success\_304.txt  
+* artifacts/proofs/success\_writers\_errors.txt  
+* artifacts/proofs/encoding\_invariance.txt (optional)  
+* artifacts/proofs/reader\_success\_get\_head\_304.json: composite proof; schema owned by the Endpoint Catalog evidence section (§8.12).
 
-  #### **Endpoint Catalog and A7 proofs**
+  ##### **Aux Narrative (text) — header snapshots**
 
-* artifacts/reader/endpoints\_snapshot.json
-
-* artifacts/proofs/endpoints\_env\_gate\_proof.log
-
-* artifacts/proofs/success\_get.txt
-
-* artifacts/proofs/success\_head.txt
-
-* artifacts/proofs/success\_304.txt
-
-* artifacts/proofs/success\_writers\_errors.txt
-
-* artifacts/proofs/encoding\_invariance.txt (optional)
-
-* artifacts/proofs/reader\_success\_get\_head\_304.json: Composite proof; schema owned by the Endpoint Catalog evidence section (§8.12).
-
-  #### **Aux Narrative (text) — header snapshots**
-
-* tests/transport/headers/aux\_text\_200.snap
-
+* tests/transport/headers/aux\_text\_200.snap  
 * tests/transport/headers/aux\_suppression\_200.snap
 
-  #### **CLI Admin Preview (narrative) — evidence**
+  ##### **CLI Admin Preview (narrative) — evidence**
 
-* artifacts/cli/narrative/stdout.txt: LF-terminated narrative text; no ANSI.
+* artifacts/cli/narrative/stdout.txt: LF-terminated narrative text; no ANSI.  
+* artifacts/cli/narrative/sidecar.json: IDs-only payload with composition\_id, fragment\_ids\[\], pack\_sha, and optional release\_id; canonical JSON.
 
-* artifacts/cli/narrative/sidecar.json: IDs-only: composition\_id, fragment\_ids\[\], pack\_sha, optional release\_id; canonical JSON.
+  ##### **Conjunction writer evidence (EPIC027)**
 
-  #### **CLI showcompat (deterministic capture) — evidence (EPIC022 D2)**
+Purpose. Govern the explicit conjunction writer proof artifacts for the existing /dev/writer/conjunction proof path without turning that writer proof path into an A7 proof family.
 
-* artifacts/cli/showcompat/stdout.json: Deterministic capture of hdctl showcompat stdout bytes (LF-terminated; success has empty stderr; emitted via canonical serializer as required by CLI evidence posture).
+Artifact paths.
 
-* artifacts/cli/showcompat/stdout.json.sha256: SHA-256 sidecar for stdout.json capture bytes.
+* artifacts/writer/conjunction\_write\_readback.log  
+* artifacts/writer/conjunction\_writer\_summary.json
 
-* artifacts/cli/showcompat/stdout.sha256: Allowed legacy alias of stdout.json.sha256 (EPIC022 D2). Evidence wiring MUST normalize this alias to stdout.json.sha256; new producers MUST NOT emit stdout.sha256. If both are present they MUST match.
+Artifact-key bindings.
 
-* artifacts/cli/showcompat/args.json: Names-only arguments/env snapshot used for deterministic capture (no secrets; canonical JSON).
+* conjunction.writer.write\_readback — artifacts/writer/conjunction\_write\_readback.log  
+* conjunction.writer.summary — artifacts/writer/conjunction\_writer\_summary.json
 
-* tools/cli/generate\_showcompat\_artifacts.py: Deterministic producer tool used to generate the EPIC022 D2 showcompat capture artifacts under closed rails.
+Path-proofs and indexing.
+
+* Each artifact above MUST have a sibling .path\_proof.txt transcript stored alongside the artifact.  
+* The Human Evidence Index and the Machine Evidence Mirror MUST each carry exactly one binding for each artifact path above under the normal PF12 parity rules.  
+* The corresponding Mirror records MUST use the artifact\_key bindings above and MUST set proof\_anchor to the sibling .path\_proof.txt transcript for that artifact.  
+* For EPIC-027, close-pack claims about executed closure workflow are governed truthfulness claims.  
+* If the EPIC027 close report, manifest, or generator output says that same-run evidence-refresh or validation lanes ran, that claim MUST be backed by same-run QA gate logs under the EPIC027 QA root.  
+* The current EPIC027 truthfulness-anchor log set is:  
+  * `audit/qa/hde-epic027/checks/gate_update_evidence_index_write/primary.log`
+
+  * `audit/qa/hde-epic027/checks/gate_update_evidence_index_check/primary.log`
+
+  * `audit/qa/hde-epic027/checks/gate_mirror_schema/primary.log`
+
+  * `audit/qa/hde-epic027/checks/gate_evidence_paths_validation/primary.log`
+
+  * `audit/qa/hde-epic027/checks/gate_lf_endings/primary.log`
+
+  * `audit/qa/hde-epic027/checks/gate_orientation_demo_write/primary.log`
+
+  * `audit/qa/hde-`  
+* The EPIC027 token matrix and close-pack bindings MUST treat the relevant log paths above as the backing execution anchors when they claim the corresponding closure lanes ran.
+
+Chronology posture.
+
+* When this family changes, the writer artifacts, their sibling path-proofs, and any changed index or mirror companion proofs MUST be refreshed with current chronology under the existing PF12 mtime\_utc and produced\_at\_utc integrity rules.
+
+  ##### **CLI showcompat (deterministic capture) — evidence (EPIC022 D2)**
+
+* artifacts/cli/showcompat/stdout.json: deterministic capture of hdctl showcompat stdout bytes; LF-terminated; success has empty stderr; emitted via the canonical serializer required by CLI evidence posture.  
+* artifacts/cli/showcompat/stdout.json.sha256: SHA-256 sidecar for stdout.json capture bytes.  
+* artifacts/cli/showcompat/stdout.sha256: allowed legacy alias of stdout.json.sha256 for EPIC022 D2. Evidence wiring MUST normalize this alias to stdout.json.sha256. New producers MUST NOT emit stdout.sha256. If both are present they MUST match.  
+* artifacts/cli/showcompat/args.json: names-only arguments and environment snapshot used for deterministic capture; no secrets; canonical JSON.  
+* tools/cli/generate\_showcompat\_artifacts.py: deterministic producer tool used to generate the EPIC022 D2 showcompat capture artifacts under closed rails.
 
 Functional showcompat QA posture (vendor dependency; current limitation).
 
-* The deterministic showcompat capture artifacts above are byte-determinism evidence and do not imply that functional showcompat runs can be executed under closed rails.
+* The deterministic showcompat capture artifacts above are byte-determinism evidence and do not imply that functional showcompat runs can be executed under closed rails.  
+* Until BodyGraph storage or replay exists for QA, functional showcompat runs cannot rely on precomputed BodyGraph inputs being available locally.  
+* Any Live QA step that executes showcompat in a context where BodyGraph data is not already available MUST run that step with vendor rails open. Closed rails, meaning network disabled, MUST be treated as an expected blocker for functional showcompat runs under this limitation.  
+* The rails change MUST be explicit and step-scoped. After the showcompat step, restore the default rails posture.  
+* showcompat MUST NOT be executed as a zero-argument command in QA plans or QA runs. The authoritative command and argument contract is owned by HDE-CLI-API-Vendor-Ref.  
+* If showcompat is attempted under closed rails or without required arguments, classify the outcome as a tooling, environment, or usage defect for that step, not a product behavior failure. Record the rails posture used, names-only, and the failure signature in the step log.
 
-* Until BodyGraph storage or replay exists for QA, functional showcompat runs cannot rely on precomputed BodyGraph inputs being available locally.
+  ##### **Compat closure artifacts**
 
-* Any Live QA step that executes showcompat in a context where BodyGraph data is not already available MUST run that step with vendor rails open (open network rails). Closed rails (network disabled) MUST be treated as an expected blocker for functional showcompat runs under this limitation.
+* artifacts/compat/identity\_hash.txt: primary governed compat-closure artifact for explicit conjunction identity-hash capture. Its bytes MUST match the canonical AB compat bytes for the same pair.
 
-* The rails change MUST be explicit and step-scoped. After the showcompat step, restore the default rails posture.
+Family-scoped compat closure checks MAY target this artifact directly when a compat-only slice is being validated, but those targeted checks MUST NOT narrow or replace same-PR updates and validations for docs/evidence/INDEX.json, docs/evidence/INDEX.sha256, artifacts/evidence\_index.jsonl, artifacts/evidence\_index.jsonl.sha256, or the governed sibling .path\_proof.txt transcripts required elsewhere in PF12 when governed evidence bytes change.
 
-* showcompat MUST NOT be executed as a zero-argument command in QA plans or QA runs. The authoritative command or argument contract is owned by HDE-CLI-API-Vendor-Ref.
+##### **Showcompat artifacts (EPIC024 D03)**
 
-* If showcompat is attempted under closed rails or without required arguments, classify the outcome as a tooling/environment or usage defect for that step, not a product behavior failure. Record the rails posture used (names-only) and the failure signature in the step log.
+* artifacts/showcompat/epic024/showcompat\_manifest.json: deterministic showcompat manifest for EPIC024, produced by the D03 runner.  
+* artifacts/showcompat/epic024/showcompat\_symbols.json: deterministic showcompat symbols table for EPIC024, produced by the D03 runner.  
+* tools/evidence/run\_showcompat\_artifacts.py: EPIC024 D03 showcompat runner, wrapper around scripts/hdctl.py showcompat.
 
-  #### **Showcompat artifacts (EPIC024 D03)**
+  ##### **Sampler evidence (EPIC024 D04)**
 
-* artifacts/showcompat/epic024/showcompat\_manifest.json: Deterministic showcompat manifest for EPIC024 (artifacts output of the D03 runner).
+* artifacts/sampler/epic024/sampler\_evidence.json: EPIC024 D04 sampler evidence summary artifact, meta-evidence over sampler families.  
+* artifacts/sampler/epic024/manifest.json: EPIC024 D04 sampler evidence manifest with pointers and metadata for sampler\_evidence.json.  
+* tools/evidence/run\_sampler\_evidence.py: EPIC024 D04 sampler evidence runner that produces sampler\_evidence.json and manifest.json.
 
-* artifacts/showcompat/epic024/showcompat\_symbols.json: Deterministic showcompat symbols table for EPIC024 (artifacts output of the D03 runner).
+  ##### **CLI guardrail artifacts (EPIC024 D08)**
 
-* tools/evidence/run\_showcompat\_artifacts.py: EPIC024 D03 showcompat runner (wrapper around scripts/hdctl.py showcompat).
+* artifacts/cli/guards/serializer\_grep\_guard.log: serializer grep guard output log for the CLI serialization guardrail.  
+* tools/cli/serializer\_grep\_guard.py: serializer grep guard producer tool that generates serializer\_grep\_guard.log.
 
-#### **Sampler evidence (EPIC024 D04)**
+  #### **C. Gates, runtime, DB, and ops evidence**
 
-* artifacts/sampler/epic024/sampler\_evidence.json: EPIC024 D04 sampler evidence summary artifact (meta-evidence over sampler families).
-
-* artifacts/sampler/epic024/manifest.json: EPIC024 D04 sampler evidence manifest (pointers \+ metadata for sampler\_evidence.json).
-
-* tools/evidence/run\_sampler\_evidence.py: EPIC024 D04 sampler evidence runner (produces sampler\_evidence.json and manifest.json).
-
-#### **CLI guardrail artifacts (EPIC024 D08)**
-
-* artifacts/cli/guards/serializer\_grep\_guard.log: Serializer grep guard output log (CLI serialization guardrail).
-
-* tools/cli/serializer\_grep\_guard.py: Serializer grep guard producer tool (generates serializer\_grep\_guard.log).
-
-  #### **Narratives coverage (router)**
+  ##### **Narratives coverage (router)**
 
 * audit/gates/narratives/keys\_10x4.table.json
 
-  #### **Determinism env pins (gate)**
+  ##### **Determinism env pins (gate)**
 
-* audit/gates/determinism/env\_pins.log: Determinism env pins gate output (structured log; current-state schema: `determinism_env_pins.v1`).
+* audit/gates/determinism/env\_pins.log: determinism env pins gate output; structured log; current-state schema determinism\_env\_pins.v1.  
+* tools/evidence/run\_env\_pins\_gate.py: determinism env pins gate runner, wrapping ci/checks/check\_env\_pins.sh with proper environment setup.
 
-* tools/evidence/run\_env\_pins\_gate.py: Determinism env pins gate runner (wraps ci/checks/check\_env\_pins.sh with proper environment setup).
+  ##### **Sanity pipeline (gate)**
 
-#### **Sanity pipeline (gate)**
+* audit/gates/sanity\_pipeline/sanity\_pipeline.log: sanity pipeline gate stable log; single canonical evidence surface.  
+* tools/evidence/run\_sanity\_pipeline.py: sanity pipeline runner that produces sanity\_pipeline.log.  
+* tools/evidence/run\_sanity\_pipeline\_gate.py: sanity pipeline gate wrapper; gate-style invocation entrypoint.
 
-* audit/gates/sanity\_pipeline/sanity\_pipeline.log: Sanity pipeline gate stable log (single canonical evidence surface).
+  ##### **Rails proofs (ops)**
 
-* tools/evidence/run\_sanity\_pipeline.py: Sanity pipeline runner (produces sanity\_pipeline.log).
-
-* tools/evidence/run\_sanity\_pipeline\_gate.py: Sanity pipeline gate wrapper (gate-style invocation entrypoint).
-
-  #### **Rails proofs (ops)**
-
-* artifacts/proofs/ops\_refusal\_proof.txt: Single-file refusal (headers → blank line → LF-terminated JSON).
-
-* Record type: ops\_refusal\_proof; policy and tokens are owned by HDE-Governance (titles-only).
-
-* ci/jobs/logs\_keys\_only\_redaction.yml
-
+* artifacts/proofs/ops\_refusal\_proof.txt: single-file refusal proof with headers, then a blank line, then LF-terminated JSON.  
+* Record type: ops\_refusal\_proof. Policy and tokens are owned by HDE-Governance.  
+* ci/jobs/logs\_keys\_only\_redaction.yml  
 * ci/jobs/rails\_open\_conformance.yml
 
-  #### **DB posture and runtime**
+  ##### **DB posture and runtime**
 
-* artifacts/db/ddl\_fingerprint.json
-
-* artifacts/db/grants.txt
-
-* artifacts/db/check\_schema.txt
-
-* artifacts/db/check\_constraints.txt
-
-* artifacts/db/partition\_plan.txt
-
+* artifacts/db/ddl\_fingerprint.json  
+* artifacts/db/grants.txt  
+* artifacts/db/check\_schema.txt  
+* artifacts/db/check\_constraints.txt  
+* artifacts/db/partition\_plan.txt  
 * artifacts/db/db\_rw\_smoke.log (optional)
 
-  #### **Runtime / env**
+  ##### **Runtime and environment**
 
-* artifacts/runtime/env\_matrix.snapshot.json: Singleton snapshot (schema\_version: 3); default rails and determinism pins; presence booleans for DB/bridge/guard. Schema owned by §8.3.2; tokens by title in Governance.
+* artifacts/runtime/env\_matrix.snapshot.json: singleton snapshot with schema\_version: 3, default rails and determinism pins, and presence booleans for DB, bridge, and guard. Schema is owned by §8.3.2; tokens are routed by title to Governance.  
+* artifacts/runtime/env\_connectivity.snapshot.json: dev resolver snapshot that records attempts and selected source on fallback.
 
-* artifacts/runtime/env\_connectivity.snapshot.json: Dev resolver snapshot; records attempts and selected source on fallback.
+  ##### **Ops and refusal (closed-rails)**
 
-  #### **Ops / refusal (closed-rails)**
+* artifacts/proofs/ops\_refusal\_proof.txt: same governed artifact as above, viewed here specifically as the closed-rails refusal proof. It carries headers, then a blank line, then LF-terminated JSON. Policy and tokens are routed by title to Governance.
 
-* artifacts/proofs/ops\_refusal\_proof.txt: Same governed artifact as above, viewed here specifically as the closed-rails refusal proof (headers → blank line → LF-terminated JSON). Policy and tokens by title in Governance.
+  #### **D. Internal-ops surface — /internal/version identity artifacts (INTVER\_\*)**
 
-  #### **Internal-ops surface — /internal/version identity artifacts (INTVER\_\*)**
-
-These entries register the /internal/version identity artifacts required by Governance as governed Evidence Catalog families. /internal/version is an ops-only identity surface (non-A7); PF12 records its evidence artifacts, artifact\_keys, and Index/Mirror discipline, while transport bytes and token semantics remain in HDE-Governance and HDE-CLI-API-Vendor-Ref by title.
+These entries register the /internal/version identity artifacts required by Governance as governed Evidence Catalog families. /internal/version is an ops-only identity surface, non-A7. PF12 records its evidence artifacts, artifact\_keys, and Index/Mirror discipline, while transport bytes and token semantics remain in HDE-Governance and HDE-CLI-API-Vendor-Ref by title.
 
 ##### **Auth posture (not canonized; discovery evidence required)**
 
-PF-Canon defines the /internal/version transport/content contract and its governed identity artifacts, but does not canonize the auth posture (public vs operator-network gated vs auth-header required) or the expected failure mode when access is missing/invalid.
+PF-Canon defines the /internal/version transport and content contract and its governed identity artifacts, but does not canonize the auth posture, meaning public vs operator-network gated vs auth-header required, or the expected failure mode when access is missing or invalid.
 
-Until canonized, remediation guides and operational tooling MUST NOT state auth requirements for /internal/version as canon. Any statement about auth posture MUST be explicitly labeled as Observed Evidence (non-PF).
+Until canonized, remediation guides and operational tooling MUST NOT state auth requirements for /internal/version as canon. Any statement about auth posture MUST be explicitly labeled as Observed Evidence, non-PF.
 
-Until an auth-gated posture is both implemented and canonized, runbooks MUST NOT require an auth header for /internal/version. If an auth header is used in a probe, it MUST be treated as optional and recorded as presence-only (never the raw value) in any associated request-chain or run logs.
+Until an auth-gated posture is both implemented and canonized, runbooks MUST NOT require an auth header for /internal/version. If an auth header is used in a probe, it MUST be treated as optional and recorded as presence-only, never the raw value, in any associated request-chain or run logs.
 
-Canonization of auth posture requires OPS discovery evidence that captures status line and headers for the canonical deployment context(s) under two conditions:
+Canonization of auth posture requires OPS discovery evidence that captures status line and headers for the canonical deployment context or contexts under two conditions:
 
-* with no auth header
+* with no auth header  
+* with the expected auth header present, with value redacted or presence-only noted
 
-* with the expected auth header present (value redacted or presence-only noted)
+This discovery evidence MUST be secret-free and stored in-repo under a lowercase audit path, titles-only: HDE-Build Notes OPS posture. PF12 governs only that any such evidence, when promoted, must live under governed roots and follow the Evidence Index and Machine Mirror discipline.
 
-This discovery evidence MUST be secret-free and stored in-repo under a lowercase audit path (titles-only: HDE-Build Notes OPS posture). PF12 governs only that any such evidence, when promoted, must live under governed roots and follow the Evidence Index/Mirror discipline.
-
-Checksum sidecars in this family (INTVER\_*SHA256*) are optional unless explicitly required by an acceptance roster; if present, each checksum file MUST be the sha256 hex \+ LF of the corresponding artifact bytes.
+Checksum sidecars in this family, INTVER\_SHA256, are optional unless explicitly required by an acceptance roster. If present, each checksum file MUST be the sha256 hex plus LF of the corresponding artifact bytes.
 
 ##### **/internal/version invariant checklist (minimum set; MUST be explicit)**
 
-Any remediation guide, QA step, or probe tool that produces governed /internal/version evidence artifacts (INTVER\_\*) MUST explicitly enumerate and verify the canon-critical invariants below. It is not acceptable to imply these checks by referencing PF sections only.
+Any remediation guide, QA step, or probe tool that produces governed /internal/version evidence artifacts, INTVER\_\*, MUST explicitly enumerate and verify the canon-critical invariants below. It is not acceptable to imply these checks by referencing PF sections only.
 
-###### **A. Transport**
+A. Transport
 
-* GET MUST return 200\.
+* GET MUST return 200\.  
+* HEAD MUST return 200 and satisfy parity expectations.  
+* Conditional requests using If-None-Match and If-Modified-Since MUST NOT yield 304\. They MUST return 200\.
 
-* HEAD MUST return 200 and satisfy parity expectations.
+B. Headers
 
-* Conditional requests (If-None-Match, If-Modified-Since) MUST NOT yield 304\. They MUST return 200\.
-
-  ###### **B. Headers**
-
-* Cache-Control: no-store MUST be present.
-
-* Content-Type: application/json; charset=utf-8 MUST be present.
-
-* ETag MUST be absent.
-
-* Absence is literal: the captured header set MUST NOT contain an ETag: header line at all (do not emit placeholder lines such as ETag: \<absent\>).
-
+* Cache-Control: no-store MUST be present.  
+* Content-Type: application/json; charset=utf-8 MUST be present.  
+* ETag MUST be absent.  
+* Absence is literal. The captured header set MUST NOT contain an ETag: header line at all. Do not emit placeholder lines such as ETag: .  
 * Last-Modified MUST be absent.
 
-  ###### **C. Body (identity payload)**
+C. Body (identity payload)
 
-* Body MUST be fixed-schema JSON with exactly these keys (no extras): engine\_tag, build\_commit, invocation\_tag, invocation\_sha256, emitter\_sha256, release\_id.
+* Body MUST be fixed-schema JSON with exactly these keys and no extras: engine\_tag, build\_commit, invocation\_tag, invocation\_sha256, emitter\_sha256, release\_id.  
+* Body bytes MUST satisfy the canon identity-bytes posture where applicable: canonical JSON per §4, including LF termination.
 
-* Body bytes MUST satisfy the canon identity bytes posture where applicable: canonical JSON per §4, including LF termination.
+D. Coupling and fail-closed behavior
 
-  ###### **D. Coupling and fail-closed behavior**
+* Verification MUST be performed against the same captured bytes that are written as governed artifacts for that run, including headers snapshots, body snapshot, and any two-run identity digest or log.  
+* If coupling cannot be established, for example mixed target or redirect drift, or verification cannot be completed, for example tooling failure, the run MUST fail closed for evidence purposes and MUST NOT be recorded as satisfying the corresponding invariants.
 
-* Verification MUST be performed against the same captured bytes that are written as governed artifacts for that run (headers snapshots, body snapshot, and any two-run identity digest/log).
+This checklist does not canonize auth posture. Auth posture remains not canonized until OPS discovery evidence is captured, as described above.
 
-* If coupling cannot be established (mixed target or redirect drift) or verification cannot be completed (tooling failure), the run MUST fail closed for evidence purposes and MUST NOT be recorded as satisfying the corresponding invariants.
+##### **INTVER artifact families**
 
-This checklist does not canonize auth posture. Auth posture remains not canonized until OPS discovery evidence is captured (see the Auth posture subsection above).
+* INTVER\_BODY\_GET\_V1 — GET body snapshot  
+  Artifact path, example: artifacts/ops/internal\_version/body\_get.json. Canonical JSON body for a successful GET /internal/version with six provenance fields and no extras; LF-terminated.  
+  Schema path: a JSON Schema under docs/schemas/\*\* that captures the frozen six-field identity envelope for /internal/version.  
+  Mirror: artifact\_key:"INTVER\_BODY\_GET\_V1", role:"snapshot".  
+  Human Index: same artifact\_key and the body\_get.json path as discovered\_physical\_path.  
+* INTVER\_BODY\_GET\_SHA256\_V1 — GET body hash record  
+  Artifact path, example: artifacts/ops/internal\_version/body\_get.sha256. Small JSON or text artifact recording the sha256 and size of body\_get.json as governed in Governance.  
+  Mirror: artifact\_key:"INTVER\_BODY\_GET\_SHA256\_V1", role:"snapshot".  
+  Human Index: same artifact\_key and the hash file path.  
+* INTVER\_HEADERS\_GET\_V1 — GET headers snapshot  
+  Artifact path, example: artifacts/ops/internal\_version/headers\_get.txt. Raw GET /internal/version response headers proving Cache-Control: no-store, absence of ETag and Last-Modified, and correct Content-Type.  
+  Mirror: artifact\_key:"INTVER\_HEADERS\_GET\_V1", role:"snapshot".  
+  Human Index: same artifact\_key and the headers file path.  
+* INTVER\_HEADERS\_COND\_IF\_NONE\_MATCH\_V1 — conditional headers snapshot, If-None-Match  
+  Artifact path, canonical: artifacts/ops/internal\_version/headers\_cond\_if\_none\_match.txt. Raw response headers captured from a conditional request to /internal/version with If-None-Match present.  
+  Purpose: provide governed evidence that /internal/version ignores conditional delivery for its ops-only identity contract, names-only and no body bytes in this artifact.  
+  Mirror: artifact\_key:"INTVER\_HEADERS\_COND\_IF\_NONE\_MATCH\_V1", role:"snapshot".  
+  Human Index: same artifact\_key and the conditional headers file path.  
+* INTVER\_HEADERS\_COND\_IF\_MODIFIED\_SINCE\_V1 — conditional headers snapshot, If-Modified-Since  
+  Artifact path, canonical: artifacts/ops/internal\_version/headers\_cond\_if\_modified\_since.txt. Raw response headers captured from a conditional request to /internal/version with If-Modified-Since present.  
+  Purpose: provide governed evidence that /internal/version ignores conditional delivery for its ops-only identity contract, names-only and no body bytes in this artifact.  
+  Mirror: artifact\_key:"INTVER\_HEADERS\_COND\_IF\_MODIFIED\_SINCE\_V1", role:"snapshot".  
+  Human Index: same artifact\_key and the conditional headers file path.
 
-##### **INTVER\_BODY\_GET\_V1 — GET body snapshot**
+Conditional artifact-key posture (normative).
 
-Artifact path (example): artifacts/ops/internal\_version/body\_get.json — canonical JSON body for a successful GET /internal/version (six provenance fields, no extras, LF-terminated).
-
-Schema path: a JSON Schema under docs/schemas/\*\* that captures the frozen six-field identity envelope for /internal/version.
-
-Mirror: records use artifact\_key:"INTVER\_BODY\_GET\_V1" and role:"snapshot"; Human Index entries use the same artifact\_key and the body\_get.json path as discovered\_physical\_path.
-
-##### **INTVER\_BODY\_GET\_SHA256\_V1 — GET body hash record**
-
-Artifact path (example): artifacts/ops/internal\_version/body\_get.sha256 — small JSON or text artifact recording the sha256 and size of body\_get.json as governed in Governance.
-
-Mirror: records use artifact\_key:"INTVER\_BODY\_GET\_SHA256\_V1" and role:"snapshot"; Human Index entries use the same artifact\_key and the hash file path.
-
-##### **INTVER\_HEADERS\_GET\_V1 — GET headers snapshot**
-
-Artifact path (example): artifacts/ops/internal\_version/headers\_get.txt — raw GET /internal/version response headers (proving Cache-Control: no-store, absence of ETag/Last-Modified, correct Content-Type).
-
-Mirror: records use artifact\_key:"INTVER\_HEADERS\_GET\_V1" and role:"snapshot"; Human Index entries use the same artifact\_key and headers file path.
-
-##### **INTVER\_HEADERS\_COND\_IF\_NONE\_MATCH\_V1 — conditional headers snapshot (If-None-Match)**
-
-Artifact path (canonical): artifacts/ops/internal\_version/headers\_cond\_if\_none\_match.txt — raw response headers captured from a conditional request to /internal/version with If-None-Match present.
-
-Purpose: provide governed evidence that /internal/version ignores conditional delivery for its ops-only identity contract (names-only; no body bytes in this artifact).
-
-Mirror: records use artifact\_key:"INTVER\_HEADERS\_COND\_IF\_NONE\_MATCH\_V1" and role:"snapshot"; Human Index entries use the same artifact\_key and the conditional headers file path.
-
-##### **INTVER\_HEADERS\_COND\_IF\_MODIFIED\_SINCE\_V1 — conditional headers snapshot (If-Modified-Since)**
-
-Artifact path (canonical): artifacts/ops/internal\_version/headers\_cond\_if\_modified\_since.txt — raw response headers captured from a conditional request to /internal/version with If-Modified-Since present.
-
-Purpose: provide governed evidence that /internal/version ignores conditional delivery for its ops-only identity contract (names-only; no body bytes in this artifact).
-
-Mirror: records use artifact\_key:"INTVER\_HEADERS\_COND\_IF\_MODIFIED\_SINCE\_V1" and role:"snapshot"; Human Index entries use the same artifact\_key and the conditional headers file path.
-
-##### **Conditional artifact key posture (normative)**
-
-Conditional header capture artifacts for /internal/version MUST use dedicated INTVER\_HEADERS\_COND\_\* artifact keys as listed above. They MUST NOT be indexed under INTVER\_HEADERS\_GET\_V1 or INTVER\_HEADERS\_HEAD\_V1.
-
-Evidence Index and Machine Mirror entries for these files MUST be consistent with this dedicated-key posture.
-
-##### **INTVER\_HEADERS\_HEAD\_V1 — HEAD headers snapshot**
-
-Artifact path (example): artifacts/ops/internal\_version/headers\_head.txt — raw HEAD /internal/version response headers (200, Content-Length \== len(identity GET body), Content-Type \== GET, no body).
-
-Mirror: records use artifact\_key:"INTVER\_HEADERS\_HEAD\_V1" and role:"snapshot"; Human Index entries use the same artifact\_key and headers file path.
-
-##### **INTVER\_TWO\_RUN\_IDENTITY\_V1 — coupling and two-run identity log (single governed proof)**
-
-Artifact path (example): artifacts/ops/internal\_version/two\_run\_identity.log — single governed log proving /internal/version coupling and two-run identity under closed rails.
-
-Minimum required content (names-only; no secrets):
-
-* Two-run identity result: explicit pass/fail that two consecutive GET /internal/version captures are byte-identical, including recorded digests or byte identifiers for both runs.
-
-* Coupling verification result: explicit pass/fail that the six /internal/version fields match their governing identity sources (record the governing artifact paths by name and the check outcome, including release\_id coupling).
-
-* Rails posture reference: names-only reference to closed-rails posture and the determinism pins evidence surface (audit/gates/determinism/env\_pins.log).
-
-Mirror: records use artifact\_key:"INTVER\_TWO\_RUN\_IDENTITY\_V1" and role:"log"; Human Index entries use the same artifact\_key and log path.
-
-##### **INTVER\_REQUEST\_CHAIN\_MANIFEST\_V1 — request-chain manifest (deterministic)**
-
-Artifact path (canonical): artifacts/ops/internal\_version/request\_chain\_manifest.json
-
-Deterministic request-chain manifest associated with /internal/version evidence capture runs.
-
-Requirements (normative):
-
-* MUST be secret-free. If an auth header is used by a probe or harness, the manifest MUST NOT record the raw value (presence-only or redacted placeholder only).
-
-* MUST have a co-located sibling path-proof transcript: artifacts/ops/internal\_version/request\_chain\_manifest.json.path\_proof.txt
-
-Mirror/Index linkage (names-only):
-
-* Mirror: records use artifact\_key:"INTVER\_REQUEST\_CHAIN\_MANIFEST\_V1" and role:"snapshot".
-
-* Human Index: entries use the same artifact\_key and the manifest path as discovered\_physical\_path.
-
-* proof\_anchor MUST point to artifacts/ops/internal\_version/request\_chain\_manifest.json.path\_proof.txt.
+* Conditional header capture artifacts for /internal/version MUST use dedicated INTVER\_HEADERS\_COND\_\* artifact keys as listed above.  
+* They MUST NOT be indexed under INTVER\_HEADERS\_GET\_V1 or INTVER\_HEADERS\_HEAD\_V1.  
+* Evidence Index and Machine Mirror entries for these files MUST be consistent with this dedicated-key posture.  
+* INTVER\_HEADERS\_HEAD\_V1 — HEAD headers snapshot  
+  Artifact path, example: artifacts/ops/internal\_version/headers\_head.txt. Raw HEAD /internal/version response headers proving 200, Content-Length equal to the length of the identity GET body, Content-Type equal to GET, and no body.  
+  Mirror: artifact\_key:"INTVER\_HEADERS\_HEAD\_V1", role:"snapshot".  
+  Human Index: same artifact\_key and the headers file path.  
+* INTVER\_TWO\_RUN\_IDENTITY\_V1 — coupling and two-run identity log, single governed proof  
+  Artifact path, example: artifacts/ops/internal\_version/two\_run\_identity.log. Single governed log proving /internal/version coupling and two-run identity under closed rails.  
+  Minimum required content, names-only and no secrets:  
+  * two-run identity result: explicit pass or fail that two consecutive GET /internal/version captures are byte-identical, including recorded digests or byte identifiers for both runs  
+  * coupling verification result: explicit pass or fail that the six /internal/version fields match their governing identity sources, recording the governing artifact paths by name and the check outcome, including release\_id coupling  
+  * rails posture reference: names-only reference to closed-rails posture and the determinism pins evidence surface, audit/gates/determinism/env\_pins.log  
+    Mirror: artifact\_key:"INTVER\_TWO\_RUN\_IDENTITY\_V1", role:"log".  
+    Human Index: same artifact\_key and the log path.  
+* INTVER\_REQUEST\_CHAIN\_MANIFEST\_V1 — request-chain manifest, deterministic  
+  Artifact path, canonical: artifacts/ops/internal\_version/request\_chain\_manifest.json.  
+  Deterministic request-chain manifest associated with /internal/version evidence capture runs.  
+  Requirements (normative):  
+  * MUST be secret-free. If an auth header is used by a probe or harness, the manifest MUST NOT record the raw value; presence-only or redacted placeholder only.  
+  * MUST have a co-located sibling path-proof transcript at artifacts/ops/internal\_version/request\_chain\_manifest.json.path\_proof.txt.  
+* Mirror and Human Index linkage, names-only:  
+  * Mirror: artifact\_key:"INTVER\_REQUEST\_CHAIN\_MANIFEST\_V1", role:"snapshot"  
+  * Human Index: same artifact\_key and the manifest path as discovered\_physical\_path  
+  * proof\_anchor MUST point to artifacts/ops/internal\_version/request\_chain\_manifest.json.path\_proof.txt
 
   ##### **Indexing and Mirror discipline**
 
-For each INTVER\_\* family above, the Human Evidence Index (docs/evidence/INDEX.json) MUST contain at least one entry with the appropriate artifact\_key and a discovered\_physical\_path pointing to the governed artifact under artifacts/ops/internal\_version/\*\*; docs/evidence/INDEX.sha256 MUST be updated in the same PR when adding or changing any /internal/version artifact. The Machine Evidence Mirror (artifacts/evidence\_index.jsonl) MUST contain canonical JSONL records for each governed /internal/version artifact and schema, using the artifact\_key names exactly as above and the minimum Mirror record schema in §8.3 (artifact\_key, role, sha256, size\_bytes, produced\_at\_utc, discovered\_physical\_path, proof\_anchor).
+For each INTVER\_\* family above, the Human Evidence Index, docs/evidence/INDEX.json, MUST contain at least one entry with the appropriate artifact\_key and a discovered\_physical\_path pointing to the governed artifact under artifacts/ops/internal\_version/\*\*. docs/evidence/INDEX.sha256 MUST be updated in the same PR when adding or changing any /internal/version artifact.
+
+The Machine Evidence Mirror, artifacts/evidence\_index.jsonl, MUST contain canonical JSONL records for each governed /internal/version artifact and schema, using the artifact\_key names exactly as above and the minimum Mirror record schema in §8.3: artifact\_key, role, sha256, size\_bytes, produced\_at\_utc, discovered\_physical\_path, proof\_anchor.
 
 ##### **Acceptance hints (names-only)**
 
-These INTVER\_\* families are the governed surfaces for the /internal/version identity token titles defined in PF04 (and the relevant EPIC acceptance roster), e.g.: INTERNAL\_VERSION\_200\_CTYPE\_JSON\_UTF8\_OK, INTERNAL\_VERSION\_200\_CTYPE\_JSON\_UTF8\_NOTOK, INTERNAL\_VERSION\_200\_CTYPE\_HTML\_NOTOK, INTERNAL\_VERSION\_404\_NOTOK.
+These INTVER\_\* families are the governed surfaces for the /internal/version identity token titles defined in PF04 and the relevant epic acceptance roster, for example INTERNAL\_VERSION\_200\_CTYPE\_JSON\_UTF8\_OK, INTERNAL\_VERSION\_200\_CTYPE\_JSON\_UTF8\_NOTOK, INTERNAL\_VERSION\_200\_CTYPE\_HTML\_NOTOK, and INTERNAL\_VERSION\_404\_NOTOK.
 
-#### **Presenter evidence (EPIC020 D2 — presenter/emitter identity)**
+#### **E. Presenter evidence (EPIC020 D2 — presenter/emitter identity)**
 
-These entries register the presenter evidence families introduced by HDE-EPIC020 D2 as governed members of the Evidence Catalog. They follow the same canonical JSON and Evidence Index/Mirror discipline as other families in this section (UTF-8, sorted keys, compact separators, exactly one trailing LF for JSON artifacts; governed paths only; path-proofs and Index/Mirror parity per §8.3–§8.6). PF12 binds these families to D2 tokens by artifact\_key and path only; token semantics remain in HDE-Governance and Glow QA Guide by title.
+These entries register the presenter evidence families introduced by HDE-EPIC020 D2 as governed members of the Evidence Catalog. They follow the same canonical JSON and Evidence Index/Mirror discipline as other families in this section: UTF-8, sorted keys, compact separators, exactly one trailing LF for JSON artifacts, governed paths only, and path-proofs plus Index/Mirror parity per §8.3 to §8.6. PF12 binds these families to D2 tokens by artifact\_key and path only. Token semantics remain in HDE-Governance and Glow QA Guide by title.
 
-##### **Presenter identity summary — canonical JSON summary for showcompat identity**
+Shared family rule. For each presenter family below, the Human Evidence Index MUST contain at least one entry per artifact\_key with discovered\_physical\_path pointing to the governed artifact path under artifacts/presenter/\*\*. docs/evidence/INDEX.sha256 MUST be updated in the same PR when adding or changing any presenter artifact. The Machine Evidence Mirror MUST contain canonical JSONL records for each governed presenter artifact and schema using the exact artifact\_key names below and the minimum Mirror record schema in §8.3.
 
-Example path: a JSON file under artifacts/presenter/ (for example, artifacts/presenter/showcompat\_identity\_summary.json); schema owned by an engine/presenter presenter evidence schema in docs/schemas/\*\*.
+* PRESENTER\_IDENTITY\_SUMMARY\_V1 — presenter identity summary  
+  Canonical JSON summary for showcompat identity.  
+  Example path: a JSON file under artifacts/presenter/, for example artifacts/presenter/showcompat\_identity\_summary.json.  
+  Schema: an engine/presenter evidence schema under docs/schemas/\*\*.  
+  Mirror role: snapshot.  
+* PRESENTER\_PREIMAGE\_RECOMPUTE\_V1 — presenter preimage recompute log  
+  Preimage recompute evidence for presenter and Reader envelopes.  
+  Example path: a log file under artifacts/presenter/, for example artifacts/presenter/preimage\_recompute.log.  
+  Mirror role: log.  
+* PRESENTER\_READER\_CLI\_PARITY\_V1 — presenter Reader and CLI parity bytes  
+  Reader vs CLI presenter parity sample.  
+  Example path: a bytes or JSON artifact under artifacts/presenter/, for example artifacts/presenter/reader\_cli\_parity.bytes.  
+  Mirror role: snapshot or log, depending on implementation.  
+* PRESENTER\_SHOWCOMPAT\_AB\_BYTES\_V1 and PRESENTER\_SHOWCOMPAT\_BA\_BYTES\_V1 — presenter AB and BA identity bytes  
+  Showcompat presenter bytes for AB and BA.  
+  Example paths: artifacts/presenter/showcompat\_ab.bytes and artifacts/presenter/showcompat\_ba.bytes.  
+  Mirror role: snapshot.
 
-Family name: PRESENTER\_IDENTITY\_SUMMARY\_V1 — Machine Mirror records for this family use artifact\_key:"PRESENTER\_IDENTITY\_SUMMARY\_V1" and a role such as "snapshot"; Human Index entries use the same artifact\_key as the title and the concrete summary file path as discovered\_physical\_path.
+Acceptance hints (names-only).
 
-##### **Presenter preimage recompute log — preimage recompute evidence for presenter/Reader envelopes**
+These families support the EPIC020 D2 presenter tokens, for example CLI\_SHOWCOMPAT\_CANON\_OK, TWO\_RUN\_IDENTITY\_OK, COMPOSITE\_ABBA\_IDENTITY\_OK, and PREIMAGE\_RECOMPUTE\_OK, by providing governed artifacts and Index/Mirror records. PF12 binds tokens to artifacts by name and path only and does not redefine token semantics.
 
-Example path: a log file under artifacts/presenter/ (for example, artifacts/presenter/preimage\_recompute.log).
+#### **F. Error evidence (EPIC020 D1 — Reader/CLI parity, schema, token map)**
 
-Family name: PRESENTER\_PREIMAGE\_RECOMPUTE\_V1 — Mirror records use artifact\_key:"PRESENTER\_PREIMAGE\_RECOMPUTE\_V1" and role:"log"; Human Index entries use that artifact\_key and the log path as discovered\_physical\_path.
+These entries register the error evidence families introduced by HDE-EPIC020 D1 as governed members of the Evidence Catalog. They follow the same canonical JSON and Evidence Index/Mirror discipline as other families in this section: UTF-8, sorted keys, compact separators, exactly one trailing LF where JSON is used, governed paths only, and path-proofs plus Index/Mirror parity per §8.3 to §8.6.
 
-##### **Presenter Reader/CLI parity bytes — Reader vs CLI presenter parity sample**
+* ERRORS\_READER\_CLI\_PARITY\_V1 — Reader↔CLI parity artifacts  
+  Paths:  
+  * parity/errors\_reader\_cli.\*.http.json  
+  * parity/errors\_reader\_cli.\*.cli.txt  
+    Closed-rails error parity artifacts for EPIC020 D1. Each scenario captures a typed error envelope from the HTTP surface and a matching CLI stderr or text log, used together to prove Reader↔CLI parity for error codes and messages under closed rails.  
+    Mirror: artifact\_key:"ERRORS\_READER\_CLI\_PARITY\_V1", role:"log".  
+    Human Index: same artifact\_key and the concrete parity file paths as discovered\_physical\_path values.  
+    Token semantics, for example CLI\_READER\_PARITY\_OK and related parity tokens, remain owned by HDE-Governance and Glow QA Guide. PF12 binds them to this family by name and path only.  
+* ERROR\_SCHEMA\_CHECK\_V1 — error-envelope schema-check logs  
+  Path:  
+  * errors/schema\_check/error\_envelope\_\*.log  
+    Error-envelope schema-check logs for selected scenarios, for example invalid\_json, invalid\_viewer\_prefs, db\_unavailable, or vendor\_attempt\_closed\_rails. Each log records at minimum the scenario name, HTTP status, canonical error code, and schema validation result under the governed error-envelope schema.  
+    Mirror: artifact\_key:"ERROR\_SCHEMA\_CHECK\_V1", role:"log".  
+    Human Index: same artifact\_key and the concrete log paths under errors/schema\_check/.  
+    These artifacts support error-envelope schema tokens such as ERROR\_JSON\_CANON\_OK and JSON\_CANONICAL\_CHECK\_OK, names-only; semantics live in Governance.  
+* ERROR\_TOKEN\_MAP\_V1 — token-map snapshot  
+  Path:  
+  * errors/token\_map/token\_map.json  
+    Canonical JSON snapshot of the typed error token map, listing each error code with its aliases and message text for the current error-envelope set.  
+    Mirror: artifact\_key:"ERROR\_TOKEN\_MAP\_V1", role:"snapshot".  
+    Human Index: same artifact\_key and discovered\_physical\_path:"errors/token\_map/token\_map.json".  
+    This artifact underpins ERROR\_TOKEN\_MAP\_OK, names-only, ensuring the runtime error token map matches the governed snapshot used in tests and CLI/HTTP error behavior.
 
-Example path: a bytes or JSON artifact under artifacts/presenter/ capturing a presenter-level Reader/CLI parity proof (for example, artifacts/presenter/reader\_cli\_parity.bytes).
+Indexing and path-proofs.
 
-Family name: PRESENTER\_READER\_CLI\_PARITY\_V1 — Mirror records use artifact\_key:"PRESENTER\_READER\_CLI\_PARITY\_V1" and role:"snapshot" (or "log" depending on implementation); Human Index entries use the same artifact\_key and the parity artifact path.
+All three error evidence families MUST participate in the standard Evidence Index and Machine Mirror discipline.
 
-##### **Presenter AB/BA identity bytes — showcompat AB/BA presenter bytes**
+Human Index, docs/evidence/INDEX.json:
 
-Example paths: bytes artifacts under artifacts/presenter/ capturing AB and BA showcompat presenter bytes (for example, artifacts/presenter/showcompat\_ab.bytes and artifacts/presenter/showcompat\_ba.bytes).
-
-Family names: PRESENTER\_SHOWCOMPAT\_AB\_BYTES\_V1 and PRESENTER\_SHOWCOMPAT\_BA\_BYTES\_V1 — Mirror records use these artifact\_keys and role:"snapshot"; Human Index entries use the same artifact\_keys and their corresponding AB/BA presenter byte paths as discovered\_physical\_path values.
-
-##### **Indexing and Mirror discipline**
-
-For each of the presenter families above, the Human Evidence Index (docs/evidence/INDEX.json) MUST contain at least one entry per artifact\_key (for example, "PRESENTER\_IDENTITY\_SUMMARY\_V1") with a discovered\_physical\_path pointing to the governed artifact path under artifacts/presenter/\*\*; docs/evidence/INDEX.sha256 MUST be updated in the same PR when adding or changing any presenter artifact. The Machine Evidence Mirror (artifacts/evidence\_index.jsonl) MUST contain canonical JSONL records for each governed presenter artifact and schema, using the artifact\_key names exactly as above and the minimum Mirror record schema in §8.3 (artifact\_key, role, sha256, size\_bytes, produced\_at\_utc, discovered\_physical\_path, proof\_anchor).
-
-##### **Acceptance hints (names-only)**
-
-These families support the EPIC020 D2 presenter tokens (for example, CLI\_SHOWCOMPAT\_CANON\_OK, TWO\_RUN\_IDENTITY\_OK, COMPOSITE\_ABBA\_IDENTITY\_OK, PREIMAGE\_RECOMPUTE\_OK) by providing governed artifacts and Index/Mirror records; PF12 binds tokens to artifacts by name and path only and does not redefine token semantics.
-
-#### **Error evidence (EPIC020 D1 — Reader/CLI parity, schema, token map)**
-
-These entries register the error evidence families introduced by HDE-EPIC020 D1 as governed members of the Evidence Catalog. They follow the same canonical JSON and Evidence Index/Mirror discipline as other families in this section (UTF-8, sorted keys, compact separators, exactly one trailing LF where JSON is used; governed paths only; path-proofs and Index/Mirror parity per §8.3–§8.6).
-
-##### **ERRORS\_READER\_CLI\_PARITY\_V1 — Reader↔CLI parity artifacts**
-
-* parity/errors\_reader\_cli.\*.http.json
-
-* parity/errors\_reader\_cli.\*.cli.txt
-
-Closed-rails error parity artifacts for EPIC020 D1. Each scenario captures a typed error envelope from the HTTP surface and a matching CLI stderr/text log, used together to prove Reader↔CLI parity for error codes and messages under closed rails. These files form the ERRORS\_READER\_CLI\_PARITY\_V1 evidence family. Machine Mirror records for this family use artifact\_key:"ERRORS\_READER\_CLI\_PARITY\_V1" and role:"log"; Human Index entries use the same artifact\_key as the title and the concrete parity file paths as discovered\_physical\_path values. Token semantics (for example, CLI\_READER\_PARITY\_OK and related parity tokens) remain owned by HDE-Governance and Glow QA Guide; PF12 binds them to this family by name and path only.
-
-##### **ERROR\_SCHEMA\_CHECK\_V1 — error-envelope schema-check logs**
-
-* errors/schema\_check/error\_envelope\_\*.log
-
-Error-envelope schema-check logs for selected error-envelope scenarios (for example, invalid\_json, invalid\_viewer\_prefs, db\_unavailable, vendor\_attempt\_closed\_rails). Each log records at minimum the scenario name, HTTP status, canonical error code, and schema validation result under the governed error envelope schema. These files form the ERROR\_SCHEMA\_CHECK\_V1 evidence family. Machine Mirror records use artifact\_key:"ERROR\_SCHEMA\_CHECK\_V1" and role:"log"; Human Index entries use the same artifact\_key and the concrete log paths under errors/schema\_check/. These artifacts support error-envelope schema tokens such as ERROR\_JSON\_CANON\_OK and JSON\_CANONICAL\_CHECK\_OK (names-only; semantics live in Governance).
-
-##### **ERROR\_TOKEN\_MAP\_V1 — token-map snapshot**
-
-* errors/token\_map/token\_map.json
-
-Canonical JSON snapshot of the typed error token map, listing each error code with its aliases and message text for the current error envelope set. This file forms the ERROR\_TOKEN\_MAP\_V1 evidence family. Machine Mirror records use artifact\_key:"ERROR\_TOKEN\_MAP\_V1" and role:"snapshot"; the Human Index entry uses the same artifact\_key and discovered\_physical\_path:"errors/token\_map/token\_map.json". This artifact underpins the ERROR\_TOKEN\_MAP\_OK token (names-only), ensuring that the runtime error token map matches the governed snapshot used in tests and CLI/HTTP error behavior.
-
-##### **Indexing and path-proofs**
-
-All three error evidence families MUST participate in the standard Evidence Index/Mirror discipline:
-
-Human Index (docs/evidence/INDEX.json):
-
-* For every concrete parity artifact (parity/errors\_reader\_cli.*.http.json or parity/errors\_reader\_cli.*.cli.txt), there MUST be an entry whose artifact\_key is "ERRORS\_READER\_CLI\_PARITY\_V1" and whose discovered\_physical\_path equals that file’s repo-relative path.
-
-* For every schema-check log under errors/schema\_check/error\_envelope\_\*.log, there MUST be an entry whose artifact\_key is "ERROR\_SCHEMA\_CHECK\_V1" and whose discovered\_physical\_path equals that log’s path.
-
-* For the token-map snapshot, there MUST be an entry with artifact\_key:"ERROR\_TOKEN\_MAP\_V1" and discovered\_physical\_path:"errors/token\_map/token\_map.json".
-
+* For every concrete parity artifact, parity/errors\_reader\_cli.*.http.json or parity/errors\_reader\_cli.*.cli.txt, there MUST be an entry whose artifact\_key is ERRORS\_READER\_CLI\_PARITY\_V1 and whose discovered\_physical\_path equals that file’s repo-relative path.  
+* For every schema-check log under errors/schema\_check/error\_envelope\_\*.log, there MUST be an entry whose artifact\_key is ERROR\_SCHEMA\_CHECK\_V1 and whose discovered\_physical\_path equals that log’s path.  
+* For the token-map snapshot, there MUST be an entry with artifact\_key:"ERROR\_TOKEN\_MAP\_V1" and discovered\_physical\_path:"errors/token\_map/token\_map.json".  
 * docs/evidence/INDEX.sha256 MUST be updated in the same PR as any change to these artifacts or their indexing.
 
-Machine mirror (artifacts/evidence\_index.jsonl):
+Machine Mirror, artifacts/evidence\_index.jsonl:
 
-* MUST contain canonical JSONL records for each governed error artifact above with:
-
-  * artifact\_key set to "ERRORS\_READER\_CLI\_PARITY\_V1", "ERROR\_SCHEMA\_CHECK\_V1", or "ERROR\_TOKEN\_MAP\_V1" as appropriate,
-
-  * role set to "log" for parity and schema-check artifacts and "snapshot" for the token map,
-
-  * discovered\_physical\_path equal to the path recorded in the Human Index,
-
-  * sha256 and size\_bytes matching the artifact’s canonical bytes,
-
-  * produced\_at\_utc reflecting the evidence refresh time, and
-
-  * proof\_anchor pointing to the matching .path\_proof.txt transcript alongside each artifact.
-
-* Mirror records MUST obey all §8.3 rules (field set, ASCII field order, sort-before-write, single mirror file, unknown-key rejection).
+* MUST contain canonical JSONL records for each governed error artifact above.  
+* artifact\_key MUST be ERRORS\_READER\_CLI\_PARITY\_V1, ERROR\_SCHEMA\_CHECK\_V1, or ERROR\_TOKEN\_MAP\_V1 as appropriate.  
+* role MUST be log for parity and schema-check artifacts and snapshot for the token map.  
+* discovered\_physical\_path MUST equal the path recorded in the Human Index.  
+* sha256 and size\_bytes MUST match the artifact’s canonical bytes.  
+* produced\_at\_utc MUST reflect the evidence refresh time.  
+* proof\_anchor MUST point to the matching .path\_proof.txt transcript alongside each artifact.  
+* Mirror records MUST obey all §8.3 rules: field set, ASCII field order, sort-before-write, single mirror file, and unknown-key rejection.
 
 Path-proofs:
 
-* Each concrete parity artifact and schema-check log MUST have a sibling path-proof transcript (\<file\>.path\_proof.txt) stored alongside the artifact, whose path, sha256, size\_bytes, mtime\_utc, and produced\_at\_utc match the artifact’s canonical bytes and its Mirror record.
-
+* Each concrete parity artifact and schema-check log MUST have a sibling path-proof transcript, .path\_proof.txt, stored alongside the artifact, whose path, sha256, size\_bytes, mtime\_utc, and produced\_at\_utc match the artifact’s canonical bytes and its Mirror record.  
 * errors/token\_map/token\_map.json MUST have a sibling errors/token\_map/token\_map.json.path\_proof.txt transcript with the same constraints.
 
-Acceptance hints for these families are names-only and include error/parity and schema tokens such as CLI\_READER\_PARITY\_OK (and its legacy alias CLI\_READER\_EMITTER\_PARITY\_OK), ERROR\_JSON\_CANON\_OK, JSON\_CANONICAL\_CHECK\_OK, and ERROR\_TOKEN\_MAP\_OK. PF12 does not change token semantics; it binds these tokens to the governed error evidence families by artifact\_key and path so that Governance, QA, and PF09 can route by title only.
+Acceptance hints for these families are names-only and include error/parity and schema tokens such as CLI\_READER\_PARITY\_OK, including its legacy alias CLI\_READER\_EMITTER\_PARITY\_OK, ERROR\_JSON\_CANON\_OK, JSON\_CANONICAL\_CHECK\_OK, and ERROR\_TOKEN\_MAP\_OK. PF12 does not change token semantics; it binds these tokens to the governed error evidence families by artifact\_key and path so Governance, QA, and PF09 can route by title only.
+
+#### **G. Sampler evidence (D4 — HDE-EPIC019)**
+
+These entries register the sampler and ranker evidence families introduced by HDE-EPIC019 D4 as governed members of the Evidence Catalog. They follow the same canonical JSON and Evidence Index/Mirror discipline as other families in this section: UTF-8, sorted keys, compact, exactly one trailing LF, governed paths only, and path-proofs plus Index/Mirror parity per §8.3 to §8.6.
+
+* sampler\_pool\_snapshots — sampler pool and eligibility snapshots  
+  Purpose: canonical JSON snapshots of sampler candidate pools, including viewer ID, candidate IDs, bands, compat scores, weights, and eligibility flags, used to prove sampler pool composition and eligibility filters.  
+  Artifact path, example: artifacts/sampler/pool\_snapshots/baseline.json, and siblings under artifacts/sampler/pool\_snapshots/.  
+  Schema path: docs/schemas/sampler/pool\_snapshots.schema.json.  
+  PII posture: artifacts omit PII beyond IDs, bands, compat labels, and QA-necessary metadata. No app-level user identifiers or raw personal data are permitted.  
+* sampler\_two\_run\_logs — sampler two-run identity logs  
+  Purpose: logs demonstrating two-run identity for sampler output, same inputs implying identical ordering, used to prove sampler determinism under closed rails.  
+  Artifact path: artifacts/sampler/two\_run/identity.json.  
+  Schema path: docs/schemas/sampler/two\_run\_logs.schema.json.  
+  Notes: canonical JSON; array fields that represent sets follow arrays-as-sets rules in §4.2.  
+* sampler\_abba\_logs — AB, BA, and ABBA parity logs  
+  Purpose: AB, BA, and ABBA sampler runs for parity checks, used to show sampler ranking is invariant under label order when inputs are normalized.  
+  Artifact path: artifacts/sampler/abba/ab\_ba\_parity.json.  
+  Schema path: docs/schemas/sampler/abba\_logs.schema.json.  
+* sampler\_diversity\_artifacts — diversity and window evidence  
+  Purpose: evidence for diversity, window, and recent-selection constraints in the sampler, used to show the sampler respects configured spread and recency rules.  
+  Artifact path: artifacts/sampler/diversity/diversity\_requirements.json.  
+  Schema path: docs/schemas/sampler/diversity\_artifacts.schema.json.  
+* sampler\_seed\_replay\_logs — seed replay logs for CLI and HTTP harnesses  
+  Purpose: seed replay logs from dev sampler CLI and HTTP harnesses, capturing repeated seeded runs and proving seed-echo semantics and candidate-set stability across surfaces.  
+  Artifact path: artifacts/sampler/seed\_replay/cli\_http\_seed\_replay.json.  
+  Schema path: docs/schemas/sampler/seed\_replay\_logs.schema.json.
+
+Canonical JSON policy and governed locations, sampler family.
+
+* All sampler artifacts listed above MUST use the canonical JSON emitter governed by §4: UTF-8, ASCII-sorted keys, compact separators, exactly one trailing LF; arrays treated as sets are deduped and ASCII-sorted by identity.  
+* All sampler artifacts and schemas MUST live under governed locations:  
+  * artifacts/sampler/\*\*  
+  * docs/schemas/sampler/\*\*
+
+Sampler evidence summary and manifest (EPIC024 D04).
+
+* artifacts/sampler/epic024/sampler\_evidence.json: summary artifact. Current-state output reports counts for existing\_artifacts, missing\_artifacts, and total\_artifacts.  
+* artifacts/sampler/epic024/manifest.json: manifest artifact. Current-state output includes:  
+  * artifacts: object with concrete paths for manifest and sampler\_evidence  
+  * epic: epic identifier string  
+  * generated\_at\_utc: UTC timestamp string, example 2026-01-21T20:55:39Z  
+  * generator: generator script path, example tools/evidence/run\_sampler\_evidence.py  
+  * referenced\_artifacts: list of referenced sampler evidence categories  
+* Generator: tools/evidence/run\_sampler\_evidence.py.  
+* Transient generator paths, for example codex/out/\*\* and temp directories, MUST NOT be indexed or mirrored.
+
+Evidence Index, Machine Mirror, and path-proofs.
+
+* For each sampler family, the Human Evidence Index MUST contain an entry with the appropriate artifact\_key, for example sampler\_pool\_snapshots, and discovered\_physical\_path pointing to the governed artifact path. docs/evidence/INDEX.sha256 MUST be updated in the same PR.  
+* The Machine Evidence Mirror MUST contain a canonical JSONL record for each governed sampler artifact and schema using artifact\_key names exactly as above and the minimum Mirror record schema in §8.3.  
+* Each sampler artifact and schema MUST have a sibling path-proof transcript, for example artifacts/sampler/pool\_snapshots/baseline.json.path\_proof.txt and docs/schemas/sampler/pool\_snapshots.schema.json.path\_proof.txt, that satisfies the path-proof schema in §8.3 and is referenced from the Mirror record via proof\_anchor.
+
+Acceptance hints (names-only; sampler).
+
+Sampler evidence families participate in the existing mirror and index tokens referenced in §0.2 and §8.3, for example EVIDENCE\_INDEX\_UPDATED\_OK, EVIDENCE\_INDEX\_HASH\_OK, EVIDENCE\_INDEX\_MIRROR\_OK, EVIDENCE\_PATHS\_VALIDATED\_OK, MACHINE\_MIRROR\_UPDATED\_OK, and JSON\_CANONICAL\_CHECK\_OK. PF12 binds these tokens to sampler artifacts by name and path only. Token semantics remain owned by Governance and Glow QA Guide.
+
+#### **H. Engine Core evidence (DISS003/DISS004 — HDE-EPIC019)**
+
+These entries register the Engine Core evidence families introduced by HDE-EPIC019 PR7 as governed members of the Evidence Catalog. They mirror the sampler evidence pattern: canonical JSON artifacts under artifacts/core/, schemas under docs/schemas/core/, and full Index/Mirror plus path-proof discipline under §8.3 to §8.6.
+
+* engine\_core\_purity\_report — Engine Core purity report  
+  Purpose: canonical JSON report summarizing Engine Core purity checks over compute\_core scenarios, for example invariants that must hold for all core calls under closed rails. Each report instance is produced under closed rails and records environment posture and provenance alongside result data.  
+  Artifact path: artifacts/core/purity/purity\_report.json, and siblings under artifacts/core/purity/ if multiple reports are captured.  
+  Schema path: docs/schemas/core/engine\_core\_purity\_report.schema.json.  
+  Generated-at and environment metadata: each artifact MUST include a payload-level generated\_at\_utc field, UTC ISO-8601, and closed-rails environment metadata sufficient to reconstruct the determinism posture used for the run. Provenance semantics and timestamp constraints follow §8.3, Artifacts with generated\_at\_utc, for all Engine Core families.  
+* engine\_core\_two\_run\_logs — Engine Core two-run identity logs  
+  Purpose: canonical JSON logs demonstrating two-run identity for Engine Core output, same inputs implying identical outputs, under closed rails. These logs are used to prove TWO\_RUN\_IDENTITY\_OK and related determinism tokens for the core engine.  
+  Artifact path: artifacts/core/two\_run/identity.json.  
+  Schema path: docs/schemas/core/engine\_core\_two\_run\_logs.schema.json.  
+  Notes: arrays that function as sets, for example lists of tested scenarios, MUST follow arrays-as-sets rules in §4.2, deduped and ASCII-sorted.  
+* engine\_core\_abba\_logs — Engine Core AB, BA, and ABBA parity logs  
+  Purpose: canonical JSON logs for AB, BA, and ABBA runs over Engine Core, for example swapping label order where appropriate, used to demonstrate core behavior is invariant under symmetry-preserving input permutations after normalization.  
+  Artifact path: artifacts/core/abba/ab\_ba\_parity.json.  
+  Schema path: docs/schemas/core/engine\_core\_abba\_logs.schema.json.  
+  Notes: these logs complement engine\_core\_two\_run\_logs by proving parity properties. The same canonical JSON and path-proof discipline applies.  
+* engine\_core\_json\_compare\_logs — Engine Core JSON-compare logs  
+  Purpose: canonical JSON logs produced by comparing Engine Core result JSON across two runs or two surfaces, for example CLI vs internal harness, and recording equality or inequality at the structured JSON level. These artifacts support JSON\_CANONICAL\_CHECK\_OK, TWO\_RUN\_IDENTITY\_OK, and related core evidence tokens.  
+  Artifact path: artifacts/core/json\_compare/core\_result\_json\_compare.json.  
+  Schema path: docs/schemas/core/engine\_core\_json\_compare\_logs.schema.json.  
+  Notes: logs MUST NOT include raw payloads beyond what the schema requires for comparison. They remain names-only and structural, and rely on canonical JSON for reproducible diffs.
+
+Canonical JSON policy and governed locations, Engine Core family.
+
+* All Engine Core artifacts listed above MUST use the canonical JSON emitter governed by §4: UTF-8, ASCII-sorted keys, compact separators, exactly one trailing LF; arrays used as sets are deduped and ASCII-sorted by identity.  
+* All Engine Core artifacts and schemas MUST live under governed locations:  
+  * artifacts/core/\*\*  
+  * docs/schemas/core/\*\*  
+* Transient generator paths, for example scratch or codex/out/\*\*, MUST NOT be indexed or mirrored.
+
+Evidence Index, Machine Mirror, and path-proofs.
+
+* For each Engine Core family, the Human Evidence Index MUST contain at least one entry with the appropriate artifact\_key, for example engine\_core\_purity\_report, and a discovered\_physical\_path pointing to the governed artifact path. docs/evidence/INDEX.sha256 MUST be updated in the same PR when adding or changing any Engine Core artifact.  
+* The Machine Evidence Mirror MUST contain canonical JSONL records for each governed Engine Core artifact and schema, using artifact\_key names exactly as above and the minimum Mirror record schema in §8.3.  
+* Each Engine Core artifact and schema MUST have a sibling path-proof transcript, for example artifacts/core/purity/purity\_report.json.path\_proof.txt and docs/schemas/core/engine\_core\_purity\_report.schema.json.path\_proof.txt, that satisfies the path-proof schema in §8.3 and is referenced from the Mirror record via proof\_anchor. Path-proof sha256 and size\_bytes MUST match both the artifact’s canonical bytes and the Mirror record values.
+
+Acceptance hints (names-only; Engine Core skeleton).
+
+Engine Core evidence families participate in the existing Mirror and Index tokens referenced in §0.2 and §8.3, for example EVIDENCE\_INDEX\_UPDATED\_OK, EVIDENCE\_INDEX\_HASH\_OK, EVIDENCE\_INDEX\_MIRROR\_OK, EVIDENCE\_PATHS\_VALIDATED\_OK, MACHINE\_MIRROR\_UPDATED\_OK, JSON\_CANONICAL\_CHECK\_OK, and TWO\_RUN\_IDENTITY\_OK. Together with the sampler evidence families, they form the governed Engine Core and sampler evidence skeleton for DISS003/DISS004. PF12 binds these tokens to Engine Core artifacts by name and path only. Token semantics remain owned by Governance and Glow QA Guide.
+
+#### **I. SBOM, registry, config, BodyGraph, lifecycle, and admin QA**
 
-#### **Sampler evidence (D4 — HDE-EPIC019)**
+##### **SBOM**
 
-These entries register the sampler/ranker evidence families introduced by HDE-EPIC019 D4 as governed members of the Evidence Catalog. They follow the same canonical JSON and Evidence Index/Mirror discipline as other families in this section (UTF-8, sorted keys, compact, exactly one trailing LF; governed paths only; path-proofs and Index/Mirror parity per §8.3–§8.6).
-
-##### **sampler\_pool\_snapshots — sampler pool/eligibility snapshots**
-
-Purpose. Canonical JSON snapshots of sampler candidate pools, including viewer ID, candidate IDs, bands, compat scores, weights, and eligibility flags, used to prove sampler pool composition and eligibility filters (D1 core behavior).
-
-Artifact path (example). artifacts/sampler/pool\_snapshots/baseline.json (and siblings under artifacts/sampler/pool\_snapshots/).
-
-Schema path. docs/schemas/sampler/pool\_snapshots.schema.json (JSON Schema 2020-12, titles-only here).
-
-PII posture. Artifacts omit PII beyond IDs, bands, compat labels, and QA-necessary metadata; no app-level user identifiers or raw personal data are permitted.
-
-##### **sampler\_two\_run\_logs — sampler two-run identity logs**
-
-Purpose. Logs demonstrating two-run identity for sampler output (same inputs ⇒ identical ordering), used to prove sampler determinism under closed rails.
-
-Artifact path. artifacts/sampler/two\_run/identity.json.
-
-Schema path. docs/schemas/sampler/two\_run\_logs.schema.json.
-
-Notes. Canonical JSON; array fields that represent sets follow arrays-as-sets rules (§4.2).
-
-##### **sampler\_abba\_logs — AB/BA/ABBA parity logs**
-
-Purpose. AB/BA/ABBA sampler runs for parity checks (A→B, B→A, ABBA), used to show that sampler ranking is invariant under label order when inputs are normalized.
-
-Artifact path. artifacts/sampler/abba/ab\_ba\_parity.json.
-
-Schema path. docs/schemas/sampler/abba\_logs.schema.json.
-
-##### **sampler\_diversity\_artifacts — diversity/window evidence**
-
-Purpose. Evidence for diversity, window, and “recent selection” constraints in the sampler, used to show that the sampler respects configured spread and recency rules.
-
-Artifact path. artifacts/sampler/diversity/diversity\_requirements.json.
-
-Schema path. docs/schemas/sampler/diversity\_artifacts.schema.json.
-
-##### **sampler\_seed\_replay\_logs — seed replay logs (CLI/HTTP harnesses)**
-
-Purpose. Seed replay logs from dev sampler CLI/HTTP harnesses, capturing repeated seeded runs and proving seed-echo semantics and candidate-set stability across surfaces.
-
-Artifact path. artifacts/sampler/seed\_replay/cli\_http\_seed\_replay.json.
-
-Schema path. docs/schemas/sampler/seed\_replay\_logs.schema.json.
-
-##### **Canonical JSON policy and governed locations (sampler)**
-
-All sampler artifacts listed above MUST use the canonical JSON emitter governed by §4 (UTF-8, ASCII-sorted keys, compact separators, exactly one trailing LF; arrays treated as sets are deduped and ASCII-sorted by identity).
-
-All sampler artifacts and schemas MUST live under governed locations:
-
-* artifacts/sampler/\*\*
-
-* docs/schemas/sampler/\*\*
-
-##### **Sampler evidence summary and manifest (EPIC024 D04)**
-
-EPIC024 D04 produces a sampler evidence summary \+ manifest pair under artifacts/sampler/epic024/. These artifacts are meta-evidence intended to summarize whether the sampler evidence families required for the epic are present.
-
-* artifacts/sampler/epic024/sampler\_evidence.json: Summary artifact. Current-state output reports counts for `existing_artifacts`, `missing_artifacts`, and `total_artifacts`.
-
-* artifacts/sampler/epic024/manifest.json: Manifest artifact. Current-state output includes:
-
-  * `artifacts`: object with concrete paths for `manifest` and `sampler_evidence`.
-
-  * `epic`: epic identifier string.
-
-  * `generated_at_utc`: UTC timestamp string (example: 2026-01-21T20:55:39Z).
-
-  * `generator`: generator script path (example: tools/evidence/run\_sampler\_evidence.py).
-
-  * `referenced_artifacts`: list of referenced sampler evidence categories.
-
-Generator: tools/evidence/run\_sampler\_evidence.py.
-
-Transient generator paths (for example, codex/out/\*\*, temp directories) MUST NOT be indexed or mirrored.
-
-##### **Evidence Index/Mirror and path-proofs (sampler)**
-
-For each sampler family, the Human Evidence Index (docs/evidence/INDEX.json) MUST contain an entry with the appropriate artifact\_key (for example, "sampler\_pool\_snapshots") and discovered\_physical\_path pointing to the governed artifact path; docs/evidence/INDEX.sha256 MUST be updated in the same PR.
-
-The Machine Evidence Mirror (artifacts/evidence\_index.jsonl) MUST contain a canonical JSONL record for each governed sampler artifact and schema, using artifact\_key names exactly as above and the minimum Mirror record schema in §8.3 (artifact\_key, role, sha256, size\_bytes, produced\_at\_utc, discovered\_physical\_path, proof\_anchor).
-
-Each sampler artifact and schema MUST have a sibling path-proof transcript (for example, artifacts/sampler/pool\_snapshots/baseline.json.path\_proof.txt, docs/schemas/sampler/pool\_snapshots.schema.json.path\_proof.txt) that satisfies the path-proof schema in §8.3 and is referenced from the Mirror record via proof\_anchor.
-
-##### **Acceptance hints (names-only; sampler)**
-
-Sampler evidence families participate in the existing mirror/index tokens referenced in §0.2 and §8.3 (for example, EVIDENCE\_INDEX\_UPDATED\_OK, EVIDENCE\_INDEX\_HASH\_OK, EVIDENCE\_INDEX\_MIRROR\_OK, EVIDENCE\_PATHS\_VALIDATED\_OK, MACHINE\_MIRROR\_UPDATED\_OK, JSON\_CANONICAL\_CHECK\_OK). PF12 binds these tokens to sampler artifacts by name and path only; token semantics remain owned by Governance and Glow QA Guide.
-
-#### **Engine Core evidence (DISS003/DISS004 — HDE-EPIC019)**
-
-These entries register the Engine Core evidence families introduced by HDE-EPIC019 PR7 as governed members of the Evidence Catalog. They mirror the sampler evidence pattern: canonical JSON artifacts under artifacts/core/, schemas under docs/schemas/core/, and full Index/Mirror \+ path-proof discipline under §8.3–§8.6.
-
-##### **engine\_core\_purity\_report — Engine Core purity report**
-
-Purpose. Canonical JSON report that summarizes Engine Core “purity” checks over compute\_core scenarios (for example, invariants that must hold for all core calls under closed rails). Each report instance is produced under closed rails and records env posture and provenance alongside result data.
-
-Artifact path. artifacts/core/purity/purity\_report.json (and siblings under artifacts/core/purity/ if multiple purity reports are captured).
-
-Schema path. docs/schemas/core/engine\_core\_purity\_report.schema.json (JSON Schema 2020-12, titles-only here).
-
-Generated-at and env metadata. Each artifact MUST include a payload-level generated\_at\_utc field (UTC ISO-8601) and closed-rails env metadata sufficient to reconstruct the determinism posture used for the run; provenance semantics and timestamp constraints follow §8.3 (“Artifacts with generated\_at\_utc”) for all Engine Core families.
-
-##### **engine\_core\_two\_run\_logs — Engine Core two-run identity logs**
-
-Purpose. Canonical JSON logs demonstrating two-run identity for Engine Core output (same inputs ⇒ identical outputs) under closed rails. These logs are used to prove TWO\_RUN\_IDENTITY\_OK and related determinism tokens for the core engine.
-
-Artifact path. artifacts/core/two\_run/identity.json.
-
-Schema path. docs/schemas/core/engine\_core\_two\_run\_logs.schema.json.
-
-Notes. Arrays that function as sets (for example, lists of tested scenarios) MUST follow arrays-as-sets rules in §4.2 (deduped by identity, ASCII-sorted).
-
-##### **engine\_core\_abba\_logs — Engine Core AB/BA/ABBA parity logs**
-
-Purpose. Canonical JSON logs for AB/BA/ABBA runs over Engine Core (for example, swapping label order where appropriate), used to demonstrate that core behavior is invariant under symmetry-preserving input permutations after normalization.
-
-Artifact path. artifacts/core/abba/ab\_ba\_parity.json.
-
-Schema path. docs/schemas/core/engine\_core\_abba\_logs.schema.json.
-
-Notes. These logs complement engine\_core\_two\_run\_logs by proving parity properties; the same canonical JSON and path-proof discipline applies.
-
-##### **engine\_core\_json\_compare\_logs — Engine Core JSON-compare logs**
-
-Purpose. Canonical JSON logs produced by comparing Engine Core result JSON across two runs or two surfaces (for example, CLI vs internal harness) and recording equality/inequality at the structured JSON level. These artifacts are used to support JSON\_CANONICAL\_CHECK\_OK, TWO\_RUN\_IDENTITY\_OK, and related core evidence tokens.
-
-Artifact path. artifacts/core/json\_compare/core\_result\_json\_compare.json.
-
-Schema path. docs/schemas/core/engine\_core\_json\_compare\_logs.schema.json.
-
-Notes. Logs MUST NOT include raw payloads beyond what the schema requires for comparison; they remain names-only and structural, and rely on canonical JSON for reproducible diffs.
-
-##### **Canonical JSON policy and governed locations (Engine Core)**
-
-All Engine Core artifacts listed above MUST use the canonical JSON emitter governed by §4 (UTF-8, ASCII-sorted keys, compact separators, exactly one trailing LF; arrays used as sets are deduped and ASCII-sorted by identity).
-
-All Engine Core artifacts and schemas MUST live under governed locations:
-
-* artifacts: artifacts/core/\*\*
-
-* schemas: docs/schemas/core/\*\*
-
-Transient generator paths (for example, scratch or codex/out/\*\*) MUST NOT be indexed or mirrored.
-
-##### **Evidence Index/Mirror and path-proofs (Engine Core)**
-
-For each Engine Core family, the Human Evidence Index (docs/evidence/INDEX.json) MUST contain at least one entry with the appropriate artifact\_key (for example, "engine\_core\_purity\_report") and a discovered\_physical\_path pointing to the governed artifact path; docs/evidence/INDEX.sha256 MUST be updated in the same PR when adding or changing any Engine Core artifact.
-
-The Machine Evidence Mirror (artifacts/evidence\_index.jsonl) MUST contain canonical JSONL records for each governed Engine Core artifact and schema, using artifact\_key names exactly as above and the minimum Mirror record schema in §8.3 (artifact\_key, role, sha256, size\_bytes, produced\_at\_utc, discovered\_physical\_path, proof\_anchor).
-
-Each Engine Core artifact and schema MUST have a sibling path-proof transcript (for example, artifacts/core/purity/purity\_report.json.path\_proof.txt, docs/schemas/core/engine\_core\_purity\_report.schema.json.path\_proof.txt) that satisfies the path-proof schema in §8.3 and is referenced from the Mirror record via proof\_anchor. Path-proof sha256 and size\_bytes MUST match both the artifact’s canonical bytes and the Mirror record values.
-
-##### **Acceptance hints (names-only; Engine Core skeleton)**
-
-Engine Core evidence families participate in the existing Mirror/Index tokens referenced in §0.2 and §8.3 (for example, EVIDENCE\_INDEX\_UPDATED\_OK, EVIDENCE\_INDEX\_HASH\_OK, EVIDENCE\_INDEX\_MIRROR\_OK, EVIDENCE\_PATHS\_VALIDATED\_OK, MACHINE\_MIRROR\_UPDATED\_OK, JSON\_CANONICAL\_CHECK\_OK, TWO\_RUN\_IDENTITY\_OK). Together with the sampler evidence families, they form the governed Engine Core/sampler evidence skeleton for DISS003/DISS004; PF12 binds these tokens to Engine Core artifacts by name and path only. Token semantics remain owned by Governance and Glow QA Guide.
-
-#### **SBOM**
-
-* sbom/cyclonedx.json
-
+* sbom/cyclonedx.json  
 * sbom/cyclonedx.json.sha256
 
-  #### **Registry/reporting & config**
+  ##### **Registry, reporting, and config**
 
-* artifacts/registry/registry\_report.json
+* artifacts/registry/registry\_report.json  
+* config.magic10 — Magic-10 configuration snapshot  
+  Names-only summary of Magic-10 order, caps, and seed metadata; canonical JSON.  
+  Path: artifacts/thresholds/magic10\_config.json  
+  Path-proof: artifacts/thresholds/magic10\_config.json.path\_proof.txt  
+  Mirror record: artifact\_key:"config.magic10", role:"snapshot", discovered\_physical\_path:"artifacts/thresholds/magic10\_config.json", with sha256, size\_bytes, produced\_at\_utc, and proof\_anchor matching the artifact’s canonical bytes and path-proof as required by §8.3 and §8.14.1.  
+* config.band\_edges — band-edges configuration snapshot  
+  Names-only summary of band names, edges, clamp, rounding mode, and version linked to math/thresholds.json; canonical JSON.  
+  Path: artifacts/thresholds/band\_edges.json  
+  Path-proof: artifacts/thresholds/band\_edges.json.path\_proof.txt  
+  Mirror record: artifact\_key:"config.band\_edges", role:"snapshot", discovered\_physical\_path:"artifacts/thresholds/band\_edges.json", with sha256, size\_bytes, produced\_at\_utc, and proof\_anchor matching the artifact’s canonical bytes and path-proof as required by §8.3 and §8.14.2.  
+* epic018.config.acceptance\_map — HDE-EPIC018 config acceptance map  
+  PF09-style mapping from config tasks to artifact keys to tokens and tests; canonical JSON.  
+  Path: audit/EPIC-018\_config\_acceptance\_map.json  
+  Path-proof: audit/EPIC-018\_config\_acceptance\_map.json.path\_proof.txt  
+  Mirror record: artifact\_key:"epic018.config.acceptance\_map", role:"snapshot", discovered\_physical\_path:"audit/EPIC-018\_config\_acceptance\_map.json", with sha256, size\_bytes, produced\_at\_utc, and proof\_anchor matching the artifact’s canonical bytes and path-proof as required by §8.3 and §8.14.3.  
+* epic024.qa\_rca — EPIC024 QA RCA narrative file, close-pack companion  
+  Path: audit/EPIC-024\_QA\_RCA.md  
+* config\_bundle.fe — typed frontend config bundle  
+  Names-only projection of governed Magic-10 config, band-edges config, and registry topology or alias policy for client consumption; canonical JSON; includes a sources block keyed to the underlying config artifacts and registry report.  
+  Path: JSON file under artifacts/config\_bundles/, exact filename pinned by the bundle generator and tests.  
+  Path-proof: sibling .path\_proof.txt transcript under artifacts/path\_proofs/ for the same path.  
+  Mirror record: artifact\_key:"config\_bundle.fe", role:"snapshot", discovered\_physical\_path equal to the bundle path, with sha256, size\_bytes, produced\_at\_utc, and proof\_anchor matching the bundle’s canonical bytes and path-proof as required by §8.3 and §8.15.  
+* config\_bundle.be — typed backend config bundle  
+  Names-only projection of governed Magic-10 config, band-edges config, full channels, centers, domains, alias policy, and registry-derived topology for engine and internal use; canonical JSON; includes a sources block keyed to the underlying config artifacts and registry report.  
+  Path: JSON file under artifacts/config\_bundles/, exact filename pinned by the bundle generator and tests.  
+  Path-proof: a sibling \<bundle\_file\>.path\_proof.txt transcript stored alongside the bundle file in the same directory.  
+  Mirror record: artifact\_key:"config\_bundle.be", role:"snapshot", discovered\_physical\_path equal to the bundle path, with sha256, size\_bytes, produced\_at\_utc, and proof\_anchor matching the bundle’s canonical bytes and path-proof as required by §8.3 and §8.15.
 
-config.magic10 — Magic-10 configuration snapshot (names-only summary of Magic-10 order, caps, and seed metadata; canonical JSON).
+  ##### **BodyGraph adapter data-source and invariance**
 
-Path: artifacts/thresholds/magic10\_config.json
-
-Path-proof: artifacts/thresholds/magic10\_config.json.path\_proof.txt
-
-Mirror record: artifact\_key:"config.magic10", role:"snapshot", discovered\_physical\_path:"artifacts/thresholds/magic10\_config.json", with sha256, size\_bytes, produced\_at\_utc, and proof\_anchor matching the artifact’s canonical bytes and path-proof as required by §8.3 and §8.14.1.
-
-config.band\_edges — Band-edges configuration snapshot (names-only summary of band names, edges, clamp, rounding mode, and version linked to math/thresholds.json; canonical JSON).
-
-Path: artifacts/thresholds/band\_edges.json
-
-Path-proof: artifacts/thresholds/band\_edges.json.path\_proof.txt
-
-Mirror record: artifact\_key:"config.band\_edges", role:"snapshot", discovered\_physical\_path:"artifacts/thresholds/band\_edges.json", with sha256, size\_bytes, produced\_at\_utc, and proof\_anchor matching the artifact’s canonical bytes and path-proof as required by §8.3 and §8.14.2.
-
-epic018.config.acceptance\_map — HDE-EPIC018 config acceptance map (PF09-style mapping from config tasks → artifact keys → tokens/tests; canonical JSON).
-
-epic024.qa\_rca — EPIC024 QA RCA narrative file (close-pack companion). (path: audit/EPIC-024\_QA\_RCA.md)
-
-Path: audit/EPIC-018\_config\_acceptance\_map.json
-
-Path-proof: audit/EPIC-018\_config\_acceptance\_map.json.path\_proof.txt
-
-Mirror record: artifact\_key:"epic018.config.acceptance\_map", role:"snapshot", discovered\_physical\_path:"audit/EPIC-018\_config\_acceptance\_map.json", with sha256, size\_bytes, produced\_at\_utc, and proof\_anchor matching the artifact’s canonical bytes and path-proof as required by §8.3 and §8.14.3.
-
-config\_bundle.fe — Typed frontend config bundle (names-only projection of governed Magic-10 config, band-edges config, and registry topology/alias policy for client consumption; canonical JSON; includes a sources block keyed to the underlying config artifacts and registry report).
-
-Path: JSON file under artifacts/config\_bundles/ (exact filename pinned by the bundle generator and tests).
-
-Path-proof: sibling .path\_proof.txt transcript under artifacts/path\_proofs/\<SUBPATH\> for the same path.
-
-Mirror record: artifact\_key:"config\_bundle.fe", role:"snapshot", discovered\_physical\_path equal to the bundle path, with sha256, size\_bytes, produced\_at\_utc, and proof\_anchor matching the bundle’s canonical bytes and path-proof as required by §8.3 and §8.15.
-
-config\_bundle.be — Typed backend config bundle (names-only projection of governed Magic-10 config, band-edges config, full channels/centers/domains/alias policy, and registry-derived topology for engine/internal use; canonical JSON; includes a sources block keyed to the underlying config artifacts and registry report).
-
-Path: JSON file under artifacts/config\_bundles/ (exact filename pinned by the bundle generator and tests).
-
-Path-proof: a sibling \<bundle\_file\>.path\_proof.txt transcript stored alongside the bundle file (same directory).
-
-Mirror record: artifact\_key:"config\_bundle.be", role:"snapshot", discovered\_physical\_path equal to the bundle path, with sha256, size\_bytes, produced\_at\_utc, and proof\_anchor matching the bundle’s canonical bytes and path-proof as required by §8.3 and §8.15.
-
-#### **BodyGraph adapter data-source and invariance**
-
-* artifacts/bodygraph/source\_selection.snapshot.json
-
-* artifacts/bodygraph/source\_invariance/ab.json
-
-* artifacts/bodygraph/source\_invariance/ba.json
-
-* artifacts/bodygraph/source\_invariance/summary.json
-
-* artifacts/bodygraph/release\_bindings.json
-
-* artifacts/bodygraph/refresh\_policy.snapshot.json
-
-* artifacts/bodygraph/metrics.snapshot.json
-
+* artifacts/bodygraph/source\_selection.snapshot.json  
+* artifacts/bodygraph/source\_invariance/ab.json  
+* artifacts/bodygraph/source\_invariance/ba.json  
+* artifacts/bodygraph/source\_invariance/summary.json  
+* artifacts/bodygraph/release\_bindings.json  
+* artifacts/bodygraph/refresh\_policy.snapshot.json  
+* artifacts/bodygraph/metrics.snapshot.json  
 * artifacts/bodygraph/keys\_only.logs.sample
 
-  #### **Lifecycle (backup/restore/retention) — OPS-managed captures**
+  ##### **Lifecycle (backup, restore, retention) — OPS-managed captures**
 
-* artifacts/db/backup\_manifest.json
-
-* artifacts/db/restore\_verify.log
-
+* artifacts/db/backup\_manifest.json  
+* artifacts/db/restore\_verify.log  
 * artifacts/db/retention\_run.log
 
-  #### **Admin QA and runbooks**
+  ##### **Admin QA and runbooks**
 
-* docs/run/PROD\_ENDPOINTS.json
-
-* docs/run/RUN\_PROD\_QA.md
-
-* docs/run/EPIC011\_TEST\_IDENTITIES.md
-
-* artifacts/ops/admin\_vendor\_calls.jsonl
+* docs/run/PROD\_ENDPOINTS.json  
+* docs/run/RUN\_PROD\_QA.md  
+* docs/run/EPIC011\_TEST\_IDENTITIES.md  
+* artifacts/ops/admin\_vendor\_calls.jsonl  
+* 
 
 ---
 
@@ -4656,10 +4579,9 @@ These entries register QA harness ledger files that summarize Live QA results as
 ### **Invariant required outputs (current-state; canonical paths)**
 
 * `audit/qa/<epic-id>/qa_step_logs_manifest.json`: Per-epic manifest acting as a current-state index keyed by check\_id, pointing to (at minimum) each check’s status and the canonical path to its primary log. Records-only canonical JSON (UTF-8, ASCII-sorted keys, compact, exactly one trailing LF).  
-* `audit/qa/<epic-id>/checks/po-000/qa_step_logs_manifest.json`: Optional step-0, check-scoped current-state copy of the QA step logs manifest. When a Live QA plan explicitly names this check-scoped manifest as a required deliverable, it is the binding surface for that run.
-
-* `audit/qa/<epic-id>/checks/po-000/qa_step_logs_manifest.json.path_proof.txt`: Required sibling path-proof transcript whenever the step-0 check-scoped manifest copy exists.
-
+* `audit/qa/<epic-id>/qa_step_logs_manifest.json.path_proof.txt`: Required sibling path-proof transcript whenever the root-level current-state manifest is created, refreshed, or indexed as governed evidence for the run.  
+* `audit/qa/<epic-id>/checks/po-000/qa_step_logs_manifest.json`: Optional step-0, check-scoped current-state copy of the QA step logs manifest. When a Live QA plan explicitly names this check-scoped manifest as a required deliverable, it is the binding surface for that run.  
+* `audit/qa/<epic-id>/checks/po-000/qa_step_logs_manifest.json.path_proof.txt`: Required sibling path-proof transcript whenever the step-0 check-scoped manifest copy exists.  
 * Legacy/root-level continuity note. A root-level pair at `audit/qa/<epic-id>/qa_step_logs_manifest.json` and `audit/qa/<epic-id>/qa_step_logs_manifest.json.path_proof.txt` MAY remain for continuity, but it is non-decisive for a run when the Live QA plan explicitly binds the step-0 check-scoped pair.
 
 ### **Optional per-check outputs (check-owned; current-state if present)**
@@ -4667,7 +4589,9 @@ These entries register QA harness ledger files that summarize Live QA results as
 * `audit/qa/<epic-id>/checks/<check_id>/transcript.txt`: Optional per-check execution transcript (non-empty UTF-8 text). If treated as governed evidence, it MUST have a sibling `transcript.txt.path_proof.txt`.
 
 * `audit/qa/<epic-id>/checks/<check_id>/deliverables_report.md`: Optional per-check deliverables report summarizing step-scoped planned outputs and observed artifacts. When used as QA proof, it is admissible only if it lands under the canonical epic QA root and the canonical check directory for that step. It MUST NOT rely on per-run nesting as a correctness key.  
-* `audit/qa/<epic-id>/checks/po-009/closed_rails_stdout.log`: Optional CHECK po-009 stdout capture for a closed-rails lane. Produced only when that lane executes. If present, it MUST be UTF-8 text.
+* `audit/qa/<epic-id>/checks/po-009/closed_rails_stdout.log`: Optional CHECK po-009 stdout capture for a closed-rails lane. Produced only when that lane executes. If present, it MUST be UTF-8 text.  
+* `audit/qa/hde-epic027/checks/po-009/catalog_surface_inventory.txt`: Optional CHECK po-009 plain-text catalog-surface inventory used to demonstrate that no unexpected public success surface appears in the current EPIC027 catalog family. LF-terminated text when present.  
+* `audit/qa/hde-epic027/checks/po-009/token_inventory.txt`: Optional CHECK po-009 plain-text token inventory used to demonstrate that no non-canonical token names are introduced in the current EPIC027 token family. LF-terminated text when present.
 
 * `audit/qa/<epic-id>/checks/po-009/closed_rails_stderr.log`: Optional CHECK po-009 stderr capture for a closed-rails lane. Produced only when that lane executes. It MAY be empty only when the underlying command produced no stderr and the plan still requires the file.
 
@@ -4706,28 +4630,44 @@ These entries register QA harness ledger files that summarize Live QA results as
 
 * `audit/qa/<epic-id>/checks/<check_id>/sanity_pipeline_stdout.txt`: Optional per-check stdout capture for `ci/pipeline/run_sanity_pipeline.py`. If present, it MUST have a sibling `sanity_pipeline_stdout.txt.sha256`.
 
-* `audit/qa/<epic-id>/checks/<check_id>/endpoints_catalog.json`: Optional per-check endpoint catalog snapshot used for the step’s validation. If present, it MUST have a sibling `endpoints_catalog.json.sha256`.
-
-* `audit/qa/<epic-id>/checks/<check_id>/route_proof.txt`: Optional per-check plain-text route proof used to demonstrate route existence and gating. LF-terminated text when present.
-
-* `audit/qa/<epic-id>/checks/po-007/catalog_sha256_check.txt`: Optional CHECK po-007 text capture of a baseline-versus-current endpoint catalog hash comparison. LF-terminated text when present.
-
-* `audit/qa/<epic-id>/checks/po-007/catalog_extract_dev_endpoints.json`: Optional CHECK po-007 extracted dev-endpoints proof file used to verify the `/dev/*/conjunction` endpoint set. Canonical JSON when present.
-
-* `audit/qa/<epic-id>/checks/<check_id>/pytest_stdout.log`: Optional per-check stdout capture for a pytest lane. If present, it MUST be UTF-8 text.
-
-* `audit/qa/<epic-id>/checks/<check_id>/pytest_stderr.log`: Optional per-check stderr capture for a pytest lane. It MAY be empty only when the underlying command produced no stderr and the plan still requires the file.
-
-* `audit/qa/<epic-id>/checks/<check_id>/pytest_rc.txt`: Optional per-check exit-code capture for a pytest lane. If present, it MUST contain only the final integer exit code plus trailing LF.
-
-* `audit/qa/<epic-id>/checks/<check_id>/catalog_api_compat_entry.json`: Optional per-check extracted compat-catalog proof file used to demonstrate `/api/compat/v1` presence for that step. Canonical JSON when present.
-
-* `audit/qa/<epic-id>/checks/po-008/cli_help.txt`: Optional CHECK po-008 stdout capture for `hdctl --help`. If present, it MUST be UTF-8 text.
-
-* `audit/qa/<epic-id>/checks/po-008/showcompat_help.txt`: Optional CHECK po-008 stdout capture for `hdctl showcompat --help`. If present, it MUST be UTF-8 text.
-
-* `audit/qa/<epic-id>/checks/po-008/reject_nonjson_stdout.log`: Optional CHECK po-008 stdout capture for a non-JSON conjunction-modifier rejection lane. If present, it MUST be UTF-8 text.
-
+* `audit/qa/<epic-id>/checks/<check_id>/endpoints_catalog.json`: Optional per-check endpoint catalog snapshot used for the step’s validation. If present, it MUST have a sibling `endpoints_catalog.json.sha256`.  
+* `audit/qa/<epic-id>/checks/<check_id>/route_proof.txt`: Optional per-check plain-text route proof used to demonstrate route existence and gating. LF-terminated text when present.  
+* `audit/qa/<epic-id>/checks/po-007/catalog_sha256_check.txt`: Optional CHECK po-007 text capture of a baseline-versus-current endpoint catalog hash comparison. LF-terminated text when present.  
+* `audit/qa/<epic-id>/checks/po-007/catalog_extract_dev_endpoints.json`: Optional CHECK po-007 extracted dev-endpoints proof file used to verify the `/dev/*/conjunction` endpoint set. Canonical JSON when present.  
+* `audit/qa/hde-epic027/checks/po-007/update_evidence_index_write.txt`: Optional CHECK po-007 stdout capture for the evidence-index write lane. If present, it MUST be UTF-8 text.  
+* `audit/qa/hde-epic027/checks/po-007/update_evidence_index_check.txt`: Optional CHECK po-007 stdout capture for the evidence-index check lane. If present, it MUST be UTF-8 text.  
+* `audit/qa/hde-epic027/checks/po-007/orientation_demo_write.txt`: Optional CHECK po-007 stdout capture for the topology orientation-demo write lane. If present, it MUST be UTF-8 text.  
+* `audit/qa/hde-epic027/checks/po-007/orientation_demo_check.txt`: Optional CHECK po-007 stdout capture for the topology orientation-demo check lane. If present, it MUST be UTF-8 text.  
+* `audit/qa/hde-epic027/checks/po-007/validate_evidence_paths.txt`: Optional CHECK po-007 stdout capture for the evidence-path validation lane. If present, it MUST be UTF-8 text.  
+* `audit/qa/hde-epic027/checks/po-007/check_lf_endings.txt`: Optional CHECK po-007 stdout capture for the final-LF validation lane. If present, it MUST be UTF-8 text.  
+* `audit/qa/hde-epic027/checks/po-007/check_mirror_schema.txt`: Optional CHECK po-007 stdout capture for the mirror-schema validation lane. If present, it MUST be UTF-8 text.  
+* `audit/qa/hde-epic027/checks/po-007/qa_step_manifest_lookup.txt`: Optional CHECK po-007 plain-text lookup proof used to demonstrate EPIC027 qa-step manifest coverage in the updater source and governed ledgers. LF-terminated text when present.  
+* `audit/qa/<epic-id>/checks/<check_id>/pytest_stdout.log`: Optional per-check stdout capture for a pytest lane. If present, it MUST be UTF-8 text.  
+* `audit/qa/<epic-id>/checks/<check_id>/pytest_stderr.log`: Optional per-check stderr capture for a pytest lane. It MAY be empty only when the underlying command produced no stderr and the plan still requires the file.  
+* `audit/qa/<epic-id>/checks/<check_id>/pytest_rc.txt`: Optional per-check exit-code capture for a pytest lane. If present, it MUST contain only the final integer exit code plus trailing LF.  
+* `audit/qa/<epic-id>/checks/<check_id>/catalog_api_compat_entry.json`: Optional per-check extracted compat-catalog proof file used to demonstrate `/api/compat/v1` presence for that step. Canonical JSON when present.  
+* `audit/qa/<epic-id>/checks/po-001/route_inventory.txt`: Optional CHECK po-001 plain-text route inventory proof used to demonstrate the dev conjunction trio and the related blueprint registration state. LF-terminated text when present.  
+* `audit/qa/<epic-id>/checks/po-001/dev_conjunction_http.txt`: Optional CHECK po-001 pytest stdout capture for the dev conjunction HTTP validation lane. If present, it MUST be UTF-8 text.  
+* `audit/qa/<epic-id>/checks/po-001/endpoint_catalog.txt`: Optional CHECK po-001 pytest stdout capture for the endpoint catalog validation lane. If present, it MUST be UTF-8 text.  
+* `audit/qa/<epic-id>/checks/po-002/compat_surface.txt`: Optional CHECK po-002 plain-text compat surface proof used to demonstrate `/api/compat/v1` mount posture and compat blueprint root behavior for that step. LF-terminated text when present.  
+* `audit/qa/<epic-id>/checks/po-002/compat_identity_discovery.txt`: Optional CHECK po-002 plain-text identity-discoverability proof used to show updater or mirror references to `compat.conjunction.identity_hash`. LF-terminated text when present.  
+* `audit/qa/<epic-id>/checks/po-003/cli_emitter_proof.txt`: Optional CHECK po-003 plain-text emitter proof used to show shared `emit_public` usage and the CLI LF or CRLF guard posture for that step. LF-terminated text when present.  
+* `audit/qa/<epic-id>/checks/po-003/showcompat_parity.txt`: Optional CHECK po-003 pytest stdout capture for the showcompat parity and identity lane. If present, it MUST be UTF-8 text.  
+* `audit/qa/<epic-id>/checks/po-003/showcompat_help.txt`: Optional CHECK po-003 stdout capture for `hdctl showcompat --help`. If present, it MUST be UTF-8 text.  
+* `audit/qa/hde-epic027/checks/po-004/entrypoint_proof.txt`: Optional CHECK po-004 plain-text entrypoint proof used to demonstrate explicit pyproject console binding for that step. LF-terminated text when present.  
+* `audit/qa/hde-epic027/checks/po-004/cli_install_help.txt`: Optional CHECK po-004 pytest stdout capture for the CLI install-help validation lane. If present, it MUST be UTF-8 text.  
+* `audit/qa/hde-epic027/checks/po-004/bg_resolve_test.txt`: Optional CHECK po-004 pytest stdout capture for the bg-resolve validation lane. If present, it MUST be UTF-8 text.  
+* `audit/qa/hde-epic027/checks/po-004/bg_resolve_help.txt`: Optional CHECK po-004 stdout capture for `hdctl bg:resolve --help`. If present, it MUST be UTF-8 text.  
+* `audit/qa/hde-epic027/checks/po-005/reader_a7_transport.txt`: Optional CHECK po-005 pytest stdout capture for the Reader A7 transport validation lane. If present, it MUST be UTF-8 text.  
+* `audit/qa/hde-epic027/checks/po-005/catalog_routes.txt`: Optional CHECK po-005 plain-text catalog route inventory proof used to show `/reader` A7 eligibility and `/internal/version` non-A7 posture for that step. LF-terminated text when present.  
+* `audit/qa/hde-epic027/checks/po-006/dev_conjunction_http.txt`: Optional CHECK po-006 pytest stdout capture for the dev conjunction HTTP validation lane. If present, it MUST be UTF-8 text.  
+* `audit/qa/hde-epic027/checks/po-006/writer_index_rows.txt`: Optional CHECK po-006 plain-text mirror row proof used to show discoverability of `conjunction.writer.summary` and `conjunction.writer.write_readback` for that step. LF-terminated text when present.  
+* `audit/qa/hde-epic027/checks/po-008/generate_close_pack.txt`: Optional CHECK po-008 stdout capture for the EPIC027 close-pack generator lane. If present, it MUST be UTF-8 text.  
+* `audit/qa/hde-epic027/checks/po-008/close_pack_bindings.txt`: Optional CHECK po-008 plain-text binding proof used to demonstrate that close-pack bindings point to the EPIC027 QA root and current canonical ledger files. LF-terminated text when present.  
+* `audit/qa/hde-epic027/checks/po-008/qa_step_manifest_lookup.txt`: Optional CHECK po-008 plain-text lookup proof used to demonstrate that the EPIC027 qa-step manifest is ledger-bound and not merely present on disk. LF-terminated text when present.  
+* `audit/qa/<epic-id>/checks/po-008/cli_help.txt`: Optional CHECK po-008 stdout capture for `hdctl --help`. If present, it MUST be UTF-8 text.  
+* `audit/qa/<epic-id>/checks/po-008/showcompat_help.txt`: Optional CHECK po-008 stdout capture for `hdctl showcompat --help`. If present, it MUST be UTF-8 text.  
+* `audit/qa/<epic-id>/checks/po-008/reject_nonjson_stdout.log`: Optional CHECK po-008 stdout capture for a non-JSON conjunction-modifier rejection lane. If present, it MUST be UTF-8 text.  
 * `audit/qa/<epic-id>/checks/po-008/reject_nonjson_stderr.log`: Optional CHECK po-008 stderr capture for a non-JSON conjunction-modifier rejection lane. It MAY be empty only when the underlying command produced no stderr and the plan still requires the file.
 
 * `audit/qa/<epic-id>/checks/po-008/reject_nonjson_rc.txt`: Optional CHECK po-008 exit-code capture for a non-JSON conjunction-modifier rejection lane. If present, it MUST contain only the final integer exit code plus trailing LF.
@@ -4753,7 +4693,9 @@ These entries register QA harness ledger files that summarize Live QA results as
 
 * `audit/qa/<epic-id>/checks/po-009/open_rails_note.txt`: Optional CHECK po-009 blocking note used when the open-rails lane does not execute because required product inputs are unavailable. Non-empty UTF-8 text when present.
 
-* `audit/qa/<epic-id>/checks/po-009/po-009_input_constraint.log`: Optional CHECK po-009 text record explaining the input-availability constraint that blocked the planned lane. LF-terminated text when present.
+* `audit/qa/<epic-id>/checks/po-009/po-009_input_constraint.log`: Optional CHECK po-009 text record explaining the input-availability constraint that blocked the planned lane. LF-terminated text when present.  
+* `audit/qa/hde-epic027/checks/po-010/runtime_log_presence.txt`: Optional CHECK po-010 plain-text runtime-log presence proof used to show that no prerequisite same-run runtime logs are missing for that step. LF-terminated text when present.  
+* `audit/qa/hde-epic027/checks/po-010/runtime_surface_inventory.txt`: Optional CHECK po-010 plain-text runtime-surface inventory used to demonstrate same-run execution across the required runtime proof families for that step. LF-terminated text when present.
 
 * `audit/qa/<epic-id>/checks/po-010/showcompat_help.txt`: Optional CHECK po-010 stdout capture for `hdctl showcompat --help`. If present, it MUST be UTF-8 text.
 
@@ -5708,13 +5650,12 @@ Scope / root.
 
 The canonical root for Live QA evidence is:
 
-EPIC\_QA\_ROOT \= audit/qa/\<epic-id\>/
+* EPIC\_QA\_ROOT \= audit/qa/\<epic-id\>/
 
 Within EPIC\_QA\_ROOT, evidence is organized primarily by check\_id (current-state), with a stable epic-level manifest at:
 
-audit/qa/\<epic-id\>/qa\_step\_logs\_manifest.json
-
-Per-run nesting is disallowed for Live QA evidence. Run-id directories, timestamped run roots, and operator-selected fresh evidence roots MUST NOT be introduced or depended on by Live QA Plans, QA prompts, QA reviews, or current-state evidence tooling.
+* `audit/qa/<epic-id>/qa_step_logs_manifest.json`: Per-epic manifest acting as a current-state index keyed by check\_id. Each manifest entry MUST carry, at minimum, `check_id`, `check_name`, `status`, `fail_status`, `log_path`, and `timestamp_utc`; `log_path` MUST point to that check’s canonical primary log under the epic QA root. Records-only canonical JSON (UTF-8, ASCII-sorted keys, compact, exactly one trailing LF).  
+* `audit/qa/<epic-id>/checks/po-000/qa_step_logs_manifest.json`: Optional step-0, check-scoped current-state copy of the QA step logs manifest. When a Live QA plan explicitly names this check-scoped manifest as a required deliverable, it is the binding surface for that run.
 
 This section does not define:
 
@@ -6953,6 +6894,8 @@ env\_pins — Environment pins snapshot used for specific runs (LC\_ALL, LANG, T
 validator\_outputs — Validator outputs proving config sanity. (path: artifacts/proofs/validator\_outputs.json)
 
 internal\_version\_get\_head — /internal/version ops identity proof (headers/body/conditionals). (path: artifacts/proofs/internal\_version\_get\_head.json)
+
+compat.conjunction.identity\_hash — Primary governed compat-closure artifact for explicit conjunction identity-hash capture; bytes MUST match the canonical AB compat bytes for the same pair. (path: artifacts/compat/identity\_hash.txt)
 
 cli.showcompat.stdout — Canonical stdout capture for `hde showcompat` (LF-terminated; no CRLF; non-empty on success; success has empty stderr). (path: artifacts/cli/showcompat/stdout.json)
 

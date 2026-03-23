@@ -2,11 +2,11 @@
 
 **Status:** Reference
 
-**Version:** v1.7.9
+**Version:** v1.8
 
-**Effective date:** 2026-03-03
+**Effective date:** 2026-03-19
 
-**Last Update Gate:** HDE-EPIC026 Closure
+**Last Update Gate:** HDE-EPIC027 Closure
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -5593,4 +5593,293 @@ Deliverables register mismatch note: PF10’s closure review includes a separate
 **E. Roll-forward integrity:**
 
 * PF10 closeout posture sets overall readiness to “Not ready” pending resolution of the `po-005` auditability defect and the `po-009` planning-defect remediation deferral (PF10 — HDE Build Notes, §2.32).
+
+### **2.12 HDE-EPIC027 Epic Plan**
+
+#### **2.12.1 Meta**
+
+**Epic ID:** HDE-EPIC027  
+**Epic title (Implementation Guide):** Conjunction Pass 3 (`r7 Epic Plan HDE-EPIC027.md`, header)  
+**Epic name (short):** Conjunction Pass 3  
+**Phase:** Conjunction  
+**Status:** Archived  
+**Owner:** Unknown (not present in inputs)  
+**Priority:** Unknown (not present in inputs)  
+**Date started:** 2025.03.11 (operator-provided)  
+**Date completed:** 2025.03.19 (operator-provided)  
+**Epic outcome (per PF10):** Done
+
+**Epic intent (planned; one paragraph):** This epic is a Conjunction hardening and completion pass. It preserves the existing Reader covenant, keeps A7 proofs bound to the cataloged JSON success route family, keeps writers outside the A7 proof surface family, forbids new token names and public contract surfaces, and finishes the remaining Conjunction work in compat, CLI serializer coupling, reader transport wiring, CLI tooling, writer surfaces, and global evidence discipline. (`r7 Epic Plan HDE-EPIC027.md`, §Business Case; §Contract and Compatibility Posture)
+
+**Scope anchor (plan):** `r7 Epic Plan HDE-EPIC027.md`, §Deliverables (Jobs To Be Done)  
+**Stakeholders:** Unknown (not present in inputs)
+
+**PR stream (PF10):** PR-01 cleanup/remediation, PR02, PR03, PR04, Audit Analysis, Implementation Report, ADR Set (PF10 — HDE Build Notes, §2.1–§2.8)  
+**QA log stream (PF10):** CHECK `d0_discovery`, `po-001`, `po-002`, `po-003`, `po-004`, `po-005`, `po-006`, `po-007`, `po-008`, `po-009`, `po-010` (PF10 — HDE Build Notes, §2.11–§2.21)
+
+**Date provenance mismatch:** PF10 QA evidence and closeout artifacts repeatedly cite March 2026 timestamps, including `2026-03-19T07:32:00Z` and `2026-03-19T07:32:17Z` in `audit/qa/hde-epic027/checks/po-010/primary.log` and `audit/qa/hde-epic027/qa_step_logs_manifest.json.path_proof.txt`, while the operator-provided start/close dates are `2025.03.11` and `2025.03.19`. This archive record preserves the operator-provided dates and records the mismatch explicitly.
+
+**Plan-source mismatch:** PF10’s Implementation Report cites `r5 Implementation Plan HDE-EPIC027.md` as the approved execution-shape source, while this archive record uses `r7 Epic Plan HDE-EPIC027.md` as the planned-scope input per task instructions. PF10 remains the source of truth for what happened.
+
+#### **2.12.2 Existing Work Check (MUST)**
+
+**Planned existing-work posture (`r7 Epic Plan HDE-EPIC027.md`, §Existing Work Check (MUST)):**
+
+* PF09 already treated Conjunction as a partially built phase rather than a blank slate, with Dev HTTP Harness and Caching and Transport Wiring (Reader) already complete and other Conjunction rows still partial/not done.  
+* Existing canon-aligned reusable slices explicitly identified by the plan:  
+  * Dev HTTP Harness already exists as the single dev/QA HTTP harness.  
+  * CLI Serializer Coupling already has a mechanics home and canonical shared presenter/emitter rules.  
+  * Reader success-route proof posture, Endpoint Catalog posture, and A7 success-route invariants already exist and are reused.  
+  * Writer mechanics already exist as a distinct surface family outside the A7 proof family.  
+* Existing tokens validated in the plan include: `TWO_RUN_IDENTITY_OK`, `COMPOSITE_ABBA_IDENTITY_OK`, `JSON_CANONICAL_CHECK_OK`, `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`, `EVIDENCE_INDEX_HASH_OK`, `CI_CHECK_MIRROR_SCHEMA_OK`, `CI_CHECK_FINAL_LF_OK`.
+
+**Actual reuse and delta (PF10):**
+
+* PF10’s Implementation Report explicitly states: “The approved execution shape reused already-implemented D1, D3, and D4 scope, and concentrated new work into four PR slices: compat identity-hash and compat indexing, CLI installability/conformance, writer readback/indexing, and EPIC027 acceptance-ledger plus close-pack bindings.” (PF10 — HDE Build Notes, §2.7)  
+* PF10 records the following concrete reuse/completion outcomes:  
+  * PR-01 supports HDE-CONJ002.3 and HDE-CONJ002.4 moving to Done (PF10 — HDE Build Notes, §2.2).  
+  * PR02 supports the impacted CLI/installability subtasks moving to Done (PF10 — HDE Build Notes, §2.3).  
+  * PR03 supports HDE-CONJ008.2 and HDE-CONJ008.3 moving to Done and preserves writer/A7 separation (PF10 — HDE Build Notes, §2.4).  
+  * PR04 binds 17 canonical tokens in the remedial acceptance map and produces close-pack artifacts at canonical paths (PF10 — HDE Build Notes, §2.5).  
+* PF10 Audit Analysis records one remaining canon delta only: “The only concrete canon delta supported by the allowlisted evidence is a PF14 mechanics correction for the dev writer conjunction endpoint method.” It also states: “No PF09 runnable-task delta is required from this audit pass.” (PF10 — HDE Build Notes, §2.6)
+
+#### **2.12.3 Deliverables (Jobs-to-be-done) — Planned vs Actual Reconciliation**
+
+##### **D1 — Dev HTTP Harness completion**
+
+* **Planned (`r7 Epic Plan HDE-EPIC027.md`, §Deliverable D1):** Reuse the already-complete non-production harness behavior and close the remaining infra wiring so the dev harness remains the single home for local and QA conjunction validation without becoming a public surface. Includes `HDE-CONJ001.1` and `HDE-CONJ001.4`.  
+* **Actual (PF10):** PF10’s Implementation Report states the approved execution shape reused D1 as already-implemented scope rather than landing a new PR slice for it (PF10 — HDE Build Notes, §2.7 “The approved execution shape reused already-implemented D1, D3, and D4 scope”).  
+* **Disposition (archive):** Satisfied as reused baseline. New EPIC027-specific D1 evidence pointers are Unknown (not present in inputs).
+
+##### **D2 — Compat Surface hardening**
+
+* **Planned (`r7 Epic Plan HDE-EPIC027.md`, §Deliverable D2):** Finish the internal compat surface so conjunction compat semantics, canonical bytes, identity-hash capture, and evidence indexing are explicit, deterministic, and closure-ready. Includes `HDE-CONJ002.1`, `HDE-CONJ002.2`, `HDE-CONJ002.3`, `HDE-CONJ002.4`.  
+* **Actual (PF10):** PR-01 ended as a compat-only closure slice for `HDE-CONJ002.3` and `HDE-CONJ002.4`, with the final remediation preserving the compat-only branch state, neutralizing bridge artifact churn, and resolving the CI blocker through a targeted checker/test fix. Concrete anchors include:  
+  * `ci/checks/check_bridge_consistency.py`  
+  * `tests/unit/test_check_bridge_consistency.py`  
+  * `artifacts/db_bridge/adapter_selection.snapshot.json`  
+  * `artifacts/evidence_index.jsonl`  
+    (PF10 — HDE Build Notes, §2.1; §2.2; §2.7)  
+* **Disposition (archive):** Satisfied. PF10 explicitly says the reviewed combined evidence supports moving `HDE-CONJ002.3` and `HDE-CONJ002.4` to Done (PF10 — HDE Build Notes, §2.2).
+
+##### **D3 — CLI Serializer Coupling completion**
+
+* **Planned (`r7 Epic Plan HDE-EPIC027.md`, §Deliverable D3):** Close the remaining serializer-coupling work so conjunction-related CLI bytes are forced through the shared presenter/emitter path, guarded against ad-hoc serialization, and proven deterministic. Includes `HDE-CONJ003.1`, `HDE-CONJ003.2`, `HDE-CONJ003.3`, `HDE-CONJ003.4`.  
+* **Actual (PF10):** PF10’s Implementation Report states D3 was reused as already-implemented scope: “The approved execution shape reused already-implemented D1, D3, and D4 scope.” (PF10 — HDE Build Notes, §2.7)  
+* **Disposition (archive):** Satisfied as reused baseline. New EPIC027-specific D3 evidence pointers are Unknown (not present in inputs).
+
+##### **D4 — Reader Surface and Transport Wiring completion**
+
+* **Planned (`r7 Epic Plan HDE-EPIC027.md`, §Deliverable D4):** Finish the conjunction-facing Reader success-route work so the Reader body, Endpoint Catalog posture, A7 success-route transport behavior, env-gating, encoding invariance, and transport evidence indexing are complete and canon-aligned. Includes `HDE-CONJ005.1`–`HDE-CONJ005.4` and reuses `HDE-CONJ006.1`–`HDE-CONJ006.3`.  
+* **Actual (PF10):** PF10’s Implementation Report states D4 was reused as already-implemented scope (PF10 — HDE Build Notes, §2.7). The QA stream also records PASS for runtime/transport checks:  
+  * CHECK `po-005`: “A7 transport test passed” and “the catalog route inventory includes `/reader`” (PF10 — HDE Build Notes, §2.16)  
+  * CHECK `po-010`: “Runtime proof requirements are satisfied” and “Governed metadata trust constraints are satisfied in final state” (PF10 — HDE Build Notes, §2.21, content for `po-010`)  
+* **Disposition (archive):** Satisfied as reused baseline, with additional PASS runtime proof recorded in the QA stream.
+
+##### **D5 — CLI Conformance and CLI Tooling completion**
+
+* **Planned (`r7 Epic Plan HDE-EPIC027.md`, §Deliverable D5):** Complete the operator-facing CLI surface for conjunction by closing installability, entrypoints, showcompat conjunction behavior, sample behavior, conformance, parity, help/argument-policing captures, and tooling evidence indexing. Includes `HDE-CONJ004.1`–`HDE-CONJ004.5` and `HDE-CONJ007.1`–`HDE-CONJ007.4`.  
+* **Actual (PF10):** PR02 delivered explicit CLI installability, help/version, argument-policing, deterministic sampler evidence, and governed CLI artifact coherence. Concrete evidence anchors include:  
+  * `artifacts/cli/install/entrypoints.txt`  
+  * `artifacts/cli/install/installability_summary.json`  
+  * `artifacts/cli/summary.json`  
+  * PASS QA steps `po-003` and `po-004`  
+    (PF10 — HDE Build Notes, §2.3; §2.14; §2.15; §2.7)  
+* **Disposition (archive):** Satisfied. PF10 states the reviewed evidence supports moving the impacted PR02 subtasks to Done (PF10 — HDE Build Notes, §2.3).
+
+##### **D6 — Writer Surfaces completion**
+
+* **Planned (`r7 Epic Plan HDE-EPIC027.md`, §Deliverable D6):** Finish conjunction writer posture so the writer envelope, idempotent write path, evidence indexing, and explicit A7 exclusion posture are complete without widening the A7 proof surface. Includes `HDE-CONJ008.1`–`HDE-CONJ008.4`.  
+* **Actual (PF10):** PR03 delivered writer readback-parity and governed writer evidence while preserving writer/A7 separation. Concrete evidence anchors include:  
+  * `artifacts/writer/conjunction_write_readback.log`  
+  * `artifacts/writer/conjunction_writer_summary.json`  
+  * PASS QA step `po-006`: “this step did not treat writer proof as A7 family proof.”  
+    (PF10 — HDE Build Notes, §2.4; §2.17; §2.7)  
+* **Disposition (archive):** Satisfied. PF10 states the combined work supports changing `HDE-CONJ008.2` and `HDE-CONJ008.3` to Done (PF10 — HDE Build Notes, §2.4).
+
+##### **D7 — Global discipline completion**
+
+* **Planned (`r7 Epic Plan HDE-EPIC027.md`, §Deliverable D7):** Close the remaining conjunction-wide canonical JSON and Index/Mirror discipline work so all conjunction-touched surfaces participate in the single-emitter, canonical-JSON, same-PR evidence posture. Includes `HDE-CONJ009.1` and `HDE-CONJ009.2`.  
+* **Actual (PF10):** PR04 delivered the EPIC027 close-pack slice with canonical acceptance ledgers and same-run QA gate logs. Concrete evidence anchors include:  
+  * `docs/acceptance_map_epic027.json`  
+  * `audit/qa/hde-epic027/token_evidence_matrix.md`  
+  * `audit/qa/hde-epic027/acceptance_map_viability.log`  
+  * `audit/EPIC-027_close_report.md`  
+  * `audit/EPIC-027_MANIFEST.json`  
+  * `audit/qa/hde-epic027/qa_step_logs_manifest.json`  
+  * PASS QA steps `po-007`, `po-008`, `po-009`, `po-010`  
+    (PF10 — HDE Build Notes, §2.5; §2.18–§2.21; §2.7)  
+* **Disposition (archive):** Satisfied as implemented. PF10 states PR04’s remedial acceptance map binds 17 canonical tokens and the close-pack artifacts exist at required canonical paths (PF10 — HDE Build Notes, §2.5). Epic-level closure readiness is still “Not ready” because a PF14 mechanics correction remained open before closure was decided (PF10 — HDE Build Notes, §2.22; §2.8).
+
+**Planned vs actual mismatches (explicit archive notes):**
+
+* **Plan source mismatch:** PF10 Implementation Report cites `r5 Implementation Plan HDE-EPIC027.md` as the approved execution-shape source, while this archive entry uses `r7 Epic Plan HDE-EPIC027.md` as the planned-scope input by task instruction.  
+* **Outcome mismatch:** PF10 records all QA steps `d0_discovery` and `po-001` through `po-010` as PASS, but the final closeout posture remains “Overall readiness: Not ready” because PF10’s ADR set requires the PF14 dev-writer conjunction endpoint correction to drain before closure is decided.  
+* **QA log mismatch:** PF10 section `2.21) QA Pass - HDE-EPIC027 - CHECK po-009` contains content for `CHECK po-010: PO-010`. The heading and the check content do not match.  
+* **Scope mismatch:** The plan treated D1, D3, and D4 as reused baseline, but PF10’s implementation narrative is centered on PR-01 through PR-04 and does not restate a separate closure artifact for the reuse boundary beyond the Implementation Report summary.  
+* **Docs sweep mismatch:** `r7 Epic Plan HDE-EPIC027.md` does not define a standalone docs-sweep deliverable, and PF10 does not provide a distinct EPIC027 Docs PR section.
+
+#### **2.12.4 PF Reference Map**
+
+**Core PF references (from `r7 Epic Plan HDE-EPIC027.md`, §PF Reference Map):**
+
+* PF21 — 7 Phases of Alchemical Engineering, §4. Conjunction  
+* PF10 — HDE Build Notes  
+* PF27 — Canon Plan Templates  
+* PF09 — Canon-HDE-Build-Checklist  
+* PF14 — Canon-HDE-Mechanics-Guide  
+* PF23 — Canon-Reality-Audits  
+* PF02 — Canon-HDE-Architecture  
+* PF04 — Canon-HDE-Governance  
+* PF05 — Canon-HDE-CLI-API-Vendor-Ref  
+* PF12 — Canon-HDE-Schemas-and-Artifacts  
+* PF19 — Canon-Glow-QA-Guide  
+* PF06 — Canon-Epic-Process-Guide
+
+**Execution and results sources used for this archive entry:**
+
+* PF10 — HDE Build Notes, §2.1) Remediation Plan PR-01 \- HDE-EPIC027  
+* PF10 — HDE Build Notes, §2.2) PR-01 Cleanup HDE-EPIC027  
+* PF10 — HDE Build Notes, §2.3) PR02 HDE-EPIC027  
+* PF10 — HDE Build Notes, §2.4) PR03 HDE-EPIC027  
+* PF10 — HDE Build Notes, §2.5) PR04 HDE-EPIC027  
+* PF10 — HDE Build Notes, §2.6) Audit Analysis HDE-EPIC027  
+* PF10 — HDE Build Notes, §2.7) HDE-EPIC027 Implementation Report  
+* PF10 — HDE Build Notes, §2.8) HDE-EPIC027 ADR Set  
+* PF10 — HDE Build Notes, §2.11) QA Pass \- HDE-EPIC027 \- CHECK d0\_discovery: d0 through §2.21) QA Pass \- HDE-EPIC027 \- CHECK po-009  
+* PF10 — HDE Build Notes, §2.22) HDE-EPIC027 Final QA Closeout Review \+ QA RCA  
+* `r7 Epic Plan HDE-EPIC027.md`, §Existing Work Check (MUST), §Deliverables (Jobs To Be Done), §Tokens and Evidence (Acceptance), §QA Rails — Open/Close (Final PR), §Tracked Issues, §Plan Preflight (MUST)  
+* PF27 — Canon Plan Templates, §Epic Record Template (Normative)
+
+#### **2.12.5 Tokens and Evidence (Acceptance)**
+
+**Planned token inventory (`r7 Epic Plan HDE-EPIC027.md`, §Token Inventory):**
+
+* Baseline close tokens: `TESTS_PASS_OK`, `DOC_DELTA_PRESENT_OK`, `EVIDENCE_INDEX_UPDATED_OK`, `MACHINE_MIRROR_UPDATED_OK`, `EVIDENCE_INDEX_HASH_OK`  
+* Additional in-scope token families:  
+  * Compat / global discipline: `JSON_CANONICAL_CHECK_OK`, `TWO_RUN_IDENTITY_OK`, `COMPOSITE_ABBA_IDENTITY_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`  
+  * CLI parity: `CLI_READER_PARITY_OK`  
+  * Reader/A7 transport: `ENDPOINTS_CATALOG_OK`, `ENDPOINTS_CATALOG_ENV_GATE_OK`, `A7_GET_QUOTED_ETAG_OK`, `A7_HEAD_PARITY_OK`, `A7_304_OMITS_CT_CL_OK`, `A7_VARY_AUTH_AE_OK`, `A7_ENCODING_INVARIANCE_OK`  
+  * Global discipline: `CI_CHECK_MIRROR_SCHEMA_OK`, `CI_CHECK_FINAL_LF_OK`  
+  * Rails: `ENV_RAILS_POLICY_OK`
+
+**Planned evidence families (`r7 Epic Plan HDE-EPIC027.md`, §Deliverable-level in-scope token posture):**
+
+* Dev harness posture and infra-wiring family  
+* Compat contract, canonical-compat, and compat identity family  
+* CLI shared presenter and emitter parity family  
+* CLI help, installability, argument-policing, and command-conformance family  
+* Reader success-route and Endpoint Catalog family  
+* A7 success-route and encoding-invariance family  
+* Writer envelope, idempotence, and write and readback parity family  
+* Human Evidence Index and Machine Mirror coherence family  
+* Canonical JSON gate and same-PR proof-anchor refresh family
+
+**Actual token/evidence posture (PF10):**
+
+* **Explicit token claims in PR-01:** `JSON_CANONICAL_CHECK_OK`, `PREIMAGE_RECOMPUTE_OK`, `COMPOSITE_ABBA_IDENTITY_OK` (PF10 — HDE Build Notes, §2.5 PR-01 token evidence print as summarized in §2.7).  
+* **Explicit close-pack ledger claim in PR-04:** “The Remedial PR acceptance map now binds 17 canonical tokens” and “The Remedial PR token matrix now mirrors that expanded ledger.” Exact 17-token list is Unknown (not present in inputs). (PF10 — HDE Build Notes, §2.5; §2.22)  
+* **Concrete evidence pointers recorded in PF10:**  
+  * `docs/acceptance_map_epic027.json`  
+  * `audit/qa/hde-epic027/token_evidence_matrix.md`  
+  * `audit/qa/hde-epic027/acceptance_map_viability.log`  
+  * `audit/EPIC-027_close_report.md`  
+  * `audit/EPIC-027_MANIFEST.json`  
+  * `audit/qa/hde-epic027/qa_step_logs_manifest.json`  
+  * `audit/qa/hde-epic027/qa_step_logs_manifest.json.path_proof.txt`  
+  * `artifacts/evidence_index.jsonl`  
+  * `docs/evidence/INDEX.json`  
+  * `artifacts/compat/identity_hash.txt`  
+  * `artifacts/cli/install/entrypoints.txt`  
+  * `artifacts/cli/install/installability_summary.json`  
+  * `artifacts/cli/summary.json`  
+  * `artifacts/writer/conjunction_write_readback.log`  
+  * `artifacts/writer/conjunction_writer_summary.json`  
+  * `audit/qa/hde-epic027/checks/po-010/runtime_log_presence.txt`  
+  * `audit/qa/hde-epic027/checks/po-010/runtime_surface_inventory.txt`  
+* **Token-name mismatch note:** PF10 does not enumerate the full planned token roster verbatim. The archive record preserves the r7 planned token inventory and separately records PF10’s narrower explicit token claims and the 17-token-close-pack statement.
+
+#### **2.12.6 QA Rails — Open/Close (Final PR)**
+
+**Planned rails posture (`r7 Epic Plan HDE-EPIC027.md`, §QA Rails — Open/Close (Final PR)):**
+
+* Final-PR rails posture is closed by default for acceptance-relevant proof runs.  
+* Any opened-rails exception is titles-only posture, not a runbook.  
+* Live QA is required at epic close under PF06 and PF19.  
+* The epic plan explicitly does not embed a Live QA runbook, step list, command sequence, QA root layout, or evidence directory design.
+
+**Actual QA event stream (PF10 — HDE Build Notes, §2.11–§2.21):**
+
+* CHECK `d0_discovery` — PASS; “The step’s governed `primary.log` now satisfies the PF-Canon trust constraint.” Evidence pointer: `audit/qa/hde-epic027/checks/d0_discovery/primary.log`  
+* CHECK `po-001` — PASS; “4 passed in 2.40s.” Evidence pointer: `audit/qa/hde-epic027/checks/po-001/primary.log`  
+* CHECK `po-002` — PASS; “identity-proof discoverability is explicit in the updater or mirror output.” Evidence pointer: `audit/qa/hde-epic027/checks/po-002/primary.log`  
+* CHECK `po-003` — PASS; parity test \+ help behavior recorded. Evidence pointer: `audit/qa/hde-epic027/checks/po-003/primary.log`  
+* CHECK `po-004` — PASS; “bg:resolve \--help returned usage text with rc=0.” Evidence pointer: `audit/qa/hde-epic027/checks/po-004/primary.log`  
+* CHECK `po-005` — PASS; “A7 transport test passed.” Evidence pointer: `audit/qa/hde-epic027/checks/po-005/primary.log`  
+* CHECK `po-006` — PASS; “this step did not treat writer proof as A7 family proof.” Evidence pointer: `audit/qa/hde-epic027/checks/po-006/primary.log`  
+* CHECK `po-007` — PASS; “all evidence-discipline jobs passed” and “EPIC027 manifest coverage is present in required mapping loci.” Evidence pointers: `audit/qa/hde-epic027/checks/po-007/primary.log`, `audit/qa/hde-epic027/qa_step_logs_manifest.json`  
+* CHECK `po-008` — PASS; “the close-pack generator ran” and “the EPIC027 qa-step manifest is ledger-bound.” Evidence pointer: `audit/qa/hde-epic027/checks/po-008/primary.log`  
+* CHECK `po-009` — PASS; “no unexpected public success surface appears in the catalog inventory” and “no non-canonical token names are introduced in the token inventory.” Evidence pointer: `audit/qa/hde-epic027/checks/po-009/primary.log`  
+* CHECK `po-010` — PASS; “Runtime proof requirements are satisfied” and “Governed metadata trust constraints are satisfied in final state.” Evidence pointers:  
+  * `audit/qa/hde-epic027/checks/po-010/runtime_log_presence.txt`  
+  * `audit/qa/hde-epic027/checks/po-010/runtime_surface_inventory.txt`  
+  * `audit/qa/hde-epic027/checks/po-010/primary.log`
+
+**QA stream mismatch archived explicitly:**
+
+* PF10 heading mismatch: section `2.21) QA Pass - HDE-EPIC027 - CHECK po-009` contains content for `CHECK po-010: PO-010`.  
+* PF10 closeout posture mismatch: step-level PASS is strong across `d0_discovery` and `po-001` through `po-010`, but the final QA Closeout Summary still states “Overall readiness: Not ready” because closure remained blocked on the PF14 dev-writer conjunction endpoint mechanics correction (PF10 — HDE Build Notes, §2.22; §2.8).
+
+#### **2.12.7 Tracked Issues**
+
+**Tracked issues at plan creation (`r7 Epic Plan HDE-EPIC027.md`, §Tracked Issues):**
+
+* “Tracked Issues: None at plan creation.”  
+* Planning-time rule: if a reality ambiguity, canon contradiction, or unproven repo locus appears during planning or execution, it must be recorded and disposed as Completed, Carried forward, Promoted, or Explicitly dropped.
+
+**Actual tracked issues / ADRs recorded in PF10:**
+
+* **ADR-027-CLOSE-01 — PF14 dev writer conjunction endpoint correction timing**  
+  * Decision: “Drain the PF14 correction before closure is decided.”  
+  * Why it matters: PF10 classifies this as the only concrete remaining canon delta after EPIC027.  
+  * Evidence anchor: PF10 — HDE Build Notes, §2.8  
+* **ADR-027-CLOSE-02 — PF09 EPIC027 completion-row timing**  
+  * Decision: Update PF09 rows now; do not hold PF09 status moves hostage to the PF14 doc drain.  
+  * Supported rows: `HDE-CONJ002.3`, `HDE-CONJ002.4`, `HDE-CONJ008.2`, `HDE-CONJ008.3`, `HDE-CONJ009.2`  
+  * Evidence anchor: PF10 — HDE Build Notes, §2.8  
+* **ADR-027-CLOSE-03 — PF10 audit conclusion on PF09 runnable-task delta**  
+  * Decision: Accept that no new PF09 runnable-task delta is required.  
+  * Evidence anchor: PF10 — HDE Build Notes, §2.8  
+* **ADR-027-CLOSE-04 — Status of observational drift themes**  
+  * Decision: Treat dual `create_app` loci, evidence-root classification/root proliferation, and determinism-versus-I/O seam placement as closed observations unless they re-trigger.  
+  * Evidence anchor: PF10 — HDE Build Notes, §2.8
+
+**Implementation-vs-closeout mismatch archived explicitly:**
+
+* PF10 Implementation Report states the remaining issue is only a PF14 mechanics correction and no new PF09 runnable-task delta is required (PF10 — HDE Build Notes, §2.6; §2.7).  
+* PF10 QA Closeout Summary still marks “Overall readiness: Not ready” because ADR-027-CLOSE-01 requires the PF14 correction before closure is decided (PF10 — HDE Build Notes, §2.22; §2.8).
+
+#### **2.12.8 Plan Preflight (MUST)**
+
+**Planned preflight posture (`r7 Epic Plan HDE-EPIC027.md`, §Plan Preflight (MUST)):**
+
+* PF23 consult completed for planning traceability.  
+* Acceptance token names must remain canonical; no local aliases or newly minted token names in the plan.  
+* Close-pack baseline for epic close is declared by title only: epic close report, epic manifest, epic acceptance map, token-to-evidence matrix when required.  
+* The plan remains Epic Planning only and does not embed QA runbooks, step sequences, commands, or evidence directory design.
+
+**Actual archive-level reconciliation:**
+
+* **Existing Work Check:** present in the plan and corroborated by PF10’s Implementation Report reuse statement for D1, D3, and D4 (PF10 — HDE Build Notes, §2.7).  
+* **Canonical token naming:** PF10 step `po-009` records “no non-canonical token names are introduced in the token inventory.” Evidence pointer: `audit/qa/hde-epic027/checks/po-009/primary.log` (PF10 — HDE Build Notes, §2.20).  
+* **Close-pack baseline:** present in actual evidence:  
+  * `docs/acceptance_map_epic027.json`  
+  * `audit/qa/hde-epic027/token_evidence_matrix.md`  
+  * `audit/qa/hde-epic027/acceptance_map_viability.log`  
+  * `audit/EPIC-027_close_report.md`  
+  * `audit/EPIC-027_MANIFEST.json`  
+    (PF10 — HDE Build Notes, §2.5; §2.18–§2.19)  
+* **QA runbook exclusion:** preserved. PF10 Implementation Report restates that the epic “forbids new token names, new public contract surfaces, and embedded Live QA runbooks.” (PF10 — HDE Build Notes, §2.7)
+
+**Archive mismatch note:** The planned preflight posture is satisfied at the plan/structure level, but final close readiness was still blocked by a non-runnable canon delta (PF14 dev writer conjunction endpoint method correction) per ADR-027-CLOSE-01.
 

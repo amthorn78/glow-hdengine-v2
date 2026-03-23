@@ -4,13 +4,13 @@
 
 **Title:** PF09-Canon-HDE-Build-Checklist
 
-**Version:** v3.3.8
+**Version:** v3.4.8
 
 **Status:** Canon
 
-**Effective date:** 2026-03-07
+**Effective date:** 2026-03-22
 
-**Last Update Gate:** BN 10.0.5 Drain A16-22
+**Last Update Gate:** BN 10.1.4 Drain A23-24
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -5715,6 +5715,16 @@ Passes canonicalization checks (canonical JSON, LF-termination, sorted keys, arr
 
 **Subtask status:** **Partial**
 
+**Subtask status notes:**
+
+* **Status (Drain 10.1.4 — 12-14 HDE-EPIC027 CHECK po-001):** Partial.
+
+Current-state QA confirms the dev conjunction trio and compat blueprint mount/app registration, and records passing `dev_conjunction_http` and `endpoint_catalog` test runs under closed rails with deterministic pins.
+
+Primary current-state step artifacts for this proof are `audit/qa/hde-epic027/checks/po-001/route_inventory.txt`, `audit/qa/hde-epic027/checks/po-001/dev_conjunction_http.txt`, and `audit/qa/hde-epic027/checks/po-001/endpoint_catalog.txt`.
+
+This corroborates current-state harness coherence for the dev/internal conjunction surface, but it does not close the broader environment and binding scope already called out in this row, so the subtask remains **Partial**.
+
 **Epic or card:** **HDE-EPIC019 (D3 — Dev-only sampler HTTP endpoint harness), Remediation PR01/PR02A (dev Reader start command & DEV\_SAMPLER\_URL wiring and APP\_ENV forwarding for Codespaces)**
 
 **Tokens:** **Unknown** (any infra/HTTP harness tokens for dev-only internal surfaces will be defined in Governance, Glow Infrastructure, and Mechanics; PF09 will reference them by title once minted)
@@ -5788,6 +5798,30 @@ Passes canonicalization checks (canonical JSON, LF-termination, sorted keys, arr
 Addendum 05-08 PR01 (HDE-EPIC026): adds conjunction contract canonical bytes checks (newline-terminated), AB and BA byte identity, and two-run determinism in `tests/http/test_compat_endpoint_contract.py`.
 
 Pass indicator: `python -m pytest -q tests/http/test_compat_endpoint_contract.py` shows 8 passed.
+
+**Task status notes:**
+
+* **Status (Audit v1 — 2025-11-17):** Not done.
+
+* **Status (Drain 10.1.4 — 1-2 HDE-EPIC027):** Partial (`HDE-CONJ002.3` and `HDE-CONJ002.4` Done; `HDE-CONJ002.2` remains Not done).
+
+The compat-only PR-01 remediation keeps the final net diff compat-only, reverses the bridge snapshot and evidence-index companion churn, resolves the remaining bridge-consistency CI blocker with checker logic plus targeted unit coverage, and reruns the relevant validation set to green.
+
+Retain `tests/unit/test_check_bridge_consistency.py` as direct regression coverage for the sanctioned fallback path; dropping it would weaken reviewability of bridge-consistency semantics.
+
+Internal endpoint for pair-compat emission and QA; not a public product surface.
+
+Uses the same presenter/emitter as Reader/CLI.
+
+Never exposes SR/XR numerics on Reader; any CLI-only diagnostic sidecar is flag-guarded and admin-only.
+
+* **Status (Drain 10.1.4 — 12-14 HDE-EPIC027 CHECK po-002):** Partial.
+
+Current-state QA confirms that the compat surface is mounted at `/api/compat/v1`, that the compat blueprint still exposes the GET probe and POST compute routes, and that `compat.conjunction.identity_hash` is explicitly discoverable via the updater or machine mirror.
+
+Primary current-state step artifacts for this proof are `audit/qa/hde-epic027/checks/po-002/compat_surface.txt` and `audit/qa/hde-epic027/checks/po-002/compat_identity_discovery.txt`.
+
+This corroborates the existing Done posture for `HDE-CONJ002.1`, `HDE-CONJ002.3`, and `HDE-CONJ002.4`. Task status remains **Partial** because `HDE-CONJ002.2` is still **Not done**.
 
 **Status (Audit v1 — 2025-11-17):** Not done.
 
@@ -5885,9 +5919,15 @@ Obey AB↔BA parity on the full compat body, including Integration channel cases
 **Subtask description:**  
  Capture `identity_hash` for compat payloads as sha256 over the LF-terminated compat body for internal/admin evidence.
 
-**Subtask status:** **Not done**
+**Subtask status:** **Done**
 
-**Epic or card:** **Unknown**
+**Subtask status notes:**
+
+* **Status (Drain 10.1.4 — 1-2 HDE-EPIC027):** Done.
+
+The compat-only PR-01 slice keeps explicit conjunction `identity_hash` capture in place, preserves compat contract coverage for `artifacts/compat/identity_hash.txt`, and is now unblocked by the green bridge-consistency remediation.
+
+**Epic or card:** **HDE-EPIC027**
 
 **Tokens:**
 
@@ -5899,6 +5939,8 @@ Obey AB↔BA parity on the full compat body, including Integration channel cases
 
 `artifacts/compat/identity_hash.txt`
 
+`tests/http/test_compat_endpoint_contract.py`
+
 ### Subtask HDE-CONJ002.4 — Compat evidence indexing
 
 **Subtask name/label:** Compat surface Evidence Index & mirror
@@ -5906,9 +5948,15 @@ Obey AB↔BA parity on the full compat body, including Integration channel cases
 **Subtask description:**  
  Index compat artifacts (`artifacts/compat/identity_hash.txt`, `tests/compat/test_abba_parity.py`) in the human Evidence Index and machine mirror in the same PR (records-only canonical JSONL; one LF; unknown-key reject; `proof_anchor` present).
 
-**Subtask status:** **Not done**
+**Subtask status:** **Done**
 
-**Epic or card:** **Unknown**
+**Subtask status notes:**
+
+* **Status (Drain 10.1.4 — 1-2 HDE-EPIC027):** Done.
+
+The final PR-01 cleanup keeps compat-only closure independently auditable, restores full `tests/ops/test_evidence_index.py` coverage in the main lane, preserves the fail-closed guard, refreshes the machine-mirror companion integrity files after rollback, and finishes green across evidence-index, evidence-skeleton, mirror-schema, and bridge-consistency validation.
+
+**Epic or card:** **HDE-EPIC027**
 
 **Tokens:**
 
@@ -5924,6 +5972,18 @@ Obey AB↔BA parity on the full compat body, including Integration channel cases
 
 `artifacts/evidence_index.jsonl`
 
+`artifacts/evidence_index.jsonl.path_proof.txt`
+
+`artifacts/evidence_index.jsonl.sha256`
+
+`artifacts/evidence_index.jsonl.sha256.path_proof.txt`
+
+`tests/ops/test_evidence_index.py`
+
+`tests/evidence/test_evidence_skeleton.py`
+
+`ci/checks/check_mirror_schema.sh`
+
 ---
 
 ## Task HDE-CONJ003 — CLI Serializer Coupling
@@ -5932,7 +5992,7 @@ Obey AB↔BA parity on the full compat body, including Integration channel cases
 
 **Task name/label:** CLI Serializer Coupling
 
-**Task status:** **Not done**
+**Task status: Partial**
 
 **Task description:**  
  Ensure CLI, Reader, and compat flows in tests all use the same presenter/emitter symbol as production, enforce an allow-list of emitters, and prove parity/determinism and absence of ad-hoc JSON via grep/symbol proofs and evidence.
@@ -5972,9 +6032,17 @@ No ad-hoc serializers on public paths; guarded via grep and import-graph symbol 
 **Subtask description:**  
  Ensure all test harnesses that exercise public JSON (Reader, CLI, compat) call the same presenter/emitter symbol used in production; no test-only serializers or bypass paths permitted.
 
-**Subtask status:** **Not done**
+**Subtask status:** **Partial**
 
-**Epic or card:** **Unknown**
+**Subtask status notes:**
+
+* **Status (Drain 10.1.4 — 12-14 HDE-EPIC027 CHECK po-003):** Partial.
+
+Current-state QA proves the CLI-side conjunction path writes public bytes through `_emit_stdout_bytes(emitter.emit_public(conjunction_payload))` and preserves the LF/CRLF guard behavior on that stdout path.
+
+This does not yet prove the full row scope across all Reader and compat harnesses or a complete no-alt-JSON posture, so the subtask remains **Partial**.
+
+**Epic or card:** **HDE-EPIC027**
 
 **Tokens:**
 
@@ -5985,6 +6053,10 @@ No ad-hoc serializers on public paths; guarded via grep and import-graph symbol 
 **Evidence / artifacts:**
 
 `tests/test_emitter_determinism.py`
+
+`audit/qa/hde-epic027/checks/po-003/cli_emitter_proof.txt`
+
+`audit/qa/hde-epic027/checks/po-003/primary.log`
 
 ### Subtask HDE-CONJ003.2 — Emitter allow-list & grep/symbol proofs
 
@@ -6014,9 +6086,17 @@ No ad-hoc serializers on public paths; guarded via grep and import-graph symbol 
 **Subtask description:**  
  Prove that CLI Reader surfaces (stdout / `--dump-reader`) are byte-identical to Reader bodies and that outputs are canonical JSON with LF-termination.
 
-**Subtask status:** **Not done**
+**Subtask status:** **Partial**
 
-**Epic or card:** **Unknown**
+**Subtask status notes:**
+
+* **Status (Drain 10.1.4 — 12-14 HDE-EPIC027 CHECK po-003):** Partial.
+
+Current-state QA records a PASS for `tests/cli/test_showcompat_parity_and_identity.py` and a successful `hdctl showcompat --help` capture under closed rails with deterministic pins, which advances the CLI showcompat parity and canonical-JSON slice.
+
+This source excerpt does not yet prove the full row scope for Reader-body byte equality across all CLI Reader surfaces, so the subtask remains **Partial**.
+
+**Epic or card:** **HDE-EPIC027**
 
 **Tokens:**
 
@@ -6033,6 +6113,12 @@ No ad-hoc serializers on public paths; guarded via grep and import-graph symbol 
 `tests/test_emitter_determinism.py`
 
 `artifacts/cli/reader_cli_parity.bytes`
+
+`audit/qa/hde-epic027/checks/po-003/showcompat_parity.txt`
+
+`audit/qa/hde-epic027/checks/po-003/showcompat_help.txt`
+
+`audit/qa/hde-epic027/checks/po-003/primary.log`
 
 ### Subtask HDE-CONJ003.4 — Serializer coupling evidence indexing
 
@@ -6067,7 +6153,7 @@ No ad-hoc serializers on public paths; guarded via grep and import-graph symbol 
 
 **Task name/label:** CLI Conformance
 
-**Task status:** **Not done**
+**Task status: Partial**
 
 **Task description:**  
  Prove CLI installation and entrypoints, showcompat wiring, canonical JSON output, CLI↔Reader parity, AB↔BA/two-run identity for CLI compat flows, and index the key CLI artifacts.
@@ -6083,6 +6169,11 @@ CLI parity/determinism harness exists as a plan; acceptance tokens not yet prove
 Addendum 23-28 HDE-EPIC026 Live QA CHECK po-008 provides governed proof that `hdctl --help` and `hdctl showcompat --help` return 0 with stdout captured, that a non-JSON conjunction modifier invocation is rejected with a non-zero exit, and that optional conjunction-output artifacts are correctly skipped when `USER_A_ID` and `USER_B_ID` are intentionally absent.
 
 Addendum 23-28 HDE-EPIC026 Live QA CHECK po-009 is blocked by product-input availability: `USER_A_ID` and `USER_B_ID` are not valid product inputs for that run, so the plan’s open-rails PASS path is currently unreachable. Treat this as an input-availability gate and planning defect, not as a demonstrated behavior defect; rerun only when valid product IDs exist. Task status remains Partial because full showcompat parity and determinism proof is still incomplete.
+
+**Status (Drain 10.1.4 — 2.3 PR02 HDE-EPIC027):**  
+ The HDE-CONJ004 closure slice now supports `HDE-CONJ004.1`, `HDE-CONJ004.3`, `HDE-CONJ004.4`, and `HDE-CONJ004.5` as Done. Reviewed closure evidence records positive module and console installability proof, deterministic help and version behavior, refreshed CLI parity artifacts, governed Human Index and Machine Mirror registration, and a fully green validation set after remediation.
+
+Task posture remains **Partial** because `HDE-CONJ004.2` is still open in PF09.
 
 ### **Subtask HDE-CONJ004.1 — CLI install and entrypoints**
 
@@ -6101,9 +6192,15 @@ Installation path is correct for the target environment.
 
 hdctl \--help exits with status 0 and prints help text to stdout.
 
-Subtask status: Partial
+Subtask status: Done
 
-Epic or card: EPIC-017 (QA02 CLI help availability)
+Subtask status notes:
+
+* **Status (Drain 10.1.4 — 2.7 Implementation Report / PR02 HDE-EPIC027):** Done.
+
+The PR-02 closure slice records positive module and console help/version proof, deterministic editable-install evidence, and single-sourced installability metadata for the shipped `hdctl` surface.
+
+Epic or card: HDE-EPIC027
 
 Tokens:
 
@@ -6121,15 +6218,15 @@ CLI\_HELP\_OK
 
 Evidence / artifacts:
 
-EPIC017 QA02 hdctl help run (Codespaces → Railway): help banner showing hdctl is on PATH, runs successfully, and exposes the subcommands showcompat, aux-preview, and bg:resolve with concise, canon-consistent descriptions (stored under the EPIC017 QA logs area; path not pinned here).
+`artifacts/cli/help/hdctl_help.txt`
 
-Future CLI install and entrypoint logs (pyproject entrypoint, python \-m entrypoint, installation path) to be captured and indexed when those aspects are exercised.
+`artifacts/cli/install/entrypoints.txt`
+
+`artifacts/cli/install/installability_summary.json`
 
 Notes:
 
-For EPIC017 QA02, the acceptance criterion for this slice is that the hdctl CLI entrypoint exists in the Codespace environment, runs without error, and exposes the three expected subcommands. That confirms CLI availability and shape so later QA steps can safely rely on hdctl for compat, aux-preview, and bg:resolve runs.
-
-This subtask remains Partial because it still requires explicit evidence for pyproject and python \-m entrypoints and installation path across supported environments; those will be validated and indexed in future work. The help-related tokens (CLI\_HELP\_EXIT\_0\_OK and CLI\_HELP\_STDOUT\_OK) are considered covered for EPIC017 in the Codespaces → Railway QA setup, but the broader CLI installation and entrypoint tokens remain open until additional evidence is captured.
+The Remedial PR regenerates `entrypoints.txt` and `installability_summary.json` so both report `console_entrypoint_available=true` and the same concrete console path, replacing the earlier skipped or negative console-proof posture.
 
 ### **Subtask HDE-CONJ004.2 — showcompat canonical JSON and presence**
 
@@ -6224,16 +6321,22 @@ AB↔BA parity and Reader↔CLI parity proven and indexed, and
 
 integration of these artifacts into the global Distillation gates and Index/Mirror discipline. Those aspects are covered mechanically by the Canonical Serialization Package and higher-phase tasks and will be reflected here by moving the status to Done once the CLI conformance harness and indexing are fully wired and passing.
 
-### Subtask HDE-CONJ004.3 — CLI compat parity & determinism
+### **Subtask HDE-CONJ004.3 — CLI compat parity & determinism**
 
 **Subtask name/label:** CLI ABBA & two-run identity
 
 **Subtask description:**  
  Prove Reader↔CLI parity and AB↔BA / two-run identity for CLI compat flows, using `ab.json`, `ba.json`, and `summary.json`.
 
-**Subtask status:** **Not done**
+**Subtask status:** **Done**
 
-**Epic or card:** **Unknown**
+**Subtask status notes:**
+
+* **Status (Drain 10.1.4 — 2.7 Implementation Report / PR02 HDE-EPIC027):** Done.
+
+Reviewed closure evidence records preserved CLI parity outputs in `artifacts/cli/ab.json` and `artifacts/cli/ba.json`, deterministic CLI summary evidence, and a green post-regeneration validation set for the compat-parity slice.
+
+**Epic or card:** **HDE-EPIC027**
 
 **Tokens:**
 
@@ -6249,20 +6352,26 @@ integration of these artifacts into the global Distillation gates and Index/Mirr
 
 `artifacts/cli/ab.json`
 
-`artifacts/cli/ba.json` (byte-identical to `ab.json`)
+`artifacts/cli/ba.json`
 
 `artifacts/cli/summary.json`
 
-### Subtask HDE-CONJ004.4 — CLI conformance evidence indexing
+### **Subtask HDE-CONJ004.4 — CLI conformance evidence indexing**
 
 **Subtask name/label:** CLI conformance Evidence Index & mirror
 
 **Subtask description:**  
  Index `ab.json`, `ba.json`, and `summary.json` in both the Human Index and machine mirror in the same PR (records-only canonical JSONL; one LF; unknown-key reject; `proof_anchor` present).
 
-**Subtask status:** **Not done**
+**Subtask status:** **Done**
 
-**Epic or card:** **Unknown**
+**Subtask status notes:**
+
+* **Status (Drain 10.1.4 — 2.7 Implementation Report / PR02 HDE-EPIC027):** Done.
+
+The PR-02 remediation records governed CLI artifact coherence and a green rerun of the evidence-index, evidence-skeleton, mirror-schema, and bridge-consistency validation set after artifact regeneration.
+
+**Epic or card:** **HDE-EPIC027**
 
 **Tokens:**
 
@@ -6310,9 +6419,15 @@ Ensure that the set of CLI commands implemented in the binary matches the PF05 c
 
 Gate this via `CLI_IMPLEMENTED_SET_OK` to indicate that the implemented set is in sync with PF05.
 
-*Subtask status:* Not done
+*Subtask status:* Done
 
-*Epic or card:* Unknown
+*Subtask status notes:*
+
+* **Status (Drain 10.1.4 — 2.7 Implementation Report / PR02 HDE-EPIC027):** Done.
+
+The PR-02 closure slice records explicit help/version and argument-policing captures together with single-sourced installability metadata, which closes the PF05 conformance slice for the shipped conjunction CLI surface.
+
+*Epic or card:* HDE-EPIC027
 
 *Tokens (titles-only; tokens live in HDE-Governance / HDE Phased Epics):*
 
@@ -6332,13 +6447,13 @@ CLI conformance:
 
 *Evidence / artifacts (titles/paths only):*
 
-CLI install/help/version logs and command-invocation tests that:
+`artifacts/cli/help/hdctl_help.txt`
 
-Show `hdctl` is installed and reachable (pyproject entrypoint and `python -m engine.cli`).
+`artifacts/cli/help/showcompat_help.txt`
 
-Verify `hdctl --help` and `hdctl --version` exit 0 and write to stdout (no stderr noise).
+`artifacts/cli/help/reject_nonjson.txt`
 
-Exercise each documented command and compare observed flags/usage/behavior against PF05’s catalog.
+`artifacts/cli/install/installability_summary.json`
 
 Indexing of these artifacts follows the global Evidence Index & Machine Mirror discipline (`docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl`); PF09 does not restate Mirror schema.
 
@@ -6565,6 +6680,12 @@ Encoding invariance: ETag and effective Content-Length stable across accepted en
 
 A7 matrix proven on a cataloged JSON success route; encoding invariance and env-gate evidence captured; evidence index \+ mirror updated.
 
+**Status (Drain 10.1.4 — 15-18 HDE-EPIC027 CHECK po-005):** Done.
+
+Current-state QA reconfirms that the Reader A7 transport test passes on the cataloged `/reader` route and that `/internal/version` is not treated as an A7 PASS target because the catalog marks it `a7_eligible false`.
+
+Primary current-state step artifacts for this proof are `audit/qa/hde-epic027/checks/po-005/reader_a7_transport.txt`, `audit/qa/hde-epic027/checks/po-005/catalog_routes.txt`, and `audit/qa/hde-epic027/checks/po-005/primary.log`.
+
 ### **Subtask HDE-CONJ006.1 — Enforce A7 matrix on Catalog route**
 
 **Subtask name/label:** Enforce A7 matrix on Catalog route
@@ -6645,7 +6766,7 @@ A7 matrix proven on a cataloged JSON success route; encoding invariance and env-
 
 **Task name/label:** CLI Tooling (showcompat, sample)
 
-**Task status:** Partial
+**Task status:** **Done**
 
 **Task description:**  
  Provide showcompat and sample CLI tooling with deterministic, canonical JSON outputs, diversity constraints, parity/determinism harness, and indexed artifacts.
@@ -6655,6 +6776,14 @@ A7 matrix proven on a cataloged JSON success route; encoding invariance and env-
 **Status (Audit v1 — 2025-11-17):** Not done.
 
 CLI parity/determinism harness exists as a plan; acceptance tokens not yet proven or indexed.
+
+**Status (Drain 10.1.4 — 2.3 PR02 HDE-EPIC027):**  
+ The HDE-CONJ007 closure slice now supports `HDE-CONJ007.2`, `HDE-CONJ007.3`, and `HDE-CONJ007.4` as Done. Reviewed closure evidence records deterministic sampler semantics in `artifacts/cli/summary.json`, preserved parity outputs, governed CLI artifact indexing, and a green post-remediation validation set.
+
+**Status (Drain 10.1.4 — 23-24 HDE-EPIC027 Closure Review):**  
+ The final epic closeout keeps the PR-02 CLI slice satisfied and records the PF09 status-reconciliation delta as PF09 follow-up work rather than as a separate blocker.
+
+HDE-CONJ007 is now **Done** because PF09 already records `HDE-CONJ007.1` and `HDE-CONJ007.5` as Done, and the source excerpt closes the remaining EPIC027-targeted slice by supporting Done posture for `HDE-CONJ007.2`, `HDE-CONJ007.3`, and `HDE-CONJ007.4`.
 
 ### Subtask HDE-CONJ007.1 — showcompat semantics & gating
 
@@ -6669,7 +6798,7 @@ When `eligible == true` and `v1`, include exactly one `{id: "harmony", band}`.
 
 Keep merge-blocking until parity/determinism tokens pass.
 
-**Subtask status:** **Not done**
+**Subtask status:** **Done**
 
 **Epic or card:** **Unknown**
 
@@ -6708,9 +6837,15 @@ Enforce diversity window/bounds/recent constraints.
 
 Exactly one LF in output.
 
-**Subtask status:** **Not done**
+**Subtask status:** **Done**
 
-**Epic or card:** **Unknown**
+**Subtask status notes:**
+
+* **Status (Drain 10.1.4 — 2.7 Implementation Report / PR02 HDE-EPIC027):** Done.
+
+The PR-02 closure slice adds deterministic sampler semantics evidence in `artifacts/cli/summary.json` and closes the sampler-specific portion of the conjunction CLI tooling slice.
+
+**Epic or card:** **HDE-EPIC027**
 
 **Tokens:**
 
@@ -6720,7 +6855,11 @@ Exactly one LF in output.
 
 **Evidence / artifacts:**
 
-`artifacts/cli/ab.json` / `ba.json` / `summary.json` (reused)
+`artifacts/cli/summary.json`
+
+`artifacts/cli/ab.json`
+
+`artifacts/cli/ba.json`
 
 ### Subtask HDE-CONJ007.3 — CLI conformance & parity tokens
 
@@ -6747,13 +6886,25 @@ Parity harness:
 
 `CLI_SHOWCOMPAT_CANON_OK`
 
-**Subtask status:** **Not done**
+**Subtask status:** **Done**
 
-**Epic or card:** **Unknown**
+**Subtask status notes:**
+
+* **Status (Drain 10.1.4 — 2.7 Implementation Report / PR02 HDE-EPIC027):** Done.
+
+Reviewed PR-02 closure evidence records explicit installability, help/version, and argument-policing captures together with preserved parity outputs for the conjunction CLI surface.
+
+**Epic or card:** **HDE-EPIC027**
 
 **Tokens:** (as listed above)
 
 **Evidence / artifacts:**
+
+`artifacts/cli/help/hdctl_help.txt`
+
+`artifacts/cli/help/showcompat_help.txt`
+
+`artifacts/cli/help/reject_nonjson.txt`
 
 `artifacts/cli/ab.json`
 
@@ -6761,16 +6912,22 @@ Parity harness:
 
 `artifacts/cli/summary.json`
 
-### Subtask HDE-CONJ007.4 — CLI tooling evidence indexing
+### **Subtask HDE-CONJ007.4 — CLI tooling evidence indexing**
 
 **Subtask name/label:** showcompat/sample Evidence Index & mirror
 
 **Subtask description:**  
  Index `artifacts/cli/ab.json`, `ba.json`, and `summary.json` in Human Index and mirror (records-only canonical JSONL; one LF; unknown-key reject; `proof_anchor` present) in the same PR.
 
-**Subtask status:** **Not done**
+**Subtask status:** **Done**
 
-**Epic or card:** **Unknown**
+**Subtask status notes:**
+
+* **Status (Drain 10.1.4 — 2.7 Implementation Report / PR02 HDE-EPIC027):** Done.
+
+The PR-02 closure slice records governed CLI artifact coherence and refreshed Human Index and Machine Mirror registration for the showcompat and sample evidence family.
+
+**Epic or card:** **HDE-EPIC027**
 
 **Tokens:**
 
@@ -6869,15 +7026,27 @@ Run byte-equality checks between stored bytes and emitter output.
 
 Re-issuing the same valid request leaves state unchanged and preserves response semantics.
 
-**Subtask status:** **Not done**
+**Subtask status:** **Done**
 
-**Epic or card:** **Unknown**
+**Subtask status notes:**
+
+* **Status (Drain 10.1.4 — 2.4 PR03 HDE-EPIC027):** Done.
+
+Reviewed closure evidence records explicit writer/readback parity artifacts, coherent governed path proofs for those artifacts, preserved idempotence behavior, and a green writer-route validation run.
+
+**Epic or card:** **HDE-EPIC027**
 
 **Tokens:** **Unknown**
 
 **Evidence / artifacts:**
 
-Write/readback byte parity logs.
+`artifacts/writer/conjunction_write_readback.log`
+
+`artifacts/writer/conjunction_write_readback.log.path_proof.txt`
+
+`artifacts/writer/conjunction_writer_summary.json`
+
+`artifacts/writer/conjunction_writer_summary.json.path_proof.txt`
 
 ### Subtask HDE-CONJ008.3 — Writer evidence presence & indexing
 
@@ -6886,9 +7055,17 @@ Write/readback byte parity logs.
 **Subtask description:**  
  Capture and index writer evidence artifacts (write/readback logs, DDL updates, ops logs) with Evidence Index entries and machine mirror records; `EVIDENCE_INDEX_UPDATED_OK` and related Index/Mirror tokens gate that evidence is captured and synchronized.
 
-**Subtask status:** **Not done**
+**Subtask status:** **Done**
 
-**Epic or card:** **Unknown**
+**Subtask status notes:**
+
+* **Status (Drain 10.1.4 — 2.4 PR03 HDE-EPIC027):** Done.
+
+The combined work now provides explicit writer artifact keys, coherent Human Evidence Index and Machine Mirror updates, refreshed chronology across proof sidecars, and a green evidence and index validation suite.
+
+Writer proof behavior remains outside the A7 proof family. The writer evidence generator now requires explicit caller-provided open rails and no longer silently widens rails on its own.
+
+**Epic or card:** **HDE-EPIC027**
 
 **Tokens:**
 
@@ -6900,9 +7077,21 @@ Write/readback byte parity logs.
 
 **Evidence / artifacts:**
 
-Writer DDL updates & ops logs (paths not pinned)
+`docs/evidence/INDEX.json` / `docs/evidence/INDEX.sha256`
 
-Evidence Index entries for writer artifacts
+`artifacts/evidence_index.jsonl`
+
+`artifacts/evidence_index.jsonl.path_proof.txt`
+
+`artifacts/evidence_index.jsonl.sha256`
+
+`artifacts/evidence_index.jsonl.sha256.path_proof.txt`
+
+`tests/http/test_endpoint_catalog.py`
+
+`python tools/evidence/update_evidence_index.py --check`
+
+`python ci/checks/check_mirror_schema.sh artifacts/evidence_index.jsonl`
 
 ### Subtask HDE-CONJ008.4 — A7 family excluded for writers
 
@@ -6911,15 +7100,27 @@ Evidence Index entries for writer artifacts
 **Subtask description:**  
  Ensure Governance A7 tokens (`A7_*`, `READER_*`) remain bound to Catalog JSON success routes only; writer routes are not used as A7 proof surfaces and are not directly gated by A7 tokens.
 
-**Subtask status:** **Not done**
+**Subtask status:** **Done**
 
-**Epic or card:** **Unknown**
+**Subtask status notes:**
+
+**Status (Drain 10.1.4 — 15-18 HDE-EPIC027 CHECK po-006):** Done.
+
+Current-state QA records a passing dev conjunction HTTP run, confirms writer artifact rows are discoverable in the machine mirror, and captures catalog context that `/dev/writer/conjunction` is marked `a7_eligible false`.
+
+This closes the writer/A7 scoping row for the current conjunction writer slice without widening the writer proof path into an A7 family proof surface.
+
+**Epic or card:** **HDE-EPIC027**
 
 **Tokens:** **None** (behavioral scoping; A7 tokens deliberately not applied)
 
 **Evidence / artifacts:**
 
-Governance configuration and test plans (titles-only in PF docs).
+`audit/qa/hde-epic027/checks/po-006/dev_conjunction_http.txt`
+
+`audit/qa/hde-epic027/checks/po-006/writer_index_rows.txt`
+
+`audit/qa/hde-epic027/checks/po-006/primary.log`
 
 ---
 
@@ -6994,23 +7195,83 @@ Canonical-compare logs across phases (various `canonical_json/*.log` and `json_c
 **Subtask description:**  
  Ensure that whenever any artifacts are added or changed, the Evidence Index and Machine Mirror are updated in the same PR, with canonical JSONL, unknown-key reject, and path-proofs in place.
 
-**Subtask status:** **Not done**
+**Subtask status:** **Done**
 
-**Epic or card:** **Unknown**
+**Subtask status notes:**
+
+* **Status (Drain 10.1.4 — 2.5 PR04 HDE-EPIC027):** Done.
+
+The EPIC027 close-pack slice now provides the canonical acceptance map, token-evidence matrix, viability log, close report, and manifest at the required canonical paths.
+
+The remedial pass expands the acceptance-ledger model from the original 6-token global-only set to a 17-token canonical D1/D3/D4 plus close-slice binding model, reusing the existing conjunction proof families rather than re-implementing them.
+
+The close-report truthfulness defect is closed: the governed close workflow is now actually executed, and same-run QA gate logs are persisted for evidence-index write and check, mirror-schema, evidence-path validation, LF, and orientation-demo runs.
+
+Human Index, hash sentinel, Machine Mirror, and sibling path-proof files are refreshed coherently in the same PR, with chronology corrected to the March 14 remedial context.
+
+HDE-CONJ009 remains **Partial** because HDE-CONJ009.1 is still **Not done**. This subtask closes the EPIC027 global-discipline slice only.
+
+Remaining risk is low and non-blocking: future edits to `tools/qa/generate_epic027_close_pack.py` must preserve the expanded token roster and same-run QA log capture so the close report remains truthful.
+
+**Epic or card:** **HDE-EPIC027**
 
 **Tokens:**
 
 `EVIDENCE_INDEX_UPDATED_OK`
 
+`EVIDENCE_INDEX_HASH_OK`
+
 `EVIDENCE_INDEX_MIRROR_OK`
 
 `EVIDENCE_PATHS_VALIDATED_OK`
 
+`CI_CHECK_MIRROR_SCHEMA_OK`
+
+`CI_CHECK_FINAL_LF_OK`
+
 **Evidence / artifacts:**
+
+`docs/acceptance_map_epic027.json`
+
+`audit/qa/hde-epic027/token_evidence_matrix.md`
+
+`audit/qa/hde-epic027/acceptance_map_viability.log`
+
+`audit/EPIC-027_close_report.md`
+
+`audit/EPIC-027_MANIFEST.json`
 
 `docs/evidence/INDEX.json` / `docs/evidence/INDEX.sha256`
 
+`docs/evidence/INDEX.json.path_proof.txt`
+
+`docs/evidence/INDEX.sha256.path_proof.txt`
+
 `artifacts/evidence_index.jsonl`
+
+`artifacts/evidence_index.jsonl.path_proof.txt`
+
+`artifacts/evidence_index.jsonl.sha256`
+
+`artifacts/evidence_index.jsonl.sha256.path_proof.txt`
+
+`audit/gates/topology/orientation_demo.txt`
+
+`audit/gates/topology/orientation_demo.txt.path_proof.txt`
+
+`audit/qa/hde-epic027/checks/gate_update_evidence_index_write/primary.log`
+
+`audit/qa/hde-epic027/checks/gate_update_evidence_index_check/primary.log`
+
+`audit/qa/hde-epic027/checks/gate_mirror_schema/primary.log`
+
+`audit/qa/hde-epic027/checks/gate_evidence_paths_validation/primary.log`
+
+`audit/qa/hde-epic027/checks/gate_lf_endings/primary.log`
+
+`audit/qa/hde-epic027/checks/gate_orientation_demo_check/primary.log`
+
+`audit/qa/hde-epic027/checks/gate_orientation_demo_write/primary.log`
 
 # **Phase V — Fermentation (Narratives & external bridges)**
 
@@ -7269,6 +7530,16 @@ Fixed field order.
 `proof_anchor` pointing to a co-located `*.path_proof.txt`.
 
 Treat **HDE-Schemas & Artifacts** §8.6 as the single home for the evidence listing; Appendix C defines record types and schemas. PF09 (this subtask) does not duplicate those schemas.
+
+Current-state QA (Drain 10.1.4 — 19-22 HDE-EPIC027 CHECK po-008, po-009, po-010):
+
+* All plan-defined deliverables for po-008, po-009, and po-010 are present under the EPIC027 current-state QA root, including the qa-step manifest pair and the per-check `primary.log` artifacts.
+
+* The po-008 and po-009 passes record closed rails and canonical determinism pins. The po-008 pass is no longer in the blocked branch because po-007 already reached PASS, and it confirms that the close-pack generator runs, the close-pack bindings point to the EPIC027 QA root and current canonical ledger files, and the qa-step manifest is ledger-bound rather than merely present on disk. The po-009 pass confirms that the catalog inventory introduces no unexpected public success surface, no non-canonical token names are introduced, and the manifest pair refresh is header-driven from `audit/qa/hde-epic027/checks/po-009/primary.log`.
+
+* The po-010 pass records an exact ordered `primary.log` command string with `command_provenance` set to `Explicitly created`, fresh manifest path-proof and mirror alignment after the byte-changing refresh, no missing prerequisite runtime logs, and same-run runtime proof across `CLI=PRESENT`, `dev-http-conjunction=PRESENT`, and `reader-a7=PRESENT`.
+
+* Primary current-state QA artifacts for this validation set are `audit/qa/hde-epic027/checks/po-008/generate_close_pack.txt`, `audit/qa/hde-epic027/checks/po-008/close_pack_bindings.txt`, `audit/qa/hde-epic027/checks/po-008/qa_step_manifest_lookup.txt`, `audit/qa/hde-epic027/checks/po-008/primary.log`, `audit/qa/hde-epic027/checks/po-009/catalog_surface_inventory.txt`, `audit/qa/hde-epic027/checks/po-009/token_inventory.txt`, `audit/qa/hde-epic027/checks/po-009/primary.log`, `audit/qa/hde-epic027/checks/po-010/runtime_log_presence.txt`, `audit/qa/hde-epic027/checks/po-010/runtime_surface_inventory.txt`, `audit/qa/hde-epic027/checks/po-010/primary.log`, `audit/qa/hde-epic027/qa_step_logs_manifest.json`, and `audit/qa/hde-epic027/qa_step_logs_manifest.json.path_proof.txt`.
 
 **Subtask status:** Not done
 

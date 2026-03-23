@@ -3,12 +3,12 @@
 ## 0.1 **Header**
 
 **Title:** PF14-Canon-HDE-Mechanics-Guide  
-**Version:** v2.8.3
+**Version:** v2.9.1
 
 **Status:** Canon  
-**Effective date:** 2026-03-07
+**Effective date:** 2026-03-23
 
-**Last Update Gate:** BN 10.0.5 Drain A29-31  
+**Last Update Gate:** BN 10.1.4 Drain A23-24  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
 ---
@@ -984,6 +984,42 @@ EPIC026 step-scope and non-canonical-path posture (normative for the observed fa
 * If a legacy root-level pair also exists under `audit/qa/hde-epic026/qa_step_logs_manifest.json` and `audit/qa/hde-epic026/qa_step_logs_manifest.json.path_proof.txt`, treat that pair as legacy traceability for the Step-0 family unless the owning QA canon explicitly binds it as the authoritative surface for the step in question.
 
 * Earlier-attempt or appendix artifacts under `artifacts/hde-epic026/checks/**` are non-canonical for these Live QA step families and MUST NOT replace the canonical audit/qa paths above.
+
+EPIC027 early Live QA evidence paths observed (records-only):
+
+* checks/po-001:
+
+  * `audit/qa/hde-epic027/checks/po-001/primary.log`
+
+  * `audit/qa/hde-epic027/checks/po-001/route_inventory.txt`
+
+  * `audit/qa/hde-epic027/checks/po-001/dev_conjunction_http.txt`
+
+  * `audit/qa/hde-epic027/checks/po-001/endpoint_catalog.txt`
+
+* checks/po-002:
+
+  * `audit/qa/hde-epic027/checks/po-002/primary.log`
+
+  * `audit/qa/hde-epic027/checks/po-002/compat_surface.txt`
+
+  * `audit/qa/hde-epic027/checks/po-002/compat_identity_discovery.txt`
+
+* checks/po-003:
+
+  * `audit/qa/hde-epic027/checks/po-003/primary.log`
+
+  * `audit/qa/hde-epic027/checks/po-003/cli_emitter_proof.txt`
+
+  * `audit/qa/hde-epic027/checks/po-003/showcompat_parity.txt`
+
+  * `audit/qa/hde-epic027/checks/po-003/showcompat_help.txt`
+
+Shared per-epic current-state manifest pair refreshed by po-001 to po-003:
+
+* `audit/qa/hde-epic027/qa_step_logs_manifest.json`
+
+* `audit/qa/hde-epic027/qa_step_logs_manifest.json.path_proof.txt`
 
 Maintain per-epic step logs manifest (current-state):
 
@@ -2271,6 +2307,34 @@ Contract tests (required). tests/http/test\_compat\_endpoint\_contract.py MUST i
 
 * The emitted bytes include a trailing newline (canonical JSON emission discipline).
 
+## 
+
+### **9.3.1 Compat identity-hash closure and evidence-index proof split**
+
+Compat identity-hash artifact (required). When conjunction compat closure is proven, the governed compat artifact family MUST include `artifacts/compat/identity_hash.txt`, and the compat-scoped evidence target key for that family is `compat.conjunction.identity_hash`.
+
+Evidence-index proof split (required). `tests/ops/test_evidence_index.py` MAY implement a compat/repo split as `COMPAT_TARGETS` and `REPO_TARGETS` only if all of the following remain true:
+
+* the compat-scoped and repo-scoped assertions remain separately testable, including `test_evidence_index_has_required_compat_artifacts` and `test_evidence_index_has_required_repo_artifacts`
+
+* the main CI lane continues to execute the full `tests/ops/test_evidence_index.py` module
+
+* `test_write_if_changed_check_mode_fails_closed_for_missing_target` remains in the main-lane module coverage
+
+* repo-wide evidence checks remain truthful and are not narrowed to compat-only coverage
+
+Independent compat-only closure lane (required). A separate compat-only CI lane MAY be used to make conjunction closure independently auditable. When present, that lane MUST:
+
+* run only the compat closure assertions for the conjunction identity-hash artifact family
+
+* remain additive to the main CI lane rather than replacing it
+
+* keep mirror-schema and bridge-consistency safeguards as repo-wide checks outside the compat-only lane
+
+If the isolated lane is wired for the PR-01 compat closure slice, the dedicated job name is `compat-conj-pr01-closure`.
+
+Compat closure proof (required). The compat-only closure assertions MUST continue to prove conjunction canonical-byte correctness and Evidence Index presence for the compat identity-hash artifact family.
+
 ## **9.4 Internal ops: /internal/version (ops-only) \[Required-Now\]**
 
 Purpose (normative). Operator surface for identity and provenance. Not a JSON success route and not A7-eligible (see HDE-Governance §10.5).
@@ -2405,9 +2469,7 @@ Routing (titles-only):
 
 * Schemas & canonical JSON: PF-Canon-HDE-Schemas & Artifacts.
 
-Dev writer conjunction endpoint (dev harness only).
-
-Route (GET; dev harness): /dev/writer/conjunction
+Route (dev harness): /dev/writer/conjunction
 
 Gate (required). This endpoint MUST only be enabled when APP\_ENV is one of dev, test, or local, and it MUST be protected by the shared dev-admin gate.
 
@@ -2428,6 +2490,64 @@ Tests (required).
 * tests/http/test\_dev\_conjunction\_http.py MUST cover /dev/writer/conjunction and include an idempotence check comparing repeated identical requests.
 
 * tests/http/test\_endpoint\_catalog.py MUST assert that /dev/writer/conjunction and route\_id dev.writer.conjunction.v1 are present in the endpoint catalog.
+
+### **10.6.1 Conjunction writer evidence family (dev harness only)**
+
+Generation tool (normative). Canonical entrypoint: `python tools/evidence/generate_conjunction_writer_evidence.py`. The generator MUST reuse the existing dev writer and dev reader conjunction surfaces to produce governed writer proof artifacts. It MUST NOT widen the writer contract or turn the writer proof path into an A7 proof surface.
+
+Required governed artifacts. The writer evidence family MUST include:
+
+* `artifacts/writer/conjunction_write_readback.log`
+
+* `artifacts/writer/conjunction_write_readback.log.path_proof.txt`
+
+* `artifacts/writer/conjunction_writer_summary.json`
+
+* `artifacts/writer/conjunction_writer_summary.json.path_proof.txt`
+
+Writer proof posture (required). This family MUST prove:
+
+* writer bytes two-run equality
+
+* writer payload two-run equality
+
+* writer-result and reader-readback equality for the conjunction proof path
+
+Rails posture (required). The generator MUST NOT silently force open rails. It MUST require explicit caller-provided open rails for the proof run and fail before emission if that posture is absent.
+
+Determinism env posture (required). The generator MUST preserve the conjunction identity env inputs that influence emitted bytes, including `ENGINE_TAG`, `RELEASE_ID`, and `PRODUCT_INVOCATION_TAG`, alongside the normal proof-run env needed for the conjunction capture.
+
+Indexing family (required). The Human Index and Machine Mirror MUST carry explicit writer-family bindings for this evidence set. The canonical writer artifact keys are:
+
+* `conjunction.writer.summary`
+
+* `conjunction.writer.write_readback`
+
+Any byte change to this family MUST refresh the corresponding Human Index, Machine Mirror, checksum, and path-proof companions in the same PR.
+
+Chronology posture (required). Writer artifacts, their co-located path-proofs, and the changed index or mirror companion proofs MUST be regenerated with current chronology when bytes change. Backdated or stale chronology is a merge-blocking integrity failure.
+
+Validation set (required when this family changes). Refreshing the conjunction writer evidence family MUST rerun and pass:
+
+* `python -m pytest -q tests/http/test_dev_conjunction_http.py`
+
+* `python -m pytest -q tests/http/test_endpoint_catalog.py`
+
+* `SAFE_MODE=0 ALLOW_NETWORK=1 python tools/evidence/generate_conjunction_writer_evidence.py`
+
+* `python tools/evidence/update_evidence_index.py`
+
+* `python tools/evidence/update_evidence_index.py --check`
+
+* `python tools/evidence/orientation_demo.py`
+
+* `python tools/evidence/orientation_demo.py --check`
+
+* `python tools/evidence/validate_evidence_paths.py`
+
+* `python tools/evidence/check_lf_endings.py`
+
+* `python ci/checks/check_mirror_schema.sh artifacts/evidence_index.jsonl`
 
 # 11\) Input Normalization & Validation Layer
 
@@ -3112,11 +3232,11 @@ Required tests.
 
 ## **17.5 Installability & entrypoints**
 
-* Console script. The pyproject console-script entrypoint hdctl is present and installable.
-
-* Module-run. python \-m engine.cli behaves identically to the console script; parity is required for help, version, and command invocation.
-
-* Packaging. Building and installing the CLI in a clean environment succeeds. hdctl \--help and hdctl \--version behave as specified in PF05 (exit 0; output to stdout; no stderr noise).
+* Console script. The pyproject console-script entrypoint hdctl is present and installable.  
+* Module-run. `python -m engine.cli` behaves identically to the console script; parity is required for help, version, and command invocation.  
+* Deterministic installability proof. The CLI conformance tooling MUST be able to produce positive installability proof in a clean environment using a deterministic editable-install path. When this proof path is exercised, it MUST run with `PIP_NO_INDEX=1`, `--no-deps`, and `--no-build-isolation`, and it MUST fail closed if the installed `hdctl` console entrypoint is absent from the interpreter scripts directory.  
+* Positive help and version proof. Installability proof is not complete unless both the console entrypoint and the module runner return help and version successfully with exit 0, stdout output, and no stderr noise, as routed by PF05.  
+* Single-sourced installability metadata. The installability proof artifacts MUST report one coherent console-entrypoint result and MUST NOT write duplicate or conflicting help or version payloads across summary and installability outputs.
 
 ## **17.6 Environment pins (runtime)**
 
@@ -3956,6 +4076,24 @@ Mechanics MUST:
 Bridge parity and env connectivity artifacts are indexed via HDE-Schemas & Artifacts; PF14 requires only that the mechanics jobs produce them.
 
 Acceptance impact. No new tokens are introduced here. This section clarifies the mechanics expected by existing DB posture/partition/bridge acceptance in HDE-Governance and infrastructure documents (titles-only), without enumerating token names.
+
+### **20.3.1 Bridge-consistency checker fallback contract**
+
+Bridge selection snapshot (required). `artifacts/db_bridge/adapter_selection.snapshot.json` is the checked-in adapter selection snapshot used by the bridge-consistency checker for this parity family.
+
+Bridge-consistency checker (required). `ci/checks/check_bridge_consistency.py` is the governed checker for the bridge parity family.
+
+Sanctioned fallback (required). The checker MUST allow the `bridge_fallback` case where the checked-in adapter selection remains `psycopg` and the runtime env connectivity resolves to `bridge`.
+
+Fallback guardrail (required). The sanctioned fallback is valid only when `provider_parity` matches `env_connectivity`. Any mismatch between `provider_parity` and `env_connectivity` MUST fail the checker.
+
+No bridge-snapshot churn for compat-only closure (required). A compat-only remediation or closure slice MUST NOT satisfy bridge-consistency by rewriting `artifacts/db_bridge/adapter_selection.snapshot.json` or its governed evidence companions solely to force bridge selection. The sanctioned fallback above is the required way to keep compat-only closure scope clean while preserving bridge truthfulness.
+
+Required test coverage. `tests/unit/test_check_bridge_consistency.py` MUST cover at least:
+
+* one passing sanctioned-fallback case
+
+* one failing provider-mismatch case
 
 # 21\) BodyGraph refresh worker (dev-only; policy-aligned) \[Required-Now\]
 
@@ -5289,6 +5427,130 @@ Discipline:
 
 Acceptance (routing only). Acceptance token naming and semantics are owned by HDE-Governance (titles-only). This guide does not list token names. CI must enforce machine mirror canonical JSONL discipline, unknown-key rejection, fixed field set/order as defined by the mirror schema, and strict 1:1 parity with the Human Evidence Index, with path-proofs required.
 
+EPIC027 early Live QA evidence paths observed (records-only):
+
+* checks/po-001:
+
+  * `audit/qa/hde-epic027/checks/po-001/primary.log`
+
+  * `audit/qa/hde-epic027/checks/po-001/route_inventory.txt`
+
+  * `audit/qa/hde-epic027/checks/po-001/dev_conjunction_http.txt`
+
+  * `audit/qa/hde-epic027/checks/po-001/endpoint_catalog.txt`
+
+* checks/po-002:
+
+  * `audit/qa/hde-epic027/checks/po-002/primary.log`
+
+  * `audit/qa/hde-epic027/checks/po-002/compat_surface.txt`
+
+  * `audit/qa/hde-epic027/checks/po-002/compat_identity_discovery.txt`
+
+* checks/po-003:
+
+  * `audit/qa/hde-epic027/checks/po-003/primary.log`
+
+  * `audit/qa/hde-epic027/checks/po-003/cli_emitter_proof.txt`
+
+  * `audit/qa/hde-epic027/checks/po-003/showcompat_parity.txt`
+
+  * `audit/qa/hde-epic027/checks/po-003/showcompat_help.txt`
+
+* checks/po-004:
+
+  * `audit/qa/hde-epic027/checks/po-004/primary.log`
+
+  * `audit/qa/hde-epic027/checks/po-004/entrypoint_proof.txt`
+
+  * `audit/qa/hde-epic027/checks/po-004/cli_install_help.txt`
+
+  * `audit/qa/hde-epic027/checks/po-004/bg_resolve_test.txt`
+
+  * `audit/qa/hde-epic027/checks/po-004/bg_resolve_help.txt`
+
+* checks/po-005:
+
+  * `audit/qa/hde-epic027/checks/po-005/primary.log`
+
+  * `audit/qa/hde-epic027/checks/po-005/reader_a7_transport.txt`
+
+  * `audit/qa/hde-epic027/checks/po-005/catalog_routes.txt`
+
+* checks/po-006:
+
+  * `audit/qa/hde-epic027/checks/po-006/primary.log`
+
+  * `audit/qa/hde-epic027/checks/po-006/dev_conjunction_http.txt`
+
+  * `audit/qa/hde-epic027/checks/po-006/writer_index_rows.txt`
+
+* checks/po-007:
+
+  * `audit/qa/hde-epic027/checks/po-007/primary.log`
+
+  * `audit/qa/hde-epic027/checks/po-007/update_evidence_index_write.txt`
+
+  * `audit/qa/hde-epic027/checks/po-007/update_evidence_index_check.txt`
+
+  * `audit/qa/hde-epic027/checks/po-007/orientation_demo_write.txt`
+
+  * `audit/qa/hde-epic027/checks/po-007/orientation_demo_check.txt`
+
+  * `audit/qa/hde-epic027/checks/po-007/validate_evidence_paths.txt`
+
+  * `audit/qa/hde-epic027/checks/po-007/check_lf_endings.txt`
+
+  * `audit/qa/hde-epic027/checks/po-007/check_mirror_schema.txt`
+
+  * `audit/qa/hde-epic027/checks/po-007/qa_step_manifest_lookup.txt`
+
+* checks/po-008:
+
+  * `audit/qa/hde-epic027/checks/po-008/primary.log`
+
+  * `audit/qa/hde-epic027/checks/po-008/generate_close_pack.txt`
+
+  * `audit/qa/hde-epic027/checks/po-008/close_pack_bindings.txt`
+
+  * `audit/qa/hde-epic027/checks/po-008/qa_step_manifest_lookup.txt`
+
+* checks/po-009:
+
+  * `audit/qa/hde-epic027/checks/po-009/primary.log`
+
+  * `audit/qa/hde-epic027/checks/po-009/catalog_surface_inventory.txt`
+
+  * `audit/qa/hde-epic027/checks/po-009/token_inventory.txt`
+
+* checks/po-010:
+
+  * `audit/qa/hde-epic027/checks/po-010/primary.log`
+
+  * `audit/qa/hde-epic027/checks/po-010/runtime_log_presence.txt`
+
+  * `audit/qa/hde-epic027/checks/po-010/runtime_surface_inventory.txt`
+
+EPIC027 current-state step notes (records-only).
+
+* `checks/po-005` confirms `/reader` as the cataloged A7-eligible success-route target for the step and keeps `/internal/version` outside the A7 PASS target family.
+
+* `checks/po-006` confirms the writer proof remains outside the A7 family and records writer-family discoverability in the Machine Mirror.
+
+* `checks/po-007` records `epic027.qa_step_logs_manifest` coverage in `tools/evidence/update_evidence_index.py`, `docs/evidence/INDEX.json`, and `artifacts/evidence_index.jsonl`.
+
+* `checks/po-008` records that the close-pack generator ran, that close-pack bindings point to the EPIC027 QA root and current canonical ledger files, that the EPIC027 qa-step manifest is ledger-bound, and that the blocked branch for this step cleared once `po-007` reached PASS.
+
+* `checks/po-009` records PASS inventory checks for catalog surfaces, no unexpected public success surface, no non-canonical token names introduced, and manifest-pair refresh from the `po-009` primary.log governed header.
+
+* `checks/po-010` records PASS runtime proof across CLI, dev-http-conjunction, and reader-a7 surfaces, with no missing prerequisite runtime logs and with the refreshed manifest pair returned to fresh internal provenance after the byte-changing refresh.
+
+Shared per-epic current-state manifest pair refreshed by po-001 to po-010:
+
+* `audit/qa/hde-epic027/qa_step_logs_manifest.json`
+
+* `audit/qa/hde-epic027/qa_step_logs_manifest.json.path_proof.txt`
+
 ### **37.4.1 CLI help and argument-policing captures for conjunction-mode evidence**
 
 When a governed review, QA step, or docs-evidence update depends on the shipped CLI syntax or CLI rejection behavior for conjunction flows, governed capture artifacts MUST be recorded for:
@@ -5312,6 +5574,36 @@ The capture family MUST:
 * be refreshed in the same PR whenever the shipped help text, accepted conjunction modifiers, or CLI rejection behavior changes
 
 Help captures are evidence of the shipped CLI help surfaces only. Rejection captures are evidence of CLI argument-policing behavior only. PF05 remains the single home for CLI contract bytes, flag semantics, and exit-code mappings.
+
+### **37.4.2 CLI installability and conformance captures for conjunction-mode evidence**
+
+Generation tool (normative). Canonical entrypoint: `python tools/cli/generate_cli_conformance_artifacts.py`. The generator MUST produce positive, non-skipped installability proof and MUST fail closed if the console entrypoint required by the run is missing.
+
+Required governed artifacts. When CLI conformance evidence is refreshed for conjunction work, the governed capture family MUST include:
+
+* `artifacts/cli/help/hdctl_help.txt`
+
+* `artifacts/cli/help/showcompat_help.txt`
+
+* `artifacts/cli/help/reject_nonjson.txt`
+
+* `artifacts/cli/install/entrypoints.txt`
+
+* `artifacts/cli/install/installability_summary.json`
+
+* `artifacts/cli/summary.json`
+
+Path-proofs (normative). Each artifact above MUST have a co-located `.path_proof.txt` transcript and MUST be listed in the Human Index and mirrored 1:1 in the Machine Mirror in the same PR as any byte change.
+
+Installability coherence (normative). `artifacts/cli/install/entrypoints.txt` and `artifacts/cli/install/installability_summary.json` MUST remain single-sourced and internally coherent. When they report console-entrypoint proof, both artifacts MUST agree on whether the console entrypoint is available and, when available, on the concrete console-entrypoint path used for the proof.
+
+Conformance summary (normative). `artifacts/cli/summary.json` MUST preserve conjunction CLI conformance sections for:
+
+* installability
+
+* `sampler_semantics`
+
+The summary MUST continue to capture deterministic CLI parity facts required elsewhere in this guide and MUST be regenerated, not hand-edited.
 
 ## **37.5 Required captures — Reader success catalog & A7 proofs**
 
@@ -5788,6 +6080,48 @@ Evidence index snapshot (gate-family; canonical):
 * audit/gates/evidence\_index\_snapshot/evidence\_index\_snapshot.json
 
 * audit/gates/evidence\_index\_snapshot/evidence\_index\_snapshot.json.path\_proof.txt
+
+### **37.18.1 EPIC027 close-pack and same-run ledger refresh**
+
+Canonical close-pack generator (required). `python tools/qa/generate_epic027_close_pack.py` is the EPIC027 close-pack generator for the conjunction global-discipline slice.
+
+Required close-pack artifacts. The generator MUST emit and refresh, at minimum:
+
+* `docs/acceptance_map_epic027.json`
+
+* `audit/qa/hde-epic027/token_evidence_matrix.md`
+
+* `audit/qa/hde-epic027/acceptance_map_viability.log`
+
+* `audit/EPIC-027_close_report.md`
+
+* `audit/EPIC-027_MANIFEST.json`
+
+Close-report truthfulness (required). The close-pack generator MUST NOT claim Human Index, Machine Mirror, checksum, path-proof, or same-run gate refresh unless that workflow was actually executed in the same run.
+
+Same-run governed workflow (required). When the EPIC027 close-pack family changes, the bound close-pack workflow MUST execute and persist the same-run outputs for:
+
+* `python tools/evidence/update_evidence_index.py`
+
+* `python tools/evidence/update_evidence_index.py --check`
+
+* `python tools/evidence/orientation_demo.py`
+
+* `python tools/evidence/orientation_demo.py --check`
+
+* `python tools/evidence/validate_evidence_paths.py`
+
+* `python tools/evidence/check_lf_endings.py`
+
+* `python ci/checks/check_mirror_schema.sh artifacts/evidence_index.jsonl`
+
+* the acceptance-map viability run that writes `audit/qa/hde-epic027/acceptance_map_viability.log`
+
+Same-change ledger refresh (required). Any byte change in the EPIC027 close-pack family MUST refresh the Human Index, Machine Mirror, hash sentinels, and changed path-proof companions in the same PR.
+
+Chronology posture (required). Changed close-pack, index, mirror, topology, checksum, and sibling path-proof artifacts in this family MUST carry current chronology after regeneration. Stale chronology is a merge-blocking integrity failure.
+
+QA gate-log capture (required). The EPIC027 close-pack workflow MUST persist same-run QA gate logs for the executed close-pack and evidence-discipline checks. Artifact existence alone is not sufficient when the close report claims the gates ran.
 
 Generator (normative). Generate with: python tools/evidence/generate\_evidence\_index\_snapshot.py. Plans and QA docs MUST NOT reference run\_evidence\_index\_snapshot.py for this gate-family.
 

@@ -4,13 +4,13 @@
 
 **Title:** PF05-Canon-HDE-CLI-API-Vendor-Ref
 
-**Version:** v1.7.9
+**Version:** v1.8.8
 
 **Status:** Canon
 
-**Effective date:** 2026-03-07
+**Effective date:** 2026-03-23
 
-**Last Update Gate:** BN 10.0.5 drain A32-33
+**Last Update Gate:** BN 10.1.4 drain A22-24
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -132,24 +132,21 @@
 
   # **3\) CLI Overview & Conventions \[Required-Now\]**
 
-**QA status note (informative).** The CLI is installable and `--help` / `--version` behave as expected. A known issue remains: in some runs `hdctl showcompat` emits empty stdout, which violates the non-empty compat JSON requirement and blocks determinism/parity evidence. Regressions must fail the associated acceptance tokens (`CLI_SHOWCOMPAT_CANON_OK`, `CLI_STDOUT_LF_OK`, `COMPOSITE_ABBA_IDENTITY_OK`, `TWO_RUN_IDENTITY_OK`, `CLI_READER_PARITY_OK`, `JSON_CANONICAL_CHECK_OK`). Until the empty-stdout defect is fixed and re-proven, those tokens remain pending. All success output must come from the single canonical emitter, be UTF-8 with ASCII-sorted keys and exactly one trailing LF, and be validated under `LC_ALL=C`, `LANG=C`, and `TZ=UTC`.
+**QA status note (informative).** EPIC027 closed the CLI installability, help/version, argument-policing, showcompat parity/conformance, and deterministic sampler evidence slices. Governed CLI conformance evidence includes `artifacts/cli/help/hdctl_help.txt`, `artifacts/cli/help/showcompat_help.txt`, `artifacts/cli/help/reject_nonjson.txt`, `artifacts/cli/install/entrypoints.txt`, `artifacts/cli/install/installability_summary.json`, `artifacts/cli/ab.json`, `artifacts/cli/ba.json`, and `artifacts/cli/summary.json`. The current CLI evidence snapshot supports `CLI_PYPROJECT_ENTRYPOINT_OK`, `CLI_MODULE_RUN_OK`, `CLI_INSTALL_OK`, `CLI_HELP_EXIT_0_OK`, `CLI_HELP_STDOUT_OK`, `CLI_READER_PARITY_OK`, `COMPOSITE_ABBA_IDENTITY_OK`, and `TWO_RUN_IDENTITY_OK`. All success output must come from the single canonical emitter, be UTF-8 with ASCII-sorted keys and exactly one trailing LF, and be validated under `LC_ALL=C`, `LANG=C`, and `TZ=UTC`.
 
 ## **3.1 Global flags & process contract**
 
 * **Packaging & entrypoints (normative).** Single home in **pyproject**:  
    `[project.scripts]` defines `hdctl = "engine.cli.main:cli"`.  
    **Module-runner parity:** `python -m engine.cli --help` ≡ `hdctl --help` (exit 0).  
-   **QA status:** expected PASS for `CLI_PYPROJECT_ENTRYPOINT_OK`, `CLI_INSTALL_OK`, `CLI_MODULE_RUN_OK`, `CLI_HELP_EXIT_0_OK`, `CLI_HELP_STDOUT_OK`.
-
-* **`--help` / `-h`** — print usage synopsis and exit 0 (no payload; stdout).
-
-* **`--version`** — print CLI version/build tag and exit 0 (no payload; stdout).
-
-* **Environment gate** — the CLI must **not** alter SAFE rails or emit non-canonical bytes; all public outputs come from the **single presenter/emitter** (see §6).
-
+   **QA status:** expected PASS for `CLI_PYPROJECT_ENTRYPOINT_OK`, `CLI_INSTALL_OK`, `CLI_MODULE_RUN_OK`, `CLI_HELP_EXIT_0_OK`, `CLI_HELP_STDOUT_OK`.  
+* **Governed installability proof (normative).** `CLI_INSTALL_OK` evidence for the shipped console entrypoint MUST be positive and MUST NOT rely on skipped console checks. Governed installability artifacts are `artifacts/cli/install/entrypoints.txt` and `artifacts/cli/install/installability_summary.json`. The proof run MUST use a deterministic editable-install path (`PIP_NO_INDEX=1`, `--no-deps`, `--no-build-isolation`), require `console_entrypoint_available=true`, and keep module and console help/version facts single-sourced and internally coherent across the installability artifacts.  
+* **`--help` / `-h`** — print usage synopsis and exit 0 (no payload; stdout).  
+* **`--version`** — print CLI version/build tag and exit 0 (no payload; stdout).  
+* **Environment gate** — the CLI must **not** alter SAFE rails or emit non-canonical bytes; all public outputs come from the **single presenter/emitter** (see §6).  
 * **Input normalization** — the CLI prepares normalized inputs (**order-neutral AB↔BA**) before invoking the engine.
 
-  ## **3.2 Input forms (files vs inline) \[Required-Now\]**
+## **3.2 Input forms (files vs inline) \[Required-Now\]**
 
 Input methods for commands that compare or display charts. Titles-only pointers; no transport bytes restated here.
 
@@ -1831,6 +1828,7 @@ Legacy lowercase strings such as `"invalid_json"`, `"invalid_prefs"`, and `"miss
 * **CLI parity (public):** `artifacts/cli/parity/reader_cli_parity.bytes`, `artifacts/cli/parity/abba_identity.bytes`, `artifacts/cli/parity/tworun_identity.sha256`.  
 * **Harness headers:** `artifacts/cli/transport/post_nonconditional_proof.log`, `artifacts/cli/transport/no_secrets_error_headers.log`.  
 * **Serializer guards:** `artifacts/cli/guards/serializer_grep_guard.log`, `artifacts/cli/guards/emitter_symbol.txt`.  
+* **Compat conjunction identity capture:** `artifacts/compat/identity_hash.txt`; contract proof MUST show that `identity_hash.txt` matches the canonical AB bytes from `artifacts/compat/AB.json`.  
 * **(If sidecar enabled)** internal-contract parity bytes for compat v1 (file path per Doc-Delta).  
    **Indexing discipline:** update **PF12** human `docs/evidence/INDEX.json`, **hash sentinel**, and machine `artifacts/evidence_index.jsonl` **in the same PR**.
 
@@ -1902,13 +1900,19 @@ Legacy lowercase strings such as `"invalid_json"`, `"invalid_prefs"`, and `"miss
   * env\_gate: `{"APP_ENV":["dev","test","local"]}`  
   * a7\_eligible: false  
 * **`Dev writer conjunction (dev-only):`** `/dev/writer/conjunction`  
-  * path: `/dev/writer/conjunction`  
-  * route\_id: `dev.writer.conjunction.v1`  
-  * allowed\_methods: ‘POST‘\`POST\`‘POST‘  
-  * internal: true  
-  * class: `dev_harness`  
-  * env\_gate: `{"APP_ENV":["dev","test","local"]}`  
-  * a7\_eligible: false  
+  * Any governed writer-evidence run that exercises `GET /dev/writer/conjunction` MUST require explicit caller-provided open rails and MUST NOT silently force `SAFE_MODE=0` or `ALLOW_NETWORK=1` on behalf of the caller.  
+  * Such writer-evidence runs do not widen the route contract and do not move this endpoint into the A7 proof family.  
+  * **Output canon (normative).**  
+    * Any success payload emitted by these routes MUST be serialized by the canonical public emitter, producing deterministic JSON bytes with ASCII-sorted keys and exactly one trailing LF.  
+    * AB↔BA parity MUST hold for conjunction evaluation: swapping A and B MUST NOT change emitted bytes after canonical emission.  
+  * Endpoints (dev-only).  
+    * GET /dev/sampler/conjunction  
+      * Dev-only conjunction preview route for sampler evaluation.  
+    * GET /dev/reader/conjunction  
+      * Dev-only conjunction preview route for Reader-style response emission and VendorError mapping.  
+    * GET /dev/writer/conjunction  
+      * Dev-only conjunction preview route returning an idempotent writer-style envelope (not the public Reader v1 envelope).  
+      * The Endpoint Catalog route id for this endpoint is `dev.writer.conjunction.v1`.  
 * **Compat v1 (internal admin, dev-only):** `/api/compat/v1`  
   * path: `/api/compat/v1`  
   * allowed\_methods: \[`POST`\]  
@@ -2435,34 +2439,26 @@ Evidence and tests (titles-only):
 
   * At minimum, `a_id` and `b_id` MUST be accepted as pair identifiers.
 
-  * Request validation MUST fail closed for missing or malformed required identifiers, and MUST use canonical typed error mapping (no ad-hoc string errors).
-
-* **Resolver acquisition and SAFE rails posture (normative).**
-
+  * Request validation MUST fail closed for missing or malformed required identifiers, and MUST use canonical typed error mapping (no ad-hoc string errors).  
+* Resolver acquisition and SAFE rails posture (normative).  
   * Provider acquisition MUST be performed through resolver acquisition (not raw cache reads), so cache hits are normalized into a resolved shape and resolved detection remains correct even when a cached record is vendor-shaped.
 
   * SAFE rails posture is closed by default. When an explicit environment configuration enables open-rails acquisition, acquisition MAY open rails only long enough to acquire missing data and MUST close back before compute and emission.
 
-* **Output canon (normative).**
+  * Any governed writer-evidence run that exercises `GET /dev/writer/conjunction` MUST require explicit caller-provided open rails and MUST NOT silently force `SAFE_MODE=0` or `ALLOW_NETWORK=1` on behalf of the caller.
 
+  * Such writer-evidence runs do not widen the route contract and do not move this endpoint into the A7 proof family.  
+* Output canon (normative).  
   * Any success payload emitted by these routes MUST be serialized by the canonical public emitter, producing deterministic JSON bytes with ASCII-sorted keys and exactly one trailing LF.
 
-  * AB↔BA parity MUST hold for conjunction evaluation: swapping A and B MUST NOT change emitted bytes after canonical emission.
-
-* **Endpoints (dev-only).**
-
-  * `GET /dev/sampler/conjunction`
-
-    * Dev-only conjunction preview route for sampler evaluation.
-
-  * `GET /dev/reader/conjunction`
-
-    * Dev-only conjunction preview route for Reader-style response emission and VendorError mapping.
-
-  * `POST /dev/writer/conjunction`
-
-    * Dev-only conjunction preview route returning an idempotent writer-style envelope (not the public Reader v1 envelope).
-
+  * AB↔BA parity MUST hold for conjunction evaluation: swapping A and B MUST NOT change emitted bytes after canonical emission.  
+* Endpoints (dev-only).  
+  * GET /dev/sampler/conjunction  
+    * Dev-only conjunction preview route for sampler evaluation.  
+  * GET /dev/reader/conjunction  
+    * Dev-only conjunction preview route for Reader-style response emission and VendorError mapping.  
+  * GET /dev/writer/conjunction  
+    * Dev-only conjunction preview route returning an idempotent writer-style envelope (not the public Reader v1 envelope).  
     * The Endpoint Catalog route id for this endpoint is `dev.writer.conjunction.v1`.
 
   ---
@@ -3068,33 +3064,34 @@ These codes are exhaustive for the CLI public surface in the sense that success 
 
   ## 9.5 Evidence posture (titles-only; PF12 single home)
 
-* **Maintain proofs.** Keep evidence current for: parity (Reader↔CLI, AB↔BA, two-run), idempotence recompute, transport (ETag/304/HEAD, no-store on writers/errors, Vary, encoding-invariance), and vendor rails (refusal closed; conformance open).
+* **Maintain proofs.** Keep evidence current for: parity (Reader↔CLI, AB↔BA, two-run), idempotence recompute, transport (ETag/304/HEAD, no-store on writers/errors, Vary, encoding-invariance), and vendor rails (refusal closed; conformance open).  
+* **Index (human).** **`docs/evidence/INDEX.json`** (PF12 §8.6) lists artifacts and scripts (**titles/paths only; no payload bytes**). A **hash sentinel** **`docs/evidence/INDEX.sha256`** gates merges and is **not mirrored**.  
+* **Machine mirror (single home).** The records-only JSONL mirror lives at **`artifacts/evidence_index.jsonl`** (PF12 §8.3). Human↔machine entries **must be 1:1**; a non one-to-one join is a failure. Each mirror record includes `sha256`, `size_bytes`, `produced_at_utc`, `discovered_physical_path`, and a `proof_anchor` (transcript reference plus on-disk stat). The mirror is **ASCII field-ordered** and **sort-before-write** with **unknown-key rejection**; a **single** mirror file is permitted.  
+* **Repo docs tokens (PR checklist).** Include `EVIDENCE_INDEX_UPDATED_OK`, **`EVIDENCE_INDEX_HASH_OK`**, `EVIDENCE_INDEX_MIRROR_OK`, and `EVIDENCE_PATHS_VALIDATED_OK`.  
+* **Repo docs tokens (PR checklist).** Include `EVIDENCE_INDEX_UPDATED_OK`, **`EVIDENCE_INDEX_HASH_OK`**, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`, `CI_CHECK_MIRROR_SCHEMA_OK`, and `CI_CHECK_FINAL_LF_OK`.  
+* **Close-pack execution truthfulness (MUST).** If a PF05-scoped acceptance map, token-evidence matrix, close report, or manifest claims Human Index refresh, hash-sentinel refresh, machine-mirror refresh, mirror-schema validation, LF validation, orientation-demo refresh, acceptance-map viability generation, or related evidence-workflow execution, that claim MUST be backed by same-run governed QA log anchors under `audit/qa/<epic-id>/checks/<check-id>/`.  
+* **Epic-close runtime proof sufficiency (MUST).** A PF05-scoped epic-close recommendation MUST NOT rely on artifact-only close-pack files. When changed PF05 runtime surfaces are part of the close recommendation, same-run governed QA proof MUST show that prerequisite runtime logs are present and that the changed runtime proof families actually executed in that run.
 
-* **Index (human).** **`docs/evidence/INDEX.json`** (PF12 §8.6) lists artifacts and scripts (**titles/paths only; no payload bytes**). A **hash sentinel** **`docs/evidence/INDEX.sha256`** gates merges and is **not mirrored**.
-
-* **Machine mirror (single home).** The records-only JSONL mirror lives at **`artifacts/evidence_index.jsonl`** (PF12 §8.3). Human↔machine entries **must be 1:1**; a non one-to-one join is a failure. Each mirror record includes `sha256`, `size_bytes`, `produced_at_utc`, `discovered_physical_path`, and a `proof_anchor` (transcript reference plus on-disk stat). The mirror is **ASCII field-ordered** and **sort-before-write** with **unknown-key rejection**; a **single** mirror file is permitted.
-
-* **Repo docs tokens (PR checklist).** Include `EVIDENCE_INDEX_UPDATED_OK`, **`EVIDENCE_INDEX_HASH_OK`**, `EVIDENCE_INDEX_MIRROR_OK`, and `EVIDENCE_PATHS_VALIDATED_OK`.
-
-* **Update discipline (MUST).** When any golden, artifact, or script path changes, update **`docs/evidence/INDEX.json`**, **`docs/evidence/INDEX.sha256`**, and **`artifacts/evidence_index.jsonl`** in the **same commit/PR**, and add a matching entry in **§11 Change Management: Doc-Delta Hooks**.
-
+* **Runtime-proof synthesis deliverables (MUST).** The governed synthesis step MUST capture `runtime_log_presence.txt`, `runtime_surface_inventory.txt`, and the corresponding `primary.log` under `audit/qa/<epic-id>/checks/<check-id>/`.  
+* **Update discipline (MUST).** When any golden, artifact, or script path changes, update **`docs/evidence/INDEX.json`**, **`docs/evidence/INDEX.sha256`**, and **`artifacts/evidence_index.jsonl`** in the **same commit/PR**, and add a matching entry in **§11 Change Management: Doc-Delta Hooks**.  
+* **Update discipline (MUST).** When any golden, artifact, or script path changes, update **`docs/evidence/INDEX.json`**, **`docs/evidence/INDEX.sha256`**, and **`artifacts/evidence_index.jsonl`** in the **same commit/PR**, and add a matching entry in **§11 Change Management: Doc-Delta Hooks**.  
 * **Process routing.** The “update in same PR” workflow and merge gating for the sentinel live in **Epic-Process-Guide** (titles only).
 
-  # **10\. Security & Privacy \[Required-Now\]**
+# **10\. Security & Privacy \[Required-Now\]**
 
-  ## **10.1 Public covenant (numeric-free)**
+## **10.1 Public covenant (numeric-free)**
 
 * **Bands-only, no numerics.** Public Reader bodies are **numeric-free**; `categories[*]` are **exactly** `{id, band}`. No `score`, `score_pct`, or other numeric fields appear on the public surface.
 
 * **Canonical emission only.** All public bytes (success and typed errors) are produced by the **single presenter emitter** (UTF-8, sorted keys, compact, **one LF**).
 
-  ## **10.2 Logging hygiene (keys-only)**
+## **10.2 Logging hygiene (keys-only)**
 
 * **No secrets/PII in logs.** Never log request/response bodies, header **values**, or vendor payloads. API keys and tokens **must** be redacted (keys-only posture).
 
 * **Deterministic, bounded labels.** Observability uses bounded enums/labels (route, outcome class, rails state); no user identifiers or free-text payloads in logs.
 
-  ## **10.3 Dev harness containment**
+## **10.3 Dev harness containment**
 
 * **Fixtures only; no vendors.** The dev Reader harness uses **local fixtures** and **must not** perform vendor calls.
 
@@ -3171,7 +3168,7 @@ Admin surfaces are never part of the Reader public covenant and must remain clea
   * v1.0 — Add §7.2 Request Shaping; pin typed error mapping; assert rails refusal posture.  
 * **Where to put links.** Evidence artifacts and scripts are indexed in **Appendix D — Evidence Index** (titles/paths only); do not paste payloads or transport bytes here. If the human Index changed, note **“Sentinel updated: YES”** in the Change Log entry (the sentinel is derived from Appendix D and is not mirrored).
 
-  ## **11.2 Doc-Delta Hooks (how we propose, review, and land changes)**
+## **11.2 Doc-Delta Hooks (how we propose, review, and land changes)**
 
 **Purpose.** Provide a uniform, auditable record for any normative change. Each Doc-Delta is self-contained and copy-paste-ready.
 
@@ -3196,7 +3193,7 @@ Admin surfaces are never part of the Reader public covenant and must remain clea
 * **Rollout plan:** CI jobs to update (parity, LF one-trailing-LF check, idempotence, rails refusal), and any gated integration jobs.  
 * **PR checklist tokens:** include `EVIDENCE_INDEX_UPDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`.
 
-  ### **11.2.2 Acceptance to land a Doc-Delta (binary outcome)**
+### **11.2.2 Acceptance to land a Doc-Delta (binary outcome)**
 
 A Doc-Delta is **Accepted** only when:
 
@@ -3395,6 +3392,42 @@ Keep this index synchronized with repo changes. When any golden or artifact path
 * `audit/EPIC-009_close_report.md`  
 * `audit/EPIC-009_MANIFEST.json`
 
+  #### **D.0b EPIC027 acceptance ledgers and close-pack**
+
+* `docs/acceptance_map_epic027.json`
+
+* `docs/acceptance_map_epic027.json.path_proof.txt`
+
+* `audit/qa/hde-epic027/token_evidence_matrix.md`
+
+* `audit/qa/hde-epic027/token_evidence_matrix.md.path_proof.txt`
+
+* `audit/qa/hde-epic027/acceptance_map_viability.log`
+
+* `audit/EPIC-027_close_report.md`
+
+* `audit/EPIC-027_MANIFEST.json`
+
+* `audit/EPIC-027_close_report.md.path_proof.txt`
+
+* `audit/EPIC-027_MANIFEST.json.path_proof.txt`
+
+  #### **D.0c EPIC027 close-pack same-run QA gate logs**
+
+* `audit/qa/hde-epic027/checks/gate_update_evidence_index_write/primary.log`
+
+* `audit/qa/hde-epic027/checks/gate_update_evidence_index_check/primary.log`
+
+* `audit/qa/hde-epic027/checks/gate_mirror_schema/primary.log`
+
+* `audit/qa/hde-epic027/checks/gate_evidence_paths_validation/primary.log`
+
+* `audit/qa/hde-epic027/checks/gate_lf_endings/primary.log`
+
+* `audit/qa/hde-epic027/checks/gate_orientation_demo_write/primary.log`
+
+* `audit/qa/hde-epic027/checks/gate_orientation_demo_check/primary.log`
+
 ### **D.1 Parity (Reader↔CLI, AB↔BA, two-run)**
 
 * Goldens: `goldens/reader/v1/g02_ab_ba_parity_A.jsonl`, `goldens/reader/v1/g02_ab_ba_parity_B.jsonl`  
@@ -3475,7 +3508,7 @@ Keep this index synchronized with repo changes. When any golden or artifact path
 * `tests/cli/test_cli_canonical_bytes.py` *(showcompat stdout canonical-bytes validation)*  
 * `tests/cli/test_cli_usage_and_errors.py` *(showcompat usage/errors validation)*
 
-### **D.8a showcompat conjunction fixtures (AB / BA \+ sidecar)**
+#### D.8a showcompat conjunction fixtures (AB / BA \+ sidecar)
 
 * Pair fixtures (direct `a` / `b` ordering):
 
@@ -3497,6 +3530,44 @@ Keep this index synchronized with repo changes. When any golden or artifact path
 
   * `artifacts/cli/abba_sidecar.json` (sidecar)
 
+  #### **D.8b compat conjunction identity capture (internal compat route)**
+
+* `artifacts/compat/identity_hash.txt` *(explicit conjunction compat identity capture)*
+
+* `artifacts/compat/identity_hash.txt.path_proof.txt` *(governed path-proof for the explicit conjunction compat identity capture)*
+
+* `artifacts/compat/AB.json` *(canonical AB compat bytes referenced by the identity-hash proof)*
+
+* `tests/http/test_compat_endpoint_contract.py` *(compat contract coverage for the conjunction identity-hash artifact)*
+
+#### **D.8c CLI installability and conformance**
+
+* `artifacts/cli/install/entrypoints.txt` *(positive console-entrypoint installability proof)*
+
+* `artifacts/cli/install/installability_summary.json` *(installability summary with module and console help/version proof)*
+
+* `artifacts/cli/help/hdctl_help.txt` *(top-level CLI help capture)*
+
+* `artifacts/cli/help/showcompat_help.txt` *(showcompat help capture)*
+
+* `artifacts/cli/help/reject_nonjson.txt` *(argument-policing capture for non-JSON rejection)*
+
+* `artifacts/cli/summary.json` *(CLI conformance summary including deterministic sampler semantics)*
+
+#### **D.8d Dev writer conjunction readback parity and A7 exclusion**
+
+* `artifacts/writer/conjunction_write_readback.log` *(writer idempotence and write/readback parity log)*
+
+* `artifacts/writer/conjunction_write_readback.log.path_proof.txt` *(governed path-proof for the write/readback log)*
+
+* `artifacts/writer/conjunction_writer_summary.json` *(writer summary artifact)*
+
+* `artifacts/writer/conjunction_writer_summary.json.path_proof.txt` *(governed path-proof for the writer summary artifact)*
+
+* `tests/http/test_dev_conjunction_http.py` *(writer behavior and readback parity proof)*
+
+* `tests/http/test_endpoint_catalog.py` *(A7-exclusion confirmation; no writer contract widening)*
+
 ### **D.9 Vendor rails (closed refusal and open conformance)**
 
 * Closed-rails refusal proof (single-file canonical; headers → blank line → body): `artifacts/proofs/ops_refusal_proof.txt`  
@@ -3511,23 +3582,108 @@ Keep this index synchronized with repo changes. When any golden or artifact path
 
   ### **D.11 QA artifacts namespace (transient captures)**
 
-* **Live QA root (write-scope):** `audit/qa/<epic-id>/` (mechanical artifacts only; runbook rails and “gitless/no git-status gating” live in Glow QA Guide and Epic-Process-Guide by title)
-
-* **Checks-only evidence layout.** Live QA evidence MUST be organized only by `check_id` under stable check directories: `audit/qa/<epic-id>/checks/<check-id>/`. Re-running QA MUST reuse the same epic-scoped root and stable check directories.
-
-* **Per-run nesting is disallowed.** Do not create run-id directories, timestamped run directories, or other per-run subroots under the Live QA root.
-
-* **Per-run root variables are vetoed.** Plans and reviews MUST NOT require operator-selected “fresh directory for this run” postures; evidence writes to the stable check directories.
-
-* **Plan-created deliverables under checks.** When Live QA requires plan-created deliverables, they MUST be written under the stable check directory, not under per-run directories or ad-hoc run roots.
-
-* **Transient captures (test-only; non-gating):** `artifacts/qa/` (allowed for local/test captures; not the Live QA run root)
-
-* **Filename case posture.** Uppercase letters in filenames are allowed. The lowercase ASCII naming rail applies to directory names (and to identifier classes explicitly defined as lowercase-only, such as check IDs). Reviewers and lint MUST NOT treat uppercase filename segments as a lowercase-rule violation.
-
-* **No run\_id correctness key.** Live QA plans and governed evidence artifacts MUST NOT require `run_id` (or `RUN_ID`) as an operator input, step-log header field, manifest field, or correctness key; acceptance is check-centric and stable across reruns.
-
+* **Live QA root (write-scope):** `audit/qa/<epic-id>/` (mechanical artifacts only; runbook rails and “gitless/no git-status gating” live in Glow QA Guide and Epic-Process-Guide by title)  
+* **Checks-only evidence layout.** Live QA evidence MUST be organized only by `check_id` under stable check directories: `audit/qa/<epic-id>/checks/<check-id>/`. Re-running QA MUST reuse the same epic-scoped root and stable check directories.  
+* **Per-run nesting is disallowed.** Do not create run-id directories, timestamped run directories, or other per-run subroots under the Live QA root.  
+* **Per-run root variables are vetoed.** Plans and reviews MUST NOT require operator-selected “fresh directory for this run” postures; evidence writes to the stable check directories.  
+* **Plan-created deliverables under checks.** When Live QA requires plan-created deliverables, they MUST be written under the stable check directory, not under per-run directories or ad-hoc run roots.  
+* **Transient captures (test-only; non-gating):** `artifacts/qa/` (allowed for local/test captures; not the Live QA run root)  
+* **Filename case posture.** Uppercase letters in filenames are allowed. The lowercase ASCII naming rail applies to directory names (and to identifier classes explicitly defined as lowercase-only, such as check IDs). Reviewers and lint MUST NOT treat uppercase filename segments as a lowercase-rule violation.  
+* **No run\_id correctness key.** Live QA plans and governed evidence artifacts MUST NOT require `run_id` (or `RUN_ID`) as an operator input, step-log header field, manifest field, or correctness key; acceptance is check-centric and stable across reruns.  
 * **History retention is non-gating.** Optional per-execution history nesting or labeling MUST remain non-canonical and non-gating; acceptance binds only to canonical check-centric evidence surfaces, not to per-execution identifiers.
+
+#### D.11a EPIC027 Live QA proof anchors for PF05 surfaces
+
+* **po-001 dev conjunction and catalog coherence**
+
+  * `audit/qa/hde-epic027/checks/po-001/route_inventory.txt` *(dev conjunction trio and compat blueprint route inventory proof)*
+
+  * `audit/qa/hde-epic027/checks/po-001/dev_conjunction_http.txt` *(dev conjunction HTTP PASS capture)*
+
+  * `audit/qa/hde-epic027/checks/po-001/endpoint_catalog.txt` *(Endpoint Catalog proof capture for the passing po-001 run)*
+
+  * `audit/qa/hde-epic027/checks/po-001/primary.log` *(governed step log for po-001)*
+
+* **po-002 compat surface and identity discoverability**
+
+  * `audit/qa/hde-epic027/checks/po-002/compat_surface.txt` *(compat surface mount, GET probe, POST compute, and prod APP\_ENV gate proof)*
+
+  * `audit/qa/hde-epic027/checks/po-002/compat_identity_discovery.txt` *(discoverability proof via updater and mirror references to `compat.conjunction.identity_hash`)*
+
+  * `audit/qa/hde-epic027/checks/po-002/primary.log` *(governed step log for po-002)*
+
+* **po-003 shared emitter and showcompat proofs**
+
+  * `audit/qa/hde-epic027/checks/po-003/cli_emitter_proof.txt` *(LF guard and shared `emit_public` proof)*
+
+  * `audit/qa/hde-epic027/checks/po-003/showcompat_parity.txt` *(showcompat parity and identity proof capture)*
+
+  * `audit/qa/hde-epic027/checks/po-003/showcompat_help.txt` *(showcompat help-surface proof capture)*
+
+  * `audit/qa/hde-epic027/checks/po-003/primary.log` *(governed step log for po-003)*  
+* **po-004 CLI installability, conformance, and `bg:resolve` help proof**  
+  * `audit/qa/hde-epic027/checks/po-004/entrypoint_proof.txt` (explicit pyproject console-binding proof)
+
+  * `audit/qa/hde-epic027/checks/po-004/cli_install_help.txt` (CLI install-help test PASS capture)
+
+  * `audit/qa/hde-epic027/checks/po-004/bg_resolve_test.txt` (bg:resolve CLI test PASS capture)
+
+  * `audit/qa/hde-epic027/checks/po-004/bg_resolve_help.txt` (bg:resolve help-surface proof capture)
+
+  * `audit/qa/hde-epic027/checks/po-004/primary.log` (governed step log for po-004)  
+* **po-005 Reader A7 proof family and catalog-target discipline**  
+  * *`audit/qa/hde-epic027/checks/po-005/reader_a7_transport.txt` (Reader A7 transport PASS capture)*
+
+  * *`audit/qa/hde-epic027/checks/po-005/catalog_routes.txt` (catalog inventory proof that `/reader` is A7-eligible and `/internal/version` is excluded)*
+
+  * *`audit/qa/hde-epic027/checks/po-005/primary.log` (governed step log for po-005)*  
+* **po-006 writer behavior, mirror discoverability, and A7 exclusion**  
+  * *`audit/qa/hde-epic027/checks/po-006/dev_conjunction_http.txt` (dev conjunction HTTP PASS capture for writer behavior)*
+
+  * *`audit/qa/hde-epic027/checks/po-006/writer_index_rows.txt` (machine-mirror discoverability proof for writer artifacts)*
+
+  * *`audit/qa/hde-epic027/checks/po-006/primary.log` (governed step log for po-006)*  
+* **po-007 evidence-discipline and qa-step-manifest ledger coverage**  
+  * *`audit/qa/hde-epic027/checks/po-007/update_evidence_index_write.txt` (evidence-index write PASS capture)*
+
+  * *`audit/qa/hde-epic027/checks/po-007/update_evidence_index_check.txt` (evidence-index check PASS capture)*
+
+  * *`audit/qa/hde-epic027/checks/po-007/orientation_demo_write.txt` (orientation-demo write PASS capture)*
+
+  * *`audit/qa/hde-epic027/checks/po-007/orientation_demo_check.txt` (orientation-demo check PASS capture)*
+
+  * *`audit/qa/hde-epic027/checks/po-007/validate_evidence_paths.txt` (evidence-path validation PASS capture)*
+
+  * *`audit/qa/hde-epic027/checks/po-007/check_lf_endings.txt` (final-LF validation PASS capture)*
+
+  * *`audit/qa/hde-epic027/checks/po-007/check_mirror_schema.txt` (mirror-schema PASS capture)*
+
+  * *`audit/qa/hde-epic027/checks/po-007/qa_step_manifest_lookup.txt` (EPIC027 qa-step-manifest coverage proof in updater and governed ledgers)*
+
+  * *`audit/qa/hde-epic027/checks/po-007/primary.log` (governed step log for po-007; claimed tokens are recorded in the step header)*  
+* **po-008 close-pack generator, bindings, and ledger truthfulness**  
+  * *`audit/qa/hde-epic027/checks/po-008/generate_close_pack.txt` (close-pack generator run capture)*  
+  * *`audit/qa/hde-epic027/checks/po-008/close_pack_bindings.txt` (binding proof that close-pack paths point to the EPIC027 QA root and canonical ledger files)*  
+  * *`audit/qa/hde-epic027/checks/po-008/qa_step_manifest_lookup.txt` (proof that the EPIC027 qa-step manifest is ledger-bound rather than merely present on disk)*  
+  * *`audit/qa/hde-epic027/checks/po-008/primary.log` (governed step log for po-008)*  
+* **po-009 catalog surface and token inventory guard**  
+  * *`audit/qa/hde-epic027/checks/po-009/catalog_surface_inventory.txt` (catalog inventory proof that no unexpected public success surface appears in the EPIC027 surface family)*
+
+  * *`audit/qa/hde-epic027/checks/po-009/token_inventory.txt` (token inventory proof that no non-canonical token names are introduced)*
+
+  * *`audit/qa/hde-epic027/checks/po-009/primary.log` (governed step log for po-009)*  
+* **po-010 runtime functional proof posture**  
+  * *`audit/qa/hde-epic027/checks/po-010/runtime_log_presence.txt` (same-run prerequisite runtime-log presence proof)*
+
+  * *`audit/qa/hde-epic027/checks/po-010/runtime_surface_inventory.txt` (same-run runtime-surface inventory proof across the changed PF05 proof families)*
+
+  * *`audit/qa/hde-epic027/checks/po-010/primary.log` (governed step log for po-010)*
+
+* **EPIC027 QA manifest pair**
+
+  * `audit/qa/hde-epic027/qa_step_logs_manifest.json`
+
+  * `audit/qa/hde-epic027/qa_step_logs_manifest.json.path_proof.txt`
 
 ### **D.12 BodyGraph adapter data-source & invariance (PF10-AA)**
 
