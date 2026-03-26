@@ -1,5 +1,5 @@
 path: artifacts/cli/guards/emitter_symbol_proof.txt
 size_bytes: 392
 sha256: 6120d745ff554e12d9bc4b731a597f60264e6f5c8fff60c1939a71f35652bfc4
-mtime_utc: 2025-12-06T04:06:36Z
-produced_at_utc: 2025-11-22T17:07:45Z
+mtime_utc: 2026-03-26T11:02:06Z
+produced_at_utc: 2026-03-26T11:03:10Z
