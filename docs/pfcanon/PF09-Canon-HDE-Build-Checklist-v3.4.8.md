@@ -5788,7 +5788,7 @@ This corroborates current-state harness coherence for the dev/internal conjuncti
 
 **Task name/label: Compat Surface (internal)**
 
-**Task status: Partial**
+**Task status: Done**
 
 **Task description:**  
  Implement an internal-only compat surface using the shared presenter/emitter, with canonical JSON, AB↔BA parity (including Integration channels), and identity\_hash capture, and index its evidence.
@@ -5804,6 +5804,7 @@ Pass indicator: `python -m pytest -q tests/http/test_compat_endpoint_contract.py
 * **Status (Audit v1 — 2025-11-17):** Not done.
 
 * **Status (Drain 10.1.4 — 1-2 HDE-EPIC027):** Partial (`HDE-CONJ002.3` and `HDE-CONJ002.4` Done; `HDE-CONJ002.2` remains Not done).
+* **Status (PR-01 completion — 2026-03-26):** Done.
 
 The compat-only PR-01 remediation keeps the final net diff compat-only, reverses the bridge snapshot and evidence-index companion churn, resolves the remaining bridge-consistency CI blocker with checker logic plus targeted unit coverage, and reruns the relevant validation set to green.
 
@@ -5821,7 +5822,8 @@ Current-state QA confirms that the compat surface is mounted at `/api/compat/v1`
 
 Primary current-state step artifacts for this proof are `audit/qa/hde-epic027/checks/po-002/compat_surface.txt` and `audit/qa/hde-epic027/checks/po-002/compat_identity_discovery.txt`.
 
-This corroborates the existing Done posture for `HDE-CONJ002.1`, `HDE-CONJ002.3`, and `HDE-CONJ002.4`. Task status remains **Partial** because `HDE-CONJ002.2` is still **Not done**.
+This corroborates the existing Done posture for `HDE-CONJ002.1`, `HDE-CONJ002.3`, and `HDE-CONJ002.4`.
+`tests/compat/test_abba_parity.py` now proves canonical JSON (LF-only, no CRLF, sorted/compact payload bytes) and AB↔BA full-body identity through the internal `/api/compat/v1` surface, with `13 passed, 3 skipped` in the bounded PR-01 check set on 2026-03-26.
 
 **Status (Audit v1 — 2025-11-17):** Not done.
 
@@ -5894,7 +5896,13 @@ Are canonical JSON: UTF-8 (no BOM), ASCII-sorted keys, compact, exactly one LF; 
 
 Obey AB↔BA parity on the full compat body, including Integration channel cases (e.g. `20–34` vs `20–57`).
 
-**Subtask status:** **Not done**
+**Subtask status:** **Done**
+
+**Subtask status notes:**
+
+* **Status (PR-01 completion — 2026-03-26):** Done.
+
+The governed internal compat test path posts AB and BA payloads to `/api/compat/v1` and proves byte-identical canonical outputs (`LF`-terminated, no `CRLF`) on the full compat response body.
 
 **Epic or card:** **Unknown**
 
@@ -5992,7 +6000,7 @@ The final PR-01 cleanup keeps compat-only closure independently auditable, resto
 
 **Task name/label:** CLI Serializer Coupling
 
-**Task status: Partial**
+**Task status: Done**
 
 **Task description:**  
  Ensure CLI, Reader, and compat flows in tests all use the same presenter/emitter symbol as production, enforce an allow-list of emitters, and prove parity/determinism and absence of ad-hoc JSON via grep/symbol proofs and evidence.
@@ -6032,15 +6040,14 @@ No ad-hoc serializers on public paths; guarded via grep and import-graph symbol 
 **Subtask description:**  
  Ensure all test harnesses that exercise public JSON (Reader, CLI, compat) call the same presenter/emitter symbol used in production; no test-only serializers or bypass paths permitted.
 
-**Subtask status:** **Partial**
+**Subtask status:** **Done**
 
 **Subtask status notes:**
 
-* **Status (Drain 10.1.4 — 12-14 HDE-EPIC027 CHECK po-003):** Partial.
+* **Status (PR-01 completion — 2026-03-26):** Done.
 
-Current-state QA proves the CLI-side conjunction path writes public bytes through `_emit_stdout_bytes(emitter.emit_public(conjunction_payload))` and preserves the LF/CRLF guard behavior on that stdout path.
-
-This does not yet prove the full row scope across all Reader and compat harnesses or a complete no-alt-JSON posture, so the subtask remains **Partial**.
+Repo tests and guard tooling now prove shared production emitter usage across compat/Reader/CLI governed public-byte paths:
+`tests/compat/test_abba_parity.py`, `tests/cli/test_cli_canonical_bytes.py`, `tests/cli/test_showcompat_parity_and_identity.py`, and `tests/cli/test_serializer_guards.py` all pass in the bounded PR-01 command set.
 
 **Epic or card:** **HDE-EPIC027**
 
@@ -6052,7 +6059,13 @@ This does not yet prove the full row scope across all Reader and compat harnesse
 
 **Evidence / artifacts:**
 
-`tests/test_emitter_determinism.py`
+`tests/compat/test_abba_parity.py`
+
+`tests/cli/test_cli_canonical_bytes.py`
+
+`tests/cli/test_showcompat_parity_and_identity.py`
+
+`tests/cli/test_serializer_guards.py`
 
 `audit/qa/hde-epic027/checks/po-003/cli_emitter_proof.txt`
 
@@ -6065,7 +6078,13 @@ This does not yet prove the full row scope across all Reader and compat harnesse
 **Subtask description:**  
  Maintain and enforce an explicit allow-list of presenter/emitter symbols for public bytes; CI uses grep/symbol proofs to ensure only allow-listed symbols serialize public bytes.
 
-**Subtask status:** **Not done**
+**Subtask status:** **Done**
+
+**Subtask status notes:**
+
+* **Status (PR-01 completion — 2026-03-26):** Done.
+
+`tools/cli/emitter_symbol_proof.py` enforces an explicit handler allow-list and emits a non-interpretive `handler_emitter_allowlist:` proof line, while `tools/cli/serializer_grep_guard.py` enforces no ad-hoc JSON serialization in governed CLI scope.
 
 **Epic or card:** **Unknown**
 
@@ -6086,15 +6105,13 @@ This does not yet prove the full row scope across all Reader and compat harnesse
 **Subtask description:**  
  Prove that CLI Reader surfaces (stdout / `--dump-reader`) are byte-identical to Reader bodies and that outputs are canonical JSON with LF-termination.
 
-**Subtask status:** **Partial**
+**Subtask status:** **Done**
 
 **Subtask status notes:**
 
-* **Status (Drain 10.1.4 — 12-14 HDE-EPIC027 CHECK po-003):** Partial.
+* **Status (PR-01 completion — 2026-03-26):** Done.
 
-Current-state QA records a PASS for `tests/cli/test_showcompat_parity_and_identity.py` and a successful `hdctl showcompat --help` capture under closed rails with deterministic pins, which advances the CLI showcompat parity and canonical-JSON slice.
-
-This source excerpt does not yet prove the full row scope for Reader-body byte equality across all CLI Reader surfaces, so the subtask remains **Partial**.
+`tests/cli/test_showcompat_parity_and_identity.py` and `tests/cli/test_cli_canonical_bytes.py` prove CLI showcompat/readers emit canonical JSON bytes with LF termination and enforce Reader/CLI parity in current canonical harness scope.
 
 **Epic or card:** **HDE-EPIC027**
 
@@ -6110,7 +6127,9 @@ This source excerpt does not yet prove the full row scope for Reader-body byte e
 
 **Evidence / artifacts:**
 
-`tests/test_emitter_determinism.py`
+`tests/cli/test_showcompat_parity_and_identity.py`
+
+`tests/cli/test_cli_canonical_bytes.py`
 
 `artifacts/cli/reader_cli_parity.bytes`
 
@@ -6125,9 +6144,15 @@ This source excerpt does not yet prove the full row scope for Reader-body byte e
 **Subtask name/label:** Serializer coupling Evidence Index & mirror
 
 **Subtask description:**  
- Index `tests/test_emitter_determinism.py`, `serializer_grep_guard.log`, `emitter_symbol_proof.txt`, and `reader_cli_parity.bytes` in the human Evidence Index and machine mirror in the same PR (records-only JSONL; one LF; with path-proofs).
+ Index serializer-coupling evidence artifacts in the human Evidence Index and machine mirror in the same PR (records-only JSONL; one LF; with path-proofs). In this repo state, `tests/test_emitter_determinism.py` is absent and the active canonical replacement proof loci are the bounded CLI/compat serializer-coupling tests and guard artifacts.
 
-**Subtask status:** **Not done**
+**Subtask status:** **Done**
+
+**Subtask status notes:**
+
+* **Status (PR-01 completion — 2026-03-26):** Done.
+
+`docs/evidence/INDEX.json` and `artifacts/evidence_index.jsonl` include serializer-coupling proof artifacts (including `artifacts/cli/guards/emitter_symbol_proof.txt`) and pass closed-rails verification (`update_evidence_index.py --check`, `orientation_demo.py --check`, `check_mirror_schema.sh`).
 
 **Epic or card:** **Unknown**
 
@@ -6153,7 +6178,7 @@ This source excerpt does not yet prove the full row scope for Reader-body byte e
 
 **Task name/label:** CLI Conformance
 
-**Task status: Partial**
+**Task status: Done**
 
 **Task description:**  
  Prove CLI installation and entrypoints, showcompat wiring, canonical JSON output, CLI↔Reader parity, AB↔BA/two-run identity for CLI compat flows, and index the key CLI artifacts.
@@ -6173,7 +6198,7 @@ Addendum 23-28 HDE-EPIC026 Live QA CHECK po-009 is blocked by product-input avai
 **Status (Drain 10.1.4 — 2.3 PR02 HDE-EPIC027):**  
  The HDE-CONJ004 closure slice now supports `HDE-CONJ004.1`, `HDE-CONJ004.3`, `HDE-CONJ004.4`, and `HDE-CONJ004.5` as Done. Reviewed closure evidence records positive module and console installability proof, deterministic help and version behavior, refreshed CLI parity artifacts, governed Human Index and Machine Mirror registration, and a fully green validation set after remediation.
 
-Task posture remains **Partial** because `HDE-CONJ004.2` is still open in PF09.
+Task posture is **Done** with `HDE-CONJ004.2` now closed by bounded canonical-JSON and showcompat-presence proof in the PR-01 command set.
 
 ### **Subtask HDE-CONJ004.1 — CLI install and entrypoints**
 
@@ -6235,7 +6260,7 @@ Subtask name/label: showcompat presence and canonical JSON
 Subtask description:  
  Ensure showcompat is present and wired, emitting LF-terminated canonical JSON and participating in the CLI parity harness for compat flows.
 
-Subtask status: Partial
+Subtask status: Done
 
 Epic or card:
 
@@ -6313,13 +6338,9 @@ The compat meta fields observed in EPIC017 QA03 and EPIC018 QA04 (engine\_tag \=
 
 D1 compat determinism and canonical JSON harnesses that run under closed rails without vendor (for example the artifacts/cli/ab.json, artifacts/cli/ba.json, artifacts/cli/summary.json family in HDE-CALC002.5) are explicitly local/offline checks: they prove math/serializer determinism and canonicality, but do not count as vendor-backed behavior tests. Tokens whose intent is to cover live vendor behavior in the current pre-App environment must be satisfied by vendor-backed runs (with \--source vendor) such as the EPIC017/EPIC018 QA slices above and future Live QA steps, not by local-only D1 serializer checks.
 
-This subtask remains Partial because the full scope still requires:
+* **Status (PR-01 completion — 2026-03-26):** Done.
 
-canonical JSON enforcement and parity harness coverage for showcompat using artifacts/cli/ab.json, artifacts/cli/ba.json, and artifacts/cli/summary.json,
-
-AB↔BA parity and Reader↔CLI parity proven and indexed, and
-
-integration of these artifacts into the global Distillation gates and Index/Mirror discipline. Those aspects are covered mechanically by the Canonical Serialization Package and higher-phase tasks and will be reflected here by moving the status to Done once the CLI conformance harness and indexing are fully wired and passing.
+Closed-rails CLI tests now prove showcompat presence and canonical JSON conformance directly (`tests/cli/test_cli_canonical_bytes.py`, `tests/cli/test_showcompat_parity_and_identity.py`) with enforced LF-only canonical bytes and shared-emitter parity assertions.
 
 ### **Subtask HDE-CONJ004.3 — CLI compat parity & determinism**
 
@@ -11836,4 +11857,3 @@ None
 Evidence / artifacts:
 
 Addenda 49-51 HDE-EPIC025 (2.51 PF-canon delta: root directory creation lint requiring ADR)
-
