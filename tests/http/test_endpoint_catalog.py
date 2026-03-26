@@ -39,3 +39,13 @@ def test_dev_conjunction_endpoints_catalog_entries_are_dev_only():
         assert entry.get("a7_eligible") is False
         assert isinstance(entry.get("env_gate"), str)
         assert entry.get("env_gate")
+
+
+def test_reader_endpoint_catalog_entry_is_a7_json_success_route():
+    entry = next((item for item in _catalog_entries() if item.get("path") == "/reader"), None)
+    assert entry is not None
+    method = entry.get("method")
+    assert method == ["GET", "HEAD"]
+    assert entry.get("classification") == "dev_harness"
+    assert entry.get("a7_eligible") is True
+    assert entry.get("env_gate") == "APP_ENV=dev"

@@ -149,6 +149,31 @@ EPIC027_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     },
 ]
 
+EPIC028_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "epic028.acceptance_map",
+        "discovered_physical_path": "docs/acceptance_map_epic028.json",
+        "epic_id": "HDE-EPIC028",
+    },
+    {
+        "artifact_key": "epic028.token_matrix",
+        "discovered_physical_path": "audit/qa/hde-epic028/token_evidence_matrix.md",
+        "epic_id": "HDE-EPIC028",
+    },
+    {
+        "artifact_key": "epic028.acceptance_map_viability",
+        "discovered_physical_path": "audit/qa/hde-epic028/acceptance_map_viability.log",
+        "epic_id": "HDE-EPIC028",
+    },
+]
+
+A7_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "a7.success_encoding_invariance",
+        "discovered_physical_path": "artifacts/proofs/success_encoding_invariance.txt",
+    },
+]
+
 CLI_CONFORMANCE_ARTIFACTS: list[dict[str, object]] = [
     {"artifact_key": "cli.help.hdctl", "discovered_physical_path": "artifacts/cli/help/hdctl_help.txt"},
     {"artifact_key": "cli.help.showcompat", "discovered_physical_path": "artifacts/cli/help/showcompat_help.txt"},
@@ -408,6 +433,8 @@ def _load_human_index() -> list[dict[str, object]]:
             *EPIC022_PRIMARY_ARTIFACTS,
             *EPIC024_PRIMARY_ARTIFACTS,
             *EPIC027_PRIMARY_ARTIFACTS,
+            *EPIC028_PRIMARY_ARTIFACTS,
+            *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,
             *CONJUNCTION_WRITER_ARTIFACTS,
