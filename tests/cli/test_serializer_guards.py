@@ -46,6 +46,7 @@ def test_guards_pass_on_repo_state(tmp_path: Path) -> None:
     assert "summary:PASS" in proof_body
     assert "adapter/http_reader.py" in serializer_body
     assert "canonical_emitters:emit_reader_public_envelope,emitter.emit_public" in proof_body
+    assert "handler_emitter_allowlist:aux-preview=<none>,bg:resolve=emitter.emit_public,showcompat=emit_reader_public_envelope|emitter.emit_public" in proof_body
     assert "showcompat:showcompat:emit_reader_public_envelope,emitter.emit_public" in proof_body
 
 

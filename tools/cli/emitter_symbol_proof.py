@@ -22,6 +22,11 @@ GOVERNED_HANDLERS = {
     "aux-preview": "aux_preview",
     "bg:resolve": "bg_resolve",
 }
+HANDLER_EMITTER_ALLOWLIST = {
+    "showcompat": frozenset({"emitter.emit_public", "emit_reader_public_envelope"}),
+    "aux-preview": frozenset(),
+    "bg:resolve": frozenset({"emitter.emit_public"}),
+}
 OPTIONAL_EMITTER_HANDLERS = {"aux-preview"}
 
 
@@ -81,12 +86,40 @@ def _parse_cli(path: Path, targets: Mapping[str, str]) -> Iterable[HandlerProof]
 
 def _render_proof(proofs: Sequence[HandlerProof]) -> str:
     lines = ["CLI Emitter Symbol Proof", "canonical_emitters:" + ",".join(sorted(CANONICAL_EMITTERS))]
-    failures = [p for p in proofs if (not p.emitters and not p.optional)]
+    allowlist_line = ",".join(
+        f"{handler}={'|'.join(sorted(HANDLER_EMITTER_ALLOWLIST[handler])) or '<none>'}"
+        for handler in sorted(HANDLER_EMITTER_ALLOWLIST)
+    )
+    lines.append("handler_emitter_allowlist:" + allowlist_line)
+    failures = []
+    for proof in proofs:
+        expected = HANDLER_EMITTER_ALLOWLIST.get(proof.handler, frozenset())
+        actual = set(proof.emitters)
+        if proof.optional:
+            if not actual.issubset(expected):
+                failures.append(proof)
+            continue
+        if actual != expected:
+            failures.append(proof)
     lines.append(f"summary:{'FAIL' if failures else 'PASS'}")
     for proof in proofs:
         lines.append(proof.render())
     lines.append("")
     return "\n".join(lines)
+
+
+def _failures(proofs: Sequence[HandlerProof]) -> list[HandlerProof]:
+    failures: list[HandlerProof] = []
+    for proof in proofs:
+        expected = HANDLER_EMITTER_ALLOWLIST.get(proof.handler, frozenset())
+        actual = set(proof.emitters)
+        if proof.optional:
+            if not actual.issubset(expected):
+                failures.append(proof)
+            continue
+        if actual != expected:
+            failures.append(proof)
+    return failures
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -116,7 +149,7 @@ def main(argv: list[str] | None = None) -> int:
     proof_body = _render_proof(proofs)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(proof_body, encoding="utf-8")
-    failures = [proof for proof in proofs if not proof.emitters and not proof.optional]
+    failures = _failures(proofs)
     return 1 if failures else 0
 
 

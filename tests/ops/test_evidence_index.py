@@ -35,6 +35,7 @@ REPO_TARGETS = [
     ("cli.help.reject_nonjson", "artifacts/cli/help/reject_nonjson.txt"),
     ("cli.install.entrypoints", "artifacts/cli/install/entrypoints.txt"),
     ("cli.install.installability_summary", "artifacts/cli/install/installability_summary.json"),
+    ("cli.guard.emitter_symbol_proof", "artifacts/cli/guards/emitter_symbol_proof.txt"),
 ]
 
 
