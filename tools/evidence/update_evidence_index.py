@@ -725,41 +725,53 @@ def main(argv: list[str] | None = None) -> None:
     _refresh_path_proof(HUMAN_INDEX, default_produced_at=produced_default, check=args.check)
     _refresh_path_proof(HASH_SENTINEL, default_produced_at=produced_default, check=args.check)
 
-    mirror_bytes, mirror_rec = _render_mirror(entries, produced_default=produced_default, check=args.check)
-    mirror_size = len(mirror_bytes)
-    mirror_rec["size_bytes"] = mirror_size
-    _write_if_changed(MIRROR_PATH, mirror_bytes, check=args.check)
+    def _write_mirror_bundle(*, check: bool) -> None:
+        mirror_bytes, mirror_rec = _render_mirror(entries, produced_default=produced_default, check=check)
+        mirror_size = len(mirror_bytes)
+        mirror_rec["size_bytes"] = mirror_size
+        _write_if_changed(MIRROR_PATH, mirror_bytes, check=check)
 
-    mirror_stat = MIRROR_PATH.stat()
-    mirror_file_sha = _sha256_path(MIRROR_PATH)
-    mirror_sha_line = f"{mirror_file_sha}  {MIRROR_REL}\n".encode("utf-8")
-    _write_if_changed(MIRROR_SHA_PATH, mirror_sha_line, check=args.check)
-    _refresh_path_proof(MIRROR_SHA_PATH, default_produced_at=produced_default, check=args.check)
+        mirror_stat = MIRROR_PATH.stat()
+        mirror_file_sha = _sha256_path(MIRROR_PATH)
+        mirror_sha_line = f"{mirror_file_sha}  {MIRROR_REL}\n".encode("utf-8")
+        _write_if_changed(MIRROR_SHA_PATH, mirror_sha_line, check=check)
+        _refresh_path_proof(MIRROR_SHA_PATH, default_produced_at=produced_default, check=check)
 
-    mirror_body_sha = str(mirror_rec["sha256"])
-    proof_anchor, produced_at = _write_path_proof(
-        MIRROR_REL,
-        sha256=mirror_file_sha,
-        size_bytes=mirror_stat.st_size,
-        mtime_utc=mirror_proof_existing.get("mtime_utc"),
-        produced_at=str(mirror_rec.get("produced_at_utc")),
-        default_produced_at=produced_default,
-        check=args.check,
-        stat_mtime=mirror_stat.st_mtime,
-        extra_fields={"mirror_body_sha256": mirror_body_sha},
-    )
-    if proof_anchor != mirror_rec["proof_anchor"]:
-        mirror_rec["proof_anchor"] = proof_anchor
-        if args.check:
-            raise SystemExit(f"STALE_PROOF:{proof_anchor}")
-    if produced_at != mirror_rec["produced_at_utc"]:
-        mirror_rec["produced_at_utc"] = produced_at
-        if args.check:
-            raise SystemExit(f"STALE_PRODUCED_AT:{MIRROR_REL}")
-    if mirror_stat.st_size != int(mirror_rec["size_bytes"]):
-        if args.check:
-            raise SystemExit(f"STALE_SIZE:{MIRROR_REL}")
-        mirror_rec["size_bytes"] = mirror_stat.st_size
+        mirror_body_sha = str(mirror_rec["sha256"])
+        proof_anchor, produced_at = _write_path_proof(
+            MIRROR_REL,
+            sha256=mirror_file_sha,
+            size_bytes=mirror_stat.st_size,
+            mtime_utc=mirror_proof_existing.get("mtime_utc"),
+            produced_at=str(mirror_rec.get("produced_at_utc")),
+            default_produced_at=produced_default,
+            check=check,
+            stat_mtime=mirror_stat.st_mtime,
+            extra_fields={"mirror_body_sha256": mirror_body_sha},
+        )
+        if proof_anchor != mirror_rec["proof_anchor"]:
+            mirror_rec["proof_anchor"] = proof_anchor
+            if check:
+                raise SystemExit(f"STALE_PROOF:{proof_anchor}")
+        if produced_at != mirror_rec["produced_at_utc"]:
+            mirror_rec["produced_at_utc"] = produced_at
+            if check:
+                raise SystemExit(f"STALE_PRODUCED_AT:{MIRROR_REL}")
+        if mirror_stat.st_size != int(mirror_rec["size_bytes"]):
+            if check:
+                raise SystemExit(f"STALE_SIZE:{MIRROR_REL}")
+            mirror_rec["size_bytes"] = mirror_stat.st_size
+
+    _write_mirror_bundle(check=args.check)
+    if not args.check:
+        # Converge in a single invocation by running a strict post-write pass.
+        # If non-mirror proof metadata shifted during the write, the second pass
+        # rewrites once and then validates deterministically.
+        try:
+            _write_mirror_bundle(check=True)
+        except SystemExit:
+            _write_mirror_bundle(check=False)
+            _write_mirror_bundle(check=True)
 
 
 if __name__ == "__main__":
