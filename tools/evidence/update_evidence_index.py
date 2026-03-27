@@ -217,6 +217,12 @@ FORCE_REFRESH_ARTIFACT_RELS: set[str] = {
     "docs/evidence/INDEX.sha256",
     "audit/gates/topology/orientation_demo.txt",
 }
+STALE_PROOF_TRIGGER_RELS: set[str] = FORCE_REFRESH_ARTIFACT_RELS - {
+    "artifacts/evidence_index.jsonl",
+    "artifacts/evidence_index.jsonl.sha256",
+    "docs/evidence/INDEX.json",
+    "docs/evidence/INDEX.sha256",
+}
 
 
 def _sha256_bytes(data: bytes) -> str:
@@ -319,7 +325,6 @@ def _write_path_proof(
         existing_produced = None
         existing_mtime = None
     produced = requested_produced or existing_produced or default_produced_at
-
     if check:
         if not proof_path.exists():
             raise SystemExit(f"MISSING_PROOF:{proof_rel}")
@@ -684,18 +689,6 @@ def main(argv: list[str] | None = None) -> None:
     ensure_determinism_env()
     print(f"[evidence-index] env pins: {_render_env_pins()}")
 
-    produced_default = _isoformat(_dt.datetime.now(tz=_dt.timezone.utc))
-    mirror_proof_path = MIRROR_PATH.with_suffix(".jsonl.path_proof.txt")
-    mirror_proof_existing = _load_existing_proof(mirror_proof_path)
-    mirror_produced = mirror_proof_existing.get("produced_at_utc")
-    if mirror_produced:
-        try:
-            _parse_utc_iso8601(mirror_produced)
-        except Exception:  # noqa: BLE001
-            mirror_produced = None
-    if mirror_produced:
-        produced_default = mirror_produced
-
     def _stale_proof(rel: str) -> bool:
         proof = _load_existing_proof(ROOT / f"{rel}.path_proof.txt")
         mtime_raw = proof.get("mtime_utc")
@@ -707,25 +700,35 @@ def main(argv: list[str] | None = None) -> None:
         except Exception:  # noqa: BLE001
             return True
 
-    if any(_stale_proof(rel) for rel in FORCE_REFRESH_ARTIFACT_RELS):
-        produced_default = _isoformat(_dt.datetime.now(tz=_dt.timezone.utc))
-
-    entries = _load_human_index()
-
     epic_ids = set(args.epic_id)
-    if "HDE-EPIC020" in epic_ids:
-        epic020_tokens = _load_epic020_tokens("HDE-EPIC020")
-        entries = _dedupe_entries(entries + _load_epic020_bundle_entries("HDE-EPIC020", epic020_tokens))
 
-    index_bytes = _render_human_index(entries)
-    _write_if_changed(HUMAN_INDEX, index_bytes, check=args.check)
+    def _run_once(*, check: bool) -> None:
+        produced_default = _isoformat(_dt.datetime.now(tz=_dt.timezone.utc))
+        mirror_proof_path = MIRROR_PATH.with_suffix(".jsonl.path_proof.txt")
+        mirror_proof_existing = _load_existing_proof(mirror_proof_path)
+        mirror_produced = mirror_proof_existing.get("produced_at_utc")
+        if mirror_produced:
+            try:
+                _parse_utc_iso8601(mirror_produced)
+            except Exception:  # noqa: BLE001
+                mirror_produced = None
+        if mirror_produced:
+            produced_default = mirror_produced
+        if any(_stale_proof(rel) for rel in STALE_PROOF_TRIGGER_RELS):
+            produced_default = _isoformat(_dt.datetime.now(tz=_dt.timezone.utc))
 
-    hash_line = f"{_sha256_bytes(index_bytes)}  docs/evidence/INDEX.json\n".encode("utf-8")
-    _write_if_changed(HASH_SENTINEL, hash_line, check=args.check)
-    _refresh_path_proof(HUMAN_INDEX, default_produced_at=produced_default, check=args.check)
-    _refresh_path_proof(HASH_SENTINEL, default_produced_at=produced_default, check=args.check)
+        entries = _load_human_index()
+        if "HDE-EPIC020" in epic_ids:
+            epic020_tokens = _load_epic020_tokens("HDE-EPIC020")
+            entries = _dedupe_entries(entries + _load_epic020_bundle_entries("HDE-EPIC020", epic020_tokens))
 
-    def _write_mirror_bundle(*, check: bool) -> None:
+        index_bytes = _render_human_index(entries)
+        _write_if_changed(HUMAN_INDEX, index_bytes, check=check)
+        hash_line = f"{_sha256_bytes(index_bytes)}  docs/evidence/INDEX.json\n".encode("utf-8")
+        _write_if_changed(HASH_SENTINEL, hash_line, check=check)
+        _refresh_path_proof(HUMAN_INDEX, default_produced_at=produced_default, check=check)
+        _refresh_path_proof(HASH_SENTINEL, default_produced_at=produced_default, check=check)
+
         mirror_bytes, mirror_rec = _render_mirror(entries, produced_default=produced_default, check=check)
         mirror_size = len(mirror_bytes)
         mirror_rec["size_bytes"] = mirror_size
@@ -762,16 +765,27 @@ def main(argv: list[str] | None = None) -> None:
                 raise SystemExit(f"STALE_SIZE:{MIRROR_REL}")
             mirror_rec["size_bytes"] = mirror_stat.st_size
 
-    _write_mirror_bundle(check=args.check)
-    if not args.check:
-        # Converge in a single invocation by running a strict post-write pass.
-        # If non-mirror proof metadata shifted during the write, the second pass
-        # rewrites once and then validates deterministically.
+    if args.check:
+        _run_once(check=True)
+        return
+
+    # Converge in one invocation with a bounded fixed-point loop.
+    # Mirror rendering depends on artifacts written by this same updater
+    # (notably artifacts/evidence_index.jsonl.sha256 and related path proofs),
+    # so a single rewrite is not always sufficient.
+    max_passes = 3
+    last_error: SystemExit | None = None
+    for _ in range(max_passes):
+        _run_once(check=False)
         try:
-            _write_mirror_bundle(check=True)
-        except SystemExit:
-            _write_mirror_bundle(check=False)
-            _write_mirror_bundle(check=True)
+            _run_once(check=True)
+            last_error = None
+            break
+        except SystemExit as exc:
+            last_error = exc
+
+    if last_error is not None:
+        raise SystemExit(f"MIRROR_CONVERGENCE_FAILED:{last_error}")
 
 
 if __name__ == "__main__":
