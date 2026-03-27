@@ -209,6 +209,15 @@ CONJUNCTION_WRITER_ARTIFACTS: list[dict[str, object]] = [
     },
 ]
 
+FORCE_REFRESH_ARTIFACT_RELS: set[str] = {
+    "artifacts/proofs/success_encoding_invariance.txt",
+    "artifacts/evidence_index.jsonl",
+    "artifacts/evidence_index.jsonl.sha256",
+    "docs/evidence/INDEX.json",
+    "docs/evidence/INDEX.sha256",
+    "audit/gates/topology/orientation_demo.txt",
+}
+
 
 def _sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
@@ -287,11 +296,6 @@ def _write_path_proof(
     proof_rel = f"{rel}.path_proof.txt"
     proof_path = ROOT / proof_rel
     proof_path.parent.mkdir(parents=True, exist_ok=True)
-    {
-        "artifact_key": "epic027.qa_step_logs_manifest",
-        "discovered_physical_path": "audit/qa/hde-epic027/qa_step_logs_manifest.json",
-        "epic_id": "HDE-EPIC027",
-    },
 
     def _normalize_utc(raw: str | None) -> str | None:
         if not raw:
@@ -309,6 +313,9 @@ def _write_path_proof(
     existing_mtime = _normalize_utc(existing.get("mtime_utc"))
     requested_produced = _normalize_utc(produced_at)
     requested_mtime = _normalize_utc(mtime_utc)
+    if rel in FORCE_REFRESH_ARTIFACT_RELS and not check:
+        existing_produced = None
+        existing_mtime = None
     produced = requested_produced or existing_produced or default_produced_at
 
     if check:
@@ -686,6 +693,20 @@ def main(argv: list[str] | None = None) -> None:
             mirror_produced = None
     if mirror_produced:
         produced_default = mirror_produced
+
+    def _stale_proof(rel: str) -> bool:
+        proof = _load_existing_proof(ROOT / f"{rel}.path_proof.txt")
+        mtime_raw = proof.get("mtime_utc")
+        produced_raw = proof.get("produced_at_utc")
+        if not mtime_raw or not produced_raw:
+            return False
+        try:
+            return _parse_utc_iso8601(produced_raw) < _parse_utc_iso8601(mtime_raw)
+        except Exception:  # noqa: BLE001
+            return True
+
+    if any(_stale_proof(rel) for rel in FORCE_REFRESH_ARTIFACT_RELS):
+        produced_default = _isoformat(_dt.datetime.now(tz=_dt.timezone.utc))
 
     entries = _load_human_index()
 
