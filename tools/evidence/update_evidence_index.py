@@ -314,6 +314,8 @@ def _write_path_proof(
     requested_produced = _normalize_utc(produced_at)
     requested_mtime = _normalize_utc(mtime_utc)
     if rel in FORCE_REFRESH_ARTIFACT_RELS and not check:
+        requested_produced = None
+        requested_mtime = None
         existing_produced = None
         existing_mtime = None
     produced = requested_produced or existing_produced or default_produced_at
