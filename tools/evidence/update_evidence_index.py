@@ -149,6 +149,31 @@ EPIC027_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     },
 ]
 
+EPIC028_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "epic028.acceptance_map",
+        "discovered_physical_path": "docs/acceptance_map_epic028.json",
+        "epic_id": "HDE-EPIC028",
+    },
+    {
+        "artifact_key": "epic028.token_matrix",
+        "discovered_physical_path": "audit/qa/hde-epic028/token_evidence_matrix.md",
+        "epic_id": "HDE-EPIC028",
+    },
+    {
+        "artifact_key": "epic028.acceptance_map_viability",
+        "discovered_physical_path": "audit/qa/hde-epic028/acceptance_map_viability.log",
+        "epic_id": "HDE-EPIC028",
+    },
+]
+
+A7_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "a7.success_encoding_invariance",
+        "discovered_physical_path": "artifacts/proofs/success_encoding_invariance.txt",
+    },
+]
+
 CLI_CONFORMANCE_ARTIFACTS: list[dict[str, object]] = [
     {"artifact_key": "cli.help.hdctl", "discovered_physical_path": "artifacts/cli/help/hdctl_help.txt"},
     {"artifact_key": "cli.help.showcompat", "discovered_physical_path": "artifacts/cli/help/showcompat_help.txt"},
@@ -183,6 +208,15 @@ CONJUNCTION_WRITER_ARTIFACTS: list[dict[str, object]] = [
         "schema_version": "1.0",
     },
 ]
+
+FORCE_REFRESH_ARTIFACT_RELS: set[str] = {
+    "artifacts/proofs/success_encoding_invariance.txt",
+    "artifacts/evidence_index.jsonl",
+    "artifacts/evidence_index.jsonl.sha256",
+    "docs/evidence/INDEX.json",
+    "docs/evidence/INDEX.sha256",
+    "audit/gates/topology/orientation_demo.txt",
+}
 
 
 def _sha256_bytes(data: bytes) -> str:
@@ -262,11 +296,6 @@ def _write_path_proof(
     proof_rel = f"{rel}.path_proof.txt"
     proof_path = ROOT / proof_rel
     proof_path.parent.mkdir(parents=True, exist_ok=True)
-    {
-        "artifact_key": "epic027.qa_step_logs_manifest",
-        "discovered_physical_path": "audit/qa/hde-epic027/qa_step_logs_manifest.json",
-        "epic_id": "HDE-EPIC027",
-    },
 
     def _normalize_utc(raw: str | None) -> str | None:
         if not raw:
@@ -284,6 +313,11 @@ def _write_path_proof(
     existing_mtime = _normalize_utc(existing.get("mtime_utc"))
     requested_produced = _normalize_utc(produced_at)
     requested_mtime = _normalize_utc(mtime_utc)
+    if rel in FORCE_REFRESH_ARTIFACT_RELS and not check:
+        requested_produced = None
+        requested_mtime = None
+        existing_produced = None
+        existing_mtime = None
     produced = requested_produced or existing_produced or default_produced_at
 
     if check:
@@ -408,6 +442,8 @@ def _load_human_index() -> list[dict[str, object]]:
             *EPIC022_PRIMARY_ARTIFACTS,
             *EPIC024_PRIMARY_ARTIFACTS,
             *EPIC027_PRIMARY_ARTIFACTS,
+            *EPIC028_PRIMARY_ARTIFACTS,
+            *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,
             *CONJUNCTION_WRITER_ARTIFACTS,
@@ -660,6 +696,20 @@ def main(argv: list[str] | None = None) -> None:
     if mirror_produced:
         produced_default = mirror_produced
 
+    def _stale_proof(rel: str) -> bool:
+        proof = _load_existing_proof(ROOT / f"{rel}.path_proof.txt")
+        mtime_raw = proof.get("mtime_utc")
+        produced_raw = proof.get("produced_at_utc")
+        if not mtime_raw or not produced_raw:
+            return False
+        try:
+            return _parse_utc_iso8601(produced_raw) < _parse_utc_iso8601(mtime_raw)
+        except Exception:  # noqa: BLE001
+            return True
+
+    if any(_stale_proof(rel) for rel in FORCE_REFRESH_ARTIFACT_RELS):
+        produced_default = _isoformat(_dt.datetime.now(tz=_dt.timezone.utc))
+
     entries = _load_human_index()
 
     epic_ids = set(args.epic_id)
@@ -675,41 +725,53 @@ def main(argv: list[str] | None = None) -> None:
     _refresh_path_proof(HUMAN_INDEX, default_produced_at=produced_default, check=args.check)
     _refresh_path_proof(HASH_SENTINEL, default_produced_at=produced_default, check=args.check)
 
-    mirror_bytes, mirror_rec = _render_mirror(entries, produced_default=produced_default, check=args.check)
-    mirror_size = len(mirror_bytes)
-    mirror_rec["size_bytes"] = mirror_size
-    _write_if_changed(MIRROR_PATH, mirror_bytes, check=args.check)
+    def _write_mirror_bundle(*, check: bool) -> None:
+        mirror_bytes, mirror_rec = _render_mirror(entries, produced_default=produced_default, check=check)
+        mirror_size = len(mirror_bytes)
+        mirror_rec["size_bytes"] = mirror_size
+        _write_if_changed(MIRROR_PATH, mirror_bytes, check=check)
 
-    mirror_stat = MIRROR_PATH.stat()
-    mirror_file_sha = _sha256_path(MIRROR_PATH)
-    mirror_sha_line = f"{mirror_file_sha}  {MIRROR_REL}\n".encode("utf-8")
-    _write_if_changed(MIRROR_SHA_PATH, mirror_sha_line, check=args.check)
-    _refresh_path_proof(MIRROR_SHA_PATH, default_produced_at=produced_default, check=args.check)
+        mirror_stat = MIRROR_PATH.stat()
+        mirror_file_sha = _sha256_path(MIRROR_PATH)
+        mirror_sha_line = f"{mirror_file_sha}  {MIRROR_REL}\n".encode("utf-8")
+        _write_if_changed(MIRROR_SHA_PATH, mirror_sha_line, check=check)
+        _refresh_path_proof(MIRROR_SHA_PATH, default_produced_at=produced_default, check=check)
 
-    mirror_body_sha = str(mirror_rec["sha256"])
-    proof_anchor, produced_at = _write_path_proof(
-        MIRROR_REL,
-        sha256=mirror_file_sha,
-        size_bytes=mirror_stat.st_size,
-        mtime_utc=mirror_proof_existing.get("mtime_utc"),
-        produced_at=str(mirror_rec.get("produced_at_utc")),
-        default_produced_at=produced_default,
-        check=args.check,
-        stat_mtime=mirror_stat.st_mtime,
-        extra_fields={"mirror_body_sha256": mirror_body_sha},
-    )
-    if proof_anchor != mirror_rec["proof_anchor"]:
-        mirror_rec["proof_anchor"] = proof_anchor
-        if args.check:
-            raise SystemExit(f"STALE_PROOF:{proof_anchor}")
-    if produced_at != mirror_rec["produced_at_utc"]:
-        mirror_rec["produced_at_utc"] = produced_at
-        if args.check:
-            raise SystemExit(f"STALE_PRODUCED_AT:{MIRROR_REL}")
-    if mirror_stat.st_size != int(mirror_rec["size_bytes"]):
-        if args.check:
-            raise SystemExit(f"STALE_SIZE:{MIRROR_REL}")
-        mirror_rec["size_bytes"] = mirror_stat.st_size
+        mirror_body_sha = str(mirror_rec["sha256"])
+        proof_anchor, produced_at = _write_path_proof(
+            MIRROR_REL,
+            sha256=mirror_file_sha,
+            size_bytes=mirror_stat.st_size,
+            mtime_utc=mirror_proof_existing.get("mtime_utc"),
+            produced_at=str(mirror_rec.get("produced_at_utc")),
+            default_produced_at=produced_default,
+            check=check,
+            stat_mtime=mirror_stat.st_mtime,
+            extra_fields={"mirror_body_sha256": mirror_body_sha},
+        )
+        if proof_anchor != mirror_rec["proof_anchor"]:
+            mirror_rec["proof_anchor"] = proof_anchor
+            if check:
+                raise SystemExit(f"STALE_PROOF:{proof_anchor}")
+        if produced_at != mirror_rec["produced_at_utc"]:
+            mirror_rec["produced_at_utc"] = produced_at
+            if check:
+                raise SystemExit(f"STALE_PRODUCED_AT:{MIRROR_REL}")
+        if mirror_stat.st_size != int(mirror_rec["size_bytes"]):
+            if check:
+                raise SystemExit(f"STALE_SIZE:{MIRROR_REL}")
+            mirror_rec["size_bytes"] = mirror_stat.st_size
+
+    _write_mirror_bundle(check=args.check)
+    if not args.check:
+        # Converge in a single invocation by running a strict post-write pass.
+        # If non-mirror proof metadata shifted during the write, the second pass
+        # rewrites once and then validates deterministically.
+        try:
+            _write_mirror_bundle(check=True)
+        except SystemExit:
+            _write_mirror_bundle(check=False)
+            _write_mirror_bundle(check=True)
 
 
 if __name__ == "__main__":
