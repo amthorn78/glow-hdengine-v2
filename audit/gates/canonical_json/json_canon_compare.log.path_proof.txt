@@ -1,5 +1,5 @@
 path: audit/gates/canonical_json/json_canon_compare.log
 size_bytes: 4992
-sha256: 20f2f7c513dd66cc9e0ee17a68e91d7ea94a1a119ec95a2ef6d893528769d49b
-mtime_utc: 2026-01-05T01:22:11Z
-produced_at_utc: 2026-01-05T00:42:35Z
+sha256: 38a778f846cbd232ee9488a0df4036509b75264b4ce74911c1e0104263cfbd09
+mtime_utc: 2026-03-28T14:54:05Z
+produced_at_utc: 2026-03-28T14:54:05Z
