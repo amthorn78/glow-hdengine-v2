@@ -76,20 +76,6 @@ def _write_path_proof(rel_path: str, *, produced_at: str) -> None:
     )
 
 
-def _load_gate_timestamp() -> str | None:
-    gate_path = CANON_DIR / "canonical_json.gate.json"
-    if not gate_path.exists():
-        return None
-    try:
-        payload = json.loads(gate_path.read_text(encoding="utf-8"))
-    except Exception:  # noqa: BLE001
-        return None
-    raw = payload.get("generated_at_utc")
-    if isinstance(raw, str):
-        return raw
-    return None
-
-
 def _render_log_lines(rows: Iterable[Mapping[str, object]]) -> bytes:
     serialized = [json.dumps(row, separators=(",", ":"), sort_keys=True) for row in rows]
     return ("\n".join(serialized) + "\n").encode("utf-8")
@@ -97,7 +83,7 @@ def _render_log_lines(rows: Iterable[Mapping[str, object]]) -> bytes:
 
 def _run_gate(targets: Sequence[Target], *, check_only: bool = False) -> int:
     env = ensure_determinism_env(apply=True)
-    generated_at = _load_gate_timestamp() or _utc_now()
+    generated_at = _utc_now()
 
     check_rows: list[dict[str, object]] = []
     compare_rows: list[dict[str, object]] = []
@@ -212,6 +198,9 @@ def _run_gate(targets: Sequence[Target], *, check_only: bool = False) -> int:
         _write_if_changed(CANON_DIR / "json_canonical_check.log", check_bytes)
         _write_if_changed(CANON_DIR / "json_canon_compare.log", compare_bytes)
         _write_if_changed(CANON_DIR / "canonical_json.gate.json", sercanon(gate_payload, sort_keys=True))
+        _write_path_proof("audit/gates/canonical_json/json_canonical_check.log", produced_at=generated_at)
+        _write_path_proof("audit/gates/canonical_json/json_canon_compare.log", produced_at=generated_at)
+        _write_path_proof("audit/gates/canonical_json/canonical_json.gate.json", produced_at=generated_at)
         _write_if_changed(JSON_GATE_DIR / "json_gate_check_log.ndjson", check_bytes)
         _write_if_changed(JSON_GATE_DIR / "json_gate_compare_log.ndjson", compare_bytes)
         _write_if_changed(
