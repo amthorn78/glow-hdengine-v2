@@ -1,0 +1,34 @@
+{
+  "captured_env": {
+    "ALLOW_NETWORK": "0",
+    "APP_ENV": "dev",
+    "LANG": "C",
+    "LC_ALL": "C",
+    "SAFE_MODE": "1",
+    "TZ": "UTC"
+  },
+  "check_id": "po-005",
+  "check_name": "Governed Reader proof-surface designation",
+  "claimed_tokens": [],
+  "command": "capture catalog row and route ownership proof for /reader; classify explicit governed Reader success-proof surface designation",
+  "command_provenance": "Explicitly created",
+  "evidence_artifacts": [
+    "audit/qa/hde-epic028/checks/po-005/primary.log",
+    "audit/qa/hde-epic028/checks/po-005/catalog_snapshot.txt",
+    "audit/qa/hde-epic028/checks/po-005/http_reader_snapshot.txt",
+    "audit/qa/hde-epic028/checks/po-005/blocked_note.txt"
+  ],
+  "fail_status": "NO_EXPLICIT_GOVERNED_SUCCESS_PROOF_DESIGNATION",
+  "intended_tokens": [],
+  "pf_refs": [
+    "PF10 - HDE-Build Notes",
+    "PF05 - HDE-CLI-API-Vendor-Ref",
+    "PF02 - Canon-HDE-Core",
+    "PF14 - HDE-Mechanics Guide",
+    "PF06 - Epic-Process-Guide",
+    "PF27 - Canon Plan Templates"
+  ],
+  "schema_version": "pf27.step_log_header.v1",
+  "status": "TOOLING_BLOCKED",
+  "timestamp_utc": "2026-04-02T14:33:43Z"
+}\n

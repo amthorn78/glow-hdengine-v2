@@ -1,0 +1,6 @@
+SOURCE=docs/ENDPOINTS_CATALOG.json
+READER_ROW_COUNT=1
+READER_A7_ELIGIBLE_COUNT=1
+READER_ROWS_JSON=[{"a7_eligible":true,"blueprint_module":"adapter.http_reader","classification":"dev_harness","description":"Reader success route (dev-only)","env_gate":"APP_ENV=dev","method":["GET","HEAD"],"path":"/reader","rails_profile":"dev-harness reader a7"}]
+SUCCESS_ENDPOINTS_JSON=[]
+DESIGNATION_REASON=NO_EXPLICIT_GOVERNED_SUCCESS_PROOF_DESIGNATION
