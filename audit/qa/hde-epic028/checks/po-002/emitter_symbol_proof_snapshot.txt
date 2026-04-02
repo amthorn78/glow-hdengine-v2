@@ -1,0 +1,7 @@
+CLI Emitter Symbol Proof
+canonical_emitters:emit_reader_public_envelope,emitter.emit_public
+handler_emitter_allowlist:aux-preview=<none>,bg:resolve=emitter.emit_public,showcompat=emit_reader_public_envelope|emitter.emit_public
+summary:PASS
+aux-preview:aux_preview:<none> (exempt)
+bg:resolve:bg_resolve:emitter.emit_public
+showcompat:showcompat:emit_reader_public_envelope,emitter.emit_public

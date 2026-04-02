@@ -1,0 +1,7 @@
+expected_cli_entrypoint=python -m engine.cli --help
+expected_compat_surface=/api/compat/v1
+expected_reader_surface=/reader
+expected_internal_surface=/internal/version
+expected_dev_surface=/dev/sampler/conjunction
+expected_dev_surface=/dev/reader/conjunction
+expected_dev_surface=/dev/writer/conjunction

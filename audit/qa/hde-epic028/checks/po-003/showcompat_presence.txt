@@ -1,0 +1,3 @@
+2:             {showcompat,aux-preview,bg:resolve,dev:sampler} ...
+7:  {showcompat,aux-preview,bg:resolve,dev:sampler}
+8:    showcompat          Emit canonical Reader v1 bytes from vendor JSON (stdin

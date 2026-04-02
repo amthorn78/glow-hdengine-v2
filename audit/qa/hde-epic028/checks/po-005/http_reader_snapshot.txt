@@ -1,0 +1,8 @@
+SOURCE=adapter/http_reader.py
+323:    bp = Blueprint("reader_v1", __name__)
+325:    @bp.get("/reader")
+326:    def reader_v1():
+436:    @bp.post("/reader")
+437:    def reader_v1_post():
+836:    bp = Blueprint("reader_v1", __name__)
+ALIAS_CHECK:/api/reader NOT_FOUND_IN_FILE

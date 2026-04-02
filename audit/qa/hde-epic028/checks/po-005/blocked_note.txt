@@ -1,0 +1,6 @@
+STEP=PO-005
+CHECK=Governed Reader proof-surface designation
+STATUS=TOOLING_BLOCKED
+REASON=NO_EXPLICIT_GOVERNED_SUCCESS_PROOF_DESIGNATION
+IMPACT=Downstream Reader transport proof claims remain blocked behind PO-005.
+DETAIL=Catalog currently proves route existence and a7_eligible posture but does not explicitly designate one governed Reader success-proof surface.
