@@ -45,8 +45,8 @@ po_001=recorded
 po_002=recorded
 po_003=recorded
 po_004=recorded
-po_005=blocked
-po_006=blocked
+po_005=recorded
+po_006=recorded
 po_007=recorded
 po_008=recorded
 po_009=recorded
@@ -56,6 +56,6 @@ po_009=recorded
 
 - Summary is explicit and reproducible: yes (deterministic rule and evidence files present).
 - Limited to repo-supported completion only: yes.
-- Distinguishes blocked vs completed checks: yes (`po_005=blocked`, `po_006=blocked`, others recorded).
+- Distinguishes blocked vs completed checks: yes (this run has no blocked check in po_001..po_009 after remediation; all are `recorded`).
 - No over-claim on canon drain completion: yes (`canon_drain_complete: no_claim`).
 - No over-claim on formal close-pack completion: yes (`formal_close_pack_complete: no_claim`).
