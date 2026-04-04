@@ -1,6 +1,1 @@
-STEP=PO-005
-CHECK=Governed Reader proof-surface designation
-STATUS=TOOLING_BLOCKED
-REASON=NO_EXPLICIT_GOVERNED_SUCCESS_PROOF_DESIGNATION
-IMPACT=Downstream Reader transport proof claims remain blocked behind PO-005.
-DETAIL=Catalog currently proves route existence and a7_eligible posture but does not explicitly designate one governed Reader success-proof surface.
+lookup_note: /reader remains the current Reader route under review; success_endpoints is empty while /reader is marked a7_eligible:true, and PF10 addendum 2.14 treats that missing explicit designation as downstream canon drift rather than a reason to invent a second proof-surface mechanism for this step

@@ -1,0 +1,8 @@
+audit/gates/canonical_json/canonical_json.gate.json
+audit/gates/canonical_json/canonical_json.gate.json.path_proof.txt
+audit/gates/canonical_json/cli_surfaces.log
+audit/gates/canonical_json/cli_surfaces.log.path_proof.txt
+audit/gates/canonical_json/json_canon_compare.log
+audit/gates/canonical_json/json_canon_compare.log.path_proof.txt
+audit/gates/canonical_json/json_canonical_check.log
+audit/gates/canonical_json/json_canonical_check.log.path_proof.txt

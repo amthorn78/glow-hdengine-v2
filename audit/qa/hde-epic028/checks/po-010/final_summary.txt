@@ -1,0 +1,12 @@
+repo_supported_completion_only: yes
+canon_drain_complete: no_claim
+formal_close_pack_complete: no_claim
+po_001=recorded
+po_002=recorded
+po_003=recorded
+po_004=recorded
+po_005=blocked
+po_006=blocked
+po_007=recorded
+po_008=recorded
+po_009=recorded

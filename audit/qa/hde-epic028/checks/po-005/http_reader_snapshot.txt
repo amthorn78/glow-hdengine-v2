@@ -1,8 +1,180 @@
-SOURCE=adapter/http_reader.py
-323:    bp = Blueprint("reader_v1", __name__)
-325:    @bp.get("/reader")
-326:    def reader_v1():
-436:    @bp.post("/reader")
-437:    def reader_v1_post():
-836:    bp = Blueprint("reader_v1", __name__)
-ALIAS_CHECK:/api/reader NOT_FOUND_IN_FILE
+from __future__ import annotations
+import hashlib, json, os, tempfile
+from datetime import datetime, timezone
+from pathlib import Path
+from flask import Blueprint, Response, request, Flask, g
+from threading import Lock
+from engine.presenter.emitter import emit_public
+from engine.serializer import canon
+from engine.runtime import emit_reader_public_bytes
+from engine.narratives import emit_public_aux, get_pack
+from engine.compat.categories import CATEGORIES_ORDER_V1
+from engine.compat.compute import conjunction_public_resolved
+from engine.sampler.core import CandidateFeatures, ViewerProfile, sample_and_rank
+from adapter.no_io_guard import NoIoGuard
+from engine.compat.errors import error_envelope
+from engine.bodygraph.ingest import resolve_db_user_id
+from engine.bodygraph.vendor_client import VendorError
+from engine.http.compat_handler import compat_blueprint
+from engine.db import DBAccess
+from engine.db.errors import AdapterError, PrimaryUnavailable
+
+_PROCESS_STARTED_AT = datetime.now(timezone.utc)
+_PROCESS_PID = os.getpid()
+
+# A7 helpers
+def _sha256_hex(b: bytes) -> str: return hashlib.sha256(b).hexdigest()
+
+def _set_reader_200_headers(resp: Response) -> Response:
+    resp.headers["Content-Type"] = "application/json; charset=utf-8"
+    resp.headers["Cache-Control"] = "private, max-age=0, must-revalidate"
+    resp.headers["Vary"] = "Authorization, Accept-Encoding"
+    return resp
+
+
+def _collect_query_values(name: str) -> list[str]:
+    values = [item.strip() for item in request.args.getlist(name) if item.strip()]
+    if values:
+        return values
+    raw = request.args.get(name)
+    if not raw:
+        return []
+    return [part.strip() for part in raw.split(",") if part.strip()]
+
+_MAX_WRITER_BYTES = 32_768
+_DIAGNOSTIC_ROUTE_ID = "ops.writer.diagnostic.v1"
+_DEV_WRITER_CONJUNCTION_ROUTE_ID = "dev.writer.conjunction.v1"
+
+_IDEMPOTENCE_CACHE: dict[str, dict[str, object]] = {}
+_IDEMPOTENCE_CACHE_LOCK = Lock()
+_ENV_UNSET = object()
+
+
+class _WriterTransportResponse(Response):
+    def get_wsgi_headers(self, environ):  # type: ignore[override]
+        headers = super().get_wsgi_headers(environ)
+        if self.status_code == 204:
+            headers["Content-Length"] = "0"
+        return headers
+
+def _clear_writer_error_caching(resp: Response) -> Response:
+    resp.headers["Cache-Control"] = "no-store"
+    resp.headers.pop("ETag", None)
+    return resp
+
+
+def _emit_writer_response(
+    envelope: dict[str, object],
+    *,
+    status: int,
+    extra_headers: dict[str, str] | None = None,
+    sort_keys: bool = True,
+) -> Response:
+    body = emit_public(envelope, sort_keys=sort_keys)
+    resp = Response(body, status=status, mimetype="application/json; charset=utf-8")
+    resp.headers["Content-Type"] = "application/json; charset=utf-8"
+    resp.headers["Cache-Control"] = "no-store"
+    resp.headers.pop("ETag", None)
+    resp.headers.pop("Content-Encoding", None)
+    resp.headers.pop("Vary", None)
+    resp.headers["Content-Length"] = str(len(body))
+    if extra_headers:
+        for key, value in extra_headers.items():
+            resp.headers[key] = value
+    return resp
+
+
+def _writer_error(
+    code: str,
+    *,
+    status: int,
+    extra_headers: dict[str, str] | None = None,
+    sort_keys: bool = True,
+) -> Response:
+    envelope = error_envelope(code)
+    return _emit_writer_response(
+        envelope,
+        status=status,
+        extra_headers=extra_headers,
+        sort_keys=sort_keys,
+    )
+
+
+def _json_content_type_ok(header_value: str | None) -> bool:
+    if not header_value:
+        return False
+    normalized = header_value.strip().lower()
+    return normalized == "application/json; charset=utf-8"
+
+
+def _reject_request_too_large() -> Response:
+    return _writer_error("ERR_WRITER_REQUEST_TOO_LARGE", status=413)
+
+
+def _read_writer_json(
+    *,
+    allow_empty_body: bool,
+    allowed_keys: set[str] | None = None,
+) -> tuple[dict[str, object] | None, Response | None]:
+    content_length = request.content_length
+    if content_length is not None and content_length > _MAX_WRITER_BYTES:
+        return None, _reject_request_too_large()
+
+    raw = request.get_data(cache=False)
+    if len(raw) > _MAX_WRITER_BYTES:
+        return None, _reject_request_too_large()
+
+    if not raw:
+        if allow_empty_body:
+            return {}, None
+        return None, _writer_error("ERR_WRITER_INVALID_CONTENT_TYPE", status=415)
+
+    if not _json_content_type_ok(request.headers.get("Content-Type")):
+        return None, _writer_error("ERR_WRITER_INVALID_CONTENT_TYPE", status=415)
+
+    try:
+        text = raw.decode("utf-8")
+    except UnicodeDecodeError:
+        return None, _writer_error("ERR_WRITER_INVALID_JSON", status=400)
+
+    if text.startswith("\ufeff"):
+        return None, _writer_error("ERR_WRITER_INVALID_JSON", status=400)
+
+    try:
+        data = json.loads(text)
+    except json.JSONDecodeError:
+        return None, _writer_error("ERR_WRITER_INVALID_JSON", status=400)
+
+    if not isinstance(data, dict):
+        return None, _writer_error("ERR_WRITER_INVALID_INPUT", status=422)
+
+    if allowed_keys is not None:
+        unknown = [k for k in data.keys() if k not in allowed_keys]
+        if unknown:
+            return None, _writer_error("ERR_WRITER_UNKNOWN_KEY", status=422)
+
+    return data, None
+
+
+def _require_admin_scope() -> Response | None:
+    auth_header = request.headers.get("Authorization", "")
+    if not auth_header.startswith("Bearer "):
+        return _writer_error(
+            "ERR_WRITER_UNAUTHORIZED",
+            status=401,
+            extra_headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    token = auth_header.split(" ", 1)[1].strip()
+    admin_token = (os.environ.get("HDE_TEST_TOKEN_ADMIN") or "").strip()
+    none_token = (os.environ.get("HDE_TEST_TOKEN_NONE") or "").strip()
+
+    if admin_token and token == admin_token:
+        return None
+    if none_token and token == none_token:
+        return _writer_error("ERR_WRITER_FORBIDDEN", status=403)
+
+    return _writer_error(
+        "ERR_WRITER_UNAUTHORIZED",
+        status=401,
+        extra_headers={"WWW-Authenticate": "Bearer"},
