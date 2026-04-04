@@ -10,7 +10,7 @@
 ## 2) Final status
 
 - Result: PASS
-- Header timestamp (UTC): 2026-04-03T23:19:57Z
+- Header timestamp (UTC): 2026-04-04T12:58:55Z
 
 ## 3) Evidence artifacts (plan deliverables)
 
@@ -22,8 +22,8 @@
 Format: path|size_bytes|sha256|mtime_utc
 
 ```text
-audit/qa/hde-epic028/checks/po-010/primary.log|1541|09090fa7f6e82e3de3d432faa341589fc9cf0fc6fd67a2143603432a489544e0|2026-04-03T23:19:57Z
-audit/qa/hde-epic028/checks/po-010/final_summary.txt|246|e4abd21428e2f9f8e06f6782ccf45978e3361b3b7bb258567d846b38816f67fa|2026-04-03T23:19:57Z
+audit/qa/hde-epic028/checks/po-010/primary.log|1541|2d69e2ba2c11ff6aa8152b37196e4d70adbd1141004fee4a29b236bcea79e129|2026-04-04T12:58:55Z
+audit/qa/hde-epic028/checks/po-010/final_summary.txt|248|dae7a26f4a612573cd7ae01373a834f72cf8f2708907654fc981c0168cfe4f82|2026-04-04T12:58:55Z
 ```
 
 ## 5) Full evidence output (verbatim)
@@ -31,7 +31,7 @@ audit/qa/hde-epic028/checks/po-010/final_summary.txt|246|e4abd21428e2f9f8e06f678
 ### 5.1 primary.log
 
 ```text
-{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"po-010","check_name":"Acceptance reporting and repo-supported completion summary","claimed_tokens":[],"command":"python -c \"from pathlib import Path; Path('audit/qa/hde-epic028/checks/po-010/final_summary.txt').write_text('repo_supported_completion_only: yes\ncanon_drain_complete: no_claim\nformal_close_pack_complete: no_claim\n', encoding='utf-8')\"; python -c \"from pathlib import Path; checks=['po-001','po-002','po-003','po-004','po-005','po-006','po-007','po-008','po-009']; status_lines=[]; [status_lines.append(check.replace('-', '_')+'='+('blocked' if Path(f'audit/qa/hde-epic028/checks/{check}/blocked_note.txt').exists() else ('recorded' if Path(f'audit/qa/hde-epic028/checks/{check}/primary.log').exists() else 'missing'))) for check in checks]; Path('audit/qa/hde-epic028/checks/po-010/final_summary.txt').write_text(Path('audit/qa/hde-epic028/checks/po-010/final_summary.txt').read_text(encoding='utf-8')+'\n'.join(status_lines)+'\n', encoding='utf-8')\"","command_provenance":"Explicitly created","evidence_artifacts":["audit/qa/hde-epic028/checks/po-010/primary.log","audit/qa/hde-epic028/checks/po-010/final_summary.txt"],"fail_status":"","intended_tokens":[],"pf_refs":["PF19 — Glow QA Guide","PF27 — Canon Plan Templates"],"schema_version":"pf27.step_log_header.v1","status":"PASS","timestamp_utc":"2026-04-03T23:19:57Z"}
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"po-010","check_name":"Acceptance reporting and repo-supported completion summary","claimed_tokens":[],"command":"python -c \"from pathlib import Path; Path('audit/qa/hde-epic028/checks/po-010/final_summary.txt').write_text('repo_supported_completion_only: yes\ncanon_drain_complete: no_claim\nformal_close_pack_complete: no_claim\n', encoding='utf-8')\"; python -c \"from pathlib import Path; checks=['po-001','po-002','po-003','po-004','po-005','po-006','po-007','po-008','po-009']; status_lines=[]; [status_lines.append(check.replace('-', '_')+'='+('blocked' if Path(f'audit/qa/hde-epic028/checks/{check}/blocked_note.txt').exists() else ('recorded' if Path(f'audit/qa/hde-epic028/checks/{check}/primary.log').exists() else 'missing'))) for check in checks]; Path('audit/qa/hde-epic028/checks/po-010/final_summary.txt').write_text(Path('audit/qa/hde-epic028/checks/po-010/final_summary.txt').read_text(encoding='utf-8')+'\n'.join(status_lines)+'\n', encoding='utf-8')\"","command_provenance":"Explicitly created","evidence_artifacts":["audit/qa/hde-epic028/checks/po-010/primary.log","audit/qa/hde-epic028/checks/po-010/final_summary.txt"],"fail_status":"","intended_tokens":[],"pf_refs":["PF19 — Glow QA Guide","PF27 — Canon Plan Templates"],"schema_version":"pf27.step_log_header.v1","status":"PASS","timestamp_utc":"2026-04-04T12:58:55Z"}
 planned_step: write a repo-supported completion summary for the current run
 ```
 
@@ -56,6 +56,6 @@ po_009=recorded
 
 - Summary is explicit and reproducible: yes (deterministic rule and evidence files present).
 - Limited to repo-supported completion only: yes.
-- Distinguishes blocked vs completed checks: yes (this run has no blocked check in po_001..po_009 after remediation; all are `recorded`).
+- Distinguishes blocked vs completed checks: yes (po_005 and po_006 are recorded in this remediated run).
 - No over-claim on canon drain completion: yes (`canon_drain_complete: no_claim`).
 - No over-claim on formal close-pack completion: yes (`formal_close_pack_complete: no_claim`).
