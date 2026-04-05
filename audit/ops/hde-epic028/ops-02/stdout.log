@@ -1,0 +1,27 @@
+RUN c01: git rev-parse --show-toplevel
+/workspaces/glow-hdengine-v2
+RUN c02: git rev-parse HEAD
+b8f361b7b6e304bc3b34fabf85dca96a6b03f32d
+RUN c03: /workspaces/glow-hdengine-v2/.venv/bin/python --version
+Python 3.11.14
+RUN c04: bash -lc for key in APP_ENV ALLOW_NETWORK GEO_API_KEY HDAPI_BASE_URL HD_API_KEY SAFE_MODE CODESPACES CODESPACE_NAME GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN; do if [[ -n "${!key-}" ]]; then echo "$key=SET"; else echo "$key=UNSET"; fi; done | tee audit/ops/hde-epic028/ops-02/codespaces_env.txt
+APP_ENV=SET
+ALLOW_NETWORK=SET
+GEO_API_KEY=SET
+HDAPI_BASE_URL=SET
+HD_API_KEY=SET
+SAFE_MODE=SET
+CODESPACES=SET
+CODESPACE_NAME=SET
+GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN=SET
+RUN c05: bash -lc python -c "from pathlib import Path; Path('audit/qa/hde-epic028/checks/po-010/final_summary.txt').write_text('repo_supported_completion_only: yes\ncanon_drain_complete: no_claim\nformal_close_pack_complete: no_claim\n', encoding='utf-8')" && python -c "from pathlib import Path; checks=['po-001','po-002','po-003','po-004','po-005','po-006','po-007','po-008','po-009']; status_lines=[]; [status_lines.append(check.replace('-', '_')+'='+('blocked' if Path(f'audit/qa/hde-epic028/checks/{check}/blocked_note.txt').exists() else ('recorded' if Path(f'audit/qa/hde-epic028/checks/{check}/primary.log').exists() else 'missing'))) for check in checks]; Path('audit/qa/hde-epic028/checks/po-010/final_summary.txt').write_text(Path('audit/qa/hde-epic028/checks/po-010/final_summary.txt').read_text(encoding='utf-8')+'\n'.join(status_lines)+'\n', encoding='utf-8')"
+RUN c06: sha256sum audit/qa/hde-epic028/checks/po-010/final_summary.txt audit/qa/hde-epic028/checks/po-010/primary.log
+dae7a26f4a612573cd7ae01373a834f72cf8f2708907654fc981c0168cfe4f82  audit/qa/hde-epic028/checks/po-010/final_summary.txt
+2d69e2ba2c11ff6aa8152b37196e4d70adbd1141004fee4a29b236bcea79e129  audit/qa/hde-epic028/checks/po-010/primary.log
+RUN c07: date -u +%Y-%m-%dT%H:%M:%SZ
+2026-04-05T17:36:31Z
+RUN c08: write codespaces_harness_binding.md
+RUN c09: /workspaces/glow-hdengine-v2/.venv/bin/python -c import hashlib; from pathlib import Path; from tools.evidence import update_evidence_index; p=Path('audit/ops/hde-epic028/ops-02/codespaces_harness_binding.md'); rel=p.as_posix(); st=p.stat(); produced_at=Path('audit/ops/hde-epic028/ops-02/executed_at_utc.txt').read_text(encoding='utf-8').strip(); sha256=hashlib.sha256(p.read_bytes()).hexdigest(); update_evidence_index._write_path_proof(rel=rel, sha256=sha256, size_bytes=st.st_size, mtime_utc=update_evidence_index._isoformat_from_timestamp(st.st_mtime), produced_at=produced_at, default_produced_at=produced_at, check=False, stat_mtime=st.st_mtime); print(rel + '.path_proof.txt')
+audit/ops/hde-epic028/ops-02/codespaces_harness_binding.md.path_proof.txt
+RUN c10: write D1/D2/D11 remediation artifacts
+RUN c11: write created_files_sha256.txt

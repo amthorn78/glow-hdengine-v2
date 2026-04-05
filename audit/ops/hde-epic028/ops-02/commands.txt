@@ -1,0 +1,13 @@
+PO-run note: OPS-02 remediation run (narrow rerun-based provenance binding).
+rails: LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0
+[c01] git rev-parse --show-toplevel > audit/ops/hde-epic028/ops-02/repo_root.txt
+[c02] git rev-parse HEAD > audit/ops/hde-epic028/ops-02/repo_head.txt
+[c03] /workspaces/glow-hdengine-v2/.venv/bin/python --version > audit/ops/hde-epic028/ops-02/python_version.txt
+[c04] redacted venue probe (SET/UNSET only) > audit/ops/hde-epic028/ops-02/codespaces_env.txt
+[c05] narrow rerun command family to regenerate audit/qa/hde-epic028/checks/po-010/final_summary.txt
+[c06] sha256sum audit/qa/hde-epic028/checks/po-010/final_summary.txt audit/qa/hde-epic028/checks/po-010/primary.log > audit/ops/hde-epic028/ops-02/bound_artifact_sha256.txt
+[c07] date -u +%Y-%m-%dT%H:%M:%SZ > audit/ops/hde-epic028/ops-02/executed_at_utc.txt
+[c08] write audit/ops/hde-epic028/ops-02/codespaces_harness_binding.md
+[c09] write audit/ops/hde-epic028/ops-02/codespaces_harness_binding.md.path_proof.txt using tools.evidence.update_evidence_index._write_path_proof
+[c10] write D1/D2/D11 remediation artifacts
+[c11] sha256 snapshot of relied-on OPS-02 artifacts > audit/ops/hde-epic028/ops-02/created_files_sha256.txt

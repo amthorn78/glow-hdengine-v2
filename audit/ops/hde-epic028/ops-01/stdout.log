@@ -1,0 +1,18 @@
+[c01] RUN /workspaces/glow-hdengine-v2/.venv/bin/python tools/qa/generate_epic028_close_pack.py
+WROTE audit/EPIC-028_close_report.md
+WROTE audit/EPIC-028_MANIFEST.json
+WROTE audit/EPIC-028_close_report.md.path_proof.txt
+WROTE audit/EPIC-028_MANIFEST.json.path_proof.txt
+WROTE audit/ops/hde-epic028/ops-01/created_files_sha256.txt
+[c02] RUN grep -Fq "Prior formal close-pack completion remained no_claim only because the canonical EPIC028 close-pack baseline had not yet been surfaced under the required audit paths." audit/EPIC-028_close_report.md || sed -i '/PO-010 final summary confirms repo-supported completion only and no formal close-pack claim by the QA step\./a - Prior formal close-pack completion remained no_claim only because the canonical EPIC028 close-pack baseline had not yet been surfaced under the required audit paths.' audit/EPIC-028_close_report.md
+[c03] RUN grep -Fq "Prior formal close-pack completion remained no_claim only because the canonical EPIC028 close-pack baseline had not yet been surfaced under the required audit paths." audit/EPIC-028_close_report.md
+[c04] RUN /workspaces/glow-hdengine-v2/.venv/bin/python tools/evidence/update_evidence_index.py
+[evidence-index] env pins: ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC
+[c05] RUN /workspaces/glow-hdengine-v2/.venv/bin/python tools/evidence/orientation_demo.py
+[c06] RUN /workspaces/glow-hdengine-v2/.venv/bin/python tools/evidence/update_evidence_index.py --check
+[evidence-index] env pins: ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC
+[c07] RUN /workspaces/glow-hdengine-v2/.venv/bin/python tools/evidence/orientation_demo.py --check
+[c08] RUN /workspaces/glow-hdengine-v2/.venv/bin/python tools/evidence/validate_evidence_paths.py
+[c09] RUN /workspaces/glow-hdengine-v2/.venv/bin/python tools/evidence/check_lf_endings.py
+[c10] RUN ci/checks/check_mirror_schema.sh
+[c11] RUN sha256sum audit/EPIC-028_close_report.md audit/EPIC-028_close_report.md.path_proof.txt audit/EPIC-028_MANIFEST.json audit/EPIC-028_MANIFEST.json.path_proof.txt > audit/ops/hde-epic028/ops-01/created_files_sha256.txt

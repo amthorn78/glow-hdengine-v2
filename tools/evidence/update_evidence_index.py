@@ -170,6 +170,21 @@ EPIC028_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
         "discovered_physical_path": "audit/qa/hde-epic028/qa_step_logs_manifest.json",
         "epic_id": "HDE-EPIC028",
     },
+    {
+        "artifact_key": "epic028.close_report",
+        "discovered_physical_path": "audit/EPIC-028_close_report.md",
+        "epic_id": "HDE-EPIC028",
+    },
+    {
+        "artifact_key": "epic028.manifest",
+        "discovered_physical_path": "audit/EPIC-028_MANIFEST.json",
+        "epic_id": "HDE-EPIC028",
+    },
+    {
+        "artifact_key": "epic028.ops01.created_files_sha256",
+        "discovered_physical_path": "audit/ops/hde-epic028/ops-01/created_files_sha256.txt",
+        "epic_id": "HDE-EPIC028",
+    },
 ]
 
 A7_PRIMARY_ARTIFACTS: list[dict[str, object]] = [

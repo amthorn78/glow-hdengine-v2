@@ -1,0 +1,5 @@
+path: audit/ops/hde-epic028/ops-02/codespaces_harness_binding.md
+size_bytes: 1540
+sha256: 5fd418cdeb36755d755f9e51d0b699de948f05a18149b357102003bd8d5d845b
+mtime_utc: 2026-04-05T17:36:31Z
+produced_at_utc: 2026-04-05T17:36:31Z

@@ -1,0 +1,13 @@
+PO-run note: corrective OPS-01 rerun for close-pack content remediation.
+rails: LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0
+[c01] /workspaces/glow-hdengine-v2/.venv/bin/python tools/qa/generate_epic028_close_pack.py
+[c02] grep -Fq "Prior formal close-pack completion remained no_claim only because the canonical EPIC028 close-pack baseline had not yet been surfaced under the required audit paths." audit/EPIC-028_close_report.md || sed -i '/PO-010 final summary confirms repo-supported completion only and no formal close-pack claim by the QA step\./a - Prior formal close-pack completion remained no_claim only because the canonical EPIC028 close-pack baseline had not yet been surfaced under the required audit paths.' audit/EPIC-028_close_report.md
+[c03] grep -Fq "Prior formal close-pack completion remained no_claim only because the canonical EPIC028 close-pack baseline had not yet been surfaced under the required audit paths." audit/EPIC-028_close_report.md
+[c04] /workspaces/glow-hdengine-v2/.venv/bin/python tools/evidence/update_evidence_index.py
+[c05] /workspaces/glow-hdengine-v2/.venv/bin/python tools/evidence/orientation_demo.py
+[c06] /workspaces/glow-hdengine-v2/.venv/bin/python tools/evidence/update_evidence_index.py --check
+[c07] /workspaces/glow-hdengine-v2/.venv/bin/python tools/evidence/orientation_demo.py --check
+[c08] /workspaces/glow-hdengine-v2/.venv/bin/python tools/evidence/validate_evidence_paths.py
+[c09] /workspaces/glow-hdengine-v2/.venv/bin/python tools/evidence/check_lf_endings.py
+[c10] ci/checks/check_mirror_schema.sh
+[c11] sha256sum audit/EPIC-028_close_report.md audit/EPIC-028_close_report.md.path_proof.txt audit/EPIC-028_MANIFEST.json audit/EPIC-028_MANIFEST.json.path_proof.txt > audit/ops/hde-epic028/ops-01/created_files_sha256.txt

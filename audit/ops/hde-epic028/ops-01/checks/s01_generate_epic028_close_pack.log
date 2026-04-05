@@ -1,0 +1,7 @@
+[RUN] s01_generate_epic028_close_pack
+WROTE audit/EPIC-028_close_report.md
+WROTE audit/EPIC-028_MANIFEST.json
+WROTE audit/EPIC-028_close_report.md.path_proof.txt
+WROTE audit/EPIC-028_MANIFEST.json.path_proof.txt
+WROTE audit/ops/hde-epic028/ops-01/created_files_sha256.txt
+[RC] 0

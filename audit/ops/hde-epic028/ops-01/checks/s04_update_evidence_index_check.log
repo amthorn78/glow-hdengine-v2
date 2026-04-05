@@ -1,0 +1,3 @@
+[RUN] s04_update_evidence_index_check
+[evidence-index] env pins: ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC
+[RC] 0

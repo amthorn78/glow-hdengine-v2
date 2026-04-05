@@ -1,0 +1,10 @@
+e8576b7b9ae43caada90c568b49aad2e1664a0e8b70d463b103f213b29cf6625  audit/ops/hde-epic028/ops-02/repo_root.txt
+85835ceb2b61074f0398fd182ff3d83a97c4fcea5e6657eb8664f1852ef2c065  audit/ops/hde-epic028/ops-02/repo_head.txt
+8fa6fee68fb4ca8eda41d4db888f6a2a6b039d072f18375fa9df13d8912037d7  audit/ops/hde-epic028/ops-02/python_version.txt
+c875177f2242daf228db23048e0d36bc6093aa96efd83565608a96c3d43aaafe  audit/ops/hde-epic028/ops-02/codespaces_env.txt
+2361bd31e454768682a18e8dd441d2edddf35ed8e62cd4c8f9ca6c2b4c4af4b2  audit/ops/hde-epic028/ops-02/bound_artifact_sha256.txt
+5fd418cdeb36755d755f9e51d0b699de948f05a18149b357102003bd8d5d845b  audit/ops/hde-epic028/ops-02/codespaces_harness_binding.md
+2871eace832f35665d47bdaa6b31dabb530d11b7bddd9dfdf459ee66ae0422a6  audit/ops/hde-epic028/ops-02/codespaces_harness_binding.md.path_proof.txt
+cf8a6bab3e34b0a2bb8e424f2d59895dc2a083e9a5e9232b963baf2a270326b2  audit/ops/hde-epic028/ops-02/binding_content_check.md
+08bf45d0c32cb83c645afc6239cd00cb469c8f05e7fd5b1972b04c294944ac59  audit/ops/hde-epic028/ops-02/binding_content_gaps.md
+c9c10cca269fb9b061b71831e3f53bc1b1c0389d59a16be2c1cefdc02ae3d139  audit/ops/hde-epic028/ops-02/provenance_artifact_status.md
