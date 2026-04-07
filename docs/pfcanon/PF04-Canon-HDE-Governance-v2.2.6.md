@@ -3,12 +3,12 @@
 ## 0.1 Header
 
  **Title:** PF04-Canon-HDE-Governance  
- **Version:** v2.2
+ **Version:** v2.2.6
 
 **Status:** Canon  
-**Effective date:** 2026-03-23
+**Effective date:** 2026-04-06
 
-**Last Update Gate:** BN 10.1.4 A23-24
+**Last Update Gate:** BN 10.3.3 A20-24
 
 **Invocation tag:** `INV-f2ac55d77ce9aacc`
 
@@ -520,6 +520,8 @@ Any deviation is a mechanical blocker. The binding must be corrected, not interp
 * **CANONICAL\_JSON\_GATE\_UPDATED\_OK —** The canonical JSON gate coverage has been updated when the governed JSON surface changes. At minimum: the gate’s canonical outputs under `audit/gates/json_gate/canonical/` are refreshed to reflect the current checked target set, and any legacy-named summary outputs under `audit/gates/canonical_json/` that are still produced are also refreshed. (Owned: Governance; Evidence & Artifacts)
 
 * **CANONICAL\_JSON\_GATE\_PASSED\_OK —** The canonical JSON gate run passes for the current build, producing the canonical outputs under `audit/gates/json_gate/canonical/` and recording pass status for each checked target in the gate logs and structured record. (Owned: Governance; Evidence & Artifacts)  
+  * When the canonical JSON gate run still produces more than one governed canonical-JSON family, `CANONICAL_JSON_GATE_PASSED_OK` requires same-change coherence across the full still-produced set: the authoritative family under `audit/gates/json_gate/canonical/` and any legacy family under `audit/gates/canonical_json/` that remains produced MUST both be present before and after the run, and the canonical gate writer MUST exit `0`.  
+  * A successful writer exit alone is insufficient if any still-produced governed family disappears, is omitted from the run, or is no longer surfaced as a governed family in the same change.  
 * **EVIDENCE\_PATH\_PROOFS\_OK** — For every governed artifact indexed in the machine mirror, a co-located path-proof file exists and validates: each mirror record’s `proof_anchor` resolves to a `*.path_proof.txt` stored alongside the artifact, and the proof’s structured fields match the indexed artifact’s canonical bytes.  
   * Minimum required fields in each `.path_proof.txt`:  
     * `path` (repo-relative path to the artifact)
@@ -561,7 +563,7 @@ Any deviation is a mechanical blocker. The binding must be corrected, not interp
     The `index.machine_mirror` self-record must represent the current `artifacts/evidence_index.jsonl` file, and its `sha256` and `size_bytes` must match the canonical bytes of the whole mirror file (file-bytes basis, not a “row-body” basis). Its `proof_anchor` must point to a co-located path-proof for the mirror file.
 
 4. **Remediation posture for evidence drift (merge-blocking).**  
-    If any governed artifact’s `*.path_proof.txt` (including the INDEX path-proofs above) disagrees with the on-disk artifact bytes (sha256 or size), treat it as a mechanical blocker. Remediation is to regenerate evidence via the canonical evidence tooling (for example `tools/evidence/update_evidence_index.py` and its `--check` mode), not to hand-edit path proofs or machine mirror rows.  
+    If any governed artifact’s `*.path_proof.txt` (including the INDEX path-proofs above) disagrees with the on-disk artifact bytes (sha256 or size), treat it as a mechanical blocker. Remediation is to regenerate evidence via the canonical evidence tooling (for example `tools/evidence/update_evidence_index.py` and its `--check` mode), not to hand-edit path proofs or machine mirror rows. When the same generation flow still produces more than one governed canonical-JSON evidence family, remediation and closeout MUST treat every changed still-produced family in that generation scope as in-scope. This includes any legacy-named canonical-JSON outputs that remain produced alongside the authoritative family. Closeout for a canonical-JSON-gate or evidence-indexing row may be stated only when the changed governed families in scope have been refreshed coherently in the same run, including their co-located `*.path_proof.txt` companions and any required index or mirror updates for changed artifacts. A green authoritative subfamily is insufficient if another changed still-produced family remains stale, unindexed, unmirrored, or missing current companion proofs.  
 5. **Chronology correctness (produced\_at and proof timestamps)** These are clarifications of existing evidence tokens; no new tokens are introduced.  
    * **No backdating.** A record MUST NOT claim an earlier `produced_at_utc` or proof timestamp for an artifact whose bytes were created or modified later; that is treated as an integrity failure.  
    * **Proof capture is post-artifact (expected).** It is normal for a `*.path_proof.txt` transcript’s `produced_at_utc` (and related proof timestamps) to be later than the governed artifact’s filesystem `mtime`/`mtime_utc`; the proof is captured after file production. This is not “contradictory chronology.”  
@@ -920,13 +922,20 @@ Plans and implementations MUST NOT introduce parallel alternate spellings for th
     *  if the manifest bytes change as part of that refresh, the co-located \`audit/qa/\<epic-id\>/qa\_step\_logs\_manifest.json.path\_proof.txt\` MUST be refreshed from the new manifest bytes before the step is treated as complete.  
     * if the epic is not claiming \*\*QA\_LIVE\_QA\_RUN\_OK\*\*, the manifest MAY set \`checks: \[\]\` to explicitly declare that no Live QA checks are being claimed. When \*\*QA\_LIVE\_QA\_RUN\_OK\*\* is claimed, \`checks\` MUST enumerate the required Live QA checks and MUST NOT be empty.    
     * the step-logs manifest MUST have a co-located path-proof transcript: `audit/qa/<epic-id>/qa_step_logs_manifest.json.path_proof.txt`. The path-proof MUST record at minimum the manifest’s `path`, `size_bytes`, and `sha256`, and MUST match the current-state manifest bytes.  
-    * nothing else is auto-required unless Governance explicitly pins a governed evidence family/path for the epic.
+    * when a step claims human-ledger, machine-ledger, or companion-proof refresh coherence for the current-state manifest, the canonical updater MUST exit \`0\`, the current-state manifest pair MUST exist, and the manifest MUST be positively discoverable in the updater, the human Evidence Index, and the machine mirror before the step may claim \`PASS\`.  
+    * a positive discoverability check MUST be captured as a concrete step artifact for each of those three loci and MUST resolve affirmatively for the current-state manifest.  
+    * nothing else is auto-required unless Governance explicitly pins a governed evidence family/path for the epic.  
+    * if a tooling-state mismatch prevents those conditions from holding, an allowed Moon Loop MAY re-run the canonical updater under closed rails, rebuild the current-state manifest from governed \`primary.log\` headers, refresh the co-located manifest path-proof, regenerate the discoverability artifacts, and then rewrite the step \`primary.log\` from the refreshed concrete artifacts. This remediation MUST remain evidence-capture only and MUST NOT expand scope or change the acceptance target.
 
   * checks SHOULD prefer validating existing canon evidence families/paths over minting new QA artifacts; the check’s `primary.log` records PASS/FAIL and references the canonical evidence validated.
 
   * planning-trace artifacts MUST NOT be required Deliverables for Live QA execution (e.g., no PF23 consult capture artifacts under QA\_ROOT).
 
-  * for Live QA runs executed in GitHub Codespaces: a “Codespaces snapshot” artifact is optional convenience-only and must not appear in required Deliverables lists and must not be used to decide PASS vs remediation.).
+  * for Live QA runs executed in GitHub Codespaces: a “Codespaces snapshot” artifact is optional convenience-only and must not appear in required Deliverables lists and must not be used to decide PASS vs remediation.).  
+  * This convenience-only snapshot rule does not prohibit a governed venue-provenance artifact when a closeout review, or an approved provenance-only closeout slice, must establish that at least one executed QA or closeout artifact family was produced from GitHub Codespaces.  
+  * Such a venue-provenance artifact is closeout-only and non-default. Unless a plan or closeout review explicitly requires venue confirmation, it MUST NOT appear in required per-step Deliverables lists and MUST NOT decide PASS versus remediation for the underlying QA step.  
+  * When used, it MUST bind to an existing governed artifact family, record the bound governed artifact path, the in-session command or command family, presence-only or redacted Codespaces session context, repo root and commit linkage, and any non-claim boundaries. If it is treated as governed closeout evidence, it MUST also carry a sibling `.path_proof.txt` transcript.  
+  * A narrow rerun of one stable governed artifact family MAY be used to produce this provenance when the approved closeout slice explicitly allows it. That rerun MUST remain packaging/provenance only and MUST NOT reopen implementation scope or change QA verdicts.
 
 * Acceptance.
 
@@ -1084,11 +1093,12 @@ Ownership: Governance (classification semantics at policy level); **Glow QA Guid
 
   * `QA_ACCEPTANCE_MAP_VIABILITY_OK` is **satisfied** only when:
 
-    * every token listed in the epic’s acceptance map appears as a row in the token/evidence matrix, and vice versa, with no “orphan” tokens,
-
-    * the matrix rows for the epic’s QA Acceptance Tokens have no `"e.g."`/`"TBD"` placeholders and enumerate tests, CI jobs, QA\_ROOT logs, and evidence artifacts, as required by §9.7.2, and
-
-    * the viability log for the epic under QA\_ROOT exists, is non-empty, and indicates that all tokens in scope are wired and evidenced (PF19 owns the detailed viability thresholds and failure patterns).
+    * every token listed in the epic’s acceptance map appears as a row in the token/evidence matrix, and vice versa, with no “orphan” tokens,  
+    * the matrix rows for the epic’s QA Acceptance Tokens have no `"e.g."`/`"TBD"` placeholders and enumerate tests, CI jobs, QA\_ROOT logs, and evidence artifacts, as required by §9.7.2, and  
+    * the viability log for the epic under QA\_ROOT exists, is non-empty, and indicates that all tokens in scope are wired and evidenced (PF19 owns the detailed viability thresholds and failure patterns).  
+    * the current-epic acceptance binding is single-home across three authoritative governed artifacts only: the epic acceptance map at its canonical docs path, the epic token/evidence matrix under QA\\\_ROOT, and the epic viability log under QA\\\_ROOT. Step-scoped snapshots or convenience copies MAY be produced for review, but they are not alternate homes and MUST NOT be used as acceptance binding sources.  
+    * the machine mirror MUST contain matching rows for all three authoritative binding artifacts before a step or closeout record claims that the current-epic acceptance binding is coherent.  
+    * no alternate acceptance-map home is authoritative. If an alternate or convenience copy exists, it is non-binding and MUST NOT be used to satisfy acceptance-map presence or acceptance-binding coherence claims.
 
 * Ownership: Governance (viability semantics and coupling to tokens/acceptance maps); **Glow QA Guide** (viability harness behavior and log format); **HDE-Schemas & Artifacts** (artifact family and Index/mirror mapping for token/evidence matrix and viability logs); **HDE-Build Checklist** (Calcination and later-phase tasks that wire acceptance maps and matrix artifacts); **HDE-Phased Epics** (D-goals and epic-level acceptance maps referencing this token).  
 * **QA\_PRECOMMIT\_CHECKLIST\_OK** — The epic’s **precommit QA checklist** has been executed and passed under the required rails posture (closed rails unless the checklist explicitly scopes an open-rails probe), producing machine-generated evidence that the required governance preflights are in place. The checklist’s exact steps and log schema are owned by **Glow QA Guide** (titles-only).
@@ -1133,6 +1143,10 @@ Ownership: Governance (classification semantics at policy level); **Glow QA Guid
     * when the epic closes by reusing already-implemented governed scope, a reuse-boundary summary identifying which proof families or deliverable groups were inherited baseline versus newly closed in the epic,  
     * when closure is distributed across bounded PR or work slices, a PR-to-deliverable allocation summary that states which slice closed which governed deliverable family or acceptance-bound proof family,  
     * an explicit deferrals list (including deferred item IDs when available),  
+    * **Repo-supported completion summary (required when closeout is recommended from repo evidence)**.The closeout record MUST state whether the completion summary is limited to repo-supported completion and MUST distinguish repo-supported completion from canon drainage and from formal close-pack completion.  
+    * **Outcome-classification clarity.** The closeout summary MUST distinguish recorded, blocked, and no-claim outcomes for the relevant QA or closeout items and MUST NOT collapse those states into a single undifferentiated PASS narrative.  
+    * **No over-claim rule.** The closeout record MUST NOT imply that canon drainage is complete, that formal close-pack completion is complete, or that merge provenance is established unless those claims are directly evidenced by governed artifacts in the reviewed source set.  
+    * **Bounded reclassification rule.** If a bounded Moon Loop or equivalent closeout remediation changes a false blocked classification caused by contextual or filename-based artifacts rather than a real blocking condition, the closeout record MUST preserve the contextual note as separate evidence, identify the trigger that caused the false blocked classification, record the Step-0B delta pair when that remediation path is used, and state the post-remediation classification explicitly.  
     * a pointer to the close-pack manifest `key_outputs` bindings in `audit/EPIC-###_MANIFEST.json`,  
     * pointers to any closeout companion ledgers used for the epic (including their canonical paths under `audit/docdeltas/`),  
     * explicit “canon pointer” fields when closing TI-002 (or other TI items) as satisfied in the closeout, including:  
@@ -1148,6 +1162,12 @@ Ownership: Governance (classification semantics at policy level); **Glow QA Guid
       * PF-Canon is normative where PF10 is silent.    
       * The Implementation Guide is used for intended scope framing only.  
       * The QA Plan is used for intended QA requirement framing only.   
+    * **Required-elements checklist (when a closeout recommendation is issued).\*\*** The closeout record MUST explicitly confirm the presence or absence of:  
+      * the D0 Discovery artifact,  
+      * current-state QA evidence under the governed QA root,  
+      * a QA RCA / Doc Delta summary,  
+      * indexed evidence for the claimed closeout artifacts, and  
+      * when the review requires venue confirmation, at least one governed artifact or closeout note that proves an executed QA or closeout artifact family was produced from the claimed venue, for example GitHub Codespaces.  
     * **Readiness / closeout recommendation (required).** The closeout record MUST state an explicit overall recommendation, such as \`Ready\` or \`Not ready\`.  
     * **Blocker accounting for recommendation.** The closeout record MUST identify the unresolved blocker set that drives that recommendation, including any must-fix canon delta, stale closeout-blocking checklist state, or other unresolved governance blocker.  
     * **Readiness / closeout recommendation (required).** The closeout record MUST state an explicit overall recommendation, such as \`Ready\` or \`Not ready\`.    
@@ -1156,6 +1176,7 @@ Ownership: Governance (classification semantics at policy level); **Glow QA Guid
     * **Documentation drainage is non-blocking.** Undrained changes to canon, checklist rows, guides, summaries, or other documentation MUST NOT be used as a blocker for finishing QA execution, issuing step verdicts, issuing epic QA closeout review, or deciding epic close posture, provided PF10 explicitly records the truth of what happened and the required QA proof is otherwise complete.  
     * **Allowed blockers remain limited to QA truth and proof.** The closeout record MUST identify the unresolved blocker set that drives the recommendation. Allowed closeout blockers are limited to incomplete required QA steps, missing required deliverables, untrusted or non-governed evidence, unresolved \`FAIL\_BEHAVIOR\` / \`FAIL\_TOOLING\` / \`TOOLING\_BLOCKED\` conditions that affect acceptance, or missing required close-gate QA artifacts. Documentation drainage itself is not an allowed blocker.  
     * **Record, then drain later.** When a documentation mismatch or canon delta is found during QA or closeout, it MUST be recorded in PF10 as a follow-up, implementation gap, ADR note, or doc-delta item. It MUST NOT be converted into a pre-drain closure blocker solely because the destination PF document has not yet been updated.    
+    * **Supportable versus drained status wording is required.** When repo evidence supports a status change for a checklist row, guide row, or other governed document state that has not yet been drained into the destination PF document, the closeout record and any related governance report MUST say so explicitly. It MUST distinguish “supportable from repo evidence” from “already drained into canon,” and it MUST NOT imply that the destination PF document has already been updated when it has not. Once the destination PF document is updated, the record MAY state the status as drained or canonical.  
     * **Post-QA drain ordering is mandatory.** Drainage into canon, checklist rows, guides, or other document homes occurs only after all QA tasks for the epic are complete.   
     * **Truthfulness still applies.** This rule changes timing, not honesty requirements. PF10 MUST still state open doc deltas, remaining follow-ups, and any caveats plainly and explicitly.  
     * **QA-pass is necessary but not sufficient.** A positive step-level QA record does not by itself authorize epic closeout when the closeout record still identifies unresolved allowed blockers. If QA evidence is complete and trustworthy and all required QA tasks are complete, the epic MAY be recommended \`Ready\` even when undrained documentation deltas remain. Undrained documentation deltas alone do not justify a \`Not ready\` verdict.    
@@ -1178,8 +1199,10 @@ Ownership: Governance (classification semantics at policy level); **Glow QA Guid
 
     * **No tokenization by default.** Plans, acceptance maps, token/evidence matrices, and step logs MUST NOT mint, claim, or require a `CLOSE_PACK_FILES_PRESENT_OK` token (or any similar close-pack presence token) unless Governance explicitly registers it as a token in §2.0 (which this drain explicitly does not do).
 
-    * **No relocation.** Do not relocate the close-pack pair into `audit/qa/**` or `artifacts/**` without an explicit canon change. Any extra copies elsewhere are convenience-only and MUST NOT be used for acceptance binding.
-
+    * **No relocation.** Do not relocate the close-pack pair into `audit/qa/**` or `artifacts/**` without an explicit canon change. Any extra copies elsewhere are convenience-only and MUST NOT be used for acceptance binding.  
+    * **Packaging/evidence-only closeout slices.** A closeout slice whose sole purpose is to surface, bind, or verify the close-pack pair or companion closeout artifacts MUST remain packaging/evidence-only: it MUST NOT reopen implementation scope, MUST NOT change step-level QA verdicts, and MUST NOT claim merge provenance unless merge proof is itself a required governed artifact of that slice.  
+    * **Minimum Ops execution bundle.** When such a slice executes under \`audit/ops/\*\*\`, the governed Ops bundle MUST at minimum include \`commands.txt\`, \`stdout.log\`, \`stderr.log\`, \`exit\_codes.txt\`, and \`created\_files\_sha256.txt\` under a stable lowercase ops path.  
+    * **Binding rule.** Such a slice MUST bind the already-proven epic acceptance or QA evidence family via the close-pack manifest \`key\_outputs\` map or explicit close-report pointers. It MUST NOT invent a replacement closeout proof surface.  
     * **Verification posture.** Close-pack presence is verified mechanically by artifact existence \+ binding to the canonical filenames (see Appendix D.0) and by the closeout review process (titles-only).
 
 ---
@@ -2660,7 +2683,9 @@ Stage A and Stage B have different blocking standards. A plan must explicitly ma
 
 * token→evidence matrix cells left implicit (“we probably did it”, “it’s in the logs”, “TBD”)
 
-* results that claim “plausibly proven” for any gated token without a governed evidence artifact
+* results that claim “plausibly proven” for any gated token without a governed evidence artifact  
+* a PR or remediation slice that leaves one or more assigned HDE-Build Checklist subtasks unresolved without an explicit per-subtask explanation that names each affected subtask ID, states exactly what was completed, states exactly what remains incomplete, describes the blocking condition or limiting constraint, explains why completion was not possible within the approved PR scope, and cites the concrete repo-grounded evidence or test result for that conclusion  
+* silent omission of unresolved assigned subtasks, partial completion without that explanation, or any claim that the PR is complete while assigned subtasks remain unresolved
 
 **Downgrades.** A blocker may only be downgraded if:
 
@@ -3152,6 +3177,7 @@ Duplicate rows for the same token are a mechanical blocker because they create a
 
 * Plans MAY include a “Doc deltas capture” or “Doc delta candidates” note, but these notes MUST be explicitly non-mandatory and MUST NOT be expressed as required PR or OPS tasks. Any PF doc maintenance implied by those notes is PO-owned and out of plan scope.
 
+* Coding agents and implementation agents MAY NOT directly modify PF-Canon documents. If implementation work reveals canon drift, missing canon coverage, or a needed canon change, the agent MUST record that explicitly as a drift note or Doc-Delta candidate in its report and MUST NOT edit the PF-Canon document directly.  
 * How plans MUST express “reality/existence confirmation.” If a plan requires confirming whether a component, route, contract, or locus exists, the plan MUST express confirmation in one of these allowed forms:  
   * PF check (allowed): “Check Reality Audits for the current recorded existence/locus statement.” This is a read-only check and MUST NOT imply an update.
 
@@ -3678,6 +3704,12 @@ If any template/checklist/process language causes non-execution issues to be tre
 * name the canonical route (`/reader` or `/aux/narrative`), with `/api/**` used only when that is the configured mount
 
 * capture evidence from the real route surface, not from an invented substitute
+
+**Governed Reader success-proof-surface designation (normative).** The canonical Reader route named above, including `/api/reader` only when `/api` is the configured mount, is the governed Reader success-proof surface for Reader transport proof selection and related QA interpretation.
+
+* Governance MUST NOT require a second designation carrier, a second inventory home, a new route, or a new flag to recognize that surface.  
+* If the Endpoint Catalog row for the canonical Reader route remains present and A7-eligible but the inventory or readout still does not make that governed proof-surface status explicit, treat that omission as catalog or canon drift to be drained. It is not a reason to block proof-surface determination, invent a substitute proof route, or widen remediation into runtime or writer work.  
+* Supplemental dev-harness, preview, or lookup captures do not create a second Reader proof surface. Reader A7 proofs remain bound to the cataloged JSON success route, and `/internal/version` remains ops-only and excluded from A7.
 
 ## 10.1 Success (200) matrix \[Required-Now\]
 
