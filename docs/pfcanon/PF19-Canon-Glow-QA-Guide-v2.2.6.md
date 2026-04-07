@@ -6,11 +6,11 @@
 
 **Status:** Canon
 
-**Version:** v2.1.9
+**Version:** v2.2.6
 
-**Effective date:** 2026-03-23
+**Effective date:** 2026-04-06
 
-**Last Update Gate:** BN 10.1.4 A23-24
+**Last Update Gate:** BN 10.3.3 A20-24
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -1855,6 +1855,13 @@ Rules (semantics from PF12 — HDE-Schemas & Artifacts):
 
 Stale timestamp drift after a byte-changing refresh is blocking. If a governed artifact’s bytes change (regenerated or refreshed) but its corresponding path\_proof.txt (or the Mirror/Index record for that path) still reports older carried-forward produced\_at\_utc or mtime\_utc, treat this as a provenance/audit-trail defect and rerun the evidence tooling in write mode to regenerate proofs and refresh Index/Mirror entries. Do not hand-edit timestamps. This does not apply to no-op runs where the underlying bytes did not change.
 
+**Whole-family same-change freshness is required (normative).** When a write run or remediation changes more than one governed artifact that still participates in the claimed evidence family, QA MUST treat the full changed set as one same-change family.
+
+* It is not enough to refresh only the primary or authoritative branch if supplemental legacy outputs, alternate summaries, or other still-produced companions also changed in the same run.  
+* PASS requires every changed participating artifact, its path-proof companion, and any affected Human Index or Machine Mirror entries to reflect the same current run context.  
+* A branch that is preserved-valid while another changed branch remains stale is still a blocking evidence-family defect.  
+* When this occurs, rerun the canonical evidence tooling until the full participating family converges in write mode and then passes check mode. Do not certify subset freshness as sufficient.
+
 QA checks for lifecycle or OPS-managed artifacts should always examine both:
 
 * produced\_at\_utc (when did we prove this), and
@@ -1991,10 +1998,10 @@ Requirements (normative):
 
 * Each entry MUST include:
 
-  * check\_id
-
-  * log\_path (relative path from audit/qa/\<epic-id\>/ to the canonical primary log)
-
+  * check\_id  
+  * log\_path (relative path from audit/qa/\<epic-id\>/ to the canonical primary log)  
+  * status — the canonical step status for that check.  
+  * status MUST match the first-line header status in the referenced primary.log for that check.  
 * log\_path MUST be a relative path within the epic QA root and MUST NOT point outside `audit/qa/<epic-id>/`.
 
 * Plans and runbooks MUST NOT mint required artifact paths. A log\_path entry MUST point to a real canonical primary log produced by the corresponding check, under the governed QA root.
@@ -2075,13 +2082,13 @@ Environment variable drift (normative): Step-log header `captured_env` MUST NOT 
 
 Minimum header fields (Plan Templates; required):
 
-* check\_id — stable identifier for the check.
-
-* status — a Plan Templates status value.
-
-* command — the complete command/entrypoint executed for this check (copy/paste-ready).
-
-* captured\_env — structured snapshot of the rails/pins in effect for this check. At minimum, this MUST capture:
+* check\_id — stable identifier for the check.  
+* status — a Plan Templates status value.  
+  command — the complete command/entrypoint executed for this check (copy/paste-ready).  
+* command\_provenance — one of `Codex prompt`, `Copy/paste from plan`, or `Explicitly created`.  
+* If multiple commands were executed for one check, `command` MUST preserve the exact ordered sequence as one explicit command string, either as a pipeline or as an explicit `;`\-joined sequence that preserves execution order.  
+* evidence\_artifacts — array of one or more evidence paths produced for this check. For a PASS step, this MUST include the check’s own primary.log path.  
+  captured\_env — structured snapshot of the rails/pins in effect for this check. At minimum, this MUST capture:
 
   * SAFE\_MODE
 
@@ -5013,7 +5020,22 @@ so reviewers do not assume those dependencies are implicit. The token/evidence m
 
 **Deterministic parity scenarios (normative).** Any new or expanded error parity scenario used for acceptance (for example DB-unavailable or a closed-rails vendor attempt) MUST be reproducible under determinism env pins and closed rails, without reliance on external network or a live database. Preferred posture is exercising the real codepath using a deterministic failure trigger (controlled injection or harness-level deterministic failure), producing stable envelopes and stable stored artifacts. If that is not feasible, use a deterministic stub only to the extent required to produce the canonical envelope and parity artifacts (no live I/O). Acceptance proof MUST include stored parity artifacts for both sides of the parity claim (Reader/HTTP and CLI) and those artifacts MUST be indexable under governed evidence surfaces. Any added scenario MUST have a stable scenario identifier so stored artifacts do not churn.
 
-**PF09 subtask closeout uses evidence-binding first (normative).** When closing a PF09 subtask described as captured elsewhere or piecemeal, the default closure method is to bind existing governed evidence (tests and artifacts) into the epic’s acceptance artifacts (acceptance map and token/evidence matrix). Creating a new evidence family for closeout is allowed only if the epic includes an explicit gap statement (“what is missing from existing evidence”) and the new evidence aligns to governed artifact conventions (titles-only; owned elsewhere). Closure is not complete unless the acceptance artifacts explicitly map the PF09 subtask to concrete evidence; implicit “it exists somewhere else” is non-conforming.
+**PF09 subtask closeout uses evidence-binding first (normative).** When closing a PF09 subtask described as captured elsewhere or piecemeal, the default closure method is to bind existing governed evidence (tests and artifacts) into the epic’s acceptance artifacts (acceptance map and token/evidence matrix). Creating a new evidence family for closeout is allowed only if the epic includes an explicit gap statement (“what is missing from existing evidence”) and the new evidence aligns to governed artifact conventions (titles-only; owned elsewhere). Closure is not complete unless the acceptance artifacts explicitly map the PF09 subtask to concrete evidence; im**Assigned PF09-subtask coverage is all-or-explicit (normative).** If a PR, remediation slice, or closeout review claims completion for a defined set of PF09 subtasks, QA MUST account for every assigned subtask explicitly.
+
+* For each assigned subtask, the review or closeout record MUST either:  
+  * show that the subtask is supportable as complete from governed repo evidence, or  
+  * state that the subtask remains unresolved and explain that outcome in detail.  
+* For any assigned subtask not completed, the record MUST identify:  
+  * the exact PF09 subtask ID,  
+  * exactly what was completed,  
+  * exactly what remains incomplete,  
+  * the blocking condition or limiting constraint,  
+  * why completion was not possible within the approved PR or remediation scope, and  
+  * the concrete repo evidence, test result, or other mechanical basis for that conclusion.  
+* Silent omission, partial completion without this detail, or a blanket claim that the PR is complete while assigned subtasks remain unresolved is non-conforming.  
+* A review may record a subtask as supportable as Done from governed evidence without treating PF09 as already updated. Until the canon row is changed, the closeout record MUST distinguish support posture from current PF09 document state.
+
+plicit “it exists somewhere else” is non-conforming.
 
 **/internal/version coupling proof uses a single governed log artifact (normative).** When an epic claims /internal/version coupling proof and/or two-run identity closure, the governed proof artifact is `artifacts/ops/internal_version/two_run_identity.log`.
 
@@ -5091,6 +5113,25 @@ The Live QA closeout record MUST include an explicit Coverage vs QA Plan account
 * For each UNCOVERED step, include an explicit waiver reference (ADR title only) and a reason.
 
 Unreported gaps are non-conforming. A closeout record that omits this coverage accounting is blocked for approval.
+
+#### **9.2.15.6 Final QA closeout review required elements (required; closeout gate)**
+
+The final Live QA closeout review MUST include an explicit required-elements checklist that confirms the presence or absence of the following, with governed evidence pointers when present:
+
+* the D0 discovery artifact for the epic  
+* functional runtime proof on changed runtime surfaces  
+* governed current-state QA evidence under the canonical epic QA root  
+* the QA RCA and Doc Delta summary for the epic  
+* the Coverage vs QA Plan accounting required in §9.2.15.5  
+* the overall readiness or closeout recommendation  
+* indexed evidence in the Human Evidence Index and the Machine Mirror  
+* at least one Codespaces harness run, or a governed provenance artifact that truthfully binds an executed QA artifact to the Codespaces venue when venue provenance is part of the closeout claim
+
+The closeout review MUST distinguish repo-supported completion from canon drain completion, formal close-pack completion, and merge provenance. When any of those later closure axes are not being claimed, the review MUST say so explicitly rather than implying they are complete.
+
+A repo-supported completion summary used for closeout MUST be explicit, reproducible, and limited to repo-supported facts. It MUST distinguish recorded, blocked, and no-claim outcomes, and it MUST NOT silently collapse a blocked or contextual state into PASS prose.
+
+If a bounded Moon Loop remediation changed a step from false blocked to recorded or PASS, the closeout review MUST preserve the pre-remediation context as governed or context artifacts, record the minimal change set at the governed delta path, and make the rerun basis explicit.
 
 # 10\. Templates & harnesses (to be filled; titles-only anchors)
 
@@ -5884,6 +5925,54 @@ Additional step-review learnings from `po-008` to `po-010` are as follows.
 * For runtime functional proof posture, the durable PASS pattern was a governed check-scoped evidence package that showed no missing prerequisite runtime logs and a runtime-surface inventory proving the required proof families were actually exercised in the same run.
 
 * For provenance-sensitive runtime closeout steps, `primary.log` had to preserve the exact ordered command string actually executed, and any byte-changing refresh to the manifest pair or related governed evidence had to be followed by refreshed path-proof and Index/Mirror records with internally consistent freshness values.
+
+Known non-goals: these addenda do not redefine token semantics, A7 byte rules, or PF09 status rows. PF19 records the QA posture and review learnings only.
+
+## **13.8 HDE-EPIC028 — QA learnings snapshot for compat proof-surface discipline and Reader evidence-family closeout**
+
+PF19 records the EPIC028 learnings only as a durable QA reference for future reviewers and implementers, not as acceptance criteria.
+
+These addenda focus on two late Conjunction proof clusters: PR01 compat or shared-emitter or showcompat closure and PR02 Reader evidence-family closeout.
+
+Key QA learnings:
+
+* Internal compat proof-surface discipline matters. When the claim is canonical compat JSON and AB↔BA parity for the internal or admin compat surface, the durable PASS pattern is a closed-rails app-client proof against `/api/compat/v1`. A vendor-backed `showcompat` path under open rails is the wrong proof surface for that claim.  
+* Shared-emitter and showcompat closure is not satisfied by a generic parity claim alone. The durable PASS pattern required explicit handler-level allow-list enforcement, a governed allow-list proof artifact, direct serializer-guard regression coverage, and explicit evidence-index coverage for the serializer-grep and Reader↔CLI parity artifacts.  
+* For this PR01 pattern, the stable validation bundle was a closed-rails set that paired targeted pytest with evidence update/check, orientation check, and mirror-schema validation, while preserving showcompat presence and canonical JSON or LF conformance. The proof posture stayed within compat and CLI scope and did not widen into Reader or writer implementation.  
+* The direct PR02 blocker was evidence-family integrity, not Reader runtime behavior. The durable remediation pattern preserved the existing Reader success-body, catalog, and A7 runtime or test slice and repaired the evidence family without reopening Reader behavior or widening into writer work.  
+* For this PR02 pattern, a supportable closeout required passing canonical generation, evidence update/check, orientation check, mirror-schema validation, and the targeted Reader or evidence pytest subset under the declared rails.
+
+Additional retrospective learnings for this PR02 pattern are as follows.
+
+* A rerun-only remediation is not enough when the defect sits inside writer or generator logic. Reviewers should look for the code-level writer fix, not repeated refresh-only attempts.  
+* Plan-first remediation is useful when the changed evidence family is broader than the initially failing proof surface. Reviewers should separate the broader participating family before certifying closeout.  
+* Canonical JSON gate timestamp behavior can be a single-point failure for chronology. A superficially refreshed proof set is not trustworthy if the writer still reuses stale gate timestamps.
+
+Additional step-review learnings from `d0` to `po-005` are as follows.
+
+* For D0 bootstrap checks, the durable PASS pattern was a current-state, check-scoped evidence set under the canonical epic QA root, with a governed `primary.log` that records the exact executed command sequence, uses `Explicitly created` command provenance when applicable, includes the step’s own primary log in `evidence_artifacts`, and captures the actual closed-rails environment. PASS also depended on the full six-deliverable bootstrap set at the plan-defined paths: runtime context, CLI help baseline, services or surfaces baseline, the current manifest pair, and confirmation that no per-run nested root was created.  
+* For internal compatibility proof checks, the durable PASS pattern was a governed snapshot set that proves the order-neutral internal compat path end to end: `normalize_pair`, `pair_key`, `compat_public`, and `emit_public`, with the governed emitter snapshot delegating to the canonical serializer rather than an alternate serializer path.  
+* For one-governed-emission-path checks, reviewers should require both halves of the proof together: Reader or public snapshots showing `emit_public` and `emit_reader_v1` routing, and CLI-side guard artifacts showing the governed emitter allow-list plus serializer-grep PASS posture. One side alone is not sufficient to prove one governed emission path across CLI, Reader, and internal compatibility.  
+* For CLI compatibility-surface checks, the durable PASS pattern was `hdctl --help` evidence that exits 0 and exposes `showcompat`, paired with passing governed CLI guard artifacts and a non-zero Reader↔CLI parity probe. These steps remain valid only when they stay on existing CLI loci and do not invent new flags or new routes to satisfy the proof obligation.  
+* For public Reader envelope checks, the durable PASS pattern was a passing Reader transport test plus an encoding-invariance snapshot, captured under the canonical check directory, with explicit confirmation that the step preserved the existing public success surface and six-part numeric-free payload rather than introducing a new route or payload contract.  
+* For governed Reader proof-surface designation checks, the durable PASS pattern for this epic was to treat the open issue as a documentation or classification gap, not a new runtime defect. While the temporary PF10 clarification remained live, reviewers could treat `/reader` as the governed Reader success-proof surface for current EPIC028 scope when the approved lookup artifact proved route existence, `APP_ENV=dev` gating, and `a7_eligible:true`, without inventing a second designation mechanism, a new route, a new flag, or a new evidence family.  
+* The `po-005` clarification did not change PASS criteria or evidence shape. The durable posture was PF10-first temporary canon plus downstream canon alignment: use the already-approved `po-005` evidence family to unblock the step now, then drain the explicit designation into canon later. A stale blocked-branch plan note was non-blocking once the rerun made the PASS basis explicit.
+
+Additional step-review learnings from `po-006` to `po-008` are as follows.
+
+* For governed public success-surface transport checks, the durable PASS pattern was to run the Reader transport proof only after `po-005` had already established the governed Reader success-proof surface. Reviewers should expect a passing transport test exit code together with an explicit statement that the blocked branch did not trigger. A stale blocked-lane command block was non-blocking once the rerun made the resolved branch explicit and introduced no new route, flag, or proof-surface carrier.  
+* For current-epic acceptance-binding checks, the durable PASS pattern was single-home binding across the current epic acceptance trio: acceptance map, token/evidence matrix, and acceptance-map viability log, plus matching Machine Mirror rows for all three. Reviewers should treat alternate acceptance-map homes as a QA failure when the step’s PASS predicate is single-home acceptance binding.  
+* For same-change coherence checks across changed governed evidence families, the durable PASS pattern was to validate the full participating family, not only the primary family: both the authoritative `audit/gates/json_gate/canonical` family and the legacy-but-still-governed `audit/gates/canonical_json` family had to remain present before and after the gate-writer run, with the writer exiting 0\.
+
+Additional closeout and closure-support learnings from `po-009` to epic close are as follows.
+
+* For repo-supported completion summary checks, the durable PASS pattern was an explicit, reproducible summary under the governed check directory that distinguished recorded, blocked, and no-claim outcomes and carried no-claim posture for canon drain and formal close-pack completion. Reviewers should not let later packaging or drainage work be implied as complete by a PASS label alone.  
+* When a bounded Moon Loop remediation corrected a false blocked state caused by contextual `blocked_note.txt` files, the durable pattern was to preserve the contextual note content as separate context artifacts, remove only the trigger filenames, capture the governed Step-0B delta pair, and rerun the already-approved summary step under the same rails. Silent deletion or narrative-only reclassification is non-conforming.  
+* A packaging-only OPS closeout lane was valid when it surfaced the formal close-pack baseline artifacts, kept reopened implementation, QA verdict changes, canon drain, and merge provenance as explicit no-claim boundaries, and bound the manifest to the already-proven epic evidence family rather than inventing a new proof surface.  
+* A provenance-only OPS closeout lane was valid when it used a narrow rerun-based binding against one governed QA artifact family instead of a full QA rerun, and when the resulting provenance artifact carried the governed artifact path, in-session command family, Codespaces venue context, repo root and commit linkage, non-claim boundaries, and a sibling path-proof.  
+* Codespaces venue provenance mattered only when the closeout claim depended on it. When an epic needed to prove a Codespaces-run closure step, at least one governed artifact had to bind the relied-on QA artifact to the Codespaces session context and the command family that produced it.  
+* PF09 status lag after repo-proven completion was a closeout clarity issue, not a proof failure. Reviewers should distinguish supportable-as-Done posture from drained PF09 state and should not let that distinction collapse into an over-claim of canon completion.  
+* Closeout defensibility depended on explicit Coverage vs QA Plan accounting, step-scoped evidence pointers under the governed QA root, and surfaced close-pack or provenance artifacts where required. A PASS heading, retrospective summary, or OPS verdict line alone was not sufficient proof.
 
 Known non-goals: these addenda do not redefine token semantics, A7 byte rules, or PF09 status rows. PF19 records the QA posture and review learnings only.
 

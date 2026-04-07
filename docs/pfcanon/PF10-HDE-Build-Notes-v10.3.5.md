@@ -1,9 +1,8 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version:** v10.1.7
-
-Effective Date: 03/23/26
+**Version:** v10.3.5  
+Effective Date: 2026.04.07
 
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
@@ -51,10 +50,13 @@ TEMPLATE Addendum Entry (do not edit/remove)
 
 **This section should be considered current and authoritative. Index all addenda numbers listed below.**
 
-No current addenda.
+1\) 2.1 PF09 phased split for indexing and reference routing
 
 # 2\) Numbered Addenda
 
 ---
 
-\<eof\>
+## 2.1 PF09 phased split for indexing and reference routing
+
+Details: For indexing and document-management purposes, the former single PF09 document is now retired and replaced by seven phased documents, identified as PF09.1 through PF09.7. All documentation, planning, reviews, and future work must reference the relevant phased PF09 document or documents rather than the retired single-document PF09. Where the split leaves ambiguity, thin context, or cross-phase confusion inside an individual phased PF09 document, clarifying updates may be made in the appropriate phased document. The retired single-document PF09 must not be used as the active reference surface.
+

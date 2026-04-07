@@ -4,13 +4,13 @@
 
 **Title:** PF12-Canon-HDE-Schemas-and-Artifacts
 
-**Version:** v2.2.2
+**Version:** v2.2.8
 
 **Status:** Canon
 
-**Effective date:** 2026-03-23
+**Effective date:** 2026-04-05
 
-**Last Update Gate:** BN 10.1.4 Drain A22-24
+**Last Update Gate:** BN 10.3.3 Drain A20-24
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -602,15 +602,13 @@ Close-pack artifacts (deterministic path-of-record; baseline artifacts)
 
 The close-pack baseline artifacts MUST be located under audit/ using the EPIC-\#\#\# pattern (3 digits):
 
-* audit/EPIC-\#\#\#\_close\_report.md
+* audit/EPIC-\#\#\#\_close\_report.md  
+* audit/EPIC-\#\#\#\_close\_report.md.path\_proof.txt  
+* audit/EPIC-\#\#\#\_MANIFEST.json  
+* audit/EPIC-\#\#\#\_MANIFEST.json.path\_proof.txt  
+* audit/EPIC-\#\#\#\_QA\_RCA.md only when the QA RCA & Doc Delta summary is externalized as a separate governed artifact.
 
-* audit/EPIC-\#\#\#\_close\_report.md.path\_proof.txt
-
-* audit/EPIC-\#\#\#\_MANIFEST.json
-
-* audit/EPIC-\#\#\#\_MANIFEST.json.path\_proof.txt
-
-* audit/EPIC-\#\#\#\_QA\_RCA.md
+If the QA RCA & Doc Delta summary is embedded directly inside audit/EPIC-\#\#\#\_close\_report.md, the separate audit/EPIC-\#\#\#\_QA\_RCA.md artifact is not required. If a separate QA RCA artifact is used, the close report MUST reference it by exact repo-relative path.
 
 The close report at `audit/EPIC-###_close_report.md` MUST:
 
@@ -631,6 +629,25 @@ If `audit/qa/<epic-id>/00_meta/doc_deltas.md` is present as a QA-root copy, it M
 In the close report’s dedicated deferrals section, each deferral MUST include its ID (e.g., TI-002) and its drain target pointer (PF09 pointer) when available. If a PF09 pointer is not yet available, the close report MUST declare the ADR status and rationale and ensure the deferral is represented in `audit/docdeltas/<epic-id>_drain_targets.md` as a canon pointer record.
 
 These are baseline closure artifacts (required artifacts), not acceptance tokens by default. They MUST NOT be relocated into alternate directory trees (for example audit/qa/\*\* or artifacts/\*\*) without an explicit canon change.
+
+EPIC-028 OPS closeout evidence bundles (current-state).
+
+* `audit/ops/hde-epic028/ops-01/commands.txt`: Optional OPS-01 action ledger for the packaging/evidence-only close-pack surfacing run. LF-terminated text when present.  
+* `audit/ops/hde-epic028/ops-01/stdout.log`: Optional OPS-01 stdout capture for the packaging/evidence-only close-pack surfacing run. If present, it MUST be UTF-8 text.  
+* `audit/ops/hde-epic028/ops-01/stderr.log`: Optional OPS-01 stderr capture for the packaging/evidence-only close-pack surfacing run. It MAY be empty only when the underlying command produced no stderr and the run still requires the file.  
+* `audit/ops/hde-epic028/ops-01/exit_codes.txt`: Optional OPS-01 exit-code ledger for the packaging/evidence-only close-pack surfacing run. If present, it MUST contain only the final integer exit codes plus trailing LF.  
+* `audit/ops/hde-epic028/ops-01/created_files_sha256.txt`: Optional OPS-01 checksum ledger for the surfaced close-pack outputs. LF-terminated text when present.  
+* `audit/ops/hde-epic028/ops-02/commands.txt`: Optional OPS-02 action ledger for the provenance-only closeout binding run. LF-terminated text when present.  
+* `audit/ops/hde-epic028/ops-02/repo_root.txt`: Optional OPS-02 repo-root capture. LF-terminated text when present.  
+* `audit/ops/hde-epic028/ops-02/repo_head.txt`: Optional OPS-02 repo-head capture. LF-terminated text when present.  
+* `audit/ops/hde-epic028/ops-02/python_version.txt`: Optional OPS-02 Python-version capture. LF-terminated text when present.  
+* `audit/ops/hde-epic028/ops-02/stdout.log`: Optional OPS-02 stdout capture for the provenance-only closeout binding run. If present, it MUST be UTF-8 text.  
+* `audit/ops/hde-epic028/ops-02/stderr.log`: Optional OPS-02 stderr capture for the provenance-only closeout binding run. It MAY be empty only when the underlying command produced no stderr and the run still requires the file.  
+* `audit/ops/hde-epic028/ops-02/exit_codes.txt`: Optional OPS-02 exit-code ledger for the provenance-only closeout binding run. If present, it MUST contain only the final integer exit codes plus trailing LF.  
+* `audit/ops/hde-epic028/ops-02/codespaces_harness_binding.md`: Optional OPS-02 governed provenance artifact used to bind one executed QA artifact family to a Codespaces execution context using presence-only venue details. Non-empty UTF-8 markdown when present.  
+* `audit/ops/hde-epic028/ops-02/codespaces_harness_binding.md.path_proof.txt`: Required sibling path-proof transcript whenever `codespaces_harness_binding.md` is treated as governed closeout evidence.
+
+When the OPS-02 provenance bundle uses a single closure-relevant governed QA artifact as its binding target, the allowed current-state target is either `audit/qa/hde-epic028/qa_step_logs_manifest.json` or `audit/qa/hde-epic028/checks/po-010/final_summary.txt`. The currently surfaced EPIC028 OPS-02 bundle binds `audit/qa/hde-epic028/checks/po-010/final_summary.txt`.
 
 Generator (titles-only; EPIC-025). The EPIC-025 close-pack baseline artifacts are generated mechanically by `tools/qa/generate_epic025_close_pack.py`. Outputs include:
 
@@ -750,6 +767,33 @@ EPIC-027 binding authority note.
   * `epic027.qa_step_logs_manifest` — `audit/qa/hde-epic027/qa_step_logs_manifest.json`  
   * `epic027.close_report` — `audit/EPIC-027_close_report.md`  
   * `epic027.manifest` — `audit/EPIC-027_MANIFEST.json`
+
+EPIC-028 acceptance-ledger bindings (current-state).
+
+* The governed acceptance-ledger set evidenced for EPIC-028 is:  
+  * `docs/acceptance_map_epic028.json`  
+  * `audit/qa/hde-epic028/token_evidence_matrix.md`  
+  * `audit/qa/hde-epic028/acceptance_map_viability.log`  
+* For EPIC-028, the token matrix is the governed ledger that binds the EPIC028 acceptance roster to the corresponding governed evidence families used by the epic.  
+* For EPIC-028, the acceptance-map viability log is the governed viability ledger for the EPIC028 acceptance map and token matrix.  
+* The Machine Evidence Mirror bindings for this EPIC028 acceptance-ledger set are:  
+  * `epic028.acceptance_map` — `docs/acceptance_map_epic028.json`  
+  * `epic028.token_matrix` — `audit/qa/hde-epic028/token_evidence_matrix.md`  
+  * `epic028.acceptance_map_viability` — `audit/qa/hde-epic028/acceptance_map_viability.log`
+
+EPIC-028 surfaced close-pack binding authority (current-state).
+
+* The surfaced EPIC028 close-pack authoritative pair is `audit/EPIC-028_close_report.md` and `audit/EPIC-028_MANIFEST.json`.  
+* For EPIC-028, the surfaced close-pack manifest’s `key_outputs` map is the primary binding index for the already-governed EPIC028 acceptance and QA evidence family.  
+* The current surfaced EPIC028 `key_outputs` binding set includes at minimum these governed paths:  
+  * `docs/acceptance_map_epic028.json`  
+  * `audit/qa/hde-epic028/token_evidence_matrix.md`  
+  * `audit/qa/hde-epic028/acceptance_map_viability.log`  
+  * `audit/qa/hde-epic028/qa_step_logs_manifest.json`  
+  * `audit/qa/hde-epic028/qa_step_logs_manifest.json.path_proof.txt`  
+  * `audit/qa/hde-epic028/checks/po-010/final_summary.txt`  
+* For EPIC-028, the close-pack MAY use `audit/qa/hde-epic028/checks/po-010/final_summary.txt` as the closure-relevant repo-supported completion anchor when that artifact is the governed QA artifact bound by the surfaced provenance bundle for the run.  
+* The current EPIC028 qa-step manifest pair remains a governed closure-support artifact and, when surfaced in the close-pack binding set, MUST remain discoverable in both the Human Evidence Index and the Machine Evidence Mirror.
 
 Titles-only routing rule
 
@@ -3996,6 +4040,14 @@ In any PR that changes governed evidence artifacts or their indexing, you MUST u
 
 And you MUST assert the mirror/index tokens named in §8.3 (for example, EVIDENCE\_INDEX\_UPDATED\_OK, EVIDENCE\_INDEX\_HASH\_OK, EVIDENCE\_INDEX\_MIRROR\_OK, EVIDENCE\_PATHS\_VALIDATED\_OK, etc.) on every change.
 
+Whole-family same-change closeout rule (MUST).
+
+For evidence-indexing closeout claims, success MUST be evaluated across the whole set of governed evidence families whose bytes changed in the scoped run.
+
+If the same scoped run changes more than one governed evidence family, closeout is satisfied only when every changed family is refreshed in that same run, indexed and mirrored coherently, and backed by current sibling `.path_proof.txt` transcripts where PF12 requires them.
+
+A green result for one changed subfamily MUST NOT be used as a proxy for whole-family coherence. “Authoritative family fixed” is not equivalent to “whole changed family coherent.”
+
 ### **8.6.3 Entries (authoritative list; titles/paths only)**
 
 Note (normative). The Evidence Catalog is intentionally multi-root: governed evidence artifacts are expected to exist under multiple repo roots, for example audit/, artifacts/, docs/, catalog/, and narratives/. In evidence terms, the single-home constraint means PF12 is the single authoritative home for evidence family naming, canonical path bindings, and the Index and Mirror discipline that binds those paths. It does not mean evidence must live under a single directory.
@@ -4034,6 +4086,11 @@ Human Index entries are titles and paths only. Machine Mirror records include at
 * audit/gates/json\_gate/canonical/json\_gate\_check\_log.ndjson  
 * audit/gates/json\_gate/canonical/json\_gate\_compare\_log.ndjson  
 * audit/gates/json\_gate/canonical/json\_gate\_structured\_record.json (optional)  
+* audit/gates/canonical\_json/canonical\_json.gate.json  
+* audit/gates/canonical\_json/json\_canon\_compare.log  
+* audit/gates/canonical\_json/json\_canonical\_check.log  
+  * The audit/gates/canonical\_json/ family is a supplemental legacy canonical-JSON gate family. While this family is still produced by the repo, it remains governed evidence under PF12.  
+  * If any member of this family changes in a run, each changed member and its sibling .path\_proof.txt transcript MUST be refreshed in that same run, and the broader same-change requirement applies alongside the authoritative audit/gates/json\_gate/canonical/ family.  
 * artifacts/topology/topology\_coherence.log
 
   ##### **Evidence Index snapshot (gate family)**
@@ -4069,7 +4126,7 @@ These artifacts form the topology.orientation\_demo family and serve as the exem
 * artifacts/proofs/success\_head.txt  
 * artifacts/proofs/success\_304.txt  
 * artifacts/proofs/success\_writers\_errors.txt  
-* artifacts/proofs/encoding\_invariance.txt (optional)  
+* artifacts/proofs/success\_encoding\_invariance.txt (optional)  
 * artifacts/proofs/reader\_success\_get\_head\_304.json: composite proof; schema owned by the Endpoint Catalog evidence section (§8.12).
 
   ##### **Aux Narrative (text) — header snapshots**
@@ -4140,11 +4197,13 @@ Functional showcompat QA posture (vendor dependency; current limitation).
 * showcompat MUST NOT be executed as a zero-argument command in QA plans or QA runs. The authoritative command and argument contract is owned by HDE-CLI-API-Vendor-Ref.  
 * If showcompat is attempted under closed rails or without required arguments, classify the outcome as a tooling, environment, or usage defect for that step, not a product behavior failure. Record the rails posture used, names-only, and the failure signature in the step log.
 
-  ##### **Compat closure artifacts**
+##### **Compat closure artifacts**
 
+* artifacts/compat/AB.json: governed compat proof artifact for canonical AB ordering bytes; canonical single-line JSON.  
+* artifacts/compat/BA.json: governed compat proof artifact for canonical BA ordering bytes; canonical single-line JSON; matches the AB proof family bytes for the same pair.  
 * artifacts/compat/identity\_hash.txt: primary governed compat-closure artifact for explicit conjunction identity-hash capture. Its bytes MUST match the canonical AB compat bytes for the same pair.
 
-Family-scoped compat closure checks MAY target this artifact directly when a compat-only slice is being validated, but those targeted checks MUST NOT narrow or replace same-PR updates and validations for docs/evidence/INDEX.json, docs/evidence/INDEX.sha256, artifacts/evidence\_index.jsonl, artifacts/evidence\_index.jsonl.sha256, or the governed sibling .path\_proof.txt transcripts required elsewhere in PF12 when governed evidence bytes change.
+Family-scoped compat closure checks MAY target artifacts/compat/identity\_hash.txt directly when a compat-only slice is being validated, but those targeted checks MUST NOT narrow or replace same-PR updates and validations for docs/evidence/INDEX.json, docs/evidence/INDEX.sha256, artifacts/evidence\_index.jsonl, artifacts/evidence\_index.jsonl.sha256, or the governed sibling .path\_proof.txt transcripts required elsewhere in PF12 when governed evidence bytes change.
 
 ##### **Showcompat artifacts (EPIC024 D03)**
 
@@ -4163,9 +4222,17 @@ Family-scoped compat closure checks MAY target this artifact directly when a com
 * artifacts/cli/guards/serializer\_grep\_guard.log: serializer grep guard output log for the CLI serialization guardrail.  
 * tools/cli/serializer\_grep\_guard.py: serializer grep guard producer tool that generates serializer\_grep\_guard.log.
 
-  #### **C. Gates, runtime, DB, and ops evidence**
+   **CLI serializer-coupling proof artifacts (EPIC028 PR01)**
 
-  ##### **Narratives coverage (router)**
+* artifacts/cli/guards/emitter\_symbol\_proof.txt: governed emitter allow-list proof artifact for the CLI serializer-coupling surface.  
+* artifacts/cli/reader\_cli\_parity.bytes: governed Reader↔CLI parity bytes artifact for the CLI serializer-coupling surface.  
+* tools/cli/emitter\_symbol\_proof.py: emitter allow-list proof producer tool that generates emitter\_symbol\_proof.txt.
+
+Whenever the governed proof artifacts above change, their sibling .path\_proof.txt transcripts and their Human Index/Machine Mirror bindings MUST be refreshed in the same change.
+
+#### **C. Gates, runtime, DB, and ops evidence**
+
+##### **Narratives coverage (router)**
 
 * audit/gates/narratives/keys\_10x4.table.json
 
@@ -4642,6 +4709,10 @@ These entries register QA harness ledger files that summarize Live QA results as
 * `audit/qa/hde-epic027/checks/po-007/check_lf_endings.txt`: Optional CHECK po-007 stdout capture for the final-LF validation lane. If present, it MUST be UTF-8 text.  
 * `audit/qa/hde-epic027/checks/po-007/check_mirror_schema.txt`: Optional CHECK po-007 stdout capture for the mirror-schema validation lane. If present, it MUST be UTF-8 text.  
 * `audit/qa/hde-epic027/checks/po-007/qa_step_manifest_lookup.txt`: Optional CHECK po-007 plain-text lookup proof used to demonstrate EPIC027 qa-step manifest coverage in the updater source and governed ledgers. LF-terminated text when present.  
+* `audit/qa/hde-epic028/checks/po-007/acceptance_map_snapshot.json`: Optional CHECK po-007 snapshot of `docs/acceptance_map_epic028.json` used to capture the current epic acceptance-map home for the step. Canonical JSON when present.  
+* `audit/qa/hde-epic028/checks/po-007/token_matrix_snapshot.txt`: Optional CHECK po-007 plain-text snapshot of `audit/qa/hde-epic028/token_evidence_matrix.md` used to capture the current epic token-matrix home for the step. LF-terminated text when present.  
+* `audit/qa/hde-epic028/checks/po-007/acceptance_map_viability_snapshot.txt`: Optional CHECK po-007 plain-text snapshot of `audit/qa/hde-epic028/acceptance_map_viability.log` used to capture the current epic viability home for the step. LF-terminated text when present.  
+* `audit/qa/hde-epic028/checks/po-007/mirror_binding_snapshot.jsonl`: Optional CHECK po-007 records-only JSONL snapshot of the current EPIC028 acceptance-binding rows from the Machine Evidence Mirror. Canonical JSONL when present.  
 * `audit/qa/<epic-id>/checks/<check_id>/pytest_stdout.log`: Optional per-check stdout capture for a pytest lane. If present, it MUST be UTF-8 text.  
 * `audit/qa/<epic-id>/checks/<check_id>/pytest_stderr.log`: Optional per-check stderr capture for a pytest lane. It MAY be empty only when the underlying command produced no stderr and the plan still requires the file.  
 * `audit/qa/<epic-id>/checks/<check_id>/pytest_rc.txt`: Optional per-check exit-code capture for a pytest lane. If present, it MUST contain only the final integer exit code plus trailing LF.  
@@ -4649,17 +4720,40 @@ These entries register QA harness ledger files that summarize Live QA results as
 * `audit/qa/<epic-id>/checks/po-001/route_inventory.txt`: Optional CHECK po-001 plain-text route inventory proof used to demonstrate the dev conjunction trio and the related blueprint registration state. LF-terminated text when present.  
 * `audit/qa/<epic-id>/checks/po-001/dev_conjunction_http.txt`: Optional CHECK po-001 pytest stdout capture for the dev conjunction HTTP validation lane. If present, it MUST be UTF-8 text.  
 * `audit/qa/<epic-id>/checks/po-001/endpoint_catalog.txt`: Optional CHECK po-001 pytest stdout capture for the endpoint catalog validation lane. If present, it MUST be UTF-8 text.  
+* `audit/qa/hde-epic028/checks/po-001/ordering_snapshot.txt`: Optional CHECK po-001 plain-text source snapshot used to capture `normalize_pair` and `pair_key` loci for internal compat ordering. LF-terminated text when present.  
+* `audit/qa/hde-epic028/checks/po-001/compat_compute_snapshot.txt`: Optional CHECK po-001 plain-text source snapshot used to capture `compat_public` ordering flow and pair-key use. LF-terminated text when present.  
+* `audit/qa/hde-epic028/checks/po-001/emitter_snapshot.txt`: Optional CHECK po-001 plain-text source snapshot used to capture canonical emitter loci used by the internal compat path. LF-terminated text when present.  
 * `audit/qa/<epic-id>/checks/po-002/compat_surface.txt`: Optional CHECK po-002 plain-text compat surface proof used to demonstrate `/api/compat/v1` mount posture and compat blueprint root behavior for that step. LF-terminated text when present.  
-* `audit/qa/<epic-id>/checks/po-002/compat_identity_discovery.txt`: Optional CHECK po-002 plain-text identity-discoverability proof used to show updater or mirror references to `compat.conjunction.identity_hash`. LF-terminated text when present.  
 * `audit/qa/<epic-id>/checks/po-003/cli_emitter_proof.txt`: Optional CHECK po-003 plain-text emitter proof used to show shared `emit_public` usage and the CLI LF or CRLF guard posture for that step. LF-terminated text when present.  
 * `audit/qa/<epic-id>/checks/po-003/showcompat_parity.txt`: Optional CHECK po-003 pytest stdout capture for the showcompat parity and identity lane. If present, it MUST be UTF-8 text.  
 * `audit/qa/<epic-id>/checks/po-003/showcompat_help.txt`: Optional CHECK po-003 stdout capture for `hdctl showcompat --help`. If present, it MUST be UTF-8 text.  
+* `audit/qa/hde-epic028/checks/po-003/hdctl_help.txt`: Optional CHECK po-003 stdout capture for `hdctl --help`. If present, it MUST be UTF-8 text.  
+* `audit/qa/hde-epic028/checks/po-003/hdctl_help.stderr.txt`: Optional CHECK po-003 stderr capture for `hdctl --help`. It MAY be empty only when the underlying command produced no stderr and the plan still requires the file.  
+* `audit/qa/hde-epic028/checks/po-003/hdctl_help.rc.txt`: Optional CHECK po-003 exit-code capture for `hdctl --help`. If present, it MUST contain only the final integer exit code plus trailing LF.  
+* `audit/qa/hde-epic028/checks/po-003/showcompat_presence.txt`: Optional CHECK po-003 plain-text help-surface probe used to demonstrate that `showcompat` is present in the CLI help output. LF-terminated text when present.  
+* `audit/qa/hde-epic028/checks/po-003/emitter_symbol_proof_snapshot.txt`: Optional CHECK po-003 snapshot of the governed emitter-symbol proof artifact. LF-terminated text when present.  
+* `audit/qa/hde-epic028/checks/po-003/serializer_grep_guard_snapshot.txt`: Optional CHECK po-003 snapshot of the governed serializer-grep guard artifact. LF-terminated text when present.  
+* `audit/qa/hde-epic028/checks/po-003/reader_cli_parity_probe.txt`: Optional CHECK po-003 plain-text probe used to demonstrate that the governed Reader↔CLI parity bytes artifact exists and is non-zero for the step. LF-terminated text when present.  
+* `audit/qa/hde-epic028/checks/po-004/success_encoding_invariance_snapshot.txt`: Optional CHECK po-004 plain-text snapshot of `artifacts/proofs/success_encoding_invariance.txt` used to verify the preserved encoding-invariance proof surface for the step. LF-terminated text when present.  
+* `audit/qa/hde-epic028/checks/po-003/hdctl_help.txt`: Optional CHECK po-003 stdout capture for `hdctl --help`. If present, it MUST be UTF-8 text.  
+* `audit/qa/hde-epic028/checks/po-003/hdctl_help.stderr.txt`: Optional CHECK po-003 stderr capture for `hdctl --help`. It MAY be empty only when the underlying command produced no stderr and the plan still requires the file.  
+* `audit/qa/hde-epic028/checks/po-003/hdctl_help.rc.txt`: Optional CHECK po-003 exit-code capture for `hdctl --help`. If present, it MUST contain only the final integer exit code plus trailing LF.  
+* `audit/qa/hde-epic028/checks/po-003/showcompat_presence.txt`: Optional CHECK po-003 plain-text help-surface probe used to demonstrate that `showcompat` is present in the CLI help output. LF-terminated text when present.  
+* `audit/qa/hde-epic028/checks/po-003/emitter_symbol_proof_snapshot.txt`: Optional CHECK po-003 snapshot of the governed emitter-symbol proof artifact. LF-terminated text when present.  
+* `audit/qa/hde-epic028/checks/po-003/serializer_grep_guard_snapshot.txt`: Optional CHECK po-003 snapshot of the governed serializer-grep guard artifact. LF-terminated text when present.  
+* `audit/qa/hde-epic028/checks/po-003/reader_cli_parity_probe.txt`: Optional CHECK po-003 plain-text probe used to demonstrate that the governed Reader↔CLI parity bytes artifact exists and is non-zero for the step. LF-terminated text when present.  
+* `audit/qa/hde-epic028/checks/po-004/success_encoding_invariance_snapshot.txt`: Optional CHECK po-004 plain-text snapshot of `artifacts/proofs/success_encoding_invariance.txt` used to verify the preserved encoding-invariance proof surface for the step. LF-terminated text when present.  
 * `audit/qa/hde-epic027/checks/po-004/entrypoint_proof.txt`: Optional CHECK po-004 plain-text entrypoint proof used to demonstrate explicit pyproject console binding for that step. LF-terminated text when present.  
 * `audit/qa/hde-epic027/checks/po-004/cli_install_help.txt`: Optional CHECK po-004 pytest stdout capture for the CLI install-help validation lane. If present, it MUST be UTF-8 text.  
 * `audit/qa/hde-epic027/checks/po-004/bg_resolve_test.txt`: Optional CHECK po-004 pytest stdout capture for the bg-resolve validation lane. If present, it MUST be UTF-8 text.  
-* `audit/qa/hde-epic027/checks/po-004/bg_resolve_help.txt`: Optional CHECK po-004 stdout capture for `hdctl bg:resolve --help`. If present, it MUST be UTF-8 text.  
-* `audit/qa/hde-epic027/checks/po-005/reader_a7_transport.txt`: Optional CHECK po-005 pytest stdout capture for the Reader A7 transport validation lane. If present, it MUST be UTF-8 text.  
+* `audit/qa/hde-epic028/checks/po-005/catalog_snapshot.txt`: Optional CHECK po-005 plain-text catalog snapshot used to identify the current governed Reader success-proof surface for the step. LF-terminated text when present.  
+* `audit/qa/hde-epic028/checks/po-005/http_reader_snapshot.txt`: Optional CHECK po-005 plain-text source snapshot of `adapter/http_reader.py` used to demonstrate Reader route ownership and co-located surface classification for the step. LF-terminated text when present.  
+* `audit/qa/hde-epic028/checks/po-005/blocked_note.txt`: Optional CHECK po-005 plain-text context note preserving blocked-branch or lookup-note reasoning for the step. LF-terminated text when present.  
 * `audit/qa/hde-epic027/checks/po-005/catalog_routes.txt`: Optional CHECK po-005 plain-text catalog route inventory proof used to show `/reader` A7 eligibility and `/internal/version` non-A7 posture for that step. LF-terminated text when present.  
+* `audit/qa/hde-epic028/checks/po-006/po_005_lookup.txt`: Optional CHECK po-006 plain-text imported lookup artifact used to carry the decisive PO-005 governed proof-surface resolution into the step. LF-terminated text when present.  
+* `audit/qa/hde-epic028/checks/po-006/blocked_note.txt`: Optional CHECK po-006 plain-text branch note or blocked-reason note recording the resolved or blocked lane for the step. LF-terminated text when present.  
+* `audit/qa/hde-epic028/checks/po-005/context_note_pre_po010_moonloop.txt`: Optional immutable context-note capture used to preserve historical PO-005 blocked-note or lookup-note text when a bounded PO-010 Moon Loop remediation re-homes that text out of the current-state trigger filename. LF-terminated text when present.  
+* `audit/qa/hde-epic028/checks/po-006/context_note_pre_po010_moonloop.txt`: Optional immutable context-note capture used to preserve historical PO-006 blocked-note or branch-note text when a bounded PO-010 Moon Loop remediation re-homes that text out of the current-state trigger filename. LF-terminated text when present.  
 * `audit/qa/hde-epic027/checks/po-006/dev_conjunction_http.txt`: Optional CHECK po-006 pytest stdout capture for the dev conjunction HTTP validation lane. If present, it MUST be UTF-8 text.  
 * `audit/qa/hde-epic027/checks/po-006/writer_index_rows.txt`: Optional CHECK po-006 plain-text mirror row proof used to show discoverability of `conjunction.writer.summary` and `conjunction.writer.write_readback` for that step. LF-terminated text when present.  
 * `audit/qa/hde-epic027/checks/po-008/generate_close_pack.txt`: Optional CHECK po-008 stdout capture for the EPIC027 close-pack generator lane. If present, it MUST be UTF-8 text.  
@@ -4679,6 +4773,13 @@ These entries register QA harness ledger files that summarize Live QA results as
 * `audit/qa/<epic-id>/checks/po-008/concat_output.json`: Optional CHECK po-008 conjunction output artifact produced only when the run provides both `USER_A_ID` and `USER_B_ID`. Canonical JSON when present.
 
 * `audit/qa/<epic-id>/checks/po-008/concat_output_order_check.txt`: Optional CHECK po-008 text verification of conjunction output order; produced only when `concat_output.json` is produced.  
+* `audit/qa/hde-epic028/checks/po-008/json_gate_family_before.txt`: Optional CHECK po-008 plain-text inventory of the authoritative `audit/gates/json_gate/canonical` family captured before the canonical gate writer runs. LF-terminated text when present.  
+* `audit/qa/hde-epic028/checks/po-008/canonical_json_family_before.txt`: Optional CHECK po-008 plain-text inventory of the supplemental `audit/gates/canonical_json` family captured before the canonical gate writer runs. LF-terminated text when present.  
+* `audit/qa/hde-epic028/checks/po-008/run_canonical_json_gate.stdout.log`: Optional CHECK po-008 stdout capture for the canonical gate-writer lane. If present, it MUST be UTF-8 text.  
+* `audit/qa/hde-epic028/checks/po-008/run_canonical_json_gate.stderr.log`: Optional CHECK po-008 stderr capture for the canonical gate-writer lane. It MAY be empty only when the underlying command produced no stderr and the plan still requires the file.  
+* `audit/qa/hde-epic028/checks/po-008/run_canonical_json_gate.rc.txt`: Optional CHECK po-008 exit-code capture for the canonical gate-writer lane. If present, it MUST contain only the final integer exit code plus trailing LF.  
+* `audit/qa/hde-epic028/checks/po-008/json_gate_family_after.txt`: Optional CHECK po-008 plain-text inventory of the authoritative `audit/gates/json_gate/canonical` family captured after the canonical gate writer runs. LF-terminated text when present.  
+* `audit/qa/hde-epic028/checks/po-008/canonical_json_family_after.txt`: Optional CHECK po-008 plain-text inventory of the supplemental `audit/gates/canonical_json` family captured after the canonical gate writer runs. LF-terminated text when present.  
 * `audit/qa/<epic-id>/checks/po-009/closed_rails_stdout.log`: Optional CHECK po-009 stdout capture for a closed-rails lane. Produced only when that lane executes. If present, it MUST be UTF-8 text.
 
 * `audit/qa/<epic-id>/checks/po-009/closed_rails_stderr.log`: Optional CHECK po-009 stderr capture for a closed-rails lane. Produced only when that lane executes. It MAY be empty only when the underlying command produced no stderr and the plan still requires the file.
@@ -4694,47 +4795,42 @@ These entries register QA harness ledger files that summarize Live QA results as
 * `audit/qa/<epic-id>/checks/po-009/open_rails_note.txt`: Optional CHECK po-009 blocking note used when the open-rails lane does not execute because required product inputs are unavailable. Non-empty UTF-8 text when present.
 
 * `audit/qa/<epic-id>/checks/po-009/po-009_input_constraint.log`: Optional CHECK po-009 text record explaining the input-availability constraint that blocked the planned lane. LF-terminated text when present.  
+* `audit/qa/hde-epic028/checks/po-009/update_evidence_index.stdout.log`: Optional CHECK po-009 stdout capture for the evidence-index refresh lane. If present, it MUST be UTF-8 text.  
+* `audit/qa/hde-epic028/checks/po-009/update_evidence_index.stderr.log`: Optional CHECK po-009 stderr capture for the evidence-index refresh lane. It MAY be empty only when the underlying command produced no stderr and the plan still requires the file.  
+* `audit/qa/hde-epic028/checks/po-009/update_evidence_index.rc.txt`: Optional CHECK po-009 exit-code capture for the evidence-index refresh lane. If present, it MUST contain only the final integer exit code plus trailing LF.  
+* `audit/qa/hde-epic028/checks/po-009/index_snapshot.json`: Optional CHECK po-009 snapshot of `docs/evidence/INDEX.json` used to capture the current human-ledger body for the step. Canonical JSON when present.  
+* `audit/qa/hde-epic028/checks/po-009/index_sha_snapshot.txt`: Optional CHECK po-009 plain-text snapshot of `docs/evidence/INDEX.sha256` used to capture the current human-ledger hash sentinel for the step. LF-terminated text when present.  
+* `audit/qa/hde-epic028/checks/po-009/mirror_path_proof_snapshot.txt`: Optional CHECK po-009 plain-text snapshot of `artifacts/evidence_index.jsonl.path_proof.txt` used to capture the current machine-ledger companion proof for the step. LF-terminated text when present.  
+* `audit/qa/hde-epic028/checks/po-009/manifest_updater_lookup.txt`: Optional CHECK po-009 plain-text lookup proof used to show that `audit/qa/hde-epic028/qa_step_logs_manifest.json` is referenced by the evidence-index updater source. LF-terminated text when present.  
+* `audit/qa/hde-epic028/checks/po-009/manifest_human_index_lookup.txt`: Optional CHECK po-009 plain-text lookup proof used to show that `audit/qa/hde-epic028/qa_step_logs_manifest.json` is discoverable in `docs/evidence/INDEX.json`. LF-terminated text when present.  
+* `audit/qa/hde-epic028/checks/po-009/manifest_mirror_lookup.txt`: Optional CHECK po-009 plain-text lookup proof used to show that `audit/qa/hde-epic028/qa_step_logs_manifest.json` is discoverable in `artifacts/evidence_index.jsonl`. LF-terminated text when present.  
 * `audit/qa/hde-epic027/checks/po-010/runtime_log_presence.txt`: Optional CHECK po-010 plain-text runtime-log presence proof used to show that no prerequisite same-run runtime logs are missing for that step. LF-terminated text when present.  
-* `audit/qa/hde-epic027/checks/po-010/runtime_surface_inventory.txt`: Optional CHECK po-010 plain-text runtime-surface inventory used to demonstrate same-run execution across the required runtime proof families for that step. LF-terminated text when present.
-
-* `audit/qa/<epic-id>/checks/po-010/showcompat_help.txt`: Optional CHECK po-010 stdout capture for `hdctl showcompat --help`. If present, it MUST be UTF-8 text.
-
-* `audit/qa/<epic-id>/checks/po-010/catalog_extract_dev_endpoints.json`: Optional CHECK po-010 extracted dev-endpoints proof file used to verify conjunction endpoint presence under the dev scope. Canonical JSON when present.
-
-* `audit/qa/<epic-id>/checks/po-011/canonical_json_gate_stdout.log`: Optional CHECK po-011 stdout capture for a canonical JSON gate lane. If present, it MUST be UTF-8 text.
-
-* `audit/qa/<epic-id>/checks/po-011/canonical_json_gate_stderr.log`: Optional CHECK po-011 stderr capture for a canonical JSON gate lane. It MAY be empty only when the underlying command produced no stderr and the plan still requires the file.
-
-* `audit/qa/<epic-id>/checks/po-011/canonical_json_gate_rc.txt`: Optional CHECK po-011 exit-code capture for a canonical JSON gate lane. If present, it MUST contain only the final integer exit code plus trailing LF.
-
-* `audit/qa/<epic-id>/checks/po-011/update_evidence_index_stdout.log`: Optional CHECK po-011 stdout capture for an evidence-index update lane. If present, it MUST be UTF-8 text.
-
-* `audit/qa/<epic-id>/checks/po-011/update_evidence_index_stderr.log`: Optional CHECK po-011 stderr capture for an evidence-index update lane. It MAY be empty only when the underlying command produced no stderr and the plan still requires the file.
-
-* `audit/qa/<epic-id>/checks/po-011/update_evidence_index_rc.txt`: Optional CHECK po-011 exit-code capture for an evidence-index update lane. If present, it MUST contain only the final integer exit code plus trailing LF.
-
-* `audit/qa/<epic-id>/checks/po-011/check_evidence_bindings_stdout.log`: Optional CHECK po-011 stdout capture for `tools/evidence/check_evidence_bindings.py --strict` when that auxiliary lane is executed. If present, it MUST be UTF-8 text.
-
-* `audit/qa/<epic-id>/checks/po-011/check_evidence_bindings_stderr.log`: Optional CHECK po-011 stderr capture for `tools/evidence/check_evidence_bindings.py --strict` when that auxiliary lane is executed. It MAY be empty only when the underlying command produced no stderr and the plan still requires the file.
-
-* `audit/qa/<epic-id>/checks/po-011/check_evidence_bindings_rc.txt`: Optional CHECK po-011 exit-code capture for `tools/evidence/check_evidence_bindings.py --strict` when that auxiliary lane is executed. If present, it MUST contain only the final integer exit code plus trailing LF.
-
-* `audit/qa/<epic-id>/checks/po-012/generator_stdout.log`: Optional CHECK po-012 stdout capture for the close-pack generator lane. If present, it MUST be UTF-8 text.
-
-* `audit/qa/<epic-id>/checks/po-012/generator_stderr.log`: Optional CHECK po-012 stderr capture for the close-pack generator lane. It MAY be empty only when the underlying command produced no stderr and the plan still requires the file.
-
-* `audit/qa/<epic-id>/checks/po-012/generator_rc.txt`: Optional CHECK po-012 exit-code capture for the close-pack generator lane. If present, it MUST contain only the final integer exit code plus trailing LF.
-
-* `audit/qa/<epic-id>/checks/po-012/close_pack_copy/epic-026_manifest.json`: Optional CHECK po-012 copied close-pack manifest used for generator verification. Canonical JSON when present.
-
-* `audit/qa/<epic-id>/checks/po-012/close_pack_copy/epic-026_evidence_index.json`: Optional CHECK po-012 copied evidence-index snapshot used for generator verification. Canonical JSON when present.
-
-* `audit/qa/<epic-id>/checks/po-012/close_pack_copy/endpoints_catalog.json`: Optional CHECK po-012 copied endpoint catalog snapshot used for generator verification. Canonical JSON when present.
-
+* `audit/qa/hde-epic027/checks/po-010/runtime_surface_inventory.txt`: Optional CHECK po-010 plain-text runtime-surface inventory used to demonstrate same-run execution across the required runtime proof families for that step. LF-terminated text when present.  
+* `audit/qa/hde-epic028/checks/po-010/final_summary.txt`: Optional CHECK po-010 repo-supported completion summary. When present, it MUST explicitly distinguish recorded, blocked, and no-claim step outcomes and MUST NOT over-claim canon drain or formal close-pack completion for the run. LF-terminated text when present.  
+* `audit/qa/<epic-id>/checks/po-010/showcompat_help.txt`: Optional CHECK po-010 stdout capture for `hdctl showcompat --help`. If present, it MUST be UTF-8 text.  
+* `audit/qa/<epic-id>/checks/po-010/catalog_extract_dev_endpoints.json`: Optional CHECK po-010 extracted dev-endpoints proof file used to verify conjunction endpoint presence under the dev scope. Canonical JSON when present.  
+* `audit/qa/<epic-id>/checks/po-011/canonical_json_gate_stdout.log`: Optional CHECK po-011 stdout capture for a canonical JSON gate lane. If present, it MUST be UTF-8 text.  
+* `audit/qa/<epic-id>/checks/po-011/canonical_json_gate_stderr.log`: Optional CHECK po-011 stderr capture for a canonical JSON gate lane. It MAY be empty only when the underlying command produced no stderr and the plan still requires the file.  
+* `audit/qa/<epic-id>/checks/po-011/canonical_json_gate_rc.txt`: Optional CHECK po-011 exit-code capture for a canonical JSON gate lane. If present, it MUST contain only the final integer exit code plus trailing LF.  
+* `audit/qa/<epic-id>/checks/po-011/update_evidence_index_stdout.log`: Optional CHECK po-011 stdout capture for an evidence-index update lane. If present, it MUST be UTF-8 text.  
+* `audit/qa/<epic-id>/checks/po-011/update_evidence_index_stderr.log`: Optional CHECK po-011 stderr capture for an evidence-index update lane. It MAY be empty only when the underlying command produced no stderr and the plan still requires the file.  
+* `audit/qa/<epic-id>/checks/po-011/update_evidence_index_rc.txt`: Optional CHECK po-011 exit-code capture for an evidence-index update lane. If present, it MUST contain only the final integer exit code plus trailing LF.  
+* `audit/qa/<epic-id>/checks/po-011/check_evidence_bindings_stdout.log`: Optional CHECK po-011 stdout capture for `tools/evidence/check_evidence_bindings.py --strict` when that auxiliary lane is executed. If present, it MUST be UTF-8 text.  
+* `audit/qa/<epic-id>/checks/po-011/check_evidence_bindings_stderr.log`: Optional CHECK po-011 stderr capture for `tools/evidence/check_evidence_bindings.py --strict` when that auxiliary lane is executed. It MAY be empty only when the underlying command produced no stderr and the plan still requires the file.  
+* `audit/qa/<epic-id>/checks/po-011/check_evidence_bindings_rc.txt`: Optional CHECK po-011 exit-code capture for `tools/evidence/check_evidence_bindings.py --strict` when that auxiliary lane is executed. If present, it MUST contain only the final integer exit code plus trailing LF.  
+* `audit/qa/<epic-id>/checks/po-012/generator_stdout.log`: Optional CHECK po-012 stdout capture for the close-pack generator lane. If present, it MUST be UTF-8 text.  
+* `audit/qa/<epic-id>/checks/po-012/generator_stderr.log`: Optional CHECK po-012 stderr capture for the close-pack generator lane. It MAY be empty only when the underlying command produced no stderr and the plan still requires the file.  
+* `audit/qa/<epic-id>/checks/po-012/generator_rc.txt`: Optional CHECK po-012 exit-code capture for the close-pack generator lane. If present, it MUST contain only the final integer exit code plus trailing LF.  
+* `audit/qa/<epic-id>/checks/po-012/close_pack_copy/epic-026_manifest.json`: Optional CHECK po-012 copied close-pack manifest used for generator verification. Canonical JSON when present.  
+* `audit/qa/<epic-id>/checks/po-012/close_pack_copy/epic-026_evidence_index.json`: Optional CHECK po-012 copied evidence-index snapshot used for generator verification. Canonical JSON when present.  
+* `audit/qa/<epic-id>/checks/po-012/close_pack_copy/endpoints_catalog.json`: Optional CHECK po-012 copied endpoint catalog snapshot used for generator verification. Canonical JSON when present.  
 * `audit/qa/<epic-id>/checks/po-012/close_pack_copy/endpoints_catalog.json.sha256`: Optional CHECK po-012 copied checksum sidecar for `close_pack_copy/endpoints_catalog.json`. LF-terminated text when present.  
-* `audit/qa/<epic-id>/checks/po-000/doc_deltas.md`: Optional step-0, check-scoped doc-delta capture for the run. Non-empty UTF-8 markdown.
-
-* `audit/qa/<epic-id>/checks/po-000/qa_helpers.sh`: Optional step-0, check-scoped helper copy created or pinned by the plan/run. If a plan uses this file, it MUST be treated as a run-local helper surface, not as a pre-existing repo-resident source outside the run.
+* `audit/qa/<epic-id>/checks/po-000/doc_deltas.md`: Optional step-0, check-scoped doc-delta capture for the run. Non-empty UTF-8 markdown.  
+* `audit/qa/<epic-id>/checks/po-000/qa_helpers.sh`: Optional step-0, check-scoped helper copy created or pinned by the plan/run. If a plan uses this file, it MUST be treated as a run-local helper surface, not as a pre-existing repo-resident source outside the run.  
+* `audit/qa/hde-epic028/checks/d0/runtime_context.txt`: Optional D0 runtime-context snapshot recording the effective rails and runtime context for the run. LF-terminated text when present.  
+* `audit/qa/hde-epic028/checks/d0/cli_health.txt`: Optional D0 CLI-health baseline recording the initial CLI-help return code and stdout/stderr line counts for the run. LF-terminated text when present.  
+* `audit/qa/hde-epic028/checks/d0/services_surfaces.txt`: Optional D0 services/surfaces baseline recording the expected compat, Reader, internal, and dev surfaces for the run. LF-terminated text when present.  
+* `audit/qa/hde-epic028/checks/d0/d0_exact_commands.sh`: Optional D0 executed shell-script capture used when the bootstrap commands are consolidated into one explicit runtime sequence. If present, it MUST be treated as a run-local helper surface, not as a pre-existing repo-resident source outside the run.
 
 ### **Optional ledger artifacts (non-required for closure; current-state if present)**
 
@@ -4746,7 +4842,9 @@ These entries register QA harness ledger files that summarize Live QA results as
   * Deferred and Not Run listing constraint (normative).  
     * If `epic_closure_record.md` is present and it lists any checks as Deferred or Not Run for the current run, it MUST NOT present those checks’ artifact paths (including `primary.log` paths) as required primary evidence paths for the current run. Deferred or Not Run artifacts MAY be listed only under an explicitly labeled Deferred or Not Run section and MUST be clearly marked non-binding.
 
-* `audit/qa/<epic-id>/00_meta/codespaces_snapshot.json`: Optional Step-0 Codespaces environment snapshot (tool versions, rails pins, presence-only env context). Canonical JSON; schema and indexing posture are defined in §8.17.5. Live QA Plans MUST NOT require this artifact for closure by default.
+* `audit/qa/<epic-id>/00_meta/codespaces_snapshot.json`: Optional Step-0 Codespaces environment snapshot (tool versions, rails pins, presence-only env context). Canonical JSON; schema and indexing posture are defined in §8.17.5. Live QA Plans MUST NOT require this artifact for closure by default.  
+* `audit/qa/hde-epic028/00_meta/delta/patch.diff`: Optional Step-0B patch capture for a bounded Moon Loop remediation or equivalent controlled delta repair within the stable EPIC028 QA root. Non-empty UTF-8 text when present.  
+* `audit/qa/hde-epic028/00_meta/delta/changed_files.txt`: Optional Step-0B changed-files ledger paired with `audit/qa/hde-epic028/00_meta/delta/patch.diff`. LF-terminated text when present.
 
 * `audit/qa/<epic-id>/00_meta/deferred_scope_posture.md`: Optional per-epic deferred scope posture record (non-empty UTF-8 markdown).
 
@@ -4945,6 +5043,18 @@ Canonical Reader route: GET /reader. Reader v1 is selected via query parameter v
 API-mount alias posture: when the Reader blueprint is mounted under an /api prefix, /api/reader is an alias of the same Reader surface. It is not a distinct contract or a separate proof surface.
 
 Forbidden invented route: /api/reader-proof/v1 MUST NOT appear in the Endpoint Catalog, in endpoint snapshot artifacts, or in any proof-surface references. Proofs that depend on a Reader success route MUST target the actual reachable mounted Reader route for the target environment. When this Catalog is used for selection, select only from Catalog entries that correspond to real mounted routes (no invented proof routes).
+
+Governed Reader success-proof designation (normative).
+
+The authoritative Endpoint Catalog MUST explicitly designate the governed Reader success-proof surface within the Catalog’s own machine-readable structure.
+
+For the current HD Engine Reader success surface, that designation resolves to `GET /reader`.
+
+When an `/api` blueprint mount exists, `/api/reader` is an alias of the same Reader surface and MUST NOT be treated as a second governed proof surface.
+
+This designation MUST NOT be inferred solely from route existence, env-gate posture, or `a7_eligible:true` on a catalog row.
+
+The designation MUST remain inside the existing single-home Catalog posture and MUST NOT be carried by a second designation mechanism, a second inventory home, a new route, or a flag created solely to carry proof-surface authority.
 
 Minimum required fields (per endpoint record). Each endpoint entry in `docs/ENDPOINTS_CATALOG.json` MUST include at least:
 
@@ -5654,7 +5764,7 @@ The canonical root for Live QA evidence is:
 
 Within EPIC\_QA\_ROOT, evidence is organized primarily by check\_id (current-state), with a stable epic-level manifest at:
 
-* `audit/qa/<epic-id>/qa_step_logs_manifest.json`: Per-epic manifest acting as a current-state index keyed by check\_id. Each manifest entry MUST carry, at minimum, `check_id`, `check_name`, `status`, `fail_status`, `log_path`, and `timestamp_utc`; `log_path` MUST point to that check’s canonical primary log under the epic QA root. Records-only canonical JSON (UTF-8, ASCII-sorted keys, compact, exactly one trailing LF).  
+* `audit/qa/<epic-id>/qa_step_logs_manifest.json`: Per-epic manifest acting as a current-state index keyed by check\_id. Each manifest entry MUST carry, at minimum, `check_id`, `status`, and `log_path`; `log_path` MUST point to that check’s canonical primary log under the epic QA root. Additional fields such as `check_name`, `fail_status`, and `timestamp_utc` MAY appear when the producing plan or harness records them. Records-only canonical JSON (UTF-8, ASCII-sorted keys, compact, exactly one trailing LF).  
 * `audit/qa/<epic-id>/checks/po-000/qa_step_logs_manifest.json`: Optional step-0, check-scoped current-state copy of the QA step logs manifest. When a Live QA plan explicitly names this check-scoped manifest as a required deliverable, it is the binding surface for that run.
 
 This section does not define:
@@ -6883,7 +6993,7 @@ reader\_success\_proof — Composite proof JSON for GET/HEAD/304 on Catalog rout
 
 artifacts/proofs/ops\_refusal\_proof.txt — ops refusal proof capturing why rails were closed and how the system declined a run under closed-rails posture.
 
-encoding\_invariance\_probe — Proof that identity (ETag) and effective length are stable across Accept-Encoding. (path: artifacts/proofs/encoding\_invariance.txt)
+a7.success\_encoding\_invariance — Reader A7 encoding-invariance proof that identity (ETag) and effective length are stable across accepted Accept-Encoding values. (path: artifacts/proofs/success\_encoding\_invariance.txt)
 
 start\_command\_capture — Effective start command captured as bytes \+ sha256. (path: artifacts/proofs/start\_command\_capture.txt)
 
@@ -6919,13 +7029,15 @@ cli.conjunction.output\_ba — Conjunction-mode showcompat output artifact (BA o
 
 cli.conjunction.abba\_sidecar — Conjunction-mode ABBA sidecar proof artifact tying AB and BA outputs. (path: artifacts/cli/abba\_sidecar.json)
 
-cli.guards.serializer\_grep\_guard — Serializer grep guard output log for CLI serialization guardrails. (path: artifacts/cli/guards/serializer\_grep\_guard.log)
+cli.guard.emitter\_symbol\_proof — Governed emitter allow-list proof artifact for the CLI serializer-coupling surface. (path: artifacts/cli/guards/emitter\_symbol\_proof.txt)
+
+cli.guard.serializer\_grep — Serializer grep guard output log for the CLI serialization guardrail. (path: artifacts/cli/guards/serializer\_grep\_guard.log)
 
 cli\_showcompat\_two\_run — Two-run identity log for showcompat. (path: artifacts/cli/showcompat/two\_run\_identity.log)
 
 cli\_showcompat\_abba — AB↔BA byte-diff for showcompat (expected empty). (path: artifacts/cli/showcompat/abba.diff)
 
-reader\_cli\_parity\_diff — Reader vs CLI parity diff (expected empty). (path: artifacts/cli/showcompat/reader\_cli\_parity.diff)
+cli.showcompat.reader\_cli\_parity — Governed Reader↔CLI parity bytes artifact for the CLI serializer-coupling surface. (path: artifacts/cli/reader\_cli\_parity.bytes)
 
 preimage\_recompute — Log proving sha256(preimage\_bytes) equals idempotence\_hash. (path: artifacts/cli/showcompat/preimage\_recompute.log)
 

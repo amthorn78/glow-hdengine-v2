@@ -2,12 +2,12 @@
 
 **Title:** PF06-Canon-Epic-Process-Guide 
 
-**Version:** v1.8
+**Version:** v1.8.5
 
 **Status:** Canon
 
-**Effective date**: 2026-03-23  
-**Last Update Gate:**  BN drain 10.1.4 A23-24
+**Effective date**: 2026-04-06  
+**Last Update Gate:**  BN drain 10.3.3 A20-24
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -34,6 +34,12 @@ CodEx opens PRs automatically for each epic slice and pushes:
   * Machine: artifacts/evidence\_index.jsonl
 
 Implementation Agent analyzes PR bundles and produces PF-canon Doc Deltas.
+
+Coding agents and Implementation Agents MAY NOT directly modify PF-Canon documents as part of implementation PR work.
+
+If implementation work reveals canon drift, missing canon coverage, or a needed canon change, the agent MUST record that explicitly as a drift note or Doc Delta candidate with evidence pointers rather than editing the PF-Canon file directly.
+
+A PR review or remediation report MAY support a future PF-Canon status update, but the canon edit itself remains separate documentation work. This applies to HDE-Build Checklist rows and any other PF-Canon status tables.
 
 An epic MAY be delivered in a series of PRs (up to 10 PRs per epic), each PR carrying a coherent slice of work with its own code \+ evidence parity.
 
@@ -293,6 +299,19 @@ No governance drift. Ops tasks MUST NOT create new acceptance tokens or redefine
 
 Clarification. If a change is fully achievable as code (including tests and deterministic artifacts), it is PR work. If any step requires human console/config action, that step is an Ops task (even if adjacent code changes exist). Ops tasks can be prerequisites for epic completion, but they are proven by evidence artifacts, not by agent execution claims.
 
+Ops closeout packaging run (OPS-01). When an epic uses an Ops task to surface already-produced close-pack artifacts and closure evidence, the run MUST remain packaging and evidence only:
+
+* no reopened implementation work  
+* no QA verdict changes  
+* no canon-drain claim  
+* no merge-provenance claim
+
+The OPS-01 execution bundle MUST include, at minimum, commands.txt, stdout.log, stderr.log, exit\_codes.txt, and created\_files\_sha256.txt under the stable ops root for the epic.
+
+OPS-01 MAY surface the canonical close-pack baseline artifacts and their sibling path-proofs, but it MUST bind those artifacts to the existing governed acceptance or QA evidence family rather than inventing a replacement proof surface.
+
+A later OPS provenance run is optional unless the approved plan explicitly makes it mandatory.
+
 ## 0.3 Participants and responsibilities
 
 * Implementation Agent (ChatGPT). Runs each epic end to end, prepares CRD-ready drafts, sets up CodEx asks (what, not how), verifies proofs and artifacts, ensures Doc-Delta and both indices are updated in the same PR, and escalates blockers to the Lead Developer. Does not run git or create PRs.
@@ -392,7 +411,11 @@ At minimum, the summary MUST:
 * When the QA RCA & Doc Delta summary is used to support epic-close readiness, it MUST state the source-of-truth posture for the review. The summary MUST name the primary epic-specific execution source, the canon homes used for closeout interpretation, and any Implementation Guide or QA Plan inputs that were used only for framing.  
 * When a Live QA Plan exists, the summary MUST include explicit Coverage vs QA Plan accounting in plan order using stable step identifiers. For each planned step, it MUST record whether the step is Fully evidenced, Partially evidenced, or Not evidenced, whether governed evidence pointers exist, any material mismatch between the planned step and the recorded step, and the closeout impact.  
 * When closeout depends on runtime functional proof, the summary MUST state whether same-run runtime proof exists across the changed runtime surfaces required by the approved plan, and it MUST name the governed artifacts that prove presence or absence of those runtime surfaces.  
-* The summary MUST include an explicit closeout-readiness recommendation. This recommendation is a closure-oriented review result and MUST remain distinct from the final SATISFIED or NOT SATISFIED decision recorded in the close report.
+* The summary MUST include an explicit closeout-readiness recommendation. This recommendation is a closure-oriented review result and MUST remain distinct from the final SATISFIED or NOT SATISFIED decision recorded in the close report.  
+* When a QA closeout or acceptance-reporting summary is limited to repo-supported completion, it MUST say so explicitly.  
+* It MUST distinguish, as separate states, repo-supported completion, canon-drain completion, and formal close-pack completion.  
+* If canon-drain completion or formal close-pack completion is not proven, the summary MUST mark those states as no-claim or equivalent explicit non-claim wording rather than implying completion.  
+* A repo-supported completion summary MUST distinguish blocked steps from recorded or completed steps in the current run and MUST NOT be phrased as though formal merge or close is already proven unless that stronger proof is actually present.
 
 Location (normative)  
 The QA RCA & Doc Delta summary MAY live as a section of the epic close report, or as a separate governed artifact referenced from the close report.
@@ -471,6 +494,17 @@ If remediation occurs inside a QA session, the existing primary log artifacts MU
   * audit/qa//remediation/moon\_loop/patch.diff (or equivalent)  
   * audit/qa//remediation/moon\_loop/changed\_files.txt (paths \+ sha256)  
   * This delta capture MUST NOT discuss branches, commits, or PR workflow.
+
+For reporting or classification steps, a bounded Moon Loop MAY correct a false blocked state when the blocked result was triggered by the presence of a trigger file rather than by a hard blocking condition in the file content.
+
+If this pattern is used:
+
+* preserve the original contextual note by copying it to an immutable context artifact under the same governed step root  
+* remove or rename only the trigger filename or trigger filenames that caused the false blocked classification  
+* capture the Step-0B or equivalent delta pair for the change  
+* rerun only the already-approved reporting step under the same deliverable family
+
+This is acceptable only when the rerun changes reporting state, not behavior state, and when the preserved context artifact plus the rerun evidence make the transition auditable without inventing a new evidence surface.
 
 Stop condition
 
@@ -1033,6 +1067,18 @@ The step-logs manifest is a governed artifact and MUST have a sibling path-proof
 
 * audit/qa//qa\_step\_logs\_manifest.json.path\_proof.txt
 
+For ledger-refresh or evidence-discoverability checks, the step MAY treat the current-run step-logs manifest pair as a decisive deliverable. When it does, the approved PASS criteria MUST name:
+
+* the required updater or refresher exit-status artifact  
+* the current-run step-logs manifest and its sibling path-proof transcript  
+* any required discoverability lookup artifacts and the exact found=True condition they must record
+
+For such a step, the manifest content requirement is not just file existence. The manifest MUST record check\_id, status, and log\_path for the current executed checks captured by that run.
+
+If a step executes multiple commands to refresh or verify this ledger state, the primary.log command field MUST preserve execution order as one explicit pipeline or one explicit ;-joined sequence, not as an ambiguous paraphrase.
+
+When these criteria are used, a Moon Loop rerun may re-run the updater, rebuild the current-run manifest pair from the governed check headers, regenerate the named lookup artifacts, and rewrite primary.log from the concrete refreshed artifacts without being treated as scope expansion, provided the approved deliverables and PASS criteria do not change.
+
 Posture-only steps (no validation logic executed). If a check is posture-only and records TOOLING\_BLOCKED, the step MUST still:
 
 * Write the per-check primary.log with status: "TOOLING\_BLOCKED" and include a one-line posture note beginning with UNPROVEN/TOOLING\_BLOCKED: (what is missing / why unproven).  
@@ -1046,6 +1092,17 @@ If a step claims it updated qa\_step\_logs\_manifest.json, the step’s primary.
 Steps that are “validate existing canon evidence” SHOULD prefer referencing existing governed artifacts in the primary.log (paths-only) over generating duplicate snapshots. Do not create extra artifacts that do not change PASS vs REMEDIATION NEEDED.
 
 Additional required artifacts (files beyond the per-check primary.log \+ manifest) are allowed only when they are acceptance-decisive and already canonized as a governed evidence family/path. If an artifact is diagnostic-only (does not change PASS vs REMEDIATION NEEDED), it MUST NOT be required for plan approval or Live QA execution; it may be included only as optional diagnostics.
+
+When a Live QA step validates same-change coherence across more than one existing governed evidence family, the plan MUST name the full coherence set and treat it as one acceptance-decisive unit.
+
+For such a step, PASS criteria MUST state both:
+
+* that each named family remains present before and after the writer or generator run  
+* that the writer or generator exit status for the same run is successful
+
+If one named family disappears, is omitted from the before/after capture, or the writer or generator exits non-zero, the step MUST fail exactly as the approved plan defines.
+
+This kind of step is verification only. It does not reclassify legacy versus canonical homes by itself, and it does not authorize new binding targets.
 
 Each QA step MUST explicitly name which repo files it will touch/edit. Plans and implementations MUST NOT introduce parallel alternate QA roots or ad-hoc epic slugs.
 
@@ -1421,6 +1478,31 @@ Prompt-family separation (AUTHORING vs REVIEW). Every QA prompt used in this pro
 
 REVIEW-mode remediation exception (verbatim-only). If remediation requires quoting commands, the REVIEW-mode prompt MAY include only command snippets copied verbatim from the approved plan text (including caveats). The prompt MUST label the snippet as verbatim and MUST NOT introduce new flags, paths, or steps.
 
+Temporary PF10 clarification during review (step-preserving posture). If a live PF10 addendum explicitly resolves a documentation, inventory, or classification ambiguity for an already-approved QA step, the review MUST treat the issue as canon-alignment drift rather than as a new runtime defect unless the governed evidence shows a real runtime failure.
+
+For that exact ambiguity while the addendum remains live, the reviewer MUST apply the PF10 clarification first and the older ambiguous canon wording second.
+
+Under this posture, the existing approved step MAY be rerun or evaluated using its existing step ID, existing PASS/FAIL posture, and existing approved evidence family.
+
+REVIEW mode MUST NOT use the clarification as a reason to invent a new route, a new flag, a new proof-surface carrier, a new QA step, a new evidence family, or a new acceptance token.
+
+The review record MUST state the temporary clarified designation, identify the existing approved evidence family used for the decision, and list the downstream canon-drain targets required for permanent alignment.
+
+Downstream drainage MUST preserve the existing single-home inventory posture and the existing proof-surface separation. Do not create a second designation mechanism or alternate inventory home as part of the temporary clarification.
+
+If a live PF10 clarification resolves a previously blocked branch for an already-approved step, stale blocked-lane command text that remains in the approved plan is a planning defect, not an automatic blocker, when all of the following are true:
+
+* the actual rerun uses the existing approved step ID  
+* the actual rerun stays within the existing approved deliverable family  
+* the deciding lookup artifact comes from the already-approved evidence family  
+* the governed rerun evidence proves the approved PASS criteria
+
+In that case, the review MUST state which stale blocked-lane command or lookup path was superseded, which governed artifact actually drove the successful branch, and that no extra governed paths were introduced.
+
+A rerun that changes only the deciding lookup source within the existing deliverable family remains execution-preserving. It does not create a new evidence family, a new proof-surface carrier, or a scope expansion.
+
+This temporary clarification posture is execution-preserving only. It does not remove the downstream drain obligation, and it MUST NOT widen into new dev or ops remediation work unless governed evidence proves such work is actually required.
+
 QoS stop-rule (iteration churn escalation). If the Live QA plan requires repeated structural remediation for the same failure mode across revisions (suggest threshold: 2), treat the issue as a systems-level prompt/template defect. Escalate to a systems RCA and a canonical drain that targets the class of failure, not the incident.
 
 Step list coherence (no undefined steps). If a Live QA plan includes a step matrix, checklist, or run sequence, every step ID listed MUST have a corresponding step definition in the plan’s Step Details (or the plan MUST explicitly state that the step is out of scope and must not be executed).
@@ -1472,6 +1554,15 @@ No dangling links rule for deferred steps. A plan or close-pack rollup MUST NOT 
 A plan MUST NOT list a file path as a required prerequisite unless it is canon-defined or audit-proven. If it is neither, the plan MUST include the exact create/write step(s) under audit/\*\* or artifacts/\*\* (no placeholders) and treat the artifact as QA-run-produced evidence (not a preflight prerequisite).
 
 Directly executable (copy/paste discipline). All operator-run steps MUST be copy/paste runnable in Codespaces. If a step includes script content, it MUST be provided so execution results in a syntactically valid file.
+
+Inline-command consolidation via step-local script is allowed when controlled. If an approved step is written as inline commands but the actual run consolidates those commands into a step-local script, that execution form is allowed when:
+
+* the script is created under the same governed step root and is itself captured as a step artifact or embedded verbatim in primary.log  
+* primary.log records the exact executed command sequence or exact script content with command\_provenance set to Explicitly created  
+* the plan-defined deliverables, governed output paths, and PASS/FAIL predicates remain unchanged  
+* the script does not introduce hidden dependencies or widen scope beyond the approved step
+
+When these conditions are met, reviewers MUST treat the script as a provenance or execution-form improvement, not as a blocker. It becomes blocking only if it changes the required deliverables, the required proof posture, or the meaning of the step.
 
 Gitless runbook. Live QA runbooks are gitless in the sense that they MUST NOT describe or enforce VCS workflow (branches/commits/PRs). A runbook must contain only verification steps; no branching, merging, resetting, committing, etc.
 
@@ -2156,6 +2247,18 @@ No dual-home acceptance binding:
 
 * Any deviation is a mechanical blocker: fix the binding, do not reinterpret.
 
+Snapshot-and-verify acceptance-binding checks are allowed when the step is verifying an already-existing current-epic binding rather than regenerating it.
+
+For such a step, PASS requires governed evidence that shows all of the following:
+
+* the expected current-epic homes are named explicitly  
+* the machine mirror contains matching rows for each of those same homes  
+* no alternate acceptance-map home is detected for the current epic
+
+When those conditions are met, the step MAY pass on a snapshot-and-verify basis without regenerating ledgers, relocating artifacts, or inventing alternate homes.
+
+If any expected home is missing, any matching mirror row is absent, or an alternate acceptance-map home is detected, the step MUST NOT pass as a single-home acceptance-binding check.
+
 Canonical compare artifacts: reuse canon surfaces (no epic-local compare paths). Default posture: compare proofs MUST bind to canon-defined compare artifact surfaces. An epic MUST NOT introduce a new compare artifact path as the canonical compare proof unless that surface has been introduced through the canon change pathway and drained into the owning canonical homes.
 
 Any binding to a non-canonical path is a mechanical blocker and must be corrected before approval. If a non-canonical path is truly required, it must be routed via ADR and drained into the correct canonical home.
@@ -2633,34 +2736,55 @@ Use the exact labels below (fill every field; use N/A when a field does not appl
 
 Audit Summary
 
-\<one sentence\>
+State the audit summary in one sentence.
 
-Drift theme: "\<theme\>"
+Drift theme: state the drift theme in a short quoted phrase.
 
-Count of findings: \<N\>  
- Count of Must-act-now findings: \<N\>
+Count of findings: state the number.  
+ Count of Must-act-now findings: state the number.
+
+A finding MAY be Must-act-now while still requiring no PF09 task delta. If the finding is a documentation-drain issue only and does not identify new runnable dev or ops work, mark PF09 task delta as NO and route the delta only to the correct PF home or homes.
 
 Findings → Doc Delta Map (required; single sink)
 
 FND-001 —
 
-Finding (one sentence): \<one sentence\>  
- Audit anchor: \<verbatim observed line\>  
- Audit evidence pointer: \<repo path or artifact pointer\>  
- Epic Plan linkage (one sentence): \<one sentence\>  
- Epic Plan anchor: \<verbatim plan line or N/A\>  
+Finding (one sentence): state the finding in one sentence.  
+ Audit anchor: copy the verbatim observed line.  
+ Audit evidence pointer: give the repo path or governed artifact pointer.  
+ Epic Plan linkage (one sentence): state how the finding maps to epic scope, or state that it does not create new planned runnable work.  
+ Epic Plan anchor: quote the governing plan line, or write N/A.  
  Must-act-now: YES|NO  
- Doc deltas required (bullets; at least one; targets only):
+ Doc deltas required (targets only):
 
-* PF09 task delta: YES (required)
+* PF09 task delta: YES|NO  
+* PF14 mechanics delta: YES|NO  
+* PF02 architecture delta: YES|NO  
+* Other PF canon delta(s): titles-only list or None  
+* PF20 historical correction: YES|NO
 
-* PF14 mechanics delta: YES|NO
+Why these are the correct homes: give a one-sentence routing rationale.
 
-* PF02 architecture delta: YES|NO
+Repeat FND blocks until all findings are captured. Use sequential IDs.
 
-* Other PF canon delta(s): \<titles-only list or None\>
+Doc Delta Proposals — PF09 (Tasks) (include only if any finding requires a runnable task or checklist-row change)
 
-Repeat FND blocks until all findings are captured. Use sequential IDs (FND-001, FND-002, FND-003, and so on).
+PF09-TSK-001 —
+
+Task ID: exact PF09 task or subtask ID.  
+ Status: Not done | Optional | Done  
+ Task title: short title.  
+ Type: Canon update | Clarify | Debt/confirm  
+ Must-act-now: YES|NO  
+ Source finding: cite the finding ID that drives the task delta.  
+ Evidence pointer(s):
+
+* repo path or governed artifact pointer  
+   Notes (optional; 1 line): short note.
+
+Repeat PF09-TSK blocks until all required task deltas are captured.
+
+If no PF09 task delta is required, write: None.
 
 Doc Delta Proposals — PF09 (Tasks) (required)
 
@@ -2823,6 +2947,12 @@ Codex opens PRs automatically for each epic slice and pushes code \+ Doc-Delta \
 
 An epic MAY use up to 10 PRs to deliver its full scope; each PR MUST be self-contained and follow the PR-first and parity rules in §0.2.
 
+Assigned HDE-Build Checklist scope is binding for each PR. When the approved Implementation Plan, remediation plan, or review scope assigns specific HDE-Build Checklist tasks or subtasks to a PR, that PR MUST either complete every assigned subtask or explain each unresolved assigned subtask in detail before the PR can be treated as complete.
+
+The explanation MUST identify each affected task ID and subtask ID, state exactly what was completed, state exactly what remains incomplete, describe the blocking condition or limiting constraint, explain why completion was not possible within the approved PR scope, and cite the repo evidence, test result, or other concrete basis for that conclusion.
+
+Silent omission, partial completion without this explanation, or a completeness claim that ignores unresolved assigned subtasks is non-conforming.
+
 The Product Owner (PO) is the sole merger (squash on PASS).
 
 Epic-level acceptance (as recorded in HDE Phased Epics) occurs only after:
@@ -2869,6 +2999,21 @@ A Live QA step that validates close-pack generation or close-pack completeness M
 Those copied artifacts are validation surfaces only. The step MAY use generator exit status and the existence of the copied artifacts as its PASS predicate when that predicate is stated explicitly in the approved plan.
 
 Such copies MUST NOT replace, rename, or redefine the canonical close-pack baseline files. Final close-pack acceptance remains bound to the canonical filenames listed above.
+
+Ops closeout provenance run (OPS-02). When existing closeout evidence is not enough to prove venue or execution provenance, an Ops task MAY perform a provenance-only run after the close-pack baseline is surfaced.
+
+OPS-02 MUST remain bounded:
+
+* no full QA rerun  
+* no invented QA outcome  
+* no canon-drain claim  
+* no merge-provenance claim
+
+OPS-02 SHOULD prefer binding existing evidence. It MAY use a minimal rerun of one governed QA step or one governed artifact family only when that is the smallest truthful way to create the provenance binding.
+
+The OPS-02 execution bundle MUST include, at minimum, commands.txt, repo\_root.txt, repo\_head.txt, python\_version.txt, stdout.log, stderr.log, exit\_codes.txt, and one primary provenance artifact. If the primary provenance artifact is treated as governed closeout evidence, it MUST also have a sibling path-proof transcript.
+
+The primary provenance artifact MUST state the governed artifact path being bound, the in-session command family, the venue or Codespaces context used, the repo root and commit linkage, and the non-claim boundaries for the run.
 
 #### **3.5.2.2 Core determinism and parity tokens**
 
@@ -3729,7 +3874,11 @@ Common RCA checks:
 * If a PR adds or regenerates governed artifacts, reviewers MUST verify that changed artifacts, path-proofs, index rows, mirror rows, and checksum sidecars carry current and internally coherent chronology for the changed bytes. Stale or backdated produced\_at\_utc or mtime\_utc evidence is a blocker until the evidence family is regenerated with canonical tooling.  
 * If a proof generator or evidence harness needs open rails, it MUST require explicit caller-provided open rails and MUST NOT silently force SAFE\_MODE=0, ALLOW\_NETWORK=1, or equivalent. The invocation used for the proof must make the rails posture explicit.  
 * If emitted or summarized bytes depend on specific env fields beyond the standard deterministic pins, the generator or harness MUST pin or otherwise prove those env inputs explicitly. Missing byte-affecting env pins leave the proof nondeterministic and non-accepting.  
-* When a remediation changes only evidence tooling, generators, or governed artifacts, the review MUST state explicitly whether any public contract, route family, or A7 scope changed. If none changed, say so plainly.
+* When a remediation changes only evidence tooling, generators, or governed artifacts, the review MUST state explicitly whether any public contract, route family, or A7 scope changed. If none changed, say so plainly.  
+* If a remediation is scoped as evidence-family closeout and the review shows that the underlying runtime, route, or transport slice was already correct, the review MUST say so explicitly and MUST NOT widen the remediation claim to reopened runtime, route, or writer work unless a real defect is shown.  
+* The review MUST name the preserved slice and the exact evidence-family gap that remained open.  
+* Same-change evidence-family closure is family-complete, not primary-family-only. If the remediation or canonical generator changes supplemental, legacy, or compatibility outputs that are still produced by the same governed flow, their companion path-proofs, mirror rows, and checksum or index companions MUST also be current in that same run.  
+* A remediation MUST NOT be recommended as complete on the basis of a rerun claim while any changed still-produced governed companion remains stale. Subset freshness is insufficient; every changed governed output family that still participates in the slice must close as one coherent same-change whole.
 
 ### **Requirement Satisfaction Crosswalk (REQUIRED for remediation sequences)**
 
@@ -3753,18 +3902,15 @@ For remediation sequences, each requirement row SHOULD also record:
 
 ### **PF09 Impact & Status Posture (include when the PR review is used to support PF09 closeout)**
 
-* PF09 task ID: record the exact task ID supported by the review.
-
-* PF09 subtask ID(s): record the exact subtask IDs supported by the review.
-
-* Current PF09 status: quote the current task and subtask status lines from PF09.
-
-* Status recommendation: state the exact status move supported by the reviewed evidence, or state No status change supported.
-
-* Why this status posture is supported: tie the recommendation to the approved plan, the final remediated evidence, and the blocker or blockers that were resolved or remain open.
-
-* Evidence pointer(s): point to the governing plan and the final review evidence.
-
+* PF09 task ID: record the exact task ID supported by the review.  
+* PF09 subtask ID(s): record the exact subtask IDs supported by the review.  
+* Current PF09 status: quote the current task and subtask status lines from PF09.  
+* Status recommendation: state the exact status move supported by the reviewed evidence, or state No status change supported.  
+* Drain state: state exactly one of Already drained into PF-Canon | Supportable from repo evidence only | Unknown from current review.  
+* If the review supports a PF09 status move but the current PF09 row still shows the older state, quote that older state separately and keep it distinct from the recommendation.  
+* Review, retrospective, and implementation reports MUST NOT phrase a supportable status move as though the canon row has already been updated.  
+* Why this status posture is supported: tie the recommendation to the approved plan, the final remediated evidence, and the blocker or blockers that were resolved or remain open.  
+* Evidence pointer(s): point to the governing plan and the final review evidence.  
 * PF proof excerpt(s) when PF09 is relied on: quote the exact PF09 task and subtask status lines used for the recommendation.
 
 ### **Doc Deltas (PF-Canon only; ALWAYS INCLUDED)**
@@ -4148,7 +4294,10 @@ For each gap, record:
 
   ### **Canon Alignment and Documentation Outcomes**
 
-* Canon references used: list only the canon homes that materially informed the closeout analysis.
+* Canon references used: list only the canon homes that materially informed the closeout analysis.  
+* Source posture and inputs used: name the primary source of truth for what happened, state which plans or other artifacts were used only for intended scope or framing, and state explicitly whether PF20, PF23, or any non-PF artifacts were used.  
+* Important limits: state any material limits in the current session or evidence set, especially when merged-PR proof, close-pack proof, or other closure-defining artifacts are missing.  
+* Repo-proven versus formally closed posture: if the retrospective can support completion or status moves from repo evidence but cannot prove formal merge or close, say that distinction plainly rather than blurring it.
 
 * Proposed addenda or live deltas: record any still-live canon deltas, their intended drain homes, and whether they are implementation work, documentation work, or unresolved analysis.
 

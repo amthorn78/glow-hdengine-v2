@@ -1,12 +1,12 @@
 # **0\. Front Matter**
 
 **Title:** PF07-Canon-Glow-Infrastructure  
-**Version:** v1.7.1
+**Version:** v1.7.6
 
 **Status:** Canon  
-**Effective date:** 2026-03-23
+**Effective date:** 2026-04-06
 
-**Last Update Gate:** BN 10.1.4 Drain A23-24
+**Last Update Gate:** BN 10.3.3 Drain A15-19
 
 **Invocation tag:** `INV-f2ac55d77ce9aacc`
 
@@ -1223,14 +1223,11 @@ Whenever governed evidence bytes change, update in the same change-set:
 * Evidence Index hash sentinel path-proof: `docs/evidence/INDEX.sha256.path_proof.txt`  
 * Human Evidence Index page (docs-side): `docs/evidence/INDEX.md`  
 * Human path-proof anchors root (docs-side): `docs/evidence/path_proof/`  
-* Machine mirror (records-only): `artifacts/evidence_index.jsonl`  
-* Machine mirror path-proof: `artifacts/evidence_index.jsonl.path_proof.txt`  
-* Machine mirror hash sentinel (docs-side companion): `artifacts/evidence_index.sha256`  
-* Machine mirror (records-only): `artifacts/evidence_index.jsonl`  
-* Machine mirror path-proof: `artifacts/evidence_index.jsonl.path_proof.txt`  
-* Machine mirror hash sentinel: `artifacts/evidence_index.jsonl.sha256`  
-* Machine mirror hash sentinel path-proof: `artifacts/evidence_index.jsonl.sha256.path_proof.txt`  
-  Docs evidence index snapshot (JSON): `docs/evidence_index_snapshot/index.json`  
+* `Machine mirror (records-only): artifacts/evidence_index.jsonl`  
+* `Machine mirror path-proof: artifacts/evidence_index.jsonl.path_proof.txt`  
+* `Machine mirror hash sentinel: artifacts/evidence_index.jsonl.sha256`  
+* `Machine mirror hash sentinel path-proof: artifacts/evidence_index.jsonl.sha256.path_proof.txt`  
+* Docs evidence index snapshot (JSON): `docs/evidence_index_snapshot/index.json`  
 * Docs evidence index snapshot (JSON): `docs/evidence_index_snapshot/index.json`  
 * Docs evidence index snapshot path-proof: `docs/evidence_index_snapshot/index.json.path_proof.txt`
 
@@ -1419,7 +1416,7 @@ Canonical proof artifacts under `artifacts/proofs/` (plus sibling path-proofs `<
 * `artifacts/proofs/success_writers_errors.txt`
 
 * `artifacts/proofs/reader_route_proof.json`  
-* `artifacts/proofs/encoding_invariance.txt`
+* `artifacts/proofs/success_encoding_invariance.txt`
 
 ### **CLI showcompat artifacts (EPIC025; names-only)**
 
@@ -1461,25 +1458,27 @@ Canonical proof artifacts under `artifacts/proofs/` (plus sibling path-proofs `<
 
 ### CLI installability, help, and parity artifacts (EPIC027; names-only)
 
-* `artifacts/cli/install/entrypoints.txt`
-
-* `artifacts/cli/install/installability_summary.json`
-
-* `artifacts/cli/help/hdctl_help.txt`
-
-* `artifacts/cli/help/showcompat_help.txt`
-
-* `artifacts/cli/help/reject_nonjson.txt`
-
-* `artifacts/cli/ab.json`
-
-* `artifacts/cli/ba.json`
-
+* `artifacts/cli/install/entrypoints.txt`  
+* `artifacts/cli/install/installability_summary.json`  
+* `artifacts/cli/help/hdctl_help.txt`  
+* `artifacts/cli/help/showcompat_help.txt`  
+* `artifacts/cli/help/reject_nonjson.txt`  
+* `artifacts/cli/ab.json`  
+* `artifacts/cli/ba.json`  
 * `artifacts/cli/summary.json`
+
+### CLI serializer-coupling proof artifacts (EPIC028; names-only)
+
+* `artifacts/cli/guards/emitter_symbol_proof.txt`  
+* `artifacts/cli/guards/emitter_symbol_proof.txt.path_proof.txt`  
+* `artifacts/cli/guards/serializer_grep_guard.log`  
+* `artifacts/cli/reader_cli_parity.bytes`
 
 ### Compat identity-hash artifacts (EPIC027; names-only)
 
-* `artifacts/compat/identity_hash.txt`
+* **`artifacts/compat/AB.json`**  
+* **`artifacts/compat/BA.json`**  
+* **`artifacts/compat/identity_hash.txt`**
 
 ### Bridge adapter-selection snapshot artifact (EPIC027; names-only)
 
@@ -1521,6 +1520,12 @@ To prevent naming ambiguity and parallel spellings, governed epic close-pack art
 * `audit/EPIC-<NNN>_MANIFEST.json.path_proof.txt`
 
 where `<NNN>` is a zero-padded 3-digit epic number (example: 022).
+
+**Conditional close-pack QA RCA artifact (names-only).** If the QA RCA and Doc Delta summary is maintained as a separate governed artifact rather than embedded inside the close report, use:
+
+* `audit/EPIC-<NNN>_QA_RCA.md`
+
+When externalized, the epic close report references this artifact by path.
 
 **Close-pack proof completeness (clarification).** When a plan, deliverables report, or closure review asserts the close-pack pair exists, it MUST also explicitly assert the existence of the two `.path_proof.txt` siblings listed above. A close-pack pair without these two path proofs is not a complete close-pack proof.
 
@@ -1575,6 +1580,23 @@ Ops execution evidence (PO-only, IA-guided; names-only) MUST be stored under a l
 When ops execution evidence is captured as part of Live QA execution, it MAY instead live under the epic QA root:
 
 * `audit/qa/<epic-id>/`
+
+Common numbered OPS closeout bundles (names-only). When an epic records discrete OPS closeout runs under the OPS root, paths may include:
+
+* `audit/ops/<epic-id>/ops-01/commands.txt`  
+* `audit/ops/<epic-id>/ops-01/stdout.log`  
+* `audit/ops/<epic-id>/ops-01/stderr.log`  
+* `audit/ops/<epic-id>/ops-01/exit_codes.txt`  
+* `audit/ops/<epic-id>/ops-01/created_files_sha256.txt`  
+* `audit/ops/<epic-id>/ops-02/commands.txt`  
+* `audit/ops/<epic-id>/ops-02/repo_root.txt`  
+* `audit/ops/<epic-id>/ops-02/repo_head.txt`  
+* `audit/ops/<epic-id>/ops-02/python_version.txt`  
+* `audit/ops/<epic-id>/ops-02/stdout.log`  
+* `audit/ops/<epic-id>/ops-02/stderr.log`  
+* `audit/ops/<epic-id>/ops-02/exit_codes.txt`  
+* `audit/ops/<epic-id>/ops-02/codespaces_harness_binding.md`  
+* `audit/ops/<epic-id>/ops-02/codespaces_harness_binding.md.path_proof.txt`
 
 ### Epic QA meta and layout (names-only; updated)
 
@@ -1636,6 +1658,37 @@ When the step-log manifest is indexed as governed evidence, the sibling path-pro
 
 * `audit/qa/hde-epic<NNN>/checks/po-000/qa_helpers.sh`
 
+**Bounded Moon Loop delta capture (EPIC028; names-only).** Some epics may capture bounded remediation under the stable delta directory:
+
+* `audit/qa/hde-epic<NNN>/00_meta/delta/patch.diff`  
+* `audit/qa/hde-epic<NNN>/00_meta/delta/changed_files.txt`
+
+**Preserved context-note artifacts (EPIC028; names-only; step-specific).** When contextual note content is preserved before trigger-file removal, checks may write:
+
+* `audit/qa/hde-epic<NNN>/checks/po-005/context_note_pre_po010_moonloop.txt`  
+* `audit/qa/hde-epic<NNN>/checks/po-006/context_note_pre_po010_moonloop.txt`
+
+EPIC028 discovery and governed-path snapshot artifacts (names-only; step-specific).
+
+D0 — Discovery and evidence bootstrap:
+
+* `audit/qa/hde-epic<NNN>/checks/d0/runtime_context.txt`  
+* `audit/qa/hde-epic<NNN>/checks/d0/cli_health.txt`  
+* `audit/qa/hde-epic<NNN>/checks/d0/services_surfaces.txt`
+
+PO-001 — Internal compatibility canonical, order-neutral, shared governed emission path:
+
+* `audit/qa/hde-epic<NNN>/checks/po-001/ordering_snapshot.txt`  
+* `audit/qa/hde-epic<NNN>/checks/po-001/compat_compute_snapshot.txt`  
+* `audit/qa/hde-epic<NNN>/checks/po-001/emitter_snapshot.txt`
+
+PO-002 — One governed emission path across CLI, Reader, and internal compatibility:
+
+* `audit/qa/hde-epic<NNN>/checks/po-002/reader_v1_emitter_snapshot.txt`  
+* `audit/qa/hde-epic<NNN>/checks/po-002/runtime_public_snapshot.txt`  
+* `audit/qa/hde-epic<NNN>/checks/po-002/emitter_symbol_proof_snapshot.txt`  
+* `audit/qa/hde-epic<NNN>/checks/po-002/serializer_grep_guard_snapshot.txt`
+
 **Per-check primary logs (stable; one per check):**
 
 * `audit/qa/hde-epic<NNN>/checks/<check_id>/primary.log`
@@ -1647,6 +1700,10 @@ When the step-log manifest is indexed as governed evidence, the sibling path-pro
 **Per-check deliverables reports (EPIC026; names-only; step-specific).** Some checks may write:
 
 * `audit/qa/hde-epic<NNN>/checks/<check_id>/deliverables_report.md`
+
+**Per-check repo-supported completion summary artifact (EPIC028; names-only; step-specific).** Some checks may write:
+
+* `audit/qa/hde-epic<NNN>/checks/po-010/final_summary.txt`
 
 **Per-check CLI entrypoint and resolve proof artifacts (EPIC027; names-only; step-specific).** Some checks may write:
 
@@ -1678,11 +1735,31 @@ When the step-log manifest is indexed as governed evidence, the sibling path-pro
 
 * `audit/qa/hde-epic<NNN>/checks/<check_id>/writer_index_rows.txt`
 
+**Per-check Reader proof-surface designation artifacts (EPIC028; names-only; step-specific).**
+
+PO-005 — Governed Reader proof-surface designation:
+
+* `audit/qa/hde-epic<NNN>/checks/po-005/catalog_snapshot.txt`  
+* `audit/qa/hde-epic<NNN>/checks/po-005/http_reader_snapshot.txt`  
+* `audit/qa/hde-epic<NNN>/checks/po-005/blocked_note.txt`
+
+**Per-check Reader transport resolution artifacts (EPIC028; names-only; step-specific).** Some checks may write:
+
+* `audit/qa/hde-epic<NNN>/checks/po-006/po_005_lookup.txt`  
+* `audit/qa/hde-epic<NNN>/checks/po-006/blocked_note.txt`
+
 **Per-check runtime proof inventory artifacts (EPIC027; names-only; step-specific).** Some checks may write:
 
 * `audit/qa/hde-epic<NNN>/checks/<check_id>/runtime_log_presence.txt`
 
 * `audit/qa/hde-epic<NNN>/checks/<check_id>/runtime_surface_inventory.txt`
+
+**Per-check acceptance-binding snapshot artifacts (EPIC028; names-only; step-specific).** Some checks may write:
+
+* `audit/qa/hde-epic<NNN>/checks/po-007/acceptance_map_snapshot.json`  
+* `audit/qa/hde-epic<NNN>/checks/po-007/token_matrix_snapshot.txt`  
+* `audit/qa/hde-epic<NNN>/checks/po-007/acceptance_map_viability_snapshot.txt`  
+* `audit/qa/hde-epic<NNN>/checks/po-007/mirror_binding_snapshot.jsonl`
 
 **Per-check step artifacts (EPIC025; names-only; step-specific).** In addition to `primary.log`, checks MAY write step-specific artifacts under `audit/qa/hde-epic<NNN>/checks/<check_id>/`. Examples observed in EPIC025 include:
 
@@ -1739,19 +1816,17 @@ When the step-log manifest is indexed as governed evidence, the sibling path-pro
 
 * `audit/qa/hde-epic<NNN>/checks/<check_id>/token_inventory.txt`
 
-**Per-check canonical JSON gate and evidence-index update artifacts (EPIC026; names-only; step-specific).** Some checks may write:
+**Per-check canonical JSON gate and evidence-index update artifacts (EPIC026 and EPIC028; names-only; step-specific).** Some checks may write:
 
-* `audit/qa/hde-epic<NNN>/checks/<check_id>/canonical_json_gate_stdout.log`
-
-* `audit/qa/hde-epic<NNN>/checks/<check_id>/canonical_json_gate_stderr.log`
-
-* `audit/qa/hde-epic<NNN>/checks/<check_id>/canonical_json_gate_rc.txt`
-
-* `audit/qa/hde-epic<NNN>/checks/<check_id>/update_evidence_index_stdout.log`
-
-* `audit/qa/hde-epic<NNN>/checks/<check_id>/update_evidence_index_stderr.log`
-
-* `audit/qa/hde-epic<NNN>/checks/<check_id>/update_evidence_index_rc.txt`
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/canonical_json_gate_stdout.log`  
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/canonical_json_gate_stderr.log`  
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/canonical_json_gate_rc.txt`  
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/run_canonical_json_gate.stdout.log`  
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/run_canonical_json_gate.stderr.log`  
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/run_canonical_json_gate.rc.txt`  
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/update_evidence_index.stdout.log`  
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/update_evidence_index.stderr.log`  
+* `audit/qa/hde-epic<NNN>/checks/<check_id>/update_evidence_index.rc.txt`
 
 **Per-check evidence-discipline deliverables (EPIC027; names-only; step-specific).** Some checks may write:
 
@@ -1770,6 +1845,22 @@ When the step-log manifest is indexed as governed evidence, the sibling path-pro
 * `audit/qa/hde-epic<NNN>/checks/<check_id>/check_mirror_schema.txt`
 
 * `audit/qa/hde-epic<NNN>/checks/<check_id>/qa_step_manifest_lookup.txt`
+
+**Per-check canonical-JSON family coherence artifacts (EPIC028; names-only; step-specific).** Some checks may write:
+
+* `audit/qa/hde-epic<NNN>/checks/po-008/json_gate_family_before.txt`  
+* `audit/qa/hde-epic<NNN>/checks/po-008/canonical_json_family_before.txt`  
+* `audit/qa/hde-epic<NNN>/checks/po-008/json_gate_family_after.txt`  
+* `audit/qa/hde-epic<NNN>/checks/po-008/canonical_json_family_after.txt`
+
+**Per-check manifest refresh coherence artifacts (EPIC028; names-only; step-specific).** Some checks may write:
+
+* `audit/qa/hde-epic<NNN>/checks/po-009/index_snapshot.json`  
+* `audit/qa/hde-epic<NNN>/checks/po-009/index_sha_snapshot.txt`  
+* `audit/qa/hde-epic<NNN>/checks/po-009/mirror_path_proof_snapshot.txt`  
+* `audit/qa/hde-epic<NNN>/checks/po-009/manifest_updater_lookup.txt`  
+* `audit/qa/hde-epic<NNN>/checks/po-009/manifest_human_index_lookup.txt`  
+* `audit/qa/hde-epic<NNN>/checks/po-009/manifest_mirror_lookup.txt`
 
 **Per-check close-pack execution and binding artifacts (EPIC027; names-only; step-specific).** Some checks may write:
 
@@ -1800,6 +1891,22 @@ When `USER_A_ID` and `USER_B_ID` are provided, some checks may also write:
 * `audit/qa/hde-epic<NNN>/checks/<check_id>/cli_emitter_proof.txt`
 
 * `audit/qa/hde-epic<NNN>/checks/<check_id>/showcompat_parity.txt`
+
+Per-check EPIC028 CLI and Reader-envelope snapshot artifacts (names-only; step-specific).
+
+PO-003 — CLI compatibility surface presence and deterministic proof-surface verification:
+
+* `audit/qa/hde-epic<NNN>/checks/po-003/hdctl_help.txt`  
+* `audit/qa/hde-epic<NNN>/checks/po-003/hdctl_help.stderr.txt`  
+* `audit/qa/hde-epic<NNN>/checks/po-003/hdctl_help.rc.txt`  
+* `audit/qa/hde-epic<NNN>/checks/po-003/showcompat_presence.txt`  
+* `audit/qa/hde-epic<NNN>/checks/po-003/emitter_symbol_proof_snapshot.txt`  
+* `audit/qa/hde-epic<NNN>/checks/po-003/serializer_grep_guard_snapshot.txt`  
+* `audit/qa/hde-epic<NNN>/checks/po-003/reader_cli_parity_probe.txt`
+
+PO-004 — Public six-part Reader success envelope remains numeric-free:
+
+* `audit/qa/hde-epic<NNN>/checks/po-004/success_encoding_invariance_snapshot.txt`
 
 **Per-check CLI rails proof artifacts (EPIC026; names-only; step-specific).** Some checks may write:
 

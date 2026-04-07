@@ -1,12 +1,12 @@
 # **0\. Front Matter**
 
 **Title:** PF02-Canon-HDE-Architecture  
- **Version:** v1.8.3
+ **Version:** v1.8.9
 
  **Status:** Canon  
-**Effective date:** 2026-03-22
+**Effective date:** 2026-04-06
 
- **Last Update Gate:** BN 10.1.5 A23-24
+ **Last Update Gate:** BN 10.3.3 A20-24
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -298,9 +298,7 @@ Architecture remains contract-free.
 
 ### **Repo map (normative)**
 
-engine/ \# math only  
- adapter/ \# single HTTP home  
- presenter/ \# single emitter entrypoint for all public bytes
+Repo map (normative)
 
 **Sampler and Engine Core modules (names-only)**
 
@@ -330,13 +328,13 @@ engine/ \# math only
 
 **Routing (titles-only).**
 
-* Detailed sampler/core mechanics, including evidence generators and determinism pipelines → **HDE-Mechanics Guide**.
-
-* Evidence schemas, artifact keys, and indices/mirror discipline for sampler/core families → **HDE-Schemas & Artifacts**.
-
-* QA tokens and epic D-goals for sampler/core behavior and evidence → **Glow QA Guide** and **HDE-Phased Epics**.
-
-* CLI and HTTP harness bytes for sampler/core behavior → **HDE-CLI-API-Vendor-Ref**.
+* Detailed sampler/core mechanics, including evidence generators and determinism pipelines → **HDE-Mechanics Guide**.  
+* Evidence schemas, artifact keys, and indices/mirror discipline for sampler/core families → **HDE-Schemas & Artifacts**.  
+* QA tokens and epic D-goals for sampler/core behavior and evidence → **Glow QA Guide** and **HDE-Phased Epics**.  
+* CLI and HTTP harness bytes for sampler/core behavior → **HDE-CLI-API-Vendor-Ref**.  
+* **Presenter component home (names-only).** The presenter component is single-home by role and byte-authoritative emitter symbol, not by one literal repository path.  
+* **Namespace split without serializer split.** Wrapper envelope builders MAY live under top-level `presenter/`, while the byte-authoritative emitter entrypoint MAY live under `engine/presenter/`, provided all public-byte emission delegates to the same governed emitter path.  
+* **No second serializer home.** Dual presenter namespaces do not create a second presenter component, a second serializer home, or an alternate public-byte path.
 
 ### **Deny-list (normative)**
 
@@ -751,23 +749,18 @@ See §2.4 for the compat request flow, including how BodyGraph, Engine Core, and
 
 **Reader route posture (route-only).**
 
-* **Canonical route:** `GET /reader` is the canonical Reader route for the v1 dev/proof surface.
-
-* **Version selection:** Reader v1 is selected via query parameter `v=1` on the Reader route; the route path does not change for v1 selection.
-
-* **Optional `/api` mount alias:** when the Reader blueprint is mounted under an `/api` prefix in a given runtime configuration, `/api/reader` is an alias of the same Reader surface (not a distinct contract or separate proof surface).
-
-* **No invented reader-proof path:** there is no `/api/reader-proof/v1` route. Treat references to that path as drift and correct them to the canonical Reader route (`/reader`, or `/api/reader` only when that is the configured mount).
-
-* **Proof-surface selection:** any proof that depends on a Reader success route must reference the actual reachable Reader route for the target environment. Do not invent alternate proof routes. When an Endpoint Catalog is used, select the proof route from catalog entries that correspond to real mounted routes.
-
-* **Scope note:** this posture records canonical Reader surface routing for planning and QA and does not introduce new routes or restate public contract bytes.
+* **Canonical route:** `GET /reader` is the canonical Reader route for the v1 Reader success surface.  
+* **Governed proof-surface role:** `/reader` is the governed Reader success-proof surface when it is the selected cataloged Reader success route for the target environment. Co-location with dev or internal routes in the same adapter module does not make `/reader` a dev-harness-only route class.  
+* **Version selection:** Reader v1 is selected via query parameter `v=1` on the Reader route; the route path does not change for v1 selection.  
+* **Optional `/api` mount alias:** when the Reader blueprint is mounted under an `/api` prefix in a given runtime configuration, `/api/reader` is an alias of the same Reader surface (not a distinct contract or separate proof surface).  
+* **No invented reader-proof path:** there is no `/api/reader-proof/v1` route. Treat references to that path as drift and correct them to the canonical Reader route (`/reader`, or `/api/reader` only when that is the configured mount).  
+* **Proof-surface selection:** any proof that depends on a Reader success route must reference the actual reachable Reader route for the target environment. Do not invent alternate proof routes or second designation carriers. When an Endpoint Catalog is used, select the proof route from catalog entries that correspond to real mounted routes; if that inventory is missing an explicit governed-surface designation, treat the gap as documentation drift to correct at the inventory home rather than inventing a second mechanism in Architecture or QA.  
+* **Scope note:** this posture records canonical Reader surface routing for planning and QA, preserves the existing Reader success surface, and does not introduce new routes, new flags, or writer-side surfaces.
 
 **A7 proof surface (route-only; titles-only).**
 
 * **Cataloged route only.**  
-  Reader success proofs run only on a cataloged JSON success route named in the Endpoint Catalog (HDE-CLI-API-Vendor-Ref). The Catalog’s single home is `docs/ENDPOINTS_CATALOG.json` (+ `.sha256` sidecar). The `.sha256` sidecar must reference `docs/ENDPOINTS_CATALOG.json` for repo-root verification. Proofs target a route listed there; `/internal/version` remains excluded. In EPIC025, the selected proof route is `/reader` (dev-harness internal), env gated to dev (`APP_ENV=dev`), and marked A7-eligible. Env-gate proof is mandatory (headers-only).
-
+* Reader success proofs run only on a cataloged JSON success route named in the Endpoint Catalog (HDE-CLI-API-Vendor-Ref). The Catalog’s single home is `docs/ENDPOINTS_CATALOG.json` (+ `.sha256` sidecar). The `.sha256` sidecar must reference `docs/ENDPOINTS_CATALOG.json` for repo-root verification. Proofs target a route listed there; `/internal/version` remains excluded. When the selected cataloged proof route is `/reader`, `/reader` is the governed Reader success-proof surface for that scope, env gated to dev (`APP_ENV=dev`), and A7-eligible. This does not classify `/reader` as a dev-only conjunction or preview route. Env-gate proof is mandatory (headers-only).  
 * **Catalog posture.**  
    The Endpoint Catalog is internal-only and env-gated; non-prod entries must be unreachable in prod. Capture a headers-only env-gate proof.
 
@@ -1046,9 +1039,9 @@ HTTP QA against “Reader” or dev harness surfaces is considered misconfigured
   * checks-only evidence layout under a single epic-scoped QA root, with no per-run nesting, no run-id directories, and no operator-set “fresh directory” posture for reruns,  
   * any required QA step-logs manifest and sibling path proof at the epic-scoped QA root (`audit/qa/<epic-id>/qa_step_logs_manifest.json` and `audit/qa/<epic-id>/qa_step_logs_manifest.json.path_proof.txt`), with each manifest entry mapping a `check_id` to its `checks/<check_id>/primary.log` path and with the manifest itself expected to be discoverable through the governed updater and the human and machine evidence ledgers when canon requires it,  
   * Nothing else is auto-required unless canon explicitly pins a governed evidence family or path. Any additional required artifact MUST be acceptance-decisive and MUST be canonized (PF10 or PF-Canon) as a governed evidence family or path.  
-  * **Step-log header normalization (KISS).** Every `primary.log` MUST begin with a JSON header object that includes: `check_id`, `status`, `command`, `captured_env`, `pf_refs`, `intended_tokens`, `claimed_tokens`. The three list fields MUST be present; empty lists (`[]`) are allowed and SHOULD be used when no refs/tokens are in play. If any required list field is missing, treat it as an evidence-format gap; a reviewer-of-record MAY mechanically normalize the header by inserting missing empty lists and re-serializing the header as canonical JSON (no step rerun required). Token claims are never inferred: if `claimed_tokens` is missing or empty, token claims are treated as none. Status vocabulary remains gating (PASS, FAIL\_BEHAVIOR, FAIL\_TOOLING, TOOLING\_BLOCKED, PARKED).  
+  * **Step-log header normalization (KISS).** Every `primary.log` MUST begin with a JSON header object that includes: `check_id`, `status`, `command`, `command_provenance`, `captured_env`, `evidence_artifacts`, `pf_refs`, `intended_tokens`, `claimed_tokens`. The `command` field MUST record the actual executed command sequence, not a paraphrase. If multiple commands were executed, `command` MUST be an explicit pipeline or an explicit `;`\-joined sequence that preserves the execution order. The four list fields MUST be present; empty lists (`[]`) are allowed and SHOULD be used when no refs/tokens are in play. `evidence_artifacts` MUST include the check’s own `primary.log` path. If any required list field is missing, treat it as an evidence-format gap; a reviewer-of-record MAY mechanically normalize the header by inserting missing empty lists and re-serializing the header as canonical JSON (no step rerun required). Token claims are never inferred: if `claimed_tokens` is missing or empty, token claims are treated as none. Status vocabulary remains gating (PASS, FAIL\_BEHAVIOR, FAIL\_TOOLING, TOOLING\_BLOCKED, PARKED).  
   * **Step-log header writer exports (per-check).** If a Live QA plan uses a step-log header writer that reads per-check metadata from environment variables, the plan MUST export the complete required set immediately before header generation for each check and MUST NOT rely on prior step state.  
-    * Minimum per-check exports (names are governed by the writer contract): `CHECK_ID`, `CHECK_NAME`, `PASS_FAIL`, `COMMANDS_JSON`, `ARTIFACTS_JSON`, `PF_REFS_JSON`.  
+    * Minimum per-check exports (names are governed by the writer contract): `CHECK_ID`, `CHECK_NAME`, `PASS_FAIL`, `COMMANDS_JSON`, `COMMAND_PROVENANCE`, `ARTIFACTS_JSON`, `PF_REFS_JSON`.  
     * Live QA handling (evidence-capture only): if a check ran successfully but `primary.log` is missing a required JSON header or contains incorrect check metadata due to missing exports, a reviewer-of-record MAY apply a minimal Moon Loop deviation to (1) export the required header vars, and (2) regenerate the JSON header and reassemble `primary.log` by prepending the corrected header while preserving the existing body verbatim.  
     * Anti-drift: plans MUST be internally consistent. Do not mix patterns where one check exports header variables and another does not while still calling the same header writer.  
   * **Prefer validating canon evidence over generating QA artifacts.** By default, if PF10/PF-canon already establishes an artifact family/path, the Live QA plan validates it (exists \+ minimal posture checks) and records PASS/FAIL in the check’s `primary.log`. QA creates new artifacts only when the check itself is about QA-run outputs (primary logs, step-logs manifest) or when canon explicitly requires a generated QA artifact. If a plan requires an EPIC-scoped derived artifact path to satisfy a predicate, the artifact MUST be mechanically derived from the canonical surface and MUST be treated as evidence-only (not a new governed evidence family/path) unless and until canon explicitly pins it.  
@@ -1446,8 +1439,15 @@ Concrete artifact names/paths, bundle usage for A7 families, and tokenisation ar
 * **Same-run runtime-surface inventory posture.** When closeout or QA synthesis proves changed runtime behaviour, it does so by inventorying already-declared runtime surface families from the same run rather than by creating a proof-only surface. Architecture-level runtime synthesis may therefore bind the existing CLI surface, the dev conjunction route family, and the cataloged Reader success route when those are the changed surfaces under review.
 
 * **No new public-surface inference from closeout inventory.** Catalog-surface and runtime-surface inventories are confirmatory only. They may show that no unexpected public success surface has appeared beyond the declared PF02 runtime surface set, but they do not create, widen, or rename that set.  
+* **Authoritative plus supplemental gate-family posture (names-only).** When one offline canonical-gate flow still produces both the authoritative `audit/gates/json_gate/canonical/` family and a supplemental legacy `audit/gates/canonical_json/` family, architecture treats both families as one same-change evidence event inside the offline plane.  
+* **Coherence across still-produced families.** If either family changes, current companion path proofs and ledger refresh apply to every changed family that still participates in that run. The supplemental legacy family remains continuity evidence only; it does not create a second truth home, a second runtime surface, or a second Presenter path.  
 * **Epic QA step-manifest surface (names-only).** Within this same offline evidence plane, the current-state epic QA ledger uses a `qa_step_logs_manifest.json` manifest with a sibling `qa_step_logs_manifest.json.path_proof.txt`, together with check-scoped `primary.log` files under the epic QA `checks/` subtree.  
 * **EPIC027 acceptance-ledger close-pack surfaces (names-only).** The EPIC027 close-pack binds existing runtime proof families through governed offline artifacts at `docs/acceptance_map_epic027.json`, `audit/qa/hde-epic027/token_evidence_matrix.md`, `audit/qa/hde-epic027/acceptance_map_viability.log`, `audit/EPIC-027_close_report.md`, and `audit/EPIC-027_MANIFEST.json`. These are offline ledger surfaces only and do not create new runtime routes, new Presenter paths, or new public transport surfaces.  
+* **EPIC028 Reader acceptance-ledger surfaces (names-only).** The EPIC028 Reader closeout binds existing Reader runtime proof families through governed offline artifacts at `docs/acceptance_map_epic028.json`, `audit/qa/hde-epic028/token_evidence_matrix.md`, and `audit/qa/hde-epic028/acceptance_map_viability.log`. These are offline ledger surfaces only; they preserve the existing Reader route, Endpoint Catalog and env-gate, and Reader A7 proof family without creating new runtime routes, new Presenter paths, or writer-side surfaces.  
+* EPIC028 single-home acceptance binding posture (names-only). The current-epic Reader acceptance binding remains single-home at docs/acceptance\_map\_epic028.json, audit/qa/hde-epic028/token\_evidence\_matrix.md, and audit/qa/hde-epic028/acceptance\_map\_viability.log. Matching Machine Evidence Index rows for all three belong to the same offline discoverability posture, and Architecture does not recognize an alternate acceptance-map home for EPIC028.  
+* **EPIC028 close-pack baseline surfaces (names-only).** The surfaced EPIC028 close-pack baseline consists of `audit/EPIC-028_close_report.md`, `audit/EPIC-028_MANIFEST.json`, `audit/EPIC-028_close_report.md.path_proof.txt`, and `audit/EPIC-028_MANIFEST.json.path_proof.txt`.  
+* **EPIC028 close-pack binding posture (names-only).** These packaging artifacts bind to the already-proven EPIC028 evidence family, including `docs/acceptance_map_epic028.json`, `audit/qa/hde-epic028/token_evidence_matrix.md`, `audit/qa/hde-epic028/acceptance_map_viability.log`, `audit/qa/hde-epic028/qa_step_logs_manifest.json`, `audit/qa/hde-epic028/qa_step_logs_manifest.json.path_proof.txt`, and `audit/qa/hde-epic028/checks/po-010/final_summary.txt`, rather than inventing a replacement proof surface.  
+* **Packaging-only posture.** These close-pack baseline surfaces remain offline packaging artifacts only. They do not reopen implementation scope, create new runtime routes, or replace the existing Reader success, acceptance-binding, or epic QA manifest surfaces.  
 * **Ledger discoverability posture.** Close-pack and evidence-discipline jobs consume this manifest family as governed offline evidence only when it is discoverable through the Human Evidence Index and the Machine Evidence Index. PF02 records that names-and-paths linkage only; updater logic, record fields, and token claims remain out of scope here
 
 **Behaviour source.**

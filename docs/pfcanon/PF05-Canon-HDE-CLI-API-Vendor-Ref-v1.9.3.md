@@ -4,13 +4,13 @@
 
 **Title:** PF05-Canon-HDE-CLI-API-Vendor-Ref
 
-**Version:** v1.8.8
+**Version:** v1.9.3
 
 **Status:** Canon
 
-**Effective date:** 2026-03-23
+**Effective date:** 2026-04-06
 
-**Last Update Gate:** BN 10.1.4 drain A22-24
+**Last Update Gate:** BN 10.3.3 drain A20-24
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -1825,10 +1825,12 @@ Legacy lowercase strings such as `"invalid_json"`, `"invalid_prefs"`, and `"miss
 
 ### **Evidence (records-only; titles-only; indexed via PF12)**
 
-* **CLI parity (public):** `artifacts/cli/parity/reader_cli_parity.bytes`, `artifacts/cli/parity/abba_identity.bytes`, `artifacts/cli/parity/tworun_identity.sha256`.  
+* **Proof posture (compat route).** Governed parity proof for this dev-only compat surface MUST exercise the in-repo app-client surface on `POST /api/compat/v1` under closed rails (`SAFE_MODE=1`, `ALLOW_NETWORK=0`). Vendor-backed `hdctl showcompat --source vendor` is not the governing proof surface for this route.  
+* **Compat-route proof bytes:** `artifacts/compat/AB.json`, `artifacts/compat/BA.json`, `artifacts/compat/identity_hash.txt`.  
+* **CLI parity (public):** `artifacts/cli/reader_cli_parity.bytes`.  
 * **Harness headers:** `artifacts/cli/transport/post_nonconditional_proof.log`, `artifacts/cli/transport/no_secrets_error_headers.log`.  
-* **Serializer guards:** `artifacts/cli/guards/serializer_grep_guard.log`, `artifacts/cli/guards/emitter_symbol.txt`.  
-* **Compat conjunction identity capture:** `artifacts/compat/identity_hash.txt`; contract proof MUST show that `identity_hash.txt` matches the canonical AB bytes from `artifacts/compat/AB.json`.  
+* **Serializer guards:** `artifacts/cli/guards/serializer_grep_guard.log`, `artifacts/cli/guards/emitter_symbol_proof.txt`.  
+* **Guard regression and index coverage:** `tests/cli/test_serializer_guards.py`, `tests/ops/test_evidence_index.py`.  
 * **(If sidecar enabled)** internal-contract parity bytes for compat v1 (file path per Doc-Delta).  
    **Indexing discipline:** update **PF12** human `docs/evidence/INDEX.json`, **hash sentinel**, and machine `artifacts/evidence_index.jsonl` **in the same PR**.
 
@@ -1878,13 +1880,16 @@ Legacy lowercase strings such as `"invalid_json"`, `"invalid_prefs"`, and `"miss
 
 ### **Catalog entries (normative; minimal)**
 
-* **Reader success route (dev harness):** `/reader`  
-  * path: `/reader`  
-  * allowed\_methods: \[`GET`, `HEAD`\]  
+* **Reader success route (governed proof surface; dev-harness class):** `/reader`  
+  * ath: `/reader`  
+  * allowed\_methods: ‘GET‘,‘HEAD‘\`GET\`, \`HEAD\`‘GET‘,‘HEAD‘  
   * internal: true  
   * class: `dev_harness`  
   * env\_gate: `{"APP_ENV":"dev"}`  
   * a7\_eligible: true  
+  * For the current closure scope, this route is the governed Reader success-proof surface.  
+  * The governed machine-readable inventory for this surface remains `docs/ENDPOINTS_CATALOG.json`; do not create a second inventory or designation carrier.  
+  * This designation does not authorize a new route, a new flag, a new proof-surface carrier, or any writer-surface widening.  
 * **Dev sampler conjunction (dev-only):** `/dev/sampler/conjunction`  
   * path: `/dev/sampler/conjunction`  
   * allowed\_methods: \[`GET`\]  
@@ -3065,6 +3070,8 @@ These codes are exhaustive for the CLI public surface in the sense that success 
   ## 9.5 Evidence posture (titles-only; PF12 single home)
 
 * **Maintain proofs.** Keep evidence current for: parity (Reader↔CLI, AB↔BA, two-run), idempotence recompute, transport (ETag/304/HEAD, no-store on writers/errors, Vary, encoding-invariance), and vendor rails (refusal closed; conformance open).  
+* **Same-change evidence-family completeness (MUST).** When a PF05-scoped proof or gate run changes any governed artifact in an evidence family, refreshing only a subset of related companions is non-conforming. All changed primary artifacts, sibling `*.path_proof.txt` transcripts, and affected human-index and machine-mirror companion files for that family MUST be regenerated to current same-change chronology in the same run or change.  
+* **Canonical JSON gate dual-family closeout (MUST).** If both `audit/gates/json_gate/canonical/` and `audit/gates/canonical_json/` are still produced by the same generation flow, closeout MUST refresh both families and their sibling `*.path_proof.txt` transcripts in the same run. Refreshing only one family is insufficient, and closure claims MUST use whole-family same-change validation rather than subset freshness.  
 * **Index (human).** **`docs/evidence/INDEX.json`** (PF12 §8.6) lists artifacts and scripts (**titles/paths only; no payload bytes**). A **hash sentinel** **`docs/evidence/INDEX.sha256`** gates merges and is **not mirrored**.  
 * **Machine mirror (single home).** The records-only JSONL mirror lives at **`artifacts/evidence_index.jsonl`** (PF12 §8.3). Human↔machine entries **must be 1:1**; a non one-to-one join is a failure. Each mirror record includes `sha256`, `size_bytes`, `produced_at_utc`, `discovered_physical_path`, and a `proof_anchor` (transcript reference plus on-disk stat). The mirror is **ASCII field-ordered** and **sort-before-write** with **unknown-key rejection**; a **single** mirror file is permitted.  
 * **Repo docs tokens (PR checklist).** Include `EVIDENCE_INDEX_UPDATED_OK`, **`EVIDENCE_INDEX_HASH_OK`**, `EVIDENCE_INDEX_MIRROR_OK`, and `EVIDENCE_PATHS_VALIDATED_OK`.  
@@ -3428,6 +3435,24 @@ Keep this index synchronized with repo changes. When any golden or artifact path
 
 * `audit/qa/hde-epic027/checks/gate_orientation_demo_check/primary.log`
 
+#### **D.0d EPIC028 acceptance ledgers**
+
+* `docs/acceptance_map_epic028.json`  
+* `audit/qa/hde-epic028/token_evidence_matrix.md`  
+* `audit/qa/hde-epic028/acceptance_map_viability.log`
+
+#### **D.0e EPIC028 formal close-pack baseline**
+
+* `audit/EPIC-028_close_report.md`  
+* `audit/EPIC-028_MANIFEST.json`  
+* `audit/EPIC-028_close_report.md.path_proof.txt`  
+* `audit/EPIC-028_MANIFEST.json.path_proof.txt`
+
+#### **D.0f EPIC028 Codespaces venue provenance**
+
+* `audit/ops/hde-epic028/ops-02/codespaces_harness_binding.md`  
+* `audit/ops/hde-epic028/ops-02/codespaces_harness_binding.md.path_proof.txt`
+
 ### **D.1 Parity (Reader↔CLI, AB↔BA, two-run)**
 
 * Goldens: `goldens/reader/v1/g02_ab_ba_parity_A.jsonl`, `goldens/reader/v1/g02_ab_ba_parity_B.jsonl`  
@@ -3453,21 +3478,17 @@ Keep this index synchronized with repo changes. When any golden or artifact path
 
 **A7 proof snapshots**
 
-* `artifacts/reader/endpoints_snapshot.json` — snapshot of endpoints and env gates used for the proof run.
-
-* `artifacts/proofs/endpoints_env_gate_proof.log` — proof log showing env-gated endpoints refuse production access (no-store posture).
-
-* `artifacts/proofs/a7_transport_proof.log` — transport invariant proof summary for A7 routes.
-
-* `artifacts/proofs/success_get.txt` — raw GET success snapshot used by A7 transport proofs.
-
-* `artifacts/proofs/success_head.txt` — raw HEAD success snapshot used by A7 transport parity proofs.
-
-* `artifacts/proofs/success_304.txt` — raw 304 snapshot used by conditional delivery proofs.
-
-* `artifacts/proofs/success_writers_errors.txt` — raw writer/error snapshot used by no-store and no-ETag posture proofs.
-
-* `artifacts/proofs/encoding_invariance.txt` — encoding invariance proof snapshot.
+* `artifacts/reader/endpoints_snapshot.json` — snapshot of endpoints and env gates used for the proof run.  
+* `artifacts/proofs/endpoints_env_gate_proof.log` — proof log showing env-gated endpoints refuse production access (no-store posture).  
+* `artifacts/proofs/a7_transport_proof.log` — transport invariant proof summary for A7 routes.  
+* `artifacts/proofs/success_get.txt` — raw GET success snapshot used by A7 transport proofs.  
+* `artifacts/proofs/success_head.txt` — raw HEAD success snapshot used by A7 transport parity proofs.  
+* `artifacts/proofs/success_304.txt` — raw 304 snapshot used by conditional delivery proofs.  
+* `artifacts/proofs/success_writers_errors.txt` — raw writer/error snapshot used by no-store and no-ETag posture proofs.  
+* `artifacts/proofs/success_encoding_invariance.txt` — encoding invariance proof snapshot.  
+* `artifacts/proofs/success_encoding_invariance.txt.path_proof.txt` — governed path-proof for the encoding invariance proof snapshot.  
+* `tests/http/test_endpoint_catalog.py` *(Reader Endpoint Catalog coverage proof anchor)*  
+* `tests/http/test_reader_a7_transport.py` *(Reader A7 transport proof anchor)*
 
 **Proof emission gating**
 
@@ -3487,14 +3508,27 @@ Keep this index synchronized with repo changes. When any golden or artifact path
 
 ### **D.6 Single-emitter guard (serializer path)**
 
-* Grep-guard: `ci/grep-guards/no_json_dumps_public.regex`  
-* Allowlist for canonical emitter: `ci/grep-guards/canonical_emitter.allowlist`  
-* Shared presenter/emitter symbol proof: `audit/gates/canonical_emitter/emitter_symbol_proof.txt`
+* `Grep-guard: ci/grep-guards/no_json_dumps_public.regex`  
+* `Allowlist for canonical emitter: ci/grep-guards/canonical_emitter.allowlist`  
+* `Governed serializer grep artifact: artifacts/cli/guards/serializer_grep_guard.log`  
+* `Governed emitter symbol proof: artifacts/cli/guards/emitter_symbol_proof.txt`  
+* `Guard regression coverage: tests/cli/test_serializer_guards.py`  
+* `Evidence-index target coverage: tests/ops/test_evidence_index.py`
 
 ### **D.7 Canonical JSON checks (public bytes)**
 
-* Policy check: `audit/gates/canonical_json/json_canonical_check.log`  
-* Canonical re-serialization compare: `audit/gates/canonical_json/json_canon_compare.log`
+* `audit/gates/canonical_json/canonical_json.gate.json` *(supplemental canonical JSON gate summary)*  
+* `audit/gates/canonical_json/canonical_json.gate.json.path_proof.txt` *(governed path-proof for the supplemental canonical JSON gate summary)*  
+* `audit/gates/canonical_json/json_canonical_check.log`  
+* `audit/gates/canonical_json/json_canonical_check.log.path_proof.txt`  
+* `audit/gates/canonical_json/json_canon_compare.log`  
+* `audit/gates/canonical_json/json_canon_compare.log.path_proof.txt`  
+* `audit/gates/json_gate/canonical/json_gate_check_log.ndjson` *(authoritative canonical JSON gate check log)*  
+* `audit/gates/json_gate/canonical/json_gate_check_log.ndjson.path_proof.txt` *(governed path-proof for the authoritative canonical JSON gate check log)*  
+* `audit/gates/json_gate/canonical/json_gate_compare_log.ndjson` *(authoritative canonical JSON gate compare log)*  
+* `audit/gates/json_gate/canonical/json_gate_compare_log.ndjson.path_proof.txt` *(governed path-proof for the authoritative canonical JSON gate compare log)*  
+* `audit/gates/json_gate/canonical/json_gate_structured_record.json` *(authoritative canonical JSON gate structured record)*  
+* `audit/gates/json_gate/canonical/json_gate_structured_record.json.path_proof.txt` *(governed path-proof for the authoritative canonical JSON gate structured record)*
 
   ### **D.8 showcompat seam (non-empty canonical JSON \+ parity)**
 
@@ -3684,6 +3718,90 @@ Keep this index synchronized with repo changes. When any golden or artifact path
   * `audit/qa/hde-epic027/qa_step_logs_manifest.json`
 
   * `audit/qa/hde-epic027/qa_step_logs_manifest.json.path_proof.txt`
+
+#### **D.11b EPIC028 Live QA proof anchors for PF05 surfaces**
+
+* **d0 discovery and evidence bootstrap**  
+  * `audit/qa/hde-epic028/checks/d0/primary.log` *(governed step log for d0)*  
+  * `audit/qa/hde-epic028/checks/d0/runtime_context.txt` *(rails and runtime context capture for the EPIC028 QA root)*  
+  * `audit/qa/hde-epic028/checks/d0/cli_health.txt` *(CLI help baseline capture)*  
+  * `audit/qa/hde-epic028/checks/d0/services_surfaces.txt` *(surface baseline for `/api/compat/v1`, `/reader`, and `/internal/version`)*  
+  * `audit/qa/hde-epic028/qa_step_logs_manifest.json` *(EPIC028 QA step manifest)*  
+  * `audit/qa/hde-epic028/qa_step_logs_manifest.json.path_proof.txt` *(governed path-proof for the EPIC028 QA step manifest)*  
+* **po-001 internal compatibility canonical, order-neutral, shared governed emission path**  
+  * `audit/qa/hde-epic028/checks/po-001/ordering_snapshot.txt` *(normalize\_pair and pair\_key proof capture)*  
+  * `audit/qa/hde-epic028/checks/po-001/compat_compute_snapshot.txt` *(compat\_public ordering and pair-key proof capture)*  
+  * `audit/qa/hde-epic028/checks/po-001/emitter_snapshot.txt` *(emit\_public delegation to the canonical serializer)*  
+  * `audit/qa/hde-epic028/checks/po-001/primary.log` *(governed step log for po-001)*  
+* **po-002 one governed emission path across CLI, Reader, and internal compatibility**  
+  * `audit/qa/hde-epic028/checks/po-002/reader_v1_emitter_snapshot.txt` *(Reader-side governed emitter snapshot)*  
+  * `audit/qa/hde-epic028/checks/po-002/runtime_public_snapshot.txt` *(runtime public envelope routing snapshot)*  
+  * `audit/qa/hde-epic028/checks/po-002/emitter_symbol_proof_snapshot.txt` *(governed emitter allow-list proof snapshot)*  
+  * `audit/qa/hde-epic028/checks/po-002/serializer_grep_guard_snapshot.txt` *(CLI serializer grep-guard snapshot)*  
+  * `audit/qa/hde-epic028/checks/po-002/primary.log` *(governed step log for po-002)*  
+* **po-003 CLI compatibility surface presence and deterministic proof-surface verification**  
+  * `audit/qa/hde-epic028/checks/po-003/hdctl_help.txt` *(CLI help capture)*  
+  * `audit/qa/hde-epic028/checks/po-003/hdctl_help.stderr.txt` *(CLI help stderr capture)*  
+  * `audit/qa/hde-epic028/checks/po-003/hdctl_help.rc.txt` *(CLI help return-code capture)*  
+  * `audit/qa/hde-epic028/checks/po-003/showcompat_presence.txt` *(showcompat help-surface presence proof)*  
+  * `audit/qa/hde-epic028/checks/po-003/emitter_symbol_proof_snapshot.txt` *(governed emitter allow-list proof snapshot)*  
+  * `audit/qa/hde-epic028/checks/po-003/serializer_grep_guard_snapshot.txt` *(CLI serializer grep-guard snapshot)*  
+  * `audit/qa/hde-epic028/checks/po-003/reader_cli_parity_probe.txt` *(non-zero Reader↔CLI parity artifact probe)*  
+  * `audit/qa/hde-epic028/checks/po-003/primary.log` *(governed step log for po-003)*  
+* **po-004 public six-part Reader success envelope remains numeric-free**  
+  * `audit/qa/hde-epic028/checks/po-004/pytest_stdout.log` *(Reader transport test stdout capture)*  
+  * `audit/qa/hde-epic028/checks/po-004/pytest_stderr.log` *(Reader transport test stderr capture)*  
+  * `audit/qa/hde-epic028/checks/po-004/pytest_rc.txt` *(Reader transport test return-code capture)*  
+  * `audit/qa/hde-epic028/checks/po-004/success_encoding_invariance_snapshot.txt` *(encoding-invariance proof snapshot)*  
+  * `audit/qa/hde-epic028/checks/po-004/primary.log` *(governed step log for po-004)*  
+* **po-005 governed Reader proof-surface designation**  
+  * `audit/qa/hde-epic028/checks/po-006/primary.log (governed step log for po-006)`  
+  * `audit/qa/hde-epic028/checks/po-006/po_005_lookup.txt (copied PO-005 PASS lookup proving /reader was resolved before transport proof)`  
+  * `audit/qa/hde-epic028/checks/po-006/context_note_pre_po010_moonloop.txt (preserved PO-006 resolved-branch context after bounded Moon Loop remediation)`  
+  * `audit/qa/hde-epic028/checks/po-006/pytest_stdout.log (Reader transport proof stdout capture)`  
+  * `audit/qa/hde-epic028/checks/po-006/pytest_stderr.log (Reader transport proof stderr capture)`  
+  * `audit/qa/hde-epic028/checks/po-006/pytest_rc.txt (Reader transport proof return-code capture; PASS lane requires 0)`  
+* **po-006 governed public success surface transport posture**  
+  * `audit/qa/hde-epic028/checks/po-006/primary.log` *(governed step log for po-006)*  
+  * `audit/qa/hde-epic028/checks/po-006/po_005_lookup.txt` *(copied PO-005 PASS lookup proving `/reader` was resolved before transport proof)*  
+  * `audit/qa/hde-epic028/checks/po-006/blocked_note.txt` *(resolved-branch note artifact for po-006)*  
+  * `audit/qa/hde-epic028/checks/po-006/pytest_stdout.log` *(Reader transport proof stdout capture)*  
+  * `audit/qa/hde-epic028/checks/po-006/pytest_stderr.log` *(Reader transport proof stderr capture)*  
+  * `audit/qa/hde-epic028/checks/po-006/pytest_rc.txt` *(Reader transport proof return-code capture; PASS lane requires `0`)*  
+* **po-007 one coherent current-epic acceptance binding**  
+  * `audit/qa/hde-epic028/checks/po-007/primary.log` *(governed step log for po-007)*  
+  * `audit/qa/hde-epic028/checks/po-007/acceptance_map_snapshot.json` *(current-epic acceptance-map home snapshot)*  
+  * `audit/qa/hde-epic028/checks/po-007/token_matrix_snapshot.txt` *(current-epic token-matrix home snapshot)*  
+  * `audit/qa/hde-epic028/checks/po-007/acceptance_map_viability_snapshot.txt` *(current-epic viability-log home snapshot)*  
+  * `audit/qa/hde-epic028/checks/po-007/mirror_binding_snapshot.jsonl` *(machine-mirror binding rows proving the current-epic acceptance binding remains single-home and mirrored)*  
+* **po-008 same-change coherence across changed governed evidence families**  
+  * `audit/qa/hde-epic028/checks/po-008/primary.log` *(governed step log for po-008)*  
+  * `audit/qa/hde-epic028/checks/po-008/json_gate_family_before.txt` *(before-snapshot of the authoritative `audit/gates/json_gate/canonical` family)*  
+  * `audit/qa/hde-epic028/checks/po-008/canonical_json_family_before.txt` *(before-snapshot of the legacy-but-governed `audit/gates/canonical_json` family)*  
+  * `audit/qa/hde-epic028/checks/po-008/run_canonical_json_gate.stdout.log` *(canonical gate-writer stdout capture)*  
+  * `audit/qa/hde-epic028/checks/po-008/run_canonical_json_gate.stderr.log` *(canonical gate-writer stderr capture)*  
+  * `audit/qa/hde-epic028/checks/po-008/run_canonical_json_gate.rc.txt` *(canonical gate-writer return-code capture; PASS lane requires `0`)*  
+  * `audit/qa/hde-epic028/checks/po-008/json_gate_family_after.txt` *(after-snapshot of the authoritative `audit/gates/json_gate/canonical` family)*  
+  * `audit/qa/hde-epic028/checks/po-008/canonical_json_family_after.txt` *(after-snapshot of the legacy-but-governed `audit/gates/canonical_json` family)*  
+* **po-009 human ledger, machine ledger, and companion proof refresh coherence**  
+  * `audit/qa/hde-epic028/checks/po-009/primary.log` *(governed step log for po-009)*  
+  * `audit/qa/hde-epic028/checks/po-009/update_evidence_index.stdout.log` *(evidence-index updater stdout capture)*  
+  * `audit/qa/hde-epic028/checks/po-009/update_evidence_index.stderr.log` *(evidence-index updater stderr capture)*  
+  * `audit/qa/hde-epic028/checks/po-009/update_evidence_index.rc.txt` *(evidence-index updater return-code capture; PASS lane requires `0`)*  
+  * `audit/qa/hde-epic028/checks/po-009/index_snapshot.json` *(human Evidence Index snapshot used for the coherence check)*  
+  * `audit/qa/hde-epic028/checks/po-009/index_sha_snapshot.txt` *(human Evidence Index hash-sentinel snapshot)*  
+  * `audit/qa/hde-epic028/checks/po-009/mirror_path_proof_snapshot.txt` *(machine-mirror path-proof snapshot)*  
+  * `audit/qa/hde-epic028/qa_step_logs_manifest.json` *(current-run step manifest; records `check_id`, `status`, and `log_path` for each executed check)*  
+  * `audit/qa/hde-epic028/qa_step_logs_manifest.json.path_proof.txt` *(current-run step-manifest path-proof used by the po-009 coherence check)*  
+  * `audit/qa/hde-epic028/checks/po-009/manifest_updater_lookup.txt` *(updater-source lookup proving current-run step-manifest discoverability)*  
+  * `audit/qa/hde-epic028/checks/po-009/manifest_human_index_lookup.txt` *(human-index lookup proving current-run step-manifest discoverability)*  
+  * `audit/qa/hde-epic028/checks/po-009/manifest_mirror_lookup.txt` *(machine-mirror lookup proving current-run step-manifest discoverability)*  
+* **step-0B bounded Moon Loop delta capture**  
+  * `audit/qa/hde-epic028/00_meta/delta/patch.diff` *(bounded Moon Loop patch capture used by the po-010 rerun review)*  
+  * `audit/qa/hde-epic028/00_meta/delta/changed_files.txt` *(bounded Moon Loop changed-files capture used by the po-010 rerun review)*  
+* **po-010 acceptance reporting and repo-supported completion summary**  
+  * `audit/qa/hde-epic028/checks/po-010/primary.log` *(governed step log for po-010)*  
+  * `audit/qa/hde-epic028/checks/po-010/final_summary.txt` *(repo-supported completion summary with explicit no-claim posture for canon drain and formal close-pack completion)*
 
 ### **D.12 BodyGraph adapter data-source & invariance (PF10-AA)**
 

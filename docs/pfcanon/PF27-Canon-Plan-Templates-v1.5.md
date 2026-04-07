@@ -4,13 +4,13 @@
 
 **Title:** PF27-Canon-Plan-Templates
 
-**Version:** v1.3.4
+**Version:** v1.5
 
 **Status:** Canon
 
-**Effective date:** 2026-03-07
+**Effective date:** 2026-04-06
 
-**Last Update Gate:** BN 10.0.5 Drain 32-33
+**Last Update Gate:** BN 10.3.3 Drain A20-24
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -654,6 +654,16 @@ Use this section only when the Live QA Plan includes the referenced check ID.
 
 * Proof-surface selection posture: choose the proof route from known mounted surfaces (or from an Endpoint Catalog entry that is itself sourced from real mounted surfaces). Do not invent “proof routes.”
 
+**PO-005 governed Reader proof-surface designation (temporary addenda-driven clarification)**
+
+* Review precedence for this check while the relevant PF10 clarification is live: apply the live PF10 clarification first and the other owning PF homes second for this specific ambiguity.  
+* While the relevant PF10 clarification is live, `/reader` is the governed Reader success-proof surface for the current closure scope addressed by PO-005.  
+* `docs/ENDPOINTS_CATALOG.json` remains the single canonical machine-readable endpoint inventory.  
+* If the current inventory or readout lacks an explicit governed designation for `/reader`, but the approved PO-005 evidence family proves route existence, env-gate posture, and A7 eligibility, treat that gap as canon drift to be drained, not as a reason to keep PO-005 blocked or to invent a second proof-surface carrier.  
+* Use the existing approved PO-005 evidence family and keep the existing PASS, FAIL, and BLOCKED posture. Do not create a new QA step or a new evidence family to resolve this clarification.  
+* This clarification does not authorize a new route, a new flag, a new proof-surface carrier invented at execution time, a second designation mechanism, or widening into writer work.  
+* Downstream canon-alignment drains remain required for permanent alignment, but they are not a prerequisite for PO-005 PASS while this clarification is live.
+
 #### **CHECK \<check\_id\>: \<check\_name\>**
 
 Surface / D-goal mapping: \<D\# \+ surface\>  
@@ -895,7 +905,12 @@ It is a closure-oriented summary artifact that:
     * failure signature \= the incorrect snippet,  
     * remediation note \= the correction rationale,  
     * rerun output \= post-fix verification output proving headings, step identifiers, and evidence pointers align.  
-* enumerates known open issues and deferred work with disposition (waive / defer / follow-up) and the evidence impact.
+* enumerates known open issues and deferred work with disposition (waive / defer / follow-up) and the evidence impact.  
+* states whether any undrained documentation delta remains and, if so, records it as follow-up work rather than as a close blocker when required QA evidence is complete and trustworthy and all required QA tasks are complete.  
+* states that documentation drainage itself is not an allowed blocker for step verdicts, epic QA closeout review, or the readiness / closeout recommendation.  
+* limits blocker posture to incomplete required QA steps, missing required deliverables, untrusted or non-governed evidence, unresolved FAIL\_BEHAVIOR / FAIL\_TOOLING / TOOLING\_BLOCKED conditions that affect acceptance, or missing required close-gate QA artifacts.  
+* when documentation mismatches are found during QA or closeout, records them as doc-delta or follow-up items and names the intended drain targets by title rather than treating the undrained destination document as the blocker.  
+* if the summary relies on undrained truth carried in the current epic-specific source of truth, it MUST say so explicitly and keep the caveat visible.
 
 Location:
 
@@ -907,22 +922,17 @@ Location:
 
 ### **Hard blockers for plan approval/execution**
 
-* All inputs, loci, and paths MUST be explicit and reproducible. Any required executable locus (script, check entrypoint, endpoint/route, or command) that is not canon-defined or audit-proven is blocked. No fabricated loci.
-
-* Structural template completeness is gating. Missing required sections or required structural blocks (including required end markers and required gates) is blocking. Where a template requires canon pointers (for example PF09 or PF14 pointers), missing pointers are blocking. Invalid non-PF references and ungrounded existence claims are blocking.
-
-* Plans MAY consult PF documents during planning and review, but MUST NOT mandate PF document updates as plan deliverables, acceptance criteria, or completion criteria. Reality Audits updates are PO-only. Plans MAY note doc delta candidates as explicitly non-mandatory follow-up intents for PO.
-
-* How plans MUST express reality or existence confirmation: cite a PF clause (titles-only) when PF already establishes the claim, or capture repo-local evidence for the current run under `audit/` when PF is silent. Do not treat an intended PF update as substitute evidence.
-
+* All inputs, loci, and paths MUST be explicit and reproducible. Any required executable locus (script, check entrypoint, endpoint/route, or command) that is not canon-defined or audit-proven is blocked. No fabricated loci.  
+* Structural template completeness is gating. Missing required sections or required structural blocks (including required end markers and required gates) is blocking. Where a template requires canon pointers (for example PF09 or PF14 pointers), missing pointers are blocking. Invalid non-PF references and ungrounded existence claims are blocking.  
+* Plans MAY consult PF documents during planning and review, but MUST NOT mandate PF document updates as plan deliverables, acceptance criteria, or completion criteria. Reality Audits updates are PO-only. Plans MAY note doc delta candidates as explicitly non-mandatory follow-up intents for PO.  
+* PR-slice completion discipline (required). When a plan, remediation guide, or review record claims that a PR slice or remediation lane is complete or acceptable, it MUST account for every assigned HDE Build Checklist subtask. If one or more assigned subtasks are not complete, the document MUST identify each affected subtask ID, state exactly what was completed, state exactly what remains incomplete, describe the blocking condition or limiting constraint, explain why completion was not possible within the approved scope, and name the repo evidence, test result, or other concrete basis for that conclusion. Silent omission, partial completion without this explanation, or claiming completion while assigned subtasks remain unresolved is non-conforming.  
+* PF-Canon non-edit discipline (required). Coding and implementation agents MUST NOT directly modify PF-Canon documents as part of implementation PR work, including checklist-status canon such as HDE Build Checklist. If implementation work reveals canon drift, missing canon coverage, or supportable checklist or canon status changes, the plan or review MUST record that as a drift note or doc-delta candidate and MUST route PF-Canon changes as follow-on canon maintenance rather than direct implementation-lane edits.  
+* How plans MUST express reality or existence confirmation: cite a PF clause (titles-only) when PF already establishes the claim, or capture repo-local evidence for the current run under `audit/` when PF is silent. Do not treat an intended PF update as substitute evidence.  
 * No interactive steps. The plan must be runnable headlessly (and must log all commands).  
 * Prompt-family separation (mode boundary; required):  
-  * Every QA prompt MUST declare its mode as one of: `AUTHORING` or `REVIEW`.
-
-  * The agent MUST output only the declared mode’s required structure.
-
-  * If mode is `REVIEW`, the agent MUST NOT produce new runbooks or new commands.
-
+  * Every QA prompt MUST declare its mode as one of: `AUTHORING` or `REVIEW`.  
+  * The agent MUST output only the declared mode’s required structure.  
+  * If mode is `REVIEW`, the agent MUST NOT produce new runbooks or new commands.  
   * Review-mode remediation exception: if a command must be suggested, it MUST be copied verbatim from the approved plan and include the plan’s caveats.  
 * Workflow recommendation (non-canon; strongly advised): enforce mode with a mechanical gate (mode header token plus a required section list). If the required sections do not match the declared mode, fail fast.
 
@@ -1101,6 +1111,58 @@ Workflow and harness recommendation (non-canon, strongly advised):
 If a QA plan or closure record exhibits repeated structural remediation for the same failure mode (for example, templates listing future-step artifacts as required now, or producer-step and artifact mismatch), escalate from incremental plan edits to a systems RCA plus a template and canon drain.
 
 The drain MUST target the class of failure (template semantics, artifact map source-of-truth, prompt-family separation), not the individual incident.
+
+#### **Redline bundle construction discipline (required for editorial redline sets)**
+
+Applies when a plan review, remediation review, audit review, or doc-drain task emits editorial redlines.
+
+Rules:
+
+* Original-document anchor space only. All placement anchors in one redline bundle MUST be resolved against the unchanged base document only. A later redline MUST NOT anchor against text that would exist only after an earlier redline is applied.
+
+* Non-overlap invariant. No two redlines may target intersecting spans of the base document. No INSERT may land inside a span already covered by a REPLACE. No REPLACE may partially or fully cover a span already targeted by another REPLACE.
+
+* One strategy per affected region. For any contiguous affected region, choose exactly one strategy: one consolidated REPLACE for the whole region, or multiple smaller redlines whose target spans are pairwise non-overlapping. Mixing both strategies within the same affected region is prohibited.
+
+* Parent-child prohibition. If one redline REPLACEs a parent block, section, step block, heading block, list block, or other enclosing region, no later redline may target any line inside that parent region. All required child edits MUST be folded into the parent replacement.
+
+* No second-pass layering. If additional fixes are discovered inside an already-targeted region, rebuild from the original base document and re-emit the affected region as one consolidated replacement or as a new non-overlapping set.
+
+* Repeated-anchor safeguard. If a target line or boundary line is repeated in the base document, widen the target to the nearest unique enclosing heading or other unique boundary before emitting the redline. A repeated line MUST NOT be used as the only placement anchor.
+
+* Coverage-before-emission rule. Before outputting redlines, map each required review item to the exact base-document target region that will implement it. The author MUST NOT discover scope incrementally while already emitting the redline bundle.
+
+* Merge-on-conflict rule. If two or more required changes touch the same region, they MUST be merged into one consolidated redline. Sibling redlines that depend on one another’s output are prohibited.
+
+* One-pass apply simulation required. Before output, the full bundle MUST be tested mentally or mechanically against the unchanged base document as a one-pass application set. A redline bundle is valid only if it can be applied once from the original base document without anchor collision, span overlap, parent-child nesting conflict, or re-anchoring later redlines after earlier edits.
+
+* Mechanical blocker posture. If requested changes cannot be represented as a non-overlapping one-pass bundle, do not emit a self-conflicting bundle. Rebuild the affected region as one consolidated replacement, or return the item for revision when the declared review mode allows blocked output.
+
+#### **Review stability and no-moving-target discipline (required for diff-first approval loops)**
+
+Applies to Epic Plans, Implementation Plans, Live QA Plans, remediation plans, closeout reviews, and other diff-first approval loops that use PF27 templates.
+
+Rules:
+
+* Full-gate first pass is required. The first approval review MUST apply the full active review gate set to the full artifact, not a partial subset.
+
+* Gate freeze across the same review loop. After the first review on a given artifact line, do not introduce a new blocker from already-visible unchanged text unless triggered by current-revision text, a newly supplied authoritative input, a PF canon change, or a prior read failure.
+
+* Coupled-constraint rule. If a reviewer requires more explicitness, the same review MUST also declare the coupled constraints triggered by that explicitness, including provenance, command-string, path/locus, creation-ownership, schema/header, naming, and portability constraints.
+
+* Unchanged-text blocker rule. Any blocker first raised against unchanged text in a later revision MUST state the trigger that made it newly raisable. Without a valid trigger, classify it as Review Drift.
+
+* Review Drift handling. If an omitted earlier-visible blocker is discovered later, label it as Review Drift, state that it was visible earlier, consolidate other same-scope pre-existing blockers in the same review, and stop drip-feeding blockers from that same unchanged-text family in later rounds.
+
+* Contradictory review prohibition. Do not alternate between "too implicit" and "too explicit" on the same requirement family unless the later problem is created by newly changed text or the exact canon constraint supporting the later objection was already cited in the earlier review.
+
+* Read-failure and truncation handling. If a missed issue was caused by truncation, partial retrieval, or other read failure, rerun the full sweep after full retrieval before issuing a new decision.
+
+* Non-author penalty rule. Issues that were visible in an earlier reviewed revision but omitted by the reviewer MUST NOT be framed as author-created churn, treated as a fresh author-side defect cycle, or used to imply that the author changed requirements when the review target itself moved.
+
+* Approval integrity. A later-discovered real blocker may still block approval, but it MUST be handled under the provenance and Review Drift rules above.
+
+* Required blocker provenance in review output. Every blocker or caveat in a diff-first approval loop MUST be classed as one of: Introduced by current revision, Previously raised and still unresolved, or Review Drift.
 
 ## **2\) HDE-EPIC-Plan**
 
@@ -1625,13 +1687,21 @@ Token hygiene examples:
 
   * the epic acceptance map, and
 
-  * the token→evidence matrix (when required by the QA posture for that epic).  
+  * the token→evidence matrix (when required by the QA posture for that epic), and
+
+  * the acceptance-map viability log at `audit/qa/<epic-id>/acceptance_map_viability.log` (when the epic carries an acceptance map or token→evidence matrix as part of the close-pack posture).  
 * Close report minimum required fields (required):  
-  * Canon pointer fields: the close report MUST include explicit canonical path pointers to the plan’s declared close-pack artifacts (at minimum: the close report path itself, the deterministic path-of-record selection, and any declared manifest, acceptance map, and token→evidence matrix paths).
+  * Canon pointer fields: the close report MUST include explicit canonical path pointers to the plan’s declared close-pack artifacts (at minimum: the close report path itself, the deterministic path-of-record selection, and any declared manifest, acceptance map, token→evidence matrix, and acceptance-map viability paths).
 
   * TI-002 mapping (when TI-002 is claimed): the close report MUST include an explicit mapping from TI-002 to the satisfying governed artifact(s), including (a) artifact path(s) and (b) a minimal excerpt or other precise locator sufficient to audit the claim without guessing.
 
   * For any other token claims that require explicit mapping, apply the same mapping rule as TI-002.
+
+  * Workflow-truthfulness fields: if the close report states that a governed write, refresh, validation, or close-pack workflow ran, it MUST point to the same-run governed artifact(s) or gate-log artifact(s) that prove the execution, rather than reporting the action as narrative-only.
+
+  * Reused-proof-family fields: if the close-pack reuses already-existing proof families from earlier deliverables or PR slices, the close report MUST identify those reused proof families by exact governed artifact path and MUST NOT present them as newly implemented in the close slice.
+
+**Close-pack deterministic path-of-record (normative).**
 
 **Close-pack deterministic path-of-record (normative).**
 
@@ -1652,6 +1722,10 @@ MUST NOT relocate these artifacts into alternative directory trees (example: `au
 * each key is a stable pointer name (string)
 
 * each value is a repo-relative artifact path (string)
+
+* when the close-pack baseline includes an acceptance map, token→evidence matrix, or acceptance-map viability log, `key_outputs` MUST include explicit named bindings for each declared close-pack artifact.
+
+* when the close-pack binds reused proof families or same-run gate execution evidence, those reused proof artifacts and governed gate-log artifacts MUST appear as explicit named `key_outputs` bindings.
 
 `key_outputs` MUST NOT be a list.
 
@@ -2135,3 +2209,1040 @@ ADR-001 — \<short title\>
 * Drain targets (required; owning PF docs \+ intended doc delta):
 
 * Notes / external task creation (optional):
+
+  ---
+
+## **5\) Remediation Review Record (Template; REVIEW mode only)**
+
+### **Scope**
+
+Use this template for REVIEW-mode evaluation of an approved remediation lane, cleanup PR, or follow-up remediation chain. It is review-only: it compares the approved lane, the original attempt, any intermediate remedial attempts, and the current state, and it does not create new runbooks or new command sequences.
+
+### **Required structure (paste-ready)**
+
+**Artifact Map**
+
+* Review lane or PR name:  
+* Implementation or approval source:  
+* Original attempt bundle:  
+* Remediation bundle(s):  
+* Extra evidence bundle:  
+* Output:  
+* Keywords traced:  
+* Artifacts used:  
+* PF canon used:
+
+**Source Posture**
+
+* Primary source of truth for what happened:  
+* Plans or other secondary sources used for intended scope only:  
+* PF20 used: YES | NO, and why:  
+* PF23 used: YES | NO, and why:  
+* Other PF canon used only where the primary source is silent:  
+* Important limit, if any:  
+* Search basis, if search-driven reconstruction was used:
+
+**Provenance (Approved \-\> Attempt Chain \-\> Current State)**
+
+* Approved source and scope statement:  
+* Attempt-chain summary, repeated as needed:  
+* Current remedial-attempt summary:  
+* Net-effective outcome:
+
+**Review Summary**
+
+* What was attempted:
+
+* What was insufficient in the earlier attempt:
+
+* What changed in remediation:
+
+* Whether the current state satisfies the approved scope:
+
+* Remaining risk:
+
+**Keyword Hit Map (optional when search-driven reconstruction was used)**
+
+K-001
+
+* Artifact:  
+* Keyword(s) matched:  
+* Why it matters:  
+* Evidence pointer:
+
+Repeat K blocks as needed.
+
+**Chain of Events**
+
+EVT-001
+
+* Event:  
+* Event type:  
+* Timing basis:  
+* Evidence pointer:
+
+Repeat EVT blocks as needed.
+
+**Diff Review (required when code or governed-artifact diffs are under review)**
+
+DR-001
+
+* Change summary:
+
+* Risk assessment:
+
+* Why it matters:
+
+* Evidence pointer:
+
+* Approved-plan linkage:
+
+* Supported status posture, if any:
+
+Repeat DR blocks as needed.
+
+**Root Cause Analysis (RCA)**
+
+A) Bug or failure statement
+
+* Failure sequence:  
+* Where it occurred:  
+* Evidence pointer(s):
+
+B) Root cause(s)
+
+* Root cause statement:  
+* Evidence pointer(s):  
+* PF references only when needed:
+
+C) Fix across attempts
+
+* What in the earlier attempt was insufficient:  
+* What changed in remediation:  
+* Why the change addresses the root cause:
+
+D) Fix verification
+
+* Proof the issue is resolved:  
+* Residual risk or edge case evidenced:
+
+**Deliverables and Results**
+
+RES-001
+
+* Deliverable produced:  
+* Result now true that was not true before:  
+* Residual risk:  
+* Evidence pointer:
+
+Repeat RES blocks as needed.
+
+**Remediations Applied**
+
+RMD-001
+
+* Remediation:  
+* Why it was needed:  
+* What evidence shows it worked:  
+* Evidence pointer:
+
+Repeat RMD blocks as needed.
+
+**Findings**
+
+DR-001
+
+* Source artifact or lane:  
+* What I observed:  
+* Why it matters:  
+* Evidence pointer(s):  
+* Impacted checklist task ID(s), if proven:  
+* Impacted checklist subtask ID(s), if proven:  
+* Supported status posture:  
+* Review provenance class, if this finding is used as a blocker or caveat: Introduced by current revision | Previously raised and still unresolved | Review Drift  
+* Trigger for newly raisable unchanged-text issue, if applicable:
+
+Repeat finding blocks as needed.
+
+**Requirement Satisfaction Crosswalk (required when approval conditions or requirement labels exist)**
+
+* Requirement label:
+
+* Earlier-attempt status:
+
+* Evidence pointer(s) in earlier attempt:
+
+* Remedial change that addresses it:
+
+* Current status after remediation:
+
+* Evidence pointer(s) in remedial attempt:
+
+* Notes:
+
+* Impacted checklist task ID(s), if proven:
+
+* Impacted checklist subtask ID(s), if proven:
+
+Repeat crosswalk blocks as needed.
+
+**Checklist Impact & Status Posture (when a status move is in scope)**
+
+* Owning checklist or status record:
+
+* Current status:
+
+* Status recommendation:
+
+* Why this status posture is supported:
+
+* Evidence pointer(s):
+
+* PF proof excerpt(s) when a PF checklist or status record is relied on:
+
+* Linked Findings item(s):
+
+* Linked CHG item(s), if any:
+
+**Evidence Print (PASS PROOF; required)**
+
+A) Acceptance coverage evidence
+
+* Requirement label:
+
+* Evidence pointer(s) proving satisfaction:
+
+* Key proof facts copied verbatim from the reviewed artifacts:
+
+Repeat acceptance-coverage lines as needed.
+
+B) Evidence and verification posture now satisfied
+
+* What earlier evidence or verification gap existed:
+
+* What is now present:
+
+* Evidence pointer(s):
+
+C) Token and gate evidence
+
+* Tokens explicitly claimed (names-only), or state that no tokens were explicitly claimed.
+
+* If no tokens were explicitly claimed, include the search method and result.
+
+* Evidence pointer(s):
+
+D) Test or CI proof
+
+* Job or test name:
+
+* Pass indicator copied verbatim:
+
+* Where it appears in the reviewed artifacts:
+
+Repeat test or CI lines as needed.
+
+E) Artifact and evidence outputs
+
+* Path:
+
+* Type:
+
+* Key proof facts copied verbatim from the reviewed artifacts:
+
+Repeat evidence lines as needed.
+
+**Doc Deltas (PF-Canon only; required when the review supports a canon or checklist change)**
+
+**PF Checklist Impact Summary**
+
+* PF task ID:
+
+* PF subtask ID(s):
+
+* Current status if evidenced:
+
+* Status action:
+
+* Evidence pointer(s):
+
+* Linked Findings item(s):
+
+* Linked CHG item(s), if any:
+
+**PF Doc Delta Proposal**
+
+DD-001
+
+* Target doc:
+
+* Target section:
+
+* Delta (actionable; 1–3 bullets):
+
+* Why:
+
+* Evidence pointer(s):
+
+* PF proof excerpt(s) when canon is invoked:
+
+* Why this is the correct home:
+
+Repeat DD blocks as needed.
+
+**Canon Documentation Outcomes**
+
+AD-001
+
+* Addendum title:  
+* Why:  
+* Supportable status change versus current canon or drain state, if relevant:  
+* Decision / rule / clarification:  
+* Drain targets (doc delta intents):  
+* Supersedes / conflicts, if applicable:  
+* Implementation impact:  
+* Evidence pointer:
+
+Repeat addendum blocks as needed.
+
+**Retrospective Notes**
+
+* What went well:  
+* What did not go well:  
+* What we learned about the process:  
+* What we learned about the system:
+
+**Unknowns or Missing Evidence**
+
+UNK-001
+
+* Unknown or missing item:  
+* Why it matters:  
+* Evidence needed:  
+* Where that proof should exist, if known:  
+* Search basis, if search-driven reconstruction was used:
+
+Repeat UNK blocks as needed.
+
+**Decision**
+
+* Decision:  
+* Why this decision is supported:  
+* Residual caution or follow-up boundary, if any:
+
+## **6\) Audit Analysis Record (Template; REVIEW mode only)**
+
+### **Scope**
+
+Use this template when an audit report is being translated into explicit home classification, must-act-now posture, and doc-delta proposals. It is review-only: it inventories the audit inputs, summarizes the drift themes, maps each finding to the correct PF home, and records whether any runnable checklist delta is supported.
+
+### **Required structure (paste-ready)**
+
+**Artifact Map**
+
+* Audit Report:
+
+* Epic Plan:
+
+* Existing Issues List:
+
+* PF Canon consulted:
+
+* Output:
+
+**Audit Summary**
+
+* What the audit compares:
+
+* Top drift themes:
+
+* Number of discrete findings extracted:
+
+* Number of must-act-now findings:
+
+* Concrete canon delta(s) supported:
+
+* Any no-task-delta conclusion, if supported:
+
+**Findings → Doc Delta Map**
+
+FND-001
+
+* Finding (one sentence):
+
+* Audit anchor (verbatim line):
+
+* Audit evidence pointer:
+
+* Epic Plan linkage (one sentence):
+
+* Epic Plan anchor (verbatim line or N/A):
+
+* Must-act-now: YES | NO
+
+* Observation-only: YES | NO
+
+* Re-open trigger, if observation-only:
+
+* Correct home(s):
+
+  * PF09 task delta: YES | NO
+
+  * PF14 mechanics delta: YES | NO
+
+  * PF02 architecture delta: YES | NO
+
+  * Other PF doc delta(s):
+
+  * PF20 historical correction: YES | NO
+
+* Why these are the correct homes:
+
+* Review provenance class, if this finding is used as a blocker or closeout caveat: Introduced by current revision | Previously raised and still unresolved | Review Drift
+
+* Trigger for newly raisable unchanged-text issue, if applicable:
+
+Repeat FND blocks as needed.
+
+**Doc Delta Proposals — PF09 (Tasks)**
+
+* None. when no PF09 task delta is supported.
+
+PD-001
+
+* Target doc:
+
+* Target section:
+
+* Delta (actionable; 1–3 bullets):
+
+* Why:
+
+* Evidence pointer(s):
+
+* PF proof excerpt(s) when canon is invoked:
+
+Repeat PF09 proposal blocks as needed.
+
+**Doc Delta Proposals — Other PF homes**
+
+PD-001
+
+* Target doc:
+
+* Target section:
+
+* Delta (actionable; 1–3 bullets):
+
+* Why:
+
+* Evidence pointer(s):
+
+* PF proof excerpt(s) when canon is invoked:
+
+* Why this is the correct home:
+
+Repeat proposal blocks as needed.
+
+## **7\) Implementation Closeout Report (Template; REVIEW mode only)**
+
+### **Scope**
+
+Use this template when a completed implementation slice, remediation bundle, or epic closeout needs a review-grade report of what stayed fixed, what was reused, what was newly delivered, what evidence exists, and what canon or checklist follow-up remains. It is review-only: it records implementation outcomes and closeout posture, and it does not create new runbooks, new commands, or new acceptance tokens.
+
+### **Required structure (paste-ready)**
+
+**Executive Summary**
+
+* Scope classification:
+
+* Preserved scope boundaries:
+
+* Approved reuse baseline, if any:
+
+* New implementation allocation or slice map:
+
+* Biggest wins:
+
+* Biggest remaining risks or gaps:
+
+**Implementation Breakdown (slice-by-slice)**
+
+CHG-001
+
+* Slice name:
+
+* Purpose:
+
+* Key changes, high level:
+
+* Key surfaces touched:
+
+* Tests or evidence produced:
+
+* Outcome:
+
+* Evidence pointer(s):
+
+Repeat CHG blocks as needed.
+
+**Major Surfaces Affected**
+
+* Surface family:
+
+* Specific surfaces:
+
+* Why it matters:
+
+Repeat surface blocks as needed.
+
+**Evidence Inventory**
+
+* Evidence family:
+
+* Path(s):
+
+* What it proves:
+
+* Related token names, if explicitly claimed:
+
+Repeat evidence-family blocks as needed.
+
+**Source Posture**
+
+* Primary source of truth for what happened:  
+* Secondary sources used for intended scope only:  
+* PF20 used: YES | NO, and why:  
+* PF23 used: YES | NO, and why:  
+* Other PF canon used only where the primary source is silent:  
+* Non-PF in-session artifacts used, if any:  
+* Important limit, if any:
+
+**Canon Alignment and Documentation Outcomes**
+
+* Canon references used:  
+* Existing live PF10 delta or canon mismatch on record:  
+* Supportable status change(s) from repo evidence, if any:  
+* Current canon or drain state for those rows, if different:  
+* Token or evidence semantics note, if applicable:  
+* Evidence-family completeness or same-change-family note, if applicable:  
+* Likely drain targets by title only:  
+* Additional PF10 addendum needed: YES | NO  
+* Why:
+
+**Proposed PF10 Addenda (when the retrospective supports living-addendum text)**
+
+AD-001
+
+* Addendum title:  
+* Why:  
+* Decision / rule / clarification:  
+* Drain targets (doc delta intents):  
+* Supersedes / conflicts, if applicable:  
+* Implementation impact:  
+* Evidence pointer(s):
+
+Repeat addendum blocks as needed.
+
+**Closure Decision Set (when close posture depends on explicit decisions)**
+
+DEC-001
+
+* Decision:
+
+* Rationale:
+
+* Supported status updates, if any:
+
+* Closure timing recommendation, if any:
+
+* No-new-runnable-task-delta conclusion, if any:
+
+* Observation-only themes and re-open triggers, if any:
+
+* Net resolution effect:
+
+Repeat DEC blocks as needed.
+
+**Closure Evidence Snapshot**
+
+A) Evidence produced
+
+* Path:  
+* What it proves:
+
+Repeat produced-evidence lines as needed.
+
+B) Evidence missing or ambiguous
+
+* Item:  
+* What would prove it:  
+* Where that proof should exist, if known:
+
+Repeat missing-or-ambiguous lines as needed.
+
+C) Open closure items or questions for the Lead
+
+* Question:  
+* Relevant canon or evidence:
+
+Repeat question lines as needed.
+
+## **8\) QA Pass Review Record (Template; REVIEW mode only)**
+
+### **Scope**
+
+Use this template when a completed Live QA check is being reviewed against its approved Check Block and its Deliverables Report. It is review-only: it determines whether the step is trustworthy, whether the plan-defined deliverables and PASS criteria were satisfied, whether the step stayed aligned to the approved token posture when token-attached, and whether any follow-up or doc delta is required. It does not create new runbooks, new commands, or new acceptance tokens.
+
+### **Required structure (paste-ready)**
+
+**Review Summary**
+
+* Check label:  
+* Decision line:  
+* Deliverables Report anchor:  
+* Evidence-trust statement:  
+* Evidence pointer(s):  
+* Approved-plan PASS criteria statement:  
+* Evidence pointer(s):  
+* Decision lane, branch policy, or scope-discipline statement, if applicable:  
+* Evidence pointer(s):  
+* Approved token-posture statement, if token-attached:  
+* Evidence pointer(s):  
+* Doc Deltas:  
+* State `None` when no PF-Canon inconsistencies or new doc requirements were found.
+
+**Findings**
+
+FND-001
+
+* What you observed:  
+* Classification:  
+* PF touchpoints when needed:  
+* Evidence pointer(s):  
+* Why it matters:  
+* Drives decision: Yes | No  
+* Negative-claim proof, if this finding depends on the absence of direct lines in DELIVERABLES\_REPORT\_FILE:
+
+Repeat finding blocks as needed.
+
+Finding posture rules:
+
+* Non-blocking planning failures, process imperfections, or earlier failed attempts MAY be recorded as findings, but they MUST be distinguished from verdict-driving facts and MUST use `Drives decision: No` when they do not affect the decision.  
+* If the review relies on step-evidence trust, the findings MUST make explicit which trust facts were confirmed, such as the governed `primary.log` header, captured rails and determinism pins, and the current-state QA root and manifest-pair posture when applicable.  
+* If a finding depends on the absence of a direct token-level proof line or other direct proof line in DELIVERABLES\_REPORT\_FILE, the review MUST record the exact negative-claim search and the no-match result rather than implying absence.
+
+**Evidence Print**
+
+A) Required deliverables checklist
+
+* Deliverable name/label, quoted from plan/caveats:  
+* Evidence pointer to the plan/caveats:  
+* Expected path:  
+* Present in DELIVERABLES\_REPORT\_FILE: Yes | No  
+* Evidence pointer in DELIVERABLES\_REPORT\_FILE:
+
+Repeat deliverable lines as needed.
+
+B) Evidence artifacts relied on
+
+* Path/label, exact as listed in DELIVERABLES\_REPORT\_FILE:  
+* Evidence pointer:  
+* Key proof facts, 1–3 short exact strings, status lines, or hashes:
+
+Repeat artifact lines as needed.
+
+C) Tokens/gates (required only when the reviewed step is token-attached)
+
+* Token/gate name, quoted from plan/caveats, with Evidence pointer:  
+* Evidence pointer(s) in DELIVERABLES\_REPORT\_FILE proving it, or state `Unknown.` when DELIVERABLES\_REPORT\_FILE does not surface a direct token-level proof line:  
+* Negative-claim proof, if `Unknown.` is used:
+
+Repeat token lines as needed.
+
+**QA Verdict and Optional Follow-ups**
+
+* Verdict line:  
+* Evidence-grounded decision bullets:  
+  * primary evidence trust:  
+  * deliverables posture:  
+  * PASS criteria posture:  
+  * token posture, if applicable:  
+* Optional follow-up or planning-failure note, if any:
+
+**ADRs — Deviations (optional)**
+
+**ADR-DEV-01**
+
+* **What changed:**  
+* **Why it changed:**  
+* **Plan or caveat reference, with Evidence pointer:**  
+* **What was actually run, with Evidence pointer:**  
+* **Evidence impact: files added/changed/missing, using verbatim paths**  
+* **Decision:**  
+* **Canon impact:**  
+* **PF proof excerpt, if canon is invoked:**
+
+**Repeat ADR-DEV blocks as needed.**
+
+* **PF proof excerpt, if canon is invoked:**
+
+**State `No deviations observed for this step.` when no deviation block is needed.**
+
+## **9\) Final QA Closeout Review \+ QA RCA (Template; REVIEW mode only)**
+
+### **Scope**
+
+**Use this template when the completed Live QA stream for an epic must be synthesized into a closeout recommendation, canonical RCA basis, coverage-vs-plan accounting, and PF-only doc-delta proposals. It is review-only: it summarizes executed QA and closeout posture, and it does not create new runbooks, new commands, or new acceptance tokens.**
+
+### **Required structure (paste-ready)**
+
+**Artifact Map**
+
+* **Epic:**  
+* **PF10:**  
+* **Implementation Guide:**  
+* **QA Plan:**  
+* **Output:**
+
+**QA Closeout Summary**
+
+* **Epic reviewed:**  
+* **PF10-stated QA execution outcome:**  
+* **What was reviewed:**  
+* **Overall readiness:**  
+* **Root cause category:**  
+* **Implementation Guide framing, if used:**  
+* **Evidence pointer(s):**
+
+**Canonical RCA Requirement Basis**
+
+**A) PF19 references relied on**
+
+**REF-001**
+
+* **PF19 reference:**  
+* **Proof excerpt:**  
+* **Evidence pointer:**
+
+**Repeat PF19 reference blocks as needed.**
+
+**B) PF27 and PF06 references relied on**
+
+**REF-001**
+
+* **PF reference:**  
+* **Proof excerpt:**  
+* **Evidence pointer:**
+
+**Repeat PF27 / PF06 reference blocks as needed.**
+
+**Checklist of required RCA/closeout elements**
+
+* **D0 Discovery artifact:**  
+* **Functional runtime proof on changed runtime surfaces:**  
+* **Governed current-state QA evidence under the epic QA root:**  
+* **QA RCA & Doc Delta summary:**  
+* **Coverage vs QA Plan accounting:**  
+* **Readiness / closeout recommendation:**  
+* **Codespaces harness execution at least once:**  
+* **Indexed evidence under Human Evidence Index and Machine Mirror:**  
+* **Compliance statement:**
+
+**Source-of-Truth Posture**
+
+* **Primary SoT for epic-specific QA events:**  
+* **Implementation Guide used:**  
+* **QA Plan used:**  
+* **Mismatches identified between the primary SoT and the QA Plan, if any:**  
+* **Negative-claim proof, if a mismatch search is used:**
+
+**QA Timeline**
+
+**EV-001**
+
+* **Source order or chronology basis:**  
+* **Event type:**  
+* **Event name/label:**  
+* **Outcome label:**  
+* **Evidence pointer(s):**
+
+**Repeat event blocks as needed.**
+
+**Coverage vs QA Plan**
+
+**CV-001**
+
+* **Step name as written in QA Plan:**  
+* **Coverage status:**  
+* **Evidence pointer(s):**  
+* **Mismatches/deviations vs QA Plan, if any:**  
+* **Closeout impact:**
+
+**Repeat coverage blocks as needed.**
+
+**Findings**
+
+**FND-001**
+
+* **What happened, grounded in the reviewed evidence:**  
+* **Why it matters:**  
+* **Classification:**  
+* **PF touchpoints when needed:**  
+* **Evidence pointer(s), or state `none provided.`:**  
+* **Negative-claim proof, if `none provided.` is used:**  
+* **Where reviewed evidence supports it, classify substantive failures or anomalies as:**
+
+**Repeat finding blocks as needed.**
+
+**Root Cause Analysis**
+
+**A) Primary root cause**
+
+* **Statement:**  
+* **Evidence pointer(s):**
+
+**B) Contributing factors**
+
+**CF-001**
+
+* **Factor:**  
+* **Evidence pointer(s):**
+
+**Repeat contributing-factor blocks as needed.**
+
+**C) What made it hard to detect earlier, if applicable**
+
+* **Statement:**  
+* **Evidence pointer(s):**
+
+**D) What made it hard to close confidently, if applicable**
+
+* **Statement:**  
+* **Evidence pointer(s):**
+
+**Remediation Loop Assessment**
+
+**RL-001**
+
+* **Loop label:**  
+* **Outcome:**  
+* **Evidence pointer(s):**  
+* **Residual uncertainty, if any:**
+
+**Repeat remediation-loop blocks as needed.**
+
+**Implementation Gaps and Proposed Fixes**
+
+**IMP-01**
+
+* **Symptom, quoting reviewed evidence where useful:**  
+* **Expected behavior from reviewed evidence and/or PF canon:**  
+* **Evidence pointer(s):**  
+* **Likely locus only if the reviewed evidence names a component or surface:**  
+* **Proposed fix, high-level only:**  
+* **Verification hook:**
+
+**Repeat implementation-gap blocks as needed.**
+
+**Doc Deltas (PF-Canon only; excluding PF10)**
+
+**A) PF19 doc deltas (targeted)**
+
+* **None.**
+
+**DD-001**
+
+* **Section:**  
+* **Delta:**  
+* **Why:**  
+* **Evidence pointer(s):**
+
+**Repeat PF19 delta blocks as needed.**
+
+**B) Optional other PF doc deltas (maximum 5; only if PF19 is not the correct home)**
+
+**DD-001**
+
+* **Doc:**  
+* **Section:**  
+* **Delta:**  
+* **Why PF19 is not the correct home:**  
+* **Evidence pointer(s):**
+
+**Repeat optional other-doc delta blocks as needed.**
+
+## **10\) Epic Closure Review \+ Retrospective (Template; REVIEW mode only)**
+
+### **Scope**
+
+Use this template when one review artifact must combine epic closure decision, closure-trace accounting, implementation retrospective, PF-only doc-delta routing, and recommendation posture. It is review-only: it records what was completed, what evidence supports closure, what follow-up remains, and what should drain later, and it does not create new runbooks, new commands, or new acceptance tokens.
+
+### **Required structure (paste-ready)**
+
+**Inputs Posture**
+
+* **Implementation Guide provided:**  
+* **QA Plan provided:**  
+* **Primary epic-specific source of truth:**  
+* **Current-reality source, if used:**  
+* **PF-Canon homes used where the primary source is silent:**  
+* **Implementation Guide used for intended scope framing only:**  
+* **QA Plan used for intended QA requirement framing only:**  
+* **Evidence pointer(s):**
+
+**Closure Registers**
+
+**A) Deliverables Register**
+
+**CR-DEL-001**
+
+* **Deliverable label:**  
+* **Source:**  
+* **Anchor quote:**  
+* **Explicitly stated required evidence, path, or token strings, verbatim if present:**  
+* **Evidence pointer:**
+
+**Repeat deliverable blocks as needed.**
+
+**B) QA Verification Register**
+
+**CR-QA-001**
+
+* **Step or verification label:**  
+* **Source:**  
+* **Anchor quote:**  
+* **Required evidence outputs or pass-fail posture, verbatim if present:**  
+* **Evidence pointer:**
+
+**Repeat verification blocks as needed.**
+
+**C) Primary Results Register**
+
+**CR-RES-001**
+
+* **Result claim summary:**  
+* **Anchor quote:**  
+* **Evidence pointers or paths, verbatim, or state `none provided.`:**  
+* **Outcome label, if recorded:**  
+* **Evidence pointer:**
+
+**Repeat result blocks as needed.**
+
+**D) Current-Reality Register**
+
+**CR-REAL-001**
+
+* **Surface summary:**  
+* **Anchor quote:**  
+* **Paths or components, verbatim if present:**  
+* **Closeout impact:**  
+* **Evidence pointer:**
+
+**Repeat current-reality blocks as needed.**
+
+**Closure Trace Ledger**
+
+**CTL-001**
+
+* **Deliverable:**  
+* **Mapped QA verification item(s):**  
+* **Mapped primary-source result claim(s):**  
+* **Current-reality check:**  
+* **Status:**  
+* **Why:**  
+* **Evidence pointer(s):**
+
+**Repeat closure-trace blocks as needed.**
+
+**Path and Surface Reality Ledger**
+
+**PSR-001**
+
+* **Path or surface string, verbatim:**  
+* **Source(s):**  
+* **Status:**  
+* **Required for closure:**  
+* **Notes:**
+
+**Repeat path and surface blocks as needed.**
+
+**Closure Decision**
+
+* **Epic closure decision:**  
+* **Why this decision is supported:**  
+* **Documentation-drain posture:**  
+* **Follow-up-only items that do not block closure, if any:**  
+* **Minimal follow-ups required only if not satisfied:**
+
+**Retrospective — Executive Summary**
+
+* **Scope and contract-preservation summary:**  
+* **Delivered implementation summary:**  
+* **Biggest wins:**  
+* **Biggest remaining risks or gaps:**
+
+**Implementation Report**
+
+**IR-001**
+
+* **PR or slice label:**  
+* **Purpose:**  
+* **Key changes:**  
+* **Key surfaces touched:**  
+* **Tests or evidence produced:**  
+* **Outcome:**  
+* **Evidence pointer:**
+
+**Repeat implementation-report blocks as needed.**
+
+**Retrospective — Process**
+
+* **What went well:**  
+* **What did not go well:**  
+* **What we learned:**
+
+**Retrospective — Application / System**
+
+* **What we learned about the system:**  
+* **Known remaining risks or debt:**
+
+**ADRs and Ambiguity Resolution**
+
+**ADR-001**
+
+* **Decision point:**  
+* **Options considered:**  
+* **PF-canon constraints relied on:**  
+* **Final decision for this epic:**  
+* **Should this become canonical for future work:** Yes | No
+
+**Repeat ADR blocks as needed.**
+
+**PF-Canon Doc Deltas**
+
+**DD-001**
+
+* **Doc:**  
+* **Section:**  
+* **Delta:**  
+* **Why this doc is the correct home:**  
+* **Evidence pointer:**
+
+**Repeat doc-delta blocks as needed.**
+
+**Build Improvements and Future Work**
+
+**FW-001**
+
+* **Short description:**  
+* **Where it should live:**  
+* **PF docs to reference or update if pursued later:**  
+* **If it depends on a reality-audit gap:**
+
+**Repeat future-work blocks as needed.**
+
+**Recommendation only**
+
+* **Implementation posture recommendation:**
+
