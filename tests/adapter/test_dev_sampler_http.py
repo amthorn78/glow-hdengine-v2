@@ -94,7 +94,7 @@ def test_dev_sampler_rejected_in_prod(monkeypatch):
     assert json.loads(resp.data) == {
         "schema": "v1",
         "ok": False,
-        "code": "forbidden",
+        "code": "ERR_WRITER_FORBIDDEN",
         "error": "insufficient scope",
     }
 
@@ -108,7 +108,7 @@ def test_dev_sampler_rejected_when_app_env_missing(monkeypatch):
         resp = _post(client, payload)
 
     assert resp.status_code == 403
-    assert json.loads(resp.data)["code"] == "forbidden"
+    assert json.loads(resp.data)["code"] == "ERR_WRITER_FORBIDDEN"
 
 
 def test_dev_sampler_rejected_when_app_env_empty(monkeypatch):
@@ -119,4 +119,4 @@ def test_dev_sampler_rejected_when_app_env_empty(monkeypatch):
         resp = _post(client, payload)
 
     assert resp.status_code == 403
-    assert json.loads(resp.data)["code"] == "forbidden"
+    assert json.loads(resp.data)["code"] == "ERR_WRITER_FORBIDDEN"
