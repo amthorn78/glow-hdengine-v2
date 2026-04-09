@@ -58,8 +58,12 @@ def _parse_url(url: str) -> Tuple[str, int]:
     parsed = urlparse(url)
     if parsed.scheme not in {"http", "https"}:
         raise ValueError(f"Unsupported scheme in DEV_SAMPLER_URL: {parsed.scheme!r}")
-    host = parsed.hostname or "127.0.0.1"
-    port = parsed.port or (443 if parsed.scheme == "https" else 80)
+    if not parsed.hostname:
+        raise ValueError("DEV_SAMPLER_URL must include an explicit hostname")
+    if parsed.port is None:
+        raise ValueError("DEV_SAMPLER_URL must include an explicit port")
+    host = parsed.hostname
+    port = parsed.port
     return host, port
 
 
@@ -171,9 +175,10 @@ def _run_check(mode: str, url: str, payload: Dict[str, Any]) -> Tuple[int | None
 
 
 def main() -> int:
-    dev_sampler_url = os.environ.get("DEV_SAMPLER_URL")
+    raw_sampler_url = os.environ.get("DEV_SAMPLER_URL")
+    dev_sampler_url = raw_sampler_url.strip() if raw_sampler_url is not None else ""
     if not dev_sampler_url:
-        _log("DEV_SAMPLER_URL is required")
+        _log("DEV_SAMPLER_URL is required and must be non-empty")
         return 1
 
     LOG_DIR.mkdir(parents=True, exist_ok=True)
