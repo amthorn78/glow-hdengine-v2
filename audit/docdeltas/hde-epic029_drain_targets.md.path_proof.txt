@@ -1,0 +1,5 @@
+path: audit/docdeltas/hde-epic029_drain_targets.md
+size_bytes: 580
+sha256: 81f3b7cf412836a2de70bcbfbf7c6107989eb6754667b658b7e9d02b46edc2ec
+mtime_utc: 2026-04-09T19:50:30Z
+produced_at_utc: 2026-04-09T15:30:05Z

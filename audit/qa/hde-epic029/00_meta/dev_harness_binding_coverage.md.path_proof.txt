@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic029/00_meta/dev_harness_binding_coverage.md
+size_bytes: 1126
+sha256: aca712380d2e90c366ed550fe6736eb6cee0db9c0cb76f5161c980b4b3a1e6a7
+mtime_utc: 2026-04-09T19:50:30Z
+produced_at_utc: 2026-04-09T15:30:05Z

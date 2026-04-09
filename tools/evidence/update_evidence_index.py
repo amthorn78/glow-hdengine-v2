@@ -187,6 +187,59 @@ EPIC028_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     },
 ]
 
+EPIC029_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "epic029.acceptance_map",
+        "discovered_physical_path": "docs/acceptance_map_epic029.json",
+        "epic_id": "HDE-EPIC029",
+    },
+    {
+        "artifact_key": "epic029.token_matrix",
+        "discovered_physical_path": "audit/qa/hde-epic029/token_evidence_matrix.md",
+        "epic_id": "HDE-EPIC029",
+    },
+    {
+        "artifact_key": "epic029.acceptance_map_viability",
+        "discovered_physical_path": "audit/qa/hde-epic029/acceptance_map_viability.log",
+        "epic_id": "HDE-EPIC029",
+    },
+    {
+        "artifact_key": "epic029.qa_step_logs_manifest",
+        "discovered_physical_path": "audit/qa/hde-epic029/qa_step_logs_manifest.json",
+        "epic_id": "HDE-EPIC029",
+    },
+    {
+        "artifact_key": "epic029.conjunction_json_surface_inventory",
+        "discovered_physical_path": "audit/qa/hde-epic029/00_meta/conjunction_json_surface_inventory.md",
+        "epic_id": "HDE-EPIC029",
+    },
+    {
+        "artifact_key": "epic029.dev_harness_binding_coverage",
+        "discovered_physical_path": "audit/qa/hde-epic029/00_meta/dev_harness_binding_coverage.md",
+        "epic_id": "HDE-EPIC029",
+    },
+    {
+        "artifact_key": "epic029.doc_deltas",
+        "discovered_physical_path": "audit/docdeltas/hde-epic029_doc_deltas.md",
+        "epic_id": "HDE-EPIC029",
+    },
+    {
+        "artifact_key": "epic029.drain_targets",
+        "discovered_physical_path": "audit/docdeltas/hde-epic029_drain_targets.md",
+        "epic_id": "HDE-EPIC029",
+    },
+    {
+        "artifact_key": "epic029.close_report",
+        "discovered_physical_path": "audit/EPIC-029_close_report.md",
+        "epic_id": "HDE-EPIC029",
+    },
+    {
+        "artifact_key": "epic029.manifest",
+        "discovered_physical_path": "audit/EPIC-029_MANIFEST.json",
+        "epic_id": "HDE-EPIC029",
+    },
+]
+
 A7_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
         "artifact_key": "a7.success_encoding_invariance",
@@ -469,6 +522,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *EPIC024_PRIMARY_ARTIFACTS,
             *EPIC027_PRIMARY_ARTIFACTS,
             *EPIC028_PRIMARY_ARTIFACTS,
+            *EPIC029_PRIMARY_ARTIFACTS,
             *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,
