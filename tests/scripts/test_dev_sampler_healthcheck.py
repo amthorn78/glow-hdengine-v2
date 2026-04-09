@@ -49,3 +49,66 @@ def test_dev_sampler_healthcheck_runs(tmp_path):
     log_text = log_path.read_text(encoding="utf-8")
     assert "sampler_response mode=dev" in log_text
     assert "status=200" in log_text
+
+
+def test_dev_sampler_healthcheck_fails_when_url_missing(tmp_path):
+    log_dir = tmp_path / "logs"
+    log_path = log_dir / "healthcheck.log"
+    env = os.environ.copy()
+    env.update(
+        {
+            "APP_ENV": "dev",
+            "SAFE_MODE": "1",
+            "ALLOW_NETWORK": "0",
+            "LC_ALL": "C",
+            "LANG": "C",
+            "TZ": "UTC",
+            "DEV_SAMPLER_LOG_DIR": str(log_dir),
+            "DEV_SAMPLER_LOG_PATH": str(log_path),
+        }
+    )
+    env.pop("DEV_SAMPLER_URL", None)
+
+    result = subprocess.run(
+        [sys.executable, str(HEALTHCHECK)],
+        cwd=REPO_ROOT,
+        env=env,
+        text=True,
+        capture_output=True,
+        timeout=120,
+    )
+
+    assert result.returncode == 1
+    log_text = log_path.read_text(encoding="utf-8")
+    assert "DEV_SAMPLER_URL is required and must be non-empty" in log_text
+
+
+def test_dev_sampler_healthcheck_fails_when_url_lacks_explicit_port(tmp_path):
+    log_dir = tmp_path / "logs"
+    log_path = log_dir / "healthcheck.log"
+    env = os.environ.copy()
+    env.update(
+        {
+            "DEV_SAMPLER_URL": "http://127.0.0.1/internal/dev/sampler",
+            "APP_ENV": "dev",
+            "SAFE_MODE": "1",
+            "ALLOW_NETWORK": "0",
+            "LC_ALL": "C",
+            "LANG": "C",
+            "TZ": "UTC",
+            "DEV_SAMPLER_LOG_DIR": str(log_dir),
+            "DEV_SAMPLER_LOG_PATH": str(log_path),
+        }
+    )
+
+    result = subprocess.run(
+        [sys.executable, str(HEALTHCHECK)],
+        cwd=REPO_ROOT,
+        env=env,
+        text=True,
+        capture_output=True,
+        timeout=120,
+    )
+
+    assert result.returncode == 1
+    assert "DEV_SAMPLER_URL must include an explicit port" in result.stderr
