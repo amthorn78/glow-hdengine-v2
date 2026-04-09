@@ -44,6 +44,8 @@ def _collect_query_values(name: str) -> list[str]:
 _MAX_WRITER_BYTES = 32_768
 _DIAGNOSTIC_ROUTE_ID = "ops.writer.diagnostic.v1"
 _DEV_WRITER_CONJUNCTION_ROUTE_ID = "dev.writer.conjunction.v1"
+_DEV_WRITER_CONJUNCTION_SUCCESS_TYPE = "dev.writer.conjunction.success.v1"
+_DEV_WRITER_CONJUNCTION_ERROR_TYPE = "dev.writer.conjunction.error.v1"
 
 _IDEMPOTENCE_CACHE: dict[str, dict[str, object]] = {}
 _IDEMPOTENCE_CACHE_LOCK = Lock()
@@ -89,9 +91,12 @@ def _writer_error(
     *,
     status: int,
     extra_headers: dict[str, str] | None = None,
+    envelope_type: str | None = None,
     sort_keys: bool = True,
 ) -> Response:
     envelope = error_envelope(code)
+    if envelope_type:
+        envelope["type"] = envelope_type
     return _emit_writer_response(
         envelope,
         status=status,
@@ -575,7 +580,11 @@ def get_reader_bp(emit_fn=None):
         left = _conjunction_part("a")
         right = _conjunction_part("b")
         if left is None or right is None:
-            return _writer_error("ERR_WRITER_INVALID_INPUT", status=422)
+            return _writer_error(
+                "ERR_WRITER_INVALID_INPUT",
+                status=422,
+                envelope_type=_DEV_WRITER_CONJUNCTION_ERROR_TYPE,
+            )
 
         request_payload = _canonical_conjunction_request(left, right)
         digest, canonical_preimage_text, canonical_json = _build_writer_request_preimage(
@@ -586,17 +595,27 @@ def get_reader_bp(emit_fn=None):
         g._idempotence_hash = digest
         _persist_idempotence_record(digest, canonical_preimage_text, canonical_json)
 
-        response = _emit_conjunction_response(left=left, right=right)
+        response = _emit_conjunction_response(
+            left=left,
+            right=right,
+            envelope_type=_DEV_WRITER_CONJUNCTION_ERROR_TYPE,
+        )
         if response.status_code != 200:
             return response
 
         try:
             conjunction_payload = json.loads(response.get_data(as_text=True))
         except json.JSONDecodeError:
-            return _writer_error("ERR_WRITER_INVALID_INPUT", status=422)
+            return _writer_error(
+                "ERR_WRITER_INVALID_INPUT",
+                status=422,
+                envelope_type=_DEV_WRITER_CONJUNCTION_ERROR_TYPE,
+            )
 
         writer_payload = {
             "ok": True,
+            "schema": "v1",
+            "type": _DEV_WRITER_CONJUNCTION_SUCCESS_TYPE,
             "writer": {
                 "idempotence_hash": digest,
                 "method": "GET",
@@ -606,11 +625,20 @@ def get_reader_bp(emit_fn=None):
         }
         return _emit_writer_response(writer_payload, status=200)
 
-    def _emit_conjunction_response(*, left: dict[str, str] | None = None, right: dict[str, str] | None = None) -> Response:
+    def _emit_conjunction_response(
+        *,
+        left: dict[str, str] | None = None,
+        right: dict[str, str] | None = None,
+        envelope_type: str | None = None,
+    ) -> Response:
         left = left if left is not None else _conjunction_part("a")
         right = right if right is not None else _conjunction_part("b")
         if left is None or right is None:
-            return _writer_error("ERR_WRITER_INVALID_INPUT", status=422)
+            return _writer_error(
+                "ERR_WRITER_INVALID_INPUT",
+                status=422,
+                envelope_type=envelope_type,
+            )
 
         rails_env = {
             "SAFE_MODE": os.getenv("SAFE_MODE", "1"),
@@ -646,13 +674,20 @@ def get_reader_bp(emit_fn=None):
             }
             if exc.details is not None:
                 details["provider_details"] = exc.details
+            envelope = error_envelope("ERR_WRITER_RAILS_CLOSED", details=details)
+            if envelope_type:
+                envelope["type"] = envelope_type
             return _emit_writer_response(
-                error_envelope("ERR_WRITER_RAILS_CLOSED", details=details),
+                envelope,
                 status=503,
                 sort_keys=False,
             )
         except ValueError:
-            return _writer_error("ERR_WRITER_INVALID_INPUT", status=422)
+            return _writer_error(
+                "ERR_WRITER_INVALID_INPUT",
+                status=422,
+                envelope_type=envelope_type,
+            )
 
         body = emit_public(payload, sort_keys=True)
         resp = Response(body, status=200, mimetype="application/json; charset=utf-8")

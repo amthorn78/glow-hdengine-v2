@@ -62,15 +62,26 @@ def main() -> int:
         writer_first = client.get("/dev/writer/conjunction", query_string=QUERY)
         writer_second = client.get("/dev/writer/conjunction", query_string=QUERY)
         reader = client.get("/dev/reader/conjunction", query_string=QUERY)
+        writer_invalid = client.get("/dev/writer/conjunction", query_string={"a_user_id": "left"})
 
-    if writer_first.status_code != 200 or writer_second.status_code != 200 or reader.status_code != 200:
+    if (
+        writer_first.status_code != 200
+        or writer_second.status_code != 200
+        or reader.status_code != 200
+        or writer_invalid.status_code != 422
+    ):
         raise SystemExit(
-            f"writer/readback failure statuses: writer_first={writer_first.status_code} writer_second={writer_second.status_code} reader={reader.status_code}"
+            "writer/readback failure statuses: "
+            f"writer_first={writer_first.status_code} "
+            f"writer_second={writer_second.status_code} "
+            f"reader={reader.status_code} "
+            f"writer_invalid={writer_invalid.status_code}"
         )
 
     writer_first_payload = json.loads(writer_first.data)
     writer_second_payload = json.loads(writer_second.data)
     reader_payload = json.loads(reader.data)
+    writer_invalid_payload = json.loads(writer_invalid.data)
 
     writer_result = writer_first_payload.get("result")
     parity_writer_bytes = writer_first.data == writer_second.data
@@ -89,6 +100,8 @@ def main() -> int:
             "writer_bytes_two_run_equal": parity_writer_bytes,
             "writer_payload_two_run_equal": parity_writer_result,
             "writer_result_reader_readback_equal": parity_readback,
+            "writer_success_typed_envelope": writer_first_payload.get("type") == "dev.writer.conjunction.success.v1",
+            "writer_error_typed_envelope": writer_invalid_payload.get("type") == "dev.writer.conjunction.error.v1",
         },
         "query": QUERY,
     }
@@ -106,11 +119,14 @@ def main() -> int:
                 "writer_first_status=200",
                 "writer_second_status=200",
                 "reader_status=200",
+                "writer_invalid_status=422",
                 f"writer_route_id={summary['writer_route_id']}",
                 f"idempotence_hash={summary['idempotence_hash']}",
                 f"writer_bytes_two_run_equal={str(parity_writer_bytes).lower()}",
                 f"writer_payload_two_run_equal={str(parity_writer_result).lower()}",
                 f"writer_result_reader_readback_equal={str(parity_readback).lower()}",
+                f"writer_success_type={writer_first_payload.get('type')}",
+                f"writer_error_type={writer_invalid_payload.get('type')}",
                 f"writer_payload_sha256={hashlib.sha256(_as_json_bytes(writer_first_payload)).hexdigest()}",
                 f"reader_payload_sha256={hashlib.sha256(_as_json_bytes(reader_payload)).hexdigest()}",
                 "",

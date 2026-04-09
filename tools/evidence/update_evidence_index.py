@@ -230,7 +230,8 @@ CONJUNCTION_WRITER_ARTIFACTS: list[dict[str, object]] = [
 ]
 
 FORCE_REFRESH_ARTIFACT_RELS: set[str] = {
-    "artifacts/proofs/success_encoding_invariance.txt",
+    "artifacts/writer/conjunction_write_readback.log",
+    "artifacts/writer/conjunction_writer_summary.json",
     "artifacts/evidence_index.jsonl",
     "artifacts/evidence_index.jsonl.sha256",
     "docs/evidence/INDEX.json",
