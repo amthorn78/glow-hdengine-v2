@@ -1,4 +1,4 @@
 environment: local_dev
-dev_sampler_url: not published
+dev_sampler_url: http://127.0.0.1:8000/internal/dev/sampler
 status: not yet closed
-reason: local-dev DEV_SAMPLER_URL is still OPEN/TBD in canon; no infra-owned binding was available for this OPS run, so no local URL was guessed.
+reason: PF07 publishes DEV_SAMPLER_URL, but this OPS run disposition remained not-closed due step creation and AI data indexing failure.
