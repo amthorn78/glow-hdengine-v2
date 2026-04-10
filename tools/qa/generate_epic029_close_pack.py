@@ -62,6 +62,41 @@ LIVE_QA_CHECKS = {
 }
 
 
+def _has_path_proof(path: Path) -> bool:
+    return path.with_name(path.name + ".path_proof.txt").exists()
+
+
+def _evidence_index_status() -> dict[str, bool]:
+    index = ROOT / "docs" / "evidence" / "INDEX.json"
+    mirror = ROOT / "artifacts" / "evidence_index.jsonl"
+    index_sha = ROOT / "docs" / "evidence" / "INDEX.sha256"
+    mirror_sha = ROOT / "artifacts" / "evidence_index.jsonl.sha256"
+
+    index_present = index.exists() and _has_path_proof(index)
+    mirror_present = mirror.exists() and _has_path_proof(mirror)
+    hashes_present = (
+        index_sha.exists()
+        and mirror_sha.exists()
+        and _has_path_proof(index_sha)
+        and _has_path_proof(mirror_sha)
+    )
+    hashes_match = False
+    if index_present and mirror_present and hashes_present:
+        index_parts = index_sha.read_text(encoding="utf-8").strip().split()
+        mirror_parts = mirror_sha.read_text(encoding="utf-8").strip().split()
+        if index_parts and mirror_parts:
+            index_expected = index_parts[0]
+            mirror_expected = mirror_parts[0]
+            hashes_match = (
+                index_expected == _sha256(index) and mirror_expected == _sha256(mirror)
+            )
+    return {
+        "evidence_index_updated": index_present,
+        "machine_mirror_updated": mirror_present,
+        "evidence_index_hash": hashes_present and hashes_match,
+    }
+
+
 def _utc_now() -> str:
     return _dt.datetime.now(tz=_dt.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
@@ -112,7 +147,7 @@ def _live_qa_status() -> dict[str, bool]:
     return status
 
 
-def _tokens(live_qa: dict[str, bool]) -> list[dict[str, object]]:
+def _tokens(live_qa: dict[str, bool], index_status: dict[str, bool]) -> list[dict[str, object]]:
     return [
         {
             "name": "DOC_DELTA_PRESENT_OK",
@@ -126,19 +161,19 @@ def _tokens(live_qa: dict[str, bool]) -> list[dict[str, object]]:
         {
             "name": "EVIDENCE_INDEX_UPDATED_OK",
             "owner_pf": "PF12 — Schemas & Artifacts §Evidence Index",
-            "status": "implemented",
+            "status": "implemented" if index_status["evidence_index_updated"] else "token_incomplete",
             "evidence_titles": ["docs/evidence/INDEX.json"],
         },
         {
             "name": "MACHINE_MIRROR_UPDATED_OK",
             "owner_pf": "PF12 — Schemas & Artifacts §Evidence Mirror",
-            "status": "implemented",
+            "status": "implemented" if index_status["machine_mirror_updated"] else "token_incomplete",
             "evidence_titles": ["artifacts/evidence_index.jsonl"],
         },
         {
             "name": "EVIDENCE_INDEX_HASH_OK",
             "owner_pf": "PF12 — Schemas & Artifacts §Evidence Hash Discipline",
-            "status": "implemented",
+            "status": "implemented" if index_status["evidence_index_hash"] else "token_incomplete",
             "evidence_titles": [
                 "docs/evidence/INDEX.sha256",
                 "artifacts/evidence_index.jsonl.sha256",
@@ -182,20 +217,20 @@ def _tokens(live_qa: dict[str, bool]) -> list[dict[str, object]]:
     ]
 
 
-def _write_acceptance_map(live_qa: dict[str, bool]) -> None:
-    _write_json(ACCEPTANCE_MAP_PATH, {"epic_id": EPIC_ID, "tokens": _tokens(live_qa)})
+def _write_acceptance_map(live_qa: dict[str, bool], index_status: dict[str, bool]) -> None:
+    _write_json(ACCEPTANCE_MAP_PATH, {"epic_id": EPIC_ID, "tokens": _tokens(live_qa, index_status)})
 
 
-def _write_token_matrix(live_qa: dict[str, bool]) -> None:
+def _write_token_matrix(live_qa: dict[str, bool], index_status: dict[str, bool]) -> None:
     lines = [
         "# HDE-EPIC029 Token ↔ Evidence Matrix",
         "",
         "| token_name | owner_pf | evidence_artifacts | ci_tests_jobs | qa_root_logs | status | notes |",
         "| --- | --- | --- | --- | --- | --- | --- |",
         "| DOC_DELTA_PRESENT_OK | PF04 — HDE Governance §2.0.0 | audit/docdeltas/hde-epic029_doc_deltas.md; audit/docdeltas/hde-epic029_drain_targets.md | Bound by close-pack generator outputs | acceptance_map_viability.log | Implemented | Doc-delta and drain-target ledgers are generated and bound for this close pack. |",
-        "| EVIDENCE_INDEX_UPDATED_OK | PF12 — Schemas & Artifacts §Evidence Index | docs/evidence/INDEX.json | tools/evidence/update_evidence_index.py | acceptance_map_viability.log | Implemented | Human evidence index is refreshed in lockstep with governed artifacts. |",
-        "| MACHINE_MIRROR_UPDATED_OK | PF12 — Schemas & Artifacts §Evidence Mirror | artifacts/evidence_index.jsonl | tools/evidence/update_evidence_index.py | acceptance_map_viability.log | Implemented | Machine mirror is refreshed in lockstep with the human index. |",
-        "| EVIDENCE_INDEX_HASH_OK | PF12 — Schemas & Artifacts §Evidence Hash Discipline | docs/evidence/INDEX.sha256; artifacts/evidence_index.jsonl.sha256 | tools/evidence/update_evidence_index.py | acceptance_map_viability.log | Implemented | Index and mirror hash sidecars are regenerated with canonical tooling. |",
+        f"| EVIDENCE_INDEX_UPDATED_OK | PF12 — Schemas & Artifacts §Evidence Index | docs/evidence/INDEX.json | tools/evidence/update_evidence_index.py | acceptance_map_viability.log | {'Implemented' if index_status['evidence_index_updated'] else 'Planned'} | {'Bound only when INDEX.json and INDEX.json.path_proof.txt are present.' if index_status['evidence_index_updated'] else 'Deferred: missing INDEX.json or its path proof; no synthetic pass claim.'} |",
+        f"| MACHINE_MIRROR_UPDATED_OK | PF12 — Schemas & Artifacts §Evidence Mirror | artifacts/evidence_index.jsonl | tools/evidence/update_evidence_index.py | acceptance_map_viability.log | {'Implemented' if index_status['machine_mirror_updated'] else 'Planned'} | {'Bound only when evidence_index.jsonl and evidence_index.jsonl.path_proof.txt are present.' if index_status['machine_mirror_updated'] else 'Deferred: missing evidence mirror or its path proof; no synthetic pass claim.'} |",
+        f"| EVIDENCE_INDEX_HASH_OK | PF12 — Schemas & Artifacts §Evidence Hash Discipline | docs/evidence/INDEX.sha256; artifacts/evidence_index.jsonl.sha256 | tools/evidence/update_evidence_index.py | acceptance_map_viability.log | {'Implemented' if index_status['evidence_index_hash'] else 'Planned'} | {'Bound only when sha256 sidecars and path proofs exist and hashes match current bytes.' if index_status['evidence_index_hash'] else 'Deferred: missing or mismatched hash sidecars/path proofs; no synthetic pass claim.'} |",
         "| ENV_RAILS_POLICY_OK | PF10 — HDE Build Notes §Closed Rails | artifacts/proofs/env_pins.txt | ci/checks/check_env_pins.sh (via sanity pipeline) | acceptance_map_viability.log | Implemented | Determinism env pins evidence remains present for closed-rails posture. |",
         "| JSON_CANONICAL_CHECK_OK | PF10 — HDE Build Notes §Canonical JSON Gate | audit/gates/json_gate/canonical/json_gate_structured_record.json; audit/gates/canonical_json/json_canonical_check.log | tools/evidence/run_canonical_json_gate.py (governed) | acceptance_map_viability.log | Implemented | Canonical JSON gate evidence is bound without introducing new token names. |",
         f"| TESTS_PASS_OK | PF19 — Glow QA Guide §QA Rails | audit/qa/hde-epic029/checks/po-epic-close-live-qa/primary.log | Existing epic-close live QA output only | acceptance_map_viability.log | {'Implemented' if live_qa['po-epic-close-live-qa'] else 'Planned'} | {'Bound to existing live QA primary log.' if live_qa['po-epic-close-live-qa'] else 'Deferred: required live QA primary log is missing; no pass claim synthesized.'} |",
@@ -420,9 +455,10 @@ def main() -> int:
 
     produced_at = _utc_now()
     live_qa = _live_qa_status()
+    index_status = _evidence_index_status()
 
-    _write_acceptance_map(live_qa)
-    _write_token_matrix(live_qa)
+    _write_acceptance_map(live_qa, index_status)
+    _write_token_matrix(live_qa, index_status)
     _write_qa_step_manifest(live_qa)
     _write_viability_log()
     _write_dev_harness_binding_coverage(live_qa)
