@@ -1,0 +1,6 @@
+[check_id] po-postcommit
+[timestamp_utc] 2026-04-10T21:07:52Z
+[command] /workspaces/glow-hdengine-v2/.venv/bin/python tools/evidence/run_sanity_pipeline.py
+[evidence-index] env pins: ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC
+[evidence-index] env pins: ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC
+[exit_code] 0

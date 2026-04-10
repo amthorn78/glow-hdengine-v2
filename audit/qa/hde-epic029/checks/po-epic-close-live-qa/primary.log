@@ -1,0 +1,6 @@
+[check_id] po-epic-close-live-qa
+[timestamp_utc] 2026-04-10T21:07:22Z
+[command] /workspaces/glow-hdengine-v2/.venv/bin/python -m pytest -q tests/adapter/test_dev_sampler_http.py tests/http/test_dev_conjunction_http.py tests/http/test_endpoint_catalog.py
+..............                                                           [100%]
+14 passed in 1.39s
+[exit_code] 0

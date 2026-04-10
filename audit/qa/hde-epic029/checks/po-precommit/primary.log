@@ -1,0 +1,4 @@
+[check_id] po-precommit
+[timestamp_utc] 2026-04-10T21:07:40Z
+[command] ci/checks/check_env_pins.sh && ci/checks/check_cli_help.sh && ci/checks/check_final_lf.sh
+[exit_code] 0
