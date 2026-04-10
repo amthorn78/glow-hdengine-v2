@@ -17,6 +17,6 @@
 - `audit/ops/hde-epic029/ops-01/created_files_sha256.txt`
 
 ## Epic-close Live QA outputs disposition
-- `audit/qa/hde-epic029/checks/po-epic-close-live-qa/primary.log`: missing (deferred; no synthetic PASS claim).
-- `audit/qa/hde-epic029/checks/po-precommit/primary.log`: missing (deferred; no synthetic PASS claim).
-- `audit/qa/hde-epic029/checks/po-postcommit/primary.log`: missing (deferred; no synthetic PASS claim).
+- `audit/qa/hde-epic029/checks/po-epic-close-live-qa/primary.log`: present and bound.
+- `audit/qa/hde-epic029/checks/po-precommit/primary.log`: present and bound.
+- `audit/qa/hde-epic029/checks/po-postcommit/primary.log`: present and bound.
