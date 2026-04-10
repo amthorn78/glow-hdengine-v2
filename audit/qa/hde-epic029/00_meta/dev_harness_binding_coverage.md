@@ -4,7 +4,7 @@
 - Source of truth: `audit/ops/hde-epic029/ops-01/binding_disposition.md`.
 - Codespaces remains **not yet closed** because accepted remediation evidence recorded `gating_discrepancy observed (APP_ENV=prod did not return 403)`.
 - Local dev remains **not yet closed**; PF07 publishes `DEV_SAMPLER_URL=http://127.0.0.1:8000/internal/dev/sampler`, but OPS disposition recorded step-creation and AI-data-indexing failure.
-- Therefore `HDE_CONJ001_4_DEV_HARNESS_CLOSURE_OK` remains `token_incomplete` in this close-pack.
+- Therefore `HDE-CONJ001.4` remains not done in this close-pack.
 
 ## OPS-01 files bound by this PR
 - `audit/ops/hde-epic029/ops-01/commands.txt`
