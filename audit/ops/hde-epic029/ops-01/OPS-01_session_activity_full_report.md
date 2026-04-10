@@ -30,7 +30,7 @@ This report consolidates the full session activity for OPS-01 (HDE-EPIC029 / Con
 8. Probed local-dev environment for a published local-dev sampler binding:
    - LOCAL_DEV_SAMPLER_URL was empty/not set.
    - DEV_SAMPLER_URL was set to canonical Codespaces value.
-9. Applied explicit local-dev deferral (no guessed URL), recorded in:
+9. Recorded local-dev published PF07 DEV_SAMPLER_URL and not-yet-closed disposition (step creation + AI data indexing failure), recorded in:
    - local_dev_sampler_url.md
    - binding_disposition.md
    - exit_codes.txt (deferred marker)
@@ -40,7 +40,7 @@ This report consolidates the full session activity for OPS-01 (HDE-EPIC029 / Con
 13. Performed post-run verification of checksum file newline integrity.
 
 ## Outcome Summary
-- Codespaces binding validation: PASSED (closed)
+- Codespaces binding validation: NOT YET CLOSED (gating_discrepancy persisted: APP_ENV=prod returned 200)
 - Local-dev binding validation: DEFERRED (not yet closed; published PF07 DEV_SAMPLER_URL was available, but step creation and AI data indexing failure kept disposition open)
 - OPS-01 deliverables D1-D8: PRESENT
 
@@ -123,7 +123,7 @@ allow_network: 0
 lc_all: C
 lang: C
 tz: UTC
-notes: canonical Codespaces binding validated via scripts/qa/dev_sampler_healthcheck.py
+notes: remediation rerun captured gating_discrepancy observed (APP_ENV=prod did not return 403); Codespaces remains not yet closed pending clean validation.
 ```
 
 ### D6 — local_dev_sampler_url.md
@@ -140,7 +140,7 @@ reason: PF07 publishes DEV_SAMPLER_URL=http://127.0.0.1:8000/internal/dev/sample
 Path: audit/ops/hde-epic029/ops-01/binding_disposition.md
 
 ```text
-codespaces: closed - canonical DEV_SAMPLER_URL validated and repo-side healthcheck passed.
+codespaces: not yet closed - remediation rerun recorded gating_discrepancy observed (APP_ENV=prod did not return 403) in stdout.log.
 local_dev: not yet closed - PF07 published DEV_SAMPLER_URL=http://127.0.0.1:8000/internal/dev/sampler, but OPS recorded step creation and AI data indexing failure.
 ```
 
@@ -148,17 +148,17 @@ local_dev: not yet closed - PF07 published DEV_SAMPLER_URL=http://127.0.0.1:8000
 Path: audit/ops/hde-epic029/ops-01/created_files_sha256.txt
 
 ```text
-d98b94dfe5aa1fa656fadb6c6389c4e984a76c10a7de7a41d0d8e76b812ac6a2  audit/ops/hde-epic029/ops-01/commands.txt
-17de299f5f8e26985bbdf52994302b362b116d4ea24ec7effe66de6c97b875d2  audit/ops/hde-epic029/ops-01/stdout.log
-4eb0efcc3eb35703a1d9c2eed81955219d78cc25ff26acb4b679dbbc24d95e63  audit/ops/hde-epic029/ops-01/stderr.log
-3bc97f326b278473fec1c7a1bffca33e1db4364abdd4bcea0f21b8fc0d3a8caf  audit/ops/hde-epic029/ops-01/exit_codes.txt
-18d91fb90c8978612d619d96664750288304f55ff6631ee78eaaf49e25150a4d  audit/ops/hde-epic029/ops-01/codespaces_dev_sampler_url.md
+8921960ab9153dd28663b3a5883fe0d49bf99b69fe7d9c16ed3d254462e75d1c  audit/ops/hde-epic029/ops-01/commands.txt
+9a8bf85603389752a2a4991265e27bff1161bf6608074eb98c27886d1b26872f  audit/ops/hde-epic029/ops-01/stdout.log
+99dda4af95f223a831e1e3d8427a4b0ec46c9a3cf990322dc981daca04f4bb7d  audit/ops/hde-epic029/ops-01/stderr.log
+28656388378da089abd5ad6db74ebedd40fe46d9cb534f39bf5da8a1e6803811  audit/ops/hde-epic029/ops-01/exit_codes.txt
+b2dd8457e7027ceb414c66b463f7b97718528b9bbe23bb20fa03c9b542bb7911  audit/ops/hde-epic029/ops-01/codespaces_dev_sampler_url.md
 aaf8b0fd222b3afbfeeeb5526687ca29efcab9614758df7fc8318ae6d914ee66  audit/ops/hde-epic029/ops-01/local_dev_sampler_url.md
-a22b94d2c649a9e1bcd4ad0d9964881468e16c6fb7c41c98e6891c272c9052f2  audit/ops/hde-epic029/ops-01/binding_disposition.md
+30990460fd2a0a9668b49ce5f4dd47cffb4a2165265153088c110fb5129e7adc  audit/ops/hde-epic029/ops-01/binding_disposition.md
 ```
 
 ## Final Session Status
 OPS-01 evidence generation is complete for this session with explicit, non-overstated closure status:
 
-- codespaces: closed
+- codespaces: not yet closed
 - local_dev: not yet closed
