@@ -41,7 +41,7 @@ This report consolidates the full session activity for OPS-01 (HDE-EPIC029 / Con
 
 ## Outcome Summary
 - Codespaces binding validation: PASSED (closed)
-- Local-dev binding validation: DEFERRED (not yet closed; no published infra-owned local URL available in environment)
+- Local-dev binding validation: DEFERRED (not yet closed; published PF07 DEV_SAMPLER_URL was available, but step creation and AI data indexing failure kept disposition open)
 - OPS-01 deliverables D1-D8: PRESENT
 
 ## Post-Run Verification Output
@@ -68,7 +68,7 @@ Path: audit/ops/hde-epic029/ops-01/commands.txt
 ```text
 APP_ENV=dev SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC PORT=8000 scripts/dev_start_reader.sh
 DEV_SAMPLER_URL=http://127.0.0.1:8000/internal/dev/sampler APP_ENV=dev SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC scripts/qa/dev_sampler_healthcheck.py
-LOCAL_DEV flow: use published local-dev DEV_SAMPLER_URL if present; otherwise record deferral and do not guess.
+LOCAL_DEV flow: use published PF07 DEV_SAMPLER_URL and record OPS outcome when step creation / AI data indexing failure prevents closure.
 ```
 
 ### D2 — stdout.log
@@ -108,7 +108,7 @@ Path: audit/ops/hde-epic029/ops-01/exit_codes.txt
 
 ```text
 codespaces_healthcheck=0
-local_dev_healthcheck=DEFERRED_NO_PUBLISHED_BINDING
+local_dev_healthcheck=NOT_CLOSED_STEP_CREATION_AND_AI_DATA_INDEXING_FAILURE
 ```
 
 ### D5 — codespaces_dev_sampler_url.md
@@ -131,9 +131,9 @@ Path: audit/ops/hde-epic029/ops-01/local_dev_sampler_url.md
 
 ```text
 environment: local_dev
-dev_sampler_url: not published
+dev_sampler_url: http://127.0.0.1:8000/internal/dev/sampler
 status: not yet closed
-reason: local-dev DEV_SAMPLER_URL is still OPEN/TBD in canon; no infra-owned binding was available for this OPS run, so no local URL was guessed.
+reason: PF07 publishes DEV_SAMPLER_URL=http://127.0.0.1:8000/internal/dev/sampler, but OPS outcome remained not yet closed due step creation and AI data indexing failure.
 ```
 
 ### D7 — binding_disposition.md
@@ -141,7 +141,7 @@ Path: audit/ops/hde-epic029/ops-01/binding_disposition.md
 
 ```text
 codespaces: closed - canonical DEV_SAMPLER_URL validated and repo-side healthcheck passed.
-local_dev: not yet closed - no published infra-owned local DEV_SAMPLER_URL was available for this OPS run.
+local_dev: not yet closed - PF07 published DEV_SAMPLER_URL=http://127.0.0.1:8000/internal/dev/sampler, but OPS recorded step creation and AI data indexing failure.
 ```
 
 ### D8 — created_files_sha256.txt
@@ -153,7 +153,7 @@ d98b94dfe5aa1fa656fadb6c6389c4e984a76c10a7de7a41d0d8e76b812ac6a2  audit/ops/hde-
 4eb0efcc3eb35703a1d9c2eed81955219d78cc25ff26acb4b679dbbc24d95e63  audit/ops/hde-epic029/ops-01/stderr.log
 3bc97f326b278473fec1c7a1bffca33e1db4364abdd4bcea0f21b8fc0d3a8caf  audit/ops/hde-epic029/ops-01/exit_codes.txt
 18d91fb90c8978612d619d96664750288304f55ff6631ee78eaaf49e25150a4d  audit/ops/hde-epic029/ops-01/codespaces_dev_sampler_url.md
-5b3c14b78d688206f5f13f65d93f8e070e47e67983985c579916d47c2393e4c4  audit/ops/hde-epic029/ops-01/local_dev_sampler_url.md
+aaf8b0fd222b3afbfeeeb5526687ca29efcab9614758df7fc8318ae6d914ee66  audit/ops/hde-epic029/ops-01/local_dev_sampler_url.md
 a22b94d2c649a9e1bcd4ad0d9964881468e16c6fb7c41c98e6891c272c9052f2  audit/ops/hde-epic029/ops-01/binding_disposition.md
 ```
 

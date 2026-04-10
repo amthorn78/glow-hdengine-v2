@@ -32,7 +32,7 @@ To remove contradiction and prevent false-positive closure propagation, the bund
    - discrepancy persisted (`APP_ENV=prod did not return 403`).
 8. Updated `codespaces_dev_sampler_url.md` note to truthful remediation outcome.
 9. Updated `binding_disposition.md` to `codespaces: not yet closed`.
-10. Preserved local-dev deferral evidence unchanged (`not published`, `not yet closed`).
+10. Recorded local-dev published DEV_SAMPLER_URL and preserved not-yet-closed OPS disposition due step creation / AI data indexing failure.
 11. Regenerated `created_files_sha256.txt` for final D1-D7 state.
 12. Verified checksum file newline integrity.
 
@@ -100,7 +100,7 @@ Path: `audit/ops/hde-epic029/ops-01/exit_codes.txt`
 ```text
 codespaces_healthcheck_rerun=0
 codespaces_disposition_rerun=NOT_YET_CLOSED_GATING_DISCREPANCY
-local_dev_healthcheck=DEFERRED_NO_PUBLISHED_BINDING
+local_dev_healthcheck=NOT_CLOSED_STEP_CREATION_AND_AI_DATA_INDEXING_FAILURE
 ```
 
 ### D5 — codespaces_dev_sampler_url.md
@@ -123,9 +123,9 @@ Path: `audit/ops/hde-epic029/ops-01/local_dev_sampler_url.md`
 
 ```text
 environment: local_dev
-dev_sampler_url: not published
+dev_sampler_url: http://127.0.0.1:8000/internal/dev/sampler
 status: not yet closed
-reason: local-dev DEV_SAMPLER_URL is still OPEN/TBD in canon; no infra-owned binding was available for this OPS run, so no local URL was guessed.
+reason: PF07 publishes DEV_SAMPLER_URL=http://127.0.0.1:8000/internal/dev/sampler, but OPS outcome remained not yet closed due step creation and AI data indexing failure.
 ```
 
 ### D7 — binding_disposition.md
@@ -133,7 +133,7 @@ Path: `audit/ops/hde-epic029/ops-01/binding_disposition.md`
 
 ```text
 codespaces: not yet closed - remediation rerun recorded gating_discrepancy observed (APP_ENV=prod did not return 403) in stdout.log.
-local_dev: not yet closed - no published infra-owned local DEV_SAMPLER_URL was available for this OPS run.
+local_dev: not yet closed - PF07 published DEV_SAMPLER_URL=http://127.0.0.1:8000/internal/dev/sampler, but OPS recorded step creation and AI data indexing failure.
 ```
 
 ### D8 — created_files_sha256.txt
@@ -145,8 +145,8 @@ Path: `audit/ops/hde-epic029/ops-01/created_files_sha256.txt`
 99dda4af95f223a831e1e3d8427a4b0ec46c9a3cf990322dc981daca04f4bb7d  audit/ops/hde-epic029/ops-01/stderr.log
 28656388378da089abd5ad6db74ebedd40fe46d9cb534f39bf5da8a1e6803811  audit/ops/hde-epic029/ops-01/exit_codes.txt
 b2dd8457e7027ceb414c66b463f7b97718528b9bbe23bb20fa03c9b542bb7911  audit/ops/hde-epic029/ops-01/codespaces_dev_sampler_url.md
-5b3c14b78d688206f5f13f65d93f8e070e47e67983985c579916d47c2393e4c4  audit/ops/hde-epic029/ops-01/local_dev_sampler_url.md
-84dbbcd4c27d5a9eae996794707d2c86410cc3ded5b8850fc32534ac4091aeb3  audit/ops/hde-epic029/ops-01/binding_disposition.md
+aaf8b0fd222b3afbfeeeb5526687ca29efcab9614758df7fc8318ae6d914ee66  audit/ops/hde-epic029/ops-01/local_dev_sampler_url.md
+30990460fd2a0a9668b49ce5f4dd47cffb4a2165265153088c110fb5129e7adc  audit/ops/hde-epic029/ops-01/binding_disposition.md
 ```
 
 ## Final Acceptance Posture for PR-04 Input
