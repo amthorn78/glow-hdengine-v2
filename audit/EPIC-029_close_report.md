@@ -4,12 +4,17 @@
 This close-pack finalizes offline acceptance and closure-artifact binding for EPIC029 using existing governed evidence only. It does not reopen runtime scope.
 
 ## Capture timestamp
-- `2026-04-10T15:42:02Z`
+- `2026-04-10T18:00:52Z`
 
 ## PF09 mapping used
 - Task: `HDE-CONJ009`
 - Subtask: `HDE-CONJ009.1`
 - Additional bound subtasks: `HDE-CONJ008.1`, `HDE-CONJ001.4`.
+
+## PF09 scope truth (bound in metadata, not minted as acceptance tokens)
+- `HDE-CONJ009` / `HDE-CONJ009.1`: represented via conjunction JSON surface inventory binding.
+- `HDE-CONJ008` / `HDE-CONJ008.1`: represented via writer-envelope evidence binding.
+- `HDE-CONJ001` / `HDE-CONJ001.4`: represented via OPS disposition; remains not done while codespaces/local_dev are not yet closed.
 
 ## OPS-01 truth preserved
 - Codespaces is **not yet closed** (accepted remediation rerun recorded gating discrepancy: APP_ENV=prod did not return 403).

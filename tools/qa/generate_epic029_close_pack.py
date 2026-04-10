@@ -21,6 +21,11 @@ EPIC_SLUG = "hde-epic029"
 RUN_ID = "epic029-close"
 PF09_TASK_ID = "HDE-CONJ009"
 PF09_SUBTASK_ID = "HDE-CONJ009.1"
+PF09_SCOPE = [
+    {"task_id": "HDE-CONJ009", "subtask_id": "HDE-CONJ009.1"},
+    {"task_id": "HDE-CONJ008", "subtask_id": "HDE-CONJ008.1"},
+    {"task_id": "HDE-CONJ001", "subtask_id": "HDE-CONJ001.4"},
+]
 
 QA_ROOT = ROOT / "audit" / "qa" / EPIC_SLUG
 OPS_ROOT = ROOT / "audit" / "ops" / EPIC_SLUG / "ops-01"
@@ -55,6 +60,41 @@ LIVE_QA_CHECKS = {
     "po-precommit": QA_ROOT / "checks" / "po-precommit" / "primary.log",
     "po-postcommit": QA_ROOT / "checks" / "po-postcommit" / "primary.log",
 }
+
+
+def _has_path_proof(path: Path) -> bool:
+    return path.with_name(path.name + ".path_proof.txt").exists()
+
+
+def _evidence_index_status() -> dict[str, bool]:
+    index = ROOT / "docs" / "evidence" / "INDEX.json"
+    mirror = ROOT / "artifacts" / "evidence_index.jsonl"
+    index_sha = ROOT / "docs" / "evidence" / "INDEX.sha256"
+    mirror_sha = ROOT / "artifacts" / "evidence_index.jsonl.sha256"
+
+    index_present = index.exists() and _has_path_proof(index)
+    mirror_present = mirror.exists() and _has_path_proof(mirror)
+    hashes_present = (
+        index_sha.exists()
+        and mirror_sha.exists()
+        and _has_path_proof(index_sha)
+        and _has_path_proof(mirror_sha)
+    )
+    hashes_match = False
+    if index_present and mirror_present and hashes_present:
+        index_parts = index_sha.read_text(encoding="utf-8").strip().split()
+        mirror_parts = mirror_sha.read_text(encoding="utf-8").strip().split()
+        if index_parts and mirror_parts:
+            index_expected = index_parts[0]
+            mirror_expected = mirror_parts[0]
+            hashes_match = (
+                index_expected == _sha256(index) and mirror_expected == _sha256(mirror)
+            )
+    return {
+        "evidence_index_updated": index_present,
+        "machine_mirror_updated": mirror_present,
+        "evidence_index_hash": hashes_present and hashes_match,
+    }
 
 
 def _utc_now() -> str:
@@ -98,43 +138,69 @@ def _missing_required_paths() -> list[str]:
 
 
 def _live_qa_status() -> dict[str, bool]:
-    return {check_id: path.exists() for check_id, path in LIVE_QA_CHECKS.items()}
+    status: dict[str, bool] = {}
+    for check_id, path in LIVE_QA_CHECKS.items():
+        if not path.exists():
+            status[check_id] = False
+            continue
+        status[check_id] = path.read_text(encoding="utf-8").strip() != "MISSING"
+    return status
 
 
-def _tokens(live_qa: dict[str, bool]) -> list[dict[str, object]]:
+def _tokens(live_qa: dict[str, bool], index_status: dict[str, bool]) -> list[dict[str, object]]:
     return [
         {
-            "name": "HDE_CONJ009_1_SURFACE_INVENTORY_BOUND_OK",
-            "owner_pf": "PF09.4 — Canon-HDE-Build-Checklist-Conjunction-v1 §HDE-CONJ009.1",
+            "name": "DOC_DELTA_PRESENT_OK",
+            "owner_pf": "PF04 — HDE Governance §2.0.0",
             "status": "implemented",
             "evidence_titles": [
-                "audit/qa/hde-epic029/00_meta/conjunction_json_surface_inventory.md",
-                "docs/acceptance_map_epic029.json",
+                "audit/docdeltas/hde-epic029_doc_deltas.md",
+                "audit/docdeltas/hde-epic029_drain_targets.md",
             ],
         },
         {
-            "name": "HDE_CONJ008_1_WRITER_ENVELOPE_BOUND_OK",
-            "owner_pf": "PF09.4 — Canon-HDE-Build-Checklist-Conjunction-v1 §HDE-CONJ008.1",
-            "status": "implemented",
+            "name": "EVIDENCE_INDEX_UPDATED_OK",
+            "owner_pf": "PF12 — Schemas & Artifacts §Evidence Index",
+            "status": "implemented" if index_status["evidence_index_updated"] else "token_incomplete",
+            "evidence_titles": ["docs/evidence/INDEX.json"],
+        },
+        {
+            "name": "MACHINE_MIRROR_UPDATED_OK",
+            "owner_pf": "PF12 — Schemas & Artifacts §Evidence Mirror",
+            "status": "implemented" if index_status["machine_mirror_updated"] else "token_incomplete",
+            "evidence_titles": ["artifacts/evidence_index.jsonl"],
+        },
+        {
+            "name": "EVIDENCE_INDEX_HASH_OK",
+            "owner_pf": "PF12 — Schemas & Artifacts §Evidence Hash Discipline",
+            "status": "implemented" if index_status["evidence_index_hash"] else "token_incomplete",
             "evidence_titles": [
-                "artifacts/writer/conjunction_write_readback.log",
-                "artifacts/writer/conjunction_writer_summary.json",
+                "docs/evidence/INDEX.sha256",
+                "artifacts/evidence_index.jsonl.sha256",
             ],
         },
         {
-            "name": "HDE_CONJ001_4_DEV_HARNESS_CLOSURE_OK",
-            "owner_pf": "PF09.4 — Canon-HDE-Build-Checklist-Conjunction-v1 §HDE-CONJ001.4",
-            "status": "token_incomplete",
+            "name": "ENV_RAILS_POLICY_OK",
+            "owner_pf": "PF10 — HDE Build Notes §Closed Rails",
+            "status": "implemented",
+            "evidence_titles": ["artifacts/proofs/env_pins.txt"],
+        },
+        {
+            "name": "JSON_CANONICAL_CHECK_OK",
+            "owner_pf": "PF10 — HDE Build Notes §Canonical JSON Gate",
+            "status": "implemented",
             "evidence_titles": [
-                "audit/ops/hde-epic029/ops-01/binding_disposition.md",
-                "audit/qa/hde-epic029/00_meta/dev_harness_binding_coverage.md",
+                "audit/gates/json_gate/canonical/json_gate_structured_record.json",
+                "audit/gates/canonical_json/json_canonical_check.log",
             ],
         },
         {
             "name": "TESTS_PASS_OK",
             "owner_pf": "PF19 — Glow QA Guide §QA Rails",
             "status": "implemented" if live_qa["po-epic-close-live-qa"] else "token_incomplete",
-            "evidence_titles": ["audit/qa/hde-epic029/checks/po-epic-close-live-qa/primary.log"],
+            "evidence_titles": [
+                "audit/qa/hde-epic029/checks/po-epic-close-live-qa/primary.log",
+            ],
         },
         {
             "name": "QA_PRECOMMIT_CHECKLIST_OK",
@@ -151,22 +217,31 @@ def _tokens(live_qa: dict[str, bool]) -> list[dict[str, object]]:
     ]
 
 
-def _write_acceptance_map(live_qa: dict[str, bool]) -> None:
-    _write_json(ACCEPTANCE_MAP_PATH, {"epic_id": EPIC_ID, "tokens": _tokens(live_qa)})
+def _write_acceptance_map(live_qa: dict[str, bool], index_status: dict[str, bool]) -> None:
+    _write_json(ACCEPTANCE_MAP_PATH, {"epic_id": EPIC_ID, "tokens": _tokens(live_qa, index_status)})
 
 
-def _write_token_matrix(live_qa: dict[str, bool]) -> None:
+def _write_token_matrix(live_qa: dict[str, bool], index_status: dict[str, bool]) -> None:
     lines = [
         "# HDE-EPIC029 Token ↔ Evidence Matrix",
         "",
         "| token_name | owner_pf | evidence_artifacts | ci_tests_jobs | qa_root_logs | status | notes |",
         "| --- | --- | --- | --- | --- | --- | --- |",
-        "| HDE_CONJ009_1_SURFACE_INVENTORY_BOUND_OK | PF09.4 — Canon-HDE-Build-Checklist-Conjunction-v1 §HDE-CONJ009.1 | audit/qa/hde-epic029/00_meta/conjunction_json_surface_inventory.md | Reuse-only bounded inventory from PR-01 | acceptance_map_viability.log | Implemented | Existing conjunction JSON surface inventory is bound without widening scope. |",
-        "| HDE_CONJ008_1_WRITER_ENVELOPE_BOUND_OK | PF09.4 — Canon-HDE-Build-Checklist-Conjunction-v1 §HDE-CONJ008.1 | artifacts/writer/conjunction_write_readback.log; artifacts/writer/conjunction_writer_summary.json | Reuse writer evidence artifacts already present | acceptance_map_viability.log | Implemented | Writer-envelope evidence is bound from existing governed artifacts. |",
-        "| HDE_CONJ001_4_DEV_HARNESS_CLOSURE_OK | PF09.4 — Canon-HDE-Build-Checklist-Conjunction-v1 §HDE-CONJ001.4 | audit/ops/hde-epic029/ops-01/binding_disposition.md; audit/qa/hde-epic029/00_meta/dev_harness_binding_coverage.md | OPS-01 evidence binding only; no rerun | acceptance_map_viability.log | Planned | Not yet closed: codespaces has gating_discrepancy (APP_ENV=prod returned 200), and local_dev uses published DEV_SAMPLER_URL http://127.0.0.1:8000/internal/dev/sampler but OPS reported step-creation/AI-data-indexing failure. |",
+        "| DOC_DELTA_PRESENT_OK | PF04 — HDE Governance §2.0.0 | audit/docdeltas/hde-epic029_doc_deltas.md; audit/docdeltas/hde-epic029_drain_targets.md | Bound by close-pack generator outputs | acceptance_map_viability.log | Implemented | Doc-delta and drain-target ledgers are generated and bound for this close pack. |",
+        f"| EVIDENCE_INDEX_UPDATED_OK | PF12 — Schemas & Artifacts §Evidence Index | docs/evidence/INDEX.json | tools/evidence/update_evidence_index.py | acceptance_map_viability.log | {'Implemented' if index_status['evidence_index_updated'] else 'Planned'} | {'Bound only when INDEX.json and INDEX.json.path_proof.txt are present.' if index_status['evidence_index_updated'] else 'Deferred: missing INDEX.json or its path proof; no synthetic pass claim.'} |",
+        f"| MACHINE_MIRROR_UPDATED_OK | PF12 — Schemas & Artifacts §Evidence Mirror | artifacts/evidence_index.jsonl | tools/evidence/update_evidence_index.py | acceptance_map_viability.log | {'Implemented' if index_status['machine_mirror_updated'] else 'Planned'} | {'Bound only when evidence_index.jsonl and evidence_index.jsonl.path_proof.txt are present.' if index_status['machine_mirror_updated'] else 'Deferred: missing evidence mirror or its path proof; no synthetic pass claim.'} |",
+        f"| EVIDENCE_INDEX_HASH_OK | PF12 — Schemas & Artifacts §Evidence Hash Discipline | docs/evidence/INDEX.sha256; artifacts/evidence_index.jsonl.sha256 | tools/evidence/update_evidence_index.py | acceptance_map_viability.log | {'Implemented' if index_status['evidence_index_hash'] else 'Planned'} | {'Bound only when sha256 sidecars and path proofs exist and hashes match current bytes.' if index_status['evidence_index_hash'] else 'Deferred: missing or mismatched hash sidecars/path proofs; no synthetic pass claim.'} |",
+        "| ENV_RAILS_POLICY_OK | PF10 — HDE Build Notes §Closed Rails | artifacts/proofs/env_pins.txt | ci/checks/check_env_pins.sh (via sanity pipeline) | acceptance_map_viability.log | Implemented | Determinism env pins evidence remains present for closed-rails posture. |",
+        "| JSON_CANONICAL_CHECK_OK | PF10 — HDE Build Notes §Canonical JSON Gate | audit/gates/json_gate/canonical/json_gate_structured_record.json; audit/gates/canonical_json/json_canonical_check.log | tools/evidence/run_canonical_json_gate.py (governed) | acceptance_map_viability.log | Implemented | Canonical JSON gate evidence is bound without introducing new token names. |",
         f"| TESTS_PASS_OK | PF19 — Glow QA Guide §QA Rails | audit/qa/hde-epic029/checks/po-epic-close-live-qa/primary.log | Existing epic-close live QA output only | acceptance_map_viability.log | {'Implemented' if live_qa['po-epic-close-live-qa'] else 'Planned'} | {'Bound to existing live QA primary log.' if live_qa['po-epic-close-live-qa'] else 'Deferred: required live QA primary log is missing; no pass claim synthesized.'} |",
         f"| QA_PRECOMMIT_CHECKLIST_OK | PF19 — Glow QA Guide §QA Rails | audit/qa/hde-epic029/checks/po-precommit/primary.log | Existing precommit checklist output only | acceptance_map_viability.log | {'Implemented' if live_qa['po-precommit'] else 'Planned'} | {'Bound to existing precommit primary log.' if live_qa['po-precommit'] else 'Deferred: required precommit primary log is missing; no pass claim synthesized.'} |",
         f"| QA_POSTCOMMIT_CHECKLIST_OK | PF19 — Glow QA Guide §QA Rails | audit/qa/hde-epic029/checks/po-postcommit/primary.log | Existing postcommit checklist output only | acceptance_map_viability.log | {'Implemented' if live_qa['po-postcommit'] else 'Planned'} | {'Bound to existing postcommit primary log.' if live_qa['po-postcommit'] else 'Deferred: required postcommit primary log is missing; no pass claim synthesized.'} |",
+        "",
+        "## PF09 scope bindings (status-only; not acceptance tokens)",
+        "",
+        f"- `{PF09_SCOPE[0]['task_id']}` / `{PF09_SCOPE[0]['subtask_id']}`: bound via `audit/qa/hde-epic029/00_meta/conjunction_json_surface_inventory.md`.",
+        f"- `{PF09_SCOPE[1]['task_id']}` / `{PF09_SCOPE[1]['subtask_id']}`: bound via `artifacts/writer/conjunction_write_readback.log` and `artifacts/writer/conjunction_writer_summary.json`.",
+        f"- `{PF09_SCOPE[2]['task_id']}` / `{PF09_SCOPE[2]['subtask_id']}`: bound via OPS disposition; remains not done while codespaces/local_dev are not yet closed.",
     ]
     _write_text(TOKEN_MATRIX_PATH, "\n".join(lines) + "\n")
 
@@ -186,7 +261,7 @@ def _write_dev_harness_binding_coverage(live_qa: dict[str, bool]) -> None:
 - Source of truth: `audit/ops/hde-epic029/ops-01/binding_disposition.md`.
 - Codespaces remains **not yet closed** because accepted remediation evidence recorded `gating_discrepancy observed (APP_ENV=prod did not return 403)`.
 - Local dev remains **not yet closed**; PF07 publishes `DEV_SAMPLER_URL=http://127.0.0.1:8000/internal/dev/sampler`, but OPS disposition recorded step-creation and AI-data-indexing failure.
-- Therefore `HDE_CONJ001_4_DEV_HARNESS_CLOSURE_OK` remains `token_incomplete` in this close-pack.
+- Therefore `HDE-CONJ001.4` remains not done in this close-pack.
 
 ## OPS-01 files bound by this PR
 - `audit/ops/hde-epic029/ops-01/commands.txt`
@@ -267,6 +342,11 @@ This close-pack finalizes offline acceptance and closure-artifact binding for EP
 - Subtask: `{PF09_SUBTASK_ID}`
 - Additional bound subtasks: `HDE-CONJ008.1`, `HDE-CONJ001.4`.
 
+## PF09 scope truth (bound in metadata, not minted as acceptance tokens)
+- `HDE-CONJ009` / `HDE-CONJ009.1`: represented via conjunction JSON surface inventory binding.
+- `HDE-CONJ008` / `HDE-CONJ008.1`: represented via writer-envelope evidence binding.
+- `HDE-CONJ001` / `HDE-CONJ001.4`: represented via OPS disposition; remains not done while codespaces/local_dev are not yet closed.
+
 ## OPS-01 truth preserved
 - Codespaces is **not yet closed** (accepted remediation rerun recorded gating discrepancy: APP_ENV=prod did not return 403).
 - Local dev is **not yet closed** (PF07 published DEV_SAMPLER_URL `http://127.0.0.1:8000/internal/dev/sampler`; OPS outcome was step-creation and AI-data-indexing failure).
@@ -319,6 +399,7 @@ def _write_close_manifest(produced_at: str, live_qa: dict[str, bool]) -> None:
         "ops_task_id": "OPS-01",
         "pf09_task_id": PF09_TASK_ID,
         "pf09_subtask_id": PF09_SUBTASK_ID,
+        "pf09_scope": PF09_SCOPE,
         "qa_epic_root": "audit/qa/hde-epic029",
         "qa_step_count": len(live_qa),
         "qa_step_manifest_path": "audit/qa/hde-epic029/qa_step_logs_manifest.json",
@@ -374,9 +455,10 @@ def main() -> int:
 
     produced_at = _utc_now()
     live_qa = _live_qa_status()
+    index_status = _evidence_index_status()
 
-    _write_acceptance_map(live_qa)
-    _write_token_matrix(live_qa)
+    _write_acceptance_map(live_qa, index_status)
+    _write_token_matrix(live_qa, index_status)
     _write_qa_step_manifest(live_qa)
     _write_viability_log()
     _write_dev_harness_binding_coverage(live_qa)
