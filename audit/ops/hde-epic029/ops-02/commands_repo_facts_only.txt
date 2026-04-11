@@ -1,0 +1,12 @@
+git status --short --branch
+git rev-parse main
+git rev-parse HEAD
+git merge-base main HEAD
+nl -ba tests/http/test_dev_conjunction_http.py | sed -n '1,260p'
+nl -ba tests/adapter/test_dev_sampler_http.py | sed -n '1,240p'
+nl -ba audit/qa/hde-epic029/00_meta/conjunction_json_surface_inventory.md | sed -n '1,220p'
+nl -ba audit/qa/hde-epic029/token_evidence_matrix.md | sed -n '1,220p'
+cat audit/gates/json_gate/canonical/json_gate_structured_record.json
+python -m json.tool audit/gates/json_gate/canonical/json_gate_structured_record.json > /dev/null
+nl -ba tests/transport/headers/no_store_writers_errors.snap | sed -n '1,120p'
+nl -ba audit/ops/hde-epic029/ops-01/binding_disposition.md | sed -n '1,80p'

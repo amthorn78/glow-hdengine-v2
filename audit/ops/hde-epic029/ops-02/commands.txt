@@ -1,0 +1,12 @@
+git status --short --branch
+git rev-parse main
+git rev-parse HEAD
+git merge-base main HEAD
+git diff --name-only main..HEAD
+git diff --name-only main..HEAD -- docs/pfcanon/PF09.4-Canon-HDE-Build-Checklist-Conjunction-v1.md audit/qa/hde-epic029/token_evidence_matrix.md audit/qa/hde-epic029/00_meta/conjunction_json_surface_inventory.md tests/transport/headers/no_store_writers_errors.snap
+git diff main..HEAD -- docs/pfcanon/PF09.4-Canon-HDE-Build-Checklist-Conjunction-v1.md audit/qa/hde-epic029/token_evidence_matrix.md audit/qa/hde-epic029/00_meta/conjunction_json_surface_inventory.md tests/transport/headers/no_store_writers_errors.snap
+nl -ba docs/pfcanon/PF09.4-Canon-HDE-Build-Checklist-Conjunction-v1.md | sed -n '2300,2525p'
+nl -ba audit/qa/hde-epic029/00_meta/conjunction_json_surface_inventory.md | sed -n '1,220p'
+nl -ba audit/qa/hde-epic029/token_evidence_matrix.md | sed -n '1,220p'
+nl -ba tests/transport/headers/no_store_writers_errors.snap | sed -n '1,220p'
+nl -ba audit/ops/hde-epic029/ops-01/binding_disposition.md | sed -n '1,120p'

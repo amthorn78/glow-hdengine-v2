@@ -1,0 +1,12 @@
+git_status_branch=0
+git_rev_parse_main=0
+git_rev_parse_head=0
+git_merge_base=0
+nl_dev_conjunction_http_tests=0
+nl_dev_sampler_http_tests=0
+nl_conjunction_inventory=0
+nl_token_matrix_epic029=0
+cat_json_gate_structured_record=0
+python_json_tool_json_gate=0
+nl_writer_no_store_snapshot=0
+nl_binding_disposition_ops01=0

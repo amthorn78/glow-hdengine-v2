@@ -1,0 +1,5 @@
+55dd27effaafbcf5e176acbce4bc58a372b1879de2fc571df501fa5451d691d7  audit/ops/hde-epic029/ops-02/commands.txt
+380f4779fb2e1f8c0af36cfe85db7deb2bbb2be7ed587e04cff588f4ca08dad0  audit/ops/hde-epic029/ops-02/stdout.log
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  audit/ops/hde-epic029/ops-02/stderr.log
+914e20919cd0fdf2fd235709ef24f19a518b2f70125b39f5308dd1cf7afbd5d3  audit/ops/hde-epic029/ops-02/exit_codes.txt
+04daf98b89d61ae92dd9c25054ec1a6590288d81fad70c233d8d8c860a78bf80  audit/ops/hde-epic029/ops-02/W-001_blocker_classification.md

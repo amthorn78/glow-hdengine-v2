@@ -1,0 +1,12 @@
+git_status_branch=0
+git_rev_parse_main=0
+git_rev_parse_head=0
+git_merge_base=0
+git_diff_name_only_all=0
+git_diff_name_only_targets=0
+git_diff_targets=0
+nl_pf09_conj_rows=0
+nl_epic029_json_inventory=0
+nl_epic029_token_matrix=0
+nl_writer_no_store_snapshot=0
+nl_ops01_binding_disposition=0

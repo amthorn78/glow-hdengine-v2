@@ -1,0 +1,6 @@
+efc91d9f70b614e54848ca28370144ff21098097b1a4fa04ddc246b3211adbed  audit/ops/hde-epic029/ops-02/commands_w001_run2.txt
+639dce9e161c15615e2618a08a2fdf88ada4b5effccd2ec54130339a7fa92ecb  audit/ops/hde-epic029/ops-02/stdout_w001_run2.log
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  audit/ops/hde-epic029/ops-02/stderr_w001_run2.log
+58abf9d3122b1d2aa9801e0e0d8b7615b2438396e53369a267c04a2bee9b6f2b  audit/ops/hde-epic029/ops-02/exit_codes_w001_run2.txt
+4ec71ab0d15bc3c5104b818a9b7855798c39df26ef52e0c760235014f08d00c7  audit/ops/hde-epic029/ops-02/W-001_classification_run2.md
+e30bb856434fbeea819e3fcd2b447ca22af421f9ad5902a6a55afff85bd74ba6  audit/ops/hde-epic029/ops-02/W-001_action_log_and_evidence_output_run2.md
