@@ -147,12 +147,57 @@ def _live_qa_status() -> dict[str, bool]:
     return status
 
 
-def _tokens(live_qa: dict[str, bool], index_status: dict[str, bool]) -> list[dict[str, object]]:
+def _ops_binding_disposition_status() -> dict[str, str]:
+    disposition = OPS_ROOT / "binding_disposition.md"
+    status = {"codespaces": "not yet closed", "local_dev": "not yet closed"}
+    if not disposition.exists():
+        return status
+
+    for raw in disposition.read_text(encoding="utf-8").splitlines():
+        line = raw.strip()
+        if line.startswith("codespaces:"):
+            status["codespaces"] = line.split(":", 1)[1].strip().split(" - ", 1)[0]
+        elif line.startswith("local_dev:"):
+            status["local_dev"] = line.split(":", 1)[1].strip().split(" - ", 1)[0]
+    return status
+
+
+def _pf09_row_closure_gate(live_qa: dict[str, bool], index_status: dict[str, bool]) -> dict[str, object]:
+    disposition_status = _ops_binding_disposition_status()
+    codespaces_closed = disposition_status["codespaces"] == "closed"
+    local_dev_closed = disposition_status["local_dev"] == "closed"
+    required_inputs_ready = not _missing_required_paths()
+    qa_complete = all(live_qa.values())
+    evidence_index_complete = all(index_status.values())
+    ready_for_close_binding = all(
+        [
+            codespaces_closed,
+            local_dev_closed,
+            required_inputs_ready,
+            qa_complete,
+            evidence_index_complete,
+        ]
+    )
+    return {
+        "sequencing_classification": "sequencing correction only",
+        "codespaces": disposition_status["codespaces"],
+        "local_dev": disposition_status["local_dev"],
+        "mapped_rows": {
+            "HDE-CONJ009.1": "later row-closing work required before close-pack binding",
+            "HDE-CONJ008.1": "later row-closing work required before close-pack binding",
+            "HDE-CONJ001.4": "remains open while codespaces or local_dev is not yet closed",
+        },
+        "ready_for_close_binding": ready_for_close_binding,
+    }
+
+
+def _tokens(live_qa: dict[str, bool], index_status: dict[str, bool], gate: dict[str, object]) -> list[dict[str, object]]:
+    gate_open = bool(gate["ready_for_close_binding"])
     return [
         {
             "name": "DOC_DELTA_PRESENT_OK",
             "owner_pf": "PF04 — HDE Governance §2.0.0",
-            "status": "implemented",
+            "status": "implemented" if gate_open else "token_incomplete",
             "evidence_titles": [
                 "audit/docdeltas/hde-epic029_doc_deltas.md",
                 "audit/docdeltas/hde-epic029_drain_targets.md",
@@ -161,19 +206,19 @@ def _tokens(live_qa: dict[str, bool], index_status: dict[str, bool]) -> list[dic
         {
             "name": "EVIDENCE_INDEX_UPDATED_OK",
             "owner_pf": "PF12 — Schemas & Artifacts §Evidence Index",
-            "status": "implemented" if index_status["evidence_index_updated"] else "token_incomplete",
+            "status": "implemented" if (gate_open and index_status["evidence_index_updated"]) else "token_incomplete",
             "evidence_titles": ["docs/evidence/INDEX.json"],
         },
         {
             "name": "MACHINE_MIRROR_UPDATED_OK",
             "owner_pf": "PF12 — Schemas & Artifacts §Evidence Mirror",
-            "status": "implemented" if index_status["machine_mirror_updated"] else "token_incomplete",
+            "status": "implemented" if (gate_open and index_status["machine_mirror_updated"]) else "token_incomplete",
             "evidence_titles": ["artifacts/evidence_index.jsonl"],
         },
         {
             "name": "EVIDENCE_INDEX_HASH_OK",
             "owner_pf": "PF12 — Schemas & Artifacts §Evidence Hash Discipline",
-            "status": "implemented" if index_status["evidence_index_hash"] else "token_incomplete",
+            "status": "implemented" if (gate_open and index_status["evidence_index_hash"]) else "token_incomplete",
             "evidence_titles": [
                 "docs/evidence/INDEX.sha256",
                 "artifacts/evidence_index.jsonl.sha256",
@@ -182,13 +227,13 @@ def _tokens(live_qa: dict[str, bool], index_status: dict[str, bool]) -> list[dic
         {
             "name": "ENV_RAILS_POLICY_OK",
             "owner_pf": "PF10 — HDE Build Notes §Closed Rails",
-            "status": "implemented",
+            "status": "implemented" if gate_open else "token_incomplete",
             "evidence_titles": ["artifacts/proofs/env_pins.txt"],
         },
         {
             "name": "JSON_CANONICAL_CHECK_OK",
             "owner_pf": "PF10 — HDE Build Notes §Canonical JSON Gate",
-            "status": "implemented",
+            "status": "implemented" if gate_open else "token_incomplete",
             "evidence_titles": [
                 "audit/gates/json_gate/canonical/json_gate_structured_record.json",
                 "audit/gates/canonical_json/json_canonical_check.log",
@@ -197,7 +242,7 @@ def _tokens(live_qa: dict[str, bool], index_status: dict[str, bool]) -> list[dic
         {
             "name": "TESTS_PASS_OK",
             "owner_pf": "PF19 — Glow QA Guide §QA Rails",
-            "status": "implemented" if live_qa["po-epic-close-live-qa"] else "token_incomplete",
+            "status": "implemented" if (gate_open and live_qa["po-epic-close-live-qa"]) else "token_incomplete",
             "evidence_titles": [
                 "audit/qa/hde-epic029/checks/po-epic-close-live-qa/primary.log",
             ],
@@ -205,43 +250,47 @@ def _tokens(live_qa: dict[str, bool], index_status: dict[str, bool]) -> list[dic
         {
             "name": "QA_PRECOMMIT_CHECKLIST_OK",
             "owner_pf": "PF19 — Glow QA Guide §QA Rails",
-            "status": "implemented" if live_qa["po-precommit"] else "token_incomplete",
+            "status": "implemented" if (gate_open and live_qa["po-precommit"]) else "token_incomplete",
             "evidence_titles": ["audit/qa/hde-epic029/checks/po-precommit/primary.log"],
         },
         {
             "name": "QA_POSTCOMMIT_CHECKLIST_OK",
             "owner_pf": "PF19 — Glow QA Guide §QA Rails",
-            "status": "implemented" if live_qa["po-postcommit"] else "token_incomplete",
+            "status": "implemented" if (gate_open and live_qa["po-postcommit"]) else "token_incomplete",
             "evidence_titles": ["audit/qa/hde-epic029/checks/po-postcommit/primary.log"],
         },
     ]
 
 
-def _write_acceptance_map(live_qa: dict[str, bool], index_status: dict[str, bool]) -> None:
-    _write_json(ACCEPTANCE_MAP_PATH, {"epic_id": EPIC_ID, "tokens": _tokens(live_qa, index_status)})
+def _write_acceptance_map(live_qa: dict[str, bool], index_status: dict[str, bool], gate: dict[str, object]) -> None:
+    _write_json(ACCEPTANCE_MAP_PATH, {"epic_id": EPIC_ID, "sequencing_gate": gate, "tokens": _tokens(live_qa, index_status, gate)})
 
 
-def _write_token_matrix(live_qa: dict[str, bool], index_status: dict[str, bool]) -> None:
+def _write_token_matrix(live_qa: dict[str, bool], index_status: dict[str, bool], gate: dict[str, object]) -> None:
+    gate_open = bool(gate["ready_for_close_binding"])
     lines = [
         "# HDE-EPIC029 Token ↔ Evidence Matrix",
         "",
+        "Sequencing posture: **sequencing correction only** (contributory/intermediate only).",
+        "Close-pack acceptance binding remains blocked until mapped PF09 row-closing work is complete for `HDE-CONJ009.1`, `HDE-CONJ008.1`, and `HDE-CONJ001.4`.",
+        "",
         "| token_name | owner_pf | evidence_artifacts | ci_tests_jobs | qa_root_logs | status | notes |",
         "| --- | --- | --- | --- | --- | --- | --- |",
-        "| DOC_DELTA_PRESENT_OK | PF04 — HDE Governance §2.0.0 | audit/docdeltas/hde-epic029_doc_deltas.md; audit/docdeltas/hde-epic029_drain_targets.md | Bound by close-pack generator outputs | acceptance_map_viability.log | Implemented | Doc-delta and drain-target ledgers are generated and bound for this close pack. |",
-        f"| EVIDENCE_INDEX_UPDATED_OK | PF12 — Schemas & Artifacts §Evidence Index | docs/evidence/INDEX.json | tools/evidence/update_evidence_index.py | acceptance_map_viability.log | {'Implemented' if index_status['evidence_index_updated'] else 'Planned'} | {'Bound only when INDEX.json and INDEX.json.path_proof.txt are present.' if index_status['evidence_index_updated'] else 'Deferred: missing INDEX.json or its path proof; no synthetic pass claim.'} |",
-        f"| MACHINE_MIRROR_UPDATED_OK | PF12 — Schemas & Artifacts §Evidence Mirror | artifacts/evidence_index.jsonl | tools/evidence/update_evidence_index.py | acceptance_map_viability.log | {'Implemented' if index_status['machine_mirror_updated'] else 'Planned'} | {'Bound only when evidence_index.jsonl and evidence_index.jsonl.path_proof.txt are present.' if index_status['machine_mirror_updated'] else 'Deferred: missing evidence mirror or its path proof; no synthetic pass claim.'} |",
-        f"| EVIDENCE_INDEX_HASH_OK | PF12 — Schemas & Artifacts §Evidence Hash Discipline | docs/evidence/INDEX.sha256; artifacts/evidence_index.jsonl.sha256 | tools/evidence/update_evidence_index.py | acceptance_map_viability.log | {'Implemented' if index_status['evidence_index_hash'] else 'Planned'} | {'Bound only when sha256 sidecars and path proofs exist and hashes match current bytes.' if index_status['evidence_index_hash'] else 'Deferred: missing or mismatched hash sidecars/path proofs; no synthetic pass claim.'} |",
-        "| ENV_RAILS_POLICY_OK | PF10 — HDE Build Notes §Closed Rails | artifacts/proofs/env_pins.txt | ci/checks/check_env_pins.sh (via sanity pipeline) | acceptance_map_viability.log | Implemented | Determinism env pins evidence remains present for closed-rails posture. |",
-        "| JSON_CANONICAL_CHECK_OK | PF10 — HDE Build Notes §Canonical JSON Gate | audit/gates/json_gate/canonical/json_gate_structured_record.json; audit/gates/canonical_json/json_canonical_check.log | tools/evidence/run_canonical_json_gate.py (governed) | acceptance_map_viability.log | Implemented | Canonical JSON gate evidence is bound without introducing new token names. |",
-        f"| TESTS_PASS_OK | PF19 — Glow QA Guide §QA Rails | audit/qa/hde-epic029/checks/po-epic-close-live-qa/primary.log | Existing epic-close live QA output only | acceptance_map_viability.log | {'Implemented' if live_qa['po-epic-close-live-qa'] else 'Planned'} | {'Bound to existing live QA primary log.' if live_qa['po-epic-close-live-qa'] else 'Deferred: required live QA primary log is missing; no pass claim synthesized.'} |",
-        f"| QA_PRECOMMIT_CHECKLIST_OK | PF19 — Glow QA Guide §QA Rails | audit/qa/hde-epic029/checks/po-precommit/primary.log | Existing precommit checklist output only | acceptance_map_viability.log | {'Implemented' if live_qa['po-precommit'] else 'Planned'} | {'Bound to existing precommit primary log.' if live_qa['po-precommit'] else 'Deferred: required precommit primary log is missing; no pass claim synthesized.'} |",
-        f"| QA_POSTCOMMIT_CHECKLIST_OK | PF19 — Glow QA Guide §QA Rails | audit/qa/hde-epic029/checks/po-postcommit/primary.log | Existing postcommit checklist output only | acceptance_map_viability.log | {'Implemented' if live_qa['po-postcommit'] else 'Planned'} | {'Bound to existing postcommit primary log.' if live_qa['po-postcommit'] else 'Deferred: required postcommit primary log is missing; no pass claim synthesized.'} |",
+        f"| DOC_DELTA_PRESENT_OK | PF04 — HDE Governance §2.0.0 | audit/docdeltas/hde-epic029_doc_deltas.md; audit/docdeltas/hde-epic029_drain_targets.md | Bound by close-pack generator outputs | acceptance_map_viability.log | {'Implemented' if gate_open else 'Planned'} | {'Doc-delta and drain-target ledgers are generated and bound for close-pack readiness.' if gate_open else 'Deferred by sequencing gate: contributory/intermediate only; later row-closing work required before close-pack binding.'} |",
+        f"| EVIDENCE_INDEX_UPDATED_OK | PF12 — Schemas & Artifacts §Evidence Index | docs/evidence/INDEX.json | tools/evidence/update_evidence_index.py | acceptance_map_viability.log | {'Implemented' if (gate_open and index_status['evidence_index_updated']) else 'Planned'} | {'Bound only when INDEX.json and INDEX.json.path_proof.txt are present.' if (gate_open and index_status['evidence_index_updated']) else 'Deferred by sequencing gate: no status change to Done in this slice.'} |",
+        f"| MACHINE_MIRROR_UPDATED_OK | PF12 — Schemas & Artifacts §Evidence Mirror | artifacts/evidence_index.jsonl | tools/evidence/update_evidence_index.py | acceptance_map_viability.log | {'Implemented' if (gate_open and index_status['machine_mirror_updated']) else 'Planned'} | {'Bound only when evidence_index.jsonl and evidence_index.jsonl.path_proof.txt are present.' if (gate_open and index_status['machine_mirror_updated']) else 'Deferred by sequencing gate: no status change to Done in this slice.'} |",
+        f"| EVIDENCE_INDEX_HASH_OK | PF12 — Schemas & Artifacts §Evidence Hash Discipline | docs/evidence/INDEX.sha256; artifacts/evidence_index.jsonl.sha256 | tools/evidence/update_evidence_index.py | acceptance_map_viability.log | {'Implemented' if (gate_open and index_status['evidence_index_hash']) else 'Planned'} | {'Bound only when sha256 sidecars and path proofs exist and hashes match current bytes.' if (gate_open and index_status['evidence_index_hash']) else 'Deferred by sequencing gate: no status change to Done in this slice.'} |",
+        f"| ENV_RAILS_POLICY_OK | PF10 — HDE Build Notes §Closed Rails | artifacts/proofs/env_pins.txt | ci/checks/check_env_pins.sh (via sanity pipeline) | acceptance_map_viability.log | {'Implemented' if gate_open else 'Planned'} | {'Determinism env pins evidence remains present for closed-rails posture.' if gate_open else 'Deferred by sequencing gate until mapped PF09 row closures are complete.'} |",
+        f"| JSON_CANONICAL_CHECK_OK | PF10 — HDE Build Notes §Canonical JSON Gate | audit/gates/json_gate/canonical/json_gate_structured_record.json; audit/gates/canonical_json/json_canonical_check.log | tools/evidence/run_canonical_json_gate.py (governed) | acceptance_map_viability.log | {'Implemented' if gate_open else 'Planned'} | {'Canonical JSON gate evidence is bound without introducing new token names.' if gate_open else 'Deferred by sequencing gate until mapped PF09 row closures are complete.'} |",
+        f"| TESTS_PASS_OK | PF19 — Glow QA Guide §QA Rails | audit/qa/hde-epic029/checks/po-epic-close-live-qa/primary.log | Existing epic-close live QA output only | acceptance_map_viability.log | {'Implemented' if (gate_open and live_qa['po-epic-close-live-qa']) else 'Planned'} | {'Bound to existing live QA primary log.' if (gate_open and live_qa['po-epic-close-live-qa']) else 'Deferred by sequencing gate: keep token spelling exact but do not promote early in this sequencing-only slice.'} |",
+        f"| QA_PRECOMMIT_CHECKLIST_OK | PF19 — Glow QA Guide §QA Rails | audit/qa/hde-epic029/checks/po-precommit/primary.log | Existing precommit checklist output only | acceptance_map_viability.log | {'Implemented' if (gate_open and live_qa['po-precommit']) else 'Planned'} | {'Bound to existing precommit primary log.' if (gate_open and live_qa['po-precommit']) else 'Deferred by sequencing gate: keep token spelling exact but do not promote early in this sequencing-only slice.'} |",
+        f"| QA_POSTCOMMIT_CHECKLIST_OK | PF19 — Glow QA Guide §QA Rails | audit/qa/hde-epic029/checks/po-postcommit/primary.log | Existing postcommit checklist output only | acceptance_map_viability.log | {'Implemented' if (gate_open and live_qa['po-postcommit']) else 'Planned'} | {'Bound to existing postcommit primary log.' if (gate_open and live_qa['po-postcommit']) else 'Deferred by sequencing gate: keep token spelling exact but do not promote early in this sequencing-only slice.'} |",
         "",
         "## PF09 scope bindings (status-only; not acceptance tokens)",
         "",
-        f"- `{PF09_SCOPE[0]['task_id']}` / `{PF09_SCOPE[0]['subtask_id']}`: bound via `audit/qa/hde-epic029/00_meta/conjunction_json_surface_inventory.md`.",
-        f"- `{PF09_SCOPE[1]['task_id']}` / `{PF09_SCOPE[1]['subtask_id']}`: bound via `artifacts/writer/conjunction_write_readback.log` and `artifacts/writer/conjunction_writer_summary.json`.",
-        f"- `{PF09_SCOPE[2]['task_id']}` / `{PF09_SCOPE[2]['subtask_id']}`: bound via OPS disposition; remains not done while codespaces/local_dev are not yet closed.",
+        f"- `{PF09_SCOPE[0]['task_id']}` / `{PF09_SCOPE[0]['subtask_id']}`: sequencing correction only; later row-closing work required before close-pack binding.",
+        f"- `{PF09_SCOPE[1]['task_id']}` / `{PF09_SCOPE[1]['subtask_id']}`: sequencing correction only; later row-closing work required before close-pack binding.",
+        f"- `{PF09_SCOPE[2]['task_id']}` / `{PF09_SCOPE[2]['subtask_id']}`: bound via OPS disposition; remains open while codespaces/local_dev are not yet closed.",
     ]
     _write_text(TOKEN_MATRIX_PATH, "\n".join(lines) + "\n")
 
@@ -332,7 +381,7 @@ def _write_close_report(produced_at: str, live_qa: dict[str, bool]) -> None:
     content = f"""# HDE-EPIC029 — Close Report
 
 ## Overview
-This close-pack finalizes offline acceptance and closure-artifact binding for EPIC029 using existing governed evidence only. It does not reopen runtime scope.
+This is a sequencing correction only slice for EPIC029. It prevents premature acceptance/close-pack claims and preserves anti-overclaim posture while mapped PF09 row-closing work remains open.
 
 ## Capture timestamp
 - `{produced_at}`
@@ -343,14 +392,19 @@ This close-pack finalizes offline acceptance and closure-artifact binding for EP
 - Additional bound subtasks: `HDE-CONJ008.1`, `HDE-CONJ001.4`.
 
 ## PF09 scope truth (bound in metadata, not minted as acceptance tokens)
-- `HDE-CONJ009` / `HDE-CONJ009.1`: represented via conjunction JSON surface inventory binding.
-- `HDE-CONJ008` / `HDE-CONJ008.1`: represented via writer-envelope evidence binding.
+- `HDE-CONJ009` / `HDE-CONJ009.1`: sequencing correction only; no status change to Done in this slice.
+- `HDE-CONJ008` / `HDE-CONJ008.1`: sequencing correction only; no status change to Done in this slice.
 - `HDE-CONJ001` / `HDE-CONJ001.4`: represented via OPS disposition; remains not done while codespaces/local_dev are not yet closed.
 
 ## OPS-01 truth preserved
 - Codespaces is **not yet closed** (accepted remediation rerun recorded gating discrepancy: APP_ENV=prod did not return 403).
 - Local dev is **not yet closed** (PF07 published DEV_SAMPLER_URL `http://127.0.0.1:8000/internal/dev/sampler`; OPS outcome was step-creation and AI-data-indexing failure).
 - `HDE-CONJ001.4` is therefore not marked complete in this PR.
+
+## Sequencing gate outcome
+- Close-pack acceptance binding remains blocked in this slice.
+- Later row-closing work is required before close-pack binding for `HDE-CONJ009.1` and `HDE-CONJ008.1`.
+- `HDE-CONJ001.4` remains open until both intended environments are closed.
 
 ## Epic-close Live QA outputs
 {chr(10).join(qa_lines)}
@@ -409,10 +463,13 @@ def _write_close_manifest(produced_at: str, live_qa: dict[str, bool]) -> None:
             f"po-postcommit={'recorded' if live_qa['po-postcommit'] else 'missing'}",
             "codespaces=not_yet_closed_gating_discrepancy_observed",
             "local_dev=not_yet_closed_step_creation_and_ai_data_indexing_failure_with_published_dev_sampler_url",
+            "hde_conj009_1=no_status_change_done_in_this_slice",
+            "hde_conj008_1=no_status_change_done_in_this_slice",
             "hde_conj001_4=token_incomplete",
+            "sequencing_gate=blocked_later_row_closing_work_required_before_close_pack_binding",
         ],
         "run_id": RUN_ID,
-        "scope": "offline_acceptance_close_pack_binding_only",
+        "scope": "sequencing_correction_only_close_pack_binding_blocked",
     }
     _write_json(CLOSE_MANIFEST_PATH, payload)
 
@@ -456,9 +513,10 @@ def main() -> int:
     produced_at = _utc_now()
     live_qa = _live_qa_status()
     index_status = _evidence_index_status()
+    gate = _pf09_row_closure_gate(live_qa, index_status)
 
-    _write_acceptance_map(live_qa, index_status)
-    _write_token_matrix(live_qa, index_status)
+    _write_acceptance_map(live_qa, index_status, gate)
+    _write_token_matrix(live_qa, index_status, gate)
     _write_qa_step_manifest(live_qa)
     _write_viability_log()
     _write_dev_harness_binding_coverage(live_qa)
