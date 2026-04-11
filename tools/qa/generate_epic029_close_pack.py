@@ -147,17 +147,47 @@ def _live_qa_status() -> dict[str, bool]:
     return status
 
 
-def _pf09_row_closure_gate() -> dict[str, object]:
+def _ops_binding_disposition_status() -> dict[str, str]:
+    disposition = OPS_ROOT / "binding_disposition.md"
+    status = {"codespaces": "not yet closed", "local_dev": "not yet closed"}
+    if not disposition.exists():
+        return status
+
+    for raw in disposition.read_text(encoding="utf-8").splitlines():
+        line = raw.strip()
+        if line.startswith("codespaces:"):
+            status["codespaces"] = line.split(":", 1)[1].strip().split(" - ", 1)[0]
+        elif line.startswith("local_dev:"):
+            status["local_dev"] = line.split(":", 1)[1].strip().split(" - ", 1)[0]
+    return status
+
+
+def _pf09_row_closure_gate(live_qa: dict[str, bool], index_status: dict[str, bool]) -> dict[str, object]:
+    disposition_status = _ops_binding_disposition_status()
+    codespaces_closed = disposition_status["codespaces"] == "closed"
+    local_dev_closed = disposition_status["local_dev"] == "closed"
+    required_inputs_ready = not _missing_required_paths()
+    qa_complete = all(live_qa.values())
+    evidence_index_complete = all(index_status.values())
+    ready_for_close_binding = all(
+        [
+            codespaces_closed,
+            local_dev_closed,
+            required_inputs_ready,
+            qa_complete,
+            evidence_index_complete,
+        ]
+    )
     return {
         "sequencing_classification": "sequencing correction only",
-        "codespaces": "not yet closed",
-        "local_dev": "not yet closed",
+        "codespaces": disposition_status["codespaces"],
+        "local_dev": disposition_status["local_dev"],
         "mapped_rows": {
             "HDE-CONJ009.1": "later row-closing work required before close-pack binding",
             "HDE-CONJ008.1": "later row-closing work required before close-pack binding",
             "HDE-CONJ001.4": "remains open while codespaces or local_dev is not yet closed",
         },
-        "ready_for_close_binding": False,
+        "ready_for_close_binding": ready_for_close_binding,
     }
 
 
@@ -483,7 +513,7 @@ def main() -> int:
     produced_at = _utc_now()
     live_qa = _live_qa_status()
     index_status = _evidence_index_status()
-    gate = _pf09_row_closure_gate()
+    gate = _pf09_row_closure_gate(live_qa, index_status)
 
     _write_acceptance_map(live_qa, index_status, gate)
     _write_token_matrix(live_qa, index_status, gate)
