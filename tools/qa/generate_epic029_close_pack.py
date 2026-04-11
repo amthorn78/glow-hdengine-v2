@@ -61,6 +61,16 @@ LIVE_QA_CHECKS = {
     "po-postcommit": QA_ROOT / "checks" / "po-postcommit" / "primary.log",
 }
 
+PF09_ROW_CLOSURE_PROOFS = {
+    "HDE-CONJ009.1": QA_ROOT / "00_meta" / "pf09_row_closure_status.md",
+    "HDE-CONJ008.1": QA_ROOT / "00_meta" / "pf09_row_closure_status.md",
+}
+
+PF09_ROW_CLOSURE_MARKERS = {
+    "HDE-CONJ009.1": "hde-conj009.1: closed",
+    "HDE-CONJ008.1": "hde-conj008.1: closed",
+}
+
 
 def _has_path_proof(path: Path) -> bool:
     return path.with_name(path.name + ".path_proof.txt").exists()
@@ -143,7 +153,10 @@ def _live_qa_status() -> dict[str, bool]:
         if not path.exists():
             status[check_id] = False
             continue
-        status[check_id] = path.read_text(encoding="utf-8").strip() != "MISSING"
+        text = path.read_text(encoding="utf-8")
+        lines = [line.strip() for line in text.splitlines() if line.strip()]
+        exit_code_line = next((line for line in reversed(lines) if line.startswith("[exit_code]")), "")
+        status[check_id] = exit_code_line == "[exit_code] 0"
     return status
 
 
@@ -162,6 +175,14 @@ def _ops_binding_disposition_status() -> dict[str, str]:
     return status
 
 
+def _pf09_subtask_row_closed(subtask_id: str) -> bool:
+    proof_path = PF09_ROW_CLOSURE_PROOFS[subtask_id]
+    if not proof_path.exists():
+        return False
+    body = proof_path.read_text(encoding="utf-8").lower()
+    return PF09_ROW_CLOSURE_MARKERS[subtask_id] in body
+
+
 def _pf09_row_closure_gate(live_qa: dict[str, bool], index_status: dict[str, bool]) -> dict[str, object]:
     disposition_status = _ops_binding_disposition_status()
     codespaces_closed = disposition_status["codespaces"] == "closed"
@@ -169,10 +190,14 @@ def _pf09_row_closure_gate(live_qa: dict[str, bool], index_status: dict[str, boo
     required_inputs_ready = not _missing_required_paths()
     qa_complete = all(live_qa.values())
     evidence_index_complete = all(index_status.values())
+    hde_conj009_1_closed = _pf09_subtask_row_closed("HDE-CONJ009.1")
+    hde_conj008_1_closed = _pf09_subtask_row_closed("HDE-CONJ008.1")
+    hde_conj001_4_closed = codespaces_closed and local_dev_closed
     ready_for_close_binding = all(
         [
-            codespaces_closed,
-            local_dev_closed,
+            hde_conj009_1_closed,
+            hde_conj008_1_closed,
+            hde_conj001_4_closed,
             required_inputs_ready,
             qa_complete,
             evidence_index_complete,
@@ -182,6 +207,11 @@ def _pf09_row_closure_gate(live_qa: dict[str, bool], index_status: dict[str, boo
         "sequencing_classification": "sequencing correction only",
         "codespaces": disposition_status["codespaces"],
         "local_dev": disposition_status["local_dev"],
+        "row_closure_status": {
+            "HDE-CONJ009.1": "closed" if hde_conj009_1_closed else "not closed",
+            "HDE-CONJ008.1": "closed" if hde_conj008_1_closed else "not closed",
+            "HDE-CONJ001.4": "closed" if hde_conj001_4_closed else "not closed",
+        },
         "mapped_rows": {
             "HDE-CONJ009.1": "later row-closing work required before close-pack binding",
             "HDE-CONJ008.1": "later row-closing work required before close-pack binding",

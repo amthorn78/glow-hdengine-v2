@@ -4,7 +4,7 @@
 This is a sequencing correction only slice for EPIC029. It prevents premature acceptance/close-pack claims and preserves anti-overclaim posture while mapped PF09 row-closing work remains open.
 
 ## Capture timestamp
-- `2026-04-11T16:07:08Z`
+- `2026-04-11T17:18:42Z`
 
 ## PF09 mapping used
 - Task: `HDE-CONJ009`
