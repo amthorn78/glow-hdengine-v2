@@ -2,14 +2,15 @@
 
 ## Scope guard (PF09.4 / HDE-CONJ009.1)
 
-This inventory is intentionally bounded to conjunction JSON-emitting loci that are already repo-proven and in-scope for PR-01.
+This inventory is intentionally bounded to the full in-scope conjunction JSON-emitting loci that are already repo-proven for PR-01.
 
-Included loci (minimum required):
+Included loci (required in-scope set):
 - `/reader`
+- `/dev/sampler/conjunction`
+- `/dev/reader/conjunction`
 - `/dev/writer/conjunction`
 - `/internal/dev/sampler`
 
-Additional conjunction loci were included only when already repo-proven and in the same bounded conjunction family.
 No new routes, no new proof surfaces, and no alternate serializer/emitter paths are introduced by this inventory.
 
 ## Single-emitter verification checklist
@@ -33,20 +34,18 @@ Canonical shared emitter: `engine.presenter.emitter.emit_public` (delegates to `
 - Handler `dev_sampler_internal()` returns bytes via `body = emit_public(response_payload, sort_keys=True)`.
 - Result: **uses single shared emitter path**.
 
-### 4) Additional bounded conjunction loci (repo-proven, same family)
-
-#### `/dev/sampler/conjunction` (GET)
+### 4) `/dev/sampler/conjunction` (GET)
 - Route calls `_emit_conjunction_response()`.
 - `_emit_conjunction_response()` returns `body = emit_public(payload, sort_keys=True)`.
 - Result: **uses single shared emitter path**.
 
-#### `/dev/reader/conjunction` (GET)
+### 5) `/dev/reader/conjunction` (GET)
 - Route calls `_emit_conjunction_response()`.
 - `_emit_conjunction_response()` returns `body = emit_public(payload, sort_keys=True)`.
 - Result: **uses single shared emitter path**.
 
 ## Conclusion (PR-01 bounded outcome)
 
-All inventoried conjunction JSON-emitting loci in this bounded PR-01 scope route through the single shared canonical emitter (`emit_public` -> `sercanon`).
+All in-scope conjunction JSON-emitting loci in this bounded PR-01 scope route through the single shared canonical emitter (`emit_public` -> `sercanon`).
 
 No in-place emitter fix was needed for the inventoried loci.

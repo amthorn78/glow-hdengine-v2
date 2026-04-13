@@ -680,7 +680,7 @@ def get_reader_bp(emit_fn=None):
             return _emit_writer_response(
                 envelope,
                 status=503,
-                sort_keys=False,
+                sort_keys=True,
             )
         except ValueError:
             return _writer_error(
