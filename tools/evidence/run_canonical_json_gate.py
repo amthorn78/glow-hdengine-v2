@@ -53,6 +53,7 @@ class Probe:
     name: str
     method: str
     route: str
+    expected_status: int
     query: Mapping[str, str] | None = None
     payload: Mapping[str, object] | None = None
 
@@ -62,6 +63,7 @@ CONJUNCTION_PROBES: Sequence[Probe] = (
         name="http_reader",
         method="GET",
         route="/reader",
+        expected_status=400,
         query={
             "birthdate": "1990-01-01",
             "birthtime": "12:00",
@@ -72,6 +74,7 @@ CONJUNCTION_PROBES: Sequence[Probe] = (
         name="http_dev_writer_conjunction",
         method="GET",
         route="/dev/writer/conjunction",
+        expected_status=503,
         query={
             "a_user_id": "left",
             "b_user_id": "right",
@@ -87,6 +90,7 @@ CONJUNCTION_PROBES: Sequence[Probe] = (
         name="http_dev_reader_conjunction",
         method="GET",
         route="/dev/reader/conjunction",
+        expected_status=503,
         query={
             "a_user_id": "left",
             "b_user_id": "right",
@@ -102,6 +106,7 @@ CONJUNCTION_PROBES: Sequence[Probe] = (
         name="http_dev_sampler_conjunction",
         method="GET",
         route="/dev/sampler/conjunction",
+        expected_status=503,
         query={
             "a_user_id": "left",
             "b_user_id": "right",
@@ -117,6 +122,7 @@ CONJUNCTION_PROBES: Sequence[Probe] = (
         name="http_internal_dev_sampler",
         method="POST",
         route="/internal/dev/sampler",
+        expected_status=200,
         payload={
             "viewer_id": "viewer-1",
             "candidate_ids": ["candidate-a", "candidate-b"],
@@ -262,11 +268,17 @@ def _run_gate(targets: Sequence[Target], *, check_only: bool = False) -> int:
                 "compared_at_utc": generated_at,
             }
             if probe.method == "POST":
-                response = client.post(probe.route, json=probe.payload)
+                response = client.post(
+                    probe.route,
+                    data=json.dumps(probe.payload),
+                    headers={"Content-Type": "application/json; charset=utf-8"},
+                )
             else:
                 response = client.get(probe.route, query_string=probe.query)
             data = response.data
             issues: list[str] = []
+            if response.status_code != probe.expected_status:
+                issues.append(f"unexpected_http_status:{response.status_code}!={probe.expected_status}")
             try:
                 obj = json.loads(data)
             except json.JSONDecodeError as exc:
@@ -302,6 +314,7 @@ def _run_gate(targets: Sequence[Target], *, check_only: bool = False) -> int:
                     "match": match,
                     "trailing_lf": trailing_lf,
                     "http_status": response.status_code,
+                    "expected_http_status": probe.expected_status,
                 }
             )
             compare_rows.append(
@@ -314,6 +327,7 @@ def _run_gate(targets: Sequence[Target], *, check_only: bool = False) -> int:
                     "size_bytes": len(data),
                     "issues": issues,
                     "http_status": response.status_code,
+                    "expected_http_status": probe.expected_status,
                 }
             )
 
