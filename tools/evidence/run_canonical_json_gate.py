@@ -6,6 +6,7 @@ import argparse
 import datetime as _dt
 import hashlib
 import json
+import os
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -18,6 +19,7 @@ if str(ROOT) not in sys.path:
 from engine.runtime.determinism_env import ensure_determinism_env
 from engine.serializer.canon import sercanon
 from tools.evidence import update_evidence_index
+from adapter.http_reader import create_app
 
 CANON_DIR = ROOT / "audit" / "gates" / "canonical_json"
 JSON_GATE_DIR = ROOT / "audit" / "gates" / "json_gate" / "canonical"
@@ -43,6 +45,90 @@ TARGETS: Sequence[Target] = (
     Target("cli_conjunction_pair_ba", "artifacts/audit/cli/pair_ba.json"),
     Target("cli_conjunction_showcompat_ab", "artifacts/audit/cli/showcompat_ab.json"),
     Target("cli_conjunction_showcompat_ba", "artifacts/audit/cli/showcompat_ba.json"),
+)
+
+
+@dataclass(frozen=True)
+class Probe:
+    name: str
+    method: str
+    route: str
+    expected_status: int
+    query: Mapping[str, str] | None = None
+    payload: Mapping[str, object] | None = None
+
+
+CONJUNCTION_PROBES: Sequence[Probe] = (
+    Probe(
+        name="http_reader",
+        method="GET",
+        route="/reader",
+        expected_status=400,
+        query={
+            "birthdate": "1990-01-01",
+            "birthtime": "12:00",
+            "location": "UTC",
+        },
+    ),
+    Probe(
+        name="http_dev_writer_conjunction",
+        method="GET",
+        route="/dev/writer/conjunction",
+        expected_status=503,
+        query={
+            "a_user_id": "left",
+            "b_user_id": "right",
+            "a_birthdate": "1990-01-01",
+            "a_birthtime": "08:30",
+            "a_location": "Amsterdam",
+            "b_birthdate": "1991-02-02",
+            "b_birthtime": "09:45",
+            "b_location": "Berlin",
+        },
+    ),
+    Probe(
+        name="http_dev_reader_conjunction",
+        method="GET",
+        route="/dev/reader/conjunction",
+        expected_status=503,
+        query={
+            "a_user_id": "left",
+            "b_user_id": "right",
+            "a_birthdate": "1990-01-01",
+            "a_birthtime": "08:30",
+            "a_location": "Amsterdam",
+            "b_birthdate": "1991-02-02",
+            "b_birthtime": "09:45",
+            "b_location": "Berlin",
+        },
+    ),
+    Probe(
+        name="http_dev_sampler_conjunction",
+        method="GET",
+        route="/dev/sampler/conjunction",
+        expected_status=503,
+        query={
+            "a_user_id": "left",
+            "b_user_id": "right",
+            "a_birthdate": "1990-01-01",
+            "a_birthtime": "08:30",
+            "a_location": "Amsterdam",
+            "b_birthdate": "1991-02-02",
+            "b_birthtime": "09:45",
+            "b_location": "Berlin",
+        },
+    ),
+    Probe(
+        name="http_internal_dev_sampler",
+        method="POST",
+        route="/internal/dev/sampler",
+        expected_status=200,
+        payload={
+            "viewer_id": "viewer-1",
+            "candidate_ids": ["candidate-a", "candidate-b"],
+            "seed": "seed-1",
+        },
+    ),
 )
 
 
@@ -163,6 +249,87 @@ def _run_gate(targets: Sequence[Target], *, check_only: bool = False) -> int:
                 "issues": issues,
             }
         )
+
+    os.environ.setdefault("APP_ENV", "dev")
+    app = create_app()
+    app.config.update(TESTING=True)
+    with app.test_client() as client:
+        for probe in CONJUNCTION_PROBES:
+            entry_common = {
+                "schema": "canonical_json.check.v1",
+                "artifact": probe.name,
+                "path": f"endpoint:{probe.route}",
+                "checked_at_utc": generated_at,
+            }
+            compare_common = {
+                "schema": "canonical_json.compare.v1",
+                "artifact": probe.name,
+                "path": f"endpoint:{probe.route}",
+                "compared_at_utc": generated_at,
+            }
+            if probe.method == "POST":
+                response = client.post(
+                    probe.route,
+                    data=json.dumps(probe.payload),
+                    headers={"Content-Type": "application/json; charset=utf-8"},
+                )
+            else:
+                response = client.get(probe.route, query_string=probe.query)
+            data = response.data
+            issues: list[str] = []
+            if response.status_code != probe.expected_status:
+                issues.append(f"unexpected_http_status:{response.status_code}!={probe.expected_status}")
+            try:
+                obj = json.loads(data)
+            except json.JSONDecodeError as exc:
+                obj = None
+                issues.append(f"json_error:{exc.msg}")
+            canonical_bytes = b""
+            if obj is not None:
+                canonical_bytes = sercanon(obj, sort_keys=True)
+
+            trailing_lf = data.endswith(b"\n")
+            if not trailing_lf:
+                issues.append("missing_trailing_lf")
+            if data.startswith(b"\xef\xbb\xbf"):
+                issues.append("utf8_bom_present")
+            if not data:
+                issues.append("empty_bytes")
+
+            match = bool(obj is not None and data == canonical_bytes)
+            if not match:
+                issues.append("non_canonical_bytes")
+            status = "pass" if not issues else "fail"
+            if status == "fail":
+                failures.append(f"endpoint:{probe.route}")
+
+            check_rows.append(
+                {
+                    **entry_common,
+                    "status": status,
+                    "issues": issues,
+                    "sha256": _sha256(data),
+                    "canonical_sha256": _sha256(canonical_bytes) if canonical_bytes else None,
+                    "size_bytes": len(data),
+                    "match": match,
+                    "trailing_lf": trailing_lf,
+                    "http_status": response.status_code,
+                    "expected_http_status": probe.expected_status,
+                }
+            )
+            compare_rows.append(
+                {
+                    **compare_common,
+                    "status": status,
+                    "match": match,
+                    "original_sha256": _sha256(data),
+                    "canonical_sha256": _sha256(canonical_bytes) if canonical_bytes else None,
+                    "size_bytes": len(data),
+                    "issues": issues,
+                    "http_status": response.status_code,
+                    "expected_http_status": probe.expected_status,
+                }
+            )
 
     if not check_only:
         check_bytes = _render_log_lines(check_rows)
