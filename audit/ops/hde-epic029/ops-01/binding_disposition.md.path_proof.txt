@@ -1,5 +1,5 @@
 path: audit/ops/hde-epic029/ops-01/binding_disposition.md
-size_bytes: 272
-sha256: 1076d0b2d2b5531d2ccab0cdc38232ab9bed7f85a5e1b752316ed213fe4c04ea
-mtime_utc: 2026-04-13T22:02:16Z
-produced_at_utc: 2026-04-14T09:29:26Z
+size_bytes: 109
+sha256: 10f60c556375c75ab5e4274a8f8f073af20b7983daad71ac629226b5118c57bf
+mtime_utc: 2026-04-14T11:34:14Z
+produced_at_utc: 2026-04-14T11:34:21Z

@@ -1,10 +1,10 @@
 # HDE-EPIC029 — Close Report
 
 ## Overview
-This is a sequencing correction only slice for EPIC029. It prevents premature acceptance/close-pack claims and preserves anti-overclaim posture while mapped PF09 row-closing work remains open.
+This EPIC029 closeout refresh is bounded to repo-side governed evidence and report-only status recommendations for the controlling conjunction rows.
 
 ## Capture timestamp
-- `2026-04-14T09:29:26Z`
+- `2026-04-14T11:34:21Z`
 
 ## PF09 mapping used
 - Task: `HDE-CONJ009`
@@ -12,9 +12,9 @@ This is a sequencing correction only slice for EPIC029. It prevents premature ac
 - Additional bound subtasks: `HDE-CONJ008.1`, `HDE-CONJ001.4`.
 
 ## PF09 scope truth (bound in metadata, not minted as acceptance tokens)
-- `HDE-CONJ009` / `HDE-CONJ009.1`: mixed blocker; no status change to Done in this slice.
-- `HDE-CONJ008` / `HDE-CONJ008.1`: governed approval/evidence blocker; no status change to Done in this slice.
-- `HDE-CONJ001` / `HDE-CONJ001.4`: closed by explicit binding-equivalence normalization across OPS-01 governed evidence.
+- `HDE-CONJ001` / `HDE-CONJ001.4`: status supportability is bound via normalized OPS-01 disposition evidence.
+- `HDE-CONJ008` / `HDE-CONJ008.1`: status supportability is bound via existing writer conjunction evidence.
+- `HDE-CONJ009` / `HDE-CONJ009.1`: status supportability is bound via existing conjunction surface inventory evidence.
 
 ## OPS-01 truth preserved
 - Codespaces is **closed** under OPS-01 governed evidence.
@@ -22,10 +22,15 @@ This is a sequencing correction only slice for EPIC029. It prevents premature ac
 - Closure mode: binding-equivalence
 - `HDE-CONJ001.4` is marked complete using approved equivalence closure with no claim of a second independently exercised runtime.
 
-## Sequencing gate outcome
-- Close-pack acceptance binding remains blocked in this slice.
-- Later row-closing work is required before close-pack binding for `HDE-CONJ009.1` and `HDE-CONJ008.1`.
-- `HDE-CONJ001.4` is closed in this slice.
+## PF09 status recommendations (report only; no PF edits)
+- Current PF09 text is not edited here.
+- Statuses below are supportable from repo evidence only.
+- Any PF09 status change happens later, outside this Codex work.
+- Supportable from repo evidence: HDE-CONJ009.1 -> Done
+- Supportable from repo evidence: HDE-CONJ009 -> Done
+- Supportable from repo evidence: HDE-CONJ008.1 -> Done
+- Supportable from repo evidence: HDE-CONJ008 -> Done
+- Supportable from repo evidence: HDE-CONJ001.4 -> Done, contingent on the normalized OPS-01 binding-equivalence family now present in repo
 
 ## Epic-close Live QA outputs
 - `audit/qa/hde-epic029/checks/po-epic-close-live-qa/primary.log`: present

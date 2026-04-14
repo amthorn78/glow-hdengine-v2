@@ -12,3 +12,5 @@
 [2026-04-13T20:20:19.763631+00:00] sampler_response mode=prod status=403 http_version=HTTP/1.1 body={"body": {"code": "ERR_WRITER_FORBIDDEN", "error": "insufficient scope", "ok": false, "schema": "v1"}, "headers": {"Cache-Control": "no-store", "Connection": "close", "Content-Length": "86", "Content-Type": "application/json; charset=utf-8", "Date": "Mon, 13 Apr 2026 20:20:19 GMT", "Server": "Werkzeug/3.1.6 Python/3.11.14"}}
 [2026-04-13T20:20:19.767017+00:00] gating_diagnostic expected=403? actual_status=403 body_keys=['code', 'error', 'ok', 'schema']
 === CODESPACES_HEALTHCHECK_END ===
+=== NORMALIZATION_NOTE ===
+no separate local-dev runtime was executed in this evidence pass; local_dev closure is binding-equivalence to the same DEV_SAMPLER_URL value validated in codespaces.
