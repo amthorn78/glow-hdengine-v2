@@ -166,6 +166,65 @@ def _ops_binding_disposition_status() -> dict[str, str]:
     return status
 
 
+def _has_surface_inventory_closure_semantics(path: Path) -> bool:
+    if not path.exists():
+        return False
+    text = path.read_text(encoding="utf-8")
+    required_fragments = (
+        "## Conclusion (PR-01 bounded outcome)",
+        "single shared canonical emitter (`emit_public` -> `sercanon`)",
+        "No in-place emitter fix was needed for the inventoried loci.",
+    )
+    return all(fragment in text for fragment in required_fragments)
+
+
+def _has_writer_closure_semantics(log_path: Path, summary_path: Path) -> bool:
+    if not (log_path.exists() and summary_path.exists()):
+        return False
+
+    log_lines = {
+        line.strip()
+        for line in log_path.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    }
+    required_log_lines = {
+        "schema=conjunction_write_readback.log.v1",
+        "route=/dev/writer/conjunction",
+        "reader_route=/dev/reader/conjunction",
+        "writer_first_status=200",
+        "writer_second_status=200",
+        "reader_status=200",
+        "writer_invalid_status=422",
+        "writer_bytes_two_run_equal=true",
+        "writer_payload_two_run_equal=true",
+        "writer_result_reader_readback_equal=true",
+        "writer_success_type=dev.writer.conjunction.success.v1",
+        "writer_error_type=dev.writer.conjunction.error.v1",
+    }
+    if not required_log_lines.issubset(log_lines):
+        return False
+
+    try:
+        summary = json.loads(summary_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return False
+
+    checks = summary.get("checks")
+    if not isinstance(checks, dict):
+        return False
+
+    required_true_checks = (
+        "writer_status_200",
+        "reader_status_200",
+        "writer_error_typed_envelope",
+        "writer_success_typed_envelope",
+        "writer_bytes_two_run_equal",
+        "writer_payload_two_run_equal",
+        "writer_result_reader_readback_equal",
+    )
+    return all(checks.get(check_name) is True for check_name in required_true_checks)
+
+
 def _pf09_row_closure_gate(live_qa: dict[str, bool], index_status: dict[str, bool]) -> dict[str, object]:
     disposition_status = _ops_binding_disposition_status()
     codespaces_closed = disposition_status["codespaces"] == "closed"
@@ -173,11 +232,10 @@ def _pf09_row_closure_gate(live_qa: dict[str, bool], index_status: dict[str, boo
     required_inputs_ready = not _missing_required_paths()
     qa_complete = all(live_qa.values())
     evidence_index_complete = all(index_status.values())
-    hde_conj009_1_closed = SURFACE_INVENTORY_PATH.exists()
-    hde_conj008_1_closed = (
-        (ROOT / "artifacts" / "writer" / "conjunction_write_readback.log").exists()
-        and (ROOT / "artifacts" / "writer" / "conjunction_writer_summary.json").exists()
-    )
+    writer_log = ROOT / "artifacts" / "writer" / "conjunction_write_readback.log"
+    writer_summary = ROOT / "artifacts" / "writer" / "conjunction_writer_summary.json"
+    hde_conj009_1_closed = _has_surface_inventory_closure_semantics(SURFACE_INVENTORY_PATH)
+    hde_conj008_1_closed = _has_writer_closure_semantics(writer_log, writer_summary)
     hde_conj001_4_closed = codespaces_closed and local_dev_closed
     ready_for_close_binding = all(
         [
