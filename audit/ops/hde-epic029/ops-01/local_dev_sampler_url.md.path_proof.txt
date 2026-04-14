@@ -1,0 +1,5 @@
+path: audit/ops/hde-epic029/ops-01/local_dev_sampler_url.md
+size_bytes: 255
+sha256: cfc3e1c1975e8529203cddf9970899a5472f9410868afb82b91cbef1e1797b30
+mtime_utc: 2026-04-13T22:02:07Z
+produced_at_utc: 2026-04-14T09:29:26Z

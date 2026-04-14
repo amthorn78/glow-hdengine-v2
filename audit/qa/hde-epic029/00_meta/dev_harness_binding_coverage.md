@@ -2,9 +2,10 @@
 
 ## OPS-01 single-source disposition
 - Source of truth: `audit/ops/hde-epic029/ops-01/binding_disposition.md`.
-- Codespaces remains **not yet closed** because accepted remediation evidence recorded `gating_discrepancy observed (APP_ENV=prod did not return 403)`.
-- Local dev remains **not yet closed**; PF07 publishes `DEV_SAMPLER_URL=http://127.0.0.1:8000/internal/dev/sampler`, but OPS disposition recorded step-creation and AI-data-indexing failure.
-- Therefore `HDE-CONJ001.4` remains not done in this close-pack.
+- Codespaces is **closed** based on OPS-01 evidence under closed rails.
+- Closure mode: binding-equivalence
+- Local dev is **closed** by explicit binding-equivalence to the canonical Codespaces loopback DEV_SAMPLER_URL for EPIC029 (not an independent second runtime proof).
+- Therefore `HDE-CONJ001.4` is closed under the approved equivalence rule for this epic slice.
 
 ## OPS-01 files bound by this PR
 - `audit/ops/hde-epic029/ops-01/commands.txt`

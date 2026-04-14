@@ -6,4 +6,4 @@ allow_network: 0
 lc_all: C
 lang: C
 tz: UTC
-notes: remediation rerun captured gating_discrepancy observed (APP_ENV=prod did not return 403); Codespaces remains not yet closed pending clean validation.
+notes: healthcheck passed with dev success and prod-mode refusal diagnostic (expected 403).

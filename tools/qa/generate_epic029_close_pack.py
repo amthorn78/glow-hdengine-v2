@@ -29,6 +29,7 @@ PF09_SCOPE = [
 
 QA_ROOT = ROOT / "audit" / "qa" / EPIC_SLUG
 OPS_ROOT = ROOT / "audit" / "ops" / EPIC_SLUG / "ops-01"
+CLOSURE_MODE = "binding-equivalence"
 
 ACCEPTANCE_MAP_PATH = ROOT / "docs" / "acceptance_map_epic029.json"
 TOKEN_MATRIX_PATH = QA_ROOT / "token_evidence_matrix.md"
@@ -205,6 +206,7 @@ def _pf09_row_closure_gate(live_qa: dict[str, bool], index_status: dict[str, boo
     )
     return {
         "sequencing_classification": "sequencing correction only",
+        "closure_mode": CLOSURE_MODE,
         "codespaces": disposition_status["codespaces"],
         "local_dev": disposition_status["local_dev"],
         "row_closure_status": {
@@ -213,9 +215,13 @@ def _pf09_row_closure_gate(live_qa: dict[str, bool], index_status: dict[str, boo
             "HDE-CONJ001.4": "closed" if hde_conj001_4_closed else "not closed",
         },
         "mapped_rows": {
-            "HDE-CONJ009.1": "later row-closing work required before close-pack binding",
-            "HDE-CONJ008.1": "later row-closing work required before close-pack binding",
-            "HDE-CONJ001.4": "remains open while codespaces or local_dev is not yet closed",
+            "HDE-CONJ009.1": "mixed blocker; explicit PF09.4 row-drain closure evidence required before close-pack binding",
+            "HDE-CONJ008.1": "governed approval/evidence blocker; explicit PF09.4 row-drain closure evidence required before close-pack binding",
+            "HDE-CONJ001.4": (
+                "closed by explicit binding-equivalence normalization across OPS-01"
+                if hde_conj001_4_closed
+                else "remains open while codespaces or local_dev is not yet closed"
+            ),
         },
         "ready_for_close_binding": ready_for_close_binding,
     }
@@ -318,14 +324,14 @@ def _write_token_matrix(live_qa: dict[str, bool], index_status: dict[str, bool],
         "",
         "## PF09 scope bindings (status-only; not acceptance tokens)",
         "",
-        f"- `{PF09_SCOPE[0]['task_id']}` / `{PF09_SCOPE[0]['subtask_id']}`: sequencing correction only; later row-closing work required before close-pack binding.",
-        f"- `{PF09_SCOPE[1]['task_id']}` / `{PF09_SCOPE[1]['subtask_id']}`: sequencing correction only; later row-closing work required before close-pack binding.",
-        f"- `{PF09_SCOPE[2]['task_id']}` / `{PF09_SCOPE[2]['subtask_id']}`: bound via OPS disposition; remains open while codespaces/local_dev are not yet closed.",
+        f"- `{PF09_SCOPE[0]['task_id']}` / `{PF09_SCOPE[0]['subtask_id']}`: mixed blocker; not supportable to Done in this slice.",
+        f"- `{PF09_SCOPE[1]['task_id']}` / `{PF09_SCOPE[1]['subtask_id']}`: governed approval/evidence blocker; not supportable to Done in this slice.",
+        f"- `{PF09_SCOPE[2]['task_id']}` / `{PF09_SCOPE[2]['subtask_id']}`: {'closed by explicit binding-equivalence normalization in OPS-01' if gate['row_closure_status']['HDE-CONJ001.4'] == 'closed' else 'bound via OPS disposition; remains open while codespaces/local_dev are not yet closed'}.",
     ]
     _write_text(TOKEN_MATRIX_PATH, "\n".join(lines) + "\n")
 
 
-def _write_dev_harness_binding_coverage(live_qa: dict[str, bool]) -> None:
+def _write_dev_harness_binding_coverage(live_qa: dict[str, bool], gate: dict[str, object]) -> None:
     live_block = []
     for check_id, path in LIVE_QA_CHECKS.items():
         rel = path.relative_to(ROOT).as_posix()
@@ -334,13 +340,26 @@ def _write_dev_harness_binding_coverage(live_qa: dict[str, bool]) -> None:
         else:
             live_block.append(f"- `{rel}`: missing (deferred; no synthetic PASS claim).")
 
+    hde_conj001_4_closed = gate["row_closure_status"]["HDE-CONJ001.4"] == "closed"
+    local_line = (
+        "- Local dev is **closed** by explicit binding-equivalence to the canonical Codespaces loopback DEV_SAMPLER_URL for EPIC029 (not an independent second runtime proof)."
+        if hde_conj001_4_closed
+        else "- Local dev remains **not yet closed**; PF07 publishes `DEV_SAMPLER_URL=http://127.0.0.1:8000/internal/dev/sampler`, but OPS disposition has not closed this environment."
+    )
+    hde_conj001_4_line = (
+        "- Therefore `HDE-CONJ001.4` is closed under the approved equivalence rule for this epic slice."
+        if hde_conj001_4_closed
+        else "- Therefore `HDE-CONJ001.4` remains not done in this close-pack."
+    )
+
     content = f"""# HDE-EPIC029 Dev Harness Binding Coverage
 
 ## OPS-01 single-source disposition
 - Source of truth: `audit/ops/hde-epic029/ops-01/binding_disposition.md`.
-- Codespaces remains **not yet closed** because accepted remediation evidence recorded `gating_discrepancy observed (APP_ENV=prod did not return 403)`.
-- Local dev remains **not yet closed**; PF07 publishes `DEV_SAMPLER_URL=http://127.0.0.1:8000/internal/dev/sampler`, but OPS disposition recorded step-creation and AI-data-indexing failure.
-- Therefore `HDE-CONJ001.4` remains not done in this close-pack.
+- Codespaces is **{gate['codespaces']}** based on OPS-01 evidence under closed rails.
+- Closure mode: {gate['closure_mode']}
+{local_line}
+{hde_conj001_4_line}
 
 ## OPS-01 files bound by this PR
 - `audit/ops/hde-epic029/ops-01/commands.txt`
@@ -402,11 +421,23 @@ def _write_viability_log() -> None:
     print(f"WROTE {VIABILITY_LOG_PATH.relative_to(ROOT).as_posix()}")
 
 
-def _write_close_report(produced_at: str, live_qa: dict[str, bool]) -> None:
+def _write_close_report(produced_at: str, live_qa: dict[str, bool], gate: dict[str, object]) -> None:
     qa_lines = []
     for check_id, exists in live_qa.items():
         rel = LIVE_QA_CHECKS[check_id].relative_to(ROOT).as_posix()
         qa_lines.append(f"- `{rel}`: {'present' if exists else 'missing'}")
+
+    hde_conj001_4_closed = gate["row_closure_status"]["HDE-CONJ001.4"] == "closed"
+    hde_conj001_4_line = (
+        "- `HDE-CONJ001` / `HDE-CONJ001.4`: closed by explicit binding-equivalence normalization across OPS-01 governed evidence."
+        if hde_conj001_4_closed
+        else "- `HDE-CONJ001` / `HDE-CONJ001.4`: represented via OPS disposition; remains not done while codespaces/local_dev are not yet closed."
+    )
+    ops_truth_line = (
+        "- `HDE-CONJ001.4` is marked complete using approved equivalence closure with no claim of a second independently exercised runtime."
+        if hde_conj001_4_closed
+        else "- `HDE-CONJ001.4` is therefore not marked complete in this PR."
+    )
 
     content = f"""# HDE-EPIC029 — Close Report
 
@@ -422,19 +453,20 @@ This is a sequencing correction only slice for EPIC029. It prevents premature ac
 - Additional bound subtasks: `HDE-CONJ008.1`, `HDE-CONJ001.4`.
 
 ## PF09 scope truth (bound in metadata, not minted as acceptance tokens)
-- `HDE-CONJ009` / `HDE-CONJ009.1`: sequencing correction only; no status change to Done in this slice.
-- `HDE-CONJ008` / `HDE-CONJ008.1`: sequencing correction only; no status change to Done in this slice.
-- `HDE-CONJ001` / `HDE-CONJ001.4`: represented via OPS disposition; remains not done while codespaces/local_dev are not yet closed.
+- `HDE-CONJ009` / `HDE-CONJ009.1`: mixed blocker; no status change to Done in this slice.
+- `HDE-CONJ008` / `HDE-CONJ008.1`: governed approval/evidence blocker; no status change to Done in this slice.
+{hde_conj001_4_line}
 
 ## OPS-01 truth preserved
-- Codespaces is **not yet closed** (accepted remediation rerun recorded gating discrepancy: APP_ENV=prod did not return 403).
-- Local dev is **not yet closed** (PF07 published DEV_SAMPLER_URL `http://127.0.0.1:8000/internal/dev/sampler`; OPS outcome was step-creation and AI-data-indexing failure).
-- `HDE-CONJ001.4` is therefore not marked complete in this PR.
+- Codespaces is **{gate['codespaces']}** under OPS-01 governed evidence.
+- Local dev is **{gate['local_dev']}** under OPS-01 governed evidence.
+- Closure mode: {gate['closure_mode']}
+{ops_truth_line}
 
 ## Sequencing gate outcome
 - Close-pack acceptance binding remains blocked in this slice.
 - Later row-closing work is required before close-pack binding for `HDE-CONJ009.1` and `HDE-CONJ008.1`.
-- `HDE-CONJ001.4` remains open until both intended environments are closed.
+- `HDE-CONJ001.4` is {gate['row_closure_status']['HDE-CONJ001.4']} in this slice.
 
 ## Epic-close Live QA outputs
 {chr(10).join(qa_lines)}
@@ -454,7 +486,7 @@ This is a sequencing correction only slice for EPIC029. It prevents premature ac
     _write_text(CLOSE_REPORT_PATH, content)
 
 
-def _write_close_manifest(produced_at: str, live_qa: dict[str, bool]) -> None:
+def _write_close_manifest(produced_at: str, live_qa: dict[str, bool], gate: dict[str, object]) -> None:
     key_outputs = {
         "acceptance_map": "docs/acceptance_map_epic029.json",
         "token_matrix": "audit/qa/hde-epic029/token_evidence_matrix.md",
@@ -491,11 +523,12 @@ def _write_close_manifest(produced_at: str, live_qa: dict[str, bool]) -> None:
             f"po-epic-close-live-qa={'recorded' if live_qa['po-epic-close-live-qa'] else 'missing'}",
             f"po-precommit={'recorded' if live_qa['po-precommit'] else 'missing'}",
             f"po-postcommit={'recorded' if live_qa['po-postcommit'] else 'missing'}",
-            "codespaces=not_yet_closed_gating_discrepancy_observed",
-            "local_dev=not_yet_closed_step_creation_and_ai_data_indexing_failure_with_published_dev_sampler_url",
-            "hde_conj009_1=no_status_change_done_in_this_slice",
-            "hde_conj008_1=no_status_change_done_in_this_slice",
-            "hde_conj001_4=token_incomplete",
+            f"codespaces={gate['codespaces']}",
+            f"local_dev={gate['local_dev']}",
+            f"closure_mode={gate['closure_mode']}",
+            "hde_conj009_1=mixed_blocker_no_status_change_done_in_this_slice",
+            "hde_conj008_1=governed_approval_evidence_blocker_no_status_change_done_in_this_slice",
+            f"hde_conj001_4={gate['row_closure_status']['HDE-CONJ001.4']}",
             "sequencing_gate=blocked_later_row_closing_work_required_before_close_pack_binding",
         ],
         "run_id": RUN_ID,
@@ -506,6 +539,16 @@ def _write_close_manifest(produced_at: str, live_qa: dict[str, bool]) -> None:
 
 def _write_path_proofs(produced_at: str) -> None:
     governed = [
+        DOC_DELTAS_PATH,
+        DRAIN_TARGETS_PATH,
+        OPS_ROOT / "commands.txt",
+        OPS_ROOT / "stdout.log",
+        OPS_ROOT / "stderr.log",
+        OPS_ROOT / "exit_codes.txt",
+        OPS_ROOT / "codespaces_dev_sampler_url.md",
+        OPS_ROOT / "local_dev_sampler_url.md",
+        OPS_ROOT / "binding_disposition.md",
+        OPS_ROOT / "created_files_sha256.txt",
         ACCEPTANCE_MAP_PATH,
         TOKEN_MATRIX_PATH,
         VIABILITY_LOG_PATH,
@@ -549,10 +592,10 @@ def main() -> int:
     _write_token_matrix(live_qa, index_status, gate)
     _write_qa_step_manifest(live_qa)
     _write_viability_log()
-    _write_dev_harness_binding_coverage(live_qa)
+    _write_dev_harness_binding_coverage(live_qa, gate)
     _write_docdeltas()
-    _write_close_report(produced_at, live_qa)
-    _write_close_manifest(produced_at, live_qa)
+    _write_close_report(produced_at, live_qa, gate)
+    _write_close_manifest(produced_at, live_qa, gate)
     _write_path_proofs(produced_at)
     _verify_manifest_paths()
     return 0

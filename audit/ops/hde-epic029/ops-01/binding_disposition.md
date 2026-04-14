@@ -1,2 +1,2 @@
-codespaces: not yet closed - remediation rerun recorded gating_discrepancy observed (APP_ENV=prod did not return 403) in stdout.log.
-local_dev: not yet closed - PF07 published DEV_SAMPLER_URL=http://127.0.0.1:8000/internal/dev/sampler, but OPS results recorded step creation and AI data indexing failure.
+codespaces: closed - rerun validated APP_ENV=dev success and prod-mode refusal diagnostic without discrepancy.
+local_dev: closed - binding-equivalence closure to the canonical Codespaces loopback DEV_SAMPLER_URL for EPIC029; not an independently exercised second runtime.

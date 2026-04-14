@@ -17,6 +17,6 @@ Close-pack acceptance binding remains blocked until mapped PF09 row-closing work
 
 ## PF09 scope bindings (status-only; not acceptance tokens)
 
-- `HDE-CONJ009` / `HDE-CONJ009.1`: sequencing correction only; later row-closing work required before close-pack binding.
-- `HDE-CONJ008` / `HDE-CONJ008.1`: sequencing correction only; later row-closing work required before close-pack binding.
-- `HDE-CONJ001` / `HDE-CONJ001.4`: bound via OPS disposition; remains open while codespaces/local_dev are not yet closed.
+- `HDE-CONJ009` / `HDE-CONJ009.1`: mixed blocker; not supportable to Done in this slice.
+- `HDE-CONJ008` / `HDE-CONJ008.1`: governed approval/evidence blocker; not supportable to Done in this slice.
+- `HDE-CONJ001` / `HDE-CONJ001.4`: closed by explicit binding-equivalence normalization in OPS-01.

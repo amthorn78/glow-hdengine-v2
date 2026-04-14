@@ -1,0 +1,5 @@
+path: audit/ops/hde-epic029/ops-01/exit_codes.txt
+size_bytes: 177
+sha256: 61d0894406051bdbe2a843b54885285b26d6057afcb79efa16791bb3dc139b6f
+mtime_utc: 2026-04-14T09:14:59Z
+produced_at_utc: 2026-04-14T09:29:26Z

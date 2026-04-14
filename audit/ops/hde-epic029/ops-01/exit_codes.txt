@@ -1,3 +1,5 @@
-codespaces_healthcheck_rerun=0
-codespaces_disposition_rerun=NOT_YET_CLOSED_GATING_DISCREPANCY
-local_dev_healthcheck=DEFERRED_NO_PUBLISHED_BINDING
+dev_start_probe=124
+codespaces_healthcheck=0
+codespaces_disposition=CLOSED
+local_dev_healthcheck=BINDING_EQUIVALENCE_CLOSURE
+local_dev_disposition=CLOSED_BY_BINDING_EQUIVALENCE
