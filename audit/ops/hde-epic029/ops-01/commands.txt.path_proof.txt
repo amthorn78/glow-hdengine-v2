@@ -1,5 +1,5 @@
 path: audit/ops/hde-epic029/ops-01/commands.txt
-size_bytes: 562
-sha256: 2d215d0f179b47ab979ec32c2c17934ea0115d76a728e825e321366ee4723744
-mtime_utc: 2026-04-14T09:14:51Z
-produced_at_utc: 2026-04-14T09:29:26Z
+size_bytes: 663
+sha256: 0e1cd17c4677c53b8fe506f1018453432b40b392d537f023e08b066dc0ccdcfd
+mtime_utc: 2026-04-14T11:34:14Z
+produced_at_utc: 2026-04-14T11:34:21Z

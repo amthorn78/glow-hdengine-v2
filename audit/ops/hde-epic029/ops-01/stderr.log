@@ -3,3 +3,4 @@
  * Running on http://127.0.0.1:8000
  * Running on http://10.0.2.168:8000
 [33mPress CTRL+C to quit[0m
+NORMALIZATION_NOTE: local_dev runtime not executed in this pass; binding-equivalence closure recorded in OPS-01 artifacts.
