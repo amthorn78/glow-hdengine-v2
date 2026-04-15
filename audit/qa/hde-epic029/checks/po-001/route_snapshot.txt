@@ -1,0 +1,8 @@
+323:    Factory: returns a Blueprint exposing /reader (to be mounted under /api).
+330:    @bp.get("/reader")
+441:    @bp.post("/reader")
+538:    # Discovery: internal/dev surfaces (e.g., /reader, ops probes) gate via APP_ENV
+698:    @bp.route("/internal/dev/sampler", methods=["POST"], provide_automatic_options=False)
+766:    @bp.get("/dev/sampler/conjunction")
+774:    @bp.get("/dev/reader/conjunction")
+782:    @bp.get("/dev/writer/conjunction")
