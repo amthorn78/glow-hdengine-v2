@@ -1,5 +1,5 @@
 path: audit/gates/json_gate/canonical/json_gate_structured_record.json
 size_bytes: 878
-sha256: 7a629ae78802dd77808285789e4fd94ee3bb128595855ba8e7205458e81bfa9c
-mtime_utc: 2026-04-13T12:31:05Z
-produced_at_utc: 2026-04-13T12:31:05Z
+sha256: c15bf9ecd7131f855fc995d19f06efa7294333c9adede93a9ed551e8dde74b24
+mtime_utc: 2026-04-15T20:09:59Z
+produced_at_utc: 2026-04-15T20:09:59Z

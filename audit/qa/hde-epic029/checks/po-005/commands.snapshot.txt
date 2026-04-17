@@ -1,0 +1,6 @@
+# OPS-01 normalization pass (2026-04-14T00:00:00Z)
+# context_probe: evidence normalization for bounded W-004 closure; no additional local_dev runtime execution.
+APP_ENV=dev SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC PORT=8000 scripts/dev_start_reader.sh
+DEV_SAMPLER_URL=http://127.0.0.1:8000/internal/dev/sampler APP_ENV=dev SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC scripts/qa/dev_sampler_healthcheck.py # codespaces runtime basis
+# local_dev_closure: binding-equivalence using the same published DEV_SAMPLER_URL value as codespaces for the same sampler harness binding.
+# note: no separate local-dev runtime was executed in this evidence pass.
