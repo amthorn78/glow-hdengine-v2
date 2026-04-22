@@ -37,7 +37,7 @@ from engine.runtime import emit_reader_public_envelope
 from engine.serializer.canon import sercanon
 from engine.narratives import emit_public_aux, get_pack
 from engine.narratives.constants import BANDS as AUX_BANDS, PERSPECTIVES as AUX_PERSPECTIVES
-from engine.validation.viewer_prefs import validate_viewer_prefs
+from engine.validation.viewer_prefs import normalize_viewer_prefs, validate_viewer_prefs
 from engine.bodygraph.vendor_client import VendorError
 from engine.sampler.core import CandidateFeatures, ViewerProfile, sample_and_rank
 
@@ -212,7 +212,7 @@ def _load_viewer_prefs(path: str | None) -> Dict[str, Any]:
     err = validate_viewer_prefs(data)
     if err:
         raise CliError("INVALID_VIEWER_PREFS")
-    return data
+    return normalize_viewer_prefs(data)
 
 
 def bg_resolve(args: argparse.Namespace) -> int:
