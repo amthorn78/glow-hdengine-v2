@@ -6,11 +6,11 @@
 
 **Status:** Canon
 
-**Version:** v2.2.6
+**Version:** v2.3.7
 
-**Effective date:** 2026-04-06
+**Effective date:** 2026-04-19
 
-**Last Update Gate:** BN 10.3.3 A20-24
+**Last Update Gate:** BN 10.5.7 A35
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -30,7 +30,12 @@ HD Engine specifics are delegated, titles-only, to:
 * PF12 — HDE-Schemas & Artifacts  
 * PF14 — HDE-Mechanics Guide  
 * PF16 — HDE Epics Map (historical context only)  
-* PF17 — HDE Narratives Guide
+* PF17 — HDE Narratives Guide  
+* PF09 phased reference rule (normative).  
+  * The former single-document PF09 is retired for active reference use.  
+  * New QA plans, review artifacts, remediation guides, and future PF19 updates MUST reference the relevant phased PF09 document or documents, identified as PF09.1 through PF09.7, rather than the retired single-document PF09.  
+  * Existing PF19 mentions of “PF09 — HDE-Build Checklist” should be read as family references to the phased PF09.x documents until those mentions are drained to the narrower phase-specific home.  
+  * Where a QA question crosses phase boundaries, the artifact MUST name the exact phased PF09.x document or documents consulted rather than treating the retired single-document PF09 as the active source.
 
 Epics and phased planning (titles-only).
 
@@ -331,6 +336,14 @@ If a pytest run fails during collection/import (for example `ModuleNotFoundError
 
 QA MUST NOT treat “collection died due to missing optional dependency” as a product behavior failure.
 
+This is also a plan-review requirement for executable QA steps.
+
+* Any pytest-backed or tool-backed QA step MUST declare the exact dependency set it requires, the explicit preflight check or checks that prove each dependency is present and runnable, and the exact activation or installation action to use when the dependency is missing and remediation is allowed in the execution venue.  
+* If the plan cannot truthfully specify the activation or installation action, it MUST say so explicitly and MUST classify a failed preflight as `FAIL_TOOLING` or `TOOLING_BLOCKED`. It MUST NOT invent installation commands and it MUST NOT let dependency failure collapse into `FAIL_BEHAVIOR`.  
+* Per-step enforcement is required. A shared bootstrap step does not remove step-local responsibility. Each later QA step MUST either include its own dependency preflight and remediation logic inline or explicitly depend on the bootstrap step and rerun a short step-local readiness check before the main command.  
+* The dependency preflight result, any install or activation action taken, and the final ready or not-ready outcome MUST be captured in the step’s governed QA evidence stream.  
+* Any QA plan or QA step that omits dependency preflight and install or remediation posture for a required dependency is non-conforming and blocked for approval.
+
 ### **2.2.6 Rails posture in CI (default CLOSED)**
 
 Run pre-commit/CI with `SAFE_MODE=1`, `ALLOW_NETWORK=0` by default.
@@ -529,7 +542,10 @@ Post-QA document drainage and closeout ordering (normative) is as follows.
 
 * Allowed close blockers remain limited to QA truth and proof failures, such as incomplete required QA steps, missing required deliverables, untrusted or non-governed evidence, unresolved `FAIL_BEHAVIOR`, `FAIL_TOOLING`, or `TOOLING_BLOCKED` conditions that affect acceptance, or missing required close-gate QA artifacts.
 
-* When a documentation mismatch or canon delta is discovered during QA or closeout, it MUST be recorded as a follow-up, implementation gap, ADR note, or doc-delta item in PF10. It MUST NOT be converted into a pre-drain close blocker solely because the destination PF document has not yet been updated.
+* When a documentation mismatch or canon delta is discovered during QA or closeout, it MUST be recorded as a follow-up, implementation gap, ADR note, or doc-delta item in PF10. It MUST NOT be converted into a pre-drain close blocker solely because the destination PF document has not yet been updated.  
+* No QA artifact may require its own drainage to be valid. A Live QA plan, review artifact, closeout report, acceptance map, token↔evidence matrix, or step log MAY note later drain targets or required future canon updates, but it MUST NOT require those drains already to be complete in order for the current step verdict, epic readiness judgment, repo-supported completion recommendation, canon-supported recommendation, or closeout recommendation to stand.  
+* QA plans and other QA artifacts MUST NOT mandate PF document edits as required outputs for QA execution, step completion, or closeout readiness.  
+* Any QA wording that says or implies `drain required before close`, `cannot pass until PF10 is drained`, `not ready because canon is not yet drained`, `PF update required before acceptance`, or equivalent drain-required posture is non-conforming.
 
 * Post-QA drain ordering is mandatory. Drainage into canon, checklist rows, guides, or other documentation homes occurs only after the epic’s required QA tasks are complete.
 
@@ -995,7 +1011,9 @@ Non-blocking review constraints (do not fail the plan for these):
 
 * Uppercase letters in filenames (the lowercase constraint applies to directory names only).
 
-* Copy or paste artifacts and presentation escapes, including backslash-escaped underscores, escaped asterisks, escaped list markers, and wrapper characters. Reviewers should compare de-escaped semantic strings when validating paths, command flags, token names, and endpoint routes.
+* Copy or paste artifacts and presentation escapes, including backslash-escaped underscores, escaped asterisks, escaped list markers, and wrapper characters, are non-blocking unless the reviewer first proves that the characters exist in the actual source text and materially change meaning, runability, code validity, JSON validity, path or filename correctness, URL or endpoint correctness, environment variable spelling, token spelling, identifier spelling, or other proof-critical content.  
+* Reviewers should compare de-escaped semantic strings when validating paths, command flags, token names, endpoint routes, URLs, environment variables, filenames, and other execution-critical identifiers.  
+* If a relied-on passage appears to contain potentially material escape characters, the reviewer MUST re-open or re-retrieve the raw source before issuing a blocker. Rendered escapes alone are not source truth.
 
 * Command syntax defects that do not change command identity. Plans may be approved with syntax remediations pending, but the executed command MUST be captured verbatim in Moon Loop artifacts before a PASS claim is made.
 
@@ -1247,7 +1265,7 @@ Where possible, it should also prescribe how to capture outputs on that environm
 
 Key principle: Codespaces is where we persist and analyze what happened when we ran prod; it is not itself the authoritative behavior runtime.
 
-Live QA plans MUST NOT conflate these two phases. A step that only runs logic inside Codespaces under closed rails (for example hdctl showcompat pointing at localhost with SAFE\_MODE=1, ALLOW\_NETWORK=0) may be used as a local smoke check, but cannot be used to satisfy tokens or D-goals that assert prod behavior (compat in prod, narratives in prod, vendor ingest in prod, full product payload from prod). Any such step must be explicitly labeled as a local smoke check in the QA plan and must not be used to claim prod behavior tokens.
+Live QA plans MUST NOT conflate these two phases. A step that only runs logic inside Codespaces under closed rails (for example hdctl showcompat pointing at `127.0.0.1` with SAFE\_MODE=1, ALLOW\_NETWORK=0) may be used as a local smoke check, but cannot be used to satisfy tokens or D-goals that assert prod behavior (compat in prod, narratives in prod, vendor ingest in prod, full product payload from prod). Any such step must be explicitly labeled as a local smoke check in the QA plan and must not be used to claim prod behavior tokens.
 
 ### **3.5.5 Pre-Glow full-payload admin bundle flow (acceptance expectation)**
 
@@ -5110,7 +5128,8 @@ The Live QA closeout record MUST include an explicit Coverage vs QA Plan account
 
 * For each COVERED step, point to the evidence artifact(s) produced under the governed QA root for the epic.
 
-* For each UNCOVERED step, include an explicit waiver reference (ADR title only) and a reason.
+* For each UNCOVERED step, include an explicit waiver reference (ADR title only) and a reason.  
+* Coverage vs QA Plan accounting MUST separately identify any accepted plan-execution deviation that materially changed how a COVERED step was actually run, including bounded Moon Loop reruns, rails changes, and step-local dependency-preflight corrections. For each such deviation, the closeout record MUST name the affected step, state the accepted deviation, and point to the governed evidence that preserves the deviation and the final accepted basis.
 
 Unreported gaps are non-conforming. A closeout record that omits this coverage accounting is blocked for approval.
 
@@ -5127,11 +5146,39 @@ The final Live QA closeout review MUST include an explicit required-elements che
 * indexed evidence in the Human Evidence Index and the Machine Mirror  
 * at least one Codespaces harness run, or a governed provenance artifact that truthfully binds an executed QA artifact to the Codespaces venue when venue provenance is part of the closeout claim
 
+When a PF10 addendum is the decisive epic-close authority for a closure claim, the closeout review MUST state whether that addendum provides direct evidence-pointer lines or only evidence-basis prose. If the decisive addendum provides only evidence-basis prose, the closeout review MUST record that explicitly and treat it as an auditability caveat rather than silently assuming pointer-complete sourcing.
+
 The closeout review MUST distinguish repo-supported completion from canon drain completion, formal close-pack completion, and merge provenance. When any of those later closure axes are not being claimed, the review MUST say so explicitly rather than implying they are complete.
 
 A repo-supported completion summary used for closeout MUST be explicit, reproducible, and limited to repo-supported facts. It MUST distinguish recorded, blocked, and no-claim outcomes, and it MUST NOT silently collapse a blocked or contextual state into PASS prose.
 
 If a bounded Moon Loop remediation changed a step from false blocked to recorded or PASS, the closeout review MUST preserve the pre-remediation context as governed or context artifacts, record the minimal change set at the governed delta path, and make the rerun basis explicit.
+
+#### **9.2.15.7 Acceptability language vs PF09 pre-drain status (required; review gate)**
+
+Current PF09 recorded status text is not a closure gate by itself.
+
+* A PR, OPS task, remediation slice, QA-readiness record, or closeout record MUST use acceptable-status language only when the exact mapped PF09.x task or subtask is complete in substance from approved implementation state, approved OPS state where applicable, governed evidence, truthful review and approval artifacts, and the live PF10 record where PF10 explicitly speaks.  
+* PF10 is the live in-flight authority where it explicitly covers the mapped work. PF09 remains the checklist mapping and later-drain record.  
+* This rule applies at the exact PF09.x mapping level. If a subtask exists, that subtask is the controlling unit. If a slice claims more than one mapped PF09.x subtask, each claimed subtask must independently satisfy this rule.  
+* Green tests, bounded diff scope, evidence refresh, successful OPS execution, review-clean posture, token coverage, or green QA checks are necessary but not sufficient by themselves.  
+* Before the mapped work is complete in substance, allowed posture language is limited to contributory, intermediate, review-clean, bounded, or supportable from repo evidence.  
+* Acceptable, accepted, satisfied, complete-for-close, and supportable for later drain to Done are allowed only when the mapped work is complete in substance, governed evidence proves that posture, and the live PF10 record supports later drain to Done where PF10 speaks.  
+* Current PF09 recorded status may be cited only as canon-as-recorded. It MUST NOT by itself block PR acceptability, OPS acceptability, QA entry, QA readiness, or epic close.  
+* Review and closeout artifacts MUST distinguish current PF09 recorded status, supported later-drain status, actual implemented state, actual OPS state, and actual governed evidence state.  
+* If a slice is not closure-ready, the blocker MUST be stated as real implementation, OPS, evidence, planning, or execution incompleteness. It MUST NOT be stated only as PF09 still saying `Not done` or `Partial`.  
+* Review of a bounded approved task MUST stay inside the approved task scope unless the artifact explicitly claims closure. Reviewers MUST NOT widen a bounded PR, OPS task, remediation slice, or validation step to later PRs, later OPS tasks, later validation runs, or whole-epic closure work that the approved task did not claim.  
+* If an approved task is explicitly validation-only, sequencing-only, evidence-only, contributory, or otherwise non-closure, PF09 row closure and later close-pack work are not review gates for that task. Reviewers MUST judge the artifact on whether it truthfully completes its own approved purpose, avoids overclaiming closure, and preserves any still-open mapped PF09.x work as open or no-claim where that posture is real.  
+* This rule does not require PF09 to be edited in the same PR, OPS task, or QA step. PF09 drain remains later documentation work.
+
+#### **9.2.15.8 Governed evidence family coherence and documentation-only normalization (required; review gate)**
+
+* For any bounded PR, OPS task, remediation slice, QA-readiness record, or closeout record that depends on a governed evidence family for one claimed closure dimension, that family MUST express exactly one authoritative posture at a time. Mixed-state families are invalid for review and acceptance.  
+* If one governed artifact says `closed` while another artifact in the same bounded family says `not yet closed`, `deferred`, `partial`, or an equivalent contradictory posture for the same closure dimension, the family is mechanically non-acceptable until normalized.  
+* A consolidation, review, or closeout record MUST NOT summarize contradictory source bytes as though they were one coherent truth surface. When runtime facts are stable but the governed family disagrees, reviewers MUST classify the defect as a documentation or evidence failure rather than as a new runtime failure.  
+* Documentation or evidence normalization may be accepted instead of a rerun only when the relied-on runtime facts are unchanged and already evidenced, no new runtime command, route behavior, environment binding, or OPS action is being claimed, and every governed artifact in the affected family is refreshed to the same authoritative posture with coherent Human Index, Machine Mirror, checksum, and required path-proof updates in the same change.  
+* When equivalence or substitution is used instead of an independently exercised runtime, the approval artifact or governing plan MUST state the closure mode explicitly before the governed evidence family is rewritten.  
+* If the approved task is only to normalize documentation or evidence posture for a bounded slice, review MUST stay bounded to that task. Full epic closure is not a blocker unless the approved task explicitly claims full closure.
 
 # 10\. Templates & harnesses (to be filled; titles-only anchors)
 
@@ -5488,6 +5535,26 @@ When a non-PF observation drives a branching decision or supports a claim in a r
 
 This rule prevents plans from relying on screenshots, ad-hoc terminal scrollback, or ephemeral browser views.
 
+## **10.6 Approval artifacts that support later PF-canon drain**
+
+Later-drain PF-canon update statement (normative).
+
+If an approval artifact is intended to support later PF-canon drainage, it MUST include an explicit later-drain PF-canon update statement. This does not move canon drain earlier. It makes the supported later drain explicit at approval time.
+
+Required fields are as follows.
+
+* Affected PF canon home(s)  
+* Exact affected locator(s)  
+* Current canon posture. If the current posture is not established in reviewed evidence, the artifact MUST say so explicitly.  
+* Supported later-drain action — exactly one of `change to Done`, `change to Partial`, `change to Not done`, `change to Consolidation pending`, `change to Optional`, or `No status change recommended`  
+* Drain readiness classification — exactly one of `Supportable from repo evidence`, `Not yet supportable from repo evidence`, or `Already drained into PF-canon`  
+* Evidence basis — exact evidence pointer(s) that support the later-drain posture  
+* Epic-close expectation — exactly one of `at epic close`, `after an additional PR or OPS slice`, or `after a separate canon-only drain step`
+
+Approval artifacts MUST NOT stop at vague approval language such as accepted, complete, merge-ready, approved, or no further remediation needed when the practical intent is to support a later PF-canon update.
+
+This rule applies to PR final reviews, PR remediation acceptance reviews, OPS task final reviews, final close-pack reviews, and any implementation-plan or QA-plan approval artifact that is intended to feed later PF-canon drain.
+
 # 11\. Roles & RACI (QA)
 
 ## **11.1 QA roles (titles-only pointer to PF06)**
@@ -5499,6 +5566,13 @@ Definition (normative). An Ops task is any work item that requires privileged ac
 Execution authority (normative). Ops tasks MUST be executed by the PO (human operator) only. Automation agents and Codex-style tooling MUST NOT execute Ops tasks, MUST NOT claim completion, and MUST NOT simulate external state changes.
 
 IA facilitation posture (normative). Ops tasks MAY be part of an epic, but they must be described and reviewed as PO-only execution with IA guidance. The IA’s job is to specify the task in a what-not-how manner and then work directly with the PO during execution.
+
+Canon-grounded OPS instructions when available (normative).
+
+* If PF canon already provides concrete operator instructions, commands, required fields, safety rails, validation checks, evidence captures, canonical paths, or decision rules for an Ops task, the Ops task record MUST carry those canon-grounded instructions explicitly rather than remaining only at the level of intent, constraints, or outcome.  
+* This requirement applies only when the canon instruction detail already exists and can be carried forward truthfully.  
+* This rule does not authorize invented procedure. If canon is silent, incomplete, or ambiguous, the Ops task MUST state that the missing instruction is unknown and MUST NOT fabricate steps.  
+* PF references used for this purpose remain titles-only.
 
 Ops task spec format (required fields). Every Ops task record MUST include:
 
@@ -5604,6 +5678,25 @@ Canon-first inventory (before planning) is required. Before drafting a QA plan o
 * HDE-Build Notes for relevant addenda and cross-epic QA guidance  
 * HDE Phased Epics for the epic’s D-goals and acceptance roster  
 * this guide (Glow QA Guide) for QA tokens, rails, and playbooks
+
+PF07-derived vs PF07-gap posture (normative).
+
+* Any QA plan, Live QA runbook, review artifact, remediation guide, implementation guide, or epic QA document that includes an infra or ops dependency MUST bind that dependency in exactly one of two ways:  
+  * PF07-derived posture: the exact required value already exists in Glow Infrastructure and is cited directly.  
+  * PF07-gap posture: the exact required value is missing from Glow Infrastructure; the document identifies the exact missing value set and marks the affected step or claim blocked by missing PF07 inventory.  
+* QA artifacts MUST NOT use placeholder language such as “infra to provide”, “ops to confirm”, “ask infra”, or “await ops details”.  
+* QA artifacts MUST NOT guess hostnames, ports, service URLs, start commands, environment bindings, config-key values, or canonical QA-root patterns.  
+* When an infra or ops dependency is executable rather than blocked, the artifact MUST name the concrete provider, project, service, base URL or port, config key, and governed QA root, as applicable.  
+* When a PF07-gap exists, the document MUST stop at the gap, record the intended Glow Infrastructure update or doc-delta follow-up, and MUST NOT convert the missing value into an executable QA instruction.  
+* This applies to bindings such as `DEV_SAMPLER_URL`, `HDE_BASE_URL`, `DATABASE_URL`, `DB_BRIDGE_URL`, production service URLs, environment-specific ports, and canonical QA-root patterns.
+
+Documented client-access default for local-style dev and QA surfaces (normative).
+
+* When a QA plan, Live QA runbook, remediation guide, or review artifact needs to show a non-prod client access address for a local or local-style surface, the default documented host MUST be `127.0.0.1`, not `localhost`.  
+* This is a client-access convention only. It MUST NOT be used to redefine service identity, canonical infrastructure values, or the underlying server bind address.  
+* The correct port, path, and any prod-facing target must still come from Glow Infrastructure or the other owning canon homes.  
+* Production and other prod-facing surfaces MUST keep their real hosted service URLs or other real infrastructure addresses.  
+* If a surface is not actually reachable at `127.0.0.1` from the intended operator context, the artifact MUST record an explicit exception and the real access route. It MUST NOT guess a forwarded hostname or alternate URL.
 
 If those documents already specify an infra/env value (for example a prod base URL, DB name, or rails pattern) and do not mark it as OPEN/TBD, the IA MUST NOT treat that value as a PO input.
 
@@ -5973,6 +6066,48 @@ Additional closeout and closure-support learnings from `po-009` to epic close ar
 * Codespaces venue provenance mattered only when the closeout claim depended on it. When an epic needed to prove a Codespaces-run closure step, at least one governed artifact had to bind the relied-on QA artifact to the Codespaces session context and the command family that produced it.  
 * PF09 status lag after repo-proven completion was a closeout clarity issue, not a proof failure. Reviewers should distinguish supportable-as-Done posture from drained PF09 state and should not let that distinction collapse into an over-claim of canon completion.  
 * Closeout defensibility depended on explicit Coverage vs QA Plan accounting, step-scoped evidence pointers under the governed QA root, and surfaced close-pack or provenance artifacts where required. A PASS heading, retrospective summary, or OPS verdict line alone was not sufficient proof.
+
+Known non-goals: these addenda do not redefine token semantics, A7 byte rules, or PF09 status rows. PF19 records the QA posture and review learnings only.
+
+## **13.9 HDE-EPIC029 — QA learnings snapshot for bounded conjunction closure and writer-evidence review cleanliness**
+
+These addenda focus on the bounded EPIC029 closure slices that drove review and closeout: PR-01 conjunction JSON surface inventory and canonical JSON discipline, PR-02 conjunction writer-envelope posture, PR-03 repo-side dev harness binding and healthcheck closure, OPS-01 environment-validation truthfulness, and PR-04 final close-pack binding.
+
+Key QA learnings:
+
+* For bounded conjunction closure, reviewers should treat the approved surface family as explicit and minimal: the conjunction inventory artifact, the canonical JSON gate family, the shared Human Index and Machine Mirror refresh, topology orientation support, and only directly required companion path-proofs. Unrelated governed artifact churn outside that family is blocking even when the core slice is otherwise correct.  
+* For canonical JSON gate route probes, byte equality alone is not sufficient. The durable PASS pattern required route-specific expected-status checks and failure when actual and expected HTTP status diverged, even when the returned bytes were otherwise canonical.  
+* Green validation alone did not settle PR-01 acceptance when attempt-local remediation bundles still left current-diff provenance ambiguous. The durable closure pattern was a read-only branch-truth proof against `main`, an empty `main..HEAD` diff, and re-confirmation of the required functional anchors in repo state.  
+* For PR-01, the required bounded minimum loci remained `/reader`, `/dev/writer/conjunction`, and `/internal/dev/sampler`. Additional same-family loci could be documented, but they did not replace the obligation to prove the approved minimum bounded set and single-emitter posture.  
+* Canonical-gate and evidence-index refreshes can fail review through evidence integrity even when the intended runtime slice is right. Stale mirror hashes, stale writer-family or gate-family chronology, or mismatched freshness across governed companions are blocking defects until canonical tooling refreshes them coherently.  
+* For writer-envelope closure, the durable PASS pattern was to preserve the already-correct runtime slice on `/dev/writer/conjunction`: typed numeric-free success and error envelopes, `no-store`, non-conditional posture, and explicit non-A7 scope. Corrective work belonged in the governed writer evidence family, not in reopening the runtime surface without cause.  
+* Full named validation sets can be green while a slice is still non-passing if the current diff carries out-of-scope governed artifacts or stale chronology inside the approved evidence family. Reviewers should separate runtime correctness, evidence-family coherence, and scope cleanliness rather than treating any one of them as sufficient by itself.  
+* When an approved slice is explicitly contributory or evidence-only, repo-supported merge readiness does not by itself justify a PF09 status drain. Reviewers SHOULD keep merge readiness separate from later checklist status updates.  
+* Additional step-review learnings from `po-001` to `po-005` are as follows.  
+  * For `po-001`, the durable PASS pattern was governed step evidence that paired a non-empty deliverables set with bounded-scope proof across the conjunction inventory snapshot, the Endpoint Catalog snapshot, and the recorded route slice. The receipt alone was not sufficient without those bounded-scope artifacts.  
+  * For `po-002`, the durable PASS pattern was a gate return code of `0` plus both governed canonical JSON family snapshots present and non-empty. A zero-byte `run_canonical_json_gate.output.log` was non-blocking when the rc capture, the structured canonical record, and the legacy canonical check log all recorded pass posture.  
+  * For `po-003`, a PO-approved Moon Loop rerun could still be accepted when the rails deviation was explicit, the governed evidence root remained intact, and the formerly empty generator output log was replaced by a non-empty governed artifact. A bounded rerun under this posture remained step-acceptable, but the deviation had to be surfaced rather than normalized away.  
+  * For `po-004`, the durable PASS pattern was a passing sampler HTTP test plus non-empty start-helper and healthcheck snapshots under the governed step root. The `/internal/dev/sampler` harness stayed bounded to dev/admin scope, and the repeated `APP_ENV=prod` probe in the healthcheck remained a non-fatal gating diagnostic rather than a new public or cataloged proof surface.  
+  * For `po-005`, the durable PASS pattern was exact agreement on one published `DEV_SAMPLER_URL` value across the environment snapshots, combined with an explicit disposition split: direct runtime closure for `codespaces` and approved `binding-equivalence` closure for `local_dev`. The step remained supportable only when that stated closure mode and the no-new-local-runtime-claim posture were both preserved.  
+* For bounded validation or blocker-classification OPS lanes, the durable PASS pattern was a read-only validation run with an explicit action log, command ledger, exit codes, and a written classification result. These steps could be accepted for their bounded purpose even when they did not themselves close the mapped PF09.x rows.  
+* For W-001-style blocker classification, reviewers had to separate mixed implementation-plus-evidence blockers from pure governed approval or evidence blockers. A bounded conjunction inventory plus artifact- or CLI-focused canonical JSON gate PASS was not enough to prove exhaustive all-surface HTTP emitter coverage for `HDE-CONJ009.1`, while directly evidenced writer-envelope behavior could leave `HDE-CONJ008.1` as an approval/evidence blocker rather than a runtime defect.  
+* For repo-side dev harness closure slices, the durable PASS pattern was a bounded helper, script, and test change set only: no new public route, no route-contract redesign, no new governed evidence family, and `/internal/dev/sampler` left functionally unchanged.  
+* For dev Reader start helpers, silent `APP_ENV` defaulting was non-conforming. The durable posture was to propagate `APP_ENV` exactly as supplied, including unset or empty states, and to make the effective state explicit in governed evidence.  
+* For dev sampler healthcheck tooling, `DEV_SAMPLER_URL` was the authoritative input. Reviewers should reject helper logic that reconstructs a hostname or port implicitly. The durable posture required an explicit hostname and explicit port, loud-fail behavior when the binding was missing or blank, and negative tests that prove the no-guess posture.  
+* For OPS environment-validation reruns, truthful disposition mattered more than optimistic closure language. A bundle that proved a real dev-mode exercise but also recorded a prod-gating discrepancy had to keep `codespaces` at `not yet closed` and preserve that discrepancy as the accepted OPS truth.  
+* For local-dev environment validation, absence of a published infra-owned `DEV_SAMPLER_URL` remained a real blocker. Reviewers should preserve `not yet closed` posture and reject guessed local URLs.  
+* For sequencing-only remediation on epic-close artifacts, the durable PASS pattern was to keep acceptance and close-pack outputs blocked or incomplete-planned under current evidence rather than promote tokens or closure state early. Reviewers should accept the sequencing correction when it makes the no-claim boundaries explicit and preserves still-open PF09.x scope and accepted `not yet closed` environment truth.  
+* For close-binding gates, the durable PASS pattern was explicit proof requirements rather than permanent-false blocks or weak file-existence heuristics. `ready_for_close_binding` had to require explicit row-closure proof for `HDE-CONJ009.1` and `HDE-CONJ008.1`, plus environment closure for `HDE-CONJ001.4`, and Live QA completeness had to require governed primary logs with `[exit_code] 0` rather than mere log existence.  
+* For PR-04 close-pack closure, invented epic-local acceptance token names were non-conforming. The durable PASS pattern used canonical or PF10-minted token names only, while representing `HDE-CONJ009.1`, `HDE-CONJ008.1`, and `HDE-CONJ001.4` as bound PF09 scope rather than as acceptance tokens.  
+* For close-pack generators and other close-pack-producing tooling, the durable PASS pattern was to enforce canonical token posture and PF09 scope posture at generation time rather than correcting those surfaces only in late remediation. Reviewers should treat generator output that invents epic-local token names or turns bound PF09 scope into acceptance-token claims as non-conforming even when later remedial edits could restate the close-pack correctly.  
+* For epic-close QA bridge tokens, promotion from planned or missing to implemented or covered required real governed QA logs at the canonical paths with passing results. Generator logic or close-pack structure alone was not sufficient.  
+* For final close-pack binding of mixed QA and OPS truth, the durable PASS pattern preserved the accepted `not yet closed` environment state inside the close-pack rather than overclaiming environment closure because the QA bridge evidence had become green.  
+* For PR-04, same-PR refresh of the Human Index, Machine Mirror, close-pack companions, and related path-proofs remained necessary but not sufficient. Unrelated cross-epic governed drift stayed blocking until it was removed from the final remedial bundle.  
+* For bounded W-004 closure, `binding-equivalence` was an acceptable closure mode only when the approved `DEV_SAMPLER_URL` for `local_dev` matched the approved Codespaces value for the same dev-only sampler harness, no new local-dev-only runtime behavior was claimed, the closure mode was stated explicitly, and the governed OPS-01 family was normalized to one authoritative posture. This was the bounded basis for supportable later-drain `Done` posture on `HDE-CONJ001.4` at epic close.  
+* For final EPIC029 closeout, once PF10 explicitly recorded the controlling Conjunction work as complete in substance and supportable for later drain at epic close, the closeout review had to use that live PF10 truth plus the governed repo evidence as the authoritative in-flight closure basis while keeping PF09 as the later-drain record until epic-end drain.  
+* Under that final close posture, `HDE-CONJ009.1`, `HDE-CONJ008.1`, and `HDE-CONJ001.4` were treated as supportable from repo evidence for later-drain `Done`, not as already drained PF09 state.  
+* For final EPIC029 closeout review, PF23 functioned only as a confirmatory repo-reality cross-check. It was used to verify the existence and current classification of the closure-critical runtime surfaces and the current evidence-update skeleton, and to confirm that those realities did not contradict the governing PF10 closure basis.  
+* For the decisive PF10 close-authority addendum in EPIC029, evidence-basis prose without direct evidence-pointer lines remained a real auditability gap but not a closure-truth reversal. The durable review posture was to record that caveat explicitly and rely on the governed repo evidence plus the live PF10 authority rather than silently assuming pointer-complete sourcing.
 
 Known non-goals: these addenda do not redefine token semantics, A7 byte rules, or PF09 status rows. PF19 records the QA posture and review learnings only.
 

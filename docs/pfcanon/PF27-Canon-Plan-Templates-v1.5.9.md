@@ -4,13 +4,13 @@
 
 **Title:** PF27-Canon-Plan-Templates
 
-**Version:** v1.5
+**Version:** v1.5.9
 
 **Status:** Canon
 
-**Effective date:** 2026-04-06
+**Effective date:** 2026-04-19
 
-**Last Update Gate:** BN 10.3.3 Drain A20-24
+**Last Update Gate:** BN 10.5.7 Drain A35
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -398,38 +398,25 @@ Header MUST include, at minimum:
 
 * `fail_status`: MUST be `""`when `status`is `PASS`, else MUST equal `status`.
 
-* `command`: the exact command line executed for this check step (the actual string, not a paraphrase). If multiple commands were executed, `command`MUST be an explicit pipeline or an explicit `;`\-joined sequence that preserves the execution order.
-
-* `command_provenance`: one of `Codex prompt`, `Copy/paste from plan`, or `Explicitly created`.
-
-* evidence\_artifacts: array of one or more paths to evidence artifacts produced for this check (example: the check's `primary.log` path).
-
-* Invariant (PASS): `evidence_artifacts` MUST include the check's `primary.log` path. If a PASS step omits `primary.log` from the artifacts list or manifest, it is an evidence hygiene defect and the step MUST NOT be closed as PASS until remediated.
-
-* captured\_env: JSON object containing the actual env vars for the run (not inferred), limited to canon-defined names.
-
-* `pf_refs`: array of PF document titles consulted (titles-only).
-
-* `intended_tokens`: array of intended acceptance tokens (may be empty).
-
+* `command`: the exact command line executed for this check step (the actual string, not a paraphrase). If multiple commands were executed, `command`MUST be an explicit pipeline or an explicit `;`\-joined sequence that preserves the execution order.  
+* `command_provenance`: a short truthful source string for how the exact `command` string was obtained. Use `Codex prompt`, `Copy/paste from plan`, or `Explicitly created` when one source fully explains the command. When the executed command materially combines the approved plan command with a bounded canon-backed correction or preflight, record both sources in one composite string (example: `Plan + PF10 dependency preflight`).  
+* `exit_code`: integer exit code for the executed `command` sequence. When an executed check is recorded as `PASS`, `exit_code` MUST be `0`. A PASS step MUST NOT rely only on file presence or the absence of a sentinel string.  
+* evidence\_artifacts: array of one or more paths to evidence artifacts produced for this check (example: the check's `primary.log` path).  
+* Invariant (PASS): `evidence_artifacts` MUST include the check's `primary.log` path. If a PASS step omits `primary.log` from the artifacts list or manifest, it is an evidence hygiene defect and the step MUST NOT be closed as PASS until remediated.  
+* captured\_env: JSON object containing the actual env vars for the run (not inferred), limited to canon-defined names.  
+* `pf_refs`: array of PF document titles consulted (titles-only).  
+* `intended_tokens`: array of intended acceptance tokens (may be empty).  
 * `claimed_tokens`: array of claimed acceptance tokens (may be empty).
 
 Notes:
 
-* Step templates MUST generate the header via the canonical header-writer snippet below (or a repo-defined canonical helper that emits the same keys).
-
-* `captured_env`MUST include only canon-defined env var names. Environment variable names are governed interface surfaces (like repo loci and CLI surfaces) and MUST NOT be invented ad hoc for QA convenience.
-
-  * Mechanical blocker: any `MODO_*`environment variables are non-canonical and MUST NOT appear as plan inputs, required exports, required schema keys, or required step-log capture keys.
-
-  * No QA-time env var minting: if a QA plan, runbook, or tool would require a new env var name, that is a development change that requires PO approval and canon documentation before any QA plan can rely on it.
-
-  * Grandfathered exception (HDE-EPIC025 only): `MODO_*`references in the already-approved EPIC025 plan are inert placeholders and MUST NOT be treated as required inputs or copied into new plans.
-
-* `command_provenance`MUST reflect how the exact `command`string was obtained. The plan may provide a directive or a suggested command, but the step log MUST record the exact command(s) executed.
-
-* `pf_refs`MUST contain titles only (no versions).
-
+* Step templates MUST generate the header via the canonical header-writer snippet below (or a repo-defined canonical helper that emits the same keys).  
+* `captured_env`MUST include only canon-defined env var names. Environment variable names are governed interface surfaces (like repo loci and CLI surfaces) and MUST NOT be invented ad hoc for QA convenience.  
+  * Mechanical blocker: any `MODO_*`environment variables are non-canonical and MUST NOT appear as plan inputs, required exports, required schema keys, or required step-log capture keys.  
+  * No QA-time env var minting: if a QA plan, runbook, or tool would require a new env var name, that is a development change that requires PO approval and canon documentation before any QA plan can rely on it.  
+  * Grandfathered exception (HDE-EPIC025 only): `MODO_*`references in the already-approved EPIC025 plan are inert placeholders and MUST NOT be treated as required inputs or copied into new plans.  
+* `command_provenance`MUST reflect how the exact `command`string was obtained. The plan may provide a directive or a suggested command, but the step log MUST record the exact command(s) executed.  
+* `pf_refs`MUST contain titles only (no versions).  
 * Authors MUST NOT add novel env vars or CLI switches to plans or execution artifacts for convenience. Any env var name (and its semantics) is a governed interface surface and can only be introduced via a documented canonical change.
 
 **Canonical step-log header writer (paste-ready; emits header JSON with all required keys):**
@@ -444,24 +431,18 @@ Anti-drift: a Live QA Plan MUST use one header-writer contract consistently acro
 
 Minimum per-check exports (names must match the header writer contract):
 
-* `CHECK_ID`
-
-* `CHECK_NAME`
-
-* `PASS_FAIL`
-
-* `COMMANDS_JSON`(JSON array of exact command string(s) executed, in order)
-
-* `ARTIFACTS_JSON`(JSON array of evidence artifact paths)
-
+* `CHECK_ID`  
+* `CHECK_NAME`  
+* `PASS_FAIL`  
+* `EXIT_CODE`  
+* `COMMANDS_JSON`(JSON array of exact command string(s) executed, in order)  
+* `ARTIFACTS_JSON`(JSON array of evidence artifact paths)  
 * `PF_REFS_JSON`(JSON array of PF titles)
 
 Optional exports:
 
-* `COMMAND_PROVENANCE`(defaults to `Explicitly created`)
-
-* `INTENDED_TOKENS_JSON`(JSON array)
-
+* `COMMAND_PROVENANCE`(defaults to `Explicitly created`)  
+* `INTENDED_TOKENS_JSON`(JSON array)  
 * `CLAIMED_TOKENS_JSON`(JSON array)
 
 If a header is missing or incorrect due to missing exports, a minimal Moon Loop deviation is allowed to export the missing inputs and regenerate the header. Evidence-capture-only correction MUST reassemble `primary.log`by prepending the corrected JSON header while preserving the existing body verbatim.
@@ -479,11 +460,15 @@ If a header is missing or incorrect due to missing exports, a minimal Moon Loop 
  `` `schema_version = "pf27.step_log_header.v1"` `timestamp_utc = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "Z"` ``  
  `status = env("PASS_FAIL")`  
  `fail_status = "" if status == "PASS" else status`  
+ `exit_code_raw = env("EXIT_CODE", "")`  
+ `exit_code = int(exit_code_raw) if exit_code_raw != "" else None`  
+ `if status == "PASS" and exit_code != 0:`  
+ `raise SystemExit("PASS requires EXIT_CODE=0")`  
  `commands = env_json("COMMANDS_JSON", [])`  
  `if isinstance(commands, str):`  
  `commands = [commands]`  
  `command = "; ".join(commands) if commands else "N/A"`  
- `` `header = {` ` "schema_version": schema_version,` ` "timestamp_utc": timestamp_utc,` ` "check_id": env("CHECK_ID"),` ` "check_name": env("CHECK_NAME"),` ` "status": status,` ` "fail_status": fail_status,` ` "command": command,` ` "command_provenance": env("COMMAND_PROVENANCE", "Explicitly created"),` ` "evidence_artifacts": env_json("ARTIFACTS_JSON", []),` ` "captured_env": {` ` "SAFE_MODE": env("SAFE_MODE"),` ` "ALLOW_NETWORK": env("ALLOW_NETWORK"),` ` "APP_ENV": env("APP_ENV"),` ` "LC_ALL": env("LC_ALL"),` ` "LANG": env("LANG"),` ` "TZ": env("TZ"),` ` },` ` "pf_refs": env_json("PF_REFS_JSON", []),` ` "intended_tokens": env_json("INTENDED_TOKENS_JSON", []),` ` "claimed_tokens": env_json("CLAIMED_TOKENS_JSON", []),` `}` ``  
+ `` `header = {` ` "schema_version": schema_version,` ` "timestamp_utc": timestamp_utc,` ` "check_id": env("CHECK_ID"),` ` "check_name": env("CHECK_NAME"),` ` "status": status,` ` "fail_status": fail_status,` ` "command": command,` ` "command_provenance": env("COMMAND_PROVENANCE", "Explicitly created"),` ` "exit_code": exit_code,` ` "evidence_artifacts": env_json("ARTIFACTS_JSON", []),` ` "captured_env": {` ` "SAFE_MODE": env("SAFE_MODE"),` ` "ALLOW_NETWORK": env("ALLOW_NETWORK"),` ` "APP_ENV": env("APP_ENV"),` ` "LC_ALL": env("LC_ALL"),` ` "LANG": env("LANG"),` ` "TZ": env("TZ"),` ` },` ` "pf_refs": env_json("PF_REFS_JSON", []),` ` "intended_tokens": env_json("INTENDED_TOKENS_JSON", []),` ` "claimed_tokens": env_json("CLAIMED_TOKENS_JSON", []),` `}` ``  
  `print(json.dumps(header, ensure_ascii=False))`  
  `PY`
 
@@ -504,6 +489,14 @@ Purpose: mechanically record repo reality mismatches, missing prerequisites, and
 * Hard boundary: Moon Loop MUST NOT expand scope into new acceptance surfaces or feature work. If the needed change is not trivially bounded, stop and escalate to a remediation guide.
 
 * Stop condition: If Moon Loop work exceeds a short, bounded threshold (e.g., \>30 minutes or touches multiple subsystems), stop and convert to a remediation guide.
+
+Bounded step-level rerun posture (required when a plan permits one):
+
+* The plan MUST state the exact trigger condition for the rerun and the exact check or checks that may be rerun.  
+* The plan MUST state whether rails may change for the rerun and, if so, the exact replacement rails posture for that rerun only.  
+* The rerun MUST stay on the same governed step root and the same deliverable family unless the plan explicitly states a narrower reporting-state-only rerun under that same step root.  
+* The plan MUST preserve the earlier failed or blocked state in the same governed evidence stream and MUST require a short remediation note that records what changed and why.  
+* The plan MUST require the rerun evidence to show the final step outcome without widening scope into new acceptance surfaces, new feature work, or a new evidence family.
 
 **Doc-delta surfaces (required; two-surface pair).**
 
@@ -709,6 +702,15 @@ Vendor-dependent steps (rails-scoped):
 
 * If the plan includes an exact command string, it MUST be proven by an allowed provenance source.
 
+Dependency posture (required for executable checks):
+
+* **Dependencies required:** exact commands, interpreters, modules, virtual-environment state, helper binaries, or other executable prerequisites this check depends on.  
+* **Preflight command(s):** one or more explicit readiness checks that run before behavior evaluation.  
+* **Activation or installation remediation, if allowed in the execution venue:** exact action to take when a required dependency is missing or not runnable.  
+* **If remediation is not allowed or not known:** state that explicitly and classify the step as `FAIL_TOOLING` or `TOOLING_BLOCKED` if readiness cannot be established.  
+* **Per-step enforcement:** each executable check must include its own dependency posture, or must explicitly depend on a bootstrap step and rerun a short step-local readiness check before the main behavior command.  
+* **Dependency evidence:** the preflight result, any activation or installation action taken, and the final ready or not-ready outcome must be captured in the step’s governed evidence stream.
+
 **Expected result (PASS/FAIL predicates)**
 
 PASS if:
@@ -757,6 +759,13 @@ Conditional deliverables (when applicable):
 * Conditional deliverables are not required for the current run when the condition is unmet. They MUST NOT be listed as unconditional must-exist evidence for PASS or FAIL adjudication.
 
 * When the condition is unmet, the check evidence MUST record the unmet condition and the reason the conditional outputs were not produced.
+
+Supplementary captures and stream-silent command logs (required when applicable):
+
+* If a check-scoped file is not part of the stated PASS or FAIL predicates, the plan MUST label it as supplementary and non-gating.  
+* A present-but-empty supplementary capture is non-blocking when the stated PASS or FAIL predicates are satisfied by the required rc and required evidence artifacts.  
+* If the plan requires a governed output log for a command that may succeed with no stdout or stderr, the plan MUST define the approved non-empty capture rule for that log and MUST keep the rc artifact authoritative.  
+* The approved capture rule MUST state the exact text to be written when no stdout or stderr is produced and MUST keep that log under the same governed step root and deliverable family.
 
 Path provenance and locus provenance lock (required; per required path or repo-resident locus):
 
@@ -923,9 +932,36 @@ Location:
 ### **Hard blockers for plan approval/execution**
 
 * All inputs, loci, and paths MUST be explicit and reproducible. Any required executable locus (script, check entrypoint, endpoint/route, or command) that is not canon-defined or audit-proven is blocked. No fabricated loci.  
+* PF09 phased-reference rule (required). Plans, reviews, and future work MUST cite the relevant phased HDE Build Checklist document or documents, using PF09.1 through PF09.7 as applicable, and MUST NOT rely on a retired single-document PF09 surface.  
+* PF07-derived / PF07-gap infrastructure posture (required). Any plan, implementation guide, QA plan, review artifact, remediation guide, runbook, or epic document that includes an infra task, ops task, environment binding, service binding, URL, port, project name, provider name, config key, QA root, or start-command dependency MUST use exactly one of these postures:  
+  * PF09 phased-reference rule (required). Plans, reviews, and future work MUST cite the relevant phased HDE Build Checklist document or documents, using PF09.1 through PF09.7 as applicable, and MUST NOT rely on a retired single-document PF09 surface.  
+  * PF07-derived / PF07-gap infrastructure posture (required). Any plan, implementation guide, QA plan, review artifact, remediation guide, runbook, or epic document that includes an infra task, ops task, environment binding, service binding, URL, port, project name, provider name, config key, QA root, or start-command dependency MUST use exactly one of these postures:  
+* Placeholder external-ownership language is non-conforming. Plans and related documents MUST NOT use phrases such as “infra to provide”, “ops to confirm”, “ask infra”, “await ops details”, guessed hostnames, guessed ports, guessed URLs, guessed start commands, guessed environment bindings, or placeholder external ownership without a concrete PF07-backed value or an explicit PF07-gap statement.  
+* QA plans and Live QA runbooks MUST NOT guess or redefine environment bindings that PF07 is meant to own. This includes, as applicable, `DEV_SAMPLER_URL`, `HDE_BASE_URL`, `DATABASE_URL`, `DB_BRIDGE_URL`, production service base URLs, environment-specific host and port bindings, and canonical QA-root patterns.  
+* Default documented dev and QA access address (required). When a plan, implementation plan, QA plan, remediation guide, review, runbook, example command, or inline documentation needs to show a non-prod local-style client access address, it MUST use `127.0.0.1` as the default host, plus the correct port and endpoint path.  
+* This default does not replace canonical config keys, infra wiring, or per-environment configuration. It is a documented client access convention only.  
+* `127.0.0.1` in these templates is not a service identity claim and not a server bind requirement. Real provider, project, service, base URL, and config-key identity remain governed elsewhere, and services may still bind to `0.0.0.0`, `$PORT`, or another infra-owned target when that is the correct runtime posture.  
+* When a QA console or runbook targets a real production service, that surface MUST be documented with the real production address even if the operator is in Codespaces, CI, or another remote shell.  
+* Production and other prod-facing surfaces MUST keep the real hosted service URL or other real infrastructure address. Do not rewrite prod-facing targets to `127.0.0.1`.  
+* `localhost` is not the preferred canonical example host for new or revised dev and QA documentation in these templates.  
+* If a dev or QA surface cannot truly be reached at `127.0.0.1` from the intended operator context, the document MUST state an explicit exception and the real access route. Do not guess hostnames, forwarded URLs, ports, config keys, start commands, or endpoints.  
 * Structural template completeness is gating. Missing required sections or required structural blocks (including required end markers and required gates) is blocking. Where a template requires canon pointers (for example PF09 or PF14 pointers), missing pointers are blocking. Invalid non-PF references and ungrounded existence claims are blocking.  
-* Plans MAY consult PF documents during planning and review, but MUST NOT mandate PF document updates as plan deliverables, acceptance criteria, or completion criteria. Reality Audits updates are PO-only. Plans MAY note doc delta candidates as explicitly non-mandatory follow-up intents for PO.  
+* Plans MAY consult PF documents during planning and review, and MAY note drain targets or doc-delta candidates as explicitly non-mandatory follow-up intents for PO, but PF10 drainage and any other PF-canon drainage are never execution conditions, approval conditions, completion conditions, required deliverables, required checks, acceptance criteria, or blockers for the current plan, review, QA step, OPS task, or closeout artifact. Reality Audits updates are PO-only.  
 * PR-slice completion discipline (required). When a plan, remediation guide, or review record claims that a PR slice or remediation lane is complete or acceptable, it MUST account for every assigned HDE Build Checklist subtask. If one or more assigned subtasks are not complete, the document MUST identify each affected subtask ID, state exactly what was completed, state exactly what remains incomplete, describe the blocking condition or limiting constraint, explain why completion was not possible within the approved scope, and name the repo evidence, test result, or other concrete basis for that conclusion. Silent omission, partial completion without this explanation, or claiming completion while assigned subtasks remain unresolved is non-conforming.  
+* Review and closure posture for mapped PF09 work (required). Current PF09 recorded status text is not a pre-drain acceptability gate, closure gate, QA-entry gate, or OPS acceptability gate. When a plan, remediation guide, QA-readiness review, closeout review, or approval artifact evaluates mapped PF09.x work, the controlling question is whether the mapped work is complete in substance from approved implementation state, approved OPS state where applicable, governed evidence, and truthful review artifacts, plus PF10 live truth where PF10 explicitly speaks.  
+* Exact mapping control (required). If a slice maps to an exact PF09.x subtask, that subtask is the controlling unit. If a slice claims to close more than one mapped PF09.x subtask, each claimed subtask must be complete in substance before acceptable-status language is allowed.  
+* Sufficiency rule (required). Green tests, bounded diff scope, passing evidence refresh, successful OPS execution, or review-clean artifact posture are necessary but not sufficient by themselves. They do not authorize acceptable-status language if the mapped work remains open in substance.  
+* Review-language discipline (required). Before mapped work is complete in substance, allowed labels are: contributory, intermediate, review-clean, bounded, and `Supportable from repo evidence:`. Labels such as acceptable, accepted, satisfied, complete-for-close, and supportable for later drain to Done are reserved for reviews where the mapped work is complete in substance, the governed evidence proves that posture, and PF10 records that live truth where PF10 explicitly speaks.  
+* Current PF09 recorded status may be cited only as canon-as-recorded, not as the live blocker source. Reviewers and approval artifacts MUST NOT block a slice solely because PF09 still says `Not done`, `Partial`, `Deferred`, or another pre-drain state.  
+* Implementation-plan and QA-plan approval artifacts that are intended to feed later PF-canon drain MUST include an explicit later-drain PF-canon update statement naming the affected PF canon home(s), exact locator(s), supported later-drain action, and evidence basis.  
+* Review-scope unit (required). Reviewers MUST review the approved PR or OPS task itself and its explicitly approved scope. They MUST NOT widen the review to later PRs, later OPS tasks, later validation runs, or whole-epic closure work unless the approved task explicitly includes them.  
+* Non-closure task rule (required). If the approved task is explicitly validation-only, classification-only, evidence-only, sequencing-only, or another bounded non-closure step, PF09 closure is not a review gate for that task. The reviewer MUST judge whether the task truthfully and correctly completed its own approved job.  
+* Boundary-preservation rule (required). For approved non-closure steps, reviewers MUST verify that the task stays within approved scope, does not overclaim closure, preserves any still-open PF09 or environment truth explicitly, and does not silently imply that later closure work is already complete.  
+* Decision separation (required). Review and acceptance language MUST distinguish task-level acceptance of the approved step from PF09 closure status of the mapped row or subtask.  
+* Governed evidence family coherence (required). When a review or closeout decision depends on governed evidence for a bounded task and a claimed closure dimension, the governed evidence family MUST express one authoritative posture only. Mixed-state families are invalid and mechanically block acceptance until normalized.  
+* Contradictory-source consolidation is forbidden. A review, closeout, or consolidation artifact MUST NOT summarize or bind acceptance over source artifacts that still encode contradictory closure meanings for the same closure dimension. If contradiction exists, stop and classify the issue as a documentation/evidence failure rather than producing a merged authoritative summary.  
+* Documentation/evidence normalization instead of rerun (required). If the runtime proof remains unchanged and the only defect is contradictory governed evidence or closure semantics, remediation may be a documentation/evidence normalization pass rather than a new runtime rerun only when the unchanged runtime facts are already evidenced, no new runtime or OPS claim is added, the affected governed family is refreshed to one authoritative posture in the same change, the Human Evidence Index, Machine Mirror, checksum sidecars, and required sibling path-proofs are refreshed coherently, and any prior contradictory bundle or report is explicitly treated as superseded evidence.  
+* Failure classification rule (required). Reviews that rely on governed evidence MUST distinguish runtime or implementation failure from documentation/evidence failure. Stable runtime facts plus contradictory governed artifacts are a documentation/evidence failure. Runtime wrongness remains a runtime or implementation failure.  
 * PF-Canon non-edit discipline (required). Coding and implementation agents MUST NOT directly modify PF-Canon documents as part of implementation PR work, including checklist-status canon such as HDE Build Checklist. If implementation work reveals canon drift, missing canon coverage, or supportable checklist or canon status changes, the plan or review MUST record that as a drift note or doc-delta candidate and MUST route PF-Canon changes as follow-on canon maintenance rather than direct implementation-lane edits.  
 * How plans MUST express reality or existence confirmation: cite a PF clause (titles-only) when PF already establishes the claim, or capture repo-local evidence for the current run under `audit/` when PF is silent. Do not treat an intended PF update as substitute evidence.  
 * No interactive steps. The plan must be runnable headlessly (and must log all commands).  
@@ -1374,6 +1410,9 @@ List any additional acceptance tokens required by this epic’s design (names-on
 * Canon sources for token claims. A token MAY be listed in `claimed_tokens` only if it exists verbatim in PF04 or PF10.  
 * Epic Plan token inventory (required): Epic Plans MUST include a Token Inventory subsection that lists every acceptance token referenced by the epic and confirms each token exists in PF04 or PF10 with exact canonical spelling (and cites the PF anchor for each).  
 * No plan-local minting. If an acceptance requirement is not represented by an existing token, record it as a non-token obligation (commands, artifacts, PASS predicate), and route token creation through ADR \+ conflict check \+ Governance Doc-Delta before any plan can claim it as an acceptance token.  
+* PF09 scope/status-only binding rule. When an Epic Plan, acceptance map, token→evidence matrix, close report, or manifest needs to record that a slice closes, contributes to, or leaves open a PF09 task or subtask, it MUST represent that as PF09 scope/status-only binding metadata, not as an acceptance token.  
+* Acceptance tokens and PF09 scope bindings MUST remain distinct surfaces. Do not mint slice-local names or PF09-derived names as substitute acceptance tokens. Use canonical acceptance tokens for acceptance only, and record PF09 scope/status posture in a separate PF09 scope-binding section or equivalent metadata surface.  
+* Temporary bridge tokens may be claimed only when they are canonical in PF04 or live PF10 and are bound to truthful governed evidence.  
 * Token minting workflow (planning gate):  
   * Open an ADR proposing the token and its meaning (owner: PO), including a conflict check against PF04.  
   * Open an ADR proposing the token and its meaning (owner: PO), including a conflict check against PF04.  
@@ -1937,39 +1976,47 @@ An **Ops task** is any work item that requires privileged access to systems outs
 
 ### **IA facilitation posture (normative)**
 
-* Ops tasks **MAY** be part of an epic. When included, they are facilitated by the **Implementation Agent (IA)**, who **MUST** guide the PO through execution.
-
-* IA guidance **MUST** specify **intent, constraints, verification, and evidence requirements** in a **what-not-how** manner, then work directly with the PO during execution.
+* Ops tasks **MAY** be part of an epic. When included, they are facilitated by the **Implementation Agent (IA)**, who **MUST** guide the PO through execution.  
+* IA guidance **MUST** specify **intent, constraints, verification, and evidence requirements**.  
+* When canon already provides concrete operator instructions, commands, required fields, safety rails, validation checks, evidence captures, canonical paths, or decision rules for the task, the Ops task record **MUST** include those canon-grounded instructions explicitly.  
+* If canon is silent, incomplete, or ambiguous, the Ops task record **MUST** state that the missing instruction is unknown and **MUST NOT** fabricate steps.
 
 ### **Not a PR (normative)**
 
-* Ops tasks are **not** Codex PRs and **MUST NOT** be represented as “implementable PR work.”
-
+* Ops tasks are **not** Codex PRs and **MUST NOT** be represented as “implementable PR work.”  
 * Any plan/guide that includes both DEV work and OPS work **MUST** separate them and clearly label OPS work as: **PO-only execution, IA-guided**.
 
 ### **Ops Task record fields (required; what-not-how)**
 
 Every Ops task record **MUST** include:
 
-* **Task ID** (stable; referenced consistently)
-
-* **Owner:** `PO`
-
-* **Facilitator:** `IA`
-
-* **Target system/service** (name only; no secrets)
-
-* **Intent / desired end state** (what changes; what “done” looks like)
-
-* **Constraints / safety rails** (what must remain true while executing)
-
-* **Success criteria** (observable outcomes; not assumptions)
-
-* **Evidence to capture** (what will prove the change; where it will be stored)
-
-* **Rollback intent** (what “revert” means at a high level)
-
-* **Secret handling note** (explicitly: no plaintext secrets in docs or evidence)
+* **Task ID** (stable; referenced consistently)  
+* **Owner:** `PO`  
+* **Facilitator:** `IA`  
+* **PF07 posture:** `PF07-derived` or `PF07-gap`  
+* **Infra/ops fact inventory** (as applicable):  
+  * target provider  
+  * target project  
+  * target service  
+  * target repository  
+  * target base URL or port  
+  * target database instance or schema  
+  * exact config key name  
+  * exact governed evidence root or QA root  
+  * exact expected value or exact value source in PF07  
+* **PF07 gap statement** (required when the exact value is missing from PF07; state the missing fact set and mark the affected task or claim blocked by missing PF07 infrastructure inventory)  
+* **Intent / desired end state** (what changes; what “done” looks like)  
+* **Constraints / safety rails** (what must remain true while executing)  
+* **Success criteria** (observable outcomes; not assumptions)  
+* **Closure dimension, if the task claims or supports closure** (exact environment, surface, or status dimension affected)  
+* **Closure mode, if applicable:** direct runtime validation | binding-equivalence | substitution | documentation/evidence normalization only | not applicable  
+* **Unchanged runtime facts already evidenced, if a non-runtime closure mode is used:**  
+* **Governed evidence family to normalize, if applicable:**  
+* **Superseded contradictory artifacts or reports, if any:**  
+* **Evidence to capture** (what will prove the change; where it will be stored)  
+* **Rollback intent** (what “revert” means at a high level)  
+* **Secret handling note** (explicitly: no plaintext secrets in docs or evidence)  
+* **Canon-grounded instructions, when available** (titles-only PF references; carry forward concrete operator steps, commands, required fields, safety rails, validation checks, evidence captures, canonical paths, or decision rules that already exist in canon)
 
 ### **Evidence posture (required)**
 
@@ -2027,6 +2074,18 @@ Instead, mark the decision as `TBD` and constrain it:
 * list the small set of plausible options (names/paths), and
 
 * state the decision criteria and the enforcing validator/test that will fail closed if the wrong option is chosen.
+
+### **Closure-mode declaration (required when closure is claimed without a new runtime exercise)**
+
+If the guide intends to close or recommend closure for an environment, surface, or other closure dimension by binding-equivalence, substitution, or documentation/evidence normalization rather than by a newly exercised runtime, it MUST state all of the following explicitly:
+
+* **Closure dimension:** exact environment, surface, or status dimension affected.  
+* **Closure mode:** direct runtime validation | binding-equivalence | substitution | documentation/evidence normalization only.  
+* **Unchanged runtime facts already evidenced:** exact previously proved runtime facts being relied on.  
+* **No-new-runtime-claim statement:** state that no new runtime command, route behavior, environment binding, or OPS action is being claimed beyond the evidenced basis.  
+* **Governed evidence family to normalize:** exact governed artifact family or path set that must be rewritten or refreshed to one authoritative posture.  
+* **Superseded contradictory artifacts or reports:** identify any prior contradictory bundle or report that will be treated as superseded evidence.  
+* **Same-change evidence refresh requirement:** when indexed governed bytes change, refresh the Human Evidence Index, Machine Mirror, checksum sidecars, and required sibling path-proofs coherently in the same change.
 
 ### **Permitted step types (only)**
 
@@ -2216,7 +2275,7 @@ ADR-001 — \<short title\>
 
 ### **Scope**
 
-Use this template for REVIEW-mode evaluation of an approved remediation lane, cleanup PR, or follow-up remediation chain. It is review-only: it compares the approved lane, the original attempt, any intermediate remedial attempts, and the current state, and it does not create new runbooks or new command sequences.
+Use this template for REVIEW-mode evaluation of an approved remediation lane, bounded implementation PR slice, cleanup PR, or follow-up remediation chain. It is review-only: it compares the approved lane or slice, the original attempt, any intermediate remedial attempts, and the current state, and it does not create new runbooks or new command sequences.
 
 ### **Required structure (paste-ready)**
 
@@ -2260,6 +2319,25 @@ Use this template for REVIEW-mode evaluation of an approved remediation lane, cl
 * Whether the current state satisfies the approved scope:
 
 * Remaining risk:
+
+**Scope and Closure Claim Posture**
+
+* **Approved task type:** closure-claiming | bounded intermediate | validation-only | sequencing-only | evidence-only | other  
+* **Does the approved task itself claim PF09 or canon closure now:** Yes | No  
+* **If No, what still-open state must remain explicit:**  
+* **Which later approved task or step owns remaining closure work, if any:**  
+* **If current outputs remain blocked or incomplete-planned under current evidence, how that posture is recorded without overclaiming:**
+
+**Governed Evidence Family Consistency (required when closure or later-drain posture relies on governed evidence)**
+
+* **Closure dimension under review:**  
+* **Closure mode:** direct runtime validation | binding-equivalence | substitution | documentation/evidence normalization only | not applicable  
+* **Are the relied-on runtime facts unchanged from prior evidence:** Yes | No | Not applicable  
+* **Is the governed evidence family internally consistent:** Yes | No  
+* **If No, classification:** documentation/evidence failure  
+* **If No, required review action:** stop the closure recommendation and do not consolidate contradictory source bytes until the family is normalized to one authoritative posture  
+* **If a documentation/evidence normalization pass is being accepted instead of a rerun, what same-change refresh proves it:**  
+* **Superseded contradictory artifacts or reports, if any:**
 
 **Keyword Hit Map (optional when search-driven reconstruction was used)**
 
@@ -2355,6 +2433,8 @@ DR-001
 * Source artifact or lane:  
 * What I observed:  
 * Why it matters:  
+* PF reference(s), if canon is invoked:  
+* Canon proof excerpt(s), if canon is invoked:  
 * Evidence pointer(s):  
 * Impacted checklist task ID(s), if proven:  
 * Impacted checklist subtask ID(s), if proven:  
@@ -2366,42 +2446,41 @@ Repeat finding blocks as needed.
 
 **Requirement Satisfaction Crosswalk (required when approval conditions or requirement labels exist)**
 
-* Requirement label:
+RC-001
 
-* Earlier-attempt status:
-
-* Evidence pointer(s) in earlier attempt:
-
-* Remedial change that addresses it:
-
-* Current status after remediation:
-
-* Evidence pointer(s) in remedial attempt:
-
-* Notes:
-
-* Impacted checklist task ID(s), if proven:
-
+* Requirement label:  
+* Baseline attempt or step:  
+* Baseline status:  
+* Baseline evidence pointer(s):  
+* Intermediate attempt status block(s), repeated as needed:  
+  * Attempt label:  
+  * Status:  
+  * Evidence pointer(s):  
+* Remedial change or current-state proof that addresses it:  
+* Current status after the latest attempt or closure check:  
+* Evidence pointer(s) in the latest attempt or closure check:  
+* Notes:  
+* Impacted checklist task ID(s), if proven:  
 * Impacted checklist subtask ID(s), if proven:
 
-Repeat crosswalk blocks as needed.
+Repeat RC blocks as needed.
 
-**Checklist Impact & Status Posture (when a status move is in scope)**
+**Checklist Impact & Status Posture (when a status move or later-drain posture is in scope)**
 
-* Owning checklist or status record:
-
-* Current status:
-
-* Status recommendation:
-
-* Why this status posture is supported:
-
-* Evidence pointer(s):
-
-* PF proof excerpt(s) when a PF checklist or status record is relied on:
-
-* Linked Findings item(s):
-
+* Affected PF canon home(s) or status record:  
+* Exact affected locator(s):  
+* Current canon posture:  
+* Current PF09 or other canon recorded status, if relevant:  
+* Actual implemented state:  
+* Actual OPS state, if applicable:  
+* Actual governed evidence state:  
+* Supported later-drain action: change to Done | change to Partial | change to Not done | change to Consolidation pending | change to Optional | No status change recommended  
+* Drain readiness classification: Supportable from repo evidence | Not yet supportable from repo evidence | Already drained into PF-canon  
+* Why this status posture is supported:  
+* Evidence pointer(s):  
+* PF proof excerpt(s) when a PF checklist or status record is relied on:  
+* Epic-close expectation: at epic close | after an additional PR or OPS slice | after a separate canon-only drain step  
+* Linked Findings item(s):  
 * Linked CHG item(s), if any:
 
 **Evidence Print (PASS PROOF; required)**
@@ -2955,7 +3034,9 @@ Repeat token lines as needed.
 * **Implementation Guide used:**  
 * **QA Plan used:**  
 * **Mismatches identified between the primary SoT and the QA Plan, if any:**  
-* **Negative-claim proof, if a mismatch search is used:**
+* **Negative-claim proof, if a mismatch search is used:**  
+* **If a PF10 addendum is the decisive close-authority statement: say whether it provides direct evidence-pointer lines or evidence-basis prose only.**  
+* **If only evidence-basis prose is available: record that as an auditability caveat and identify the governed evidence clusters used to support the closeout conclusion.**
 
 **QA Timeline**
 
@@ -2977,6 +3058,8 @@ Repeat token lines as needed.
 * **Coverage status:**  
 * **Evidence pointer(s):**  
 * **Mismatches/deviations vs QA Plan, if any:**  
+* **Accepted execution deviation(s), if any (example: bounded Moon Loop rerun, rails change, or step-local dependency-preflight correction):**  
+* **Why the deviation remained acceptable, with Evidence pointer(s):**  
 * **Closeout impact:**
 
 **Repeat coverage blocks as needed.**
@@ -3162,6 +3245,9 @@ Use this template when one review artifact must combine epic closure decision, c
 * **Path or surface string, verbatim:**  
 * **Source(s):**  
 * **Status:**  
+* **Closure mode, if the surface or environment is treated as closed:** direct runtime validation | binding-equivalence | substitution | documentation/evidence normalization only | not applicable  
+* **Is the governed evidence family for this surface internally consistent:** Yes | No  
+* **If closed without a new runtime exercise, what unchanged runtime facts or approved equivalence basis support that posture:**  
 * **Required for closure:**  
 * **Notes:**
 
@@ -3171,9 +3257,24 @@ Use this template when one review artifact must combine epic closure decision, c
 
 * **Epic closure decision:**  
 * **Why this decision is supported:**  
-* **Documentation-drain posture:**  
-* **Follow-up-only items that do not block closure, if any:**  
-* **Minimal follow-ups required only if not satisfied:**
+* **Current PF09 or other canon recorded status, if relevant:**  
+* **Actual implemented state:**  
+* **Actual OPS state, if applicable:**  
+* **Actual governed evidence state:**  
+* **Auditability caveat, if any:** say whether the decisive primary-source close-authority statement provides direct evidence-pointer lines or evidence-basis prose only. If only evidence-basis prose is available, record that explicitly and identify the governed evidence clusters used to support the closure conclusion.  
+* **Documentation-drain posture:** state whether any PF10 or PF-canon drain remains, name the intended drain targets by title, and say explicitly whether the later drain is only follow-up work or already drained; if the current verdict relies on undrained live truth, use supportable-versus-drained wording explicitly.  
+* **Follow-up-only items that do not block closure, if any:** include remaining drain targets and doc-delta candidates here when required QA, implementation state, OPS state, and governed evidence already support closure. Documentation drainage itself is follow-up work, not a closure blocker.  
+* **Minimal follow-ups required only if not satisfied:** list only real truth-and-proof blockers that prevent closure, such as incomplete required QA steps, missing required deliverables, untrusted or non-governed evidence, unresolved FAIL\_BEHAVIOR / FAIL\_TOOLING / TOOLING\_BLOCKED conditions that affect acceptance, or missing required close-gate QA artifacts.
+
+**Later-Drain PF-Canon Update (required when this review supports later PF-canon drainage)**
+
+* **Affected PF canon home(s):**  
+* **Exact affected locator(s):**  
+* **Current canon posture:**  
+* **Supported later-drain action: change to Done | change to Partial | change to Not done | change to Consolidation pending | change to Optional | No status change recommended**  
+* **Drain readiness classification: Supportable from repo evidence | Not yet supportable from repo evidence | Already drained into PF-canon**  
+* **Evidence basis:**  
+* **Epic-close expectation: at epic close | after an additional PR or OPS slice | after a separate canon-only drain step**
 
 **Retrospective — Executive Summary**
 
@@ -3196,6 +3297,13 @@ Use this template when one review artifact must combine epic closure decision, c
 
 **Repeat implementation-report blocks as needed.**
 
+**Implementation Report — Cross-slice summary (required when the review covers more than one PR, OPS task, or QA step)**
+
+* **Major surfaces affected:**  
+* **Evidence inventory:**  
+* **Evidence gaps or caveats:**  
+* **Evidence pointer(s):**
+
 **Retrospective — Process**
 
 * **What went well:**  
@@ -3215,7 +3323,8 @@ Use this template when one review artifact must combine epic closure decision, c
 * **Options considered:**  
 * **PF-canon constraints relied on:**  
 * **Final decision for this epic:**  
-* **Should this become canonical for future work:** Yes | No
+* **Should this become canonical for future work:** Yes | No  
+* **Evidence pointer:**
 
 **Repeat ADR blocks as needed.**
 
@@ -3238,7 +3347,8 @@ Use this template when one review artifact must combine epic closure decision, c
 * **Short description:**  
 * **Where it should live:**  
 * **PF docs to reference or update if pursued later:**  
-* **If it depends on a reality-audit gap:**
+* **PF23 dependency: Yes | No**  
+* **If Yes, state the gap, anchor, or why the dependency matters:**
 
 **Repeat future-work blocks as needed.**
 
@@ -3246,3 +3356,84 @@ Use this template when one review artifact must combine epic closure decision, c
 
 * **Implementation posture recommendation:**
 
+## **11\) Ops Task Final Review Record (Template; REVIEW mode only)**
+
+### **Scope**
+
+**Use this template when a completed Ops task, ops remediation rerun, or other bounded PO-executed ops slice must be reviewed against an approved Ops Task Record, approved plan, or approved remediation scope. It is review-only: it determines whether the run stayed within approved scope, whether the required governed outputs and environment or binding dispositions were captured truthfully, whether the result is acceptable for downstream binding or follow-on work, and what later PF-canon drain posture is supported when the review is intended to feed canon drainage. It does not create new runbooks, new commands, or new acceptance tokens.**
+
+### **Required structure (paste-ready)**
+
+**Review Summary**
+
+* **Ops task or run label:**  
+* **Approved task or plan source:**  
+* **What actions were performed:**  
+* **Environment or binding disposition, if applicable:**  
+* **Whether the run stayed within approved scope:**  
+* **Whether deliverables and evidence are sufficient:**  
+* **Remaining operational risk, if any:**  
+* **Downstream binding or follow-on use, if any:**
+
+**Task Boundary and Closure Claim Posture**
+
+* **Run posture: state-changing ops run | read-only validation run | classification-only run | evidence-refresh-only run**  
+* **Does the approved ops task itself claim PF09 or canon closure now: Yes | No**  
+* **If blocker classification is the approved purpose, what classification result was reached:**  
+* **If No, what bounded purpose is being accepted:**  
+* **If No, what still-open state must remain explicit:**  
+* **If No, which later approved task or step owns remaining closure work, if any:**
+
+**Findings**
+
+**FND-001**
+
+* **What I observed:**  
+* **Why it matters:**  
+* **Expected requirement from the Approved Plan:**  
+* **Blocker for acceptance: Yes | No**  
+* **Evidence pointer(s):**
+
+**Repeat finding blocks as needed.**
+
+**Evidence Print (PASS PROOF; required)**
+
+**A) Required deliverables satisfied**
+
+* **Deliverable name:**  
+* **Evidence pointer:**  
+* **Key proof facts:**
+
+**Repeat deliverable lines as needed.**
+
+**B) Commands/actions evidence**
+
+* **Action:**  
+* **Evidence pointer:**  
+* **Success signal found in evidence:**
+
+**Repeat action lines as needed.**
+
+**C) Configuration/infra state evidence (if applicable)**
+
+* **Evidence pointer:**  
+* **What state it proves:**
+
+**Repeat state-evidence lines as needed.**
+
+**Decision**
+
+* **Decision:**  
+* **Why this decision is supported:**  
+* **Remaining risk or not-yet-closed state, if any:**  
+* **Supported downstream binding or follow-on use, if any:**
+
+**Later-Drain PF-Canon Update (required when this review supports later PF-canon drainage)**
+
+* **Affected PF canon home(s):**  
+* **Exact affected locator(s):**  
+* **Current canon posture:**  
+* **Supported later-drain action: change to Done | change to Partial | change to Not done | change to Consolidation pending | change to Optional | No status change recommended**  
+* **Drain readiness classification: Supportable from repo evidence | Not yet supportable from repo evidence | Already drained into PF-canon**  
+* **Evidence basis:**  
+* **Epic-close expectation: at epic close | after an additional PR or OPS slice | after a separate canon-only drain step**

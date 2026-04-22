@@ -4,13 +4,13 @@
 
 **Title:** PF05-Canon-HDE-CLI-API-Vendor-Ref
 
-**Version:** v1.9.3
+**Version:** v2.0.3
 
 **Status:** Canon
 
-**Effective date:** 2026-04-06
+**Effective date:** 2026-04-19
 
-**Last Update Gate:** BN 10.3.3 drain A20-24
+**Last Update Gate:** BN 10.5.7 drain A35
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -52,8 +52,9 @@
 
 * **Mirror schema check invocation (operator note).** `ci/checks/check_mirror_schema.sh` is a Python entrypoint. Invoke it as `python ci/checks/check_mirror_schema.sh` (or direct exec only if the executable bit is guaranteed). Do **not** run it via `bash ci/checks/check_mirror_schema.sh`; that invocation is invalid and is a known source of drift.
 
-* **Process ownership.** Use the evidence-only PR template and follow the “update in same PR” workflow defined in **Epic-Process-Guide** (titles only). **Build Notes** are WIP only; drained guidance must land in canon.
-
+* **Process ownership.** Use the evidence-only PR template and follow the “update in same PR” workflow defined in **Epic-Process-Guide** (titles only). **Build Notes** are WIP only; drained guidance must land in canon.  
+* **Documentation drainage is never a blocker.** PF10 drain and any later documentation drainage are never prerequisites, required deliverables, required checks, acceptance conditions, or readiness blockers for PF05-owned CLI, Reader, or Vendor work. Allowed blockers remain limited to truth and proof failures, such as missing required QA artifacts, untrusted evidence, or unresolved fail states that affect acceptance.  
+* **PF10 carries live truth until later drain.** When an undrained canon delta affects PF05-owned surfaces, PF10 remains the temporary live-truth home until drainage occurs. Plans, reviews, QA artifacts, acceptance maps, step logs, and closeout materials may record later drain targets or doc-delta candidates, but they must not require PF document updates as execution or closeout conditions, and they must distinguish supportable-from-repo-evidence posture from already drained posture.  
 * **Freeze-pack changes.** If a freeze-pack is affected, emit a new `release_id` and log it in the Change Log; snapshot/manifest schemas are owned by **HDE-Schemas & Artifacts** (titles only).
 
 **Editorial vs. normative.** Pure editorial rearrangements need not be logged; any change to math, transport, or the public contract **must** be logged.
@@ -1264,7 +1265,7 @@ Posture:
 
   * The command **MUST** only run when `APP_ENV ∈ {dev, test, local}`.
 
-  * When `APP_ENV` is unset, empty, or set to any other value (including `prod`), `dev:sampler` **MUST** fail fast with a typed CLI error (for example a `DEV_ADMIN_ONLY` style code) on `stderr` and exit with a non-zero code; `stdout` remains empty.
+  * When `APP_ENV` is unset, empty, or set to any other value (including `prod`), the handler **MUST** return a **403 Forbidden** response using the typed error envelope from §5.2 with `code: "ERR_WRITER_FORBIDDEN"`, and **MUST NOT** call the sampler core. The body is a numeric-free error object; `Cache-Control: no-store`; no `ETag`.
 
 * **Rails posture (closed by default).**
 
@@ -1734,7 +1735,8 @@ These transport bytes are owned here; PF05 owns **Reader bytes only** and keeps 
 
 * **Scope note.** This note records the canonical state of Reader surfaces for planning and QA. It does not introduce new routes, change public contract semantics, or mint new acceptance obligations.
 
-* **Gate.** The route **must** be gated by `APP_ENV=dev` and bound only to a local interface (for example, `127.0.0.1`), or disabled entirely. It must not be mounted in production builds or non-dev deploys.
+* **Gate.** The route **must** be gated by `APP_ENV=dev` and bound only to a local interface (for example, `127.0.0.1`), or disabled entirely. It must not be mounted in production builds or non-dev deploys.  
+* **Documented local-style access (clarification).** Where PF05 shows a dev or QA example address for a non-prod local-style surface, it MUST use `127.0.0.1` as the default documented client host, plus the effective port and endpoint path. This is a client-access convention only; it does not redefine service identity or server bind address. Prod-facing targets keep their real hosted addresses. If a surface cannot be reached at `127.0.0.1` from the intended operator context, PF05 must state an explicit exception and the real access route. `localhost` is not the preferred canonical example host.
 
 * **Rails closed.** Harness runs with rails closed (`SAFE_MODE=1`, `ALLOW_NETWORK=0`); it never opens vendor rails.
 
@@ -2428,35 +2430,27 @@ Evidence and tests (titles-only):
 
   ## **5.12 Dev conjunction endpoints \[Implemented (dev-only)\]**
 
-* **Purpose.** Provide dev-only HTTP routes for conjunction preview and harness evaluation without coupling to the internal sampler harness.
-
-* **Environment gating (normative).**
-
-  * These routes MUST be gated by `APP_ENV` in `{dev, test, local}` and MUST NOT be available in production.
-
-  * If env-gating fails, requests to these routes MUST be forbidden using the Writer-style error envelope in §5.2 (not a raw HTTP 403 payload).
-
-  * These routes are not eligible for A7 proof selection; they MUST be registered with `a7_eligible=false` in the Endpoint Catalog.
-
-* **Input contract (normative).**
-
-  * Inputs are supplied as query-string keys in the `a_*` and `b_*` namespace.
-
-  * At minimum, `a_id` and `b_id` MUST be accepted as pair identifiers.
-
+* **Purpose.** Provide dev-only HTTP routes for conjunction preview and harness evaluation without coupling to the internal sampler harness.  
+* **Environment gating (normative).**  
+  * These routes MUST be gated by `APP_ENV` in `{dev, test, local}` and MUST NOT be available in production.  
+  * If env-gating fails, requests to these routes MUST be forbidden using the Writer-style error envelope in §5.2 with `code: "ERR_WRITER_FORBIDDEN"` (not a raw HTTP 403 payload).  
+  * These routes are not eligible for A7 proof selection; they MUST be registered with `a7_eligible=false` in the Endpoint Catalog.  
+* **Input contract (normative).**  
+  * Inputs are supplied as query-string keys in the `a_*` and `b_*` namespace.  
+  * At minimum, `a_id` and `b_id` MUST be accepted as pair identifiers.  
   * Request validation MUST fail closed for missing or malformed required identifiers, and MUST use canonical typed error mapping (no ad-hoc string errors).  
 * Resolver acquisition and SAFE rails posture (normative).  
-  * Provider acquisition MUST be performed through resolver acquisition (not raw cache reads), so cache hits are normalized into a resolved shape and resolved detection remains correct even when a cached record is vendor-shaped.
-
-  * SAFE rails posture is closed by default. When an explicit environment configuration enables open-rails acquisition, acquisition MAY open rails only long enough to acquire missing data and MUST close back before compute and emission.
-
-  * Any governed writer-evidence run that exercises `GET /dev/writer/conjunction` MUST require explicit caller-provided open rails and MUST NOT silently force `SAFE_MODE=0` or `ALLOW_NETWORK=1` on behalf of the caller.
-
+  * Provider acquisition MUST be performed through resolver acquisition (not raw cache reads), so cache hits are normalized into a resolved shape and resolved detection remains correct even when a cached record is vendor-shaped.  
+  * SAFE rails posture is closed by default. When an explicit environment configuration enables open-rails acquisition, acquisition MAY open rails only long enough to acquire missing data and MUST close back before compute and emission.  
+  * Any governed writer-evidence run that exercises `GET /dev/writer/conjunction` MUST require explicit caller-provided open rails and MUST NOT silently force `SAFE_MODE=0` or `ALLOW_NETWORK=1` on behalf of the caller.  
   * Such writer-evidence runs do not widen the route contract and do not move this endpoint into the A7 proof family.  
 * Output canon (normative).  
-  * Any success payload emitted by these routes MUST be serialized by the canonical public emitter, producing deterministic JSON bytes with ASCII-sorted keys and exactly one trailing LF.
-
+  * Any success payload emitted by these routes MUST be serialized by the canonical public emitter, producing deterministic JSON bytes with ASCII-sorted keys and exactly one trailing LF.  
   * AB↔BA parity MUST hold for conjunction evaluation: swapping A and B MUST NOT change emitted bytes after canonical emission.  
+  * `GET /dev/writer/conjunction` MUST emit typed, numeric-free writer-style success and error envelopes.  
+  * The success envelope type MUST be `dev.writer.conjunction.success.v1`.  
+  * The error envelope type MUST be `dev.writer.conjunction.error.v1`.  
+  * Writer-style success and error outcomes on `GET /dev/writer/conjunction` MUST remain `Cache-Control: no-store`, MUST NOT emit `ETag`, and MUST be treated as non-conditional.  
 * Endpoints (dev-only).  
   * GET /dev/sampler/conjunction  
     * Dev-only conjunction preview route for sampler evaluation.  
@@ -2464,7 +2458,10 @@ Evidence and tests (titles-only):
     * Dev-only conjunction preview route for Reader-style response emission and VendorError mapping.  
   * GET /dev/writer/conjunction  
     * Dev-only conjunction preview route returning an idempotent writer-style envelope (not the public Reader v1 envelope).  
-    * The Endpoint Catalog route id for this endpoint is `dev.writer.conjunction.v1`.
+    * The Endpoint Catalog route id for this endpoint is `dev.writer.conjunction.v1`.  
+    * The `/dev/*/conjunction` family notation is bounded to the currently canonized conjunction-family surfaces listed in this subsection.  
+    * It does **not** create a reusable wildcard or standing rule that any future dev route matched by a `/dev/*/` pattern is automatically valid, dev-harness, or outside the formal proof family.  
+    * Any future non-conjunction dev route requires explicit canon classification before it is treated as valid, dev-harness, or outside the formal proof family.
 
   ---
 
@@ -3071,6 +3068,7 @@ These codes are exhaustive for the CLI public surface in the sense that success 
 
 * **Maintain proofs.** Keep evidence current for: parity (Reader↔CLI, AB↔BA, two-run), idempotence recompute, transport (ETag/304/HEAD, no-store on writers/errors, Vary, encoding-invariance), and vendor rails (refusal closed; conformance open).  
 * **Same-change evidence-family completeness (MUST).** When a PF05-scoped proof or gate run changes any governed artifact in an evidence family, refreshing only a subset of related companions is non-conforming. All changed primary artifacts, sibling `*.path_proof.txt` transcripts, and affected human-index and machine-mirror companion files for that family MUST be regenerated to current same-change chronology in the same run or change.  
+* **Bounded evidence-family refresh (MUST).** When a PF05-scoped PR, remediation slice, or proof refresh is explicitly bounded to a named PF05 evidence family, governed updates MUST be limited to that family and to directly required shared index, mirror, topology, and sibling `*.path_proof.txt` companions. Unrelated governed artifact churn outside the approved family is non-conforming unless the changed artifact is directly required by the same proof flow.  
 * **Canonical JSON gate dual-family closeout (MUST).** If both `audit/gates/json_gate/canonical/` and `audit/gates/canonical_json/` are still produced by the same generation flow, closeout MUST refresh both families and their sibling `*.path_proof.txt` transcripts in the same run. Refreshing only one family is insufficient, and closure claims MUST use whole-family same-change validation rather than subset freshness.  
 * **Index (human).** **`docs/evidence/INDEX.json`** (PF12 §8.6) lists artifacts and scripts (**titles/paths only; no payload bytes**). A **hash sentinel** **`docs/evidence/INDEX.sha256`** gates merges and is **not mirrored**.  
 * **Machine mirror (single home).** The records-only JSONL mirror lives at **`artifacts/evidence_index.jsonl`** (PF12 §8.3). Human↔machine entries **must be 1:1**; a non one-to-one join is a failure. Each mirror record includes `sha256`, `size_bytes`, `produced_at_utc`, `discovered_physical_path`, and a `proof_anchor` (transcript reference plus on-disk stat). The mirror is **ASCII field-ordered** and **sort-before-write** with **unknown-key rejection**; a **single** mirror file is permitted.  
@@ -3453,6 +3451,31 @@ Keep this index synchronized with repo changes. When any golden or artifact path
 * `audit/ops/hde-epic028/ops-02/codespaces_harness_binding.md`  
 * `audit/ops/hde-epic028/ops-02/codespaces_harness_binding.md.path_proof.txt`
 
+#### **D.0g EPIC029 acceptance ledgers**
+
+* `docs/acceptance_map_epic029.json` *(acceptance-map ledger binding `HDE-CONJ009.1` and `HDE-CONJ008.1` as supportable from repo evidence for later drain to Done at epic close)*  
+* `docs/acceptance_map_epic029.json.path_proof.txt` *(governed path-proof for the EPIC029 acceptance map)*  
+* `audit/qa/hde-epic029/token_evidence_matrix.md` *(token-to-evidence ledger supporting the EPIC029 closeout bindings for the controlling Conjunction rows)*  
+* `audit/qa/hde-epic029/token_evidence_matrix.md.path_proof.txt` *(governed path-proof for the EPIC029 token-to-evidence ledger)*  
+* `audit/qa/hde-epic029/acceptance_map_viability.log` *(viability log for the EPIC029 acceptance bindings used by the closeout review)*  
+* `audit/qa/hde-epic029/acceptance_map_viability.log.path_proof.txt` *(governed path-proof for the EPIC029 acceptance-map viability log)*  
+* `audit/qa/hde-epic029/qa_step_logs_manifest.json` *(qa-step log ledger confirming governed step coverage for the EPIC029 closeout review)*  
+* `audit/qa/hde-epic029/qa_step_logs_manifest.json.path_proof.txt` *(governed path-proof for the EPIC029 qa-step log ledger)*
+
+#### **D.0h EPIC029 formal close-pack baseline**
+
+* `audit/EPIC-029_close_report.md` *(formal EPIC029 close report binding `HDE-CONJ009.1` and `HDE-CONJ008.1` as supportable from repo evidence for Done at epic close)*  
+* `audit/EPIC-029_MANIFEST.json` *(formal EPIC029 close manifest binding the close-pack outputs and the later-drain actions for those controlling Conjunction rows)*  
+* `audit/EPIC-029_close_report.md.path_proof.txt` *(governed path-proof for the formal EPIC029 close report)*  
+* `audit/EPIC-029_MANIFEST.json.path_proof.txt` *(governed path-proof for the formal EPIC029 close manifest)*  
+* *For the EPIC029 close decision, read this formal close-pack baseline together with the bounded dev-harness proof anchors and OPS-01 bundle listed later in **D.11c** and **D.11d**; those companion artifacts carry the HDE-CONJ001.4 closure posture, including the bounded local\_dev binding-equivalence path that the epic close review treated as supportable from repo evidence for later drain to Done at epic close.*
+
+#### **D.0i EPIC029 shared evidence sentinel and mirror artifacts**
+
+* `docs/evidence/INDEX.sha256`  
+* `artifacts/evidence_index.jsonl`  
+* `artifacts/evidence_index.jsonl.sha256`
+
 ### **D.1 Parity (Reader↔CLI, AB↔BA, two-run)**
 
 * Goldens: `goldens/reader/v1/g02_ab_ba_parity_A.jsonl`, `goldens/reader/v1/g02_ab_ba_parity_B.jsonl`  
@@ -3517,20 +3540,20 @@ Keep this index synchronized with repo changes. When any golden or artifact path
 
 ### **D.7 Canonical JSON checks (public bytes)**
 
-* `audit/gates/canonical_json/canonical_json.gate.json` *(supplemental canonical JSON gate summary)*  
-* `audit/gates/canonical_json/canonical_json.gate.json.path_proof.txt` *(governed path-proof for the supplemental canonical JSON gate summary)*  
-* `audit/gates/canonical_json/json_canonical_check.log`  
-* `audit/gates/canonical_json/json_canonical_check.log.path_proof.txt`  
-* `audit/gates/canonical_json/json_canon_compare.log`  
-* `audit/gates/canonical_json/json_canon_compare.log.path_proof.txt`  
-* `audit/gates/json_gate/canonical/json_gate_check_log.ndjson` *(authoritative canonical JSON gate check log)*  
-* `audit/gates/json_gate/canonical/json_gate_check_log.ndjson.path_proof.txt` *(governed path-proof for the authoritative canonical JSON gate check log)*  
-* `audit/gates/json_gate/canonical/json_gate_compare_log.ndjson` *(authoritative canonical JSON gate compare log)*  
-* `audit/gates/json_gate/canonical/json_gate_compare_log.ndjson.path_proof.txt` *(governed path-proof for the authoritative canonical JSON gate compare log)*  
-* `audit/gates/json_gate/canonical/json_gate_structured_record.json` *(authoritative canonical JSON gate structured record)*  
-* `audit/gates/json_gate/canonical/json_gate_structured_record.json.path_proof.txt` *(governed path-proof for the authoritative canonical JSON gate structured record)*
+* *`audit/gates/canonical_json/canonical_json.gate.json` (supplemental canonical JSON gate summary)*  
+* *`audit/gates/canonical_json/canonical_json.gate.json.path_proof.txt` (governed path-proof for the supplemental canonical JSON gate summary)*  
+* *`audit/gates/canonical_json/json_canonical_check.log`*  
+* *`audit/gates/canonical_json/json_canonical_check.log.path_proof.txt`*  
+* *`audit/gates/canonical_json/json_canon_compare.log`*  
+* *`audit/gates/canonical_json/json_canon_compare.log.path_proof.txt`*  
+* *`audit/gates/json_gate/canonical/json_gate_check_log.ndjson` (authoritative canonical JSON gate check log for the bounded conjunction route-probe set `/reader`, `/dev/writer/conjunction`, `/dev/reader/conjunction`, `/dev/sampler/conjunction`, and `/internal/dev/sampler`)*  
+* *`audit/gates/json_gate/canonical/json_gate_check_log.ndjson.path_proof.txt` (governed path-proof for the authoritative canonical JSON gate check log)*  
+* *`audit/gates/json_gate/canonical/json_gate_compare_log.ndjson` (authoritative canonical JSON gate compare log for the bounded conjunction route-probe set and the corrected expected-status evaluation on `/internal/dev/sampler`)*  
+* *`audit/gates/json_gate/canonical/json_gate_compare_log.ndjson.path_proof.txt` (governed path-proof for the authoritative canonical JSON gate compare log)*  
+* *`audit/gates/json_gate/canonical/json_gate_structured_record.json` (authoritative canonical JSON gate structured record, including the corrected `/internal/dev/sampler` result `expected_http_status: 200`, `http_status: 200`, and `status: "pass"`)*  
+* *`audit/gates/json_gate/canonical/json_gate_structured_record.json.path_proof.txt` (governed path-proof for the authoritative canonical JSON gate structured record)*
 
-  ### **D.8 showcompat seam (non-empty canonical JSON \+ parity)**
+  ### D.8 showcompat seam (non-empty canonical JSON \+ parity)
 
 * `artifacts/cli/showcompat/stdout.json` *(LF-terminated, non-empty)*  
 * `artifacts/cli/showcompat/stdout.json.sha256` *(sha256 of stdout.json bytes; canonical)*  
@@ -3802,6 +3825,95 @@ Keep this index synchronized with repo changes. When any golden or artifact path
 * **po-010 acceptance reporting and repo-supported completion summary**  
   * `audit/qa/hde-epic028/checks/po-010/primary.log` *(governed step log for po-010)*  
   * `audit/qa/hde-epic028/checks/po-010/final_summary.txt` *(repo-supported completion summary with explicit no-claim posture for canon drain and formal close-pack completion)*
+
+  #### **D.11c EPIC029 bounded conjunction and dev-harness proof anchors**
+
+* *`audit/qa/hde-epic029/00_meta/conjunction_json_surface_inventory.md (explicit bounded conjunction route inventory for /reader, /dev/writer/conjunction, /dev/reader/conjunction, /dev/sampler/conjunction, and /internal/dev/sampler)`*  
+* *`audit/qa/hde-epic029/00_meta/conjunction_json_surface_inventory.md.path_proof.txt (governed path-proof for the bounded conjunction JSON surface inventory)`*  
+* *`audit/qa/hde-epic029/00_meta/dev_harness_binding_coverage.md (EPIC029 dev-harness binding coverage artifact for the W-004 closure review, including Codespaces direct-runtime proof and local_dev binding-equivalence for DEV_SAMPLER_URL=http://127.0.0.1:8000/internal/dev/sampler)`*  
+* *`audit/qa/hde-epic029/00_meta/dev_harness_binding_coverage.md.path_proof.txt (governed path-proof for the dev-harness binding coverage artifact)`*  
+* *`tests/adapter/test_dev_sampler_http.py (dev sampler APP_ENV gate and ERR_WRITER_FORBIDDEN proof anchor for /internal/dev/sampler)`*
+
+#### **D.11d EPIC029 OPS-01 and epic-close QA proof anchors**
+
+* `audit/ops/hde-epic029/ops-01/commands.txt` *(OPS-01 command transcript for the W-004 dev-harness closure normalization pass)*  
+* `audit/ops/hde-epic029/ops-01/stdout.log` *(OPS-01 runtime transcript including the Codespaces direct-runtime proof and the binding-equivalence normalization inputs)*  
+* `audit/ops/hde-epic029/ops-01/stderr.log` *(OPS-01 stderr transcript)*  
+* `audit/ops/hde-epic029/ops-01/exit_codes.txt` *(OPS-01 exit-code and final normalized disposition summary)*  
+* `audit/ops/hde-epic029/ops-01/codespaces_dev_sampler_url.md` *(Codespaces closure artifact for the dev sampler harness, closed by direct runtime validation)*  
+* `audit/ops/hde-epic029/ops-01/local_dev_sampler_url.md` *(local-dev closure artifact for the same dev sampler harness, closed by binding-equivalence with no separate local-dev runtime in this evidence pass)*  
+* `audit/ops/hde-epic029/ops-01/binding_disposition.md` *(authoritative environment-by-environment closure record with no mixed-state `not yet closed` posture remaining in OPS-01)*  
+* `audit/ops/hde-epic029/ops-01/created_files_sha256.txt` *(OPS-01 checksum ledger for the normalized bounded evidence family)*  
+* `audit/qa/hde-epic029/checks/po-epic-close-live-qa/primary.log` *(canonical epic-close Live QA log bound as PASS evidence for the final in-epic closure review)*  
+* `audit/qa/hde-epic029/checks/po-precommit/primary.log` *(canonical precommit QA log bound as PASS evidence)*  
+* `audit/qa/hde-epic029/checks/po-postcommit/primary.log` *(canonical postcommit QA log bound as PASS evidence)*
+
+#### **D.11e EPIC029 W-001 blocker-classification proof anchors**
+
+* `audit/ops/hde-epic029/ops-02/W-001_action_log_and_evidence_output_run2.md` *(read-only validation bundle for W-001 classification of the remaining blockers for `HDE-CONJ009.1` and `HDE-CONJ008.1`)*  
+* `audit/ops/hde-epic029/ops-02/W-001_classification_run2.md` *(classification artifact for the remaining EPIC029 conjunction blockers)*  
+* `audit/ops/hde-epic029/ops-02/commands_w001_run2.txt` *(inspection-command ledger for the W-001 validation run)*  
+* `audit/ops/hde-epic029/ops-02/exit_codes_w001_run2.txt` *(exit-code ledger for the W-001 validation run)*  
+* `audit/ops/hde-epic029/ops-02/stdout_w001_run2.log` *(stdout capture preserving the inspected evidence excerpts for the W-001 validation run)*  
+* `audit/ops/hde-epic029/ops-02/stderr_w001_run2.log` *(stderr capture for the W-001 validation run)*
+
+#### **D.11f EPIC029 Live QA proof anchors for po-001 to po-005**
+
+* **po-001 bounded Conjunction closeout slice / no new public surface**  
+  * `audit/qa/hde-epic029/checks/po-001/primary.log` *(canonical step receipt for the bounded Conjunction closeout slice)*  
+  * `audit/qa/hde-epic029/checks/po-001/conjunction_json_surface_inventory.snapshot.md` *(bounded conjunction inventory snapshot for the approved in-scope surface family)*  
+  * `audit/qa/hde-epic029/checks/po-001/endpoints_catalog.snapshot.json` *(Endpoint Catalog compatibility snapshot anchoring `/reader` and `/dev/writer/conjunction`)*  
+  * `audit/qa/hde-epic029/checks/po-001/route_snapshot.txt` *(route-slice snapshot for the bounded conjunction family)*  
+* **po-002 canonical JSON discipline across the bounded Conjunction slice**  
+  * `audit/qa/hde-epic029/checks/po-002/primary.log` *(canonical step receipt for the bounded canonical-JSON check)*  
+  * `audit/qa/hde-epic029/checks/po-002/run_canonical_json_gate.output.log` *(supplementary canonical-gate output capture)*  
+  * `audit/qa/hde-epic029/checks/po-002/run_canonical_json_gate.rc.txt` *(canonical-gate return-code capture)*  
+  * `audit/qa/hde-epic029/checks/po-002/json_gate_structured_record.snapshot.json` *(authoritative canonical JSON gate structured-record snapshot)*  
+  * `audit/qa/hde-epic029/checks/po-002/json_canonical_check.snapshot.log` *(legacy canonical-family snapshot log)*  
+* **po-003 existing dev writer posture remains typed, numeric-free, and outside formal transport proofs**  
+  * `audit/qa/hde-epic029/checks/po-003/primary.log` *(canonical step receipt for the dev writer posture check)*  
+  * `audit/qa/hde-epic029/checks/po-003/generate_conjunction_writer_evidence.output.log` *(writer-evidence generator output capture)*  
+  * `audit/qa/hde-epic029/checks/po-003/generate_conjunction_writer_evidence.rc.txt` *(writer-evidence generator return-code capture)*  
+  * `audit/qa/hde-epic029/checks/po-003/test_dev_conjunction_http.output.log` *(dev writer HTTP proof output capture)*  
+  * `audit/qa/hde-epic029/checks/po-003/test_dev_conjunction_http.rc.txt` *(dev writer HTTP proof return-code capture)*  
+  * `audit/qa/hde-epic029/checks/po-003/conjunction_write_readback.snapshot.log` *(writer readback snapshot for the dev writer conjunction surface)*  
+  * `audit/qa/hde-epic029/checks/po-003/conjunction_writer_summary.snapshot.json` *(writer summary snapshot for the typed dev writer envelope posture)*  
+* **po-004 internal sampler harness remains dev/admin-only and refuses prod or misconfigured use**  
+  * `audit/qa/hde-epic029/checks/po-004/primary.log` *(canonical step receipt for the internal sampler harness check)*  
+  * `audit/qa/hde-epic029/checks/po-004/test_dev_sampler_http.output.log` *(internal sampler HTTP test output capture)*  
+  * `audit/qa/hde-epic029/checks/po-004/test_dev_sampler_http.rc.txt` *(internal sampler HTTP test return-code capture)*  
+  * `audit/qa/hde-epic029/checks/po-004/dev_start_reader.snapshot.sh` *(dev reader harness start snapshot used by the sampler check)*  
+  * `audit/qa/hde-epic029/checks/po-004/dev_sampler_healthcheck.snapshot.py` *(dev sampler healthcheck snapshot used by the sampler check)*  
+* **po-005 dev harness binding closure for `HDE-CONJ001.4`**  
+  * `audit/qa/hde-epic029/checks/po-005/primary.log` *(canonical step receipt for the dev-harness binding closure check)*  
+  * `audit/qa/hde-epic029/checks/po-005/commands.snapshot.txt` *(OPS-01 commands snapshot for the binding-closure review)*  
+  * `audit/qa/hde-epic029/checks/po-005/exit_codes.snapshot.txt` *(OPS-01 exit-codes snapshot for the binding-closure review)*  
+  * `audit/qa/hde-epic029/checks/po-005/codespaces_dev_sampler_url.snapshot.md` *(Codespaces URL snapshot for the published dev sampler binding)*  
+  * `audit/qa/hde-epic029/checks/po-005/local_dev_sampler_url.snapshot.md` *(local-dev URL snapshot for the same published dev sampler binding)*  
+  * `audit/qa/hde-epic029/checks/po-005/binding_disposition.snapshot.md` *(binding-disposition snapshot for direct runtime closure in Codespaces and binding-equivalence closure in local\_dev)*
+
+#### **D.11g EPIC029 Live QA proof anchors for po-006 to po-008**
+
+* **po-006 formal transport proof surface remains the cataloged Reader success surface**  
+  * `audit/qa/hde-epic029/checks/po-006/primary.log` *(canonical step receipt for the Endpoint Catalog proof-boundary check)*  
+  * `audit/qa/hde-epic029/checks/po-006/test_endpoint_catalog.output.log` *(endpoint-catalog test output capture for the formal A7-surface check)*  
+  * `audit/qa/hde-epic029/checks/po-006/test_endpoint_catalog.rc.txt` *(endpoint-catalog test return-code capture for the formal A7-surface check)*  
+  * `audit/qa/hde-epic029/checks/po-006/endpoints_catalog.snapshot.json` *(Endpoint Catalog snapshot proving `/reader` remains the formal A7 surface and that dev/internal surfaces are not promoted into the formal transport-proof family)*  
+* **po-007 real functional harness proof exists and passes**  
+  * `audit/qa/hde-epic029/checks/po-007/primary.log` *(canonical step receipt for the combined functional harness proof)*  
+  * `audit/qa/hde-epic029/checks/po-007/functional_bundle.output.log` *(combined functional bundle output capture, including the accepted dependency-preflight line recorded for the pytest-backed step)*  
+  * `audit/qa/hde-epic029/checks/po-007/functional_bundle.rc.txt` *(combined functional bundle return-code capture)*  
+* **po-008 final bounded acceptance surface closeout**  
+  * `audit/qa/hde-epic029/checks/po-008/primary.log` *(canonical step receipt for the bounded acceptance-surface closeout check)*  
+  * `audit/qa/hde-epic029/checks/po-008/acceptance_map.snapshot.json` *(acceptance-map snapshot proving `ready_for_close_binding` for the EPIC029 closeout slice)*  
+  * `audit/qa/hde-epic029/checks/po-008/token_evidence_matrix.snapshot.md` *(token-to-evidence snapshot for the bounded EPIC029 closeout surface)*  
+  * `audit/qa/hde-epic029/checks/po-008/acceptance_map_viability.snapshot.log` *(viability snapshot proving `COVERED=9 PLANNED=0 MISSING=0` for the EPIC029 acceptance bindings)*  
+  * `audit/qa/hde-epic029/checks/po-008/qa_step_logs_manifest.snapshot.json` *(qa-step log manifest snapshot for the EPIC029 closeout review)*  
+  * `audit/qa/hde-epic029/checks/po-008/close_report.snapshot.md` *(close-report snapshot for the bounded EPIC029 closeout surface)*  
+  * `audit/qa/hde-epic029/checks/po-008/close_manifest.snapshot.json` *(close-manifest snapshot for the bounded EPIC029 closeout surface)*  
+  * `audit/qa/hde-epic029/checks/po-008/po_epic_close_live_qa.snapshot.log` *(canonical epic-close Live QA bridge-log snapshot supporting `TESTS_PASS_OK`)*  
+  * `audit/qa/hde-epic029/checks/po-008/po_precommit.snapshot.log` *(precommit QA bridge-log snapshot supporting `QA_PRECOMMIT_CHECKLIST_OK`)*  
+  * `audit/qa/hde-epic029/checks/po-008/po_postcommit.snapshot.log` *(postcommit QA bridge-log snapshot supporting `QA_POSTCOMMIT_CHECKLIST_OK`)*
 
 ### **D.12 BodyGraph adapter data-source & invariance (PF10-AA)**
 

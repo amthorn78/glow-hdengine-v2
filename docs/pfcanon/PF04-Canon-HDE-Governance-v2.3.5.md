@@ -3,12 +3,12 @@
 ## 0.1 Header
 
  **Title:** PF04-Canon-HDE-Governance  
- **Version:** v2.2.6
+ **Version:** v2.3.5
 
 **Status:** Canon  
-**Effective date:** 2026-04-06
+**Effective date:** 2026-04-19
 
-**Last Update Gate:** BN 10.3.3 A20-24
+**Last Update Gate:** BN 10.5.7 A35
 
 **Invocation tag:** `INV-f2ac55d77ce9aacc`
 
@@ -748,7 +748,7 @@ These tokens apply whenever SAFE rails are opened for vendor calls in any enviro
   * **Canonical name.** `DOC_DELTA_PRESENT_OK` is the canonical token spelling. Any alias or near-match (for example `DOC_DELTA_CAPTURED_OK`) is non-canonical and MUST NOT be used as an acceptance token name.  
   * **Evidence posture.** Both surfaces MUST be mechanically produced (no manual-fill templates). If either surface’s bytes change, indexing/mirror/path-proof discipline applies where these files are promoted to governed evidence for closure wiring. (Owned: Governance; Evidence & Artifacts)
 
-* **TESTS\_PASS\_OK** — The EPIC017 QA suite for compat, registry, ordering, and evidence (including manifest and acceptance-map tests) is present and passing, with coverage recorded in `qa.compat.coverage_summary`. (Owned: Glow QA Guide; Evidence & Artifacts)
+* **TESTS\_PASS\_OK** — The current epic’s required automated test suite for the claimed slice has been executed and passed under the approved rails posture, with truthful governed evidence that identifies the concrete test commands or CI jobs supporting the claim. This token may be used in epic-close acceptance artifacts when it is bound to governed evidence. It does not subsume `QA_PRECOMMIT_CHECKLIST_OK` or `QA_POSTCOMMIT_CHECKLIST_OK`; those checklist tokens remain separately governed when the epic-close posture requires them. (Owned: Glow QA Guide; Evidence & Artifacts)
 
 ### **2.0.14 QA branches & diff-scoped CI**
 
@@ -1154,14 +1154,19 @@ Ownership: Governance (classification semantics at policy level); **Glow QA Guid
       * a `TI-002 pointers:` line listing the canon pointers used to evidence TI-002 (or a `TI-<id> pointers:` line for other TI items), and  
       * an `ADR status line:` line identifying the ADR governing the TI claim,  
     * **Coverage vs QA Plan accounting (required when the epic has a Live QA Plan or claims `QA_LIVE_QA_RUN_OK`).** The closeout record MUST include an explicit, step-by-step, complete, and auditable coverage ledger. It MUST list every planned QA step in plan order with a stable step identifier, a coverage status (`PASS`, `FAIL`, `BLOCKED`, or `NOT_RUN`), and the closeout impact for that step,  
+    * **Accepted execution-deviation accounting (required).** When a step recorded in the coverage ledger as \`PASS\` materially diverged from the approved QA Plan but was still accepted, the closeout record MUST preserve the step’s coverage status and add a separate deviation note for that step.    
+    * **Deviation note content (minimum).** The deviation note MUST identify the deviation type (for example a bounded Moon Loop rerun, a rails change, or a step-local dependency-preflight correction), the governing approval or PF10 addendum that accepted it, and the reason the accepted deviation did not change the acceptance target or the step’s closeout impact.    
     * **Step evidence rule for closeout.** For any step recorded as `PASS`, the closeout record MUST point to at least one step-scoped evidence artifact under the governed QA root for that exact step, or to an explicitly equivalent step-scoped evidence pointer line preserved in the epic’s primary QA record. Heading-only or summary-only PASS statements are insufficient,  
     * **Token/evidence matrix pointer (required when in-scope QA tokens exist).** The closeout record MUST point to the epic’s token/evidence matrix artifact and MUST identify any in-scope QA token rows that remain blocked, incomplete, or not applicable.  
     * **Closeout review inputs posture (required).** When a closeout recommendation is issued, the closeout record MUST state the source-of-truth posture used for that recommendation. At minimum:   
       * PF10 is primary for epic-specific recorded implementation, remediation, QA execution, closeout, and documented supersession of earlier closeout wording.  
-      * PF23 is required for current-reality alignment of surfaces, entrypoints, evidence homes, and repo structure.   
+      *  PF23 is required for current-reality alignment of surfaces, component placement, entrypoints, evidence homes, and repo structure.     
       * PF-Canon is normative where PF10 is silent.    
       * The Implementation Guide is used for intended scope framing only.  
       * The QA Plan is used for intended QA requirement framing only.   
+      * **Decisive PF10 addendum auditability note (required).** When a closeout recommendation relies on a PF10 addendum as the decisive epic-close authority, the closeout record MUST state whether that addendum provides direct evidence-pointer lines or only evidence-basis prose.    
+      * **Evidence-basis-only caveat.** If the decisive PF10 addendum provides only evidence-basis prose, the closeout record MUST record that explicitly as an auditability caveat and MUST NOT imply pointer-complete support from that addendum alone. The record MUST also identify the governed evidence family or closeout companion artifacts used to complete the trace.    
+      *   
     * **Required-elements checklist (when a closeout recommendation is issued).\*\*** The closeout record MUST explicitly confirm the presence or absence of:  
       * the D0 Discovery artifact,  
       * current-state QA evidence under the governed QA root,  
@@ -1177,6 +1182,17 @@ Ownership: Governance (classification semantics at policy level); **Glow QA Guid
     * **Allowed blockers remain limited to QA truth and proof.** The closeout record MUST identify the unresolved blocker set that drives the recommendation. Allowed closeout blockers are limited to incomplete required QA steps, missing required deliverables, untrusted or non-governed evidence, unresolved \`FAIL\_BEHAVIOR\` / \`FAIL\_TOOLING\` / \`TOOLING\_BLOCKED\` conditions that affect acceptance, or missing required close-gate QA artifacts. Documentation drainage itself is not an allowed blocker.  
     * **Record, then drain later.** When a documentation mismatch or canon delta is found during QA or closeout, it MUST be recorded in PF10 as a follow-up, implementation gap, ADR note, or doc-delta item. It MUST NOT be converted into a pre-drain closure blocker solely because the destination PF document has not yet been updated.    
     * **Supportable versus drained status wording is required.** When repo evidence supports a status change for a checklist row, guide row, or other governed document state that has not yet been drained into the destination PF document, the closeout record and any related governance report MUST say so explicitly. It MUST distinguish “supportable from repo evidence” from “already drained into canon,” and it MUST NOT imply that the destination PF document has already been updated when it has not. Once the destination PF document is updated, the record MAY state the status as drained or canonical.  
+    * **No artifact may require its own drainage to be valid.** A closeout record, approval artifact, review artifact, acceptance map, token↔evidence matrix, step log, OPS task, PR summary, or related governance artifact MAY recommend later drainage, note drain targets, or identify required future canon updates, but it MUST NOT require that those drains already be completed in order for the current artifact's verdict or recommendation to stand.    
+    * **Drain-required wording is non-conforming.** Any wording that says or implies \`drain required before close\`, \`cannot pass until PF10 is drained\`, \`not ready because canon is not yet drained\`, \`PF update required before acceptance\`, or any equivalent formulation is non-conforming and MUST be corrected.    
+    *   
+    * **Later-drain update statement is required.** Any PR approval, OPS-task approval, remediation acceptance, close-pack approval, or other approval artifact that is intended to support later PF-canon drainage MUST include an explicit later-drain PF-canon update statement. Approval is not the drain itself, but the artifact MUST make the later drain concrete, reviewable, and non-ambiguous.  
+    * **Required later-drain fields.** Such an approval artifact MUST state: the affected PF canon home or homes, the exact affected locator or locators, the current canon posture, exactly one supported later-drain action (\`change to Done\`, \`change to Partial\`, \`change to Not done\`, \`change to Consolidation pending\`, \`change to Optional\`, or \`No status change recommended\`), exactly one drain readiness classification (\`Supportable from repo evidence\`, \`Not yet supportable from repo evidence\`, or \`Already drained into PF-canon\`), the evidence basis for that posture, and the epic-close expectation (\`at epic close\`, \`after an additional PR or OPS slice\`, or \`after a separate canon-only drain step\`).  
+    * **Pre-drain status distinction is mandatory.** Before PF09 is drained, review and closeout artifacts that speak about mapped PF09 work MUST distinguish the current PF09 recorded status, the supported later-drain status, the actual implemented state, the actual OPS state, and the actual governed evidence state. Vague approval language such as accepted, complete, merge-ready, approved, or no further remediation needed is non-conforming when the practical intent is to support a later PF-canon update but the later drain target is left unstated.  
+    * **Single authoritative posture per governed evidence family.** For any single bounded task and any single claimed closure dimension, the governed evidence family MUST express exactly one authoritative posture. Contradictory \\\`closed\\\`, \\\`not yet closed\\\`, \\\`deferred\\\`, \\\`partial\\\`, or equivalent closure meanings for the same dimension inside the same governed family are non-conforming.  
+    * **Mixed-state family blocks acceptance.** A review, consolidation artifact, or closeout artifact MUST NOT summarize or approve a governed evidence family that remains internally contradictory. It MUST classify that condition as a documentation/evidence failure until the family is normalized.  
+    * **Documentation/evidence normalization may replace rerun when runtime facts are unchanged.** When the underlying runtime facts are unchanged and already evidenced, and no new runtime command, environment binding, route behavior, or ops action is being claimed, remediation MAY be a documentation/evidence normalization pass rather than a fresh runtime rerun. In that case, all affected governed artifacts in the family, plus any required Human Index, Machine Mirror, checksum, and sibling path-proof companions, MUST be refreshed coherently in the same change, and any prior contradictory bundle or report MUST be treated as superseded evidence rather than as a parallel truth surface.  
+    * **Closure mode must be explicit when equivalence is used.** If a closure or supportability claim relies on equivalence rather than a separately exercised runtime, the approval artifact or governing plan MUST state that exact closure mode explicitly before the governed evidence family is rewritten.  
+    * **Runtime failure versus documentation/evidence failure must be classified separately.** When runtime behavior is stable but the governed evidence family disagrees internally, the condition MUST be classified as a documentation/evidence failure rather than a runtime or implementation failure. Additional reruns are not required unless the runtime facts themselves are missing, changed, or contradicted.  
     * **Post-QA drain ordering is mandatory.** Drainage into canon, checklist rows, guides, or other document homes occurs only after all QA tasks for the epic are complete.   
     * **Truthfulness still applies.** This rule changes timing, not honesty requirements. PF10 MUST still state open doc deltas, remaining follow-ups, and any caveats plainly and explicitly.  
     * **QA-pass is necessary but not sufficient.** A positive step-level QA record does not by itself authorize epic closeout when the closeout record still identifies unresolved allowed blockers. If QA evidence is complete and trustworthy and all required QA tasks are complete, the epic MAY be recommended \`Ready\` even when undrained documentation deltas remain. Undrained documentation deltas alone do not justify a \`Not ready\` verdict.    
@@ -2446,9 +2462,14 @@ An **Ops task** is any work item that requires privileged access to systems outs
 
 2. **Not a PR.** Ops tasks are not PR work. Any implementation/remediation document that includes Ops work MUST separate Ops tasks from repo-local DEV work and label Ops items clearly as PO-only execution, IA-guided.
 
-3. **Ops task record (required fields).** Every Ops task record MUST include: Task ID, Owner (PO), Facilitator (IA), target system/service (name only, no secrets), intent/end state, constraints/safety rails, success criteria (observable outcomes), evidence to capture (artifact paths), rollback intent, and a secret-handling note (no plaintext secrets in docs or evidence).
-
-4. **Evidence posture (required).** Completion of an Ops task MUST produce a repo-stored evidence artifact (text-first) under a lowercase audit path such as `audit/ops/<epic-id>/...` (or `audit/qa/<epic-id>/...` when captured as part of QA execution). Evidence MUST NOT include secrets. If a setting/value is sensitive, evidence MUST be presence-only, redacted, or hashed, while still being sufficient to verify the intended state.
+3. **Ops task record (required fields).** Every Ops task record MUST include: Task ID, Owner (PO), Facilitator (IA), target system/service (name only, no secrets), intent/end state, constraints/safety rails, success criteria (observable outcomes), evidence to capture (artifact paths), rollback intent, and a secret-handling note (no plaintext secrets in docs or evidence).  
+   * When canon already provides concrete operator steps, commands, required fields, safety rails, validation checks, evidence captures, canonical paths, or decision rules for the task, the Ops task record MUST include those canon-grounded instructions explicitly rather than remaining only at the level of intent, constraints, or outcome.  
+   * This does not authorize invented procedure. If canon is silent, incomplete, or ambiguous for the needed procedure, the Ops task record MUST state that the missing instruction is unknown and MUST NOT fabricate steps. Any PF references used for these instructions remain titles-only.  
+4. **Evidence posture (required).** Completion of an Ops task MUST produce a repo-stored evidence artifact (text-first) under a lowercase audit path such as `audit/ops/<epic-id>/...` (or `audit/qa/<epic-id>/...` when captured as part of QA execution). Evidence MUST NOT include secrets. If a setting/value is sensitive, evidence MUST be presence-only, redacted, or hashed, while still being sufficient to verify the intended state.  
+   * **Environment-validation disposition rule.** When an Ops task exists to validate intended environment bindings or dev/admin harness reachability across one or more environments, the evidence bundle MUST record each intended environment separately as either `validated` or `not yet closed`, with an explicit reason for every `not yet closed` result.  
+   * **No silent closure.** If the same run records a gating discrepancy, failed validation, missing prerequisite, or other unresolved condition for an intended environment, the Ops bundle MUST preserve that environment as `not yet closed` and MUST NOT present it as closed in any related binding-disposition or closeout surface.  
+   * **No guessed binding in validation evidence.** If an intended environment does not have a published infra-owned binding, the Ops bundle MUST record that absence explicitly and MUST NOT guess a URL, hostname, or port in order to force a validation run.  
+   * **Bounded meaning of a truthful validation slice.** A bounded Ops validation task MAY still be complete as an evidence-capture or classification slice when it truthfully records one or more environments as `not yet closed`, but that result MUST NOT be used to imply that the underlying PF09 scope or closeout claim is complete.
 
 5. **No governance drift.** Ops tasks MUST NOT create new acceptance tokens or redefine acceptance semantics. If an Ops task affects acceptance, it MUST map to existing governance-defined acceptance posture and be proven via evidence artifacts.
 
@@ -2615,6 +2636,14 @@ For each in-scope token row, the matrix MUST include, at minimum:
 * evidence artifacts (repo-relative paths) generated by those tests/steps, and
 
 * Evidence Index and Machine Mirror entries (artifact\_key, epic\_id, tokens, proof\_anchor), as required by the evidence schema.
+
+**Scope-binding versus token posture.** Acceptance maps and the governance-token column of the token/evidence matrix MUST contain only canonical governance token names. They MUST NOT mint epic-local token names, and they MUST NOT use PF09 task or subtask IDs as substitute token names. If a close slice needs to record bound PF09 scope, that scope MUST be recorded in a separate status-only or scope-binding section, or in related closeout or manifest artifacts, not as acceptance tokens.
+
+**Complete scope-binding posture.** When a close slice records PF09 scope bindings, it MUST represent the full in-scope PF09 task and subtask set for that slice truthfully, including any unresolved or not-complete items. Omission of an in-scope PF09 binding is non-conforming.
+
+**Temporary-token claim rule.** A token MAY be marked implemented, covered, satisfied, or equivalent in the acceptance map or token/evidence matrix only when the governed evidence artifacts at the bound canonical paths already exist and the linked validator run, checklist log, or QA primary log actually shows PASS. Planned, expected, or missing future evidence is insufficient.
+
+**No implied scope completion.** Promoting a token to implemented or covered does not by itself promote any separate PF09 task or subtask to complete. When accepted Ops evidence or other governed evidence still shows part of the mapped PF09 scope as unresolved, not yet closed, or not complete, the acceptance artifacts and related closeout surfaces MUST preserve that unresolved status explicitly.
 
 **Binding posture (proof anchors; acceptance artifacts).** In the token/evidence matrix and acceptance maps, tokens MUST bind to the **primary governed artifacts** and the **validator runs/tests** that produce or verify them. Tokens MUST NOT bind directly to `*.path_proof.txt` files as primary evidence surfaces. Path proofs are still required and merge-gating, but they are referenced via the machine mirror record’s `proof_anchor` for the bound artifact and are validated by the evidence index/mirror checks.
 
@@ -3171,13 +3200,27 @@ Duplicate rows for the same token are a mechanical blocker because they create a
 * Reality Audits are PO-maintained. Planning documents MUST NOT create tasks that assign Reality Audits updates. If an audit appears stale or missing required component coverage, the plan MAY note that as an observation, but must not assign it as agent work.  
 * Plans MAY check PF documents during planning and review, including read-only checks against Reality Audits, to confirm what PF currently states.
 
-* Plans MUST NOT mandate PF document updates. Planning artifacts MUST NOT require updates to any PF documents as part of PR or OPS deliverables, acceptance posture, tracked issues, “confirming artifacts,” or completion criteria.
-
+* Plans MUST NOT mandate PF document updates. Planning artifacts MUST NOT require updates to any PF documents as part of PR or OPS deliverables, acceptance posture, tracked issues, “confirming artifacts,” or completion criteria.  
+* **Documentation drainage is never a planning or approval gate.** Planning artifacts, implementation guides, QA plans, review artifacts, remediation guides, OPS tasks, closeout artifacts, acceptance maps, token↔evidence matrices, step logs, PR summaries, and epic artifacts MUST NOT treat PF10 drain or any other post-QA documentation drainage as a prerequisite, required deliverable, required check, acceptance condition, blocker, or readiness condition by itself.  
 * Updates to Reality Audits are a manual PO operation only. PR scope MUST NOT include Reality Audits edits, and plans MUST NOT mandate or schedule Reality Audits updates inside PR or OPS work.
 
-* Plans MAY include a “Doc deltas capture” or “Doc delta candidates” note, but these notes MUST be explicitly non-mandatory and MUST NOT be expressed as required PR or OPS tasks. Any PF doc maintenance implied by those notes is PO-owned and out of plan scope.
-
+* Plans MAY include a “Doc deltas capture” or “Doc delta candidates” note, but these notes MUST be explicitly non-mandatory and MUST NOT be expressed as required PR or OPS tasks. Any PF doc maintenance implied by those notes is PO-owned and out of plan scope.  
 * Coding agents and implementation agents MAY NOT directly modify PF-Canon documents. If implementation work reveals canon drift, missing canon coverage, or a needed canon change, the agent MUST record that explicitly as a drift note or Doc-Delta candidate in its report and MUST NOT edit the PF-Canon document directly.  
+* Mapped PF09 completion posture for review and acceptance. When a PR, OPS task, remediation pass, closeout record, or related review artifact speaks about a mapped PF09.x task or subtask, the governing question is whether the mapped work is complete in substance from approved implementation state, approved OPS state where applicable, governed evidence, and truthful review or approval artifacts. The current pre-drain PF09 status text is canon-as-recorded only and MUST NOT by itself be used as a PR acceptability gate, OPS acceptability gate, QA-entry gate, or closure gate.  
+* PF10 live-truth posture for mapped work. Where PF10 explicitly records the live in-flight truth for the mapped work, review and approval language MUST follow that live truth until later drainage occurs. PF09 remains the checklist-mapping and later-drain record; it is not the live in-flight status surface.  
+* Review unit and scope for bounded tasks. During review of a PR or OPS task, the reviewer MUST review only the approved task in question and its explicitly approved scope. The reviewer MUST NOT widen the review to later PRs, later OPS tasks, later validation runs, or whole-epic closure work unless the approved task explicitly includes them.  
+* Approved non-closure steps are judged on their own purpose. If the approved task is a bounded non-closure step, such as validation, gap classification, sequencing correction, evidence capture, repo-side wiring, or another explicitly non-closure step, the reviewer MUST judge that task on whether it truthfully and correctly completes its own approved job. If the approved task’s job is not to bring a mapped PF09.x task or subtask to closure, then PF09 closure is not a review gate for that task and may be skipped in that review as an approved scoping boundary.  
+* Required truth posture for non-closure steps. For approved non-closure steps, the reviewer MUST verify that the task stays within approved scope, does not overclaim closure, preserves any still-open PF09.x row truthfully as open, contributory, intermediate, validation-only, sequencing-only, evidence-only, deferred, or equivalent approved posture, and does not silently imply that later closure work is already complete.  
+* Closure-gate trigger for task review. A PF09 closure gate applies in task review only when the approved task explicitly claims that it brings a mapped PF09.x task or subtask to Done, supports a Done recommendation now, or performs final closure, final binding, final acceptance promotion, or other explicitly closure-claiming work. It is non-conforming to hold a bounded approved task to later closure work that belongs to a different approved task or a later approved step.  
+* Review-language discipline before drain. Before the mapped work is complete in substance, allowed posture words for the mapped PF09.x row are limited to contributory, intermediate, review-clean, bounded, and supportable from repo evidence. Acceptable-status language such as acceptable, accepted, satisfied, complete-for-close, or supportable for later drain to Done MUST be used for the mapped PF09.x row only when the mapped work is complete in substance and governed evidence supports later drainage. Task-level acceptance of an approved non-closure step MUST remain explicitly distinct from PF09 closure status of the mapped row, and the same rule applies to OPS tasks.  
+* Current PF09 wording may be cited, but only as current canon record. A review or closeout artifact MAY cite the current PF09 row text to show what canon currently records before drain, but it MUST NOT treat that recorded text as proof that the work remains incomplete when approved implementation state, approved OPS state where applicable, and governed evidence already prove the later-drain posture.  
+* **Infrastructure source rule for plans and related artifacts.** When a plan, implementation guide, QA plan, review artifact, remediation guide, or epic document names an infra or ops dependency (for example provider, project, service, repository, base URL, port, database instance or schema, config key, QA root, or start-command dependency), it MUST use exactly one of these two postures:  
+  * **PF07-derived posture.** The exact required value is already present in **Glow Infrastructure**, and the document cites or copies that fact directly.  
+  * **PF07-gap posture.** The exact required value is not yet present in **Glow Infrastructure**. The document MUST identify the exact missing value set and mark the affected step or claim blocked by missing infrastructure inventory. It MUST NOT leave the item as an executable dependency to be provided later by an unspecified infra or ops owner.  
+* The following placeholder postures are non-conforming in plans and related documents: vague external-owner instructions such as “infra to provide”, “ops to confirm”, “ask infra”, “await ops details”, guessed hostnames, guessed ports, guessed URLs, guessed start commands, guessed environment bindings, or `TBD` values treated as executable infra inputs.  
+* Any infra or ops task described in a plan MUST name the concrete bound value or its exact value source. When the required value is missing from **Glow Infrastructure**, the document MUST identify the missing facts explicitly, mark the dependency blocked by missing infrastructure inventory, and route the needed update as a Doc-Delta candidate or PO follow-up rather than inventing an external owner.  
+* QA plans and Live QA artifacts MUST NOT guess or redefine infrastructure-owned environment or service bindings. This includes bindings such as `DEV_SAMPLER_URL`, `HDE_BASE_URL`, `DATABASE_URL`, and `DB_BRIDGE_URL`, plus production service base URLs, environment-specific host or port bindings, and canonical QA-root patterns.  
+* A plan or review artifact that treats an infra or ops dependency as executable without a concrete infrastructure fact or an explicit blocked-gap statement is non-conforming.  
 * How plans MUST express “reality/existence confirmation.” If a plan requires confirming whether a component, route, contract, or locus exists, the plan MUST express confirmation in one of these allowed forms:  
   * PF check (allowed): “Check Reality Audits for the current recorded existence/locus statement.” This is a read-only check and MUST NOT imply an update.
 
@@ -3349,6 +3392,16 @@ For every QA step in a Live QA plan, the operator MUST produce the deliverables 
 
 * explicit PASS and FAIL predicates.
 
+**Dependency posture is required per step.**
+
+* If a QA step depends on an executable dependency, the step MUST name the dependency set explicitly.  
+* The step MUST perform a dependency preflight before behavior evaluation. The plan MUST state the exact readiness check or checks that prove the dependency is present and runnable.  
+* When the execution venue allows activation or installation, the step MUST state the exact activation or installation action to take if the preflight fails.  
+* When activation or installation is not allowed or not known, the plan MUST say so explicitly. If readiness cannot be established, the step MUST be classified as `FAIL_TOOLING` or `TOOLING_BLOCKED`, as appropriate.  
+* Behavior verdicts MUST NOT be issued before dependency readiness is established. A dependency readiness failure MUST NOT be classified as `FAIL_BEHAVIOR`.  
+* A shared bootstrap step does not remove per-step responsibility. Each later step MUST either include its own dependency preflight or explicitly depend on the bootstrap and rerun a short step-local readiness check before the main behavior command.  
+* The dependency preflight result and any activation or installation action taken MUST be captured in the step’s governed evidence.
+
 Steps MUST use general command-line directives, not literal command strings. A plan MAY include example command forms, but reviewers MUST NOT require verbatim, syntax-perfect command lines as an approval gate. Execution-time command resolution is authoritative. The step log is authoritative for the exact command(s) executed and the produced artifacts. Syntax-layer issues are handled by the Live QA Moon Loop and MUST NOT be used as plan-approval blockers.
 
 Plans SHOULD minimize locus strings in step text. Avoid naming specific script paths or test file paths unless they are canon-defined or are fixed-path obligations. If a step must name a repo locus string, the repo loci proof gate still applies.
@@ -3433,6 +3486,19 @@ This posture does not relax existing requirements for functional Live QA, eviden
  If an epic includes a runtime-visible behavioral change (a functional change), at least one Live QA step MUST execute the runtime path and capture evidence of the behavior. Artifact-only outputs (for example catalogs, headers, or static snapshots) are insufficient by themselves for functional changes.
 
 If a functional change touches a vendor seam, the functional Live QA step MUST exercise that seam (live or controlled mock) and capture evidence of the observed behavior. If functional proof requires opening SAFE rails (for example `ALLOW_NETWORK=1`), that is acceptable when required, but it MUST be explicit, bounded, and captured with a keys-only and secret-free evidence posture (see §3.1).
+
+**Step-local rails deviations must be explicit and bounded.**
+
+* When a Live QA step executes under a rails posture that differs from the approved plan default for that step, the deviation MUST be recorded explicitly as a step-local deviation rather than silently treated as conforming execution.  
+* A step MAY still be reviewed or recorded as `PASS` under such a deviation only when all of the following are true:  
+  * the deviation is explicitly PO-approved for that step,  
+  * the actual executed rails are captured in the governed step evidence,  
+  * the step’s required deliverables are complete and trustworthy,  
+  * the step’s stated PASS and FAIL predicates are still evaluated against the actual evidence, and  
+  * the deviation does not expand scope, weaken the secret-free or keys-only evidence posture, or change the acceptance target.  
+* When the deviation is introduced via a Moon Loop or equivalent step-local approval, the governed evidence MUST include the approval entry or equivalent step-scoped note under the step’s QA root.  
+* In that posture, the deviation is a planning or execution caveat and MUST be called out as such in the review record. It is not automatically a trust failure or automatic remediation trigger.  
+* If the deviation is unapproved, unrecorded, or changes the acceptance target, the step MUST NOT be treated as `PASS`.
 
 **Requirements (binary):**
 

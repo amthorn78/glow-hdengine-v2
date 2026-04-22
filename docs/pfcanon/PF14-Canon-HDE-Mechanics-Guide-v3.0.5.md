@@ -3,12 +3,12 @@
 ## 0.1 **Header**
 
 **Title:** PF14-Canon-HDE-Mechanics-Guide  
-**Version:** v2.9.6
+**Version:** v3.0.5
 
 **Status:** Canon  
-**Effective date:** 2026-04-06
+**Effective date:** 2026-04-19
 
-**Last Update Gate:** BN 10.3.3 Drain A20-24  
+**Last Update Gate:** BN 10.5.7 Drain A35  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
 ---
@@ -610,6 +610,25 @@ Depend on a successful bootstrap:
 
 * Check the QA tooling bootstrap harness result before executing Engine tests or CLI commands.  
 * If the most recent bootstrap log reports a tooling failure, the Live QA harness MUST NOT proceed to run tests or Engine commands and MUST surface that condition as a tooling problem (for example, via a tooling\_failure: true or equivalent marker in its own logs).
+
+Per-step dependency posture (normative):
+
+* Every QA step that depends on an executable dependency (for example, `python`, `pytest`, `jq`, `curl`, an importable module, a virtual environment, or a repo-provided helper) MUST declare the dependency set required by that step.  
+* Every such step MUST include an explicit preflight check that proves each dependency is present and runnable before the main behavior command runs.  
+* When the execution venue allows activation or installation remediation, the step MUST include the exact activation or installation action to take if the dependency preflight fails.  
+* When activation or installation remediation is not allowed or cannot be truthfully specified, the step MUST say so explicitly and MUST classify the step as tooling-blocked if readiness cannot be established.  
+* A QA step is non-conforming if it assumes dependency availability without checking it.
+
+Bootstrap dependency semantics (normative):
+
+* A shared bootstrap step MAY satisfy the first dependency pass for later checks, but it does not remove per-step responsibility.  
+* Each later QA step MUST either include its own dependency preflight and activation or install-remediation logic inline, or explicitly depend on the bootstrap artifact and rerun a short step-local readiness check before the main command.  
+* Behavior verdicts MUST NOT be issued before dependency readiness is established. If preflight fails and remediation does not resolve the issue, the step MUST be classified as `FAIL_TOOLING` or `TOOLING_BLOCKED`, not `FAIL_BEHAVIOR`.
+
+Governed evidence capture (normative):
+
+* The dependency preflight result, any activation or installation action taken, and the final ready or not-ready disposition MUST be captured in the step’s governed QA evidence stream.  
+* QA plans and step artifacts that omit dependency preflight and activation or install-remediation posture for a required dependency are mechanics-nonconforming and not approval-ready.
 
 Provide copy/paste-ready commands (no hand-editing):
 
@@ -1768,6 +1787,23 @@ DEV\_SAMPLER\_URL MUST be treated as an infra-owned configuration value:
 
 Mechanics does not pin where DEV\_SAMPLER\_URL is stored (for example, env var, config file, or Codespaces devcontainer config), only that it exists as a single infra-owned binding for /internal/dev/sampler per environment and that QA/PO treat it as the authority for that harness URL.
 
+Repo-side dev sampler healthcheck posture (required). Any repo-owned helper or healthcheck that consumes `DEV_SAMPLER_URL` for `/internal/dev/sampler` MUST treat that value as authoritative and MUST NOT reconstruct, default, or guess an alternate URL.
+
+The repo-side healthcheck MUST:
+
+* trim `DEV_SAMPLER_URL` before validation  
+* fail non-zero when `DEV_SAMPLER_URL` is missing or empty  
+* require an explicit hostname and an explicit port in `DEV_SAMPLER_URL`  
+* reject silent fallback to `127.0.0.1`, `localhost`, or any default port  
+* record the effective `dev_sampler_url` and the rails snapshot before exercising the dev and prod checks
+
+Negative-path coverage is required for the repo-side healthcheck family. The test suite for this healthcheck MUST include, at minimum:
+
+* one failure-path test for missing or empty `DEV_SAMPLER_URL`  
+* one failure-path test for a `DEV_SAMPLER_URL` value that lacks an explicit port
+
+These repo-side helper and healthcheck requirements do not widen the `/internal/dev/sampler` route contract and do not promote the route into a public or A7 surface.
+
 Infra validation of dev harness URLs (pre-QA). Before handing any DEV\_SAMPLER\_URL to QA or using it in QA plans, infra/ops MUST validate the dev sampler HTTP harness locally:
 
 * Run the infra-owned dev Reader start command with APP\_ENV=dev (and, where feasible, the determinism pins used elsewhere in this guide: SAFE\_MODE=1, ALLOW\_NETWORK=0, LC\_ALL=C, LANG=C, TZ=UTC).  
@@ -2128,6 +2164,17 @@ Classification is mandatory. Every catalog entry MUST be classified into one of 
 * dev\_harness
 
 Mixing responsibilities is permitted but discouraged. Implementations may mix endpoint classes in one Python module, but the catalog must still carry per-endpoint classification so CI and QA can enforce distinct rails and posture per class.
+
+Endpoint-class authority note (normative). Endpoint class, A7-eligibility posture, and dev/internal scope are per-endpoint catalog facts. They remain authoritative even when handlers are implemented in different repo modules and mounted together by adapter factories; handler package path or module placement MUST NOT be used to infer catalog class or proof-surface posture.
+
+Crosswalk (mechanics-only; current canonized surface family):
+
+* /reader — public\_reader; current Reader success surface; A7-eligibility is determined by the catalog entry for this route and its proof-surface rules.  
+* /api/compat/v1 — internal\_admin; internal/admin compat surface; not a public proof surface by route family alone.  
+* /internal/dev/sampler — dev\_harness; internal/dev harness; never A7-eligible.  
+* /dev/\*/conjunction — dev\_harness bounded conjunction-family notation for the current canonized conjunction routes, including /dev/writer/conjunction, /dev/reader/conjunction, and /dev/sampler/conjunction; not A7-eligible unless a future canon change explicitly says so.
+
+Bounded conjunction-family rule. The /dev/*/conjunction notation is a bounded catalog shorthand for the currently canonized conjunction-family dev routes only. It MUST NOT be interpreted as a reusable wildcard that automatically classifies future /dev/* routes as valid dev-harness surfaces or as outside the formal proof family by pattern alone.
 
 Catalog entry minimum fields (titles-only; schema owned elsewhere). Each entry in docs/ENDPOINTS\_CATALOG.json MUST include, at minimum:
 
@@ -2539,6 +2586,10 @@ Indexing family (required). The Human Index and Machine Mirror MUST carry explic
 Any byte change to this family MUST refresh the corresponding Human Index, Machine Mirror, checksum, and path-proof companions in the same PR.
 
 Chronology posture (required). Writer artifacts, their co-located path-proofs, and the changed index or mirror companion proofs MUST be regenerated with current chronology when bytes change. Backdated or stale chronology is a merge-blocking integrity failure.
+
+Updater coupling (required). `python tools/evidence/update_evidence_index.py` MUST force-refresh the governed conjunction writer evidence artifacts and their co-located path-proofs during evidence regeneration whenever this family is part of the changed governed surface.
+
+This updater-driven force-refresh MUST keep the writer-family chronology coherent with the Human Index, Machine Mirror, and the other same-run companion refreshes, rather than leaving stale writer-family timestamps after index regeneration.
 
 Validation set (required when this family changes). Refreshing the conjunction writer evidence family MUST rerun and pass:
 
@@ -5074,6 +5125,21 @@ Execution authority (hard).
 
 IA facilitation posture (required). When Ops tasks are part of an epic, they are facilitated by the Implementation Agent (IA). The IA MUST specify intent, constraints, verification, and evidence requirements in a what-not-how manner, then work directly with the PO during execution.
 
+Canon-grounded operator instructions when available (required). When the relevant PF canon already provides concrete operator instructions for an Ops task, the Ops task record or guide MUST include those canon-grounded instructions explicitly, in addition to the what-not-how fields in this section, rather than remaining only at the level of intent, constraints, or outcome.
+
+This includes, when already available in canon:
+
+* concrete operator steps  
+* commands  
+* required fields  
+* safety rails  
+* validation checks  
+* evidence captures  
+* canonical paths  
+* decision rules
+
+If the relevant canon is silent, incomplete, or ambiguous, the Ops task MUST state that the missing instruction is unknown and MUST NOT invent procedure. PF references used for these instructions remain titles-only.
+
 Not a PR (required). Ops tasks are not Codex PRs. Any implementation or remediation guide MUST separate Ops tasks from PR work and clearly label Ops steps as: PO-only execution, IA-guided.
 
 Ops task record format (what-not-how; required fields). Every Ops task record MUST include:
@@ -5126,11 +5192,11 @@ Registry for small, deterministic documentation artifacts and gate evidence. Tit
 
 ## **37.1 Purpose & scope**
 
-* Provide a single registry for governed documentation artifacts and gate evidence.
-
-* Keep Human Index and Machine Mirror in 1:1 parity, updated in the same commit/PR.
-
-* Act only on governed paths; transient generator outputs are never authoritative.
+* Provide a single registry for governed documentation artifacts and gate evidence.  
+* Keep Human Index and Machine Mirror in 1:1 parity, updated in the same commit/PR.  
+* Treat updater, orientation, and check tooling as the synchronization layer across the governed evidence roots used by the registry.  
+* Roots that merely look like evidence or truth homes are non-authoritative unless this guide or HDE-Schemas & Artifacts explicitly routes them into the governed evidence model.  
+* Act only on governed paths; transient generator outputs are never authoritative, and same-change synchronization applies to governed roots rather than to every top-level root that merely looks evidentiary.
 
 ## **37.2 Governance & homes**
 
@@ -5174,26 +5240,33 @@ Close report (minimum content; generated): The close report MUST summarize deliv
 
 Doc deltas capture file (minimum content; generated): The doc deltas capture file MUST enumerate canon deltas found during the run. If none exist, it MUST state: "Doc Deltas: None".
 
-Close-pack manifest (minimum binding responsibilities; generated): The manifest MUST include a pointer to the close report and MUST expose a machine-discoverable set of key outputs bindings for primary artifacts. The manifest schema is owned by PF12-Canon-HDE-Schemas-and-Artifacts.
+Close-pack manifest (minimum binding responsibilities; generated): The manifest MUST include a pointer to the close report and MUST expose a machine-discoverable set of key outputs bindings for primary artifacts. When a close-pack or related closeout surface records epic checklist coverage, it MUST express that coverage as PF09 scope and status-only bindings rather than as invented epic-local acceptance token names. Acceptance token names, token semantics, and any temporary bridge-token admission remain governed by HDE-Governance and HDE-Build Notes (titles-only). Close-pack outputs MAY point to the governing acceptance artifacts that carry token claims, but they MUST NOT substitute local invented token spellings for those artifacts. The manifest schema is owned by PF12-Canon-HDE-Schemas-and-Artifacts.
 
 QA closeout summary (RCA) minimum structure (when required by the epic QA plan). The QA closeout summary MUST include, at minimum, the following titled sections:
 
-* Compliance statement
-
-* Scope boundary and reference set
-
-* Closeout decision trace
-
+* Compliance statement  
+* Scope boundary and reference set  
+* Source-of-Truth posture  
+* Coverage vs QA Plan accounting  
+* D0 discovery artifact accounting  
+* Governed current-state QA evidence accounting under the canonical epic QA root  
+* Functional runtime proof accounting for changed or reviewed runtime surfaces  
+* Accepted plan-execution deviations (if any), including bounded Moon Loop reruns, rails changes, and step-local dependency-preflight corrections  
+* Closeout decision trace  
 * Moon Loop stop-condition assessment  
-* Minimum stop-rule (QoS): If more than three (3) structural plan-to-evidence mismatches are discovered during a single closeout attempt, stop and repair the plan/templates and evidence-indexing artifacts before executing additional QA steps. Structural mismatches include: a required artifact is declared but absent; a required artifact path is spelled differently than the produced file; a closure record places NOT RUN / DEFERRED forward pointers under required artifacts; a primary.log header artifacts list omits primary.log.
-
-* The assessment MUST state the mismatch count, the first mismatch signature, and the remediation action taken (or state "not remediated; closeout halted").
-
-* Token and evidence posture (required tokens must be proven with explicit evidence pointers; missing required tokens must not be inferred)
-
-* Source-of-Truth posture
+* Minimum stop-rule (QoS): If more than three (3) structural plan-to-evidence mismatches are discovered during a single closeout attempt, stop and repair the plan/templates and evidence-indexing artifacts before executing additional QA steps. Structural mismatches include: a required artifact is declared but absent; a required artifact path is spelled differently than the produced file; a closure record places NOT RUN / DEFERRED forward pointers under required artifacts; a primary.log header artifacts list omits primary.log.  
+* The assessment MUST state the mismatch count, the first mismatch signature, and the remediation action taken (or state "not remediated; closeout halted").  
+* Token and evidence posture (required tokens must be proven with explicit evidence pointers; missing required tokens must not be inferred)  
+* Overall readiness or closeout recommendation  
+* When a PF10 addendum is used as the decisive epic-close authority, the summary MUST state whether that addendum provides direct evidence-pointer lines or only evidence-basis prose. If only evidence-basis prose is available, the summary MUST record that fact explicitly as an auditability caveat and MUST NOT assume pointer completeness.
 
 Additional sections are allowed, but the QA closeout summary MUST retain explicit evidence pointers for any claim that a required token is proven or that a deviation is accepted.
+
+Documentation drainage posture for closeout artifacts (mechanics-only). Close reports, QA RCA summaries, acceptance maps, token-to-evidence matrices, step logs, repo-supported completion summaries, and related closeout artifacts MUST NOT encode PF10 drain or any other post-QA documentation drainage as a prerequisite, required deliverable, required check, acceptance condition, readiness condition, or blocker.
+
+Allowed blocker posture (mechanics-only). These artifacts may treat only truth-and-proof failures as blockers, including incomplete required QA steps, missing required deliverables, untrusted or non-governed evidence, unresolved FAIL\_BEHAVIOR / FAIL\_TOOLING / TOOLING\_BLOCKED conditions that affect acceptance, or missing required close-gate QA artifacts.
+
+Undrained delta posture (mechanics-only). When repo evidence supports a later canon, checklist, or guide status change that has not yet been drained, the artifact MUST treat PF10 as the temporary live-truth home, MAY list later drain targets, MUST use supportable from repo evidence wording for the undrained posture, and MUST NOT imply that drainage already happened or is required for the current verdict. Plans and closeout artifacts MUST NOT require PF document updates as execution or closeout outputs.
 
 Acceptance scaffolds (epic-scoped; canonical locations):
 
@@ -5674,6 +5747,71 @@ Shared per-epic current-state manifest pair refreshed through po-009:
 * `audit/qa/hde-epic028/qa_step_logs_manifest.json`  
 * `audit/qa/hde-epic028/qa_step_logs_manifest.json.path_proof.txt`
 
+### **EPIC029 bounded conjunction closure artifact (records-only)**
+
+* `audit/qa/hde-epic029/00_meta/conjunction_json_surface_inventory.md`
+
+EPIC029 bounded conjunction inventory note (records-only).
+
+* The artifact above records the required bounded minimum conjunction JSON loci `/reader`, `/dev/writer/conjunction`, and `/internal/dev/sampler`.  
+* In the current observed state, the same artifact also records the same-family preview loci `/dev/reader/conjunction` and `/dev/sampler/conjunction` without widening the bounded minimum above.  
+* The same inventory artifact records single-emitter verification for each included locus on the `emit_public -> sercanon` path.
+
+EPIC029 early Live QA evidence paths observed (records-only):
+
+* checks/po-001:  
+  * `audit/qa/hde-epic029/checks/po-001/primary.log`  
+  * `audit/qa/hde-epic029/checks/po-001/conjunction_json_surface_inventory.snapshot.md`  
+  * `audit/qa/hde-epic029/checks/po-001/endpoints_catalog.snapshot.json`  
+  * `audit/qa/hde-epic029/checks/po-001/route_snapshot.txt`  
+* checks/po-002:  
+  * `audit/qa/hde-epic029/checks/po-002/primary.log`  
+  * `audit/qa/hde-epic029/checks/po-002/run_canonical_json_gate.output.log`  
+  * `audit/qa/hde-epic029/checks/po-002/run_canonical_json_gate.rc.txt`  
+  * `audit/qa/hde-epic029/checks/po-002/json_gate_structured_record.snapshot.json`  
+  * `audit/qa/hde-epic029/checks/po-002/json_canonical_check.snapshot.log`  
+* checks/po-003:  
+  * `audit/qa/hde-epic029/checks/po-003/primary.log`  
+  * `audit/qa/hde-epic029/checks/po-003/test_dev_conjunction_http.output.log`  
+  * `audit/qa/hde-epic029/checks/po-003/test_dev_conjunction_http.rc.txt`  
+  * `audit/qa/hde-epic029/checks/po-003/generate_conjunction_writer_evidence.output.log`  
+  * `audit/qa/hde-epic029/checks/po-003/generate_conjunction_writer_evidence.rc.txt`  
+  * `audit/qa/hde-epic029/checks/po-003/conjunction_write_readback.snapshot.log`  
+  * `audit/qa/hde-epic029/checks/po-003/conjunction_writer_summary.snapshot.json`  
+  * `audit/qa/hde-epic029/checks/po-003/moon_loop_po_approval_entry.md`  
+* checks/po-004:  
+  * `audit/qa/hde-epic029/checks/po-004/primary.log`  
+  * `audit/qa/hde-epic029/checks/po-004/test_dev_sampler_http.output.log`  
+  * `audit/qa/hde-epic029/checks/po-004/test_dev_sampler_http.rc.txt`  
+  * `audit/qa/hde-epic029/checks/po-004/dev_start_reader.snapshot.sh`  
+  * `audit/qa/hde-epic029/checks/po-004/dev_sampler_healthcheck.snapshot.py`  
+* checks/po-005:  
+  * `audit/qa/hde-epic029/checks/po-005/primary.log`  
+  * `audit/qa/hde-epic029/checks/po-005/commands.snapshot.txt`  
+  * `audit/qa/hde-epic029/checks/po-005/exit_codes.snapshot.txt`  
+  * `audit/qa/hde-epic029/checks/po-005/codespaces_dev_sampler_url.snapshot.md`  
+  * `audit/qa/hde-epic029/checks/po-005/local_dev_sampler_url.snapshot.md`  
+  * `audit/qa/hde-epic029/checks/po-005/binding_disposition.snapshot.md`  
+* checks/po-006:  
+  * `audit/qa/hde-epic029/checks/po-006/primary.log`  
+  * `audit/qa/hde-epic029/checks/po-006/test_endpoint_catalog.output.log`  
+  * `audit/qa/hde-epic029/checks/po-006/test_endpoint_catalog.rc.txt`  
+  * `audit/qa/hde-epic029/checks/po-006/endpoints_catalog.snapshot.json`  
+* checks/po-007:  
+  * `audit/qa/hde-epic029/checks/po-007/primary.log`  
+  * `audit/qa/hde-epic029/checks/po-007/functional_bundle.output.log`  
+  * `audit/qa/hde-epic029/checks/po-007/functional_bundle.rc.txt`
+
+EPIC029 early Live QA current-state notes (records-only).
+
+* checks/po-001 records a PASS bounded conjunction closeout slice by binding the conjunction inventory snapshot, Endpoint Catalog snapshot, and adapter route snapshot to the in-scope surface family under `audit/qa/hde-epic029/checks/po-001/`.  
+* checks/po-002 records a PASS canonical JSON gate step by binding the gate return-code artifact and the governed structured and canonical snapshot pair under `audit/qa/hde-epic029/checks/po-002/`; the companion gate output log may be present as a zero-byte supplemental artifact when the governing pass criteria are satisfied by the return code and snapshot pair.  
+* checks/po-003 records a PASS writer-envelope QA slice under `/dev/writer/conjunction`, with the HTTP test rc, writer evidence generator rc, readback snapshot, writer summary snapshot, and Moon Loop approval entry all bound under `audit/qa/hde-epic029/checks/po-003/`; the generator output log in this corrected family is non-empty.  
+* checks/po-004 records a PASS dev sampler HTTP harness slice under `audit/qa/hde-epic029/checks/po-004/`, with the sampler HTTP test rc and output plus the repo-side `scripts/dev_start_reader.sh` and `scripts/qa/dev_sampler_healthcheck.py` snapshots bound as the required step artifacts; this step remains confined to the internal sampler family and does not promote `/internal/dev/sampler` into a public or cataloged proof surface.  
+* checks/po-005 records a PASS normalized OPS-01 snapshot family under `audit/qa/hde-epic029/checks/po-005/`, with one published binding value `http://127.0.0.1:8000/internal/dev/sampler` captured in both environment URL snapshots and a binding-disposition snapshot that records direct runtime validation for `codespaces` and binding-equivalence closure for `local_dev`.  
+* checks/po-006 records a PASS formal transport proof-surface step under `audit/qa/hde-epic029/checks/po-006/`, with the endpoint catalog test output and zero return code bound to the governed catalog snapshot; the snapshot confirms `/reader` as the formal A7 surface, keeps `/dev/writer/conjunction` not A7-eligible, and does not promote `/internal/dev/sampler` into the formal proof family.  
+* checks/po-007 records a PASS functional-bundle step under `audit/qa/hde-epic029/checks/po-007/`, with the combined pytest output and zero return code bound to the governed step family; the accepted execution records a step-local dependency preflight in `primary.log` command provenance and does not add a second governed deliverable family beyond `primary.log`, `functional_bundle.output.log`, and `functional_bundle.rc.txt`.
+
 ### **37.4.1 CLI help and argument-policing captures for conjunction-mode evidence**
 
 When a governed review, QA step, or docs-evidence update depends on the shipped CLI syntax or CLI rejection behavior for conjunction flows, governed capture artifacts MUST be recorded for:
@@ -5949,6 +6087,26 @@ Conjunction CLI artifacts (required). When conjunction-mode CLI evidence is capt
 Path-proofs (normative). Each artifact above MUST have a co-located `.path_proof.txt` transcript and MUST be listed in the Human Evidence Index and mirrored 1:1 in `artifacts/evidence_index.jsonl` in the same PR as any byte change.
 
 Canonical JSON gate coverage (normative). `tools/evidence/run_canonical_json_gate.py` MUST include the conjunction CLI artifact family above in its checked target set whenever those artifacts are part of the governed evidence surface for the PR. Any change to that checked target set MUST refresh the canonical JSON gate outputs under `audit/gates/json_gate/canonical/` and the corresponding `.path_proof.txt` transcripts in the same PR.
+
+Bounded conjunction route-probe extension (normative). When the governed evidence surface for a PR or remediation includes the bounded conjunction JSON surface inventory, `tools/evidence/run_canonical_json_gate.py` MUST extend the checked target set to the bounded conjunction HTTP surface family `/reader`, `/dev/writer/conjunction`, `/dev/reader/conjunction`, `/dev/sampler/conjunction`, and `/internal/dev/sampler`, in addition to the conjunction CLI artifact family above.
+
+Expected-status posture (normative). Route-probe targets in this family MUST validate expected HTTP status in addition to canonical-byte equality. For `/internal/dev/sampler`, the probe MUST send JSON bytes with `Content-Type: application/json; charset=utf-8`, MUST fail closed when actual and expected status differ, and MUST record a passing posture only when `expected_http_status` and `http_status` both equal `200`.
+
+Same-change regeneration (normative). Any change to the bounded conjunction checked target set or to the expected-status logic MUST rerun the canonical JSON gate and refresh the authoritative outputs under `audit/gates/json_gate/canonical/`, the compatibility-only legacy family under `audit/gates/canonical_json/` when emitted, the Human Index and Machine Mirror companions, and the corresponding `.path_proof.txt` transcripts in the same PR.
+
+Validation set (required when this bounded route-probe family changes). Refreshing this family MUST rerun and pass:
+
+* `python tools/evidence/run_canonical_json_gate.py`  
+* `python -m pytest -q tests/http/test_dev_conjunction_http.py`  
+* `python -m pytest -q tests/http/test_endpoint_catalog.py`  
+* `python -m pytest -q tests/adapter/test_dev_sampler_http.py`  
+* `python tools/evidence/update_evidence_index.py`  
+* `python tools/evidence/update_evidence_index.py --check`  
+* `python tools/evidence/orientation_demo.py`  
+* `python tools/evidence/orientation_demo.py --check`  
+* `python tools/evidence/validate_evidence_paths.py`  
+* `python tools/evidence/check_lf_endings.py`  
+* `python ci/checks/check_mirror_schema.sh artifacts/evidence_index.jsonl`
 
 EPIC024 showcompat artifacts capture (D03) fixed outputs (records-only):
 
@@ -6292,6 +6450,116 @@ OPS-02 venue-provenance execution bundle observed (records-only):
 OPS-02 binding posture (records-only). The venue-provenance artifact binds to the rerun-produced EPIC028 governed QA artifact family under `audit/qa/hde-epic028/checks/po-010/`, with the primary bound artifact at `audit/qa/hde-epic028/checks/po-010/final_summary.txt`.
 
 OPS-02 execution posture (records-only). The execution bundle records the final corrective command ledger as fully successful and captures repo identity plus presence-only Codespaces venue context.
+
+### **37.18.3 EPIC029 close-pack baseline and OPS-01 dev-harness binding evidence**
+
+EPIC029 close-pack baseline artifacts observed (records-only):
+
+* `docs/acceptance_map_epic029.json`  
+* `docs/acceptance_map_epic029.json.path_proof.txt`  
+* `audit/qa/hde-epic029/token_evidence_matrix.md`  
+* `audit/qa/hde-epic029/token_evidence_matrix.md.path_proof.txt`  
+* `audit/qa/hde-epic029/acceptance_map_viability.log`  
+* `audit/qa/hde-epic029/acceptance_map_viability.log.path_proof.txt`  
+* `audit/qa/hde-epic029/qa_step_logs_manifest.json`  
+* `audit/qa/hde-epic029/qa_step_logs_manifest.json.path_proof.txt`  
+* `audit/qa/hde-epic029/00_meta/dev_harness_binding_coverage.md`  
+* `audit/qa/hde-epic029/00_meta/dev_harness_binding_coverage.md.path_proof.txt`  
+* `audit/qa/hde-epic029/00_meta/conjunction_json_surface_inventory.md`  
+* `audit/qa/hde-epic029/00_meta/conjunction_json_surface_inventory.md.path_proof.txt`  
+* `audit/EPIC-029_close_report.md`  
+* `audit/EPIC-029_close_report.md.path_proof.txt`  
+* `audit/EPIC-029_MANIFEST.json`  
+* `audit/EPIC-029_MANIFEST.json.path_proof.txt`
+
+Manifest-binding posture (records-only). The EPIC029 close-pack baseline binds the acceptance map, token-evidence matrix, viability log, QA step-manifest pair, dev-harness binding coverage artifact, and bounded conjunction inventory artifact as one governed closeout family and MUST NOT be treated as a replacement proof surface.
+
+EPIC029 closeout QA logs observed (records-only):
+
+* `audit/qa/hde-epic029/checks/po-epic-close-live-qa/primary.log`  
+* `audit/qa/hde-epic029/checks/po-precommit/primary.log`  
+* `audit/qa/hde-epic029/checks/po-postcommit/primary.log`
+
+EPIC029 closeout snapshot family observed (records-only):
+
+* `audit/qa/hde-epic029/checks/po-008/primary.log`  
+* `audit/qa/hde-epic029/checks/po-008/acceptance_map.snapshot.json`  
+* `audit/qa/hde-epic029/checks/po-008/token_evidence_matrix.snapshot.md`  
+* `audit/qa/hde-epic029/checks/po-008/acceptance_map_viability.snapshot.log`  
+* `audit/qa/hde-epic029/checks/po-008/qa_step_logs_manifest.snapshot.json`  
+* `audit/qa/hde-epic029/checks/po-008/close_report.snapshot.md`  
+* `audit/qa/hde-epic029/checks/po-008/close_manifest.snapshot.json`  
+* `audit/qa/hde-epic029/checks/po-008/po_epic_close_live_qa.snapshot.log`  
+* `audit/qa/hde-epic029/checks/po-008/po_precommit.snapshot.log`  
+* `audit/qa/hde-epic029/checks/po-008/po_postcommit.snapshot.log`
+
+Closeout snapshot posture (records-only). checks/po-008 records a PASS final closeout snapshot family under `audit/qa/hde-epic029/checks/po-008/`, with `ready_for_close_binding` set true in the acceptance-map snapshot, the viability summary recorded as `COVERED=9 PLANNED=0 MISSING=0`, the three canonical QA log snapshots bound as token-support evidence for the closeout family, and the close\_report/close\_manifest snapshot pair kept on one bounded Conjunction acceptance surface without widening into a new public surface or writer-runtime redesign.
+
+Closeout QA binding posture (records-only). The EPIC029 step-manifest pair records PASS for the three canonical closeout QA checks only when the three primary logs above exist at their governed paths, each primary log records `[exit_code] 0`, and the logs are bound into the close-pack family. File existence alone or a non-`MISSING` sentinel is insufficient for closeout completeness.
+
+OPS-01 dev-harness binding bundle observed (records-only):
+
+* `audit/ops/hde-epic029/ops-01/commands.txt`  
+* `audit/ops/hde-epic029/ops-01/stdout.log`  
+* `audit/ops/hde-epic029/ops-01/stderr.log`  
+* `audit/ops/hde-epic029/ops-01/exit_codes.txt`  
+* `audit/ops/hde-epic029/ops-01/codespaces_dev_sampler_url.md`  
+* `audit/ops/hde-epic029/ops-01/local_dev_sampler_url.md`  
+* `audit/ops/hde-epic029/ops-01/binding_disposition.md`  
+* `audit/ops/hde-epic029/ops-01/created_files_sha256.txt`
+
+OPS-01 binding posture (records-only). The normalized bundle records the Codespaces dev-harness binding at `http://127.0.0.1:8000/internal/dev/sampler` closed by direct runtime validation. The same bundle records `local_dev` closed by binding-equivalence at the same published `DEV_SAMPLER_URL`, with explicit `Closure mode: binding-equivalence`, on the basis that the client access binding is identical to Codespaces for the same dev-only sampler harness.
+
+Authoritative local-dev artifact posture (records-only). The normalized OPS-01 family MUST record that no separate local-dev runtime was executed in that evidence pass and MUST NOT preserve contradictory `not yet closed`, deferred, or equivalent posture anywhere in the same governed family.
+
+OPS-02 blocker-classification validation bundle observed (records-only):
+
+* `audit/ops/hde-epic029/ops-02/W-001_action_log_and_evidence_output_run2.md`  
+* `audit/ops/hde-epic029/ops-02/W-001_classification_run2.md`  
+* `audit/ops/hde-epic029/ops-02/commands_w001_run2.txt`  
+* `audit/ops/hde-epic029/ops-02/exit_codes_w001_run2.txt`  
+* `audit/ops/hde-epic029/ops-02/stdout_w001_run2.log`  
+* `audit/ops/hde-epic029/ops-02/stderr_w001_run2.log`
+
+OPS-02 classification posture (records-only). The read-only validation bundle records `HDE-CONJ009.1` as a mixed blocker because the bounded conjunction inventory and the current canonical JSON gate do not, by themselves, prove exhaustive all-surface HTTP emitter coverage. The same bundle records `HDE-CONJ008.1` as a governed approval or evidence blocker because writer-envelope behavior is already evidenced by tests and writer snapshots rather than by an open runtime defect.
+
+OPS-02 execution posture (records-only). The bundle is read-only, captures inspection commands plus zero-exit read checks, uses repo facts only, and does not itself close PF09 rows or reopen implementation scope.
+
+Generator and same-run workflow observed (records-only):
+
+* `python tools/qa/generate_epic029_close_pack.py`  
+* `python tools/evidence/update_evidence_index.py`  
+* `python tools/evidence/update_evidence_index.py --check`  
+* `python tools/evidence/orientation_demo.py`  
+* `python tools/evidence/orientation_demo.py --check`  
+* `python tools/evidence/validate_evidence_paths.py`  
+* `python tools/evidence/check_lf_endings.py`  
+* `python ci/checks/check_mirror_schema.sh artifacts/evidence_index.jsonl`  
+* `python -m pytest -q tests/qa/test_epic022_close_pack_ready.py`  
+* `python -m json.tool audit/EPIC-029_MANIFEST.json > /dev/null`  
+* `python -m json.tool docs/acceptance_map_epic029.json > /dev/null`
+
+Observed W-002 reruns used closed rails and determinism pins: `LC_ALL=C`, `LANG=C`, `TZ=UTC`, `SAFE_MODE=1`, `ALLOW_NETWORK=0`.
+
+EPIC029 close-pack sequencing gate posture (records-only). The close-pack generator’s `ready_for_close_binding` gate is sequencing-only: it MUST require explicit PF09 row-closure proof markers for `HDE-CONJ009.1` and `HDE-CONJ008.1`, MUST require both `codespaces` and `local_dev` closed for `HDE-CONJ001.4`, and MUST keep the EPIC029 acceptance and close-pack outputs blocked or incomplete-planned under current evidence when those proofs are absent. The generator MUST NOT promote close-binding or token completion from generic readiness alone.
+
+Same-change companion refreshes observed (records-only):
+
+* `docs/evidence/INDEX.json`  
+* `docs/evidence/INDEX.json.path_proof.txt`  
+* `docs/evidence/INDEX.sha256`  
+* `docs/evidence/INDEX.sha256.path_proof.txt`  
+* `artifacts/evidence_index.jsonl`  
+* `artifacts/evidence_index.jsonl.path_proof.txt`  
+* `artifacts/evidence_index.jsonl.sha256`  
+* `artifacts/evidence_index.jsonl.sha256.path_proof.txt`  
+* `audit/gates/topology/orientation_demo.txt`
+
+EPIC029 closeout posture (records-only). The close-pack family binds the governed QA and OPS evidence above under one authoritative OPS posture for `HDE-CONJ001.4`, rather than preserving parallel closed and not-yet-closed states.
+
+Governed evidence-family posture (normative). Any governed evidence family that participates in acceptance binding MUST express one authoritative posture per claimed closure dimension. Mixed-state families are mechanically invalid: contradictory `closed`, `not yet closed`, deferred, partial, or equivalent postures for the same dimension MUST be normalized before acceptance binding or close-pack consolidation.
+
+Documentation/evidence normalization posture (normative). When runtime facts are unchanged and only the closure interpretation changes, a documentation/evidence normalization pass MAY update the family without a new runtime rerun, provided the closure mode is explicit and every affected governed artifact, Index/Mirror entry, checksum companion, and path-proof is refreshed coherently in the same change.
 
 Same-PR rule. Any addition, removal, or relocation in this registry must update both Index and Mirror in the same commit/PR.
 
