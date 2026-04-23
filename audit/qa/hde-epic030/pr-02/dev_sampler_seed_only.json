@@ -1,0 +1,1 @@
+{"candidate_ids_equal":true,"response_a":{"candidate_ids":["alpha","bravo","charlie"],"meta":{"seed":"111"},"viewer_id":"viewer-epic030-pr02"},"response_b":{"candidate_ids":["alpha","bravo","charlie"],"meta":{"seed":"222"},"viewer_id":"viewer-epic030-pr02"},"schema":"epic030_dev_sampler_seed_only.v1","seed_a":"111","seed_b":"222"}
