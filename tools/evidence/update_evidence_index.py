@@ -223,6 +223,33 @@ EPIC030_PR02_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     },
 ]
 
+EPIC030_PR03_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "epic030.pr03.compat_parity_binding",
+        "discovered_physical_path": "audit/qa/hde-epic030/pr-03/compat_parity_binding.log",
+        "epic_id": "HDE-EPIC030",
+        "record_type": "epic030_pr03_evidence",
+        "schema_version": "1.0",
+        "notes": "EPIC030 PR-03 compat AB↔BA parity binding evidence for HDE-DISS002.6",
+    },
+    {
+        "artifact_key": "epic030.pr03.compat_identity_binding",
+        "discovered_physical_path": "audit/qa/hde-epic030/pr-03/compat_identity_binding.log",
+        "epic_id": "HDE-EPIC030",
+        "record_type": "epic030_pr03_evidence",
+        "schema_version": "1.0",
+        "notes": "EPIC030 PR-03 compat identity-hash binding evidence for HDE-DISS002.6",
+    },
+    {
+        "artifact_key": "epic030.pr03.category_order_binding",
+        "discovered_physical_path": "audit/qa/hde-epic030/pr-03/category_order_binding.log",
+        "epic_id": "HDE-EPIC030",
+        "record_type": "epic030_pr03_evidence",
+        "schema_version": "1.0",
+        "notes": "EPIC030 PR-03 category-order and narrative key-table binding evidence for HDE-DISS002.6",
+    },
+]
+
 A7_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
         "artifact_key": "a7.success_encoding_invariance",
@@ -243,9 +270,27 @@ CLI_CONFORMANCE_ARTIFACTS: list[dict[str, object]] = [
 
 COMPAT_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
+        "artifact_key": "compat.conjunction.ab",
+        "discovered_physical_path": "artifacts/compat/AB.json",
+        "record_type": "compat_parity_payload",
+        "schema_version": "1.0",
+    },
+    {
+        "artifact_key": "compat.conjunction.ba",
+        "discovered_physical_path": "artifacts/compat/BA.json",
+        "record_type": "compat_parity_payload",
+        "schema_version": "1.0",
+    },
+    {
         "artifact_key": "compat.conjunction.identity_hash",
         "discovered_physical_path": "artifacts/compat/identity_hash.txt",
         "record_type": "compat_identity_hash",
+        "schema_version": "1.0",
+    },
+    {
+        "artifact_key": "compat.narratives.key_table_10x2",
+        "discovered_physical_path": "artifacts/narratives/key_table_10x2.snapshot.json",
+        "record_type": "compat_narrative_key_table",
         "schema_version": "1.0",
     }
 ]
@@ -506,6 +551,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *EPIC027_PRIMARY_ARTIFACTS,
             *EPIC028_PRIMARY_ARTIFACTS,
             *EPIC030_PR02_PRIMARY_ARTIFACTS,
+            *EPIC030_PR03_PRIMARY_ARTIFACTS,
             *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,

@@ -1,0 +1,5 @@
+path: artifacts/compat/AB.json
+size_bytes: 62
+sha256: f4616998ad4ce55dc7c716388709f767718a4d3056d866f9c2f73fa4f4703ed7
+mtime_utc: 2026-04-23T17:40:37Z
+produced_at_utc: 2026-04-23T13:25:43Z
