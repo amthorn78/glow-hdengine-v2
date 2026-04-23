@@ -1,0 +1,5 @@
+path: artifacts/narratives/key_table_10x2.snapshot.json
+size_bytes: 1456
+sha256: c6474d27dca8484a93aceafbe932aa33dc1f670f40f5224f708a57b37bed79f2
+mtime_utc: 2026-04-23T17:44:04Z
+produced_at_utc: 2026-04-23T13:25:43Z
