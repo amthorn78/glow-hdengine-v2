@@ -32,3 +32,24 @@ def normalize_viewer_prefs(prefs: Dict[str, object]) -> Dict[str, object]:
         "top_category": prefs["top_category"],
         "weights": {category: int(weights[category]) for category in CATEGORIES_ORDER_V1},
     }
+
+
+def weight_for_candidate_top_category(
+    normalized_prefs: Dict[str, object],
+    candidate_top_category: str,
+) -> float:
+    """Project normalized viewer preferences into sampler candidate weight.
+
+    This is the normalization-side handoff point for zero-weight intent; the
+    sampler remains the behavior owner for exclusion when weight <= 0.
+    """
+
+    weights = normalized_prefs.get("weights")
+    if not isinstance(weights, dict):
+        raise ValueError("INVALID_NORMALIZED_PREFS")
+    if candidate_top_category not in CATEGORIES_SET_V1:
+        raise ValueError("INVALID_CANDIDATE_TOP_CATEGORY")
+    value = weights.get(candidate_top_category)
+    if not isinstance(value, int):
+        raise ValueError("INVALID_NORMALIZED_PREFS")
+    return float(value)

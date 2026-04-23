@@ -2,9 +2,11 @@
 from __future__ import annotations
 
 import argparse
+import datetime as _dt
 import json
 import sys
 from pathlib import Path
+from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
@@ -14,9 +16,23 @@ from engine.compat.categories import CATEGORIES_ORDER_V1
 from engine.runtime.determinism_env import ensure_determinism_env
 from engine.sampler.core import CandidateFeatures, ViewerProfile, build_candidate_pool
 from engine.serializer.canon import sercanon
-from engine.validation.viewer_prefs import normalize_viewer_prefs, validate_viewer_prefs
+from engine.validation.viewer_prefs import (
+    normalize_viewer_prefs,
+    validate_viewer_prefs,
+    weight_for_candidate_top_category,
+)
+from tools.evidence import update_evidence_index
 
 OUT_DIR = ROOT / "audit" / "qa" / "hde-epic030" / "pr-01"
+ARTIFACT_KEYS = {
+    "zero_weight_handoff": "epic030.pr01.zero_weight_handoff",
+    "normalization_canonical_compare": "epic030.pr01.normalization_canonical_compare",
+    "invalid_viewer_prefs": "epic030.pr01.invalid_viewer_prefs",
+}
+
+
+def _iso_now() -> str:
+    return _dt.datetime.now(tz=_dt.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
 def _write_bytes(path: Path, data: bytes) -> None:
@@ -36,6 +52,62 @@ def _valid_prefs() -> dict[str, object]:
     }
 
 
+def _upsert_index_entries() -> None:
+    produced_at = _iso_now()
+    entries = update_evidence_index._load_human_index()
+    existing = {
+        str(entry.get("artifact_key")): entry
+        for entry in entries
+        if str(entry.get("artifact_key", "")).startswith("epic030.pr01.")
+    }
+
+    target_entries: list[dict[str, Any]] = [
+        {
+            "artifact_key": ARTIFACT_KEYS["zero_weight_handoff"],
+            "discovered_physical_path": "audit/qa/hde-epic030/pr-01/zero_weight_handoff.json",
+            "epic_id": "HDE-EPIC030",
+            "record_type": "epic030_pr01_evidence",
+            "schema_version": "1.0",
+            "produced_at_utc": produced_at,
+            "notes": "EPIC030 PR-01 normalization zero-weight handoff evidence",
+        },
+        {
+            "artifact_key": ARTIFACT_KEYS["normalization_canonical_compare"],
+            "discovered_physical_path": "audit/qa/hde-epic030/pr-01/normalization_canonical_compare.log",
+            "epic_id": "HDE-EPIC030",
+            "record_type": "epic030_pr01_evidence",
+            "schema_version": "1.0",
+            "produced_at_utc": produced_at,
+            "notes": "EPIC030 PR-01 normalization canonical compare evidence",
+        },
+        {
+            "artifact_key": ARTIFACT_KEYS["invalid_viewer_prefs"],
+            "discovered_physical_path": "audit/qa/hde-epic030/pr-01/invalid_viewer_prefs.log",
+            "epic_id": "HDE-EPIC030",
+            "record_type": "epic030_pr01_evidence",
+            "schema_version": "1.0",
+            "produced_at_utc": produced_at,
+            "notes": "EPIC030 PR-01 normalization invalid viewer prefs evidence",
+        },
+    ]
+
+    # Preserve existing produced_at_utc when a row is already present to avoid
+    # unnecessary churn across unrelated evidence families.
+    for target in target_entries:
+        previous = existing.get(target["artifact_key"])
+        if isinstance(previous, dict) and previous.get("produced_at_utc"):
+            target["produced_at_utc"] = previous["produced_at_utc"]
+
+    retained = [
+        entry
+        for entry in entries
+        if str(entry.get("artifact_key", "")) not in set(ARTIFACT_KEYS.values())
+    ]
+    merged = update_evidence_index._dedupe_entries(retained + target_entries)
+    rendered = update_evidence_index._render_human_index(merged)
+    update_evidence_index._write_if_changed(update_evidence_index.HUMAN_INDEX, rendered, check=False)
+
+
 def generate() -> None:
     ensure_determinism_env()
 
@@ -51,19 +123,17 @@ def generate() -> None:
     if err is not None:
         raise SystemExit("VALID_PREFS_REJECTED")
     normalized = normalize_viewer_prefs(prefs)
-    normalized_weights = normalized["weights"]
-    assert isinstance(normalized_weights, dict)
 
     candidates = [
         CandidateFeatures(
             person_uid="zero-weight-candidate",
-            weight=float(normalized_weights[excluded_category]),
+            weight=weight_for_candidate_top_category(normalized, excluded_category),
             compat_score=80,
             categories=(excluded_category,),
         ),
         CandidateFeatures(
             person_uid="positive-weight-candidate",
-            weight=float(normalized_weights[retained_category]),
+            weight=weight_for_candidate_top_category(normalized, retained_category),
             compat_score=80,
             categories=(retained_category,),
         ),
@@ -73,14 +143,16 @@ def generate() -> None:
     handoff_payload = {
         "schema": "hde_epic030.pr01.zero_weight_handoff.v1",
         "viewer_prefs_normalized": normalized,
-        "candidate_weight_projection": [
+        "projected_candidate_weights": [
             {
                 "person_uid": candidate.person_uid,
                 "category": list(candidate.categories or [None])[0],
                 "weight": candidate.weight,
+                "weight_projection_source": "weight_for_candidate_top_category",
             }
             for candidate in candidates
         ],
+        "sampler_handoff_entrypoint": "engine.validation.viewer_prefs.weight_for_candidate_top_category",
         "sampler_pool_candidate_ids": [cand.person_uid for cand in pool.candidates],
         "excluded_ids": sorted({candidate.person_uid for candidate in candidates} - {cand.person_uid for cand in pool.candidates}),
     }
@@ -113,6 +185,7 @@ def generate() -> None:
         lines.append(f"{name}: {'PASS' if validate_viewer_prefs(case) is not None else 'FAIL'}")
     lines.append("")
     _write_text(OUT_DIR / "invalid_viewer_prefs.log", "\n".join(lines))
+    _upsert_index_entries()
 
 
 def main() -> None:

@@ -1,5 +1,5 @@
 path: audit/gates/topology/orientation_demo.txt
 size_bytes: 115
 sha256: 3d5ea661e214defc8c46dce461207e658508f6dd91204109c88e87b725e5f341
-mtime_utc: 2026-04-22T20:15:17Z
-produced_at_utc: 2026-04-22T20:18:15Z
+mtime_utc: 2026-04-23T11:27:33Z
+produced_at_utc: 2026-04-23T11:30:14Z
