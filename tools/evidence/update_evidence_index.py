@@ -187,6 +187,42 @@ EPIC028_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     },
 ]
 
+
+EPIC030_PR02_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "epic030.pr02.dev_sampler_http_headers",
+        "discovered_physical_path": "audit/qa/hde-epic030/pr-02/dev_sampler_http_headers.txt",
+        "epic_id": "HDE-EPIC030",
+        "record_type": "epic030_pr02_evidence",
+        "schema_version": "1.0",
+        "notes": "EPIC030 PR-02 dev sampler harness HTTP headers evidence",
+    },
+    {
+        "artifact_key": "epic030.pr02.dev_sampler_http_body",
+        "discovered_physical_path": "audit/qa/hde-epic030/pr-02/dev_sampler_http_body.json",
+        "epic_id": "HDE-EPIC030",
+        "record_type": "epic030_pr02_evidence",
+        "schema_version": "1.0",
+        "notes": "EPIC030 PR-02 dev sampler harness HTTP body evidence",
+    },
+    {
+        "artifact_key": "epic030.pr02.dev_sampler_two_run_identity",
+        "discovered_physical_path": "audit/qa/hde-epic030/pr-02/dev_sampler_two_run_identity.json",
+        "epic_id": "HDE-EPIC030",
+        "record_type": "epic030_pr02_evidence",
+        "schema_version": "1.0",
+        "notes": "EPIC030 PR-02 dev sampler two-run identity evidence",
+    },
+    {
+        "artifact_key": "epic030.pr02.dev_sampler_seed_only",
+        "discovered_physical_path": "audit/qa/hde-epic030/pr-02/dev_sampler_seed_only.json",
+        "epic_id": "HDE-EPIC030",
+        "record_type": "epic030_pr02_evidence",
+        "schema_version": "1.0",
+        "notes": "EPIC030 PR-02 dev sampler seed-only metadata evidence",
+    },
+]
+
 A7_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
         "artifact_key": "a7.success_encoding_invariance",
@@ -469,6 +505,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *EPIC024_PRIMARY_ARTIFACTS,
             *EPIC027_PRIMARY_ARTIFACTS,
             *EPIC028_PRIMARY_ARTIFACTS,
+            *EPIC030_PR02_PRIMARY_ARTIFACTS,
             *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,

@@ -120,3 +120,12 @@ def test_dev_sampler_rejected_when_app_env_empty(monkeypatch):
 
     assert resp.status_code == 403
     assert json.loads(resp.data)["code"] == "ERR_WRITER_FORBIDDEN"
+
+
+def test_dev_sampler_post_only(monkeypatch):
+    app = _app(monkeypatch, "dev")
+
+    with app.test_client() as client:
+        get_resp = client.get("/internal/dev/sampler")
+
+    assert get_resp.status_code == 405
