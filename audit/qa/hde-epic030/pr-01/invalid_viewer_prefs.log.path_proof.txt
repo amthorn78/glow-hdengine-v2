@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic030/pr-01/invalid_viewer_prefs.log
+size_bytes: 124
+sha256: 8418f7b159639702fc45ec734e75f889471d33f4b82cbf7888196c941642c6c2
+mtime_utc: 2026-04-23T11:30:13Z
+produced_at_utc: 2026-04-23T11:30:13Z

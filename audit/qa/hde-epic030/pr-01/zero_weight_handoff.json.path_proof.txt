@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic030/pr-01/zero_weight_handoff.json
+size_bytes: 759
+sha256: c3e211bab8fad866c548f01db14514aed1acb88f41e1afddc6b07f118649a51e
+mtime_utc: 2026-04-23T11:30:13Z
+produced_at_utc: 2026-04-23T11:30:13Z

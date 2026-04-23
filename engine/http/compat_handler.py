@@ -5,7 +5,7 @@ from flask import Blueprint, request, Response
 from engine.presenter import emit_public
 from engine.compat.errors import error_envelope
 from engine.compat.compute import compat_public
-from engine.validation.viewer_prefs import validate_viewer_prefs
+from engine.validation.viewer_prefs import normalize_viewer_prefs, validate_viewer_prefs
 from engine.compat.ordering import UID_RE
 
 compat_blueprint = Blueprint("compat", __name__, url_prefix="/api/compat/v1")
@@ -117,6 +117,7 @@ def post_json():
     err = validate_viewer_prefs(vp)
     if err:
         return _writer_payload(err, status=400)
+    vp = normalize_viewer_prefs(vp)
     body = compat_public(
         a, b, vp["top_category"], vp["weights"],
         engine_tag="dev", release_id="dev", invocation_tag="INV-DEV",
