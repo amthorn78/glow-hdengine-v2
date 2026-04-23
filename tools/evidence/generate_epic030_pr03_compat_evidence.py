@@ -81,12 +81,20 @@ def _write_key_table_snapshot() -> str:
 def generate() -> None:
     ensure_determinism_env()
 
-    ab = _load_json(AB_PATH)
-    ba = _load_json(BA_PATH)
-    parity_equal = ab == ba
+    ab_bytes = AB_PATH.read_bytes()
+    ba_bytes = BA_PATH.read_bytes()
+    parity_equal = ab_bytes == ba_bytes
+    ab_json = json.loads(ab_bytes.decode("utf-8"))
+    ba_json = json.loads(ba_bytes.decode("utf-8"))
+    parity_structural_equal = ab_json == ba_json
 
     identity_hash = IDENTITY_HASH_PATH.read_text(encoding="utf-8").strip()
-    identity_valid = bool(re.fullmatch(r"[0-9a-f]{64}", identity_hash))
+    identity_format_valid = bool(re.fullmatch(r"[0-9a-f]{64}", identity_hash))
+    recomputed_ab_sha256 = hashlib.sha256(ab_bytes).hexdigest()
+    recomputed_ba_sha256 = hashlib.sha256(ba_bytes).hexdigest()
+    identity_matches_ab = identity_hash == recomputed_ab_sha256
+    identity_matches_ba = identity_hash == recomputed_ba_sha256
+    identity_valid = identity_format_valid and identity_matches_ab and identity_matches_ba
 
     key_table_sha = _write_key_table_snapshot()
     produced_at = _iso_now()
@@ -100,7 +108,10 @@ def generate() -> None:
         "binding_family: compat_parity_ab_ba",
         "source_artifact_ab: artifacts/compat/AB.json",
         "source_artifact_ba: artifacts/compat/BA.json",
+        f"ab_sha256: {recomputed_ab_sha256}",
+        f"ba_sha256: {recomputed_ba_sha256}",
         f"ab_equals_ba: {parity_equal}",
+        f"ab_equals_ba_structural: {parity_structural_equal}",
         "status: PASS" if parity_equal else "status: FAIL",
         "",
     ]
@@ -115,7 +126,11 @@ def generate() -> None:
         "binding_family: compat_identity_hash",
         "source_artifact: artifacts/compat/identity_hash.txt",
         f"identity_hash: {identity_hash}",
-        f"identity_hash_valid_sha256_hex: {identity_valid}",
+        f"identity_hash_valid_sha256_hex: {identity_format_valid}",
+        f"recomputed_ab_sha256: {recomputed_ab_sha256}",
+        f"recomputed_ba_sha256: {recomputed_ba_sha256}",
+        f"identity_matches_ab: {identity_matches_ab}",
+        f"identity_matches_ba: {identity_matches_ba}",
         "status: PASS" if identity_valid else "status: FAIL",
         "",
     ]

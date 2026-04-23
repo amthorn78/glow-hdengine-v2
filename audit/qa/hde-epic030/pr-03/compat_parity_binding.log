@@ -1,10 +1,13 @@
 schema: hde_epic030.pr03.compat_parity_binding.v1
-produced_at_utc: 2026-04-23T17:44:04Z
+produced_at_utc: 2026-04-23T17:59:08Z
 epic_id: HDE-EPIC030
 task_id: HDE-DISS002
 subtask_id: HDE-DISS002.6
 binding_family: compat_parity_ab_ba
 source_artifact_ab: artifacts/compat/AB.json
 source_artifact_ba: artifacts/compat/BA.json
+ab_sha256: f4616998ad4ce55dc7c716388709f767718a4d3056d866f9c2f73fa4f4703ed7
+ba_sha256: f4616998ad4ce55dc7c716388709f767718a4d3056d866f9c2f73fa4f4703ed7
 ab_equals_ba: True
+ab_equals_ba_structural: True
 status: PASS

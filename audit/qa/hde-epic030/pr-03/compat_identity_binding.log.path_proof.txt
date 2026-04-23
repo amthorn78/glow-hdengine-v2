@@ -1,5 +1,5 @@
 path: audit/qa/hde-epic030/pr-03/compat_identity_binding.log
-size_bytes: 377
-sha256: 68162df6847115b8b5f01b4ea935be5162db8420e8ae1a28342aeaa693483023
+size_bytes: 603
+sha256: 6d8ccfcdc7f9ba8535197fdc97f89de4716bcba0878637ebec458d18e7fabb62
 mtime_utc: 2026-04-23T17:44:04Z
 produced_at_utc: 2026-04-23T13:25:43Z

@@ -1,5 +1,5 @@
 path: audit/qa/hde-epic030/pr-03/compat_parity_binding.log
-size_bytes: 314
-sha256: cf58b113511cd3c52dcd7d010888046a3b62a56f975cc0fd5e52f1b5e394d412
+size_bytes: 496
+sha256: 17d02e2342de5ed1da11672fa585bfffac59b6492872b1273660d6e710d78b5b
 mtime_utc: 2026-04-23T17:44:04Z
 produced_at_utc: 2026-04-23T13:25:43Z
