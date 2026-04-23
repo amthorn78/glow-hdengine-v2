@@ -311,6 +311,9 @@ CONJUNCTION_WRITER_ARTIFACTS: list[dict[str, object]] = [
 ]
 
 FORCE_REFRESH_ARTIFACT_RELS: set[str] = {
+    "audit/qa/hde-epic030/pr-03/category_order_binding.log",
+    "audit/qa/hde-epic030/pr-03/compat_identity_binding.log",
+    "audit/qa/hde-epic030/pr-03/compat_parity_binding.log",
     "artifacts/writer/conjunction_write_readback.log",
     "artifacts/writer/conjunction_writer_summary.json",
     "artifacts/evidence_index.jsonl",
