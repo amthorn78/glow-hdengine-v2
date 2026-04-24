@@ -1,6 +1,7 @@
-# HD Engine Repo Docs — Index (HDE-EPIC027 aligned)
+# HD Engine Repo Docs — Index (HDE-EPIC030 aligned)
 
 ## Acceptance & evidence
+- EPIC030 implementation-slice evidence families: `audit/qa/hde-epic030/pr-01/` (normalization), `pr-02/` (dev sampler harness), `pr-03/` (compat bindings), `pr-04/` (band-threshold tuning/bindings), `pr-05/` (category-framework bindings). Each artifact in these families has a sibling `.path_proof.txt` and is indexed in `docs/evidence/INDEX.json` + `artifacts/evidence_index.jsonl`.
 - Evidence skeleton (same-PR rule): `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, and `artifacts/evidence_index.jsonl` (all with `.path_proof.txt` siblings; mirror self-records include `mirror_body_sha256`). Refresh with `python tools/evidence/update_evidence_index.py` → `python tools/evidence/orientation_demo.py` → their `--check` variants → `ci/checks/check_mirror_schema.sh`.
 - Endpoint catalog source-of-truth: `docs/ENDPOINTS_CATALOG.json` + `docs/ENDPOINTS_CATALOG.json.sha256` (with docs-side `.path_proof.txt` companions) and audit mirror `artifacts/audit/ENDPOINTS_CATALOG.json`. Catalog includes conjunction dev routes and current methods/env-gates as shipped.
 - EPIC027 QA ledger: per-check logs under `audit/qa/hde-epic027/checks/<check_id>/primary.log`, token matrix at `audit/qa/hde-epic027/token_evidence_matrix.md`, and acceptance-map viability log at `audit/qa/hde-epic027/acceptance_map_viability.log`. Close-pack: `audit/EPIC-027_MANIFEST.json`, `audit/EPIC-027_close_report.md`, and acceptance map `docs/acceptance_map_epic027.json`.
