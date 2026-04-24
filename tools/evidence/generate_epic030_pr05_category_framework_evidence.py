@@ -199,7 +199,16 @@ def generate() -> None:
     index_ok = _index_has_pr05_bindings()
     mirror_ok = _mirror_has_pr05_bindings()
 
-    binding_status = all((per_channel.get("status") == "PASS", category_order_ok, reader_public_ok, index_ok, mirror_ok))
+    binding_status = all(
+        (
+            per_channel.get("status") == "PASS",
+            compare_ok,
+            category_order_ok,
+            reader_public_ok,
+            index_ok,
+            mirror_ok,
+        )
+    )
     binding_lines = [
         "schema: hde_epic030.pr05.category_framework_binding.v1",
         f"produced_at_utc: {produced_at}",
@@ -213,6 +222,7 @@ def generate() -> None:
         f"mirror_binding_present: {mirror_ok}",
         f"per_channel_mechanics_status: {per_channel.get('status')}",
         "canonical_compare_artifact: audit/qa/hde-epic030/pr-05/category_canonical_compare.log",
+        f"canonical_compare_status: {'PASS' if compare_ok else 'FAIL'}",
         "status: PASS" if binding_status else "status: FAIL",
     ]
     _write_text(OUT_DIR / "category_framework_binding.log", "\n".join(binding_lines))
