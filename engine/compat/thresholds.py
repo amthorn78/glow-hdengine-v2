@@ -1,14 +1,18 @@
-"""
-Band thresholds (inclusive) for EPIC003.
-Order of checks: <= cool_max, <= open_max, <= warm_max, else Glow.
-A score of 100 always maps to Glow.
-"""
+"""Band thresholds (inclusive) sourced from the constants-pack threshold edges."""
 from __future__ import annotations
+
 from typing import Dict
 
+from engine.magic10.thresholds import BANDS as _PACK_BANDS
+from engine.magic10.thresholds import THRESHOLD_EDGES
+
+if len(THRESHOLD_EDGES) != 4:
+    raise ValueError("Expected exactly four threshold edges from constants pack")
+
 THRESHOLDS_V1: Dict[str, int] = {
-    "cool_max": 24,
-    "open_max": 49,
-    "warm_max": 74,
+    "cool_max": int(THRESHOLD_EDGES[0]),
+    "open_max": int(THRESHOLD_EDGES[1]),
+    "warm_max": int(THRESHOLD_EDGES[2]),
 }
-BANDS = ("Cool","Open","Warm","Glow")
+
+BANDS = tuple(_PACK_BANDS)
