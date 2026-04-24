@@ -1,5 +1,15 @@
 # CHANGELOG
 
+Unreleased — HDE-EPIC030: final repo docs sweep (README/CHANGELOG/AGENTS/docs/)
+
+### Added
+- Documented EPIC030 Dissolution Pass 3 evidence families under `audit/qa/hde-epic030/pr-01/` … `pr-05/` with governed `.path_proof.txt` siblings and Index/Mirror bindings.
+- Documented PR-05 category-framework closure evidence for `HDE-DISS006.3`, `HDE-DISS006.4`, and `HDE-DISS006.5` via `per_channel_mechanics.json`, `category_canonical_compare.log`, and `category_framework_binding.log`.
+
+### Changed / Fixed
+- Updated docs posture from EPIC027-led wording to EPIC030 current truth: internal/admin/dev-surface closure focus, explicit public-vs-admin split, and unchanged public Reader bands-only numeric-free contract.
+- Clarified EPIC030 slice evidence roles (`pr-01`…`pr-05`) without implying new public routes/flags, alternate evidence homes, or EPIC030 close-pack artifacts.
+
 Unreleased — HDE-EPIC027: final repo docs sweep (README/CHANGELOG/AGENTS/docs/)
 
 ### Added

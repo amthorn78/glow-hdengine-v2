@@ -2,9 +2,17 @@
 > Add new entries there first, then mirror key pointers here for quick navigation. Update the skeleton (`docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl` + `.path_proof.txt` companions) in the same PR whenever governed bytes change.
 > Refresh order: run `python tools/evidence/update_evidence_index.py` (write) before `python tools/evidence/orientation_demo.py` (write), then their `--check` variants, and finish with `ci/checks/check_mirror_schema.sh`. Mirror path proofs include both `sha256` and `mirror_body_sha256` for the self-record entry in `artifacts/evidence_index.jsonl`.
 
-# Appendix-D — Evidence Index (EPIC-027)
+# Appendix-D — Evidence Index (EPIC-030 + historical pointers)
 
-## QA ledger and close-pack
+## EPIC030 PR-slice evidence families (implementation closure, not close-pack)
+* PR-01 normalization: `audit/qa/hde-epic030/pr-01/zero_weight_handoff.json`, `audit/qa/hde-epic030/pr-01/invalid_viewer_prefs.log`, `audit/qa/hde-epic030/pr-01/normalization_canonical_compare.log`
+* PR-02 dev sampler harness: `audit/qa/hde-epic030/pr-02/dev_sampler_http_headers.txt`, `audit/qa/hde-epic030/pr-02/dev_sampler_http_body.json`, `audit/qa/hde-epic030/pr-02/dev_sampler_seed_only.json`, `audit/qa/hde-epic030/pr-02/dev_sampler_two_run_identity.json`
+* PR-03 compat bindings: `audit/qa/hde-epic030/pr-03/category_order_binding.log`, `audit/qa/hde-epic030/pr-03/compat_identity_binding.log`, `audit/qa/hde-epic030/pr-03/compat_parity_binding.log`
+* PR-04 band-threshold/tuning bindings: `audit/qa/hde-epic030/pr-04/band_edges_binding.log`, `audit/qa/hde-epic030/pr-04/band_thresholds_diff.json`, `audit/qa/hde-epic030/pr-04/band_thresholds_identity_hash.txt`
+* PR-05 category-framework closure: `audit/qa/hde-epic030/pr-05/per_channel_mechanics.json`, `audit/qa/hde-epic030/pr-05/category_canonical_compare.log`, `audit/qa/hde-epic030/pr-05/category_framework_binding.log`
+* Path-proof discipline: each EPIC030 PR-slice artifact above has a sibling `.path_proof.txt`; index/mirror entries are in `docs/evidence/INDEX.json` and `artifacts/evidence_index.jsonl`.
+
+## Historical EPIC027 QA ledger and close-pack (not EPIC030 outputs)
 * Acceptance map: `docs/acceptance_map_epic027.json`
 * Token matrix: `audit/qa/hde-epic027/token_evidence_matrix.md`
 * Acceptance-map viability: `audit/qa/hde-epic027/acceptance_map_viability.log`
