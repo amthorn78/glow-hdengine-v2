@@ -96,18 +96,23 @@ def generate() -> None:
         "subtask_id: HDE-DISS005.3",
         "hash_basis: sha256 of LF-terminated compat body",
     ]
+    run_hashes: dict[str, str] = {}
     all_ok = True
     for run_id, path in runs:
         data = path.read_bytes()
         if not data.endswith(b"\n"):
             data = data + b"\n"
         digest = hashlib.sha256(data).hexdigest()
+        run_hashes[run_id] = digest
         identity_lines.extend(
             [
                 f"run_{run_id}_source: {path.relative_to(ROOT).as_posix()}",
                 f"run_{run_id}_identity_hash: {digest}",
             ]
         )
+    ab_ba_identity_match = run_hashes.get("AB") == run_hashes.get("BA")
+    all_ok = all_ok and ab_ba_identity_match
+    identity_lines.append(f"ab_ba_identity_match: {ab_ba_identity_match}")
     if (OUT_DIR / "band_thresholds_identity_hash.txt").exists():
         previous = {
             line.split(":", 1)[0]: line.split(":", 1)[1].strip()

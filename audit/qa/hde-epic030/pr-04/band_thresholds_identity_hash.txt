@@ -1,5 +1,5 @@
 schema: hde_epic030.pr04.band_thresholds_identity_hash.v1
-produced_at_utc: 2026-04-24T12:10:47Z
+produced_at_utc: 2026-04-24T12:26:42Z
 epic_id: HDE-EPIC030
 task_id: HDE-DISS005
 subtask_id: HDE-DISS005.3
@@ -8,4 +8,5 @@ run_AB_source: artifacts/compat/AB.json
 run_AB_identity_hash: f4616998ad4ce55dc7c716388709f767718a4d3056d866f9c2f73fa4f4703ed7
 run_BA_source: artifacts/compat/BA.json
 run_BA_identity_hash: f4616998ad4ce55dc7c716388709f767718a4d3056d866f9c2f73fa4f4703ed7
+ab_ba_identity_match: True
 status: PASS
