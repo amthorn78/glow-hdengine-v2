@@ -277,6 +277,33 @@ EPIC030_PR04_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     },
 ]
 
+EPIC030_PR05_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "epic030.pr05.category_framework_binding",
+        "discovered_physical_path": "audit/qa/hde-epic030/pr-05/category_framework_binding.log",
+        "epic_id": "HDE-EPIC030",
+        "record_type": "epic030_pr05_evidence",
+        "schema_version": "1.0",
+        "notes": "EPIC030 PR-05 category-framework binding evidence for HDE-DISS006.3/.4/.5",
+    },
+    {
+        "artifact_key": "epic030.pr05.per_channel_mechanics",
+        "discovered_physical_path": "audit/qa/hde-epic030/pr-05/per_channel_mechanics.json",
+        "epic_id": "HDE-EPIC030",
+        "record_type": "epic030_pr05_evidence",
+        "schema_version": "1.0",
+        "notes": "EPIC030 PR-05 per-channel mechanics evidence for canonical NN-NN and circuit scope (HDE-DISS006.3)",
+    },
+    {
+        "artifact_key": "epic030.pr05.category_canonical_compare",
+        "discovered_physical_path": "audit/qa/hde-epic030/pr-05/category_canonical_compare.log",
+        "epic_id": "HDE-EPIC030",
+        "record_type": "epic030_pr05_evidence",
+        "schema_version": "1.0",
+        "notes": "EPIC030 PR-05 canonical JSON compare evidence for category framework (HDE-DISS006.4)",
+    },
+]
+
 A7_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
         "artifact_key": "a7.success_encoding_invariance",
@@ -341,6 +368,9 @@ FORCE_REFRESH_ARTIFACT_RELS: set[str] = {
     "audit/qa/hde-epic030/pr-04/band_edges_binding.log",
     "audit/qa/hde-epic030/pr-04/band_thresholds_diff.json",
     "audit/qa/hde-epic030/pr-04/band_thresholds_identity_hash.txt",
+    "audit/qa/hde-epic030/pr-05/category_framework_binding.log",
+    "audit/qa/hde-epic030/pr-05/per_channel_mechanics.json",
+    "audit/qa/hde-epic030/pr-05/category_canonical_compare.log",
     "audit/qa/hde-epic030/pr-03/category_order_binding.log",
     "audit/qa/hde-epic030/pr-03/compat_identity_binding.log",
     "audit/qa/hde-epic030/pr-03/compat_parity_binding.log",
@@ -586,6 +616,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *EPIC030_PR02_PRIMARY_ARTIFACTS,
             *EPIC030_PR03_PRIMARY_ARTIFACTS,
             *EPIC030_PR04_PRIMARY_ARTIFACTS,
+            *EPIC030_PR05_PRIMARY_ARTIFACTS,
             *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,
