@@ -1,0 +1,11 @@
+schema: hde_epic030.pr04.band_edges_binding.v1
+produced_at_utc: 2026-04-24T12:10:47Z
+epic_id: HDE-EPIC030
+task_id: HDE-DISS005
+subtask_id: HDE-DISS005.2
+constants_pack_artifact: artifacts/thresholds/band_edges.json
+compat_thresholds_binding: engine.compat.thresholds.THRESHOLDS_V1
+bands: Cool,Open,Warm,Glow
+edges: 24,49,74,100
+thresholds_v1: cool_max=24,open_max=49,warm_max=74
+status: PASS

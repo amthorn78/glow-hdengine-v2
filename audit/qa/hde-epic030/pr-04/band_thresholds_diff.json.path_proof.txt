@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic030/pr-04/band_thresholds_diff.json
+size_bytes: 693
+sha256: 5d60d90d8367f98866b1aa8a3916d017423564c4c8725b5c1d7d72c145d0a0f0
+mtime_utc: 2026-04-24T12:10:47Z
+produced_at_utc: 2026-04-24T12:11:00Z

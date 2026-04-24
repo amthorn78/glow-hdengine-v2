@@ -250,6 +250,33 @@ EPIC030_PR03_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     },
 ]
 
+EPIC030_PR04_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "epic030.pr04.band_thresholds_diff",
+        "discovered_physical_path": "audit/qa/hde-epic030/pr-04/band_thresholds_diff.json",
+        "epic_id": "HDE-EPIC030",
+        "record_type": "epic030_pr04_evidence",
+        "schema_version": "1.0",
+        "notes": "EPIC030 PR-04 compact threshold diffs for HDE-DISS005.3",
+    },
+    {
+        "artifact_key": "epic030.pr04.band_thresholds_identity_hash",
+        "discovered_physical_path": "audit/qa/hde-epic030/pr-04/band_thresholds_identity_hash.txt",
+        "epic_id": "HDE-EPIC030",
+        "record_type": "epic030_pr04_evidence",
+        "schema_version": "1.0",
+        "notes": "EPIC030 PR-04 LF-terminated compat identity hashes for tuning runs (HDE-DISS005.3)",
+    },
+    {
+        "artifact_key": "epic030.pr04.band_edges_binding",
+        "discovered_physical_path": "audit/qa/hde-epic030/pr-04/band_edges_binding.log",
+        "epic_id": "HDE-EPIC030",
+        "record_type": "epic030_pr04_evidence",
+        "schema_version": "1.0",
+        "notes": "EPIC030 PR-04 constants-pack band-edge binding evidence for HDE-DISS005.2",
+    },
+]
+
 A7_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
         "artifact_key": "a7.success_encoding_invariance",
@@ -311,6 +338,9 @@ CONJUNCTION_WRITER_ARTIFACTS: list[dict[str, object]] = [
 ]
 
 FORCE_REFRESH_ARTIFACT_RELS: set[str] = {
+    "audit/qa/hde-epic030/pr-04/band_edges_binding.log",
+    "audit/qa/hde-epic030/pr-04/band_thresholds_diff.json",
+    "audit/qa/hde-epic030/pr-04/band_thresholds_identity_hash.txt",
     "audit/qa/hde-epic030/pr-03/category_order_binding.log",
     "audit/qa/hde-epic030/pr-03/compat_identity_binding.log",
     "audit/qa/hde-epic030/pr-03/compat_parity_binding.log",
@@ -555,6 +585,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *EPIC028_PRIMARY_ARTIFACTS,
             *EPIC030_PR02_PRIMARY_ARTIFACTS,
             *EPIC030_PR03_PRIMARY_ARTIFACTS,
+            *EPIC030_PR04_PRIMARY_ARTIFACTS,
             *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,
