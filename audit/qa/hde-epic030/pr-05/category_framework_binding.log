@@ -1,5 +1,5 @@
 schema: hde_epic030.pr05.category_framework_binding.v1
-produced_at_utc: 2026-04-24T13:17:40Z
+produced_at_utc: 2026-04-24T13:47:59Z
 epic_id: HDE-EPIC030
 task_id: HDE-DISS006
 subtask_ids: HDE-DISS006.3,HDE-DISS006.4,HDE-DISS006.5
@@ -10,4 +10,5 @@ index_binding_present: True
 mirror_binding_present: True
 per_channel_mechanics_status: PASS
 canonical_compare_artifact: audit/qa/hde-epic030/pr-05/category_canonical_compare.log
+canonical_compare_status: PASS
 status: PASS
