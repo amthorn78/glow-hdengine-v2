@@ -1,0 +1,6 @@
+schema: hde_epic030.po001.surface_inventory.v1
+route:/api/compat/v1:present=True
+route:/internal/dev/sampler:present=True
+route:/reader:present=True
+route:/dev/sampler/conjunction:present=True
+no_public_widening_found: True

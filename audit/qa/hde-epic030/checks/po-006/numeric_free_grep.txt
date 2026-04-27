@@ -1,0 +1,1 @@
+8:public_reader_bands_only_numeric_free: True

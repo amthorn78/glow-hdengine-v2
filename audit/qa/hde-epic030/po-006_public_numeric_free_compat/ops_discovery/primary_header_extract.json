@@ -1,0 +1,30 @@
+{
+  "exists": true,
+  "parse_ok": true,
+  "path": "audit/qa/hde-epic030/checks/po-006/primary.log",
+  "raw_first_line": "{\"schema_version\": \"pf27.step_log_header.v1\", \"timestamp_utc\": \"2026-04-27T16:06:50Z\", \"check_id\": \"po-006\", \"check_name\": \"Public user-facing compatibility output must remain band-only and free of numeric compatibility details.\", \"status\": \"FAIL_BEHAVIOR\", \"fail_status\": \"FAIL_BEHAVIOR\", \"command\": \"mkdir -p audit/qa/hde-epic030/checks/po-006; python -m pytest --version; python -m pip install -r requirements-dev.txt when pytest readiness fails; grep --version; python -m pytest tests/compat/test_compat_public_ab_ba_identity.py tests/compat/test_compat_public_lf_bom.py; grep -n public_reader_bands_only_numeric_free: True audit/qa/hde-epic030/pr-05/category_framework_binding.log; python - << 'PY' PF27 canonical inline header writer for CHECK po-006; cat audit/qa/hde-epic030/checks/po-006/pytest_stdout.log audit/qa/hde-epic030/checks/po-006/numeric_free_grep.txt >> audit/qa/hde-epic030/checks/po-006/primary.log\", \"command_provenance\": \"Copy/paste from approved plan with open-rails rerun requested by PO\", \"exit_code\": 1, \"evidence_artifacts\": [\"audit/qa/hde-epic030/checks/po-006/primary.log\", \"audit/qa/hde-epic030/checks/po-006/numeric_free_grep.txt\", \"audit/qa/hde-epic030/pr-05/category_framework_binding.log\"], \"captured_env\": {\"SAFE_MODE\": \"0\", \"ALLOW_NETWORK\": \"1\", \"APP_ENV\": \"dev\", \"LC_ALL\": \"C\", \"LANG\": \"C\", \"TZ\": \"UTC\"}, \"pf_refs\": [\"PF10 \u2014 HDE-Build Notes\", \"PF05 \u2014 HDE-CLI-API-Vendor-Ref\", \"PF02 \u2014 HDE Architecture\"], \"intended_tokens\": [], \"claimed_tokens\": []}",
+  "selected": {
+    "captured_env": {
+      "ALLOW_NETWORK": "1",
+      "APP_ENV": "dev",
+      "LANG": "C",
+      "LC_ALL": "C",
+      "SAFE_MODE": "0",
+      "TZ": "UTC"
+    },
+    "check_id": "po-006",
+    "claimed_tokens": [],
+    "command": "mkdir -p audit/qa/hde-epic030/checks/po-006; python -m pytest --version; python -m pip install -r requirements-dev.txt when pytest readiness fails; grep --version; python -m pytest tests/compat/test_compat_public_ab_ba_identity.py tests/compat/test_compat_public_lf_bom.py; grep -n public_reader_bands_only_numeric_free: True audit/qa/hde-epic030/pr-05/category_framework_binding.log; python - << 'PY' PF27 canonical inline header writer for CHECK po-006; cat audit/qa/hde-epic030/checks/po-006/pytest_stdout.log audit/qa/hde-epic030/checks/po-006/numeric_free_grep.txt >> audit/qa/hde-epic030/checks/po-006/primary.log",
+    "command_provenance": "Copy/paste from approved plan with open-rails rerun requested by PO",
+    "evidence_artifacts": [
+      "audit/qa/hde-epic030/checks/po-006/primary.log",
+      "audit/qa/hde-epic030/checks/po-006/numeric_free_grep.txt",
+      "audit/qa/hde-epic030/pr-05/category_framework_binding.log"
+    ],
+    "exit_code": 1,
+    "fail_status": "FAIL_BEHAVIOR",
+    "intended_tokens": [],
+    "schema_version": "pf27.step_log_header.v1",
+    "status": "FAIL_BEHAVIOR"
+  }
+}

@@ -1,0 +1,13 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-04-26T11:24:12Z", "check_id": "po-003", "check_name": "Viewer-preference normalization must reject invalid input while preserving deterministic, stable output for valid input.", "status": "PASS", "fail_status": "", "command": "mkdir -p audit/qa/hde-epic030/checks/po-003; python -m pytest --version; python -m pip install -r requirements-dev.txt when pytest readiness fails; python -m pytest tests/unit/test_viewer_prefs_normalization.py; python tools/evidence/generate_epic030_pr01_normalization_evidence.py; python - << 'PY' PF27 canonical inline header writer for CHECK po-003; cat audit/qa/hde-epic030/checks/po-003/pytest_stdout.log audit/qa/hde-epic030/checks/po-003/generator_stdout.log >> audit/qa/hde-epic030/checks/po-003/primary.log", "command_provenance": "Copy/paste from approved plan with QA syntax-safe dependency capture", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic030/checks/po-003/primary.log", "audit/qa/hde-epic030/pr-01/invalid_viewer_prefs.log", "audit/qa/hde-epic030/pr-01/normalization_canonical_compare.log"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 — HDE-Build Notes", "PF05 — HDE-CLI-API-Vendor-Ref", "PF02 — HDE Architecture"], "intended_tokens": [], "claimed_tokens": []}
+Python 3.11.15
+pytest 8.4.2
+============================= test session starts ==============================
+platform linux -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0
+rootdir: /workspaces/glow-hdengine-v2
+configfile: pytest.ini
+plugins: cov-4.1.0, mock-3.15.1
+collected 4 items
+
+tests/unit/test_viewer_prefs_normalization.py ....                       [100%]
+
+============================== 4 passed in 0.18s ===============================

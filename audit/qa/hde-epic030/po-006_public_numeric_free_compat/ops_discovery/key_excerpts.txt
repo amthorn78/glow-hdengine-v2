@@ -1,0 +1,24 @@
+=== audit/qa/hde-epic030/checks/po-006/primary.log ===
+1: {"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-04-27T16:06:50Z", "check_id": "po-006", "check_name": "Public user-facing compatibility output must remain band-only and free of numeric compatibility details.", "status": "FAIL_BEHAVIOR", "fail_status": "FAIL_BEHAVIOR", "command": "mkdir -p audit/qa/hde-epic030/checks/po-006; python -m pytest --version; python -m pip install -r requirements-dev.txt when pytest readiness fails; grep --version; python -m pytest tests/compat/test_compat_public_ab_ba_identity.py tests/compat/test_compat_public_lf_bom.py; grep -n public_reader_bands_only_numeric_free: True audit/qa/hde-epic030/pr-05/category_framework_binding.log; python - << 'PY' PF27 canonical inline header writer for CHECK po-006; cat audit/qa/hde-epic030/checks/po-006/pytest_stdout.log audit/qa/hde-epic030/checks/po-006/numeric_free_grep.txt >> audit/qa/hde-epic030/checks/po-006/primary.log", "command_provenance": "Copy/paste from approved plan with open-rails rerun requested by PO", "exit_code": 1, "evidence_artifacts": ["audit/qa/hde-epic030/checks/po-006/primary.log", "audit/qa/hde-epic030/checks/po-006/numeric_free_grep.txt", "audit/qa/hde-epic030/pr-05/category_framework_binding.log"], "captured_env": {"SAFE_MODE": "0", "ALLOW_NETWORK": "1", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 — HDE-Build Notes", "PF05 — HDE-CLI-API-Vendor-Ref", "PF02 — HDE Architecture"], "intended_tokens": [], "claimed_tokens": []}
+21: tests/compat/test_compat_public_ab_ba_identity.py .                      [ 50%]
+22: tests/compat/test_compat_public_lf_bom.py F                              [100%]
+32: >       out = serialize(mod.compat_public(ca, cb))
+34: E       TypeError: compat_public() missing 5 required positional arguments: 'viewer_top', 'viewer_weights', 'engine_tag', 'release_id', and 'invocation_tag'
+36: tests/compat/test_compat_public_lf_bom.py:11: TypeError
+38: FAILED tests/compat/test_compat_public_lf_bom.py::test_public_bytes_lf_and_no_bom
+40: 8:public_reader_bands_only_numeric_free: True
+=== audit/qa/hde-epic030/checks/po-006/pytest_stdout.log ===
+8: tests/compat/test_compat_public_ab_ba_identity.py .                      [ 50%]
+9: tests/compat/test_compat_public_lf_bom.py F                              [100%]
+19: >       out = serialize(mod.compat_public(ca, cb))
+21: E       TypeError: compat_public() missing 5 required positional arguments: 'viewer_top', 'viewer_weights', 'engine_tag', 'release_id', and 'invocation_tag'
+23: tests/compat/test_compat_public_lf_bom.py:11: TypeError
+25: FAILED tests/compat/test_compat_public_lf_bom.py::test_public_bytes_lf_and_no_bom
+=== audit/qa/hde-epic030/checks/po-006/pytest_stderr.log ===
+NO_MATCHES
+=== audit/qa/hde-epic030/checks/po-006/numeric_free_grep.txt ===
+1: 8:public_reader_bands_only_numeric_free: True
+=== audit/qa/hde-epic030/checks/po-006/grep_stderr.log ===
+NO_MATCHES
+=== audit/qa/hde-epic030/pr-05/category_framework_binding.log ===
+8: public_reader_bands_only_numeric_free: True

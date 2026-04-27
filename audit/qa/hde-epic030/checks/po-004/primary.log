@@ -1,0 +1,15 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-04-27T14:01:55Z", "check_id": "po-004", "check_name": "The dev-only candidate-selection harness must remain non-public, environment-bounded, deterministic, and limited to safe diagnostic output.", "status": "PASS", "fail_status": "", "command": "mkdir -p audit/qa/hde-epic030/checks/po-004; python -m pip --version; python -m pytest --version; python -m pytest tests/adapter/test_dev_sampler_http.py tests/cli/test_dev_sampler_cli.py; python tools/evidence/generate_epic030_pr02_sampler_harness_evidence.py; python - << 'PY' PF27 canonical inline header writer for CHECK po-004; cat preflight/pytest/generator stdout logs into primary.log", "command_provenance": "Approved po-004 rerun with verified pip/pytest readiness", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic030/checks/po-004/primary.log", "audit/qa/hde-epic030/pr-02/dev_sampler_two_run_identity.json", "audit/qa/hde-epic030/pr-02/dev_sampler_http_headers.txt"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 — HDE-Build Notes", "PF05 — HDE-CLI-API-Vendor-Ref", "PF02 — HDE Architecture"], "intended_tokens": [], "claimed_tokens": []}
+Python 3.13.5
+pip 25.1.1 from /usr/lib/python3/dist-packages/pip (python 3.13)
+pytest 8.4.2
+============================= test session starts ==============================
+platform linux -- Python 3.13.5, pytest-8.4.2, pluggy-1.6.0
+rootdir: /workspaces/glow-hdengine-v2
+configfile: pytest.ini
+plugins: cov-4.1.0, mock-3.15.1
+collected 10 items
+
+tests/adapter/test_dev_sampler_http.py .......                           [ 70%]
+tests/cli/test_dev_sampler_cli.py ...                                    [100%]
+
+============================== 10 passed in 1.00s ==============================

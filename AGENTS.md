@@ -15,6 +15,7 @@
 
 ## Operating workflow (closed rails, evidence discipline)
 - Closed rails default: `LC_ALL=C`, `LANG=C`, `TZ=UTC`, `SAFE_MODE=1`, `ALLOW_NETWORK=0` enforced by `engine.runtime.determinism_env.ensure_determinism_env` and checked via `ci/checks/check_env_pins.sh`. No network access for public/QA surfaces unless explicitly allowed for a governed harness.
+- Pytest readiness rule: always install dev test dependencies before pytest-dependent checks using `python -m pip install -r requirements-dev.txt` (or the environment-equivalent Python executable), then run `python -m pytest --version` as readiness proof.
 - PF05 showcompat posture: when Live QA requires `hdctl showcompat` in pre-Glow environments, use birth-argument inputs with `--source vendor` and allow open rails as required by the plan; record the active env values in the step log. Treat zero-arg showcompat plans as planning defects and apply a minimal Moon Loop deviation to align with PF05.
 - Conjunction surfaces (EPIC027): use `hdctl showcompat --conjunction` for CLI conjunction output. Input modes are verified in-repo as `--user-a/--user-b`, `--pair-file`, `--a-file/--b-file`, or stdin pair payloads; do not invent `--pair` syntax.
 - Conjunction SAFE rails: unresolved conjunction users resolve through BodyGraph lookup/resolver. Default rails are closed (`SAFE_MODE=1`, `ALLOW_NETWORK=0`) so provider acquisition can refuse explicitly (`PROVIDER_REFUSED`); open rails require both `SAFE_MODE=0` and `ALLOW_NETWORK=1`.

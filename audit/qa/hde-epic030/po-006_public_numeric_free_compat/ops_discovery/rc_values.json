@@ -1,0 +1,17 @@
+{
+  "exit_code": {
+    "exists": true,
+    "path": "audit/qa/hde-epic030/checks/po-006/exit_code.txt",
+    "value": "1"
+  },
+  "grep_rc": {
+    "exists": true,
+    "path": "audit/qa/hde-epic030/checks/po-006/grep_rc.txt",
+    "value": "0"
+  },
+  "pytest_rc": {
+    "exists": true,
+    "path": "audit/qa/hde-epic030/checks/po-006/pytest_rc.txt",
+    "value": "1"
+  }
+}

@@ -1,0 +1,12 @@
+EPIC_ID=hde-epic030
+STEP_SLUG=po-006_public_numeric_free_compat
+OUTPUT_DIR=audit/qa/${EPIC_ID}/${STEP_SLUG}/ops_discovery
+mkdir -p "$OUTPUT_DIR"
+python --version
+python -m pytest --version
+command -v grep
+file/existence inventory for po-006 required loci and Step-0A
+parse po-006 primary.log header
+capture rc values and key excerpts from po-006 artifacts
+capture category_framework_binding.log numeric-free marker lines
+write evidence file sha256 ledger

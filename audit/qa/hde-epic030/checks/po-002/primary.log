@@ -1,0 +1,14 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-04-25T21:57:11Z", "check_id": "po-002", "check_name": "Zero-weight user intent must be preserved through normalization and lead to the intended candidate exclusion behavior.", "status": "PASS", "fail_status": "", "command": "mkdir -p audit/qa/hde-epic030/checks/po-002; python -m pytest --version; python -m pip install -r requirements-dev.txt when pytest readiness fails; python -m pytest tests/unit/test_viewer_prefs_normalization.py tests/unit/test_sampler_core.py; python tools/evidence/generate_epic030_pr01_normalization_evidence.py; python - << 'PY' PF27 canonical inline header writer for CHECK po-002; cat audit/qa/hde-epic030/checks/po-002/pytest_stdout.log audit/qa/hde-epic030/checks/po-002/generator_stdout.log >> audit/qa/hde-epic030/checks/po-002/primary.log", "command_provenance": "Copy/paste from approved plan with QA syntax-safe dependency capture", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic030/checks/po-002/primary.log", "audit/qa/hde-epic030/checks/po-002/pytest_stdout.log", "audit/qa/hde-epic030/checks/po-002/generator_stdout.log", "audit/qa/hde-epic030/pr-01/zero_weight_handoff.json"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 — HDE-Build Notes", "PF05 — HDE-CLI-API-Vendor-Ref", "PF02 — HDE Architecture"], "intended_tokens": [], "claimed_tokens": []}
+Python 3.11.15
+pytest 8.4.2
+============================= test session starts ==============================
+platform linux -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0
+rootdir: /workspaces/glow-hdengine-v2
+configfile: pytest.ini
+plugins: cov-4.1.0, mock-3.15.1
+collected 8 items
+
+tests/unit/test_viewer_prefs_normalization.py ....                       [ 50%]
+tests/unit/test_sampler_core.py ....                                     [100%]
+
+============================== 8 passed in 0.05s ===============================

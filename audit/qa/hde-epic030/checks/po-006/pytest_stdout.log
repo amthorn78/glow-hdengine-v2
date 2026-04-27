@@ -1,0 +1,26 @@
+============================= test session starts ==============================
+platform linux -- Python 3.13.5, pytest-8.4.2, pluggy-1.6.0
+rootdir: /workspaces/glow-hdengine-v2
+configfile: pytest.ini
+plugins: cov-4.1.0, mock-3.15.1
+collected 2 items
+
+tests/compat/test_compat_public_ab_ba_identity.py .                      [ 50%]
+tests/compat/test_compat_public_lf_bom.py F                              [100%]
+
+=================================== FAILURES ===================================
+_______________________ test_public_bytes_lf_and_no_bom ________________________
+
+    def test_public_bytes_lf_and_no_bom():
+        mod = importlib.import_module("engine.compat.compute")
+        # Use tz from pinned IANA list.
+        ca = load_chart("1990-05-04","14:22","Austin, US", tz="Europe/Amsterdam")
+        cb = load_chart("1992-07-19","08:05","New York, US", tz="Europe/Amsterdam")
+>       out = serialize(mod.compat_public(ca, cb))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: compat_public() missing 5 required positional arguments: 'viewer_top', 'viewer_weights', 'engine_tag', 'release_id', and 'invocation_tag'
+
+tests/compat/test_compat_public_lf_bom.py:11: TypeError
+=========================== short test summary info ============================
+FAILED tests/compat/test_compat_public_lf_bom.py::test_public_bytes_lf_and_no_bom
+========================= 1 failed, 1 passed in 0.08s ==========================

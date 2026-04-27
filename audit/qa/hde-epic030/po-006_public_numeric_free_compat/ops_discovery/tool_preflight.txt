@@ -1,0 +1,11 @@
+]633;E;printf 'python --version\\n';e856a897-8a8c-43ee-9239-e7907d70a7fa]633;Cpython --version
+Python 3.13.5
+python_version_rc=0
+
+python -m pytest --version
+pytest 8.4.2
+pytest_version_rc=0
+
+command -v grep
+/usr/bin/grep
+grep_lookup_rc=0

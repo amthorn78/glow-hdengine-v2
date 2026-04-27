@@ -1,0 +1,13 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-04-27T14:35:07Z", "check_id": "po-005", "check_name": "Compatibility behavior must be proven order-neutral, identity-stable, and category-order coherent for the implemented slice.", "status": "PASS", "fail_status": "", "command": "mkdir -p audit/qa/hde-epic030/checks/po-005; python -m pytest --version; python -m pip install -r requirements-dev.txt when pytest readiness fails; python -m pytest tests/compat/test_compat_public_ab_ba_identity.py; python tools/evidence/generate_epic030_pr03_compat_evidence.py; python - << 'PY' PF27 canonical inline header writer for CHECK po-005; cat audit/qa/hde-epic030/checks/po-005/pytest_stdout.log audit/qa/hde-epic030/checks/po-005/generator_stdout.log >> audit/qa/hde-epic030/checks/po-005/primary.log", "command_provenance": "Copy/paste from approved plan with QA syntax-safe dependency capture", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic030/checks/po-005/primary.log", "audit/qa/hde-epic030/pr-03/compat_identity_binding.log", "audit/qa/hde-epic030/pr-03/compat_parity_binding.log"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 — HDE-Build Notes", "PF05 — HDE-CLI-API-Vendor-Ref", "PF02 — HDE Architecture"], "intended_tokens": [], "claimed_tokens": []}
+Python 3.13.5
+pytest 8.4.2
+============================= test session starts ==============================
+platform linux -- Python 3.13.5, pytest-8.4.2, pluggy-1.6.0
+rootdir: /workspaces/glow-hdengine-v2
+configfile: pytest.ini
+plugins: cov-4.1.0, mock-3.15.1
+collected 1 item
+
+tests/compat/test_compat_public_ab_ba_identity.py .                      [100%]
+
+============================== 1 passed in 0.05s ===============================

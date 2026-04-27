@@ -1,0 +1,7 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-04-25T20:55:10Z", "check_id": "po-001", "check_name": "The epic must remain a Dissolution closeout of internal and admin-only behavior, without widening the public user-facing contract.", "status": "PASS", "fail_status": "", "command": "mkdir -p audit/qa/hde-epic030/checks/po-001; python - << 'PY' surface inventory command for CHECK po-001; python - << 'PY' PF27 canonical inline header writer for CHECK po-001; cat audit/qa/hde-epic030/checks/po-001/surface_inventory.txt >> audit/qa/hde-epic030/checks/po-001/primary.log", "command_provenance": "Plan + QA syntax correction", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic030/checks/po-001/primary.log", "audit/qa/hde-epic030/checks/po-001/surface_inventory.txt", "audit/qa/hde-epic030/checks/po-001/exit_code.txt"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 — HDE-Build Notes", "PF05 — HDE-CLI-API-Vendor-Ref", "PF02 — HDE Architecture"], "intended_tokens": [], "claimed_tokens": []}
+schema: hde_epic030.po001.surface_inventory.v1
+route:/api/compat/v1:present=True
+route:/internal/dev/sampler:present=True
+route:/reader:present=True
+route:/dev/sampler/conjunction:present=True
+no_public_widening_found: True

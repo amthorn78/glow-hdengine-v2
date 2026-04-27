@@ -49,3 +49,15 @@
 {"ts":"2025-09-29T01:16:41Z","route":"loader.load_chart","provider":"fixtures","source":"default","status":"ok","duration_ms":0,"safe_mode":true,"correlation_id":"CID-94f4723d24c769a6"}
 {"ts":"2025-09-29T01:16:41Z","route":"loader.load_chart","provider":"fixtures","source":"default","status":"ok","duration_ms":0,"safe_mode":true,"correlation_id":"CID-67dae63bcf600050"}
 {"ts":"2025-09-29T01:16:41Z","route":"loader.load_chart","provider":"fixtures","source":"default","status":"ok","duration_ms":0,"safe_mode":true,"correlation_id":"CID-67dae63bcf600050"}
+{"ts":"2026-04-27T14:57:43Z","route":"loader.load_chart","provider":"fixtures","source":"default","status":"ok","duration_ms":4,"safe_mode":true,"correlation_id":"CID-0c851239277b41d0"}
+{"ts":"2026-04-27T14:57:43Z","route":"loader.load_chart","provider":"fixtures","source":"default","status":"ok","duration_ms":0,"safe_mode":true,"correlation_id":"CID-77a12fe8bc95a36f"}
+{"ts":"2026-04-27T15:04:14Z","route":"loader.load_chart","provider":"fixtures","source":"default","status":"ok","duration_ms":2,"safe_mode":false,"correlation_id":"CID-61d5086858d90e89"}
+{"ts":"2026-04-27T15:04:14Z","route":"loader.load_chart","provider":"fixtures","source":"default","status":"ok","duration_ms":0,"safe_mode":false,"correlation_id":"CID-257a6bce3d11134d"}
+{"ts":"2026-04-27T15:06:11Z","route":"loader.load_chart","provider":"fixtures","source":"default","status":"ok","duration_ms":3,"safe_mode":true,"correlation_id":"CID-b303b2e84224f2c0"}
+{"ts":"2026-04-27T15:06:11Z","route":"loader.load_chart","provider":"fixtures","source":"default","status":"ok","duration_ms":0,"safe_mode":true,"correlation_id":"CID-5e3ed4ff866844d1"}
+{"ts":"2026-04-27T16:06:38Z","route":"loader.load_chart","provider":"fixtures","source":"default","status":"ok","duration_ms":40,"safe_mode":false,"correlation_id":"CID-a497900d15609fd3"}
+{"ts":"2026-04-27T16:06:38Z","route":"loader.load_chart","provider":"fixtures","source":"default","status":"ok","duration_ms":0,"safe_mode":false,"correlation_id":"CID-fe2ac69933129d83"}
+{"ts":"2026-04-27T16:06:50Z","route":"loader.load_chart","provider":"fixtures","source":"default","status":"ok","duration_ms":3,"safe_mode":false,"correlation_id":"CID-c33ecd93d6a65632"}
+{"ts":"2026-04-27T16:06:50Z","route":"loader.load_chart","provider":"fixtures","source":"default","status":"ok","duration_ms":0,"safe_mode":false,"correlation_id":"CID-f0ba209cabd9ed1e"}
+{"ts":"2026-04-27T16:08:41Z","route":"loader.load_chart","provider":"fixtures","source":"default","status":"ok","duration_ms":2,"safe_mode":false,"correlation_id":"CID-eb36af0047feb925"}
+{"ts":"2026-04-27T16:08:41Z","route":"loader.load_chart","provider":"fixtures","source":"default","status":"ok","duration_ms":0,"safe_mode":false,"correlation_id":"CID-2209ac23f16b0185"}
