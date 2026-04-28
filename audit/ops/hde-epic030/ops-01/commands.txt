@@ -1,0 +1,33 @@
+/usr/bin/python3 --version > audit/ops/hde-epic030/ops-01/python_version.txt 2> audit/ops/hde-epic030/ops-01/python_version.stderr
+/usr/bin/python3 -m pytest --version > audit/ops/hde-epic030/ops-01/pytest_version.txt 2> audit/ops/hde-epic030/ops-01/pytest_version.stderr
+command -v grep > audit/ops/hde-epic030/ops-01/grep_path.txt 2> audit/ops/hde-epic030/ops-01/grep_path.stderr
+command -v hdctl > audit/ops/hde-epic030/ops-01/hdctl_path.txt 2> audit/ops/hde-epic030/ops-01/hdctl_path.stderr
+hdctl --help > audit/ops/hde-epic030/ops-01/hdctl_help.txt 2> audit/ops/hde-epic030/ops-01/hdctl_help.stderr
+hdctl showcompat --help > audit/ops/hde-epic030/ops-01/showcompat_help.txt 2> audit/ops/hde-epic030/ops-01/showcompat_help.stderr
+/usr/bin/python3 - <<'PY'
+import json
+import os
+
+keys = [
+"SAFE_MODE",
+"ALLOW_NETWORK",
+"APP_ENV",
+"LC_ALL",
+"LANG",
+"TZ",
+"HDE_BASE_URL",
+"HDAPI_BASE_URL",
+"HD_API_KEY",
+"GEO_API_KEY",
+]
+
+data = {key: bool(os.environ.get(key)) for key in keys}
+
+with open("audit/ops/hde-epic030/ops-01/env_presence.json", "w", encoding="utf-8") as f:
+    json.dump(data, f, sort_keys=True, separators=(",", ":"))
+    f.write("\n")
+PY
+find audit/ops/hde-epic030/ops-01 -type f ! -name files_sha256.txt -print | sort | xargs sha256sum > audit/ops/hde-epic030/ops-01/files_sha256.txt
+EDIT_ACTION audit/ops/hde-epic030/ops-01/vendor_command_candidate.txt -> replaced placeholder template with exact unresolved sentinel
+EDIT_ACTION audit/ops/hde-epic030/ops-01/discovery_summary.md -> aligned command-proof posture to unresolved and result posture to TOOLING_BLOCKED
+find audit/ops/hde-epic030/ops-01 -type f ! -name files_sha256.txt -print | sort | xargs sha256sum > audit/ops/hde-epic030/ops-01/files_sha256.txt
