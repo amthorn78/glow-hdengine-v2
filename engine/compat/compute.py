@@ -129,6 +129,15 @@ def _birth_fields(raw: object) -> Tuple[str | None, str | None, str | None]:
     return values[0], values[1], values[2]
 
 
+def _derived_birth_uid(raw: object) -> str | None:
+    birthdate, birthtime, location = _birth_fields(raw)
+    if not (birthdate and birthtime and location):
+        return None
+    preimage = f"birth|{birthdate}|{birthtime}|{location}".encode("utf-8")
+    digest = hashlib.sha256(preimage).hexdigest()[:32]
+    return f"birth-{digest}"
+
+
 def conjunction_public_resolved(
     left: Mapping[str, Any] | str,
     right: Mapping[str, Any] | str,
@@ -165,6 +174,11 @@ def conjunction_public_resolved(
             hinted = _resolved_person_with_hint(raw)
             if hinted is not None:
                 return hinted
+            # Birth-only boundary: only derive internal UID when caller provided no user identifier.
+            if _conjunction_user_id(raw) is None:
+                birth_uid = _derived_birth_uid(raw)
+                if birth_uid is not None:
+                    return {"person_uid": birth_uid}
         user_id = _conjunction_user_id(raw)
         if not user_id:
             raise ValueError("conjunction input must be resolved bodygraph or include user_id")
