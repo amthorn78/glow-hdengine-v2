@@ -1,5 +1,5 @@
-651879c11d52a46e9d77e6e18163525e8f5490d36f2dcdabb9df6573155b0001  audit/ops/hde-epic030/ops-01/commands.txt
-6b836024d38afc322a7e98108f3e6bcacbc9a2d30099222e265ed4f6f374b127  audit/ops/hde-epic030/ops-01/discovery_summary.md
+72d4e335979a2a5c032b3e5053caa5044f9a6c72953dedc0e0a7a8f3b55a10a8  audit/ops/hde-epic030/ops-01/commands.txt
+5d8ec73f3c0c154a8cc62b4fc8ca12959858ddcac518d4e2d7d38713b7749ef7  audit/ops/hde-epic030/ops-01/discovery_summary.md
 8c71cbc9734f44cfabd6adcaab89348546823cb7c27a039086488b7e83ece36b  audit/ops/hde-epic030/ops-01/env_presence.json
 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  audit/ops/hde-epic030/ops-01/grep_path.stderr
 edd6353ef7eba57ea1038b61e947d2132785adbba64abd647fefa5d34715e958  audit/ops/hde-epic030/ops-01/grep_path.txt
@@ -13,4 +13,4 @@ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  audit/ops/hde-
 01870de7caca112afeefd77b3c3b4c5e263cf5539a33af3f3411100727fad7d3  audit/ops/hde-epic030/ops-01/python_version.txt
 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  audit/ops/hde-epic030/ops-01/showcompat_help.stderr
 f9cdc8861dee7e3fb5f34c244e56a66f4660f679f29e6cd0badf28690ea82035  audit/ops/hde-epic030/ops-01/showcompat_help.txt
-ed89f3e3aeba6382b515a41dbcdbde580596cc588e8cbd1b78fe4847c087256d  audit/ops/hde-epic030/ops-01/vendor_command_candidate.txt
+05ef2689453801666341330444119b962db84da38b93f4ac9668e64c576ee843  audit/ops/hde-epic030/ops-01/vendor_command_candidate.txt

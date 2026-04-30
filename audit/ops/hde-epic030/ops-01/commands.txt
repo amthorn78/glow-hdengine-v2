@@ -31,3 +31,5 @@ find audit/ops/hde-epic030/ops-01 -type f ! -name files_sha256.txt -print | sort
 EDIT_ACTION audit/ops/hde-epic030/ops-01/vendor_command_candidate.txt -> replaced placeholder template with exact unresolved sentinel
 EDIT_ACTION audit/ops/hde-epic030/ops-01/discovery_summary.md -> aligned command-proof posture to unresolved and result posture to TOOLING_BLOCKED
 find audit/ops/hde-epic030/ops-01 -type f ! -name files_sha256.txt -print | sort | xargs sha256sum > audit/ops/hde-epic030/ops-01/files_sha256.txt
+EDIT_ACTION audit/ops/hde-epic030/ops-01/vendor_command_candidate.txt -> replaced unresolved sentinel with concrete birth-substituted hdctl showcompat --source vendor command
+EDIT_ACTION audit/ops/hde-epic030/ops-01/discovery_summary.md -> aligned command-proof posture to resolved and downstream OPS-02 strict gate usability

@@ -1,1 +1,1 @@
-UNRESOLVED — exact vendor-backed no-user command not proven from CLI help and available canon
+hdctl showcompat --source vendor --birthdate-a "1999-10-16" --birthtime-a "04:37" --location-a "Santiago, Chile" --birthdate-b "1978-06-17" --birthtime-b "02:35" --location-b "Tallinn, Estonia"

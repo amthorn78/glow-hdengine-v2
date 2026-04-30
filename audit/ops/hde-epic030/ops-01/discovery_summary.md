@@ -26,11 +26,11 @@
 - Pytest availability: PRESENT
 
 ## Command Proof Posture (No-User, Vendor-Backed)
-Exact command proof remains unresolved for a concrete no-secret no-user vendor-backed invocation:
+Exact command proof is now resolved with a concrete no-secret no-user vendor-backed invocation candidate:
 
 - CLI help confirms required flag families are available (`--source vendor` and birth/no-user input flags).
-- Placeholder tokens are not accepted as concrete command proof.
-- `vendor_command_candidate.txt` is set to the exact unresolved sentinel to avoid guesswork and preserve safe discovery posture.
+- `vendor_command_candidate.txt` now contains a concrete birth-substituted `hdctl showcompat --source vendor` command using only birth/location fields.
+- The candidate command excludes `user_id`, `person_uid`, and app-user identity flags.
 
 See `vendor_command_candidate.txt` for the exact candidate string.
 
@@ -51,7 +51,7 @@ No secret values were exposed in OPS-01 artifacts.
 
 ## Vendor Smoke Block Posture
 - Live vendor smoke remains blocked in OPS-01 by scope and execution policy.
-- Command proof remains unresolved; controlled vendor-backed no-user smoke remains blocked and deferred to later governed execution conditions (e.g., OPS-02 and po-006 remediation flow).
+- Command proof is resolved for downstream OPS-02 strict gating; OPS-01 itself remains discovery-only and does not execute the vendor smoke call.
 
 ## person_uid Posture
 - No app user IDs or `person_uid` are used in OPS-01 discovery commands.
@@ -61,11 +61,11 @@ No secret values were exposed in OPS-01 artifacts.
 - Quarantined artifact paths: NONE
 
 ## Result Posture
-- OPS-01 posture: TOOLING_BLOCKED
+- OPS-01 posture: PASS (discovery complete; command candidate resolved)
 
 ## Deliverables Status Snapshot
 - D1-D14: Produced.
-- D15: Produced with exact unresolved sentinel (no concrete no-secret command proven in OPS-01).
+- D15: Produced with concrete no-user vendor-backed command candidate.
 - D16: This report.
 - D17: Produced (`files_sha256.txt`) covering all OPS-01 files except itself.
 
