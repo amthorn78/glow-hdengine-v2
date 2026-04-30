@@ -1,6 +1,6 @@
 Remediation Implementation Guide HDE-EPIC030
 
-Version: r2 
+Version: r3 
 
 Executive Summary
 
@@ -645,9 +645,7 @@ ADR linkage:
 
 ADR-001
 
-Work Item ID: OPS-02
-
-Work item name: Execute controlled vendor-backed no-user implementation smoke when PF07 target facts are proven
+Work item name: Execute controlled vendor-backed birth-only no-user implementation smoke
 
 Work item type (PR / OPS): OPS
 
@@ -659,188 +657,647 @@ Facilitator: IA
 
 Implementation agent:
 
-OPS: PO manual
+OPS: PO manual only
 
-Target system/service:
+Codex / automated agents: forbidden for execution
 
-* PF07-backed execution target for the PR-02-remediated HD Engine runtime.  
-* Current blocker: the exact PF07 target fact set is not proven in this Plan.  
-* Missing PF07 fact set:  
-  * target environment name for the vendor-backed smoke,  
-  * service/base URL or CLI execution context for the remediated HD Engine runtime,  
-  * deployment, branch, or build binding that proves PR-02 is available on the target,  
-  * authorized open-rails vendor credential source, presence-only,  
-  * required target-specific environment bindings for the no-user vendor command.  
-* Until those PF07 facts are supplied, OPS-02 is `TOOLING_BLOCKED` and must not execute a vendor smoke.
+# **Target system/service**
 
-Working directory assumptions:
+OPS-02 target must be classified before any vendor smoke runs.
 
-* Repository root or PF07-backed CLI execution context, only after PF07 target facts are supplied.  
-* If PF07 does not prove the working directory or execution context, write the blocked summary and stop.
+Allowed target classifications:
 
-Preconditions:
+1. `CLI_LOCAL_VENDOR_SMOKE`  
+2. `HOSTED_HD_ENGINE_SERVICE_SMOKE`  
+3. `TARGET_UNPROVEN_TOOLING_BLOCKED`
+
+## **CLI\_LOCAL\_VENDOR\_SMOKE**
+
+Use this classification only when all of the following are true:
+
+* The executed command target is `hdctl showcompat`.  
+* The command uses explicit vendor source: `--source vendor`.  
+* The command is run in a PO-controlled repository checkout or CLI execution context.  
+* The command does not call a hosted HD Engine HTTP service directly.  
+* Vendor/API binding is supplied by environment variables, not by a hosted HD Engine service URL.  
+* The command does not require app user IDs, `user_id`, DB-backed users, or caller-provided `person_uid`.
+
+For `CLI_LOCAL_VENDOR_SMOKE`, hosted-service PF07 facts are not required.
+
+Required target facts for `CLI_LOCAL_VENDOR_SMOKE` are:
+
+* command target: `hdctl showcompat`  
+* command source/provenance  
+* PO-controlled CLI/repo execution context  
+* PR-02 runtime binding in that execution context  
+* vendor binding env-key presence, redacted  
+* deterministic pins: `LC_ALL=C`, `LANG=C`, `TZ=UTC`  
+* open rails for the vendor step only: `SAFE_MODE=0`, `ALLOW_NETWORK=1`  
+* `APP_ENV=dev`  
+* PO authorization to run the controlled smoke
+
+Do not invent a hosted PF07 target for a local CLI vendor-source smoke.
+
+If a reviewer requires PF07 for this classification, the correct statement is:
+
+`PF07 is not being used to invent a hosted target. This smoke targets the local hdctl CLI with vendor source. Hosted-service PF07 facts are not applicable unless the command is changed to call an HD Engine HTTP service.`
+
+## **HOSTED\_HD\_ENGINE\_SERVICE\_SMOKE**
+
+Use this classification only if the command actually calls a hosted HD Engine HTTP service.
+
+For `HOSTED_HD_ENGINE_SERVICE_SMOKE`, the evidence must include:
+
+* target environment name  
+* provider/project/service name  
+* service/base URL  
+* proof that the hosted target includes the PR-02 remediation  
+* authorized open-rails credential source, presence-only  
+* required target-specific environment bindings
+
+If these facts are not proven, classify as `TARGET_UNPROVEN_TOOLING_BLOCKED`.
+
+## **TARGET\_UNPROVEN\_TOOLING\_BLOCKED**
+
+Use this classification when the target cannot be proven.
+
+If this classification is used:
+
+* no vendor command may run  
+* `result_summary.md` must be `TOOLING_BLOCKED`  
+* the missing target facts must be listed explicitly  
+* no PASS may be claimed
+
+# **Working directory assumptions**
+
+* For `CLI_LOCAL_VENDOR_SMOKE`, the working directory is the PO-controlled repository checkout or CLI execution context where `hdctl showcompat` is available.  
+* The exact working directory or execution context must be recorded in `target_disposition.md`.  
+* If the working directory or CLI context is not known, classify as `TARGET_UNPROVEN_TOOLING_BLOCKED`.
+
+# **Preconditions**
+
+All preconditions below must be satisfied before any vendor command runs.
 
 * ADR-002 is approved.  
-* OPS-01 produced a concrete no-secret vendor command or explicitly recorded it as unresolved.  
-* PR-02 report confirms the repo-local remediation and targeted tests.  
-* PF07-backed target facts listed above are proven before any vendor smoke runs.  
+* PR-02 remediation is complete and accepted at implementation-review level.  
+* PR-02 runtime binding is proven in the CLI/runtime context used for OPS-02.  
+* Target classification is written to `target_disposition.md`.  
+* The command is exact and contains no placeholders.  
+* The command uses birth-only inputs.  
+* The command uses explicit vendor source.  
+* The command contains no app user IDs.  
+* The command contains no `user_id`.  
+* The command contains no caller-provided `person_uid`.  
+* The command contains no inline secret values.  
+* Required env-key presence is captured as booleans only.  
+* PO authorization to run the controlled vendor smoke is recorded.  
 * This is implementation validation only, not a QA rerun and not a closure decision.
 
-Inputs:
+If any precondition is missing, write `TOOLING_BLOCKED` to `result_summary.md` and do not run the vendor command.
+
+# **Inputs**
+
+Required input files:
+
+* `audit/ops/hde-epic030/ops-02/sample_birth_inputs.json`  
+* `audit/ops/hde-epic030/ops-02/vendor_command.txt`  
+* `audit/ops/hde-epic030/ops-02/redacted_env_presence.json`  
+* `audit/ops/hde-epic030/ops-02/target_disposition.md`  
+* `audit/ops/hde-epic030/ops-02/pr02_runtime_binding.md`
+
+Optional input files:
 
 * `audit/ops/hde-epic030/ops-01/vendor_command_candidate.txt`  
-* `audit/ops/hde-epic030/ops-01/discovery_summary.md`  
-* PR-02 report confirming targeted tests passed.  
-* PF07-backed target fact set for the remediated runtime.  
-* PO-held secret values, presence-only.
+* `audit/ops/hde-epic030/ops-01/discovery_summary.md`
 
-Inputs needed from Work Item PR-02 during implementation:
+OPS-01 may provide command provenance, but OPS-02 is not blocked by an unresolved OPS-01 file if this plan’s exact command contract is used and recorded. In that case, `request_summary.txt` must state:
 
-* PR-02 report confirming targeted tests passed.  
-* PR-02 report naming any runtime command or no-user compatibility surface to exercise.  
-* If PR-02 reports no executable runtime surface, classify OPS-02 as TOOLING\_BLOCKED rather than inventing one.
+`command source: OPS-02 command contract plus sample_birth_inputs.json`
 
-Canon constraints:
+If OPS-01 provides the final command, `request_summary.txt` must state:
 
-* PF07 — Glow Infrastructure, §0 Front Matter  
+`command source: OPS-01 vendor_command_candidate.txt`
+
+# **Required birth-only command shape**
+
+The command must have this shape:
+
+`hdctl showcompat --source vendor --birthdate-a "<YYYY-MM-DD>" --birthtime-a "<HH:MM>" --location-a "<LOCATION_A>" --birthdate-b "<YYYY-MM-DD>" --birthtime-b "<HH:MM>" --location-b "<LOCATION_B>"`
+
+Before execution, every placeholder must be replaced using the values in:
+
+`audit/ops/hde-epic030/ops-02/sample_birth_inputs.json`
+
+The executable command copied into:
+
+`audit/ops/hde-epic030/ops-02/vendor_command.txt`
+
+must contain no unresolved placeholder tokens before it is run.
+
+Forbidden command contents:
+
+* `<YYYY-MM-DD>`  
+* `<HH:MM>`  
+* `<LOCATION_A>`  
+* `<LOCATION_B>`  
+* `--user-a`  
+* `--user-b`  
+* `--a-user`  
+* `--b-user`  
+* `--source db`  
+* `user_id`  
+* `person_uid`  
+* app user IDs  
+* inline secret values
+
+# **Inputs needed from PR-02**
+
+PR-02 must be proven in `pr02_runtime_binding.md`.
+
+`pr02_runtime_binding.md` must state:
+
+* PR-02 remediation present in runtime: `true`  
+* birth-only boundary implemented: `true`  
+* no caller `user_id` required: `true`  
+* no caller `person_uid` required: `true`  
+* target runtime used for OPS-02 includes PR-02 remediation: `true`
+
+It must also include:
+
+* git branch or commit used during OPS-02 execution  
+* clean/dirty working tree status, or explicit dirty-state explanation  
+* exact file or symbol proving the birth-only boundary exists  
+* exact PR-02 test name proving birth-only caller input  
+* exact PR-02 targeted test command and pass result  
+* statement that no vendor command was run by Codex during PR-02
+
+If PR-02 runtime binding cannot be proven, classify OPS-02 as:
+
+`TOOLING_BLOCKED — PR-02 runtime binding not proven`
+
+Do not run a vendor command.
+
+# **Canon constraints**
+
+* PF10 — HDE-Build Notes, §2.20) HDE-EPIC030 po-006 remediation ADR set — proof authority and controlled vendor smoke  
 * PF19 — Glow QA Guide, §3.3 Environment constraints — pre-App, no-user QA mode  
 * PF19 — Glow QA Guide, §3.5.6 PO Live QA sessions (vendor-first rails)  
 * PF04 — HDE-Governance, §3.4 Open rails (controlled) \[Required-Now\]  
 * PF04 — HDE-Governance, §3.3 Secrets & env validation \[Required-Now\]  
-* PF12 — HDE Schemas & Artifacts, §8.3 Machine Evidence Index — JSONL mirror (records-only), if later promoted as governed evidence
+* PF05 — HDE CLI-API-Vendor-Ref, `hdctl showcompat` command posture, if exact CLI contract wording is needed  
+* PF07 — Glow Infrastructure, only when a hosted HD Engine target is actually used or when PF07 owns an environment binding fact  
+* PF12 — HDE Schemas & Artifacts, only if evidence is later promoted as governed evidence
 
-Observed Evidence / Findings (non-PF):
+# **Observed Evidence / Findings (non-PF)**
 
-* The PO states real compatibility behavior testing requires the vendor because no person data is stored in JSON or database.  
-* The failed po-006 path did not establish vendor-backed no-user behavior.  
-* The failed open-rails reproduction still failed locally because of compute/test contract shape.  
-* OPS-02 is needed after PR remediation to prove the implementation can run in the current real no-user posture.  
-* The Plan does not currently prove the PF07 target facts needed to bind PR-02 availability to a runtime target.
+* The PO requires compatibility to work from birth data only in the current no-user posture.  
+* A proof that removes only `person_uid` is insufficient if it still requires `user_id`.  
+* PR-02 remediation must prove birth-only caller input:  
+  * no `person_uid`  
+  * no `user_id`  
+  * no app user ID  
+  * no DB-backed user record as caller input  
+* OPS-02 validates the vendor-backed runtime path.  
+* OPS-02 is implementation validation only.  
+* OPS-02 does not claim QA PASS, Live QA completion, PF09 status change, or epic closure.
 
-Rollback intent:
+# **Rollback intent**
 
 * No persistent vendor, DB, or app-user state change is intended.  
-* If the command runs and fails, do not retry by changing flags, inputs, hostnames, ports, URLs, or credentials unless those changes are PF07-backed and recorded in `result_summary.md`.  
-* If the smoke produces contaminated or secret-bearing output, mark `FAIL_TOOLING`, quarantine the affected artifact path in `result_summary.md`, and do not use the artifact as evidence.  
-* If the smoke cannot run because PF07 target facts are missing, record `TOOLING_BLOCKED` and stop without touching external state.
+* If the command runs and fails, do not retry by changing flags, birth values, hostnames, ports, URLs, credentials, or rails unless the change is explicitly recorded in `result_summary.md` and backed by the governing target contract.  
+* If the command output contradicts expected birth-only vendor behavior after all preconditions are proven, classify as `FAIL_BEHAVIOR`.  
+* If the command cannot run because prerequisites are missing, classify as `TOOLING_BLOCKED`.  
+* If the command or evidence exposes secret values, classify as `FAIL_TOOLING`, quarantine the affected artifact path in `result_summary.md`, and do not use that artifact as evidence.
 
-Secret-handling posture:
+# **Secret-handling posture**
 
 * Use secret values only as runtime environment values supplied by the PO.  
-* Do not write secret values to command files, logs, summaries, stderr, stdout, JSON, checksums, or environment snapshots.  
-* `redacted_env_presence.json` must contain only key names and presence booleans.  
-* Any command string containing a secret value is invalid and must not be executed.
+* Do not write secret values to:  
+  * command files  
+  * logs  
+  * summaries  
+  * stderr  
+  * stdout  
+  * JSON  
+  * checksums  
+  * environment snapshots  
+* `redacted_env_presence.json` must contain only key names and booleans.  
+* Any command string containing a secret value is invalid and must not be executed.  
+* Any evidence file containing a secret value makes OPS-02 `FAIL_TOOLING`.
 
-Actions:
+# **Actions**
 
-* Create `audit/ops/hde-epic030/ops-02/`.  
-* Copy the command candidate:  
-  * `cp audit/ops/hde-epic030/ops-01/vendor_command_candidate.txt audit/ops/hde-epic030/ops-02/vendor_command.txt`  
-* If `vendor_command.txt` contains `UNRESOLVED`, write `TOOLING_BLOCKED — exact vendor-backed no-user command unresolved` to `audit/ops/hde-epic030/ops-02/result_summary.md` and do not run a vendor call.  
-* If the PF07 target fact set is missing, write `TOOLING_BLOCKED — PF07 target facts missing: target environment name; service/base URL or CLI execution context; PR-02 deployment or build binding; authorized open-rails vendor credential source; target-specific environment bindings` to `audit/ops/hde-epic030/ops-02/result_summary.md` and do not run a vendor call.  
-* If `vendor_command.txt` contains inline secret values, write `FAIL_TOOLING — command contains secret value inline` to `audit/ops/hde-epic030/ops-02/result_summary.md` and do not run a vendor call.  
-* Set rails for the vendor smoke only after command and PF07 target facts are proven:  
-  * `SAFE_MODE=0`  
-  * `ALLOW_NETWORK=1`  
-  * `APP_ENV=dev`  
-  * `LC_ALL=C`  
-  * `LANG=C`  
-  * `TZ=UTC`  
-* Run the exact command in `vendor_command.txt` only after confirming it is no-secret, no-user, and PF07-target-bound:  
-  * `set +e; SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC sh -lc "$(cat audit/ops/hde-epic030/ops-02/vendor_command.txt)" > audit/ops/hde-epic030/ops-02/stdout.json 2> audit/ops/hde-epic030/ops-02/stderr.log; printf "%s\n" "$?" > audit/ops/hde-epic030/ops-02/exit_code.txt`  
-* Capture redacted environment presence to `audit/ops/hde-epic030/ops-02/redacted_env_presence.json`.  
-* Write `audit/ops/hde-epic030/ops-02/request_summary.txt` stating:  
-  * command source was OPS-01,  
-  * no `person_uid` was present in command inputs,  
-  * no app user IDs were used,  
-  * vendor source was explicit,  
-  * PF07 target facts used, names-only,  
-  * secrets were not stored.  
-* If `stdout.json` exists, generate:  
-  * `sha256sum audit/ops/hde-epic030/ops-02/stdout.json > audit/ops/hde-epic030/ops-02/stdout.json.sha256`  
-* Write `audit/ops/hde-epic030/ops-02/result_summary.md` with:  
-  * status: PASS, FAIL\_BEHAVIOR, FAIL\_TOOLING, or TOOLING\_BLOCKED,  
-  * exit code if command ran,  
-  * whether no-user inputs were used,  
-  * whether vendor source was explicit,  
-  * whether PF07 target facts were proven,  
-  * whether output was produced,  
-  * whether secrets were avoided,  
-  * statement that this is not a QA rerun or closure verdict.  
-* Generate:  
-  * `find audit/ops/hde-epic030/ops-02 -type f ! -name files_sha256.txt -print | sort | xargs sha256sum > audit/ops/hde-epic030/ops-02/files_sha256.txt`
+## **A1. Create the OPS-02 evidence root**
 
-Expected output or success criteria:
+Create:
 
-* If PF07 target facts are missing, `result_summary.md` records `TOOLING_BLOCKED` and no vendor call runs.  
-* If command proof is missing, `result_summary.md` records `TOOLING_BLOCKED` and no vendor call runs.  
-* If command and PF07 target facts are proven and the command runs, `exit_code.txt`, `request_summary.txt`, and `result_summary.md` state the observed outcome without claiming QA PASS or closure.  
-* No secret values are persisted.
+`audit/ops/hde-epic030/ops-02/`
 
-Failure handling:
+## **A2. Create sample birth inputs**
 
-* Missing vendor credentials, missing exact command, or missing PF07 target facts is `TOOLING_BLOCKED`.  
-* Inline secrets or secret-bearing output is `FAIL_TOOLING`.  
-* Runtime output contradicting expected no-user vendor behavior after command and PF07 target facts are proven is `FAIL_BEHAVIOR`.  
-* Do not modify the command or target by guesswork to force a PASS.
+Create:
 
-Codex Prompt:
+`audit/ops/hde-epic030/ops-02/sample_birth_inputs.json`
+
+Required shape:
+
+`{"birthdate-a":"1999-10-16","birthtime-a":"04:37","location-a":"Santiago, Chile","birthdate-b":"1978-06-17","birthtime-b":"02:35","location-b":"Tallinn, Estonia","constraints":{"no_app_user_ids":true,"no_person_uid":true,"no_user_id":true,"vendor_call_executed":false}}`
+
+Before the command runs, `vendor_call_executed` may be `false`.
+
+After a successful command run, update it to `true`.
+
+If the command does not run, leave it `false` and classify the result accordingly.
+
+## **A3. Create the exact vendor command**
+
+Create:
+
+`audit/ops/hde-epic030/ops-02/vendor_command.txt`
+
+Use the birth values from `sample_birth_inputs.json`.
+
+Required command:
+
+`hdctl showcompat --source vendor --birthdate-a "1999-10-16" --birthtime-a "04:37" --location-a "Santiago, Chile" --birthdate-b "1978-06-17" --birthtime-b "02:35" --location-b "Tallinn, Estonia"`
+
+If different birth values are used, they must match `sample_birth_inputs.json`.
+
+## **A4. Capture redacted environment presence**
+
+Create:
+
+`audit/ops/hde-epic030/ops-02/redacted_env_presence.json`
+
+Required key names and boolean-only values:
+
+* `SAFE_MODE`  
+* `ALLOW_NETWORK`  
+* `APP_ENV`  
+* `LC_ALL`  
+* `LANG`  
+* `TZ`  
+* `HDAPI_BASE_URL`  
+* `HD_API_KEY`  
+* `GEO_API_KEY`  
+* `HDE_BASE_URL`, only if relevant
+
+No secret values are allowed.
+
+## **A5. Create target disposition**
+
+Create:
+
+`audit/ops/hde-epic030/ops-02/target_disposition.md`
+
+Must state exactly one classification:
+
+* `CLI_LOCAL_VENDOR_SMOKE`  
+* `HOSTED_HD_ENGINE_SERVICE_SMOKE`  
+* `TARGET_UNPROVEN_TOOLING_BLOCKED`
+
+For CLI-local smoke, required content:
+
+* target classification: `CLI_LOCAL_VENDOR_SMOKE`  
+* command target: `hdctl showcompat`  
+* source: `vendor`  
+* execution context: PO-controlled CLI/repo environment  
+* hosted HD Engine service target: not required for this command  
+* PF07 hosted-service binding required: no  
+* reason: this is a CLI vendor-source smoke, not a hosted HD Engine HTTP service smoke  
+* PR-02 runtime binding proof: `audit/ops/hde-epic030/ops-02/pr02_runtime_binding.md`  
+* env binding proof: `audit/ops/hde-epic030/ops-02/redacted_env_presence.json`  
+* command proof: `audit/ops/hde-epic030/ops-02/vendor_command.txt`
+
+If this cannot be stated truthfully, classify as:
+
+`TARGET_UNPROVEN_TOOLING_BLOCKED`
+
+and stop before running the command.
+
+## **A6. Create PR-02 runtime binding proof**
+
+Create:
+
+`audit/ops/hde-epic030/ops-02/pr02_runtime_binding.md`
+
+Required content:
+
+* PR-02 remediation present in runtime: `true`  
+* birth-only boundary implemented: `true`  
+* no caller `user_id` required: `true`  
+* no caller `person_uid` required: `true`  
+* target runtime used for OPS-02 includes PR-02 remediation: `true`  
+* git branch or commit used during OPS-02 execution  
+* clean or dirty working tree status  
+* exact source file or symbol proving the birth-only boundary exists  
+* exact test name proving birth-only caller input  
+* exact test command and pass result  
+* runtime/no-user compatibility surface exercised by OPS-02  
+* no Codex vendor command was run during PR-02
+
+If this cannot be proven, classify as:
+
+`TOOLING_BLOCKED — PR-02 runtime binding not proven`
+
+and do not run the vendor command.
+
+## **A7. Write request summary**
+
+Create:
+
+`audit/ops/hde-epic030/ops-02/request_summary.txt`
+
+Required content:
+
+* command source:  
+  * `OPS-01 vendor_command_candidate.txt`, or  
+  * `OPS-02 command contract plus sample_birth_inputs.json`  
+* command target: `hdctl showcompat`  
+* source: `vendor`  
+* input shape: `birth-only`  
+* no `person_uid` in command: `true`  
+* no `user_id` in command: `true`  
+* no app user IDs in command: `true`  
+* no inline secrets: `true`  
+* target classification: value from `target_disposition.md`  
+* hosted PF07 service target required: `yes` or `no`  
+* if no: `not applicable because this is a CLI vendor-source smoke`  
+* PR-02 runtime binding: `audit/ops/hde-epic030/ops-02/pr02_runtime_binding.md`  
+* env presence: `audit/ops/hde-epic030/ops-02/redacted_env_presence.json`  
+* PO authorization to run controlled smoke: `true`
+
+## **A8. Preflight before command run**
+
+Before running the command, verify:
+
+* `vendor_command.txt` contains no placeholders.  
+* `vendor_command.txt` contains `--source vendor`.  
+* `vendor_command.txt` contains no forbidden user identity input.  
+* `sample_birth_inputs.json` contains birth values for A and B.  
+* `target_disposition.md` is not `TARGET_UNPROVEN_TOOLING_BLOCKED`.  
+* `pr02_runtime_binding.md` proves PR-02 runtime binding.  
+* `redacted_env_presence.json` contains booleans only.  
+* PO authorization is recorded in `request_summary.txt`.
+
+If any check fails, write `TOOLING_BLOCKED` or `FAIL_TOOLING` to `result_summary.md` and do not run the command.
+
+## **A9. Run the controlled vendor smoke**
+
+Run only after A8 passes.
+
+Use exactly:
+
+`set +e; SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC sh -lc "$(cat audit/ops/hde-epic030/ops-02/vendor_command.txt)" > audit/ops/hde-epic030/ops-02/stdout.json 2> audit/ops/hde-epic030/ops-02/stderr.log; printf "%s\n" "$?" > audit/ops/hde-epic030/ops-02/exit_code.txt`
+
+Do not edit the command after failure to force a PASS.
+
+Do not retry with changed flags, URLs, credentials, target context, or birth values unless the change is explicitly recorded and justified in `result_summary.md`.
+
+## **A10. Hash stdout if produced**
+
+If `stdout.json` exists, run:
+
+`sha256sum audit/ops/hde-epic030/ops-02/stdout.json > audit/ops/hde-epic030/ops-02/stdout.json.sha256`
+
+## **A11. Validate stdout parseability**
+
+Create:
+
+`audit/ops/hde-epic030/ops-02/stdout_parse_validation.md`
+
+Required content:
+
+* `parseable_json: true` or `false`  
+* `stdout_nonempty: true` or `false`  
+* `stdout_sha256: <hash>`  
+* `secret_values_detected: false` or `true`  
+* `command_exit_code: <exit code>`
+
+If stdout is not parseable JSON and the command claims PASS, classify as `FAIL_BEHAVIOR` or `FAIL_TOOLING` according to the failure source.
+
+## **A12. Write execution classification**
+
+Create:
+
+`audit/ops/hde-epic030/ops-02/execution_classification.md`
+
+Required content:
+
+* whether the command actually ran  
+* whether the vendor call executed  
+* final classification:  
+  * `PASS`  
+  * `FAIL_BEHAVIOR`  
+  * `FAIL_TOOLING`  
+  * `TOOLING_BLOCKED`  
+* why that classification applies  
+* whether any previous contradiction was resolved  
+* whether a rerun occurred after target and PR-02 proof were established
+
+## **A13. Write result summary**
+
+Create:
+
+`audit/ops/hde-epic030/ops-02/result_summary.md`
+
+Required content:
+
+* final status:  
+  * `PASS`  
+  * `FAIL_BEHAVIOR`  
+  * `FAIL_TOOLING`  
+  * `TOOLING_BLOCKED`  
+* exit code, if command ran  
+* no-user inputs used  
+* explicit vendor source  
+* target disposition classification  
+* whether PR-02 runtime binding was proven  
+* whether output was produced  
+* whether stdout was parseable  
+* whether secrets were avoided  
+* statement that this is not:  
+  * QA PASS  
+  * Live QA completion  
+  * PF09 status change  
+  * epic closure
+
+## **A14. Generate checksum ledger**
+
+Run:
+
+`find audit/ops/hde-epic030/ops-02 -type f ! -name files_sha256.txt -print | sort | xargs sha256sum > audit/ops/hde-epic030/ops-02/files_sha256.txt`
+
+The ledger must include every OPS-02 evidence file except itself.
+
+## **A15. Create final consolidated evidence bundle**
+
+Create:
+
+`audit/ops/hde-epic030/ops-02/ops02_complete_action_log_and_evidence_final.md`
+
+This file must quote decisive contents from every required evidence file.
+
+Required sections:
+
+* Artifact Map  
+* Preflight Proof  
+* Command Executed  
+* Birth Inputs Used  
+* Target Disposition  
+* PR-02 Runtime Binding  
+* Request Summary  
+* Runtime Results  
+* Execution Classification  
+* Result Summary  
+* Checksum Ledger  
+* Non-Claims
+
+The final consolidated evidence bundle must include the full `files_sha256.txt`, not representative hashes.
+
+# **OPS-02 outcome classification**
+
+## **PASS**
+
+Use `PASS` only when all are true:
+
+* target disposition is not `TARGET_UNPROVEN_TOOLING_BLOCKED`  
+* PR-02 runtime binding is proven  
+* `vendor_command.txt` contains the exact birth-only vendor command  
+* `sample_birth_inputs.json` has `vendor_call_executed: true`  
+* `redacted_env_presence.json` contains booleans only  
+* command ran with exit code `0`  
+* `stdout.json` is non-empty  
+* `stdout.json` is parseable JSON  
+* `stderr.log` is empty or explained  
+* no secret values are persisted  
+* no `person_uid`, `user_id`, or app user ID was supplied  
+* `result_summary.md` states this is implementation validation only  
+* no QA PASS, Live QA completion, PF09 status change, or epic closure is claimed  
+* final consolidated evidence bundle quotes decisive contents and includes full checksum ledger
+
+## **TOOLING\_BLOCKED**
+
+Use `TOOLING_BLOCKED` when OPS-02 cannot safely run.
+
+Examples:
+
+* target disposition cannot be proven  
+* PR-02 runtime binding cannot be proven  
+* command has placeholders  
+* command uses or requires user identity  
+* command provenance is unclear  
+* required env presence is absent  
+* PO authorization is absent
+
+## **FAIL\_TOOLING**
+
+Use `FAIL_TOOLING` when execution or evidence is contaminated.
+
+Examples:
+
+* secret value appears in any evidence  
+* command changed by guesswork after failure  
+* forbidden user identity input used  
+* evidence files missing after attempted run  
+* env capture stores secret values instead of booleans
+
+## **FAIL\_BEHAVIOR**
+
+Use `FAIL_BEHAVIOR` only when:
+
+* all prerequisites are proven  
+* the command runs  
+* no tooling or secret failure occurs  
+* runtime behavior shows vendor-backed compat cannot work from birth-only no-user input
+
+# **Expected output or success criteria**
+
+* `target_disposition.md` classifies the target honestly.  
+* `vendor_command.txt` contains no placeholders and no user identity inputs.  
+* `sample_birth_inputs.json` contains birth-only values and matching constraints.  
+* `pr02_runtime_binding.md` proves PR-02 runtime availability.  
+* `request_summary.txt` states command source, input shape, target classification, no-user facts, and no-secret facts.  
+* `result_summary.md` states PASS, FAIL\_BEHAVIOR, FAIL\_TOOLING, or TOOLING\_BLOCKED.  
+* If command ran, `exit_code.txt`, `stdout.json`, `stderr.log`, `stdout_parse_validation.md`, and `stdout.json.sha256` exist.  
+* `files_sha256.txt` covers all OPS-02 files except itself.  
+* `ops02_complete_action_log_and_evidence_final.md` exposes decisive evidence contents, not just paths.  
+* No secret values are persisted.  
+* No QA PASS, Live QA completion, PF09 status change, or epic closure is claimed.
+
+# **Failure handling**
+
+* Missing command proof is `TOOLING_BLOCKED`.  
+* Missing birth inputs are `TOOLING_BLOCKED`.  
+* Missing PR-02 runtime binding is `TOOLING_BLOCKED`.  
+* Unproven target disposition is `TOOLING_BLOCKED`.  
+* Inline secret values are `FAIL_TOOLING`.  
+* Secret-bearing output is `FAIL_TOOLING`.  
+* Runtime contradiction after all prerequisites are proven is `FAIL_BEHAVIOR`.  
+* Do not modify command or target by guesswork to force a PASS.
+
+# **Codex Prompt**
 
 None — forbidden for OPS work items.
 
-Outputs:
+# **Outputs**
 
 * `audit/ops/hde-epic030/ops-02/vendor_command.txt`  
+* `audit/ops/hde-epic030/ops-02/sample_birth_inputs.json`  
+* `audit/ops/hde-epic030/ops-02/redacted_env_presence.json`  
+* `audit/ops/hde-epic030/ops-02/target_disposition.md`  
+* `audit/ops/hde-epic030/ops-02/pr02_runtime_binding.md`  
+* `audit/ops/hde-epic030/ops-02/request_summary.txt`  
 * `audit/ops/hde-epic030/ops-02/stdout.json`  
 * `audit/ops/hde-epic030/ops-02/stderr.log`  
 * `audit/ops/hde-epic030/ops-02/exit_code.txt`  
-* `audit/ops/hde-epic030/ops-02/redacted_env_presence.json`  
-* `audit/ops/hde-epic030/ops-02/request_summary.txt`  
+* `audit/ops/hde-epic030/ops-02/stdout_parse_validation.md`  
 * `audit/ops/hde-epic030/ops-02/stdout.json.sha256`  
+* `audit/ops/hde-epic030/ops-02/execution_classification.md`  
 * `audit/ops/hde-epic030/ops-02/result_summary.md`  
-* `audit/ops/hde-epic030/ops-02/files_sha256.txt`
+* `audit/ops/hde-epic030/ops-02/files_sha256.txt`  
+* `audit/ops/hde-epic030/ops-02/ops02_complete_action_log_and_evidence_final.md`
 
-Verification:
+# **Verification**
 
-* `result_summary.md` exists and reports PASS, FAIL\_BEHAVIOR, FAIL\_TOOLING, or TOOLING\_BLOCKED.  
-* `result_summary.md` states whether PF07 target facts were proven.  
-* `exit_code.txt` exists if the command ran.  
-* `request_summary.txt` states no `person_uid`, no app user ID, and explicit vendor source.  
+* `vendor_command.txt` contains exact birth-only vendor command.  
+* `sample_birth_inputs.json` matches the command.  
+* `target_disposition.md` proves the target classification.  
+* `pr02_runtime_binding.md` proves PR-02 runtime binding.  
+* `request_summary.txt` contains all required command and target facts.  
+* `result_summary.md` contains exactly one final classification.  
+* If the command ran, `exit_code.txt` exists.  
+* If the command ran, `stdout.json` is non-empty and parseable.  
+* If the command ran, `stderr.log` is captured.  
 * `redacted_env_presence.json` contains no secret values.  
-* If the smoke ran, `stdout.json` is non-empty and hash-captured.  
-* The work item does not claim QA PASS, Live QA completion, or epic closure.
+* `files_sha256.txt` covers all OPS-02 files except itself.  
+* `ops02_complete_action_log_and_evidence_final.md` contains decisive excerpts from every required file.  
+* The work item does not claim QA PASS, Live QA completion, PF09 status change, or epic closure.
 
-In-flight determinations:
+# **PF09 impact and status posture**
 
-* Caveat: Missing vendor credentials, exact command, or PF07 target facts should be TOOLING\_BLOCKED, not FAIL\_BEHAVIOR.  
-* Owner: PO  
-* Evidence trigger: `vendor_command.txt`, `redacted_env_presence.json`, `request_summary.txt`, `exit_code.txt`, and `result_summary.md`.  
-* Safe default: do not run a vendor call until exact command and PF07 target facts are proven.  
-* Risk if unresolved: local repo tests may pass without proving the actual current no-user/vendor behavior required by the PO.
+Affected PF09 task:
 
-ADR linkage:
+* `HDE-DISS005`
 
-ADR-002
+Affected PF09 subtask:
 
-PF Docs Consulted
+* `HDE-DISS005.2`
 
-PF10 — HDE-Build Notes
+OPS-02 does not authorize an immediate PF09 status change by itself.
 
-PF02 — HDE Architecture
+If OPS-02 is `PASS`, it may support this statement for later review:
 
-PF04 — HDE-Governance
+`Supportable from repo evidence: HDE-DISS005.2 has vendor-backed birth-only no-user implementation-validation evidence, pending final QA interpretation and any later PF09.2 drain.`
 
-PF07 — Glow Infrastructure
+If OPS-02 is `TOOLING_BLOCKED`, `FAIL_TOOLING`, or `FAIL_BEHAVIOR`, no PF09 status change is supportable.
 
-PF12 — HDE Schemas & Artifacts
+# **In-flight determinations**
 
-PF14 — HDE Mechanics Guide
-
-PF19 — Glow QA Guide
-
-PF23 — Reality Audits
-
-PF27 — Canon Plan Templates
+* Caveat: `CLI_LOCAL_VENDOR_SMOKE` does not require hosted-service PF07 facts. It requires target-disposition proof, CLI execution context, command provenance, PR-02 runtime binding, environment presence, PO authorization, and secret-safe evidence.  
+* Caveat: `HOSTED_HD_ENGINE_SERVICE_SMOKE` does require hosted-service PF07 facts.  
+* Caveat: Missing target classification, PR-02 runtime binding, exact command, birth inputs, PO authorization, or required env presence is `TOOLING_BLOCKED`, not `FAIL_BEHAVIOR`.  
+* Caveat: A PASS classification is invalid unless the final consolidated evidence bundle quotes decisive contents and includes the full checksum ledger.
 
 ADRs Requiring Thoth Approval
 
