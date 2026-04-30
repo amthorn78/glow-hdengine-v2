@@ -1,0 +1,39 @@
+command_source=pf10_addendum_2.24_submission + sample_birth_inputs.json
+command_status=concrete_birth_only_vendor_cli
+no_person_uid=true
+no_user_id=true
+no_app_user_ids=true
+birth_only_input_shape=true
+vendor_source_explicit=true (--source vendor)
+pf07_target_facts_used=command_target:hdctl_showcompat;data_source:vendor;execution_context:po_controlled_terminal_with_hdctl;vendor_binding:HDAPI_BASE_URL;vendor_credential_presence:HD_API_KEY;geo_credential_presence_if_required:GEO_API_KEY;determinism_pins:LC_ALL_LANG_TZ;open_rails_vendor_step_only:SAFE_MODE_0_ALLOW_NETWORK_1;app_env:dev;hde_base_url_required:false_for_exact_cli_vendor_smoke
+pf07_target_fact_command_target=hdctl showcompat
+pf07_target_fact_data_source=vendor
+pf07_target_fact_execution_context=po_controlled_terminal_with_hdctl
+pf07_target_fact_vendor_binding=HDAPI_BASE_URL
+pf07_target_fact_vendor_credential_presence=HD_API_KEY present
+pf07_target_fact_geo_credential_presence=GEO_API_KEY present (if required)
+pf07_target_fact_determinism_pins=LC_ALL=C;LANG=C;TZ=UTC
+pf07_target_fact_open_rails_vendor_step_only=SAFE_MODE=0;ALLOW_NETWORK=1
+pf07_target_fact_app_env=dev
+pf07_target_fact_hde_base_url_required=false for exact CLI smoke
+po_proceed_authorization_present=true (user addendum 2.24 submission, 2026-04-29)
+secrets_stored=false
+vendor_call_executed=true (executed under explicit user/PO direction with manual wrapper semantics)
+vendor_execution_contradiction_resolved=true (sample_birth_inputs constraints normalized to executed=true)
+runtime_exit_code=0
+runtime_stdout_file=audit/ops/hde-epic030/ops-02/stdout.json
+runtime_stdout_sha256_file=audit/ops/hde-epic030/ops-02/stdout.json.sha256
+runtime_stdout_parse_validation_file=audit/ops/hde-epic030/ops-02/stdout_parse_validation.md
+runtime_stderr_file=audit/ops/hde-epic030/ops-02/stderr.log
+runtime_exit_code_file=audit/ops/hde-epic030/ops-02/exit_code.txt
+runtime_stdout_non_empty=true
+runtime_stderr_empty=true
+sample_birth_inputs_file=audit/ops/hde-epic030/ops-02/sample_birth_inputs.json
+rails_status_validation_file=audit/ops/hde-epic030/ops-02/rails_status_validation.md
+rails_wrapper_validation_file=audit/ops/hde-epic030/ops-02/rails_wrapper_validation.md
+ambient_rails_status_pass=false (LANG mismatch)
+wrapper_rails_status_pass=true
+strict_pf10_2_24_conformance=true
+strict_pf10_2_24_classification=PASS
+strict_pf10_2_24_blocking_condition=none
+note=preflight validated, wrapper execution completed, and OPS-01 command-proof prerequisite resolved
