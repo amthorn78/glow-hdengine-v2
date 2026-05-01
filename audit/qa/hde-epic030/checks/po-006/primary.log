@@ -1,40 +1,43 @@
-{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-04-27T16:06:50Z", "check_id": "po-006", "check_name": "Public user-facing compatibility output must remain band-only and free of numeric compatibility details.", "status": "FAIL_BEHAVIOR", "fail_status": "FAIL_BEHAVIOR", "command": "mkdir -p audit/qa/hde-epic030/checks/po-006; python -m pytest --version; python -m pip install -r requirements-dev.txt when pytest readiness fails; grep --version; python -m pytest tests/compat/test_compat_public_ab_ba_identity.py tests/compat/test_compat_public_lf_bom.py; grep -n public_reader_bands_only_numeric_free: True audit/qa/hde-epic030/pr-05/category_framework_binding.log; python - << 'PY' PF27 canonical inline header writer for CHECK po-006; cat audit/qa/hde-epic030/checks/po-006/pytest_stdout.log audit/qa/hde-epic030/checks/po-006/numeric_free_grep.txt >> audit/qa/hde-epic030/checks/po-006/primary.log", "command_provenance": "Copy/paste from approved plan with open-rails rerun requested by PO", "exit_code": 1, "evidence_artifacts": ["audit/qa/hde-epic030/checks/po-006/primary.log", "audit/qa/hde-epic030/checks/po-006/numeric_free_grep.txt", "audit/qa/hde-epic030/pr-05/category_framework_binding.log"], "captured_env": {"SAFE_MODE": "0", "ALLOW_NETWORK": "1", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 — HDE-Build Notes", "PF05 — HDE-CLI-API-Vendor-Ref", "PF02 — HDE Architecture"], "intended_tokens": [], "claimed_tokens": []}
-Python 3.13.5
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-05-01T09:57:19Z", "check_id": "po-006", "check_name": "Public user-facing compatibility output must remain band-only and OPS-02 must prove birth-only vendor-backed no-user implementation-validation evidence.", "status": "PASS", "fail_status": "", "command": "mkdir -p audit/qa/hde-epic030/checks/po-006; python -m pytest tests/compat/test_compat_public_ab_ba_identity.py tests/compat/test_compat_public_lf_bom.py; grep -n public_reader_bands_only_numeric_free: True audit/qa/hde-epic030/pr-05/category_framework_binding.log; python inline OPS-02 evidence validator", "command_provenance": "Copy/paste from approved plan with syntax-safe command formatting", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic030/checks/po-006/primary.log", "audit/qa/hde-epic030/checks/po-006/numeric_free_grep.txt", "audit/qa/hde-epic030/checks/po-006/ops02_evidence_validation.json", "audit/qa/hde-epic030/checks/po-006/ops02_evidence_validation.stderr", "audit/qa/hde-epic030/checks/po-006/ops02_evidence_validation_rc.txt", "audit/qa/hde-epic030/pr-05/category_framework_binding.log", "audit/ops/hde-epic030/ops-02/ops02_complete_action_log_and_evidence_final.md"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 Addendum 2.20 po-006 remediation ADR set", "PF10 Addendum 2.24 OPS-02 completion contract", "PF05 governed path and CLI stream posture", "PF02 preflight and no invented entrypoints"], "intended_tokens": [], "claimed_tokens": []}
+]633;E;printf "\\n# preflight_stdout.log\\n";768237d2-b08c-46ec-8566-b6e2e3577e97]633;C
+# preflight_stdout.log
+Python 3.11.15
 pytest 8.4.2
-grep (GNU grep) 3.11
-Copyright (C) 2023 Free Software Foundation, Inc.
-License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.
-This is free software: you are free to change and redistribute it.
-There is NO WARRANTY, to the extent permitted by law.
+present: tests/compat/test_compat_public_ab_ba_identity.py
+present: tests/compat/test_compat_public_lf_bom.py
+present: audit/qa/hde-epic030/pr-05/category_framework_binding.log
+present: audit/ops/hde-epic030/ops-02/vendor_command.txt
+present: audit/ops/hde-epic030/ops-02/sample_birth_inputs.json
+present: audit/ops/hde-epic030/ops-02/redacted_env_presence.json
+present: audit/ops/hde-epic030/ops-02/target_disposition.md
+present: audit/ops/hde-epic030/ops-02/pr02_runtime_binding.md
+present: audit/ops/hde-epic030/ops-02/request_summary.txt
+present: audit/ops/hde-epic030/ops-02/result_summary.md
+present: audit/ops/hde-epic030/ops-02/pfcanon_ops02_completion_matrix.md
+present: audit/ops/hde-epic030/ops-02/execution_classification.md
+present: audit/ops/hde-epic030/ops-02/stdout.json
+present: audit/ops/hde-epic030/ops-02/stderr.log
+present: audit/ops/hde-epic030/ops-02/exit_code.txt
+present: audit/ops/hde-epic030/ops-02/stdout_parse_validation.md
+present: audit/ops/hde-epic030/ops-02/stdout.json.sha256
+present: audit/ops/hde-epic030/ops-02/files_sha256.txt
+present: audit/ops/hde-epic030/ops-02/ops02_complete_action_log_and_evidence_final.md
 
-Written by Mike Haertel and others; see
-<https://git.savannah.gnu.org/cgit/grep.git/tree/AUTHORS>.
-
-grep -P uses PCRE2 10.46 2025-08-27
+# pytest_stdout.log
 ============================= test session starts ==============================
-platform linux -- Python 3.13.5, pytest-8.4.2, pluggy-1.6.0
+platform linux -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0
 rootdir: /workspaces/glow-hdengine-v2
 configfile: pytest.ini
 plugins: cov-4.1.0, mock-3.15.1
 collected 2 items
 
 tests/compat/test_compat_public_ab_ba_identity.py .                      [ 50%]
-tests/compat/test_compat_public_lf_bom.py F                              [100%]
+tests/compat/test_compat_public_lf_bom.py .                              [100%]
 
-=================================== FAILURES ===================================
-_______________________ test_public_bytes_lf_and_no_bom ________________________
+============================== 2 passed in 0.07s ===============================
 
-    def test_public_bytes_lf_and_no_bom():
-        mod = importlib.import_module("engine.compat.compute")
-        # Use tz from pinned IANA list.
-        ca = load_chart("1990-05-04","14:22","Austin, US", tz="Europe/Amsterdam")
-        cb = load_chart("1992-07-19","08:05","New York, US", tz="Europe/Amsterdam")
->       out = serialize(mod.compat_public(ca, cb))
-                        ^^^^^^^^^^^^^^^^^^^^^^^^^
-E       TypeError: compat_public() missing 5 required positional arguments: 'viewer_top', 'viewer_weights', 'engine_tag', 'release_id', and 'invocation_tag'
-
-tests/compat/test_compat_public_lf_bom.py:11: TypeError
-=========================== short test summary info ============================
-FAILED tests/compat/test_compat_public_lf_bom.py::test_public_bytes_lf_and_no_bom
-========================= 1 failed, 1 passed in 0.08s ==========================
+# numeric_free_grep.txt
 8:public_reader_bands_only_numeric_free: True
+
+# ops02_evidence_validation.json
+{"checks":{"all_required_files_exist":true,"classification_command_ran":true,"classification_pass":true,"classification_vendor_call_executed":true,"completion_matrix_present":true,"exit_code_zero":true,"files_sha256_contains_execution_classification":true,"files_sha256_contains_exit_code":true,"files_sha256_contains_files_sha256":true,"files_sha256_contains_final_bundle":true,"files_sha256_contains_pfcanon_ops02_completion_matrix":true,"files_sha256_contains_pr02_runtime_binding":true,"files_sha256_contains_redacted_env_presence":true,"files_sha256_contains_request_summary":true,"files_sha256_contains_result_summary":true,"files_sha256_contains_sample_birth_inputs":true,"files_sha256_contains_stderr":true,"files_sha256_contains_stdout":true,"files_sha256_contains_stdout_parse_validation":true,"files_sha256_contains_stdout_sha256":true,"files_sha256_contains_target_disposition":true,"files_sha256_contains_vendor_command":true,"non_claim_not_closure":true,"non_claim_not_live_qa":true,"non_claim_not_pf09":true,"non_claim_not_qa_pass":true,"parseable_json_true":true,"pr02_birth_only_boundary":true,"pr02_no_caller_person_uid":true,"pr02_no_caller_user_id":true,"pr02_runtime_binding_present":true,"request_birth_only":true,"request_command_source_ops01":true,"request_po_authorization":true,"required_files_nonempty_except_stderr":true,"result_status_pass":true,"sample_no_app_user_ids":true,"sample_no_person_uid":true,"sample_no_user_id":true,"sample_vendor_call_executed":true,"secret_values_detected_false":true,"stderr_empty":true,"stdout_nonempty":true,"stdout_nonempty_true":true,"target_cli_local_vendor_smoke":true,"target_hosted_pf07_not_required":true,"vendor_command_birthdate_a":true,"vendor_command_birthdate_b":true,"vendor_command_birthtime_a":true,"vendor_command_birthtime_b":true,"vendor_command_location_a":true,"vendor_command_location_b":true,"vendor_command_no_forbidden_identity_or_placeholder":true,"vendor_command_source_vendor":true},"empty_required":[],"missing":[],"schema":"hde_epic030.po006.ops02_evidence_validation.v1","status":"PASS"}

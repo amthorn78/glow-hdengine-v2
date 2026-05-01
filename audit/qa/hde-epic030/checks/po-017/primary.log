@@ -1,0 +1,9 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-05-01T21:13:18Z", "check_id": "po-017", "check_name": "Undrained documentation deltas must not be treated as QA blockers when implementation truth and governed proof are otherwise complete.", "status": "PASS", "fail_status": "", "command": "mkdir -p audit/qa/hde-epic030/checks/po-017; python --version; python - << PY drainage posture generation; python - << PY drainage posture validation; python - << PY PF27 header writer; cat audit/qa/hde-epic030/checks/po-017/documentation_drainage_posture.txt >> audit/qa/hde-epic030/checks/po-017/primary.log", "command_provenance": "Copy/paste from approved plan with QA syntax-safe preflight classification", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic030/checks/po-017/primary.log", "audit/qa/hde-epic030/checks/po-017/documentation_drainage_posture.txt"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 — HDE-Build Notes", "PF05 — HDE-CLI-API-Vendor-Ref", "PF02 — HDE Architecture"], "intended_tokens": [], "claimed_tokens": []}
+schema: hde_epic030.po017.documentation_drainage_posture.v1
+drainage_blocker: False
+real_truth_and_proof_blockers: incomplete_required_QA_steps
+real_truth_and_proof_blockers: missing_required_deliverables
+real_truth_and_proof_blockers: untrusted_or_non_governed_evidence
+real_truth_and_proof_blockers: unresolved_FAIL_BEHAVIOR_FAIL_TOOLING_or_TOOLING_BLOCKED_conditions_that_affect_acceptance
+real_truth_and_proof_blockers: missing_required_close_gate_QA_artifacts
+pf09_2_drainage_required_before_otherwise_proven_QA_pass: False

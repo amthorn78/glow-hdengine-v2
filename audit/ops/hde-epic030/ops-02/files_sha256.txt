@@ -24,3 +24,4 @@ a31ee26bf24e58a11662b5904f58301ffab24c40621aff1237de6d2061e02f30  audit/ops/hde-
 856b63ee82b5f162821ba6c0f3ee38b0dd27e021cb057e8bde3de74628be65e5  audit/ops/hde-epic030/ops-02/stdout_parse_validation.md
 de3ab2cbc46790098d731c709ca730da7a38d9c110a4273957e5b361e97ca8c0  audit/ops/hde-epic030/ops-02/target_disposition.md
 05ef2689453801666341330444119b962db84da38b93f4ac9668e64c576ee843  audit/ops/hde-epic030/ops-02/vendor_command.txt
+a889741e3073fecf584c8484499193948d9f14d0787dc4bd87a7043cd74e1c8e  audit/ops/hde-epic030/ops-02/files_sha256.txt

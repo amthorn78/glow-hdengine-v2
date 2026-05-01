@@ -1,0 +1,41 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-05-01T21:12:48Z", "check_id": "po-016", "check_name": "The final QA interpretation must explain what was run, what the outcomes mean, what evidence supports them, and whether canon follow-up is required.", "status": "PASS", "fail_status": "", "command": "mkdir -p audit/qa/hde-epic030/checks/po-016 audit; test -d audit/qa/hde-epic030/checks; python --version; python - << PY QA RCA generation; python - << PY QA RCA validation; python - << PY PF27 header writer; cat audit/EPIC-030_QA_RCA.md >> audit/qa/hde-epic030/checks/po-016/primary.log", "command_provenance": "Plan + QA syntax correction", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic030/checks/po-016/primary.log", "audit/EPIC-030_QA_RCA.md"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 — HDE-Build Notes", "PF05 — HDE-CLI-API-Vendor-Ref", "PF02 — HDE Architecture"], "intended_tokens": [], "claimed_tokens": []}
+# HDE-EPIC030 QA RCA & Doc Delta Summary
+
+Source-of-truth posture: repo-supported completion is evaluated by Live QA logs; canon-drain completion is no-claim until drained; formal close-pack completion is no-claim until close-pack artifacts exist.
+
+## Coverage vs QA Plan
+- po-001: Fully evidenced; status=PASS; artifacts=['audit/qa/hde-epic030/checks/po-001/primary.log', 'audit/qa/hde-epic030/checks/po-001/surface_inventory.txt', 'audit/qa/hde-epic030/checks/po-001/exit_code.txt']; note=
+- po-002: Fully evidenced; status=PASS; artifacts=['audit/qa/hde-epic030/checks/po-002/primary.log', 'audit/qa/hde-epic030/checks/po-002/pytest_stdout.log', 'audit/qa/hde-epic030/checks/po-002/generator_stdout.log', 'audit/qa/hde-epic030/pr-01/zero_weight_handoff.json']; note=
+- po-003: Fully evidenced; status=PASS; artifacts=['audit/qa/hde-epic030/checks/po-003/primary.log', 'audit/qa/hde-epic030/pr-01/invalid_viewer_prefs.log', 'audit/qa/hde-epic030/pr-01/normalization_canonical_compare.log']; note=
+- po-004: Fully evidenced; status=PASS; artifacts=['audit/qa/hde-epic030/checks/po-004/primary.log', 'audit/qa/hde-epic030/pr-02/dev_sampler_two_run_identity.json', 'audit/qa/hde-epic030/pr-02/dev_sampler_http_headers.txt']; note=
+- po-005: Fully evidenced; status=PASS; artifacts=['audit/qa/hde-epic030/checks/po-005/primary.log', 'audit/qa/hde-epic030/pr-03/compat_identity_binding.log', 'audit/qa/hde-epic030/pr-03/compat_parity_binding.log']; note=
+- po-006: Fully evidenced; status=PASS; artifacts=['audit/qa/hde-epic030/checks/po-006/primary.log', 'audit/qa/hde-epic030/checks/po-006/numeric_free_grep.txt', 'audit/qa/hde-epic030/checks/po-006/ops02_evidence_validation.json', 'audit/qa/hde-epic030/checks/po-006/ops02_evidence_validation.stderr', 'audit/qa/hde-epic030/checks/po-006/ops02_evidence_validation_rc.txt', 'audit/qa/hde-epic030/pr-05/category_framework_binding.log', 'audit/ops/hde-epic030/ops-02/ops02_complete_action_log_and_evidence_final.md']; note=
+- po-007: Fully evidenced; status=PASS; artifacts=['audit/qa/hde-epic030/checks/po-007/primary.log', 'audit/qa/hde-epic030/checks/po-007/threshold_ownership.txt', 'audit/qa/hde-epic030/pr-04/band_edges_binding.log']; note=
+- po-008: Fully evidenced; status=PASS; artifacts=['audit/qa/hde-epic030/checks/po-008/primary.log', 'audit/qa/hde-epic030/checks/po-008/preflight.log', 'audit/qa/hde-epic030/checks/po-008/preflight_rc.txt', 'audit/qa/hde-epic030/checks/po-008/pytest_version.txt', 'audit/qa/hde-epic030/checks/po-008/pytest_version.stderr', 'audit/qa/hde-epic030/checks/po-008/generator_stdout.log', 'audit/qa/hde-epic030/checks/po-008/generator_stderr.log', 'audit/qa/hde-epic030/checks/po-008/generator_rc.txt', 'audit/qa/hde-epic030/checks/po-008/pytest_stdout.log', 'audit/qa/hde-epic030/checks/po-008/pytest_stderr.log', 'audit/qa/hde-epic030/checks/po-008/pytest_rc.txt', 'audit/qa/hde-epic030/checks/po-008/artifact_presence_rc.txt', 'audit/qa/hde-epic030/checks/po-008/status_gate.log', 'audit/qa/hde-epic030/checks/po-008/exit_code.txt', 'audit/qa/hde-epic030/pr-04/band_thresholds_diff.json', 'audit/qa/hde-epic030/pr-04/band_thresholds_identity_hash.txt']; note=
+- po-009: Fully evidenced; status=PASS; artifacts=['audit/qa/hde-epic030/checks/po-009/primary.log', 'audit/qa/hde-epic030/pr-05/category_framework_binding.log']; note=
+- po-010: Fully evidenced; status=PASS; artifacts=['audit/qa/hde-epic030/checks/po-010/primary.log', 'audit/qa/hde-epic030/checks/po-010/fail_closed_visibility.txt', 'audit/qa/hde-epic030/checks/po-010/pytest_stdout.log', 'audit/qa/hde-epic030/checks/po-010/exit_code.txt']; note=
+- po-011: Fully evidenced; status=PASS; artifacts=['audit/qa/hde-epic030/checks/po-011/primary.log', 'audit/qa/hde-epic030/checks/po-011/traceability_summary.json']; note=
+- po-012: Fully evidenced; status=PASS; artifacts=['audit/qa/hde-epic030/checks/po-012/primary.log', 'audit/qa/hde-epic030/checks/po-012/reused_history_classification.txt']; note=
+- po-013: Fully evidenced; status=PASS; artifacts=['audit/qa/hde-epic030/checks/po-013/primary.log', 'audit/qa/hde-epic030/checks/po-013/source_of_truth_posture.txt']; note=
+- po-014: Fully evidenced; status=PASS; artifacts=['audit/qa/hde-epic030/checks/po-014/primary.log', 'audit/qa/hde-epic030/checks/po-014/all_slice_coherence.json', 'audit/qa/hde-epic030/checks/po-014/exit_code.txt']; note=
+- po-015: Fully evidenced; status=PASS; artifacts=['audit/qa/hde-epic030/checks/po-015/primary.log', 'audit/qa/hde-epic030/checks/po-015/discovery.json', 'audit/qa/hde-epic030/checks/po-015/discovery_validation.txt']; note=
+- po-016: Not evidenced; status=NOT_EVIDENCED; artifacts=[]; note=primary log missing
+- po-017: Not evidenced; status=NOT_EVIDENCED; artifacts=[]; note=primary log missing
+
+## Findings classification
+PASS checks: po-001, po-002, po-003, po-004, po-005, po-006, po-007, po-008, po-009, po-010, po-011, po-012, po-013, po-014, po-015
+FAIL_BEHAVIOR checks: none
+FAIL_TOOLING, TOOLING_BLOCKED, or not-evidenced checks: po-016, po-017
+
+## Outcome meaning
+PASS means the check's governed evidence satisfied the plan predicate. FAIL_BEHAVIOR means observed evidence contradicts the approved predicate. FAIL_TOOLING or TOOLING_BLOCKED means the run did not establish behavior truth for that check.
+For po-006, OPS-02 PASS is implementation-validation evidence for the vendor-backed birth-only no-user smoke. It is not QA PASS by itself, not Live QA completion, not PF09 status change, and not epic closure.
+
+## Evidence support
+Evidence support is the per-check primary.log header and the artifacts listed in each parsed header. Missing or unparseable headers are classified above and are not hidden.
+
+## Canon follow-up
+PF09.2 history-lock narrowing remains a doc-delta candidate unless already drained. Documentation drainage is not an execution blocker by itself.
+
+## Closeout-readiness recommendation
+NOT FINAL until all required primary logs, discovery artifact, QA RCA, step-log manifest, acceptance map, token matrix, viability log, close report, close manifest, and required path proofs exist and are reviewed.

@@ -1,0 +1,8 @@
+schema: hde_epic030.po010.fail_closed_visibility.v1
+pr01_pr03_fail_closed_test: tests/evidence/test_epic030_pr01_pr03_fail_closed_evidence.py
+pr01_pr03_fail_closed_comprehensive_proof: proven
+pr04_fail_closed_test: tests/evidence/test_epic030_pr04_band_thresholds_evidence.py
+pr04_fail_closed_status: proven
+pr05_fail_closed_test: tests/evidence/test_epic030_pr05_category_framework_evidence.py
+pr05_fail_closed_status: proven
+classification: PASS all generated proof families used by the epic have fail-closed proof in-repo

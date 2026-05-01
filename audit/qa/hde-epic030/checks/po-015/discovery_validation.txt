@@ -1,0 +1,1 @@
+{"discovery_exists":true,"discovery_path":"audit/qa/hde-epic030/checks/po-015/discovery.json","discovery_valid":true,"has_paths":true,"has_rails":true,"has_surfaces":true,"schema":"hde_epic030.po015.discovery_validation.v1"}

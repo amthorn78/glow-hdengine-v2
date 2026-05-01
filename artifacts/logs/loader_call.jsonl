@@ -61,3 +61,7 @@
 {"ts":"2026-04-27T16:06:50Z","route":"loader.load_chart","provider":"fixtures","source":"default","status":"ok","duration_ms":0,"safe_mode":false,"correlation_id":"CID-f0ba209cabd9ed1e"}
 {"ts":"2026-04-27T16:08:41Z","route":"loader.load_chart","provider":"fixtures","source":"default","status":"ok","duration_ms":2,"safe_mode":false,"correlation_id":"CID-eb36af0047feb925"}
 {"ts":"2026-04-27T16:08:41Z","route":"loader.load_chart","provider":"fixtures","source":"default","status":"ok","duration_ms":0,"safe_mode":false,"correlation_id":"CID-2209ac23f16b0185"}
+{"ts":"2026-05-01T09:47:55Z","route":"loader.load_chart","provider":"fixtures","source":"default","status":"ok","duration_ms":129,"safe_mode":true,"correlation_id":"CID-f1d0c84fa12eb549"}
+{"ts":"2026-05-01T09:47:55Z","route":"loader.load_chart","provider":"fixtures","source":"default","status":"ok","duration_ms":0,"safe_mode":true,"correlation_id":"CID-ed1e935b8427c8d5"}
+{"ts":"2026-05-01T09:57:18Z","route":"loader.load_chart","provider":"fixtures","source":"default","status":"ok","duration_ms":4,"safe_mode":true,"correlation_id":"CID-70a99b3f8512ca93"}
+{"ts":"2026-05-01T09:57:18Z","route":"loader.load_chart","provider":"fixtures","source":"default","status":"ok","duration_ms":0,"safe_mode":true,"correlation_id":"CID-e116513f8af02ae0"}

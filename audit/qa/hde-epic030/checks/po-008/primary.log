@@ -1,0 +1,35 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-05-01T12:22:03Z", "check_id": "po-008", "check_name": "Band tuning proof must show that comparisons and identity behavior are current, complete, and based on the final implemented logic.", "status": "PASS", "fail_status": "", "command": "mkdir -p audit/qa/hde-epic030/checks/po-008; test -f audit/qa/hde-epic030/checks/po-015/discovery.json; python -m pytest --version; test -f tools/evidence/generate_epic030_pr04_band_thresholds_evidence.py; test -f tests/evidence/test_epic030_pr04_band_thresholds_evidence.py; python tools/evidence/generate_epic030_pr04_band_thresholds_evidence.py; python -m pytest tests/evidence/test_epic030_pr04_band_thresholds_evidence.py; test -s audit/qa/hde-epic030/pr-04/band_thresholds_diff.json; test -s audit/qa/hde-epic030/pr-04/band_thresholds_identity_hash.txt", "command_provenance": "Moon-loop rerun: po-008 identity artifact aligned to implemented canonical path band_thresholds_identity_hash.txt", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic030/checks/po-008/primary.log", "audit/qa/hde-epic030/checks/po-008/preflight.log", "audit/qa/hde-epic030/checks/po-008/preflight_rc.txt", "audit/qa/hde-epic030/checks/po-008/pytest_version.txt", "audit/qa/hde-epic030/checks/po-008/pytest_version.stderr", "audit/qa/hde-epic030/checks/po-008/generator_stdout.log", "audit/qa/hde-epic030/checks/po-008/generator_stderr.log", "audit/qa/hde-epic030/checks/po-008/generator_rc.txt", "audit/qa/hde-epic030/checks/po-008/pytest_stdout.log", "audit/qa/hde-epic030/checks/po-008/pytest_stderr.log", "audit/qa/hde-epic030/checks/po-008/pytest_rc.txt", "audit/qa/hde-epic030/checks/po-008/artifact_presence_rc.txt", "audit/qa/hde-epic030/checks/po-008/status_gate.log", "audit/qa/hde-epic030/checks/po-008/exit_code.txt", "audit/qa/hde-epic030/pr-04/band_thresholds_diff.json", "audit/qa/hde-epic030/pr-04/band_thresholds_identity_hash.txt"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 — HDE-Build Notes", "PF05 — HDE-CLI-API-Vendor-Ref", "PF02 — HDE Architecture"], "intended_tokens": [], "claimed_tokens": []}
+]633;E;printf "\\n## preflight\\n";d8f4d3a8-51b5-4676-a699-951e80bc4695]633;C
+## preflight
+]633;E;printf "check_id=%s\\n" "${CHECK_ID}";d8f4d3a8-51b5-4676-a699-951e80bc4695]633;Ccheck_id=po-008
+rails=1,0,dev,C,C,UTC
+present: audit/qa/hde-epic030/checks/po-015/discovery.json
+present: tools/evidence/generate_epic030_pr04_band_thresholds_evidence.py
+present: tests/evidence/test_epic030_pr04_band_thresholds_evidence.py
+present: pytest
+
+## status gate
+]633;E;printf "preflight_rc=%s\\n" "${preflight_rc}";d8f4d3a8-51b5-4676-a699-951e80bc4695]633;Cpreflight_rc=0
+generator_rc=0
+pytest_rc=0
+artifact_presence_rc=0
+status=PASS
+exit_code=0
+
+## generator stdout
+
+## generator stderr
+
+## pytest stdout
+============================= test session starts ==============================
+platform linux -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0
+rootdir: /workspaces/glow-hdengine-v2
+configfile: pytest.ini
+plugins: cov-4.1.0, mock-3.15.1
+collected 1 item
+
+tests/evidence/test_epic030_pr04_band_thresholds_evidence.py .           [100%]
+
+============================== 1 passed in 0.03s ===============================
+
+## pytest stderr

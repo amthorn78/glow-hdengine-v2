@@ -1,0 +1,7 @@
+schema: hde_epic030.po007.threshold_ownership.v1
+engine/compat/thresholds.py:exists=True
+engine/compat/thresholds.py:has_thresholds_v1=True
+engine/compat/thresholds.py:has_threshold_edges=True
+engine/magic10/thresholds.py:exists=True
+engine/magic10/thresholds.py:has_thresholds_v1=False
+engine/magic10/thresholds.py:has_threshold_edges=True

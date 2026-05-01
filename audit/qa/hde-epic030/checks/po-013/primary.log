@@ -1,0 +1,6 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-05-01T19:20:00Z", "check_id": "po-013", "check_name": "QA interpretation must distinguish implemented completion support from permanent checklist drainage.", "status": "PASS", "fail_status": "", "command": "test -f audit/qa/hde-epic030/00_meta/doc_deltas.md; mkdir -p audit/qa/hde-epic030/checks/po-013; python - << 'PY'; python - << 'PY' > audit/qa/hde-epic030/checks/po-013/primary.log; cat audit/qa/hde-epic030/checks/po-013/source_of_truth_posture.txt >> audit/qa/hde-epic030/checks/po-013/primary.log", "command_provenance": "Copy/paste from approved po-013 instructions", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic030/checks/po-013/primary.log", "audit/qa/hde-epic030/checks/po-013/source_of_truth_posture.txt"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 — HDE-Build Notes", "PF05 — HDE-CLI-API-Vendor-Ref", "PF02 — HDE Architecture"], "intended_tokens": [], "claimed_tokens": []}
+schema: hde_epic030.po013.source_of_truth_posture.v1
+repo_supported_completion: evaluated by implementation proof and Live QA logs
+canon_drain_completion: no-claim until drained
+formal_close_pack_completion: no-claim until close-pack artifacts exist
+drainage_required_before_QA_PASS: False

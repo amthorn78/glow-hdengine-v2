@@ -1,0 +1,25 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-05-01T10:44:25Z", "check_id": "po-007", "check_name": "Band threshold and tuning behavior must use the existing single ownership model and must not introduce a duplicate home.", "status": "PASS", "fail_status": "", "command": "mkdir -p audit/qa/hde-epic030/checks/po-007; test -f engine/compat/thresholds.py; test -f engine/magic10/thresholds.py; test -f tools/evidence/generate_epic030_pr04_band_thresholds_evidence.py; python tools/evidence/generate_epic030_pr04_band_thresholds_evidence.py; python - << PY threshold ownership writer; PF27 inline header writer", "command_provenance": "Copy/paste from approved plan with explicit PF02 preflight and PF27 header writer", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic030/checks/po-007/primary.log", "audit/qa/hde-epic030/checks/po-007/threshold_ownership.txt", "audit/qa/hde-epic030/pr-04/band_edges_binding.log"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 — HDE-Build Notes", "PF05 — HDE-CLI-API-Vendor-Ref", "PF02 — HDE Architecture"], "intended_tokens": [], "claimed_tokens": []}
+]633;E;printf "\\n## preflight.log\\n";1939df91-a2c3-4586-b3d9-1c2810918a96]633;C
+## preflight.log
+present: engine/compat/thresholds.py
+present: engine/magic10/thresholds.py
+present: tools/evidence/generate_epic030_pr04_band_thresholds_evidence.py
+
+## threshold_ownership.txt
+schema: hde_epic030.po007.threshold_ownership.v1
+engine/compat/thresholds.py:exists=True
+engine/compat/thresholds.py:has_thresholds_v1=True
+engine/compat/thresholds.py:has_threshold_edges=True
+engine/magic10/thresholds.py:exists=True
+engine/magic10/thresholds.py:has_thresholds_v1=False
+engine/magic10/thresholds.py:has_threshold_edges=True
+
+## generator_rc.txt
+0
+
+## generator_stdout.log
+
+## generator_stderr.log
+
+## exit_code.txt
+0

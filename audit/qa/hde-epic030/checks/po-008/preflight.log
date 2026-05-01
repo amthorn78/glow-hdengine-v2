@@ -1,0 +1,6 @@
+]633;E;printf "check_id=%s\\n" "${CHECK_ID}";d8f4d3a8-51b5-4676-a699-951e80bc4695]633;Ccheck_id=po-008
+rails=1,0,dev,C,C,UTC
+present: audit/qa/hde-epic030/checks/po-015/discovery.json
+present: tools/evidence/generate_epic030_pr04_band_thresholds_evidence.py
+present: tests/evidence/test_epic030_pr04_band_thresholds_evidence.py
+present: pytest

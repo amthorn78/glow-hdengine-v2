@@ -1,0 +1,11 @@
+schema: hde_epic030.po012.reused_history_classification.v1
+reused_history: HDE-DISS005.1
+reused_history: HDE-DISS006.1
+reused_history: HDE-DISS006.2
+active_hde_epic030_scope: HDE-DISS005.2
+active_hde_epic030_scope: HDE-DISS005.3
+active_hde_epic030_scope: HDE-DISS005.4
+active_hde_epic030_scope: HDE-DISS006.3
+active_hde_epic030_scope: HDE-DISS006.4
+active_hde_epic030_scope: HDE-DISS006.5
+new_implementation_claim_for_reused_history: False

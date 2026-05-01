@@ -1,0 +1,6 @@
+]633;E;printf "preflight_rc=%s\\n" "${preflight_rc}";d8f4d3a8-51b5-4676-a699-951e80bc4695]633;Cpreflight_rc=0
+generator_rc=0
+pytest_rc=0
+artifact_presence_rc=0
+status=PASS
+exit_code=0

@@ -1,0 +1,12 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0
+rootdir: /workspaces/glow-hdengine-v2
+configfile: pytest.ini
+plugins: cov-4.1.0, mock-3.15.1
+collected 6 items
+
+tests/evidence/test_epic030_pr01_pr03_fail_closed_evidence.py ...        [ 50%]
+tests/evidence/test_epic030_pr04_band_thresholds_evidence.py .           [ 66%]
+tests/evidence/test_epic030_pr05_category_framework_evidence.py ..       [100%]
+
+============================== 6 passed in 0.16s ===============================

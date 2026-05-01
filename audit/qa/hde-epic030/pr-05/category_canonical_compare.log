@@ -1,8 +1,8 @@
 schema: hde_epic030.pr05.category_canonical_compare.v1
-produced_at_utc: 2026-04-24T13:47:59Z
+produced_at_utc: 2026-05-01T16:31:49Z
 epic_id: HDE-EPIC030
 task_id: HDE-DISS006
 subtask_id: HDE-DISS006.4
-target: audit/qa/hde-epic030/pr-05/per_channel_mechanics.json canonical_roundtrip_equal=True sha256=3ebc6c0ea32955df56409794bdf389aa8732d57dbf33445a0552dcdc00b95250 bytes=12873
+target: audit/qa/hde-epic030/pr-05/per_channel_mechanics.json canonical_roundtrip_equal=True sha256=1d7eb1b31469468b9482a588f0bc5632c93f0d51ee2df455679fdfa8bdb762c7 bytes=12873
 target: artifacts/compat/AB.json canonical_roundtrip_equal=True sha256=f4616998ad4ce55dc7c716388709f767718a4d3056d866f9c2f73fa4f4703ed7 bytes=62
 status: PASS

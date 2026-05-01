@@ -1,0 +1,5 @@
+schema: hde_epic030.po013.source_of_truth_posture.v1
+repo_supported_completion: evaluated by implementation proof and Live QA logs
+canon_drain_completion: no-claim until drained
+formal_close_pack_completion: no-claim until close-pack artifacts exist
+drainage_required_before_QA_PASS: False

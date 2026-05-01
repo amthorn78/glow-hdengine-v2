@@ -1,12 +1,21 @@
-Python 3.13.5
+Python 3.11.15
 pytest 8.4.2
-grep (GNU grep) 3.11
-Copyright (C) 2023 Free Software Foundation, Inc.
-License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.
-This is free software: you are free to change and redistribute it.
-There is NO WARRANTY, to the extent permitted by law.
-
-Written by Mike Haertel and others; see
-<https://git.savannah.gnu.org/cgit/grep.git/tree/AUTHORS>.
-
-grep -P uses PCRE2 10.46 2025-08-27
+present: tests/compat/test_compat_public_ab_ba_identity.py
+present: tests/compat/test_compat_public_lf_bom.py
+present: audit/qa/hde-epic030/pr-05/category_framework_binding.log
+present: audit/ops/hde-epic030/ops-02/vendor_command.txt
+present: audit/ops/hde-epic030/ops-02/sample_birth_inputs.json
+present: audit/ops/hde-epic030/ops-02/redacted_env_presence.json
+present: audit/ops/hde-epic030/ops-02/target_disposition.md
+present: audit/ops/hde-epic030/ops-02/pr02_runtime_binding.md
+present: audit/ops/hde-epic030/ops-02/request_summary.txt
+present: audit/ops/hde-epic030/ops-02/result_summary.md
+present: audit/ops/hde-epic030/ops-02/pfcanon_ops02_completion_matrix.md
+present: audit/ops/hde-epic030/ops-02/execution_classification.md
+present: audit/ops/hde-epic030/ops-02/stdout.json
+present: audit/ops/hde-epic030/ops-02/stderr.log
+present: audit/ops/hde-epic030/ops-02/exit_code.txt
+present: audit/ops/hde-epic030/ops-02/stdout_parse_validation.md
+present: audit/ops/hde-epic030/ops-02/stdout.json.sha256
+present: audit/ops/hde-epic030/ops-02/files_sha256.txt
+present: audit/ops/hde-epic030/ops-02/ops02_complete_action_log_and_evidence_final.md
