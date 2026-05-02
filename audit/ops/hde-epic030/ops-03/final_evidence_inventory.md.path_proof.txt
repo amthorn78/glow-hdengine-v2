@@ -1,0 +1,5 @@
+path: audit/ops/hde-epic030/ops-03/final_evidence_inventory.md
+size_bytes: 1223
+sha256: 1a1845f995046a4f624e644672df4fc17d1d35381f68d9b1321dddb60236fedb
+mtime_utc: 2026-05-02T00:38:13Z
+produced_at_utc: 2026-05-02T00:38:13Z

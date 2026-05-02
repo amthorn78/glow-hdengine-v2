@@ -1,0 +1,225 @@
+# OPS-03 executable command transcript (moon-loop remediation r2)
+# rails: LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev
+
+T1_prepare_ops_root
+export LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev
+mkdir -p audit/ops/hde-epic030/ops-03
+cp audit/ops/hde-epic030/ops-03/commands.txt audit/ops/hde-epic030/ops-03/commands_prev_invalid.txt
+
+T2_validate_manifest_key_outputs
+python - <<'PY'
+import json
+from pathlib import Path
+p = Path('audit/EPIC-030_MANIFEST.json')
+data = json.loads(p.read_text(encoding='utf-8'))
+ko = data.get('key_outputs')
+if not isinstance(ko, dict):
+    raise SystemExit('key_outputs is not an object')
+required = {
+    'close_report': 'audit/EPIC-030_close_report.md',
+    'close_manifest': 'audit/EPIC-030_MANIFEST.json',
+    'qa_rca': 'audit/EPIC-030_QA_RCA.md',
+    'acceptance_map': 'docs/acceptance_map_epic030.json',
+    'token_matrix': 'audit/qa/hde-epic030/token_evidence_matrix.md',
+    'acceptance_map_viability': 'audit/qa/hde-epic030/acceptance_map_viability.log',
+    'qa_step_manifest': 'audit/qa/hde-epic030/qa_step_logs_manifest.json',
+    'doc_deltas': 'audit/docdeltas/hde-epic030_doc_deltas.md',
+    'drain_targets': 'audit/docdeltas/hde-epic030_drain_targets.md',
+    'final_evidence_inventory': 'audit/ops/hde-epic030/ops-03/final_evidence_inventory.md',
+}
+for k, v in required.items():
+    if k not in ko or ko[k] != v or not Path(v).exists():
+        raise SystemExit(f'manifest validation failed for {k}')
+print('manifest key_outputs validation PASS')
+PY
+
+T3_validate_close_report
+python - <<'PY'
+from pathlib import Path
+text = Path('audit/EPIC-030_close_report.md').read_text(encoding='utf-8')
+required = [
+    'QA Rails — Open/Close (Final PR)',
+    'Acceptance and evidence pointers',
+    'docs/acceptance_map_epic030.json',
+    'audit/qa/hde-epic030/token_evidence_matrix.md',
+    'audit/qa/hde-epic030/acceptance_map_viability.log',
+    'audit/qa/hde-epic030/qa_step_logs_manifest.json',
+    'audit/docdeltas/hde-epic030_drain_targets.md',
+]
+missing = [x for x in required if x not in text]
+if missing:
+    raise SystemExit('missing close report required text: ' + ', '.join(missing))
+for forbidden in ['PF09.2 is drained', 'new acceptance claims created', 'vendor call executed by OPS-03']:
+    if forbidden in text:
+        raise SystemExit('overclaiming text found: ' + forbidden)
+print('close report text validation PASS')
+PY
+
+T4_generate_and_validate_path_proofs
+python - <<'PY'
+import datetime
+import hashlib
+from pathlib import Path
+targets = [
+    'audit/EPIC-030_close_report.md',
+    'audit/EPIC-030_MANIFEST.json',
+    'audit/ops/hde-epic030/ops-03/final_evidence_inventory.md',
+]
+now = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + 'Z'
+for raw in targets:
+    p = Path(raw)
+    Path(raw + '.path_proof.txt').write_text(
+        'path: ' + raw + '\n'
+        + 'size_bytes: ' + str(p.stat().st_size) + '\n'
+        + 'sha256: ' + hashlib.sha256(p.read_bytes()).hexdigest() + '\n'
+        + 'mtime_utc: ' + datetime.datetime.utcfromtimestamp(p.stat().st_mtime).replace(microsecond=0).isoformat() + 'Z\n'
+        + 'produced_at_utc: ' + now + '\n',
+        encoding='utf-8',
+    )
+for raw in targets:
+    p = Path(raw)
+    kv = {}
+    for line in Path(raw + '.path_proof.txt').read_text(encoding='utf-8').splitlines():
+        if ': ' in line:
+            k, v = line.split(': ', 1)
+            kv[k] = v
+    if kv.get('path') != raw or kv.get('size_bytes') != str(p.stat().st_size) or kv.get('sha256') != hashlib.sha256(p.read_bytes()).hexdigest():
+        raise SystemExit('path proof mismatch: ' + raw)
+print('path proof generation PASS')
+print('path proof validation PASS')
+PY
+
+T5_generate_final_inventory
+python - <<'PY'
+from pathlib import Path
+artifacts = [
+'audit/EPIC-030_close_report.md',
+'audit/EPIC-030_close_report.md.path_proof.txt',
+'audit/EPIC-030_MANIFEST.json',
+'audit/EPIC-030_MANIFEST.json.path_proof.txt',
+'audit/EPIC-030_QA_RCA.md',
+'docs/acceptance_map_epic030.json',
+'audit/qa/hde-epic030/token_evidence_matrix.md',
+'audit/qa/hde-epic030/acceptance_map_viability.log',
+'audit/qa/hde-epic030/qa_step_logs_manifest.json',
+'audit/docdeltas/hde-epic030_doc_deltas.md',
+'audit/docdeltas/hde-epic030_drain_targets.md',
+'audit/ops/hde-epic030/ops-03/commands.txt',
+'audit/ops/hde-epic030/ops-03/stdout.log',
+'audit/ops/hde-epic030/ops-03/stderr.log',
+'audit/ops/hde-epic030/ops-03/exit_codes.txt',
+'audit/ops/hde-epic030/ops-03/created_files_sha256.txt',
+'audit/ops/hde-epic030/ops-03/final_evidence_inventory.md',
+'audit/ops/hde-epic030/ops-03/final_evidence_inventory.md.path_proof.txt',
+]
+rows = ['# HDE-EPIC030 OPS-03 Final Evidence Inventory', '', '| Path | Status | Notes |', '| --- | --- | --- |']
+for a in artifacts:
+    status = 'present' if Path(a).exists() else 'missing'
+    rows.append(f'| `{a}` | {status} |  |')
+Path('audit/ops/hde-epic030/ops-03/final_evidence_inventory.md').write_text('\n'.join(rows) + '\n', encoding='utf-8')
+print('final evidence inventory generation PASS')
+PY
+python - <<'PY'
+import datetime, hashlib
+from pathlib import Path
+raw = 'audit/ops/hde-epic030/ops-03/final_evidence_inventory.md'
+p = Path(raw)
+now = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + 'Z'
+Path(raw + '.path_proof.txt').write_text(
+    'path: ' + raw + '\n'
+    + 'size_bytes: ' + str(p.stat().st_size) + '\n'
+    + 'sha256: ' + hashlib.sha256(p.read_bytes()).hexdigest() + '\n'
+    + 'mtime_utc: ' + datetime.datetime.utcfromtimestamp(p.stat().st_mtime).replace(microsecond=0).isoformat() + 'Z\n'
+    + 'produced_at_utc: ' + now + '\n',
+    encoding='utf-8',
+)
+print('inventory path proof regeneration PASS')
+PY
+
+T6_generate_created_files_sha256
+python - <<'PY'
+import hashlib
+from pathlib import Path
+paths = [
+'audit/EPIC-030_close_report.md',
+'audit/EPIC-030_close_report.md.path_proof.txt',
+'audit/EPIC-030_MANIFEST.json',
+'audit/EPIC-030_MANIFEST.json.path_proof.txt',
+'audit/ops/hde-epic030/ops-03/commands_prev_invalid.txt',
+'audit/ops/hde-epic030/ops-03/commands.txt',
+'audit/ops/hde-epic030/ops-03/stdout.log',
+'audit/ops/hde-epic030/ops-03/stderr.log',
+'audit/ops/hde-epic030/ops-03/exit_codes.txt',
+'audit/ops/hde-epic030/ops-03/final_evidence_inventory.md',
+'audit/ops/hde-epic030/ops-03/final_evidence_inventory.md.path_proof.txt',
+'audit/ops/hde-epic030/ops-03/final_validation.log',
+]
+rows = []
+for raw in paths:
+    p = Path(raw)
+    if p.exists():
+        rows.append(hashlib.sha256(p.read_bytes()).hexdigest() + '  ' + raw)
+Path('audit/ops/hde-epic030/ops-03/created_files_sha256.txt').write_text('\n'.join(rows) + '\n', encoding='utf-8')
+print('created_files_sha256 generation PASS')
+PY
+
+T7_final_comprehensive_validation
+python - <<'PY'
+import json
+import hashlib
+from pathlib import Path
+required_files = {
+    'Close Report': 'audit/EPIC-030_close_report.md',
+    'Close Report Proof': 'audit/EPIC-030_close_report.md.path_proof.txt',
+    'Manifest': 'audit/EPIC-030_MANIFEST.json',
+    'Manifest Proof': 'audit/EPIC-030_MANIFEST.json.path_proof.txt',
+    'OPS Commands': 'audit/ops/hde-epic030/ops-03/commands.txt',
+    'OPS Stdout': 'audit/ops/hde-epic030/ops-03/stdout.log',
+    'OPS Stderr': 'audit/ops/hde-epic030/ops-03/stderr.log',
+    'OPS Exit Codes': 'audit/ops/hde-epic030/ops-03/exit_codes.txt',
+    'OPS Checksums': 'audit/ops/hde-epic030/ops-03/created_files_sha256.txt',
+    'Final Inventory': 'audit/ops/hde-epic030/ops-03/final_evidence_inventory.md',
+    'Final Inventory Proof': 'audit/ops/hde-epic030/ops-03/final_evidence_inventory.md.path_proof.txt',
+}
+lines = ['HDE-EPIC030 OPS-03 FINAL COMPREHENSIVE VALIDATION']
+missing = [label for label, p in required_files.items() if not Path(p).exists()]
+if missing:
+    raise SystemExit('file existence FAIL: ' + ', '.join(missing))
+lines.append('PASS file existence')
+manifest = json.loads(Path('audit/EPIC-030_MANIFEST.json').read_text(encoding='utf-8'))
+ko = manifest.get('key_outputs')
+if not isinstance(ko, dict):
+    raise SystemExit('manifest key_outputs not object')
+required_keys = ['close_report','close_manifest','qa_rca','acceptance_map','token_matrix','acceptance_map_viability','qa_step_manifest','doc_deltas','drain_targets','final_evidence_inventory']
+for k in required_keys:
+    if k not in ko or not Path(ko[k]).exists():
+        raise SystemExit('manifest validation fail for key: ' + k)
+lines.append('PASS manifest validation')
+text = Path('audit/EPIC-030_close_report.md').read_text(encoding='utf-8')
+for x in ['QA Rails — Open/Close (Final PR)','Acceptance and evidence pointers','docs/acceptance_map_epic030.json','audit/qa/hde-epic030/token_evidence_matrix.md','audit/qa/hde-epic030/acceptance_map_viability.log','audit/qa/hde-epic030/qa_step_logs_manifest.json','audit/docdeltas/hde-epic030_drain_targets.md']:
+    if x not in text:
+        raise SystemExit('close report missing: ' + x)
+lines.append('PASS close report validation')
+for raw in ['audit/EPIC-030_close_report.md','audit/EPIC-030_MANIFEST.json','audit/ops/hde-epic030/ops-03/final_evidence_inventory.md']:
+    p = Path(raw)
+    kv = {}
+    for line in Path(raw + '.path_proof.txt').read_text(encoding='utf-8').splitlines():
+        if ': ' in line:
+            k, v = line.split(': ', 1)
+            kv[k] = v
+    if kv.get('path') != raw or kv.get('size_bytes') != str(p.stat().st_size) or kv.get('sha256') != hashlib.sha256(p.read_bytes()).hexdigest():
+        raise SystemExit('proof mismatch: ' + raw)
+lines.append('PASS path-proof validation')
+inv = Path('audit/ops/hde-epic030/ops-03/final_evidence_inventory.md').read_text(encoding='utf-8')
+present = sum(1 for l in inv.splitlines() if l.startswith('| `') and '| present |' in l)
+missing_rows = sum(1 for l in inv.splitlines() if l.startswith('| `') and '| missing |' in l)
+if present != 18 or missing_rows != 0:
+    raise SystemExit(f'inventory mismatch present={present} missing={missing_rows}')
+lines.append('PASS final inventory validation')
+for p in ['audit/ops/hde-epic030/ops-03/commands_prev_invalid.txt','audit/ops/hde-epic030/ops-03/commands.txt','audit/ops/hde-epic030/ops-03/stdout.log','audit/ops/hde-epic030/ops-03/stderr.log','audit/ops/hde-epic030/ops-03/exit_codes.txt','audit/ops/hde-epic030/ops-03/created_files_sha256.txt']:
+    if not Path(p).exists():
+        raise SystemExit('ops evidence bundle missing: ' + p)
+lines.append('PASS ops-03 evidence bundle validation')
+Path('audit/ops/hde-epic030/ops-03/final_validation.log').write_text('\n'.join(lines) + '\n', encoding='utf-8')
+print('\n'.join(lines))
+PY
