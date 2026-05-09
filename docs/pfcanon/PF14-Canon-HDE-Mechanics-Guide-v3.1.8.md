@@ -3,12 +3,12 @@
 ## 0.1 **Header**
 
 **Title:** PF14-Canon-HDE-Mechanics-Guide  
-**Version:** v3.0.5
+**Version:** v3.1.8
 
 **Status:** Canon  
-**Effective date:** 2026-04-19
+**Effective date:** 2026-05-07
 
-**Last Update Gate:** BN 10.5.7 Drain A35  
+**Last Update Gate:** canon-update-hdapi-v2-conformance  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
 ---
@@ -181,6 +181,64 @@ Scope (normative). Mechanics requires a set of capabilities that enable determin
 * Ops artifacts. Start-command capture (bytes \+ hash), health/ready checks; no secrets in logs; SAFE rails defaults enforced per Governance.  
 * Scriptable pipeline. A single sanity pipeline (name is implementation-defined) that runs, in order: formatting → lint/type → unit/prop tests → schema checks → goldens/evidence capture → index & mirror parity \+ path-proof validation.
 
+Audit classification for I/O-bearing engine seams. Mechanics audits MUST classify modules by sanctioned seam responsibilities, not by a blanket “engine is pure compute” rule. Pure-compute obligations apply to Engine Core and sampler core modules. Resolver, ingest, vendor, catalog, and loader-style modules under `engine/` may be I/O-bearing only when HDE Architecture or this guide explicitly authorizes that responsibility.
+
+BodyGraph and loader seam posture. BodyGraph resolution and ingest remain the sanctioned BodyGraph I/O seam described in §19.1. Non-BodyGraph loader-style I/O observed under `engine/`, including loader modules such as `engine/charts/loader.py`, MUST be classified as exactly one of: sanctioned loader seam, implementation drift, or future canon gap requiring PO adjudication. The classification MUST NOT be resolved by assumption and MUST NOT authorize new I/O in pure compute modules.
+
+Non-task posture. This audit-classification note creates no new token, no new HDE-Build Checklist task, and no remediation plan by itself.
+
+PF23 audit classification posture. Mechanics observations drawn from Reality Audits or other repo-reality audits MUST be routed to the owning PF canon home by subject. Such observations MUST NOT be converted into HDE-Build Checklist task deltas, implementation scope, remediation scope, OPS scope, evidence homes, or acceptance-token obligations by assumption. A PO or later canon decision is required before any such observation becomes executable work.
+
+HDAPI v2 vendor conformance mechanics posture (pending, mechanics-only). HumanDesignAPI v2 conformance is pending until the owning Fermentation checklist rows are implemented and evidenced. This guide does not declare the HDE runtime v2-conformant, does not define vendor bytes, does not assign PF09 statuses, and does not create acceptance tokens. It defines the mechanical capabilities the repo must provide so the owning PF homes can later prove conformance.
+
+HDAPI v2 source and contract inventory mechanics. The repo MUST provide a governed vendor-contract inventory workflow for HumanDesignAPI v2 and legacy v1. That workflow MUST:
+
+* Discover and record same-origin HumanDesignAPI documentation sources needed for conformance, including `v2-routes.yaml`, `v1-routes.yaml`, v2 and v1 overview pages, endpoint pages, authentication, rate limiting, error handling, response format, migration, and related vendor-contract pages.  
+* Treat `llms.txt`, `llms-full.txt`, and any AI-agent or LLM-oriented vendor documentation as documentation-discovery context only, never as product scope, runtime scope, AI enablement, or acceptance evidence for AI features.  
+* Validate machine-readable v2 and v1 route artifacts before using them as source authority.  
+* Apply source precedence in this order: validated v2 and v1 YAML route specs first, rendered endpoint pages second, high-level guide pages third, and suspect artifacts quarantined.  
+* Quarantine `api-reference/openapi.json` unless domain, title, server, and path-family validation prove it is a HumanDesignAPI artifact.  
+* Produce a source-backed endpoint reference that distinguishes recommended v2 chart endpoints from legacy v1 BodyGraph endpoints.  
+* Cover at minimum `POST /v2/charts`, `POST /v2/charts/simple`, `POST /v2/charts/coordinates`, `POST /v1/bodygraphs`, and `POST /v1/bodygraphs/simple`.  
+* Record the auth model, geocode-key requirement, request-content type, request fields, success envelope, error-code model, route version, and source proof for each covered endpoint without defining byte contracts in this guide.
+
+HDAPI v2 vendor seam mechanics. The repo MUST provide one sanctioned vendor seam for HumanDesignAPI integration. That seam MUST route source selection, request shaping, response normalization, cache writes, CLI surfaces, and internal/admin compat flows through the existing architecture boundaries. It MUST NOT create a second HTTP home, bypass the Adapter, bypass the Presenter, or authorize I/O in pure compute modules.
+
+HDAPI v2 request-shaping and response-mapping mechanics. The repo MUST provide deterministic request-shaping and response-mapping proofs for the pending v2 vendor path. These mechanics MUST:
+
+* Derive v2 endpoint selection, auth-header use, geocode-key handling, and request-body shaping from governed contract inventory and the owning bytes document, not from guesses.  
+* Preserve v1 BodyGraph behavior as explicit legacy behavior until the owning architecture and byte-contract homes decide whether v1 remains a fallback or is retired.  
+* Map the standard v2 response envelope into HDE internal structures only after the mapping is proven.  
+* Prove whether v2 response data can feed the existing BodyGraph cache and compat input path, or identify that a schema update is required in the owning schema home.  
+* Preserve the public Reader contract. No public Reader byte change is implied by this mechanics posture.
+
+HDAPI v2 rails and Live QA mechanics. The repo MUST provide closed-rails and open-rails proof mechanics for HumanDesignAPI v2 conformance. Closed-rails mechanics MUST prove deterministic refusal and no outbound I/O when rails are closed. Open-rails vendor smoke, when required, is PO-only execution and MUST be treated as an ops task, not PR work and not QA substitution. The mechanics MUST require secret-safe, governed evidence for any PO-run open-rails smoke, including command transcript, stdout, stderr, exit code, redacted or presence-only secret posture, request summary, result summary, and file checksums, while avoiding plaintext secrets and unapproved vendor payload storage.
+
+HDAPI v2 error, retry, and rate-limit mechanics. The repo MUST provide deterministic mapping proofs for v2 vendor HTTP outcomes, error envelope behavior, Retry-After behavior, rate-limit headers, malformed responses, and typed HDE errors. These proofs MUST avoid vendor payload echo, avoid secrets in logs, and preserve deterministic output. This guide names the mechanical responsibility only; token semantics remain owned by HDE-Governance.
+
+HDAPI v2 evidence mechanics. The repo MUST provide evidence generators and validators for the HDAPI v2 contract inventory, request shaping, response mapping, source selection, legacy-v1 guard, adapter-boundary proof, closed-rails refusal proof, open-rails smoke summary where PO-executed, error mapping, rate-limit mapping, and normalized data path proof. Governed paths, schemas, path-proof naming, Human Evidence Index binding, Machine Mirror binding, canonical JSON rules, and evidence catalog ownership remain routed to HDE-Schemas & Artifacts and HDE-Build Checklist by title. PF14 does not pin concrete repository paths for this family.
+
+HDAPI v2 evidence generators MUST fail closed when:
+
+* Required source inventory is missing.  
+* `v2-routes.yaml` or `v1-routes.yaml` validation fails.  
+* The suspect `api-reference/openapi.json` has not been validated but is being used as authority.  
+* Recommended v2 chart routes are collapsed into legacy v1 BodyGraph routes without an explicit legacy decision.  
+* Required path-proof, Human Index, or Machine Mirror binding is absent for governed evidence.  
+* Closed-rails proof attempts outbound I/O.  
+* Open-rails evidence is not PO-executed, secret-safe, and governed.  
+* Any AI, OpenAI, LLM, AI-agent, prompt, embedding, chatbot, model-call, AI-provider credential, AI rails, or AI evidence family is introduced under this conformance work.
+
+Open-decision guard for HDAPI v2 mechanics. Until the PO or owning PF homes resolve the relevant decisions, mechanics and evidence generators MUST mark the following as pending rather than guessing:
+
+* Exact HDE epic or card assignment for the Fermentation work.  
+* Exact v2 credential, config-key, base-URL, and secret-binding names.  
+* Whether v1 BodyGraph routes remain supported as explicit legacy fallback or are retired after v2 migration.  
+* Whether Governance admits any vendor-v2-specific acceptance token.  
+* Whether v2 response data maps cleanly into the existing BodyGraph cache schema or requires an owning schema update.
+
+AI boundary for HDAPI v2 mechanics. OpenAI will not be used inside the HD Engine under this conformance work. AI remains a Glow development tool only. No mechanics, generator, QA harness, vendor seam, config key, evidence family, acceptance posture, or architecture flow may infer OpenAI, LLM, AI-agent, prompt, embedding, chatbot, model-call, or AI-enablement scope from HumanDesignAPI documentation.
+
 ## 1.2 Environment & secrets (names-only)
 
 Env allow-list.
@@ -330,9 +388,21 @@ tools/evidence/update\_evidence\_index.py is the single writer for:
 * artifacts/evidence\_index.jsonl (Machine Mirror), and  
 * governed \*.path\_proof.txt transcripts for artifacts listed in this guide.
 
+Evidence generator direct-invocation posture (normative). Repo-owned evidence generators MUST be directly runnable from the repository root using their documented Python invocation without requiring callers to set PYTHONPATH. If a generator imports repo modules, it MUST establish repository-root importability before those imports and fail as tooling if it cannot.
+
 Updater fixed-point convergence (normative). `tools/evidence/update_evidence_index.py` MUST converge to a deterministic fixed point from a clean checkout in CI-like order. The updater MUST centralize Human Index, hash sentinel, Machine Mirror, and governed path-proof writes inside one bounded convergence loop and MUST NOT require a second manual rerun to settle stale in-memory or pre-write proof metadata.
 
 Check-mode equivalence (normative). `python tools/evidence/update_evidence_index.py --check` MUST validate the same ordered write model used by normal generation. A `--check` failure caused by updater self-instability, rather than by true artifact drift, is a mechanics defect.
+
+Evidence generator PASS predicate and refresh coherence (normative). Governed evidence generators MUST emit PASS only when all decisive predicates for the claimed family evaluate true. A generator MUST NOT use parsed-object equality as a substitute for canonical-byte equality when bytes are the acceptance subject, and MUST NOT accept a lowercase 64-hex value as identity proof without recomputing the expected hash from the final governed artifacts. When an artifact claims AB↔BA identity-hash equality, current AB and BA body hashes MUST be compared in that run and the match result MUST be part of the PASS predicate. When a binding artifact summarizes canonical compare evidence, the top-level binding status MUST include the canonical compare result and MUST NOT report PASS if the canonical compare result is FAIL.
+
+Final-artifact regeneration. When a generator hardening change alters decisive predicates, binding status, or generated log content, the final governed artifacts, sibling path proofs, Human Evidence Index, Machine Mirror rows, hash sentinel, and orientation snapshot MUST be regenerated from the final generator logic in the same governed pass. Stale proof, stale binding logs, or stale mirror metadata after regenerated artifact bytes is a mechanics defect.
+
+Evidence-generator failure-path coverage. Governed evidence generators that emit PASS for identity, binding, canonical compare, index/mirror, or path-proof families MUST include targeted negative-path tests for the decisive predicates that could otherwise falsely pass. At minimum, generators that compare AB and BA bodies MUST test a mismatched-body failure path, and generators that summarize canonical compare or binding evidence MUST test a failure path where a lower-level compare fails and the top-level binding also fails.
+
+Adjacent-generator audit trigger. When a false-positive PASS pattern is found in one EPIC-style evidence generator, the adjacent generators in that family or pattern class MUST be reviewed for the same omitted-predicate class and either receive targeted negative-path coverage or record a bounded no-impact finding in the governed PR evidence. This review creates no new acceptance token and no standalone HDE-Build Checklist task by itself.
+
+Bounded evidence-refresh side effects. When the evidence updater or generator refreshes governed proof companions outside the direct target family, the run evidence MUST name those refreshed families and classify them as expected updater convergence, required dependency refresh, or unexpected drift. Unclassified side-effect churn that obscures the direct evidence family is a mechanics defect until classified.
 
 Scope of convergence (required). This fixed-point rule applies to:
 
@@ -1704,7 +1774,7 @@ Routing (titles-only):
 
 Purpose. Provide a dev/admin-only HTTP harness for the sampler core that mirrors the dev sampler CLI semantics while remaining a strictly internal surface. This harness is for local and dev/admin use; it is not part of the public API, is not listed in the Endpoint Catalog, and is not an A7 proof surface.
 
-Route and method. Route: POST /internal/dev/sampler. Method posture: POST only; non-conditional (no conditional headers are honored, and the route never returns 304). Transport posture: emitted via the same canonical serializer used elsewhere in this document (UTF-8, no BOM, ASCII-sorted keys, compact, exactly one trailing LF; arrays-as-sets deduped and ASCII-sorted). Cache-control and error envelopes follow the writer/error posture defined elsewhere in this document (no-store, no ETag for errors).
+Route and method. Route: POST /internal/dev/sampler. Method posture: POST only; unsupported methods return 405\. The route is non-conditional: no conditional headers are honored, and the route never returns 304\. Transport posture: emitted via the same canonical serializer used elsewhere in this document (UTF-8, no BOM, ASCII-sorted keys, compact, exactly one trailing LF; arrays-as-sets deduped and ASCII-sorted). Successful dev/admin responses carry JSON Content-Type, Cache-Control: no-store, and no ETag. Error envelopes follow the writer/error posture defined elsewhere in this document.
 
 Environment gating (dev/admin only). The dev sampler HTTP harness is enabled only when APP\_ENV is explicitly one of:
 
@@ -1751,10 +1821,10 @@ Behavior and payload. When APP\_ENV is allowed and the request body is valid, th
 * Builds in-memory sampler inputs (for example, a viewer profile and candidate feature records) from viewer\_id and candidate\_ids, using fixed safe placeholders for any features not specified by PF-Canon.  
 * Invokes the existing sampler core (for example, sample\_and\_rank) without changing its eligibility or ordering rules.  
 * Constructs a response payload with exactly these top-level keys:  
-  * viewer\_id — echo of the viewer\_id from the request.  
+  * candidate\_ids — an array of candidate ids in the ranked order returned by the sampler core.  
   * meta — an object that, at minimum, includes:  
     * seed — the provided seed value rendered as a string if present, or null if no seed was supplied.  
-    * candidate\_ids — an array of candidate ids in the ranked order returned by the sampler core.
+  * viewer\_id — echo of the viewer\_id from the request.
 
 Mechanics requires that:
 
@@ -1830,6 +1900,17 @@ PO and QA agents are responsible for:
 * treating failures to reach or use DEV\_SAMPLER\_URL as tooling/infra issues to be escalated, not as sampler/core bugs, unless the infra validation above has already passed and QA has concrete behavior evidence
 
 Mechanics records these responsibilities so the dev sampler HTTP harness and any similar internal/dev harnesses are fully accounted for in the mechanical schematic: the harness route and behavior in §5.8, the dev Reader process and ports via infra-owned start commands, and the dev URLs (DEV\_SAMPLER\_URL and equivalents) wired and validated before QA exercises them.
+
+EPIC030 PR-02 dev sampler evidence family (records-only). When this bounded PR-02 family is used to prove the dev sampler HTTP harness, Mechanics requires the governed evidence family to include these artifacts under `audit/qa/hde-epic030/pr-02/`, each with a sibling path proof:
+
+* `dev_sampler_http_headers.txt`  
+* `dev_sampler_http_body.json`  
+* `dev_sampler_two_run_identity.json`  
+* `dev_sampler_seed_only.json`
+
+The evidence family MUST be bound into the existing Human Evidence Index and Machine Mirror homes in the same PR, with the hash sentinel, mirror sidecars, path proofs, LF validation, evidence-path validation, mirror-schema validation, and topology orientation refresh/check kept coherent with the final artifacts.
+
+This records a local/dev evidence family only. It does not add a public route, does not add an Endpoint Catalog success route, does not make `/internal/dev/sampler` A7-eligible, and does not create close-stage acceptance-map or close-pack artifacts.
 
 A7 and Endpoint Catalog posture. POST /internal/dev/sampler is an internal/dev surface and is explicitly not a JSON success route in the Endpoint Catalog.
 
@@ -1937,7 +2018,7 @@ Purpose. Wire per-category subtotal → band calculators with precedence hooks; 
 
 Frozen category set & order (titles-only). All category logic addresses the ten Magic-10 identifiers in their fixed canonical order. Iteration order is normative and MUST be enforced via the total-order utilities (ASCII / cmp\_category; see §5 and HDE-Schemas & Artifacts §2.6, HDE-Math-Spec §5.1).
 
-Per-channel semantics (normative). Calculators consume channel-scoped primitives: every “channel” reference is the canonical NN-NN edge (min-first, zero-padded), not a free-form string or unordered gate pair. Junction gates {10,20,34,57} may appear in multiple channels; treat each channel independently. Arrays of channels used as sets MUST be deduped & ASCII-sorted by canonical identity (see §5 comparators and canonicalization rules in §4; titles-only to HDE-Schemas & Artifacts §2.1).
+Per-channel semantics (normative). Calculators consume channel-scoped primitives: every “channel” reference is the canonical NN-NN edge (min-first, zero-padded), not a free-form string or unordered gate pair. Junction gates {10,20,34,57} may appear in multiple channels; treat each channel independently. Compromise direction and compromise gate fields are derived only from canonical gate ordering and do not create a secondary runtime compromise surface. Channel-scoped circuit metadata is derived from governed channel catalog data and stays attached to the channel record in category-framework proof artifacts. Arrays of channels used as sets MUST be deduped & ASCII-sorted by canonical identity (see §5 comparators and canonicalization rules in §4; titles-only to HDE-Schemas & Artifacts §2.1).
 
 Public vs internal. Category subtotals and narrative keys are internal/admin artifacts. The public Reader surface stays bands-only, numeric-free and is specified in HDE-CLI-API-Vendor-Ref (titles-only). Mechanics wires the allow-listed presenter/emitter (§4) and does not duplicate public JSON schema.
 
@@ -1957,25 +2038,67 @@ Registry only (titles-only). Mechanics maintains the authoring workflow for numb
 
 Normative sources. Inclusive-high policy and global edges (for example, 24, 49, 74, 100\) are specified in HDE-Math-Spec. Per-category overrides and the constants pack live in HDE-Schemas & Artifacts (constants and manifest rules); Mechanics routes to those documents by title and does not duplicate numeric tables here.
 
+Compat threshold source (normative). Internal compat threshold code MUST derive `THRESHOLDS_V1` from `engine.magic10.thresholds.THRESHOLD_EDGES` and `BANDS` from `engine.magic10.thresholds.BANDS`. Compat threshold code MUST NOT maintain a second hard-coded threshold home or a second band-order home.
+
+Admin/public split. The admin/test compat surface may carry scores and threshold evidence. The public Reader-facing surface remains bands-only and numeric-free. PR-04 threshold/tuning mechanics MUST NOT add a public route, new flag, new serializer path, second threshold home, acceptance-map path, token-matrix path, viability-log path, doc-delta-ledger path, or close-pack path.
+
 Config artifacts (governed snapshots). Band thresholds are materialized by the Programmatic Configuration System as a governed band-edges config artifact (see §3.7):
 
-* The band-edges config artifact captures band names, numeric edges, clamp behavior, rounding mode, and a version tag, and includes a structured pointer back to the thresholds source used to derive it
-
-* The artifact is generated under closed rails with canonical JSON (UTF-8, no BOM; ASCII-sorted keys; compact; exactly one trailing line feed) and must satisfy two-run identity in determinism-pinned environments, consistent with §3.7 and §4
-
-* Schema, artifact\_key, and any additional metadata fields for the band-edges config artifact remain single-homed in HDE-Schemas & Artifacts; Mechanics only requires that such an artifact exist, be deterministic, and be wired into the evidence skeleton
-
+* The band-edges config artifact captures band names, numeric edges, clamp behavior, rounding mode, and a version tag, and includes a structured pointer back to the thresholds source used to derive it  
+* The artifact is generated under closed rails with canonical JSON (UTF-8, no BOM; ASCII-sorted keys; compact; exactly one trailing line feed) and must satisfy two-run identity in determinism-pinned environments, consistent with §3.7 and §4  
+* Schema, artifact\_key, and any additional metadata fields for the band-edges config artifact remain single-homed in HDE-Schemas & Artifacts; Mechanics only requires that such an artifact exist, be deterministic, and be wired into the evidence skeleton  
 * The same configuration system may also produce a governed Magic-10 config artifact (see §3.7) that defines per-category caps and seed metadata; band tuning and band-edges behavior must remain consistent with the Magic-10 configuration and the math rules in HDE-Math-Spec
 
 Visibility and evidence. Thresholds and scores are admin/test-visible only. Mechanics provides helpers to dump and apply band-threshold sets and to capture identity and stability proofs, such as canonical snapshots and sha256 digests over compat bytes that include the final line feed. All tuning artifacts, including the band-edges config artifact and any supporting snapshots, must:
 
-* be listed in the human Evidence Index with titles and paths
-
-* have corresponding machine-mirror records in artifacts/evidence\_index.jsonl with canonical JSONL records and path-proof anchors
-
+* be listed in the human Evidence Index with titles and paths  
+* have corresponding machine-mirror records in artifacts/evidence\_index.jsonl with canonical JSONL records and path-proof anchors  
 * be updated together with their mirror records in the same PR, under the evidence discipline defined in §1.3 and §37
 
+EPIC030 PR-04 band-threshold evidence family (records-only). When the bounded PR-04 threshold/tuning family is used, Mechanics requires these governed artifacts under `audit/qa/hde-epic030/pr-04/`, each with a sibling path proof:
+
+* `band_edges_binding.log`  
+* `band_thresholds_diff.json`  
+* `band_thresholds_identity_hash.txt`
+
+Binding requirements. The PR-04 evidence family MUST prove, at minimum:
+
+* `band_edges_binding.log` binds compat thresholds to the constants-pack-backed threshold edges and records the resolved `THRESHOLDS_V1` and `BANDS` source posture.  
+* `band_thresholds_diff.json` records compact threshold diffs for the governed edges and band order, and reports PASS only when all compared threshold and band values match the expected governed source.  
+* `band_thresholds_identity_hash.txt` computes identity hashes over LF-terminated compat bodies, records whether current AB and BA hashes match, and reports PASS only when the current AB↔BA identity comparison is true.  
+* The PR-04 evidence generator is directly runnable from the repository root and uses canonical JSON emission for JSON artifacts.  
+* Targeted tests cover constants-pack threshold routing and the evidence-generator failure case where mismatched AB and BA compat bodies must produce a FAIL identity-hash result.
+
+Indexing requirements. The PR-04 family MUST be registered in the existing evidence-index update path, loaded into the Human Evidence Index source set, mirrored into the Machine Mirror, covered by sibling path proofs, and refreshed through the existing updater, orientation, mirror-schema, evidence-path, and LF-ending checks.
+
 Mechanics does not define additional acceptance tokens for band tuning; token names and their semantics remain single-homed in HDE-Governance, HDE-Build Checklist, and HDE Phased Epics.
+
+## **7.4 EPIC030 PR-05 category-framework evidence and indexing family (records-only)**
+
+Purpose. For the bounded PR-05 category-framework family, Mechanics records repo-side proof responsibilities only. This family stays on existing category-framework, compat/admin, evidence-generator, and evidence-index surfaces. It does not create a public route, new flag, serializer or emitter work, close-pack work, QA-ledger work, Live QA runbook work, or PF-canon edit work.
+
+Required governed artifacts. The PR-05 family MUST include, at minimum, these artifacts under `audit/qa/hde-epic030/pr-05/`, each with a sibling path proof:
+
+* `per_channel_mechanics.json`  
+* `category_canonical_compare.log`  
+* `category_framework_binding.log`
+
+Per-channel mechanics proof. The `per_channel_mechanics.json` artifact MUST record a PASS result for the category-framework per-channel mechanics proof and MUST bind the proof to the relevant task and subtask identifiers. It MUST include canonical channel edges, compromise direction and gate fields derived only from canonical gate ordering, channel-scoped circuit metadata derived from governed catalog channel data, and a channel-record count sufficient to prove the closed category-framework channel set exercised by the generator.
+
+Canonical compare proof. The `category_canonical_compare.log` artifact MUST prove canonical round-trip equality for the PR-05 category-framework targets recorded by the generator, including the per-channel mechanics snapshot and compat body target(s), and MUST report PASS only when those canonical comparisons pass.
+
+Top-level binding proof. The `category_framework_binding.log` artifact MUST summarize the PR-05 family and derive its top-level status from decisive predicates that include, at minimum:
+
+* Magic-10 order preserved for admin compat.  
+* Public Reader posture remains bands-only and numeric-free.  
+* Human Index binding is present.  
+* Machine Mirror binding is present.  
+* Per-channel mechanics status is PASS.  
+* Canonical compare status is PASS.
+
+The top-level binding artifact MUST carry `canonical_compare_status` and MUST NOT report PASS when the canonical compare status is FAIL.
+
+Indexing and refresh requirements. The PR-05 family MUST be registered in the existing evidence-index update path, loaded into the Human Evidence Index source set, mirrored into the Machine Mirror, covered by sibling path proofs, and refreshed through the existing updater, orientation, mirror-schema, evidence-path, and LF-ending checks. If generator logic changes after artifact bytes are first produced, the final governed artifacts, path proofs, Human Index, Machine Mirror rows, hash sentinel, and orientation snapshot MUST be regenerated from the final generator flow.
 
 ---
 
@@ -2347,6 +2470,12 @@ Conjunction compute contract (internal; required). The engine MUST provide an in
 
 * No new public transport: this is an internal surface. It does not introduce a new public endpoint or new public byte contract.
 
+Birth-only no-user boundary (required for pre-App compatibility proof). The resolved conjunction surface MAY accept caller inputs that contain a complete birth tuple and no caller-supplied user identity. When no caller `person_uid`, `user_id`, app user ID, or DB-backed user BodyGraph is supplied, the boundary MUST derive deterministic internal metadata inside `engine/compat/compute.py` before strict compatibility compute. The boundary-produced internal identifier MUST stay internal and MUST NOT become a public route contract, public CLI flag, public Reader field, or caller obligation.
+
+The accepted local proof for this boundary is a birth-only caller-input proof in which caller inputs include only `birthdate`, `birthtime`, and `location`, assert no `person_uid` and no `user_id` in caller objects, and prove AB↔BA stability. Existing internal user-ID flows remain valid internal flows and MUST NOT be weakened globally to satisfy no-user proof.
+
+Public/admin separation remains unchanged. `/api/compat/v1` stays internal/admin, public Reader remains bands-only and numeric-free, and this boundary MUST NOT add a public compat route, new public flag, alternate serializer/emitter path, OPS action, governed evidence family, or PF-canon edit by itself.
+
 Contract tests (required). tests/http/test\_compat\_endpoint\_contract.py MUST include a conjunction contract test that asserts:
 
 * Same inputs, same bytes across two runs.
@@ -2394,6 +2523,19 @@ Harness shape (required). The proof MAY use an in-repo app client or equivalent 
 * AB↔BA byte equality for the emitted compat body  
 * LF-terminated canonical JSON with no CRLF bytes  
 * the governed compat artifacts remain part of the same PR and evidence-index refresh as the compat identity-hash family
+
+### **9.3.3 EPIC030 PR-03 compat evidence and indexing family (records-only)**
+
+Purpose. For the bounded compat evidence and indexing family, Mechanics records the repo-side proof responsibilities only. This family stays on existing compat/admin evidence surfaces and does not create a public route, new flag, new serializer path, public-surface redesign, or close-stage artifact family.
+
+Required governed artifacts. The PR-03 family MUST include, at minimum:
+
+* `audit/qa/hde-epic030/pr-03/category_order_binding.log` and its sibling path proof  
+* `audit/qa/hde-epic030/pr-03/compat_identity_binding.log` and its sibling path proof  
+* `audit/qa/hde-epic030/pr-03/compat_parity_binding.log` and its sibling path proof  
+* `artifacts/narratives/key_table_10x2.snapshot.json` and its sibling path proof
+
+Binding requirements. The category-order proof MUST bind the Magic-10 order and narrative-key-table linkage. The PR-03 family MUST be bound into the existing Human Evidence Index and Machine Mirror homes, including the hash sentinel and companion proof artifacts.
 
 ## **9.4 Internal ops: /internal/version (ops-only) \[Required-Now\]**
 
@@ -2641,6 +2783,8 @@ Canonicalization (inputs). Input JSON is normalized to UTF-8 (no BOM), ASCII-sor
 
 AB↔BA neutrality. Normalization MUST produce identical normalized forms for (A,B) and (B,A).
 
+Normalization-side handoff helper. The viewer-prefs normalization module MUST expose `engine.validation.viewer_prefs.weight_for_candidate_top_category` as the repo-owned handoff helper from normalized viewer preferences to sampler/ranker behavior. The helper resolves the weight for a candidate's top category, fails closed for unknown category IDs, and does not exclude candidates itself. Candidate exclusion remains owned by the sampler/ranker mechanics in §11.3.
+
 ## **11.2 Validation (binary)**
 
 * Completeness. weights includes all ten category keys; each value is int 0..100.
@@ -2713,7 +2857,9 @@ Purpose. Build a candidate pool that respects viewer weights (including the zero
 
 * Canonical bytes: outputs are canonical JSON (UTF-8 no BOM, sorted keys, compact, one LF).
 
-* Evidence Index: append artifacts (sampler snapshots, seed replay logs) in the same PR; PF-12 machine mirror lines present with path-proofs.
+* Evidence Index: append artifacts (sampler snapshots, seed replay logs) in the same PR; PF-12 machine mirror lines present with path-proofs.  
+* Normalization-handoff evidence. Evidence generators that prove zero-weight handoff MUST call the repo-owned viewer-prefs handoff helper rather than a synthetic projection. The governed proof family MUST capture invalid viewer-preference failures, canonical normalization comparison, and zero-weight handoff into sampler/ranker behavior.  
+* Same-PR binding. Those artifacts MUST include sibling path proofs, Human Evidence Index entries, Machine Mirror records, hash-sentinel refresh, and topology orientation refresh/check in the same PR that changes the evidence family.
 
 Routing (titles-only):
 
@@ -3454,26 +3600,223 @@ Assumptions (pre-Glow prod).
 
 ### **17.10.1 Compat & Reader (prod QA)**
 
-For Live QA in pre-Glow prod:
+For Live QA and implementation-validation work in pre-Glow prod:
 
-* hdctl showcompat MUST be exercised with birth arguments only (for example, \--birthdate-a/-b, \--birthtime-a/-b, \--location-a/-b).  
-* Rails posture for functional showcompat runs. Any Live QA step that executes showcompat in a context where BodyGraph data is not already available MUST run that step with vendor rails open so the vendor can be called. Closed rails must be treated as an expected blocker for functional showcompat runs under this limitation. This constraint applies until the Engine can store and replay BodyGraphs locally without vendor calls.
-
-* The rails change MUST be explicit and scoped to only the showcompat step(s). After the step, restore the default rails posture.
-
+* hdctl showcompat MUST be exercised with birth arguments only when the proof claim is no-user or pre-App compatibility. Allowed caller or command inputs for the controlled vendor-backed no-user smoke are:  
+  * `\--source vendor`  
+  * `\--birthdate-a`  
+  * `\--birthtime-a`  
+  * `\--location-a`  
+  * `\--birthdate-b`  
+  * `\--birthtime-b`  
+  * `\--location-b`  
+* Forbidden caller or command inputs for the controlled vendor-backed no-user smoke are:  
+  * `\--user-a`  
+  * `\--user-b`  
+  * `\--a-user`  
+  * `\--b-user`  
+  * app user IDs  
+  * `user_id`  
+  * `person_uid`  
+  * DB-backed user BodyGraphs as caller input  
+  * `\--source db`  
+  * any inline secret value  
+* Proof classes MUST remain separate:  
+  * public numeric-free output proof  
+  * internal/admin compatibility compute proof  
+  * vendor-backed no-user behavior proof  
+* The public or birth-facing compatibility path MUST NOT require caller-provided `person_uid`, `user_id`, app user IDs, or DB-backed user BodyGraphs as caller input.  
+* Strict compatibility compute MAY remain internal only if a sanctioned no-user adapter or resolver boundary supplies deterministic internal metadata before compute.  
+* Fixture-only `person_uid` injection or fixture-only `user_id` injection is not sufficient remediation for public or birth-facing no-user behavior proof.  
+* Local pytest and grep checks MAY prove public numeric-free posture, canonicalization, serializer or math properties, and internal compute properties only when labeled as such. They MUST NOT be used as a substitute for vendor-backed no-user behavior proof when the claim is live behavior in the current pre-App no-user environment.  
+* Rails posture for functional showcompat runs. Any Live QA step that executes showcompat in a context where BodyGraph data is not already available MUST run that step with vendor rails open so the vendor can be called. Closed rails must be treated as an expected blocker for functional showcompat runs under this limitation. This constraint applies until the Engine can store and replay BodyGraphs locally without vendor calls.  
+* The rails change MUST be explicit and scoped to only the showcompat step or steps. After the step, restore the default rails posture.  
 * showcompat requires arguments. hdctl showcompat MUST NOT be executed as a zero-argument command in QA runs. If showcompat is attempted under closed rails or without required arguments, classify the outcome as FAIL\_TOOLING or TOOLING\_BLOCKED for that step, not FAIL\_BEHAVIOR, and record the rails posture and failure signature in primary.log. The authoritative command and argument contract is owned by HDE-CLI-API-Vendor-Ref.
 
-* \--user-a/--user-b and \--source=db MUST NOT be used in production QA flows while the app user model is absent.
+OPS-01 discovery posture.
 
-* QA MUST continue to verify:
+* OPS-01 is discovery-only. It may capture command/help output, presence-only environment state, command-candidate disposition, discovery-summary posture, and checksums for captured files.  
+* If exact no-user vendor command proof is not proven, OPS-01 MUST classify the command proof as unresolved and the result as TOOLING\_BLOCKED, not FAIL\_BEHAVIOR.  
+* `audit/ops/hde-epic030/ops-01/vendor_command_candidate.txt` MUST contain either a concrete no-secret no-user vendor command candidate or the exact unresolved sentinel allowed by the governing plan.  
+* `audit/ops/hde-epic030/ops-01/discovery_summary.md` MUST state whether command discovery is proven or unresolved and MUST preserve any blocked or TOOLING\_BLOCKED posture truthfully.  
+* `audit/ops/hde-epic030/ops-01/commands.txt` MUST record the discovery commands and any remediation edit actions actually performed.  
+* `audit/ops/hde-epic030/ops-01/env_presence.json` MUST contain key names and booleans only. It MUST NOT contain secret values.  
+* `audit/ops/hde-epic030/ops-01/files_sha256.txt` MUST cover the OPS-01 captured files except itself.  
+* OPS-01 evidence is not QA PASS, not Live QA completion, not a PF09 status change, and not epic closure.
 
-  * canonical JSON on stdout (UTF-8, no BOM; ASCII-sorted keys; compact; exactly one trailing LF)
+PR-01 discovery posture.
 
-  * AB↔BA identity using swapped birth tuples
+* PR-01 boundary/source-skew discovery MAY be read-only. If it is read-only, it MUST NOT claim implementation, test execution, vendor execution, QA PASS, OPS completion, PF09 status change, or epic closure.  
+* The discovery report MAY establish current source facts such as the `compat_public` signature, current caller metadata posture, `normalize_pair` user-identity requirements, source/evidence skew, public Reader versus internal/admin compat boundary, existing no-user proof gaps, and safe follow-up loci.  
+* Discovery findings MUST keep the public Reader numeric-free proof, internal/admin compat compute proof, and vendor-backed no-user behavior proof separate.
 
-  * Reader v1 envelopes via \--dump-reader, with Reader↔CLI parity proven via the shared presenter/emitter (§4, §8, §18)
+PR-02 local proof posture.
 
-These checks reuse the existing determinism and canonicalization rules in this guide and do not add new transport bytes.
+* PR-02 local implementation proof may satisfy the birth-only boundary at implementation-proof level when it proves all of the following:  
+  * caller inputs contain only `birthdate`, `birthtime`, and `location`  
+  * caller inputs contain no `person_uid`  
+  * caller inputs contain no `user_id`  
+  * boundary-produced internal metadata is created inside the resolver boundary and stays internal  
+  * public Reader remains bands-only and numeric-free  
+  * `/api/compat/v1` remains internal/admin  
+  * no vendor command is run by Codex or any automated agent  
+* The accepted local proof name for this posture is `test_no_user_boundary_accepts_birth_only_input_without_person_uid_or_user_id_and_is_ab_ba_stable`.  
+* PR-02 proves the local boundary only. OPS-02 validates the vendor-backed runtime path and MUST NOT re-litigate the PR-02 local proof unless current evidence contradicts it.
+
+Controlled vendor-backed no-user smoke posture.
+
+* A controlled PO manual vendor-backed no-user smoke is allowed only after command discovery and PR remediation.  
+* The controlled smoke MUST be PO-only, IA-guided, use explicit open rails only for the vendor step, use no app user IDs, use no caller-provided `person_uid`, use no caller-provided `user_id`, store no secret values, capture only presence-safe secret posture, and avoid any guessed command, host, port, URL, service binding, target, or environment fact.  
+* OPS-02 MAY execute the controlled vendor-backed smoke only after the exact command, safe secret posture, target facts, no-user input shape, explicit vendor source posture, PR-02 local proof, and PO proceed authorization are proven.  
+* For the exact CLI vendor smoke shape, the target is the HD Engine CLI running in the PO-controlled execution context using the vendor source through HDAPI.  
+* Required target facts for the exact CLI vendor smoke shape:  
+  * command target: `hdctl showcompat`  
+  * data source: `\--source vendor`  
+  * execution context: PO-controlled terminal with `hdctl` available  
+  * vendor binding: `HDAPI_BASE_URL`  
+  * vendor credential presence: `HD_API_KEY`  
+  * geocoding credential presence, if required by the command path: `GEO_API_KEY`  
+  * deterministic capture pins: `LC_ALL=C`, `LANG=C`, `TZ=UTC`  
+  * open rails for the vendor step only: `SAFE_MODE=0`, `ALLOW_NETWORK=1`  
+  * application environment for this controlled smoke: `APP_ENV=dev`  
+* `HDE_BASE_URL` is not required for the exact CLI vendor smoke unless the command is changed to call an HD Engine HTTP service.  
+* If a future attempt changes the target from CLI vendor execution to an HD Engine HTTP service call, that change requires a PF07-backed target fact set before execution.
+
+OPS-02 command and preflight requirements.
+
+* `audit/ops/hde-epic030/ops-02/vendor_command.txt` MUST contain a fully substituted executable `hdctl showcompat --source vendor` command with birth-only flags. It MUST NOT contain unresolved placeholder tokens before execution.  
+* `audit/ops/hde-epic030/ops-02/sample_birth_inputs.json` MUST contain the birth values used in the command. OPS-02 MUST NOT invent substitute birth values while that file exists.  
+* `vendor_command.txt` MUST contain no `\--user-a`, `\--user-b`, `\--a-user`, `\--b-user`, `user_id`, `person_uid`, inline secret value, or DB-backed user input.  
+* The command MUST contain `\--source vendor`.  
+* The execution wrapper MUST set `SAFE_MODE=0` and `ALLOW_NETWORK=1` for the vendor command only.  
+* The execution wrapper MUST set `APP_ENV=dev`, `LC_ALL=C`, `LANG=C`, and `TZ=UTC`.  
+* `redacted_env_presence.json` MUST record presence booleans for `HDAPI_BASE_URL`, `HD_API_KEY`, and `GEO_API_KEY` as applicable.  
+* `request_summary.txt` MUST record PO authorization before the command runs.  
+* If `audit/ops/hde-epic030/ops-01/vendor_command_candidate.txt` contains the unresolved sentinel, OPS-02 MUST stop as TOOLING\_BLOCKED.
+
+Use this execution wrapper only after every OPS-02 preflight requirement above is satisfied:
+
+`set +e; SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC sh -lc "$(cat audit/ops/hde-epic030/ops-02/vendor_command.txt)" > audit/ops/hde-epic030/ops-02/stdout.json 2> audit/ops/hde-epic030/ops-02/stderr.log; printf "%s\n" "$?" > audit/ops/hde-epic030/ops-02/exit_code.txt`
+
+Execution rules:
+
+* Do not edit the command after a failed run to force a PASS.  
+* Do not retry with different flags, URLs, hostnames, ports, credentials, or birth data unless the change is PF07-backed or HDE-Build Notes-backed and recorded in `result_summary.md`.  
+* Do not run the command through Codex or any automated agent.  
+* Do not persist secret values.  
+* Do not treat an exit-zero run as QA PASS or epic closure.
+
+OPS-02 required evidence outputs. OPS-02 completion requires these files under `audit/ops/hde-epic030/ops-02/`:
+
+* `vendor_command.txt`  
+* `sample_birth_inputs.json`  
+* `redacted_env_presence.json`  
+* `request_summary.txt`  
+* `stdout.json`  
+* `stderr.log`  
+* `exit_code.txt`  
+* `result_summary.md`  
+* `pfcanon_ops02_completion_matrix.md`  
+* `files_sha256.txt`
+
+Required content:
+
+* `vendor_command.txt` must contain the exact executable command used.  
+* `sample_birth_inputs.json` must contain the birth values substituted into the command.  
+* `redacted_env_presence.json` must contain key names and booleans only.  
+* `request_summary.txt` must state that explicit vendor source was used, no `person_uid` was supplied, no `user_id` or app user ID was supplied, birth-only input shape was used, and PO proceed authorization was present.  
+* `stdout.json` must contain command stdout, if any.  
+* `stderr.log` must contain command stderr, if any.  
+* `exit_code.txt` must contain only the command exit code and trailing LF.  
+* `result_summary.md` must classify the outcome as exactly one of: PASS, FAIL\_BEHAVIOR, FAIL\_TOOLING, or TOOLING\_BLOCKED.  
+* `pfcanon_ops02_completion_matrix.md` must map each OPS-02 prerequisite to its PF canon or HDE-Build Notes basis and evidence status.  
+* `files_sha256.txt` must include hashes for all OPS-02 evidence files except itself.
+
+OPS-02 outcome classification.
+
+* PASS may be used only when all preflight rows pass, the exact command runs, `exit_code.txt` records `0`, the command uses `\--source vendor`, the command uses birth-only flags, no app user ID, `user_id`, or caller-provided `person_uid` is supplied, no secret values are persisted, `stdout.json` is non-empty and parseable as JSON unless the command’s documented success output differs, and `result_summary.md` states this is implementation-validation evidence only.  
+* FAIL\_BEHAVIOR may be used only when all prerequisites are proven, the command runs, no tooling or secret failure occurs, and runtime behavior shows that vendor-backed compatibility cannot be computed from the birth-only no-user command.  
+* FAIL\_TOOLING may be used when OPS-02 execution or evidence is contaminated or invalid as a tool run, including inline secret values, persisted secret values, guessed command changes after failure, user identity input, missing evidence files after an attempted run, or env capture that stores secret values instead of booleans.  
+* TOOLING\_BLOCKED may be used when OPS-02 cannot safely run, including unresolved or placeholder-bearing command, missing or incomplete `sample_birth_inputs.json`, required vendor env presence false or uncaptured, missing `hdctl`, absent PO authorization, missing or contradicted PR-02 accepted birth-only proof, or an HTTP-service target change without PF07-backed target facts.
+
+Expected adoption evidence for this remediation path includes:
+
+* PR-01 boundary report  
+* PR-02 targeted test report  
+* absence of caller-provided `person_uid`, `user_id`, or app user ID from the public or birth-facing no-user proof  
+* `audit/ops/hde-epic030/ops-01/vendor_command_candidate.txt`  
+* `audit/ops/hde-epic030/ops-01/discovery_summary.md`  
+* `audit/ops/hde-epic030/ops-01/commands.txt`  
+* `audit/ops/hde-epic030/ops-01/env_presence.json`  
+* `audit/ops/hde-epic030/ops-01/files_sha256.txt`  
+* `audit/ops/hde-epic030/ops-02/vendor_command.txt`  
+* `audit/ops/hde-epic030/ops-02/sample_birth_inputs.json`  
+* `audit/ops/hde-epic030/ops-02/redacted_env_presence.json`  
+* `audit/ops/hde-epic030/ops-02/request_summary.txt`  
+* `audit/ops/hde-epic030/ops-02/stdout.json`  
+* `audit/ops/hde-epic030/ops-02/stderr.log`  
+* `audit/ops/hde-epic030/ops-02/exit_code.txt`  
+* `audit/ops/hde-epic030/ops-02/result_summary.md`  
+* `audit/ops/hde-epic030/ops-02/pfcanon_ops02_completion_matrix.md`  
+* `audit/ops/hde-epic030/ops-02/files_sha256.txt`
+
+These evidence outputs may support remediation verification. They do not by themselves claim QA PASS, Live QA completion, PF09 status change, or epic closure.
+
+QA MUST continue to verify:
+
+* canonical JSON on stdout (UTF-8, no BOM; ASCII-sorted keys; compact; exactly one trailing LF)  
+* AB↔BA identity using swapped birth tuples  
+* Reader v1 envelopes via \--dump-reader, with Reader↔CLI parity proven via the shared presenter/emitter (§4, §8, §18)
+
+These checks reuse the existing determinism and canonicalization rules in this guide and do not add new transport bytes, public routes, public flags, acceptance tokens, QA PASS claims, Live QA completion claims, PF09 status-change claims, or epic-closure claims.
+
+OPS-02 observed completion bundle (records-only). The controlled vendor-backed birth-only no-user smoke for HDE-EPIC030 OPS-02 records an implementation-validation PASS posture, with command execution through `hdctl showcompat --source vendor`, birthdate, birthtime, and location inputs only, no caller app user ID, no caller `user_id`, and no caller-provided `person_uid`.
+
+Observed OPS-02 evidence paths include:
+
+* `audit/ops/hde-epic030/ops-02/vendor_command.txt`  
+* `audit/ops/hde-epic030/ops-02/sample_birth_inputs.json`  
+* `audit/ops/hde-epic030/ops-02/redacted_env_presence.json`  
+* `audit/ops/hde-epic030/ops-02/target_disposition.md`  
+* `audit/ops/hde-epic030/ops-02/pr02_runtime_binding.md`  
+* `audit/ops/hde-epic030/ops-02/request_summary.txt`  
+* `audit/ops/hde-epic030/ops-02/stdout.json`  
+* `audit/ops/hde-epic030/ops-02/stderr.log`  
+* `audit/ops/hde-epic030/ops-02/exit_code.txt`  
+* `audit/ops/hde-epic030/ops-02/stdout_parse_validation.md`  
+* `audit/ops/hde-epic030/ops-02/stdout.json.sha256`  
+* `audit/ops/hde-epic030/ops-02/execution_classification.md`  
+* `audit/ops/hde-epic030/ops-02/result_summary.md`  
+* `audit/ops/hde-epic030/ops-02/files_sha256.txt`  
+* `audit/ops/hde-epic030/ops-02/ops02_complete_action_log_and_evidence_final.md`
+
+Observed OPS-02 proof facts include exit code `0`, non-empty parseable JSON stdout, empty stderr, recorded stdout SHA-256, boolean-only redacted environment presence, `secret_values_detected=false`, `vendor_call_executed=true`, `command_source_was_ops01=true`, and PR-02 runtime binding present.
+
+This observed bundle may support remediation verification and later checklist review language. It remains implementation-validation evidence only and does not by itself claim QA PASS, Live QA completion, PF09 status change, acceptance-map closure, close-pack completion, or epic closure.
+
+OPS-02 observed completion bundle (records-only). The controlled vendor-backed birth-only no-user smoke for HDE-EPIC030 OPS-02 records an implementation-validation PASS posture, with command execution through `hdctl showcompat --source vendor`, birthdate, birthtime, and location inputs only, no caller app user ID, no caller `user_id`, and no caller-provided `person_uid`.
+
+Observed OPS-02 evidence paths include:
+
+* `audit/ops/hde-epic030/ops-02/vendor_command.txt`  
+* `audit/ops/hde-epic030/ops-02/sample_birth_inputs.json`  
+* `audit/ops/hde-epic030/ops-02/redacted_env_presence.json`  
+* `audit/ops/hde-epic030/ops-02/target_disposition.md`  
+* `audit/ops/hde-epic030/ops-02/pr02_runtime_binding.md`  
+* `audit/ops/hde-epic030/ops-02/request_summary.txt`  
+* `audit/ops/hde-epic030/ops-02/stdout.json`  
+* `audit/ops/hde-epic030/ops-02/stderr.log`  
+* `audit/ops/hde-epic030/ops-02/exit_code.txt`  
+* `audit/ops/hde-epic030/ops-02/stdout_parse_validation.md`  
+* `audit/ops/hde-epic030/ops-02/stdout.json.sha256`  
+* `audit/ops/hde-epic030/ops-02/execution_classification.md`  
+* `audit/ops/hde-epic030/ops-02/result_summary.md`  
+* `audit/ops/hde-epic030/ops-02/files_sha256.txt`  
+* `audit/ops/hde-epic030/ops-02/ops02_complete_action_log_and_evidence_final.md`
+
+Observed OPS-02 proof facts include exit code `0`, non-empty parseable JSON stdout, empty stderr, recorded stdout SHA-256, boolean-only redacted environment presence, `secret_values_detected=false`, `vendor_call_executed=true`, `command_source_was_ops01=true`, and PR-02 runtime binding present.
+
+This observed bundle may support remediation verification and later checklist review language. It remains implementation-validation evidence only and does not by itself claim QA PASS, Live QA completion, PF09 status change, acceptance-map closure, close-pack completion, or epic closure.
 
 ### **17.10.2 Aux narratives (prod QA)**
 
@@ -5812,6 +6155,295 @@ EPIC029 early Live QA current-state notes (records-only).
 * checks/po-006 records a PASS formal transport proof-surface step under `audit/qa/hde-epic029/checks/po-006/`, with the endpoint catalog test output and zero return code bound to the governed catalog snapshot; the snapshot confirms `/reader` as the formal A7 surface, keeps `/dev/writer/conjunction` not A7-eligible, and does not promote `/internal/dev/sampler` into the formal proof family.  
 * checks/po-007 records a PASS functional-bundle step under `audit/qa/hde-epic029/checks/po-007/`, with the combined pytest output and zero return code bound to the governed step family; the accepted execution records a step-local dependency preflight in `primary.log` command provenance and does not add a second governed deliverable family beyond `primary.log`, `functional_bundle.output.log`, and `functional_bundle.rc.txt`.
 
+EPIC030 early Live QA evidence paths observed (records-only):
+
+* checks/po-001:  
+  * `audit/qa/hde-epic030/checks/po-001/primary.log`  
+  * `audit/qa/hde-epic030/checks/po-001/surface_inventory.txt`  
+  * `audit/qa/hde-epic030/checks/po-001/exit_code.txt`  
+* checks/po-002:  
+  * `audit/qa/hde-epic030/checks/po-002/primary.log`  
+  * `audit/qa/hde-epic030/checks/po-002/pytest_stdout.log`  
+  * `audit/qa/hde-epic030/checks/po-002/generator_stdout.log`  
+  * `audit/qa/hde-epic030/checks/po-002/pytest_rc.txt`  
+  * `audit/qa/hde-epic030/checks/po-002/generator_rc.txt`  
+  * `audit/qa/hde-epic030/checks/po-002/exit_code.txt`  
+  * `audit/qa/hde-epic030/pr-01/zero_weight_handoff.json`  
+* checks/po-003:  
+  * `audit/qa/hde-epic030/checks/po-003/primary.log`  
+  * `audit/qa/hde-epic030/checks/po-003/pytest_stdout.log`  
+  * `audit/qa/hde-epic030/checks/po-003/generator_rc.txt`  
+  * `audit/qa/hde-epic030/checks/po-003/exit_code.txt`  
+  * `audit/qa/hde-epic030/pr-01/invalid_viewer_prefs.log`  
+  * `audit/qa/hde-epic030/pr-01/normalization_canonical_compare.log`  
+* checks/po-004:  
+  * `audit/qa/hde-epic030/checks/po-004/primary.log`  
+  * `audit/qa/hde-epic030/checks/po-004/pytest_stdout.log`  
+  * `audit/qa/hde-epic030/checks/po-004/generator_rc.txt`  
+  * `audit/qa/hde-epic030/checks/po-004/exit_code.txt`  
+  * `audit/qa/hde-epic030/pr-02/dev_sampler_two_run_identity.json`  
+  * `audit/qa/hde-epic030/pr-02/dev_sampler_http_headers.txt`  
+* checks/po-005:  
+  * `audit/qa/hde-epic030/checks/po-005/primary.log`  
+  * `audit/qa/hde-epic030/checks/po-005/pytest_stdout.log`  
+  * `audit/qa/hde-epic030/checks/po-005/generator_rc.txt`  
+  * `audit/qa/hde-epic030/checks/po-005/exit_code.txt`  
+  * `audit/qa/hde-epic030/pr-03/compat_identity_binding.log`  
+  * `audit/qa/hde-epic030/pr-03/compat_parity_binding.log`
+
+EPIC030 early Live QA current-state notes (records-only).
+
+* checks/po-001 records a PASS surface-inventory step under `audit/qa/hde-epic030/checks/po-001/`, with seeded route families present and no HDE-EPIC030 public-route widening recorded.  
+* checks/po-002 records a PASS zero-weight handoff step under `audit/qa/hde-epic030/checks/po-002/`, with the PR-01 `zero_weight_handoff.json` proof showing zero-weight candidate exclusion while the positive-weight candidate remains in the sampler pool.  
+* checks/po-003 records a PASS normalization evidence step under `audit/qa/hde-epic030/checks/po-003/`, with the PR-01 invalid-viewer-preferences and canonical-normalization comparison logs present and non-empty.  
+* checks/po-004 records a PASS dev sampler harness step under `audit/qa/hde-epic030/checks/po-004/`, with the PR-02 two-run identity and dev/internal header artifacts present and non-empty, scoped to `/internal/dev/sampler`.  
+* checks/po-005 records a PASS compatibility identity/parity step under `audit/qa/hde-epic030/checks/po-005/`, with the PR-03 identity and parity binding logs present and non-empty and recording order-neutral, identity-stable compatibility behavior for the implemented slice.
+
+EPIC030 continued Live QA evidence paths observed (records-only):
+
+* checks/po-006:  
+  * `audit/qa/hde-epic030/checks/po-006/primary.log`  
+  * `audit/qa/hde-epic030/checks/po-006/numeric_free_grep.txt`  
+  * `audit/qa/hde-epic030/checks/po-006/ops02_evidence_validation.json`  
+  * `audit/qa/hde-epic030/checks/po-006/ops02_evidence_validation.stderr`  
+  * `audit/qa/hde-epic030/checks/po-006/ops02_evidence_validation_rc.txt`  
+  * `audit/qa/hde-epic030/checks/po-006/pytest_rc.txt`  
+  * `audit/qa/hde-epic030/pr-05/category_framework_binding.log`  
+  * `audit/ops/hde-epic030/ops-02/files_sha256.txt`  
+  * `audit/ops/hde-epic030/ops-02/ops02_complete_action_log_and_evidence_final.md`  
+* checks/po-007:  
+  * `audit/qa/hde-epic030/checks/po-007/primary.log`  
+  * `audit/qa/hde-epic030/checks/po-007/threshold_ownership.txt`  
+  * `audit/qa/hde-epic030/checks/po-007/generator_stdout.log`  
+  * `audit/qa/hde-epic030/checks/po-007/generator_stderr.log`  
+  * `audit/qa/hde-epic030/checks/po-007/generator_rc.txt`  
+  * `audit/qa/hde-epic030/checks/po-007/preflight.log`  
+  * `audit/qa/hde-epic030/checks/po-007/exit_code.txt`  
+  * `audit/qa/hde-epic030/pr-04/band_edges_binding.log`  
+* checks/po-008:  
+  * `audit/qa/hde-epic030/checks/po-008/primary.log`  
+  * `audit/qa/hde-epic030/checks/po-008/status_gate.log`  
+  * `audit/qa/hde-epic030/checks/po-008/preflight.log`  
+  * `audit/qa/hde-epic030/checks/po-008/pytest_stdout.log`  
+  * `audit/qa/hde-epic030/pr-04/band_thresholds_diff.json`  
+  * `audit/qa/hde-epic030/pr-04/band_thresholds_identity_hash.txt`
+
+EPIC030 continued Live QA current-state notes (records-only):
+
+* checks/po-006 records a PASS public compatibility and OPS-02 validation step under `audit/qa/hde-epic030/checks/po-006/`, with public Reader bands-only numeric-free proof, OPS-02 evidence validation PASS, pytest and grep return codes `0`, and the OPS-02 complete evidence bundle bound for review. The bounded Moon Loop remediation for this step updated `audit/ops/hde-epic030/ops-02/files_sha256.txt` with a deterministic self-reference row, did not run a new vendor command, did not open network rails, and did not expand evidence roots.  
+* checks/po-007 records a PASS threshold-ownership step under `audit/qa/hde-epic030/checks/po-007/`, with closed rails, required source loci present, `engine.compat.thresholds.THRESHOLDS_V1` as the governed compat threshold source, no duplicate threshold home introduced, generator return code `0`, and PR-04 `band_edges_binding.log` present with status PASS.  
+* checks/po-008 records a PASS band-tuning proof step under `audit/qa/hde-epic030/checks/po-008/`, with generator, pytest, and artifact-presence return codes `0`, PR-04 `band_thresholds_diff.json` present, and PR-04 `band_thresholds_identity_hash.txt` accepted as the implemented identity-hash artifact. The bounded Moon Loop aligned the check from the stale planned `band_thresholds_identity.log` path to the implemented `band_thresholds_identity_hash.txt` path without code changes, PF-Canon edits, or new evidence roots.
+
+EPIC030 final Live QA evidence paths observed for this slice (records-only):
+
+* checks/po-009:  
+  * `audit/qa/hde-epic030/checks/po-009/primary.log`  
+  * `audit/qa/hde-epic030/checks/po-009/exit_code.txt`  
+  * `audit/qa/hde-epic030/checks/po-009/generator_rc.txt`  
+  * `audit/qa/hde-epic030/checks/po-009/pytest_rc.txt`  
+  * `audit/qa/hde-epic030/checks/po-009/pytest_stdout.log`  
+  * `audit/qa/hde-epic030/pr-05/category_framework_binding.log`  
+  * `audit/qa/hde-epic030/pr-05/category_canonical_compare.log`  
+  * `audit/qa/hde-epic030/pr-05/per_channel_mechanics.json`  
+* checks/po-010:  
+  * `audit/qa/hde-epic030/checks/po-010/primary.log`  
+  * `audit/qa/hde-epic030/checks/po-010/exit_code.txt`  
+  * `audit/qa/hde-epic030/checks/po-010/fail_closed_visibility.txt`  
+  * `audit/qa/hde-epic030/checks/po-010/pytest_rc.txt`  
+  * `audit/qa/hde-epic030/checks/po-010/pytest_stdout.log`  
+  * `tests/evidence/test_epic030_pr01_pr03_fail_closed_evidence.py`  
+* checks/po-011:  
+  * `audit/qa/hde-epic030/checks/po-011/primary.log`  
+  * `audit/qa/hde-epic030/checks/po-011/traceability_summary.json`  
+  * `audit/qa/hde-epic030/checks/po-011/exit_code.txt`  
+* checks/po-012:  
+  * `audit/qa/hde-epic030/checks/po-012/primary.log`  
+  * `audit/qa/hde-epic030/checks/po-012/reused_history_classification.txt`  
+  * `audit/qa/hde-epic030/00_meta/doc_deltas.md`  
+  * `audit/qa/hde-epic030/00_meta/step_0b_primary.log`  
+  * `audit/docdeltas/hde-epic030_doc_deltas.md`
+
+EPIC030 final Live QA current-state notes for this slice (records-only):
+
+* checks/po-009 records a PASS category-framework binding step under `audit/qa/hde-epic030/checks/po-009/`, with generator and pytest return codes `0`, primary log PASS, PR-05 `category_framework_binding.log` PASS, PR-05 `category_canonical_compare.log` PASS, per-channel mechanics PASS, public Reader bands-only numeric-free proof, and Human Index and Machine Mirror binding present.  
+* checks/po-010 records a PASS generated-proof fail-closed step under `audit/qa/hde-epic030/checks/po-010/`. The first run correctly stopped at TOOLING\_BLOCKED because PR-01 through PR-03 lacked explicit fail-closed proof coverage. The accepted remediation added PR-01 through PR-03 fail-closed proof coverage, reran the full fail-closed suite with PR-01 through PR-05 proof families covered, recorded `fail_closed_visibility.txt` as proven for PR-01 through PR-05, and preserved non-claim posture for close-pack completion, PF-canon drainage completion, and acceptance-map closure.  
+* checks/po-011 records a PASS traceability step under `audit/qa/hde-epic030/checks/po-011/`, with `traceability_summary.json` recording required PR-slice artifacts present, indexed in `docs/evidence/INDEX.json`, and mirrored in `artifacts/evidence_index.jsonl`, and with the primary log recording PASS, exit code `0`, and plan-copy command provenance.  
+* checks/po-012 records a PASS reused-history classification step under `audit/qa/hde-epic030/checks/po-012/`, after bounded Step-0B precondition remediation restored `audit/docdeltas/hde-epic030_doc_deltas.md`, `audit/qa/hde-epic030/00_meta/doc_deltas.md`, and `audit/qa/hde-epic030/00_meta/step_0b_primary.log`. The final classification separates reused-history rows `HDE-DISS005.1`, `HDE-DISS006.1`, and `HDE-DISS006.2` from active HDE-EPIC030 rows and records `new_implementation_claim_for_reused_history: False`.
+
+EPIC030 late Live QA evidence paths observed (records-only):
+
+* checks/po-013:  
+  * audit/qa/hde-epic030/checks/po-013/primary.log  
+  * audit/qa/hde-epic030/checks/po-013/source\_of\_truth\_posture.txt  
+* checks/po-014:  
+  * audit/qa/hde-epic030/checks/po-014/primary.log  
+  * audit/qa/hde-epic030/checks/po-014/all\_slice\_coherence.json  
+  * audit/qa/hde-epic030/checks/po-014/exit\_code.txt  
+* checks/po-015:  
+  * audit/qa/hde-epic030/checks/po-015/primary.log  
+  * audit/qa/hde-epic030/checks/po-015/discovery.json  
+  * audit/qa/hde-epic030/checks/po-015/discovery\_validation.txt  
+* checks/po-016:  
+  * audit/qa/hde-epic030/checks/po-016/primary.log  
+  * audit/EPIC-030\_QA\_RCA.md  
+* checks/po-017:  
+  * audit/qa/hde-epic030/checks/po-017/primary.log  
+  * audit/qa/hde-epic030/checks/po-017/documentation\_drainage\_posture.txt
+
+EPIC030 late Live QA current-state notes (records-only):
+
+* checks/po-013 records a PASS source-of-truth posture step under audit/qa/hde-epic030/checks/po-013/, with repo-supported completion, canon-drain completion, and formal close-pack completion kept as separate states. The step records that documentation drainage is not a required execution gate before QA PASS.  
+* checks/po-014 records a PASS all-slice coherence step under audit/qa/hde-epic030/checks/po-014/, with all prior po-001 through po-013 primary logs present, required PR-01 through PR-05 core artifacts present, and derived PASS status aligned with recorded primary-log status and exit code 0\.  
+* checks/po-015 records a PASS baseline discovery step under audit/qa/hde-epic030/checks/po-015/, with discovery.json present and parseable, rails, paths, and surfaces present, and discovery\_validation.txt recording discovery validity.  
+* checks/po-016 records a PASS QA RCA step under audit/qa/hde-epic030/checks/po-016/, with audit/EPIC-030\_QA\_RCA.md generated and containing Coverage vs QA Plan, Findings classification, Outcome meaning, evidence support, canon follow-up, and closeout-readiness interpretation.  
+* checks/po-017 records a PASS documentation-drainage posture step under audit/qa/hde-epic030/checks/po-017/, with drainage\_blocker recorded as False, PF09.2 drainage before otherwise-proven QA PASS recorded as False, and real truth-and-proof blockers preserved as the relevant blocker class.  
+* checks/po-015 and checks/po-016 record Plan \+ QA syntax correction command provenance for rendered Markdown exception-class syntax defects. The corrected executions preserve the approved proof targets, artifact families, and PASS/FAIL predicates, and the provenance is recorded in governed step evidence.
+
+EPIC030 QA RCA and closeout interpretation posture (records-only). The QA RCA records source-of-truth posture, coverage vs QA Plan, QA timeline, findings classification, root cause analysis, remediation loop assessment, implementation gaps, doc deltas excluding PF10, and an explicit readiness recommendation. The recorded root cause class is proof-class and evidence-discipline separation across a Dissolution closeout, including no-user/vendor proof ambiguity, generated-proof fail-closed coverage gaps, and separation between repo-supported completion, PF09.2 drainage, and formal close-pack completion.
+
+EPIC030 QA RCA remediation-loop notes (records-only):
+
+* po-006 remediation updated audit/ops/hde-epic030/ops-02/files\_sha256.txt with a deterministic self-reference row and reran the existing tests, grep, OPS-02 validator, and header generation without running a new vendor command.  
+* po-010 remediation changed an initial TOOLING\_BLOCKED posture to PASS after PR-01 through PR-03 generated proof families received explicit fail-closed coverage and the full po-010 suite reran.  
+* po-011 and po-012 remediation used Step-0B precondition evidence to reduce ambiguity around reused-history and active-scope separation before final PASS.  
+* The repeated evidence-generator lesson is that top-level PASS must derive from decisive predicate checks and not from partial or stale local state.
+
+EPIC030 closeout readiness note (records-only). The recorded QA verdict is READY WITH CAVEATS. The caveats preserve that QA closeout readiness is not a claim that PF09.2 drainage is complete or that formal close-pack completion is proven beyond the surfaced close-pack artifacts and separate OPS review.
+
+EPIC030 late Live QA evidence paths observed (records-only):
+
+* checks/po-013:  
+  * audit/qa/hde-epic030/checks/po-013/primary.log  
+  * audit/qa/hde-epic030/checks/po-013/source\_of\_truth\_posture.txt  
+* checks/po-014:  
+  * audit/qa/hde-epic030/checks/po-014/primary.log  
+  * audit/qa/hde-epic030/checks/po-014/all\_slice\_coherence.json  
+  * audit/qa/hde-epic030/checks/po-014/exit\_code.txt  
+* checks/po-015:  
+  * audit/qa/hde-epic030/checks/po-015/primary.log  
+  * audit/qa/hde-epic030/checks/po-015/discovery.json  
+  * audit/qa/hde-epic030/checks/po-015/discovery\_validation.txt  
+* checks/po-016:  
+  * audit/qa/hde-epic030/checks/po-016/primary.log  
+  * audit/EPIC-030\_QA\_RCA.md  
+* checks/po-017:  
+  * audit/qa/hde-epic030/checks/po-017/primary.log  
+  * audit/qa/hde-epic030/checks/po-017/documentation\_drainage\_posture.txt
+
+EPIC030 late Live QA current-state notes (records-only):
+
+* checks/po-013 records a PASS source-of-truth posture step under audit/qa/hde-epic030/checks/po-013/, with repo-supported completion, canon-drain completion, and formal close-pack completion kept as separate states. The step records that documentation drainage is not a required execution gate before QA PASS.  
+* checks/po-014 records a PASS all-slice coherence step under audit/qa/hde-epic030/checks/po-014/, with all prior po-001 through po-013 primary logs present, required PR-01 through PR-05 core artifacts present, and derived PASS status aligned with recorded primary-log status and exit code 0\.  
+* checks/po-015 records a PASS baseline discovery step under audit/qa/hde-epic030/checks/po-015/, with discovery.json present and parseable, rails, paths, and surfaces present, and discovery\_validation.txt recording discovery validity.  
+* checks/po-016 records a PASS QA RCA step under audit/qa/hde-epic030/checks/po-016/, with audit/EPIC-030\_QA\_RCA.md generated and containing Coverage vs QA Plan, Findings classification, Outcome meaning, evidence support, canon follow-up, and closeout-readiness interpretation.  
+* checks/po-017 records a PASS documentation-drainage posture step under audit/qa/hde-epic030/checks/po-017/, with drainage\_blocker recorded as False, PF09.2 drainage before otherwise-proven QA PASS recorded as False, and real truth-and-proof blockers preserved as the relevant blocker class.  
+* checks/po-015 and checks/po-016 record Plan \+ QA syntax correction command provenance for rendered Markdown exception-class syntax defects. The corrected executions preserve the approved proof targets, artifact families, and PASS/FAIL predicates, and the provenance is recorded in governed step evidence.
+
+EPIC030 QA RCA and closeout interpretation posture (records-only). The QA RCA records source-of-truth posture, coverage vs QA Plan, QA timeline, findings classification, root cause analysis, remediation loop assessment, implementation gaps, doc deltas excluding PF10, and an explicit readiness recommendation. The recorded root cause class is proof-class and evidence-discipline separation across a Dissolution closeout, including no-user/vendor proof ambiguity, generated-proof fail-closed coverage gaps, and separation between repo-supported completion, PF09.2 drainage, and formal close-pack completion.
+
+EPIC030 QA RCA remediation-loop notes (records-only):
+
+* po-006 remediation updated audit/ops/hde-epic030/ops-02/files\_sha256.txt with a deterministic self-reference row and reran the existing tests, grep, OPS-02 validator, and header generation without running a new vendor command.  
+* po-010 remediation changed an initial TOOLING\_BLOCKED posture to PASS after PR-01 through PR-03 generated proof families received explicit fail-closed coverage and the full po-010 suite reran.  
+* po-011 and po-012 remediation used Step-0B precondition evidence to reduce ambiguity around reused-history and active-scope separation before final PASS.  
+* The repeated evidence-generator lesson is that top-level PASS must derive from decisive predicate checks and not from partial or stale local state.
+
+EPIC030 closeout readiness note (records-only). The recorded QA verdict is READY WITH CAVEATS. The caveats preserve that QA closeout readiness is not a claim that PF09.2 drainage is complete or that formal close-pack completion is proven beyond the surfaced close-pack artifacts and separate OPS review.
+
+EPIC030 final closure review and retrospective bundle observed (records-only). The HDE-EPIC030 final closeout review records a satisfied closure trace for review purposes only. It is not a PO closeout action, not PF09.2 drainage, not a new QA PASS claim beyond the PF10-recorded check outcomes, and not a new acceptance-token source.
+
+Final review source posture observed:
+
+* PF10 is the primary record for epic-specific implementation events, remediation loops, ADRs, QA outcomes, evidence pointers, and review-close trace.  
+* PF23 is current-reality context only and is not closure proof, a gate, or an acceptance source.  
+* PF-Canon is normative where PF10 is silent.  
+* PF19 and PF06 supplied QA RCA and close-gate interpretation where PF10 was silent.  
+* The Implementation Guide and QA Plan were used only for intended scope, goals, requirements, and evidence framing.  
+* PF20 was not used.
+
+Final deliverable register observed:
+
+* D1 zero-weight rule handoff.  
+* D2 sampler endpoint harness.  
+* D3 normalization evidence coverage.  
+* D4 compatibility evidence and indexing.  
+* D5 reused already-complete Dissolution foundations.  
+* D6 band thresholds and tuning active carry-forward.  
+* D7 category-framework active carry-forward.  
+* Human Evidence Index and Machine Mirror governance.  
+* Live QA close-stage proof.  
+* Close-pack baseline, including `audit/EPIC-030_close_report.md`, `audit/EPIC-030_MANIFEST.json`, and sibling path proofs.
+
+Final QA verification register observed:
+
+* PO-001 boundary and no public widening.  
+* PO-002 zero-weight handoff.  
+* PO-003 normalization determinism.  
+* PO-004 dev-only sampler harness.  
+* PO-005 compatibility identity and order coherence.  
+* PO-006 public numeric-free compatibility proof plus OPS-02 evidence.  
+* PO-007 threshold ownership.  
+* PO-008 tuning comparison and identity proof.  
+* PO-009 category-framework proof.  
+* PO-010 generated-proof fail-closed proof.  
+* PO-011 governed evidence traceability.  
+* PO-012 reused-history separation.  
+* PO-013 drainage-state separation.  
+* PO-014 all-slice coherence.  
+* PO-015 baseline discovery and tool health.  
+* PO-016 final QA interpretation.  
+* PO-017 documentation-drainage non-blocker posture.
+
+Final closure trace observed. D1 through D7, the public numeric-free compatibility proof, OPS-02 no-user vendor-backed implementation-validation evidence, D0 discovery and tool health, QA RCA and final QA interpretation, doc-delta non-blocker posture, close-pack pair and manifest, and PF09.2 later-drain support are all recorded as satisfied for the review trace. PF09.2 later-drain support remains not-drained and must not be described as already drained.
+
+Final path and surface ledger observed. The review records these closure-relevant governed paths or surfaces as proven in PF10:
+
+* `docs/evidence/INDEX.json`  
+* `docs/evidence/INDEX.sha256`  
+* `artifacts/evidence_index.jsonl`  
+* `artifacts/evidence_index.jsonl.sha256`  
+* `audit/qa/hde-epic030/checks/po-006/primary.log`  
+* `audit/qa/hde-epic030/checks/po-006/numeric_free_grep.txt`  
+* `audit/qa/hde-epic030/checks/po-006/ops02_evidence_validation.json`  
+* `audit/ops/hde-epic030/ops-02/ops02_complete_action_log_and_evidence_final.md`  
+* `audit/qa/hde-epic030/qa_step_logs_manifest.json`  
+* `audit/qa/hde-epic030/qa_step_logs_manifest.json.path_proof.txt`  
+* `audit/EPIC-030_close_report.md`  
+* `audit/EPIC-030_close_report.md.path_proof.txt`  
+* `audit/EPIC-030_MANIFEST.json`  
+* `audit/EPIC-030_MANIFEST.json.path_proof.txt`  
+* `audit/docdeltas/hde-epic030_doc_deltas.md`  
+* `audit/docdeltas/hde-epic030_drain_targets.md`  
+* `/api/compat/v1`  
+* `/internal/dev/sampler`
+
+Final path and surface context observed. The review records `/reader`, `presenter/reader_v1/emitter.py`, `engine/presenter/emitter.py`, `engine/bodygraph/vendor_client.py`, and `engine/charts/loader.py` as current-reality context rather than closure proof. The `engine/charts/loader.py` seam remains an unresolved reality/canon interpretation question unless adjudicated by the owning canon process.
+
+Final closure decision observed. HDE-EPIC030 is recorded as SATISFIED for this review trace, with caveats. The caveats are later PF09.2 drainage and canonization of lessons learned. PF23 drift signals do not block the PF10-backed closure trace unless a later PO or canon decision turns them into executable work.
+
+Final QA RCA mechanics lessons observed:
+
+* The primary root cause was proof-class and evidence-discipline failure across a Dissolution closeout, not a single runtime failure.  
+* The no-user environment made vendor-backed proof easy to confuse with user-ID or DB-backed proof.  
+* Generated proof artifacts could appear green before decisive predicate binding was complete.  
+* Implementation proof, QA proof, PF09.2 drain, and formal close-pack proof needed sharper separation.  
+* po-006 Moon Loop was acceptable because it was bounded, PO-approved, evidence-scoped, did not open network rails, and did not expand evidence roots.  
+* po-010 remediation was acceptable because it converted TOOLING\_BLOCKED into PASS by adding fail-closed coverage and rerunning the full po-010 suite.  
+* po-011 and po-012 remediation were acceptable because Step-0B precondition remediation clarified reused-history and active-scope separation.  
+* OPS-03 evidence-packaging remediation was acceptable because it repaired transcript, exit-code, stdout, inventory, and validation provenance defects while preserving packaging-only scope.
+
+Final retrospective mechanics notes observed:
+
+* The active implementation scope included normalization and zero-weight handoff, dev-only sampler harness, compatibility evidence and indexing, band-threshold and tuning carry-forward, and category-framework carry-forward.  
+* The implementation was delivered as five PR slices and later Live QA checks po-001 through po-017.  
+* OPS-01 remained TOOLING\_BLOCKED for exact no-secret no-user vendor command proof.  
+* OPS-02 completed the vendor-backed no-user smoke as implementation-validation evidence.  
+* OPS-03 completed close-pack evidence packaging and surfacing.  
+* The evidence inventory includes PR-01 through PR-05 evidence families, po-001 through po-017 primary logs, the QA step-log manifest, QA RCA, close report, close manifest, doc-delta ledger, and drain-target ledger.  
+* No closure-trace evidence gap remains visible in PF10.  
+* PF09.2 actual drain is not proven and is intentionally non-claimed.  
+* The strongest retained mechanics lessons are proof-class separation, governed evidence binding, generated-proof fail-closed posture, explicit no-user vendor-backed proof labels, multi-root evidence governance through index/mirror/path-proof discipline, and non-claim posture for PF09.2 drainage.
+
 ### **37.4.1 CLI help and argument-policing captures for conjunction-mode evidence**
 
 When a governed review, QA step, or docs-evidence update depends on the shipped CLI syntax or CLI rejection behavior for conjunction flows, governed capture artifacts MUST be recorded for:
@@ -6560,6 +7192,41 @@ EPIC029 closeout posture (records-only). The close-pack family binds the governe
 Governed evidence-family posture (normative). Any governed evidence family that participates in acceptance binding MUST express one authoritative posture per claimed closure dimension. Mixed-state families are mechanically invalid: contradictory `closed`, `not yet closed`, deferred, partial, or equivalent postures for the same dimension MUST be normalized before acceptance binding or close-pack consolidation.
 
 Documentation/evidence normalization posture (normative). When runtime facts are unchanged and only the closure interpretation changes, a documentation/evidence normalization pass MAY update the family without a new runtime rerun, provided the closure mode is explicit and every affected governed artifact, Index/Mirror entry, checksum companion, and path-proof is refreshed coherently in the same change.
+
+EPIC030 close-pack baseline and OPS-03 evidence-packaging bundle observed (records-only).
+
+EPIC030 close-pack and supporting closeout artifacts observed:
+
+* audit/EPIC-030\_close\_report.md  
+* audit/EPIC-030\_MANIFEST.json  
+* audit/EPIC-030\_close\_report.md.path\_proof.txt  
+* audit/EPIC-030\_MANIFEST.json.path\_proof.txt  
+* audit/EPIC-030\_QA\_RCA.md  
+* docs/acceptance\_map\_epic030.json  
+* audit/qa/hde-epic030/token\_evidence\_matrix.md  
+* audit/qa/hde-epic030/qa\_step\_logs\_manifest.json  
+* audit/docdeltas/hde-epic030\_doc\_deltas.md  
+* audit/docdeltas/hde-epic030\_drain\_targets.md
+
+OPS-03 evidence-packaging bundle observed:
+
+* audit/ops/hde-epic030/ops-03/commands.txt  
+* audit/ops/hde-epic030/ops-03/commands\_prev\_invalid.txt  
+* audit/ops/hde-epic030/ops-03/stdout.log  
+* audit/ops/hde-epic030/ops-03/stderr.log  
+* audit/ops/hde-epic030/ops-03/exit\_codes.txt  
+* audit/ops/hde-epic030/ops-03/final\_evidence\_inventory.md  
+* audit/ops/hde-epic030/ops-03/final\_evidence\_inventory.md.path\_proof.txt  
+* audit/ops/hde-epic030/ops-03/final\_validation.log  
+* audit/ops/hde-epic030/ops-03/created\_files\_sha256.txt
+
+OPS-03 packaging posture (records-only). The OPS-03 bundle is evidence packaging and close-pack surfacing only. It records closed deterministic rails, no QA reruns, no vendor calls, no implementation changes, no PF-Canon edits, no PF09.2 drain claims, and no new acceptance claims.
+
+OPS-03 remediation posture (records-only). The R3 evidence remediates prior OPS-03 evidence blockers by replacing the invalid transcript with executable labeled heredoc command blocks, preserving the prior invalid transcript for audit, labeling stdout, stderr, and exit-code evidence by action, regenerating the three-column final inventory, regenerating its sibling path proof, and validating file existence, manifest bindings, close report text, path proofs, final inventory, and the OPS-03 evidence bundle.
+
+Manifest and inventory posture (records-only). The EPIC030 close-pack manifest records key\_outputs as a named binding map for close-pack, QA, doc-delta, drain-target, and OPS-03 inventory/checksum outputs. The final inventory records 18 governed artifacts present and 0 missing. The checksum ledger records 12 files checksummed.
+
+Drain posture (records-only). OPS-03 proves close-pack surfacing and drain-target recording. It does not by itself prove PF09.2 row status changes, PF09.2 drainage completion, QA rerun completion, new acceptance claims, or epic closure beyond the surfaced close-pack and OPS-03 evidence family.
 
 Same-PR rule. Any addition, removal, or relocation in this registry must update both Index and Mirror in the same commit/PR.
 

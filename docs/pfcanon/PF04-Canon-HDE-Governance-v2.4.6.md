@@ -3,12 +3,12 @@
 ## 0.1 Header
 
  **Title:** PF04-Canon-HDE-Governance  
- **Version:** v2.3.5
+ **Version:** v2.4.6
 
 **Status:** Canon  
-**Effective date:** 2026-04-19
+**Effective date:** 2026-05-07
 
-**Last Update Gate:** BN 10.5.7 A35
+**Last Update Gate:** canon-update-hdapi-v2-conformance
 
 **Invocation tag:** `INV-f2ac55d77ce9aacc`
 
@@ -551,25 +551,25 @@ Any deviation is a mechanical blocker. The binding must be corrected, not interp
  These clarifications do not introduce new tokens. They make existing evidence tokens concrete for common drift failures.
 
 1. **Human index and hash sentinel are governed artifacts with governed path-proofs.**  
-    The following files are governed and MUST each have a co-located path-proof transcript:
-
-   * `docs/evidence/INDEX.json` and `docs/evidence/INDEX.json.path_proof.txt`
-
-   * `docs/evidence/INDEX.sha256` and `docs/evidence/INDEX.sha256.path_proof.txt`
-
-2. When either `INDEX.json` or `INDEX.sha256` changes bytes, its `*.path_proof.txt` MUST be regenerated in the same PR as the byte change. Stale or mismatched `INDEX.*.path_proof.txt` is a hard failure under the existing evidence/path-proof tokens in this section.
-
+    The following files are governed and MUST each have a co-located path-proof transcript:  
+   * `docs/evidence/INDEX.json` and `docs/evidence/INDEX.json.path_proof.txt`  
+   * `docs/evidence/INDEX.sha256` and `docs/evidence/INDEX.sha256.path_proof.txt`  
+2. When either `INDEX.json` or `INDEX.sha256` changes bytes, its `*.path_proof.txt` MUST be regenerated in the same PR as the byte change. Stale or mismatched `INDEX.*.path_proof.txt` is a hard failure under the existing evidence/path-proof tokens in this section.  
 3. **Machine mirror self-record must reflect the whole mirror file bytes.**  
-    The `index.machine_mirror` self-record must represent the current `artifacts/evidence_index.jsonl` file, and its `sha256` and `size_bytes` must match the canonical bytes of the whole mirror file (file-bytes basis, not a “row-body” basis). Its `proof_anchor` must point to a co-located path-proof for the mirror file.
-
+    The `index.machine_mirror` self-record must represent the current `artifacts/evidence_index.jsonl` file, and its `sha256` and `size_bytes` must match the canonical bytes of the whole mirror file (file-bytes basis, not a “row-body” basis). Its `proof_anchor` must point to a co-located path-proof for the mirror file.  
 4. **Remediation posture for evidence drift (merge-blocking).**  
     If any governed artifact’s `*.path_proof.txt` (including the INDEX path-proofs above) disagrees with the on-disk artifact bytes (sha256 or size), treat it as a mechanical blocker. Remediation is to regenerate evidence via the canonical evidence tooling (for example `tools/evidence/update_evidence_index.py` and its `--check` mode), not to hand-edit path proofs or machine mirror rows. When the same generation flow still produces more than one governed canonical-JSON evidence family, remediation and closeout MUST treat every changed still-produced family in that generation scope as in-scope. This includes any legacy-named canonical-JSON outputs that remain produced alongside the authoritative family. Closeout for a canonical-JSON-gate or evidence-indexing row may be stated only when the changed governed families in scope have been refreshed coherently in the same run, including their co-located `*.path_proof.txt` companions and any required index or mirror updates for changed artifacts. A green authoritative subfamily is insufficient if another changed still-produced family remains stale, unindexed, unmirrored, or missing current companion proofs.  
 5. **Chronology correctness (produced\_at and proof timestamps)** These are clarifications of existing evidence tokens; no new tokens are introduced.  
-   * **No backdating.** A record MUST NOT claim an earlier `produced_at_utc` or proof timestamp for an artifact whose bytes were created or modified later; that is treated as an integrity failure.  
-   * **Proof capture is post-artifact (expected).** It is normal for a `*.path_proof.txt` transcript’s `produced_at_utc` (and related proof timestamps) to be later than the governed artifact’s filesystem `mtime`/`mtime_utc`; the proof is captured after file production. This is not “contradictory chronology.”  
-   * **Index family included.** If an `audit/**/_index/evidence_index.json` is used for acceptance, it is governed by `EVIDENCE_INDEX_PRESENT_OK` and its chronology fields apply.  
-   * **Acceptance artifacts included.** If an epic’s acceptance artifacts bind to this report as decisive evidence, the artifact MUST follow the evidence skeleton (path-proof, evidence-index update, etc.).  
-   * **Failure posture (merge-blocking).** If these fields are stale or contradictory (for example, a changed artifact whose proof timestamps or mirror `produced_at_utc` imply a prior production context), the merge is blocked until corrected (see §2.0.5 and §9.7.0).
+* **No backdating.** A record MUST NOT claim an earlier `produced_at_utc` or proof timestamp for an artifact whose bytes were created or modified later; that is treated as an integrity failure.  
+* **Proof capture is post-artifact (expected).** It is normal for a `*.path_proof.txt` transcript’s `produced_at_utc` (and related proof timestamps) to be later than the governed artifact’s filesystem `mtime`/`mtime_utc`; the proof is captured after file production. This is not “contradictory chronology.”  
+* **Index family included.** If an `audit/**/_index/evidence_index.json` is used for acceptance, it is governed by `EVIDENCE_INDEX_PRESENT_OK` and its chronology fields apply.  
+* **Acceptance artifacts included.** If an epic’s acceptance artifacts bind to this report as decisive evidence, the artifact MUST follow the evidence skeleton (path-proof, evidence-index update, etc.).  
+* **Failure posture (merge-blocking).** If these fields are stale or contradictory (for example, a changed artifact whose proof timestamps or mirror `produced_at_utc` imply a prior production context), the merge is blocked until corrected (see §2.0.5 and §9.7.0).  
+6. **Predicate-bound PASS for governed evidence generators.** A governed evidence generator, proof writer, or review harness MUST NOT emit `PASS`, an integrity-success signal, or any `*_OK`\-claiming record for a parity, identity-hash, canonical compare, path-proof, evidence-indexing, or binding family unless every decisive predicate for that family is evaluated against the current generated artifacts in the same run and passes. Parsed-object equality alone is insufficient when byte identity is the invariant; regex-only validation of a hash string is insufficient when the claim is that the hash matches the current artifact or preimage; a top-level binding status is insufficient when a linked canonical compare, parity, identity, index, or mirror predicate can fail independently. Required predicates MUST use byte-level comparison, recomputation, schema or canonical checks, and mirror or path-proof binding as applicable to the claimed evidence family.  
+* **Final-artifact regeneration after generator changes.** If evidence-generator logic, predicate wiring, or PASS derivation changes, the final governed artifacts for that evidence family MUST be regenerated from the final logic path before acceptance may rely on them. A stale artifact produced by earlier generator logic is not sufficient proof after remediation, even if the generator code itself has been corrected.  
+* **False-positive regression coverage for governed evidence generators.** When a governed evidence generator, proof writer, or review harness is corrected because it could emit `PASS` without evaluating a decisive predicate, the remediation MUST include a regression check that exercises the failure path for the omitted predicate. A PASS-path-only test is insufficient after a false-positive PASS defect. The regression check MUST fail the generated artifact or harness result when the decisive predicate fails and MUST prove that the top-level `PASS` or integrity-success signal is derived from the predicate set.  
+* **Generated proof-family fail-closed coverage.** When a governed evidence generator, proof writer, or review harness produces or validates more than one generated proof family for an epic, a cross-family PASS claim MUST be held at `TOOLING_BLOCKED` or equivalent until every generated proof family used by the epic has explicit fail-closed proof coverage. Remediation MAY add missing fail-closed checks and rerun the affected suite when the work remains bounded to proving the approved evidence families. A PASS claim MUST NOT be issued while any generated proof family remains unproven for fail-closed behavior.  
+7. **Bounded evidence-refresh side effects.** Evidence-tool side effects outside the primary PR slice MAY be accepted only when they are produced by the canonical evidence tooling in the same coherent run, remain under existing governed artifact families, have current co-located path-proofs and required index or mirror updates, are explained as proof-refresh or updater-convergence side effects, and do not create new runtime scope, public-contract surface, route, flag, token, or artifact family obligation. Unexplained or unvalidated side effects remain evidence drift and MUST NOT be used to support acceptance or PF09 status posture.
 
 ---
 
@@ -587,9 +587,9 @@ Any deviation is a mechanical blocker. The binding must be corrected, not interp
 
 * **RELEASE\_ID\_FROM\_MANIFEST\_OK** — `release_id` derives only from the manifest. (Owned: Evidence & Artifacts — Manifest)
 
-* **RELEASE\_ID\_RECOMPUTE\_OK** — `sha256(canonical_manifest_bytes)` matches recompute. (Owned: Evidence & Artifacts — Manifest)
-
-* **TWO\_RUN\_IDENTITY\_OK** — Two-run identity of the recompute step. (Owned: Evidence & Artifacts — Manifest)
+* **TWO\_RUN\_IDENTITY\_OK** — Two-run identity of the recompute step. (Owned: Evidence & Artifacts — Manifest)  
+* **BAND\_MAX\_INCLUSIVE\_OK** — Band threshold maxima are inclusive-high and are validated against the current frozen threshold source before any public or admin band claim is accepted. Evidence MUST show the active maxima, the band order, and the same-change index and mirror bindings for the governed threshold artifact family when those artifacts change. (Owned: HDE-Math-Spec; HDE-Schemas & Artifacts; Evidence & Artifacts)  
+* **BAND\_EDGE\_GOLDENS\_OK** — Band-edge golden evidence proves the governed threshold edges at `24`, `49`, `74`, and `100`, including the \+1 transitions for Cool→Open, Open→Warm, and Warm→Glow, and proves that `100` maps to Glow. Evidence MAY include band-edge binding logs and compact diff artifacts, but any claim of this token MUST be tied to current PASS evidence and governed index/mirror/path-proof bindings. (Owned: HDE-Math-Spec; HDE-Schemas & Artifacts; Evidence & Artifacts)
 
 ---
 
@@ -890,6 +890,10 @@ Until a full protocol is published, use this minimal, non-optional stub whenever
 
 * Resolution routing is PO-owned. The PO decides whether the fix is a canon update, implementation remediation, or a formalized exception with canon follow-up.
 
+**PF23 audit observation classification.**
+
+PF23 audit findings MAY identify canon-routing or classification deltas without creating execution work. A PF23 audit finding MUST be routed to the owning PF canon home by subject and MUST NOT be converted into a PF09.x task delta, implementation remediation, OPS task, Live QA task, or PF20 historical correction by assumption. Such work exists only when an approved plan, PF10 addendum, Product Owner adjudication, or owning PF canon update explicitly creates it.
+
 **Routing for PR analysis (when PF23 is out of scope).**
 
 When PF23 is out of scope (PR analysis), reviewers MUST rely on the owning PF canon homes by title and repo reality for the PR under review. Typical anchors include: HDE Architecture, HDE Governance, HDE CLI/API Vendor Ref, HDE Schemas and Artifacts, HDE Build Checklist, HDE Mechanics Guide, Glow QA Guide, and HDE Epic-Process Guide.
@@ -1142,6 +1146,7 @@ Ownership: Governance (classification semantics at policy level); **Glow QA Guid
     * a brief delivered-work summary (what shipped in the epic),  
     * when the epic closes by reusing already-implemented governed scope, a reuse-boundary summary identifying which proof families or deliverable groups were inherited baseline versus newly closed in the epic,  
     * when closure is distributed across bounded PR or work slices, a PR-to-deliverable allocation summary that states which slice closed which governed deliverable family or acceptance-bound proof family,  
+    * **Implementation-slice evidence and close-pack evidence are distinct.** When closure is distributed across bounded PR or work slices, the closeout record MUST keep implementation-slice evidence separate from close-pack evidence and Live QA close-gate evidence. PR-slice implementation evidence MAY support delivered-work summaries, supportable PF09 drainage posture, and closeout binding, but it MUST NOT be described as close-pack production, Live QA completion, final closeout, or epic-close proof unless those close-stage artifacts and checks are directly evidenced in the reviewed source set.  
     * an explicit deferrals list (including deferred item IDs when available),  
     * **Repo-supported completion summary (required when closeout is recommended from repo evidence)**.The closeout record MUST state whether the completion summary is limited to repo-supported completion and MUST distinguish repo-supported completion from canon drainage and from formal close-pack completion.  
     * **Outcome-classification clarity.** The closeout summary MUST distinguish recorded, blocked, and no-claim outcomes for the relevant QA or closeout items and MUST NOT collapse those states into a single undifferentiated PASS narrative.  
@@ -1164,15 +1169,27 @@ Ownership: Governance (classification semantics at policy level); **Glow QA Guid
       * PF-Canon is normative where PF10 is silent.    
       * The Implementation Guide is used for intended scope framing only.  
       * The QA Plan is used for intended QA requirement framing only.   
+      * PF23 is current-reality context only in closeout review. It may support alignment of surfaces, component placement, entrypoints, evidence homes, and repo structure, but it MUST NOT be treated as closure proof, a gate, an acceptance source, or closeout authority by itself.    
+      * A closure-trace review, QA closeout review, or readiness recommendation may state that the reviewed trace is satisfied, ready, or ready with caveats only as review posture. It is not a Product Owner closeout action unless the Product Owner explicitly performs or records that closeout action.    
       * **Decisive PF10 addendum auditability note (required).** When a closeout recommendation relies on a PF10 addendum as the decisive epic-close authority, the closeout record MUST state whether that addendum provides direct evidence-pointer lines or only evidence-basis prose.    
       * **Evidence-basis-only caveat.** If the decisive PF10 addendum provides only evidence-basis prose, the closeout record MUST record that explicitly as an auditability caveat and MUST NOT imply pointer-complete support from that addendum alone. The record MUST also identify the governed evidence family or closeout companion artifacts used to complete the trace.    
       *   
-    * **Required-elements checklist (when a closeout recommendation is issued).\*\*** The closeout record MUST explicitly confirm the presence or absence of:  
-      * the D0 Discovery artifact,  
-      * current-state QA evidence under the governed QA root,  
-      * a QA RCA / Doc Delta summary,  
-      * indexed evidence for the claimed closeout artifacts, and  
-      * when the review requires venue confirmation, at least one governed artifact or closeout note that proves an executed QA or closeout artifact family was produced from the claimed venue, for example GitHub Codespaces.  
+    * **Required-elements checklist (when a closeout recommendation is issued).**  The closeout record MUST explicitly confirm the presence or absence of:  
+      *   \* the D0 Discovery artifact,    
+      *   \* current-state QA evidence under the governed QA root,    
+      *  a QA RCA / Doc Delta summary,    
+      * indexed evidence for the claimed closeout artifacts,    
+      * when the review requires venue confirmation, at least one governed artifact or closeout note that proves an executed QA or closeout artifact family was produced from the claimed venue, for example GitHub Codespaces,    
+      *  source-of-truth posture for the closeout analysis, including which sources are used for epic-specific event truth, process interpretation, intended QA framing, and normative canon where the live record is silent,    
+      * Coverage vs QA Plan in plan order, including each planned step’s coverage status, deviations or mismatches, and closeout impact,    
+      * a QA timeline that records QA steps, remediation loops, and ADR or decision events,    
+      * findings with classification and evidence pointers,    
+      * root cause analysis,    
+      * remediation loop assessment,    
+      * implementation gaps and proposed fixes,    
+      * PF-canon doc deltas excluding PF10, and    
+      * explicit verdict and recommendation.    
+      * When the QA timeline uses reconstructed ordering, the closeout record MUST state the ordering basis. PF10 addendum order MAY be used as the fallback ordering basis only when exact timestamps are absent or incomplete, and the record MUST NOT imply timestamps were observed when they were not.  
     * **Readiness / closeout recommendation (required).** The closeout record MUST state an explicit overall recommendation, such as \`Ready\` or \`Not ready\`.  
     * **Blocker accounting for recommendation.** The closeout record MUST identify the unresolved blocker set that drives that recommendation, including any must-fix canon delta, stale closeout-blocking checklist state, or other unresolved governance blocker.  
     * **Readiness / closeout recommendation (required).** The closeout record MUST state an explicit overall recommendation, such as \`Ready\` or \`Not ready\`.    
@@ -1216,10 +1233,14 @@ Ownership: Governance (classification semantics at policy level); **Glow QA Guid
     * **No tokenization by default.** Plans, acceptance maps, token/evidence matrices, and step logs MUST NOT mint, claim, or require a `CLOSE_PACK_FILES_PRESENT_OK` token (or any similar close-pack presence token) unless Governance explicitly registers it as a token in §2.0 (which this drain explicitly does not do).
 
     * **No relocation.** Do not relocate the close-pack pair into `audit/qa/**` or `artifacts/**` without an explicit canon change. Any extra copies elsewhere are convenience-only and MUST NOT be used for acceptance binding.  
-    * **Packaging/evidence-only closeout slices.** A closeout slice whose sole purpose is to surface, bind, or verify the close-pack pair or companion closeout artifacts MUST remain packaging/evidence-only: it MUST NOT reopen implementation scope, MUST NOT change step-level QA verdicts, and MUST NOT claim merge provenance unless merge proof is itself a required governed artifact of that slice.  
+    * **Packaging/evidence-only closeout slices.** A closeout slice whose sole purpose is to surface, bind, or verify the close-pack pair or companion closeout artifacts MUST remain packaging/evidence-only: it MUST NOT run or rerun QA checks, MUST NOT execute vendor calls, MUST NOT modify implementation files, MUST NOT edit PF-Canon, MUST NOT claim PF09 drainage, MUST NOT create new acceptance claims, MUST NOT reopen implementation scope, MUST NOT change step-level QA verdicts, and MUST NOT claim merge provenance unless merge proof is itself a required governed artifact of that slice.  
     * **Minimum Ops execution bundle.** When such a slice executes under \`audit/ops/\*\*\`, the governed Ops bundle MUST at minimum include \`commands.txt\`, \`stdout.log\`, \`stderr.log\`, \`exit\_codes.txt\`, and \`created\_files\_sha256.txt\` under a stable lowercase ops path.  
+    * **Replayable command transcript.** The command transcript MUST be an executable, replayable, task-labeled record of the exact commands run. A transcript that contains an invalid command for a claimed action, or that cannot be mapped to the produced artifacts, is non-conforming until repaired or explicitly superseded by a corrected governed bundle.  
+    * **Labeled output and exit-code mapping.** Stdout, stderr, and exit-code evidence MUST be labeled and mapped to the critical command actions. Bare exit codes, unlabeled stdout, missing stderr capture, or summaries that assert validation without the corresponding captured output are insufficient for OPS acceptance. Empty stderr MAY be valid only when it is explicitly captured or represented with an integrity-checkable empty-file posture.  
+    * **Inventory provenance.** Any final evidence inventory or checksum ledger used by the close-pack slice MUST be generated by a command whose output structure matches the persisted artifact. If the transcript and artifact disagree on table shape, row count, checksum rows, or generation method, the inventory is not trustworthy until regenerated and path-proven from current bytes.  
+    * **Final validation.** A packaging/evidence-only closeout slice MUST include a final validation artifact when the approved task requires one. The final validation artifact MUST reconcile, as applicable, file existence, close-pack manifest bindings, close report presence, path-proofs, final inventory, checksum ledger, and the OPS evidence bundle. The validation result MUST be captured, not merely asserted.  
     * **Binding rule.** Such a slice MUST bind the already-proven epic acceptance or QA evidence family via the close-pack manifest \`key\_outputs\` map or explicit close-report pointers. It MUST NOT invent a replacement closeout proof surface.  
-    * **Verification posture.** Close-pack presence is verified mechanically by artifact existence \+ binding to the canonical filenames (see Appendix D.0) and by the closeout review process (titles-only).
+    * **Verification posture.** Close-pack presence is verified mechanically by artifact existence and binding to the canonical filenames (see Appendix D.0), by trustable packaging evidence when the approved slice requires it, and by the closeout review process (titles-only).
 
 ---
 
@@ -1425,6 +1446,44 @@ Routing (titles-only).
    (b) **open-rails conformance** run (with redaction checks), and  
    (c) **env-validator outputs** per environment.  
    *(PF12 single home; same-PR updates apply.)*
+
+**HDAPI v2 open-rails vendor proof posture.** A controlled HDAPI v2 open-rails smoke is an Ops evidence task when it requires secrets or privileged runtime posture. It MUST be PO-only, IA-guided, secret-safe, and stored under a lowercase audit ops path. Automated agents MUST NOT execute the vendor call, claim completion, or simulate external state.
+
+Before execution, the task record and evidence MUST prove the exact command or approved command family, PF07-backed target facts or an explicit PF07-gap blocker posture, safe secret posture, source-selection posture, v2 route family, expected request class, and acceptance target. Missing exact command, missing credentials, missing target facts, missing authorization, or unresolved placeholders classify the result as `TOOLING_BLOCKED` and the vendor call MUST NOT run.
+
+The evidence bundle MUST capture commands, stdout, stderr, exit codes, redacted environment presence, request summary, result summary, and checksum inventory in a secret-free posture. It MUST NOT persist plaintext secrets, header values, request or response bodies beyond the approved evidence shape, or vendor payload echoes.
+
+The result is `FAIL_TOOLING` if secret-bearing output is persisted. The result is `FAIL_BEHAVIOR` only when command, credentials, safe posture, source selection, target facts, and evidence shape are proven and the runtime behavior contradicts the expected vendor behavior. Open-rails success does not by itself claim QA PASS, Live QA completion, PF09 status change, epic closure, public Reader change, new route, new acceptance token, or PF-canon drainage.
+
+**Controlled vendor-backed no-user validation.** When a remediation, OPS task, QA correction, or closeout review claims vendor-backed no-user behavior, PF04 distinguishes these proof classes:
+
+* public numeric-free output proof  
+* internal or admin compatibility-compute proof  
+* vendor-backed no-user behavior proof
+
+Local tests, grep checks, fixture-only `person_uid` injection, or internal compute evidence MAY prove their own labeled proof class only. They MUST NOT substitute for vendor-backed no-user behavior proof when the claim is live no-user behavior in a pre-App or no-user context.
+
+**No-user meaning for controlled vendor smoke.** For a controlled vendor-backed no-user smoke, the caller-facing or operator-facing command input MUST be birth-data-only or otherwise identity-free according to the approved slice. It MUST NOT require app user IDs, `user_id`, caller-provided `person_uid`, DB-backed user records as caller input, source-db caller posture, or inline secret values. If implementation creates deterministic internal metadata inside the resolver or compute boundary from approved no-user input, that metadata MUST remain internal and MUST NOT become a caller contract, public route field, public flag, or public proof substitute.
+
+**Discovery and prerequisite posture.** Discovery-only prerequisite work MAY complete its own bounded discovery purpose when it truthfully records the command candidate or unresolved disposition, command ledger, presence-only environment state, checksum inventory for captured files, and explicit non-claims. Discovery-only evidence MUST NOT be read as vendor behavior proof, QA PASS, Live QA completion, PF09 status change, or epic closure.
+
+A controlled vendor-backed no-user smoke MAY run only when explicitly approved for that slice and only after the required command discovery and remediation prerequisites are satisfied. It MUST be PO-only, IA-guided, limited to the explicit open-rails vendor step, and secret-free in persisted evidence. It MUST use no app user IDs, no caller-provided `person_uid`, no guessed command, no guessed host or port, no guessed URL, no guessed service binding, no guessed target, no guessed environment fact, and no unresolved placeholder-bearing command.
+
+**Target fact posture.** Before the smoke may run, the evidence record MUST prove the exact placeholder-free command, safe secret posture, required PF07-backed target facts or an explicit PF07-gap blocker posture, no-user input shape, explicit vendor source posture, and PO authorization for the controlled vendor step. If the target is a local CLI vendor smoke, hosted-service target facts are not required unless the command is changed to call a hosted HTTP service. If the target changes to a hosted HTTP service call, the evidence record MUST prove the PF07-backed hosted target facts or classify the result as blocked by missing infrastructure inventory before execution.
+
+**Preflight and execution classification.** If the exact command is unresolved, placeholder-bearing, or missing; if required sample input is absent or incomplete; if required vendor credentials are false or uncaptured; if required target facts are missing; if the command includes forbidden user identity input; if the vendor source is not explicit; if the open-rails posture for the vendor step is absent; if determinism pins are absent; or if PO authorization is absent, the result is `TOOLING_BLOCKED` and the vendor call MUST NOT run.
+
+If secret-bearing output is written to logs, summaries, command captures, stdout, stderr, JSON, or other persisted evidence, the result is `FAIL_TOOLING`. Any secret-bearing artifact MUST be quarantined, named in the result summary, and excluded from proof.
+
+If command, credentials, safe posture, no-user input shape, vendor source, and target facts are proven and the runtime output contradicts the expected no-user vendor behavior, the result is `FAIL_BEHAVIOR`.
+
+Use `PASS` only when all preflight rows pass, the exact command runs, exit code is `0`, the command uses the approved vendor source and no-user input shape, no app user ID, `user_id`, or caller-provided `person_uid` is supplied, no secret values are persisted, stdout is non-empty and parseable as JSON unless the command’s documented success output differs, and the result summary states that the evidence is implementation-validation evidence only.
+
+**Evidence-output posture.** The governed evidence bundle for a controlled vendor-backed no-user smoke MUST record the exact command actually executed, the approved no-user input values or presence-only input posture, redacted environment presence as key names and booleans only, request summary, stdout, stderr, exit code, result summary, prerequisite or completion matrix, and checksum inventory for captured files. The evidence bundle MUST preserve command provenance and MUST NOT silently alter the acceptance target.
+
+Do not edit the command after a failed run to force `PASS`. Do not retry with different flags, URLs, hostnames, ports, credentials, target facts, or input values unless the change is PF07-backed or PF10-backed and recorded in the result summary.
+
+Controlled vendor-backed no-user smoke evidence is implementation-validation evidence only. It does not by itself claim QA PASS, Live QA completion, PF09 status change, epic closure, a new public route, a new public flag, a new public surface, a new CLI flag, a PF-canon drain, or a new acceptance token.
 
 **Tokens:** see **§2.0 Acceptance Tokens** (A-gates roster).
 
@@ -2750,15 +2809,17 @@ If any such approval or remediation guide defines a token name and semantics for
 
 Plan acceptance is a governance act. It must not thrash on low-signal edits, and it must not allow token drift.
 
-* **Plans are pointers.** Epic plans are a pointer map, not a full SOP.
-
-* **Token value and budget discipline.** Plans should use only meaningful acceptance tokens. Do not add tokens "just in case."
-
+* **Approval-submission sentinel.** Any planning artifact submitted for approval MUST include the explicit `ASK OK?` approval sentinel. This applies to approval-submitted Epic Plans, Implementation Plans, QA Plans, remediation plans, and other plan-form artifacts that request approval before execution.  
+  * The presence of `ASK OK?` is required and non-blocking by default for approval-submitted plans.  
+  * Reviewers MUST NOT classify `ASK OK?` as stray text, formatting noise, or a blocker merely because it appears in the plan.  
+  * Missing the required approval sentinel remains a blocker.  
+  * The in-plan `ASK OK?` approval-submission sentinel is distinct from a reviewer response final decision line such as `ASK OK` or `REVISE AND RESUBMIT`.  
+* **Plans are pointers.** Epic plans are a pointer map, not a full SOP.  
+* **Token value and budget discipline.** Plans should use only meaningful acceptance tokens. Do not add tokens "just in case."  
 * **QA planning is post-implementation.** Stage A plans should not attempt to specify the entire QA script. They should specify what must be proven (tokens), and which evidence artifacts will be generated, with pointers to playbooks where relevant.  
 * **Implementation planning must not require extensive QA evidence.** Epic Implementation Plans and Implementation Guides MUST NOT require the production of extensive QA evidence artifacts. These planning artifacts MAY state QA objectives and closeout proof obligations, but they MUST NOT embed a full QA runbook or require that QA evidence be generated as part of implementation planning.
 
-* **QA planning is separate.** QA planning and QA evidence production are owned by the Live QA Plan and QA execution artifacts. The Live QA Plan is where step intents, evidence expectations, and PASS/FAIL posture are specified and where governed QA evidence is produced and indexed.
-
+* **QA planning is separate.** QA planning and QA evidence production are owned by the Live QA Plan and QA execution artifacts. The Live QA Plan is where step intents, evidence expectations, and PASS/FAIL posture are specified and where governed QA evidence is produced and indexed.  
 * **Ops tasks are not QA tasks.** Ops tasks are implementation tasks that change the runtime environment and cannot be performed by code changes alone (for example: service configuration, environment variable changes, secrets management, privileged infrastructure actions). Ops tasks MUST be tracked and evidenced as implementation work, not as QA work.  
   * Ops task completion evidence may be required for a feature to function, but it does not satisfy QA verification. QA verification still requires functional proof and the required QA evidence outputs defined in QA planning.  
 * **Separation rule (no category mixing).** Planning artifacts MUST keep these categories distinct:  
@@ -2772,8 +2833,13 @@ Plan acceptance is a governance act. It must not thrash on low-signal edits, and
 
 * **No plan-local token minting.** A plan must not invent new token names or introduce local synonyms. If a new token is needed, it must be minted via the governance process.
 
-* **No "proof by intent."** Plans must not treat "we will test" or "we will validate" as evidence. Plans must name evidence artifacts and where they will live.
+* **No "proof by intent."** Plans must not treat "we will test" or "we will validate" as evidence. Plans must name evidence artifacts and where they will live.  
+* **Retrieval-first, proof-first review posture.** AI reviewers MUST NOT approve, block, downgrade, or assert drift for planning, remediation, QA, repo audit, closeout, or related review artifacts from memory, partial snippets, truncated excerpts, display-layer artifacts, or guessed repo reality.  
+  * Source order: use PF10 first where it explicitly speaks; then read the current artifact under review end-to-end; then consult the owning PF canon home for each specific issue; then use repo-reality proof for any claimed path, command, endpoint, environment variable, test ID, artifact path, or component home.  
+  * Tool order: use full-source retrieval first for uploaded documents and PF artifacts; use container inventory commands next when repo reality matters; use exact-string repo search with fixed-string matching for known IDs, headings, route strings, command strings, filenames, artifact keys, token names, and environment variables; use regex search only when exact-string search cannot prove or disprove the claim; use broader semantic or exploratory search only after exact search fails.  
+  * Proof rules: do not rely on truncated viewer snippets or partial excerpts as proof; distinguish canon requirement, observed repo reality, and inference; leave any unproven locus, path, route, command, flag, token spelling, or environment variable as UNKNOWN or BLOCKED rather than guessing; anchor findings to verbatim source text and controlling proof; web lookup is not a substitute for uploaded-file truth or repo-local truth.
 
+* Negative audit proof is valid proof when the reviewed artifact or audit records the claim being negated, the search or check scope, the controlling source or repo locus, the command or retrieval method used, and the observed negative result. Reviewers MUST NOT require a rerun, fallback audit, or substitute proof solely because the proof establishes absence rather than presence. A negative proof remains insufficient only when its scope, source, command, or result does not actually cover the claim, or when it is contradicted by stronger governed evidence.  
 * **Template adherence is structural only.** For all planning artifacts that use PF templates (including Epic Plans and QA Plans), reviewers MUST evaluate template adherence only for structural completeness: required sections present, required end marker present, and required gates present. Header styling is not part of structural adherence.  
   * Header formatting is a Nit. Reviewers MUST NOT request redlines that only change heading levels, add or remove bold or italics in headings, or reformat headings for aesthetic alignment.  
   * Header formatting is a Nit. Reviewers MUST NOT request redlines that only change heading levels, add or remove bold or italics in headings, or reformat headings for aesthetic alignment.  
@@ -2799,11 +2865,12 @@ Plan acceptance is a governance act. It must not thrash on low-signal edits, and
       * The Business Case is not a marketing pitch or ROI report; it SHOULD remain practical and falsifiable.  
     * Review posture:  
       * If the Business Case section is missing, empty, or placeholder-only (for example "TBD" or "N/A"), reviewers MUST return the plan for revision and MUST NOT approve it.  
-* **Non-blocking presentation variance (including heading levels).** During planning review, presentation-only differences MUST NOT be treated as blockers to plan approval. Reviewers MAY request these as non-blocking "Nits" only.
+* **Non-blocking presentation variance (including heading levels and markup wrappers).** During planning review, presentation-only differences MUST NOT be treated as blockers to plan approval when required content, required ordering or adjacency, and meaning remain unchanged. Reviewers MAY request these as non-blocking "Nits" only.
 
-  * Examples (non-blocking): bullet marker choice (hyphen vs asterisk), escaped Markdown list markers (for example a leading \* that renders as a bullet), backslashes inserted only for Markdown rendering or escaping, cosmetic whitespace differences (blank lines, indentation, alignment), bold or italic marker differences that do not change the underlying words, section ordering that preserves meaning, and Markdown heading levels.
+  * Examples (non-blocking): bullet marker choice (hyphen vs asterisk), escaped Markdown list markers (for example a leading \* that renders as a bullet), backslashes inserted only for Markdown rendering or escaping, inline backtick or inline-code wrappers around human-readable planning labels, backticks around PF titles, task IDs, subtask IDs, token names, or short literals used only for human-readable planning text, cosmetic whitespace differences (blank lines, indentation, alignment), bold or italic marker differences that do not change the underlying words, section ordering or adjacency that preserves required content and meaning, and Markdown heading levels.
 
-* **Formatting exceptions (still blocking).** This non-blocking posture does not apply to formatting or text that changes meaning, breaks execution, prevents verification, violates prohibited-character rules (see §9.7.4), or affects any of the following:  
+* **Formatting exceptions (still blocking).** This non-blocking posture does not apply to formatting or text that changes meaning, hides required content, breaks execution, prevents verification, violates prohibited-character rules (see §9.7.4), or affects any of the following:  
+  * Missing or incorrect required fields, required section order, required adjacency, PF09.x documents, task IDs, subtask IDs, PF14 references, dispositions, token spellings, path strings, endpoint strings, command strings, schemas, JSON, or code.  
   * Commands or code that must run as written.  
   * Evidence outputs, filenames, or required lowercase ASCII paths.  
   * Portability rules (for example references to external attachments).  
@@ -3402,7 +3469,15 @@ For every QA step in a Live QA plan, the operator MUST produce the deliverables 
 * A shared bootstrap step does not remove per-step responsibility. Each later step MUST either include its own dependency preflight or explicitly depend on the bootstrap and rerun a short step-local readiness check before the main behavior command.  
 * The dependency preflight result and any activation or installation action taken MUST be captured in the step’s governed evidence.
 
-Steps MUST use general command-line directives, not literal command strings. A plan MAY include example command forms, but reviewers MUST NOT require verbatim, syntax-perfect command lines as an approval gate. Execution-time command resolution is authoritative. The step log is authoritative for the exact command(s) executed and the produced artifacts. Syntax-layer issues are handled by the Live QA Moon Loop and MUST NOT be used as plan-approval blockers.
+Steps MUST use general command-line directives, not literal command strings. A plan MAY include example command forms, but reviewers MUST NOT require verbatim, syntax-perfect command lines as an approval gate. Execution-time command resolution is authoritative. The step log is authoritative for the exact command or commands executed and the produced artifacts.
+
+A command syntax defect in a Live QA Plan, QA Plan, remediation plan, or plan-review artifact MUST NOT be treated as a Blocker when command identity, target check, proof obligation, evidence family, and PASS or FAIL or TOOLING classification remain clear, and when the defect is limited to syntax, quoting, escaping, punctuation, rendered markup, or a small local expression repair that the QA executor can correct without inventing a new repo locus, command source, route, artifact family, acceptance predicate, or PASS or FAIL criterion.
+
+QA-correctable syntax defects include shell quoting or escaping cleanup, markdown-rendering artifacts inside a command note, obvious local expression punctuation repair, heredoc or JSON quoting normalization, wrapper syntax that does not alter the command target, inputs, outputs, or PASS or FAIL predicate, and similar syntax-layer issues that preserve the approved command identity.
+
+The following remain blocking: an unproven executable repo locus; ambiguous command identity; a command that points to the wrong artifact, route, evidence family, check, or predicate; a defect that requires inventing replacement execution logic; a defect that changes acceptance semantics; a plan dependency on unavailable non-PF documents for command reconstruction; or a plan that requires guessing missing paths, endpoints, test names, token names, or repo loci.
+
+When QA corrects a plan command syntax defect during execution, the governed step evidence MUST record the exact command actually executed, the command provenance, the reason for the correction, the produced evidence artifacts, and the final PASS, FAIL, or TOOLING classification. The correction MUST NOT silently alter the acceptance target.
 
 Plans SHOULD minimize locus strings in step text. Avoid naming specific script paths or test file paths unless they are canon-defined or are fixed-path obligations. If a step must name a repo locus string, the repo loci proof gate still applies.
 
@@ -3499,6 +3574,13 @@ If a functional change touches a vendor seam, the functional Live QA step MUST e
 * When the deviation is introduced via a Moon Loop or equivalent step-local approval, the governed evidence MUST include the approval entry or equivalent step-scoped note under the step’s QA root.  
 * In that posture, the deviation is a planning or execution caveat and MUST be called out as such in the review record. It is not automatically a trust failure or automatic remediation trigger.  
 * If the deviation is unapproved, unrecorded, or changes the acceptance target, the step MUST NOT be treated as `PASS`.
+
+**Step-local evidence deviations and path-equivalence corrections must be explicit.**
+
+* A bounded Moon Loop or equivalent step-local approval MAY correct an evidence-scoped defect, restore a missing precondition artifact, or align a stale planned artifact path to the current implemented evidence family only when the approval is step-scoped, the correction remains under existing governed roots, no new route, public surface, evidence root, acceptance target, or PF-canon edit is introduced, and the required PASS and FAIL predicates remain unchanged.  
+* If a planned deliverable path is stale but the same proof goal is satisfied by a current PF10-supported or plan-approved evidence artifact, the governed step evidence MUST record the stale path, the replacement artifact path, the source that makes the replacement authoritative for the step, and the search or proof showing why the stale path is not the final governing artifact.  
+* If the deviation restores a required precondition artifact before rerunning the approved step, the governed step evidence MUST name the precondition artifact, the remediation action, the final step deliverables, and the final PASS, FAIL, or TOOLING classification.  
+* The earlier blocked or failed condition remains part of the record and MUST NOT be hidden. It is not a blocker by itself once the bounded rerun is clearly evidenced, the approved criteria are met, and the review record states why the deviation did not change the acceptance target.
 
 **Requirements (binary):**
 
@@ -4138,6 +4220,16 @@ In production, `/internal/version`:
 ## **11.1 Request shaping (owned here) \[Required-Now\]**
 
 **Scope (normative).** This section pins the bytes used to construct HDAPI requests and to remap provider outcomes into typed, numeric-free errors. Rails posture (open/closed) is governed in §3; live-call behavior (timeouts/retries/backoff) is in §11.2.
+
+**HDAPI v2 conformance pending governance posture.** Until the vendor v2 conformance work is implemented and evidenced, HDE vendor architecture MUST be treated as legacy, partially conforming, or pending v2 conformance, not v2-conformant. Documentation consolidation, vendor research, or contract inventory alone MUST NOT be used as runtime conformance proof.
+
+Existing SAFE rails, no-I/O refusal, typed error, keys-only logging, evidence-indexing, public Reader v1, and PO-only open-rails posture apply to HDAPI v2 vendor work. Plans, implementation guides, QA plans, reviews, acceptance maps, and closeout artifacts MUST distinguish contract-inventory proof, architecture update, closed-rails shaping proof, and PO-only open-rails vendor smoke.
+
+No vendor-v2-specific acceptance token may be claimed unless it exists in §2.0 or has been minted in PF10 pending drainage. HDE-FERM006 through HDE-FERM008 consume existing Governance tokens unless Governance explicitly registers a new token. If a future AI-related token is proposed, it is a separate PO-approved product decision outside HDAPI v2 conformance.
+
+This conformance work does not authorize OpenAI, LLMs, AI agents, prompts, embeddings, chatbots, model calls, AI-provider credentials, AI-specific rails, AI evidence families, AI QA obligations, or Glow App AI features. Vendor AI/LLM-oriented documentation, including documentation-discovery files, may be used only as documentation-structure context and MUST NOT be interpreted as product or runtime scope.
+
+V2 endpoint bytes, auth names, request-body rules, response envelopes, rate-limit behavior, error mapping, and legacy-v1 fallback policy remain pending until their owning PF homes and governed evidence bind them. Existing v1 BodyGraph request shaping in this section MUST NOT be cited as v2 request shaping.
 
 ### **11.1.1 Endpoint & method**
 

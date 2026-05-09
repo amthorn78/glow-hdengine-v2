@@ -2,12 +2,12 @@
 
 **Title:** PF06-Canon-Epic-Process-Guide 
 
-**Version:** v1.9.5
+**Version:** v2.0.4
 
 **Status:** Canon
 
-**Effective date**: 2026-04-19  
-**Last Update Gate:**  BN drain 10.5.7 A35
+**Effective date**: 2026-05-06  
+**Last Update Gate:**  BN drain 10.8 A35
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -158,6 +158,15 @@ Reviewers MUST NOT assert canon violations or contradictions about:
 * transport bytes / CLI contract expectations,
 
 unless they have fully retrieved the governing canonical passages being referenced (the relevant roster section(s) and the relevant registry / rails / contract entries).
+
+AI review retrieval and proof order.
+
+* Reviewers and AI agents evaluating plans, remediation guides, QA plans, repo audits, closeout artifacts, or related review documents MUST use retrieval-first, proof-first review.  
+* Where PF10 explicitly speaks, use the latest applicable PF10 addendum before older PF canon on that topic. Then read the current artifact under review end-to-end, retrieve the owning PF canon home for each specific issue, and prove any repo-reality claim with concrete repo-local evidence.  
+* For known literals, exact-string lookup comes before regex or broad search. This applies to task IDs, subtask IDs, token names, headings, route strings, command strings, filenames, artifact keys, environment variable names, and other exact literals.  
+* Do not rely on memory, truncated viewer snippets, ellipsized passages, partial excerpts, or broad semantic search as proof when exact retrieval is available.  
+* If a locus, path, route, command, flag, token spelling, heading, ID, artifact key, or environment variable cannot be proven, classify it as UNKNOWN or BLOCKED and do not invent or near-match it.  
+* Review findings MUST distinguish canon requirement, observed repo reality, and inference.
 
 Build Notes reference posture (living addenda).
 
@@ -315,6 +324,12 @@ No governance drift. Ops tasks MUST NOT create new acceptance tokens or redefine
 
 Clarification. If a change is fully achievable as code (including tests and deterministic artifacts), it is PR work. If any step requires human console/config action, that step is an Ops task (even if adjacent code changes exist). Ops tasks can be prerequisites for epic completion, but they are proven by evidence artifacts, not by agent execution claims.
 
+Bounded Ops discovery and validation runs. An Ops task approved as DISCOVERY, command-discovery, validation-only, sequencing-correction, blocker-classification, or implementation-validation MUST be reviewed only for that bounded approved purpose. If exact command proof, target facts, required credentials, prerequisite proof, or safe execution context remain unproven, the task MUST record the unresolved posture and MUST NOT convert that state into FAIL\_BEHAVIOR.
+
+Dependent Ops execution guard. A downstream Ops execution task MUST NOT proceed from unresolved command proof or unresolved target facts. When the safe execution basis is not proven, classify the downstream task as TOOLING\_BLOCKED and record what proof would unblock it.
+
+Ops evidence overclaim guard. Bounded Ops discovery, validation, and implementation-validation evidence MUST NOT by itself claim QA PASS, Live QA completion, PF09 status change, acceptance-token satisfaction, PF-canon drain completion, or epic closure. It may support a later-drain posture only when the approved task claimed that posture and the governed evidence proves it.
+
 Ops closeout packaging run (OPS-01). When an epic uses an Ops task to surface already-produced close-pack artifacts and closure evidence, the run MUST remain packaging and evidence only:
 
 * no reopened implementation work  
@@ -335,6 +350,28 @@ For each intended environment, the bundle MUST either show a validated run or re
 Missing infra-owned bindings MUST be preserved as `not yet closed` or deferred states. They MUST NOT be guessed, reconstructed, or silently treated as closed.
 
 Accepting a truthful OPS-01 validation bundle does not by itself support a PF09 status move or a claim that the underlying environment task is complete. It only proves the bounded validation outcome the run was approved to capture.
+
+Ops evidence-packaging remediation runs. When an Ops task is approved as evidence packaging, close-pack surfacing, or provenance repair, it MUST remain within the approved evidence boundary.
+
+A packaging-only Ops remediation MUST NOT:
+
+* rerun QA  
+* make vendor calls  
+* modify implementation files  
+* edit PF-Canon  
+* claim PF09 status drainage  
+* create new acceptance claims
+
+If the remediation repairs a prior Ops evidence defect, the repaired bundle MUST make the repair auditable by recording:
+
+* the defect class or blocker that was repaired  
+* the corrected command transcript or evidence artifact  
+* labeled stdout, stderr, and exit-code evidence mapped to the corrected actions  
+* validation output for each claimed check result  
+* the prior invalid or superseded artifact when preservation is needed for audit trail  
+* the final bounded outcome and any non-claim posture that remains
+
+A packaging-only Ops remediation may support close-pack surfacing or evidence-provenance closure only for the bounded task it was approved to perform. It MUST NOT be used to imply new implementation completion, QA rerun completion, PF09 status change, PF-canon drain completion, or epic closure unless those claims are separately approved and proven.
 
 ## 0.3 Participants and responsibilities
 
@@ -509,6 +546,7 @@ Allowed remediation actions (minimum set)
 * Create small helper scripts under /tmp for parsing/glue (ephemeral; never treated as governed evidence).  
 * Adjust the QA check procedure to key on the canonical emitted evidence surfaces already required by canon and implementation.  
 * Apply the smallest change required for the failing check(s) to execute and validate the intended behavior.  
+* A PO-approved Moon Loop MAY repair an existing governed evidence-integrity ledger, checksum companion, or self-reference row when the only failing predicate is ledger completeness or binding coherence and the underlying behavior proof already satisfies the approved predicates. The correction MUST stay inside the existing evidence family and governed step root, MUST NOT run a new behavior command, vendor call, or network-opening step, MUST NOT introduce a new evidence root or evidence family, and MUST be followed by a rerun or validator output that proves the original PASS criteria.  
 * Re-run the affected check(s) and capture the PASS-grade evidence artifacts.
 
 Evidence posture for in-session remediation (mandatory)  
@@ -520,7 +558,8 @@ If remediation occurs inside a QA session, the existing primary log artifacts MU
 * If any repo files were changed, capture a minimal delta artifact under a lowercase governed path, for example:  
   * audit/qa//remediation/moon\_loop/patch.diff (or equivalent)  
   * audit/qa//remediation/moon\_loop/changed\_files.txt (paths \+ sha256)  
-  * This delta capture MUST NOT discuss branches, commits, or PR workflow.
+  * This delta capture MUST NOT discuss branches, commits, or PR workflow.  
+* If a Moon Loop changes evidence packaging, transcript repair, validation provenance, or classification after an initial failure, the governed evidence stream MUST record the approved scope boundary, the exact command or command family used, material stdout, stderr, exit-code, or validator output, any superseded artifact posture, and any remaining non-claim boundaries.
 
 A PO-approved Moon Loop MAY temporarily open rails on one already-approved Live QA step even when the approved plan defaulted that step to closed rails, but only as a bounded deviation for that step.
 
@@ -919,6 +958,7 @@ Before drafting any QA Plan or Implementation Plan for a Live QA epic, they MUST
 * This note is traceability-only. It MUST NOT duplicate PF23 content, and it MUST NOT be presented as a required Live QA deliverable or a required acceptance token.  
 * PF23 consult is non-token closure evidence. It is not a gateable token and MUST NOT be represented as a token (for example: no REALITY\_AUDIT\_OK, no PF23\_OK) on a closure pack acceptance roster.  
 * PF23 consult scope: PF23 consult may be used to inform epic planning, implementation planning, and QA planning. It MUST NOT be used for PR analysis, PR review, or post-hoc “blockers” in a merge decision.  
+* PF23 audit observations MUST route to their owning canon homes by title and MUST NOT be converted into PF09.x task deltas, remediation scope, implementation deltas, evidence homes, or acceptance tokens by assumption. If an audit observation appears to imply new work, record the classification and routing question for Product Owner or owning-canon adjudication before treating it as executable scope.  
 * Drift handling (protocol stub): If any PF23 Reality Audit statement appears to contradict PF canon, record a drift item (cite the PF canon requirement and the PF23 statement, explain the contradiction, and propose the minimum safe posture). Route the drift item to the Product Owner for adjudication. Do not resolve by ad-hoc interpretation inside the plan.  
 * PF23 is a post-epic audit input: it reflects the latest closed-epic snapshot, not an in-flight PR truth source.  
 * PF23 is a post-epic audit input: it reflects the latest closed-epic snapshot, not an in-flight PR truth source.  
@@ -2443,24 +2483,33 @@ Review stability and no-moving-target discipline applies to diff-first approval 
 
 This does not relax structural requirements. Missing required sections, missing required end markers, missing required gates, missing required pointers to HDE-Build Checklist or HDE-Mechanics Guide when required by this guide or the template, invalid/non-PF references, and ungrounded existence claims remain valid blockers.
 
+Approval-submission sentinel.
+
+* Approval-submitted planning artifacts MUST include `ASK OK?` as the approval-submission sentinel when their purpose is to request approval before execution.  
+* The presence of `ASK OK?` is intentional and MUST NOT be treated as stray text, formatting noise, or a blocker by itself.  
+* Missing `ASK OK?` remains a valid blocker for approval-submitted plans.  
+* The in-plan `ASK OK?` sentinel is distinct from the reviewer final verdict format, such as `ASK OK` or `REVISE AND RESUBMIT`; reviewers MUST NOT conflate the two surfaces.
+
 Non-reviewable formatting (do not block)
 
-* Markdown heading depth (H2 vs H3 vs H4) is non-reviewable.
-
-* List marker choice (`-` vs `*`), whitespace, indentation, and text wrapping are non-reviewable. Whitespace-only issues MUST NOT block plan approval, including when embedded snippets have whitespace sensitivity (indentation-sensitive code, shell heredocs, YAML). Capture as a nit and resolve via bounded in-flight remediation during execution, with the executed bytes captured in evidence.
-
-* Copy/paste perfection MUST NOT be an approval gate. Plans and reviews MUST NOT block approval on the expectation that multi-line command blocks will copy and run without any operator adjustment. The approval standard is that the commands and steps are semantically valid and executable with ordinary operator care.
-
-* Command syntax latitude is allowed when command identity and intent are clear. Syntax-only issues (quoting style, line breaks, JSON formatting in shell assignments) MUST NOT block plan approval if the plan makes the intended command identity reviewable and the execution evidence records the exact command used.
-
+* Markdown heading depth (H2 vs H3 vs H4) is non-reviewable.  
+* List marker choice (`-` vs `*`), whitespace, indentation, and text wrapping are non-reviewable. Whitespace-only issues MUST NOT block plan approval, including when embedded snippets have whitespace sensitivity (indentation-sensitive code, shell heredocs, YAML). Capture as a nit and resolve via bounded in-flight remediation during execution, with the executed bytes captured in evidence.  
+* Copy/paste perfection MUST NOT be an approval gate. Plans and reviews MUST NOT block approval on the expectation that multi-line command blocks will copy and run without any operator adjustment. The approval standard is that the commands and steps are semantically valid and executable with ordinary operator care.  
+* Command syntax latitude is allowed when command identity and proof target are clear. QA Plan, Live QA Plan, remediation-plan, and plan-review command syntax defects MUST NOT be blockers when the defect is limited to syntax, quoting, escaping, punctuation, rendered markup, or a small local expression repair; the intended PASS, FAIL, or TOOLING classification remains clear; the executor can correct it without inventing a repo locus, command source, route, artifact family, acceptance predicate, or PASS/FAIL criterion; and the execution evidence records the exact corrected command used.  
+* Reviewers MUST evaluate command defects by command identity and proof impact rather than literal syntax perfection. When the approved command identity and proof target remain clear, classify QA-correctable syntax defects as no issue, Suggestion, or Caveat according to execution risk, not as Blockers.  
+* A syntax defect remains a valid Blocker when it makes the command identity ambiguous, points to the wrong artifact, route, evidence family, check, or PASS/FAIL predicate, changes acceptance semantics, depends on unproven repo loci or non-attached/non-PF material for command reconstruction, requires the QA engineer to guess paths, endpoints, test names, token names, or repo loci, or appears inside actual repo code, canonical JSON, schemas, acceptance maps, token registries, governed machine-read artifacts, or executed command transcripts.  
+* When a QA executor corrects a plan command syntax defect during execution, the governed step evidence MUST record the exact command actually executed, the command provenance, the reason for the correction, the produced evidence artifacts, and the final PASS, FAIL, or TOOLING classification. The correction MUST NOT silently alter the acceptance target.  
+* This latitude applies to planning and review documents only. After execution, the exact executed command record must be truthful for what actually ran.  
 * Presentation-only Markdown escapes are non-reviewable. Reviewers may normalize punctuation-escape backslashes for readability when the backslash is escaping Markdown punctuation (for example: \_ used to render \_). Reviewers MUST NOT silently change semantic escapes inside shell strings, JSON env vars, regexes, or file contents.  
+* Inline-code or backtick wrappers in planning and review artifacts are presentation-only when the underlying field name, content, ordering or adjacency, and meaning are unchanged.  
+* Reviewers MUST NOT block approval solely because a required planning label, PF title, task ID, subtask ID, token name, or short human-readable literal is wrapped in inline backticks.  
+* This non-blocking posture does not apply when the wrapper changes or hides executable commands, code, schema, JSON, token spelling, path strings, endpoint strings, environment variable names, governed evidence bytes, acceptance maps, token registries, or other machine-sensitive content.  
 * Rendered escape characters that plausibly arise from AI processing, markdown rendering, display-layer normalization, or retrieval formatting are not source truth by themselves.  
   * A reviewer may block on visible escape characters only when both are established:  
     * the characters are proven to exist in the actual source text, not only in the rendered view  
     * they materially change command runability, code validity, JSON validity, path or filename correctness, URL or endpoint correctness, environment variable spelling, token spelling, identifier spelling, evidence meaning, or other execution-critical or proof-critical conten.  
   * If either condition is not established, treat the issue as non-blocking display-layer noise.  
-  * If a relied-on passage might contain display artifacts, the reviewer MUST re-open or re-retrieve the source until raw-text truth is resolved before issuing a blocker. Approval must follow source truth and execution meaning, not markdown-safe rendering artifacts.
-
+  * If a relied-on passage might contain display artifacts, the reviewer MUST re-open or re-retrieve the source until raw-text truth is resolved before issuing a blocker. Approval must follow source truth and execution meaning, not markdown-safe rendering artifacts.  
 * Boldface, italics, and line-break differences are non-reviewable unless they obscure required semantics.
 
 Mechanical blockers (planning artifacts)
@@ -2827,7 +2876,9 @@ Checklist (titles only for references; IA supplies exact formats/snippets as nee
 
 * Evidence parity & PR readiness (PF12 single home). Human Evidence Index (docs/evidence/INDEX.json), hash sentinel (docs/evidence/INDEX.sha256), and machine mirror (artifacts/evidence\_index.jsonl) exist or can be emitted in the same PR; mirror is records-only, canonical JSONL (UTF-8, sorted keys, compact, one LF), unknown-keys rejected, ASCII field order, sort-before-write, single mirror file, and supports a proof\_anchor pointing to a co-located path-proof file. CI has—or will add—parity/unknown-key checks. (Schemas & Artifacts; Build Notes)
 
-* Governed locations only. All evidence under artifacts/\*\* and docs/\*\*; no transient/generator paths. (Schemas & Artifacts)
+* Governed locations only. All evidence under artifacts/\*\* and docs/\*\*; no transient/generator paths. (Schemas & Artifacts)  
+* Negative or no-hit audit proof. When an audit uses absence as proof, it MUST record the exact search scope, string set or predicate, source searched, and result. A concrete repeatable negative result MAY be accepted as proof; reviewers MUST NOT demand a rerun or fallback audit solely because the proof is negative.  
+* Rerun is required only when the search method, scope, source, or relied-on passage is incomplete, ambiguous, contradicted, or not retrievable.
 
 * Gaps & proposals. List missing components/schemas; propose minimal fixes or scoped improvements; call out any risks that would block CodEx from opening a PR and satisfying tokens.
 
@@ -3485,6 +3536,8 @@ Brings older, epic-specific guidance into line with the current epic’s rails a
 
 Does not modify PF-Canon itself. The repo docs sweep MUST NOT modify any PF-Canon docs (for example files under docs/pfcanon/\*\*). PF-Canon remains the single home for normative rules; the repo docs sweep is strictly an implementation-level alignment.
 
+Repo docs sweeps MUST distinguish implementation-slice evidence, close-pack evidence, Live QA evidence, formal PF-Canon drainage, and historical evidence. They MUST NOT present PR-slice artifacts, repo-doc validation, or historical evidence families as close-pack artifacts, Live QA proof, PF-Canon drainage, or final closure evidence unless those exact artifacts or results are directly proven.
+
 Lives in the close PR. This repo docs sweep is part of the close-out tasks for such epics and is performed in the same close PR that carries:
 
 * the close-pack
@@ -3967,7 +4020,8 @@ Fill the sections below. Use DR-\#\#\#, F-\#\#\#, and RCA-\#\#\# numbering as ne
   * Read-only closure-proof attempt: when the remaining blocker is proof of final net branch truth or scope cleanliness rather than a new code or evidence change, a remediation sequence MAY end with a read-only closure-proof attempt instead of another write-producing attempt.  
   * Read-only proof requirements: the review MUST state that no repo edits or governed-artifact regenerations were made, MUST identify the latest write-producing attempt whose green validations remain the operative functional evidence, and MUST explain why a no-edit proof pass is sufficient.  
   * Branch-truth proof posture: the read-only proof MUST establish the final shipped state against the named comparison target by recording the current comparison posture and the net-diff status for any previously disputed files or artifact families.  
-  * Closure effect: a read-only closure-proof attempt may resolve a provenance or scope-cleanliness blocker without reopening implementation only when it proves that no further repo edits remain and that the final combined outcome is the shipped state under review.
+  * Closure effect: a read-only closure-proof attempt may resolve a provenance or scope-cleanliness blocker without reopening implementation only when it proves that no further repo edits remain and that the final combined outcome is the shipped state under review.  
+  * Read-only discovery or source-skew proof attempt: when the approved PR purpose is discovery-only, no-edit, no-diff, source-skew, or boundary-classification proof, the review MAY accept the artifact without diff hunks, tests, or committed governed artifacts only when the review states that no repo edits or governed-artifact regenerations were made, identifies the discovery questions answered, names the read-only command ledger or inspected source basis, and preserves any mapped PF09.x row as No status change recommended unless the approved task claimed closure and produced governed evidence for that closure.
 
 ### **Diff Review (REQUIRED; primary technical review)**
 
@@ -4049,9 +4103,14 @@ Common RCA checks:
 * If a .sha256 sidecar is updated, verify it references the correct repo-relative target path and that `sha256sum -c <sidecar>` works from repo root.  
 * If a remediation review identifies more than one distinct cause, record each root cause separately with its own evidence pointer rather than collapsing them into one narrative.  
 * If a PR adds or regenerates governed artifacts, reviewers MUST verify that changed artifacts, path-proofs, index rows, mirror rows, and checksum sidecars carry current and internally coherent chronology for the changed bytes. Stale or backdated produced\_at\_utc or mtime\_utc evidence is a blocker until the evidence family is regenerated with canonical tooling.  
+* Evidence generators and proof harnesses MUST derive top-level PASS from the current decisive predicate checks for the evidence family. Format-only validation, regex-only digest validation, parsed-object equality when byte identity is the claim, or stale local state MUST NOT satisfy a PASS claim.  
+* When a QA check, proof harness, or generated acceptance artifact evaluates a roster of generated proof families, PASS requires explicit fail-closed visibility for every generated family in the claimed roster. If any generated family lacks explicit proof coverage, the result MUST remain TOOLING\_BLOCKED or another approved non-PASS posture until coverage is added, the family is explicitly handled as a non-claim, or the approved roster is changed.  
+* When generator or proof-harness logic changes, any governed artifacts used to prove that logic MUST be regenerated from the final logic path before the review may treat them as acceptance evidence. Stale artifacts from earlier generator logic are not sufficient proof after remediation.  
+* When remediation fixes a false-PASS evidence generator or proof harness, the review MUST state whether the fix includes a regression test or equivalent mechanically repeatable negative check for the old false-positive path. If no such check exists, record the gap as residual risk rather than silently treating the generator defect as hardened.  
 * If a proof generator or evidence harness needs open rails, it MUST require explicit caller-provided open rails and MUST NOT silently force SAFE\_MODE=0, ALLOW\_NETWORK=1, or equivalent. The invocation used for the proof must make the rails posture explicit.  
 * If emitted or summarized bytes depend on specific env fields beyond the standard deterministic pins, the generator or harness MUST pin or otherwise prove those env inputs explicitly. Missing byte-affecting env pins leave the proof nondeterministic and non-accepting.  
 * When a remediation changes only evidence tooling, generators, or governed artifacts, the review MUST state explicitly whether any public contract, route family, or A7 scope changed. If none changed, say so plainly.  
+* Existing governed evidence refreshed outside the direct PR slice MAY be treated as bounded evidence churn only when the review proves all of the following: the refresh was produced by the canonical updater or generator, the refreshed items remain in existing governed homes, companion index, mirror, checksum, and path-proof artifacts are coherent, and the review does not use that churn to claim unrelated PF09 closure, route work, writer work, public-contract change, or new acceptance scope.  
 * If a remediation is scoped as evidence-family closeout and the review shows that the underlying runtime, route, or transport slice was already correct, the review MUST say so explicitly and MUST NOT widen the remediation claim to reopened runtime, route, or writer work unless a real defect is shown.  
 * The review MUST name the preserved slice and the exact evidence-family gap that remained open.  
 * Same-change evidence-family closure is family-complete, not primary-family-only. If the remediation or canonical generator changes supplemental, legacy, or compatibility outputs that are still produced by the same governed flow, their companion path-proofs, mirror rows, and checksum or index companions MUST also be current in that same run.  
@@ -4453,13 +4512,11 @@ Template:
 
 For each gap, record:
 
-* Gap: state what is missing or not verified.
-
-* Status: use Unknown, Missing, or Ambiguous.
-
-* What would prove it: state the minimal test, proof, or artifact that would close the gap.
-
-* Where that proof should exist, if known: name the expected canon or governed artifact home.
+* Gap: state what is missing or not verified.  
+* Status: use Unknown, Missing, or Ambiguous.  
+* What would prove it: state the minimal test, proof, or artifact that would close the gap.  
+* Where that proof should exist, if known: name the expected canon or governed artifact home.  
+* If implementation PR evidence exists but close-pack, Live QA, PF-Canon drainage, or final aggregate validation is not directly proven, the snapshot MUST mark each missing proof as Missing, Unknown, Ambiguous, or No claim. PR-slice evidence MUST NOT imply formal close-pack proof, Live QA completion, PF-Canon drainage, or final aggregate validation unless those exact artifacts or results are directly proven.
 
   ### **Retrospective (Process)**
 
@@ -4508,7 +4565,8 @@ Minimum structure
   * Current-reality register. Record any repo-reality or surface-existence confirmations used to support closure, the relevant path or surface strings when they matter, and whether each confirmation supports, contradicts, or does not address closure.  
 * Closure Trace Ledger. For each closure-critical deliverable or slice, map the deliverable to the QA verification item or items that validate it, the governing execution result or results that claim completion, whether current-reality confirmation was used, a status line (Satisfied | Not satisfied | Caveat), and a short why statement grounded in those inputs.
 
-* Path and Surface Reality Ledger. When closure depends on named routes, entrypoints, governed ledgers, or close-pack files, list each required path or surface string verbatim, its source or sources, whether it is proven in current reality or only by execution record, whether it is required for closure, and a short note explaining its closure role.
+* Path and Surface Reality Ledger. When closure depends on named routes, entrypoints, governed ledgers, or close-pack files, list each required path or surface string verbatim, its source or sources, whether it is proven in current reality or only by execution record, whether it is required for closure, and a short note explaining its closure role.  
+* Proof-Class Separation. When a closure claim relies on more than one proof class, the review MUST name each proof class and state which artifacts prove each class. Do not let public output proof, internal/admin compute proof, vendor-backed behavior proof, QA proof, OPS proof, PF09 drain proof, or close-pack proof imply another proof class unless the review names and proves the bridge.
 
 * QA Closeout Summary. State the step-level QA outcome, the overall readiness recommendation, the main blocker or non-blocker themes, and the highest-impact closure risks or gaps that remain.
 
@@ -4524,7 +4582,8 @@ Minimum structure
 * Findings. Record each substantive finding with what happened, why it matters, classification, PF touchpoints when needed, and evidence-pointer posture.
 
 * Root Cause Analysis. State the primary root cause, contributing factors, what made the issue hard to detect or hard to close, and the role of any remediation loops in reducing or preserving uncertainty.  
-* Remediation Loop Assessment. For each major remediation loop, rerun sequence, or ADR-backed correction path used in closeout, state whether it reduced uncertainty, corrected evidence or closure-posture drift, or only preserved a caveat, and explain why. Distinguish productive bounded remediation from churn
+* Remediation Loop Assessment. For each major remediation loop, rerun sequence, or ADR-backed correction path used in closeout, state whether it reduced uncertainty, corrected evidence or closure-posture drift, or only preserved a caveat, and explain why. Distinguish productive bounded remediation from churn  
+* Evidence Hygiene Assessment. State which evidence families were strong, which remained risky, and whether each decisive proof depended on step logs, path-proof surfaces, validators, checksums, close-pack binding, or other governed evidence discipline. When a risk could recur in future epics, state the canon, planning, QA, or evidence-posture change that would prevent recurrence.
 
 * Implementation Gaps and Proposed Fixes. For each remaining gap, state the symptom, the expected behavior, the likely locus, a high-level fix, and a verification hook.
 
@@ -4786,13 +4845,16 @@ In-flight operational detail is allowed during execution (OPS command selection,
 
 Even when commands and failure handling are developed in flight, OPS execution MUST still capture (as repo-stored artifacts under lowercase audit paths):
 
-* the exact commands actually run (verbatim)
-
-* stdout/stderr \+ exit code (or equivalent output)
-
-* the produced artifacts at the declared output paths
-
+* the exact commands actually run (verbatim)  
+* stdout/stderr \+ exit code (or equivalent output)  
+* the produced artifacts at the declared output paths  
 * deviation notes explaining why a different command/flag was used
+
+OPS execution preflight and classification. Before any OPS task executes external, vendor-backed, privileged, or open-rails behavior, the producing plan or in-flight OPS evidence MUST prove the execution preflight that applies to that task: executable command, target facts, input shape, secret posture, rails posture, deterministic pins, prerequisite proof, PO authorization, and required env or credential presence where applicable. Missing command proof, unresolved placeholders, missing target facts, missing prerequisite proof, absent PO authorization, or uncaptured required env posture is TOOLING\_BLOCKED unless the approved task defines a narrower non-execution outcome.
+
+OPS outcome labels. Use PASS only when the task preflight passes, the approved command or action runs, the captured outputs satisfy the task success criteria, no secret or identity contamination occurs, and the result summary preserves any non-claims that apply. Use FAIL\_BEHAVIOR only when prerequisites are proven and the observed behavior fails. Use FAIL\_TOOLING when the run or evidence is contaminated, unsafe, secret-bearing, identity-bearing when forbidden, guessed, missing required outputs after an attempted run, or otherwise invalid as a tool run. Use TOOLING\_BLOCKED when the task cannot safely run.
+
+Post-failure command discipline. OPS commands, flags, targets, credentials, hostnames, ports, birth or user inputs, or evidence locations MUST NOT be changed after a failed run merely to force PASS. Any retry-changing fact MUST be canon-backed or approved in the task context, recorded in the result summary, and reflected in the produced evidence.
 
 In-flight flexibility MUST NOT permit:
 

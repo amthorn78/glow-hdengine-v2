@@ -1,12 +1,12 @@
 # **0\. Front Matter**
 
 **Title:** PF02-Canon-HDE-Architecture  
- **Version:** v1.9.9
+ **Version:** v2.1
 
  **Status:** Canon  
-**Effective date:** 2026-04-19
+**Effective date:** 2026-05-07
 
- **Last Update Gate:** BN 10.5.7 A35
+ **Last Update Gate:** canon-update-hdapi-v2-conformance.
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -182,7 +182,9 @@ CLI parity work remains open; Architecture keeps the single-emitter rule while H
 
 Purity rule (normative). Any module designated as deterministic compute (including sampler core and Engine Core modules) MUST be pure-compute: no time, network, file I/O, randomness, or environment reads at compute time; no import-time side effects. Inputs are pure data; outputs are pure data; side effects are forbidden.
 
-BodyGraph seam carve-out (normative). BodyGraph resolution and ingest MAY perform vendor and DB I/O through the DB abstraction as a sanctioned seam, including when implemented under `engine/bodygraph/`. This carve-out does not relax purity requirements for deterministic compute modules
+BodyGraph seam carve-out (normative). BodyGraph resolution and ingest MAY perform vendor and DB I/O through the DB abstraction as a sanctioned seam, including when implemented under `engine/bodygraph/`. This carve-out does not relax purity requirements for deterministic compute modules.
+
+Non-BodyGraph loader-style I/O classification (normative). Loader-style modules under `engine/` that are outside the BodyGraph seam, including `engine/charts/loader.py` when observed, are not classified by assumption. Each must be explicitly adjudicated as a sanctioned loader seam, implementation drift, or future canon gap; until that classification is made, the BodyGraph seam carve-out does not authorize new I/O in Engine Core, sampler core, or other deterministic compute modules.
 
 Within `engine/`, the sampler core module and Engine Core module are single homes for their behaviors:
 
@@ -249,6 +251,8 @@ All canonicalization and compares run with `LC_ALL=C`, `LANG=C`, `TZ=UTC`. These
 **Offline pipelines & evidence generators.**  
  Offline pipelines and evidence generators (for example, determinism jobs and evidence-family generators) MUST invoke Engine Core and sampler core modules with pinned fixtures and MUST honor the same canonical JSON, idempotence, AB↔BA, two-run identity, and locale pins as runtime requests. They produce governed artifacts into evidence families and update the human Evidence Index and machine mirror in the same PR as the code changes; schemas, artifact families, and gating rules live in HDE-Schemas & Artifacts, HDE-Mechanics Guide, HDE-Build Checklist, and Epic-Process-Guide.
 
+Governed evidence-generator PASS posture (architecture-level). Architecture recognizes an offline evidence family as PASS-grade only when the final governed artifact is produced by the final generator logic and the top-level PASS is derived from evaluated decisive predicates for that evidence family. Stale artifacts or partial local state do not create an architecture-valid proof surface. This is an offline-evidence classification rule only; it does not create a runtime route, acceptance token, OPS task, or blanket audit obligation.
+
 **Routing (titles-only).**  
  Payload schemas, category construction, and transport/header rules live in HDE-CLI-API-Vendor-Ref and HDE-Governance; canonical JSON, pack/manifest, and the machine Evidence Index live in HDE-Schemas & Artifacts; idempotence preimage and math live in HDE-Math-Spec. Architecture remains contract-free and describes invariants only.
 
@@ -309,7 +313,7 @@ Repo map (normative)
 
 * The canonical sampler behavior lives in a single module under the `engine/` tree, referred to here as the **sampler core module** (currently `engine.sampler.core`). It owns sampler/ranker behavior: pool formation, eligibility, ordering, and sampling decisions.
 
-* The canonical Engine Core behavior lives in a single module under the `engine/` tree, referred to here as the **Engine Core module** (currently `engine.core.core`). It owns the core compatibility computation: neutral and directional metrics, AB↔BA parity, and the normalized result structure consumed by Presenter and evidence tooling.
+* The canonical Engine Core behavior lives in a single module under the `engine/` tree, referred to here as the **Engine Core module** (currently `engine.core.core`). It owns the core compatibility computation: neutral and directional metrics, category-framework and per-channel mechanics integration, AB↔BA parity, and the normalized result structure consumed by Presenter and evidence tooling.
 
 **Behavior-only boundary.**
 
@@ -337,7 +341,8 @@ Repo map (normative)
 * CLI and HTTP harness bytes for sampler/core behavior → **HDE-CLI-API-Vendor-Ref**.  
 * **Presenter component home (names-only).** The presenter component is single-home by role and byte-authoritative emitter symbol, not by one literal repository path.  
 * **Namespace split without serializer split.** Wrapper envelope builders MAY live under top-level `presenter/`, while the byte-authoritative emitter entrypoint MAY live under `engine/presenter/`, provided all public-byte emission delegates to the same governed emitter path.  
-* **No second serializer home.** Dual presenter namespaces do not create a second presenter component, a second serializer home, or an alternate public-byte path.
+* **Failure condition.** A namespace split becomes architecture drift only if it introduces a second independent presenter component, a second serializer home, or an alternate public-byte path.  
+* **Delegation proof routing.** Emitter-delegation proof, guard checks, and path evidence route by title to **HDE-Mechanics Guide** and **HDE-Schemas & Artifacts**; PF02 records the architecture classification only.
 
 ### **Deny-list (normative)**
 
@@ -462,6 +467,10 @@ For mirrored compat surfaces:
 * `showcompat` stdout is a compat payload (admin/test surface) and may include numeric scores and weights.  
 * Reader v1 bytes are the numeric-free public success envelope and are emitted by the Reader success route. When the CLI emits Reader v1 bytes for parity, it does so via a dedicated dump sidecar output (titles-only; see **HDE-CLI-API-Vendor-Ref**).  
 * Byte identity for “Reader↔CLI parity” refers to the Reader 200 body vs the CLI’s dumped Reader v1 bytes for the same normalized inputs (single-emitter rule). It does not refer to `showcompat` stdout.  
+* Public, birth-facing, or no-user compat proof paths MUST NOT require caller-provided `person_uid`, `user_id`, or app user ID. If strict compatibility compute still needs internal metadata, a sanctioned resolver or adapter boundary MAY derive deterministic internal metadata before Engine Core compute; this does not make that metadata a public, birth-facing, or caller-supplied input.  
+* Fixture-only `person_uid` injection is an internal-compute proof class only; it is not sufficient architecture proof for live no-user or birth-facing behavior.  
+* Vendor-backed no-user smoke evidence is implementation-validation evidence through the governed vendor seam. It does not create a new public route, public flag, acceptance token, QA PASS, Live QA completion, or epic closure.  
+* **Proof-class boundary (architecture-level).** Public Reader output, internal/admin compat compute output, and public or birth-facing no-user compatibility behavior are separate proof classes. Public Reader proof establishes bands-only, numeric-free Presenter output; internal/admin compat proof may validate Engine Core compute and admin/test compat payloads; no-user or birth-facing behavior proof validates the adapter or resolver boundary that supplies internal metadata without caller identity. Any UID-coupled internal ordering needed to stabilize strict compute remains an internal resolver or adapter concern and does not become a caller-facing identity requirement. Passing evidence in one proof class does not, by itself, satisfy the others or create a new public route.  
 * The compat request flow is detailed in §2.4 (Reader/CLI → Engine Core → Presenter) and remains contract-free; concrete shapes and tokens live in **HDE-CLI-API-Vendor-Ref**, **HDE-Math-Spec**, and **HDE-Schemas & Artifacts** by title.
 
 ---
@@ -536,11 +545,15 @@ PF02 does **not** carry:
 
 ## **2.4 BodyGraph ingest & durability \[Required-Now\]**
 
-This subsection describes the BodyGraph lifecycle at the architecture level:
+his subsection describes the BodyGraph lifecycle at the architecture level:
 
 request → DB runtime resolver → vendor (when needed) → Engine → DB persist → subsequent requests
 
 It ties together the DB cache, vendor seam, and Engine’s stateless contract.
+
+**HumanDesignAPI v2 conformance pending (architecture-level).** Current BodyGraph ingest and vendor-seam architecture remains legacy BodyGraph-oriented until HDE-FERM006 through HDE-FERM008 are implemented and evidenced. PF02 must not describe the HDE vendor seam as v2-conformant until the governed contract inventory, v2 adapter shaping, response normalization, closed-rails proof, and PO-only open-rails smoke evidence are complete. When later implemented and evidenced, this flow should show v2 chart routes as the recommended vendor path, v1 BodyGraph routes as explicit legacy behavior, adapter boundary preservation, and response normalization into the HDE cache and compat inputs. This pending conformance path creates no public Reader route, no Reader v1 contract change, and no change to the bands-only numeric-free Reader posture.
+
+**No-AI runtime boundary for this vendor conformance path.** HumanDesignAPI v2 conformance is deterministic vendor integration only. It does not add OpenAI, LLM, AI-agent, chatbot, prompt, embedding, model-call, or AI-enablement architecture inside the HD Engine, Glow App, Reader, vendor adapter, cache, sampler, compat engine, narrative machinery, public surfaces, or admin runtime surfaces. Vendor documentation files or pages aimed at AI or LLM consumers may be inspected only as documentation-discovery context and must not be treated as product or runtime scope.
 
 ### **Adapter source policy (env-aware)**
 
@@ -690,6 +703,14 @@ Titles only; **no bytes restated here**.
 * **Endpoint Catalog binding (high level):** the Endpoint Catalog entry for `/api/compat/v1` binds the POST compute surface and MUST include a non-empty env gate field. Env-gate proof is headers-only.  
 * Malformed or incomplete inputs are rejected. (Detailed shapes live in **HDE-CLI-API-Vendor-Ref**.)
 
+**Viewer-preference normalization handoff (high level).**
+
+Compat and CLI compatibility flows normalize viewer preferences before candidate-selection, sampler, or ranker behavior consumes them. Zero-weight intent is carried as normalized input truth into the existing sampler/ranker behavior home; sampler/ranker remains the owner of candidate exclusion behavior. This handoff uses existing CLI and compat call paths and does not create a new public surface, route, serializer path, or public contract.
+
+**Threshold ownership handoff (high level).**
+
+Compat threshold symbols used by compat and CLI compatibility flows are compatibility-facing shims over the existing Magic-10 threshold source in the Engine math layer. `engine.compat.thresholds.THRESHOLDS_V1` derives from `engine.magic10.thresholds.THRESHOLD_EDGES`, and `engine.compat.thresholds.BANDS` derives from `engine.magic10.thresholds.BANDS`. This preserves one threshold home, keeps threshold arithmetic and constants-pack ownership outside Architecture, and does not create a new public route, flag, serializer path, public contract, or second threshold source.
+
 **Presenter rule.**  
  The adapter never hand-crafts public JSON. Only the Presenter’s single emitter serializes public bytes for **all** callers (HTTP and CLI).
 
@@ -704,6 +725,10 @@ Conjunction computation is an internal Engine surface. It does not create a new 
   * `conjunction_public` (pure compute over resolved BodyGraphs)
 
   * `conjunction_public_resolved` (local-first resolution via the existing BodyGraph resolver path, then compute; SAFE rails apply)
+
+**Birth-only no-user boundary (architecture-level).**
+
+`conjunction_public_resolved` is the sanctioned no-user resolver boundary for local compatibility proof when caller input provides a complete birth tuple and provides no `person_uid`, `user_id`, or app user ID. The boundary may derive deterministic internal metadata before strict Engine compute, including an internal `person_uid`, but that metadata stays internal and is not a caller input, public field, public route contract, CLI flag, or serializer path. Existing internal `user_id` flows remain separate and unchanged.
 
 **Parity expectations.**
 
@@ -994,9 +1019,10 @@ For epics whose D-goals involve Reader/HTTP behaviour, compat behaviour, or dev 
 
 * **Reader v1** (public success route) for HTTP-level compat envelopes.  
 * **Compat CLI surfaces** (as described in **HDE-CLI-API-Vendor-Ref**) for terminal-based compat flows. CLI stdout may be an admin/test compat payload (for example `showcompat`). When Reader-identical bytes are required for parity proofs, the CLI emits Reader v1 bytes via a dedicated dump sidecar output (titles-only; see **HDE-CLI-API-Vendor-Ref**).  
+* **Controlled no-user vendor smoke (CLI proof class).** A PO-run `showcompat` vendor smoke is a CLI proof class through the vendor seam. For architecture purposes, it is not an HTTP Reader run, not a hosted-service proof, and not a new public route. If a future smoke changes from CLI vendor execution to an HD Engine HTTP service call, the target classification changes and must be grounded in the infrastructure home before execution. Concrete command flags, environment variables, credentials, and evidence outputs are routed by title to the owning CLI/API, infrastructure, QA, and build-checklist homes.  
 * **Repo-local script launcher surface (names-only).** `scripts/hdctl.py` is a repo-local launcher over the same CLI family and is used for subcommand help and invocation flows such as `bg:resolve`. Architecture treats this launcher as part of the existing emitter-backed CLI entrypoint family, not as a second serializer, second contract, or distinct runtime surface.  
 * **CLI entrypoint wiring (repo surface; names-only).** `pyproject.toml` exposes `hdctl = engine.cli.main:cli`, `engine/cli/main.py` is the repo-local wiring surface, and `python -m engine.cli` is the module-runner surface over the same CLI entrypoint family for conjunction-oriented `showcompat` flows. Architecture treats console-script and module-runner invocation as one emitter-backed CLI surface and keeps CLI bytes and argument contract out of scope here.  
-* **Dev sampler harnesses** (CLI and HTTP) for sampler-specific behaviour, always through Engine Core and the single Presenter emitter.  
+* **Dev sampler harnesses** (CLI and HTTP) for sampler-specific behaviour. The HTTP harness is a non-public internal/dev surface under the adapter family, uses `POST /internal/dev/sampler` when HTTP evidence is required, is `APP_ENV`\-gated rather than public, and calls the sampler core in-process before bytes are emitted through the single Presenter emitter. CLI and HTTP harnesses do not create a new public route, second sampler implementation, or alternate serializer.  
 * **Bounded conjunction closeout family (names-only).** For conjunction-bounded closure work, the canonical dev/QA surface family may include the Reader success surface, the internal/dev sampler surface (`POST /internal/dev/sampler`), and the dev-only conjunction routes (`GET /dev/sampler/conjunction`, `GET /dev/reader/conjunction`, and `GET /dev/writer/conjunction`). Using this existing family for Live QA or closeout does not create a new public route by itself.  
 * **Surface-class distinction (names-only).** Reader-like success surfaces, compat API surfaces (for example `/api/compat/v1`), and dev/internal harness surfaces may coexist inside one adapter-mounted HTTP family without collapsing into one proof class. Architecture records the mounted family and the single-emitter boundary only; epic-specific proof-surface selection remains routed by title to the owning QA and governance documents.  
 * **Closeout-impact posture (names-only).** Internal/dev harnesses can materially affect closure and evidence binding even when no new public route is introduced, because they still exercise the same adapter-mounted and Presenter-emitted architecture.
@@ -1061,31 +1087,17 @@ HTTP QA against “Reader” or dev harness surfaces is considered misconfigured
     * In conjunction mode, \`showcompat\` is local-first and uses the same resolved-BodyGraph path as \`conjunction\_public\_resolved\`, respecting SAFE rails. If either party’s BodyGraph is missing locally, open rails are required to fetch; if rails are closed, the step MUST refuse deterministically and MUST NOT attempt network.  
     * When conjunction-mode \`showcompat\` succeeds, it MUST emit deterministic canonical JSON to stdout (byte-stable for identical inputs), enabling gated comparisons and traceable evidence artifacts.  
     * `showcompat` MUST NOT be executed as a zero-argument command in QA plans or QA runs. Follow the authoritative command and argument contract in **HDE-CLI-API-Vendor-Ref**.  
-  * **PF23 consult is required in QA planning (read-only).** Reality Audits (PF23) MUST be consulted during QA planning and QA plan review as a primary input for repo-reality context and existence or locus framing. Plans and reviews MUST NOT treat PF23 consult as a required deliverable, a required check, or an acceptance token. Do not instruct the operator to run commands solely to “prove PF23 consult.”  
-    * If a plan names repo-resident loci, reviewers SHOULD consult PF23 before approval to reduce fabricated or stale locus assumptions.
-
-    * Consultation is read-only; PF23 updates remain PO-only, and QA execution MUST NOT include PF23 updates as a required output.
-
-    * A plan MAY include a single “PF23 Anchors” note (components consulted and loci touched), but it is informational only and MUST NOT appear as a required check or required evidence output.
-
-    * If any PF23 Reality Audit statement contradicts PF canon, or appears inconsistent with other allowed repo-reality sources, record it as an explicit drift item requiring adjudication and treat the situation as reality ambiguity. Do not resolve contradictions by assumption or assert a reconciled locus as fact inside the plan.
-
+  * **PF23 consult is required in QA planning (read-only).** Reality Audits (PF23) MUST be consulted during QA planning and QA plan review as a primary input for repo-reality context and existence or locus framing. Plans and reviews MUST NOT treat PF23 consult as a required deliverable, a required check, or an acceptance token. Do not instruct the operator to run commands solely to prove PF23 consult.  
+    * If a plan names repo-resident loci, reviewers SHOULD consult PF23 before approval to reduce fabricated or stale locus assumptions.  
+    * Consultation is read-only; PF23 updates remain PO-only, and QA execution MUST NOT include PF23 updates as a required output.  
+    * A plan MAY include a single “PF23 Anchors” note (components consulted and loci touched), but it is informational only and MUST NOT appear as a required check or required evidence output.  
+    * If any PF23 Reality Audit statement contradicts PF canon, or appears inconsistent with other allowed repo-reality sources, record it as an explicit drift item requiring adjudication and treat the situation as reality ambiguity. Do not resolve contradictions by assumption or assert a reconciled locus as fact inside the plan.  
     * Record each contradiction as a set:  
-      * PF23 claim (verbatim quote)
-
-      * Canon claim (verbatim quote plus PF canon citation)
-
+      * PF23 claim (verbatim quote)  
+      * Canon claim (verbatim quote plus PF canon citation)  
       * Impacted epic or surface  
-    * PF23 claim (verbatim quote)
-
-    * Canon claim (verbatim quote plus PF canon citation)
-
-    * Impacted epic or surface  
-      * Canon defect (PF canon is wrong or incomplete)
-
-      * Implementation drift (repo or runtime deviates from canon)
-
-      * Necessary reality shift (PF canon must be updated to reflect ground truth)  
+      * Classification bucket: canon defect, implementation drift, or necessary reality shift  
+    * **PF23 audit-classification routing (architecture-level).** PF23 repo-reality observations that implicate PF02 architecture, PF14 mechanics, PF05 transport, or PF12 schemas/artifacts MUST route to the owning canon home by title. Do not convert those observations into PF09.x task deltas, remediation work, implementation deltas, new evidence homes, or acceptance tokens by assumption.  
     * Adjudication is owned by the PO, who decides whether the resolution path is a canon update, implementation remediation, or a formalized exception with a canon follow-up.  
   * **No VCS workflow content (hard).** Live QA Plans MUST NOT instruct or discuss branches, commits, PRs, or any other VCS workflow steps, and MUST NOT gate PASS/FAIL on VCS state (for example “working tree clean” or “on correct branch”). Read-only, non-mutating git commands are allowed only as optional, non-gating repo-root sanity checks and must not rely on branch names, commit SHAs, or PR identifiers.  
   * **Discovery-first, objective-first Live QA plans.** Live QA Plans MUST specify intent and proof obligations per step and MUST treat any repo detail not proven at planning time as unknown until discovered during the run.  
@@ -1450,11 +1462,26 @@ Concrete artifact names/paths, bundle usage for A7 families, and tokenisation ar
 * **Bounded conjunction inventory posture (names-only).** For conjunction-slice inventory and bounded closeout review, the current JSON surface family is the cataloged Reader success route `GET /reader`, the dev-only conjunction routes `GET /dev/writer/conjunction`, `GET /dev/reader/conjunction`, `GET /dev/sampler/conjunction`, and the internal dev sampler route `POST /internal/dev/sampler`.  
 * **Inventory-only posture for bounded conjunction review.** Grouping these existing routes for conjunction review does not create a new public surface, a separate proof carrier, or an alternate serializer or emitter path.  
 * **No new public-surface inference from closeout inventory.** Catalog-surface and runtime-surface inventories are confirmatory only. They may show that no unexpected public success surface has appeared beyond the declared PF02 runtime surface set, but they do not create, widen, or rename that set.  
+* **EPIC030 PR-01 normalization evidence surfaces (names-only).** The PR-01 normalization slice binds existing viewer-preference normalization and zero-weight handoff behavior through governed offline evidence at `audit/qa/hde-epic030/pr-01/zero_weight_handoff.json`, `audit/qa/hde-epic030/pr-01/invalid_viewer_prefs.log`, and `audit/qa/hde-epic030/pr-01/normalization_canonical_compare.log`, with sibling path proofs and Human Evidence Index and Machine Evidence Index linkage. This offline evidence family records normalized input truth, invalid-preference handling, and canonical-compare posture for existing CLI and compat call paths; it does not create a new public route, flag, serializer path, public contract, or second exclusion home.  
+* **EPIC030 PR-02 dev-sampler evidence surfaces (names-only).** The PR-02 dev-sampler slice binds the existing internal/dev sampler harness through governed offline evidence at `audit/qa/hde-epic030/pr-02/dev_sampler_http_headers.txt`, `audit/qa/hde-epic030/pr-02/dev_sampler_http_body.json`, `audit/qa/hde-epic030/pr-02/dev_sampler_seed_only.json`, and `audit/qa/hde-epic030/pr-02/dev_sampler_two_run_identity.json`, with sibling path proofs and Human Evidence Index and Machine Evidence Index linkage. This offline evidence family records headers/body snapshot, seed-only metadata, and two-run identity posture for the existing `POST /internal/dev/sampler` dev harness; it does not create a public route, A7 proof surface, production mount, second sampler implementation, or alternate serializer.  
+* **EPIC030 PR-03 compat evidence surfaces (names-only).** The PR-03 compat slice binds existing compat behavior through governed offline evidence at `audit/qa/hde-epic030/pr-03/category_order_binding.log`, `audit/qa/hde-epic030/pr-03/compat_identity_binding.log`, `audit/qa/hde-epic030/pr-03/compat_parity_binding.log`, and `artifacts/narratives/key_table_10x2.snapshot.json`, with sibling path proofs and Human Evidence Index and Machine Evidence Index linkage. This offline evidence family records category-order, compat identity, compat parity, and narrative key-table snapshot linkage for existing compat/admin surfaces; it does not create a new public route, second compat surface, second Presenter path, or alternate evidence home.  
+* **EPIC030 PR-04 band-threshold evidence surfaces (names-only).** The PR-04 threshold/tuning slice binds the existing compat threshold and band-order flow through governed offline evidence at `audit/qa/hde-epic030/pr-04/band_edges_binding.log`, `audit/qa/hde-epic030/pr-04/band_thresholds_diff.json`, and `audit/qa/hde-epic030/pr-04/band_thresholds_identity_hash.txt`, with sibling path proofs and Human Evidence Index and Machine Evidence Index linkage. This offline evidence family records threshold-source binding and AB↔BA identity posture for the existing compat/admin threshold surface; it does not create a new public route, flag, serializer path, public contract, close-pack surface, or second threshold home.  
+* **EPIC030 PR-05 category-framework evidence surfaces (names-only).** The PR-05 category-framework slice binds existing category-framework and per-channel mechanics proof through governed offline evidence at `audit/qa/hde-epic030/pr-05/category_framework_binding.log`, `audit/qa/hde-epic030/pr-05/category_canonical_compare.log`, and `audit/qa/hde-epic030/pr-05/per_channel_mechanics.json`, with sibling path proofs and Human Evidence Index and Machine Evidence Index linkage. This offline evidence family records canonical-compare and per-channel mechanics posture for existing Engine category-framework behavior; it does not create a new public route, flag, serializer path, close-pack surface, QA-ledger surface, Live QA runbook surface, PF-canon edit, or runtime proof route.  
+* **EPIC030 QA check-surface binding (names-only).** CHECK po-006 through po-010 are check-scoped offline QA surfaces under `audit/qa/hde-epic030/checks/po-0NN/`. They bind already-existing proof families from OPS-02, PR-04, PR-05, and the PR-01 through PR-05 generated proof families; they do not create new runtime routes, public surfaces, A7 proof surfaces, or Presenter paths.  
+* **EPIC030 no-user, threshold, and generated-proof-family checks (names-only).** CHECK po-006 binds public numeric-free compat proof and OPS-02 birth-only no-user implementation-validation evidence. CHECK po-007 and po-008 bind threshold ownership, band-edge binding, and band-threshold identity-hash evidence to the existing compat/admin threshold surface and Magic-10 threshold source. CHECK po-009 and po-010 bind category-framework, per-channel mechanics, and fail-closed generated-proof-family visibility to existing offline proof families. Check-scoped evidence remediations and accepted deviations inside these checks are offline ledger updates only; these checks do not create a second threshold home, second category-framework home, public route, flag, serializer path, public contract, epic-level QA PASS by themselves, Live QA completion by themselves, PF09 status change, or epic closure.  
 * **Authoritative plus supplemental gate-family posture (names-only).** When one offline canonical-gate flow still produces both the authoritative `audit/gates/json_gate/canonical/` family and a supplemental legacy `audit/gates/canonical_json/` family, architecture treats both families as one same-change evidence event inside the offline plane.  
 * **Coherence across still-produced families.** If either family changes, current companion path proofs and ledger refresh apply to every changed family that still participates in that run. The supplemental legacy family remains continuity evidence only; it does not create a second truth home, a second runtime surface, or a second Presenter path.  
 * **Epic QA step-manifest surface (names-only).** Within this same offline evidence plane, the current-state epic QA ledger uses a `qa_step_logs_manifest.json` manifest with a sibling `qa_step_logs_manifest.json.path_proof.txt`, together with check-scoped `primary.log` files under the epic QA `checks/` subtree.  
+* **EPIC030 traceability and reused-history QA-ledger surfaces (names-only).** CHECK po-011 binds traceability state across required PR-slice artifacts, Human Evidence Index, and Machine Evidence Index. CHECK po-012 classifies reused-history rows separately from active HDE-EPIC030 rows and records no new implementation claim for reused-history rows. These are offline QA-ledger classifications only; they do not create runtime behavior, implementation deltas, new proof families, or close-pack completion by themselves.  
+* **EPIC030 source-of-truth and all-slice coherence QA-ledger surfaces (names-only).** CHECK po-013 and CHECK po-014 are check-scoped offline QA surfaces under `audit/qa/hde-epic030/checks/po-013/` and `audit/qa/hde-epic030/checks/po-014/`. CHECK po-013 binds `primary.log` and `source_of_truth_posture.txt` to the separation between repo-supported completion, canon-drain completion, and formal close-pack completion. CHECK po-014 binds `primary.log`, `all_slice_coherence.json`, and `exit_code.txt` to the post-implementation all-slice coherence proof across prior primary logs and PR-01 through PR-05 core artifacts. These checks are offline QA-ledger classifications only; they do not create runtime behavior, implementation deltas, new public routes, new proof families, PF-canon drainage, or close-pack completion by themselves.  
+* **EPIC030 discovery, QA RCA, and documentation-drainage QA-ledger surfaces (names-only).** CHECK po-015, CHECK po-016, and CHECK po-017 are check-scoped offline QA surfaces under `audit/qa/hde-epic030/checks/po-015/` through `audit/qa/hde-epic030/checks/po-017/`. CHECK po-015 binds `primary.log`, `discovery.json`, and `discovery_validation.txt` to baseline execution-context discovery. CHECK po-016 binds `primary.log` and `audit/EPIC-030_QA_RCA.md` to final QA interpretation and required RCA sections. CHECK po-017 binds `primary.log` and `documentation_drainage_posture.txt` to the non-blocking documentation-drainage posture while preserving real truth-and-proof blockers. These surfaces do not create runtime routes, public surfaces, new Presenter paths, PF09.2 status changes, or close-pack completion by themselves.  
+* **EPIC030 closeout proof-class separation (names-only).** For EPIC030 architecture, repo-supported completion, canon-drain completion, and formal close-pack completion are separate offline states. Runtime and implementation proof may support QA interpretation, but Architecture recognizes no PF09.2 drainage or close-pack completion unless the governed close-pack or later-drain surface is separately present and bound.  
 * **Authoritative-family posture (names-only).** Within the offline evidence plane, any governed evidence family used for bounded closeout, OPS validation, or acceptance binding carries one authoritative closure posture at a time. Architecture does not recognize contradictory family states as a valid proof surface.  
 * **Documentation/evidence normalization posture (names-only).** When runtime facts are unchanged and only closure interpretation changes, a bounded normalization pass may rewrite the affected governed family, its index or mirror companions, and required path proofs without creating a new runtime route, a new A7 surface, or a second truth home.  
+* **EPIC030 OPS-03 close-pack surfacing surfaces (names-only).** OPS-03 is an evidence-packaging and close-pack surfacing surface for HDE-EPIC030. The canonical close-pack pair is `audit/EPIC-030_close_report.md` and `audit/EPIC-030_MANIFEST.json`, with sibling path proofs and a named `key_outputs` map binding close report, manifest, acceptance map, QA RCA, QA step manifest, token matrix, doc deltas, drain targets, OPS-03 final evidence inventory, and created-files checksum ledger outputs. This packaging surface binds existing QA and implementation proof families; it does not create a runtime route, public surface, A7 proof surface, Presenter path, implementation delta, PF-canon edit, PF09.2 drain, new acceptance claim, or vendor execution.  
+* **EPIC030 OPS-03 support-evidence family (names-only).** The OPS-03 support family records corrected command transcript, labeled stdout, stderr, exit-code evidence, final evidence inventory, inventory path proof, final validation log, and created/refreshed file checksum ledger under `audit/ops/hde-epic030/ops-03/`. These artifacts are offline packaging and validation evidence only; they do not alter Reader, CLI, compat, sampler, BodyGraph, or Presenter runtime behavior.  
+* **EPIC030 formal close-pack separation (names-only).** Formal close-pack surfacing can be recorded by the canonical close-pack pair and bound support family while PF09.2 later-drain support remains recorded but not drained. Architecture treats that as offline closure-state classification, not as an immediate checklist status change or new engine component.  
+* **EPIC030 final closeout synthesis surface (names-only).** The HDE-EPIC030 final closure review, QA RCA, and Lead Dev Epic Retrospective are offline synthesis artifacts that consolidate PR-slice outcomes, Live QA check outcomes, remediation loops, OPS-02 and OPS-03 proof posture, closure-trace satisfaction, and ready-with-caveats recommendation. Architecture treats this synthesis as a traceability and interpretation surface over existing proof families; it does not create a runtime route, public surface, A7 proof surface, Presenter path, implementation delta, PF09.2 drainage, PO closeout action, or acceptance claim by itself.  
 * **EPIC027 acceptance-ledger close-pack surfaces (names-only).** The EPIC027 close-pack binds existing runtime proof families through governed offline artifacts at `docs/acceptance_map_epic027.json`, `audit/qa/hde-epic027/token_evidence_matrix.md`, `audit/qa/hde-epic027/acceptance_map_viability.log`, `audit/EPIC-027_close_report.md`, and `audit/EPIC-027_MANIFEST.json`. These are offline ledger surfaces only and do not create new runtime routes, new Presenter paths, or new public transport surfaces.  
 * **EPIC028 Reader acceptance-ledger surfaces (names-only).** The EPIC028 Reader closeout binds existing Reader runtime proof families through governed offline artifacts at `docs/acceptance_map_epic028.json`, `audit/qa/hde-epic028/token_evidence_matrix.md`, and `audit/qa/hde-epic028/acceptance_map_viability.log`. These are offline ledger surfaces only; they preserve the existing Reader route, Endpoint Catalog and env-gate, and Reader A7 proof family without creating new runtime routes, new Presenter paths, or writer-side surfaces.  
 * EPIC028 single-home acceptance binding posture (names-only). The current-epic Reader acceptance binding remains single-home at docs/acceptance\_map\_epic028.json, audit/qa/hde-epic028/token\_evidence\_matrix.md, and audit/qa/hde-epic028/acceptance\_map\_viability.log. Matching Machine Evidence Index rows for all three belong to the same offline discoverability posture, and Architecture does not recognize an alternate acceptance-map home for EPIC028.  
@@ -1577,11 +1604,13 @@ Resolver semantics, connection details, and evidence live in **Glow Infrastructu
 
 **Responsibilities.**
 
-* Adapter (or a dedicated provider module at the seam) constructs URLs, headers, and bodies by policy.
-
-* The vendor seam normalises vendor responses into BodyGraphs or other internal structures that match the schemas owned in other documents.
-
+* Adapter (or a dedicated provider module at the seam) constructs URLs, headers, and bodies by policy.  
+* The vendor seam normalises vendor responses into BodyGraphs or other internal structures that match the schemas owned in other documents.  
 * Engine Core and sampler core receive only normalised data structures; they never see vendor transport details or directly open sockets or database connections.
+
+**HumanDesignAPI v2 vendor route posture (names-only; pending).** Under the pending v2 conformance path, vendor source selection distinguishes `POST /v2/charts`, `POST /v2/charts/simple`, and `POST /v2/charts/coordinates` as the recommended v2 chart route family, while `POST /v1/bodygraphs` and `POST /v1/bodygraphs/simple` remain explicit legacy route families unless later retired by PO decision and drained through the vendor-contract homes. PF02 records the route-family relationship only; auth headers, base URLs, request bodies, response envelopes, rate-limit behavior, retry posture, and error bytes are owned by HDE-CLI-API-Vendor-Ref, Glow Infrastructure, HDE-Governance, and HDE-Schemas & Artifacts by title.
+
+**HumanDesignAPI v2 adapter boundary posture (names-only; pending).** V2 request shaping, route choice, response normalization, cache writes, CLI surfaces, and internal/admin compat flows must pass through the sanctioned vendor seam and existing Adapter/CLI source-selection boundary. They must not create a second HTTP home, bypass adapter guards, bypass the Presenter single-emitter boundary, place live HTTP or DB access inside Engine Core or sampler core, log payload bodies or secrets, or infer BodyGraph compatibility without governed mapping proof. Closed rails prove deterministic refusal and no external I/O only; they do not substitute for PO-only open-rails vendor conformance evidence.
 
 **Repo-local seam location (names-only).**
 
