@@ -52,7 +52,8 @@ def test_mirror_schema_and_parity():
         assert key_set - (required_fields | optional_fields) == set()
         if "tokens" in rec:
             assert rec["tokens"], f"tokens missing for {rec['artifact_key']}"
-            if acceptance_tokens:
+            if rec.get("epic_id") == "HDE-EPIC020":
+                assert acceptance_tokens, "EPIC020 acceptance token roster is required"
                 assert set(rec["tokens"]).issubset(acceptance_tokens)
         key = (rec["artifact_key"], rec["discovered_physical_path"])
         assert key not in seen
