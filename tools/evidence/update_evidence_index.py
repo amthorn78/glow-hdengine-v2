@@ -197,7 +197,6 @@ EPIC031_PR01_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
         "record_type": "epic031_pr01_evidence",
         "schema_version": "1.0",
         "produced_at_utc": "2026-05-10T15:38:37Z",
-        "tokens": ["ENV_RAILS_POLICY_OK", "VENDOR_RETRY_BACKOFF_OK"],
         "notes": "EPIC031 PR-01 pinned SAFE rails provider policy evidence",
     },
     {
@@ -207,7 +206,6 @@ EPIC031_PR01_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
         "record_type": "epic031_pr01_evidence",
         "schema_version": "1.0",
         "produced_at_utc": "2026-05-10T15:38:37Z",
-        "tokens": ["RETRY_AFTER_PARSE_OK", "PROVIDER_429_TYPED_OK"],
         "notes": "EPIC031 PR-01 Retry-After deterministic parse evidence",
     },
     {
@@ -217,7 +215,6 @@ EPIC031_PR01_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
         "record_type": "epic031_pr01_evidence",
         "schema_version": "1.0",
         "produced_at_utc": "2026-05-10T15:38:37Z",
-        "tokens": ["ENV_RAILS_POLICY_OK", "VENDOR_RETRY_BACKOFF_OK"],
         "notes": "EPIC031 PR-01 open rails policy proof",
     },
     {
@@ -227,7 +224,6 @@ EPIC031_PR01_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
         "record_type": "epic031_pr01_evidence",
         "schema_version": "1.0",
         "produced_at_utc": "2026-05-10T15:38:37Z",
-        "tokens": ["VENDOR_RETRY_BACKOFF_OK", "PROVIDER_429_TYPED_OK", "RETRY_AFTER_PARSE_OK"],
         "notes": "EPIC031 PR-01 retry, backoff, and 429 typed proof",
     },
     {
@@ -237,7 +233,6 @@ EPIC031_PR01_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
         "record_type": "epic031_pr01_evidence",
         "schema_version": "1.0",
         "produced_at_utc": "2026-05-10T15:38:37Z",
-        "tokens": ["ENV_RAILS_POLICY_OK"],
         "notes": "EPIC031 PR-01 closed default and open exception rails proof",
     },
 ]
