@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import json
+from io import BytesIO
 from pathlib import Path
+from urllib import error as urlerror
+from urllib import request as urlrequest
 
 import pytest
 
@@ -99,6 +102,64 @@ def test_fetch_does_not_retry_other_4xx_statuses() -> None:
 
     assert excinfo.value.code == "PROVIDER_FORBIDDEN"
     assert calls == ["https://vendor.test/v1/bodygraphs"]
+
+
+def test_fetch_does_not_retry_other_http_statuses() -> None:
+    calls = []
+
+    def redirect(req, timeout):
+        calls.append(req.full_url)
+        return 302, b"{}", {"location": "https://vendor.test/redirect"}
+
+    client = _client(redirect)
+    request = VendorRequest(url="https://vendor.test/v1/bodygraphs", headers={}, body_bytes=b"{}\n", input_fingerprint="abc")
+    with pytest.raises(VendorError) as excinfo:
+        client.fetch(request)
+
+    assert excinfo.value.code == "PROVIDER_ERROR"
+    assert excinfo.value.details == {"status": 302}
+    assert calls == ["https://vendor.test/v1/bodygraphs"]
+
+
+def test_default_request_returns_redirect_status_without_following(monkeypatch: pytest.MonkeyPatch) -> None:
+    opened = []
+    captured_handlers = []
+
+    class RedirectBody(BytesIO):
+        def close(self) -> None:
+            pass
+
+    class FakeOpener:
+        def open(self, req, timeout):
+            opened.append((req.full_url, timeout, dict(req.headers)))
+            raise urlerror.HTTPError(
+                req.full_url,
+                302,
+                "Found",
+                {"Location": "https://vendor.test/redirect"},
+                RedirectBody(b"redirect"),
+            )
+
+    def fake_build_opener(*handlers):
+        captured_handlers.extend(handlers)
+        return FakeOpener()
+
+    monkeypatch.setattr(urlrequest, "build_opener", fake_build_opener)
+    req = urlrequest.Request(
+        "https://vendor.test/v1/bodygraphs",
+        data=b"{}\n",
+        headers={"HD-Api-Key": "api"},
+        method="POST",
+    )
+
+    status, body, headers = HdApiClient._default_request(req, 2.0)
+
+    assert status == 302
+    assert body == b"redirect"
+    assert headers["location"] == "https://vendor.test/redirect"
+    assert opened == [("https://vendor.test/v1/bodygraphs", 2.0, {"Hd-api-key": "api"})]
+    assert len(captured_handlers) == 1
+    assert captured_handlers[0].redirect_request(req, None, 302, "Found", {}, "https://vendor.test/redirect") is None
 
 
 def test_fetch_retries_only_5xx_and_network_errors() -> None:

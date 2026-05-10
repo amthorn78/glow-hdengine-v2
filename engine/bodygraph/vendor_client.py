@@ -154,6 +154,11 @@ def _append_retry_log(path: Path | None, record: Mapping[str, Any]) -> None:
         return
 
 
+class _NoRedirectHandler(urlrequest.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
+
 class HdApiClient:
     """HTTP client with pinned retry/backoff and typed error mapping."""
 
@@ -406,7 +411,7 @@ class HdApiClient:
             return "5xx"
         if 400 <= status <= 499:
             return "4xx"
-        return "network_error"
+        return "http_status_other"
 
     def _retry_after_ms(self, headers: Mapping[str, str]) -> int | None:
         retry_after = None
@@ -455,8 +460,14 @@ class HdApiClient:
 
     @staticmethod
     def _default_request(req: urlrequest.Request, timeout: float) -> tuple[int, bytes, Mapping[str, str]]:
-        with urlrequest.urlopen(req, timeout=timeout) as resp:  # type: ignore[arg-type]
-            status = getattr(resp, "status", resp.getcode())
-            body = resp.read()
-            headers = {k.lower(): v for k, v in resp.headers.items()}
-            return status, body, headers
+        opener = urlrequest.build_opener(_NoRedirectHandler())
+        try:
+            with opener.open(req, timeout=timeout) as resp:  # type: ignore[arg-type]
+                status = getattr(resp, "status", resp.getcode())
+                body = resp.read()
+                headers = {k.lower(): v for k, v in resp.headers.items()}
+                return status, body, headers
+        except urlerror.HTTPError as exc:
+            body = exc.read()
+            headers = {k.lower(): v for k, v in exc.headers.items()}
+            return exc.code, body, headers
