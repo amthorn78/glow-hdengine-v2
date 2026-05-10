@@ -1,0 +1,30 @@
+HDE-EPIC031 PR-03 SAFE rails governed evidence refresh
+produced_at_utc: 2026-05-10T17:05:00Z
+epic_id: HDE-EPIC031
+pf09_subtask: HDE-FERM001.4
+rails: SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC
+live_vendor_call_executed: false
+secret_values_recorded: false
+generator_step_outcomes:
+  - step: write audit/qa/hde-epic031/pr-03/evidence_family_map.json
+    outcome: PASS
+  - step: write audit/qa/hde-epic031/pr-03/safe_rails_evidence_coherence.json
+    outcome: PASS
+  - step: write audit/qa/hde-epic031/pr-03/evidence_refresh.log
+    outcome: PASS
+  - step: write co-located PR-03 path proofs
+    outcome: PASS
+validation_command_roster:
+  execution_record: external validation commands are listed for reproducibility; this generator does not mark unexecuted commands PASS or FAIL.
+  - command: SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/generate_epic031_pr03_evidence_coherence.py
+  - command: SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/update_evidence_index.py
+  - command: SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/orientation_demo.py
+  - command: SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/generate_epic031_pr03_evidence_coherence.py --check
+  - command: SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/update_evidence_index.py --check
+  - command: SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/orientation_demo.py --check
+  - command: SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/validate_evidence_paths.py
+  - command: SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC ci/checks/check_mirror_schema.sh
+  - command: SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC ci/checks/check_evidence_index_hash.sh
+  - command: SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/check_lf_endings.py
+  - command: git diff --check
+coherence_status: PASS
