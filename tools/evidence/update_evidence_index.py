@@ -321,7 +321,7 @@ EPIC031_PR03_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
         "record_type": "epic031_pr03_evidence",
         "schema_version": "1.0",
         "produced_at_utc": "2026-05-10T17:05:00Z",
-        "notes": "EPIC031 PR-03 evidence refresh command transcript with PASS/FAIL outcomes",
+        "notes": "EPIC031 PR-03 evidence refresh log with generator outcomes and validation command roster",
     },
 ]
 

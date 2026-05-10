@@ -5,27 +5,26 @@ pf09_subtask: HDE-FERM001.4
 rails: SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC
 live_vendor_call_executed: false
 secret_values_recorded: false
-commands:
+generator_step_outcomes:
+  - step: write audit/qa/hde-epic031/pr-03/evidence_family_map.json
+    outcome: PASS
+  - step: write audit/qa/hde-epic031/pr-03/safe_rails_evidence_coherence.json
+    outcome: PASS
+  - step: write audit/qa/hde-epic031/pr-03/evidence_refresh.log
+    outcome: PASS
+  - step: write co-located PR-03 path proofs
+    outcome: PASS
+validation_command_roster:
+  execution_record: external validation commands are listed for reproducibility; this generator does not mark unexecuted commands PASS or FAIL.
   - command: SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/generate_epic031_pr03_evidence_coherence.py
-    outcome: PASS
   - command: SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/update_evidence_index.py
-    outcome: PASS
   - command: SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/orientation_demo.py
-    outcome: PASS
   - command: SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/generate_epic031_pr03_evidence_coherence.py --check
-    outcome: PASS
   - command: SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/update_evidence_index.py --check
-    outcome: PASS
   - command: SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/orientation_demo.py --check
-    outcome: PASS
   - command: SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/validate_evidence_paths.py
-    outcome: PASS
   - command: SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC ci/checks/check_mirror_schema.sh
-    outcome: PASS
   - command: SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC ci/checks/check_evidence_index_hash.sh
-    outcome: PASS
   - command: SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/check_lf_endings.py
-    outcome: PASS
   - command: git diff --check
-    outcome: PASS
-overall_status: PASS
+coherence_status: PASS

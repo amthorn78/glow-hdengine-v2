@@ -43,46 +43,69 @@ PR02_ARTIFACTS = [
     "audit/qa/hde-epic031/pr-02/secret_redaction_scan.log",
 ]
 PR03_ARTIFACTS = [FAMILY_MAP_REL, COHERENCE_REL, REFRESH_LOG_REL]
-SAFE_RAILS_ARTIFACTS = [*PR01_ARTIFACTS, *PR02_ARTIFACTS, *PR03_ARTIFACTS]
+SAFE_RAILS_ARTIFACTS = [*PR01_ARTIFACTS, *PR02_ARTIFACTS]
+GOVERNED_PR03_PROOF_ARTIFACTS = [*SAFE_RAILS_ARTIFACTS, *PR03_ARTIFACTS]
+SUPPORTING_JOB_PATHS = [
+    "ci/jobs/rails_closed_refusal.yml",
+    "ci/jobs/rails_open_conformance.yml",
+    "ci/jobs/logs_keys_only_redaction.yml",
+]
 
-FAMILY_MAP: dict[str, list[str]] = {
-    "SAFE rails open-posture proof family": [
-        "ci/jobs/rails_closed_refusal.yml",
-        "ci/jobs/rails_open_conformance.yml",
-        "artifacts/vendor/policies_pinned.md",
-        "audit/qa/hde-epic031/pr-01/open_rails_policy_proof.json",
-        "audit/qa/hde-epic031/pr-01/closed_default_open_exception_rails.json",
-    ],
-    "SAFE retry/backoff/typed 429 proof family": [
-        "artifacts/vendor/retry_after_parse.log",
-        "audit/qa/hde-epic031/pr-01/retry_backoff_429_proof.json",
-    ],
-    "SAFE rails keys-only log-redaction proof family": [
-        "ci/jobs/logs_keys_only_redaction.yml",
-        "audit/qa/hde-epic031/pr-02/vendor_keys_only.sample.jsonl",
-        "audit/qa/hde-epic031/pr-02/vendor_rails_scope.txt",
-        "audit/qa/hde-epic031/pr-02/keys_only_log_redaction.json",
-        "audit/qa/hde-epic031/pr-02/bounded_label_observability.json",
-        "audit/qa/hde-epic031/pr-02/secret_redaction_scan.log",
-    ],
-    "SAFE rails governed evidence-index coherence family": [
-        FAMILY_MAP_REL,
-        COHERENCE_REL,
-        REFRESH_LOG_REL,
-    ],
-    "Human Evidence Index refresh family": [
-        HUMAN_INDEX_REL,
-        HUMAN_INDEX_SHA_REL,
-        f"{HUMAN_INDEX_REL}.path_proof.txt",
-        f"{HUMAN_INDEX_SHA_REL}.path_proof.txt",
-    ],
-    "Machine Mirror refresh family": [
-        MIRROR_REL,
-        MIRROR_SHA_REL,
-        f"{MIRROR_REL}.path_proof.txt",
-        f"{MIRROR_SHA_REL}.path_proof.txt",
-    ],
-    "Path-proof validation family": [f"{path}.path_proof.txt" for path in SAFE_RAILS_ARTIFACTS],
+FAMILY_MAP: dict[str, dict[str, list[str]]] = {
+    "SAFE rails open-posture proof family": {
+        "artifact_paths": [
+            "artifacts/vendor/policies_pinned.md",
+            "audit/qa/hde-epic031/pr-01/open_rails_policy_proof.json",
+            "audit/qa/hde-epic031/pr-01/closed_default_open_exception_rails.json",
+        ],
+        "supporting_paths": [
+            "ci/jobs/rails_closed_refusal.yml",
+            "ci/jobs/rails_open_conformance.yml",
+        ],
+    },
+    "SAFE retry/backoff/typed 429 proof family": {
+        "artifact_paths": [
+            "artifacts/vendor/retry_after_parse.log",
+            "audit/qa/hde-epic031/pr-01/retry_backoff_429_proof.json",
+        ],
+        "supporting_paths": [],
+    },
+    "SAFE rails keys-only log-redaction proof family": {
+        "artifact_paths": [
+            "audit/qa/hde-epic031/pr-02/vendor_keys_only.sample.jsonl",
+            "audit/qa/hde-epic031/pr-02/vendor_rails_scope.txt",
+            "audit/qa/hde-epic031/pr-02/keys_only_log_redaction.json",
+            "audit/qa/hde-epic031/pr-02/bounded_label_observability.json",
+            "audit/qa/hde-epic031/pr-02/secret_redaction_scan.log",
+        ],
+        "supporting_paths": ["ci/jobs/logs_keys_only_redaction.yml"],
+    },
+    "SAFE rails governed evidence-index coherence family": {
+        "artifact_paths": [FAMILY_MAP_REL, COHERENCE_REL, REFRESH_LOG_REL],
+        "supporting_paths": [],
+    },
+    "Human Evidence Index refresh family": {
+        "artifact_paths": [
+            HUMAN_INDEX_REL,
+            HUMAN_INDEX_SHA_REL,
+            f"{HUMAN_INDEX_REL}.path_proof.txt",
+            f"{HUMAN_INDEX_SHA_REL}.path_proof.txt",
+        ],
+        "supporting_paths": [],
+    },
+    "Machine Mirror refresh family": {
+        "artifact_paths": [
+            MIRROR_REL,
+            MIRROR_SHA_REL,
+            f"{MIRROR_REL}.path_proof.txt",
+            f"{MIRROR_SHA_REL}.path_proof.txt",
+        ],
+        "supporting_paths": [],
+    },
+    "Path-proof validation family": {
+        "artifact_paths": [f"{path}.path_proof.txt" for path in GOVERNED_PR03_PROOF_ARTIFACTS],
+        "supporting_paths": [],
+    },
 }
 
 VALIDATION_COMMANDS = [
@@ -175,6 +198,20 @@ def _proof_ok(rel: str) -> bool:
     return bool(proof.get("mtime_utc") and proof.get("produced_at_utc"))
 
 
+def _mirror_row_ok(path: str, mirror: dict[str, dict[str, Any]]) -> bool:
+    artifact = ROOT / path
+    record = mirror.get(path)
+    if record is None or not artifact.exists():
+        return False
+    if record.get("proof_anchor") != f"{path}.path_proof.txt":
+        return False
+    if record.get("sha256") != _sha256_path(path):
+        return False
+    if record.get("size_bytes") != artifact.stat().st_size:
+        return False
+    return True
+
+
 def _hash_statuses() -> dict[str, str]:
     index_ok = False
     mirror_ok = False
@@ -190,15 +227,28 @@ def _hash_statuses() -> dict[str, str]:
     }
 
 
+def _all_family_artifact_paths() -> list[str]:
+    return sorted({path for family in FAMILY_MAP.values() for path in family["artifact_paths"]})
+
+
+def _all_supporting_paths() -> list[str]:
+    return sorted({path for family in FAMILY_MAP.values() for path in family["supporting_paths"]})
+
+
 def _family_payload() -> dict[str, Any]:
     return {
         "artifact": "evidence_family_map",
         "epic_id": EPIC_ID,
         "pf09_subtask": PF09_SUBTASK,
         "produced_at_utc": PRODUCED_AT,
-        "schema_version": "1.0",
+        "schema_version": "1.1",
         "proof_families": [
-            {"family_name": name, "artifact_paths": paths, "proof_label_is_acceptance_token": False}
+            {
+                "family_name": name,
+                "artifact_paths": paths["artifact_paths"],
+                "supporting_paths": paths["supporting_paths"],
+                "proof_label_is_acceptance_token": False,
+            }
             for name, paths in FAMILY_MAP.items()
         ],
         "scope_guardrails": {
@@ -214,18 +264,18 @@ def _coherence_payload() -> dict[str, Any]:
     human_paths = _load_human_paths()
     mirror = _load_mirror()
     indexed = {path: path in human_paths for path in SAFE_RAILS_ARTIFACTS}
-    mirrored = {path: path in mirror for path in SAFE_RAILS_ARTIFACTS}
-    proofs = {path: _proof_ok(path) for path in SAFE_RAILS_ARTIFACTS}
-    proof_anchors = {
-        path: mirror.get(path, {}).get("proof_anchor") == f"{path}.path_proof.txt"
-        for path in SAFE_RAILS_ARTIFACTS
-    }
+    mirror_rows = {path: _mirror_row_ok(path, mirror) for path in SAFE_RAILS_ARTIFACTS}
+    proofs = {path: _proof_ok(path) for path in GOVERNED_PR03_PROOF_ARTIFACTS}
     hashes = _hash_statuses()
+    supporting_paths = _all_supporting_paths()
+    family_artifact_paths = _all_family_artifact_paths()
     sections = {
-        "indexed_artifact_presence": all((ROOT / path).exists() for path in SAFE_RAILS_ARTIFACTS),
+        "indexed_artifact_presence": all((ROOT / path).exists() for path in family_artifact_paths),
+        "supporting_path_presence": all((ROOT / path).exists() for path in supporting_paths),
         "path_proof_status": all(proofs.values()),
+        "pr03_output_path_proofs": all(proofs[path] for path in PR03_ARTIFACTS),
         "human_index_binding": all(indexed.values()),
-        "machine_mirror_binding": all(mirrored.values()) and all(proof_anchors.values()),
+        "machine_mirror_binding": all(mirror_rows.values()),
         "hash_status": all(value == "PASS" for value in hashes.values()),
     }
     status = "PASS" if all(sections.values()) else "FAIL"
@@ -234,7 +284,7 @@ def _coherence_payload() -> dict[str, Any]:
         "epic_id": EPIC_ID,
         "pf09_subtask": PF09_SUBTASK,
         "produced_at_utc": PRODUCED_AT,
-        "schema_version": "1.0",
+        "schema_version": "1.1",
         "local_deterministic_posture": {
             "ALLOW_NETWORK": "0",
             "LANG": "C",
@@ -245,16 +295,31 @@ def _coherence_payload() -> dict[str, Any]:
             "secret_values_required": False,
             "secret_values_recorded": False,
         },
+        "family_artifact_paths": [
+            {"path": path, "exists": (ROOT / path).exists()} for path in family_artifact_paths
+        ],
+        "supporting_paths": [
+            {"path": path, "exists": (ROOT / path).exists(), "path_proof_required": False}
+            for path in supporting_paths
+        ],
         "safe_rails_artifacts": [
             {
                 "path": path,
                 "exists": (ROOT / path).exists(),
                 "path_proof": "PASS" if proofs[path] else "FAIL",
                 "human_index_binding": "PASS" if indexed[path] else "FAIL",
-                "machine_mirror_binding": "PASS" if mirrored[path] else "FAIL",
-                "proof_anchor": "PASS" if proof_anchors[path] else "FAIL",
+                "machine_mirror_binding": "PASS" if mirror_rows[path] else "FAIL",
             }
             for path in SAFE_RAILS_ARTIFACTS
+        ],
+        "pr03_outputs": [
+            {
+                "path": path,
+                "exists": (ROOT / path).exists(),
+                "path_proof": "PASS" if proofs[path] else "FAIL",
+                "machine_mirror_binding": "validated by update_evidence_index.py and ci/checks/check_mirror_schema.sh after index refresh",
+            }
+            for path in PR03_ARTIFACTS
         ],
         "coherence_checks": {key: "PASS" if value else "FAIL" for key, value in sections.items()},
         "hash_checks": hashes,
@@ -270,6 +335,12 @@ def _coherence_payload() -> dict[str, Any]:
 
 
 def _refresh_log_payload(coherence_status: str) -> bytes:
+    generator_steps = [
+        f"write {FAMILY_MAP_REL}",
+        f"write {COHERENCE_REL}",
+        f"write {REFRESH_LOG_REL}",
+        "write co-located PR-03 path proofs",
+    ]
     lines = [
         "HDE-EPIC031 PR-03 SAFE rails governed evidence refresh",
         f"produced_at_utc: {PRODUCED_AT}",
@@ -278,17 +349,35 @@ def _refresh_log_payload(coherence_status: str) -> bytes:
         "rails: SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC",
         "live_vendor_call_executed: false",
         "secret_values_recorded: false",
-        "commands:",
+        "generator_step_outcomes:",
     ]
-    lines.extend(f"  - command: {command}\n    outcome: {'PASS' if coherence_status == 'PASS' else 'FAIL'}" for command in VALIDATION_COMMANDS)
-    lines.append(f"overall_status: {coherence_status}")
+    lines.extend(f"  - step: {step}\n    outcome: PASS" for step in generator_steps)
+    lines.extend(
+        [
+            "validation_command_roster:",
+            "  execution_record: external validation commands are listed for reproducibility; this generator does not mark unexecuted commands PASS or FAIL.",
+        ]
+    )
+    lines.extend(f"  - command: {command}" for command in VALIDATION_COMMANDS)
+    lines.append(f"coherence_status: {coherence_status}")
     return ("\n".join(lines) + "\n").encode("utf-8")
+
+
+def _materialize_pr03_files(*, check: bool) -> None:
+    family_payload = _family_payload()
+    _write_governed(FAMILY_MAP_REL, _json_bytes(family_payload), check=check)
+    if not check:
+        # Fresh checkout/cleaned evidence bootstrap: materialize self-generated artifacts and
+        # their path proofs before computing coherence over the complete PR-03 family.
+        if not (ROOT / COHERENCE_REL).exists():
+            _write_governed(COHERENCE_REL, _json_bytes({"artifact": "safe_rails_evidence_coherence", "status": "BOOTSTRAP"}), check=False)
+        if not (ROOT / REFRESH_LOG_REL).exists():
+            _write_governed(REFRESH_LOG_REL, _refresh_log_payload("BOOTSTRAP"), check=False)
 
 
 def generate(*, check: bool) -> None:
     ensure_determinism_env()
-    family_payload = _family_payload()
-    _write_governed(FAMILY_MAP_REL, _json_bytes(family_payload), check=check)
+    _materialize_pr03_files(check=check)
     coherence_payload = _coherence_payload()
     _write_governed(COHERENCE_REL, _json_bytes(coherence_payload), check=check)
     _write_governed(REFRESH_LOG_REL, _refresh_log_payload(str(coherence_payload["status"])), check=check)
