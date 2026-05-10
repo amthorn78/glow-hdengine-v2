@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic031/pr-02/bounded_label_observability.json
+size_bytes: 1062
+sha256: 03fb571faf6c9ea81fdcd85a80a3d31678353d69ea1c6f2fc989a67e62a8188e
+mtime_utc: 2026-05-10T17:54:22Z
+produced_at_utc: 2026-05-10T16:20:00Z

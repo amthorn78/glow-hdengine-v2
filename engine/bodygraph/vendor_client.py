@@ -60,6 +60,29 @@ PINNED_BACKOFF_PROFILES = frozenset(
     }
 )
 _RETRY_AFTER_MAX_MS = 2_147_483_647
+_VENDOR_LOG_ROUTE = "vendor.hdapi.post:/bodygraphs"
+_VENDOR_LOG_KEYS = frozenset(
+    {
+        "at",
+        "attempt",
+        "backoff_ms",
+        "duration_ms",
+        "error_class",
+        "error_code",
+        "outcome",
+        "profile",
+        "rails_state",
+        "retry_after_ms",
+        "route",
+        "status",
+        "timeout_profile",
+    }
+)
+_VENDOR_LOG_OUTCOMES = frozenset({"success", "failure"})
+_VENDOR_LOG_ERROR_CLASSES = frozenset(
+    {"none", "network_error", "4xx", "5xx", "429", "http_status_other", "provider_bad_response"}
+)
+_VENDOR_LOG_RAILS_STATES = frozenset({"closed_default", "open_exception"})
 
 
 def _validate_retry_config(retry: "VendorRetryConfig") -> None:
@@ -92,8 +115,8 @@ def _now_ms() -> float:
     return time.monotonic() * 1000.0
 
 
-def _utc_iso() -> str:
-    return time.strftime("%Y-%m-%dT%H:%M:%S", time.gmtime()) + "Z"
+def _utc_iso(epoch_seconds: float | None = None) -> str:
+    return time.strftime("%Y-%m-%dT%H:%M:%S", time.gmtime(epoch_seconds)) + "Z"
 
 
 class VendorError(Exception):
@@ -172,6 +195,7 @@ class HdApiClient:
         retry: VendorRetryConfig,
         timeouts: VendorTimeouts,
         log_path: Path | None = None,
+        rails_state: str = "open_exception",
         request: Callable[[urlrequest.Request, float], tuple[int, bytes, Mapping[str, str]]] | None = None,
         sleep: Callable[[float], None] | None = None,
         monotonic_ms: Callable[[], float] | None = None,
@@ -188,7 +212,14 @@ class HdApiClient:
         self._release_id = release_id
         self._retry = retry
         self._timeouts = timeouts
+        if rails_state not in _VENDOR_LOG_RAILS_STATES:
+            raise VendorError(
+                "PROVIDER_CONFIG_INVALID",
+                "rails_state is not pinned",
+                details={"rails_state": rails_state},
+            )
         self._log_path = log_path
+        self._rails_state = rails_state
         self._request = request or self._default_request
         self._sleep = sleep or time.sleep
         self._monotonic = monotonic_ms or _now_ms
@@ -232,6 +263,7 @@ class HdApiClient:
             retry=retry_cfg,
             timeouts=timeouts_cfg,
             log_path=log_path,
+            rails_state="open_exception",
             request=request,
         )
 
@@ -299,7 +331,7 @@ class HdApiClient:
                     payload = json.loads(body_bytes.decode("utf-8"))
                 except Exception as exc:
                     raise VendorError("PROVIDER_BAD_RESPONSE", "malformed JSON", details={"status": status_code}) from exc
-                self._log_attempt(attempt, status_code, duration_ms, error_class)
+                self._log_attempt(attempt, status_code, duration_ms, error_class, outcome="success")
                 return VendorResult(payload=payload, duration_ms=duration_ms, attempts=attempt)
             except VendorError as exc:
                 last_error = exc
@@ -316,6 +348,7 @@ class HdApiClient:
                     error_code=error_code,
                     retry_after_ms=retry_after_ms,
                     backoff_ms=planned_backoff_ms,
+                    outcome="failure",
                 )
                 if not retryable:
                     break
@@ -333,6 +366,7 @@ class HdApiClient:
                     error_class,
                     error_code="PROVIDER_NETWORK_ERROR",
                     backoff_ms=planned_backoff_ms,
+                    outcome="failure",
                 )
             if attempt >= self._retry.max_attempts or not retryable or planned_backoff_ms <= 0:
                 break
@@ -346,18 +380,27 @@ class HdApiClient:
         duration_ms: float,
         error_class: str,
         *,
+        outcome: str,
         error_code: str | None = None,
         retry_after_ms: int | None = None,
         backoff_ms: float | None = None,
     ) -> None:
+        timeout_profile = (
+            f"connect={self._timeouts.connect_timeout_ms};"
+            f"read={self._timeouts.read_timeout_ms};"
+            f"total={self._timeouts.total_timeout_ms}"
+        )
         record = {
-            "at": _utc_iso(),
+            "at": _utc_iso(self._wall_time()),
             "attempt": attempt,
             "status": status,
             "duration_ms": round(float(duration_ms), 3),
             "profile": self._retry.profile,
-            "error_class": error_class,
-            "route": "vendor.hdapi.post:/bodygraphs",
+            "error_class": self._bounded_error_class(error_class),
+            "outcome": self._bounded_outcome(outcome),
+            "rails_state": self._rails_state,
+            "route": _VENDOR_LOG_ROUTE,
+            "timeout_profile": timeout_profile,
         }
         if error_code:
             record["error_code"] = error_code
@@ -365,7 +408,22 @@ class HdApiClient:
             record["retry_after_ms"] = retry_after_ms
         if backoff_ms is not None:
             record["backoff_ms"] = int(backoff_ms)
+        unexpected = set(record) - _VENDOR_LOG_KEYS
+        if unexpected:  # pragma: no cover - defensive guardrail
+            return
         _append_retry_log(self._log_path, record)
+
+    @staticmethod
+    def _bounded_outcome(outcome: str) -> str:
+        return outcome if outcome in _VENDOR_LOG_OUTCOMES else "failure"
+
+    @staticmethod
+    def _bounded_error_class(error_class: str) -> str:
+        if error_class in _VENDOR_LOG_ERROR_CLASSES:
+            return error_class
+        if error_class == "provider_bad_response":
+            return error_class
+        return "http_status_other"
 
     def _bounded_backoff_delay(self, attempt: int, deadline: float) -> float:
         delay = self._backoff_delay(attempt)

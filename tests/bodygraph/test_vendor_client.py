@@ -230,3 +230,111 @@ def test_vendor_policy_rejects_unpinned_retry_and_timeout_profiles() -> None:
             timeouts=VendorTimeouts(connect_timeout_ms=999, read_timeout_ms=2000, total_timeout_ms=5000),
         )
     assert timeout_exc.value.code == "PROVIDER_CONFIG_INVALID"
+
+
+def _read_jsonl(path: Path) -> list[dict[str, object]]:
+    return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+
+
+def test_vendor_safe_rails_logs_are_keys_only_bounded_and_secret_free(tmp_path: Path) -> None:
+    log_path = tmp_path / "safe_rails.jsonl"
+    secret_header = "plain-secret-value"
+    payload_body = b'{"birthdate":"01-Jan-1990","birthtime":"12:00","location":"Secret City"}\n'
+
+    def ok_request(req, timeout):
+        assert req.data == payload_body
+        assert req.headers["Hd-api-key"] == secret_header
+        return 200, b'{"ok":true}', {"authorization": "Bearer response-secret"}
+
+    client = HdApiClient(
+        base_url="https://vendor.test/v1",
+        api_key=secret_header,
+        geo_key="plain-geo-secret",
+        release_id="0" * 64,
+        retry=VendorRetryConfig(max_attempts=1, profile="none", exp_base_ms=0, exp_ceiling_ms=0),
+        timeouts=VendorTimeouts(connect_timeout_ms=1000, read_timeout_ms=2000, total_timeout_ms=5000),
+        log_path=log_path,
+        request=ok_request,
+        monotonic_ms=lambda: 0.0,
+        wall_time=lambda: 1_700_000_000.0,
+    )
+    request = VendorRequest(
+        url="https://vendor.test/v1/bodygraphs",
+        headers={"HD-Api-Key": secret_header, "HD-Geocode-Key": "plain-geo-secret"},
+        body_bytes=payload_body,
+        input_fingerprint="abc",
+    )
+
+    client.fetch(request)
+
+    records = _read_jsonl(log_path)
+    assert records == [
+        {
+            "at": "2023-11-14T22:13:20Z",
+            "attempt": 1,
+            "duration_ms": 0.0,
+            "error_class": "none",
+            "outcome": "success",
+            "profile": "none",
+            "rails_state": "open_exception",
+            "route": "vendor.hdapi.post:/bodygraphs",
+            "status": 200,
+            "timeout_profile": "connect=1000;read=2000;total=5000",
+        }
+    ]
+    rendered = log_path.read_text(encoding="utf-8")
+    forbidden_fragments = [
+        "plain-secret-value",
+        "plain-geo-secret",
+        "Secret City",
+        "birthdate",
+        "birthtime",
+        "location",
+        "authorization",
+        "headers",
+        "\"body\"",
+        "\"payload\"",
+        "HD-Api-Key",
+        "HD-Geocode-Key",
+    ]
+    for fragment in forbidden_fragments:
+        assert fragment not in rendered
+
+
+def test_vendor_safe_rails_failure_classes_are_observable(tmp_path: Path) -> None:
+    cases = [
+        ("network_error", lambda req, timeout: (_ for _ in ()).throw(OSError("boom")), "PROVIDER_NETWORK_ERROR"),
+        ("4xx", lambda req, timeout: (403, b"{}", {}), "PROVIDER_FORBIDDEN"),
+        ("5xx", lambda req, timeout: (503, b"{}", {}), "PROVIDER_UNAVAILABLE"),
+        ("429", lambda req, timeout: (429, b"{}", {"retry-after": "4"}), "PROVIDER_RATE_LIMITED"),
+    ]
+    request = VendorRequest(
+        url="https://vendor.test/v1/bodygraphs",
+        headers={},
+        body_bytes=b"{}\n",
+        input_fingerprint="abc",
+    )
+
+    for index, (expected_class, request_func, expected_code) in enumerate(cases):
+        log_path = tmp_path / f"case-{index}.jsonl"
+        client = HdApiClient(
+            base_url="https://vendor.test/v1",
+            api_key="api",
+            geo_key="geo",
+            release_id="0" * 64,
+            retry=VendorRetryConfig(max_attempts=1, profile="none", exp_base_ms=0, exp_ceiling_ms=0),
+            timeouts=VendorTimeouts(connect_timeout_ms=1000, read_timeout_ms=2000, total_timeout_ms=5000),
+            log_path=log_path,
+            request=request_func,
+            monotonic_ms=lambda: 0.0,
+            wall_time=lambda: 1_700_000_000.0,
+        )
+        with pytest.raises(VendorError) as excinfo:
+            client.fetch(request)
+        assert excinfo.value.code == expected_code
+        record = _read_jsonl(log_path)[0]
+        assert record["error_class"] == expected_class
+        assert record["outcome"] == "failure"
+        assert record["rails_state"] == "open_exception"
+        assert record["route"] == "vendor.hdapi.post:/bodygraphs"
+        assert record["timeout_profile"] == "connect=1000;read=2000;total=5000"

@@ -237,6 +237,59 @@ EPIC031_PR01_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     },
 ]
 
+EPIC031_PR02_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "epic031.pr02.keys_only_sample",
+        "discovered_physical_path": "artifacts/logs/keys_only.sample.jsonl",
+        "epic_id": "HDE-EPIC031",
+        "record_type": "epic031_pr02_evidence",
+        "schema_version": "1.0",
+        "produced_at_utc": "2026-05-10T16:20:00Z",
+        "notes": "EPIC031 PR-02 SAFE rails keys-only vendor log sample",
+        "tokens": ["VENDOR_NO_PAYLOAD_LOGGING_OK", "ENV_RAILS_POLICY_OK"],
+    },
+    {
+        "artifact_key": "epic031.pr02.rails_open_scope",
+        "discovered_physical_path": "artifacts/ops/rails_open_scope.txt",
+        "epic_id": "HDE-EPIC031",
+        "record_type": "epic031_pr02_evidence",
+        "schema_version": "1.0",
+        "produced_at_utc": "2026-05-10T16:20:00Z",
+        "notes": "EPIC031 PR-02 local deterministic rails scope for log posture",
+        "tokens": ["ENV_RAILS_POLICY_OK"],
+    },
+    {
+        "artifact_key": "epic031.pr02.keys_only_log_redaction",
+        "discovered_physical_path": "audit/qa/hde-epic031/pr-02/keys_only_log_redaction.json",
+        "epic_id": "HDE-EPIC031",
+        "record_type": "epic031_pr02_evidence",
+        "schema_version": "1.0",
+        "produced_at_utc": "2026-05-10T16:20:00Z",
+        "notes": "EPIC031 PR-02 keys-only payload and secret redaction proof",
+        "tokens": ["VENDOR_NO_PAYLOAD_LOGGING_OK"],
+    },
+    {
+        "artifact_key": "epic031.pr02.bounded_label_observability",
+        "discovered_physical_path": "audit/qa/hde-epic031/pr-02/bounded_label_observability.json",
+        "epic_id": "HDE-EPIC031",
+        "record_type": "epic031_pr02_evidence",
+        "schema_version": "1.0",
+        "produced_at_utc": "2026-05-10T16:20:00Z",
+        "notes": "EPIC031 PR-02 bounded label observability proof",
+        "tokens": ["VENDOR_NO_PAYLOAD_LOGGING_OK", "ENV_RAILS_POLICY_OK"],
+    },
+    {
+        "artifact_key": "epic031.pr02.secret_redaction_scan",
+        "discovered_physical_path": "audit/qa/hde-epic031/pr-02/secret_redaction_scan.log",
+        "epic_id": "HDE-EPIC031",
+        "record_type": "epic031_pr02_evidence",
+        "schema_version": "1.0",
+        "produced_at_utc": "2026-05-10T16:20:00Z",
+        "notes": "EPIC031 PR-02 deterministic redaction scan log",
+        "tokens": ["VENDOR_NO_PAYLOAD_LOGGING_OK", "TESTS_PASS_OK"],
+    },
+]
+
 EPIC030_PR02_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
         "artifact_key": "epic030.pr02.dev_sampler_http_headers",
@@ -664,6 +717,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *EPIC028_PRIMARY_ARTIFACTS,
             *EPIC030_PR02_PRIMARY_ARTIFACTS,
             *EPIC031_PR01_PRIMARY_ARTIFACTS,
+            *EPIC031_PR02_PRIMARY_ARTIFACTS,
             *EPIC030_PR03_PRIMARY_ARTIFACTS,
             *EPIC030_PR04_PRIMARY_ARTIFACTS,
             *EPIC030_PR05_PRIMARY_ARTIFACTS,
