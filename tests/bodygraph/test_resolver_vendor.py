@@ -30,7 +30,7 @@ def test_vendor_resolver_maps_synthetic_user(monkeypatch):
 
     captured = {}
 
-    def fake_ingest(inputs, env=None):
+    def fake_ingest(inputs, env=None, dry_run=False):
         captured["inputs"] = inputs
         return _make_outcome()
 
@@ -79,3 +79,43 @@ def test_vendor_resolver_wraps_unexpected_normalization_errors(monkeypatch):
 
     assert result.status == "error"
     assert result.payload["error"]["code"] == "PROVIDER_INPUT_INVALID"
+
+
+def test_vendor_resolver_refuses_closed_safe_rails_before_input_or_ingest(monkeypatch):
+    def fail_resolve_inputs(*_, **__):  # pragma: no cover - assertion guard
+        raise AssertionError("closed SAFE rails must not resolve vendor inputs")
+
+    monkeypatch.setattr(resolver, "_resolve_inputs", fail_resolve_inputs)
+    result = resolver._resolve_vendor(
+        "user",
+        {"safe_mode": True, "allow_network": False, "requested_source": "vendor"},
+        upsert=False,
+        dry_run=False,
+        env={},
+        birthdate=None,
+        birthtime=None,
+        location=None,
+    )
+
+    assert result.status == "error"
+    assert result.payload["error"]["code"] == "PROVIDER_REFUSED"
+
+
+def test_vendor_resolver_requires_open_network_exception_before_ingest(monkeypatch):
+    def fail_resolve_inputs(*_, **__):  # pragma: no cover - assertion guard
+        raise AssertionError("blocked rails must not resolve vendor inputs")
+
+    monkeypatch.setattr(resolver, "_resolve_inputs", fail_resolve_inputs)
+    result = resolver._resolve_vendor(
+        "user",
+        {"safe_mode": False, "allow_network": False, "requested_source": "vendor"},
+        upsert=False,
+        dry_run=False,
+        env={},
+        birthdate=None,
+        birthtime=None,
+        location=None,
+    )
+
+    assert result.status == "error"
+    assert result.payload["error"]["code"] == "PROVIDER_NETWORK_BLOCKED"

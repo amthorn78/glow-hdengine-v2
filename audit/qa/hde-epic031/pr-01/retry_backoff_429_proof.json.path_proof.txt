@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic031/pr-01/retry_backoff_429_proof.json
+size_bytes: 542
+sha256: 2166596cc1ff173b247d22952086e00a548f318006443ca17a2c9f733ce9b980
+mtime_utc: 2026-05-10T15:38:37Z
+produced_at_utc: 2026-05-10T15:38:37Z

@@ -5,6 +5,8 @@ import os
 import socket
 import time
 from dataclasses import dataclass
+from datetime import timezone
+from email.utils import parsedate_to_datetime
 from hashlib import sha256
 from pathlib import Path
 from typing import Any, Callable, Mapping, MutableMapping
@@ -13,6 +15,9 @@ from urllib import request as urlrequest
 from urllib.parse import urlparse
 
 __all__ = [
+    "PINNED_BACKOFF_PROFILES",
+    "PINNED_MAX_ATTEMPTS",
+    "PINNED_TIMEOUT_PROFILES",
     "VendorError",
     "VendorRetryConfig",
     "VendorTimeouts",
@@ -36,6 +41,51 @@ _MONTH = {
     "11": "Nov",
     "12": "Dec",
 }
+
+PINNED_MAX_ATTEMPTS = frozenset({0, 1, 2, 3})
+PINNED_TIMEOUT_PROFILES = frozenset(
+    {
+        (500, 1000, 2000),
+        (1000, 2000, 5000),
+        (2000, 5000, 10000),
+    }
+)
+PINNED_BACKOFF_PROFILES = frozenset(
+    {
+        ("none", 0, 0),
+        ("fixed", 250, 250),
+        ("fixed", 500, 500),
+        ("exponential", 250, 500),
+        ("exponential", 500, 2000),
+    }
+)
+_RETRY_AFTER_MAX_MS = 2_147_483_647
+
+
+def _validate_retry_config(retry: "VendorRetryConfig") -> None:
+    if retry.max_attempts not in PINNED_MAX_ATTEMPTS:
+        raise VendorError(
+            "PROVIDER_CONFIG_INVALID",
+            "max_attempts must be pinned to 0, 1, 2, or 3",
+            details={"max_attempts": retry.max_attempts},
+        )
+    profile = (retry.profile, retry.exp_base_ms, retry.exp_ceiling_ms)
+    if profile not in PINNED_BACKOFF_PROFILES:
+        raise VendorError(
+            "PROVIDER_CONFIG_INVALID",
+            "retry backoff profile is not pinned",
+            details={"profile": retry.profile},
+        )
+
+
+def _validate_timeouts(timeouts: "VendorTimeouts") -> None:
+    profile = (timeouts.connect_timeout_ms, timeouts.read_timeout_ms, timeouts.total_timeout_ms)
+    if profile not in PINNED_TIMEOUT_PROFILES:
+        raise VendorError(
+            "PROVIDER_CONFIG_INVALID",
+            "timeout profile is not pinned",
+            details={"timeout_profile_ms": list(profile)},
+        )
 
 
 def _now_ms() -> float:
@@ -120,10 +170,13 @@ class HdApiClient:
         request: Callable[[urlrequest.Request, float], tuple[int, bytes, Mapping[str, str]]] | None = None,
         sleep: Callable[[float], None] | None = None,
         monotonic_ms: Callable[[], float] | None = None,
+        wall_time: Callable[[], float] | None = None,
     ) -> None:
         parsed = urlparse(base_url)
         if parsed.scheme != "https":
             raise VendorError("PROVIDER_CONFIG_MISSING", "HDAPI_BASE_URL must be https", details={"base_url": base_url})
+        _validate_retry_config(retry)
+        _validate_timeouts(timeouts)
         self._base_url = base_url.rstrip("/")
         self._api_key = api_key
         self._geo_key = geo_key
@@ -134,6 +187,7 @@ class HdApiClient:
         self._request = request or self._default_request
         self._sleep = sleep or time.sleep
         self._monotonic = monotonic_ms or _now_ms
+        self._wall_time = wall_time or time.time
 
     @classmethod
     def from_env(
@@ -216,12 +270,13 @@ class HdApiClient:
         while attempt < self._retry.max_attempts:
             attempt += 1
             start = self._monotonic()
-            status = "error"
+            status: Any = "error"
             duration_ms = 0.0
             error_code = None
             error_class = "none"
             retry_after_ms: int | None = None
             planned_backoff_ms = 0.0
+            retryable = False
             try:
                 req = urlrequest.Request(request.url, data=request.body_bytes, headers=request.headers, method="POST")
                 timeout = self._timeouts.read_timeout_ms / 1000.0
@@ -231,6 +286,7 @@ class HdApiClient:
                 if status_code != 200:
                     error_code = self._map_status_to_code(status_code)
                     error_class = self._error_class(status_code)
+                    retryable = self._is_retryable_error_class(error_class)
                     if status_code == 429:
                         retry_after_ms = self._retry_after_ms(headers)
                     raise VendorError(error_code, "vendor_error", details={"status": status_code})
@@ -245,8 +301,8 @@ class HdApiClient:
                 duration_ms = duration_ms or (self._monotonic() - start)
                 error_code = exc.code
                 error_class = error_class or exc.code.lower()
-                if attempt < self._retry.max_attempts:
-                    planned_backoff_ms = self._backoff_delay(attempt)
+                if retryable and attempt < self._retry.max_attempts:
+                    planned_backoff_ms = self._bounded_backoff_delay(attempt, deadline)
                 self._log_attempt(
                     attempt,
                     status,
@@ -256,28 +312,26 @@ class HdApiClient:
                     retry_after_ms=retry_after_ms,
                     backoff_ms=planned_backoff_ms,
                 )
+                if not retryable:
+                    break
             except (urlerror.URLError, TimeoutError, socket.timeout, OSError) as exc:
                 last_error = VendorError("PROVIDER_NETWORK_ERROR", "network failure", details={"error": str(exc)})
                 duration_ms = self._monotonic() - start
+                error_class = "network_error"
+                retryable = True
                 if attempt < self._retry.max_attempts:
-                    planned_backoff_ms = self._backoff_delay(attempt)
+                    planned_backoff_ms = self._bounded_backoff_delay(attempt, deadline)
                 self._log_attempt(
                     attempt,
                     status,
                     duration_ms,
-                    "network_error",
+                    error_class,
                     error_code="PROVIDER_NETWORK_ERROR",
                     backoff_ms=planned_backoff_ms,
                 )
-            if attempt >= self._retry.max_attempts:
+            if attempt >= self._retry.max_attempts or not retryable or planned_backoff_ms <= 0:
                 break
-            now = self._monotonic()
-            if now >= deadline:
-                break
-            backoff_ms = planned_backoff_ms or self._backoff_delay(attempt)
-            if now + backoff_ms >= deadline:
-                break
-            self._sleep(backoff_ms / 1000.0)
+            self._sleep(planned_backoff_ms / 1000.0)
         raise last_error or VendorError("PROVIDER_UNAVAILABLE", "vendor unavailable")
 
     def _log_attempt(
@@ -308,12 +362,29 @@ class HdApiClient:
             record["backoff_ms"] = int(backoff_ms)
         _append_retry_log(self._log_path, record)
 
-    def _backoff_delay(self, attempt: int) -> float:
-        if self._retry.profile != "exponential" or attempt <= 0:
+    def _bounded_backoff_delay(self, attempt: int, deadline: float) -> float:
+        delay = self._backoff_delay(attempt)
+        if delay <= 0:
             return 0.0
-        exp = attempt - 1
-        delay = min(self._retry.exp_base_ms * (2 ** exp), self._retry.exp_ceiling_ms)
-        return float(delay)
+        now = self._monotonic()
+        if now >= deadline or now + delay > deadline:
+            return 0.0
+        return delay
+
+    def _backoff_delay(self, attempt: int) -> float:
+        if attempt <= 0 or self._retry.profile == "none":
+            return 0.0
+        if self._retry.profile == "fixed":
+            return float(self._retry.exp_base_ms)
+        if self._retry.profile == "exponential":
+            exp = attempt - 1
+            delay = min(self._retry.exp_base_ms * (2 ** exp), self._retry.exp_ceiling_ms)
+            return float(delay)
+        return 0.0
+
+    @staticmethod
+    def _is_retryable_error_class(error_class: str) -> bool:
+        return error_class in {"network_error", "5xx"}
 
     def _map_status_to_code(self, status: int) -> str:
         if status == 401:
@@ -338,17 +409,49 @@ class HdApiClient:
         return "network_error"
 
     def _retry_after_ms(self, headers: Mapping[str, str]) -> int | None:
-        retry_after = headers.get("retry-after") if headers else None
+        retry_after = None
+        if headers:
+            retry_after = headers.get("retry-after") or headers.get("Retry-After")
         if not retry_after:
             return None
         retry_after = retry_after.strip()
         if not retry_after:
             return None
+        delay_ms: int | None
+        if retry_after.isdigit():
+            delay_ms = self._retry_after_delta_ms(retry_after)
+        else:
+            delay_ms = self._retry_after_http_date_ms(retry_after)
+        if delay_ms is None or delay_ms > _RETRY_AFTER_MAX_MS:
+            return None
+        return delay_ms
+
+    @staticmethod
+    def _retry_after_delta_ms(raw: str) -> int | None:
         try:
-            seconds = int(float(retry_after))
+            seconds = int(raw, 10)
         except ValueError:
             return None
-        return max(0, seconds * 1000)
+        delay_ms = seconds * 1000
+        if delay_ms > _RETRY_AFTER_MAX_MS:
+            return None
+        return delay_ms
+
+    def _retry_after_http_date_ms(self, raw: str) -> int | None:
+        try:
+            parsed = parsedate_to_datetime(raw)
+        except (TypeError, ValueError, IndexError, OverflowError):
+            return None
+        if parsed is None:
+            return None
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=timezone.utc)
+        target = parsed.astimezone(timezone.utc).timestamp()
+        delta_seconds = max(0.0, target - self._wall_time())
+        delay_ms = int(delta_seconds * 1000)
+        if delay_ms > _RETRY_AFTER_MAX_MS:
+            return None
+        return delay_ms
 
     @staticmethod
     def _default_request(req: urlrequest.Request, timeout: float) -> tuple[int, bytes, Mapping[str, str]]:

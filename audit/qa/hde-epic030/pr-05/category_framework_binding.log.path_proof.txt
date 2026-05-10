@@ -1,5 +1,5 @@
 path: audit/qa/hde-epic030/pr-05/category_framework_binding.log
 size_bytes: 549
-sha256: 833e6a52bd51d10923895948921991f14406b246172501dbd224650698c9e2b4
-mtime_utc: 2026-04-24T13:47:59Z
-produced_at_utc: 2026-04-24T13:48:02Z
+sha256: 4d6530b77e4aac9fb89476f7e818b1111c97c9715c3f4071879b62e05dee3e42
+mtime_utc: 2026-05-10T15:35:01Z
+produced_at_utc: 2026-05-10T15:39:14Z

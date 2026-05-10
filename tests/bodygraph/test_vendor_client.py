@@ -67,3 +67,105 @@ def test_fetch_success_parses_json(tmp_path: Path):
     assert isinstance(result, VendorResult)
     assert result.payload["ok"] is True
     assert log_path.exists()
+
+
+def test_fetch_does_not_retry_429_and_parses_retry_after_delta() -> None:
+    calls = []
+
+    def rate_limited(req, timeout):
+        calls.append(req.full_url)
+        return 429, b"{}", {"retry-after": "4"}
+
+    client = _client(rate_limited)
+    request = VendorRequest(url="https://vendor.test/v1/bodygraphs", headers={}, body_bytes=b"{}\n", input_fingerprint="abc")
+    with pytest.raises(VendorError) as excinfo:
+        client.fetch(request)
+
+    assert excinfo.value.code == "PROVIDER_RATE_LIMITED"
+    assert calls == ["https://vendor.test/v1/bodygraphs"]
+
+
+def test_fetch_does_not_retry_other_4xx_statuses() -> None:
+    calls = []
+
+    def forbidden(req, timeout):
+        calls.append(req.full_url)
+        return 403, b"{}", {}
+
+    client = _client(forbidden)
+    request = VendorRequest(url="https://vendor.test/v1/bodygraphs", headers={}, body_bytes=b"{}\n", input_fingerprint="abc")
+    with pytest.raises(VendorError) as excinfo:
+        client.fetch(request)
+
+    assert excinfo.value.code == "PROVIDER_FORBIDDEN"
+    assert calls == ["https://vendor.test/v1/bodygraphs"]
+
+
+def test_fetch_retries_only_5xx_and_network_errors() -> None:
+    statuses = [500, 200]
+    sleeps = []
+
+    def flaky(req, timeout):
+        status = statuses.pop(0)
+        body = json.dumps({"ok": True}).encode("utf-8")
+        return status, body, {}
+
+    client = HdApiClient(
+        base_url="https://vendor.test/v1",
+        api_key="api",
+        geo_key="geo",
+        release_id="0" * 64,
+        retry=VendorRetryConfig(max_attempts=2, profile="fixed", exp_base_ms=250, exp_ceiling_ms=250),
+        timeouts=VendorTimeouts(connect_timeout_ms=1000, read_timeout_ms=2000, total_timeout_ms=5000),
+        request=flaky,
+        sleep=lambda seconds: sleeps.append(seconds),
+        monotonic_ms=lambda: 0.0,
+    )
+    request = VendorRequest(url="https://vendor.test/v1/bodygraphs", headers={}, body_bytes=b"{}\n", input_fingerprint="abc")
+
+    result = client.fetch(request)
+
+    assert result.payload == {"ok": True}
+    assert result.attempts == 2
+    assert sleeps == [0.25]
+
+
+def test_retry_after_parses_http_date_and_omits_invalid_or_overflow() -> None:
+    client = HdApiClient(
+        base_url="https://vendor.test/v1",
+        api_key="api",
+        geo_key="geo",
+        release_id="0" * 64,
+        retry=VendorRetryConfig(max_attempts=1, profile="none", exp_base_ms=0, exp_ceiling_ms=0),
+        timeouts=VendorTimeouts(connect_timeout_ms=1000, read_timeout_ms=2000, total_timeout_ms=5000),
+        request=lambda req, timeout: (200, b"{}", {}),
+        wall_time=lambda: 1_700_000_000.0,
+    )
+
+    assert client._retry_after_ms({"retry-after": "Tue, 14 Nov 2023 23:13:20 GMT"}) == 3_600_000
+    assert client._retry_after_ms({"retry-after": "not-a-date"}) is None
+    assert client._retry_after_ms({"retry-after": "2147484"}) is None
+
+
+def test_vendor_policy_rejects_unpinned_retry_and_timeout_profiles() -> None:
+    with pytest.raises(VendorError) as retry_exc:
+        HdApiClient(
+            base_url="https://vendor.test/v1",
+            api_key="api",
+            geo_key="geo",
+            release_id="0" * 64,
+            retry=VendorRetryConfig(max_attempts=4, profile="exponential", exp_base_ms=250, exp_ceiling_ms=500),
+            timeouts=VendorTimeouts(connect_timeout_ms=1000, read_timeout_ms=2000, total_timeout_ms=5000),
+        )
+    assert retry_exc.value.code == "PROVIDER_CONFIG_INVALID"
+
+    with pytest.raises(VendorError) as timeout_exc:
+        HdApiClient(
+            base_url="https://vendor.test/v1",
+            api_key="api",
+            geo_key="geo",
+            release_id="0" * 64,
+            retry=VendorRetryConfig(max_attempts=1, profile="none", exp_base_ms=0, exp_ceiling_ms=0),
+            timeouts=VendorTimeouts(connect_timeout_ms=999, read_timeout_ms=2000, total_timeout_ms=5000),
+        )
+    assert timeout_exc.value.code == "PROVIDER_CONFIG_INVALID"
