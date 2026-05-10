@@ -1,0 +1,16 @@
+name: rails_open_conformance
+rails:
+  SAFE_MODE: "0"
+  ALLOW_NETWORK: "1"
+  LC_ALL: C
+  LANG: C
+  TZ: UTC
+scope: hde-epic031-pr-01-fixture-backed-only
+live_vendor_calls: forbidden
+steps:
+  - command: python -m pytest tests/bodygraph/test_vendor_client.py -q
+    proves:
+      - open rails provider policy is local and mocked
+      - retry/backoff behavior is bounded and jitter-free
+      - HTTP 429 maps to PROVIDER_RATE_LIMITED and is not retried
+      - Retry-After delta-seconds and HTTP-date parsing are deterministic

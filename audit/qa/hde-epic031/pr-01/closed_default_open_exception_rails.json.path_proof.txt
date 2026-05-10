@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic031/pr-01/closed_default_open_exception_rails.json
+size_bytes: 468
+sha256: 5d9602144c3761c7d1e4277082b160525147241479112caf25e0a02fc0c396d1
+mtime_utc: 2026-05-10T15:38:37Z
+produced_at_utc: 2026-05-10T15:38:37Z

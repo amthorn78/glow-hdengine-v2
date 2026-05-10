@@ -1,0 +1,14 @@
+name: rails_closed_refusal
+rails:
+  SAFE_MODE: "1"
+  ALLOW_NETWORK: "0"
+  LC_ALL: C
+  LANG: C
+  TZ: UTC
+scope: hde-epic031-pr-01-local-deterministic
+live_vendor_calls: forbidden
+steps:
+  - command: python -m pytest tests/bodygraph/test_resolver_vendor.py -q
+    proves:
+      - closed SAFE rails refuse provider behavior before vendor input resolution
+      - closed-default state is SAFE_MODE=1 and ALLOW_NETWORK=0

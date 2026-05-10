@@ -1,0 +1,5 @@
+path: artifacts/vendor/policies_pinned.md
+size_bytes: 1400
+sha256: 053fec079b085ff50e4efc223415528435aaf9ddf662d552d0935b0c9a74f449
+mtime_utc: 2026-05-10T15:38:37Z
+produced_at_utc: 2026-05-10T15:38:37Z

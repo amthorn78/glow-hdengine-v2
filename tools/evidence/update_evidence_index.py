@@ -188,6 +188,55 @@ EPIC028_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
 ]
 
 
+
+EPIC031_PR01_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "epic031.pr01.policies_pinned",
+        "discovered_physical_path": "artifacts/vendor/policies_pinned.md",
+        "epic_id": "HDE-EPIC031",
+        "record_type": "epic031_pr01_evidence",
+        "schema_version": "1.0",
+        "produced_at_utc": "2026-05-10T15:38:37Z",
+        "notes": "EPIC031 PR-01 pinned SAFE rails provider policy evidence",
+    },
+    {
+        "artifact_key": "vendor.retry_after_parse",
+        "discovered_physical_path": "artifacts/vendor/retry_after_parse.log",
+        "epic_id": "HDE-EPIC031",
+        "record_type": "epic031_pr01_evidence",
+        "schema_version": "1.0",
+        "produced_at_utc": "2026-05-10T15:38:37Z",
+        "notes": "EPIC031 PR-01 Retry-After deterministic parse evidence",
+    },
+    {
+        "artifact_key": "epic031.pr01.open_rails_policy_proof",
+        "discovered_physical_path": "audit/qa/hde-epic031/pr-01/open_rails_policy_proof.json",
+        "epic_id": "HDE-EPIC031",
+        "record_type": "epic031_pr01_evidence",
+        "schema_version": "1.0",
+        "produced_at_utc": "2026-05-10T15:38:37Z",
+        "notes": "EPIC031 PR-01 open rails policy proof",
+    },
+    {
+        "artifact_key": "epic031.pr01.retry_backoff_429_proof",
+        "discovered_physical_path": "audit/qa/hde-epic031/pr-01/retry_backoff_429_proof.json",
+        "epic_id": "HDE-EPIC031",
+        "record_type": "epic031_pr01_evidence",
+        "schema_version": "1.0",
+        "produced_at_utc": "2026-05-10T15:38:37Z",
+        "notes": "EPIC031 PR-01 retry, backoff, and 429 typed proof",
+    },
+    {
+        "artifact_key": "epic031.pr01.closed_default_open_exception_rails",
+        "discovered_physical_path": "audit/qa/hde-epic031/pr-01/closed_default_open_exception_rails.json",
+        "epic_id": "HDE-EPIC031",
+        "record_type": "epic031_pr01_evidence",
+        "schema_version": "1.0",
+        "produced_at_utc": "2026-05-10T15:38:37Z",
+        "notes": "EPIC031 PR-01 closed default and open exception rails proof",
+    },
+]
+
 EPIC030_PR02_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
         "artifact_key": "epic030.pr02.dev_sampler_http_headers",
@@ -614,6 +663,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *EPIC027_PRIMARY_ARTIFACTS,
             *EPIC028_PRIMARY_ARTIFACTS,
             *EPIC030_PR02_PRIMARY_ARTIFACTS,
+            *EPIC031_PR01_PRIMARY_ARTIFACTS,
             *EPIC030_PR03_PRIMARY_ARTIFACTS,
             *EPIC030_PR04_PRIMARY_ARTIFACTS,
             *EPIC030_PR05_PRIMARY_ARTIFACTS,
