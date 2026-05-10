@@ -110,49 +110,107 @@ BOUNDED_SIDE_EFFECT_REFRESHES = [
     {
         "family_name": "writer proof companions",
         "classification": "expected updater convergence",
-        "rationale": "Global evidence-index regeneration refreshes registered writer proof companions while converging path-proof metadata; no writer primary artifact behavior changed in PR-03.",
+        "rationale": "Global evidence-index regeneration refreshes registered writer proof companions and their Machine Mirror rows while converging path-proof metadata; no writer primary artifact behavior changed in PR-03.",
         "paths": [
             "artifacts/writer/conjunction_write_readback.log.path_proof.txt",
             "artifacts/writer/conjunction_writer_summary.json.path_proof.txt",
+        ],
+        "mirror_rows": [
+            {
+                "artifact_key": "conjunction.writer.write_readback",
+                "discovered_physical_path": "artifacts/writer/conjunction_write_readback.log",
+            },
+            {
+                "artifact_key": "conjunction.writer.summary",
+                "discovered_physical_path": "artifacts/writer/conjunction_writer_summary.json",
+            },
         ],
     },
     {
         "family_name": "topology orientation refresh",
         "classification": "required dependency refresh",
-        "rationale": "Orientation evidence is regenerated after Human Index and Machine Mirror changes so topology counts and its proof companion remain coherent with the PR-03 evidence-index fixed point.",
+        "rationale": "Orientation evidence and its Machine Mirror row are regenerated after Human Index and Machine Mirror changes so topology counts and its proof companion remain coherent with the PR-03 evidence-index fixed point.",
         "paths": [
             "audit/gates/topology/orientation_demo.txt",
             "audit/gates/topology/orientation_demo.txt.path_proof.txt",
+        ],
+        "mirror_rows": [
+            {
+                "artifact_key": "topology.orientation_demo",
+                "discovered_physical_path": "audit/gates/topology/orientation_demo.txt",
+            },
         ],
     },
     {
         "family_name": "HDE-EPIC030 PR-03 proof companions",
         "classification": "expected updater convergence",
-        "rationale": "Global path-proof convergence refreshes existing EPIC030 PR-03 proof companions as registered evidence-index rows are rewritten; no EPIC030 implementation scope is changed by PR-03.",
+        "rationale": "Global path-proof convergence refreshes existing EPIC030 PR-03 proof companions and Machine Mirror rows as registered evidence-index rows are rewritten; no EPIC030 implementation scope is changed by PR-03.",
         "paths": [
             "audit/qa/hde-epic030/pr-03/category_order_binding.log.path_proof.txt",
             "audit/qa/hde-epic030/pr-03/compat_identity_binding.log.path_proof.txt",
             "audit/qa/hde-epic030/pr-03/compat_parity_binding.log.path_proof.txt",
         ],
+        "mirror_rows": [
+            {
+                "artifact_key": "epic030.pr03.category_order_binding",
+                "discovered_physical_path": "audit/qa/hde-epic030/pr-03/category_order_binding.log",
+            },
+            {
+                "artifact_key": "epic030.pr03.compat_identity_binding",
+                "discovered_physical_path": "audit/qa/hde-epic030/pr-03/compat_identity_binding.log",
+            },
+            {
+                "artifact_key": "epic030.pr03.compat_parity_binding",
+                "discovered_physical_path": "audit/qa/hde-epic030/pr-03/compat_parity_binding.log",
+            },
+        ],
     },
     {
         "family_name": "HDE-EPIC030 PR-04 proof companions",
         "classification": "expected updater convergence",
-        "rationale": "Global path-proof convergence refreshes existing EPIC030 PR-04 proof companions as registered evidence-index rows are rewritten; no EPIC030 implementation scope is changed by PR-03.",
+        "rationale": "Global path-proof convergence refreshes existing EPIC030 PR-04 proof companions and Machine Mirror rows as registered evidence-index rows are rewritten; no EPIC030 implementation scope is changed by PR-03.",
         "paths": [
             "audit/qa/hde-epic030/pr-04/band_edges_binding.log.path_proof.txt",
             "audit/qa/hde-epic030/pr-04/band_thresholds_diff.json.path_proof.txt",
             "audit/qa/hde-epic030/pr-04/band_thresholds_identity_hash.txt.path_proof.txt",
         ],
+        "mirror_rows": [
+            {
+                "artifact_key": "epic030.pr04.band_edges_binding",
+                "discovered_physical_path": "audit/qa/hde-epic030/pr-04/band_edges_binding.log",
+            },
+            {
+                "artifact_key": "epic030.pr04.band_thresholds_diff",
+                "discovered_physical_path": "audit/qa/hde-epic030/pr-04/band_thresholds_diff.json",
+            },
+            {
+                "artifact_key": "epic030.pr04.band_thresholds_identity_hash",
+                "discovered_physical_path": "audit/qa/hde-epic030/pr-04/band_thresholds_identity_hash.txt",
+            },
+        ],
     },
     {
         "family_name": "HDE-EPIC030 PR-05 proof companions",
         "classification": "expected updater convergence",
-        "rationale": "Global path-proof convergence refreshes existing EPIC030 PR-05 proof companions as registered evidence-index rows are rewritten; no EPIC030 implementation scope is changed by PR-03.",
+        "rationale": "Global path-proof convergence refreshes existing EPIC030 PR-05 proof companions and Machine Mirror rows as registered evidence-index rows are rewritten; no EPIC030 implementation scope is changed by PR-03.",
         "paths": [
             "audit/qa/hde-epic030/pr-05/category_canonical_compare.log.path_proof.txt",
             "audit/qa/hde-epic030/pr-05/category_framework_binding.log.path_proof.txt",
             "audit/qa/hde-epic030/pr-05/per_channel_mechanics.json.path_proof.txt",
+        ],
+        "mirror_rows": [
+            {
+                "artifact_key": "epic030.pr05.category_canonical_compare",
+                "discovered_physical_path": "audit/qa/hde-epic030/pr-05/category_canonical_compare.log",
+            },
+            {
+                "artifact_key": "epic030.pr05.category_framework_binding",
+                "discovered_physical_path": "audit/qa/hde-epic030/pr-05/category_framework_binding.log",
+            },
+            {
+                "artifact_key": "epic030.pr05.per_channel_mechanics",
+                "discovered_physical_path": "audit/qa/hde-epic030/pr-05/per_channel_mechanics.json",
+            },
         ],
     },
 ]
@@ -302,19 +360,76 @@ def _all_supporting_paths() -> list[str]:
     return sorted({path for family in FAMILY_MAP.values() for path in family["supporting_paths"]})
 
 
-def _side_effect_payload() -> list[dict[str, Any]]:
+def _side_effect_proof_target(path: str) -> str:
+    suffix = ".path_proof.txt"
+    if path.endswith(suffix):
+        return path[: -len(suffix)]
+    return path
+
+
+def _side_effect_path_status(path: str) -> dict[str, Any]:
+    target = _side_effect_proof_target(path)
+    proof_required = path.endswith(".path_proof.txt") or (ROOT / f"{target}.path_proof.txt").exists()
+    proof_valid = _proof_ok(target) if proof_required else None
+    return {
+        "path": path,
+        "exists": (ROOT / path).exists(),
+        "proof_target": target,
+        "proof_required": proof_required,
+        "proof_valid": proof_valid,
+    }
+
+
+def _side_effect_mirror_status(
+    expected_row: dict[str, str], mirror: dict[str, dict[str, Any]]
+) -> dict[str, Any]:
+    path = expected_row["discovered_physical_path"]
+    artifact_key = expected_row["artifact_key"]
+    record = mirror.get(path)
+    artifact = ROOT / path
+    row_present = record is not None
+    artifact_key_matches = row_present and record.get("artifact_key") == artifact_key
+    row_valid = row_present and artifact_key_matches and _mirror_row_ok(path, mirror, strict_hash=True)
+    return {
+        "artifact_key": artifact_key,
+        "discovered_physical_path": path,
+        "artifact_exists": artifact.exists(),
+        "row_present": row_present,
+        "artifact_key_matches": artifact_key_matches,
+        "proof_anchor": record.get("proof_anchor") if record else None,
+        "sha256_size_match": row_valid,
+        "mirror_row_valid": row_valid,
+    }
+
+
+def _side_effect_payload(mirror: dict[str, dict[str, Any]] | None = None) -> list[dict[str, Any]]:
+    mirror_records = mirror if mirror is not None else _load_mirror()
     return [
         {
             "classification": group["classification"],
             "family_name": group["family_name"],
-            "paths": [
-                {"path": path, "exists": (ROOT / path).exists()}
-                for path in group["paths"]
+            "paths": [_side_effect_path_status(path) for path in group["paths"]],
+            "machine_mirror_rows": [
+                _side_effect_mirror_status(row, mirror_records)
+                for row in group["mirror_rows"]
             ],
             "rationale": group["rationale"],
         }
         for group in BOUNDED_SIDE_EFFECT_REFRESHES
     ]
+
+
+def _side_effects_ok(side_effects: list[dict[str, Any]]) -> bool:
+    for group in side_effects:
+        for path_status in group["paths"]:
+            if not path_status["exists"]:
+                return False
+            if path_status["proof_required"] and path_status["proof_valid"] is not True:
+                return False
+        for mirror_status in group["machine_mirror_rows"]:
+            if not mirror_status["mirror_row_valid"]:
+                return False
+    return True
 
 
 def _family_payload() -> dict[str, Any]:
@@ -323,7 +438,7 @@ def _family_payload() -> dict[str, Any]:
         "epic_id": EPIC_ID,
         "pf09_subtask": PF09_SUBTASK,
         "produced_at_utc": PRODUCED_AT,
-        "schema_version": "1.2",
+        "schema_version": "1.3",
         "bounded_side_effect_refreshes": _side_effect_payload(),
         "proof_families": [
             {
@@ -343,14 +458,15 @@ def _family_payload() -> dict[str, Any]:
     }
 
 
-def _coherence_payload() -> dict[str, Any]:
+def _coherence_payload(*, check: bool = False) -> dict[str, Any]:
     human_paths = _load_human_paths()
     mirror = _load_mirror()
     indexed = {path: path in human_paths for path in INDEXED_SAFE_RAILS_ARTIFACTS}
     mirror_rows = {
-        path: _mirror_row_ok(path, mirror, strict_hash=path not in PR03_ARTIFACTS)
+        path: _mirror_row_ok(path, mirror, strict_hash=check or path not in PR03_ARTIFACTS)
         for path in INDEXED_SAFE_RAILS_ARTIFACTS
     }
+    side_effects = _side_effect_payload(mirror)
     proofs = {path: _proof_ok(path) for path in GOVERNED_PR03_PROOF_ARTIFACTS}
     hashes = _hash_statuses()
     supporting_paths = _all_supporting_paths()
@@ -363,6 +479,7 @@ def _coherence_payload() -> dict[str, Any]:
         "human_index_binding": all(indexed.values()),
         "machine_mirror_binding": all(mirror_rows.values()),
         "hash_status": all(value == "PASS" for value in hashes.values()),
+        "bounded_side_effects_validated": _side_effects_ok(side_effects),
     }
     status = "PASS" if all(sections.values()) else "FAIL"
     return {
@@ -370,8 +487,8 @@ def _coherence_payload() -> dict[str, Any]:
         "epic_id": EPIC_ID,
         "pf09_subtask": PF09_SUBTASK,
         "produced_at_utc": PRODUCED_AT,
-        "schema_version": "1.2",
-        "bounded_side_effect_refreshes": _side_effect_payload(),
+        "schema_version": "1.3",
+        "bounded_side_effect_refreshes": side_effects,
         "local_deterministic_posture": {
             "ALLOW_NETWORK": "0",
             "LANG": "C",
@@ -421,7 +538,7 @@ def _coherence_payload() -> dict[str, Any]:
         "hash_checks": hashes,
         "machine_mirror_self_record_note": {
             "paths": PR03_ARTIFACTS,
-            "posture": "proof-anchor checked without self-generated artifact hash recursion during generation; update_evidence_index.py binds final sha256 and size_bytes after PR-03 evidence generation.",
+            "posture": "non-check generation checks proof anchors for self-generated artifacts before update_evidence_index.py binds final sha256 and size_bytes; --check validates final sha256 and size_bytes for every PR-03 Machine Mirror row.",
         },
         "out_of_scope_confirmations": {
             "hdapi_v2_runtime_conformance_implemented": False,
@@ -463,6 +580,11 @@ def _refresh_log_payload(coherence_status: str) -> bytes:
             ]
         )
         lines.extend(f"      - {path}" for path in group["paths"])
+        lines.append("    machine_mirror_rows:")
+        lines.extend(
+            f"      - artifact_key: {row['artifact_key']} discovered_physical_path: {row['discovered_physical_path']}"
+            for row in group["mirror_rows"]
+        )
     lines.extend(
         [
             "validation_command_roster:",
@@ -495,7 +617,7 @@ def generate(*, check: bool) -> None:
     ensure_determinism_env()
     _materialize_pr03_files(check=check)
     if check:
-        coherence_payload = _coherence_payload()
+        coherence_payload = _coherence_payload(check=True)
         _write_coherence_pair(coherence_payload, check=True)
         if coherence_payload["status"] != "PASS":
             raise SystemExit("EPIC031_PR03_COHERENCE_FAIL")

@@ -17,37 +17,54 @@ generator_step_outcomes:
 bounded_side_effect_refreshes:
   - family: writer proof companions
     classification: expected updater convergence
-    rationale: Global evidence-index regeneration refreshes registered writer proof companions while converging path-proof metadata; no writer primary artifact behavior changed in PR-03.
+    rationale: Global evidence-index regeneration refreshes registered writer proof companions and their Machine Mirror rows while converging path-proof metadata; no writer primary artifact behavior changed in PR-03.
     paths:
       - artifacts/writer/conjunction_write_readback.log.path_proof.txt
       - artifacts/writer/conjunction_writer_summary.json.path_proof.txt
+    machine_mirror_rows:
+      - artifact_key: conjunction.writer.write_readback discovered_physical_path: artifacts/writer/conjunction_write_readback.log
+      - artifact_key: conjunction.writer.summary discovered_physical_path: artifacts/writer/conjunction_writer_summary.json
   - family: topology orientation refresh
     classification: required dependency refresh
-    rationale: Orientation evidence is regenerated after Human Index and Machine Mirror changes so topology counts and its proof companion remain coherent with the PR-03 evidence-index fixed point.
+    rationale: Orientation evidence and its Machine Mirror row are regenerated after Human Index and Machine Mirror changes so topology counts and its proof companion remain coherent with the PR-03 evidence-index fixed point.
     paths:
       - audit/gates/topology/orientation_demo.txt
       - audit/gates/topology/orientation_demo.txt.path_proof.txt
+    machine_mirror_rows:
+      - artifact_key: topology.orientation_demo discovered_physical_path: audit/gates/topology/orientation_demo.txt
   - family: HDE-EPIC030 PR-03 proof companions
     classification: expected updater convergence
-    rationale: Global path-proof convergence refreshes existing EPIC030 PR-03 proof companions as registered evidence-index rows are rewritten; no EPIC030 implementation scope is changed by PR-03.
+    rationale: Global path-proof convergence refreshes existing EPIC030 PR-03 proof companions and Machine Mirror rows as registered evidence-index rows are rewritten; no EPIC030 implementation scope is changed by PR-03.
     paths:
       - audit/qa/hde-epic030/pr-03/category_order_binding.log.path_proof.txt
       - audit/qa/hde-epic030/pr-03/compat_identity_binding.log.path_proof.txt
       - audit/qa/hde-epic030/pr-03/compat_parity_binding.log.path_proof.txt
+    machine_mirror_rows:
+      - artifact_key: epic030.pr03.category_order_binding discovered_physical_path: audit/qa/hde-epic030/pr-03/category_order_binding.log
+      - artifact_key: epic030.pr03.compat_identity_binding discovered_physical_path: audit/qa/hde-epic030/pr-03/compat_identity_binding.log
+      - artifact_key: epic030.pr03.compat_parity_binding discovered_physical_path: audit/qa/hde-epic030/pr-03/compat_parity_binding.log
   - family: HDE-EPIC030 PR-04 proof companions
     classification: expected updater convergence
-    rationale: Global path-proof convergence refreshes existing EPIC030 PR-04 proof companions as registered evidence-index rows are rewritten; no EPIC030 implementation scope is changed by PR-03.
+    rationale: Global path-proof convergence refreshes existing EPIC030 PR-04 proof companions and Machine Mirror rows as registered evidence-index rows are rewritten; no EPIC030 implementation scope is changed by PR-03.
     paths:
       - audit/qa/hde-epic030/pr-04/band_edges_binding.log.path_proof.txt
       - audit/qa/hde-epic030/pr-04/band_thresholds_diff.json.path_proof.txt
       - audit/qa/hde-epic030/pr-04/band_thresholds_identity_hash.txt.path_proof.txt
+    machine_mirror_rows:
+      - artifact_key: epic030.pr04.band_edges_binding discovered_physical_path: audit/qa/hde-epic030/pr-04/band_edges_binding.log
+      - artifact_key: epic030.pr04.band_thresholds_diff discovered_physical_path: audit/qa/hde-epic030/pr-04/band_thresholds_diff.json
+      - artifact_key: epic030.pr04.band_thresholds_identity_hash discovered_physical_path: audit/qa/hde-epic030/pr-04/band_thresholds_identity_hash.txt
   - family: HDE-EPIC030 PR-05 proof companions
     classification: expected updater convergence
-    rationale: Global path-proof convergence refreshes existing EPIC030 PR-05 proof companions as registered evidence-index rows are rewritten; no EPIC030 implementation scope is changed by PR-03.
+    rationale: Global path-proof convergence refreshes existing EPIC030 PR-05 proof companions and Machine Mirror rows as registered evidence-index rows are rewritten; no EPIC030 implementation scope is changed by PR-03.
     paths:
       - audit/qa/hde-epic030/pr-05/category_canonical_compare.log.path_proof.txt
       - audit/qa/hde-epic030/pr-05/category_framework_binding.log.path_proof.txt
       - audit/qa/hde-epic030/pr-05/per_channel_mechanics.json.path_proof.txt
+    machine_mirror_rows:
+      - artifact_key: epic030.pr05.category_canonical_compare discovered_physical_path: audit/qa/hde-epic030/pr-05/category_canonical_compare.log
+      - artifact_key: epic030.pr05.category_framework_binding discovered_physical_path: audit/qa/hde-epic030/pr-05/category_framework_binding.log
+      - artifact_key: epic030.pr05.per_channel_mechanics discovered_physical_path: audit/qa/hde-epic030/pr-05/per_channel_mechanics.json
 validation_command_roster:
   execution_record: external validation commands are listed for reproducibility; this generator does not mark unexecuted commands PASS or FAIL.
   - command: SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/generate_epic031_pr03_evidence_coherence.py
