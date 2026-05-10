@@ -1,5 +1,15 @@
 # CHANGELOG
 
+Unreleased — HDE-EPIC031: final repo docs sweep (README/CHANGELOG/AGENTS/docs/)
+
+### Added
+- Documented HDE-EPIC031 as the first SAFE rails Fermentation Pass 2 docs sweep for PF09.5 HDE-FERM001.2, HDE-FERM001.3, and HDE-FERM001.4, with PR-01 provider-gate policy evidence, PR-02 keys-only vendor log evidence, and PR-03 evidence/index coherence evidence.
+- Added repo-verified EPIC031 evidence homes: `audit/qa/hde-epic031/pr-01/`, `audit/qa/hde-epic031/pr-02/`, `audit/qa/hde-epic031/pr-03/`, and supporting PR-01 vendor policy artifacts under `artifacts/vendor/`.
+
+### Changed / Fixed
+- Clarified that HDE-EPIC031 preserved public-surface boundaries: no public Reader contract change, no public route/flag/payload-field change, no live vendor execution, no HDAPI v2 runtime conformance, no close-pack output, no token-matrix rows, and no PF-Canon edit.
+- Clarified that PR-02 vendor-specific evidence lives under `audit/qa/hde-epic031/pr-02/` rather than shared DB-bridge paths such as `artifacts/logs/keys_only.sample.jsonl` or `artifacts/ops/rails_open_scope.txt`.
+
 Unreleased — HDE-EPIC030: final repo docs sweep (README/CHANGELOG/AGENTS/docs/)
 
 ### Added
@@ -334,7 +344,7 @@ One-page, command-free acceptance checklist names and artifact expectations for 
 
 2025-10-01 — Alpha docs/playbooks refresh (v1.2)
 
-(unchanged from prior; retained here for history) 
+(unchanged from prior; retained here for history)
 
 [A3] CLI Alpha Public Invariant (docs/CLI_commands.md v1.2)
 

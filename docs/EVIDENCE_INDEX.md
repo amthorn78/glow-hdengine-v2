@@ -2,7 +2,15 @@
 > Add new entries there first, then mirror key pointers here for quick navigation. Update the skeleton (`docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl` + `.path_proof.txt` companions) in the same PR whenever governed bytes change.
 > Refresh order: run `python tools/evidence/update_evidence_index.py` (write) before `python tools/evidence/orientation_demo.py` (write), then their `--check` variants, and finish with `ci/checks/check_mirror_schema.sh`. Mirror path proofs include both `sha256` and `mirror_body_sha256` for the self-record entry in `artifacts/evidence_index.jsonl`.
 
-# Appendix-D — Evidence Index (EPIC-030 + historical pointers)
+# Appendix-D — Evidence Index (EPIC-031 + historical pointers)
+
+## EPIC031 SAFE rails evidence families (implementation slice, not close-pack)
+* PR-01 provider-gate policy: `audit/qa/hde-epic031/pr-01/open_rails_policy_proof.json`, `audit/qa/hde-epic031/pr-01/retry_backoff_429_proof.json`, `audit/qa/hde-epic031/pr-01/closed_default_open_exception_rails.json`, plus supporting policy artifacts `artifacts/vendor/policies_pinned.md` and `artifacts/vendor/retry_after_parse.log`.
+* PR-02 keys-only vendor log posture: `audit/qa/hde-epic031/pr-02/vendor_keys_only.sample.jsonl`, `audit/qa/hde-epic031/pr-02/vendor_rails_scope.txt`, `audit/qa/hde-epic031/pr-02/keys_only_log_redaction.json`, `audit/qa/hde-epic031/pr-02/bounded_label_observability.json`, and `audit/qa/hde-epic031/pr-02/secret_redaction_scan.log`. These are vendor-specific evidence files and are separate from historical DB-bridge artifacts under `artifacts/logs/` and `artifacts/ops/`.
+* PR-03 evidence/index coherence: `audit/qa/hde-epic031/pr-03/evidence_family_map.json`, `audit/qa/hde-epic031/pr-03/safe_rails_evidence_coherence.json`, and `audit/qa/hde-epic031/pr-03/evidence_refresh.log`.
+* Scope guardrails: the PR-03 coherence artifact records no new acceptance tokens, no follow-up HDAPI v2 scope implementation, no live vendor call, and no public Reader contract change.
+* Path-proof discipline: each EPIC031 artifact above has a sibling `.path_proof.txt`; Index/Mirror entries are in `docs/evidence/INDEX.json` and `artifacts/evidence_index.jsonl`.
+* Repo-supported validation references include `ci/jobs/rails_closed_refusal.yml`, `ci/jobs/rails_open_conformance.yml`, `ci/jobs/logs_keys_only_redaction.yml`, `python tools/evidence/generate_epic031_pr02_log_posture.py --check`, `python tools/evidence/generate_epic031_pr03_evidence_coherence.py --check`, `python tools/evidence/update_evidence_index.py --check`, `python tools/evidence/orientation_demo.py --check`, `python tools/evidence/validate_evidence_paths.py`, `ci/checks/check_mirror_schema.sh`, `ci/checks/check_evidence_index_hash.sh`, and `python tools/evidence/check_lf_endings.py`.
 
 ## EPIC030 PR-slice evidence families (implementation closure, not close-pack)
 * PR-01 normalization: `audit/qa/hde-epic030/pr-01/zero_weight_handoff.json`, `audit/qa/hde-epic030/pr-01/invalid_viewer_prefs.log`, `audit/qa/hde-epic030/pr-01/normalization_canonical_compare.log`
