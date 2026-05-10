@@ -179,15 +179,6 @@ def _evidence_payloads() -> dict[str, object]:
             "schema_version": "1.0",
             "evidence_refresh_side_effects": [
                 {
-                    "artifact_family": "artifacts/ingest/*.path_proof.txt",
-                    "classification": "expected updater convergence",
-                    "paths": [
-                        "artifacts/ingest/ingest_success.log.path_proof.txt",
-                        "artifacts/ingest/retry_trace.log.path_proof.txt",
-                    ],
-                    "reason": "Evidence index regeneration refreshes governed path-proof transcripts for indexed legacy ingest artifacts to maintain proof-anchor/hash coherence.",
-                },
-                {
                     "artifact_family": "artifacts/writer/*.path_proof.txt",
                     "classification": "expected updater convergence",
                     "paths": [
