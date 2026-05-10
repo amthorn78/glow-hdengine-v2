@@ -44,12 +44,9 @@ PR02_ARTIFACTS = [
 ]
 PR03_ARTIFACTS = [FAMILY_MAP_REL, COHERENCE_REL, REFRESH_LOG_REL]
 SAFE_RAILS_ARTIFACTS = [*PR01_ARTIFACTS, *PR02_ARTIFACTS]
-GOVERNED_PR03_PROOF_ARTIFACTS = [*SAFE_RAILS_ARTIFACTS, *PR03_ARTIFACTS]
-SUPPORTING_JOB_PATHS = [
-    "ci/jobs/rails_closed_refusal.yml",
-    "ci/jobs/rails_open_conformance.yml",
-    "ci/jobs/logs_keys_only_redaction.yml",
-]
+INDEXED_SAFE_RAILS_ARTIFACTS = [*SAFE_RAILS_ARTIFACTS, *PR03_ARTIFACTS]
+INDEX_MIRROR_REFRESH_ARTIFACTS = [HUMAN_INDEX_REL, HUMAN_INDEX_SHA_REL, MIRROR_REL, MIRROR_SHA_REL]
+GOVERNED_PR03_PROOF_ARTIFACTS = [*INDEXED_SAFE_RAILS_ARTIFACTS, *INDEX_MIRROR_REFRESH_ARTIFACTS]
 
 FAMILY_MAP: dict[str, dict[str, list[str]]] = {
     "SAFE rails open-posture proof family": {
@@ -193,9 +190,25 @@ def _proof_ok(rel: str) -> bool:
         return False
     if proof.get("sha256") != _sha256_path(rel):
         return False
-    if proof.get("size_bytes") != str(path.stat().st_size):
+    try:
+        recorded_size = int(proof.get("size_bytes", ""))
+    except ValueError:
         return False
-    return bool(proof.get("mtime_utc") and proof.get("produced_at_utc"))
+    if recorded_size != path.stat().st_size:
+        return False
+    mtime_raw = proof.get("mtime_utc")
+    produced_raw = proof.get("produced_at_utc")
+    if not mtime_raw or not produced_raw:
+        return False
+    try:
+        mtime_dt = update_evidence_index._parse_utc_iso8601(mtime_raw)
+        update_evidence_index._parse_utc_iso8601(produced_raw)
+    except Exception:  # noqa: BLE001 - match evidence gate fail-closed parsing posture
+        return False
+    stat_mtime_dt = update_evidence_index._dt.datetime.fromtimestamp(
+        path.stat().st_mtime, tz=update_evidence_index._dt.timezone.utc
+    )
+    return mtime_dt <= stat_mtime_dt
 
 
 def _mirror_row_ok(path: str, mirror: dict[str, dict[str, Any]]) -> bool:
@@ -263,8 +276,8 @@ def _family_payload() -> dict[str, Any]:
 def _coherence_payload() -> dict[str, Any]:
     human_paths = _load_human_paths()
     mirror = _load_mirror()
-    indexed = {path: path in human_paths for path in SAFE_RAILS_ARTIFACTS}
-    mirror_rows = {path: _mirror_row_ok(path, mirror) for path in SAFE_RAILS_ARTIFACTS}
+    indexed = {path: path in human_paths for path in INDEXED_SAFE_RAILS_ARTIFACTS}
+    mirror_rows = {path: _mirror_row_ok(path, mirror) for path in INDEXED_SAFE_RAILS_ARTIFACTS}
     proofs = {path: _proof_ok(path) for path in GOVERNED_PR03_PROOF_ARTIFACTS}
     hashes = _hash_statuses()
     supporting_paths = _all_supporting_paths()
@@ -317,9 +330,18 @@ def _coherence_payload() -> dict[str, Any]:
                 "path": path,
                 "exists": (ROOT / path).exists(),
                 "path_proof": "PASS" if proofs[path] else "FAIL",
-                "machine_mirror_binding": "validated by update_evidence_index.py and ci/checks/check_mirror_schema.sh after index refresh",
+                "human_index_binding": "PASS" if indexed[path] else "FAIL",
+                "machine_mirror_binding": "PASS" if mirror_rows[path] else "FAIL",
             }
             for path in PR03_ARTIFACTS
+        ],
+        "index_mirror_refresh_artifacts": [
+            {
+                "path": path,
+                "exists": (ROOT / path).exists(),
+                "path_proof": "PASS" if proofs[path] else "FAIL",
+            }
+            for path in INDEX_MIRROR_REFRESH_ARTIFACTS
         ],
         "coherence_checks": {key: "PASS" if value else "FAIL" for key, value in sections.items()},
         "hash_checks": hashes,
@@ -375,13 +397,31 @@ def _materialize_pr03_files(*, check: bool) -> None:
             _write_governed(REFRESH_LOG_REL, _refresh_log_payload("BOOTSTRAP"), check=False)
 
 
+def _write_coherence_pair(coherence_payload: dict[str, Any], *, check: bool) -> None:
+    _write_governed(COHERENCE_REL, _json_bytes(coherence_payload), check=check)
+    _write_governed(REFRESH_LOG_REL, _refresh_log_payload(str(coherence_payload["status"])), check=check)
+
+
 def generate(*, check: bool) -> None:
     ensure_determinism_env()
     _materialize_pr03_files(check=check)
-    coherence_payload = _coherence_payload()
-    _write_governed(COHERENCE_REL, _json_bytes(coherence_payload), check=check)
-    _write_governed(REFRESH_LOG_REL, _refresh_log_payload(str(coherence_payload["status"])), check=check)
-    if check and coherence_payload["status"] != "PASS":
+    if check:
+        coherence_payload = _coherence_payload()
+        _write_coherence_pair(coherence_payload, check=True)
+        if coherence_payload["status"] != "PASS":
+            raise SystemExit("EPIC031_PR03_COHERENCE_FAIL")
+        return
+
+    final_payload: dict[str, Any] | None = None
+    for _ in range(4):
+        coherence_payload = _coherence_payload()
+        _write_coherence_pair(coherence_payload, check=False)
+        recomputed_payload = _coherence_payload()
+        if _json_bytes(recomputed_payload) == (ROOT / COHERENCE_REL).read_bytes():
+            final_payload = recomputed_payload
+            break
+        final_payload = recomputed_payload
+    if final_payload is None or final_payload["status"] != "PASS":
         raise SystemExit("EPIC031_PR03_COHERENCE_FAIL")
 
 
