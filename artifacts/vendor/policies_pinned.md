@@ -23,6 +23,7 @@ Pinned timeout triples are `(connect_timeout_ms, read_timeout_ms, total_timeout_
 - Retryable outcome classes are only `network_error` and `5xx`.
 - HTTP `429` is typed as `PROVIDER_RATE_LIMITED` and is not retried.
 - Other `4xx` statuses are not retried by this component.
+- Non-200 HTTP statuses outside `4xx` and `5xx` are typed as `PROVIDER_ERROR` and are not retried.
 - Backoff modes are pinned to `none`, `fixed`, or `exponential` with closed integer parameters.
 - Jitter is not implemented or configured.
 - Planned sleep is bounded so accumulated delay cannot exceed `total_timeout_ms`.

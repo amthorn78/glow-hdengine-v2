@@ -80,6 +80,7 @@ Pinned timeout triples are `(connect_timeout_ms, read_timeout_ms, total_timeout_
 - Retryable outcome classes are only `network_error` and `5xx`.
 - HTTP `429` is typed as `PROVIDER_RATE_LIMITED` and is not retried.
 - Other `4xx` statuses are not retried by this component.
+- Non-200 HTTP statuses outside `4xx` and `5xx` are typed as `PROVIDER_ERROR` and are not retried.
 - Backoff modes are pinned to `none`, `fixed`, or `exponential` with closed integer parameters.
 - Jitter is not implemented or configured.
 - Planned sleep is bounded so accumulated delay cannot exceed `total_timeout_ms`.
@@ -168,9 +169,73 @@ def _evidence_payloads() -> dict[str, object]:
             },
             "retry": {
                 "max_attempts": sorted(PINNED_MAX_ATTEMPTS),
+                "non_4xx_non_5xx_http_statuses": {
+                    "error_class": "http_status_other",
+                    "error_code": "PROVIDER_ERROR",
+                    "retried": False,
+                },
                 "retryable_error_classes": ["network_error", "5xx"],
             },
             "schema_version": "1.0",
+            "evidence_refresh_side_effects": [
+                {
+                    "artifact_family": "artifacts/ingest/*.path_proof.txt",
+                    "classification": "expected updater convergence",
+                    "paths": [
+                        "artifacts/ingest/ingest_success.log.path_proof.txt",
+                        "artifacts/ingest/retry_trace.log.path_proof.txt",
+                    ],
+                    "reason": "Evidence index regeneration refreshes governed path-proof transcripts for indexed legacy ingest artifacts to maintain proof-anchor/hash coherence.",
+                },
+                {
+                    "artifact_family": "artifacts/writer/*.path_proof.txt",
+                    "classification": "expected updater convergence",
+                    "paths": [
+                        "artifacts/writer/conjunction_write_readback.log.path_proof.txt",
+                        "artifacts/writer/conjunction_writer_summary.json.path_proof.txt",
+                    ],
+                    "reason": "Evidence index regeneration refreshes governed path-proof transcripts for indexed conjunction writer artifacts to maintain proof-anchor/hash coherence.",
+                },
+                {
+                    "artifact_family": "audit/gates/topology/orientation_demo",
+                    "classification": "required dependency refresh",
+                    "paths": [
+                        "audit/gates/topology/orientation_demo.txt",
+                        "audit/gates/topology/orientation_demo.txt.path_proof.txt",
+                    ],
+                    "reason": "Orientation demo count depends on the Human Evidence Index/Machine Mirror fixed point after adding EPIC031 PR-01 records.",
+                },
+                {
+                    "artifact_family": "audit/qa/hde-epic030/pr-03/*.path_proof.txt",
+                    "classification": "expected updater convergence",
+                    "paths": [
+                        "audit/qa/hde-epic030/pr-03/category_order_binding.log.path_proof.txt",
+                        "audit/qa/hde-epic030/pr-03/compat_identity_binding.log.path_proof.txt",
+                        "audit/qa/hde-epic030/pr-03/compat_parity_binding.log.path_proof.txt",
+                    ],
+                    "reason": "Evidence index regeneration refreshes governed path-proof transcripts for indexed EPIC030 PR-03 artifacts without changing their primary evidence payloads.",
+                },
+                {
+                    "artifact_family": "audit/qa/hde-epic030/pr-04/*.path_proof.txt",
+                    "classification": "expected updater convergence",
+                    "paths": [
+                        "audit/qa/hde-epic030/pr-04/band_edges_binding.log.path_proof.txt",
+                        "audit/qa/hde-epic030/pr-04/band_thresholds_diff.json.path_proof.txt",
+                        "audit/qa/hde-epic030/pr-04/band_thresholds_identity_hash.txt.path_proof.txt",
+                    ],
+                    "reason": "Evidence index regeneration refreshes governed path-proof transcripts for indexed EPIC030 PR-04 artifacts without changing their primary evidence payloads.",
+                },
+                {
+                    "artifact_family": "audit/qa/hde-epic030/pr-05/*.path_proof.txt",
+                    "classification": "expected updater convergence",
+                    "paths": [
+                        "audit/qa/hde-epic030/pr-05/category_canonical_compare.log.path_proof.txt",
+                        "audit/qa/hde-epic030/pr-05/category_framework_binding.log.path_proof.txt",
+                        "audit/qa/hde-epic030/pr-05/per_channel_mechanics.json.path_proof.txt",
+                    ],
+                    "reason": "Evidence index regeneration refreshes governed path-proof transcripts for indexed EPIC030 PR-05 artifacts without changing their primary evidence payloads.",
+                },
+            ],
             "secret_values_recorded": False,
             "timeout_profiles_ms": _sorted_profiles(PINNED_TIMEOUT_PROFILES),
             "tokens_supported": ["ENV_RAILS_POLICY_OK", "VENDOR_RETRY_BACKOFF_OK"],
@@ -184,6 +249,11 @@ def _evidence_payloads() -> dict[str, object]:
                 "retried": False,
             },
             "live_vendor_call_executed": False,
+            "non_4xx_non_5xx_http_statuses": {
+                "error_class": "http_status_other",
+                "error_code": "PROVIDER_ERROR",
+                "retried": False,
+            },
             "other_4xx": {"retried": False},
             "retry_policy": {
                 "backoff_modes": ["none", "fixed", "exponential"],

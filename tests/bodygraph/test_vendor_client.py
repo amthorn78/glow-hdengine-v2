@@ -101,6 +101,23 @@ def test_fetch_does_not_retry_other_4xx_statuses() -> None:
     assert calls == ["https://vendor.test/v1/bodygraphs"]
 
 
+def test_fetch_does_not_retry_other_http_statuses() -> None:
+    calls = []
+
+    def redirect(req, timeout):
+        calls.append(req.full_url)
+        return 302, b"{}", {"location": "https://vendor.test/redirect"}
+
+    client = _client(redirect)
+    request = VendorRequest(url="https://vendor.test/v1/bodygraphs", headers={}, body_bytes=b"{}\n", input_fingerprint="abc")
+    with pytest.raises(VendorError) as excinfo:
+        client.fetch(request)
+
+    assert excinfo.value.code == "PROVIDER_ERROR"
+    assert excinfo.value.details == {"status": 302}
+    assert calls == ["https://vendor.test/v1/bodygraphs"]
+
+
 def test_fetch_retries_only_5xx_and_network_errors() -> None:
     statuses = [500, 200]
     sleeps = []

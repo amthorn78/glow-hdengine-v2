@@ -406,7 +406,7 @@ class HdApiClient:
             return "5xx"
         if 400 <= status <= 499:
             return "4xx"
-        return "network_error"
+        return "http_status_other"
 
     def _retry_after_ms(self, headers: Mapping[str, str]) -> int | None:
         retry_after = None
