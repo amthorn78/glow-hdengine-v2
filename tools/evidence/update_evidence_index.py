@@ -237,10 +237,15 @@ EPIC031_PR01_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     },
 ]
 
+EPIC031_PR02_SUPERSEDED_INDEX_KEYS = {
+    ("epic031.pr02.keys_only_sample", "artifacts/logs/keys_only.sample.jsonl"),
+    ("epic031.pr02.rails_open_scope", "artifacts/ops/rails_open_scope.txt"),
+}
+
 EPIC031_PR02_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
-        "artifact_key": "epic031.pr02.keys_only_sample",
-        "discovered_physical_path": "artifacts/logs/keys_only.sample.jsonl",
+        "artifact_key": "epic031.pr02.vendor_keys_only_sample",
+        "discovered_physical_path": "audit/qa/hde-epic031/pr-02/vendor_keys_only.sample.jsonl",
         "epic_id": "HDE-EPIC031",
         "record_type": "epic031_pr02_evidence",
         "schema_version": "1.0",
@@ -249,13 +254,13 @@ EPIC031_PR02_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
         "tokens": ["VENDOR_NO_PAYLOAD_LOGGING_OK", "ENV_RAILS_POLICY_OK"],
     },
     {
-        "artifact_key": "epic031.pr02.rails_open_scope",
-        "discovered_physical_path": "artifacts/ops/rails_open_scope.txt",
+        "artifact_key": "epic031.pr02.vendor_rails_scope",
+        "discovered_physical_path": "audit/qa/hde-epic031/pr-02/vendor_rails_scope.txt",
         "epic_id": "HDE-EPIC031",
         "record_type": "epic031_pr02_evidence",
         "schema_version": "1.0",
         "produced_at_utc": "2026-05-10T16:20:00Z",
-        "notes": "EPIC031 PR-02 local deterministic rails scope for log posture",
+        "notes": "EPIC031 PR-02 local deterministic vendor rails scope for log posture",
         "tokens": ["ENV_RAILS_POLICY_OK"],
     },
     {
@@ -707,6 +712,12 @@ def _dedupe_entries(entries: Iterable[Mapping[str, object]]) -> list[dict[str, o
 
 def _load_human_index() -> list[dict[str, object]]:
     payload = json.loads(HUMAN_INDEX.read_text(encoding="utf-8"))
+    payload = [
+        entry
+        for entry in payload
+        if (entry.get("artifact_key"), entry.get("discovered_physical_path"))
+        not in EPIC031_PR02_SUPERSEDED_INDEX_KEYS
+    ]
     return _dedupe_entries(
         [
             *payload,

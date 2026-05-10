@@ -1,5 +1,5 @@
 path: audit/qa/hde-epic030/pr-03/category_order_binding.log
 size_bytes: 583
 sha256: 852c2958df97b07631c8dd15acdccf3f84d280c87b2ae90022cf0f4efee2f23c
-mtime_utc: 2026-05-10T17:49:54Z
-produced_at_utc: 2026-05-10T17:54:37Z
+mtime_utc: 2026-05-10T18:11:29Z
+produced_at_utc: 2026-05-10T18:14:21Z

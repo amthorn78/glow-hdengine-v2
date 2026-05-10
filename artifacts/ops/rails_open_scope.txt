@@ -1,19 +1,9 @@
 summary:
-  total_calls = 5
-scope: hde-epic031-pr-02-local-deterministic
-live_vendor_calls: forbidden
-rails:
-  SAFE_MODE = 1
-  ALLOW_NETWORK = 0
-  LC_ALL = C
-  LANG = C
-  TZ = UTC
+  total_calls = 11
 routes:
-  vendor.hdapi.post:/bodygraphs 5
-failure_classes:
-  429 1
-  4xx 1
-  5xx 1
-  network_error 1
-  none 1
-vendor_routes_detected: 1
+  db_bridge.get:/health 2
+  db_bridge.get:/introspect/fingerprint 3
+  db_bridge.get:/introspect/search_path 2
+  db_bridge.post:/query 3
+  ops.bootstrap.s0 1
+vendor_routes_detected: 0

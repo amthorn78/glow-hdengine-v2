@@ -1,5 +1,5 @@
 path: artifacts/ops/rails_open_scope.txt
-size_bytes: 315
-sha256: f08e194d168bafbcffc1ee1b4760542502855fa1f7832472b6007138f1926e37
+size_bytes: 219
+sha256: 7601378d8b544d7820fc88a5347ca1e097bbaa19fb8beb55cfd142c6d787b2d4
 mtime_utc: 2025-12-06T04:06:36Z
 produced_at_utc: 2026-05-10T16:20:00Z

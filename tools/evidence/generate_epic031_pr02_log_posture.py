@@ -18,8 +18,8 @@ from engine.runtime.determinism_env import ensure_determinism_env  # noqa: E402
 from tools.evidence import update_evidence_index  # noqa: E402
 
 PRODUCED_AT = "2026-05-10T16:20:00Z"
-LOG_SAMPLE_REL = "artifacts/logs/keys_only.sample.jsonl"
-RAILS_SCOPE_REL = "artifacts/ops/rails_open_scope.txt"
+LOG_SAMPLE_REL = "audit/qa/hde-epic031/pr-02/vendor_keys_only.sample.jsonl"
+RAILS_SCOPE_REL = "audit/qa/hde-epic031/pr-02/vendor_rails_scope.txt"
 REDACTION_REL = "audit/qa/hde-epic031/pr-02/keys_only_log_redaction.json"
 BOUNDED_REL = "audit/qa/hde-epic031/pr-02/bounded_label_observability.json"
 SCAN_REL = "audit/qa/hde-epic031/pr-02/secret_redaction_scan.log"
