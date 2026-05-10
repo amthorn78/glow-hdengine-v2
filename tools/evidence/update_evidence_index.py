@@ -295,6 +295,36 @@ EPIC031_PR02_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     },
 ]
 
+EPIC031_PR03_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "epic031.pr03.evidence_family_map",
+        "discovered_physical_path": "audit/qa/hde-epic031/pr-03/evidence_family_map.json",
+        "epic_id": "HDE-EPIC031",
+        "record_type": "epic031_pr03_evidence",
+        "schema_version": "1.0",
+        "produced_at_utc": "2026-05-10T17:05:00Z",
+        "notes": "EPIC031 PR-03 SAFE rails evidence family map for governed index coherence",
+    },
+    {
+        "artifact_key": "epic031.pr03.safe_rails_evidence_coherence",
+        "discovered_physical_path": "audit/qa/hde-epic031/pr-03/safe_rails_evidence_coherence.json",
+        "epic_id": "HDE-EPIC031",
+        "record_type": "epic031_pr03_evidence",
+        "schema_version": "1.0",
+        "produced_at_utc": "2026-05-10T17:05:00Z",
+        "notes": "EPIC031 PR-03 SAFE rails Human Index, Machine Mirror, hash, and path-proof coherence evidence",
+    },
+    {
+        "artifact_key": "epic031.pr03.evidence_refresh_log",
+        "discovered_physical_path": "audit/qa/hde-epic031/pr-03/evidence_refresh.log",
+        "epic_id": "HDE-EPIC031",
+        "record_type": "epic031_pr03_evidence",
+        "schema_version": "1.0",
+        "produced_at_utc": "2026-05-10T17:05:00Z",
+        "notes": "EPIC031 PR-03 evidence refresh command transcript with PASS/FAIL outcomes",
+    },
+]
+
 EPIC030_PR02_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
         "artifact_key": "epic030.pr02.dev_sampler_http_headers",
@@ -729,6 +759,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *EPIC030_PR02_PRIMARY_ARTIFACTS,
             *EPIC031_PR01_PRIMARY_ARTIFACTS,
             *EPIC031_PR02_PRIMARY_ARTIFACTS,
+            *EPIC031_PR03_PRIMARY_ARTIFACTS,
             *EPIC030_PR03_PRIMARY_ARTIFACTS,
             *EPIC030_PR04_PRIMARY_ARTIFACTS,
             *EPIC030_PR05_PRIMARY_ARTIFACTS,

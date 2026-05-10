@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic031/pr-03/evidence_refresh.log
+size_bytes: 1659
+sha256: 8ab5d6f45643afdb57e0acc8fa77454274f9c6f5c19f784785b2cbae414128b5
+mtime_utc: 2026-05-10T19:17:14Z
+produced_at_utc: 2026-05-10T17:05:00Z

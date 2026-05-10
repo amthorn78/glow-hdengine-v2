@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic031/pr-03/safe_rails_evidence_coherence.json
+size_bytes: 3249
+sha256: c542676862c58f8d0447b33f31685ce06678fd4c21a24afdacbd239bca8c037e
+mtime_utc: 2026-05-10T19:17:14Z
+produced_at_utc: 2026-05-10T17:05:00Z
