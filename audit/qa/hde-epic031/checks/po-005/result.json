@@ -1,0 +1,7 @@
+{
+  "retry_after_delta_parsed": true,
+  "schema": "hde_epic031.po005.rate_limit.v1",
+  "source_maps_429": true,
+  "status": "PASS",
+  "typed_429_evidence_present": true
+}

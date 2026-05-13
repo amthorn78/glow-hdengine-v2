@@ -1,0 +1,19 @@
+{
+  "non_success_classification_present": true,
+  "pinned_attempts_present": true,
+  "pytest": {
+    "cmd": [
+      "/usr/bin/python3",
+      "-m",
+      "pytest",
+      "tests/bodygraph/test_vendor_client.py",
+      "-q"
+    ],
+    "returncode": 0,
+    "stderr": "",
+    "stdout": ".............                                                            [100%]\n13 passed in 0.19s\n"
+  },
+  "retry_backoff_artifact_present": true,
+  "schema": "hde_epic031.po004.retry_backoff.v1",
+  "status": "PASS"
+}

@@ -1,0 +1,8 @@
+{
+  "acceptance_map_present": false,
+  "claims_limited_to_evidence_scope": true,
+  "note": "No acceptance-token claim is made by this check. Missing acceptance map or token matrix remains a close-stage artifact posture, not a runtime behavior failure.",
+  "schema": "hde_epic031.po011.acceptance_scope.v1",
+  "status": "PASS",
+  "token_matrix_present": false
+}

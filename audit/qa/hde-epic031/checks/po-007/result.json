@@ -1,0 +1,17 @@
+{
+  "generator_check": {
+    "cmd": [
+      "/usr/local/bin/python",
+      "tools/evidence/generate_epic031_pr02_log_posture.py",
+      "--check"
+    ],
+    "returncode": 0,
+    "stderr": "",
+    "stdout": "EPIC031_PR02_LOG_POSTURE_OK\n"
+  },
+  "scan_has_title": true,
+  "scan_present": true,
+  "schema": "hde_epic031.po007.secret_absence.v1",
+  "scope_live_forbidden": true,
+  "status": "PASS"
+}

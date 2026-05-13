@@ -1,0 +1,55 @@
+{
+  "all_commands_green": true,
+  "coherence_status": "PASS",
+  "commands": [
+    {
+      "cmd": [
+        "/usr/local/bin/python",
+        "tools/evidence/generate_epic031_pr03_evidence_coherence.py",
+        "--check"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "EPIC031_PR03_EVIDENCE_COHERENCE_OK\n"
+    },
+    {
+      "cmd": [
+        "/usr/local/bin/python",
+        "tools/evidence/update_evidence_index.py",
+        "--check"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "[evidence-index] env pins: ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC\n"
+    },
+    {
+      "cmd": [
+        "/usr/local/bin/python",
+        "tools/evidence/validate_evidence_paths.py"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "cmd": [
+        "bash",
+        "ci/checks/check_evidence_index_hash.sh"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "cmd": [
+        "/usr/local/bin/python",
+        "ci/checks/check_mirror_schema.sh"
+      ],
+      "returncode": 0,
+      "stderr": "",
+      "stdout": ""
+    }
+  ],
+  "schema": "hde_epic031.po008.evidence_coherence.v1",
+  "status": "PASS"
+}

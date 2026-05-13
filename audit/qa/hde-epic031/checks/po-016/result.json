@@ -1,0 +1,6 @@
+{
+  "no_live_vendor_policy": true,
+  "schema": "hde_epic031.po016.vendor_version_not_completed.v1",
+  "status": "PASS",
+  "vendor_version_runtime_conformance_claimed": false
+}

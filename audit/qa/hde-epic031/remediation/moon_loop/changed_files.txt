@@ -1,0 +1,21 @@
+# HDE-EPIC031 Moon Loop changed files (sha256)
+# generated_at_utc: 2026-05-13T14:42:06Z
+
+audit/qa/hde-epic031/00_meta/live_qa_harness.py d0b274319117de0b01d536c8e38cc24dd69840ec6921c2dbf0bb120a668ac8be
+audit/qa/hde-epic031/checks/po-006/primary.log 14a7ed380f2891cf42a07b33184ae57c2b36d2a3ee7738738b99bb441e312810
+audit/qa/hde-epic031/checks/po-006/result.json 9fe0951dc334d1b8609804f714b9a17a4a1cddad6b258fd3594568712f2035d8
+
+# PO-008 moon loop remediation
+# generated_at_utc: 2026-05-13T16:58:45Z
+audit/qa/hde-epic031/checks/po-008/primary.log 19cb7bc40b14d9778fbb28398898db394f5c36a92f3c8e0ddc85a4043ef5e474
+audit/qa/hde-epic031/checks/po-008/result.json 354865705e127cad3480a09155fc67a75f357add17b757453117659f8c63de2c
+audit/qa/hde-epic031/pr-03/evidence_family_map.json d71ef9a543d43be1822e270ec7c912039c8c90b8f058d665c222f0353dc28df6
+audit/qa/hde-epic031/pr-03/safe_rails_evidence_coherence.json a62fc187d5aa69cbe493a61b0c5ccff11582353c0d96b63e421290849ba82c33
+audit/qa/hde-epic031/pr-03/evidence_refresh.log 0be1d384e1ac7b0a249606256f86236fce0a45d84920a2cfc0053993addc2000
+docs/evidence/INDEX.json 7c3888fd4a5d9a8f2e5c36ef62a40adf811a0507bb0e194a5164eed10a5a270d
+docs/evidence/INDEX.sha256 94c5648876afb7192f92e7043abde0f4783a0492338da7ea0add6c870ca7535d
+artifacts/evidence_index.jsonl 537e8b0b27858131aed581460dd074fa002965216ce19987d0cc3c325db45017
+artifacts/evidence_index.jsonl.sha256 1a94aad5e2607e6e81bf13ee985c472fd186368a70b99e05d186d8f7d3751dc8
+artifacts/evidence_index.jsonl.path_proof.txt 67ee0166133a10d3ef1f4c73dcdab17a3b2af7c87302b2eb4e67bde0666687b3
+artifacts/compat/AB.json f4616998ad4ce55dc7c716388709f767718a4d3056d866f9c2f73fa4f4703ed7
+artifacts/compat/BA.json f4616998ad4ce55dc7c716388709f767718a4d3056d866f9c2f73fa4f4703ed7

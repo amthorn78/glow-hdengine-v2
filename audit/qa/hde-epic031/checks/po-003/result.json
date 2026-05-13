@@ -1,0 +1,20 @@
+{
+  "closed_evidence_contains_refusal": true,
+  "pytest": {
+    "cmd": [
+      "/usr/local/bin/python",
+      "-m",
+      "pytest",
+      "tests/bodygraph/test_vendor_client.py",
+      "tests/bodygraph/test_resolver_vendor.py",
+      "-q"
+    ],
+    "returncode": 0,
+    "stderr": "",
+    "stdout": ".................                                                        [100%]\n17 passed in 0.04s\n"
+  },
+  "schema": "hde_epic031.po003.refusal.v1",
+  "source_contains_network_blocked": true,
+  "source_contains_provider_refused": true,
+  "status": "PASS"
+}

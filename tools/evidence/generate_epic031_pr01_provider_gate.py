@@ -2,6 +2,7 @@
 """Generate HDE-EPIC031 PR-01 local provider-gate evidence."""
 from __future__ import annotations
 
+import argparse
 import json
 import sys
 from pathlib import Path
@@ -276,7 +277,53 @@ def _evidence_payloads() -> dict[str, object]:
     }
 
 
-def main() -> None:
+def _expected_outputs() -> dict[str, str]:
+    outputs: dict[str, str] = {}
+    outputs.update(JOB_FILES)
+    outputs["artifacts/vendor/policies_pinned.md"] = POLICIES_PINNED
+    outputs["artifacts/vendor/retry_after_parse.log"] = "".join(_json_line(item) for item in RETRY_AFTER_PARSE)
+    for rel, payload in _evidence_payloads().items():
+        outputs[rel] = _json_line(payload)
+    return outputs
+
+
+def _check_mode() -> int:
+    ensure_determinism_env()
+    expected = _expected_outputs()
+    missing: list[str] = []
+    mismatched: list[str] = []
+
+    for rel, expected_text in expected.items():
+        path = ROOT / rel
+        if not path.exists():
+            missing.append(rel)
+            continue
+        actual_text = path.read_text(encoding="utf-8")
+        if actual_text != expected_text:
+            mismatched.append(rel)
+
+    report = {
+        "schema": "hde_epic031.pr01.provider_gate.check.v1",
+        "status": "PASS" if not missing and not mismatched else "FAIL",
+        "missing": missing,
+        "mismatched": mismatched,
+    }
+    if missing or mismatched:
+        print(json.dumps(report, sort_keys=True, indent=2))
+        return 2
+
+    print("EPIC031_PR01_PROVIDER_GATE_OK")
+    return 0
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Generate or check HDE-EPIC031 PR-01 provider-gate evidence.")
+    parser.add_argument("--check", action="store_true", help="Validate current artifacts against canonical expected outputs.")
+    args = parser.parse_args()
+
+    if args.check:
+        return _check_mode()
+
     ensure_determinism_env()
     for rel, text in JOB_FILES.items():
         _write(rel, text)
@@ -284,7 +331,8 @@ def main() -> None:
     _write_governed("artifacts/vendor/retry_after_parse.log", "".join(_json_line(item) for item in RETRY_AFTER_PARSE))
     for rel, payload in _evidence_payloads().items():
         _write_governed(rel, _json_line(payload))
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

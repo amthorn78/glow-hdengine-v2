@@ -1,0 +1,27 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"po-010","check_name":"PO-010","claimed_tokens":[],"command":"python audit/qa/hde-epic031/00_meta/live_qa_harness.py po-010","command_provenance":"Copy/paste from plan","evidence_artifacts":["audit/qa/hde-epic031/checks/po-010/primary.log","audit/qa/hde-epic031/checks/po-010/result.json"],"exit_code":0,"fail_status":"","intended_tokens":[],"pf_refs":["PF10 \u2014 HDE-Build Notes","PF19 \u2014 Glow QA Guide","PF27 \u2014 Canon Plan Templates","PF06 \u2014 Epic Process Guide"],"schema_version":"pf27.step_log_header.v1","status":"PASS","timestamp_utc":"2026-05-13T19:54:21Z"}
+{
+  "blocked_reason": "",
+  "pr01_generator_check_mode_present": true,
+  "pr02_check_mode_result": {
+    "cmd": [
+      "/usr/bin/python3",
+      "tools/evidence/generate_epic031_pr02_log_posture.py",
+      "--check"
+    ],
+    "returncode": 0,
+    "stderr": "",
+    "stdout": "EPIC031_PR02_LOG_POSTURE_OK\n"
+  },
+  "pr03_check_mode_result": {
+    "cmd": [
+      "/usr/bin/python3",
+      "tools/evidence/generate_epic031_pr03_evidence_coherence.py",
+      "--check"
+    ],
+    "returncode": 0,
+    "stderr": "",
+    "stdout": "EPIC031_PR03_EVIDENCE_COHERENCE_OK\n"
+  },
+  "schema": "hde_epic031.po010.fail_closed.v1",
+  "status": "PASS"
+}

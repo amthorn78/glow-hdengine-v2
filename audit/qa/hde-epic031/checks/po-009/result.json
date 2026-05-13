@@ -1,0 +1,9 @@
+{
+  "coherence_status": "PASS",
+  "family_map_present": true,
+  "family_map_type": "dict",
+  "machine_mirror_present": true,
+  "mirror_mentions_epic031": true,
+  "schema": "hde_epic031.po009.mirror_alignment.v1",
+  "status": "PASS"
+}

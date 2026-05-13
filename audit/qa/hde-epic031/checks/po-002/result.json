@@ -1,0 +1,20 @@
+{
+  "closed_default_refusal": true,
+  "no_live_vendor_policy": true,
+  "open_exception_proof_present": true,
+  "pytest": {
+    "cmd": [
+      "/usr/local/bin/python",
+      "-m",
+      "pytest",
+      "tests/bodygraph/test_vendor_client.py",
+      "tests/bodygraph/test_resolver_vendor.py",
+      "-q"
+    ],
+    "returncode": 0,
+    "stderr": "",
+    "stdout": ".................                                                        [100%]\n17 passed in 0.16s\n"
+  },
+  "schema": "hde_epic031.po002.closed_default_open_exception.v1",
+  "status": "PASS"
+}

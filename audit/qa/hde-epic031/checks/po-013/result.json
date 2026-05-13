@@ -1,0 +1,11 @@
+{
+  "active_slice_only": [
+    "HDE-FERM001.2",
+    "HDE-FERM001.3",
+    "HDE-FERM001.4"
+  ],
+  "new_implementation_claim_for_reused_foundation": false,
+  "reused_foundation_classification": "history_only",
+  "schema": "hde_epic031.po013.reused_foundation.v1",
+  "status": "PASS"
+}

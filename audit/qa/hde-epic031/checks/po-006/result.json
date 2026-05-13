@@ -1,0 +1,18 @@
+{
+  "allowed_keys_present": true,
+  "generator_check": {
+    "cmd": [
+      "/usr/bin/python3",
+      "tools/evidence/generate_epic031_pr02_log_posture.py",
+      "--check"
+    ],
+    "returncode": 0,
+    "stderr": "",
+    "stdout": "EPIC031_PR02_LOG_POSTURE_OK\n"
+  },
+  "payload_body_absent": true,
+  "plaintext_secret_absent": true,
+  "raw_secret_header_absent": true,
+  "schema": "hde_epic031.po006.keys_only.v1",
+  "status": "PASS"
+}

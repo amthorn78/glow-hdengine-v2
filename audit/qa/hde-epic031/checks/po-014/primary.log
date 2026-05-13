@@ -1,0 +1,22 @@
+{"captured_env":{"ALLOW_NETWORK":"0","APP_ENV":"dev","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"check_id":"po-014","check_name":"PO-014","claimed_tokens":[],"command":"python audit/qa/hde-epic031/00_meta/live_qa_harness.py po-014","command_provenance":"Copy/paste from plan","evidence_artifacts":["audit/qa/hde-epic031/checks/po-014/primary.log","audit/qa/hde-epic031/checks/po-014/result.json"],"exit_code":0,"fail_status":"","intended_tokens":[],"pf_refs":["PF10 \u2014 HDE-Build Notes","PF19 \u2014 Glow QA Guide","PF27 \u2014 Canon Plan Templates","PF06 \u2014 Epic Process Guide"],"schema_version":"pf27.step_log_header.v1","status":"PASS","timestamp_utc":"2026-05-13T20:50:06Z"}
+{
+  "all_prior_logs_present": true,
+  "implementation_readiness_is_final_qa_outcome": false,
+  "prior_live_qa_logs": {
+    "po-001": true,
+    "po-002": true,
+    "po-003": true,
+    "po-004": true,
+    "po-005": true,
+    "po-006": true,
+    "po-007": true,
+    "po-008": true,
+    "po-009": true,
+    "po-010": true,
+    "po-011": true,
+    "po-012": true,
+    "po-013": true
+  },
+  "schema": "hde_epic031.po014.qa_not_implementation_readiness.v1",
+  "status": "PASS"
+}

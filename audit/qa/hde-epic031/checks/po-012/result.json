@@ -1,0 +1,9 @@
+{
+  "all_required_paths_present": true,
+  "hde_ferm001_2_supported": true,
+  "hde_ferm001_3_supported": true,
+  "hde_ferm001_4_supported": true,
+  "pf09_5_drain_claimed": false,
+  "schema": "hde_epic031.po012.active_subtasks.v1",
+  "status": "PASS"
+}

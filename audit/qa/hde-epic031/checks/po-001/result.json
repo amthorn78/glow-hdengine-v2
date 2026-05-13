@@ -1,0 +1,7 @@
+{
+  "endpoint_catalog_present": true,
+  "has_known_catalog_surfaces": true,
+  "no_epic031_public_surface": true,
+  "schema": "hde_epic031.po001.scope_boundary.v1",
+  "status": "PASS"
+}

@@ -1,0 +1,9 @@
+{
+  "documentation_drainage": "separate",
+  "final_qa_outcome": "separate",
+  "implementation_readiness": "separate",
+  "pf09_5_drainage_required_before_qa_pass": false,
+  "qa_readiness": "separate",
+  "schema": "hde_epic031.po015.truth_classes.v1",
+  "status": "PASS"
+}

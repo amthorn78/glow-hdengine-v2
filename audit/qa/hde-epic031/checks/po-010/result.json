@@ -1,0 +1,26 @@
+{
+  "blocked_reason": "",
+  "pr01_generator_check_mode_present": true,
+  "pr02_check_mode_result": {
+    "cmd": [
+      "/usr/bin/python3",
+      "tools/evidence/generate_epic031_pr02_log_posture.py",
+      "--check"
+    ],
+    "returncode": 0,
+    "stderr": "",
+    "stdout": "EPIC031_PR02_LOG_POSTURE_OK\n"
+  },
+  "pr03_check_mode_result": {
+    "cmd": [
+      "/usr/bin/python3",
+      "tools/evidence/generate_epic031_pr03_evidence_coherence.py",
+      "--check"
+    ],
+    "returncode": 0,
+    "stderr": "",
+    "stdout": "EPIC031_PR03_EVIDENCE_COHERENCE_OK\n"
+  },
+  "schema": "hde_epic031.po010.fail_closed.v1",
+  "status": "PASS"
+}

@@ -1,0 +1,8 @@
+{
+  "closeout_action_performed_by_live_qa": false,
+  "implementation_performed_by_live_qa": false,
+  "live_qa_role": "prove_current_results_only",
+  "remediation_performed_by_live_qa": false,
+  "schema": "hde_epic031.po018.qa_boundary.v1",
+  "status": "PASS"
+}
