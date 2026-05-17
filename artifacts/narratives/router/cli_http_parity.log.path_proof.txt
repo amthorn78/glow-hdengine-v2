@@ -1,5 +1,5 @@
 path: artifacts/narratives/router/cli_http_parity.log
-size_bytes: 847
-sha256: 00354df82418f8b67fe91130525c5440758f787b5ed199c9350fb3b5fc76f929
-mtime_utc: 2026-05-17T15:32:29Z
-produced_at_utc: 2026-05-17T15:33:08Z
+size_bytes: 29053
+sha256: 29eb89567166efd2fd9e1194bd6cd6a05680cfa68214394d5126b5c3571688c4
+mtime_utc: 2026-05-17T16:09:12Z
+produced_at_utc: 2026-05-17T16:09:18Z

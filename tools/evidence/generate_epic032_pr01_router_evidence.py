@@ -2,6 +2,7 @@
 """Generate HDE-EPIC032 PR-01 narrative-router evidence artifacts."""
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import subprocess
@@ -15,6 +16,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from adapter.http_reader import app
+from engine.serializer.canon import sercanon
 from engine.narratives import MISSING_NARRATIVE_KEY, get_pack, route_keys
 from engine.narratives.constants import BANDS, PERSPECTIVES
 from engine.runtime.determinism_env import ensure_determinism_env
@@ -22,6 +24,20 @@ from engine.runtime.determinism_env import ensure_determinism_env
 KEY_TABLE_PATH = ROOT / "audit/gates/narratives/keys_10x4.table.json"
 ABBA_LOG_PATH = ROOT / "artifacts/narratives/router/parity_abba.log"
 CLI_HTTP_LOG_PATH = ROOT / "artifacts/narratives/router/cli_http_parity.log"
+EXPECTED_CATEGORIES: tuple[str, ...] = (
+    "heat",
+    "harmony",
+    "communication",
+    "alignment",
+    "comfort",
+    "consistency",
+    "expansion",
+    "creativity",
+    "drive",
+    "balance",
+)
+EXPECTED_KEY_TABLE_ROWS = 40
+RELEASE_ID = "0" * 64
 
 
 def _canonical_json_bytes(value: object) -> bytes:
@@ -41,12 +57,36 @@ def _write_text(path: Path, lines: Iterable[str]) -> None:
     path.write_text(text, encoding="utf-8")
 
 
+def _supported_cases() -> list[tuple[str, str, str]]:
+    return [
+        (category, band, perspective)
+        for category in EXPECTED_CATEGORIES
+        for band in BANDS
+        for perspective in PERSPECTIVES
+    ]
+
+
+def _validate_pack_roster() -> None:
+    pack = get_pack()
+    actual = tuple(category for category in EXPECTED_CATEGORIES if category in pack.categories)
+    missing = sorted(set(EXPECTED_CATEGORIES) - pack.categories)
+    extra = sorted(pack.categories - set(EXPECTED_CATEGORIES))
+    if missing or extra or actual != EXPECTED_CATEGORIES:
+        raise SystemExit(
+            "ROUTER_CATEGORY_ROSTER_MISMATCH:"
+            f"missing={','.join(missing) or '-'};extra={','.join(extra) or '-'}"
+        )
+
+
 def _key_table() -> list[dict[str, str]]:
     pack = get_pack()
+    _validate_pack_roster()
     rows: list[dict[str, str]] = []
-    for category in sorted(pack.categories):
+    for category in EXPECTED_CATEGORIES:
         for band in BANDS:
             routed = route_keys(category, band, "shared", viewer_top=None, flags=None)
+            if MISSING_NARRATIVE_KEY in routed.values():
+                raise SystemExit(f"ROUTER_KEY_TABLE_MISSING:{category}:{band}")
             rows.append(
                 {
                     "band": band,
@@ -55,23 +95,19 @@ def _key_table() -> list[dict[str, str]]:
                     "shared_key": routed["shared_key"],
                 }
             )
+    if len(rows) != EXPECTED_KEY_TABLE_ROWS:
+        raise SystemExit(f"ROUTER_KEY_TABLE_ROW_COUNT:{len(rows)}")
     return rows
 
 
 def _generate_abba_log() -> None:
-    pack = get_pack()
+    _validate_pack_roster()
     cases: list[tuple[str, str, str]] = [
-        ("harmony", "Cool", "shared"),
-        ("heat", "Open", "a_to_b"),
-        ("balance", "Glow", "b_to_a"),
+        *_supported_cases(),
         ("unknown", "Cool", "shared"),
         ("harmony", "Unknown", "shared"),
         ("harmony", "Cool", "unknown"),
     ]
-    for category in sorted(pack.categories):
-        for band in BANDS:
-            cases.append((category, band, "a_to_b"))
-            cases.append((category, band, "b_to_a"))
 
     lines = [
         "schema=hde_epic032.pr01.router_abba.v1",
@@ -103,7 +139,7 @@ def _generate_abba_log() -> None:
         )
 
     abba_ok = True
-    for category in sorted(pack.categories):
+    for category in EXPECTED_CATEGORIES:
         for band in BANDS:
             ab = route_keys(category, band, "a_to_b", viewer_top=None, flags=None)
             ba = route_keys(category, band, "b_to_a", viewer_top=None, flags=None)
@@ -171,7 +207,7 @@ def _run_cli_admin(category: str, band: str, perspective: str, admin_out: Path) 
             "TZ": "UTC",
             "SAFE_MODE": "1",
             "ALLOW_NETWORK": "0",
-            "RELEASE_ID": "0" * 64,
+            "RELEASE_ID": RELEASE_ID,
         }
     )
     cmd = [
@@ -195,11 +231,8 @@ def _run_cli_admin(category: str, band: str, perspective: str, admin_out: Path) 
 
 
 def _generate_cli_http_log() -> None:
-    cases = [
-        ("harmony", "Cool", "shared"),
-        ("heat", "Open", "a_to_b"),
-        ("unknown", "Cool", "shared"),
-    ]
+    _validate_pack_roster()
+    cases = _supported_cases()
     client = app.test_client()
     lines = [
         "schema=hde_epic032.pr01.router_cli_http_parity.v1",
@@ -228,27 +261,51 @@ def _generate_cli_http_log() -> None:
                 or resp.headers.get("X-Narrative-Composition")
                 or ""
             )
-            http_composition = resp.headers.get("X-Narrative-Composition") or ""
-            cli_key = str(cli_payload.get("key", ""))
-            cli_composition = str(cli_payload.get("composition_id", ""))
+            http_payload = {
+                "composition_id": resp.headers.get("X-Narrative-Composition") or "",
+                "key": http_key,
+                "pack_sha": resp.headers.get("X-Narrative-Pack-Sha") or "",
+                "release_id": RELEASE_ID,
+            }
+            expected_fields = {"composition_id", "key", "pack_sha", "release_id"}
+            fields_equal = (
+                set(cli_payload) == expected_fields and cli_payload == http_payload
+            )
+            cli_bytes = admin_out.read_bytes()
+            cli_canonical = cli_bytes == sercanon(cli_payload)
+            sidecar = admin_out.with_name(f"{admin_out.name}.sha256")
+            if sidecar.exists():
+                sidecar_digest = sidecar.read_text(encoding="utf-8").strip()
+            else:
+                sidecar_digest = ""
+            sidecar_equal = sidecar_digest == hashlib.sha256(cli_bytes).hexdigest()
             equal = (
                 resp.status_code == 200
-                and cli_key == http_key
-                and cli_composition == http_composition
+                and fields_equal
+                and cli_canonical
+                and sidecar_equal
             )
             parity_ok = parity_ok and equal
             lines.append(
                 "case={idx:03d} category={category} band={band} perspective={perspective} "
-                "cli_key={cli_key} http_key={http_key} cli_composition={cli_comp} "
-                "http_composition={http_comp} parity_equal={equal}".format(
+                "key={key} composition_id={composition_id} pack_sha_equal={pack_sha_equal} "
+                "release_id_equal={release_id_equal} fields_equal={fields_equal} "
+                "cli_canonical={cli_canonical} sidecar_equal={sidecar_equal} parity_equal={equal}".format(
                     idx=idx,
                     category=category,
                     band=band,
                     perspective=perspective,
-                    cli_key=cli_key,
-                    http_key=http_key,
-                    cli_comp=cli_composition,
-                    http_comp=http_composition,
+                    key=http_payload["key"],
+                    composition_id=http_payload["composition_id"],
+                    pack_sha_equal=str(
+                        cli_payload.get("pack_sha") == http_payload["pack_sha"]
+                    ).lower(),
+                    release_id_equal=str(
+                        cli_payload.get("release_id") == RELEASE_ID
+                    ).lower(),
+                    fields_equal=str(fields_equal).lower(),
+                    cli_canonical=str(cli_canonical).lower(),
+                    sidecar_equal=str(sidecar_equal).lower(),
                     equal=str(equal).lower(),
                 )
             )

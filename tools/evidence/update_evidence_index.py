@@ -448,8 +448,8 @@ EPIC032_PR01_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
         "epic_id": "HDE-EPIC032",
         "record_type": "epic032_pr01_evidence",
         "schema_version": "1.0",
-        "tokens": ["JSON_CANONICAL_CHECK_OK"],
-        "notes": "EPIC032 PR-01 canonical narrative router 10x4 key coverage table for HDE-FERM002.2",
+        "tokens": ["NARR_REGISTRY_CLOSURE_OK", "JSON_CANONICAL_CHECK_OK"],
+        "notes": "EPIC032 PR-01 canonical narrative router 10x4 registry-closure coverage table for HDE-FERM002.2",
     },
     {
         "artifact_key": "epic032.pr01.router_parity_abba",
