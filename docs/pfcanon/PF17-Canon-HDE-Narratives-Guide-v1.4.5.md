@@ -2,12 +2,12 @@
 
 ## 0.1 Document Control
 
-**Title:** PF17-Canon-HDE Narratives Guide  
-**Version:** v1.4.4  
+**Title:** PF17-Canon-HDE-Narratives-Guide  
+**Version:** v1.4.5  
 **Status:** Canon  
-**Effective** **date**: 2025-12-03
+**Effective** **date**: 2026-05-14
 
-**Last Update Gate:** Audit 2025-12-03  
+**Last Update Gate:** BN 10.9.8 A4-5  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
 ---
@@ -122,37 +122,30 @@ Specify a **deterministic, LLM-free** layer that converts a set of keys into a s
 
 * **No A7 proof details here.** PF17 does not restate A7 bytes; it only notes that proofs require **env-gate headers** and a **composite A7 proof JSON** (PF12 schema) on a **cataloged success route**.
 
-### **1.1.1 EPIC-011 preservation boundary (historical; pattern for future epics)**
+  ### **1.1.1 Non-narrative epic boundary (historical; pattern for future epics)**
 
-For **EPIC-011 — Vendor Ingest & Data Durability (failed)**, Aux narratives were treated as **preservation surfaces**, not a feature surface. This pattern remains in force for any future “durability-only” epics:
+For **EPIC-011 — Vendor Ingest & Data Durability (failed)**, Aux narratives were treated as **preservation surfaces**, not a feature surface. This pattern remains in force for any future epic whose scope is durability, ingest, infrastructure, provider rails, evidence coherence, or repo documentation rather than narrative content.
 
-* **No new narrative semantics under EPIC-011.**  
-   EPIC-011 was allowed to add durability structures, tests, and headers-only evidence around Aux narratives, but it **must not** change:
-
-  * the set of narrative packs and their IDs,
-
-  * pack text or composition,
-
-  * suppression rules, or
-
-  * which output surfaces exist (Aux API and CLI admin preview) or how packs are routed to them.
-
-* **Pattern for future durability-only epics.**  
-   The same boundary applies to any future epic whose scope is durability, ingest, or infrastructure rather than content:
-
-  * narrative packs and semantics stay owned here in PF17;
-
-  * durability/infra epics may add tests, headers-only proofs, and indices around these surfaces;
-
-  * content changes (new or revised text, suppression rules, pack coverage/routing, new surfaces) must be owned by **content epics**, not durability epics.
-
+* **No new narrative semantics under non-narrative epics.**  
+   Non-narrative epics may add durability structures, tests, headers-only evidence, rails/provider proofs, logs, evidence coherence artifacts, and indices around Aux narratives, but they **must not** change:  
+  * the set of narrative packs and their IDs,  
+  * pack text or composition,  
+  * suppression rules,  
+  * narrative router parity or narrative registry closure,  
+  * which output surfaces exist (Aux API and CLI admin preview), or  
+  * how packs are routed to those surfaces.  
+* **HDE-EPIC031 boundary (SAFE rails Fermentation slice).**  
+   HDE-EPIC031 evidence for SAFE rails open posture, keys-only observability, and governed evidence/indexing coherence does **not** close narrative router parity, narrative registry closure, DB bridge parity, HDAPI v2 runtime conformance, or any PF17 narrative acceptance gate. Its PR evidence and repo-docs sweep must not be cited as proof that any PF17 narrative semantics, pack contents, suppression rule, pack coverage, pack routing, Aux behavior, or CLI admin preview behavior changed.  
+* **Pattern for future non-narrative epics.**  
+   The same boundary applies to any future epic whose scope is durability, ingest, infrastructure, provider rails, evidence coherence, or repo documentation rather than content:  
+  * narrative packs and semantics stay owned here in PF17;  
+  * non-narrative epics may add tests, headers-only proofs, provider-rails proofs, logs, and indices around these surfaces;  
+  * content changes (new or revised text, suppression rules, pack coverage/routing, new surfaces, or closure of narrative router parity/registry closure) must be owned by content or narrative epics, not by non-narrative provider, infrastructure, or evidence epics.  
 * **Scope routing (titles-only).**  
-   PF17 remains the single home for narrative semantics (packs, keys, suppression, and surfaces).
-
-  * Epic-level planning and acceptance rosters now live in **PF20 — Canon-HDE-Phased Epics**; **PF16 — HD Engine Epics Map** is historical only.
-
+   PF17 remains the single home for narrative semantics (packs, keys, suppression, and surfaces).  
+  * Epic-level planning and acceptance rosters now live in **PF20 — Canon-HDE-Phased Epics**; **PF16 — HD Engine Epics Map** is historical only.  
   * Token semantics and epic acceptance sets live in **HDE-Governance**.  
-     Any functional change to Aux narratives or CLI preview content **must** be owned by a separate epic that explicitly claims those surfaces in PF20; it is out of scope for EPIC-011 and for any purely durability-focused epic.
+     Any functional change to Aux narratives or CLI preview content **must** be owned by a separate epic that explicitly claims those surfaces in PF20; it is out of scope for EPIC-011, HDE-EPIC031, and any purely durability-, provider-, infrastructure-, repo-docs-, or evidence-focused epic.
 
 ---
 

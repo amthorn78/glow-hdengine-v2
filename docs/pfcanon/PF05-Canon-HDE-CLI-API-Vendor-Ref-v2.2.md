@@ -4,13 +4,13 @@
 
 **Title:** PF05-Canon-HDE-CLI-API-Vendor-Ref
 
-**Version:** v2.1.4
+**Version:** v2.2
 
 **Status:** Canon
 
-**Effective date:** 2026-05-07
+**Effective date:** 2026-05-15
 
-**Last Update Gate:** canon-update-hdapi-v2-conformance
+**Last Update Gate:**  BN 10.9.8 A16
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -2974,33 +2974,55 @@ Domains (ms):
 
 One `timeout_profile ∈ {small, default, long}` pins the triple.
 
-### **7.3.3 Retries (deterministic classes)**
+### **7.3.3 Retries, status classification, and redirects (deterministic classes)**
 
-`max_attempts ∈ {0,1,2,3}` (includes the initial try).  
- Retryable classes: `{network_error, 5xx}`. Do not retry other 4xx; 429 handling is defined below (no auto-success in EPIC011).
+`max_attempts ∈ {0,1,2,3}` (includes the initial try).
+
+Retryable classes are exactly `{network_error, 5xx}`.
+
+Do not retry `429`, other `4xx`, `3xx`, or other non-200 statuses outside `4xx` and `5xx`.
+
+Non-200 HTTP statuses outside `4xx` and `5xx` MUST be classified as `http_status_other`, mapped to typed error code `PROVIDER_ERROR`, and emitted with `retried:false` in governed proof artifacts when that fact is captured.
+
+The default vendor request path MUST NOT follow redirects. If the provider returns a redirect status such as `302` with a `Location` header, PF05 requires the original status, response body, and response headers to be surfaced for classification rather than following the redirect.
+
+HTTP error responses captured by the default request path MUST be converted into status, body, and header tuples before classification. This allows the same typed mapping rules to apply to injected and default request paths.
 
 ### **7.3.4 Backoff policy (deterministic; no jitter)**
 
-`backoff ∈ {none, fixed, exponential}` with closed integer params.  
- Schedule respects `total_timeout_ms`; no random jitter.
+`backoff ∈ {none, fixed, exponential}` with closed integer params.
+
+Schedule respects `total_timeout_ms`; no random jitter.
 
 ### **7.3.5 Rate limits & Retry-After (429)**
 
-Map **429** to a typed `PROVIDER_RATE_LIMITED` error (numeric-free).  
- If `Retry-After` parses, surface `retry_after_ms` (int ≥ 0); otherwise omit.  
- EPIC011 does not auto-recover on 429; any success-path retry belongs to a later epic.
+Map **429** to a typed `PROVIDER_RATE_LIMITED` error.
+
+If `Retry-After` parses, surface `retry_after_ms` as an integer greater than or equal to 0; otherwise omit it.
+
+EPIC011 does not auto-recover on 429; any success-path retry belongs to a later epic.
 
 ### **7.3.6 Observability (keys-only)**
 
-Bounded labels; never log request/response bodies or secret header values; secrets redacted.
+Vendor SAFE-rails observability MUST be keys-only, bounded, and secret-safe.
+
+Vendor logs and persisted vendor log samples MUST NOT contain request bodies, response bodies, plaintext secrets, raw secret header values, vendor payload bytes, unbounded labels, or user identifiers.
+
+Allowed vendor observability is limited to bounded keys and labels such as route class, rails state, timeout profile, retry/backoff profile, outcome class, status class, and deterministic success or failure class.
+
+Failure classes for governed vendor-log proof MAY include `429`, `4xx`, `5xx`, and `network_error`; other non-200 status handling is classified separately as `http_status_other` when captured by the provider-gate proof.
+
+Log timestamps or ordering markers used for deterministic proof MUST be controlled so they do not create nondeterministic public or acceptance bytes.
+
+PR-specific vendor log samples MUST remain under the PR-specific governed audit path when a shared artifact family would otherwise be overwritten.
 
 ### **7.3.7 Failure posture (typed, numeric-free)**
 
-Refusal on closed rails (no I/O); deterministic mapping per §7.2;
+Refusal on closed rails requires no I/O; deterministic mapping follows §7.2.
 
-* timeouts/exhaustion → `PROVIDER_UNAVAILABLE`
-
-* malformed vendor JSON → `PROVIDER_BAD_RESPONSE`
+* timeouts/exhaustion → `PROVIDER_UNAVAILABLE`  
+* malformed vendor JSON → `PROVIDER_BAD_RESPONSE`  
+* non-200 statuses outside `4xx` and `5xx` → `PROVIDER_ERROR` with internal class `http_status_other`
 
 ### **7.3.8 Acceptance to flip rails**
 
@@ -4326,6 +4348,130 @@ These anchors are PF05 surface-proof candidates only. Final evidence schema, Hum
   * `audit/docdeltas/hde-epic030_drain_targets.md` *(drain-targets ledger surfaced by OPS-03)*  
 * **OPS-03 non-overclaim posture**  
   * OPS-03 is evidence packaging and close-pack surfacing only. It does not rerun QA, execute vendor calls, modify implementation, edit PF-Canon, claim PF09.2 drainage, create new acceptance claims, or authorize an immediate PF09.2 status change by itself.
+
+#### **D.11r EPIC031 PR-01 SAFE rails provider-gate proof anchors**
+
+* `artifacts/vendor/policies_pinned.md` *(provider policy evidence for pinned timeouts, bounded attempts, deterministic backoff, and non-retry classification for non-200 statuses outside `4xx` and `5xx`)*  
+* `artifacts/vendor/policies_pinned.md.path_proof.txt` *(governed path-proof for the pinned provider policy evidence)*  
+* `artifacts/vendor/retry_after_parse.log` *(deterministic `Retry-After` parsing proof for delta-seconds, HTTP-date, invalid, unsupported, and overflow values)*  
+* `audit/qa/hde-epic031/pr-01/open_rails_policy_proof.json` *(governed PR-01 proof for open-rails provider-gate policy, no-live-vendor posture, non-retry `http_status_other` handling, and classified side-effect families)*  
+* `audit/qa/hde-epic031/pr-01/open_rails_policy_proof.json.path_proof.txt` *(governed path-proof for the PR-01 open-rails policy proof)*  
+* `audit/qa/hde-epic031/pr-01/retry_backoff_429_proof.json` *(governed PR-01 proof for retry, backoff, 429 handling, `Retry-After`, and non-4xx non-5xx `PROVIDER_ERROR` mapping)*  
+* `audit/qa/hde-epic031/pr-01/retry_backoff_429_proof.json.path_proof.txt` *(governed path-proof for the retry/backoff proof)*  
+* `audit/qa/hde-epic031/pr-01/closed_default_open_exception_rails.json` *(governed PR-01 proof that local mocked or fixture-backed provider results are the only allowed open exception in the no-live-call proof lane)*  
+* `tools/evidence/generate_epic031_pr01_provider_gate.py` *(governed evidence generator for the PR-01 provider-gate proof family)*  
+* `tests/bodygraph/test_vendor_client.py` *(vendor-client regression proof for retry classes, 429 behavior, non-redirect handling, default request-path classification, and keys-only logging where applicable)*  
+* `tests/bodygraph/test_resolver_vendor.py` *(resolver-vendor regression proof for the PR-01 provider-gate slice)*
+
+#### **D.11s EPIC031 PR-02 SAFE rails observability proof anchors**
+
+* `audit/qa/hde-epic031/pr-02/bounded_label_observability.json` *(governed PR-02 evidence proving bounded labels, route observability, timeout-profile observability, and observed failure classes)*  
+* `audit/qa/hde-epic031/pr-02/bounded_label_observability.json.path_proof.txt` *(governed path-proof for the bounded-label observability proof)*  
+* `audit/qa/hde-epic031/pr-02/keys_only_log_redaction.json` *(governed PR-02 evidence proving keys-only logs, no payload body, no plaintext secret, no raw secret header, no forbidden hits, and no key violations)*  
+* `audit/qa/hde-epic031/pr-02/keys_only_log_redaction.json.path_proof.txt` *(governed path-proof for the keys-only log-redaction proof)*  
+* `audit/qa/hde-epic031/pr-02/secret_redaction_scan.log` *(governed deterministic redaction scan for PR-02 vendor log posture)*  
+* `audit/qa/hde-epic031/pr-02/secret_redaction_scan.log.path_proof.txt` *(governed path-proof for the redaction scan)*  
+* `audit/qa/hde-epic031/pr-02/vendor_keys_only.sample.jsonl` *(PR-specific governed vendor keys-only JSONL sample; do not overwrite shared DB-bridge log evidence with this vendor sample)*  
+* `audit/qa/hde-epic031/pr-02/vendor_keys_only.sample.jsonl.path_proof.txt` *(governed path-proof for the PR-specific vendor keys-only sample)*  
+* `audit/qa/hde-epic031/pr-02/vendor_rails_scope.txt` *(PR-specific governed vendor rails-scope artifact proving closed deterministic rails, no live vendor calls, and detected vendor-route scope for PR-02)*  
+* `audit/qa/hde-epic031/pr-02/vendor_rails_scope.txt.path_proof.txt` *(governed path-proof for the PR-specific vendor rails-scope artifact)*  
+* `ci/jobs/logs_keys_only_redaction.yml` *(local CI job definition for keys-only log-redaction proof under closed rails)*  
+* `tools/evidence/generate_epic031_pr02_log_posture.py` *(governed evidence generator for the PR-02 bounded-label, redaction, scan, vendor-sample, and vendor-scope evidence family)*  
+* `tools/evidence/update_evidence_index.py` *(single-writer evidence-index tooling binding the PR-02 evidence rows to the Human Evidence Index and Machine Evidence Mirror)*  
+* `tests/evidence/test_evidence_skeleton.py` *(evidence skeleton regression proof preserving non-EPIC020 mirror schema validation while scoping the EPIC020 token-roster assertion to EPIC020 records)*  
+* `docs/evidence/INDEX.json` *(Human Evidence Index carrying the EPIC031 PR-01 and PR-02 evidence rows)*  
+* `docs/evidence/INDEX.sha256` *(hash sentinel refreshed for the Human Evidence Index update)*  
+* `artifacts/evidence_index.jsonl` *(Machine Evidence Mirror carrying the EPIC031 PR-01 and PR-02 evidence rows)*  
+* `artifacts/evidence_index.jsonl.sha256` *(hash sentinel refreshed for the Machine Evidence Mirror update)*
+
+#### **D.11t EPIC031 Live QA proof anchors for Step-0A through po-006**
+
+* **Step-0A discovery and harness setup**  
+  * `audit/qa/hde-epic031/00_meta/live_qa_harness.py` *(Live QA harness used by EPIC031 check execution)*  
+  * `audit/qa/hde-epic031/checks/step-0a-discovery/primary.log` *(canonical step receipt for Step-0A PASS evidence under closed deterministic rails)*  
+  * `audit/qa/hde-epic031/checks/step-0a-discovery/discovery.json` *(check-root discovery sidecar for rails, surfaces, and seed-path presence)*  
+  * The conflicting plan action reference to `audit/qa/hde-epic031/00_meta/discovery.json` is not a PF05 proof anchor for Step-0A; use the check-root discovery path above.  
+* **Step-0B doc-delta capture**  
+  * `audit/docdeltas/hde-epic031_doc_deltas.md` *(repo-root doc-delta surface for EPIC031)*  
+  * `audit/qa/hde-epic031/00_meta/doc_deltas.md` *(QA-root doc-delta surface for EPIC031, including later PO-006 remediation notes where applicable)*  
+  * `audit/qa/hde-epic031/checks/step-0b-doc-delta/primary.log` *(canonical step receipt for Step-0B PASS evidence)*  
+* **po-001 Fermentation first-slice scope boundary**  
+  * `audit/qa/hde-epic031/checks/po-001/primary.log` *(canonical step receipt for po-001 PASS evidence)*  
+  * `audit/qa/hde-epic031/checks/po-001/result.json` *(scope-boundary proof that no EPIC031 public surface was added and that later vendor-version, database, router, public-surface, close-pack, and acceptance expansion remain excluded for this slice)*  
+  * `audit/qa/hde-epic031/pr-03/evidence_family_map.json` *(scope-guardrail companion relied on by po-001 for acceptance-token and follow-up-scope non-expansion facts)*  
+  * `audit/qa/hde-epic031/pr-03/safe_rails_evidence_coherence.json` *(scope-guardrail companion relied on by po-001 for HDAPI v2 runtime, live-vendor, and PO-only smoke non-execution facts)*  
+* **po-002 closed-by-default provider access and bounded opening**  
+  * `audit/qa/hde-epic031/checks/po-002/primary.log` *(canonical step receipt for po-002 PASS evidence)*  
+  * `audit/qa/hde-epic031/checks/po-002/result.json` *(closed-default refusal, bounded opening, provider-test, and no-live-vendor proof for po-002)*  
+  * `audit/qa/hde-epic031/pr-02/vendor_rails_scope.txt` *(local deterministic vendor-scope proof relied on by po-002)*  
+* **po-003 deterministic typed provider refusal before unsafe input or ingest**  
+  * `audit/qa/hde-epic031/checks/po-003/primary.log` *(canonical step receipt for po-003 PASS evidence)*  
+  * `audit/qa/hde-epic031/checks/po-003/result.json` *(typed provider-refusal proof for closed SAFE rails before unsafe provider input or ingest)*  
+  * `engine/bodygraph/resolver.py` *(resolver control-flow evidence relied on by po-003 for refusal before vendor input resolution)*  
+  * `tests/bodygraph/test_resolver_vendor.py` *(regression proof relied on by po-003 for closed SAFE rails refusal before input or ingest)*  
+* **po-004 pinned policy, non-success classification, and retry/backoff proof**  
+  * `audit/qa/hde-epic031/checks/po-004/primary.log` *(canonical step receipt for po-004 PASS evidence)*  
+  * `audit/qa/hde-epic031/checks/po-004/result.json` *(non-success classification, pinned-attempts, and retry/backoff artifact-presence proof for po-004)*  
+* **po-005 Retry-After, typed 429, and rate-limit proof**  
+  * `audit/qa/hde-epic031/checks/po-005/primary.log` *(canonical step receipt for po-005 PASS evidence)*  
+  * `audit/qa/hde-epic031/checks/po-005/result.json` *(Retry-After delta parsing, 429 source mapping, and typed 429 evidence proof for po-005)*  
+* **po-006 keys-only observability and Moon Loop remediation**  
+  * `audit/qa/hde-epic031/checks/po-006/primary.log` *(canonical step receipt for final po-006 PASS evidence after Moon Loop remediation)*  
+  * `audit/qa/hde-epic031/checks/po-006/result.json` *(allowed-keys, payload-body-absence, plaintext-secret-absence, and raw-secret-header-absence proof for po-006)*  
+  * `audit/qa/hde-epic031/remediation/moon_loop/patch.diff` *(Moon Loop remediation patch proving the QA-created harness predicate was aligned to canonical redaction schema fields)*  
+  * `audit/qa/hde-epic031/remediation/moon_loop/changed_files.txt` *(Moon Loop changed-files proof with sha256 values for the changed harness and po-006 current-state evidence)*  
+  * The po-006 Moon Loop remediation is accepted only as QA-harness correction evidence. It does not create new PF05 bytes, new public routes, new acceptance tokens, new vendor runtime behavior, or a substitute for the PR-02 governed keys-only proof family listed in **D.11s**.
+
+#### **D.11u EPIC031 Live QA proof anchors for po-007 to po-009**
+
+* **po-007 sensitive provider data absence from QA-visible diagnostics**  
+  * `audit/qa/hde-epic031/checks/po-007/primary.log` *(canonical step receipt for po-007 PASS evidence under closed deterministic rails)*  
+  * `audit/qa/hde-epic031/checks/po-007/result.json` *(redaction-scan and no-live-vendor-scope proof for po-007, including `scan_present: true`, `scope_live_forbidden: true`, and `status: PASS`)*  
+* **po-008 governed human and machine evidence coherence**  
+  * `audit/qa/hde-epic031/checks/po-008/primary.log` *(canonical step receipt for final po-008 PASS evidence after Moon Loop remediation)*  
+  * `audit/qa/hde-epic031/checks/po-008/result.json` *(evidence-coherence proof for po-008, including `all_commands_green: true`, `coherence_status: PASS`, and `status: PASS`)*  
+  * `audit/qa/hde-epic031/remediation/moon_loop/patch.diff` *(po-008 Moon Loop patch capture for governed coherence/index remediation)*  
+  * `audit/qa/hde-epic031/remediation/moon_loop/changed_files.txt` *(po-008 Moon Loop changed-files proof for refreshed coherence/index artifacts, hash sentinels, Machine Mirror artifacts, path proofs, and compat AB/BA filesystem mtime normalization with bytes unchanged)*  
+* **po-009 machine mirror and family-map alignment**  
+  * `audit/qa/hde-epic031/checks/po-009/primary.log` *(canonical step receipt for po-009 PASS evidence under closed deterministic rails)*  
+  * `audit/qa/hde-epic031/checks/po-009/result.json` *(machine-mirror and family-map alignment proof for po-009, including `family_map_present: true`, `machine_mirror_present: true`, `mirror_mentions_epic031: true`, and `status: PASS`)*
+
+#### **D.11v EPIC031 Live QA proof anchors for po-010 to po-012**
+
+* **po-010 generated-proof fail-closed posture**  
+  * `audit/qa/hde-epic031/checks/po-010/primary.log` *(canonical step receipt for po-010 PASS evidence after the prior PR-01 check-mode blocker was resolved)*  
+  * `audit/qa/hde-epic031/checks/po-010/result.json` *(generated-proof fail-closed proof for po-010, including `pr01_generator_check_mode_present: true`, PR-02 generator check success, PR-03 coherence check success, and `status: PASS`)*  
+  * `tools/evidence/generate_epic031_pr01_provider_gate.py` *(PR-01 provider-gate generator check-mode proof relied on by po-010)*  
+* **po-011 acceptance-claim boundary**  
+  * `audit/qa/hde-epic031/checks/po-011/primary.log` *(canonical step receipt for po-011 PASS evidence)*  
+  * `audit/qa/hde-epic031/checks/po-011/result.json` *(acceptance-claim boundary proof for po-011, including no claimed tokens, `claims_limited_to_evidence_scope: true`, and the note that missing acceptance map or token matrix remains close-stage posture rather than runtime behavior failure)*  
+* **po-012 active Fermentation subtask supportability without PF09.5 drainage claim**  
+  * `audit/qa/hde-epic031/checks/po-012/primary.log` *(canonical step receipt for po-012 PASS evidence)*  
+  * `audit/qa/hde-epic031/checks/po-012/result.json` *(supportability proof for HDE-FERM001.2, HDE-FERM001.3, and HDE-FERM001.4 from current evidence, with `pf09_5_drain_claimed: false` and `status: PASS`)*
+
+#### **D.11w EPIC031 Live QA proof anchors for po-013 to po-015**
+
+* **po-013 reused foundation remains history-only**  
+  * `audit/qa/hde-epic031/checks/po-013/primary.log` *(canonical step receipt for po-013 PASS evidence under closed deterministic rails)*  
+  * `audit/qa/hde-epic031/checks/po-013/result.json` *(reused-foundation proof for po-013, including active-slice-only posture, `new_implementation_claim_for_reused_foundation: false`, `reused_foundation_classification: history_only`, and `status: PASS`)*  
+* **po-014 implementation readiness is not final QA outcome**  
+  * `audit/qa/hde-epic031/checks/po-014/primary.log` *(canonical step receipt for po-014 PASS evidence under closed deterministic rails)*  
+  * `audit/qa/hde-epic031/checks/po-014/result.json` *(prior-log and readiness-separation proof for po-014, including `all_prior_logs_present: true`, `implementation_readiness_is_final_qa_outcome: false`, and `status: PASS`)*  
+* **po-015 truth-class and drainage separation**  
+  * `audit/qa/hde-epic031/checks/po-015/primary.log` *(canonical step receipt for po-015 PASS evidence under closed deterministic rails)*  
+  * `audit/qa/hde-epic031/checks/po-015/result.json` *(truth-class separation proof for po-015, including implementation readiness, QA readiness, final QA outcome, and documentation drainage as separate, with `pf09_5_drainage_required_before_qa_pass: false`)*
+
+#### **D.11x EPIC031 Live QA proof anchors for po-016 to po-018**
+
+* **po-016 vendor-version runtime conformance is not completed by this epic**  
+  * `audit/qa/hde-epic031/checks/po-016/primary.log` *(canonical step receipt for po-016 PASS evidence under closed deterministic rails)*  
+  * `audit/qa/hde-epic031/checks/po-016/result.json` *(vendor-version runtime non-claim proof for po-016, including `vendor_version_runtime_conformance_claimed: false`, `no_live_vendor_policy: true`, and `status: PASS`)*  
+* **po-017 live vendor behavior is not claimed from local proof**  
+  * `audit/qa/hde-epic031/checks/po-017/primary.log` *(canonical step receipt for po-017 PASS evidence under closed deterministic rails)*  
+  * `audit/qa/hde-epic031/checks/po-017/result.json` *(live-vendor-behavior non-claim proof for po-017, including `live_vendor_behavior_claimed: false`, `live_vendor_calls_forbidden_recorded: true`, and `status: PASS`)*  
+* **po-018 Live QA stays QA, not implementation, remediation, or closeout action**  
+  * `audit/qa/hde-epic031/checks/po-018/primary.log` *(canonical step receipt for po-018 PASS evidence under closed deterministic rails)*  
+  * `audit/qa/hde-epic031/checks/po-018/result.json` *(Live QA proof-only boundary proof for po-018, including `implementation_performed_by_live_qa: false`, `remediation_performed_by_live_qa: false`, `closeout_action_performed_by_live_qa: false`, and `live_qa_role: prove_current_results_only`)*
 
 ### **D.12 BodyGraph adapter data-source & invariance (PF10-AA)**
 

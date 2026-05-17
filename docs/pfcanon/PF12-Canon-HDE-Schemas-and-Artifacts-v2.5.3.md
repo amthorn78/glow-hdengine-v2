@@ -4,13 +4,13 @@
 
 **Title:** PF12-Canon-HDE-Schemas-and-Artifacts
 
-**Version:** v2.4.7
+**Version:** v2.5.3
 
 **Status:** Canon
 
-**Effective date:** 2026-05-07
+**Effective date:** 2026-05-16
 
-**Last Update Gate:** canon-update-hdapi-v2-conformance
+**Last Update Gate:** BN 10.9.8 A16
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -126,7 +126,9 @@ Scope note (directory-only).
 
 * This rail applies to directory names only. Filenames MAY contain uppercase characters unless separately forbidden by canon.  
 * Canon-defined close-pack filenames such as `audit/EPIC-030_MANIFEST.json` and `audit/EPIC-030_close_report.md` are not directory-case drift when every directory segment remains lowercase ASCII and the filename follows the governed close-pack pattern.  
-* Legacy filename-style differences MUST be classified as historical or path-normalization observations unless they create a broken canonical binding, conflict with an explicit filename rule, or break Human Index, Machine Mirror, or path-proof coherence.
+* Legacy filename-style differences MUST be classified as historical or path-normalization observations unless they create a broken canonical binding, conflict with an explicit filename rule, or break Human Index, Machine Mirror, or path-proof coherence.  
+* Governed artifact paths, evidence paths, manifest filenames, path-proof filenames, hash filenames, JSON keys, token names, command labels, and environment variable names MUST be evaluated from the source artifact, governed record, or canonical binding, not from assistant-rendered, markdown-rendered, transcript-rendered, or review-rendered prose.  
+* Rendered escape characters in review output are not evidence that the governed source path or artifact identity contains those characters. A blocker requires a substantive source-level defect that remains after rendering artifacts are ignored.
 
 If any directory renames are required to normalize legacy mixed-case drift, those renames MUST be accompanied by same-PR updates to the Human Evidence Index (docs/evidence/INDEX.json), its hash sentinel (docs/evidence/INDEX.sha256), the Machine Evidence Mirror (artifacts/evidence\_index.jsonl), and the affected path-proofs, per §8.6 and §8.3.
 
@@ -627,6 +629,22 @@ The close-pack baseline artifacts MUST be located under audit/ using the EPIC-\#
 * audit/EPIC-\#\#\#\_QA\_RCA.md only when the QA RCA & Doc Delta summary is externalized as a separate governed artifact.
 
 If the QA RCA & Doc Delta summary is embedded directly inside audit/EPIC-\#\#\#\_close\_report.md, the separate audit/EPIC-\#\#\#\_QA\_RCA.md artifact is not required. If a separate QA RCA artifact is used, the close report MUST reference it by exact repo-relative path.
+
+When a QA RCA & Doc Delta summary is embedded in the close report or externalized as a separate governed QA RCA artifact, the RCA content SHOULD include, at minimum:
+
+* what was reviewed and which source posture governed the review  
+* coverage versus the QA plan or review plan  
+* findings classification  
+* outcome meaning  
+* evidence support  
+* root causes  
+* remediation-loop assessment  
+* evidence-hygiene assessment  
+* recurrence-prevention follow-ups  
+* canon follow-up posture  
+* closeout-readiness recommendation
+
+The QA RCA content MUST preserve proof-class separation among implementation support, QA result, close-pack packaging, PF-canon drainage, formal closeout, and deferred future work.
 
 The close report at `audit/EPIC-###_close_report.md` MUST:
 
@@ -4604,6 +4622,128 @@ HDE-EPIC030 implementation-slice evidence posture.
 * The HDE-EPIC030 PR-01 through PR-05 families above are governed implementation-slice evidence families. They are not the HDE-EPIC030 close-pack authoritative pair, not a close-stage substitute, and not a QA-ledger path by themselves.  
 * When an HDE-EPIC030 close-pack is produced, it MUST use the close-pack baseline artifacts and key\_outputs binding rules in this section. The PR-slice evidence families may be referenced from that close-pack only through the normal governed artifact binding posture.
 
+##### HDE-EPIC031 PR-01 SAFE rails provider-gate evidence.
+
+##### Purpose. Govern the direct PR-01 SAFE rails provider-gate evidence family for pinned provider timeout, retry, backoff, typed 429, Retry-After parsing, closed SAFE rails refusal, local no-live-call posture, and no-live-vendor provider behavior. This family is implementation-slice evidence only. It does not create a live vendor-call claim, public Reader change, HDAPI v2 runtime conformance claim, PO-only open-rails v2 smoke, close-pack path, QA-ledger path, or PF-canon edit path.
+
+##### Primary artifact paths.
+
+* ##### artifacts/vendor/policies\_pinned.md: Direct PR-01 policy evidence artifact for pinned timeout, retry, backoff, and non-200 classification posture. When refreshed, it records that non-200 HTTP statuses outside `4xx` and `5xx` are typed as `PROVIDER_ERROR` and are not retried.
+
+* ##### artifacts/vendor/retry\_after\_parse.log: Direct PR-01 Retry-After parse evidence log. When refreshed, it records deterministic delta-seconds and HTTP-date parsing posture and invalid, unsupported, or overflow omission posture.
+
+* ##### audit/qa/hde-epic031/pr-01/open\_rails\_policy\_proof.json: Direct PR-01 governed proof JSON for open-rails policy posture without live vendor execution. Canonical JSON when present. When refreshed, it records no live vendor call, local mocked or fixture-backed proof posture, non-4xx and non-5xx `http_status_other` behavior, and classified side-effect families.
+
+* ##### audit/qa/hde-epic031/pr-01/retry\_backoff\_429\_proof.json: Direct PR-01 governed proof JSON for retry and backoff posture. Canonical JSON when present. When refreshed, it records 429, 4xx, 5xx, network-error, and other non-200 classification behavior and retry posture.
+
+* ##### audit/qa/hde-epic031/pr-01/closed\_default\_open\_exception\_rails.json: Direct PR-01 governed proof JSON for closed default and open exception rails posture. Canonical JSON when present. When refreshed, it records that provider access is allowed only for local mocked or fixture-backed proof.
+
+##### Path-proofs and indexing.
+
+* ##### Each primary artifact above MUST have a sibling .path\_proof.txt transcript stored alongside the artifact when the artifact is promoted into governed evidence, indexed, mirrored, or used as acceptance-support evidence.
+
+* ##### The Human Evidence Index and the Machine Evidence Mirror MUST each carry exactly one binding for each promoted artifact path above under the normal PF12 parity rules.
+
+* ##### The corresponding Mirror records MUST set proof\_anchor to the sibling .path\_proof.txt transcript for that artifact.
+
+* ##### Mirror records for this PR-01 family MUST use the exact artifact\_key values emitted by the governed single-writer evidence updater for these paths. This entry does not mint unsourced artifact\_key spellings for PR-01 paths whose exact keys are not surfaced here.
+
+* ##### When this family changes, the changed primary artifacts, their sibling path-proofs, the Human Index, the Human Index hash sentinel, the Machine Mirror, the Machine Mirror checksum sidecar, and the required index and mirror sibling path-proofs MUST be refreshed coherently in the same change.
+
+##### HDE-EPIC031 PR-02 SAFE rails observability and keys-only log evidence.
+
+##### Purpose. Govern the direct PR-02 SAFE rails observability and keys-only log posture evidence family for bounded vendor log keys, bounded label domains, success and failure class observability, keys-only sample evidence, redaction proof artifacts, secret-redaction scan output, and PR-specific rails-scope evidence. This family is implementation-slice evidence only. It does not create a live vendor-call claim, public Reader change, close-pack path, QA-ledger path, or PF-canon edit path.
+
+##### Primary artifact paths.
+
+* ##### audit/qa/hde-epic031/pr-02/bounded\_label\_observability.json: Direct PR-02 governed evidence JSON for bounded label and observability posture. Canonical JSON when present. When refreshed, it records observed failure classes, route observability, timeout-profile observability, and PASS/FAIL status.
+
+* ##### audit/qa/hde-epic031/pr-02/keys\_only\_log\_redaction.json: Direct PR-02 governed evidence JSON for keys-only log redaction posture. Canonical JSON when present. When refreshed, it records forbidden hits, key violations, payload-body absence, plaintext-secret absence, raw-secret-header absence, and PASS/FAIL status.
+
+* ##### audit/qa/hde-epic031/pr-02/secret\_redaction\_scan.log: Direct PR-02 governed redaction scan log. LF-terminated text when present. When refreshed, it records records scanned, forbidden-hit count, and PASS/FAIL status.
+
+* ##### audit/qa/hde-epic031/pr-02/vendor\_keys\_only.sample.jsonl: Direct PR-02 governed keys-only JSONL sample for vendor SAFE rails log records. Canonical JSONL when present. When refreshed, it records bounded key-only sample records across success and failure classes without payload or secret leakage.
+
+* ##### audit/qa/hde-epic031/pr-02/vendor\_rails\_scope.txt: Direct PR-02 governed rails-scope text artifact. LF-terminated text when present. When refreshed, it records local deterministic scope, live vendor-call prohibition, SAFE rails pins, and vendor route detection posture.
+
+##### Current surfaced artifact-key bindings.
+
+* ##### epic031.pr02.vendor\_keys\_only\_sample maps to audit/qa/hde-epic031/pr-02/vendor\_keys\_only.sample.jsonl
+
+* ##### epic031.pr02.vendor\_rails\_scope maps to audit/qa/hde-epic031/pr-02/vendor\_rails\_scope.txt
+
+* ##### epic031.pr02.keys\_only\_log\_redaction maps to audit/qa/hde-epic031/pr-02/keys\_only\_log\_redaction.json
+
+* ##### epic031.pr02.secret\_redaction\_scan maps to audit/qa/hde-epic031/pr-02/secret\_redaction\_scan.log
+
+* ##### audit/qa/hde-epic031/pr-02/bounded\_label\_observability.json is a governed path in this family; when indexed or mirrored, its Mirror record MUST use the exact artifact\_key emitted by the governed single-writer evidence updater for that path.
+
+##### PR-specific path-collision posture.
+
+* ##### Vendor-specific PR-02 sample and rails-scope evidence MUST stay under audit/qa/hde-epic031/pr-02/ unless a later PF12 change explicitly re-homes the family.
+
+* ##### This family MUST NOT overwrite or substitute for shared DB-bridge or generic rails artifacts such as artifacts/logs/keys\_only.sample.jsonl or artifacts/ops/rails\_open\_scope.txt. Those shared artifacts remain separate governed families when cataloged, indexed, mirrored, and path-proven under their own bindings.
+
+* ##### If a PR-specific vendor artifact and a shared artifact both change in the same evidence-refresh pass, the run evidence MUST keep their paths, artifact roles, and proof anchors distinct.
+
+##### Path-proofs and indexing.
+
+* ##### Each primary artifact above MUST have a sibling .path\_proof.txt transcript stored alongside the artifact when the artifact is promoted into governed evidence, indexed, mirrored, or used as acceptance-support evidence.
+
+* ##### The Human Evidence Index and the Machine Evidence Mirror MUST each carry exactly one binding for each promoted artifact path above under the normal PF12 parity rules.
+
+* ##### The corresponding Mirror records MUST use the artifact\_key bindings surfaced above where supplied, and MUST set proof\_anchor to the sibling .path\_proof.txt transcript for that artifact.
+
+* ##### When this family changes, the changed primary artifacts, their sibling path-proofs, the Human Index, the Human Index hash sentinel, the Machine Mirror, the Machine Mirror checksum sidecar, and the required index and mirror sibling path-proofs MUST be refreshed coherently in the same change.
+
+##### HDE-EPIC031 PR-03 SAFE rails evidence and indexing coherence.
+
+##### Purpose. Govern the direct PR-03 SAFE rails evidence and indexing coherence family for binding PR-01, PR-02, and PR-03 SAFE rails artifacts through the Human Evidence Index, Human Index hash sentinel, Machine Evidence Mirror, Machine Mirror checksum sidecar, co-located path proofs, side-effect classification, and closed-rails validation checks. This family is implementation-slice evidence only. It does not create a live vendor-call claim, public Reader change, HDAPI v2 runtime conformance claim, PO-only open-rails v2 smoke, close-pack path, QA-ledger path, Live QA runbook path, token-matrix claim, or PF-canon edit path.
+
+##### Primary artifact paths.
+
+* ##### `audit/qa/hde-epic031/pr-03/evidence_family_map.json`: Direct PR-03 governed evidence-family map. Canonical JSON when present. When refreshed, it records the PR-03 proof families, bounded side-effect refreshes, affected Machine Mirror rows, proof-validity posture, and sha256 or size matching posture.
+
+* ##### `audit/qa/hde-epic031/pr-03/safe_rails_evidence_coherence.json`: Direct PR-03 governed coherence artifact. Canonical JSON when present. PASS requires the PR-03 evidence family, Human Index binding, Machine Mirror binding, path-proof binding, hash checks, and side-effect validation to be current and valid.
+
+* ##### `audit/qa/hde-epic031/pr-03/evidence_refresh.log`: Direct PR-03 governed refresh log. LF-terminated text when present. When refreshed, it records closed-rails posture, refresh commands, check commands, side-effect classifications, live-vendor-call posture, and secret-recording posture.
+
+##### Bounded side-effect classification.
+
+* ##### When the PR-03 evidence generator or updater refreshes governed proof companions outside the direct PR-03 family, the PR-03 run evidence MUST name each refreshed family and classify it as exactly one of: `expected updater convergence`, `required dependency refresh`, or `unexpected drift`.
+
+* ##### The bounded side-effect set for this PR-03 family MAY include writer proof companions, topology orientation refreshes, and HDE-EPIC030 PR-03, PR-04, or PR-05 proof-companion refreshes when those are caused by the same governed evidence refresh.
+
+* ##### Side-effect classification MUST include both proof-companion paths and the affected Machine Mirror artifact keys or discovered paths when mirror rows change.
+
+* ##### A PR-03 coherence artifact MUST NOT report PASS if any classified side-effect path is missing, any classified side-effect proof companion fails validation, or any classified Machine Mirror row fails to match artifact key, proof anchor, sha256, or size.
+
+* ##### Classified outside-family side effects do not re-home those artifacts. The referenced writer, topology, and HDE-EPIC030 artifacts remain governed by their existing Evidence Catalog families and proof anchors.
+
+##### Path-proofs and indexing.
+
+* ##### Each primary artifact above MUST have a sibling `.path_proof.txt` transcript stored alongside the artifact when the artifact is promoted into governed evidence, indexed, mirrored, or used as acceptance-support evidence.
+
+* ##### The Human Evidence Index and the Machine Evidence Mirror MUST each carry exactly one binding for each promoted artifact path above under the normal PF12 parity rules.
+
+* ##### The Human Index hash sentinel, Machine Mirror checksum sidecar, and their required sibling path-proofs MUST be refreshed coherently when this family changes governed evidence bytes.
+
+* ##### The corresponding Mirror records MUST set proof\_anchor to the sibling `.path_proof.txt` transcript for that artifact.
+
+* ##### Mirror records for this PR-03 family MUST use the exact artifact\_key values emitted by the governed single-writer evidence updater for these paths. This entry does not mint unsourced artifact\_key spellings for PR-03 paths whose exact keys are not surfaced here.
+
+* ##### When this family changes, the three primary artifacts, their sibling path-proofs, classified side-effect proof companions, Human Index rows, Human Index hash sentinel, Machine Mirror rows, Machine Mirror checksum sidecar, and the required index and mirror sibling path-proofs MUST be refreshed coherently in the same change.
+
+##### HDE-EPIC031 implementation-slice evidence posture.
+
+* ##### The HDE-EPIC031 PR-01 through PR-03 families above are governed implementation-slice evidence families. They are not a close-pack authoritative pair, not a close-stage substitute, and not QA-ledger paths by themselves.
+
+* ##### PR-slice evidence MAY support a later close-pack only through the normal governed artifact binding posture. It MUST NOT be used by itself to claim close-pack production, Live QA completion, PF09 drain, token-matrix completion, or epic closure.
+
+* ##### If HDE-EPIC031 close-pack artifacts are produced, they MUST use the close-pack baseline artifacts and key\_outputs binding rules in this section. Expected close-pack paths named by the current evidence posture include `audit/EPIC-031_close_report.md`, `audit/EPIC-031_MANIFEST.json`, and `docs/acceptance_map_epic031.json`; those paths remain unclaimed until the actual governed artifacts, path proofs, and required Index or Mirror bindings exist.
+
+* ##### HDE-EPIC031 close-pack, Live QA, acceptance-map, token-matrix, and close-stage review artifacts remain separate governed surfaces from the PR-01 through PR-03 implementation-slice families.
+
   ##### **Showcompat artifacts (EPIC024 D03)**
 
 * artifacts/showcompat/epic024/showcompat\_manifest.json: deterministic showcompat manifest for EPIC024, produced by the D03 runner.  
@@ -5257,6 +5397,59 @@ These entries register QA harness ledger files that summarize Live QA results as
   * `audit/qa/hde-epic030/checks/po-017/primary.log`: Optional CHECK po-017 primary log for documentation-drainage non-blocker posture. Non-empty UTF-8 text when present.  
   * `audit/qa/hde-epic030/checks/po-017/documentation_drainage_posture.txt`: Optional CHECK po-017 documentation-drainage posture artifact. LF-terminated text when present. It SHOULD preserve that documentation drainage is not a blocker by itself while real truth-and-proof blocker classes remain explicit.  
   * CHECK po-013 through po-017 artifacts are check-level current-state evidence. They do not by themselves claim PF09.2 drainage, formal close-pack completion, or epic closure unless a separately cataloged close-pack artifact binds that claim.  
+* HDE-EPIC031 Step-0A and Step-0B check-local current-state outputs.  
+  * `audit/qa/hde-epic031/00_meta/live_qa_harness.py`: Optional HDE-EPIC031 QA harness helper used by current-state QA checks. UTF-8 source text when present. It is QA harness evidence only and MUST NOT be treated as product behavior evidence by itself.  
+  * `audit/qa/hde-epic031/checks/step-0a-discovery/primary.log`: Optional Step-0A primary log for discovery posture and harness setup. Non-empty UTF-8 text when present.  
+  * `audit/qa/hde-epic031/checks/step-0a-discovery/discovery.json`: Optional Step-0A discovery artifact recording rails, paths, surfaces, and required seed-path presence. Canonical JSON when present.  
+  * `audit/docdeltas/hde-epic031_doc_deltas.md`: Optional HDE-EPIC031 doc-delta ledger used by Step-0B and close-pack adjacency. Non-empty UTF-8 markdown when present unless the ledger explicitly records that it is empty.  
+  * `audit/qa/hde-epic031/00_meta/doc_deltas.md`: Optional HDE-EPIC031 QA-root doc-delta copy used as a Step-0B precondition artifact for later checks. If present, it MUST remain byte-identical to `audit/docdeltas/hde-epic031_doc_deltas.md` unless a later PF12 entry explicitly permits divergence.  
+  * `audit/qa/hde-epic031/checks/step-0b-doc-delta/primary.log`: Optional Step-0B primary log recording the governed doc-delta capture precondition run. Non-empty UTF-8 text when present.  
+  * `audit/qa/hde-epic031/checks/step-0a-discovery/discovery.json` is the accepted current-state Step-0A discovery path for this ledger entry. The conflicting action-line reference to `audit/qa/hde-epic031/00_meta/discovery.json` is not cataloged as a governed Step-0A deliverable by this entry unless a later PF12 entry explicitly promotes it.  
+* HDE-EPIC031 CHECK po-001 through po-006 check-local current-state outputs.  
+  * `audit/qa/hde-epic031/checks/po-001/primary.log`: Optional CHECK po-001 primary log for Fermentation first-slice scope-boundary validation. Non-empty UTF-8 text when present.  
+  * `audit/qa/hde-epic031/checks/po-001/result.json`: Optional CHECK po-001 result artifact recording scope-boundary posture, no public-surface widening, and excluded later-scope work. Canonical JSON when present.  
+  * `audit/qa/hde-epic031/checks/po-002/primary.log`: Optional CHECK po-002 primary log for closed-by-default provider access and explicit bounded-opening validation. Non-empty UTF-8 text when present.  
+  * `audit/qa/hde-epic031/checks/po-002/result.json`: Optional CHECK po-002 result artifact recording provider-test, closed-default refusal, bounded-opening, and no-live-vendor policy posture. Canonical JSON when present.  
+  * `audit/qa/hde-epic031/checks/po-003/primary.log`: Optional CHECK po-003 primary log for deterministic typed provider refusal when external access is not allowed. Non-empty UTF-8 text when present.  
+  * `audit/qa/hde-epic031/checks/po-003/result.json`: Optional CHECK po-003 result artifact recording typed refusal markers, provider-test posture, and refusal-before-input or refusal-before-ingest ordering facts. Canonical JSON when present.  
+  * `audit/qa/hde-epic031/checks/po-004/primary.log`: Optional CHECK po-004 primary log for retry, backoff, and non-success classification validation. Non-empty UTF-8 text when present.  
+  * `audit/qa/hde-epic031/checks/po-004/result.json`: Optional CHECK po-004 result artifact recording non-success classification, pinned-attempt, and retry-backoff evidence facts. Canonical JSON when present.  
+  * `audit/qa/hde-epic031/checks/po-005/primary.log`: Optional CHECK po-005 primary log for typed 429 and Retry-After parsing validation. Non-empty UTF-8 text when present.  
+  * `audit/qa/hde-epic031/checks/po-005/result.json`: Optional CHECK po-005 result artifact recording Retry-After delta parsing, 429 source mapping, and typed 429 evidence facts. Canonical JSON when present.  
+  * `audit/qa/hde-epic031/checks/po-006/primary.log`: Optional CHECK po-006 primary log for keys-only redaction and observability validation. Non-empty UTF-8 text when present.  
+  * `audit/qa/hde-epic031/checks/po-006/result.json`: Optional CHECK po-006 result artifact recording allowed-key presence, payload-body absence, plaintext-secret absence, raw-secret-header absence, and final PASS or failure posture. Canonical JSON when present.  
+  * `audit/qa/hde-epic031/remediation/moon_loop/patch.diff`: Optional Moon Loop remediation patch artifact for in-session QA harness remediation. UTF-8 diff text when present.  
+  * `audit/qa/hde-epic031/remediation/moon_loop/changed_files.txt`: Optional Moon Loop changed-files artifact recording changed paths and sha256 values for in-session remediation. LF-terminated text when present.  
+  * CHECK po-006 MAY reference `audit/qa/hde-epic031/00_meta/doc_deltas.md` for the recorded remediation note, but that artifact remains governed by the QA-meta doc-delta family and is not re-homed into the po-006 check directory by this ledger entry.  
+  * CHECK po-001 through po-006 artifacts are check-level current-state evidence. They do not by themselves claim close-pack production, Live QA completion beyond the named checks, PF09 drain, token-matrix completion, or epic closure unless a separately cataloged close-pack artifact binds that claim.  
+* HDE-EPIC031 CHECK po-007 through po-018 check-local current-state outputs.  
+  * `audit/qa/hde-epic031/checks/po-007/primary.log`: Optional CHECK po-007 primary log for sensitive-provider-material absence and live-vendor-call prohibition validation. Non-empty UTF-8 text when present.  
+  * `audit/qa/hde-epic031/checks/po-007/result.json`: Optional CHECK po-007 result artifact recording redaction-scan presence, scope-live-forbidden posture, and final PASS or failure posture. Canonical JSON when present.  
+  * `audit/qa/hde-epic031/checks/po-008/primary.log`: Optional CHECK po-008 primary log for governed evidence coherence, hash-sentinel, validator-command, and PR-03 coherence validation. Non-empty UTF-8 text when present.  
+  * `audit/qa/hde-epic031/checks/po-008/result.json`: Optional CHECK po-008 result artifact recording command-green posture, coherence status, and final PASS or failure posture. Canonical JSON when present.  
+  * CHECK po-008 MAY reference `audit/qa/hde-epic031/remediation/moon_loop/patch.diff` and `audit/qa/hde-epic031/remediation/moon_loop/changed_files.txt` for the auditable Moon Loop remediation stream, including changed coherence, index, mirror, path-proof, and compat artifacts. Those remediation artifacts remain governed by the HDE-EPIC031 remediation family and are not re-homed into the po-008 check directory by this ledger entry.  
+  * `audit/qa/hde-epic031/checks/po-009/primary.log`: Optional CHECK po-009 primary log for machine-mirror and evidence-family-map alignment validation. Non-empty UTF-8 text when present.  
+  * `audit/qa/hde-epic031/checks/po-009/result.json`: Optional CHECK po-009 result artifact recording family-map presence, machine-mirror presence, mirror EPIC031 linkage, and final PASS or failure posture. Canonical JSON when present.  
+  * `audit/qa/hde-epic031/checks/po-010/primary.log`: Optional CHECK po-010 primary log for generated-proof fail-closed posture validation. Non-empty UTF-8 text when present.  
+  * `audit/qa/hde-epic031/checks/po-010/result.json`: Optional CHECK po-010 result artifact recording PR-01 generator check-mode presence, PR-02 and PR-03 generator-check posture, blocked-reason posture, and final PASS or failure posture. Canonical JSON when present.  
+  * CHECK po-010 MAY reference check-mode validation labels such as `PR-01 check-mode validation` only as command or evidence labels. Non-path labels are not cataloged as governed artifacts by this entry unless a later PF12 entry supplies concrete repo-relative paths for them.  
+  * `audit/qa/hde-epic031/checks/po-011/primary.log`: Optional CHECK po-011 primary log for acceptance-claim boundary validation. Non-empty UTF-8 text when present.  
+  * `audit/qa/hde-epic031/checks/po-011/result.json`: Optional CHECK po-011 result artifact recording no claimed tokens, evidence-scope-limited claims, acceptance-map or token-matrix close-stage posture, and final PASS or failure posture. Canonical JSON when present.  
+  * `audit/qa/hde-epic031/checks/po-012/primary.log`: Optional CHECK po-012 primary log for active Fermentation subtask supportability validation. Non-empty UTF-8 text when present.  
+  * `audit/qa/hde-epic031/checks/po-012/result.json`: Optional CHECK po-012 result artifact recording HDE-FERM001.2, HDE-FERM001.3, and HDE-FERM001.4 supportability, PF09.5 drainage non-claim posture, and final PASS or failure posture. Canonical JSON when present.  
+  * `audit/qa/hde-epic031/checks/po-013/primary.log`: Optional CHECK po-013 primary log for reused-foundation and active-scope classification validation. Non-empty UTF-8 text when present.  
+  * `audit/qa/hde-epic031/checks/po-013/result.json`: Optional CHECK po-013 result artifact recording reused-foundation history-only classification, no new implementation claim for reused foundation, active-slice limitation posture, and final PASS or failure posture. Canonical JSON when present.  
+  * `audit/qa/hde-epic031/checks/po-014/primary.log`: Optional CHECK po-014 primary log for prior-log presence and implementation-readiness interpretation validation. Non-empty UTF-8 text when present.  
+  * `audit/qa/hde-epic031/checks/po-014/result.json`: Optional CHECK po-014 result artifact recording all-prior-logs-present posture, implementation-readiness not-final-QA-outcome posture, and final PASS or failure posture. Canonical JSON when present.  
+  * `audit/qa/hde-epic031/checks/po-015/primary.log`: Optional CHECK po-015 primary log for implementation-readiness, QA-readiness, final-QA-outcome, and documentation-drainage truth-class separation validation. Non-empty UTF-8 text when present.  
+  * `audit/qa/hde-epic031/checks/po-015/result.json`: Optional CHECK po-015 result artifact recording documentation-drainage separation, final-QA-outcome separation, PF09.5 drainage not-required-before-QA-PASS posture, and final PASS or failure posture. Canonical JSON when present.  
+  * `audit/qa/hde-epic031/checks/po-016/primary.log`: Optional CHECK po-016 primary log for vendor-version runtime-conformance non-claim validation. Non-empty UTF-8 text when present.  
+  * `audit/qa/hde-epic031/checks/po-016/result.json`: Optional CHECK po-016 result artifact recording vendor-version runtime conformance non-claim, no-live-vendor policy posture, and final PASS or failure posture. Canonical JSON when present.  
+  * `audit/qa/hde-epic031/checks/po-017/primary.log`: Optional CHECK po-017 primary log for live-vendor-behavior non-claim validation. Non-empty UTF-8 text when present.  
+  * `audit/qa/hde-epic031/checks/po-017/result.json`: Optional CHECK po-017 result artifact recording live-vendor-behavior non-claim, live-vendor-calls-forbidden posture, and final PASS or failure posture. Canonical JSON when present.  
+  * `audit/qa/hde-epic031/checks/po-018/primary.log`: Optional CHECK po-018 primary log for Live QA proof-only boundary validation. Non-empty UTF-8 text when present.  
+  * `audit/qa/hde-epic031/checks/po-018/result.json`: Optional CHECK po-018 result artifact recording no implementation by Live QA, no remediation by Live QA, no closeout action by Live QA, Live QA proof-only role, and final PASS or failure posture. Canonical JSON when present.  
+  * CHECK po-007 through po-018 artifacts are check-level current-state evidence. They do not by themselves claim close-pack production, Live QA completion beyond the named checks, PF09.5 drainage, token-matrix completion, vendor-version runtime conformance, live vendor behavior, formal close-pack completion, PO closeout, or epic closure unless a separately cataloged close-pack artifact binds that claim.  
 * Per-check dependency-preflight, activation/remediation, and ready/not-ready evidence MAY be carried in `primary.log` or in additional check-scoped command output and rc artifacts beneath the same canonical check directory. When separate artifacts are used, they are governed QA evidence under this ledger family and MUST NOT rely on per-run nesting as a correctness key.  
 * `audit/qa/<epic-id>/checks/po-009/closed_rails_stdout.log`: Optional CHECK po-009 stdout capturefor a closed-rails lane. Produced only when that lane executes. If present, it MUST be UTF-8 text.  
 * `audit/qa/hde-epic027/checks/po-009/catalog_surface_inventory.txt`: Optional CHECK po-009 plain-text catalog-surface inventory used to demonstrate that no unexpected public success surface appears in the current EPIC027 catalog family. LF-terminated text when present.  

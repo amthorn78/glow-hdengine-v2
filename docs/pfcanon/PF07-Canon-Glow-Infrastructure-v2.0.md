@@ -1,12 +1,12 @@
 # **0\. Front Matter**
 
 **Title:** PF07-Canon-Glow-Infrastructure  
-**Version:** v1.9.5
+**Version:** v2.0
 
 **Status:** Canon  
-**Effective date:** 2026-05-07
+**Effective date:** 2026-05-16
 
-**Last Update Gate:** canon-update-hdapi-v2-conformance
+**Last Update Gate:** BN 10.9.8 A16
 
 **Invocation tag:** `INV-f2ac55d77ce9aacc`
 
@@ -62,7 +62,9 @@ Where a single shared canonical home exists for a given capability across multip
 * **Capture environment pins (titles-only).** Snapshot/canonicalization jobs run with `LC_ALL=C`, `LANG=C`, `TZ=UTC` to guarantee deterministic bytes. Enforcement and gates live in **HDE-Build Checklist** and **HDE-Schemas & Artifacts**; PF07 records only which environments/components are expected to use these pins.  
 * **PF07 as the required infrastructure source for plans and ops-task descriptions.** For planning and documentation posture, PF07 assumes no separate external infra or ops team outside the workspace. Any plan, implementation guide, QA plan, review artifact, remediation guide, or epic document that includes an infra task, ops task, infra-owned value, ops-owned value, environment binding, service binding, URL, port, provider name, project name, service name, repository name, config key, QA root, or start-command dependency MUST treat PF07 as the required source for that concrete infrastructure fact.  
 * **PF07-derived and PF07-gap postures.** A document that needs a PF07-owned fact MUST either cite the exact PF07 fact directly or identify the exact missing PF07 fact set, mark the affected step or claim as blocked by missing PF07 infrastructure inventory, and record the needed PF07 update as a drain target or doc-delta candidate. Placeholder ownership and guessed values are non-conforming, including “infra to provide,” “ops to confirm,” “infra-owned” without the actual PF07 fact, “ask infra,” “await ops details,” guessed hostnames, guessed ports, guessed URLs, guessed start commands, guessed environment bindings, or treating **TBD** as an executable input.  
-* **Specificity and review posture.** When PF07 is cited for an infra or ops task, the document MUST name the applicable provider, project, service, repository, base URL or port, database instance or schema, config key, governed evidence root or QA root, and the exact expected value or exact PF07 value source, as relevant. A plan or document that refers to infra or ops work without the concrete PF07-backed value, or without an explicit PF07-gap blocker, is non-conforming and must stop at the gap.
+* **Specificity and review posture.** When PF07 is cited for an infra or ops task, the document MUST name the applicable provider, project, service, repository, base URL or port, database instance or schema, config key, governed evidence root or QA root, and the exact expected value or exact PF07 value source, as relevant. A plan or document that refers to infra or ops work without the concrete PF07-backed value, or without an explicit PF07-gap blocker, is non-conforming and must stop at the gap.  
+* **Rendered escape artifacts in PF07-owned strings (review posture).** For PF07-owned command, path, endpoint, config-key, environment-variable, evidence-path, manifest, hash, and path-proof string review, escaped display in AI output or rendered markdown is not evidence that the underlying command, path, or environment variable name is invalid. Review must judge the intended canonical identity and the PF07-backed fact or gap, not assistant-rendered backslashes around punctuation, underscores, shell redirection, or code-like text. If the underlying command identity, artifact identity, path identity, config-key identity, environment-variable identity, and proof obligation remain clear after ignoring rendered escapes, PF07 does not treat the escaped display as an infrastructure defect.  
+* **Rendered escape artifacts in PF07-owned strings (review posture).** For PF07-owned command, path, endpoint, config-key, environment-variable, evidence-path, manifest, hash, and path-proof string review, escaped display in AI output or rendered markdown is not evidence that the underlying command, path, or environment variable name is invalid. Review must judge the intended canonical identity and the PF07-backed fact or gap, not assistant-rendered backslashes around punctuation, underscores, shell redirection, or code-like text. If the underlying command identity, artifact identity, path identity, config-key identity, environment-variable identity, and proof obligation remain clear after ignoring rendered escapes, PF07 does not treat the escaped display as an infrastructure defect.
 
 **Primary homes referenced in this document (titles-only).**
 
@@ -1260,7 +1262,7 @@ Keep verbatim — this is the source of truth as configured in Railway.
 
 The authoritative listing of evidence artifacts (titles/paths) and governed record types is owned by the canonical **Schemas & Artifacts** document (titles-only). **Glow Infrastructure** is names-only: it inventories stable evidence index and mirror file locations used by the repo, but does not define evidence schemas, acceptance rules, or token semantics.
 
-**Multi-root evidence posture (clarification; names-only).** The EPIC025 and EPIC030 audits observe governed or evidence-like outputs stored across multiple roots (for example: `audit/`, `artifacts/`, `docs/`, `proofs/`, `parity/`, `reports/`, `scan_reports/`, `validation/`, `catalog/`, `narratives/`, `internal/`, `scripts/`, `tools/`, and `tests/transport/headers/`). In PF07, “single home” in evidence terms means the single authoritative Evidence Index plus machine mirror parity and the fixed-path governed evidence surfaces enumerated below, not that all evidence bytes or evidence-like snapshots must live under one directory root.
+**Multi-root evidence posture (clarification; names-only).** The EPIC025, EPIC030, and EPIC031 audits observe governed or evidence-like outputs stored across multiple roots and root-adjacent homes, including `docs/evidence/`, `artifacts/`, `audit/gates/`, `audit/qa/`, `artifacts/audit/`, `artifacts/proofs/`, `artifacts/ops/internal_version/`, `audit/`, `docs/`, `tools/`, `scripts/`, `catalog/`, `schemas/`, `goldens/`, `fixtures/`, `proofs/`, `parity/`, `reports/`, `scan_reports/`, `validation/`, `narratives/`, `internal/`, and `tests/transport/headers/`. In PF07, “single home” in evidence terms means the single authoritative Evidence Index plus machine mirror parity and the fixed-path governed evidence surfaces enumerated below, not that all evidence bytes or evidence-like snapshots must live under one directory root.
 
 **Classification note (routing-only).** PF07 records root names and stable paths only. Evidence-family classification and any decision to treat a root as governed evidence vs tooling output is owned by the canonical Schemas & Artifacts document (titles-only).
 
@@ -1384,6 +1386,171 @@ Whenever governed evidence bytes change, update in the same change-set:
 * audit/qa/hde-epic030/pr-05/per\_channel\_mechanics.json.path\_proof.txt
 
 **EPIC030 PR-slice evidence versus close-pack posture (names-only).** The EPIC030 PR-01 through PR-05 evidence families above are implementation-slice evidence families under the epic QA tree. They do not replace, satisfy, or relocate the canonical epic close-pack artifacts. Close-pack artifacts remain governed by the canonical close-pack filename section below.
+
+**EPIC031 PR-slice evidence surfaces (names-only).** The HDE-EPIC031 PR-01 through PR-03 evidence families are implementation-slice evidence families under governed audit and artifact roots. They do not replace, satisfy, or relocate canonical close-pack artifacts.
+
+PR-01 — SAFE rails open posture and provider-gate policy proof:
+
+* `artifacts/vendor/policies_pinned.md`  
+* `artifacts/vendor/policies_pinned.md.path_proof.txt`  
+* `artifacts/vendor/retry_after_parse.log`  
+* `audit/qa/hde-epic031/pr-01/open_rails_policy_proof.json`  
+* `audit/qa/hde-epic031/pr-01/open_rails_policy_proof.json.path_proof.txt`  
+* `audit/qa/hde-epic031/pr-01/retry_backoff_429_proof.json`  
+* `audit/qa/hde-epic031/pr-01/retry_backoff_429_proof.json.path_proof.txt`  
+* `audit/qa/hde-epic031/pr-01/closed_default_open_exception_rails.json`
+
+PR-02 — SAFE rails observability and keys-only log posture:
+
+* `audit/qa/hde-epic031/pr-02/bounded_label_observability.json`  
+* `audit/qa/hde-epic031/pr-02/bounded_label_observability.json.path_proof.txt`  
+* `audit/qa/hde-epic031/pr-02/keys_only_log_redaction.json`  
+* `audit/qa/hde-epic031/pr-02/keys_only_log_redaction.json.path_proof.txt`  
+* `audit/qa/hde-epic031/pr-02/secret_redaction_scan.log`  
+* `audit/qa/hde-epic031/pr-02/secret_redaction_scan.log.path_proof.txt`  
+* `audit/qa/hde-epic031/pr-02/vendor_keys_only.sample.jsonl`  
+* `audit/qa/hde-epic031/pr-02/vendor_keys_only.sample.jsonl.path_proof.txt`  
+* `audit/qa/hde-epic031/pr-02/vendor_rails_scope.txt`  
+* `audit/qa/hde-epic031/pr-02/vendor_rails_scope.txt.path_proof.txt`
+
+PR-03 — SAFE rails governed evidence and indexing coherence:
+
+* `audit/qa/hde-epic031/pr-03/evidence_family_map.json`  
+* `audit/qa/hde-epic031/pr-03/evidence_family_map.json.path_proof.txt`  
+* `audit/qa/hde-epic031/pr-03/safe_rails_evidence_coherence.json`  
+* `audit/qa/hde-epic031/pr-03/safe_rails_evidence_coherence.json.path_proof.txt`  
+* `audit/qa/hde-epic031/pr-03/evidence_refresh.log`  
+* `audit/qa/hde-epic031/pr-03/evidence_refresh.log.path_proof.txt`
+
+Shared restored DB-bridge evidence surfaces that must not be overwritten by PR-specific vendor evidence:
+
+* `artifacts/logs/keys_only.sample.jsonl`  
+* `artifacts/logs/keys_only.sample.jsonl.path_proof.txt`  
+* `artifacts/ops/rails_open_scope.txt`  
+* `artifacts/ops/rails_open_scope.txt.path_proof.txt`
+
+**EPIC031 Live QA Step-0A, Step-0B, and po-001 through po-018 check-local evidence surfaces (names-only).** The governed check-local and supporting evidence surfaces for these HDE-EPIC031 QA checks are carried at:
+
+Step-0A \- discovery posture and harness setup:
+
+* `audit/qa/hde-epic031/00_meta/live_qa_harness.py`  
+* `audit/qa/hde-epic031/checks/step-0a-discovery/primary.log`  
+* `audit/qa/hde-epic031/checks/step-0a-discovery/discovery.json`
+
+Step-0A accepted discovery-path posture:
+
+* `audit/qa/hde-epic031/checks/step-0a-discovery/discovery.json` is the accepted current-state discovery path for HDE-EPIC031 Step-0A.  
+* `audit/qa/hde-epic031/00_meta/discovery.json` is recorded as framing-only drift for this epic and is not the accepted Step-0A current-state discovery path.
+
+Step-0B \- doc-delta capture:
+
+* `audit/docdeltas/hde-epic031_doc_deltas.md`  
+* `audit/qa/hde-epic031/00_meta/doc_deltas.md`  
+* `audit/qa/hde-epic031/checks/step-0b-doc-delta/primary.log`
+
+PO-001 \- Fermentation first-slice scope boundary:
+
+* `audit/qa/hde-epic031/checks/po-001/primary.log`  
+* `audit/qa/hde-epic031/checks/po-001/result.json`
+
+PO-002 \- closed-by-default provider access with explicit bounded opening:
+
+* `audit/qa/hde-epic031/checks/po-002/primary.log`  
+* `audit/qa/hde-epic031/checks/po-002/result.json`
+
+PO-003 \- deterministic typed provider refusal when external access is not allowed:
+
+* `audit/qa/hde-epic031/checks/po-003/primary.log`  
+* `audit/qa/hde-epic031/checks/po-003/result.json`
+
+PO-004 \- retry and backoff proof check:
+
+* `audit/qa/hde-epic031/checks/po-004/primary.log`  
+* `audit/qa/hde-epic031/checks/po-004/result.json`
+
+PO-005 \- 429 and Retry-After proof check:
+
+* `audit/qa/hde-epic031/checks/po-005/primary.log`  
+* `audit/qa/hde-epic031/checks/po-005/result.json`
+
+PO-006 \- keys-only redaction proof check:
+
+* `audit/qa/hde-epic031/checks/po-006/primary.log`  
+* `audit/qa/hde-epic031/checks/po-006/result.json`
+
+HDE-EPIC031 Moon Loop remediation evidence surfaces:
+
+* `audit/qa/hde-epic031/remediation/moon_loop/patch.diff`  
+* `audit/qa/hde-epic031/remediation/moon_loop/changed_files.txt`  
+* `audit/qa/hde-epic031/00_meta/doc_deltas.md`
+
+PO-007 \- sensitive-provider-data absence and live-vendor-call prohibition proof:
+
+* `audit/qa/hde-epic031/checks/po-007/primary.log`  
+* `audit/qa/hde-epic031/checks/po-007/result.json`
+
+PO-008 \- PR-03 evidence coherence and Moon Loop remediation proof:
+
+* `audit/qa/hde-epic031/checks/po-008/primary.log`  
+* `audit/qa/hde-epic031/checks/po-008/result.json`
+
+PO-009 \- machine mirror and evidence family map alignment proof:
+
+* `audit/qa/hde-epic031/checks/po-009/primary.log`  
+* `audit/qa/hde-epic031/checks/po-009/result.json`
+
+PO-010 \- generated-proof fail-closed proof:
+
+* `audit/qa/hde-epic031/checks/po-010/primary.log`  
+* `audit/qa/hde-epic031/checks/po-010/result.json`
+
+PO-011 \- acceptance-claim boundary proof:
+
+* `audit/qa/hde-epic031/checks/po-011/primary.log`  
+* `audit/qa/hde-epic031/checks/po-011/result.json`
+
+PO-012 \- active Fermentation subtask support proof:
+
+* `audit/qa/hde-epic031/checks/po-012/primary.log`  
+* `audit/qa/hde-epic031/checks/po-012/result.json`
+
+PO-013 \- reused-foundation history-only proof:
+
+* `audit/qa/hde-epic031/checks/po-013/primary.log`  
+* `audit/qa/hde-epic031/checks/po-013/result.json`
+
+PO-014 \- prior-log and readiness-separation proof:
+
+* `audit/qa/hde-epic031/checks/po-014/primary.log`  
+* `audit/qa/hde-epic031/checks/po-014/result.json`
+
+PO-015 \- truth-class and documentation-drainage separation proof:
+
+* `audit/qa/hde-epic031/checks/po-015/primary.log`  
+* `audit/qa/hde-epic031/checks/po-015/result.json`
+
+PO-016 \- vendor-version runtime non-claim proof:
+
+* `audit/qa/hde-epic031/checks/po-016/primary.log`  
+* `audit/qa/hde-epic031/checks/po-016/result.json`
+
+PO-017 \- live-vendor behavior non-claim proof:
+
+* `audit/qa/hde-epic031/checks/po-017/primary.log`  
+* `audit/qa/hde-epic031/checks/po-017/result.json`
+
+PO-018 \- Live QA proof-only boundary proof:
+
+* `audit/qa/hde-epic031/checks/po-018/primary.log`  
+* `audit/qa/hde-epic031/checks/po-018/result.json`
+
+**EPIC031 QA manifest and close-pack caveat surfaces (names-only).** HDE-EPIC031 carries the following additional surfaces:
+
+* `audit/qa/hde-epic031/qa_step_logs_manifest.json`  
+* `audit/EPIC-031_close_report.md`  
+* `audit/EPIC-031_MANIFEST.json`
+
+The QA step-log manifest is a proven QA evidence-family surface for this epic. The close-report and manifest paths are recorded as framing-only caveat surfaces in this retrospective and do not establish completed close-pack proof by themselves.
 
 **EPIC030 Live QA po-001 through po-017 check-local evidence surfaces (names-only).** The governed check-local evidence surfaces for these HDE-EPIC030 QA checks are carried at:
 
@@ -2384,6 +2551,8 @@ When canon requires an explicit repo-local entrypoint script for evidence discip
 * Writer evidence generator: `tools/evidence/generate_conjunction_writer_evidence.py`  
 * Canonical JSON gate runner: `tools/evidence/run_canonical_json_gate.py`  
 * Evidence index updater/checker: `tools/evidence/update_evidence_index.py`  
+* EPIC031 PR-03 evidence coherence generator: `tools/evidence/generate_epic031_pr03_evidence_coherence.py`  
+* Evidence index hash checker: `ci/checks/check_evidence_index_hash.sh`  
 * Evidence index refresh helper: `tools/evidence/refresh_evidence_index.py`  
 * Audit/QA path validator: `tools/evidence/validate_audit_qa_paths.py`  
 * Evidence bindings checker: `tools/evidence/check_evidence_bindings.py` (source-excerpt-captured outputs, when written, use `audit/qa/hde-epic<NNN>/checks/<check_id>/check_evidence_bindings_stdout.log`, `audit/qa/hde-epic<NNN>/checks/<check_id>/check_evidence_bindings_stderr.log`, and `audit/qa/hde-epic<NNN>/checks/<check_id>/check_evidence_bindings_rc.txt`; these outputs are non-required unless explicitly listed as deliverables)  

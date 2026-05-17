@@ -3,12 +3,12 @@
 ## 0.1 **Header**
 
 **Title:** PF14-Canon-HDE-Mechanics-Guide  
-**Version:** v3.1.8
+**Version:** v3.2.3
 
 **Status:** Canon  
-**Effective date:** 2026-05-07
+**Effective date:** 2026-05-16
 
-**Last Update Gate:** canon-update-hdapi-v2-conformance  
+**Last Update Gate:** BN 10.9.8 A16  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
 ---
@@ -158,18 +158,6 @@ What it does not do
 
 **Scope (normative).** Mechanics requires a **set of capabilities** that enable determinism, transport acceptance, and evidence generation. The **concrete repository layout, file names, and tool targets are implementation-defined** and **must not be pinned** here. This section states *what must exist*, not *where or how*.
 
-1. DELTA NOTES  
-* No targeted replacements were applicable to this excerpt, so a standards-tightening pass was applied.  
-* Reformatted capability lists, evidence rules, and workflow steps into consistent bullets and sub-bullets.  
-* Normalized spacing and indentation to remove accidental blank-line fragmentation.  
-* Restructured long paragraphs into shorter, parallel statements without changing meaning.  
-* Made sequences explicit as ordered steps where the text already described an ordered flow.  
-* Preserved all requirements, constraints, and single-home routing statements.  
-2. REVISED EXCERPT  
-3. Repository & Tooling Skeleton (capabilities, not paths)
-
-Scope (normative). Mechanics requires a set of capabilities that enable determinism, transport acceptance, and evidence generation. The concrete repository layout, file names, and tool targets are implementation-defined and must not be pinned here. This section states what must exist, not where or how.
-
 ## 1.1 Capabilities the repo must provide
 
 * Adapter surface (HTTP only). Wires Reader routes and the ops endpoint; does not define public bytes (route by title to PF-Canon-HDE-CLI-API-Vendor-Ref).  
@@ -216,6 +204,16 @@ HDAPI v2 rails and Live QA mechanics. The repo MUST provide closed-rails and ope
 
 HDAPI v2 error, retry, and rate-limit mechanics. The repo MUST provide deterministic mapping proofs for v2 vendor HTTP outcomes, error envelope behavior, Retry-After behavior, rate-limit headers, malformed responses, and typed HDE errors. These proofs MUST avoid vendor payload echo, avoid secrets in logs, and preserve deterministic output. This guide names the mechanical responsibility only; token semantics remain owned by HDE-Governance.
 
+HDAPI provider retry and status classification mechanics. The vendor seam MUST classify provider HTTP outcomes deterministically before retry decisions. Retryable outcomes are limited to actual `network_error` and `5xx` outcomes. `429` and all other `4xx` outcomes MUST NOT be retried. Non-200 HTTP statuses outside `4xx` and `5xx` MUST be classified as `http_status_other` with provider error posture and MUST NOT be retried.
+
+HDAPI redirect handling mechanics. The default vendor request path MUST NOT follow redirects when provider status classification is the proof target. Redirect responses such as `302` with `Location` MUST surface the original response status and bounded metadata to the vendor seam so the seam can classify the original outcome. HTTPError responses returned by the underlying request library MUST be converted into status, body, and header tuples before classification, without treating redirect-following as proof of provider behavior.
+
+HDAPI provider policy proof mechanics. Provider policy evidence MUST cover pinned timeout profiles, pinned max-attempt domains, deterministic jitter-free backoff, typed `429`, Retry-After parsing for delta-seconds and HTTP-date forms, invalid Retry-After omission, closed-rails refusal, no-live-vendor local proof posture, and the non-retry behavior for `429`, other `4xx`, non-200 non-5xx statuses, and redirect responses.
+
+HDAPI SAFE-rails log posture mechanics. Vendor SAFE-rails logs MUST be keys-only, bounded, and secret-safe. They MUST NOT record request bodies, response bodies, raw secret headers, plaintext secret values, or unbounded labels. They MUST expose bounded diagnostic keys sufficient to prove rails state, route family, timeout profile, and success or failure class observability, including observed `none`, `network_error`, `4xx`, `5xx`, and `429` classes where the proof family claims that coverage.
+
+HDAPI log evidence collision guard. Vendor-specific log samples and rails-scope evidence MUST use PR-specific governed evidence families when they would otherwise collide with shared DB-bridge or cross-epic evidence paths. Shared evidence paths MUST NOT be overwritten by vendor-specific proof payloads. If a collision is discovered, the final proof family MUST restore the shared path contents, move vendor-specific evidence to its scoped family, and regenerate Human Index, Machine Mirror, hash sentinel, path proofs, and orientation evidence from the final state.
+
 HDAPI v2 evidence mechanics. The repo MUST provide evidence generators and validators for the HDAPI v2 contract inventory, request shaping, response mapping, source selection, legacy-v1 guard, adapter-boundary proof, closed-rails refusal proof, open-rails smoke summary where PO-executed, error mapping, rate-limit mapping, and normalized data path proof. Governed paths, schemas, path-proof naming, Human Evidence Index binding, Machine Mirror binding, canonical JSON rules, and evidence catalog ownership remain routed to HDE-Schemas & Artifacts and HDE-Build Checklist by title. PF14 does not pin concrete repository paths for this family.
 
 HDAPI v2 evidence generators MUST fail closed when:
@@ -238,6 +236,66 @@ Open-decision guard for HDAPI v2 mechanics. Until the PO or owning PF homes reso
 * Whether v2 response data maps cleanly into the existing BodyGraph cache schema or requires an owning schema update.
 
 AI boundary for HDAPI v2 mechanics. OpenAI will not be used inside the HD Engine under this conformance work. AI remains a Glow development tool only. No mechanics, generator, QA harness, vendor seam, config key, evidence family, acceptance posture, or architecture flow may infer OpenAI, LLM, AI-agent, prompt, embedding, chatbot, model-call, or AI-enablement scope from HumanDesignAPI documentation.
+
+HDE-EPIC031 PR-01 provider-gate proof family observed (records-only). PF14 records these paths as the observed PR-01 proof family for the completed provider-gate slice. This is a records-only closure trace for HDE-EPIC031 PR-01 and does not pin future HDAPI v2 conformance paths.
+
+Observed PR-01 paths include:
+
+* `artifacts/vendor/policies_pinned.md`  
+* `artifacts/vendor/retry_after_parse.log`  
+* `audit/qa/hde-epic031/pr-01/open_rails_policy_proof.json`  
+* `audit/qa/hde-epic031/pr-01/retry_backoff_429_proof.json`  
+* `audit/qa/hde-epic031/pr-01/closed_default_open_exception_rails.json`  
+* `docs/evidence/INDEX.json`  
+* `artifacts/evidence_index.jsonl`
+
+Observed PR-01 proof posture. The PR-01 family records no live vendor call, fixture-backed or local proof for open exception posture, pinned timeout and max-attempt policy, deterministic retry/backoff domains, typed `429`, Retry-After parsing, closed-rails refusal, non-retry behavior for `429`, other `4xx`, and non-200 non-5xx statuses, and provider classification as `http_status_other` for statuses outside `4xx` and `5xx`.
+
+Observed PR-01 remediation posture. The final PR-01 state records retry classes limited to `network_error` and `5xx`, default request redirect following disabled for provider classification, HTTPError responses converted into classifiable status/body/header tuples, and regression coverage for both injected and default `302` behavior.
+
+Observed PR-01 evidence-refresh posture. The final PR-01 evidence family removes stale ingest side-effect classification and names remaining cross-family proof refreshes as expected updater convergence or required dependency refresh, including writer, topology, and HDE-EPIC030 PR-03, PR-04, and PR-05 proof companions. The final state records Human Index, Machine Mirror, hash sentinel, path-proof, evidence-path, mirror-schema, LF-ending, orientation, evidence generator, and `git diff --check` validation as green.
+
+HDE-EPIC031 PR-02 keys-only log posture proof family observed (records-only). PF14 records these paths as the observed PR-02 proof family for the completed SAFE-rails observability slice. This is a records-only closure trace for HDE-EPIC031 PR-02 and does not pin future HDAPI v2 conformance paths.
+
+Observed PR-02 paths include:
+
+* `audit/qa/hde-epic031/pr-02/bounded_label_observability.json`  
+* `audit/qa/hde-epic031/pr-02/keys_only_log_redaction.json`  
+* `audit/qa/hde-epic031/pr-02/secret_redaction_scan.log`  
+* `audit/qa/hde-epic031/pr-02/vendor_keys_only.sample.jsonl`  
+* `audit/qa/hde-epic031/pr-02/vendor_rails_scope.txt`  
+* `ci/jobs/logs_keys_only_redaction.yml`  
+* `docs/evidence/INDEX.json`  
+* `artifacts/evidence_index.jsonl`
+
+Observed PR-02 proof posture. The PR-02 family records closed rails, no live vendor calls, bounded log labels, success and failure class observability, keys-only vendor samples, no forbidden hits, no key violations, payload-body absence, plaintext-secret absence, raw-secret-header absence, deterministic redaction scan, and PR-specific vendor rails-scope evidence.
+
+Observed PR-02 collision-remediation posture. The final PR-02 state moves vendor-specific log sample and vendor rails-scope evidence to PR-specific files under `audit/qa/hde-epic031/pr-02/`, restores the shared DB-bridge paths, filters superseded colliding entries, and keeps the final Human Index and Machine Mirror rows bound to the PR-specific vendor evidence family.
+
+Observed PR-02 validation posture. The final PR-02 state records the targeted BodyGraph test suite, the PR-02 evidence generator check, Evidence Index update check, topology orientation check, evidence path validation, mirror schema check, evidence index hash check, LF and final-LF checks, evidence skeleton test, and `git diff --check` as passing.
+
+HDE-EPIC031 PR-03 SAFE rails evidence and indexing proof family observed (records-only). PF14 records these paths as the observed PR-03 proof family for the completed SAFE-rails evidence/indexing slice. This is a records-only closure trace for HDE-EPIC031 PR-03 and does not pin future HDAPI v2 conformance paths, create acceptance tokens, change public Reader scope, or introduce AI/LLM/OpenAI/model-call scope.
+
+Observed PR-03 paths include:
+
+* `audit/qa/hde-epic031/pr-03/evidence_family_map.json`  
+* `audit/qa/hde-epic031/pr-03/safe_rails_evidence_coherence.json`  
+* `audit/qa/hde-epic031/pr-03/evidence_refresh.log`  
+* companion `*.path_proof.txt` files for the PR-03 evidence artifacts  
+* `docs/evidence/INDEX.json`  
+* `docs/evidence/INDEX.sha256`  
+* `docs/evidence/INDEX.json.path_proof.txt`  
+* `docs/evidence/INDEX.sha256.path_proof.txt`  
+* `artifacts/evidence_index.jsonl`  
+* `artifacts/evidence_index.jsonl.sha256`  
+* `artifacts/evidence_index.jsonl.path_proof.txt`  
+* `artifacts/evidence_index.jsonl.sha256.path_proof.txt`
+
+Observed PR-03 proof posture. The PR-03 family records governed SAFE rails evidence and indexing coherence by binding PR-01, PR-02, and PR-03 SAFE rails artifacts through the Human Evidence Index, hash sentinel, Machine Mirror, co-located path proofs, evidence-family map, coherence artifact, and refresh log.
+
+Observed PR-03 remediation posture. The final PR-03 state records bounded side-effect classification for writer proof companions, topology orientation refreshes, and HDE-EPIC030 PR-03, PR-04, and PR-05 proof companions, including associated Machine Mirror artifact keys and discovered paths.
+
+Observed PR-03 validation posture. The final PR-03 evidence family records PASS only when side-effect paths exist, proof companions validate against their targets, and classified Machine Mirror rows match artifact key, proof anchor, sha256, and size. The final state records generator write/check, Evidence Index updater write/check, orientation write/check, evidence path validation, mirror schema, evidence hash, LF check, py-compile, and `git diff --check` validation as green.
 
 ## 1.2 Environment & secrets (names-only)
 
@@ -402,7 +460,11 @@ Evidence-generator failure-path coverage. Governed evidence generators that emit
 
 Adjacent-generator audit trigger. When a false-positive PASS pattern is found in one EPIC-style evidence generator, the adjacent generators in that family or pattern class MUST be reviewed for the same omitted-predicate class and either receive targeted negative-path coverage or record a bounded no-impact finding in the governed PR evidence. This review creates no new acceptance token and no standalone HDE-Build Checklist task by itself.
 
+Epic-specific mirror validation scope. Evidence skeleton tests MAY enforce an epic-specific acceptance-roster subset only against mirror records that belong to that exact epic. Non-target epic records MUST remain subject to mirror schema validation, field-set validation, uniqueness validation, sort-order validation, path-proof existence, and proof-anchor matching, but MUST NOT be compared against an unrelated epic’s acceptance roster. This rule is structural only and does not define, rename, or curate token names.
+
 Bounded evidence-refresh side effects. When the evidence updater or generator refreshes governed proof companions outside the direct target family, the run evidence MUST name those refreshed families and classify them as expected updater convergence, required dependency refresh, or unexpected drift. Unclassified side-effect churn that obscures the direct evidence family is a mechanics defect until classified.
+
+Bounded side-effect validation. When side-effect classifications are part of a governed evidence family’s PASS posture, the generator or updater check MUST validate the classified side-effect paths, their proof companions, and any affected Machine Mirror rows before reporting PASS. A classified side effect MUST NOT be treated as coherent if the path is missing, if the proof companion fails against its target, or if the Machine Mirror row does not match the expected artifact key, proof anchor, sha256, and size. This rule applies to normal generation and `--check` mode; self-generated artifact recursion concerns may affect write ordering, but they MUST NOT allow check mode to skip validation of final mirror bindings.
 
 Scope of convergence (required). This fixed-point rule applies to:
 
@@ -586,24 +648,6 @@ Evidence jobs that write or validate governed \*.path\_proof.txt MUST treat mtim
 Mechanics does not redefine these semantics here; it routes to HDE-Schemas & Artifacts and the Glow QA Guide by title. The evidence change workflow in this section assumes that tools/evidence/update\_evidence\_index.py, tools/evidence/generate\_engine\_core\_evidence.py, ci/checks/check\_mirror\_schema.sh, sampler and Engine Core evidence generators, the sanity pipeline harness, the env-pins check, and the evidence tests are wired to these mtime\_utc and produced\_at\_utc rules and that any governed path-proofs they emit or validate satisfy the schema and monotone constraints pinned in those PF documents.
 
 ---
-
-Artifact Map
-
-Doc A: EXCERPT
-
-Doc B: "PF14 redlines addenda 1-5 bn 9.4.4 drain.md"
-
-Output: Revised EXCERPT
-
-Delta Notes
-
-* No change requests were actionable because none of the specified target strings appeared verbatim in the excerpt.  
-* Converted numeric section headers into a consistent Markdown heading hierarchy and improved paragraph spacing for paste-safe layout.  
-* Normalized implicit colon-introduced blocks into explicit bullet lists and removed trailing commas from list lines.  
-* Replaced duplicate repeated blocks and placeholder ellipses with explicit placeholders to improve clarity without changing requirements.  
-* Consolidated fragment lines into complete sentences and grouped related requirements into logical subsections.
-
-Revised Excerpt
 
 ## **1.4 Routing (single homes; no duplication)**
 
@@ -6443,6 +6487,219 @@ Final retrospective mechanics notes observed:
 * No closure-trace evidence gap remains visible in PF10.  
 * PF09.2 actual drain is not proven and is intentionally non-claimed.  
 * The strongest retained mechanics lessons are proof-class separation, governed evidence binding, generated-proof fail-closed posture, explicit no-user vendor-backed proof labels, multi-root evidence governance through index/mirror/path-proof discipline, and non-claim posture for PF09.2 drainage.
+
+HDE-EPIC031 early Live QA evidence paths observed (records-only):
+
+* checks/step-0a-discovery:  
+  * `audit/qa/hde-epic031/00_meta/live_qa_harness.py`  
+  * `audit/qa/hde-epic031/checks/step-0a-discovery/primary.log`  
+  * `audit/qa/hde-epic031/checks/step-0a-discovery/discovery.json`  
+* checks/step-0b-doc-delta:  
+  * `audit/docdeltas/hde-epic031_doc_deltas.md`  
+  * `audit/qa/hde-epic031/00_meta/doc_deltas.md`  
+  * `audit/qa/hde-epic031/checks/step-0b-doc-delta/primary.log`  
+* checks/po-001:  
+  * `audit/qa/hde-epic031/checks/po-001/primary.log`  
+  * `audit/qa/hde-epic031/checks/po-001/result.json`  
+* checks/po-002:  
+  * `audit/qa/hde-epic031/checks/po-002/primary.log`  
+  * `audit/qa/hde-epic031/checks/po-002/result.json`  
+* checks/po-003:  
+  * `audit/qa/hde-epic031/checks/po-003/primary.log`  
+  * `audit/qa/hde-epic031/checks/po-003/result.json`  
+* checks/po-004:  
+  * `audit/qa/hde-epic031/checks/po-004/primary.log`  
+  * `audit/qa/hde-epic031/checks/po-004/result.json`  
+* checks/po-005:  
+  * `audit/qa/hde-epic031/checks/po-005/primary.log`  
+  * `audit/qa/hde-epic031/checks/po-005/result.json`  
+* checks/po-006:  
+  * `audit/qa/hde-epic031/checks/po-006/primary.log`  
+  * `audit/qa/hde-epic031/checks/po-006/result.json`  
+  * `audit/qa/hde-epic031/remediation/moon_loop/patch.diff`  
+  * `audit/qa/hde-epic031/remediation/moon_loop/changed_files.txt`  
+  * `audit/qa/hde-epic031/00_meta/doc_deltas.md`
+
+HDE-EPIC031 early Live QA current-state notes observed (records-only).
+
+* Step-0A and Step-0B record PASS under closed rails and deterministic capture pins, with no blocking or tooling states observed. Step-0A records discovery under `audit/qa/hde-epic031/checks/step-0a-discovery/`; Step-0B records the doc-delta pair and primary log under the governed roots listed above.  
+* Step-0A records an accepted plan-execution drift: one plan action referenced `audit/qa/hde-epic031/00_meta/discovery.json`, while the plan-required deliverable and execution helper used `audit/qa/hde-epic031/checks/step-0a-discovery/discovery.json`. The final posture is non-blocking because the required check-root deliverable exists and current-state evidence remains under the stable check directory.  
+* checks/po-001 records a PASS first-slice scope-boundary proof under `audit/qa/hde-epic031/checks/po-001/`, including no public-surface widening and no later vendor-version, database, router, close-pack, or acceptance expansion claim for this slice. It also records an accepted plan-guidance mismatch between the plan key `no_epic031_public_route` and the reported evidence key `no_epic031_public_surface`.  
+* checks/po-002 records a PASS closed-by-default provider-access proof under `audit/qa/hde-epic031/checks/po-002/`, including closed-default refusal, bounded opening evidence, provider tests, and preserved no-live-vendor policy.  
+* checks/po-003 records a PASS deterministic typed-provider-refusal proof under `audit/qa/hde-epic031/checks/po-003/`, including typed refusal markers and explicit refusal-before-input-or-ingest ordering evidence.  
+* checks/po-004 records a PASS bounded retry/backoff and non-success-classification proof under `audit/qa/hde-epic031/checks/po-004/`, including pinned attempts, retry/backoff evidence, and non-success behavior not treated as success.  
+* checks/po-005 records a PASS typed rate-limit and Retry-After proof under `audit/qa/hde-epic031/checks/po-005/`, including typed `429` handling, Retry-After parsing evidence, and behavior not reported as success.  
+* checks/po-006 records a PASS keys-only provider diagnostics proof under `audit/qa/hde-epic031/checks/po-006/`, including `allowed_keys_present: true`, payload-body absence, plaintext-secret absence, raw-secret-header absence, and generator check return code `0`.  
+* checks/po-006 records an accepted Moon Loop remediation of the QA-created harness predicate in `audit/qa/hde-epic031/00_meta/live_qa_harness.py`. The initial predicate produced a false `FAIL_BEHAVIOR` despite PR-02 generator and redaction evidence being PASS. The accepted remediation aligned `check_po006` with the canonical redaction schema fields `allowed_keys` and `status`, captured failure signature, remediation note, rerun PASS excerpt, patch, changed-files sha256 evidence, and doc-delta note, and stayed inside the already-scoped PO-006 evidence family.
+
+HDE-EPIC031 continued Live QA evidence paths observed (records-only):
+
+* checks/po-007:  
+  * `audit/qa/hde-epic031/checks/po-007/primary.log`  
+  * `audit/qa/hde-epic031/checks/po-007/result.json`  
+* checks/po-008:  
+  * `audit/qa/hde-epic031/checks/po-008/primary.log`  
+  * `audit/qa/hde-epic031/checks/po-008/result.json`  
+  * `audit/qa/hde-epic031/remediation/moon_loop/patch.diff`  
+  * `audit/qa/hde-epic031/remediation/moon_loop/changed_files.txt`  
+  * `audit/qa/hde-epic031/pr-03/evidence_family_map.json`  
+  * `audit/qa/hde-epic031/pr-03/safe_rails_evidence_coherence.json`  
+  * `audit/qa/hde-epic031/pr-03/evidence_refresh.log`  
+  * `docs/evidence/INDEX.json`  
+  * `docs/evidence/INDEX.sha256`  
+  * `artifacts/evidence_index.jsonl`  
+  * `artifacts/evidence_index.jsonl.sha256`  
+  * `artifacts/evidence_index.jsonl.path_proof.txt`  
+  * `artifacts/compat/AB.json`  
+  * `artifacts/compat/BA.json`  
+* checks/po-009:  
+  * `audit/qa/hde-epic031/checks/po-009/primary.log`  
+  * `audit/qa/hde-epic031/checks/po-009/result.json`  
+* checks/po-010:  
+  * `audit/qa/hde-epic031/checks/po-010/primary.log`  
+  * `audit/qa/hde-epic031/checks/po-010/result.json`  
+* checks/po-011:  
+  * `audit/qa/hde-epic031/checks/po-011/primary.log`  
+  * `audit/qa/hde-epic031/checks/po-011/result.json`  
+* checks/po-012:  
+  * `audit/qa/hde-epic031/checks/po-012/primary.log`  
+  * `audit/qa/hde-epic031/checks/po-012/result.json`  
+* checks/po-013:  
+  * `audit/qa/hde-epic031/checks/po-013/primary.log`  
+  * `audit/qa/hde-epic031/checks/po-013/result.json`  
+* checks/po-014:  
+  * `audit/qa/hde-epic031/checks/po-014/primary.log`  
+  * `audit/qa/hde-epic031/checks/po-014/result.json`  
+* checks/po-015:  
+  * `audit/qa/hde-epic031/checks/po-015/primary.log`  
+  * `audit/qa/hde-epic031/checks/po-015/result.json`  
+* checks/po-016:  
+  * `audit/qa/hde-epic031/checks/po-016/primary.log`  
+  * `audit/qa/hde-epic031/checks/po-016/result.json`  
+* checks/po-017:  
+  * `audit/qa/hde-epic031/checks/po-017/primary.log`  
+  * `audit/qa/hde-epic031/checks/po-017/result.json`  
+* checks/po-018:  
+  * `audit/qa/hde-epic031/checks/po-018/primary.log`  
+  * `audit/qa/hde-epic031/checks/po-018/result.json`
+
+HDE-EPIC031 continued Live QA current-state notes observed (records-only).
+
+* checks/po-007 records a PASS sensitive-provider-data absence proof under `audit/qa/hde-epic031/checks/po-007/`, including redaction scan presence, sensitive provider material absence from QA-visible diagnostics, and live vendor calls remaining forbidden.  
+* checks/po-008 records a PASS governed human and machine evidence-coherence proof under `audit/qa/hde-epic031/checks/po-008/`, after Moon Loop remediation. The final evidence records command success, PR-03 coherence status PASS, Human Evidence Index and Machine Mirror coherence, hash-sentinel presence, and changed-files proof for the affected evidence/index family.  
+* checks/po-008 records an accepted Moon Loop remediation for governed coherence/index artifacts. The initial evidence recorded stale or proof-mtime failures while coherence status was PASS. The accepted remediation refreshed governed coherence/index artifacts under closed rails, normalized `artifacts/compat/AB.json` and `artifacts/compat/BA.json` filesystem mtimes with bytes unchanged, captured failure signature, remediation note, rerun PASS excerpt, patch, changed-files proof, and remained acceptable as an auditable in-session remediation.  
+* checks/po-009 records a PASS machine-readable evidence alignment proof under `audit/qa/hde-epic031/checks/po-009/`, including family-map presence, family-map type `dict`, Machine Mirror presence, mirror mention of EPIC031, mirror path-proof existence, and mirror-schema success as reported in the adjacent governed evidence stream.  
+* checks/po-010 records a PASS generated-proof fail-closed proof under `audit/qa/hde-epic031/checks/po-010/`. The current evidence resolves the prior PR-01 check-mode blocker with `pr01_generator_check_mode_present: true`, records PR-02 and PR-03 generator check return codes as `0`, records PR-03 evidence coherence success, and records final status PASS.  
+* checks/po-011 records a PASS acceptance-claim boundary proof under `audit/qa/hde-epic031/checks/po-011/`. The check records no claimed tokens, keeps missing acceptance-map or token-matrix posture as close-stage rather than runtime behavior proof, and records `claims_limited_to_evidence_scope: true`.  
+* checks/po-012 records a PASS active-Fermentation-subtask support proof under `audit/qa/hde-epic031/checks/po-012/`. The check records `hde_ferm001_2_supported: true`, `hde_ferm001_3_supported: true`, and `hde_ferm001_4_supported: true`, while explicitly recording `pf09_5_drain_claimed: false`.  
+* checks/po-013 records a PASS reused-foundation boundary proof under `audit/qa/hde-epic031/checks/po-013/`. The check records reused foundation as history-only, no new implementation claim for the reused foundation, and active slice work limited to HDE-FERM001.2, HDE-FERM001.3, and HDE-FERM001.4.  
+* checks/po-014 records a PASS implementation-readiness boundary proof under `audit/qa/hde-epic031/checks/po-014/`. The check records prior logs present, PO-014 preflight success, and implementation readiness not treated as final QA outcome.  
+* checks/po-015 records a PASS truth-class separation proof under `audit/qa/hde-epic031/checks/po-015/`. The check records implementation readiness, QA readiness, final QA outcome, and documentation drainage as separate, and records PF09.5 drainage as not required before QA PASS.  
+* checks/po-016 records a PASS vendor-version runtime non-claim proof under `audit/qa/hde-epic031/checks/po-016/`. The check records no vendor-version runtime conformance claim and visible no-live-vendor policy.  
+* checks/po-017 records a PASS live-vendor-behavior non-claim proof under `audit/qa/hde-epic031/checks/po-017/`. The check records no live vendor behavior claim, local proof kept separate from live vendor proof, and live vendor calls forbidden.  
+* checks/po-018 records a PASS Live QA proof-only boundary under `audit/qa/hde-epic031/checks/po-018/`. The check records no implementation, remediation, PF edit, or closeout action performed by Live QA, and records the Live QA role as proving current results only.  
+* PO-013, PO-014, PO-015, PO-016, PO-017, and PO-018 primary logs record captured rails and determinism environment fields, including SAFE\_MODE, ALLOW\_NETWORK, APP\_ENV, LC\_ALL, LANG, and TZ.
+
+HDE-EPIC031 final QA RCA and closeout interpretation observed (records-only).
+
+* The QA RCA records PF10 as primary for HDE-EPIC031-specific QA events, outcomes, remediation loops, ADRs, and evidence pointers. It records PF19 as QA process and RCA basis where PF10 is silent, PF06 only for the close-gate QA RCA and Doc Delta summary requirement, no PF27 use, no Implementation Guide goal framing, and QA Plan use only for intended requirements framing.  
+* The QA timeline is recorded in PF10 source order with no chronological reordering. The timeline records PR-01, PR-02, and PR-03 remediation loops, the HDE-EPIC031 retrospective, PF23 audit analysis, Step-0A and Step-0B, and PO-001 through PO-018 as the ordered QA and remediation chain.  
+* The RCA records all QA Plan checks from Step-0A through PO-018 as fully evidenced. The recorded mismatches or deviations are non-blocking for closeout: Step-0A discovery sidecar path drift, PO-001 plan-key wording drift, PO-006 Moon Loop false FAIL predicate remediation, PO-008 Moon Loop evidence-coherence remediation, and PO-010 prior blocker remediation.  
+* The RCA records the PR-01, PR-02, and PR-03 implementation evidence chain as strong: PR-01 provider policy proof, PR-02 log and redaction posture, and PR-03 evidence/index coherence.  
+* The RCA root cause is proof-boundary and evidence-coupling difficulty in the first provider-control Fermentation slice: provider non-success statuses needed exact classification, redirect behavior needed default-path coverage, vendor-specific evidence needed PR-specific homes, generated proofs needed fail-closed side-effect validation, and Live QA needed to preserve separation between implementation readiness, final QA outcome, PF09.5 drainage, formal close-pack completion, vendor-version conformance, and live vendor behavior.  
+* The RCA records why detection was hard: some failures appeared only when the proof path matched actual runtime or evidence-generator behavior. The injected request test did not expose default urllib redirect following, and generated evidence could look green unless side-effect paths, proof companions, and mirror rows were validated as a family.  
+* The RCA records why closeout was hard: the closeout had to prove PASS while avoiding overclaims. It records no live vendor behavior, no vendor-version runtime conformance, no acceptance-token claim from tokenless Live QA checks, no PF09.5 drainage claim, and no formal close-pack completion claim from Live QA alone.  
+* The RCA records remediation loops as useful because PR-01 fixed retry classification and redirect handling, PR-02 moved vendor evidence away from shared DB-bridge paths into PR-specific audit paths, PR-03 converted outside-family proof churn into explicit side-effect classification and fail-closed validation, PO-006 corrected a false FAIL\_BEHAVIOR harness predicate, PO-008 restored governed evidence coherence, and PO-010 resolved the prior generator check-mode blocker.  
+* The RCA records no new PF-canon doc deltas required from the RCA itself.  
+* The RCA verdict is Ready with caveats. The caveats are formal close-pack completion, PF09.5 drainage, parent-task posture, and deferred later Fermentation work, not failed Live QA behavior.  
+* Deferred later Fermentation work remains visible as future scope only: HDAPI v2 runtime and live conformance, DB bridge and DB runtime acceptance, router parity, narrative registry closure, and parent HDE-FERM001 status posture. This records a no-claim boundary only; it does not create PF14 tasks, PF09 statuses, acceptance tokens, closeout gates, or future implementation scope by itself.
+
+HDE-EPIC031 Lead Dev retrospective observed (records-only). The retrospective records HDE-EPIC031 as SATISFIED for this review’s closure trace only. It is not a PO closeout action, not PF09.5 drainage, not formal close-pack completion, not a new acceptance-token source, and not a claim of HDAPI v2 runtime conformance or live vendor behavior.
+
+Final review source posture observed:
+
+* PF10 is primary for HDE-EPIC031-specific implementation records, QA events, remediation loops, ADRs, outcomes, and evidence pointers.  
+* PF23 is read-only current-reality context only. It may support or challenge component, pathname, surface, or evidence-surface interpretation, but it does not prove closure or create blockers by itself.  
+* PF-Canon is normative where PF10 is silent.  
+* The Implementation Guide is used only for intended scope framing.  
+* The QA Plan is used only for intended QA requirements framing.  
+* PF20 was not used.
+
+Final Lead Dev deliverable and QA registers observed:
+
+* The first Fermentation Pass 2 SAFE rails slice is recorded as limited to `HDE-FERM001.2`, `HDE-FERM001.3`, and `HDE-FERM001.4`.  
+* PR-01 records the SAFE rails open posture and integration-gate slice.  
+* PR-02 records the SAFE rails observability and secret-safe log posture slice.  
+* PR-03 records SAFE rails governed evidence and indexing coherence.  
+* CLI Aux preview is recorded as an already-complete reused foundation, not new implementation scope for this epic.  
+* Deferred later Fermentation rows remain out of current scope: `HDE-FERM006`, `HDE-FERM007`, and `HDE-FERM008`.  
+* No public Reader contract, route, flag, payload field, or HDAPI v2 runtime expansion is recorded for this slice.  
+* Governed evidence binding is recorded through the Human Evidence Index, Machine Mirror, hash sentinel, and path proofs.  
+* Step-0A, Step-0B, and PO-001 through PO-018 are recorded as PASS, including accepted Moon Loop remediation for PO-006 and PO-008 and resolved prior blocker posture for PO-010.  
+* Final QA closeout posture is recorded as READY WITH CAVEATS.
+
+Final Lead Dev path and surface ledger observed:
+
+* `audit/qa/hde-epic031/`  
+* `audit/qa/hde-epic031/checks/`  
+* `audit/qa/hde-epic031/checks/step-0a-discovery/discovery.json`  
+* `audit/qa/hde-epic031/00_meta/discovery.json` as framing-only drift, not closure proof  
+* `audit/docdeltas/hde-epic031_doc_deltas.md`  
+* `audit/qa/hde-epic031/00_meta/doc_deltas.md`  
+* `audit/qa/hde-epic031/checks/po-001/primary.log`  
+* `audit/qa/hde-epic031/checks/po-006/primary.log`  
+* `audit/qa/hde-epic031/checks/po-010/primary.log`  
+* `audit/qa/hde-epic031/qa_step_logs_manifest.json`  
+* `docs/evidence/INDEX.json`  
+* `docs/evidence/INDEX.sha256`  
+* `artifacts/evidence_index.jsonl`  
+* `artifacts/evidence_index.jsonl.sha256`  
+* `audit/qa/hde-epic031/pr-03/safe_rails_evidence_coherence.json`  
+* `/reader` as public Reader route context, not closure proof by itself  
+* `/api/compat/v1` as internal/admin compat context, not closure proof by itself  
+* `engine/bodygraph/vendor_client.py` as vendor seam context, not closure proof by itself  
+* `engine/bodygraph/ingest.py` as current-reality context only  
+* `engine/bodygraph/resolver.py` as provider-gate context only  
+* `engine/compat/compute.py` as current-reality seam context only  
+* `presenter/` as namespace context only  
+* `engine/presenter/` as namespace context only  
+* `audit/EPIC-031_close_report.md` as framing-only caveat, not completed close-pack proof  
+* `audit/EPIC-031_MANIFEST.json` as framing-only caveat, not completed close-pack proof
+
+Final Lead Dev closure trace observed:
+
+* The PR-01, PR-02, and PR-03 implementation evidence chain supports the three active Fermentation subtasks for this epic.  
+* Step-0A, Step-0B, and PO-001 through PO-018 are recorded as PASS, including accepted Moon Loop remediation where needed.  
+* The remaining caveats are formal close-pack completion, PF09.5 drainage, parent-task posture, and deferred later Fermentation work. Those caveats are not failed Live QA behavior.  
+* PF23 context does not reveal an unresolved current-reality contradiction that overrides PF10’s QA outcome record.  
+* Documentation drainage and PF09.5 status movement remain follow-up posture, not blockers to this review’s closure trace.
+
+Final Lead Dev RCA and mechanics lessons observed:
+
+* Provider status classification required tighter separation among rate-limit, retryable network, retryable server, and non-retryable provider status classes.  
+* Redirect behavior matters because injected request tests may not cover default request behavior.  
+* Secret-safe observability requires bounded labels plus proof of payload-body absence, plaintext-secret absence, and raw-secret-header absence.  
+* Evidence generators need fail-closed behavior so missing or stale proof companions cannot silently produce accepted proof.  
+* Side-effect evidence families must fail closed when target proof companions are missing or stale.  
+* Human Evidence Index and Machine Mirror coherence are central to trusting SAFE rails evidence.  
+* Current-state check roots reduce ambiguity when run-id or sidecar paths drift.  
+* Moon Loop remediation is acceptable only when bounded, evidence-linked, and explicitly recorded with failure signature, remediation note, rerun proof, and changed-artifact proof.  
+* Live QA must stay proof-only and must not drift into implementation, remediation, PF edits, or closeout action.  
+* PF09 subtask supportability and permanent PF09 drainage remain distinct truth classes.  
+* Public Reader and HDAPI v2 runtime boundaries must stay out of the SAFE first-slice proof unless explicitly scoped.  
+* Vendor live behavior and local provider-control proof are separate proof classes.  
+* Evidence roots can be multi-root when bound by governed index, mirror, and path-proof discipline.  
+* PF23 reality context is useful for confirming surfaces and seams but does not replace PF10 QA evidence.
+
+Final Lead Dev no-claim and future-scope boundaries observed:
+
+* Preserve PF10’s no-claim posture for HDAPI v2 runtime conformance until a later Fermentation slice proves it.  
+* Preserve PF10’s no-claim posture for live vendor behavior until a later scoped proof exists.  
+* Do not mark PF09.5 permanent drainage complete until the actual PF09.5 row update is assigned and proven.  
+* Parent `HDE-FERM001` status posture remains a later close or drain judgment.  
+* Deferred later Fermentation work remains future scope only: HDAPI v2 runtime conformance, live vendor behavior, DB bridge and DB runtime acceptance, narrative/router parity, and registry closure.  
+* Future cards may harden evidence side-effect classification patterns and generated-proof fail-closed conventions, but this retrospective does not create PF14 tasks, PF09 statuses, acceptance tokens, closeout gates, or future implementation scope by itself.  
+* The retrospective records no current PF-Canon doc delta required from the PF23 audit pass or final QA RCA.
 
 ### **37.4.1 CLI help and argument-policing captures for conjunction-mode evidence**
 

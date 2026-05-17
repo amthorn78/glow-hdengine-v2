@@ -2,12 +2,12 @@
 
 **Title:** PF06-Canon-Epic-Process-Guide 
 
-**Version:** v2.0.4
+**Version:** v2.1
 
 **Status:** Canon
 
-**Effective date**: 2026-05-06  
-**Last Update Gate:**  BN drain 10.8 A35
+**Effective date**: 2026-05-16  
+**Last Update Gate:**  BN 10.9.8 A16
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -2193,15 +2193,11 @@ Canonical token string hygiene (common invalid variants). Token strings are cont
 
 Observed invalid variants must be corrected as follows:
 
-* CANON\_JSON\_OK → JSON\_CANONICAL\_CHECK\_OK
-
+* CANON\_JSON\_OK → JSON\_CANONICAL\_CHECK\_OK  
 * DOC\_DELTA\_CAPTURED\_OK → DOC\_DELTA\_PRESENT\_OK  
-* COMPOSITE\_AB\_BA\_IDENTITY\_OK → COMPOSITE\_ABBA\_IDENTITY\_OK
-
-* CLI\_READER\_EMITTER\_PARITY\_OK → CLI\_READER\_PARITY\_OK
-
-* CATEGORY\_FRAMEWORK\_OK → (non-canonical and ambiguous; replace with the correct canonical token for the intended claim: MAGIC10\_DOMAIN\_CLOSED\_OK for domain closure, or PREFS\_KEYSET\_10\_OK for prefs keyset contract)  
-* 
+* COMPOSITE\_AB\_BA\_IDENTITY\_OK → COMPOSITE\_ABBA\_IDENTITY\_OK  
+* CLI\_READER\_EMITTER\_PARITY\_OK → CLI\_READER\_PARITY\_OK  
+* CATEGORY\_FRAMEWORK\_OK → (non-canonical and ambiguous; replace with the correct canonical token for the intended claim: MAGIC10\_DOMAIN\_CLOSED\_OK for domain closure, or PREFS\_KEYSET\_10\_OK for prefs keyset contract)
 
 Close-pack presence is baseline artifacts, not a token by default. Do not include CLOSE\_PACK\_FILES\_PRESENT\_OK in acceptance rosters or plan token lists unless and until Governance explicitly registers and canonizes it as a token. Close-pack presence is verified by the existence of the canonical close-pack artifacts and their evidence bindings.
 
@@ -2258,6 +2254,12 @@ However:
 Every acceptance token to artifact binding that appears in an Epic Plan and in the token/evidence matrix MUST be validated against the canonical evidence catalog before approval or merge.
 
 If the evidence catalog defines a fixed canonical path for a token’s evidence surface, the plan and matrix MUST bind to that exact path.
+
+If a PR or remediation produces evidence for a PR-specific, check-specific, vendor-specific, or slice-specific behavior, it MUST NOT overwrite shared or global governed evidence artifacts unless the approved task explicitly requires refreshing those shared artifacts.
+
+If an attempted evidence output collides with an existing shared or global evidence family, the final review MUST show that the collision was repaired by restoring the shared artifact, relocating the slice-specific evidence under a governed slice-specific root, refreshing required companion proof, index, mirror, and checksum artifacts, and classifying any shared or global companion churn.
+
+A collision repair is acceptable only when it preserves the approved behavior, does not drop required evidence, does not create an alternate evidence home, and does not use the repaired collision to claim unrelated PF09 closure, route work, public-contract change, or new acceptance scope.
 
 Evidence-path authority order (normative). When determining the authoritative path-of-record or token → artifact binding for governed evidence, resolve conflicts using this authority order (highest wins):
 
@@ -2423,6 +2425,16 @@ Approval, review, retrospective, and closeout artifacts MUST keep these states s
 
 They MUST NOT say that a slice is blocked only because PF09 still says Not done or Partial, and they MUST NOT phrase a supportable status move as though PF09 has already been updated.
 
+Parent-task drainage after partial subtask completion.
+
+When evidence supports completion of one or more subtasks under a broader PF09.x parent task, but not every child row or acceptance dimension under that parent is proven complete, review and closeout artifacts MUST keep the parent-task posture separate from the subtask posture.
+
+A subtask may be recorded as supportable to Done while the parent task remains Partial, Consolidation pending, or another non-Done posture if unproven child rows, deferred dimensions, close-pack gaps, or drain-only caveats remain.
+
+A parent PF09.x row may be recommended for Done only when the review names every child row or acceptance dimension that must close that parent and proves that each one is complete in substance from approved implementation state, approved OPS state where applicable, governed evidence, and truthful review artifacts.
+
+If the parent-task decision is intentionally deferred to a later close or drain step, the artifact MUST say so explicitly and MUST NOT imply that subtask completion automatically closes the parent.
+
 When a PR or OPS task is approved as a bounded non-closure step, review MUST be limited to the approved task in question and its explicitly approved scope.
 
 A PF09 closure gate applies only when the approved task explicitly claims one or more of the following:
@@ -2504,41 +2516,37 @@ Non-reviewable formatting (do not block)
 * Inline-code or backtick wrappers in planning and review artifacts are presentation-only when the underlying field name, content, ordering or adjacency, and meaning are unchanged.  
 * Reviewers MUST NOT block approval solely because a required planning label, PF title, task ID, subtask ID, token name, or short human-readable literal is wrapped in inline backticks.  
 * This non-blocking posture does not apply when the wrapper changes or hides executable commands, code, schema, JSON, token spelling, path strings, endpoint strings, environment variable names, governed evidence bytes, acceptance maps, token registries, or other machine-sensitive content.  
-* Rendered escape characters that plausibly arise from AI processing, markdown rendering, display-layer normalization, or retrieval formatting are not source truth by themselves.  
-  * A reviewer may block on visible escape characters only when both are established:  
-    * the characters are proven to exist in the actual source text, not only in the rendered view  
-    * they materially change command runability, code validity, JSON validity, path or filename correctness, URL or endpoint correctness, environment variable spelling, token spelling, identifier spelling, evidence meaning, or other execution-critical or proof-critical conten.  
-  * If either condition is not established, treat the issue as non-blocking display-layer noise.  
+* Rendered escape characters that plausibly arise from AI processing, markdown rendering, display-layer normalization, retrieval formatting, reviewer quoting, or chat transcript display are not source truth by themselves.  
+  * In AI plan review, escape-character appearance is not a blocker. Only an underlying non-rendering defect may be a blocker.  
+  * This rule applies to all Glow AI approval-loop surfaces, including Epic Plan review, Implementation Plan review, QA Plan review, Live QA Plan review, remediation guide review, redline review, Codex prompt review, PF10 addendum review, and any AI-generated review ledger or approval loop.  
+  * This rule applies even when the affected string is a machine-sensitive string, including paths, artifact paths, command strings, shell redirection, heredoc markers, script paths, check names, token names, environment variable names, endpoint strings, JSON keys, evidence filenames, manifest filenames, path-proof filenames, hash filenames, Python expressions, shell snippets, inline runbook text, and QA-created script bodies.  
+  * Before raising any blocker that mentions escaped characters, backslashes, markdown escaping, rendered paths, rendered shell syntax, or rendered code syntax, the reviewer MUST ignore the apparent rendering escapes and ask whether the command identity, artifact identity, path identity, token identity, evidence identity, PASS or FAIL posture, TOOLING posture, and proof obligation remain clear.  
+  * If the intended proof target remains clear after ignoring rendered escapes, the issue is not a Blocker. The correct disposition is No issue, Suggestion, or Caveat according to execution risk.  
+  * A reviewer may raise a blocker only for a substantive defect that remains after the rendered escape layer is ignored, such as missing command identity, missing proof target, missing required deliverable, wrong evidence family, unsafe execution posture, unproven repo locus, canon conflict, or changed PASS or FAIL semantics.  
+  * Reviewers MUST NOT ask the Product Owner, plan author, or documentation author to revise rendered escape characters when the source meaning and proof target are clear.  
+  * If an issue remains after ignoring escape characters, write the issue without relying on the escape characters.  
+  * Acceptable source proof includes a raw file read, a byte-preserving excerpt, an explicit source-view excerpt showing the literal characters, or a deterministic source-artifact search result for the literal escaped string.  
+  * The proof MUST distinguish source text, rendered review output, model or transcript markdown escaping, and copied quote changes. Only source text may support a blocker.  
+  * If source-byte proof is unavailable, the reviewer MUST NOT state that the source artifact contains escaped characters. The reviewer may only state that rendered review text shows escaped characters and that source-byte proof is unavailable. That statement is not a blocker by itself.  
+  * If either the substantive non-rendering defect or the source truth is not established, treat the issue as non-blocking display-layer noise.  
   * If a relied-on passage might contain display artifacts, the reviewer MUST re-open or re-retrieve the source until raw-text truth is resolved before issuing a blocker. Approval must follow source truth and execution meaning, not markdown-safe rendering artifacts.  
 * Boldface, italics, and line-break differences are non-reviewable unless they obscure required semantics.
 
 Mechanical blockers (planning artifacts)
 
 * Business Case is missing or not product-oriented: every Epic Plan MUST include a clearly labeled Business Case section that explains the product goal, the user problem, and the value (what changes for the user and what success looks like). If missing or purely technical, return the plan for revision.  
-* Contract Change Justification is missing: the Epic Plan MUST include a clearly labeled Contract Change Justification section that explains any new or modified contract surfaces (CLI flags or modes, endpoint routes, output shapes) and why a new surface is necessary rather than reusing an existing one.
-
-* Backward compatibility posture is missing: the Epic Plan MUST include a clearly labeled Backward Compatibility posture section that states what remains unchanged by default, what changes (if anything), and the rollback plan if the change must be reverted.
-
-* Any plan fact that asserts a repo path, module home, env var name/value, CLI shape, script/module/check/test name, endpoint route, or other executable entrypoint MUST be validated (Canon-cited, CA vetted, IG Approved, or QA-created). Unvalidated or fabricated loci are mechanical blockers. Missing tooling is a repo gap to be addressed by PR work, not by QA-time script creation. (See §0.5.1.)
-
-* Plans MUST NOT use placeholders that shift responsibility to reviewers (for example: “PO will fill”, “TBD”, “???”, “e.g.”). If a value is unknown, the plan MUST cite a gap in PF canon and record it as a Tracked Issue with an owner and disposition.
-
-* Prohibited characters are mechanical blockers outside explicit code spans: Unicode ellipsis character (U+2026), and a sequence of three consecutive full stop characters (U+002E repeated three times). Use the approved omission markers below instead.
-
-* Fenced code blocks are prohibited in planning documents, reviews, and plan-derived excerpts. Commands and snippets must be presented as plain text lines with surrounding context and clear labeling rather than fencing.
-
-* Plans, QA plans, endpoint catalogs, and runbooks MUST NOT invent “proof-only” routes. Route references MUST be to canonical registered routes (as defined in the Endpoint Catalog) and to routes that actually exist in the target runtime mount. In particular:
-
-  * Reader surface: GET /reader (canonical). Reader v1 is selected via query param v=1 (for example: GET /reader?v=1).
-
-  * If the API is mounted under /api, /api/reader is an alias of the same Reader surface (not a separate contract).
-
-  * Plans and runbooks MUST NOT reference /api/reader-proof/v1.
-
-  * Aux narrative surface: POST /aux/narrative (canonical).
-
-* Plans, QA prompts, and QA reviews MUST NOT introduce, require, or depend on run\_id, timestamped run directories, fresh-run roots, or any per-run directory nesting as operator input, step-log header field, manifest field, or correctness key.
-
+* Contract Change Justification is missing: the Epic Plan MUST include a clearly labeled Contract Change Justification section that explains any new or modified contract surfaces (CLI flags or modes, endpoint routes, output shapes) and why a new surface is necessary rather than reusing an existing one.  
+* Backward compatibility posture is missing: the Epic Plan MUST include a clearly labeled Backward Compatibility posture section that states what remains unchanged by default, what changes (if anything), and the rollback plan if the change must be reverted.  
+* Any plan fact that asserts a repo path, module home, env var name/value, CLI shape, script/module/check/test name, endpoint route, or other executable entrypoint MUST be validated (Canon-cited, CA vetted, IG Approved, or QA-created). Unvalidated or fabricated loci are mechanical blockers. Missing tooling is a repo gap to be addressed by PR work, not by QA-time script creation. (See §0.5.1.)  
+* Plans MUST NOT use placeholders that shift responsibility to reviewers (for example: “PO will fill”, “TBD”, “???”, “e.g.”). If a value is unknown, the plan MUST cite a gap in PF canon and record it as a Tracked Issue with an owner and disposition.  
+* Prohibited characters are mechanical blockers outside explicit code spans: Unicode ellipsis character (U+2026), and a sequence of three consecutive full stop characters (U+002E repeated three times). Use the approved omission markers below instead.  
+* Fenced code blocks are prohibited in planning documents, reviews, and plan-derived excerpts. Commands and snippets must be presented as plain text lines with surrounding context and clear labeling rather than fencing.  
+* Plans, QA plans, endpoint catalogs, and runbooks MUST NOT invent “proof-only” routes. Route references MUST be to canonical registered routes (as defined in the Endpoint Catalog) and to routes that actually exist in the target runtime mount. In particular:  
+  * Reader surface: GET /reader (canonical). Reader v1 is selected via query param v=1 (for example: GET /reader?v=1).  
+  * If the API is mounted under /api, /api/reader is an alias of the same Reader surface (not a separate contract).  
+  * Plans and runbooks MUST NOT reference /api/reader-proof/v1.  
+  * Aux narrative surface: POST /aux/narrative (canonical).  
+* Plans, QA prompts, and QA reviews MUST NOT introduce, require, or depend on run\_id, timestamped run directories, fresh-run roots, or any per-run directory nesting as operator input, step-log header field, manifest field, or correctness key.  
 * Live QA evidence layout is checks-only under a stable epic-scoped QA root. Re-runs MUST refresh the same check directories and MUST NOT create new run roots for correctness purposes.
 
 Approved omission markers (portable)
@@ -3538,6 +3546,12 @@ Does not modify PF-Canon itself. The repo docs sweep MUST NOT modify any PF-Cano
 
 Repo docs sweeps MUST distinguish implementation-slice evidence, close-pack evidence, Live QA evidence, formal PF-Canon drainage, and historical evidence. They MUST NOT present PR-slice artifacts, repo-doc validation, or historical evidence families as close-pack artifacts, Live QA proof, PF-Canon drainage, or final closure evidence unless those exact artifacts or results are directly proven.
 
+Repo docs sweeps MUST prove non-obvious claims before documenting them. Before a sweep adds or updates claims about commands, flags, workflows, file paths, module paths, service names, endpoints, config keys, environment variables, artifact paths, token names, validation references, evidence roots, or PF terminology, the sweep MUST ground those claims in repo reality, PF10, or PF-Canon.
+
+The sweep artifact or review record MUST preserve the proof posture for those claims, such as repo-proof notes, PF10 anchors, PF-canon anchors, or an explicit Unknown or Not verified statement.
+
+Docs-only scope validation MUST also prove that code, tests, schemas, generated evidence, governed evidence indices, and PF-Canon files were not changed unless those changes were separately approved.
+
 Lives in the close PR. This repo docs sweep is part of the close-out tasks for such epics and is performed in the same close PR that carries:
 
 * the close-pack
@@ -4111,6 +4125,8 @@ Common RCA checks:
 * If emitted or summarized bytes depend on specific env fields beyond the standard deterministic pins, the generator or harness MUST pin or otherwise prove those env inputs explicitly. Missing byte-affecting env pins leave the proof nondeterministic and non-accepting.  
 * When a remediation changes only evidence tooling, generators, or governed artifacts, the review MUST state explicitly whether any public contract, route family, or A7 scope changed. If none changed, say so plainly.  
 * Existing governed evidence refreshed outside the direct PR slice MAY be treated as bounded evidence churn only when the review proves all of the following: the refresh was produced by the canonical updater or generator, the refreshed items remain in existing governed homes, companion index, mirror, checksum, and path-proof artifacts are coherent, and the review does not use that churn to claim unrelated PF09 closure, route work, writer work, public-contract change, or new acceptance scope.  
+* When run evidence classifies outside-family proof-companion churn, the classification MUST name each refreshed family and, where Machine Mirror rows change, the affected artifact key and discovered physical path or other canonical row locator.  
+* A PASS claim for bounded side-effect classification MUST fail closed if any classified side-effect path is missing, any proof companion does not validate against its target artifact, or any affected Machine Mirror row fails to match artifact key, proof anchor, sha256, or size\_bytes.  
 * If a remediation is scoped as evidence-family closeout and the review shows that the underlying runtime, route, or transport slice was already correct, the review MUST say so explicitly and MUST NOT widen the remediation claim to reopened runtime, route, or writer work unless a real defect is shown.  
 * The review MUST name the preserved slice and the exact evidence-family gap that remained open.  
 * Same-change evidence-family closure is family-complete, not primary-family-only. If the remediation or canonical generator changes supplemental, legacy, or compatibility outputs that are still produced by the same governed flow, their companion path-proofs, mirror rows, and checksum or index companions MUST also be current in that same run.  
@@ -4539,6 +4555,8 @@ For each gap, record:
 * When PF10 provides the primary epic-specific account of what happened but does not restate the original epic business case or the single consolidated PR or OPS sequence, the report MAY use the Epic Plan or Implementation Plan for those specific gaps only.  
 * The report MUST say explicitly which facts are taken from PF10 and which facts are taken from plan artifacts as gap-filling inputs.  
 * Plans used in this way are framing inputs only and MUST NOT override a live PF10 addendum on the same point.  
+* When PF10 is silent on a docs-only repo-docs sweep, a retrospective or closeout artifact MAY use the docs PR artifact only for documentation-step history, docs file list, validation posture, repo-proof notes, and scope-boundary facts.  
+* The artifact MUST label PF10 silence and MUST NOT use the docs PR artifact to prove implementation behavior, QA completion, close-pack completion, PF-canon drainage, acceptance-token satisfaction, or epic closure unless those stronger proofs are separately present.  
 * Important limits: state any material limits in the current session or evidence set, especially when merged-PR proof, close-pack proof, or other closure-defining artifacts are missing.  
 * Repo-proven versus formally closed posture: if the retrospective can support completion or status moves from repo evidence but cannot prove formal merge or close, say that distinction plainly rather than blurring it.  
 * Later-drain PF-canon updates: when the artifact is intended to support a later PF-canon drain, name the exact affected PF canon home or homes, the exact affected locator or locators, the supported later-drain action, the drain readiness classification, the evidence basis, and whether the drain is expected at epic close, after an additional PR or OPS slice, or after a separate canon-only drain step.  
