@@ -1,6 +1,9 @@
 import hashlib
 import json
+import shutil
 from pathlib import Path
+
+import pytest
 
 from engine.narratives import get_pack
 
@@ -66,3 +69,64 @@ def test_narrative_pack_identity_two_run_matches_manifest_sha():
     assert lines["two_run_first"] == expected
     assert lines["two_run_second"] == expected
     assert lines["two_run_match"] == "true"
+
+
+def test_registry_diff_rejects_unexpected_manifest_rows(tmp_path, monkeypatch):
+    from tools.evidence import generate_narrative_registry_diff as generator
+
+    catalog_copy = tmp_path / "catalog" / "narratives"
+    shutil.copytree(Path("catalog/narratives"), catalog_copy)
+    manifest_path = catalog_copy / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["files"].append(
+        {
+            "path": "catalog/narratives/extra.json",
+            "sha256": "0" * 64,
+            "size_bytes": 2,
+        }
+    )
+    manifest_path.write_text(
+        json.dumps(manifest, separators=(",", ":"), sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+    monkeypatch.setattr(generator, "ROOT", tmp_path)
+    monkeypatch.setattr(generator, "CATALOG_ROOT", catalog_copy)
+    monkeypatch.setattr(generator, "MANIFEST_PATH", manifest_path)
+    monkeypatch.setattr(generator, "KEYS_PATH", catalog_copy / "keys.json")
+
+    with pytest.raises(generator.RegistryDiffError, match="unexpected manifest paths"):
+        generator._require_manifest()
+
+
+def test_registry_diff_rejects_unknown_category_and_band():
+    from tools.evidence import generate_narrative_registry_diff as generator
+
+    records = json.loads(Path("catalog/narratives/keys.json").read_text(encoding="utf-8"))
+    records[0] = {**records[0], "category": "unknown", "category_slug": "unknown"}
+    with pytest.raises(generator.RegistryDiffError, match="unknown category_slug"):
+        generator._identity_table(records)
+
+    records = json.loads(Path("catalog/narratives/keys.json").read_text(encoding="utf-8"))
+    records[0] = {**records[0], "band": "Unknown"}
+    with pytest.raises(generator.RegistryDiffError, match="unknown band"):
+        generator._identity_table(records)
+
+
+def test_registry_diff_rejects_incomplete_category_band_perspective_slot_grid():
+    from tools.evidence import generate_narrative_registry_diff as generator
+
+    records = json.loads(Path("catalog/narratives/keys.json").read_text(encoding="utf-8"))
+    incomplete = [
+        record
+        for record in records
+        if not (
+            record["category_slug"] == "heat"
+            and record["band"] == "Cool"
+            and record["perspective"] == "personal"
+            and record["slot"] == 3
+        )
+    ]
+
+    with pytest.raises(generator.RegistryDiffError, match="missing required registry identities"):
+        generator._identity_table(incomplete)

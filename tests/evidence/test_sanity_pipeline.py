@@ -65,3 +65,15 @@ def test_pipeline_refresh_records_post_index(monkeypatch, tmp_path):
     assert exit_code == 0
     log_lines = log_path.read_text(encoding="utf-8").splitlines()
     assert any(line.startswith("check update_evidence_index.post:") for line in log_lines)
+
+
+def test_default_pipeline_checks_narrative_registry_diff_before_index_check():
+    names = [step.name for step in run_sanity_pipeline.default_steps()]
+
+    generate_index = names.index("python tools/evidence/generate_narrative_registry_diff.py")
+    update_index = names.index("python tools/evidence/update_evidence_index.py")
+    check_index = names.index("python tools/evidence/generate_narrative_registry_diff.py --check")
+    update_check_index = names.index("python tools/evidence/update_evidence_index.py --check")
+
+    assert generate_index < update_index
+    assert check_index < update_check_index

@@ -16,6 +16,8 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from engine.compat.categories import CATEGORIES_ORDER_V1
+from engine.narratives.constants import BANDS
 from engine.runtime.determinism_env import ensure_determinism_env
 
 CATALOG_ROOT = ROOT / "catalog" / "narratives"
@@ -32,6 +34,7 @@ REQUIRED_MANIFEST_FILES = (
 )
 REQUIRED_KEY_FIELDS = ("band", "category", "category_slug", "key", "perspective", "slot")
 IDENTITY_PERSPECTIVES = ("personal", "shared")
+IDENTITY_SLOTS = (1, 2, 3)
 
 
 class RegistryDiffError(RuntimeError):
@@ -85,11 +88,16 @@ def _require_manifest() -> dict[str, Any]:
             raise RegistryDiffError(f"duplicate manifest path: {path}")
         by_path[path] = entry
 
-    missing = [path for path in REQUIRED_MANIFEST_FILES if path not in by_path]
+    expected_paths = set(REQUIRED_MANIFEST_FILES)
+    actual_paths = set(by_path)
+    missing = sorted(expected_paths - actual_paths)
     if missing:
         raise RegistryDiffError(f"missing required manifest paths: {','.join(missing)}")
+    extra = sorted(actual_paths - expected_paths)
+    if extra:
+        raise RegistryDiffError(f"unexpected manifest paths: {','.join(extra)}")
 
-    for rel in REQUIRED_MANIFEST_FILES:
+    for rel in sorted(actual_paths):
         artifact_path = ROOT / rel
         canonical = _canonical_json_bytes(_read_json(artifact_path), trailing_lf=False)
         entry = by_path[rel]
@@ -121,6 +129,17 @@ def _identity_table(keys_payload: Any) -> tuple[list[dict[str, Any]], dict[str, 
     if not isinstance(keys_payload, list):
         raise RegistryDiffError("keys.json must be an array")
 
+    allowed_categories = set(CATEGORIES_ORDER_V1)
+    allowed_bands = set(BANDS)
+    allowed_perspectives = set(IDENTITY_PERSPECTIVES)
+    expected_tuples = {
+        (category, band, perspective, slot)
+        for category in CATEGORIES_ORDER_V1
+        for band in BANDS
+        for perspective in IDENTITY_PERSPECTIVES
+        for slot in IDENTITY_SLOTS
+    }
+
     tuples: set[tuple[str, str, str, int]] = set()
     key_values: set[str] = set()
     summary_by_tuple: Counter[tuple[str, str, str]] = Counter()
@@ -139,8 +158,16 @@ def _identity_table(keys_payload: Any) -> tuple[list[dict[str, Any]], dict[str, 
             raise RegistryDiffError("key record string field has invalid type")
         if not isinstance(record["slot"], int):
             raise RegistryDiffError("key record slot has invalid type")
-        if record["perspective"] not in IDENTITY_PERSPECTIVES:
+        if record["category_slug"] not in allowed_categories:
+            raise RegistryDiffError(f"unknown category_slug: {record['category_slug']}")
+        if record["category"] != record["category_slug"]:
+            raise RegistryDiffError(f"category/category_slug mismatch: {record['key']}")
+        if record["band"] not in allowed_bands:
+            raise RegistryDiffError(f"unknown band: {record['band']}")
+        if record["perspective"] not in allowed_perspectives:
             raise RegistryDiffError(f"unknown perspective: {record['perspective']}")
+        if record["slot"] not in IDENTITY_SLOTS:
+            raise RegistryDiffError(f"unknown slot: {record['slot']}")
         tuple_key = (record["category_slug"], record["band"], record["perspective"], record["slot"])
         if tuple_key in tuples:
             raise RegistryDiffError("duplicate category/band/perspective/slot tuple")
@@ -153,13 +180,20 @@ def _identity_table(keys_payload: Any) -> tuple[list[dict[str, Any]], dict[str, 
         summary_by_perspective[record["perspective"]] += 1
         records.append(record)
 
-    missing_primary = [
-        "/".join((category, band, perspective))
-        for (category, band, perspective), count in sorted(summary_by_tuple.items())
-        if count < 1
-    ]
-    if missing_primary:
-        raise RegistryDiffError(f"missing required registry identities: {','.join(missing_primary)}")
+    missing_tuples = sorted(expected_tuples - tuples)
+    if missing_tuples:
+        missing = [
+            "/".join((category, band, perspective, str(slot)))
+            for category, band, perspective, slot in missing_tuples
+        ]
+        raise RegistryDiffError(f"missing required registry identities: {','.join(missing)}")
+    extra_tuples = sorted(tuples - expected_tuples)
+    if extra_tuples:
+        extra = [
+            "/".join((category, band, perspective, str(slot)))
+            for category, band, perspective, slot in extra_tuples
+        ]
+        raise RegistryDiffError(f"unexpected registry identities: {','.join(extra)}")
 
     records.sort(key=lambda row: (row["category_slug"], row["band"], row["perspective"], row["slot"], row["key"]))
     summary = {
