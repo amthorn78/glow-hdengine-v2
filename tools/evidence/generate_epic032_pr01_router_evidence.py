@@ -253,16 +253,21 @@ def _generate_cli_http_log() -> None:
                     "category": category,
                     "band": band,
                     "perspective": perspective,
+                    "release_id": RELEASE_ID,
                     "v": "1",
                 },
             )
-            http_key = (
-                resp.headers.get("X-Narrative-Key")
-                or resp.headers.get("X-Narrative-Composition")
-                or ""
-            )
+            key_header = resp.headers.get("X-Narrative-Key")
+            composition_id = resp.headers.get("X-Narrative-Composition") or ""
+            suppressed = resp.headers.get("X-Narrative-Policy") == "suppressed"
+            if suppressed:
+                http_key = composition_id
+                key_header_ok = key_header is None
+            else:
+                http_key = key_header or ""
+                key_header_ok = bool(key_header)
             http_payload = {
-                "composition_id": resp.headers.get("X-Narrative-Composition") or "",
+                "composition_id": composition_id,
                 "key": http_key,
                 "pack_sha": resp.headers.get("X-Narrative-Pack-Sha") or "",
                 "release_id": RELEASE_ID,
@@ -281,6 +286,7 @@ def _generate_cli_http_log() -> None:
             sidecar_equal = sidecar_digest == hashlib.sha256(cli_bytes).hexdigest()
             equal = (
                 resp.status_code == 200
+                and key_header_ok
                 and fields_equal
                 and cli_canonical
                 and sidecar_equal
@@ -288,7 +294,8 @@ def _generate_cli_http_log() -> None:
             parity_ok = parity_ok and equal
             lines.append(
                 "case={idx:03d} category={category} band={band} perspective={perspective} "
-                "key={key} composition_id={composition_id} pack_sha_equal={pack_sha_equal} "
+                "key={key} composition_id={composition_id} suppressed={suppressed} "
+                "key_header_ok={key_header_ok} pack_sha_equal={pack_sha_equal} "
                 "release_id_equal={release_id_equal} fields_equal={fields_equal} "
                 "cli_canonical={cli_canonical} sidecar_equal={sidecar_equal} parity_equal={equal}".format(
                     idx=idx,
@@ -297,6 +304,8 @@ def _generate_cli_http_log() -> None:
                     perspective=perspective,
                     key=http_payload["key"],
                     composition_id=http_payload["composition_id"],
+                    suppressed=str(suppressed).lower(),
+                    key_header_ok=str(key_header_ok).lower(),
                     pack_sha_equal=str(
                         cli_payload.get("pack_sha") == http_payload["pack_sha"]
                     ).lower(),
