@@ -1,0 +1,138 @@
+schema=hde_epic032.pr01.router_abba.v1
+epic_id=HDE-EPIC032
+subtask_id=HDE-FERM002.2
+tokens=TWO_RUN_IDENTITY_OK,COMPOSITE_ABBA_IDENTITY_OK
+case=001 category=harmony band=Cool perspective=shared personal_key=harmony.cool.personal.1 shared_key=harmony.cool.shared.1 two_run_equal=true
+case=002 category=heat band=Open perspective=a_to_b personal_key=heat.open.personal.1 shared_key=heat.open.shared.1 two_run_equal=true
+case=003 category=balance band=Glow perspective=b_to_a personal_key=balance.glow.personal.1 shared_key=balance.glow.shared.1 two_run_equal=true
+case=004 category=unknown band=Cool perspective=shared personal_key=missing_narrative_key shared_key=missing_narrative_key two_run_equal=true
+case=005 category=harmony band=Unknown perspective=shared personal_key=missing_narrative_key shared_key=missing_narrative_key two_run_equal=true
+case=006 category=harmony band=Cool perspective=unknown personal_key=missing_narrative_key shared_key=missing_narrative_key two_run_equal=true
+case=007 category=alignment band=Cool perspective=a_to_b personal_key=alignment.cool.personal.1 shared_key=alignment.cool.shared.1 two_run_equal=true
+case=008 category=alignment band=Cool perspective=b_to_a personal_key=alignment.cool.personal.1 shared_key=alignment.cool.shared.1 two_run_equal=true
+case=009 category=alignment band=Open perspective=a_to_b personal_key=alignment.open.personal.1 shared_key=alignment.open.shared.1 two_run_equal=true
+case=010 category=alignment band=Open perspective=b_to_a personal_key=alignment.open.personal.1 shared_key=alignment.open.shared.1 two_run_equal=true
+case=011 category=alignment band=Warm perspective=a_to_b personal_key=alignment.warm.personal.1 shared_key=alignment.warm.shared.1 two_run_equal=true
+case=012 category=alignment band=Warm perspective=b_to_a personal_key=alignment.warm.personal.1 shared_key=alignment.warm.shared.1 two_run_equal=true
+case=013 category=alignment band=Glow perspective=a_to_b personal_key=alignment.glow.personal.1 shared_key=alignment.glow.shared.1 two_run_equal=true
+case=014 category=alignment band=Glow perspective=b_to_a personal_key=alignment.glow.personal.1 shared_key=alignment.glow.shared.1 two_run_equal=true
+case=015 category=balance band=Cool perspective=a_to_b personal_key=balance.cool.personal.1 shared_key=balance.cool.shared.1 two_run_equal=true
+case=016 category=balance band=Cool perspective=b_to_a personal_key=balance.cool.personal.1 shared_key=balance.cool.shared.1 two_run_equal=true
+case=017 category=balance band=Open perspective=a_to_b personal_key=balance.open.personal.1 shared_key=balance.open.shared.1 two_run_equal=true
+case=018 category=balance band=Open perspective=b_to_a personal_key=balance.open.personal.1 shared_key=balance.open.shared.1 two_run_equal=true
+case=019 category=balance band=Warm perspective=a_to_b personal_key=balance.warm.personal.1 shared_key=balance.warm.shared.1 two_run_equal=true
+case=020 category=balance band=Warm perspective=b_to_a personal_key=balance.warm.personal.1 shared_key=balance.warm.shared.1 two_run_equal=true
+case=021 category=balance band=Glow perspective=a_to_b personal_key=balance.glow.personal.1 shared_key=balance.glow.shared.1 two_run_equal=true
+case=022 category=balance band=Glow perspective=b_to_a personal_key=balance.glow.personal.1 shared_key=balance.glow.shared.1 two_run_equal=true
+case=023 category=comfort band=Cool perspective=a_to_b personal_key=comfort.cool.personal.1 shared_key=comfort.cool.shared.1 two_run_equal=true
+case=024 category=comfort band=Cool perspective=b_to_a personal_key=comfort.cool.personal.1 shared_key=comfort.cool.shared.1 two_run_equal=true
+case=025 category=comfort band=Open perspective=a_to_b personal_key=comfort.open.personal.1 shared_key=comfort.open.shared.1 two_run_equal=true
+case=026 category=comfort band=Open perspective=b_to_a personal_key=comfort.open.personal.1 shared_key=comfort.open.shared.1 two_run_equal=true
+case=027 category=comfort band=Warm perspective=a_to_b personal_key=comfort.warm.personal.1 shared_key=comfort.warm.shared.1 two_run_equal=true
+case=028 category=comfort band=Warm perspective=b_to_a personal_key=comfort.warm.personal.1 shared_key=comfort.warm.shared.1 two_run_equal=true
+case=029 category=comfort band=Glow perspective=a_to_b personal_key=comfort.glow.personal.1 shared_key=comfort.glow.shared.1 two_run_equal=true
+case=030 category=comfort band=Glow perspective=b_to_a personal_key=comfort.glow.personal.1 shared_key=comfort.glow.shared.1 two_run_equal=true
+case=031 category=communication band=Cool perspective=a_to_b personal_key=communication.cool.personal.1 shared_key=communication.cool.shared.1 two_run_equal=true
+case=032 category=communication band=Cool perspective=b_to_a personal_key=communication.cool.personal.1 shared_key=communication.cool.shared.1 two_run_equal=true
+case=033 category=communication band=Open perspective=a_to_b personal_key=communication.open.personal.1 shared_key=communication.open.shared.1 two_run_equal=true
+case=034 category=communication band=Open perspective=b_to_a personal_key=communication.open.personal.1 shared_key=communication.open.shared.1 two_run_equal=true
+case=035 category=communication band=Warm perspective=a_to_b personal_key=communication.warm.personal.1 shared_key=communication.warm.shared.1 two_run_equal=true
+case=036 category=communication band=Warm perspective=b_to_a personal_key=communication.warm.personal.1 shared_key=communication.warm.shared.1 two_run_equal=true
+case=037 category=communication band=Glow perspective=a_to_b personal_key=communication.glow.personal.1 shared_key=communication.glow.shared.1 two_run_equal=true
+case=038 category=communication band=Glow perspective=b_to_a personal_key=communication.glow.personal.1 shared_key=communication.glow.shared.1 two_run_equal=true
+case=039 category=consistency band=Cool perspective=a_to_b personal_key=consistency.cool.personal.1 shared_key=consistency.cool.shared.1 two_run_equal=true
+case=040 category=consistency band=Cool perspective=b_to_a personal_key=consistency.cool.personal.1 shared_key=consistency.cool.shared.1 two_run_equal=true
+case=041 category=consistency band=Open perspective=a_to_b personal_key=consistency.open.personal.1 shared_key=consistency.open.shared.1 two_run_equal=true
+case=042 category=consistency band=Open perspective=b_to_a personal_key=consistency.open.personal.1 shared_key=consistency.open.shared.1 two_run_equal=true
+case=043 category=consistency band=Warm perspective=a_to_b personal_key=consistency.warm.personal.1 shared_key=consistency.warm.shared.1 two_run_equal=true
+case=044 category=consistency band=Warm perspective=b_to_a personal_key=consistency.warm.personal.1 shared_key=consistency.warm.shared.1 two_run_equal=true
+case=045 category=consistency band=Glow perspective=a_to_b personal_key=consistency.glow.personal.1 shared_key=consistency.glow.shared.1 two_run_equal=true
+case=046 category=consistency band=Glow perspective=b_to_a personal_key=consistency.glow.personal.1 shared_key=consistency.glow.shared.1 two_run_equal=true
+case=047 category=creativity band=Cool perspective=a_to_b personal_key=creativity.cool.personal.1 shared_key=creativity.cool.shared.1 two_run_equal=true
+case=048 category=creativity band=Cool perspective=b_to_a personal_key=creativity.cool.personal.1 shared_key=creativity.cool.shared.1 two_run_equal=true
+case=049 category=creativity band=Open perspective=a_to_b personal_key=creativity.open.personal.1 shared_key=creativity.open.shared.1 two_run_equal=true
+case=050 category=creativity band=Open perspective=b_to_a personal_key=creativity.open.personal.1 shared_key=creativity.open.shared.1 two_run_equal=true
+case=051 category=creativity band=Warm perspective=a_to_b personal_key=creativity.warm.personal.1 shared_key=creativity.warm.shared.1 two_run_equal=true
+case=052 category=creativity band=Warm perspective=b_to_a personal_key=creativity.warm.personal.1 shared_key=creativity.warm.shared.1 two_run_equal=true
+case=053 category=creativity band=Glow perspective=a_to_b personal_key=creativity.glow.personal.1 shared_key=creativity.glow.shared.1 two_run_equal=true
+case=054 category=creativity band=Glow perspective=b_to_a personal_key=creativity.glow.personal.1 shared_key=creativity.glow.shared.1 two_run_equal=true
+case=055 category=drive band=Cool perspective=a_to_b personal_key=drive.cool.personal.1 shared_key=drive.cool.shared.1 two_run_equal=true
+case=056 category=drive band=Cool perspective=b_to_a personal_key=drive.cool.personal.1 shared_key=drive.cool.shared.1 two_run_equal=true
+case=057 category=drive band=Open perspective=a_to_b personal_key=drive.open.personal.1 shared_key=drive.open.shared.1 two_run_equal=true
+case=058 category=drive band=Open perspective=b_to_a personal_key=drive.open.personal.1 shared_key=drive.open.shared.1 two_run_equal=true
+case=059 category=drive band=Warm perspective=a_to_b personal_key=drive.warm.personal.1 shared_key=drive.warm.shared.1 two_run_equal=true
+case=060 category=drive band=Warm perspective=b_to_a personal_key=drive.warm.personal.1 shared_key=drive.warm.shared.1 two_run_equal=true
+case=061 category=drive band=Glow perspective=a_to_b personal_key=drive.glow.personal.1 shared_key=drive.glow.shared.1 two_run_equal=true
+case=062 category=drive band=Glow perspective=b_to_a personal_key=drive.glow.personal.1 shared_key=drive.glow.shared.1 two_run_equal=true
+case=063 category=expansion band=Cool perspective=a_to_b personal_key=expansion.cool.personal.1 shared_key=expansion.cool.shared.1 two_run_equal=true
+case=064 category=expansion band=Cool perspective=b_to_a personal_key=expansion.cool.personal.1 shared_key=expansion.cool.shared.1 two_run_equal=true
+case=065 category=expansion band=Open perspective=a_to_b personal_key=expansion.open.personal.1 shared_key=expansion.open.shared.1 two_run_equal=true
+case=066 category=expansion band=Open perspective=b_to_a personal_key=expansion.open.personal.1 shared_key=expansion.open.shared.1 two_run_equal=true
+case=067 category=expansion band=Warm perspective=a_to_b personal_key=expansion.warm.personal.1 shared_key=expansion.warm.shared.1 two_run_equal=true
+case=068 category=expansion band=Warm perspective=b_to_a personal_key=expansion.warm.personal.1 shared_key=expansion.warm.shared.1 two_run_equal=true
+case=069 category=expansion band=Glow perspective=a_to_b personal_key=expansion.glow.personal.1 shared_key=expansion.glow.shared.1 two_run_equal=true
+case=070 category=expansion band=Glow perspective=b_to_a personal_key=expansion.glow.personal.1 shared_key=expansion.glow.shared.1 two_run_equal=true
+case=071 category=harmony band=Cool perspective=a_to_b personal_key=harmony.cool.personal.1 shared_key=harmony.cool.shared.1 two_run_equal=true
+case=072 category=harmony band=Cool perspective=b_to_a personal_key=harmony.cool.personal.1 shared_key=harmony.cool.shared.1 two_run_equal=true
+case=073 category=harmony band=Open perspective=a_to_b personal_key=harmony.open.personal.1 shared_key=harmony.open.shared.1 two_run_equal=true
+case=074 category=harmony band=Open perspective=b_to_a personal_key=harmony.open.personal.1 shared_key=harmony.open.shared.1 two_run_equal=true
+case=075 category=harmony band=Warm perspective=a_to_b personal_key=harmony.warm.personal.1 shared_key=harmony.warm.shared.1 two_run_equal=true
+case=076 category=harmony band=Warm perspective=b_to_a personal_key=harmony.warm.personal.1 shared_key=harmony.warm.shared.1 two_run_equal=true
+case=077 category=harmony band=Glow perspective=a_to_b personal_key=harmony.glow.personal.1 shared_key=harmony.glow.shared.1 two_run_equal=true
+case=078 category=harmony band=Glow perspective=b_to_a personal_key=harmony.glow.personal.1 shared_key=harmony.glow.shared.1 two_run_equal=true
+case=079 category=heat band=Cool perspective=a_to_b personal_key=heat.cool.personal.1 shared_key=heat.cool.shared.1 two_run_equal=true
+case=080 category=heat band=Cool perspective=b_to_a personal_key=heat.cool.personal.1 shared_key=heat.cool.shared.1 two_run_equal=true
+case=081 category=heat band=Open perspective=a_to_b personal_key=heat.open.personal.1 shared_key=heat.open.shared.1 two_run_equal=true
+case=082 category=heat band=Open perspective=b_to_a personal_key=heat.open.personal.1 shared_key=heat.open.shared.1 two_run_equal=true
+case=083 category=heat band=Warm perspective=a_to_b personal_key=heat.warm.personal.1 shared_key=heat.warm.shared.1 two_run_equal=true
+case=084 category=heat band=Warm perspective=b_to_a personal_key=heat.warm.personal.1 shared_key=heat.warm.shared.1 two_run_equal=true
+case=085 category=heat band=Glow perspective=a_to_b personal_key=heat.glow.personal.1 shared_key=heat.glow.shared.1 two_run_equal=true
+case=086 category=heat band=Glow perspective=b_to_a personal_key=heat.glow.personal.1 shared_key=heat.glow.shared.1 two_run_equal=true
+abba category=alignment band=Cool ab_personal_key=alignment.cool.personal.1 ba_personal_key=alignment.cool.personal.1 ab_shared_key=alignment.cool.shared.1 ba_shared_key=alignment.cool.shared.1 normalized_equal=true
+abba category=alignment band=Open ab_personal_key=alignment.open.personal.1 ba_personal_key=alignment.open.personal.1 ab_shared_key=alignment.open.shared.1 ba_shared_key=alignment.open.shared.1 normalized_equal=true
+abba category=alignment band=Warm ab_personal_key=alignment.warm.personal.1 ba_personal_key=alignment.warm.personal.1 ab_shared_key=alignment.warm.shared.1 ba_shared_key=alignment.warm.shared.1 normalized_equal=true
+abba category=alignment band=Glow ab_personal_key=alignment.glow.personal.1 ba_personal_key=alignment.glow.personal.1 ab_shared_key=alignment.glow.shared.1 ba_shared_key=alignment.glow.shared.1 normalized_equal=true
+abba category=balance band=Cool ab_personal_key=balance.cool.personal.1 ba_personal_key=balance.cool.personal.1 ab_shared_key=balance.cool.shared.1 ba_shared_key=balance.cool.shared.1 normalized_equal=true
+abba category=balance band=Open ab_personal_key=balance.open.personal.1 ba_personal_key=balance.open.personal.1 ab_shared_key=balance.open.shared.1 ba_shared_key=balance.open.shared.1 normalized_equal=true
+abba category=balance band=Warm ab_personal_key=balance.warm.personal.1 ba_personal_key=balance.warm.personal.1 ab_shared_key=balance.warm.shared.1 ba_shared_key=balance.warm.shared.1 normalized_equal=true
+abba category=balance band=Glow ab_personal_key=balance.glow.personal.1 ba_personal_key=balance.glow.personal.1 ab_shared_key=balance.glow.shared.1 ba_shared_key=balance.glow.shared.1 normalized_equal=true
+abba category=comfort band=Cool ab_personal_key=comfort.cool.personal.1 ba_personal_key=comfort.cool.personal.1 ab_shared_key=comfort.cool.shared.1 ba_shared_key=comfort.cool.shared.1 normalized_equal=true
+abba category=comfort band=Open ab_personal_key=comfort.open.personal.1 ba_personal_key=comfort.open.personal.1 ab_shared_key=comfort.open.shared.1 ba_shared_key=comfort.open.shared.1 normalized_equal=true
+abba category=comfort band=Warm ab_personal_key=comfort.warm.personal.1 ba_personal_key=comfort.warm.personal.1 ab_shared_key=comfort.warm.shared.1 ba_shared_key=comfort.warm.shared.1 normalized_equal=true
+abba category=comfort band=Glow ab_personal_key=comfort.glow.personal.1 ba_personal_key=comfort.glow.personal.1 ab_shared_key=comfort.glow.shared.1 ba_shared_key=comfort.glow.shared.1 normalized_equal=true
+abba category=communication band=Cool ab_personal_key=communication.cool.personal.1 ba_personal_key=communication.cool.personal.1 ab_shared_key=communication.cool.shared.1 ba_shared_key=communication.cool.shared.1 normalized_equal=true
+abba category=communication band=Open ab_personal_key=communication.open.personal.1 ba_personal_key=communication.open.personal.1 ab_shared_key=communication.open.shared.1 ba_shared_key=communication.open.shared.1 normalized_equal=true
+abba category=communication band=Warm ab_personal_key=communication.warm.personal.1 ba_personal_key=communication.warm.personal.1 ab_shared_key=communication.warm.shared.1 ba_shared_key=communication.warm.shared.1 normalized_equal=true
+abba category=communication band=Glow ab_personal_key=communication.glow.personal.1 ba_personal_key=communication.glow.personal.1 ab_shared_key=communication.glow.shared.1 ba_shared_key=communication.glow.shared.1 normalized_equal=true
+abba category=consistency band=Cool ab_personal_key=consistency.cool.personal.1 ba_personal_key=consistency.cool.personal.1 ab_shared_key=consistency.cool.shared.1 ba_shared_key=consistency.cool.shared.1 normalized_equal=true
+abba category=consistency band=Open ab_personal_key=consistency.open.personal.1 ba_personal_key=consistency.open.personal.1 ab_shared_key=consistency.open.shared.1 ba_shared_key=consistency.open.shared.1 normalized_equal=true
+abba category=consistency band=Warm ab_personal_key=consistency.warm.personal.1 ba_personal_key=consistency.warm.personal.1 ab_shared_key=consistency.warm.shared.1 ba_shared_key=consistency.warm.shared.1 normalized_equal=true
+abba category=consistency band=Glow ab_personal_key=consistency.glow.personal.1 ba_personal_key=consistency.glow.personal.1 ab_shared_key=consistency.glow.shared.1 ba_shared_key=consistency.glow.shared.1 normalized_equal=true
+abba category=creativity band=Cool ab_personal_key=creativity.cool.personal.1 ba_personal_key=creativity.cool.personal.1 ab_shared_key=creativity.cool.shared.1 ba_shared_key=creativity.cool.shared.1 normalized_equal=true
+abba category=creativity band=Open ab_personal_key=creativity.open.personal.1 ba_personal_key=creativity.open.personal.1 ab_shared_key=creativity.open.shared.1 ba_shared_key=creativity.open.shared.1 normalized_equal=true
+abba category=creativity band=Warm ab_personal_key=creativity.warm.personal.1 ba_personal_key=creativity.warm.personal.1 ab_shared_key=creativity.warm.shared.1 ba_shared_key=creativity.warm.shared.1 normalized_equal=true
+abba category=creativity band=Glow ab_personal_key=creativity.glow.personal.1 ba_personal_key=creativity.glow.personal.1 ab_shared_key=creativity.glow.shared.1 ba_shared_key=creativity.glow.shared.1 normalized_equal=true
+abba category=drive band=Cool ab_personal_key=drive.cool.personal.1 ba_personal_key=drive.cool.personal.1 ab_shared_key=drive.cool.shared.1 ba_shared_key=drive.cool.shared.1 normalized_equal=true
+abba category=drive band=Open ab_personal_key=drive.open.personal.1 ba_personal_key=drive.open.personal.1 ab_shared_key=drive.open.shared.1 ba_shared_key=drive.open.shared.1 normalized_equal=true
+abba category=drive band=Warm ab_personal_key=drive.warm.personal.1 ba_personal_key=drive.warm.personal.1 ab_shared_key=drive.warm.shared.1 ba_shared_key=drive.warm.shared.1 normalized_equal=true
+abba category=drive band=Glow ab_personal_key=drive.glow.personal.1 ba_personal_key=drive.glow.personal.1 ab_shared_key=drive.glow.shared.1 ba_shared_key=drive.glow.shared.1 normalized_equal=true
+abba category=expansion band=Cool ab_personal_key=expansion.cool.personal.1 ba_personal_key=expansion.cool.personal.1 ab_shared_key=expansion.cool.shared.1 ba_shared_key=expansion.cool.shared.1 normalized_equal=true
+abba category=expansion band=Open ab_personal_key=expansion.open.personal.1 ba_personal_key=expansion.open.personal.1 ab_shared_key=expansion.open.shared.1 ba_shared_key=expansion.open.shared.1 normalized_equal=true
+abba category=expansion band=Warm ab_personal_key=expansion.warm.personal.1 ba_personal_key=expansion.warm.personal.1 ab_shared_key=expansion.warm.shared.1 ba_shared_key=expansion.warm.shared.1 normalized_equal=true
+abba category=expansion band=Glow ab_personal_key=expansion.glow.personal.1 ba_personal_key=expansion.glow.personal.1 ab_shared_key=expansion.glow.shared.1 ba_shared_key=expansion.glow.shared.1 normalized_equal=true
+abba category=harmony band=Cool ab_personal_key=harmony.cool.personal.1 ba_personal_key=harmony.cool.personal.1 ab_shared_key=harmony.cool.shared.1 ba_shared_key=harmony.cool.shared.1 normalized_equal=true
+abba category=harmony band=Open ab_personal_key=harmony.open.personal.1 ba_personal_key=harmony.open.personal.1 ab_shared_key=harmony.open.shared.1 ba_shared_key=harmony.open.shared.1 normalized_equal=true
+abba category=harmony band=Warm ab_personal_key=harmony.warm.personal.1 ba_personal_key=harmony.warm.personal.1 ab_shared_key=harmony.warm.shared.1 ba_shared_key=harmony.warm.shared.1 normalized_equal=true
+abba category=harmony band=Glow ab_personal_key=harmony.glow.personal.1 ba_personal_key=harmony.glow.personal.1 ab_shared_key=harmony.glow.shared.1 ba_shared_key=harmony.glow.shared.1 normalized_equal=true
+abba category=heat band=Cool ab_personal_key=heat.cool.personal.1 ba_personal_key=heat.cool.personal.1 ab_shared_key=heat.cool.shared.1 ba_shared_key=heat.cool.shared.1 normalized_equal=true
+abba category=heat band=Open ab_personal_key=heat.open.personal.1 ba_personal_key=heat.open.personal.1 ab_shared_key=heat.open.shared.1 ba_shared_key=heat.open.shared.1 normalized_equal=true
+abba category=heat band=Warm ab_personal_key=heat.warm.personal.1 ba_personal_key=heat.warm.personal.1 ab_shared_key=heat.warm.shared.1 ba_shared_key=heat.warm.shared.1 normalized_equal=true
+abba category=heat band=Glow ab_personal_key=heat.glow.personal.1 ba_personal_key=heat.glow.personal.1 ab_shared_key=heat.glow.shared.1 ba_shared_key=heat.glow.shared.1 normalized_equal=true
+missing category=unknown band=Cool perspective=shared personal_key=missing_narrative_key shared_key=missing_narrative_key missing_equal=true
+missing category=harmony band=Unknown perspective=shared personal_key=missing_narrative_key shared_key=missing_narrative_key missing_equal=true
+missing category=harmony band=Cool perspective=unknown personal_key=missing_narrative_key shared_key=missing_narrative_key missing_equal=true
+missing category=unknown band=Unknown perspective=unknown personal_key=missing_narrative_key shared_key=missing_narrative_key missing_equal=true
+two_run_identity=true
+abba_identity=true
+missing_key_identity=true
+status=PASS

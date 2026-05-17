@@ -1,0 +1,10 @@
+schema=hde_epic032.pr01.router_cli_http_parity.v1
+epic_id=HDE-EPIC032
+subtask_id=HDE-FERM002.2
+surface=hdctl_aux_preview_admin_out_to_api_aux_narrative_headers
+tokens=CLI_READER_PARITY_OK
+case=001 category=harmony band=Cool perspective=shared cli_key=harmony.cool.shared.1 http_key=harmony.cool.shared.1 cli_composition=harmony.cool.shared.1 http_composition=harmony.cool.shared.1 parity_equal=true
+case=002 category=heat band=Open perspective=a_to_b cli_key=heat.open.personal.1 http_key=heat.open.personal.1 cli_composition=heat.open.personal.1 http_composition=heat.open.personal.1 parity_equal=true
+case=003 category=unknown band=Cool perspective=shared cli_key=missing_narrative_key http_key=missing_narrative_key cli_composition=missing_narrative_key http_composition=missing_narrative_key parity_equal=true
+cli_http_parity=true
+status=PASS

@@ -441,6 +441,36 @@ EPIC030_PR05_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     },
 ]
 
+EPIC032_PR01_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "epic032.pr01.router_key_table_10x4",
+        "discovered_physical_path": "audit/gates/narratives/keys_10x4.table.json",
+        "epic_id": "HDE-EPIC032",
+        "record_type": "epic032_pr01_evidence",
+        "schema_version": "1.0",
+        "tokens": ["JSON_CANONICAL_CHECK_OK"],
+        "notes": "EPIC032 PR-01 canonical narrative router 10x4 key coverage table for HDE-FERM002.2",
+    },
+    {
+        "artifact_key": "epic032.pr01.router_parity_abba",
+        "discovered_physical_path": "artifacts/narratives/router/parity_abba.log",
+        "epic_id": "HDE-EPIC032",
+        "record_type": "epic032_pr01_evidence",
+        "schema_version": "1.0",
+        "tokens": ["TWO_RUN_IDENTITY_OK", "COMPOSITE_ABBA_IDENTITY_OK"],
+        "notes": "EPIC032 PR-01 keys-only router two-run identity and AB↔BA coherence log for HDE-FERM002.2",
+    },
+    {
+        "artifact_key": "epic032.pr01.router_cli_http_parity",
+        "discovered_physical_path": "artifacts/narratives/router/cli_http_parity.log",
+        "epic_id": "HDE-EPIC032",
+        "record_type": "epic032_pr01_evidence",
+        "schema_version": "1.0",
+        "tokens": ["CLI_READER_PARITY_OK"],
+        "notes": "EPIC032 PR-01 keys-only aux-preview CLI admin output to aux HTTP header parity log for HDE-FERM002.2",
+    },
+]
+
 A7_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
         "artifact_key": "a7.success_encoding_invariance",
@@ -513,6 +543,9 @@ FORCE_REFRESH_ARTIFACT_RELS: set[str] = {
     "audit/qa/hde-epic030/pr-03/compat_parity_binding.log",
     "artifacts/writer/conjunction_write_readback.log",
     "artifacts/writer/conjunction_writer_summary.json",
+    "audit/gates/narratives/keys_10x4.table.json",
+    "artifacts/narratives/router/parity_abba.log",
+    "artifacts/narratives/router/cli_http_parity.log",
     "artifacts/evidence_index.jsonl",
     "artifacts/evidence_index.jsonl.sha256",
     "docs/evidence/INDEX.json",
@@ -763,6 +796,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *EPIC030_PR03_PRIMARY_ARTIFACTS,
             *EPIC030_PR04_PRIMARY_ARTIFACTS,
             *EPIC030_PR05_PRIMARY_ARTIFACTS,
+            *EPIC032_PR01_PRIMARY_ARTIFACTS,
             *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,
