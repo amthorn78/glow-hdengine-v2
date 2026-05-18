@@ -150,3 +150,24 @@ def test_prod_guard_can_be_overridden(monkeypatch: pytest.MonkeyPatch) -> None:
         {"provider": "psycopg", "status": "error", "reason": "primary_connect_failed"},
         {"provider": "bridge", "status": "ok"},
     ]
+
+
+def test_stage_allows_bridge_when_primary_unavailable(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("DATABASE_URL", "postgresql://primary")
+    monkeypatch.setenv("DB_BRIDGE_URL", "https://bridge.example")
+    monkeypatch.setenv("APP_ENV", "stage")
+
+    primary_error = PrimaryUnavailable("primary_connect_failed", code="primary_connect_failed")
+
+    db = DBAccess.for_current_env(
+        psycopg_factory=lambda dsn: FakeProvider("psycopg", error=primary_error),
+        bridge_factory=lambda url: FakeProvider("bridge"),
+    )
+
+    assert db.provider_name == "bridge"
+    snapshot = _read_snapshot()
+    assert snapshot["selected"] == "bridge"
+    assert snapshot["attempts"] == [
+        {"provider": "psycopg", "status": "error", "reason": "primary_connect_failed"},
+        {"provider": "bridge", "status": "ok"},
+    ]

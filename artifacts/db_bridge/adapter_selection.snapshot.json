@@ -1,1 +1,1 @@
-{"attempts":[{"provider":"psycopg","status":"ok"}],"flags":{"allow_bridge_prod":false,"env":"dev","force_bridge":false,"force_pg":false},"schema":"v1","selected":"psycopg"}
+{"attempts":[{"provider":"psycopg","reason":"primary_connect_failed","status":"error"},{"provider":"bridge","status":"ok"}],"flags":{"allow_bridge_prod":false,"env":"dev","force_bridge":false,"force_pg":false},"schema":"v1","selected":"bridge"}

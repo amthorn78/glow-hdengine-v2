@@ -501,6 +501,36 @@ EPIC032_PR02_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     },
 ]
 
+EPIC032_PR03_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "epic032.pr03.adapter_selection",
+        "discovered_physical_path": "artifacts/db_bridge/adapter_selection.snapshot.json",
+        "epic_id": "HDE-EPIC032",
+        "record_type": "epic032_pr03_evidence",
+        "schema_version": "1.0",
+        "tokens": ["DB_CONN_ENV_OK"],
+        "notes": "EPIC032 PR-03 DBAccess provider selection and guarded bridge fallback evidence for HDE-FERM004.2",
+    },
+    {
+        "artifact_key": "epic032.pr03.provider_parity",
+        "discovered_physical_path": "artifacts/db_bridge/provider_parity.proof.json",
+        "epic_id": "HDE-EPIC032",
+        "record_type": "epic032_pr03_evidence",
+        "schema_version": "1.0",
+        "tokens": ["JSON_CANONICAL_CHECK_OK"],
+        "notes": "EPIC032 PR-03 provider-parity harness and non-token bridge capability proof-label evidence for HDE-FERM004.2",
+    },
+    {
+        "artifact_key": "epic032.pr03.env_connectivity",
+        "discovered_physical_path": "artifacts/runtime/env_connectivity.snapshot.json",
+        "epic_id": "HDE-EPIC032",
+        "record_type": "epic032_pr03_evidence",
+        "schema_version": "1.0",
+        "tokens": ["DEV_DB_BRIDGE_FALLBACK_OK", "DB_CONN_ENV_OK"],
+        "notes": "EPIC032 PR-03 secret-free dev DB bridge fallback proof through DBAccess for HDE-FERM004.2",
+    },
+]
+
 A7_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
         "artifact_key": "a7.success_encoding_invariance",
@@ -831,6 +861,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *EPIC030_PR05_PRIMARY_ARTIFACTS,
             *EPIC032_PR01_PRIMARY_ARTIFACTS,
             *EPIC032_PR02_PRIMARY_ARTIFACTS,
+            *EPIC032_PR03_PRIMARY_ARTIFACTS,
             *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,

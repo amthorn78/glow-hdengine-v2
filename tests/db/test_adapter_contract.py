@@ -241,3 +241,18 @@ def test_dbaccess_introspect_wrappers_propagate_errors() -> None:
 
     with pytest.raises(IntrospectionError):
         db.introspect_version()
+
+
+def test_bridge_provider_exposes_adapter_contract_capabilities() -> None:
+    provider = BridgeProvider(
+        "https://bridge.example",
+        request=lambda url, method, data, headers: BridgeResponse(
+            status=200,
+            body=json.dumps({"status": "ok", "rows": [[1]]}).encode("utf-8"),
+            headers={},
+        ),
+    )
+
+    required = ["health", "query", "exec", "tx", "introspect"]
+    assert provider.name == "bridge"
+    assert all(callable(getattr(provider, method, None)) for method in required)
