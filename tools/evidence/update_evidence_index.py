@@ -471,6 +471,36 @@ EPIC032_PR01_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     },
 ]
 
+EPIC032_PR02_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "epic032.pr02.registry_diff",
+        "discovered_physical_path": "audit/gates/narratives/registry.diff.json",
+        "epic_id": "HDE-EPIC032",
+        "record_type": "epic032_pr02_evidence",
+        "schema_version": "1.0",
+        "tokens": ["JSON_CANONICAL_CHECK_OK"],
+        "notes": "EPIC032 PR-02 canonical narrative registry diff evidence for HDE-FERM003.2",
+    },
+    {
+        "artifact_key": "epic032.pr02.pack_identity",
+        "discovered_physical_path": "audit/gates/narratives/pack_identity.txt",
+        "epic_id": "HDE-EPIC032",
+        "record_type": "epic032_pr02_evidence",
+        "schema_version": "1.0",
+        "tokens": ["TWO_RUN_IDENTITY_OK"],
+        "notes": "EPIC032 PR-02 pack identity evidence from canonical manifest bytes for HDE-FERM003.2",
+    },
+    {
+        "artifact_key": "epic032.pr02.doc_deltas",
+        "discovered_physical_path": "audit/docdeltas/hde-epic032_doc_deltas.md",
+        "epic_id": "HDE-EPIC032",
+        "record_type": "epic032_pr02_evidence",
+        "schema_version": "1.0",
+        "tokens": ["DOC_DELTA_PRESENT_OK"],
+        "notes": "EPIC032 PR-02 Doc-Delta posture record for HDE-FERM003.2",
+    },
+]
+
 A7_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
         "artifact_key": "a7.success_encoding_invariance",
@@ -546,6 +576,9 @@ FORCE_REFRESH_ARTIFACT_RELS: set[str] = {
     "audit/gates/narratives/keys_10x4.table.json",
     "artifacts/narratives/router/parity_abba.log",
     "artifacts/narratives/router/cli_http_parity.log",
+    "audit/gates/narratives/registry.diff.json",
+    "audit/gates/narratives/pack_identity.txt",
+    "audit/docdeltas/hde-epic032_doc_deltas.md",
     "artifacts/evidence_index.jsonl",
     "artifacts/evidence_index.jsonl.sha256",
     "docs/evidence/INDEX.json",
@@ -797,6 +830,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *EPIC030_PR04_PRIMARY_ARTIFACTS,
             *EPIC030_PR05_PRIMARY_ARTIFACTS,
             *EPIC032_PR01_PRIMARY_ARTIFACTS,
+            *EPIC032_PR02_PRIMARY_ARTIFACTS,
             *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,
