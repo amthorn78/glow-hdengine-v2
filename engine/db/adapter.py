@@ -62,8 +62,11 @@ def _is_dev_env(tag: str) -> bool:
     return tag in {"", "dev", "development", "test", "testing"}
 
 
+PROD_ENV_ALIASES = {"prod", "production", "live"}
+
+
 def _is_prod_env(tag: str) -> bool:
-    return tag in {"prod", "production"}
+    return tag in PROD_ENV_ALIASES
 
 
 def _snapshot_path(default: str | None) -> Path | None:
