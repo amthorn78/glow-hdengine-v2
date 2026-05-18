@@ -41,6 +41,34 @@ def _require_all_errors(label: str, attempts: list[dict]) -> None:
         sys.exit(f"{label} reported successful attempts despite selected 'none': {providers}")
 
 
+
+def _direct_unavailable(value: object) -> bool:
+    if not isinstance(value, dict):
+        return False
+    status = str(value.get("status") or "").lower()
+    return status in {"missing", "skip", "skipped", "unavailable", "not_available", "error"}
+
+
+def _require_no_pass_with_unavailable_direct(parity: dict) -> None:
+    parity_status = str(
+        parity.get("provider_parity_status")
+        or (parity.get("live_provider_parity") or {}).get("parity_status")
+        or ""
+    ).lower()
+    capabilities = parity.get("capabilities") or []
+    direct_unavailable = False
+    if isinstance(capabilities, list):
+        for capability in capabilities:
+            if not isinstance(capability, dict):
+                continue
+            direct = capability.get("direct")
+            if _direct_unavailable(direct):
+                direct_unavailable = True
+                if str(capability.get("parity") or "").lower() == "pass":
+                    sys.exit("provider_parity reported pass with unavailable direct rows")
+    if direct_unavailable and parity_status == "pass":
+        sys.exit("provider_parity reported pass with unavailable direct rows")
+
 def main() -> None:
     adapter = _load_json("artifacts/db_bridge/adapter_selection.snapshot.json")
     env = _load_json("artifacts/runtime/env_connectivity.snapshot.json")
@@ -80,6 +108,8 @@ def main() -> None:
 
     if parity_selected != env_selected:
         sys.exit(f"env_connectivity selected {env_selected!r} but provider_parity selected {parity_selected!r}")
+
+    _require_no_pass_with_unavailable_direct(parity)
 
 
 if __name__ == "__main__":

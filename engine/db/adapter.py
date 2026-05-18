@@ -62,6 +62,13 @@ def _is_dev_env(tag: str) -> bool:
     return tag in {"", "dev", "development", "test", "testing"}
 
 
+PROD_ENV_ALIASES = {"prod", "production", "live"}
+
+
+def _is_prod_env(tag: str) -> bool:
+    return tag in PROD_ENV_ALIASES
+
+
 def _snapshot_path(default: str | None) -> Path | None:
     if not default:
         return None
@@ -155,7 +162,7 @@ class DBAccess:
         last_primary_error: PrimaryUnavailable | None = None
         last_bridge_error: AdapterError | None = None
 
-        bridge_allowed = force_bridge or dev_env or allow_bridge_prod
+        bridge_allowed = force_bridge or not _is_prod_env(tag) or allow_bridge_prod
 
         psycopg_ctor = psycopg_factory or (lambda value: PsycopgProvider(value))
         bridge_ctor = bridge_factory or (lambda value: BridgeProvider(value))

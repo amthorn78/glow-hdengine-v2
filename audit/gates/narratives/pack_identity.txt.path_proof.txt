@@ -1,5 +1,5 @@
 path: audit/gates/narratives/pack_identity.txt
 size_bytes: 883
 sha256: e4facb2a0e2d6ace217c2bcdb639b7a508bbc8f19333dca904371b81f4de3b2c
-mtime_utc: 2026-05-17T23:38:24Z
-produced_at_utc: 2026-05-17T23:38:55Z
+mtime_utc: 2026-05-18T00:55:39Z
+produced_at_utc: 2026-05-18T01:24:35Z

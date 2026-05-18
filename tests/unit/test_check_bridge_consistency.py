@@ -76,3 +76,65 @@ def test_provider_parity_must_match_env_selection(tmp_path: Path) -> None:
 
     with pytest.raises(SystemExit, match="env_connectivity selected 'bridge' but provider_parity selected 'psycopg'"):
         module.main()
+
+
+def test_provider_parity_rejects_pass_when_direct_is_unavailable(tmp_path: Path) -> None:
+    module = _load_check_module()
+    module.ROOT = tmp_path
+
+    _write_payloads(
+        tmp_path,
+        adapter={"schema": "v1", "selected": "bridge", "attempts": [{"provider": "bridge", "status": "ok"}]},
+        env={
+            "schema": "v2",
+            "dev_only": True,
+            "selection_result": {"provider": "bridge", "attempts": [{"provider": "bridge", "status": "ok"}]},
+        },
+        parity={
+            "schema": "v2",
+            "selected": "bridge",
+            "attempts": [{"provider": "bridge", "status": "ok"}],
+            "capabilities": [
+                {
+                    "name": "select_one",
+                    "direct": {"status": "missing"},
+                    "bridge": {"status": "ok"},
+                    "parity": "pass",
+                }
+            ],
+        },
+    )
+
+    with pytest.raises(SystemExit, match="provider_parity reported pass with unavailable direct rows"):
+        module.main()
+
+
+def test_provider_parity_allows_skip_when_direct_is_unavailable(tmp_path: Path) -> None:
+    module = _load_check_module()
+    module.ROOT = tmp_path
+
+    _write_payloads(
+        tmp_path,
+        adapter={"schema": "v1", "selected": "bridge", "attempts": [{"provider": "bridge", "status": "ok"}]},
+        env={
+            "schema": "v2",
+            "dev_only": True,
+            "selection_result": {"provider": "bridge", "attempts": [{"provider": "bridge", "status": "ok"}]},
+        },
+        parity={
+            "schema": "v2",
+            "selected": "bridge",
+            "attempts": [{"provider": "bridge", "status": "ok"}],
+            "capabilities": [
+                {
+                    "name": "select_one",
+                    "direct": {"status": "missing"},
+                    "bridge": {"status": "not_exercised"},
+                    "parity": "skip",
+                    "parity_reason": "direct_unavailable",
+                }
+            ],
+        },
+    )
+
+    module.main()
