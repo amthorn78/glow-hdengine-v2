@@ -501,9 +501,13 @@ EPIC032_PR02_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     },
 ]
 
+EPIC032_PR03_SUPERSEDED_INDEX_KEYS = {
+    ("epic032.pr03.adapter_selection", "artifacts/db_bridge/adapter_selection.snapshot.json"),
+}
+
 EPIC032_PR03_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
-        "artifact_key": "epic032.pr03.adapter_selection",
+        "artifact_key": "db_bridge.adapter_selection.snapshot",
         "discovered_physical_path": "artifacts/db_bridge/adapter_selection.snapshot.json",
         "epic_id": "HDE-EPIC032",
         "record_type": "epic032_pr03_evidence",
@@ -843,6 +847,8 @@ def _load_human_index() -> list[dict[str, object]]:
         for entry in payload
         if (entry.get("artifact_key"), entry.get("discovered_physical_path"))
         not in EPIC031_PR02_SUPERSEDED_INDEX_KEYS
+        and (entry.get("artifact_key"), entry.get("discovered_physical_path"))
+        not in EPIC032_PR03_SUPERSEDED_INDEX_KEYS
     ]
     return _dedupe_entries(
         [
