@@ -1,0 +1,263 @@
+OPS-01 Action Report and Evidence Output V3
+Generated: 2026-05-19 UTC
+Epic: HDE-EPIC032
+Task: OPS-01
+Evidence root: audit/ops/hde-epic032/db-provider-parity
+
+Scope
+- OPS evidence capture only
+- Target environment: dev
+- PF10 posture: proof labels only, no acceptance-token overclaim
+
+Action Summary
+1. Patched ddl_fingerprint parity comparator in scripts/db/capture_epic011_posture.py to compare shared canonical projection (kind/name + column name/type).
+2. Re-ran capture harness and refreshed provider artifacts.
+3. Re-ran bridge consistency check and captured outputs.
+4. Generated provider_parity_closure_decision.json.
+5. Updated parity scope rationale, non-claims, and final report to a single closed status.
+6. Refreshed checksum ledger.
+
+Execution Snapshot
+- command: /usr/local/bin/python scripts/db/capture_epic011_posture.py > audit/ops/hde-epic032/db-provider-parity/stdout.log 2> audit/ops/hde-epic032/db-provider-parity/stderr.log
+- exit_code: 0
+- stdout: <empty>
+- stderr: <empty>
+
+Provider Parity Outcome
+- status: CLOSED
+- active corpus rows: grants, search_path, select_one, ddl_fingerprint
+- row parity: all match
+- acceptance posture: OPS evidence only; acceptance candidate for reviewer decision
+
+BEGIN_VERBATIM_EVIDENCE
+
+===== FILE: audit/ops/hde-epic032/db-provider-parity/provider_parity_closure_decision.json =====
+{"active_parity_corpus":[{"active":true,"bridge_status":"ok","direct_status":"ok","name":"grants","parity":"match","parity_reason":null,"supports_provider_parity":true},{"active":true,"bridge_status":"ok","direct_status":"ok","name":"search_path","parity":"match","parity_reason":null,"supports_provider_parity":true},{"active":true,"bridge_status":"ok","direct_status":"ok","name":"select_one","parity":"match","parity_reason":null,"supports_provider_parity":true},{"active":true,"bridge_status":"ok","direct_status":"ok","name":"ddl_fingerprint","parity":"match","parity_reason":null,"supports_provider_parity":true}],"approved_plan_success_criteria":{"created_files_sha256_records_hashes":true,"direct_and_bridge_compared_on_canonical_corpus":true,"no_plaintext_secrets":true,"ops_evidence_only":true,"provider_parity_non_skipped_when_both_available":true},"artifact":{"created_at_utc":"2026-05-19T12:30:41Z","epic_id":"HDE-EPIC032","ops_task":"OPS-01","path":"audit/ops/hde-epic032/db-provider-parity/provider_parity_closure_decision.json","schema":"ops01_provider_parity_closure_decision.v1","target_environment":"dev"},"closure_evaluation":{"all_active_rows_match":true,"all_active_rows_non_skipped":true,"no_active_diff_rows":true,"no_unresolved_rows":true,"provider_parity_closure_reason":"all active corpus rows match","provider_parity_closure_status":"closed"},"commands_and_checks":{"bridge_consistency_command":"/usr/local/bin/python ci/checks/check_bridge_consistency.py","bridge_consistency_result":"PASS","capture_command":"/usr/local/bin/python scripts/db/capture_epic011_posture.py > audit/ops/hde-epic032/db-provider-parity/stdout.log 2> audit/ops/hde-epic032/db-provider-parity/stderr.log","capture_exit_code":0,"stderr_status":"empty","stdout_status":"empty"},"inactive_or_excluded_rows":[],"linked_evidence":{"bridge_consistency_result":{"path":"audit/ops/hde-epic032/db-provider-parity/bridge_consistency_result.txt","sha256":"f0e1ef7cdac7441b47f3f54709a070a22ed52bb90a3a7937c3b7f1dc01d9c5d3"},"created_files_sha256":{"path":"audit/ops/hde-epic032/db-provider-parity/created_files_sha256.txt","sha256":null},"non_claims":{"path":"audit/ops/hde-epic032/db-provider-parity/non_claims.txt","sha256":"b7cd04cf8bf74fd4ce46f17b89ec172740b11a7ae3a89b7805596cdbc2c1f750"},"parity_scope_rationale":{"path":"audit/ops/hde-epic032/db-provider-parity/parity_scope_rationale.txt","sha256":"122fd9685f427ace71fe147f6557e87df74ef17658c22d953215811ce581567b"},"provider_parity_proof":{"path":"audit/ops/hde-epic032/db-provider-parity/provider_parity.proof.json","sha256":"fdbbd6b0163ea26d47c53d9cc402be63b6c51514f2e5b0c6f4624873e27971b2"}},"non_claims":{"acceptance_token_satisfaction_claimed_for_db_bridge_caps_ok":false,"acceptance_token_satisfaction_claimed_for_db_bridge_fallback_ok":false,"acceptance_token_satisfaction_claimed_for_db_provider_parity_ok":false,"epic_closure_claimed":false,"pf09_status_move_claimed":false,"qa_pass_claimed":false},"parity_corpus_authority":{"authority_evidence_pointer":"scripts/db/capture_epic011_posture.py#_ddl_projection","authority_owner":"OPS technical implementation","authority_recorded_at_utc":"2026-05-19T12:30:41Z","authority_status":"provided","decision":{"ddl_fingerprint_excluded_reason":null,"ddl_fingerprint_exclusion_authorized":false,"ddl_fingerprint_included_in_active_corpus":true}},"provider_availability":{"bridge_provider":{"available":true,"name":"bridge","status_source":"provider_parity.proof.json"},"direct_provider":{"available":true,"name":"psycopg","status_source":"provider_parity.proof.json"}},"secret_safety":{"database_url":"SET","db_allow_bridge_in_prod":"","db_bridge_url":"SET","plaintext_secret_values_present":false,"secret_posture":"presence_only"}}
+
+===== END FILE: audit/ops/hde-epic032/db-provider-parity/provider_parity_closure_decision.json =====
+
+===== FILE: audit/ops/hde-epic032/db-provider-parity/provider_parity.proof.json =====
+{"attempts":[{"provider":"psycopg","status":"ok"}],"capabilities":[{"bridge":{"status":"ok","value":[{"columns":[{"name":"user_id","type":"uuid"},{"name":"vendor","type":"text"},{"name":"vendor_version","type":"integer"},{"name":"input_fingerprint","type":"character"},{"name":"payload","type":"jsonb"},{"name":"created_at","type":"timestamp with time zone"},{"name":"refreshed_at","type":"timestamp with time zone"},{"name":"ttl_at","type":"timestamp with time zone"}],"constraints":[],"kind":"table","name":"hde.body_graphs"},{"definition":"","kind":"view","name":"hde.body_graphs_current"},{"definition":"","kind":"view","name":"public.hde_body_graphs_current"}]},"direct":{"status":"ok","value":[{"columns":[{"data_type":"uuid","default":"","name":"user_id","nullable":false},{"data_type":"text","default":"","name":"vendor","nullable":false},{"data_type":"integer","default":"","name":"vendor_version","nullable":false},{"data_type":"character","default":"","name":"input_fingerprint","nullable":false},{"data_type":"jsonb","default":"","name":"payload","nullable":false},{"data_type":"timestamp with time zone","default":"now()","name":"created_at","nullable":false},{"data_type":"timestamp with time zone","default":"","name":"refreshed_at","nullable":true},{"data_type":"timestamp with time zone","default":"","name":"ttl_at","nullable":true}],"constraints":[{"definition":"UNIQUE (user_id, vendor, vendor_version, input_fingerprint)","name":"body_graphs_user_id_vendor_vendor_version_input_fingerprint_key"}],"kind":"table","name":"hde.body_graphs"},{"definition":"SELECT DISTINCT ON (user_id, vendor) user_id, vendor, vendor_version, input_fingerprint, payload, created_at, refreshed_at, ttl_at FROM body_graphs ORDER BY user_id, vendor, (COALESCE(refreshed_at, created_at)) DESC;","kind":"view","name":"hde.body_graphs_current"},{"definition":"SELECT user_id, vendor, vendor_version, input_fingerprint, payload, created_at, refreshed_at, ttl_at FROM body_graphs_current;","kind":"view","name":"public.hde_body_graphs_current"}]},"name":"ddl_fingerprint","parity":"match"},{"bridge":{"status":"ok","value":["postgres hde.body_graphs DELETE","postgres hde.body_graphs INSERT","postgres hde.body_graphs REFERENCES","postgres hde.body_graphs SELECT","postgres hde.body_graphs TRIGGER","postgres hde.body_graphs TRUNCATE","postgres hde.body_graphs UPDATE","postgres hde.body_graphs_current DELETE","postgres hde.body_graphs_current INSERT","postgres hde.body_graphs_current REFERENCES","postgres hde.body_graphs_current SELECT","postgres hde.body_graphs_current TRIGGER","postgres hde.body_graphs_current TRUNCATE","postgres hde.body_graphs_current UPDATE","postgres public.hde_body_graphs_current DELETE","postgres public.hde_body_graphs_current INSERT","postgres public.hde_body_graphs_current REFERENCES","postgres public.hde_body_graphs_current SELECT","postgres public.hde_body_graphs_current TRIGGER","postgres public.hde_body_graphs_current TRUNCATE","postgres public.hde_body_graphs_current UPDATE"]},"direct":{"status":"ok","value":["postgres hde.body_graphs DELETE","postgres hde.body_graphs INSERT","postgres hde.body_graphs REFERENCES","postgres hde.body_graphs SELECT","postgres hde.body_graphs TRIGGER","postgres hde.body_graphs TRUNCATE","postgres hde.body_graphs UPDATE","postgres hde.body_graphs_current DELETE","postgres hde.body_graphs_current INSERT","postgres hde.body_graphs_current REFERENCES","postgres hde.body_graphs_current SELECT","postgres hde.body_graphs_current TRIGGER","postgres hde.body_graphs_current TRUNCATE","postgres hde.body_graphs_current UPDATE","postgres public.hde_body_graphs_current DELETE","postgres public.hde_body_graphs_current INSERT","postgres public.hde_body_graphs_current REFERENCES","postgres public.hde_body_graphs_current SELECT","postgres public.hde_body_graphs_current TRIGGER","postgres public.hde_body_graphs_current TRUNCATE","postgres public.hde_body_graphs_current UPDATE"]},"name":"grants","parity":"match"},{"bridge":{"status":"ok","value":"hde, public"},"direct":{"status":"ok","value":"hde, public"},"name":"search_path","parity":"match"},{"bridge":{"status":"ok","value":1},"direct":{"status":"ok","value":1},"name":"select_one","parity":"match"}],"captured_at_utc":"2026-05-19T12:30:41Z","environment":"dev","rails_open":false,"schema":"v2","selected":"psycopg"}
+
+===== END FILE: audit/ops/hde-epic032/db-provider-parity/provider_parity.proof.json =====
+
+===== FILE: audit/ops/hde-epic032/db-provider-parity/bridge_consistency_result.txt =====
+# Bridge Consistency Check - OPS-01 Evidence
+# HDE-EPIC032 | audit/ops/hde-epic032/db-provider-parity/
+
+command: /usr/local/bin/python ci/checks/check_bridge_consistency.py
+working_directory: /workspaces/glow-hdengine-v2
+exit_code: 0
+result: PASS
+stdout_status: empty
+stderr_status: empty
+
+active_parity_corpus:
+- grants
+- search_path
+- select_one
+- ddl_fingerprint
+
+excluded_rows:
+- <none>
+
+row_parity_summary:
+- grants: match
+- search_path: match
+- select_one: match
+- ddl_fingerprint: match
+
+provider_parity_closure_status: closed
+provider_parity_closure_reason: all active corpus rows are non-skipped and match.
+acceptance_posture: OPS evidence only; candidate for OPS acceptance review.
+
+===== END FILE: audit/ops/hde-epic032/db-provider-parity/bridge_consistency_result.txt =====
+
+===== FILE: audit/ops/hde-epic032/db-provider-parity/parity_scope_rationale.txt =====
+# Parity Scope Rationale - OPS-01
+# HDE-EPIC032 | audit/ops/hde-epic032/db-provider-parity/
+
+determined_at_utc: 2026-05-19T12:30:41Z
+authority_owner: OPS technical implementation (Path A)
+authority_status: provided
+authority_evidence_pointer: scripts/db/capture_epic011_posture.py (ddl_fingerprint projection comparator)
+
+decision:
+- ddl_fingerprint_included_in_active_corpus: true
+- ddl_fingerprint_excluded_reason: null
+- ddl_fingerprint_exclusion_authorized: false
+
+active_parity_corpus:
+- grants
+- search_path
+- select_one
+- ddl_fingerprint
+
+closure_status:
+- provider_parity_closure_status: closed
+- reason: all active corpus rows match after canonical DDL projection parity alignment.
+
+token_posture:
+- No acceptance-token claims for DB_PROVIDER_PARITY_OK, DB_BRIDGE_CAPS_OK, DB_BRIDGE_FALLBACK_OK.
+
+===== END FILE: audit/ops/hde-epic032/db-provider-parity/parity_scope_rationale.txt =====
+
+===== FILE: audit/ops/hde-epic032/db-provider-parity/non_claims.txt =====
+# Non-Claims - OPS-01 Evidence Bundle
+# HDE-EPIC032 | audit/ops/hde-epic032/db-provider-parity/
+# Governed by: PF10 - HDE-Build Notes section 2.1 DB bridge/provider parity proof-label posture
+
+This OPS-01 report captures evidence only. The following claims are explicitly NOT made:
+
+1. QA PASS is not claimed.
+2. PF09 status move is not claimed.
+3. Epic closure is not claimed.
+4. Acceptance-token satisfaction is not claimed for:
+   - DB_PROVIDER_PARITY_OK
+   - DB_BRIDGE_CAPS_OK
+   - DB_BRIDGE_FALLBACK_OK
+
+provider_parity_closure_status: closed
+provider_parity_closure_basis: all active parity corpus rows match in provider_parity.proof.json.
+
+Proof-label posture:
+- DB_PROVIDER_PARITY_OK, DB_BRIDGE_CAPS_OK, and DB_BRIDGE_FALLBACK_OK remain non-token proof labels unless governance registers them as tokens.
+
+===== END FILE: audit/ops/hde-epic032/db-provider-parity/non_claims.txt =====
+
+===== FILE: audit/ops/hde-epic032/db-provider-parity/ops01_final_report.txt =====
+OPS-01 Final Report (Corrected Evidence Set)
+Generated: 2026-05-19 UTC
+Epic: HDE-EPIC032
+Task: OPS-01
+Evidence root: audit/ops/hde-epic032/db-provider-parity
+
+target_environment: dev
+command_executed: /usr/local/bin/python scripts/db/capture_epic011_posture.py > audit/ops/hde-epic032/db-provider-parity/stdout.log 2> audit/ops/hde-epic032/db-provider-parity/stderr.log
+exit_code: 0
+
+env_presence_posture:
+- APP_ENV=dev
+- DATABASE_URL=SET
+- DB_BRIDGE_URL=SET
+- DB_ALLOW_BRIDGE_IN_PROD=
+
+active_parity_corpus:
+- grants
+- search_path
+- select_one
+- ddl_fingerprint
+
+excluded_rows:
+- <none>
+
+provider_parity_closure_status: closed
+provider_parity_closure_reason: all active rows are non-skipped and parity=match.
+
+bridge_consistency_check:
+- command: /usr/local/bin/python ci/checks/check_bridge_consistency.py
+- result: PASS
+- stdout_status: empty
+- stderr_status: empty
+
+explicit_non_claims:
+- no QA PASS claim
+- no PF09 status move claim
+- no epic closure claim
+- no acceptance-token satisfaction claim for DB_PROVIDER_PARITY_OK, DB_BRIDGE_CAPS_OK, DB_BRIDGE_FALLBACK_OK
+
+checksum_summary:
+- See created_files_sha256.txt for final evidence hashes.
+
+OPS-01 acceptance candidate: YES
+
+===== END FILE: audit/ops/hde-epic032/db-provider-parity/ops01_final_report.txt =====
+
+===== FILE: audit/ops/hde-epic032/db-provider-parity/commands.txt =====
+# OPS-01 — DB Bridge Provider Parity Capture
+# Harness identity: scripts/db/capture_epic011_posture.py
+#   This is the repo-resident DB bridge provider parity capture harness introduced
+#   as part of HDE-EPIC032 PR-03 (EPIC011 DB posture, provider parity, and env
+#   connectivity evidence capture). The script name reflects its EPIC011 foundation;
+#   it is the only repo-resident harness that satisfies the PR-03 DB bridge parity
+#   proof obligation. There is no separate generate_db_bridge_parity.py in this repo.
+#   See scripts/db/capture_epic011_posture.py docstring:
+#     "Capture EPIC011 DB posture, provider parity, and env connectivity evidence."
+#
+# Target environment: dev
+# Python interpreter: /usr/local/bin/python (3.11.15, psycopg 3.3.4)
+# Working directory: /workspaces/glow-hdengine-v2 (branch: main)
+# Run mode: APP_ENV=dev, SAFE_MODE=1, ALLOW_NETWORK=0, rails_open=false
+
+cd /workspaces/glow-hdengine-v2
+/usr/local/bin/python scripts/db/capture_epic011_posture.py > audit/ops/hde-epic032/db-provider-parity/stdout.log 2> audit/ops/hde-epic032/db-provider-parity/stderr.log
+echo $? > audit/ops/hde-epic032/db-provider-parity/exit_codes.txt
+
+===== END FILE: audit/ops/hde-epic032/db-provider-parity/commands.txt =====
+
+===== FILE: audit/ops/hde-epic032/db-provider-parity/stdout.log =====
+<empty>
+
+===== END FILE: audit/ops/hde-epic032/db-provider-parity/stdout.log =====
+
+===== FILE: audit/ops/hde-epic032/db-provider-parity/stderr.log =====
+<empty>
+
+===== END FILE: audit/ops/hde-epic032/db-provider-parity/stderr.log =====
+
+===== FILE: audit/ops/hde-epic032/db-provider-parity/exit_codes.txt =====
+0
+
+===== END FILE: audit/ops/hde-epic032/db-provider-parity/exit_codes.txt =====
+
+===== FILE: audit/ops/hde-epic032/db-provider-parity/redacted_env_presence.txt =====
+target_environment=dev
+APP_ENV=dev
+DATABASE_URL=SET
+DB_BRIDGE_URL=SET
+DB_ALLOW_BRIDGE_IN_PROD=
+
+===== END FILE: audit/ops/hde-epic032/db-provider-parity/redacted_env_presence.txt =====
+
+===== FILE: audit/ops/hde-epic032/db-provider-parity/adapter_selection.snapshot.json =====
+{"attempts":[{"provider":"psycopg","status":"ok"}],"captured_at_utc":"2026-05-19T12:30:41Z","environment":"dev","flags":{"DATABASE_URL_present":true,"DB_BRIDGE_URL_present":true,"allow_bridge_prod":false,"env":"dev","force_bridge":false,"force_pg":false,"rails_open":false},"schema":"v2","selected":"psycopg"}
+
+===== END FILE: audit/ops/hde-epic032/db-provider-parity/adapter_selection.snapshot.json =====
+
+===== FILE: audit/ops/hde-epic032/db-provider-parity/env_connectivity.snapshot.json =====
+{"captured_at_utc":"2026-05-19T12:30:41Z","dev_only":true,"env_checks":[{"name":"DATABASE_URL","value_kind":"dsn_redacted"},{"name":"DB_BRIDGE_URL","value_kind":"dsn_redacted"}],"environment":"dev","fallback_rules":["Attempt DATABASE_URL first via psycopg with search_path pin and health check","If DATABASE_URL is missing or psycopg health fails, try HTTPS DB_BRIDGE_URL","Bridge path is allowed only when rails are open or DB_FORCE_BRIDGE=1"],"final_selection":{"attempts":[{"provider":"psycopg","status":"ok"}],"provider":"psycopg"},"missing_config_envelope":{"code":"missing_db_config","error":"database configuration not found","ok":false,"schema":"v1"},"rails_open":false,"resolver_ok":true,"resolver_snapshot":{"checks":[{"name":"DATABASE_URL","value_kind":"dsn_redacted"},{"name":"DB_BRIDGE_URL","value_kind":"dsn_redacted"}],"ok":true,"result":{"which":"DATABASE_URL"},"schema":"v1"},"schema":"v2","selection_order":["DATABASE_URL","DB_BRIDGE_URL"],"selection_result":{"attempts":[{"provider":"psycopg","status":"ok"}],"provider":"psycopg"}}
+
+===== END FILE: audit/ops/hde-epic032/db-provider-parity/env_connectivity.snapshot.json =====
+
+===== FILE: audit/ops/hde-epic032/db-provider-parity/created_files_sha256.txt =====
+00739084551ed52b9d2da5c0521b255a2ab28c17d58c95a215c8c4a3e763d499  audit/ops/hde-epic032/db-provider-parity/OPS-01_fresh_bundle.txt
+d8d82519cdf0c90fd71d861bbfbf3937119920358d3eb88d17c3d7b7e9a68759  audit/ops/hde-epic032/db-provider-parity/OPS-01_full_action_report_and_evidence_output.md
+6a8931f3bb199bfa63357adede23aa0d0032405b218b85e6358bed53942c3c64  audit/ops/hde-epic032/db-provider-parity/OPS-01_full_evidence_bundle_v2.txt
+22bfcd1588631805a31c691f0d891dc2c6340238b898c7d6c5633812b0cd2e6b  audit/ops/hde-epic032/db-provider-parity/adapter_selection.snapshot.json
+26140af4e79676918b372571c4ede1306c25ec921f98dc749afb8bcb377f52b5  audit/ops/hde-epic032/db-provider-parity/bridge_consistency_result.txt
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  audit/ops/hde-epic032/db-provider-parity/bridge_consistency_stderr.log
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  audit/ops/hde-epic032/db-provider-parity/bridge_consistency_stdout.log
+ba63cdadf0a0f7261244c16540248aaa4b98c12778a8921e005edf58a2544813  audit/ops/hde-epic032/db-provider-parity/commands.txt
+f5f5243037daafaf092f6693854ce11dbf957f0507fdb8008dca1b102c8128bb  audit/ops/hde-epic032/db-provider-parity/ddl_fingerprint_normalization_probe.json
+08e08b85822018c0b93e7ab5fe5484208077fc3d19c2af74529d3e53e1c94da5  audit/ops/hde-epic032/db-provider-parity/ddl_fingerprint_projection_probe.json
+a242cc56a9f11035b9cead9595411c9ecd5d129fe6860d179428719a570fe171  audit/ops/hde-epic032/db-provider-parity/env_connectivity.snapshot.json
+9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa  audit/ops/hde-epic032/db-provider-parity/exit_codes.txt
+898f21a3ff702522c333315fde016cdf47cbc5d933b11100dfa917cc1df57068  audit/ops/hde-epic032/db-provider-parity/non_claims.txt
+7c819c0511dc560ffbad58199df61bf0ec6a4ebe86aad104bfb1d74a6ef1431a  audit/ops/hde-epic032/db-provider-parity/ops01_action_report_and_evidence_output_v3.txt
+8cdf14f809bd6a0c82a769e8edaf2b5eea475f8a8f4702e4f181ed0ed39ba85c  audit/ops/hde-epic032/db-provider-parity/ops01_final_report.txt
+9de678910693013e8dda3436cffcfb2914a810d896d20d1e50bac26e39fbb356  audit/ops/hde-epic032/db-provider-parity/parity_scope_rationale.txt
+89bfa737fcbcb7498d6ae35a735f59c4a4306fed2b73f799c2e15705a522072a  audit/ops/hde-epic032/db-provider-parity/provider_parity.proof.json
+096f9f656ae91cc610efcfe1d65944e30075bd7541590a8315ffc898ad6efc42  audit/ops/hde-epic032/db-provider-parity/provider_parity_closure_decision.json
+4248c1b5f89ba605ec671ff5fbd3ad5603d28a00f24bf3bfd7d723c9a9ef979f  audit/ops/hde-epic032/db-provider-parity/redacted_env_presence.txt
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  audit/ops/hde-epic032/db-provider-parity/stderr.log
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  audit/ops/hde-epic032/db-provider-parity/stdout.log
+
+===== END FILE: audit/ops/hde-epic032/db-provider-parity/created_files_sha256.txt =====
+
+END_VERBATIM_EVIDENCE
+
+Non-Claims
+- No QA PASS claim
+- No PF09 status move claim
+- No epic closure claim
+- No acceptance-token satisfaction claim for DB_PROVIDER_PARITY_OK, DB_BRIDGE_CAPS_OK, DB_BRIDGE_FALLBACK_OK

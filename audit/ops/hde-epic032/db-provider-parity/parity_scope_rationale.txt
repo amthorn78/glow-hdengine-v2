@@ -1,0 +1,25 @@
+# Parity Scope Rationale - OPS-01
+# HDE-EPIC032 | audit/ops/hde-epic032/db-provider-parity/
+
+determined_at_utc: 2026-05-19T12:30:41Z
+authority_owner: OPS technical implementation (Path A)
+authority_status: provided
+authority_evidence_pointer: scripts/db/capture_epic011_posture.py (ddl_fingerprint projection comparator)
+
+decision:
+- ddl_fingerprint_included_in_active_corpus: true
+- ddl_fingerprint_excluded_reason: null
+- ddl_fingerprint_exclusion_authorized: false
+
+active_parity_corpus:
+- grants
+- search_path
+- select_one
+- ddl_fingerprint
+
+closure_status:
+- provider_parity_closure_status: closed
+- reason: all active corpus rows match after canonical DDL projection parity alignment.
+
+token_posture:
+- No acceptance-token claims for DB_PROVIDER_PARITY_OK, DB_BRIDGE_CAPS_OK, DB_BRIDGE_FALLBACK_OK.

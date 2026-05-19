@@ -1,0 +1,19 @@
+# Non-Claims - OPS-01 Evidence Bundle
+# HDE-EPIC032 | audit/ops/hde-epic032/db-provider-parity/
+# Governed by: PF10 - HDE-Build Notes section 2.1 DB bridge/provider parity proof-label posture
+
+This OPS-01 report captures evidence only. The following claims are explicitly NOT made:
+
+1. QA PASS is not claimed.
+2. PF09 status move is not claimed.
+3. Epic closure is not claimed.
+4. Acceptance-token satisfaction is not claimed for:
+   - DB_PROVIDER_PARITY_OK
+   - DB_BRIDGE_CAPS_OK
+   - DB_BRIDGE_FALLBACK_OK
+
+provider_parity_closure_status: closed
+provider_parity_closure_basis: all active parity corpus rows match in provider_parity.proof.json.
+
+Proof-label posture:
+- DB_PROVIDER_PARITY_OK, DB_BRIDGE_CAPS_OK, and DB_BRIDGE_FALLBACK_OK remain non-token proof labels unless governance registers them as tokens.

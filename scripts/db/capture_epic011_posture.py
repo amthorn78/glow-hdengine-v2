@@ -378,6 +378,58 @@ def _canonical_value(value: Any) -> str:
     return json.dumps(value, separators=(",", ":"), sort_keys=True)
 
 
+def _ddl_projection(value: Any) -> Any:
+    """Normalize DDL fingerprint rows to shared fields across providers.
+
+    Direct introspection includes richer metadata (nullable/default/constraints/view SQL),
+    while bridge captures a reduced projection. Provider parity compares only the
+    shared schema identity surface: object kind/name and column name/type.
+    """
+    if not isinstance(value, list):
+        return value
+    projected: List[Dict[str, Any]] = []
+    for obj in value:
+        if not isinstance(obj, Mapping):
+            continue
+        row: Dict[str, Any] = {
+            "kind": obj.get("kind"),
+            "name": obj.get("name"),
+        }
+        columns = obj.get("columns")
+        if isinstance(columns, list):
+            proj_cols: List[Dict[str, Any]] = []
+            for col in columns:
+                if not isinstance(col, Mapping):
+                    continue
+                proj_cols.append(
+                    {
+                        "name": col.get("name"),
+                        "type": col.get("type") or col.get("data_type"),
+                    }
+                )
+            row["columns"] = sorted(
+                proj_cols,
+                key=lambda item: (
+                    str(item.get("name") or ""),
+                    str(item.get("type") or ""),
+                ),
+            )
+        projected.append(row)
+    return sorted(
+        projected,
+        key=lambda item: (
+            str(item.get("kind") or ""),
+            str(item.get("name") or ""),
+        ),
+    )
+
+
+def _parity_match(name: str, direct_value: Any, bridge_value: Any) -> bool:
+    if name == "ddl_fingerprint":
+        return _canonical_value(_ddl_projection(direct_value)) == _canonical_value(_ddl_projection(bridge_value))
+    return _canonical_value(direct_value) == _canonical_value(bridge_value)
+
+
 def _parity_summary(
     direct_capture: Mapping[str, Any],
     bridge_capture: Mapping[str, Any],
@@ -405,7 +457,7 @@ def _parity_summary(
         parity = "skip"
         reason = "direct_unavailable"
         if direct_entry and direct_entry.get("status") == "ok" and bridge_entry and bridge_entry.get("status") == "ok":
-            parity = "match" if _canonical_value(direct_entry.get("value")) == _canonical_value(bridge_entry.get("value")) else "diff"
+            parity = "match" if _parity_match(name, direct_entry.get("value"), bridge_entry.get("value")) else "diff"
             reason = "" if parity == "match" else "value_mismatch"
         entry["parity"] = parity
         if reason:

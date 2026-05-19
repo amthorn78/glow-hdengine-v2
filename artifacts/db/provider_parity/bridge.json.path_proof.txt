@@ -1,5 +1,4 @@
 path: artifacts/db/provider_parity/bridge.json
+sha256: 8c670e7d5802ad33aeaabec66ba4143319f57cfde909f0e86af72cb6058cbeb1
 size_bytes: 1840
-sha256: 7274ce1569dbcdf58eeef612b72abef5a78b7407b53f97835cede712680381bf
-mtime_utc: 2025-12-06T04:06:36Z
-produced_at_utc: 2025-11-22T02:27:04Z
+mtime_utc: 2026-05-19T12:30:45Z

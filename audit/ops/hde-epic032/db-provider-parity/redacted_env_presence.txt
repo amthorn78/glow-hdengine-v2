@@ -1,0 +1,5 @@
+target_environment=dev
+APP_ENV=dev
+DATABASE_URL=SET
+DB_BRIDGE_URL=SET
+DB_ALLOW_BRIDGE_IN_PROD=

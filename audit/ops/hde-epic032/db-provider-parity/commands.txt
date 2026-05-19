@@ -1,0 +1,18 @@
+# OPS-01 — DB Bridge Provider Parity Capture
+# Harness identity: scripts/db/capture_epic011_posture.py
+#   This is the repo-resident DB bridge provider parity capture harness introduced
+#   as part of HDE-EPIC032 PR-03 (EPIC011 DB posture, provider parity, and env
+#   connectivity evidence capture). The script name reflects its EPIC011 foundation;
+#   it is the only repo-resident harness that satisfies the PR-03 DB bridge parity
+#   proof obligation. There is no separate generate_db_bridge_parity.py in this repo.
+#   See scripts/db/capture_epic011_posture.py docstring:
+#     "Capture EPIC011 DB posture, provider parity, and env connectivity evidence."
+#
+# Target environment: dev
+# Python interpreter: /usr/local/bin/python (3.11.15, psycopg 3.3.4)
+# Working directory: /workspaces/glow-hdengine-v2 (branch: main)
+# Run mode: APP_ENV=dev, SAFE_MODE=1, ALLOW_NETWORK=0, rails_open=false
+
+cd /workspaces/glow-hdengine-v2
+/usr/local/bin/python scripts/db/capture_epic011_posture.py > audit/ops/hde-epic032/db-provider-parity/stdout.log 2> audit/ops/hde-epic032/db-provider-parity/stderr.log
+echo $? > audit/ops/hde-epic032/db-provider-parity/exit_codes.txt

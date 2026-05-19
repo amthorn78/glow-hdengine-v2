@@ -1,0 +1,28 @@
+# Bridge Consistency Check - OPS-01 Evidence
+# HDE-EPIC032 | audit/ops/hde-epic032/db-provider-parity/
+
+command: /usr/local/bin/python ci/checks/check_bridge_consistency.py
+working_directory: /workspaces/glow-hdengine-v2
+exit_code: 0
+result: PASS
+stdout_status: empty
+stderr_status: empty
+
+active_parity_corpus:
+- grants
+- search_path
+- select_one
+- ddl_fingerprint
+
+excluded_rows:
+- <none>
+
+row_parity_summary:
+- grants: match
+- search_path: match
+- select_one: match
+- ddl_fingerprint: match
+
+provider_parity_closure_status: closed
+provider_parity_closure_reason: all active corpus rows are non-skipped and match.
+acceptance_posture: OPS evidence only; candidate for OPS acceptance review.

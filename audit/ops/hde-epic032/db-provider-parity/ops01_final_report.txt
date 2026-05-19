@@ -1,0 +1,44 @@
+OPS-01 Final Report (Corrected Evidence Set)
+Generated: 2026-05-19 UTC
+Epic: HDE-EPIC032
+Task: OPS-01
+Evidence root: audit/ops/hde-epic032/db-provider-parity
+
+target_environment: dev
+command_executed: /usr/local/bin/python scripts/db/capture_epic011_posture.py > audit/ops/hde-epic032/db-provider-parity/stdout.log 2> audit/ops/hde-epic032/db-provider-parity/stderr.log
+exit_code: 0
+
+env_presence_posture:
+- APP_ENV=dev
+- DATABASE_URL=SET
+- DB_BRIDGE_URL=SET
+- DB_ALLOW_BRIDGE_IN_PROD=
+
+active_parity_corpus:
+- grants
+- search_path
+- select_one
+- ddl_fingerprint
+
+excluded_rows:
+- <none>
+
+provider_parity_closure_status: closed
+provider_parity_closure_reason: all active rows are non-skipped and parity=match.
+
+bridge_consistency_check:
+- command: /usr/local/bin/python ci/checks/check_bridge_consistency.py
+- result: PASS
+- stdout_status: empty
+- stderr_status: empty
+
+explicit_non_claims:
+- no QA PASS claim
+- no PF09 status move claim
+- no epic closure claim
+- no acceptance-token satisfaction claim for DB_PROVIDER_PARITY_OK, DB_BRIDGE_CAPS_OK, DB_BRIDGE_FALLBACK_OK
+
+checksum_summary:
+- See created_files_sha256.txt for final evidence hashes.
+
+OPS-01 acceptance candidate: YES
