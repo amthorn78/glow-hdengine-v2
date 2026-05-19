@@ -23,6 +23,7 @@ from engine.runtime.determinism_env import ensure_determinism_env
 ADAPTER_SELECTION_PATH = ROOT / "artifacts/db_bridge/adapter_selection.snapshot.json"
 PROVIDER_PARITY_PATH = ROOT / "artifacts/db_bridge/provider_parity.proof.json"
 ENV_CONNECTIVITY_PATH = ROOT / "artifacts/runtime/env_connectivity.snapshot.json"
+NONDEV_FAILURE_PATH = ROOT / "artifacts/runtime/env_connectivity.nondev_failure.json"
 
 PRODUCED_AT_UTC = "2026-05-18T00:00:00Z"
 REDACTED_DSN = "redacted_database_url_present"
@@ -283,6 +284,34 @@ def _provider_parity_payload(db: DBAccess) -> dict[str, Any]:
     }
 
 
+def _nondev_total_failure_payload() -> dict[str, Any]:
+    with _patched_env({"APP_ENV": "prod", "DB_ALLOW_BRIDGE_IN_PROD": "0"}):
+        try:
+            DBAccess.for_current_env(
+                snapshot_path=None,
+                psycopg_factory=lambda _dsn: HarnessProvider("psycopg"),
+                bridge_factory=lambda _url: HarnessProvider("bridge"),
+            )
+        except PrimaryUnavailable as exc:
+            err = {"class": exc.__class__.__name__, "code": exc.code}
+        except Exception as exc:  # pragma: no cover
+            err = {"class": exc.__class__.__name__, "code": "unexpected"}
+        else:  # pragma: no cover
+            err = {"class": "None", "code": "unexpected_success"}
+
+    return {
+        "schema": "v1",
+        "captured_at_utc": PRODUCED_AT_UTC,
+        "environment": "prod",
+        "production_like_aliases": ["prod", "production", "live"],
+        "selection_order": ["DATABASE_URL", "DB_BRIDGE_URL"],
+        "bridge_guard": {"db_allow_bridge_in_prod": False, "bridge_allowed": False},
+        "total_failure": {"ok": False, "typed_error": err},
+        "public_failure_posture": {"numeric_free": True, "secret_free": True, "raw_stack_trace": False},
+        "probe_posture": {"no_proactive_probes": True, "adapter_path_only": True},
+        "secret_posture": "presence_only"
+    }
+
 def generate(*, check: bool = False) -> None:
     ensure_determinism_env()
     if check:
@@ -298,7 +327,10 @@ def generate(*, check: bool = False) -> None:
 
     _write_or_check(ADAPTER_SELECTION_PATH, adapter_payload, check=check)
     _write_or_check(ENV_CONNECTIVITY_PATH, env_payload, check=check)
+    nondev_payload = _nondev_total_failure_payload()
+
     _write_or_check(PROVIDER_PARITY_PATH, parity_payload, check=check)
+    _write_or_check(NONDEV_FAILURE_PATH, nondev_payload, check=check)
 
 
 def main(argv: Iterable[str] | None = None) -> int:

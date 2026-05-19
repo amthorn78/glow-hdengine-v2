@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 
 from engine.db.adapter import DBAccess
-from engine.db.errors import PrimaryUnavailable
+from engine.db.errors import BridgeUnavailable, PrimaryUnavailable
 
 SNAPSHOT_PATH = Path("artifacts/db_bridge/adapter_selection.snapshot.json")
 
@@ -190,5 +190,45 @@ def test_live_env_uses_prod_bridge_guard(monkeypatch: pytest.MonkeyPatch) -> Non
     assert snapshot["selected"] == "none"
     assert snapshot["attempts"] == [
         {"provider": "psycopg", "status": "error", "reason": "primary_connect_failed"},
+        {"provider": "bridge", "status": "skip", "reason": "guard_blocked"},
+    ]
+
+
+def test_nondev_total_failure_missing_config_is_typed(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.delenv("DATABASE_URL", raising=False)
+    monkeypatch.delenv("DB_BRIDGE_URL", raising=False)
+    monkeypatch.setenv("APP_ENV", "stage")
+
+    with pytest.raises(BridgeUnavailable) as excinfo:
+        DBAccess.for_current_env(
+            psycopg_factory=lambda dsn: FakeProvider("psycopg"),
+            bridge_factory=lambda url: FakeProvider("bridge"),
+        )
+
+    assert excinfo.value.code == "missing_bridge_url"
+    snapshot = _read_snapshot()
+    assert snapshot["selected"] == "none"
+    assert snapshot["attempts"] == [
+        {"provider": "psycopg", "status": "skip", "reason": "missing_database_url"},
+        {"provider": "bridge", "status": "skip", "reason": "missing_bridge_url"},
+    ]
+
+
+def test_prod_total_failure_missing_database_url_is_typed(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.delenv("DATABASE_URL", raising=False)
+    monkeypatch.setenv("DB_BRIDGE_URL", "https://bridge.example")
+    monkeypatch.setenv("APP_ENV", "prod")
+
+    with pytest.raises(PrimaryUnavailable) as excinfo:
+        DBAccess.for_current_env(
+            psycopg_factory=lambda dsn: FakeProvider("psycopg"),
+            bridge_factory=lambda url: FakeProvider("bridge"),
+        )
+
+    assert excinfo.value.code == "missing_database_url"
+    snapshot = _read_snapshot()
+    assert snapshot["selected"] == "none"
+    assert snapshot["attempts"] == [
+        {"provider": "psycopg", "status": "skip", "reason": "missing_database_url"},
         {"provider": "bridge", "status": "skip", "reason": "guard_blocked"},
     ]
