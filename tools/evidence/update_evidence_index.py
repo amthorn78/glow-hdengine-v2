@@ -535,6 +535,27 @@ EPIC032_PR03_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     },
 ]
 
+
+EPIC032_PR04_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "epic032.pr04.env_connectivity_nondev_failure",
+        "discovered_physical_path": "artifacts/runtime/env_connectivity.nondev_failure.json",
+        "epic_id": "HDE-EPIC032",
+        "record_type": "epic032_pr04_evidence",
+        "schema_version": "1.0",
+        "tokens": ["DB_CONN_ENV_OK", "JSON_CANONICAL_CHECK_OK"],
+        "notes": "EPIC032 PR-04 non-dev total-failure typed-error and numeric-free posture evidence for HDE-FERM004.3/.4",
+    },
+    {
+        "artifact_key": "epic032.pr04.ops01.provider_parity_closure_decision",
+        "discovered_physical_path": "audit/ops/hde-epic032/db-provider-parity/provider_parity_closure_decision.json",
+        "epic_id": "HDE-EPIC032",
+        "record_type": "epic032_pr04_ops_evidence",
+        "schema_version": "1.0",
+        "notes": "EPIC032 PR-04 OPS-01 provider parity closure decision bound as OPS evidence only (non-claiming)",
+    },
+]
+
 A7_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
         "artifact_key": "a7.success_encoding_invariance",
@@ -868,6 +889,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *EPIC032_PR01_PRIMARY_ARTIFACTS,
             *EPIC032_PR02_PRIMARY_ARTIFACTS,
             *EPIC032_PR03_PRIMARY_ARTIFACTS,
+            *EPIC032_PR04_PRIMARY_ARTIFACTS,
             *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,
