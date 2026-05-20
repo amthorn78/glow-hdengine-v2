@@ -16,7 +16,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from engine.db.adapter import DBAccess, Statement
-from engine.db.errors import PrimaryUnavailable
+from engine.db.errors import AdapterError, PrimaryUnavailable
 from engine.db.providers.bridge_provider import BridgeProvider
 from engine.runtime.determinism_env import ensure_determinism_env
 
@@ -285,31 +285,43 @@ def _provider_parity_payload(db: DBAccess) -> dict[str, Any]:
 
 
 def _nondev_total_failure_payload() -> dict[str, Any]:
-    with _patched_env({"APP_ENV": "prod", "DB_ALLOW_BRIDGE_IN_PROD": "0"}):
-        try:
-            DBAccess.for_current_env(
-                snapshot_path=None,
-                psycopg_factory=lambda _dsn: HarnessProvider("psycopg"),
-                bridge_factory=lambda _url: HarnessProvider("bridge"),
-            )
-        except PrimaryUnavailable as exc:
-            err = {"class": exc.__class__.__name__, "code": exc.code}
-        except Exception as exc:  # pragma: no cover
-            err = {"class": exc.__class__.__name__, "code": "unexpected"}
-        else:  # pragma: no cover
-            err = {"class": "None", "code": "unexpected_success"}
+    with tempfile.TemporaryDirectory() as tmpdir:
+        snapshot_path = Path(tmpdir) / "nondev.adapter_selection.snapshot.json"
+        with _patched_env({"APP_ENV": "stage"}):
+            try:
+                DBAccess.for_current_env(
+                    snapshot_path=str(snapshot_path),
+                    psycopg_factory=lambda _dsn: HarnessProvider("psycopg"),
+                    bridge_factory=lambda _url: HarnessProvider("bridge"),
+                )
+            except AdapterError as exc:
+                err = {"class": exc.__class__.__name__, "code": exc.code}
+                if err["class"] != "BridgeUnavailable" or err["code"] != "missing_bridge_url":
+                    raise SystemExit(f"NONDEV_TYPED_ERROR_UNEXPECTED:{err['class']}:{err['code']}")
+            else:
+                raise SystemExit("NONDEV_TYPED_ERROR_UNEXPECTED:unexpected_success")
+
+            if not snapshot_path.exists():
+                raise SystemExit("NONDEV_SELECTION_SNAPSHOT_MISSING")
+            attempts = json.loads(snapshot_path.read_text(encoding="utf-8")).get("attempts", [])
+
+    expected_attempts = [
+        {"provider": "psycopg", "status": "skip", "reason": "missing_database_url"},
+        {"provider": "bridge", "status": "skip", "reason": "missing_bridge_url"},
+    ]
+    if attempts != expected_attempts:
+        raise SystemExit(f"NONDEV_SELECTION_ORDER_UNEXPECTED:{attempts}")
 
     return {
         "schema": "v1",
         "captured_at_utc": PRODUCED_AT_UTC,
-        "environment": "prod",
-        "production_like_aliases": ["prod", "production", "live"],
-        "selection_order": ["DATABASE_URL", "DB_BRIDGE_URL"],
-        "bridge_guard": {"db_allow_bridge_in_prod": False, "bridge_allowed": False},
+        "environment": "stage",
+        "selection_attempts": attempts,
+        "selection_order": [attempt["provider"] for attempt in attempts],
         "total_failure": {"ok": False, "typed_error": err},
         "public_failure_posture": {"numeric_free": True, "secret_free": True, "raw_stack_trace": False},
         "probe_posture": {"no_proactive_probes": True, "adapter_path_only": True},
-        "secret_posture": "presence_only"
+        "secret_posture": "presence_only",
     }
 
 def generate(*, check: bool = False) -> None:

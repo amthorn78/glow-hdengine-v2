@@ -1,5 +1,5 @@
 path: artifacts/narratives/router/parity_abba.log
 size_bytes: 27411
 sha256: 283578d9ed224d8d8ed8cfb13bf8980e7427c6f975bad5caa70d36277410807b
-mtime_utc: 2026-05-19T17:00:53Z
-produced_at_utc: 2026-05-19T17:03:37Z
+mtime_utc: 2026-05-20T00:30:46Z
+produced_at_utc: 2026-05-20T00:32:05Z
