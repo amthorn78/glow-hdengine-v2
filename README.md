@@ -1,4 +1,4 @@
-# Glow HD Engine — HDE-EPIC031 final repo-docs sweep
+# Glow HD Engine — HDE-EPIC032 final repo-docs sweep
 
 The Glow HD Engine is a deterministic Human Design engine and CLI that emits governed, canonically serialized bytes. PF-Canon remains authoritative (titles only: PF05 — CLI/API/Vendor Ref, PF12 — Schemas & Artifacts, PF14 — Mechanics Guide, PF19 — QA Guide, PF20 — Phased Epics).
 
@@ -22,6 +22,14 @@ The Glow HD Engine is a deterministic Human Design engine and CLI that emits gov
   - PR-02 evidence lives under `audit/qa/hde-epic031/pr-02/` and records bounded vendor labels, keys-only redaction proof, redaction scan output, vendor sample logs, and vendor rails scope; vendor-specific evidence is intentionally not stored in the shared DB-bridge `artifacts/logs/` or `artifacts/ops/` paths.
   - PR-03 evidence lives under `audit/qa/hde-epic031/pr-03/` and records the evidence-family map, SAFE rails evidence coherence, and evidence refresh log while keeping Human Evidence Index (`docs/evidence/INDEX.json`) and Machine Mirror (`artifacts/evidence_index.jsonl`) coherent.
   - Scope boundaries remain explicit: no public route/flag/payload-field change, no live vendor execution, no HDAPI v2 runtime conformance, no open-rails v2 smoke runbook, no close-pack output, no new token-matrix rows, and no PF-Canon edit.
+
+- What HDE-EPIC032 adds for Fermentation Pass 3:
+  - HDE-EPIC032 documents completed Fermentation Pass 3 repo evidence for narrative router parity/indexing, narrative registry diff/identity/indexing, DB bridge/provider parity posture, non-dev typed DB failure posture, and OPS-01 provider parity closure evidence without changing the public Reader contract.
+  - Narrative router evidence is keys-only and governed under `audit/gates/narratives/keys_10x4.table.json`, `artifacts/narratives/router/parity_abba.log`, and `artifacts/narratives/router/cli_http_parity.log` (indexed via `docs/evidence/INDEX.json` and `artifacts/evidence_index.jsonl`).
+  - Narrative registry evidence is governed by `tools/evidence/generate_narrative_registry_diff.py` with outputs at `audit/gates/narratives/registry.diff.json` and `audit/gates/narratives/pack_identity.txt`, plus Doc-Delta evidence at `audit/docdeltas/hde-epic032_doc_deltas.md`.
+  - DB parity/fallback posture evidence includes `tools/evidence/generate_db_bridge_parity.py`, provider parity proof `artifacts/db_bridge/provider_parity.proof.json`, non-dev typed failure artifact `artifacts/runtime/env_connectivity.nondev_failure.json`, and OPS-01 closure decision evidence at `audit/ops/hde-epic032/db-provider-parity/provider_parity_closure_decision.json`.
+  - Proof labels `DB_PROVIDER_PARITY_OK`, `DB_BRIDGE_CAPS_OK`, and `DB_BRIDGE_FALLBACK_OK` are documented as evidence proof labels (non-acceptance-token labels in current repo posture), while `DEV_DB_BRIDGE_FALLBACK_OK` remains the acceptance token for dev bridge fallback scope.
+  - Scope boundaries remain explicit: no public Reader route/flag/payload-field change, no narrative prose-generation contract, and no HDAPI v2 conformance claim introduced by EPIC032 docs.
 
 - Current non-public compat/admin and dev transport posture (unchanged by EPIC030 docs sweep):
   - `/api/compat/v1` contract (no `/compatibility` suffix): GET is probe-only (rejects request bodies) and returns `{ok:true,schema:"v1"}`; POST is the compat computation surface with request-shape rules (reject mixed id+payload patterns) and strict id validation against `UID_RE` (invalid IDs return an `invalid_json` error envelope with a 400 status). In prod, `APP_ENV=prod` returns 404 with `ERR_NOT_FOUND` (implementation in `engine/http/compat_handler.py`; id regex in `engine/compat/ordering.py`). Endpoint catalog entry is POST-only, `internal_admin`, `a7_eligible: false`, and `env_gate` is non-empty (`docs/ENDPOINTS_CATALOG.json` + `.sha256`).
