@@ -1,5 +1,15 @@
 # CHANGELOG
 
+Unreleased — HDE-EPIC032: final repo docs sweep (README/CHANGELOG/AGENTS/docs/)
+
+### Added
+- Documented HDE-EPIC032 Fermentation Pass 3 outcomes in repo docs with verified evidence homes for narrative router parity/indexing, narrative registry diff/pack identity/indexing, DB bridge/provider parity posture, non-dev typed DB failure posture, and OPS-01 provider parity closure evidence.
+- Added repo-verified EPIC032 evidence references: `audit/gates/narratives/keys_10x4.table.json`, `artifacts/narratives/router/parity_abba.log`, `artifacts/narratives/router/cli_http_parity.log`, `audit/gates/narratives/registry.diff.json`, `audit/gates/narratives/pack_identity.txt`, and `audit/docdeltas/hde-epic032_doc_deltas.md`.
+
+### Changed / Fixed
+- Clarified EPIC032 DB evidence references and proof-label posture: `tools/evidence/generate_db_bridge_parity.py`, `artifacts/db_bridge/provider_parity.proof.json`, `artifacts/runtime/env_connectivity.nondev_failure.json`, `audit/ops/hde-epic032/db-provider-parity/provider_parity_closure_decision.json`; `DB_PROVIDER_PARITY_OK` / `DB_BRIDGE_CAPS_OK` / `DB_BRIDGE_FALLBACK_OK` are documented as proof labels while `DEV_DB_BRIDGE_FALLBACK_OK` remains the acceptance token for dev bridge fallback scope.
+- Clarified OPS-01 provider parity closure evidence as OPS evidence only (not QA PASS, not PF09 status move, not epic closure claim) and preserved the unchanged public Reader contract posture.
+
 Unreleased — HDE-EPIC031: final repo docs sweep (README/CHANGELOG/AGENTS/docs/)
 
 ### Added
