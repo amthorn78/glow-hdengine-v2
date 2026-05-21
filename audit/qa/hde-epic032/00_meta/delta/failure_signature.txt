@@ -1,0 +1,3 @@
+SyntaxError: invalid syntax
+File "/workspaces/glow-hdengine-v2/audit/qa/hde-epic032/00_meta/live_qa_harness.py", line 1
+[PASTE EXACT HARNESS CONTENT FROM USER PROMPT]

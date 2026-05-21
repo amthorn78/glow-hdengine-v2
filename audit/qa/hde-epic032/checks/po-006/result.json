@@ -1,0 +1,17 @@
+{
+  "behavior_failures": [],
+  "check_id": "po-006",
+  "checked_at_utc": "2026-05-21T15:56:44Z",
+  "rails": {
+    "ALLOW_NETWORK": "0",
+    "APP_ENV": "dev",
+    "LANG": "C",
+    "LC_ALL": "C",
+    "SAFE_MODE": "1",
+    "TZ": "UTC"
+  },
+  "required_missing": [],
+  "schema": "hde_epic032.po_006.v1",
+  "status": "PASS",
+  "unsupported_registry_token_claim_seen": false
+}

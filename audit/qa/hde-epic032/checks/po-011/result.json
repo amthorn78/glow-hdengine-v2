@@ -1,0 +1,41 @@
+{
+  "behavior_failures": [],
+  "check_id": "po-011",
+  "checked_at_utc": "2026-05-21T19:45:34Z",
+  "missing_bridge_url_seen": true,
+  "numeric_free_seen": true,
+  "pytest": {
+    "cmd": [
+      "/usr/local/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "tests/db/test_adapter_selection.py",
+      "tests/evidence/test_generate_db_bridge_parity_nondev.py"
+    ],
+    "returncode": 0,
+    "stderr": "",
+    "stdout": "..........                                                               [100%]\n10 passed in 0.13s\n"
+  },
+  "pytest_preflight": {
+    "cmd": [
+      "/usr/local/bin/python",
+      "-c",
+      "import pytest; print('pytest import PASS')"
+    ],
+    "returncode": 0,
+    "stderr": "",
+    "stdout": "pytest import PASS\n"
+  },
+  "rails": {
+    "ALLOW_NETWORK": "0",
+    "APP_ENV": "dev",
+    "LANG": "C",
+    "LC_ALL": "C",
+    "SAFE_MODE": "1",
+    "TZ": "UTC"
+  },
+  "required_missing": [],
+  "schema": "hde_epic032.po_011.v1",
+  "status": "PASS"
+}

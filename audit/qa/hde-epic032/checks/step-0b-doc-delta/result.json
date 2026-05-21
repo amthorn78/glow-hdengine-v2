@@ -1,0 +1,20 @@
+{
+  "blockers_heading_present": true,
+  "capture_exists": true,
+  "capture_path": "audit/qa/hde-epic032/00_meta/doc_deltas.md",
+  "caveats_heading_present": true,
+  "check_id": "step-0b-doc-delta",
+  "checked_at_utc": "2026-05-21T13:28:49Z",
+  "draft_exists": true,
+  "draft_path": "audit/docdeltas/hde-epic032_doc_deltas.md",
+  "rails": {
+    "ALLOW_NETWORK": "0",
+    "APP_ENV": "dev",
+    "LANG": "C",
+    "LC_ALL": "C",
+    "SAFE_MODE": "1",
+    "TZ": "UTC"
+  },
+  "schema": "hde_epic032.step_0b_doc_delta.v1",
+  "status": "PASS"
+}

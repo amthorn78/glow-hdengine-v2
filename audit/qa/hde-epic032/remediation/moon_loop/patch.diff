@@ -1,0 +1,31 @@
+diff --git a/tools/evidence/generate_db_bridge_parity.py b/tools/evidence/generate_db_bridge_parity.py
+index a10cd0fc..3c2c34c8 100755
+--- a/tools/evidence/generate_db_bridge_parity.py
++++ b/tools/evidence/generate_db_bridge_parity.py
+@@ -151,7 +151,12 @@ def _run_dev_fallback_adapter(*, snapshot_path: Path = ADAPTER_SELECTION_PATH) -
+ 
+ 
+ def _selection_payload(db: DBAccess) -> dict[str, Any]:
+-    return {"attempts": list(db.attempts), "provider": db.provider_name}
++    attempts = list(db.attempts)
++    return {
++        "attempts": attempts,
++        "provider": db.provider_name,
++        "selection_order": [attempt["provider"] for attempt in attempts if isinstance(attempt, dict) and "provider" in attempt],
++    }
+ 
+ 
+ def _bridge_capability_payload() -> dict[str, Any]:
+@@ -334,6 +339,13 @@ def generate(*, check: bool = False) -> None:
+     else:
+         db = _run_dev_fallback_adapter(snapshot_path=ADAPTER_SELECTION_PATH)
+         adapter_payload = json.loads(ADAPTER_SELECTION_PATH.read_text(encoding="utf-8"))
++    # Keep adapter evidence aligned with QA harness checks by recording observed selection order.
++    if "selection_order" not in adapter_payload:
++        adapter_payload["selection_order"] = [
++            attempt["provider"]
++            for attempt in adapter_payload.get("attempts", [])
++            if isinstance(attempt, dict) and "provider" in attempt
++        ]
+     env_payload = _env_connectivity_payload(db)
+     parity_payload = _provider_parity_payload(db)

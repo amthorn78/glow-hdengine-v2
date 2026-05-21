@@ -1,0 +1,164 @@
+{
+  "check_id": "step-0a-discovery",
+  "checked_at_utc": "2026-05-21T13:28:49Z",
+  "checks_root": "audit/qa/hde-epic032/checks",
+  "epic_qa_root": "audit/qa/hde-epic032",
+  "meta_root": "audit/qa/hde-epic032/00_meta",
+  "qa_root_created": true,
+  "rails": {
+    "ALLOW_NETWORK": "0",
+    "APP_ENV": "dev",
+    "LANG": "C",
+    "LC_ALL": "C",
+    "SAFE_MODE": "1",
+    "TZ": "UTC"
+  },
+  "repo_locus_discovery": {
+    "agents": {
+      "exists": true,
+      "path": "AGENTS.md"
+    },
+    "changelog": {
+      "exists": true,
+      "path": "CHANGELOG.md"
+    },
+    "cli_main": {
+      "exists": true,
+      "path": "engine/cli/main.py"
+    },
+    "db_adapter_selection": {
+      "exists": true,
+      "path": "artifacts/db_bridge/adapter_selection.snapshot.json"
+    },
+    "db_generator": {
+      "exists": true,
+      "path": "tools/evidence/generate_db_bridge_parity.py"
+    },
+    "db_provider_parity": {
+      "exists": true,
+      "path": "artifacts/db_bridge/provider_parity.proof.json"
+    },
+    "docs_index": {
+      "exists": true,
+      "path": "docs/INDEX.md"
+    },
+    "endpoint_catalog": {
+      "exists": true,
+      "path": "docs/ENDPOINTS_CATALOG.json"
+    },
+    "env_connectivity": {
+      "exists": true,
+      "path": "artifacts/runtime/env_connectivity.snapshot.json"
+    },
+    "env_nondev_failure": {
+      "exists": true,
+      "path": "artifacts/runtime/env_connectivity.nondev_failure.json"
+    },
+    "http_reader": {
+      "exists": true,
+      "path": "adapter/http_reader.py"
+    },
+    "human_index": {
+      "exists": true,
+      "path": "docs/evidence/INDEX.json"
+    },
+    "human_index_hash": {
+      "exists": true,
+      "path": "docs/evidence/INDEX.sha256"
+    },
+    "index_hash": {
+      "exists": true,
+      "path": "ci/checks/check_evidence_index_hash.sh"
+    },
+    "index_updater": {
+      "exists": true,
+      "path": "tools/evidence/update_evidence_index.py"
+    },
+    "lf_checker": {
+      "exists": true,
+      "path": "tools/evidence/check_lf_endings.py"
+    },
+    "machine_mirror": {
+      "exists": true,
+      "path": "artifacts/evidence_index.jsonl"
+    },
+    "machine_mirror_hash": {
+      "exists": true,
+      "path": "artifacts/evidence_index.jsonl.sha256"
+    },
+    "mirror_schema": {
+      "exists": true,
+      "path": "ci/checks/check_mirror_schema.sh"
+    },
+    "narrative_manifest": {
+      "exists": true,
+      "path": "catalog/narratives/manifest.json"
+    },
+    "ops_provider_closure": {
+      "exists": true,
+      "path": "audit/ops/hde-epic032/db-provider-parity/provider_parity_closure_decision.json"
+    },
+    "ops_provider_closure_proof": {
+      "exists": true,
+      "path": "audit/ops/hde-epic032/db-provider-parity/provider_parity_closure_decision.json.path_proof.txt"
+    },
+    "pack_identity": {
+      "exists": true,
+      "path": "audit/gates/narratives/pack_identity.txt"
+    },
+    "path_validator": {
+      "exists": true,
+      "path": "tools/evidence/validate_evidence_paths.py"
+    },
+    "pyproject": {
+      "exists": true,
+      "path": "pyproject.toml"
+    },
+    "readme": {
+      "exists": true,
+      "path": "README.md"
+    },
+    "registry_diff": {
+      "exists": true,
+      "path": "audit/gates/narratives/registry.diff.json"
+    },
+    "registry_generator": {
+      "exists": true,
+      "path": "tools/evidence/generate_narrative_registry_diff.py"
+    },
+    "router_cli_http_parity": {
+      "exists": true,
+      "path": "artifacts/narratives/router/cli_http_parity.log"
+    },
+    "router_key_table": {
+      "exists": true,
+      "path": "audit/gates/narratives/keys_10x4.table.json"
+    },
+    "router_parity_abba": {
+      "exists": true,
+      "path": "artifacts/narratives/router/parity_abba.log"
+    },
+    "test_cli_aux": {
+      "exists": true,
+      "path": "tests/cli/test_aux_preview.py"
+    },
+    "test_db_adapter": {
+      "exists": true,
+      "path": "tests/db/test_adapter_selection.py"
+    },
+    "test_db_nondev": {
+      "exists": true,
+      "path": "tests/evidence/test_generate_db_bridge_parity_nondev.py"
+    },
+    "test_router": {
+      "exists": true,
+      "path": "tests/unit/test_narratives_router.py"
+    },
+    "test_transport_aux": {
+      "exists": true,
+      "path": "tests/transport/test_aux_narrative.py"
+    }
+  },
+  "schema": "hde_epic032.step_0a_discovery.v1",
+  "status": "PASS"
+}

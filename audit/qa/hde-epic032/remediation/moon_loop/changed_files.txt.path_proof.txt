@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic032/remediation/moon_loop/changed_files.txt
+sha256: 5d8a9e6835f045a367cbe6cfc5ddd61b0e0981af2add35197a715480d77c8df8
+size_bytes: 656
+mtime_utc: 2026-05-21T20:22:41Z
+produced_at_utc: 2026-05-21T20:22:59Z

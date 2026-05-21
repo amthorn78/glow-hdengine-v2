@@ -1,0 +1,28 @@
+{
+  "behavior_failures": [],
+  "check_id": "po-008",
+  "checked_at_utc": "2026-05-21T18:21:26Z",
+  "generator_check": {
+    "cmd": [
+      "/usr/bin/python3",
+      "tools/evidence/generate_db_bridge_parity.py",
+      "--check"
+    ],
+    "returncode": 0,
+    "stderr": "",
+    "stdout": ""
+  },
+  "ops_closure_status_visible": true,
+  "provider_parity_label_visible": true,
+  "rails": {
+    "ALLOW_NETWORK": "0",
+    "APP_ENV": "dev",
+    "LANG": "C",
+    "LC_ALL": "C",
+    "SAFE_MODE": "1",
+    "TZ": "UTC"
+  },
+  "required_missing": [],
+  "schema": "hde_epic032.po_008.v1",
+  "status": "PASS"
+}

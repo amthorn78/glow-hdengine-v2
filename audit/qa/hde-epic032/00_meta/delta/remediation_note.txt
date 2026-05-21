@@ -1,0 +1,1 @@
+Remediation: corrected live_qa_harness.py placeholder body to restore bounded Moon Loop contingency Step-0A execution path.

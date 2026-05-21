@@ -1,0 +1,11 @@
+# HDE-EPIC032 Moon Loop changed files
+# Format: <path>|<size_bytes>|<sha256>
+# Captured at 2026-05-21 UTC
+
+tools/evidence/generate_db_bridge_parity.py|14560|7e0e97f5e62763035b7f1c010bb352a9e2535afc94bb0df8f041932df92f94c6
+artifacts/db_bridge/adapter_selection.snapshot.json|284|7b2dbb9e8b477b40cb5ad4de0a19d2c04e6590f6946fe250ee4796699e6717ed
+artifacts/runtime/env_connectivity.snapshot.json|1191|5f5fc10c2335ed3497bbd658ad32b49932c8ab9ce49a0d2d87e3f075a9a16a45
+
+# Trust-boundary note
+# The Moon Loop touched an evidence generator outside audit/qa/hde-epic032/.
+# Per Live QA Plan stop condition, affected-check trust classification is REMEDIATION NEEDED.

@@ -1,0 +1,19 @@
+{
+  "behavior_failures": [],
+  "check_id": "po-001",
+  "checked_at_utc": "2026-05-21T14:53:52Z",
+  "db_proof_labels_checked": true,
+  "dev_reader_surface_seen": true,
+  "rails": {
+    "ALLOW_NETWORK": "0",
+    "APP_ENV": "dev",
+    "LANG": "C",
+    "LC_ALL": "C",
+    "SAFE_MODE": "1",
+    "TZ": "UTC"
+  },
+  "reader_surface_seen": true,
+  "required_missing": [],
+  "schema": "hde_epic032.po_001.v1",
+  "status": "PASS"
+}
