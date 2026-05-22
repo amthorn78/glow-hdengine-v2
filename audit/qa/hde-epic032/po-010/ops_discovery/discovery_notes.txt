@@ -1,0 +1,4 @@
+PO-010 initial failure artifact present: UNKNOWN unless copied result/log excerpts show initial FAIL_BEHAVIOR.
+PO-010 final artifact state: see copied result/log excerpts.
+No QA rerun was performed by this discovery procedure.
+No file edits were performed by this discovery procedure.

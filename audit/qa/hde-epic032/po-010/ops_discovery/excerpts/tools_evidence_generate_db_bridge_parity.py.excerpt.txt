@@ -1,0 +1,12 @@
+### tools/evidence/generate_db_bridge_parity.py
+153:def _selection_payload(db: DBAccess) -> dict[str, Any]:
+158:        "selection_order": [attempt["provider"] for attempt in attempts if isinstance(attempt, dict) and "provider" in attempt],
+239:    selection = _selection_payload(db)
+264:        "selection_order": ["DATABASE_URL", "DB_BRIDGE_URL"],
+283:            {"name": "DB_PROVIDER_PARITY_OK", "status": "not_claimed", "type": "non_token"},
+325:        "selection_order": [attempt["provider"] for attempt in attempts],
+332:def generate(*, check: bool = False) -> None:
+343:    if "selection_order" not in adapter_payload:
+344:        adapter_payload["selection_order"] = [
+362:    parser.add_argument("--check", action="store_true", help="fail if generated evidence bytes differ")
+364:    generate(check=args.check)

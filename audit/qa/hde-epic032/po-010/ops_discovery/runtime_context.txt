@@ -1,0 +1,7 @@
+pwd=/workspaces/glow-hdengine-v2
+SAFE_MODE=1
+ALLOW_NETWORK=0
+APP_ENV=dev
+LC_ALL=C
+LANG=en_US.UTF-8
+TZ=UTC

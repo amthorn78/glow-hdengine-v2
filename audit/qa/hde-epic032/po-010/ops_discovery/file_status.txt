@@ -1,0 +1,10 @@
+FOUND audit/qa/hde-epic032/checks/po-010/primary.log
+FOUND audit/qa/hde-epic032/checks/po-010/primary.log.path_proof.txt
+FOUND audit/qa/hde-epic032/checks/po-010/result.json
+FOUND artifacts/db_bridge/provider_parity.proof.json
+FOUND artifacts/db_bridge/provider_parity.proof.json.path_proof.txt
+FOUND artifacts/db_bridge/adapter_selection.snapshot.json
+FOUND artifacts/db_bridge/adapter_selection.snapshot.json.path_proof.txt
+FOUND audit/ops/hde-epic032/db-provider-parity/provider_parity_closure_decision.json
+FOUND audit/ops/hde-epic032/db-provider-parity/provider_parity_closure_decision.json.path_proof.txt
+FOUND tools/evidence/generate_db_bridge_parity.py
