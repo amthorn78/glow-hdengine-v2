@@ -220,10 +220,17 @@ class DBAccess:
                 attempts.append(_canonical_attempt("bridge", "ok"))
                 break
 
+        selection_order = [
+            attempt["provider"]
+            for attempt in attempts
+            if isinstance(attempt, Mapping) and "provider" in attempt
+        ]
+
         snapshot_payload: Dict[str, Any] = {
             "schema": "v1",
             "selected": getattr(selected_provider, "name", "none"),
             "attempts": attempts,
+            "selection_order": selection_order,
             "flags": {
                 "env": tag or "unset",
                 "force_pg": force_pg,

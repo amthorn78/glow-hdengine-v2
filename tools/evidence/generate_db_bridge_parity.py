@@ -159,6 +159,30 @@ def _selection_payload(db: DBAccess) -> dict[str, Any]:
     }
 
 
+
+
+def _selection_order_from_attempts(attempts: Any) -> list[str]:
+    if not isinstance(attempts, list):
+        return []
+    return [
+        attempt["provider"]
+        for attempt in attempts
+        if isinstance(attempt, dict) and "provider" in attempt
+    ]
+
+
+def _ensure_structural_selection_order(payload: dict[str, Any]) -> dict[str, Any]:
+    derived = _selection_order_from_attempts(payload.get("attempts"))
+    observed = payload.get("selection_order")
+    if observed is None:
+        payload["selection_order"] = derived
+        return payload
+    if not isinstance(observed, list):
+        raise SystemExit("SELECTION_ORDER_NOT_ARRAY")
+    if observed != derived:
+        raise SystemExit(f"SELECTION_ORDER_MISMATCH:{observed!r}:{derived!r}")
+    return payload
+
 def _bridge_capability_payload() -> dict[str, Any]:
     required_methods = ["health", "query", "exec", "tx", "introspect"]
     provider = BridgeProvider(REDACTED_BRIDGE, request=lambda *_args: None)  # type: ignore[arg-type]
@@ -339,13 +363,7 @@ def generate(*, check: bool = False) -> None:
     else:
         db = _run_dev_fallback_adapter(snapshot_path=ADAPTER_SELECTION_PATH)
         adapter_payload = json.loads(ADAPTER_SELECTION_PATH.read_text(encoding="utf-8"))
-    # Keep adapter evidence aligned with QA harness checks by recording observed selection order.
-    if "selection_order" not in adapter_payload:
-        adapter_payload["selection_order"] = [
-            attempt["provider"]
-            for attempt in adapter_payload.get("attempts", [])
-            if isinstance(attempt, dict) and "provider" in attempt
-        ]
+    adapter_payload = _ensure_structural_selection_order(adapter_payload)
     env_payload = _env_connectivity_payload(db)
     parity_payload = _provider_parity_payload(db)
 

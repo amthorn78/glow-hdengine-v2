@@ -51,6 +51,13 @@ def _read_snapshot() -> dict[str, object]:
     return json.loads(SNAPSHOT_PATH.read_text(encoding="utf-8"))
 
 
+def _assert_selection_order_matches_attempts(snapshot: dict[str, object]) -> None:
+    attempts = snapshot["attempts"]
+    assert isinstance(attempts, list)
+    expected = [attempt["provider"] for attempt in attempts]
+    assert snapshot["selection_order"] == expected
+
+
 def test_primary_success_selects_psycopg(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("DATABASE_URL", "postgresql://primary")
     monkeypatch.delenv("DB_BRIDGE_URL", raising=False)
@@ -68,6 +75,7 @@ def test_primary_success_selects_psycopg(monkeypatch: pytest.MonkeyPatch) -> Non
     assert snapshot["attempts"] == [
         {"provider": "psycopg", "status": "ok"},
     ]
+    _assert_selection_order_matches_attempts(snapshot)
 
 
 def test_bridge_fallback_when_primary_unavailable(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -89,6 +97,7 @@ def test_bridge_fallback_when_primary_unavailable(monkeypatch: pytest.MonkeyPatc
         {"provider": "psycopg", "status": "error", "reason": "primary_connect_failed"},
         {"provider": "bridge", "status": "ok"},
     ]
+    _assert_selection_order_matches_attempts(snapshot)
 
 
 def test_force_bridge_flag(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -150,6 +159,7 @@ def test_prod_guard_can_be_overridden(monkeypatch: pytest.MonkeyPatch) -> None:
         {"provider": "psycopg", "status": "error", "reason": "primary_connect_failed"},
         {"provider": "bridge", "status": "ok"},
     ]
+    _assert_selection_order_matches_attempts(snapshot)
 
 
 def test_stage_allows_bridge_when_primary_unavailable(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -171,6 +181,7 @@ def test_stage_allows_bridge_when_primary_unavailable(monkeypatch: pytest.Monkey
         {"provider": "psycopg", "status": "error", "reason": "primary_connect_failed"},
         {"provider": "bridge", "status": "ok"},
     ]
+    _assert_selection_order_matches_attempts(snapshot)
 
 
 def test_live_env_uses_prod_bridge_guard(monkeypatch: pytest.MonkeyPatch) -> None:
