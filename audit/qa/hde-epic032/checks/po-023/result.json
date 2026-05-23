@@ -1,0 +1,18 @@
+{
+  "behavior_failures": [],
+  "check_id": "po-023",
+  "checked_at_utc": "2026-05-23T16:29:41Z",
+  "invented_reader_proof_route_absent": true,
+  "rails": {
+    "ALLOW_NETWORK": "0",
+    "APP_ENV": "dev",
+    "LANG": "C",
+    "LC_ALL": "C",
+    "SAFE_MODE": "1",
+    "TZ": "UTC"
+  },
+  "reader_route_visible": true,
+  "required_missing": [],
+  "schema": "hde_epic032.po_023.v1",
+  "status": "PASS"
+}

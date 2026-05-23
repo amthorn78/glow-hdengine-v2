@@ -1,0 +1,18 @@
+{
+  "check_id": "po-024",
+  "checked_at_utc": "2026-05-23T16:29:54Z",
+  "live_qa_planning_or_execution_performed_closeout_action": false,
+  "live_qa_planning_or_execution_performed_implementation": false,
+  "live_qa_planning_or_execution_performed_pf_edit": false,
+  "live_qa_role": "prove_current_results_only",
+  "rails": {
+    "ALLOW_NETWORK": "0",
+    "APP_ENV": "dev",
+    "LANG": "C",
+    "LC_ALL": "C",
+    "SAFE_MODE": "1",
+    "TZ": "UTC"
+  },
+  "schema": "hde_epic032.po_024.v1",
+  "status": "PASS"
+}

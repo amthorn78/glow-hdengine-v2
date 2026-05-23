@@ -1,0 +1,17 @@
+{
+  "behavior_failures": [],
+  "check_id": "po-019",
+  "checked_at_utc": "2026-05-23T14:08:26Z",
+  "rails": {
+    "ALLOW_NETWORK": "0",
+    "APP_ENV": "dev",
+    "LANG": "C",
+    "LC_ALL": "C",
+    "SAFE_MODE": "1",
+    "TZ": "UTC"
+  },
+  "required_missing": [],
+  "reused_foundation_checked_from_repo_docs": true,
+  "schema": "hde_epic032.po_019.v1",
+  "status": "PASS"
+}

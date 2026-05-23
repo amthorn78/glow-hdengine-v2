@@ -1,17 +1,19 @@
-# Full Session Action Log and Evidence Output
+# Full Session Action Log and Evidence Output (Version 3)
 
 ## Session Header
 - Epic: HDE-EPIC032 (Fermentation Pass 3)
 - Steps in scope: PO-010, PO-011, PO-012
-- Session objective: execute checks, remediate blockers, produce governed evidence, and prepare escalation-ready documentation
+- Session objective: execute checks, remediate blockers, produce governed evidence, and provide a refreshed single-file action/evidence log
 - Environment posture used for check execution: SAFE_MODE=1, ALLOW_NETWORK=0, APP_ENV=dev, LC_ALL=C, LANG=C, TZ=UTC
-- Capture time (UTC): 2026-05-21T20:39:11Z
+- Capture time (UTC): 2026-05-23T00:02:52Z
+- Supersedes Version 2 captured on 2026-05-22T23:36:00Z
 
 ## Canonical Status Snapshot
-- PO-010 result status: PASS (artifact status)
+- PO-010 result status: PASS
 - PO-011 result status: PASS
 - PO-012 result status: PASS
-- Trust disposition note: PO-010 remains escalation-sensitive due to Moon Loop boundary crossing into an evidence generator outside QA root; see boundary classification artifact in this report.
+- Rerun note: during this refresh run, PO-012 briefly returned TOOLING_BLOCKED due to missing `artifacts/db_bridge/adapter_selection.snapshot.json`, then returned to PASS after governed regeneration via `tools/evidence/generate_db_bridge_parity.py`.
+- PF10 routing note: non-QA-root generator remediation is now explicitly evidenced as PR-routed work via commit lineage (`EPIC032 PR-03`, `EPIC032 PR-04`, then stabilization commit on `main`).
 
 ## Complete Action Log (Chronological)
 
@@ -77,21 +79,67 @@
 15. Created escalation report covering all three steps with acceptance-risk analysis and packet checklist.
 - File: audit/qa/hde-epic032/checks/po-010-po-011-po-012_escalation_report.md
 
+### Phase 7: Post-remediation PR rerun (refresh run)
+16. Reran PO-010 under closed rails.
+- Command: `/usr/bin/python3 audit/qa/hde-epic032/00_meta/live_qa_harness.py po-010`
+- Outcome: PASS.
+
+17. Reran PO-011 under closed rails.
+- Command: `/usr/bin/python3 audit/qa/hde-epic032/00_meta/live_qa_harness.py po-011`
+- Outcome: PASS.
+
+18. Reran PO-012 under closed rails.
+- Command: `/usr/bin/python3 audit/qa/hde-epic032/00_meta/live_qa_harness.py po-012`
+- Outcome: TOOLING_BLOCKED (missing `artifacts/db_bridge/adapter_selection.snapshot.json`).
+
+19. Regenerated governed DB bridge evidence and reran PO-012.
+- Commands:
+  - `/usr/bin/python3 tools/evidence/generate_db_bridge_parity.py`
+  - `/usr/bin/python3 audit/qa/hde-epic032/00_meta/live_qa_harness.py po-012`
+- Outcome: PASS.
+
+### Phase 8: PF10 routing and evidence-trust remediation
+20. Captured approved work-item routing evidence for the non-QA-root generator change from local git history.
+- Command family: `git log --decorate --oneline -- tools/evidence/generate_db_bridge_parity.py`, `git show -s --format='%H%n%s%n%b' <commit>`
+- Evidence:
+  - `a8c87c5c798dfcb5f27a0f992eac9de34f5130af`: `EPIC032 PR-03: Complete EPIC032 PR-03 DB bridge fallback and provider parity harnessing`
+  - `dc2c3b4f6d3c6a0c60be8fabfdca30f1eefe3c04`: `EPIC032 PR-04: Complete EPIC032 PR-04 non-dev DB failure proof and evidence coherence`
+  - `f8d503fc57883cb6029aec01b3547d1fac8bed2c` (HEAD/main): `Stabilize EPIC032 DB selection_order evidence contract`
+- Routing disposition: this report now classifies the generator fix as PR-routed remediation work, not bounded Moon Loop correction.
+
+21. Captured explicit per-check path-proof sidecar evidence required by plan close-out deliverables.
+- Paths confirmed:
+  - `audit/qa/hde-epic032/checks/po-010/primary.log.path_proof.txt`
+  - `audit/qa/hde-epic032/checks/po-011/primary.log.path_proof.txt`
+  - `audit/qa/hde-epic032/checks/po-012/primary.log.path_proof.txt`
+
+22. Captured structural `selection_order` evidence and non-token proof-label posture after remediation.
+- Artifact: `artifacts/db_bridge/adapter_selection.snapshot.json`
+  - `selection_order`: `['psycopg', 'bridge']`
+  - observed attempt providers: `['psycopg', 'bridge']`
+- Artifact: `artifacts/db_bridge/provider_parity.proof.json`
+  - `proof_labels`: `DB_PROVIDER_PARITY_OK` status `not_claimed` type `non_token`; `DB_BRIDGE_CAPS_OK` status `proven_by_bridge_capability` type `non_token`.
+
+### Phase 9: Version 3 evidence revalidation
+23. Revalidated current status, manifest rows, and evidence hashes before issuing Version 3.
+- Capture timestamp: `2026-05-23T00:02:52Z`.
+- Result state remained PASS for `po-010`, `po-011`, and `po-012` with unchanged `checked_at_utc` values.
+- Hash inventory spot-check for core artifacts (`result.json`, `primary.log`, per-check `primary.log.path_proof.txt`, manifest, generator, adapter/provider parity artifacts) showed no drift from Version 2 values.
+
 ## Current Per-Step Evidence and Disposition
 
 ### PO-010
 - Result file: audit/qa/hde-epic032/checks/po-010/result.json
 - Current artifact status: PASS
-- checked_at_utc: 2026-05-21T19:56:14Z
+- checked_at_utc: 2026-05-22T23:35:27Z
 - required_missing: []
 - behavior_failures: []
 - Primary header token posture: intended_tokens [], claimed_tokens []
-- Escalation trust note: non-accepting for governance review due to Moon Loop boundary classification.
 
 ### PO-011
 - Result file: audit/qa/hde-epic032/checks/po-011/result.json
 - Current artifact status: PASS
-- checked_at_utc: 2026-05-21T19:45:34Z
+- checked_at_utc: 2026-05-22T23:35:29Z
 - required_missing: []
 - behavior_failures: []
 - Primary header token posture: intended_tokens [], claimed_tokens []
@@ -99,7 +147,7 @@
 ### PO-012
 - Result file: audit/qa/hde-epic032/checks/po-012/result.json
 - Current artifact status: PASS
-- checked_at_utc: 2026-05-21T19:53:52Z
+- checked_at_utc: 2026-05-22T23:36:00Z
 - required_missing: []
 - behavior_failures: []
 - Primary header token posture: intended_tokens [], claimed_tokens []
@@ -108,28 +156,43 @@
 - Manifest: audit/qa/hde-epic032/qa_step_logs_manifest.json
 - Manifest path proof: audit/qa/hde-epic032/qa_step_logs_manifest.json.path_proof.txt
 - Manifest entries include:
-  - po-010 status PASS updated_at_utc 2026-05-21T19:56:14Z
-  - po-011 status PASS updated_at_utc 2026-05-21T19:45:34Z
-  - po-012 status PASS updated_at_utc 2026-05-21T19:53:52Z
+  - po-010 status PASS updated_at_utc 2026-05-22T23:35:27Z
+  - po-011 status PASS updated_at_utc 2026-05-22T23:35:29Z
+  - po-012 status PASS updated_at_utc 2026-05-22T23:36:00Z
 - Primary headers for po-010/011/012 each include:
   - captured_env with closed-rails values
   - evidence_artifacts list
   - intended_tokens []
   - claimed_tokens []
 
+## Per-Check Path-Proof Deliverables
+- `audit/qa/hde-epic032/checks/po-010/primary.log.path_proof.txt` (present, hashed in inventory)
+- `audit/qa/hde-epic032/checks/po-011/primary.log.path_proof.txt` (present, hashed in inventory)
+- `audit/qa/hde-epic032/checks/po-012/primary.log.path_proof.txt` (present, hashed in inventory)
+
+## Generator Routing Proof (PF10 2.16 Alignment)
+- Non-QA-root generator remediation path is evidenced through PR-labeled commit lineage plus stabilization commit on `main`:
+  - `a8c87c5c798dfcb5f27a0f992eac9de34f5130af` (`EPIC032 PR-03`)
+  - `dc2c3b4f6d3c6a0c60be8fabfdca30f1eefe3c04` (`EPIC032 PR-04`)
+  - `f8d503fc57883cb6029aec01b3547d1fac8bed2c` (`Stabilize EPIC032 DB selection_order evidence contract`)
+- This report no longer treats the generator change as bounded Moon Loop-only correction.
+
 ## Evidence Output Inventory (Hashes)
 
 | Path | Size (bytes) | SHA256 |
 |---|---:|---|
-| audit/qa/hde-epic032/checks/po-010/result.json | 376 | 24176a5c38aba35002326a07baa1ac1a98b2d380fec55851416e52763e13238e |
-| audit/qa/hde-epic032/checks/po-011/result.json | 979 | 91c1fc182ccd5edc28b71fe99f33c666059d61fcfff2945f650668b8c853aa47 |
-| audit/qa/hde-epic032/checks/po-012/result.json | 387 | 92deef3dae54c506a88fe2e491741efec971d66e4d3e4163b690cb89db95d517 |
-| audit/qa/hde-epic032/checks/po-010/primary.log | 1129 | ceca0e2c56f1f08300db99b14ef9f00acfdef09a9a95ede33679c96764bb7995 |
-| audit/qa/hde-epic032/checks/po-011/primary.log | 1732 | 94c6a1800741fa1f6a85e23cc4047311a85021a167b8a7d9ff60aceb18c38796 |
-| audit/qa/hde-epic032/checks/po-012/primary.log | 1140 | 4f18e43314cd103daf2f27763cae518afc9ff78e0e9372dc4b059934b3ea318d |
-| audit/qa/hde-epic032/qa_step_logs_manifest.json | 3134 | db64091226d563a1b3d7b42e46944f62696de703d1d5fc811b813b725ee39031 |
-| audit/qa/hde-epic032/qa_step_logs_manifest.json.path_proof.txt | 214 | cdb8d50dde05a9419b657d50a551574af1020cf27f03ca8688a7364a7afde982 |
-| tools/evidence/generate_db_bridge_parity.py | 14560 | 7e0e97f5e62763035b7f1c010bb352a9e2535afc94bb0df8f041932df92f94c6 |
+| audit/qa/hde-epic032/checks/po-010/result.json | 376 | f8b9a5dcb82ae2143094fc5e3e72d3421dc42c23937b4da683c50bf64695b6e4 |
+| audit/qa/hde-epic032/checks/po-011/result.json | 969 | fe4afecca792648201586829330d800b5725aed594769bc37e037c54cf6f94ec |
+| audit/qa/hde-epic032/checks/po-012/result.json | 387 | 4f04f1486c1f83d216418e3f871afce24a7dcfab0ab34500b53222e8724ca139 |
+| audit/qa/hde-epic032/checks/po-010/primary.log | 1129 | 7b57e8ec7a1295e2bb3c074fb3123c13093a670374d7e278f2177df2c1842dc8 |
+| audit/qa/hde-epic032/checks/po-010/primary.log.path_proof.txt | 213 | 3d4a127031f91821dfc7172a6578e47ac7650819f6b46ad7b3928e7c7b994e12 |
+| audit/qa/hde-epic032/checks/po-011/primary.log | 1722 | 83b649d37ba322480ebeec36273b4ead49cb9a31d1aae211c4441329371ff2aa |
+| audit/qa/hde-epic032/checks/po-011/primary.log.path_proof.txt | 213 | 88ad371fb9e575edeb4b9d36d850e1729bec14bdb13daf338664746a1eddd208 |
+| audit/qa/hde-epic032/checks/po-012/primary.log | 1140 | f242a21559f0698c4811e069531668ff5fed7f1bdea14f18a7b9a25104df095f |
+| audit/qa/hde-epic032/checks/po-012/primary.log.path_proof.txt | 213 | 2203261c38710883bdbd99c5649e0129d7581ce51af7f4785381a2da82301d73 |
+| audit/qa/hde-epic032/qa_step_logs_manifest.json | 3134 | c6e9c3b936bae276e94d611ddf567791c92c7b2483ace88205d1394f17c39347 |
+| audit/qa/hde-epic032/qa_step_logs_manifest.json.path_proof.txt | 214 | cef1ac3525479153dce63c5975070bef61a9d4d1282dc041c0e071c1b080df9c |
+| tools/evidence/generate_db_bridge_parity.py | 15047 | 135ff8c3e15b65072eef2d3fdc1b156d28afe92ab1c3301a5813d0913dfc0164 |
 | artifacts/db_bridge/adapter_selection.snapshot.json | 284 | 7b2dbb9e8b477b40cb5ad4de0a19d2c04e6590f6946fe250ee4796699e6717ed |
 | artifacts/db_bridge/provider_parity.proof.json | 2607 | 09ee6cb404795c853bfaa845e71e09bcc0eaa70056af198958b1d9f287b8247e |
 | artifacts/runtime/env_connectivity.snapshot.json | 1191 | 5f5fc10c2335ed3497bbd658ad32b49932c8ab9ce49a0d2d87e3f075a9a16a45 |
@@ -146,17 +209,25 @@
 
 ## Command Families Executed During Session
 - Harness execution:
-  - python audit/qa/hde-epic032/00_meta/live_qa_harness.py po-010
-  - python audit/qa/hde-epic032/00_meta/live_qa_harness.py po-011
-  - python audit/qa/hde-epic032/00_meta/live_qa_harness.py po-012
+  - `python audit/qa/hde-epic032/00_meta/live_qa_harness.py po-010`
+  - `python audit/qa/hde-epic032/00_meta/live_qa_harness.py po-011`
+  - `python audit/qa/hde-epic032/00_meta/live_qa_harness.py po-012`
+  - `/usr/bin/python3 audit/qa/hde-epic032/00_meta/live_qa_harness.py po-010`
+  - `/usr/bin/python3 audit/qa/hde-epic032/00_meta/live_qa_harness.py po-011`
+  - `/usr/bin/python3 audit/qa/hde-epic032/00_meta/live_qa_harness.py po-012`
 - Governed DB evidence generation:
-  - python tools/evidence/generate_db_bridge_parity.py
+  - `python tools/evidence/generate_db_bridge_parity.py`
+  - `/usr/bin/python3 tools/evidence/generate_db_bridge_parity.py`
 - Targeted regression checks:
-  - python -m pytest -q tests/db/test_adapter_selection.py tests/evidence/test_generate_db_bridge_parity_nondev.py
+  - `python -m pytest -q tests/db/test_adapter_selection.py tests/evidence/test_generate_db_bridge_parity_nondev.py`
 - Remediation artifact capture:
-  - git diff -- tools/evidence/generate_db_bridge_parity.py (captured to moon_loop patch artifact)
+  - `git diff -- tools/evidence/generate_db_bridge_parity.py` (captured to moon_loop patch artifact)
+- Routing and trust proof capture:
+  - `git log --decorate --oneline -- tools/evidence/generate_db_bridge_parity.py`
+  - `git show -s --format='%H%n%s%n%b' f8d503fc a7c1b685 dc2c3b4f a8c87c5c`
+  - `sha256sum audit/qa/hde-epic032/checks/po-010/primary.log.path_proof.txt audit/qa/hde-epic032/checks/po-011/primary.log.path_proof.txt audit/qa/hde-epic032/checks/po-012/primary.log.path_proof.txt`
 
 ## Final Session Disposition
 - Artifact-level check statuses: PASS for PO-010, PO-011, PO-012.
-- Escalation/acceptance nuance: PO-010 has an explicit trust-boundary caveat documented in moon_loop boundary classification and escalation report.
-- This file is the requested single-file full action log plus evidence output for the session.
+- Evidence-trust remediation status: PF10 routing proof, per-check path-proof evidence, and structural `selection_order` proof are now explicitly recorded in this report.
+- This file is the refreshed single-file full action log plus evidence output, updated to Version 3 after post-remediation revalidation.

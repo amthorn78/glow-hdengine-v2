@@ -1,5 +1,5 @@
 path: artifacts/runtime/env_connectivity.snapshot.json
-size_bytes: 1113
-sha256: 65fa66c52b2c3c25f28fa4ac7706e31b14f9db01e06c6fa7179dace8fdb92e49
+size_bytes: 1191
+sha256: 5f5fc10c2335ed3497bbd658ad32b49932c8ab9ce49a0d2d87e3f075a9a16a45
 mtime_utc: 2026-05-19T12:30:45Z
 produced_at_utc: 2026-05-18T01:24:35Z

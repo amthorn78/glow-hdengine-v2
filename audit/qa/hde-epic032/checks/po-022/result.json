@@ -1,0 +1,17 @@
+{
+  "behavior_failures": [],
+  "check_id": "po-022",
+  "checked_at_utc": "2026-05-23T16:29:25Z",
+  "live_provider_behavior_claimed": false,
+  "rails": {
+    "ALLOW_NETWORK": "0",
+    "APP_ENV": "dev",
+    "LANG": "C",
+    "LC_ALL": "C",
+    "SAFE_MODE": "1",
+    "TZ": "UTC"
+  },
+  "required_missing": [],
+  "schema": "hde_epic032.po_022.v1",
+  "status": "PASS"
+}

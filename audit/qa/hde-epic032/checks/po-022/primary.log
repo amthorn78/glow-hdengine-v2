@@ -1,0 +1,18 @@
+{"captured_env": {"ALLOW_NETWORK": "0", "APP_ENV": "dev", "LANG": "C", "LC_ALL": "C", "SAFE_MODE": "1", "TZ": "UTC"}, "check_id": "po-022", "check_name": "PO-022", "claimed_tokens": [], "command": "python audit/qa/hde-epic032/00_meta/live_qa_harness.py po-022", "command_provenance": "Copy/paste from plan", "evidence_artifacts": ["audit/qa/hde-epic032/checks/po-022/primary.log", "audit/qa/hde-epic032/checks/po-022/primary.log.path_proof.txt", "audit/qa/hde-epic032/checks/po-022/result.json"], "exit_code": 0, "fail_status": "", "intended_tokens": [], "pf_refs": ["PF10 - HDE-Build Notes", "PF19 - Glow QA Guide", "PF27 - Canon Plan Templates"], "schema_version": "pf27.step_log_header.v1", "status": "PASS", "timestamp_utc": "2026-05-23T16:29:25Z"}
+{
+  "behavior_failures": [],
+  "check_id": "po-022",
+  "checked_at_utc": "2026-05-23T16:29:25Z",
+  "live_provider_behavior_claimed": false,
+  "rails": {
+    "ALLOW_NETWORK": "0",
+    "APP_ENV": "dev",
+    "LANG": "C",
+    "LC_ALL": "C",
+    "SAFE_MODE": "1",
+    "TZ": "UTC"
+  },
+  "required_missing": [],
+  "schema": "hde_epic032.po_022.v1",
+  "status": "PASS"
+}
