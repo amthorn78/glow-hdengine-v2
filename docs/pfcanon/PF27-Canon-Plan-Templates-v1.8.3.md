@@ -4,13 +4,13 @@
 
 **Title:** PF27-Canon-Plan-Templates
 
-**Version:** v1.7.4
+**Version:** v1.8.3
 
 **Status:** Canon
 
-**Effective date:** 2026-05-16
+**Effective date:** 2026-05-28
 
-**Last Update Gate:** BN 10.9.8 A16
+**Last Update Gate:** BN 11.2.7 A24
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -497,10 +497,13 @@ Bounded step-level rerun posture (required when a plan permits one):
 * The plan MUST state whether rails may change for the rerun and, if so, the exact replacement rails posture for that rerun only.  
 * The rerun MUST stay on the same governed step root and the same deliverable family unless the plan explicitly states a narrower reporting-state-only rerun under that same step root.  
 * The plan MUST preserve the earlier failed or blocked state in the same governed evidence stream and MUST require a short remediation note that records what changed and why.  
+* Missing or overwritten initial failure artifacts (required). If an initial failure artifact, log, hash, timestamp, or result body is overwritten or unavailable by the time remediation begins, the plan, report, or review MUST state that the initial failure artifact is unavailable and MUST NOT reconstruct or invent the missing bytes. The remediation record may rely only on preserved failure signatures, approved sources, current evidence, and a truthful unavailability note.  
 * The plan MUST require the rerun evidence to show the final step outcome without widening scope into new acceptance surfaces, new feature work, or a new evidence family.  
 * Step-0B precondition remediation (required when applicable). If a later check cannot be interpreted because the required Step-0B doc-delta capture is absent at run time, the plan or review MAY accept an approved precondition remediation only when it runs the approved Step-0B commands, produces the required Step-0B artifacts under the established meta and doc-delta surfaces, reruns the affected check under the approved rails, preserves the earlier blocked or failed state, and records the remediation as an accepted PASS-only deviation. This does not change the affected check’s required deliverables or PASS/FAIL criteria.  
 * QA-created harness predicate, evidence-assembly, or proof-metadata defects may be accepted as PASS-only Moon Loop deviations when the product or runtime proof target remains unchanged, the correction stays inside already-scoped QA evidence or harness files, the failure signature is preserved, the remediation note names changed paths and why, rerun PASS is captured in the same evidence stream, and patch or changed-files evidence with hashes is recorded when repo files change. Classify the original defect as planning, harness, or evidence-posture failure, not product behavior failure, when unchanged generator, runtime, or redaction evidence already proved the product predicate.  
-* If an executed Moon Loop is broader than a narrow plan example but still remains minimal, auditable, within approved check scope, and does not add new acceptance surfaces, feature work, evidence family, token, or public contract, the review may accept it as a caveat or PASS-only deviation. The review must state why the deviation remained acceptable and must not hide it under PASS.
+* If an executed Moon Loop is broader than a narrow plan example but still remains minimal, auditable, within approved check scope, and does not add new acceptance surfaces, feature work, evidence family, token, or public contract, the review may accept it as a caveat or PASS-only deviation. The review must state why the deviation remained acceptable and must not hide it under PASS.  
+* Live QA Moon Loop route boundary (required). Moon Loop correction may repair QA-created evidence-harness, header, manifest, path-proof, doc-delta, or QA evidence assembly defects only when the changed files remain under the approved QA root and do not change product behavior, repo evidence-generator behavior, governed artifact behavior, public contracts, PF documents, acceptance tokens, or multiple implementation subsystems.  
+* Non-QA-root remediation route (required). A change to product code, repo tests, repo evidence generators, governed artifacts outside the QA root, public contracts, PF documents, acceptance tokens, or multiple implementation subsystems is remediation work, not Moon Loop correction. It MUST be routed through an approved work item type such as PR, OPS, QA\_PLAN\_UPDATE, or DOC\_UPDATE, and later QA review MUST cite that routing before accepting the final PASS state.
 
 **Doc-delta surfaces (required; two-surface pair).**
 
@@ -753,6 +756,11 @@ TOOLING\_BLOCKED if:
 
 * A re-run is actionable only when the required product input becomes valid or available. Until then, record the blockage mechanically and do not label it as remediable evidence loss.
 
+Structural governed-field predicate rule:
+
+* When a Live QA check, remediation plan, or review depends on the presence, shape, or semantics of a field in a governed JSON artifact, the PASS predicate MUST state the structural requirement and the source relationship the field must prove. Raw string presence, grep-only visibility, or detached generator-only text is not sufficient when the field must be semantically tied to another source such as observed attempts, provider order, canonical rows, or evidence-index entries.  
+* If the structural predicate is not met, classify the issue using the approved PASS/FAIL map and route the fix through the correct work type. A plan, remediation, or review MUST NOT create a new acceptance-token claim from a structural evidence field unless Governance or live PF10 explicitly mints that token.
+
 **Primary evidence artifact (required)**
 
 Canonical (current-state) primary log:
@@ -971,6 +979,8 @@ Location:
 * Plans MAY consult PF documents during planning and review, and MAY note drain targets or doc-delta candidates as explicitly non-mandatory follow-up intents for PO, but PF10 drainage and any other PF-canon drainage are never execution conditions, approval conditions, completion conditions, required deliverables, required checks, acceptance criteria, or blockers for the current plan, review, QA step, OPS task, or closeout artifact. Reality Audits updates are PO-only.  
 * PR-slice completion discipline (required). When a plan, remediation guide, or review record claims that a PR slice or remediation lane is complete or acceptable, it MUST account for every assigned HDE Build Checklist subtask. If one or more assigned subtasks are not complete, the document MUST identify each affected subtask ID, state exactly what was completed, state exactly what remains incomplete, describe the blocking condition or limiting constraint, explain why completion was not possible within the approved scope, and name the repo evidence, test result, or other concrete basis for that conclusion. Silent omission, partial completion without this explanation, or claiming completion while assigned subtasks remain unresolved is non-conforming.  
 * Review and closure posture for mapped PF09 work (required). Current PF09 recorded status text is not a pre-drain acceptability gate, closure gate, QA-entry gate, or OPS acceptability gate. When a plan, remediation guide, QA-readiness review, closeout review, or approval artifact evaluates mapped PF09.x work, the controlling question is whether the mapped work is complete in substance from approved implementation state, approved OPS state where applicable, governed evidence, and truthful review artifacts, plus PF10 live truth where PF10 explicitly speaks.  
+* Combined-evidence supportability decisions (required). When live PF10 records that individually accepted PR or OPS slices intentionally did not move a mapped PF09.x row, a later plan, review, QA-readiness artifact, closeout artifact, or approval artifact may rely on a PF10-recorded combined-evidence supportability decision only if it identifies the exact slices combined, the mapped PF09.x row or subtask, the row’s substantive proof burden, the slice-local no-move conditions, what each slice proves, and the live PF10 conclusion. Prior slice-local no-status-move language must be preserved as slice-local truth, not treated as a prohibition against a later combined-evidence supportability decision.  
+* Combined-evidence non-claim boundary (required). A combined-evidence supportability decision MUST state what it does not claim, including whether PF09.x has already been drained, QA has passed, the epic is closed, live vendor behavior has been proven, vendor-version runtime conformance has been completed, unregistered proof labels have become acceptance tokens, OPS evidence has become QA evidence, or any individual PR or OPS slice alone moves PF09.x status.  
 * Exact mapping control (required). If a slice maps to an exact PF09.x subtask, that subtask is the controlling unit. If a slice claims to close more than one mapped PF09.x subtask, each claimed subtask must be complete in substance before acceptable-status language is allowed.  
 * PF10 reopened-subtask planning rule (required). When current PF10 explicitly reopens, rebinds, or names active HDE Build Checklist subtasks for an epic, Epic Plans, QA Plans, remediation guides, and reviews MUST treat the exact subtask IDs as active scope unless a later PF10 addendum reverses that posture. Broader parent-task history-only wording MUST NOT suppress an exact subtask row that PF10 names as active.  
 * Truth constraint for reopened scope (required). A reopened or rebound subtask is not automatically complete. Plans and reviews MUST preserve the current truth of its status and MUST NOT claim runtime facts are already true merely because the row is in scope. If active-scope and current-status text conflict, record the issue as a PF09.x doc-delta candidate or later-drain item rather than deferring the subtask by assumption.  
@@ -985,6 +995,7 @@ Location:
 * Decision separation (required). Review and acceptance language MUST distinguish task-level acceptance of the approved step from PF09 closure status of the mapped row or subtask.  
 * Governed evidence family coherence (required). When a review or closeout decision depends on governed evidence for a bounded task and a claimed closure dimension, the governed evidence family MUST express one authoritative posture only. Mixed-state families are invalid and mechanically block acceptance until normalized.  
 * Evidence-family path collision repair (required). A review MUST treat evidence outputs that overwrite or collide with an existing governed evidence family as blocking until the collision is repaired. A repair is acceptable only when the task-specific evidence is moved to the approved PR/check/task-specific governed path, the overwritten shared or dependency artifacts are restored or refreshed, matching path proofs/index/mirror bindings are coherent, and the review records the collision and repair as evidence posture rather than silently accepting the overwritten state.  
+* Evidence artifact-key collision repair (required). A review MUST treat an evidence-index or Machine Mirror key that can override, shadow, duplicate, or supersede the canonical artifact key for the same discovered physical path as blocking until corrected. A repair is acceptable only when the governed source row uses the canonical artifact key, stale duplicate keys or EPIC-specific keys are filtered or removed before dedupe and regeneration, Human Evidence Index and Machine Mirror are regenerated coherently, and the review records the collision and repair as evidence posture rather than silently accepting a duplicate-key state.  
 * Contradictory-source consolidation is forbidden. A review, closeout, or consolidation artifact MUST NOT summarize or bind acceptance over source artifacts that still encode contradictory closure meanings for the same closure dimension. If contradiction exists, stop and classify the issue as a documentation/evidence failure rather than producing a merged authoritative summary.  
 * Documentation/evidence normalization instead of rerun (required). If the runtime proof remains unchanged and the only defect is contradictory governed evidence or closure semantics, remediation may be a documentation/evidence normalization pass rather than a new runtime rerun only when the unchanged runtime facts are already evidenced, no new runtime or OPS claim is added, the affected governed family is refreshed to one authoritative posture in the same change, the Human Evidence Index, Machine Mirror, checksum sidecars, and required sibling path-proofs are refreshed coherently, and any prior contradictory bundle or report is explicitly treated as superseded evidence.  
 * Bounded evidence-refresh side effects (required). Evidence-side churn outside the direct PR or task evidence family is non-blocking only when it remains within existing governed proof families, is caused by canonical evidence refresh, updater convergence, or required dependency refresh, adds no new runtime, route, serializer, public contract, token, or artifact-family claim, and the relevant index, mirror, path-proof, checksum, LF, schema, and orientation checks are coherent. The run or review evidence MUST name each affected family, classify each side effect as expected updater convergence, required dependency refresh, or unexpected drift, and identify any affected proof-companion paths plus corresponding Machine Mirror artifact keys or discovered paths when mirror rows move. A PASS or acceptance claim MUST fail closed unless the classified side-effect paths exist, proof companions validate against their targets, and affected mirror rows match artifact key, proof anchor, sha256, and size. The review MUST NOT use bounded side effects to claim unrelated PF09 status movement.  
@@ -992,6 +1003,7 @@ Location:
 * Failure classification rule (required). Reviews that rely on governed evidence MUST distinguish runtime or implementation failure from documentation/evidence failure. Stable runtime facts plus contradictory governed artifacts are a documentation/evidence failure. Runtime wrongness remains a runtime or implementation failure.  
 * Evidence-generator portability (required). When a plan, remediation guide, review, or closeout artifact relies on a repo-owned evidence generator as a governed proof command, the generator must be reviewable under a normal repo-root invocation or the artifact must explicitly classify the missing invocation support as tooling failure or tooling blocked. Plans and reviews MUST NOT treat caller-supplied `PYTHONPATH`, unstated local shell state, or other ad hoc environment setup as an acceptable substitute for a portable governed proof command unless the approved task explicitly defines that environment requirement and captures it in the step evidence.  
 * Evidence-generator PASS binding (required). A governed evidence generator MUST NOT emit or support a `PASS` claim unless every decisive predicate for the claimed evidence family is evaluated against the current artifacts and passes. PASS status MUST be derived from current predicate checks, not from previous-artifact drift, stale local state, artifact presence, format-only checks, parsed-object equality where byte identity is required, digest-shape checks without recomputation, file presence alone, or absence of a sentinel string.  
+* Evidence-generator currentness before index proof (required). When a plan, review, or closeout relies on generated evidence plus Human Evidence Index, Machine Mirror, checksum, orientation, path-proof, LF, schema, or updater checks, the artifact MUST show that the generator materialization command and generator check ran from the current logic path before evidence-index or mirror updater commands and their checks. Index, mirror, hash, path, orientation, LF, schema, or updater checks alone are not sufficient to prove generated evidence currentness when the generator itself was not invoked or checked in the governed run.  
 * Generated-proof family completeness (required). When a check claims that generated proof families fail closed, PASS requires explicit fail-closed proof for every generated proof family used by the epic. If any such family is not proven, the step MUST remain TOOLING\_BLOCKED until the missing coverage is added and the final suite is rerun from the updated proof path.  
 * Final generator logic rule (required). After evidence-generator logic changes, final governed artifacts, sibling path-proofs, Human Evidence Index entries, Machine Mirror rows, checksum sidecars, and any required targeted tests MUST be regenerated or rerun from the final logic path before a review, closeout, or later-drain recommendation may rely on them. A stale artifact produced by earlier generator logic is not sufficient proof after remediation.  
 * Evidence-generator check-mode binding (required). When a governed evidence generator produces or registers its own artifacts, non-check generation may avoid write-time self-hash recursion only for the materialization step. Check mode MUST validate the final committed or current Machine Mirror sha256 and size bindings for every row the generator claims or depends on, including self-generated rows and any classified side-effect rows.  
@@ -1102,6 +1114,24 @@ KISS evidence posture for Live QA (normative):
   * QA creates new artifacts only when the check is specifically about QA-run outputs (step logs, manifest) or when canon explicitly requires a generated QA artifact family/path.
 
 * Any additional required artifact must be explicitly justified as acceptance-decisive and must be canonized (and path-pinned) by PF10 or PF-canon as a governed evidence family/path.
+
+Materiality-based blocker discipline (required for Epic Plan and Implementation Plan review):
+
+* A planning artifact MUST NOT be blocked solely for template hygiene, formatting, inventory completeness, provenance-label phrasing, quote-block style, table formatting, heading style, punctuation, spacing, bold markers, presentation style, inventory-row ordering, template-perfect phrasing, missing non-decisive locator precision, missing titles-only polish, or an Epic QA root omission in an Epic Plan that does not authorize QA execution, unless the defect materially changes truth, proof, acceptance, execution safety, source authority, portability, implementation scope, PF09.x completion mapping, evidence identity, evidence trust, OPS/PR boundary, public/private surface posture, canon conflict handling, or closeout truth.  
+* Review severity MUST map to material effect: Blocker changes truth, proof, acceptance, execution, source authority, or portability; Caveat creates a real risk with a safe default; Suggestion improves clarity, consistency, or maintainability; Nit is cosmetic, template-polish, or wording-level only.  
+* Valid blocker framing must state the material harm, such as conflict with active PF10, an unresolved ADR after PF10 resolves the exact topic, a required external CA/audit/non-PF source for Codex execution, unregistered token claimed as an acceptance token, Already Implemented claimed without embedded proof, OPS work required inside Codex PR work, unproven repo locus, public surface expansion without canon support, PF23 used as deliverable/token/blocker/acceptance authority, or PF20 used as current planning authority.  
+* Invalid blocker framing includes a missing token row when the plan does not overclaim a token and the evidence family is scoped, imperfect CA quote-block formatting when the fact is embedded and self-contained, provenance labels such as CA vetted when no external CA access is required, or section formatting that is not template-perfect but preserves meaning.
+
+Live QA Plan approval materiality discipline (required):
+
+* Live QA Plan approval is an operational-readiness review. A Live QA Plan should be approved when it is safe, self-contained, phase-bounded, and clear enough for the assigned operator to execute the QA run and produce a meaningful governed verdict.  
+* A Live QA Plan MUST NOT be blocked solely for rendered escape characters, markdown or AI-rendered backslashes, heading style, bullet style, table style, quote-block formatting, code-block formatting, whitespace, punctuation, line wrapping, command syntax polish, command invocation style, interpreter choice unless it changes operational behavior, exact shell spelling, exact command ordering unless order is required for safety or proof, evidence-ledger byte-shape polish at plan approval, path-proof transcript field polish at plan approval, canonical JSON compactness wording at plan approval, or step-log header polish at plan approval.  
+* Valid Live QA Plan approval blockers are operational: missing required QA step coverage, missing required deliverables or explicit PASS/FAIL criteria, unsafe rails, secret exposure, live-provider or external-action boundary violation, public/private surface boundary violation, token overclaim, non-token proof label treated as an acceptance token, PF23 used as an execution artifact, PF20 used as current authority, PF14 used as governance or acceptance authority, PF-canon drainage required as a gate, unproven required existing locus with no source-grounded proof, no discovery posture, and no QA-created fallback, wrong target execution, prohibited mutation, no governed evidence family, no decisive receipt, contradiction of active PF10, or contradiction of permanent PF-Canon where PF10 is silent and the contradiction affects operational truth.  
+* Commands in a Live QA Plan are operational instructions rather than canon contracts unless the plan explicitly states exact invocation is required and the owning PF home requires exactness for the operational result. Exact-command mismatch is a Caveat, Suggestion, or execution note when check intent, proof target, rails posture, expected evidence family, PASS/FAIL predicate, operator safety boundary, and actual-command capture remain clear and an equivalent safe command can produce the same proof.  
+* A Live QA Plan may create QA-only harness scaffolding during Step 0 when the harness is limited to QA evidence capture and does not create product behavior. Reviewers MUST NOT require repo-existence proof for a QA-created harness that the plan explicitly creates during the QA run. Formatting, indentation, line wrapping, and code style inside QA-created scaffolding are non-blocking unless they prevent creation or safe execution and no bounded correction is allowed during QA execution.  
+* Live QA Plan approval requires evidence identity, not final closeout perfection. At approval time, the plan must identify what each check proves, what result counts as PASS, what result counts as FAIL, where the QA run records the decisive receipt, which evidence family or evidence class supports the verdict, and how token claims are avoided unless registered and in scope. Final byte-level details may still fail QA execution or closeout validation; they are approval blockers only when the plan lacks evidence identity, lacks a decisive receipt, relies on ungoverned evidence as decisive proof, or explicitly rejects required governed-evidence discipline.  
+* Review severity for Live QA Plan approval MUST map to operational harm: Blocker prevents safe execution, invalidates the intended QA verdict, breaks source authority, creates token or acceptance overclaim, violates rails or secret posture, requires unavailable execution inputs, or makes required evidence untrustworthy; Caveat creates operational risk with a safe default, bounded discovery path, or equivalent execution path; Suggestion improves clarity, operator usability, reviewability, or future maintainability; Nit is cosmetic, formatting-level, or presentation-only.  
+* A reviewer who returns a Live QA Plan for revision MUST state the concrete operational harm and show that the defect prevents safe execution, invalidates the QA verdict, breaks evidence trust, changes source authority, creates token overclaim, or violates rails or safety boundaries.
 
 Explicit non-blockers (do not gate approval):
 
@@ -1454,6 +1484,8 @@ List any additional acceptance tokens required by this epic’s design (names-on
 * PF09 scope/status-only binding rule. When an Epic Plan, acceptance map, token→evidence matrix, close report, or manifest needs to record that a slice closes, contributes to, or leaves open a PF09 task or subtask, it MUST represent that as PF09 scope/status-only binding metadata, not as an acceptance token.  
 * Acceptance tokens and PF09 scope bindings MUST remain distinct surfaces. Do not mint slice-local names or PF09-derived names as substitute acceptance tokens. Use canonical acceptance tokens for acceptance only, and record PF09 scope/status posture in a separate PF09 scope-binding section or equivalent metadata surface.  
 * Temporary bridge tokens may be claimed only when they are canonical in PF04 or live PF10 and are bound to truthful governed evidence.  
+* PF10 non-token proof-label posture (required). When live PF10 classifies a token-like label as a non-token proof label, plans, QA plans, reviews, OPS evidence, acceptance maps, token-to-evidence matrices, manifests, and closeout artifacts MUST NOT claim that label as a satisfied acceptance token unless the exact spelling is registered in Governance or minted by a later PF10 addendum. The work may continue as a governed non-token proof obligation with commands, artifacts, and PASS predicates.  
+* Proof-label ADR closure rule (required). When live PF10 already resolves the exact token/proof-label posture, a plan or review MUST cite that live PF10 decision and remove any ADR placeholder that asks to resolve the same topic. If later close-stage review requires the proof label to become a gated acceptance predicate, route token admission through Governance before any acceptance artifact claims it.  
 * Token minting workflow (planning gate):  
   * Open an ADR proposing the token and its meaning (owner: PO), including a conflict check against PF04.  
   * Open an ADR proposing the token and its meaning (owner: PO), including a conflict check against PF04.  
@@ -2591,10 +2623,10 @@ B) Evidence and verification posture now satisfied
 
 C) Token and gate evidence
 
-* Tokens explicitly claimed (names-only), or state that no tokens were explicitly claimed.
-
-* If no tokens were explicitly claimed, include the search method and result.
-
+* Tokens explicitly claimed (names-only), or state that no tokens were explicitly claimed.  
+* If no tokens were explicitly claimed, include the search method and result.  
+* Unsupported, removed, downgraded, or non-token proof labels, if any:  
+* If a prior attempt claimed an unsupported token or token-like label, the review MUST record the source-row correction, regenerated Human Evidence Index and Machine Mirror posture when affected, refreshed hash/path-proof posture when affected, and exact search method/result proving the unsupported claim is absent from the governed source and evidence surfaces.  
 * Evidence pointer(s):
 
 D) Test or CI proof
@@ -2639,9 +2671,12 @@ Repeat evidence lines as needed.
 
 CHG-001
 
-* Change claim:  
+* Change claim type: behavior or output | configuration or environment | governed paths or artifact families | tokens, rails, or evidence posture | rails/evidence posture | interface or contract | workflow steps | PF09 status-impact requirement | supported PF09 status posture changes | other  
+* Claim:  
 * Evidence pointer:  
-* Canon basis: CANON MISMATCH | NO CANON MISMATCH | CANON SILENT | ALREADY DRAINED  
+* Canon basis: CANON ALIGNED | CANON MISMATCH | NO CANON MISMATCH | CANON SILENCE | CANON SILENT | ALREADY DRAINED  
+* Canon Check Gate:  
+* Canon proof excerpt(s) when canon is invoked:  
 * Impacted PF task ID(s), if any:  
 * Impacted PF subtask ID(s), if any:  
 * Proposed status action, if any:  
@@ -2737,17 +2772,14 @@ Use this template when an audit report is being translated into explicit home cl
 
 **Audit Summary**
 
-* What the audit compares:
-
-* Top drift themes:
-
-* Number of discrete findings extracted:
-
-* Number of must-act-now findings:
-
-* Concrete canon delta(s) supported:
-
-* Any no-task-delta conclusion, if supported:
+* What the audit compares:  
+* Top drift themes:  
+* Number of discrete findings extracted:  
+* Number of must-act-now findings:  
+* Concrete canon delta(s) supported:  
+* Any no-task-delta conclusion, if supported:  
+* PF doc homes consulted for classification:  
+* PF doc homes receiving proposals:
 
 **Findings → Doc Delta Map**
 
@@ -2761,10 +2793,10 @@ FND-001
 * Must-act-now: YES | NO  
 * Observation-only: YES | NO  
 * Re-open trigger, if observation-only:  
-* Disposition: Doc delta proposed | Observation only | Existing issue duplicate | No action | PO decision needed  
+* Disposition: Doc delta proposed | Observation only | Existing issue duplicate | No doc delta needed | No action | PO decision needed  
 * Correct home(s):  
-  * PF09 task delta: YES | NO  
-  * PF09 target, if any:  
+  * PF09.x task delta: YES | NO  
+  * PF09.x target, if any:  
   * PF14 mechanics delta: YES | NO  
   * PF02 architecture delta: YES | NO  
   * Other PF doc delta(s):  
@@ -2776,25 +2808,20 @@ FND-001
 
 Repeat FND blocks as needed.
 
-**Doc Delta Proposals — PF09 (Tasks)**
+**Doc Delta Proposals — PF09.x (Tasks)**
 
-* None. when no PF09 task delta is supported.
+* None. when no PF09.x task delta is supported.
 
 PD-001
 
-* Target doc:
-
-* Target section:
-
-* Delta (actionable; 1–3 bullets):
-
-* Why:
-
-* Evidence pointer(s):
-
+* Target doc:  
+* Target section:  
+* Delta (actionable; 1–3 bullets):  
+* Why:  
+* Evidence pointer(s):  
 * PF proof excerpt(s) when canon is invoked:
 
-Repeat PF09 proposal blocks as needed.
+Repeat PF09.x proposal blocks as needed.
 
 **Doc Delta Proposals — Other PF homes**
 
@@ -2961,6 +2988,8 @@ Repeat canon-reference blocks as needed.
 
 **Proposed PF10 Addenda (when the retrospective supports living-addendum text)**
 
+* None: state when no new PF10 addenda are proposed, why no new addendum is needed, and which existing addenda, docs PR, or evidence record already carries the needed posture.
+
 AD-001
 
 * Addendum title:  
@@ -3070,7 +3099,8 @@ Finding posture rules:
 
 * Non-blocking planning failures, process imperfections, or earlier failed attempts MAY be recorded as findings, but they MUST be distinguished from verdict-driving facts and MUST use `Drives decision: No` when they do not affect the decision.  
 * If the review relies on step-evidence trust, the findings MUST make explicit which trust facts were confirmed, such as the governed `primary.log` header, captured rails and determinism pins, and the current-state QA root and manifest-pair posture when applicable.  
-* If a finding depends on the absence of a direct token-level proof line or other direct proof line in DELIVERABLES\_REPORT\_FILE, the review MUST record the exact negative-claim search and the no-match result rather than implying absence.
+* If a finding depends on the absence of a direct token-level proof line or other direct proof line in DELIVERABLES\_REPORT\_FILE, the review MUST record the exact negative-claim search and the no-match result rather than implying absence.  
+* Non-fatal runtime warnings MAY be recorded as findings with `Drives decision: No` when the deliverables report also records no `TOOLING_BLOCKED`, `FAIL_TOOLING`, or `FAIL_BEHAVIOR` condition and the approved PASS predicates are otherwise satisfied. The review MUST still record the warning evidence pointer and any follow-up needed, but the warning alone is not a blocker or fail classification.
 
 **Evidence Print**
 
@@ -3188,6 +3218,7 @@ Acceptance-claim boundary rule:
 * **D0 / Step-0 discovery and baseline rails posture:** state whether D0 discovery, Step-0 discovery, Step-0 doc-delta capture when required, closed/open rails posture, deterministic pins, and captured environment posture are covered, missing, or not applicable.  
 * **Functional runtime proof on changed runtime surfaces:**  
 * **Governed current-state QA evidence under the epic QA root:**  
+* **Per-step-cluster manifest/header/path-proof trust proof:** when a final QA closeout asks a reviewer to approve an executed QA step cluster, the artifact MUST surface the manifest entry, canonical primary-log path, primary-log header fields, `captured_env`, `evidence_artifacts`, `intended_tokens`, `claimed_tokens`, path-proof binding, token posture, rails/determinism posture, and final status for that cluster. A PASS result JSON or summary label alone is not sufficient closeout proof when manifest, header, or path-proof trust is required.  
 * **QA RCA & Doc Delta summary:**  
 * **Coverage vs QA Plan accounting:**  
 * **All-slice coherence proof:** when the QA closeout claims post-implementation coherence after multiple slices, verify all prior step primary logs required for that claim are present, all required implementation-slice artifacts are present, and the derived status agrees with the recorded primary-log header status and exit code.  
@@ -3201,6 +3232,8 @@ Acceptance-claim boundary rule:
 * **Primary SoT for epic-specific QA events:**  
 * **Implementation Guide used:**  
 * **QA Plan used:**  
+* **Implementation Guide authority posture:** goals framing only | scope framing only | close authority | not used | other evidence-backed posture  
+* **QA Plan authority posture:** intended QA requirement framing only | close authority | not used | other evidence-backed posture  
 * **Mismatches identified between the primary SoT and the QA Plan, if any:**  
 * **Negative-claim proof, if a mismatch search is used:**  
 * **If a PF10 addendum is the decisive close-authority statement: say whether it provides direct evidence-pointer lines or evidence-basis prose only.**  
@@ -3325,16 +3358,8 @@ Chronology rule: reconstruct chronological order from explicit timestamps when p
 
 **Repeat implementation-gap blocks as needed.**
 
-**Doc Deltas (PF-Canon only; excluding PF10)**
-
-**A) PF19 doc deltas (targeted)**
-
-* **None.**
-
-**DD-001**
-
-* **Section:**  
-* **Delta:**  
+* HYGIENE | DELETION | other evidence-backed tag  
+* **Proof excerpt(s) when canon is invoked:**  
 * **Why:**  
 * **Evidence pointer(s):**
 
@@ -3347,6 +3372,8 @@ Chronology rule: reconstruct chronological order from explicit timestamps when p
 * **Doc:**  
 * **Section:**  
 * **Delta:**  
+* **Tag:** NEW CANON PROPOSAL | CLARIFICATION | CONSISTENCY | DOC HYGIENE | DELETION | other evidence-backed tag  
+* **Proof excerpt(s) when canon is invoked:**  
 * **Why PF19 is not the correct home:**  
 * **Evidence pointer(s):**
 
@@ -3372,6 +3399,7 @@ Use this template when one review artifact must combine epic closure decision, c
 
 * **Implementation Guide provided:**  
 * **QA Plan provided:**  
+* **Input-name, epic-name, or phase-label mismatch, if any:** state any mismatch between prompt labels and primary-source epic identity, which source controls the review identity, whether the prompt label is preserved only as artifact-map or provenance text, and evidence pointer(s)  
 * **Sources intentionally excluded from closure authority, if any:**  
 * **Why excluded sources do not drive closure:**  
 * **Primary epic-specific source of truth:**  
@@ -3552,6 +3580,9 @@ Repeat ADR summary rows as needed.
 * **Decision point:**  
 * **Options considered:**  
 * **PF-canon constraints relied on:**  
+* **Proof excerpt(s) when canon is invoked:**  
+* **ADR tag, if recorded:** NEW CANON PROPOSAL | CLARIFICATION | CONSISTENCY | DOC HYGIENE | DELETION | other evidence-backed tag  
+* **ADR proposal text, if recorded:**  
 * **Final decision for this epic:**  
 * **Should this become canonical for future work:** Yes | No  
 * **Evidence pointer:**
@@ -3575,6 +3606,8 @@ Repeat ADR summary rows as needed.
 * **Doc:**  
 * **Section:**  
 * **Delta:**  
+* **Tag:** NEW CANON PROPOSAL | CLARIFICATION | CONSISTENCY | DOC HYGIENE | DELETION | other evidence-backed tag  
+* **Proof excerpt(s) when canon is invoked:**  
 * **Why this doc is the correct home:**  
 * **Evidence pointer:**
 
@@ -3635,6 +3668,8 @@ Repeat ADR summary rows as needed.
 * **If No, what still-open state must remain explicit:**  
 * **If No, which later approved task or step owns remaining closure work, if any:**  
 * **Command ledger and checksum evidence:** state whether every action actually performed is recorded and whether checksum or integrity evidence covers the captured files.  
+* **Row-level closure proof for corpus, parity, or multi-row closure claims:** state the active corpus or row inventory, any excluded or skipped rows, row-level status for each active row, the closure decision artifact, the consistency-check result, and whether the consistency result agrees with the row-level proof.  
+* **Scope-rationale evidence when corpus interpretation was contested or remediated:** state the authority or rationale used, whether the run resolved the issue through inclusion and match or through exclusion, and whether any external exclusion authority remains necessary.  
 * **Secret and environment evidence posture:** presence-only booleans | redacted | hashed | not applicable; state whether any secret-value persistence is evidenced.  
 * **Non-claims preserved:** QA PASS | Live QA completion | PF09 status change | epic closure | PF-canon drain completion | other  
 * **Evidence-packaging or close-pack surfacing scope:** when run posture is evidence-refresh-only, evidence packaging, or close-pack surfacing, verify that no QA reruns, vendor calls, implementation changes, PF-Canon edits, PF09 status-drain claims, new acceptance claims, or new tokens occurred unless the approved task explicitly authorized them.  
@@ -3677,6 +3712,19 @@ Repeat ADR summary rows as needed.
 
 * **Evidence pointer:**  
 * **What state it proves:**
+
+**D) PF09.x later-drain support (if applicable)**
+
+Use this section only when the approved Ops task ties the run to PF09.x completion, close, or later-drain posture.
+
+* **PF09.x document:**  
+* **PF09.x task ID:**  
+* **PF09.x subtask ID, if any:**  
+* **Current claim in the approved task or plan:**  
+* **Supportable later-drain action:** no PF09.x support proven | supportable from Ops evidence only | supportable after PR/QA/closeout binding | supportable from repo evidence | already drained | not applicable  
+* **Evidence basis:**  
+* **Non-claim notes:** state whether the Ops run avoids QA PASS, PF09 status move, epic closure, acceptance-token satisfaction, or other overclaim.  
+* **Later owner:** state whether later PR, QA, closeout, or canon-only drain work owns any status movement.
 
 **Repeat state-evidence lines as needed.**
 

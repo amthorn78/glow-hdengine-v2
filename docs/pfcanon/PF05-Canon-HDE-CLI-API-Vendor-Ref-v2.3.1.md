@@ -4,13 +4,13 @@
 
 **Title:** PF05-Canon-HDE-CLI-API-Vendor-Ref
 
-**Version:** v2.2
+**Version:** v2.3.1
 
 **Status:** Canon
 
-**Effective date:** 2026-05-15
+**Effective date:** 2026-05-27
 
-**Last Update Gate:**  BN 10.9.8 A16
+**Last Update Gate:**  BN 11.2.7 A24
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -46,12 +46,10 @@
 
 * **Lowercase directories (ASCII) only.** Don’t create mixed-case directories.
 
-* **Deterministic CLI results.** Any CLI command results used in QA MUST satisfy determinism (AB↔BA) and be reproducible as described in §9. *(Token names live in Governance.)*
-
-* **Evidence anchoring.** Any evidence pointer emitted by the CLI must use governed repo roots and must be path-proven in the evidence index (see **Glow QA Guide** and **HDE-Governance §9** by title).
-
-* **Mirror schema check invocation (operator note).** `ci/checks/check_mirror_schema.sh` is a Python entrypoint. Invoke it as `python ci/checks/check_mirror_schema.sh` (or direct exec only if the executable bit is guaranteed). Do **not** run it via `bash ci/checks/check_mirror_schema.sh`; that invocation is invalid and is a known source of drift.
-
+* **Deterministic CLI results.** Any CLI command results used in QA MUST satisfy determinism (AB↔BA) and be reproducible as described in §9. *(Token names live in Governance.)*  
+* **Evidence anchoring.** Any evidence pointer emitted by the CLI must use governed repo roots and must be path-proven in the evidence index (see **Glow QA Guide** and **HDE-Governance §9** by title).  
+* **Mirror schema check invocation (operator note).** `ci/checks/check_mirror_schema.sh` is a Python entrypoint. Invoke it as `python ci/checks/check_mirror_schema.sh` (or direct exec only if the executable bit is guaranteed). Do **not** run it via `bash ci/checks/check_mirror_schema.sh`; that invocation is invalid and is a known source of drift.  
+* **Live QA Plan command-invocation materiality.** PF05 may preserve preferred command invocations for execution and evidence reproducibility. A mismatch from a preferred command spelling is a Live QA Plan approval blocker only when it changes operational behavior, proves the wrong target, opens unsafe rails, exposes secrets, mutates prohibited state, prevents the check from running, makes PASS/FAIL unverdictable, or damages governed evidence trust. Otherwise, exact-command mismatch belongs in caveats, suggestions, execution notes, or the captured QA evidence command transcript.  
 * **Process ownership.** Use the evidence-only PR template and follow the “update in same PR” workflow defined in **Epic-Process-Guide** (titles only). **Build Notes** are WIP only; drained guidance must land in canon.  
 * **Documentation drainage is never a blocker.** PF10 drain and any later documentation drainage are never prerequisites, required deliverables, required checks, acceptance conditions, or readiness blockers for PF05-owned CLI, Reader, or Vendor work. Allowed blockers remain limited to truth and proof failures, such as missing required QA artifacts, untrusted evidence, or unresolved fail states that affect acceptance.  
 * **PF10 carries live truth until later drain.** When an undrained canon delta affects PF05-owned surfaces, PF10 remains the temporary live-truth home until drainage occurs. Plans, reviews, QA artifacts, acceptance maps, step logs, and closeout materials may record later drain targets or doc-delta candidates, but they must not require PF document updates as execution or closeout conditions, and they must distinguish supportable-from-repo-evidence posture from already drained posture.  
@@ -4472,6 +4470,334 @@ These anchors are PF05 surface-proof candidates only. Final evidence schema, Hum
 * **po-018 Live QA stays QA, not implementation, remediation, or closeout action**  
   * `audit/qa/hde-epic031/checks/po-018/primary.log` *(canonical step receipt for po-018 PASS evidence under closed deterministic rails)*  
   * `audit/qa/hde-epic031/checks/po-018/result.json` *(Live QA proof-only boundary proof for po-018, including `implementation_performed_by_live_qa: false`, `remediation_performed_by_live_qa: false`, `closeout_action_performed_by_live_qa: false`, and `live_qa_role: prove_current_results_only`)*
+
+#### **D.11y EPIC032 PR-01 narrative-router parity and evidence-indexing proof anchors**
+
+* `tools/evidence/generate_epic032_pr01_router_evidence.py` *(governed generator for HDE-EPIC032 PR-01 router coverage, AB↔BA and two-run identity, and CLI/HTTP parity proof)*  
+* `audit/gates/narratives/keys_10x4.table.json` *(router coverage snapshot proving the 10 category by 4 band key table, canonical JSON, and missing-key cases)*  
+* `audit/gates/narratives/keys_10x4.table.json.path_proof.txt` *(governed path-proof for the router coverage snapshot)*  
+* `artifacts/narratives/router/parity_abba.log` *(AB↔BA and two-run identity log for router outputs; keys-only and no-prose evidence)*  
+* `artifacts/narratives/router/parity_abba.log.path_proof.txt` *(governed path-proof for the AB↔BA and two-run identity log)*  
+* `artifacts/narratives/router/cli_http_parity.log` *(CLI/HTTP parity log for router responses where parity is defined, including 120 passing parity rows)*  
+* `artifacts/narratives/router/cli_http_parity.log.path_proof.txt` *(governed path-proof for the CLI/HTTP parity log)*  
+* `tests/unit/test_narratives_router.py` *(router matrix, supported tuple behavior, missing-key fail-closed behavior, two-run identity, and AB↔BA coherence proof anchor)*  
+* `tests/cli/test_aux_preview.py` *(CLI narrative preview proof anchor for the PR-01 validation roster)*  
+* `tests/transport/test_aux_narrative.py` *(transport narrative proof anchor for the PR-01 validation roster)*  
+* `tools/evidence/update_evidence_index.py` *(single-writer evidence-index tooling that carries the corrected HDE-EPIC032 PR-01 token posture)*  
+* `docs/evidence/INDEX.json` *(Human Evidence Index carrying the HDE-EPIC032 PR-01 evidence rows)*  
+* `docs/evidence/INDEX.sha256` *(hash sentinel refreshed for the HDE-EPIC032 PR-01 Human Evidence Index update)*  
+* `docs/evidence/INDEX.json.path_proof.txt` *(governed path-proof for the Human Evidence Index update)*  
+* `docs/evidence/INDEX.sha256.path_proof.txt` *(governed path-proof for the Human Evidence Index hash sentinel update)*  
+* `artifacts/evidence_index.jsonl` *(Machine Evidence Mirror carrying the HDE-EPIC032 PR-01 evidence rows; the router key-table row carries only `JSON_CANONICAL_CHECK_OK`, while parity rows retain `CLI_READER_PARITY_OK`, `TWO_RUN_IDENTITY_OK`, and `COMPOSITE_ABBA_IDENTITY_OK`)*  
+* `artifacts/evidence_index.jsonl.sha256` *(hash sentinel refreshed for the HDE-EPIC032 PR-01 Machine Evidence Mirror update)*  
+* `artifacts/evidence_index.jsonl.path_proof.txt` *(governed path-proof for the Machine Evidence Mirror update)*  
+* `artifacts/evidence_index.jsonl.sha256.path_proof.txt` *(governed path-proof for the Machine Evidence Mirror hash sentinel update)*  
+* The unsupported `NARR_REGISTRY_CLOSURE_OK` claim is not a PF05 acceptance anchor for this PR-01 evidence family; the corrected key-table posture is `JSON_CANONICAL_CHECK_OK` only.  
+* This PR-01 proof family does not create a new public Reader route, public Reader flag, public payload field, public numeric output, or public narrative text contract.
+
+#### **D.11z EPIC032 PR-02 narrative registry diff, pack identity, and evidence-indexing proof anchors**
+
+* `tools/evidence/generate_narrative_registry_diff.py` *(governed generator for HDE-EPIC032 PR-02 narrative registry diff, pack identity, and fail-closed manifest and key-grid validation)*  
+* `tools/evidence/run_sanity_pipeline.py` *(sanity-pipeline proof anchor that runs narrative registry generation and generator check before evidence updater operations)*  
+* `tests/unit/test_narratives_loader.py` *(narrative loader and generator proof anchor for canonical rendering, keys-only posture, pack identity, supported category and band validation, full tuple-grid validation, duplicate rejection, and fail-closed negative cases)*  
+* `tests/evidence/test_sanity_pipeline.py` *(pipeline-ordering proof anchor that prevents stale registry diff or pack identity evidence from being accepted by index checks alone)*  
+* `audit/gates/narratives/registry.diff.json` *(canonical PR-02 registry diff artifact for manifest changes, keys-only registry counts, no-prior-baseline diff state, and HDE-FERM003.2 scope)*  
+* `audit/gates/narratives/registry.diff.json.path_proof.txt` *(governed path-proof for the PR-02 registry diff artifact)*  
+* `audit/gates/narratives/pack_identity.txt` *(pack identity proof with canonical manifest SHA, manifest path, canonical size, two-run hashes, and two-run match)*  
+* `audit/gates/narratives/pack_identity.txt.path_proof.txt` *(governed path-proof for the PR-02 pack identity proof)*  
+* `audit/docdeltas/hde-epic032_doc_deltas.md` *(Doc-Delta posture artifact for PR-02, including the no-PF-Canon-edit posture reported by PR Artifacts)*  
+* `audit/docdeltas/hde-epic032_doc_deltas.md.path_proof.txt` *(governed path-proof for the PR-02 Doc-Delta posture artifact)*  
+* `audit/gates/topology/orientation_demo.txt` *(orientation evidence refreshed from `total_artifacts: 342` to `total_artifacts: 345` after the three PR-02 indexed artifacts were added)*  
+* `audit/gates/topology/orientation_demo.txt.path_proof.txt` *(governed path-proof for the refreshed orientation evidence)*  
+* `tools/evidence/update_evidence_index.py` *(single-writer evidence-index tooling that loads `epic032.pr02.doc_deltas`, `epic032.pr02.pack_identity`, and `epic032.pr02.registry_diff` into Human Index and Machine Mirror generation)*  
+* `docs/evidence/INDEX.json` *(Human Evidence Index carrying the HDE-EPIC032 PR-02 evidence rows)*  
+* `docs/evidence/INDEX.sha256` *(hash sentinel refreshed for the HDE-EPIC032 PR-02 Human Evidence Index update)*  
+* `docs/evidence/INDEX.json.path_proof.txt` *(governed path-proof for the Human Evidence Index update)*  
+* `docs/evidence/INDEX.sha256.path_proof.txt` *(governed path-proof for the Human Evidence Index hash sentinel update)*  
+* `artifacts/evidence_index.jsonl` *(Machine Evidence Mirror carrying the HDE-EPIC032 PR-02 evidence rows for Doc-Delta, pack identity, and registry diff)*  
+* `artifacts/evidence_index.jsonl.sha256` *(hash sentinel refreshed for the HDE-EPIC032 PR-02 Machine Evidence Mirror update)*  
+* `artifacts/evidence_index.jsonl.path_proof.txt` *(governed path-proof for the Machine Evidence Mirror update)*  
+* `artifacts/evidence_index.jsonl.sha256.path_proof.txt` *(governed path-proof for the Machine Evidence Mirror hash sentinel update)*  
+* PR-02 uses only approved PR-02 token names in new rows and does not introduce `NARR_REGISTRY_CLOSURE_OK` or any new PF05 acceptance token.  
+* This PR-02 proof family does not create a new public Reader route, public Reader flag, public payload field, public numeric output, public narrative text contract, or PF05 transport contract change.
+
+#### **D.11aa EPIC032 PR-03 DB bridge fallback, provider parity, and evidence-indexing proof anchors**
+
+* `tools/evidence/generate_db_bridge_parity.py` *(governed generator for HDE-EPIC032 PR-03 adapter selection, dev bridge fallback, bridge capability, deterministic provider parity, env connectivity, redaction posture, fail-closed check mode, and closed-rails live-unavailable posture)*  
+* `artifacts/db_bridge/adapter_selection.snapshot.json` *(adapter selection snapshot proving deterministic dev fallback from direct `psycopg` selection to bridge selection, with no raw DSN recorded)*  
+* `artifacts/db_bridge/adapter_selection.snapshot.json` MUST carry structural `selection_order` evidence derived from observed `attempts[*].provider`. Raw string presence, detached generator-only data, missing source binding, non-array shape, or mismatched order is insufficient and MUST fail generator write or check mode. This selection-order proof does not create a new acceptance-token claim.  
+* `artifacts/db_bridge/adapter_selection.snapshot.json.path_proof.txt` *(governed path-proof for the adapter selection snapshot)*  
+* `artifacts/db_bridge/provider_parity.proof.json` *(provider parity and bridge capability proof with deterministic direct-vs-bridge harness cases, live provider parity marked unavailable under closed rails, and non-token proof labels for DB provider parity and bridge capability)*  
+* `artifacts/db_bridge/provider_parity.proof.json.path_proof.txt` *(governed path-proof for the provider parity and bridge capability proof)*  
+* `artifacts/runtime/env_connectivity.snapshot.json` *(runtime env connectivity snapshot proving secret-free dev bridge fallback through `DBAccess`, redacted presence for `DATABASE_URL` and `DB_BRIDGE_URL`, and fallback from psycopg error to bridge success)*  
+* `artifacts/runtime/env_connectivity.snapshot.json.path_proof.txt` *(governed path-proof for the runtime env connectivity snapshot)*  
+* `ci/checks/check_bridge_consistency.py` *(bridge consistency guard proof anchor; rejects false-PASS provider-parity conditions when direct rows are missing, skipped, unavailable, or errored)*  
+* `engine/db/adapter.py` *(adapter-selection implementation proof anchor for `PROD_ENV_ALIASES = {"prod", "production", "live"}` and production-like bridge guard behavior for `APP_ENV=live`)*  
+* `tests/db/test_adapter_selection.py` *(adapter-selection regression proof for non-production fallback and `APP_ENV=live` production-like guard behavior)*  
+* `tests/db/test_adapter_contract.py` *(adapter contract proof that bridge provider exposes provider contract methods expected by `DBAccess`)*  
+* `tests/unit/test_check_bridge_consistency.py` *(bridge consistency regression proof for false-PASS rejection and truth-preserving skip acceptance)*  
+* `tests/evidence` *(evidence regression proof family for PR-03 DB bridge fallback and provider parity evidence generation)*  
+* `tests/ops/test_evidence_index.py` *(evidence-index regression proof for canonical adapter-selection key binding and stale duplicate key filtering)*  
+* `tools/evidence/update_evidence_index.py` *(single-writer evidence-index tooling that binds PR-03 artifacts into the Human Evidence Index and Machine Evidence Mirror, uses canonical key `db_bridge.adapter_selection.snapshot`, and filters stale `epic032.pr03.adapter_selection`)*  
+* `docs/evidence/INDEX.json` *(Human Evidence Index carrying the canonical adapter-selection row with HDE-EPIC032 PR-03 metadata and `DB_CONN_ENV_OK`)*  
+* `docs/evidence/INDEX.sha256` *(hash sentinel refreshed for the HDE-EPIC032 PR-03 Human Evidence Index update)*  
+* `docs/evidence/INDEX.json.path_proof.txt` *(governed path-proof for the Human Evidence Index update)*  
+* `docs/evidence/INDEX.sha256.path_proof.txt` *(governed path-proof for the Human Evidence Index hash sentinel update)*  
+* `artifacts/evidence_index.jsonl` *(Machine Evidence Mirror carrying PR-03 rows for canonical adapter selection, env connectivity, and provider parity; adapter-selection uses `DB_CONN_ENV_OK`, env-connectivity uses `DEV_DB_BRIDGE_FALLBACK_OK` and `DB_CONN_ENV_OK`, and provider-parity uses `JSON_CANONICAL_CHECK_OK`)*  
+* `artifacts/evidence_index.jsonl.sha256` *(hash sentinel refreshed for the HDE-EPIC032 PR-03 Machine Evidence Mirror update)*  
+* `artifacts/evidence_index.jsonl.path_proof.txt` *(governed path-proof for the Machine Evidence Mirror update)*  
+* `artifacts/evidence_index.jsonl.sha256.path_proof.txt` *(governed path-proof for the Machine Evidence Mirror hash sentinel update)*  
+* `audit/gates/topology/orientation_demo.txt` *(orientation evidence reporting a coherent evidence skeleton with 347 artifacts after duplicate adapter-selection row removal)*  
+* `audit/gates/topology/orientation_demo.txt.path_proof.txt` *(governed path-proof for the refreshed orientation evidence)*  
+* Shared path-proof refreshes for already-governed PR-01, PR-02, EPIC030, writer, topology, Human Index, and Machine Mirror companion files are evidence-tool refresh behavior only. They do not reopen earlier PR behavior, introduce a new public Reader route, create a new PF05 transport contract, or change public Reader bytes.  
+* Live provider parity remains truthfully unavailable under closed rails and MUST NOT be reported as pass. Provider parity evidence MAY proceed as governed proof-label evidence without claiming those proof labels as acceptance tokens.
+
+#### **D.11ab EPIC032 OPS-01 DB provider parity closure proof anchors**
+
+* `audit/ops/hde-epic032/db-provider-parity/provider_parity_closure_decision.json` *(primary OPS-01 closure decision artifact; records `provider_parity_closure_status: closed`, active corpus closure, provider availability, presence-only secret posture, and no active parity row with `parity=diff`)*  
+* `audit/ops/hde-epic032/db-provider-parity/provider_parity_closure_decision.json.path_proof.txt` *(governed path-proof for the OPS-01 closure decision artifact)*  
+* `audit/ops/hde-epic032/db-provider-parity/provider_parity.proof.json` *(provider parity proof showing active rows `grants`, `search_path`, `select_one`, and `ddl_fingerprint` are non-skipped and match)*  
+* `audit/ops/hde-epic032/db-provider-parity/bridge_consistency_result.txt` *(bridge consistency proof recording command, exit code 0, result `PASS`, active corpus, and all row parity values as match)*  
+* `audit/ops/hde-epic032/db-provider-parity/parity_scope_rationale.txt` *(parity scope rationale proving Path A closure by all active corpus rows matching, not by excluding `ddl_fingerprint`)*  
+* `audit/ops/hde-epic032/db-provider-parity/non_claims.txt` *(non-claim posture proof that OPS-01 does not claim QA PASS, PF09 status move, epic closure, or acceptance-token satisfaction for DB proof labels)*  
+* `audit/ops/hde-epic032/db-provider-parity/ops01_final_report.txt` *(human-readable final OPS evidence summary for provider parity closure-candidate posture)*  
+* `audit/ops/hde-epic032/db-provider-parity/created_files_sha256.txt` *(checksum ledger covering the closure decision, provider parity proof, bridge consistency result, non-claims, and support files)*  
+* `audit/ops/hde-epic032/db-provider-parity/commands.txt` *(execution command transcript for DB posture and provider parity capture)*  
+* `audit/ops/hde-epic032/db-provider-parity/stdout.log` *(stdout capture; empty stdout supports clean execution and secret-safe posture)*  
+* `audit/ops/hde-epic032/db-provider-parity/stderr.log` *(stderr capture; empty stderr supports clean execution and secret-safe posture)*  
+* `audit/ops/hde-epic032/db-provider-parity/exit_codes.txt` *(exit-code capture for OPS-01 provider parity execution)*  
+* `audit/ops/hde-epic032/db-provider-parity/redacted_env_presence.txt` *(target environment and presence-only `DATABASE_URL` and `DB_BRIDGE_URL` posture; no secret values)*  
+* `audit/ops/hde-epic032/db-provider-parity/adapter_selection.snapshot.json` *(provider availability and selection posture evidence carried by the OPS-01 closure packet)*  
+* `audit/ops/hde-epic032/db-provider-parity/env_connectivity.snapshot.json` *(environment connectivity and selection-order evidence carried by the OPS-01 closure packet)*  
+* OPS-01 provider parity closure is acceptable as OPS evidence only. It does not by itself claim QA PASS, PF09 status movement, HDE-FERM004.2 status movement, epic closure, DB proof-label acceptance-token satisfaction, or public Reader behavior.
+
+#### **D.11ac EPIC032 PR-04 non-dev typed DB failure and evidence-coherence proof anchors**
+
+* `artifacts/runtime/env_connectivity.nondev_failure.json` *(canonical JSON non-dev total-failure proof for `APP_ENV=stage`, no proactive probes, numeric-free public failure posture, secret-free posture, observed selection order `["psycopg","bridge"]`, and typed `BridgeUnavailable` / `missing_bridge_url` failure)*  
+* `artifacts/runtime/env_connectivity.nondev_failure.json.path_proof.txt` *(governed path-proof for the non-dev total-failure proof)*  
+* `artifacts/runtime/env_connectivity.snapshot.json` *(existing runtime env connectivity snapshot carried forward in the PR-04 DB posture evidence family)*  
+* `artifacts/runtime/env_connectivity.snapshot.json.path_proof.txt` *(governed path-proof for the runtime env connectivity snapshot)*  
+* `artifacts/db_bridge/adapter_selection.snapshot.json` *(adapter selection snapshot carried forward from prior DBAccess provider-selection evidence)*  
+* `artifacts/db_bridge/adapter_selection.snapshot.json.path_proof.txt` *(governed path-proof for the adapter selection snapshot)*  
+* `artifacts/db_bridge/provider_parity.proof.json` *(provider parity and bridge evidence row carried forward with `JSON_CANONICAL_CHECK_OK` and proof-label notes, not unsupported acceptance tokens)*  
+* `artifacts/db_bridge/provider_parity.proof.json.path_proof.txt` *(governed path-proof for the provider parity proof)*  
+* `audit/ops/hde-epic032/db-provider-parity/provider_parity_closure_decision.json` *(OPS-01 provider parity closure evidence indexed as OPS evidence only)*  
+* `audit/ops/hde-epic032/db-provider-parity/provider_parity_closure_decision.json.path_proof.txt` *(governed path-proof for the OPS-01 provider parity closure evidence)*  
+* `tools/evidence/generate_db_bridge_parity.py` *(governed generator for PR-04 non-dev total-failure evidence, including fail-closed behavior when success, typed error class or code, snapshot, or attempt-order expectations deviate)*  
+* `tests/evidence/test_generate_db_bridge_parity_nondev.py` *(evidence regression proof for non-dev stage posture, observed attempt order, and typed `BridgeUnavailable` / `missing_bridge_url`)*  
+* `tests/db/test_adapter_selection.py` *(adapter-selection regression proof for stage missing-config and prod guard total-failure behavior with typed errors)*  
+* `tools/evidence/update_evidence_index.py` *(single-writer evidence-index tooling that loads PR-04 primary artifact rows, including non-dev failure and OPS-01 closure-decision rows, into the Human Evidence Index and Machine Evidence Mirror entry set)*  
+* `docs/evidence/INDEX.json` *(Human Evidence Index carrying HDE-EPIC032 PR-04 evidence rows)*  
+* `docs/evidence/INDEX.sha256` *(hash sentinel refreshed for the HDE-EPIC032 PR-04 Human Evidence Index update)*  
+* `docs/evidence/INDEX.json.path_proof.txt` *(governed path-proof for the Human Evidence Index update)*  
+* `docs/evidence/INDEX.sha256.path_proof.txt` *(governed path-proof for the Human Evidence Index hash sentinel update)*  
+* `artifacts/evidence_index.jsonl` *(Machine Evidence Mirror carrying PR-04 non-dev failure and OPS-01 closure-decision records)*  
+* `artifacts/evidence_index.jsonl.sha256` *(hash sentinel refreshed for the HDE-EPIC032 PR-04 Machine Evidence Mirror update)*  
+* `artifacts/evidence_index.jsonl.path_proof.txt` *(governed path-proof for the Machine Evidence Mirror update)*  
+* `artifacts/evidence_index.jsonl.sha256.path_proof.txt` *(governed path-proof for the Machine Evidence Mirror hash sentinel update)*  
+* PR-04 evidence binds OPS-01 provider parity closure as OPS evidence only. It does not convert OPS-01 into QA evidence, PF09 status movement, epic closure, or unregistered DB provider or bridge proof-label token satisfaction.  
+* PR-04 non-dev typed DB failure evidence does not create a new public Reader route, public Reader field, public transport contract, or Vendor ingest endpoint.  
+* For PF05 evidence-anchor reading, **D.11aa**, **D.11ab**, and **D.11ac** form the combined proof chain for `HDE-FERM004.2`: PR-03 supplies DB bridge fallback, bridge capability proof, deterministic provider-parity harnessing, false-PASS parity guards, evidence-index binding, and CI remediation; OPS-01 supplies provider-parity closure as OPS evidence; PR-04 supplies non-dev typed DB failure behavior, evidence coherence, and OPS-01 binding. This combined proof-chain note does not edit PF09.5 status, claim QA PASS, claim epic closure, claim live vendor behavior, or convert DB proof labels into acceptance tokens.  
+* DB provider and bridge proof-label posture for PF05 evidence anchors: `DB_PROVIDER_PARITY_OK`, `DB_BRIDGE_CAPS_OK`, and `DB_BRIDGE_FALLBACK_OK` are non-token proof labels unless HDE-Governance admits them or Build Notes mints them pending drainage. `DEV_DB_BRIDGE_FALLBACK_OK` remains canonical only for scoped dev fallback. PF05 evidence rows MUST NOT treat those DB provider or bridge proof labels as acceptance tokens by inference, Machine Mirror row membership, OPS-01 closure, QA PASS, or PF09.5 supportability language.
+
+#### **D.11ad EPIC032 Live QA proof anchors for Step-0A and Step-0B**
+
+* **Step-0A discovery posture and Live QA harness setup**  
+  * `audit/qa/hde-epic032/00_meta/live_qa_harness.py` *(QA-created harness used for HDE-EPIC032 Live QA Step-0A and Step-0B execution)*  
+  * `audit/qa/hde-epic032/checks/step-0a-discovery/primary.log` *(canonical step receipt for Step-0A PASS evidence under closed rails and deterministic pins)*  
+  * `audit/qa/hde-epic032/checks/step-0a-discovery/primary.log.path_proof.txt` *(governed path-proof for the Step-0A primary log)*  
+  * `audit/qa/hde-epic032/checks/step-0a-discovery/result.json` *(Step-0A result sidecar proving QA root creation, listed repo loci discovery, status PASS, and exit code 0\)*  
+  * `audit/qa/hde-epic032/checks/step-0a-discovery/remediation_provenance.md` *(same-stream remediation provenance for the bounded Step-0A harness correction)*  
+  * `audit/qa/hde-epic032/00_meta/delta/changed_files.txt` *(bounded Moon Loop changed-files capture for the Step-0A harness correction)*  
+  * `audit/qa/hde-epic032/00_meta/delta/changed_files.sha256` *(hash capture for the bounded Step-0A harness correction)*  
+  * `audit/qa/hde-epic032/00_meta/delta/remediation_note.txt` *(remediation note recording the corrected `live_qa_harness.py` placeholder body and why it changed)*  
+  * `audit/qa/hde-epic032/00_meta/delta/failure_signature.txt` *(failure-signature capture for the Step-0A placeholder-body syntax failure)*  
+* **Step-0B doc-delta capture**  
+  * `audit/docdeltas/hde-epic032_doc_deltas.md` *(repo-root doc-delta surface containing BLOCKERS and CAVEATS headings and the Step-0A correction note)*  
+  * `audit/qa/hde-epic032/00_meta/doc_deltas.md` *(QA-root doc-delta surface containing BLOCKERS and CAVEATS headings and the Step-0A correction note)*  
+  * `audit/qa/hde-epic032/checks/step-0b-doc-delta/primary.log` *(canonical step receipt for Step-0B PASS evidence)*  
+  * `audit/qa/hde-epic032/checks/step-0b-doc-delta/primary.log.path_proof.txt` *(governed path-proof for the Step-0B primary log)*  
+  * `audit/qa/hde-epic032/checks/step-0b-doc-delta/result.json` *(Step-0B result sidecar proving draft and capture surfaces exist and required headings are present)*  
+* **Step manifest**  
+  * `audit/qa/hde-epic032/qa_step_logs_manifest.json` *(current-state QA step manifest recording Step-0A and Step-0B PASS entries and log paths)*  
+  * `audit/qa/hde-epic032/qa_step_logs_manifest.json.path_proof.txt` *(governed path-proof for the HDE-EPIC032 QA step manifest)*  
+* Step-0A and Step-0B remain tokenless Live QA evidence. Their primary headers record `intended_tokens: []` and `claimed_tokens: []`. The bounded Moon Loop correction is QA-harness correction evidence only and does not create PF05 product bytes, public Reader expansion, acceptance-token satisfaction, PF09 drainage, or epic closeout.
+
+#### **D.11ae EPIC032 Live QA proof anchors for PO-001 to PO-003**
+
+* **PO-001 Fermentation Pass 3 scope boundary**  
+  * `audit/qa/hde-epic032/checks/po-001/primary.log` *(canonical step receipt for PO-001 PASS evidence under closed rails and deterministic pins)*  
+  * `audit/qa/hde-epic032/checks/po-001/primary.log.path_proof.txt` *(governed path-proof for the PO-001 primary log)*  
+  * `audit/qa/hde-epic032/checks/po-001/result.json` *(PO-001 result sidecar proving Reader and dev Reader catalog surfaces visible, OPS evidence not treated as QA PASS by itself, and DB proof labels not treated as acceptance tokens)*  
+* **PO-002 router determinism and identity**  
+  * `audit/qa/hde-epic032/checks/po-002/primary.log` *(canonical step receipt for PO-002 PASS evidence under closed rails and deterministic pins)*  
+  * `audit/qa/hde-epic032/checks/po-002/primary.log.path_proof.txt` *(governed path-proof for the PO-002 primary log)*  
+  * `audit/qa/hde-epic032/checks/po-002/result.json` *(PO-002 result sidecar proving router tests return exit code 0, key-table evidence exists, and AB↔BA parity evidence exists)*  
+* **PO-003 keys-only and Reader non-expansion**  
+  * `audit/qa/hde-epic032/checks/po-003/primary.log` *(canonical step receipt for PO-003 PASS evidence under closed rails and deterministic pins)*  
+  * `audit/qa/hde-epic032/checks/po-003/primary.log.path_proof.txt` *(governed path-proof for the PO-003 primary log)*  
+  * `audit/qa/hde-epic032/checks/po-003/result.json` *(PO-003 result sidecar proving router key-table evidence remains keys-only, Reader route posture is visible and not expanded into a new proof route, and APP\_ENV gating is visible for internal/dev surfaces)*  
+* **Manifest and primary-header trust proof**  
+  * `audit/qa/hde-epic032/qa_step_logs_manifest.json` *(current-state manifest proving PO-001, PO-002, and PO-003 entries with PASS status and check-scoped primary-log paths)*  
+  * `audit/qa/hde-epic032/qa_step_logs_manifest.json.path_proof.txt` *(governed path-proof for the manifest used by PO-001 through PO-003)*  
+* PO-001, PO-002, and PO-003 remain tokenless Live QA evidence. Their primary headers record `captured_env`, `evidence_artifacts`, `intended_tokens: []`, and `claimed_tokens: []`. These checks do not claim acceptance-token satisfaction, final QA outcome, PF09.5 drainage, or epic closeout by themselves.
+
+#### **D.11af EPIC032 Live QA proof anchors for PO-004 to PO-006**
+
+* **PO-004 narrative-router identity**  
+  * `audit/qa/hde-epic032/checks/po-004/primary.log` *(canonical step receipt for PO-004 PASS evidence under closed rails and deterministic pins)*  
+  * `audit/qa/hde-epic032/checks/po-004/primary.log.path_proof.txt` *(governed path-proof for the PO-004 primary log)*  
+  * `audit/qa/hde-epic032/checks/po-004/result.json` *(PO-004 result sidecar proving router pytest exit code 0, AB↔BA or identity marker evidence exists, and six router tests passed)*  
+  * `artifacts/narratives/router/parity_abba.log` *(router identity evidence relied on by PO-004; full PR-01 anchor is listed in D.11y)*  
+* **PO-005 registry diff and pack identity**  
+  * `audit/qa/hde-epic032/checks/po-005/primary.log` *(canonical step receipt for PO-005 PASS evidence under closed rails and deterministic pins)*  
+  * `audit/qa/hde-epic032/checks/po-005/primary.log.path_proof.txt` *(governed path-proof for the PO-005 primary log)*  
+  * `audit/qa/hde-epic032/checks/po-005/result.json` *(PO-005 result sidecar proving registry generator check returns exit code 0, registry diff is bound to HDE-EPIC032, and pack identity posture is recorded)*  
+  * `audit/gates/narratives/registry.diff.json` *(registry diff evidence relied on by PO-005; full PR-02 anchor is listed in D.11z)*  
+  * `audit/gates/narratives/pack_identity.txt` *(pack identity evidence relied on by PO-005; full PR-02 anchor is listed in D.11z)*  
+* **PO-006 registry non-overclaim**  
+  * `audit/qa/hde-epic032/checks/po-006/primary.log` *(canonical step receipt for PO-006 PASS evidence under closed rails and deterministic pins)*  
+  * `audit/qa/hde-epic032/checks/po-006/primary.log.path_proof.txt` *(governed path-proof for the PO-006 primary log)*  
+  * `audit/qa/hde-epic032/checks/po-006/result.json` *(PO-006 result sidecar proving unsupported registry token claims were not seen, required missing items are empty, and behavior failures are empty)*  
+  * `audit/gates/narratives/keys_10x4.table.json` *(keys-only roster evidence relied on by PO-006; full PR-01 anchor is listed in D.11y)*  
+* **Manifest and token-header trust proof**  
+  * `audit/qa/hde-epic032/qa_step_logs_manifest.json` *(current-state manifest proving PO-004, PO-005, and PO-006 PASS entries with check-scoped primary-log paths and path-proof references)*  
+  * `audit/qa/hde-epic032/qa_step_logs_manifest.json.path_proof.txt` *(governed path-proof for the manifest used by PO-004 through PO-006)*  
+* PO-004, PO-005, and PO-006 remain tokenless Live QA evidence. Their primary headers record `intended_tokens: []` and `claimed_tokens: []`. These checks do not claim acceptance-token satisfaction, final QA outcome, PF09.5 drainage, or epic closeout by themselves. The registry evidence does not claim unsupported acceptance semantics, and the router key-table evidence does not overclaim `NARR_REGISTRY_CLOSURE_OK`.
+
+#### **D.11ag EPIC032 Live QA proof anchors for PO-007 to PO-009**
+
+* **PO-007 registry and doc-delta identity**  
+  * `audit/qa/hde-epic032/checks/po-007/primary.log` *(canonical step receipt for PO-007 PASS evidence under closed rails and deterministic pins)*  
+  * `audit/qa/hde-epic032/checks/po-007/primary.log.path_proof.txt` *(governed path-proof for the PO-007 primary log)*  
+  * `audit/qa/hde-epic032/checks/po-007/result.json` *(PO-007 result sidecar proving registry diff binding, doc-delta surface availability, and PASS status)*  
+  * `audit/gates/narratives/registry.diff.json` *(registry diff evidence relied on by PO-007; full PR-02 anchor is listed in D.11z)*  
+  * `audit/docdeltas/hde-epic032_doc_deltas.md` *(doc-delta surface relied on by PO-007; full PR-02 anchor is listed in D.11z)*  
+* **PO-008 DB bridge and provider parity proof-chain**  
+  * `audit/qa/hde-epic032/checks/po-008/primary.log` *(canonical step receipt for PO-008 PASS evidence under closed rails and deterministic pins)*  
+  * `audit/qa/hde-epic032/checks/po-008/primary.log.path_proof.txt` *(governed path-proof for the PO-008 primary log)*  
+  * `audit/qa/hde-epic032/checks/po-008/result.json` *(PO-008 result sidecar proving generator check return code 0, OPS closure status visibility, and PASS status)*  
+  * `tools/evidence/generate_db_bridge_parity.py` *(DB bridge/provider parity generator relied on by PO-008; full PR-03 and PR-04 anchors are listed in D.11aa and D.11ac)*  
+  * `audit/ops/hde-epic032/db-provider-parity/provider_parity_closure_decision.json` *(OPS provider-parity closure evidence relied on by PO-008; full OPS-01 anchor is listed in D.11ab)*  
+* **PO-009 OPS evidence non-claim posture**  
+  * `audit/qa/hde-epic032/checks/po-009/primary.log` *(canonical step receipt for PO-009 PASS evidence under closed rails and deterministic pins)*  
+  * `audit/qa/hde-epic032/checks/po-009/primary.log.path_proof.txt` *(governed path-proof for the PO-009 primary log)*  
+  * `audit/qa/hde-epic032/checks/po-009/result.json` *(PO-009 result sidecar proving OPS status visibility, OPS QA PASS non-claim posture, and PASS status)*  
+  * OPS provider parity evidence remains support evidence only for PO-009. It does not become QA success, checklist completion, PF09.5 drainage, acceptance-token satisfaction, or epic closure by itself.  
+* **Manifest, header, and tokenless posture for PO-007 to PO-009**  
+  * `audit/qa/hde-epic032/qa_step_logs_manifest.json` *(current-state manifest proving PO-007, PO-008, and PO-009 entries with PASS status and check-scoped primary-log paths)*  
+  * `audit/qa/hde-epic032/qa_step_logs_manifest.json.path_proof.txt` *(governed path-proof for the manifest used by PO-007 through PO-009)*  
+  * PO-007, PO-008, and PO-009 remain tokenless Live QA evidence. Their primary headers record `captured_env`, `evidence_artifacts`, `intended_tokens: []`, and `claimed_tokens: []`. These checks do not claim acceptance-token satisfaction, final QA outcome, PF09.5 drainage, or epic closeout by themselves.
+
+#### **D.11ah EPIC032 Live QA proof anchors for PO-010 to PO-012**
+
+* **PO-010 structural selection-order proof**  
+  * `audit/qa/hde-epic032/checks/po-010/primary.log` *(canonical step receipt for final PO-010 PASS evidence after PR-routed selection-order remediation)*  
+  * `audit/qa/hde-epic032/checks/po-010/primary.log.path_proof.txt` *(governed path-proof for the PO-010 primary log)*  
+  * `audit/qa/hde-epic032/checks/po-010/result.json` *(PO-010 result sidecar proving PASS status, no required-missing entries, no behavior failures, and tokenless primary-header posture)*  
+  * `artifacts/db_bridge/adapter_selection.snapshot.json` *(structural `selection_order` evidence relied on by PO-010; `selection_order` must match observed attempt providers)*  
+  * `artifacts/db_bridge/provider_parity.proof.json` *(provider-parity proof-label posture relied on by PO-010; DB proof labels remain non-token proof labels)*  
+  * `tools/evidence/generate_db_bridge_parity.py` *(PR-routed generator remediation relied on by PO-010 to stabilize structural selection-order evidence)*  
+* **PO-011 current-state PASS proof**  
+  * `audit/qa/hde-epic032/checks/po-011/primary.log` *(canonical step receipt for PO-011 PASS evidence under closed rails and deterministic pins)*  
+  * `audit/qa/hde-epic032/checks/po-011/primary.log.path_proof.txt` *(governed path-proof for the PO-011 primary log)*  
+  * `audit/qa/hde-epic032/checks/po-011/result.json` *(PO-011 result sidecar proving PASS status, no required-missing entries, no behavior failures, and tokenless primary-header posture)*  
+* **PO-012 regenerated DB bridge evidence proof**  
+  * `audit/qa/hde-epic032/checks/po-012/primary.log` *(canonical step receipt for final PO-012 PASS evidence after governed DB bridge evidence regeneration)*  
+  * `audit/qa/hde-epic032/checks/po-012/primary.log.path_proof.txt` *(governed path-proof for the PO-012 primary log)*  
+  * `audit/qa/hde-epic032/checks/po-012/result.json` *(PO-012 result sidecar proving final PASS status, no required-missing entries, no behavior failures, and tokenless primary-header posture)*  
+  * A brief PO-012 `TOOLING_BLOCKED` state caused by missing `artifacts/db_bridge/adapter_selection.snapshot.json` during refresh is non-blocking only after governed regeneration via `tools/evidence/generate_db_bridge_parity.py` restores the final current-state PASS result.  
+* **PR-routed remediation and tokenless posture for PO-010 to PO-012**  
+  * `audit/qa/hde-epic032/remediation/moon_loop/patch.diff` *(remediation package artifact recorded for the PO-010 through PO-012 review)*  
+  * `audit/qa/hde-epic032/remediation/moon_loop/boundary_classification.md` *(boundary-classification artifact recording that non-QA-root generator remediation is PR-routed remediation, not bounded Moon Loop-only correction)*  
+  * `audit/qa/hde-epic032/qa_step_logs_manifest.json` *(current-state manifest proving PO-010, PO-011, and PO-012 entries with PASS status and check-scoped primary-log paths)*  
+  * `audit/qa/hde-epic032/qa_step_logs_manifest.json.path_proof.txt` *(governed path-proof for the manifest used by PO-010 through PO-012)*  
+  * PO-010, PO-011, and PO-012 remain tokenless Live QA evidence. Their primary headers record `captured_env`, `evidence_artifacts`, `intended_tokens: []`, and `claimed_tokens: []`. These checks do not claim acceptance-token satisfaction, final QA outcome, PF09.5 drainage, or epic closeout by themselves.
+
+#### **D.11ai EPIC032 Live QA proof anchors for PO-013 to PO-015**
+
+* **PO-013 evidence-index coherence**  
+  * `audit/qa/hde-epic032/checks/po-013/primary.log` *(canonical step receipt for PO-013 PASS evidence under closed rails and deterministic pins)*  
+  * `audit/qa/hde-epic032/checks/po-013/primary.log.path_proof.txt` *(governed path-proof for the PO-013 primary log)*  
+  * `audit/qa/hde-epic032/checks/po-013/result.json` *(PO-013 result sidecar proving PASS status, required-missing empty, Human Index present, Machine Mirror present, and command checks returning 0\)*  
+  * `docs/evidence/INDEX.json` *(Human Evidence Index proof anchor relied on by PO-013)*  
+  * `artifacts/evidence_index.jsonl` *(Machine Evidence Mirror proof anchor relied on by PO-013)*  
+* **PO-014 Human Index and Machine Mirror alignment**  
+  * `audit/qa/hde-epic032/checks/po-014/primary.log` *(canonical step receipt for PO-014 PASS evidence under closed rails and deterministic pins)*  
+  * `audit/qa/hde-epic032/checks/po-014/primary.log.path_proof.txt` *(governed path-proof for the PO-014 primary log)*  
+  * `audit/qa/hde-epic032/checks/po-014/result.json` *(PO-014 result sidecar proving PASS status, required-missing empty, Human and Machine evidence loci present, and command checks returning 0\)*  
+  * `docs/evidence/INDEX.json` *(Human Evidence Index proof anchor relied on by PO-014)*  
+  * `artifacts/evidence_index.jsonl` *(Machine Evidence Mirror proof anchor relied on by PO-014)*  
+* **PO-015 generated-proof fail-closed checks**  
+  * `audit/qa/hde-epic032/checks/po-015/primary.log` *(canonical step receipt for PO-015 PASS evidence under closed rails and deterministic pins)*  
+  * `audit/qa/hde-epic032/checks/po-015/primary.log.path_proof.txt` *(governed path-proof for the PO-015 primary log)*  
+  * `audit/qa/hde-epic032/checks/po-015/result.json` *(PO-015 result sidecar proving PASS status, required-missing empty, all commands green, and command checks returning 0\)*  
+  * `tools/evidence/generate_narrative_registry_diff.py` *(generated-proof fail-closed command target relied on by PO-015)*  
+  * `tools/evidence/generate_db_bridge_parity.py` *(generated-proof fail-closed command target relied on by PO-015)*  
+* **Manifest and tokenless posture for PO-013 to PO-015**  
+  * `audit/qa/hde-epic032/qa_step_logs_manifest.json` *(current-state manifest proving PO-013, PO-014, and PO-015 entries with PASS status and check-scoped primary-log paths)*  
+  * `audit/qa/hde-epic032/qa_step_logs_manifest.json.path_proof.txt` *(governed path-proof for the manifest used by PO-013 through PO-015)*  
+  * PO-013, PO-014, and PO-015 remain tokenless Live QA evidence. Their primary headers record `captured_env`, `evidence_artifacts`, `intended_tokens: []`, and `claimed_tokens: []`. These checks do not claim acceptance-token satisfaction, final QA outcome, PF09.5 drainage, or epic closeout by themselves.
+
+#### **D.11aj EPIC032 Live QA proof anchors for PO-016 to PO-018**
+
+* **PO-016 DB proof-label non-token posture**  
+  * `audit/qa/hde-epic032/checks/po-016/primary.log` *(canonical step receipt for PO-016 PASS evidence under closed rails and deterministic pins)*  
+  * `audit/qa/hde-epic032/checks/po-016/primary.log.path_proof.txt` *(governed path-proof for the PO-016 primary log)*  
+  * `audit/qa/hde-epic032/checks/po-016/result.json` *(PO-016 result sidecar proving PASS status, DB proof-label token overclaim not detected, no required-missing entries, and no behavior failures)*  
+  * `artifacts/db_bridge/provider_parity.proof.json` *(DB provider parity proof anchor relied on by PO-016; DB proof labels remain non-token proof labels unless Governance registers them)*  
+* **PO-017 dev bridge fallback scope**  
+  * `audit/qa/hde-epic032/checks/po-017/primary.log` *(canonical step receipt for PO-017 PASS evidence under closed rails and deterministic pins)*  
+  * `audit/qa/hde-epic032/checks/po-017/primary.log.path_proof.txt` *(governed path-proof for the PO-017 primary log)*  
+  * `audit/qa/hde-epic032/checks/po-017/result.json` *(PO-017 result sidecar proving PASS status, fallback-scope checking, no required-missing entries, and no behavior failures)*  
+  * `artifacts/db_bridge/adapter_selection.snapshot.json` *(DB bridge fallback and adapter-selection proof anchor relied on by PO-017)*  
+* **PO-018 active evidence families and PF09 drainage non-claim**  
+  * `audit/qa/hde-epic032/checks/po-018/primary.log` *(canonical step receipt for PO-018 PASS evidence under closed rails and deterministic pins)*  
+  * `audit/qa/hde-epic032/checks/po-018/primary.log.path_proof.txt` *(governed path-proof for the PO-018 primary log)*  
+  * `audit/qa/hde-epic032/checks/po-018/result.json` *(PO-018 result sidecar proving PASS status, active evidence families present, PF09 drainage not claimed, no required-missing entries, and no behavior failures)*  
+  * `audit/ops/hde-epic032/db-provider-parity/provider_parity_closure_decision.json` *(OPS support evidence locus relied on by PO-018; OPS evidence does not by itself claim PF09.5 drainage or epic closure)*  
+* **Manifest, path-proof, and tokenless posture for PO-016 to PO-018**  
+  * `audit/qa/hde-epic032/qa_step_logs_manifest.json` *(current-state manifest proving PO-016, PO-017, and PO-018 entries with PASS status and check-scoped primary-log paths)*  
+  * `audit/qa/hde-epic032/qa_step_logs_manifest.json.path_proof.txt` *(governed path-proof for the manifest used by PO-016 through PO-018)*  
+  * PO-016, PO-017, and PO-018 remain tokenless Live QA evidence. Their primary headers record `captured_env`, `evidence_artifacts`, `intended_tokens: []`, and `claimed_tokens: []`. These checks do not claim acceptance-token satisfaction, final QA outcome, PF09.5 drainage, or epic closeout by themselves.
+
+#### **D.11ak EPIC032 Live QA proof anchors for PO-019 to PO-021**
+
+* **PO-019 reused-foundation posture**  
+  * `audit/qa/hde-epic032/checks/po-019/primary.log` *(canonical step receipt for PO-019 PASS evidence under closed rails and deterministic pins)*  
+  * `audit/qa/hde-epic032/checks/po-019/primary.log.path_proof.txt` *(governed path-proof for the PO-019 primary log)*  
+  * `audit/qa/hde-epic032/checks/po-019/result.json` *(PO-019 result sidecar proving reused foundation checked from repo docs, no required-missing entries, no behavior failures, and PASS status)*  
+* **PO-020 truth-class separation**  
+  * `audit/qa/hde-epic032/checks/po-020/primary.log` *(canonical step receipt for PO-020 PASS evidence under closed rails and deterministic pins)*  
+  * `audit/qa/hde-epic032/checks/po-020/primary.log.path_proof.txt` *(governed path-proof for the PO-020 primary log)*  
+  * `audit/qa/hde-epic032/checks/po-020/result.json` *(PO-020 result sidecar proving OPS evidence, QA result, PF09.5 drainage, and final closeout remain separate truth classes)*  
+* **PO-021 vendor-version runtime conformance non-claim**  
+  * `audit/qa/hde-epic032/checks/po-021/primary.log` *(canonical step receipt for PO-021 PASS evidence under closed rails and deterministic pins)*  
+  * `audit/qa/hde-epic032/checks/po-021/primary.log.path_proof.txt` *(governed path-proof for the PO-021 primary log)*  
+  * `audit/qa/hde-epic032/checks/po-021/result.json` *(PO-021 result sidecar proving vendor-version runtime conformance is not claimed and PASS status is limited to the reviewed proof lane)*  
+* **Manifest, path-proof, and tokenless posture for PO-019 to PO-021**  
+  * `audit/qa/hde-epic032/qa_step_logs_manifest.json` *(current-state manifest proving PO-019, PO-020, and PO-021 entries with PASS status and check-scoped primary-log paths)*  
+  * `audit/qa/hde-epic032/qa_step_logs_manifest.json.path_proof.txt` *(governed path-proof for the manifest used by PO-019 through PO-021)*  
+  * PO-019, PO-020, and PO-021 remain tokenless Live QA evidence. Their primary headers record `captured_env`, `evidence_artifacts`, `intended_tokens: []`, and `claimed_tokens: []`. These checks do not claim acceptance-token satisfaction, final QA outcome, PF09.5 drainage, vendor-version runtime conformance, or epic closeout by themselves.
+
+#### **D.11al EPIC032 Live QA proof anchors for PO-022 to PO-024**
+
+* **PO-022 live-provider behavior non-claim**  
+  * `audit/qa/hde-epic032/checks/po-022/primary.log` *(canonical step receipt for PO-022 PASS evidence under closed rails and deterministic pins)*  
+  * `audit/qa/hde-epic032/checks/po-022/primary.log.path_proof.txt` *(governed path-proof for the PO-022 primary log)*  
+  * `audit/qa/hde-epic032/checks/po-022/result.json` *(PO-022 result sidecar proving live provider behavior is not claimed, no required-missing entries, no behavior failures, and PASS status)*  
+* **PO-023 public Reader non-expansion**  
+  * `audit/qa/hde-epic032/checks/po-023/primary.log` *(canonical step receipt for PO-023 PASS evidence under closed rails and deterministic pins)*  
+  * `audit/qa/hde-epic032/checks/po-023/primary.log.path_proof.txt` *(governed path-proof for the PO-023 primary log)*  
+  * `audit/qa/hde-epic032/checks/po-023/result.json` *(PO-023 result sidecar proving `/reader` remains visible, the invented proof route is absent, no required-missing entries exist, and public Reader non-expansion posture holds)*  
+* **PO-024 proof-only Live QA role**  
+  * `audit/qa/hde-epic032/checks/po-024/primary.log` *(canonical step receipt for PO-024 PASS evidence under closed rails and deterministic pins)*  
+  * `audit/qa/hde-epic032/checks/po-024/primary.log.path_proof.txt` *(governed path-proof for the PO-024 primary log)*  
+  * `audit/qa/hde-epic032/checks/po-024/result.json` *(PO-024 result sidecar proving Live QA planning or execution did not perform implementation, PF edits, closeout action, route edits, Reader adapter edits, public payload edits, public flag edits, or evidence-index/token-map edits)*  
+* **Manifest, path-proof, tokenless posture, and non-expansion posture for PO-022 to PO-024**  
+  * `audit/qa/hde-epic032/qa_step_logs_manifest.json` *(current-state manifest proving PO-022, PO-023, and PO-024 entries with PASS status and check-scoped primary-log paths)*  
+  * `audit/qa/hde-epic032/qa_step_logs_manifest.json.path_proof.txt` *(governed path-proof for the manifest used by PO-022 through PO-024)*  
+  * PO-022, PO-023, and PO-024 remain tokenless Live QA evidence. Their primary headers record `captured_env`, `evidence_artifacts`, `intended_tokens: []`, and `claimed_tokens: []`. These checks do not claim acceptance-token satisfaction, final QA outcome, PF09.5 drainage, live-provider behavior, public Reader route expansion, public Reader flag expansion, public payload expansion, PF edits, or epic closeout by themselves.
 
 ### **D.12 BodyGraph adapter data-source & invariance (PF10-AA)**
 

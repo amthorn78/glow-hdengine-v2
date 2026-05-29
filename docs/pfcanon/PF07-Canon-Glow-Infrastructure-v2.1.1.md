@@ -1,12 +1,12 @@
 # **0\. Front Matter**
 
 **Title:** PF07-Canon-Glow-Infrastructure  
-**Version:** v2.0
+**Version:** v2.1.1
 
 **Status:** Canon  
-**Effective date:** 2026-05-16
+**Effective date:** 2026-05-28
 
-**Last Update Gate:** BN 10.9.8 A16
+**Last Update Gate:** BN 11.2.7 A24
 
 **Invocation tag:** `INV-f2ac55d77ce9aacc`
 
@@ -813,17 +813,19 @@ This section lists **domain names and DNS roles in use across Glow**. It is **na
 ## **7.0 Runtime posture (normative)**
 
 * **Connection precedence (env-aware)**  
-   • **Prod (guarded):** select **DATABASE\_URL**; the HTTPS bridge is **disabled by default**. Enable **only** when `DB_ALLOW_BRIDGE_IN_PROD=1`; otherwise return a typed error.  
-   • **Stage/Test & Dev:** select by availability with fallback: `DATABASE_URL → DB_BRIDGE_URL(https) → typed error`. If `DATABASE_URL` is present but unusable in dev, automatically fall back to `DB_BRIDGE_URL` and proceed.  
-   • **No proactive probe:** do not run test queries pre-selection; on total failure return a deterministic, numeric-free error.  
-   • **Evidence (dev fallback only):** capture `artifacts/runtime/env_connectivity.snapshot.json` recording attempts and selection; index with the human Evidence Index and machine mirror in the same PR.
+  * **Prod (guarded):** select **DATABASE\_URL**; the HTTPS bridge is **disabled by default**. Enable **only** when `DB_ALLOW_BRIDGE_IN_PROD=1`; otherwise return a typed error.  
+  * **Production-like APP\_ENV aliases:** `prod`, `production`, and `live` are production-like `APP_ENV` values for DB bridge fallback guarding. They use the same `DATABASE_URL`\-first / bridge-disabled-by-default posture as Prod unless `DB_ALLOW_BRIDGE_IN_PROD=1` is explicitly set.  
+  * **Stage/Test & Dev:** select by availability with fallback: `DATABASE_URL → DB_BRIDGE_URL(https) → typed error`. If `DATABASE_URL` is present but unusable in dev, automatically fall back to `DB_BRIDGE_URL` and proceed.  
+  * **Stage APP\_ENV example:** `APP_ENV=stage` is a stage/test value for non-dev typed failure evidence. It is not a production-like alias and must not use production guard posture. Production-like aliases remain `prod`, `production`, and `live`.  
+  * **No proactive probe:** do not run test queries pre-selection; on total failure return a deterministic, numeric-free error.  
+  * **Evidence (dev fallback only):** capture `artifacts/runtime/env_connectivity.snapshot.json` recording attempts and selection; index with the human Evidence Index and machine mirror in the same PR.
 
 * **Runtime search\_path**  
-   • `hde, public` (unquoted; in this order). Verify at startup (emit a `SHOW search_path` echo in ops logs). Pin at the ROLE level.
+  *  `hde, public` (unquoted; in this order). Verify at startup (emit a `SHOW search_path` echo in ops logs). Pin at the ROLE level.
 
 * **Least-privilege (names-only)**  
-   • `HDE_APP_ROLE` (runtime): USAGE on app schema; SELECT on `hde.meta`; SELECT/INSERT/DELETE on `hde.public_results`; no DDL.  
-   • `HDE_MIGRATOR_ROLE` (DDL): DDL on app schema; no runtime data access.
+  * `HDE_APP_ROLE` (runtime): USAGE on app schema; SELECT on `hde.meta`; SELECT/INSERT/DELETE on `hde.public_results`; no DDL.  
+  * `HDE_MIGRATOR_ROLE` (DDL): DDL on app schema; no runtime data access.
 
 * **Evidence (titles-only)**  
    Capture: connection echo; search\_path echo; roles/grants snapshot; canonical DDL dump \+ SHA-256 fingerprint; env-selection proof.  
@@ -1065,10 +1067,8 @@ PF07 records only the key names here and does not define their byte-level behavi
 
 **Notes**
 
-* **Connection precedence:** see §7.0 — non-dev selects by presence (`DATABASE_URL → DB_BRIDGE_URL`); dev falls back to `DB_BRIDGE_URL` if `DATABASE_URL` is unusable.
-
-* **Evidence:** when dev fallback occurs, capture `artifacts/runtime/env_connectivity.snapshot.json` and index it in the human Evidence Index \+ machine mirror in the same PR.
-
+* **Connection precedence:** see §7.0 — production-like `APP_ENV` values (`prod`, `production`, `live`) select `DATABASE_URL` first and keep `DB_BRIDGE_URL` disabled by default unless `DB_ALLOW_BRIDGE_IN_PROD=1`; stage/test and dev select by availability, and dev falls back to `DB_BRIDGE_URL` if `DATABASE_URL` is present but unusable.  
+* **Evidence:** when dev fallback occurs, capture `artifacts/runtime/env_connectivity.snapshot.json` and index it in the human Evidence Index \+ machine mirror in the same PR.  
   ---
 
 **Admin writer credentials** (names-only; no values here)
@@ -1262,7 +1262,7 @@ Keep verbatim — this is the source of truth as configured in Railway.
 
 The authoritative listing of evidence artifacts (titles/paths) and governed record types is owned by the canonical **Schemas & Artifacts** document (titles-only). **Glow Infrastructure** is names-only: it inventories stable evidence index and mirror file locations used by the repo, but does not define evidence schemas, acceptance rules, or token semantics.
 
-**Multi-root evidence posture (clarification; names-only).** The EPIC025, EPIC030, and EPIC031 audits observe governed or evidence-like outputs stored across multiple roots and root-adjacent homes, including `docs/evidence/`, `artifacts/`, `audit/gates/`, `audit/qa/`, `artifacts/audit/`, `artifacts/proofs/`, `artifacts/ops/internal_version/`, `audit/`, `docs/`, `tools/`, `scripts/`, `catalog/`, `schemas/`, `goldens/`, `fixtures/`, `proofs/`, `parity/`, `reports/`, `scan_reports/`, `validation/`, `narratives/`, `internal/`, and `tests/transport/headers/`. In PF07, “single home” in evidence terms means the single authoritative Evidence Index plus machine mirror parity and the fixed-path governed evidence surfaces enumerated below, not that all evidence bytes or evidence-like snapshots must live under one directory root.
+**Multi-root evidence posture (clarification; names-only).** The EPIC025, EPIC030, EPIC031, and EPIC032 audits observe governed or evidence-like outputs stored across multiple roots and root-adjacent homes, including `docs/evidence/`, `artifacts/`, `audit/gates/`, `audit/qa/`, `artifacts/audit/`, `artifacts/proofs/`, `artifacts/ops/internal_version/`, `audit/`, `docs/`, `tools/`, `scripts/`, `catalog/`, `ci/`, `schemas/`, `goldens/`, `fixtures/`, `proofs/`, `parity/`, `reports/`, `scan_reports/`, `validation/`, `narratives/`, `internal/`, and `tests/transport/headers/`. In PF07, “single home” in evidence terms means the single authoritative Evidence Index plus machine mirror parity and the fixed-path governed evidence surfaces enumerated below, not that all evidence bytes or evidence-like snapshots must live under one directory root.
 
 **Classification note (routing-only).** PF07 records root names and stable paths only. Evidence-family classification and any decision to treat a root as governed evidence vs tooling output is owned by the canonical Schemas & Artifacts document (titles-only).
 
@@ -1428,6 +1428,253 @@ Shared restored DB-bridge evidence surfaces that must not be overwritten by PR-s
 * `artifacts/logs/keys_only.sample.jsonl.path_proof.txt`  
 * `artifacts/ops/rails_open_scope.txt`  
 * `artifacts/ops/rails_open_scope.txt.path_proof.txt`
+
+**EPIC032 PR-slice evidence surfaces (names-only).** The HDE-EPIC032 PR-01 through PR-03 evidence families are implementation-slice evidence families under governed audit and artifact roots. They do not replace, satisfy, or relocate canonical close-pack artifacts.
+
+PR-01 \- narrative router parity and evidence-indexing proof:
+
+* `audit/gates/narratives/keys_10x4.table.json`  
+* `audit/gates/narratives/keys_10x4.table.json.path_proof.txt`  
+* `artifacts/narratives/router/parity_abba.log`  
+* `artifacts/narratives/router/parity_abba.log.path_proof.txt`  
+* `artifacts/narratives/router/cli_http_parity.log`  
+* `artifacts/narratives/router/cli_http_parity.log.path_proof.txt`
+
+PR-02 \- narrative registry diff, pack identity, and Doc-Delta evidence proof:
+
+* `audit/gates/narratives/registry.diff.json`  
+* `audit/gates/narratives/registry.diff.json.path_proof.txt`  
+* `audit/gates/narratives/pack_identity.txt`  
+* `audit/gates/narratives/pack_identity.txt.path_proof.txt`  
+* `audit/docdeltas/hde-epic032_doc_deltas.md`  
+* `audit/docdeltas/hde-epic032_doc_deltas.md.path_proof.txt`
+
+PR-03 \- DB bridge fallback, bridge capability, and provider parity proof:
+
+* `artifacts/db_bridge/adapter_selection.snapshot.json`  
+* `artifacts/db_bridge/adapter_selection.snapshot.json.path_proof.txt`  
+* `artifacts/db_bridge/provider_parity.proof.json`  
+* `artifacts/db_bridge/provider_parity.proof.json.path_proof.txt`  
+* `artifacts/runtime/env_connectivity.snapshot.json`  
+* `artifacts/runtime/env_connectivity.snapshot.json.path_proof.txt`
+
+**EPIC032 PR-04 and OPS-01 DB evidence surfaces (names-only).** The HDE-EPIC032 PR-04 and OPS-01 evidence families are governed evidence surfaces under artifact and audit roots. They do not replace, satisfy, or relocate canonical close-pack artifacts.
+
+PR-04 \- non-dev typed DB failure and DB evidence-coherence proof:
+
+* `artifacts/runtime/env_connectivity.nondev_failure.json`  
+* `artifacts/runtime/env_connectivity.nondev_failure.json.path_proof.txt`  
+* `artifacts/db_bridge/caps.snapshot.json.path_proof.txt`
+
+PR-04 DB posture path-proof refresh surfaces:
+
+* `artifacts/db/boundary_view.readonly.proof.txt.path_proof.txt`  
+* `artifacts/db/check_schema.txt.path_proof.txt`  
+* `artifacts/db/ddl_fingerprint.json.path_proof.txt`  
+* `artifacts/db/grants.txt.path_proof.txt`  
+* `artifacts/db/partition_plan.txt.path_proof.txt`  
+* `artifacts/db/partition_verify.log.path_proof.txt`  
+* `artifacts/db/provider_parity/bridge.json.path_proof.txt`  
+* `artifacts/db/provider_parity/direct.json.path_proof.txt`  
+* `artifacts/db/provider_parity/summary.json.path_proof.txt`
+
+OPS-01 \- DB provider parity closure packet and support artifacts:
+
+* `audit/ops/hde-epic032/db-provider-parity/provider_parity_closure_decision.json`  
+* `audit/ops/hde-epic032/db-provider-parity/provider_parity_closure_decision.json.path_proof.txt`  
+* `audit/ops/hde-epic032/db-provider-parity/provider_parity.proof.json`  
+* `audit/ops/hde-epic032/db-provider-parity/bridge_consistency_result.txt`  
+* `audit/ops/hde-epic032/db-provider-parity/parity_scope_rationale.txt`  
+* `audit/ops/hde-epic032/db-provider-parity/non_claims.txt`  
+* `audit/ops/hde-epic032/db-provider-parity/ops01_final_report.txt`  
+* `audit/ops/hde-epic032/db-provider-parity/created_files_sha256.txt`  
+* `audit/ops/hde-epic032/db-provider-parity/commands.txt`  
+* `audit/ops/hde-epic032/db-provider-parity/stdout.log`  
+* `audit/ops/hde-epic032/db-provider-parity/stderr.log`  
+* `audit/ops/hde-epic032/db-provider-parity/exit_codes.txt`  
+* `audit/ops/hde-epic032/db-provider-parity/redacted_env_presence.txt`  
+* `audit/ops/hde-epic032/db-provider-parity/adapter_selection.snapshot.json`  
+* `audit/ops/hde-epic032/db-provider-parity/env_connectivity.snapshot.json`
+
+**EPIC032 Live QA Step-0A, Step-0B, and po-001 through po-024 check-local evidence surfaces (names-only).** The governed check-local and supporting evidence surfaces for these HDE-EPIC032 QA checks are carried at:
+
+Step-0A \- discovery posture and Live QA harness setup:
+
+* `audit/qa/hde-epic032/00_meta/live_qa_harness.py`  
+* `audit/qa/hde-epic032/checks/step-0a-discovery/primary.log`  
+* `audit/qa/hde-epic032/checks/step-0a-discovery/primary.log.path_proof.txt`  
+* `audit/qa/hde-epic032/checks/step-0a-discovery/result.json`  
+* `audit/qa/hde-epic032/checks/step-0a-discovery/remediation_provenance.md`
+
+Step-0B \- Doc Delta capture:
+
+* `audit/docdeltas/hde-epic032_doc_deltas.md`  
+* `audit/qa/hde-epic032/00_meta/doc_deltas.md`  
+* `audit/qa/hde-epic032/checks/step-0b-doc-delta/primary.log`  
+* `audit/qa/hde-epic032/checks/step-0b-doc-delta/primary.log.path_proof.txt`  
+* `audit/qa/hde-epic032/checks/step-0b-doc-delta/result.json`
+
+HDE-EPIC032 QA step-log manifest surfaces:
+
+* `audit/qa/hde-epic032/qa_step_logs_manifest.json`  
+* `audit/qa/hde-epic032/qa_step_logs_manifest.json.path_proof.txt`
+
+Step-0A bounded Moon Loop remediation provenance surfaces:
+
+* `audit/qa/hde-epic032/00_meta/delta/`  
+* `audit/qa/hde-epic032/00_meta/delta/changed_files.txt`  
+* `audit/qa/hde-epic032/00_meta/delta/changed_files.sha256`  
+* `audit/qa/hde-epic032/00_meta/delta/remediation_note.txt`  
+* `audit/qa/hde-epic032/00_meta/delta/failure_signature.txt`
+
+PO-001 \- Fermentation Pass 3 scope-boundary proof:
+
+* `audit/qa/hde-epic032/checks/po-001/primary.log`  
+* `audit/qa/hde-epic032/checks/po-001/primary.log.path_proof.txt`  
+* `audit/qa/hde-epic032/checks/po-001/result.json`
+
+PO-002 \- narrative-router deterministic key-selection proof:
+
+* `audit/qa/hde-epic032/checks/po-002/primary.log`  
+* `audit/qa/hde-epic032/checks/po-002/primary.log.path_proof.txt`  
+* `audit/qa/hde-epic032/checks/po-002/result.json`
+
+PO-003 \- keys-only router proof and public Reader non-expansion proof:
+
+* `audit/qa/hde-epic032/checks/po-003/primary.log`  
+* `audit/qa/hde-epic032/checks/po-003/primary.log.path_proof.txt`  
+* `audit/qa/hde-epic032/checks/po-003/result.json`
+
+PO-004 \- narrative-router identity proof:
+
+* `audit/qa/hde-epic032/checks/po-004/primary.log`  
+* `audit/qa/hde-epic032/checks/po-004/primary.log.path_proof.txt`  
+* `audit/qa/hde-epic032/checks/po-004/result.json`
+
+PO-005 \- registry diff and pack identity proof:
+
+* `audit/qa/hde-epic032/checks/po-005/primary.log`  
+* `audit/qa/hde-epic032/checks/po-005/primary.log.path_proof.txt`  
+* `audit/qa/hde-epic032/checks/po-005/result.json`
+
+PO-006 \- registry non-overclaim proof:
+
+* `audit/qa/hde-epic032/checks/po-006/primary.log`  
+* `audit/qa/hde-epic032/checks/po-006/primary.log.path_proof.txt`  
+* `audit/qa/hde-epic032/checks/po-006/result.json`
+
+PO-007 \- registry and doc-delta identity proof:
+
+* `audit/qa/hde-epic032/checks/po-007/primary.log`  
+* `audit/qa/hde-epic032/checks/po-007/primary.log.path_proof.txt`  
+* `audit/qa/hde-epic032/checks/po-007/result.json`
+
+PO-008 \- DB bridge and provider parity proof-chain proof:
+
+* `audit/qa/hde-epic032/checks/po-008/primary.log`  
+* `audit/qa/hde-epic032/checks/po-008/primary.log.path_proof.txt`  
+* `audit/qa/hde-epic032/checks/po-008/result.json`
+
+PO-009 \- OPS evidence non-claim proof:
+
+* `audit/qa/hde-epic032/checks/po-009/primary.log`  
+* `audit/qa/hde-epic032/checks/po-009/primary.log.path_proof.txt`  
+* `audit/qa/hde-epic032/checks/po-009/result.json`
+
+PO-010 \- DB bridge structural selection-order proof:
+
+* `audit/qa/hde-epic032/checks/po-010/primary.log`  
+* `audit/qa/hde-epic032/checks/po-010/primary.log.path_proof.txt`  
+* `audit/qa/hde-epic032/checks/po-010/result.json`
+
+PO-010 Moon Loop remediation evidence surfaces:
+
+* `audit/qa/hde-epic032/remediation/moon_loop/patch.diff`  
+* `audit/qa/hde-epic032/remediation/moon_loop/boundary_classification.md`
+
+PO-011 \- generated-proof failure mode proof:
+
+* `audit/qa/hde-epic032/checks/po-011/primary.log`  
+* `audit/qa/hde-epic032/checks/po-011/primary.log.path_proof.txt`  
+* `audit/qa/hde-epic032/checks/po-011/result.json`
+
+PO-012 \- supportability and non-overclaim proof:
+
+* `audit/qa/hde-epic032/checks/po-012/primary.log`  
+* `audit/qa/hde-epic032/checks/po-012/primary.log.path_proof.txt`  
+* `audit/qa/hde-epic032/checks/po-012/result.json`
+
+PO-013 \- evidence-index coherence proof:
+
+* `audit/qa/hde-epic032/checks/po-013/primary.log`  
+* `audit/qa/hde-epic032/checks/po-013/primary.log.path_proof.txt`  
+* `audit/qa/hde-epic032/checks/po-013/result.json`
+
+PO-014 \- human and machine evidence loci proof:
+
+* `audit/qa/hde-epic032/checks/po-014/primary.log`  
+* `audit/qa/hde-epic032/checks/po-014/primary.log.path_proof.txt`  
+* `audit/qa/hde-epic032/checks/po-014/result.json`
+
+PO-015 \- generated-proof command-coherence proof:
+
+* `audit/qa/hde-epic032/checks/po-015/primary.log`  
+* `audit/qa/hde-epic032/checks/po-015/primary.log.path_proof.txt`  
+* `audit/qa/hde-epic032/checks/po-015/result.json`
+
+PO-016 \- DB proof-label token-boundary proof:
+
+* `audit/qa/hde-epic032/checks/po-016/primary.log`  
+* `audit/qa/hde-epic032/checks/po-016/primary.log.path_proof.txt`  
+* `audit/qa/hde-epic032/checks/po-016/result.json`
+
+PO-017 \- bridge fallback-scope proof:
+
+* `audit/qa/hde-epic032/checks/po-017/primary.log`  
+* `audit/qa/hde-epic032/checks/po-017/primary.log.path_proof.txt`  
+* `audit/qa/hde-epic032/checks/po-017/result.json`
+
+PO-018 \- active evidence-family and PF09 drainage non-claim proof:
+
+* `audit/qa/hde-epic032/checks/po-018/primary.log`  
+* `audit/qa/hde-epic032/checks/po-018/primary.log.path_proof.txt`  
+* `audit/qa/hde-epic032/checks/po-018/result.json`
+
+PO-019 \- reused-foundation posture proof:
+
+* `audit/qa/hde-epic032/checks/po-019/primary.log`  
+* `audit/qa/hde-epic032/checks/po-019/primary.log.path_proof.txt`  
+* `audit/qa/hde-epic032/checks/po-019/result.json`
+
+PO-020 \- truth-class separation proof:
+
+* `audit/qa/hde-epic032/checks/po-020/primary.log`  
+* `audit/qa/hde-epic032/checks/po-020/primary.log.path_proof.txt`  
+* `audit/qa/hde-epic032/checks/po-020/result.json`
+
+PO-021 \- vendor-version runtime non-claim proof:
+
+* `audit/qa/hde-epic032/checks/po-021/primary.log`  
+* `audit/qa/hde-epic032/checks/po-021/primary.log.path_proof.txt`  
+* `audit/qa/hde-epic032/checks/po-021/result.json`
+
+PO-022 \- live-provider non-claim proof:
+
+* `audit/qa/hde-epic032/checks/po-022/primary.log`  
+* `audit/qa/hde-epic032/checks/po-022/primary.log.path_proof.txt`  
+* `audit/qa/hde-epic032/checks/po-022/result.json`
+
+PO-023 \- public Reader non-expansion proof:
+
+* `audit/qa/hde-epic032/checks/po-023/primary.log`  
+* `audit/qa/hde-epic032/checks/po-023/primary.log.path_proof.txt`  
+* `audit/qa/hde-epic032/checks/po-023/result.json`
+
+PO-024 \- proof-only Live QA role proof:
+
+* `audit/qa/hde-epic032/checks/po-024/primary.log`  
+* `audit/qa/hde-epic032/checks/po-024/primary.log.path_proof.txt`  
+* `audit/qa/hde-epic032/checks/po-024/result.json`
 
 **EPIC031 Live QA Step-0A, Step-0B, and po-001 through po-018 check-local evidence surfaces (names-only).** The governed check-local and supporting evidence surfaces for these HDE-EPIC031 QA checks are carried at:
 
@@ -2552,6 +2799,11 @@ When canon requires an explicit repo-local entrypoint script for evidence discip
 * Canonical JSON gate runner: `tools/evidence/run_canonical_json_gate.py`  
 * Evidence index updater/checker: `tools/evidence/update_evidence_index.py`  
 * EPIC031 PR-03 evidence coherence generator: `tools/evidence/generate_epic031_pr03_evidence_coherence.py`  
+* EPIC032 PR-01 router evidence generator: `tools/evidence/generate_epic032_pr01_router_evidence.py`  
+* EPIC032 PR-02 narrative registry diff and pack-identity generator: `tools/evidence/generate_narrative_registry_diff.py`  
+* EPIC032 PR-03 DB bridge parity generator: `tools/evidence/generate_db_bridge_parity.py`  
+* Bridge consistency checker: `ci/checks/check_bridge_consistency.py`  
+* Evidence sanity pipeline runner: `tools/evidence/run_sanity_pipeline.py`  
 * Evidence index hash checker: `ci/checks/check_evidence_index_hash.sh`  
 * Evidence index refresh helper: `tools/evidence/refresh_evidence_index.py`  
 * Audit/QA path validator: `tools/evidence/validate_audit_qa_paths.py`  

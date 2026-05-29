@@ -2,11 +2,11 @@
 
 **Status:** Reference
 
-**Version:** v1.8.4
+**Version:** v1.8.5
 
-**Effective date:** 2026-05-14
+**Effective date:** 2026-05-23
 
-**Last Update Gate:** HDE-EPIC031 Closure
+**Last Update Gate:** HDE-EPIC032 Closure
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -7105,4 +7105,436 @@ Deliverables register mismatch note: PF10’s closure review includes a separate
 * Canonical evidence-path binding is satisfied for PR and QA evidence families recorded in PF10 through `audit/qa/hde-epic031/`, `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl`, and `artifacts/evidence_index.jsonl.sha256`.  
 * Lowercase directory naming is preserved for `audit/qa/hde-epic031/`; mixed-case `EPIC-031` appears in planned close-pack filenames, not directory names.  
 * Final archive posture: HDE-EPIC031 is SATISFIED for PF10’s review closure trace, with formal close-pack completion, PF09.5 drainage, parent `HDE-FERM001` status posture, and deferred later Fermentation work preserved as caveats rather than silently closed.
+
+### **2.17 HDE-EPIC032 Epic Plan — Fermentation Pass 3**
+
+#### **2.17.1 Meta**
+
+**Epic ID:** HDE-EPIC032  
+**Epic title (Implementation Guide):** Fermentation Pass 3 (`r3 epic plan HDE-EPIC032.md`, header)  
+**Epic name (short):** Fermentation Pass 3  
+**Phase:** Fermentation  
+**Status:** Archived  
+**Owner:** Unknown (not present in inputs)  
+**Priority:** Unknown (not present in inputs)  
+**Date started:** 2026.05.16 (operator-provided)  
+**Date completed:** 2026.05.23 (operator-provided)  
+**Epic outcome (per latest PF10 closeout):** SATISFIED for this review’s closure trace; implementation posture recommendation: READY
+
+**Phase rationale (planned; 1–3 sentences):** This epic remains in Fermentation because it completes live-pressure stabilization work around narrative router parity, narrative registry closure, and database runtime posture. The work is about disciplined proof under operational reality: parity, bridge behavior, typed failures, and governed evidence coherence. (`r3 epic plan HDE-EPIC032.md`, §Meta)
+
+**Problem statement (planned):** Glow needs the HD Engine’s narrative and database runtime paths to remain stable under real operational pressure. Current Fermentation rows show that some core behavior exists, but parity, registry evidence closure, DB bridge parity, typed non-dev failure behavior, and DB evidence coherence are still partial. (`r3 epic plan HDE-EPIC032.md`, §Business Case (MUST))
+
+**Proposed change (planned):** Complete the next Fermentation slice by closing narrative router parity and evidence indexing, narrative key registry diffing and Doc-Delta identity, and DB runtime posture for bridge fallback, typed non-dev failure behavior, and governed DB evidence coherence. (`r3 epic plan HDE-EPIC032.md`, §Business Case (MUST))
+
+**Value/impact (planned):** This reduces risk that the system appears complete while narrative keys, registry manifests, DB fallback behavior, or evidence indexes remain only partially proven. It also prepares later Fermentation HDAPI v2 work by stabilizing the narrative and DB proof base first. (`r3 epic plan HDE-EPIC032.md`, §Business Case (MUST))
+
+**Why now (planned):** HDE-EPIC031 completed the first SAFE rails provider-control slice, but PF09.5 still records router parity, narrative registry closure, and DB runtime posture as partial. These rows are dependency-sensitive and should be resolved before later HDAPI v2 contract and live-conformance work expands vendor/runtime surface area. (`r3 epic plan HDE-EPIC032.md`, §Business Case (MUST))
+
+**What success looks like (planned):** Router outputs are parity-proven and indexed; narrative registry diffs and Doc-Delta identity are coherent; DB dev fallback, bridge capability, provider parity, non-dev typed errors, DB posture acceptance, and evidence/indexing discipline are supportable to Done. (`r3 epic plan HDE-EPIC032.md`, §Business Case (MUST))
+
+**Scope anchor (plan):** `r3 epic plan HDE-EPIC032.md`, §Deliverables (Jobs To Be Done)  
+**Stakeholders:** Unknown (not present in inputs)
+
+**PR / remediation / OPS / QA stream (PF10):** PR-01 HDE-EPIC032; PR-02 HDE-EPIC032; PR-03 HDE-EPIC032; OPS-01 HDE-EPIC032; PR-04 HDE-EPIC032; HDE-EPIC032 Audit Review; HDE-EPIC032 Implementation Retrospective; HDE-EPIC032 ADR — HDE-FERM004.2 combined-evidence supportability decision; Remedial PR-01 HDE-EPIC032; QA HDE-EPIC032 Step-0A; Step-0B; QA HDE-EPIC032 PO-001 through PO-024; HDE-EPIC032 Final QA Closeout Review \+ QA RCA; Epic Closure Review — HDE-EPIC032.  
+**QA log stream (PF10):** `step-0a-discovery`, `step-0b-doc-delta`, `po-001`, `po-002`, `po-003`, `po-004`, `po-005`, `po-006`, `po-007`, `po-008`, `po-009`, `po-010`, `po-011`, `po-012`, `po-013`, `po-014`, `po-015`, `po-016`, `po-017`, `po-018`, `po-019`, `po-020`, `po-021`, `po-022`, `po-023`, `po-024`.
+
+**Scope boundaries (planned):**
+
+* limited to `HDE-FERM002.2`, `HDE-FERM003.2`, `HDE-FERM004.2`, `HDE-FERM004.3`, and `HDE-FERM004.4`  
+* does not reopen `HDE-FERM005.1`  
+* does not implement HDAPI v2 contract inventory, v2 adapter architecture, or v2 live conformance  
+* does not execute PO-only open-rails v2 smoke  
+* does not add or change the public Reader contract  
+* does not introduce AI, LLM, OpenAI, prompt, embedding, chatbot, model-call, or AI-enablement scope
+
+**Contract changes / new surfaces (planned):** No new public Reader contract, public route, public flag, or public payload field is introduced by this epic. (`r3 epic plan HDE-EPIC032.md`, §Contract and Compatibility Posture (MUST))
+
+**Internal/admin and runtime posture (planned):** This epic may complete internal narrative router parity, registry diffing, DB bridge fallback, DB typed failure behavior, and DB evidence coherence. These are internal engine/runtime proof surfaces, not public contract expansions. (`r3 epic plan HDE-EPIC032.md`, §Contract and Compatibility Posture (MUST))
+
+**Flag strategy (planned):** No new flag is planned. Existing rails, DB environment, and evidence-governance posture remain governed by existing PF docs named in the plan. (`r3 epic plan HDE-EPIC032.md`, §Contract and Compatibility Posture (MUST))
+
+**Backward-compat posture (planned):** Public Reader output remains unchanged by default. Narrative router work remains keys-only. Narrative registry work remains manifest and identity work, not prose generation. DB runtime work must preserve typed failure behavior and must not expose secrets, payloads, raw stack traces, or public numeric leakage. (`r3 epic plan HDE-EPIC032.md`, §Contract and Compatibility Posture (MUST))
+
+**HDAPI v2 posture (planned):** HDAPI v2 inventory, adapter architecture, request shaping, response mapping, live conformance, and open-rails v2 smoke remain deferred. This epic must not claim vendor v2 runtime conformance. (`r3 epic plan HDE-EPIC032.md`, §Contract and Compatibility Posture (MUST))
+
+**Execution-governance addenda recorded in PF10:** PF10 addendum 2.1 records DB bridge/provider parity proof-label posture for HDE-EPIC032; PF10 addendum 2.10 records `ADR-032-HDE-FERM004.2-SUPPORTABILITY` and selects “Decision: Option 3”; PF10 addendum 2.16 records that Live QA failure remediation must not relabel non-QA-root fixes as Moon Loop correction; PF10 addendum 2.23 records `Verdict: READY FOR EPIC CLOSEOUT`; PF10 addendum 2.24 records `Epic closure decision: HDE-EPIC032 is SATISFIED`.
+
+**Date provenance note:** `r3 epic plan HDE-EPIC032.md` records `Date started: 2026.05.16` and `Date completed: [INTENTIONALLY LEFT BLANK]`. This archive record preserves the operator-provided close date `2026.05.23`.
+
+**Closeout-posture chronology mismatch:** PF10 addendum 2.23 records `Verdict: READY FOR EPIC CLOSEOUT`. PF10 addendum 2.24 later records `Epic closure decision: HDE-EPIC032 is SATISFIED` and `Implementation posture recommendation: READY`. This archive record preserves both postures.
+
+**PF10 input-name finding note:** PF10 addendum 2.24 records an input-name finding from its own closure review where a prompt label conflicted with PF10/source naming. The current operator-provided epic name, PF10, and `r3 epic plan HDE-EPIC032.md` all identify this archive entry as Fermentation Pass 3\.
+
+**Merged-PR provenance:** Unknown (not present in inputs).
+
+#### **2.17.2 Existing Work Check (MUST)**
+
+**Planned existing-work posture (`r3 epic plan HDE-EPIC032.md`, §Existing Work Check (MUST)):**
+
+* Deterministic router implementation is already Done under `HDE-FERM002.1`; this epic targets parity, coverage, and evidence indexing under `HDE-FERM002.2`.  
+* Manifest shape and closure validation are already Done under `HDE-FERM003.1`; this epic targets diffing, Doc-Delta wiring, identity, and indexing under `HDE-FERM003.2`.  
+* Adapter façade, runtime search path, and structural posture are already Done under `HDE-FERM004.1`; this epic targets DB bridge fallback, provider parity, typed non-dev failures, and evidence/indexing coherence under `HDE-FERM004.2`, `HDE-FERM004.3`, and `HDE-FERM004.4`.  
+* CLI Aux preview posture is already Done under `HDE-FERM005.1` and is reused only.  
+* HDE-EPIC031 completed the prior SAFE rails provider-control slice; that work is not reopened here.
+
+**Planned existing tokens validated (`r3 epic plan HDE-EPIC032.md`, §Existing Work Check (MUST)):**
+
+* `CLI_READER_PARITY_OK`  
+* `TWO_RUN_IDENTITY_OK`  
+* `JSON_CANONICAL_CHECK_OK`  
+* `DOC_DELTA_PRESENT_OK`  
+* `COMPOSITE_ABBA_IDENTITY_OK`  
+* `EVIDENCE_INDEX_UPDATED_OK`  
+* `EVIDENCE_INDEX_HASH_OK`  
+* `MACHINE_MIRROR_UPDATED_OK`  
+* `EVIDENCE_PATHS_VALIDATED_OK`  
+* `EVIDENCE_PATH_PROOFS_OK`  
+* `EVIDENCE_INDEX_MIRROR_OK`  
+* `CI_CHECK_MIRROR_SCHEMA_OK`  
+* `CI_CHECK_FINAL_LF_OK`  
+* `DEV_DB_BRIDGE_FALLBACK_OK`  
+* `DB_CONN_ENV_OK`  
+* `DB_RUNTIME_SEARCH_PATH_OK`  
+* `DB_ROLE_OK`  
+* `DB_SCHEMA_FINGERPRINT_OK`
+
+**Planned gap statement (`r3 epic plan HDE-EPIC032.md`, §Existing Work Check (MUST)):**
+
+* Router parity and evidence indexing remain partial under `HDE-FERM002.2`.  
+* Narrative registry diffing, Doc-Delta wiring, identity, and indexing remain partial under `HDE-FERM003.2`.  
+* DB dev fallback and bridge capability/provider parity remain partial under `HDE-FERM004.2`.  
+* Non-dev typed failure behavior remains partial under `HDE-FERM004.3`.  
+* DB posture acceptance, capture discipline, and Evidence Index/Mirror coherence remain partial under `HDE-FERM004.4`.  
+* Several DB proof names listed in PF09.5 are not confirmed in the Epic Plan as PF04 canonical acceptance tokens and are treated as non-token proof labels pending governance clarification.
+
+**Actual reuse and delta (PF10):**
+
+* PF10 addendum 2.3 records PR-01 as the narrative-router parity and evidence-indexing slice for `HDE-FERM002.2`, with the combined net effective change-set satisfying router matrix coverage, missing-key behavior, two-run identity, AB↔BA coherence, CLI/HTTP parity where defined, canonical JSON proof, and index/mirror/path-proof binding after remediation.  
+* PF10 addendum 2.4 records PR-02 as the narrative registry diffing, Doc-Delta identity, and indexing slice for `HDE-FERM003.2`, with registry diff generation, pack identity evidence, Doc-Delta binding, evidence index / Machine Mirror binding, sanity pipeline integration, and orientation evidence remediation.  
+* PF10 addendum 2.5 records PR-03 as DB bridge fallback, bridge capability proof, deterministic provider-parity harnessing, false-PASS parity guards, evidence-index binding, and CI remediation for the canonical adapter-selection artifact key, but with no standalone status move for `HDE-FERM004.2`.  
+* PF10 addendum 2.6 records OPS-01 provider parity closure as OPS evidence, with `OPS-01 closure status: CLOSE CANDIDATE`, `provider_parity_closure_status: closed`, and active corpus rows `grants`, `search_path`, `select_one`, and `ddl_fingerprint` all matching.  
+* PF10 addendum 2.7 records PR-04 as the non-dev typed DB failure and DB evidence-coherence slice for `HDE-FERM004.3` and `HDE-FERM004.4`, including corrected `APP_ENV=stage` non-dev failure evidence, real observed DBAccess attempt ordering, fail-closed generator behavior, regression tests, and governed evidence regeneration.  
+* PF10 addendum 2.10 records that `HDE-FERM004.2` is supportable to Done from combined PR-03 \+ OPS-01 \+ PR-04 evidence for QA-readiness purposes, while PF09.5 row drainage remains later non-blocking canon maintenance.
+
+#### **2.17.3 Deliverables (Jobs-to-be-done) — Planned vs Actual Reconciliation**
+
+##### **D1 — Router tests, parity, and evidence indexing**
+
+* **Planned (`r3 epic plan HDE-EPIC032.md`, §Deliverable D1):** Complete router test coverage, two-run identity, AB↔BA coherence where applicable, CLI/Reader parity where defined, missing-key behavior, and Evidence Index/Machine Mirror binding for narrative router outputs. Includes `HDE-FERM002` / `HDE-FERM002.2`.  
+* **Actual (PF10):** PR-01 added router unit-test coverage for fixed roster, 40-row key-table, two-run identity, AB↔BA coherence, missing-key fail-closed behavior, a router evidence generator, and key-table/parity artifacts. PF10 records original generated artifacts `audit/gates/narratives/keys_10x4.table.json`, `artifacts/narratives/router/parity_abba.log`, and `artifacts/narratives/router/cli_http_parity.log`.  
+* **Remediation (PF10):** Original PR-01 overclaimed `NARR_REGISTRY_CLOSURE_OK` with `JSON_CANONICAL_CHECK_OK`; remedial work removed the unsupported token claim and regenerated governed evidence so the key-table row carried only `JSON_CANONICAL_CHECK_OK`, while parity rows retained `CLI_READER_PARITY_OK`, `TWO_RUN_IDENTITY_OK`, and `COMPOSITE_ABBA_IDENTITY_OK`.  
+* **Disposition (archive):** Satisfied. PF10 addendum 2.3 records `PF09 status action: change to Done` for `HDE-FERM002.2`.
+
+##### **D2 — Narrative registry diffing, Doc-Delta identity, and indexing**
+
+* **Planned (`r3 epic plan HDE-EPIC032.md`, §Deliverable D2):** Complete registry diffing and Doc-Delta wiring so manifest changes are diffable, identity-stable, canonical, and evidence-indexed. Includes `HDE-FERM003` / `HDE-FERM003.2`.  
+* **Actual (PF10):** PR-02 added narrative registry diff generation, pack identity evidence, Doc-Delta binding, evidence index / Machine Mirror binding, sanity pipeline integration, and orientation evidence remediation.  
+* **Evidence anchors (PF10):** `audit/gates/narratives/registry.diff.json`, `audit/gates/narratives/registry.diff.json.path_proof.txt`, `audit/gates/narratives/pack_identity.txt`, `audit/gates/narratives/pack_identity.txt.path_proof.txt`, `audit/docdeltas/hde-epic032_doc_deltas.md`, `audit/docdeltas/hde-epic032_doc_deltas.md.path_proof.txt`, `audit/gates/topology/orientation_demo.txt`, and `audit/gates/topology/orientation_demo.txt.path_proof.txt`.  
+* **Remediation (PF10):** PR-02 fixed validation bugs around unexpected manifest rows, unsupported categories/bands, incomplete tuple-grid validation, missing sanity-pipeline generator checks, and `ORIENTATION_DRIFT`, with the orientation evidence refreshed from `total_artifacts: 342` to `total_artifacts: 345`.  
+* **Disposition (archive):** Satisfied. PF10 addendum 2.4 records `PF09 status action: change to Done` for `HDE-FERM003.2`.
+
+##### **D3 — DB dev fallback, bridge capability, and provider parity**
+
+* **Planned (`r3 epic plan HDE-EPIC032.md`, §Deliverable D3):** Complete DB dev fallback and bridge capability posture by proving dev fallback through the adapter façade, bridge capability, and provider parity using deterministic, secret-free evidence. Includes `HDE-FERM004` / `HDE-FERM004.2`.  
+* **Actual PR-03 (PF10):** PR-03 implemented DB bridge fallback, bridge capability proof, deterministic provider-parity harnessing, false-PASS parity guards, evidence-index binding, and CI remediation for the canonical adapter-selection artifact key. PF10 records key evidence anchors `artifacts/db_bridge/adapter_selection.snapshot.json`, `artifacts/db_bridge/adapter_selection.snapshot.json.path_proof.txt`, `artifacts/db_bridge/provider_parity.proof.json`, and `artifacts/db_bridge/provider_parity.proof.json.path_proof.txt`.  
+* **Actual OPS-01 (PF10):** OPS-01 provided provider parity closure evidence as OPS evidence, with `provider_parity_closure_status: closed`, `result: PASS`, active corpus rows `grants`, `search_path`, `select_one`, and `ddl_fingerprint` all matching, and evidence anchors including `audit/ops/hde-epic032/db-provider-parity/provider_parity_closure_decision.json`, `audit/ops/hde-epic032/db-provider-parity/provider_parity.proof.json`, `audit/ops/hde-epic032/db-provider-parity/bridge_consistency_result.txt`, `audit/ops/hde-epic032/db-provider-parity/non_claims.txt`, `audit/ops/hde-epic032/db-provider-parity/ops01_final_report.txt`, and `audit/ops/hde-epic032/db-provider-parity/created_files_sha256.txt`.  
+* **Actual PR-04 / ADR (PF10):** PR-04 bound OPS-01 evidence as OPS evidence only, and PF10 addendum 2.10 records `Decision: Option 3`, meaning `HDE-FERM004.2` is supportable to Done from combined PR-03 \+ OPS-01 \+ PR-04 evidence for QA-readiness purposes.  
+* **Disposition (archive):** Satisfied for closure trace through combined-evidence supportability. PF10 addendum 2.10 records that PF09.5 row drainage remains later non-blocking canon maintenance.
+
+##### **D4 — Non-dev total failure behavior and typed errors**
+
+* **Planned (`r3 epic plan HDE-EPIC032.md`, §Deliverable D4):** Complete non-dev total failure behavior by proving presence-order selection, typed deterministic errors, numeric-free public failure posture, and no proactive probes beyond the sanctioned adapter path. Includes `HDE-FERM004` / `HDE-FERM004.3`.  
+* **Actual (PF10):** PR-04 implemented corrected `APP_ENV=stage` non-dev failure evidence, real observed DBAccess attempt ordering, fail-closed generator behavior, targeted regression tests, and governed evidence regeneration.  
+* **Evidence anchors (PF10):** `artifacts/runtime/env_connectivity.nondev_failure.json`, `artifacts/runtime/env_connectivity.nondev_failure.json.path_proof.txt`, `tools/evidence/generate_db_bridge_parity.py`, `tests/db/test_adapter_selection.py`, and `tests/evidence/test_generate_db_bridge_parity_nondev.py`.  
+* **Disposition (archive):** Satisfied. PF10 addendum 2.7 records `PF09 status action: change to Done` for `HDE-FERM004.3`.
+
+##### **D5 — DB posture acceptance, capture discipline, and Evidence Index/Mirror coherence**
+
+* **Planned (`r3 epic plan HDE-EPIC032.md`, §Deliverable D5):** Complete DB posture acceptance and evidence coherence by consolidating governed DB posture artifacts, Human Evidence Index, hash sentinel, Machine Mirror, and path-proof discipline for DB runtime and bridge proof families. Includes `HDE-FERM004` / `HDE-FERM004.4`.  
+* **Actual (PF10):** PR-04 bound `artifacts/runtime/env_connectivity.nondev_failure.json` through Human Evidence Index, Machine Mirror, hash sentinels, and path proofs; bound OPS-01 provider parity closure evidence as OPS evidence only; and used `tools/evidence/update_evidence_index.py` as the evidence index / mirror / path-proof writer.  
+* **Evidence anchors (PF10):** `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl`, `artifacts/evidence_index.jsonl.sha256`, `audit/ops/hde-epic032/db-provider-parity/provider_parity_closure_decision.json`, and `audit/ops/hde-epic032/db-provider-parity/provider_parity_closure_decision.json.path_proof.txt`.  
+* **Disposition (archive):** Satisfied. PF10 addendum 2.7 records `PF09 status action: change to Done` for `HDE-FERM004.4`.
+
+##### **D6 — Remedial PR-01 / PO-010 structural selection-order remediation**
+
+* **Planned:** Unknown (not present in inputs) as a planned deliverable in `r3 epic plan HDE-EPIC032.md`.  
+* **Actual (PF10):** Remedial PR-01 remediated the PO-010 `selection_order_missing` failure by adding native `selection_order` emission in `DBAccess.for_current_env`, derived from observed adapter attempts/provider order, and hardening generator validation for structural `selection_order` shape and mismatch failure.  
+* **Evidence anchors (PF10):** `engine/db/adapter.py`, `tests/db/test_adapter_selection.py`, `tests/evidence/test_generate_db_bridge_parity_nondev.py`, `tools/evidence/generate_db_bridge_parity.py`, and `artifacts/db_bridge/adapter_selection.snapshot.json`.  
+* **Disposition (archive):** Satisfied as remediation evidence; no PF09 status change is supported by the remedial PR alone.
+
+##### **D7 — Formal close-pack baseline**
+
+* **Planned (`r3 epic plan HDE-EPIC032.md`, §Close-pack baseline declared for eventual close):** `audit/EPIC-032_close_report.md`, `audit/EPIC-032_MANIFEST.json`, `docs/acceptance_map_epic032.json`, `audit/qa/hde-epic032/token_evidence_matrix.md`, `audit/qa/hde-epic032/acceptance_map_viability.log`, `audit/EPIC-032_close_report.md.path_proof.txt`, `audit/EPIC-032_MANIFEST.json.path_proof.txt`, and `docs/acceptance_map_epic032.json.path_proof.txt`.  
+* **Actual (PF10):** Unknown (not present in inputs). PF10 addenda 2.23 and 2.24 record QA closeout readiness and epic closure decision, but the provided PF10 text does not provide actual evidence pointers for the planned close-pack pair or acceptance-map artifacts listed above.  
+* **Disposition (archive):** Unclear for actual close-pack artifact production; not used here to override PF10 addendum 2.24’s closure-trace decision.
+
+**Planned-vs-actual mismatches archived explicitly:**
+
+* `r3 epic plan HDE-EPIC032.md` planned D1 through D5 plus close-pack baseline expectations; PF10 actual execution records PR-01, PR-02, PR-03, OPS-01, PR-04, Remedial PR-01, Step-0A/Step-0B, PO-001 through PO-024, QA Closeout Review \+ QA RCA, and Epic Closure Review.  
+* The Epic Plan listed acceptance tokens, but PF10’s QA evidence posture records `intended_tokens` and `claimed_tokens` as `[]` in primary log headers and says no individual check claims acceptance-token satisfaction, final QA outcome, PF09.5 drainage, or epic closeout by itself.  
+* The Epic Plan treated `DB_PROVIDER_PARITY_OK`, `DB_BRIDGE_CAPS_OK`, and `DB_BRIDGE_FALLBACK_OK` as non-token proof labels pending governance confirmation; PF10 addendum 2.1 makes that posture live truth for HDE-EPIC032.  
+* PR-03 did not support a standalone PF09 status move for `HDE-FERM004.2`; PF10 addendum 2.10 later resolves supportability through combined PR-03 \+ OPS-01 \+ PR-04 evidence.  
+* The Epic Plan deferred public Reader contract changes, HDAPI v2 inventory/adapter/runtime conformance, live conformance, and PO-only open-rails v2 smoke; PF10 addendum 2.24 preserves those deferrals and records that deferred scopes were not absorbed.
+
+#### **2.17.4 PF Reference Map**
+
+**Core PF references (from `r3 epic plan HDE-EPIC032.md`, §PF Reference Map):**
+
+* `PF21 - 7 Phases of Alchemical Engineering - Fermentation`  
+* `PF06 - Epic Process Guide - execution posture and close-gate posture`  
+* `PF09.5 - HDE Build Checklist Fermentation - HDE-FERM002.2`, `HDE-FERM003.2`, `HDE-FERM004.2`, `HDE-FERM004.3`, `HDE-FERM004.4`  
+* `PF19 - Glow QA Guide - QA posture and close-stage Live QA requirement`
+
+**Additional PF references (from `r3 epic plan HDE-EPIC032.md`, §PF Reference Map):**
+
+* `PF02 - HDE Architecture - architecture boundaries and public/internal surface separation`  
+* `PF03 - Technical Writing Best Practices - Doc-Delta and paste-safe documentation hygiene`  
+* `PF04 - HDE Governance - token registry, rails posture, DB posture token semantics, and no token invention`  
+* `PF05 - HDE CLI-API-Vendor Ref - CLI/Reader parity, public bytes, typed errors, vendor and DB-facing contracts`  
+* `PF07 - Glow Infrastructure - infrastructure-owned env/config facts and DB/bridge runtime ownership`  
+* `PF12 - HDE Schemas and Artifacts - Human Evidence Index, Machine Mirror, hash sentinel, path-proof discipline, canonical JSON, and artifact catalog`  
+* `PF14 - HDE Mechanics Guide - narrative router, narrative registry, DB posture, bridge parity, and evidence job mechanics`  
+* `PF17 - HDE Narratives Guide - narrative key and pack posture`
+
+**PF23 anchors carried in the plan:**
+
+* Existing: `engine/db/adapter.py`  
+* Existing: `engine/db/providers/bridge_provider.py`  
+* Existing: `engine/db/providers/psycopg_provider.py`  
+* Existing: `engine/cli/main.py`  
+* Existing: `adapter/http_reader.py`  
+* Existing: `docs/evidence/INDEX.json`  
+* Existing: `docs/evidence/INDEX.sha256`  
+* Existing: `artifacts/evidence_index.jsonl`  
+* Existing: `tools/evidence/update_evidence_index.py`  
+* Unknown: exact narrative router implementation locus for this plan  
+* Unknown: exact narrative registry implementation locus for this plan
+
+**Execution and results sources used for this archive entry:**
+
+* PF10 addendum 2.1 — DB bridge/provider parity proof-label posture  
+* PF10 addendum 2.2 — Template hygiene defects are non-blocking unless they affect truth, portability, evidence identity, or execution safety  
+* PF10 addendum 2.3 — PR-01 HDE-EPIC032  
+* PF10 addendum 2.4 — PR-02 HDE-EPIC032  
+* PF10 addendum 2.5 — PR-03 HDE-EPIC032  
+* PF10 addendum 2.6 — OPS-01 HDE-EPIC032  
+* PF10 addendum 2.7 — PR-04 HDE-EPIC032  
+* PF10 addendum 2.8 — HDE-EPIC032 Audit Review  
+* PF10 addendum 2.9 — HDE-EPIC032 Implementation Retrospective  
+* PF10 addendum 2.10 — HDE-EPIC032 ADR — HDE-FERM004.2 combined-evidence supportability decision  
+* PF10 addendum 2.11 — QA Plan approval blockers are operational, not exact-command or formatting defects  
+* PF10 addendum 2.12 — QA HDE-EPIC032 Step-0A; Step-0B  
+* PF10 addenda 2.13 through 2.15 — QA HDE-EPIC032 PO-001 through PO-009  
+* PF10 addendum 2.16 — Live QA failure remediation must not relabel non-QA-root fixes as Moon Loop correction  
+* PF10 addendum 2.17 — Remedial PR-01 HDE-EPIC032  
+* PF10 addenda 2.18 through 2.22 — QA HDE-EPIC032 PO-010 through PO-024  
+* PF10 addendum 2.23 — HDE-EPIC032 Final QA Closeout Review \+ QA RCA  
+* PF10 addendum 2.24 — Epic Closure Review — HDE-EPIC032  
+* `r3 epic plan HDE-EPIC032.md`, §Existing Work Check (MUST), §Deliverables (Jobs To Be Done), §Tokens and Evidence (Acceptance), §QA Rails — Open/Close (Final PR), §Tracked Issues, and §Plan Preflight (MUST)
+
+#### **2.17.5 Tokens and Evidence (Acceptance)**
+
+**Planned token inventory (`r3 epic plan HDE-EPIC032.md`, §Tokens and Evidence (Acceptance)):**
+
+* Baseline close tokens: `TESTS_PASS_OK`, `DOC_DELTA_PRESENT_OK`, `EVIDENCE_INDEX_UPDATED_OK`, `MACHINE_MIRROR_UPDATED_OK`, `EVIDENCE_INDEX_HASH_OK`  
+* QA rail tokens: `QA_PRECOMMIT_CHECKLIST_OK`, `QA_POSTCOMMIT_CHECKLIST_OK`, `ENV_RAILS_POLICY_OK`  
+* Phase-specific tokens: `CLI_READER_PARITY_OK`, `TWO_RUN_IDENTITY_OK`, `JSON_CANONICAL_CHECK_OK`, `COMPOSITE_ABBA_IDENTITY_OK`, `EVIDENCE_PATHS_VALIDATED_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATH_PROOFS_OK`, `CI_CHECK_MIRROR_SCHEMA_OK`, `CI_CHECK_FINAL_LF_OK`, `DEV_DB_BRIDGE_FALLBACK_OK`, `DB_CONN_ENV_OK`, `DB_RUNTIME_SEARCH_PATH_OK`, `DB_ROLE_OK`, `DB_SCHEMA_FINGERPRINT_OK`
+
+**Planned non-token proof-label posture (`r3 epic plan HDE-EPIC032.md`, §Tokens and Evidence (Acceptance)):**
+
+* `DB_PROVIDER_PARITY_OK`, `DB_BRIDGE_CAPS_OK`, and `DB_BRIDGE_FALLBACK_OK` are not claimed as acceptance tokens by the plan unless PF04 or PF10 confirms or mints them.  
+* PF10 addendum 2.1 preserves that posture and states that `DB_PROVIDER_PARITY_OK`, `DB_BRIDGE_CAPS_OK`, and `DB_BRIDGE_FALLBACK_OK` are non-token proof labels unless admitted by governance.
+
+**Planned evidence families (`r3 epic plan HDE-EPIC032.md`, §Evidence pointers, titles-only):**
+
+* Narrative router parity proof family  
+* Narrative router two-run identity proof family  
+* Narrative router missing-key fail-closed proof family  
+* Narrative key registry diff proof family  
+* Narrative registry Doc-Delta proof family  
+* Narrative registry identity proof family  
+* DB dev bridge fallback proof family  
+* DB bridge capability proof family  
+* DB provider parity proof family  
+* DB non-dev typed failure proof family  
+* DB posture governed artifact family  
+* Human Evidence Index refresh family  
+* Machine Mirror refresh family  
+* Path-proof validation family  
+* Close-pack baseline family
+
+**Planned canonical evidence binding surfaces (`r3 epic plan HDE-EPIC032.md`, §Evidence pointers, titles-only):**
+
+* `audit/qa/hde-epic032/`  
+* `docs/evidence/INDEX.json`  
+* `docs/evidence/INDEX.sha256`  
+* `docs/evidence/INDEX.json.path_proof.txt`  
+* `docs/evidence/INDEX.sha256.path_proof.txt`  
+* `artifacts/evidence_index.jsonl`  
+* `artifacts/evidence_index.jsonl.sha256`  
+* `artifacts/evidence_index.jsonl.path_proof.txt`  
+* `artifacts/evidence_index.jsonl.sha256.path_proof.txt`  
+* `audit/EPIC-032_close_report.md`  
+* `audit/EPIC-032_MANIFEST.json`  
+* `docs/acceptance_map_epic032.json`  
+* `audit/qa/hde-epic032/token_evidence_matrix.md`  
+* `audit/qa/hde-epic032/acceptance_map_viability.log`  
+* `audit/docdeltas/hde-epic032_doc_deltas.md`  
+* `audit/qa/hde-epic032/00_meta/doc_deltas.md`
+
+**Actual evidence posture (PF10):**
+
+* **PR-01 router proof family:** `audit/gates/narratives/keys_10x4.table.json`, `audit/gates/narratives/keys_10x4.table.json.path_proof.txt`, `artifacts/narratives/router/parity_abba.log`, `artifacts/narratives/router/parity_abba.log.path_proof.txt`, `artifacts/narratives/router/cli_http_parity.log`, and `artifacts/narratives/router/cli_http_parity.log.path_proof.txt`.  
+* **PR-02 registry proof family:** `audit/gates/narratives/registry.diff.json`, `audit/gates/narratives/registry.diff.json.path_proof.txt`, `audit/gates/narratives/pack_identity.txt`, `audit/gates/narratives/pack_identity.txt.path_proof.txt`, `audit/docdeltas/hde-epic032_doc_deltas.md`, `audit/docdeltas/hde-epic032_doc_deltas.md.path_proof.txt`, `audit/gates/topology/orientation_demo.txt`, and `audit/gates/topology/orientation_demo.txt.path_proof.txt`.  
+* **PR-03 DB bridge proof family:** `artifacts/db_bridge/adapter_selection.snapshot.json`, `artifacts/db_bridge/adapter_selection.snapshot.json.path_proof.txt`, `artifacts/db_bridge/provider_parity.proof.json`, `artifacts/db_bridge/provider_parity.proof.json.path_proof.txt`, `artifacts/runtime/env_connectivity.snapshot.json`, and `artifacts/runtime/env_connectivity.snapshot.json.path_proof.txt`.  
+* **OPS-01 provider parity closure family:** `audit/ops/hde-epic032/db-provider-parity/provider_parity_closure_decision.json`, `audit/ops/hde-epic032/db-provider-parity/provider_parity.proof.json`, `audit/ops/hde-epic032/db-provider-parity/bridge_consistency_result.txt`, `audit/ops/hde-epic032/db-provider-parity/non_claims.txt`, `audit/ops/hde-epic032/db-provider-parity/ops01_final_report.txt`, `audit/ops/hde-epic032/db-provider-parity/created_files_sha256.txt`, `audit/ops/hde-epic032/db-provider-parity/stdout.log`, `audit/ops/hde-epic032/db-provider-parity/stderr.log`, and `audit/ops/hde-epic032/db-provider-parity/exit_codes.txt`.  
+* **PR-04 non-dev typed failure and DB coherence family:** `artifacts/runtime/env_connectivity.nondev_failure.json`, `artifacts/runtime/env_connectivity.nondev_failure.json.path_proof.txt`, `audit/ops/hde-epic032/db-provider-parity/provider_parity_closure_decision.json`, `audit/ops/hde-epic032/db-provider-parity/provider_parity_closure_decision.json.path_proof.txt`, `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl`, and `artifacts/evidence_index.jsonl.sha256`.  
+* **QA evidence roots:** `audit/qa/hde-epic032/checks/<check_id>/primary.log`, `audit/qa/hde-epic032/checks/<check_id>/primary.log.path_proof.txt`, `audit/qa/hde-epic032/checks/<check_id>/result.json`, `audit/qa/hde-epic032/qa_step_logs_manifest.json`, and `audit/qa/hde-epic032/qa_step_logs_manifest.json.path_proof.txt`.
+
+**Actual token/posture notes (PF10):**
+
+* PR-01 remedial evidence leaves the key-table row with only `JSON_CANONICAL_CHECK_OK`, while parity rows retain `CLI_READER_PARITY_OK`, `TWO_RUN_IDENTITY_OK`, and `COMPOSITE_ABBA_IDENTITY_OK`.  
+* PR-02 evidence records `epic032.pr02.doc_deltas` with `DOC_DELTA_PRESENT_OK`, `epic032.pr02.registry_diff` with `JSON_CANONICAL_CHECK_OK`, and `epic032.pr02.pack_identity` with `TWO_RUN_IDENTITY_OK`.  
+* PF10 addendum 2.1 says `DB_PROVIDER_PARITY_OK`, `DB_BRIDGE_CAPS_OK`, and `DB_BRIDGE_FALLBACK_OK` must not be claimed as satisfied acceptance tokens unless governance registers them or a later PF10 addendum mints them.  
+* PF10 QA addenda record `intended_tokens` and `claimed_tokens` as `[]` in primary log headers; no individual QA check claims acceptance-token satisfaction, final QA outcome, PF09.5 drainage, or epic closeout by itself.  
+* PF10 addendum 2.24 nevertheless records the full Live QA ladder as PASS and records `Epic closure decision: HDE-EPIC032 is SATISFIED` for the review’s closure trace.
+
+**Planned-token mismatch note:**
+
+* The Epic Plan lists close-stage acceptance tokens, but PF10’s actual QA evidence stream is tokenless at the per-check primary-header level.  
+* PF10 supports implementation/evidence posture through specific PR, OPS, remediation, and QA evidence families, but the provided PF10 text does not provide actual close-pack acceptance-map or token-evidence-matrix evidence pointers for `docs/acceptance_map_epic032.json`, `audit/qa/hde-epic032/token_evidence_matrix.md`, or `audit/qa/hde-epic032/acceptance_map_viability.log`.  
+* Actual final close-pack token mapping: Unknown (not present in inputs).
+
+#### **2.17.6 QA Rails — Open/Close (Final PR)**
+
+**Planned rails posture (`r3 epic plan HDE-EPIC032.md`, §QA Rails — Open/Close (Final PR)):**
+
+* Closed rails are the default for final-PR CI and acceptance-relevant proof.  
+* Any DB, bridge, narrative, or evidence proof must preserve deterministic env posture and secret-free evidence behavior.  
+* Live QA is required for eventual epic close under Epic Process Guide and Glow QA Guide.  
+* The Epic Plan does not include a Live QA plan, runbook, step sequence, command, QA root design, or QA evidence file production instructions.  
+* This epic is not a QA-only epic; QA proof belongs to close-stage artifacts.
+
+**Actual QA event stream (PF10):**
+
+* CHECK `Step-0A; Step-0B` — PASS. PF10 addendum 2.12 records `Step-0A status: PASS`, `Step-0A exit_code: 0`, and `Step-0B status: PASS`, with governed evidence at `audit/qa/hde-epic032/checks/step-0a-discovery/primary.log.path_proof.txt`, `audit/qa/hde-epic032/checks/step-0a-discovery/result.json`, `audit/qa/hde-epic032/qa_step_logs_manifest.json`, and `audit/qa/hde-epic032/qa_step_logs_manifest.json.path_proof.txt`.  
+* CHECK `PO-001; PO-002; PO-003` — PASS. PF10 addendum 2.13 records `po_001_status: PASS`, `po_002_status: PASS`, `po_003_status: PASS`, closed rails, deterministic pins, and manifest/header provenance remediation complete.  
+* CHECK `PO-004; PO-005; PO-006` — PASS. PF10 addendum 2.14 records `po_004_status: PASS`, `po_005_status: PASS`, `po_006_status: PASS`, closed rails, deterministic pins, and remediation closure for manifest entry proof and per-check token-header proof.  
+* CHECK `PO-007; PO-008; PO-009` — PASS. PF10 addendum 2.15 records `po_007_status: PASS`, `po_008_status: PASS`, `po_009_status: PASS`, no tooling-blocked, fail-tooling, or fail-behavior conditions, and non-fatal DeprecationWarning.  
+* CHECK `PO-010; PO-011; PO-012` — PASS. PF10 addendum 2.18 records current PASS status for all three, manifest evidence, per-check primary-log path-proof evidence, tokenless primary-header posture, and structural `selection_order` proof after PR-routed remediation.  
+* CHECK `PO-013; PO-014; PO-015` — PASS. PF10 addendum 2.19 records PASS for all three, no tooling-blocked, fail-tooling, or fail-behavior state, and explicit manifest/header proof including captured\_env, evidence\_artifacts, intended\_tokens, and claimed\_tokens.  
+* CHECK `PO-016; PO-017; PO-018` — PASS. PF10 addendum 2.20 records PASS for all three with harness exit code 0, manifest, manifest path proof, per-check primary-header trust proof, and `pf09_drainage_not_claimed: true` for PO-018.  
+* CHECK `PO-019; PO-020; PO-021` — PASS. PF10 addendum 2.21 records PASS for all three, shell exit code 0, manifest path proof, tokenless posture, truth-class separation, and `vendor_version_runtime_conformance_claimed: false`.  
+* CHECK `PO-022; PO-023; PO-024` — PASS. PF10 addendum 2.22 records PASS for all three, shell exit code 0, manifest binding, manifest path proof, per-check primary-log headers, path-proof sidecars, tokenless posture, `live_provider_behavior_claimed: false`, `reader_route_visible: true`, `invented_reader_proof_route_absent: true`, and proof-only Live QA role posture.
+
+**Remediation loops and decisions (PF10):**
+
+* PF10 addendum 2.3 records PR-01 token overclaim remediation: remove unsupported `NARR_REGISTRY_CLOSURE_OK` from the router key-table evidence row and regenerate Human Index / Machine Mirror hashes and path proofs.  
+* PF10 addendum 2.4 records PR-02 remediation for validation bugs and `ORIENTATION_DRIFT`.  
+* PF10 addendum 2.5 records PR-03 hardening for `APP_ENV=live` as a production-like alias and canonical adapter-selection key identity.  
+* PF10 addendum 2.6 records OPS-01 closure of provider parity evidence as OPS evidence, not QA evidence, PF09 status movement, epic closure, or token satisfaction.  
+* PF10 addendum 2.7 records PR-04 remediation for production posture used in non-dev evidence, synthetic unexpected outputs, and hardcoded `selection_order`.  
+* PF10 addendum 2.10 records `ADR-032-HDE-FERM004.2-SUPPORTABILITY` with `Decision: Option 3`.  
+* PF10 addendum 2.16 records that non-QA-root generator remediation must be PR-routed remediation, not relabeled as bounded Moon Loop correction.  
+* PF10 addendum 2.17 records Remedial PR-01 for PO-010 `selection_order_missing`, with `selection_order` emitted in `DBAccess.for_current_env` and generator validation hardened.
+
+**Closeout-posture chronology archived explicitly:**
+
+* PF10 addendum 2.23 — HDE-EPIC032 Final QA Closeout Review \+ QA RCA: `Verdict: READY FOR EPIC CLOSEOUT`.  
+* PF10 addendum 2.24 — Epic Closure Review — HDE-EPIC032: `Epic closure decision: HDE-EPIC032 is SATISFIED`.  
+* PF10 addendum 2.24 — SATISFIED means satisfied for this review’s closure trace only; it is not a PO closeout action.  
+* PF10 addendum 2.24 — Implementation posture recommendation: READY.  
+* PF10 addendum 2.24 — documentation drainage and PF09.5 physical drainage are not closure blockers by themselves when PF10 has the relevant live supportability record.
+
+#### **2.17.7 Tracked Issues**
+
+**Tracked issues at plan creation (`r3 epic plan HDE-EPIC032.md`, §Tracked Issues):**
+
+* **`TI-032-001` — HDAPI v2 contract inventory deferred**  
+  * **Plan status:** Carried forward to later Fermentation work.  
+  * **Scope / description:** `HDE-FERM006.1` through `HDE-FERM006.4` remain open HDAPI v2 contract inventory and source-precedence work.  
+  * **Final disposition:** Carried forward to later Fermentation work. Destination epic ID: Unknown (not present in inputs). PF10 addendum 2.24 records that deferred public Reader / HDAPI v2 / open-rails v2 scopes remained deferred.  
+* **`TI-032-002` — HDAPI v2 adapter architecture deferred**  
+  * **Plan status:** Carried forward to later Fermentation work.  
+  * **Scope / description:** `HDE-FERM007.1` through `HDE-FERM007.5` remain open v2 adapter architecture work dependent on governed contract inventory and PF05/PF07 posture.  
+  * **Final disposition:** Carried forward to later Fermentation work. Destination epic ID: Unknown (not present in inputs). PF10 addendum 2.24 records no HDAPI v2 inventory, adapter, runtime conformance, or live conformance expansion.  
+* **`TI-032-003` — HDAPI v2 live conformance deferred**  
+  * **Plan status:** Carried forward to later Fermentation work.  
+  * **Scope / description:** `HDE-FERM008.1` through `HDE-FERM008.5` remain open v2 live-conformance, rails, rate-limit, response-normalization, and evidence-loop work.  
+  * **Final disposition:** Carried forward to later Fermentation work. Destination epic ID: Unknown (not present in inputs). PF10 addendum 2.22 records `live_provider_behavior_claimed: false`, and PF10 addendum 2.24 records deferred scopes stayed deferred.  
+* **`TI-032-004` — DB provider parity and bridge capability token posture**  
+  * **Plan status:** Bounded governance note.  
+  * **Scope / description:** PF09.5 lists DB proof labels including `DB_PROVIDER_PARITY_OK`, `DB_BRIDGE_CAPS_OK`, and `DB_BRIDGE_FALLBACK_OK`. The Epic Plan does not claim those names as acceptance tokens unless PF04 or PF10 confirms or mints them.  
+  * **Final disposition:** Completed under HDE-EPIC032 for this epic’s operating posture. PF10 addendum 2.1 records those names as non-token proof labels unless governance registers them, and PF10 addendum 2.24 records the same DB provider/bridge token ambiguity as resolved for this epic.  
+* **`TI-032-005` — PF23 component and evidence-root complexity**  
+  * **Plan status:** Current-reality context only.  
+  * **Scope / description:** PF23 records multi-root evidence surfaces, DB/cache components, and vendor/runtime seam complexity. The Epic Plan uses PF23 only as planning-time context and does not treat PF23 as acceptance proof, a blocker source, or a task source.  
+  * **Final disposition:** Completed under HDE-EPIC032 as context-only classification. PF10 addendum 2.24 records PF23 as current-reality context only and not closure proof, not acceptance source, and not blocker source.  
+* **`TI-032-006` — Parent task status posture after subtask completion**  
+  * **Plan status:** Carried forward to close-stage interpretation.  
+  * **Scope / description:** Completing `HDE-FERM004.2`, `HDE-FERM004.3`, and `HDE-FERM004.4` may support a future status action for parent `HDE-FERM004`, but the Epic Plan does not pre-claim the parent row without governed close evidence.  
+  * **Final disposition:** Partially resolved for subtasks, not resolved for physical PF09.5 parent drainage. PF10 addendum 2.10 records `HDE-FERM004.2` supportable to Done from combined evidence, PF10 addendum 2.7 records `HDE-FERM004.3` and `HDE-FERM004.4` supportable to Done, and PF10 addendum 2.24 preserves PF09.5 physical drainage as non-blocking later work. Parent-task physical-drain status: Unknown (not present in inputs).
+
+**Actual tracked issues / closeout drifts recorded in PF10:**
+
+* **PR-01 unsupported-token overclaim**  
+  * **Status:** Completed under HDE-EPIC032.  
+  * **Disposition:** PF10 addendum 2.3 records that `NARR_REGISTRY_CLOSURE_OK` was removed from the PR-01 key-table evidence row, leaving only `JSON_CANONICAL_CHECK_OK`.  
+* **PR-02 validation bugs and `ORIENTATION_DRIFT`**  
+  * **Status:** Completed under HDE-EPIC032.  
+  * **Disposition:** PF10 addendum 2.4 records remediated validation bugs and `ORIENTATION_DRIFT` resolved by refreshing orientation evidence from `total_artifacts: 342` to `total_artifacts: 345`.  
+* **PR-03 production-like `APP_ENV=live` ambiguity**  
+  * **Status:** Completed under HDE-EPIC032 for implementation posture; future doc-drain possible.  
+  * **Disposition:** PF10 addendum 2.5 records `APP_ENV=live` treated as a production-like alias with `PROD_ENV_ALIASES = {"prod", "production", "live"}`.  
+* **PR-03 canonical adapter-selection key drift**  
+  * **Status:** Completed under HDE-EPIC032.  
+  * **Disposition:** PF10 addendum 2.5 records correction to canonical key `db_bridge.adapter_selection.snapshot` and filtering of stale `epic032.pr03.adapter_selection`.  
+* **OPS-01 provider parity loop**  
+  * **Status:** Completed under HDE-EPIC032 as OPS evidence.  
+  * **Disposition:** PF10 addendum 2.6 records `ddl_fingerprint` included in the active corpus with `parity=match`, `provider_parity_closure_status: closed`, and `result: PASS`.  
+* **PR-04 non-dev evidence and generator failures**  
+  * **Status:** Completed under HDE-EPIC032.  
+  * **Disposition:** PF10 addendum 2.7 records remediation for production posture used for non-dev evidence, synthetic unexpected outputs, and hardcoded `selection_order`.  
+* **PO-010 `selection_order_missing`**  
+  * **Status:** Completed under HDE-EPIC032.  
+  * **Disposition:** PF10 addenda 2.16, 2.17, and 2.18 record the failure as PR-routed remediation, not bounded Moon Loop correction, and record PO-010 / PO-011 / PO-012 as PASS after structural `selection_order` proof.  
+* **Final repo path existence after docs PR**  
+  * **Status:** Unknown (not present in inputs).  
+  * **Disposition:** PF10 addendum 2.23 records an evidence gap: whether direct final repo path existence checks are current after docs PR is unknown because the report did not inspect the repo itself.
+
+#### **2.17.8 Plan Preflight (MUST)**
+
+**Planned preflight posture (`r3 epic plan HDE-EPIC032.md`, §Plan Preflight (MUST)):**
+
+* PF23 was consulted for planning-time component and locus context only.  
+* PF23 is not an acceptance token, deliverable, execution artifact, or blocker source by itself.  
+* Acceptance token names used in the plan are drawn from PF04 — HDE Governance.  
+* DB proof labels not confirmed as canonical token names are not claimed as acceptance tokens and are recorded in `TI-032-004`.  
+* The eventual close-pack baseline is declared in Tokens and Evidence, but the plan does not include close-pack execution steps.  
+* No local evidence bundle directory is claimed as complete by the Epic Plan.  
+* The plan binds only to canonical evidence and close-pack surfaces required by PF12 and PF27.  
+* Any additional governed artifact family discovered during implementation must use canonical PF12 evidence posture or be routed through a Tracked Issue and ADR stub.
+
+**Planned ADR stubs (`r3 epic plan HDE-EPIC032.md`, §ADR Stubs):**
+
+* `ADR-032-001 — HDE-EPIC032 first-slice scope classification`  
+  * **Default plan posture:** Scope executable work to D1 through D5 and record all HDAPI v2 rows as deferred.  
+  * **Actual disposition (PF10):** Completed for this epic. PF10 addendum 2.24 records deferred public Reader / HDAPI v2 / open-rails v2 scopes as not absorbed.  
+* `ADR-032-002 — DB provider parity and bridge capability token posture`  
+  * **Default plan posture:** Do not claim `DB_PROVIDER_PARITY_OK`, `DB_BRIDGE_CAPS_OK`, or `DB_BRIDGE_FALLBACK_OK` as acceptance tokens; treat them as non-token proof obligations under D3 through D5.  
+  * **Actual disposition (PF10):** Completed for this epic. PF10 addendum 2.1 records those names as non-token proof labels unless admitted as canonical acceptance tokens.  
+* `ADR-032-003 — Narrative router and registry concrete locus discovery`  
+  * **Default plan posture:** Do not assert exact existing narrative router or narrative registry paths; record component-level PF09.5/PF14 scope and leave exact loci to implementation planning or future PF23 update.  
+  * **Actual disposition (PF10):** Actual concrete evidence paths are recorded through PF10 PR-01 and PR-02 evidence families, including `audit/gates/narratives/keys_10x4.table.json`, `artifacts/narratives/router/parity_abba.log`, `artifacts/narratives/router/cli_http_parity.log`, `audit/gates/narratives/registry.diff.json`, and `audit/gates/narratives/pack_identity.txt`.
+
+**Actual archive-level reconciliation:**
+
+* PF23 consult remained context-only. PF10 addendum 2.24 records PF23 as current-reality context only, not closure proof, not an acceptance source, and not a blocker source.  
+* Token registry validation remained bounded. PF10 addendum 2.1 governs DB provider/bridge proof labels, and PF10 QA addenda record tokenless per-check primary log posture.  
+* Close-pack baseline is planned, but actual close-pack artifact production is Unknown (not present in inputs).  
+* QA boundary discipline is preserved. `r3 epic plan HDE-EPIC032.md` contains close-stage QA posture only, while PF10 addenda 2.12 through 2.24 record separate QA execution, remediation, RCA, and closeout interpretation.  
+* Canonical evidence-path binding is satisfied for implementation and QA evidence families recorded in PF10 through `audit/gates/narratives/`, `artifacts/narratives/router/`, `artifacts/db_bridge/`, `artifacts/runtime/`, `audit/ops/hde-epic032/db-provider-parity/`, `audit/qa/hde-epic032/`, `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, and `artifacts/evidence_index.jsonl`.  
+* Lowercase directory naming is preserved for directory segments such as `audit/qa/hde-epic032/`, `audit/ops/hde-epic032/`, `audit/gates/narratives/`, `artifacts/db_bridge/`, and `artifacts/runtime/`; mixed-case `EPIC-032` appears in planned close-pack filenames, not directory names.  
+* Final archive posture: HDE-EPIC032 is SATISFIED for PF10’s review closure trace, with implementation posture recommendation READY; PF09.5 physical drainage, formal close-pack artifact production, and future public Reader / HDAPI v2 / live-provider conformance work are preserved as separate from this archive entry rather than silently closed.
 
