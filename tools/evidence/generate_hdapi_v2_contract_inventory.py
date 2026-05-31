@@ -1,14 +1,24 @@
 #!/usr/bin/env python3
-"""Generate HDE-EPIC033 HDAPI v2 contract-inventory evidence."""
+"""Generate HDE-EPIC033 HDAPI v2 contract-inventory evidence.
+
+The default mode is closed-rails and consumes pre-captured public documentation
+inputs from artifacts/vendor/hdapi_v2/source_cache/. Refreshing those inputs is
+an explicit public-docs operation and requires both --refresh-public-docs and
+open rails (SAFE_MODE=0, ALLOW_NETWORK=1). The generator never calls
+credentialed runtime vendor endpoints.
+"""
 from __future__ import annotations
 
+import argparse
 import csv
 import datetime as dt
 import hashlib
-import io
 import json
+import os
 import re
+import subprocess
 import sys
+import tempfile
 import urllib.error
 import urllib.request
 from pathlib import Path
@@ -16,6 +26,8 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "artifacts" / "vendor" / "hdapi_v2"
+SOURCE_CACHE = OUT / "source_cache"
+SOURCE_METADATA = SOURCE_CACHE / "source_metadata.json"
 ACCEPTANCE = ROOT / "docs" / "acceptance_map_epic033.json"
 TOKEN_MATRIX = ROOT / "audit" / "qa" / "hde-epic033" / "token_evidence_matrix.md"
 VIABILITY = ROOT / "audit" / "qa" / "hde-epic033" / "acceptance_map_viability.log"
@@ -24,22 +36,22 @@ QA_DOC_DELTAS = ROOT / "audit" / "qa" / "hde-epic033" / "00_meta" / "doc_deltas.
 
 BASE = "https://docs.humandesignapi.nl"
 SOURCES = [
-    ("robots_preflight", f"{BASE}/robots.txt", "robots_preflight", "seed"),
-    ("llms_txt", f"{BASE}/llms.txt", "documentation-discovery-only", "robots_preflight"),
-    ("llms_full_txt", f"{BASE}/llms-full.txt", "documentation-discovery-only", "llms_txt"),
-    ("v2_routes_yaml", f"{BASE}/openapi/v2-routes.yaml", "validated_machine_readable_route_spec", "llms_txt"),
-    ("v1_routes_yaml", f"{BASE}/openapi/v1-routes.yaml", "validated_machine_readable_route_spec", "llms_txt"),
-    ("suspect_openapi_json", f"{BASE}/api-reference/openapi.json", "suspect_quarantined_openapi", "llms_txt"),
-    ("v2_overview", f"{BASE}/api-reference/v2/overview", "rendered_high_level_guide", "llms_txt"),
-    ("v1_overview", f"{BASE}/api-reference/v1/overview", "rendered_high_level_guide", "llms_txt"),
-    ("v2_full_chart_page", f"{BASE}/api-reference/charts/generate-a-full-chart", "rendered_endpoint_page", "llms_txt"),
-    ("v2_simple_chart_page", f"{BASE}/api-reference/charts/generate-a-simple-chart", "rendered_endpoint_page", "llms_txt"),
-    ("v2_coordinates_chart_page", f"{BASE}/api-reference/charts/generate-a-chart-from-coordinates", "rendered_endpoint_page", "llms_txt"),
-    ("authentication", f"{BASE}/authentication", "rendered_contract_page", "llms_txt"),
-    ("rate_limiting", f"{BASE}/guides/rate-limiting", "rendered_contract_page", "llms_txt"),
-    ("response_format", f"{BASE}/response-format", "rendered_contract_page", "llms_txt"),
-    ("migration_v1_to_v2", f"{BASE}/migration/v1-to-v2", "rendered_contract_page", "llms_txt"),
-    ("coordinates_guide", f"{BASE}/guides/coordinates-endpoint", "rendered_contract_page", "llms_txt"),
+    ("robots_preflight", f"{BASE}/robots.txt", "robots_preflight", "seed", None),
+    ("llms_txt", f"{BASE}/llms.txt", "documentation-discovery-only", "robots_preflight", None),
+    ("llms_full_txt", f"{BASE}/llms-full.txt", "documentation-discovery-only", "llms_txt", "llms-full.endpoint-tiers.txt"),
+    ("v2_routes_yaml", f"{BASE}/openapi/v2-routes.yaml", "validated_machine_readable_route_spec", "llms_txt", "v2-routes.yaml"),
+    ("v1_routes_yaml", f"{BASE}/openapi/v1-routes.yaml", "validated_machine_readable_route_spec", "llms_txt", "v1-routes.yaml"),
+    ("suspect_openapi_json", f"{BASE}/api-reference/openapi.json", "suspect_quarantined_openapi", "llms_txt", "api-reference.openapi.json"),
+    ("v2_overview", f"{BASE}/api-reference/v2/overview", "rendered_high_level_guide", "llms_txt", None),
+    ("v1_overview", f"{BASE}/api-reference/v1/overview", "rendered_high_level_guide", "llms_txt", None),
+    ("v2_full_chart_page", f"{BASE}/api-reference/charts/generate-a-full-chart", "rendered_endpoint_page", "llms_txt", None),
+    ("v2_simple_chart_page", f"{BASE}/api-reference/charts/generate-a-simple-chart", "rendered_endpoint_page", "llms_txt", None),
+    ("v2_coordinates_chart_page", f"{BASE}/api-reference/charts/generate-a-chart-from-coordinates", "rendered_endpoint_page", "llms_txt", None),
+    ("authentication", f"{BASE}/authentication", "rendered_contract_page", "llms_txt", None),
+    ("rate_limiting", f"{BASE}/guides/rate-limiting", "rendered_contract_page", "llms_txt", None),
+    ("response_format", f"{BASE}/response-format", "rendered_contract_page", "llms_txt", None),
+    ("migration_v1_to_v2", f"{BASE}/migration/v1-to-v2", "rendered_contract_page", "llms_txt", None),
+    ("coordinates_guide", f"{BASE}/guides/coordinates-endpoint", "rendered_contract_page", "llms_txt", None),
 ]
 
 REQUIRED_ENDPOINTS = [
@@ -49,6 +61,12 @@ REQUIRED_ENDPOINTS = [
     ("POST", "/v1/bodygraphs"),
     ("POST", "/v1/bodygraphs/simple"),
 ]
+
+ALLOWED_STATUS = {200}
+
+
+def iso_now() -> str:
+    return dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
 def canonical_json_bytes(obj: Any) -> bytes:
@@ -62,8 +80,28 @@ def write_text(path: Path, text: str) -> None:
     path.write_text(text, encoding="utf-8", newline="\n")
 
 
-def fetch(url: str) -> tuple[str, str, int | str, bytes]:
-    req = urllib.request.Request(url, headers={"User-Agent": "glow-hde-epic033-contract-inventory/1.0"})
+def write_bytes(path: Path, body: bytes) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(body)
+
+
+def sha256_bytes(body: bytes) -> str:
+    return hashlib.sha256(body).hexdigest()
+
+
+
+def llms_full_endpoint_tier_excerpt(body: bytes) -> bytes:
+    text = body.decode("utf-8", errors="replace")
+    rows = [
+        line for line in text.splitlines()
+        if line.startswith("| `POST /v") and ("Advanced" in line or "Basic" in line)
+    ]
+    if not rows:
+        raise SystemExit("LLMS_FULL_TIER_EXCERPT_EMPTY")
+    return ("\n".join(rows) + "\n").encode("utf-8")
+
+def fetch_public_doc(url: str) -> tuple[str, str, int | str, bytes]:
+    req = urllib.request.Request(url, headers={"User-Agent": "glow-hde-epic033-contract-inventory/1.1"})
     try:
         with urllib.request.urlopen(req, timeout=30) as resp:
             return resp.geturl(), resp.headers.get("content-type", ""), resp.status, resp.read()
@@ -73,263 +111,407 @@ def fetch(url: str) -> tuple[str, str, int | str, bytes]:
         return url, "", f"FETCH_ERROR:{exc.reason}", b""
 
 
-def header_value(text: str, name: str) -> str | None:
-    m = re.search(rf"^\s*{re.escape(name)}:\s*(.+)$", text, re.MULTILINE)
-    return m.group(1).strip().strip("'") if m else None
+def require_open_rails_for_refresh() -> None:
+    if os.environ.get("SAFE_MODE") != "0" or os.environ.get("ALLOW_NETWORK") != "1":
+        raise SystemExit("OPEN_RAILS_REQUIRED: set SAFE_MODE=0 and ALLOW_NETWORK=1 with --refresh-public-docs for public documentation fetching")
 
 
-def has_path(text: str, path: str) -> bool:
-    return re.search(rf"^\s{{2}}{re.escape(path)}:\s*$", text, re.MULTILINE) is not None
+def source_cache_rel(cache_name: str | None) -> str | None:
+    return f"artifacts/vendor/hdapi_v2/source_cache/{cache_name}" if cache_name else None
 
 
-def extract_block(text: str, path: str) -> str:
-    lines = text.splitlines()
-    start = None
-    marker = f"  {path}:"
-    for i, line in enumerate(lines):
-        if line == marker:
-            start = i
-            break
-    if start is None:
-        return ""
-    out = []
-    for line in lines[start:]:
-        if out and re.match(r"^  /[^ ]+:$", line):
-            break
-        out.append(line)
-    return "\n".join(out)
-
-
-def response_codes(block: str) -> str:
-    codes = re.findall(r"^\s{8}'(\d{3})':", block, re.MULTILINE)
-    return ";".join(codes)
-
-
-def error_codes(block: str) -> str:
-    codes = sorted(set(re.findall(r"`([A-Z0-9_]+)`", block)))
-    return ";".join(codes) if codes else "schema-defined StandardErrorResponse"
-
-
-def schema_ref(block: str) -> str:
-    m = re.search(r"\$ref: '#/components/schemas/([^']+)'", block)
-    return m.group(1) if m else "unknown"
-
-
-def validate_routes(name: str, text: str, version: str, server: str, required_paths: list[str]) -> list[str]:
-    lines = [f"[{name}] status=VALIDATED"]
-    checks = {
-        "openapi_3": text.startswith("openapi: 3."),
-        "title_humandesignapi": "title: Human Design API" in text,
-        "version_present": bool(header_value(text, "version")),
-        "server_domain": server in text,
-        "required_paths_present": all(has_path(text, p) for p in required_paths),
-    }
-    for key, ok in checks.items():
-        lines.append(f"[{name}] {key}={'PASS' if ok else 'FAIL'}")
-    lines.append(f"[{name}] observed_version={header_value(text, 'version') or 'UNKNOWN'} expected_family={version}")
-    if not all(checks.values()):
-        lines[0] = f"[{name}] status=INVALID"
-    return lines
-
-
-def main() -> None:
-    produced = dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
-    OUT.mkdir(parents=True, exist_ok=True)
-    fetched: dict[str, dict[str, Any]] = {}
+def refresh_source_cache(produced: str) -> tuple[dict[str, dict[str, Any]], dict[str, bytes]]:
+    require_open_rails_for_refresh()
+    SOURCE_CACHE.mkdir(parents=True, exist_ok=True)
+    metadata: dict[str, dict[str, Any]] = {}
     bodies: dict[str, bytes] = {}
-    for key, url, classification, discovered_from in SOURCES:
-        final_url, content_type, status, body = fetch(url)
-        sha = hashlib.sha256(body).hexdigest() if body else ""
-        fetched[key] = {
+    for key, url, classification, discovered_from, cache_name in SOURCES:
+        final_url, content_type, status, body = fetch_public_doc(url)
+        cache_body = body
+        if key == "llms_full_txt":
+            cache_body = llms_full_endpoint_tier_excerpt(body)
+        if cache_name:
+            write_bytes(SOURCE_CACHE / cache_name, cache_body)
+            bodies[key] = cache_body
+        metadata[key] = {
+            "cache_path": source_cache_rel(cache_name),
+            "cache_sha256": sha256_bytes(cache_body) if cache_name else None,
             "content_type": content_type,
             "discovered_from": discovered_from,
             "fetch_status": str(status),
             "final_url": final_url,
             "last_seen_utc": produced,
-            "sha256": sha,
+            "sha256": sha256_bytes(body) if body else "",
             "source_classification": classification,
             "source_url": url,
         }
-        bodies[key] = body
+    SOURCE_METADATA.write_bytes(canonical_json_bytes({"generated_at_utc": produced, "sources": metadata}))
+    return metadata, bodies
 
-    inventory = {
-        "ai_boundary": "llms.txt, llms-full.txt, and AI/LLM-oriented vendor documentation are documentation-discovery-only context; no AI product, runtime, evidence, token, credential, rail, QA, or model-call scope is created.",
-        "generated_at_utc": produced,
-        "source_precedence": [
-            "validated v2 and v1 YAML route specs",
-            "rendered endpoint pages",
-            "high-level guide pages",
-            "suspect artifacts quarantined until validated",
-        ],
-        "sources": fetched,
-    }
-    (OUT / "source_inventory.json").write_bytes(canonical_json_bytes(inventory))
 
-    md_lines = [
-        "# HDAPI v2 and legacy v1 Source Inventory",
-        "",
-        f"Generated at UTC: {produced}",
-        "",
-        "This governed inventory records public same-origin HumanDesignAPI documentation sources only. It does not call credentialed runtime vendor endpoints and does not claim runtime v2 conformance.",
-        "",
-        "AI/LLM-oriented documentation, including `llms.txt` and `llms-full.txt`, is classified as documentation-discovery-only context and creates no AI product, runtime, evidence, token, credential, rail, QA, prompt, embedding, chatbot, model-call, or provider scope.",
-        "",
-        "| key | source_classification | fetch_status | content_type | sha256 | final_url | discovered_from |",
-        "| --- | --- | --- | --- | --- | --- | --- |",
+def load_source_cache() -> tuple[dict[str, dict[str, Any]], dict[str, bytes]]:
+    if not SOURCE_METADATA.exists():
+        raise SystemExit("MISSING_SOURCE_CACHE: run with --refresh-public-docs under SAFE_MODE=0 ALLOW_NETWORK=1 to capture public docs")
+    payload = json.loads(SOURCE_METADATA.read_text(encoding="utf-8"))
+    metadata = payload.get("sources")
+    if not isinstance(metadata, dict):
+        raise SystemExit("INVALID_SOURCE_CACHE: missing sources")
+    bodies: dict[str, bytes] = {}
+    for key, _url, _classification, _discovered_from, cache_name in SOURCES:
+        row = metadata.get(key)
+        if not isinstance(row, dict):
+            raise SystemExit(f"INVALID_SOURCE_CACHE: missing {key}")
+        if cache_name:
+            cache_path = SOURCE_CACHE / cache_name
+            if not cache_path.exists():
+                raise SystemExit(f"MISSING_SOURCE_BODY:{cache_path.relative_to(ROOT).as_posix()}")
+            body = cache_path.read_bytes()
+            expected = row.get("cache_sha256") or row.get("sha256")
+            actual = sha256_bytes(body)
+            if expected != actual:
+                raise SystemExit(f"SOURCE_CACHE_SHA_MISMATCH:{key}")
+            bodies[key] = body
+    return metadata, bodies
+
+
+def parse_yaml_openapi(body: bytes, name: str) -> dict[str, Any]:
+    with tempfile.NamedTemporaryFile(suffix=".yaml") as tmp:
+        tmp.write(body)
+        tmp.flush()
+        result = subprocess.run(
+            ["ruby", "-ryaml", "-rjson", "-e", "puts JSON.generate(YAML.safe_load_file(ARGV.fetch(0), permitted_classes: [], aliases: false))", tmp.name],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+    if result.returncode != 0:
+        raise ValueError(f"YAML_PARSE_FAILED:{name}:{result.stderr.strip()}")
+    parsed = json.loads(result.stdout)
+    if not isinstance(parsed, dict):
+        raise ValueError(f"YAML_PARSE_NOT_OBJECT:{name}")
+    return parsed
+
+
+def ref_name(ref: str | None) -> str:
+    if not ref or not ref.startswith("#/components/schemas/"):
+        return ""
+    return ref.rsplit("/", 1)[-1]
+
+
+def schema_ref_names(schema: Any) -> list[str]:
+    refs: list[str] = []
+    if isinstance(schema, dict):
+        if "$ref" in schema:
+            refs.append(ref_name(str(schema["$ref"])))
+        for value in schema.values():
+            refs.extend(schema_ref_names(value))
+    elif isinstance(schema, list):
+        for item in schema:
+            refs.extend(schema_ref_names(item))
+    return [ref for ref in refs if ref]
+
+
+def method_obj(spec: dict[str, Any], path: str) -> dict[str, Any]:
+    paths = spec.get("paths")
+    if not isinstance(paths, dict) or path not in paths:
+        raise ValueError(f"MISSING_PATH:{path}")
+    path_item = paths[path]
+    if not isinstance(path_item, dict) or not isinstance(path_item.get("post"), dict):
+        raise ValueError(f"MISSING_POST:{path}")
+    return path_item["post"]
+
+
+def content_type_and_schema(method: dict[str, Any]) -> tuple[str, str]:
+    body = method.get("requestBody")
+    if not isinstance(body, dict) or body.get("required") is not True:
+        raise ValueError("REQUEST_BODY_REQUIRED_MISSING")
+    content = body.get("content")
+    if not isinstance(content, dict) or not content:
+        raise ValueError("REQUEST_CONTENT_MISSING")
+    if "application/json" not in content:
+        raise ValueError("REQUEST_CONTENT_NOT_JSON")
+    schema = content["application/json"].get("schema")
+    if not isinstance(schema, dict):
+        raise ValueError("REQUEST_SCHEMA_MISSING")
+    return "application/json", ref_name(str(schema.get("$ref", "")))
+
+
+def required_fields(spec: dict[str, Any], schema_name: str) -> list[str]:
+    schemas = spec.get("components", {}).get("schemas", {})
+    schema = schemas.get(schema_name)
+    if not isinstance(schema, dict):
+        raise ValueError(f"MISSING_SCHEMA:{schema_name}")
+    required = schema.get("required")
+    if not isinstance(required, list) or not all(isinstance(item, str) for item in required):
+        raise ValueError(f"MISSING_REQUIRED_FIELDS:{schema_name}")
+    return required
+
+
+def success_envelope(method: dict[str, Any], *, version: str) -> str:
+    responses = method.get("responses")
+    if not isinstance(responses, dict) or "200" not in responses:
+        raise ValueError("MISSING_200_RESPONSE")
+    content = responses["200"].get("content", {})
+    schema = content.get("application/json", {}).get("schema")
+    refs = schema_ref_names(schema)
+    if version == "v2":
+        if "StandardResponse" not in refs:
+            raise ValueError("MISSING_STANDARD_RESPONSE")
+        response_type = ""
+        if isinstance(schema, dict):
+            all_of = schema.get("allOf", [])
+            if isinstance(all_of, list):
+                for entry in all_of:
+                    props = entry.get("properties", {}) if isinstance(entry, dict) else {}
+                    type_prop = props.get("type", {}) if isinstance(props, dict) else {}
+                    if isinstance(type_prop, dict) and type_prop.get("example"):
+                        response_type = str(type_prop["example"])
+        data_refs = [ref for ref in refs if ref != "StandardResponse"]
+        if not response_type or not data_refs:
+            raise ValueError("MISSING_V2_SUCCESS_DATA_REF")
+        return f"StandardResponse with type={response_type} and data={data_refs[-1]}"
+    if not refs:
+        raise ValueError("MISSING_V1_SUCCESS_SCHEMA")
+    return f"flat JSON {refs[-1]}; no v2 StandardResponse envelope"
+
+
+def collect_error_codes(value: Any) -> list[str]:
+    codes: set[str] = set()
+    if isinstance(value, str):
+        codes.update(re.findall(r"`([A-Z0-9_]+)`", value))
+    elif isinstance(value, dict):
+        for child in value.values():
+            codes.update(collect_error_codes(child))
+    elif isinstance(value, list):
+        for child in value:
+            codes.update(collect_error_codes(child))
+    return sorted(codes)
+
+
+def response_error_codes(method: dict[str, Any]) -> str:
+    responses = method.get("responses")
+    if not isinstance(responses, dict):
+        raise ValueError("MISSING_RESPONSES")
+    codes = collect_error_codes({k: v for k, v in responses.items() if k != "200"})
+    return ";".join(codes) if codes else "schema-defined StandardErrorResponse"
+
+
+def security_names(method: dict[str, Any]) -> list[str]:
+    security = method.get("security")
+    if not isinstance(security, list) or not security or not isinstance(security[0], dict):
+        raise ValueError("MISSING_SECURITY")
+    return list(security[0].keys())
+
+
+def auth_model(spec: dict[str, Any], method: dict[str, Any]) -> str:
+    schemes = spec.get("components", {}).get("securitySchemes", {})
+    names = security_names(method)
+    rendered: list[str] = []
+    for name in names:
+        scheme = schemes.get(name)
+        if not isinstance(scheme, dict):
+            raise ValueError(f"MISSING_SECURITY_SCHEME:{name}")
+        if scheme.get("type") == "http" and scheme.get("scheme") == "bearer":
+            rendered.append("Authorization Bearer token")
+        elif scheme.get("type") == "apiKey" and scheme.get("in") == "header" and scheme.get("name"):
+            rendered.append(f"{scheme['name']} header")
+        else:
+            raise ValueError(f"UNSUPPORTED_SECURITY_SCHEME:{name}")
+    return " plus ".join(rendered)
+
+
+def geocode_requirement(method: dict[str, Any]) -> str:
+    return "required" if "GeocodeKeyAuth" in security_names(method) else "not needed"
+
+
+def parse_tier_map(llms_full: str) -> dict[str, str]:
+    tier_map: dict[str, str] = {}
+    for raw in llms_full.splitlines():
+        if "POST /v2/charts/coordinates" in raw:
+            tier_map["/v2/charts/coordinates"] = "Advanced"
+        elif "POST /v2/charts/simple" in raw:
+            tier_map["/v2/charts/simple"] = "Basic + Advanced"
+        elif "POST /v2/charts" in raw and "/coordinates" not in raw and "/simple" not in raw:
+            tier_map["/v2/charts"] = "Advanced"
+        elif "POST /v1/bodygraphs/simple" in raw:
+            tier_map["/v1/bodygraphs/simple"] = "Basic + Advanced"
+        elif "POST /v1/bodygraphs" in raw and "/simple" not in raw:
+            tier_map["/v1/bodygraphs"] = "Advanced"
+    missing = [path for _method, path in REQUIRED_ENDPOINTS if path not in tier_map]
+    if missing:
+        raise ValueError(f"TIER_MAP_MISSING:{','.join(missing)}")
+    return tier_map
+
+
+def validate_openapi_spec(name: str, spec: dict[str, Any], *, expected_title: str, expected_server: str, paths: list[str]) -> tuple[bool, list[str]]:
+    checks: list[tuple[str, bool]] = []
+    info = spec.get("info")
+    servers = spec.get("servers")
+    components = spec.get("components")
+    checks.append(("openapi_3_parse", isinstance(spec.get("openapi"), str) and str(spec["openapi"]).startswith("3.")))
+    checks.append(("title_humandesignapi", isinstance(info, dict) and info.get("title") == expected_title))
+    checks.append(("version_present", isinstance(info, dict) and bool(info.get("version"))))
+    checks.append(("server_domain", isinstance(servers, list) and any(isinstance(item, dict) and item.get("url") == expected_server for item in servers)))
+    checks.append(("components_present", isinstance(components, dict) and isinstance(components.get("schemas"), dict) and isinstance(components.get("securitySchemes"), dict)))
+    for path in paths:
+        try:
+            method = method_obj(spec, path)
+            content_type_and_schema(method)
+            security_names(method)
+            success_envelope(method, version="v2" if "v2" in name else "v1")
+            checks.append((f"path_{path}_post_contract", True))
+        except ValueError:
+            checks.append((f"path_{path}_post_contract", False))
+    ok = all(result for _label, result in checks)
+    lines = [f"[{name}] status={'VALIDATED' if ok else 'INVALID'}"]
+    lines.extend(f"[{name}] {label}={'PASS' if result else 'FAIL'}" for label, result in checks)
+    version = info.get("version") if isinstance(info, dict) else "UNKNOWN"
+    lines.append(f"[{name}] observed_version={version or 'UNKNOWN'}")
+    return ok, lines
+
+
+def validate_suspect_openapi(body: bytes) -> tuple[bool, dict[str, Any], list[str]]:
+    try:
+        obj = json.loads(body.decode("utf-8"))
+    except json.JSONDecodeError:
+        return False, {}, ["[api-reference/openapi.json] status=QUARANTINED", "[api-reference/openapi.json] json_parse=FAIL"]
+    title = str(obj.get("info", {}).get("title", "")) if isinstance(obj.get("info"), dict) else ""
+    servers = obj.get("servers") if isinstance(obj.get("servers"), list) else []
+    paths = obj.get("paths") if isinstance(obj.get("paths"), dict) else {}
+    server_domain_ok = any(isinstance(item, dict) and "humandesignapi.nl" in str(item.get("url", "")) for item in servers)
+    path_family_ok = any(path.startswith(("/v1/", "/v2/", "/charts", "/bodygraphs")) for path in paths)
+    title_ok = "Human Design API" in title
+    ok = title_ok and server_domain_ok and path_family_ok
+    lines = [
+        f"[api-reference/openapi.json] status={'VALIDATED' if ok else 'QUARANTINED'}",
+        f"[api-reference/openapi.json] title={title or 'MISSING'}",
+        f"[api-reference/openapi.json] title_humandesignapi={'PASS' if title_ok else 'FAIL'}",
+        f"[api-reference/openapi.json] server_domain={'PASS' if server_domain_ok else 'FAIL'}",
+        f"[api-reference/openapi.json] path_family={'PASS' if path_family_ok else 'FAIL'}",
     ]
-    for key in sorted(fetched):
-        row = fetched[key]
-        md_lines.append(f"| {key} | {row['source_classification']} | {row['fetch_status']} | {row['content_type']} | {row['sha256']} | {row['final_url']} | {row['discovered_from']} |")
-    write_text(OUT / "source_inventory.md", "\n".join(md_lines))
+    return ok, {"title": title, "servers": servers, "paths": sorted(paths)}, lines
 
-    v2 = bodies["v2_routes_yaml"].decode("utf-8", errors="replace")
-    v1 = bodies["v1_routes_yaml"].decode("utf-8", errors="replace")
-    suspect = bodies["suspect_openapi_json"].decode("utf-8", errors="replace")
-    validation_lines = [
+
+def source_spec_for(path: str) -> str:
+    if path.startswith("/v2"):
+        relative = path.removeprefix("/v2")
+        encoded = relative.replace("/", "~1")
+        return f"docs.humandesignapi.nl/openapi/v2-routes.yaml#/paths/{encoded}/post"
+    relative = path.removeprefix("/v1")
+    encoded = relative.replace("/", "~1")
+    return f"docs.humandesignapi.nl/openapi/v1-routes.yaml#/paths/{encoded}/post"
+
+
+def build_endpoint_rows(v2_spec: dict[str, Any], v1_spec: dict[str, Any], llms_full: str) -> list[dict[str, str]]:
+    tier_map = parse_tier_map(llms_full)
+    rows: list[dict[str, str]] = []
+    for method, full_path in REQUIRED_ENDPOINTS:
+        version = "v2" if full_path.startswith("/v2") else "v1"
+        spec = v2_spec if version == "v2" else v1_spec
+        spec_path = full_path.removeprefix(f"/{version}")
+        op = method_obj(spec, spec_path)
+        request_content_type, schema_name = content_type_and_schema(op)
+        request_fields = required_fields(spec, schema_name)
+        rows.append(
+            {
+                "auth_model": auth_model(spec, op),
+                "error_codes": response_error_codes(op),
+                "geocode_key_requirement": geocode_requirement(op),
+                "method": method,
+                "path": full_path,
+                "request_content_type": request_content_type,
+                "request_fields": ";".join(request_fields),
+                "route_family": "recommended_v2_chart" if version == "v2" else "legacy_v1_bodygraph",
+                "source_spec": source_spec_for(full_path),
+                "success_envelope": success_envelope(op, version=version),
+                "tier": tier_map[full_path],
+            }
+        )
+    return rows
+
+
+def build_validation_log(produced: str, v2_ok: bool, v2_lines: list[str], v1_ok: bool, v1_lines: list[str], suspect_lines: list[str], *, mode: str) -> str:
+    lines = [
         f"generated_at_utc={produced}",
         "scope=HDE-EPIC033 HDE-FERM006.2 machine-readable vendor route validation",
-        "network_posture=public documentation fetch only; no credentialed runtime vendor API call",
-        "validator=structural OpenAPI 3/domain/title/server/path-family checks using fetched public docs bytes",
+        f"source_mode={mode}",
+        "network_posture=public documentation refresh only when --refresh-public-docs is used with SAFE_MODE=0 and ALLOW_NETWORK=1; default generation is closed-rails cache replay",
+        "validator=Ruby Psych YAML parser plus fail-closed OpenAPI structural validator for title/version/server/security/request/response/path-family ownership",
     ]
-    validation_lines += validate_routes("v2-routes.yaml", v2, "v2", "https://api.humandesignapi.nl/v2", ["/charts", "/charts/simple", "/charts/coordinates"])
-    validation_lines += validate_routes("v1-routes.yaml", v1, "v1", "https://api.humandesignapi.nl/v1", ["/bodygraphs", "/bodygraphs/simple"])
-    try:
-        suspect_obj = json.loads(suspect)
-        suspect_title = str(suspect_obj.get("info", {}).get("title", ""))
-        suspect_servers = json.dumps(suspect_obj.get("servers", []), sort_keys=True)
-        suspect_paths = sorted(suspect_obj.get("paths", {}).keys())
-        suspect_ok = ("Human Design API" in suspect_title and "humandesignapi.nl" in suspect_servers and any(p.startswith(("/v1/", "/v2/", "/charts", "/bodygraphs")) for p in suspect_paths))
-        validation_lines.append(f"[api-reference/openapi.json] status={'VALIDATED' if suspect_ok else 'QUARANTINED'}")
-        validation_lines.append(f"[api-reference/openapi.json] title={suspect_title or 'MISSING'}")
-        validation_lines.append(f"[api-reference/openapi.json] server_domain={'PASS' if 'humandesignapi.nl' in suspect_servers else 'FAIL'}")
-        validation_lines.append(f"[api-reference/openapi.json] path_family={'PASS' if suspect_ok else 'FAIL'}")
-    except json.JSONDecodeError:
-        validation_lines.append("[api-reference/openapi.json] status=QUARANTINED")
-        validation_lines.append("[api-reference/openapi.json] json_parse=FAIL")
-    write_text(OUT / "openapi_validation.log", "\n".join(validation_lines))
+    lines.extend(v2_lines)
+    lines.extend(v1_lines)
+    lines.extend(suspect_lines)
+    lines.append(f"[route-spec-gate] status={'PASS' if v2_ok and v1_ok else 'FAIL'}")
+    return "\n".join(lines)
 
-    anomaly = [
+
+def build_anomaly_text(produced: str, suspect_ok: bool, suspect_info: dict[str, Any]) -> str:
+    title = suspect_info.get("title") or "MISSING"
+    servers = suspect_info.get("servers") or []
+    paths = suspect_info.get("paths") or []
+    lines = [
         "# HDAPI v2 Known Anomalies",
         "",
         f"Generated at UTC: {produced}",
         "",
-        "## api-reference/openapi.json quarantine",
+        "## api-reference/openapi.json posture",
         "",
-        "Decision: QUARANTINED.",
-        "",
-        "The repository path `api-reference/openapi.json` is absent in this repo. The public documentation URL `https://docs.humandesignapi.nl/api-reference/openapi.json` was fetched as a suspect artifact and did not prove HumanDesignAPI ownership: its title is `OpenAPI Plant Store`, its server is `http://sandbox.mintlify.com`, and its path family is not the HumanDesignAPI v1/v2 chart/bodygraph family.",
-        "",
-        "Quarantine effect: the suspect artifact is not used as authority for vendor bytes, schemas, endpoint routes, request shaping, response mapping, runtime conformance, or architecture conformance. Validated YAML route specs remain first-precedence authority for this contract-inventory slice.",
-        "",
-        "## Runtime and public-surface boundary",
-        "",
-        "No runtime v2 request shaping, runtime source selection, open-rails vendor smoke, public Reader byte change, public route, public flag, public payload, new HTTP home, or AI runtime/evidence scope is introduced by this inventory.",
     ]
-    write_text(OUT / "known_anomalies.md", "\n".join(anomaly))
+    if suspect_ok:
+        lines.extend(
+            [
+                "Decision: VALIDATED.",
+                "",
+                "The suspect public documentation OpenAPI artifact passed HumanDesignAPI title, server-domain, and path-family ownership checks in this run. No quarantine entry is emitted for it in the contract map.",
+                "",
+            ]
+        )
+    else:
+        lines.extend(
+            [
+                "Decision: QUARANTINED.",
+                "",
+                f"The repository path `api-reference/openapi.json` is {'present' if (ROOT / 'api-reference/openapi.json').exists() else 'absent'} in this repo. The public documentation URL `https://docs.humandesignapi.nl/api-reference/openapi.json` did not prove HumanDesignAPI ownership in this run: title=`{title}`, servers={json.dumps(servers, sort_keys=True)}, paths_sample={json.dumps(paths[:5], sort_keys=True)}.",
+                "",
+                "Quarantine effect: the suspect artifact is not used as authority for vendor bytes, schemas, endpoint routes, request shaping, response mapping, runtime conformance, or architecture conformance. Validated YAML route specs remain first-precedence authority for this contract-inventory slice.",
+                "",
+            ]
+        )
+    lines.extend(
+        [
+            "## Runtime and public-surface boundary",
+            "",
+            "No runtime v2 request shaping, runtime source selection, open-rails vendor smoke, public Reader byte change, public route, public flag, public payload, new HTTP home, or AI runtime/evidence scope is introduced by this inventory.",
+        ]
+    )
+    return "\n".join(lines)
 
-    endpoints = {
-        ("POST", "/v2/charts"): {
-            "route_family": "recommended_v2_chart",
-            "auth_model": "Authorization Bearer token plus HD-Geocode-Key header",
-            "geocode_key_requirement": "required",
-            "tier": "Advanced",
-            "request_fields": "birthdate;birthtime;location",
-            "success_envelope": "StandardResponse with type=ChartResult and data=ChartResult",
-            "source_spec": "docs.humandesignapi.nl/openapi/v2-routes.yaml#/paths/~1charts/post",
-            "source_text": v2,
-        },
-        ("POST", "/v2/charts/simple"): {
-            "route_family": "recommended_v2_chart",
-            "auth_model": "Authorization Bearer token plus HD-Geocode-Key header",
-            "geocode_key_requirement": "required",
-            "tier": "Basic + Advanced",
-            "request_fields": "birthdate;birthtime;location",
-            "success_envelope": "StandardResponse with type=ChartSimpleResult and data=ChartSimpleResult",
-            "source_spec": "docs.humandesignapi.nl/openapi/v2-routes.yaml#/paths/~1charts~1simple/post",
-            "source_text": v2,
-        },
-        ("POST", "/v2/charts/coordinates"): {
-            "route_family": "recommended_v2_chart",
-            "auth_model": "Authorization Bearer token",
-            "geocode_key_requirement": "not needed",
-            "tier": "Advanced",
-            "request_fields": "birthdate;birthtime;lat;lng",
-            "success_envelope": "StandardResponse with type=ChartResult and data=ChartResult",
-            "source_spec": "docs.humandesignapi.nl/openapi/v2-routes.yaml#/paths/~1charts~1coordinates/post",
-            "source_text": v2,
-        },
-        ("POST", "/v1/bodygraphs"): {
-            "route_family": "legacy_v1_bodygraph",
-            "auth_model": "HD-Api-Key header plus HD-Geocode-Key header",
-            "geocode_key_requirement": "required",
-            "tier": "Advanced",
-            "request_fields": "birthdate;birthtime;location",
-            "success_envelope": "flat JSON BodygraphResponse; no v2 StandardResponse envelope",
-            "source_spec": "docs.humandesignapi.nl/openapi/v1-routes.yaml#/paths/~1bodygraphs/post",
-            "source_text": v1,
-        },
-        ("POST", "/v1/bodygraphs/simple"): {
-            "route_family": "legacy_v1_bodygraph",
-            "auth_model": "HD-Api-Key header plus HD-Geocode-Key header",
-            "geocode_key_requirement": "required",
-            "tier": "Basic + Advanced",
-            "request_fields": "birthdate;birthtime;location",
-            "success_envelope": "flat JSON SimpleBodygraphResponse; no v2 StandardResponse envelope",
-            "source_spec": "docs.humandesignapi.nl/openapi/v1-routes.yaml#/paths/~1bodygraphs~1simple/post",
-            "source_text": v1,
-        },
-    }
-    csv_path = OUT / "endpoint_reference.csv"
-    with csv_path.open("w", encoding="utf-8", newline="") as f:
-        fields = ["method", "path", "route_family", "auth_model", "geocode_key_requirement", "tier", "request_content_type", "request_fields", "success_envelope", "error_codes", "source_spec"]
-        writer = csv.DictWriter(f, fieldnames=fields, lineterminator="\n")
-        writer.writeheader()
-        for method, path in REQUIRED_ENDPOINTS:
-            info = endpoints[(method, path)]
-            block = extract_block(info["source_text"], path.removeprefix("/v2") if path.startswith("/v2") else path.removeprefix("/v1"))
-            writer.writerow({
-                "method": method,
-                "path": path,
-                "route_family": info["route_family"],
-                "auth_model": info["auth_model"],
-                "geocode_key_requirement": info["geocode_key_requirement"],
-                "tier": info["tier"],
-                "request_content_type": "application/json",
-                "request_fields": info["request_fields"],
-                "success_envelope": info["success_envelope"],
-                "error_codes": error_codes(block),
-                "source_spec": info["source_spec"],
-            })
 
+def build_contract_map(produced: str, fetched: dict[str, dict[str, Any]], rows: list[dict[str, str]], suspect_ok: bool) -> dict[str, Any]:
     route_families = []
-    for method, path in REQUIRED_ENDPOINTS:
-        info = endpoints[(method, path)]
-        source_key = "v2_routes_yaml" if path.startswith("/v2") else "v1_routes_yaml"
-        route_families.append({
-            "auth_model": info["auth_model"],
-            "geocode_key_requirement": info["geocode_key_requirement"],
-            "method": method,
-            "path": path,
-            "request_content_type": "application/json",
-            "request_fields": info["request_fields"].split(";"),
-            "route_family": info["route_family"],
-            "source_precedence_rank": 1,
-            "source_spec": info["source_spec"],
-            "source_sha256": fetched[source_key]["sha256"],
-            "success_envelope": info["success_envelope"],
-            "tier": info["tier"],
-        })
-    contract_map = {
+    for row in rows:
+        source_key = "v2_routes_yaml" if row["path"].startswith("/v2") else "v1_routes_yaml"
+        route_families.append(
+            {
+                "auth_model": row["auth_model"],
+                "geocode_key_requirement": row["geocode_key_requirement"],
+                "method": row["method"],
+                "path": row["path"],
+                "request_content_type": row["request_content_type"],
+                "request_fields": row["request_fields"].split(";"),
+                "route_family": row["route_family"],
+                "source_precedence_rank": 1,
+                "source_sha256": fetched[source_key]["sha256"],
+                "source_spec": row["source_spec"],
+                "success_envelope": row["success_envelope"],
+                "tier": row["tier"],
+            }
+        )
+    contract = {
         "ai_boundary": "No OpenAI, LLM, AI-agent, prompt, embedding, chatbot, model-call, AI-provider credential, AI rail, AI evidence family, AI token, or AI runtime scope is introduced.",
         "generated_at_utc": produced,
         "non_conformance_claim": "Contract inventory only; no HumanDesignAPI v2 runtime request shaping, source selection, live conformance, public Reader change, or open-rails smoke is claimed.",
-        "quarantined_sources": [
-            {
-                "reason": "Public api-reference/openapi.json did not prove HumanDesignAPI domain/title/server/path-family ownership; repo api-reference/openapi.json is absent.",
-                "source_key": "suspect_openapi_json",
-                "source_url": f"{BASE}/api-reference/openapi.json",
-            }
-        ],
+        "quarantined_sources": [],
         "route_families": route_families,
         "source_precedence": [
             "validated v2 and v1 YAML route specs",
@@ -338,15 +520,80 @@ def main() -> None:
             "suspect artifacts quarantined until validated",
         ],
         "validated_sources": [
-            {"source_key": "v2_routes_yaml", "source_url": f"{BASE}/openapi/v2-routes.yaml", "sha256": fetched["v2_routes_yaml"]["sha256"]},
-            {"source_key": "v1_routes_yaml", "source_url": f"{BASE}/openapi/v1-routes.yaml", "sha256": fetched["v1_routes_yaml"]["sha256"]},
+            {"sha256": fetched["v2_routes_yaml"]["sha256"], "source_key": "v2_routes_yaml", "source_url": f"{BASE}/openapi/v2-routes.yaml"},
+            {"sha256": fetched["v1_routes_yaml"]["sha256"], "source_key": "v1_routes_yaml", "source_url": f"{BASE}/openapi/v1-routes.yaml"},
         ],
     }
-    (OUT / "contract_map.json").write_bytes(canonical_json_bytes(contract_map))
+    if not suspect_ok:
+        contract["quarantined_sources"].append(
+            {
+                "reason": "api-reference/openapi.json did not prove HumanDesignAPI title/server/path-family ownership in this run or repo-local artifact was absent.",
+                "source_key": "suspect_openapi_json",
+                "source_url": f"{BASE}/api-reference/openapi.json",
+            }
+        )
+    return contract
 
-    acceptance = {
+
+def validate_source_statuses(fetched: dict[str, dict[str, Any]]) -> None:
+    for key in ["v2_routes_yaml", "v1_routes_yaml", "suspect_openapi_json", "llms_full_txt"]:
+        status = fetched[key].get("fetch_status")
+        if status not in {str(item) for item in ALLOWED_STATUS}:
+            raise SystemExit(f"SOURCE_NOT_USABLE:{key}:{status}")
+        if not fetched[key].get("sha256"):
+            raise SystemExit(f"SOURCE_EMPTY:{key}")
+
+
+def render_source_inventory(produced: str, fetched: dict[str, dict[str, Any]], *, mode: str) -> tuple[bytes, str]:
+    inventory = {
+        "ai_boundary": "llms.txt, llms-full.txt, and AI/LLM-oriented vendor documentation are documentation-discovery-only context; no AI product, runtime, evidence, token, credential, rail, QA, or model-call scope is created.",
+        "generated_at_utc": produced,
+        "source_mode": mode,
+        "source_precedence": [
+            "validated v2 and v1 YAML route specs",
+            "rendered endpoint pages",
+            "high-level guide pages",
+            "suspect artifacts quarantined until validated",
+        ],
+        "sources": fetched,
+    }
+    md_lines = [
+        "# HDAPI v2 and legacy v1 Source Inventory",
+        "",
+        f"Generated at UTC: {produced}",
+        "",
+        f"Source mode: {mode}",
+        "",
+        "This governed inventory records public same-origin HumanDesignAPI documentation sources only. It does not call credentialed runtime vendor endpoints and does not claim runtime v2 conformance.",
+        "",
+        "AI/LLM-oriented documentation, including `llms.txt` and `llms-full.txt`, is classified as documentation-discovery-only context and creates no AI product, runtime, evidence, token, credential, rail, QA, prompt, embedding, chatbot, model-call, or provider scope.",
+        "",
+        "| key | source_classification | fetch_status | content_type | sha256 | final_url | discovered_from | cache_path | cache_sha256 |",
+        "| --- | --- | --- | --- | --- | --- | --- | --- | --- |",
+    ]
+    for key in sorted(fetched):
+        row = fetched[key]
+        md_lines.append(f"| {key} | {row['source_classification']} | {row['fetch_status']} | {row['content_type']} | {row['sha256']} | {row['final_url']} | {row['discovered_from']} | {row.get('cache_path') or ''} | {row.get('cache_sha256') or ''} |")
+    return canonical_json_bytes(inventory), "\n".join(md_lines)
+
+
+def write_endpoint_reference(rows: list[dict[str, str]]) -> bytes:
+    from io import StringIO
+
+    buf = StringIO()
+    fields = ["method", "path", "route_family", "auth_model", "geocode_key_requirement", "tier", "request_content_type", "request_fields", "success_envelope", "error_codes", "source_spec"]
+    writer = csv.DictWriter(buf, fieldnames=fields, lineterminator="\n")
+    writer.writeheader()
+    for row in rows:
+        writer.writerow({field: row[field] for field in fields})
+    return buf.getvalue().encode("utf-8")
+
+
+def build_acceptance(produced: str) -> dict[str, Any]:
+    return {
         "acceptance_claims_mode": "baseline_existing_tokens_only",
         "epic_id": "HDE-EPIC033",
+        "generated_at_utc": produced,
         "notes": [
             "HDE-FERM006.1 through HDE-FERM006.4 contract-inventory artifacts only.",
             "No vendor-v2-specific acceptance token is minted or claimed.",
@@ -365,8 +612,9 @@ def main() -> None:
             {"evidence_titles": ["artifacts/vendor/hdapi_v2/source_inventory.json", "artifacts/vendor/hdapi_v2/contract_map.json"], "name": "JSON_CANONICAL_CHECK_OK", "owner_pf": "PF12 — HDE-Schemas and Artifacts §Canonical JSON", "status": "supported_by_pr_validation"},
         ],
     }
-    ACCEPTANCE.write_bytes(canonical_json_bytes(acceptance))
 
+
+def write_baseline_pointer_artifacts(produced: str, acceptance: dict[str, Any]) -> dict[Path, bytes]:
     matrix_lines = [
         "# HDE-EPIC033 Token Evidence Matrix",
         "",
@@ -377,34 +625,86 @@ def main() -> None:
     ]
     for token in acceptance["tokens"]:
         matrix_lines.append(f"| {token['name']} | {'; '.join(token['evidence_titles'])} | {token['status']} | Contract inventory only; no runtime v2 conformance or AI scope |")
-    write_text(TOKEN_MATRIX, "\n".join(matrix_lines))
+    viability = "\n".join(
+        [
+            f"generated_at_utc={produced}",
+            "epic_id=HDE-EPIC033",
+            "status=PASS",
+            "tokens_checked=TESTS_PASS_OK,DOC_DELTA_PRESENT_OK,EVIDENCE_INDEX_UPDATED_OK,MACHINE_MIRROR_UPDATED_OK,EVIDENCE_INDEX_HASH_OK,EVIDENCE_PATHS_VALIDATED_OK,EVIDENCE_PATH_PROOFS_OK,JSON_CANONICAL_CHECK_OK",
+            "vendor_v2_specific_tokens=NONE",
+            "runtime_v2_conformance_claim=NONE",
+            "public_reader_surface_change=NONE",
+            "ai_scope=NONE",
+        ]
+    )
+    doc_delta_text = "\n".join(
+        [
+            "# HDE-EPIC033 Doc Deltas",
+            "",
+            "## BLOCKERS",
+            "",
+            "None recorded for PR-01 contract-inventory evidence binding.",
+            "",
+            "## CAVEATS",
+            "",
+            "This PR binds HumanDesignAPI v2 and legacy v1 public documentation contract inventory only. It does not implement or claim runtime v2 request shaping, runtime source selection, open-rails vendor smoke, public Reader changes, a new HTTP home, or AI scope.",
+        ]
+    )
+    return {
+        ACCEPTANCE: canonical_json_bytes(acceptance),
+        TOKEN_MATRIX: ("\n".join(matrix_lines) + "\n").encode("utf-8"),
+        VIABILITY: (viability + "\n").encode("utf-8"),
+        DOC_DELTAS: (doc_delta_text + "\n").encode("utf-8"),
+        QA_DOC_DELTAS: (doc_delta_text + "\n").encode("utf-8"),
+    }
 
-    write_text(VIABILITY, "\n".join([
-        f"generated_at_utc={produced}",
-        "epic_id=HDE-EPIC033",
-        "status=PASS",
-        "tokens_checked=TESTS_PASS_OK,DOC_DELTA_PRESENT_OK,EVIDENCE_INDEX_UPDATED_OK,MACHINE_MIRROR_UPDATED_OK,EVIDENCE_INDEX_HASH_OK,EVIDENCE_PATHS_VALIDATED_OK,EVIDENCE_PATH_PROOFS_OK,JSON_CANONICAL_CHECK_OK",
-        "vendor_v2_specific_tokens=NONE",
-        "runtime_v2_conformance_claim=NONE",
-        "public_reader_surface_change=NONE",
-        "ai_scope=NONE",
-    ]))
 
-    doc_delta_text = "\n".join([
-        "# HDE-EPIC033 Doc Deltas",
-        "",
-        "## BLOCKERS",
-        "",
-        "None recorded for PR-01 contract-inventory evidence binding.",
-        "",
-        "## CAVEATS",
-        "",
-        "This PR binds HumanDesignAPI v2 and legacy v1 public documentation contract inventory only. It does not implement or claim runtime v2 request shaping, runtime source selection, open-rails vendor smoke, public Reader changes, a new HTTP home, or AI scope.",
-    ])
-    write_text(DOC_DELTAS, doc_delta_text)
-    write_text(QA_DOC_DELTAS, doc_delta_text)
+def render_outputs(produced: str, fetched: dict[str, dict[str, Any]], bodies: dict[str, bytes], *, mode: str) -> dict[Path, bytes]:
+    validate_source_statuses(fetched)
+    v2_spec = parse_yaml_openapi(bodies["v2_routes_yaml"], "v2-routes.yaml")
+    v1_spec = parse_yaml_openapi(bodies["v1_routes_yaml"], "v1-routes.yaml")
+    v2_ok, v2_lines = validate_openapi_spec("v2-routes.yaml", v2_spec, expected_title="Human Design API — v2", expected_server="https://api.humandesignapi.nl/v2", paths=["/charts", "/charts/simple", "/charts/coordinates"])
+    v1_ok, v1_lines = validate_openapi_spec("v1-routes.yaml", v1_spec, expected_title="Human Design API — v1", expected_server="https://api.humandesignapi.nl/v1", paths=["/bodygraphs", "/bodygraphs/simple"])
+    suspect_ok, suspect_info, suspect_lines = validate_suspect_openapi(bodies["suspect_openapi_json"])
+    validation_log = build_validation_log(produced, v2_ok, v2_lines, v1_ok, v1_lines, suspect_lines, mode=mode)
+    if not (v2_ok and v1_ok):
+        raise SystemExit("ROUTE_SPEC_VALIDATION_FAILED: refusing to write promoted endpoint/contract/acceptance evidence")
+    rows = build_endpoint_rows(v2_spec, v1_spec, bodies["llms_full_txt"].decode("utf-8", errors="replace"))
+    inventory_json, inventory_md = render_source_inventory(produced, fetched, mode=mode)
+    acceptance = build_acceptance(produced)
+    outputs = {
+        OUT / "source_inventory.json": inventory_json,
+        OUT / "source_inventory.md": (inventory_md + "\n").encode("utf-8"),
+        OUT / "openapi_validation.log": (validation_log + "\n").encode("utf-8"),
+        OUT / "known_anomalies.md": (build_anomaly_text(produced, suspect_ok, suspect_info) + "\n").encode("utf-8"),
+        OUT / "endpoint_reference.csv": write_endpoint_reference(rows),
+        OUT / "contract_map.json": canonical_json_bytes(build_contract_map(produced, fetched, rows, suspect_ok)),
+    }
+    outputs.update(write_baseline_pointer_artifacts(produced, acceptance))
+    return outputs
 
-    print(f"generated {OUT.relative_to(ROOT)} and HDE-EPIC033 baseline artifacts at {produced}")
+
+def write_outputs(outputs: dict[Path, bytes]) -> None:
+    for path, body in outputs.items():
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(body)
+
+
+def main(argv: list[str] | None = None) -> None:
+    parser = argparse.ArgumentParser(description="Generate HDE-EPIC033 HDAPI v2 contract-inventory evidence")
+    parser.add_argument("--refresh-public-docs", action="store_true", help="Fetch public docs and refresh source_cache; requires SAFE_MODE=0 ALLOW_NETWORK=1")
+    args = parser.parse_args(argv)
+
+    produced = iso_now()
+    if args.refresh_public_docs:
+        fetched, bodies = refresh_source_cache(produced)
+        mode = "public-docs-refresh"
+    else:
+        fetched, bodies = load_source_cache()
+        mode = "closed-rails-source-cache"
+    outputs = render_outputs(produced, fetched, bodies, mode=mode)
+    write_outputs(outputs)
+    print(f"generated {OUT.relative_to(ROOT).as_posix()} and HDE-EPIC033 baseline artifacts at {produced} ({mode})")
 
 
 if __name__ == "__main__":

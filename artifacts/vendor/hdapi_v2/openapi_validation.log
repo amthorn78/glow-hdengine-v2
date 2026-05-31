@@ -1,22 +1,30 @@
-generated_at_utc=2026-05-31T17:03:04Z
+generated_at_utc=2026-05-31T17:39:27Z
 scope=HDE-EPIC033 HDE-FERM006.2 machine-readable vendor route validation
-network_posture=public documentation fetch only; no credentialed runtime vendor API call
-validator=structural OpenAPI 3/domain/title/server/path-family checks using fetched public docs bytes
+source_mode=closed-rails-source-cache
+network_posture=public documentation refresh only when --refresh-public-docs is used with SAFE_MODE=0 and ALLOW_NETWORK=1; default generation is closed-rails cache replay
+validator=Ruby Psych YAML parser plus fail-closed OpenAPI structural validator for title/version/server/security/request/response/path-family ownership
 [v2-routes.yaml] status=VALIDATED
-[v2-routes.yaml] openapi_3=PASS
+[v2-routes.yaml] openapi_3_parse=PASS
 [v2-routes.yaml] title_humandesignapi=PASS
 [v2-routes.yaml] version_present=PASS
 [v2-routes.yaml] server_domain=PASS
-[v2-routes.yaml] required_paths_present=PASS
-[v2-routes.yaml] observed_version=2.0.0 expected_family=v2
+[v2-routes.yaml] components_present=PASS
+[v2-routes.yaml] path_/charts_post_contract=PASS
+[v2-routes.yaml] path_/charts/simple_post_contract=PASS
+[v2-routes.yaml] path_/charts/coordinates_post_contract=PASS
+[v2-routes.yaml] observed_version=2.0.0
 [v1-routes.yaml] status=VALIDATED
-[v1-routes.yaml] openapi_3=PASS
+[v1-routes.yaml] openapi_3_parse=PASS
 [v1-routes.yaml] title_humandesignapi=PASS
 [v1-routes.yaml] version_present=PASS
 [v1-routes.yaml] server_domain=PASS
-[v1-routes.yaml] required_paths_present=PASS
-[v1-routes.yaml] observed_version=1.1.204 expected_family=v1
+[v1-routes.yaml] components_present=PASS
+[v1-routes.yaml] path_/bodygraphs_post_contract=PASS
+[v1-routes.yaml] path_/bodygraphs/simple_post_contract=PASS
+[v1-routes.yaml] observed_version=1.1.204
 [api-reference/openapi.json] status=QUARANTINED
 [api-reference/openapi.json] title=OpenAPI Plant Store
+[api-reference/openapi.json] title_humandesignapi=FAIL
 [api-reference/openapi.json] server_domain=FAIL
 [api-reference/openapi.json] path_family=FAIL
+[route-spec-gate] status=PASS

@@ -653,6 +653,27 @@ EPIC033_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     },
 ]
 
+
+
+def _load_epic033_entries() -> list[dict[str, object]]:
+    produced_at = None
+    source_inventory = ROOT / "artifacts/vendor/hdapi_v2/source_inventory.json"
+    if source_inventory.exists():
+        try:
+            payload = json.loads(source_inventory.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as exc:
+            raise SystemExit("INVALID_EPIC033_SOURCE_INVENTORY") from exc
+        produced = payload.get("generated_at_utc")
+        if isinstance(produced, str) and produced:
+            produced_at = produced
+    entries: list[dict[str, object]] = []
+    for entry in EPIC033_PRIMARY_ARTIFACTS:
+        normalized = dict(entry)
+        if produced_at is not None:
+            normalized["produced_at_utc"] = produced_at
+        entries.append(normalized)
+    return entries
+
 A7_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
         "artifact_key": "a7.success_encoding_invariance",
@@ -987,7 +1008,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *EPIC032_PR02_PRIMARY_ARTIFACTS,
             *EPIC032_PR03_PRIMARY_ARTIFACTS,
             *EPIC032_PR04_PRIMARY_ARTIFACTS,
-            *EPIC033_PRIMARY_ARTIFACTS,
+            *_load_epic033_entries(),
             *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,

@@ -1,0 +1,789 @@
+openapi: 3.0.3
+info:
+  title: Human Design API — v2
+  description: >
+    v2 chart generation endpoints. Returns camelCase JSON wrapped in a standard
+    response envelope.
+
+
+    ## Authentication
+
+    All endpoints require a Bearer token in the `Authorization` header.
+
+    Geocode-based endpoints additionally require an `HD-Geocode-Key` header with
+    a Google Geocoding API key.
+
+
+    ## Response Envelope
+
+    Every response follows the same structure:
+
+    ```json
+
+    {
+      "timestamp": "2026-03-24T12:00:00.000Z",
+      "success": true,
+      "message": "Chart generated",
+      "errorCode": "",
+      "type": "ChartResult",
+      "data": { ... }
+    }
+
+    ```
+  version: 2.0.0
+  contact:
+    name: API Support
+    email: info@mail.humandesignapi.nl
+    url: https://humandesignapi.nl
+  license:
+    name: Proprietary
+    url: https://humandesignapi.nl
+servers:
+  - url: https://api.humandesignapi.nl/v2
+    description: Production server
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: API key used as Bearer token in the Authorization header
+    GeocodeKeyAuth:
+      type: apiKey
+      in: header
+      name: HD-Geocode-Key
+      description: Google Geocoding API key
+  schemas:
+    ChartInput:
+      type: object
+      required:
+        - birthdate
+        - birthtime
+        - location
+      properties:
+        birthdate:
+          type: string
+          pattern: ^\d{4}-\d{2}-\d{2}$
+          description: Date of birth in YYYY-MM-DD format
+          example: '1990-01-15'
+        birthtime:
+          type: string
+          pattern: ^\d{2}:\d{2}$
+          description: Time of birth in HH:MM format (24-hour)
+          example: '14:30'
+        location:
+          type: string
+          minLength: 4
+          maxLength: 200
+          description: Location of birth (city, country)
+          example: Amsterdam, The Netherlands
+    CoordinatesInput:
+      type: object
+      required:
+        - birthdate
+        - birthtime
+        - lat
+        - lng
+      properties:
+        birthdate:
+          type: string
+          pattern: ^\d{4}-\d{2}-\d{2}$
+          description: Date of birth in YYYY-MM-DD format
+          example: '1990-01-15'
+        birthtime:
+          type: string
+          pattern: ^\d{2}:\d{2}$
+          description: Time of birth in HH:MM format (24-hour)
+          example: '14:30'
+        lat:
+          type: number
+          format: float
+          minimum: -90
+          maximum: 90
+          description: Latitude of birth location
+          example: 52.3676
+        lng:
+          type: number
+          format: float
+          minimum: -180
+          maximum: 180
+          description: Longitude of birth location
+          example: 4.9041
+    StandardResponse:
+      type: object
+      description: Standard API response envelope wrapping all responses
+      required:
+        - timestamp
+        - success
+        - message
+        - errorCode
+        - type
+        - data
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp of response generation
+          example: '2026-03-24T12:00:00.000Z'
+        success:
+          type: boolean
+          description: Whether the request succeeded
+          example: true
+        message:
+          type: string
+          description: Human-readable success or error message
+          example: Chart generated
+        errorCode:
+          type: string
+          description: Machine-readable error code (empty string on success)
+          example: ''
+        type:
+          type: string
+          description: Data type name of the object in the data field
+        data:
+          type: object
+          nullable: true
+          description: The response payload (null on error)
+    ActivationSide:
+      type: object
+      description: Planetary gate.line activations for one side (design or personality)
+      properties:
+        sun:
+          type: string
+          example: '20.1'
+        earth:
+          type: string
+          example: '34.1'
+        northNode:
+          type: string
+          example: '10.3'
+        southNode:
+          type: string
+          example: '15.3'
+        moon:
+          type: string
+          example: '57.4'
+        mercury:
+          type: string
+          example: '48.2'
+        venus:
+          type: string
+          example: '18.5'
+        mars:
+          type: string
+          example: '28.1'
+        jupiter:
+          type: string
+          example: '32.6'
+        saturn:
+          type: string
+          example: '50.3'
+        uranus:
+          type: string
+          example: '44.2'
+        neptune:
+          type: string
+          example: '26.4'
+        pluto:
+          type: string
+          example: '54.1'
+    ChartResult:
+      type: object
+      description: Full Human Design chart with all properties
+      properties:
+        type:
+          type: string
+          description: >-
+            Human Design type: Generator, Manifesting Generator, Projector,
+            Manifestor, or Reflector
+          example: Generator
+        profile:
+          type: string
+          description: Profile line combination
+          example: 6/2
+        channelsShort:
+          type: array
+          items:
+            type: string
+          description: Active channel connections as gate pairs
+          example:
+            - 20-34
+            - 10-57
+        centers:
+          type: array
+          items:
+            type: string
+          description: Defined (active) energy centers
+          example:
+            - G
+            - Sacral
+            - Spleen
+            - Throat
+        strategy:
+          type: string
+          description: Decision-making strategy based on type
+          example: To Respond
+        authority:
+          type: string
+          description: Inner authority for decision-making
+          example: Sacral
+        incarnationCross:
+          type: string
+          description: Incarnation cross with gate numbers
+          example: Right Angle Cross of Tension (39/38 | 51/57)
+        definition:
+          type: string
+          description: >-
+            How defined centers connect: Single, Split, Triple Split, Quad
+            Split, or No Definition
+          example: Split Definition
+        signature:
+          type: string
+          description: Emotional signature when living correctly
+          example: Satisfaction
+        notSelfTheme:
+          type: string
+          description: Emotional indicator of misalignment
+          example: Frustration
+        cognition:
+          type: string
+          description: Cognitive processing style
+          example: Smell
+        determination:
+          type: string
+          description: Dietary determination for wellbeing
+          example: Calm Appetite
+        variables:
+          type: string
+          description: Variable configuration (arrow directions)
+          example: PLL DRL
+        motivation:
+          type: string
+          description: Underlying motivation theme
+          example: Hope
+        transference:
+          type: string
+          description: Not-self motivation pattern
+          example: Guilt
+        perspective:
+          type: string
+          description: Perspective awareness theme
+          example: Survival
+        distraction:
+          type: string
+          description: Not-self perspective pattern
+          example: Power
+        environment:
+          type: string
+          description: Optimal physical environment
+          example: Selective Caves
+        circuitries:
+          type: string
+          description: Active circuitry types (comma-separated)
+          example: Individual, Tribal
+        channelsLong:
+          type: array
+          items:
+            type: string
+          description: Full channel names with gate numbers
+          example:
+            - The Channel of Charisma (20-34)
+            - The Channel of the Brainwave (57-10)
+        gates:
+          type: array
+          items:
+            type: string
+          description: All activated gate numbers
+          example:
+            - '20'
+            - '34'
+            - '10'
+            - '57'
+        activations:
+          type: object
+          description: Planetary gate/line activations for both sides
+          properties:
+            design:
+              $ref: '#/components/schemas/ActivationSide'
+            personality:
+              $ref: '#/components/schemas/ActivationSide'
+        birthDateUtc:
+          type: string
+          format: date-time
+          description: Birth date/time converted to UTC
+          example: '1990-01-15T13:30:00.000Z'
+    ChartSimpleResult:
+      type: object
+      description: Simplified chart with core properties only
+      properties:
+        type:
+          type: string
+          description: >-
+            Human Design type: Generator, Manifesting Generator, Projector,
+            Manifestor, or Reflector
+          example: Generator
+        profile:
+          type: string
+          description: Profile line combination
+          example: 6/2
+        gates:
+          type: array
+          items:
+            type: string
+          description: All activated gate numbers
+          example:
+            - '20'
+            - '34'
+            - '10'
+            - '57'
+        channelsShort:
+          type: array
+          items:
+            type: string
+          description: Active channel connections as gate pairs
+          example:
+            - 20-34
+            - 10-57
+        centers:
+          type: array
+          items:
+            type: string
+          description: Defined (active) energy centers
+          example:
+            - G
+            - Sacral
+            - Spleen
+            - Throat
+    ErrorResponse:
+      type: object
+      description: Standard error response
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          example: '2026-03-24T12:00:01.000Z'
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          description: Human-readable error description
+          example: Birthdate must be in YYYY-MM-DD format
+        errorCode:
+          type: string
+          description: Machine-readable error code for client logic
+          example: INVALID_BIRTHDATE
+          enum:
+            - INVALID_BIRTHDATE
+            - INVALID_BIRTHTIME
+            - INVALID_LOCATION
+            - INVALID_LATITUDE
+            - INVALID_LONGITUDE
+            - GEOCODE_LOCATION_NOT_FOUND
+            - GEOCODE_KEY_INVALID
+            - GEOCODE_KEY_MISSING
+            - GEOCODE_RATE_LIMITED
+            - API_KEY_MISSING
+            - API_KEY_INVALID
+            - CREDITS_EXHAUSTED
+            - ACCESS_DENIED
+            - ACCOUNT_INACTIVE
+            - RATE_LIMIT_EXCEEDED
+            - CHART_GENERATION_FAILED
+            - EPHEMERIS_ERROR
+            - TIMEZONE_LOOKUP_FAILED
+            - INTERNAL_ERROR
+        type:
+          type: string
+          example: ''
+        data:
+          type: object
+          nullable: true
+          example: null
+paths:
+  /charts:
+    post:
+      summary: Generate a full chart
+      description: >
+        Generates a complete Human Design chart from birth date, time, and
+        location.
+
+        Requires the "advanced" access tier.
+      operationId: generateChart
+      security:
+        - BearerAuth: []
+          GeocodeKeyAuth: []
+      tags:
+        - Charts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChartInput'
+      responses:
+        '200':
+          description: Chart generated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/StandardResponse'
+                  - type: object
+                    properties:
+                      type:
+                        example: ChartResult
+                      data:
+                        $ref: '#/components/schemas/ChartResult'
+        '400':
+          description: >
+            Validation or geocoding error.
+
+            Possible error codes: `INVALID_BIRTHDATE`, `INVALID_BIRTHTIME`,
+            `INVALID_LOCATION`,
+
+            `GEOCODE_LOCATION_NOT_FOUND`, `GEOCODE_KEY_INVALID`,
+            `GEOCODE_KEY_MISSING`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                timestamp: '2026-03-24T12:00:01.000Z'
+                success: false
+                message: Birthdate must be in YYYY-MM-DD format
+                errorCode: INVALID_BIRTHDATE
+                type: ''
+                data: null
+        '401':
+          description: |
+            Authentication failed.
+            Possible error codes: `API_KEY_MISSING`, `API_KEY_INVALID`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                timestamp: '2026-03-24T12:00:01.000Z'
+                success: false
+                message: No Authorization header provided
+                errorCode: API_KEY_MISSING
+                type: ''
+                data: null
+        '402':
+          description: |
+            Credits exhausted.
+            Error code: `CREDITS_EXHAUSTED`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                timestamp: '2026-03-24T12:00:01.000Z'
+                success: false
+                message: No credits remaining. Enable overage or upgrade your plan.
+                errorCode: CREDITS_EXHAUSTED
+                type: ''
+                data: null
+        '403':
+          description: |
+            Access denied — insufficient tier or inactive account.
+            Possible error codes: `ACCESS_DENIED`, `ACCOUNT_INACTIVE`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                timestamp: '2026-03-24T12:00:01.000Z'
+                success: false
+                message: Your plan does not include this endpoint
+                errorCode: ACCESS_DENIED
+                type: ''
+                data: null
+        '429':
+          description: |
+            Rate limit exceeded.
+            Possible error codes: `RATE_LIMIT_EXCEEDED`, `GEOCODE_RATE_LIMITED`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                timestamp: '2026-03-24T12:00:01.000Z'
+                success: false
+                message: Too many requests. Please try again later.
+                errorCode: RATE_LIMIT_EXCEEDED
+                type: ''
+                data: null
+        '500':
+          description: |
+            Internal server error.
+            Possible error codes: `CHART_GENERATION_FAILED`, `EPHEMERIS_ERROR`,
+            `TIMEZONE_LOOKUP_FAILED`, `INTERNAL_ERROR`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                timestamp: '2026-03-24T12:00:01.000Z'
+                success: false
+                message: An unexpected error occurred
+                errorCode: INTERNAL_ERROR
+                type: ''
+                data: null
+  /charts/simple:
+    post:
+      summary: Generate a simple chart
+      description: >
+        Generates a simplified Human Design chart with type, profile, gates,
+        channels, and centers.
+
+        Available to any access tier.
+      operationId: generateSimpleChart
+      security:
+        - BearerAuth: []
+          GeocodeKeyAuth: []
+      tags:
+        - Charts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChartInput'
+      responses:
+        '200':
+          description: Simple chart generated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/StandardResponse'
+                  - type: object
+                    properties:
+                      type:
+                        example: ChartSimpleResult
+                      data:
+                        $ref: '#/components/schemas/ChartSimpleResult'
+        '400':
+          description: >
+            Validation or geocoding error.
+
+            Possible error codes: `INVALID_BIRTHDATE`, `INVALID_BIRTHTIME`,
+            `INVALID_LOCATION`,
+
+            `GEOCODE_LOCATION_NOT_FOUND`, `GEOCODE_KEY_INVALID`,
+            `GEOCODE_KEY_MISSING`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                timestamp: '2026-03-24T12:00:01.000Z'
+                success: false
+                message: Birthdate must be in YYYY-MM-DD format
+                errorCode: INVALID_BIRTHDATE
+                type: ''
+                data: null
+        '401':
+          description: |
+            Authentication failed.
+            Possible error codes: `API_KEY_MISSING`, `API_KEY_INVALID`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                timestamp: '2026-03-24T12:00:01.000Z'
+                success: false
+                message: No Authorization header provided
+                errorCode: API_KEY_MISSING
+                type: ''
+                data: null
+        '402':
+          description: |
+            Credits exhausted.
+            Error code: `CREDITS_EXHAUSTED`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                timestamp: '2026-03-24T12:00:01.000Z'
+                success: false
+                message: No credits remaining. Enable overage or upgrade your plan.
+                errorCode: CREDITS_EXHAUSTED
+                type: ''
+                data: null
+        '403':
+          description: |
+            Access denied or inactive account.
+            Possible error codes: `ACCESS_DENIED`, `ACCOUNT_INACTIVE`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                timestamp: '2026-03-24T12:00:01.000Z'
+                success: false
+                message: Your plan does not include this endpoint
+                errorCode: ACCESS_DENIED
+                type: ''
+                data: null
+        '429':
+          description: |
+            Rate limit exceeded.
+            Possible error codes: `RATE_LIMIT_EXCEEDED`, `GEOCODE_RATE_LIMITED`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                timestamp: '2026-03-24T12:00:01.000Z'
+                success: false
+                message: Too many requests. Please try again later.
+                errorCode: RATE_LIMIT_EXCEEDED
+                type: ''
+                data: null
+        '500':
+          description: |
+            Internal server error.
+            Possible error codes: `CHART_GENERATION_FAILED`, `EPHEMERIS_ERROR`,
+            `TIMEZONE_LOOKUP_FAILED`, `INTERNAL_ERROR`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                timestamp: '2026-03-24T12:00:01.000Z'
+                success: false
+                message: An unexpected error occurred
+                errorCode: INTERNAL_ERROR
+                type: ''
+                data: null
+  /charts/coordinates:
+    post:
+      summary: Generate a chart from coordinates
+      description: >
+        Generates a complete Human Design chart from birth date, time, and
+        geographic coordinates.
+
+        No geocoding key required — timezone is resolved from lat/lng directly.
+
+        Requires the "advanced" access tier.
+      operationId: generateChartFromCoordinates
+      security:
+        - BearerAuth: []
+      tags:
+        - Charts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CoordinatesInput'
+      responses:
+        '200':
+          description: Chart generated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/StandardResponse'
+                  - type: object
+                    properties:
+                      type:
+                        example: ChartResult
+                      data:
+                        $ref: '#/components/schemas/ChartResult'
+        '400':
+          description: |
+            Validation error.
+            Possible error codes: `INVALID_BIRTHDATE`, `INVALID_BIRTHTIME`,
+            `INVALID_LATITUDE`, `INVALID_LONGITUDE`, `TIMEZONE_LOOKUP_FAILED`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                timestamp: '2026-03-24T12:00:01.000Z'
+                success: false
+                message: Latitude must be a number between -90 and 90
+                errorCode: INVALID_LATITUDE
+                type: ''
+                data: null
+        '401':
+          description: |
+            Authentication failed.
+            Possible error codes: `API_KEY_MISSING`, `API_KEY_INVALID`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                timestamp: '2026-03-24T12:00:01.000Z'
+                success: false
+                message: No Authorization header provided
+                errorCode: API_KEY_MISSING
+                type: ''
+                data: null
+        '402':
+          description: |
+            Credits exhausted.
+            Error code: `CREDITS_EXHAUSTED`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                timestamp: '2026-03-24T12:00:01.000Z'
+                success: false
+                message: No credits remaining. Enable overage or upgrade your plan.
+                errorCode: CREDITS_EXHAUSTED
+                type: ''
+                data: null
+        '403':
+          description: |
+            Access denied — insufficient tier or inactive account.
+            Possible error codes: `ACCESS_DENIED`, `ACCOUNT_INACTIVE`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                timestamp: '2026-03-24T12:00:01.000Z'
+                success: false
+                message: Your plan does not include this endpoint
+                errorCode: ACCESS_DENIED
+                type: ''
+                data: null
+        '429':
+          description: |
+            Rate limit exceeded.
+            Error code: `RATE_LIMIT_EXCEEDED`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                timestamp: '2026-03-24T12:00:01.000Z'
+                success: false
+                message: Too many requests. Please try again later.
+                errorCode: RATE_LIMIT_EXCEEDED
+                type: ''
+                data: null
+        '500':
+          description: |
+            Internal server error.
+            Possible error codes: `CHART_GENERATION_FAILED`, `EPHEMERIS_ERROR`,
+            `TIMEZONE_LOOKUP_FAILED`, `INTERNAL_ERROR`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                timestamp: '2026-03-24T12:00:01.000Z'
+                success: false
+                message: An unexpected error occurred
+                errorCode: INTERNAL_ERROR
+                type: ''
+                data: null

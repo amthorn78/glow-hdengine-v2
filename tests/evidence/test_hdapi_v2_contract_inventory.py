@@ -4,6 +4,10 @@ import csv
 import json
 from pathlib import Path
 
+import pytest
+
+from tools.evidence import generate_hdapi_v2_contract_inventory as generator
+
 ROOT = Path(__file__).resolve().parents[2]
 VENDOR_DIR = ROOT / "artifacts" / "vendor" / "hdapi_v2"
 REQUIRED_PRIMARY_ARTIFACTS = [
@@ -18,6 +22,13 @@ REQUIRED_PRIMARY_ARTIFACTS = [
     ROOT / "audit" / "qa" / "hde-epic033" / "acceptance_map_viability.log",
     ROOT / "audit" / "docdeltas" / "hde-epic033_doc_deltas.md",
     ROOT / "audit" / "qa" / "hde-epic033" / "00_meta" / "doc_deltas.md",
+]
+REQUIRED_SOURCE_CACHE = [
+    VENDOR_DIR / "source_cache" / "source_metadata.json",
+    VENDOR_DIR / "source_cache" / "v2-routes.yaml",
+    VENDOR_DIR / "source_cache" / "v1-routes.yaml",
+    VENDOR_DIR / "source_cache" / "api-reference.openapi.json",
+    VENDOR_DIR / "source_cache" / "llms-full.endpoint-tiers.txt",
 ]
 REQUIRED_ENDPOINTS = {
     ("POST", "/v2/charts"): "recommended_v2_chart",
@@ -56,11 +67,15 @@ def test_hdapi_v2_primary_artifacts_exist_and_are_lf_terminated() -> None:
         assert raw, path
         assert raw.endswith(b"\n"), path
         assert b"\r\n" not in raw, path
+    for path in REQUIRED_SOURCE_CACHE:
+        assert path.exists(), path
+        assert path.read_bytes(), path
 
 
 def test_hdapi_v2_inventory_records_required_source_fields_and_ai_boundary() -> None:
     inventory = _assert_canonical_json(VENDOR_DIR / "source_inventory.json")
     assert "documentation-discovery-only" in inventory["ai_boundary"]
+    assert inventory["source_mode"] == "closed-rails-source-cache"
     for key in ["llms_txt", "llms_full_txt", "v2_routes_yaml", "v1_routes_yaml", "suspect_openapi_json"]:
         source = inventory["sources"][key]
         for field in ["source_url", "final_url", "content_type", "fetch_status", "sha256", "discovered_from", "last_seen_utc", "source_classification"]:
@@ -71,8 +86,12 @@ def test_hdapi_v2_inventory_records_required_source_fields_and_ai_boundary() -> 
 
 def test_hdapi_v2_validation_quarantines_suspect_openapi() -> None:
     log = (VENDOR_DIR / "openapi_validation.log").read_text(encoding="utf-8")
+    assert "source_mode=closed-rails-source-cache" in log
+    assert "Ruby Psych YAML parser" in log
     assert "[v2-routes.yaml] status=VALIDATED" in log
+    assert "[v2-routes.yaml] openapi_3_parse=PASS" in log
     assert "[v1-routes.yaml] status=VALIDATED" in log
+    assert "[route-spec-gate] status=PASS" in log
     assert "[api-reference/openapi.json] status=QUARANTINED" in log
     anomalies = (VENDOR_DIR / "known_anomalies.md").read_text(encoding="utf-8")
     assert "Decision: QUARANTINED." in anomalies
@@ -125,3 +144,62 @@ def test_hdapi_v2_index_and_path_proof_bindings_when_promoted() -> None:
         proof_text = proof.read_text(encoding="utf-8")
         assert f"path: {rel}" in proof_text
         assert "sha256: " in proof_text
+
+
+def test_generator_default_closed_rails_uses_source_cache_without_network_fetch(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SAFE_MODE", "1")
+    monkeypatch.setenv("ALLOW_NETWORK", "0")
+
+    def fail_fetch(_url: str) -> tuple[str, str, int | str, bytes]:
+        raise AssertionError("network fetch must not run in closed-rails source-cache mode")
+
+    monkeypatch.setattr(generator, "fetch_public_doc", fail_fetch)
+    metadata, bodies = generator.load_source_cache()
+    outputs = generator.render_outputs("2026-05-31T00:00:00Z", metadata, bodies, mode="closed-rails-source-cache")
+    assert VENDOR_DIR / "source_inventory.json" in outputs
+
+
+def test_generator_refresh_requires_explicit_open_rails(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SAFE_MODE", "1")
+    monkeypatch.setenv("ALLOW_NETWORK", "0")
+    with pytest.raises(SystemExit, match="OPEN_RAILS_REQUIRED"):
+        generator.require_open_rails_for_refresh()
+
+
+def test_generator_fails_before_promoting_contract_when_route_validation_fails() -> None:
+    metadata, bodies = generator.load_source_cache()
+    broken = dict(bodies)
+    broken["v2_routes_yaml"] = "openapi: 3.0.3\ninfo:\n  title: Human Design API — v2\n  version: 2.0.0\npaths: {}\n".encode("utf-8")
+    with pytest.raises(SystemExit, match="ROUTE_SPEC_VALIDATION_FAILED"):
+        generator.render_outputs("2026-05-31T00:00:00Z", metadata, broken, mode="closed-rails-source-cache")
+
+
+def test_endpoint_reference_matches_source_parsed_rows() -> None:
+    _metadata, bodies = generator.load_source_cache()
+    parsed_rows = generator.build_endpoint_rows(
+        generator.parse_yaml_openapi(bodies["v2_routes_yaml"], "v2-routes.yaml"),
+        generator.parse_yaml_openapi(bodies["v1_routes_yaml"], "v1-routes.yaml"),
+        bodies["llms_full_txt"].decode("utf-8"),
+    )
+    csv_rows = list(csv.DictReader((VENDOR_DIR / "endpoint_reference.csv").read_text(encoding="utf-8").splitlines()))
+    assert csv_rows == parsed_rows
+
+
+def test_epic033_mirror_chronology_matches_artifact_generation_time() -> None:
+    inventory = json.loads((VENDOR_DIR / "source_inventory.json").read_text(encoding="utf-8"))
+    produced = inventory["generated_at_utc"]
+    for rel in [
+        "artifacts/vendor/hdapi_v2/source_inventory.json",
+        "artifacts/vendor/hdapi_v2/contract_map.json",
+        "docs/acceptance_map_epic033.json",
+    ]:
+        proof = (ROOT / f"{rel}.path_proof.txt").read_text(encoding="utf-8")
+        assert f"produced_at_utc: {produced}" in proof
+    mirror_rows = [json.loads(line) for line in (ROOT / "artifacts/evidence_index.jsonl").read_text(encoding="utf-8").splitlines() if line]
+    for row in mirror_rows:
+        if row["discovered_physical_path"] in {
+            "artifacts/vendor/hdapi_v2/source_inventory.json",
+            "artifacts/vendor/hdapi_v2/contract_map.json",
+            "docs/acceptance_map_epic033.json",
+        }:
+            assert row["produced_at_utc"] == produced

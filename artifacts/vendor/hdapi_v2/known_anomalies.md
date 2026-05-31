@@ -1,12 +1,12 @@
 # HDAPI v2 Known Anomalies
 
-Generated at UTC: 2026-05-31T17:03:04Z
+Generated at UTC: 2026-05-31T17:39:27Z
 
-## api-reference/openapi.json quarantine
+## api-reference/openapi.json posture
 
 Decision: QUARANTINED.
 
-The repository path `api-reference/openapi.json` is absent in this repo. The public documentation URL `https://docs.humandesignapi.nl/api-reference/openapi.json` was fetched as a suspect artifact and did not prove HumanDesignAPI ownership: its title is `OpenAPI Plant Store`, its server is `http://sandbox.mintlify.com`, and its path family is not the HumanDesignAPI v1/v2 chart/bodygraph family.
+The repository path `api-reference/openapi.json` is absent in this repo. The public documentation URL `https://docs.humandesignapi.nl/api-reference/openapi.json` did not prove HumanDesignAPI ownership in this run: title=`OpenAPI Plant Store`, servers=[{"url": "http://sandbox.mintlify.com"}], paths_sample=["/plants", "/plants/{id}"].
 
 Quarantine effect: the suspect artifact is not used as authority for vendor bytes, schemas, endpoint routes, request shaping, response mapping, runtime conformance, or architecture conformance. Validated YAML route specs remain first-precedence authority for this contract-inventory slice.
 
