@@ -1,5 +1,15 @@
 # CHANGELOG
 
+Unreleased — HDE-EPIC033 PR-01: HDAPI contract-inventory evidence (README/CHANGELOG/AGENTS/docs/)
+
+### Added
+- Documented the HDE-EPIC033 PR-01 HumanDesignAPI v2 and legacy v1 contract-inventory evidence family under `artifacts/vendor/hdapi_v2/`, including source inventory, validated route-spec posture, known-anomaly quarantine, endpoint reference, contract map, source-cache inputs, path proofs, acceptance map, token evidence matrix, and Evidence Index / Machine Mirror coverage.
+- Added repo-doc posture for the closed-rails source-cache default in `tools/evidence/generate_hdapi_v2_contract_inventory.py` and the explicit public-doc refresh mode (`--refresh-public-docs` with `SAFE_MODE=0` and `ALLOW_NETWORK=1`).
+
+### Changed / Fixed
+- Clarified that HDE-EPIC033 PR-01 is inventory-only for HDE-FERM006.1 through HDE-FERM006.4 and does not claim HumanDesignAPI v2 runtime request shaping, source selection, live conformance, public Reader changes, open-rails vendor smoke, a new HTTP home, or AI scope; HDE-FERM007 and HDE-FERM008 remain follow-up/out of scope.
+- Clarified that `llms.txt` / `llms-full.txt` are documentation-discovery-only context and that the suspect `api-reference/openapi.json` source is quarantined rather than trusted authority.
+
 Unreleased — HDE-EPIC032: final repo docs sweep (README/CHANGELOG/AGENTS/docs/)
 
 ### Added
