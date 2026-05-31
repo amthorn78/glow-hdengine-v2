@@ -1,0 +1,28 @@
+# Human Design API
+
+## Docs
+
+- [Generate a complete bodygraph](https://docs.humandesignapi.nl/api-reference/bodygraph/generate-a-complete-bodygraph.md): Generates a full Human Design bodygraph chart from birth data and location.
+- [Generate a simplified bodygraph](https://docs.humandesignapi.nl/api-reference/bodygraph/generate-a-simplified-bodygraph.md): Generates a simplified Human Design chart with type, profile, gates, channels, and centers.
+- [Generate a chart from coordinates](https://docs.humandesignapi.nl/api-reference/charts/generate-a-chart-from-coordinates.md): Generates a complete Human Design chart from birth date, time, and geographic coordinates. No geocoding key required — timezone is resolved from lat/lng directly. Requires the "advanced" access tier.
+- [Generate a full chart](https://docs.humandesignapi.nl/api-reference/charts/generate-a-full-chart.md): Generates a complete Human Design chart from birth date, time, and location. Requires the "advanced" access tier.
+- [Generate a simple chart](https://docs.humandesignapi.nl/api-reference/charts/generate-a-simple-chart.md): Generates a simplified Human Design chart with type, profile, gates, channels, and centers. Available to any access tier.
+- [Error Codes](https://docs.humandesignapi.nl/api-reference/error-codes.md): Complete reference of all machine-readable error codes.
+- [v1 API Overview (Legacy)](https://docs.humandesignapi.nl/api-reference/v1/overview.md): Overview of the legacy v1 Bodygraph API.
+- [v2 API Overview](https://docs.humandesignapi.nl/api-reference/v2/overview.md): Overview of the v2 Human Design Chart API.
+- [Authentication](https://docs.humandesignapi.nl/authentication.md): How to authenticate with the Human Design API.
+- [Using with AI Agents & LLMs](https://docs.humandesignapi.nl/guides/agentic-tools.md): Integrate the Human Design API with AI agents, LLMs, and no-code tools.
+- [Using Coordinates Instead of Location](https://docs.humandesignapi.nl/guides/coordinates-endpoint.md): Generate charts from latitude and longitude without a geocoding key.
+- [Error Handling](https://docs.humandesignapi.nl/guides/error-handling.md): How to handle errors from the Human Design API.
+- [Plans & Credits](https://docs.humandesignapi.nl/guides/plans-and-credits.md): Understand API plans, credit allocation, and usage tracking.
+- [Rate Limiting](https://docs.humandesignapi.nl/guides/rate-limiting.md): Understand rate limits and how to handle them.
+- [Human Design API](https://docs.humandesignapi.nl/index.md): Generate Human Design personality charts from birth date, time, and location.
+- [Migrating from v1 to v2](https://docs.humandesignapi.nl/migration/v1-to-v2.md): Step-by-step guide to upgrade from API v1 to v2.
+- [Quick Start](https://docs.humandesignapi.nl/quickstart.md): Make your first API call in under 5 minutes.
+- [Response Format](https://docs.humandesignapi.nl/response-format.md): The standard response envelope used by all v2 endpoints.
+
+## OpenAPI Specs
+
+- [v2-routes](https://docs.humandesignapi.nl/openapi/v2-routes.yaml)
+- [v1-routes](https://docs.humandesignapi.nl/openapi/v1-routes.yaml)
+- [openapi](https://docs.humandesignapi.nl/api-reference/openapi.json)

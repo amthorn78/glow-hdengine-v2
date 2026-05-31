@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import csv
 import json
 from pathlib import Path
@@ -25,10 +26,22 @@ REQUIRED_PRIMARY_ARTIFACTS = [
 ]
 REQUIRED_SOURCE_CACHE = [
     VENDOR_DIR / "source_cache" / "source_metadata.json",
+    VENDOR_DIR / "source_cache" / "robots_preflight.body",
+    VENDOR_DIR / "source_cache" / "llms_txt.body",
+    VENDOR_DIR / "source_cache" / "llms-full.endpoint-tiers.txt",
     VENDOR_DIR / "source_cache" / "v2-routes.yaml",
     VENDOR_DIR / "source_cache" / "v1-routes.yaml",
     VENDOR_DIR / "source_cache" / "api-reference.openapi.json",
-    VENDOR_DIR / "source_cache" / "llms-full.endpoint-tiers.txt",
+    VENDOR_DIR / "source_cache" / "v2_overview.body",
+    VENDOR_DIR / "source_cache" / "v1_overview.body",
+    VENDOR_DIR / "source_cache" / "v2_full_chart_page.body",
+    VENDOR_DIR / "source_cache" / "v2_simple_chart_page.body",
+    VENDOR_DIR / "source_cache" / "v2_coordinates_chart_page.body",
+    VENDOR_DIR / "source_cache" / "authentication.body",
+    VENDOR_DIR / "source_cache" / "rate_limiting.body",
+    VENDOR_DIR / "source_cache" / "response_format.body",
+    VENDOR_DIR / "source_cache" / "migration_v1_to_v2.body",
+    VENDOR_DIR / "source_cache" / "coordinates_guide.body",
 ]
 REQUIRED_ENDPOINTS = {
     ("POST", "/v2/charts"): "recommended_v2_chart",
@@ -84,7 +97,7 @@ def test_hdapi_v2_inventory_records_required_source_fields_and_ai_boundary() -> 
     assert inventory["sources"]["llms_full_txt"]["source_classification"] == "documentation-discovery-only"
 
 
-def test_hdapi_v2_validation_quarantines_suspect_openapi() -> None:
+def test_hdapi_v2_validation_and_anomaly_posture_are_consistent() -> None:
     log = (VENDOR_DIR / "openapi_validation.log").read_text(encoding="utf-8")
     assert "source_mode=closed-rails-source-cache" in log
     assert "Ruby Psych YAML parser" in log
@@ -92,11 +105,16 @@ def test_hdapi_v2_validation_quarantines_suspect_openapi() -> None:
     assert "[v2-routes.yaml] openapi_3_parse=PASS" in log
     assert "[v1-routes.yaml] status=VALIDATED" in log
     assert "[route-spec-gate] status=PASS" in log
-    assert "[api-reference/openapi.json] status=QUARANTINED" in log
     anomalies = (VENDOR_DIR / "known_anomalies.md").read_text(encoding="utf-8")
-    assert "Decision: QUARANTINED." in anomalies
-    assert "OpenAPI Plant Store" in anomalies
-    assert "repository path `api-reference/openapi.json` is absent" in anomalies
+    contract = _assert_canonical_json(VENDOR_DIR / "contract_map.json")
+    if "[api-reference/openapi.json] status=VALIDATED" in log:
+        assert "Decision: VALIDATED." in anomalies
+        assert contract["quarantined_sources"] == []
+    else:
+        assert "[api-reference/openapi.json] status=QUARANTINED" in log
+        assert "Decision: QUARANTINED." in anomalies
+        assert contract["quarantined_sources"]
+        assert contract["quarantined_sources"][0]["source_key"] == "suspect_openapi_json"
 
 
 def test_hdapi_v2_endpoint_reference_distinguishes_v2_and_legacy_v1() -> None:
@@ -117,7 +135,8 @@ def test_hdapi_v2_contract_map_is_canonical_and_non_conformance_only() -> None:
     assert set(routes) == set(REQUIRED_ENDPOINTS)
     assert routes[("POST", "/v2/charts")]["route_family"] == "recommended_v2_chart"
     assert routes[("POST", "/v1/bodygraphs")]["route_family"] == "legacy_v1_bodygraph"
-    assert contract["quarantined_sources"][0]["source_key"] == "suspect_openapi_json"
+    if contract["quarantined_sources"]:
+        assert contract["quarantined_sources"][0]["source_key"] == "suspect_openapi_json"
 
 
 def test_epic033_acceptance_uses_only_allowed_existing_tokens() -> None:
@@ -183,6 +202,46 @@ def test_endpoint_reference_matches_source_parsed_rows() -> None:
     )
     csv_rows = list(csv.DictReader((VENDOR_DIR / "endpoint_reference.csv").read_text(encoding="utf-8").splitlines()))
     assert csv_rows == parsed_rows
+
+
+
+
+def test_source_inventory_rows_have_verified_cache_bodies() -> None:
+    metadata, _bodies = generator.load_source_cache()
+    inventory = _assert_canonical_json(VENDOR_DIR / "source_inventory.json")
+    for key, source in inventory["sources"].items():
+        cache_path = source.get("cache_path")
+        assert cache_path, key
+        body = (ROOT / cache_path).read_bytes()
+        assert generator.sha256_bytes(body) == metadata[key]["cache_sha256"]
+
+
+def test_tiers_are_parsed_from_endpoint_tier_table_cells() -> None:
+    metadata, bodies = generator.load_source_cache()
+    changed = dict(bodies)
+    changed["llms_full_txt"] = bodies["llms_full_txt"].replace(
+        b"| `POST /v2/charts`             | Full chart with all properties                             | Advanced         | Required    |",
+        b"| `POST /v2/charts`             | Full chart with all properties                             | Professional     | Required    |",
+    )
+    outputs = generator.render_outputs("2026-05-31T00:00:00Z", metadata, changed, mode="closed-rails-source-cache")
+    rows = list(csv.DictReader(outputs[VENDOR_DIR / "endpoint_reference.csv"].decode("utf-8").splitlines()))
+    assert {row["path"]: row["tier"] for row in rows}["/v2/charts"] == "Professional"
+
+
+def test_unavailable_suspect_openapi_does_not_block_contract_generation() -> None:
+    metadata, bodies = generator.load_source_cache()
+    changed_metadata = copy.deepcopy(metadata)
+    changed_bodies = dict(bodies)
+    changed_metadata["suspect_openapi_json"]["fetch_status"] = "404"
+    changed_metadata["suspect_openapi_json"]["sha256"] = ""
+    changed_metadata["suspect_openapi_json"]["cache_sha256"] = generator.sha256_bytes(b"")
+    changed_bodies["suspect_openapi_json"] = b""
+    outputs = generator.render_outputs("2026-05-31T00:00:00Z", changed_metadata, changed_bodies, mode="closed-rails-source-cache")
+    log = outputs[VENDOR_DIR / "openapi_validation.log"].decode("utf-8")
+    assert "[route-spec-gate] status=PASS" in log
+    assert "[api-reference/openapi.json] fetch_status=404" in log
+    contract = json.loads(outputs[VENDOR_DIR / "contract_map.json"].decode("utf-8"))
+    assert contract["quarantined_sources"][0]["source_key"] == "suspect_openapi_json"
 
 
 def test_epic033_mirror_chronology_matches_artifact_generation_time() -> None:

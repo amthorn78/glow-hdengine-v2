@@ -116,6 +116,10 @@ def require_open_rails_for_refresh() -> None:
         raise SystemExit("OPEN_RAILS_REQUIRED: set SAFE_MODE=0 and ALLOW_NETWORK=1 with --refresh-public-docs for public documentation fetching")
 
 
+def source_cache_name(key: str, configured: str | None) -> str:
+    return configured or f"{key}.body"
+
+
 def source_cache_rel(cache_name: str | None) -> str | None:
     return f"artifacts/vendor/hdapi_v2/source_cache/{cache_name}" if cache_name else None
 
@@ -125,17 +129,17 @@ def refresh_source_cache(produced: str) -> tuple[dict[str, dict[str, Any]], dict
     SOURCE_CACHE.mkdir(parents=True, exist_ok=True)
     metadata: dict[str, dict[str, Any]] = {}
     bodies: dict[str, bytes] = {}
-    for key, url, classification, discovered_from, cache_name in SOURCES:
+    for key, url, classification, discovered_from, configured_cache_name in SOURCES:
+        cache_name = source_cache_name(key, configured_cache_name)
         final_url, content_type, status, body = fetch_public_doc(url)
         cache_body = body
-        if key == "llms_full_txt":
+        if key == "llms_full_txt" and status in ALLOWED_STATUS:
             cache_body = llms_full_endpoint_tier_excerpt(body)
-        if cache_name:
-            write_bytes(SOURCE_CACHE / cache_name, cache_body)
-            bodies[key] = cache_body
+        write_bytes(SOURCE_CACHE / cache_name, cache_body)
+        bodies[key] = cache_body
         metadata[key] = {
             "cache_path": source_cache_rel(cache_name),
-            "cache_sha256": sha256_bytes(cache_body) if cache_name else None,
+            "cache_sha256": sha256_bytes(cache_body),
             "content_type": content_type,
             "discovered_from": discovered_from,
             "fetch_status": str(status),
@@ -157,20 +161,23 @@ def load_source_cache() -> tuple[dict[str, dict[str, Any]], dict[str, bytes]]:
     if not isinstance(metadata, dict):
         raise SystemExit("INVALID_SOURCE_CACHE: missing sources")
     bodies: dict[str, bytes] = {}
-    for key, _url, _classification, _discovered_from, cache_name in SOURCES:
+    for key, _url, _classification, _discovered_from, configured_cache_name in SOURCES:
         row = metadata.get(key)
         if not isinstance(row, dict):
             raise SystemExit(f"INVALID_SOURCE_CACHE: missing {key}")
-        if cache_name:
-            cache_path = SOURCE_CACHE / cache_name
-            if not cache_path.exists():
-                raise SystemExit(f"MISSING_SOURCE_BODY:{cache_path.relative_to(ROOT).as_posix()}")
-            body = cache_path.read_bytes()
-            expected = row.get("cache_sha256") or row.get("sha256")
-            actual = sha256_bytes(body)
-            if expected != actual:
-                raise SystemExit(f"SOURCE_CACHE_SHA_MISMATCH:{key}")
-            bodies[key] = body
+        cache_name = source_cache_name(key, configured_cache_name)
+        cache_path = SOURCE_CACHE / cache_name
+        if not cache_path.exists():
+            if key == "suspect_openapi_json":
+                bodies[key] = b""
+                continue
+            raise SystemExit(f"MISSING_SOURCE_BODY:{cache_path.relative_to(ROOT).as_posix()}")
+        body = cache_path.read_bytes()
+        expected = row.get("cache_sha256") or row.get("sha256")
+        actual = sha256_bytes(body)
+        if expected != actual:
+            raise SystemExit(f"SOURCE_CACHE_SHA_MISMATCH:{key}")
+        bodies[key] = body
     return metadata, bodies
 
 
@@ -324,19 +331,26 @@ def geocode_requirement(method: dict[str, Any]) -> str:
     return "required" if "GeocodeKeyAuth" in security_names(method) else "not needed"
 
 
+def markdown_cells(raw: str) -> list[str]:
+    if not raw.startswith("|"):
+        return []
+    return [cell.strip().strip("`").strip() for cell in raw.strip().strip("|").split("|")]
+
+
 def parse_tier_map(llms_full: str) -> dict[str, str]:
     tier_map: dict[str, str] = {}
     for raw in llms_full.splitlines():
-        if "POST /v2/charts/coordinates" in raw:
-            tier_map["/v2/charts/coordinates"] = "Advanced"
-        elif "POST /v2/charts/simple" in raw:
-            tier_map["/v2/charts/simple"] = "Basic + Advanced"
-        elif "POST /v2/charts" in raw and "/coordinates" not in raw and "/simple" not in raw:
-            tier_map["/v2/charts"] = "Advanced"
-        elif "POST /v1/bodygraphs/simple" in raw:
-            tier_map["/v1/bodygraphs/simple"] = "Basic + Advanced"
-        elif "POST /v1/bodygraphs" in raw and "/simple" not in raw:
-            tier_map["/v1/bodygraphs"] = "Advanced"
+        cells = markdown_cells(raw)
+        if len(cells) < 3:
+            continue
+        endpoint = cells[0]
+        tier = cells[2]
+        for _method, path in REQUIRED_ENDPOINTS:
+            label = f"POST {path}"
+            if endpoint == label:
+                if not tier:
+                    raise ValueError(f"TIER_EMPTY:{path}")
+                tier_map[path] = tier
     missing = [path for _method, path in REQUIRED_ENDPOINTS if path not in tier_map]
     if missing:
         raise ValueError(f"TIER_MAP_MISSING:{','.join(missing)}")
@@ -370,11 +384,18 @@ def validate_openapi_spec(name: str, spec: dict[str, Any], *, expected_title: st
     return ok, lines
 
 
-def validate_suspect_openapi(body: bytes) -> tuple[bool, dict[str, Any], list[str]]:
+def validate_suspect_openapi(body: bytes, source_row: dict[str, Any]) -> tuple[bool, dict[str, Any], list[str]]:
+    fetch_status = str(source_row.get("fetch_status", ""))
+    if fetch_status != "200":
+        return False, {"fetch_status": fetch_status}, [
+            "[api-reference/openapi.json] status=QUARANTINED",
+            f"[api-reference/openapi.json] fetch_status={fetch_status or 'MISSING'}",
+            "[api-reference/openapi.json] availability=UNAVAILABLE",
+        ]
     try:
         obj = json.loads(body.decode("utf-8"))
     except json.JSONDecodeError:
-        return False, {}, ["[api-reference/openapi.json] status=QUARANTINED", "[api-reference/openapi.json] json_parse=FAIL"]
+        return False, {"fetch_status": fetch_status}, ["[api-reference/openapi.json] status=QUARANTINED", "[api-reference/openapi.json] json_parse=FAIL"]
     title = str(obj.get("info", {}).get("title", "")) if isinstance(obj.get("info"), dict) else ""
     servers = obj.get("servers") if isinstance(obj.get("servers"), list) else []
     paths = obj.get("paths") if isinstance(obj.get("paths"), dict) else {}
@@ -389,7 +410,7 @@ def validate_suspect_openapi(body: bytes) -> tuple[bool, dict[str, Any], list[st
         f"[api-reference/openapi.json] server_domain={'PASS' if server_domain_ok else 'FAIL'}",
         f"[api-reference/openapi.json] path_family={'PASS' if path_family_ok else 'FAIL'}",
     ]
-    return ok, {"title": title, "servers": servers, "paths": sorted(paths)}, lines
+    return ok, {"fetch_status": fetch_status, "title": title, "servers": servers, "paths": sorted(paths)}, lines
 
 
 def source_spec_for(path: str) -> str:
@@ -536,7 +557,7 @@ def build_contract_map(produced: str, fetched: dict[str, dict[str, Any]], rows: 
 
 
 def validate_source_statuses(fetched: dict[str, dict[str, Any]]) -> None:
-    for key in ["v2_routes_yaml", "v1_routes_yaml", "suspect_openapi_json", "llms_full_txt"]:
+    for key in ["v2_routes_yaml", "v1_routes_yaml", "llms_full_txt"]:
         status = fetched[key].get("fetch_status")
         if status not in {str(item) for item in ALLOWED_STATUS}:
             raise SystemExit(f"SOURCE_NOT_USABLE:{key}:{status}")
@@ -665,7 +686,7 @@ def render_outputs(produced: str, fetched: dict[str, dict[str, Any]], bodies: di
     v1_spec = parse_yaml_openapi(bodies["v1_routes_yaml"], "v1-routes.yaml")
     v2_ok, v2_lines = validate_openapi_spec("v2-routes.yaml", v2_spec, expected_title="Human Design API — v2", expected_server="https://api.humandesignapi.nl/v2", paths=["/charts", "/charts/simple", "/charts/coordinates"])
     v1_ok, v1_lines = validate_openapi_spec("v1-routes.yaml", v1_spec, expected_title="Human Design API — v1", expected_server="https://api.humandesignapi.nl/v1", paths=["/bodygraphs", "/bodygraphs/simple"])
-    suspect_ok, suspect_info, suspect_lines = validate_suspect_openapi(bodies["suspect_openapi_json"])
+    suspect_ok, suspect_info, suspect_lines = validate_suspect_openapi(bodies.get("suspect_openapi_json", b""), fetched["suspect_openapi_json"])
     validation_log = build_validation_log(produced, v2_ok, v2_lines, v1_ok, v1_lines, suspect_lines, mode=mode)
     if not (v2_ok and v1_ok):
         raise SystemExit("ROUTE_SPEC_VALIDATION_FAILED: refusing to write promoted endpoint/contract/acceptance evidence")
