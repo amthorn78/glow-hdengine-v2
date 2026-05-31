@@ -634,6 +634,14 @@ EPIC033_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
         "notes": "EPIC033 PR-01 acceptance-map viability baseline for existing-token posture",
     },
     {
+        "artifact_key": "epic033.source_cache_ellipsis_scan",
+        "discovered_physical_path": "audit/qa/hde-epic033/source_cache_ellipsis_scan.log",
+        "epic_id": "HDE-EPIC033",
+        "record_type": "epic033_remediation_proof",
+        "schema_version": "1.0",
+        "notes": "EPIC033 PR-01 remediation proof that raw source-cache bodies contain no literal ellipsization marker",
+    },
+    {
         "artifact_key": "epic033.doc_deltas",
         "discovered_physical_path": "audit/docdeltas/hde-epic033_doc_deltas.md",
         "epic_id": "HDE-EPIC033",

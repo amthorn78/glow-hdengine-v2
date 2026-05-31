@@ -33,6 +33,8 @@ TOKEN_MATRIX = ROOT / "audit" / "qa" / "hde-epic033" / "token_evidence_matrix.md
 VIABILITY = ROOT / "audit" / "qa" / "hde-epic033" / "acceptance_map_viability.log"
 DOC_DELTAS = ROOT / "audit" / "docdeltas" / "hde-epic033_doc_deltas.md"
 QA_DOC_DELTAS = ROOT / "audit" / "qa" / "hde-epic033" / "00_meta" / "doc_deltas.md"
+ELLIPSIS_SCAN = ROOT / "audit" / "qa" / "hde-epic033" / "source_cache_ellipsis_scan.log"
+ELLIPSIZATION_MARKER = b"[... " + b"ELLIPSIZATION" + b" ...]"
 
 BASE = "https://docs.humandesignapi.nl"
 SOURCES = [
@@ -151,6 +153,12 @@ def refresh_source_cache(produced: str) -> tuple[dict[str, dict[str, Any]], dict
         }
     SOURCE_METADATA.write_bytes(canonical_json_bytes({"generated_at_utc": produced, "sources": metadata}))
     return metadata, bodies
+
+
+def assert_no_elision_markers(bodies: dict[str, bytes]) -> None:
+    offenders = sorted(key for key, body in bodies.items() if ELLIPSIZATION_MARKER in body)
+    if offenders:
+        raise SystemExit("SOURCE_CACHE_ELLIPSIZATION_MARKER:" + ",".join(offenders))
 
 
 def load_source_cache() -> tuple[dict[str, dict[str, Any]], dict[str, bytes]]:
@@ -635,6 +643,43 @@ def build_acceptance(produced: str) -> dict[str, Any]:
     }
 
 
+def build_ellipsis_scan_log(produced: str, bodies: dict[str, bytes], *, mode: str) -> bytes:
+    lines = [
+        f"generated_at_utc={produced}",
+        "epic_id=HDE-EPIC033",
+        f"mode={mode}",
+        "scope=artifacts/vendor/hdapi_v2/source_cache",
+        "marker_label=literal_ellipsis_marker",
+    ]
+    marker_present = False
+    for key in sorted(bodies):
+        body = bodies[key]
+        present = ELLIPSIZATION_MARKER in body
+        marker_present = marker_present or present
+        rel = fetched_source_cache_path(key)
+        lines.append(
+            "file "
+            f"source_key={key} "
+            f"path={rel} "
+            f"size_bytes={len(body)} "
+            f"line_count={body.count(b'\n')} "
+            f"sha256={sha256_bytes(body)} "
+            f"marker_present={'true' if present else 'false'}"
+        )
+    lines.append(f"raw_repo_marker_present={'true' if marker_present else 'false'}")
+    lines.append("remediation_note=Raw repository source-cache bodies were scanned; this proof does not call credentialed runtime vendor endpoints.")
+    if marker_present:
+        raise SystemExit("SOURCE_CACHE_ELLIPSIZATION_MARKER")
+    return ("\n".join(lines) + "\n").encode("utf-8")
+
+
+def fetched_source_cache_path(source_key: str) -> str:
+    for key, _url, _classification, _discovered_from, configured in SOURCES:
+        if key == source_key:
+            return source_cache_rel(source_cache_name(key, configured)) or ""
+    return f"artifacts/vendor/hdapi_v2/source_cache/{source_key}.body"
+
+
 def write_baseline_pointer_artifacts(produced: str, acceptance: dict[str, Any]) -> dict[Path, bytes]:
     matrix_lines = [
         "# HDE-EPIC033 Token Evidence Matrix",
@@ -701,6 +746,7 @@ def render_outputs(produced: str, fetched: dict[str, dict[str, Any]], bodies: di
         OUT / "endpoint_reference.csv": write_endpoint_reference(rows),
         OUT / "contract_map.json": canonical_json_bytes(build_contract_map(produced, fetched, rows, suspect_ok)),
     }
+    outputs[ELLIPSIS_SCAN] = build_ellipsis_scan_log(produced, bodies, mode=mode)
     outputs.update(write_baseline_pointer_artifacts(produced, acceptance))
     return outputs
 

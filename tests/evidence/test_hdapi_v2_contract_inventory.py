@@ -21,6 +21,7 @@ REQUIRED_PRIMARY_ARTIFACTS = [
     ROOT / "docs" / "acceptance_map_epic033.json",
     ROOT / "audit" / "qa" / "hde-epic033" / "token_evidence_matrix.md",
     ROOT / "audit" / "qa" / "hde-epic033" / "acceptance_map_viability.log",
+    ROOT / "audit" / "qa" / "hde-epic033" / "source_cache_ellipsis_scan.log",
     ROOT / "audit" / "docdeltas" / "hde-epic033_doc_deltas.md",
     ROOT / "audit" / "qa" / "hde-epic033" / "00_meta" / "doc_deltas.md",
 ]
@@ -83,6 +84,24 @@ def test_hdapi_v2_primary_artifacts_exist_and_are_lf_terminated() -> None:
     for path in REQUIRED_SOURCE_CACHE:
         assert path.exists(), path
         assert path.read_bytes(), path
+
+
+def test_hdapi_v2_source_cache_contains_no_ellipsis_marker() -> None:
+    for path in REQUIRED_SOURCE_CACHE:
+        assert generator.ELLIPSIZATION_MARKER not in path.read_bytes(), path
+    scan = (ROOT / "audit" / "qa" / "hde-epic033" / "source_cache_ellipsis_scan.log").read_text(encoding="utf-8")
+    assert "marker_label=literal_ellipsis_marker" in scan
+    assert "raw_repo_marker_present=false" in scan
+    assert "marker_present=true" not in scan
+
+
+def test_generator_rejects_ellipsis_marker_in_source_cache() -> None:
+    metadata, bodies = generator.load_source_cache()
+    changed = dict(bodies)
+    changed["authentication"] = bodies["authentication"] + generator.ELLIPSIZATION_MARKER + b"\n"
+    with pytest.raises(SystemExit, match="SOURCE_CACHE_ELLIPSIZATION_MARKER:authentication"):
+        generator.assert_no_elision_markers(changed)
+    assert metadata["authentication"]["cache_path"].endswith("authentication.body")
 
 
 def test_hdapi_v2_inventory_records_required_source_fields_and_ai_boundary() -> None:

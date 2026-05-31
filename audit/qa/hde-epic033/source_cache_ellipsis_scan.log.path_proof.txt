@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic033/source_cache_ellipsis_scan.log
+size_bytes: 3897
+sha256: 9c505fb953be6a718b78665119009a1db0bfb836503a5abad72a48ca115e8634
+mtime_utc: 2026-05-31T19:20:01Z
+produced_at_utc: 2026-05-31T19:21:08Z
