@@ -556,6 +556,124 @@ EPIC032_PR04_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     },
 ]
 
+
+EPIC033_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "hdapi_v2.source_inventory_json",
+        "discovered_physical_path": "artifacts/vendor/hdapi_v2/source_inventory.json",
+        "epic_id": "HDE-EPIC033",
+        "record_type": "hdapi_v2_contract_inventory",
+        "schema_version": "1.0",
+        "tokens": ["JSON_CANONICAL_CHECK_OK"],
+        "notes": "EPIC033 PR-01 HDAPI v2 and legacy v1 public documentation source inventory for HDE-FERM006.1",
+    },
+    {
+        "artifact_key": "hdapi_v2.source_inventory_md",
+        "discovered_physical_path": "artifacts/vendor/hdapi_v2/source_inventory.md",
+        "epic_id": "HDE-EPIC033",
+        "record_type": "hdapi_v2_contract_inventory",
+        "schema_version": "1.0",
+        "notes": "EPIC033 PR-01 human-readable HDAPI v2 source inventory summary and AI-boundary classification",
+    },
+    {
+        "artifact_key": "hdapi_v2.openapi_validation",
+        "discovered_physical_path": "artifacts/vendor/hdapi_v2/openapi_validation.log",
+        "epic_id": "HDE-EPIC033",
+        "record_type": "hdapi_v2_contract_inventory",
+        "schema_version": "1.0",
+        "notes": "EPIC033 PR-01 validation and quarantine posture for v2-routes.yaml, v1-routes.yaml, and suspect OpenAPI artifacts",
+    },
+    {
+        "artifact_key": "hdapi_v2.known_anomalies",
+        "discovered_physical_path": "artifacts/vendor/hdapi_v2/known_anomalies.md",
+        "epic_id": "HDE-EPIC033",
+        "record_type": "hdapi_v2_contract_inventory",
+        "schema_version": "1.0",
+        "notes": "EPIC033 PR-01 quarantine ledger for suspect api-reference/openapi.json and no-claim boundaries",
+    },
+    {
+        "artifact_key": "hdapi_v2.endpoint_reference",
+        "discovered_physical_path": "artifacts/vendor/hdapi_v2/endpoint_reference.csv",
+        "epic_id": "HDE-EPIC033",
+        "record_type": "hdapi_v2_contract_inventory",
+        "schema_version": "1.0",
+        "notes": "EPIC033 PR-01 endpoint reference distinguishing recommended v2 chart routes from legacy v1 BodyGraph routes for HDE-FERM006.3",
+    },
+    {
+        "artifact_key": "hdapi_v2.contract_map",
+        "discovered_physical_path": "artifacts/vendor/hdapi_v2/contract_map.json",
+        "epic_id": "HDE-EPIC033",
+        "record_type": "hdapi_v2_contract_inventory",
+        "schema_version": "1.0",
+        "tokens": ["JSON_CANONICAL_CHECK_OK"],
+        "notes": "EPIC033 PR-01 canonical contract map binding validated route specs to v2 and legacy v1 route families",
+    },
+    {
+        "artifact_key": "epic033.acceptance_map",
+        "discovered_physical_path": "docs/acceptance_map_epic033.json",
+        "epic_id": "HDE-EPIC033",
+        "record_type": "epic033_baseline_pointer",
+        "schema_version": "1.0",
+        "tokens": ["JSON_CANONICAL_CHECK_OK"],
+        "notes": "EPIC033 PR-01 acceptance baseline map using existing registry-valid tokens only",
+    },
+    {
+        "artifact_key": "epic033.token_matrix",
+        "discovered_physical_path": "audit/qa/hde-epic033/token_evidence_matrix.md",
+        "epic_id": "HDE-EPIC033",
+        "record_type": "epic033_baseline_pointer",
+        "schema_version": "1.0",
+        "notes": "EPIC033 PR-01 token evidence matrix with no vendor-v2-specific token",
+    },
+    {
+        "artifact_key": "epic033.acceptance_map_viability",
+        "discovered_physical_path": "audit/qa/hde-epic033/acceptance_map_viability.log",
+        "epic_id": "HDE-EPIC033",
+        "record_type": "epic033_baseline_pointer",
+        "schema_version": "1.0",
+        "notes": "EPIC033 PR-01 acceptance-map viability baseline for existing-token posture",
+    },
+    {
+        "artifact_key": "epic033.doc_deltas",
+        "discovered_physical_path": "audit/docdeltas/hde-epic033_doc_deltas.md",
+        "epic_id": "HDE-EPIC033",
+        "record_type": "epic033_baseline_pointer",
+        "schema_version": "1.0",
+        "tokens": ["DOC_DELTA_PRESENT_OK"],
+        "notes": "EPIC033 PR-01 doc-delta baseline pointer",
+    },
+    {
+        "artifact_key": "epic033.qa_meta_doc_deltas",
+        "discovered_physical_path": "audit/qa/hde-epic033/00_meta/doc_deltas.md",
+        "epic_id": "HDE-EPIC033",
+        "record_type": "epic033_baseline_pointer",
+        "schema_version": "1.0",
+        "tokens": ["DOC_DELTA_PRESENT_OK"],
+        "notes": "EPIC033 PR-01 QA meta doc-delta baseline pointer",
+    },
+]
+
+
+
+def _load_epic033_entries() -> list[dict[str, object]]:
+    produced_at = None
+    source_inventory = ROOT / "artifacts/vendor/hdapi_v2/source_inventory.json"
+    if source_inventory.exists():
+        try:
+            payload = json.loads(source_inventory.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as exc:
+            raise SystemExit("INVALID_EPIC033_SOURCE_INVENTORY") from exc
+        produced = payload.get("generated_at_utc")
+        if isinstance(produced, str) and produced:
+            produced_at = produced
+    entries: list[dict[str, object]] = []
+    for entry in EPIC033_PRIMARY_ARTIFACTS:
+        normalized = dict(entry)
+        if produced_at is not None:
+            normalized["produced_at_utc"] = produced_at
+        entries.append(normalized)
+    return entries
+
 A7_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
         "artifact_key": "a7.success_encoding_invariance",
@@ -890,6 +1008,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *EPIC032_PR02_PRIMARY_ARTIFACTS,
             *EPIC032_PR03_PRIMARY_ARTIFACTS,
             *EPIC032_PR04_PRIMARY_ARTIFACTS,
+            *_load_epic033_entries(),
             *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,

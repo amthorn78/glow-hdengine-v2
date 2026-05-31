@@ -1,0 +1,5 @@
+| `POST /v1/bodygraphs`        | Full bodygraph with all properties                             | Advanced         |
+| `POST /v1/bodygraphs/simple` | Simplified bodygraph (type, profile, gates, channels, centers) | Basic + Advanced |
+| `POST /v2/charts`             | Full chart with all properties                             | Advanced         | Required    |
+| `POST /v2/charts/simple`      | Simplified chart (type, profile, gates, channels, centers) | Basic + Advanced | Required    |
+| `POST /v2/charts/coordinates` | Full chart from latitude/longitude                         | Advanced         | Not needed  |
