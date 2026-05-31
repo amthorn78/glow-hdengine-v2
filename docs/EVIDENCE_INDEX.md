@@ -2,7 +2,14 @@
 > Add new entries there first, then mirror key pointers here for quick navigation. Update the skeleton (`docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl` + `.path_proof.txt` companions) in the same PR whenever governed bytes change.
 > Refresh order: run `python tools/evidence/update_evidence_index.py` (write) before `python tools/evidence/orientation_demo.py` (write), then their `--check` variants, and finish with `ci/checks/check_mirror_schema.sh`. Mirror path proofs include both `sha256` and `mirror_body_sha256` for the self-record entry in `artifacts/evidence_index.jsonl`.
 
-# Appendix-D — Evidence Index (EPIC-031 + historical pointers)
+# Appendix-D — Evidence Index (EPIC-033 + historical pointers)
+
+## EPIC033 contract-inventory evidence family (PR-01, not runtime conformance)
+* Contract inventory artifacts: `artifacts/vendor/hdapi_v2/source_inventory.json`, `artifacts/vendor/hdapi_v2/source_inventory.md`, `artifacts/vendor/hdapi_v2/openapi_validation.log`, `artifacts/vendor/hdapi_v2/known_anomalies.md`, `artifacts/vendor/hdapi_v2/endpoint_reference.csv`, and `artifacts/vendor/hdapi_v2/contract_map.json`. Each governed artifact has a sibling `.path_proof.txt`.
+* Source-cache inputs: `artifacts/vendor/hdapi_v2/source_cache/` contains the cached public documentation inputs used by the default closed-rails replay, including `v2-routes.yaml`, `v1-routes.yaml`, `api-reference.openapi.json`, `llms_txt.body`, and `llms-full.endpoint-tiers.txt`.
+* Acceptance and QA pointers: `docs/acceptance_map_epic033.json`, `audit/qa/hde-epic033/token_evidence_matrix.md`, `audit/qa/hde-epic033/acceptance_map_viability.log`, `audit/docdeltas/hde-epic033_doc_deltas.md`, and `audit/qa/hde-epic033/00_meta/doc_deltas.md`.
+* Generator posture: `python tools/evidence/generate_hdapi_v2_contract_inventory.py` is the governed generator; default generation is closed-rails source-cache replay. Public documentation refresh uses `python tools/evidence/generate_hdapi_v2_contract_inventory.py --refresh-public-docs` with `SAFE_MODE=0` and `ALLOW_NETWORK=1`; this is not credentialed runtime vendor smoke.
+* Scope guardrails: inventory only for HDE-FERM006.1 through HDE-FERM006.4; no runtime v2 request shaping, source selection, live conformance, public Reader change, open-rails vendor smoke, new HTTP home, vendor-v2-specific acceptance token, or AI scope is claimed. HDE-FERM007 and HDE-FERM008 remain follow-up/out of scope. The current inventory quarantines suspect `api-reference/openapi.json` and treats `llms.txt` / `llms-full.txt` as documentation-discovery-only context.
 
 ## EPIC031 SAFE rails evidence families (implementation slice, not close-pack)
 * PR-01 provider-gate policy: `audit/qa/hde-epic031/pr-01/open_rails_policy_proof.json`, `audit/qa/hde-epic031/pr-01/retry_backoff_429_proof.json`, `audit/qa/hde-epic031/pr-01/closed_default_open_exception_rails.json`, plus supporting policy artifacts `artifacts/vendor/policies_pinned.md` and `artifacts/vendor/retry_after_parse.log`.

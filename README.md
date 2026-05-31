@@ -1,4 +1,4 @@
-# Glow HD Engine — HDE-EPIC032 final repo-docs sweep
+# Glow HD Engine — HDE-EPIC033 final repo-docs sweep
 
 The Glow HD Engine is a deterministic Human Design engine and CLI that emits governed, canonically serialized bytes. PF-Canon remains authoritative (titles only: PF05 — CLI/API/Vendor Ref, PF12 — Schemas & Artifacts, PF14 — Mechanics Guide, PF19 — QA Guide, PF20 — Phased Epics).
 
@@ -30,6 +30,15 @@ The Glow HD Engine is a deterministic Human Design engine and CLI that emits gov
   - DB parity/fallback posture evidence includes `tools/evidence/generate_db_bridge_parity.py`, provider parity proof `artifacts/db_bridge/provider_parity.proof.json`, non-dev typed failure artifact `artifacts/runtime/env_connectivity.nondev_failure.json`, and OPS-01 closure decision evidence at `audit/ops/hde-epic032/db-provider-parity/provider_parity_closure_decision.json`.
   - Proof labels `DB_PROVIDER_PARITY_OK`, `DB_BRIDGE_CAPS_OK`, and `DB_BRIDGE_FALLBACK_OK` are documented as evidence proof labels (non-acceptance-token labels in current repo posture), while `DEV_DB_BRIDGE_FALLBACK_OK` remains the acceptance token for dev bridge fallback scope.
   - Scope boundaries remain explicit: no public Reader route/flag/payload-field change, no narrative prose-generation contract, and no HDAPI v2 conformance claim introduced by EPIC032 docs.
+
+- What HDE-EPIC033 adds for Fermentation Pass 4 / PR-01:
+  - HDE-EPIC033 PR-01 adds a governed HumanDesignAPI v2 and legacy v1 contract-inventory evidence family for HDE-FERM006.1 through HDE-FERM006.4. It does not implement or claim HumanDesignAPI v2 runtime request shaping, runtime source selection, live conformance, open-rails vendor smoke, public Reader changes, a new HTTP home, or AI scope.
+  - Contract-inventory evidence lives under `artifacts/vendor/hdapi_v2/`: `source_inventory.json`, `source_inventory.md`, `openapi_validation.log`, `known_anomalies.md`, `endpoint_reference.csv`, and `contract_map.json`, each with sibling `.path_proof.txt` files. Source-cache inputs live under `artifacts/vendor/hdapi_v2/source_cache/`.
+  - Acceptance and QA pointers are `docs/acceptance_map_epic033.json`, `audit/qa/hde-epic033/token_evidence_matrix.md`, `audit/qa/hde-epic033/acceptance_map_viability.log`, and EPIC033 doc deltas under `audit/docdeltas/hde-epic033_doc_deltas.md` plus `audit/qa/hde-epic033/00_meta/doc_deltas.md`. Index/Mirror coverage is recorded in `docs/evidence/INDEX.json` and `artifacts/evidence_index.jsonl`.
+  - `tools/evidence/generate_hdapi_v2_contract_inventory.py` defaults to closed-rails source-cache replay. Refreshing public documentation sources requires explicit `--refresh-public-docs` intent with `SAFE_MODE=0` and `ALLOW_NETWORK=1`; this is public-doc refresh only, not credentialed runtime vendor smoke.
+  - The suspect public documentation URL `https://docs.humandesignapi.nl/api-reference/openapi.json` is quarantined in the current inventory and is not authority for vendor bytes, schemas, endpoint routes, request shaping, response mapping, runtime conformance, or architecture conformance. Validated `v2-routes.yaml` and `v1-routes.yaml` source-cache specs are the promoted machine-readable route sources for this inventory slice.
+  - AI/LLM-oriented vendor documentation such as `llms.txt` and `llms-full.txt` is documentation-discovery-only context; it creates no AI product, runtime, evidence, token, credential, rail, QA, prompt, embedding, chatbot, model-call, or provider scope.
+  - HDE-FERM007 and HDE-FERM008 remain follow-up/out of scope for this PR.
 
 - Current non-public compat/admin and dev transport posture (unchanged by EPIC030 docs sweep):
   - `/api/compat/v1` contract (no `/compatibility` suffix): GET is probe-only (rejects request bodies) and returns `{ok:true,schema:"v1"}`; POST is the compat computation surface with request-shape rules (reject mixed id+payload patterns) and strict id validation against `UID_RE` (invalid IDs return an `invalid_json` error envelope with a 400 status). In prod, `APP_ENV=prod` returns 404 with `ERR_NOT_FOUND` (implementation in `engine/http/compat_handler.py`; id regex in `engine/compat/ordering.py`). Endpoint catalog entry is POST-only, `internal_admin`, `a7_eligible: false`, and `env_gate` is non-empty (`docs/ENDPOINTS_CATALOG.json` + `.sha256`).
