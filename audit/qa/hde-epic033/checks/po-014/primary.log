@@ -1,0 +1,26 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-06-05T00:24:50Z", "check_id": "po-014", "check_name": "PO-014", "status": "PASS", "fail_status": "", "command": "test -d audit/qa/hde-epic033 || { echo \"TOOLING_BLOCKED: audit/qa/hde-epic033 missing\"; exit 99; }; test -d audit/qa/hde-epic033/checks || { echo \"TOOLING_BLOCKED: audit/qa/hde-epic033/checks missing\"; exit 99; }; find audit/qa/hde-epic033/checks -name primary.log -type f | grep -F \"primary.log\" && echo \"non_claims: no implementation work; no PF document edit; no runtime vendor conformance; no public Reader change; no new HTTP home; no AI scope; no epic closure action\"", "command_provenance": "Copy/paste from plan", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic033/checks/po-014/primary.log", "audit/qa/hde-epic033/checks/po-014/primary.log.path_proof.txt", "audit/qa/hde-epic033"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF19 — Glow QA Guide", "PF27 — Canon Plan Templates"], "intended_tokens": [], "claimed_tokens": []}
+check_id=po-014
+check_name=PO-014
+validation_command=test -d audit/qa/hde-epic033 || { echo "TOOLING_BLOCKED: audit/qa/hde-epic033 missing"; exit 99; }; test -d audit/qa/hde-epic033/checks || { echo "TOOLING_BLOCKED: audit/qa/hde-epic033/checks missing"; exit 99; }; find audit/qa/hde-epic033/checks -name primary.log -type f | grep -F "primary.log" && echo "non_claims: no implementation work; no PF document edit; no runtime vendor conformance; no public Reader change; no new HTTP home; no AI scope; no epic closure action"
+rails SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev
+pins LC_ALL=C LANG=C TZ=UTC
+audit/qa/hde-epic033/checks/po-003/primary.log
+audit/qa/hde-epic033/checks/po-009/primary.log
+audit/qa/hde-epic033/checks/po-008/primary.log
+audit/qa/hde-epic033/checks/po-006-remediation-r2/primary.log
+audit/qa/hde-epic033/checks/po-012/primary.log
+audit/qa/hde-epic033/checks/step-0b-doc-delta-capture/primary.log
+audit/qa/hde-epic033/checks/po-010-remediation-r1/primary.log
+audit/qa/hde-epic033/checks/po-005/primary.log
+audit/qa/hde-epic033/checks/po-007/primary.log
+audit/qa/hde-epic033/checks/po-011/primary.log
+audit/qa/hde-epic033/checks/po-002/primary.log
+audit/qa/hde-epic033/checks/po-006-remediation/primary.log
+audit/qa/hde-epic033/checks/po-010/primary.log
+audit/qa/hde-epic033/checks/po-006/primary.log
+audit/qa/hde-epic033/checks/po-013/primary.log
+audit/qa/hde-epic033/checks/po-001/primary.log
+audit/qa/hde-epic033/checks/po-006-remediation-r3/primary.log
+audit/qa/hde-epic033/checks/po-004/primary.log
+audit/qa/hde-epic033/checks/po-012-remediation-r1/primary.log
+non_claims: no implementation work; no PF document edit; no runtime vendor conformance; no public Reader change; no new HTTP home; no AI scope; no epic closure action

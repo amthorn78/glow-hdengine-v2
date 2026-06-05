@@ -1,0 +1,19 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-06-02T03:18:49Z", "check_id": "po-003", "check_name": "PO-003", "status": "PASS", "fail_status": "", "command": "command -v /workspaces/glow-hdengine-v2/.venv/bin/python >/dev/null || { echo \"TOOLING_BLOCKED: python missing\"; exit 99; }; test -f tests/evidence/test_hdapi_v2_contract_inventory.py && test -f artifacts/vendor/hdapi_v2/openapi_validation.log && grep -F \"[v2-routes.yaml] status=VALIDATED\" artifacts/vendor/hdapi_v2/openapi_validation.log && grep -F \"[v1-routes.yaml] status=VALIDATED\" artifacts/vendor/hdapi_v2/openapi_validation.log && grep -F \"[route-spec-gate] status=PASS\" artifacts/vendor/hdapi_v2/openapi_validation.log && /workspaces/glow-hdengine-v2/.venv/bin/python -m pytest tests/evidence/test_hdapi_v2_contract_inventory.py", "command_provenance": "Copy/paste from plan", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic033/checks/po-003/primary.log", "audit/qa/hde-epic033/checks/po-003/primary.log.path_proof.txt", "artifacts/vendor/hdapi_v2/openapi_validation.log", "tests/evidence/test_hdapi_v2_contract_inventory.py"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 — HDE-Build Notes", "PF12 — HDE Schemas and Artifacts", "PF19 — Glow QA Guide"], "intended_tokens": ["TESTS_PASS_OK"], "claimed_tokens": ["TESTS_PASS_OK"]}
+check_id=po-003
+check_name=PO-003
+validation_command=command -v /workspaces/glow-hdengine-v2/.venv/bin/python >/dev/null || { echo "TOOLING_BLOCKED: python missing"; exit 99; }; test -f tests/evidence/test_hdapi_v2_contract_inventory.py && test -f artifacts/vendor/hdapi_v2/openapi_validation.log && grep -F "[v2-routes.yaml] status=VALIDATED" artifacts/vendor/hdapi_v2/openapi_validation.log && grep -F "[v1-routes.yaml] status=VALIDATED" artifacts/vendor/hdapi_v2/openapi_validation.log && grep -F "[route-spec-gate] status=PASS" artifacts/vendor/hdapi_v2/openapi_validation.log && /workspaces/glow-hdengine-v2/.venv/bin/python -m pytest tests/evidence/test_hdapi_v2_contract_inventory.py
+rails SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev
+pins LC_ALL=C LANG=C TZ=UTC
+[v2-routes.yaml] status=VALIDATED
+[v1-routes.yaml] status=VALIDATED
+[route-spec-gate] status=PASS
+============================= test session starts ==============================
+platform linux -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0
+rootdir: /workspaces/glow-hdengine-v2
+configfile: pytest.ini
+plugins: cov-4.1.0, mock-3.15.1
+collected 15 items
+
+tests/evidence/test_hdapi_v2_contract_inventory.py ...............       [100%]
+
+============================== 15 passed in 1.32s ==============================

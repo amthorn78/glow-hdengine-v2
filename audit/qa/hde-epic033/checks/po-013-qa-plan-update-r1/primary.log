@@ -1,0 +1,12 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-06-05T04:54:06Z", "check_id": "po-013-qa-plan-update-r1", "check_name": "PO-013 QA_PLAN_UPDATE Routing R1", "status": "PASS", "fail_status": "", "command": "record QA_PLAN_UPDATE routing basis from user-requested further remediation review", "command_provenance": "User-requested further remediation; QA_PLAN_UPDATE routing receipt before final post-routing PO-013 proof", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic033/checks/po-013-qa-plan-update-r1/primary.log", "audit/qa/hde-epic033/checks/po-013-qa-plan-update-r1/primary.log.path_proof.txt", "audit/qa/hde-epic033/checks/po-013-po-014-qa-16-closeout-evidence.md", "audit/qa/hde-epic033/checks/po-013-remediation-r1/primary.log", "audit/qa/hde-epic033/checks/po-013-remediation-r1/primary.log.path_proof.txt", "audit/qa/hde-epic033/checks/po-013-remediation-r2/primary.log", "audit/qa/hde-epic033/checks/po-013-remediation-r2/primary.log.path_proof.txt"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF19 — Glow QA Guide", "PF12 — Schemas & Artifacts", "PF10 — HDE-Build Notes"], "intended_tokens": [], "claimed_tokens": []}
+check_id=po-013-qa-plan-update-r1
+check_name=PO-013 QA_PLAN_UPDATE Routing R1
+routing_type=QA_PLAN_UPDATE
+routing_source=user_request=Further Remediation Needed; review requested proof of approved PR/OPS/QA_PLAN_UPDATE/DOC_UPDATE basis before final PASS-grade proof
+routing_scope=HDE-EPIC033 PO-013 remediation only
+allowed_actions=Use canonical evidence tools to prove current governed evidence coherence; record accepted proof only after this QA_PLAN_UPDATE routing receipt exists
+non_claims=no product code edit; no PF document edit; no public contract change; no acceptance token change; no formal PO closeout; no runtime vendor conformance claim
+post_routing_required_receipt=audit/qa/hde-epic033/checks/po-013-remediation-r3/primary.log
+rails SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev
+pins LC_ALL=C LANG=C TZ=UTC
+QA_PLAN_UPDATE_ROUTING_OK

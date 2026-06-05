@@ -1,0 +1,31 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-06-05T04:37:09Z", "check_id": "po-013-remediation-r2", "check_name": "PO-013 Remediation R2 Verdictability Addendum", "status": "PASS", "fail_status": "", "command": "command -v python >/dev/null || { echo \"TOOLING_BLOCKED: python missing\"; exit 99; }; test -f audit/qa/hde-epic033/checks/po-013-remediation-r1/primary.log || { echo \"TOOLING_BLOCKED: po-013-remediation-r1 primary.log missing\"; exit 99; }; test -f audit/qa/hde-epic033/checks/po-013-remediation-r1/primary.log.path_proof.txt || { echo \"TOOLING_BLOCKED: po-013-remediation-r1 path proof missing\"; exit 99; }; python - <<'PY2'\nfrom tools.evidence.orientation_demo import _load_human_index, _load_mirror_records, _validate, MIRROR_PATH\nmessages, total = _validate(_load_human_index(), _load_mirror_records(), mirror_lines=MIRROR_PATH.read_text(encoding=\"utf-8\").splitlines(True))\nprint(f\"orientation_total={total}\")\nprint(f\"message_count={len(messages)}\")\nif messages:\n    for msg in messages:\n        print(msg)\n    raise SystemExit(1)\nPY2\npython tools/evidence/update_evidence_index.py --check && echo EVIDENCE_INDEX_CHECK_OK && python tools/evidence/validate_evidence_paths.py && echo EVIDENCE_PATHS_VALIDATED_OK && python tools/evidence/check_lf_endings.py && echo LF_CHECKS_OK && python tools/evidence/orientation_demo.py --check && echo ORIENTATION_CHECK_OK && python ci/checks/check_mirror_schema.sh && echo MIRROR_SCHEMA_OK && bash ci/checks/check_evidence_index_hash.sh && echo EVIDENCE_INDEX_HASH_OK && bash ci/checks/check_final_lf.sh && echo FINAL_LF_OK && grep -F \"runtime_v2_conformance_claim=NONE\" audit/qa/hde-epic033/acceptance_map_viability.log && grep -F \"public_reader_surface_change=NONE\" audit/qa/hde-epic033/acceptance_map_viability.log && grep -F \"ai_scope=NONE\" audit/qa/hde-epic033/acceptance_map_viability.log && echo VIABILITY_BOUNDARIES_OK", "command_provenance": "QA-root verdictability addendum after review remediation request; post-refresh proof only", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic033/checks/po-013-remediation-r2/primary.log", "audit/qa/hde-epic033/checks/po-013-remediation-r2/primary.log.path_proof.txt", "audit/qa/hde-epic033/checks/po-013-remediation-r1/primary.log", "audit/qa/hde-epic033/checks/po-013-remediation-r1/primary.log.path_proof.txt", "docs/evidence/INDEX.json", "docs/evidence/INDEX.sha256", "artifacts/evidence_index.jsonl", "audit/gates/topology/orientation_demo.txt", "audit/qa/hde-epic033/acceptance_map_viability.log", "tools/evidence/update_evidence_index.py", "tools/evidence/validate_evidence_paths.py", "tools/evidence/check_lf_endings.py", "tools/evidence/orientation_demo.py", "ci/checks/check_mirror_schema.sh", "ci/checks/check_evidence_index_hash.sh", "ci/checks/check_final_lf.sh"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 — HDE-Build Notes", "PF19 — Glow QA Guide", "PF12 — Schemas & Artifacts"], "intended_tokens": [], "claimed_tokens": []}
+check_id=po-013-remediation-r2
+check_name=PO-013 Remediation R2 Verdictability Addendum
+validation_command=command -v python >/dev/null || { echo "TOOLING_BLOCKED: python missing"; exit 99; }; test -f audit/qa/hde-epic033/checks/po-013-remediation-r1/primary.log || { echo "TOOLING_BLOCKED: po-013-remediation-r1 primary.log missing"; exit 99; }; test -f audit/qa/hde-epic033/checks/po-013-remediation-r1/primary.log.path_proof.txt || { echo "TOOLING_BLOCKED: po-013-remediation-r1 path proof missing"; exit 99; }; python - <<'PY2'
+from tools.evidence.orientation_demo import _load_human_index, _load_mirror_records, _validate, MIRROR_PATH
+messages, total = _validate(_load_human_index(), _load_mirror_records(), mirror_lines=MIRROR_PATH.read_text(encoding="utf-8").splitlines(True))
+print(f"orientation_total={total}")
+print(f"message_count={len(messages)}")
+if messages:
+    for msg in messages:
+        print(msg)
+    raise SystemExit(1)
+PY2
+python tools/evidence/update_evidence_index.py --check && echo EVIDENCE_INDEX_CHECK_OK && python tools/evidence/validate_evidence_paths.py && echo EVIDENCE_PATHS_VALIDATED_OK && python tools/evidence/check_lf_endings.py && echo LF_CHECKS_OK && python tools/evidence/orientation_demo.py --check && echo ORIENTATION_CHECK_OK && python ci/checks/check_mirror_schema.sh && echo MIRROR_SCHEMA_OK && bash ci/checks/check_evidence_index_hash.sh && echo EVIDENCE_INDEX_HASH_OK && bash ci/checks/check_final_lf.sh && echo FINAL_LF_OK && grep -F "runtime_v2_conformance_claim=NONE" audit/qa/hde-epic033/acceptance_map_viability.log && grep -F "public_reader_surface_change=NONE" audit/qa/hde-epic033/acceptance_map_viability.log && grep -F "ai_scope=NONE" audit/qa/hde-epic033/acceptance_map_viability.log && echo VIABILITY_BOUNDARIES_OK
+rails SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev
+pins LC_ALL=C LANG=C TZ=UTC
+provenance_note=R2 is a QA-root verdictability addendum. It does not classify the earlier non-QA-root canonical evidence refresh as Moon Loop correction; it proves the post-refresh state with explicit PASS-grade receipt lines.
+orientation_total=360
+message_count=0
+[evidence-index] env pins: ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC
+EVIDENCE_INDEX_CHECK_OK
+EVIDENCE_PATHS_VALIDATED_OK
+LF_CHECKS_OK
+ORIENTATION_CHECK_OK
+MIRROR_SCHEMA_OK
+EVIDENCE_INDEX_HASH_OK
+FINAL_LF_OK
+runtime_v2_conformance_claim=NONE
+public_reader_surface_change=NONE
+ai_scope=NONE
+VIABILITY_BOUNDARIES_OK

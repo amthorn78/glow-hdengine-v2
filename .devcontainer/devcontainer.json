@@ -10,5 +10,12 @@
   "containerEnv": {
     "DEV_SAMPLER_URL": "http://127.0.0.1:8000/internal/dev/sampler"
   },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "openai.chatgpt"
+      ]
+    }
+  },
   "postCreateCommand": "python -m pip install --upgrade pip && python -m pip install --user -e . && python -m engine.cli --help>/tmp/devcontainer_cli_help.log"
 }
