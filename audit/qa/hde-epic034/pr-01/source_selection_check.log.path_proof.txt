@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic034/pr-01/source_selection_check.log
+size_bytes: 447
+sha256: f758846cd11dcfed423e3664419abc5905e7673dac732fec6c7f63b3f8cf0786
+mtime_utc: 2026-06-16T17:33:24Z
+produced_at_utc: 2026-06-16T17:33:23Z

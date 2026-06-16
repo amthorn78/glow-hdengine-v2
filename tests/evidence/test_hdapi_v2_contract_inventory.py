@@ -262,3 +262,73 @@ def test_epic033_mirror_chronology_matches_artifact_generation_time() -> None:
             "docs/acceptance_map_epic033.json",
         }:
             assert row["produced_at_utc"] == produced
+
+
+def test_epic034_source_selection_snapshot_is_canonical_and_derived_from_contract_map() -> None:
+    contract = _assert_canonical_json(VENDOR_DIR / "contract_map.json")
+    snapshot = _assert_canonical_json(VENDOR_DIR / "source_selection.snapshot.json")
+    assert snapshot == generator.build_source_selection_snapshot(snapshot["generated_at_utc"], contract)
+    assert snapshot["source_selection_policy"]["classification_source"] == "governed contract inventory"
+    assert snapshot["runtime_conformance_claim"] == "NONE"
+    assert snapshot["request_shaping_claim"] == "NONE"
+    assert snapshot["open_rails_vendor_smoke_claim"] == "NONE"
+    assert snapshot["public_reader_change_claim"] == "NONE"
+    assert snapshot["ai_scope_claim"] == "NONE"
+
+
+def test_epic034_source_selection_distinguishes_v2_chart_variants_and_v1_legacy() -> None:
+    snapshot = _assert_canonical_json(VENDOR_DIR / "source_selection.snapshot.json")
+    routes = {(route["method"], route["path"]): route for route in snapshot["route_families"]}
+    assert set(routes) == set(REQUIRED_ENDPOINTS)
+    assert routes[("POST", "/v2/charts")]["route_family"] == "recommended_v2_chart"
+    assert routes[("POST", "/v2/charts/simple")]["route_family"] == "recommended_v2_chart"
+    assert routes[("POST", "/v2/charts/coordinates")]["route_family"] == "recommended_v2_chart"
+    assert routes[("POST", "/v1/bodygraphs")]["route_family"] == "legacy_v1_bodygraph"
+    assert routes[("POST", "/v1/bodygraphs/simple")]["route_family"] == "legacy_v1_bodygraph"
+    assert {
+        routes[("POST", "/v2/charts")]["route_variant"],
+        routes[("POST", "/v2/charts/simple")]["route_variant"],
+        routes[("POST", "/v2/charts/coordinates")]["route_variant"],
+    } == {"full_chart", "simple_chart", "coordinates_chart"}
+    assert all(route["classification_source"] == "artifacts/vendor/hdapi_v2/contract_map.json route_families" for route in routes.values())
+
+
+def test_epic034_v1_legacy_guard_log_proves_no_silent_v1_to_v2_collapse() -> None:
+    log_path = VENDOR_DIR / "v1_legacy_guard.log"
+    raw = log_path.read_bytes()
+    assert raw.endswith(b"\n")
+    assert b"\r\n" not in raw
+    log = raw.decode("utf-8")
+    assert "[/v1/bodygraphs] legacy_v1_bodygraph_explicit=PASS" in log
+    assert "[/v1/bodygraphs/simple] legacy_v1_bodygraph_explicit=PASS" in log
+    assert "[/v1/bodygraphs] collapsed_to_recommended_v2_chart=FAIL" in log
+    assert "[/v1/bodygraphs/simple] collapsed_to_recommended_v2_chart=FAIL" in log
+    assert "v2_chart_route_variants_distinct=PASS" in log
+    assert "status=PASS" in log
+
+
+def test_epic034_source_selection_check_log_exists_and_passes() -> None:
+    log_path = ROOT / "audit" / "qa" / "hde-epic034" / "pr-01" / "source_selection_check.log"
+    raw = log_path.read_bytes()
+    assert raw.endswith(b"\n")
+    assert b"\r\n" not in raw
+    log = raw.decode("utf-8")
+    for check in [
+        "recommended_v2_full_chart",
+        "recommended_v2_simple_chart",
+        "recommended_v2_coordinates_chart",
+        "legacy_v1_full_bodygraph",
+        "legacy_v1_simple_bodygraph",
+        "v2_variants_distinguished",
+        "v1_not_collapsed_to_v2",
+    ]:
+        assert f"[{check}] status=PASS" in log
+    assert "network_posture=closed-rails-source-cache; no live vendor calls" in log
+
+
+def test_epic034_source_selection_fails_when_contract_inventory_is_missing_required_route() -> None:
+    contract = _assert_canonical_json(VENDOR_DIR / "contract_map.json")
+    broken = copy.deepcopy(contract)
+    broken["route_families"] = [route for route in broken["route_families"] if route["path"] != "/v2/charts/coordinates"]
+    with pytest.raises(ValueError, match="SOURCE_SELECTION_MISSING_CONTRACT_ROUTES"):
+        generator.build_source_selection_snapshot("2026-06-16T00:00:00Z", broken)

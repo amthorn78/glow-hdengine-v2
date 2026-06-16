@@ -1,0 +1,11 @@
+generated_at_utc=2026-06-16T17:33:23Z
+scope=HDE-EPIC034 PR-01 source-selection check
+network_posture=closed-rails-source-cache; no live vendor calls
+[recommended_v2_full_chart] status=PASS
+[recommended_v2_simple_chart] status=PASS
+[recommended_v2_coordinates_chart] status=PASS
+[legacy_v1_full_bodygraph] status=PASS
+[legacy_v1_simple_bodygraph] status=PASS
+[v2_variants_distinguished] status=PASS
+[v1_not_collapsed_to_v2] status=PASS
+status=PASS

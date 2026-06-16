@@ -1,0 +1,14 @@
+generated_at_utc=2026-06-16T17:33:23Z
+scope=HDE-EPIC034 PR-01 HDE-FERM007.1 v1 legacy guard
+classification_source=artifacts/vendor/hdapi_v2/contract_map.json route_families
+[/v1/bodygraphs] legacy_v1_bodygraph_explicit=PASS
+[/v1/bodygraphs] collapsed_to_recommended_v2_chart=FAIL
+[/v1/bodygraphs/simple] legacy_v1_bodygraph_explicit=PASS
+[/v1/bodygraphs/simple] collapsed_to_recommended_v2_chart=FAIL
+v2_chart_route_variants_distinct=PASS
+request_shaping_claim=NONE
+runtime_conformance_claim=NONE
+public_reader_change_claim=NONE
+open_rails_vendor_smoke_claim=NONE
+ai_scope=NONE
+status=PASS
