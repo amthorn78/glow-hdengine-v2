@@ -607,10 +607,12 @@ def build_source_selection_snapshot(produced: str, contract: dict[str, Any]) -> 
             raise ValueError(f"SOURCE_SELECTION_AUTH_MODEL_MISSING:{method} {path}")
         if not isinstance(geocode, str) or not geocode:
             raise ValueError(f"SOURCE_SELECTION_GEOCODE_REQUIREMENT_MISSING:{method} {path}")
-        if expected_family == "recommended_v2_chart" and "Authorization Bearer token" not in auth:
-            raise ValueError(f"SOURCE_SELECTION_AUTH_FAMILY_MISMATCH:{method} {path}")
-        if expected_family == "legacy_v1_bodygraph" and "HD-Api-Key header" not in auth:
-            raise ValueError(f"SOURCE_SELECTION_AUTH_FAMILY_MISMATCH:{method} {path}")
+        if expected_family == "recommended_v2_chart":
+            if "Authorization Bearer token" not in auth or "HD-Api-Key header" in auth:
+                raise ValueError(f"SOURCE_SELECTION_AUTH_FAMILY_MISMATCH:{method} {path}")
+        if expected_family == "legacy_v1_bodygraph":
+            if "HD-Api-Key header" not in auth or "Authorization Bearer token" in auth:
+                raise ValueError(f"SOURCE_SELECTION_AUTH_FAMILY_MISMATCH:{method} {path}")
         snapshot_routes.append(
             {
                 "auth_model": auth,
@@ -682,8 +684,22 @@ def build_source_selection_check_log(produced: str, snapshot: dict[str, Any], *,
         ("legacy_v1_simple_bodygraph", families.get(("POST", "/v1/bodygraphs/simple")) == "legacy_v1_bodygraph"),
         ("v2_variants_distinguished", len({variants.get(item[:2]) for item in V2_CHART_ROUTES}) == 3),
         ("v1_not_collapsed_to_v2", all(families.get((method, path)) != "recommended_v2_chart" for method, path, _variant in V1_BODYGRAPH_ROUTES)),
-        ("v2_auth_family_bearer", all("Authorization Bearer token" in str(auth_models.get((method, path), "")) for method, path, _variant in V2_CHART_ROUTES)),
-        ("v1_auth_family_hd_api_key", all("HD-Api-Key header" in str(auth_models.get((method, path), "")) for method, path, _variant in V1_BODYGRAPH_ROUTES)),
+        (
+            "v2_auth_family_bearer_only",
+            all(
+                "Authorization Bearer token" in str(auth_models.get((method, path), ""))
+                and "HD-Api-Key header" not in str(auth_models.get((method, path), ""))
+                for method, path, _variant in V2_CHART_ROUTES
+            ),
+        ),
+        (
+            "v1_auth_family_hd_api_key_only",
+            all(
+                "HD-Api-Key header" in str(auth_models.get((method, path), ""))
+                and "Authorization Bearer token" not in str(auth_models.get((method, path), ""))
+                for method, path, _variant in V1_BODYGRAPH_ROUTES
+            ),
+        ),
         ("coordinates_geocode_not_needed", geocode.get(("POST", "/v2/charts/coordinates")) == "not needed"),
     ]
     network_posture = (

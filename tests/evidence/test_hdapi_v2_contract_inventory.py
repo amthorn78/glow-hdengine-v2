@@ -294,8 +294,13 @@ def test_epic034_source_selection_distinguishes_v2_chart_variants_and_v1_legacy(
     assert "Authorization Bearer token" in routes[("POST", "/v2/charts")]["auth_model"]
     assert "Authorization Bearer token" in routes[("POST", "/v2/charts/simple")]["auth_model"]
     assert "Authorization Bearer token" in routes[("POST", "/v2/charts/coordinates")]["auth_model"]
+    assert "HD-Api-Key header" not in routes[("POST", "/v2/charts")]["auth_model"]
+    assert "HD-Api-Key header" not in routes[("POST", "/v2/charts/simple")]["auth_model"]
+    assert "HD-Api-Key header" not in routes[("POST", "/v2/charts/coordinates")]["auth_model"]
     assert "HD-Api-Key header" in routes[("POST", "/v1/bodygraphs")]["auth_model"]
     assert "HD-Api-Key header" in routes[("POST", "/v1/bodygraphs/simple")]["auth_model"]
+    assert "Authorization Bearer token" not in routes[("POST", "/v1/bodygraphs")]["auth_model"]
+    assert "Authorization Bearer token" not in routes[("POST", "/v1/bodygraphs/simple")]["auth_model"]
     assert routes[("POST", "/v2/charts/coordinates")]["geocode_key_requirement"] == "not needed"
 
 
@@ -327,8 +332,8 @@ def test_epic034_source_selection_check_log_exists_and_passes() -> None:
         "legacy_v1_simple_bodygraph",
         "v2_variants_distinguished",
         "v1_not_collapsed_to_v2",
-        "v2_auth_family_bearer",
-        "v1_auth_family_hd_api_key",
+        "v2_auth_family_bearer_only",
+        "v1_auth_family_hd_api_key_only",
         "coordinates_geocode_not_needed",
     ]:
         assert f"[{check}] status=PASS" in log
@@ -359,3 +364,20 @@ def test_epic034_source_selection_fails_when_auth_family_collapses() -> None:
             route["auth_model"] = "Authorization Bearer token"
     with pytest.raises(ValueError, match="SOURCE_SELECTION_AUTH_FAMILY_MISMATCH"):
         generator.build_source_selection_snapshot("2026-06-16T00:00:00Z", broken)
+
+
+def test_epic034_source_selection_fails_when_auth_family_is_mixed() -> None:
+    contract = _assert_canonical_json(VENDOR_DIR / "contract_map.json")
+    mixed_v1 = copy.deepcopy(contract)
+    for route in mixed_v1["route_families"]:
+        if route["path"] == "/v1/bodygraphs":
+            route["auth_model"] = "HD-Api-Key header plus Authorization Bearer token"
+    with pytest.raises(ValueError, match="SOURCE_SELECTION_AUTH_FAMILY_MISMATCH"):
+        generator.build_source_selection_snapshot("2026-06-16T00:00:00Z", mixed_v1)
+
+    mixed_v2 = copy.deepcopy(contract)
+    for route in mixed_v2["route_families"]:
+        if route["path"] == "/v2/charts":
+            route["auth_model"] = "Authorization Bearer token plus HD-Api-Key header"
+    with pytest.raises(ValueError, match="SOURCE_SELECTION_AUTH_FAMILY_MISMATCH"):
+        generator.build_source_selection_snapshot("2026-06-16T00:00:00Z", mixed_v2)
