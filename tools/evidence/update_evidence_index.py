@@ -706,6 +706,24 @@ EPIC034_PR01_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
         "tokens": ["TESTS_PASS_OK", "EVIDENCE_PATH_PROOFS_OK"],
         "notes": "EPIC034 PR-01 source-selection check log for route-family distinction and v1 legacy isolation",
     },
+    {
+        "artifact_key": "epic034.pr01.doc_deltas",
+        "discovered_physical_path": "audit/docdeltas/hde-epic034_doc_deltas.md",
+        "epic_id": "HDE-EPIC034",
+        "record_type": "epic034_pr01_doc_delta",
+        "schema_version": "1.0",
+        "tokens": ["DOC_DELTA_PRESENT_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC034 PR-01 current-epic draft/staging doc-delta surface for HDE-FERM007.1 source-selection evidence",
+    },
+    {
+        "artifact_key": "epic034.pr01.qa_meta_doc_deltas",
+        "discovered_physical_path": "audit/qa/hde-epic034/00_meta/doc_deltas.md",
+        "epic_id": "HDE-EPIC034",
+        "record_type": "epic034_pr01_doc_delta",
+        "schema_version": "1.0",
+        "tokens": ["DOC_DELTA_PRESENT_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC034 PR-01 epic-scoped QA meta doc-delta capture for HDE-FERM007.1 source-selection evidence",
+    },
 ]
 
 
