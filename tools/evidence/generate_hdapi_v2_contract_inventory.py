@@ -621,6 +621,10 @@ def build_source_selection_snapshot(produced: str, contract: dict[str, Any]) -> 
         if expected_family == "legacy_v1_bodygraph":
             if "HD-Api-Key header" not in auth or "Authorization Bearer token" in auth:
                 raise ValueError(f"SOURCE_SELECTION_AUTH_FAMILY_MISMATCH:{method} {path}")
+        if expected_geocode == "required" and "HD-Geocode-Key header" not in auth:
+            raise ValueError(f"SOURCE_SELECTION_GEOCODE_AUTH_MISMATCH:{method} {path}")
+        if expected_geocode == "not needed" and "HD-Geocode-Key header" in auth:
+            raise ValueError(f"SOURCE_SELECTION_GEOCODE_AUTH_MISMATCH:{method} {path}")
         snapshot_routes.append(
             {
                 "auth_model": auth,
@@ -713,6 +717,17 @@ def build_source_selection_check_log(produced: str, snapshot: dict[str, Any], *,
         ("v2_location_geocode_required", all(geocode.get((method, path)) == "required" for method, path in [("POST", "/v2/charts"), ("POST", "/v2/charts/simple")])),
         ("v1_bodygraph_geocode_required", all(geocode.get((method, path)) == "required" for method, path, _variant in V1_BODYGRAPH_ROUTES)),
         ("coordinates_geocode_not_needed", geocode.get(("POST", "/v2/charts/coordinates")) == "not needed"),
+        (
+            "required_geocode_auth_header_present",
+            all(
+                "HD-Geocode-Key header" in str(auth_models.get((method, path), ""))
+                for method, path in [("POST", "/v2/charts"), ("POST", "/v2/charts/simple"), ("POST", "/v1/bodygraphs"), ("POST", "/v1/bodygraphs/simple")]
+            ),
+        ),
+        (
+            "coordinates_geocode_auth_header_absent",
+            "HD-Geocode-Key header" not in str(auth_models.get(("POST", "/v2/charts/coordinates"), "")),
+        ),
         (
             "source_authority_validated_yaml_rank1",
             all(

@@ -703,7 +703,7 @@ EPIC034_PR01_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
         "epic_id": "HDE-EPIC034",
         "record_type": "epic034_pr01_source_selection",
         "schema_version": "1.0",
-        "tokens": ["TESTS_PASS_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "tokens": ["EVIDENCE_PATH_PROOFS_OK"],
         "notes": "EPIC034 PR-01 source-selection check log for route-family distinction and v1 legacy isolation",
     },
     {
@@ -940,6 +940,12 @@ def _write_path_proof(
         requested_mtime = None
         existing_produced = None
         existing_mtime = None
+    if requested_produced and existing_mtime:
+        try:
+            if _parse_utc_iso8601(existing_mtime) < _parse_utc_iso8601(requested_produced):
+                existing_mtime = None
+        except Exception:  # noqa: BLE001
+            existing_mtime = None
     produced = requested_produced or existing_produced or default_produced_at
     if check:
         if not proof_path.exists():

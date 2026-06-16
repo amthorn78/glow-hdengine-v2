@@ -1,5 +1,5 @@
 path: audit/gates/narratives/keys_10x4.table.json
 size_bytes: 4746
 sha256: f7f5672a1cfc1b9feb1e94295805e85cb2b5bdf403b8e00f16197c202380eb6e
-mtime_utc: 2026-06-16T20:42:33Z
-produced_at_utc: 2026-06-16T21:00:02Z
+mtime_utc: 2026-06-16T21:44:21Z
+produced_at_utc: 2026-06-16T21:45:59Z

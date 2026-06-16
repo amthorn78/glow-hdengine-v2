@@ -302,10 +302,15 @@ def test_epic034_source_selection_distinguishes_v2_chart_variants_and_v1_legacy(
     assert "Authorization Bearer token" not in routes[("POST", "/v1/bodygraphs")]["auth_model"]
     assert "Authorization Bearer token" not in routes[("POST", "/v1/bodygraphs/simple")]["auth_model"]
     assert routes[("POST", "/v2/charts")]["geocode_key_requirement"] == "required"
+    assert "HD-Geocode-Key header" in routes[("POST", "/v2/charts")]["auth_model"]
     assert routes[("POST", "/v2/charts/simple")]["geocode_key_requirement"] == "required"
+    assert "HD-Geocode-Key header" in routes[("POST", "/v2/charts/simple")]["auth_model"]
     assert routes[("POST", "/v2/charts/coordinates")]["geocode_key_requirement"] == "not needed"
+    assert "HD-Geocode-Key header" not in routes[("POST", "/v2/charts/coordinates")]["auth_model"]
     assert routes[("POST", "/v1/bodygraphs")]["geocode_key_requirement"] == "required"
+    assert "HD-Geocode-Key header" in routes[("POST", "/v1/bodygraphs")]["auth_model"]
     assert routes[("POST", "/v1/bodygraphs/simple")]["geocode_key_requirement"] == "required"
+    assert "HD-Geocode-Key header" in routes[("POST", "/v1/bodygraphs/simple")]["auth_model"]
     for (method, path), route in routes.items():
         assert route["source_precedence_rank"] == 1
         assert route["source_spec"] == generator.source_spec_for(path)
@@ -344,6 +349,8 @@ def test_epic034_source_selection_check_log_exists_and_passes() -> None:
         "v2_location_geocode_required",
         "v1_bodygraph_geocode_required",
         "coordinates_geocode_not_needed",
+        "required_geocode_auth_header_present",
+        "coordinates_geocode_auth_header_absent",
         "source_authority_validated_yaml_rank1",
     ]:
         assert f"[{check}] status=PASS" in log
@@ -418,3 +425,20 @@ def test_epic034_source_selection_fails_when_non_coordinate_geocode_drifts() -> 
             route["geocode_key_requirement"] = "not needed"
     with pytest.raises(ValueError, match="SOURCE_SELECTION_GEOCODE_REQUIREMENT_MISMATCH"):
         generator.build_source_selection_snapshot("2026-06-16T00:00:00Z", broken)
+
+
+def test_epic034_source_selection_fails_when_geocode_auth_header_drifts() -> None:
+    contract = _assert_canonical_json(VENDOR_DIR / "contract_map.json")
+    missing_required = copy.deepcopy(contract)
+    for route in missing_required["route_families"]:
+        if route["path"] == "/v2/charts":
+            route["auth_model"] = "Authorization Bearer token"
+    with pytest.raises(ValueError, match="SOURCE_SELECTION_GEOCODE_AUTH_MISMATCH"):
+        generator.build_source_selection_snapshot("2026-06-16T00:00:00Z", missing_required)
+
+    extra_coordinates = copy.deepcopy(contract)
+    for route in extra_coordinates["route_families"]:
+        if route["path"] == "/v2/charts/coordinates":
+            route["auth_model"] = "Authorization Bearer token plus HD-Geocode-Key header"
+    with pytest.raises(ValueError, match="SOURCE_SELECTION_GEOCODE_AUTH_MISMATCH"):
+        generator.build_source_selection_snapshot("2026-06-16T00:00:00Z", extra_coordinates)
