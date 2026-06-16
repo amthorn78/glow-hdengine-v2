@@ -1,5 +1,5 @@
 path: audit/qa/hde-epic030/pr-04/band_thresholds_identity_hash.txt
 size_bytes: 506
 sha256: 889a92696521c425a7a482957b32f1d51042b72a7ceaba949a274b4e0db4ac9d
-mtime_utc: 2026-06-02T02:09:46Z
-produced_at_utc: 2026-06-05T03:59:50Z
+mtime_utc: 2026-06-16T21:44:22Z
+produced_at_utc: 2026-06-16T21:45:59Z

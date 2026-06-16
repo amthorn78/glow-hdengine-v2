@@ -505,6 +505,11 @@ EPIC032_PR03_SUPERSEDED_INDEX_KEYS = {
     ("epic032.pr03.adapter_selection", "artifacts/db_bridge/adapter_selection.snapshot.json"),
 }
 
+EPIC034_PR01_SUPERSEDED_INDEX_KEYS = {
+    ("epic034.pr01.source_selection_snapshot", "artifacts/vendor/hdapi_v2/source_selection.snapshot.json"),
+    ("epic034.pr01.v1_legacy_guard", "artifacts/vendor/hdapi_v2/v1_legacy_guard.log"),
+}
+
 EPIC032_PR03_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
         "artifact_key": "db_bridge.adapter_selection.snapshot",
@@ -673,6 +678,74 @@ def _load_epic033_entries() -> list[dict[str, object]]:
             normalized["produced_at_utc"] = produced_at
         entries.append(normalized)
     return entries
+EPIC034_PR01_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "hdapi_v2.source_selection",
+        "discovered_physical_path": "artifacts/vendor/hdapi_v2/source_selection.snapshot.json",
+        "epic_id": "HDE-EPIC034",
+        "record_type": "epic034_pr01_source_selection",
+        "schema_version": "1.0",
+        "tokens": ["JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC034 PR-01 canonical source-selection snapshot for HDE-FERM007.1 derived from governed HDAPI v2 contract inventory",
+    },
+    {
+        "artifact_key": "hdapi_v2.v1_legacy_guard",
+        "discovered_physical_path": "artifacts/vendor/hdapi_v2/v1_legacy_guard.log",
+        "epic_id": "HDE-EPIC034",
+        "record_type": "epic034_pr01_source_selection",
+        "schema_version": "1.0",
+        "tokens": ["EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC034 PR-01 LF-terminated legacy v1 BodyGraph guard proving v1 routes do not silently collapse into recommended v2 chart routes",
+    },
+    {
+        "artifact_key": "epic034.pr01.source_selection_check",
+        "discovered_physical_path": "audit/qa/hde-epic034/pr-01/source_selection_check.log",
+        "epic_id": "HDE-EPIC034",
+        "record_type": "epic034_pr01_source_selection",
+        "schema_version": "1.0",
+        "tokens": ["EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC034 PR-01 source-selection check log for route-family distinction and v1 legacy isolation",
+    },
+    {
+        "artifact_key": "epic034.pr01.doc_deltas",
+        "discovered_physical_path": "audit/docdeltas/hde-epic034_doc_deltas.md",
+        "epic_id": "HDE-EPIC034",
+        "record_type": "epic034_pr01_doc_delta",
+        "schema_version": "1.0",
+        "tokens": ["DOC_DELTA_PRESENT_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC034 PR-01 current-epic draft/staging doc-delta surface for HDE-FERM007.1 source-selection evidence",
+    },
+    {
+        "artifact_key": "epic034.pr01.qa_meta_doc_deltas",
+        "discovered_physical_path": "audit/qa/hde-epic034/00_meta/doc_deltas.md",
+        "epic_id": "HDE-EPIC034",
+        "record_type": "epic034_pr01_doc_delta",
+        "schema_version": "1.0",
+        "tokens": ["DOC_DELTA_PRESENT_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC034 PR-01 epic-scoped QA meta doc-delta capture for HDE-FERM007.1 source-selection evidence",
+    },
+]
+
+
+def _load_epic034_pr01_entries() -> list[dict[str, object]]:
+    produced_at = None
+    snapshot = ROOT / "artifacts/vendor/hdapi_v2/source_selection.snapshot.json"
+    if snapshot.exists():
+        try:
+            payload = json.loads(snapshot.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as exc:
+            raise SystemExit("INVALID_EPIC034_SOURCE_SELECTION_SNAPSHOT") from exc
+        produced = payload.get("generated_at_utc")
+        if isinstance(produced, str) and produced:
+            produced_at = produced
+    entries: list[dict[str, object]] = []
+    for entry in EPIC034_PR01_PRIMARY_ARTIFACTS:
+        normalized = dict(entry)
+        if produced_at is not None and normalized.get("record_type") != "epic034_pr01_doc_delta":
+            normalized["produced_at_utc"] = produced_at
+        entries.append(normalized)
+    return entries
+
 
 A7_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
@@ -752,6 +825,8 @@ FORCE_REFRESH_ARTIFACT_RELS: set[str] = {
     "audit/gates/narratives/registry.diff.json",
     "audit/gates/narratives/pack_identity.txt",
     "audit/docdeltas/hde-epic032_doc_deltas.md",
+    "audit/docdeltas/hde-epic034_doc_deltas.md",
+    "audit/qa/hde-epic034/00_meta/doc_deltas.md",
     "artifacts/evidence_index.jsonl",
     "artifacts/evidence_index.jsonl.sha256",
     "docs/evidence/INDEX.json",
@@ -865,6 +940,12 @@ def _write_path_proof(
         requested_mtime = None
         existing_produced = None
         existing_mtime = None
+    if requested_produced and existing_mtime:
+        try:
+            if _parse_utc_iso8601(existing_mtime) < _parse_utc_iso8601(requested_produced):
+                existing_mtime = None
+        except Exception:  # noqa: BLE001
+            existing_mtime = None
     produced = requested_produced or existing_produced or default_produced_at
     if check:
         if not proof_path.exists():
@@ -988,6 +1069,8 @@ def _load_human_index() -> list[dict[str, object]]:
         not in EPIC031_PR02_SUPERSEDED_INDEX_KEYS
         and (entry.get("artifact_key"), entry.get("discovered_physical_path"))
         not in EPIC032_PR03_SUPERSEDED_INDEX_KEYS
+        and (entry.get("artifact_key"), entry.get("discovered_physical_path"))
+        not in EPIC034_PR01_SUPERSEDED_INDEX_KEYS
     ]
     return _dedupe_entries(
         [
@@ -1009,6 +1092,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *EPIC032_PR03_PRIMARY_ARTIFACTS,
             *EPIC032_PR04_PRIMARY_ARTIFACTS,
             *_load_epic033_entries(),
+            *_load_epic034_pr01_entries(),
             *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,

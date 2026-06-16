@@ -33,6 +33,10 @@ TOKEN_MATRIX = ROOT / "audit" / "qa" / "hde-epic033" / "token_evidence_matrix.md
 VIABILITY = ROOT / "audit" / "qa" / "hde-epic033" / "acceptance_map_viability.log"
 DOC_DELTAS = ROOT / "audit" / "docdeltas" / "hde-epic033_doc_deltas.md"
 QA_DOC_DELTAS = ROOT / "audit" / "qa" / "hde-epic033" / "00_meta" / "doc_deltas.md"
+EPIC034_QA = ROOT / "audit" / "qa" / "hde-epic034" / "pr-01"
+SOURCE_SELECTION_SNAPSHOT = OUT / "source_selection.snapshot.json"
+V1_LEGACY_GUARD_LOG = OUT / "v1_legacy_guard.log"
+SOURCE_SELECTION_CHECK_LOG = EPIC034_QA / "source_selection_check.log"
 
 BASE = "https://docs.humandesignapi.nl"
 SOURCES = [
@@ -63,6 +67,15 @@ REQUIRED_ENDPOINTS = [
 ]
 
 ALLOWED_STATUS = {200}
+V2_CHART_ROUTES = [
+    ("POST", "/v2/charts", "full_chart"),
+    ("POST", "/v2/charts/simple", "simple_chart"),
+    ("POST", "/v2/charts/coordinates", "coordinates_chart"),
+]
+V1_BODYGRAPH_ROUTES = [
+    ("POST", "/v1/bodygraphs", "legacy_full_bodygraph"),
+    ("POST", "/v1/bodygraphs/simple", "legacy_simple_bodygraph"),
+]
 
 
 def iso_now() -> str:
@@ -556,6 +569,188 @@ def build_contract_map(produced: str, fetched: dict[str, dict[str, Any]], rows: 
     return contract
 
 
+
+def _contract_routes(contract: dict[str, Any]) -> dict[tuple[str, str], dict[str, Any]]:
+    routes = contract.get("route_families")
+    if not isinstance(routes, list):
+        raise ValueError("CONTRACT_MAP_MISSING_ROUTE_FAMILIES")
+    mapped: dict[tuple[str, str], dict[str, Any]] = {}
+    for route in routes:
+        if not isinstance(route, dict):
+            raise ValueError("CONTRACT_MAP_ROUTE_NOT_OBJECT")
+        method = route.get("method")
+        path = route.get("path")
+        if not isinstance(method, str) or not isinstance(path, str):
+            raise ValueError("CONTRACT_MAP_ROUTE_MISSING_METHOD_OR_PATH")
+        mapped[(method, path)] = route
+    return mapped
+
+
+def build_source_selection_snapshot(produced: str, contract: dict[str, Any]) -> dict[str, Any]:
+    """Derive HDE-EPIC034 PR-01 source-selection evidence from contract inventory."""
+    routes = _contract_routes(contract)
+    required = V2_CHART_ROUTES + V1_BODYGRAPH_ROUTES
+    missing = [(method, path) for method, path, _variant in required if (method, path) not in routes]
+    if missing:
+        formatted = ",".join(f"{method} {path}" for method, path in missing)
+        raise ValueError(f"SOURCE_SELECTION_MISSING_CONTRACT_ROUTES:{formatted}")
+
+    snapshot_routes: list[dict[str, Any]] = []
+    for method, path, variant in required:
+        route = routes[(method, path)]
+        expected_family = "recommended_v2_chart" if path.startswith("/v2/") else "legacy_v1_bodygraph"
+        if route.get("route_family") != expected_family:
+            raise ValueError(f"SOURCE_SELECTION_ROUTE_FAMILY_MISMATCH:{method} {path}")
+        auth = route.get("auth_model")
+        geocode = route.get("geocode_key_requirement")
+        source_spec = route.get("source_spec")
+        source_precedence_rank = route.get("source_precedence_rank")
+        if not isinstance(auth, str) or not auth:
+            raise ValueError(f"SOURCE_SELECTION_AUTH_MODEL_MISSING:{method} {path}")
+        if not isinstance(geocode, str) or not geocode:
+            raise ValueError(f"SOURCE_SELECTION_GEOCODE_REQUIREMENT_MISSING:{method} {path}")
+        expected_source_spec = source_spec_for(path)
+        if source_spec != expected_source_spec or source_precedence_rank != 1:
+            raise ValueError(f"SOURCE_SELECTION_SOURCE_AUTHORITY_MISMATCH:{method} {path}")
+        expected_geocode = "not needed" if path == "/v2/charts/coordinates" else "required"
+        if geocode != expected_geocode:
+            raise ValueError(f"SOURCE_SELECTION_GEOCODE_REQUIREMENT_MISMATCH:{method} {path}")
+        if expected_family == "recommended_v2_chart":
+            if "Authorization Bearer token" not in auth or "HD-Api-Key header" in auth:
+                raise ValueError(f"SOURCE_SELECTION_AUTH_FAMILY_MISMATCH:{method} {path}")
+        if expected_family == "legacy_v1_bodygraph":
+            if "HD-Api-Key header" not in auth or "Authorization Bearer token" in auth:
+                raise ValueError(f"SOURCE_SELECTION_AUTH_FAMILY_MISMATCH:{method} {path}")
+        if expected_geocode == "required" and "HD-Geocode-Key header" not in auth:
+            raise ValueError(f"SOURCE_SELECTION_GEOCODE_AUTH_MISMATCH:{method} {path}")
+        if expected_geocode == "not needed" and "HD-Geocode-Key header" in auth:
+            raise ValueError(f"SOURCE_SELECTION_GEOCODE_AUTH_MISMATCH:{method} {path}")
+        snapshot_routes.append(
+            {
+                "auth_model": auth,
+                "classification_source": "artifacts/vendor/hdapi_v2/contract_map.json route_families",
+                "geocode_key_requirement": geocode,
+                "method": method,
+                "path": path,
+                "route_family": expected_family,
+                "route_variant": variant,
+                "source_precedence_rank": source_precedence_rank,
+                "source_spec": source_spec,
+            }
+        )
+
+    return {
+        "ai_scope_claim": "NONE",
+        "generated_at_utc": produced,
+        "open_rails_vendor_smoke_claim": "NONE",
+        "public_reader_change_claim": "NONE",
+        "request_shaping_claim": "NONE",
+        "route_families": snapshot_routes,
+        "runtime_conformance_claim": "NONE",
+        "source_selection_policy": {
+            "classification_source": "governed contract inventory",
+            "legacy_v1_bodygraph_route_family": "legacy_v1_bodygraph",
+            "recommended_internal_vendor_route_family": "recommended_v2_chart",
+            "selection_scope": "HDE-EPIC034 PR-01 HDE-FERM007.1 route-family source selection only",
+        },
+    }
+
+
+def build_v1_legacy_guard_log(produced: str, snapshot: dict[str, Any]) -> str:
+    routes = snapshot.get("route_families")
+    if not isinstance(routes, list):
+        raise ValueError("SOURCE_SELECTION_SNAPSHOT_MISSING_ROUTES")
+    by_path = {route["path"]: route for route in routes if isinstance(route, dict) and "path" in route}
+    lines = [
+        f"generated_at_utc={produced}",
+        "scope=HDE-EPIC034 PR-01 HDE-FERM007.1 v1 legacy guard",
+        "classification_source=artifacts/vendor/hdapi_v2/contract_map.json route_families",
+    ]
+    for _method, path, variant in V1_BODYGRAPH_ROUTES:
+        route = by_path.get(path)
+        status = "PASS" if route and route.get("route_family") == "legacy_v1_bodygraph" and route.get("route_variant") == variant else "FAIL"
+        lines.append(f"[{path}] legacy_v1_bodygraph_explicit={status}")
+        lines.append(f"[{path}] collapsed_to_recommended_v2_chart={'FAIL' if status == 'PASS' else 'UNKNOWN'}")
+    v2_variants = [by_path[path].get("route_variant") for _method, path, _variant in V2_CHART_ROUTES if path in by_path]
+    lines.append(f"v2_chart_route_variants_distinct={'PASS' if len(set(v2_variants)) == 3 else 'FAIL'}")
+    lines.append("request_shaping_claim=NONE")
+    lines.append("runtime_conformance_claim=NONE")
+    lines.append("public_reader_change_claim=NONE")
+    lines.append("open_rails_vendor_smoke_claim=NONE")
+    lines.append("ai_scope=NONE")
+    lines.append("status=PASS" if all("FAIL" not in line for line in lines if "collapsed_to_recommended_v2_chart" not in line) else "status=FAIL")
+    return "\n".join(lines)
+
+
+def build_source_selection_check_log(produced: str, snapshot: dict[str, Any], *, mode: str) -> str:
+    routes = snapshot["route_families"]
+    families = {(route["method"], route["path"]): route["route_family"] for route in routes}
+    variants = {(route["method"], route["path"]): route["route_variant"] for route in routes}
+    auth_models = {(route["method"], route["path"]): route.get("auth_model") for route in routes}
+    geocode = {(route["method"], route["path"]): route.get("geocode_key_requirement") for route in routes}
+    source_specs = {(route["method"], route["path"]): route.get("source_spec") for route in routes}
+    source_ranks = {(route["method"], route["path"]): route.get("source_precedence_rank") for route in routes}
+    checks = [
+        ("recommended_v2_full_chart", families.get(("POST", "/v2/charts")) == "recommended_v2_chart"),
+        ("recommended_v2_simple_chart", families.get(("POST", "/v2/charts/simple")) == "recommended_v2_chart"),
+        ("recommended_v2_coordinates_chart", families.get(("POST", "/v2/charts/coordinates")) == "recommended_v2_chart"),
+        ("legacy_v1_full_bodygraph", families.get(("POST", "/v1/bodygraphs")) == "legacy_v1_bodygraph"),
+        ("legacy_v1_simple_bodygraph", families.get(("POST", "/v1/bodygraphs/simple")) == "legacy_v1_bodygraph"),
+        ("v2_variants_distinguished", len({variants.get(item[:2]) for item in V2_CHART_ROUTES}) == 3),
+        ("v1_not_collapsed_to_v2", all(families.get((method, path)) != "recommended_v2_chart" for method, path, _variant in V1_BODYGRAPH_ROUTES)),
+        (
+            "v2_auth_family_bearer_only",
+            all(
+                "Authorization Bearer token" in str(auth_models.get((method, path), ""))
+                and "HD-Api-Key header" not in str(auth_models.get((method, path), ""))
+                for method, path, _variant in V2_CHART_ROUTES
+            ),
+        ),
+        (
+            "v1_auth_family_hd_api_key_only",
+            all(
+                "HD-Api-Key header" in str(auth_models.get((method, path), ""))
+                and "Authorization Bearer token" not in str(auth_models.get((method, path), ""))
+                for method, path, _variant in V1_BODYGRAPH_ROUTES
+            ),
+        ),
+        ("v2_location_geocode_required", all(geocode.get((method, path)) == "required" for method, path in [("POST", "/v2/charts"), ("POST", "/v2/charts/simple")])),
+        ("v1_bodygraph_geocode_required", all(geocode.get((method, path)) == "required" for method, path, _variant in V1_BODYGRAPH_ROUTES)),
+        ("coordinates_geocode_not_needed", geocode.get(("POST", "/v2/charts/coordinates")) == "not needed"),
+        (
+            "required_geocode_auth_header_present",
+            all(
+                "HD-Geocode-Key header" in str(auth_models.get((method, path), ""))
+                for method, path in [("POST", "/v2/charts"), ("POST", "/v2/charts/simple"), ("POST", "/v1/bodygraphs"), ("POST", "/v1/bodygraphs/simple")]
+            ),
+        ),
+        (
+            "coordinates_geocode_auth_header_absent",
+            "HD-Geocode-Key header" not in str(auth_models.get(("POST", "/v2/charts/coordinates"), "")),
+        ),
+        (
+            "source_authority_validated_yaml_rank1",
+            all(
+                source_specs.get((method, path)) == source_spec_for(path)
+                and source_ranks.get((method, path)) == 1
+                for method, path, _variant in V2_CHART_ROUTES + V1_BODYGRAPH_ROUTES
+            ),
+        ),
+    ]
+    network_posture = (
+        "closed-rails-source-cache; no live vendor calls"
+        if mode == "closed-rails-source-cache"
+        else "public-docs-refresh; no credentialed runtime vendor calls"
+    )
+    lines = [
+        f"generated_at_utc={produced}",
+        "scope=HDE-EPIC034 PR-01 source-selection check",
+        f"network_posture={network_posture}",
+    ]
+    lines.extend(f"[{name}] status={'PASS' if ok else 'FAIL'}" for name, ok in checks)
+    lines.append("status=PASS" if all(ok for _name, ok in checks) else "status=FAIL")
+    return "\n".join(lines)
+
 def validate_source_statuses(fetched: dict[str, dict[str, Any]]) -> None:
     for key in ["v2_routes_yaml", "v1_routes_yaml", "llms_full_txt"]:
         status = fetched[key].get("fetch_status")
@@ -701,6 +896,13 @@ def render_outputs(produced: str, fetched: dict[str, dict[str, Any]], bodies: di
         OUT / "endpoint_reference.csv": write_endpoint_reference(rows),
         OUT / "contract_map.json": canonical_json_bytes(build_contract_map(produced, fetched, rows, suspect_ok)),
     }
+    contract = build_contract_map(produced, fetched, rows, suspect_ok)
+    snapshot = build_source_selection_snapshot(produced, contract)
+    outputs.update({
+        SOURCE_SELECTION_SNAPSHOT: canonical_json_bytes(snapshot),
+        V1_LEGACY_GUARD_LOG: (build_v1_legacy_guard_log(produced, snapshot) + "\n").encode("utf-8"),
+        SOURCE_SELECTION_CHECK_LOG: (build_source_selection_check_log(produced, snapshot, mode=mode) + "\n").encode("utf-8"),
+    })
     outputs.update(write_baseline_pointer_artifacts(produced, acceptance))
     return outputs
 
