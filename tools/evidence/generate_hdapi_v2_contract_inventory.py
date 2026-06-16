@@ -601,9 +601,21 @@ def build_source_selection_snapshot(produced: str, contract: dict[str, Any]) -> 
         expected_family = "recommended_v2_chart" if path.startswith("/v2/") else "legacy_v1_bodygraph"
         if route.get("route_family") != expected_family:
             raise ValueError(f"SOURCE_SELECTION_ROUTE_FAMILY_MISMATCH:{method} {path}")
+        auth = route.get("auth_model")
+        geocode = route.get("geocode_key_requirement")
+        if not isinstance(auth, str) or not auth:
+            raise ValueError(f"SOURCE_SELECTION_AUTH_MODEL_MISSING:{method} {path}")
+        if not isinstance(geocode, str) or not geocode:
+            raise ValueError(f"SOURCE_SELECTION_GEOCODE_REQUIREMENT_MISSING:{method} {path}")
+        if expected_family == "recommended_v2_chart" and "Authorization Bearer token" not in auth:
+            raise ValueError(f"SOURCE_SELECTION_AUTH_FAMILY_MISMATCH:{method} {path}")
+        if expected_family == "legacy_v1_bodygraph" and "HD-Api-Key header" not in auth:
+            raise ValueError(f"SOURCE_SELECTION_AUTH_FAMILY_MISMATCH:{method} {path}")
         snapshot_routes.append(
             {
+                "auth_model": auth,
                 "classification_source": "artifacts/vendor/hdapi_v2/contract_map.json route_families",
+                "geocode_key_requirement": geocode,
                 "method": method,
                 "path": path,
                 "route_family": expected_family,
@@ -656,10 +668,12 @@ def build_v1_legacy_guard_log(produced: str, snapshot: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
-def build_source_selection_check_log(produced: str, snapshot: dict[str, Any]) -> str:
+def build_source_selection_check_log(produced: str, snapshot: dict[str, Any], *, mode: str) -> str:
     routes = snapshot["route_families"]
     families = {(route["method"], route["path"]): route["route_family"] for route in routes}
     variants = {(route["method"], route["path"]): route["route_variant"] for route in routes}
+    auth_models = {(route["method"], route["path"]): route.get("auth_model") for route in routes}
+    geocode = {(route["method"], route["path"]): route.get("geocode_key_requirement") for route in routes}
     checks = [
         ("recommended_v2_full_chart", families.get(("POST", "/v2/charts")) == "recommended_v2_chart"),
         ("recommended_v2_simple_chart", families.get(("POST", "/v2/charts/simple")) == "recommended_v2_chart"),
@@ -668,11 +682,19 @@ def build_source_selection_check_log(produced: str, snapshot: dict[str, Any]) ->
         ("legacy_v1_simple_bodygraph", families.get(("POST", "/v1/bodygraphs/simple")) == "legacy_v1_bodygraph"),
         ("v2_variants_distinguished", len({variants.get(item[:2]) for item in V2_CHART_ROUTES}) == 3),
         ("v1_not_collapsed_to_v2", all(families.get((method, path)) != "recommended_v2_chart" for method, path, _variant in V1_BODYGRAPH_ROUTES)),
+        ("v2_auth_family_bearer", all("Authorization Bearer token" in str(auth_models.get((method, path), "")) for method, path, _variant in V2_CHART_ROUTES)),
+        ("v1_auth_family_hd_api_key", all("HD-Api-Key header" in str(auth_models.get((method, path), "")) for method, path, _variant in V1_BODYGRAPH_ROUTES)),
+        ("coordinates_geocode_not_needed", geocode.get(("POST", "/v2/charts/coordinates")) == "not needed"),
     ]
+    network_posture = (
+        "closed-rails-source-cache; no live vendor calls"
+        if mode == "closed-rails-source-cache"
+        else "public-docs-refresh; no credentialed runtime vendor calls"
+    )
     lines = [
         f"generated_at_utc={produced}",
         "scope=HDE-EPIC034 PR-01 source-selection check",
-        "network_posture=closed-rails-source-cache; no live vendor calls",
+        f"network_posture={network_posture}",
     ]
     lines.extend(f"[{name}] status={'PASS' if ok else 'FAIL'}" for name, ok in checks)
     lines.append("status=PASS" if all(ok for _name, ok in checks) else "status=FAIL")
@@ -828,7 +850,7 @@ def render_outputs(produced: str, fetched: dict[str, dict[str, Any]], bodies: di
     outputs.update({
         SOURCE_SELECTION_SNAPSHOT: canonical_json_bytes(snapshot),
         V1_LEGACY_GUARD_LOG: (build_v1_legacy_guard_log(produced, snapshot) + "\n").encode("utf-8"),
-        SOURCE_SELECTION_CHECK_LOG: (build_source_selection_check_log(produced, snapshot) + "\n").encode("utf-8"),
+        SOURCE_SELECTION_CHECK_LOG: (build_source_selection_check_log(produced, snapshot, mode=mode) + "\n").encode("utf-8"),
     })
     outputs.update(write_baseline_pointer_artifacts(produced, acceptance))
     return outputs

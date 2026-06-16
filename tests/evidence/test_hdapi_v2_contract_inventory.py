@@ -291,6 +291,12 @@ def test_epic034_source_selection_distinguishes_v2_chart_variants_and_v1_legacy(
         routes[("POST", "/v2/charts/coordinates")]["route_variant"],
     } == {"full_chart", "simple_chart", "coordinates_chart"}
     assert all(route["classification_source"] == "artifacts/vendor/hdapi_v2/contract_map.json route_families" for route in routes.values())
+    assert "Authorization Bearer token" in routes[("POST", "/v2/charts")]["auth_model"]
+    assert "Authorization Bearer token" in routes[("POST", "/v2/charts/simple")]["auth_model"]
+    assert "Authorization Bearer token" in routes[("POST", "/v2/charts/coordinates")]["auth_model"]
+    assert "HD-Api-Key header" in routes[("POST", "/v1/bodygraphs")]["auth_model"]
+    assert "HD-Api-Key header" in routes[("POST", "/v1/bodygraphs/simple")]["auth_model"]
+    assert routes[("POST", "/v2/charts/coordinates")]["geocode_key_requirement"] == "not needed"
 
 
 def test_epic034_v1_legacy_guard_log_proves_no_silent_v1_to_v2_collapse() -> None:
@@ -321,6 +327,9 @@ def test_epic034_source_selection_check_log_exists_and_passes() -> None:
         "legacy_v1_simple_bodygraph",
         "v2_variants_distinguished",
         "v1_not_collapsed_to_v2",
+        "v2_auth_family_bearer",
+        "v1_auth_family_hd_api_key",
+        "coordinates_geocode_not_needed",
     ]:
         assert f"[{check}] status=PASS" in log
     assert "network_posture=closed-rails-source-cache; no live vendor calls" in log
@@ -331,4 +340,22 @@ def test_epic034_source_selection_fails_when_contract_inventory_is_missing_requi
     broken = copy.deepcopy(contract)
     broken["route_families"] = [route for route in broken["route_families"] if route["path"] != "/v2/charts/coordinates"]
     with pytest.raises(ValueError, match="SOURCE_SELECTION_MISSING_CONTRACT_ROUTES"):
+        generator.build_source_selection_snapshot("2026-06-16T00:00:00Z", broken)
+
+
+def test_epic034_source_selection_check_log_reflects_public_docs_refresh_mode() -> None:
+    contract = _assert_canonical_json(VENDOR_DIR / "contract_map.json")
+    snapshot = generator.build_source_selection_snapshot("2026-06-16T00:00:00Z", contract)
+    log = generator.build_source_selection_check_log("2026-06-16T00:00:00Z", snapshot, mode="public-docs-refresh")
+    assert "network_posture=public-docs-refresh; no credentialed runtime vendor calls" in log
+    assert "network_posture=closed-rails-source-cache" not in log
+
+
+def test_epic034_source_selection_fails_when_auth_family_collapses() -> None:
+    contract = _assert_canonical_json(VENDOR_DIR / "contract_map.json")
+    broken = copy.deepcopy(contract)
+    for route in broken["route_families"]:
+        if route["path"] == "/v1/bodygraphs":
+            route["auth_model"] = "Authorization Bearer token"
+    with pytest.raises(ValueError, match="SOURCE_SELECTION_AUTH_FAMILY_MISMATCH"):
         generator.build_source_selection_snapshot("2026-06-16T00:00:00Z", broken)

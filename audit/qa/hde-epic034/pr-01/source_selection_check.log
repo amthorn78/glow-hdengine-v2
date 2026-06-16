@@ -1,4 +1,4 @@
-generated_at_utc=2026-06-16T17:33:23Z
+generated_at_utc=2026-06-16T19:36:29Z
 scope=HDE-EPIC034 PR-01 source-selection check
 network_posture=closed-rails-source-cache; no live vendor calls
 [recommended_v2_full_chart] status=PASS
@@ -8,4 +8,7 @@ network_posture=closed-rails-source-cache; no live vendor calls
 [legacy_v1_simple_bodygraph] status=PASS
 [v2_variants_distinguished] status=PASS
 [v1_not_collapsed_to_v2] status=PASS
+[v2_auth_family_bearer] status=PASS
+[v1_auth_family_hd_api_key] status=PASS
+[coordinates_geocode_not_needed] status=PASS
 status=PASS

@@ -675,7 +675,7 @@ def _load_epic033_entries() -> list[dict[str, object]]:
     return entries
 EPIC034_PR01_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
-        "artifact_key": "epic034.pr01.source_selection_snapshot",
+        "artifact_key": "hdapi_v2.source_selection",
         "discovered_physical_path": "artifacts/vendor/hdapi_v2/source_selection.snapshot.json",
         "epic_id": "HDE-EPIC034",
         "record_type": "epic034_pr01_source_selection",
@@ -684,7 +684,7 @@ EPIC034_PR01_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
         "notes": "EPIC034 PR-01 canonical source-selection snapshot for HDE-FERM007.1 derived from governed HDAPI v2 contract inventory",
     },
     {
-        "artifact_key": "epic034.pr01.v1_legacy_guard",
+        "artifact_key": "hdapi_v2.v1_legacy_guard",
         "discovered_physical_path": "artifacts/vendor/hdapi_v2/v1_legacy_guard.log",
         "epic_id": "HDE-EPIC034",
         "record_type": "epic034_pr01_source_selection",
