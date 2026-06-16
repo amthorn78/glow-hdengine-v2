@@ -603,10 +603,18 @@ def build_source_selection_snapshot(produced: str, contract: dict[str, Any]) -> 
             raise ValueError(f"SOURCE_SELECTION_ROUTE_FAMILY_MISMATCH:{method} {path}")
         auth = route.get("auth_model")
         geocode = route.get("geocode_key_requirement")
+        source_spec = route.get("source_spec")
+        source_precedence_rank = route.get("source_precedence_rank")
         if not isinstance(auth, str) or not auth:
             raise ValueError(f"SOURCE_SELECTION_AUTH_MODEL_MISSING:{method} {path}")
         if not isinstance(geocode, str) or not geocode:
             raise ValueError(f"SOURCE_SELECTION_GEOCODE_REQUIREMENT_MISSING:{method} {path}")
+        expected_source_spec = source_spec_for(path)
+        if source_spec != expected_source_spec or source_precedence_rank != 1:
+            raise ValueError(f"SOURCE_SELECTION_SOURCE_AUTHORITY_MISMATCH:{method} {path}")
+        expected_geocode = "not needed" if path == "/v2/charts/coordinates" else "required"
+        if geocode != expected_geocode:
+            raise ValueError(f"SOURCE_SELECTION_GEOCODE_REQUIREMENT_MISMATCH:{method} {path}")
         if expected_family == "recommended_v2_chart":
             if "Authorization Bearer token" not in auth or "HD-Api-Key header" in auth:
                 raise ValueError(f"SOURCE_SELECTION_AUTH_FAMILY_MISMATCH:{method} {path}")
@@ -622,8 +630,8 @@ def build_source_selection_snapshot(produced: str, contract: dict[str, Any]) -> 
                 "path": path,
                 "route_family": expected_family,
                 "route_variant": variant,
-                "source_precedence_rank": route.get("source_precedence_rank"),
-                "source_spec": route.get("source_spec"),
+                "source_precedence_rank": source_precedence_rank,
+                "source_spec": source_spec,
             }
         )
 
@@ -676,6 +684,8 @@ def build_source_selection_check_log(produced: str, snapshot: dict[str, Any], *,
     variants = {(route["method"], route["path"]): route["route_variant"] for route in routes}
     auth_models = {(route["method"], route["path"]): route.get("auth_model") for route in routes}
     geocode = {(route["method"], route["path"]): route.get("geocode_key_requirement") for route in routes}
+    source_specs = {(route["method"], route["path"]): route.get("source_spec") for route in routes}
+    source_ranks = {(route["method"], route["path"]): route.get("source_precedence_rank") for route in routes}
     checks = [
         ("recommended_v2_full_chart", families.get(("POST", "/v2/charts")) == "recommended_v2_chart"),
         ("recommended_v2_simple_chart", families.get(("POST", "/v2/charts/simple")) == "recommended_v2_chart"),
@@ -700,7 +710,17 @@ def build_source_selection_check_log(produced: str, snapshot: dict[str, Any], *,
                 for method, path, _variant in V1_BODYGRAPH_ROUTES
             ),
         ),
+        ("v2_location_geocode_required", all(geocode.get((method, path)) == "required" for method, path in [("POST", "/v2/charts"), ("POST", "/v2/charts/simple")])),
+        ("v1_bodygraph_geocode_required", all(geocode.get((method, path)) == "required" for method, path, _variant in V1_BODYGRAPH_ROUTES)),
         ("coordinates_geocode_not_needed", geocode.get(("POST", "/v2/charts/coordinates")) == "not needed"),
+        (
+            "source_authority_validated_yaml_rank1",
+            all(
+                source_specs.get((method, path)) == source_spec_for(path)
+                and source_ranks.get((method, path)) == 1
+                for method, path, _variant in V2_CHART_ROUTES + V1_BODYGRAPH_ROUTES
+            ),
+        ),
     ]
     network_posture = (
         "closed-rails-source-cache; no live vendor calls"

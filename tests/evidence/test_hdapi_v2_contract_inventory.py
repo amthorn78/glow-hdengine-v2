@@ -301,7 +301,14 @@ def test_epic034_source_selection_distinguishes_v2_chart_variants_and_v1_legacy(
     assert "HD-Api-Key header" in routes[("POST", "/v1/bodygraphs/simple")]["auth_model"]
     assert "Authorization Bearer token" not in routes[("POST", "/v1/bodygraphs")]["auth_model"]
     assert "Authorization Bearer token" not in routes[("POST", "/v1/bodygraphs/simple")]["auth_model"]
+    assert routes[("POST", "/v2/charts")]["geocode_key_requirement"] == "required"
+    assert routes[("POST", "/v2/charts/simple")]["geocode_key_requirement"] == "required"
     assert routes[("POST", "/v2/charts/coordinates")]["geocode_key_requirement"] == "not needed"
+    assert routes[("POST", "/v1/bodygraphs")]["geocode_key_requirement"] == "required"
+    assert routes[("POST", "/v1/bodygraphs/simple")]["geocode_key_requirement"] == "required"
+    for (method, path), route in routes.items():
+        assert route["source_precedence_rank"] == 1
+        assert route["source_spec"] == generator.source_spec_for(path)
 
 
 def test_epic034_v1_legacy_guard_log_proves_no_silent_v1_to_v2_collapse() -> None:
@@ -334,7 +341,10 @@ def test_epic034_source_selection_check_log_exists_and_passes() -> None:
         "v1_not_collapsed_to_v2",
         "v2_auth_family_bearer_only",
         "v1_auth_family_hd_api_key_only",
+        "v2_location_geocode_required",
+        "v1_bodygraph_geocode_required",
         "coordinates_geocode_not_needed",
+        "source_authority_validated_yaml_rank1",
     ]:
         assert f"[{check}] status=PASS" in log
     assert "network_posture=closed-rails-source-cache; no live vendor calls" in log
@@ -381,3 +391,30 @@ def test_epic034_source_selection_fails_when_auth_family_is_mixed() -> None:
             route["auth_model"] = "Authorization Bearer token plus HD-Api-Key header"
     with pytest.raises(ValueError, match="SOURCE_SELECTION_AUTH_FAMILY_MISMATCH"):
         generator.build_source_selection_snapshot("2026-06-16T00:00:00Z", mixed_v2)
+
+
+def test_epic034_source_selection_fails_when_source_authority_drifts() -> None:
+    contract = _assert_canonical_json(VENDOR_DIR / "contract_map.json")
+    broken_spec = copy.deepcopy(contract)
+    for route in broken_spec["route_families"]:
+        if route["path"] == "/v2/charts":
+            route["source_spec"] = "docs.humandesignapi.nl/quarantined#/paths/~1charts/post"
+    with pytest.raises(ValueError, match="SOURCE_SELECTION_SOURCE_AUTHORITY_MISMATCH"):
+        generator.build_source_selection_snapshot("2026-06-16T00:00:00Z", broken_spec)
+
+    broken_rank = copy.deepcopy(contract)
+    for route in broken_rank["route_families"]:
+        if route["path"] == "/v1/bodygraphs":
+            route["source_precedence_rank"] = 2
+    with pytest.raises(ValueError, match="SOURCE_SELECTION_SOURCE_AUTHORITY_MISMATCH"):
+        generator.build_source_selection_snapshot("2026-06-16T00:00:00Z", broken_rank)
+
+
+def test_epic034_source_selection_fails_when_non_coordinate_geocode_drifts() -> None:
+    contract = _assert_canonical_json(VENDOR_DIR / "contract_map.json")
+    broken = copy.deepcopy(contract)
+    for route in broken["route_families"]:
+        if route["path"] == "/v2/charts/simple":
+            route["geocode_key_requirement"] = "not needed"
+    with pytest.raises(ValueError, match="SOURCE_SELECTION_GEOCODE_REQUIREMENT_MISMATCH"):
+        generator.build_source_selection_snapshot("2026-06-16T00:00:00Z", broken)

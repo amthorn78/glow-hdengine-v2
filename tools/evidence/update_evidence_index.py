@@ -741,7 +741,7 @@ def _load_epic034_pr01_entries() -> list[dict[str, object]]:
     entries: list[dict[str, object]] = []
     for entry in EPIC034_PR01_PRIMARY_ARTIFACTS:
         normalized = dict(entry)
-        if produced_at is not None:
+        if produced_at is not None and normalized.get("record_type") != "epic034_pr01_doc_delta":
             normalized["produced_at_utc"] = produced_at
         entries.append(normalized)
     return entries
@@ -825,6 +825,8 @@ FORCE_REFRESH_ARTIFACT_RELS: set[str] = {
     "audit/gates/narratives/registry.diff.json",
     "audit/gates/narratives/pack_identity.txt",
     "audit/docdeltas/hde-epic032_doc_deltas.md",
+    "audit/docdeltas/hde-epic034_doc_deltas.md",
+    "audit/qa/hde-epic034/00_meta/doc_deltas.md",
     "artifacts/evidence_index.jsonl",
     "artifacts/evidence_index.jsonl.sha256",
     "docs/evidence/INDEX.json",
