@@ -18,11 +18,8 @@ mkdir -p "${out_dir}" || {
   exit 1
 }
 
-exec 3>&1
-exec >> "${report}" 2>&1
-
 append() {
-  printf '%s\n' "$*"
+  printf '%s\n' "$*" >> "${report}"
 }
 
 section() {
@@ -30,16 +27,24 @@ section() {
   append "## $*"
 }
 
-run_section() {
+redact_sensitive_stream() {
+  sed -E \
+    -e 's#https?://[^[:space:]"'"'"'<>]+#REDACTED_URL#g' \
+    -e 's#([A-Za-z0-9_]*(KEY|TOKEN|SECRET|PASSWORD|DATABASE_URL|DB_|GEO_API_KEY|HD_API_KEY|HD_API_BASE_URL|HDAPI_BASE_URL|AUTH|BEARER|URL)[A-Za-z0-9_]*[=:])["'"'"']?[^[:space:]"'"'"']+["'"'"']?#\1REDACTED#g'
+}
+
+append_redacted() {
+  redact_sensitive_stream >> "${report}"
+}
+
+run_command() {
   section "$1"
   shift
   append "\$ $*"
-  if "$@" >> "${report}" 2>&1; then
-    append "[exit=0]"
-  else
-    status=$?
-    append "[exit=${status}]"
-  fi
+  output="$({ "$@"; } 2>&1)"
+  status=$?
+  printf '%s\n' "${output}" | append_redacted
+  append "[exit=${status}]"
 }
 
 run_optional() {
@@ -47,12 +52,10 @@ run_optional() {
   shift
   if command -v "$1" >/dev/null 2>&1; then
     append "\$ $*"
-    if "$@" >> "${report}" 2>&1; then
-      append "[exit=0]"
-    else
-      status=$?
-      append "[exit=${status}]"
-    fi
+    output="$({ "$@"; } 2>&1)"
+    status=$?
+    printf '%s\n' "${output}" | append_redacted
+    append "[exit=${status}]"
   else
     append "$1: not available"
   fi
@@ -63,28 +66,16 @@ run_with_timeout() {
   shift
   if command -v timeout >/dev/null 2>&1; then
     append "\$ timeout 15s $*"
-    if timeout 15s "$@" >> "${report}" 2>&1; then
-      append "[exit=0]"
-    else
-      status=$?
-      append "[exit=${status}]"
-    fi
+    output="$({ timeout 15s "$@"; } 2>&1)"
+    status=$?
   else
     append "timeout: not available; running without timeout"
     append "\$ $*"
-    if "$@" >> "${report}" 2>&1; then
-      append "[exit=0]"
-    else
-      status=$?
-      append "[exit=${status}]"
-    fi
+    output="$({ "$@"; } 2>&1)"
+    status=$?
   fi
-}
-
-redact_sensitive_stream() {
-  sed -E \
-    -e 's#https?://[^[:space:]]+#REDACTED_URL#g' \
-    -e 's#([A-Za-z0-9_]*(KEY|TOKEN|SECRET|PASSWORD|DATABASE_URL|DB_|GEO_API_KEY|HD_API_KEY|HD_API_BASE_URL|HDAPI_BASE_URL|AUTH|BEARER|URL)[A-Za-z0-9_]*[=:])[^[:space:]]+#\1REDACTED#g'
+  printf '%s\n' "${output}" | append_redacted
+  append "[exit=${status}]"
 }
 
 redacted_env_presence() {
@@ -113,7 +104,7 @@ repo_file_presence() {
     fi
   done
   if [ -d ".github/codespaces" ]; then
-    find .github/codespaces -maxdepth 2 -type f -print | LC_ALL=C sort
+    find .github/codespaces -maxdepth 2 -type f -print 2>/dev/null | LC_ALL=C sort
   else
     printf 'absent: .github/codespaces/\n'
   fi
@@ -125,20 +116,30 @@ repo_extension_recommendations() {
       printf -- '--- %s ---\n' "${path}"
       awk '
         /extensions|recommendations|unwantedRecommendations|customizations|vscode|openai|OpenAI|chatgpt|ChatGPT/ { print }
-      ' "${path}" | redact_sensitive_stream
+      ' "${path}"
     fi
   done
 }
 
-extension_dirs() {
+extension_roots() {
   for dir in \
     "${HOME:-}/.vscode-server/extensions" \
     "${HOME:-}/.vscode-server-insiders/extensions" \
     "${HOME:-}/.vscode-remote/extensions" \
     "${HOME:-}/.vscode/extensions" \
+    "/home/vscode/.vscode-server/extensions" \
+    "/home/vscode/.vscode-server-insiders/extensions" \
+    "/home/vscode/.vscode-remote/extensions" \
+    "/home/vscode/.vscode/extensions" \
     "/workspaces/.codespaces/.persistedshare/extensions"
   do
-    if [ -n "${dir}" ] && [ -d "${dir}" ]; then
+    [ -n "${dir}" ] && printf '%s\n' "${dir}"
+  done | awk '!seen[$0]++'
+}
+
+extension_dirs() {
+  extension_roots | while IFS= read -r dir; do
+    if [ -d "${dir}" ]; then
       printf -- '--- %s ---\n' "${dir}"
       find "${dir}" -maxdepth 1 -mindepth 1 -type d -printf '%f\n' 2>/dev/null | LC_ALL=C sort | sed -n '1,200p'
     else
@@ -147,22 +148,20 @@ extension_dirs() {
   done
 }
 
+installed_extensions() {
+  if command -v code >/dev/null 2>&1; then
+    if command -v timeout >/dev/null 2>&1; then
+      timeout 15s code --list-extensions --show-versions 2>/dev/null || true
+    else
+      code --list-extensions --show-versions 2>/dev/null || true
+    fi
+  fi
+}
+
 openai_matches() {
   {
-    if command -v code >/dev/null 2>&1; then
-      if command -v timeout >/dev/null 2>&1; then
-        timeout 15s code --list-extensions --show-versions 2>/dev/null || true
-      else
-        code --list-extensions --show-versions 2>/dev/null || true
-      fi
-    fi
-    for dir in \
-      "${HOME:-}/.vscode-server/extensions" \
-      "${HOME:-}/.vscode-server-insiders/extensions" \
-      "${HOME:-}/.vscode-remote/extensions" \
-      "${HOME:-}/.vscode/extensions" \
-      "/workspaces/.codespaces/.persistedshare/extensions"
-    do
+    installed_extensions
+    extension_roots | while IFS= read -r dir; do
       [ -d "${dir}" ] && find "${dir}" -maxdepth 1 -mindepth 1 -type d -printf '%f\n' 2>/dev/null
     done
     repo_extension_recommendations
@@ -173,7 +172,10 @@ vscode_log_dirs() {
   for dir in \
     "${HOME:-}/.vscode-server/data/logs" \
     "${HOME:-}/.vscode-server-insiders/data/logs" \
-    "${HOME:-}/.vscode-remote/data/logs"
+    "${HOME:-}/.vscode-remote/data/logs" \
+    "/home/vscode/.vscode-server/data/logs" \
+    "/home/vscode/.vscode-server-insiders/data/logs" \
+    "/home/vscode/.vscode-remote/data/logs"
   do
     if [ -d "${dir}" ]; then
       printf -- '--- %s ---\n' "${dir}"
@@ -181,75 +183,77 @@ vscode_log_dirs() {
     else
       printf 'absent: %s\n' "${dir}"
     fi
-  done
+  done | awk '!seen[$0]++'
 }
 
 append "# Codespaces Freeze Probe"
-  append "Generated UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || date)"
-  append "Report path: ${report}"
-  append "Safety: diagnostic only; no network calls, installs, settings changes, or extension changes."
+append "Generated UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || date)"
+append "Report path: ${report}"
+append "Safety: diagnostic only; no network calls, installs, settings changes, or extension changes."
 
-  section "Header"
-  append "Current working directory: ${repo_root}"
-  append "User: $(id -un 2>/dev/null || printf 'unknown')"
-  append "Hostname: $(hostname 2>/dev/null || printf 'unknown')"
+section "Header"
+append "Current working directory: ${repo_root}"
+append "User: $(id -un 2>/dev/null || printf 'unknown')"
+append "Hostname: $(hostname 2>/dev/null || printf 'unknown')"
 
-  run_section "System" uname -a
-  run_optional "OS release" cat /etc/os-release
+run_command "System" uname -a
+run_optional "OS release" cat /etc/os-release
 
-  section "Git"
-  if command -v git >/dev/null 2>&1 && git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+section "Git"
+if command -v git >/dev/null 2>&1 && git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  {
     git branch --show-current 2>&1 || true
     git rev-parse HEAD 2>&1 || true
     git status --short --branch 2>&1 || true
-  else
-    append "git repo: unavailable"
-  fi
+  } | append_redacted
+else
+  append "git repo: unavailable"
+fi
 
-  run_optional "Disk usage" df -h
-  run_optional "Memory usage" free -h
+run_optional "Disk usage" df -h
+run_optional "Memory usage" free -h
 
-  section "Process snapshot"
-  if command -v ps >/dev/null 2>&1; then
-    append "Top by CPU:"
-    ps -eo pid,ppid,pcpu,pmem,comm --sort=-pcpu 2>/dev/null | sed -n '1,16p'
-    append ""
-    append "Top by memory:"
-    ps -eo pid,ppid,pcpu,pmem,comm --sort=-pmem 2>/dev/null | sed -n '1,16p'
-  else
-    append "ps: not available"
-  fi
+section "Process snapshot"
+if command -v ps >/dev/null 2>&1; then
+  append "Top by CPU:"
+  ps -eo pid,ppid,pcpu,pmem,comm --sort=-pcpu 2>/dev/null | sed -n '1,16p' | append_redacted
+  append ""
+  append "Top by memory:"
+  ps -eo pid,ppid,pcpu,pmem,comm --sort=-pmem 2>/dev/null | sed -n '1,16p' | append_redacted
+else
+  append "ps: not available"
+fi
 
-  section "Relevant environment presence (values redacted)"
-  redacted_env_presence
+section "Relevant environment presence (values redacted)"
+redacted_env_presence >> "${report}"
 
-  section "VS Code CLI status"
-  if command -v code >/dev/null 2>&1; then
-    append "code CLI: available ($(command -v code))"
-    run_with_timeout "VS Code CLI version" code --version
-    run_with_timeout "Installed VS Code extensions" code --list-extensions --show-versions
-  else
-    append "code CLI: not available"
-  fi
+section "VS Code CLI status"
+if command -v code >/dev/null 2>&1; then
+  append "code CLI: available ($(command -v code))"
+  run_with_timeout "VS Code CLI version" code --version
+  run_with_timeout "Installed VS Code extensions" code --list-extensions --show-versions
+else
+  append "code CLI: not available"
+fi
 
-  section "Extension directory scan"
-  extension_dirs
+section "Extension directory scan"
+extension_dirs | append_redacted
 
-  section "OpenAI-related extension matches"
-  openai_matches
+section "OpenAI-related extension matches"
+openai_matches | append_redacted
 
-  section "Repo extension recommendations"
-  repo_extension_recommendations
+section "Repo extension recommendations"
+repo_extension_recommendations | append_redacted
 
-  section "Devcontainer/Codespaces config presence"
-  repo_file_presence
+section "Devcontainer/Codespaces config presence"
+repo_file_presence | append_redacted
 
-  section "Recent VS Code server log directories"
-  vscode_log_dirs
+section "Recent VS Code server log directories"
+vscode_log_dirs | append_redacted
 
-  section "Interpretation notes"
-  append "- OpenAI-related matches show extension IDs, directory names, or repo recommendations containing openai/chatgpt/gpt/codex."
-  append "- A match is correlation evidence only; it does not prove root cause."
-  append "- Share this report only after confirming it contains no raw secrets. Do not paste secrets into issues, PR comments, or chat."
+section "Interpretation notes"
+append "- OpenAI-related matches show extension IDs, directory names, or repo recommendations containing openai/chatgpt/gpt/codex."
+append "- A match is correlation evidence only; it does not prove root cause."
+append "- Share this report only after confirming it contains no raw secrets. Do not paste secrets into issues, PR comments, or chat."
 
-printf 'Codespaces freeze diagnostic report written to: %s\n' "${report}" >&3
+printf 'Codespaces freeze diagnostic report written to: %s\n' "${report}"
