@@ -1,4 +1,4 @@
-generated_at_utc=2026-06-17T06:58:56Z
+generated_at_utc=2026-06-17T07:24:24Z
 scope=HDE-EPIC034 PR-02 request-shaping check
 rails=SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC
 network_posture=closed-rails-source-cache; no live vendor calls

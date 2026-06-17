@@ -454,6 +454,8 @@ def test_epic034_request_shaping_snapshot_is_canonical_secret_safe_and_contract_
     assert snapshot["deprecated_base_url_alias"]["env_var"] == "HDAPI_BASE_URL"
     assert snapshot["v2_auth_header_posture"] == "Authorization: Bearer <redacted>"
     assert snapshot["v1_legacy_auth_header_posture"] == "HD-Api-Key: <redacted>"
+    assert "v2 chart birthdate remains YYYY-MM-DD" in snapshot["canonical_request_body_construction_proof"]
+    assert "lat/lng are serialized as JSON numbers" in snapshot["canonical_request_body_construction_proof"]
     rendered = json.dumps(snapshot, sort_keys=True)
     for secret in ["api-key", "geo-key", "k_test", "Bearer api", "Bearer geo"]:
         assert secret not in rendered
@@ -501,3 +503,11 @@ def test_epic034_request_shaping_fails_on_ops_fact_summary_missing_required_fact
     source_selection = _assert_canonical_json(VENDOR_DIR / "source_selection.snapshot.json")
     with pytest.raises(ValueError, match="OPS01_FACT_SUMMARY_INCOMPLETE"):
         generator.build_request_shaping_snapshot("2026-06-17T00:00:00Z", contract, source_selection, {"PR-02": "proceed"})
+
+
+def test_epic034_request_shaping_outputs_do_not_depend_on_existing_source_selection_file(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    monkeypatch.setattr(generator, "SOURCE_SELECTION_SNAPSHOT", tmp_path / "missing-source-selection.snapshot.json")
+    metadata, bodies = generator.load_source_cache()
+    outputs = generator.render_outputs("2026-06-17T00:00:00Z", metadata, bodies, mode="closed-rails-source-cache")
+    assert generator.REQUEST_SHAPING_SNAPSHOT in outputs
+    assert generator.REQUEST_SHAPING_CHECK_LOG in outputs

@@ -831,7 +831,7 @@ def build_request_shaping_snapshot(produced: str, contract: dict[str, Any], sour
     return {
         "ai_scope_claim": "NONE",
         "base_url_env_var": "HD_API_BASE_URL",
-        "canonical_request_body_construction_proof": "request body keys are ordered from governed contract_map request_fields and serialized as canonical JSON bytes by engine.bodygraph.vendor_client.HdApiClient.build_contract_route_request",
+        "canonical_request_body_construction_proof": "request body keys are ordered from governed contract_map request_fields and serialized as canonical JSON bytes by engine.bodygraph.vendor_client.HdApiClient.build_contract_route_request; v1 bodygraph birthdate is legacy DD-Mon-YYYY while v2 chart birthdate remains YYYY-MM-DD and v2 coordinate lat/lng are serialized as JSON numbers",
         "credential_env_var": "HD_API_KEY",
         "deprecated_base_url_alias": {"env_var": "HDAPI_BASE_URL", "posture": "temporary compatibility alias only; used only when HD_API_BASE_URL is absent; conflicting values fail closed"},
         "generated_at_utc": produced,
@@ -1033,13 +1033,12 @@ def render_outputs(produced: str, fetched: dict[str, dict[str, Any]], bodies: di
         V1_LEGACY_GUARD_LOG: (build_v1_legacy_guard_log(produced, snapshot) + "\n").encode("utf-8"),
         SOURCE_SELECTION_CHECK_LOG: (build_source_selection_check_log(produced, snapshot, mode=mode) + "\n").encode("utf-8"),
     })
-    if SOURCE_SELECTION_SNAPSHOT.exists():
-        ops_summary = _load_ops01_fact_summary()
-        request_snapshot = build_request_shaping_snapshot(produced, contract, snapshot, ops_summary)
-        outputs.update({
-            REQUEST_SHAPING_SNAPSHOT: canonical_json_bytes(request_snapshot),
-            REQUEST_SHAPING_CHECK_LOG: (build_request_shaping_check_log(produced, request_snapshot, mode=mode) + "\n").encode("utf-8"),
-        })
+    ops_summary = _load_ops01_fact_summary()
+    request_snapshot = build_request_shaping_snapshot(produced, contract, snapshot, ops_summary)
+    outputs.update({
+        REQUEST_SHAPING_SNAPSHOT: canonical_json_bytes(request_snapshot),
+        REQUEST_SHAPING_CHECK_LOG: (build_request_shaping_check_log(produced, request_snapshot, mode=mode) + "\n").encode("utf-8"),
+    })
     outputs.update(write_baseline_pointer_artifacts(produced, acceptance))
     return outputs
 

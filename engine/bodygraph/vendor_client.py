@@ -164,6 +164,7 @@ class VendorRequest:
     headers: Mapping[str, str]
     body_bytes: bytes
     input_fingerprint: str
+    route: str = ""
 
 
 @dataclass(frozen=True)
@@ -298,18 +299,37 @@ class HdApiClient:
         lng: str | float | None = None,
     ) -> VendorRequest:
         values = {"birthdate": birthdate, "birthtime": birthtime, "location": location, "lat": lat, "lng": lng}
-        missing = [name for name in request_fields if values.get(name) in (None, "")]
+        missing = [
+            name
+            for name in request_fields
+            if values.get(name) is None or (isinstance(values.get(name), str) and not str(values.get(name)).strip())
+        ]
         if missing:
             raise VendorError("PROVIDER_INPUT_INVALID", "birth data incomplete", details={"missing": missing})
         try:
             yyyy, mm, dd = birthdate.split("-")
         except ValueError as exc:
             raise VendorError("PROVIDER_INPUT_INVALID", "invalid birthdate") from exc
-        if mm not in _MONTH:
+        if (
+            len(birthdate) != 10
+            or birthdate[4] != "-"
+            or birthdate[7] != "-"
+            or not (yyyy.isdigit() and mm.isdigit() and dd.isdigit())
+            or mm not in _MONTH
+        ):
             raise VendorError("PROVIDER_INPUT_INVALID", "invalid birthdate")
+        v2_route = path.startswith("/v2/charts")
         body: dict[str, Any] = {}
         for field in request_fields:
-            body[field] = f"{dd}-{_MONTH[mm]}-{yyyy}" if field == "birthdate" else values[field]
+            if field == "birthdate":
+                body[field] = birthdate if v2_route else f"{dd}-{_MONTH[mm]}-{yyyy}"
+            elif field in {"lat", "lng"}:
+                try:
+                    body[field] = float(values[field])
+                except (TypeError, ValueError) as exc:
+                    raise VendorError("PROVIDER_INPUT_INVALID", "invalid coordinates", details={"field": field}) from exc
+            else:
+                body[field] = values[field]
         body_bytes = json.dumps(body, sort_keys=True, separators=(",", ":")).encode("utf-8") + b"\n"
         fingerprint = sha256(body_bytes).hexdigest()
         headers = {
@@ -317,7 +337,7 @@ class HdApiClient:
             "Content-Type": "application/json; charset=utf-8",
             "User-Agent": f"GlowHDEngine/{self._release_id}",
         }
-        if path.startswith("/v2/charts"):
+        if v2_route:
             headers["Authorization"] = f"Bearer {self._api_key}"
         elif path.startswith("/v1/bodygraphs"):
             headers["HD-Api-Key"] = self._api_key
@@ -330,6 +350,7 @@ class HdApiClient:
             headers=headers,
             body_bytes=body_bytes,
             input_fingerprint=fingerprint,
+            route=self._route_label(path),
         )
 
     def _route_base_url(self, path: str) -> str:
@@ -369,7 +390,7 @@ class HdApiClient:
                     payload = json.loads(body_bytes.decode("utf-8"))
                 except Exception as exc:
                     raise VendorError("PROVIDER_BAD_RESPONSE", "malformed JSON", details={"status": status_code}) from exc
-                self._log_attempt(attempt, status_code, duration_ms, error_class, outcome="success")
+                self._log_attempt(attempt, status_code, duration_ms, error_class, outcome="success", route=request.route or self._route_label_from_url(request.url))
                 return VendorResult(payload=payload, duration_ms=duration_ms, attempts=attempt)
             except VendorError as exc:
                 last_error = exc
@@ -387,6 +408,7 @@ class HdApiClient:
                     retry_after_ms=retry_after_ms,
                     backoff_ms=planned_backoff_ms,
                     outcome="failure",
+                    route=request.route or self._route_label_from_url(request.url),
                 )
                 if not retryable:
                     break
@@ -405,6 +427,7 @@ class HdApiClient:
                     error_code="PROVIDER_NETWORK_ERROR",
                     backoff_ms=planned_backoff_ms,
                     outcome="failure",
+                    route=request.route or self._route_label_from_url(request.url),
                 )
             if attempt >= self._retry.max_attempts or not retryable or planned_backoff_ms <= 0:
                 break
@@ -422,6 +445,7 @@ class HdApiClient:
         error_code: str | None = None,
         retry_after_ms: int | None = None,
         backoff_ms: float | None = None,
+        route: str | None = None,
     ) -> None:
         timeout_profile = (
             f"connect={self._timeouts.connect_timeout_ms};"
@@ -437,7 +461,7 @@ class HdApiClient:
             "error_class": self._bounded_error_class(error_class),
             "outcome": self._bounded_outcome(outcome),
             "rails_state": self._rails_state,
-            "route": _VENDOR_LOG_ROUTE,
+            "route": route or _VENDOR_LOG_ROUTE,
             "timeout_profile": timeout_profile,
         }
         if error_code:
@@ -450,6 +474,17 @@ class HdApiClient:
         if unexpected:  # pragma: no cover - defensive guardrail
             return
         _append_retry_log(self._log_path, record)
+
+    @staticmethod
+    def _route_label(path: str) -> str:
+        if path == "/v1/bodygraphs":
+            return _VENDOR_LOG_ROUTE
+        return f"vendor.hdapi.post:{path}"
+
+    @classmethod
+    def _route_label_from_url(cls, url: str) -> str:
+        parsed = urlparse(url)
+        return cls._route_label(parsed.path or "/bodygraphs")
 
     @staticmethod
     def _bounded_outcome(outcome: str) -> str:

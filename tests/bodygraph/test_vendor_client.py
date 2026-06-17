@@ -393,3 +393,70 @@ def test_build_contract_route_request_preserves_v1_hd_api_key_and_coordinates_sk
     )
     assert coordinates.headers["Authorization"] == "Bearer api"
     assert "HD-Geocode-Key" not in coordinates.headers
+
+
+def test_build_request_rejects_whitespace_required_fields() -> None:
+    client = _client(lambda req, timeout: (200, b"{}", {}))
+    with pytest.raises(VendorError) as excinfo:
+        client.build_request(birthdate="1990-01-01", birthtime="   ", location="   ")
+    assert excinfo.value.code == "PROVIDER_INPUT_INVALID"
+    assert excinfo.value.details["missing"] == ["birthtime", "location"]
+
+
+def test_v2_request_body_preserves_iso_birthdate_and_numeric_coordinates() -> None:
+    client = _client(lambda req, timeout: (200, b"{}", {}))
+    request = client.build_contract_route_request(
+        path="/v2/charts/coordinates",
+        request_fields=("birthdate", "birthtime", "lat", "lng"),
+        geocode_required=False,
+        birthdate="1990-01-15",
+        birthtime="12:00",
+        lat="52.1",
+        lng="4.3",
+    )
+    body = json.loads(request.body_bytes.decode("utf-8"))
+    assert body == {"birthdate": "1990-01-15", "birthtime": "12:00", "lat": 52.1, "lng": 4.3}
+
+
+def test_v2_request_body_rejects_non_contract_date_and_coordinates() -> None:
+    client = _client(lambda req, timeout: (200, b"{}", {}))
+    with pytest.raises(VendorError):
+        client.build_contract_route_request(
+            path="/v2/charts/coordinates",
+            request_fields=("birthdate", "birthtime", "lat", "lng"),
+            geocode_required=False,
+            birthdate="1990-01-5",
+            birthtime="12:00",
+            lat="52.1",
+            lng="4.3",
+        )
+    with pytest.raises(VendorError):
+        client.build_contract_route_request(
+            path="/v2/charts/coordinates",
+            request_fields=("birthdate", "birthtime", "lat", "lng"),
+            geocode_required=False,
+            birthdate="1990-01-15",
+            birthtime="12:00",
+            lat="north",
+            lng="4.3",
+        )
+
+
+def test_fetch_logs_shaped_v2_route(tmp_path: Path) -> None:
+    log_path = tmp_path / "retry.log"
+
+    def ok_request(req, timeout):
+        return 200, b'{"ok":true}', {}
+
+    client = _client(ok_request, log_path=log_path)
+    request = client.build_contract_route_request(
+        path="/v2/charts",
+        request_fields=("birthdate", "birthtime", "location"),
+        geocode_required=True,
+        birthdate="1990-01-15",
+        birthtime="12:00",
+        location="Amsterdam, NL",
+    )
+    client.fetch(request)
+    record = _read_jsonl(log_path)[0]
+    assert record["route"] == "vendor.hdapi.post:/v2/charts"
