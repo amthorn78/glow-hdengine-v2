@@ -43,4 +43,10 @@ Do not paste raw secrets into issues, PR comments, chat, or external tools. The 
 
 ## Next steps after evidence review
 
-A future remediation PR may remove, disable, or override auto-installed extensions only after the PO reviews diagnostic evidence. This diagnostic PR intentionally does not change extension recommendations or auto-install behavior.
+Remediation should change extension recommendations only after diagnostic evidence review. The diagnostic probe itself remains safe to run and does not change extension recommendations or auto-install behavior.
+
+## Remediation applied after diagnostic review
+
+After the diagnostic probe confirmed that the repository recommended the `openai.chatgpt` VS Code extension from `.devcontainer/devcontainer.json`, the remediation removes that repo-level auto-install recommendation. This does not uninstall extensions that are already present in an existing Codespace or modify user settings; operators should rebuild or create a fresh Codespace to verify startup behavior without the repo installing that extension automatically.
+
+To verify the remediation, run the probe again and confirm that `openai.chatgpt` no longer appears under repo extension recommendations. If it still appears in installed-extension or extension-directory sections, that indicates user-level or already-installed Codespace state rather than a repo recommendation.
