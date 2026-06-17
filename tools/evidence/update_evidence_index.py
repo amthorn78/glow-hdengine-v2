@@ -746,6 +746,47 @@ def _load_epic034_pr01_entries() -> list[dict[str, object]]:
         entries.append(normalized)
     return entries
 
+EPIC034_PR02_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "hdapi_v2.request_shaping",
+        "discovered_physical_path": "artifacts/vendor/hdapi_v2/request_shaping.snapshot.json",
+        "epic_id": "HDE-EPIC034",
+        "record_type": "epic034_pr02_request_shaping",
+        "schema_version": "1.0",
+        "tokens": ["JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC034 PR-02 canonical request-shaping snapshot for HDE-FERM007.2 derived from governed HDAPI v2 contract inventory and OPS-01 fact summary",
+    },
+    {
+        "artifact_key": "epic034.pr02.request_shaping_check",
+        "discovered_physical_path": "audit/qa/hde-epic034/pr-02/request_shaping_check.log",
+        "epic_id": "HDE-EPIC034",
+        "record_type": "epic034_pr02_request_shaping",
+        "schema_version": "1.0",
+        "tokens": ["TESTS_PASS_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC034 PR-02 LF-terminated request-shaping check log for v2 Bearer, v1 HD-Api-Key, geocode, base URL alias, and secret-safety posture",
+    },
+]
+
+
+def _load_epic034_pr02_entries() -> list[dict[str, object]]:
+    produced_at = None
+    snapshot = ROOT / "artifacts/vendor/hdapi_v2/request_shaping.snapshot.json"
+    if snapshot.exists():
+        try:
+            payload = json.loads(snapshot.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as exc:
+            raise SystemExit("INVALID_EPIC034_REQUEST_SHAPING_SNAPSHOT") from exc
+        produced = payload.get("generated_at_utc")
+        if isinstance(produced, str) and produced:
+            produced_at = produced
+    entries: list[dict[str, object]] = []
+    for entry in EPIC034_PR02_PRIMARY_ARTIFACTS:
+        normalized = dict(entry)
+        if produced_at is not None:
+            normalized["produced_at_utc"] = produced_at
+        entries.append(normalized)
+    return entries
+
 
 A7_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
@@ -1093,6 +1134,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *EPIC032_PR04_PRIMARY_ARTIFACTS,
             *_load_epic033_entries(),
             *_load_epic034_pr01_entries(),
+            *_load_epic034_pr02_entries(),
             *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,

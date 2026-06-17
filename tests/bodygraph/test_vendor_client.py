@@ -338,3 +338,58 @@ def test_vendor_safe_rails_failure_classes_are_observable(tmp_path: Path) -> Non
         assert record["rails_state"] == "open_exception"
         assert record["route"] == "vendor.hdapi.post:/bodygraphs"
         assert record["timeout_profile"] == "connect=1000;read=2000;total=5000"
+
+
+def test_from_env_prefers_canonical_hd_api_base_url_and_allows_matching_legacy_alias(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("HD_API_BASE_URL", "https://vendor.test/v1")
+    monkeypatch.setenv("HDAPI_BASE_URL", "https://vendor.test/v1")
+    monkeypatch.setenv("HD_API_KEY", "api-key")
+    monkeypatch.setenv("GEO_API_KEY", "geo-key")
+    client = HdApiClient.from_env(release_id="0" * 64)
+    request = client.build_request(birthdate="1990-01-01", birthtime="12:00", location="X")
+    assert request.url == "https://vendor.test/v1/bodygraphs"
+
+
+def test_from_env_fails_closed_on_conflicting_base_url_alias(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("HD_API_BASE_URL", "https://vendor.test/v1")
+    monkeypatch.setenv("HDAPI_BASE_URL", "https://other.test/v1")
+    monkeypatch.setenv("HD_API_KEY", "api-key")
+    monkeypatch.setenv("GEO_API_KEY", "geo-key")
+    with pytest.raises(VendorError) as excinfo:
+        HdApiClient.from_env(release_id="0" * 64)
+    assert excinfo.value.code == "PROVIDER_CONFIG_INVALID"
+    assert "https://" not in str(excinfo.value.as_payload())
+
+
+def test_build_contract_route_request_uses_v2_bearer_and_geocode_when_required() -> None:
+    client = _client(lambda req, timeout: (200, b"{}", {}))
+    request = client.build_contract_route_request(
+        path="/v2/charts",
+        request_fields=("birthdate", "birthtime", "location"),
+        geocode_required=True,
+        birthdate="1990-01-01",
+        birthtime="12:00",
+        location="X",
+    )
+    assert request.url == "https://vendor.test/v2/charts"
+    assert request.headers["Authorization"] == "Bearer api"
+    assert "HD-Api-Key" not in request.headers
+    assert request.headers["HD-Geocode-Key"] == "geo"
+
+
+def test_build_contract_route_request_preserves_v1_hd_api_key_and_coordinates_skip_geocode() -> None:
+    client = _client(lambda req, timeout: (200, b"{}", {}))
+    legacy = client.build_request(birthdate="1990-01-01", birthtime="12:00", location="X")
+    assert legacy.headers["HD-Api-Key"] == "api"
+    assert "Authorization" not in legacy.headers
+    coordinates = client.build_contract_route_request(
+        path="/v2/charts/coordinates",
+        request_fields=("birthdate", "birthtime", "lat", "lng"),
+        geocode_required=False,
+        birthdate="1990-01-01",
+        birthtime="12:00",
+        lat="52.1",
+        lng="4.3",
+    )
+    assert coordinates.headers["Authorization"] == "Bearer api"
+    assert "HD-Geocode-Key" not in coordinates.headers

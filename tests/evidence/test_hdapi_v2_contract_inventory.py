@@ -442,3 +442,62 @@ def test_epic034_source_selection_fails_when_geocode_auth_header_drifts() -> Non
             route["auth_model"] = "Authorization Bearer token plus HD-Geocode-Key header"
     with pytest.raises(ValueError, match="SOURCE_SELECTION_GEOCODE_AUTH_MISMATCH"):
         generator.build_source_selection_snapshot("2026-06-16T00:00:00Z", extra_coordinates)
+
+
+def test_epic034_request_shaping_snapshot_is_canonical_secret_safe_and_contract_derived() -> None:
+    contract = _assert_canonical_json(VENDOR_DIR / "contract_map.json")
+    source_selection = _assert_canonical_json(VENDOR_DIR / "source_selection.snapshot.json")
+    ops = json.loads((ROOT / "audit" / "ops" / "hde-epic034" / "ops-01" / "fact_summary.json").read_text(encoding="utf-8"))
+    snapshot = _assert_canonical_json(VENDOR_DIR / "request_shaping.snapshot.json")
+    assert snapshot == generator.build_request_shaping_snapshot(snapshot["generated_at_utc"], contract, source_selection, ops)
+    assert snapshot["base_url_env_var"] == "HD_API_BASE_URL"
+    assert snapshot["deprecated_base_url_alias"]["env_var"] == "HDAPI_BASE_URL"
+    assert snapshot["v2_auth_header_posture"] == "Authorization: Bearer <redacted>"
+    assert snapshot["v1_legacy_auth_header_posture"] == "HD-Api-Key: <redacted>"
+    rendered = json.dumps(snapshot, sort_keys=True)
+    for secret in ["api-key", "geo-key", "k_test", "Bearer api", "Bearer geo"]:
+        assert secret not in rendered
+    assert snapshot["live_vendor_call_claim"] == "NONE"
+    assert snapshot["public_reader_change_claim"] == "NONE"
+    assert snapshot["open_rails_vendor_smoke_claim"] == "NONE"
+    assert snapshot["runtime_conformance_claim"] == "NONE"
+    assert snapshot["ai_scope_claim"] == "NONE"
+
+
+def test_epic034_request_shaping_auth_base_url_and_geocode_postures() -> None:
+    snapshot = _assert_canonical_json(VENDOR_DIR / "request_shaping.snapshot.json")
+    routes = {route["endpoint_path"]: route for route in snapshot["routes"]}
+    for path in ["/v2/charts", "/v2/charts/simple", "/v2/charts/coordinates"]:
+        assert routes[path]["auth_header_posture"] == "Authorization: Bearer <redacted>"
+        assert "HD-Api-Key" not in routes[path]["auth_header_posture"]
+        assert routes[path]["credential_env_var"] == "HD_API_KEY"
+        assert routes[path]["content_type_posture"] == "application/json"
+    for path in ["/v1/bodygraphs", "/v1/bodygraphs/simple"]:
+        assert routes[path]["auth_header_posture"] == "HD-Api-Key: <redacted>"
+        assert "Bearer" not in routes[path]["auth_header_posture"]
+    assert routes["/v2/charts"]["geocode_env_var"] == "GEO_API_KEY"
+    assert routes["/v2/charts"]["geocode_header_posture"] == "HD-Geocode-Key: <redacted>"
+    assert routes["/v2/charts/simple"]["geocode_header_posture"] == "HD-Geocode-Key: <redacted>"
+    assert routes["/v2/charts/coordinates"]["geocode_header_posture"] == "not applicable"
+
+
+def test_epic034_request_shaping_check_log_exists_and_passes() -> None:
+    log_path = ROOT / "audit" / "qa" / "hde-epic034" / "pr-02" / "request_shaping_check.log"
+    raw = log_path.read_bytes()
+    assert raw.endswith(b"\n")
+    assert b"\r\n" not in raw
+    log = raw.decode("utf-8")
+    for check in [
+        "closed_rails_generation", "no_live_vendor_call_attempted", "v2_bearer_auth_posture",
+        "v1_legacy_hd_api_key_posture", "geocode_posture", "canonical_base_url_key_posture",
+        "deprecated_alias_posture", "no_secret_values_emitted", "evidence_index_and_path_proof_posture",
+    ]:
+        assert f"[{check}] status=PASS" in log
+    assert "status=PASS" in log
+
+
+def test_epic034_request_shaping_fails_on_ops_fact_summary_missing_required_fact() -> None:
+    contract = _assert_canonical_json(VENDOR_DIR / "contract_map.json")
+    source_selection = _assert_canonical_json(VENDOR_DIR / "source_selection.snapshot.json")
+    with pytest.raises(ValueError, match="OPS01_FACT_SUMMARY_INCOMPLETE"):
+        generator.build_request_shaping_snapshot("2026-06-17T00:00:00Z", contract, source_selection, {"PR-02": "proceed"})
