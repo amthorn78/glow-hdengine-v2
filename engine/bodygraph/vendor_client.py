@@ -84,6 +84,12 @@ _VENDOR_LOG_ERROR_CLASSES = frozenset(
     {"none", "network_error", "4xx", "5xx", "429", "http_status_other", "provider_bad_response"}
 )
 _VENDOR_LOG_RAILS_STATES = frozenset({"closed_default", "open_exception"})
+_ROUTE_CONTRACTS: Mapping[str, tuple[tuple[str, ...], bool]] = {
+    "/v1/bodygraphs": (("birthdate", "birthtime", "location"), True),
+    "/v2/charts": (("birthdate", "birthtime", "location"), True),
+    "/v2/charts/simple": (("birthdate", "birthtime", "location"), True),
+    "/v2/charts/coordinates": (("birthdate", "birthtime", "lat", "lng"), False),
+}
 
 
 def _validate_retry_config(retry: "VendorRetryConfig") -> None:
@@ -299,6 +305,22 @@ class HdApiClient:
         lat: str | float | None = None,
         lng: str | float | None = None,
     ) -> VendorRequest:
+        contract = _ROUTE_CONTRACTS.get(path)
+        if contract is None:
+            raise VendorError("PROVIDER_CONFIG_INVALID", "unsupported governed HDAPI route")
+        contract_fields, contract_geocode_required = contract
+        if request_fields != contract_fields:
+            raise VendorError(
+                "PROVIDER_INPUT_INVALID",
+                "request fields do not match governed route contract",
+                details={"expected": list(contract_fields), "actual": list(request_fields)},
+            )
+        if geocode_required != contract_geocode_required:
+            raise VendorError(
+                "PROVIDER_CONFIG_INVALID",
+                "geocode posture does not match governed route contract",
+                details={"expected": contract_geocode_required, "actual": geocode_required},
+            )
         values = {"birthdate": birthdate, "birthtime": birthtime, "location": location, "lat": lat, "lng": lng}
         string_fields = {"birthdate", "birthtime", "location"}
         missing = []

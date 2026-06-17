@@ -437,6 +437,60 @@ def test_geocoded_routes_require_geo_api_key_when_shaped(monkeypatch: pytest.Mon
     assert excinfo.value.details["missing"] == ["GEO_API_KEY"]
 
 
+def test_build_contract_route_request_rejects_drifted_request_field_sets() -> None:
+    client = _client(lambda req, timeout: (200, b"{}", {}))
+    for path, fields, kwargs in [
+        (
+            "/v2/charts",
+            ("birthdate", "birthtime"),
+            {"birthdate": "1990-01-15", "birthtime": "12:00", "location": "Amsterdam, NL"},
+        ),
+        (
+            "/v2/charts/coordinates",
+            ("birthdate", "birthtime", "lat"),
+            {"birthdate": "1990-01-15", "birthtime": "12:00", "lat": "52.1", "lng": "4.3"},
+        ),
+    ]:
+        with pytest.raises(VendorError) as excinfo:
+            client.build_contract_route_request(
+                path=path,
+                request_fields=fields,
+                geocode_required=path != "/v2/charts/coordinates",
+                **kwargs,
+            )
+        assert excinfo.value.code == "PROVIDER_INPUT_INVALID"
+        assert "expected" in excinfo.value.details
+        assert "actual" in excinfo.value.details
+
+
+def test_build_contract_route_request_rejects_drifted_geocode_posture() -> None:
+    client = _client(lambda req, timeout: (200, b"{}", {}))
+    with pytest.raises(VendorError) as excinfo:
+        client.build_contract_route_request(
+            path="/v2/charts",
+            request_fields=("birthdate", "birthtime", "location"),
+            geocode_required=False,
+            birthdate="1990-01-15",
+            birthtime="12:00",
+            location="Amsterdam, NL",
+        )
+    assert excinfo.value.code == "PROVIDER_CONFIG_INVALID"
+    assert excinfo.value.details == {"expected": True, "actual": False}
+
+    with pytest.raises(VendorError) as excinfo:
+        client.build_contract_route_request(
+            path="/v2/charts/coordinates",
+            request_fields=("birthdate", "birthtime", "lat", "lng"),
+            geocode_required=True,
+            birthdate="1990-01-15",
+            birthtime="12:00",
+            lat="52.1",
+            lng="4.3",
+        )
+    assert excinfo.value.code == "PROVIDER_CONFIG_INVALID"
+    assert excinfo.value.details == {"expected": False, "actual": True}
+
+
 def test_build_request_rejects_non_string_required_fields() -> None:
     client = _client(lambda req, timeout: (200, b"{}", {}))
     with pytest.raises(VendorError) as excinfo:
