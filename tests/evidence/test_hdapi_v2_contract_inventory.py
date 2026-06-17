@@ -568,5 +568,8 @@ def test_epic034_pr02_stale_index_rows_are_removed_when_outputs_are_absent(monke
 def test_epic034_pr02_request_shaping_check_index_row_does_not_claim_tests_pass() -> None:
     rows = {entry["artifact_key"]: entry for entry in indexer.EPIC034_PR02_PRIMARY_ARTIFACTS}
 
-    assert rows["epic034.pr02.request_shaping_check"]["tokens"] == ["EVIDENCE_PATH_PROOFS_OK"]
-    assert "TESTS_PASS_OK" not in rows["epic034.pr02.request_shaping_check"]["tokens"]
+    row = rows["epic034.pr02.request_shaping_check"]
+    assert row["tokens"] == ["EVIDENCE_PATH_PROOFS_OK"]
+    assert "TESTS_PASS_OK" not in row["tokens"]
+    assert "pytest" not in row["notes"].lower()
+    assert "indexed separately" not in row["notes"].lower()
