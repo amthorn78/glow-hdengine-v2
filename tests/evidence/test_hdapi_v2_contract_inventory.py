@@ -492,9 +492,11 @@ def test_epic034_request_shaping_check_log_exists_and_passes() -> None:
     for check in [
         "closed_rails_generation", "no_live_vendor_call_attempted", "v2_bearer_auth_posture",
         "v1_legacy_hd_api_key_posture", "geocode_posture", "canonical_base_url_key_posture",
-        "deprecated_alias_posture", "no_secret_values_emitted", "evidence_index_and_path_proof_posture",
+        "deprecated_alias_posture", "no_secret_values_emitted",
     ]:
         assert f"[{check}] status=PASS" in log
+    assert "[evidence_index_and_path_proof_posture] status=PASS" not in log
+    assert "evidence_index_and_path_proof_posture=validated_by_update_evidence_index_and_validate_evidence_paths_not_generator" in log
     assert "status=PASS" in log
 
 
@@ -527,3 +529,19 @@ def test_epic034_request_shaping_artifacts_are_closed_rails_only_for_public_doc_
     outputs = generator.render_outputs("2026-06-17T00:00:00Z", metadata, bodies, mode="public-docs-refresh")
     assert generator.REQUEST_SHAPING_SNAPSHOT not in outputs
     assert generator.REQUEST_SHAPING_CHECK_LOG not in outputs
+
+
+def test_epic034_request_shaping_closed_rails_generation_requires_env_pins(monkeypatch: pytest.MonkeyPatch) -> None:
+    metadata, bodies = generator.load_source_cache()
+    monkeypatch.delenv("SAFE_MODE", raising=False)
+    with pytest.raises(SystemExit, match="CLOSED_RAILS_REQUIRED_FOR_REQUEST_SHAPING"):
+        generator.render_outputs("2026-06-17T00:00:00Z", metadata, bodies, mode="closed-rails-source-cache")
+
+
+def test_epic034_public_doc_refresh_removes_stale_pr02_outputs(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    stale = [tmp_path / "request_shaping.snapshot.json", tmp_path / "request_shaping.snapshot.json.path_proof.txt", tmp_path / "request_shaping_check.log", tmp_path / "request_shaping_check.log.path_proof.txt"]
+    for path in stale:
+        path.write_text("stale\n", encoding="utf-8")
+    monkeypatch.setattr(generator, "REQUEST_SHAPING_OUTPUTS", tuple(stale))
+    generator.remove_request_shaping_outputs()
+    assert all(not path.exists() for path in stale)

@@ -369,7 +369,7 @@ def test_build_contract_route_request_uses_v2_bearer_and_geocode_when_required()
         geocode_required=True,
         birthdate="1990-01-01",
         birthtime="12:00",
-        location="X",
+        location="Test",
     )
     assert request.url == "https://vendor.test/v2/charts"
     assert request.headers["Authorization"] == "Bearer api"
@@ -416,6 +416,20 @@ def test_v2_request_body_preserves_iso_birthdate_and_numeric_coordinates() -> No
     )
     body = json.loads(request.body_bytes.decode("utf-8"))
     assert body == {"birthdate": "1990-01-15", "birthtime": "12:00", "lat": 52.1, "lng": 4.3}
+
+
+def test_v2_location_routes_reject_non_contract_birthtime_and_location() -> None:
+    client = _client(lambda req, timeout: (200, b"{}", {}))
+    for birthtime, location in [("9:00", "Amsterdam, NL"), ("24:00", "Amsterdam, NL"), ("12:60", "Amsterdam, NL"), ("12:00", "X")]:
+        with pytest.raises(VendorError):
+            client.build_contract_route_request(
+                path="/v2/charts",
+                request_fields=("birthdate", "birthtime", "location"),
+                geocode_required=True,
+                birthdate="1990-01-15",
+                birthtime=birthtime,
+                location=location,
+            )
 
 
 def test_v2_request_body_rejects_non_contract_date_and_coordinates() -> None:

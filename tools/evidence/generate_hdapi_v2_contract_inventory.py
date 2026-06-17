@@ -37,6 +37,13 @@ EPIC034_QA = ROOT / "audit" / "qa" / "hde-epic034" / "pr-01"
 EPIC034_PR02_QA = ROOT / "audit" / "qa" / "hde-epic034" / "pr-02"
 REQUEST_SHAPING_SNAPSHOT = OUT / "request_shaping.snapshot.json"
 REQUEST_SHAPING_CHECK_LOG = EPIC034_PR02_QA / "request_shaping_check.log"
+REQUEST_SHAPING_OUTPUTS = (
+    REQUEST_SHAPING_SNAPSHOT,
+    REQUEST_SHAPING_SNAPSHOT.with_suffix(REQUEST_SHAPING_SNAPSHOT.suffix + ".path_proof.txt"),
+    REQUEST_SHAPING_CHECK_LOG,
+    REQUEST_SHAPING_CHECK_LOG.with_suffix(REQUEST_SHAPING_CHECK_LOG.suffix + ".path_proof.txt"),
+)
+CLOSED_RAILS_ENV = {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}
 SOURCE_SELECTION_SNAPSHOT = OUT / "source_selection.snapshot.json"
 V1_LEGACY_GUARD_LOG = OUT / "v1_legacy_guard.log"
 SOURCE_SELECTION_CHECK_LOG = EPIC034_QA / "source_selection_check.log"
@@ -80,6 +87,28 @@ V1_BODYGRAPH_ROUTES = [
     ("POST", "/v1/bodygraphs/simple", "legacy_simple_bodygraph"),
 ]
 
+
+
+def closed_rails_env_snapshot() -> dict[str, str]:
+    return {key: os.environ.get(key, "UNSET") for key in CLOSED_RAILS_ENV}
+
+
+def closed_rails_env_ok() -> bool:
+    return all(os.environ.get(key) == value for key, value in CLOSED_RAILS_ENV.items())
+
+
+def require_closed_rails_for_request_shaping() -> None:
+    if not closed_rails_env_ok():
+        observed = ",".join(f"{key}={os.environ.get(key, 'UNSET')}" for key in sorted(CLOSED_RAILS_ENV))
+        raise SystemExit(f"CLOSED_RAILS_REQUIRED_FOR_REQUEST_SHAPING:{observed}")
+
+
+def remove_request_shaping_outputs() -> None:
+    for path in REQUEST_SHAPING_OUTPUTS:
+        try:
+            path.unlink()
+        except FileNotFoundError:
+            pass
 
 def iso_now() -> str:
     return dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
@@ -860,8 +889,9 @@ def build_request_shaping_snapshot(produced: str, contract: dict[str, Any], sour
 def build_request_shaping_check_log(produced: str, snapshot: dict[str, Any], *, mode: str) -> str:
     routes = snapshot["routes"]
     by_path = {row["endpoint_path"]: row for row in routes}
+    env_snapshot = closed_rails_env_snapshot()
     checks = [
-        ("closed_rails_generation", mode == "closed-rails-source-cache"),
+        ("closed_rails_generation", mode == "closed-rails-source-cache" and closed_rails_env_ok()),
         ("no_live_vendor_call_attempted", snapshot["live_vendor_call_claim"] == "NONE"),
         ("v2_bearer_auth_posture", all(by_path[p]["auth_header_posture"] == "Authorization: Bearer <redacted>" and by_path[p]["credential_env_var"] == "HD_API_KEY" for _m,p,_v in V2_CHART_ROUTES)),
         ("v1_legacy_hd_api_key_posture", all(by_path[p]["auth_header_posture"] == "HD-Api-Key: <redacted>" for _m,p,_v in V1_BODYGRAPH_ROUTES)),
@@ -869,9 +899,9 @@ def build_request_shaping_check_log(produced: str, snapshot: dict[str, Any], *, 
         ("canonical_base_url_key_posture", snapshot["base_url_env_var"] == "HD_API_BASE_URL"),
         ("deprecated_alias_posture", snapshot["deprecated_base_url_alias"]["env_var"] == "HDAPI_BASE_URL"),
         ("no_secret_values_emitted", "secret" not in json.dumps(snapshot).lower() and "k_test" not in json.dumps(snapshot)),
-        ("evidence_index_and_path_proof_posture", True),
     ]
-    lines = [f"generated_at_utc={produced}", "scope=HDE-EPIC034 PR-02 request-shaping check", "rails=SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC", "network_posture=closed-rails-source-cache; no live vendor calls"]
+    rails = " ".join(f"{key}={env_snapshot[key]}" for key in sorted(CLOSED_RAILS_ENV))
+    lines = [f"generated_at_utc={produced}", "scope=HDE-EPIC034 PR-02 request-shaping check", f"rails={rails}", "network_posture=closed-rails-source-cache; no live vendor calls", "evidence_index_and_path_proof_posture=validated_by_update_evidence_index_and_validate_evidence_paths_not_generator"]
     lines.extend(f"[{name}] status={'PASS' if ok else 'FAIL'}" for name, ok in checks)
     lines.append("status=PASS" if all(ok for _name, ok in checks) else "status=FAIL")
     return "\n".join(lines)
@@ -1037,6 +1067,7 @@ def render_outputs(produced: str, fetched: dict[str, dict[str, Any]], bodies: di
         SOURCE_SELECTION_CHECK_LOG: (build_source_selection_check_log(produced, snapshot, mode=mode) + "\n").encode("utf-8"),
     })
     if mode == "closed-rails-source-cache":
+        require_closed_rails_for_request_shaping()
         ops_summary = _load_ops01_fact_summary()
         request_snapshot = build_request_shaping_snapshot(produced, contract, snapshot, ops_summary)
         outputs.update({
@@ -1067,6 +1098,8 @@ def main(argv: list[str] | None = None) -> None:
         mode = "closed-rails-source-cache"
     outputs = render_outputs(produced, fetched, bodies, mode=mode)
     write_outputs(outputs)
+    if args.refresh_public_docs:
+        remove_request_shaping_outputs()
     print(f"generated {OUT.relative_to(ROOT).as_posix()} and HDE-EPIC033 baseline artifacts at {produced} ({mode})")
 
 

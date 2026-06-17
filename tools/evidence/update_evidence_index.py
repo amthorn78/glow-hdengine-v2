@@ -771,14 +771,16 @@ EPIC034_PR02_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
 def _load_epic034_pr02_entries() -> list[dict[str, object]]:
     produced_at = None
     snapshot = ROOT / "artifacts/vendor/hdapi_v2/request_shaping.snapshot.json"
-    if snapshot.exists():
-        try:
-            payload = json.loads(snapshot.read_text(encoding="utf-8"))
-        except json.JSONDecodeError as exc:
-            raise SystemExit("INVALID_EPIC034_REQUEST_SHAPING_SNAPSHOT") from exc
-        produced = payload.get("generated_at_utc")
-        if isinstance(produced, str) and produced:
-            produced_at = produced
+    check_log = ROOT / "audit/qa/hde-epic034/pr-02/request_shaping_check.log"
+    if not snapshot.exists() or not check_log.exists():
+        return []
+    try:
+        payload = json.loads(snapshot.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise SystemExit("INVALID_EPIC034_REQUEST_SHAPING_SNAPSHOT") from exc
+    produced = payload.get("generated_at_utc")
+    if isinstance(produced, str) and produced:
+        produced_at = produced
     entries: list[dict[str, object]] = []
     for entry in EPIC034_PR02_PRIMARY_ARTIFACTS:
         normalized = dict(entry)
