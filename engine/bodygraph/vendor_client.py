@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import math
 import os
 import socket
 import time
@@ -83,6 +84,12 @@ _VENDOR_LOG_ERROR_CLASSES = frozenset(
     {"none", "network_error", "4xx", "5xx", "429", "http_status_other", "provider_bad_response"}
 )
 _VENDOR_LOG_RAILS_STATES = frozenset({"closed_default", "open_exception"})
+_ROUTE_CONTRACTS: Mapping[str, tuple[tuple[str, ...], bool]] = {
+    "/v1/bodygraphs": (("birthdate", "birthtime", "location"), True),
+    "/v2/charts": (("birthdate", "birthtime", "location"), True),
+    "/v2/charts/simple": (("birthdate", "birthtime", "location"), True),
+    "/v2/charts/coordinates": (("birthdate", "birthtime", "lat", "lng"), False),
+}
 
 
 def _validate_retry_config(retry: "VendorRetryConfig") -> None:
@@ -117,6 +124,14 @@ def _now_ms() -> float:
 
 def _utc_iso(epoch_seconds: float | None = None) -> str:
     return time.strftime("%Y-%m-%dT%H:%M:%S", time.gmtime(epoch_seconds)) + "Z"
+
+
+def _resolve_hdapi_base_url(env: Mapping[str, str]) -> str:
+    canonical = (env.get("HD_API_BASE_URL") or "").strip().rstrip("/")
+    legacy = (env.get("HDAPI_BASE_URL") or "").strip().rstrip("/")
+    if canonical and legacy and canonical != legacy:
+        raise VendorError("PROVIDER_CONFIG_INVALID", "ambiguous HD API base URL configuration")
+    return canonical or legacy
 
 
 class VendorError(Exception):
@@ -156,6 +171,7 @@ class VendorRequest:
     headers: Mapping[str, str]
     body_bytes: bytes
     input_fingerprint: str
+    route: str = ""
 
 
 @dataclass(frozen=True)
@@ -203,7 +219,7 @@ class HdApiClient:
     ) -> None:
         parsed = urlparse(base_url)
         if parsed.scheme != "https":
-            raise VendorError("PROVIDER_CONFIG_MISSING", "HDAPI_BASE_URL must be https", details={"base_url": base_url})
+            raise VendorError("PROVIDER_CONFIG_MISSING", "HD_API_BASE_URL must be https")
         _validate_retry_config(retry)
         _validate_timeouts(timeouts)
         self._base_url = base_url.rstrip("/")
@@ -236,10 +252,10 @@ class HdApiClient:
         request: Callable[[urlrequest.Request, float], tuple[int, bytes, Mapping[str, str]]] | None = None,
     ) -> "HdApiClient":
         env = os.environ
-        raw_base_url = (env.get("HDAPI_BASE_URL") or "").strip().rstrip("/")
+        raw_base_url = _resolve_hdapi_base_url(env)
         api_key = (env.get("HD_API_KEY") or "").strip()
         geo_key = (env.get("GEO_API_KEY") or "").strip()
-        pairs = (("HDAPI_BASE_URL", raw_base_url), ("HD_API_KEY", api_key), ("GEO_API_KEY", geo_key))
+        pairs = (("HD_API_BASE_URL", raw_base_url), ("HD_API_KEY", api_key))
         missing = [key for key, value in pairs if not value]
         if missing:
             raise VendorError(
@@ -268,37 +284,130 @@ class HdApiClient:
         )
 
     def build_request(self, *, birthdate: str, birthtime: str, location: str) -> VendorRequest:
-        fields = ("birthdate", "birthtime", "location")
-        missing = [name for name, value in zip(fields, (birthdate, birthtime, location)) if not (isinstance(value, str) and value.strip())]
+        return self.build_contract_route_request(
+            path="/v1/bodygraphs",
+            request_fields=("birthdate", "birthtime", "location"),
+            geocode_required=True,
+            birthdate=birthdate,
+            birthtime=birthtime,
+            location=location,
+        )
+
+    def build_contract_route_request(
+        self,
+        *,
+        path: str,
+        request_fields: tuple[str, ...],
+        geocode_required: bool,
+        birthdate: str,
+        birthtime: str,
+        location: str | None = None,
+        lat: str | float | None = None,
+        lng: str | float | None = None,
+    ) -> VendorRequest:
+        contract = _ROUTE_CONTRACTS.get(path)
+        if contract is None:
+            raise VendorError("PROVIDER_CONFIG_INVALID", "unsupported governed HDAPI route")
+        contract_fields, contract_geocode_required = contract
+        if request_fields != contract_fields:
+            raise VendorError(
+                "PROVIDER_INPUT_INVALID",
+                "request fields do not match governed route contract",
+                details={"expected": list(contract_fields), "actual": list(request_fields)},
+            )
+        if geocode_required != contract_geocode_required:
+            raise VendorError(
+                "PROVIDER_CONFIG_INVALID",
+                "geocode posture does not match governed route contract",
+                details={"expected": contract_geocode_required, "actual": geocode_required},
+            )
+        values = {"birthdate": birthdate, "birthtime": birthtime, "location": location, "lat": lat, "lng": lng}
+        string_fields = {"birthdate", "birthtime", "location"}
+        missing = []
+        for name in request_fields:
+            value = values.get(name)
+            if name in string_fields:
+                if not isinstance(value, str) or not value.strip():
+                    missing.append(name)
+            elif value is None or (isinstance(value, str) and not value.strip()):
+                missing.append(name)
         if missing:
             raise VendorError("PROVIDER_INPUT_INVALID", "birth data incomplete", details={"missing": missing})
         try:
             yyyy, mm, dd = birthdate.split("-")
         except ValueError as exc:
-            raise VendorError("PROVIDER_INPUT_INVALID", "invalid birthdate", details={"birthdate": birthdate}) from exc
-        if mm not in _MONTH:
-            raise VendorError("PROVIDER_INPUT_INVALID", "invalid birthdate", details={"birthdate": birthdate})
-        canon_date = f"{dd}-{_MONTH[mm]}-{yyyy}"
-        body = {
-            "birthdate": canon_date,
-            "birthtime": birthtime,
-            "location": location,
-        }
+            raise VendorError("PROVIDER_INPUT_INVALID", "invalid birthdate") from exc
+        if (
+            len(birthdate) != 10
+            or birthdate[4] != "-"
+            or birthdate[7] != "-"
+            or not (yyyy.isdigit() and mm.isdigit() and dd.isdigit())
+            or mm not in _MONTH
+        ):
+            raise VendorError("PROVIDER_INPUT_INVALID", "invalid birthdate")
+        v2_route = path.startswith("/v2/charts")
+        if v2_route:
+            if (
+                len(birthtime) != 5
+                or birthtime[2] != ":"
+                or not (birthtime[:2].isdigit() and birthtime[3:].isdigit())
+                or int(birthtime[:2]) > 23
+                or int(birthtime[3:]) > 59
+            ):
+                raise VendorError("PROVIDER_INPUT_INVALID", "invalid birthtime")
+            if "location" in request_fields and (
+                not isinstance(location, str) or len(location) < 4 or len(location) > 200
+            ):
+                raise VendorError("PROVIDER_INPUT_INVALID", "invalid location")
+        body: dict[str, Any] = {}
+        for field in request_fields:
+            if field == "birthdate":
+                body[field] = birthdate if v2_route else f"{dd}-{_MONTH[mm]}-{yyyy}"
+            elif field in {"lat", "lng"}:
+                try:
+                    coordinate = float(values[field])
+                except (TypeError, ValueError) as exc:
+                    raise VendorError("PROVIDER_INPUT_INVALID", "invalid coordinates", details={"field": field}) from exc
+                lower, upper = (-90.0, 90.0) if field == "lat" else (-180.0, 180.0)
+                if not math.isfinite(coordinate) or coordinate < lower or coordinate > upper:
+                    raise VendorError("PROVIDER_INPUT_INVALID", "invalid coordinates", details={"field": field})
+                body[field] = coordinate
+            else:
+                body[field] = values[field]
         body_bytes = json.dumps(body, sort_keys=True, separators=(",", ":")).encode("utf-8") + b"\n"
         fingerprint = sha256(body_bytes).hexdigest()
         headers = {
             "Accept": "application/json",
             "Content-Type": "application/json; charset=utf-8",
-            "HD-Api-Key": self._api_key,
-            "HD-Geocode-Key": self._geo_key,
             "User-Agent": f"GlowHDEngine/{self._release_id}",
         }
+        if v2_route:
+            headers["Authorization"] = f"Bearer {self._api_key}"
+        elif path.startswith("/v1/bodygraphs"):
+            headers["HD-Api-Key"] = self._api_key
+        else:
+            raise VendorError("PROVIDER_CONFIG_INVALID", "unsupported governed HDAPI route")
+        if geocode_required:
+            if not self._geo_key:
+                raise VendorError(
+                    "PROVIDER_CONFIG_MISSING",
+                    "missing vendor configuration",
+                    details={"missing": ["GEO_API_KEY"]},
+                )
+            headers["HD-Geocode-Key"] = self._geo_key
         return VendorRequest(
-            url=f"{self._base_url}/bodygraphs",
+            url=f"{self._route_base_url(path)}{path}",
             headers=headers,
             body_bytes=body_bytes,
             input_fingerprint=fingerprint,
+            route=self._route_label(path),
         )
+
+    def _route_base_url(self, path: str) -> str:
+        parsed = urlparse(self._base_url)
+        if parsed.path in {"/v1", "/v2"} and path.startswith("/v"):
+            return f"{parsed.scheme}://{parsed.netloc}"
+        return self._base_url
 
     def fetch(self, request: VendorRequest) -> VendorResult:
         attempt = 0
@@ -331,7 +440,7 @@ class HdApiClient:
                     payload = json.loads(body_bytes.decode("utf-8"))
                 except Exception as exc:
                     raise VendorError("PROVIDER_BAD_RESPONSE", "malformed JSON", details={"status": status_code}) from exc
-                self._log_attempt(attempt, status_code, duration_ms, error_class, outcome="success")
+                self._log_attempt(attempt, status_code, duration_ms, error_class, outcome="success", route=request.route or self._route_label_from_url(request.url))
                 return VendorResult(payload=payload, duration_ms=duration_ms, attempts=attempt)
             except VendorError as exc:
                 last_error = exc
@@ -349,6 +458,7 @@ class HdApiClient:
                     retry_after_ms=retry_after_ms,
                     backoff_ms=planned_backoff_ms,
                     outcome="failure",
+                    route=request.route or self._route_label_from_url(request.url),
                 )
                 if not retryable:
                     break
@@ -367,6 +477,7 @@ class HdApiClient:
                     error_code="PROVIDER_NETWORK_ERROR",
                     backoff_ms=planned_backoff_ms,
                     outcome="failure",
+                    route=request.route or self._route_label_from_url(request.url),
                 )
             if attempt >= self._retry.max_attempts or not retryable or planned_backoff_ms <= 0:
                 break
@@ -384,6 +495,7 @@ class HdApiClient:
         error_code: str | None = None,
         retry_after_ms: int | None = None,
         backoff_ms: float | None = None,
+        route: str | None = None,
     ) -> None:
         timeout_profile = (
             f"connect={self._timeouts.connect_timeout_ms};"
@@ -399,7 +511,7 @@ class HdApiClient:
             "error_class": self._bounded_error_class(error_class),
             "outcome": self._bounded_outcome(outcome),
             "rails_state": self._rails_state,
-            "route": _VENDOR_LOG_ROUTE,
+            "route": route or _VENDOR_LOG_ROUTE,
             "timeout_profile": timeout_profile,
         }
         if error_code:
@@ -412,6 +524,17 @@ class HdApiClient:
         if unexpected:  # pragma: no cover - defensive guardrail
             return
         _append_retry_log(self._log_path, record)
+
+    @staticmethod
+    def _route_label(path: str) -> str:
+        if path == "/v1/bodygraphs":
+            return _VENDOR_LOG_ROUTE
+        return f"vendor.hdapi.post:{path}"
+
+    @classmethod
+    def _route_label_from_url(cls, url: str) -> str:
+        parsed = urlparse(url)
+        return cls._route_label(parsed.path or "/bodygraphs")
 
     @staticmethod
     def _bounded_outcome(outcome: str) -> str:

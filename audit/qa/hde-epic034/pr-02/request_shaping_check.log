@@ -1,0 +1,14 @@
+generated_at_utc=2026-06-17T08:20:37Z
+scope=HDE-EPIC034 PR-02 request-shaping check
+rails=ALLOW_NETWORK=0 LANG=C LC_ALL=C SAFE_MODE=1 TZ=UTC
+network_posture=closed-rails-source-cache; no live vendor calls
+evidence_index_and_path_proof_posture=validated_by_update_evidence_index_and_validate_evidence_paths_not_generator
+[closed_rails_generation] status=PASS
+[no_live_vendor_call_attempted] status=PASS
+[v2_bearer_auth_posture] status=PASS
+[v1_legacy_hd_api_key_posture] status=PASS
+[geocode_posture] status=PASS
+[canonical_base_url_key_posture] status=PASS
+[deprecated_alias_posture] status=PASS
+[no_secret_values_emitted] status=PASS
+status=PASS

@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 
 from tools.evidence import generate_hdapi_v2_contract_inventory as generator
+from tools.evidence import update_evidence_index as indexer
 
 ROOT = Path(__file__).resolve().parents[2]
 VENDOR_DIR = ROOT / "artifacts" / "vendor" / "hdapi_v2"
@@ -442,3 +443,123 @@ def test_epic034_source_selection_fails_when_geocode_auth_header_drifts() -> Non
             route["auth_model"] = "Authorization Bearer token plus HD-Geocode-Key header"
     with pytest.raises(ValueError, match="SOURCE_SELECTION_GEOCODE_AUTH_MISMATCH"):
         generator.build_source_selection_snapshot("2026-06-16T00:00:00Z", extra_coordinates)
+
+
+def test_epic034_request_shaping_snapshot_is_canonical_secret_safe_and_contract_derived() -> None:
+    contract = _assert_canonical_json(VENDOR_DIR / "contract_map.json")
+    source_selection = _assert_canonical_json(VENDOR_DIR / "source_selection.snapshot.json")
+    ops = json.loads((ROOT / "audit" / "ops" / "hde-epic034" / "ops-01" / "fact_summary.json").read_text(encoding="utf-8"))
+    snapshot = _assert_canonical_json(VENDOR_DIR / "request_shaping.snapshot.json")
+    assert snapshot == generator.build_request_shaping_snapshot(snapshot["generated_at_utc"], contract, source_selection, ops)
+    assert snapshot["base_url_env_var"] == "HD_API_BASE_URL"
+    assert snapshot["deprecated_base_url_alias"]["env_var"] == "HDAPI_BASE_URL"
+    assert snapshot["v2_auth_header_posture"] == "Authorization: Bearer <redacted>"
+    assert snapshot["v1_legacy_auth_header_posture"] == "HD-Api-Key: <redacted>"
+    assert "v2 chart birthdate remains YYYY-MM-DD" in snapshot["canonical_request_body_construction_proof"]
+    assert "lat/lng are serialized as JSON numbers" in snapshot["canonical_request_body_construction_proof"]
+    rendered = json.dumps(snapshot, sort_keys=True)
+    for secret in ["api-key", "geo-key", "k_test", "Bearer api", "Bearer geo"]:
+        assert secret not in rendered
+    assert snapshot["live_vendor_call_claim"] == "NONE"
+    assert snapshot["public_reader_change_claim"] == "NONE"
+    assert snapshot["open_rails_vendor_smoke_claim"] == "NONE"
+    assert snapshot["runtime_conformance_claim"] == "NONE"
+    assert snapshot["ai_scope_claim"] == "NONE"
+
+
+def test_epic034_request_shaping_auth_base_url_and_geocode_postures() -> None:
+    snapshot = _assert_canonical_json(VENDOR_DIR / "request_shaping.snapshot.json")
+    routes = {route["endpoint_path"]: route for route in snapshot["routes"]}
+    for path in ["/v2/charts", "/v2/charts/simple", "/v2/charts/coordinates"]:
+        assert routes[path]["auth_header_posture"] == "Authorization: Bearer <redacted>"
+        assert "HD-Api-Key" not in routes[path]["auth_header_posture"]
+        assert routes[path]["credential_env_var"] == "HD_API_KEY"
+        assert routes[path]["content_type_posture"] == "application/json"
+    for path in ["/v1/bodygraphs", "/v1/bodygraphs/simple"]:
+        assert routes[path]["auth_header_posture"] == "HD-Api-Key: <redacted>"
+        assert "Bearer" not in routes[path]["auth_header_posture"]
+    assert routes["/v2/charts"]["geocode_env_var"] == "GEO_API_KEY"
+    assert routes["/v2/charts"]["geocode_header_posture"] == "HD-Geocode-Key: <redacted>"
+    assert routes["/v2/charts/simple"]["geocode_header_posture"] == "HD-Geocode-Key: <redacted>"
+    assert routes["/v2/charts/coordinates"]["geocode_header_posture"] == "not applicable"
+
+
+def test_epic034_request_shaping_check_log_exists_and_passes() -> None:
+    log_path = ROOT / "audit" / "qa" / "hde-epic034" / "pr-02" / "request_shaping_check.log"
+    raw = log_path.read_bytes()
+    assert raw.endswith(b"\n")
+    assert b"\r\n" not in raw
+    log = raw.decode("utf-8")
+    for check in [
+        "closed_rails_generation", "no_live_vendor_call_attempted", "v2_bearer_auth_posture",
+        "v1_legacy_hd_api_key_posture", "geocode_posture", "canonical_base_url_key_posture",
+        "deprecated_alias_posture", "no_secret_values_emitted",
+    ]:
+        assert f"[{check}] status=PASS" in log
+    assert "[evidence_index_and_path_proof_posture] status=PASS" not in log
+    assert "evidence_index_and_path_proof_posture=validated_by_update_evidence_index_and_validate_evidence_paths_not_generator" in log
+    assert "status=PASS" in log
+
+
+def test_epic034_request_shaping_fails_on_ops_fact_summary_missing_required_fact() -> None:
+    contract = _assert_canonical_json(VENDOR_DIR / "contract_map.json")
+    source_selection = _assert_canonical_json(VENDOR_DIR / "source_selection.snapshot.json")
+    with pytest.raises(ValueError, match="OPS01_FACT_SUMMARY_INCOMPLETE"):
+        generator.build_request_shaping_snapshot("2026-06-17T00:00:00Z", contract, source_selection, {"PR-02": "proceed"})
+
+
+def test_epic034_request_shaping_outputs_do_not_depend_on_existing_source_selection_file(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    monkeypatch.setattr(generator, "SOURCE_SELECTION_SNAPSHOT", tmp_path / "missing-source-selection.snapshot.json")
+    metadata, bodies = generator.load_source_cache()
+    outputs = generator.render_outputs("2026-06-17T00:00:00Z", metadata, bodies, mode="closed-rails-source-cache")
+    assert generator.REQUEST_SHAPING_SNAPSHOT in outputs
+    assert generator.REQUEST_SHAPING_CHECK_LOG in outputs
+
+
+def test_epic034_request_shaping_rejects_ops01_blocker_wording() -> None:
+    contract = _assert_canonical_json(VENDOR_DIR / "contract_map.json")
+    source_selection = _assert_canonical_json(VENDOR_DIR / "source_selection.snapshot.json")
+    ops = json.loads((ROOT / "audit" / "ops" / "hde-epic034" / "ops-01" / "fact_summary.json").read_text(encoding="utf-8"))
+    ops["pr02_can_proceed_safely"] = "blocker: PR-02 must not proceed until PO approval is recorded"
+    with pytest.raises(ValueError, match="pr02_can_proceed_safely"):
+        generator.build_request_shaping_snapshot("2026-06-17T00:00:00Z", contract, source_selection, ops)
+
+
+def test_epic034_request_shaping_artifacts_are_closed_rails_only_for_public_doc_refresh() -> None:
+    metadata, bodies = generator.load_source_cache()
+    outputs = generator.render_outputs("2026-06-17T00:00:00Z", metadata, bodies, mode="public-docs-refresh")
+    assert generator.REQUEST_SHAPING_SNAPSHOT not in outputs
+    assert generator.REQUEST_SHAPING_CHECK_LOG not in outputs
+
+
+def test_epic034_request_shaping_closed_rails_generation_requires_env_pins(monkeypatch: pytest.MonkeyPatch) -> None:
+    metadata, bodies = generator.load_source_cache()
+    monkeypatch.delenv("SAFE_MODE", raising=False)
+    with pytest.raises(SystemExit, match="CLOSED_RAILS_REQUIRED_FOR_REQUEST_SHAPING"):
+        generator.render_outputs("2026-06-17T00:00:00Z", metadata, bodies, mode="closed-rails-source-cache")
+
+
+def test_epic034_public_doc_refresh_removes_stale_pr02_outputs(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    stale = [tmp_path / "request_shaping.snapshot.json", tmp_path / "request_shaping.snapshot.json.path_proof.txt", tmp_path / "request_shaping_check.log", tmp_path / "request_shaping_check.log.path_proof.txt"]
+    for path in stale:
+        path.write_text("stale\n", encoding="utf-8")
+    monkeypatch.setattr(generator, "REQUEST_SHAPING_OUTPUTS", tuple(stale))
+    generator.remove_request_shaping_outputs()
+    assert all(not path.exists() for path in stale)
+
+
+def test_epic034_pr02_stale_index_rows_are_removed_when_outputs_are_absent(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    stale_payload = [
+        {"artifact_key": "hdapi_v2.request_shaping", "discovered_physical_path": "artifacts/vendor/hdapi_v2/request_shaping.snapshot.json"},
+        {"artifact_key": "epic034.pr02.request_shaping_check", "discovered_physical_path": "audit/qa/hde-epic034/pr-02/request_shaping_check.log"},
+        {"artifact_key": "keep", "discovered_physical_path": "artifacts/keep.txt"},
+    ]
+    index_path = tmp_path / "INDEX.json"
+    index_path.write_text(json.dumps(stale_payload), encoding="utf-8")
+    monkeypatch.setattr(indexer, "HUMAN_INDEX", index_path)
+    monkeypatch.setattr(indexer, "_load_epic034_pr02_entries", lambda: [])
+    loaded = indexer._load_human_index()
+    keys = {(entry["artifact_key"], entry["discovered_physical_path"]) for entry in loaded}
+    assert ("hdapi_v2.request_shaping", "artifacts/vendor/hdapi_v2/request_shaping.snapshot.json") not in keys
+    assert ("epic034.pr02.request_shaping_check", "audit/qa/hde-epic034/pr-02/request_shaping_check.log") not in keys
+    assert ("keep", "artifacts/keep.txt") in keys
