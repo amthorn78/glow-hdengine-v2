@@ -1,0 +1,6 @@
+9595b89f74408cf276ff80398e0a1bb995bd3595d3c067c504684d8ffe43fd78  audit/ops/hde-epic034/ops-01/commands.txt
+f456c1ffc6a33cd5dae1ca90cf499aadeabb167b9e687175a8fc62476833374c  audit/ops/hde-epic034/ops-01/exit_codes.txt
+de8df355f0bec6521f38462922b8dbbd5449cae45f38271ae4759f469436599a  audit/ops/hde-epic034/ops-01/fact_summary.json
+2b5009ceae4b30a0c3feaa514607730dbd6cf3a5b1574ea98c2754dd93bbd647  audit/ops/hde-epic034/ops-01/fact_summary.json.path_proof.txt
+01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b  audit/ops/hde-epic034/ops-01/stderr.log
+87683c773e1fa97c6021dd92892fdc8c7dfb24b3f1036aba426750763e6fa0c2  audit/ops/hde-epic034/ops-01/stdout.log

@@ -1,0 +1,31 @@
+mkdir -p audit/ops/hde-epic034/ops-01
+EDIT_ACTION audit/ops/hde-epic034/ops-01/fact_summary.json -> created secret-safe OPS-01 fact summary from PO-provided answers and repo/PF reality
+EDIT_ACTION audit/ops/hde-epic034/ops-01/commands.txt -> created command/action ledger
+EDIT_ACTION audit/ops/hde-epic034/ops-01/stdout.log -> created stdout capture for repo-local validation commands
+EDIT_ACTION audit/ops/hde-epic034/ops-01/stderr.log -> created stderr capture for repo-local validation commands
+EDIT_ACTION audit/ops/hde-epic034/ops-01/exit_codes.txt -> created exit-code ledger for repo-local validation commands
+EDIT_ACTION audit/ops/hde-epic034/ops-01/fact_summary.json -> expanded target environment set from QA-only to Prod - Railway, Dev - Codex, and QA - Codespaces from PO-provided answers
+python -m json.tool audit/ops/hde-epic034/ops-01/fact_summary.json > /tmp/hde_epic034_ops01_fact_summary.pretty.json
+python - <<'PY'
+from pathlib import Path
+import hashlib
+import os
+from tools.evidence import update_evidence_index
+
+rel = "audit/ops/hde-epic034/ops-01/fact_summary.json"
+path = update_evidence_index.ROOT / rel
+body = path.read_bytes()
+stat = path.stat()
+update_evidence_index._write_path_proof(
+    rel,
+    sha256=hashlib.sha256(body).hexdigest(),
+    size_bytes=stat.st_size,
+    mtime_utc=None,
+    produced_at="2026-06-17T05:39:27Z",
+    default_produced_at="2026-06-17T05:39:27Z",
+    check=False,
+    stat_mtime=stat.st_mtime,
+)
+PY
+test -f audit/ops/hde-epic034/ops-01/fact_summary.json.path_proof.txt
+find audit/ops/hde-epic034/ops-01 -type f ! -name files_sha256.txt -print | sort | xargs sha256sum > audit/ops/hde-epic034/ops-01/files_sha256.txt
