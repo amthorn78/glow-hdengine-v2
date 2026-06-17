@@ -329,7 +329,9 @@ class HdApiClient:
                 or int(birthtime[3:]) > 59
             ):
                 raise VendorError("PROVIDER_INPUT_INVALID", "invalid birthtime")
-            if "location" in request_fields and (not isinstance(location, str) or len(location) < 4 or len(location) > 200):
+            if "location" in request_fields and (
+                not isinstance(location, str) or len(location) < 4 or len(location) > 200
+            ):
                 raise VendorError("PROVIDER_INPUT_INVALID", "invalid location")
         body: dict[str, Any] = {}
         for field in request_fields:

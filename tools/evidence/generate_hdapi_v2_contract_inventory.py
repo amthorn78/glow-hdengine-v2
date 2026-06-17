@@ -110,6 +110,7 @@ def remove_request_shaping_outputs() -> None:
         except FileNotFoundError:
             pass
 
+
 def iso_now() -> str:
     return dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
@@ -901,7 +902,13 @@ def build_request_shaping_check_log(produced: str, snapshot: dict[str, Any], *, 
         ("no_secret_values_emitted", "secret" not in json.dumps(snapshot).lower() and "k_test" not in json.dumps(snapshot)),
     ]
     rails = " ".join(f"{key}={env_snapshot[key]}" for key in sorted(CLOSED_RAILS_ENV))
-    lines = [f"generated_at_utc={produced}", "scope=HDE-EPIC034 PR-02 request-shaping check", f"rails={rails}", "network_posture=closed-rails-source-cache; no live vendor calls", "evidence_index_and_path_proof_posture=validated_by_update_evidence_index_and_validate_evidence_paths_not_generator"]
+    lines = [
+        f"generated_at_utc={produced}",
+        "scope=HDE-EPIC034 PR-02 request-shaping check",
+        f"rails={rails}",
+        "network_posture=closed-rails-source-cache; no live vendor calls",
+        "evidence_index_and_path_proof_posture=validated_by_update_evidence_index_and_validate_evidence_paths_not_generator",
+    ]
     lines.extend(f"[{name}] status={'PASS' if ok else 'FAIL'}" for name, ok in checks)
     lines.append("status=PASS" if all(ok for _name, ok in checks) else "status=FAIL")
     return "\n".join(lines)
