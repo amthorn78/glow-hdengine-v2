@@ -767,8 +767,8 @@ EPIC034_PR02_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
         "epic_id": "HDE-EPIC034",
         "record_type": "epic034_pr02_request_shaping",
         "schema_version": "1.0",
-        "tokens": ["TESTS_PASS_OK", "EVIDENCE_PATH_PROOFS_OK"],
-        "notes": "EPIC034 PR-02 LF-terminated request-shaping check log for v2 Bearer, v1 HD-Api-Key, geocode, base URL alias, and secret-safety posture",
+        "tokens": ["EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC034 PR-02 LF-terminated request-shaping posture check log for v2 Bearer, v1 HD-Api-Key, geocode, base URL alias, and secret-safety posture",
     },
 ]
 

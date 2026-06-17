@@ -86,10 +86,14 @@ _VENDOR_LOG_ERROR_CLASSES = frozenset(
 _VENDOR_LOG_RAILS_STATES = frozenset({"closed_default", "open_exception"})
 _ROUTE_CONTRACTS: Mapping[str, tuple[tuple[str, ...], bool]] = {
     "/v1/bodygraphs": (("birthdate", "birthtime", "location"), True),
+    "/v1/bodygraphs/simple": (("birthdate", "birthtime", "location"), True),
     "/v2/charts": (("birthdate", "birthtime", "location"), True),
     "/v2/charts/simple": (("birthdate", "birthtime", "location"), True),
     "/v2/charts/coordinates": (("birthdate", "birthtime", "lat", "lng"), False),
 }
+_VENDOR_LOG_ROUTE_LABELS = frozenset(
+    {_VENDOR_LOG_ROUTE, *(f"vendor.hdapi.post:{path}" for path in _ROUTE_CONTRACTS if path != "/v1/bodygraphs")}
+)
 
 
 def _validate_retry_config(retry: "VendorRetryConfig") -> None:
@@ -440,7 +444,7 @@ class HdApiClient:
                     payload = json.loads(body_bytes.decode("utf-8"))
                 except Exception as exc:
                     raise VendorError("PROVIDER_BAD_RESPONSE", "malformed JSON", details={"status": status_code}) from exc
-                self._log_attempt(attempt, status_code, duration_ms, error_class, outcome="success", route=request.route or self._route_label_from_url(request.url))
+                self._log_attempt(attempt, status_code, duration_ms, error_class, outcome="success", route=self._safe_route_label(request))
                 return VendorResult(payload=payload, duration_ms=duration_ms, attempts=attempt)
             except VendorError as exc:
                 last_error = exc
@@ -458,7 +462,7 @@ class HdApiClient:
                     retry_after_ms=retry_after_ms,
                     backoff_ms=planned_backoff_ms,
                     outcome="failure",
-                    route=request.route or self._route_label_from_url(request.url),
+                    route=self._safe_route_label(request),
                 )
                 if not retryable:
                     break
@@ -477,7 +481,7 @@ class HdApiClient:
                     error_code="PROVIDER_NETWORK_ERROR",
                     backoff_ms=planned_backoff_ms,
                     outcome="failure",
-                    route=request.route or self._route_label_from_url(request.url),
+                    route=self._safe_route_label(request),
                 )
             if attempt >= self._retry.max_attempts or not retryable or planned_backoff_ms <= 0:
                 break
@@ -529,12 +533,20 @@ class HdApiClient:
     def _route_label(path: str) -> str:
         if path == "/v1/bodygraphs":
             return _VENDOR_LOG_ROUTE
-        return f"vendor.hdapi.post:{path}"
+        if path in _ROUTE_CONTRACTS:
+            return f"vendor.hdapi.post:{path}"
+        return _VENDOR_LOG_ROUTE
 
     @classmethod
     def _route_label_from_url(cls, url: str) -> str:
         parsed = urlparse(url)
         return cls._route_label(parsed.path or "/bodygraphs")
+
+    @classmethod
+    def _safe_route_label(cls, request: VendorRequest) -> str:
+        if request.route in _VENDOR_LOG_ROUTE_LABELS:
+            return request.route
+        return cls._route_label_from_url(request.url)
 
     @staticmethod
     def _bounded_outcome(outcome: str) -> str:

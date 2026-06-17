@@ -563,3 +563,13 @@ def test_epic034_pr02_stale_index_rows_are_removed_when_outputs_are_absent(monke
     assert ("hdapi_v2.request_shaping", "artifacts/vendor/hdapi_v2/request_shaping.snapshot.json") not in keys
     assert ("epic034.pr02.request_shaping_check", "audit/qa/hde-epic034/pr-02/request_shaping_check.log") not in keys
     assert ("keep", "artifacts/keep.txt") in keys
+
+
+def test_epic034_pr02_request_shaping_check_index_row_does_not_claim_tests_pass() -> None:
+    rows = {entry["artifact_key"]: entry for entry in indexer.EPIC034_PR02_PRIMARY_ARTIFACTS}
+
+    row = rows["epic034.pr02.request_shaping_check"]
+    assert row["tokens"] == ["EVIDENCE_PATH_PROOFS_OK"]
+    assert "TESTS_PASS_OK" not in row["tokens"]
+    assert "pytest" not in row["notes"].lower()
+    assert "indexed separately" not in row["notes"].lower()
