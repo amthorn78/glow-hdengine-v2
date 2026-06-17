@@ -249,7 +249,7 @@ class HdApiClient:
         raw_base_url = _resolve_hdapi_base_url(env)
         api_key = (env.get("HD_API_KEY") or "").strip()
         geo_key = (env.get("GEO_API_KEY") or "").strip()
-        pairs = (("HD_API_BASE_URL", raw_base_url), ("HD_API_KEY", api_key), ("GEO_API_KEY", geo_key))
+        pairs = (("HD_API_BASE_URL", raw_base_url), ("HD_API_KEY", api_key))
         missing = [key for key, value in pairs if not value]
         if missing:
             raise VendorError(
@@ -366,6 +366,12 @@ class HdApiClient:
         else:
             raise VendorError("PROVIDER_CONFIG_INVALID", "unsupported governed HDAPI route")
         if geocode_required:
+            if not self._geo_key:
+                raise VendorError(
+                    "PROVIDER_CONFIG_MISSING",
+                    "missing vendor configuration",
+                    details={"missing": ["GEO_API_KEY"]},
+                )
             headers["HD-Geocode-Key"] = self._geo_key
         return VendorRequest(
             url=f"{self._route_base_url(path)}{path}",

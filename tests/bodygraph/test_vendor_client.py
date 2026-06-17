@@ -395,6 +395,48 @@ def test_build_contract_route_request_preserves_v1_hd_api_key_and_coordinates_sk
     assert "HD-Geocode-Key" not in coordinates.headers
 
 
+def test_from_env_allows_coordinates_route_without_geo_api_key(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("HD_API_BASE_URL", "https://vendor.test")
+    monkeypatch.setenv("HD_API_KEY", "api")
+    monkeypatch.delenv("HDAPI_BASE_URL", raising=False)
+    monkeypatch.delenv("GEO_API_KEY", raising=False)
+
+    client = HdApiClient.from_env(request=lambda req, timeout: (200, b"{}", {}))
+    request = client.build_contract_route_request(
+        path="/v2/charts/coordinates",
+        request_fields=("birthdate", "birthtime", "lat", "lng"),
+        geocode_required=False,
+        birthdate="1990-01-15",
+        birthtime="12:00",
+        lat="52.1",
+        lng="4.3",
+    )
+
+    assert request.headers["Authorization"] == "Bearer api"
+    assert "HD-Geocode-Key" not in request.headers
+
+
+def test_geocoded_routes_require_geo_api_key_when_shaped(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("HD_API_BASE_URL", "https://vendor.test")
+    monkeypatch.setenv("HD_API_KEY", "api")
+    monkeypatch.delenv("HDAPI_BASE_URL", raising=False)
+    monkeypatch.delenv("GEO_API_KEY", raising=False)
+
+    client = HdApiClient.from_env(request=lambda req, timeout: (200, b"{}", {}))
+    with pytest.raises(VendorError) as excinfo:
+        client.build_contract_route_request(
+            path="/v2/charts",
+            request_fields=("birthdate", "birthtime", "location"),
+            geocode_required=True,
+            birthdate="1990-01-15",
+            birthtime="12:00",
+            location="Amsterdam, NL",
+        )
+
+    assert excinfo.value.code == "PROVIDER_CONFIG_MISSING"
+    assert excinfo.value.details["missing"] == ["GEO_API_KEY"]
+
+
 def test_build_request_rejects_non_string_required_fields() -> None:
     client = _client(lambda req, timeout: (200, b"{}", {}))
     with pytest.raises(VendorError) as excinfo:
