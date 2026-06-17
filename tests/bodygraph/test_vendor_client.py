@@ -395,6 +395,24 @@ def test_build_contract_route_request_preserves_v1_hd_api_key_and_coordinates_sk
     assert "HD-Geocode-Key" not in coordinates.headers
 
 
+def test_build_request_rejects_non_string_required_fields() -> None:
+    client = _client(lambda req, timeout: (200, b"{}", {}))
+    with pytest.raises(VendorError) as excinfo:
+        client.build_request(birthdate="1990-01-01", birthtime=1200, location="Amsterdam")  # type: ignore[arg-type]
+    assert excinfo.value.code == "PROVIDER_INPUT_INVALID"
+    assert excinfo.value.details["missing"] == ["birthtime"]
+
+    with pytest.raises(VendorError) as excinfo:
+        client.build_request(birthdate=19900101, birthtime="12:00", location="Amsterdam")  # type: ignore[arg-type]
+    assert excinfo.value.code == "PROVIDER_INPUT_INVALID"
+    assert excinfo.value.details["missing"] == ["birthdate"]
+
+    with pytest.raises(VendorError) as excinfo:
+        client.build_request(birthdate="1990-01-01", birthtime="12:00", location=12345)  # type: ignore[arg-type]
+    assert excinfo.value.code == "PROVIDER_INPUT_INVALID"
+    assert excinfo.value.details["missing"] == ["location"]
+
+
 def test_build_request_rejects_whitespace_required_fields() -> None:
     client = _client(lambda req, timeout: (200, b"{}", {}))
     with pytest.raises(VendorError) as excinfo:

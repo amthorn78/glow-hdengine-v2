@@ -300,11 +300,15 @@ class HdApiClient:
         lng: str | float | None = None,
     ) -> VendorRequest:
         values = {"birthdate": birthdate, "birthtime": birthtime, "location": location, "lat": lat, "lng": lng}
-        missing = [
-            name
-            for name in request_fields
-            if values.get(name) is None or (isinstance(values.get(name), str) and not str(values.get(name)).strip())
-        ]
+        string_fields = {"birthdate", "birthtime", "location"}
+        missing = []
+        for name in request_fields:
+            value = values.get(name)
+            if name in string_fields:
+                if not isinstance(value, str) or not value.strip():
+                    missing.append(name)
+            elif value is None or (isinstance(value, str) and not value.strip()):
+                missing.append(name)
         if missing:
             raise VendorError("PROVIDER_INPUT_INVALID", "birth data incomplete", details={"missing": missing})
         try:

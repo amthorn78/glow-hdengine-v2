@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 
 from tools.evidence import generate_hdapi_v2_contract_inventory as generator
+from tools.evidence import update_evidence_index as indexer
 
 ROOT = Path(__file__).resolve().parents[2]
 VENDOR_DIR = ROOT / "artifacts" / "vendor" / "hdapi_v2"
@@ -545,3 +546,20 @@ def test_epic034_public_doc_refresh_removes_stale_pr02_outputs(monkeypatch: pyte
     monkeypatch.setattr(generator, "REQUEST_SHAPING_OUTPUTS", tuple(stale))
     generator.remove_request_shaping_outputs()
     assert all(not path.exists() for path in stale)
+
+
+def test_epic034_pr02_stale_index_rows_are_removed_when_outputs_are_absent(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    stale_payload = [
+        {"artifact_key": "hdapi_v2.request_shaping", "discovered_physical_path": "artifacts/vendor/hdapi_v2/request_shaping.snapshot.json"},
+        {"artifact_key": "epic034.pr02.request_shaping_check", "discovered_physical_path": "audit/qa/hde-epic034/pr-02/request_shaping_check.log"},
+        {"artifact_key": "keep", "discovered_physical_path": "artifacts/keep.txt"},
+    ]
+    index_path = tmp_path / "INDEX.json"
+    index_path.write_text(json.dumps(stale_payload), encoding="utf-8")
+    monkeypatch.setattr(indexer, "HUMAN_INDEX", index_path)
+    monkeypatch.setattr(indexer, "_load_epic034_pr02_entries", lambda: [])
+    loaded = indexer._load_human_index()
+    keys = {(entry["artifact_key"], entry["discovered_physical_path"]) for entry in loaded}
+    assert ("hdapi_v2.request_shaping", "artifacts/vendor/hdapi_v2/request_shaping.snapshot.json") not in keys
+    assert ("epic034.pr02.request_shaping_check", "audit/qa/hde-epic034/pr-02/request_shaping_check.log") not in keys
+    assert ("keep", "artifacts/keep.txt") in keys

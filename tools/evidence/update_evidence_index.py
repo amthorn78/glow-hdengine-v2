@@ -510,6 +510,11 @@ EPIC034_PR01_SUPERSEDED_INDEX_KEYS = {
     ("epic034.pr01.v1_legacy_guard", "artifacts/vendor/hdapi_v2/v1_legacy_guard.log"),
 }
 
+EPIC034_PR02_SUPERSEDED_INDEX_KEYS = {
+    ("hdapi_v2.request_shaping", "artifacts/vendor/hdapi_v2/request_shaping.snapshot.json"),
+    ("epic034.pr02.request_shaping_check", "audit/qa/hde-epic034/pr-02/request_shaping_check.log"),
+}
+
 EPIC032_PR03_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
         "artifact_key": "db_bridge.adapter_selection.snapshot",
@@ -1114,6 +1119,8 @@ def _load_human_index() -> list[dict[str, object]]:
         not in EPIC032_PR03_SUPERSEDED_INDEX_KEYS
         and (entry.get("artifact_key"), entry.get("discovered_physical_path"))
         not in EPIC034_PR01_SUPERSEDED_INDEX_KEYS
+        and (entry.get("artifact_key"), entry.get("discovered_physical_path"))
+        not in EPIC034_PR02_SUPERSEDED_INDEX_KEYS
     ]
     return _dedupe_entries(
         [
