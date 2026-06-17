@@ -430,16 +430,17 @@ def test_v2_request_body_rejects_non_contract_date_and_coordinates() -> None:
             lat="52.1",
             lng="4.3",
         )
-    with pytest.raises(VendorError):
-        client.build_contract_route_request(
-            path="/v2/charts/coordinates",
-            request_fields=("birthdate", "birthtime", "lat", "lng"),
-            geocode_required=False,
-            birthdate="1990-01-15",
-            birthtime="12:00",
-            lat="north",
-            lng="4.3",
-        )
+    for lat, lng in [("north", "4.3"), ("nan", "4.3"), ("inf", "4.3"), ("91", "4.3"), ("52.1", "181")]:
+        with pytest.raises(VendorError):
+            client.build_contract_route_request(
+                path="/v2/charts/coordinates",
+                request_fields=("birthdate", "birthtime", "lat", "lng"),
+                geocode_required=False,
+                birthdate="1990-01-15",
+                birthtime="12:00",
+                lat=lat,
+                lng=lng,
+            )
 
 
 def test_fetch_logs_shaped_v2_route(tmp_path: Path) -> None:

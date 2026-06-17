@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import math
 import os
 import socket
 import time
@@ -325,9 +326,13 @@ class HdApiClient:
                 body[field] = birthdate if v2_route else f"{dd}-{_MONTH[mm]}-{yyyy}"
             elif field in {"lat", "lng"}:
                 try:
-                    body[field] = float(values[field])
+                    coordinate = float(values[field])
                 except (TypeError, ValueError) as exc:
                     raise VendorError("PROVIDER_INPUT_INVALID", "invalid coordinates", details={"field": field}) from exc
+                lower, upper = (-90.0, 90.0) if field == "lat" else (-180.0, 180.0)
+                if not math.isfinite(coordinate) or coordinate < lower or coordinate > upper:
+                    raise VendorError("PROVIDER_INPUT_INVALID", "invalid coordinates", details={"field": field})
+                body[field] = coordinate
             else:
                 body[field] = values[field]
         body_bytes = json.dumps(body, sort_keys=True, separators=(",", ":")).encode("utf-8") + b"\n"

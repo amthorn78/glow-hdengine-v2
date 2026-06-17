@@ -511,3 +511,19 @@ def test_epic034_request_shaping_outputs_do_not_depend_on_existing_source_select
     outputs = generator.render_outputs("2026-06-17T00:00:00Z", metadata, bodies, mode="closed-rails-source-cache")
     assert generator.REQUEST_SHAPING_SNAPSHOT in outputs
     assert generator.REQUEST_SHAPING_CHECK_LOG in outputs
+
+
+def test_epic034_request_shaping_rejects_ops01_blocker_wording() -> None:
+    contract = _assert_canonical_json(VENDOR_DIR / "contract_map.json")
+    source_selection = _assert_canonical_json(VENDOR_DIR / "source_selection.snapshot.json")
+    ops = json.loads((ROOT / "audit" / "ops" / "hde-epic034" / "ops-01" / "fact_summary.json").read_text(encoding="utf-8"))
+    ops["pr02_can_proceed_safely"] = "blocker: PR-02 must not proceed until PO approval is recorded"
+    with pytest.raises(ValueError, match="pr02_can_proceed_safely"):
+        generator.build_request_shaping_snapshot("2026-06-17T00:00:00Z", contract, source_selection, ops)
+
+
+def test_epic034_request_shaping_artifacts_are_closed_rails_only_for_public_doc_refresh() -> None:
+    metadata, bodies = generator.load_source_cache()
+    outputs = generator.render_outputs("2026-06-17T00:00:00Z", metadata, bodies, mode="public-docs-refresh")
+    assert generator.REQUEST_SHAPING_SNAPSHOT not in outputs
+    assert generator.REQUEST_SHAPING_CHECK_LOG not in outputs

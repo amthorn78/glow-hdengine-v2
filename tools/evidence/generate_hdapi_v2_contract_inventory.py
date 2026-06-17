@@ -763,9 +763,12 @@ def _validate_ops01_fact_summary(payload: dict[str, Any]) -> None:
     raw = json.dumps(payload, sort_keys=True)
     required = [
         "HD_API_BASE_URL", "HDAPI_BASE_URL", "HD_API_KEY", "GEO_API_KEY",
-        "Authorization: Bearer <redacted>", "HD-Api-Key: <redacted>", "HD-Geocode-Key: <redacted>", "PR-02", "proceed",
+        "Authorization: Bearer <redacted>", "HD-Api-Key: <redacted>", "HD-Geocode-Key: <redacted>",
     ]
     missing = [item for item in required if item not in raw]
+    pr02_posture = payload.get("pr02_can_proceed_safely")
+    if not isinstance(pr02_posture, str) or not pr02_posture.startswith(("proceed_with_caveat:", "proceed_with_requirement:")):
+        missing.append("pr02_can_proceed_safely")
     if missing:
         raise ValueError(f"OPS01_FACT_SUMMARY_INCOMPLETE:{','.join(missing)}")
 
@@ -1033,12 +1036,13 @@ def render_outputs(produced: str, fetched: dict[str, dict[str, Any]], bodies: di
         V1_LEGACY_GUARD_LOG: (build_v1_legacy_guard_log(produced, snapshot) + "\n").encode("utf-8"),
         SOURCE_SELECTION_CHECK_LOG: (build_source_selection_check_log(produced, snapshot, mode=mode) + "\n").encode("utf-8"),
     })
-    ops_summary = _load_ops01_fact_summary()
-    request_snapshot = build_request_shaping_snapshot(produced, contract, snapshot, ops_summary)
-    outputs.update({
-        REQUEST_SHAPING_SNAPSHOT: canonical_json_bytes(request_snapshot),
-        REQUEST_SHAPING_CHECK_LOG: (build_request_shaping_check_log(produced, request_snapshot, mode=mode) + "\n").encode("utf-8"),
-    })
+    if mode == "closed-rails-source-cache":
+        ops_summary = _load_ops01_fact_summary()
+        request_snapshot = build_request_shaping_snapshot(produced, contract, snapshot, ops_summary)
+        outputs.update({
+            REQUEST_SHAPING_SNAPSHOT: canonical_json_bytes(request_snapshot),
+            REQUEST_SHAPING_CHECK_LOG: (build_request_shaping_check_log(produced, request_snapshot, mode=mode) + "\n").encode("utf-8"),
+        })
     outputs.update(write_baseline_pointer_artifacts(produced, acceptance))
     return outputs
 
