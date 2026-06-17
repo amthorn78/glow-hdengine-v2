@@ -30,7 +30,8 @@ section() {
 redact_sensitive_stream() {
   sed -E \
     -e 's#https?://[^[:space:]"'"'"'<>]+#REDACTED_URL#g' \
-    -e 's#([A-Za-z0-9_]*(KEY|TOKEN|SECRET|PASSWORD|DATABASE_URL|DB_|GEO_API_KEY|HD_API_KEY|HD_API_BASE_URL|HDAPI_BASE_URL|AUTH|BEARER|URL)[A-Za-z0-9_]*[=:])["'"'"']?[^[:space:]"'"'"']+["'"'"']?#\1REDACTED#g'
+    -e 's#("[^"]*(KEY|TOKEN|SECRET|PASSWORD|DATABASE_URL|DB_|GEO_API_KEY|HD_API_KEY|HD_API_BASE_URL|HDAPI_BASE_URL|AUTH|BEARER|URL|APIKEY|API_KEY)[^"]*"[[:space:]]*:[[:space:]]*")[^"]*"#\1REDACTED"#gI' \
+    -e 's#([A-Za-z0-9_.-]*(KEY|TOKEN|SECRET|PASSWORD|DATABASE_URL|DB_|GEO_API_KEY|HD_API_KEY|HD_API_BASE_URL|HDAPI_BASE_URL|AUTH|BEARER|URL|APIKEY|API_KEY)[A-Za-z0-9_.-]*[=:])["'"'"']?[^[:space:]"'"'"']+["'"'"']?#\1REDACTED#gI'
 }
 
 append_redacted() {
@@ -90,12 +91,25 @@ redacted_env_presence() {
   '
 }
 
+repo_config_files() {
+  for path in \
+    ".devcontainer/devcontainer.json" \
+    ".devcontainer.json" \
+    ".vscode/extensions.json" \
+    ".vscode/settings.json"
+  do
+    [ -f "${path}" ] && printf '%s\n' "${path}"
+  done
+  [ -d ".devcontainer" ] && find .devcontainer -mindepth 2 -maxdepth 2 -name devcontainer.json -type f -print 2>/dev/null
+  [ -d ".github/codespaces" ] && find .github/codespaces -maxdepth 2 -type f -print 2>/dev/null
+}
+
 repo_file_presence() {
   for path in \
     ".devcontainer/devcontainer.json" \
+    ".devcontainer.json" \
     ".vscode/extensions.json" \
-    ".vscode/settings.json" \
-    "devcontainer.json"
+    ".vscode/settings.json"
   do
     if [ -e "${path}" ]; then
       printf 'present: %s\n' "${path}"
@@ -103,21 +117,24 @@ repo_file_presence() {
       printf 'absent: %s\n' "${path}"
     fi
   done
+  if [ -d ".devcontainer" ]; then
+    find .devcontainer -mindepth 2 -maxdepth 2 -name devcontainer.json -type f -print 2>/dev/null | LC_ALL=C sort | sed 's/^/present selectable: /'
+  else
+    printf 'absent: .devcontainer/ selectable configs\n'
+  fi
   if [ -d ".github/codespaces" ]; then
-    find .github/codespaces -maxdepth 2 -type f -print 2>/dev/null | LC_ALL=C sort
+    find .github/codespaces -maxdepth 2 -type f -print 2>/dev/null | LC_ALL=C sort | sed 's/^/present: /'
   else
     printf 'absent: .github/codespaces/\n'
   fi
 }
 
 repo_extension_recommendations() {
-  for path in ".vscode/extensions.json" ".devcontainer/devcontainer.json" "devcontainer.json"; do
-    if [ -f "${path}" ]; then
-      printf -- '--- %s ---\n' "${path}"
-      awk '
-        /extensions|recommendations|unwantedRecommendations|customizations|vscode|openai|OpenAI|chatgpt|ChatGPT/ { print }
-      ' "${path}"
-    fi
+  repo_config_files | LC_ALL=C sort -u | while IFS= read -r path; do
+    printf -- '--- %s ---\n' "${path}"
+    awk '
+      /extensions|recommendations|unwantedRecommendations|customizations|vscode|openai|OpenAI|chatgpt|ChatGPT|codex|Codex|apiKey|API_KEY|apikey/ { print }
+    ' "${path}"
   done
 }
 

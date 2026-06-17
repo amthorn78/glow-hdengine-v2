@@ -27,7 +27,7 @@ Review the report sections for:
 - Whether the `code` CLI is available and whether `code --list-extensions --show-versions` completed.
 - Installed VS Code extensions and extension directories under common VS Code server paths.
 - OpenAI-related matches from extension IDs, extension directory names, or repo recommendations.
-- Repo-level VS Code recommendation and devcontainer customization snippets, if present.
+- Repo-level VS Code recommendation and devcontainer customization snippets, including `.devcontainer/devcontainer.json`, root `.devcontainer.json`, and selectable `.devcontainer/<name>/devcontainer.json` files when present.
 - Codespaces/devcontainer config files present in the repo.
 - Recent VS Code server log directory names, without dumping large logs by default.
 
@@ -39,7 +39,7 @@ If a freeze or slowdown happens at the same time an OpenAI-related extension is 
 
 ## Secret handling
 
-Do not paste raw secrets into issues, PR comments, chat, or external tools. The probe redacts sensitive environment values, but operators should still review the report before sharing it.
+Do not paste raw secrets into issues, PR comments, chat, or external tools. The probe redacts sensitive environment values and sensitive-looking key/value snippets from inspected config lines, but operators should still review the report before sharing it.
 
 ## Next steps after evidence review
 
