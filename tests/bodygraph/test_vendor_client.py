@@ -301,6 +301,48 @@ def test_vendor_safe_rails_logs_are_keys_only_bounded_and_secret_free(tmp_path: 
         assert fragment not in rendered
 
 
+def test_fetch_derives_retry_log_route_when_request_route_is_untrusted(tmp_path: Path) -> None:
+    log_path = tmp_path / "retry.jsonl"
+    leaked_route = "https://vendor.test/v1/bodygraphs?api_key=plain-secret-value"
+
+    def ok_request(req, timeout):
+        return 200, b'{"ok":true}', {}
+
+    client = _client(ok_request, log_path=log_path)
+    request = VendorRequest(
+        url="https://vendor.test/v1/bodygraphs",
+        headers={},
+        body_bytes=b"{}\n",
+        input_fingerprint="abc",
+        route=leaked_route,
+    )
+
+    client.fetch(request)
+
+    records = _read_jsonl(log_path)
+    assert records[0]["route"] == "vendor.hdapi.post:/bodygraphs"
+    assert leaked_route not in log_path.read_text(encoding="utf-8")
+
+
+def test_build_contract_route_request_supports_legacy_simple_bodygraphs() -> None:
+    client = _client(lambda req, timeout: (200, b"{}", {}))
+
+    request = client.build_contract_route_request(
+        path="/v1/bodygraphs/simple",
+        request_fields=("birthdate", "birthtime", "location"),
+        geocode_required=True,
+        birthdate="1990-01-02",
+        birthtime="12:34",
+        location="London, UK",
+    )
+
+    assert request.url == "https://vendor.test/v1/bodygraphs/simple"
+    assert request.headers["HD-Api-Key"] == "api"
+    assert request.headers["HD-Geocode-Key"] == "geo"
+    assert request.body_bytes == b'{"birthdate":"02-Jan-1990","birthtime":"12:34","location":"London, UK"}\n'
+    assert request.route == "vendor.hdapi.post:/v1/bodygraphs/simple"
+
+
 def test_vendor_safe_rails_failure_classes_are_observable(tmp_path: Path) -> None:
     cases = [
         ("network_error", lambda req, timeout: (_ for _ in ()).throw(OSError("boom")), "PROVIDER_NETWORK_ERROR"),
