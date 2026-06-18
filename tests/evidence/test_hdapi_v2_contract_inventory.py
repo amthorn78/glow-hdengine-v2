@@ -1848,3 +1848,156 @@ def test_epic034_vendor_guard_fails_on_socket_or_subprocess_fetch(monkeypatch: p
             generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
     finally:
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+@pytest.mark.parametrize(
+    "body",
+    [
+        """
+import requests
+SAFE_MODE='1'
+def route():
+    with requests.Session() as session:
+        return session.get('https://example.invalid')
+""",
+        """
+import aiohttp
+SAFE_MODE='1'
+async def route():
+    async with aiohttp.ClientSession() as session:
+        return await session.post('https://example.invalid')
+""",
+    ],
+)
+def test_epic034_adapter_boundary_fails_closed_on_context_managed_clients(monkeypatch: pytest.MonkeyPatch, body: str) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    try:
+        bad_adapter = _write_boundary_temp(rel_dir, "context_client.py", body)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (bad_adapter,))
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_adapter_bypass"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_adapter_boundary_fails_closed_on_imported_build_opener(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from urllib.request import build_opener
+SAFE_MODE='1'
+def route(req):
+    opener = build_opener()
+    return opener.open(req)
+"""
+    try:
+        bad_adapter = _write_boundary_temp(rel_dir, "build_opener_adapter.py", body)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (bad_adapter,))
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_adapter_bypass"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_adapter_boundary_fails_closed_on_attribute_client(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+import requests
+SAFE_MODE='1'
+class Adapter:
+    def __init__(self):
+        self.session = requests.Session()
+adapter = Adapter()
+def route():
+    return adapter.session.get('https://example.invalid')
+"""
+    try:
+        bad_adapter = _write_boundary_temp(rel_dir, "attribute_client.py", body)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (bad_adapter,))
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_adapter_bypass"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+@pytest.mark.parametrize(
+    "body",
+    [
+        """
+import orjson
+def emit_public(payload):
+    return orjson.dumps(payload)
+""",
+        """
+import simplejson
+def emit_public(payload):
+    return simplejson.dumps(payload).encode('utf-8')
+""",
+    ],
+)
+def test_epic034_ad_hoc_serialization_detects_nonstdlib_json_modules(monkeypatch: pytest.MonkeyPatch, body: str) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    try:
+        bad_presenter = _write_boundary_temp(rel_dir, "bad_presenter.py", body)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PRESENTER_LOCI", (bad_presenter,))
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_ad_hoc_serialization"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_presenter_bypass_checks_class_based_add_url_rule(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask, jsonify
+from flask.views import MethodView
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+SAFE_MODE='1'
+@app.route('/good')
+def good():
+    return emit_public({'ok': True})
+class Bad(MethodView):
+    def get(self):
+        return jsonify({'ok': False})
+app.add_url_rule('/bad', view_func=Bad.as_view('bad'))
+"""
+    try:
+        bad_adapter = _write_boundary_temp(rel_dir, "class_view.py", body)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (bad_adapter,))
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_presenter_bypass"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_presenter_emitter_accepts_module_qualified_calls(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask
+from engine.presenter import emitter
+app = Flask(__name__)
+SAFE_MODE='1'
+@app.route('/good')
+def good():
+    return emitter.emit_public_with_envelope({'ok': True})
+"""
+    try:
+        good_adapter = _write_boundary_temp(rel_dir, "qualified_presenter.py", body)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (good_adapter,))
+        proof, checks = generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+        assert checks["presenter_emitter_inspected"] is True
+        assert "[presenter_emitter_inspected] status=PASS" in proof
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)

@@ -1252,23 +1252,60 @@ def _adapter_external_io_calls(loci: tuple[str, ...]) -> list[str]:
         _path, _text, tree = _python_source(rel)
         aliases = _import_aliases(tree)
         client_roots: set[str] = set()
-        for node in ast.walk(tree):
-            if not isinstance(node, (ast.Assign, ast.AnnAssign)) or not isinstance(node.value, ast.Call):
-                continue
-            ctor_chain = _attribute_chain(node.value.func)
-            ctor_root = _root_name(node.value.func)
+        client_attrs: set[str] = set()
+        opener_roots: set[str] = set()
+
+        def remember_client_target(target_node: ast.AST) -> None:
+            if isinstance(target_node, ast.Name):
+                client_roots.add(target_node.id)
+            elif isinstance(target_node, ast.Attribute):
+                client_attrs.add(_attribute_chain(target_node))
+                client_attrs.add(target_node.attr)
+
+        def remember_opener_target(target_node: ast.AST) -> None:
+            if isinstance(target_node, ast.Name):
+                opener_roots.add(target_node.id)
+            elif isinstance(target_node, ast.Attribute):
+                opener_roots.add(_attribute_chain(target_node))
+
+        def call_constructs_client(call: ast.Call) -> bool:
+            ctor_chain = _attribute_chain(call.func)
+            ctor_root = _root_name(call.func)
             ctor_target = aliases.get(ctor_root or "", ctor_root or "")
-            if (
+            return (
                 ctor_target.startswith(("requests", "httpx", "urllib3", "http.client", "aiohttp"))
                 and (
                     ctor_chain.endswith((".Session", ".Client", ".AsyncClient", ".PoolManager", ".HTTPConnection", ".HTTPSConnection", ".ClientSession"))
                     or ctor_target.endswith((".Session", ".Client", ".AsyncClient", ".PoolManager", ".HTTPConnection", ".HTTPSConnection", ".ClientSession"))
                 )
-            ):
+            )
+
+        def call_constructs_opener(call: ast.Call) -> bool:
+            ctor_chain = _attribute_chain(call.func)
+            ctor_root = _root_name(call.func)
+            ctor_target = aliases.get(ctor_root or "", ctor_root or "")
+            return ctor_target == "urllib.request.build_opener" or (ctor_target == "urllib.request" and ctor_chain.endswith(".build_opener")) or ctor_chain == "build_opener"
+
+        for node in ast.walk(tree):
+            if not isinstance(node, (ast.Assign, ast.AnnAssign)) or not isinstance(node.value, ast.Call):
+                continue
+            if call_constructs_client(node.value):
                 target_nodes = node.targets if isinstance(node, ast.Assign) else [node.target]
                 for target_node in target_nodes:
-                    if isinstance(target_node, ast.Name):
-                        client_roots.add(target_node.id)
+                    remember_client_target(target_node)
+            if call_constructs_opener(node.value):
+                target_nodes = node.targets if isinstance(node, ast.Assign) else [node.target]
+                for target_node in target_nodes:
+                    remember_opener_target(target_node)
+        for node in ast.walk(tree):
+            if not isinstance(node, (ast.With, ast.AsyncWith)):
+                continue
+            for item in node.items:
+                if isinstance(item.context_expr, ast.Call) and item.optional_vars is not None:
+                    if call_constructs_client(item.context_expr):
+                        remember_client_target(item.optional_vars)
+                    if call_constructs_opener(item.context_expr):
+                        remember_opener_target(item.optional_vars)
         for node in ast.walk(tree):
             if not isinstance(node, ast.Call):
                 continue
@@ -1277,9 +1314,14 @@ def _adapter_external_io_calls(loci: tuple[str, ...]) -> list[str]:
             target = aliases.get(root or "", root or "")
             attr = chain.rsplit(".", 1)[-1] if chain else ""
             target_attr = target.rsplit(".", 1)[-1] if target else ""
+            receiver = chain.rsplit(".", 1)[0] if "." in chain else root or ""
             if (target.startswith("socket") and attr in {"create_connection", "socket"}) or (target.startswith("subprocess") and attr in {"run", "Popen", "call", "check_call", "check_output"}):
                 findings.append(f"{rel}:{chain}")
             elif root in client_roots and attr in http_methods:
+                findings.append(f"{rel}:{chain}")
+            elif (receiver in client_attrs or any(receiver.endswith(f".{client_attr}") for client_attr in client_attrs)) and attr in http_methods:
+                findings.append(f"{rel}:{chain}")
+            elif (root in opener_roots or receiver in opener_roots) and attr == "open":
                 findings.append(f"{rel}:{chain}")
             elif target in forbidden_modules or any(target.startswith(f"{module}.") for module in forbidden_modules):
                 if (
@@ -1319,9 +1361,9 @@ def _ad_hoc_json_serializers(loci: tuple[str, ...]) -> list[str]:
             target = aliases.get(root or "", root or "")
             attr = chain.rsplit(".", 1)[-1] if chain else ""
             if not (
-                (target == "json" and attr in {"dump", "dumps"})
-                or target in {"json.dump", "json.dumps"}
-                or chain in {"json.dump", "json.dumps", "dump", "dumps"}
+                (target in {"json", "orjson", "simplejson"} and attr in {"dump", "dumps"})
+                or target in {"json.dump", "json.dumps", "orjson.dumps", "simplejson.dump", "simplejson.dumps"}
+                or chain in {"json.dump", "json.dumps", "orjson.dumps", "simplejson.dump", "simplejson.dumps", "dump", "dumps"}
             ):
                 continue
             func_name = ""
@@ -1347,6 +1389,14 @@ def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
         _path, _text, tree = _python_source(rel)
         aliases = _import_aliases(tree)
         function_defs = {node.name: node for node in ast.walk(tree) if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))}
+        class_methods: dict[str, set[str]] = {}
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ClassDef):
+                class_methods[node.name] = {
+                    child.name
+                    for child in node.body
+                    if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)) and child.name in {"get", "post", "put", "patch", "delete", "head", "options", "dispatch_request"}
+                }
         function_calls: dict[str, set[str]] = {}
         function_return_calls: dict[str, set[str]] = {}
         direct_presenter: set[str] = set()
@@ -1456,7 +1506,7 @@ def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
             calls = direct_call_names(fn)
             function_calls[name] = calls
             function_return_calls[name] = return_call_names(fn)
-            if any(call in presenter_calls or call.endswith(".emit_public") for call in calls):
+            if any(call in presenter_calls or any(call.endswith(f".{presenter_call}") for presenter_call in presenter_calls) for call in calls):
                 direct_presenter.add(name)
             for deco in fn.decorator_list:
                 deco_name = _attribute_chain(deco.func if isinstance(deco, ast.Call) else deco)
@@ -1492,6 +1542,11 @@ def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
                 view_func = node.args[2]
             if isinstance(view_func, ast.Name) and view_func.id in function_defs:
                 route_functions.add(view_func.id)
+            elif isinstance(view_func, ast.Call):
+                view_chain = _attribute_chain(view_func.func)
+                class_name = view_chain.rsplit(".", 1)[0] if view_chain.endswith(".as_view") else ""
+                if class_name in class_methods:
+                    route_functions.update(class_methods[class_name])
         for name, fn in function_defs.items():
             if function_has_bypass(fn, function_calls[name]):
                 direct_bypass.add(name)
@@ -1618,6 +1673,21 @@ def _vendor_external_io_functions(loci: tuple[str, ...]) -> list[str]:
         aliases = _import_aliases(tree)
         opener_roots: set[str] = set()
         client_roots: set[str] = set()
+        client_attrs: set[str] = set()
+
+        def remember_client_target(target_node: ast.AST) -> None:
+            if isinstance(target_node, ast.Name):
+                client_roots.add(target_node.id)
+            elif isinstance(target_node, ast.Attribute):
+                client_attrs.add(_attribute_chain(target_node))
+                client_attrs.add(target_node.attr)
+
+        def remember_opener_target(target_node: ast.AST) -> None:
+            if isinstance(target_node, ast.Name):
+                opener_roots.add(target_node.id)
+            elif isinstance(target_node, ast.Attribute):
+                opener_roots.add(_attribute_chain(target_node))
+
         for node in ast.walk(tree):
             if not isinstance(node, (ast.Assign, ast.AnnAssign)) or not isinstance(node.value, ast.Call):
                 continue
@@ -1627,8 +1697,7 @@ def _vendor_external_io_functions(loci: tuple[str, ...]) -> list[str]:
             if ctor_target == "urllib.request" and ctor_chain.endswith(".build_opener"):
                 target_nodes = node.targets if isinstance(node, ast.Assign) else [node.target]
                 for target_node in target_nodes:
-                    if isinstance(target_node, ast.Name):
-                        opener_roots.add(target_node.id)
+                    remember_opener_target(target_node)
             if (
                 ctor_target.startswith(("requests", "httpx", "urllib3", "http.client", "aiohttp"))
                 and (
@@ -1638,8 +1707,26 @@ def _vendor_external_io_functions(loci: tuple[str, ...]) -> list[str]:
             ):
                 target_nodes = node.targets if isinstance(node, ast.Assign) else [node.target]
                 for target_node in target_nodes:
-                    if isinstance(target_node, ast.Name):
-                        client_roots.add(target_node.id)
+                    remember_client_target(target_node)
+        for node in ast.walk(tree):
+            if not isinstance(node, (ast.With, ast.AsyncWith)):
+                continue
+            for item in node.items:
+                if not isinstance(item.context_expr, ast.Call) or item.optional_vars is None:
+                    continue
+                ctor_chain = _attribute_chain(item.context_expr.func)
+                ctor_root = _root_name(item.context_expr.func)
+                ctor_target = aliases.get(ctor_root or "", ctor_root or "")
+                if ctor_target == "urllib.request" and ctor_chain.endswith(".build_opener"):
+                    remember_opener_target(item.optional_vars)
+                if (
+                    ctor_target.startswith(("requests", "httpx", "urllib3", "http.client", "aiohttp"))
+                    and (
+                        ctor_chain.endswith((".Session", ".Client", ".AsyncClient", ".PoolManager", ".HTTPConnection", ".HTTPSConnection", ".ClientSession"))
+                        or ctor_target.endswith((".Session", ".Client", ".AsyncClient", ".PoolManager", ".HTTPConnection", ".HTTPSConnection", ".ClientSession"))
+                    )
+                ):
+                    remember_client_target(item.optional_vars)
         parents: dict[ast.AST, ast.AST] = {}
         for parent in ast.walk(tree):
             for child in ast.iter_child_nodes(parent):
@@ -1651,11 +1738,14 @@ def _vendor_external_io_functions(loci: tuple[str, ...]) -> list[str]:
             root = _root_name(node.func)
             target = aliases.get(root or "", root or "")
             attr = chain.rsplit(".", 1)[-1] if chain else ""
+            receiver = chain.rsplit(".", 1)[0] if "." in chain else root or ""
             shell_or_socket_methods = {"create_connection", "socket", "run", "Popen", "call", "check_call", "check_output", "system", "popen"}
             is_external = (
                 (target.startswith(("urllib.request", "requests", "httpx", "urllib3", "http.client", "aiohttp")) and attr in http_methods | {"build_opener", "ClientSession"})
                 or (root in opener_roots and attr == "open")
+                or (receiver in opener_roots and attr == "open")
                 or (root in client_roots and attr in http_methods)
+                or ((receiver in client_attrs or any(receiver.endswith(f".{client_attr}") for client_attr in client_attrs)) and attr in http_methods)
                 or (target.startswith(("socket", "subprocess", "os")) and attr in shell_or_socket_methods)
                 or target in {
                     "socket.create_connection",
@@ -1764,9 +1854,8 @@ def build_adapter_boundary_proof(produced: str, source_selection: dict[str, Any]
 
     adapter_presenter_calls = sorted(
         call for call in adapter_calls
-        if call == "emit_public"
-        or call.endswith(".emit_public")
-        or call in {"emit_reader_public_bytes", "emit_reader_public_envelope", "emit_fn"}
+        if call in {"emit_public", "emit_public_with_envelope", "emit_reader_public_bytes", "emit_reader_public_envelope", "emit_fn"}
+        or any(call.endswith(f".{presenter_call}") for presenter_call in {"emit_public", "emit_public_with_envelope", "emit_reader_public_bytes", "emit_reader_public_envelope", "emit_fn"})
     )
     presenter_bypass = _adapter_presenter_bypass_routes(ADAPTER_BOUNDARY_ADAPTER_LOCI)
     presenter_uses_emitter = bool(adapter_presenter_calls) and not presenter_bypass
