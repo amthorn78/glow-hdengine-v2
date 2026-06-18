@@ -25,6 +25,11 @@ import urllib.request
 from pathlib import Path
 from typing import Any
 
+if __package__ in {None, ""}:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+
+from tools.evidence import hdapi_v2_boundary_analyzer as boundary_analyzer
+
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "artifacts" / "vendor" / "hdapi_v2"
 SOURCE_CACHE = OUT / "source_cache"
@@ -1815,6 +1820,7 @@ def _unsupported_scope_claims(*payloads: dict[str, Any]) -> list[str]:
 
 
 def build_adapter_boundary_proof(produced: str, source_selection: dict[str, Any], request_shaping: dict[str, Any], response_mapping: dict[str, Any]) -> tuple[str, dict[str, bool]]:
+    boundary_analyzer.ROOT = ROOT
     if source_selection.get("request_shaping_claim") != "NONE":
         raise ValueError("ADAPTER_BOUNDARY_SOURCE_SELECTION_BASELINE_DRIFT")
     if request_shaping.get("route_family") != "recommended_v2_chart":
@@ -1842,7 +1848,7 @@ def build_adapter_boundary_proof(produced: str, source_selection: dict[str, Any]
         _path, _text, tree = _python_source(rel)
         vendor_modules |= _import_modules(tree)
         vendor_calls |= _call_names(tree)
-    if not _vendor_seam_guarded(ADAPTER_BOUNDARY_VENDOR_SEAM_LOCI):
+    if not boundary_analyzer._vendor_seam_guarded(ADAPTER_BOUNDARY_VENDOR_SEAM_LOCI):
         raise ValueError("ADAPTER_BOUNDARY_VENDOR_GUARD_UNEXPECTED:engine/bodygraph")
 
     pure_modules: set[str] = set()
@@ -1857,13 +1863,13 @@ def build_adapter_boundary_proof(produced: str, source_selection: dict[str, Any]
         if call in {"emit_public", "emit_public_with_envelope", "emit_reader_public_bytes", "emit_reader_public_envelope", "emit_fn"}
         or any(call.endswith(f".{presenter_call}") for presenter_call in {"emit_public", "emit_public_with_envelope", "emit_reader_public_bytes", "emit_reader_public_envelope", "emit_fn"})
     )
-    presenter_bypass = _adapter_presenter_bypass_routes(ADAPTER_BOUNDARY_ADAPTER_LOCI)
+    presenter_bypass = boundary_analyzer._adapter_presenter_bypass_routes(ADAPTER_BOUNDARY_ADAPTER_LOCI)
     presenter_uses_emitter = bool(adapter_presenter_calls) and not presenter_bypass
-    pure_external_io = _pure_compute_external_io(ADAPTER_BOUNDARY_PURE_COMPUTE_LOCI)
+    pure_external_io = boundary_analyzer._pure_compute_external_io(ADAPTER_BOUNDARY_PURE_COMPUTE_LOCI)
     second_http_home = sorted(module for module in vendor_modules if _is_http_home_module(module))
-    adapter_bypass = _adapter_external_io_calls(ADAPTER_BOUNDARY_ADAPTER_LOCI)
-    ad_hoc_serializers = _ad_hoc_json_serializers(ADAPTER_BOUNDARY_ADAPTER_LOCI + ADAPTER_BOUNDARY_VENDOR_SEAM_LOCI + ADAPTER_BOUNDARY_PRESENTER_LOCI)
-    unsupported_scope_claims = _unsupported_scope_claims(source_selection, request_shaping, response_mapping)
+    adapter_bypass = boundary_analyzer._adapter_external_io_calls(ADAPTER_BOUNDARY_ADAPTER_LOCI)
+    ad_hoc_serializers = boundary_analyzer._ad_hoc_json_serializers(ADAPTER_BOUNDARY_ADAPTER_LOCI + ADAPTER_BOUNDARY_VENDOR_SEAM_LOCI + ADAPTER_BOUNDARY_PRESENTER_LOCI)
+    unsupported_scope_claims = boundary_analyzer._unsupported_scope_claims(source_selection, request_shaping, response_mapping)
 
     checks = {
         "adapter_http_home_inspected": bool(adapter_http_modules),
