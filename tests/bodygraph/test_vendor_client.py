@@ -166,7 +166,7 @@ def test_default_request_returns_redirect_status_without_following(monkeypatch: 
 
 def test_default_request_refuses_unless_both_open_rails_flags_are_set(monkeypatch: pytest.MonkeyPatch) -> None:
     req = urlrequest.Request("https://vendor.test/v1/bodygraphs", data=b"{}\n", method="POST")
-    for safe_mode, allow_network in [("1", "0"), ("0", "0"), (None, "0"), (None, None)]:
+    for safe_mode, allow_network in [("1", "0"), ("0", "0"), (None, "1"), (None, "0"), (None, None)]:
         monkeypatch.delenv("SAFE_MODE", raising=False)
         monkeypatch.delenv("ALLOW_NETWORK", raising=False)
         if safe_mode is not None:

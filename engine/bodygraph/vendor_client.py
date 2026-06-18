@@ -662,10 +662,10 @@ class HdApiClient:
 
     @staticmethod
     def _default_request(req: urlrequest.Request, timeout: float) -> tuple[int, bytes, Mapping[str, str]]:
-        safe_mode = (os.environ.get("SAFE_MODE") or "").strip().lower() in {"1", "true", "yes", "on"}
-        allow_network = (os.environ.get("ALLOW_NETWORK") or "").strip().lower() in {"1", "true", "yes", "on"}
-        if safe_mode or not allow_network:
-            raise VendorError("PROVIDER_REFUSED", "Vendor source refused unless SAFE_MODE=0 and ALLOW_NETWORK=1", details={"SAFE_MODE": safe_mode, "ALLOW_NETWORK": allow_network})
+        safe_mode = (os.environ.get("SAFE_MODE") or "").strip()
+        allow_network = (os.environ.get("ALLOW_NETWORK") or "").strip()
+        if safe_mode != "0" or allow_network != "1":
+            raise VendorError("PROVIDER_REFUSED", "Vendor source refused unless SAFE_MODE=0 and ALLOW_NETWORK=1", details={"SAFE_MODE": safe_mode or "UNSET", "ALLOW_NETWORK": allow_network or "UNSET"})
         opener = urlrequest.build_opener(_NoRedirectHandler())
         try:
             with opener.open(req, timeout=timeout) as resp:  # type: ignore[arg-type]
