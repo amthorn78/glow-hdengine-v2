@@ -1237,6 +1237,20 @@ def _adapter_external_io_calls(loci: tuple[str, ...]) -> list[str]:
     for rel in loci:
         _path, _text, tree = _python_source(rel)
         aliases = _import_aliases(tree)
+        client_roots: set[str] = set()
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Assign) or not isinstance(node.value, ast.Call):
+                continue
+            ctor_chain = _attribute_chain(node.value.func)
+            ctor_root = _root_name(node.value.func)
+            ctor_target = aliases.get(ctor_root or "", ctor_root or "")
+            if (
+                ctor_target.startswith(("requests", "httpx", "urllib3"))
+                and (ctor_chain.endswith((".Session", ".Client", ".PoolManager")) or ctor_target.endswith((".Session", ".Client", ".PoolManager")))
+            ):
+                for target_node in node.targets:
+                    if isinstance(target_node, ast.Name):
+                        client_roots.add(target_node.id)
         for node in ast.walk(tree):
             if not isinstance(node, ast.Call):
                 continue
@@ -1246,6 +1260,8 @@ def _adapter_external_io_calls(loci: tuple[str, ...]) -> list[str]:
             attr = chain.rsplit(".", 1)[-1] if chain else ""
             target_attr = target.rsplit(".", 1)[-1] if target else ""
             if (target.startswith("socket") and attr in {"create_connection", "socket"}) or (target.startswith("subprocess") and attr in {"run", "Popen", "call"}):
+                findings.append(f"{rel}:{chain}")
+            elif root in client_roots and attr in http_methods:
                 findings.append(f"{rel}:{chain}")
             elif target in forbidden_modules or any(target.startswith(f"{module}.") for module in forbidden_modules):
                 if attr in http_methods or target_attr in http_methods or chain.endswith((".Client", ".PoolManager")) or ".Client." in chain or ".PoolManager." in chain:
@@ -1301,8 +1317,10 @@ def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
     bypass_calls = {"jsonify", "json.dumps", "json.dump", "dumps", "dump"}
     for rel in loci:
         _path, _text, tree = _python_source(rel)
+        aliases = _import_aliases(tree)
         function_defs = {node.name: node for node in ast.walk(tree) if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))}
         function_calls: dict[str, set[str]] = {}
+        function_return_calls: dict[str, set[str]] = {}
         direct_presenter: set[str] = set()
         direct_bypass: set[str] = set()
         route_functions: set[str] = set()
@@ -1328,6 +1346,18 @@ def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
                     names.add(_attribute_chain(func))
             return names
 
+        def return_call_names(fn: ast.FunctionDef | ast.AsyncFunctionDef) -> set[str]:
+            names: set[str] = set()
+            for node in iter_body_nodes(fn):
+                if not isinstance(node, ast.Return) or node.value is None:
+                    continue
+                value = node.value
+                if isinstance(value, ast.Tuple):
+                    value = value.elts[0] if value.elts else value
+                if isinstance(value, ast.Call):
+                    names.add(_attribute_chain(value.func))
+            return names
+
         def node_is_jsonish(value: ast.AST) -> bool:
             if isinstance(value, (ast.Dict, ast.List)):
                 return True
@@ -1336,13 +1366,25 @@ def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
                 return stripped.startswith("{") or stripped.startswith("[")
             if isinstance(value, ast.Call):
                 call_name = _attribute_chain(value.func)
-                if call_name in {"json.dumps", "dumps", "jsonify", "make_response", "current_app.json.response"} or call_name.endswith((".jsonify", ".json.response", ".dumps")):
+                root = _root_name(value.func)
+                target = aliases.get(root or "", root or "")
+                if (
+                    call_name in {"json.dumps", "dumps", "jsonify", "make_response", "current_app.json.response"}
+                    or target in {"flask.jsonify", "flask.make_response", "json.dumps"}
+                    or call_name.endswith((".jsonify", ".json.response", ".dumps"))
+                ):
                     return True
                 return False
             return False
 
         def function_has_bypass(fn: ast.FunctionDef | ast.AsyncFunctionDef, calls: set[str]) -> bool:
-            if any(call in bypass_calls or call.endswith((".jsonify", ".json.response", ".dumps", ".dump")) or call == "make_response" for call in calls):
+            if any(
+                call in bypass_calls
+                or aliases.get(call, "") in {"flask.jsonify", "flask.make_response", "json.dumps", "json.dump"}
+                or call.endswith((".jsonify", ".json.response", ".dumps", ".dump"))
+                or call == "make_response"
+                for call in calls
+            ):
                 return True
             for node in iter_body_nodes(fn):
                 if isinstance(node, ast.Return) and node.value is not None and node_is_jsonish(node.value):
@@ -1356,18 +1398,15 @@ def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
         for name, fn in function_defs.items():
             calls = direct_call_names(fn)
             function_calls[name] = calls
+            function_return_calls[name] = return_call_names(fn)
             if any(call in presenter_calls or call.endswith(".emit_public") for call in calls):
                 direct_presenter.add(name)
             for deco in fn.decorator_list:
                 deco_name = _attribute_chain(deco.func if isinstance(deco, ast.Call) else deco)
-                if deco_name.endswith((".route", ".get", ".post", ".put", ".patch", ".delete", ".before_app_request", ".errorhandler")):
+                if deco_name.endswith((".route", ".get", ".post", ".put", ".patch", ".delete", ".before_app_request", ".before_request", ".errorhandler")):
                     route_functions.add(name)
         for name, fn in function_defs.items():
-            if function_has_bypass(fn, function_calls[name]) and (
-                name in route_functions
-                or any(call in function_calls[name] for call in {"jsonify", "make_response", "current_app.json.response", "Response"})
-                or any(call.endswith((".jsonify", ".json.response")) for call in function_calls[name])
-            ):
+            if function_has_bypass(fn, function_calls[name]):
                 direct_bypass.add(name)
 
         reaches_presenter: dict[str, bool] = {}
@@ -1400,7 +1439,7 @@ def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
                 reaches_bypass[name] = False
                 return False
             seen.add(name)
-            result = any(callee in function_defs and reaches_direct_bypass(callee, seen) for callee in function_calls.get(name, set()))
+            result = any(callee in function_defs and reaches_direct_bypass(callee, seen) for callee in function_return_calls.get(name, set()))
             reaches_bypass[name] = result
             return result
 

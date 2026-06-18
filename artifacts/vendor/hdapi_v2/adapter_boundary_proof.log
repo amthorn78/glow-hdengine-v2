@@ -1,4 +1,4 @@
-generated_at_utc=2026-06-18T06:21:15Z
+generated_at_utc=2026-06-18T06:42:15Z
 scope=HDE-EPIC034 PR-04 adapter/presenter boundary proof for HDE-FERM007.4
 rails=ALLOW_NETWORK=0 LANG=C LC_ALL=C SAFE_MODE=1 TZ=UTC
 observed_adapter_http_home_posture=adapter package owns Flask HTTP home; v2 vendor seam did not add a second HTTP home
