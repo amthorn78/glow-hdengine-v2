@@ -517,6 +517,13 @@ EPIC034_PR02_SUPERSEDED_INDEX_KEYS = {
     ("epic034.pr02.request_shaping_check", "audit/qa/hde-epic034/pr-02/request_shaping_check.log"),
 }
 
+EPIC034_PR03_SUPERSEDED_INDEX_KEYS = {
+    ("hdapi_v2.response_mapping", "artifacts/vendor/hdapi_v2/response_mapping.snapshot.json"),
+    ("epic034.pr03.response_mapping_check", "audit/qa/hde-epic034/pr-03/response_mapping_check.log"),
+    ("epic034.pr03.doc_deltas", "audit/docdeltas/hde-epic034_doc_deltas.md"),
+    ("epic034.pr03.qa_meta_doc_deltas", "audit/qa/hde-epic034/00_meta/doc_deltas.md"),
+}
+
 EPIC032_PR03_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
         "artifact_key": "db_bridge.adapter_selection.snapshot",
@@ -1167,6 +1174,8 @@ def _load_human_index() -> list[dict[str, object]]:
         not in EPIC034_PR01_SUPERSEDED_INDEX_KEYS
         and (entry.get("artifact_key"), entry.get("discovered_physical_path"))
         not in EPIC034_PR02_SUPERSEDED_INDEX_KEYS
+        and (entry.get("artifact_key"), entry.get("discovered_physical_path"))
+        not in EPIC034_PR03_SUPERSEDED_INDEX_KEYS
     ]
     return _dedupe_entries(
         [

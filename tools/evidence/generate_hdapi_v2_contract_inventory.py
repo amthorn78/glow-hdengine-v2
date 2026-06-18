@@ -96,6 +96,13 @@ V1_BODYGRAPH_ROUTES = [
     ("POST", "/v1/bodygraphs", "legacy_full_bodygraph"),
     ("POST", "/v1/bodygraphs/simple", "legacy_simple_bodygraph"),
 ]
+RESPONSE_MAPPING_REQUIRED_STANDARD_FIELDS = ("success", "errorCode", "type", "data")
+RESPONSE_MAPPING_INTERNAL_LOCI = (
+    "engine/bodygraph/vendor_client.py",
+    "engine/bodygraph/ingest.py",
+    "engine/bodygraph/resolver.py",
+    "engine/compat/compute.py",
+)
 
 
 
@@ -338,6 +345,27 @@ def success_envelope(method: dict[str, Any], *, version: str) -> str:
     return f"flat JSON {refs[-1]}; no v2 StandardResponse envelope"
 
 
+def standard_response_fields(spec: dict[str, Any], *, version: str) -> list[str]:
+    if version != "v2":
+        return []
+    schema = spec.get("components", {}).get("schemas", {}).get("StandardResponse")
+    if not isinstance(schema, dict):
+        raise ValueError("MISSING_STANDARD_RESPONSE_SCHEMA")
+    required = schema.get("required")
+    properties = schema.get("properties")
+    if not isinstance(required, list) or not all(isinstance(item, str) for item in required):
+        raise ValueError("STANDARD_RESPONSE_REQUIRED_FIELDS_MISSING")
+    if not isinstance(properties, dict):
+        raise ValueError("STANDARD_RESPONSE_PROPERTIES_MISSING")
+    missing = [
+        field for field in RESPONSE_MAPPING_REQUIRED_STANDARD_FIELDS
+        if field not in required or field not in properties
+    ]
+    if missing:
+        raise ValueError(f"STANDARD_RESPONSE_FIELDS_MISSING:{','.join(missing)}")
+    return required
+
+
 def collect_error_codes(value: Any) -> list[str]:
     codes: set[str] = set()
     if isinstance(value, str):
@@ -429,6 +457,7 @@ def validate_openapi_spec(name: str, spec: dict[str, Any], *, expected_title: st
             content_type_and_schema(method)
             security_names(method)
             success_envelope(method, version="v2" if "v2" in name else "v1")
+            standard_response_fields(spec, version="v2" if "v2" in name else "v1")
             checks.append((f"path_{path}_post_contract", True))
         except ValueError:
             checks.append((f"path_{path}_post_contract", False))
@@ -489,6 +518,7 @@ def build_endpoint_rows(v2_spec: dict[str, Any], v1_spec: dict[str, Any], llms_f
         op = method_obj(spec, spec_path)
         request_content_type, schema_name = content_type_and_schema(op)
         request_fields = required_fields(spec, schema_name)
+        envelope_fields = standard_response_fields(spec, version=version)
         rows.append(
             {
                 "auth_model": auth_model(spec, op),
@@ -500,6 +530,7 @@ def build_endpoint_rows(v2_spec: dict[str, Any], v1_spec: dict[str, Any], llms_f
                 "request_fields": ";".join(request_fields),
                 "route_family": "recommended_v2_chart" if version == "v2" else "legacy_v1_bodygraph",
                 "source_spec": source_spec_for(full_path),
+                "response_envelope_fields": ";".join(envelope_fields) if envelope_fields else "not applicable",
                 "success_envelope": success_envelope(op, version=version),
                 "tier": tier_map[full_path],
             }
@@ -576,6 +607,11 @@ def build_contract_map(produced: str, fetched: dict[str, dict[str, Any]], rows: 
                 "path": row["path"],
                 "request_content_type": row["request_content_type"],
                 "request_fields": row["request_fields"].split(";"),
+                "response_envelope_fields": (
+                    row["response_envelope_fields"].split(";")
+                    if row["response_envelope_fields"] != "not applicable"
+                    else "not applicable"
+                ),
                 "route_family": row["route_family"],
                 "source_precedence_rank": 1,
                 "source_sha256": fetched[source_key]["sha256"],
@@ -938,6 +974,31 @@ def _response_data_schema_from_success_envelope(route: dict[str, Any]) -> str:
     return envelope.rsplit(" and data=", 1)[1]
 
 
+def _response_mapping_envelope_fields(route: dict[str, Any]) -> list[str]:
+    fields = route.get("response_envelope_fields")
+    if not isinstance(fields, list) or not all(isinstance(item, str) for item in fields):
+        raise ValueError(f"RESPONSE_MAPPING_ENVELOPE_FIELDS_MISSING:{route.get('path')}")
+    missing = [field for field in RESPONSE_MAPPING_REQUIRED_STANDARD_FIELDS if field not in fields]
+    if missing:
+        raise ValueError(f"RESPONSE_MAPPING_ENVELOPE_FIELDS_MISSING:{route.get('path')}:{','.join(missing)}")
+    return fields
+
+
+def _response_mapping_internal_loci() -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for rel in RESPONSE_MAPPING_INTERNAL_LOCI:
+        path = ROOT / rel
+        if not path.is_file():
+            raise ValueError(f"RESPONSE_MAPPING_INTERNAL_LOCUS_MISSING:{rel}")
+        text = path.read_text(encoding="utf-8")
+        if rel.startswith("engine/bodygraph/") and "bodygraph" not in text.lower():
+            raise ValueError(f"RESPONSE_MAPPING_INTERNAL_LOCUS_UNEXPECTED:{rel}")
+        if rel == "engine/compat/compute.py" and "compat" not in text.lower():
+            raise ValueError(f"RESPONSE_MAPPING_INTERNAL_LOCUS_UNEXPECTED:{rel}")
+        rows.append({"path": rel, "sha256": _sha256_path(path)})
+    return rows
+
+
 def build_response_mapping_snapshot(
     produced: str,
     contract: dict[str, Any],
@@ -949,6 +1010,7 @@ def build_response_mapping_snapshot(
     _validate_ops01_fact_summary(ops_summary)
     if request_shaping.get("route_family") != "recommended_v2_chart":
         raise ValueError("RESPONSE_MAPPING_REQUEST_SHAPING_BASELINE_DRIFT")
+    inspected_internal_loci = _response_mapping_internal_loci()
     shaped_by_path = {row.get("endpoint_path"): row for row in request_shaping.get("routes", []) if isinstance(row, dict)}
     expected_response_schemas = {
         "/v2/charts": ("ChartResult", "ChartResult"),
@@ -965,6 +1027,7 @@ def build_response_mapping_snapshot(
             raise ValueError(f"RESPONSE_MAPPING_ROUTE_FAMILY_MISMATCH:{path}")
         response_type = _response_type_from_success_envelope(contract_route)
         data_schema = _response_data_schema_from_success_envelope(contract_route)
+        envelope_fields = _response_mapping_envelope_fields(contract_route)
         expected_response_type, expected_data_schema = expected_response_schemas[path]
         if response_type != expected_response_type or data_schema != expected_data_schema:
             raise ValueError(
@@ -980,6 +1043,7 @@ def build_response_mapping_snapshot(
                 "errorCode_handling": "preserve StandardResponse.errorCode as envelope error_code posture; no retry/rate-limit mapping is claimed in PR-03",
                 "method": method,
                 "response_type": response_type,
+                "response_envelope_fields": envelope_fields,
                 "route_family": "recommended_v2_chart",
                 "route_variant": variant,
                 "source_spec": contract_route.get("source_spec"),
@@ -1025,6 +1089,7 @@ def build_response_mapping_snapshot(
             "request_shaping_snapshot": {"path": "artifacts/vendor/hdapi_v2/request_shaping.snapshot.json", "sha256": sha256_bytes(canonical_json_bytes(request_shaping))},
             "source_selection_snapshot": {"path": "artifacts/vendor/hdapi_v2/source_selection.snapshot.json", "sha256": sha256_bytes(canonical_json_bytes(source_selection))},
         },
+        "inspected_internal_loci": inspected_internal_loci,
         "internal_target_posture": internal_target_posture,
         "live_vendor_call_claim": "NONE",
         "no_ai_transformation_posture": "no AI interpretation, model-generated transformation, prompt, embedding, chatbot, model call, or AI-provider credential is introduced",
@@ -1051,11 +1116,12 @@ def build_response_mapping_check_log(produced: str, snapshot: dict[str, Any], *,
         ("closed_rails_generation", mode == "closed-rails-source-cache" and closed_rails_env_ok()),
         ("no_live_vendor_call_attempted", snapshot.get("live_vendor_call_claim") == "NONE"),
         ("response_type_preservation", all(isinstance(row, dict) and row.get("response_type") in {"ChartResult", "ChartSimpleResult"} for row in routes)),
-        ("success_status_handling", snapshot.get("success_status_handling", "").startswith("StandardResponse.success")),
-        ("errorCode_handling", "errorCode" in snapshot.get("errorCode_handling", "")),
+        ("success_status_handling", snapshot.get("success_status_handling", "").startswith("StandardResponse.success") and all("success" in row.get("response_envelope_fields", []) for row in routes if isinstance(row, dict))),
+        ("errorCode_handling", "errorCode" in snapshot.get("errorCode_handling", "") and all("errorCode" in row.get("response_envelope_fields", []) for row in routes if isinstance(row, dict))),
         ("data_payload_identity_posture", snapshot.get("data_payload_body_emitted") is False and "identity" in snapshot.get("data_payload_identity_posture", "")),
         ("route_variant_preservation", {row.get("route_variant") for row in routes if isinstance(row, dict)} == {"full_chart", "simple_chart", "coordinates_chart"}),
         ("internal_target_posture_or_schema_gap_recorded", snapshot.get("schema_gap_status") == "GAP_RECORDED" and isinstance(snapshot.get("internal_target_posture"), dict)),
+        ("internal_loci_inspected", len(snapshot.get("inspected_internal_loci", [])) == len(RESPONSE_MAPPING_INTERNAL_LOCI)),
         ("no_compatibility_by_inference_claim", snapshot.get("no_compatibility_by_inference") is True),
         ("no_normalized_data_path_proof_claimed", snapshot.get("normalized_data_path_proof_claim") == "NONE"),
         ("no_vendor_payload_bodies_emitted", snapshot.get("no_vendor_payload_body_posture", "").startswith("fixture-backed proof")),
@@ -1119,7 +1185,7 @@ def write_endpoint_reference(rows: list[dict[str, str]]) -> bytes:
     from io import StringIO
 
     buf = StringIO()
-    fields = ["method", "path", "route_family", "auth_model", "geocode_key_requirement", "tier", "request_content_type", "request_fields", "success_envelope", "error_codes", "source_spec"]
+    fields = ["method", "path", "route_family", "auth_model", "geocode_key_requirement", "tier", "request_content_type", "request_fields", "response_envelope_fields", "success_envelope", "error_codes", "source_spec"]
     writer = csv.DictWriter(buf, fieldnames=fields, lineterminator="\n")
     writer.writeheader()
     for row in rows:

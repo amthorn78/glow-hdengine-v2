@@ -584,6 +584,27 @@ def test_epic034_pr02_stale_index_rows_are_removed_when_outputs_are_absent(monke
     assert ("keep", "artifacts/keep.txt") in keys
 
 
+def test_epic034_pr03_stale_index_rows_are_removed_when_outputs_are_absent(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    stale_payload = [
+        {"artifact_key": "hdapi_v2.response_mapping", "discovered_physical_path": "artifacts/vendor/hdapi_v2/response_mapping.snapshot.json"},
+        {"artifact_key": "epic034.pr03.response_mapping_check", "discovered_physical_path": "audit/qa/hde-epic034/pr-03/response_mapping_check.log"},
+        {"artifact_key": "epic034.pr03.doc_deltas", "discovered_physical_path": "audit/docdeltas/hde-epic034_doc_deltas.md"},
+        {"artifact_key": "epic034.pr03.qa_meta_doc_deltas", "discovered_physical_path": "audit/qa/hde-epic034/00_meta/doc_deltas.md"},
+        {"artifact_key": "keep", "discovered_physical_path": "artifacts/keep.txt"},
+    ]
+    index_path = tmp_path / "INDEX.json"
+    index_path.write_text(json.dumps(stale_payload), encoding="utf-8")
+    monkeypatch.setattr(indexer, "HUMAN_INDEX", index_path)
+    monkeypatch.setattr(indexer, "_load_epic034_pr03_entries", lambda: [])
+    loaded = indexer._load_human_index()
+    keys = {(entry["artifact_key"], entry["discovered_physical_path"]) for entry in loaded}
+    assert ("hdapi_v2.response_mapping", "artifacts/vendor/hdapi_v2/response_mapping.snapshot.json") not in keys
+    assert ("epic034.pr03.response_mapping_check", "audit/qa/hde-epic034/pr-03/response_mapping_check.log") not in keys
+    assert ("epic034.pr03.doc_deltas", "audit/docdeltas/hde-epic034_doc_deltas.md") not in keys
+    assert ("epic034.pr03.qa_meta_doc_deltas", "audit/qa/hde-epic034/00_meta/doc_deltas.md") not in keys
+    assert ("keep", "artifacts/keep.txt") in keys
+
+
 def test_epic034_pr02_request_shaping_check_index_row_does_not_claim_tests_pass() -> None:
     rows = {entry["artifact_key"]: entry for entry in indexer.EPIC034_PR02_PRIMARY_ARTIFACTS}
 
@@ -627,6 +648,7 @@ def test_epic034_response_mapping_preserves_envelope_fields_and_route_variants()
     assert routes["/v2/charts/coordinates"]["response_type"] == "ChartResult"
     assert routes["/v2/charts/coordinates"]["route_variant"] == "coordinates_chart"
     for route in routes.values():
+        assert set(["success", "errorCode", "type", "data"]) <= set(route["response_envelope_fields"])
         assert "StandardResponse.success" in route["success_status_handling"]
         assert "StandardResponse.errorCode" in route["errorCode_handling"]
         assert route["data_payload_identity_posture"].startswith("preserve data object identity")
@@ -653,7 +675,7 @@ def test_epic034_response_mapping_check_log_exists_and_passes() -> None:
         "closed_rails_generation", "no_live_vendor_call_attempted", "response_type_preservation",
         "success_status_handling", "errorCode_handling", "data_payload_identity_posture",
         "route_variant_preservation", "internal_target_posture_or_schema_gap_recorded",
-        "no_compatibility_by_inference_claim", "no_normalized_data_path_proof_claimed",
+        "internal_loci_inspected", "no_compatibility_by_inference_claim", "no_normalized_data_path_proof_claimed",
         "no_vendor_payload_bodies_emitted", "no_secret_values_emitted",
     ]:
         assert f"[{check}] status=PASS" in log
@@ -685,6 +707,38 @@ def test_epic034_response_mapping_rejects_route_specific_schema_drift_with_allow
             route["success_envelope"] = "StandardResponse with type=ChartResult and data=ChartResult"
     with pytest.raises(ValueError, match="RESPONSE_MAPPING_ROUTE_SCHEMA_MISMATCH:/v2/charts/simple"):
         generator.build_response_mapping_snapshot("2026-06-18T00:00:00Z", broken, source_selection, request_shaping, ops)
+
+
+def test_epic034_response_mapping_rejects_missing_standard_response_fields() -> None:
+    contract = _assert_canonical_json(VENDOR_DIR / "contract_map.json")
+    source_selection = _assert_canonical_json(VENDOR_DIR / "source_selection.snapshot.json")
+    request_shaping = _assert_canonical_json(VENDOR_DIR / "request_shaping.snapshot.json")
+    ops = json.loads((ROOT / "audit" / "ops" / "hde-epic034" / "ops-01" / "fact_summary.json").read_text(encoding="utf-8"))
+    broken = copy.deepcopy(contract)
+    for route in broken["route_families"]:
+        if route["path"] == "/v2/charts":
+            route["response_envelope_fields"] = ["timestamp", "message", "type", "data"]
+    with pytest.raises(ValueError, match="RESPONSE_MAPPING_ENVELOPE_FIELDS_MISSING:/v2/charts:success,errorCode"):
+        generator.build_response_mapping_snapshot("2026-06-18T00:00:00Z", broken, source_selection, request_shaping, ops)
+
+
+def test_epic034_contract_inventory_rejects_standard_response_field_drift() -> None:
+    metadata, bodies = generator.load_source_cache()
+    spec = generator.parse_yaml_openapi(bodies["v2_routes_yaml"], "v2-routes.yaml")
+    spec["components"]["schemas"]["StandardResponse"]["required"].remove("success")
+    with pytest.raises(ValueError, match="STANDARD_RESPONSE_FIELDS_MISSING:success"):
+        generator.standard_response_fields(spec, version="v2")
+
+
+def test_epic034_response_mapping_fails_when_internal_locus_missing(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    missing = "engine/bodygraph/missing_for_response_mapping.py"
+    monkeypatch.setattr(generator, "RESPONSE_MAPPING_INTERNAL_LOCI", (missing,))
+    contract = _assert_canonical_json(VENDOR_DIR / "contract_map.json")
+    source_selection = _assert_canonical_json(VENDOR_DIR / "source_selection.snapshot.json")
+    request_shaping = _assert_canonical_json(VENDOR_DIR / "request_shaping.snapshot.json")
+    ops = json.loads((ROOT / "audit" / "ops" / "hde-epic034" / "ops-01" / "fact_summary.json").read_text(encoding="utf-8"))
+    with pytest.raises(ValueError, match="RESPONSE_MAPPING_INTERNAL_LOCUS_MISSING"):
+        generator.build_response_mapping_snapshot("2026-06-18T00:00:00Z", contract, source_selection, request_shaping, ops)
 
 
 def test_epic034_pr03_response_mapping_index_rows_use_approved_tokens_only() -> None:
