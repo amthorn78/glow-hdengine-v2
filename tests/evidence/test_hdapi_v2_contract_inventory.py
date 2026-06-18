@@ -2377,6 +2377,155 @@ def unused():
     finally:
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
 
+
+def test_epic034_vendor_external_io_detects_alias_imports() -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from urllib.request import urlopen as open_url
+from requests import get as rget
+
+def first():
+    return open_url('https://vendor.test')
+
+def second():
+    return rget('https://vendor.test')
+"""
+    try:
+        rel = _write_boundary_temp(rel_dir, "vendor_alias_io.py", body)
+        findings = boundary_analyzer._vendor_external_io_functions((rel,))
+        assert f"{rel}:first:open_url" in findings
+        assert f"{rel}:second:rget" in findings
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_adapter_boundary_does_not_trust_unresolved_emit_fn(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask
+app = Flask(__name__)
+def emit_fn(payload):
+    return 'plain'
+@app.route('/bad')
+def bad():
+    return emit_fn({'ok': False})
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "fake_emit_fn.py", body)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", tuple(boundary_analyzer._adapter_public_route_signatures((adapter,))))
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_presenter_bypass"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_adapter_boundary_fails_closed_on_after_request_replacement(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+@app.after_request
+def replace(resp):
+    return 'raw replacement'
+@app.route('/good')
+def good():
+    return emit_public({'ok': True})
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "raw_after_request.py", body)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", tuple(boundary_analyzer._adapter_public_route_signatures((adapter,))))
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_presenter_bypass"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_adapter_boundary_distinguishes_duplicate_nested_handler_names(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask, Blueprint
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+def first_bp():
+    bp = Blueprint('first', __name__)
+    @bp.route('/first')
+    def index():
+        return emit_public({'ok': True})
+    return bp
+def second_bp():
+    bp = Blueprint('second', __name__)
+    @bp.route('/second')
+    def index():
+        return 'raw duplicate handler'
+    return bp
+app.register_blueprint(first_bp())
+app.register_blueprint(second_bp())
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "duplicate_nested_index.py", body)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", tuple(boundary_analyzer._adapter_public_route_signatures((adapter,))))
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_presenter_bypass"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_adapter_boundary_rejects_empty_get_response_without_transport_context(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask, Response
+app = Flask(__name__)
+@app.get('/empty')
+def empty():
+    return Response(b'', status=503)
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "empty_get_response.py", body)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", tuple(boundary_analyzer._adapter_public_route_signatures((adapter,))))
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_presenter_bypass"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_adapter_boundary_rejects_unscoped_errorhandler_returning_err(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+@app.errorhandler(404)
+def missing(err):
+    if False:
+        return emit_public({'ok': False})
+    return err
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "unscoped_errorhandler_err.py", body)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", tuple(boundary_analyzer._adapter_public_route_signatures((adapter,))))
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_presenter_bypass"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
 def test_epic034_adapter_boundary_fails_closed_when_repointed_route_loci_drift(monkeypatch: pytest.MonkeyPatch) -> None:
     import shutil
 

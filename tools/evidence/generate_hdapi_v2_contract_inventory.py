@@ -1355,7 +1355,7 @@ def _adapter_external_io_calls(loci: tuple[str, ...]) -> list[str]:
             root = _root_name(node.func)
             target = aliases.get(root or "", root or "")
             attr = chain.rsplit(".", 1)[-1] if chain else ""
-            target_attr = target.rsplit(".", 1)[-1] if target else ""
+            target_attr = target.rsplit(".", 1)[-1] if target and chain == (root or "") else ""
             receiver = chain.rsplit(".", 1)[0] if "." in chain else root or ""
             if (target.startswith("socket") and attr in {"create_connection", "socket"}) or (target.startswith("subprocess") and attr in {"run", "Popen", "call", "check_call", "check_output"}):
                 findings.append(f"{rel}:{chain}")
@@ -1780,10 +1780,12 @@ def _vendor_external_io_functions(loci: tuple[str, ...]) -> list[str]:
             root = _root_name(node.func)
             target = aliases.get(root or "", root or "")
             attr = chain.rsplit(".", 1)[-1] if chain else ""
+            target_attr = target.rsplit(".", 1)[-1] if target and chain == (root or "") else ""
             receiver = chain.rsplit(".", 1)[0] if "." in chain else root or ""
             shell_or_socket_methods = {"create_connection", "socket", "run", "Popen", "call", "check_call", "check_output", "system", "popen"}
+            http_method_names = http_methods | {"build_opener", "ClientSession"}
             is_external = (
-                (target.startswith(("urllib.request", "requests", "httpx", "urllib3", "http.client", "aiohttp")) and attr in http_methods | {"build_opener", "ClientSession"})
+                (target.startswith(("urllib.request", "requests", "httpx", "urllib3", "http.client", "aiohttp")) and (attr in http_method_names or target_attr in http_method_names))
                 or (root in opener_roots and attr == "open")
                 or (receiver in opener_roots and attr == "open")
                 or (root in client_roots and attr in http_methods)
