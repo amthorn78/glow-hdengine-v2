@@ -35,14 +35,24 @@ DOC_DELTAS = ROOT / "audit" / "docdeltas" / "hde-epic033_doc_deltas.md"
 QA_DOC_DELTAS = ROOT / "audit" / "qa" / "hde-epic033" / "00_meta" / "doc_deltas.md"
 EPIC034_QA = ROOT / "audit" / "qa" / "hde-epic034" / "pr-01"
 EPIC034_PR02_QA = ROOT / "audit" / "qa" / "hde-epic034" / "pr-02"
+EPIC034_PR03_QA = ROOT / "audit" / "qa" / "hde-epic034" / "pr-03"
 REQUEST_SHAPING_SNAPSHOT = OUT / "request_shaping.snapshot.json"
 REQUEST_SHAPING_CHECK_LOG = EPIC034_PR02_QA / "request_shaping_check.log"
+RESPONSE_MAPPING_SNAPSHOT = OUT / "response_mapping.snapshot.json"
+RESPONSE_MAPPING_CHECK_LOG = EPIC034_PR03_QA / "response_mapping_check.log"
 REQUEST_SHAPING_OUTPUTS = (
     REQUEST_SHAPING_SNAPSHOT,
     REQUEST_SHAPING_SNAPSHOT.with_suffix(REQUEST_SHAPING_SNAPSHOT.suffix + ".path_proof.txt"),
     REQUEST_SHAPING_CHECK_LOG,
     REQUEST_SHAPING_CHECK_LOG.with_suffix(REQUEST_SHAPING_CHECK_LOG.suffix + ".path_proof.txt"),
 )
+RESPONSE_MAPPING_OUTPUTS = (
+    RESPONSE_MAPPING_SNAPSHOT,
+    RESPONSE_MAPPING_SNAPSHOT.with_suffix(RESPONSE_MAPPING_SNAPSHOT.suffix + ".path_proof.txt"),
+    RESPONSE_MAPPING_CHECK_LOG,
+    RESPONSE_MAPPING_CHECK_LOG.with_suffix(RESPONSE_MAPPING_CHECK_LOG.suffix + ".path_proof.txt"),
+)
+EPIC034_CLOSED_RAILS_DERIVED_OUTPUTS = REQUEST_SHAPING_OUTPUTS + RESPONSE_MAPPING_OUTPUTS
 CLOSED_RAILS_ENV = {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}
 SOURCE_SELECTION_SNAPSHOT = OUT / "source_selection.snapshot.json"
 V1_LEGACY_GUARD_LOG = OUT / "v1_legacy_guard.log"
@@ -86,6 +96,13 @@ V1_BODYGRAPH_ROUTES = [
     ("POST", "/v1/bodygraphs", "legacy_full_bodygraph"),
     ("POST", "/v1/bodygraphs/simple", "legacy_simple_bodygraph"),
 ]
+RESPONSE_MAPPING_REQUIRED_STANDARD_FIELDS = ("success", "errorCode", "type", "data")
+RESPONSE_MAPPING_INTERNAL_LOCI = (
+    "engine/bodygraph/vendor_client.py",
+    "engine/bodygraph/ingest.py",
+    "engine/bodygraph/resolver.py",
+    "engine/compat/compute.py",
+)
 
 
 
@@ -104,7 +121,7 @@ def require_closed_rails_for_request_shaping() -> None:
 
 
 def remove_request_shaping_outputs() -> None:
-    for path in REQUEST_SHAPING_OUTPUTS:
+    for path in EPIC034_CLOSED_RAILS_DERIVED_OUTPUTS:
         try:
             path.unlink()
         except FileNotFoundError:
@@ -328,6 +345,27 @@ def success_envelope(method: dict[str, Any], *, version: str) -> str:
     return f"flat JSON {refs[-1]}; no v2 StandardResponse envelope"
 
 
+def standard_response_fields(spec: dict[str, Any], *, version: str) -> list[str]:
+    if version != "v2":
+        return []
+    schema = spec.get("components", {}).get("schemas", {}).get("StandardResponse")
+    if not isinstance(schema, dict):
+        raise ValueError("MISSING_STANDARD_RESPONSE_SCHEMA")
+    required = schema.get("required")
+    properties = schema.get("properties")
+    if not isinstance(required, list) or not all(isinstance(item, str) for item in required):
+        raise ValueError("STANDARD_RESPONSE_REQUIRED_FIELDS_MISSING")
+    if not isinstance(properties, dict):
+        raise ValueError("STANDARD_RESPONSE_PROPERTIES_MISSING")
+    missing = [
+        field for field in RESPONSE_MAPPING_REQUIRED_STANDARD_FIELDS
+        if field not in required or field not in properties
+    ]
+    if missing:
+        raise ValueError(f"STANDARD_RESPONSE_FIELDS_MISSING:{','.join(missing)}")
+    return required
+
+
 def collect_error_codes(value: Any) -> list[str]:
     codes: set[str] = set()
     if isinstance(value, str):
@@ -419,6 +457,7 @@ def validate_openapi_spec(name: str, spec: dict[str, Any], *, expected_title: st
             content_type_and_schema(method)
             security_names(method)
             success_envelope(method, version="v2" if "v2" in name else "v1")
+            standard_response_fields(spec, version="v2" if "v2" in name else "v1")
             checks.append((f"path_{path}_post_contract", True))
         except ValueError:
             checks.append((f"path_{path}_post_contract", False))
@@ -479,6 +518,7 @@ def build_endpoint_rows(v2_spec: dict[str, Any], v1_spec: dict[str, Any], llms_f
         op = method_obj(spec, spec_path)
         request_content_type, schema_name = content_type_and_schema(op)
         request_fields = required_fields(spec, schema_name)
+        envelope_fields = standard_response_fields(spec, version=version)
         rows.append(
             {
                 "auth_model": auth_model(spec, op),
@@ -490,6 +530,7 @@ def build_endpoint_rows(v2_spec: dict[str, Any], v1_spec: dict[str, Any], llms_f
                 "request_fields": ";".join(request_fields),
                 "route_family": "recommended_v2_chart" if version == "v2" else "legacy_v1_bodygraph",
                 "source_spec": source_spec_for(full_path),
+                "response_envelope_fields": ";".join(envelope_fields) if envelope_fields else "not applicable",
                 "success_envelope": success_envelope(op, version=version),
                 "tier": tier_map[full_path],
             }
@@ -566,6 +607,11 @@ def build_contract_map(produced: str, fetched: dict[str, dict[str, Any]], rows: 
                 "path": row["path"],
                 "request_content_type": row["request_content_type"],
                 "request_fields": row["request_fields"].split(";"),
+                "response_envelope_fields": (
+                    row["response_envelope_fields"].split(";")
+                    if row["response_envelope_fields"] != "not applicable"
+                    else "not applicable"
+                ),
                 "route_family": row["route_family"],
                 "source_precedence_rank": 1,
                 "source_sha256": fetched[source_key]["sha256"],
@@ -913,6 +959,186 @@ def build_request_shaping_check_log(produced: str, snapshot: dict[str, Any], *, 
     lines.append("status=PASS" if all(ok for _name, ok in checks) else "status=FAIL")
     return "\n".join(lines)
 
+
+def _response_type_from_success_envelope(route: dict[str, Any]) -> str:
+    envelope = route.get("success_envelope")
+    if not isinstance(envelope, str) or "StandardResponse with type=" not in envelope or " and data=" not in envelope:
+        raise ValueError(f"RESPONSE_MAPPING_ENVELOPE_MISSING:{route.get('path')}")
+    return envelope.split("StandardResponse with type=", 1)[1].split(" and data=", 1)[0]
+
+
+def _response_data_schema_from_success_envelope(route: dict[str, Any]) -> str:
+    envelope = route.get("success_envelope")
+    if not isinstance(envelope, str) or " and data=" not in envelope:
+        raise ValueError(f"RESPONSE_MAPPING_DATA_SCHEMA_MISSING:{route.get('path')}")
+    return envelope.rsplit(" and data=", 1)[1]
+
+
+def _response_mapping_envelope_fields(route: dict[str, Any]) -> list[str]:
+    fields = route.get("response_envelope_fields")
+    if not isinstance(fields, list) or not all(isinstance(item, str) for item in fields):
+        raise ValueError(f"RESPONSE_MAPPING_ENVELOPE_FIELDS_MISSING:{route.get('path')}")
+    missing = [field for field in RESPONSE_MAPPING_REQUIRED_STANDARD_FIELDS if field not in fields]
+    if missing:
+        raise ValueError(f"RESPONSE_MAPPING_ENVELOPE_FIELDS_MISSING:{route.get('path')}:{','.join(missing)}")
+    return fields
+
+
+def _response_mapping_internal_loci() -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for rel in RESPONSE_MAPPING_INTERNAL_LOCI:
+        path = ROOT / rel
+        if not path.is_file():
+            raise ValueError(f"RESPONSE_MAPPING_INTERNAL_LOCUS_MISSING:{rel}")
+        text = path.read_text(encoding="utf-8")
+        if rel.startswith("engine/bodygraph/") and "bodygraph" not in text.lower():
+            raise ValueError(f"RESPONSE_MAPPING_INTERNAL_LOCUS_UNEXPECTED:{rel}")
+        if rel == "engine/compat/compute.py" and "compat" not in text.lower():
+            raise ValueError(f"RESPONSE_MAPPING_INTERNAL_LOCUS_UNEXPECTED:{rel}")
+        rows.append({"path": rel, "sha256": _sha256_path(path)})
+    return rows
+
+
+def build_response_mapping_snapshot(
+    produced: str,
+    contract: dict[str, Any],
+    source_selection: dict[str, Any],
+    request_shaping: dict[str, Any],
+    ops_summary: dict[str, Any],
+) -> dict[str, Any]:
+    """Derive HDE-EPIC034 PR-03 proof-level v2 response-envelope mapping evidence."""
+    _validate_ops01_fact_summary(ops_summary)
+    if request_shaping.get("route_family") != "recommended_v2_chart":
+        raise ValueError("RESPONSE_MAPPING_REQUEST_SHAPING_BASELINE_DRIFT")
+    inspected_internal_loci = _response_mapping_internal_loci()
+    shaped_by_path = {row.get("endpoint_path"): row for row in request_shaping.get("routes", []) if isinstance(row, dict)}
+    expected_response_schemas = {
+        "/v2/charts": ("ChartResult", "ChartResult"),
+        "/v2/charts/simple": ("ChartSimpleResult", "ChartSimpleResult"),
+        "/v2/charts/coordinates": ("ChartResult", "ChartResult"),
+    }
+    route_mappings: list[dict[str, Any]] = []
+    for method, path, variant in V2_CHART_ROUTES:
+        contract_route = _route_by_path(contract, path)
+        shaped_route = shaped_by_path.get(path)
+        if not isinstance(shaped_route, dict) or shaped_route.get("route_variant") != variant:
+            raise ValueError(f"RESPONSE_MAPPING_REQUEST_ROUTE_MISSING:{path}")
+        if contract_route.get("route_family") != "recommended_v2_chart":
+            raise ValueError(f"RESPONSE_MAPPING_ROUTE_FAMILY_MISMATCH:{path}")
+        response_type = _response_type_from_success_envelope(contract_route)
+        data_schema = _response_data_schema_from_success_envelope(contract_route)
+        envelope_fields = _response_mapping_envelope_fields(contract_route)
+        expected_response_type, expected_data_schema = expected_response_schemas[path]
+        if response_type != expected_response_type or data_schema != expected_data_schema:
+            raise ValueError(
+                f"RESPONSE_MAPPING_ROUTE_SCHEMA_MISMATCH:{path}:"
+                f"type={response_type}:data={data_schema}:"
+                f"expected_type={expected_response_type}:expected_data={expected_data_schema}"
+            )
+        route_mappings.append(
+            {
+                "data_payload_identity_posture": "preserve data object identity by reference/digest posture only; vendor payload body is not emitted in proof artifacts",
+                "data_schema": data_schema,
+                "endpoint_path": path,
+                "errorCode_handling": "preserve StandardResponse.errorCode as envelope error_code posture; no retry/rate-limit mapping is claimed in PR-03",
+                "method": method,
+                "response_type": response_type,
+                "response_envelope_fields": envelope_fields,
+                "route_family": "recommended_v2_chart",
+                "route_variant": variant,
+                "source_spec": contract_route.get("source_spec"),
+                "success_status_handling": "preserve StandardResponse.success as boolean success status posture without claiming live runtime status",
+            }
+        )
+    internal_target_posture = {
+        "admin": {
+            "consumer_status": "inspected_evidence_only",
+            "mapping_result": "no_public_or_admin_runtime_behavior_change_claimed",
+            "proof_basis": "no new HTTP home, public route, flag, payload, response shape, or transport behavior is introduced",
+        },
+        "bodygraph": {
+            "consumer_status": "inspected engine.bodygraph.vendor_client, engine.bodygraph.ingest, and engine.bodygraph.resolver",
+            "mapping_result": "schema_gap_recorded",
+            "proof_basis": "existing ingest path is v1 BodyGraph-oriented and persists emitted payloads after vendor fetch; PR-03 does not add a ChartResult-to-BodyGraph adapter",
+        },
+        "cache": {
+            "consumer_status": "inspected hde.body_graphs persistence path through engine.bodygraph.ingest",
+            "mapping_result": "not_truthfully_proven_for_v2_chart_data",
+            "proof_basis": "opaque JSON persistence mechanics exist for the v1 vendor path, but v2 ChartResult/cache compatibility is not claimed without adapter proof",
+        },
+        "compatibility": {
+            "consumer_status": "inspected engine.compat.compute person/bodygraph input helpers",
+            "mapping_result": "schema_gap_recorded",
+            "proof_basis": "compat/conjunction helpers consume person_uid-style resolved BodyGraph/person inputs; v2 ChartResult data is not proven to provide that internal shape",
+        },
+        "sampler": {
+            "consumer_status": "inspected as non-public/dev evidence boundary",
+            "mapping_result": "no_runtime_feed_claimed",
+            "proof_basis": "sampler/admin/public surfaces are not changed by this proof-level mapping slice",
+        },
+    }
+    return {
+        "ai_scope_claim": "NONE",
+        "data_payload_body_emitted": False,
+        "data_payload_identity_posture": "identity is proven only as an envelope data-field preservation posture; no vendor payload body is serialized",
+        "errorCode_handling": "StandardResponse.errorCode is preserved as nullable/defined envelope error-code posture in proof rows; follow-up retry/rate-limit mapping is out of scope",
+        "generated_at_utc": produced,
+        "input_references": {
+            "contract_map": {"path": "artifacts/vendor/hdapi_v2/contract_map.json", "sha256": sha256_bytes(canonical_json_bytes(contract))},
+            "ops01_fact_summary": {"path": "audit/ops/hde-epic034/ops-01/fact_summary.json", "sha256": _sha256_path(ROOT / "audit/ops/hde-epic034/ops-01/fact_summary.json")},
+            "request_shaping_snapshot": {"path": "artifacts/vendor/hdapi_v2/request_shaping.snapshot.json", "sha256": sha256_bytes(canonical_json_bytes(request_shaping))},
+            "source_selection_snapshot": {"path": "artifacts/vendor/hdapi_v2/source_selection.snapshot.json", "sha256": sha256_bytes(canonical_json_bytes(source_selection))},
+        },
+        "inspected_internal_loci": inspected_internal_loci,
+        "internal_target_posture": internal_target_posture,
+        "live_vendor_call_claim": "NONE",
+        "no_ai_transformation_posture": "no AI interpretation, model-generated transformation, prompt, embedding, chatbot, model call, or AI-provider credential is introduced",
+        "no_compatibility_by_inference": True,
+        "no_secret_values_posture": "only secret-safe env var/header names and redacted postures are recorded",
+        "no_vendor_payload_body_posture": "fixture-backed proof records schema/type/posture only and does not emit vendor payload bodies",
+        "normalized_data_path_proof_claim": "NONE",
+        "open_rails_vendor_smoke_claim": "NONE",
+        "public_reader_change_claim": "NONE",
+        "response_envelope_mapping_scope": "HDE-FERM007.3 proof-level v2 StandardResponse envelope mapping only",
+        "route_family": "recommended_v2_chart",
+        "routes": route_mappings,
+        "runtime_conformance_claim": "NONE",
+        "schema_gap_status": "GAP_RECORDED",
+        "schema_gap_summary": "v2 ChartResult/ChartSimpleResult StandardResponse data is not proven to feed existing BodyGraph cache or compat input paths without a follow-up adapter/presenter boundary proof",
+        "success_status_handling": "StandardResponse.success is preserved as success status posture; no live HTTP success or runtime conformance is claimed",
+    }
+
+
+def build_response_mapping_check_log(produced: str, snapshot: dict[str, Any], *, mode: str) -> str:
+    env_snapshot = closed_rails_env_snapshot()
+    routes = snapshot.get("routes", [])
+    checks = [
+        ("closed_rails_generation", mode == "closed-rails-source-cache" and closed_rails_env_ok()),
+        ("no_live_vendor_call_attempted", snapshot.get("live_vendor_call_claim") == "NONE"),
+        ("response_type_preservation", all(isinstance(row, dict) and row.get("response_type") in {"ChartResult", "ChartSimpleResult"} for row in routes)),
+        ("success_status_handling", snapshot.get("success_status_handling", "").startswith("StandardResponse.success") and all("success" in row.get("response_envelope_fields", []) for row in routes if isinstance(row, dict))),
+        ("errorCode_handling", "errorCode" in snapshot.get("errorCode_handling", "") and all("errorCode" in row.get("response_envelope_fields", []) for row in routes if isinstance(row, dict))),
+        ("data_payload_identity_posture", snapshot.get("data_payload_body_emitted") is False and "identity" in snapshot.get("data_payload_identity_posture", "")),
+        ("route_variant_preservation", {row.get("route_variant") for row in routes if isinstance(row, dict)} == {"full_chart", "simple_chart", "coordinates_chart"}),
+        ("internal_target_posture_or_schema_gap_recorded", snapshot.get("schema_gap_status") == "GAP_RECORDED" and isinstance(snapshot.get("internal_target_posture"), dict)),
+        ("internal_loci_inspected", len(snapshot.get("inspected_internal_loci", [])) == len(RESPONSE_MAPPING_INTERNAL_LOCI)),
+        ("no_compatibility_by_inference_claim", snapshot.get("no_compatibility_by_inference") is True),
+        ("no_normalized_data_path_proof_claimed", snapshot.get("normalized_data_path_proof_claim") == "NONE"),
+        ("no_vendor_payload_bodies_emitted", snapshot.get("no_vendor_payload_body_posture", "").startswith("fixture-backed proof")),
+        ("no_secret_values_emitted", "k_test" not in json.dumps(snapshot) and "Bearer api" not in json.dumps(snapshot) and "Bearer geo" not in json.dumps(snapshot)),
+    ]
+    rails = " ".join(f"{key}={env_snapshot[key]}" for key in sorted(CLOSED_RAILS_ENV))
+    lines = [
+        f"generated_at_utc={produced}",
+        "scope=HDE-EPIC034 PR-03 response-mapping check",
+        f"rails={rails}",
+        "network_posture=closed-rails-source-cache; no live vendor calls",
+        "evidence_index_and_path_proof_posture=validated_by_update_evidence_index_and_validate_evidence_paths_not_generator",
+    ]
+    lines.extend(f"[{name}] status={'PASS' if ok else 'FAIL'}" for name, ok in checks)
+    lines.append("status=PASS" if all(ok for _name, ok in checks) else "status=FAIL")
+    return "\n".join(lines)
+
 def validate_source_statuses(fetched: dict[str, dict[str, Any]]) -> None:
     for key in ["v2_routes_yaml", "v1_routes_yaml", "llms_full_txt"]:
         status = fetched[key].get("fetch_status")
@@ -959,7 +1185,7 @@ def write_endpoint_reference(rows: list[dict[str, str]]) -> bytes:
     from io import StringIO
 
     buf = StringIO()
-    fields = ["method", "path", "route_family", "auth_model", "geocode_key_requirement", "tier", "request_content_type", "request_fields", "success_envelope", "error_codes", "source_spec"]
+    fields = ["method", "path", "route_family", "auth_model", "geocode_key_requirement", "tier", "request_content_type", "request_fields", "response_envelope_fields", "success_envelope", "error_codes", "source_spec"]
     writer = csv.DictWriter(buf, fieldnames=fields, lineterminator="\n")
     writer.writeheader()
     for row in rows:
@@ -1077,9 +1303,12 @@ def render_outputs(produced: str, fetched: dict[str, dict[str, Any]], bodies: di
         require_closed_rails_for_request_shaping()
         ops_summary = _load_ops01_fact_summary()
         request_snapshot = build_request_shaping_snapshot(produced, contract, snapshot, ops_summary)
+        response_snapshot = build_response_mapping_snapshot(produced, contract, snapshot, request_snapshot, ops_summary)
         outputs.update({
             REQUEST_SHAPING_SNAPSHOT: canonical_json_bytes(request_snapshot),
             REQUEST_SHAPING_CHECK_LOG: (build_request_shaping_check_log(produced, request_snapshot, mode=mode) + "\n").encode("utf-8"),
+            RESPONSE_MAPPING_SNAPSHOT: canonical_json_bytes(response_snapshot),
+            RESPONSE_MAPPING_CHECK_LOG: (build_response_mapping_check_log(produced, response_snapshot, mode=mode) + "\n").encode("utf-8"),
         })
     outputs.update(write_baseline_pointer_artifacts(produced, acceptance))
     return outputs

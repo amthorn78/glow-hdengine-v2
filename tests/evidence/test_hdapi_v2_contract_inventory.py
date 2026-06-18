@@ -544,6 +544,25 @@ def test_epic034_public_doc_refresh_removes_stale_pr02_outputs(monkeypatch: pyte
     for path in stale:
         path.write_text("stale\n", encoding="utf-8")
     monkeypatch.setattr(generator, "REQUEST_SHAPING_OUTPUTS", tuple(stale))
+    monkeypatch.setattr(generator, "EPIC034_CLOSED_RAILS_DERIVED_OUTPUTS", tuple(stale))
+    generator.remove_request_shaping_outputs()
+    assert all(not path.exists() for path in stale)
+
+
+def test_epic034_public_doc_refresh_removes_stale_pr03_response_mapping_outputs(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    stale = [
+        tmp_path / "request_shaping.snapshot.json",
+        tmp_path / "request_shaping.snapshot.json.path_proof.txt",
+        tmp_path / "request_shaping_check.log",
+        tmp_path / "request_shaping_check.log.path_proof.txt",
+        tmp_path / "response_mapping.snapshot.json",
+        tmp_path / "response_mapping.snapshot.json.path_proof.txt",
+        tmp_path / "response_mapping_check.log",
+        tmp_path / "response_mapping_check.log.path_proof.txt",
+    ]
+    for path in stale:
+        path.write_text("stale\n", encoding="utf-8")
+    monkeypatch.setattr(generator, "EPIC034_CLOSED_RAILS_DERIVED_OUTPUTS", tuple(stale))
     generator.remove_request_shaping_outputs()
     assert all(not path.exists() for path in stale)
 
@@ -565,6 +584,27 @@ def test_epic034_pr02_stale_index_rows_are_removed_when_outputs_are_absent(monke
     assert ("keep", "artifacts/keep.txt") in keys
 
 
+def test_epic034_pr03_stale_index_rows_are_removed_when_outputs_are_absent(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    stale_payload = [
+        {"artifact_key": "hdapi_v2.response_mapping", "discovered_physical_path": "artifacts/vendor/hdapi_v2/response_mapping.snapshot.json"},
+        {"artifact_key": "epic034.pr03.response_mapping_check", "discovered_physical_path": "audit/qa/hde-epic034/pr-03/response_mapping_check.log"},
+        {"artifact_key": "epic034.pr03.doc_deltas", "discovered_physical_path": "audit/docdeltas/hde-epic034_doc_deltas.md"},
+        {"artifact_key": "epic034.pr03.qa_meta_doc_deltas", "discovered_physical_path": "audit/qa/hde-epic034/00_meta/doc_deltas.md"},
+        {"artifact_key": "keep", "discovered_physical_path": "artifacts/keep.txt"},
+    ]
+    index_path = tmp_path / "INDEX.json"
+    index_path.write_text(json.dumps(stale_payload), encoding="utf-8")
+    monkeypatch.setattr(indexer, "HUMAN_INDEX", index_path)
+    monkeypatch.setattr(indexer, "_load_epic034_pr03_entries", lambda: [])
+    loaded = indexer._load_human_index()
+    keys = {(entry["artifact_key"], entry["discovered_physical_path"]) for entry in loaded}
+    assert ("hdapi_v2.response_mapping", "artifacts/vendor/hdapi_v2/response_mapping.snapshot.json") not in keys
+    assert ("epic034.pr03.response_mapping_check", "audit/qa/hde-epic034/pr-03/response_mapping_check.log") not in keys
+    assert ("epic034.pr03.doc_deltas", "audit/docdeltas/hde-epic034_doc_deltas.md") not in keys
+    assert ("epic034.pr03.qa_meta_doc_deltas", "audit/qa/hde-epic034/00_meta/doc_deltas.md") not in keys
+    assert ("keep", "artifacts/keep.txt") in keys
+
+
 def test_epic034_pr02_request_shaping_check_index_row_does_not_claim_tests_pass() -> None:
     rows = {entry["artifact_key"]: entry for entry in indexer.EPIC034_PR02_PRIMARY_ARTIFACTS}
 
@@ -573,3 +613,151 @@ def test_epic034_pr02_request_shaping_check_index_row_does_not_claim_tests_pass(
     assert "TESTS_PASS_OK" not in row["tokens"]
     assert "pytest" not in row["notes"].lower()
     assert "indexed separately" not in row["notes"].lower()
+
+
+def test_epic034_response_mapping_snapshot_is_canonical_secret_safe_and_contract_derived() -> None:
+    contract = _assert_canonical_json(VENDOR_DIR / "contract_map.json")
+    source_selection = _assert_canonical_json(VENDOR_DIR / "source_selection.snapshot.json")
+    request_shaping = _assert_canonical_json(VENDOR_DIR / "request_shaping.snapshot.json")
+    ops = json.loads((ROOT / "audit" / "ops" / "hde-epic034" / "ops-01" / "fact_summary.json").read_text(encoding="utf-8"))
+    snapshot = _assert_canonical_json(VENDOR_DIR / "response_mapping.snapshot.json")
+    assert snapshot == generator.build_response_mapping_snapshot(snapshot["generated_at_utc"], contract, source_selection, request_shaping, ops)
+    assert snapshot["response_envelope_mapping_scope"].startswith("HDE-FERM007.3")
+    assert snapshot["live_vendor_call_claim"] == "NONE"
+    assert snapshot["runtime_conformance_claim"] == "NONE"
+    assert snapshot["public_reader_change_claim"] == "NONE"
+    assert snapshot["open_rails_vendor_smoke_claim"] == "NONE"
+    assert snapshot["normalized_data_path_proof_claim"] == "NONE"
+    assert snapshot["ai_scope_claim"] == "NONE"
+    assert snapshot["data_payload_body_emitted"] is False
+    assert snapshot["no_compatibility_by_inference"] is True
+    rendered = json.dumps(snapshot, sort_keys=True)
+    for secret in ["api-key", "geo-key", "k_test", "Bearer api", "Bearer geo"]:
+        assert secret not in rendered
+
+
+def test_epic034_response_mapping_preserves_envelope_fields_and_route_variants() -> None:
+    snapshot = _assert_canonical_json(VENDOR_DIR / "response_mapping.snapshot.json")
+    routes = {row["endpoint_path"]: row for row in snapshot["routes"]}
+    assert routes["/v2/charts"]["response_type"] == "ChartResult"
+    assert routes["/v2/charts"]["data_schema"] == "ChartResult"
+    assert routes["/v2/charts"]["route_variant"] == "full_chart"
+    assert routes["/v2/charts/simple"]["response_type"] == "ChartSimpleResult"
+    assert routes["/v2/charts/simple"]["data_schema"] == "ChartSimpleResult"
+    assert routes["/v2/charts/simple"]["route_variant"] == "simple_chart"
+    assert routes["/v2/charts/coordinates"]["response_type"] == "ChartResult"
+    assert routes["/v2/charts/coordinates"]["route_variant"] == "coordinates_chart"
+    for route in routes.values():
+        assert set(["success", "errorCode", "type", "data"]) <= set(route["response_envelope_fields"])
+        assert "StandardResponse.success" in route["success_status_handling"]
+        assert "StandardResponse.errorCode" in route["errorCode_handling"]
+        assert route["data_payload_identity_posture"].startswith("preserve data object identity")
+
+
+def test_epic034_response_mapping_records_schema_gap_for_bodygraph_cache_and_compat() -> None:
+    snapshot = _assert_canonical_json(VENDOR_DIR / "response_mapping.snapshot.json")
+    posture = snapshot["internal_target_posture"]
+    assert snapshot["schema_gap_status"] == "GAP_RECORDED"
+    assert posture["bodygraph"]["mapping_result"] == "schema_gap_recorded"
+    assert posture["cache"]["mapping_result"] == "not_truthfully_proven_for_v2_chart_data"
+    assert posture["compatibility"]["mapping_result"] == "schema_gap_recorded"
+    assert "adapter" in snapshot["schema_gap_summary"]
+    assert snapshot["no_compatibility_by_inference"] is True
+
+
+def test_epic034_response_mapping_check_log_exists_and_passes() -> None:
+    log_path = ROOT / "audit" / "qa" / "hde-epic034" / "pr-03" / "response_mapping_check.log"
+    raw = log_path.read_bytes()
+    assert raw.endswith(b"\n")
+    assert b"\r\n" not in raw
+    log = raw.decode("utf-8")
+    for check in [
+        "closed_rails_generation", "no_live_vendor_call_attempted", "response_type_preservation",
+        "success_status_handling", "errorCode_handling", "data_payload_identity_posture",
+        "route_variant_preservation", "internal_target_posture_or_schema_gap_recorded",
+        "internal_loci_inspected", "no_compatibility_by_inference_claim", "no_normalized_data_path_proof_claimed",
+        "no_vendor_payload_bodies_emitted", "no_secret_values_emitted",
+    ]:
+        assert f"[{check}] status=PASS" in log
+    assert "evidence_index_and_path_proof_posture=validated_by_update_evidence_index_and_validate_evidence_paths_not_generator" in log
+    assert "status=PASS" in log
+
+
+def test_epic034_response_mapping_rejects_unproven_data_schema() -> None:
+    contract = _assert_canonical_json(VENDOR_DIR / "contract_map.json")
+    source_selection = _assert_canonical_json(VENDOR_DIR / "source_selection.snapshot.json")
+    request_shaping = _assert_canonical_json(VENDOR_DIR / "request_shaping.snapshot.json")
+    ops = json.loads((ROOT / "audit" / "ops" / "hde-epic034" / "ops-01" / "fact_summary.json").read_text(encoding="utf-8"))
+    broken = copy.deepcopy(contract)
+    for route in broken["route_families"]:
+        if route["path"] == "/v2/charts":
+            route["success_envelope"] = "StandardResponse with type=ChartResult and data=BodygraphResponse"
+    with pytest.raises(ValueError, match="RESPONSE_MAPPING_ROUTE_SCHEMA_MISMATCH"):
+        generator.build_response_mapping_snapshot("2026-06-18T00:00:00Z", broken, source_selection, request_shaping, ops)
+
+
+def test_epic034_response_mapping_rejects_route_specific_schema_drift_with_allowed_schema() -> None:
+    contract = _assert_canonical_json(VENDOR_DIR / "contract_map.json")
+    source_selection = _assert_canonical_json(VENDOR_DIR / "source_selection.snapshot.json")
+    request_shaping = _assert_canonical_json(VENDOR_DIR / "request_shaping.snapshot.json")
+    ops = json.loads((ROOT / "audit" / "ops" / "hde-epic034" / "ops-01" / "fact_summary.json").read_text(encoding="utf-8"))
+    broken = copy.deepcopy(contract)
+    for route in broken["route_families"]:
+        if route["path"] == "/v2/charts/simple":
+            route["success_envelope"] = "StandardResponse with type=ChartResult and data=ChartResult"
+    with pytest.raises(ValueError, match="RESPONSE_MAPPING_ROUTE_SCHEMA_MISMATCH:/v2/charts/simple"):
+        generator.build_response_mapping_snapshot("2026-06-18T00:00:00Z", broken, source_selection, request_shaping, ops)
+
+
+def test_epic034_response_mapping_rejects_missing_standard_response_fields() -> None:
+    contract = _assert_canonical_json(VENDOR_DIR / "contract_map.json")
+    source_selection = _assert_canonical_json(VENDOR_DIR / "source_selection.snapshot.json")
+    request_shaping = _assert_canonical_json(VENDOR_DIR / "request_shaping.snapshot.json")
+    ops = json.loads((ROOT / "audit" / "ops" / "hde-epic034" / "ops-01" / "fact_summary.json").read_text(encoding="utf-8"))
+    broken = copy.deepcopy(contract)
+    for route in broken["route_families"]:
+        if route["path"] == "/v2/charts":
+            route["response_envelope_fields"] = ["timestamp", "message", "type", "data"]
+    with pytest.raises(ValueError, match="RESPONSE_MAPPING_ENVELOPE_FIELDS_MISSING:/v2/charts:success,errorCode"):
+        generator.build_response_mapping_snapshot("2026-06-18T00:00:00Z", broken, source_selection, request_shaping, ops)
+
+
+def test_epic034_contract_inventory_rejects_standard_response_field_drift() -> None:
+    metadata, bodies = generator.load_source_cache()
+    spec = generator.parse_yaml_openapi(bodies["v2_routes_yaml"], "v2-routes.yaml")
+    spec["components"]["schemas"]["StandardResponse"]["required"].remove("success")
+    with pytest.raises(ValueError, match="STANDARD_RESPONSE_FIELDS_MISSING:success"):
+        generator.standard_response_fields(spec, version="v2")
+
+
+def test_epic034_response_mapping_fails_when_internal_locus_missing(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    missing = "engine/bodygraph/missing_for_response_mapping.py"
+    monkeypatch.setattr(generator, "RESPONSE_MAPPING_INTERNAL_LOCI", (missing,))
+    contract = _assert_canonical_json(VENDOR_DIR / "contract_map.json")
+    source_selection = _assert_canonical_json(VENDOR_DIR / "source_selection.snapshot.json")
+    request_shaping = _assert_canonical_json(VENDOR_DIR / "request_shaping.snapshot.json")
+    ops = json.loads((ROOT / "audit" / "ops" / "hde-epic034" / "ops-01" / "fact_summary.json").read_text(encoding="utf-8"))
+    with pytest.raises(ValueError, match="RESPONSE_MAPPING_INTERNAL_LOCUS_MISSING"):
+        generator.build_response_mapping_snapshot("2026-06-18T00:00:00Z", contract, source_selection, request_shaping, ops)
+
+
+def test_epic034_pr03_response_mapping_index_rows_use_approved_tokens_only() -> None:
+    rows = {entry["artifact_key"]: entry for entry in indexer.EPIC034_PR03_PRIMARY_ARTIFACTS}
+    approved = {
+        "JSON_CANONICAL_CHECK_OK", "EVIDENCE_INDEX_UPDATED_OK", "MACHINE_MIRROR_UPDATED_OK",
+        "EVIDENCE_PATHS_VALIDATED_OK", "EVIDENCE_PATH_PROOFS_OK", "TESTS_PASS_OK", "DOC_DELTA_PRESENT_OK",
+    }
+    assert set(rows["hdapi_v2.response_mapping"]["tokens"]) <= approved
+    assert set(rows["epic034.pr03.response_mapping_check"]["tokens"]) <= approved
+    assert set(rows["epic034.pr03.doc_deltas"]["tokens"]) <= approved
+    assert set(rows["epic034.pr03.qa_meta_doc_deltas"]["tokens"]) <= approved
+    assert "TESTS_PASS_OK" not in rows["epic034.pr03.response_mapping_check"]["tokens"]
+
+
+def test_epic034_current_doc_deltas_are_not_indexed_as_pr01_after_pr03_update() -> None:
+    pr01_rows = {entry["artifact_key"]: entry for entry in indexer.EPIC034_PR01_PRIMARY_ARTIFACTS}
+    pr03_rows = {entry["artifact_key"]: entry for entry in indexer.EPIC034_PR03_PRIMARY_ARTIFACTS}
+    assert "epic034.pr01.doc_deltas" not in pr01_rows
+    assert "epic034.pr01.qa_meta_doc_deltas" not in pr01_rows
+    assert pr03_rows["epic034.pr03.doc_deltas"]["record_type"] == "epic034_pr03_doc_delta"
+    assert pr03_rows["epic034.pr03.qa_meta_doc_deltas"]["record_type"] == "epic034_pr03_doc_delta"

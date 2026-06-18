@@ -1,0 +1,19 @@
+generated_at_utc=2026-06-18T02:44:04Z
+scope=HDE-EPIC034 PR-03 response-mapping check
+rails=ALLOW_NETWORK=0 LANG=C LC_ALL=C SAFE_MODE=1 TZ=UTC
+network_posture=closed-rails-source-cache; no live vendor calls
+evidence_index_and_path_proof_posture=validated_by_update_evidence_index_and_validate_evidence_paths_not_generator
+[closed_rails_generation] status=PASS
+[no_live_vendor_call_attempted] status=PASS
+[response_type_preservation] status=PASS
+[success_status_handling] status=PASS
+[errorCode_handling] status=PASS
+[data_payload_identity_posture] status=PASS
+[route_variant_preservation] status=PASS
+[internal_target_posture_or_schema_gap_recorded] status=PASS
+[internal_loci_inspected] status=PASS
+[no_compatibility_by_inference_claim] status=PASS
+[no_normalized_data_path_proof_claimed] status=PASS
+[no_vendor_payload_bodies_emitted] status=PASS
+[no_secret_values_emitted] status=PASS
+status=PASS
