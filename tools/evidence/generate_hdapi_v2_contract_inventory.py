@@ -46,6 +46,13 @@ REQUEST_SHAPING_OUTPUTS = (
     REQUEST_SHAPING_CHECK_LOG,
     REQUEST_SHAPING_CHECK_LOG.with_suffix(REQUEST_SHAPING_CHECK_LOG.suffix + ".path_proof.txt"),
 )
+RESPONSE_MAPPING_OUTPUTS = (
+    RESPONSE_MAPPING_SNAPSHOT,
+    RESPONSE_MAPPING_SNAPSHOT.with_suffix(RESPONSE_MAPPING_SNAPSHOT.suffix + ".path_proof.txt"),
+    RESPONSE_MAPPING_CHECK_LOG,
+    RESPONSE_MAPPING_CHECK_LOG.with_suffix(RESPONSE_MAPPING_CHECK_LOG.suffix + ".path_proof.txt"),
+)
+EPIC034_CLOSED_RAILS_DERIVED_OUTPUTS = REQUEST_SHAPING_OUTPUTS + RESPONSE_MAPPING_OUTPUTS
 CLOSED_RAILS_ENV = {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}
 SOURCE_SELECTION_SNAPSHOT = OUT / "source_selection.snapshot.json"
 V1_LEGACY_GUARD_LOG = OUT / "v1_legacy_guard.log"
@@ -107,7 +114,7 @@ def require_closed_rails_for_request_shaping() -> None:
 
 
 def remove_request_shaping_outputs() -> None:
-    for path in REQUEST_SHAPING_OUTPUTS:
+    for path in EPIC034_CLOSED_RAILS_DERIVED_OUTPUTS:
         try:
             path.unlink()
         except FileNotFoundError:
@@ -943,6 +950,11 @@ def build_response_mapping_snapshot(
     if request_shaping.get("route_family") != "recommended_v2_chart":
         raise ValueError("RESPONSE_MAPPING_REQUEST_SHAPING_BASELINE_DRIFT")
     shaped_by_path = {row.get("endpoint_path"): row for row in request_shaping.get("routes", []) if isinstance(row, dict)}
+    expected_response_schemas = {
+        "/v2/charts": ("ChartResult", "ChartResult"),
+        "/v2/charts/simple": ("ChartSimpleResult", "ChartSimpleResult"),
+        "/v2/charts/coordinates": ("ChartResult", "ChartResult"),
+    }
     route_mappings: list[dict[str, Any]] = []
     for method, path, variant in V2_CHART_ROUTES:
         contract_route = _route_by_path(contract, path)
@@ -953,8 +965,13 @@ def build_response_mapping_snapshot(
             raise ValueError(f"RESPONSE_MAPPING_ROUTE_FAMILY_MISMATCH:{path}")
         response_type = _response_type_from_success_envelope(contract_route)
         data_schema = _response_data_schema_from_success_envelope(contract_route)
-        if data_schema not in {"ChartResult", "ChartSimpleResult"}:
-            raise ValueError(f"RESPONSE_MAPPING_UNSUPPORTED_DATA_SCHEMA:{path}:{data_schema}")
+        expected_response_type, expected_data_schema = expected_response_schemas[path]
+        if response_type != expected_response_type or data_schema != expected_data_schema:
+            raise ValueError(
+                f"RESPONSE_MAPPING_ROUTE_SCHEMA_MISMATCH:{path}:"
+                f"type={response_type}:data={data_schema}:"
+                f"expected_type={expected_response_type}:expected_data={expected_data_schema}"
+            )
         route_mappings.append(
             {
                 "data_payload_identity_posture": "preserve data object identity by reference/digest posture only; vendor payload body is not emitted in proof artifacts",

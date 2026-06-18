@@ -508,6 +508,8 @@ EPIC032_PR03_SUPERSEDED_INDEX_KEYS = {
 EPIC034_PR01_SUPERSEDED_INDEX_KEYS = {
     ("epic034.pr01.source_selection_snapshot", "artifacts/vendor/hdapi_v2/source_selection.snapshot.json"),
     ("epic034.pr01.v1_legacy_guard", "artifacts/vendor/hdapi_v2/v1_legacy_guard.log"),
+    ("epic034.pr01.doc_deltas", "audit/docdeltas/hde-epic034_doc_deltas.md"),
+    ("epic034.pr01.qa_meta_doc_deltas", "audit/qa/hde-epic034/00_meta/doc_deltas.md"),
 }
 
 EPIC034_PR02_SUPERSEDED_INDEX_KEYS = {
@@ -711,24 +713,6 @@ EPIC034_PR01_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
         "tokens": ["EVIDENCE_PATH_PROOFS_OK"],
         "notes": "EPIC034 PR-01 source-selection check log for route-family distinction and v1 legacy isolation",
     },
-    {
-        "artifact_key": "epic034.pr01.doc_deltas",
-        "discovered_physical_path": "audit/docdeltas/hde-epic034_doc_deltas.md",
-        "epic_id": "HDE-EPIC034",
-        "record_type": "epic034_pr01_doc_delta",
-        "schema_version": "1.0",
-        "tokens": ["DOC_DELTA_PRESENT_OK", "EVIDENCE_PATH_PROOFS_OK"],
-        "notes": "EPIC034 PR-01 current-epic draft/staging doc-delta surface for HDE-FERM007.1 source-selection evidence",
-    },
-    {
-        "artifact_key": "epic034.pr01.qa_meta_doc_deltas",
-        "discovered_physical_path": "audit/qa/hde-epic034/00_meta/doc_deltas.md",
-        "epic_id": "HDE-EPIC034",
-        "record_type": "epic034_pr01_doc_delta",
-        "schema_version": "1.0",
-        "tokens": ["DOC_DELTA_PRESENT_OK", "EVIDENCE_PATH_PROOFS_OK"],
-        "notes": "EPIC034 PR-01 epic-scoped QA meta doc-delta capture for HDE-FERM007.1 source-selection evidence",
-    },
 ]
 
 
@@ -814,6 +798,24 @@ EPIC034_PR03_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
         "tokens": ["EVIDENCE_PATH_PROOFS_OK"],
         "notes": "EPIC034 PR-03 LF-terminated response-mapping posture check log for envelope field preservation, schema gaps, secret safety, and non-claims",
     },
+    {
+        "artifact_key": "epic034.pr03.doc_deltas",
+        "discovered_physical_path": "audit/docdeltas/hde-epic034_doc_deltas.md",
+        "epic_id": "HDE-EPIC034",
+        "record_type": "epic034_pr03_doc_delta",
+        "schema_version": "1.0",
+        "tokens": ["DOC_DELTA_PRESENT_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC034 PR-03 current-epic draft/staging doc-delta surface for HDE-FERM007.3 response-mapping evidence",
+    },
+    {
+        "artifact_key": "epic034.pr03.qa_meta_doc_deltas",
+        "discovered_physical_path": "audit/qa/hde-epic034/00_meta/doc_deltas.md",
+        "epic_id": "HDE-EPIC034",
+        "record_type": "epic034_pr03_doc_delta",
+        "schema_version": "1.0",
+        "tokens": ["DOC_DELTA_PRESENT_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC034 PR-03 epic-scoped QA meta doc-delta capture for HDE-FERM007.3 response-mapping evidence",
+    },
 ]
 
 
@@ -833,7 +835,7 @@ def _load_epic034_pr03_entries() -> list[dict[str, object]]:
     entries: list[dict[str, object]] = []
     for entry in EPIC034_PR03_PRIMARY_ARTIFACTS:
         normalized = dict(entry)
-        if produced_at is not None:
+        if produced_at is not None and normalized.get("record_type") != "epic034_pr03_doc_delta":
             normalized["produced_at_utc"] = produced_at
         entries.append(normalized)
     return entries

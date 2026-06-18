@@ -544,6 +544,25 @@ def test_epic034_public_doc_refresh_removes_stale_pr02_outputs(monkeypatch: pyte
     for path in stale:
         path.write_text("stale\n", encoding="utf-8")
     monkeypatch.setattr(generator, "REQUEST_SHAPING_OUTPUTS", tuple(stale))
+    monkeypatch.setattr(generator, "EPIC034_CLOSED_RAILS_DERIVED_OUTPUTS", tuple(stale))
+    generator.remove_request_shaping_outputs()
+    assert all(not path.exists() for path in stale)
+
+
+def test_epic034_public_doc_refresh_removes_stale_pr03_response_mapping_outputs(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    stale = [
+        tmp_path / "request_shaping.snapshot.json",
+        tmp_path / "request_shaping.snapshot.json.path_proof.txt",
+        tmp_path / "request_shaping_check.log",
+        tmp_path / "request_shaping_check.log.path_proof.txt",
+        tmp_path / "response_mapping.snapshot.json",
+        tmp_path / "response_mapping.snapshot.json.path_proof.txt",
+        tmp_path / "response_mapping_check.log",
+        tmp_path / "response_mapping_check.log.path_proof.txt",
+    ]
+    for path in stale:
+        path.write_text("stale\n", encoding="utf-8")
+    monkeypatch.setattr(generator, "EPIC034_CLOSED_RAILS_DERIVED_OUTPUTS", tuple(stale))
     generator.remove_request_shaping_outputs()
     assert all(not path.exists() for path in stale)
 
@@ -651,7 +670,20 @@ def test_epic034_response_mapping_rejects_unproven_data_schema() -> None:
     for route in broken["route_families"]:
         if route["path"] == "/v2/charts":
             route["success_envelope"] = "StandardResponse with type=ChartResult and data=BodygraphResponse"
-    with pytest.raises(ValueError, match="RESPONSE_MAPPING_UNSUPPORTED_DATA_SCHEMA"):
+    with pytest.raises(ValueError, match="RESPONSE_MAPPING_ROUTE_SCHEMA_MISMATCH"):
+        generator.build_response_mapping_snapshot("2026-06-18T00:00:00Z", broken, source_selection, request_shaping, ops)
+
+
+def test_epic034_response_mapping_rejects_route_specific_schema_drift_with_allowed_schema() -> None:
+    contract = _assert_canonical_json(VENDOR_DIR / "contract_map.json")
+    source_selection = _assert_canonical_json(VENDOR_DIR / "source_selection.snapshot.json")
+    request_shaping = _assert_canonical_json(VENDOR_DIR / "request_shaping.snapshot.json")
+    ops = json.loads((ROOT / "audit" / "ops" / "hde-epic034" / "ops-01" / "fact_summary.json").read_text(encoding="utf-8"))
+    broken = copy.deepcopy(contract)
+    for route in broken["route_families"]:
+        if route["path"] == "/v2/charts/simple":
+            route["success_envelope"] = "StandardResponse with type=ChartResult and data=ChartResult"
+    with pytest.raises(ValueError, match="RESPONSE_MAPPING_ROUTE_SCHEMA_MISMATCH:/v2/charts/simple"):
         generator.build_response_mapping_snapshot("2026-06-18T00:00:00Z", broken, source_selection, request_shaping, ops)
 
 
@@ -663,4 +695,15 @@ def test_epic034_pr03_response_mapping_index_rows_use_approved_tokens_only() -> 
     }
     assert set(rows["hdapi_v2.response_mapping"]["tokens"]) <= approved
     assert set(rows["epic034.pr03.response_mapping_check"]["tokens"]) <= approved
+    assert set(rows["epic034.pr03.doc_deltas"]["tokens"]) <= approved
+    assert set(rows["epic034.pr03.qa_meta_doc_deltas"]["tokens"]) <= approved
     assert "TESTS_PASS_OK" not in rows["epic034.pr03.response_mapping_check"]["tokens"]
+
+
+def test_epic034_current_doc_deltas_are_not_indexed_as_pr01_after_pr03_update() -> None:
+    pr01_rows = {entry["artifact_key"]: entry for entry in indexer.EPIC034_PR01_PRIMARY_ARTIFACTS}
+    pr03_rows = {entry["artifact_key"]: entry for entry in indexer.EPIC034_PR03_PRIMARY_ARTIFACTS}
+    assert "epic034.pr01.doc_deltas" not in pr01_rows
+    assert "epic034.pr01.qa_meta_doc_deltas" not in pr01_rows
+    assert pr03_rows["epic034.pr03.doc_deltas"]["record_type"] == "epic034_pr03_doc_delta"
+    assert pr03_rows["epic034.pr03.qa_meta_doc_deltas"]["record_type"] == "epic034_pr03_doc_delta"

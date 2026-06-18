@@ -1,5 +1,5 @@
 path: artifacts/vendor/hdapi_v2/openapi_validation.log
 size_bytes: 1575
-sha256: 5d8d021821f77a7878053855b959888d735790c7ea8a9ea0c8e346a6698c1a4c
-mtime_utc: 2026-06-18T01:48:00Z
-produced_at_utc: 2026-06-18T01:48:00Z
+sha256: 74b9c51503f4404d528dfd6c654393a77d499637bea70700ee69f0d7afead11b
+mtime_utc: 2026-06-18T02:21:04Z
+produced_at_utc: 2026-06-18T02:21:03Z
