@@ -822,27 +822,6 @@ def test_epic034_adapter_boundary_builder_fails_closed_on_missing_locus(monkeypa
         generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", source_selection, request_shaping, response_mapping)
 
 
-def test_epic034_adapter_boundary_detects_second_http_home_and_pure_io(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
-    import shutil
-
-    bad_dir = ROOT / "tmp_boundary_test"
-    try:
-        bad_dir.mkdir(exist_ok=True)
-        bad_vendor = bad_dir / "bad_vendor.py"
-        bad_vendor.write_text("from flask import Flask\nfrom urllib import request as urlrequest\nALLOW_NETWORK='0'\nSAFE_MODE='1'\n", encoding="utf-8")
-        bad_compute = bad_dir / "bad_compute.py"
-        bad_compute.write_text("import requests\n", encoding="utf-8")
-        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_VENDOR_SEAM_LOCI", (bad_vendor.relative_to(ROOT).as_posix(),))
-        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PURE_COMPUTE_LOCI", (bad_compute.relative_to(ROOT).as_posix(),))
-        source_selection = _assert_canonical_json(VENDOR_DIR / "source_selection.snapshot.json")
-        request_shaping = _assert_canonical_json(VENDOR_DIR / "request_shaping.snapshot.json")
-        response_mapping = _assert_canonical_json(VENDOR_DIR / "response_mapping.snapshot.json")
-        _proof, checks = generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", source_selection, request_shaping, response_mapping)
-        assert checks["no_second_http_home"] is False
-        assert checks["no_pure_compute_external_io"] is False
-    finally:
-        shutil.rmtree(bad_dir, ignore_errors=True)
-
 
 def test_epic034_pr04_index_rows_use_approved_tokens_only() -> None:
     rows = {entry["artifact_key"]: entry for entry in json.loads((ROOT / "docs" / "evidence" / "INDEX.json").read_text(encoding="utf-8"))}
@@ -850,3 +829,95 @@ def test_epic034_pr04_index_rows_use_approved_tokens_only() -> None:
     for key in ["hdapi_v2.adapter_boundary_proof", "epic034.pr04.boundary_check", "epic034.pr04.doc_deltas", "epic034.pr04.qa_meta_doc_deltas"]:
         assert key in rows
         assert set(rows[key].get("tokens", [])) <= approved
+
+
+def _epic034_boundary_inputs() -> tuple[dict, dict, dict]:
+    return (
+        _assert_canonical_json(VENDOR_DIR / "source_selection.snapshot.json"),
+        _assert_canonical_json(VENDOR_DIR / "request_shaping.snapshot.json"),
+        _assert_canonical_json(VENDOR_DIR / "response_mapping.snapshot.json"),
+    )
+
+
+def _write_boundary_temp(rel_dir: str, name: str, body: str) -> str:
+    path = ROOT / rel_dir / name
+    path.parent.mkdir(exist_ok=True)
+    path.write_text(body, encoding="utf-8")
+    return path.relative_to(ROOT).as_posix()
+
+
+def test_epic034_adapter_boundary_fails_closed_on_second_http_home_and_pure_io(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    try:
+        bad_vendor = _write_boundary_temp(rel_dir, "bad_vendor.py", "from flask import Flask\nfrom urllib import request as urlrequest\nALLOW_NETWORK='0'\nSAFE_MODE='1'\n")
+        bad_compute = _write_boundary_temp(rel_dir, "bad_compute.py", "import requests\n")
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_VENDOR_SEAM_LOCI", (bad_vendor,))
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PURE_COMPUTE_LOCI", (bad_compute,))
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_second_http_home.*no_pure_compute_external_io"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+@pytest.mark.parametrize(
+    "body",
+    [
+        "from flask import Flask\nimport requests\ndef route():\n    return requests.request('GET', 'https://example.invalid')\nSAFE_MODE='1'\n",
+        "from flask import Flask\nimport requests\ndef route():\n    return requests.get('https://example.invalid')\nSAFE_MODE='1'\n",
+        "from flask import Flask\nimport httpx\ndef route():\n    return httpx.Client().post('https://example.invalid')\nSAFE_MODE='1'\n",
+        "from flask import Flask\nimport urllib.request\ndef route():\n    return urllib.request.urlopen('https://example.invalid')\nSAFE_MODE='1'\n",
+    ],
+)
+def test_epic034_adapter_boundary_fails_closed_on_common_adapter_external_io(monkeypatch: pytest.MonkeyPatch, body: str) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    try:
+        bad_adapter = _write_boundary_temp(rel_dir, "bad_adapter.py", body)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (bad_adapter,))
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_adapter_bypass.*no_presenter_bypass"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_adapter_boundary_requires_adapter_presenter_use_not_only_presenter_module(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    try:
+        bad_adapter = _write_boundary_temp(rel_dir, "jsonify_adapter.py", "from flask import Flask, jsonify\ndef route():\n    return jsonify({'ok': True})\nSAFE_MODE='1'\n")
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (bad_adapter,))
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_presenter_bypass"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_adapter_boundary_fails_closed_on_json_dumps_serializer(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    try:
+        bad_adapter = _write_boundary_temp(rel_dir, "serializer_adapter.py", "from flask import Flask\nfrom engine.presenter.emitter import emit_public\nimport json\ndef route():\n    return json.dumps({'ok': True})\nSAFE_MODE='1'\n")
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (bad_adapter,))
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_ad_hoc_serialization"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_pr04_superseded_rows_are_removed_when_outputs_absent(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    stale_rows = [
+        {"artifact_key": "hdapi_v2.adapter_boundary_proof", "discovered_physical_path": "artifacts/vendor/hdapi_v2/adapter_boundary_proof.log"},
+        {"artifact_key": "epic034.pr04.boundary_check", "discovered_physical_path": "audit/qa/hde-epic034/pr-04/boundary_check.log"},
+    ]
+    human_index = tmp_path / "INDEX.json"
+    human_index.write_text(json.dumps(stale_rows) + "\n", encoding="utf-8")
+    monkeypatch.setattr(indexer, "ROOT", tmp_path)
+    monkeypatch.setattr(indexer, "HUMAN_INDEX", human_index)
+    rows = indexer._load_human_index()
+    row_keys = {(row["artifact_key"], row["discovered_physical_path"]) for row in rows}
+    assert not row_keys & indexer.EPIC034_PR04_SUPERSEDED_INDEX_KEYS

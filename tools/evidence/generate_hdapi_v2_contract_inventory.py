@@ -1191,6 +1191,99 @@ def _import_modules(tree: ast.AST) -> set[str]:
     return modules
 
 
+def _import_aliases(tree: ast.AST) -> dict[str, str]:
+    aliases: dict[str, str] = {}
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                aliases[alias.asname or alias.name.split(".")[0]] = alias.name
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            for alias in node.names:
+                aliases[alias.asname or alias.name] = f"{node.module}.{alias.name}"
+    return aliases
+
+
+def _root_name(node: ast.AST) -> str | None:
+    current = node
+    while isinstance(current, ast.Attribute):
+        current = current.value
+    if isinstance(current, ast.Call):
+        return _root_name(current.func)
+    if isinstance(current, ast.Name):
+        return current.id
+    return None
+
+
+def _attribute_chain(node: ast.AST) -> str:
+    parts: list[str] = []
+    current = node
+    while isinstance(current, ast.Attribute):
+        parts.append(current.attr)
+        current = current.value
+    if isinstance(current, ast.Name):
+        parts.append(current.id)
+    elif isinstance(current, ast.Call):
+        nested = _attribute_chain(current.func)
+        if nested:
+            parts.append(nested)
+    return ".".join(reversed(parts))
+
+
+def _adapter_external_io_calls(loci: tuple[str, ...]) -> list[str]:
+    findings: list[str] = []
+    http_methods = {"request", "get", "post", "put", "patch", "delete", "head", "options", "urlopen"}
+    for rel in loci:
+        _path, _text, tree = _python_source(rel)
+        aliases = _import_aliases(tree)
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Call):
+                continue
+            chain = _attribute_chain(node.func)
+            root = _root_name(node.func)
+            target = aliases.get(root or "", root or "")
+            attr = chain.rsplit(".", 1)[-1] if chain else ""
+            if target.startswith("requests") and attr in http_methods:
+                findings.append(f"{rel}:{chain}")
+            elif target.startswith("httpx") and (attr in http_methods or chain.endswith(".Client") or ".Client." in chain):
+                findings.append(f"{rel}:{chain}")
+            elif (target.startswith("urllib.request") or chain.startswith("urllib.request")) and attr in {"urlopen", "Request"}:
+                findings.append(f"{rel}:{chain}")
+    return sorted(set(findings))
+
+
+def _ad_hoc_json_serializers(loci: tuple[str, ...]) -> list[str]:
+    """Find direct JSON serializers outside known internal vendor request/log helpers."""
+
+    allowed_vendor_funcs = {"_append_retry_log", "_append_jsonl", "build_contract_route_request", "ingest_bodygraph"}
+    findings: list[str] = []
+    for rel in loci:
+        _path, _text, tree = _python_source(rel)
+        aliases = _import_aliases(tree)
+        parents: dict[ast.AST, ast.AST] = {}
+        for parent in ast.walk(tree):
+            for child in ast.iter_child_nodes(parent):
+                parents[child] = parent
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Call):
+                continue
+            chain = _attribute_chain(node.func)
+            root = _root_name(node.func)
+            target = aliases.get(root or "", root or "")
+            if not ((target == "json" and chain in {"json.dump", "json.dumps"}) or chain in {"json.dump", "json.dumps"}):
+                continue
+            func_name = ""
+            current = parents.get(node)
+            while current is not None:
+                if isinstance(current, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                    func_name = current.name
+                    break
+                current = parents.get(current)
+            if rel.startswith("engine/bodygraph/") and func_name in allowed_vendor_funcs:
+                continue
+            findings.append(f"{rel}:{func_name or '<module>'}:{chain}")
+    return sorted(set(findings))
+
+
 def _locus_rows(loci: tuple[str, ...]) -> list[dict[str, str]]:
     rows = []
     for rel in loci:
@@ -1238,13 +1331,19 @@ def build_adapter_boundary_proof(produced: str, source_selection: dict[str, Any]
         pure_modules |= _import_modules(tree)
         pure_calls |= _call_names(tree)
 
-    presenter_uses_emitter = any("emit_public" in _python_source(rel)[1] for rel in ADAPTER_BOUNDARY_ADAPTER_LOCI + ADAPTER_BOUNDARY_PRESENTER_LOCI + ("engine/cli/main.py",))
+    adapter_presenter_calls = sorted(
+        call for call in adapter_calls
+        if call == "emit_public"
+        or call.endswith(".emit_public")
+        or call in {"emit_reader_public_bytes", "emit_reader_public_envelope", "emit_fn"}
+    )
+    presenter_uses_emitter = bool(adapter_presenter_calls)
     forbidden_http_modules = {"requests", "httpx", "urllib", "urllib.request", "urllib3"}
     pure_external_io = sorted((pure_modules | pure_calls) & forbidden_http_modules)
     second_http_home = sorted((vendor_modules - {"urllib.error", "urllib.request", "urllib.parse"}) & {"flask", "fastapi", "starlette"})
-    adapter_bypass = "urlrequest.urlopen" in adapter_calls or "requests.post" in adapter_calls or "httpx.post" in adapter_calls
+    adapter_bypass = _adapter_external_io_calls(ADAPTER_BOUNDARY_ADAPTER_LOCI)
     presenter_bypass = not presenter_uses_emitter
-    ad_hoc_serializers = sorted(call for call in (adapter_calls | vendor_calls) if call in {"json.dump"})
+    ad_hoc_serializers = _ad_hoc_json_serializers(ADAPTER_BOUNDARY_ADAPTER_LOCI + ADAPTER_BOUNDARY_VENDOR_SEAM_LOCI)
 
     checks = {
         "adapter_http_home_inspected": bool(adapter_http_modules),
@@ -1258,6 +1357,10 @@ def build_adapter_boundary_proof(produced: str, source_selection: dict[str, Any]
         "prior_evidence_families_bound": all((ROOT / rel).exists() for rel in ["artifacts/vendor/hdapi_v2/source_selection.snapshot.json", "artifacts/vendor/hdapi_v2/request_shaping.snapshot.json", "artifacts/vendor/hdapi_v2/response_mapping.snapshot.json"]),
         "no_unsupported_scope_claim": True,
     }
+    failed = [name for name, ok in checks.items() if not ok]
+    if failed:
+        raise ValueError("ADAPTER_BOUNDARY_CHECK_FAILED:" + ",".join(failed))
+
     lines = [
         f"generated_at_utc={produced}",
         "scope=HDE-EPIC034 PR-04 adapter/presenter boundary proof for HDE-FERM007.4",
@@ -1303,6 +1406,10 @@ def build_adapter_boundary_check_log(produced: str, proof: str, checks: dict[str
         "pr01_pr02_pr03_pr04_evidence_family_binding_checked": True,
         "no_unsupported_scope_claim_emitted": all(token in proof for token in ["no_HDE-FERM007.5_claim=NONE", "no_HDE-FERM008_claim=NONE", "no_AI_scope_claim=NONE"]),
     }
+    failed = [name for name, ok in log_checks.items() if not ok]
+    if failed:
+        raise ValueError("ADAPTER_BOUNDARY_CHECK_FAILED:" + ",".join(failed))
+
     lines = [
         f"generated_at_utc={produced}",
         "scope=HDE-EPIC034 PR-04 boundary check",
