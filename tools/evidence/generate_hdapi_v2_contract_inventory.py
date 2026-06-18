@@ -113,7 +113,7 @@ RESPONSE_MAPPING_INTERNAL_LOCI = (
     "engine/bodygraph/resolver.py",
     "engine/compat/compute.py",
 )
-ADAPTER_BOUNDARY_ADAPTER_LOCI = ("adapter/wsgi.py", "adapter/factory.py", "adapter/http_reader.py")
+ADAPTER_BOUNDARY_ADAPTER_LOCI = ("adapter/wsgi.py", "adapter/factory.py", "adapter/http_reader.py", "engine/http/compat_handler.py")
 ADAPTER_BOUNDARY_PRESENTER_LOCI = ("engine/presenter/emitter.py", "presenter/reader_v1/emitter.py")
 ADAPTER_BOUNDARY_VENDOR_SEAM_LOCI = ("engine/bodygraph/vendor_client.py", "engine/bodygraph/ingest.py", "engine/bodygraph/resolver.py")
 ADAPTER_BOUNDARY_PURE_COMPUTE_LOCI = ("engine/compat/compute.py",)
@@ -1248,6 +1248,8 @@ def _adapter_external_io_calls(loci: tuple[str, ...]) -> list[str]:
                 findings.append(f"{rel}:{chain}")
             elif (target.startswith("urllib.request") or chain.startswith("urllib.request")) and attr in {"urlopen", "Request"}:
                 findings.append(f"{rel}:{chain}")
+            elif target.startswith("urllib3") and (attr in http_methods or chain.endswith(".PoolManager") or ".PoolManager." in chain):
+                findings.append(f"{rel}:{chain}")
     return sorted(set(findings))
 
 
@@ -1269,7 +1271,12 @@ def _ad_hoc_json_serializers(loci: tuple[str, ...]) -> list[str]:
             chain = _attribute_chain(node.func)
             root = _root_name(node.func)
             target = aliases.get(root or "", root or "")
-            if not ((target == "json" and chain in {"json.dump", "json.dumps"}) or chain in {"json.dump", "json.dumps"}):
+            attr = chain.rsplit(".", 1)[-1] if chain else ""
+            if not (
+                (target == "json" and attr in {"dump", "dumps"})
+                or target in {"json.dump", "json.dumps"}
+                or chain in {"json.dump", "json.dumps", "dump", "dumps"}
+            ):
                 continue
             func_name = ""
             current = parents.get(node)
@@ -1282,6 +1289,78 @@ def _ad_hoc_json_serializers(loci: tuple[str, ...]) -> list[str]:
                 continue
             findings.append(f"{rel}:{func_name or '<module>'}:{chain}")
     return sorted(set(findings))
+
+
+def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
+    """Find registered adapter routes that serialize/respond without a presenter path."""
+
+    findings: list[str] = []
+    presenter_calls = {"emit_public", "emit_public_with_envelope", "emit_reader_public_bytes", "emit_reader_public_envelope", "emit_fn"}
+    bypass_calls = {"jsonify", "json.dumps", "json.dump", "dumps", "dump"}
+    for rel in loci:
+        _path, _text, tree = _python_source(rel)
+        function_defs = {node.name: node for node in ast.walk(tree) if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))}
+        function_calls: dict[str, set[str]] = {}
+        direct_presenter: set[str] = set()
+        direct_bypass: set[str] = set()
+        route_functions: set[str] = set()
+        for name, fn in function_defs.items():
+            calls = _call_names(fn)
+            function_calls[name] = calls
+            if any(call in presenter_calls or call.endswith(".emit_public") for call in calls):
+                direct_presenter.add(name)
+            if any(call in bypass_calls or call.endswith(".jsonify") or call.endswith(".dumps") or call.endswith(".dump") for call in calls):
+                direct_bypass.add(name)
+            for deco in fn.decorator_list:
+                deco_name = _attribute_chain(deco.func if isinstance(deco, ast.Call) else deco)
+                if deco_name.endswith((".route", ".get", ".post", ".put", ".patch", ".delete", ".before_app_request")):
+                    route_functions.add(name)
+
+        reaches_presenter: dict[str, bool] = {}
+
+        def reaches(name: str, seen: set[str] | None = None) -> bool:
+            if name in reaches_presenter:
+                return reaches_presenter[name]
+            if name in direct_presenter:
+                reaches_presenter[name] = True
+                return True
+            seen = set(seen or set())
+            if name in seen:
+                reaches_presenter[name] = False
+                return False
+            seen.add(name)
+            result = any(callee in function_defs and reaches(callee, seen) for callee in function_calls.get(name, set()))
+            reaches_presenter[name] = result
+            return result
+
+        for name in sorted(route_functions):
+            if (name in direct_bypass or any(callee in direct_bypass for callee in function_calls.get(name, set()))) and not reaches(name):
+                findings.append(f"{rel}:{name}")
+    return findings
+
+
+def _pure_compute_external_io(loci: tuple[str, ...]) -> list[str]:
+    findings: list[str] = []
+    forbidden_modules = {"requests", "httpx", "urllib", "urllib.request", "urllib3", "socket", "subprocess"}
+    forbidden_calls = {"socket.create_connection", "create_connection", "subprocess.run", "subprocess.Popen", "subprocess.call", "os.system"}
+    for rel in loci:
+        _path, _text, tree = _python_source(rel)
+        modules = _import_modules(tree)
+        calls = _call_names(tree)
+        aliases = _import_aliases(tree)
+        for module in sorted(modules):
+            if module in forbidden_modules or any(module.startswith(f"{forbidden}.") for forbidden in forbidden_modules):
+                findings.append(f"{rel}:import:{module}")
+        for call in sorted(calls):
+            root = call.split(".", 1)[0]
+            target = aliases.get(root, root)
+            if call in forbidden_calls or target in forbidden_modules or any(target.startswith(f"{forbidden}.") for forbidden in forbidden_modules):
+                findings.append(f"{rel}:call:{call}")
+    return sorted(set(findings))
+
+
+def _is_http_home_module(module: str) -> bool:
+    return module in {"flask", "fastapi", "starlette"} or module.startswith(("flask.", "fastapi.", "starlette."))
 
 
 def _locus_rows(loci: tuple[str, ...]) -> list[dict[str, str]]:
@@ -1337,13 +1416,12 @@ def build_adapter_boundary_proof(produced: str, source_selection: dict[str, Any]
         or call.endswith(".emit_public")
         or call in {"emit_reader_public_bytes", "emit_reader_public_envelope", "emit_fn"}
     )
-    presenter_uses_emitter = bool(adapter_presenter_calls)
-    forbidden_http_modules = {"requests", "httpx", "urllib", "urllib.request", "urllib3"}
-    pure_external_io = sorted((pure_modules | pure_calls) & forbidden_http_modules)
-    second_http_home = sorted((vendor_modules - {"urllib.error", "urllib.request", "urllib.parse"}) & {"flask", "fastapi", "starlette"})
+    presenter_bypass = _adapter_presenter_bypass_routes(ADAPTER_BOUNDARY_ADAPTER_LOCI)
+    presenter_uses_emitter = bool(adapter_presenter_calls) and not presenter_bypass
+    pure_external_io = _pure_compute_external_io(ADAPTER_BOUNDARY_PURE_COMPUTE_LOCI)
+    second_http_home = sorted(module for module in vendor_modules if _is_http_home_module(module))
     adapter_bypass = _adapter_external_io_calls(ADAPTER_BOUNDARY_ADAPTER_LOCI)
-    presenter_bypass = not presenter_uses_emitter
-    ad_hoc_serializers = _ad_hoc_json_serializers(ADAPTER_BOUNDARY_ADAPTER_LOCI + ADAPTER_BOUNDARY_VENDOR_SEAM_LOCI)
+    ad_hoc_serializers = _ad_hoc_json_serializers(ADAPTER_BOUNDARY_ADAPTER_LOCI + ADAPTER_BOUNDARY_VENDOR_SEAM_LOCI + ADAPTER_BOUNDARY_PRESENTER_LOCI)
 
     checks = {
         "adapter_http_home_inspected": bool(adapter_http_modules),
@@ -1354,7 +1432,7 @@ def build_adapter_boundary_proof(produced: str, source_selection: dict[str, Any]
         "no_presenter_bypass": not presenter_bypass,
         "no_ad_hoc_serialization": not ad_hoc_serializers,
         "no_pure_compute_external_io": not pure_external_io,
-        "prior_evidence_families_bound": all((ROOT / rel).exists() for rel in ["artifacts/vendor/hdapi_v2/source_selection.snapshot.json", "artifacts/vendor/hdapi_v2/request_shaping.snapshot.json", "artifacts/vendor/hdapi_v2/response_mapping.snapshot.json"]),
+        "prior_evidence_families_bound": all(isinstance(payload, dict) and payload for payload in [source_selection, request_shaping, response_mapping]),
         "no_unsupported_scope_claim": True,
     }
     failed = [name for name, ok in checks.items() if not ok]
