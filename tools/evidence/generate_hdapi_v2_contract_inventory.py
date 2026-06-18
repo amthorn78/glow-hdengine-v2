@@ -1232,7 +1232,7 @@ def _attribute_chain(node: ast.AST) -> str:
 def _adapter_external_io_calls(loci: tuple[str, ...]) -> list[str]:
     findings: list[str] = []
     http_methods = {"request", "get", "post", "put", "patch", "delete", "head", "options", "urlopen"}
-    forbidden_modules = {"requests", "httpx", "urllib.request", "urllib3", "http.client", "socket", "subprocess"}
+    forbidden_modules = {"requests", "httpx", "urllib.request", "urllib3", "http.client", "aiohttp", "socket", "subprocess"}
     forbidden_calls = {"socket.create_connection", "create_connection", "subprocess.run", "subprocess.Popen", "subprocess.call", "os.system"}
     for rel in loci:
         _path, _text, tree = _python_source(rel)
@@ -1245,10 +1245,10 @@ def _adapter_external_io_calls(loci: tuple[str, ...]) -> list[str]:
             ctor_root = _root_name(node.value.func)
             ctor_target = aliases.get(ctor_root or "", ctor_root or "")
             if (
-                ctor_target.startswith(("requests", "httpx", "urllib3", "http.client"))
+                ctor_target.startswith(("requests", "httpx", "urllib3", "http.client", "aiohttp"))
                 and (
-                    ctor_chain.endswith((".Session", ".Client", ".PoolManager", ".HTTPConnection", ".HTTPSConnection"))
-                    or ctor_target.endswith((".Session", ".Client", ".PoolManager", ".HTTPConnection", ".HTTPSConnection"))
+                    ctor_chain.endswith((".Session", ".Client", ".PoolManager", ".HTTPConnection", ".HTTPSConnection", ".ClientSession"))
+                    or ctor_target.endswith((".Session", ".Client", ".PoolManager", ".HTTPConnection", ".HTTPSConnection", ".ClientSession"))
                 )
             ):
                 target_nodes = node.targets if isinstance(node, ast.Assign) else [node.target]
@@ -1276,6 +1276,7 @@ def _adapter_external_io_calls(loci: tuple[str, ...]) -> list[str]:
                     or ".PoolManager." in chain
                     or ".HTTPConnection." in chain
                     or ".HTTPSConnection." in chain
+                    or ".ClientSession." in chain
                 ):
                     findings.append(f"{rel}:{chain}")
             elif chain in forbidden_calls or target in {"socket.create_connection", "subprocess.run", "subprocess.Popen", "subprocess.call", "os.system"}:
@@ -1381,6 +1382,8 @@ def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
             return names
 
         def node_is_jsonish(value: ast.AST) -> bool:
+            if isinstance(value, ast.Tuple):
+                return bool(value.elts) and node_is_jsonish(value.elts[0])
             if isinstance(value, (ast.Dict, ast.List)):
                 return True
             if isinstance(value, ast.Constant) and isinstance(value.value, str):
@@ -1488,7 +1491,7 @@ def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
 
 def _pure_compute_external_io(loci: tuple[str, ...]) -> list[str]:
     findings: list[str] = []
-    forbidden_modules = {"requests", "httpx", "urllib", "urllib.request", "urllib3", "socket", "subprocess"}
+    forbidden_modules = {"requests", "httpx", "urllib", "urllib.request", "urllib3", "http.client", "aiohttp", "socket", "subprocess"}
     forbidden_calls = {"socket.create_connection", "create_connection", "subprocess.run", "subprocess.Popen", "subprocess.call", "os.system"}
     for rel in loci:
         _path, _text, tree = _python_source(rel)
@@ -1501,7 +1504,12 @@ def _pure_compute_external_io(loci: tuple[str, ...]) -> list[str]:
         for call in sorted(calls):
             root = call.split(".", 1)[0]
             target = aliases.get(root, root)
-            if call in forbidden_calls or target in forbidden_modules or any(target.startswith(f"{forbidden}.") for forbidden in forbidden_modules):
+            if (
+                call in forbidden_calls
+                or target in forbidden_calls
+                or target in forbidden_modules
+                or any(target.startswith(f"{forbidden}.") for forbidden in forbidden_modules)
+            ):
                 findings.append(f"{rel}:call:{call}")
     return sorted(set(findings))
 
@@ -1548,6 +1556,7 @@ def _vendor_external_io_functions(loci: tuple[str, ...]) -> list[str]:
         _path, _text, tree = _python_source(rel)
         aliases = _import_aliases(tree)
         opener_roots: set[str] = set()
+        client_roots: set[str] = set()
         for node in ast.walk(tree):
             if not isinstance(node, (ast.Assign, ast.AnnAssign)) or not isinstance(node.value, ast.Call):
                 continue
@@ -1559,6 +1568,17 @@ def _vendor_external_io_functions(loci: tuple[str, ...]) -> list[str]:
                 for target_node in target_nodes:
                     if isinstance(target_node, ast.Name):
                         opener_roots.add(target_node.id)
+            if (
+                ctor_target.startswith(("requests", "httpx", "urllib3", "http.client", "aiohttp"))
+                and (
+                    ctor_chain.endswith((".Session", ".Client", ".PoolManager", ".HTTPConnection", ".HTTPSConnection", ".ClientSession"))
+                    or ctor_target.endswith((".Session", ".Client", ".PoolManager", ".HTTPConnection", ".HTTPSConnection", ".ClientSession"))
+                )
+            ):
+                target_nodes = node.targets if isinstance(node, ast.Assign) else [node.target]
+                for target_node in target_nodes:
+                    if isinstance(target_node, ast.Name):
+                        client_roots.add(target_node.id)
         parents: dict[ast.AST, ast.AST] = {}
         for parent in ast.walk(tree):
             for child in ast.iter_child_nodes(parent):
@@ -1571,8 +1591,9 @@ def _vendor_external_io_functions(loci: tuple[str, ...]) -> list[str]:
             target = aliases.get(root or "", root or "")
             attr = chain.rsplit(".", 1)[-1] if chain else ""
             is_external = (
-                (target.startswith(("urllib.request", "requests", "httpx", "urllib3", "http.client")) and attr in http_methods | {"build_opener"})
+                (target.startswith(("urllib.request", "requests", "httpx", "urllib3", "http.client", "aiohttp")) and attr in http_methods | {"build_opener", "ClientSession"})
                 or (root in opener_roots and attr == "open")
+                or (root in client_roots and attr in http_methods)
             )
             if not is_external:
                 continue
