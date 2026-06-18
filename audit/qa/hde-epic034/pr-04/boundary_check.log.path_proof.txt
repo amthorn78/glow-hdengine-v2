@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic034/pr-04/boundary_check.log
+size_bytes: 911
+sha256: 9e9057885313d6fa1dfa9bd8598369bd562b5dbbdbddaf7dd7e172103d43a98c
+mtime_utc: 2026-06-18T16:29:07Z
+produced_at_utc: 2026-06-18T16:29:06Z

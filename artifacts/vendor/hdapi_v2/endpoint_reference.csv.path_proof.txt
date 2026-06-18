@@ -1,5 +1,5 @@
 path: artifacts/vendor/hdapi_v2/endpoint_reference.csv
 size_bytes: 2770
 sha256: 5f53f46737ee3630e44aebce4c83ae4fcfef95f53bdb97ac4926e636243ec661
-mtime_utc: 2026-06-18T02:44:05Z
-produced_at_utc: 2026-06-18T02:44:04Z
+mtime_utc: 2026-06-18T16:29:07Z
+produced_at_utc: 2026-06-18T16:29:06Z

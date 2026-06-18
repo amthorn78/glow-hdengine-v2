@@ -1,0 +1,18 @@
+generated_at_utc=2026-06-18T16:29:06Z
+scope=HDE-EPIC034 PR-04 boundary check
+rails=ALLOW_NETWORK=0 LANG=C LC_ALL=C SAFE_MODE=1 TZ=UTC
+network_posture=closed-rails-source-cache; no live vendor calls
+evidence_index_and_path_proof_posture=validated_by_update_evidence_index_and_validate_evidence_paths_not_generator
+[closed_rails_generation] status=PASS
+[no_live_vendor_call_attempted] status=PASS
+[adapter_http_home_posture_inspected] status=PASS
+[presenter_emitter_posture_inspected] status=PASS
+[vendor_seam_posture_inspected] status=PASS
+[no_second_http_home_check_passed] status=PASS
+[no_adapter_bypass_check_passed] status=PASS
+[no_presenter_bypass_check_passed] status=PASS
+[no_ad_hoc_serialization_check_passed] status=PASS
+[no_pure_compute_external_io_check_passed] status=PASS
+[pr01_pr02_pr03_pr04_evidence_family_binding_checked] status=PASS
+[no_unsupported_scope_claim_emitted] status=PASS
+status=PASS

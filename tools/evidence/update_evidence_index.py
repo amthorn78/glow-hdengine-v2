@@ -524,6 +524,13 @@ EPIC034_PR03_SUPERSEDED_INDEX_KEYS = {
     ("epic034.pr03.qa_meta_doc_deltas", "audit/qa/hde-epic034/00_meta/doc_deltas.md"),
 }
 
+EPIC034_PR04_SUPERSEDED_INDEX_KEYS = {
+    ("hdapi_v2.adapter_boundary_proof", "artifacts/vendor/hdapi_v2/adapter_boundary_proof.log"),
+    ("epic034.pr04.boundary_check", "audit/qa/hde-epic034/pr-04/boundary_check.log"),
+    ("epic034.pr04.doc_deltas", "audit/docdeltas/hde-epic034_doc_deltas.md"),
+    ("epic034.pr04.qa_meta_doc_deltas", "audit/qa/hde-epic034/00_meta/doc_deltas.md"),
+}
+
 EPIC032_PR03_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
         "artifact_key": "db_bridge.adapter_selection.snapshot",
@@ -839,10 +846,74 @@ def _load_epic034_pr03_entries() -> list[dict[str, object]]:
     produced = payload.get("generated_at_utc")
     if isinstance(produced, str) and produced:
         produced_at = produced
+    pr04_doc_delta_active = (
+        (ROOT / "artifacts/vendor/hdapi_v2/adapter_boundary_proof.log").exists()
+        and (ROOT / "audit/qa/hde-epic034/pr-04/boundary_check.log").exists()
+    )
     entries: list[dict[str, object]] = []
     for entry in EPIC034_PR03_PRIMARY_ARTIFACTS:
+        if pr04_doc_delta_active and entry.get("record_type") == "epic034_pr03_doc_delta":
+            continue
         normalized = dict(entry)
         if produced_at is not None and normalized.get("record_type") != "epic034_pr03_doc_delta":
+            normalized["produced_at_utc"] = produced_at
+        entries.append(normalized)
+    return entries
+
+EPIC034_PR04_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "hdapi_v2.adapter_boundary_proof",
+        "discovered_physical_path": "artifacts/vendor/hdapi_v2/adapter_boundary_proof.log",
+        "epic_id": "HDE-EPIC034",
+        "record_type": "epic034_pr04_adapter_boundary",
+        "schema_version": "1.0",
+        "tokens": ["EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC034 PR-04 LF-terminated adapter/presenter boundary proof for HDE-FERM007.4 with no live vendor, open-rails, public Reader, HDE-FERM007.5, HDE-FERM008, or AI scope claim",
+    },
+    {
+        "artifact_key": "epic034.pr04.boundary_check",
+        "discovered_physical_path": "audit/qa/hde-epic034/pr-04/boundary_check.log",
+        "epic_id": "HDE-EPIC034",
+        "record_type": "epic034_pr04_adapter_boundary",
+        "schema_version": "1.0",
+        "tokens": ["EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC034 PR-04 boundary check log for adapter HTTP home, presenter boundary, serializer, pure-compute, and prior-family binding posture",
+    },
+    {
+        "artifact_key": "epic034.pr04.doc_deltas",
+        "discovered_physical_path": "audit/docdeltas/hde-epic034_doc_deltas.md",
+        "epic_id": "HDE-EPIC034",
+        "record_type": "epic034_pr04_doc_delta",
+        "schema_version": "1.0",
+        "tokens": ["DOC_DELTA_PRESENT_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC034 PR-04 current-epic doc-delta surface records no PF-Canon edit for HDE-FERM007.4 boundary proof",
+    },
+    {
+        "artifact_key": "epic034.pr04.qa_meta_doc_deltas",
+        "discovered_physical_path": "audit/qa/hde-epic034/00_meta/doc_deltas.md",
+        "epic_id": "HDE-EPIC034",
+        "record_type": "epic034_pr04_doc_delta",
+        "schema_version": "1.0",
+        "tokens": ["DOC_DELTA_PRESENT_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC034 PR-04 QA meta doc-delta surface records no PF-Canon edit for HDE-FERM007.4 boundary proof",
+    },
+]
+
+
+def _load_epic034_pr04_entries() -> list[dict[str, object]]:
+    proof = ROOT / "artifacts/vendor/hdapi_v2/adapter_boundary_proof.log"
+    check_log = ROOT / "audit/qa/hde-epic034/pr-04/boundary_check.log"
+    if not proof.exists() or not check_log.exists():
+        return []
+    produced_at = None
+    for line in proof.read_text(encoding="utf-8").splitlines():
+        if line.startswith("generated_at_utc="):
+            produced_at = line.split("=", 1)[1]
+            break
+    entries: list[dict[str, object]] = []
+    for entry in EPIC034_PR04_PRIMARY_ARTIFACTS:
+        normalized = dict(entry)
+        if produced_at is not None and normalized.get("record_type") != "epic034_pr04_doc_delta":
             normalized["produced_at_utc"] = produced_at
         entries.append(normalized)
     return entries
@@ -1176,6 +1247,8 @@ def _load_human_index() -> list[dict[str, object]]:
         not in EPIC034_PR02_SUPERSEDED_INDEX_KEYS
         and (entry.get("artifact_key"), entry.get("discovered_physical_path"))
         not in EPIC034_PR03_SUPERSEDED_INDEX_KEYS
+        and (entry.get("artifact_key"), entry.get("discovered_physical_path"))
+        not in EPIC034_PR04_SUPERSEDED_INDEX_KEYS
     ]
     return _dedupe_entries(
         [
@@ -1200,6 +1273,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *_load_epic034_pr01_entries(),
             *_load_epic034_pr02_entries(),
             *_load_epic034_pr03_entries(),
+            *_load_epic034_pr04_entries(),
             *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,
