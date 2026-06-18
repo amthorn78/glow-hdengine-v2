@@ -1232,7 +1232,7 @@ def _attribute_chain(node: ast.AST) -> str:
 def _adapter_external_io_calls(loci: tuple[str, ...]) -> list[str]:
     findings: list[str] = []
     http_methods = {"request", "get", "post", "put", "patch", "delete", "head", "options", "urlopen"}
-    forbidden_modules = {"requests", "httpx", "urllib.request", "urllib3", "socket", "subprocess"}
+    forbidden_modules = {"requests", "httpx", "urllib.request", "urllib3", "http.client", "socket", "subprocess"}
     forbidden_calls = {"socket.create_connection", "create_connection", "subprocess.run", "subprocess.Popen", "subprocess.call", "os.system"}
     for rel in loci:
         _path, _text, tree = _python_source(rel)
@@ -1245,8 +1245,11 @@ def _adapter_external_io_calls(loci: tuple[str, ...]) -> list[str]:
             ctor_root = _root_name(node.value.func)
             ctor_target = aliases.get(ctor_root or "", ctor_root or "")
             if (
-                ctor_target.startswith(("requests", "httpx", "urllib3"))
-                and (ctor_chain.endswith((".Session", ".Client", ".PoolManager")) or ctor_target.endswith((".Session", ".Client", ".PoolManager")))
+                ctor_target.startswith(("requests", "httpx", "urllib3", "http.client"))
+                and (
+                    ctor_chain.endswith((".Session", ".Client", ".PoolManager", ".HTTPConnection", ".HTTPSConnection"))
+                    or ctor_target.endswith((".Session", ".Client", ".PoolManager", ".HTTPConnection", ".HTTPSConnection"))
+                )
             ):
                 target_nodes = node.targets if isinstance(node, ast.Assign) else [node.target]
                 for target_node in target_nodes:
@@ -1265,7 +1268,15 @@ def _adapter_external_io_calls(loci: tuple[str, ...]) -> list[str]:
             elif root in client_roots and attr in http_methods:
                 findings.append(f"{rel}:{chain}")
             elif target in forbidden_modules or any(target.startswith(f"{module}.") for module in forbidden_modules):
-                if attr in http_methods or target_attr in http_methods or chain.endswith((".Client", ".PoolManager")) or ".Client." in chain or ".PoolManager." in chain:
+                if (
+                    attr in http_methods
+                    or target_attr in http_methods
+                    or chain.endswith((".Client", ".PoolManager", ".HTTPConnection", ".HTTPSConnection"))
+                    or ".Client." in chain
+                    or ".PoolManager." in chain
+                    or ".HTTPConnection." in chain
+                    or ".HTTPSConnection." in chain
+                ):
                     findings.append(f"{rel}:{chain}")
             elif chain in forbidden_calls or target in {"socket.create_connection", "subprocess.run", "subprocess.Popen", "subprocess.call", "os.system"}:
                 findings.append(f"{rel}:{chain}")
@@ -1315,7 +1326,7 @@ def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
 
     findings: list[str] = []
     presenter_calls = {"emit_public", "emit_public_with_envelope", "emit_reader_public_bytes", "emit_reader_public_envelope", "emit_fn"}
-    bypass_calls = {"jsonify", "json.dumps", "json.dump", "dumps", "dump"}
+    bypass_calls = {"jsonify", "json.dumps", "json.dump", "dumps", "dump", "sercanon", "serialize"}
     for rel in loci:
         _path, _text, tree = _python_source(rel)
         aliases = _import_aliases(tree)
@@ -1380,9 +1391,9 @@ def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
                 root = _root_name(value.func)
                 target = aliases.get(root or "", root or "")
                 if (
-                    call_name in {"json.dumps", "dumps", "jsonify", "make_response", "current_app.json.response"}
+                    call_name in {"json.dumps", "dumps", "jsonify", "make_response", "current_app.json.response", "sercanon", "serialize"}
                     or target in {"flask.jsonify", "flask.make_response", "json.dumps"}
-                    or call_name.endswith((".jsonify", ".json.response", ".dumps"))
+                    or call_name.endswith((".jsonify", ".json.response", ".dumps", ".sercanon", ".serialize"))
                 ):
                     return True
                 return False
@@ -1392,7 +1403,7 @@ def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
             if any(
                 call in bypass_calls
                 or aliases.get(call, "") in {"flask.jsonify", "flask.make_response", "json.dumps", "json.dump"}
-                or call.endswith((".jsonify", ".json.response", ".dumps", ".dump"))
+                or call.endswith((".jsonify", ".json.response", ".dumps", ".dump", ".sercanon", ".serialize"))
                 or call == "make_response"
                 for call in calls
             ):
@@ -1507,6 +1518,118 @@ def _locus_rows(loci: tuple[str, ...]) -> list[dict[str, str]]:
     return rows
 
 
+def _node_mentions_guard_symbol(node: ast.AST, symbol: str) -> bool:
+    for child in ast.walk(node):
+        if isinstance(child, ast.Constant) and child.value == symbol:
+            return True
+    return False
+
+
+def _vendor_guard_entrypoints(loci: tuple[str, ...]) -> list[str]:
+    guarded: list[str] = []
+    for rel in loci:
+        _path, _text, tree = _python_source(rel)
+        for node in ast.walk(tree):
+            if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                continue
+            if (
+                _node_mentions_guard_symbol(node, "SAFE_MODE")
+                and _node_mentions_guard_symbol(node, "ALLOW_NETWORK")
+                and any(isinstance(child, ast.Raise) for child in ast.walk(node))
+            ):
+                guarded.append(f"{rel}:{node.name}")
+    return sorted(set(guarded))
+
+
+def _vendor_external_io_functions(loci: tuple[str, ...]) -> list[str]:
+    findings: list[str] = []
+    http_methods = {"urlopen", "request", "get", "post", "put", "patch", "delete", "head", "options"}
+    for rel in loci:
+        _path, _text, tree = _python_source(rel)
+        aliases = _import_aliases(tree)
+        opener_roots: set[str] = set()
+        for node in ast.walk(tree):
+            if not isinstance(node, (ast.Assign, ast.AnnAssign)) or not isinstance(node.value, ast.Call):
+                continue
+            ctor_chain = _attribute_chain(node.value.func)
+            ctor_root = _root_name(node.value.func)
+            ctor_target = aliases.get(ctor_root or "", ctor_root or "")
+            if ctor_target == "urllib.request" and ctor_chain.endswith(".build_opener"):
+                target_nodes = node.targets if isinstance(node, ast.Assign) else [node.target]
+                for target_node in target_nodes:
+                    if isinstance(target_node, ast.Name):
+                        opener_roots.add(target_node.id)
+        parents: dict[ast.AST, ast.AST] = {}
+        for parent in ast.walk(tree):
+            for child in ast.iter_child_nodes(parent):
+                parents[child] = parent
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Call):
+                continue
+            chain = _attribute_chain(node.func)
+            root = _root_name(node.func)
+            target = aliases.get(root or "", root or "")
+            attr = chain.rsplit(".", 1)[-1] if chain else ""
+            is_external = (
+                (target.startswith(("urllib.request", "requests", "httpx", "urllib3", "http.client")) and attr in http_methods | {"build_opener"})
+                or (root in opener_roots and attr == "open")
+            )
+            if not is_external:
+                continue
+            func_name = "<module>"
+            current = parents.get(node)
+            while current is not None:
+                if isinstance(current, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                    func_name = current.name
+                    break
+                current = parents.get(current)
+            findings.append(f"{rel}:{func_name}:{chain}")
+    return sorted(set(findings))
+
+
+def _vendor_seam_guarded(loci: tuple[str, ...]) -> bool:
+    guarded_entrypoints = _vendor_guard_entrypoints(loci)
+    external_io_functions = _vendor_external_io_functions(loci)
+    if not external_io_functions:
+        return True
+    allowed_low_level = {"engine/bodygraph/vendor_client.py:_default_request"}
+    unguarded_external = [
+        finding
+        for finding in external_io_functions
+        if ":".join(finding.split(":", 2)[:2]) not in allowed_low_level
+    ]
+    return bool(guarded_entrypoints) and not unguarded_external
+
+
+def _unsupported_scope_claims(*payloads: dict[str, Any]) -> list[str]:
+    unsupported_claim_keys = {
+        "ai_scope_claim",
+        "live_vendor_call_claim",
+        "open_rails_vendor_smoke_claim",
+        "public_reader_change_claim",
+        "runtime_conformance_claim",
+        "normalized_data_path_proof_claim",
+        "hde_ferm007_5_claim",
+        "hde_ferm008_claim",
+    }
+    findings: list[str] = []
+
+    def visit(value: Any, path: str) -> None:
+        if isinstance(value, dict):
+            for key, nested in value.items():
+                nested_path = f"{path}.{key}" if path else str(key)
+                if key in unsupported_claim_keys and nested != "NONE":
+                    findings.append(f"{nested_path}={nested!r}")
+                visit(nested, nested_path)
+        elif isinstance(value, list):
+            for index, nested in enumerate(value):
+                visit(nested, f"{path}[{index}]")
+
+    for index, payload in enumerate(payloads):
+        visit(payload, f"payload[{index}]")
+    return sorted(set(findings))
+
+
 def build_adapter_boundary_proof(produced: str, source_selection: dict[str, Any], request_shaping: dict[str, Any], response_mapping: dict[str, Any]) -> tuple[str, dict[str, bool]]:
     if source_selection.get("request_shaping_claim") != "NONE":
         raise ValueError("ADAPTER_BOUNDARY_SOURCE_SELECTION_BASELINE_DRIFT")
@@ -1532,11 +1655,10 @@ def build_adapter_boundary_proof(produced: str, source_selection: dict[str, Any]
     vendor_modules: set[str] = set()
     vendor_calls: set[str] = set()
     for rel in ADAPTER_BOUNDARY_VENDOR_SEAM_LOCI:
-        _path, text, tree = _python_source(rel)
+        _path, _text, tree = _python_source(rel)
         vendor_modules |= _import_modules(tree)
         vendor_calls |= _call_names(tree)
-    vendor_guard_text = "\n".join(_python_source(rel)[1] for rel in ADAPTER_BOUNDARY_VENDOR_SEAM_LOCI)
-    if "ALLOW_NETWORK" not in vendor_guard_text or "SAFE_MODE" not in vendor_guard_text:
+    if not _vendor_seam_guarded(ADAPTER_BOUNDARY_VENDOR_SEAM_LOCI):
         raise ValueError("ADAPTER_BOUNDARY_VENDOR_GUARD_UNEXPECTED:engine/bodygraph")
 
     pure_modules: set[str] = set()
@@ -1558,6 +1680,7 @@ def build_adapter_boundary_proof(produced: str, source_selection: dict[str, Any]
     second_http_home = sorted(module for module in vendor_modules if _is_http_home_module(module))
     adapter_bypass = _adapter_external_io_calls(ADAPTER_BOUNDARY_ADAPTER_LOCI)
     ad_hoc_serializers = _ad_hoc_json_serializers(ADAPTER_BOUNDARY_ADAPTER_LOCI + ADAPTER_BOUNDARY_VENDOR_SEAM_LOCI + ADAPTER_BOUNDARY_PRESENTER_LOCI)
+    unsupported_scope_claims = _unsupported_scope_claims(source_selection, request_shaping, response_mapping)
 
     checks = {
         "adapter_http_home_inspected": bool(adapter_http_modules),
@@ -1569,7 +1692,7 @@ def build_adapter_boundary_proof(produced: str, source_selection: dict[str, Any]
         "no_ad_hoc_serialization": not ad_hoc_serializers,
         "no_pure_compute_external_io": not pure_external_io,
         "prior_evidence_families_bound": all(isinstance(payload, dict) and payload for payload in [source_selection, request_shaping, response_mapping]),
-        "no_unsupported_scope_claim": True,
+        "no_unsupported_scope_claim": not unsupported_scope_claims,
     }
     failed = [name for name, ok in checks.items() if not ok]
     if failed:

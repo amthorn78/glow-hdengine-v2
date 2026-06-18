@@ -1411,3 +1411,77 @@ def bad():
             generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
     finally:
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_adapter_boundary_fails_closed_on_stdlib_http_client(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+import http.client
+SAFE_MODE='1'
+def route():
+    conn = http.client.HTTPSConnection('example.invalid')
+    conn.request('GET', '/')
+    return 'ok'
+"""
+    try:
+        bad_adapter = _write_boundary_temp(rel_dir, "stdlib_http_client.py", body)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (bad_adapter,))
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_adapter_bypass"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_presenter_bypass_detects_direct_canonical_bytes_response(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask, Response
+from engine.presenter.emitter import emit_public
+from engine.util import canon
+app = Flask(__name__)
+SAFE_MODE='1'
+@app.route('/good')
+def good():
+    return emit_public({'ok': True})
+@app.route('/bad')
+def bad():
+    return Response(canon.sercanon({'ok': False}), mimetype='application/json')
+"""
+    try:
+        bad_adapter = _write_boundary_temp(rel_dir, "canonical_response.py", body)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (bad_adapter,))
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_presenter_bypass"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_vendor_guard_ignores_comment_only_safe_mode_mentions(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from urllib import request as urlrequest
+# SAFE_MODE and ALLOW_NETWORK are mentioned here only, not as a guard.
+def fetch():
+    return urlrequest.urlopen('https://example.invalid')
+"""
+    try:
+        bad_vendor = _write_boundary_temp(rel_dir, "unguarded_vendor.py", body)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_VENDOR_SEAM_LOCI", (bad_vendor,))
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_VENDOR_GUARD_UNEXPECTED"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_boundary_fails_closed_on_prior_unsupported_scope_claim() -> None:
+    source_selection, request_shaping, response_mapping = _epic034_boundary_inputs()
+    drifted = dict(request_shaping)
+    drifted["live_vendor_call_claim"] = "CLAIMED"
+    with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_unsupported_scope_claim"):
+        generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", source_selection, drifted, response_mapping)

@@ -1,4 +1,4 @@
-generated_at_utc=2026-06-18T07:05:44Z
+generated_at_utc=2026-06-18T07:25:54Z
 scope=HDE-EPIC034 PR-01 HDE-FERM007.1 v1 legacy guard
 classification_source=artifacts/vendor/hdapi_v2/contract_map.json route_families
 [/v1/bodygraphs] legacy_v1_bodygraph_explicit=PASS
