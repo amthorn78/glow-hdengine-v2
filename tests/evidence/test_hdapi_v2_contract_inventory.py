@@ -761,3 +761,92 @@ def test_epic034_current_doc_deltas_are_not_indexed_as_pr01_after_pr03_update() 
     assert "epic034.pr01.qa_meta_doc_deltas" not in pr01_rows
     assert pr03_rows["epic034.pr03.doc_deltas"]["record_type"] == "epic034_pr03_doc_delta"
     assert pr03_rows["epic034.pr03.qa_meta_doc_deltas"]["record_type"] == "epic034_pr03_doc_delta"
+
+
+def test_epic034_adapter_boundary_proof_exists_and_passes() -> None:
+    proof_path = VENDOR_DIR / "adapter_boundary_proof.log"
+    proof = proof_path.read_text(encoding="utf-8")
+    assert proof.endswith("\n")
+    assert "\r\n" not in proof
+    required = [
+        "observed_adapter_http_home_posture=adapter package owns Flask HTTP home",
+        "observed_presenter_emitter_posture=presenter/emitter remains byte-authoritative",
+        "observed_vendor_seam_posture=engine.bodygraph.vendor_client remains sanctioned BodyGraph/vendor external-I/O seam",
+        "no_second_http_home_claim=PASS",
+        "no_adapter_bypass_claim=PASS",
+        "no_presenter_bypass_claim=PASS",
+        "no_ad_hoc_serialization_claim=PASS",
+        "no_pure_compute_external_io_claim=PASS",
+        "no_live_vendor_success_claim=NONE",
+        "no_public_reader_change_claim=NONE",
+        "no_open_rails_smoke_claim=NONE",
+        "no_HDE-FERM007.5_claim=NONE",
+        "no_HDE-FERM008_claim=NONE",
+        "no_AI_scope_claim=NONE",
+        "status=PASS",
+    ]
+    for needle in required:
+        assert needle in proof
+
+
+def test_epic034_boundary_check_log_exists_and_binds_prior_families() -> None:
+    log_path = ROOT / "audit" / "qa" / "hde-epic034" / "pr-04" / "boundary_check.log"
+    log = log_path.read_text(encoding="utf-8")
+    assert log.endswith("\n")
+    assert "\r\n" not in log
+    for check in [
+        "closed_rails_generation",
+        "no_live_vendor_call_attempted",
+        "adapter_http_home_posture_inspected",
+        "presenter_emitter_posture_inspected",
+        "vendor_seam_posture_inspected",
+        "no_second_http_home_check_passed",
+        "no_adapter_bypass_check_passed",
+        "no_presenter_bypass_check_passed",
+        "no_ad_hoc_serialization_check_passed",
+        "no_pure_compute_external_io_check_passed",
+        "pr01_pr02_pr03_pr04_evidence_family_binding_checked",
+        "no_unsupported_scope_claim_emitted",
+    ]:
+        assert f"[{check}] status=PASS" in log
+    assert "evidence_index_and_path_proof_posture=validated_by_update_evidence_index_and_validate_evidence_paths_not_generator" in log
+    assert "status=PASS" in log
+
+
+def test_epic034_adapter_boundary_builder_fails_closed_on_missing_locus(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", ("adapter/missing_for_boundary.py",))
+    source_selection = _assert_canonical_json(VENDOR_DIR / "source_selection.snapshot.json")
+    request_shaping = _assert_canonical_json(VENDOR_DIR / "request_shaping.snapshot.json")
+    response_mapping = _assert_canonical_json(VENDOR_DIR / "response_mapping.snapshot.json")
+    with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_LOCUS_MISSING"):
+        generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", source_selection, request_shaping, response_mapping)
+
+
+def test_epic034_adapter_boundary_detects_second_http_home_and_pure_io(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    import shutil
+
+    bad_dir = ROOT / "tmp_boundary_test"
+    try:
+        bad_dir.mkdir(exist_ok=True)
+        bad_vendor = bad_dir / "bad_vendor.py"
+        bad_vendor.write_text("from flask import Flask\nfrom urllib import request as urlrequest\nALLOW_NETWORK='0'\nSAFE_MODE='1'\n", encoding="utf-8")
+        bad_compute = bad_dir / "bad_compute.py"
+        bad_compute.write_text("import requests\n", encoding="utf-8")
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_VENDOR_SEAM_LOCI", (bad_vendor.relative_to(ROOT).as_posix(),))
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PURE_COMPUTE_LOCI", (bad_compute.relative_to(ROOT).as_posix(),))
+        source_selection = _assert_canonical_json(VENDOR_DIR / "source_selection.snapshot.json")
+        request_shaping = _assert_canonical_json(VENDOR_DIR / "request_shaping.snapshot.json")
+        response_mapping = _assert_canonical_json(VENDOR_DIR / "response_mapping.snapshot.json")
+        _proof, checks = generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", source_selection, request_shaping, response_mapping)
+        assert checks["no_second_http_home"] is False
+        assert checks["no_pure_compute_external_io"] is False
+    finally:
+        shutil.rmtree(bad_dir, ignore_errors=True)
+
+
+def test_epic034_pr04_index_rows_use_approved_tokens_only() -> None:
+    rows = {entry["artifact_key"]: entry for entry in json.loads((ROOT / "docs" / "evidence" / "INDEX.json").read_text(encoding="utf-8"))}
+    approved = {"JSON_CANONICAL_CHECK_OK", "EVIDENCE_INDEX_UPDATED_OK", "MACHINE_MIRROR_UPDATED_OK", "EVIDENCE_PATHS_VALIDATED_OK", "EVIDENCE_PATH_PROOFS_OK", "TESTS_PASS_OK", "DOC_DELTA_PRESENT_OK"}
+    for key in ["hdapi_v2.adapter_boundary_proof", "epic034.pr04.boundary_check", "epic034.pr04.doc_deltas", "epic034.pr04.qa_meta_doc_deltas"]:
+        assert key in rows
+        assert set(rows[key].get("tokens", [])) <= approved

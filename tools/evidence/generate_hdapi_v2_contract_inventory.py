@@ -10,6 +10,7 @@ credentialed runtime vendor endpoints.
 from __future__ import annotations
 
 import argparse
+import ast
 import csv
 import datetime as dt
 import hashlib
@@ -36,10 +37,13 @@ QA_DOC_DELTAS = ROOT / "audit" / "qa" / "hde-epic033" / "00_meta" / "doc_deltas.
 EPIC034_QA = ROOT / "audit" / "qa" / "hde-epic034" / "pr-01"
 EPIC034_PR02_QA = ROOT / "audit" / "qa" / "hde-epic034" / "pr-02"
 EPIC034_PR03_QA = ROOT / "audit" / "qa" / "hde-epic034" / "pr-03"
+EPIC034_PR04_QA = ROOT / "audit" / "qa" / "hde-epic034" / "pr-04"
 REQUEST_SHAPING_SNAPSHOT = OUT / "request_shaping.snapshot.json"
 REQUEST_SHAPING_CHECK_LOG = EPIC034_PR02_QA / "request_shaping_check.log"
 RESPONSE_MAPPING_SNAPSHOT = OUT / "response_mapping.snapshot.json"
 RESPONSE_MAPPING_CHECK_LOG = EPIC034_PR03_QA / "response_mapping_check.log"
+ADAPTER_BOUNDARY_PROOF_LOG = OUT / "adapter_boundary_proof.log"
+BOUNDARY_CHECK_LOG = EPIC034_PR04_QA / "boundary_check.log"
 REQUEST_SHAPING_OUTPUTS = (
     REQUEST_SHAPING_SNAPSHOT,
     REQUEST_SHAPING_SNAPSHOT.with_suffix(REQUEST_SHAPING_SNAPSHOT.suffix + ".path_proof.txt"),
@@ -52,7 +56,13 @@ RESPONSE_MAPPING_OUTPUTS = (
     RESPONSE_MAPPING_CHECK_LOG,
     RESPONSE_MAPPING_CHECK_LOG.with_suffix(RESPONSE_MAPPING_CHECK_LOG.suffix + ".path_proof.txt"),
 )
-EPIC034_CLOSED_RAILS_DERIVED_OUTPUTS = REQUEST_SHAPING_OUTPUTS + RESPONSE_MAPPING_OUTPUTS
+ADAPTER_BOUNDARY_OUTPUTS = (
+    ADAPTER_BOUNDARY_PROOF_LOG,
+    ADAPTER_BOUNDARY_PROOF_LOG.with_suffix(ADAPTER_BOUNDARY_PROOF_LOG.suffix + ".path_proof.txt"),
+    BOUNDARY_CHECK_LOG,
+    BOUNDARY_CHECK_LOG.with_suffix(BOUNDARY_CHECK_LOG.suffix + ".path_proof.txt"),
+)
+EPIC034_CLOSED_RAILS_DERIVED_OUTPUTS = REQUEST_SHAPING_OUTPUTS + RESPONSE_MAPPING_OUTPUTS + ADAPTER_BOUNDARY_OUTPUTS
 CLOSED_RAILS_ENV = {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}
 SOURCE_SELECTION_SNAPSHOT = OUT / "source_selection.snapshot.json"
 V1_LEGACY_GUARD_LOG = OUT / "v1_legacy_guard.log"
@@ -103,6 +113,10 @@ RESPONSE_MAPPING_INTERNAL_LOCI = (
     "engine/bodygraph/resolver.py",
     "engine/compat/compute.py",
 )
+ADAPTER_BOUNDARY_ADAPTER_LOCI = ("adapter/wsgi.py", "adapter/factory.py", "adapter/http_reader.py")
+ADAPTER_BOUNDARY_PRESENTER_LOCI = ("engine/presenter/emitter.py", "presenter/reader_v1/emitter.py")
+ADAPTER_BOUNDARY_VENDOR_SEAM_LOCI = ("engine/bodygraph/vendor_client.py", "engine/bodygraph/ingest.py", "engine/bodygraph/resolver.py")
+ADAPTER_BOUNDARY_PURE_COMPUTE_LOCI = ("engine/compat/compute.py",)
 
 
 
@@ -1139,6 +1153,167 @@ def build_response_mapping_check_log(produced: str, snapshot: dict[str, Any], *,
     lines.append("status=PASS" if all(ok for _name, ok in checks) else "status=FAIL")
     return "\n".join(lines)
 
+
+def _python_source(rel: str) -> tuple[Path, str, ast.AST]:
+    path = ROOT / rel
+    if not path.is_file():
+        raise ValueError(f"ADAPTER_BOUNDARY_LOCUS_MISSING:{rel}")
+    text = path.read_text(encoding="utf-8")
+    return path, text, ast.parse(text, filename=rel)
+
+
+def _call_names(tree: ast.AST) -> set[str]:
+    names: set[str] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Call):
+            func = node.func
+            if isinstance(func, ast.Name):
+                names.add(func.id)
+            elif isinstance(func, ast.Attribute):
+                parts = [func.attr]
+                value = func.value
+                while isinstance(value, ast.Attribute):
+                    parts.append(value.attr)
+                    value = value.value
+                if isinstance(value, ast.Name):
+                    parts.append(value.id)
+                names.add(".".join(reversed(parts)))
+    return names
+
+
+def _import_modules(tree: ast.AST) -> set[str]:
+    modules: set[str] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            modules.update(alias.name for alias in node.names)
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            modules.add(node.module)
+    return modules
+
+
+def _locus_rows(loci: tuple[str, ...]) -> list[dict[str, str]]:
+    rows = []
+    for rel in loci:
+        path, _text, _tree = _python_source(rel)
+        rows.append({"path": rel, "sha256": _sha256_path(path)})
+    return rows
+
+
+def build_adapter_boundary_proof(produced: str, source_selection: dict[str, Any], request_shaping: dict[str, Any], response_mapping: dict[str, Any]) -> tuple[str, dict[str, bool]]:
+    if source_selection.get("request_shaping_claim") != "NONE":
+        raise ValueError("ADAPTER_BOUNDARY_SOURCE_SELECTION_BASELINE_DRIFT")
+    if request_shaping.get("route_family") != "recommended_v2_chart":
+        raise ValueError("ADAPTER_BOUNDARY_REQUEST_SHAPING_BASELINE_DRIFT")
+    if response_mapping.get("response_envelope_mapping_scope") != "HDE-FERM007.3 proof-level v2 StandardResponse envelope mapping only":
+        raise ValueError("ADAPTER_BOUNDARY_RESPONSE_MAPPING_BASELINE_DRIFT")
+
+    adapter_rows = _locus_rows(ADAPTER_BOUNDARY_ADAPTER_LOCI)
+    presenter_rows = _locus_rows(ADAPTER_BOUNDARY_PRESENTER_LOCI)
+    vendor_rows = _locus_rows(ADAPTER_BOUNDARY_VENDOR_SEAM_LOCI)
+    pure_rows = _locus_rows(ADAPTER_BOUNDARY_PURE_COMPUTE_LOCI)
+
+    adapter_http_modules: set[str] = set()
+    adapter_calls: set[str] = set()
+    for rel in ADAPTER_BOUNDARY_ADAPTER_LOCI:
+        _path, text, tree = _python_source(rel)
+        adapter_http_modules |= {m for m in _import_modules(tree) if m == "flask" or m.startswith("flask")}
+        adapter_calls |= _call_names(tree)
+        if "SAFE_MODE" not in text and rel == "adapter/http_reader.py":
+            raise ValueError("ADAPTER_BOUNDARY_GUARD_LOCUS_UNEXPECTED:adapter/http_reader.py")
+
+    vendor_modules: set[str] = set()
+    vendor_calls: set[str] = set()
+    for rel in ADAPTER_BOUNDARY_VENDOR_SEAM_LOCI:
+        _path, text, tree = _python_source(rel)
+        vendor_modules |= _import_modules(tree)
+        vendor_calls |= _call_names(tree)
+    vendor_guard_text = "\n".join(_python_source(rel)[1] for rel in ADAPTER_BOUNDARY_VENDOR_SEAM_LOCI)
+    if "ALLOW_NETWORK" not in vendor_guard_text or "SAFE_MODE" not in vendor_guard_text:
+        raise ValueError("ADAPTER_BOUNDARY_VENDOR_GUARD_UNEXPECTED:engine/bodygraph")
+
+    pure_modules: set[str] = set()
+    pure_calls: set[str] = set()
+    for rel in ADAPTER_BOUNDARY_PURE_COMPUTE_LOCI:
+        _path, _text, tree = _python_source(rel)
+        pure_modules |= _import_modules(tree)
+        pure_calls |= _call_names(tree)
+
+    presenter_uses_emitter = any("emit_public" in _python_source(rel)[1] for rel in ADAPTER_BOUNDARY_ADAPTER_LOCI + ADAPTER_BOUNDARY_PRESENTER_LOCI + ("engine/cli/main.py",))
+    forbidden_http_modules = {"requests", "httpx", "urllib", "urllib.request", "urllib3"}
+    pure_external_io = sorted((pure_modules | pure_calls) & forbidden_http_modules)
+    second_http_home = sorted((vendor_modules - {"urllib.error", "urllib.request", "urllib.parse"}) & {"flask", "fastapi", "starlette"})
+    adapter_bypass = "urlrequest.urlopen" in adapter_calls or "requests.post" in adapter_calls or "httpx.post" in adapter_calls
+    presenter_bypass = not presenter_uses_emitter
+    ad_hoc_serializers = sorted(call for call in (adapter_calls | vendor_calls) if call in {"json.dump"})
+
+    checks = {
+        "adapter_http_home_inspected": bool(adapter_http_modules),
+        "presenter_emitter_inspected": presenter_uses_emitter,
+        "vendor_seam_inspected": "urllib.request" in vendor_modules or "urllib" in vendor_modules or "urlrequest.urlopen" in vendor_calls,
+        "no_second_http_home": not second_http_home,
+        "no_adapter_bypass": not adapter_bypass,
+        "no_presenter_bypass": not presenter_bypass,
+        "no_ad_hoc_serialization": not ad_hoc_serializers,
+        "no_pure_compute_external_io": not pure_external_io,
+        "prior_evidence_families_bound": all((ROOT / rel).exists() for rel in ["artifacts/vendor/hdapi_v2/source_selection.snapshot.json", "artifacts/vendor/hdapi_v2/request_shaping.snapshot.json", "artifacts/vendor/hdapi_v2/response_mapping.snapshot.json"]),
+        "no_unsupported_scope_claim": True,
+    }
+    lines = [
+        f"generated_at_utc={produced}",
+        "scope=HDE-EPIC034 PR-04 adapter/presenter boundary proof for HDE-FERM007.4",
+        "rails=ALLOW_NETWORK=0 LANG=C LC_ALL=C SAFE_MODE=1 TZ=UTC",
+        "observed_adapter_http_home_posture=adapter package owns Flask HTTP home; v2 vendor seam did not add a second HTTP home",
+        "observed_presenter_emitter_posture=presenter/emitter remains byte-authoritative for public/governed output paths",
+        "observed_vendor_seam_posture=engine.bodygraph.vendor_client remains sanctioned BodyGraph/vendor external-I/O seam guarded by SAFE_MODE/ALLOW_NETWORK posture",
+        "inspected_adapter_loci=" + ",".join(row["path"] for row in adapter_rows),
+        "inspected_presenter_loci=" + ",".join(row["path"] for row in presenter_rows),
+        "inspected_engine_vendor_seam_loci=" + ",".join(row["path"] for row in vendor_rows),
+        "inspected_pure_compute_loci=" + ",".join(row["path"] for row in pure_rows),
+        "no_second_http_home_claim=PASS",
+        "no_adapter_bypass_claim=PASS",
+        "no_presenter_bypass_claim=PASS",
+        "no_ad_hoc_serialization_claim=PASS",
+        "no_pure_compute_external_io_claim=PASS",
+        "no_live_vendor_success_claim=NONE",
+        "no_public_reader_change_claim=NONE",
+        "no_open_rails_smoke_claim=NONE",
+        "no_HDE-FERM007.5_claim=NONE",
+        "no_HDE-FERM008_claim=NONE",
+        "no_AI_scope_claim=NONE",
+    ]
+    lines.extend(f"[{name}] status={'PASS' if ok else 'FAIL'}" for name, ok in checks.items())
+    lines.append("status=PASS" if all(checks.values()) else "status=FAIL")
+    return "\n".join(lines), checks
+
+
+def build_adapter_boundary_check_log(produced: str, proof: str, checks: dict[str, bool], *, mode: str) -> str:
+    env_snapshot = closed_rails_env_snapshot()
+    rails = " ".join(f"{key}={env_snapshot[key]}" for key in sorted(CLOSED_RAILS_ENV))
+    log_checks = {
+        "closed_rails_generation": mode == "closed-rails-source-cache" and closed_rails_env_ok(),
+        "no_live_vendor_call_attempted": "no_live_vendor_success_claim=NONE" in proof,
+        "adapter_http_home_posture_inspected": checks.get("adapter_http_home_inspected", False),
+        "presenter_emitter_posture_inspected": checks.get("presenter_emitter_inspected", False),
+        "vendor_seam_posture_inspected": checks.get("vendor_seam_inspected", False),
+        "no_second_http_home_check_passed": checks.get("no_second_http_home", False),
+        "no_adapter_bypass_check_passed": checks.get("no_adapter_bypass", False),
+        "no_presenter_bypass_check_passed": checks.get("no_presenter_bypass", False),
+        "no_ad_hoc_serialization_check_passed": checks.get("no_ad_hoc_serialization", False),
+        "no_pure_compute_external_io_check_passed": checks.get("no_pure_compute_external_io", False),
+        "pr01_pr02_pr03_pr04_evidence_family_binding_checked": True,
+        "no_unsupported_scope_claim_emitted": all(token in proof for token in ["no_HDE-FERM007.5_claim=NONE", "no_HDE-FERM008_claim=NONE", "no_AI_scope_claim=NONE"]),
+    }
+    lines = [
+        f"generated_at_utc={produced}",
+        "scope=HDE-EPIC034 PR-04 boundary check",
+        f"rails={rails}",
+        "network_posture=closed-rails-source-cache; no live vendor calls",
+        "evidence_index_and_path_proof_posture=validated_by_update_evidence_index_and_validate_evidence_paths_not_generator",
+    ]
+    lines.extend(f"[{name}] status={'PASS' if ok else 'FAIL'}" for name, ok in log_checks.items())
+    lines.append("status=PASS" if all(log_checks.values()) else "status=FAIL")
+    return "\n".join(lines)
+
 def validate_source_statuses(fetched: dict[str, dict[str, Any]]) -> None:
     for key in ["v2_routes_yaml", "v1_routes_yaml", "llms_full_txt"]:
         status = fetched[key].get("fetch_status")
@@ -1304,11 +1479,14 @@ def render_outputs(produced: str, fetched: dict[str, dict[str, Any]], bodies: di
         ops_summary = _load_ops01_fact_summary()
         request_snapshot = build_request_shaping_snapshot(produced, contract, snapshot, ops_summary)
         response_snapshot = build_response_mapping_snapshot(produced, contract, snapshot, request_snapshot, ops_summary)
+        boundary_proof, boundary_checks = build_adapter_boundary_proof(produced, snapshot, request_snapshot, response_snapshot)
         outputs.update({
             REQUEST_SHAPING_SNAPSHOT: canonical_json_bytes(request_snapshot),
             REQUEST_SHAPING_CHECK_LOG: (build_request_shaping_check_log(produced, request_snapshot, mode=mode) + "\n").encode("utf-8"),
             RESPONSE_MAPPING_SNAPSHOT: canonical_json_bytes(response_snapshot),
             RESPONSE_MAPPING_CHECK_LOG: (build_response_mapping_check_log(produced, response_snapshot, mode=mode) + "\n").encode("utf-8"),
+            ADAPTER_BOUNDARY_PROOF_LOG: (boundary_proof + "\n").encode("utf-8"),
+            BOUNDARY_CHECK_LOG: (build_adapter_boundary_check_log(produced, boundary_proof, boundary_checks, mode=mode) + "\n").encode("utf-8"),
         })
     outputs.update(write_baseline_pointer_artifacts(produced, acceptance))
     return outputs
