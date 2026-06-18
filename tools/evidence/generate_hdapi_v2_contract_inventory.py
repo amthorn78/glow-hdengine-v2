@@ -1232,6 +1232,8 @@ def _attribute_chain(node: ast.AST) -> str:
 def _adapter_external_io_calls(loci: tuple[str, ...]) -> list[str]:
     findings: list[str] = []
     http_methods = {"request", "get", "post", "put", "patch", "delete", "head", "options", "urlopen"}
+    forbidden_modules = {"requests", "httpx", "urllib.request", "urllib3", "socket", "subprocess"}
+    forbidden_calls = {"socket.create_connection", "create_connection", "subprocess.run", "subprocess.Popen", "subprocess.call", "os.system"}
     for rel in loci:
         _path, _text, tree = _python_source(rel)
         aliases = _import_aliases(tree)
@@ -1242,13 +1244,13 @@ def _adapter_external_io_calls(loci: tuple[str, ...]) -> list[str]:
             root = _root_name(node.func)
             target = aliases.get(root or "", root or "")
             attr = chain.rsplit(".", 1)[-1] if chain else ""
-            if target.startswith("requests") and attr in http_methods:
+            target_attr = target.rsplit(".", 1)[-1] if target else ""
+            if (target.startswith("socket") and attr in {"create_connection", "socket"}) or (target.startswith("subprocess") and attr in {"run", "Popen", "call"}):
                 findings.append(f"{rel}:{chain}")
-            elif target.startswith("httpx") and (attr in http_methods or chain.endswith(".Client") or ".Client." in chain):
-                findings.append(f"{rel}:{chain}")
-            elif (target.startswith("urllib.request") or chain.startswith("urllib.request")) and attr in {"urlopen", "Request"}:
-                findings.append(f"{rel}:{chain}")
-            elif target.startswith("urllib3") and (attr in http_methods or chain.endswith(".PoolManager") or ".PoolManager." in chain):
+            elif target in forbidden_modules or any(target.startswith(f"{module}.") for module in forbidden_modules):
+                if attr in http_methods or target_attr in http_methods or chain.endswith((".Client", ".PoolManager")) or ".Client." in chain or ".PoolManager." in chain:
+                    findings.append(f"{rel}:{chain}")
+            elif chain in forbidden_calls or target in {"socket.create_connection", "subprocess.run", "subprocess.Popen", "subprocess.call", "os.system"}:
                 findings.append(f"{rel}:{chain}")
     return sorted(set(findings))
 
@@ -1304,17 +1306,48 @@ def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
         direct_presenter: set[str] = set()
         direct_bypass: set[str] = set()
         route_functions: set[str] = set()
+
+        def node_is_jsonish(value: ast.AST) -> bool:
+            if isinstance(value, (ast.Dict, ast.List)):
+                return True
+            if isinstance(value, ast.Constant) and isinstance(value.value, str):
+                stripped = value.value.lstrip()
+                return stripped.startswith("{") or stripped.startswith("[")
+            if isinstance(value, ast.Call):
+                call_name = _attribute_chain(value.func)
+                if call_name in {"json.dumps", "dumps", "jsonify", "make_response", "current_app.json.response"} or call_name.endswith((".jsonify", ".json.response", ".dumps")):
+                    return True
+                return any(node_is_jsonish(arg) for arg in value.args)
+            return False
+
+        def function_has_bypass(fn: ast.FunctionDef | ast.AsyncFunctionDef, calls: set[str]) -> bool:
+            if any(call in bypass_calls or call.endswith((".jsonify", ".json.response", ".dumps", ".dump")) or call == "make_response" for call in calls):
+                return True
+            for node in ast.walk(fn):
+                if isinstance(node, ast.Return) and node.value is not None and node_is_jsonish(node.value):
+                    return True
+                if isinstance(node, ast.Call):
+                    call_name = _attribute_chain(node.func)
+                    if call_name == "Response" and any(node_is_jsonish(arg) for arg in node.args):
+                        return True
+            return False
+
         for name, fn in function_defs.items():
             calls = _call_names(fn)
             function_calls[name] = calls
             if any(call in presenter_calls or call.endswith(".emit_public") for call in calls):
                 direct_presenter.add(name)
-            if any(call in bypass_calls or call.endswith(".jsonify") or call.endswith(".dumps") or call.endswith(".dump") for call in calls):
-                direct_bypass.add(name)
             for deco in fn.decorator_list:
                 deco_name = _attribute_chain(deco.func if isinstance(deco, ast.Call) else deco)
                 if deco_name.endswith((".route", ".get", ".post", ".put", ".patch", ".delete", ".before_app_request")):
                     route_functions.add(name)
+        for name, fn in function_defs.items():
+            if function_has_bypass(fn, function_calls[name]) and (
+                name in route_functions
+                or any(call in function_calls[name] for call in {"jsonify", "make_response", "current_app.json.response", "Response"})
+                or any(call.endswith((".jsonify", ".json.response")) for call in function_calls[name])
+            ):
+                direct_bypass.add(name)
 
         reaches_presenter: dict[str, bool] = {}
 
@@ -1333,8 +1366,25 @@ def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
             reaches_presenter[name] = result
             return result
 
+        reaches_bypass: dict[str, bool] = {}
+
+        def reaches_direct_bypass(name: str, seen: set[str] | None = None) -> bool:
+            if name in reaches_bypass:
+                return reaches_bypass[name]
+            if name in direct_bypass:
+                reaches_bypass[name] = True
+                return True
+            seen = set(seen or set())
+            if name in seen:
+                reaches_bypass[name] = False
+                return False
+            seen.add(name)
+            result = any(callee in function_defs and reaches_direct_bypass(callee, seen) for callee in function_calls.get(name, set()))
+            reaches_bypass[name] = result
+            return result
+
         for name in sorted(route_functions):
-            if (name in direct_bypass or any(callee in direct_bypass for callee in function_calls.get(name, set()))) and not reaches(name):
+            if reaches_direct_bypass(name) and not reaches(name):
                 findings.append(f"{rel}:{name}")
     return findings
 
