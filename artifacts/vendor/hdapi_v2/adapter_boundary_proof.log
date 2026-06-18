@@ -1,4 +1,4 @@
-generated_at_utc=2026-06-18T12:26:10Z
+generated_at_utc=2026-06-18T12:53:38Z
 scope=HDE-EPIC034 PR-04 adapter/presenter boundary proof for HDE-FERM007.4
 rails=ALLOW_NETWORK=0 LANG=C LC_ALL=C SAFE_MODE=1 TZ=UTC
 observed_adapter_http_home_posture=adapter package owns Flask HTTP home; v2 vendor seam did not add a second HTTP home
@@ -28,5 +28,6 @@ no_AI_scope_claim=NONE
 [no_ad_hoc_serialization] status=PASS
 [no_pure_compute_external_io] status=PASS
 [prior_evidence_families_bound] status=PASS
+[no_public_reader_change] status=PASS
 [no_unsupported_scope_claim] status=PASS
 status=PASS

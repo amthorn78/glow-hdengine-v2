@@ -1,5 +1,5 @@
 path: artifacts/vendor/hdapi_v2/contract_map.json
 size_bytes: 4512
-sha256: 2038d9287ff7753aebe033b66bc5c35460073ddaed98645706d17afa0b9eb4f4
-mtime_utc: 2026-06-18T12:26:11Z
-produced_at_utc: 2026-06-18T12:26:10Z
+sha256: aaaf2755cbbfff9d5f3f95c38bfa046259799866a7ae6bca3ec5f7ee598c3597
+mtime_utc: 2026-06-18T12:53:39Z
+produced_at_utc: 2026-06-18T12:53:38Z

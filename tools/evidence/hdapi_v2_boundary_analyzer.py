@@ -237,6 +237,69 @@ def _ad_hoc_json_serializers(loci: tuple[str, ...]) -> list[str]:
     return sorted(set(findings))
 
 
+def _string_constant(node: ast.AST) -> str | None:
+    if isinstance(node, ast.Constant) and isinstance(node.value, str):
+        return node.value
+    return None
+
+
+def _iter_function_defs(tree: ast.AST) -> dict[str, ast.FunctionDef | ast.AsyncFunctionDef]:
+    function_defs: dict[str, ast.FunctionDef | ast.AsyncFunctionDef] = {}
+    for node in ast.iter_child_nodes(tree):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            function_defs[node.name] = node
+        elif isinstance(node, ast.ClassDef):
+            for child in node.body:
+                if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                    function_defs[f"{node.name}.{child.name}"] = child
+    return function_defs
+
+
+def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
+    """Return stable public adapter route/hook registrations for PR-04 drift checks."""
+
+    signatures: list[str] = []
+    route_decorator_suffixes = (
+        ".route",
+        ".get",
+        ".post",
+        ".put",
+        ".patch",
+        ".delete",
+        ".before_app_request",
+        ".before_request",
+        ".after_app_request",
+        ".after_request",
+        ".errorhandler",
+        ".app_errorhandler",
+    )
+    for rel in loci:
+        _path, _text, tree = _python_source(rel)
+        for node in ast.walk(tree):
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                for deco in node.decorator_list:
+                    deco_call = deco.func if isinstance(deco, ast.Call) else deco
+                    deco_name = _attribute_chain(deco_call)
+                    if not deco_name.endswith(route_decorator_suffixes):
+                        continue
+                    route_arg = ""
+                    if isinstance(deco, ast.Call) and deco.args:
+                        route_arg = _string_constant(deco.args[0]) or ""
+                    signatures.append(f"{rel}:{deco_name}:{route_arg}:{node.name}")
+            if isinstance(node, ast.Call) and _attribute_chain(node.func).endswith(".add_url_rule"):
+                route_arg = _string_constant(node.args[0]) if node.args else ""
+                endpoint = _string_constant(node.args[1]) if len(node.args) > 1 else ""
+                view_desc = ""
+                for keyword in node.keywords:
+                    if keyword.arg == "view_func":
+                        view_desc = _attribute_chain(keyword.value.func) if isinstance(keyword.value, ast.Call) else _attribute_chain(keyword.value)
+                        break
+                if not view_desc and len(node.args) >= 3:
+                    view_desc = _attribute_chain(node.args[2].func) if isinstance(node.args[2], ast.Call) else _attribute_chain(node.args[2])
+                signatures.append(f"{rel}:add_url_rule:{route_arg or ''}:{endpoint or ''}:{view_desc}")
+    return sorted(set(signatures))
+
+
 def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
     """Find registered adapter routes that serialize/respond without a presenter path."""
 
@@ -246,12 +309,12 @@ def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
     for rel in loci:
         _path, _text, tree = _python_source(rel)
         aliases = _import_aliases(tree)
-        function_defs = {node.name: node for node in ast.walk(tree) if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))}
+        function_defs = _iter_function_defs(tree)
         class_methods: dict[str, set[str]] = {}
         for node in ast.walk(tree):
             if isinstance(node, ast.ClassDef):
                 class_methods[node.name] = {
-                    child.name
+                    f"{node.name}.{child.name}"
                     for child in node.body
                     if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)) and child.name in {"get", "post", "put", "patch", "delete", "head", "options", "dispatch_request"}
                 }
@@ -316,6 +379,9 @@ def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
             if isinstance(value, ast.Constant) and isinstance(value.value, str):
                 stripped = value.value.lstrip()
                 return stripped.startswith("{") or stripped.startswith("[")
+            if isinstance(value, ast.Constant) and isinstance(value.value, bytes):
+                stripped = value.value.lstrip()
+                return stripped.startswith(b"{") or stripped.startswith(b"[")
             if isinstance(value, ast.Call):
                 call_name = _attribute_chain(value.func)
                 root = _root_name(value.func)
@@ -409,6 +475,13 @@ def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
             if function_has_bypass(fn, function_calls[name]):
                 direct_bypass.add(name)
 
+        def callee_candidates(owner: str, callee: str) -> set[str]:
+            candidates = {callee}
+            if "." in owner and "." not in callee:
+                class_name = owner.split(".", 1)[0]
+                candidates.add(f"{class_name}.{callee}")
+            return {candidate for candidate in candidates if candidate in function_defs}
+
         reaches_presenter: dict[str, bool] = {}
 
         def reaches(name: str, seen: set[str] | None = None) -> bool:
@@ -422,7 +495,7 @@ def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
                 reaches_presenter[name] = False
                 return False
             seen.add(name)
-            result = any(callee in function_defs and reaches(callee, seen) for callee in function_calls.get(name, set()))
+            result = any(reaches(candidate, seen) for callee in function_calls.get(name, set()) for candidate in callee_candidates(name, callee))
             reaches_presenter[name] = result
             return result
 
@@ -439,7 +512,7 @@ def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
                 reaches_bypass[name] = False
                 return False
             seen.add(name)
-            result = any(callee in function_defs and reaches_direct_bypass(callee, seen) for callee in function_return_calls.get(name, set()))
+            result = any(reaches_direct_bypass(candidate, seen) for callee in function_return_calls.get(name, set()) for candidate in callee_candidates(name, callee))
             reaches_bypass[name] = result
             return result
 

@@ -118,10 +118,42 @@ RESPONSE_MAPPING_INTERNAL_LOCI = (
     "engine/bodygraph/resolver.py",
     "engine/compat/compute.py",
 )
-ADAPTER_BOUNDARY_ADAPTER_LOCI = ("adapter/wsgi.py", "adapter/factory.py", "adapter/http_reader.py", "engine/http/compat_handler.py")
+ADAPTER_BOUNDARY_CANONICAL_ADAPTER_LOCI = ("adapter/wsgi.py", "adapter/factory.py", "adapter/http_reader.py", "engine/http/compat_handler.py")
+ADAPTER_BOUNDARY_ADAPTER_LOCI = ADAPTER_BOUNDARY_CANONICAL_ADAPTER_LOCI
 ADAPTER_BOUNDARY_PRESENTER_LOCI = ("engine/presenter/emitter.py", "presenter/reader_v1/emitter.py")
 ADAPTER_BOUNDARY_VENDOR_SEAM_LOCI = ("engine/bodygraph/vendor_client.py", "engine/bodygraph/ingest.py", "engine/bodygraph/resolver.py")
 ADAPTER_BOUNDARY_PURE_COMPUTE_LOCI = ("engine/compat/compute.py",)
+ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE = (
+    'adapter/factory.py:app.after_request::_strip_etag_on_internal',
+    'adapter/http_reader.py:app.after_request::_strip_etag_on_internal',
+    'adapter/http_reader.py:app.errorhandler::_compat_scoped_method_not_allowed',
+    'adapter/http_reader.py:app.errorhandler::_compat_scoped_not_found',
+    'adapter/http_reader.py:bp.get:/api/aux/narrative:aux_narrative',
+    'adapter/http_reader.py:bp.get:/aux/narrative:aux_narrative',
+    'adapter/http_reader.py:bp.get:/dev/reader/conjunction:dev_reader_conjunction',
+    'adapter/http_reader.py:bp.get:/dev/sampler/conjunction:dev_sampler_conjunction',
+    'adapter/http_reader.py:bp.get:/dev/writer/conjunction:dev_writer_conjunction',
+    'adapter/http_reader.py:bp.get:/reader:reader_v1',
+    'adapter/http_reader.py:bp.post:/reader:reader_v1_post',
+    'adapter/http_reader.py:bp.route:/internal/dev/sampler:dev_sampler_internal',
+    'adapter/http_reader.py:bp.route:/internal/version:internal_version',
+    'adapter/http_reader.py:bp.route:/ops/db/unavailable:ops_db_unavailable',
+    'adapter/http_reader.py:bp.route:/ops/probe/env:ops_probe_env',
+    'adapter/http_reader.py:bp.route:/ops/rails/refusal:ops_rails_refusal',
+    'adapter/http_reader.py:bp.route:/ops/writer/diagnostic:diagnostic_writer',
+    'adapter/http_reader.py:bp.route:/ops/writer/diagnostic:diagnostic_writer_head',
+    'adapter/http_reader.py:bp.route:/ops/writer/diagnostic:diagnostic_writer_options',
+    'adapter/wsgi.py:app.after_request::_ensure_common_headers',
+    'adapter/wsgi.py:app.errorhandler::_method_not_allowed',
+    'adapter/wsgi.py:app.errorhandler::_not_found',
+    'adapter/wsgi.py:app.get:/internal/healthz:internal_healthz',
+    'adapter/wsgi.py:app.get:/internal/readyz:internal_readyz',
+    'engine/http/compat_handler.py:compat_blueprint.before_app_request::_compat_writer_transport_guard',
+    'engine/http/compat_handler.py:compat_blueprint.get::get_ids_only',
+    'engine/http/compat_handler.py:compat_blueprint.route::post_json',
+    'engine/http/compat_handler.py:compat_blueprint.route::post_json_head',
+    'engine/http/compat_handler.py:compat_blueprint.route::post_json_options',
+)
 
 
 
@@ -1864,6 +1896,12 @@ def build_adapter_boundary_proof(produced: str, source_selection: dict[str, Any]
         or any(call.endswith(f".{presenter_call}") for presenter_call in {"emit_public", "emit_public_with_envelope", "emit_reader_public_bytes", "emit_reader_public_envelope", "emit_fn"})
     )
     presenter_bypass = boundary_analyzer._adapter_presenter_bypass_routes(ADAPTER_BOUNDARY_ADAPTER_LOCI)
+    discovered_public_routes = boundary_analyzer._adapter_public_route_signatures(ADAPTER_BOUNDARY_ADAPTER_LOCI)
+    public_reader_route_drift = (
+        sorted(set(discovered_public_routes) ^ set(ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE))
+        if ADAPTER_BOUNDARY_ADAPTER_LOCI == ADAPTER_BOUNDARY_CANONICAL_ADAPTER_LOCI
+        else []
+    )
     presenter_uses_emitter = bool(adapter_presenter_calls) and not presenter_bypass
     pure_external_io = boundary_analyzer._pure_compute_external_io(ADAPTER_BOUNDARY_PURE_COMPUTE_LOCI)
     second_http_home = sorted(module for module in vendor_modules if _is_http_home_module(module))
@@ -1881,6 +1919,7 @@ def build_adapter_boundary_proof(produced: str, source_selection: dict[str, Any]
         "no_ad_hoc_serialization": not ad_hoc_serializers,
         "no_pure_compute_external_io": not pure_external_io,
         "prior_evidence_families_bound": all(isinstance(payload, dict) and payload for payload in [source_selection, request_shaping, response_mapping]),
+        "no_public_reader_change": not public_reader_route_drift,
         "no_unsupported_scope_claim": not unsupported_scope_claims,
     }
     failed = [name for name, ok in checks.items() if not ok]
