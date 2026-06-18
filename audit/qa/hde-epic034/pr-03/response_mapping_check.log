@@ -1,4 +1,4 @@
-generated_at_utc=2026-06-18T12:53:38Z
+generated_at_utc=2026-06-18T16:29:06Z
 scope=HDE-EPIC034 PR-03 response-mapping check
 rails=ALLOW_NETWORK=0 LANG=C LC_ALL=C SAFE_MODE=1 TZ=UTC
 network_posture=closed-rails-source-cache; no live vendor calls

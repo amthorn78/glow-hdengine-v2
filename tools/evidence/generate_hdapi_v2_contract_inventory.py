@@ -124,35 +124,40 @@ ADAPTER_BOUNDARY_PRESENTER_LOCI = ("engine/presenter/emitter.py", "presenter/rea
 ADAPTER_BOUNDARY_VENDOR_SEAM_LOCI = ("engine/bodygraph/vendor_client.py", "engine/bodygraph/ingest.py", "engine/bodygraph/resolver.py")
 ADAPTER_BOUNDARY_PURE_COMPUTE_LOCI = ("engine/compat/compute.py",)
 ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE = (
-    'adapter/factory.py:app.after_request::_strip_etag_on_internal',
-    'adapter/http_reader.py:app.after_request::_strip_etag_on_internal',
-    'adapter/http_reader.py:app.errorhandler::_compat_scoped_method_not_allowed',
-    'adapter/http_reader.py:app.errorhandler::_compat_scoped_not_found',
-    'adapter/http_reader.py:bp.get:/api/aux/narrative:aux_narrative',
-    'adapter/http_reader.py:bp.get:/aux/narrative:aux_narrative',
-    'adapter/http_reader.py:bp.get:/dev/reader/conjunction:dev_reader_conjunction',
-    'adapter/http_reader.py:bp.get:/dev/sampler/conjunction:dev_sampler_conjunction',
-    'adapter/http_reader.py:bp.get:/dev/writer/conjunction:dev_writer_conjunction',
-    'adapter/http_reader.py:bp.get:/reader:reader_v1',
-    'adapter/http_reader.py:bp.post:/reader:reader_v1_post',
-    'adapter/http_reader.py:bp.route:/internal/dev/sampler:dev_sampler_internal',
-    'adapter/http_reader.py:bp.route:/internal/version:internal_version',
-    'adapter/http_reader.py:bp.route:/ops/db/unavailable:ops_db_unavailable',
-    'adapter/http_reader.py:bp.route:/ops/probe/env:ops_probe_env',
-    'adapter/http_reader.py:bp.route:/ops/rails/refusal:ops_rails_refusal',
-    'adapter/http_reader.py:bp.route:/ops/writer/diagnostic:diagnostic_writer',
-    'adapter/http_reader.py:bp.route:/ops/writer/diagnostic:diagnostic_writer_head',
-    'adapter/http_reader.py:bp.route:/ops/writer/diagnostic:diagnostic_writer_options',
-    'adapter/wsgi.py:app.after_request::_ensure_common_headers',
-    'adapter/wsgi.py:app.errorhandler::_method_not_allowed',
-    'adapter/wsgi.py:app.errorhandler::_not_found',
-    'adapter/wsgi.py:app.get:/internal/healthz:internal_healthz',
-    'adapter/wsgi.py:app.get:/internal/readyz:internal_readyz',
-    'engine/http/compat_handler.py:compat_blueprint.before_app_request::_compat_writer_transport_guard',
-    'engine/http/compat_handler.py:compat_blueprint.get::get_ids_only',
-    'engine/http/compat_handler.py:compat_blueprint.route::post_json',
-    'engine/http/compat_handler.py:compat_blueprint.route::post_json_head',
-    'engine/http/compat_handler.py:compat_blueprint.route::post_json_options',
+    'adapter/factory.py:app.after_request:::_strip_etag_on_internal',
+    'adapter/factory.py:register_blueprint:bp:',
+    'adapter/http_reader.py:app.after_request:::_strip_etag_on_internal',
+    'adapter/http_reader.py:app.errorhandler:::_compat_scoped_method_not_allowed',
+    'adapter/http_reader.py:app.errorhandler:::_compat_scoped_not_found',
+    'adapter/http_reader.py:bp.get:/api/aux/narrative:GET:aux_narrative',
+    'adapter/http_reader.py:bp.get:/aux/narrative:GET:aux_narrative',
+    'adapter/http_reader.py:bp.get:/dev/reader/conjunction:GET:dev_reader_conjunction',
+    'adapter/http_reader.py:bp.get:/dev/sampler/conjunction:GET:dev_sampler_conjunction',
+    'adapter/http_reader.py:bp.get:/dev/writer/conjunction:GET:dev_writer_conjunction',
+    'adapter/http_reader.py:bp.get:/reader:GET:reader_v1',
+    'adapter/http_reader.py:bp.post:/reader:POST:reader_v1_post',
+    'adapter/http_reader.py:bp.route:/internal/dev/sampler:POST:dev_sampler_internal',
+    'adapter/http_reader.py:bp.route:/internal/version:GET,HEAD:internal_version',
+    'adapter/http_reader.py:bp.route:/ops/db/unavailable:GET:ops_db_unavailable',
+    'adapter/http_reader.py:bp.route:/ops/probe/env:GET:ops_probe_env',
+    'adapter/http_reader.py:bp.route:/ops/rails/refusal:GET,POST:ops_rails_refusal',
+    'adapter/http_reader.py:bp.route:/ops/writer/diagnostic:HEAD:diagnostic_writer_head',
+    'adapter/http_reader.py:bp.route:/ops/writer/diagnostic:OPTIONS:diagnostic_writer_options',
+    'adapter/http_reader.py:bp.route:/ops/writer/diagnostic:POST:diagnostic_writer',
+    'adapter/http_reader.py:register_blueprint:bp:',
+    'adapter/http_reader.py:register_blueprint:compat_blueprint:',
+    'adapter/wsgi.py:app.after_request:::_ensure_common_headers',
+    'adapter/wsgi.py:app.errorhandler:::_method_not_allowed',
+    'adapter/wsgi.py:app.errorhandler:::_not_found',
+    'adapter/wsgi.py:app.get:/internal/healthz:GET:internal_healthz',
+    'adapter/wsgi.py:app.get:/internal/readyz:GET:internal_readyz',
+    'adapter/wsgi.py:register_blueprint:compat_blueprint:',
+    'adapter/wsgi.py:register_blueprint:reader_bp:',
+    'engine/http/compat_handler.py:compat_blueprint.before_app_request:::_compat_writer_transport_guard',
+    'engine/http/compat_handler.py:compat_blueprint.get::GET:get_ids_only',
+    'engine/http/compat_handler.py:compat_blueprint.route::HEAD:post_json_head',
+    'engine/http/compat_handler.py:compat_blueprint.route::OPTIONS:post_json_options',
+    'engine/http/compat_handler.py:compat_blueprint.route::POST:post_json',
 )
 
 
@@ -1890,11 +1895,7 @@ def build_adapter_boundary_proof(produced: str, source_selection: dict[str, Any]
         pure_modules |= _import_modules(tree)
         pure_calls |= _call_names(tree)
 
-    adapter_presenter_calls = sorted(
-        call for call in adapter_calls
-        if call in {"emit_public", "emit_public_with_envelope", "emit_reader_public_bytes", "emit_reader_public_envelope", "emit_fn"}
-        or any(call.endswith(f".{presenter_call}") for presenter_call in {"emit_public", "emit_public_with_envelope", "emit_reader_public_bytes", "emit_reader_public_envelope", "emit_fn"})
-    )
+    adapter_presenter_calls = boundary_analyzer._adapter_presenter_calls(ADAPTER_BOUNDARY_ADAPTER_LOCI)
     presenter_bypass = boundary_analyzer._adapter_presenter_bypass_routes(ADAPTER_BOUNDARY_ADAPTER_LOCI)
     discovered_public_routes = boundary_analyzer._adapter_public_route_signatures(ADAPTER_BOUNDARY_ADAPTER_LOCI)
     public_reader_route_drift = (

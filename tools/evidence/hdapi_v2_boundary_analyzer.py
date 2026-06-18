@@ -243,6 +243,45 @@ def _string_constant(node: ast.AST) -> str | None:
     return None
 
 
+def _literal_string_list(node: ast.AST) -> tuple[str, ...]:
+    if isinstance(node, (ast.List, ast.Tuple, ast.Set)):
+        values = [_string_constant(item) for item in node.elts]
+        if all(value is not None for value in values):
+            return tuple(str(value).upper() for value in values)
+    value = _string_constant(node)
+    return (value.upper(),) if value is not None else ()
+
+
+def _route_methods(deco_name: str, deco: ast.AST) -> str:
+    method_by_suffix = {
+        ".get": ("GET",),
+        ".post": ("POST",),
+        ".put": ("PUT",),
+        ".patch": ("PATCH",),
+        ".delete": ("DELETE",),
+    }
+    for suffix, methods in method_by_suffix.items():
+        if deco_name.endswith(suffix):
+            return ",".join(methods)
+    if isinstance(deco, ast.Call):
+        for keyword in deco.keywords:
+            if keyword.arg == "methods":
+                methods = _literal_string_list(keyword.value)
+                if methods:
+                    return ",".join(sorted(methods))
+    return ""
+
+
+def _expr_name(node: ast.AST) -> str:
+    if isinstance(node, ast.Name):
+        return node.id
+    if isinstance(node, ast.Attribute):
+        return _attribute_chain(node)
+    if isinstance(node, ast.Call):
+        return _attribute_chain(node.func)
+    return ""
+
+
 def _iter_function_defs(tree: ast.AST) -> dict[str, ast.FunctionDef | ast.AsyncFunctionDef]:
     function_defs: dict[str, ast.FunctionDef | ast.AsyncFunctionDef] = {}
     for node in ast.iter_child_nodes(tree):
@@ -285,19 +324,62 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                     route_arg = ""
                     if isinstance(deco, ast.Call) and deco.args:
                         route_arg = _string_constant(deco.args[0]) or ""
-                    signatures.append(f"{rel}:{deco_name}:{route_arg}:{node.name}")
+                    methods = _route_methods(deco_name, deco)
+                    signatures.append(f"{rel}:{deco_name}:{route_arg}:{methods}:{node.name}")
             if isinstance(node, ast.Call) and _attribute_chain(node.func).endswith(".add_url_rule"):
                 route_arg = _string_constant(node.args[0]) if node.args else ""
                 endpoint = _string_constant(node.args[1]) if len(node.args) > 1 else ""
                 view_desc = ""
+                methods = ""
                 for keyword in node.keywords:
                     if keyword.arg == "view_func":
                         view_desc = _attribute_chain(keyword.value.func) if isinstance(keyword.value, ast.Call) else _attribute_chain(keyword.value)
-                        break
+                    elif keyword.arg == "methods":
+                        method_values = _literal_string_list(keyword.value)
+                        if method_values:
+                            methods = ",".join(sorted(method_values))
                 if not view_desc and len(node.args) >= 3:
                     view_desc = _attribute_chain(node.args[2].func) if isinstance(node.args[2], ast.Call) else _attribute_chain(node.args[2])
-                signatures.append(f"{rel}:add_url_rule:{route_arg or ''}:{endpoint or ''}:{view_desc}")
+                signatures.append(f"{rel}:add_url_rule:{route_arg or ''}:{endpoint or ''}:{methods}:{view_desc}")
+            if isinstance(node, ast.Call) and _attribute_chain(node.func).endswith(".register_blueprint"):
+                blueprint = _expr_name(node.args[0]) if node.args else ""
+                url_prefix = ""
+                for keyword in node.keywords:
+                    if keyword.arg == "url_prefix":
+                        url_prefix = _string_constant(keyword.value) or ""
+                signatures.append(f"{rel}:register_blueprint:{blueprint}:{url_prefix}")
     return sorted(set(signatures))
+
+
+def _is_sanctioned_presenter_call(call: str, aliases: dict[str, str]) -> bool:
+    presenter_names = {"emit_public", "emit_public_with_envelope", "emit_reader_public_bytes", "emit_reader_public_envelope", "emit_fn"}
+    attr = call.rsplit(".", 1)[-1]
+    if attr not in presenter_names:
+        return False
+    root = call.split(".", 1)[0]
+    target = aliases.get(root, "")
+    if call in presenter_names:
+        return aliases.get(call, "") in {
+            "engine.presenter.emit_public",
+            "engine.presenter.emitter.emit_public",
+            "engine.presenter.emitter.emit_public_with_envelope",
+            "engine.presenter.emitter.emit_reader_public_bytes",
+            "engine.presenter.emitter.emit_reader_public_envelope",
+            "presenter.reader_v1.emitter.emit_public",
+            "presenter.reader_v1.emitter.emit_public_with_envelope",
+        }
+    return target in {"engine.presenter", "engine.presenter.emitter", "presenter.reader_v1.emitter"}
+
+
+def _adapter_presenter_calls(loci: tuple[str, ...]) -> list[str]:
+    calls: list[str] = []
+    for rel in loci:
+        _path, _text, tree = _python_source(rel)
+        aliases = _import_aliases(tree)
+        for call in sorted(_call_names(tree)):
+            if _is_sanctioned_presenter_call(call, aliases):
+                calls.append(f"{rel}:{call}")
+    return sorted(set(calls))
 
 
 def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
@@ -386,9 +468,13 @@ def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
                 call_name = _attribute_chain(value.func)
                 root = _root_name(value.func)
                 target = aliases.get(root or "", root or "")
+                if call_name == "make_response" or target == "flask.make_response" or call_name.endswith(".make_response"):
+                    return any(node_is_jsonish(arg) for arg in value.args) or any(
+                        keyword.arg in {"response", "json", "data"} and node_is_jsonish(keyword.value) for keyword in value.keywords
+                    )
                 if (
-                    call_name in {"json.dumps", "dumps", "jsonify", "make_response", "current_app.json.response", "sercanon", "serialize"}
-                    or target in {"flask.jsonify", "flask.make_response", "json.dumps"}
+                    call_name in {"json.dumps", "dumps", "jsonify", "current_app.json.response", "sercanon", "serialize"}
+                    or target in {"flask.jsonify", "json.dumps"}
                     or call_name.endswith((".jsonify", ".json.response", ".dumps", ".sercanon", ".serialize"))
                 ):
                     return True
@@ -398,9 +484,8 @@ def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
         def function_has_bypass(fn: ast.FunctionDef | ast.AsyncFunctionDef, calls: set[str]) -> bool:
             if any(
                 call in bypass_calls
-                or aliases.get(call, "") in {"flask.jsonify", "flask.make_response", "json.dumps", "json.dump"}
+                or aliases.get(call, "") in {"flask.jsonify", "json.dumps", "json.dump"}
                 or call.endswith((".jsonify", ".json.response", ".dumps", ".dump", ".sercanon", ".serialize"))
-                or call == "make_response"
                 for call in calls
             ):
                 return True
@@ -420,17 +505,27 @@ def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
                 if isinstance(node, ast.Call):
                     call_name = _attribute_chain(node.func)
                     if call_name.endswith("Response") and (
-                        any(node_is_jsonish(arg) for arg in node.args)
-                        or any(keyword.arg in {"response", "json", "data"} and node_is_jsonish(keyword.value) for keyword in node.keywords)
+                        any(node_is_jsonish(arg) or (isinstance(arg, ast.Name) and arg.id in assigned_jsonish) for arg in node.args)
+                        or any(
+                            keyword.arg in {"response", "json", "data"}
+                            and (node_is_jsonish(keyword.value) or (isinstance(keyword.value, ast.Name) and keyword.value.id in assigned_jsonish))
+                            for keyword in node.keywords
+                        )
                     ):
                         return True
             return False
+
+        imported_adapter_helpers = {
+            name
+            for name, target in aliases.items()
+            if target.startswith(("adapter.", "engine.http."))
+        }
 
         for name, fn in function_defs.items():
             calls = direct_call_names(fn)
             function_calls[name] = calls
             function_return_calls[name] = return_call_names(fn)
-            if any(call in presenter_calls or any(call.endswith(f".{presenter_call}") for presenter_call in presenter_calls) for call in calls):
+            if any(_is_sanctioned_presenter_call(call, aliases) for call in calls):
                 direct_presenter.add(name)
             for deco in fn.decorator_list:
                 deco_name = _attribute_chain(deco.func if isinstance(deco, ast.Call) else deco)
@@ -512,7 +607,15 @@ def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
                 reaches_bypass[name] = False
                 return False
             seen.add(name)
-            result = any(reaches_direct_bypass(candidate, seen) for callee in function_return_calls.get(name, set()) for candidate in callee_candidates(name, callee))
+            returned_calls = function_return_calls.get(name, set())
+            result = any(reaches_direct_bypass(candidate, seen) for callee in returned_calls for candidate in callee_candidates(name, callee))
+            if not result:
+                result = any(
+                    not callee_candidates(name, callee)
+                    and not _is_sanctioned_presenter_call(callee, aliases)
+                    and callee.split(".", 1)[0] in imported_adapter_helpers
+                    for callee in returned_calls
+                )
             reaches_bypass[name] = result
             return result
 
@@ -573,9 +676,18 @@ def _locus_rows(loci: tuple[str, ...]) -> list[dict[str, str]]:
     return rows
 
 
+def _body_without_docstring(node: ast.FunctionDef | ast.AsyncFunctionDef) -> list[ast.stmt]:
+    body = list(node.body)
+    if body and isinstance(body[0], ast.Expr) and isinstance(body[0].value, ast.Constant) and isinstance(body[0].value.value, str):
+        return body[1:]
+    return body
+
+
 def _node_mentions_guard_symbol(node: ast.AST, symbol: str) -> bool:
     for child in ast.walk(node):
         if isinstance(child, ast.Constant) and child.value == symbol:
+            return True
+        if isinstance(child, ast.Name) and child.id == symbol:
             return True
     return False
 
@@ -587,10 +699,11 @@ def _vendor_guard_entrypoints(loci: tuple[str, ...]) -> list[str]:
         for node in ast.walk(tree):
             if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 continue
+            guarded_body = ast.Module(body=_body_without_docstring(node), type_ignores=[])
             if (
-                _node_mentions_guard_symbol(node, "SAFE_MODE")
-                and _node_mentions_guard_symbol(node, "ALLOW_NETWORK")
-                and any(isinstance(child, ast.Raise) for child in ast.walk(node))
+                _node_mentions_guard_symbol(guarded_body, "SAFE_MODE")
+                and _node_mentions_guard_symbol(guarded_body, "ALLOW_NETWORK")
+                and any(isinstance(child, ast.Raise) for child in ast.walk(guarded_body))
             ):
                 guarded.append(f"{rel}:{node.name}")
     return sorted(set(guarded))

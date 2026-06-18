@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 
 from tools.evidence import generate_hdapi_v2_contract_inventory as generator
+from tools.evidence import hdapi_v2_boundary_analyzer as boundary_analyzer
 from tools.evidence import update_evidence_index as indexer
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -2051,7 +2052,7 @@ def new_reader():
         monkeypatch.setattr(
             generator,
             "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE",
-            (f"{adapter}:app.route:/reader:reader",),
+            (f"{adapter}:app.route:/reader::reader",),
         )
         with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_public_reader_change"):
             generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
@@ -2083,5 +2084,189 @@ app.add_url_rule('/good', view_func=Good.as_view('good'))
         monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (bad_adapter,))
         with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_presenter_bypass"):
             generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+
+def test_epic034_adapter_boundary_fails_closed_on_blueprint_prefix_drift(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask, Blueprint
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+bp = Blueprint('reader', __name__)
+SAFE_MODE='1'
+@bp.get('/reader')
+def reader():
+    return emit_public({'ok': True})
+app.register_blueprint(bp, url_prefix='/v2')
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "blueprint_prefix.py", body)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_CANONICAL_ADAPTER_LOCI", (adapter,))
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
+        monkeypatch.setattr(
+            generator,
+            "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE",
+            (
+                f"{adapter}:bp.get:/reader:GET:reader",
+                f"{adapter}:register_blueprint:bp:",
+            ),
+        )
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_public_reader_change"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_adapter_boundary_fails_closed_on_route_methods_drift(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+SAFE_MODE='1'
+@app.route('/reader', methods=['GET', 'POST'])
+def reader():
+    return emit_public({'ok': True})
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "method_drift.py", body)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_CANONICAL_ADAPTER_LOCI", (adapter,))
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
+        monkeypatch.setattr(
+            generator,
+            "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE",
+            (f"{adapter}:app.route:/reader:GET:reader",),
+        )
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_public_reader_change"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_presenter_bypass_allows_make_response_wrapping_presenter(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask, make_response
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+SAFE_MODE='1'
+@app.route('/good')
+def good():
+    return make_response(emit_public({'ok': True}), 202)
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "make_response_presenter.py", body)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
+        proof, checks = generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+        assert checks["no_presenter_bypass"] is True
+        assert "[no_presenter_bypass] status=PASS" in proof
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_presenter_bypass_detects_json_variable_response(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = r"""
+from flask import Flask, Response
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+SAFE_MODE='1'
+@app.route('/good')
+def good():
+    return emit_public({'ok': True})
+@app.route('/bad')
+def bad():
+    body = b'{"ok":false}\n'
+    return Response(body, mimetype='application/json')
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "json_variable_response.py", body)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_presenter_bypass"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_presenter_call_must_resolve_to_sanctioned_import(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = r"""
+from flask import Flask, Response
+app = Flask(__name__)
+SAFE_MODE='1'
+def emit_public(payload):
+    return b'{"ok":false}\n'
+@app.route('/bad')
+def bad():
+    return Response(emit_public({'ok': False}), mimetype='application/json')
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "fake_emit_public.py", body)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*presenter_emitter_inspected"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_presenter_bypass_detects_imported_adapter_helper(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    helper_path = ROOT / "adapter" / "boundary_tmp_helper.py"
+    route_path = ROOT / "adapter" / "boundary_tmp_route.py"
+    try:
+        helper_path.write_text(
+            "from flask import jsonify\n"
+            "def bad_response():\n"
+            "    return jsonify({'ok': False})\n",
+            encoding="utf-8",
+        )
+        route_path.write_text(
+            "from flask import Flask\n"
+            "from engine.presenter.emitter import emit_public\n"
+            "from adapter.boundary_tmp_helper import bad_response\n"
+            "app = Flask(__name__)\n"
+            "SAFE_MODE='1'\n"
+            "@app.route('/good')\n"
+            "def good():\n"
+            "    return emit_public({'ok': True})\n"
+            "@app.route('/bad')\n"
+            "def bad():\n"
+            "    return bad_response()\n",
+            encoding="utf-8",
+        )
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", ("adapter/boundary_tmp_route.py", "adapter/boundary_tmp_helper.py"))
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_presenter_bypass"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        helper_path.unlink(missing_ok=True)
+        route_path.unlink(missing_ok=True)
+
+
+def test_epic034_vendor_guard_symbols_ignore_docstrings(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+def fetch():
+    \"\"\"Mentions SAFE_MODE and ALLOW_NETWORK without enforcing rails.\"\"\"
+    raise RuntimeError('unrelated')
+"""
+    try:
+        rel = _write_boundary_temp(rel_dir, "docstring_guard.py", body)
+        assert boundary_analyzer._vendor_guard_entrypoints((rel,)) == []
     finally:
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
