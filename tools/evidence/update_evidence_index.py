@@ -846,8 +846,14 @@ def _load_epic034_pr03_entries() -> list[dict[str, object]]:
     produced = payload.get("generated_at_utc")
     if isinstance(produced, str) and produced:
         produced_at = produced
+    pr04_doc_delta_active = (
+        (ROOT / "artifacts/vendor/hdapi_v2/adapter_boundary_proof.log").exists()
+        and (ROOT / "audit/qa/hde-epic034/pr-04/boundary_check.log").exists()
+    )
     entries: list[dict[str, object]] = []
     for entry in EPIC034_PR03_PRIMARY_ARTIFACTS:
+        if pr04_doc_delta_active and entry.get("record_type") == "epic034_pr03_doc_delta":
+            continue
         normalized = dict(entry)
         if produced_at is not None and normalized.get("record_type") != "epic034_pr03_doc_delta":
             normalized["produced_at_utc"] = produced_at

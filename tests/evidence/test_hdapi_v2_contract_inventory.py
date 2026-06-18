@@ -1171,3 +1171,80 @@ def bad():
             generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
     finally:
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_presenter_bypass_ignores_nested_closure_emit_public(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask, jsonify
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+SAFE_MODE='1'
+@app.route('/bad')
+def bad():
+    def nested_presenter():
+        return emit_public({'ok': True})
+    return jsonify({'ok': True})
+"""
+    try:
+        bad_adapter = _write_boundary_temp(rel_dir, "nested_closure.py", body)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (bad_adapter,))
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_presenter_bypass"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_presenter_bypass_checks_errorhandler_routes(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask, jsonify
+app = Flask(__name__)
+SAFE_MODE='1'
+@app.errorhandler(500)
+def error_handler(exc):
+    return jsonify({'error': 'boom'}), 500
+"""
+    try:
+        bad_adapter = _write_boundary_temp(rel_dir, "errorhandler.py", body)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (bad_adapter,))
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_presenter_bypass"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_presenter_bypass_detects_alternate_json_branch(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask, jsonify, request
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+SAFE_MODE='1'
+@app.route('/maybe')
+def maybe():
+    if request.args.get('bad'):
+        return jsonify({'ok': False})
+    return emit_public({'ok': True})
+"""
+    try:
+        bad_adapter = _write_boundary_temp(rel_dir, "alternate_branch.py", body)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (bad_adapter,))
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_presenter_bypass"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_pr04_doc_delta_rows_supersede_pr03_doc_delta_rows() -> None:
+    rows = {entry["artifact_key"]: entry for entry in json.loads((ROOT / "docs" / "evidence" / "INDEX.json").read_text(encoding="utf-8"))}
+    assert "epic034.pr04.doc_deltas" in rows
+    assert "epic034.pr04.qa_meta_doc_deltas" in rows
+    assert "epic034.pr03.doc_deltas" not in rows
+    assert "epic034.pr03.qa_meta_doc_deltas" not in rows

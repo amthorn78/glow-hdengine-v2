@@ -1307,6 +1307,27 @@ def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
         direct_bypass: set[str] = set()
         route_functions: set[str] = set()
 
+        def iter_body_nodes(fn: ast.FunctionDef | ast.AsyncFunctionDef):
+            stack = list(fn.body)
+            while stack:
+                node = stack.pop()
+                yield node
+                if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.Lambda, ast.ClassDef)):
+                    continue
+                stack.extend(ast.iter_child_nodes(node))
+
+        def direct_call_names(fn: ast.FunctionDef | ast.AsyncFunctionDef) -> set[str]:
+            names: set[str] = set()
+            for node in iter_body_nodes(fn):
+                if not isinstance(node, ast.Call):
+                    continue
+                func = node.func
+                if isinstance(func, ast.Name):
+                    names.add(func.id)
+                elif isinstance(func, ast.Attribute):
+                    names.add(_attribute_chain(func))
+            return names
+
         def node_is_jsonish(value: ast.AST) -> bool:
             if isinstance(value, (ast.Dict, ast.List)):
                 return True
@@ -1317,13 +1338,13 @@ def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
                 call_name = _attribute_chain(value.func)
                 if call_name in {"json.dumps", "dumps", "jsonify", "make_response", "current_app.json.response"} or call_name.endswith((".jsonify", ".json.response", ".dumps")):
                     return True
-                return any(node_is_jsonish(arg) for arg in value.args)
+                return False
             return False
 
         def function_has_bypass(fn: ast.FunctionDef | ast.AsyncFunctionDef, calls: set[str]) -> bool:
             if any(call in bypass_calls or call.endswith((".jsonify", ".json.response", ".dumps", ".dump")) or call == "make_response" for call in calls):
                 return True
-            for node in ast.walk(fn):
+            for node in iter_body_nodes(fn):
                 if isinstance(node, ast.Return) and node.value is not None and node_is_jsonish(node.value):
                     return True
                 if isinstance(node, ast.Call):
@@ -1333,13 +1354,13 @@ def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
             return False
 
         for name, fn in function_defs.items():
-            calls = _call_names(fn)
+            calls = direct_call_names(fn)
             function_calls[name] = calls
             if any(call in presenter_calls or call.endswith(".emit_public") for call in calls):
                 direct_presenter.add(name)
             for deco in fn.decorator_list:
                 deco_name = _attribute_chain(deco.func if isinstance(deco, ast.Call) else deco)
-                if deco_name.endswith((".route", ".get", ".post", ".put", ".patch", ".delete", ".before_app_request")):
+                if deco_name.endswith((".route", ".get", ".post", ".put", ".patch", ".delete", ".before_app_request", ".errorhandler")):
                     route_functions.add(name)
         for name, fn in function_defs.items():
             if function_has_bypass(fn, function_calls[name]) and (
@@ -1384,7 +1405,7 @@ def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
             return result
 
         for name in sorted(route_functions):
-            if reaches_direct_bypass(name) and not reaches(name):
+            if reaches_direct_bypass(name):
                 findings.append(f"{rel}:{name}")
     return findings
 
