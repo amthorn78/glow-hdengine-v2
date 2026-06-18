@@ -1239,7 +1239,7 @@ def _adapter_external_io_calls(loci: tuple[str, ...]) -> list[str]:
         aliases = _import_aliases(tree)
         client_roots: set[str] = set()
         for node in ast.walk(tree):
-            if not isinstance(node, ast.Assign) or not isinstance(node.value, ast.Call):
+            if not isinstance(node, (ast.Assign, ast.AnnAssign)) or not isinstance(node.value, ast.Call):
                 continue
             ctor_chain = _attribute_chain(node.value.func)
             ctor_root = _root_name(node.value.func)
@@ -1248,7 +1248,8 @@ def _adapter_external_io_calls(loci: tuple[str, ...]) -> list[str]:
                 ctor_target.startswith(("requests", "httpx", "urllib3"))
                 and (ctor_chain.endswith((".Session", ".Client", ".PoolManager")) or ctor_target.endswith((".Session", ".Client", ".PoolManager")))
             ):
-                for target_node in node.targets:
+                target_nodes = node.targets if isinstance(node, ast.Assign) else [node.target]
+                for target_node in target_nodes:
                     if isinstance(target_node, ast.Name):
                         client_roots.add(target_node.id)
         for node in ast.walk(tree):
@@ -1348,6 +1349,14 @@ def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
 
         def return_call_names(fn: ast.FunctionDef | ast.AsyncFunctionDef) -> set[str]:
             names: set[str] = set()
+            assigned_calls: dict[str, set[str]] = {}
+            for node in iter_body_nodes(fn):
+                if isinstance(node, (ast.Assign, ast.AnnAssign)) and isinstance(node.value, ast.Call):
+                    call_name = _attribute_chain(node.value.func)
+                    target_nodes = node.targets if isinstance(node, ast.Assign) else [node.target]
+                    for target_node in target_nodes:
+                        if isinstance(target_node, ast.Name):
+                            assigned_calls.setdefault(target_node.id, set()).add(call_name)
             for node in iter_body_nodes(fn):
                 if not isinstance(node, ast.Return) or node.value is None:
                     continue
@@ -1356,6 +1365,8 @@ def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
                     value = value.elts[0] if value.elts else value
                 if isinstance(value, ast.Call):
                     names.add(_attribute_chain(value.func))
+                elif isinstance(value, ast.Name):
+                    names.update(assigned_calls.get(value.id, set()))
             return names
 
         def node_is_jsonish(value: ast.AST) -> bool:
@@ -1405,6 +1416,21 @@ def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
                 deco_name = _attribute_chain(deco.func if isinstance(deco, ast.Call) else deco)
                 if deco_name.endswith((".route", ".get", ".post", ".put", ".patch", ".delete", ".before_app_request", ".before_request", ".errorhandler")):
                     route_functions.add(name)
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Call):
+                continue
+            call_name = _attribute_chain(node.func)
+            if not call_name.endswith(".add_url_rule"):
+                continue
+            view_func: ast.AST | None = None
+            for keyword in node.keywords:
+                if keyword.arg == "view_func":
+                    view_func = keyword.value
+                    break
+            if view_func is None and len(node.args) >= 3:
+                view_func = node.args[2]
+            if isinstance(view_func, ast.Name) and view_func.id in function_defs:
+                route_functions.add(view_func.id)
         for name, fn in function_defs.items():
             if function_has_bypass(fn, function_calls[name]):
                 direct_bypass.add(name)
