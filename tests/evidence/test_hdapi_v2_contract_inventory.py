@@ -1997,6 +1997,7 @@ def good():
     try:
         good_adapter = _write_boundary_temp(rel_dir, "qualified_presenter.py", body)
         monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (good_adapter,))
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", tuple(boundary_analyzer._adapter_public_route_signatures((good_adapter,))))
         proof, checks = generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
         assert checks["presenter_emitter_inspected"] is True
         assert "[presenter_emitter_inspected] status=PASS" in proof
@@ -2166,6 +2167,7 @@ def good():
     try:
         adapter = _write_boundary_temp(rel_dir, "make_response_presenter.py", body)
         monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", tuple(boundary_analyzer._adapter_public_route_signatures((adapter,))))
         proof, checks = generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
         assert checks["no_presenter_bypass"] is True
         assert "[no_presenter_bypass] status=PASS" in proof
@@ -2270,6 +2272,35 @@ def fetch():
         assert boundary_analyzer._vendor_guard_entrypoints((rel,)) == []
     finally:
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_adapter_boundary_fails_closed_when_repointed_route_loci_drift(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+SAFE_MODE='1'
+@app.route('/unexpected-public')
+def unexpected_public():
+    return emit_public({'ok': True})
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "unexpected_public_route.py", body)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", ("adapter/other.py:app.route:/expected:GET:expected",))
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_public_reader_change"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_adapter_boundary_requires_low_level_vendor_io_guard() -> None:
+    proof, checks = generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    assert checks["guard_provenance_per_relevant_path"] is True
+    assert "guarded_by=engine/bodygraph/vendor_client.py:_default_request" in proof
 
 def test_epic034_adapter_boundary_reports_positive_contract_classifications() -> None:
     proof, checks = generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())

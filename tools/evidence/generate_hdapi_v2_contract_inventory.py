@@ -1889,8 +1889,8 @@ def _vendor_guard_provenance_findings(loci: tuple[str, ...]) -> tuple[list[str],
         key = ":".join(item.split(":", 2)[:2])
         if key in guarded_keys:
             allowed.append(item + " guarded_by=" + key)
-        elif key in allowed_low_level and guarded:
-            allowed.append(item + " delegated_from_guarded_entrypoint=" + ",".join(guarded))
+        elif key in allowed_low_level and key in guarded_keys:
+            allowed.append(item + " guarded_by_low_level_helper=" + key)
         else:
             unresolved.append(item)
     return allowed, unresolved, guarded
@@ -1936,10 +1936,8 @@ def build_adapter_boundary_proof(produced: str, source_selection: dict[str, Any]
     presenter_bypass = boundary_analyzer._adapter_presenter_bypass_routes(ADAPTER_BOUNDARY_ADAPTER_LOCI)
     discovered_public_routes = boundary_analyzer._adapter_public_route_signatures(ADAPTER_BOUNDARY_ADAPTER_LOCI)
     public_reader_route_drift = sorted(set(discovered_public_routes) ^ set(ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE))
-    route_baseline_reconciled = (
-        (bool(discovered_public_routes) and not public_reader_route_drift)
-        or ADAPTER_BOUNDARY_ADAPTER_LOCI != ADAPTER_BOUNDARY_CANONICAL_ADAPTER_LOCI
-    )
+    route_baseline_reconciled = bool(discovered_public_routes) and not public_reader_route_drift
+    route_baseline_out_of_scope = not discovered_public_routes and ADAPTER_BOUNDARY_ADAPTER_LOCI != ADAPTER_BOUNDARY_CANONICAL_ADAPTER_LOCI
     pure_external_io = boundary_analyzer._pure_compute_external_io(ADAPTER_BOUNDARY_PURE_COMPUTE_LOCI)
     second_http_home = sorted(module for module in vendor_modules if _is_http_home_module(module))
     adapter_bypass = boundary_analyzer._adapter_external_io_calls(ADAPTER_BOUNDARY_ADAPTER_LOCI)
@@ -1961,10 +1959,10 @@ def build_adapter_boundary_proof(produced: str, source_selection: dict[str, Any]
         ),
         _boundary_finding(
             "public_routes",
-            BOUNDARY_ALLOWED if route_baseline_reconciled else BOUNDARY_UNKNOWN,
-            "PASS" if route_baseline_reconciled else "FAIL",
+            BOUNDARY_ALLOWED if route_baseline_reconciled else (BOUNDARY_OUT_OF_SCOPE if route_baseline_out_of_scope else BOUNDARY_UNKNOWN),
+            "PASS" if route_baseline_reconciled or route_baseline_out_of_scope else "FAIL",
             [row["path"] for row in adapter_rows],
-            "discovered current route signatures reconcile with governed PR-04 baseline" if route_baseline_reconciled else "discovered current route signatures cannot be reconciled with baseline; route drift fails closed",
+            "discovered current route signatures reconcile with governed PR-04 baseline" if route_baseline_reconciled else ("no public route signatures discovered in noncanonical test locus; route surface is out of scope" if route_baseline_out_of_scope else "discovered current route signatures cannot be reconciled with baseline; route drift fails closed"),
             public_reader_route_drift or discovered_public_routes,
         ),
         _boundary_finding(

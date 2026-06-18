@@ -122,6 +122,8 @@ def test_fetch_does_not_retry_other_http_statuses() -> None:
 
 
 def test_default_request_returns_redirect_status_without_following(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SAFE_MODE", "0")
+    monkeypatch.setenv("ALLOW_NETWORK", "1")
     opened = []
     captured_handlers = []
 
@@ -160,6 +162,17 @@ def test_default_request_returns_redirect_status_without_following(monkeypatch: 
     assert opened == [("https://vendor.test/v1/bodygraphs", 2.0, {"Hd-api-key": "api"})]
     assert len(captured_handlers) == 1
     assert captured_handlers[0].redirect_request(req, None, 302, "Found", {}, "https://vendor.test/redirect") is None
+
+
+def test_default_request_refuses_closed_rails(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SAFE_MODE", "1")
+    monkeypatch.setenv("ALLOW_NETWORK", "0")
+    req = urlrequest.Request("https://vendor.test/v1/bodygraphs", data=b"{}\n", method="POST")
+
+    with pytest.raises(VendorError) as excinfo:
+        HdApiClient._default_request(req, 2.0)
+
+    assert excinfo.value.code == "PROVIDER_REFUSED"
 
 
 def test_fetch_retries_only_5xx_and_network_errors() -> None:
