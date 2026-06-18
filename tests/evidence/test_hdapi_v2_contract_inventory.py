@@ -1571,3 +1571,118 @@ def fetch():
             generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
     finally:
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+@pytest.mark.parametrize(
+    "body",
+    [
+        """
+import requests
+SAFE_MODE='1'
+def route(req):
+    session = requests.Session()
+    return session.send(req)
+""",
+        """
+import httpx
+SAFE_MODE='1'
+def route():
+    return httpx.stream('GET', 'https://example.invalid')
+""",
+        """
+import httpx
+SAFE_MODE='1'
+def route():
+    client = httpx.AsyncClient()
+    return client.get('https://example.invalid')
+""",
+    ],
+)
+def test_epic034_adapter_boundary_fails_closed_on_send_stream_async_client(monkeypatch: pytest.MonkeyPatch, body: str) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    try:
+        bad_adapter = _write_boundary_temp(rel_dir, "adapter_http_variants.py", body)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (bad_adapter,))
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_adapter_bypass"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_presenter_bypass_detects_module_qualified_flask_response(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+import flask
+from flask import Flask
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+SAFE_MODE='1'
+@app.route('/good')
+def good():
+    return emit_public({'ok': True})
+@app.route('/bad')
+def bad():
+    return flask.Response('{\"ok\":true}', mimetype='application/json')
+"""
+    try:
+        bad_adapter = _write_boundary_temp(rel_dir, "flask_response.py", body)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (bad_adapter,))
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_presenter_bypass"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_presenter_bypass_checks_blueprint_app_errorhandler(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Blueprint, Flask
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+bp = Blueprint('bp', __name__)
+SAFE_MODE='1'
+@app.route('/good')
+def good():
+    return emit_public({'ok': True})
+@bp.app_errorhandler(404)
+def not_found(error):
+    return {'error': 'missing'}, 404
+"""
+    try:
+        bad_adapter = _write_boundary_temp(rel_dir, "bp_errorhandler.py", body)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (bad_adapter,))
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_presenter_bypass"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_presenter_bypass_checks_after_request_hooks(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask, jsonify
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+SAFE_MODE='1'
+@app.route('/good')
+def good():
+    return emit_public({'ok': True})
+@app.after_request
+def rewrite(response):
+    return jsonify({'rewritten': True})
+"""
+    try:
+        bad_adapter = _write_boundary_temp(rel_dir, "after_request.py", body)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (bad_adapter,))
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_presenter_bypass"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)

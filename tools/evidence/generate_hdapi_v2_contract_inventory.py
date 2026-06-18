@@ -1231,7 +1231,7 @@ def _attribute_chain(node: ast.AST) -> str:
 
 def _adapter_external_io_calls(loci: tuple[str, ...]) -> list[str]:
     findings: list[str] = []
-    http_methods = {"request", "get", "post", "put", "patch", "delete", "head", "options", "urlopen"}
+    http_methods = {"request", "get", "post", "put", "patch", "delete", "head", "options", "urlopen", "send", "stream"}
     forbidden_modules = {"requests", "httpx", "urllib.request", "urllib3", "http.client", "aiohttp", "socket", "subprocess"}
     forbidden_calls = {"socket.create_connection", "create_connection", "subprocess.run", "subprocess.Popen", "subprocess.call", "os.system"}
     for rel in loci:
@@ -1247,8 +1247,8 @@ def _adapter_external_io_calls(loci: tuple[str, ...]) -> list[str]:
             if (
                 ctor_target.startswith(("requests", "httpx", "urllib3", "http.client", "aiohttp"))
                 and (
-                    ctor_chain.endswith((".Session", ".Client", ".PoolManager", ".HTTPConnection", ".HTTPSConnection", ".ClientSession"))
-                    or ctor_target.endswith((".Session", ".Client", ".PoolManager", ".HTTPConnection", ".HTTPSConnection", ".ClientSession"))
+                    ctor_chain.endswith((".Session", ".Client", ".AsyncClient", ".PoolManager", ".HTTPConnection", ".HTTPSConnection", ".ClientSession"))
+                    or ctor_target.endswith((".Session", ".Client", ".AsyncClient", ".PoolManager", ".HTTPConnection", ".HTTPSConnection", ".ClientSession"))
                 )
             ):
                 target_nodes = node.targets if isinstance(node, ast.Assign) else [node.target]
@@ -1271,8 +1271,9 @@ def _adapter_external_io_calls(loci: tuple[str, ...]) -> list[str]:
                 if (
                     attr in http_methods
                     or target_attr in http_methods
-                    or chain.endswith((".Client", ".PoolManager", ".HTTPConnection", ".HTTPSConnection"))
+                    or chain.endswith((".Client", ".AsyncClient", ".PoolManager", ".HTTPConnection", ".HTTPSConnection"))
                     or ".Client." in chain
+                    or ".AsyncClient." in chain
                     or ".PoolManager." in chain
                     or ".HTTPConnection." in chain
                     or ".HTTPSConnection." in chain
@@ -1416,7 +1417,7 @@ def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
                     return True
                 if isinstance(node, ast.Call):
                     call_name = _attribute_chain(node.func)
-                    if call_name == "Response" and any(node_is_jsonish(arg) for arg in node.args):
+                    if call_name.endswith("Response") and any(node_is_jsonish(arg) for arg in node.args):
                         return True
             return False
 
@@ -1428,7 +1429,22 @@ def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
                 direct_presenter.add(name)
             for deco in fn.decorator_list:
                 deco_name = _attribute_chain(deco.func if isinstance(deco, ast.Call) else deco)
-                if deco_name.endswith((".route", ".get", ".post", ".put", ".patch", ".delete", ".before_app_request", ".before_request", ".errorhandler")):
+                if deco_name.endswith(
+                    (
+                        ".route",
+                        ".get",
+                        ".post",
+                        ".put",
+                        ".patch",
+                        ".delete",
+                        ".before_app_request",
+                        ".before_request",
+                        ".after_app_request",
+                        ".after_request",
+                        ".errorhandler",
+                        ".app_errorhandler",
+                    )
+                ):
                     route_functions.add(name)
         for node in ast.walk(tree):
             if not isinstance(node, ast.Call):
@@ -1551,7 +1567,7 @@ def _vendor_guard_entrypoints(loci: tuple[str, ...]) -> list[str]:
 
 def _vendor_external_io_functions(loci: tuple[str, ...]) -> list[str]:
     findings: list[str] = []
-    http_methods = {"urlopen", "request", "get", "post", "put", "patch", "delete", "head", "options"}
+    http_methods = {"urlopen", "request", "get", "post", "put", "patch", "delete", "head", "options", "send", "stream"}
     for rel in loci:
         _path, _text, tree = _python_source(rel)
         aliases = _import_aliases(tree)
@@ -1571,8 +1587,8 @@ def _vendor_external_io_functions(loci: tuple[str, ...]) -> list[str]:
             if (
                 ctor_target.startswith(("requests", "httpx", "urllib3", "http.client", "aiohttp"))
                 and (
-                    ctor_chain.endswith((".Session", ".Client", ".PoolManager", ".HTTPConnection", ".HTTPSConnection", ".ClientSession"))
-                    or ctor_target.endswith((".Session", ".Client", ".PoolManager", ".HTTPConnection", ".HTTPSConnection", ".ClientSession"))
+                    ctor_chain.endswith((".Session", ".Client", ".AsyncClient", ".PoolManager", ".HTTPConnection", ".HTTPSConnection", ".ClientSession"))
+                    or ctor_target.endswith((".Session", ".Client", ".AsyncClient", ".PoolManager", ".HTTPConnection", ".HTTPSConnection", ".ClientSession"))
                 )
             ):
                 target_nodes = node.targets if isinstance(node, ast.Assign) else [node.target]
