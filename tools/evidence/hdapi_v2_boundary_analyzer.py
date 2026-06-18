@@ -563,6 +563,13 @@ def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
                     break
             if view_func is None and len(node.args) >= 3:
                 view_func = node.args[2]
+            method_values: set[str] = set()
+            for keyword in node.keywords:
+                if keyword.arg == "methods":
+                    method_values = set(_literal_string_list(keyword.value))
+                    break
+            if method_values and method_values <= {"HEAD", "OPTIONS"}:
+                continue
             if isinstance(view_func, ast.Name) and view_func.id in function_defs:
                 route_functions.add(view_func.id)
             elif isinstance(view_func, ast.Call):
@@ -625,6 +632,117 @@ def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
 
         for name in sorted(route_functions):
             if reaches_direct_bypass(name):
+                findings.append(f"{rel}:{name}")
+    return findings
+
+
+def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
+    """Find response-producing adapter routes with no sanctioned presenter path."""
+
+    findings: list[str] = []
+    route_decorator_suffixes = (
+        ".route",
+        ".get",
+        ".post",
+        ".put",
+        ".patch",
+        ".delete",
+        ".errorhandler",
+        ".app_errorhandler",
+    )
+    for rel in loci:
+        _path, _text, tree = _python_source(rel)
+        aliases = _import_aliases(tree)
+        function_defs = _iter_function_defs(tree)
+        class_methods: dict[str, set[str]] = {}
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ClassDef):
+                class_methods[node.name] = {
+                    f"{node.name}.{child.name}"
+                    for child in node.body
+                    if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)) and child.name in {"get", "post", "put", "patch", "delete", "head", "options", "dispatch_request"}
+                }
+
+        def iter_body_nodes(fn: ast.FunctionDef | ast.AsyncFunctionDef):
+            stack = list(fn.body)
+            while stack:
+                node = stack.pop()
+                yield node
+                if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.Lambda, ast.ClassDef)):
+                    continue
+                stack.extend(ast.iter_child_nodes(node))
+
+        function_calls: dict[str, set[str]] = {}
+        direct_presenter: set[str] = set()
+        route_functions: set[str] = set()
+        for name, fn in function_defs.items():
+            calls: set[str] = set()
+            for node in iter_body_nodes(fn):
+                if not isinstance(node, ast.Call):
+                    continue
+                call = _attribute_chain(node.func)
+                if call:
+                    calls.add(call)
+            function_calls[name] = calls
+            if any(_is_sanctioned_presenter_call(call, aliases) for call in calls):
+                direct_presenter.add(name)
+            for deco in fn.decorator_list:
+                deco_name = _attribute_chain(deco.func if isinstance(deco, ast.Call) else deco)
+                if deco_name.endswith(route_decorator_suffixes):
+                    methods = set(filter(None, _route_methods(deco_name, deco).split(",")))
+                    if methods and methods <= {"HEAD", "OPTIONS"}:
+                        continue
+                    route_functions.add(name)
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Call) or not _attribute_chain(node.func).endswith(".add_url_rule"):
+                continue
+            view_func: ast.AST | None = None
+            for keyword in node.keywords:
+                if keyword.arg == "view_func":
+                    view_func = keyword.value
+                    break
+            if view_func is None and len(node.args) >= 3:
+                view_func = node.args[2]
+            method_values: set[str] = set()
+            for keyword in node.keywords:
+                if keyword.arg == "methods":
+                    method_values = set(_literal_string_list(keyword.value))
+                    break
+            if method_values and method_values <= {"HEAD", "OPTIONS"}:
+                continue
+            if isinstance(view_func, ast.Name) and view_func.id in function_defs:
+                route_functions.add(view_func.id)
+            elif isinstance(view_func, ast.Call):
+                view_chain = _attribute_chain(view_func.func)
+                class_name = view_chain.rsplit(".", 1)[0] if view_chain.endswith(".as_view") else ""
+                if class_name in class_methods:
+                    route_functions.update(class_methods[class_name])
+
+        def callee_candidates(owner: str, callee: str) -> set[str]:
+            candidates = {callee}
+            if "." in owner and "." not in callee:
+                candidates.add(f"{owner.split('.', 1)[0]}.{callee}")
+            return {candidate for candidate in candidates if candidate in function_defs}
+
+        reaches_presenter: dict[str, bool] = {}
+
+        def reaches(name: str, seen: set[str] | None = None) -> bool:
+            if name in reaches_presenter:
+                return reaches_presenter[name]
+            if name in direct_presenter:
+                reaches_presenter[name] = True
+                return True
+            seen = set(seen or set())
+            if name in seen:
+                reaches_presenter[name] = False
+                return False
+            seen.add(name)
+            result = any(reaches(candidate, seen) for callee in function_calls.get(name, set()) for candidate in callee_candidates(name, callee))
+            reaches_presenter[name] = result
+            return result
+
+        for name in sorted(route_functions):
+            if not reaches(name):
                 findings.append(f"{rel}:{name}")
     return findings
 

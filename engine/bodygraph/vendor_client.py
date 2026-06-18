@@ -81,7 +81,7 @@ _VENDOR_LOG_KEYS = frozenset(
 )
 _VENDOR_LOG_OUTCOMES = frozenset({"success", "failure"})
 _VENDOR_LOG_ERROR_CLASSES = frozenset(
-    {"none", "network_error", "4xx", "5xx", "429", "http_status_other", "provider_bad_response"}
+    {"none", "network_error", "4xx", "5xx", "429", "http_status_other", "provider_bad_response", "provider_refused"}
 )
 _VENDOR_LOG_RAILS_STATES = frozenset({"closed_default", "open_exception"})
 _ROUTE_CONTRACTS: Mapping[str, tuple[tuple[str, ...], bool]] = {
@@ -450,7 +450,8 @@ class HdApiClient:
                 last_error = exc
                 duration_ms = duration_ms or (self._monotonic() - start)
                 error_code = exc.code
-                error_class = error_class or exc.code.lower()
+                if error_class == "none":
+                    error_class = self._error_class_for_vendor_error(exc.code)
                 if retryable and attempt < self._retry.max_attempts:
                     planned_backoff_ms = self._bounded_backoff_delay(attempt, deadline)
                 self._log_attempt(
@@ -551,6 +552,14 @@ class HdApiClient:
     @staticmethod
     def _bounded_outcome(outcome: str) -> str:
         return outcome if outcome in _VENDOR_LOG_OUTCOMES else "failure"
+
+    @staticmethod
+    def _error_class_for_vendor_error(code: str) -> str:
+        if code == "PROVIDER_REFUSED":
+            return "provider_refused"
+        if code == "PROVIDER_BAD_RESPONSE":
+            return "provider_bad_response"
+        return code.lower()
 
     @staticmethod
     def _bounded_error_class(error_class: str) -> str:
@@ -655,8 +664,8 @@ class HdApiClient:
     def _default_request(req: urlrequest.Request, timeout: float) -> tuple[int, bytes, Mapping[str, str]]:
         safe_mode = (os.environ.get("SAFE_MODE") or "").strip().lower() in {"1", "true", "yes", "on"}
         allow_network = (os.environ.get("ALLOW_NETWORK") or "").strip().lower() in {"1", "true", "yes", "on"}
-        if safe_mode and not allow_network:
-            raise VendorError("PROVIDER_REFUSED", "Vendor source refused under SAFE rails", details={"SAFE_MODE": True})
+        if safe_mode or not allow_network:
+            raise VendorError("PROVIDER_REFUSED", "Vendor source refused unless SAFE_MODE=0 and ALLOW_NETWORK=1", details={"SAFE_MODE": safe_mode, "ALLOW_NETWORK": allow_network})
         opener = urlrequest.build_opener(_NoRedirectHandler())
         try:
             with opener.open(req, timeout=timeout) as resp:  # type: ignore[arg-type]

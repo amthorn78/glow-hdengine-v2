@@ -1934,6 +1934,7 @@ def build_adapter_boundary_proof(produced: str, source_selection: dict[str, Any]
 
     adapter_presenter_calls = boundary_analyzer._adapter_presenter_calls(ADAPTER_BOUNDARY_ADAPTER_LOCI)
     presenter_bypass = boundary_analyzer._adapter_presenter_bypass_routes(ADAPTER_BOUNDARY_ADAPTER_LOCI)
+    unresolved_presenter_routes = boundary_analyzer._adapter_routes_without_presenter(ADAPTER_BOUNDARY_ADAPTER_LOCI)
     discovered_public_routes = boundary_analyzer._adapter_public_route_signatures(ADAPTER_BOUNDARY_ADAPTER_LOCI)
     public_reader_route_drift = sorted(set(discovered_public_routes) ^ set(ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE))
     route_baseline_reconciled = bool(discovered_public_routes) and not public_reader_route_drift
@@ -1967,19 +1968,19 @@ def build_adapter_boundary_proof(produced: str, source_selection: dict[str, Any]
         ),
         _boundary_finding(
             "response_producing_paths",
-            BOUNDARY_ALLOWED if adapter_presenter_calls and not presenter_bypass else (BOUNDARY_FORBIDDEN if presenter_bypass else BOUNDARY_UNKNOWN),
-            "PASS" if adapter_presenter_calls and not presenter_bypass else "FAIL",
+            BOUNDARY_ALLOWED if adapter_presenter_calls and not presenter_bypass and not unresolved_presenter_routes else (BOUNDARY_FORBIDDEN if presenter_bypass else BOUNDARY_UNKNOWN),
+            "PASS" if adapter_presenter_calls and not presenter_bypass and not unresolved_presenter_routes else "FAIL",
             [row["path"] for row in adapter_rows],
-            "public response-producing paths have explicit presenter/emitter provenance" if adapter_presenter_calls and not presenter_bypass else "response-producing path provenance is unresolved or bypasses presenter",
-            presenter_bypass or adapter_presenter_calls,
+            "public response-producing paths have explicit presenter/emitter provenance" if adapter_presenter_calls and not presenter_bypass and not unresolved_presenter_routes else "response-producing path provenance is unresolved or bypasses presenter",
+            presenter_bypass + unresolved_presenter_routes or adapter_presenter_calls,
         ),
         _boundary_finding(
             "presenter_provenance",
-            BOUNDARY_ALLOWED if adapter_presenter_calls and not presenter_bypass else (BOUNDARY_FORBIDDEN if presenter_bypass else BOUNDARY_UNKNOWN),
-            "PASS" if adapter_presenter_calls and not presenter_bypass else "FAIL",
+            BOUNDARY_ALLOWED if adapter_presenter_calls and not presenter_bypass and not unresolved_presenter_routes else (BOUNDARY_FORBIDDEN if presenter_bypass else BOUNDARY_UNKNOWN),
+            "PASS" if adapter_presenter_calls and not presenter_bypass and not unresolved_presenter_routes else "FAIL",
             [row["path"] for row in presenter_rows],
-            "adapter routes resolve to sanctioned presenter/emitter calls" if adapter_presenter_calls and not presenter_bypass else "presenter provenance is not proven for every response path",
-            presenter_bypass or adapter_presenter_calls,
+            "adapter routes resolve to sanctioned presenter/emitter calls" if adapter_presenter_calls and not presenter_bypass and not unresolved_presenter_routes else "presenter provenance is not proven for every response path",
+            presenter_bypass + unresolved_presenter_routes or adapter_presenter_calls,
         ),
         _boundary_finding(
             "serializer_paths",
@@ -2050,7 +2051,7 @@ def build_adapter_boundary_proof(produced: str, source_selection: dict[str, Any]
         "vendor_seam_inspected": bool(vendor_rows) and ("urllib.request" in vendor_modules or "urllib" in vendor_modules or "urlrequest.urlopen" in vendor_calls),
         "no_second_http_home": not second_http_home,
         "no_adapter_bypass": not adapter_bypass,
-        "no_presenter_bypass": not presenter_bypass and bool(adapter_presenter_calls),
+        "no_presenter_bypass": not presenter_bypass and not unresolved_presenter_routes and bool(adapter_presenter_calls),
         "no_ad_hoc_serialization": not ad_hoc_serializers,
         "no_pure_compute_external_io": not pure_external_io,
         "guard_provenance_per_relevant_path": check_by_category["guard_provenance"],

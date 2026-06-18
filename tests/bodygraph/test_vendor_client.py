@@ -164,15 +164,39 @@ def test_default_request_returns_redirect_status_without_following(monkeypatch: 
     assert captured_handlers[0].redirect_request(req, None, 302, "Found", {}, "https://vendor.test/redirect") is None
 
 
-def test_default_request_refuses_closed_rails(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setenv("SAFE_MODE", "1")
-    monkeypatch.setenv("ALLOW_NETWORK", "0")
+def test_default_request_refuses_unless_both_open_rails_flags_are_set(monkeypatch: pytest.MonkeyPatch) -> None:
     req = urlrequest.Request("https://vendor.test/v1/bodygraphs", data=b"{}\n", method="POST")
+    for safe_mode, allow_network in [("1", "0"), ("0", "0"), (None, "0"), (None, None)]:
+        monkeypatch.delenv("SAFE_MODE", raising=False)
+        monkeypatch.delenv("ALLOW_NETWORK", raising=False)
+        if safe_mode is not None:
+            monkeypatch.setenv("SAFE_MODE", safe_mode)
+        if allow_network is not None:
+            monkeypatch.setenv("ALLOW_NETWORK", allow_network)
+
+        with pytest.raises(VendorError) as excinfo:
+            HdApiClient._default_request(req, 2.0)
+
+        assert excinfo.value.code == "PROVIDER_REFUSED"
+
+
+def test_fetch_logs_provider_refused_as_bounded_failure_class(tmp_path: Path) -> None:
+    log_path = tmp_path / "refused.jsonl"
+
+    def refused(req, timeout):
+        raise VendorError("PROVIDER_REFUSED", "refused")
+
+    client = _client(refused, log_path=log_path)
+    request = VendorRequest(url="https://vendor.test/v1/bodygraphs", headers={}, body_bytes=b"{}\n", input_fingerprint="abc")
 
     with pytest.raises(VendorError) as excinfo:
-        HdApiClient._default_request(req, 2.0)
+        client.fetch(request)
 
     assert excinfo.value.code == "PROVIDER_REFUSED"
+    record = _read_jsonl(log_path)[0]
+    assert record["error_class"] == "provider_refused"
+    assert record["error_code"] == "PROVIDER_REFUSED"
+    assert record["outcome"] == "failure"
 
 
 def test_fetch_retries_only_5xx_and_network_errors() -> None:
