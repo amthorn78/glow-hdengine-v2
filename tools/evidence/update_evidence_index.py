@@ -795,6 +795,50 @@ def _load_epic034_pr02_entries() -> list[dict[str, object]]:
     return entries
 
 
+EPIC034_PR03_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "hdapi_v2.response_mapping",
+        "discovered_physical_path": "artifacts/vendor/hdapi_v2/response_mapping.snapshot.json",
+        "epic_id": "HDE-EPIC034",
+        "record_type": "epic034_pr03_response_mapping",
+        "schema_version": "1.0",
+        "tokens": ["JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC034 PR-03 canonical response-envelope mapping snapshot for HDE-FERM007.3 with schema-gap posture and no live vendor conformance claim",
+    },
+    {
+        "artifact_key": "epic034.pr03.response_mapping_check",
+        "discovered_physical_path": "audit/qa/hde-epic034/pr-03/response_mapping_check.log",
+        "epic_id": "HDE-EPIC034",
+        "record_type": "epic034_pr03_response_mapping",
+        "schema_version": "1.0",
+        "tokens": ["EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC034 PR-03 LF-terminated response-mapping posture check log for envelope field preservation, schema gaps, secret safety, and non-claims",
+    },
+]
+
+
+def _load_epic034_pr03_entries() -> list[dict[str, object]]:
+    produced_at = None
+    snapshot = ROOT / "artifacts/vendor/hdapi_v2/response_mapping.snapshot.json"
+    check_log = ROOT / "audit/qa/hde-epic034/pr-03/response_mapping_check.log"
+    if not snapshot.exists() or not check_log.exists():
+        return []
+    try:
+        payload = json.loads(snapshot.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise SystemExit("INVALID_EPIC034_RESPONSE_MAPPING_SNAPSHOT") from exc
+    produced = payload.get("generated_at_utc")
+    if isinstance(produced, str) and produced:
+        produced_at = produced
+    entries: list[dict[str, object]] = []
+    for entry in EPIC034_PR03_PRIMARY_ARTIFACTS:
+        normalized = dict(entry)
+        if produced_at is not None:
+            normalized["produced_at_utc"] = produced_at
+        entries.append(normalized)
+    return entries
+
+
 A7_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
         "artifact_key": "a7.success_encoding_invariance",
@@ -1144,6 +1188,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *_load_epic033_entries(),
             *_load_epic034_pr01_entries(),
             *_load_epic034_pr02_entries(),
+            *_load_epic034_pr03_entries(),
             *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,

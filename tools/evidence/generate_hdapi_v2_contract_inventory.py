@@ -35,8 +35,11 @@ DOC_DELTAS = ROOT / "audit" / "docdeltas" / "hde-epic033_doc_deltas.md"
 QA_DOC_DELTAS = ROOT / "audit" / "qa" / "hde-epic033" / "00_meta" / "doc_deltas.md"
 EPIC034_QA = ROOT / "audit" / "qa" / "hde-epic034" / "pr-01"
 EPIC034_PR02_QA = ROOT / "audit" / "qa" / "hde-epic034" / "pr-02"
+EPIC034_PR03_QA = ROOT / "audit" / "qa" / "hde-epic034" / "pr-03"
 REQUEST_SHAPING_SNAPSHOT = OUT / "request_shaping.snapshot.json"
 REQUEST_SHAPING_CHECK_LOG = EPIC034_PR02_QA / "request_shaping_check.log"
+RESPONSE_MAPPING_SNAPSHOT = OUT / "response_mapping.snapshot.json"
+RESPONSE_MAPPING_CHECK_LOG = EPIC034_PR03_QA / "response_mapping_check.log"
 REQUEST_SHAPING_OUTPUTS = (
     REQUEST_SHAPING_SNAPSHOT,
     REQUEST_SHAPING_SNAPSHOT.with_suffix(REQUEST_SHAPING_SNAPSHOT.suffix + ".path_proof.txt"),
@@ -913,6 +916,146 @@ def build_request_shaping_check_log(produced: str, snapshot: dict[str, Any], *, 
     lines.append("status=PASS" if all(ok for _name, ok in checks) else "status=FAIL")
     return "\n".join(lines)
 
+
+def _response_type_from_success_envelope(route: dict[str, Any]) -> str:
+    envelope = route.get("success_envelope")
+    if not isinstance(envelope, str) or "StandardResponse with type=" not in envelope or " and data=" not in envelope:
+        raise ValueError(f"RESPONSE_MAPPING_ENVELOPE_MISSING:{route.get('path')}")
+    return envelope.split("StandardResponse with type=", 1)[1].split(" and data=", 1)[0]
+
+
+def _response_data_schema_from_success_envelope(route: dict[str, Any]) -> str:
+    envelope = route.get("success_envelope")
+    if not isinstance(envelope, str) or " and data=" not in envelope:
+        raise ValueError(f"RESPONSE_MAPPING_DATA_SCHEMA_MISSING:{route.get('path')}")
+    return envelope.rsplit(" and data=", 1)[1]
+
+
+def build_response_mapping_snapshot(
+    produced: str,
+    contract: dict[str, Any],
+    source_selection: dict[str, Any],
+    request_shaping: dict[str, Any],
+    ops_summary: dict[str, Any],
+) -> dict[str, Any]:
+    """Derive HDE-EPIC034 PR-03 proof-level v2 response-envelope mapping evidence."""
+    _validate_ops01_fact_summary(ops_summary)
+    if request_shaping.get("route_family") != "recommended_v2_chart":
+        raise ValueError("RESPONSE_MAPPING_REQUEST_SHAPING_BASELINE_DRIFT")
+    shaped_by_path = {row.get("endpoint_path"): row for row in request_shaping.get("routes", []) if isinstance(row, dict)}
+    route_mappings: list[dict[str, Any]] = []
+    for method, path, variant in V2_CHART_ROUTES:
+        contract_route = _route_by_path(contract, path)
+        shaped_route = shaped_by_path.get(path)
+        if not isinstance(shaped_route, dict) or shaped_route.get("route_variant") != variant:
+            raise ValueError(f"RESPONSE_MAPPING_REQUEST_ROUTE_MISSING:{path}")
+        if contract_route.get("route_family") != "recommended_v2_chart":
+            raise ValueError(f"RESPONSE_MAPPING_ROUTE_FAMILY_MISMATCH:{path}")
+        response_type = _response_type_from_success_envelope(contract_route)
+        data_schema = _response_data_schema_from_success_envelope(contract_route)
+        if data_schema not in {"ChartResult", "ChartSimpleResult"}:
+            raise ValueError(f"RESPONSE_MAPPING_UNSUPPORTED_DATA_SCHEMA:{path}:{data_schema}")
+        route_mappings.append(
+            {
+                "data_payload_identity_posture": "preserve data object identity by reference/digest posture only; vendor payload body is not emitted in proof artifacts",
+                "data_schema": data_schema,
+                "endpoint_path": path,
+                "errorCode_handling": "preserve StandardResponse.errorCode as envelope error_code posture; no retry/rate-limit mapping is claimed in PR-03",
+                "method": method,
+                "response_type": response_type,
+                "route_family": "recommended_v2_chart",
+                "route_variant": variant,
+                "source_spec": contract_route.get("source_spec"),
+                "success_status_handling": "preserve StandardResponse.success as boolean success status posture without claiming live runtime status",
+            }
+        )
+    internal_target_posture = {
+        "admin": {
+            "consumer_status": "inspected_evidence_only",
+            "mapping_result": "no_public_or_admin_runtime_behavior_change_claimed",
+            "proof_basis": "no new HTTP home, public route, flag, payload, response shape, or transport behavior is introduced",
+        },
+        "bodygraph": {
+            "consumer_status": "inspected engine.bodygraph.vendor_client, engine.bodygraph.ingest, and engine.bodygraph.resolver",
+            "mapping_result": "schema_gap_recorded",
+            "proof_basis": "existing ingest path is v1 BodyGraph-oriented and persists emitted payloads after vendor fetch; PR-03 does not add a ChartResult-to-BodyGraph adapter",
+        },
+        "cache": {
+            "consumer_status": "inspected hde.body_graphs persistence path through engine.bodygraph.ingest",
+            "mapping_result": "not_truthfully_proven_for_v2_chart_data",
+            "proof_basis": "opaque JSON persistence mechanics exist for the v1 vendor path, but v2 ChartResult/cache compatibility is not claimed without adapter proof",
+        },
+        "compatibility": {
+            "consumer_status": "inspected engine.compat.compute person/bodygraph input helpers",
+            "mapping_result": "schema_gap_recorded",
+            "proof_basis": "compat/conjunction helpers consume person_uid-style resolved BodyGraph/person inputs; v2 ChartResult data is not proven to provide that internal shape",
+        },
+        "sampler": {
+            "consumer_status": "inspected as non-public/dev evidence boundary",
+            "mapping_result": "no_runtime_feed_claimed",
+            "proof_basis": "sampler/admin/public surfaces are not changed by this proof-level mapping slice",
+        },
+    }
+    return {
+        "ai_scope_claim": "NONE",
+        "data_payload_body_emitted": False,
+        "data_payload_identity_posture": "identity is proven only as an envelope data-field preservation posture; no vendor payload body is serialized",
+        "errorCode_handling": "StandardResponse.errorCode is preserved as nullable/defined envelope error-code posture in proof rows; follow-up retry/rate-limit mapping is out of scope",
+        "generated_at_utc": produced,
+        "input_references": {
+            "contract_map": {"path": "artifacts/vendor/hdapi_v2/contract_map.json", "sha256": sha256_bytes(canonical_json_bytes(contract))},
+            "ops01_fact_summary": {"path": "audit/ops/hde-epic034/ops-01/fact_summary.json", "sha256": _sha256_path(ROOT / "audit/ops/hde-epic034/ops-01/fact_summary.json")},
+            "request_shaping_snapshot": {"path": "artifacts/vendor/hdapi_v2/request_shaping.snapshot.json", "sha256": sha256_bytes(canonical_json_bytes(request_shaping))},
+            "source_selection_snapshot": {"path": "artifacts/vendor/hdapi_v2/source_selection.snapshot.json", "sha256": sha256_bytes(canonical_json_bytes(source_selection))},
+        },
+        "internal_target_posture": internal_target_posture,
+        "live_vendor_call_claim": "NONE",
+        "no_ai_transformation_posture": "no AI interpretation, model-generated transformation, prompt, embedding, chatbot, model call, or AI-provider credential is introduced",
+        "no_compatibility_by_inference": True,
+        "no_secret_values_posture": "only secret-safe env var/header names and redacted postures are recorded",
+        "no_vendor_payload_body_posture": "fixture-backed proof records schema/type/posture only and does not emit vendor payload bodies",
+        "normalized_data_path_proof_claim": "NONE",
+        "open_rails_vendor_smoke_claim": "NONE",
+        "public_reader_change_claim": "NONE",
+        "response_envelope_mapping_scope": "HDE-FERM007.3 proof-level v2 StandardResponse envelope mapping only",
+        "route_family": "recommended_v2_chart",
+        "routes": route_mappings,
+        "runtime_conformance_claim": "NONE",
+        "schema_gap_status": "GAP_RECORDED",
+        "schema_gap_summary": "v2 ChartResult/ChartSimpleResult StandardResponse data is not proven to feed existing BodyGraph cache or compat input paths without a follow-up adapter/presenter boundary proof",
+        "success_status_handling": "StandardResponse.success is preserved as success status posture; no live HTTP success or runtime conformance is claimed",
+    }
+
+
+def build_response_mapping_check_log(produced: str, snapshot: dict[str, Any], *, mode: str) -> str:
+    env_snapshot = closed_rails_env_snapshot()
+    routes = snapshot.get("routes", [])
+    checks = [
+        ("closed_rails_generation", mode == "closed-rails-source-cache" and closed_rails_env_ok()),
+        ("no_live_vendor_call_attempted", snapshot.get("live_vendor_call_claim") == "NONE"),
+        ("response_type_preservation", all(isinstance(row, dict) and row.get("response_type") in {"ChartResult", "ChartSimpleResult"} for row in routes)),
+        ("success_status_handling", snapshot.get("success_status_handling", "").startswith("StandardResponse.success")),
+        ("errorCode_handling", "errorCode" in snapshot.get("errorCode_handling", "")),
+        ("data_payload_identity_posture", snapshot.get("data_payload_body_emitted") is False and "identity" in snapshot.get("data_payload_identity_posture", "")),
+        ("route_variant_preservation", {row.get("route_variant") for row in routes if isinstance(row, dict)} == {"full_chart", "simple_chart", "coordinates_chart"}),
+        ("internal_target_posture_or_schema_gap_recorded", snapshot.get("schema_gap_status") == "GAP_RECORDED" and isinstance(snapshot.get("internal_target_posture"), dict)),
+        ("no_compatibility_by_inference_claim", snapshot.get("no_compatibility_by_inference") is True),
+        ("no_normalized_data_path_proof_claimed", snapshot.get("normalized_data_path_proof_claim") == "NONE"),
+        ("no_vendor_payload_bodies_emitted", snapshot.get("no_vendor_payload_body_posture", "").startswith("fixture-backed proof")),
+        ("no_secret_values_emitted", "k_test" not in json.dumps(snapshot) and "Bearer api" not in json.dumps(snapshot) and "Bearer geo" not in json.dumps(snapshot)),
+    ]
+    rails = " ".join(f"{key}={env_snapshot[key]}" for key in sorted(CLOSED_RAILS_ENV))
+    lines = [
+        f"generated_at_utc={produced}",
+        "scope=HDE-EPIC034 PR-03 response-mapping check",
+        f"rails={rails}",
+        "network_posture=closed-rails-source-cache; no live vendor calls",
+        "evidence_index_and_path_proof_posture=validated_by_update_evidence_index_and_validate_evidence_paths_not_generator",
+    ]
+    lines.extend(f"[{name}] status={'PASS' if ok else 'FAIL'}" for name, ok in checks)
+    lines.append("status=PASS" if all(ok for _name, ok in checks) else "status=FAIL")
+    return "\n".join(lines)
+
 def validate_source_statuses(fetched: dict[str, dict[str, Any]]) -> None:
     for key in ["v2_routes_yaml", "v1_routes_yaml", "llms_full_txt"]:
         status = fetched[key].get("fetch_status")
@@ -1077,9 +1220,12 @@ def render_outputs(produced: str, fetched: dict[str, dict[str, Any]], bodies: di
         require_closed_rails_for_request_shaping()
         ops_summary = _load_ops01_fact_summary()
         request_snapshot = build_request_shaping_snapshot(produced, contract, snapshot, ops_summary)
+        response_snapshot = build_response_mapping_snapshot(produced, contract, snapshot, request_snapshot, ops_summary)
         outputs.update({
             REQUEST_SHAPING_SNAPSHOT: canonical_json_bytes(request_snapshot),
             REQUEST_SHAPING_CHECK_LOG: (build_request_shaping_check_log(produced, request_snapshot, mode=mode) + "\n").encode("utf-8"),
+            RESPONSE_MAPPING_SNAPSHOT: canonical_json_bytes(response_snapshot),
+            RESPONSE_MAPPING_CHECK_LOG: (build_response_mapping_check_log(produced, response_snapshot, mode=mode) + "\n").encode("utf-8"),
         })
     outputs.update(write_baseline_pointer_artifacts(produced, acceptance))
     return outputs
