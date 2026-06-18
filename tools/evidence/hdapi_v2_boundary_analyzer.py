@@ -783,6 +783,29 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
                     return set()
             return returned
 
+
+        def response_param_content_status_safe(fn: ast.FunctionDef | ast.AsyncFunctionDef, param_name: str) -> bool:
+            unsafe_attrs = {"data", "response", "status", "status_code"}
+            unsafe_methods = {"set_data", "set_json"}
+            for node in iter_body_nodes(fn):
+                if isinstance(node, (ast.Assign, ast.AnnAssign, ast.AugAssign)):
+                    targets = []
+                    if isinstance(node, ast.Assign):
+                        targets = list(node.targets)
+                    elif isinstance(node, ast.AnnAssign):
+                        targets = [node.target]
+                    else:
+                        targets = [node.target]
+                    for target in targets:
+                        if isinstance(target, ast.Name) and target.id == param_name:
+                            return False
+                        if isinstance(target, ast.Attribute) and isinstance(target.value, ast.Name) and target.value.id == param_name and target.attr in unsafe_attrs:
+                            return False
+                if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute) and isinstance(node.func.value, ast.Name):
+                    if node.func.value.id == param_name and node.func.attr in unsafe_methods:
+                        return False
+            return True
+
         def _constant_int(node: ast.AST | None) -> int | None:
             return node.value if isinstance(node, ast.Constant) and isinstance(node.value, int) else None
 
@@ -900,7 +923,7 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
                 if hook_kind_by_key.get(name) == "errorhandler" and isinstance(node.value, ast.Name) and node.value.id in params and function_has_compat_scope_predicate(fn):
                     continue
                 if hook_kind_by_key.get(name) == "after_request":
-                    if isinstance(node.value, ast.Name) and node.value.id in params:
+                    if isinstance(node.value, ast.Name) and node.value.id in params and response_param_content_status_safe(fn, node.value.id):
                         saw_passthrough_return = True
                         continue
                     if isinstance(node.value, ast.Call):
@@ -910,7 +933,14 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
                             passthrough = helper_passthrough_params(candidate)
                             positional_params = [arg.arg for arg in function_defs[candidate].args.args + function_defs[candidate].args.posonlyargs]
                             for index, arg in enumerate(node.value.args):
-                                if index < len(positional_params) and positional_params[index] in passthrough and isinstance(arg, ast.Name) and arg.id in params:
+                                if (
+                                    index < len(positional_params)
+                                    and positional_params[index] in passthrough
+                                    and isinstance(arg, ast.Name)
+                                    and arg.id in params
+                                    and response_param_content_status_safe(fn, arg.id)
+                                    and response_param_content_status_safe(function_defs[candidate], positional_params[index])
+                                ):
                                     saw_passthrough_return = True
                                     break
                             if saw_passthrough_return:

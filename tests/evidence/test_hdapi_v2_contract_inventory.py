@@ -2449,6 +2449,32 @@ def good():
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
 
 
+
+def test_epic034_adapter_boundary_rejects_after_request_body_mutation(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+@app.after_request
+def mutate(resp):
+    resp.set_data(b'raw replacement')
+    return resp
+@app.route('/good')
+def good():
+    return emit_public({'ok': True})
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "mutating_after_request.py", body)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", tuple(boundary_analyzer._adapter_public_route_signatures((adapter,))))
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_presenter_bypass"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
 def test_epic034_adapter_boundary_distinguishes_duplicate_nested_handler_names(monkeypatch: pytest.MonkeyPatch) -> None:
     import shutil
 
