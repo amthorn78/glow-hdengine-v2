@@ -1233,7 +1233,21 @@ def _adapter_external_io_calls(loci: tuple[str, ...]) -> list[str]:
     findings: list[str] = []
     http_methods = {"request", "get", "post", "put", "patch", "delete", "head", "options", "urlopen", "send", "stream"}
     forbidden_modules = {"requests", "httpx", "urllib.request", "urllib3", "http.client", "aiohttp", "socket", "subprocess"}
-    forbidden_calls = {"socket.create_connection", "create_connection", "subprocess.run", "subprocess.Popen", "subprocess.call", "os.system"}
+    forbidden_calls = {
+        "socket.create_connection",
+        "create_connection",
+        "subprocess.run",
+        "subprocess.Popen",
+        "subprocess.call",
+        "subprocess.check_call",
+        "subprocess.check_output",
+        "check_call",
+        "check_output",
+        "os.system",
+        "os.popen",
+        "system",
+        "popen",
+    }
     for rel in loci:
         _path, _text, tree = _python_source(rel)
         aliases = _import_aliases(tree)
@@ -1263,7 +1277,7 @@ def _adapter_external_io_calls(loci: tuple[str, ...]) -> list[str]:
             target = aliases.get(root or "", root or "")
             attr = chain.rsplit(".", 1)[-1] if chain else ""
             target_attr = target.rsplit(".", 1)[-1] if target else ""
-            if (target.startswith("socket") and attr in {"create_connection", "socket"}) or (target.startswith("subprocess") and attr in {"run", "Popen", "call"}):
+            if (target.startswith("socket") and attr in {"create_connection", "socket"}) or (target.startswith("subprocess") and attr in {"run", "Popen", "call", "check_call", "check_output"}):
                 findings.append(f"{rel}:{chain}")
             elif root in client_roots and attr in http_methods:
                 findings.append(f"{rel}:{chain}")
@@ -1280,7 +1294,7 @@ def _adapter_external_io_calls(loci: tuple[str, ...]) -> list[str]:
                     or ".ClientSession." in chain
                 ):
                     findings.append(f"{rel}:{chain}")
-            elif chain in forbidden_calls or target in {"socket.create_connection", "subprocess.run", "subprocess.Popen", "subprocess.call", "os.system"}:
+            elif chain in forbidden_calls or target in forbidden_calls:
                 findings.append(f"{rel}:{chain}")
     return sorted(set(findings))
 
@@ -1376,6 +1390,8 @@ def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
                 value = node.value
                 if isinstance(value, ast.Tuple):
                     value = value.elts[0] if value.elts else value
+                if isinstance(value, ast.Await):
+                    value = value.value
                 if isinstance(value, ast.Call):
                     names.add(_attribute_chain(value.func))
                 elif isinstance(value, ast.Name):
@@ -1383,6 +1399,8 @@ def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
             return names
 
         def node_is_jsonish(value: ast.AST) -> bool:
+            if isinstance(value, ast.Await):
+                return node_is_jsonish(value.value)
             if isinstance(value, ast.Tuple):
                 return bool(value.elts) and node_is_jsonish(value.elts[0])
             if isinstance(value, (ast.Dict, ast.List)):
@@ -1412,12 +1430,25 @@ def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
                 for call in calls
             ):
                 return True
+            assigned_jsonish: set[str] = set()
             for node in iter_body_nodes(fn):
-                if isinstance(node, ast.Return) and node.value is not None and node_is_jsonish(node.value):
-                    return True
+                if isinstance(node, (ast.Assign, ast.AnnAssign)) and node.value is not None and node_is_jsonish(node.value):
+                    target_nodes = node.targets if isinstance(node, ast.Assign) else [node.target]
+                    for target_node in target_nodes:
+                        if isinstance(target_node, ast.Name):
+                            assigned_jsonish.add(target_node.id)
+            for node in iter_body_nodes(fn):
+                if isinstance(node, ast.Return) and node.value is not None:
+                    if node_is_jsonish(node.value):
+                        return True
+                    if isinstance(node.value, ast.Name) and node.value.id in assigned_jsonish:
+                        return True
                 if isinstance(node, ast.Call):
                     call_name = _attribute_chain(node.func)
-                    if call_name.endswith("Response") and any(node_is_jsonish(arg) for arg in node.args):
+                    if call_name.endswith("Response") and (
+                        any(node_is_jsonish(arg) for arg in node.args)
+                        or any(keyword.arg in {"response", "json", "data"} and node_is_jsonish(keyword.value) for keyword in node.keywords)
+                    ):
                         return True
             return False
 
@@ -1508,7 +1539,21 @@ def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
 def _pure_compute_external_io(loci: tuple[str, ...]) -> list[str]:
     findings: list[str] = []
     forbidden_modules = {"requests", "httpx", "urllib", "urllib.request", "urllib3", "http.client", "aiohttp", "socket", "subprocess"}
-    forbidden_calls = {"socket.create_connection", "create_connection", "subprocess.run", "subprocess.Popen", "subprocess.call", "os.system"}
+    forbidden_calls = {
+        "socket.create_connection",
+        "create_connection",
+        "subprocess.run",
+        "subprocess.Popen",
+        "subprocess.call",
+        "subprocess.check_call",
+        "subprocess.check_output",
+        "check_call",
+        "check_output",
+        "os.system",
+        "os.popen",
+        "system",
+        "popen",
+    }
     for rel in loci:
         _path, _text, tree = _python_source(rel)
         modules = _import_modules(tree)
@@ -1606,10 +1651,22 @@ def _vendor_external_io_functions(loci: tuple[str, ...]) -> list[str]:
             root = _root_name(node.func)
             target = aliases.get(root or "", root or "")
             attr = chain.rsplit(".", 1)[-1] if chain else ""
+            shell_or_socket_methods = {"create_connection", "socket", "run", "Popen", "call", "check_call", "check_output", "system", "popen"}
             is_external = (
                 (target.startswith(("urllib.request", "requests", "httpx", "urllib3", "http.client", "aiohttp")) and attr in http_methods | {"build_opener", "ClientSession"})
                 or (root in opener_roots and attr == "open")
                 or (root in client_roots and attr in http_methods)
+                or (target.startswith(("socket", "subprocess", "os")) and attr in shell_or_socket_methods)
+                or target in {
+                    "socket.create_connection",
+                    "subprocess.run",
+                    "subprocess.Popen",
+                    "subprocess.call",
+                    "subprocess.check_call",
+                    "subprocess.check_output",
+                    "os.system",
+                    "os.popen",
+                }
             )
             if not is_external:
                 continue
