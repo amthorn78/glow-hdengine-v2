@@ -12,6 +12,10 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
 
+
+def _sha256_path(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
 def _python_source(rel: str) -> tuple[Path, str, ast.AST]:
     path = ROOT / rel
     if not path.is_file():

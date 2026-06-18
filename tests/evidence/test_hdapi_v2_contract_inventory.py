@@ -2270,3 +2270,30 @@ def fetch():
         assert boundary_analyzer._vendor_guard_entrypoints((rel,)) == []
     finally:
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+def test_epic034_adapter_boundary_reports_positive_contract_classifications() -> None:
+    proof, checks = generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    assert checks["conservative_positive_boundary_contract_applied"] is True
+    assert "work_item=W-001" in proof
+    assert "classification_categories_used=allowed,forbidden,unknown / fail-closed,out of scope" in proof
+    assert "unknown_current_categories_fail_closed=true" in proof
+    for category in [
+        "public_routes",
+        "response_producing_paths",
+        "presenter_provenance",
+        "serializer_paths",
+        "external_io_paths",
+        "pure_compute_external_io",
+        "guard_provenance",
+        "evidence_binding_posture",
+    ]:
+        assert f"boundary_finding category={category}" in proof
+    assert "classification=allowed verdict=PASS" in proof
+    assert "classification=out of scope verdict=PASS" in proof
+
+
+def test_epic034_boundary_unknown_category_is_fail_closed() -> None:
+    finding = generator._boundary_finding("synthetic_unknown", generator.BOUNDARY_UNKNOWN, "FAIL", ["synthetic.py"], "unresolved current category")
+    assert generator._finding_passes(finding) is False
+    bad_finding = generator._boundary_finding("synthetic_unknown", generator.BOUNDARY_UNKNOWN, "PASS", ["synthetic.py"], "would be false pass")
+    assert generator._finding_passes(bad_finding) is False
