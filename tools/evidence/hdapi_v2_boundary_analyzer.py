@@ -1603,6 +1603,22 @@ BOUNDARY_FORBIDDEN = "forbidden"
 BOUNDARY_UNKNOWN = "unknown / fail-closed"
 BOUNDARY_OUT_OF_SCOPE = "out of scope"
 BOUNDARY_PASS_CLASSIFICATIONS = {BOUNDARY_ALLOWED, BOUNDARY_OUT_OF_SCOPE}
+BOUNDARY_TAXONOMY_GROUP_TO_FINDING = {
+    "route_registration_surfaces": "adapter_route_registration",
+    "public_route_signatures": "public_routes",
+    "response_producing_paths": "response_producing_paths",
+    "presenter_valid_paths": "presenter_provenance",
+    "presenter_bypass_paths": "presenter_provenance",
+    "serializer_families": "serializer_paths",
+    "external_io_families": "external_io_paths",
+    "import_and_alias_forms": "presenter_provenance",
+    "cross_file_helper_chains": "presenter_provenance",
+    "vendor_guard_provenance": "guard_provenance",
+    "pure_compute_forbidden_operations": "pure_compute_external_io",
+    "public_internal_route_classification": "public_routes",
+    "evidence_family_binding": "evidence_binding_posture",
+}
+REQUIRED_BOUNDARY_TAXONOMY_GROUPS = tuple(BOUNDARY_TAXONOMY_GROUP_TO_FINDING)
 
 
 def boundary_finding(category: str, classification: str, verdict: str, inspected: list[str], reason: str, details: list[str] | None = None) -> dict[str, Any]:
@@ -1712,12 +1728,24 @@ def analyze_adapter_boundary(
         boundary_finding("hde_ferm007_5_runtime_v2_live_open_rails_ai_scope", BOUNDARY_OUT_OF_SCOPE, "PASS", [row["path"] for row in evidence_tool_rows], "explicitly outside W-002 / HDE-FERM007.4; no claim is emitted", []),
     ]
     check_by_category = {finding["category"]: finding_passes(finding) for finding in findings}
+    finding_by_category = {finding["category"]: finding for finding in findings}
+    taxonomy_group_verdicts = {
+        group: {
+            "finding_category": category,
+            "classification": finding_by_category[category]["classification"],
+            "verdict": finding_by_category[category]["verdict"],
+            "w003_scope": "in_scope" if finding_by_category[category]["classification"] != BOUNDARY_OUT_OF_SCOPE else "follow_up_or_out_of_scope_visible",
+        }
+        for group, category in BOUNDARY_TAXONOMY_GROUP_TO_FINDING.items()
+    }
     checks = {
         "adapter_http_home_inspected": check_by_category["adapter_route_registration"],
         "actual_repo_loci_discovered_before_classification": all([adapter_rows, presenter_rows, vendor_rows, pure_rows, evidence_tool_rows]),
         "hard_coded_path_lists_not_used_as_proof": bool(discovered_public_routes) or adapter_loci != canonical_adapter_loci,
         "unknown_current_categories_fail_closed": all(f["verdict"] != "PASS" for f in findings if f["classification"] == BOUNDARY_UNKNOWN),
         "conservative_positive_boundary_contract_applied": {f["classification"] for f in findings} <= {BOUNDARY_ALLOWED, BOUNDARY_FORBIDDEN, BOUNDARY_UNKNOWN, BOUNDARY_OUT_OF_SCOPE},
+        "table_driven_boundary_taxonomy_applied": set(taxonomy_group_verdicts) == set(REQUIRED_BOUNDARY_TAXONOMY_GROUPS),
+        "required_taxonomy_groups_visible": all(group in taxonomy_group_verdicts for group in REQUIRED_BOUNDARY_TAXONOMY_GROUPS),
         "presenter_emitter_inspected": check_by_category["presenter_provenance"],
         "vendor_seam_inspected": bool(vendor_rows) and ("urllib.request" in vendor_modules or "urllib" in vendor_modules or "urlrequest.urlopen" in vendor_calls),
         "no_second_http_home": not second_http_home,
@@ -1732,10 +1760,13 @@ def analyze_adapter_boundary(
     }
     verdict_status = "PASS" if all(checks.values()) and all(finding_passes(f) for f in findings) else ("FAIL" if any(f["classification"] == BOUNDARY_FORBIDDEN for f in findings) else "UNKNOWN")
     return {
-        "work_item": "W-002",
-        "scope": "HDE-EPIC034 PR-04 analyzer-owned adapter/presenter boundary proof for HDE-FERM007.4 only",
+        "work_item": "W-003",
+        "scope": "HDE-EPIC034 PR-04 table-driven adapter/presenter boundary taxonomy proof for HDE-FERM007.4 only",
         "inspected_loci": {"adapter": adapter_rows, "presenter": presenter_rows, "engine": pure_rows, "vendor_seam": vendor_rows, "evidence_tool": evidence_tool_rows},
         "findings": findings,
+        "boundary_taxonomy": taxonomy_group_verdicts,
+        "required_taxonomy_groups": list(REQUIRED_BOUNDARY_TAXONOMY_GROUPS),
+        "missing_taxonomy_groups": sorted(set(REQUIRED_BOUNDARY_TAXONOMY_GROUPS) - set(taxonomy_group_verdicts)),
         "unknowns": [f for f in findings if f["classification"] == BOUNDARY_UNKNOWN],
         "public_route_deltas": public_reader_route_drift,
         "public_internal_route_classification_posture": next(f for f in findings if f["category"] == "public_routes"),

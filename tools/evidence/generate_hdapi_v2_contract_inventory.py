@@ -1910,7 +1910,11 @@ def render_adapter_boundary_proof(produced: str, result: dict[str, Any]) -> tupl
     lines = [
         f"generated_at_utc={produced}",
         f"work_item={result['work_item']}",
-        "scope=HDE-EPIC034 PR-04 analyzer-owned adapter/presenter boundary proof for HDE-FERM007.4 only",
+        "scope=HDE-EPIC034 PR-04 table-driven adapter/presenter boundary taxonomy proof for HDE-FERM007.4 only",
+        "hde_ferm007_4_scope=adapter and presenter boundary preservation remediation slice only; not final subtask completion",
+        "table_driven_boundary_taxonomy=applied to analyzer-owned categories for W-003",
+        "required_taxonomy_groups_covered=" + ",".join(result["required_taxonomy_groups"]),
+        "taxonomy_missing_category_posture=" + ("none" if not result["missing_taxonomy_groups"] else ",".join(result["missing_taxonomy_groups"]) + " fail-closed"),
         "analyzer_rendering_separation=analyzer owns findings, unknowns, deltas, provenance, bindings, and verdicts; renderer only emits analyzer output",
         f"analyzer_owned_verdict_status={result['verdict_status']}",
         "renderer_only_posture=evidence generator does not rediscover route, guard, presenter, serializer, external-I/O, or boundary truth",
@@ -1940,7 +1944,28 @@ def render_adapter_boundary_proof(produced: str, result: dict[str, Any]) -> tupl
             f"reason={finding['reason']} "
             "details=" + json.dumps(finding["details"], sort_keys=True, separators=(",", ":"))
         )
+    for group, row in sorted(result["boundary_taxonomy"].items()):
+        lines.append(
+            f"boundary_taxonomy group={group} "
+            f"finding_category={row['finding_category']} "
+            f"classification={row['classification']} "
+            f"verdict={row['verdict']} "
+            f"scope={row['w003_scope']}"
+        )
     lines.extend([
+        "route_registration_taxonomy_verdict=" + _finding_summary(result, "adapter_route_registration"),
+        "public_route_signature_taxonomy_verdict=" + _finding_summary(result, "public_routes"),
+        "response_producing_path_taxonomy_verdict=" + _finding_summary(result, "response_producing_paths"),
+        "presenter_valid_path_taxonomy_verdict=" + _finding_summary(result, "presenter_provenance"),
+        "presenter_bypass_path_taxonomy_verdict=" + _finding_summary(result, "presenter_provenance"),
+        "serializer_taxonomy_verdict=" + _finding_summary(result, "serializer_paths"),
+        "external_io_taxonomy_verdict=" + _finding_summary(result, "external_io_paths"),
+        "import_alias_taxonomy_verdict=" + _finding_summary(result, "presenter_provenance"),
+        "cross_file_helper_chain_taxonomy_verdict=" + _finding_summary(result, "presenter_provenance"),
+        "vendor_guard_provenance_taxonomy_verdict=" + _finding_summary(result, "guard_provenance"),
+        "pure_compute_forbidden_operation_taxonomy_verdict=" + _finding_summary(result, "pure_compute_external_io"),
+        "public_internal_route_classification_taxonomy_verdict=" + _finding_summary(result, "public_routes"),
+        "evidence_family_binding_taxonomy_verdict=" + _finding_summary(result, "evidence_binding_posture"),
         "public_route_findings_and_verdict=" + _finding_summary(result, "public_routes"),
         "response_producing_path_findings_and_verdict=" + _finding_summary(result, "response_producing_paths"),
         "presenter_provenance_findings_and_verdict=" + _finding_summary(result, "presenter_provenance"),
@@ -1997,6 +2022,9 @@ def build_adapter_boundary_check_log(produced: str, proof: str, checks: dict[str
         "renderer_did_not_override_analyzer_unknowns_or_failures": "renderer_does_not_override_analyzer_unknowns_or_failures=true" in proof,
         "analyzer_owned_verdict_pass": "analyzer_owned_verdict_status=PASS" in proof,
         "conservative_positive_boundary_contract_applied": checks.get("conservative_positive_boundary_contract_applied", False),
+        "table_driven_boundary_taxonomy_applied": checks.get("table_driven_boundary_taxonomy_applied", False) and "table_driven_boundary_taxonomy=" in proof,
+        "required_taxonomy_groups_covered_or_visibly_marked": checks.get("required_taxonomy_groups_visible", False) and "taxonomy_missing_category_posture=" in proof,
+        "no_required_taxonomy_group_silently_skipped": checks.get("required_taxonomy_groups_visible", False),
         "unknown_current_categories_fail_closed": checks.get("unknown_current_categories_fail_closed", False) and "unknown_current_categories_fail_closed=true" in proof,
         "actual_repo_loci_discovered_before_classification": checks.get("actual_repo_loci_discovered_before_classification", False),
         "hard_coded_path_lists_were_not_used_as_proof": checks.get("hard_coded_path_lists_not_used_as_proof", False),
@@ -2026,10 +2054,13 @@ def build_adapter_boundary_check_log(produced: str, proof: str, checks: dict[str
         raise ValueError("ADAPTER_BOUNDARY_CHECK_FAILED:" + ",".join(failed))
     lines = [
         f"generated_at_utc={produced}",
-        "scope=HDE-EPIC034 PR-04 boundary check for W-002 / HDE-FERM007.4",
+        "scope=HDE-EPIC034 PR-04 boundary check for W-003 / HDE-FERM007.4",
         f"rails={rails}",
         "network_posture=closed-rails-source-cache; no live vendor calls",
         "boundary_proof_generated_under_closed_rails=true",
+        "table_driven_boundary_taxonomy_was_applied=true",
+        "required_taxonomy_groups_are_covered_or_visibly_marked=true",
+        "no_required_taxonomy_group_was_silently_skipped=true",
         "analyzer_rendering_separation_was_applied=true",
         "evidence_generator_rendered_analyzer_output_only=true",
         "renderer_did_not_recompute_boundary_truth=true",

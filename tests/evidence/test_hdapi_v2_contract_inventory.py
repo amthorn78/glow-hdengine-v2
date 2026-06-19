@@ -845,6 +845,274 @@ def _write_boundary_temp(rel_dir: str, name: str, body: str) -> str:
     return path.relative_to(ROOT).as_posix()
 
 
+W003_REQUIRED_TAXONOMY_GROUPS = set(boundary_analyzer.REQUIRED_BOUNDARY_TAXONOMY_GROUPS)
+W003_TAXONOMY_ROWS = [
+    {
+        "case_id": "W003-route-registration-direct-blueprint-hooks",
+        "group": "route_registration_surfaces",
+        "description": "direct route decorators, blueprint registration, error handlers, and request hooks are analyzer-owned route-registration evidence",
+        "fixture": "current_repo",
+        "locus_type": "adapter",
+        "expected_classification": boundary_analyzer.BOUNDARY_ALLOWED,
+        "expected_verdict": "PASS",
+        "expected_category": "adapter_route_registration",
+        "proof_fragment": "discovered Flask adapter registrations",
+        "scope": "W-003 in scope",
+    },
+    {
+        "case_id": "W003-public-route-signature-baseline",
+        "group": "public_route_signatures",
+        "description": "path/method/endpoint/source public signatures reconcile only through analyzer baseline truth",
+        "fixture": "current_repo",
+        "locus_type": "adapter",
+        "expected_classification": boundary_analyzer.BOUNDARY_ALLOWED,
+        "expected_verdict": "PASS",
+        "expected_category": "public_routes",
+        "proof_fragment": "reconcile with governed PR-04 baseline",
+        "scope": "W-003 in scope",
+    },
+    {
+        "case_id": "W003-route-drift-fail-closed",
+        "group": "public_route_signatures",
+        "description": "unreconciled public route drift remains unknown / fail-closed for W-004 follow-up, never PASS",
+        "fixture": "unexpected_public_route",
+        "locus_type": "adapter",
+        "expected_classification": boundary_analyzer.BOUNDARY_UNKNOWN,
+        "expected_verdict": "UNKNOWN",
+        "expected_category": "public_routes",
+        "proof_fragment": "route drift fails closed",
+        "scope": "W-004 follow-up visible",
+    },
+    {
+        "case_id": "W003-response-producing-presenter-valid",
+        "group": "response_producing_paths",
+        "description": "public response-producing paths require analyzer-proven presenter/emitter provenance",
+        "fixture": "current_repo",
+        "locus_type": "adapter",
+        "expected_classification": boundary_analyzer.BOUNDARY_ALLOWED,
+        "expected_verdict": "PASS",
+        "expected_category": "response_producing_paths",
+        "proof_fragment": "explicit presenter/emitter provenance",
+        "scope": "W-003 in scope",
+    },
+    {
+        "case_id": "W003-presenter-valid-cross-file-helper",
+        "group": "presenter_valid_paths",
+        "description": "valid presenter/emitter and helper provenance must be owned by the analyzer",
+        "fixture": "current_repo",
+        "locus_type": "adapter",
+        "expected_classification": boundary_analyzer.BOUNDARY_ALLOWED,
+        "expected_verdict": "PASS",
+        "expected_category": "presenter_provenance",
+        "proof_fragment": "sanctioned presenter/emitter calls",
+        "scope": "W-003 in scope",
+    },
+    {
+        "case_id": "W003-presenter-bypass-raw-string",
+        "group": "presenter_bypass_paths",
+        "description": "raw public route responses are presenter bypasses and cannot render as PASS",
+        "fixture": "plain_response_route",
+        "locus_type": "adapter",
+        "expected_classification": boundary_analyzer.BOUNDARY_UNKNOWN,
+        "expected_verdict": "UNKNOWN",
+        "expected_category": "presenter_provenance",
+        "proof_fragment": "presenter provenance is not proven",
+        "scope": "W-003 in scope",
+    },
+    {
+        "case_id": "W003-serializer-family-direct-json",
+        "group": "serializer_families",
+        "description": "direct ad-hoc JSON serializer families are forbidden outside allowed helpers",
+        "fixture": "direct_json_serializer",
+        "locus_type": "adapter",
+        "expected_classification": boundary_analyzer.BOUNDARY_FORBIDDEN,
+        "expected_verdict": "FAIL",
+        "expected_category": "serializer_paths",
+        "proof_fragment": "ad-hoc serializer path",
+        "scope": "W-003 in scope",
+    },
+    {
+        "case_id": "W003-external-io-alias-family",
+        "group": "external_io_families",
+        "description": "adapter HTTP client aliases and direct external-I/O families remain forbidden outside the vendor seam",
+        "fixture": "adapter_requests_alias",
+        "locus_type": "adapter",
+        "expected_classification": boundary_analyzer.BOUNDARY_FORBIDDEN,
+        "expected_verdict": "FAIL",
+        "expected_category": "external_io_paths",
+        "proof_fragment": "outside sanctioned vendor seam",
+        "scope": "W-003 in scope",
+    },
+    {
+        "case_id": "W003-import-alias-shadowing",
+        "group": "import_and_alias_forms",
+        "description": "import aliases and local shadowing are classified by analyzer provenance instead of renderer assumptions",
+        "fixture": "fake_emit_fn",
+        "locus_type": "adapter",
+        "expected_classification": boundary_analyzer.BOUNDARY_UNKNOWN,
+        "expected_verdict": "UNKNOWN",
+        "expected_category": "presenter_provenance",
+        "proof_fragment": "presenter provenance is not proven",
+        "scope": "W-003 in scope",
+    },
+    {
+        "case_id": "W003-cross-file-helper-chain",
+        "group": "cross_file_helper_chains",
+        "description": "helper pass-through chains are allowed only when presenter provenance remains proven",
+        "fixture": "current_repo",
+        "locus_type": "adapter",
+        "expected_classification": boundary_analyzer.BOUNDARY_ALLOWED,
+        "expected_verdict": "PASS",
+        "expected_category": "presenter_provenance",
+        "proof_fragment": "sanctioned presenter/emitter calls",
+        "scope": "W-003 in scope",
+    },
+    {
+        "case_id": "W003-vendor-guard-provenance",
+        "group": "vendor_guard_provenance",
+        "description": "vendor external-I/O must be tied to closed-rails guard provenance",
+        "fixture": "current_repo",
+        "locus_type": "vendor_seam",
+        "expected_classification": boundary_analyzer.BOUNDARY_ALLOWED,
+        "expected_verdict": "PASS",
+        "expected_category": "guard_provenance",
+        "proof_fragment": "closed-rails guard entrypoint",
+        "scope": "W-003 in scope",
+    },
+    {
+        "case_id": "W003-pure-compute-forbidden-operation",
+        "group": "pure_compute_forbidden_operations",
+        "description": "pure compute external-I/O operations are forbidden or fail-closed rather than presenter PASS",
+        "fixture": "pure_compute_requests",
+        "locus_type": "pure_compute",
+        "expected_classification": boundary_analyzer.BOUNDARY_FORBIDDEN,
+        "expected_verdict": "FAIL",
+        "expected_category": "pure_compute_external_io",
+        "proof_fragment": "pure compute external-I/O capability",
+        "scope": "W-003 in scope",
+    },
+    {
+        "case_id": "W003-public-internal-route-classification",
+        "group": "public_internal_route_classification",
+        "description": "internal/dev route posture is excluded from public signature claims while public drift stays fail-closed",
+        "fixture": "current_repo",
+        "locus_type": "adapter",
+        "expected_classification": boundary_analyzer.BOUNDARY_ALLOWED,
+        "expected_verdict": "PASS",
+        "expected_category": "public_routes",
+        "proof_fragment": "governed PR-04 baseline",
+        "scope": "W-003 in scope",
+    },
+    {
+        "case_id": "W003-pr01-pr04-evidence-family-binding",
+        "group": "evidence_family_binding",
+        "description": "PR-01 through PR-04 evidence-family binding remains analyzer-owned with index/path-proof validation delegated",
+        "fixture": "current_repo",
+        "locus_type": "evidence_tool",
+        "expected_classification": boundary_analyzer.BOUNDARY_ALLOWED,
+        "expected_verdict": "PASS",
+        "expected_category": "evidence_binding_posture",
+        "proof_fragment": "PR-01/PR-02/PR-03 dependency payloads are present",
+        "scope": "W-003 in scope",
+    },
+    {
+        "case_id": "W003-unsupported-scope-out-of-scope-visible",
+        "group": "evidence_family_binding",
+        "description": "HDE-FERM007.5, HDE-FERM008, runtime/live/open-rails/public-reader/new-home/AI scope remains visibly out of scope",
+        "fixture": "current_repo",
+        "locus_type": "evidence_tool",
+        "expected_classification": boundary_analyzer.BOUNDARY_OUT_OF_SCOPE,
+        "expected_verdict": "PASS",
+        "expected_category": "hde_ferm007_5_runtime_v2_live_open_rails_ai_scope",
+        "proof_fragment": "outside W-002 / HDE-FERM007.4",
+        "scope": "follow-up/out of scope visible",
+    },
+]
+
+
+def _finding_by_category(result: dict[str, Any], category: str) -> dict[str, Any]:
+    return next(finding for finding in result["findings"] if finding["category"] == category)
+
+
+def _w003_result_for_row(row: dict[str, str]) -> dict[str, Any]:
+    import shutil
+
+    source_selection, request_shaping, response_mapping = _epic034_boundary_inputs()
+    rel_dir = "tmp_boundary_test"
+    fixture = row["fixture"]
+    bodies = {
+        "unexpected_public_route": ("unexpected_public_route.py", "from flask import Flask\nfrom engine.presenter.emitter import emit_public\napp = Flask(__name__)\nSAFE_MODE='1'\n@app.route('/unexpected-public')\ndef unexpected_public():\n    return emit_public({'ok': True})\n"),
+        "plain_response_route": ("plain_response_route.py", "from flask import Flask\nfrom engine.presenter.emitter import emit_public\napp = Flask(__name__)\nSAFE_MODE='1'\n@app.route('/good')\ndef good():\n    return emit_public({'ok': True})\n@app.route('/plain')\ndef plain():\n    return 'plain text response'\n"),
+        "direct_json_serializer": ("direct_json_serializer.py", "import json\nfrom flask import Flask\nfrom engine.presenter.emitter import emit_public\napp = Flask(__name__)\nSAFE_MODE='1'\n@app.route('/good')\ndef good():\n    return emit_public({'ok': True})\ndef helper(payload):\n    return json.dumps(payload)\n"),
+        "adapter_requests_alias": ("adapter_requests_alias.py", "import requests as rq\nfrom flask import Flask\nfrom engine.presenter.emitter import emit_public\napp = Flask(__name__)\nSAFE_MODE='1'\n@app.route('/good')\ndef good():\n    return emit_public({'ok': True})\ndef leak():\n    return rq.get('https://vendor.test')\n"),
+        "fake_emit_fn": ("fake_emit_fn.py", "from flask import Flask\napp = Flask(__name__)\nSAFE_MODE='1'\ndef emit_fn(payload):\n    return 'plain'\n@app.route('/bad')\ndef bad():\n    return emit_fn({'ok': False})\n"),
+        "pure_compute_requests": ("pure_compute_requests.py", "import requests\ndef compute():\n    return requests.get('https://vendor.test')\n"),
+    }
+    if fixture == "current_repo":
+        return _epic034_analyzer_result()
+    try:
+        name, body = bodies[fixture]
+        rel = _write_boundary_temp(rel_dir, name, body)
+        adapter_loci = (rel,) if row["locus_type"] == "adapter" else generator.ADAPTER_BOUNDARY_ADAPTER_LOCI
+        pure_loci = (rel,) if row["locus_type"] == "pure_compute" else generator.ADAPTER_BOUNDARY_PURE_COMPUTE_LOCI
+        baseline = tuple(boundary_analyzer._adapter_public_route_signatures(adapter_loci))
+        if fixture == "unexpected_public_route":
+            baseline = ("adapter/other.py:app.route:/expected:GET:expected",)
+        return boundary_analyzer.analyze_adapter_boundary(
+            source_selection=source_selection,
+            request_shaping=request_shaping,
+            response_mapping=response_mapping,
+            adapter_loci=adapter_loci,
+            canonical_adapter_loci=generator.ADAPTER_BOUNDARY_CANONICAL_ADAPTER_LOCI,
+            presenter_loci=generator.ADAPTER_BOUNDARY_PRESENTER_LOCI,
+            vendor_seam_loci=generator.ADAPTER_BOUNDARY_VENDOR_SEAM_LOCI,
+            pure_compute_loci=pure_loci,
+            public_route_baseline=baseline,
+            evidence_tool_loci=("tools/evidence/generate_hdapi_v2_contract_inventory.py", "tools/evidence/hdapi_v2_boundary_analyzer.py"),
+        )
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w003_taxonomy_required_groups_are_complete_and_visible() -> None:
+    groups = {row["group"] for row in W003_TAXONOMY_ROWS}
+    assert groups >= W003_REQUIRED_TAXONOMY_GROUPS
+    result = _epic034_analyzer_result()
+    assert set(result["required_taxonomy_groups"]) == W003_REQUIRED_TAXONOMY_GROUPS
+    assert result["missing_taxonomy_groups"] == []
+    assert set(result["boundary_taxonomy"]) == W003_REQUIRED_TAXONOMY_GROUPS
+    assert result["checks"]["table_driven_boundary_taxonomy_applied"] is True
+    assert result["checks"]["required_taxonomy_groups_visible"] is True
+
+
+def test_epic034_w003_taxonomy_covers_all_classifications_and_fail_closed() -> None:
+    classifications = {row["expected_classification"] for row in W003_TAXONOMY_ROWS}
+    assert classifications == {
+        boundary_analyzer.BOUNDARY_ALLOWED,
+        boundary_analyzer.BOUNDARY_FORBIDDEN,
+        boundary_analyzer.BOUNDARY_UNKNOWN,
+        boundary_analyzer.BOUNDARY_OUT_OF_SCOPE,
+    }
+    for row in W003_TAXONOMY_ROWS:
+        if row["expected_classification"] in {boundary_analyzer.BOUNDARY_UNKNOWN, boundary_analyzer.BOUNDARY_FORBIDDEN}:
+            finding = boundary_analyzer.boundary_finding(row["expected_category"], row["expected_classification"], "PASS", ["synthetic.py"], row["description"])
+            assert boundary_analyzer.finding_passes(finding) is False, row["case_id"]
+
+
+@pytest.mark.parametrize("row", W003_TAXONOMY_ROWS, ids=[row["case_id"] for row in W003_TAXONOMY_ROWS])
+def test_epic034_w003_taxonomy_rows_are_analyzer_owned(row: dict[str, str]) -> None:
+    result = _w003_result_for_row(row)
+    finding = _finding_by_category(result, row["expected_category"])
+    assert finding["classification"] == row["expected_classification"]
+    assert finding["verdict"] == row["expected_verdict"]
+    assert row["proof_fragment"] in finding["reason"]
+    if finding["classification"] == boundary_analyzer.BOUNDARY_ALLOWED:
+        assert finding["details"] or row["expected_category"] in {"serializer_paths", "pure_compute_external_io", "evidence_binding_posture"}
+    if finding["classification"] in {boundary_analyzer.BOUNDARY_UNKNOWN, boundary_analyzer.BOUNDARY_FORBIDDEN}:
+        assert result["verdict_status"] != "PASS"
+
+
+
 def test_epic034_adapter_boundary_fails_closed_on_second_http_home_and_pure_io(monkeypatch: pytest.MonkeyPatch) -> None:
     import shutil
 
@@ -3202,7 +3470,7 @@ def test_epic034_adapter_boundary_requires_low_level_vendor_io_guard() -> None:
 def test_epic034_adapter_boundary_reports_positive_contract_classifications() -> None:
     proof, checks = generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
     assert checks["conservative_positive_boundary_contract_applied"] is True
-    assert "work_item=W-002" in proof
+    assert "work_item=W-003" in proof
     assert "analyzer_rendering_separation=" in proof
     assert "renderer_only_posture=" in proof
     assert "analyzer_owned_verdict_status=PASS" in proof
