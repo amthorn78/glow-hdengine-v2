@@ -3900,3 +3900,31 @@ app.add_url_rule('/uninspected-import', 'uninspected', view_func=imported_view, 
             generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
     finally:
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004_import_module_alias_from_inspected_locus_is_not_unclassified() -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    view_body = """
+from engine.presenter.emitter import emit_public
+def imported_view():
+    return emit_public({'ok': True})
+"""
+    route_body = """
+from flask import Flask
+import tmp_boundary_test.w004_module_alias_targets as target_views
+app = Flask(__name__)
+app.add_url_rule('/module-alias-added', 'module_alias_endpoint', view_func=target_views.imported_view, methods=['GET'])
+"""
+    try:
+        view_rel = _write_boundary_temp(rel_dir, "w004_module_alias_targets.py", view_body)
+        route_rel = _write_boundary_temp(rel_dir, "w004_module_alias_add_url.py", route_body)
+        signatures = boundary_analyzer._adapter_public_route_signatures((route_rel, view_rel))
+        joined = "\n".join(signatures)
+        assert "view=target_views.imported_view" in joined
+        assert "imported_view_target=tmp_boundary_test.w004_module_alias_targets.imported_view" in joined
+        assert "public_internal_classification=public" in joined
+        assert "public_internal_classification=unknown / fail-closed" not in joined
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)

@@ -368,24 +368,27 @@ def _resolve_imported_target(expr: str, aliases: dict[str, str], inspected_modul
     target = aliases.get(root, "")
     if not target:
         return ""
-    resolved = target + (("." + suffix) if suffix else "")
-    if inspected_modules is None:
-        return resolved
-    module = target.rsplit(".", 1)[0] if suffix else target
-    return resolved if module in inspected_modules or target in inspected_modules else resolved
+    # ``target`` may be either a module imported with ``import x.y as z`` or an
+    # object imported with ``from x.y import z``.  Preserve the fully-resolved
+    # identity for evidence, and let _imported_target_is_inspected decide whether
+    # it is inside the inspected adapter-locus set.
+    return target + (("." + suffix) if suffix else "")
 
 
-
-
-def _imported_target_module(expr: str, aliases: dict[str, str]) -> str:
+def _candidate_imported_target_modules(expr: str, aliases: dict[str, str]) -> set[str]:
     root, _sep, _suffix = expr.partition(".")
     target = aliases.get(root, "")
-    return target.rsplit(".", 1)[0] if target else ""
+    if not target:
+        return set()
+    candidates = {target}
+    if "." in target:
+        candidates.add(target.rsplit(".", 1)[0])
+    return candidates
 
 
 def _imported_target_is_inspected(expr: str, aliases: dict[str, str], inspected_modules: set[str]) -> bool:
-    module = _imported_target_module(expr, aliases)
-    return not module or module in inspected_modules
+    candidates = _candidate_imported_target_modules(expr, aliases)
+    return not candidates or bool(candidates & inspected_modules)
 
 def _route_classification(path: str, *, has_dynamic_path: bool = False) -> str:
     if has_dynamic_path:
