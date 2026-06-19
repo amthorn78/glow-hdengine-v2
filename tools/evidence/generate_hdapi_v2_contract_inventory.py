@@ -142,11 +142,11 @@ ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE = (
     'adapter/wsgi.py:app.errorhandler:::_not_found',
     'adapter/wsgi.py:register_blueprint:compat_blueprint:',
     'adapter/wsgi.py:register_blueprint:reader_bp:',
-    'engine/http/compat_handler.py:compat_blueprint.before_app_request:::_compat_writer_transport_guard',
-    'engine/http/compat_handler.py:compat_blueprint.get::GET:get_ids_only',
-    'engine/http/compat_handler.py:compat_blueprint.route::HEAD:post_json_head',
-    'engine/http/compat_handler.py:compat_blueprint.route::OPTIONS:post_json_options',
-    'engine/http/compat_handler.py:compat_blueprint.route::POST:post_json',
+    'engine/http/compat_handler.py:compat_blueprint.before_app_request:/api/compat/v1::_compat_writer_transport_guard',
+    'engine/http/compat_handler.py:compat_blueprint.get:/api/compat/v1:GET:get_ids_only',
+    'engine/http/compat_handler.py:compat_blueprint.route:/api/compat/v1:HEAD:post_json_head',
+    'engine/http/compat_handler.py:compat_blueprint.route:/api/compat/v1:OPTIONS:post_json_options',
+    'engine/http/compat_handler.py:compat_blueprint.route:/api/compat/v1:POST:post_json',
 )
 
 

@@ -373,7 +373,7 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                     if _is_non_public_route_namespace(full_route_arg):
                         continue
                     methods = _route_methods(deco_name, deco)
-                    signatures.append(f"{rel}:{deco_name}:{route_arg}:{methods}:{node.name}")
+                    signatures.append(f"{rel}:{deco_name}:{full_route_arg}:{methods}:{node.name}")
             if isinstance(node, ast.Call) and _attribute_chain(node.func).endswith(".add_url_rule"):
                 route_arg = _string_constant(node.args[0]) if node.args else ""
                 endpoint = _string_constant(node.args[1]) if len(node.args) > 1 else ""
@@ -445,13 +445,16 @@ def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
         aliases = _import_aliases(tree)
         function_defs = _iter_function_defs(tree)
         class_methods: dict[str, set[str]] = {}
+        class_method_names: dict[str, dict[str, set[str]]] = {}
         for node in ast.walk(tree):
             if isinstance(node, ast.ClassDef):
-                class_methods[node.name] = {
-                    f"{node.name}.{child.name}"
-                    for child in node.body
-                    if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)) and child.name in {"get", "post", "put", "patch", "delete", "head", "options", "dispatch_request"}
-                }
+                class_methods[node.name] = set()
+                class_method_names[node.name] = {}
+                for child in node.body:
+                    if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)) and child.name in {"get", "post", "put", "patch", "delete", "head", "options", "dispatch_request"}:
+                        key = f"{node.name}.{child.name}"
+                        class_methods[node.name].add(key)
+                        class_method_names[node.name].setdefault(child.name, set()).add(key)
         function_calls: dict[str, set[str]] = {}
         function_return_calls: dict[str, set[str]] = {}
         direct_presenter: set[str] = set()
@@ -624,7 +627,12 @@ def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
                 view_chain = _attribute_chain(view_func.func)
                 class_name = view_chain.rsplit(".", 1)[0] if view_chain.endswith(".as_view") else ""
                 if class_name in class_methods:
-                    route_functions.update(class_methods[class_name])
+                    selected_keys = set(class_methods[class_name])
+                    if method_values:
+                        selected_keys = set(class_method_names[class_name].get("dispatch_request", set()))
+                        for method_value in method_values:
+                            selected_keys.update(class_method_names[class_name].get(method_value.lower(), set()))
+                    route_functions.update(selected_keys)
         for name, fn in function_defs.items():
             if function_has_bypass(fn, function_calls[name]):
                 direct_bypass.add(name)
@@ -717,16 +725,20 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 add_function(f"{node.name}@{node.lineno}", node.name, node)
         class_methods: dict[str, set[str]] = {}
+        class_method_names: dict[str, dict[str, set[str]]] = {}
         for node in ast.walk(tree):
             if isinstance(node, ast.ClassDef):
                 method_keys: set[str] = set()
+                method_names: dict[str, set[str]] = {}
                 for child in node.body:
                     if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)):
                         key = f"{node.name}.{child.name}@{child.lineno}"
                         add_function(key, f"{node.name}.{child.name}", child)
                         if child.name in {"get", "post", "put", "patch", "delete", "head", "options", "dispatch_request"}:
                             method_keys.add(key)
+                            method_names.setdefault(child.name, set()).add(key)
                 class_methods[node.name] = method_keys
+                class_method_names[node.name] = method_names
 
         def iter_body_nodes(fn: ast.FunctionDef | ast.AsyncFunctionDef):
             stack = list(fn.body)
@@ -888,7 +900,12 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
                 view_chain = _attribute_chain(view_func.func)
                 class_name = view_chain.rsplit(".", 1)[0] if view_chain.endswith(".as_view") else ""
                 if class_name in class_methods:
-                    for key in class_methods[class_name]:
+                    selected_keys = set(class_methods[class_name])
+                    if method_values:
+                        selected_keys = set(class_method_names[class_name].get("dispatch_request", set()))
+                        for method_value in method_values:
+                            selected_keys.update(class_method_names[class_name].get(method_value.lower(), set()))
+                    for key in selected_keys:
                         route_functions.add(key)
                         route_methods_by_key.setdefault(key, set()).update(method_values)
 
@@ -910,7 +927,7 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
             params = {arg.arg for arg in fn.args.args + fn.args.posonlyargs + fn.args.kwonlyargs}
 
             def returns_param_on_all_paths(statements: list[ast.stmt]) -> str | None:
-                for stmt in statements:
+                for index, stmt in enumerate(statements):
                     if isinstance(stmt, ast.Return):
                         if isinstance(stmt.value, ast.Name) and stmt.value.id in params:
                             return stmt.value.id
@@ -920,6 +937,11 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
                         else_result = returns_param_on_all_paths(stmt.orelse)
                         if body_result is not None and body_result == else_result:
                             return body_result
+                        tail_result = returns_param_on_all_paths(statements[index + 1 :])
+                        if body_result is not None and else_result is None and body_result == tail_result:
+                            return tail_result
+                        if else_result is not None and body_result is None and else_result == tail_result:
+                            return tail_result
                         if body_result is not None or else_result is not None:
                             return None
                 return None
@@ -1021,12 +1043,23 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
                 return value.id in assigned_good
             if isinstance(value, ast.Attribute) and isinstance(value.value, ast.Name):
                 return value.attr == "body" and value.value.id in assigned_good
+            if isinstance(value, ast.Subscript):
+                index_value = value.slice.value if isinstance(value.slice, ast.Constant) else None
+                if index_value != 0:
+                    return False
+                if isinstance(value.value, ast.Call):
+                    call = _attribute_chain(value.value.func)
+                    return _is_sanctioned_presenter_call(call, aliases) or call in presenter_callable_names_for(owner)
+                if isinstance(value.value, ast.Name):
+                    return value.value.id in assigned_good
+                return False
             if isinstance(value, ast.Call):
                 call = _attribute_chain(value.func)
                 if _is_sanctioned_presenter_call(call, aliases) or call in presenter_callable_names_for(owner):
                     return True
                 if call == "make_response" or call.endswith((".make_response", ".Response")) or call == "Response" or call.endswith("TransportResponse"):
-                    return is_empty_transport_response(value, owner) or any(value_has_presenter(arg, owner, assigned_good, seen) for arg in value.args) or any(
+                    body_arg = value.args[0] if value.args else None
+                    return is_empty_transport_response(value, owner) or (body_arg is not None and value_has_presenter(body_arg, owner, assigned_good, seen)) or any(
                         keyword.arg in {"response", "data"} and value_has_presenter(keyword.value, owner, assigned_good, seen)
                         for keyword in value.keywords
                     )
