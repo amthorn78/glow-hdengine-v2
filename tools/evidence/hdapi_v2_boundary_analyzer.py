@@ -301,6 +301,10 @@ def _iter_function_defs(tree: ast.AST) -> dict[str, ast.FunctionDef | ast.AsyncF
     return function_defs
 
 
+def _is_non_public_route_namespace(route: str) -> bool:
+    return route in {"/internal", "/ops", "/dev"} or route.startswith(("/internal/", "/ops/", "/dev/"))
+
+
 def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
     """Return stable public adapter route/hook registrations for PR-04 drift checks."""
 
@@ -331,7 +335,7 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                     route_arg = ""
                     if isinstance(deco, ast.Call) and deco.args:
                         route_arg = _string_constant(deco.args[0]) or ""
-                    if route_arg.startswith(("/internal", "/ops", "/dev")):
+                    if _is_non_public_route_namespace(route_arg):
                         continue
                     methods = _route_methods(deco_name, deco)
                     signatures.append(f"{rel}:{deco_name}:{route_arg}:{methods}:{node.name}")
@@ -347,7 +351,7 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                         method_values = _literal_string_list(keyword.value)
                         if method_values:
                             methods = ",".join(sorted(method_values))
-                if route_arg and route_arg.startswith(("/internal", "/ops", "/dev")):
+                if route_arg and _is_non_public_route_namespace(route_arg):
                     continue
                 if not view_desc and len(node.args) >= 3:
                     view_desc = _attribute_chain(node.args[2].func) if isinstance(node.args[2], ast.Call) else _attribute_chain(node.args[2])
@@ -751,7 +755,7 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
                 deco_name = _attribute_chain(deco.func if isinstance(deco, ast.Call) else deco)
                 if deco_name.endswith(route_decorator_suffixes):
                     route_path = (_string_constant(deco.args[0]) or "") if isinstance(deco, ast.Call) and deco.args else ""
-                    if route_path.startswith(("/internal", "/ops", "/dev")):
+                    if _is_non_public_route_namespace(route_path):
                         continue
                     if deco_name.endswith((".after_request", ".after_app_request")):
                         hook_kind_by_key[key] = "after_request"

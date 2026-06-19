@@ -96,6 +96,13 @@ _VENDOR_LOG_ROUTE_LABELS = frozenset(
 )
 
 
+def _rails_state_from_env(env: Mapping[str, str] | None = None) -> str:
+    source = env if env is not None else os.environ
+    safe_mode = (source.get("SAFE_MODE") or "").strip()
+    allow_network = (source.get("ALLOW_NETWORK") or "").strip()
+    return "open_exception" if safe_mode == "0" and allow_network == "1" else "closed_default"
+
+
 def _validate_retry_config(retry: "VendorRetryConfig") -> None:
     if retry.max_attempts not in PINNED_MAX_ATTEMPTS:
         raise VendorError(
@@ -283,7 +290,7 @@ class HdApiClient:
             retry=retry_cfg,
             timeouts=timeouts_cfg,
             log_path=log_path,
-            rails_state="open_exception",
+            rails_state=_rails_state_from_env(env),
             request=request,
         )
 
@@ -464,6 +471,7 @@ class HdApiClient:
                     backoff_ms=planned_backoff_ms,
                     outcome="failure",
                     route=self._safe_route_label(request),
+                    rails_state=_rails_state_from_env() if exc.code == "PROVIDER_REFUSED" else None,
                 )
                 if not retryable:
                     break
@@ -501,6 +509,7 @@ class HdApiClient:
         retry_after_ms: int | None = None,
         backoff_ms: float | None = None,
         route: str | None = None,
+        rails_state: str | None = None,
     ) -> None:
         timeout_profile = (
             f"connect={self._timeouts.connect_timeout_ms};"
@@ -515,7 +524,7 @@ class HdApiClient:
             "profile": self._retry.profile,
             "error_class": self._bounded_error_class(error_class),
             "outcome": self._bounded_outcome(outcome),
-            "rails_state": self._rails_state,
+            "rails_state": rails_state or self._rails_state,
             "route": route or _VENDOR_LOG_ROUTE,
             "timeout_profile": timeout_profile,
         }

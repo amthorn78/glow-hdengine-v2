@@ -1,5 +1,5 @@
 path: audit/qa/hde-epic031/pr-02/vendor_keys_only.sample.jsonl
-size_bytes: 1517
-sha256: 39e18e0fc949df6b63f4d9357082e84e62df8978143d905cbbdd4cf33e7266f0
+size_bytes: 1836
+sha256: 3034b0cf8542b0d83bbc8b1f305bf7be11f309321386328369369862be810717
 mtime_utc: 2026-05-10T18:12:53Z
 produced_at_utc: 2026-05-10T16:20:00Z

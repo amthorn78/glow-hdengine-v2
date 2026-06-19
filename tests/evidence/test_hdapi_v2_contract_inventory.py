@@ -206,8 +206,6 @@ def test_endpoint_reference_matches_source_parsed_rows() -> None:
     assert csv_rows == parsed_rows
 
 
-
-
 def test_source_inventory_rows_have_verified_cache_bodies() -> None:
     metadata, _bodies = generator.load_source_cache()
     inventory = _assert_canonical_json(VENDOR_DIR / "source_inventory.json")
@@ -821,7 +819,6 @@ def test_epic034_adapter_boundary_builder_fails_closed_on_missing_locus(monkeypa
     response_mapping = _assert_canonical_json(VENDOR_DIR / "response_mapping.snapshot.json")
     with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_LOCUS_MISSING"):
         generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", source_selection, request_shaping, response_mapping)
-
 
 
 def test_epic034_pr04_index_rows_use_approved_tokens_only() -> None:
@@ -2089,7 +2086,6 @@ app.add_url_rule('/good', view_func=Good.as_view('good'))
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
 
 
-
 def test_epic034_adapter_boundary_fails_closed_on_blueprint_prefix_drift(monkeypatch: pytest.MonkeyPatch) -> None:
     import shutil
 
@@ -2449,10 +2445,6 @@ def good():
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
 
 
-
-
-
-
 def test_epic034_presenter_alias_is_scoped_to_binding(monkeypatch: pytest.MonkeyPatch) -> None:
     import shutil
 
@@ -2491,6 +2483,33 @@ def test_epic034_public_route_signatures_exclude_internal_ops_dev() -> None:
     assert ':/internal/' not in proof
     assert ':/ops/' not in proof
     assert ':/dev/' not in proof
+
+
+def test_epic034_public_route_prefix_filter_keeps_developer_like_routes(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+@app.route('/developer/status')
+def developer_status():
+    return 'raw developer status'
+@app.route('/good')
+def good():
+    return emit_public({'ok': True})
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "developer_status_route.py", body)
+        signatures = boundary_analyzer._adapter_public_route_signatures((adapter,))
+        assert any(':/developer/status:' in item for item in signatures)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", tuple(signatures))
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_presenter_bypass"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
 
 
 def test_epic034_vendor_guard_rejects_open_rails_raise_before_io(monkeypatch: pytest.MonkeyPatch) -> None:

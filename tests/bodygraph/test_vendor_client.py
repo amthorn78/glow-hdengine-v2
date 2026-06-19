@@ -199,6 +199,28 @@ def test_fetch_logs_provider_refused_as_bounded_failure_class(tmp_path: Path) ->
     assert record["outcome"] == "failure"
 
 
+def test_from_env_closed_default_provider_refusal_logs_closed_rails(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    monkeypatch.setenv("HD_API_BASE_URL", "https://vendor.test/v1")
+    monkeypatch.delenv("HDAPI_BASE_URL", raising=False)
+    monkeypatch.setenv("HD_API_KEY", "api-key")
+    monkeypatch.setenv("GEO_API_KEY", "geo-key")
+    monkeypatch.setenv("SAFE_MODE", "1")
+    monkeypatch.setenv("ALLOW_NETWORK", "0")
+    log_path = tmp_path / "closed-refusal.jsonl"
+
+    client = HdApiClient.from_env(log_path=log_path, release_id="0" * 64)
+    request = client.build_request(birthdate="1990-01-01", birthtime="12:00", location="X")
+
+    with pytest.raises(VendorError) as excinfo:
+        client.fetch(request)
+
+    assert excinfo.value.code == "PROVIDER_REFUSED"
+    record = _read_jsonl(log_path)[0]
+    assert record["error_class"] == "provider_refused"
+    assert record["error_code"] == "PROVIDER_REFUSED"
+    assert record["rails_state"] == "closed_default"
+
+
 def test_fetch_retries_only_5xx_and_network_errors() -> None:
     statuses = [500, 200]
     sleeps = []
