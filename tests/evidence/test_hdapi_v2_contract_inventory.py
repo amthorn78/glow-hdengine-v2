@@ -2509,6 +2509,30 @@ def conditional():
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
 
 
+def test_epic034_adapter_boundary_rejects_conditional_presenter_alias(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+@app.route('/conditional-alias')
+def conditional_alias():
+    if False:
+        render = emit_public
+    return render({'ok': True})
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "conditional_presenter_alias.py", body)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", tuple(boundary_analyzer._adapter_public_route_signatures((adapter,))))
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_presenter_bypass"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
 def test_epic034_vendor_guard_distinguishes_duplicate_function_names(monkeypatch: pytest.MonkeyPatch) -> None:
     import shutil
 
@@ -2518,8 +2542,9 @@ from urllib.request import urlopen
 
 class Guarded:
     def call_vendor(self):
-        safe_mode = '1'
-        allow_network = '0'
+        import os
+        safe_mode = os.environ.get('SAFE_MODE')
+        allow_network = os.environ.get('ALLOW_NETWORK')
         if safe_mode != '0' or allow_network != '1':
             raise RuntimeError('refused')
         return urlopen('https://vendor.test/guarded')
@@ -2591,6 +2616,34 @@ def good():
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
 
 
+def test_epic034_public_route_prefix_filter_uses_full_blueprint_path(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask, Blueprint
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+bp = Blueprint('api', __name__, url_prefix='/api')
+@bp.route('/internal/raw')
+def raw_public_under_api():
+    return 'raw public under api'
+@app.route('/good')
+def good():
+    return emit_public({'ok': True})
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "public_blueprint_internal_segment.py", body)
+        signatures = boundary_analyzer._adapter_public_route_signatures((adapter,))
+        assert any(':/internal/raw:' in item for item in signatures)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", tuple(signatures))
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_presenter_bypass"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
 def test_epic034_vendor_guard_rejects_open_rails_raise_before_io(monkeypatch: pytest.MonkeyPatch) -> None:
     import shutil
 
@@ -2612,6 +2665,30 @@ def inverted_guard():
             generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
     finally:
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_vendor_guard_requires_rails_env_derived_predicate(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from urllib.request import urlopen
+
+def local_lookalike_guard():
+    safe_mode = '1'
+    allow_network = '0'
+    if safe_mode != '0' or allow_network != '1':
+        raise RuntimeError('refused')
+    return urlopen('https://vendor.test')
+"""
+    try:
+        rel = _write_boundary_temp(rel_dir, "local_lookalike_vendor_guard.py", body)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_VENDOR_SEAM_LOCI", (rel,))
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_VENDOR_GUARD_UNEXPECTED:.*local_lookalike_guard@.*:urlopen"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
 
 def test_epic034_vendor_guard_must_dominate_external_io(monkeypatch: pytest.MonkeyPatch) -> None:
     import shutil
@@ -2860,6 +2937,35 @@ def good():
             generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
     finally:
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_adapter_boundary_rejects_fallthrough_passthrough_helper(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+def maybe_passthrough(resp):
+    if False:
+        return resp
+@app.after_request
+def hook(resp):
+    return maybe_passthrough(resp)
+@app.route('/good')
+def good():
+    return emit_public({'ok': True})
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "fallthrough_passthrough.py", body)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", tuple(boundary_analyzer._adapter_public_route_signatures((adapter,))))
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_presenter_bypass"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
 
 def test_epic034_adapter_boundary_distinguishes_duplicate_nested_handler_names(monkeypatch: pytest.MonkeyPatch) -> None:
     import shutil

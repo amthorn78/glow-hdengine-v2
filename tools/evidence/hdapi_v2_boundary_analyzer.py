@@ -302,6 +302,41 @@ def _is_non_public_route_namespace(route: str) -> bool:
     return route in {"/internal", "/ops", "/dev"} or route.startswith(("/internal/", "/ops/", "/dev/"))
 
 
+def _join_route_prefix(prefix: str, route: str) -> str:
+    if not prefix:
+        return route
+    if not route:
+        return prefix
+    return f"/{prefix.strip('/')}/{route.strip('/')}"
+
+
+def _blueprint_prefixes(tree: ast.AST) -> dict[str, str]:
+    prefixes: dict[str, str] = {}
+    for node in ast.walk(tree):
+        if not isinstance(node, (ast.Assign, ast.AnnAssign)) or not isinstance(node.value, ast.Call):
+            continue
+        if _attribute_chain(node.value.func).rsplit(".", 1)[-1] != "Blueprint":
+            continue
+        url_prefix = ""
+        for keyword in node.value.keywords:
+            if keyword.arg == "url_prefix":
+                url_prefix = _string_constant(keyword.value) or ""
+        if not url_prefix:
+            continue
+        targets = node.targets if isinstance(node, ast.Assign) else [node.target]
+        for target in targets:
+            if isinstance(target, ast.Name):
+                prefixes[target.id] = url_prefix
+    return prefixes
+
+
+def _decorator_route_root(deco_call: ast.AST) -> str:
+    if isinstance(deco_call, ast.Attribute):
+        value = deco_call.value
+        return value.id if isinstance(value, ast.Name) else _attribute_chain(value)
+    return ""
+
+
 def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
     """Return stable public adapter route/hook registrations for PR-04 drift checks."""
 
@@ -322,6 +357,7 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
     )
     for rel in loci:
         _path, _text, tree = _python_source(rel)
+        blueprint_prefixes = _blueprint_prefixes(tree)
         for node in ast.walk(tree):
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 for deco in node.decorator_list:
@@ -332,7 +368,9 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                     route_arg = ""
                     if isinstance(deco, ast.Call) and deco.args:
                         route_arg = _string_constant(deco.args[0]) or ""
-                    if _is_non_public_route_namespace(route_arg):
+                    route_root = _decorator_route_root(deco_call)
+                    full_route_arg = _join_route_prefix(blueprint_prefixes.get(route_root, ""), route_arg)
+                    if _is_non_public_route_namespace(full_route_arg):
                         continue
                     methods = _route_methods(deco_name, deco)
                     signatures.append(f"{rel}:{deco_name}:{route_arg}:{methods}:{node.name}")
@@ -666,6 +704,7 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
     )
     for rel in loci:
         _path, _text, tree = _python_source(rel)
+        blueprint_prefixes = _blueprint_prefixes(tree)
         aliases = _import_aliases(tree)
         function_defs: dict[str, ast.FunctionDef | ast.AsyncFunctionDef] = {}
         simple_names: dict[str, list[str]] = {}
@@ -720,6 +759,61 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
                 yield node
 
         def presenter_callable_names_for(owner: str) -> set[str]:
+            def is_none_constant(value: ast.AST) -> bool:
+                return isinstance(value, ast.Constant) and value.value is None
+
+            def default_none_params(fn: ast.FunctionDef | ast.AsyncFunctionDef) -> set[str]:
+                positional = list(fn.args.posonlyargs) + list(fn.args.args)
+                defaults = [None] * (len(positional) - len(fn.args.defaults)) + list(fn.args.defaults)
+                names = {arg.arg for arg, default in zip(positional, defaults) if default is not None and is_none_constant(default)}
+                names.update(arg.arg for arg, default in zip(fn.args.kwonlyargs, fn.args.kw_defaults) if default is not None and is_none_constant(default))
+                return names
+
+            def conditional_default_aliases(fn: ast.FunctionDef | ast.AsyncFunctionDef, current_names: set[str]) -> set[str]:
+                defaults = default_none_params(fn)
+                aliases_from_defaults: set[str] = set()
+                for stmt in fn.body:
+                    if not isinstance(stmt, ast.If) or len(stmt.body) != 1 or stmt.orelse:
+                        continue
+                    body_stmt = stmt.body[0]
+                    if not isinstance(body_stmt, (ast.Assign, ast.AnnAssign)) or body_stmt.value is None:
+                        continue
+                    targets = body_stmt.targets if isinstance(body_stmt, ast.Assign) else [body_stmt.target]
+                    rhs = _attribute_chain(body_stmt.value)
+                    if not (_is_sanctioned_presenter_call(rhs, aliases) or rhs in current_names):
+                        continue
+                    for target in targets:
+                        if not isinstance(target, ast.Name) or target.id not in defaults:
+                            continue
+                        test = stmt.test
+                        if isinstance(test, ast.Compare) and isinstance(test.left, ast.Name) and test.left.id == target.id and len(test.ops) == 1 and len(test.comparators) == 1:
+                            if isinstance(test.ops[0], (ast.Is, ast.Eq)) and is_none_constant(test.comparators[0]):
+                                aliases_from_defaults.add(target.id)
+                return aliases_from_defaults
+
+            def collect_branch_complete_aliases(fn: ast.FunctionDef | ast.AsyncFunctionDef, current_names: set[str]) -> set[str]:
+                collected: set[str] = set()
+                for stmt in fn.body:
+                    if not isinstance(stmt, ast.If) or not stmt.body or not stmt.orelse:
+                        continue
+                    branch_values: list[dict[str, list[str]]] = []
+                    for branch in (stmt.body, stmt.orelse):
+                        values: dict[str, list[str]] = {}
+                        for child in branch:
+                            if not isinstance(child, (ast.Assign, ast.AnnAssign)) or child.value is None:
+                                continue
+                            rhs = _attribute_chain(child.value)
+                            targets = child.targets if isinstance(child, ast.Assign) else [child.target]
+                            for target in targets:
+                                if isinstance(target, ast.Name):
+                                    values.setdefault(target.id, []).append(rhs)
+                        branch_values.append(values)
+                    for target_name in set(branch_values[0]) & set(branch_values[1]):
+                        rhs_values = branch_values[0][target_name] + branch_values[1][target_name]
+                        if rhs_values and all(_is_sanctioned_presenter_call(rhs, aliases) or rhs in current_names for rhs in rhs_values):
+                            collected.add(target_name)
+                return collected
+
             chain: list[str] = []
             current: str | None = owner
             while current is not None:
@@ -728,7 +822,7 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
             names = set(imported_presenter_callable_names)
             for key in reversed(chain):
                 fn = function_defs[key]
-                for node in iter_body_nodes(fn):
+                for node in direct_body_nodes(fn):
                     if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name in names:
                         names.remove(node.name)
                     if not isinstance(node, (ast.Assign, ast.AnnAssign)) or node.value is None:
@@ -742,6 +836,8 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
                             names.add(target.id)
                         elif target.id in names:
                             names.remove(target.id)
+                names.update(collect_branch_complete_aliases(fn, names))
+                names.update(conditional_default_aliases(fn, names))
             return names
 
         route_functions: set[str] = set()
@@ -752,7 +848,9 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
                 deco_name = _attribute_chain(deco.func if isinstance(deco, ast.Call) else deco)
                 if deco_name.endswith(route_decorator_suffixes):
                     route_path = (_string_constant(deco.args[0]) or "") if isinstance(deco, ast.Call) and deco.args else ""
-                    if _is_non_public_route_namespace(route_path):
+                    route_root = _decorator_route_root(deco.func if isinstance(deco, ast.Call) else deco)
+                    full_route_path = _join_route_prefix(blueprint_prefixes.get(route_root, ""), route_path)
+                    if _is_non_public_route_namespace(full_route_path):
                         continue
                     if deco_name.endswith((".after_request", ".after_app_request")):
                         hook_kind_by_key[key] = "after_request"
@@ -810,13 +908,34 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
             if fn is None:
                 return set()
             params = {arg.arg for arg in fn.args.args + fn.args.posonlyargs + fn.args.kwonlyargs}
-            returned: set[str] = set()
-            for node in iter_body_nodes(fn):
-                if isinstance(node, ast.Return) and isinstance(node.value, ast.Name) and node.value.id in params:
-                    returned.add(node.value.id)
-                elif isinstance(node, ast.Return) and node.value is not None:
+
+            def returns_param_on_all_paths(statements: list[ast.stmt]) -> str | None:
+                for stmt in statements:
+                    if isinstance(stmt, ast.Return):
+                        if isinstance(stmt.value, ast.Name) and stmt.value.id in params:
+                            return stmt.value.id
+                        return None
+                    if isinstance(stmt, ast.If):
+                        body_result = returns_param_on_all_paths(stmt.body)
+                        else_result = returns_param_on_all_paths(stmt.orelse)
+                        if body_result is not None and body_result == else_result:
+                            return body_result
+                        if body_result is not None or else_result is not None:
+                            return None
+                return None
+
+            observed_returns: set[str] = set()
+            for node in ast.walk(fn):
+                if not isinstance(node, ast.Return):
+                    continue
+                if isinstance(node.value, ast.Name) and node.value.id in params:
+                    observed_returns.add(node.value.id)
+                else:
                     return set()
-            return returned if len(returned) == 1 else set()
+            if len(observed_returns) != 1:
+                return set()
+            returned = returns_param_on_all_paths(fn.body)
+            return {returned} if returned is not None and returned in observed_returns else set()
 
 
         def response_param_content_status_safe(fn: ast.FunctionDef | ast.AsyncFunctionDef, param_name: str) -> bool:
@@ -1281,46 +1400,81 @@ def _stmt_contains_node(stmt: ast.stmt, target: ast.AST) -> bool:
     return any(child is target for child in ast.walk(stmt))
 
 
-def _stmt_has_guard_refusal(stmt: ast.stmt) -> bool:
+def _rails_env_axis(node: ast.AST, env_bound_names: dict[str, str]) -> str | None:
+    if isinstance(node, ast.Name):
+        return env_bound_names.get(node.id)
+    if isinstance(node, ast.Subscript):
+        chain = _attribute_chain(node.value)
+        key = _string_constant(node.slice)
+        if chain in {"os.environ", "environ"} and key in {"SAFE_MODE", "ALLOW_NETWORK"}:
+            return key
+    if isinstance(node, ast.Call):
+        call = _attribute_chain(node.func)
+        if call in {"os.environ.get", "environ.get", "os.getenv", "getenv"} and node.args:
+            key = _string_constant(node.args[0])
+            if key in {"SAFE_MODE", "ALLOW_NETWORK"}:
+                return key
+        for arg in node.args:
+            axis = _rails_env_axis(arg, env_bound_names)
+            if axis:
+                return axis
+        if isinstance(node.func, ast.Attribute) and isinstance(node.func.value, ast.AST):
+            axis = _rails_env_axis(node.func.value, env_bound_names)
+            if axis:
+                return axis
+    if isinstance(node, ast.BoolOp):
+        axes = {_rails_env_axis(value, env_bound_names) for value in node.values}
+        axes.discard(None)
+        return next(iter(axes)) if len(axes) == 1 else None
+    if isinstance(node, ast.UnaryOp):
+        return _rails_env_axis(node.operand, env_bound_names)
+    return None
+
+
+def _rails_env_bound_names(statements: list[ast.stmt]) -> dict[str, str]:
+    bound: dict[str, str] = {}
+    for stmt in statements:
+        if not isinstance(stmt, (ast.Assign, ast.AnnAssign)) or stmt.value is None:
+            continue
+        axis = _rails_env_axis(stmt.value, bound)
+        targets = stmt.targets if isinstance(stmt, ast.Assign) else [stmt.target]
+        for target in targets:
+            if isinstance(target, ast.Name):
+                if axis is None:
+                    bound.pop(target.id, None)
+                else:
+                    bound[target.id] = axis
+    return bound
+
+
+def _stmt_has_guard_refusal(stmt: ast.stmt, env_bound_names: dict[str, str] | None = None) -> bool:
     if not isinstance(stmt, ast.If):
         return False
-
-    def expr_text(node: ast.AST) -> str:
-        if isinstance(node, ast.Name):
-            return node.id
-        if isinstance(node, ast.Attribute):
-            return node.attr + "." + expr_text(node.value)
-        if isinstance(node, ast.Call):
-            return expr_text(node.func) + "(" + ",".join(expr_text(arg) for arg in node.args) + ")"
-        if isinstance(node, ast.Constant):
-            return str(node.value)
-        return ""
+    env_bound_names = env_bound_names or {}
 
     def open_compare_axis(node: ast.AST) -> str | None:
         if not isinstance(node, ast.Compare) or len(node.ops) != 1 or len(node.comparators) != 1:
             return None
-        left = expr_text(node.left)
+        left_axis = _rails_env_axis(node.left, env_bound_names)
         right = node.comparators[0]
         right_value = right.value if isinstance(right, ast.Constant) else None
         op = node.ops[0]
-        if ("SAFE_MODE" in left or "safe_mode" in left) and isinstance(op, ast.Eq) and right_value == "0":
+        if left_axis == "SAFE_MODE" and isinstance(op, ast.Eq) and right_value == "0":
             return "SAFE_MODE"
-        if ("ALLOW_NETWORK" in left or "allow_network" in left) and isinstance(op, ast.Eq) and right_value == "1":
+        if left_axis == "ALLOW_NETWORK" and isinstance(op, ast.Eq) and right_value == "1":
             return "ALLOW_NETWORK"
         return None
 
     def refusal_compare_axis(node: ast.AST) -> str | None:
         if not isinstance(node, ast.Compare) or len(node.ops) != 1 or len(node.comparators) != 1:
             return None
-        left = expr_text(node.left)
+        left_axis = _rails_env_axis(node.left, env_bound_names)
         right = node.comparators[0]
         right_value = right.value if isinstance(right, ast.Constant) else None
-        is_safe = "SAFE_MODE" in left or "safe_mode" in left
-        is_allow = "ALLOW_NETWORK" in left or "allow_network" in left
         op = node.ops[0]
-        if is_safe and ((isinstance(op, ast.NotEq) and right_value == "0") or (isinstance(op, ast.Eq) and right_value in {"1", "true", "True"})):
+        if left_axis == "SAFE_MODE" and ((isinstance(op, ast.NotEq) and right_value == "0") or (isinstance(op, ast.Eq) and right_value in {"1", "true", "True"})):
             return "SAFE_MODE"
-        if is_allow and ((isinstance(op, ast.NotEq) and right_value == "1") or (isinstance(op, ast.Eq) and right_value in {"0", "false", "False"})):
+        if left_axis == "ALLOW_NETWORK" and ((isinstance(op, ast.NotEq) and right_value == "1") or (isinstance(op, ast.Eq) and right_value in {"0", "false", "False"})):
             return "ALLOW_NETWORK"
         return None
 
@@ -1356,7 +1510,9 @@ def _vendor_external_io_guard_dominates(item: str) -> bool:
     for stmt_index, stmt in enumerate(fn.body):
         for node in ast.walk(stmt):
             if isinstance(node, ast.Call) and _attribute_chain(node.func) == chain:
-                return any(_stmt_has_guard_refusal(prior) for prior in fn.body[:stmt_index])
+                prior_statements = fn.body[:stmt_index]
+                env_bound_names = _rails_env_bound_names(prior_statements)
+                return any(_stmt_has_guard_refusal(prior, env_bound_names) for prior in prior_statements)
     return False
 
 def _vendor_seam_guarded(loci: tuple[str, ...]) -> bool:
@@ -1400,4 +1556,3 @@ def _unsupported_scope_claims(*payloads: dict[str, Any]) -> list[str]:
     for index, payload in enumerate(payloads):
         visit(payload, f"payload[{index}]")
     return sorted(set(findings))
-
