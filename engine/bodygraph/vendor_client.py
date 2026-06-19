@@ -81,7 +81,7 @@ _VENDOR_LOG_KEYS = frozenset(
 )
 _VENDOR_LOG_OUTCOMES = frozenset({"success", "failure"})
 _VENDOR_LOG_ERROR_CLASSES = frozenset(
-    {"none", "network_error", "4xx", "5xx", "429", "http_status_other", "provider_bad_response"}
+    {"none", "network_error", "4xx", "5xx", "429", "http_status_other", "provider_bad_response", "provider_refused"}
 )
 _VENDOR_LOG_RAILS_STATES = frozenset({"closed_default", "open_exception"})
 _ROUTE_CONTRACTS: Mapping[str, tuple[tuple[str, ...], bool]] = {
@@ -94,6 +94,13 @@ _ROUTE_CONTRACTS: Mapping[str, tuple[tuple[str, ...], bool]] = {
 _VENDOR_LOG_ROUTE_LABELS = frozenset(
     {_VENDOR_LOG_ROUTE, *(f"vendor.hdapi.post:{path}" for path in _ROUTE_CONTRACTS if path != "/v1/bodygraphs")}
 )
+
+
+def _rails_state_from_env(env: Mapping[str, str] | None = None) -> str:
+    source = env if env is not None else os.environ
+    safe_mode = (source.get("SAFE_MODE") or "").strip()
+    allow_network = (source.get("ALLOW_NETWORK") or "").strip()
+    return "open_exception" if safe_mode == "0" and allow_network == "1" else "closed_default"
 
 
 def _validate_retry_config(retry: "VendorRetryConfig") -> None:
@@ -283,7 +290,7 @@ class HdApiClient:
             retry=retry_cfg,
             timeouts=timeouts_cfg,
             log_path=log_path,
-            rails_state="open_exception",
+            rails_state=_rails_state_from_env(env),
             request=request,
         )
 
@@ -450,7 +457,8 @@ class HdApiClient:
                 last_error = exc
                 duration_ms = duration_ms or (self._monotonic() - start)
                 error_code = exc.code
-                error_class = error_class or exc.code.lower()
+                if error_class == "none":
+                    error_class = self._error_class_for_vendor_error(exc.code)
                 if retryable and attempt < self._retry.max_attempts:
                     planned_backoff_ms = self._bounded_backoff_delay(attempt, deadline)
                 self._log_attempt(
@@ -463,6 +471,7 @@ class HdApiClient:
                     backoff_ms=planned_backoff_ms,
                     outcome="failure",
                     route=self._safe_route_label(request),
+                    rails_state=_rails_state_from_env() if exc.code == "PROVIDER_REFUSED" else None,
                 )
                 if not retryable:
                     break
@@ -500,6 +509,7 @@ class HdApiClient:
         retry_after_ms: int | None = None,
         backoff_ms: float | None = None,
         route: str | None = None,
+        rails_state: str | None = None,
     ) -> None:
         timeout_profile = (
             f"connect={self._timeouts.connect_timeout_ms};"
@@ -514,7 +524,7 @@ class HdApiClient:
             "profile": self._retry.profile,
             "error_class": self._bounded_error_class(error_class),
             "outcome": self._bounded_outcome(outcome),
-            "rails_state": self._rails_state,
+            "rails_state": rails_state or self._rails_state,
             "route": route or _VENDOR_LOG_ROUTE,
             "timeout_profile": timeout_profile,
         }
@@ -551,6 +561,14 @@ class HdApiClient:
     @staticmethod
     def _bounded_outcome(outcome: str) -> str:
         return outcome if outcome in _VENDOR_LOG_OUTCOMES else "failure"
+
+    @staticmethod
+    def _error_class_for_vendor_error(code: str) -> str:
+        if code == "PROVIDER_REFUSED":
+            return "provider_refused"
+        if code == "PROVIDER_BAD_RESPONSE":
+            return "provider_bad_response"
+        return code.lower()
 
     @staticmethod
     def _bounded_error_class(error_class: str) -> str:
@@ -653,6 +671,10 @@ class HdApiClient:
 
     @staticmethod
     def _default_request(req: urlrequest.Request, timeout: float) -> tuple[int, bytes, Mapping[str, str]]:
+        safe_mode = (os.environ.get("SAFE_MODE") or "").strip()
+        allow_network = (os.environ.get("ALLOW_NETWORK") or "").strip()
+        if safe_mode != "0" or allow_network != "1":
+            raise VendorError("PROVIDER_REFUSED", "Vendor source refused unless SAFE_MODE=0 and ALLOW_NETWORK=1", details={"SAFE_MODE": safe_mode or "UNSET", "ALLOW_NETWORK": allow_network or "UNSET"})
         opener = urlrequest.build_opener(_NoRedirectHandler())
         try:
             with opener.open(req, timeout=timeout) as resp:  # type: ignore[arg-type]

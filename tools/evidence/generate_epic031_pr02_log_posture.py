@@ -41,7 +41,7 @@ ALLOWED_KEYS = [
     "timeout_profile",
 ]
 BOUNDED_LABELS = {
-    "error_class": ["none", "network_error", "4xx", "5xx", "429", "http_status_other", "provider_bad_response"],
+    "error_class": ["none", "network_error", "4xx", "5xx", "429", "http_status_other", "provider_bad_response", "provider_refused"],
     "outcome": ["success", "failure"],
     "profile": ["none", "fixed", "exponential"],
     "rails_state": ["closed_default", "open_exception"],
@@ -131,6 +131,7 @@ def _make_sample() -> list[dict[str, object]]:
         ("4xx", lambda req, timeout: (403, b'{"error":"forbidden"}', {})),
         ("5xx", lambda req, timeout: (503, b'{"error":"unavailable"}', {})),
         ("429", lambda req, timeout: (429, b'{"error":"rate_limited"}', {"retry-after": "4"})),
+        ("provider_refused", lambda req, timeout: (_ for _ in ()).throw(VendorError("PROVIDER_REFUSED", "fixture refused"))),
     ]
     for _name, request_func in cases:
         try:
@@ -151,7 +152,7 @@ def _scan(records: list[dict[str, object]]) -> tuple[dict[str, object], str]:
             if key in record and record[key] not in allowed:
                 label_violations.append({"record": index, "key": key, "value": record[key]})
     classes = sorted({str(record.get("error_class")) for record in records})
-    required_classes = {"none", "network_error", "4xx", "5xx", "429"}
+    required_classes = {"none", "network_error", "4xx", "5xx", "429", "provider_refused"}
     missing_classes = sorted(required_classes - set(classes))
     passed = not forbidden_hits and not key_violations and not label_violations and not missing_classes
     summary = {

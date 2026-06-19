@@ -122,6 +122,8 @@ def test_fetch_does_not_retry_other_http_statuses() -> None:
 
 
 def test_default_request_returns_redirect_status_without_following(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SAFE_MODE", "0")
+    monkeypatch.setenv("ALLOW_NETWORK", "1")
     opened = []
     captured_handlers = []
 
@@ -160,6 +162,63 @@ def test_default_request_returns_redirect_status_without_following(monkeypatch: 
     assert opened == [("https://vendor.test/v1/bodygraphs", 2.0, {"Hd-api-key": "api"})]
     assert len(captured_handlers) == 1
     assert captured_handlers[0].redirect_request(req, None, 302, "Found", {}, "https://vendor.test/redirect") is None
+
+
+def test_default_request_refuses_unless_both_open_rails_flags_are_set(monkeypatch: pytest.MonkeyPatch) -> None:
+    req = urlrequest.Request("https://vendor.test/v1/bodygraphs", data=b"{}\n", method="POST")
+    for safe_mode, allow_network in [("1", "0"), ("0", "0"), (None, "1"), (None, "0"), (None, None)]:
+        monkeypatch.delenv("SAFE_MODE", raising=False)
+        monkeypatch.delenv("ALLOW_NETWORK", raising=False)
+        if safe_mode is not None:
+            monkeypatch.setenv("SAFE_MODE", safe_mode)
+        if allow_network is not None:
+            monkeypatch.setenv("ALLOW_NETWORK", allow_network)
+
+        with pytest.raises(VendorError) as excinfo:
+            HdApiClient._default_request(req, 2.0)
+
+        assert excinfo.value.code == "PROVIDER_REFUSED"
+
+
+def test_fetch_logs_provider_refused_as_bounded_failure_class(tmp_path: Path) -> None:
+    log_path = tmp_path / "refused.jsonl"
+
+    def refused(req, timeout):
+        raise VendorError("PROVIDER_REFUSED", "refused")
+
+    client = _client(refused, log_path=log_path)
+    request = VendorRequest(url="https://vendor.test/v1/bodygraphs", headers={}, body_bytes=b"{}\n", input_fingerprint="abc")
+
+    with pytest.raises(VendorError) as excinfo:
+        client.fetch(request)
+
+    assert excinfo.value.code == "PROVIDER_REFUSED"
+    record = _read_jsonl(log_path)[0]
+    assert record["error_class"] == "provider_refused"
+    assert record["error_code"] == "PROVIDER_REFUSED"
+    assert record["outcome"] == "failure"
+
+
+def test_from_env_closed_default_provider_refusal_logs_closed_rails(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    monkeypatch.setenv("HD_API_BASE_URL", "https://vendor.test/v1")
+    monkeypatch.delenv("HDAPI_BASE_URL", raising=False)
+    monkeypatch.setenv("HD_API_KEY", "api-key")
+    monkeypatch.setenv("GEO_API_KEY", "geo-key")
+    monkeypatch.setenv("SAFE_MODE", "1")
+    monkeypatch.setenv("ALLOW_NETWORK", "0")
+    log_path = tmp_path / "closed-refusal.jsonl"
+
+    client = HdApiClient.from_env(log_path=log_path, release_id="0" * 64)
+    request = client.build_request(birthdate="1990-01-01", birthtime="12:00", location="X")
+
+    with pytest.raises(VendorError) as excinfo:
+        client.fetch(request)
+
+    assert excinfo.value.code == "PROVIDER_REFUSED"
+    record = _read_jsonl(log_path)[0]
+    assert record["error_class"] == "provider_refused"
+    assert record["error_code"] == "PROVIDER_REFUSED"
+    assert record["rails_state"] == "closed_default"
 
 
 def test_fetch_retries_only_5xx_and_network_errors() -> None:

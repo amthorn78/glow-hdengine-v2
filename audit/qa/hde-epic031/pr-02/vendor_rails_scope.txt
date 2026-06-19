@@ -1,5 +1,5 @@
 summary:
-  total_calls = 5
+  total_calls = 6
 scope: hde-epic031-pr-02-local-deterministic
 live_vendor_calls: forbidden
 rails:
@@ -9,11 +9,12 @@ rails:
   LANG = C
   TZ = UTC
 routes:
-  vendor.hdapi.post:/bodygraphs 5
+  vendor.hdapi.post:/bodygraphs 6
 failure_classes:
   429 1
   4xx 1
   5xx 1
   network_error 1
   none 1
+  provider_refused 1
 vendor_routes_detected: 1
