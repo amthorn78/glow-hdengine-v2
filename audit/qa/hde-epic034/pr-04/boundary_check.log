@@ -1,4 +1,4 @@
-generated_at_utc=2026-06-19T06:37:43Z
+generated_at_utc=2026-06-19T06:56:49Z
 scope=HDE-EPIC034 PR-04 boundary check for W-002 / HDE-FERM007.4
 rails=ALLOW_NETWORK=0 LANG=C LC_ALL=C SAFE_MODE=1 TZ=UTC
 network_posture=closed-rails-source-cache; no live vendor calls
@@ -21,6 +21,7 @@ evidence_index_and_path_proof_posture=validated_by_update_evidence_index_and_val
 [generator_rendered_analyzer_output_only] status=PASS
 [renderer_did_not_recompute_boundary_truth] status=PASS
 [renderer_did_not_override_analyzer_unknowns_or_failures] status=PASS
+[analyzer_owned_verdict_pass] status=PASS
 [conservative_positive_boundary_contract_applied] status=PASS
 [unknown_current_categories_fail_closed] status=PASS
 [actual_repo_loci_discovered_before_classification] status=PASS

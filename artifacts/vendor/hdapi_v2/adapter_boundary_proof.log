@@ -1,4 +1,4 @@
-generated_at_utc=2026-06-19T06:37:43Z
+generated_at_utc=2026-06-19T06:56:49Z
 work_item=W-002
 scope=HDE-EPIC034 PR-04 analyzer-owned adapter/presenter boundary proof for HDE-FERM007.4 only
 analyzer_rendering_separation=analyzer owns findings, unknowns, deltas, provenance, bindings, and verdicts; renderer only emits analyzer output

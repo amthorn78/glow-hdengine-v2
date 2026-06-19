@@ -1893,6 +1893,8 @@ def _boundary_result_or_raise(result: dict[str, Any]) -> None:
     failed = [name for name, ok in result["checks"].items() if not ok]
     if failed:
         raise ValueError("ADAPTER_BOUNDARY_CHECK_FAILED:" + ",".join(failed))
+    if result.get("verdict_status") != "PASS":
+        raise ValueError(f"ADAPTER_BOUNDARY_ANALYZER_VERDICT_NON_PASS:{result.get('verdict_status', 'MISSING')}")
 
 
 def _finding_summary(result: dict[str, Any], category: str) -> str:
@@ -1993,6 +1995,7 @@ def build_adapter_boundary_check_log(produced: str, proof: str, checks: dict[str
         "generator_rendered_analyzer_output_only": "renderer_only_posture=" in proof,
         "renderer_did_not_recompute_boundary_truth": "does not rediscover" in proof,
         "renderer_did_not_override_analyzer_unknowns_or_failures": "renderer_does_not_override_analyzer_unknowns_or_failures=true" in proof,
+        "analyzer_owned_verdict_pass": "analyzer_owned_verdict_status=PASS" in proof,
         "conservative_positive_boundary_contract_applied": checks.get("conservative_positive_boundary_contract_applied", False),
         "unknown_current_categories_fail_closed": checks.get("unknown_current_categories_fail_closed", False) and "unknown_current_categories_fail_closed=true" in proof,
         "actual_repo_loci_discovered_before_classification": checks.get("actual_repo_loci_discovered_before_classification", False),

@@ -3263,6 +3263,20 @@ def test_epic034_w002_generator_consumes_analyzer_output_without_recomputing(mon
     assert "renderer_only_posture=evidence generator does not rediscover" in proof
 
 
+def test_epic034_w002_renderer_refuses_non_pass_analyzer_verdict_even_when_checks_pass() -> None:
+    result = _epic034_analyzer_result()
+    assert all(result["checks"].values())
+    result["verdict_status"] = "UNKNOWN"
+    with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_ANALYZER_VERDICT_NON_PASS:UNKNOWN"):
+        generator.render_adapter_boundary_proof("2026-06-18T00:00:00Z", result)
+
+    result = _epic034_analyzer_result()
+    assert all(result["checks"].values())
+    result["verdict_status"] = "FAIL"
+    with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_ANALYZER_VERDICT_NON_PASS:FAIL"):
+        generator.render_adapter_boundary_proof("2026-06-18T00:00:00Z", result)
+
+
 def test_epic034_w002_renderer_refuses_unknown_or_forbidden_pass() -> None:
     result = _epic034_analyzer_result()
     result["findings"][0]["classification"] = boundary_analyzer.BOUNDARY_UNKNOWN
