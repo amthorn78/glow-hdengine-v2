@@ -3928,3 +3928,65 @@ app.add_url_rule('/module-alias-added', 'module_alias_endpoint', view_func=targe
         assert "public_internal_classification=unknown / fail-closed" not in joined
     finally:
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004_unsupported_getattr_route_decorator_fails_closed(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+@getattr(app, 'route')('/getattr-added')
+def added():
+    return emit_public({'ok': True})
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004_getattr_route.py", body)
+        parsed_signatures = tuple(boundary_analyzer._adapter_public_route_signatures((adapter,)))
+        unsupported_signatures = tuple(boundary_analyzer._unsupported_route_registration_signatures((adapter,)))
+        assert parsed_signatures == ()
+        assert any("registration=unsupported_route_registration" in item for item in unsupported_signatures)
+        assert any("public_internal_classification=unknown / fail-closed" in item for item in unsupported_signatures)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", ())
+        expected_failure = (
+            "ADAPTER_BOUNDARY_CHECK_FAILED:.*route_baseline_present.*"
+            "route_signature_classification_unambiguous.*no_public_reader_change"
+        )
+        with pytest.raises(ValueError, match=expected_failure):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004_function_style_route_registration_cannot_collapse_to_empty_comparison(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+def added():
+    return emit_public({'ok': True})
+app.route('/function-style-added', methods=['POST'])(added)
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004_function_style_route.py", body)
+        parsed_signatures = tuple(boundary_analyzer._adapter_public_route_signatures((adapter,)))
+        unsupported_signatures = tuple(boundary_analyzer._unsupported_route_registration_signatures((adapter,)))
+        assert parsed_signatures == ()
+        assert any("registration=unsupported_route_registration" in item for item in unsupported_signatures)
+        assert any("provide_automatic_options" not in item for item in unsupported_signatures)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", ())
+        expected_failure = (
+            "ADAPTER_BOUNDARY_CHECK_FAILED:.*"
+            "new_public_routes_cannot_collapse_to_empty_comparison.*no_public_reader_change"
+        )
+        with pytest.raises(ValueError, match=expected_failure):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)

@@ -577,6 +577,82 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                 ))
     return sorted(set(signatures))
 
+
+def _unsupported_route_registration_signatures(loci: tuple[str, ...]) -> list[str]:
+    """Return fail-closed signatures for route-bearing forms outside the parser model.
+
+    The positive parser above proves the Flask forms this boundary proof supports. This
+    pass is deliberately narrow: it catches route-bearing higher-order/dynamic forms
+    that the positive parser cannot assign endpoint/view identity to, without
+    reclassifying the already-proven decorator/add_url_rule/register_blueprint forms.
+    """
+
+    signatures: list[str] = []
+    routeish_names = {
+        "route",
+        "get",
+        "post",
+        "put",
+        "patch",
+        "delete",
+        "add_url_rule",
+        "register_blueprint",
+        "errorhandler",
+        "app_errorhandler",
+    }
+    routeish_suffixes = tuple(f".{name}" for name in routeish_names)
+
+    def getattr_routeish(call: ast.Call) -> str:
+        if _attribute_chain(call.func) != "getattr" or len(call.args) < 2:
+            return ""
+        attr_name = _string_constant(call.args[1])
+        return attr_name if attr_name in routeish_names else ""
+
+    def supported_route_factory(call: ast.Call) -> bool:
+        call_name = _attribute_chain(call.func)
+        return call_name.endswith(routeish_suffixes) or bool(getattr_routeish(call))
+
+    for rel in loci:
+        _path, _text, tree = _python_source(rel)
+        decorator_subtree_ids: set[int] = set()
+        for fn in (node for node in ast.walk(tree) if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))):
+            for deco in fn.decorator_list:
+                decorator_subtree_ids.update(id(child) for child in ast.walk(deco))
+                if not isinstance(deco, ast.Call):
+                    continue
+                deco_call = deco.func
+                deco_name = _attribute_chain(deco_call)
+                if deco_name.endswith(routeish_suffixes):
+                    continue
+                if isinstance(deco_call, ast.Call) and getattr_routeish(deco_call):
+                    signatures.append(_route_signature(
+                        locus=rel,
+                        registration="unsupported_route_registration",
+                        decorator=ast.unparse(deco_call),
+                        endpoint=fn.name,
+                        view=fn.name,
+                        routing_keywords=_routing_keywords(deco),
+                        public_internal_classification=BOUNDARY_UNKNOWN,
+                    ))
+
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Call) or id(node) in decorator_subtree_ids:
+                continue
+            if not isinstance(node.func, ast.Call) or not supported_route_factory(node.func):
+                continue
+            # Function-style route registration, for example app.route('/x')(view),
+            # is route-bearing, but the analyzer only proves decorator-bound endpoint
+            # identity. Keep the route drift comparison active by surfacing this as an
+            # explicit unknown/fail-closed signature instead of letting it disappear.
+            signatures.append(_route_signature(
+                locus=rel,
+                registration="unsupported_route_registration",
+                decorator=ast.unparse(node.func),
+                routing_keywords=_routing_keywords(node.func),
+                public_internal_classification=BOUNDARY_UNKNOWN,
+            ))
+    return sorted(set(signatures))
+
 def _is_sanctioned_presenter_call(call: str, aliases: dict[str, str]) -> bool:
     presenter_names = {"emit_public", "emit_public_aux", "emit_public_with_envelope", "emit_reader_public_bytes", "emit_reader_public_envelope"}
     attr = call.rsplit(".", 1)[-1]
@@ -1918,7 +1994,10 @@ def analyze_adapter_boundary(
     adapter_presenter_calls = _adapter_presenter_calls(adapter_loci)
     presenter_bypass = _adapter_presenter_bypass_routes(adapter_loci)
     unresolved_presenter_routes = _adapter_routes_without_presenter(adapter_loci)
-    discovered_public_routes = _adapter_public_route_signatures(adapter_loci)
+    discovered_public_routes = sorted(
+        set(_adapter_public_route_signatures(adapter_loci))
+        | set(_unsupported_route_registration_signatures(adapter_loci))
+    )
     public_reader_route_drift = sorted(set(discovered_public_routes) ^ set(public_route_baseline))
     unknown_route_signatures = sorted(item for item in discovered_public_routes if "public_internal_classification=unknown / fail-closed" in item)
     route_baseline_missing_or_incomplete = not public_route_baseline or not discovered_public_routes
