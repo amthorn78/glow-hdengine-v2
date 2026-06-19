@@ -1,6 +1,11 @@
-generated_at_utc=2026-06-19T06:56:49Z
-work_item=W-002
-scope=HDE-EPIC034 PR-04 analyzer-owned adapter/presenter boundary proof for HDE-FERM007.4 only
+generated_at_utc=2026-06-19T07:51:20Z
+work_item=W-003
+scope=HDE-EPIC034 PR-04 table-driven adapter/presenter boundary taxonomy proof for HDE-FERM007.4 only
+hde_ferm007_4_scope=adapter and presenter boundary preservation remediation slice only; not final subtask completion
+table_driven_boundary_taxonomy=applied to analyzer-owned categories for W-003
+required_taxonomy_groups_declared=route_registration_surfaces,public_route_signatures,response_producing_paths,presenter_valid_paths,presenter_bypass_paths,serializer_families,external_io_families,import_and_alias_forms,cross_file_helper_chains,vendor_guard_provenance,pure_compute_forbidden_operations,public_internal_route_classification,evidence_family_binding,unsupported_scope_no_claims
+required_taxonomy_groups_covered=cross_file_helper_chains,evidence_family_binding,external_io_families,import_and_alias_forms,presenter_bypass_paths,presenter_valid_paths,public_internal_route_classification,public_route_signatures,pure_compute_forbidden_operations,response_producing_paths,route_registration_surfaces,serializer_families,unsupported_scope_no_claims,vendor_guard_provenance
+taxonomy_missing_category_posture=none
 analyzer_rendering_separation=analyzer owns findings, unknowns, deltas, provenance, bindings, and verdicts; renderer only emits analyzer output
 analyzer_owned_verdict_status=PASS
 renderer_only_posture=evidence generator does not rediscover route, guard, presenter, serializer, external-I/O, or boundary truth
@@ -30,7 +35,35 @@ boundary_finding category=pure_compute_external_io classification=allowed verdic
 boundary_finding category=guard_provenance classification=allowed verdict=PASS reason=each relevant vendor external-I/O path is tied to a closed-rails guard entrypoint details=["engine/bodygraph/vendor_client.py:HdApiClient._default_request@673:opener.open guarded_by=engine/bodygraph/vendor_client.py:HdApiClient._default_request@673","engine/bodygraph/vendor_client.py:HdApiClient._default_request@673:urlrequest.build_opener guarded_by=engine/bodygraph/vendor_client.py:HdApiClient._default_request@673"]
 boundary_finding category=public_surface_posture classification=allowed verdict=PASS reason=dependency evidence emits no unsupported public/runtime/open-rails/AI scope claims details=[]
 boundary_finding category=evidence_binding_posture classification=allowed verdict=PASS reason=PR-01/PR-02/PR-03 dependency payloads are present and non-empty; index/path-proof validation is delegated to governed tools details=[]
-boundary_finding category=hde_ferm007_5_runtime_v2_live_open_rails_ai_scope classification=out of scope verdict=PASS reason=explicitly outside W-002 / HDE-FERM007.4; no claim is emitted details=[]
+boundary_finding category=hde_ferm007_5_runtime_v2_live_open_rails_ai_scope classification=out of scope verdict=PASS reason=explicitly outside W-003 / HDE-FERM007.4; no claim is emitted details=[]
+boundary_taxonomy group=cross_file_helper_chains finding_category=presenter_provenance required_case_classifications=["allowed","unknown / fail-closed"] current_classification=allowed current_verdict=PASS coverage_status=covered_by_w003_invariant_suite scope=in_scope
+boundary_taxonomy group=evidence_family_binding finding_category=evidence_binding_posture required_case_classifications=["allowed","unknown / fail-closed","out of scope"] current_classification=allowed current_verdict=PASS coverage_status=covered_by_w003_invariant_suite scope=in_scope
+boundary_taxonomy group=external_io_families finding_category=external_io_paths required_case_classifications=["allowed","forbidden"] current_classification=allowed current_verdict=PASS coverage_status=covered_by_w003_invariant_suite scope=in_scope
+boundary_taxonomy group=import_and_alias_forms finding_category=presenter_provenance required_case_classifications=["allowed","forbidden","unknown / fail-closed"] current_classification=allowed current_verdict=PASS coverage_status=covered_by_w003_invariant_suite scope=in_scope
+boundary_taxonomy group=presenter_bypass_paths finding_category=presenter_provenance required_case_classifications=["forbidden","unknown / fail-closed"] current_classification=allowed current_verdict=PASS coverage_status=covered_by_w003_invariant_suite scope=in_scope
+boundary_taxonomy group=presenter_valid_paths finding_category=presenter_provenance required_case_classifications=["allowed"] current_classification=allowed current_verdict=PASS coverage_status=covered_by_w003_invariant_suite scope=in_scope
+boundary_taxonomy group=public_internal_route_classification finding_category=public_routes required_case_classifications=["allowed","unknown / fail-closed","out of scope"] current_classification=allowed current_verdict=PASS coverage_status=covered_by_w003_invariant_suite scope=in_scope
+boundary_taxonomy group=public_route_signatures finding_category=public_routes required_case_classifications=["allowed","unknown / fail-closed","out of scope"] current_classification=allowed current_verdict=PASS coverage_status=covered_by_w003_invariant_suite scope=in_scope
+boundary_taxonomy group=pure_compute_forbidden_operations finding_category=pure_compute_external_io required_case_classifications=["allowed","forbidden"] current_classification=allowed current_verdict=PASS coverage_status=covered_by_w003_invariant_suite scope=in_scope
+boundary_taxonomy group=response_producing_paths finding_category=response_producing_paths required_case_classifications=["allowed","forbidden","unknown / fail-closed"] current_classification=allowed current_verdict=PASS coverage_status=covered_by_w003_invariant_suite scope=in_scope
+boundary_taxonomy group=route_registration_surfaces finding_category=adapter_route_registration required_case_classifications=["allowed","unknown / fail-closed"] current_classification=allowed current_verdict=PASS coverage_status=covered_by_w003_invariant_suite scope=in_scope
+boundary_taxonomy group=serializer_families finding_category=serializer_paths required_case_classifications=["allowed","forbidden","unknown / fail-closed"] current_classification=allowed current_verdict=PASS coverage_status=covered_by_w003_invariant_suite scope=in_scope
+boundary_taxonomy group=unsupported_scope_no_claims finding_category=hde_ferm007_5_runtime_v2_live_open_rails_ai_scope required_case_classifications=["out of scope"] current_classification=out of scope current_verdict=PASS coverage_status=covered_by_w003_invariant_suite scope=follow_up_or_out_of_scope_visible
+boundary_taxonomy group=vendor_guard_provenance finding_category=guard_provenance required_case_classifications=["allowed","unknown / fail-closed"] current_classification=allowed current_verdict=PASS coverage_status=covered_by_w003_invariant_suite scope=in_scope
+route_registration_taxonomy_verdict=covered:PASS required_case_classifications=["allowed","unknown / fail-closed"] current_finding=allowed:PASS
+public_route_signature_taxonomy_verdict=covered:PASS required_case_classifications=["allowed","unknown / fail-closed","out of scope"] current_finding=allowed:PASS
+response_producing_path_taxonomy_verdict=covered:PASS required_case_classifications=["allowed","forbidden","unknown / fail-closed"] current_finding=allowed:PASS
+presenter_valid_path_taxonomy_verdict=covered:PASS required_case_classifications=["allowed"] current_finding=allowed:PASS
+presenter_bypass_path_taxonomy_verdict=covered:PASS required_case_classifications=["forbidden","unknown / fail-closed"] current_finding=allowed:PASS
+serializer_taxonomy_verdict=covered:PASS required_case_classifications=["allowed","forbidden","unknown / fail-closed"] current_finding=allowed:PASS
+external_io_taxonomy_verdict=covered:PASS required_case_classifications=["allowed","forbidden"] current_finding=allowed:PASS
+import_alias_taxonomy_verdict=covered:PASS required_case_classifications=["allowed","forbidden","unknown / fail-closed"] current_finding=allowed:PASS
+cross_file_helper_chain_taxonomy_verdict=covered:PASS required_case_classifications=["allowed","unknown / fail-closed"] current_finding=allowed:PASS
+vendor_guard_provenance_taxonomy_verdict=covered:PASS required_case_classifications=["allowed","unknown / fail-closed"] current_finding=allowed:PASS
+pure_compute_forbidden_operation_taxonomy_verdict=covered:PASS required_case_classifications=["allowed","forbidden"] current_finding=allowed:PASS
+public_internal_route_classification_taxonomy_verdict=covered:PASS required_case_classifications=["allowed","unknown / fail-closed","out of scope"] current_finding=allowed:PASS
+evidence_family_binding_taxonomy_verdict=covered:PASS required_case_classifications=["allowed","unknown / fail-closed","out of scope"] current_finding=allowed:PASS
+unsupported_scope_no_claims_taxonomy_verdict=covered:PASS required_case_classifications=["out of scope"] current_finding=out of scope:PASS
 public_route_findings_and_verdict=allowed:PASS
 response_producing_path_findings_and_verdict=allowed:PASS
 presenter_provenance_findings_and_verdict=allowed:PASS
@@ -58,6 +91,8 @@ no_AI_scope_claim=NONE
 [hard_coded_path_lists_not_used_as_proof] status=PASS
 [unknown_current_categories_fail_closed] status=PASS
 [conservative_positive_boundary_contract_applied] status=PASS
+[table_driven_boundary_taxonomy_applied] status=PASS
+[required_taxonomy_groups_visible] status=PASS
 [presenter_emitter_inspected] status=PASS
 [vendor_seam_inspected] status=PASS
 [no_second_http_home] status=PASS

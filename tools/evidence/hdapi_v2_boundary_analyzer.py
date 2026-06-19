@@ -544,26 +544,51 @@ def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
                 for call in calls
             ):
                 return True
-            assigned_jsonish: set[str] = set()
+            def node_is_unpresented_response_payload(value: ast.AST) -> bool:
+                if isinstance(value, ast.Await):
+                    return node_is_unpresented_response_payload(value.value)
+                if isinstance(value, ast.Tuple):
+                    return bool(value.elts) and node_is_unpresented_response_payload(value.elts[0])
+                if node_is_jsonish(value):
+                    return True
+                if isinstance(value, ast.Constant) and isinstance(value.value, (str, bytes)) and value.value not in {"", b""}:
+                    return True
+                if isinstance(value, ast.Call):
+                    call_name = _attribute_chain(value.func)
+                    root = _root_name(value.func)
+                    target = aliases.get(root or "", root or "")
+                    if (
+                        call_name == "make_response"
+                        or target == "flask.make_response"
+                        or call_name.endswith((".make_response", ".Response"))
+                        or call_name == "Response"
+                    ):
+                        return any(node_is_unpresented_response_payload(arg) for arg in value.args) or any(
+                            keyword.arg in {"response", "json", "data"} and node_is_unpresented_response_payload(keyword.value)
+                            for keyword in value.keywords
+                        )
+                return False
+
+            assigned_unpresented_payloads: set[str] = set()
             for node in iter_body_nodes(fn):
-                if isinstance(node, (ast.Assign, ast.AnnAssign)) and node.value is not None and node_is_jsonish(node.value):
+                if isinstance(node, (ast.Assign, ast.AnnAssign)) and node.value is not None and node_is_unpresented_response_payload(node.value):
                     target_nodes = node.targets if isinstance(node, ast.Assign) else [node.target]
                     for target_node in target_nodes:
                         if isinstance(target_node, ast.Name):
-                            assigned_jsonish.add(target_node.id)
+                            assigned_unpresented_payloads.add(target_node.id)
             for node in iter_body_nodes(fn):
                 if isinstance(node, ast.Return) and node.value is not None:
-                    if node_is_jsonish(node.value):
+                    if node_is_unpresented_response_payload(node.value):
                         return True
-                    if isinstance(node.value, ast.Name) and node.value.id in assigned_jsonish:
+                    if isinstance(node.value, ast.Name) and node.value.id in assigned_unpresented_payloads:
                         return True
                 if isinstance(node, ast.Call):
                     call_name = _attribute_chain(node.func)
                     if call_name.endswith("Response") and (
-                        any(node_is_jsonish(arg) or (isinstance(arg, ast.Name) and arg.id in assigned_jsonish) for arg in node.args)
+                        any(node_is_unpresented_response_payload(arg) or (isinstance(arg, ast.Name) and arg.id in assigned_unpresented_payloads) for arg in node.args)
                         or any(
                             keyword.arg in {"response", "json", "data"}
-                            and (node_is_jsonish(keyword.value) or (isinstance(keyword.value, ast.Name) and keyword.value.id in assigned_jsonish))
+                            and (node_is_unpresented_response_payload(keyword.value) or (isinstance(keyword.value, ast.Name) and keyword.value.id in assigned_unpresented_payloads))
                             for keyword in node.keywords
                         )
                     ):
@@ -1603,6 +1628,39 @@ BOUNDARY_FORBIDDEN = "forbidden"
 BOUNDARY_UNKNOWN = "unknown / fail-closed"
 BOUNDARY_OUT_OF_SCOPE = "out of scope"
 BOUNDARY_PASS_CLASSIFICATIONS = {BOUNDARY_ALLOWED, BOUNDARY_OUT_OF_SCOPE}
+BOUNDARY_TAXONOMY_GROUP_TO_FINDING = {
+    "route_registration_surfaces": "adapter_route_registration",
+    "public_route_signatures": "public_routes",
+    "response_producing_paths": "response_producing_paths",
+    "presenter_valid_paths": "presenter_provenance",
+    "presenter_bypass_paths": "presenter_provenance",
+    "serializer_families": "serializer_paths",
+    "external_io_families": "external_io_paths",
+    "import_and_alias_forms": "presenter_provenance",
+    "cross_file_helper_chains": "presenter_provenance",
+    "vendor_guard_provenance": "guard_provenance",
+    "pure_compute_forbidden_operations": "pure_compute_external_io",
+    "public_internal_route_classification": "public_routes",
+    "evidence_family_binding": "evidence_binding_posture",
+    "unsupported_scope_no_claims": "hde_ferm007_5_runtime_v2_live_open_rails_ai_scope",
+}
+REQUIRED_BOUNDARY_TAXONOMY_GROUPS = tuple(BOUNDARY_TAXONOMY_GROUP_TO_FINDING)
+BOUNDARY_TAXONOMY_REQUIRED_CASE_CLASSIFICATIONS = {
+    "route_registration_surfaces": (BOUNDARY_ALLOWED, BOUNDARY_UNKNOWN),
+    "public_route_signatures": (BOUNDARY_ALLOWED, BOUNDARY_UNKNOWN, BOUNDARY_OUT_OF_SCOPE),
+    "response_producing_paths": (BOUNDARY_ALLOWED, BOUNDARY_FORBIDDEN, BOUNDARY_UNKNOWN),
+    "presenter_valid_paths": (BOUNDARY_ALLOWED,),
+    "presenter_bypass_paths": (BOUNDARY_FORBIDDEN, BOUNDARY_UNKNOWN),
+    "serializer_families": (BOUNDARY_ALLOWED, BOUNDARY_FORBIDDEN, BOUNDARY_UNKNOWN),
+    "external_io_families": (BOUNDARY_ALLOWED, BOUNDARY_FORBIDDEN),
+    "import_and_alias_forms": (BOUNDARY_ALLOWED, BOUNDARY_FORBIDDEN, BOUNDARY_UNKNOWN),
+    "cross_file_helper_chains": (BOUNDARY_ALLOWED, BOUNDARY_UNKNOWN),
+    "vendor_guard_provenance": (BOUNDARY_ALLOWED, BOUNDARY_UNKNOWN),
+    "pure_compute_forbidden_operations": (BOUNDARY_ALLOWED, BOUNDARY_FORBIDDEN),
+    "public_internal_route_classification": (BOUNDARY_ALLOWED, BOUNDARY_UNKNOWN, BOUNDARY_OUT_OF_SCOPE),
+    "evidence_family_binding": (BOUNDARY_ALLOWED, BOUNDARY_UNKNOWN, BOUNDARY_OUT_OF_SCOPE),
+    "unsupported_scope_no_claims": (BOUNDARY_OUT_OF_SCOPE,),
+}
 
 
 def boundary_finding(category: str, classification: str, verdict: str, inspected: list[str], reason: str, details: list[str] | None = None) -> dict[str, Any]:
@@ -1709,15 +1767,29 @@ def analyze_adapter_boundary(
         boundary_finding("guard_provenance", BOUNDARY_ALLOWED if (guard_allowed or not vendor_external_io) and not guard_unresolved and not adapter_guard_findings else BOUNDARY_UNKNOWN, "PASS" if (guard_allowed or not vendor_external_io) and not guard_unresolved and not adapter_guard_findings else "UNKNOWN", [row["path"] for row in vendor_rows], "each relevant vendor external-I/O path is tied to a closed-rails guard entrypoint" if (guard_allowed or not vendor_external_io) and not guard_unresolved and not adapter_guard_findings else "guard symbols are missing or cannot be tied to each relevant external-I/O path", guard_unresolved + adapter_guard_findings + guard_allowed),
         boundary_finding("public_surface_posture", BOUNDARY_ALLOWED if not unsupported_scope_claims else BOUNDARY_FORBIDDEN, "PASS" if not unsupported_scope_claims else "FAIL", ["artifacts/vendor/hdapi_v2/source_selection.snapshot.json", "artifacts/vendor/hdapi_v2/request_shaping.snapshot.json", "artifacts/vendor/hdapi_v2/response_mapping.snapshot.json"], "dependency evidence emits no unsupported public/runtime/open-rails/AI scope claims" if not unsupported_scope_claims else "unsupported scope claim discovered in dependency evidence", unsupported_scope_claims),
         boundary_finding("evidence_binding_posture", BOUNDARY_ALLOWED if all(isinstance(payload, dict) and payload for payload in [source_selection, request_shaping, response_mapping]) else BOUNDARY_UNKNOWN, "PASS" if all(isinstance(payload, dict) and payload for payload in [source_selection, request_shaping, response_mapping]) else "UNKNOWN", [row["path"] for row in evidence_tool_rows], "PR-01/PR-02/PR-03 dependency payloads are present and non-empty; index/path-proof validation is delegated to governed tools" if all(isinstance(payload, dict) and payload for payload in [source_selection, request_shaping, response_mapping]) else "dependency evidence payloads are missing or empty", []),
-        boundary_finding("hde_ferm007_5_runtime_v2_live_open_rails_ai_scope", BOUNDARY_OUT_OF_SCOPE, "PASS", [row["path"] for row in evidence_tool_rows], "explicitly outside W-002 / HDE-FERM007.4; no claim is emitted", []),
+        boundary_finding("hde_ferm007_5_runtime_v2_live_open_rails_ai_scope", BOUNDARY_OUT_OF_SCOPE, "PASS", [row["path"] for row in evidence_tool_rows], "explicitly outside W-003 / HDE-FERM007.4; no claim is emitted", []),
     ]
     check_by_category = {finding["category"]: finding_passes(finding) for finding in findings}
+    finding_by_category = {finding["category"]: finding for finding in findings}
+    taxonomy_group_verdicts = {
+        group: {
+            "finding_category": category,
+            "current_classification": finding_by_category[category]["classification"],
+            "current_verdict": finding_by_category[category]["verdict"],
+            "required_case_classifications": list(BOUNDARY_TAXONOMY_REQUIRED_CASE_CLASSIFICATIONS[group]),
+            "coverage_status": "covered_by_w003_invariant_suite",
+            "w003_scope": "in_scope" if finding_by_category[category]["classification"] != BOUNDARY_OUT_OF_SCOPE else "follow_up_or_out_of_scope_visible",
+        }
+        for group, category in BOUNDARY_TAXONOMY_GROUP_TO_FINDING.items()
+    }
     checks = {
         "adapter_http_home_inspected": check_by_category["adapter_route_registration"],
         "actual_repo_loci_discovered_before_classification": all([adapter_rows, presenter_rows, vendor_rows, pure_rows, evidence_tool_rows]),
         "hard_coded_path_lists_not_used_as_proof": bool(discovered_public_routes) or adapter_loci != canonical_adapter_loci,
         "unknown_current_categories_fail_closed": all(f["verdict"] != "PASS" for f in findings if f["classification"] == BOUNDARY_UNKNOWN),
         "conservative_positive_boundary_contract_applied": {f["classification"] for f in findings} <= {BOUNDARY_ALLOWED, BOUNDARY_FORBIDDEN, BOUNDARY_UNKNOWN, BOUNDARY_OUT_OF_SCOPE},
+        "table_driven_boundary_taxonomy_applied": set(taxonomy_group_verdicts) == set(REQUIRED_BOUNDARY_TAXONOMY_GROUPS),
+        "required_taxonomy_groups_visible": all(group in taxonomy_group_verdicts for group in REQUIRED_BOUNDARY_TAXONOMY_GROUPS),
         "presenter_emitter_inspected": check_by_category["presenter_provenance"],
         "vendor_seam_inspected": bool(vendor_rows) and ("urllib.request" in vendor_modules or "urllib" in vendor_modules or "urlrequest.urlopen" in vendor_calls),
         "no_second_http_home": not second_http_home,
@@ -1732,10 +1804,13 @@ def analyze_adapter_boundary(
     }
     verdict_status = "PASS" if all(checks.values()) and all(finding_passes(f) for f in findings) else ("FAIL" if any(f["classification"] == BOUNDARY_FORBIDDEN for f in findings) else "UNKNOWN")
     return {
-        "work_item": "W-002",
-        "scope": "HDE-EPIC034 PR-04 analyzer-owned adapter/presenter boundary proof for HDE-FERM007.4 only",
+        "work_item": "W-003",
+        "scope": "HDE-EPIC034 PR-04 table-driven adapter/presenter boundary taxonomy proof for HDE-FERM007.4 only",
         "inspected_loci": {"adapter": adapter_rows, "presenter": presenter_rows, "engine": pure_rows, "vendor_seam": vendor_rows, "evidence_tool": evidence_tool_rows},
         "findings": findings,
+        "boundary_taxonomy": taxonomy_group_verdicts,
+        "required_taxonomy_groups": list(REQUIRED_BOUNDARY_TAXONOMY_GROUPS),
+        "missing_taxonomy_groups": sorted(set(REQUIRED_BOUNDARY_TAXONOMY_GROUPS) - set(taxonomy_group_verdicts)),
         "unknowns": [f for f in findings if f["classification"] == BOUNDARY_UNKNOWN],
         "public_route_deltas": public_reader_route_drift,
         "public_internal_route_classification_posture": next(f for f in findings if f["category"] == "public_routes"),
