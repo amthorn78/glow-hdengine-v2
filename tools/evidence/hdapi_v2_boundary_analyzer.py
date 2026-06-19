@@ -1241,8 +1241,15 @@ def _is_http_home_module(module: str) -> bool:
 
 def _locus_rows(loci: tuple[str, ...]) -> list[dict[str, str]]:
     rows = []
+    module_root = Path(__file__).resolve().parents[2]
     for rel in loci:
-        path, _text, _tree = _python_source(rel)
+        try:
+            path, _text, _tree = _python_source(rel)
+        except ValueError:
+            fallback = module_root / rel
+            if not rel.startswith("tools/evidence/") or not fallback.is_file():
+                raise
+            path = fallback
         rows.append({"path": rel, "sha256": _sha256_path(path)})
     return rows
 
@@ -1589,3 +1596,159 @@ def _unsupported_scope_claims(*payloads: dict[str, Any]) -> list[str]:
     for index, payload in enumerate(payloads):
         visit(payload, f"payload[{index}]")
     return sorted(set(findings))
+
+
+BOUNDARY_ALLOWED = "allowed"
+BOUNDARY_FORBIDDEN = "forbidden"
+BOUNDARY_UNKNOWN = "unknown / fail-closed"
+BOUNDARY_OUT_OF_SCOPE = "out of scope"
+BOUNDARY_PASS_CLASSIFICATIONS = {BOUNDARY_ALLOWED, BOUNDARY_OUT_OF_SCOPE}
+
+
+def boundary_finding(category: str, classification: str, verdict: str, inspected: list[str], reason: str, details: list[str] | None = None) -> dict[str, Any]:
+    return {
+        "category": category,
+        "classification": classification,
+        "verdict": verdict,
+        "inspected": inspected,
+        "reason": reason,
+        "details": sorted(details or []),
+    }
+
+
+def finding_passes(finding: dict[str, Any]) -> bool:
+    return finding.get("classification") in BOUNDARY_PASS_CLASSIFICATIONS and finding.get("verdict") == "PASS"
+
+
+def _is_http_home_module(module: str) -> bool:
+    return module in {"flask", "fastapi", "starlette"} or module.startswith(("flask.", "fastapi.", "starlette."))
+
+
+def vendor_guard_provenance_findings(loci: tuple[str, ...]) -> tuple[list[str], list[str], list[str]]:
+    external_io = _vendor_external_io_functions(loci)
+    guarded = _vendor_guard_entrypoints(loci)
+    guarded_keys = {":".join(item.split(":", 2)[:2]) for item in guarded}
+    unresolved: list[str] = []
+    allowed: list[str] = []
+    for item in external_io:
+        key = ":".join(item.split(":", 2)[:2])
+        if key in guarded_keys and _vendor_external_io_guard_dominates(item):
+            allowed.append(item + " guarded_by=" + key)
+        else:
+            unresolved.append(item)
+    return allowed, unresolved, guarded
+
+
+def analyze_adapter_boundary(
+    *,
+    source_selection: dict[str, Any],
+    request_shaping: dict[str, Any],
+    response_mapping: dict[str, Any],
+    adapter_loci: tuple[str, ...],
+    canonical_adapter_loci: tuple[str, ...],
+    presenter_loci: tuple[str, ...],
+    vendor_seam_loci: tuple[str, ...],
+    pure_compute_loci: tuple[str, ...],
+    public_route_baseline: tuple[str, ...],
+    evidence_tool_loci: tuple[str, ...],
+) -> dict[str, Any]:
+    """Return analyzer-owned boundary findings, deltas, provenance, and verdict."""
+    if source_selection.get("request_shaping_claim") != "NONE":
+        raise ValueError("ADAPTER_BOUNDARY_SOURCE_SELECTION_BASELINE_DRIFT")
+    if request_shaping.get("route_family") != "recommended_v2_chart":
+        raise ValueError("ADAPTER_BOUNDARY_REQUEST_SHAPING_BASELINE_DRIFT")
+    if response_mapping.get("response_envelope_mapping_scope") != "HDE-FERM007.3 proof-level v2 StandardResponse envelope mapping only":
+        raise ValueError("ADAPTER_BOUNDARY_RESPONSE_MAPPING_BASELINE_DRIFT")
+
+    adapter_rows = _locus_rows(adapter_loci)
+    presenter_rows = _locus_rows(presenter_loci)
+    vendor_rows = _locus_rows(vendor_seam_loci)
+    pure_rows = _locus_rows(pure_compute_loci)
+    evidence_tool_rows = _locus_rows(evidence_tool_loci)
+
+    adapter_http_modules: set[str] = set()
+    adapter_guard_findings: list[str] = []
+    for rel in adapter_loci:
+        _path, text, tree = _python_source(rel)
+        adapter_http_modules |= {m for m in _import_modules(tree) if m == "flask" or m.startswith("flask")}
+        if rel == "adapter/http_reader.py" and "SAFE_MODE" not in text:
+            adapter_guard_findings.append(f"{rel}:SAFE_MODE not discovered")
+
+    vendor_modules: set[str] = set()
+    vendor_calls: set[str] = set()
+    for rel in vendor_seam_loci:
+        _path, _text, tree = _python_source(rel)
+        vendor_modules |= _import_modules(tree)
+        vendor_calls |= _call_names(tree)
+
+    adapter_presenter_calls = _adapter_presenter_calls(adapter_loci)
+    presenter_bypass = _adapter_presenter_bypass_routes(adapter_loci)
+    unresolved_presenter_routes = _adapter_routes_without_presenter(adapter_loci)
+    discovered_public_routes = _adapter_public_route_signatures(adapter_loci)
+    public_reader_route_drift = sorted(set(discovered_public_routes) ^ set(public_route_baseline))
+    route_baseline_reconciled = bool(discovered_public_routes) and not public_reader_route_drift
+    route_baseline_out_of_scope = not discovered_public_routes and adapter_loci != canonical_adapter_loci
+    pure_external_io = _pure_compute_external_io(pure_compute_loci)
+    second_http_home = sorted(module for module in vendor_modules if _is_http_home_module(module))
+    adapter_bypass = _adapter_external_io_calls(adapter_loci)
+    ad_hoc_serializers = _ad_hoc_json_serializers(adapter_loci + vendor_seam_loci + presenter_loci)
+    unsupported_scope_claims = _unsupported_scope_claims(source_selection, request_shaping, response_mapping)
+    guard_allowed, guard_unresolved, guarded_entrypoints = vendor_guard_provenance_findings(vendor_seam_loci)
+    vendor_external_io = _vendor_external_io_functions(vendor_seam_loci)
+    if guard_unresolved:
+        raise ValueError("ADAPTER_BOUNDARY_VENDOR_GUARD_UNEXPECTED:" + ",".join(guard_unresolved))
+
+    findings = [
+        boundary_finding("adapter_route_registration", BOUNDARY_ALLOWED if adapter_http_modules else BOUNDARY_UNKNOWN, "PASS" if adapter_http_modules else "UNKNOWN", [row["path"] for row in adapter_rows], "discovered Flask adapter registrations before classification" if adapter_http_modules else "no current adapter route registrations were discoverable", discovered_public_routes),
+        boundary_finding("public_routes", BOUNDARY_ALLOWED if route_baseline_reconciled else (BOUNDARY_OUT_OF_SCOPE if route_baseline_out_of_scope else BOUNDARY_UNKNOWN), "PASS" if route_baseline_reconciled or route_baseline_out_of_scope else "UNKNOWN", [row["path"] for row in adapter_rows], "discovered current route signatures reconcile with governed PR-04 baseline" if route_baseline_reconciled else ("no public route signatures discovered in noncanonical test locus; route surface is out of scope" if route_baseline_out_of_scope else "discovered current route signatures cannot be reconciled with baseline; route drift fails closed"), public_reader_route_drift or discovered_public_routes),
+        boundary_finding("response_producing_paths", BOUNDARY_ALLOWED if adapter_presenter_calls and not presenter_bypass and not unresolved_presenter_routes else (BOUNDARY_FORBIDDEN if presenter_bypass else BOUNDARY_UNKNOWN), "PASS" if adapter_presenter_calls and not presenter_bypass and not unresolved_presenter_routes else ("FAIL" if presenter_bypass else "UNKNOWN"), [row["path"] for row in adapter_rows], "public response-producing paths have explicit presenter/emitter provenance" if adapter_presenter_calls and not presenter_bypass and not unresolved_presenter_routes else "response-producing path provenance is unresolved or bypasses presenter", presenter_bypass + unresolved_presenter_routes or adapter_presenter_calls),
+        boundary_finding("presenter_provenance", BOUNDARY_ALLOWED if adapter_presenter_calls and not presenter_bypass and not unresolved_presenter_routes else (BOUNDARY_FORBIDDEN if presenter_bypass else BOUNDARY_UNKNOWN), "PASS" if adapter_presenter_calls and not presenter_bypass and not unresolved_presenter_routes else ("FAIL" if presenter_bypass else "UNKNOWN"), [row["path"] for row in presenter_rows], "adapter routes resolve to sanctioned presenter/emitter calls" if adapter_presenter_calls and not presenter_bypass and not unresolved_presenter_routes else "presenter provenance is not proven for every response path", presenter_bypass + unresolved_presenter_routes or adapter_presenter_calls),
+        boundary_finding("serializer_paths", BOUNDARY_ALLOWED if not ad_hoc_serializers else BOUNDARY_FORBIDDEN, "PASS" if not ad_hoc_serializers else "FAIL", [row["path"] for row in adapter_rows + vendor_rows + presenter_rows], "no ad-hoc JSON serializer path discovered outside allowed vendor helpers" if not ad_hoc_serializers else "ad-hoc serializer path discovered on governed/public boundary", ad_hoc_serializers),
+        boundary_finding("external_io_paths", BOUNDARY_ALLOWED if not adapter_bypass and not second_http_home else BOUNDARY_FORBIDDEN, "PASS" if not adapter_bypass and not second_http_home else "FAIL", [row["path"] for row in adapter_rows + vendor_rows], "external I/O remains limited to sanctioned vendor seam" if not adapter_bypass and not second_http_home else "external I/O or HTTP home found outside sanctioned vendor seam", adapter_bypass + second_http_home),
+        boundary_finding("pure_compute_external_io", BOUNDARY_ALLOWED if not pure_external_io else BOUNDARY_FORBIDDEN, "PASS" if not pure_external_io else "FAIL", [row["path"] for row in pure_rows], "pure compute loci have no external-I/O imports or calls" if not pure_external_io else "pure compute external-I/O capability discovered", pure_external_io),
+        boundary_finding("guard_provenance", BOUNDARY_ALLOWED if (guard_allowed or not vendor_external_io) and not guard_unresolved and not adapter_guard_findings else BOUNDARY_UNKNOWN, "PASS" if (guard_allowed or not vendor_external_io) and not guard_unresolved and not adapter_guard_findings else "UNKNOWN", [row["path"] for row in vendor_rows], "each relevant vendor external-I/O path is tied to a closed-rails guard entrypoint" if (guard_allowed or not vendor_external_io) and not guard_unresolved and not adapter_guard_findings else "guard symbols are missing or cannot be tied to each relevant external-I/O path", guard_unresolved + adapter_guard_findings + guard_allowed),
+        boundary_finding("public_surface_posture", BOUNDARY_ALLOWED if not unsupported_scope_claims else BOUNDARY_FORBIDDEN, "PASS" if not unsupported_scope_claims else "FAIL", ["artifacts/vendor/hdapi_v2/source_selection.snapshot.json", "artifacts/vendor/hdapi_v2/request_shaping.snapshot.json", "artifacts/vendor/hdapi_v2/response_mapping.snapshot.json"], "dependency evidence emits no unsupported public/runtime/open-rails/AI scope claims" if not unsupported_scope_claims else "unsupported scope claim discovered in dependency evidence", unsupported_scope_claims),
+        boundary_finding("evidence_binding_posture", BOUNDARY_ALLOWED if all(isinstance(payload, dict) and payload for payload in [source_selection, request_shaping, response_mapping]) else BOUNDARY_UNKNOWN, "PASS" if all(isinstance(payload, dict) and payload for payload in [source_selection, request_shaping, response_mapping]) else "UNKNOWN", [row["path"] for row in evidence_tool_rows], "PR-01/PR-02/PR-03 dependency payloads are present and non-empty; index/path-proof validation is delegated to governed tools" if all(isinstance(payload, dict) and payload for payload in [source_selection, request_shaping, response_mapping]) else "dependency evidence payloads are missing or empty", []),
+        boundary_finding("hde_ferm007_5_runtime_v2_live_open_rails_ai_scope", BOUNDARY_OUT_OF_SCOPE, "PASS", [row["path"] for row in evidence_tool_rows], "explicitly outside W-002 / HDE-FERM007.4; no claim is emitted", []),
+    ]
+    check_by_category = {finding["category"]: finding_passes(finding) for finding in findings}
+    checks = {
+        "adapter_http_home_inspected": check_by_category["adapter_route_registration"],
+        "actual_repo_loci_discovered_before_classification": all([adapter_rows, presenter_rows, vendor_rows, pure_rows, evidence_tool_rows]),
+        "hard_coded_path_lists_not_used_as_proof": bool(discovered_public_routes) or adapter_loci != canonical_adapter_loci,
+        "unknown_current_categories_fail_closed": all(f["verdict"] != "PASS" for f in findings if f["classification"] == BOUNDARY_UNKNOWN),
+        "conservative_positive_boundary_contract_applied": {f["classification"] for f in findings} <= {BOUNDARY_ALLOWED, BOUNDARY_FORBIDDEN, BOUNDARY_UNKNOWN, BOUNDARY_OUT_OF_SCOPE},
+        "presenter_emitter_inspected": check_by_category["presenter_provenance"],
+        "vendor_seam_inspected": bool(vendor_rows) and ("urllib.request" in vendor_modules or "urllib" in vendor_modules or "urlrequest.urlopen" in vendor_calls),
+        "no_second_http_home": not second_http_home,
+        "no_adapter_bypass": not adapter_bypass,
+        "no_presenter_bypass": not presenter_bypass and not unresolved_presenter_routes and bool(adapter_presenter_calls),
+        "no_ad_hoc_serialization": not ad_hoc_serializers,
+        "no_pure_compute_external_io": not pure_external_io,
+        "guard_provenance_per_relevant_path": check_by_category["guard_provenance"],
+        "prior_evidence_families_bound": check_by_category["evidence_binding_posture"],
+        "no_public_reader_change": check_by_category["public_routes"],
+        "no_unsupported_scope_claim": check_by_category["public_surface_posture"],
+    }
+    verdict_status = "PASS" if all(checks.values()) and all(finding_passes(f) for f in findings) else ("FAIL" if any(f["classification"] == BOUNDARY_FORBIDDEN for f in findings) else "UNKNOWN")
+    return {
+        "work_item": "W-002",
+        "scope": "HDE-EPIC034 PR-04 analyzer-owned adapter/presenter boundary proof for HDE-FERM007.4 only",
+        "inspected_loci": {"adapter": adapter_rows, "presenter": presenter_rows, "engine": pure_rows, "vendor_seam": vendor_rows, "evidence_tool": evidence_tool_rows},
+        "findings": findings,
+        "unknowns": [f for f in findings if f["classification"] == BOUNDARY_UNKNOWN],
+        "public_route_deltas": public_reader_route_drift,
+        "public_internal_route_classification_posture": next(f for f in findings if f["category"] == "public_routes"),
+        "response_producing_path_findings": next(f for f in findings if f["category"] == "response_producing_paths"),
+        "presenter_provenance": next(f for f in findings if f["category"] == "presenter_provenance"),
+        "serializer_findings": next(f for f in findings if f["category"] == "serializer_paths"),
+        "external_io_findings": next(f for f in findings if f["category"] == "external_io_paths"),
+        "pure_compute_external_io_findings": next(f for f in findings if f["category"] == "pure_compute_external_io"),
+        "guard_provenance": {"finding": next(f for f in findings if f["category"] == "guard_provenance"), "guarded_entrypoints": guarded_entrypoints, "guarded_external_io": guard_allowed, "unresolved_external_io": guard_unresolved},
+        "evidence_family_binding_posture": next(f for f in findings if f["category"] == "evidence_binding_posture"),
+        "unsupported_scope_claims": unsupported_scope_claims,
+        "discovered_public_route_signatures": discovered_public_routes,
+        "discovered_presenter_calls": adapter_presenter_calls,
+        "checks": checks,
+        "verdict_status": verdict_status,
+    }

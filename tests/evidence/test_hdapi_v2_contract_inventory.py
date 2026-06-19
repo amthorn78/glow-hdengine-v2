@@ -4,6 +4,7 @@ import copy
 import csv
 import json
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -3201,7 +3202,10 @@ def test_epic034_adapter_boundary_requires_low_level_vendor_io_guard() -> None:
 def test_epic034_adapter_boundary_reports_positive_contract_classifications() -> None:
     proof, checks = generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
     assert checks["conservative_positive_boundary_contract_applied"] is True
-    assert "work_item=W-001" in proof
+    assert "work_item=W-002" in proof
+    assert "analyzer_rendering_separation=" in proof
+    assert "renderer_only_posture=" in proof
+    assert "analyzer_owned_verdict_status=PASS" in proof
     assert "classification_categories_used=allowed,forbidden,unknown / fail-closed,out of scope" in proof
     assert "unknown_current_categories_fail_closed=true" in proof
     for category in [
@@ -3220,7 +3224,101 @@ def test_epic034_adapter_boundary_reports_positive_contract_classifications() ->
 
 
 def test_epic034_boundary_unknown_category_is_fail_closed() -> None:
-    finding = generator._boundary_finding("synthetic_unknown", generator.BOUNDARY_UNKNOWN, "FAIL", ["synthetic.py"], "unresolved current category")
-    assert generator._finding_passes(finding) is False
-    bad_finding = generator._boundary_finding("synthetic_unknown", generator.BOUNDARY_UNKNOWN, "PASS", ["synthetic.py"], "would be false pass")
-    assert generator._finding_passes(bad_finding) is False
+    finding = boundary_analyzer.boundary_finding("synthetic_unknown", boundary_analyzer.BOUNDARY_UNKNOWN, "UNKNOWN", ["synthetic.py"], "unresolved current category")
+    assert boundary_analyzer.finding_passes(finding) is False
+    bad_finding = boundary_analyzer.boundary_finding("synthetic_unknown", boundary_analyzer.BOUNDARY_UNKNOWN, "PASS", ["synthetic.py"], "would be false pass")
+    assert boundary_analyzer.finding_passes(bad_finding) is False
+
+
+
+def _epic034_analyzer_result() -> dict[str, Any]:
+    source_selection, request_shaping, response_mapping = _epic034_boundary_inputs()
+    return boundary_analyzer.analyze_adapter_boundary(
+        source_selection=source_selection,
+        request_shaping=request_shaping,
+        response_mapping=response_mapping,
+        adapter_loci=generator.ADAPTER_BOUNDARY_ADAPTER_LOCI,
+        canonical_adapter_loci=generator.ADAPTER_BOUNDARY_CANONICAL_ADAPTER_LOCI,
+        presenter_loci=generator.ADAPTER_BOUNDARY_PRESENTER_LOCI,
+        vendor_seam_loci=generator.ADAPTER_BOUNDARY_VENDOR_SEAM_LOCI,
+        pure_compute_loci=generator.ADAPTER_BOUNDARY_PURE_COMPUTE_LOCI,
+        public_route_baseline=generator.ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE,
+        evidence_tool_loci=("tools/evidence/generate_hdapi_v2_contract_inventory.py", "tools/evidence/hdapi_v2_boundary_analyzer.py"),
+    )
+
+
+def test_epic034_w002_generator_consumes_analyzer_output_without_recomputing(monkeypatch: pytest.MonkeyPatch) -> None:
+    result = _epic034_analyzer_result()
+    result["findings"][0]["details"] = ["sentinel_analyzer_owned_detail"]
+    result["discovered_public_route_signatures"] = ["sentinel_analyzer_owned_route"]
+
+    def fake_analyze(**_kwargs: Any) -> dict[str, Any]:
+        return result
+
+    monkeypatch.setattr(boundary_analyzer, "analyze_adapter_boundary", fake_analyze)
+    proof, checks = generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    assert checks["conservative_positive_boundary_contract_applied"] is True
+    assert "sentinel_analyzer_owned_detail" in proof
+    assert "sentinel_analyzer_owned_route" in proof
+    assert "renderer_only_posture=evidence generator does not rediscover" in proof
+
+
+def test_epic034_w002_renderer_refuses_non_pass_analyzer_verdict_even_when_checks_pass() -> None:
+    result = _epic034_analyzer_result()
+    assert all(result["checks"].values())
+    result["verdict_status"] = "UNKNOWN"
+    with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_ANALYZER_VERDICT_NON_PASS:UNKNOWN"):
+        generator.render_adapter_boundary_proof("2026-06-18T00:00:00Z", result)
+
+    result = _epic034_analyzer_result()
+    assert all(result["checks"].values())
+    result["verdict_status"] = "FAIL"
+    with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_ANALYZER_VERDICT_NON_PASS:FAIL"):
+        generator.render_adapter_boundary_proof("2026-06-18T00:00:00Z", result)
+
+
+def test_epic034_w002_renderer_refuses_unknown_or_forbidden_pass() -> None:
+    result = _epic034_analyzer_result()
+    result["findings"][0]["classification"] = boundary_analyzer.BOUNDARY_UNKNOWN
+    result["findings"][0]["verdict"] = "PASS"
+    with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_RENDERER_REFUSED_UNKNOWN_PASS"):
+        generator.render_adapter_boundary_proof("2026-06-18T00:00:00Z", result)
+
+    result = _epic034_analyzer_result()
+    result["findings"][0]["classification"] = boundary_analyzer.BOUNDARY_FORBIDDEN
+    result["findings"][0]["verdict"] = "PASS"
+    with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_RENDERER_REFUSED_FORBIDDEN_PASS"):
+        generator.render_adapter_boundary_proof("2026-06-18T00:00:00Z", result)
+
+
+def test_epic034_w002_analyzer_findings_survive_rendering_and_no_claims_remain() -> None:
+    result = _epic034_analyzer_result()
+    proof, checks = generator.render_adapter_boundary_proof("2026-06-18T00:00:00Z", result)
+    check_log = generator.build_adapter_boundary_check_log("2026-06-18T00:00:00Z", proof, checks, mode="closed-rails-source-cache")
+    for needle in [
+        "public_route_findings_and_verdict=allowed:PASS",
+        "presenter_provenance_findings_and_verdict=allowed:PASS",
+        "serializer_findings_and_verdict=allowed:PASS",
+        "external_io_findings_and_verdict=allowed:PASS",
+        "guard_provenance_findings_and_verdict=allowed:PASS",
+        "no_HDE-FERM007.5_claim=NONE",
+        "no_HDE-FERM008_claim=NONE",
+        "no_runtime_v2_conformance_claim=NONE",
+        "no_live_vendor_conformance_claim=NONE",
+        "no_open_rails_smoke_claim=NONE",
+        "no_public_reader_change_claim=NONE",
+        "no_new_HTTP_home_claim=NONE",
+        "no_AI_scope_claim=NONE",
+    ]:
+        assert needle in proof
+    for needle in [
+        "analyzer_rendering_separation_was_applied=true",
+        "evidence_generator_rendered_analyzer_output_only=true",
+        "renderer_did_not_recompute_boundary_truth=true",
+        "public_route_findings_were_carried_from_analyzer_to_renderer=true",
+        "presenter_provenance_findings_were_carried_from_analyzer_to_renderer=true",
+        "external_io_findings_were_carried_from_analyzer_to_renderer=true",
+        "guard_provenance_findings_were_carried_from_analyzer_to_renderer=true",
+        "no_unsupported_scope_claim_was_emitted=true",
+    ]:
+        assert needle in check_log
