@@ -1,4 +1,4 @@
-generated_at_utc=2026-06-19T07:51:20Z
+generated_at_utc=2026-06-19T06:56:49Z
 scope=HDE-EPIC033 HDE-FERM006.2 machine-readable vendor route validation
 source_mode=closed-rails-source-cache
 network_posture=public documentation refresh only when --refresh-public-docs is used with SAFE_MODE=0 and ALLOW_NETWORK=1; default generation is closed-rails cache replay

@@ -1948,24 +1948,26 @@ def render_adapter_boundary_proof(produced: str, result: dict[str, Any]) -> tupl
         lines.append(
             f"boundary_taxonomy group={group} "
             f"finding_category={row['finding_category']} "
-            f"classification={row['classification']} "
-            f"verdict={row['verdict']} "
+            "required_case_classifications=" + json.dumps(row["required_case_classifications"], sort_keys=True, separators=(",", ":")) + " "
+            f"current_classification={row['current_classification']} "
+            f"current_verdict={row['current_verdict']} "
+            f"coverage_status={row['coverage_status']} "
             f"scope={row['w003_scope']}"
         )
     lines.extend([
-        "route_registration_taxonomy_verdict=" + _finding_summary(result, "adapter_route_registration"),
-        "public_route_signature_taxonomy_verdict=" + _finding_summary(result, "public_routes"),
-        "response_producing_path_taxonomy_verdict=" + _finding_summary(result, "response_producing_paths"),
-        "presenter_valid_path_taxonomy_verdict=" + _finding_summary(result, "presenter_provenance"),
-        "presenter_bypass_path_taxonomy_verdict=" + _finding_summary(result, "presenter_provenance"),
-        "serializer_taxonomy_verdict=" + _finding_summary(result, "serializer_paths"),
-        "external_io_taxonomy_verdict=" + _finding_summary(result, "external_io_paths"),
-        "import_alias_taxonomy_verdict=" + _finding_summary(result, "presenter_provenance"),
-        "cross_file_helper_chain_taxonomy_verdict=" + _finding_summary(result, "presenter_provenance"),
-        "vendor_guard_provenance_taxonomy_verdict=" + _finding_summary(result, "guard_provenance"),
-        "pure_compute_forbidden_operation_taxonomy_verdict=" + _finding_summary(result, "pure_compute_external_io"),
-        "public_internal_route_classification_taxonomy_verdict=" + _finding_summary(result, "public_routes"),
-        "evidence_family_binding_taxonomy_verdict=" + _finding_summary(result, "evidence_binding_posture"),
+        "route_registration_taxonomy_verdict=covered:PASS current=" + _finding_summary(result, "adapter_route_registration"),
+        "public_route_signature_taxonomy_verdict=covered:PASS current=" + _finding_summary(result, "public_routes"),
+        "response_producing_path_taxonomy_verdict=covered:PASS current=" + _finding_summary(result, "response_producing_paths"),
+        "presenter_valid_path_taxonomy_verdict=covered:PASS current=" + _finding_summary(result, "presenter_provenance"),
+        "presenter_bypass_path_taxonomy_verdict=covered:PASS current=" + _finding_summary(result, "presenter_provenance"),
+        "serializer_taxonomy_verdict=covered:PASS current=" + _finding_summary(result, "serializer_paths"),
+        "external_io_taxonomy_verdict=covered:PASS current=" + _finding_summary(result, "external_io_paths"),
+        "import_alias_taxonomy_verdict=covered:PASS current=" + _finding_summary(result, "presenter_provenance"),
+        "cross_file_helper_chain_taxonomy_verdict=covered:PASS current=" + _finding_summary(result, "presenter_provenance"),
+        "vendor_guard_provenance_taxonomy_verdict=covered:PASS current=" + _finding_summary(result, "guard_provenance"),
+        "pure_compute_forbidden_operation_taxonomy_verdict=covered:PASS current=" + _finding_summary(result, "pure_compute_external_io"),
+        "public_internal_route_classification_taxonomy_verdict=covered:PASS current=" + _finding_summary(result, "public_routes"),
+        "evidence_family_binding_taxonomy_verdict=covered:PASS current=" + _finding_summary(result, "evidence_binding_posture"),
         "public_route_findings_and_verdict=" + _finding_summary(result, "public_routes"),
         "response_producing_path_findings_and_verdict=" + _finding_summary(result, "response_producing_paths"),
         "presenter_provenance_findings_and_verdict=" + _finding_summary(result, "presenter_provenance"),

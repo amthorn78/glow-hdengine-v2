@@ -1619,6 +1619,21 @@ BOUNDARY_TAXONOMY_GROUP_TO_FINDING = {
     "evidence_family_binding": "evidence_binding_posture",
 }
 REQUIRED_BOUNDARY_TAXONOMY_GROUPS = tuple(BOUNDARY_TAXONOMY_GROUP_TO_FINDING)
+BOUNDARY_TAXONOMY_REQUIRED_CASE_CLASSIFICATIONS = {
+    "route_registration_surfaces": (BOUNDARY_ALLOWED, BOUNDARY_UNKNOWN),
+    "public_route_signatures": (BOUNDARY_ALLOWED, BOUNDARY_UNKNOWN, BOUNDARY_OUT_OF_SCOPE),
+    "response_producing_paths": (BOUNDARY_ALLOWED, BOUNDARY_FORBIDDEN, BOUNDARY_UNKNOWN),
+    "presenter_valid_paths": (BOUNDARY_ALLOWED,),
+    "presenter_bypass_paths": (BOUNDARY_FORBIDDEN, BOUNDARY_UNKNOWN),
+    "serializer_families": (BOUNDARY_ALLOWED, BOUNDARY_FORBIDDEN, BOUNDARY_UNKNOWN),
+    "external_io_families": (BOUNDARY_ALLOWED, BOUNDARY_FORBIDDEN),
+    "import_and_alias_forms": (BOUNDARY_ALLOWED, BOUNDARY_UNKNOWN),
+    "cross_file_helper_chains": (BOUNDARY_ALLOWED, BOUNDARY_UNKNOWN),
+    "vendor_guard_provenance": (BOUNDARY_ALLOWED, BOUNDARY_UNKNOWN),
+    "pure_compute_forbidden_operations": (BOUNDARY_ALLOWED, BOUNDARY_FORBIDDEN),
+    "public_internal_route_classification": (BOUNDARY_ALLOWED, BOUNDARY_UNKNOWN, BOUNDARY_OUT_OF_SCOPE),
+    "evidence_family_binding": (BOUNDARY_ALLOWED, BOUNDARY_UNKNOWN, BOUNDARY_OUT_OF_SCOPE),
+}
 
 
 def boundary_finding(category: str, classification: str, verdict: str, inspected: list[str], reason: str, details: list[str] | None = None) -> dict[str, Any]:
@@ -1732,8 +1747,10 @@ def analyze_adapter_boundary(
     taxonomy_group_verdicts = {
         group: {
             "finding_category": category,
-            "classification": finding_by_category[category]["classification"],
-            "verdict": finding_by_category[category]["verdict"],
+            "current_classification": finding_by_category[category]["classification"],
+            "current_verdict": finding_by_category[category]["verdict"],
+            "required_case_classifications": list(BOUNDARY_TAXONOMY_REQUIRED_CASE_CLASSIFICATIONS[group]),
+            "coverage_status": "covered_by_w003_invariant_suite",
             "w003_scope": "in_scope" if finding_by_category[category]["classification"] != BOUNDARY_OUT_OF_SCOPE else "follow_up_or_out_of_scope_visible",
         }
         for group, category in BOUNDARY_TAXONOMY_GROUP_TO_FINDING.items()

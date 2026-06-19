@@ -1083,6 +1083,12 @@ def test_epic034_w003_taxonomy_required_groups_are_complete_and_visible() -> Non
     assert set(result["boundary_taxonomy"]) == W003_REQUIRED_TAXONOMY_GROUPS
     assert result["checks"]["table_driven_boundary_taxonomy_applied"] is True
     assert result["checks"]["required_taxonomy_groups_visible"] is True
+    for group, row in result["boundary_taxonomy"].items():
+        expected_case_classes = set(boundary_analyzer.BOUNDARY_TAXONOMY_REQUIRED_CASE_CLASSIFICATIONS[group])
+        assert set(row["required_case_classifications"]) == expected_case_classes
+        assert row["coverage_status"] == "covered_by_w003_invariant_suite"
+        assert "classification" not in row
+        assert "verdict" not in row
 
 
 def test_epic034_w003_taxonomy_covers_all_classifications_and_fail_closed() -> None:
@@ -1097,6 +1103,16 @@ def test_epic034_w003_taxonomy_covers_all_classifications_and_fail_closed() -> N
         if row["expected_classification"] in {boundary_analyzer.BOUNDARY_UNKNOWN, boundary_analyzer.BOUNDARY_FORBIDDEN}:
             finding = boundary_analyzer.boundary_finding(row["expected_category"], row["expected_classification"], "PASS", ["synthetic.py"], row["description"])
             assert boundary_analyzer.finding_passes(finding) is False, row["case_id"]
+
+
+def test_epic034_w003_taxonomy_rendering_does_not_relabel_negative_groups_as_current_pass() -> None:
+    proof, _checks = generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    assert "boundary_taxonomy group=presenter_bypass_paths finding_category=presenter_provenance classification=allowed verdict=PASS" not in proof
+    assert "boundary_taxonomy group=pure_compute_forbidden_operations finding_category=pure_compute_external_io classification=allowed verdict=PASS" not in proof
+    assert "boundary_taxonomy group=presenter_bypass_paths" in proof
+    assert "required_case_classifications=[\"forbidden\",\"unknown / fail-closed\"]" in proof
+    assert "coverage_status=covered_by_w003_invariant_suite" in proof
+    assert "presenter_bypass_path_taxonomy_verdict=covered:PASS current=allowed:PASS" in proof
 
 
 @pytest.mark.parametrize("row", W003_TAXONOMY_ROWS, ids=[row["case_id"] for row in W003_TAXONOMY_ROWS])
