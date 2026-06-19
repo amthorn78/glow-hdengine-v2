@@ -3783,3 +3783,120 @@ def test_epic034_w004_route_findings_survive_renderer_output() -> None:
         "newly_discovered_public_routes_cannot_collapse_to_empty_comparison=true",
     ]:
         assert needle in check_log
+
+
+def test_epic034_w004_dynamic_blueprint_and_register_prefixes_fail_closed(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    cases = {
+        "dynamic_blueprint_prefix.py": """
+from flask import Blueprint
+from engine.presenter.emitter import emit_public
+PREFIX = '/dynamic'
+bp = Blueprint('reader', __name__, url_prefix=PREFIX)
+@bp.get('/reader')
+def reader():
+    return emit_public({'ok': True})
+""",
+        "dynamic_register_prefix.py": """
+from flask import Flask, Blueprint
+from engine.presenter.emitter import emit_public
+PREFIX = '/dynamic'
+app = Flask(__name__)
+bp = Blueprint('reader', __name__)
+@bp.get('/reader')
+def reader():
+    return emit_public({'ok': True})
+app.register_blueprint(bp, url_prefix=PREFIX)
+""",
+    }
+    rel_dir = "tmp_boundary_test"
+    try:
+        for filename, body in cases.items():
+            adapter = _write_boundary_temp(rel_dir, filename, body)
+            signatures = tuple(boundary_analyzer._adapter_public_route_signatures((adapter,)))
+            assert any("public_internal_classification=unknown / fail-closed" in item for item in signatures)
+            monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
+            monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", signatures)
+            with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*route_signature_classification_unambiguous.*no_public_reader_change"):
+                generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004_add_url_rule_without_literal_path_fails_closed(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask
+from engine.presenter.emitter import emit_public
+ROUTE = '/added-dynamic'
+app = Flask(__name__)
+def added():
+    return emit_public({'ok': True})
+app.add_url_rule(ROUTE, 'added', view_func=added, methods=['GET'])
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004_dynamic_add_url.py", body)
+        signatures = tuple(boundary_analyzer._adapter_public_route_signatures((adapter,)))
+        assert any("registration=add_url_rule" in item for item in signatures)
+        assert any("public_internal_classification=unknown / fail-closed" in item for item in signatures)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", signatures)
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*route_signature_classification_unambiguous.*no_public_reader_change"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004_add_url_rule_imported_view_from_inspected_adapter_locus_is_signed() -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    view_body = """
+from engine.presenter.emitter import emit_public
+def imported_view():
+    return emit_public({'ok': True})
+"""
+    route_body = """
+from flask import Flask
+from tmp_boundary_test.w004_view_targets import imported_view
+app = Flask(__name__)
+app.add_url_rule('/imported-added', 'imported_endpoint', view_func=imported_view, methods=['POST'])
+"""
+    try:
+        view_rel = _write_boundary_temp(rel_dir, "w004_view_targets.py", view_body)
+        route_rel = _write_boundary_temp(rel_dir, "w004_imported_add_url.py", route_body)
+        signatures = boundary_analyzer._adapter_public_route_signatures((route_rel, view_rel))
+        joined = "\n".join(signatures)
+        assert "registration=add_url_rule" in joined
+        assert "path=/imported-added" in joined
+        assert "endpoint=imported_endpoint" in joined
+        assert "view=imported_view" in joined
+        assert "imported_view_target=tmp_boundary_test.w004_view_targets.imported_view" in joined
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004_uninspected_imported_add_url_view_fails_closed(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask
+from external_adapter.views import imported_view
+app = Flask(__name__)
+app.add_url_rule('/uninspected-import', 'uninspected', view_func=imported_view, methods=['GET'])
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004_uninspected_import.py", body)
+        signatures = tuple(boundary_analyzer._adapter_public_route_signatures((adapter,)))
+        assert any("imported_view_target=external_adapter.views.imported_view" in item for item in signatures)
+        assert any("public_internal_classification=unknown / fail-closed" in item for item in signatures)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", signatures)
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*route_signature_classification_unambiguous.*no_public_reader_change"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)

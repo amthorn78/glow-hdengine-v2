@@ -1941,6 +1941,7 @@ def render_adapter_boundary_proof(produced: str, result: dict[str, Any]) -> tupl
         "discovered_evidence_tool_loci_inspected=" + ",".join(row["path"] for row in loci["evidence_tool"]),
         "current_public_route_signatures_inspected=" + json.dumps(result["discovered_public_route_signatures"], sort_keys=True, separators=(",", ":")),
         "route_baseline_signatures_inspected=" + json.dumps(result.get("route_baseline_signatures", []), sort_keys=True, separators=(",", ":")),
+        "route_baseline_loci_inspected=" + json.dumps(result.get("route_baseline_loci", []), sort_keys=True, separators=(",", ":")),
         "discovered_public_route_signatures=" + json.dumps(result["discovered_public_route_signatures"], sort_keys=True, separators=(",", ":")),
         "public_route_deltas=" + json.dumps(result["public_route_deltas"], sort_keys=True, separators=(",", ":")),
         "unknown_route_signatures=" + json.dumps(result.get("unknown_route_signatures", []), sort_keys=True, separators=(",", ":")),

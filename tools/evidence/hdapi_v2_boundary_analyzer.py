@@ -310,25 +310,33 @@ def _join_route_prefix(prefix: str, route: str) -> str:
     return f"/{prefix.strip('/')}/{route.strip('/')}"
 
 
-def _blueprint_prefixes(tree: ast.AST) -> dict[str, str]:
-    prefixes: dict[str, str] = {}
+def _blueprint_prefix_metadata(tree: ast.AST) -> dict[str, tuple[str, bool]]:
+    prefixes: dict[str, tuple[str, bool]] = {}
     for node in ast.walk(tree):
         if not isinstance(node, (ast.Assign, ast.AnnAssign)) or not isinstance(node.value, ast.Call):
             continue
         if _attribute_chain(node.value.func).rsplit(".", 1)[-1] != "Blueprint":
             continue
         url_prefix = ""
+        dynamic_prefix = False
         for keyword in node.value.keywords:
             if keyword.arg == "url_prefix":
-                url_prefix = _string_constant(keyword.value) or ""
-        if not url_prefix:
+                parsed = _string_constant(keyword.value)
+                if parsed is None:
+                    dynamic_prefix = True
+                else:
+                    url_prefix = parsed
+        if not url_prefix and not dynamic_prefix:
             continue
         targets = node.targets if isinstance(node, ast.Assign) else [node.target]
         for target in targets:
             if isinstance(target, ast.Name):
-                prefixes[target.id] = url_prefix
+                prefixes[target.id] = (url_prefix, dynamic_prefix)
     return prefixes
 
+
+def _blueprint_prefixes(tree: ast.AST) -> dict[str, str]:
+    return {name: prefix for name, (prefix, _dynamic) in _blueprint_prefix_metadata(tree).items()}
 
 def _decorator_route_root(deco_call: ast.AST) -> str:
     if isinstance(deco_call, ast.Attribute):
@@ -353,15 +361,31 @@ def _routing_keywords(call: ast.Call) -> str:
     return ",".join(sorted(values))
 
 
-def _resolve_imported_target(expr: str, aliases: dict[str, str]) -> str:
+def _resolve_imported_target(expr: str, aliases: dict[str, str], inspected_modules: set[str] | None = None) -> str:
     if not expr:
         return ""
     root, _, suffix = expr.partition(".")
     target = aliases.get(root, "")
     if not target:
         return ""
-    return target + (("." + suffix) if suffix else "")
+    resolved = target + (("." + suffix) if suffix else "")
+    if inspected_modules is None:
+        return resolved
+    module = target.rsplit(".", 1)[0] if suffix else target
+    return resolved if module in inspected_modules or target in inspected_modules else resolved
 
+
+
+
+def _imported_target_module(expr: str, aliases: dict[str, str]) -> str:
+    root, _sep, _suffix = expr.partition(".")
+    target = aliases.get(root, "")
+    return target.rsplit(".", 1)[0] if target else ""
+
+
+def _imported_target_is_inspected(expr: str, aliases: dict[str, str], inspected_modules: set[str]) -> bool:
+    module = _imported_target_module(expr, aliases)
+    return not module or module in inspected_modules
 
 def _route_classification(path: str, *, has_dynamic_path: bool = False) -> str:
     if has_dynamic_path:
@@ -391,10 +415,47 @@ def _route_signature(**fields: str) -> str:
     return ";".join(f"{key}={_route_signature_field(fields.get(key, ''))}" for key in ordered)
 
 
+
+
+def _route_signature_fields(signature: str) -> dict[str, str]:
+    # The signature vocabulary is intentionally simple and deterministic; this parser
+    # is used only for analyzer-owned reconciliation checks. Values may contain
+    # escaped separators, so split only on unescaped delimiters.
+    fields: dict[str, str] = {}
+    pieces: list[str] = []
+    current: list[str] = []
+    escaped = False
+    for char in signature:
+        if escaped:
+            current.append(char)
+            escaped = False
+        elif char == "\\":
+            escaped = True
+        elif char == ";":
+            pieces.append("".join(current))
+            current = []
+        else:
+            current.append(char)
+    pieces.append("".join(current))
+    for piece in pieces:
+        key, sep, value = piece.partition("=")
+        if sep:
+            fields[key] = value
+    return fields
+
+
+def _route_signature_loci(signatures: tuple[str, ...] | list[str]) -> set[str]:
+    return {fields["locus"] for fields in (_route_signature_fields(item) for item in signatures) if fields.get("locus")}
+
+
+def _module_name_for_locus(rel: str) -> str:
+    return rel.removesuffix(".py").replace("/", ".")
+
 def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
     """Return stable public adapter route/hook registrations for PR-04 drift checks."""
 
     signatures: list[str] = []
+    inspected_modules = {_module_name_for_locus(rel) for rel in loci}
     route_decorator_suffixes = (
         ".route",
         ".get",
@@ -412,7 +473,7 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
     for rel in loci:
         _path, _text, tree = _python_source(rel)
         aliases = _import_aliases(tree)
-        blueprint_prefixes = _blueprint_prefixes(tree)
+        blueprint_prefixes = _blueprint_prefix_metadata(tree)
         for node in ast.walk(tree):
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 for deco in node.decorator_list:
@@ -433,9 +494,9 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                             else:
                                 route_arg = raw_route_arg
                     route_root = _decorator_route_root(deco_call)
-                    blueprint_prefix = blueprint_prefixes.get(route_root, "")
+                    blueprint_prefix, dynamic_blueprint_prefix = blueprint_prefixes.get(route_root, ("", False))
                     full_route_arg = _join_route_prefix(blueprint_prefix, route_arg)
-                    classification = _route_classification(full_route_arg, has_dynamic_path=has_dynamic_path)
+                    classification = _route_classification(full_route_arg, has_dynamic_path=has_dynamic_path or dynamic_blueprint_prefix)
                     if classification == "internal":
                         continue
                     methods = _route_methods(deco_name, deco)
@@ -452,14 +513,15 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                         blueprint_constructor_prefix=blueprint_prefix,
                         errorhandler_key=errorhandler_key,
                         routing_keywords=routing_keywords,
-                        imported_view_target=_resolve_imported_target(node.name, aliases),
+                        imported_view_target=_resolve_imported_target(node.name, aliases, inspected_modules),
                         public_internal_classification=classification,
                     ))
             if isinstance(node, ast.Call) and _attribute_chain(node.func).endswith(".add_url_rule"):
-                raw_add_url_route = _string_constant(node.args[0]) if node.args else ""
+                raw_add_url_route = _string_constant(node.args[0]) if node.args else None
                 route_arg = raw_add_url_route or ""
-                has_dynamic_path = bool(node.args) and raw_add_url_route is None
+                has_dynamic_path = raw_add_url_route is None
                 endpoint = _string_constant(node.args[1]) if len(node.args) > 1 else ""
+                has_dynamic_endpoint = len(node.args) > 1 and endpoint is None
                 view_desc = ""
                 methods = ""
                 for keyword in node.keywords:
@@ -471,7 +533,8 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                             methods = ",".join(sorted(method_values))
                 if not view_desc and len(node.args) >= 3:
                     view_desc = _attribute_chain(node.args[2].func) if isinstance(node.args[2], ast.Call) else _attribute_chain(node.args[2])
-                classification = _route_classification(route_arg or "", has_dynamic_path=has_dynamic_path)
+                imported_view_uninspected = bool(view_desc) and not _imported_target_is_inspected(view_desc, aliases, inspected_modules)
+                classification = _route_classification(route_arg or "", has_dynamic_path=has_dynamic_path or has_dynamic_endpoint or imported_view_uninspected)
                 if classification == "internal":
                     continue
                 signatures.append(_route_signature(
@@ -482,16 +545,22 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                     endpoint=endpoint or view_desc,
                     view=view_desc,
                     routing_keywords=_routing_keywords(node),
-                    imported_view_target=_resolve_imported_target(view_desc, aliases),
+                    imported_view_target=_resolve_imported_target(view_desc, aliases, inspected_modules),
                     public_internal_classification=classification,
                 ))
             if isinstance(node, ast.Call) and _attribute_chain(node.func).endswith(".register_blueprint"):
                 blueprint = _expr_name(node.args[0]) if node.args else ""
                 url_prefix = ""
+                dynamic_url_prefix = False
                 for keyword in node.keywords:
                     if keyword.arg == "url_prefix":
-                        url_prefix = _string_constant(keyword.value) or ""
-                classification = _route_classification(url_prefix)
+                        parsed_prefix = _string_constant(keyword.value)
+                        if parsed_prefix is None:
+                            dynamic_url_prefix = True
+                        else:
+                            url_prefix = parsed_prefix
+                imported_blueprint_uninspected = bool(blueprint) and not _imported_target_is_inspected(blueprint, aliases, inspected_modules)
+                classification = _route_classification(url_prefix, has_dynamic_path=dynamic_url_prefix or imported_blueprint_uninspected)
                 if classification == "internal":
                     continue
                 signatures.append(_route_signature(
@@ -500,7 +569,7 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                     blueprint=blueprint,
                     register_blueprint_prefix=url_prefix,
                     routing_keywords=_routing_keywords(node),
-                    imported_view_target=_resolve_imported_target(blueprint, aliases),
+                    imported_view_target=_resolve_imported_target(blueprint, aliases, inspected_modules),
                     public_internal_classification=classification,
                 ))
     return sorted(set(signatures))
@@ -1851,7 +1920,8 @@ def analyze_adapter_boundary(
     unknown_route_signatures = sorted(item for item in discovered_public_routes if "public_internal_classification=unknown / fail-closed" in item)
     route_baseline_missing_or_incomplete = not public_route_baseline or not discovered_public_routes
     route_baseline_out_of_scope = not discovered_public_routes and adapter_loci != canonical_adapter_loci
-    route_loci_reconciled = set(adapter_loci) == set(canonical_adapter_loci) or not public_reader_route_drift
+    route_baseline_loci = _route_signature_loci(public_route_baseline)
+    route_loci_reconciled = bool(route_baseline_loci) and route_baseline_loci == set(adapter_loci)
     route_baseline_reconciled = (
         bool(discovered_public_routes)
         and bool(public_route_baseline)
@@ -1901,7 +1971,7 @@ def analyze_adapter_boundary(
         "hard_coded_path_lists_not_used_as_proof": bool(discovered_public_routes) or route_baseline_out_of_scope,
         "route_baseline_present": bool(public_route_baseline) or route_baseline_out_of_scope,
         "route_baseline_reconciled": route_baseline_reconciled or route_baseline_out_of_scope,
-        "route_loci_reconciled_or_failed_closed": route_loci_reconciled or not route_baseline_reconciled,
+        "route_loci_reconciled_or_failed_closed": route_loci_reconciled or route_baseline_out_of_scope or not check_by_category["public_routes"],
         "new_public_routes_cannot_collapse_to_empty_comparison": (bool(discovered_public_routes) and not route_baseline_missing_or_incomplete) or route_baseline_out_of_scope,
         "route_signature_classification_unambiguous": not unknown_route_signatures,
         "unknown_current_categories_fail_closed": all(f["verdict"] != "PASS" for f in findings if f["classification"] == BOUNDARY_UNKNOWN),
@@ -1933,6 +2003,7 @@ def analyze_adapter_boundary(
         "public_route_deltas": public_reader_route_drift,
         "route_baseline_reconciled": route_baseline_reconciled,
         "route_baseline_signatures": list(public_route_baseline),
+        "route_baseline_loci": sorted(route_baseline_loci),
         "unknown_route_signatures": unknown_route_signatures,
         "public_internal_route_classification_posture": next(f for f in findings if f["category"] == "public_routes"),
         "response_producing_path_findings": next(f for f in findings if f["category"] == "response_producing_paths"),
