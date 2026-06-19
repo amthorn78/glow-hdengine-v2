@@ -2391,8 +2391,8 @@ def second():
     try:
         rel = _write_boundary_temp(rel_dir, "vendor_alias_io.py", body)
         findings = boundary_analyzer._vendor_external_io_functions((rel,))
-        assert f"{rel}:first:open_url" in findings
-        assert f"{rel}:second:rget" in findings
+        assert any(item.startswith(f"{rel}:first@") and item.endswith(":open_url") for item in findings)
+        assert any(item.startswith(f"{rel}:second@") and item.endswith(":rget") for item in findings)
     finally:
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
 
@@ -2485,6 +2485,85 @@ def test_epic034_public_route_signatures_exclude_internal_ops_dev() -> None:
     assert ':/dev/' not in proof
 
 
+def test_epic034_adapter_boundary_fails_closed_on_conditional_presenter_assignment(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask, Response
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+@app.route('/conditional')
+def conditional():
+    if False:
+        body = emit_public({'ok': True})
+    return Response(body)
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "conditional_presenter_assignment.py", body)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", tuple(boundary_analyzer._adapter_public_route_signatures((adapter,))))
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_presenter_bypass"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_vendor_guard_distinguishes_duplicate_function_names(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from urllib.request import urlopen
+
+class Guarded:
+    def call_vendor(self):
+        safe_mode = '1'
+        allow_network = '0'
+        if safe_mode != '0' or allow_network != '1':
+            raise RuntimeError('refused')
+        return urlopen('https://vendor.test/guarded')
+
+class Unguarded:
+    def call_vendor(self):
+        return urlopen('https://vendor.test/unguarded')
+"""
+    try:
+        rel = _write_boundary_temp(rel_dir, "duplicate_vendor_names.py", body)
+        findings = boundary_analyzer._vendor_external_io_functions((rel,))
+        assert any(item.startswith(f"{rel}:Guarded.call_vendor@") for item in findings)
+        assert any(item.startswith(f"{rel}:Unguarded.call_vendor@") for item in findings)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_VENDOR_SEAM_LOCI", (rel,))
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_VENDOR_GUARD_UNEXPECTED:.*Unguarded.call_vendor"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_vendor_guard_rejects_nested_raise_before_io(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from urllib.request import urlopen
+
+def nested_guard(debug=False):
+    safe_mode = '1'
+    allow_network = '0'
+    if safe_mode != '0' or allow_network != '1':
+        if debug:
+            raise RuntimeError('refused only in debug')
+    return urlopen('https://vendor.test')
+"""
+    try:
+        rel = _write_boundary_temp(rel_dir, "nested_vendor_guard.py", body)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_VENDOR_SEAM_LOCI", (rel,))
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_VENDOR_GUARD_UNEXPECTED:.*nested_guard"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
 def test_epic034_public_route_prefix_filter_keeps_developer_like_routes(monkeypatch: pytest.MonkeyPatch) -> None:
     import shutil
 
@@ -2529,7 +2608,7 @@ def inverted_guard():
     try:
         rel = _write_boundary_temp(rel_dir, "inverted_vendor_guard.py", body)
         monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_VENDOR_SEAM_LOCI", (rel,))
-        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_VENDOR_GUARD_UNEXPECTED:.*inverted_guard:urlopen"):
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_VENDOR_GUARD_UNEXPECTED:.*inverted_guard@.*:urlopen"):
             generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
     finally:
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
@@ -2551,7 +2630,7 @@ def late_guard():
     try:
         rel = _write_boundary_temp(rel_dir, "late_vendor_guard.py", body)
         monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_VENDOR_SEAM_LOCI", (rel,))
-        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_VENDOR_GUARD_UNEXPECTED:.*late_guard:urlopen"):
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_VENDOR_GUARD_UNEXPECTED:.*late_guard@.*:urlopen"):
             generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
     finally:
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
@@ -2885,7 +2964,7 @@ def unexpected_public():
 def test_epic034_adapter_boundary_requires_low_level_vendor_io_guard() -> None:
     proof, checks = generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
     assert checks["guard_provenance_per_relevant_path"] is True
-    assert "guarded_by=engine/bodygraph/vendor_client.py:_default_request" in proof
+    assert "guarded_by=engine/bodygraph/vendor_client.py:HdApiClient._default_request@" in proof
 
 def test_epic034_adapter_boundary_reports_positive_contract_classifications() -> None:
     proof, checks = generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())

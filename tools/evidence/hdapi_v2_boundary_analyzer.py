@@ -212,10 +212,7 @@ def _ad_hoc_json_serializers(loci: tuple[str, ...]) -> list[str]:
     for rel in loci:
         _path, _text, tree = _python_source(rel)
         aliases = _import_aliases(tree)
-        parents: dict[ast.AST, ast.AST] = {}
-        for parent in ast.walk(tree):
-            for child in ast.iter_child_nodes(parent):
-                parents[child] = parent
+        parents = _parent_map(tree)
         for node in ast.walk(tree):
             if not isinstance(node, ast.Call):
                 continue
@@ -930,13 +927,33 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
 
         def assigned_presenter_vars(fn: ast.FunctionDef | ast.AsyncFunctionDef, owner: str, seen: set[str]) -> set[str]:
             assignments: dict[str, list[ast.AST]] = {}
-            for node in iter_body_nodes(fn):
-                if not isinstance(node, (ast.Assign, ast.AnnAssign)) or node.value is None:
-                    continue
-                targets = node.targets if isinstance(node, ast.Assign) else [node.target]
-                for target in targets:
-                    if isinstance(target, ast.Name):
-                        assignments.setdefault(target.id, []).append(node.value)
+            branch_assignments: list[dict[str, list[list[ast.AST]]]] = []
+
+            def collect_direct_assignments(statements: list[ast.stmt]) -> dict[str, list[ast.AST]]:
+                found: dict[str, list[ast.AST]] = {}
+                for stmt in statements:
+                    if not isinstance(stmt, (ast.Assign, ast.AnnAssign)) or stmt.value is None:
+                        continue
+                    targets = stmt.targets if isinstance(stmt, ast.Assign) else [stmt.target]
+                    for target in targets:
+                        if isinstance(target, ast.Name):
+                            found.setdefault(target.id, []).append(stmt.value)
+                return found
+
+            for node in fn.body:
+                if isinstance(node, (ast.Assign, ast.AnnAssign)) and node.value is not None:
+                    targets = node.targets if isinstance(node, ast.Assign) else [node.target]
+                    for target in targets:
+                        if isinstance(target, ast.Name):
+                            assignments.setdefault(target.id, []).append(node.value)
+                elif isinstance(node, ast.If) and node.body and node.orelse:
+                    branch_maps = [collect_direct_assignments(node.body), collect_direct_assignments(node.orelse)]
+                    complete: dict[str, list[list[ast.AST]]] = {}
+                    for target_name in set(branch_maps[0]) & set(branch_maps[1]):
+                        complete[target_name] = [branch[target_name] for branch in branch_maps]
+                    if complete:
+                        branch_assignments.append(complete)
+
             names: set[str] = set()
             changed = True
             while changed:
@@ -945,6 +962,10 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
                 for target_name, values in assignments.items():
                     if values and all(value_has_presenter(value, owner, names, seen) for value in values):
                         next_names.add(target_name)
+                for complete in branch_assignments:
+                    for target_name, branch_values in complete.items():
+                        if all(values and all(value_has_presenter(value, owner, names, seen) for value in values) for values in branch_values):
+                            next_names.add(target_name)
                 if next_names != names:
                     names = next_names
                     changed = True
@@ -1090,10 +1111,44 @@ def _node_mentions_guard_symbol(node: ast.AST, symbol: str) -> bool:
     return False
 
 
+def _parent_map(tree: ast.AST) -> dict[ast.AST, ast.AST]:
+    parents: dict[ast.AST, ast.AST] = {}
+    for parent in ast.walk(tree):
+        for child in ast.iter_child_nodes(parent):
+            parents[child] = parent
+    return parents
+
+
+def _function_identity(node: ast.FunctionDef | ast.AsyncFunctionDef, parents: dict[ast.AST, ast.AST]) -> str:
+    parts = [node.name]
+    current = parents.get(node)
+    while current is not None:
+        if isinstance(current, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            parts.append(current.name)
+        current = parents.get(current)
+    return f"{'.'.join(reversed(parts))}@{node.lineno}"
+
+
+def _function_node_by_identity(tree: ast.AST, identity: str) -> ast.FunctionDef | ast.AsyncFunctionDef | None:
+    if "@" not in identity:
+        return _function_node_by_name(tree, identity)
+    qualname, line_text = identity.rsplit("@", 1)
+    try:
+        lineno = int(line_text)
+    except ValueError:
+        return None
+    parents = _parent_map(tree)
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.lineno == lineno and _function_identity(node, parents).rsplit("@", 1)[0] == qualname:
+            return node
+    return None
+
+
 def _vendor_guard_entrypoints(loci: tuple[str, ...]) -> list[str]:
     guarded: list[str] = []
     for rel in loci:
         _path, _text, tree = _python_source(rel)
+        parents = _parent_map(tree)
         for node in ast.walk(tree):
             if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 continue
@@ -1103,7 +1158,7 @@ def _vendor_guard_entrypoints(loci: tuple[str, ...]) -> list[str]:
                 and _node_mentions_guard_symbol(guarded_body, "ALLOW_NETWORK")
                 and any(isinstance(child, ast.Raise) for child in ast.walk(guarded_body))
             ):
-                guarded.append(f"{rel}:{node.name}")
+                guarded.append(f"{rel}:{_function_identity(node, parents)}")
     return sorted(set(guarded))
 
 
@@ -1204,11 +1259,11 @@ def _vendor_external_io_functions(loci: tuple[str, ...]) -> list[str]:
             )
             if not is_external:
                 continue
-            func_name = "<module>"
+            func_name = "<module>@0"
             current = parents.get(node)
             while current is not None:
                 if isinstance(current, (ast.FunctionDef, ast.AsyncFunctionDef)):
-                    func_name = current.name
+                    func_name = _function_identity(current, parents)
                     break
                 current = parents.get(current)
             findings.append(f"{rel}:{func_name}:{chain}")
@@ -1285,7 +1340,7 @@ def _stmt_has_guard_refusal(stmt: ast.stmt) -> bool:
                 return axes if axes == {"SAFE_MODE", "ALLOW_NETWORK"} else set()
         return set()
 
-    raises = any(isinstance(child, ast.Raise) for child in ast.walk(ast.Module(body=stmt.body, type_ignores=[])))
+    raises = any(isinstance(child, ast.Raise) for child in stmt.body)
     return raises and refusal_axes(stmt.test) == {"SAFE_MODE", "ALLOW_NETWORK"}
 
 
@@ -1295,7 +1350,7 @@ def _vendor_external_io_guard_dominates(item: str) -> bool:
         return False
     rel, func_name, chain = parts
     _path, _text, tree = _python_source(rel)
-    fn = _function_node_by_name(tree, func_name)
+    fn = _function_node_by_identity(tree, func_name)
     if fn is None:
         return False
     for stmt_index, stmt in enumerate(fn.body):
@@ -1309,11 +1364,11 @@ def _vendor_seam_guarded(loci: tuple[str, ...]) -> bool:
     external_io_functions = _vendor_external_io_functions(loci)
     if not external_io_functions:
         return True
-    allowed_low_level = {"engine/bodygraph/vendor_client.py:_default_request"}
+    allowed_low_level_prefixes = ("engine/bodygraph/vendor_client.py:_default_request@",)
     unguarded_external = [
         finding
         for finding in external_io_functions
-        if ":".join(finding.split(":", 2)[:2]) not in allowed_low_level
+        if not any(":".join(finding.split(":", 2)[:2]).startswith(prefix) for prefix in allowed_low_level_prefixes)
     ]
     return bool(guarded_entrypoints) and not unguarded_external
 

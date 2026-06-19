@@ -1873,15 +1873,12 @@ def _vendor_guard_provenance_findings(loci: tuple[str, ...]) -> tuple[list[str],
     external_io = boundary_analyzer._vendor_external_io_functions(loci)
     guarded = boundary_analyzer._vendor_guard_entrypoints(loci)
     guarded_keys = {":".join(item.split(":", 2)[:2]) for item in guarded}
-    allowed_low_level = {"engine/bodygraph/vendor_client.py:_default_request"}
     unresolved: list[str] = []
     allowed: list[str] = []
     for item in external_io:
         key = ":".join(item.split(":", 2)[:2])
         if key in guarded_keys and boundary_analyzer._vendor_external_io_guard_dominates(item):
             allowed.append(item + " guarded_by=" + key)
-        elif key in allowed_low_level and key in guarded_keys and boundary_analyzer._vendor_external_io_guard_dominates(item):
-            allowed.append(item + " guarded_by_low_level_helper=" + key)
         else:
             unresolved.append(item)
     return allowed, unresolved, guarded
