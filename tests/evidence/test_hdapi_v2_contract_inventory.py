@@ -913,8 +913,8 @@ W003_TAXONOMY_ROWS = [
         "description": "raw public route responses are presenter bypasses and cannot render as PASS",
         "fixture": "plain_response_route",
         "locus_type": "adapter",
-        "expected_classification": boundary_analyzer.BOUNDARY_UNKNOWN,
-        "expected_verdict": "UNKNOWN",
+        "expected_classification": boundary_analyzer.BOUNDARY_FORBIDDEN,
+        "expected_verdict": "FAIL",
         "expected_category": "presenter_provenance",
         "proof_fragment": "presenter provenance is not proven",
         "scope": "W-003 in scope",
@@ -949,8 +949,8 @@ W003_TAXONOMY_ROWS = [
         "description": "import aliases and local shadowing are classified by analyzer provenance instead of renderer assumptions",
         "fixture": "fake_emit_fn",
         "locus_type": "adapter",
-        "expected_classification": boundary_analyzer.BOUNDARY_UNKNOWN,
-        "expected_verdict": "UNKNOWN",
+        "expected_classification": boundary_analyzer.BOUNDARY_FORBIDDEN,
+        "expected_verdict": "FAIL",
         "expected_category": "presenter_provenance",
         "proof_fragment": "presenter provenance is not proven",
         "scope": "W-003 in scope",
@@ -1017,14 +1017,14 @@ W003_TAXONOMY_ROWS = [
     },
     {
         "case_id": "W003-unsupported-scope-out-of-scope-visible",
-        "group": "evidence_family_binding",
+        "group": "unsupported_scope_no_claims",
         "description": "HDE-FERM007.5, HDE-FERM008, runtime/live/open-rails/public-reader/new-home/AI scope remains visibly out of scope",
         "fixture": "current_repo",
         "locus_type": "evidence_tool",
         "expected_classification": boundary_analyzer.BOUNDARY_OUT_OF_SCOPE,
         "expected_verdict": "PASS",
         "expected_category": "hde_ferm007_5_runtime_v2_live_open_rails_ai_scope",
-        "proof_fragment": "outside W-002 / HDE-FERM007.4",
+        "proof_fragment": "outside W-003 / HDE-FERM007.4",
         "scope": "follow-up/out of scope visible",
     },
 ]
@@ -1112,7 +1112,8 @@ def test_epic034_w003_taxonomy_rendering_does_not_relabel_negative_groups_as_cur
     assert "boundary_taxonomy group=presenter_bypass_paths" in proof
     assert "required_case_classifications=[\"forbidden\",\"unknown / fail-closed\"]" in proof
     assert "coverage_status=covered_by_w003_invariant_suite" in proof
-    assert "presenter_bypass_path_taxonomy_verdict=covered:PASS current=allowed:PASS" in proof
+    assert "presenter_bypass_path_taxonomy_verdict=covered:PASS required_case_classifications=[\"forbidden\",\"unknown / fail-closed\"]" in proof
+    assert "presenter_bypass_path_taxonomy_verdict=covered:PASS current=allowed:PASS" not in proof
 
 
 @pytest.mark.parametrize("row", W003_TAXONOMY_ROWS, ids=[row["case_id"] for row in W003_TAXONOMY_ROWS])
