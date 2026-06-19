@@ -369,6 +369,7 @@ def _is_sanctioned_presenter_call(call: str, aliases: dict[str, str]) -> bool:
             "engine.presenter.emitter.emit_public_with_envelope",
             "engine.narratives.emit_public_aux",
             "engine.presenter.emitter.emit_reader_public_bytes",
+            "engine.runtime.emit_reader_public_bytes",
             "engine.presenter.emitter.emit_reader_public_envelope",
             "presenter.reader_v1.emitter.emit_public",
             "presenter.reader_v1.emitter.emit_public_with_envelope",
@@ -717,7 +718,7 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
                 deco_name = _attribute_chain(deco.func if isinstance(deco, ast.Call) else deco)
                 if deco_name.endswith(route_decorator_suffixes):
                     route_path = (_string_constant(deco.args[0]) or "") if isinstance(deco, ast.Call) and deco.args else ""
-                    if route_path.startswith(("/internal", "/ops")):
+                    if route_path.startswith(("/internal", "/ops", "/dev")):
                         continue
                     if deco_name.endswith((".after_request", ".after_app_request")):
                         hook_kind_by_key[key] = "after_request"
@@ -781,7 +782,7 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
                     returned.add(node.value.id)
                 elif isinstance(node, ast.Return) and node.value is not None:
                     return set()
-            return returned
+            return returned if len(returned) == 1 else set()
 
 
         def response_param_content_status_safe(fn: ast.FunctionDef | ast.AsyncFunctionDef, param_name: str) -> bool:
@@ -843,12 +844,20 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
             if not (isinstance(first, ast.Constant) and first.value in {b"", ""}):
                 return False
             status = _response_status(value)
+            function_name = owner.split("@", 1)[0].lower()
             if status in {204, 304}:
+                return True
+            if status == 405 and ("head" in function_name or "options" in function_name):
                 return True
             methods = route_methods_by_key.get(owner, set())
             fn = function_defs.get(owner)
-            function_name = owner.split("@", 1)[0].lower()
-            return bool(methods & {"HEAD", "OPTIONS"}) or "head" in function_name or "options" in function_name or bool(fn and function_mentions_head_or_options(fn))
+            if bool(methods) and methods <= {"HEAD", "OPTIONS"}:
+                return True
+            if status == 200 and fn is not None and function_mentions_head_or_options(fn):
+                return True
+            if status == 200 and fn is not None:
+                return any(isinstance(node, ast.Attribute) and node.attr == "suppressed" for node in ast.walk(fn))
+            return False
 
         def value_has_presenter(value: ast.AST, owner: str, assigned_good: set[str], seen: set[str]) -> bool:
             if isinstance(value, ast.Await):
@@ -858,7 +867,7 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
             if isinstance(value, ast.Name):
                 return value.id in assigned_good
             if isinstance(value, ast.Attribute) and isinstance(value.value, ast.Name):
-                return value.value.id in assigned_good
+                return value.attr == "body" and value.value.id in assigned_good
             if isinstance(value, ast.Call):
                 call = _attribute_chain(value.func)
                 if _is_sanctioned_presenter_call(call, aliases) or call in presenter_callable_names:
@@ -883,20 +892,25 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
             return False
 
         def assigned_presenter_vars(fn: ast.FunctionDef | ast.AsyncFunctionDef, owner: str, seen: set[str]) -> set[str]:
+            assignments: dict[str, list[ast.AST]] = {}
+            for node in iter_body_nodes(fn):
+                if not isinstance(node, (ast.Assign, ast.AnnAssign)) or node.value is None:
+                    continue
+                targets = node.targets if isinstance(node, ast.Assign) else [node.target]
+                for target in targets:
+                    if isinstance(target, ast.Name):
+                        assignments.setdefault(target.id, []).append(node.value)
             names: set[str] = set()
             changed = True
             while changed:
                 changed = False
-                for node in iter_body_nodes(fn):
-                    if not isinstance(node, (ast.Assign, ast.AnnAssign)) or node.value is None:
-                        continue
-                    if not value_has_presenter(node.value, owner, names, seen):
-                        continue
-                    targets = node.targets if isinstance(node, ast.Assign) else [node.target]
-                    for target in targets:
-                        if isinstance(target, ast.Name) and target.id not in names:
-                            names.add(target.id)
-                            changed = True
+                next_names: set[str] = set()
+                for target_name, values in assignments.items():
+                    if values and all(value_has_presenter(value, owner, names, seen) for value in values):
+                        next_names.add(target_name)
+                if next_names != names:
+                    names = next_names
+                    changed = True
             return names
 
         def function_returns_presenter(name: str, seen: set[str] | None = None) -> bool:
@@ -919,7 +933,10 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
                 if not isinstance(node, ast.Return) or node.value is None:
                     continue
                 if isinstance(node.value, ast.Constant) and node.value.value is None:
-                    continue
+                    if hook_kind_by_key.get(name) == "before_request":
+                        continue
+                    proven_cache[name] = False
+                    return False
                 if hook_kind_by_key.get(name) == "errorhandler" and isinstance(node.value, ast.Name) and node.value.id in params and function_has_compat_scope_predicate(fn):
                     continue
                 if hook_kind_by_key.get(name) == "after_request":
@@ -951,7 +968,11 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
                 if not value_has_presenter(node.value, name, assigned_good, seen):
                     proven_cache[name] = False
                     return False
-            proven_cache[name] = saw_response_return or (hook_kind_by_key.get(name) == "after_request" and saw_passthrough_return)
+            proven_cache[name] = (
+                saw_response_return
+                or (hook_kind_by_key.get(name) == "after_request" and saw_passthrough_return)
+                or (hook_kind_by_key.get(name) == "before_request" and not saw_response_return)
+            )
             return proven_cache[name]
 
         for name in sorted(route_functions):
