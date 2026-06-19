@@ -331,6 +331,8 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                     route_arg = ""
                     if isinstance(deco, ast.Call) and deco.args:
                         route_arg = _string_constant(deco.args[0]) or ""
+                    if route_arg.startswith(("/internal", "/ops", "/dev")):
+                        continue
                     methods = _route_methods(deco_name, deco)
                     signatures.append(f"{rel}:{deco_name}:{route_arg}:{methods}:{node.name}")
             if isinstance(node, ast.Call) and _attribute_chain(node.func).endswith(".add_url_rule"):
@@ -345,6 +347,8 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                         method_values = _literal_string_list(keyword.value)
                         if method_values:
                             methods = ",".join(sorted(method_values))
+                if route_arg and route_arg.startswith(("/internal", "/ops", "/dev")):
+                    continue
                 if not view_desc and len(node.args) >= 3:
                     view_desc = _attribute_chain(node.args[2].func) if isinstance(node.args[2], ast.Call) else _attribute_chain(node.args[2])
                 signatures.append(f"{rel}:add_url_rule:{route_arg or ''}:{endpoint or ''}:{methods}:{view_desc}")
@@ -693,25 +697,51 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
                     continue
                 stack.extend(ast.iter_child_nodes(node))
 
-        presenter_callable_names: set[str] = set()
-        for alias_name in aliases:
-            if _is_sanctioned_presenter_call(alias_name, aliases):
-                presenter_callable_names.add(alias_name)
-        changed = True
-        while changed:
-            changed = False
-            for fn in function_defs.values():
+        imported_presenter_callable_names: set[str] = {
+            alias_name for alias_name in aliases if _is_sanctioned_presenter_call(alias_name, aliases)
+        }
+        ast_parents: dict[ast.AST, ast.AST] = {}
+        for parent in ast.walk(tree):
+            for child in ast.iter_child_nodes(parent):
+                ast_parents[child] = parent
+        key_by_node = {node: key for key, node in function_defs.items()}
+        parent_function_by_key: dict[str, str] = {}
+        for key, fn in function_defs.items():
+            current = ast_parents.get(fn)
+            while current is not None:
+                if isinstance(current, (ast.FunctionDef, ast.AsyncFunctionDef)) and current in key_by_node:
+                    parent_function_by_key[key] = key_by_node[current]
+                    break
+                current = ast_parents.get(current)
+
+        def direct_body_nodes(fn: ast.FunctionDef | ast.AsyncFunctionDef):
+            for node in fn.body:
+                yield node
+
+        def presenter_callable_names_for(owner: str) -> set[str]:
+            chain: list[str] = []
+            current: str | None = owner
+            while current is not None:
+                chain.append(current)
+                current = parent_function_by_key.get(current)
+            names = set(imported_presenter_callable_names)
+            for key in reversed(chain):
+                fn = function_defs[key]
                 for node in iter_body_nodes(fn):
+                    if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name in names:
+                        names.remove(node.name)
                     if not isinstance(node, (ast.Assign, ast.AnnAssign)) or node.value is None:
                         continue
                     rhs = _attribute_chain(node.value)
-                    if not (_is_sanctioned_presenter_call(rhs, aliases) or rhs in presenter_callable_names):
-                        continue
                     targets = node.targets if isinstance(node, ast.Assign) else [node.target]
                     for target in targets:
-                        if isinstance(target, ast.Name) and target.id not in presenter_callable_names:
-                            presenter_callable_names.add(target.id)
-                            changed = True
+                        if not isinstance(target, ast.Name):
+                            continue
+                        if _is_sanctioned_presenter_call(rhs, aliases) or rhs in names:
+                            names.add(target.id)
+                        elif target.id in names:
+                            names.remove(target.id)
+            return names
 
         route_functions: set[str] = set()
         route_methods_by_key: dict[str, set[str]] = {}
@@ -873,7 +903,7 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
                 return value.attr == "body" and value.value.id in assigned_good
             if isinstance(value, ast.Call):
                 call = _attribute_chain(value.func)
-                if _is_sanctioned_presenter_call(call, aliases) or call in presenter_callable_names:
+                if _is_sanctioned_presenter_call(call, aliases) or call in presenter_callable_names_for(owner):
                     return True
                 if call == "make_response" or call.endswith((".make_response", ".Response")) or call == "Response" or call.endswith("TransportResponse"):
                     return is_empty_transport_response(value, owner) or any(value_has_presenter(arg, owner, assigned_good, seen) for arg in value.args) or any(
@@ -1193,15 +1223,66 @@ def _stmt_contains_node(stmt: ast.stmt, target: ast.AST) -> bool:
 
 
 def _stmt_has_guard_refusal(stmt: ast.stmt) -> bool:
-    guard_names = {"SAFE_MODE", "ALLOW_NETWORK", "safe_mode", "allow_network"}
     if not isinstance(stmt, ast.If):
         return False
-    mentions_guard = any(
-        (isinstance(child, ast.Name) and child.id in guard_names)
-        or (isinstance(child, ast.Constant) and child.value in {"SAFE_MODE", "ALLOW_NETWORK"})
-        for child in ast.walk(stmt.test)
-    )
-    return mentions_guard and any(isinstance(child, ast.Raise) for child in ast.walk(ast.Module(body=stmt.body, type_ignores=[])))
+
+    def expr_text(node: ast.AST) -> str:
+        if isinstance(node, ast.Name):
+            return node.id
+        if isinstance(node, ast.Attribute):
+            return node.attr + "." + expr_text(node.value)
+        if isinstance(node, ast.Call):
+            return expr_text(node.func) + "(" + ",".join(expr_text(arg) for arg in node.args) + ")"
+        if isinstance(node, ast.Constant):
+            return str(node.value)
+        return ""
+
+    def open_compare_axis(node: ast.AST) -> str | None:
+        if not isinstance(node, ast.Compare) or len(node.ops) != 1 or len(node.comparators) != 1:
+            return None
+        left = expr_text(node.left)
+        right = node.comparators[0]
+        right_value = right.value if isinstance(right, ast.Constant) else None
+        op = node.ops[0]
+        if ("SAFE_MODE" in left or "safe_mode" in left) and isinstance(op, ast.Eq) and right_value == "0":
+            return "SAFE_MODE"
+        if ("ALLOW_NETWORK" in left or "allow_network" in left) and isinstance(op, ast.Eq) and right_value == "1":
+            return "ALLOW_NETWORK"
+        return None
+
+    def refusal_compare_axis(node: ast.AST) -> str | None:
+        if not isinstance(node, ast.Compare) or len(node.ops) != 1 or len(node.comparators) != 1:
+            return None
+        left = expr_text(node.left)
+        right = node.comparators[0]
+        right_value = right.value if isinstance(right, ast.Constant) else None
+        is_safe = "SAFE_MODE" in left or "safe_mode" in left
+        is_allow = "ALLOW_NETWORK" in left or "allow_network" in left
+        op = node.ops[0]
+        if is_safe and ((isinstance(op, ast.NotEq) and right_value == "0") or (isinstance(op, ast.Eq) and right_value in {"1", "true", "True"})):
+            return "SAFE_MODE"
+        if is_allow and ((isinstance(op, ast.NotEq) and right_value == "1") or (isinstance(op, ast.Eq) and right_value in {"0", "false", "False"})):
+            return "ALLOW_NETWORK"
+        return None
+
+    def refusal_axes(test: ast.AST) -> set[str]:
+        axis = refusal_compare_axis(test)
+        if axis:
+            return {axis}
+        if isinstance(test, ast.BoolOp) and isinstance(test.op, ast.Or):
+            axes: set[str] = set()
+            for value in test.values:
+                axes.update(refusal_axes(value))
+            return axes
+        if isinstance(test, ast.UnaryOp) and isinstance(test.op, ast.Not):
+            operand = test.operand
+            if isinstance(operand, ast.BoolOp) and isinstance(operand.op, ast.And):
+                axes = {axis for value in operand.values if (axis := open_compare_axis(value))}
+                return axes if axes == {"SAFE_MODE", "ALLOW_NETWORK"} else set()
+        return set()
+
+    raises = any(isinstance(child, ast.Raise) for child in ast.walk(ast.Module(body=stmt.body, type_ignores=[])))
+    return raises and refusal_axes(stmt.test) == {"SAFE_MODE", "ALLOW_NETWORK"}
 
 
 def _vendor_external_io_guard_dominates(item: str) -> bool:

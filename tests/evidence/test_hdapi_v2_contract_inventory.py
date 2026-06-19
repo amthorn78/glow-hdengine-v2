@@ -2452,6 +2452,69 @@ def good():
 
 
 
+
+def test_epic034_presenter_alias_is_scoped_to_binding(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+def setup_alias():
+    render = emit_public
+    return render({'ok': True})
+@app.route('/raw-shadow')
+def raw_shadow():
+    def render(payload):
+        return 'raw'
+    return render({'ok': False})
+@app.route('/good')
+def good():
+    return emit_public({'ok': True})
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "scoped_alias_shadow.py", body)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", tuple(boundary_analyzer._adapter_public_route_signatures((adapter,))))
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_presenter_bypass"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_public_route_signatures_exclude_internal_ops_dev() -> None:
+    signatures = boundary_analyzer._adapter_public_route_signatures(generator.ADAPTER_BOUNDARY_ADAPTER_LOCI)
+    assert not any(':/internal/' in item or ':/ops/' in item or ':/dev/' in item for item in signatures)
+    proof, checks = generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    assert checks["no_public_reader_change"] is True
+    assert ':/internal/' not in proof
+    assert ':/ops/' not in proof
+    assert ':/dev/' not in proof
+
+
+def test_epic034_vendor_guard_rejects_open_rails_raise_before_io(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from urllib.request import urlopen
+
+def inverted_guard():
+    safe_mode = '1'
+    allow_network = '0'
+    if safe_mode == '0' and allow_network == '1':
+        raise RuntimeError('wrong branch')
+    return urlopen('https://vendor.test')
+"""
+    try:
+        rel = _write_boundary_temp(rel_dir, "inverted_vendor_guard.py", body)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_VENDOR_SEAM_LOCI", (rel,))
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_VENDOR_GUARD_UNEXPECTED:.*inverted_guard:urlopen"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
 def test_epic034_vendor_guard_must_dominate_external_io(monkeypatch: pytest.MonkeyPatch) -> None:
     import shutil
 
