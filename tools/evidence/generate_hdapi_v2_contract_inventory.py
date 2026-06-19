@@ -118,7 +118,7 @@ RESPONSE_MAPPING_INTERNAL_LOCI = (
     "engine/bodygraph/resolver.py",
     "engine/compat/compute.py",
 )
-ADAPTER_BOUNDARY_CANONICAL_ADAPTER_LOCI = ("adapter/wsgi.py", "adapter/factory.py", "adapter/http_reader.py", "engine/http/compat_handler.py")
+ADAPTER_BOUNDARY_CANONICAL_ADAPTER_LOCI = ("adapter/wsgi.py", "adapter/factory.py", "adapter/http_reader.py", "adapter/logging_filter.py", "engine/http/compat_handler.py")
 ADAPTER_BOUNDARY_ADAPTER_LOCI = ADAPTER_BOUNDARY_CANONICAL_ADAPTER_LOCI
 ADAPTER_BOUNDARY_PRESENTER_LOCI = ("engine/presenter/emitter.py", "presenter/reader_v1/emitter.py")
 ADAPTER_BOUNDARY_VENDOR_SEAM_LOCI = ("engine/bodygraph/vendor_client.py", "engine/bodygraph/ingest.py", "engine/bodygraph/resolver.py")
@@ -129,6 +129,8 @@ ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE = (
     'adapter/http_reader.py:app.after_request:::_strip_etag_on_internal',
     'adapter/http_reader.py:app.errorhandler:::_compat_scoped_method_not_allowed',
     'adapter/http_reader.py:app.errorhandler:::_compat_scoped_not_found',
+    'adapter/logging_filter.py:app.after_request:::_keys_only_after',
+    'adapter/logging_filter.py:app.before_request:::_start_timer_and_cid',
     'adapter/http_reader.py:bp.get:/api/aux/narrative:GET:aux_narrative',
     'adapter/http_reader.py:bp.get:/aux/narrative:GET:aux_narrative',
     'adapter/http_reader.py:bp.get:/dev/reader/conjunction:GET:dev_reader_conjunction',
@@ -1889,9 +1891,9 @@ def _vendor_guard_provenance_findings(loci: tuple[str, ...]) -> tuple[list[str],
     allowed: list[str] = []
     for item in external_io:
         key = ":".join(item.split(":", 2)[:2])
-        if key in guarded_keys:
+        if key in guarded_keys and boundary_analyzer._vendor_external_io_guard_dominates(item):
             allowed.append(item + " guarded_by=" + key)
-        elif key in allowed_low_level and key in guarded_keys:
+        elif key in allowed_low_level and key in guarded_keys and boundary_analyzer._vendor_external_io_guard_dominates(item):
             allowed.append(item + " guarded_by_low_level_helper=" + key)
         else:
             unresolved.append(item)

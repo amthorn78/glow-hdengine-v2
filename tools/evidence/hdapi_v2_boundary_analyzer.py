@@ -207,6 +207,7 @@ def _ad_hoc_json_serializers(loci: tuple[str, ...]) -> list[str]:
     """Find direct JSON serializers outside known internal vendor request/log helpers."""
 
     allowed_vendor_funcs = {"_append_retry_log", "_append_jsonl", "build_contract_route_request", "ingest_bodygraph"}
+    allowed_log_funcs = {"_keys_only_after", "log_startup_line"}
     findings: list[str] = []
     for rel in loci:
         _path, _text, tree = _python_source(rel)
@@ -236,6 +237,8 @@ def _ad_hoc_json_serializers(loci: tuple[str, ...]) -> list[str]:
                     break
                 current = parents.get(current)
             if rel.startswith("engine/bodygraph/") and func_name in allowed_vendor_funcs:
+                continue
+            if rel == "adapter/logging_filter.py" and func_name in allowed_log_funcs:
                 continue
             findings.append(f"{rel}:{func_name or '<module>'}:{chain}")
     return sorted(set(findings))
@@ -930,6 +933,12 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
             saw_passthrough_return = False
             params = {arg.arg for arg in fn.args.args + fn.args.posonlyargs + fn.args.kwonlyargs}
             for node in iter_body_nodes(fn):
+                if isinstance(node, ast.Raise):
+                    proven_cache[name] = False
+                    return False
+                if isinstance(node, ast.Call) and _attribute_chain(node.func).endswith("abort"):
+                    proven_cache[name] = False
+                    return False
                 if not isinstance(node, ast.Return) or node.value is None:
                     continue
                 if isinstance(node.value, ast.Constant) and node.value.value is None:
@@ -1171,6 +1180,44 @@ def _vendor_external_io_functions(loci: tuple[str, ...]) -> list[str]:
             findings.append(f"{rel}:{func_name}:{chain}")
     return sorted(set(findings))
 
+
+def _function_node_by_name(tree: ast.AST, name: str) -> ast.FunctionDef | ast.AsyncFunctionDef | None:
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name == name:
+            return node
+    return None
+
+
+def _stmt_contains_node(stmt: ast.stmt, target: ast.AST) -> bool:
+    return any(child is target for child in ast.walk(stmt))
+
+
+def _stmt_has_guard_refusal(stmt: ast.stmt) -> bool:
+    guard_names = {"SAFE_MODE", "ALLOW_NETWORK", "safe_mode", "allow_network"}
+    if not isinstance(stmt, ast.If):
+        return False
+    mentions_guard = any(
+        (isinstance(child, ast.Name) and child.id in guard_names)
+        or (isinstance(child, ast.Constant) and child.value in {"SAFE_MODE", "ALLOW_NETWORK"})
+        for child in ast.walk(stmt.test)
+    )
+    return mentions_guard and any(isinstance(child, ast.Raise) for child in ast.walk(ast.Module(body=stmt.body, type_ignores=[])))
+
+
+def _vendor_external_io_guard_dominates(item: str) -> bool:
+    parts = item.split(":", 2)
+    if len(parts) != 3:
+        return False
+    rel, func_name, chain = parts
+    _path, _text, tree = _python_source(rel)
+    fn = _function_node_by_name(tree, func_name)
+    if fn is None:
+        return False
+    for stmt_index, stmt in enumerate(fn.body):
+        for node in ast.walk(stmt):
+            if isinstance(node, ast.Call) and _attribute_chain(node.func) == chain:
+                return any(_stmt_has_guard_refusal(prior) for prior in fn.body[:stmt_index])
+    return False
 
 def _vendor_seam_guarded(loci: tuple[str, ...]) -> bool:
     guarded_entrypoints = _vendor_guard_entrypoints(loci)

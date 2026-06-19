@@ -2451,6 +2451,86 @@ def good():
 
 
 
+
+def test_epic034_vendor_guard_must_dominate_external_io(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+import os
+from urllib.request import urlopen
+
+def late_guard():
+    response = urlopen('https://vendor.test')
+    if os.environ.get('SAFE_MODE') != '0' or os.environ.get('ALLOW_NETWORK') != '1':
+        raise RuntimeError('refused')
+    return response
+"""
+    try:
+        rel = _write_boundary_temp(rel_dir, "late_vendor_guard.py", body)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_VENDOR_SEAM_LOCI", (rel,))
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_VENDOR_GUARD_UNEXPECTED:.*late_guard:urlopen"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_adapter_boundary_includes_installed_logging_filter_hooks() -> None:
+    proof, checks = generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    assert checks["actual_repo_loci_discovered_before_classification"] is True
+    assert "adapter/logging_filter.py" in proof
+    assert "adapter/logging_filter.py:app.before_request:::_start_timer_and_cid" in proof
+    assert "adapter/logging_filter.py:app.after_request:::_keys_only_after" in proof
+
+
+def test_epic034_adapter_boundary_rejects_abort_response_exit(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask, abort, request
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+@app.route('/maybe-abort')
+def maybe_abort():
+    if request.args.get('maintenance'):
+        abort(503)
+    return emit_public({'ok': True})
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "abort_route.py", body)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", tuple(boundary_analyzer._adapter_public_route_signatures((adapter,))))
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_presenter_bypass"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_adapter_boundary_rejects_raise_response_exit(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask, request
+from werkzeug.exceptions import ServiceUnavailable
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+@app.route('/maybe-raise')
+def maybe_raise():
+    if request.args.get('maintenance'):
+        raise ServiceUnavailable()
+    return emit_public({'ok': True})
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "raise_route.py", body)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", tuple(boundary_analyzer._adapter_public_route_signatures((adapter,))))
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_presenter_bypass"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
 def test_epic034_adapter_boundary_rejects_mixed_get_head_empty_error_response(monkeypatch: pytest.MonkeyPatch) -> None:
     import shutil
 
