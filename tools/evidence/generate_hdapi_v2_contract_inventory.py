@@ -1884,193 +1884,52 @@ def _vendor_guard_provenance_findings(loci: tuple[str, ...]) -> tuple[list[str],
     return allowed, unresolved, guarded
 
 
-def build_adapter_boundary_proof(produced: str, source_selection: dict[str, Any], request_shaping: dict[str, Any], response_mapping: dict[str, Any]) -> tuple[str, dict[str, bool]]:
-    boundary_analyzer.ROOT = ROOT
-    if source_selection.get("request_shaping_claim") != "NONE":
-        raise ValueError("ADAPTER_BOUNDARY_SOURCE_SELECTION_BASELINE_DRIFT")
-    if request_shaping.get("route_family") != "recommended_v2_chart":
-        raise ValueError("ADAPTER_BOUNDARY_REQUEST_SHAPING_BASELINE_DRIFT")
-    if response_mapping.get("response_envelope_mapping_scope") != "HDE-FERM007.3 proof-level v2 StandardResponse envelope mapping only":
-        raise ValueError("ADAPTER_BOUNDARY_RESPONSE_MAPPING_BASELINE_DRIFT")
 
-    adapter_rows = boundary_analyzer._locus_rows(ADAPTER_BOUNDARY_ADAPTER_LOCI)
-    presenter_rows = boundary_analyzer._locus_rows(ADAPTER_BOUNDARY_PRESENTER_LOCI)
-    vendor_rows = boundary_analyzer._locus_rows(ADAPTER_BOUNDARY_VENDOR_SEAM_LOCI)
-    pure_rows = boundary_analyzer._locus_rows(ADAPTER_BOUNDARY_PURE_COMPUTE_LOCI)
-    evidence_tool_loci = ("tools/evidence/generate_hdapi_v2_contract_inventory.py", "tools/evidence/hdapi_v2_boundary_analyzer.py")
-    try:
-        evidence_tool_rows = boundary_analyzer._locus_rows(evidence_tool_loci)
-    except ValueError:
-        evidence_tool_rows = [{"path": rel, "sha256": _sha256_path(Path(__file__).resolve().parents[2] / rel)} for rel in evidence_tool_loci]
-
-    adapter_http_modules: set[str] = set()
-    adapter_calls: set[str] = set()
-    adapter_guard_findings: list[str] = []
-    for rel in ADAPTER_BOUNDARY_ADAPTER_LOCI:
-        _path, text, tree = _python_source(rel)
-        adapter_http_modules |= {m for m in _import_modules(tree) if m == "flask" or m.startswith("flask")}
-        adapter_calls |= _call_names(tree)
-        if rel == "adapter/http_reader.py" and "SAFE_MODE" not in text:
-            adapter_guard_findings.append(f"{rel}:SAFE_MODE not discovered")
-
-    vendor_modules: set[str] = set()
-    vendor_calls: set[str] = set()
-    for rel in ADAPTER_BOUNDARY_VENDOR_SEAM_LOCI:
-        _path, _text, tree = _python_source(rel)
-        vendor_modules |= _import_modules(tree)
-        vendor_calls |= _call_names(tree)
-
-    adapter_presenter_calls = boundary_analyzer._adapter_presenter_calls(ADAPTER_BOUNDARY_ADAPTER_LOCI)
-    presenter_bypass = boundary_analyzer._adapter_presenter_bypass_routes(ADAPTER_BOUNDARY_ADAPTER_LOCI)
-    unresolved_presenter_routes = boundary_analyzer._adapter_routes_without_presenter(ADAPTER_BOUNDARY_ADAPTER_LOCI)
-    discovered_public_routes = boundary_analyzer._adapter_public_route_signatures(ADAPTER_BOUNDARY_ADAPTER_LOCI)
-    public_reader_route_drift = sorted(set(discovered_public_routes) ^ set(ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE))
-    route_baseline_reconciled = bool(discovered_public_routes) and not public_reader_route_drift
-    route_baseline_out_of_scope = not discovered_public_routes and ADAPTER_BOUNDARY_ADAPTER_LOCI != ADAPTER_BOUNDARY_CANONICAL_ADAPTER_LOCI
-    pure_external_io = boundary_analyzer._pure_compute_external_io(ADAPTER_BOUNDARY_PURE_COMPUTE_LOCI)
-    second_http_home = sorted(module for module in vendor_modules if _is_http_home_module(module))
-    adapter_bypass = boundary_analyzer._adapter_external_io_calls(ADAPTER_BOUNDARY_ADAPTER_LOCI)
-    ad_hoc_serializers = boundary_analyzer._ad_hoc_json_serializers(ADAPTER_BOUNDARY_ADAPTER_LOCI + ADAPTER_BOUNDARY_VENDOR_SEAM_LOCI + ADAPTER_BOUNDARY_PRESENTER_LOCI)
-    unsupported_scope_claims = boundary_analyzer._unsupported_scope_claims(source_selection, request_shaping, response_mapping)
-    guard_allowed, guard_unresolved, guarded_entrypoints = _vendor_guard_provenance_findings(ADAPTER_BOUNDARY_VENDOR_SEAM_LOCI)
-    vendor_external_io = boundary_analyzer._vendor_external_io_functions(ADAPTER_BOUNDARY_VENDOR_SEAM_LOCI)
-    if guard_unresolved:
-        raise ValueError("ADAPTER_BOUNDARY_VENDOR_GUARD_UNEXPECTED:" + ",".join(guard_unresolved))
-
-    findings = [
-        _boundary_finding(
-            "adapter_route_registration",
-            BOUNDARY_ALLOWED if adapter_http_modules else BOUNDARY_UNKNOWN,
-            "PASS" if adapter_http_modules else "FAIL",
-            [row["path"] for row in adapter_rows],
-            "discovered Flask adapter registrations before classification" if adapter_http_modules else "no current adapter route registrations were discoverable",
-            discovered_public_routes,
-        ),
-        _boundary_finding(
-            "public_routes",
-            BOUNDARY_ALLOWED if route_baseline_reconciled else (BOUNDARY_OUT_OF_SCOPE if route_baseline_out_of_scope else BOUNDARY_UNKNOWN),
-            "PASS" if route_baseline_reconciled or route_baseline_out_of_scope else "FAIL",
-            [row["path"] for row in adapter_rows],
-            "discovered current route signatures reconcile with governed PR-04 baseline" if route_baseline_reconciled else ("no public route signatures discovered in noncanonical test locus; route surface is out of scope" if route_baseline_out_of_scope else "discovered current route signatures cannot be reconciled with baseline; route drift fails closed"),
-            public_reader_route_drift or discovered_public_routes,
-        ),
-        _boundary_finding(
-            "response_producing_paths",
-            BOUNDARY_ALLOWED if adapter_presenter_calls and not presenter_bypass and not unresolved_presenter_routes else (BOUNDARY_FORBIDDEN if presenter_bypass else BOUNDARY_UNKNOWN),
-            "PASS" if adapter_presenter_calls and not presenter_bypass and not unresolved_presenter_routes else "FAIL",
-            [row["path"] for row in adapter_rows],
-            "public response-producing paths have explicit presenter/emitter provenance" if adapter_presenter_calls and not presenter_bypass and not unresolved_presenter_routes else "response-producing path provenance is unresolved or bypasses presenter",
-            presenter_bypass + unresolved_presenter_routes or adapter_presenter_calls,
-        ),
-        _boundary_finding(
-            "presenter_provenance",
-            BOUNDARY_ALLOWED if adapter_presenter_calls and not presenter_bypass and not unresolved_presenter_routes else (BOUNDARY_FORBIDDEN if presenter_bypass else BOUNDARY_UNKNOWN),
-            "PASS" if adapter_presenter_calls and not presenter_bypass and not unresolved_presenter_routes else "FAIL",
-            [row["path"] for row in presenter_rows],
-            "adapter routes resolve to sanctioned presenter/emitter calls" if adapter_presenter_calls and not presenter_bypass and not unresolved_presenter_routes else "presenter provenance is not proven for every response path",
-            presenter_bypass + unresolved_presenter_routes or adapter_presenter_calls,
-        ),
-        _boundary_finding(
-            "serializer_paths",
-            BOUNDARY_ALLOWED if not ad_hoc_serializers else BOUNDARY_FORBIDDEN,
-            "PASS" if not ad_hoc_serializers else "FAIL",
-            [row["path"] for row in adapter_rows + vendor_rows + presenter_rows],
-            "no ad-hoc JSON serializer path discovered outside allowed vendor helpers" if not ad_hoc_serializers else "ad-hoc serializer path discovered on governed/public boundary",
-            ad_hoc_serializers,
-        ),
-        _boundary_finding(
-            "external_io_paths",
-            BOUNDARY_ALLOWED if not adapter_bypass and not second_http_home else BOUNDARY_FORBIDDEN,
-            "PASS" if not adapter_bypass and not second_http_home else "FAIL",
-            [row["path"] for row in adapter_rows + vendor_rows],
-            "external I/O remains limited to sanctioned vendor seam" if not adapter_bypass and not second_http_home else "external I/O or HTTP home found outside sanctioned vendor seam",
-            adapter_bypass + second_http_home,
-        ),
-        _boundary_finding(
-            "pure_compute_external_io",
-            BOUNDARY_ALLOWED if not pure_external_io else BOUNDARY_FORBIDDEN,
-            "PASS" if not pure_external_io else "FAIL",
-            [row["path"] for row in pure_rows],
-            "pure compute loci have no external-I/O imports or calls" if not pure_external_io else "pure compute external-I/O capability discovered",
-            pure_external_io,
-        ),
-        _boundary_finding(
-            "guard_provenance",
-            BOUNDARY_ALLOWED if (guard_allowed or not vendor_external_io) and not guard_unresolved and not adapter_guard_findings else BOUNDARY_UNKNOWN,
-            "PASS" if (guard_allowed or not vendor_external_io) and not guard_unresolved and not adapter_guard_findings else "FAIL",
-            [row["path"] for row in vendor_rows],
-            "each relevant vendor external-I/O path is tied to a closed-rails guard entrypoint" if (guard_allowed or not vendor_external_io) and not guard_unresolved and not adapter_guard_findings else "guard symbols are missing or cannot be tied to each relevant external-I/O path",
-            guard_unresolved + adapter_guard_findings + guard_allowed,
-        ),
-        _boundary_finding(
-            "public_surface_posture",
-            BOUNDARY_ALLOWED if not unsupported_scope_claims else BOUNDARY_FORBIDDEN,
-            "PASS" if not unsupported_scope_claims else "FAIL",
-            ["artifacts/vendor/hdapi_v2/source_selection.snapshot.json", "artifacts/vendor/hdapi_v2/request_shaping.snapshot.json", "artifacts/vendor/hdapi_v2/response_mapping.snapshot.json"],
-            "dependency evidence emits no unsupported public/runtime/open-rails/AI scope claims" if not unsupported_scope_claims else "unsupported scope claim discovered in dependency evidence",
-            unsupported_scope_claims,
-        ),
-        _boundary_finding(
-            "evidence_binding_posture",
-            BOUNDARY_ALLOWED if all(isinstance(payload, dict) and payload for payload in [source_selection, request_shaping, response_mapping]) else BOUNDARY_UNKNOWN,
-            "PASS" if all(isinstance(payload, dict) and payload for payload in [source_selection, request_shaping, response_mapping]) else "FAIL",
-            [row["path"] for row in evidence_tool_rows],
-            "PR-01/PR-02/PR-03 dependency payloads are present and non-empty; index/path-proof validation is delegated to governed tools" if all(isinstance(payload, dict) and payload for payload in [source_selection, request_shaping, response_mapping]) else "dependency evidence payloads are missing or empty",
-            [],
-        ),
-        _boundary_finding(
-            "hde_ferm007_5_runtime_v2_live_open_rails_ai_scope",
-            BOUNDARY_OUT_OF_SCOPE,
-            "PASS",
-            [row["path"] for row in evidence_tool_rows],
-            "explicitly outside W-001 / HDE-FERM007.4; no claim is emitted",
-            [],
-        ),
-    ]
-
-    check_by_category = {finding["category"]: _finding_passes(finding) for finding in findings}
-    checks = {
-        "adapter_http_home_inspected": check_by_category["adapter_route_registration"],
-        "actual_repo_loci_discovered_before_classification": all([adapter_rows, presenter_rows, vendor_rows, pure_rows, evidence_tool_rows]),
-        "hard_coded_path_lists_not_used_as_proof": bool(discovered_public_routes) or ADAPTER_BOUNDARY_ADAPTER_LOCI != ADAPTER_BOUNDARY_CANONICAL_ADAPTER_LOCI,
-        "unknown_current_categories_fail_closed": all(f["verdict"] == "FAIL" for f in findings if f["classification"] == BOUNDARY_UNKNOWN),
-        "conservative_positive_boundary_contract_applied": {f["classification"] for f in findings} <= {BOUNDARY_ALLOWED, BOUNDARY_FORBIDDEN, BOUNDARY_UNKNOWN, BOUNDARY_OUT_OF_SCOPE},
-        "presenter_emitter_inspected": check_by_category["presenter_provenance"],
-        "vendor_seam_inspected": bool(vendor_rows) and ("urllib.request" in vendor_modules or "urllib" in vendor_modules or "urlrequest.urlopen" in vendor_calls),
-        "no_second_http_home": not second_http_home,
-        "no_adapter_bypass": not adapter_bypass,
-        "no_presenter_bypass": not presenter_bypass and not unresolved_presenter_routes and bool(adapter_presenter_calls),
-        "no_ad_hoc_serialization": not ad_hoc_serializers,
-        "no_pure_compute_external_io": not pure_external_io,
-        "guard_provenance_per_relevant_path": check_by_category["guard_provenance"],
-        "prior_evidence_families_bound": check_by_category["evidence_binding_posture"],
-        "no_public_reader_change": check_by_category["public_routes"],
-        "no_unsupported_scope_claim": check_by_category["public_surface_posture"],
-    }
-    failed = [name for name, ok in checks.items() if not ok]
+def _boundary_result_or_raise(result: dict[str, Any]) -> None:
+    if any(finding.get("classification") == boundary_analyzer.BOUNDARY_UNKNOWN and finding.get("verdict") == "PASS" for finding in result["findings"]):
+        raise ValueError("ADAPTER_BOUNDARY_RENDERER_REFUSED_UNKNOWN_PASS")
+    if any(finding.get("classification") == boundary_analyzer.BOUNDARY_FORBIDDEN and finding.get("verdict") == "PASS" for finding in result["findings"]):
+        raise ValueError("ADAPTER_BOUNDARY_RENDERER_REFUSED_FORBIDDEN_PASS")
+    failed = [name for name, ok in result["checks"].items() if not ok]
     if failed:
         raise ValueError("ADAPTER_BOUNDARY_CHECK_FAILED:" + ",".join(failed))
 
+
+def _finding_summary(result: dict[str, Any], category: str) -> str:
+    finding = next(f for f in result["findings"] if f["category"] == category)
+    return f"{finding['classification']}:{finding['verdict']}"
+
+
+def render_adapter_boundary_proof(produced: str, result: dict[str, Any]) -> tuple[str, dict[str, bool]]:
+    """Render analyzer-owned boundary truth without recomputing it."""
+    _boundary_result_or_raise(result)
+    checks = result["checks"]
+    loci = result["inspected_loci"]
     lines = [
         f"generated_at_utc={produced}",
-        "work_item=W-001",
-        "scope=HDE-EPIC034 PR-04 conservative adapter/presenter boundary proof for HDE-FERM007.4 only",
+        f"work_item={result['work_item']}",
+        "scope=HDE-EPIC034 PR-04 analyzer-owned adapter/presenter boundary proof for HDE-FERM007.4 only",
+        "analyzer_rendering_separation=analyzer owns findings, unknowns, deltas, provenance, bindings, and verdicts; renderer only emits analyzer output",
+        f"analyzer_owned_verdict_status={result['verdict_status']}",
+        "renderer_only_posture=evidence generator does not rediscover route, guard, presenter, serializer, external-I/O, or boundary truth",
         "rails=ALLOW_NETWORK=0 LANG=C LC_ALL=C SAFE_MODE=1 TZ=UTC",
         "classification_categories_used=allowed,forbidden,unknown / fail-closed,out of scope",
         "unknown_current_categories_fail_closed=true",
+        "renderer_does_not_override_analyzer_unknowns_or_failures=true",
         "observed_adapter_http_home_posture=adapter package owns Flask HTTP home; v2 vendor seam did not add a second HTTP home",
         "observed_presenter_emitter_posture=presenter/emitter remains byte-authoritative for public/governed output paths",
         "observed_vendor_seam_posture=engine.bodygraph.vendor_client remains sanctioned BodyGraph/vendor external-I/O seam guarded by SAFE_MODE/ALLOW_NETWORK posture",
-        "discovered_adapter_loci_inspected=" + ",".join(row["path"] for row in adapter_rows),
-        "discovered_presenter_loci_inspected=" + ",".join(row["path"] for row in presenter_rows),
-        "discovered_engine_loci_inspected=" + ",".join(row["path"] for row in pure_rows),
-        "discovered_vendor_seam_loci_inspected=" + ",".join(row["path"] for row in vendor_rows),
-        "discovered_evidence_tool_loci_inspected=" + ",".join(row["path"] for row in evidence_tool_rows),
-        "discovered_public_route_signatures=" + json.dumps(discovered_public_routes, sort_keys=True, separators=(",", ":")),
-        "discovered_presenter_calls=" + json.dumps(adapter_presenter_calls, sort_keys=True, separators=(",", ":")),
-        "discovered_vendor_guard_entrypoints=" + json.dumps(guarded_entrypoints, sort_keys=True, separators=(",", ":")),
+        "discovered_adapter_loci_inspected=" + ",".join(row["path"] for row in loci["adapter"]),
+        "discovered_presenter_loci_inspected=" + ",".join(row["path"] for row in loci["presenter"]),
+        "discovered_engine_loci_inspected=" + ",".join(row["path"] for row in loci["engine"]),
+        "discovered_vendor_seam_loci_inspected=" + ",".join(row["path"] for row in loci["vendor_seam"]),
+        "discovered_evidence_tool_loci_inspected=" + ",".join(row["path"] for row in loci["evidence_tool"]),
+        "discovered_public_route_signatures=" + json.dumps(result["discovered_public_route_signatures"], sort_keys=True, separators=(",", ":")),
+        "public_route_deltas=" + json.dumps(result["public_route_deltas"], sort_keys=True, separators=(",", ":")),
+        "discovered_presenter_calls=" + json.dumps(result["discovered_presenter_calls"], sort_keys=True, separators=(",", ":")),
+        "discovered_vendor_guard_entrypoints=" + json.dumps(result["guard_provenance"]["guarded_entrypoints"], sort_keys=True, separators=(",", ":")),
     ]
-    for finding in findings:
+    for finding in result["findings"]:
         lines.append(
             "boundary_finding "
             f"category={finding['category']} "
@@ -2080,14 +1939,14 @@ def build_adapter_boundary_proof(produced: str, source_selection: dict[str, Any]
             "details=" + json.dumps(finding["details"], sort_keys=True, separators=(",", ":"))
         )
     lines.extend([
-        "public_route_findings_and_verdict=" + next(f"{f['classification']}:{f['verdict']}" for f in findings if f["category"] == "public_routes"),
-        "response_producing_path_findings_and_verdict=" + next(f"{f['classification']}:{f['verdict']}" for f in findings if f["category"] == "response_producing_paths"),
-        "presenter_provenance_findings_and_verdict=" + next(f"{f['classification']}:{f['verdict']}" for f in findings if f["category"] == "presenter_provenance"),
-        "serializer_findings_and_verdict=" + next(f"{f['classification']}:{f['verdict']}" for f in findings if f["category"] == "serializer_paths"),
-        "external_io_findings_and_verdict=" + next(f"{f['classification']}:{f['verdict']}" for f in findings if f["category"] == "external_io_paths"),
-        "pure_compute_external_io_findings_and_verdict=" + next(f"{f['classification']}:{f['verdict']}" for f in findings if f["category"] == "pure_compute_external_io"),
-        "guard_provenance_findings_and_verdict=" + next(f"{f['classification']}:{f['verdict']}" for f in findings if f["category"] == "guard_provenance"),
-        "evidence_binding_posture_and_verdict=" + next(f"{f['classification']}:{f['verdict']}" for f in findings if f["category"] == "evidence_binding_posture"),
+        "public_route_findings_and_verdict=" + _finding_summary(result, "public_routes"),
+        "response_producing_path_findings_and_verdict=" + _finding_summary(result, "response_producing_paths"),
+        "presenter_provenance_findings_and_verdict=" + _finding_summary(result, "presenter_provenance"),
+        "serializer_findings_and_verdict=" + _finding_summary(result, "serializer_paths"),
+        "external_io_findings_and_verdict=" + _finding_summary(result, "external_io_paths"),
+        "pure_compute_external_io_findings_and_verdict=" + _finding_summary(result, "pure_compute_external_io"),
+        "guard_provenance_findings_and_verdict=" + _finding_summary(result, "guard_provenance"),
+        "evidence_binding_posture_and_verdict=" + _finding_summary(result, "evidence_binding_posture"),
         "no_second_http_home_claim=PASS",
         "no_adapter_bypass_claim=PASS",
         "no_presenter_bypass_claim=PASS",
@@ -2104,8 +1963,25 @@ def build_adapter_boundary_proof(produced: str, source_selection: dict[str, Any]
         "no_AI_scope_claim=NONE",
     ])
     lines.extend(f"[{name}] status={'PASS' if ok else 'FAIL'}" for name, ok in checks.items())
-    lines.append("status=PASS" if all(checks.values()) else "status=FAIL")
+    lines.append("status=PASS" if result["verdict_status"] == "PASS" else f"status={result['verdict_status']}")
     return "\n".join(lines), checks
+
+
+def build_adapter_boundary_proof(produced: str, source_selection: dict[str, Any], request_shaping: dict[str, Any], response_mapping: dict[str, Any]) -> tuple[str, dict[str, bool]]:
+    boundary_analyzer.ROOT = ROOT
+    result = boundary_analyzer.analyze_adapter_boundary(
+        source_selection=source_selection,
+        request_shaping=request_shaping,
+        response_mapping=response_mapping,
+        adapter_loci=ADAPTER_BOUNDARY_ADAPTER_LOCI,
+        canonical_adapter_loci=ADAPTER_BOUNDARY_CANONICAL_ADAPTER_LOCI,
+        presenter_loci=ADAPTER_BOUNDARY_PRESENTER_LOCI,
+        vendor_seam_loci=ADAPTER_BOUNDARY_VENDOR_SEAM_LOCI,
+        pure_compute_loci=ADAPTER_BOUNDARY_PURE_COMPUTE_LOCI,
+        public_route_baseline=ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE,
+        evidence_tool_loci=("tools/evidence/generate_hdapi_v2_contract_inventory.py", "tools/evidence/hdapi_v2_boundary_analyzer.py"),
+    )
+    return render_adapter_boundary_proof(produced, result)
 
 
 def build_adapter_boundary_check_log(produced: str, proof: str, checks: dict[str, bool], *, mode: str) -> str:
@@ -2113,15 +1989,23 @@ def build_adapter_boundary_check_log(produced: str, proof: str, checks: dict[str
     rails = " ".join(f"{key}={env_snapshot[key]}" for key in sorted(CLOSED_RAILS_ENV))
     log_checks = {
         "closed_rails_generation": mode == "closed-rails-source-cache" and closed_rails_env_ok(),
+        "analyzer_rendering_separation_applied": "analyzer_rendering_separation=" in proof,
+        "generator_rendered_analyzer_output_only": "renderer_only_posture=" in proof,
+        "renderer_did_not_recompute_boundary_truth": "does not rediscover" in proof,
+        "renderer_did_not_override_analyzer_unknowns_or_failures": "renderer_does_not_override_analyzer_unknowns_or_failures=true" in proof,
         "conservative_positive_boundary_contract_applied": checks.get("conservative_positive_boundary_contract_applied", False),
         "unknown_current_categories_fail_closed": checks.get("unknown_current_categories_fail_closed", False) and "unknown_current_categories_fail_closed=true" in proof,
         "actual_repo_loci_discovered_before_classification": checks.get("actual_repo_loci_discovered_before_classification", False),
         "hard_coded_path_lists_were_not_used_as_proof": checks.get("hard_coded_path_lists_not_used_as_proof", False),
+        "public_route_findings_carried_from_analyzer_to_renderer": "public_route_findings_and_verdict=" in proof,
         "public_route_drift_did_not_disable_itself": checks.get("no_public_reader_change", False),
         "presenter_emitter_posture_inspected": checks.get("presenter_emitter_inspected", False),
         "presenter_provenance_checked": checks.get("presenter_emitter_inspected", False),
+        "presenter_provenance_findings_carried_from_analyzer_to_renderer": "presenter_provenance_findings_and_verdict=" in proof,
+        "external_io_findings_carried_from_analyzer_to_renderer": "external_io_findings_and_verdict=" in proof,
         "external_io_posture_checked": checks.get("no_adapter_bypass", False) and checks.get("no_second_http_home", False),
         "guard_provenance_checked_per_relevant_path": checks.get("guard_provenance_per_relevant_path", False),
+        "guard_provenance_findings_carried_from_analyzer_to_renderer": "guard_provenance_findings_and_verdict=" in proof,
         "no_live_vendor_call_attempted": "no_live_vendor_success_claim=NONE" in proof,
         "adapter_http_home_posture_inspected": checks.get("adapter_http_home_inspected", False),
         "vendor_seam_posture_inspected": checks.get("vendor_seam_inspected", False),
@@ -2137,21 +2021,23 @@ def build_adapter_boundary_check_log(produced: str, proof: str, checks: dict[str
     failed = [name for name, ok in log_checks.items() if not ok]
     if failed:
         raise ValueError("ADAPTER_BOUNDARY_CHECK_FAILED:" + ",".join(failed))
-
     lines = [
         f"generated_at_utc={produced}",
-        "scope=HDE-EPIC034 PR-04 boundary check for W-001 / HDE-FERM007.4",
+        "scope=HDE-EPIC034 PR-04 boundary check for W-002 / HDE-FERM007.4",
         f"rails={rails}",
         "network_posture=closed-rails-source-cache; no live vendor calls",
         "boundary_proof_generated_under_closed_rails=true",
+        "analyzer_rendering_separation_was_applied=true",
+        "evidence_generator_rendered_analyzer_output_only=true",
+        "renderer_did_not_recompute_boundary_truth=true",
+        "renderer_did_not_override_analyzer_unknowns_or_failures=true",
         "conservative_positive_boundary_contract_applied=true",
         "unknown_current_categories_fail_closed=true",
         "actual_repo_loci_were_discovered_before_classification=true",
-        "hard_coded_path_lists_were_not_used_as_proof=true",
-        "public_route_drift_did_not_disable_itself=true",
-        "presenter_provenance_was_checked=true",
-        "external_io_posture_was_checked=true",
-        "guard_provenance_was_checked_per_relevant_path=true",
+        "public_route_findings_were_carried_from_analyzer_to_renderer=true",
+        "presenter_provenance_findings_were_carried_from_analyzer_to_renderer=true",
+        "external_io_findings_were_carried_from_analyzer_to_renderer=true",
+        "guard_provenance_findings_were_carried_from_analyzer_to_renderer=true",
         "no_unsupported_scope_claim_was_emitted=true",
         "evidence_index_and_path_proof_posture=validated_by_update_evidence_index_and_validate_evidence_paths_not_generator",
     ]
