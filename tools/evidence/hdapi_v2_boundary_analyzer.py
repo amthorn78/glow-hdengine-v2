@@ -337,6 +337,60 @@ def _decorator_route_root(deco_call: ast.AST) -> str:
     return ""
 
 
+def _route_signature_field(value: str) -> str:
+    return value.replace("\\", "\\\\").replace(";", "\\;").replace("=", "\\=")
+
+
+def _routing_keywords(call: ast.Call) -> str:
+    values: list[str] = []
+    for keyword in call.keywords:
+        if keyword.arg in {"provide_automatic_options", "strict_slashes", "merge_slashes", "redirect_to", "subdomain"}:
+            if isinstance(keyword.value, ast.Constant):
+                rendered = repr(keyword.value.value)
+            else:
+                rendered = ast.dump(keyword.value, annotate_fields=False, include_attributes=False)
+            values.append(f"{keyword.arg}={rendered}")
+    return ",".join(sorted(values))
+
+
+def _resolve_imported_target(expr: str, aliases: dict[str, str]) -> str:
+    if not expr:
+        return ""
+    root, _, suffix = expr.partition(".")
+    target = aliases.get(root, "")
+    if not target:
+        return ""
+    return target + (("." + suffix) if suffix else "")
+
+
+def _route_classification(path: str, *, has_dynamic_path: bool = False) -> str:
+    if has_dynamic_path:
+        return "unknown / fail-closed"
+    if not path:
+        return "public"
+    return "internal" if _is_non_public_route_namespace(path) else "public"
+
+
+def _route_signature(**fields: str) -> str:
+    ordered = [
+        "locus",
+        "registration",
+        "decorator",
+        "path",
+        "methods",
+        "endpoint",
+        "view",
+        "blueprint",
+        "blueprint_constructor_prefix",
+        "register_blueprint_prefix",
+        "errorhandler_key",
+        "routing_keywords",
+        "imported_view_target",
+        "public_internal_classification",
+    ]
+    return ";".join(f"{key}={_route_signature_field(fields.get(key, ''))}" for key in ordered)
+
+
 def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
     """Return stable public adapter route/hook registrations for PR-04 drift checks."""
 
@@ -357,6 +411,7 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
     )
     for rel in loci:
         _path, _text, tree = _python_source(rel)
+        aliases = _import_aliases(tree)
         blueprint_prefixes = _blueprint_prefixes(tree)
         for node in ast.walk(tree):
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
@@ -366,16 +421,44 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                     if not deco_name.endswith(route_decorator_suffixes):
                         continue
                     route_arg = ""
+                    has_dynamic_path = False
+                    errorhandler_key = ""
                     if isinstance(deco, ast.Call) and deco.args:
-                        route_arg = _string_constant(deco.args[0]) or ""
+                        if deco_name.endswith((".errorhandler", ".app_errorhandler")):
+                            errorhandler_key = _string_constant(deco.args[0]) or ast.unparse(deco.args[0])
+                        else:
+                            raw_route_arg = _string_constant(deco.args[0])
+                            if raw_route_arg is None:
+                                has_dynamic_path = True
+                            else:
+                                route_arg = raw_route_arg
                     route_root = _decorator_route_root(deco_call)
-                    full_route_arg = _join_route_prefix(blueprint_prefixes.get(route_root, ""), route_arg)
-                    if _is_non_public_route_namespace(full_route_arg):
+                    blueprint_prefix = blueprint_prefixes.get(route_root, "")
+                    full_route_arg = _join_route_prefix(blueprint_prefix, route_arg)
+                    classification = _route_classification(full_route_arg, has_dynamic_path=has_dynamic_path)
+                    if classification == "internal":
                         continue
                     methods = _route_methods(deco_name, deco)
-                    signatures.append(f"{rel}:{deco_name}:{full_route_arg}:{methods}:{node.name}")
+                    routing_keywords = _routing_keywords(deco) if isinstance(deco, ast.Call) else ""
+                    signatures.append(_route_signature(
+                        locus=rel,
+                        registration="decorator",
+                        decorator=deco_name,
+                        path=full_route_arg,
+                        methods=methods,
+                        endpoint=node.name,
+                        view=node.name,
+                        blueprint=route_root,
+                        blueprint_constructor_prefix=blueprint_prefix,
+                        errorhandler_key=errorhandler_key,
+                        routing_keywords=routing_keywords,
+                        imported_view_target=_resolve_imported_target(node.name, aliases),
+                        public_internal_classification=classification,
+                    ))
             if isinstance(node, ast.Call) and _attribute_chain(node.func).endswith(".add_url_rule"):
-                route_arg = _string_constant(node.args[0]) if node.args else ""
+                raw_add_url_route = _string_constant(node.args[0]) if node.args else ""
+                route_arg = raw_add_url_route or ""
+                has_dynamic_path = bool(node.args) and raw_add_url_route is None
                 endpoint = _string_constant(node.args[1]) if len(node.args) > 1 else ""
                 view_desc = ""
                 methods = ""
@@ -386,20 +469,41 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                         method_values = _literal_string_list(keyword.value)
                         if method_values:
                             methods = ",".join(sorted(method_values))
-                if route_arg and _is_non_public_route_namespace(route_arg):
-                    continue
                 if not view_desc and len(node.args) >= 3:
                     view_desc = _attribute_chain(node.args[2].func) if isinstance(node.args[2], ast.Call) else _attribute_chain(node.args[2])
-                signatures.append(f"{rel}:add_url_rule:{route_arg or ''}:{endpoint or ''}:{methods}:{view_desc}")
+                classification = _route_classification(route_arg or "", has_dynamic_path=has_dynamic_path)
+                if classification == "internal":
+                    continue
+                signatures.append(_route_signature(
+                    locus=rel,
+                    registration="add_url_rule",
+                    path=route_arg or "",
+                    methods=methods,
+                    endpoint=endpoint or view_desc,
+                    view=view_desc,
+                    routing_keywords=_routing_keywords(node),
+                    imported_view_target=_resolve_imported_target(view_desc, aliases),
+                    public_internal_classification=classification,
+                ))
             if isinstance(node, ast.Call) and _attribute_chain(node.func).endswith(".register_blueprint"):
                 blueprint = _expr_name(node.args[0]) if node.args else ""
                 url_prefix = ""
                 for keyword in node.keywords:
                     if keyword.arg == "url_prefix":
                         url_prefix = _string_constant(keyword.value) or ""
-                signatures.append(f"{rel}:register_blueprint:{blueprint}:{url_prefix}")
+                classification = _route_classification(url_prefix)
+                if classification == "internal":
+                    continue
+                signatures.append(_route_signature(
+                    locus=rel,
+                    registration="register_blueprint",
+                    blueprint=blueprint,
+                    register_blueprint_prefix=url_prefix,
+                    routing_keywords=_routing_keywords(node),
+                    imported_view_target=_resolve_imported_target(blueprint, aliases),
+                    public_internal_classification=classification,
+                ))
     return sorted(set(signatures))
-
 
 def _is_sanctioned_presenter_call(call: str, aliases: dict[str, str]) -> bool:
     presenter_names = {"emit_public", "emit_public_aux", "emit_public_with_envelope", "emit_reader_public_bytes", "emit_reader_public_envelope"}
@@ -1744,8 +1848,17 @@ def analyze_adapter_boundary(
     unresolved_presenter_routes = _adapter_routes_without_presenter(adapter_loci)
     discovered_public_routes = _adapter_public_route_signatures(adapter_loci)
     public_reader_route_drift = sorted(set(discovered_public_routes) ^ set(public_route_baseline))
-    route_baseline_reconciled = bool(discovered_public_routes) and not public_reader_route_drift
+    unknown_route_signatures = sorted(item for item in discovered_public_routes if "public_internal_classification=unknown / fail-closed" in item)
+    route_baseline_missing_or_incomplete = not public_route_baseline or not discovered_public_routes
     route_baseline_out_of_scope = not discovered_public_routes and adapter_loci != canonical_adapter_loci
+    route_loci_reconciled = set(adapter_loci) == set(canonical_adapter_loci) or not public_reader_route_drift
+    route_baseline_reconciled = (
+        bool(discovered_public_routes)
+        and bool(public_route_baseline)
+        and not public_reader_route_drift
+        and not unknown_route_signatures
+        and route_loci_reconciled
+    )
     pure_external_io = _pure_compute_external_io(pure_compute_loci)
     second_http_home = sorted(module for module in vendor_modules if _is_http_home_module(module))
     adapter_bypass = _adapter_external_io_calls(adapter_loci)
@@ -1758,7 +1871,7 @@ def analyze_adapter_boundary(
 
     findings = [
         boundary_finding("adapter_route_registration", BOUNDARY_ALLOWED if adapter_http_modules else BOUNDARY_UNKNOWN, "PASS" if adapter_http_modules else "UNKNOWN", [row["path"] for row in adapter_rows], "discovered Flask adapter registrations before classification" if adapter_http_modules else "no current adapter route registrations were discoverable", discovered_public_routes),
-        boundary_finding("public_routes", BOUNDARY_ALLOWED if route_baseline_reconciled else (BOUNDARY_OUT_OF_SCOPE if route_baseline_out_of_scope else BOUNDARY_UNKNOWN), "PASS" if route_baseline_reconciled or route_baseline_out_of_scope else "UNKNOWN", [row["path"] for row in adapter_rows], "discovered current route signatures reconcile with governed PR-04 baseline" if route_baseline_reconciled else ("no public route signatures discovered in noncanonical test locus; route surface is out of scope" if route_baseline_out_of_scope else "discovered current route signatures cannot be reconciled with baseline; route drift fails closed"), public_reader_route_drift or discovered_public_routes),
+        boundary_finding("public_routes", BOUNDARY_ALLOWED if route_baseline_reconciled else (BOUNDARY_OUT_OF_SCOPE if route_baseline_out_of_scope else BOUNDARY_UNKNOWN), "PASS" if route_baseline_reconciled or route_baseline_out_of_scope else "UNKNOWN", [row["path"] for row in adapter_rows], "discovered current route signatures reconcile with governed PR-04 baseline" if route_baseline_reconciled else ("no public route signatures discovered in noncanonical test locus; route surface is out of scope" if route_baseline_out_of_scope else "discovered current route signatures, inspected loci, or baseline cannot be reconciled; route drift fails closed"), public_reader_route_drift or unknown_route_signatures or discovered_public_routes or list(public_route_baseline)),
         boundary_finding("response_producing_paths", BOUNDARY_ALLOWED if adapter_presenter_calls and not presenter_bypass and not unresolved_presenter_routes else (BOUNDARY_FORBIDDEN if presenter_bypass else BOUNDARY_UNKNOWN), "PASS" if adapter_presenter_calls and not presenter_bypass and not unresolved_presenter_routes else ("FAIL" if presenter_bypass else "UNKNOWN"), [row["path"] for row in adapter_rows], "public response-producing paths have explicit presenter/emitter provenance" if adapter_presenter_calls and not presenter_bypass and not unresolved_presenter_routes else "response-producing path provenance is unresolved or bypasses presenter", presenter_bypass + unresolved_presenter_routes or adapter_presenter_calls),
         boundary_finding("presenter_provenance", BOUNDARY_ALLOWED if adapter_presenter_calls and not presenter_bypass and not unresolved_presenter_routes else (BOUNDARY_FORBIDDEN if presenter_bypass else BOUNDARY_UNKNOWN), "PASS" if adapter_presenter_calls and not presenter_bypass and not unresolved_presenter_routes else ("FAIL" if presenter_bypass else "UNKNOWN"), [row["path"] for row in presenter_rows], "adapter routes resolve to sanctioned presenter/emitter calls" if adapter_presenter_calls and not presenter_bypass and not unresolved_presenter_routes else "presenter provenance is not proven for every response path", presenter_bypass + unresolved_presenter_routes or adapter_presenter_calls),
         boundary_finding("serializer_paths", BOUNDARY_ALLOWED if not ad_hoc_serializers else BOUNDARY_FORBIDDEN, "PASS" if not ad_hoc_serializers else "FAIL", [row["path"] for row in adapter_rows + vendor_rows + presenter_rows], "no ad-hoc JSON serializer path discovered outside allowed vendor helpers" if not ad_hoc_serializers else "ad-hoc serializer path discovered on governed/public boundary", ad_hoc_serializers),
@@ -1785,7 +1898,12 @@ def analyze_adapter_boundary(
     checks = {
         "adapter_http_home_inspected": check_by_category["adapter_route_registration"],
         "actual_repo_loci_discovered_before_classification": all([adapter_rows, presenter_rows, vendor_rows, pure_rows, evidence_tool_rows]),
-        "hard_coded_path_lists_not_used_as_proof": bool(discovered_public_routes) or adapter_loci != canonical_adapter_loci,
+        "hard_coded_path_lists_not_used_as_proof": bool(discovered_public_routes) or route_baseline_out_of_scope,
+        "route_baseline_present": bool(public_route_baseline) or route_baseline_out_of_scope,
+        "route_baseline_reconciled": route_baseline_reconciled or route_baseline_out_of_scope,
+        "route_loci_reconciled_or_failed_closed": route_loci_reconciled or not route_baseline_reconciled,
+        "new_public_routes_cannot_collapse_to_empty_comparison": (bool(discovered_public_routes) and not route_baseline_missing_or_incomplete) or route_baseline_out_of_scope,
+        "route_signature_classification_unambiguous": not unknown_route_signatures,
         "unknown_current_categories_fail_closed": all(f["verdict"] != "PASS" for f in findings if f["classification"] == BOUNDARY_UNKNOWN),
         "conservative_positive_boundary_contract_applied": {f["classification"] for f in findings} <= {BOUNDARY_ALLOWED, BOUNDARY_FORBIDDEN, BOUNDARY_UNKNOWN, BOUNDARY_OUT_OF_SCOPE},
         "table_driven_boundary_taxonomy_applied": set(taxonomy_group_verdicts) == set(REQUIRED_BOUNDARY_TAXONOMY_GROUPS),
@@ -1804,8 +1922,8 @@ def analyze_adapter_boundary(
     }
     verdict_status = "PASS" if all(checks.values()) and all(finding_passes(f) for f in findings) else ("FAIL" if any(f["classification"] == BOUNDARY_FORBIDDEN for f in findings) else "UNKNOWN")
     return {
-        "work_item": "W-003",
-        "scope": "HDE-EPIC034 PR-04 table-driven adapter/presenter boundary taxonomy proof for HDE-FERM007.4 only",
+        "work_item": "W-004",
+        "scope": "HDE-EPIC034 PR-04 public route drift boundary-proof remediation for HDE-FERM007.4 only",
         "inspected_loci": {"adapter": adapter_rows, "presenter": presenter_rows, "engine": pure_rows, "vendor_seam": vendor_rows, "evidence_tool": evidence_tool_rows},
         "findings": findings,
         "boundary_taxonomy": taxonomy_group_verdicts,
@@ -1813,6 +1931,9 @@ def analyze_adapter_boundary(
         "missing_taxonomy_groups": sorted(set(REQUIRED_BOUNDARY_TAXONOMY_GROUPS) - set(taxonomy_group_verdicts)),
         "unknowns": [f for f in findings if f["classification"] == BOUNDARY_UNKNOWN],
         "public_route_deltas": public_reader_route_drift,
+        "route_baseline_reconciled": route_baseline_reconciled,
+        "route_baseline_signatures": list(public_route_baseline),
+        "unknown_route_signatures": unknown_route_signatures,
         "public_internal_route_classification_posture": next(f for f in findings if f["category"] == "public_routes"),
         "response_producing_path_findings": next(f for f in findings if f["category"] == "response_producing_paths"),
         "presenter_provenance": next(f for f in findings if f["category"] == "presenter_provenance"),

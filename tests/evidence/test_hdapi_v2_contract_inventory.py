@@ -2446,7 +2446,7 @@ def reader():
     try:
         adapter = _write_boundary_temp(rel_dir, "blueprint_constructor_prefix.py", body)
         signatures = boundary_analyzer._adapter_public_route_signatures((adapter,))
-        assert f"{adapter}:bp.get:/v2/reader:GET:reader" in signatures
+        assert any(f"locus={adapter};registration=decorator;decorator=bp.get;path=/v2/reader;methods=GET;endpoint=reader" in item for item in signatures)
         assert f"{adapter}:bp.get:/reader:GET:reader" not in signatures
     finally:
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
@@ -2962,7 +2962,7 @@ def good():
     try:
         adapter = _write_boundary_temp(rel_dir, "developer_status_route.py", body)
         signatures = boundary_analyzer._adapter_public_route_signatures((adapter,))
-        assert any(':/developer/status:' in item for item in signatures)
+        assert any('path=/developer/status;' in item for item in signatures)
         monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
         monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", tuple(signatures))
         with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_presenter_bypass"):
@@ -2990,7 +2990,7 @@ def good():
     try:
         adapter = _write_boundary_temp(rel_dir, "public_blueprint_internal_segment.py", body)
         signatures = boundary_analyzer._adapter_public_route_signatures((adapter,))
-        assert any(':/api/internal/raw:' in item for item in signatures)
+        assert any('path=/api/internal/raw;' in item for item in signatures)
         monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
         monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", tuple(signatures))
         with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_presenter_bypass"):
@@ -3072,8 +3072,8 @@ def test_epic034_adapter_boundary_includes_installed_logging_filter_hooks() -> N
     proof, checks = generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
     assert checks["actual_repo_loci_discovered_before_classification"] is True
     assert "adapter/logging_filter.py" in proof
-    assert "adapter/logging_filter.py:app.before_request:::_start_timer_and_cid" in proof
-    assert "adapter/logging_filter.py:app.after_request:::_keys_only_after" in proof
+    assert "locus=adapter/logging_filter.py;registration=decorator;decorator=app.before_request;path=;methods=;endpoint=_start_timer_and_cid" in proof
+    assert "locus=adapter/logging_filter.py;registration=decorator;decorator=app.after_request;path=;methods=;endpoint=_keys_only_after" in proof
 
 
 def test_epic034_adapter_boundary_rejects_abort_response_exit(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -3487,7 +3487,7 @@ def test_epic034_adapter_boundary_requires_low_level_vendor_io_guard() -> None:
 def test_epic034_adapter_boundary_reports_positive_contract_classifications() -> None:
     proof, checks = generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
     assert checks["conservative_positive_boundary_contract_applied"] is True
-    assert "work_item=W-003" in proof
+    assert "work_item=W-004" in proof
     assert "analyzer_rendering_separation=" in proof
     assert "renderer_only_posture=" in proof
     assert "analyzer_owned_verdict_status=PASS" in proof
@@ -3605,5 +3605,181 @@ def test_epic034_w002_analyzer_findings_survive_rendering_and_no_claims_remain()
         "external_io_findings_were_carried_from_analyzer_to_renderer=true",
         "guard_provenance_findings_were_carried_from_analyzer_to_renderer=true",
         "no_unsupported_scope_claim_was_emitted=true",
+    ]:
+        assert needle in check_log
+
+
+def test_epic034_w004_route_drift_does_not_disable_when_adapter_loci_change(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+SAFE_MODE='1'
+@app.route('/w004-new-public', methods=['GET'])
+def w004_new_public():
+    return emit_public({'ok': True})
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004_new_public.py", body)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", ())
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*route_baseline_present.*no_public_reader_change"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+@pytest.mark.parametrize(
+    ("filename", "body", "mutate"),
+    [
+        (
+            "w004_blueprint_prefix.py",
+            """
+from flask import Blueprint
+from engine.presenter.emitter import emit_public
+bp = Blueprint('reader', __name__, url_prefix='/old')
+@bp.get('/reader')
+def reader():
+    return emit_public({'ok': True})
+""",
+            lambda sig: sig.replace("blueprint_constructor_prefix=/old", "blueprint_constructor_prefix=/new"),
+        ),
+        (
+            "w004_register_prefix.py",
+            """
+from flask import Flask, Blueprint
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+bp = Blueprint('reader', __name__)
+@bp.get('/reader')
+def reader():
+    return emit_public({'ok': True})
+app.register_blueprint(bp, url_prefix='/old')
+""",
+            lambda sig: sig.replace("register_blueprint_prefix=/old", "register_blueprint_prefix=/new"),
+        ),
+        (
+            "w004_errorhandler.py",
+            """
+from flask import Flask
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+@app.errorhandler(404)
+def missing(err):
+    return emit_public({'ok': False})
+""",
+            lambda sig: sig.replace("errorhandler_key=404", "errorhandler_key=500"),
+        ),
+        (
+            "w004_routing_keyword.py",
+            """
+from flask import Flask
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+@app.route('/kw', methods=['POST'], provide_automatic_options=False)
+def kw():
+    return emit_public({'ok': True})
+""",
+            lambda sig: sig.replace("routing_keywords=provide_automatic_options\\=False", "routing_keywords=provide_automatic_options\\=True"),
+        ),
+    ],
+)
+def test_epic034_w004_signature_field_drift_fails_closed(monkeypatch: pytest.MonkeyPatch, filename: str, body: str, mutate: Any) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    try:
+        adapter = _write_boundary_temp(rel_dir, filename, body)
+        signatures = tuple(boundary_analyzer._adapter_public_route_signatures((adapter,)))
+        assert signatures
+        stale_baseline = tuple(mutate(item) for item in signatures)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", stale_baseline)
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*route_baseline_reconciled.*no_public_reader_change"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004_add_url_rule_imported_view_target_and_endpoint_are_signed() -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask
+from engine.presenter.emitter import emit_public as imported_emit
+app = Flask(__name__)
+def local_view():
+    return imported_emit({'ok': True})
+app.add_url_rule('/added', 'added_endpoint', view_func=local_view, methods=['POST'], provide_automatic_options=False)
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004_add_url_rule.py", body)
+        signatures = boundary_analyzer._adapter_public_route_signatures((adapter,))
+        joined = "\n".join(signatures)
+        assert "registration=add_url_rule" in joined
+        assert "path=/added" in joined
+        assert "methods=POST" in joined
+        assert "endpoint=added_endpoint" in joined
+        assert "view=local_view" in joined
+        assert "routing_keywords=provide_automatic_options\\=False" in joined
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004_dynamic_route_classification_ambiguity_fails_closed(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+ROUTE = '/dynamic-public'
+@app.route(ROUTE)
+def dynamic_public():
+    return emit_public({'ok': True})
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004_dynamic_route.py", body)
+        signatures = tuple(boundary_analyzer._adapter_public_route_signatures((adapter,)))
+        assert any("public_internal_classification=unknown / fail-closed" in item for item in signatures)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", signatures)
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*route_signature_classification_unambiguous.*no_public_reader_change"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004_route_findings_survive_renderer_output() -> None:
+    result = _epic034_analyzer_result()
+    proof, checks = generator.render_adapter_boundary_proof("2026-06-18T00:00:00Z", result)
+    check_log = generator.build_adapter_boundary_check_log("2026-06-18T00:00:00Z", proof, checks, mode="closed-rails-source-cache")
+    for needle in [
+        "work_item=W-004",
+        "route_comparison_cannot_disable_itself=true",
+        "route_baseline_reconciliation_posture=reconciled",
+        "current_public_route_signatures_inspected=",
+        "route_baseline_signatures_inspected=",
+        "blueprint_constructor_prefix_posture=encoded",
+        "register_blueprint_url_prefix_posture=encoded",
+        "add_url_rule_posture=encoded",
+        "errorhandler_key_posture=encoded",
+        "routing_keyword_posture=encoded",
+        "endpoint_view_identity_posture=encoded",
+        "imported_view_target_posture=encoded",
+        "public_internal_classification_posture=encoded",
+    ]:
+        assert needle in proof
+    for needle in [
+        "w004_route_drift_repair_applied=true",
+        "route_comparison_cannot_disable_itself=true",
+        "changed_adapter_loci_cannot_bypass_route_drift_comparison=true",
+        "route_baseline_mismatch_or_missing_baseline_fails_closed=true",
+        "newly_discovered_public_routes_cannot_collapse_to_empty_comparison=true",
     ]:
         assert needle in check_log
