@@ -698,10 +698,72 @@ def _unsupported_route_registration_signatures(loci: tuple[str, ...]) -> list[st
             public_internal_classification=BOUNDARY_UNKNOWN,
         )
 
+
+    def signature_from_direct_alias_call(
+        rel: str,
+        call: ast.Call,
+        aliases: dict[str, str],
+        alias_methods: dict[str, str],
+    ) -> str:
+        call_name = _attribute_chain(call.func)
+        route_name = alias_methods[call_name]
+        if route_name == ".add_url_rule":
+            raw_route = _string_constant(call.args[0]) if call.args else None
+            endpoint = _string_constant(call.args[1]) if len(call.args) > 1 else ""
+            view = ""
+            methods = ""
+            for keyword in call.keywords:
+                if keyword.arg == "view_func":
+                    view = (
+                        _attribute_chain(keyword.value.func)
+                        if isinstance(keyword.value, ast.Call)
+                        else _attribute_chain(keyword.value)
+                    )
+                elif keyword.arg == "methods":
+                    method_values = _literal_string_list(keyword.value)
+                    if method_values:
+                        methods = ",".join(sorted(method_values))
+            if not view and len(call.args) >= 3:
+                view = (
+                    _attribute_chain(call.args[2].func)
+                    if isinstance(call.args[2], ast.Call)
+                    else _attribute_chain(call.args[2])
+                )
+            return _route_signature(
+                locus=rel,
+                registration="unsupported_route_registration",
+                decorator=call_name,
+                path=raw_route or "",
+                methods=methods,
+                endpoint=endpoint or view,
+                view=view,
+                routing_keywords=_routing_keywords(call),
+                imported_view_target=_resolve_imported_target(view, aliases, inspected_modules),
+                public_internal_classification=BOUNDARY_UNKNOWN,
+            )
+        if route_name == ".register_blueprint":
+            blueprint = _expr_name(call.args[0]) if call.args else ""
+            url_prefix = ""
+            for keyword in call.keywords:
+                if keyword.arg == "url_prefix":
+                    url_prefix = _string_constant(keyword.value) or ""
+            return _route_signature(
+                locus=rel,
+                registration="unsupported_route_registration",
+                decorator=call_name,
+                blueprint=blueprint,
+                register_blueprint_prefix=url_prefix,
+                routing_keywords=_routing_keywords(call),
+                imported_view_target=_resolve_imported_target(blueprint, aliases, inspected_modules),
+                public_internal_classification=BOUNDARY_UNKNOWN,
+            )
+        return signature_from_factory(rel, call, aliases, alias_methods)
+
     for rel in loci:
         _path, _text, tree = _python_source(rel)
         aliases = _import_aliases(tree)
         route_alias_methods = route_factory_alias_methods(tree)
+        parents = {child: parent for parent in ast.walk(tree) for child in ast.iter_child_nodes(parent)}
         decorator_subtree_ids: set[int] = set()
         for fn in (
             node
@@ -738,6 +800,17 @@ def _unsupported_route_registration_signatures(loci: tuple[str, ...]) -> list[st
 
         for node in ast.walk(tree):
             if not isinstance(node, ast.Call) or id(node) in decorator_subtree_ids:
+                continue
+            call_name = _attribute_chain(node.func)
+            parent = parents.get(node)
+            if (
+                not isinstance(node.func, ast.Call)
+                and call_name in route_alias_methods
+                and not (isinstance(parent, ast.Call) and parent.func is node)
+            ):
+                signatures.append(signature_from_direct_alias_call(
+                    rel, node, aliases, route_alias_methods
+                ))
                 continue
             if not isinstance(node.func, ast.Call):
                 continue

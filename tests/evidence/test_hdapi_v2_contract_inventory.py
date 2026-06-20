@@ -4069,3 +4069,72 @@ public_post('/aliased-function-style')(added)
             generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
     finally:
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004_aliased_add_url_rule_direct_call_fails_closed_with_signed_fields(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+add_rule = app.add_url_rule
+def added():
+    return emit_public({'ok': True})
+add_rule('/aliased-rule', 'aliased_endpoint', view_func=added, methods=['PATCH'])
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004_aliased_add_url_rule.py", body)
+        parsed_signatures = tuple(boundary_analyzer._adapter_public_route_signatures((adapter,)))
+        unsupported_signatures = tuple(boundary_analyzer._unsupported_route_registration_signatures((adapter,)))
+        assert parsed_signatures == ()
+        assert any("registration=unsupported_route_registration" in item for item in unsupported_signatures)
+        assert any("decorator=add_rule" in item for item in unsupported_signatures)
+        assert any("path=/aliased-rule" in item for item in unsupported_signatures)
+        assert any("methods=PATCH" in item for item in unsupported_signatures)
+        assert any("endpoint=aliased_endpoint" in item for item in unsupported_signatures)
+        assert any("view=added" in item for item in unsupported_signatures)
+        assert any("public_internal_classification=unknown / fail-closed" in item for item in unsupported_signatures)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", ())
+        expected_failure = (
+            "ADAPTER_BOUNDARY_CHECK_FAILED:.*"
+            "new_public_routes_cannot_collapse_to_empty_comparison.*no_public_reader_change"
+        )
+        with pytest.raises(ValueError, match=expected_failure):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004_aliased_register_blueprint_direct_call_fails_closed_with_signed_fields(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Blueprint, Flask
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+bp = Blueprint('bp', __name__)
+register = app.register_blueprint
+@bp.route('/aliased-blueprint-child')
+def added():
+    return emit_public({'ok': True})
+register(bp, url_prefix='/aliased-prefix')
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004_aliased_register_blueprint.py", body)
+        unsupported_signatures = tuple(boundary_analyzer._unsupported_route_registration_signatures((adapter,)))
+        joined = "\n".join(unsupported_signatures)
+        assert "registration=unsupported_route_registration" in joined
+        assert "decorator=register" in joined
+        assert "blueprint=bp" in joined
+        assert "register_blueprint_prefix=/aliased-prefix" in joined
+        assert "public_internal_classification=unknown / fail-closed" in joined
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", ())
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_public_reader_change"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
