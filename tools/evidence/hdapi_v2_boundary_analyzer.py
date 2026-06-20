@@ -612,26 +612,63 @@ def _unsupported_route_registration_signatures(loci: tuple[str, ...]) -> list[st
         attr_name = _string_constant(getattr_call.args[1])
         return attr_name if attr_name in routeish_names else ""
 
-    def supported_route_factory(call: ast.Call) -> bool:
-        call_name = _attribute_chain(call.func)
-        return call_name.endswith(routeish_suffixes) or bool(getattr_routeish(call))
+    def routeish_suffix(call_name: str) -> str:
+        return f".{call_name.rsplit('.', 1)[-1]}" if call_name else ""
 
-    def routeish_method_name(call: ast.Call) -> str:
+    def route_factory_alias_methods(tree: ast.AST) -> dict[str, str]:
+        methods: dict[str, str] = {}
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Assign):
+                value = node.value
+                targets = node.targets
+            elif isinstance(node, ast.AnnAssign):
+                value = node.value
+                targets = [node.target]
+            else:
+                continue
+            if value is None:
+                continue
+            alias_method = ""
+            if isinstance(value, ast.Attribute):
+                value_name = _attribute_chain(value)
+                if value_name.endswith(routeish_suffixes):
+                    alias_method = routeish_suffix(value_name)
+            elif isinstance(value, ast.Call) and getattr_routeish(value):
+                alias_method = f".{getattr_routeish(value)}"
+            if not alias_method:
+                continue
+            for target in targets:
+                if isinstance(target, ast.Name):
+                    methods[target.id] = alias_method
+        return methods
+
+    def supported_route_factory(call: ast.Call, alias_methods: dict[str, str]) -> bool:
+        call_name = _attribute_chain(call.func)
+        return (
+            call_name.endswith(routeish_suffixes)
+            or call_name in alias_methods
+            or bool(getattr_routeish(call))
+        )
+
+    def routeish_method_name(call: ast.Call, alias_methods: dict[str, str]) -> str:
         attr_name = getattr_routeish(call)
         if attr_name:
             return f".{attr_name}"
         call_name = _attribute_chain(call.func)
-        return f".{call_name.rsplit('.', 1)[-1]}" if call_name else ""
+        if call_name in alias_methods:
+            return alias_methods[call_name]
+        return routeish_suffix(call_name)
 
     def signature_from_factory(
         rel: str,
         factory: ast.Call,
         aliases: dict[str, str],
+        alias_methods: dict[str, str],
         *,
         endpoint: str = "",
         view_expr: ast.AST | None = None,
     ) -> str:
-        route_name = routeish_method_name(factory)
+        route_name = routeish_method_name(factory, alias_methods)
         route_arg = ""
         errorhandler_key = ""
         if factory.args:
@@ -664,6 +701,7 @@ def _unsupported_route_registration_signatures(loci: tuple[str, ...]) -> list[st
     for rel in loci:
         _path, _text, tree = _python_source(rel)
         aliases = _import_aliases(tree)
+        route_alias_methods = route_factory_alias_methods(tree)
         decorator_subtree_ids: set[int] = set()
         for fn in (
             node
@@ -678,11 +716,22 @@ def _unsupported_route_registration_signatures(loci: tuple[str, ...]) -> list[st
                 deco_name = _attribute_chain(deco_call)
                 if deco_name.endswith(routeish_suffixes):
                     continue
+                if deco_name in route_alias_methods:
+                    signatures.append(signature_from_factory(
+                        rel,
+                        deco,
+                        aliases,
+                        route_alias_methods,
+                        endpoint=fn.name,
+                        view_expr=ast.Name(id=fn.name),
+                    ))
+                    continue
                 if isinstance(deco_call, ast.Call) and getattr_routeish(deco_call):
                     signatures.append(signature_from_factory(
                         rel,
                         deco,
                         aliases,
+                        route_alias_methods,
                         endpoint=fn.name,
                         view_expr=ast.Name(id=fn.name),
                     ))
@@ -690,7 +739,9 @@ def _unsupported_route_registration_signatures(loci: tuple[str, ...]) -> list[st
         for node in ast.walk(tree):
             if not isinstance(node, ast.Call) or id(node) in decorator_subtree_ids:
                 continue
-            if not isinstance(node.func, ast.Call) or not supported_route_factory(node.func):
+            if not isinstance(node.func, ast.Call):
+                continue
+            if not supported_route_factory(node.func, route_alias_methods):
                 continue
             # Function-style route registration, for example app.route('/x')(view),
             # is route-bearing, but the analyzer only proves decorator-bound endpoint
@@ -698,7 +749,7 @@ def _unsupported_route_registration_signatures(loci: tuple[str, ...]) -> list[st
             # explicit unknown/fail-closed signature instead of letting it disappear.
             view_expr = node.args[0] if node.args else None
             signatures.append(signature_from_factory(
-                rel, node.func, aliases, view_expr=view_expr
+                rel, node.func, aliases, route_alias_methods, view_expr=view_expr
             ))
     return sorted(set(signatures))
 

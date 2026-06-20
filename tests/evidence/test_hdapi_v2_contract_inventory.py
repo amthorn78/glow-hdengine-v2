@@ -3997,3 +3997,75 @@ app.route('/function-style-added', methods=['POST'])(added)
             generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
     finally:
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004_aliased_route_decorator_fails_closed_with_signed_fields(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+public_route = app.route
+@public_route('/aliased-added', methods=['PUT'])
+def added():
+    return emit_public({'ok': True})
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004_aliased_route.py", body)
+        parsed_signatures = tuple(boundary_analyzer._adapter_public_route_signatures((adapter,)))
+        unsupported_signatures = tuple(boundary_analyzer._unsupported_route_registration_signatures((adapter,)))
+        assert parsed_signatures == ()
+        assert any("registration=unsupported_route_registration" in item for item in unsupported_signatures)
+        assert any("path=/aliased-added" in item for item in unsupported_signatures)
+        assert any("methods=PUT" in item for item in unsupported_signatures)
+        assert any("endpoint=added" in item for item in unsupported_signatures)
+        assert any("view=added" in item for item in unsupported_signatures)
+        assert any("public_internal_classification=unknown / fail-closed" in item for item in unsupported_signatures)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", ())
+        expected_failure = (
+            "ADAPTER_BOUNDARY_CHECK_FAILED:.*route_baseline_present.*"
+            "route_signature_classification_unambiguous.*no_public_reader_change"
+        )
+        with pytest.raises(ValueError, match=expected_failure):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004_aliased_function_style_route_cannot_collapse_to_empty_comparison(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+public_post = app.post
+def added():
+    return emit_public({'ok': True})
+public_post('/aliased-function-style')(added)
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004_aliased_function_style_route.py", body)
+        parsed_signatures = tuple(boundary_analyzer._adapter_public_route_signatures((adapter,)))
+        unsupported_signatures = tuple(boundary_analyzer._unsupported_route_registration_signatures((adapter,)))
+        assert parsed_signatures == ()
+        assert any("registration=unsupported_route_registration" in item for item in unsupported_signatures)
+        assert any("path=/aliased-function-style" in item for item in unsupported_signatures)
+        assert any("methods=POST" in item for item in unsupported_signatures)
+        assert any("endpoint=added" in item for item in unsupported_signatures)
+        assert any("view=added" in item for item in unsupported_signatures)
+        assert any("public_internal_classification=unknown / fail-closed" in item for item in unsupported_signatures)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", ())
+        expected_failure = (
+            "ADAPTER_BOUNDARY_CHECK_FAILED:.*"
+            "new_public_routes_cannot_collapse_to_empty_comparison.*no_public_reader_change"
+        )
+        with pytest.raises(ValueError, match=expected_failure):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
