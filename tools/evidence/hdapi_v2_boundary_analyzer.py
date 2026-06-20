@@ -585,6 +585,8 @@ def _unsupported_route_registration_signatures(loci: tuple[str, ...]) -> list[st
     pass is deliberately narrow: it catches route-bearing higher-order/dynamic forms
     that the positive parser cannot assign endpoint/view identity to, without
     reclassifying the already-proven decorator/add_url_rule/register_blueprint forms.
+    When a literal path, methods, or view target is still visible, those fields remain
+    signed so the fail-closed evidence pinpoints the drift surface.
     """
 
     signatures: list[str] = []
@@ -601,21 +603,73 @@ def _unsupported_route_registration_signatures(loci: tuple[str, ...]) -> list[st
         "app_errorhandler",
     }
     routeish_suffixes = tuple(f".{name}" for name in routeish_names)
+    inspected_modules = {_module_name_for_locus(rel) for rel in loci}
 
     def getattr_routeish(call: ast.Call) -> str:
-        if _attribute_chain(call.func) != "getattr" or len(call.args) < 2:
+        getattr_call = call.func if isinstance(call.func, ast.Call) else call
+        if _attribute_chain(getattr_call.func) != "getattr" or len(getattr_call.args) < 2:
             return ""
-        attr_name = _string_constant(call.args[1])
+        attr_name = _string_constant(getattr_call.args[1])
         return attr_name if attr_name in routeish_names else ""
 
     def supported_route_factory(call: ast.Call) -> bool:
         call_name = _attribute_chain(call.func)
         return call_name.endswith(routeish_suffixes) or bool(getattr_routeish(call))
 
+    def routeish_method_name(call: ast.Call) -> str:
+        attr_name = getattr_routeish(call)
+        if attr_name:
+            return f".{attr_name}"
+        call_name = _attribute_chain(call.func)
+        return f".{call_name.rsplit('.', 1)[-1]}" if call_name else ""
+
+    def signature_from_factory(
+        rel: str,
+        factory: ast.Call,
+        aliases: dict[str, str],
+        *,
+        endpoint: str = "",
+        view_expr: ast.AST | None = None,
+    ) -> str:
+        route_name = routeish_method_name(factory)
+        route_arg = ""
+        errorhandler_key = ""
+        if factory.args:
+            raw_arg = _string_constant(factory.args[0])
+            if route_name.endswith((".errorhandler", ".app_errorhandler")):
+                errorhandler_key = raw_arg or ast.unparse(factory.args[0])
+            else:
+                route_arg = raw_arg or ""
+        view = ""
+        if view_expr is not None:
+            view = (
+                _attribute_chain(view_expr.func)
+                if isinstance(view_expr, ast.Call)
+                else _attribute_chain(view_expr)
+            )
+        return _route_signature(
+            locus=rel,
+            registration="unsupported_route_registration",
+            decorator=ast.unparse(factory),
+            path=route_arg,
+            methods=_route_methods(route_name, factory),
+            endpoint=endpoint or view,
+            view=view,
+            errorhandler_key=errorhandler_key,
+            routing_keywords=_routing_keywords(factory),
+            imported_view_target=_resolve_imported_target(view, aliases, inspected_modules),
+            public_internal_classification=BOUNDARY_UNKNOWN,
+        )
+
     for rel in loci:
         _path, _text, tree = _python_source(rel)
+        aliases = _import_aliases(tree)
         decorator_subtree_ids: set[int] = set()
-        for fn in (node for node in ast.walk(tree) if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))):
+        for fn in (
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+        ):
             for deco in fn.decorator_list:
                 decorator_subtree_ids.update(id(child) for child in ast.walk(deco))
                 if not isinstance(deco, ast.Call):
@@ -625,14 +679,12 @@ def _unsupported_route_registration_signatures(loci: tuple[str, ...]) -> list[st
                 if deco_name.endswith(routeish_suffixes):
                     continue
                 if isinstance(deco_call, ast.Call) and getattr_routeish(deco_call):
-                    signatures.append(_route_signature(
-                        locus=rel,
-                        registration="unsupported_route_registration",
-                        decorator=ast.unparse(deco_call),
+                    signatures.append(signature_from_factory(
+                        rel,
+                        deco,
+                        aliases,
                         endpoint=fn.name,
-                        view=fn.name,
-                        routing_keywords=_routing_keywords(deco),
-                        public_internal_classification=BOUNDARY_UNKNOWN,
+                        view_expr=ast.Name(id=fn.name),
                     ))
 
         for node in ast.walk(tree):
@@ -644,12 +696,9 @@ def _unsupported_route_registration_signatures(loci: tuple[str, ...]) -> list[st
             # is route-bearing, but the analyzer only proves decorator-bound endpoint
             # identity. Keep the route drift comparison active by surfacing this as an
             # explicit unknown/fail-closed signature instead of letting it disappear.
-            signatures.append(_route_signature(
-                locus=rel,
-                registration="unsupported_route_registration",
-                decorator=ast.unparse(node.func),
-                routing_keywords=_routing_keywords(node.func),
-                public_internal_classification=BOUNDARY_UNKNOWN,
+            view_expr = node.args[0] if node.args else None
+            signatures.append(signature_from_factory(
+                rel, node.func, aliases, view_expr=view_expr
             ))
     return sorted(set(signatures))
 
