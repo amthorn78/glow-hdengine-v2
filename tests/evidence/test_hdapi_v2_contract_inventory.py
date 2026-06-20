@@ -4250,3 +4250,41 @@ app.register_blueprint(bp)
             generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
     finally:
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004_imported_inspected_blueprint_route_alias_fails_closed(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    owner_body = """
+from flask import Blueprint
+shared_bp = Blueprint('shared', __name__)
+"""
+    route_body = """
+from flask import Flask
+from engine.presenter.emitter import emit_public
+from tmp_boundary_test.w004_imported_bp_owner import shared_bp
+app = Flask(__name__)
+public_route = shared_bp.route
+@public_route('/imported-blueprint-alias', methods=['PUT'])
+def added():
+    return emit_public({'ok': True})
+app.register_blueprint(shared_bp)
+"""
+    try:
+        owner = _write_boundary_temp(rel_dir, "w004_imported_bp_owner.py", owner_body)
+        adapter = _write_boundary_temp(rel_dir, "w004_imported_bp_route_alias.py", route_body)
+        parsed_signatures = tuple(boundary_analyzer._adapter_public_route_signatures((adapter, owner)))
+        unsupported_signatures = tuple(boundary_analyzer._unsupported_route_registration_signatures((adapter, owner)))
+        assert all("/imported-blueprint-alias" not in item for item in parsed_signatures)
+        assert any("path=/imported-blueprint-alias" in item for item in unsupported_signatures)
+        assert any("methods=PUT" in item for item in unsupported_signatures)
+        assert any("endpoint=added" in item for item in unsupported_signatures)
+        assert any("view=added" in item for item in unsupported_signatures)
+        assert any("public_internal_classification=unknown / fail-closed" in item for item in unsupported_signatures)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter, owner))
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", ())
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_public_reader_change"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)

@@ -647,6 +647,21 @@ def _unsupported_route_registration_signatures(loci: tuple[str, ...]) -> list[st
     ) -> dict[str, str]:
         methods: dict[str, str] = {}
         route_owners = route_owner_names(tree, import_aliases)
+
+        def owner_is_route_bearing(owner: ast.AST | None) -> bool:
+            root = _root_name(owner) if owner is not None else None
+            return bool(
+                root
+                and (
+                    root in route_owners
+                    or (
+                        root in import_aliases
+                        and _imported_target_is_inspected(
+                            root, import_aliases, inspected_modules
+                        )
+                    )
+                )
+            )
         for node in ast.walk(tree):
             if isinstance(node, ast.Assign):
                 value = node.value
@@ -662,7 +677,7 @@ def _unsupported_route_registration_signatures(loci: tuple[str, ...]) -> list[st
             if isinstance(value, ast.Attribute):
                 value_name = _attribute_chain(value)
                 if (
-                    _root_name(value) in route_owners
+                    owner_is_route_bearing(value)
                     and value_name.endswith(routeish_suffixes)
                 ):
                     alias_method = routeish_suffix(value_name)
@@ -672,7 +687,7 @@ def _unsupported_route_registration_signatures(loci: tuple[str, ...]) -> list[st
                     if isinstance(value.func, ast.Call)
                     else value.args[0]
                 )
-                if _root_name(owner) in route_owners:
+                if owner_is_route_bearing(owner):
                     alias_method = f".{getattr_routeish(value)}"
             if not alias_method:
                 continue
