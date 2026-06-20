@@ -1,6 +1,6 @@
 # HDAPI v2 and legacy v1 Source Inventory
 
-Generated at UTC: 2026-06-20T09:30:18Z
+Generated at UTC: 2026-06-20T13:52:34Z
 
 Source mode: closed-rails-source-cache
 

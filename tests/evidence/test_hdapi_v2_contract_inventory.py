@@ -4911,3 +4911,213 @@ def test_epic034_w004_renderer_route_field_checks_are_analyzer_owned() -> None:
             result["checks"],
             mode="closed-rails-source-cache",
         )
+
+
+def test_epic034_w004a_literal_internal_decorator_dynamic_methods_stays_internal() -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask
+app = Flask(__name__)
+METHODS = ['GET']
+@app.route('/internal/status', methods=METHODS)
+def status():
+    return 'ok'
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004a_internal_dynamic_methods.py", body)
+        signatures = boundary_analyzer.discover_route_registrations((adapter,))
+        assert all("/internal/status" not in record.path for record in signatures)
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004a_literal_internal_add_url_rule_dynamic_metadata_stays_internal() -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask
+app = Flask(__name__)
+ENDPOINT = 'status'
+METHODS = ['GET']
+def view():
+    return 'ok'
+app.add_url_rule('/internal/status', endpoint=ENDPOINT, view_func=view, methods=METHODS)
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004a_internal_add_url_rule.py", body)
+        signatures = boundary_analyzer.discover_route_registrations((adapter,))
+        assert all("/internal/status" not in record.path for record in signatures)
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004a_function_local_flask_owner_does_not_leak_to_module_alias() -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask
+def make_local():
+    app = Flask(__name__)
+    return app
+class NonFlaskHelper:
+    def route(self, path):
+        def decorate(fn):
+            return fn
+        return decorate
+app = NonFlaskHelper()
+public_route = app.route
+@public_route('/hidden')
+def helper():
+    return 'not a flask route'
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004a_local_owner_shadow.py", body)
+        signatures = boundary_analyzer.discover_route_registrations((adapter,))
+        assert all("/hidden" not in record.path for record in signatures)
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004a_imported_factory_created_owner_fails_closed() -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    owner_body = """
+def create_app():
+    return object()
+app = create_app()
+"""
+    route_body = """
+from tmp_boundary_test.w004a_factory_owner import app
+public_route = app.route
+@public_route('/hidden')
+def hidden():
+    return 'hidden'
+"""
+    try:
+        owner = _write_boundary_temp(rel_dir, "w004a_factory_owner.py", owner_body)
+        adapter = _write_boundary_temp(rel_dir, "w004a_factory_route.py", route_body)
+        signatures = boundary_analyzer.discover_route_registrations((adapter, owner))
+        assert any(record.path == "/hidden" for record in signatures)
+        assert any(
+            record.public_internal_classification == boundary_analyzer.BOUNDARY_UNKNOWN
+            for record in signatures
+            if record.path == "/hidden"
+        )
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004a_imported_missing_owner_symbol_fails_closed() -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    owner_body = """
+not_app = object()
+"""
+    route_body = """
+from tmp_boundary_test.w004a_missing_owner import app
+public_route = app.route
+@public_route('/hidden')
+def hidden():
+    return 'hidden'
+"""
+    try:
+        owner = _write_boundary_temp(rel_dir, "w004a_missing_owner.py", owner_body)
+        adapter = _write_boundary_temp(rel_dir, "w004a_missing_owner_route.py", route_body)
+        signatures = boundary_analyzer.discover_route_registrations((adapter, owner))
+        assert any(record.path == "/hidden" for record in signatures)
+        assert any(
+            record.public_internal_classification == boundary_analyzer.BOUNDARY_UNKNOWN
+            for record in signatures
+            if record.path == "/hidden"
+        )
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004a_helper_locus_without_routes_does_not_break_route_loci_reconciliation() -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    route_body = """
+from flask import Flask
+from engine.presenter.emitter import emit_public
+from tmp_boundary_test.w004a_views import view_payload
+app = Flask(__name__)
+@app.route('/reader')
+def reader():
+    return emit_public(view_payload())
+"""
+    helper_body = """
+def view_payload():
+    return {'ok': True}
+"""
+    try:
+        route = _write_boundary_temp(rel_dir, "w004a_routes.py", route_body)
+        helper = _write_boundary_temp(rel_dir, "w004a_views.py", helper_body)
+        baseline = tuple(boundary_analyzer._adapter_public_route_signatures((route,)))
+        source_selection, request_shaping, response_mapping = _epic034_boundary_inputs()
+        result = boundary_analyzer.analyze_adapter_boundary(
+            source_selection=source_selection,
+            request_shaping=request_shaping,
+            response_mapping=response_mapping,
+            adapter_loci=(route, helper),
+            canonical_adapter_loci=(route, helper),
+            presenter_loci=generator.ADAPTER_BOUNDARY_PRESENTER_LOCI,
+            vendor_seam_loci=generator.ADAPTER_BOUNDARY_VENDOR_SEAM_LOCI,
+            pure_compute_loci=generator.ADAPTER_BOUNDARY_PURE_COMPUTE_LOCI,
+            public_route_baseline=baseline,
+            evidence_tool_loci=("tools/evidence/generate_hdapi_v2_contract_inventory.py", "tools/evidence/hdapi_v2_boundary_analyzer.py"),
+        )
+        assert result["checks"]["route_baseline_reconciled"] is True
+        assert result["inspected_helper_loci"] == [helper]
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004a_helper_locus_becoming_route_bearing_is_detected() -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    route_body = """
+from flask import Flask
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+@app.route('/reader')
+def reader():
+    return emit_public({'ok': True})
+"""
+    helper_body = """
+from flask import Flask
+from engine.presenter.emitter import emit_public
+helper_app = Flask(__name__)
+@helper_app.route('/helper-public')
+def helper_public():
+    return emit_public({'ok': True})
+"""
+    try:
+        route = _write_boundary_temp(rel_dir, "w004a_routes_public.py", route_body)
+        helper = _write_boundary_temp(rel_dir, "w004a_helper_public.py", helper_body)
+        baseline = tuple(boundary_analyzer._adapter_public_route_signatures((route,)))
+        source_selection, request_shaping, response_mapping = _epic034_boundary_inputs()
+        result = boundary_analyzer.analyze_adapter_boundary(
+            source_selection=source_selection,
+            request_shaping=request_shaping,
+            response_mapping=response_mapping,
+            adapter_loci=(route, helper),
+            canonical_adapter_loci=(route, helper),
+            presenter_loci=generator.ADAPTER_BOUNDARY_PRESENTER_LOCI,
+            vendor_seam_loci=generator.ADAPTER_BOUNDARY_VENDOR_SEAM_LOCI,
+            pure_compute_loci=generator.ADAPTER_BOUNDARY_PURE_COMPUTE_LOCI,
+            public_route_baseline=baseline,
+            evidence_tool_loci=("tools/evidence/generate_hdapi_v2_contract_inventory.py", "tools/evidence/hdapi_v2_boundary_analyzer.py"),
+        )
+        assert result["checks"]["route_baseline_reconciled"] is False
+        assert any("/helper-public" in item for item in result["public_route_deltas"])
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)

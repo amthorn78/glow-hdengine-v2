@@ -584,12 +584,19 @@ def _imported_target_is_inspected(expr: str, aliases: dict[str, str], inspected_
     candidates = _candidate_imported_target_modules(expr, aliases)
     return not candidates or bool(candidates & inspected_modules)
 
-def _route_classification(path: str, *, has_dynamic_path: bool = False) -> str:
-    if has_dynamic_path:
+def _route_classification(
+    path: str,
+    *,
+    has_dynamic_path: bool = False,
+    has_dynamic_metadata: bool = False,
+) -> str:
+    if not has_dynamic_path and path and _is_non_public_route_namespace(path):
+        return "internal"
+    if has_dynamic_path or has_dynamic_metadata:
         return "unknown / fail-closed"
     if not path:
         return "public"
-    return "internal" if _is_non_public_route_namespace(path) else "public"
+    return "public"
 
 
 def route_record(**fields: str) -> RouteSignatureRecord:
@@ -717,8 +724,8 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                     classification = _route_classification(
                         full_route_arg,
                         has_dynamic_path=has_dynamic_path
-                        or dynamic_blueprint_prefix
-                        or dynamic_endpoint
+                        or dynamic_blueprint_prefix,
+                        has_dynamic_metadata=dynamic_endpoint
                         or dynamic_methods
                         or dynamic_routing_keywords
                         or dynamic_errorhandler_key,
@@ -777,8 +784,8 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                 routing_keywords, dynamic_routing_keywords = _routing_keywords_metadata(node)
                 classification = _route_classification(
                     route_arg or "",
-                    has_dynamic_path=has_dynamic_path
-                    or has_dynamic_endpoint
+                    has_dynamic_path=has_dynamic_path,
+                    has_dynamic_metadata=has_dynamic_endpoint
                     or dynamic_methods
                     or dynamic_routing_keywords
                     or dynamic_view_func
@@ -824,8 +831,8 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                 )
                 classification = _route_classification(
                     url_prefix,
-                    has_dynamic_path=dynamic_url_prefix
-                    or dynamic_routing_keywords
+                    has_dynamic_path=dynamic_url_prefix,
+                    has_dynamic_metadata=dynamic_routing_keywords
                     or dynamic_blueprint_target
                     or imported_blueprint_uninspected,
                 )
@@ -871,6 +878,9 @@ def _unsupported_route_registration_signatures(loci: tuple[str, ...]) -> list[st
     }
     routeish_suffixes = tuple(f".{name}" for name in routeish_names)
     inspected_modules = {_module_name_for_locus(rel) for rel in loci}
+    PROVEN_ROUTE_OWNER = "PROVEN_ROUTE_OWNER"
+    PROVEN_NON_ROUTE_OWNER = "PROVEN_NON_ROUTE_OWNER"
+    UNKNOWN_ROUTE_CAPABLE = "UNKNOWN_ROUTE_CAPABLE"
 
     def getattr_routeish(call: ast.Call) -> str:
         getattr_call = call.func if isinstance(call.func, ast.Call) else call
@@ -882,9 +892,12 @@ def _unsupported_route_registration_signatures(loci: tuple[str, ...]) -> list[st
     def routeish_suffix(call_name: str) -> str:
         return f".{call_name.rsplit('.', 1)[-1]}" if call_name else ""
 
-    def route_owner_names(tree: ast.AST, import_aliases: dict[str, str]) -> set[str]:
-        owners: set[str] = set()
-        for node in ast.walk(tree):
+    def route_owner_statuses(tree: ast.AST, import_aliases: dict[str, str]) -> dict[str, str]:
+        statuses: dict[str, str] = {}
+        module_classes = {
+            node.name for node in tree.body if isinstance(node, ast.ClassDef)
+        }
+        for node in tree.body:
             if isinstance(node, ast.Assign):
                 value = node.value
                 targets = node.targets
@@ -900,40 +913,59 @@ def _unsupported_route_registration_signatures(loci: tuple[str, ...]) -> list[st
             constructor = constructor_name.rsplit(".", 1)[-1]
             target_constructor = constructor_target.rsplit(".", 1)[-1]
             if (
-                constructor not in {"Flask", "Blueprint"}
-                and target_constructor not in {"Flask", "Blueprint"}
+                constructor in {"Flask", "Blueprint"}
+                or target_constructor in {"Flask", "Blueprint"}
             ):
-                continue
+                status = PROVEN_ROUTE_OWNER
+            elif constructor in module_classes:
+                status = PROVEN_NON_ROUTE_OWNER
+            else:
+                status = UNKNOWN_ROUTE_CAPABLE
             for target in targets:
                 if isinstance(target, ast.Name):
-                    owners.add(target.id)
-        return owners
+                    statuses[target.id] = status
+        return statuses
+
+    def route_owner_names(tree: ast.AST, import_aliases: dict[str, str]) -> set[str]:
+        return {
+            name
+            for name, status in route_owner_statuses(tree, import_aliases).items()
+            if status == PROVEN_ROUTE_OWNER
+        }
+
+    def route_owner_status_for_imported_symbol(
+        root: str, import_aliases: dict[str, str]
+    ) -> str:
+        target = import_aliases.get(root, "")
+        module_name, _sep, symbol = target.rpartition(".")
+        if not module_name or not symbol:
+            return PROVEN_NON_ROUTE_OWNER
+        for rel in loci:
+            if _module_name_for_locus(rel) != module_name:
+                continue
+            _owner_path, _owner_text, owner_tree = _python_source(rel)
+            return route_owner_statuses(
+                owner_tree, _import_aliases(owner_tree)
+            ).get(symbol, UNKNOWN_ROUTE_CAPABLE)
+        return UNKNOWN_ROUTE_CAPABLE
 
     def route_factory_alias_methods(
         tree: ast.AST, import_aliases: dict[str, str]
     ) -> dict[str, str]:
         methods: dict[str, str] = {}
-        route_owners = route_owner_names(tree, import_aliases)
-
-        def imported_owner_is_route_bearing(root: str) -> bool:
-            target = import_aliases.get(root, "")
-            module_name, _sep, symbol = target.rpartition(".")
-            if not module_name or not symbol:
-                return False
-            for rel in loci:
-                if _module_name_for_locus(rel) != module_name:
-                    continue
-                _owner_path, _owner_text, owner_tree = _python_source(rel)
-                return symbol in route_owner_names(owner_tree, _import_aliases(owner_tree))
-            return False
+        route_owner_status = route_owner_statuses(tree, import_aliases)
 
         def owner_is_route_bearing(owner: ast.AST | None) -> bool:
             root = _root_name(owner) if owner is not None else None
             return bool(
                 root
-                and (root in route_owners or imported_owner_is_route_bearing(root))
+                and route_owner_status.get(
+                    root,
+                    route_owner_status_for_imported_symbol(root, import_aliases),
+                )
+                in {PROVEN_ROUTE_OWNER, UNKNOWN_ROUTE_CAPABLE}
             )
-        for node in ast.walk(tree):
+        for node in tree.body:
             if isinstance(node, ast.Assign):
                 value = node.value
                 targets = node.targets
@@ -2530,7 +2562,26 @@ def analyze_adapter_boundary(
     route_baseline_out_of_scope = not discovered_public_routes and adapter_loci != canonical_adapter_loci
     typed_route_record_field_coverage = route_records_have_required_fields or route_baseline_out_of_scope
     route_baseline_loci = _route_signature_loci(public_route_baseline)
-    route_loci_reconciled = bool(route_baseline_loci) and route_baseline_loci == set(adapter_loci)
+    discovered_supported_route_loci = {
+        record.locus
+        for record in discovered_public_route_records
+        if record.locus
+        and record.registration != "unsupported_route_registration"
+        and record.public_internal_classification != BOUNDARY_UNKNOWN
+    }
+    discovered_unknown_route_loci = {
+        record.locus
+        for record in discovered_public_route_records
+        if record.locus
+        and (
+            record.registration == "unsupported_route_registration"
+            or record.public_internal_classification == BOUNDARY_UNKNOWN
+        )
+    }
+    inspected_helper_loci = sorted(
+        set(adapter_loci) - discovered_supported_route_loci - discovered_unknown_route_loci
+    )
+    route_loci_reconciled = bool(route_baseline_loci) and route_baseline_loci == discovered_supported_route_loci
     route_baseline_reconciled = (
         bool(discovered_public_routes)
         and bool(public_route_baseline)
@@ -2625,6 +2676,9 @@ def analyze_adapter_boundary(
         "route_baseline_signatures": list(public_route_baseline),
         "route_baseline_records": route_baseline_record_dicts,
         "route_baseline_loci": sorted(route_baseline_loci),
+        "discovered_supported_route_loci": sorted(discovered_supported_route_loci),
+        "discovered_unknown_route_loci": sorted(discovered_unknown_route_loci),
+        "inspected_helper_loci": inspected_helper_loci,
         "unknown_route_signatures": unknown_route_signatures,
         "public_internal_route_classification_posture": next(f for f in findings if f["category"] == "public_routes"),
         "response_producing_path_findings": next(f for f in findings if f["category"] == "response_producing_paths"),
