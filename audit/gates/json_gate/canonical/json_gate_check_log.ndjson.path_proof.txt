@@ -1,5 +1,5 @@
 path: audit/gates/json_gate/canonical/json_gate_check_log.ndjson
 size_bytes: 7268
-sha256: d18843ce962926cdb5c8f205d799deed803e35746952fbfa8bf8c01d8e0d92bb
-mtime_utc: 2026-06-20T13:56:25Z
-produced_at_utc: 2026-06-20T13:56:24Z
+sha256: 7fa0d92e9361759cadb798da2f8da4c3368c45e43bbfa8af46a5156b26a64eea
+mtime_utc: 2026-06-20T15:08:51Z
+produced_at_utc: 2026-06-20T15:08:50Z

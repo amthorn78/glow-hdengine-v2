@@ -1,5 +1,5 @@
 path: artifacts/vendor/hdapi_v2/source_selection.snapshot.json
 size_bytes: 2609
-sha256: 67f2715248b0115a1f3d1e61d8620c058d9fd86ea9976abbae16dc6b8ae1cab1
-mtime_utc: 2026-06-20T13:52:35Z
-produced_at_utc: 2026-06-20T13:52:34Z
+sha256: 97ca7a75d8d02188e4029d680ec28cef15c4b83af3703e3949ba58b186a7d5bb
+mtime_utc: 2026-06-20T15:08:49Z
+produced_at_utc: 2026-06-20T15:08:47Z

@@ -526,30 +526,49 @@ def _route_signature_field(value: str) -> str:
     return value.replace("\\", "\\\\").replace(";", "\\;").replace("=", "\\=")
 
 
-def _routing_keywords_metadata(call: ast.Call) -> tuple[str, bool]:
+ROUTE_SURFACE_KEYWORDS = {
+    "build_only",
+    "merge_slashes",
+    "provide_automatic_options",
+    "redirect_to",
+    "strict_slashes",
+    "subdomain",
+}
+
+
+def _literal_route_keyword_value(value: ast.AST) -> tuple[str, bool]:
+    if isinstance(value, ast.Constant):
+        return repr(value.value), False
+    return ast.dump(value, annotate_fields=False, include_attributes=False), True
+
+
+def _routing_keywords_metadata(
+    call: ast.Call, *, consumed_keywords: set[str] | None = None
+) -> tuple[str, bool]:
+    consumed = consumed_keywords or set()
     values: list[str] = []
     dynamic = False
     for keyword in call.keywords:
-        if keyword.arg in {
-            "provide_automatic_options",
-            "strict_slashes",
-            "merge_slashes",
-            "redirect_to",
-            "subdomain",
-        }:
-            if isinstance(keyword.value, ast.Constant):
-                rendered = repr(keyword.value.value)
-            else:
-                dynamic = True
-                rendered = ast.dump(
-                    keyword.value, annotate_fields=False, include_attributes=False
-                )
-            values.append(f"{keyword.arg}={rendered}")
+        if keyword.arg in consumed:
+            continue
+        if keyword.arg is None:
+            rendered = ast.dump(keyword.value, annotate_fields=False, include_attributes=False)
+            values.append(f"**kwargs={rendered}")
+            dynamic = True
+            continue
+        rendered, value_dynamic = _literal_route_keyword_value(keyword.value)
+        values.append(f"{keyword.arg}={rendered}")
+        if keyword.arg not in ROUTE_SURFACE_KEYWORDS or value_dynamic:
+            dynamic = True
     return ",".join(sorted(values)), dynamic
 
 
-def _routing_keywords(call: ast.Call) -> str:
-    values, _dynamic = _routing_keywords_metadata(call)
+def _routing_keywords(
+    call: ast.Call, *, consumed_keywords: set[str] | None = None
+) -> str:
+    values, _dynamic = _routing_keywords_metadata(
+        call, consumed_keywords=consumed_keywords
+    )
     return values
 
 
@@ -715,7 +734,9 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                     routing_keywords = ""
                     dynamic_routing_keywords = False
                     if isinstance(deco, ast.Call):
-                        routing_keywords, dynamic_routing_keywords = _routing_keywords_metadata(deco)
+                        routing_keywords, dynamic_routing_keywords = _routing_keywords_metadata(
+                            deco, consumed_keywords={"endpoint", "methods"}
+                        )
                     route_root = _decorator_route_root(deco_call)
                     blueprint_prefix, dynamic_blueprint_prefix = blueprint_prefixes.get(
                         route_root, ("", False)
@@ -781,7 +802,9 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                 imported_view_uninspected = bool(view_desc) and not _imported_target_is_inspected(
                     view_desc, aliases, inspected_modules
                 )
-                routing_keywords, dynamic_routing_keywords = _routing_keywords_metadata(node)
+                routing_keywords, dynamic_routing_keywords = _routing_keywords_metadata(
+                    node, consumed_keywords={"endpoint", "methods", "view_func"}
+                )
                 classification = _route_classification(
                     route_arg or "",
                     has_dynamic_path=has_dynamic_path,
@@ -822,7 +845,9 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                             dynamic_url_prefix = True
                         else:
                             url_prefix = parsed_prefix
-                routing_keywords, dynamic_routing_keywords = _routing_keywords_metadata(node)
+                routing_keywords, dynamic_routing_keywords = _routing_keywords_metadata(
+                    node, consumed_keywords={"url_prefix"}
+                )
                 imported_blueprint_uninspected = (
                     bool(blueprint)
                     and not _imported_target_is_inspected(
@@ -892,11 +917,53 @@ def _unsupported_route_registration_signatures(loci: tuple[str, ...]) -> list[st
     def routeish_suffix(call_name: str) -> str:
         return f".{call_name.rsplit('.', 1)[-1]}" if call_name else ""
 
+    def local_class_route_statuses(
+        tree: ast.AST, import_aliases: dict[str, str]
+    ) -> dict[str, str]:
+        class_defs = {
+            node.name: node for node in tree.body if isinstance(node, ast.ClassDef)
+        }
+        statuses: dict[str, str] = {}
+        resolving: set[str] = set()
+
+        def base_status(base: ast.AST) -> str:
+            base_name = _attribute_chain(base)
+            base_tail = base_name.rsplit(".", 1)[-1]
+            base_target = import_aliases.get(base_name) or import_aliases.get(base_tail, "")
+            target_tail = base_target.rsplit(".", 1)[-1]
+            if base_tail in {"Flask", "Blueprint"} or target_tail in {"Flask", "Blueprint"}:
+                return PROVEN_ROUTE_OWNER
+            if base_tail in class_defs:
+                return class_status(base_tail)
+            if base_name or base_target:
+                return UNKNOWN_ROUTE_CAPABLE
+            return PROVEN_NON_ROUTE_OWNER
+
+        def class_status(name: str) -> str:
+            if name in statuses:
+                return statuses[name]
+            if name in resolving:
+                return UNKNOWN_ROUTE_CAPABLE
+            resolving.add(name)
+            class_def = class_defs[name]
+            base_statuses = [base_status(base) for base in class_def.bases]
+            resolving.remove(name)
+            if any(status == PROVEN_ROUTE_OWNER for status in base_statuses):
+                status = PROVEN_ROUTE_OWNER
+            elif any(status == UNKNOWN_ROUTE_CAPABLE for status in base_statuses):
+                status = UNKNOWN_ROUTE_CAPABLE
+            else:
+                status = PROVEN_NON_ROUTE_OWNER
+            statuses[name] = status
+            return status
+
+        for class_name in class_defs:
+            class_status(class_name)
+        return statuses
+
     def route_owner_statuses(tree: ast.AST, import_aliases: dict[str, str]) -> dict[str, str]:
         statuses: dict[str, str] = {}
-        module_classes = {
-            node.name for node in tree.body if isinstance(node, ast.ClassDef)
-        }
+        module_class_status = local_class_route_statuses(tree, import_aliases)
         for node in tree.body:
             if isinstance(node, ast.Assign):
                 value = node.value
@@ -917,8 +984,8 @@ def _unsupported_route_registration_signatures(loci: tuple[str, ...]) -> list[st
                 or target_constructor in {"Flask", "Blueprint"}
             ):
                 status = PROVEN_ROUTE_OWNER
-            elif constructor in module_classes:
-                status = PROVEN_NON_ROUTE_OWNER
+            elif constructor in module_class_status:
+                status = module_class_status[constructor]
             else:
                 status = UNKNOWN_ROUTE_CAPABLE
             for target in targets:
@@ -1051,7 +1118,9 @@ def _unsupported_route_registration_signatures(loci: tuple[str, ...]) -> list[st
             endpoint=endpoint or endpoint_keyword or view,
             view=view,
             errorhandler_key=errorhandler_key,
-            routing_keywords=_routing_keywords(factory),
+            routing_keywords=_routing_keywords(
+                factory, consumed_keywords={"endpoint", "methods"}
+            ),
             imported_view_target=_resolve_imported_target(view, aliases, inspected_modules),
             public_internal_classification=BOUNDARY_UNKNOWN,
         )
@@ -1097,7 +1166,9 @@ def _unsupported_route_registration_signatures(loci: tuple[str, ...]) -> list[st
                 methods=methods,
                 endpoint=endpoint or view,
                 view=view,
-                routing_keywords=_routing_keywords(call),
+                routing_keywords=_routing_keywords(
+                    call, consumed_keywords={"endpoint", "methods", "view_func"}
+                ),
                 imported_view_target=_resolve_imported_target(view, aliases, inspected_modules),
                 public_internal_classification=BOUNDARY_UNKNOWN,
             )
@@ -1113,7 +1184,7 @@ def _unsupported_route_registration_signatures(loci: tuple[str, ...]) -> list[st
                 decorator=call_name,
                 blueprint=blueprint,
                 register_blueprint_prefix=url_prefix,
-                routing_keywords=_routing_keywords(call),
+                routing_keywords=_routing_keywords(call, consumed_keywords={"url_prefix"}),
                 imported_view_target=_resolve_imported_target(blueprint, aliases, inspected_modules),
                 public_internal_classification=BOUNDARY_UNKNOWN,
             )
