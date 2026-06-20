@@ -372,11 +372,12 @@ def _join_route_prefix(prefix: str, route: str) -> str:
 
 def _blueprint_owner_metadata(tree: ast.AST) -> dict[str, bool]:
     owners: dict[str, bool] = {}
-    local_factory_names = {
-        node.name
+    local_factory_defs = {
+        node.name: node
         for node in getattr(tree, "body", ())
         if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
     }
+    local_factory_names = set(local_factory_defs)
     for node in getattr(tree, "body", ()):
         if not isinstance(node, (ast.Assign, ast.AnnAssign)) or not isinstance(node.value, ast.Call):
             continue
@@ -386,6 +387,14 @@ def _blueprint_owner_metadata(tree: ast.AST) -> dict[str, bool]:
         dynamic_owner = constructor in local_factory_names and bool(
             node.value.args or node.value.keywords
         )
+        factory_def = local_factory_defs.get(constructor)
+        if factory_def is not None:
+            dynamic_owner = dynamic_owner or any(
+                isinstance(child, ast.Call)
+                and _attribute_chain(child.func).rsplit(".", 1)[-1] == "Blueprint"
+                and any(keyword.arg == "url_prefix" for keyword in child.keywords)
+                for child in ast.walk(factory_def)
+            )
         targets = node.targets if isinstance(node, ast.Assign) else [node.target]
         for target in targets:
             if isinstance(target, ast.Name):
