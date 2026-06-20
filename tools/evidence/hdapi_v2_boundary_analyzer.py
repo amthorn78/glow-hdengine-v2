@@ -150,6 +150,20 @@ def _import_aliases(tree: ast.AST) -> dict[str, str]:
     return aliases
 
 
+def _local_module_bindings(tree: ast.AST) -> set[str]:
+    bindings: set[str] = set()
+    for node in getattr(tree, "body", ()):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            bindings.add(node.name)
+        elif isinstance(node, ast.Assign):
+            for target in node.targets:
+                if isinstance(target, ast.Name):
+                    bindings.add(target.id)
+        elif isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name):
+            bindings.add(node.target.id)
+    return bindings
+
+
 def _root_name(node: ast.AST) -> str | None:
     current = node
     while isinstance(current, ast.Attribute):
@@ -525,6 +539,10 @@ def _blueprint_prefix_metadata(tree: ast.AST) -> dict[str, tuple[str, bool]]:
         dynamic_prefix = False
         for keyword in node.value.keywords:
             if keyword.arg == "url_prefix":
+                if isinstance(keyword.value, ast.Constant) and keyword.value.value is None:
+                    url_prefix = ""
+                    dynamic_prefix = False
+                    continue
                 parsed = _string_constant(keyword.value)
                 if parsed is None:
                     dynamic_prefix = True
@@ -620,11 +638,16 @@ def _routing_keywords(
 
 
 def _resolve_imported_target(
-    expr: str, aliases: dict[str, str], inspected_modules: set[str] | None = None
+    expr: str,
+    aliases: dict[str, str],
+    inspected_modules: set[str] | None = None,
+    local_bindings: set[str] | None = None,
 ) -> str:
     if not expr:
         return ""
     root, _, suffix = expr.partition(".")
+    if local_bindings and root in local_bindings:
+        return ""
     target = aliases.get(root, "")
     if not target:
         return ""
@@ -646,7 +669,15 @@ def _candidate_imported_target_modules(expr: str, aliases: dict[str, str]) -> se
     return candidates
 
 
-def _imported_target_is_inspected(expr: str, aliases: dict[str, str], inspected_modules: set[str]) -> bool:
+def _imported_target_is_inspected(
+    expr: str,
+    aliases: dict[str, str],
+    inspected_modules: set[str],
+    local_bindings: set[str] | None = None,
+) -> bool:
+    root, _sep, _suffix = expr.partition(".")
+    if local_bindings and root in local_bindings:
+        return True
     candidates = _candidate_imported_target_modules(expr, aliases)
     return not candidates or bool(candidates & inspected_modules)
 
@@ -780,6 +811,7 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
     for rel in loci:
         _path, _text, tree = _python_source(rel)
         aliases = _import_aliases(tree)
+        local_bindings = _local_module_bindings(tree)
         blueprint_owners = _blueprint_owner_metadata(tree)
         blueprint_prefixes = _blueprint_prefix_metadata(tree)
         view_function_bindings = _view_function_bindings(tree)
@@ -856,7 +888,7 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                         errorhandler_key=errorhandler_key,
                         routing_keywords=routing_keywords,
                         imported_view_target=_resolve_imported_target(
-                            node.name, aliases, inspected_modules
+                            node.name, aliases, inspected_modules, local_bindings
                         ),
                         public_internal_classification=classification,
                     ))
@@ -891,7 +923,7 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                     else:
                         dynamic_view_func = True
                 imported_view_uninspected = bool(view_desc) and not _imported_target_is_inspected(
-                    view_desc, aliases, inspected_modules
+                    view_desc, aliases, inspected_modules, local_bindings
                 )
                 routing_keywords, dynamic_routing_keywords = _routing_keywords_metadata(
                     node, consumed_keywords={"endpoint", "methods", "rule", "view_func"}
@@ -916,7 +948,7 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                     view=view_desc,
                     routing_keywords=routing_keywords,
                     imported_view_target=_resolve_imported_target(
-                        view_desc, aliases, inspected_modules
+                        view_desc, aliases, inspected_modules, local_bindings
                     ),
                     public_internal_classification=classification,
                 ))
@@ -1112,16 +1144,39 @@ def _unsupported_route_registration_signatures(loci: tuple[str, ...]) -> list[st
     ) -> dict[str, str]:
         methods: dict[str, str] = {}
         route_owner_status = route_owner_statuses(tree, import_aliases)
+        parents = {
+            child: parent
+            for parent in ast.walk(tree)
+            for child in ast.iter_child_nodes(parent)
+        }
 
-        def owner_is_route_bearing(owner: ast.AST | None) -> bool:
+        def alias_has_route_evidence(alias_name: str, alias_method: str) -> bool:
+            if alias_method in {".route", ".add_url_rule", ".register_blueprint", ".errorhandler", ".app_errorhandler"}:
+                return True
+            for fn in (
+                node
+                for node in ast.walk(tree)
+                if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+            ):
+                for deco in fn.decorator_list:
+                    deco_call = deco.func if isinstance(deco, ast.Call) else deco
+                    if isinstance(deco_call, ast.Name) and deco_call.id == alias_name:
+                        return True
+            for call in (node for node in ast.walk(tree) if isinstance(node, ast.Call)):
+                if not isinstance(call.func, ast.Name) or call.func.id != alias_name:
+                    continue
+                parent = parents.get(call)
+                if isinstance(parent, ast.Call) and parent.func is call:
+                    return True
+            return False
+
+        def owner_route_status(owner: ast.AST | None) -> str:
             root = _root_name(owner) if owner is not None else None
-            return bool(
-                root
-                and route_owner_status.get(
-                    root,
-                    route_owner_status_for_imported_symbol(root, import_aliases),
-                )
-                in {PROVEN_ROUTE_OWNER, UNKNOWN_ROUTE_CAPABLE}
+            if not root:
+                return PROVEN_NON_ROUTE_OWNER
+            return route_owner_status.get(
+                root,
+                route_owner_status_for_imported_symbol(root, import_aliases),
             )
         for node in tree.body:
             if isinstance(node, ast.Assign):
@@ -1135,12 +1190,11 @@ def _unsupported_route_registration_signatures(loci: tuple[str, ...]) -> list[st
             if value is None:
                 continue
             alias_method = ""
+            owner_status = PROVEN_NON_ROUTE_OWNER
             if isinstance(value, ast.Attribute):
                 value_name = _attribute_chain(value)
-                if (
-                    owner_is_route_bearing(value)
-                    and value_name.endswith(routeish_suffixes)
-                ):
+                owner_status = owner_route_status(value)
+                if owner_status in {PROVEN_ROUTE_OWNER, UNKNOWN_ROUTE_CAPABLE} and value_name.endswith(routeish_suffixes):
                     alias_method = routeish_suffix(value_name)
             elif isinstance(value, ast.Call) and getattr_routeish(value):
                 owner = (
@@ -1148,12 +1202,18 @@ def _unsupported_route_registration_signatures(loci: tuple[str, ...]) -> list[st
                     if isinstance(value.func, ast.Call)
                     else value.args[0]
                 )
-                if owner_is_route_bearing(owner):
+                owner_status = owner_route_status(owner)
+                if owner_status in {PROVEN_ROUTE_OWNER, UNKNOWN_ROUTE_CAPABLE}:
                     alias_method = f".{getattr_routeish(value)}"
             if not alias_method:
                 continue
             for target in targets:
                 if isinstance(target, ast.Name):
+                    if (
+                        owner_status == UNKNOWN_ROUTE_CAPABLE
+                        and not alias_has_route_evidence(target.id, alias_method)
+                    ):
+                        continue
                     methods[target.id] = alias_method
         return methods
 

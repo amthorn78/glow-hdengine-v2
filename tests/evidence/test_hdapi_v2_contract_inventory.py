@@ -5519,3 +5519,148 @@ app.add_url_rule('/reader', endpoint='raw', methods=['GET'])
         )
     finally:
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+W004_A4_ROUTE_PROOF_CASES = {
+    "blueprint_explicit_none_prefix_is_static",
+    "local_view_shadowing_import_is_local",
+    "imported_non_flask_client_get_is_not_route",
+    "unresolved_imported_route_decorator_fails_closed",
+    "imported_blueprint_prefix_control_still_signed",
+}
+
+
+def test_epic034_w004a4_blueprint_explicit_none_prefix_is_static() -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Blueprint
+bp = Blueprint('reader', __name__, url_prefix=None)
+@bp.get('/reader')
+def reader():
+    return 'ok'
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004a4_blueprint_none_prefix.py", body)
+        records = boundary_analyzer.discover_route_registrations((adapter,))
+        assert any(
+            record.path == "/reader"
+            and record.blueprint_constructor_prefix == ""
+            and record.public_internal_classification == "public"
+            for record in records
+        )
+        assert not any(
+            record.path == "/reader"
+            and record.public_internal_classification == boundary_analyzer.BOUNDARY_UNKNOWN
+            for record in records
+        )
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004a4_local_view_shadows_imported_view_for_route_identity() -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask
+from external.views import reader
+app = Flask(__name__)
+def reader():
+    return 'local'
+app.add_url_rule('/reader', view_func=reader, methods=['GET'])
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004a4_local_view_shadows_import.py", body)
+        records = boundary_analyzer.discover_route_registrations((adapter,))
+        assert any(
+            record.registration == "add_url_rule"
+            and record.path == "/reader"
+            and record.view == "reader"
+            and record.imported_view_target == ""
+            and record.public_internal_classification == "public"
+            for record in records
+        )
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004a4_imported_non_flask_client_get_is_not_route() -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from external.client import Client
+client = Client()
+client_get = client.get
+client_get('/status')
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004a4_imported_client_get.py", body)
+        records = boundary_analyzer.discover_route_registrations((adapter,))
+        assert all("/status" not in record.path for record in records)
+        assert all(record.registration != "unsupported_route_registration" for record in records)
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004a4_unresolved_imported_route_decorator_still_fails_closed() -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from external.app import app
+@app.route('/hidden')
+def hidden():
+    return 'hidden'
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004a4_unresolved_imported_route_decorator.py", body)
+        records = boundary_analyzer.discover_route_registrations((adapter,))
+        assert any(record.path == "/hidden" for record in records)
+        assert any(
+            record.public_internal_classification == boundary_analyzer.BOUNDARY_UNKNOWN
+            for record in records
+            if record.path == "/hidden"
+        )
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004a4_imported_blueprint_prefix_control_still_signed() -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    owner_body = """
+from flask import Blueprint
+bp = Blueprint('reader', __name__, url_prefix='/signed')
+"""
+    route_body = """
+from tmp_boundary_test.w004a4_bp_control_owner import bp
+@bp.get('/reader')
+def reader():
+    return 'ok'
+"""
+    try:
+        owner = _write_boundary_temp(rel_dir, "w004a4_bp_control_owner.py", owner_body)
+        route = _write_boundary_temp(rel_dir, "w004a4_bp_control_route.py", route_body)
+        records = boundary_analyzer.discover_route_registrations((route, owner))
+        assert any(
+            record.path == "/signed/reader"
+            and record.blueprint_constructor_prefix == "/signed"
+            and record.public_internal_classification == "public"
+            for record in records
+        )
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004a4_route_proof_case_matrix_is_visible() -> None:
+    assert W004_A4_ROUTE_PROOF_CASES == {
+        "blueprint_explicit_none_prefix_is_static",
+        "local_view_shadowing_import_is_local",
+        "imported_non_flask_client_get_is_not_route",
+        "unresolved_imported_route_decorator_fails_closed",
+        "imported_blueprint_prefix_control_still_signed",
+    }
