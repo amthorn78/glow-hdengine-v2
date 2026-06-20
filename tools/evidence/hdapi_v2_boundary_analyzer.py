@@ -327,7 +327,7 @@ def _blueprint_registration_target(
     node: ast.AST | None,
     aliases: dict[str, str],
     inspected_modules: set[str],
-    blueprint_owners: set[str],
+    blueprint_owners: dict[str, bool],
 ) -> tuple[str, bool]:
     if node is None:
         return "", True
@@ -335,7 +335,7 @@ def _blueprint_registration_target(
         name = _expr_name(node)
         root = name.split(".", 1)[0]
         if root in blueprint_owners:
-            return name, False
+            return name, blueprint_owners[root]
         if _candidate_imported_target_modules(name, aliases):
             return name, not _imported_target_is_inspected(
                 name, aliases, inspected_modules
@@ -370,8 +370,8 @@ def _join_route_prefix(prefix: str, route: str) -> str:
     return f"/{prefix.strip('/')}/{route.strip('/')}"
 
 
-def _blueprint_owner_names(tree: ast.AST) -> set[str]:
-    owners: set[str] = set()
+def _blueprint_owner_metadata(tree: ast.AST) -> dict[str, bool]:
+    owners: dict[str, bool] = {}
     local_factory_names = {
         node.name
         for node in getattr(tree, "body", ())
@@ -383,10 +383,13 @@ def _blueprint_owner_names(tree: ast.AST) -> set[str]:
         constructor = _attribute_chain(node.value.func).rsplit(".", 1)[-1]
         if constructor != "Blueprint" and constructor not in local_factory_names:
             continue
+        dynamic_owner = constructor in local_factory_names and bool(
+            node.value.args or node.value.keywords
+        )
         targets = node.targets if isinstance(node, ast.Assign) else [node.target]
         for target in targets:
             if isinstance(target, ast.Name):
-                owners.add(target.id)
+                owners[target.id] = dynamic_owner
     return owners
 
 
@@ -573,7 +576,7 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
     for rel in loci:
         _path, _text, tree = _python_source(rel)
         aliases = _import_aliases(tree)
-        blueprint_owners = _blueprint_owner_names(tree)
+        blueprint_owners = _blueprint_owner_metadata(tree)
         blueprint_prefixes = _blueprint_prefix_metadata(tree)
         for node in ast.walk(tree):
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
