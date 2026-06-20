@@ -265,7 +265,7 @@ def _route_endpoint_keyword(call: ast.Call) -> tuple[str, bool]:
         return (parsed or "", parsed is None)
     return "", False
 
-def _route_methods(deco_name: str, deco: ast.AST) -> str:
+def _route_methods_metadata(deco_name: str, deco: ast.AST) -> tuple[str, bool]:
     method_by_suffix = {
         ".get": ("GET",),
         ".post": ("POST",),
@@ -275,14 +275,20 @@ def _route_methods(deco_name: str, deco: ast.AST) -> str:
     }
     for suffix, methods in method_by_suffix.items():
         if deco_name.endswith(suffix):
-            return ",".join(methods)
+            return ",".join(methods), False
     if isinstance(deco, ast.Call):
         for keyword in deco.keywords:
             if keyword.arg == "methods":
                 methods = _literal_string_list(keyword.value)
                 if methods:
-                    return ",".join(sorted(methods))
-    return ""
+                    return ",".join(sorted(methods)), False
+                return "", True
+    return "", False
+
+
+def _route_methods(deco_name: str, deco: ast.AST) -> str:
+    methods, _dynamic_methods = _route_methods_metadata(deco_name, deco)
+    return methods
 
 
 def _expr_name(node: ast.AST) -> str:
@@ -510,16 +516,21 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                     if isinstance(deco, ast.Call):
                         endpoint_keyword, dynamic_endpoint = _route_endpoint_keyword(deco)
                         endpoint = endpoint_keyword or node.name
+                    methods, dynamic_methods = _route_methods_metadata(deco_name, deco)
                     route_root = _decorator_route_root(deco_call)
-                    blueprint_prefix, dynamic_blueprint_prefix = blueprint_prefixes.get(route_root, ("", False))
+                    blueprint_prefix, dynamic_blueprint_prefix = blueprint_prefixes.get(
+                        route_root, ("", False)
+                    )
                     full_route_arg = _join_route_prefix(blueprint_prefix, route_arg)
                     classification = _route_classification(
                         full_route_arg,
-                        has_dynamic_path=has_dynamic_path or dynamic_blueprint_prefix or dynamic_endpoint,
+                        has_dynamic_path=has_dynamic_path
+                        or dynamic_blueprint_prefix
+                        or dynamic_endpoint
+                        or dynamic_methods,
                     )
                     if classification == "internal":
                         continue
-                    methods = _route_methods(deco_name, deco)
                     routing_keywords = _routing_keywords(deco) if isinstance(deco, ast.Call) else ""
                     signatures.append(_route_signature(
                         locus=rel,
@@ -533,7 +544,9 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                         blueprint_constructor_prefix=blueprint_prefix,
                         errorhandler_key=errorhandler_key,
                         routing_keywords=routing_keywords,
-                        imported_view_target=_resolve_imported_target(node.name, aliases, inspected_modules),
+                        imported_view_target=_resolve_imported_target(
+                            node.name, aliases, inspected_modules
+                        ),
                         public_internal_classification=classification,
                     ))
             if isinstance(node, ast.Call) and _attribute_chain(node.func).endswith(".add_url_rule"):
@@ -544,6 +557,7 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                 has_dynamic_endpoint = len(node.args) > 1 and endpoint is None
                 view_desc = ""
                 methods = ""
+                dynamic_methods = False
                 for keyword in node.keywords:
                     if keyword.arg == "endpoint":
                         parsed_endpoint = _string_constant(keyword.value)
@@ -559,6 +573,8 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                         method_values = _literal_string_list(keyword.value)
                         if method_values:
                             methods = ",".join(sorted(method_values))
+                        else:
+                            dynamic_methods = True
                 if not view_desc and len(node.args) >= 3:
                     view_desc = (
                         _attribute_chain(node.args[2].func)
@@ -572,6 +588,7 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                     route_arg or "",
                     has_dynamic_path=has_dynamic_path
                     or has_dynamic_endpoint
+                    or dynamic_methods
                     or imported_view_uninspected,
                 )
                 if classification == "internal":
