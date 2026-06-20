@@ -5791,3 +5791,151 @@ def test_epic034_w004_route_owner_context_case_matrix_is_visible() -> None:
         "imported_client_add_url_rule_method_not_route",
         "local_non_flask_app_name_does_not_become_route_owner",
     }
+
+
+W004_ROUTE_SHAPING_REVIEW_CASES = {
+    "non_route_shaped_imported_route_owner_fails_closed",
+    "local_factory_must_return_route_owner_to_be_proven",
+    "function_scope_route_alias_fails_closed",
+    "register_blueprint_none_prefix_is_static",
+    "dynamic_getattr_route_alias_fails_closed",
+}
+
+
+def test_epic034_w004_review_non_route_shaped_imported_route_owner_fails_closed() -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from external.owner import api
+@api.route('/hidden')
+def hidden():
+    return 'hidden'
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004_review_imported_api_route.py", body)
+        records = boundary_analyzer.discover_route_registrations((adapter,))
+        assert any(record.path == "/hidden" for record in records)
+        assert any(
+            record.public_internal_classification == boundary_analyzer.BOUNDARY_UNKNOWN
+            for record in records
+            if record.path == "/hidden"
+        )
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004_review_local_factory_must_return_route_owner_to_be_proven() -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask
+def make_app():
+    Flask(__name__)
+    return object()
+app = make_app()
+@app.get('/hidden')
+def hidden():
+    return 'hidden'
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004_review_factory_return_identity.py", body)
+        records = boundary_analyzer.discover_route_registrations((adapter,))
+        assert any(record.path == "/hidden" for record in records)
+        assert any(
+            record.public_internal_classification == boundary_analyzer.BOUNDARY_UNKNOWN
+            for record in records
+            if record.path == "/hidden"
+        )
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004_review_function_scope_route_alias_fails_closed() -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+def install(app):
+    public_route = app.route
+    @public_route('/hidden')
+    def hidden():
+        return 'hidden'
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004_review_function_scope_alias.py", body)
+        records = boundary_analyzer.discover_route_registrations((adapter,))
+        assert any(record.path == "/hidden" for record in records)
+        assert any(
+            record.public_internal_classification == boundary_analyzer.BOUNDARY_UNKNOWN
+            for record in records
+            if record.path == "/hidden"
+        )
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004_review_register_blueprint_none_prefix_is_static() -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Blueprint, Flask
+app = Flask(__name__)
+bp = Blueprint('reader', __name__)
+app.register_blueprint(bp, url_prefix=None)
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004_review_register_blueprint_none.py", body)
+        records = boundary_analyzer.discover_route_registrations((adapter,))
+        assert any(
+            record.registration == "register_blueprint"
+            and record.blueprint == "bp"
+            and record.register_blueprint_prefix == ""
+            and record.public_internal_classification == "public"
+            for record in records
+        )
+        assert not any(
+            record.registration == "register_blueprint"
+            and record.public_internal_classification == boundary_analyzer.BOUNDARY_UNKNOWN
+            for record in records
+        )
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004_review_dynamic_getattr_route_alias_fails_closed() -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask
+app = Flask(__name__)
+METHOD = 'route'
+public_route = getattr(app, METHOD)
+@public_route('/hidden')
+def hidden():
+    return 'hidden'
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004_review_dynamic_getattr_route.py", body)
+        records = boundary_analyzer.discover_route_registrations((adapter,))
+        assert any(record.path == "/hidden" for record in records)
+        assert any(
+            record.public_internal_classification == boundary_analyzer.BOUNDARY_UNKNOWN
+            for record in records
+            if record.path == "/hidden"
+        )
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004_review_route_shaping_case_matrix_is_visible() -> None:
+    assert W004_ROUTE_SHAPING_REVIEW_CASES == {
+        "non_route_shaped_imported_route_owner_fails_closed",
+        "local_factory_must_return_route_owner_to_be_proven",
+        "function_scope_route_alias_fails_closed",
+        "register_blueprint_none_prefix_is_static",
+        "dynamic_getattr_route_alias_fails_closed",
+    }

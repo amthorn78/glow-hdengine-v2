@@ -677,21 +677,32 @@ def _local_factory_route_statuses(
     for node in getattr(tree, "body", ()):
         if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
             continue
-        saw_route_owner = False
+        route_owner_vars: set[str] = set()
         saw_unknown_factory = False
         for child in ast.walk(node):
-            if not isinstance(child, ast.Call):
-                continue
-            constructor_name = _attribute_chain(child.func)
-            constructor_target = import_aliases.get(constructor_name, "")
-            constructor = constructor_name.rsplit(".", 1)[-1]
-            target_constructor = constructor_target.rsplit(".", 1)[-1]
-            if constructor in {"Flask", "Blueprint"} or target_constructor in {"Flask", "Blueprint"}:
-                saw_route_owner = True
-            elif constructor_name.startswith(("create_", "make_")):
+            if isinstance(child, (ast.Assign, ast.AnnAssign)) and isinstance(child.value, ast.Call):
+                targets = child.targets if isinstance(child, ast.Assign) else [child.target]
+                constructor_name = _attribute_chain(child.value.func)
+                constructor_target = import_aliases.get(constructor_name, "")
+                constructor = constructor_name.rsplit(".", 1)[-1]
+                target_constructor = constructor_target.rsplit(".", 1)[-1]
+                if constructor in {"Flask", "Blueprint"} or target_constructor in {"Flask", "Blueprint"}:
+                    route_owner_vars.update(
+                        target.id for target in targets if isinstance(target, ast.Name)
+                    )
+                elif constructor_name.startswith(("create_", "make_")):
+                    saw_unknown_factory = True
+            elif isinstance(child, ast.Call) and _attribute_chain(child.func).startswith(("create_", "make_")):
                 saw_unknown_factory = True
-        if saw_route_owner:
+        returned_names = {
+            child.value.id
+            for child in ast.walk(node)
+            if isinstance(child, ast.Return) and isinstance(child.value, ast.Name)
+        }
+        if route_owner_vars and returned_names & route_owner_vars:
             statuses[node.name] = PROVEN_ROUTE_OWNER
+        elif route_owner_vars:
+            statuses[node.name] = UNKNOWN_ROUTE_CAPABLE
         elif saw_unknown_factory:
             statuses[node.name] = UNKNOWN_ROUTE_CAPABLE
     return statuses
@@ -1042,6 +1053,13 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                     owner_status = _scoped_route_owner_status_for_name(
                         route_root, node, tree, aliases, loci, parents
                     )
+                    route_root_name = route_root.split(".", 1)[0] if route_root else ""
+                    if (
+                        owner_status == PROVEN_NON_ROUTE_OWNER
+                        and route_root_name in aliases
+                        and deco_name.endswith((".route", ".errorhandler", ".app_errorhandler"))
+                    ):
+                        owner_status = UNKNOWN_ROUTE_CAPABLE
                     if owner_status == PROVEN_NON_ROUTE_OWNER:
                         continue
                     route_arg = ""
@@ -1115,9 +1133,12 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                         public_internal_classification=classification,
                     ))
             if isinstance(node, ast.Call) and _attribute_chain(node.func).endswith(".add_url_rule"):
+                route_root = _decorator_route_root(node.func)
                 owner_status = _scoped_route_owner_status_for_name(
-                    _decorator_route_root(node.func), node, tree, aliases, loci, parents
+                    route_root, node, tree, aliases, loci, parents
                 )
+                if owner_status == PROVEN_NON_ROUTE_OWNER and route_root.split(".", 1)[0] in aliases:
+                    owner_status = UNKNOWN_ROUTE_CAPABLE
                 if owner_status == PROVEN_NON_ROUTE_OWNER:
                     continue
                 route_arg, has_dynamic_path = _add_url_rule_path_metadata(node)
@@ -1181,9 +1202,12 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                     public_internal_classification=classification,
                 ))
             if isinstance(node, ast.Call) and _attribute_chain(node.func).endswith(".register_blueprint"):
+                route_root = _decorator_route_root(node.func)
                 owner_status = _scoped_route_owner_status_for_name(
-                    _decorator_route_root(node.func), node, tree, aliases, loci, parents
+                    route_root, node, tree, aliases, loci, parents
                 )
+                if owner_status == PROVEN_NON_ROUTE_OWNER and route_root.split(".", 1)[0] in aliases:
+                    owner_status = UNKNOWN_ROUTE_CAPABLE
                 if owner_status == PROVEN_NON_ROUTE_OWNER:
                     continue
                 blueprint, dynamic_blueprint_target = _blueprint_registration_target(
@@ -1196,6 +1220,10 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                 dynamic_url_prefix = False
                 for keyword in node.keywords:
                     if keyword.arg == "url_prefix":
+                        if isinstance(keyword.value, ast.Constant) and keyword.value.value is None:
+                            url_prefix = ""
+                            dynamic_url_prefix = False
+                            continue
                         parsed_prefix = _string_constant(keyword.value)
                         if parsed_prefix is None:
                             dynamic_url_prefix = True
@@ -1253,6 +1281,8 @@ def _unsupported_route_registration_signatures(loci: tuple[str, ...]) -> list[st
         if _attribute_chain(getattr_call.func) != "getattr" or len(getattr_call.args) < 2:
             return ""
         attr_name = _string_constant(getattr_call.args[1])
+        if attr_name is None:
+            return "dynamic_route_method"
         return attr_name if attr_name in ROUTEISH_NAMES else ""
 
     def routeish_suffix(call_name: str) -> str:
@@ -1262,7 +1292,6 @@ def _unsupported_route_registration_signatures(loci: tuple[str, ...]) -> list[st
         tree: ast.AST, import_aliases: dict[str, str]
     ) -> dict[str, str]:
         methods: dict[str, str] = {}
-        route_owner_status = _route_owner_statuses(tree, import_aliases)
         parents = {
             child: parent
             for parent in ast.walk(tree)
@@ -1289,15 +1318,22 @@ def _unsupported_route_registration_signatures(loci: tuple[str, ...]) -> list[st
                     return True
             return False
 
-        def owner_route_status(owner: ast.AST | None) -> str:
+        def owner_route_status(owner: ast.AST | None, context: ast.AST, alias_method: str = "") -> str:
             root = _root_name(owner) if owner is not None else None
             if not root:
                 return PROVEN_NON_ROUTE_OWNER
-            return route_owner_status.get(
-                root,
-                _route_owner_status_for_imported_symbol(root, import_aliases, loci),
+            status = _scoped_route_owner_status_for_name(
+                root, context, tree, import_aliases, loci, parents
             )
-        for node in tree.body:
+            if (
+                status == PROVEN_NON_ROUTE_OWNER
+                and root in import_aliases
+                and alias_method in {".route", ".add_url_rule", ".register_blueprint", ".errorhandler", ".app_errorhandler"}
+            ):
+                return UNKNOWN_ROUTE_CAPABLE
+            return status
+
+        for node in ast.walk(tree):
             if isinstance(node, ast.Assign):
                 value = node.value
                 targets = node.targets
@@ -1312,18 +1348,25 @@ def _unsupported_route_registration_signatures(loci: tuple[str, ...]) -> list[st
             owner_status = PROVEN_NON_ROUTE_OWNER
             if isinstance(value, ast.Attribute):
                 value_name = _attribute_chain(value)
-                owner_status = owner_route_status(value)
                 if owner_status in {PROVEN_ROUTE_OWNER, UNKNOWN_ROUTE_CAPABLE} and value_name.endswith(ROUTEISH_SUFFIXES):
                     alias_method = routeish_suffix(value_name)
+                elif value_name.endswith(ROUTEISH_SUFFIXES):
+                    alias_method = routeish_suffix(value_name)
+                owner_status = owner_route_status(value, node, alias_method)
+                if owner_status not in {PROVEN_ROUTE_OWNER, UNKNOWN_ROUTE_CAPABLE}:
+                    alias_method = ""
             elif isinstance(value, ast.Call) and getattr_routeish(value):
                 owner = (
                     value.func.args[0]
                     if isinstance(value.func, ast.Call)
                     else value.args[0]
                 )
-                owner_status = owner_route_status(owner)
+                alias_method = f".{getattr_routeish(value)}"
+                owner_status = owner_route_status(owner, node, alias_method)
                 if owner_status in {PROVEN_ROUTE_OWNER, UNKNOWN_ROUTE_CAPABLE}:
                     alias_method = f".{getattr_routeish(value)}"
+                else:
+                    alias_method = ""
             if not alias_method:
                 continue
             for target in targets:
