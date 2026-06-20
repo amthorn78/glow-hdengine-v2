@@ -615,7 +615,7 @@ def _unsupported_route_registration_signatures(loci: tuple[str, ...]) -> list[st
     def routeish_suffix(call_name: str) -> str:
         return f".{call_name.rsplit('.', 1)[-1]}" if call_name else ""
 
-    def route_owner_names(tree: ast.AST) -> set[str]:
+    def route_owner_names(tree: ast.AST, import_aliases: dict[str, str]) -> set[str]:
         owners: set[str] = set()
         for node in ast.walk(tree):
             if isinstance(node, ast.Assign):
@@ -628,17 +628,25 @@ def _unsupported_route_registration_signatures(loci: tuple[str, ...]) -> list[st
                 continue
             if not isinstance(value, ast.Call):
                 continue
-            constructor = _attribute_chain(value.func).rsplit(".", 1)[-1]
-            if constructor not in {"Flask", "Blueprint"}:
+            constructor_name = _attribute_chain(value.func)
+            constructor_target = import_aliases.get(constructor_name, "")
+            constructor = constructor_name.rsplit(".", 1)[-1]
+            target_constructor = constructor_target.rsplit(".", 1)[-1]
+            if (
+                constructor not in {"Flask", "Blueprint"}
+                and target_constructor not in {"Flask", "Blueprint"}
+            ):
                 continue
             for target in targets:
                 if isinstance(target, ast.Name):
                     owners.add(target.id)
         return owners
 
-    def route_factory_alias_methods(tree: ast.AST) -> dict[str, str]:
+    def route_factory_alias_methods(
+        tree: ast.AST, import_aliases: dict[str, str]
+    ) -> dict[str, str]:
         methods: dict[str, str] = {}
-        route_owners = route_owner_names(tree)
+        route_owners = route_owner_names(tree, import_aliases)
         for node in ast.walk(tree):
             if isinstance(node, ast.Assign):
                 value = node.value
@@ -793,7 +801,7 @@ def _unsupported_route_registration_signatures(loci: tuple[str, ...]) -> list[st
     for rel in loci:
         _path, _text, tree = _python_source(rel)
         aliases = _import_aliases(tree)
-        route_alias_methods = route_factory_alias_methods(tree)
+        route_alias_methods = route_factory_alias_methods(tree, aliases)
         parents = {child: parent for parent in ast.walk(tree) for child in ast.iter_child_nodes(parent)}
         decorator_subtree_ids: set[int] = set()
         for fn in (

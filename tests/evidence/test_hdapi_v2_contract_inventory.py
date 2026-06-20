@@ -4187,3 +4187,66 @@ def added():
             generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
     finally:
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004_aliased_flask_constructor_route_alias_fails_closed(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask as FlaskCtor
+from engine.presenter.emitter import emit_public
+app = FlaskCtor(__name__)
+public_route = app.route
+@public_route('/constructor-alias-route', methods=['DELETE'])
+def added():
+    return emit_public({'ok': True})
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004_constructor_alias_route.py", body)
+        parsed_signatures = tuple(boundary_analyzer._adapter_public_route_signatures((adapter,)))
+        unsupported_signatures = tuple(boundary_analyzer._unsupported_route_registration_signatures((adapter,)))
+        assert parsed_signatures == ()
+        assert any("path=/constructor-alias-route" in item for item in unsupported_signatures)
+        assert any("methods=DELETE" in item for item in unsupported_signatures)
+        assert any("endpoint=added" in item for item in unsupported_signatures)
+        assert any("view=added" in item for item in unsupported_signatures)
+        assert any("public_internal_classification=unknown / fail-closed" in item for item in unsupported_signatures)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", ())
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_public_reader_change"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004_aliased_blueprint_constructor_route_alias_fails_closed(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Blueprint as BlueprintCtor, Flask
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+bp = BlueprintCtor('bp', __name__)
+public_get = bp.get
+@public_get('/blueprint-constructor-alias')
+def added():
+    return emit_public({'ok': True})
+app.register_blueprint(bp)
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004_blueprint_constructor_alias_route.py", body)
+        unsupported_signatures = tuple(boundary_analyzer._unsupported_route_registration_signatures((adapter,)))
+        joined = "\n".join(unsupported_signatures)
+        assert "path=/blueprint-constructor-alias" in joined
+        assert "methods=GET" in joined
+        assert "endpoint=added" in joined
+        assert "view=added" in joined
+        assert "public_internal_classification=unknown / fail-closed" in joined
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", ())
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_public_reader_change"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
