@@ -4478,3 +4478,66 @@ app.add_url_rule(
             generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
     finally:
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004_dynamic_routing_keyword_fails_closed(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+AUTO_OPTIONS = False
+@app.route('/dynamic-routing-keyword', provide_automatic_options=AUTO_OPTIONS)
+def added():
+    return emit_public({'ok': True})
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004_dynamic_routing_keyword.py", body)
+        signatures = tuple(boundary_analyzer._adapter_public_route_signatures((adapter,)))
+        joined = "\n".join(signatures)
+        assert "path=/dynamic-routing-keyword" in joined
+        assert "routing_keywords=provide_automatic_options\\=" in joined
+        assert "public_internal_classification=unknown / fail-closed" in joined
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", signatures)
+        with pytest.raises(
+            ValueError,
+            match="ADAPTER_BOUNDARY_CHECK_FAILED:.*route_signature_classification_unambiguous.*no_public_reader_change",
+        ):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004_dynamic_register_blueprint_routing_keyword_fails_closed(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Blueprint, Flask
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+bp = Blueprint('bp', __name__)
+SUBDOMAIN = 'api'
+@bp.route('/child')
+def added():
+    return emit_public({'ok': True})
+app.register_blueprint(bp, subdomain=SUBDOMAIN)
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004_dynamic_register_blueprint_keyword.py", body)
+        signatures = tuple(boundary_analyzer._adapter_public_route_signatures((adapter,)))
+        assert any("registration=register_blueprint" in item for item in signatures)
+        assert any("routing_keywords=subdomain\\=" in item for item in signatures)
+        assert any("public_internal_classification=unknown / fail-closed" in item for item in signatures)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", signatures)
+        with pytest.raises(
+            ValueError,
+            match="ADAPTER_BOUNDARY_CHECK_FAILED:.*route_signature_classification_unambiguous.*no_public_reader_change",
+        ):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)

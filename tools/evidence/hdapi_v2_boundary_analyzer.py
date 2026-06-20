@@ -364,19 +364,36 @@ def _route_signature_field(value: str) -> str:
     return value.replace("\\", "\\\\").replace(";", "\\;").replace("=", "\\=")
 
 
-def _routing_keywords(call: ast.Call) -> str:
+def _routing_keywords_metadata(call: ast.Call) -> tuple[str, bool]:
     values: list[str] = []
+    dynamic = False
     for keyword in call.keywords:
-        if keyword.arg in {"provide_automatic_options", "strict_slashes", "merge_slashes", "redirect_to", "subdomain"}:
+        if keyword.arg in {
+            "provide_automatic_options",
+            "strict_slashes",
+            "merge_slashes",
+            "redirect_to",
+            "subdomain",
+        }:
             if isinstance(keyword.value, ast.Constant):
                 rendered = repr(keyword.value.value)
             else:
-                rendered = ast.dump(keyword.value, annotate_fields=False, include_attributes=False)
+                dynamic = True
+                rendered = ast.dump(
+                    keyword.value, annotate_fields=False, include_attributes=False
+                )
             values.append(f"{keyword.arg}={rendered}")
-    return ",".join(sorted(values))
+    return ",".join(sorted(values)), dynamic
 
 
-def _resolve_imported_target(expr: str, aliases: dict[str, str], inspected_modules: set[str] | None = None) -> str:
+def _routing_keywords(call: ast.Call) -> str:
+    values, _dynamic = _routing_keywords_metadata(call)
+    return values
+
+
+def _resolve_imported_target(
+    expr: str, aliases: dict[str, str], inspected_modules: set[str] | None = None
+) -> str:
     if not expr:
         return ""
     root, _, suffix = expr.partition(".")
@@ -517,6 +534,10 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                         endpoint_keyword, dynamic_endpoint = _route_endpoint_keyword(deco)
                         endpoint = endpoint_keyword or node.name
                     methods, dynamic_methods = _route_methods_metadata(deco_name, deco)
+                    routing_keywords = ""
+                    dynamic_routing_keywords = False
+                    if isinstance(deco, ast.Call):
+                        routing_keywords, dynamic_routing_keywords = _routing_keywords_metadata(deco)
                     route_root = _decorator_route_root(deco_call)
                     blueprint_prefix, dynamic_blueprint_prefix = blueprint_prefixes.get(
                         route_root, ("", False)
@@ -527,11 +548,11 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                         has_dynamic_path=has_dynamic_path
                         or dynamic_blueprint_prefix
                         or dynamic_endpoint
-                        or dynamic_methods,
+                        or dynamic_methods
+                        or dynamic_routing_keywords,
                     )
                     if classification == "internal":
                         continue
-                    routing_keywords = _routing_keywords(deco) if isinstance(deco, ast.Call) else ""
                     signatures.append(_route_signature(
                         locus=rel,
                         registration="decorator",
@@ -584,11 +605,13 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                 imported_view_uninspected = bool(view_desc) and not _imported_target_is_inspected(
                     view_desc, aliases, inspected_modules
                 )
+                routing_keywords, dynamic_routing_keywords = _routing_keywords_metadata(node)
                 classification = _route_classification(
                     route_arg or "",
                     has_dynamic_path=has_dynamic_path
                     or has_dynamic_endpoint
                     or dynamic_methods
+                    or dynamic_routing_keywords
                     or imported_view_uninspected,
                 )
                 if classification == "internal":
@@ -600,8 +623,10 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                     methods=methods,
                     endpoint=endpoint or view_desc,
                     view=view_desc,
-                    routing_keywords=_routing_keywords(node),
-                    imported_view_target=_resolve_imported_target(view_desc, aliases, inspected_modules),
+                    routing_keywords=routing_keywords,
+                    imported_view_target=_resolve_imported_target(
+                        view_desc, aliases, inspected_modules
+                    ),
                     public_internal_classification=classification,
                 ))
             if isinstance(node, ast.Call) and _attribute_chain(node.func).endswith(".register_blueprint"):
@@ -615,8 +640,19 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                             dynamic_url_prefix = True
                         else:
                             url_prefix = parsed_prefix
-                imported_blueprint_uninspected = bool(blueprint) and not _imported_target_is_inspected(blueprint, aliases, inspected_modules)
-                classification = _route_classification(url_prefix, has_dynamic_path=dynamic_url_prefix or imported_blueprint_uninspected)
+                routing_keywords, dynamic_routing_keywords = _routing_keywords_metadata(node)
+                imported_blueprint_uninspected = (
+                    bool(blueprint)
+                    and not _imported_target_is_inspected(
+                        blueprint, aliases, inspected_modules
+                    )
+                )
+                classification = _route_classification(
+                    url_prefix,
+                    has_dynamic_path=dynamic_url_prefix
+                    or dynamic_routing_keywords
+                    or imported_blueprint_uninspected,
+                )
                 if classification == "internal":
                     continue
                 signatures.append(_route_signature(
@@ -624,8 +660,10 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                     registration="register_blueprint",
                     blueprint=blueprint,
                     register_blueprint_prefix=url_prefix,
-                    routing_keywords=_routing_keywords(node),
-                    imported_view_target=_resolve_imported_target(blueprint, aliases, inspected_modules),
+                    routing_keywords=routing_keywords,
+                    imported_view_target=_resolve_imported_target(
+                        blueprint, aliases, inspected_modules
+                    ),
                     public_internal_classification=classification,
                 ))
     return sorted(set(signatures))
