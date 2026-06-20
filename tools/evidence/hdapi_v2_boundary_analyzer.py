@@ -257,6 +257,14 @@ def _literal_string_list(node: ast.AST) -> tuple[str, ...]:
 
 
 
+
+def _errorhandler_key(node: ast.AST | None) -> tuple[str, bool]:
+    if node is None:
+        return "", True
+    if isinstance(node, ast.Constant) and isinstance(node.value, (str, int)):
+        return str(node.value), False
+    return ast.unparse(node), True
+
 def _route_endpoint_keyword(call: ast.Call) -> tuple[str, bool]:
     for keyword in call.keywords:
         if keyword.arg != "endpoint":
@@ -519,10 +527,14 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                     route_arg = ""
                     has_dynamic_path = False
                     errorhandler_key = ""
-                    if isinstance(deco, ast.Call) and deco.args:
+                    dynamic_errorhandler_key = False
+                    if isinstance(deco, ast.Call):
                         if deco_name.endswith((".errorhandler", ".app_errorhandler")):
-                            errorhandler_key = _string_constant(deco.args[0]) or ast.unparse(deco.args[0])
-                        else:
+                            key_node = deco.args[0] if deco.args else None
+                            errorhandler_key, dynamic_errorhandler_key = _errorhandler_key(
+                                key_node
+                            )
+                        elif deco.args:
                             raw_route_arg = _string_constant(deco.args[0])
                             if raw_route_arg is None:
                                 has_dynamic_path = True
@@ -549,7 +561,8 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                         or dynamic_blueprint_prefix
                         or dynamic_endpoint
                         or dynamic_methods
-                        or dynamic_routing_keywords,
+                        or dynamic_routing_keywords
+                        or dynamic_errorhandler_key,
                     )
                     if classification == "internal":
                         continue

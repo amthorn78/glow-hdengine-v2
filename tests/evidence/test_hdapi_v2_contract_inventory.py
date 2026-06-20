@@ -4541,3 +4541,58 @@ app.register_blueprint(bp, subdomain=SUBDOMAIN)
             generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
     finally:
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004_errorhandler_integer_key_is_signed() -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+@app.errorhandler(404)
+def not_found(error):
+    return emit_public({'ok': False})
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004_errorhandler_integer.py", body)
+        signatures = tuple(boundary_analyzer._adapter_public_route_signatures((adapter,)))
+        assert any("decorator=app.errorhandler" in item for item in signatures)
+        assert any("errorhandler_key=404" in item for item in signatures)
+        assert all(
+            "public_internal_classification=unknown / fail-closed" not in item
+            for item in signatures
+        )
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004_dynamic_errorhandler_key_fails_closed(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+NOT_FOUND = 404
+@app.errorhandler(NOT_FOUND)
+def not_found(error):
+    return emit_public({'ok': False})
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004_dynamic_errorhandler.py", body)
+        signatures = tuple(boundary_analyzer._adapter_public_route_signatures((adapter,)))
+        joined = "\n".join(signatures)
+        assert "errorhandler_key=NOT_FOUND" in joined
+        assert "public_internal_classification=unknown / fail-closed" in joined
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", signatures)
+        with pytest.raises(
+            ValueError,
+            match="ADAPTER_BOUNDARY_CHECK_FAILED:.*route_signature_classification_unambiguous.*no_public_reader_change",
+        ):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
