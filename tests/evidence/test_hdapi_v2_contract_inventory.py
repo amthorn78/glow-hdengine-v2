@@ -4596,3 +4596,69 @@ def not_found(error):
             generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
     finally:
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004_dynamic_add_url_rule_view_factory_fails_closed(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+def make_view():
+    def generated():
+        return emit_public({'ok': True})
+    return generated
+app.add_url_rule('/factory-view', 'factory_view', view_func=make_view(), methods=['GET'])
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004_dynamic_add_url_rule_view.py", body)
+        signatures = tuple(boundary_analyzer._adapter_public_route_signatures((adapter,)))
+        joined = "\n".join(signatures)
+        assert "registration=add_url_rule" in joined
+        assert "view=make_view" in joined
+        assert "public_internal_classification=unknown / fail-closed" in joined
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", signatures)
+        with pytest.raises(
+            ValueError,
+            match="ADAPTER_BOUNDARY_CHECK_FAILED:.*route_signature_classification_unambiguous.*no_public_reader_change",
+        ):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004_register_blueprint_factory_call_fails_closed(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Blueprint, Flask
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+def make_bp():
+    bp = Blueprint('bp', __name__)
+    @bp.get('/factory-bp')
+    def factory_bp():
+        return emit_public({'ok': True})
+    return bp
+app.register_blueprint(make_bp())
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004_dynamic_register_blueprint_target.py", body)
+        signatures = tuple(boundary_analyzer._adapter_public_route_signatures((adapter,)))
+        joined = "\n".join(signatures)
+        assert "registration=register_blueprint" in joined
+        assert "blueprint=make_bp" in joined
+        assert "public_internal_classification=unknown / fail-closed" in joined
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", signatures)
+        with pytest.raises(
+            ValueError,
+            match="ADAPTER_BOUNDARY_CHECK_FAILED:.*route_signature_classification_unambiguous.*no_public_reader_change",
+        ):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)

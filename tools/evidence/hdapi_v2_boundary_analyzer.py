@@ -309,6 +309,25 @@ def _expr_name(node: ast.AST) -> str:
     return ""
 
 
+def _route_view_target_metadata(node: ast.AST | None) -> tuple[str, bool]:
+    if node is None:
+        return "", False
+    if isinstance(node, ast.Call):
+        view = _attribute_chain(node.func)
+        return view, not view.endswith(".as_view")
+    return _attribute_chain(node), False
+
+
+def _blueprint_registration_target(node: ast.AST | None) -> tuple[str, bool]:
+    if node is None:
+        return "", True
+    if isinstance(node, (ast.Name, ast.Attribute)):
+        return _expr_name(node), False
+    if isinstance(node, ast.Call):
+        return _attribute_chain(node.func), True
+    return ast.unparse(node), True
+
+
 def _iter_function_defs(tree: ast.AST) -> dict[str, ast.FunctionDef | ast.AsyncFunctionDef]:
     function_defs: dict[str, ast.FunctionDef | ast.AsyncFunctionDef] = {}
     for node in ast.iter_child_nodes(tree):
@@ -592,16 +611,15 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                 view_desc = ""
                 methods = ""
                 dynamic_methods = False
+                dynamic_view_func = False
                 for keyword in node.keywords:
                     if keyword.arg == "endpoint":
                         parsed_endpoint = _string_constant(keyword.value)
                         endpoint = parsed_endpoint or ""
                         has_dynamic_endpoint = parsed_endpoint is None
                     elif keyword.arg == "view_func":
-                        view_desc = (
-                            _attribute_chain(keyword.value.func)
-                            if isinstance(keyword.value, ast.Call)
-                            else _attribute_chain(keyword.value)
+                        view_desc, dynamic_view_func = _route_view_target_metadata(
+                            keyword.value
                         )
                     elif keyword.arg == "methods":
                         method_values = _literal_string_list(keyword.value)
@@ -610,10 +628,8 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                         else:
                             dynamic_methods = True
                 if not view_desc and len(node.args) >= 3:
-                    view_desc = (
-                        _attribute_chain(node.args[2].func)
-                        if isinstance(node.args[2], ast.Call)
-                        else _attribute_chain(node.args[2])
+                    view_desc, dynamic_view_func = _route_view_target_metadata(
+                        node.args[2]
                     )
                 imported_view_uninspected = bool(view_desc) and not _imported_target_is_inspected(
                     view_desc, aliases, inspected_modules
@@ -625,6 +641,7 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                     or has_dynamic_endpoint
                     or dynamic_methods
                     or dynamic_routing_keywords
+                    or dynamic_view_func
                     or imported_view_uninspected,
                 )
                 if classification == "internal":
@@ -643,7 +660,9 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                     public_internal_classification=classification,
                 ))
             if isinstance(node, ast.Call) and _attribute_chain(node.func).endswith(".register_blueprint"):
-                blueprint = _expr_name(node.args[0]) if node.args else ""
+                blueprint, dynamic_blueprint_target = _blueprint_registration_target(
+                    node.args[0] if node.args else None
+                )
                 url_prefix = ""
                 dynamic_url_prefix = False
                 for keyword in node.keywords:
@@ -664,6 +683,7 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                     url_prefix,
                     has_dynamic_path=dynamic_url_prefix
                     or dynamic_routing_keywords
+                    or dynamic_blueprint_target
                     or imported_blueprint_uninspected,
                 )
                 if classification == "internal":
