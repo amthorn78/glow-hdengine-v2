@@ -256,6 +256,15 @@ def _literal_string_list(node: ast.AST) -> tuple[str, ...]:
     return (value.upper(),) if value is not None else ()
 
 
+
+def _route_endpoint_keyword(call: ast.Call) -> tuple[str, bool]:
+    for keyword in call.keywords:
+        if keyword.arg != "endpoint":
+            continue
+        parsed = _string_constant(keyword.value)
+        return (parsed or "", parsed is None)
+    return "", False
+
 def _route_methods(deco_name: str, deco: ast.AST) -> str:
     method_by_suffix = {
         ".get": ("GET",),
@@ -496,10 +505,18 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                                 has_dynamic_path = True
                             else:
                                 route_arg = raw_route_arg
+                    dynamic_endpoint = False
+                    endpoint = node.name
+                    if isinstance(deco, ast.Call):
+                        endpoint_keyword, dynamic_endpoint = _route_endpoint_keyword(deco)
+                        endpoint = endpoint_keyword or node.name
                     route_root = _decorator_route_root(deco_call)
                     blueprint_prefix, dynamic_blueprint_prefix = blueprint_prefixes.get(route_root, ("", False))
                     full_route_arg = _join_route_prefix(blueprint_prefix, route_arg)
-                    classification = _route_classification(full_route_arg, has_dynamic_path=has_dynamic_path or dynamic_blueprint_prefix)
+                    classification = _route_classification(
+                        full_route_arg,
+                        has_dynamic_path=has_dynamic_path or dynamic_blueprint_prefix or dynamic_endpoint,
+                    )
                     if classification == "internal":
                         continue
                     methods = _route_methods(deco_name, deco)
@@ -510,7 +527,7 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                         decorator=deco_name,
                         path=full_route_arg,
                         methods=methods,
-                        endpoint=node.name,
+                        endpoint=endpoint,
                         view=node.name,
                         blueprint=route_root,
                         blueprint_constructor_prefix=blueprint_prefix,
@@ -528,16 +545,35 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                 view_desc = ""
                 methods = ""
                 for keyword in node.keywords:
-                    if keyword.arg == "view_func":
-                        view_desc = _attribute_chain(keyword.value.func) if isinstance(keyword.value, ast.Call) else _attribute_chain(keyword.value)
+                    if keyword.arg == "endpoint":
+                        parsed_endpoint = _string_constant(keyword.value)
+                        endpoint = parsed_endpoint or ""
+                        has_dynamic_endpoint = parsed_endpoint is None
+                    elif keyword.arg == "view_func":
+                        view_desc = (
+                            _attribute_chain(keyword.value.func)
+                            if isinstance(keyword.value, ast.Call)
+                            else _attribute_chain(keyword.value)
+                        )
                     elif keyword.arg == "methods":
                         method_values = _literal_string_list(keyword.value)
                         if method_values:
                             methods = ",".join(sorted(method_values))
                 if not view_desc and len(node.args) >= 3:
-                    view_desc = _attribute_chain(node.args[2].func) if isinstance(node.args[2], ast.Call) else _attribute_chain(node.args[2])
-                imported_view_uninspected = bool(view_desc) and not _imported_target_is_inspected(view_desc, aliases, inspected_modules)
-                classification = _route_classification(route_arg or "", has_dynamic_path=has_dynamic_path or has_dynamic_endpoint or imported_view_uninspected)
+                    view_desc = (
+                        _attribute_chain(node.args[2].func)
+                        if isinstance(node.args[2], ast.Call)
+                        else _attribute_chain(node.args[2])
+                    )
+                imported_view_uninspected = bool(view_desc) and not _imported_target_is_inspected(
+                    view_desc, aliases, inspected_modules
+                )
+                classification = _route_classification(
+                    route_arg or "",
+                    has_dynamic_path=has_dynamic_path
+                    or has_dynamic_endpoint
+                    or imported_view_uninspected,
+                )
                 if classification == "internal":
                     continue
                 signatures.append(_route_signature(
@@ -728,6 +764,7 @@ def _unsupported_route_registration_signatures(loci: tuple[str, ...]) -> list[st
     ) -> str:
         route_name = routeish_method_name(factory, alias_methods)
         route_arg = ""
+        endpoint_keyword, _dynamic_endpoint = _route_endpoint_keyword(factory)
         errorhandler_key = ""
         if factory.args:
             raw_arg = _string_constant(factory.args[0])
@@ -748,7 +785,7 @@ def _unsupported_route_registration_signatures(loci: tuple[str, ...]) -> list[st
             decorator=ast.unparse(factory),
             path=route_arg,
             methods=_route_methods(route_name, factory),
-            endpoint=endpoint or view,
+            endpoint=endpoint or endpoint_keyword or view,
             view=view,
             errorhandler_key=errorhandler_key,
             routing_keywords=_routing_keywords(factory),
@@ -771,7 +808,9 @@ def _unsupported_route_registration_signatures(loci: tuple[str, ...]) -> list[st
             view = ""
             methods = ""
             for keyword in call.keywords:
-                if keyword.arg == "view_func":
+                if keyword.arg == "endpoint":
+                    endpoint = _string_constant(keyword.value) or ""
+                elif keyword.arg == "view_func":
                     view = (
                         _attribute_chain(keyword.value.func)
                         if isinstance(keyword.value, ast.Call)

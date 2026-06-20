@@ -3698,7 +3698,10 @@ def test_epic034_w004_signature_field_drift_fails_closed(monkeypatch: pytest.Mon
         stale_baseline = tuple(mutate(item) for item in signatures)
         monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
         monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", stale_baseline)
-        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*route_baseline_reconciled.*no_public_reader_change"):
+        with pytest.raises(
+            ValueError,
+            match="ADAPTER_BOUNDARY_CHECK_FAILED:.*route_baseline_reconciled.*no_public_reader_change",
+        ):
             generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
     finally:
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
@@ -3749,7 +3752,10 @@ def dynamic_public():
         assert any("public_internal_classification=unknown / fail-closed" in item for item in signatures)
         monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
         monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", signatures)
-        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*route_signature_classification_unambiguous.*no_public_reader_change"):
+        with pytest.raises(
+            ValueError,
+            match="ADAPTER_BOUNDARY_CHECK_FAILED:.*route_signature_classification_unambiguous.*no_public_reader_change",
+        ):
             generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
     finally:
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
@@ -3818,7 +3824,10 @@ app.register_blueprint(bp, url_prefix=PREFIX)
             assert any("public_internal_classification=unknown / fail-closed" in item for item in signatures)
             monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
             monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", signatures)
-            with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*route_signature_classification_unambiguous.*no_public_reader_change"):
+            with pytest.raises(
+            ValueError,
+            match="ADAPTER_BOUNDARY_CHECK_FAILED:.*route_signature_classification_unambiguous.*no_public_reader_change",
+        ):
                 generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
     finally:
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
@@ -3844,7 +3853,10 @@ app.add_url_rule(ROUTE, 'added', view_func=added, methods=['GET'])
         assert any("public_internal_classification=unknown / fail-closed" in item for item in signatures)
         monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
         monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", signatures)
-        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*route_signature_classification_unambiguous.*no_public_reader_change"):
+        with pytest.raises(
+            ValueError,
+            match="ADAPTER_BOUNDARY_CHECK_FAILED:.*route_signature_classification_unambiguous.*no_public_reader_change",
+        ):
             generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
     finally:
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
@@ -3896,7 +3908,10 @@ app.add_url_rule('/uninspected-import', 'uninspected', view_func=imported_view, 
         assert any("public_internal_classification=unknown / fail-closed" in item for item in signatures)
         monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
         monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", signatures)
-        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*route_signature_classification_unambiguous.*no_public_reader_change"):
+        with pytest.raises(
+            ValueError,
+            match="ADAPTER_BOUNDARY_CHECK_FAILED:.*route_signature_classification_unambiguous.*no_public_reader_change",
+        ):
             generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
     finally:
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
@@ -4309,5 +4324,92 @@ client_get('/still-not-a-flask-route')
         owner = _write_boundary_temp(rel_dir, "w004_imported_non_route_owner.py", owner_body)
         adapter = _write_boundary_temp(rel_dir, "w004_imported_non_route_alias.py", route_body)
         assert boundary_analyzer._unsupported_route_registration_signatures((adapter, owner)) == []
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004_route_decorator_endpoint_keyword_is_signed_and_drifts(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+@app.route('/endpoint-keyword', endpoint='explicit_endpoint')
+def added():
+    return emit_public({'ok': True})
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004_endpoint_keyword.py", body)
+        signatures = tuple(boundary_analyzer._adapter_public_route_signatures((adapter,)))
+        assert any("endpoint=explicit_endpoint" in item for item in signatures)
+        assert any("view=added" in item for item in signatures)
+        drifted_baseline = tuple(
+            item.replace("endpoint=explicit_endpoint", "endpoint=added")
+            for item in signatures
+        )
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", drifted_baseline)
+        with pytest.raises(
+            ValueError,
+            match="ADAPTER_BOUNDARY_CHECK_FAILED:.*route_baseline_reconciled.*no_public_reader_change",
+        ):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004_dynamic_route_decorator_endpoint_fails_closed(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+ENDPOINT = 'dynamic_endpoint'
+@app.route('/dynamic-endpoint', endpoint=ENDPOINT)
+def added():
+    return emit_public({'ok': True})
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004_dynamic_endpoint.py", body)
+        signatures = tuple(boundary_analyzer._adapter_public_route_signatures((adapter,)))
+        assert any("public_internal_classification=unknown / fail-closed" in item for item in signatures)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", signatures)
+        with pytest.raises(
+            ValueError,
+            match="ADAPTER_BOUNDARY_CHECK_FAILED:.*route_signature_classification_unambiguous.*no_public_reader_change",
+        ):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004_add_url_rule_endpoint_keyword_is_signed() -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+def added():
+    return emit_public({'ok': True})
+app.add_url_rule(
+    '/add-url-endpoint-keyword',
+    endpoint='explicit_add_endpoint',
+    view_func=added,
+    methods=['GET'],
+)
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004_add_url_endpoint_keyword.py", body)
+        signatures = tuple(boundary_analyzer._adapter_public_route_signatures((adapter,)))
+        assert any("registration=add_url_rule" in item for item in signatures)
+        assert any("endpoint=explicit_add_endpoint" in item for item in signatures)
+        assert any("view=added" in item for item in signatures)
     finally:
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
