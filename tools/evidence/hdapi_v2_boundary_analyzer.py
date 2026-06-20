@@ -7,10 +7,95 @@ from __future__ import annotations
 
 import ast
 import hashlib
+from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
+
+ROUTE_SIGNATURE_FIELDS = (
+    "locus",
+    "registration",
+    "decorator",
+    "path",
+    "methods",
+    "endpoint",
+    "view",
+    "blueprint",
+    "blueprint_constructor_prefix",
+    "register_blueprint_prefix",
+    "errorhandler_key",
+    "routing_keywords",
+    "imported_view_target",
+    "public_internal_classification",
+)
+
+SUPPORTED_ROUTE_REGISTRATION_FORMS = {
+    "decorator": {
+        "owners": ("app", "bp", "blueprint"),
+        "methods": ("route", "get", "post", "put", "patch", "delete"),
+        "dynamic_fields_fail_closed": (
+            "path",
+            "endpoint",
+            "methods",
+            "routing_keywords",
+            "blueprint_constructor_prefix",
+        ),
+        "signed_fields": ROUTE_SIGNATURE_FIELDS,
+    },
+    "hook_decorator": {
+        "methods": ("before_request", "before_app_request", "after_request", "after_app_request"),
+        "dynamic_fields_fail_closed": ("routing_keywords",),
+        "signed_fields": ROUTE_SIGNATURE_FIELDS,
+    },
+    "errorhandler": {
+        "methods": ("errorhandler", "app_errorhandler"),
+        "dynamic_fields_fail_closed": ("errorhandler_key", "routing_keywords"),
+        "signed_fields": ROUTE_SIGNATURE_FIELDS,
+    },
+    "add_url_rule": {
+        "dynamic_fields_fail_closed": (
+            "path",
+            "endpoint",
+            "methods",
+            "routing_keywords",
+            "view",
+            "imported_view_target",
+        ),
+        "signed_fields": ROUTE_SIGNATURE_FIELDS,
+    },
+    "register_blueprint": {
+        "dynamic_fields_fail_closed": (
+            "blueprint",
+            "register_blueprint_prefix",
+            "routing_keywords",
+            "imported_view_target",
+        ),
+        "signed_fields": ROUTE_SIGNATURE_FIELDS,
+    },
+    "unsupported_route_registration": {
+        "dynamic_fields_fail_closed": ROUTE_SIGNATURE_FIELDS,
+        "signed_fields": ROUTE_SIGNATURE_FIELDS,
+    },
+}
+
+
+@dataclass(frozen=True)
+class RouteSignatureRecord:
+    locus: str = ""
+    registration: str = ""
+    decorator: str = ""
+    path: str = ""
+    methods: str = ""
+    endpoint: str = ""
+    view: str = ""
+    blueprint: str = ""
+    blueprint_constructor_prefix: str = ""
+    register_blueprint_prefix: str = ""
+    errorhandler_key: str = ""
+    routing_keywords: str = ""
+    imported_view_target: str = ""
+    public_internal_classification: str = ""
 
 
 def _sha256_path(path: Path) -> str:
@@ -507,24 +592,28 @@ def _route_classification(path: str, *, has_dynamic_path: bool = False) -> str:
     return "internal" if _is_non_public_route_namespace(path) else "public"
 
 
+def route_record(**fields: str) -> RouteSignatureRecord:
+    normalized = {key: str(fields.get(key, "")) for key in ROUTE_SIGNATURE_FIELDS}
+    return RouteSignatureRecord(**normalized)
+
+
+def route_signature_from_record(record: RouteSignatureRecord | dict[str, str]) -> str:
+    if isinstance(record, RouteSignatureRecord):
+        fields = asdict(record)
+    else:
+        fields = {key: str(record.get(key, "")) for key in ROUTE_SIGNATURE_FIELDS}
+    return ";".join(
+        f"{key}={_route_signature_field(fields.get(key, ''))}"
+        for key in ROUTE_SIGNATURE_FIELDS
+    )
+
+
+def route_record_from_signature(signature: str) -> RouteSignatureRecord:
+    return route_record(**_route_signature_fields(signature))
+
+
 def _route_signature(**fields: str) -> str:
-    ordered = [
-        "locus",
-        "registration",
-        "decorator",
-        "path",
-        "methods",
-        "endpoint",
-        "view",
-        "blueprint",
-        "blueprint_constructor_prefix",
-        "register_blueprint_prefix",
-        "errorhandler_key",
-        "routing_keywords",
-        "imported_view_target",
-        "public_internal_classification",
-    ]
-    return ";".join(f"{key}={_route_signature_field(fields.get(key, ''))}" for key in ordered)
+    return route_signature_from_record(route_record(**fields))
 
 
 
@@ -1064,6 +1153,22 @@ def _unsupported_route_registration_signatures(loci: tuple[str, ...]) -> list[st
                 rel, node.func, aliases, route_alias_methods, view_expr=view_expr
             ))
     return sorted(set(signatures))
+
+
+def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRecord]:
+    """Return unified, typed route-registration candidates for W-004 proof.
+
+    The current W-004 proof intentionally supports only the declared grammar in
+    SUPPORTED_ROUTE_REGISTRATION_FORMS. Supported and unsupported route-bearing
+    forms are normalized into the same typed record shape before reconciliation;
+    unknown or ambiguous records carry ``unknown / fail-closed`` classification.
+    """
+
+    signatures = sorted(
+        set(_adapter_public_route_signatures(loci))
+        | set(_unsupported_route_registration_signatures(loci))
+    )
+    return [route_record_from_signature(signature) for signature in signatures]
 
 def _is_sanctioned_presenter_call(call: str, aliases: dict[str, str]) -> bool:
     presenter_names = {"emit_public", "emit_public_aux", "emit_public_with_envelope", "emit_reader_public_bytes", "emit_reader_public_envelope"}
@@ -2406,14 +2511,24 @@ def analyze_adapter_boundary(
     adapter_presenter_calls = _adapter_presenter_calls(adapter_loci)
     presenter_bypass = _adapter_presenter_bypass_routes(adapter_loci)
     unresolved_presenter_routes = _adapter_routes_without_presenter(adapter_loci)
-    discovered_public_routes = sorted(
-        set(_adapter_public_route_signatures(adapter_loci))
-        | set(_unsupported_route_registration_signatures(adapter_loci))
+    discovered_public_route_records = discover_route_registrations(adapter_loci)
+    discovered_public_routes = [
+        route_signature_from_record(record) for record in discovered_public_route_records
+    ]
+    route_baseline_records = [
+        route_record_from_signature(signature) for signature in public_route_baseline
+    ]
+    discovered_public_route_record_dicts = [asdict(record) for record in discovered_public_route_records]
+    route_baseline_record_dicts = [asdict(record) for record in route_baseline_records]
+    route_records_have_required_fields = bool(discovered_public_route_record_dicts) and all(
+        set(ROUTE_SIGNATURE_FIELDS) <= set(record)
+        for record in discovered_public_route_record_dicts
     )
     public_reader_route_drift = sorted(set(discovered_public_routes) ^ set(public_route_baseline))
     unknown_route_signatures = sorted(item for item in discovered_public_routes if "public_internal_classification=unknown / fail-closed" in item)
     route_baseline_missing_or_incomplete = not public_route_baseline or not discovered_public_routes
     route_baseline_out_of_scope = not discovered_public_routes and adapter_loci != canonical_adapter_loci
+    typed_route_record_field_coverage = route_records_have_required_fields or route_baseline_out_of_scope
     route_baseline_loci = _route_signature_loci(public_route_baseline)
     route_loci_reconciled = bool(route_baseline_loci) and route_baseline_loci == set(adapter_loci)
     route_baseline_reconciled = (
@@ -2468,6 +2583,17 @@ def analyze_adapter_boundary(
         "route_loci_reconciled_or_failed_closed": route_loci_reconciled or route_baseline_out_of_scope or not check_by_category["public_routes"],
         "new_public_routes_cannot_collapse_to_empty_comparison": (bool(discovered_public_routes) and not route_baseline_missing_or_incomplete) or route_baseline_out_of_scope,
         "route_signature_classification_unambiguous": not unknown_route_signatures,
+        "route_record_field_coverage": typed_route_record_field_coverage,
+        "blueprint_prefix_posture_checked": typed_route_record_field_coverage and all(
+            "blueprint_constructor_prefix" in record and "register_blueprint_prefix" in record
+            for record in discovered_public_route_record_dicts
+        ),
+        "errorhandler_key_posture_checked": typed_route_record_field_coverage and all("errorhandler_key" in record for record in discovered_public_route_record_dicts),
+        "routing_keyword_posture_checked": typed_route_record_field_coverage and all("routing_keywords" in record for record in discovered_public_route_record_dicts),
+        "add_url_rule_posture_checked": typed_route_record_field_coverage and "add_url_rule" in SUPPORTED_ROUTE_REGISTRATION_FORMS,
+        "imported_view_target_posture_checked": typed_route_record_field_coverage and all("imported_view_target" in record for record in discovered_public_route_record_dicts),
+        "endpoint_view_identity_posture_checked": typed_route_record_field_coverage and all("endpoint" in record and "view" in record for record in discovered_public_route_record_dicts),
+        "public_internal_classification_posture_checked": typed_route_record_field_coverage and all("public_internal_classification" in record for record in discovered_public_route_record_dicts),
         "unknown_current_categories_fail_closed": all(f["verdict"] != "PASS" for f in findings if f["classification"] == BOUNDARY_UNKNOWN),
         "conservative_positive_boundary_contract_applied": {f["classification"] for f in findings} <= {BOUNDARY_ALLOWED, BOUNDARY_FORBIDDEN, BOUNDARY_UNKNOWN, BOUNDARY_OUT_OF_SCOPE},
         "table_driven_boundary_taxonomy_applied": set(taxonomy_group_verdicts) == set(REQUIRED_BOUNDARY_TAXONOMY_GROUPS),
@@ -2497,6 +2623,7 @@ def analyze_adapter_boundary(
         "public_route_deltas": public_reader_route_drift,
         "route_baseline_reconciled": route_baseline_reconciled,
         "route_baseline_signatures": list(public_route_baseline),
+        "route_baseline_records": route_baseline_record_dicts,
         "route_baseline_loci": sorted(route_baseline_loci),
         "unknown_route_signatures": unknown_route_signatures,
         "public_internal_route_classification_posture": next(f for f in findings if f["category"] == "public_routes"),
@@ -2509,6 +2636,7 @@ def analyze_adapter_boundary(
         "evidence_family_binding_posture": next(f for f in findings if f["category"] == "evidence_binding_posture"),
         "unsupported_scope_claims": unsupported_scope_claims,
         "discovered_public_route_signatures": discovered_public_routes,
+        "discovered_public_route_records": discovered_public_route_record_dicts,
         "discovered_presenter_calls": adapter_presenter_calls,
         "checks": checks,
         "verdict_status": verdict_status,

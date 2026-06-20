@@ -4853,3 +4853,61 @@ app.register_blueprint(bp)
             generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
     finally:
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004_supported_route_grammar_is_declared() -> None:
+    forms = boundary_analyzer.SUPPORTED_ROUTE_REGISTRATION_FORMS
+    for required in {
+        "decorator",
+        "hook_decorator",
+        "errorhandler",
+        "add_url_rule",
+        "register_blueprint",
+        "unsupported_route_registration",
+    }:
+        assert required in forms
+        assert tuple(forms[required]["signed_fields"]) == boundary_analyzer.ROUTE_SIGNATURE_FIELDS
+        assert forms[required]["dynamic_fields_fail_closed"]
+
+
+def test_epic034_w004_baseline_is_authored_as_structured_records() -> None:
+    assert generator.ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE_RECORDS
+    assert all(
+        set(record) == set(boundary_analyzer.ROUTE_SIGNATURE_FIELDS)
+        for record in generator.ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE_RECORDS
+    )
+    assert generator.ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE == tuple(
+        boundary_analyzer.route_signature_from_record(record)
+        for record in generator.ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE_RECORDS
+    )
+
+
+def test_epic034_w004_analyzer_exposes_typed_route_records() -> None:
+    result = _epic034_analyzer_result()
+    records = result["discovered_public_route_records"]
+    baseline_records = result["route_baseline_records"]
+    assert records
+    assert baseline_records
+    assert all(set(record) == set(boundary_analyzer.ROUTE_SIGNATURE_FIELDS) for record in records)
+    assert all(set(record) == set(boundary_analyzer.ROUTE_SIGNATURE_FIELDS) for record in baseline_records)
+    assert result["checks"]["route_record_field_coverage"] is True
+    assert result["checks"]["endpoint_view_identity_posture_checked"] is True
+
+
+def test_epic034_w004_renderer_route_field_checks_are_analyzer_owned() -> None:
+    result = _epic034_analyzer_result()
+    proof, _checks = generator.render_adapter_boundary_proof(
+        "2026-06-18T00:00:00Z",
+        result,
+    )
+    assert "endpoint=" in proof
+    assert "view=" in proof
+    result["checks"] = dict(result["checks"])
+    result["checks"]["endpoint_view_identity_posture_checked"] = False
+    with pytest.raises(ValueError, match="endpoint_view_identity_posture_checked"):
+        generator.build_adapter_boundary_check_log(
+            "2026-06-18T00:00:00Z",
+            proof,
+            result["checks"],
+            mode="closed-rails-source-cache",
+        )
