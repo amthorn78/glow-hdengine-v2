@@ -1,5 +1,5 @@
 path: artifacts/vendor/hdapi_v2/known_anomalies.md
 size_bytes: 1027
-sha256: 41e7141edb91f9dd51a1d019b9f4e23c9e8f68b8884e4f262f762c71035d9b24
-mtime_utc: 2026-06-20T15:08:49Z
-produced_at_utc: 2026-06-20T15:08:47Z
+sha256: a6d66cc95f8aa2a4fb9a33a5434fda06a545aeb9a5db998c07a919e89d4f777b
+mtime_utc: 2026-06-20T18:56:55Z
+produced_at_utc: 2026-06-20T18:56:53Z

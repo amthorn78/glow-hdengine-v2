@@ -5302,3 +5302,220 @@ def hidden():
         )
     finally:
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004a3_endpoint_none_is_omitted_endpoint_metadata() -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask
+app = Flask(__name__)
+@app.route('/reader', endpoint=None)
+def reader():
+    return 'ok'
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004a3_endpoint_none.py", body)
+        records = boundary_analyzer.discover_route_registrations((adapter,))
+        assert any(
+            record.path == "/reader"
+            and record.endpoint == "reader"
+            and record.public_internal_classification == "public"
+            for record in records
+        )
+        assert not any(
+            record.path == "/reader"
+            and record.public_internal_classification == boundary_analyzer.BOUNDARY_UNKNOWN
+            for record in records
+        )
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004a3_imported_blueprint_prefix_is_signed_and_drift_detected() -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    owner_old = """
+from flask import Blueprint
+bp = Blueprint('reader', __name__, url_prefix='/old')
+"""
+    owner_new = """
+from flask import Blueprint
+bp = Blueprint('reader', __name__, url_prefix='/new')
+"""
+    route_body = """
+from tmp_boundary_test.w004a3_bp_owner import bp
+@bp.get('/reader')
+def reader():
+    return 'ok'
+"""
+    try:
+        owner = _write_boundary_temp(rel_dir, "w004a3_bp_owner.py", owner_old)
+        route = _write_boundary_temp(rel_dir, "w004a3_bp_route.py", route_body)
+        old_records = boundary_analyzer.discover_route_registrations((route, owner))
+        assert any(
+            record.path == "/old/reader"
+            and record.blueprint_constructor_prefix == "/old"
+            for record in old_records
+        )
+        old_baseline = tuple(boundary_analyzer._adapter_public_route_signatures((route, owner)))
+
+        owner = _write_boundary_temp(rel_dir, "w004a3_bp_owner.py", owner_new)
+        new_records = boundary_analyzer.discover_route_registrations((route, owner))
+        assert any(
+            record.path == "/new/reader"
+            and record.blueprint_constructor_prefix == "/new"
+            for record in new_records
+        )
+        source_selection, request_shaping, response_mapping = _epic034_boundary_inputs()
+        result = boundary_analyzer.analyze_adapter_boundary(
+            source_selection=source_selection,
+            request_shaping=request_shaping,
+            response_mapping=response_mapping,
+            adapter_loci=(route, owner),
+            canonical_adapter_loci=(route, owner),
+            presenter_loci=generator.ADAPTER_BOUNDARY_PRESENTER_LOCI,
+            vendor_seam_loci=generator.ADAPTER_BOUNDARY_VENDOR_SEAM_LOCI,
+            pure_compute_loci=generator.ADAPTER_BOUNDARY_PURE_COMPUTE_LOCI,
+            public_route_baseline=old_baseline,
+            evidence_tool_loci=("tools/evidence/generate_hdapi_v2_contract_inventory.py", "tools/evidence/hdapi_v2_boundary_analyzer.py"),
+        )
+        assert result["checks"]["route_baseline_reconciled"] is False
+        assert any("/old/reader" in item or "/new/reader" in item for item in result["public_route_deltas"])
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004a3_unresolved_imported_blueprint_prefix_fails_closed() -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    route_body = """
+from tmp_boundary_test.w004a3_missing_bp_owner import bp
+@bp.get('/reader')
+def reader():
+    return 'ok'
+"""
+    try:
+        route = _write_boundary_temp(rel_dir, "w004a3_missing_bp_route.py", route_body)
+        records = boundary_analyzer.discover_route_registrations((route,))
+        assert any(record.path == "/reader" for record in records)
+        assert any(
+            record.public_internal_classification == boundary_analyzer.BOUNDARY_UNKNOWN
+            for record in records
+            if record.path == "/reader"
+        )
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004a3_add_url_rule_rule_keyword_signs_literal_path() -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask
+app = Flask(__name__)
+def reader():
+    return 'ok'
+app.add_url_rule(rule='/reader', endpoint='reader', view_func=reader, methods=['GET'])
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004a3_add_url_rule_rule_keyword.py", body)
+        records = boundary_analyzer.discover_route_registrations((adapter,))
+        assert any(
+            record.registration == "add_url_rule"
+            and record.path == "/reader"
+            and record.view == "reader"
+            and record.public_internal_classification == "public"
+            for record in records
+        )
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004a3_add_url_rule_view_functions_binding_is_signed_and_drift_detected() -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    old_body = """
+from flask import Flask
+app = Flask(__name__)
+def reader():
+    return 'ok'
+app.add_url_rule('/reader', endpoint='raw', methods=['GET'])
+app.view_functions['raw'] = reader
+"""
+    new_body = """
+from flask import Flask
+app = Flask(__name__)
+def reader():
+    return 'ok'
+def bypass():
+    return {'raw': True}
+app.add_url_rule('/reader', endpoint='raw', methods=['GET'])
+app.view_functions['raw'] = bypass
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004a3_view_functions_binding.py", old_body)
+        old_records = boundary_analyzer.discover_route_registrations((adapter,))
+        assert any(
+            record.registration == "add_url_rule"
+            and record.path == "/reader"
+            and record.endpoint == "raw"
+            and record.view == "reader"
+            for record in old_records
+        )
+        old_baseline = tuple(boundary_analyzer._adapter_public_route_signatures((adapter,)))
+
+        adapter = _write_boundary_temp(rel_dir, "w004a3_view_functions_binding.py", new_body)
+        new_records = boundary_analyzer.discover_route_registrations((adapter,))
+        assert any(
+            record.registration == "add_url_rule"
+            and record.path == "/reader"
+            and record.endpoint == "raw"
+            and record.view == "bypass"
+            for record in new_records
+        )
+        source_selection, request_shaping, response_mapping = _epic034_boundary_inputs()
+        result = boundary_analyzer.analyze_adapter_boundary(
+            source_selection=source_selection,
+            request_shaping=request_shaping,
+            response_mapping=response_mapping,
+            adapter_loci=(adapter,),
+            canonical_adapter_loci=(adapter,),
+            presenter_loci=generator.ADAPTER_BOUNDARY_PRESENTER_LOCI,
+            vendor_seam_loci=generator.ADAPTER_BOUNDARY_VENDOR_SEAM_LOCI,
+            pure_compute_loci=generator.ADAPTER_BOUNDARY_PURE_COMPUTE_LOCI,
+            public_route_baseline=old_baseline,
+            evidence_tool_loci=("tools/evidence/generate_hdapi_v2_contract_inventory.py", "tools/evidence/hdapi_v2_boundary_analyzer.py"),
+        )
+        assert result["checks"]["route_baseline_reconciled"] is False
+        assert any("view=reader" in item or "view=bypass" in item for item in result["public_route_deltas"])
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004a3_add_url_rule_missing_view_identity_fails_closed() -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask
+app = Flask(__name__)
+app.add_url_rule('/reader', endpoint='raw', methods=['GET'])
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004a3_missing_view_identity.py", body)
+        records = boundary_analyzer.discover_route_registrations((adapter,))
+        assert any(
+            record.registration == "add_url_rule"
+            and record.path == "/reader"
+            and record.endpoint == "raw"
+            and record.public_internal_classification == boundary_analyzer.BOUNDARY_UNKNOWN
+            for record in records
+        )
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)

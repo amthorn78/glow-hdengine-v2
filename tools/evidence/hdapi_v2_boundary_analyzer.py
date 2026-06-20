@@ -354,9 +354,36 @@ def _route_endpoint_keyword(call: ast.Call) -> tuple[str, bool]:
     for keyword in call.keywords:
         if keyword.arg != "endpoint":
             continue
+        if isinstance(keyword.value, ast.Constant) and keyword.value.value is None:
+            return "", False
         parsed = _string_constant(keyword.value)
         return (parsed or "", parsed is None)
     return "", False
+
+
+def _add_url_rule_path_metadata(call: ast.Call) -> tuple[str, bool]:
+    if call.args:
+        parsed = _string_constant(call.args[0])
+        return parsed or "", parsed is None
+    for keyword in call.keywords:
+        if keyword.arg != "rule":
+            continue
+        parsed = _string_constant(keyword.value)
+        return parsed or "", parsed is None
+    return "", True
+
+
+def _add_url_rule_endpoint_metadata(call: ast.Call) -> tuple[str, bool]:
+    endpoint = _string_constant(call.args[1]) if len(call.args) > 1 else ""
+    dynamic_endpoint = len(call.args) > 1 and endpoint is None
+    for keyword in call.keywords:
+        if keyword.arg != "endpoint":
+            continue
+        if isinstance(keyword.value, ast.Constant) and keyword.value.value is None:
+            return "", False
+        parsed_endpoint = _string_constant(keyword.value)
+        return parsed_endpoint or "", parsed_endpoint is None
+    return endpoint or "", dynamic_endpoint
 
 def _route_methods_metadata(deco_name: str, deco: ast.AST) -> tuple[str, bool]:
     method_by_suffix = {
@@ -514,6 +541,26 @@ def _blueprint_prefix_metadata(tree: ast.AST) -> dict[str, tuple[str, bool]]:
 
 def _blueprint_prefixes(tree: ast.AST) -> dict[str, str]:
     return {name: prefix for name, (prefix, _dynamic) in _blueprint_prefix_metadata(tree).items()}
+
+def _view_function_bindings(tree: ast.AST) -> dict[tuple[str, str], tuple[str, bool]]:
+    bindings: dict[tuple[str, str], tuple[str, bool]] = {}
+    for node in ast.walk(tree):
+        if not isinstance(node, (ast.Assign, ast.AnnAssign)) or node.value is None:
+            continue
+        targets = node.targets if isinstance(node, ast.Assign) else [node.target]
+        for target in targets:
+            if not isinstance(target, ast.Subscript):
+                continue
+            if not _attribute_chain(target.value).endswith(".view_functions"):
+                continue
+            owner = _root_name(target.value)
+            endpoint = _string_constant(target.slice)
+            view_desc, dynamic_view = _route_view_target_metadata(node.value)
+            if owner and endpoint:
+                bindings[(owner, endpoint)] = (view_desc, dynamic_view)
+            elif owner:
+                bindings[(owner, "")] = (view_desc, True)
+    return bindings
 
 def _decorator_route_root(deco_call: ast.AST) -> str:
     if isinstance(deco_call, ast.Attribute):
@@ -678,6 +725,32 @@ def _route_signature_loci(signatures: tuple[str, ...] | list[str]) -> set[str]:
 def _module_name_for_locus(rel: str) -> str:
     return rel.removesuffix(".py").replace("/", ".")
 
+def _inspected_imported_blueprint_prefix_metadata(
+    route_root: str,
+    aliases: dict[str, str],
+    module_blueprint_prefixes: dict[str, dict[str, tuple[str, bool]]],
+    module_blueprint_owners: dict[str, dict[str, bool]],
+) -> tuple[str, bool] | None:
+    if not route_root:
+        return None
+    root, _sep, suffix = route_root.partition(".")
+    target = aliases.get(root, "")
+    if not target:
+        return None
+    resolved = target + (("." + suffix) if suffix else "")
+    module_name, sep, symbol = resolved.rpartition(".")
+    if not sep or not symbol:
+        return "", True
+    if module_name not in module_blueprint_prefixes:
+        return "", True
+    prefixes = module_blueprint_prefixes[module_name]
+    if symbol in prefixes:
+        return prefixes[symbol]
+    owners = module_blueprint_owners.get(module_name, {})
+    if symbol in owners:
+        return "", owners[symbol]
+    return "", True
+
 def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
     """Return stable public adapter route/hook registrations for PR-04 drift checks."""
 
@@ -697,11 +770,19 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
         ".errorhandler",
         ".app_errorhandler",
     )
+    module_blueprint_prefixes: dict[str, dict[str, tuple[str, bool]]] = {}
+    module_blueprint_owners: dict[str, dict[str, bool]] = {}
+    for rel in loci:
+        _path, _text, tree = _python_source(rel)
+        module_name = _module_name_for_locus(rel)
+        module_blueprint_prefixes[module_name] = _blueprint_prefix_metadata(tree)
+        module_blueprint_owners[module_name] = _blueprint_owner_metadata(tree)
     for rel in loci:
         _path, _text, tree = _python_source(rel)
         aliases = _import_aliases(tree)
         blueprint_owners = _blueprint_owner_metadata(tree)
         blueprint_prefixes = _blueprint_prefix_metadata(tree)
+        view_function_bindings = _view_function_bindings(tree)
         for node in ast.walk(tree):
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 for deco in node.decorator_list:
@@ -741,6 +822,15 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                     blueprint_prefix, dynamic_blueprint_prefix = blueprint_prefixes.get(
                         route_root, ("", False)
                     )
+                    if route_root not in blueprint_prefixes:
+                        imported_prefix = _inspected_imported_blueprint_prefix_metadata(
+                            route_root,
+                            aliases,
+                            module_blueprint_prefixes,
+                            module_blueprint_owners,
+                        )
+                        if imported_prefix is not None:
+                            blueprint_prefix, dynamic_blueprint_prefix = imported_prefix
                     full_route_arg = _join_route_prefix(blueprint_prefix, route_arg)
                     classification = _route_classification(
                         full_route_arg,
@@ -771,21 +861,14 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                         public_internal_classification=classification,
                     ))
             if isinstance(node, ast.Call) and _attribute_chain(node.func).endswith(".add_url_rule"):
-                raw_add_url_route = _string_constant(node.args[0]) if node.args else None
-                route_arg = raw_add_url_route or ""
-                has_dynamic_path = raw_add_url_route is None
-                endpoint = _string_constant(node.args[1]) if len(node.args) > 1 else ""
-                has_dynamic_endpoint = len(node.args) > 1 and endpoint is None
+                route_arg, has_dynamic_path = _add_url_rule_path_metadata(node)
+                endpoint, has_dynamic_endpoint = _add_url_rule_endpoint_metadata(node)
                 view_desc = ""
                 methods = ""
                 dynamic_methods = False
                 dynamic_view_func = False
                 for keyword in node.keywords:
-                    if keyword.arg == "endpoint":
-                        parsed_endpoint = _string_constant(keyword.value)
-                        endpoint = parsed_endpoint or ""
-                        has_dynamic_endpoint = parsed_endpoint is None
-                    elif keyword.arg == "view_func":
+                    if keyword.arg == "view_func":
                         view_desc, dynamic_view_func = _route_view_target_metadata(
                             keyword.value
                         )
@@ -799,11 +882,19 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                     view_desc, dynamic_view_func = _route_view_target_metadata(
                         node.args[2]
                     )
+                if not view_desc:
+                    owner = _root_name(node.func)
+                    if owner and endpoint and (owner, endpoint) in view_function_bindings:
+                        view_desc, dynamic_view_func = view_function_bindings[
+                            (owner, endpoint)
+                        ]
+                    else:
+                        dynamic_view_func = True
                 imported_view_uninspected = bool(view_desc) and not _imported_target_is_inspected(
                     view_desc, aliases, inspected_modules
                 )
                 routing_keywords, dynamic_routing_keywords = _routing_keywords_metadata(
-                    node, consumed_keywords={"endpoint", "methods", "view_func"}
+                    node, consumed_keywords={"endpoint", "methods", "rule", "view_func"}
                 )
                 classification = _route_classification(
                     route_arg or "",
@@ -1135,8 +1226,8 @@ def _unsupported_route_registration_signatures(loci: tuple[str, ...]) -> list[st
         call_name = _attribute_chain(call.func)
         route_name = alias_methods[call_name]
         if route_name == ".add_url_rule":
-            raw_route = _string_constant(call.args[0]) if call.args else None
-            endpoint = _string_constant(call.args[1]) if len(call.args) > 1 else ""
+            raw_route, _dynamic_route = _add_url_rule_path_metadata(call)
+            endpoint, _dynamic_endpoint = _add_url_rule_endpoint_metadata(call)
             view = ""
             methods = ""
             for keyword in call.keywords:
@@ -1167,7 +1258,7 @@ def _unsupported_route_registration_signatures(loci: tuple[str, ...]) -> list[st
                 endpoint=endpoint or view,
                 view=view,
                 routing_keywords=_routing_keywords(
-                    call, consumed_keywords={"endpoint", "methods", "view_func"}
+                    call, consumed_keywords={"endpoint", "methods", "rule", "view_func"}
                 ),
                 imported_view_target=_resolve_imported_target(view, aliases, inspected_modules),
                 public_internal_classification=BOUNDARY_UNKNOWN,
@@ -1315,6 +1406,7 @@ def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
     for rel in loci:
         _path, _text, tree = _python_source(rel)
         aliases = _import_aliases(tree)
+        view_function_bindings = _view_function_bindings(tree)
         function_defs = _iter_function_defs(tree)
         class_methods: dict[str, set[str]] = {}
         class_method_names: dict[str, dict[str, set[str]]] = {}
@@ -1505,12 +1597,19 @@ def _adapter_presenter_bypass_routes(loci: tuple[str, ...]) -> list[str]:
             if not call_name.endswith(".add_url_rule"):
                 continue
             view_func: ast.AST | None = None
+            endpoint, dynamic_endpoint = _add_url_rule_endpoint_metadata(node)
             for keyword in node.keywords:
                 if keyword.arg == "view_func":
                     view_func = keyword.value
                     break
             if view_func is None and len(node.args) >= 3:
                 view_func = node.args[2]
+            if view_func is None and endpoint and not dynamic_endpoint:
+                owner = _root_name(node.func)
+                if owner and (owner, endpoint) in view_function_bindings:
+                    view_name, dynamic_view = view_function_bindings[(owner, endpoint)]
+                    if not dynamic_view and view_name:
+                        view_func = ast.Name(id=view_name, ctx=ast.Load())
             method_values: set[str] = set()
             for keyword in node.keywords:
                 if keyword.arg == "methods":
@@ -1611,6 +1710,7 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
         _path, _text, tree = _python_source(rel)
         blueprint_prefixes = _blueprint_prefixes(tree)
         aliases = _import_aliases(tree)
+        view_function_bindings = _view_function_bindings(tree)
         function_defs: dict[str, ast.FunctionDef | ast.AsyncFunctionDef] = {}
         simple_names: dict[str, list[str]] = {}
 
@@ -1778,12 +1878,19 @@ def _adapter_routes_without_presenter(loci: tuple[str, ...]) -> list[str]:
             if not isinstance(node, ast.Call) or not _attribute_chain(node.func).endswith(".add_url_rule"):
                 continue
             view_func: ast.AST | None = None
+            endpoint, dynamic_endpoint = _add_url_rule_endpoint_metadata(node)
             for keyword in node.keywords:
                 if keyword.arg == "view_func":
                     view_func = keyword.value
                     break
             if view_func is None and len(node.args) >= 3:
                 view_func = node.args[2]
+            if view_func is None and endpoint and not dynamic_endpoint:
+                owner = _root_name(node.func)
+                if owner and (owner, endpoint) in view_function_bindings:
+                    view_name, dynamic_view = view_function_bindings[(owner, endpoint)]
+                    if not dynamic_view and view_name:
+                        view_func = ast.Name(id=view_name, ctx=ast.Load())
             method_values: set[str] = set()
             for keyword in node.keywords:
                 if keyword.arg == "methods":
