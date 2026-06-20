@@ -615,8 +615,30 @@ def _unsupported_route_registration_signatures(loci: tuple[str, ...]) -> list[st
     def routeish_suffix(call_name: str) -> str:
         return f".{call_name.rsplit('.', 1)[-1]}" if call_name else ""
 
+    def route_owner_names(tree: ast.AST) -> set[str]:
+        owners: set[str] = set()
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Assign):
+                value = node.value
+                targets = node.targets
+            elif isinstance(node, ast.AnnAssign):
+                value = node.value
+                targets = [node.target]
+            else:
+                continue
+            if not isinstance(value, ast.Call):
+                continue
+            constructor = _attribute_chain(value.func).rsplit(".", 1)[-1]
+            if constructor not in {"Flask", "Blueprint"}:
+                continue
+            for target in targets:
+                if isinstance(target, ast.Name):
+                    owners.add(target.id)
+        return owners
+
     def route_factory_alias_methods(tree: ast.AST) -> dict[str, str]:
         methods: dict[str, str] = {}
+        route_owners = route_owner_names(tree)
         for node in ast.walk(tree):
             if isinstance(node, ast.Assign):
                 value = node.value
@@ -631,10 +653,19 @@ def _unsupported_route_registration_signatures(loci: tuple[str, ...]) -> list[st
             alias_method = ""
             if isinstance(value, ast.Attribute):
                 value_name = _attribute_chain(value)
-                if value_name.endswith(routeish_suffixes):
+                if (
+                    _root_name(value) in route_owners
+                    and value_name.endswith(routeish_suffixes)
+                ):
                     alias_method = routeish_suffix(value_name)
             elif isinstance(value, ast.Call) and getattr_routeish(value):
-                alias_method = f".{getattr_routeish(value)}"
+                owner = (
+                    value.func.args[0]
+                    if isinstance(value.func, ast.Call)
+                    else value.args[0]
+                )
+                if _root_name(owner) in route_owners:
+                    alias_method = f".{getattr_routeish(value)}"
             if not alias_method:
                 continue
             for target in targets:

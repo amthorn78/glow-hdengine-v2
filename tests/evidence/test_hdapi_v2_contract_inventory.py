@@ -4138,3 +4138,52 @@ register(bp, url_prefix='/aliased-prefix')
             generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
     finally:
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004_route_alias_detection_does_not_treat_non_flask_get_alias_as_route() -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+class Session:
+    def get(self, path):
+        return {'path': path}
+session = Session()
+client_get = session.get
+client_get('/not-a-flask-route')
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004_non_flask_get_alias.py", body)
+        assert boundary_analyzer._unsupported_route_registration_signatures((adapter,)) == []
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004_getattr_route_alias_from_flask_owner_fails_closed(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+public_route = getattr(app, 'route')
+@public_route('/getattr-aliased-route')
+def added():
+    return emit_public({'ok': True})
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004_getattr_route_alias.py", body)
+        parsed_signatures = tuple(boundary_analyzer._adapter_public_route_signatures((adapter,)))
+        unsupported_signatures = tuple(boundary_analyzer._unsupported_route_registration_signatures((adapter,)))
+        assert parsed_signatures == ()
+        assert any("path=/getattr-aliased-route" in item for item in unsupported_signatures)
+        assert any("endpoint=added" in item for item in unsupported_signatures)
+        assert any("view=added" in item for item in unsupported_signatures)
+        assert any("public_internal_classification=unknown / fail-closed" in item for item in unsupported_signatures)
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", ())
+        with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*no_public_reader_change"):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
