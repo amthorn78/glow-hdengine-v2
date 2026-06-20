@@ -5664,3 +5664,130 @@ def test_epic034_w004a4_route_proof_case_matrix_is_visible() -> None:
         "unresolved_imported_route_decorator_fails_closed",
         "imported_blueprint_prefix_control_still_signed",
     }
+
+
+W004_ROUTE_OWNER_CONTEXT_CASES = {
+    "local_flask_get_decorator_supported",
+    "imported_client_get_decorator_not_route",
+    "route_shaped_unknown_app_get_decorator_fails_closed",
+    "imported_client_add_url_rule_method_not_route",
+    "local_non_flask_app_name_does_not_become_route_owner",
+}
+
+
+def test_epic034_w004_route_owner_context_local_flask_get_decorator_supported() -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask
+app = Flask(__name__)
+@app.get('/reader')
+def reader():
+    return 'ok'
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004_owner_context_flask_get.py", body)
+        records = boundary_analyzer.discover_route_registrations((adapter,))
+        assert any(
+            record.path == "/reader"
+            and record.methods == "GET"
+            and record.public_internal_classification == "public"
+            for record in records
+        )
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004_route_owner_context_imported_client_get_decorator_is_not_route() -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from external.client import Client
+client = Client()
+@client.get('/status')
+def status():
+    return 'helper'
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004_owner_context_client_get_deco.py", body)
+        records = boundary_analyzer.discover_route_registrations((adapter,))
+        assert all(record.path != "/status" for record in records)
+        assert all(record.registration != "unsupported_route_registration" for record in records)
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004_route_owner_context_route_shaped_unknown_app_get_fails_closed() -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from external.factory import create_app
+app = create_app()
+@app.get('/hidden')
+def hidden():
+    return 'hidden'
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004_owner_context_unknown_app_get.py", body)
+        records = boundary_analyzer.discover_route_registrations((adapter,))
+        assert any(record.path == "/hidden" for record in records)
+        assert any(
+            record.public_internal_classification == boundary_analyzer.BOUNDARY_UNKNOWN
+            for record in records
+            if record.path == "/hidden"
+        )
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004_route_owner_context_imported_client_add_url_rule_is_not_route() -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from external.client import Client
+client = Client()
+client.add_url_rule('/status', endpoint='status')
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004_owner_context_client_add_url_rule.py", body)
+        records = boundary_analyzer.discover_route_registrations((adapter,))
+        assert all(record.path != "/status" for record in records)
+        assert all(record.registration != "add_url_rule" for record in records)
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004_route_owner_context_local_non_flask_app_name_not_route() -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+class NonFlaskHelper:
+    def get(self, *_args, **_kwargs):
+        return None
+app = NonFlaskHelper()
+@app.get('/status')
+def status():
+    return 'helper'
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004_owner_context_non_flask_app.py", body)
+        records = boundary_analyzer.discover_route_registrations((adapter,))
+        assert all(record.path != "/status" for record in records)
+        assert all(record.registration != "unsupported_route_registration" for record in records)
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004_route_owner_context_case_matrix_is_visible() -> None:
+    assert W004_ROUTE_OWNER_CONTEXT_CASES == {
+        "local_flask_get_decorator_supported",
+        "imported_client_get_decorator_not_route",
+        "route_shaped_unknown_app_get_decorator_fails_closed",
+        "imported_client_add_url_rule_method_not_route",
+        "local_non_flask_app_name_does_not_become_route_owner",
+    }
