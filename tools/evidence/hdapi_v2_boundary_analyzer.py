@@ -648,19 +648,23 @@ def _unsupported_route_registration_signatures(loci: tuple[str, ...]) -> list[st
         methods: dict[str, str] = {}
         route_owners = route_owner_names(tree, import_aliases)
 
+        def imported_owner_is_route_bearing(root: str) -> bool:
+            target = import_aliases.get(root, "")
+            module_name, _sep, symbol = target.rpartition(".")
+            if not module_name or not symbol:
+                return False
+            for rel in loci:
+                if _module_name_for_locus(rel) != module_name:
+                    continue
+                _owner_path, _owner_text, owner_tree = _python_source(rel)
+                return symbol in route_owner_names(owner_tree, _import_aliases(owner_tree))
+            return False
+
         def owner_is_route_bearing(owner: ast.AST | None) -> bool:
             root = _root_name(owner) if owner is not None else None
             return bool(
                 root
-                and (
-                    root in route_owners
-                    or (
-                        root in import_aliases
-                        and _imported_target_is_inspected(
-                            root, import_aliases, inspected_modules
-                        )
-                    )
-                )
+                and (root in route_owners or imported_owner_is_route_bearing(root))
             )
         for node in ast.walk(tree):
             if isinstance(node, ast.Assign):

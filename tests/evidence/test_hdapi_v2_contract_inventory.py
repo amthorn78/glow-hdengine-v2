@@ -4288,3 +4288,26 @@ app.register_blueprint(shared_bp)
             generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
     finally:
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004_imported_inspected_non_route_get_alias_is_not_route() -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    owner_body = """
+class Session:
+    def get(self, path):
+        return {'path': path}
+session = Session()
+"""
+    route_body = """
+from tmp_boundary_test.w004_imported_non_route_owner import session
+client_get = session.get
+client_get('/still-not-a-flask-route')
+"""
+    try:
+        owner = _write_boundary_temp(rel_dir, "w004_imported_non_route_owner.py", owner_body)
+        adapter = _write_boundary_temp(rel_dir, "w004_imported_non_route_alias.py", route_body)
+        assert boundary_analyzer._unsupported_route_registration_signatures((adapter, owner)) == []
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
