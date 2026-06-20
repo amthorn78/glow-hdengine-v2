@@ -323,11 +323,24 @@ def _route_view_target_metadata(node: ast.AST | None) -> tuple[str, bool]:
     return _attribute_chain(node), False
 
 
-def _blueprint_registration_target(node: ast.AST | None) -> tuple[str, bool]:
+def _blueprint_registration_target(
+    node: ast.AST | None,
+    aliases: dict[str, str],
+    inspected_modules: set[str],
+    blueprint_owners: set[str],
+) -> tuple[str, bool]:
     if node is None:
         return "", True
     if isinstance(node, (ast.Name, ast.Attribute)):
-        return _expr_name(node), False
+        name = _expr_name(node)
+        root = name.split(".", 1)[0]
+        if root in blueprint_owners:
+            return name, False
+        if _candidate_imported_target_modules(name, aliases):
+            return name, not _imported_target_is_inspected(
+                name, aliases, inspected_modules
+            )
+        return name, True
     if isinstance(node, ast.Call):
         return _attribute_chain(node.func), True
     return ast.unparse(node), True
@@ -357,9 +370,29 @@ def _join_route_prefix(prefix: str, route: str) -> str:
     return f"/{prefix.strip('/')}/{route.strip('/')}"
 
 
+def _blueprint_owner_names(tree: ast.AST) -> set[str]:
+    owners: set[str] = set()
+    local_factory_names = {
+        node.name
+        for node in getattr(tree, "body", ())
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+    }
+    for node in getattr(tree, "body", ()):
+        if not isinstance(node, (ast.Assign, ast.AnnAssign)) or not isinstance(node.value, ast.Call):
+            continue
+        constructor = _attribute_chain(node.value.func).rsplit(".", 1)[-1]
+        if constructor != "Blueprint" and constructor not in local_factory_names:
+            continue
+        targets = node.targets if isinstance(node, ast.Assign) else [node.target]
+        for target in targets:
+            if isinstance(target, ast.Name):
+                owners.add(target.id)
+    return owners
+
+
 def _blueprint_prefix_metadata(tree: ast.AST) -> dict[str, tuple[str, bool]]:
     prefixes: dict[str, tuple[str, bool]] = {}
-    for node in ast.walk(tree):
+    for node in getattr(tree, "body", ()):
         if not isinstance(node, (ast.Assign, ast.AnnAssign)) or not isinstance(node.value, ast.Call):
             continue
         if _attribute_chain(node.value.func).rsplit(".", 1)[-1] != "Blueprint":
@@ -540,6 +573,7 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
     for rel in loci:
         _path, _text, tree = _python_source(rel)
         aliases = _import_aliases(tree)
+        blueprint_owners = _blueprint_owner_names(tree)
         blueprint_prefixes = _blueprint_prefix_metadata(tree)
         for node in ast.walk(tree):
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
@@ -666,7 +700,10 @@ def _adapter_public_route_signatures(loci: tuple[str, ...]) -> list[str]:
                 ))
             if isinstance(node, ast.Call) and _attribute_chain(node.func).endswith(".register_blueprint"):
                 blueprint, dynamic_blueprint_target = _blueprint_registration_target(
-                    node.args[0] if node.args else None
+                    node.args[0] if node.args else None,
+                    aliases,
+                    inspected_modules,
+                    blueprint_owners,
                 )
                 url_prefix = ""
                 dynamic_url_prefix = False

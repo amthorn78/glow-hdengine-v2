@@ -4721,3 +4721,64 @@ app.add_url_rule('/method-view', view_func=Good.as_view(VIEW_NAME), methods=['GE
             generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
     finally:
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004_local_blueprint_constructor_register_target_remains_stable() -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Blueprint, Flask
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+bp = Blueprint('bp', __name__)
+@bp.get('/stable-bp')
+def stable_bp():
+    return emit_public({'ok': True})
+app.register_blueprint(bp)
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004_stable_register_blueprint_target.py", body)
+        signatures = tuple(boundary_analyzer._adapter_public_route_signatures((adapter,)))
+        joined = "\n".join(signatures)
+        assert "registration=register_blueprint" in joined
+        assert "blueprint=bp" in joined
+        assert "public_internal_classification=unknown / fail-closed" not in joined
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004_register_blueprint_variable_from_factory_fails_closed(monkeypatch: pytest.MonkeyPatch) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Blueprint, Flask
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+def make_bp():
+    bp = Blueprint('bp', __name__)
+    @bp.get('/factory-variable-bp')
+    def factory_variable_bp():
+        return emit_public({'ok': True})
+    return bp
+FACTORY = make_bp
+bp = FACTORY()
+app.register_blueprint(bp)
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "w004_dynamic_register_blueprint_variable.py", body)
+        signatures = tuple(boundary_analyzer._adapter_public_route_signatures((adapter,)))
+        joined = "\n".join(signatures)
+        assert "registration=register_blueprint" in joined
+        assert "blueprint=bp" in joined
+        assert "public_internal_classification=unknown / fail-closed" in joined
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_ADAPTER_LOCI", (adapter,))
+        monkeypatch.setattr(generator, "ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE", signatures)
+        with pytest.raises(
+            ValueError,
+            match="ADAPTER_BOUNDARY_CHECK_FAILED:.*route_signature_classification_unambiguous.*no_public_reader_change",
+        ):
+            generator.build_adapter_boundary_proof("2026-06-18T00:00:00Z", *_epic034_boundary_inputs())
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
