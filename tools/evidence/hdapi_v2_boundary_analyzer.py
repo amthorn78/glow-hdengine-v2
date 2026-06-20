@@ -314,7 +314,12 @@ def _route_view_target_metadata(node: ast.AST | None) -> tuple[str, bool]:
         return "", False
     if isinstance(node, ast.Call):
         view = _attribute_chain(node.func)
-        return view, not view.endswith(".as_view")
+        if view.endswith(".as_view"):
+            as_view_name = _string_constant(node.args[0]) if node.args else None
+            if as_view_name is None:
+                return view, True
+            return f"{view}({as_view_name})", False
+        return view, True
     return _attribute_chain(node), False
 
 
