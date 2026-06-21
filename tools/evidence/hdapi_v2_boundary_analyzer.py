@@ -620,7 +620,7 @@ def _blueprint_registration_prefixes(tree: ast.AST) -> dict[str, tuple[str, ...]
             continue
         if not node.args or not isinstance(node.args[0], ast.Name):
             continue
-        url_prefix: str | None = None
+        url_prefix = BOUNDARY_ROUTE_NO_PREFIX_OVERRIDE
         for keyword in node.keywords:
             if keyword.arg is None:
                 url_prefix = "<dynamic>"
@@ -630,8 +630,7 @@ def _blueprint_registration_prefixes(tree: ast.AST) -> dict[str, tuple[str, ...]
                     url_prefix = BOUNDARY_ROUTE_NO_PREFIX_OVERRIDE
                     continue
                 url_prefix = _literal_value_for_signature(keyword.value)
-        if url_prefix is not None:
-            prefixes.setdefault(node.args[0].id, []).append(url_prefix)
+        prefixes.setdefault(node.args[0].id, []).append(url_prefix)
     return {name: tuple(values) for name, values in prefixes.items()}
 
 
