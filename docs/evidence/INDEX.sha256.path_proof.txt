@@ -1,5 +1,5 @@
 path: docs/evidence/INDEX.sha256
 size_bytes: 91
-sha256: aed25d2f9b7a6e07a253e0e6be0a9360c7e6319e39c9e844a934dd90cae6d01e
-mtime_utc: 2026-06-21T04:43:41Z
-produced_at_utc: 2026-06-21T04:43:42Z
+sha256: 60e879a5f0a62fe0db92ecc00f80509c4637da4a8684dec08460d64af58a20c0
+mtime_utc: 2026-06-21T22:52:15Z
+produced_at_utc: 2026-06-21T22:15:49Z
