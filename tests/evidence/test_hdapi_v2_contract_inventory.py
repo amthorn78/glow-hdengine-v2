@@ -3707,6 +3707,64 @@ W004_ROUTE_SIGNATURE_CASES = [
         "expected_reason": "dynamic_or_factory_blueprint_registration",
         "expected_classification": boundary_analyzer.BOUNDARY_UNKNOWN,
     },
+    {
+        "case_id": "expanded-decorator-kwargs-fail-closed",
+        "body": "from flask import Flask\napp = Flask(__name__)\nopts = {'methods': ['POST']}\n@app.route('/expanded', **opts)\ndef expanded():\n    return b'ok'\n",
+        "expected_status": boundary_analyzer.BOUNDARY_ROUTE_AMBIGUOUS,
+        "expected_kind": "route_decorator",
+        "expected_reason": "expanded_route_kwargs",
+        "expected_classification": boundary_analyzer.BOUNDARY_UNKNOWN,
+    },
+    {
+        "case_id": "expanded-blueprint-registration-fail-closed",
+        "body": "from flask import Flask, Blueprint\napp = Flask(__name__)\nbp = Blueprint('reader', __name__)\n@bp.get('/reader')\ndef reader():\n    return b'ok'\nopts = {'url_prefix': '/public'}\napp.register_blueprint(bp, **opts)\n",
+        "expected_status": boundary_analyzer.BOUNDARY_ROUTE_AMBIGUOUS,
+        "expected_kind": "route_decorator",
+        "expected_reason": "dynamic_register_blueprint_prefix",
+        "expected_classification": boundary_analyzer.BOUNDARY_UNKNOWN,
+    },
+    {
+        "case_id": "expanded-add-url-rule-kwargs-fail-closed",
+        "body": "from flask import Flask\napp = Flask(__name__)\ndef view():\n    return b'ok'\nopts = {'methods': ['POST']}\napp.add_url_rule('/expanded', 'expanded', view, **opts)\n",
+        "expected_status": boundary_analyzer.BOUNDARY_ROUTE_AMBIGUOUS,
+        "expected_kind": "add_url_rule",
+        "expected_reason": "expanded_add_url_rule_kwargs",
+        "expected_classification": boundary_analyzer.BOUNDARY_UNKNOWN,
+    },
+    {
+        "case_id": "add-url-rule-view-factory-fail-closed",
+        "body": "from flask import Flask\napp = Flask(__name__)\ndef make_view():\n    def view():\n        return b'ok'\n    return view\napp.add_url_rule('/factory', 'factory', view_func=make_view())\n",
+        "expected_status": boundary_analyzer.BOUNDARY_ROUTE_AMBIGUOUS,
+        "expected_kind": "add_url_rule",
+        "expected_reason": "dynamic_add_url_rule_view_factory",
+        "expected_classification": boundary_analyzer.BOUNDARY_UNKNOWN,
+    },
+    {
+        "case_id": "methodview-methods-inferred",
+        "body": "from flask import Flask\nfrom flask.views import MethodView\napp = Flask(__name__)\nclass Good(MethodView):\n    def post(self):\n        return b'ok'\napp.add_url_rule('/good', view_func=Good.as_view('good_view'))\n",
+        "expected_status": boundary_analyzer.BOUNDARY_ROUTE_SUPPORTED,
+        "expected_kind": "add_url_rule",
+        "expected_endpoint": "good_view",
+        "expected_methods": ("POST",),
+        "expected_classification": "public",
+    },
+    {
+        "case_id": "blueprint-add-url-rule-prefix-signed",
+        "body": "from flask import Flask, Blueprint\napp = Flask(__name__)\nbp = Blueprint('reader', __name__, url_prefix='/internal')\ndef reader():\n    return b'ok'\nbp.add_url_rule('/reader', 'reader', reader)\napp.register_blueprint(bp, url_prefix='/public')\n",
+        "expected_status": boundary_analyzer.BOUNDARY_ROUTE_SUPPORTED,
+        "expected_kind": "add_url_rule",
+        "expected_path": "/public/reader",
+        "expected_register_prefix": "/public",
+        "expected_classification": "public",
+    },
+    {
+        "case_id": "multi-mounted-blueprint-fail-closed",
+        "body": "from flask import Flask, Blueprint\napp = Flask(__name__)\nbp = Blueprint('reader', __name__)\n@bp.get('/reader')\ndef reader():\n    return b'ok'\napp.register_blueprint(bp, url_prefix='/one', name='one')\napp.register_blueprint(bp, url_prefix='/two', name='two')\n",
+        "expected_status": boundary_analyzer.BOUNDARY_ROUTE_AMBIGUOUS,
+        "expected_kind": "route_decorator",
+        "expected_reason": "multiple_register_blueprint_prefixes",
+        "expected_classification": boundary_analyzer.BOUNDARY_UNKNOWN,
+    },
 ]
 
 
@@ -3729,6 +3787,8 @@ def test_epic034_w004_route_signature_matrix(case: dict[str, Any]) -> None:
             assert record.errorhandler_key == case["expected_errorhandler_key"]
         if "expected_endpoint" in case:
             assert record.endpoint == case["expected_endpoint"]
+        if "expected_methods" in case:
+            assert record.http_methods == case["expected_methods"]
         if "expected_reason" in case:
             assert record.fail_closed_reason == case["expected_reason"]
         assert record.signed_fields
