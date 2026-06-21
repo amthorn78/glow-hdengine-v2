@@ -3666,6 +3666,47 @@ W004_ROUTE_SIGNATURE_CASES = [
         "expected_reason": "dynamic_getattr_decorator",
         "expected_classification": boundary_analyzer.BOUNDARY_UNKNOWN,
     },
+    {
+        "case_id": "aliased-route-decorator-fails-closed",
+        "body": "from flask import Flask\napp = Flask(__name__)\nroute = app.route\n@route('/new')\ndef new():\n    return b'ok'\n",
+        "expected_status": boundary_analyzer.BOUNDARY_ROUTE_UNSUPPORTED,
+        "expected_kind": "unsupported_route_bearing_form",
+        "expected_reason": "aliased_route_decorator",
+        "expected_classification": boundary_analyzer.BOUNDARY_UNKNOWN,
+    },
+    {
+        "case_id": "dynamic-decorator-methods-fail-closed",
+        "body": "from flask import Blueprint\nbp = Blueprint('reader', __name__)\nMETHODS = ['GET']\n@bp.route('/reader', methods=METHODS)\ndef reader():\n    return b'ok'\n",
+        "expected_status": boundary_analyzer.BOUNDARY_ROUTE_AMBIGUOUS,
+        "expected_kind": "route_decorator",
+        "expected_reason": "dynamic_route_methods",
+        "expected_classification": boundary_analyzer.BOUNDARY_UNKNOWN,
+    },
+    {
+        "case_id": "blueprint-register-mount-prefix-signed",
+        "body": "from flask import Flask, Blueprint\napp = Flask(__name__)\nbp = Blueprint('reader', __name__, url_prefix='/internal')\n@bp.get('/reader')\ndef reader():\n    return b'ok'\napp.register_blueprint(bp, url_prefix='/public')\n",
+        "expected_status": boundary_analyzer.BOUNDARY_ROUTE_SUPPORTED,
+        "expected_kind": "route_decorator",
+        "expected_path": "/public/reader",
+        "expected_register_prefix": "/public",
+        "expected_classification": "public",
+    },
+    {
+        "case_id": "aliased-add-url-rule-fails-closed",
+        "body": "from flask import Flask\napp = Flask(__name__)\ndef view():\n    return b'ok'\nrule = app.add_url_rule\nrule('/new', 'new', view)\n",
+        "expected_status": boundary_analyzer.BOUNDARY_ROUTE_UNSUPPORTED,
+        "expected_kind": "unsupported_route_bearing_form",
+        "expected_reason": "aliased_add_url_rule",
+        "expected_classification": boundary_analyzer.BOUNDARY_UNKNOWN,
+    },
+    {
+        "case_id": "factory-register-blueprint-fails-closed",
+        "body": "from flask import Flask, Blueprint\napp = Flask(__name__)\ndef make_bp():\n    return Blueprint('reader', __name__)\napp.register_blueprint(make_bp(), url_prefix='/public')\n",
+        "expected_status": boundary_analyzer.BOUNDARY_ROUTE_AMBIGUOUS,
+        "expected_kind": "register_blueprint",
+        "expected_reason": "dynamic_or_factory_blueprint_registration",
+        "expected_classification": boundary_analyzer.BOUNDARY_UNKNOWN,
+    },
 ]
 
 
@@ -3703,3 +3744,24 @@ def test_epic034_w004_renderer_refuses_route_field_substring_without_typed_field
     result["route_baseline_records"] = []
     with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_TYPED_ROUTE_FIELDS_MISSING"):
         generator.render_adapter_boundary_proof("2026-06-18T00:00:00Z", result)
+
+
+def test_epic034_w004_legacy_baseline_parser_preserves_converter_colons() -> None:
+    signature = "adapter/http_reader.py:app.get:/items/<int:id>:GET:item_view"
+    records = boundary_analyzer._normalize_route_baseline((signature,))
+
+    assert len(records) == 1
+    record = records[0]
+    assert record.parser_status == boundary_analyzer.BOUNDARY_ROUTE_SUPPORTED
+    assert record.route_path == "/items/<int:id>"
+    assert record.http_methods == ("GET",)
+    assert record.endpoint == "item_view"
+    assert record.view_identity == "item_view"
+
+
+def test_epic034_w004_malformed_legacy_baseline_fails_closed() -> None:
+    records = boundary_analyzer._normalize_route_baseline(("adapter/http_reader.py:app.get:/missing_tail",))
+
+    assert len(records) == 1
+    assert records[0].parser_status == boundary_analyzer.BOUNDARY_ROUTE_AMBIGUOUS
+    assert records[0].fail_closed_reason == "unparseable_legacy_route_baseline"

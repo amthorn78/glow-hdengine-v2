@@ -506,6 +506,52 @@ def _blueprint_prefixes(tree: ast.AST) -> dict[str, str]:
     return prefixes
 
 
+def _route_aliases(tree: ast.AST) -> dict[str, str]:
+    aliases: dict[str, str] = {}
+    route_suffixes = (
+        ".route",
+        ".get",
+        ".post",
+        ".put",
+        ".patch",
+        ".delete",
+        ".before_app_request",
+        ".before_request",
+        ".after_app_request",
+        ".after_request",
+        ".errorhandler",
+        ".app_errorhandler",
+        ".add_url_rule",
+    )
+    for node in ast.walk(tree):
+        if not isinstance(node, (ast.Assign, ast.AnnAssign)):
+            continue
+        value_chain = _attribute_chain(node.value)
+        if not any(value_chain.endswith(suffix) for suffix in route_suffixes):
+            continue
+        targets = node.targets if isinstance(node, ast.Assign) else [node.target]
+        for target in targets:
+            if isinstance(target, ast.Name):
+                aliases[target.id] = value_chain
+    return aliases
+
+
+def _blueprint_registration_prefixes(tree: ast.AST) -> dict[str, str]:
+    prefixes: dict[str, str] = {}
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call) or not _attribute_chain(node.func).endswith(".register_blueprint"):
+            continue
+        if not node.args or not isinstance(node.args[0], ast.Name):
+            continue
+        url_prefix: str | None = None
+        for keyword in node.keywords:
+            if keyword.arg == "url_prefix":
+                url_prefix = _literal_value_for_signature(keyword.value)
+        if url_prefix is not None:
+            prefixes[node.args[0].id] = url_prefix
+    return prefixes
+
+
 def _decorator_route_root(deco_call: ast.AST) -> str:
     if isinstance(deco_call, ast.Attribute):
         value = deco_call.value
@@ -617,6 +663,17 @@ def _methods_tuple(deco_name: str, deco: ast.AST) -> tuple[str, ...]:
     return tuple(filter(None, value.split(","))) if value else ()
 
 
+def _decorator_methods_are_dynamic(deco_name: str, deco: ast.AST) -> bool:
+    if not isinstance(deco, ast.Call):
+        return False
+    if deco_name.endswith((".get", ".post", ".put", ".patch", ".delete")):
+        return False
+    for keyword in deco.keywords:
+        if keyword.arg == "methods":
+            return not bool(_literal_string_list(keyword.value))
+    return False
+
+
 def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRecord]:
     """Discover bounded typed route registrations for PR-04 drift proof."""
 
@@ -639,7 +696,9 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
         _path, _text, tree = _python_source(rel)
         aliases = _import_aliases(tree)
         owners = _owner_types(tree)
+        route_aliases = _route_aliases(tree)
         blueprint_prefixes = _blueprint_prefixes(tree)
+        blueprint_mount_prefixes = _blueprint_registration_prefixes(tree)
         records.extend(_blueprint_constructor_records(rel, tree))
         for node in ast.walk(tree):
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
@@ -650,6 +709,16 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                     if not suffix:
                         if deco_name.startswith("getattr"):
                             records.append(_finalize_route_candidate(RouteRegistrationCandidate(source_locus=rel, registration_kind="unsupported_route_bearing_form", parser_status=BOUNDARY_ROUTE_UNSUPPORTED, fail_closed_reason="dynamic_getattr_decorator")))
+                        elif deco_name in route_aliases:
+                            records.append(_finalize_route_candidate(RouteRegistrationCandidate(
+                                source_locus=rel,
+                                registration_kind="unsupported_route_bearing_form",
+                                parser_status=BOUNDARY_ROUTE_UNSUPPORTED,
+                                decorator_path=deco_name,
+                                endpoint=node.name,
+                                view_identity=node.name,
+                                fail_closed_reason="aliased_route_decorator",
+                            )))
                         continue
                     route_root = _decorator_route_root(deco_call)
                     owner_type = owners.get(route_root, "BlueprintAlias" if route_root in blueprint_prefixes else ("Flask" if route_root == "app" and decorator_suffix_to_kind[suffix] == "hook_decorator" else ""))
@@ -660,6 +729,9 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                         status = BOUNDARY_ROUTE_AMBIGUOUS
                         reason = "dynamic_route_argument"
                     methods = _methods_tuple(deco_name, deco)
+                    if _decorator_methods_are_dynamic(deco_name, deco):
+                        status = BOUNDARY_ROUTE_AMBIGUOUS
+                        reason = reason or "dynamic_route_methods"
                     routing_keywords = _routing_keywords(deco, exclude={"methods"}) if isinstance(deco, ast.Call) else ()
                     if any(value == "<dynamic>" for _, value in routing_keywords):
                         status = BOUNDARY_ROUTE_AMBIGUOUS
@@ -674,7 +746,13 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                         if errorhandler_key == "<dynamic>":
                             status = BOUNDARY_ROUTE_AMBIGUOUS
                             reason = reason or "dynamic_errorhandler_key"
-                    full_route_arg = _join_route_prefix(blueprint_prefixes.get(route_root, ""), "" if route_arg == "<dynamic>" else route_arg)
+                    constructor_prefix = blueprint_prefixes.get(route_root, "")
+                    mount_prefix = blueprint_mount_prefixes.get(route_root, "")
+                    if mount_prefix == "<dynamic>":
+                        status = BOUNDARY_ROUTE_AMBIGUOUS
+                        reason = reason or "dynamic_register_blueprint_prefix"
+                    signed_prefix = "" if mount_prefix == "<dynamic>" else (mount_prefix if route_root in blueprint_mount_prefixes else constructor_prefix)
+                    full_route_arg = _join_route_prefix(signed_prefix, "" if route_arg == "<dynamic>" else route_arg)
                     records.append(_finalize_route_candidate(RouteRegistrationCandidate(
                         source_locus=rel,
                         registration_kind=decorator_suffix_to_kind[suffix],
@@ -687,12 +765,22 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                         endpoint=node.name,
                         view_identity=node.name,
                         blueprint_name=route_root if owner_type in {"Blueprint", "BlueprintAlias"} else "",
-                        blueprint_constructor_prefix=blueprint_prefixes.get(route_root, ""),
+                        blueprint_constructor_prefix=constructor_prefix,
+                        register_blueprint_prefix="" if mount_prefix == "<dynamic>" else mount_prefix,
                         errorhandler_key="" if errorhandler_key == "<dynamic>" else errorhandler_key,
                         routing_keywords=routing_keywords,
                         imported_view_target=aliases.get(node.name, ""),
                         fail_closed_reason=reason,
                     )))
+            if isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and route_aliases.get(node.func.id, "").endswith(".add_url_rule"):
+                records.append(_finalize_route_candidate(RouteRegistrationCandidate(
+                    source_locus=rel,
+                    registration_kind="unsupported_route_bearing_form",
+                    parser_status=BOUNDARY_ROUTE_UNSUPPORTED,
+                    owner_expression=node.func.id,
+                    fail_closed_reason="aliased_add_url_rule",
+                )))
+                continue
             if isinstance(node, ast.Call) and _attribute_chain(node.func).endswith(".add_url_rule"):
                 owner = _attribute_chain(node.func).rsplit(".", 1)[0]
                 owner_type = owners.get(owner, "BlueprintAlias" if owner in blueprint_prefixes else "")
@@ -762,7 +850,7 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                 status = BOUNDARY_ROUTE_SUPPORTED if owner_type == "Flask" else BOUNDARY_ROUTE_UNSUPPORTED
                 reason = "" if status == BOUNDARY_ROUTE_SUPPORTED else "unproven_register_blueprint_owner"
                 blueprint = _expr_name(node.args[0]) if node.args else ""
-                if not blueprint or blueprint.endswith("()"):
+                if not blueprint or (node.args and isinstance(node.args[0], ast.Call)):
                     status = BOUNDARY_ROUTE_AMBIGUOUS
                     reason = reason or "dynamic_or_factory_blueprint_registration"
                 url_prefix = ""
@@ -2105,48 +2193,62 @@ def _record_from_mapping(raw: dict[str, Any]) -> RouteSignatureRecord:
 
 
 def _record_from_legacy_signature(signature: str) -> RouteSignatureRecord:
-    parts = signature.split(":")
-    if len(parts) >= 5 and parts[1] == "add_url_rule":
+    malformed = lambda reason: _record_from_candidate(_finalize_route_candidate(RouteRegistrationCandidate(source_locus=signature, registration_kind="baseline", parser_status=BOUNDARY_ROUTE_AMBIGUOUS, fail_closed_reason=reason)))
+    head = signature.split(":", 2)
+    if len(head) < 3:
+        return malformed("unparseable_legacy_route_baseline")
+    source_locus, discriminator, remainder = head
+    if discriminator == "add_url_rule":
+        parts = remainder.rsplit(":", 3)
+        if len(parts) != 4:
+            return malformed("unparseable_legacy_add_url_rule_baseline")
+        route_path, endpoint, methods, view_identity = parts
         return _record_from_candidate(_finalize_route_candidate(RouteRegistrationCandidate(
-            source_locus=parts[0],
+            source_locus=source_locus,
             registration_kind="add_url_rule",
             parser_status=BOUNDARY_ROUTE_SUPPORTED,
             owner_expression="app",
             proven_owner_type="Flask",
-            route_path=parts[2],
-            endpoint=parts[3],
-            http_methods=tuple(filter(None, parts[4].split(","))),
-            view_identity=parts[5] if len(parts) > 5 else "",
+            route_path=route_path,
+            endpoint=endpoint,
+            http_methods=tuple(filter(None, methods.split(","))),
+            view_identity=view_identity,
         )))
-    if len(parts) >= 4 and parts[1] == "register_blueprint":
+    if discriminator == "register_blueprint":
+        parts = remainder.split(":", 1)
+        if len(parts) != 2:
+            return malformed("unparseable_legacy_register_blueprint_baseline")
+        blueprint_name, register_blueprint_prefix = parts
         return _record_from_candidate(_finalize_route_candidate(RouteRegistrationCandidate(
-            source_locus=parts[0],
+            source_locus=source_locus,
             registration_kind="register_blueprint",
             parser_status=BOUNDARY_ROUTE_SUPPORTED,
             owner_expression="app",
             proven_owner_type="Flask",
-            blueprint_name=parts[2],
-            register_blueprint_prefix=parts[3],
+            blueprint_name=blueprint_name,
+            register_blueprint_prefix=register_blueprint_prefix,
         )))
-    if len(parts) >= 5:
-        decorator_path = parts[1]
+    parts = remainder.rsplit(":", 2)
+    if len(parts) == 3:
+        route_path, methods, endpoint = parts
+        decorator_path = discriminator
         kind = "errorhandler_decorator" if decorator_path.endswith(("errorhandler", "app_errorhandler")) else ("hook_decorator" if any(decorator_path.endswith(suffix) for suffix in (".before_app_request", ".before_request", ".after_app_request", ".after_request")) else "route_decorator")
         owner = decorator_path.rsplit(".", 1)[0] if "." in decorator_path else ""
         owner_type = "Flask" if owner == "app" else ("BlueprintAlias" if owner else "")
         return _record_from_candidate(_finalize_route_candidate(RouteRegistrationCandidate(
-            source_locus=parts[0],
+            source_locus=source_locus,
             registration_kind=kind,
             parser_status=BOUNDARY_ROUTE_SUPPORTED,
             owner_expression=owner,
             proven_owner_type=owner_type,
-            route_path=parts[2],
+            route_path=route_path,
             decorator_path=decorator_path,
-            http_methods=tuple(filter(None, parts[3].split(","))),
-            endpoint=parts[4],
-            view_identity=parts[4],
-            errorhandler_key=parts[2] if kind == "errorhandler_decorator" else "",
+            http_methods=tuple(filter(None, methods.split(","))),
+            endpoint=endpoint,
+            view_identity=endpoint,
+            errorhandler_key=route_path if kind == "errorhandler_decorator" else "",
         )))
-    return _record_from_candidate(_finalize_route_candidate(RouteRegistrationCandidate(source_locus=signature, registration_kind="baseline", parser_status=BOUNDARY_ROUTE_AMBIGUOUS, fail_closed_reason="unparseable_legacy_route_baseline")))
+    return malformed("unparseable_legacy_route_baseline")
 
 
 def _normalize_route_baseline(public_route_baseline: tuple[Any, ...]) -> tuple[RouteSignatureRecord, ...]:
