@@ -3609,6 +3609,18 @@ def test_epic034_w002_analyzer_findings_survive_rendering_and_no_claims_remain()
         assert needle in check_log
 
 
+def test_epic034_w004_boundary_check_log_requires_rendered_separation_proof() -> None:
+    result = _epic034_analyzer_result()
+    proof, checks = generator.render_adapter_boundary_proof("2026-06-18T00:00:00Z", result)
+    proof = proof.replace(
+        "analyzer_rendering_separation=analyzer owns findings, unknowns, deltas, provenance, bindings, and verdicts; renderer only emits analyzer output",
+        "analyzer_rendering_separation_removed=true",
+    )
+
+    with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_CHECK_FAILED:.*analyzer_rendering_separation_applied"):
+        generator.build_adapter_boundary_check_log("2026-06-18T00:00:00Z", proof, checks, mode="closed-rails-source-cache")
+
+
 W004_ROUTE_SIGNATURE_CASES = [
     {
         "case_id": "blueprint-none-prefix-supported-empty",
@@ -3624,6 +3636,60 @@ W004_ROUTE_SIGNATURE_CASES = [
         "expected_status": boundary_analyzer.BOUNDARY_ROUTE_SUPPORTED,
         "expected_kind": "register_blueprint",
         "expected_register_prefix": "",
+        "expected_classification": "public",
+    },
+    {
+        "case_id": "register-blueprint-none-keeps-constructor-prefix",
+        "body": "from flask import Flask, Blueprint\napp = Flask(__name__)\nbp = Blueprint('api', __name__, url_prefix='/api')\n@bp.get('/reader')\ndef reader():\n    return b'ok'\napp.register_blueprint(bp, url_prefix=None)\n",
+        "expected_status": boundary_analyzer.BOUNDARY_ROUTE_SUPPORTED,
+        "expected_kind": "route_decorator",
+        "expected_path": "/api/reader",
+        "expected_constructor_prefix": "/api",
+        "expected_register_prefix": "",
+        "expected_methods": ("GET",),
+        "expected_classification": "public",
+    },
+    {
+        "case_id": "route-decorator-omitted-methods-default-get",
+        "body": "from flask import Flask\napp = Flask(__name__)\n@app.route('/x')\ndef x():\n    return b'ok'\n",
+        "expected_status": boundary_analyzer.BOUNDARY_ROUTE_SUPPORTED,
+        "expected_kind": "route_decorator",
+        "expected_path": "/x",
+        "expected_endpoint": "x",
+        "expected_methods": ("GET",),
+        "expected_classification": "public",
+    },
+    {
+        "case_id": "add-url-rule-omitted-endpoint-defaults-from-view",
+        "body": "from flask import Flask\napp = Flask(__name__)\ndef view():\n    return b'ok'\napp.add_url_rule('/x', view_func=view, methods=['GET'])\n",
+        "expected_status": boundary_analyzer.BOUNDARY_ROUTE_SUPPORTED,
+        "expected_kind": "add_url_rule",
+        "expected_path": "/x",
+        "expected_endpoint": "view",
+        "expected_view_identity": "view",
+        "expected_methods": ("GET",),
+        "expected_classification": "public",
+    },
+    {
+        "case_id": "add-url-rule-omitted-methods-default-get",
+        "body": "from flask import Flask\napp = Flask(__name__)\ndef view():\n    return b'ok'\napp.add_url_rule('/x', 'x', view)\n",
+        "expected_status": boundary_analyzer.BOUNDARY_ROUTE_SUPPORTED,
+        "expected_kind": "add_url_rule",
+        "expected_path": "/x",
+        "expected_endpoint": "x",
+        "expected_view_identity": "view",
+        "expected_methods": ("GET",),
+        "expected_classification": "public",
+    },
+    {
+        "case_id": "add-url-rule-omitted-endpoint-and-methods-defaults",
+        "body": "from flask import Flask\napp = Flask(__name__)\ndef view():\n    return b'ok'\napp.add_url_rule('/x', view_func=view)\n",
+        "expected_status": boundary_analyzer.BOUNDARY_ROUTE_SUPPORTED,
+        "expected_kind": "add_url_rule",
+        "expected_path": "/x",
+        "expected_endpoint": "view",
+        "expected_view_identity": "view",
+        "expected_methods": ("GET",),
         "expected_classification": "public",
     },
     {
@@ -3783,10 +3849,14 @@ def test_epic034_w004_route_signature_matrix(case: dict[str, Any]) -> None:
             assert record.route_path == case["expected_path"]
         if "expected_register_prefix" in case:
             assert record.register_blueprint_prefix == case["expected_register_prefix"]
+        if "expected_constructor_prefix" in case:
+            assert record.blueprint_constructor_prefix == case["expected_constructor_prefix"]
         if "expected_errorhandler_key" in case:
             assert record.errorhandler_key == case["expected_errorhandler_key"]
         if "expected_endpoint" in case:
             assert record.endpoint == case["expected_endpoint"]
+        if "expected_view_identity" in case:
+            assert record.view_identity == case["expected_view_identity"]
         if "expected_methods" in case:
             assert record.http_methods == case["expected_methods"]
         if "expected_reason" in case:

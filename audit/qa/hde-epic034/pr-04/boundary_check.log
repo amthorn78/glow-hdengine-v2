@@ -1,4 +1,4 @@
-generated_at_utc=2026-06-21T04:43:39Z
+generated_at_utc=2026-06-21T05:58:11Z
 scope=HDE-EPIC034 PR-04 boundary check for W-004 / HDE-FERM007.4; no Done claim
 work_item=W-004
 rails=ALLOW_NETWORK=0 LANG=C LC_ALL=C SAFE_MODE=1 TZ=UTC
@@ -20,7 +20,7 @@ add_url_rule_posture_was_checked=true
 imported_view_target_posture_was_checked=true
 endpoint_view_identity_posture_was_checked=true
 public_internal_classification_posture_was_checked=true
-renderer_checks_analyzer_owned_typed_fields_not_proof_substrings=true
+renderer_checks_analyzer_owned_typed_fields_and_required_proof_content=true
 table_driven_boundary_taxonomy_was_applied=true
 required_taxonomy_groups_are_covered_or_visibly_marked=true
 no_required_taxonomy_group_was_silently_skipped=true
