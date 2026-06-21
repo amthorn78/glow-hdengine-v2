@@ -413,8 +413,8 @@ def _is_explicit_none(node: ast.AST) -> bool:
     return isinstance(node, ast.Constant) and node.value is None
 
 
-def _expr_is_local_name(node: ast.AST) -> bool:
-    return isinstance(node, ast.Name)
+def _expr_is_local_function_name(node: ast.AST, function_defs: dict[str, ast.FunctionDef | ast.AsyncFunctionDef], aliases: dict[str, str]) -> bool:
+    return isinstance(node, ast.Name) and node.id in function_defs and node.id not in aliases
 
 
 def _routing_keywords(call: ast.Call, *, exclude: set[str] | None = None) -> tuple[tuple[str, str], ...]:
@@ -717,9 +717,11 @@ def _methodview_class_from_as_view(call: ast.Call) -> str:
     return chain.rsplit(".", 1)[0] if chain.endswith(".as_view") else ""
 
 
-def _view_method_attributes(tree: ast.AST) -> dict[str, dict[str, tuple[str, ...] | bool]]:
+def _view_method_attributes_before(tree: ast.AST, route_lineno: int) -> dict[str, dict[str, tuple[str, ...] | bool]]:
     attrs: dict[str, dict[str, tuple[str, ...] | bool]] = {}
-    for node in ast.walk(tree):
+    for node in ast.iter_child_nodes(tree):
+        if getattr(node, "lineno", route_lineno + 1) >= route_lineno:
+            continue
         targets: list[ast.AST] = []
         value: ast.AST | None = None
         if isinstance(node, ast.Assign):
@@ -770,7 +772,7 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
         blueprint_prefixes = _blueprint_prefixes(tree)
         blueprint_mount_prefixes = _blueprint_registration_prefixes(tree)
         methodview_methods = _methodview_http_methods(tree)
-        view_method_attrs = _view_method_attributes(tree)
+        function_defs = _iter_function_defs(tree)
         records.extend(_blueprint_constructor_records(rel, tree))
         for node in ast.walk(tree):
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
@@ -905,10 +907,15 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                             reason = reason or "dynamic_add_url_rule_view_factory"
                         else:
                             view_desc = _attribute_chain(keyword.value)
-                            if _expr_is_local_name(keyword.value):
+                            if _expr_is_local_function_name(keyword.value, function_defs, aliases):
                                 view_endpoint_default = view_desc
                                 view_method_attr_name = view_desc
                             imported_view_target = aliases.get(view_desc, "")
+                    elif keyword.arg == "endpoint":
+                        endpoint = _literal_value_for_signature(keyword.value)
+                        if endpoint == "<dynamic>":
+                            status = BOUNDARY_ROUTE_AMBIGUOUS
+                            reason = reason or "dynamic_add_url_rule_endpoint"
                     elif keyword.arg == "methods":
                         methods_keyword_present = True
                         method_values = _literal_string_list(keyword.value)
@@ -931,13 +938,14 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                         reason = reason or "dynamic_add_url_rule_view_factory"
                     else:
                         view_desc = _attribute_chain(view_node)
-                        if _expr_is_local_name(view_node):
+                        if _expr_is_local_function_name(view_node, function_defs, aliases):
                             view_endpoint_default = view_desc
                             view_method_attr_name = view_desc
                         imported_view_target = aliases.get(view_desc, "")
                 if not endpoint and view_endpoint_default and not methodview_view:
                     endpoint = view_endpoint_default
-                if not methods and not methods_keyword_present and not methodview_view and view_method_attr_name:
+                if not methodview_view and view_method_attr_name:
+                    view_method_attrs = _view_method_attributes_before(tree, getattr(node, "lineno", 10**9))
                     method_attrs = view_method_attrs.get(view_method_attr_name, {})
                     if method_attrs.get("dynamic"):
                         status = BOUNDARY_ROUTE_AMBIGUOUS
@@ -945,14 +953,17 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                     else:
                         attr_methods = tuple(method_attrs.get("methods") or ())
                         required_methods = tuple(method_attrs.get("required_methods") or ())
-                        methods = tuple(sorted(set(attr_methods or ("GET",)) | set(required_methods)))
+                        if not methods and not methods_keyword_present:
+                            methods = tuple(sorted(set(attr_methods or ("GET",)) | set(required_methods)))
+                        elif required_methods:
+                            methods = tuple(sorted(set(methods) | set(required_methods)))
                 if route_arg in {"", "<dynamic>"}:
                     status = BOUNDARY_ROUTE_AMBIGUOUS
                     reason = reason or "dynamic_or_missing_add_url_rule_path"
                 if endpoint in {"", "<dynamic>"} or view_desc == "":
                     status = BOUNDARY_ROUTE_AMBIGUOUS
                     reason = reason or "dynamic_or_missing_add_url_rule_endpoint_or_view"
-                routing_keywords = _routing_keywords(node, exclude={"view_func", "methods"})
+                routing_keywords = _routing_keywords(node, exclude={"endpoint", "view_func", "methods"})
                 if any(value == "<dynamic>" for _, value in routing_keywords):
                     status = BOUNDARY_ROUTE_AMBIGUOUS
                     reason = reason or "dynamic_add_url_rule_routing_keyword"
