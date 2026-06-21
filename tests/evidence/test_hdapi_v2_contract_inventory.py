@@ -3607,3 +3607,99 @@ def test_epic034_w002_analyzer_findings_survive_rendering_and_no_claims_remain()
         "no_unsupported_scope_claim_was_emitted=true",
     ]:
         assert needle in check_log
+
+
+W004_ROUTE_SIGNATURE_CASES = [
+    {
+        "case_id": "blueprint-none-prefix-supported-empty",
+        "body": "from flask import Blueprint\nbp = Blueprint('reader', __name__, url_prefix=None)\n@bp.get('/reader')\ndef reader():\n    return b'ok'\n",
+        "expected_status": boundary_analyzer.BOUNDARY_ROUTE_SUPPORTED,
+        "expected_kind": "route_decorator",
+        "expected_path": "/reader",
+        "expected_classification": "public",
+    },
+    {
+        "case_id": "register-blueprint-none-prefix-supported-empty",
+        "body": "from flask import Flask, Blueprint\napp = Flask(__name__)\nbp = Blueprint('reader', __name__)\napp.register_blueprint(bp, url_prefix=None)\n",
+        "expected_status": boundary_analyzer.BOUNDARY_ROUTE_SUPPORTED,
+        "expected_kind": "register_blueprint",
+        "expected_register_prefix": "",
+        "expected_classification": "public",
+    },
+    {
+        "case_id": "dynamic-add-url-rule-fails-closed",
+        "body": "from flask import Flask\napp = Flask(__name__)\npath = '/dynamic'\ndef view():\n    return b'ok'\napp.add_url_rule(path, 'dyn', view)\n",
+        "expected_status": boundary_analyzer.BOUNDARY_ROUTE_AMBIGUOUS,
+        "expected_kind": "add_url_rule",
+        "expected_reason": "dynamic_or_missing_add_url_rule_path",
+        "expected_classification": boundary_analyzer.BOUNDARY_UNKNOWN,
+    },
+    {
+        "case_id": "errorhandler-literal-key-signed",
+        "body": "from flask import Flask\napp = Flask(__name__)\n@app.errorhandler(404)\ndef missing(err):\n    return b'missing'\n",
+        "expected_status": boundary_analyzer.BOUNDARY_ROUTE_SUPPORTED,
+        "expected_kind": "errorhandler_decorator",
+        "expected_errorhandler_key": "404",
+        "expected_classification": "public",
+    },
+    {
+        "case_id": "nonliteral-errorhandler-fails-closed",
+        "body": "from flask import Flask\napp = Flask(__name__)\ncode = 404\n@app.errorhandler(code)\ndef missing(err):\n    return b'missing'\n",
+        "expected_status": boundary_analyzer.BOUNDARY_ROUTE_AMBIGUOUS,
+        "expected_kind": "errorhandler_decorator",
+        "expected_reason": "dynamic_route_argument",
+        "expected_classification": boundary_analyzer.BOUNDARY_UNKNOWN,
+    },
+    {
+        "case_id": "methodview-literal-endpoint-signed",
+        "body": "from flask import Flask\nfrom flask.views import MethodView\napp = Flask(__name__)\nclass Good(MethodView):\n    def get(self):\n        return b'ok'\napp.add_url_rule('/good', view_func=Good.as_view('good_view'), methods=['GET'])\n",
+        "expected_status": boundary_analyzer.BOUNDARY_ROUTE_SUPPORTED,
+        "expected_kind": "add_url_rule",
+        "expected_endpoint": "good_view",
+        "expected_classification": "public",
+    },
+    {
+        "case_id": "getattr-route-owner-fails-closed",
+        "body": "from flask import Flask\napp = Flask(__name__)\nMETHOD = 'route'\n@getattr(app, METHOD)('/dynamic')\ndef dynamic():\n    return b'ok'\n",
+        "expected_status": boundary_analyzer.BOUNDARY_ROUTE_UNSUPPORTED,
+        "expected_kind": "unsupported_route_bearing_form",
+        "expected_reason": "dynamic_getattr_decorator",
+        "expected_classification": boundary_analyzer.BOUNDARY_UNKNOWN,
+    },
+]
+
+
+@pytest.mark.parametrize("case", W004_ROUTE_SIGNATURE_CASES, ids=[case["case_id"] for case in W004_ROUTE_SIGNATURE_CASES])
+def test_epic034_w004_route_signature_matrix(case: dict[str, Any]) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    try:
+        adapter = _write_boundary_temp(rel_dir, f"{case['case_id'].replace('-', '_')}.py", case["body"])
+        records = boundary_analyzer.discover_route_registrations((adapter,))
+        record = next(record for record in records if record.registration_kind == case["expected_kind"])
+        assert record.parser_status == case["expected_status"]
+        assert record.public_internal_classification == case["expected_classification"]
+        if "expected_path" in case:
+            assert record.route_path == case["expected_path"]
+        if "expected_register_prefix" in case:
+            assert record.register_blueprint_prefix == case["expected_register_prefix"]
+        if "expected_errorhandler_key" in case:
+            assert record.errorhandler_key == case["expected_errorhandler_key"]
+        if "expected_endpoint" in case:
+            assert record.endpoint == case["expected_endpoint"]
+        if "expected_reason" in case:
+            assert record.fail_closed_reason == case["expected_reason"]
+        assert record.signed_fields
+        assert "source_locus=" in boundary_analyzer.route_signature_from_record(record)
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004_renderer_refuses_route_field_substring_without_typed_fields() -> None:
+    result = _epic034_analyzer_result()
+    assert result["work_item"] == "W-004"
+    result["typed_route_records"] = []
+    result["route_baseline_records"] = []
+    with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_TYPED_ROUTE_FIELDS_MISSING"):
+        generator.render_adapter_boundary_proof("2026-06-18T00:00:00Z", result)
