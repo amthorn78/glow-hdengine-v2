@@ -265,6 +265,7 @@ def _literal_string_list(node: ast.AST) -> tuple[str, ...]:
 BOUNDARY_ROUTE_SUPPORTED = "supported"
 BOUNDARY_ROUTE_UNSUPPORTED = "unsupported"
 BOUNDARY_ROUTE_AMBIGUOUS = "ambiguous"
+BOUNDARY_ROUTE_NO_PREFIX_OVERRIDE = "<no_prefix_override>"
 
 
 SUPPORTED_ROUTE_REGISTRATION_FORMS: dict[str, dict[str, Any]] = {
@@ -395,6 +396,18 @@ class RouteRegistrationCandidate:
     signed_fields: tuple[tuple[str, Any], ...] = ()
 
 
+@dataclass(frozen=True)
+class LocalViewBindingProof:
+    name: str
+    function_lineno: int
+    stable_binding: bool
+    endpoint_name_stable: bool
+    methods: tuple[str, ...] = ()
+    required_methods: tuple[str, ...] = ()
+    dynamic_methods: bool = False
+    reason: str = ""
+
+
 def _literal_value_for_signature(node: ast.AST) -> str:
     if isinstance(node, ast.Constant):
         if node.value is None:
@@ -407,6 +420,215 @@ def _literal_value_for_signature(node: ast.AST) -> str:
             return ",".join(values)
     return "<dynamic>"
 
+
+def _is_explicit_none(node: ast.AST) -> bool:
+    return isinstance(node, ast.Constant) and node.value is None
+
+
+def _expr_is_local_function_name(node: ast.AST, function_defs: dict[str, ast.FunctionDef | ast.AsyncFunctionDef], aliases: dict[str, str]) -> bool:
+    return isinstance(node, ast.Name) and node.id in function_defs and node.id not in aliases
+
+
+def _target_binds_name(target: ast.AST, name: str) -> bool:
+    if isinstance(target, ast.Name):
+        return target.id == name
+    if isinstance(target, (ast.Tuple, ast.List)):
+        return any(_target_binds_name(item, name) for item in target.elts)
+    return False
+
+
+def _import_binds_name(node: ast.AST, name: str) -> bool:
+    if isinstance(node, ast.Import):
+        return any((alias.asname or alias.name.split(".", 1)[0]) == name for alias in node.names)
+    if isinstance(node, ast.ImportFrom):
+        return any((alias.asname or alias.name) == name for alias in node.names)
+    return False
+
+
+def _effect_binds_or_unbinds_name(node: ast.AST, name: str) -> bool:
+    if isinstance(node, ast.Assign):
+        return any(_target_binds_name(target, name) for target in node.targets)
+    if isinstance(node, ast.AnnAssign):
+        return _target_binds_name(node.target, name)
+    if isinstance(node, ast.AugAssign):
+        return _target_binds_name(node.target, name)
+    if isinstance(node, (ast.For, ast.AsyncFor)):
+        return _target_binds_name(node.target, name)
+    if isinstance(node, (ast.With, ast.AsyncWith)):
+        return any(item.optional_vars is not None and _target_binds_name(item.optional_vars, name) for item in node.items)
+    if isinstance(node, ast.ExceptHandler):
+        return node.name == name
+    if isinstance(node, ast.NamedExpr):
+        return _target_binds_name(node.target, name)
+    if isinstance(node, ast.Delete):
+        return any(_target_binds_name(target, name) for target in node.targets)
+    return False
+
+
+def _target_writes_attribute(target: ast.AST, name: str, attrs: set[str]) -> bool:
+    if isinstance(target, ast.Attribute) and target.attr in attrs and isinstance(target.value, ast.Name):
+        return target.value.id == name
+    if isinstance(target, ast.Subscript):
+        return _target_writes_attribute(target.value, name, attrs)
+    if isinstance(target, (ast.Tuple, ast.List)):
+        return any(_target_writes_attribute(item, name, attrs) for item in target.elts)
+    return False
+
+
+def _string_subscript_key(node: ast.AST) -> str:
+    if isinstance(node, ast.Constant) and isinstance(node.value, str):
+        return node.value
+    return ""
+
+
+def _target_writes_view_dict_key(target: ast.AST, name: str, keys: set[str]) -> bool:
+    if not isinstance(target, ast.Subscript):
+        return False
+    if _string_subscript_key(target.slice) not in keys:
+        return False
+    value = target.value
+    return isinstance(value, ast.Attribute) and value.attr == "__dict__" and isinstance(value.value, ast.Name) and value.value.id == name
+
+
+def _call_mutates_attribute(call: ast.Call, name: str, attrs: set[str]) -> bool:
+    if not isinstance(call.func, ast.Attribute):
+        return False
+    mutators = {"append", "extend", "insert", "add", "update", "remove", "discard", "clear", "pop", "sort", "reverse"}
+    if call.func.attr not in mutators:
+        return False
+    receiver = call.func.value
+    return isinstance(receiver, ast.Attribute) and receiver.attr in attrs and isinstance(receiver.value, ast.Name) and receiver.value.id == name
+
+
+def _iter_binding_effect_nodes(tree: ast.AST, start_lineno: int, end_lineno: int) -> list[ast.AST]:
+    """Return module-executed statements/expressions in a line window.
+
+    This intentionally descends into module-level control-flow bodies because
+    those statements may execute before a route registration.  It does not
+    descend into function/class bodies because their bodies do not execute at
+    definition time; calls to those helpers are handled as effect barriers.
+    """
+
+    nodes: list[ast.AST] = []
+
+    def in_window(node: ast.AST) -> bool:
+        lineno = getattr(node, "lineno", 0)
+        return start_lineno < lineno < end_lineno
+
+    def visit_stmt(stmt: ast.stmt) -> None:
+        if not in_window(stmt):
+            return
+        nodes.append(stmt)
+        if isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            for decorator in getattr(stmt, "decorator_list", ()):
+                if in_window(decorator):
+                    nodes.append(decorator)
+            return
+        for child in ast.iter_child_nodes(stmt):
+            if isinstance(child, ast.stmt):
+                visit_stmt(child)
+            elif in_window(child):
+                nodes.append(child)
+                if isinstance(child, ast.Call):
+                    for grandchild in ast.walk(child):
+                        if grandchild is not child and in_window(grandchild):
+                            nodes.append(grandchild)
+
+    for stmt in getattr(tree, "body", ()):
+        if isinstance(stmt, ast.stmt):
+            visit_stmt(stmt)
+    return nodes
+
+
+def _local_view_binding_proof(
+    node: ast.AST,
+    tree: ast.AST,
+    route_lineno: int,
+    function_defs: dict[str, ast.FunctionDef | ast.AsyncFunctionDef],
+    aliases: dict[str, str],
+) -> LocalViewBindingProof:
+    if not _expr_is_local_function_name(node, function_defs, aliases):
+        return LocalViewBindingProof("", 0, False, False, reason="unproven_add_url_rule_view_binding")
+    assert isinstance(node, ast.Name)
+    name = node.id
+    function_def = function_defs.get(name)
+    if function_def is None or "." in name:
+        return LocalViewBindingProof(name, 0, False, False, reason="unproven_add_url_rule_view_binding")
+    if function_def.decorator_list:
+        return LocalViewBindingProof(name, getattr(function_def, "lineno", 0), False, False, reason="unproven_add_url_rule_view_binding")
+    function_lineno = getattr(function_def, "lineno", 0)
+    if not function_lineno or function_lineno >= route_lineno:
+        return LocalViewBindingProof(name, function_lineno, False, False, reason="unproven_add_url_rule_view_binding")
+
+    methods: tuple[str, ...] = ()
+    required_methods: tuple[str, ...] = ()
+    dynamic_methods = False
+    endpoint_name_stable = True
+
+    for effect in _iter_binding_effect_nodes(tree, function_lineno, route_lineno):
+        if isinstance(effect, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)) and effect.name == name:
+            return LocalViewBindingProof(name, function_lineno, False, endpoint_name_stable, methods, required_methods, dynamic_methods, "unproven_add_url_rule_view_binding")
+        if isinstance(effect, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)) and effect.decorator_list:
+            return LocalViewBindingProof(name, function_lineno, False, endpoint_name_stable, methods, required_methods, True, "unproven_add_url_rule_view_binding")
+        if _import_binds_name(effect, name):
+            return LocalViewBindingProof(name, function_lineno, False, endpoint_name_stable, methods, required_methods, dynamic_methods, "unproven_add_url_rule_view_binding")
+        if isinstance(effect, ast.Match):
+            return LocalViewBindingProof(name, function_lineno, False, endpoint_name_stable, methods, required_methods, dynamic_methods, "unproven_add_url_rule_view_binding")
+        if _effect_binds_or_unbinds_name(effect, name):
+            return LocalViewBindingProof(name, function_lineno, False, endpoint_name_stable, methods, required_methods, dynamic_methods, "unproven_add_url_rule_view_binding")
+
+        if isinstance(effect, ast.Assign):
+            for target in effect.targets:
+                if _target_writes_attribute(target, name, {"__name__"}) or _target_writes_view_dict_key(target, name, {"__name__"}):
+                    endpoint_name_stable = False
+                if _target_writes_view_dict_key(target, name, {"methods", "required_methods"}):
+                    dynamic_methods = True
+                    continue
+                if _target_writes_attribute(target, name, {"methods", "required_methods"}):
+                    values = _literal_string_list(effect.value)
+                    if values:
+                        if isinstance(target, ast.Attribute) and target.attr == "methods":
+                            methods = tuple(sorted(values))
+                        elif isinstance(target, ast.Attribute) and target.attr == "required_methods":
+                            required_methods = tuple(sorted(values))
+                        else:
+                            dynamic_methods = True
+                    else:
+                        dynamic_methods = True
+        elif isinstance(effect, ast.AnnAssign):
+            if _target_writes_attribute(effect.target, name, {"__name__"}) or _target_writes_view_dict_key(effect.target, name, {"__name__"}):
+                endpoint_name_stable = False
+            if _target_writes_view_dict_key(effect.target, name, {"methods", "required_methods"}):
+                dynamic_methods = True
+            elif _target_writes_attribute(effect.target, name, {"methods", "required_methods"}):
+                values = _literal_string_list(effect.value) if effect.value is not None else ()
+                if values:
+                    if isinstance(effect.target, ast.Attribute) and effect.target.attr == "methods":
+                        methods = tuple(sorted(values))
+                    elif isinstance(effect.target, ast.Attribute) and effect.target.attr == "required_methods":
+                        required_methods = tuple(sorted(values))
+                    else:
+                        dynamic_methods = True
+                else:
+                    dynamic_methods = True
+        elif isinstance(effect, ast.AugAssign):
+            if _target_writes_attribute(effect.target, name, {"__name__"}) or _target_writes_view_dict_key(effect.target, name, {"__name__"}):
+                endpoint_name_stable = False
+            if _target_writes_attribute(effect.target, name, {"methods", "required_methods"}) or _target_writes_view_dict_key(effect.target, name, {"methods", "required_methods"}):
+                dynamic_methods = True
+        elif isinstance(effect, ast.Delete):
+            for target in effect.targets:
+                if _target_writes_attribute(target, name, {"__name__"}) or _target_writes_view_dict_key(target, name, {"__name__"}):
+                    endpoint_name_stable = False
+                if _target_writes_attribute(target, name, {"methods", "required_methods"}) or _target_writes_view_dict_key(target, name, {"methods", "required_methods"}):
+                    dynamic_methods = True
+        elif isinstance(effect, ast.Call):
+            if _call_mutates_attribute(effect, name, {"methods", "required_methods"}):
+                dynamic_methods = True
+            else:
+                return LocalViewBindingProof(name, function_lineno, False, endpoint_name_stable, methods, required_methods, True, "unproven_add_url_rule_view_binding")
+
+    return LocalViewBindingProof(name, function_lineno, True, endpoint_name_stable, methods, required_methods, dynamic_methods)
 
 def _routing_keywords(call: ast.Call, *, exclude: set[str] | None = None) -> tuple[tuple[str, str], ...]:
     excluded = exclude or set()
@@ -550,15 +772,17 @@ def _blueprint_registration_prefixes(tree: ast.AST) -> dict[str, tuple[str, ...]
             continue
         if not node.args or not isinstance(node.args[0], ast.Name):
             continue
-        url_prefix: str | None = None
+        url_prefix = BOUNDARY_ROUTE_NO_PREFIX_OVERRIDE
         for keyword in node.keywords:
             if keyword.arg is None:
                 url_prefix = "<dynamic>"
                 break
             if keyword.arg == "url_prefix":
+                if _is_explicit_none(keyword.value):
+                    url_prefix = BOUNDARY_ROUTE_NO_PREFIX_OVERRIDE
+                    continue
                 url_prefix = _literal_value_for_signature(keyword.value)
-        if url_prefix is not None:
-            prefixes.setdefault(node.args[0].id, []).append(url_prefix)
+        prefixes.setdefault(node.args[0].id, []).append(url_prefix)
     return {name: tuple(values) for name, values in prefixes.items()}
 
 
@@ -684,19 +908,29 @@ def _decorator_methods_are_dynamic(deco_name: str, deco: ast.AST) -> bool:
     return False
 
 
-def _methodview_http_methods(tree: ast.AST) -> dict[str, tuple[str, ...]]:
+def _resolve_imported_chain(chain: str, aliases: dict[str, str]) -> str:
+    head, sep, tail = chain.partition(".")
+    return f"{aliases[head]}{sep}{tail}" if head in aliases else chain
+
+
+def _class_is_direct_methodview(node: ast.ClassDef, aliases: dict[str, str]) -> bool:
+    return any(_resolve_imported_chain(_attribute_chain(base), aliases) == "flask.views.MethodView" for base in node.bases)
+
+
+def _methodview_http_methods(tree: ast.AST, aliases: dict[str, str]) -> dict[str, tuple[str, ...]]:
     methods_by_class: dict[str, tuple[str, ...]] = {}
     flask_methods = {"get", "post", "put", "patch", "delete", "head", "options"}
     for node in ast.walk(tree):
         if not isinstance(node, ast.ClassDef):
+            continue
+        if not _class_is_direct_methodview(node, aliases):
             continue
         methods = sorted(
             child.name.upper()
             for child in node.body
             if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)) and child.name in flask_methods
         )
-        if methods:
-            methods_by_class[node.name] = tuple(methods)
+        methods_by_class[node.name] = tuple(methods)
     return methods_by_class
 
 
@@ -730,11 +964,12 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
         route_aliases = _route_aliases(tree)
         blueprint_prefixes = _blueprint_prefixes(tree)
         blueprint_mount_prefixes = _blueprint_registration_prefixes(tree)
-        methodview_methods = _methodview_http_methods(tree)
+        methodview_methods = _methodview_http_methods(tree, aliases)
+        function_defs = _iter_function_defs(tree)
         records.extend(_blueprint_constructor_records(rel, tree))
         for node in ast.walk(tree):
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
-                for deco in node.decorator_list:
+                for deco_index, deco in enumerate(node.decorator_list):
                     deco_call = deco.func if isinstance(deco, ast.Call) else deco
                     deco_name = _attribute_chain(deco_call)
                     suffix = next((item for item in decorator_suffix_to_kind if deco_name.endswith(item)), "")
@@ -761,6 +996,12 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                         status = BOUNDARY_ROUTE_AMBIGUOUS
                         reason = "dynamic_route_argument"
                     methods = _methods_tuple(deco_name, deco)
+                    if suffix == ".route" and not methods and not _decorator_methods_are_dynamic(deco_name, deco):
+                        if node.decorator_list[deco_index + 1:]:
+                            status = BOUNDARY_ROUTE_AMBIGUOUS
+                            reason = reason or "unproven_route_decorator_method_defaults"
+                        else:
+                            methods = ("GET",)
                     if _decorator_methods_are_dynamic(deco_name, deco):
                         status = BOUNDARY_ROUTE_AMBIGUOUS
                         reason = reason or "dynamic_route_methods"
@@ -790,7 +1031,15 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                     if mount_prefix == "<dynamic>":
                         status = BOUNDARY_ROUTE_AMBIGUOUS
                         reason = reason or "dynamic_register_blueprint_prefix"
-                    signed_prefix = "" if mount_prefix == "<dynamic>" else (mount_prefix if route_root in blueprint_mount_prefixes else constructor_prefix)
+                    signed_prefix = (
+                        ""
+                        if mount_prefix == "<dynamic>"
+                        else (
+                            constructor_prefix
+                            if mount_prefix == BOUNDARY_ROUTE_NO_PREFIX_OVERRIDE
+                            else (mount_prefix if route_root in blueprint_mount_prefixes else constructor_prefix)
+                        )
+                    )
                     full_route_arg = _join_route_prefix(signed_prefix, "" if route_arg == "<dynamic>" else route_arg)
                     records.append(_finalize_route_candidate(RouteRegistrationCandidate(
                         source_locus=rel,
@@ -805,7 +1054,7 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                         view_identity=node.name,
                         blueprint_name=route_root if owner_type in {"Blueprint", "BlueprintAlias"} else "",
                         blueprint_constructor_prefix=constructor_prefix,
-                        register_blueprint_prefix="" if mount_prefix == "<dynamic>" else mount_prefix,
+                        register_blueprint_prefix="" if mount_prefix in {"<dynamic>", BOUNDARY_ROUTE_NO_PREFIX_OVERRIDE} else mount_prefix,
                         errorhandler_key="" if errorhandler_key == "<dynamic>" else errorhandler_key,
                         routing_keywords=routing_keywords,
                         imported_view_target=aliases.get(node.name, ""),
@@ -830,6 +1079,10 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                 view_desc = ""
                 imported_view_target = ""
                 methods: tuple[str, ...] = ()
+                methods_keyword_present = False
+                methodview_view = False
+                view_endpoint_default = ""
+                local_view_proof: LocalViewBindingProof | None = None
                 for keyword in node.keywords:
                     if keyword.arg is None:
                         status = BOUNDARY_ROUTE_AMBIGUOUS
@@ -838,7 +1091,13 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                     if keyword.arg == "view_func":
                         if isinstance(keyword.value, ast.Call) and _attribute_chain(keyword.value.func).endswith(".as_view"):
                             view_desc = _attribute_chain(keyword.value.func)
-                            methods = methods or methodview_methods.get(_methodview_class_from_as_view(keyword.value), ())
+                            methodview_class = _methodview_class_from_as_view(keyword.value)
+                            if methodview_class in methodview_methods:
+                                methodview_view = True
+                                methods = methods or methodview_methods[methodview_class]
+                            else:
+                                status = BOUNDARY_ROUTE_AMBIGUOUS
+                                reason = reason or "unproven_methodview_binding"
                             if keyword.value.args:
                                 endpoint = endpoint or _literal_value_for_signature(keyword.value.args[0])
                             else:
@@ -850,8 +1109,22 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                             reason = reason or "dynamic_add_url_rule_view_factory"
                         else:
                             view_desc = _attribute_chain(keyword.value)
+                            proof = _local_view_binding_proof(keyword.value, tree, getattr(node, "lineno", 10**9), function_defs, aliases)
+                            if proof.stable_binding:
+                                local_view_proof = proof
+                                if proof.endpoint_name_stable:
+                                    view_endpoint_default = view_desc
+                            elif isinstance(keyword.value, ast.Name) and keyword.value.id in function_defs and keyword.value.id not in aliases:
+                                status = BOUNDARY_ROUTE_AMBIGUOUS
+                                reason = reason or proof.reason or "unproven_add_url_rule_view_binding"
                             imported_view_target = aliases.get(view_desc, "")
+                    elif keyword.arg == "endpoint":
+                        endpoint = _literal_value_for_signature(keyword.value)
+                        if endpoint == "<dynamic>":
+                            status = BOUNDARY_ROUTE_AMBIGUOUS
+                            reason = reason or "dynamic_add_url_rule_endpoint"
                     elif keyword.arg == "methods":
+                        methods_keyword_present = True
                         method_values = _literal_string_list(keyword.value)
                         if method_values:
                             methods = tuple(sorted(method_values))
@@ -862,7 +1135,13 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                     view_node = node.args[2]
                     if isinstance(view_node, ast.Call) and _attribute_chain(view_node.func).endswith(".as_view"):
                         view_desc = _attribute_chain(view_node.func)
-                        methods = methods or methodview_methods.get(_methodview_class_from_as_view(view_node), ())
+                        methodview_class = _methodview_class_from_as_view(view_node)
+                        if methodview_class in methodview_methods:
+                            methodview_view = True
+                            methods = methods or methodview_methods[methodview_class]
+                        else:
+                            status = BOUNDARY_ROUTE_AMBIGUOUS
+                            reason = reason or "unproven_methodview_binding"
                         if view_node.args:
                             endpoint = endpoint or _literal_value_for_signature(view_node.args[0])
                     elif isinstance(view_node, ast.Call):
@@ -871,14 +1150,45 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                         reason = reason or "dynamic_add_url_rule_view_factory"
                     else:
                         view_desc = _attribute_chain(view_node)
+                        proof = _local_view_binding_proof(view_node, tree, getattr(node, "lineno", 10**9), function_defs, aliases)
+                        if proof.stable_binding:
+                            local_view_proof = proof
+                            if proof.endpoint_name_stable:
+                                view_endpoint_default = view_desc
+                        elif isinstance(view_node, ast.Name) and view_node.id in function_defs and view_node.id not in aliases:
+                            status = BOUNDARY_ROUTE_AMBIGUOUS
+                            reason = reason or proof.reason or "unproven_add_url_rule_view_binding"
                         imported_view_target = aliases.get(view_desc, "")
+                if not endpoint and view_endpoint_default and not methodview_view:
+                    endpoint = view_endpoint_default
+                elif not endpoint and local_view_proof is not None and not local_view_proof.endpoint_name_stable and not methodview_view:
+                    status = BOUNDARY_ROUTE_AMBIGUOUS
+                    reason = reason or "dynamic_add_url_rule_endpoint_name"
+                if not methodview_view and local_view_proof is not None:
+                    attr_methods = local_view_proof.methods
+                    required_methods = local_view_proof.required_methods
+                    dynamic_methods = local_view_proof.dynamic_methods
+                    if dynamic_methods:
+                        status = BOUNDARY_ROUTE_AMBIGUOUS
+                        reason = reason or "dynamic_add_url_rule_view_methods"
+                    else:
+                        if not methods and not methods_keyword_present:
+                            methods = tuple(sorted(set(attr_methods or ("GET",)) | set(required_methods)))
+                        elif required_methods:
+                            methods = tuple(sorted(set(methods) | set(required_methods)))
+                if methodview_view and not methods and not methods_keyword_present:
+                    status = BOUNDARY_ROUTE_AMBIGUOUS
+                    reason = reason or "unproven_methodview_methods"
+                if not methods and not methods_keyword_present and not methodview_view and local_view_proof is None:
+                    status = BOUNDARY_ROUTE_AMBIGUOUS
+                    reason = reason or "unproven_add_url_rule_methods"
                 if route_arg in {"", "<dynamic>"}:
                     status = BOUNDARY_ROUTE_AMBIGUOUS
                     reason = reason or "dynamic_or_missing_add_url_rule_path"
-                if endpoint == "<dynamic>" or view_desc == "":
+                if endpoint in {"", "<dynamic>"} or view_desc == "":
                     status = BOUNDARY_ROUTE_AMBIGUOUS
                     reason = reason or "dynamic_or_missing_add_url_rule_endpoint_or_view"
-                routing_keywords = _routing_keywords(node, exclude={"view_func", "methods"})
+                routing_keywords = _routing_keywords(node, exclude={"endpoint", "view_func", "methods"})
                 if any(value == "<dynamic>" for _, value in routing_keywords):
                     status = BOUNDARY_ROUTE_AMBIGUOUS
                     reason = reason or "dynamic_add_url_rule_routing_keyword"
@@ -891,7 +1201,15 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                 if mount_prefix == "<dynamic>":
                     status = BOUNDARY_ROUTE_AMBIGUOUS
                     reason = reason or "dynamic_register_blueprint_prefix"
-                signed_prefix = "" if mount_prefix == "<dynamic>" else (mount_prefix if owner in blueprint_mount_prefixes else constructor_prefix)
+                signed_prefix = (
+                    ""
+                    if mount_prefix == "<dynamic>"
+                    else (
+                        constructor_prefix
+                        if mount_prefix == BOUNDARY_ROUTE_NO_PREFIX_OVERRIDE
+                        else (mount_prefix if owner in blueprint_mount_prefixes else constructor_prefix)
+                    )
+                )
                 full_route_arg = _join_route_prefix(signed_prefix, "" if route_arg == "<dynamic>" else route_arg)
                 records.append(_finalize_route_candidate(RouteRegistrationCandidate(
                     source_locus=rel,
@@ -905,7 +1223,7 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                     view_identity=view_desc,
                     blueprint_name=owner if owner_type in {"Blueprint", "BlueprintAlias"} else "",
                     blueprint_constructor_prefix=constructor_prefix,
-                    register_blueprint_prefix="" if mount_prefix == "<dynamic>" else mount_prefix,
+                    register_blueprint_prefix="" if mount_prefix in {"<dynamic>", BOUNDARY_ROUTE_NO_PREFIX_OVERRIDE} else mount_prefix,
                     routing_keywords=routing_keywords,
                     imported_view_target=imported_view_target,
                     fail_closed_reason=reason,
@@ -928,6 +1246,9 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                         reason = reason or "expanded_register_blueprint_kwargs"
                         break
                     if keyword.arg == "url_prefix":
+                        if _is_explicit_none(keyword.value):
+                            url_prefix = ""
+                            continue
                         url_prefix = _literal_value_for_signature(keyword.value)
                 if url_prefix == "<dynamic>":
                     status = BOUNDARY_ROUTE_AMBIGUOUS

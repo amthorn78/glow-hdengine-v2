@@ -2053,9 +2053,14 @@ def build_adapter_boundary_check_log(produced: str, proof: str, checks: dict[str
     rails = " ".join(f"{key}={env_snapshot[key]}" for key in sorted(CLOSED_RAILS_ENV))
     log_checks = {
         "closed_rails_generation": mode == "closed-rails-source-cache" and closed_rails_env_ok(),
-        "analyzer_rendering_separation_applied": checks.get("renderer_checks_typed_route_fields", False),
-        "generator_rendered_analyzer_output_only": checks.get("renderer_checks_typed_route_fields", False),
-        "renderer_did_not_recompute_boundary_truth": checks.get("renderer_checks_typed_route_fields", False),
+        "analyzer_rendering_separation_applied": checks.get("renderer_checks_typed_route_fields", False) and "analyzer_rendering_separation=" in proof,
+        "generator_rendered_analyzer_output_only": checks.get("renderer_checks_typed_route_fields", False) and "renderer_only_posture=" in proof,
+        "renderer_did_not_recompute_boundary_truth": checks.get("renderer_checks_typed_route_fields", False)
+        and all(token in proof for token in [
+            "renderer_does_not_override_analyzer_unknowns_or_failures=true",
+            "typed_public_route_signatures=",
+            "boundary_finding category=",
+        ]),
         "renderer_did_not_override_analyzer_unknowns_or_failures": checks.get("unknown_current_categories_fail_closed", False),
         "analyzer_owned_verdict_pass": all(checks.values()),
         "conservative_positive_boundary_contract_applied": checks.get("conservative_positive_boundary_contract_applied", False),
@@ -2118,7 +2123,7 @@ def build_adapter_boundary_check_log(produced: str, proof: str, checks: dict[str
         "imported_view_target_posture_was_checked=true",
         "endpoint_view_identity_posture_was_checked=true",
         "public_internal_classification_posture_was_checked=true",
-        "renderer_checks_analyzer_owned_typed_fields_not_proof_substrings=true",
+        "renderer_checks_analyzer_owned_typed_fields_and_required_proof_content=true",
         "table_driven_boundary_taxonomy_was_applied=true",
         "required_taxonomy_groups_are_covered_or_visibly_marked=true",
         "no_required_taxonomy_group_was_silently_skipped=true",
