@@ -445,6 +445,26 @@ def _import_binds_name(node: ast.AST, name: str) -> bool:
     return False
 
 
+def _effect_binds_or_unbinds_name(node: ast.AST, name: str) -> bool:
+    if isinstance(node, ast.Assign):
+        return any(_target_binds_name(target, name) for target in node.targets)
+    if isinstance(node, ast.AnnAssign):
+        return _target_binds_name(node.target, name)
+    if isinstance(node, ast.AugAssign):
+        return _target_binds_name(node.target, name)
+    if isinstance(node, (ast.For, ast.AsyncFor)):
+        return _target_binds_name(node.target, name)
+    if isinstance(node, (ast.With, ast.AsyncWith)):
+        return any(item.optional_vars is not None and _target_binds_name(item.optional_vars, name) for item in node.items)
+    if isinstance(node, ast.ExceptHandler):
+        return node.name == name
+    if isinstance(node, ast.NamedExpr):
+        return _target_binds_name(node.target, name)
+    if isinstance(node, ast.Delete):
+        return any(_target_binds_name(target, name) for target in node.targets)
+    return False
+
+
 def _target_writes_attribute(target: ast.AST, name: str, attrs: set[str]) -> bool:
     if isinstance(target, ast.Attribute) and target.attr in attrs and isinstance(target.value, ast.Name):
         return target.value.id == name
@@ -537,11 +557,9 @@ def _local_view_binding_proof(
             return LocalViewBindingProof(name, function_lineno, False, endpoint_name_stable, methods, required_methods, True, "unproven_add_url_rule_view_binding")
         if _import_binds_name(effect, name):
             return LocalViewBindingProof(name, function_lineno, False, endpoint_name_stable, methods, required_methods, dynamic_methods, "unproven_add_url_rule_view_binding")
-        if isinstance(effect, ast.Assign) and any(_target_binds_name(target, name) for target in effect.targets):
+        if isinstance(effect, ast.Match):
             return LocalViewBindingProof(name, function_lineno, False, endpoint_name_stable, methods, required_methods, dynamic_methods, "unproven_add_url_rule_view_binding")
-        if isinstance(effect, ast.AnnAssign) and _target_binds_name(effect.target, name):
-            return LocalViewBindingProof(name, function_lineno, False, endpoint_name_stable, methods, required_methods, dynamic_methods, "unproven_add_url_rule_view_binding")
-        if isinstance(effect, ast.AugAssign) and _target_binds_name(effect.target, name):
+        if _effect_binds_or_unbinds_name(effect, name):
             return LocalViewBindingProof(name, function_lineno, False, endpoint_name_stable, methods, required_methods, dynamic_methods, "unproven_add_url_rule_view_binding")
 
         if isinstance(effect, ast.Assign):
