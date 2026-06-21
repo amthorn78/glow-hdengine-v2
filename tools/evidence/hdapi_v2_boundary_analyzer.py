@@ -456,6 +456,8 @@ def _expr_is_stable_local_function_name(
     function_def = function_defs.get(name)
     if function_def is None or "." in name:
         return False
+    if function_def.decorator_list:
+        return False
     function_lineno = getattr(function_def, "lineno", 0)
     if not function_lineno or function_lineno >= route_lineno:
         return False
@@ -776,13 +778,18 @@ def _methodview_class_from_as_view(call: ast.Call) -> str:
     return chain.rsplit(".", 1)[0] if chain.endswith(".as_view") else ""
 
 
-def _view_method_attributes_before(tree: ast.AST, route_lineno: int) -> dict[str, dict[str, tuple[str, ...] | bool]]:
-    attrs: dict[str, dict[str, tuple[str, ...] | bool]] = {}
+def _view_method_attributes_for_binding(
+    tree: ast.AST,
+    view_name: str,
+    function_lineno: int,
+    route_lineno: int,
+) -> dict[str, tuple[str, ...] | bool]:
+    attrs: dict[str, tuple[str, ...] | bool] = {"methods": (), "required_methods": (), "dynamic": False}
 
     def mark_dynamic(target: ast.AST) -> None:
         if isinstance(target, ast.Attribute) and target.attr in {"methods", "required_methods"} and isinstance(target.value, ast.Name):
-            row = attrs.setdefault(target.value.id, {"methods": (), "required_methods": (), "dynamic": False})
-            row["dynamic"] = True
+            if target.value.id == view_name:
+                attrs["dynamic"] = True
         elif isinstance(target, ast.Subscript):
             mark_dynamic(target.value)
 
@@ -794,7 +801,8 @@ def _view_method_attributes_before(tree: ast.AST, route_lineno: int) -> dict[str
         mark_dynamic(expr.func.value)
 
     for node in ast.iter_child_nodes(tree):
-        if getattr(node, "lineno", route_lineno + 1) >= route_lineno:
+        node_lineno = getattr(node, "lineno", route_lineno + 1)
+        if node_lineno <= function_lineno or node_lineno >= route_lineno:
             continue
         if isinstance(node, ast.Expr):
             mark_mutating_call(node.value)
@@ -820,12 +828,13 @@ def _view_method_attributes_before(tree: ast.AST, route_lineno: int) -> dict[str
                 continue
             if not isinstance(target.value, ast.Name):
                 continue
+            if target.value.id != view_name:
+                continue
             method_values = _literal_string_list(value)
-            row = attrs.setdefault(target.value.id, {"methods": (), "required_methods": (), "dynamic": False})
             if method_values:
-                row[target.attr] = tuple(sorted(method_values))
+                attrs[target.attr] = tuple(sorted(method_values))
             else:
-                row["dynamic"] = True
+                attrs["dynamic"] = True
     return attrs
 
 
@@ -973,6 +982,7 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                 methodview_view = False
                 view_endpoint_default = ""
                 view_method_attr_name = ""
+                view_method_function_lineno = 0
                 for keyword in node.keywords:
                     if keyword.arg is None:
                         status = BOUNDARY_ROUTE_AMBIGUOUS
@@ -997,6 +1007,7 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                             if _expr_is_stable_local_function_name(keyword.value, tree, getattr(node, "lineno", 10**9), function_defs, aliases):
                                 view_endpoint_default = view_desc
                                 view_method_attr_name = view_desc
+                                view_method_function_lineno = getattr(function_defs[view_desc], "lineno", 0)
                             elif isinstance(keyword.value, ast.Name) and keyword.value.id in function_defs and keyword.value.id not in aliases:
                                 status = BOUNDARY_ROUTE_AMBIGUOUS
                                 reason = reason or "unproven_add_url_rule_view_binding"
@@ -1031,6 +1042,7 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                         if _expr_is_stable_local_function_name(view_node, tree, getattr(node, "lineno", 10**9), function_defs, aliases):
                             view_endpoint_default = view_desc
                             view_method_attr_name = view_desc
+                            view_method_function_lineno = getattr(function_defs[view_desc], "lineno", 0)
                         elif isinstance(view_node, ast.Name) and view_node.id in function_defs and view_node.id not in aliases:
                             status = BOUNDARY_ROUTE_AMBIGUOUS
                             reason = reason or "unproven_add_url_rule_view_binding"
@@ -1038,8 +1050,12 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                 if not endpoint and view_endpoint_default and not methodview_view:
                     endpoint = view_endpoint_default
                 if not methodview_view and view_method_attr_name:
-                    view_method_attrs = _view_method_attributes_before(tree, getattr(node, "lineno", 10**9))
-                    method_attrs = view_method_attrs.get(view_method_attr_name, {})
+                    method_attrs = _view_method_attributes_for_binding(
+                        tree,
+                        view_method_attr_name,
+                        view_method_function_lineno,
+                        getattr(node, "lineno", 10**9),
+                    )
                     if method_attrs.get("dynamic"):
                         status = BOUNDARY_ROUTE_AMBIGUOUS
                         reason = reason or "dynamic_add_url_rule_view_methods"
@@ -1050,6 +1066,9 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                             methods = tuple(sorted(set(attr_methods or ("GET",)) | set(required_methods)))
                         elif required_methods:
                             methods = tuple(sorted(set(methods) | set(required_methods)))
+                if not methods and not methods_keyword_present and not methodview_view and not view_method_attr_name:
+                    status = BOUNDARY_ROUTE_AMBIGUOUS
+                    reason = reason or "unproven_add_url_rule_methods"
                 if route_arg in {"", "<dynamic>"}:
                     status = BOUNDARY_ROUTE_AMBIGUOUS
                     reason = reason or "dynamic_or_missing_add_url_rule_path"
