@@ -1,5 +1,5 @@
 path: artifacts/vendor/hdapi_v2/source_inventory.json
 size_bytes: 9757
-sha256: dd1e957eac3774df7a214d79f65b67788bacb32b31ec802f9f07f163edd31949
-mtime_utc: 2026-06-21T20:21:58Z
-produced_at_utc: 2026-06-21T20:21:57Z
+sha256: 5399c4ed20077f74e93938fe6732cc24359083356f4ac0b0566b21ce49eea803
+mtime_utc: 2026-06-21T21:16:38Z
+produced_at_utc: 2026-06-21T21:16:37Z

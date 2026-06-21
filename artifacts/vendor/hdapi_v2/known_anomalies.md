@@ -1,6 +1,6 @@
 # HDAPI v2 Known Anomalies
 
-Generated at UTC: 2026-06-21T20:21:57Z
+Generated at UTC: 2026-06-21T21:16:37Z
 
 ## api-reference/openapi.json posture
 

@@ -757,19 +757,29 @@ def _decorator_methods_are_dynamic(deco_name: str, deco: ast.AST) -> bool:
     return False
 
 
-def _methodview_http_methods(tree: ast.AST) -> dict[str, tuple[str, ...]]:
+def _resolve_imported_chain(chain: str, aliases: dict[str, str]) -> str:
+    head, sep, tail = chain.partition(".")
+    return f"{aliases[head]}{sep}{tail}" if head in aliases else chain
+
+
+def _class_is_direct_methodview(node: ast.ClassDef, aliases: dict[str, str]) -> bool:
+    return any(_resolve_imported_chain(_attribute_chain(base), aliases) == "flask.views.MethodView" for base in node.bases)
+
+
+def _methodview_http_methods(tree: ast.AST, aliases: dict[str, str]) -> dict[str, tuple[str, ...]]:
     methods_by_class: dict[str, tuple[str, ...]] = {}
     flask_methods = {"get", "post", "put", "patch", "delete", "head", "options"}
     for node in ast.walk(tree):
         if not isinstance(node, ast.ClassDef):
+            continue
+        if not _class_is_direct_methodview(node, aliases):
             continue
         methods = sorted(
             child.name.upper()
             for child in node.body
             if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)) and child.name in flask_methods
         )
-        if methods:
-            methods_by_class[node.name] = tuple(methods)
+        methods_by_class[node.name] = tuple(methods)
     return methods_by_class
 
 
@@ -863,7 +873,7 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
         route_aliases = _route_aliases(tree)
         blueprint_prefixes = _blueprint_prefixes(tree)
         blueprint_mount_prefixes = _blueprint_registration_prefixes(tree)
-        methodview_methods = _methodview_http_methods(tree)
+        methodview_methods = _methodview_http_methods(tree, aliases)
         function_defs = _iter_function_defs(tree)
         records.extend(_blueprint_constructor_records(rel, tree))
         for node in ast.walk(tree):
@@ -990,9 +1000,14 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                         continue
                     if keyword.arg == "view_func":
                         if isinstance(keyword.value, ast.Call) and _attribute_chain(keyword.value.func).endswith(".as_view"):
-                            methodview_view = True
                             view_desc = _attribute_chain(keyword.value.func)
-                            methods = methods or methodview_methods.get(_methodview_class_from_as_view(keyword.value), ())
+                            methodview_class = _methodview_class_from_as_view(keyword.value)
+                            if methodview_class in methodview_methods:
+                                methodview_view = True
+                                methods = methods or methodview_methods[methodview_class]
+                            else:
+                                status = BOUNDARY_ROUTE_AMBIGUOUS
+                                reason = reason or "unproven_methodview_binding"
                             if keyword.value.args:
                                 endpoint = endpoint or _literal_value_for_signature(keyword.value.args[0])
                             else:
@@ -1028,9 +1043,14 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                 if not view_desc and len(node.args) >= 3:
                     view_node = node.args[2]
                     if isinstance(view_node, ast.Call) and _attribute_chain(view_node.func).endswith(".as_view"):
-                        methodview_view = True
                         view_desc = _attribute_chain(view_node.func)
-                        methods = methods or methodview_methods.get(_methodview_class_from_as_view(view_node), ())
+                        methodview_class = _methodview_class_from_as_view(view_node)
+                        if methodview_class in methodview_methods:
+                            methodview_view = True
+                            methods = methods or methodview_methods[methodview_class]
+                        else:
+                            status = BOUNDARY_ROUTE_AMBIGUOUS
+                            reason = reason or "unproven_methodview_binding"
                         if view_node.args:
                             endpoint = endpoint or _literal_value_for_signature(view_node.args[0])
                     elif isinstance(view_node, ast.Call):
@@ -1066,6 +1086,9 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                             methods = tuple(sorted(set(attr_methods or ("GET",)) | set(required_methods)))
                         elif required_methods:
                             methods = tuple(sorted(set(methods) | set(required_methods)))
+                if methodview_view and not methods and not methods_keyword_present:
+                    status = BOUNDARY_ROUTE_AMBIGUOUS
+                    reason = reason or "unproven_methodview_methods"
                 if not methods and not methods_keyword_present and not methodview_view and not view_method_attr_name:
                     status = BOUNDARY_ROUTE_AMBIGUOUS
                     reason = reason or "unproven_add_url_rule_methods"
