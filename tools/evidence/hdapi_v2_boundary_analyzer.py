@@ -265,6 +265,7 @@ def _literal_string_list(node: ast.AST) -> tuple[str, ...]:
 BOUNDARY_ROUTE_SUPPORTED = "supported"
 BOUNDARY_ROUTE_UNSUPPORTED = "unsupported"
 BOUNDARY_ROUTE_AMBIGUOUS = "ambiguous"
+BOUNDARY_ROUTE_NO_PREFIX_OVERRIDE = "<no_prefix_override>"
 
 
 SUPPORTED_ROUTE_REGISTRATION_FORMS: dict[str, dict[str, Any]] = {
@@ -410,6 +411,10 @@ def _literal_value_for_signature(node: ast.AST) -> str:
 
 def _is_explicit_none(node: ast.AST) -> bool:
     return isinstance(node, ast.Constant) and node.value is None
+
+
+def _expr_is_local_name(node: ast.AST) -> bool:
+    return isinstance(node, ast.Name)
 
 
 def _routing_keywords(call: ast.Call, *, exclude: set[str] | None = None) -> tuple[tuple[str, str], ...]:
@@ -561,7 +566,7 @@ def _blueprint_registration_prefixes(tree: ast.AST) -> dict[str, tuple[str, ...]
                 break
             if keyword.arg == "url_prefix":
                 if _is_explicit_none(keyword.value):
-                    url_prefix = None
+                    url_prefix = BOUNDARY_ROUTE_NO_PREFIX_OVERRIDE
                     continue
                 url_prefix = _literal_value_for_signature(keyword.value)
         if url_prefix is not None:
@@ -712,6 +717,33 @@ def _methodview_class_from_as_view(call: ast.Call) -> str:
     return chain.rsplit(".", 1)[0] if chain.endswith(".as_view") else ""
 
 
+def _view_method_attributes(tree: ast.AST) -> dict[str, dict[str, tuple[str, ...] | bool]]:
+    attrs: dict[str, dict[str, tuple[str, ...] | bool]] = {}
+    for node in ast.walk(tree):
+        targets: list[ast.AST] = []
+        value: ast.AST | None = None
+        if isinstance(node, ast.Assign):
+            targets = list(node.targets)
+            value = node.value
+        elif isinstance(node, ast.AnnAssign):
+            targets = [node.target]
+            value = node.value
+        if value is None:
+            continue
+        for target in targets:
+            if not isinstance(target, ast.Attribute) or target.attr not in {"methods", "required_methods"}:
+                continue
+            if not isinstance(target.value, ast.Name):
+                continue
+            method_values = _literal_string_list(value)
+            row = attrs.setdefault(target.value.id, {"methods": (), "required_methods": (), "dynamic": False})
+            if method_values:
+                row[target.attr] = tuple(sorted(method_values))
+            else:
+                row["dynamic"] = True
+    return attrs
+
+
 def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRecord]:
     """Discover bounded typed route registrations for PR-04 drift proof."""
 
@@ -738,6 +770,7 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
         blueprint_prefixes = _blueprint_prefixes(tree)
         blueprint_mount_prefixes = _blueprint_registration_prefixes(tree)
         methodview_methods = _methodview_http_methods(tree)
+        view_method_attrs = _view_method_attributes(tree)
         records.extend(_blueprint_constructor_records(rel, tree))
         for node in ast.walk(tree):
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
@@ -799,7 +832,15 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                     if mount_prefix == "<dynamic>":
                         status = BOUNDARY_ROUTE_AMBIGUOUS
                         reason = reason or "dynamic_register_blueprint_prefix"
-                    signed_prefix = "" if mount_prefix == "<dynamic>" else (mount_prefix if route_root in blueprint_mount_prefixes else constructor_prefix)
+                    signed_prefix = (
+                        ""
+                        if mount_prefix == "<dynamic>"
+                        else (
+                            constructor_prefix
+                            if mount_prefix == BOUNDARY_ROUTE_NO_PREFIX_OVERRIDE
+                            else (mount_prefix if route_root in blueprint_mount_prefixes else constructor_prefix)
+                        )
+                    )
                     full_route_arg = _join_route_prefix(signed_prefix, "" if route_arg == "<dynamic>" else route_arg)
                     records.append(_finalize_route_candidate(RouteRegistrationCandidate(
                         source_locus=rel,
@@ -814,7 +855,7 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                         view_identity=node.name,
                         blueprint_name=route_root if owner_type in {"Blueprint", "BlueprintAlias"} else "",
                         blueprint_constructor_prefix=constructor_prefix,
-                        register_blueprint_prefix="" if mount_prefix == "<dynamic>" else mount_prefix,
+                        register_blueprint_prefix="" if mount_prefix in {"<dynamic>", BOUNDARY_ROUTE_NO_PREFIX_OVERRIDE} else mount_prefix,
                         errorhandler_key="" if errorhandler_key == "<dynamic>" else errorhandler_key,
                         routing_keywords=routing_keywords,
                         imported_view_target=aliases.get(node.name, ""),
@@ -841,6 +882,8 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                 methods: tuple[str, ...] = ()
                 methods_keyword_present = False
                 methodview_view = False
+                view_endpoint_default = ""
+                view_method_attr_name = ""
                 for keyword in node.keywords:
                     if keyword.arg is None:
                         status = BOUNDARY_ROUTE_AMBIGUOUS
@@ -862,6 +905,9 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                             reason = reason or "dynamic_add_url_rule_view_factory"
                         else:
                             view_desc = _attribute_chain(keyword.value)
+                            if _expr_is_local_name(keyword.value):
+                                view_endpoint_default = view_desc
+                                view_method_attr_name = view_desc
                             imported_view_target = aliases.get(view_desc, "")
                     elif keyword.arg == "methods":
                         methods_keyword_present = True
@@ -885,11 +931,21 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                         reason = reason or "dynamic_add_url_rule_view_factory"
                     else:
                         view_desc = _attribute_chain(view_node)
+                        if _expr_is_local_name(view_node):
+                            view_endpoint_default = view_desc
+                            view_method_attr_name = view_desc
                         imported_view_target = aliases.get(view_desc, "")
-                if not endpoint and view_desc and not methodview_view:
-                    endpoint = view_desc
-                if not methods and not methods_keyword_present and not methodview_view and view_desc:
-                    methods = ("GET",)
+                if not endpoint and view_endpoint_default and not methodview_view:
+                    endpoint = view_endpoint_default
+                if not methods and not methods_keyword_present and not methodview_view and view_method_attr_name:
+                    method_attrs = view_method_attrs.get(view_method_attr_name, {})
+                    if method_attrs.get("dynamic"):
+                        status = BOUNDARY_ROUTE_AMBIGUOUS
+                        reason = reason or "dynamic_add_url_rule_view_methods"
+                    else:
+                        attr_methods = tuple(method_attrs.get("methods") or ())
+                        required_methods = tuple(method_attrs.get("required_methods") or ())
+                        methods = tuple(sorted(set(attr_methods or ("GET",)) | set(required_methods)))
                 if route_arg in {"", "<dynamic>"}:
                     status = BOUNDARY_ROUTE_AMBIGUOUS
                     reason = reason or "dynamic_or_missing_add_url_rule_path"
@@ -909,7 +965,15 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                 if mount_prefix == "<dynamic>":
                     status = BOUNDARY_ROUTE_AMBIGUOUS
                     reason = reason or "dynamic_register_blueprint_prefix"
-                signed_prefix = "" if mount_prefix == "<dynamic>" else (mount_prefix if owner in blueprint_mount_prefixes else constructor_prefix)
+                signed_prefix = (
+                    ""
+                    if mount_prefix == "<dynamic>"
+                    else (
+                        constructor_prefix
+                        if mount_prefix == BOUNDARY_ROUTE_NO_PREFIX_OVERRIDE
+                        else (mount_prefix if owner in blueprint_mount_prefixes else constructor_prefix)
+                    )
+                )
                 full_route_arg = _join_route_prefix(signed_prefix, "" if route_arg == "<dynamic>" else route_arg)
                 records.append(_finalize_route_candidate(RouteRegistrationCandidate(
                     source_locus=rel,
@@ -923,7 +987,7 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                     view_identity=view_desc,
                     blueprint_name=owner if owner_type in {"Blueprint", "BlueprintAlias"} else "",
                     blueprint_constructor_prefix=constructor_prefix,
-                    register_blueprint_prefix="" if mount_prefix == "<dynamic>" else mount_prefix,
+                    register_blueprint_prefix="" if mount_prefix in {"<dynamic>", BOUNDARY_ROUTE_NO_PREFIX_OVERRIDE} else mount_prefix,
                     routing_keywords=routing_keywords,
                     imported_view_target=imported_view_target,
                     fail_closed_reason=reason,
