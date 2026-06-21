@@ -3762,6 +3762,22 @@ W004_ROUTE_SIGNATURE_CASES = [
         "expected_classification": boundary_analyzer.BOUNDARY_UNKNOWN,
     },
     {
+        "case_id": "add-url-rule-bare-decorator-before-registration-fails-closed",
+        "body": "from flask import Flask\napp = Flask(__name__)\ndef view():\n    return b'ok'\ndef configure_view(fn):\n    view.methods = ['POST']\n    return fn\n@configure_view\ndef unrelated():\n    return b'unrelated'\napp.add_url_rule('/x', 'x', view)\n",
+        "expected_status": boundary_analyzer.BOUNDARY_ROUTE_AMBIGUOUS,
+        "expected_kind": "add_url_rule",
+        "expected_reason": "unproven_add_url_rule_view_binding",
+        "expected_classification": boundary_analyzer.BOUNDARY_UNKNOWN,
+    },
+    {
+        "case_id": "add-url-rule-decorator-call-before-registration-fails-closed",
+        "body": "from flask import Flask\napp = Flask(__name__)\ndef view():\n    return b'ok'\ndef configure_view():\n    view.methods = ['POST']\n    def deco(fn):\n        return fn\n    return deco\n@configure_view()\ndef unrelated():\n    return b'unrelated'\napp.add_url_rule('/x', 'x', view)\n",
+        "expected_status": boundary_analyzer.BOUNDARY_ROUTE_AMBIGUOUS,
+        "expected_kind": "add_url_rule",
+        "expected_reason": "unproven_add_url_rule_view_binding",
+        "expected_classification": boundary_analyzer.BOUNDARY_UNKNOWN,
+    },
+    {
         "case_id": "add-url-rule-omitted-endpoint-name-mutation-fails-closed",
         "body": "from flask import Flask\napp = Flask(__name__)\ndef view():\n    return b'ok'\nview.__name__ = 'renamed'\napp.add_url_rule('/x', view_func=view, methods=['GET'])\n",
         "expected_status": boundary_analyzer.BOUNDARY_ROUTE_AMBIGUOUS,

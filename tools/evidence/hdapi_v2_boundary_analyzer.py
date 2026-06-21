@@ -533,6 +533,8 @@ def _local_view_binding_proof(
     for effect in _iter_binding_effect_nodes(tree, function_lineno, route_lineno):
         if isinstance(effect, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)) and effect.name == name:
             return LocalViewBindingProof(name, function_lineno, False, endpoint_name_stable, methods, required_methods, dynamic_methods, "unproven_add_url_rule_view_binding")
+        if isinstance(effect, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)) and effect.decorator_list:
+            return LocalViewBindingProof(name, function_lineno, False, endpoint_name_stable, methods, required_methods, True, "unproven_add_url_rule_view_binding")
         if _import_binds_name(effect, name):
             return LocalViewBindingProof(name, function_lineno, False, endpoint_name_stable, methods, required_methods, dynamic_methods, "unproven_add_url_rule_view_binding")
         if isinstance(effect, ast.Assign) and any(_target_binds_name(target, name) for target in effect.targets):
@@ -583,26 +585,6 @@ def _local_view_binding_proof(
                 return LocalViewBindingProof(name, function_lineno, False, endpoint_name_stable, methods, required_methods, True, "unproven_add_url_rule_view_binding")
 
     return LocalViewBindingProof(name, function_lineno, True, endpoint_name_stable, methods, required_methods, dynamic_methods)
-
-
-def _expr_is_stable_local_function_name(
-    node: ast.AST,
-    tree: ast.AST,
-    route_lineno: int,
-    function_defs: dict[str, ast.FunctionDef | ast.AsyncFunctionDef],
-    aliases: dict[str, str],
-) -> bool:
-    """Return true only when a view name is still bound to its local FunctionDef.
-
-    Flask derives a default add_url_rule endpoint from ``view_func.__name__``.
-    For static evidence we can safely infer that only for top-level local
-    function names that are not imports/aliases and have not been rebound before
-    the route registration.  Everything else must fail closed rather than
-    emulating Python name binding.
-    """
-
-    return _local_view_binding_proof(node, tree, route_lineno, function_defs, aliases).stable_binding
-
 
 def _routing_keywords(call: ast.Call, *, exclude: set[str] | None = None) -> tuple[tuple[str, str], ...]:
     excluded = exclude or set()
@@ -913,66 +895,6 @@ def _methodview_class_from_as_view(call: ast.Call) -> str:
     return chain.rsplit(".", 1)[0] if chain.endswith(".as_view") else ""
 
 
-def _view_method_attributes_for_binding(
-    tree: ast.AST,
-    view_name: str,
-    function_lineno: int,
-    route_lineno: int,
-) -> dict[str, tuple[str, ...] | bool]:
-    attrs: dict[str, tuple[str, ...] | bool] = {"methods": (), "required_methods": (), "dynamic": False}
-
-    def mark_dynamic(target: ast.AST) -> None:
-        if isinstance(target, ast.Attribute) and target.attr in {"methods", "required_methods"} and isinstance(target.value, ast.Name):
-            if target.value.id == view_name:
-                attrs["dynamic"] = True
-        elif isinstance(target, ast.Subscript):
-            mark_dynamic(target.value)
-
-    def mark_mutating_call(expr: ast.AST) -> None:
-        if not isinstance(expr, ast.Call) or not isinstance(expr.func, ast.Attribute):
-            return
-        if expr.func.attr not in {"append", "extend", "insert", "add", "update", "remove", "discard", "clear", "pop", "sort", "reverse"}:
-            return
-        mark_dynamic(expr.func.value)
-
-    for node in ast.iter_child_nodes(tree):
-        node_lineno = getattr(node, "lineno", route_lineno + 1)
-        if node_lineno <= function_lineno or node_lineno >= route_lineno:
-            continue
-        if isinstance(node, ast.Expr):
-            mark_mutating_call(node.value)
-            continue
-        if isinstance(node, ast.AugAssign):
-            mark_dynamic(node.target)
-            continue
-        targets: list[ast.AST] = []
-        value: ast.AST | None = None
-        if isinstance(node, ast.Assign):
-            targets = list(node.targets)
-            value = node.value
-        elif isinstance(node, ast.AnnAssign):
-            targets = [node.target]
-            value = node.value
-        if value is None:
-            continue
-        for target in targets:
-            if isinstance(target, ast.Subscript):
-                mark_dynamic(target)
-                continue
-            if not isinstance(target, ast.Attribute) or target.attr not in {"methods", "required_methods"}:
-                continue
-            if not isinstance(target.value, ast.Name):
-                continue
-            if target.value.id != view_name:
-                continue
-            method_values = _literal_string_list(value)
-            if method_values:
-                attrs[target.attr] = tuple(sorted(method_values))
-            else:
-                attrs["dynamic"] = True
-    return attrs
-
-
 def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRecord]:
     """Discover bounded typed route registrations for PR-04 drift proof."""
 
@@ -1116,8 +1038,6 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                 methods_keyword_present = False
                 methodview_view = False
                 view_endpoint_default = ""
-                view_method_attr_name = ""
-                view_method_function_lineno = 0
                 local_view_proof: LocalViewBindingProof | None = None
                 for keyword in node.keywords:
                     if keyword.arg is None:
@@ -1150,8 +1070,6 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                                 local_view_proof = proof
                                 if proof.endpoint_name_stable:
                                     view_endpoint_default = view_desc
-                                view_method_attr_name = view_desc
-                                view_method_function_lineno = proof.function_lineno
                             elif isinstance(keyword.value, ast.Name) and keyword.value.id in function_defs and keyword.value.id not in aliases:
                                 status = BOUNDARY_ROUTE_AMBIGUOUS
                                 reason = reason or proof.reason or "unproven_add_url_rule_view_binding"
@@ -1193,8 +1111,6 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                             local_view_proof = proof
                             if proof.endpoint_name_stable:
                                 view_endpoint_default = view_desc
-                            view_method_attr_name = view_desc
-                            view_method_function_lineno = proof.function_lineno
                         elif isinstance(view_node, ast.Name) and view_node.id in function_defs and view_node.id not in aliases:
                             status = BOUNDARY_ROUTE_AMBIGUOUS
                             reason = reason or proof.reason or "unproven_add_url_rule_view_binding"
@@ -1204,21 +1120,10 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                 elif not endpoint and local_view_proof is not None and not local_view_proof.endpoint_name_stable and not methodview_view:
                     status = BOUNDARY_ROUTE_AMBIGUOUS
                     reason = reason or "dynamic_add_url_rule_endpoint_name"
-                if not methodview_view and view_method_attr_name:
-                    if local_view_proof is not None:
-                        attr_methods = local_view_proof.methods
-                        required_methods = local_view_proof.required_methods
-                        dynamic_methods = local_view_proof.dynamic_methods
-                    else:
-                        method_attrs = _view_method_attributes_for_binding(
-                            tree,
-                            view_method_attr_name,
-                            view_method_function_lineno,
-                            getattr(node, "lineno", 10**9),
-                        )
-                        attr_methods = tuple(method_attrs.get("methods") or ())
-                        required_methods = tuple(method_attrs.get("required_methods") or ())
-                        dynamic_methods = bool(method_attrs.get("dynamic"))
+                if not methodview_view and local_view_proof is not None:
+                    attr_methods = local_view_proof.methods
+                    required_methods = local_view_proof.required_methods
+                    dynamic_methods = local_view_proof.dynamic_methods
                     if dynamic_methods:
                         status = BOUNDARY_ROUTE_AMBIGUOUS
                         reason = reason or "dynamic_add_url_rule_view_methods"
@@ -1230,7 +1135,7 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                 if methodview_view and not methods and not methods_keyword_present:
                     status = BOUNDARY_ROUTE_AMBIGUOUS
                     reason = reason or "unproven_methodview_methods"
-                if not methods and not methods_keyword_present and not methodview_view and not view_method_attr_name:
+                if not methods and not methods_keyword_present and not methodview_view and local_view_proof is None:
                     status = BOUNDARY_ROUTE_AMBIGUOUS
                     reason = reason or "unproven_add_url_rule_methods"
                 if route_arg in {"", "<dynamic>"}:
