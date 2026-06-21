@@ -3668,6 +3668,14 @@ W004_ROUTE_SIGNATURE_CASES = [
         "expected_classification": "public",
     },
     {
+        "case_id": "route-decorator-inner-method-mutator-fails-closed",
+        "body": "from flask import Flask\napp = Flask(__name__)\ndef post_only(fn):\n    fn.methods = ['POST']\n    return fn\n@app.route('/x')\n@post_only\ndef x():\n    return b'ok'\n",
+        "expected_status": boundary_analyzer.BOUNDARY_ROUTE_AMBIGUOUS,
+        "expected_kind": "route_decorator",
+        "expected_reason": "unproven_route_decorator_method_defaults",
+        "expected_classification": boundary_analyzer.BOUNDARY_UNKNOWN,
+    },
+    {
         "case_id": "add-url-rule-omitted-endpoint-defaults-from-view",
         "body": "from flask import Flask\napp = Flask(__name__)\ndef view():\n    return b'ok'\napp.add_url_rule('/x', view_func=view, methods=['GET'])\n",
         "expected_status": boundary_analyzer.BOUNDARY_ROUTE_SUPPORTED,
@@ -3677,6 +3685,22 @@ W004_ROUTE_SIGNATURE_CASES = [
         "expected_view_identity": "view",
         "expected_methods": ("GET",),
         "expected_classification": "public",
+    },
+    {
+        "case_id": "add-url-rule-rebound-local-view-fails-closed",
+        "body": "from flask import Flask\napp = Flask(__name__)\ndef view():\n    return b'ok'\ndef other():\n    return b'other'\nview = other\napp.add_url_rule('/x', view_func=view, methods=['GET'])\n",
+        "expected_status": boundary_analyzer.BOUNDARY_ROUTE_AMBIGUOUS,
+        "expected_kind": "add_url_rule",
+        "expected_reason": "unproven_add_url_rule_view_binding",
+        "expected_classification": boundary_analyzer.BOUNDARY_UNKNOWN,
+    },
+    {
+        "case_id": "add-url-rule-rebound-local-view-with-explicit-endpoint-fails-closed",
+        "body": "from flask import Flask\napp = Flask(__name__)\ndef view():\n    return b'ok'\ndef other():\n    return b'other'\nview = other\napp.add_url_rule('/x', 'x', view, methods=['GET'])\n",
+        "expected_status": boundary_analyzer.BOUNDARY_ROUTE_AMBIGUOUS,
+        "expected_kind": "add_url_rule",
+        "expected_reason": "unproven_add_url_rule_view_binding",
+        "expected_classification": boundary_analyzer.BOUNDARY_UNKNOWN,
     },
     {
         "case_id": "add-url-rule-imported-alias-omitted-endpoint-fails-closed",
@@ -3747,6 +3771,14 @@ W004_ROUTE_SIGNATURE_CASES = [
         "expected_classification": "public",
     },
     {
+        "case_id": "add-url-rule-mutated-view-methods-fails-closed",
+        "body": "from flask import Flask\napp = Flask(__name__)\ndef view():\n    return b'ok'\nview.methods = ['GET']\nview.methods.append('POST')\napp.add_url_rule('/x', 'x', view)\n",
+        "expected_status": boundary_analyzer.BOUNDARY_ROUTE_AMBIGUOUS,
+        "expected_kind": "add_url_rule",
+        "expected_reason": "dynamic_add_url_rule_view_methods",
+        "expected_classification": boundary_analyzer.BOUNDARY_UNKNOWN,
+    },
+    {
         "case_id": "add-url-rule-late-view-methods-do-not-retroactively-override",
         "body": "from flask import Flask\napp = Flask(__name__)\ndef view():\n    return b'ok'\napp.add_url_rule('/x', 'x', view)\nview.methods = ['POST']\n",
         "expected_status": boundary_analyzer.BOUNDARY_ROUTE_SUPPORTED,
@@ -3778,6 +3810,14 @@ W004_ROUTE_SIGNATURE_CASES = [
         "expected_view_identity": "view",
         "expected_methods": ("GET", "OPTIONS"),
         "expected_classification": "public",
+    },
+    {
+        "case_id": "add-url-rule-mutated-required-methods-fails-closed",
+        "body": "from flask import Flask\napp = Flask(__name__)\ndef view():\n    return b'ok'\nview.required_methods = {'OPTIONS'}\nview.required_methods.add('PATCH')\napp.add_url_rule('/x', 'x', view, methods=['POST'])\n",
+        "expected_status": boundary_analyzer.BOUNDARY_ROUTE_AMBIGUOUS,
+        "expected_kind": "add_url_rule",
+        "expected_reason": "dynamic_add_url_rule_view_methods",
+        "expected_classification": boundary_analyzer.BOUNDARY_UNKNOWN,
     },
     {
         "case_id": "add-url-rule-dynamic-view-required-methods-fails-closed",

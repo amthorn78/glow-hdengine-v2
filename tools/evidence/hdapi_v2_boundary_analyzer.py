@@ -417,6 +417,65 @@ def _expr_is_local_function_name(node: ast.AST, function_defs: dict[str, ast.Fun
     return isinstance(node, ast.Name) and node.id in function_defs and node.id not in aliases
 
 
+def _target_binds_name(target: ast.AST, name: str) -> bool:
+    if isinstance(target, ast.Name):
+        return target.id == name
+    if isinstance(target, (ast.Tuple, ast.List)):
+        return any(_target_binds_name(item, name) for item in target.elts)
+    return False
+
+
+def _import_binds_name(node: ast.AST, name: str) -> bool:
+    if isinstance(node, ast.Import):
+        return any((alias.asname or alias.name.split(".", 1)[0]) == name for alias in node.names)
+    if isinstance(node, ast.ImportFrom):
+        return any((alias.asname or alias.name) == name for alias in node.names)
+    return False
+
+
+def _expr_is_stable_local_function_name(
+    node: ast.AST,
+    tree: ast.AST,
+    route_lineno: int,
+    function_defs: dict[str, ast.FunctionDef | ast.AsyncFunctionDef],
+    aliases: dict[str, str],
+) -> bool:
+    """Return true only when a view name is still bound to its local FunctionDef.
+
+    Flask derives a default add_url_rule endpoint from ``view_func.__name__``.
+    For static evidence we can safely infer that only for top-level local
+    function names that are not imports/aliases and have not been rebound before
+    the route registration.  Everything else must fail closed rather than
+    emulating Python name binding.
+    """
+
+    if not _expr_is_local_function_name(node, function_defs, aliases):
+        return False
+    assert isinstance(node, ast.Name)
+    name = node.id
+    function_def = function_defs.get(name)
+    if function_def is None or "." in name:
+        return False
+    function_lineno = getattr(function_def, "lineno", 0)
+    if not function_lineno or function_lineno >= route_lineno:
+        return False
+    for stmt in ast.iter_child_nodes(tree):
+        stmt_lineno = getattr(stmt, "lineno", route_lineno + 1)
+        if stmt_lineno >= route_lineno or stmt_lineno <= function_lineno:
+            continue
+        if isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef)) and stmt.name == name:
+            continue
+        if _import_binds_name(stmt, name):
+            return False
+        if isinstance(stmt, ast.Assign) and any(_target_binds_name(target, name) for target in stmt.targets):
+            return False
+        if isinstance(stmt, ast.AnnAssign) and _target_binds_name(stmt.target, name):
+            return False
+        if isinstance(stmt, ast.AugAssign) and _target_binds_name(stmt.target, name):
+            return False
+    return True
+
+
 def _routing_keywords(call: ast.Call, *, exclude: set[str] | None = None) -> tuple[tuple[str, str], ...]:
     excluded = exclude or set()
     values: list[tuple[str, str]] = []
@@ -719,8 +778,29 @@ def _methodview_class_from_as_view(call: ast.Call) -> str:
 
 def _view_method_attributes_before(tree: ast.AST, route_lineno: int) -> dict[str, dict[str, tuple[str, ...] | bool]]:
     attrs: dict[str, dict[str, tuple[str, ...] | bool]] = {}
+
+    def mark_dynamic(target: ast.AST) -> None:
+        if isinstance(target, ast.Attribute) and target.attr in {"methods", "required_methods"} and isinstance(target.value, ast.Name):
+            row = attrs.setdefault(target.value.id, {"methods": (), "required_methods": (), "dynamic": False})
+            row["dynamic"] = True
+        elif isinstance(target, ast.Subscript):
+            mark_dynamic(target.value)
+
+    def mark_mutating_call(expr: ast.AST) -> None:
+        if not isinstance(expr, ast.Call) or not isinstance(expr.func, ast.Attribute):
+            return
+        if expr.func.attr not in {"append", "extend", "insert", "add", "update", "remove", "discard", "clear", "pop", "sort", "reverse"}:
+            return
+        mark_dynamic(expr.func.value)
+
     for node in ast.iter_child_nodes(tree):
         if getattr(node, "lineno", route_lineno + 1) >= route_lineno:
+            continue
+        if isinstance(node, ast.Expr):
+            mark_mutating_call(node.value)
+            continue
+        if isinstance(node, ast.AugAssign):
+            mark_dynamic(node.target)
             continue
         targets: list[ast.AST] = []
         value: ast.AST | None = None
@@ -733,6 +813,9 @@ def _view_method_attributes_before(tree: ast.AST, route_lineno: int) -> dict[str
         if value is None:
             continue
         for target in targets:
+            if isinstance(target, ast.Subscript):
+                mark_dynamic(target)
+                continue
             if not isinstance(target, ast.Attribute) or target.attr not in {"methods", "required_methods"}:
                 continue
             if not isinstance(target.value, ast.Name):
@@ -776,7 +859,7 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
         records.extend(_blueprint_constructor_records(rel, tree))
         for node in ast.walk(tree):
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
-                for deco in node.decorator_list:
+                for deco_index, deco in enumerate(node.decorator_list):
                     deco_call = deco.func if isinstance(deco, ast.Call) else deco
                     deco_name = _attribute_chain(deco_call)
                     suffix = next((item for item in decorator_suffix_to_kind if deco_name.endswith(item)), "")
@@ -804,7 +887,11 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                         reason = "dynamic_route_argument"
                     methods = _methods_tuple(deco_name, deco)
                     if suffix == ".route" and not methods and not _decorator_methods_are_dynamic(deco_name, deco):
-                        methods = ("GET",)
+                        if node.decorator_list[deco_index + 1:]:
+                            status = BOUNDARY_ROUTE_AMBIGUOUS
+                            reason = reason or "unproven_route_decorator_method_defaults"
+                        else:
+                            methods = ("GET",)
                     if _decorator_methods_are_dynamic(deco_name, deco):
                         status = BOUNDARY_ROUTE_AMBIGUOUS
                         reason = reason or "dynamic_route_methods"
@@ -907,9 +994,12 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                             reason = reason or "dynamic_add_url_rule_view_factory"
                         else:
                             view_desc = _attribute_chain(keyword.value)
-                            if _expr_is_local_function_name(keyword.value, function_defs, aliases):
+                            if _expr_is_stable_local_function_name(keyword.value, tree, getattr(node, "lineno", 10**9), function_defs, aliases):
                                 view_endpoint_default = view_desc
                                 view_method_attr_name = view_desc
+                            elif isinstance(keyword.value, ast.Name) and keyword.value.id in function_defs and keyword.value.id not in aliases:
+                                status = BOUNDARY_ROUTE_AMBIGUOUS
+                                reason = reason or "unproven_add_url_rule_view_binding"
                             imported_view_target = aliases.get(view_desc, "")
                     elif keyword.arg == "endpoint":
                         endpoint = _literal_value_for_signature(keyword.value)
@@ -938,9 +1028,12 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                         reason = reason or "dynamic_add_url_rule_view_factory"
                     else:
                         view_desc = _attribute_chain(view_node)
-                        if _expr_is_local_function_name(view_node, function_defs, aliases):
+                        if _expr_is_stable_local_function_name(view_node, tree, getattr(node, "lineno", 10**9), function_defs, aliases):
                             view_endpoint_default = view_desc
                             view_method_attr_name = view_desc
+                        elif isinstance(view_node, ast.Name) and view_node.id in function_defs and view_node.id not in aliases:
+                            status = BOUNDARY_ROUTE_AMBIGUOUS
+                            reason = reason or "unproven_add_url_rule_view_binding"
                         imported_view_target = aliases.get(view_desc, "")
                 if not endpoint and view_endpoint_default and not methodview_view:
                     endpoint = view_endpoint_default
