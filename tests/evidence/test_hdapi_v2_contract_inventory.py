@@ -4366,6 +4366,65 @@ def test_epic034_w004_supported_routes_require_final_proof_gate() -> None:
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
 
 
+def test_epic034_w004_public_route_reconciliation_fails_with_extra_ambiguous_route() -> None:
+    import shutil
+
+    source_selection, request_shaping, response_mapping = _epic034_boundary_inputs()
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+SAFE_MODE='1'
+@app.route('/good')
+def good():
+    return emit_public({'ok': True})
+dynamic_path = '/ambiguous'
+def ambiguous():
+    return emit_public({'ok': True})
+app.add_url_rule(dynamic_path, endpoint='ambiguous', view_func=ambiguous, methods=['GET'])
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "matched_public_plus_ambiguous.py", body)
+        route_records = boundary_analyzer.discover_route_registrations((adapter,))
+        baseline = tuple(
+            record
+            for record in route_records
+            if record.parser_status == boundary_analyzer.BOUNDARY_ROUTE_SUPPORTED
+            and record.public_internal_classification == "public"
+            and record.route_path == "/good"
+        )
+
+        result = boundary_analyzer.analyze_adapter_boundary(
+            source_selection=source_selection,
+            request_shaping=request_shaping,
+            response_mapping=response_mapping,
+            adapter_loci=(adapter,),
+            canonical_adapter_loci=(adapter,),
+            presenter_loci=generator.ADAPTER_BOUNDARY_PRESENTER_LOCI,
+            vendor_seam_loci=generator.ADAPTER_BOUNDARY_VENDOR_SEAM_LOCI,
+            pure_compute_loci=generator.ADAPTER_BOUNDARY_PURE_COMPUTE_LOCI,
+            public_route_baseline=baseline,
+            evidence_tool_loci=("tools/evidence/generate_hdapi_v2_contract_inventory.py", "tools/evidence/hdapi_v2_boundary_analyzer.py"),
+        )
+
+        public_routes = _finding_by_category(result, "public_routes")
+        assert result["typed_public_route_signatures"] == result["route_baseline_signatures"]
+        assert result["route_baseline_reconciled"] is False
+        assert public_routes["classification"] == boundary_analyzer.BOUNDARY_UNKNOWN
+        assert public_routes["verdict"] == "UNKNOWN"
+        assert result["verdict_status"] != "PASS"
+        assert result["unsupported_or_ambiguous_route_records"]
+        assert public_routes["details"] == [
+            boundary_analyzer.route_signature_from_record(record)
+            for record in route_records
+            if record.parser_status != boundary_analyzer.BOUNDARY_ROUTE_SUPPORTED
+            or record.public_internal_classification == boundary_analyzer.BOUNDARY_UNKNOWN
+        ]
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
 def test_epic034_w004_dynamic_route_fails_closed_before_supported_signature() -> None:
     import shutil
 

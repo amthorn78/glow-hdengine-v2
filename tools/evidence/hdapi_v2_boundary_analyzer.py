@@ -1069,6 +1069,14 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
     """Discover bounded typed route registrations for PR-04 drift proof."""
 
     records: list[RouteRegistrationCandidate] = []
+    global_blueprint_prefixes: dict[str, str] = {}
+    global_blueprint_mount_prefixes: dict[str, tuple[str, ...]] = {}
+    for rel in loci:
+        _path, _text, tree = _python_source(rel)
+        global_blueprint_prefixes.update(_blueprint_prefixes(tree))
+        for name, values in _blueprint_registration_prefixes(tree).items():
+            merged_values = global_blueprint_mount_prefixes.get(name, ()) + values
+            global_blueprint_mount_prefixes[name] = tuple(dict.fromkeys(merged_values))
     decorator_suffix_to_kind = {
         ".route": "route_decorator",
         ".get": "route_decorator",
@@ -1088,8 +1096,10 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
         aliases = _import_aliases(tree)
         owners = _owner_types(tree)
         route_aliases = _route_aliases(tree)
-        blueprint_prefixes = _blueprint_prefixes(tree)
-        blueprint_mount_prefixes = _blueprint_registration_prefixes(tree)
+        local_blueprint_prefixes = _blueprint_prefixes(tree)
+        local_blueprint_mount_prefixes = _blueprint_registration_prefixes(tree)
+        blueprint_prefixes = {**global_blueprint_prefixes, **local_blueprint_prefixes}
+        blueprint_mount_prefixes = {**global_blueprint_mount_prefixes, **local_blueprint_mount_prefixes}
         methodview_methods = _methodview_http_methods(tree, aliases)
         function_defs = _iter_function_defs(tree)
         records.extend(_blueprint_constructor_records(rel, tree))
@@ -2840,6 +2850,26 @@ def _normalize_route_baseline(public_route_baseline: tuple[Any, ...]) -> tuple[R
     return tuple(records)
 
 
+def _route_baseline_is_reconciled(
+    discovered_supported_public: list[str],
+    baseline_supported_public: list[str],
+    drift: list[str],
+    unknown_records: list[RouteSignatureRecord],
+    baseline_unknown_records: list[RouteSignatureRecord],
+    *,
+    route_surface_out_of_scope: bool = False,
+) -> bool:
+    if route_surface_out_of_scope:
+        return False
+    return (
+        bool(discovered_supported_public)
+        and bool(baseline_supported_public)
+        and not drift
+        and not unknown_records
+        and not baseline_unknown_records
+    )
+
+
 def analyze_adapter_boundary(
     *,
     source_selection: dict[str, Any],
@@ -2905,8 +2935,15 @@ def analyze_adapter_boundary(
     route_unknown_records = [record for record in route_records if record.parser_status != BOUNDARY_ROUTE_SUPPORTED or record.public_internal_classification == BOUNDARY_UNKNOWN]
     baseline_unknown_records = [record for record in baseline_route_records if record.parser_status != BOUNDARY_ROUTE_SUPPORTED or record.public_internal_classification == BOUNDARY_UNKNOWN]
     public_reader_route_drift = sorted(set(discovered_public_record_signatures) ^ set(baseline_public_record_signatures))
-    route_baseline_reconciled = bool(discovered_public_record_signatures) and bool(baseline_public_record_signatures) and not public_reader_route_drift
     route_baseline_out_of_scope = not route_records and adapter_loci != canonical_adapter_loci
+    route_baseline_reconciled = _route_baseline_is_reconciled(
+        discovered_public_record_signatures,
+        baseline_public_record_signatures,
+        public_reader_route_drift,
+        route_unknown_records,
+        baseline_unknown_records,
+        route_surface_out_of_scope=route_baseline_out_of_scope,
+    )
     pure_external_io = _pure_compute_external_io(pure_compute_loci)
     second_http_home = sorted(module for module in vendor_modules if _is_http_home_module(module))
     adapter_bypass = _adapter_external_io_calls(adapter_loci)
@@ -2919,7 +2956,7 @@ def analyze_adapter_boundary(
 
     findings = [
         boundary_finding("adapter_route_registration", BOUNDARY_ALLOWED if adapter_http_modules and (route_records or route_baseline_out_of_scope) else BOUNDARY_UNKNOWN, "PASS" if adapter_http_modules and (route_records or route_baseline_out_of_scope) else "UNKNOWN", [row["path"] for row in adapter_rows], "discovered Flask adapter registrations before classification; typed route records active" if adapter_http_modules and (route_records or route_baseline_out_of_scope) else "no current adapter route registrations were discoverable", [route_signature_from_record(record) for record in route_records]),
-        boundary_finding("public_routes", BOUNDARY_ALLOWED if route_baseline_reconciled else (BOUNDARY_OUT_OF_SCOPE if route_baseline_out_of_scope else BOUNDARY_UNKNOWN), "PASS" if route_baseline_reconciled or route_baseline_out_of_scope else "UNKNOWN", [row["path"] for row in adapter_rows], "typed discovered route records reconcile with governed PR-04 baseline field-by-field" if route_baseline_reconciled else ("no public route signatures discovered in noncanonical test locus; route surface is out of scope" if route_baseline_out_of_scope else "typed route records cannot be reconciled with structured baseline; route drift fails closed"), public_reader_route_drift or [route_signature_from_record(record) for record in route_unknown_records + baseline_unknown_records] or discovered_public_record_signatures),
+        boundary_finding("public_routes", BOUNDARY_ALLOWED if route_baseline_reconciled else (BOUNDARY_OUT_OF_SCOPE if route_baseline_out_of_scope else BOUNDARY_UNKNOWN), "PASS" if route_baseline_reconciled or route_baseline_out_of_scope else "UNKNOWN", [row["path"] for row in adapter_rows], "typed discovered route records reconcile with governed PR-04 baseline field-by-field" if route_baseline_reconciled else ("no public route signatures discovered in noncanonical test locus; route surface is out of scope" if route_baseline_out_of_scope else "typed route records cannot be reconciled with structured baseline; route drift fails closed"), [route_signature_from_record(record) for record in route_unknown_records + baseline_unknown_records] or public_reader_route_drift or discovered_public_record_signatures),
         boundary_finding("response_producing_paths", BOUNDARY_ALLOWED if adapter_presenter_calls and not presenter_bypass and not unresolved_presenter_routes else (BOUNDARY_FORBIDDEN if presenter_bypass else BOUNDARY_UNKNOWN), "PASS" if adapter_presenter_calls and not presenter_bypass and not unresolved_presenter_routes else ("FAIL" if presenter_bypass else "UNKNOWN"), [row["path"] for row in adapter_rows], "public response-producing paths have explicit presenter/emitter provenance" if adapter_presenter_calls and not presenter_bypass and not unresolved_presenter_routes else "response-producing path provenance is unresolved or bypasses presenter", presenter_bypass + unresolved_presenter_routes or adapter_presenter_calls),
         boundary_finding("presenter_provenance", BOUNDARY_ALLOWED if adapter_presenter_calls and not presenter_bypass and not unresolved_presenter_routes else (BOUNDARY_FORBIDDEN if presenter_bypass else BOUNDARY_UNKNOWN), "PASS" if adapter_presenter_calls and not presenter_bypass and not unresolved_presenter_routes else ("FAIL" if presenter_bypass else "UNKNOWN"), [row["path"] for row in presenter_rows], "adapter routes resolve to sanctioned presenter/emitter calls" if adapter_presenter_calls and not presenter_bypass and not unresolved_presenter_routes else "presenter provenance is not proven for every response path", presenter_bypass + unresolved_presenter_routes or adapter_presenter_calls),
         boundary_finding("serializer_paths", BOUNDARY_ALLOWED if not ad_hoc_serializers else BOUNDARY_FORBIDDEN, "PASS" if not ad_hoc_serializers else "FAIL", [row["path"] for row in adapter_rows + vendor_rows + presenter_rows], "no ad-hoc JSON serializer path discovered outside allowed vendor helpers" if not ad_hoc_serializers else "ad-hoc serializer path discovered on governed/public boundary", ad_hoc_serializers),
