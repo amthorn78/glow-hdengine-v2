@@ -1,5 +1,5 @@
 path: audit/qa/hde-epic034/pr-04/w-005_final_validation_report.md
-size_bytes: 9268
-sha256: cf03170c0a1df35d783b2fda53f1312742aa5601d38dd98a830a0d283ec9702b
-mtime_utc: 2026-06-22T21:30:18Z
-produced_at_utc: 2026-06-22T21:30:18Z
+size_bytes: 5939
+sha256: 86166bf8b06c30c803846d15031882334d4309982cd9b384f27a083679ea342d
+mtime_utc: 2026-06-22T22:17:11Z
+produced_at_utc: 2026-06-22T22:16:17Z

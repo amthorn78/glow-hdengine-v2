@@ -1,5 +1,5 @@
 path: artifacts/vendor/hdapi_v2/v1_legacy_guard.log
 size_bytes: 590
-sha256: 60a6153f700280fe8ba82dfbf1fc2deeea5d2cc7ae44476fe597375d6ed577e6
-mtime_utc: 2026-06-22T08:26:01Z
-produced_at_utc: 2026-06-22T08:25:59Z
+sha256: 640bbff0c1c73cfb47608374028ab9c54414d08e47624d41a976047320e9c207
+mtime_utc: 2026-06-22T22:17:20Z
+produced_at_utc: 2026-06-22T22:17:18Z

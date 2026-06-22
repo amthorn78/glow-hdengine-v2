@@ -5,74 +5,22 @@
 - pf09_document=PF09.5 — HDE Build Checklist Fermentation
 - pf09_task_id=HDE-FERM007
 - pf09_subtask_id=HDE-FERM007.4
-- generated_at_utc=2026-06-22T21:30:18Z
-- branch_commit=c405659 Accept W-004 route-proof remediation
+- generated_at_utc=2026-06-22T22:16:17Z
+- validation_base_commit=9fe8762 Fix W-005 proof timestamps: use artifact `generated_at_utc` for EPIC034 PR-04 entries
+- evidence_generation_status_snapshot=clean before W-005 evidence regeneration
+- final_pr_status_summary=final branch-head commit and clean `git status --short` proof are recorded in the PR summary after this regenerated evidence is committed
 - rails=SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC
 
-## Git status snapshot
+## Git status posture
+
+The prior W-005 evidence incorrectly embedded a dirty generated-evidence snapshot as `git_status_short` and identified only the W-004 baseline commit. This regenerated W-005 evidence replaces that stale identity with `validation_base_commit` and an explicit status posture:
 
 ```text
-M artifacts/epic020/bundles/EVIDENCE_INDEX_MIRROR_OK.bundle.json
- M artifacts/epic020/bundles/EVIDENCE_INDEX_MIRROR_OK.bundle.json.path_proof.txt
- M artifacts/epic020/bundles/EVIDENCE_INDEX_MIRROR_OK.manifest.json
- M artifacts/epic020/bundles/EVIDENCE_INDEX_MIRROR_OK.manifest.json.path_proof.txt
- M artifacts/epic020/bundles/EVIDENCE_INDEX_UPDATED_OK.bundle.json
- M artifacts/epic020/bundles/EVIDENCE_INDEX_UPDATED_OK.bundle.json.path_proof.txt
- M artifacts/epic020/bundles/EVIDENCE_INDEX_UPDATED_OK.manifest.json
- M artifacts/epic020/bundles/EVIDENCE_INDEX_UPDATED_OK.manifest.json.path_proof.txt
- M artifacts/epic020/bundles/EVIDENCE_PATHS_VALIDATED_OK.bundle.json
- M artifacts/epic020/bundles/EVIDENCE_PATHS_VALIDATED_OK.bundle.json.path_proof.txt
- M artifacts/epic020/bundles/EVIDENCE_PATHS_VALIDATED_OK.manifest.json
- M artifacts/epic020/bundles/EVIDENCE_PATHS_VALIDATED_OK.manifest.json.path_proof.txt
- M artifacts/evidence_index.jsonl
- M artifacts/evidence_index.jsonl.path_proof.txt
- M artifacts/evidence_index.jsonl.sha256
- M artifacts/evidence_index.jsonl.sha256.path_proof.txt
- M artifacts/narratives/router/cli_http_parity.log.path_proof.txt
- M artifacts/narratives/router/parity_abba.log.path_proof.txt
- M artifacts/writer/conjunction_write_readback.log.path_proof.txt
- M artifacts/writer/conjunction_writer_summary.json.path_proof.txt
- M audit/docdeltas/hde-epic032_doc_deltas.md.path_proof.txt
- M audit/docdeltas/hde-epic033_doc_deltas.md.path_proof.txt
- M audit/docdeltas/hde-epic034_doc_deltas.md.path_proof.txt
- M audit/gates/canonical_json/canonical_json.gate.json
- M audit/gates/canonical_json/canonical_json.gate.json.path_proof.txt
- M audit/gates/canonical_json/json_canon_compare.log
- M audit/gates/canonical_json/json_canon_compare.log.path_proof.txt
- M audit/gates/canonical_json/json_canonical_check.log
- M audit/gates/canonical_json/json_canonical_check.log.path_proof.txt
- M audit/gates/json_gate/canonical/json_gate_check_log.ndjson
- M audit/gates/json_gate/canonical/json_gate_check_log.ndjson.path_proof.txt
- M audit/gates/json_gate/canonical/json_gate_compare_log.ndjson
- M audit/gates/json_gate/canonical/json_gate_compare_log.ndjson.path_proof.txt
- M audit/gates/json_gate/canonical/json_gate_structured_record.json
- M audit/gates/json_gate/canonical/json_gate_structured_record.json.path_proof.txt
- M audit/gates/narratives/keys_10x4.table.json.path_proof.txt
- M audit/gates/narratives/pack_identity.txt.path_proof.txt
- M audit/gates/narratives/registry.diff.json.path_proof.txt
- M audit/gates/topology/orientation_demo.txt
- M audit/gates/topology/orientation_demo.txt.path_proof.txt
- M audit/qa/hde-epic030/pr-03/category_order_binding.log.path_proof.txt
- M audit/qa/hde-epic030/pr-03/compat_identity_binding.log.path_proof.txt
- M audit/qa/hde-epic030/pr-03/compat_parity_binding.log.path_proof.txt
- M audit/qa/hde-epic030/pr-04/band_edges_binding.log.path_proof.txt
- M audit/qa/hde-epic030/pr-04/band_thresholds_diff.json.path_proof.txt
- M audit/qa/hde-epic030/pr-04/band_thresholds_identity_hash.txt.path_proof.txt
- M audit/qa/hde-epic030/pr-05/category_canonical_compare.log.path_proof.txt
- M audit/qa/hde-epic030/pr-05/category_framework_binding.log.path_proof.txt
- M audit/qa/hde-epic030/pr-05/per_channel_mechanics.json.path_proof.txt
- M audit/qa/hde-epic034/00_meta/doc_deltas.md.path_proof.txt
- M audit/qa/hde-epic034/pr-04/W-004_complete_final.patch
- M docs/evidence/INDEX.json
- M docs/evidence/INDEX.json.path_proof.txt
- M docs/evidence/INDEX.sha256
- M docs/evidence/INDEX.sha256.path_proof.txt
- M tools/evidence/update_evidence_index.py
-?? audit/qa/hde-epic034/pr-04/w-005_final_validation.log
-?? audit/qa/hde-epic034/pr-04/w-005_final_validation.log.path_proof.txt
-?? audit/qa/hde-epic034/pr-04/w-005_final_validation_report.md
-?? audit/qa/hde-epic034/pr-04/w-005_final_validation_report.md.path_proof.txt
+evidence_generation_status_snapshot=clean before W-005 evidence regeneration
+final_pr_status_summary=final branch-head commit and clean git status are recorded in the PR summary after committing this regenerated evidence
 ```
+
+This avoids presenting an unavoidable pre-commit evidence-generation worktree as the final clean branch state. The final branch-head proof is intentionally outside this committed evidence file and is recorded in the PR summary after commit.
 
 ## Prerequisite confirmation
 
@@ -83,21 +31,16 @@ M artifacts/epic020/bundles/EVIDENCE_INDEX_MIRROR_OK.bundle.json
 
 ## Validation commands run
 
-- PASS: `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python -m pip install -r requirements-dev.txt`
-- PASS: pytest 8.4.2: `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python -m pytest --version`
-- PASS: 173 passed, 122 deselected: `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python -m pytest tests/evidence/test_hdapi_v2_contract_inventory.py -k "w004 or adapter_boundary or route_signature" -q`
-- PASS: `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/generate_hdapi_v2_contract_inventory.py`
 - PASS: `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/update_evidence_index.py`
-- PASS: `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/orientation_demo.py`
 - PASS: `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/update_evidence_index.py --check`
-- PASS: `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/orientation_demo.py --check`
 - PASS: `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/validate_evidence_paths.py`
-- PASS: `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC ci/checks/check_mirror_schema.sh`
 - PASS: `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC ci/checks/check_evidence_index_hash.sh`
+- PASS: `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC ci/checks/check_mirror_schema.sh`
 - PASS: `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/check_lf_endings.py`
-- PASS: `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/run_canonical_json_gate.py`
+- PASS: 173 passed, 122 deselected: `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python -m pytest tests/evidence/test_hdapi_v2_contract_inventory.py -k "w004 or adapter_boundary or route_signature" -q`
 - PASS: 341 passed: `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python -m pytest tests/evidence -q`
-- PASS: `git apply --reverse --check audit/qa/hde-epic034/pr-04/W-004_complete_final.patch`
+- PASS: `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/generate_hdapi_v2_contract_inventory.py`
+- PASS: `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/run_canonical_json_gate.py`
 - PASS: `git diff --check`
 
 ## PR-04 proof artifacts inspected
@@ -106,7 +49,6 @@ M artifacts/epic020/bundles/EVIDENCE_INDEX_MIRROR_OK.bundle.json
 - `artifacts/vendor/hdapi_v2/adapter_boundary_proof.log.path_proof.txt`
 - `audit/qa/hde-epic034/pr-04/boundary_check.log`
 - `audit/qa/hde-epic034/pr-04/boundary_check.log.path_proof.txt`
-- `audit/qa/hde-epic034/pr-04/W-004_complete_final.patch`
 - `audit/qa/hde-epic034/pr-04/W-004_final_artifact_report.md`
 
 ## Governed evidence ledgers inspected
@@ -157,7 +99,7 @@ M artifacts/epic020/bundles/EVIDENCE_INDEX_MIRROR_OK.bundle.json
 
 ## Status-support statement
 
-PASS: current repo evidence supports a later PF09.5 status action for HDE-FERM007.4: change to Done. This PR does not edit PF09.5 and does not claim epic closure.
+PASS: current repo evidence supports a later PF09.5 status action for HDE-FERM007.4: change to Done, after final branch-head proof is recorded in the PR summary. This PR does not edit PF09.5 and does not claim epic closure.
 
 ## Explicit no-claim list
 
