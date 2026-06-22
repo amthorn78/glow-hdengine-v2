@@ -918,21 +918,36 @@ EPIC034_PR04_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
 ]
 
 
+def _read_generated_at_utc(path: Path) -> str | None:
+    if not path.exists():
+        return None
+    for line in path.read_text(encoding="utf-8").splitlines():
+        stripped = line.strip()
+        if stripped.startswith("- generated_at_utc="):
+            return stripped.split("=", 1)[1]
+        if stripped.startswith("generated_at_utc="):
+            return stripped.split("=", 1)[1]
+    return None
+
+
 def _load_epic034_pr04_entries() -> list[dict[str, object]]:
     proof = ROOT / "artifacts/vendor/hdapi_v2/adapter_boundary_proof.log"
     check_log = ROOT / "audit/qa/hde-epic034/pr-04/boundary_check.log"
     if not proof.exists() or not check_log.exists():
         return []
-    produced_at = None
-    for line in proof.read_text(encoding="utf-8").splitlines():
-        if line.startswith("generated_at_utc="):
-            produced_at = line.split("=", 1)[1]
-            break
+    boundary_produced_at = _read_generated_at_utc(proof)
     entries: list[dict[str, object]] = []
     for entry in EPIC034_PR04_PRIMARY_ARTIFACTS:
         normalized = dict(entry)
-        if produced_at is not None and normalized.get("record_type") != "epic034_pr04_doc_delta":
-            normalized["produced_at_utc"] = produced_at
+        if normalized.get("record_type") == "epic034_pr04_doc_delta":
+            entries.append(normalized)
+            continue
+        artifact_path = ROOT / str(normalized["discovered_physical_path"])
+        artifact_produced_at = _read_generated_at_utc(artifact_path)
+        if artifact_produced_at is not None:
+            normalized["produced_at_utc"] = artifact_produced_at
+        elif boundary_produced_at is not None:
+            normalized["produced_at_utc"] = boundary_produced_at
         entries.append(normalized)
     return entries
 
