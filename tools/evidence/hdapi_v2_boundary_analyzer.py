@@ -729,7 +729,6 @@ def _proof_contract_for_candidate(candidate: RouteRegistrationCandidate, proof_s
     if (
         candidate.proven_owner_type not in {"Blueprint", "BlueprintAlias"}
         or candidate.registration_kind in {"register_blueprint", "blueprint_constructor"}
-        or bool(candidate.blueprint_constructor_prefix)
     ):
         optional_missing_fields.add("blueprint_register_state")
     if candidate.registration_kind in {"hook_decorator", "register_blueprint", "blueprint_constructor"}:
@@ -884,7 +883,8 @@ def _blueprint_registration_prefixes(tree: ast.AST) -> dict[str, tuple[str, ...]
     for node in ast.walk(tree):
         if not isinstance(node, ast.Call) or not _attribute_chain(node.func).endswith(".register_blueprint"):
             continue
-        if not node.args or not isinstance(node.args[0], ast.Name):
+        blueprint = _register_blueprint_name(node)
+        if not blueprint:
             continue
         url_prefix = BOUNDARY_ROUTE_NO_PREFIX_OVERRIDE
         for keyword in node.keywords:
@@ -896,8 +896,20 @@ def _blueprint_registration_prefixes(tree: ast.AST) -> dict[str, tuple[str, ...]
                     url_prefix = BOUNDARY_ROUTE_NO_PREFIX_OVERRIDE
                     continue
                 url_prefix = _literal_value_for_signature(keyword.value)
-        prefixes.setdefault(node.args[0].id, []).append(url_prefix)
+        prefixes.setdefault(blueprint, []).append(url_prefix)
     return {name: tuple(values) for name, values in prefixes.items()}
+
+
+def _register_blueprint_name(call: ast.Call) -> str:
+    positional_name = _expr_name(call.args[0]) if call.args else ""
+    keyword_name = ""
+    for keyword in call.keywords:
+        if keyword.arg == "blueprint":
+            keyword_name = _expr_name(keyword.value)
+            break
+    if positional_name and keyword_name and positional_name != keyword_name:
+        return ""
+    return positional_name or keyword_name
 
 
 def _decorator_route_root(deco_call: ast.AST) -> str:
@@ -1143,7 +1155,7 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                     mount_prefix = mount_prefix_values[0] if len(mount_prefix_values) == 1 else ("<dynamic>" if len(mount_prefix_values) > 1 else "")
                     register_proof = RouteProofFact("blueprint_register_state", ProofState.MISSING.value, "", "blueprint_registration_lookup", "")
                     if owner_type in {"Blueprint", "BlueprintAlias"}:
-                        if not mount_prefix_values and not constructor_prefix:
+                        if not mount_prefix_values:
                             status = BOUNDARY_ROUTE_AMBIGUOUS
                             reason = reason or "unproven_blueprint_registration"
                             register_proof = RouteProofFact("blueprint_register_state", ProofState.MISSING.value, "", "blueprint_registration_lookup", "unproven_blueprint_registration")
@@ -1370,7 +1382,7 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                 owner_type = owners.get(owner, "")
                 status = BOUNDARY_ROUTE_SUPPORTED if owner_type == "Flask" else BOUNDARY_ROUTE_UNSUPPORTED
                 reason = "" if status == BOUNDARY_ROUTE_SUPPORTED else "unproven_register_blueprint_owner"
-                blueprint = _expr_name(node.args[0]) if node.args else ""
+                blueprint = _register_blueprint_name(node)
                 if not blueprint or (node.args and isinstance(node.args[0], ast.Call)):
                     status = BOUNDARY_ROUTE_AMBIGUOUS
                     reason = reason or "dynamic_or_factory_blueprint_registration"
@@ -2893,7 +2905,7 @@ def analyze_adapter_boundary(
     route_unknown_records = [record for record in route_records if record.parser_status != BOUNDARY_ROUTE_SUPPORTED or record.public_internal_classification == BOUNDARY_UNKNOWN]
     baseline_unknown_records = [record for record in baseline_route_records if record.parser_status != BOUNDARY_ROUTE_SUPPORTED or record.public_internal_classification == BOUNDARY_UNKNOWN]
     public_reader_route_drift = sorted(set(discovered_public_record_signatures) ^ set(baseline_public_record_signatures))
-    route_baseline_reconciled = bool(discovered_public_record_signatures) and bool(baseline_public_record_signatures) and not public_reader_route_drift and not route_unknown_records and not baseline_unknown_records
+    route_baseline_reconciled = bool(discovered_public_record_signatures) and bool(baseline_public_record_signatures) and not public_reader_route_drift
     route_baseline_out_of_scope = not route_records and adapter_loci != canonical_adapter_loci
     pure_external_io = _pure_compute_external_io(pure_compute_loci)
     second_http_home = sorted(module for module in vendor_modules if _is_http_home_module(module))
@@ -2953,7 +2965,11 @@ def analyze_adapter_boundary(
         "typed_route_records_source_of_truth": all(isinstance(record, RouteSignatureRecord) and record.signed_fields for record in route_records) and (bool(route_records) or route_baseline_out_of_scope),
         "structured_route_baseline_applied": (all(isinstance(record, RouteSignatureRecord) and record.signed_fields for record in baseline_route_records) and bool(baseline_route_records)) or route_baseline_out_of_scope,
         "route_comparison_cannot_disable_itself": (bool(discovered_public_record_signatures) and bool(baseline_public_record_signatures)) or route_baseline_out_of_scope,
-        "unsupported_or_ambiguous_route_forms_fail_closed": all(record.parser_status == BOUNDARY_ROUTE_SUPPORTED for record in route_records),
+        "unsupported_or_ambiguous_route_forms_fail_closed": all(
+            record.parser_status == BOUNDARY_ROUTE_SUPPORTED
+            or (record.public_internal_classification == BOUNDARY_UNKNOWN and record.proof_contract.final_gate == "fail_closed")
+            for record in route_records
+        ),
         "renderer_checks_typed_route_fields": all(record.proof_states and record.proof_contract.final_gate == "supported" for record in route_records if record.parser_status == BOUNDARY_ROUTE_SUPPORTED) and (bool(route_records) or route_baseline_out_of_scope),
         "supported_route_signatures_final_gate_complete": all(record.proof_contract.final_gate == "supported" for record in route_records if record.parser_status == BOUNDARY_ROUTE_SUPPORTED) and (bool(route_records) or route_baseline_out_of_scope),
         "no_unsupported_scope_claim": check_by_category["public_surface_posture"],

@@ -2432,7 +2432,7 @@ app.register_blueprint(bp, url_prefix='/v2')
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
 
 
-def test_epic034_public_route_signatures_include_blueprint_constructor_prefix() -> None:
+def test_epic034_public_route_signatures_exclude_unregistered_blueprint_constructor_prefix() -> None:
     import shutil
 
     rel_dir = "tmp_boundary_test"
@@ -2446,7 +2446,14 @@ def reader():
     try:
         adapter = _write_boundary_temp(rel_dir, "blueprint_constructor_prefix.py", body)
         signatures = boundary_analyzer._adapter_public_route_signatures((adapter,))
-        assert f"{adapter}:bp.get:/v2/reader:GET:reader" in signatures
+        records = boundary_analyzer.discover_route_registrations((adapter,))
+        record = next(item for item in records if item.registration_kind == "route_decorator")
+        assert signatures == []
+        assert record.route_path == "/v2/reader"
+        assert record.fail_closed_reason == "unproven_blueprint_registration"
+        assert record.proof_contract.final_gate == "fail_closed"
+        assert record.public_internal_classification == boundary_analyzer.BOUNDARY_UNKNOWN
+        assert f"{adapter}:bp.get:/v2/reader:GET:reader" not in signatures
         assert f"{adapter}:bp.get:/reader:GET:reader" not in signatures
     finally:
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
@@ -2789,6 +2796,7 @@ def replace(resp):
 @app.route('/good')
 def good():
     return emit_public({'ok': True})
+app.register_blueprint(bp)
 """
     try:
         adapter = _write_boundary_temp(rel_dir, "raw_after_request.py", body)
@@ -2986,6 +2994,7 @@ def raw_public_under_api():
 @app.route('/good')
 def good():
     return emit_public({'ok': True})
+app.register_blueprint(bp)
 """
     try:
         adapter = _write_boundary_temp(rel_dir, "public_blueprint_internal_segment.py", body)
@@ -3660,6 +3669,36 @@ W004_ROUTE_SIGNATURE_CASES = [
         "expected_register_prefix": "",
         "expected_methods": ("GET",),
         "expected_classification": "public",
+    },
+    {
+        "case_id": "keyword-register-blueprint-supported-empty",
+        "body": "from flask import Flask, Blueprint\napp = Flask(__name__)\nbp = Blueprint('reader', __name__)\n@bp.get('/reader')\ndef reader():\n    return b'ok'\napp.register_blueprint(blueprint=bp)\n",
+        "expected_status": boundary_analyzer.BOUNDARY_ROUTE_SUPPORTED,
+        "expected_kind": "route_decorator",
+        "expected_path": "/reader",
+        "expected_register_prefix": "",
+        "expected_methods": ("GET",),
+        "expected_classification": "public",
+    },
+    {
+        "case_id": "keyword-register-blueprint-prefix-supported",
+        "body": "from flask import Flask, Blueprint\napp = Flask(__name__)\nbp = Blueprint('reader', __name__)\n@bp.get('/reader')\ndef reader():\n    return b'ok'\napp.register_blueprint(blueprint=bp, url_prefix='/api')\n",
+        "expected_status": boundary_analyzer.BOUNDARY_ROUTE_SUPPORTED,
+        "expected_kind": "route_decorator",
+        "expected_path": "/api/reader",
+        "expected_register_prefix": "/api",
+        "expected_methods": ("GET",),
+        "expected_classification": "public",
+    },
+    {
+        "case_id": "blueprint-constructor-prefix-without-registration-fails-closed",
+        "body": "from flask import Blueprint\nbp = Blueprint('api', __name__, url_prefix='/api')\n@bp.get('/reader')\ndef reader():\n    return b'ok'\n",
+        "expected_status": boundary_analyzer.BOUNDARY_ROUTE_AMBIGUOUS,
+        "expected_kind": "route_decorator",
+        "expected_path": "/api/reader",
+        "expected_constructor_prefix": "/api",
+        "expected_reason": "unproven_blueprint_registration",
+        "expected_classification": boundary_analyzer.BOUNDARY_UNKNOWN,
     },
     {
         "case_id": "register-blueprint-none-plus-prefix-fails-closed",
