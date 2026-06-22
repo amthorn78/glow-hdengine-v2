@@ -1,5 +1,5 @@
 path: artifacts/epic020/bundles/CLI_SHOWCOMPAT_CANON_OK.manifest.json
 size_bytes: 923
-sha256: d91934fbf0d5dd31507ae5b5add4613ff57a87c74d53ef2ff9abc18796482992
+sha256: 0fff803b8dbd59f6ddfd17b0c25df4402e1496d66ea1824d43540b58f41be54e
 mtime_utc: 2025-12-06T04:12:03Z
 produced_at_utc: 2025-12-06T04:11:16Z

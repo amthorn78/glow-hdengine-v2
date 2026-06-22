@@ -4256,3 +4256,83 @@ def test_epic034_w004_malformed_legacy_baseline_fails_closed() -> None:
     assert len(records) == 1
     assert records[0].parser_status == boundary_analyzer.BOUNDARY_ROUTE_AMBIGUOUS
     assert records[0].fail_closed_reason == "unparseable_legacy_route_baseline"
+
+
+def test_epic034_w004_supported_routes_require_final_proof_gate() -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    try:
+        adapter = _write_boundary_temp(
+            rel_dir,
+            "proof_gate_supported.py",
+            "from flask import Flask\napp = Flask(__name__)\ndef view():\n    return b'ok'\napp.add_url_rule('/x', endpoint='x', view_func=view, methods=['GET'])\n",
+        )
+        records = boundary_analyzer.discover_route_registrations((adapter,))
+        record = next(item for item in records if item.registration_kind == "add_url_rule")
+        assert record.parser_status == boundary_analyzer.BOUNDARY_ROUTE_SUPPORTED
+        assert record.proof_contract.final_gate == "supported"
+        assert record.proof_contract.unproven_fields == ()
+        assert set(record.proof_contract.proven_fields) == set(boundary_analyzer.REQUIRED_SUPPORTED_ROUTE_PROOF_FIELDS)
+        states = {fact.field: fact.state for fact in record.proof_states}
+        assert states["route_path_source"] == boundary_analyzer.ProofState.LITERAL.value
+        assert states["endpoint_source"] in {boundary_analyzer.ProofState.LITERAL.value, boundary_analyzer.ProofState.PROVEN.value}
+        assert states["method_source"] == boundary_analyzer.ProofState.PROVEN.value
+        assert states["owner_binding"] in {boundary_analyzer.ProofState.LITERAL.value, boundary_analyzer.ProofState.PROVEN.value}
+        assert states["view_binding"] in {boundary_analyzer.ProofState.LITERAL.value, boundary_analyzer.ProofState.PROVEN.value}
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004_dynamic_route_fails_closed_before_supported_signature() -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    try:
+        adapter = _write_boundary_temp(
+            rel_dir,
+            "proof_gate_dynamic_path.py",
+            "from flask import Flask\napp = Flask(__name__)\npath = '/x'\ndef view():\n    return b'ok'\napp.add_url_rule(path, endpoint='x', view_func=view, methods=['GET'])\n",
+        )
+        records = boundary_analyzer.discover_route_registrations((adapter,))
+        record = next(item for item in records if item.registration_kind == "add_url_rule")
+        assert record.parser_status == boundary_analyzer.BOUNDARY_ROUTE_AMBIGUOUS
+        assert record.proof_contract.final_gate == "fail_closed"
+        assert "route_path_source" in record.proof_contract.unproven_fields
+        states = {fact.field: fact.state for fact in record.proof_states}
+        assert states["route_path_source"] == boundary_analyzer.ProofState.DYNAMIC.value
+        assert record.fail_closed_reason == "dynamic_or_missing_add_url_rule_path"
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004_register_blueprint_preserves_none_and_empty_prefix_states() -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    try:
+        adapter = _write_boundary_temp(
+            rel_dir,
+            "proof_gate_prefix_states.py",
+            "from flask import Flask, Blueprint\napp = Flask(__name__)\nbp_none = Blueprint('none', __name__)\nbp_empty = Blueprint('empty', __name__)\napp.register_blueprint(bp_none, url_prefix=None)\napp.register_blueprint(bp_empty, url_prefix='')\n",
+        )
+        records = boundary_analyzer.discover_route_registrations((adapter,))
+        by_name = {record.blueprint_name: record for record in records if record.registration_kind == "register_blueprint"}
+        none_states = {fact.field: fact.state for fact in by_name["bp_none"].proof_states}
+        empty_states = {fact.field: fact.state for fact in by_name["bp_empty"].proof_states}
+        assert none_states["blueprint_register_state"] == boundary_analyzer.ProofState.EXPLICIT_NONE.value
+        assert empty_states["blueprint_register_state"] == boundary_analyzer.ProofState.EXPLICIT_EMPTY.value
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
+def test_epic034_w004_renderer_refuses_supported_record_without_complete_proof_contract() -> None:
+    result = _epic034_analyzer_result()
+    broken = copy.deepcopy(result)
+    for record in broken["typed_route_records"]:
+        if record["parser_status"] == boundary_analyzer.BOUNDARY_ROUTE_SUPPORTED:
+            record["proof_contract"]["final_gate"] = "fail_closed"
+            record["proof_contract"]["unproven_fields"] = ["endpoint_source"]
+            break
+    with pytest.raises(ValueError, match="ADAPTER_BOUNDARY_SUPPORTED_ROUTE_PROOF_INCOMPLETE"):
+        generator.render_adapter_boundary_proof("2026-06-18T00:00:00Z", broken)

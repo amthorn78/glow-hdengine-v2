@@ -7,7 +7,8 @@ from __future__ import annotations
 
 import ast
 import hashlib
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
+from enum import Enum
 from pathlib import Path
 from typing import Any
 
@@ -350,6 +351,45 @@ SUPPORTED_ROUTE_REGISTRATION_FORMS: dict[str, dict[str, Any]] = {
 }
 
 
+class ProofState(str, Enum):
+    MISSING = "missing"
+    EXPLICIT_NONE = "explicit_none"
+    EXPLICIT_EMPTY = "explicit_empty"
+    LITERAL = "literal"
+    DYNAMIC = "dynamic"
+    UNSUPPORTED = "unsupported"
+    AMBIGUOUS = "ambiguous"
+    PROVEN = "proven"
+
+
+@dataclass(frozen=True)
+class RouteProofFact:
+    field: str
+    state: str
+    value: str = ""
+    source: str = ""
+    reason: str = ""
+
+
+@dataclass(frozen=True)
+class RouteProofContract:
+    final_gate: str
+    required_fields: tuple[str, ...]
+    proven_fields: tuple[str, ...]
+    unproven_fields: tuple[str, ...]
+
+
+REQUIRED_SUPPORTED_ROUTE_PROOF_FIELDS = (
+    "route_path_source",
+    "endpoint_source",
+    "method_source",
+    "blueprint_constructor_state",
+    "blueprint_register_state",
+    "owner_binding",
+    "view_binding",
+    "classification_inputs",
+)
+
 @dataclass(frozen=True)
 class RouteSignatureRecord:
     source_locus: str
@@ -371,6 +411,9 @@ class RouteSignatureRecord:
     public_internal_classification: str = BOUNDARY_UNKNOWN
     fail_closed_reason: str = ""
     signed_fields: tuple[tuple[str, Any], ...] = ()
+    proof_states: tuple[RouteProofFact, ...] = ()
+    proof_inputs: tuple[RouteProofFact, ...] = ()
+    proof_contract: RouteProofContract = RouteProofContract("not_evaluated", REQUIRED_SUPPORTED_ROUTE_PROOF_FIELDS, (), REQUIRED_SUPPORTED_ROUTE_PROOF_FIELDS)
 
 
 @dataclass(frozen=True)
@@ -394,6 +437,9 @@ class RouteRegistrationCandidate:
     public_internal_classification: str = BOUNDARY_UNKNOWN
     fail_closed_reason: str = ""
     signed_fields: tuple[tuple[str, Any], ...] = ()
+    proof_states: tuple[RouteProofFact, ...] = ()
+    proof_inputs: tuple[RouteProofFact, ...] = ()
+    proof_contract: RouteProofContract = RouteProofContract("not_evaluated", REQUIRED_SUPPORTED_ROUTE_PROOF_FIELDS, (), REQUIRED_SUPPORTED_ROUTE_PROOF_FIELDS)
 
 
 @dataclass(frozen=True)
@@ -621,6 +667,91 @@ def _has_expanded_kwargs(call: ast.Call) -> bool:
     return any(keyword.arg is None for keyword in call.keywords)
 
 
+
+def _proof_fact_from_expr(field: str, node: ast.AST | None, *, source: str, missing_is_proven_empty: bool = False) -> RouteProofFact:
+    if node is None:
+        return RouteProofFact(field, ProofState.MISSING.value, "", source, "" if missing_is_proven_empty else f"missing_{field}")
+    if _is_explicit_none(node):
+        return RouteProofFact(field, ProofState.EXPLICIT_NONE.value, "", source, "")
+    if isinstance(node, ast.Constant) and isinstance(node.value, str):
+        state = ProofState.EXPLICIT_EMPTY.value if node.value == "" else ProofState.LITERAL.value
+        return RouteProofFact(field, state, node.value, source, "")
+    if isinstance(node, ast.Constant) and isinstance(node.value, (int, bool)):
+        return RouteProofFact(field, ProofState.LITERAL.value, str(node.value), source, "")
+    if isinstance(node, (ast.List, ast.Tuple, ast.Set)):
+        values = [_literal_value_for_signature(item) for item in node.elts]
+        if all(value != "<dynamic>" for value in values):
+            return RouteProofFact(field, ProofState.LITERAL.value, ",".join(values), source, "")
+    return RouteProofFact(field, ProofState.DYNAMIC.value, "", source, f"dynamic_{field}")
+
+
+def _value_state(value: str, *, source: str, missing_is_proven_empty: bool = False) -> RouteProofFact:
+    if value == "<dynamic>":
+        return RouteProofFact(source, ProofState.DYNAMIC.value, "", source, f"dynamic_{source}")
+    if value == "":
+        state = ProofState.MISSING.value
+        return RouteProofFact(source, state, value, source, "" if missing_is_proven_empty else f"missing_{source}")
+    return RouteProofFact(source, ProofState.LITERAL.value, value, source, "")
+
+
+def _route_candidate_proof_states(candidate: RouteRegistrationCandidate) -> tuple[RouteProofFact, ...]:
+    method_state = ProofState.PROVEN.value if candidate.http_methods or candidate.registration_kind in {"hook_decorator", "errorhandler_decorator", "register_blueprint", "blueprint_constructor"} else ProofState.MISSING.value
+    endpoint_optional = candidate.registration_kind in {"register_blueprint", "blueprint_constructor"}
+    view_optional = candidate.registration_kind in {"register_blueprint", "blueprint_constructor"}
+    route_optional = candidate.registration_kind in {"hook_decorator", "register_blueprint", "blueprint_constructor"}
+    overrides = {fact.field: fact for fact in candidate.proof_inputs}
+
+    def fact(field: str, fallback: RouteProofFact, *, optional: bool = False) -> RouteProofFact:
+        selected = overrides.get(field, fallback)
+        if optional and selected.state == ProofState.MISSING.value and not selected.reason:
+            return selected
+        return selected
+
+    facts = (
+        fact("route_path_source", _value_state(candidate.route_path, source="route_path_source", missing_is_proven_empty=route_optional), optional=route_optional),
+        fact("endpoint_source", _value_state(candidate.endpoint, source="endpoint_source", missing_is_proven_empty=endpoint_optional), optional=endpoint_optional),
+        fact("method_source", RouteProofFact("method_source", method_state, ",".join(candidate.http_methods), "http_methods", "" if method_state == ProofState.PROVEN.value else "missing_method_source")),
+        fact("blueprint_constructor_state", _value_state(candidate.blueprint_constructor_prefix, source="blueprint_constructor_state", missing_is_proven_empty=True), optional=True),
+        fact("blueprint_register_state", _value_state(candidate.register_blueprint_prefix, source="blueprint_register_state", missing_is_proven_empty=True), optional=True),
+        fact("owner_binding", _value_state(candidate.proven_owner_type, source="owner_binding")),
+        fact("view_binding", _value_state(candidate.view_identity, source="view_binding", missing_is_proven_empty=view_optional), optional=view_optional),
+        fact("classification_inputs", _value_state(candidate.public_internal_classification, source="classification_inputs")),
+    )
+    if candidate.fail_closed_reason:
+        facts += (RouteProofFact("fail_closed_reason", ProofState.AMBIGUOUS.value, "", "final_gate", candidate.fail_closed_reason),)
+    return facts
+
+
+def _proof_contract_for_candidate(candidate: RouteRegistrationCandidate, proof_states: tuple[RouteProofFact, ...]) -> RouteProofContract:
+    required = REQUIRED_SUPPORTED_ROUTE_PROOF_FIELDS
+    proven_states = {ProofState.PROVEN.value, ProofState.LITERAL.value, ProofState.EXPLICIT_NONE.value, ProofState.EXPLICIT_EMPTY.value}
+    optional_missing_fields = {"blueprint_constructor_state", "blueprint_register_state"}
+    if candidate.registration_kind in {"hook_decorator", "register_blueprint", "blueprint_constructor"}:
+        optional_missing_fields.add("route_path_source")
+    if candidate.registration_kind in {"register_blueprint", "blueprint_constructor"}:
+        optional_missing_fields.update({"endpoint_source", "view_binding"})
+    by_field = {fact.field: fact for fact in proof_states}
+
+    def field_is_proven(field: str) -> bool:
+        fact = by_field.get(field)
+        if fact is None:
+            return False
+        if fact.state in proven_states:
+            return True
+        return fact.state == ProofState.MISSING.value and field in optional_missing_fields and fact.reason == ""
+
+    proven = tuple(field for field in required if field_is_proven(field))
+    unproven = tuple(field for field in required if field not in proven)
+    return RouteProofContract("supported" if not unproven and candidate.parser_status == BOUNDARY_ROUTE_SUPPORTED else "fail_closed", required, proven, unproven)
+
+
+def _proof_gate_status(candidate: RouteRegistrationCandidate) -> tuple[str, str, tuple[RouteProofFact, ...], RouteProofContract]:
+    proof_states = _route_candidate_proof_states(candidate)
+    contract = _proof_contract_for_candidate(candidate, proof_states)
+    if candidate.parser_status == BOUNDARY_ROUTE_SUPPORTED and contract.unproven_fields:
+        return BOUNDARY_ROUTE_AMBIGUOUS, candidate.fail_closed_reason or "route_proof_incomplete", proof_states, contract
+    return candidate.parser_status, candidate.fail_closed_reason, proof_states, contract
+
 def _signed_fields(record: RouteRegistrationCandidate) -> tuple[tuple[str, Any], ...]:
     grammar = SUPPORTED_ROUTE_REGISTRATION_FORMS.get(_grammar_key(record.registration_kind), {})
     fields = grammar.get("signed_fields", ())
@@ -796,18 +927,18 @@ def classify_route_record(record: RouteRegistrationCandidate | RouteSignatureRec
 
 def _finalize_route_candidate(candidate: RouteRegistrationCandidate) -> RouteRegistrationCandidate:
     classification = classify_route_record(candidate)
-    status = candidate.parser_status
-    reason = candidate.fail_closed_reason
+    candidate = replace(candidate, public_internal_classification=classification, signed_fields=(), proof_states=(), proof_contract=RouteProofContract("not_evaluated", REQUIRED_SUPPORTED_ROUTE_PROOF_FIELDS, (), REQUIRED_SUPPORTED_ROUTE_PROOF_FIELDS))
+    status, reason, proof_states, proof_contract = _proof_gate_status(candidate)
     if classification == BOUNDARY_UNKNOWN and status == BOUNDARY_ROUTE_SUPPORTED:
         status = BOUNDARY_ROUTE_AMBIGUOUS
         reason = reason or "route_public_internal_classification_unknown"
-    base = {**asdict(candidate), "parser_status": status, "public_internal_classification": classification, "fail_closed_reason": reason, "signed_fields": ()}
-    finalized = RouteRegistrationCandidate(**base)
-    return RouteRegistrationCandidate(**{**asdict(finalized), "signed_fields": _signed_fields(finalized)})
+        proof_contract = RouteProofContract("fail_closed", proof_contract.required_fields, proof_contract.proven_fields, proof_contract.unproven_fields or ("classification_inputs",))
+    finalized = replace(candidate, parser_status=status, public_internal_classification=classification, fail_closed_reason=reason, signed_fields=(), proof_states=proof_states, proof_contract=proof_contract)
+    return replace(finalized, signed_fields=_signed_fields(finalized))
 
 
 def _record_from_candidate(candidate: RouteRegistrationCandidate) -> RouteSignatureRecord:
-    return RouteSignatureRecord(**asdict(candidate))
+    return RouteSignatureRecord(**candidate.__dict__)
 
 
 def route_signature_from_record(record: RouteSignatureRecord | RouteRegistrationCandidate) -> str:
@@ -965,7 +1096,9 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                     owner_type = owners.get(route_root, "BlueprintAlias" if route_root in blueprint_prefixes else ("Flask" if route_root == "app" and decorator_suffix_to_kind[suffix] == "hook_decorator" else ""))
                     status = BOUNDARY_ROUTE_SUPPORTED if owner_type else BOUNDARY_ROUTE_UNSUPPORTED
                     reason = "" if owner_type else "unproven_route_owner"
-                    route_arg = _literal_value_for_signature(deco.args[0]) if isinstance(deco, ast.Call) and deco.args else ""
+                    route_node = deco.args[0] if isinstance(deco, ast.Call) and deco.args else None
+                    route_arg = _literal_value_for_signature(route_node) if route_node is not None else ""
+                    route_path_proof = _proof_fact_from_expr("route_path_source", route_node, source="decorator_route_arg", missing_is_proven_empty=decorator_suffix_to_kind[suffix] == "hook_decorator")
                     if route_arg == "<dynamic>":
                         status = BOUNDARY_ROUTE_AMBIGUOUS
                         reason = "dynamic_route_argument"
@@ -1033,6 +1166,7 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                         routing_keywords=routing_keywords,
                         imported_view_target=aliases.get(node.name, ""),
                         fail_closed_reason=reason,
+                        proof_inputs=(route_path_proof,),
                     )))
             if isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and route_aliases.get(node.func.id, "").endswith(".add_url_rule"):
                 records.append(_finalize_route_candidate(RouteRegistrationCandidate(
@@ -1048,8 +1182,12 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                 owner_type = owners.get(owner, "BlueprintAlias" if owner in blueprint_prefixes else "")
                 status = BOUNDARY_ROUTE_SUPPORTED if owner_type else BOUNDARY_ROUTE_UNSUPPORTED
                 reason = "" if owner_type else "unproven_add_url_rule_owner"
-                route_arg = _literal_value_for_signature(node.args[0]) if node.args else ""
-                endpoint = _literal_value_for_signature(node.args[1]) if len(node.args) > 1 else ""
+                route_node = node.args[0] if node.args else None
+                endpoint_node = node.args[1] if len(node.args) > 1 else None
+                route_arg = _literal_value_for_signature(route_node) if route_node is not None else ""
+                endpoint = _literal_value_for_signature(endpoint_node) if endpoint_node is not None else ""
+                route_path_proof = _proof_fact_from_expr("route_path_source", route_node, source="add_url_rule_rule_arg")
+                endpoint_proof = _proof_fact_from_expr("endpoint_source", endpoint_node, source="add_url_rule_endpoint_arg")
                 view_desc = ""
                 imported_view_target = ""
                 methods: tuple[str, ...] = ()
@@ -1074,6 +1212,7 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                                 reason = reason or "unproven_methodview_binding"
                             if keyword.value.args:
                                 endpoint = endpoint or _literal_value_for_signature(keyword.value.args[0])
+                                endpoint_proof = _proof_fact_from_expr("endpoint_source", keyword.value.args[0], source="methodview_as_view_endpoint")
                             else:
                                 status = BOUNDARY_ROUTE_AMBIGUOUS
                                 reason = reason or "missing_methodview_endpoint"
@@ -1094,6 +1233,7 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                             imported_view_target = aliases.get(view_desc, "")
                     elif keyword.arg == "endpoint":
                         endpoint = _literal_value_for_signature(keyword.value)
+                        endpoint_proof = _proof_fact_from_expr("endpoint_source", keyword.value, source="add_url_rule_endpoint_keyword")
                         if endpoint == "<dynamic>":
                             status = BOUNDARY_ROUTE_AMBIGUOUS
                             reason = reason or "dynamic_add_url_rule_endpoint"
@@ -1118,6 +1258,7 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                             reason = reason or "unproven_methodview_binding"
                         if view_node.args:
                             endpoint = endpoint or _literal_value_for_signature(view_node.args[0])
+                            endpoint_proof = _proof_fact_from_expr("endpoint_source", view_node.args[0], source="methodview_as_view_endpoint")
                     elif isinstance(view_node, ast.Call):
                         view_desc = _attribute_chain(view_node.func)
                         status = BOUNDARY_ROUTE_AMBIGUOUS
@@ -1135,6 +1276,7 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                         imported_view_target = aliases.get(view_desc, "")
                 if not endpoint and view_endpoint_default and not methodview_view:
                     endpoint = view_endpoint_default
+                    endpoint_proof = RouteProofFact("endpoint_source", ProofState.PROVEN.value, view_endpoint_default, "stable_local_view_name_default", "")
                 elif not endpoint and local_view_proof is not None and not local_view_proof.endpoint_name_stable and not methodview_view:
                     status = BOUNDARY_ROUTE_AMBIGUOUS
                     reason = reason or "dynamic_add_url_rule_endpoint_name"
@@ -1185,6 +1327,7 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                     )
                 )
                 full_route_arg = _join_route_prefix(signed_prefix, "" if route_arg == "<dynamic>" else route_arg)
+                method_proof = RouteProofFact("method_source", ProofState.PROVEN.value if methods else ProofState.MISSING.value, ",".join(methods), "add_url_rule_methods", "" if methods else "missing_method_source")
                 records.append(_finalize_route_candidate(RouteRegistrationCandidate(
                     source_locus=rel,
                     registration_kind="add_url_rule",
@@ -1201,6 +1344,7 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                     routing_keywords=routing_keywords,
                     imported_view_target=imported_view_target,
                     fail_closed_reason=reason,
+                    proof_inputs=(route_path_proof, endpoint_proof, method_proof),
                 )))
                 continue
             if isinstance(node, ast.Call) and _attribute_chain(node.func).endswith(".register_blueprint"):
@@ -1213,6 +1357,7 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                     status = BOUNDARY_ROUTE_AMBIGUOUS
                     reason = reason or "dynamic_or_factory_blueprint_registration"
                 url_prefix = ""
+                register_prefix_proof = RouteProofFact("blueprint_register_state", ProofState.MISSING.value, "", "register_blueprint_url_prefix", "")
                 for keyword in node.keywords:
                     if keyword.arg is None:
                         url_prefix = "<dynamic>"
@@ -1220,6 +1365,7 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                         reason = reason or "expanded_register_blueprint_kwargs"
                         break
                     if keyword.arg == "url_prefix":
+                        register_prefix_proof = _proof_fact_from_expr("blueprint_register_state", keyword.value, source="register_blueprint_url_prefix", missing_is_proven_empty=True)
                         if _is_explicit_none(keyword.value):
                             url_prefix = ""
                             continue
@@ -1237,6 +1383,7 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                     blueprint_constructor_prefix=blueprint_prefixes.get(blueprint, ""),
                     register_blueprint_prefix="" if url_prefix == "<dynamic>" else url_prefix,
                     fail_closed_reason=reason,
+                    proof_inputs=(register_prefix_proof,),
                 )))
     return sorted({_record_from_candidate(record) for record in records}, key=route_signature_from_record)
 
@@ -2760,7 +2907,8 @@ def analyze_adapter_boundary(
         "structured_route_baseline_applied": (all(isinstance(record, RouteSignatureRecord) and record.signed_fields for record in baseline_route_records) and bool(baseline_route_records)) or route_baseline_out_of_scope,
         "route_comparison_cannot_disable_itself": (bool(discovered_public_record_signatures) and bool(baseline_public_record_signatures)) or route_baseline_out_of_scope,
         "unsupported_or_ambiguous_route_forms_fail_closed": all(record.parser_status == BOUNDARY_ROUTE_SUPPORTED for record in route_records),
-        "renderer_checks_typed_route_fields": True,
+        "renderer_checks_typed_route_fields": all(record.proof_states and record.proof_contract.final_gate == "supported" for record in route_records if record.parser_status == BOUNDARY_ROUTE_SUPPORTED) and (bool(route_records) or route_baseline_out_of_scope),
+        "supported_route_signatures_final_gate_complete": all(record.proof_contract.final_gate == "supported" for record in route_records if record.parser_status == BOUNDARY_ROUTE_SUPPORTED) and (bool(route_records) or route_baseline_out_of_scope),
         "no_unsupported_scope_claim": check_by_category["public_surface_posture"],
     }
     verdict_status = "PASS" if all(checks.values()) and all(finding_passes(f) for f in findings) else ("FAIL" if any(f["classification"] == BOUNDARY_FORBIDDEN for f in findings) else "UNKNOWN")
