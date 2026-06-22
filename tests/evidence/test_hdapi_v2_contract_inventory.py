@@ -4258,6 +4258,48 @@ def test_epic034_w004_malformed_legacy_baseline_fails_closed() -> None:
     assert records[0].fail_closed_reason == "unparseable_legacy_route_baseline"
 
 
+def test_epic034_w004_serialized_typed_route_records_replay_as_baseline() -> None:
+    result = _epic034_analyzer_result()
+    serialized_records = tuple(result["typed_route_records"])
+
+    records = boundary_analyzer._normalize_route_baseline(serialized_records)
+
+    assert len(records) == len(serialized_records)
+    assert all(isinstance(record, boundary_analyzer.RouteSignatureRecord) for record in records)
+    supported = [record for record in records if record.parser_status == boundary_analyzer.BOUNDARY_ROUTE_SUPPORTED]
+    assert supported
+    assert all(record.proof_contract.final_gate == "supported" for record in supported)
+    assert all(record.proof_contract.unproven_fields == () for record in supported)
+
+
+def test_epic034_w004_serialized_proof_inputs_do_not_crash_baseline_replay() -> None:
+    records = boundary_analyzer._normalize_route_baseline((
+        {
+            "source_locus": "adapter/http_reader.py",
+            "registration_kind": "add_url_rule",
+            "parser_status": boundary_analyzer.BOUNDARY_ROUTE_SUPPORTED,
+            "owner_expression": "app",
+            "proven_owner_type": "Flask",
+            "route_path": "/x",
+            "http_methods": ["GET"],
+            "endpoint": "x",
+            "view_identity": "view",
+            "public_internal_classification": "public",
+            "proof_inputs": [
+                {"field": "route_path_source", "state": "literal", "value": "/x", "source": "serialized_test", "reason": ""},
+                {"field": "endpoint_source", "state": "literal", "value": "x", "source": "serialized_test", "reason": ""},
+                {"field": "method_source", "state": "proven", "value": "GET", "source": "serialized_test", "reason": ""},
+            ],
+        },
+    ))
+
+    assert len(records) == 1
+    record = records[0]
+    assert record.parser_status == boundary_analyzer.BOUNDARY_ROUTE_SUPPORTED
+    assert record.proof_contract.final_gate == "supported"
+    assert record.proof_contract.unproven_fields == ()
+
+
 def test_epic034_w004_supported_routes_require_final_proof_gate() -> None:
     import shutil
 

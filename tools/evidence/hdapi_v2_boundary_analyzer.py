@@ -2697,11 +2697,40 @@ def vendor_guard_provenance_findings(loci: tuple[str, ...]) -> tuple[list[str], 
     return allowed, unresolved, guarded
 
 
+def _route_proof_fact_from_mapping(raw: Any) -> RouteProofFact | None:
+    if isinstance(raw, RouteProofFact):
+        return raw
+    if not isinstance(raw, dict):
+        return None
+    field = raw.get("field")
+    state = raw.get("state")
+    if not isinstance(field, str) or not isinstance(state, str):
+        return None
+    value = raw.get("value", "")
+    source = raw.get("source", "")
+    reason = raw.get("reason", "")
+    return RouteProofFact(
+        field=field,
+        state=state,
+        value=value if isinstance(value, str) else str(value),
+        source=source if isinstance(source, str) else str(source),
+        reason=reason if isinstance(reason, str) else str(reason),
+    )
+
+
 def _record_from_mapping(raw: dict[str, Any]) -> RouteSignatureRecord:
     values = {field: raw.get(field, getattr(RouteSignatureRecord("", "", ""), field)) for field in RouteSignatureRecord.__dataclass_fields__ if field != "signed_fields"}
     values["parser_status"] = values.get("parser_status") or BOUNDARY_ROUTE_SUPPORTED
     values["http_methods"] = tuple(values.get("http_methods") or ())
     values["routing_keywords"] = tuple(tuple(item) for item in values.get("routing_keywords") or ())
+    proof_inputs: list[RouteProofFact] = []
+    for item in values.get("proof_inputs") or ():
+        fact = _route_proof_fact_from_mapping(item)
+        if fact is not None:
+            proof_inputs.append(fact)
+    values["proof_inputs"] = tuple(proof_inputs)
+    values["proof_states"] = ()
+    values["proof_contract"] = RouteProofContract("not_evaluated", REQUIRED_SUPPORTED_ROUTE_PROOF_FIELDS, (), REQUIRED_SUPPORTED_ROUTE_PROOF_FIELDS)
     candidate = _finalize_route_candidate(RouteRegistrationCandidate(**values, signed_fields=()))
     return _record_from_candidate(candidate)
 
