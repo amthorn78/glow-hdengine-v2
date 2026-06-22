@@ -4175,6 +4175,14 @@ W004_ROUTE_SIGNATURE_CASES = [
         "expected_classification": boundary_analyzer.BOUNDARY_UNKNOWN,
     },
     {
+        "case_id": "keyword-factory-register-blueprint-fails-closed",
+        "body": "from flask import Flask, Blueprint\napp = Flask(__name__)\ndef make_bp():\n    return Blueprint('reader', __name__)\napp.register_blueprint(blueprint=make_bp(), url_prefix='/public')\n",
+        "expected_status": boundary_analyzer.BOUNDARY_ROUTE_AMBIGUOUS,
+        "expected_kind": "register_blueprint",
+        "expected_reason": "dynamic_or_factory_blueprint_registration",
+        "expected_classification": boundary_analyzer.BOUNDARY_UNKNOWN,
+    },
+    {
         "case_id": "expanded-decorator-kwargs-fail-closed",
         "body": "from flask import Flask\napp = Flask(__name__)\nopts = {'methods': ['POST']}\n@app.route('/expanded', **opts)\ndef expanded():\n    return b'ok'\n",
         "expected_status": boundary_analyzer.BOUNDARY_ROUTE_AMBIGUOUS,

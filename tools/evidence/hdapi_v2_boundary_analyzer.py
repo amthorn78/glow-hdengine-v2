@@ -900,6 +900,12 @@ def _blueprint_registration_prefixes(tree: ast.AST) -> dict[str, tuple[str, ...]
     return {name: tuple(values) for name, values in prefixes.items()}
 
 
+def _register_blueprint_value_is_factory(call: ast.Call) -> bool:
+    if call.args and isinstance(call.args[0], ast.Call):
+        return True
+    return any(keyword.arg == "blueprint" and isinstance(keyword.value, ast.Call) for keyword in call.keywords)
+
+
 def _register_blueprint_name(call: ast.Call) -> str:
     positional_name = _expr_name(call.args[0]) if call.args else ""
     keyword_name = ""
@@ -1393,7 +1399,7 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                 status = BOUNDARY_ROUTE_SUPPORTED if owner_type == "Flask" else BOUNDARY_ROUTE_UNSUPPORTED
                 reason = "" if status == BOUNDARY_ROUTE_SUPPORTED else "unproven_register_blueprint_owner"
                 blueprint = _register_blueprint_name(node)
-                if not blueprint or (node.args and isinstance(node.args[0], ast.Call)):
+                if not blueprint or _register_blueprint_value_is_factory(node):
                     status = BOUNDARY_ROUTE_AMBIGUOUS
                     reason = reason or "dynamic_or_factory_blueprint_registration"
                 url_prefix = ""
