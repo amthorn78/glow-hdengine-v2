@@ -1900,6 +1900,14 @@ def _boundary_result_or_raise(result: dict[str, Any]) -> None:
             raise ValueError("ADAPTER_BOUNDARY_TYPED_ROUTE_FIELDS_MISSING")
         if not result.get("route_registration_grammar") or (not route_out_of_scope and not result.get("route_baseline_reconciled")):
             raise ValueError("ADAPTER_BOUNDARY_TYPED_ROUTE_RECONCILIATION_MISSING")
+        required_proof_fields = set(boundary_analyzer.REQUIRED_SUPPORTED_ROUTE_PROOF_FIELDS)
+        for record in result.get("typed_route_records", []):
+            contract = record.get("proof_contract") or {}
+            if record.get("parser_status") == boundary_analyzer.BOUNDARY_ROUTE_SUPPORTED:
+                if contract.get("final_gate") != "supported" or set(contract.get("proven_fields", [])) != required_proof_fields or contract.get("unproven_fields"):
+                    raise ValueError("ADAPTER_BOUNDARY_SUPPORTED_ROUTE_PROOF_INCOMPLETE")
+            if not record.get("proof_states"):
+                raise ValueError("ADAPTER_BOUNDARY_ROUTE_PROOF_STATES_MISSING")
     if result.get("verdict_status") != "PASS":
         raise ValueError(f"ADAPTER_BOUNDARY_ANALYZER_VERDICT_NON_PASS:{result.get('verdict_status', 'MISSING')}")
 
@@ -1927,6 +1935,10 @@ def render_adapter_boundary_proof(produced: str, result: dict[str, Any]) -> tupl
         "public_route_drift_proof_repair=W-004 typed analyzer-owned route records replace string-first drift proof",
         "declared_route_grammar=SUPPORTED_ROUTE_REGISTRATION_FORMS executable dispatch authority",
         "typed_route_record_source_of_truth=RouteRegistrationCandidate and RouteSignatureRecord are created before serialization",
+        "bounded_static_grammar_posture=only final-gate supported route signatures are emitted; unproven route-shaped forms fail closed",
+        "route_proof_contract_required_fields=" + ",".join(boundary_analyzer.REQUIRED_SUPPORTED_ROUTE_PROOF_FIELDS),
+        "route_proof_contracts=" + json.dumps([record.get("proof_contract", {}) for record in result["typed_route_records"]], sort_keys=True, separators=(",", ":")),
+        "route_proof_states=" + json.dumps([record.get("proof_states", []) for record in result["typed_route_records"]], sort_keys=True, separators=(",", ":")),
         "route_comparison_cannot_disable_itself=true",
         "structured_route_baseline_posture=ADAPTER_BOUNDARY_PUBLIC_ROUTE_BASELINE_RECORDS field-aware records rendered through analyzer serializer",
         f"route_baseline_reconciled={str(result['route_baseline_reconciled']).lower()}",
