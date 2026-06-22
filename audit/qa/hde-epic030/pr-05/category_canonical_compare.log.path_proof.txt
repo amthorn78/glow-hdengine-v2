@@ -1,5 +1,5 @@
 path: audit/qa/hde-epic030/pr-05/category_canonical_compare.log
 size_bytes: 496
 sha256: a59d727047aecfe9c443fa654d64d288b42318cf3f50e9284d70734cc062f0ec
-mtime_utc: 2026-06-22T08:22:10Z
-produced_at_utc: 2026-06-22T08:24:01Z
+mtime_utc: 2026-06-22T22:54:34Z
+produced_at_utc: 2026-06-22T23:00:24Z

@@ -1,4 +1,4 @@
-generated_at_utc=2026-06-22T08:25:59Z
+generated_at_utc=2026-06-22T22:56:19Z
 scope=HDE-EPIC034 PR-01 source-selection check
 network_posture=closed-rails-source-cache; no live vendor calls
 [recommended_v2_full_chart] status=PASS
