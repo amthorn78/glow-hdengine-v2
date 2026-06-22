@@ -4417,6 +4417,96 @@ def test_epic034_w004_supported_routes_require_final_proof_gate() -> None:
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
 
 
+def _public_route_state_record(
+    *,
+    path: str = "/reader",
+    parser_status: str = boundary_analyzer.BOUNDARY_ROUTE_SUPPORTED,
+    classification: str = "public",
+    final_gate: str = "supported",
+) -> boundary_analyzer.RouteSignatureRecord:
+    return boundary_analyzer.RouteSignatureRecord(
+        source_locus="adapter/http_reader.py",
+        registration_kind="add_url_rule",
+        parser_status=parser_status,
+        owner_expression="app",
+        proven_owner_type="Flask",
+        route_path=path,
+        http_methods=("GET",),
+        endpoint="reader",
+        view_identity="reader_view",
+        public_internal_classification=classification,
+        signed_fields=(("route_path", path),),
+        proof_contract=boundary_analyzer.RouteProofContract(
+            final_gate,
+            boundary_analyzer.REQUIRED_SUPPORTED_ROUTE_PROOF_FIELDS,
+            boundary_analyzer.REQUIRED_SUPPORTED_ROUTE_PROOF_FIELDS if final_gate == "supported" else (),
+            () if final_gate == "supported" else ("route_path_source",),
+        ),
+    )
+
+
+def test_epic034_w004_public_route_pass_state_allows_only_reconciled_or_out_of_scope() -> None:
+    record = _public_route_state_record()
+
+    reconciled = boundary_analyzer._public_route_pass_state((record,), (record,), [], False)
+    assert reconciled.passes is True
+    assert reconciled.classification == boundary_analyzer.BOUNDARY_ALLOWED
+    assert reconciled.verdict == "PASS"
+
+    out_of_scope = boundary_analyzer._public_route_pass_state((), (), [], True)
+    assert out_of_scope.passes is True
+    assert out_of_scope.classification == boundary_analyzer.BOUNDARY_OUT_OF_SCOPE
+    assert out_of_scope.verdict == "PASS"
+
+
+@pytest.mark.parametrize(
+    ("route_records", "baseline_records", "drift", "expected_reason"),
+    [
+        ((), (_public_route_state_record(),), [], "no supported public discovered"),
+        ((_public_route_state_record(),), (), [], "no supported public baseline"),
+        ((_public_route_state_record(),), (_public_route_state_record(path="/other"),), ["drift"], "route drift fails closed"),
+        (
+            (
+                _public_route_state_record(),
+                _public_route_state_record(
+                    path="/ambiguous",
+                    parser_status=boundary_analyzer.BOUNDARY_ROUTE_AMBIGUOUS,
+                ),
+            ),
+            (_public_route_state_record(),),
+            [],
+            "unknown discovered or baseline route records fail closed",
+        ),
+        (
+            (_public_route_state_record(),),
+            (
+                _public_route_state_record(),
+                _public_route_state_record(
+                    path="/ambiguous",
+                    parser_status=boundary_analyzer.BOUNDARY_ROUTE_AMBIGUOUS,
+                ),
+            ),
+            [],
+            "unknown discovered or baseline route records fail closed",
+        ),
+        ((_public_route_state_record(final_gate="fail_closed"),), (_public_route_state_record(),), [], "supported route proof gates are incomplete"),
+        ((_public_route_state_record(),), (_public_route_state_record(final_gate="fail_closed"),), [], "supported route proof gates are incomplete"),
+    ],
+)
+def test_epic034_w004_public_route_pass_state_fails_closed_for_each_invariant(
+    route_records: tuple[boundary_analyzer.RouteSignatureRecord, ...],
+    baseline_records: tuple[boundary_analyzer.RouteSignatureRecord, ...],
+    drift: list[str],
+    expected_reason: str,
+) -> None:
+    state = boundary_analyzer._public_route_pass_state(route_records, baseline_records, drift, False)
+
+    assert state.passes is False
+    assert state.classification == boundary_analyzer.BOUNDARY_UNKNOWN
+    assert state.verdict == "UNKNOWN"
+    assert expected_reason in state.reason
+
+
 def test_epic034_w004_public_route_reconciliation_fails_with_extra_ambiguous_route() -> None:
     import shutil
 
