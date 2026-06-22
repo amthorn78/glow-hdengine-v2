@@ -4566,6 +4566,73 @@ app.add_url_rule(dynamic_path, endpoint='ambiguous', view_func=ambiguous, method
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
 
 
+def test_epic034_w004_public_route_reconciliation_fails_with_keyword_factory_blueprint_record() -> None:
+    import shutil
+
+    source_selection, request_shaping, response_mapping = _epic034_boundary_inputs()
+    rel_dir = "tmp_boundary_test"
+    body = """
+from flask import Flask, Blueprint
+from engine.presenter.emitter import emit_public
+app = Flask(__name__)
+SAFE_MODE='1'
+@app.route('/good')
+def good():
+    return emit_public({'ok': True})
+def make_bp():
+    return Blueprint('reader', __name__)
+app.register_blueprint(blueprint=make_bp(), url_prefix='/public')
+"""
+    try:
+        adapter = _write_boundary_temp(rel_dir, "matched_public_plus_keyword_factory_blueprint.py", body)
+        route_records = boundary_analyzer.discover_route_registrations((adapter,))
+        baseline = tuple(
+            record
+            for record in route_records
+            if record.parser_status == boundary_analyzer.BOUNDARY_ROUTE_SUPPORTED
+            and record.public_internal_classification == "public"
+            and record.route_path == "/good"
+        )
+
+        result = boundary_analyzer.analyze_adapter_boundary(
+            source_selection=source_selection,
+            request_shaping=request_shaping,
+            response_mapping=response_mapping,
+            adapter_loci=(adapter,),
+            canonical_adapter_loci=(adapter,),
+            presenter_loci=generator.ADAPTER_BOUNDARY_PRESENTER_LOCI,
+            vendor_seam_loci=generator.ADAPTER_BOUNDARY_VENDOR_SEAM_LOCI,
+            pure_compute_loci=generator.ADAPTER_BOUNDARY_PURE_COMPUTE_LOCI,
+            public_route_baseline=baseline,
+            evidence_tool_loci=("tools/evidence/generate_hdapi_v2_contract_inventory.py", "tools/evidence/hdapi_v2_boundary_analyzer.py"),
+        )
+
+        keyword_factory_records = [
+            record
+            for record in route_records
+            if record.registration_kind == "register_blueprint"
+            and record.fail_closed_reason == "dynamic_or_factory_blueprint_registration"
+        ]
+        assert len(keyword_factory_records) == 1
+        assert keyword_factory_records[0].parser_status == boundary_analyzer.BOUNDARY_ROUTE_AMBIGUOUS
+        assert keyword_factory_records[0].public_internal_classification == boundary_analyzer.BOUNDARY_UNKNOWN
+        assert result["typed_public_route_signatures"] == result["route_baseline_signatures"]
+        assert result["route_baseline_reconciled"] is False
+        public_routes = _finding_by_category(result, "public_routes")
+        assert public_routes["classification"] == boundary_analyzer.BOUNDARY_UNKNOWN
+        assert public_routes["verdict"] == "UNKNOWN"
+        assert public_routes["verdict"] != "PASS"
+        assert result["verdict_status"] != "PASS"
+        assert public_routes["details"] == [
+            boundary_analyzer.route_signature_from_record(record)
+            for record in route_records
+            if record.parser_status != boundary_analyzer.BOUNDARY_ROUTE_SUPPORTED
+            or record.public_internal_classification == boundary_analyzer.BOUNDARY_UNKNOWN
+        ]
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
+
 def test_epic034_w004_dynamic_route_fails_closed_before_supported_signature() -> None:
     import shutil
 
