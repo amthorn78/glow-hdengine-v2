@@ -4276,6 +4276,49 @@ def test_epic034_w004_route_signature_matrix(case: dict[str, Any]) -> None:
         shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
 
 
+@pytest.mark.parametrize(
+    "case_id,register_call",
+    [
+        ("positional-factory-call", "app.register_blueprint(make_bp(), url_prefix=None)"),
+        ("keyword-factory-call", "app.register_blueprint(blueprint=make_bp(), url_prefix=None)"),
+        ("keyword-dotted-factory-call", "app.register_blueprint(blueprint=factory.make_bp(), url_prefix=None)"),
+        ("positional-subscript-call", "app.register_blueprint(registry['make_bp'](), url_prefix=None)"),
+    ],
+)
+def test_epic034_w004_register_blueprint_call_expressions_do_not_prove_static_identity(
+    case_id: str, register_call: str
+) -> None:
+    import shutil
+
+    rel_dir = "tmp_boundary_test"
+    try:
+        adapter = _write_boundary_temp(
+            rel_dir,
+            f"proof_gate_dynamic_blueprint_{case_id.replace('-', '_')}.py",
+            "from flask import Flask, Blueprint\n"
+            "app = Flask(__name__)\n"
+            "class Factory:\n"
+            "    def make_bp(self):\n"
+            "        return Blueprint('factory', __name__)\n"
+            "factory = Factory()\n"
+            "registry = {'make_bp': lambda: Blueprint('registry', __name__)}\n"
+            "def make_bp():\n"
+            "    return Blueprint('reader', __name__)\n"
+            f"{register_call}\n",
+        )
+        records = boundary_analyzer.discover_route_registrations((adapter,))
+        register_records = [record for record in records if record.registration_kind == "register_blueprint"]
+
+        assert len(register_records) == 1
+        record = register_records[0]
+        assert record.parser_status == boundary_analyzer.BOUNDARY_ROUTE_AMBIGUOUS
+        assert record.proof_contract.final_gate == "fail_closed"
+        assert record.fail_closed_reason == "dynamic_or_factory_blueprint_registration"
+        assert record.blueprint_name == ""
+        assert not [item for item in records if item.parser_status == boundary_analyzer.BOUNDARY_ROUTE_SUPPORTED]
+    finally:
+        shutil.rmtree(ROOT / rel_dir, ignore_errors=True)
+
 def test_epic034_w004_renderer_refuses_route_field_substring_without_typed_fields() -> None:
     result = _epic034_analyzer_result()
     assert result["work_item"] == "W-004"

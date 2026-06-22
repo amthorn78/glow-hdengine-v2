@@ -794,13 +794,24 @@ def _route_methods(deco_name: str, deco: ast.AST) -> str:
     return ""
 
 
-def _expr_name(node: ast.AST) -> str:
+def _expr_display_name(node: ast.AST) -> str:
     if isinstance(node, ast.Name):
         return node.id
     if isinstance(node, ast.Attribute):
         return _attribute_chain(node)
     if isinstance(node, ast.Call):
         return _attribute_chain(node.func)
+    return ""
+
+
+def _static_expr_name(node: ast.AST) -> str:
+    if isinstance(node, ast.Name):
+        return node.id
+    if isinstance(node, ast.Attribute):
+        base = _static_expr_name(node.value)
+        if not base:
+            return ""
+        return f"{base}.{node.attr}"
     return ""
 
 
@@ -907,11 +918,11 @@ def _register_blueprint_value_is_factory(call: ast.Call) -> bool:
 
 
 def _register_blueprint_name(call: ast.Call) -> str:
-    positional_name = _expr_name(call.args[0]) if call.args else ""
+    positional_name = _static_expr_name(call.args[0]) if call.args else ""
     keyword_name = ""
     for keyword in call.keywords:
         if keyword.arg == "blueprint":
-            keyword_name = _expr_name(keyword.value)
+            keyword_name = _static_expr_name(keyword.value)
             break
     if positional_name and keyword_name and positional_name != keyword_name:
         return ""
@@ -921,7 +932,7 @@ def _register_blueprint_name(call: ast.Call) -> str:
 def _decorator_route_root(deco_call: ast.AST) -> str:
     if isinstance(deco_call, ast.Attribute):
         value = deco_call.value
-        return value.id if isinstance(value, ast.Name) else _attribute_chain(value)
+        return _static_expr_name(value)
     return ""
 
 
@@ -1224,7 +1235,8 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                 )))
                 continue
             if isinstance(node, ast.Call) and _attribute_chain(node.func).endswith(".add_url_rule"):
-                owner = _attribute_chain(node.func).rsplit(".", 1)[0]
+                owner_path = _static_expr_name(node.func)
+                owner = owner_path.rsplit(".", 1)[0] if owner_path.endswith(".add_url_rule") else ""
                 owner_type = owners.get(owner, "BlueprintAlias" if owner in blueprint_prefixes else "")
                 status = BOUNDARY_ROUTE_SUPPORTED if owner_type else BOUNDARY_ROUTE_UNSUPPORTED
                 reason = "" if owner_type else "unproven_add_url_rule_owner"
@@ -1394,7 +1406,8 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                 )))
                 continue
             if isinstance(node, ast.Call) and _attribute_chain(node.func).endswith(".register_blueprint"):
-                owner = _attribute_chain(node.func).rsplit(".", 1)[0]
+                owner_path = _static_expr_name(node.func)
+                owner = owner_path.rsplit(".", 1)[0] if owner_path.endswith(".register_blueprint") else ""
                 owner_type = owners.get(owner, "")
                 status = BOUNDARY_ROUTE_SUPPORTED if owner_type == "Flask" else BOUNDARY_ROUTE_UNSUPPORTED
                 reason = "" if status == BOUNDARY_ROUTE_SUPPORTED else "unproven_register_blueprint_owner"
