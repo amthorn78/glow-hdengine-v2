@@ -724,12 +724,19 @@ def _route_candidate_proof_states(candidate: RouteRegistrationCandidate) -> tupl
 
 def _proof_contract_for_candidate(candidate: RouteRegistrationCandidate, proof_states: tuple[RouteProofFact, ...]) -> RouteProofContract:
     required = REQUIRED_SUPPORTED_ROUTE_PROOF_FIELDS
-    proven_states = {ProofState.PROVEN.value, ProofState.LITERAL.value, ProofState.EXPLICIT_NONE.value, ProofState.EXPLICIT_EMPTY.value}
-    optional_missing_fields = {"blueprint_constructor_state", "blueprint_register_state"}
+    proven_states = {ProofState.PROVEN.value, ProofState.LITERAL.value, ProofState.EXPLICIT_EMPTY.value}
+    optional_missing_fields = {"blueprint_constructor_state"}
+    if (
+        candidate.proven_owner_type not in {"Blueprint", "BlueprintAlias"}
+        or candidate.registration_kind in {"register_blueprint", "blueprint_constructor"}
+        or bool(candidate.blueprint_constructor_prefix)
+    ):
+        optional_missing_fields.add("blueprint_register_state")
     if candidate.registration_kind in {"hook_decorator", "register_blueprint", "blueprint_constructor"}:
         optional_missing_fields.add("route_path_source")
     if candidate.registration_kind in {"register_blueprint", "blueprint_constructor"}:
         optional_missing_fields.update({"endpoint_source", "view_binding"})
+    explicit_none_allowed_fields = {"blueprint_register_state"}
     by_field = {fact.field: fact for fact in proof_states}
 
     def field_is_proven(field: str) -> bool:
@@ -738,6 +745,8 @@ def _proof_contract_for_candidate(candidate: RouteRegistrationCandidate, proof_s
             return False
         if fact.state in proven_states:
             return True
+        if fact.state == ProofState.EXPLICIT_NONE.value:
+            return field in explicit_none_allowed_fields
         return fact.state == ProofState.MISSING.value and field in optional_missing_fields and fact.reason == ""
 
     proven = tuple(field for field in required if field_is_proven(field))
@@ -1132,12 +1141,21 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                     constructor_prefix = blueprint_prefixes.get(route_root, "")
                     mount_prefix_values = blueprint_mount_prefixes.get(route_root, ())
                     mount_prefix = mount_prefix_values[0] if len(mount_prefix_values) == 1 else ("<dynamic>" if len(mount_prefix_values) > 1 else "")
+                    register_proof = RouteProofFact("blueprint_register_state", ProofState.MISSING.value, "", "blueprint_registration_lookup", "")
+                    if owner_type in {"Blueprint", "BlueprintAlias"}:
+                        if not mount_prefix_values and not constructor_prefix:
+                            status = BOUNDARY_ROUTE_AMBIGUOUS
+                            reason = reason or "unproven_blueprint_registration"
+                            register_proof = RouteProofFact("blueprint_register_state", ProofState.MISSING.value, "", "blueprint_registration_lookup", "unproven_blueprint_registration")
+                        elif len(mount_prefix_values) == 1 and mount_prefix != "<dynamic>":
+                            register_proof = RouteProofFact("blueprint_register_state", ProofState.PROVEN.value, "" if mount_prefix == BOUNDARY_ROUTE_NO_PREFIX_OVERRIDE else mount_prefix, "blueprint_registration_lookup", "")
                     if len(mount_prefix_values) > 1:
                         status = BOUNDARY_ROUTE_AMBIGUOUS
                         reason = reason or "multiple_register_blueprint_prefixes"
                     if mount_prefix == "<dynamic>":
                         status = BOUNDARY_ROUTE_AMBIGUOUS
                         reason = reason or "dynamic_register_blueprint_prefix"
+                        register_proof = RouteProofFact("blueprint_register_state", ProofState.DYNAMIC.value, "", "blueprint_registration_lookup", "dynamic_register_blueprint_prefix")
                     signed_prefix = (
                         ""
                         if mount_prefix == "<dynamic>"
@@ -1166,7 +1184,7 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
                         routing_keywords=routing_keywords,
                         imported_view_target=aliases.get(node.name, ""),
                         fail_closed_reason=reason,
-                        proof_inputs=(route_path_proof,),
+                        proof_inputs=(route_path_proof, register_proof),
                     )))
             if isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and route_aliases.get(node.func.id, "").endswith(".add_url_rule"):
                 records.append(_finalize_route_candidate(RouteRegistrationCandidate(
