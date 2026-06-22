@@ -1,0 +1,60 @@
+generated_at_utc=2026-06-22T21:30:18Z
+work_item=W-005
+epic_id=HDE-EPIC034
+pf09_document=PF09.5 — HDE Build Checklist Fermentation
+pf09_task_id=HDE-FERM007
+pf09_subtask_id=HDE-FERM007.4
+branch_commit=c405659 Accept W-004 route-proof remediation
+git_status_short='M artifacts/epic020/bundles/EVIDENCE_INDEX_MIRROR_OK.bundle.json\n M artifacts/epic020/bundles/EVIDENCE_INDEX_MIRROR_OK.bundle.json.path_proof.txt\n M artifacts/epic020/bundles/EVIDENCE_INDEX_MIRROR_OK.manifest.json\n M artifacts/epic020/bundles/EVIDENCE_INDEX_MIRROR_OK.manifest.json.path_proof.txt\n M artifacts/epic020/bundles/EVIDENCE_INDEX_UPDATED_OK.bundle.json\n M artifacts/epic020/bundles/EVIDENCE_INDEX_UPDATED_OK.bundle.json.path_proof.txt\n M artifacts/epic020/bundles/EVIDENCE_INDEX_UPDATED_OK.manifest.json\n M artifacts/epic020/bundles/EVIDENCE_INDEX_UPDATED_OK.manifest.json.path_proof.txt\n M artifacts/epic020/bundles/EVIDENCE_PATHS_VALIDATED_OK.bundle.json\n M artifacts/epic020/bundles/EVIDENCE_PATHS_VALIDATED_OK.bundle.json.path_proof.txt\n M artifacts/epic020/bundles/EVIDENCE_PATHS_VALIDATED_OK.manifest.json\n M artifacts/epic020/bundles/EVIDENCE_PATHS_VALIDATED_OK.manifest.json.path_proof.txt\n M artifacts/evidence_index.jsonl\n M artifacts/evidence_index.jsonl.path_proof.txt\n M artifacts/evidence_index.jsonl.sha256\n M artifacts/evidence_index.jsonl.sha256.path_proof.txt\n M artifacts/narratives/router/cli_http_parity.log.path_proof.txt\n M artifacts/narratives/router/parity_abba.log.path_proof.txt\n M artifacts/writer/conjunction_write_readback.log.path_proof.txt\n M artifacts/writer/conjunction_writer_summary.json.path_proof.txt\n M audit/docdeltas/hde-epic032_doc_deltas.md.path_proof.txt\n M audit/docdeltas/hde-epic033_doc_deltas.md.path_proof.txt\n M audit/docdeltas/hde-epic034_doc_deltas.md.path_proof.txt\n M audit/gates/canonical_json/canonical_json.gate.json\n M audit/gates/canonical_json/canonical_json.gate.json.path_proof.txt\n M audit/gates/canonical_json/json_canon_compare.log\n M audit/gates/canonical_json/json_canon_compare.log.path_proof.txt\n M audit/gates/canonical_json/json_canonical_check.log\n M audit/gates/canonical_json/json_canonical_check.log.path_proof.txt\n M audit/gates/json_gate/canonical/json_gate_check_log.ndjson\n M audit/gates/json_gate/canonical/json_gate_check_log.ndjson.path_proof.txt\n M audit/gates/json_gate/canonical/json_gate_compare_log.ndjson\n M audit/gates/json_gate/canonical/json_gate_compare_log.ndjson.path_proof.txt\n M audit/gates/json_gate/canonical/json_gate_structured_record.json\n M audit/gates/json_gate/canonical/json_gate_structured_record.json.path_proof.txt\n M audit/gates/narratives/keys_10x4.table.json.path_proof.txt\n M audit/gates/narratives/pack_identity.txt.path_proof.txt\n M audit/gates/narratives/registry.diff.json.path_proof.txt\n M audit/gates/topology/orientation_demo.txt\n M audit/gates/topology/orientation_demo.txt.path_proof.txt\n M audit/qa/hde-epic030/pr-03/category_order_binding.log.path_proof.txt\n M audit/qa/hde-epic030/pr-03/compat_identity_binding.log.path_proof.txt\n M audit/qa/hde-epic030/pr-03/compat_parity_binding.log.path_proof.txt\n M audit/qa/hde-epic030/pr-04/band_edges_binding.log.path_proof.txt\n M audit/qa/hde-epic030/pr-04/band_thresholds_diff.json.path_proof.txt\n M audit/qa/hde-epic030/pr-04/band_thresholds_identity_hash.txt.path_proof.txt\n M audit/qa/hde-epic030/pr-05/category_canonical_compare.log.path_proof.txt\n M audit/qa/hde-epic030/pr-05/category_framework_binding.log.path_proof.txt\n M audit/qa/hde-epic030/pr-05/per_channel_mechanics.json.path_proof.txt\n M audit/qa/hde-epic034/00_meta/doc_deltas.md.path_proof.txt\n M audit/qa/hde-epic034/pr-04/W-004_complete_final.patch\n M docs/evidence/INDEX.json\n M docs/evidence/INDEX.json.path_proof.txt\n M docs/evidence/INDEX.sha256\n M docs/evidence/INDEX.sha256.path_proof.txt\n M tools/evidence/update_evidence_index.py\n?? audit/qa/hde-epic034/pr-04/w-005_final_validation.log\n?? audit/qa/hde-epic034/pr-04/w-005_final_validation.log.path_proof.txt\n?? audit/qa/hde-epic034/pr-04/w-005_final_validation_report.md\n?? audit/qa/hde-epic034/pr-04/w-005_final_validation_report.md.path_proof.txt'
+rails=SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC
+predicate=w001_conservative_positive_boundary_contract status=PASS
+predicate=w001_classifications_allowed_forbidden_unknown_out_of_scope status=PASS
+predicate=w001_discovered_loci_before_classification status=PASS
+predicate=w001_unknown_current_categories_fail_closed status=PASS
+predicate=w002_analyzer_owned_findings_and_verdict status=PASS
+predicate=w002_generator_renders_analyzer_output_only status=PASS
+predicate=w002_renderer_refuses_non_pass_analyzer_verdicts status=PASS
+predicate=w003_table_driven_boundary_taxonomy status=PASS
+predicate=w003_required_taxonomy_groups_visible status=PASS
+predicate=w003_no_silent_taxonomy_skips status=PASS
+predicate=w004_public_route_drift_proof_repaired status=PASS
+predicate=w004_route_comparison_cannot_disable_itself status=PASS
+predicate=w004_typed_route_records_source_of_truth status=PASS
+predicate=w004_declared_route_grammar_active status=PASS
+predicate=w004_unsupported_ambiguous_routes_fail_closed status=PASS
+predicate=w004_supported_route_proof_contracts_required status=PASS
+predicate=no_new_http_home status=PASS
+predicate=no_adapter_bypass status=PASS
+predicate=no_presenter_bypass status=PASS
+predicate=no_ad_hoc_serialization status=PASS
+predicate=no_pure_compute_external_io status=PASS
+predicate=guard_provenance_explicit status=PASS
+predicate=evidence_family_binding_pr01_pr04_current status=PASS
+predicate=renderer_only_no_override status=PASS
+predicate=fail_closed_known_unresolved_categories status=PASS
+predicate=path_proof_validation_result status=PASS
+predicate=hash_validation_result status=PASS
+predicate=mirror_validation_result status=PASS
+predicate=evidence_index_validation_result status=PASS
+predicate=boundary_proof_validation_result status=PASS
+predicate=no_unsupported_scope_claim_result status=PASS
+predicate=pf09_5_not_edited status=PASS
+command='SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python -m pip install -r requirements-dev.txt' result=PASS
+command='SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python -m pytest --version' result=PASS: pytest 8.4.2
+command='SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python -m pytest tests/evidence/test_hdapi_v2_contract_inventory.py -k "w004 or adapter_boundary or route_signature" -q' result=PASS: 173 passed, 122 deselected
+command='SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/generate_hdapi_v2_contract_inventory.py' result=PASS
+command='SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/update_evidence_index.py' result=PASS
+command='SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/orientation_demo.py' result=PASS
+command='SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/update_evidence_index.py --check' result=PASS
+command='SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/orientation_demo.py --check' result=PASS
+command='SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/validate_evidence_paths.py' result=PASS
+command='SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC ci/checks/check_mirror_schema.sh' result=PASS
+command='SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC ci/checks/check_evidence_index_hash.sh' result=PASS
+command='SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/check_lf_endings.py' result=PASS
+command='SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/run_canonical_json_gate.py' result=PASS
+command='SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python -m pytest tests/evidence -q' result=PASS: 341 passed
+command='git apply --reverse --check audit/qa/hde-epic034/pr-04/W-004_complete_final.patch' result=PASS
+command='git diff --check' result=PASS
+status_support=PASS current repo evidence supports a later PF09.5 status action for HDE-FERM007.4: change to Done
+pf09_5_edit=NONE
+status=PASS

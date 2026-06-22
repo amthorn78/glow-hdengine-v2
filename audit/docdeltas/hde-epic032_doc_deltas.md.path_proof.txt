@@ -1,5 +1,5 @@
 path: audit/docdeltas/hde-epic032_doc_deltas.md
 size_bytes: 142
 sha256: ba94ac32ba98d1ef4c917dfb598134d3edf600ea182f781504e932c8504a2f98
-mtime_utc: 2026-06-22T08:22:10Z
-produced_at_utc: 2026-06-22T08:24:01Z
+mtime_utc: 2026-06-22T21:23:00Z
+produced_at_utc: 2026-06-22T21:26:02Z
