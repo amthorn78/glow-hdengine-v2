@@ -1,5 +1,5 @@
 path: artifacts/vendor/hdapi_v2/request_shaping.snapshot.json
 size_bytes: 4325
-sha256: 2e0ccfcd9696e42aef6d4c41110295fe30446d16e4dc4c2c6739aa354f59ce7a
-mtime_utc: 2026-06-22T04:08:00Z
-produced_at_utc: 2026-06-22T04:07:59Z
+sha256: 6f27fab0940e0b530b29ab8c8825c237f6f54b33c8b8a346f7e1de610eb1aae5
+mtime_utc: 2026-06-22T04:45:27Z
+produced_at_utc: 2026-06-22T04:45:25Z
