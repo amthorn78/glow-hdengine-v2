@@ -475,21 +475,6 @@ def _target_writes_attribute(target: ast.AST, name: str, attrs: set[str]) -> boo
     return False
 
 
-def _string_subscript_key(node: ast.AST) -> str:
-    if isinstance(node, ast.Constant) and isinstance(node.value, str):
-        return node.value
-    return ""
-
-
-def _target_writes_view_dict_key(target: ast.AST, name: str, keys: set[str]) -> bool:
-    if not isinstance(target, ast.Subscript):
-        return False
-    if _string_subscript_key(target.slice) not in keys:
-        return False
-    value = target.value
-    return isinstance(value, ast.Attribute) and value.attr == "__dict__" and isinstance(value.value, ast.Name) and value.value.id == name
-
-
 def _call_mutates_attribute(call: ast.Call, name: str, attrs: set[str]) -> bool:
     if not isinstance(call.func, ast.Attribute):
         return False
@@ -579,11 +564,8 @@ def _local_view_binding_proof(
 
         if isinstance(effect, ast.Assign):
             for target in effect.targets:
-                if _target_writes_attribute(target, name, {"__name__"}) or _target_writes_view_dict_key(target, name, {"__name__"}):
+                if _target_writes_attribute(target, name, {"__name__"}):
                     endpoint_name_stable = False
-                if _target_writes_view_dict_key(target, name, {"methods", "required_methods"}):
-                    dynamic_methods = True
-                    continue
                 if _target_writes_attribute(target, name, {"methods", "required_methods"}):
                     values = _literal_string_list(effect.value)
                     if values:
@@ -596,11 +578,9 @@ def _local_view_binding_proof(
                     else:
                         dynamic_methods = True
         elif isinstance(effect, ast.AnnAssign):
-            if _target_writes_attribute(effect.target, name, {"__name__"}) or _target_writes_view_dict_key(effect.target, name, {"__name__"}):
+            if _target_writes_attribute(effect.target, name, {"__name__"}):
                 endpoint_name_stable = False
-            if _target_writes_view_dict_key(effect.target, name, {"methods", "required_methods"}):
-                dynamic_methods = True
-            elif _target_writes_attribute(effect.target, name, {"methods", "required_methods"}):
+            if _target_writes_attribute(effect.target, name, {"methods", "required_methods"}):
                 values = _literal_string_list(effect.value) if effect.value is not None else ()
                 if values:
                     if isinstance(effect.target, ast.Attribute) and effect.target.attr == "methods":
@@ -612,16 +592,10 @@ def _local_view_binding_proof(
                 else:
                     dynamic_methods = True
         elif isinstance(effect, ast.AugAssign):
-            if _target_writes_attribute(effect.target, name, {"__name__"}) or _target_writes_view_dict_key(effect.target, name, {"__name__"}):
+            if _target_writes_attribute(effect.target, name, {"__name__"}):
                 endpoint_name_stable = False
-            if _target_writes_attribute(effect.target, name, {"methods", "required_methods"}) or _target_writes_view_dict_key(effect.target, name, {"methods", "required_methods"}):
+            if _target_writes_attribute(effect.target, name, {"methods", "required_methods"}):
                 dynamic_methods = True
-        elif isinstance(effect, ast.Delete):
-            for target in effect.targets:
-                if _target_writes_attribute(target, name, {"__name__"}) or _target_writes_view_dict_key(target, name, {"__name__"}):
-                    endpoint_name_stable = False
-                if _target_writes_attribute(target, name, {"methods", "required_methods"}) or _target_writes_view_dict_key(target, name, {"methods", "required_methods"}):
-                    dynamic_methods = True
         elif isinstance(effect, ast.Call):
             if _call_mutates_attribute(effect, name, {"methods", "required_methods"}):
                 dynamic_methods = True
