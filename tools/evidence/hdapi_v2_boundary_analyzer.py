@@ -1069,6 +1069,14 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
     """Discover bounded typed route registrations for PR-04 drift proof."""
 
     records: list[RouteRegistrationCandidate] = []
+    global_blueprint_prefixes: dict[str, str] = {}
+    global_blueprint_mount_prefixes: dict[str, tuple[str, ...]] = {}
+    for rel in loci:
+        _path, _text, tree = _python_source(rel)
+        global_blueprint_prefixes.update(_blueprint_prefixes(tree))
+        for name, values in _blueprint_registration_prefixes(tree).items():
+            merged_values = global_blueprint_mount_prefixes.get(name, ()) + values
+            global_blueprint_mount_prefixes[name] = tuple(dict.fromkeys(merged_values))
     decorator_suffix_to_kind = {
         ".route": "route_decorator",
         ".get": "route_decorator",
@@ -1088,8 +1096,10 @@ def discover_route_registrations(loci: tuple[str, ...]) -> list[RouteSignatureRe
         aliases = _import_aliases(tree)
         owners = _owner_types(tree)
         route_aliases = _route_aliases(tree)
-        blueprint_prefixes = _blueprint_prefixes(tree)
-        blueprint_mount_prefixes = _blueprint_registration_prefixes(tree)
+        local_blueprint_prefixes = _blueprint_prefixes(tree)
+        local_blueprint_mount_prefixes = _blueprint_registration_prefixes(tree)
+        blueprint_prefixes = {**global_blueprint_prefixes, **local_blueprint_prefixes}
+        blueprint_mount_prefixes = {**global_blueprint_mount_prefixes, **local_blueprint_mount_prefixes}
         methodview_methods = _methodview_http_methods(tree, aliases)
         function_defs = _iter_function_defs(tree)
         records.extend(_blueprint_constructor_records(rel, tree))
@@ -2850,7 +2860,7 @@ def _route_baseline_is_reconciled(
     route_surface_out_of_scope: bool = False,
 ) -> bool:
     if route_surface_out_of_scope:
-        return True
+        return False
     return (
         bool(discovered_supported_public)
         and bool(baseline_supported_public)
