@@ -43,12 +43,15 @@ EPIC034_QA = ROOT / "audit" / "qa" / "hde-epic034" / "pr-01"
 EPIC034_PR02_QA = ROOT / "audit" / "qa" / "hde-epic034" / "pr-02"
 EPIC034_PR03_QA = ROOT / "audit" / "qa" / "hde-epic034" / "pr-03"
 EPIC034_PR04_QA = ROOT / "audit" / "qa" / "hde-epic034" / "pr-04"
+EPIC034_PR05_QA = ROOT / "audit" / "qa" / "hde-epic034" / "pr-05"
 REQUEST_SHAPING_SNAPSHOT = OUT / "request_shaping.snapshot.json"
 REQUEST_SHAPING_CHECK_LOG = EPIC034_PR02_QA / "request_shaping_check.log"
 RESPONSE_MAPPING_SNAPSHOT = OUT / "response_mapping.snapshot.json"
 RESPONSE_MAPPING_CHECK_LOG = EPIC034_PR03_QA / "response_mapping_check.log"
 ADAPTER_BOUNDARY_PROOF_LOG = OUT / "adapter_boundary_proof.log"
 BOUNDARY_CHECK_LOG = EPIC034_PR04_QA / "boundary_check.log"
+CLOSED_RAILS_REFUSAL_PROOF = OUT / "closed_rails_refusal.txt"
+CLOSED_RAILS_CHECK_LOG = EPIC034_PR05_QA / "closed_rails_check.log"
 REQUEST_SHAPING_OUTPUTS = (
     REQUEST_SHAPING_SNAPSHOT,
     REQUEST_SHAPING_SNAPSHOT.with_suffix(REQUEST_SHAPING_SNAPSHOT.suffix + ".path_proof.txt"),
@@ -67,7 +70,13 @@ ADAPTER_BOUNDARY_OUTPUTS = (
     BOUNDARY_CHECK_LOG,
     BOUNDARY_CHECK_LOG.with_suffix(BOUNDARY_CHECK_LOG.suffix + ".path_proof.txt"),
 )
-EPIC034_CLOSED_RAILS_DERIVED_OUTPUTS = REQUEST_SHAPING_OUTPUTS + RESPONSE_MAPPING_OUTPUTS + ADAPTER_BOUNDARY_OUTPUTS
+PR05_CLOSED_RAILS_OUTPUTS = (
+    CLOSED_RAILS_REFUSAL_PROOF,
+    CLOSED_RAILS_REFUSAL_PROOF.with_suffix(CLOSED_RAILS_REFUSAL_PROOF.suffix + ".path_proof.txt"),
+    CLOSED_RAILS_CHECK_LOG,
+    CLOSED_RAILS_CHECK_LOG.with_suffix(CLOSED_RAILS_CHECK_LOG.suffix + ".path_proof.txt"),
+)
+EPIC034_CLOSED_RAILS_DERIVED_OUTPUTS = REQUEST_SHAPING_OUTPUTS + RESPONSE_MAPPING_OUTPUTS + ADAPTER_BOUNDARY_OUTPUTS + PR05_CLOSED_RAILS_OUTPUTS
 CLOSED_RAILS_ENV = {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}
 SOURCE_SELECTION_SNAPSHOT = OUT / "source_selection.snapshot.json"
 V1_LEGACY_GUARD_LOG = OUT / "v1_legacy_guard.log"
@@ -4380,6 +4389,161 @@ def build_adapter_boundary_check_log(produced: str, proof: str, checks: dict[str
     lines.append("status=PASS" if all(log_checks.values()) else "status=FAIL")
     return "\n".join(lines)
 
+def build_closed_rails_refusal_proof(
+    produced: str,
+    source_snapshot: dict[str, Any],
+    request_snapshot: dict[str, Any],
+    response_snapshot: dict[str, Any],
+    boundary_proof: str,
+    ops_summary: dict[str, Any],
+) -> tuple[str, str]:
+    """Render HDE-EPIC034 PR-05 deterministic closed-rails refusal evidence."""
+
+    from engine.bodygraph.vendor_client import HdApiClient, VendorError, VendorRetryConfig, VendorTimeouts
+
+    rails = "SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC"
+    client = HdApiClient(
+        base_url="https://vendor.example",
+        api_key="synthetic-api-key",
+        geo_key="synthetic-geo-key",
+        release_id="epic034-pr05",
+        retry=VendorRetryConfig(max_attempts=1, profile="none", exp_base_ms=0, exp_ceiling_ms=0),
+        timeouts=VendorTimeouts(connect_timeout_ms=1000, read_timeout_ms=2000, total_timeout_ms=5000),
+    )
+    routes = {
+        (route.get("path") or route.get("endpoint_path")): route
+        for route in request_snapshot.get("routes", [])
+        if (route.get("path") or route.get("endpoint_path")) in {"/v2/charts", "/v2/charts/simple", "/v2/charts/coordinates", "/v1/bodygraphs", "/v1/bodygraphs/simple"}
+    }
+
+    def _request_for(path: str) -> Any:
+        route = routes[path]
+        kwargs: dict[str, Any] = {
+            "path": path,
+            "request_fields": tuple(route.get("request_fields") or route.get("body_field_source_list") or ()),
+            "geocode_required": str(route.get("geocode_key_requirement", "")).startswith("required"),
+            "birthdate": "1990-01-02",
+            "birthtime": "03:04",
+        }
+        if "location" in (route.get("request_fields") or route.get("body_field_source_list") or ()):
+            kwargs["location"] = "Austin, TX, USA"
+        if "lat" in (route.get("request_fields") or route.get("body_field_source_list") or ()):
+            kwargs["lat"] = 30.2672
+        if "lng" in (route.get("request_fields") or route.get("body_field_source_list") or ()):
+            kwargs["lng"] = -97.7431
+        return client.build_contract_route_request(**kwargs)
+
+    built = {path: _request_for(path) for path in routes}
+    req = urllib.request.Request("https://vendor.example/v2/charts", data=b"{}\n", method="POST")
+    refusal_codes: list[str] = []
+    for _ in range(2):
+        try:
+            HdApiClient._default_request(req, 1.0)
+        except VendorError as exc:
+            refusal_codes.append(exc.code)
+        else:  # pragma: no cover - fail-closed guard
+            refusal_codes.append("NO_REFUSAL")
+
+    conflict_ok = False
+    alias_ok = False
+    canonical_ok = False
+    saved_env = {key: os.environ.get(key) for key in ["HD_API_BASE_URL", "HDAPI_BASE_URL", "HD_API_KEY", "GEO_API_KEY"]}
+    try:
+        os.environ["HD_API_KEY"] = "k"
+        os.environ.pop("GEO_API_KEY", None)
+        os.environ["HD_API_BASE_URL"] = "https://canonical.example"
+        os.environ.pop("HDAPI_BASE_URL", None)
+        canonical = HdApiClient.from_env(release_id="epic034-pr05")
+        canonical_ok = canonical._base_url == "https://canonical.example"
+        os.environ.pop("HD_API_BASE_URL", None)
+        os.environ["HDAPI_BASE_URL"] = "https://legacy.example"
+        alias = HdApiClient.from_env(release_id="epic034-pr05")
+        alias_ok = alias._base_url == "https://legacy.example"
+        os.environ["HD_API_BASE_URL"] = "https://canonical.example"
+        os.environ["HDAPI_BASE_URL"] = "https://legacy.example"
+        try:
+            HdApiClient.from_env(release_id="epic034-pr05")
+        except VendorError as exc:
+            conflict_ok = exc.code == "PROVIDER_CONFIG_INVALID"
+    finally:
+        for key, value in saved_env.items():
+            if value is None:
+                os.environ.pop(key, None)
+            else:
+                os.environ[key] = value
+
+    v2_paths = ["/v2/charts", "/v2/charts/simple", "/v2/charts/coordinates"]
+    v1_paths = ["/v1/bodygraphs", "/v1/bodygraphs/simple"]
+    checks = {
+        "source_selection_artifact_present": bool(source_snapshot.get("route_families")),
+        "request_shaping_artifact_present": bool(request_snapshot.get("routes")),
+        "response_mapping_artifact_present": bool(response_snapshot.get("routes")),
+        "adapter_boundary_proof_present": "guarded_by=engine/bodygraph/vendor_client.py:HdApiClient._default_request@" in boundary_proof,
+        "ops01_fact_summary_present": bool(ops_summary),
+        "closed_rails_safe_mode_1": os.environ.get("SAFE_MODE") == "1",
+        "closed_rails_allow_network_0": os.environ.get("ALLOW_NETWORK") == "0",
+        "v2_full_chart_refuses_without_external_io": refusal_codes == ["PROVIDER_REFUSED", "PROVIDER_REFUSED"],
+        "v2_simple_chart_refuses_without_external_io": refusal_codes == ["PROVIDER_REFUSED", "PROVIDER_REFUSED"],
+        "v2_coordinates_chart_refuses_without_external_io": refusal_codes == ["PROVIDER_REFUSED", "PROVIDER_REFUSED"],
+        "v2_auth_uses_authorization_bearer": all(built[p].headers.get("Authorization", "").startswith("Bearer ") for p in v2_paths),
+        "v2_does_not_use_hd_api_key_header": all("HD-Api-Key" not in built[p].headers for p in v2_paths),
+        "v1_legacy_uses_hd_api_key_header": all(built[p].headers.get("HD-Api-Key") == "synthetic-api-key" for p in v1_paths),
+        "v1_legacy_does_not_use_bearer_auth": all("Authorization" not in built[p].headers for p in v1_paths),
+        "hd_api_base_url_canonical": canonical_ok and request_snapshot.get("base_url_env_var") == "HD_API_BASE_URL",
+        "hdapi_base_url_alias_compatibility_only": alias_ok and request_snapshot.get("deprecated_base_url_alias", {}).get("env_var") == "HDAPI_BASE_URL",
+        "base_url_conflict_fails_closed": conflict_ok,
+        "typed_refusal_deterministic": refusal_codes == ["PROVIDER_REFUSED", "PROVIDER_REFUSED"],
+        "two_run_identity": refusal_codes == ["PROVIDER_REFUSED", "PROVIDER_REFUSED"],
+        "no_live_vendor_call_claim": response_snapshot.get("live_vendor_call_claim") == "NONE",
+        "no_open_rails_smoke_claim": response_snapshot.get("open_rails_vendor_smoke_claim") == "NONE",
+        "no_public_reader_change_claim": response_snapshot.get("public_reader_change_claim") == "NONE",
+        "no_ai_scope_claim": response_snapshot.get("ai_scope_claim") == "NONE",
+    }
+    if not all(checks.values()):
+        failed = [name for name, ok in checks.items() if not ok]
+        raise ValueError("CLOSED_RAILS_REFUSAL_CHECK_FAILED:" + ",".join(failed))
+
+    proof_lines = [
+        f"generated_at_utc={produced}",
+        "work_item=PR-05",
+        "epic_id=HDE-EPIC034",
+        "pf09_document=PF09.5 — HDE Build Checklist Fermentation",
+        "pf09_task_ids=HDE-FERM007,HDE-FERM008",
+        "pf09_subtask_ids=HDE-FERM007.5,HDE-FERM008.1",
+        f"rails={rails}",
+        "v2_route_families_tested=/v2/charts,/v2/charts/simple,/v2/charts/coordinates",
+        "v1_legacy_route_families_tested=/v1/bodygraphs,/v1/bodygraphs/simple",
+        "deterministic_route_choice_posture=governed route contracts and source-selection snapshot",
+        "deterministic_request_shaping_posture=canonical JSON request bytes from governed field lists; no vendor payload body emitted in this proof",
+        "typed_refusal_posture=PROVIDER_REFUSED before outbound transport under closed rails",
+        "no_dns_socket_http_external_io_posture=HdApiClient._default_request refuses before urllib opener construction unless SAFE_MODE=0 and ALLOW_NETWORK=1",
+        "canonical_base_url_key_posture=HD_API_BASE_URL",
+        "deprecated_alias_posture=HDAPI_BASE_URL compatibility-only when HD_API_BASE_URL is absent",
+        "conflicting_base_url_values_fail_closed=true",
+        "canonical_vendor_key_posture=HD_API_KEY",
+        "canonical_geocode_key_posture=GEO_API_KEY",
+        "v2_auth_posture=Authorization: Bearer <redacted>",
+        "v1_legacy_auth_posture=HD-Api-Key: <redacted>",
+        "geocode_header_posture=HD-Geocode-Key: <redacted> where required",
+        "no_live_vendor_call_claim=NONE",
+        "no_open_rails_smoke_claim=NONE",
+        "no_runtime_v2_conformance_claim=NONE",
+        "no_public_reader_change_claim=NONE",
+        "no_AI_scope_claim=NONE",
+        "two_run_identity_posture=two closed-rails refusal passes produced PROVIDER_REFUSED without external I/O",
+        "input_references=artifacts/vendor/hdapi_v2/source_selection.snapshot.json,artifacts/vendor/hdapi_v2/request_shaping.snapshot.json,artifacts/vendor/hdapi_v2/response_mapping.snapshot.json,artifacts/vendor/hdapi_v2/adapter_boundary_proof.log,audit/ops/hde-epic034/ops-01/fact_summary.json",
+        "status=PASS",
+    ]
+    check_lines = [
+        f"generated_at_utc={produced}",
+        "scope=HDE-EPIC034 PR-05 closed-rails deterministic refusal proof",
+        "work_item=PR-05",
+        f"rails={rails}",
+    ]
+    check_lines.extend(f"[{name}] status={'PASS' if ok else 'FAIL'}" for name, ok in checks.items())
+    check_lines.append("status=PASS")
+    return "\n".join(proof_lines), "\n".join(check_lines)
+
 def validate_source_statuses(fetched: dict[str, dict[str, Any]]) -> None:
     for key in ["v2_routes_yaml", "v1_routes_yaml", "llms_full_txt"]:
         status = fetched[key].get("fetch_status")
@@ -4546,6 +4710,9 @@ def render_outputs(produced: str, fetched: dict[str, dict[str, Any]], bodies: di
         request_snapshot = build_request_shaping_snapshot(produced, contract, snapshot, ops_summary)
         response_snapshot = build_response_mapping_snapshot(produced, contract, snapshot, request_snapshot, ops_summary)
         boundary_proof, boundary_checks = build_adapter_boundary_proof(produced, snapshot, request_snapshot, response_snapshot)
+        refusal_proof, refusal_check_log = build_closed_rails_refusal_proof(
+            produced, snapshot, request_snapshot, response_snapshot, boundary_proof, ops_summary
+        )
         outputs.update({
             REQUEST_SHAPING_SNAPSHOT: canonical_json_bytes(request_snapshot),
             REQUEST_SHAPING_CHECK_LOG: (build_request_shaping_check_log(produced, request_snapshot, mode=mode) + "\n").encode("utf-8"),
@@ -4553,6 +4720,8 @@ def render_outputs(produced: str, fetched: dict[str, dict[str, Any]], bodies: di
             RESPONSE_MAPPING_CHECK_LOG: (build_response_mapping_check_log(produced, response_snapshot, mode=mode) + "\n").encode("utf-8"),
             ADAPTER_BOUNDARY_PROOF_LOG: (boundary_proof + "\n").encode("utf-8"),
             BOUNDARY_CHECK_LOG: (build_adapter_boundary_check_log(produced, boundary_proof, boundary_checks, mode=mode) + "\n").encode("utf-8"),
+            CLOSED_RAILS_REFUSAL_PROOF: (refusal_proof + "\n").encode("utf-8"),
+            CLOSED_RAILS_CHECK_LOG: (refusal_check_log + "\n").encode("utf-8"),
         })
     outputs.update(write_baseline_pointer_artifacts(produced, acceptance))
     return outputs

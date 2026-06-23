@@ -1,5 +1,5 @@
 path: artifacts/epic020/bundles/EVIDENCE_PATHS_VALIDATED_OK.bundle.json
 size_bytes: 762
-sha256: 094ff654b5edcca4a105c662942e8179cb1dbfd33491927fefab85df97d14563
+sha256: 68281ec0e3d96ad2653c0ebd4b6c1866dd9fefc1cbf4c9a626b4bda5b83f50bb
 mtime_utc: 2025-12-06T04:12:03Z
 produced_at_utc: 2025-12-06T04:11:16Z

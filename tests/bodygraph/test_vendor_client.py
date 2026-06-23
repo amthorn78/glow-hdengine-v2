@@ -690,3 +690,22 @@ def test_fetch_logs_shaped_v2_route(tmp_path: Path) -> None:
     client.fetch(request)
     record = _read_jsonl(log_path)[0]
     assert record["route"] == "vendor.hdapi.post:/v2/charts"
+
+
+def test_closed_rails_default_request_refuses_before_url_opener(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SAFE_MODE", "1")
+    monkeypatch.setenv("ALLOW_NETWORK", "0")
+
+    def fail_if_reached(*args, **kwargs):
+        raise AssertionError("external transport opener must not be constructed under closed rails")
+
+    monkeypatch.setattr(urlrequest, "build_opener", fail_if_reached)
+    req = urlrequest.Request(
+        "https://vendor.test/v2/charts",
+        data=b"{}\n",
+        headers={"Authorization": "Bearer api"},
+        method="POST",
+    )
+    with pytest.raises(VendorError) as excinfo:
+        HdApiClient._default_request(req, 1.0)
+    assert excinfo.value.code == "PROVIDER_REFUSED"

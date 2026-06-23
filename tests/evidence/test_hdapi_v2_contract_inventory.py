@@ -830,6 +830,72 @@ def test_epic034_pr04_index_rows_use_approved_tokens_only() -> None:
         assert set(rows[key].get("tokens", [])) <= approved
 
 
+def test_epic034_pr05_closed_rails_refusal_artifacts_are_lf_terminated_and_complete() -> None:
+    proof_path = VENDOR_DIR / "closed_rails_refusal.txt"
+    log_path = ROOT / "audit" / "qa" / "hde-epic034" / "pr-05" / "closed_rails_check.log"
+    for path in [proof_path, log_path]:
+        raw = path.read_bytes()
+        assert raw.endswith(b"\n"), path
+        assert b"\r\n" not in raw, path
+    proof = proof_path.read_text(encoding="utf-8")
+    for needle in [
+        "work_item=PR-05",
+        "epic_id=HDE-EPIC034",
+        "pf09_subtask_ids=HDE-FERM007.5,HDE-FERM008.1",
+        "rails=SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC",
+        "v2_route_families_tested=/v2/charts,/v2/charts/simple,/v2/charts/coordinates",
+        "v1_legacy_route_families_tested=/v1/bodygraphs,/v1/bodygraphs/simple",
+        "typed_refusal_posture=PROVIDER_REFUSED",
+        "canonical_base_url_key_posture=HD_API_BASE_URL",
+        "deprecated_alias_posture=HDAPI_BASE_URL compatibility-only",
+        "v2_auth_posture=Authorization: Bearer <redacted>",
+        "v1_legacy_auth_posture=HD-Api-Key: <redacted>",
+        "geocode_header_posture=HD-Geocode-Key: <redacted> where required",
+        "no_live_vendor_call_claim=NONE",
+        "no_open_rails_smoke_claim=NONE",
+        "no_runtime_v2_conformance_claim=NONE",
+        "no_public_reader_change_claim=NONE",
+        "no_AI_scope_claim=NONE",
+        "status=PASS",
+    ]:
+        assert needle in proof
+    log = log_path.read_text(encoding="utf-8")
+    for predicate in [
+        "source_selection_artifact_present",
+        "request_shaping_artifact_present",
+        "response_mapping_artifact_present",
+        "adapter_boundary_proof_present",
+        "ops01_fact_summary_present",
+        "closed_rails_safe_mode_1",
+        "closed_rails_allow_network_0",
+        "v2_full_chart_refuses_without_external_io",
+        "v2_simple_chart_refuses_without_external_io",
+        "v2_coordinates_chart_refuses_without_external_io",
+        "v2_auth_uses_authorization_bearer",
+        "v2_does_not_use_hd_api_key_header",
+        "v1_legacy_uses_hd_api_key_header",
+        "v1_legacy_does_not_use_bearer_auth",
+        "hd_api_base_url_canonical",
+        "hdapi_base_url_alias_compatibility_only",
+        "base_url_conflict_fails_closed",
+        "typed_refusal_deterministic",
+        "two_run_identity",
+        "no_live_vendor_call_claim",
+        "no_open_rails_smoke_claim",
+        "no_public_reader_change_claim",
+        "no_ai_scope_claim",
+    ]:
+        assert f"[{predicate}] status=PASS" in log
+
+
+def test_epic034_pr05_index_rows_use_approved_tokens_only() -> None:
+    rows = {entry["artifact_key"]: entry for entry in json.loads((ROOT / "docs" / "evidence" / "INDEX.json").read_text(encoding="utf-8"))}
+    approved = {"NO_EXTERNAL_IO_ON_REFUSAL_OK", "TWO_RUN_IDENTITY_OK", "EVIDENCE_PATH_PROOFS_OK"}
+    for key in ["hdapi_v2.closed_rails_refusal", "epic034.pr05.closed_rails_check"]:
+        assert key in rows
+        assert set(rows[key].get("tokens", [])) <= approved
+
+
 def _epic034_boundary_inputs() -> tuple[dict, dict, dict]:
     return (
         _assert_canonical_json(VENDOR_DIR / "source_selection.snapshot.json"),
