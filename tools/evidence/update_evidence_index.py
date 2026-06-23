@@ -529,6 +529,8 @@ EPIC034_PR04_SUPERSEDED_INDEX_KEYS = {
     ("epic034.pr04.boundary_check", "audit/qa/hde-epic034/pr-04/boundary_check.log"),
     ("epic034.pr04.doc_deltas", "audit/docdeltas/hde-epic034_doc_deltas.md"),
     ("epic034.pr04.qa_meta_doc_deltas", "audit/qa/hde-epic034/00_meta/doc_deltas.md"),
+    ("epic034.pr04.w005_final_validation_log", "audit/qa/hde-epic034/pr-04/w-005_final_validation.log"),
+    ("epic034.pr04.w005_final_validation_report", "audit/qa/hde-epic034/pr-04/w-005_final_validation_report.md"),
 }
 
 EPIC032_PR03_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
@@ -897,6 +899,24 @@ EPIC034_PR04_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
         "tokens": ["DOC_DELTA_PRESENT_OK", "EVIDENCE_PATH_PROOFS_OK"],
         "notes": "EPIC034 PR-04 QA meta doc-delta surface records no PF-Canon edit for HDE-FERM007.4 boundary proof",
     },
+    {
+        "artifact_key": "epic034.pr04.w005_final_validation_log",
+        "discovered_physical_path": "audit/qa/hde-epic034/pr-04/w-005_final_validation.log",
+        "epic_id": "HDE-EPIC034",
+        "record_type": "epic034_pr04_w005_validation",
+        "schema_version": "1.0",
+        "tokens": ["EVIDENCE_PATH_PROOFS_OK", "TESTS_PASS_OK", "EVIDENCE_INDEX_HASH_OK"],
+        "notes": "EPIC034 PR-04 W-005 machine-readable final validation log for HDE-FERM007.4 boundary-proof remediation",
+    },
+    {
+        "artifact_key": "epic034.pr04.w005_final_validation_report",
+        "discovered_physical_path": "audit/qa/hde-epic034/pr-04/w-005_final_validation_report.md",
+        "epic_id": "HDE-EPIC034",
+        "record_type": "epic034_pr04_w005_validation",
+        "schema_version": "1.0",
+        "tokens": ["EVIDENCE_PATH_PROOFS_OK", "TESTS_PASS_OK", "EVIDENCE_INDEX_HASH_OK"],
+        "notes": "EPIC034 PR-04 W-005 human-readable final validation report for HDE-FERM007.4 later PF09.5 status-action support",
+    },
 ]
 
 
@@ -912,8 +932,16 @@ def _load_epic034_pr04_entries() -> list[dict[str, object]]:
             break
     entries: list[dict[str, object]] = []
     for entry in EPIC034_PR04_PRIMARY_ARTIFACTS:
+        artifact_path = ROOT / str(entry["discovered_physical_path"])
+        if not artifact_path.exists():
+            continue
         normalized = dict(entry)
-        if produced_at is not None and normalized.get("record_type") != "epic034_pr04_doc_delta":
+        if normalized.get("record_type") == "epic034_pr04_w005_validation":
+            for line in artifact_path.read_text(encoding="utf-8").splitlines():
+                if line.startswith("produced_at_utc="):
+                    normalized["produced_at_utc"] = line.split("=", 1)[1]
+                    break
+        elif produced_at is not None and normalized.get("record_type") != "epic034_pr04_doc_delta":
             normalized["produced_at_utc"] = produced_at
         entries.append(normalized)
     return entries
