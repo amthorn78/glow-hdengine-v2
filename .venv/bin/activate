@@ -61,3 +61,8 @@ fi
 # Call hash to forget past commands. Without forgetting
 # past commands the $PATH changes we made may not be respected
 hash -r 2> /dev/null
+
+# Glow HD Engine local Codespaces/OPS env bridge.
+if [ -f "$VIRTUAL_ENV/bin/glow-codespaces-env" ] ; then
+    . "$VIRTUAL_ENV/bin/glow-codespaces-env"
+fi

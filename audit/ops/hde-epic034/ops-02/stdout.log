@@ -1,0 +1,1 @@
+{"attempts":1,"duration_ms_rounded":4088.122,"response_shape":{"data_kind":"dict","errorCode_present":true,"success":true,"top_level_keys":["data","errorCode","message","success","timestamp","type"],"type":"ChartResult"},"status":"PASS","vendor_attempted":true}

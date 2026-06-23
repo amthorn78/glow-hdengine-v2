@@ -1,0 +1,14 @@
+# OPS-02 command transcript
+work_item=HDE-EPIC034 OPS-02
+operator_surface=Codex acting as PO tooling per user authorization
+execution_class=bounded open-rails HumanDesignAPI v2 smoke wrapper
+route_resource_path=charts/coordinates
+method=POST
+rails=SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC
+base_url_env=HD_API_BASE_URL
+credential_env=HD_API_KEY
+geocode_env=GEO_API_KEY not required for charts/coordinates
+auth_header_shape=Authorization: Bearer <redacted>
+no_legacy_v2_auth_header=HD-Api-Key not used for v2 chart routes
+command=. .venv/bin/activate && python <ops02_wrapper>
+secret_policy=no raw API keys, bearer tokens, geocode keys, secret values, sensitive account details, uncontrolled production data, or full vendor payload bodies are persisted
