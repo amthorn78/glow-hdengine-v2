@@ -1,4 +1,4 @@
-generated_at_utc=2026-06-23T02:22:10Z
+generated_at_utc=2026-06-23T06:03:10Z
 scope=HDE-EPIC034 PR-05 closed-rails deterministic refusal proof
 work_item=PR-05
 rails=SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC
@@ -9,13 +9,13 @@ rails=SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC
 [ops01_fact_summary_present] status=PASS
 [closed_rails_safe_mode_1] status=PASS
 [closed_rails_allow_network_0] status=PASS
-[v2_full_chart_refuses_without_external_io] status=PASS
-[v2_simple_chart_refuses_without_external_io] status=PASS
-[v2_coordinates_chart_refuses_without_external_io] status=PASS
-[v2_auth_uses_authorization_bearer] status=PASS
-[v2_does_not_use_hd_api_key_header] status=PASS
-[v1_legacy_uses_hd_api_key_header] status=PASS
-[v1_legacy_does_not_use_bearer_auth] status=PASS
+[chart_resource_paths_refuse_without_external_io] status=PASS
+[configured_base_url_version_changes_final_url] status=PASS
+[no_double_version_prefix] status=PASS
+[chart_auth_uses_authorization_bearer] status=PASS
+[chart_does_not_use_hd_api_key_header] status=PASS
+[legacy_uses_hd_api_key_header] status=PASS
+[legacy_does_not_use_bearer_auth] status=PASS
 [hd_api_base_url_canonical] status=PASS
 [hdapi_base_url_alias_compatibility_only] status=PASS
 [base_url_conflict_fails_closed] status=PASS

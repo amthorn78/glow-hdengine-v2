@@ -3151,6 +3151,7 @@ def build_request_shaping_snapshot(produced: str, contract: dict[str, Any], sour
     routes: list[dict[str, Any]] = []
     for method, path, variant in V2_CHART_ROUTES + V1_BODYGRAPH_ROUTES:
         route = _route_by_path(contract, path)
+        resource_path = path.strip("/").split("/", 1)[1]
         fields = route.get("request_fields")
         if not isinstance(fields, list) or not fields:
             raise ValueError(f"REQUEST_SHAPING_FIELDS_MISSING:{path}")
@@ -3173,14 +3174,22 @@ def build_request_shaping_snapshot(produced: str, contract: dict[str, Any], sour
             raise ValueError(f"REQUEST_SHAPING_GEOCODE_MISMATCH:{path}")
         routes.append({
             "auth_header_posture": "Authorization: Bearer <redacted>" if v2 else "HD-Api-Key: <redacted>",
+            "auth_header_source": "route metadata, not vendor API version string",
             "body_field_source_list": fields,
+            "configured_base_url_key": "HD_API_BASE_URL",
             "content_type_posture": content_type,
             "credential_env_var": "HD_API_KEY",
             "endpoint_path": path,
+            "final_url_examples": {
+                "v2_test_base": f"https://api.example.test/v2/{resource_path}",
+                "v3_test_base": f"https://api.example.test/v3/{resource_path}",
+            },
             "geocode_env_var": "GEO_API_KEY" if geocode == "required" else "not applicable",
             "geocode_header_posture": "HD-Geocode-Key: <redacted>" if geocode == "required" else "not applicable",
             "geocode_key_requirement": geocode,
             "method": method,
+            "no_double_prefix_posture": True,
+            "resource_path": resource_path,
             "route_family": expected_family,
             "route_variant": variant,
             "source_spec": route.get("source_spec"),
@@ -3188,6 +3197,7 @@ def build_request_shaping_snapshot(produced: str, contract: dict[str, Any], sour
     return {
         "ai_scope_claim": "NONE",
         "base_url_env_var": "HD_API_BASE_URL",
+        "configured_base_url_key": "HD_API_BASE_URL",
         "canonical_request_body_construction_proof": "request body keys are ordered from governed contract_map request_fields and serialized as canonical JSON bytes by engine.bodygraph.vendor_client.HdApiClient.build_contract_route_request; v1 bodygraph birthdate is legacy DD-Mon-YYYY while v2 chart birthdate remains YYYY-MM-DD and v2 coordinate lat/lng are serialized as JSON numbers",
         "credential_env_var": "HD_API_KEY",
         "deprecated_base_url_alias": {"env_var": "HDAPI_BASE_URL", "posture": "temporary compatibility alias only; used only when HD_API_BASE_URL is absent; conflicting values fail closed"},
@@ -3206,6 +3216,7 @@ def build_request_shaping_snapshot(produced: str, contract: dict[str, Any], sour
         "routes": routes,
         "runtime_conformance_claim": "NONE",
         "source_selection_input_reference": "artifacts/vendor/hdapi_v2/source_selection.snapshot.json",
+        "version_owner": "HD_API_BASE_URL",
         "v1_legacy_auth_header_posture": "HD-Api-Key: <redacted>",
         "v2_auth_header_posture": "Authorization: Bearer <redacted>",
     }
@@ -4403,7 +4414,7 @@ def build_closed_rails_refusal_proof(
 
     rails = "SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC"
     client = HdApiClient(
-        base_url="https://vendor.example",
+        base_url="https://vendor.example/v2",
         api_key="synthetic-api-key",
         geo_key="synthetic-geo-key",
         release_id="epic034-pr05",
@@ -4411,9 +4422,9 @@ def build_closed_rails_refusal_proof(
         timeouts=VendorTimeouts(connect_timeout_ms=1000, read_timeout_ms=2000, total_timeout_ms=5000),
     )
     routes = {
-        (route.get("path") or route.get("endpoint_path")): route
+        (route.get("resource_path") or str(route.get("path") or route.get("endpoint_path", "")).strip("/").split("/", 1)[-1]): route
         for route in request_snapshot.get("routes", [])
-        if (route.get("path") or route.get("endpoint_path")) in {"/v2/charts", "/v2/charts/simple", "/v2/charts/coordinates", "/v1/bodygraphs", "/v1/bodygraphs/simple"}
+        if (route.get("resource_path") or str(route.get("path") or route.get("endpoint_path", "")).strip("/").split("/", 1)[-1]) in {"charts", "charts/simple", "charts/coordinates", "bodygraphs", "bodygraphs/simple"}
     }
 
     def _request_for(path: str) -> Any:
@@ -4434,10 +4445,10 @@ def build_closed_rails_refusal_proof(
         return client.build_contract_route_request(**kwargs)
 
     built = {path: _request_for(path) for path in routes}
-    v2_paths = ["/v2/charts", "/v2/charts/simple", "/v2/charts/coordinates"]
-    v1_paths = ["/v1/bodygraphs", "/v1/bodygraphs/simple"]
+    chart_paths = ["charts", "charts/simple", "charts/coordinates"]
+    legacy_paths = ["bodygraphs", "bodygraphs/simple"]
     route_refusals: dict[str, list[str]] = {}
-    for path in v2_paths:
+    for path in chart_paths:
         request = built[path]
         route_refusals[path] = []
         for _ in range(2):
@@ -4460,17 +4471,22 @@ def build_closed_rails_refusal_proof(
     saved_env = {key: os.environ.get(key) for key in ["HD_API_BASE_URL", "HDAPI_BASE_URL", "HD_API_KEY", "GEO_API_KEY"]}
     try:
         os.environ["HD_API_KEY"] = "k"
-        os.environ.pop("GEO_API_KEY", None)
-        os.environ["HD_API_BASE_URL"] = "https://canonical.example"
+        os.environ["GEO_API_KEY"] = "g"
+        os.environ["HD_API_BASE_URL"] = "https://canonical.example/v2"
         os.environ.pop("HDAPI_BASE_URL", None)
         canonical = HdApiClient.from_env(release_id="epic034-pr05")
-        canonical_ok = canonical._base_url == "https://canonical.example"
+        canonical_ok = canonical._base_url == "https://canonical.example/v2"
+        v3_client = HdApiClient.from_env(release_id="epic034-pr05")
+        v2_url = canonical.build_contract_route_request(path="charts", request_fields=("birthdate", "birthtime", "location"), geocode_required=True, birthdate="1990-01-02", birthtime="03:04", location="Austin, TX, USA").url
+        os.environ["HD_API_BASE_URL"] = "https://canonical.example/v3"
+        v3_client = HdApiClient.from_env(release_id="epic034-pr05")
+        v3_url = v3_client.build_contract_route_request(path="charts", request_fields=("birthdate", "birthtime", "location"), geocode_required=True, birthdate="1990-01-02", birthtime="03:04", location="Austin, TX, USA").url
         os.environ.pop("HD_API_BASE_URL", None)
-        os.environ["HDAPI_BASE_URL"] = "https://legacy.example"
+        os.environ["HDAPI_BASE_URL"] = "https://legacy.example/v2"
         alias = HdApiClient.from_env(release_id="epic034-pr05")
-        alias_ok = alias._base_url == "https://legacy.example"
-        os.environ["HD_API_BASE_URL"] = "https://canonical.example"
-        os.environ["HDAPI_BASE_URL"] = "https://legacy.example"
+        alias_ok = alias._base_url == "https://legacy.example/v2"
+        os.environ["HD_API_BASE_URL"] = "https://canonical.example/v2"
+        os.environ["HDAPI_BASE_URL"] = "https://legacy.example/v2"
         try:
             HdApiClient.from_env(release_id="epic034-pr05")
         except VendorError as exc:
@@ -4491,13 +4507,13 @@ def build_closed_rails_refusal_proof(
         "ops01_fact_summary_present": bool(ops_summary),
         "closed_rails_safe_mode_1": os.environ.get("SAFE_MODE") == "1",
         "closed_rails_allow_network_0": os.environ.get("ALLOW_NETWORK") == "0",
-        "v2_full_chart_refuses_without_external_io": route_refusal_ok["/v2/charts"],
-        "v2_simple_chart_refuses_without_external_io": route_refusal_ok["/v2/charts/simple"],
-        "v2_coordinates_chart_refuses_without_external_io": route_refusal_ok["/v2/charts/coordinates"],
-        "v2_auth_uses_authorization_bearer": all(built[p].headers.get("Authorization", "").startswith("Bearer ") for p in v2_paths),
-        "v2_does_not_use_hd_api_key_header": all("HD-Api-Key" not in built[p].headers for p in v2_paths),
-        "v1_legacy_uses_hd_api_key_header": all(built[p].headers.get("HD-Api-Key") == "synthetic-api-key" for p in v1_paths),
-        "v1_legacy_does_not_use_bearer_auth": all("Authorization" not in built[p].headers for p in v1_paths),
+        "chart_resource_paths_refuse_without_external_io": all(route_refusal_ok[p] for p in chart_paths),
+        "configured_base_url_version_changes_final_url": v2_url == "https://canonical.example/v2/charts" and v3_url == "https://canonical.example/v3/charts",
+        "no_double_version_prefix": all("/v2/v2/" not in built[p].url and "/v3/v2/" not in built[p].url and "/v1/v2/" not in built[p].url for p in chart_paths),
+        "chart_auth_uses_authorization_bearer": all(built[p].headers.get("Authorization", "").startswith("Bearer ") for p in chart_paths),
+        "chart_does_not_use_hd_api_key_header": all("HD-Api-Key" not in built[p].headers for p in chart_paths),
+        "legacy_uses_hd_api_key_header": all(built[p].headers.get("HD-Api-Key") == "synthetic-api-key" for p in legacy_paths),
+        "legacy_does_not_use_bearer_auth": all("Authorization" not in built[p].headers for p in legacy_paths),
         "hd_api_base_url_canonical": canonical_ok and request_snapshot.get("base_url_env_var") == "HD_API_BASE_URL",
         "hdapi_base_url_alias_compatibility_only": alias_ok and request_snapshot.get("deprecated_base_url_alias", {}).get("env_var") == "HDAPI_BASE_URL",
         "base_url_conflict_fails_closed": conflict_ok,
@@ -4517,9 +4533,10 @@ def build_closed_rails_refusal_proof(
             "pf09_task_ids=HDE-FERM007,HDE-FERM008",
             "pf09_subtask_ids=HDE-FERM007.5,HDE-FERM008.1",
             f"rails={rails}",
-            "v2_route_families_tested=/v2/charts,/v2/charts/simple,/v2/charts/coordinates",
-            "v1_legacy_route_families_tested=/v1/bodygraphs,/v1/bodygraphs/simple",
-            "deterministic_route_choice_posture=governed route contracts and source-selection snapshot",
+            "configured_base_url_version_owner=HD_API_BASE_URL",
+            "chart_resource_paths_tested=charts,charts/simple,charts/coordinates",
+            "legacy_resource_paths_tested=bodygraphs,bodygraphs/simple",
+            "deterministic_route_choice_posture=version-neutral governed resource paths and source-selection snapshot",
             "deterministic_request_shaping_posture=canonical JSON request bytes from governed field lists; no vendor payload body emitted in this proof",
             "typed_refusal_posture=PROVIDER_REFUSED before outbound transport under closed rails",
             "no_dns_socket_http_external_io_posture=HdApiClient._default_request refuses before urllib opener construction unless SAFE_MODE=0 and ALLOW_NETWORK=1",
@@ -4536,7 +4553,7 @@ def build_closed_rails_refusal_proof(
             "no_runtime_v2_conformance_claim=NONE",
             "no_public_reader_change_claim=NONE",
             "no_AI_scope_claim=NONE",
-            "two_run_identity_posture=stable-timestamp proof/log bytes match across two render passes; every implemented v2 route produced PROVIDER_REFUSED twice without external I/O",
+            "two_run_identity_posture=stable-timestamp proof/log bytes match across two render passes; every implemented current chart resource path produced PROVIDER_REFUSED twice without external I/O",
             "input_references=artifacts/vendor/hdapi_v2/source_selection.snapshot.json,artifacts/vendor/hdapi_v2/request_shaping.snapshot.json,artifacts/vendor/hdapi_v2/response_mapping.snapshot.json,artifacts/vendor/hdapi_v2/adapter_boundary_proof.log,audit/ops/hde-epic034/ops-01/fact_summary.json",
             "status=PASS",
         ]
