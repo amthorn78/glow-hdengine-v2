@@ -1,4 +1,4 @@
-generated_at_utc=2026-06-23T01:52:11Z
+generated_at_utc=2026-06-23T02:22:10Z
 work_item=PR-05
 epic_id=HDE-EPIC034
 pf09_document=PF09.5 — HDE Build Checklist Fermentation
@@ -24,6 +24,6 @@ no_open_rails_smoke_claim=NONE
 no_runtime_v2_conformance_claim=NONE
 no_public_reader_change_claim=NONE
 no_AI_scope_claim=NONE
-two_run_identity_posture=two closed-rails refusal passes produced PROVIDER_REFUSED without external I/O
+two_run_identity_posture=stable-timestamp proof/log bytes match across two render passes; every implemented v2 route produced PROVIDER_REFUSED twice without external I/O
 input_references=artifacts/vendor/hdapi_v2/source_selection.snapshot.json,artifacts/vendor/hdapi_v2/request_shaping.snapshot.json,artifacts/vendor/hdapi_v2/response_mapping.snapshot.json,artifacts/vendor/hdapi_v2/adapter_boundary_proof.log,audit/ops/hde-epic034/ops-01/fact_summary.json
 status=PASS

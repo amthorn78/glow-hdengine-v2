@@ -4434,15 +4434,25 @@ def build_closed_rails_refusal_proof(
         return client.build_contract_route_request(**kwargs)
 
     built = {path: _request_for(path) for path in routes}
-    req = urllib.request.Request("https://vendor.example/v2/charts", data=b"{}\n", method="POST")
-    refusal_codes: list[str] = []
-    for _ in range(2):
-        try:
-            HdApiClient._default_request(req, 1.0)
-        except VendorError as exc:
-            refusal_codes.append(exc.code)
-        else:  # pragma: no cover - fail-closed guard
-            refusal_codes.append("NO_REFUSAL")
+    v2_paths = ["/v2/charts", "/v2/charts/simple", "/v2/charts/coordinates"]
+    v1_paths = ["/v1/bodygraphs", "/v1/bodygraphs/simple"]
+    route_refusals: dict[str, list[str]] = {}
+    for path in v2_paths:
+        request = built[path]
+        route_refusals[path] = []
+        for _ in range(2):
+            req = urllib.request.Request(
+                request.url,
+                data=request.body_bytes,
+                headers=dict(request.headers),
+                method="POST",
+            )
+            try:
+                HdApiClient._default_request(req, 1.0)
+            except VendorError as exc:
+                route_refusals[path].append(exc.code)
+            else:  # pragma: no cover - fail-closed guard
+                route_refusals[path].append("NO_REFUSAL")
 
     conflict_ok = False
     alias_ok = False
@@ -4472,9 +4482,8 @@ def build_closed_rails_refusal_proof(
             else:
                 os.environ[key] = value
 
-    v2_paths = ["/v2/charts", "/v2/charts/simple", "/v2/charts/coordinates"]
-    v1_paths = ["/v1/bodygraphs", "/v1/bodygraphs/simple"]
-    checks = {
+    route_refusal_ok = {path: codes == ["PROVIDER_REFUSED", "PROVIDER_REFUSED"] for path, codes in route_refusals.items()}
+    checks_base = {
         "source_selection_artifact_present": bool(source_snapshot.get("route_families")),
         "request_shaping_artifact_present": bool(request_snapshot.get("routes")),
         "response_mapping_artifact_present": bool(response_snapshot.get("routes")),
@@ -4482,9 +4491,9 @@ def build_closed_rails_refusal_proof(
         "ops01_fact_summary_present": bool(ops_summary),
         "closed_rails_safe_mode_1": os.environ.get("SAFE_MODE") == "1",
         "closed_rails_allow_network_0": os.environ.get("ALLOW_NETWORK") == "0",
-        "v2_full_chart_refuses_without_external_io": refusal_codes == ["PROVIDER_REFUSED", "PROVIDER_REFUSED"],
-        "v2_simple_chart_refuses_without_external_io": refusal_codes == ["PROVIDER_REFUSED", "PROVIDER_REFUSED"],
-        "v2_coordinates_chart_refuses_without_external_io": refusal_codes == ["PROVIDER_REFUSED", "PROVIDER_REFUSED"],
+        "v2_full_chart_refuses_without_external_io": route_refusal_ok["/v2/charts"],
+        "v2_simple_chart_refuses_without_external_io": route_refusal_ok["/v2/charts/simple"],
+        "v2_coordinates_chart_refuses_without_external_io": route_refusal_ok["/v2/charts/coordinates"],
         "v2_auth_uses_authorization_bearer": all(built[p].headers.get("Authorization", "").startswith("Bearer ") for p in v2_paths),
         "v2_does_not_use_hd_api_key_header": all("HD-Api-Key" not in built[p].headers for p in v2_paths),
         "v1_legacy_uses_hd_api_key_header": all(built[p].headers.get("HD-Api-Key") == "synthetic-api-key" for p in v1_paths),
@@ -4492,57 +4501,64 @@ def build_closed_rails_refusal_proof(
         "hd_api_base_url_canonical": canonical_ok and request_snapshot.get("base_url_env_var") == "HD_API_BASE_URL",
         "hdapi_base_url_alias_compatibility_only": alias_ok and request_snapshot.get("deprecated_base_url_alias", {}).get("env_var") == "HDAPI_BASE_URL",
         "base_url_conflict_fails_closed": conflict_ok,
-        "typed_refusal_deterministic": refusal_codes == ["PROVIDER_REFUSED", "PROVIDER_REFUSED"],
-        "two_run_identity": refusal_codes == ["PROVIDER_REFUSED", "PROVIDER_REFUSED"],
+        "typed_refusal_deterministic": all(route_refusal_ok.values()),
         "no_live_vendor_call_claim": response_snapshot.get("live_vendor_call_claim") == "NONE",
         "no_open_rails_smoke_claim": response_snapshot.get("open_rails_vendor_smoke_claim") == "NONE",
         "no_public_reader_change_claim": response_snapshot.get("public_reader_change_claim") == "NONE",
         "no_ai_scope_claim": response_snapshot.get("ai_scope_claim") == "NONE",
     }
+
+    def _render(proof_produced: str, rendered_checks: dict[str, bool]) -> tuple[str, str]:
+        proof_lines = [
+            f"generated_at_utc={proof_produced}",
+            "work_item=PR-05",
+            "epic_id=HDE-EPIC034",
+            "pf09_document=PF09.5 — HDE Build Checklist Fermentation",
+            "pf09_task_ids=HDE-FERM007,HDE-FERM008",
+            "pf09_subtask_ids=HDE-FERM007.5,HDE-FERM008.1",
+            f"rails={rails}",
+            "v2_route_families_tested=/v2/charts,/v2/charts/simple,/v2/charts/coordinates",
+            "v1_legacy_route_families_tested=/v1/bodygraphs,/v1/bodygraphs/simple",
+            "deterministic_route_choice_posture=governed route contracts and source-selection snapshot",
+            "deterministic_request_shaping_posture=canonical JSON request bytes from governed field lists; no vendor payload body emitted in this proof",
+            "typed_refusal_posture=PROVIDER_REFUSED before outbound transport under closed rails",
+            "no_dns_socket_http_external_io_posture=HdApiClient._default_request refuses before urllib opener construction unless SAFE_MODE=0 and ALLOW_NETWORK=1",
+            "canonical_base_url_key_posture=HD_API_BASE_URL",
+            "deprecated_alias_posture=HDAPI_BASE_URL compatibility-only when HD_API_BASE_URL is absent",
+            "conflicting_base_url_values_fail_closed=true",
+            "canonical_vendor_key_posture=HD_API_KEY",
+            "canonical_geocode_key_posture=GEO_API_KEY",
+            "v2_auth_posture=Authorization: Bearer <redacted>",
+            "v1_legacy_auth_posture=HD-Api-Key: <redacted>",
+            "geocode_header_posture=HD-Geocode-Key: <redacted> where required",
+            "no_live_vendor_call_claim=NONE",
+            "no_open_rails_smoke_claim=NONE",
+            "no_runtime_v2_conformance_claim=NONE",
+            "no_public_reader_change_claim=NONE",
+            "no_AI_scope_claim=NONE",
+            "two_run_identity_posture=stable-timestamp proof/log bytes match across two render passes; every implemented v2 route produced PROVIDER_REFUSED twice without external I/O",
+            "input_references=artifacts/vendor/hdapi_v2/source_selection.snapshot.json,artifacts/vendor/hdapi_v2/request_shaping.snapshot.json,artifacts/vendor/hdapi_v2/response_mapping.snapshot.json,artifacts/vendor/hdapi_v2/adapter_boundary_proof.log,audit/ops/hde-epic034/ops-01/fact_summary.json",
+            "status=PASS",
+        ]
+        check_lines = [
+            f"generated_at_utc={proof_produced}",
+            "scope=HDE-EPIC034 PR-05 closed-rails deterministic refusal proof",
+            "work_item=PR-05",
+            f"rails={rails}",
+        ]
+        check_lines.extend(f"[{name}] status={'PASS' if ok else 'FAIL'}" for name, ok in rendered_checks.items())
+        check_lines.append("status=PASS" if all(rendered_checks.values()) else "status=FAIL")
+        return "\n".join(proof_lines), "\n".join(check_lines)
+
+    stable_checks = {**checks_base, "two_run_identity": all(route_refusal_ok.values())}
+    stable_first = _render("2000-01-01T00:00:00Z", stable_checks)
+    stable_second = _render("2000-01-01T00:00:00Z", stable_checks)
+    checks = {**checks_base, "two_run_identity": stable_first == stable_second and all(route_refusal_ok.values())}
     if not all(checks.values()):
         failed = [name for name, ok in checks.items() if not ok]
         raise ValueError("CLOSED_RAILS_REFUSAL_CHECK_FAILED:" + ",".join(failed))
 
-    proof_lines = [
-        f"generated_at_utc={produced}",
-        "work_item=PR-05",
-        "epic_id=HDE-EPIC034",
-        "pf09_document=PF09.5 — HDE Build Checklist Fermentation",
-        "pf09_task_ids=HDE-FERM007,HDE-FERM008",
-        "pf09_subtask_ids=HDE-FERM007.5,HDE-FERM008.1",
-        f"rails={rails}",
-        "v2_route_families_tested=/v2/charts,/v2/charts/simple,/v2/charts/coordinates",
-        "v1_legacy_route_families_tested=/v1/bodygraphs,/v1/bodygraphs/simple",
-        "deterministic_route_choice_posture=governed route contracts and source-selection snapshot",
-        "deterministic_request_shaping_posture=canonical JSON request bytes from governed field lists; no vendor payload body emitted in this proof",
-        "typed_refusal_posture=PROVIDER_REFUSED before outbound transport under closed rails",
-        "no_dns_socket_http_external_io_posture=HdApiClient._default_request refuses before urllib opener construction unless SAFE_MODE=0 and ALLOW_NETWORK=1",
-        "canonical_base_url_key_posture=HD_API_BASE_URL",
-        "deprecated_alias_posture=HDAPI_BASE_URL compatibility-only when HD_API_BASE_URL is absent",
-        "conflicting_base_url_values_fail_closed=true",
-        "canonical_vendor_key_posture=HD_API_KEY",
-        "canonical_geocode_key_posture=GEO_API_KEY",
-        "v2_auth_posture=Authorization: Bearer <redacted>",
-        "v1_legacy_auth_posture=HD-Api-Key: <redacted>",
-        "geocode_header_posture=HD-Geocode-Key: <redacted> where required",
-        "no_live_vendor_call_claim=NONE",
-        "no_open_rails_smoke_claim=NONE",
-        "no_runtime_v2_conformance_claim=NONE",
-        "no_public_reader_change_claim=NONE",
-        "no_AI_scope_claim=NONE",
-        "two_run_identity_posture=two closed-rails refusal passes produced PROVIDER_REFUSED without external I/O",
-        "input_references=artifacts/vendor/hdapi_v2/source_selection.snapshot.json,artifacts/vendor/hdapi_v2/request_shaping.snapshot.json,artifacts/vendor/hdapi_v2/response_mapping.snapshot.json,artifacts/vendor/hdapi_v2/adapter_boundary_proof.log,audit/ops/hde-epic034/ops-01/fact_summary.json",
-        "status=PASS",
-    ]
-    check_lines = [
-        f"generated_at_utc={produced}",
-        "scope=HDE-EPIC034 PR-05 closed-rails deterministic refusal proof",
-        "work_item=PR-05",
-        f"rails={rails}",
-    ]
-    check_lines.extend(f"[{name}] status={'PASS' if ok else 'FAIL'}" for name, ok in checks.items())
-    check_lines.append("status=PASS")
-    return "\n".join(proof_lines), "\n".join(check_lines)
+    return _render(produced, checks)
 
 def validate_source_statuses(fetched: dict[str, dict[str, Any]]) -> None:
     for key in ["v2_routes_yaml", "v1_routes_yaml", "llms_full_txt"]:

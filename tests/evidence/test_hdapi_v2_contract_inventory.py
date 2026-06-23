@@ -896,6 +896,48 @@ def test_epic034_pr05_index_rows_use_approved_tokens_only() -> None:
         assert set(rows[key].get("tokens", [])) <= approved
 
 
+def test_epic034_pr05_refusal_builder_exercises_each_v2_route(monkeypatch: pytest.MonkeyPatch) -> None:
+    from urllib.parse import urlparse
+
+    from engine.bodygraph import vendor_client
+
+    monkeypatch.setenv("SAFE_MODE", "1")
+    monkeypatch.setenv("ALLOW_NETWORK", "0")
+    source_selection, request_shaping, response_mapping = _epic034_boundary_inputs()
+    boundary_proof, _checks = generator.build_adapter_boundary_proof(
+        "2026-06-23T00:00:00Z",
+        source_selection,
+        request_shaping,
+        response_mapping,
+    )
+    observed_paths: list[str] = []
+
+    def refusing_request(req, timeout):
+        observed_paths.append(urlparse(req.full_url).path)
+        raise vendor_client.VendorError("PROVIDER_REFUSED", "closed rails")
+
+    monkeypatch.setattr(vendor_client.HdApiClient, "_default_request", staticmethod(refusing_request))
+    proof, check_log = generator.build_closed_rails_refusal_proof(
+        "2026-06-23T00:00:00Z",
+        source_selection,
+        request_shaping,
+        response_mapping,
+        boundary_proof,
+        {"ops": "present"},
+    )
+
+    assert observed_paths == [
+        "/v2/charts",
+        "/v2/charts",
+        "/v2/charts/simple",
+        "/v2/charts/simple",
+        "/v2/charts/coordinates",
+        "/v2/charts/coordinates",
+    ]
+    assert "stable-timestamp proof/log bytes match across two render passes" in proof
+    assert "[two_run_identity] status=PASS" in check_log
+
+
 def _epic034_boundary_inputs() -> tuple[dict, dict, dict]:
     return (
         _assert_canonical_json(VENDOR_DIR / "source_selection.snapshot.json"),
