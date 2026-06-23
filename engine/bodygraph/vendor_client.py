@@ -25,6 +25,7 @@ __all__ = [
     "VendorRequest",
     "VendorResult",
     "HdApiClient",
+    "join_vendor_resource_url",
 ]
 
 
@@ -84,15 +85,15 @@ _VENDOR_LOG_ERROR_CLASSES = frozenset(
     {"none", "network_error", "4xx", "5xx", "429", "http_status_other", "provider_bad_response", "provider_refused"}
 )
 _VENDOR_LOG_RAILS_STATES = frozenset({"closed_default", "open_exception"})
-_ROUTE_CONTRACTS: Mapping[str, tuple[tuple[str, ...], bool]] = {
-    "/v1/bodygraphs": (("birthdate", "birthtime", "location"), True),
-    "/v1/bodygraphs/simple": (("birthdate", "birthtime", "location"), True),
-    "/v2/charts": (("birthdate", "birthtime", "location"), True),
-    "/v2/charts/simple": (("birthdate", "birthtime", "location"), True),
-    "/v2/charts/coordinates": (("birthdate", "birthtime", "lat", "lng"), False),
+_ROUTE_CONTRACTS: Mapping[str, tuple[tuple[str, ...], bool, str]] = {
+    "bodygraphs": (("birthdate", "birthtime", "location"), True, "hd_api_key"),
+    "bodygraphs/simple": (("birthdate", "birthtime", "location"), True, "hd_api_key"),
+    "charts": (("birthdate", "birthtime", "location"), True, "bearer"),
+    "charts/simple": (("birthdate", "birthtime", "location"), True, "bearer"),
+    "charts/coordinates": (("birthdate", "birthtime", "lat", "lng"), False, "bearer"),
 }
 _VENDOR_LOG_ROUTE_LABELS = frozenset(
-    {_VENDOR_LOG_ROUTE, *(f"vendor.hdapi.post:{path}" for path in _ROUTE_CONTRACTS if path != "/v1/bodygraphs")}
+    {_VENDOR_LOG_ROUTE, *(f"vendor.hdapi.post:/{path}" for path in _ROUTE_CONTRACTS if path != "bodygraphs")}
 )
 
 
@@ -143,6 +144,15 @@ def _resolve_hdapi_base_url(env: Mapping[str, str]) -> str:
     if canonical and legacy and canonical != legacy:
         raise VendorError("PROVIDER_CONFIG_INVALID", "ambiguous HD API base URL configuration")
     return canonical or legacy
+
+
+def join_vendor_resource_url(base_url: str, resource_path: str) -> str:
+    """Join a configured vendor base URL to a version-neutral resource path."""
+    resource = resource_path.strip()
+    if not resource or resource == "/":
+        raise VendorError("PROVIDER_CONFIG_INVALID", "vendor resource path must not be empty")
+    resource = resource.lstrip("/")
+    return f"{base_url.rstrip('/')}/{resource}"
 
 
 class VendorError(Exception):
@@ -296,7 +306,7 @@ class HdApiClient:
 
     def build_request(self, *, birthdate: str, birthtime: str, location: str) -> VendorRequest:
         return self.build_contract_route_request(
-            path="/v1/bodygraphs",
+            path="bodygraphs",
             request_fields=("birthdate", "birthtime", "location"),
             geocode_required=True,
             birthdate=birthdate,
@@ -319,7 +329,7 @@ class HdApiClient:
         contract = _ROUTE_CONTRACTS.get(path)
         if contract is None:
             raise VendorError("PROVIDER_CONFIG_INVALID", "unsupported governed HDAPI route")
-        contract_fields, contract_geocode_required = contract
+        contract_fields, contract_geocode_required, auth_model = contract
         if request_fields != contract_fields:
             raise VendorError(
                 "PROVIDER_INPUT_INVALID",
@@ -356,8 +366,8 @@ class HdApiClient:
             or mm not in _MONTH
         ):
             raise VendorError("PROVIDER_INPUT_INVALID", "invalid birthdate")
-        v2_route = path.startswith("/v2/charts")
-        if v2_route:
+        chart_route = auth_model == "bearer"
+        if chart_route:
             if (
                 len(birthtime) != 5
                 or birthtime[2] != ":"
@@ -373,7 +383,7 @@ class HdApiClient:
         body: dict[str, Any] = {}
         for field in request_fields:
             if field == "birthdate":
-                body[field] = birthdate if v2_route else f"{dd}-{_MONTH[mm]}-{yyyy}"
+                body[field] = birthdate if chart_route else f"{dd}-{_MONTH[mm]}-{yyyy}"
             elif field in {"lat", "lng"}:
                 try:
                     coordinate = float(values[field])
@@ -392,9 +402,9 @@ class HdApiClient:
             "Content-Type": "application/json; charset=utf-8",
             "User-Agent": f"GlowHDEngine/{self._release_id}",
         }
-        if v2_route:
+        if auth_model == "bearer":
             headers["Authorization"] = f"Bearer {self._api_key}"
-        elif path.startswith("/v1/bodygraphs"):
+        elif auth_model == "hd_api_key":
             headers["HD-Api-Key"] = self._api_key
         else:
             raise VendorError("PROVIDER_CONFIG_INVALID", "unsupported governed HDAPI route")
@@ -407,18 +417,12 @@ class HdApiClient:
                 )
             headers["HD-Geocode-Key"] = self._geo_key
         return VendorRequest(
-            url=f"{self._route_base_url(path)}{path}",
+            url=join_vendor_resource_url(self._base_url, path),
             headers=headers,
             body_bytes=body_bytes,
             input_fingerprint=fingerprint,
             route=self._route_label(path),
         )
-
-    def _route_base_url(self, path: str) -> str:
-        parsed = urlparse(self._base_url)
-        if parsed.path in {"/v1", "/v2"} and path.startswith("/v"):
-            return f"{parsed.scheme}://{parsed.netloc}"
-        return self._base_url
 
     def fetch(self, request: VendorRequest) -> VendorResult:
         attempt = 0
@@ -541,16 +545,21 @@ class HdApiClient:
 
     @staticmethod
     def _route_label(path: str) -> str:
-        if path == "/v1/bodygraphs":
+        resource = path.strip("/")
+        if resource == "bodygraphs":
             return _VENDOR_LOG_ROUTE
-        if path in _ROUTE_CONTRACTS:
-            return f"vendor.hdapi.post:{path}"
+        if resource in _ROUTE_CONTRACTS:
+            return f"vendor.hdapi.post:/{resource}"
         return _VENDOR_LOG_ROUTE
 
     @classmethod
     def _route_label_from_url(cls, url: str) -> str:
         parsed = urlparse(url)
-        return cls._route_label(parsed.path or "/bodygraphs")
+        path = (parsed.path or "/bodygraphs").strip("/")
+        for resource in sorted(_ROUTE_CONTRACTS, key=len, reverse=True):
+            if path == resource or path.endswith(f"/{resource}"):
+                return cls._route_label(resource)
+        return _VENDOR_LOG_ROUTE
 
     @classmethod
     def _safe_route_label(cls, request: VendorRequest) -> str:

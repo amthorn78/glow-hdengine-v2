@@ -8,7 +8,7 @@ from urllib import request as urlrequest
 
 import pytest
 
-from engine.bodygraph.vendor_client import HdApiClient, VendorError, VendorRequest, VendorResult, VendorRetryConfig, VendorTimeouts
+from engine.bodygraph.vendor_client import HdApiClient, VendorError, VendorRequest, VendorResult, VendorRetryConfig, VendorTimeouts, join_vendor_resource_url
 
 
 def _client(request_func, log_path: Path | None = None):
@@ -24,6 +24,54 @@ def _client(request_func, log_path: Path | None = None):
         sleep=lambda _: None,
         monotonic_ms=lambda: 0.0,
     )
+
+
+def _client_with_base(base_url: str):
+    return HdApiClient(
+        base_url=base_url,
+        api_key="api",
+        geo_key="geo",
+        release_id="0" * 64,
+        retry=VendorRetryConfig(max_attempts=1, profile="none", exp_base_ms=0, exp_ceiling_ms=0),
+        timeouts=VendorTimeouts(connect_timeout_ms=1000, read_timeout_ms=2000, total_timeout_ms=5000),
+        request=lambda req, timeout: (200, b"{}", {}),
+    )
+
+
+def test_join_vendor_resource_url_preserves_configured_base_path() -> None:
+    assert join_vendor_resource_url("https://api.example.test/v2", "charts") == "https://api.example.test/v2/charts"
+    assert join_vendor_resource_url("https://api.example.test/v2/", "charts") == "https://api.example.test/v2/charts"
+    assert join_vendor_resource_url("https://api.example.test/v3", "charts/simple") == "https://api.example.test/v3/charts/simple"
+    assert join_vendor_resource_url("https://api.example.test/api/v9", "charts/coordinates") == "https://api.example.test/api/v9/charts/coordinates"
+    with pytest.raises(VendorError):
+        join_vendor_resource_url("https://api.example.test/v2", "")
+
+
+def test_contract_route_urls_are_configured_base_plus_neutral_resource_path() -> None:
+    cases = [
+        ("https://api.example.test/v2", "charts", "https://api.example.test/v2/charts"),
+        ("https://api.example.test/v3", "charts", "https://api.example.test/v3/charts"),
+        ("https://api.example.test/v2", "charts/simple", "https://api.example.test/v2/charts/simple"),
+        ("https://api.example.test/v3", "charts/simple", "https://api.example.test/v3/charts/simple"),
+        ("https://api.example.test/v2", "charts/coordinates", "https://api.example.test/v2/charts/coordinates"),
+        ("https://api.example.test/v3", "charts/coordinates", "https://api.example.test/v3/charts/coordinates"),
+    ]
+    for base_url, resource_path, expected in cases:
+        client = _client_with_base(base_url)
+        fields = ("birthdate", "birthtime", "lat", "lng") if resource_path.endswith("coordinates") else ("birthdate", "birthtime", "location")
+        kwargs = {"lat": "52.1", "lng": "4.3"} if "lat" in fields else {"location": "Amsterdam, NL"}
+        request = client.build_contract_route_request(
+            path=resource_path,
+            request_fields=fields,
+            geocode_required=not resource_path.endswith("coordinates"),
+            birthdate="1990-01-15",
+            birthtime="12:00",
+            **kwargs,
+        )
+        assert request.url == expected
+        assert "/v2/v2/" not in request.url
+        assert "/v3/v2/" not in request.url
+        assert "/v1/v2/" not in request.url
 
 
 def test_build_request_validates_date():
@@ -387,7 +435,7 @@ def test_build_contract_route_request_supports_legacy_simple_bodygraphs() -> Non
     client = _client(lambda req, timeout: (200, b"{}", {}))
 
     request = client.build_contract_route_request(
-        path="/v1/bodygraphs/simple",
+        path="bodygraphs/simple",
         request_fields=("birthdate", "birthtime", "location"),
         geocode_required=True,
         birthdate="1990-01-02",
@@ -399,7 +447,7 @@ def test_build_contract_route_request_supports_legacy_simple_bodygraphs() -> Non
     assert request.headers["HD-Api-Key"] == "api"
     assert request.headers["HD-Geocode-Key"] == "geo"
     assert request.body_bytes == b'{"birthdate":"02-Jan-1990","birthtime":"12:34","location":"London, UK"}\n'
-    assert request.route == "vendor.hdapi.post:/v1/bodygraphs/simple"
+    assert request.route == "vendor.hdapi.post:/bodygraphs/simple"
 
 
 def test_vendor_safe_rails_failure_classes_are_observable(tmp_path: Path) -> None:
@@ -465,14 +513,14 @@ def test_from_env_fails_closed_on_conflicting_base_url_alias(monkeypatch: pytest
 def test_build_contract_route_request_uses_v2_bearer_and_geocode_when_required() -> None:
     client = _client(lambda req, timeout: (200, b"{}", {}))
     request = client.build_contract_route_request(
-        path="/v2/charts",
+        path="charts",
         request_fields=("birthdate", "birthtime", "location"),
         geocode_required=True,
         birthdate="1990-01-01",
         birthtime="12:00",
         location="Test",
     )
-    assert request.url == "https://vendor.test/v2/charts"
+    assert request.url == "https://vendor.test/v1/charts"
     assert request.headers["Authorization"] == "Bearer api"
     assert "HD-Api-Key" not in request.headers
     assert request.headers["HD-Geocode-Key"] == "geo"
@@ -484,7 +532,7 @@ def test_build_contract_route_request_preserves_v1_hd_api_key_and_coordinates_sk
     assert legacy.headers["HD-Api-Key"] == "api"
     assert "Authorization" not in legacy.headers
     coordinates = client.build_contract_route_request(
-        path="/v2/charts/coordinates",
+        path="charts/coordinates",
         request_fields=("birthdate", "birthtime", "lat", "lng"),
         geocode_required=False,
         birthdate="1990-01-01",
@@ -504,7 +552,7 @@ def test_from_env_allows_coordinates_route_without_geo_api_key(monkeypatch: pyte
 
     client = HdApiClient.from_env(request=lambda req, timeout: (200, b"{}", {}))
     request = client.build_contract_route_request(
-        path="/v2/charts/coordinates",
+        path="charts/coordinates",
         request_fields=("birthdate", "birthtime", "lat", "lng"),
         geocode_required=False,
         birthdate="1990-01-15",
@@ -526,7 +574,7 @@ def test_geocoded_routes_require_geo_api_key_when_shaped(monkeypatch: pytest.Mon
     client = HdApiClient.from_env(request=lambda req, timeout: (200, b"{}", {}))
     with pytest.raises(VendorError) as excinfo:
         client.build_contract_route_request(
-            path="/v2/charts",
+            path="charts",
             request_fields=("birthdate", "birthtime", "location"),
             geocode_required=True,
             birthdate="1990-01-15",
@@ -542,12 +590,12 @@ def test_build_contract_route_request_rejects_drifted_request_field_sets() -> No
     client = _client(lambda req, timeout: (200, b"{}", {}))
     for path, fields, kwargs in [
         (
-            "/v2/charts",
+            "charts",
             ("birthdate", "birthtime"),
             {"birthdate": "1990-01-15", "birthtime": "12:00", "location": "Amsterdam, NL"},
         ),
         (
-            "/v2/charts/coordinates",
+            "charts/coordinates",
             ("birthdate", "birthtime", "lat"),
             {"birthdate": "1990-01-15", "birthtime": "12:00", "lat": "52.1", "lng": "4.3"},
         ),
@@ -556,7 +604,7 @@ def test_build_contract_route_request_rejects_drifted_request_field_sets() -> No
             client.build_contract_route_request(
                 path=path,
                 request_fields=fields,
-                geocode_required=path != "/v2/charts/coordinates",
+                geocode_required=path != "charts/coordinates",
                 **kwargs,
             )
         assert excinfo.value.code == "PROVIDER_INPUT_INVALID"
@@ -568,7 +616,7 @@ def test_build_contract_route_request_rejects_drifted_geocode_posture() -> None:
     client = _client(lambda req, timeout: (200, b"{}", {}))
     with pytest.raises(VendorError) as excinfo:
         client.build_contract_route_request(
-            path="/v2/charts",
+            path="charts",
             request_fields=("birthdate", "birthtime", "location"),
             geocode_required=False,
             birthdate="1990-01-15",
@@ -580,7 +628,7 @@ def test_build_contract_route_request_rejects_drifted_geocode_posture() -> None:
 
     with pytest.raises(VendorError) as excinfo:
         client.build_contract_route_request(
-            path="/v2/charts/coordinates",
+            path="charts/coordinates",
             request_fields=("birthdate", "birthtime", "lat", "lng"),
             geocode_required=True,
             birthdate="1990-01-15",
@@ -621,7 +669,7 @@ def test_build_request_rejects_whitespace_required_fields() -> None:
 def test_v2_request_body_preserves_iso_birthdate_and_numeric_coordinates() -> None:
     client = _client(lambda req, timeout: (200, b"{}", {}))
     request = client.build_contract_route_request(
-        path="/v2/charts/coordinates",
+        path="charts/coordinates",
         request_fields=("birthdate", "birthtime", "lat", "lng"),
         geocode_required=False,
         birthdate="1990-01-15",
@@ -638,7 +686,7 @@ def test_v2_location_routes_reject_non_contract_birthtime_and_location() -> None
     for birthtime, location in [("9:00", "Amsterdam, NL"), ("24:00", "Amsterdam, NL"), ("12:60", "Amsterdam, NL"), ("12:00", "X")]:
         with pytest.raises(VendorError):
             client.build_contract_route_request(
-                path="/v2/charts",
+                path="charts",
                 request_fields=("birthdate", "birthtime", "location"),
                 geocode_required=True,
                 birthdate="1990-01-15",
@@ -651,7 +699,7 @@ def test_v2_request_body_rejects_non_contract_date_and_coordinates() -> None:
     client = _client(lambda req, timeout: (200, b"{}", {}))
     with pytest.raises(VendorError):
         client.build_contract_route_request(
-            path="/v2/charts/coordinates",
+            path="charts/coordinates",
             request_fields=("birthdate", "birthtime", "lat", "lng"),
             geocode_required=False,
             birthdate="1990-01-5",
@@ -662,7 +710,7 @@ def test_v2_request_body_rejects_non_contract_date_and_coordinates() -> None:
     for lat, lng in [("north", "4.3"), ("nan", "4.3"), ("inf", "4.3"), ("91", "4.3"), ("52.1", "181")]:
         with pytest.raises(VendorError):
             client.build_contract_route_request(
-                path="/v2/charts/coordinates",
+                path="charts/coordinates",
                 request_fields=("birthdate", "birthtime", "lat", "lng"),
                 geocode_required=False,
                 birthdate="1990-01-15",
@@ -680,7 +728,7 @@ def test_fetch_logs_shaped_v2_route(tmp_path: Path) -> None:
 
     client = _client(ok_request, log_path=log_path)
     request = client.build_contract_route_request(
-        path="/v2/charts",
+        path="charts",
         request_fields=("birthdate", "birthtime", "location"),
         geocode_required=True,
         birthdate="1990-01-15",
@@ -689,7 +737,7 @@ def test_fetch_logs_shaped_v2_route(tmp_path: Path) -> None:
     )
     client.fetch(request)
     record = _read_jsonl(log_path)[0]
-    assert record["route"] == "vendor.hdapi.post:/v2/charts"
+    assert record["route"] == "vendor.hdapi.post:/charts"
 
 
 def test_closed_rails_default_request_refuses_before_url_opener(monkeypatch: pytest.MonkeyPatch) -> None:
