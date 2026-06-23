@@ -1,0 +1,5 @@
+path: artifacts/vendor/hdapi_v2/closed_rails_refusal.txt
+size_bytes: 1930
+sha256: 137050cca6e152c25969ec0eb479e4d25c36b9004d9833ace7f64723cc305701
+mtime_utc: 2026-06-23T02:22:12Z
+produced_at_utc: 2026-06-23T02:22:10Z

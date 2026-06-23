@@ -1,5 +1,5 @@
 path: artifacts/vendor/hdapi_v2/adapter_boundary_proof.log
 size_bytes: 104255
-sha256: 434d1782881cfc6999184b833cc4984138a45b0f820b8f74d516ef3412cd0c2d
-mtime_utc: 2026-06-22T22:56:20Z
-produced_at_utc: 2026-06-22T22:56:19Z
+sha256: df312a1aa98ca313d270b6c9ee6a00336474c94005e17629237d2add3eafd024
+mtime_utc: 2026-06-23T02:22:12Z
+produced_at_utc: 2026-06-23T02:22:10Z

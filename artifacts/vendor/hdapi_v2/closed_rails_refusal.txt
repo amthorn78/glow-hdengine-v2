@@ -1,0 +1,29 @@
+generated_at_utc=2026-06-23T02:22:10Z
+work_item=PR-05
+epic_id=HDE-EPIC034
+pf09_document=PF09.5 — HDE Build Checklist Fermentation
+pf09_task_ids=HDE-FERM007,HDE-FERM008
+pf09_subtask_ids=HDE-FERM007.5,HDE-FERM008.1
+rails=SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC
+v2_route_families_tested=/v2/charts,/v2/charts/simple,/v2/charts/coordinates
+v1_legacy_route_families_tested=/v1/bodygraphs,/v1/bodygraphs/simple
+deterministic_route_choice_posture=governed route contracts and source-selection snapshot
+deterministic_request_shaping_posture=canonical JSON request bytes from governed field lists; no vendor payload body emitted in this proof
+typed_refusal_posture=PROVIDER_REFUSED before outbound transport under closed rails
+no_dns_socket_http_external_io_posture=HdApiClient._default_request refuses before urllib opener construction unless SAFE_MODE=0 and ALLOW_NETWORK=1
+canonical_base_url_key_posture=HD_API_BASE_URL
+deprecated_alias_posture=HDAPI_BASE_URL compatibility-only when HD_API_BASE_URL is absent
+conflicting_base_url_values_fail_closed=true
+canonical_vendor_key_posture=HD_API_KEY
+canonical_geocode_key_posture=GEO_API_KEY
+v2_auth_posture=Authorization: Bearer <redacted>
+v1_legacy_auth_posture=HD-Api-Key: <redacted>
+geocode_header_posture=HD-Geocode-Key: <redacted> where required
+no_live_vendor_call_claim=NONE
+no_open_rails_smoke_claim=NONE
+no_runtime_v2_conformance_claim=NONE
+no_public_reader_change_claim=NONE
+no_AI_scope_claim=NONE
+two_run_identity_posture=stable-timestamp proof/log bytes match across two render passes; every implemented v2 route produced PROVIDER_REFUSED twice without external I/O
+input_references=artifacts/vendor/hdapi_v2/source_selection.snapshot.json,artifacts/vendor/hdapi_v2/request_shaping.snapshot.json,artifacts/vendor/hdapi_v2/response_mapping.snapshot.json,artifacts/vendor/hdapi_v2/adapter_boundary_proof.log,audit/ops/hde-epic034/ops-01/fact_summary.json
+status=PASS

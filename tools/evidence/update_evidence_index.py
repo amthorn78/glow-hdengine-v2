@@ -946,6 +946,46 @@ def _load_epic034_pr04_entries() -> list[dict[str, object]]:
         entries.append(normalized)
     return entries
 
+EPIC034_PR05_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "hdapi_v2.closed_rails_refusal",
+        "discovered_physical_path": "artifacts/vendor/hdapi_v2/closed_rails_refusal.txt",
+        "epic_id": "HDE-EPIC034",
+        "record_type": "epic034_pr05_closed_rails_refusal",
+        "schema_version": "1.0",
+        "tokens": ["NO_EXTERNAL_IO_ON_REFUSAL_OK", "TWO_RUN_IDENTITY_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC034 PR-05 LF-terminated closed-rails refusal proof for HDE-FERM007.5 and HDE-FERM008.1 covering deterministic v2 route shaping, PF10 header projection, typed refusal, and no external I/O; no open-rails, live conformance, public Reader, or AI scope claim",
+    },
+    {
+        "artifact_key": "epic034.pr05.closed_rails_check",
+        "discovered_physical_path": "audit/qa/hde-epic034/pr-05/closed_rails_check.log",
+        "epic_id": "HDE-EPIC034",
+        "record_type": "epic034_pr05_closed_rails_refusal",
+        "schema_version": "1.0",
+        "tokens": ["NO_EXTERNAL_IO_ON_REFUSAL_OK", "TWO_RUN_IDENTITY_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC034 PR-05 validation log with PASS predicates for source-selection, request-shaping, response-mapping, boundary proof, closed rails, v2/v1 auth posture, base URL conflict refusal, typed refusal, two-run identity, and no-claim posture",
+    },
+]
+
+
+def _load_epic034_pr05_entries() -> list[dict[str, object]]:
+    proof = ROOT / "artifacts/vendor/hdapi_v2/closed_rails_refusal.txt"
+    check_log = ROOT / "audit/qa/hde-epic034/pr-05/closed_rails_check.log"
+    if not proof.exists() or not check_log.exists():
+        return []
+    produced_at = None
+    for line in proof.read_text(encoding="utf-8").splitlines():
+        if line.startswith("generated_at_utc="):
+            produced_at = line.split("=", 1)[1]
+            break
+    entries: list[dict[str, object]] = []
+    for entry in EPIC034_PR05_PRIMARY_ARTIFACTS:
+        normalized = dict(entry)
+        if produced_at is not None:
+            normalized["produced_at_utc"] = produced_at
+        entries.append(normalized)
+    return entries
+
 
 A7_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
@@ -1302,6 +1342,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *_load_epic034_pr02_entries(),
             *_load_epic034_pr03_entries(),
             *_load_epic034_pr04_entries(),
+            *_load_epic034_pr05_entries(),
             *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,
