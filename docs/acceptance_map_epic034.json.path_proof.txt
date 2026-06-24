@@ -1,0 +1,5 @@
+path: docs/acceptance_map_epic034.json
+size_bytes: 3493
+sha256: 74b885965e3b5445aecfbd9d2c532d924c8aa4a7b0dc55218816661ee9d80cc2
+mtime_utc: 2026-06-24T18:44:08Z
+produced_at_utc: 2026-06-24T06:28:13Z
