@@ -100,7 +100,9 @@ repo_config_files() {
   do
     [ -f "${path}" ] && printf '%s\n' "${path}"
   done
-  [ -d ".devcontainer" ] && find .devcontainer -mindepth 2 -maxdepth 2 -name devcontainer.json -type f -print 2>/dev/null
+  [ -d ".devcontainer" ] && find .devcontainer -mindepth 2 -type f \
+    \( -name devcontainer.json -o -name 'post*' -o -name 'install*' \) -print 2>/dev/null
+  find . -maxdepth 2 -name '*.code-workspace' -type f -print 2>/dev/null
   [ -d ".github/codespaces" ] && find .github/codespaces -maxdepth 2 -type f -print 2>/dev/null
 }
 
@@ -118,10 +120,12 @@ repo_file_presence() {
     fi
   done
   if [ -d ".devcontainer" ]; then
-    find .devcontainer -mindepth 2 -maxdepth 2 -name devcontainer.json -type f -print 2>/dev/null | LC_ALL=C sort | sed 's/^/present selectable: /'
+    find .devcontainer -mindepth 2 -type f \
+      \( -name devcontainer.json -o -name 'post*' -o -name 'install*' \) -print 2>/dev/null | LC_ALL=C sort | sed 's/^/present devcontainer scanned: /'
   else
-    printf 'absent: .devcontainer/ selectable configs\n'
+    printf 'absent: .devcontainer/ selectable configs and scripts\n'
   fi
+  find . -maxdepth 2 -name '*.code-workspace' -type f -print 2>/dev/null | LC_ALL=C sort | sed 's/^/present workspace: /'
   if [ -d ".github/codespaces" ]; then
     find .github/codespaces -maxdepth 2 -type f -print 2>/dev/null | LC_ALL=C sort | sed 's/^/present: /'
   else
@@ -133,8 +137,21 @@ repo_extension_recommendations() {
   repo_config_files | LC_ALL=C sort -u | while IFS= read -r path; do
     printf -- '--- %s ---\n' "${path}"
     awk '
-      /extensions|recommendations|unwantedRecommendations|customizations|vscode|openai|OpenAI|chatgpt|ChatGPT|codex|Codex|apiKey|API_KEY|apikey/ { print }
+      /extensions|recommendations|unwantedRecommendations|customizations|vscode|openai|OpenAI|chatgpt|ChatGPT|codex|Codex|vcs|VCS|apiKey|API_KEY|apikey/ { print }
     ' "${path}"
+  done
+}
+
+repo_extension_install_commands() {
+  repo_config_files | LC_ALL=C sort -u | while IFS= read -r path; do
+    matches="$({
+      grep -En 'code(-insiders)?[[:space:]]+--install-extension' "${path}" || true
+      grep -Ein -- '--install-extension.*(openai|codex|vcs|chatgpt)|(openai|codex|vcs|chatgpt).*--install-extension' "${path}" || true
+    } | LC_ALL=C sort -u)"
+    if [ -n "${matches}" ]; then
+      printf -- '--- %s ---\n' "${path}"
+      printf '%s\n' "${matches}"
+    fi
   done
 }
 
@@ -262,6 +279,14 @@ openai_matches | append_redacted
 section "Repo extension recommendations"
 repo_extension_recommendations | append_redacted
 
+section "Repo extension install commands"
+install_command_matches="$(repo_extension_install_commands)"
+if [ -n "${install_command_matches}" ]; then
+  printf '%s\n' "${install_command_matches}" | append_redacted
+else
+  append "No repo extension install commands matched code/code-insiders --install-extension or openai/codex/vcs/chatgpt install-extension patterns in scanned locations."
+fi
+
 section "Devcontainer/Codespaces config presence"
 repo_file_presence | append_redacted
 
@@ -270,6 +295,7 @@ vscode_log_dirs | append_redacted
 
 section "Interpretation notes"
 append "- OpenAI-related matches show extension IDs, directory names, or repo recommendations containing openai/chatgpt/gpt/codex."
+append "- Do not add or recommend a repo-level VS Code extension file or host-placement setting for the OpenAI/Codex VCS extension unless this report identifies the exact extension ID."
 append "- A match is correlation evidence only; it does not prove root cause."
 append "- Share this report only after confirming it contains no raw secrets. Do not paste secrets into issues, PR comments, or chat."
 
