@@ -172,10 +172,43 @@ else
   add_warn "exact extension ID/version cannot be discovered"
 fi
 
+describe_tool() {
+  local tool="$1"
+  if have "$tool"; then
+    kv "$tool" "$(command -v "$tool")"
+  else
+    kv "$tool" "UNAVAILABLE"
+    add_warn "$tool is unavailable"
+  fi
+}
+
 section "Tool availability"
-for tool in git gh python python3 node npm curl ps timeout; do
-  if have "$tool"; then kv "$tool" "$(command -v "$tool")"; else kv "$tool" "UNAVAILABLE"; fi
+for tool in git gh curl jq ps ssh gpg dbus-daemon secret-tool xdg-open node npm python python3 timeout; do
+  describe_tool "$tool"
 done
+
+section "Certificate availability"
+cert_found=0
+if [ -f /etc/ssl/certs/ca-certificates.crt ]; then
+  kv "ca-certificates bundle" "/etc/ssl/certs/ca-certificates.crt"
+  cert_found=1
+else
+  kv "ca-certificates bundle" "UNAVAILABLE"
+fi
+if [ -d /etc/ssl/certs ]; then
+  cert_count="$(find /etc/ssl/certs -type f \( -name '*.crt' -o -name '*.pem' \) 2>/dev/null | wc -l | tr -d ' ')"
+  kv "certificate path /etc/ssl/certs" "exists (${cert_count} cert files)"
+  [ "${cert_count:-0}" -gt 0 ] && cert_found=1
+else
+  kv "certificate path /etc/ssl/certs" "UNAVAILABLE"
+fi
+if have dpkg-query && dpkg-query -W -f='${Status}' ca-certificates 2>/dev/null | grep -q 'install ok installed'; then
+  kv "ca-certificates package" "installed"
+  cert_found=1
+else
+  kv "ca-certificates package" "UNAVAILABLE"
+fi
+[ "$cert_found" -eq 0 ] && add_warn "ca-certificates bundle/package and common certificate paths are unavailable"
 
 section "Devcontainer files found"
 find "$ROOT/.devcontainer" -maxdepth 4 -type f -print 2>/dev/null | sort || true
