@@ -6,7 +6,13 @@ repo_root: `/workspaces/glow-hdengine-v2`
 
 branch: `main`
 
-current_head: `20c96073dfbcb6f25a9c1f3cb38267dde7472dec`
+reviewed_blocker_head: `20c96073dfbcb6f25a9c1f3cb38267dde7472dec`
+
+first_published_remediation_head: `568db0c1d9d2380dc8b82b5fddb12fbfc044455e`
+
+repo_publication_reconciliation_utc: `2026-06-24T08:04:31Z`
+
+head_identity_note: `This report intentionally avoids a self-referential live HEAD claim; committing the report changes repository identity, so repo validation should verify the branch commit that contains this file and the retained OPS-02 evidence paths.`
 
 primary_evidence_root: `audit/ops/hde-epic034/ops-02/`
 
@@ -24,6 +30,12 @@ OPS02_LIVE_V2_SUCCESS_SHAPE=true
 This packet is the current OPS-02 evidence output for the HDE-EPIC034 PR-06 open-rails HumanDesignAPI v2 smoke supporting the narrow PF09.5 HDE-FERM008.2 vendor-POST slice.
 
 The prior blocker was provenance-only: the evidence had a PASS-shaped vendor result, but the exact PASS-producing command was not bound to the current output. The Moon Loop remediation executed the repo-resident smoke procedure as PO tooling under the user's authorization and replaced the historical/provenance-blocked state with a concrete command-to-output chain.
+
+## Repo Validation Reconciliation
+
+The further-remediation review validated `origin/main` at `20c96073dfbcb6f25a9c1f3cb38267dde7472dec` and correctly found that the repo did not yet contain the Moon Loop rerun packet. Local reconciliation then verified that the rerun evidence was committed at `568db0c1d9d2380dc8b82b5fddb12fbfc044455e` and published to `origin/main`.
+
+This packet is therefore written to be path-and-content validated rather than self-validated by an embedded current HEAD hash. The acceptance-relevant repo checks are the presence of the retained OPS-02 files, the concrete rerun transcript, the updated command/request/result/stdout evidence, the absence of stale standalone reports, and the checksum verification for retained primary evidence files.
 
 ## Directory Cleanup
 
