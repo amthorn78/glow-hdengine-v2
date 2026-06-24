@@ -73,4 +73,8 @@ Neither diagnostic script modifies user settings, extensions, dotfiles, or secre
 
 Remediation should change extension recommendations only after diagnostic evidence review. The diagnostic scripts themselves remain safe to run and do not change extension recommendations, auto-install behavior, user settings, installed extensions, dotfiles, or secrets. Do not add `.vscode/extensions.json` or any repo-level host-placement setting for an OpenAI/Codex VCS extension unless the diagnostic report identifies the exact extension ID first. If an exact ID is discovered later, record that ID in the diagnostic report or follow-up documentation before making a recommendation or placement change.
 
+Host placement is intentionally not pinned in this initial repository PR. Do not add a `remote.extensionKind` entry to `.vscode/settings.json` yet because the exact VCS extension ID was not discoverable in the inspected environment, the `code` CLI was unavailable during inspection, and hardcoding a guessed extension ID could break browser Codespaces or desktop VS Code attached to Codespaces.
+
+If later validation discovers the exact extension ID and proves a host-placement mismatch, propose a separate small patch that records the exact extension ID, observed current host behavior, desired host kind, affected client mode, and rollback instruction to remove the single `remote.extensionKind` setting.
+
 If startup evidence points instead to the `@openai/codex` CLI install path in `.devcontainer/devcontainer.json`, scope remediation to that devcontainer startup path and document it as a Codespaces startup/install fix rather than as a Codex CLI product change or an `openai.chatgpt` extension recommendation change.
