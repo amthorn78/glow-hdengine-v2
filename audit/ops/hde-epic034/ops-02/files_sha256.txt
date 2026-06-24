@@ -1,8 +1,9 @@
-3346efd8375fc6b4e5a50550a22e97c6fe6bf32b43e4f71aff5fc14dd346864d  audit/ops/hde-epic034/ops-02/commands.txt
+50b6b3ee7d8dfecb0a0155be9ed210008526165221710629cc0fa48c625ce739  audit/ops/hde-epic034/ops-02/commands.txt
 566d06758ad3dc34d57427e6228e4808263fa7107b8abd28123df95397cd2fc5  audit/ops/hde-epic034/ops-02/env_presence_redacted.json
 354a244d8b29b8086dcaa4b6a48457b06dd6b77ed375ed56bfdf2c077c52e22c  audit/ops/hde-epic034/ops-02/exit_codes.txt
+0dd29a95519e069eb6beeff275fe58ac48c78830e7964b055fcd4200572e613a  audit/ops/hde-epic034/ops-02/moon_loop_rerun_transcript.txt
 407e1059596cdba51eed4b7f335ef28218f56a80df16148e19c0b7d95c5b4fca  audit/ops/hde-epic034/ops-02/ops02_open_rails_smoke_procedure.py
-e3caed458f4046b00bda819fac0e3fd16e569a885f88268253f4f49fb934ce87  audit/ops/hde-epic034/ops-02/request_summary.json
-128534056106a5e5e6184f5e89ec741a059d701a85de77b264a6db1ce65e4802  audit/ops/hde-epic034/ops-02/result_summary.json
+8bdf35464322008b5a3c3368eeab6c4ae9eb6ea1b0d23c489b949cb92035be65  audit/ops/hde-epic034/ops-02/request_summary.json
+a1f3b1d7bc0130bb02d6ac78999f3da8f4178d1c67c8f1903f66904211abaeb3  audit/ops/hde-epic034/ops-02/result_summary.json
 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b  audit/ops/hde-epic034/ops-02/stderr.log
-4fb99caba19981a03fc086760418c21ea515345657575d6420baeaf0dc88365c  audit/ops/hde-epic034/ops-02/stdout.log
+c852d3a83ae19f1aec00a71196b76b5408bd26816e4901522aaf028617b18a25  audit/ops/hde-epic034/ops-02/stdout.log

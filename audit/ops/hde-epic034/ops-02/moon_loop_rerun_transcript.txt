@@ -1,0 +1,9 @@
+HDE-EPIC034 OPS-02 MOON LOOP RERUN TRANSCRIPT
+started_at_utc=2026-06-24T06:28:13Z
+completed_at_utc=2026-06-24T06:28:13Z
+operator_surface=Codex acting as PO tooling per user authorization
+command=SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC .venv/bin/python audit/ops/hde-epic034/ops-02/ops02_open_rails_smoke_procedure.py
+exit_code=0
+stdout={"attempts":1,"duration_ms_rounded":2008.51,"response_shape":{"data_kind":"dict","errorCode_present":true,"success":true,"top_level_keys":["data","errorCode","message","success","timestamp","type"],"type":"ChartResult"},"status":"PASS","vendor_attempted":true}
+stderr=
+secret_policy=no raw API keys, bearer tokens, geocode keys, secret values, sensitive account details, uncontrolled production data, or full vendor payload bodies persisted
