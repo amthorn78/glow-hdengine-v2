@@ -27,7 +27,8 @@ Review the report sections for:
 - Whether the `code` CLI is available and whether `code --list-extensions --show-versions` completed.
 - Installed VS Code extensions and extension directories under common VS Code server paths.
 - OpenAI-related matches from extension IDs, extension directory names, or repo recommendations.
-- Repo-level VS Code recommendation and devcontainer customization snippets, including `.devcontainer/devcontainer.json`, root `.devcontainer.json`, and selectable `.devcontainer/<name>/devcontainer.json` files when present.
+- Repo-level VS Code recommendation and devcontainer customization snippets, including `.devcontainer/devcontainer.json`, root `.devcontainer.json`, selectable `.devcontainer/**/devcontainer.json` files, `.vscode/settings.json`, `.vscode/extensions.json`, `*.code-workspace`, and `.devcontainer/**/post*` or `.devcontainer/**/install*` scripts when present.
+- Repo script/config matches for `code --install-extension`, `code-insiders --install-extension`, or extension install commands containing `openai`, `codex`, `vcs`, or `chatgpt`.
 - Codespaces/devcontainer config files present in the repo.
 - Recent VS Code server log directory names, without dumping large logs by default.
 
@@ -43,7 +44,7 @@ Do not paste raw secrets into issues, PR comments, chat, or external tools. The 
 
 ## Next steps after evidence review
 
-Remediation should change extension recommendations only after diagnostic evidence review. The diagnostic probe itself remains safe to run and does not change extension recommendations or auto-install behavior.
+Remediation should change extension recommendations only after diagnostic evidence review. The diagnostic probe itself remains safe to run and does not change extension recommendations or auto-install behavior. Do not add `.vscode/extensions.json` or any repo-level host-placement setting for an OpenAI/Codex VCS extension unless the diagnostic report identifies the exact extension ID first. If an exact ID is discovered later, record that ID in the diagnostic report or follow-up documentation before making a recommendation or placement change.
 
 ## Remediation applied after diagnostic review
 
