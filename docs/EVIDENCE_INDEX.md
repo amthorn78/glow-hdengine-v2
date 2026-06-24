@@ -1,8 +1,17 @@
 > **Note:** The canonical human Evidence Index lives at `docs/evidence/INDEX.json`.
 > Add new entries there first, then mirror key pointers here for quick navigation. Update the skeleton (`docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl` + `.path_proof.txt` companions) in the same PR whenever governed bytes change.
+
+## HDE-EPIC034 evidence navigation
+
+- Source selection / v1 legacy isolation: `audit/qa/hde-epic034/pr-01/source_selection_check.log`, `artifacts/vendor/hdapi_v2/source_selection.snapshot.json`, and `artifacts/vendor/hdapi_v2/v1_legacy_guard.log`.
+- Request shaping and auth/base-url posture: `audit/qa/hde-epic034/pr-02/request_shaping_check.log` and `artifacts/vendor/hdapi_v2/request_shaping.snapshot.json`; `HD_API_BASE_URL` owns the versioned base URL while route resources remain version-neutral.
+- Response-envelope mapping and adapter boundary proof: `audit/qa/hde-epic034/pr-03/response_mapping_check.log`, `artifacts/vendor/hdapi_v2/response_mapping.snapshot.json`, `audit/qa/hde-epic034/pr-04/boundary_check.log`, and `artifacts/vendor/hdapi_v2/adapter_boundary_proof.log`.
+- Closed-rails deterministic shaping/refusal and PR-06 OPS-02 binding: `audit/qa/hde-epic034/pr-05/closed_rails_check.log`, `artifacts/vendor/hdapi_v2/closed_rails_refusal.txt`, `audit/qa/hde-epic034/pr-06/ops_smoke_evidence_binding.log`, and retained OPS-02 evidence under `audit/ops/hde-epic034/ops-02/`.
+- Acceptance/doc-delta anchors: `docs/acceptance_map_epic034.json`, `audit/docdeltas/hde-epic034_doc_deltas.md`, and `audit/qa/hde-epic034/00_meta/doc_deltas.md`. OPS-02 / PR-06 supports HDE-FERM008.2 only; it does not claim HDE-FERM008 parent completion, later HDE-FERM008 subtasks, full HumanDesignAPI v2 runtime conformance, public Reader changes, new HTTP homes, OPS execution by docs agents, or AI scope.
+
 > Refresh order: run `python tools/evidence/update_evidence_index.py` (write) before `python tools/evidence/orientation_demo.py` (write), then their `--check` variants, and finish with `ci/checks/check_mirror_schema.sh`. Mirror path proofs include both `sha256` and `mirror_body_sha256` for the self-record entry in `artifacts/evidence_index.jsonl`.
 
-# Appendix-D — Evidence Index (EPIC-033 + historical pointers)
+# Appendix-D — Evidence Index (EPIC-034 + historical pointers)
 
 ## EPIC033 contract-inventory evidence family (PR-01, not runtime conformance)
 * Contract inventory artifacts: `artifacts/vendor/hdapi_v2/source_inventory.json`, `artifacts/vendor/hdapi_v2/source_inventory.md`, `artifacts/vendor/hdapi_v2/openapi_validation.log`, `artifacts/vendor/hdapi_v2/known_anomalies.md`, `artifacts/vendor/hdapi_v2/endpoint_reference.csv`, and `artifacts/vendor/hdapi_v2/contract_map.json`. Each governed artifact has a sibling `.path_proof.txt`.
