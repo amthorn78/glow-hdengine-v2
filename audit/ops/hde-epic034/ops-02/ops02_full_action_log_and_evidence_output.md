@@ -1,89 +1,62 @@
-# HDE-EPIC034 OPS-02 Full Action Report and Evidence Output
+# HDE-EPIC034 OPS-02 Full Action Log and Evidence Output
 
-generated_at_utc: 2026-06-23T22:00:05Z
+generated_at_utc: 2026-06-24T05:43:32Z
+
+repo_root: `/workspaces/glow-hdengine-v2`
+
+branch: `main`
+
+current_head: `8f4d0b837f0e1ad2bce4ea77237a2a4656818d68`
+
+primary_evidence_root: `audit/ops/hde-epic034/ops-02/`
 
 ## Scope
 
-This report records the actions taken in this session for HDE-EPIC034 OPS-02, the PO-authorized open-rails HumanDesignAPI v2 smoke for PF09.5 HDE-FERM008.2.
+This packet records the remediated OPS-02 evidence posture for HDE-EPIC034, the PO-authorized open-rails HumanDesignAPI v2 smoke for PF09.5 HDE-FERM008.2.
 
-The run was bounded to one HumanDesignAPI-only v2 chart smoke using the version-neutral resource path `charts/coordinates` under `HD_API_BASE_URL`. The coordinate route was selected because it is a governed v2 chart route and does not require geocoding.
+The original live smoke evidence remains bounded to one HumanDesignAPI-only v2 chart smoke using the version-neutral resource path `charts/coordinates` under `HD_API_BASE_URL`. The coordinate route does not require geocoding. This packet does not re-execute the vendor call.
 
-This report does not claim full HumanDesignAPI v2 runtime conformance, HDE-FERM008 parent completion, HDE-FERM008.3/.4/.5 completion, public Reader change, AI scope, or vendor payload persistence.
+This packet does not claim full HumanDesignAPI v2 runtime conformance, HDE-FERM008 parent completion, HDE-FERM008.3/.4/.5 completion, public Reader change, AI scope, or vendor payload persistence.
 
 ## Action Log
 
-1. Read the provided OPS-02 context and repo-local PF/repo evidence requirements.
-2. Inspected current repo state, PF09.5/PF05 constraints, EPIC034 implementation plan, OPS-01 facts, and PR-05 closed-rails evidence.
-3. Verified current repo head: `main` at `1c20dc7847bd2eebd4bf26d1cf4281de5f5480b7`.
-4. Confirmed PR-05 closed-rails prerequisite evidence existed and passed.
-5. Treated Codex as PO tooling per user instruction and kept OPS-02 evidence secret-safe.
-6. Diagnosed that the shell initially did not see `HD_API_KEY`.
-7. Found Codespaces shared env files at `/workspaces/.codespaces/shared/`.
-8. Added a venv activation bridge so `.venv/bin/activate` sources `.venv/bin/glow-codespaces-env`.
-9. The env bridge imports valid entries from `/workspaces/.codespaces/shared/.env` and optionally `.venv/.glow-ops02.env`.
-10. Verified the first Codespaces shared manifest had `HD_API_BASE_URL` and `GEO_API_KEY`, but not `HD_API_KEY`.
-11. Ran an initial OPS-02 wrapper, which correctly classified `TOOLING_BLOCKED` and did not attempt a vendor call.
-12. After the user added the missing Codespaces secret, re-sourced the venv and verified `HD_API_KEY=SET` by presence only.
-13. Ran the bounded live HumanDesignAPI v2 smoke against `charts/coordinates`.
-14. Captured only redacted environment posture, request metadata, response shape metadata, exit code, result summary, and checksums.
-15. Verified checksum integrity, secret-safety scan, raw Bearer scan, and LF endings.
-16. Remediation update at `2026-06-24T05:24:43Z`: identified that the original command transcript contained a placeholder wrapper command.
-17. Persisted a concrete secret-safe reproducible procedure at `audit/ops/hde-epic034/ops-02/ops02_open_rails_smoke_procedure.py`.
-18. Removed the tracked `.venv/bin/activate` env-bridge hook because `.venv/bin/glow-codespaces-env` is not repo-resident and is not required evidence.
-19. Updated the OPS-02 command transcript and checksum ledger. The remediation did not re-execute the vendor call.
+1. Read the OPS-02 final review/remediation request and existing repo-resident evidence under `audit/ops/hde-epic034/ops-02/`.
+2. Confirmed the review blockers: `commands.txt` had used a placeholder wrapper command, and the prior action report claimed a virtualenv helper that was not repo-resident.
+3. Inspected EPIC034 plan posture, OPS-02 packet contents, HDAPI v2 request-shaping evidence, and `engine.bodygraph.vendor_client.HdApiClient`.
+4. Removed the tracked `.venv/bin/activate` hook that sourced `.venv/bin/glow-codespaces-env`.
+5. Persisted a concrete repo-resident, secret-safe operator procedure at `audit/ops/hde-epic034/ops-02/ops02_open_rails_smoke_procedure.py`.
+6. Updated `commands.txt` with an exact command using `.venv/bin/python` and the persisted procedure.
+7. Recorded the original placeholder command as a defect without retaining the placeholder token.
+8. Updated `ops02_full_action_report.md` to document the remediation and to remove the unresolved environment-bridge claim.
+9. Refreshed `files_sha256.txt` for the primary OPS-02 evidence set.
+10. Verified checksums, JSON parsing, syntax-only compile, LF endings, placeholder absence, activation-hook absence, and raw-secret scans.
 
-## Environment Persistence
-
-Remediation update at `2026-06-24T05:24:43Z`: the prior report claimed that `.venv/bin/activate` sourced `.venv/bin/glow-codespaces-env`, but repo validation did not find that helper. The tracked activation hook has been removed. OPS-02 evidence now depends only on repo-resident files under `audit/ops/hde-epic034/ops-02/`, not on virtualenv activation side effects.
-
-Final redacted activation probe:
+## Remediation Outcome
 
 ```text
-APP_ENV=dev
-SAFE_MODE=0
-ALLOW_NETWORK=1
-HD_API_BASE_URL=SET
-HDAPI_BASE_URL=UNSET
-HD_API_KEY=SET
-GEO_API_KEY=SET
-LC_ALL=C
-LANG=C
-TZ=UTC
-```
-
-## Final Outcome
-
-```text
-OPS02_CLASSIFICATION=PASS
-OPS02_EXIT_CODE=0
-OPS02_VENDOR_ATTEMPTED=true
+OPS02_REMEDIATION_CLASSIFICATION=PASS
+OPS02_VENDOR_RERUN=false
+OPS02_PLACEHOLDER_COMMAND_REMEDIATED=true
+OPS02_ENV_BRIDGE_CONTRADICTION_REMEDIATED=true
+OPS02_PRIMARY_CHECKSUMS_OK=true
 ```
 
 ## Evidence Files
-
-Primary OPS-02 evidence root:
-
-```text
-audit/ops/hde-epic034/ops-02/
-```
-
-Files produced:
 
 ```text
 audit/ops/hde-epic034/ops-02/commands.txt
 audit/ops/hde-epic034/ops-02/env_presence_redacted.json
 audit/ops/hde-epic034/ops-02/exit_codes.txt
 audit/ops/hde-epic034/ops-02/files_sha256.txt
+audit/ops/hde-epic034/ops-02/ops02_full_action_report.md
+audit/ops/hde-epic034/ops-02/ops02_open_rails_smoke_procedure.py
 audit/ops/hde-epic034/ops-02/request_summary.json
 audit/ops/hde-epic034/ops-02/result_summary.json
 audit/ops/hde-epic034/ops-02/stderr.log
 audit/ops/hde-epic034/ops-02/stdout.log
-audit/ops/hde-epic034/ops-02/ops02_open_rails_smoke_procedure.py
 ```
 
-## Evidence Output
-
-### commands.txt
+## Command Transcript
 
 ```text
 # OPS-02 command transcript
@@ -107,43 +80,43 @@ activation_bridge_status=not required; .venv/bin/glow-codespaces-env is not repo
 secret_policy=no raw API keys, bearer tokens, geocode keys, secret values, sensitive account details, uncontrolled production data, or full vendor payload bodies are persisted
 ```
 
-### env_presence_redacted.json
+## Redacted Environment Evidence
 
 ```json
 {"ALLOW_NETWORK":"1","APP_ENV":"dev","GEO_API_KEY":"SET","HDAPI_BASE_URL":"UNSET","HD_API_BASE_URL":"SET","HD_API_BASE_URL_expected_v2":true,"HD_API_KEY":"SET","LANG":"C","LC_ALL":"C","SAFE_MODE":"0","TZ":"UTC"}
 ```
 
-### request_summary.json
+## Request Summary Evidence
 
 ```json
 {"auth_header_posture":"Authorization: Bearer <redacted>","authorization_header_shape":"Authorization: Bearer <redacted>","body_sha256":"cb0005717a709aaeb3f4a652bafc33450f5e853d95fd60de034b2f805e49b0ff","configured_base_url_key":"HD_API_BASE_URL","endpoint_path_posture":"/v2/charts/coordinates via HD_API_BASE_URL plus version-neutral resource path","epic_id":"HDE-EPIC034","generated_at_utc":"2026-06-23T22:00:01Z","geocode_key_requirement":"not needed","hd_api_key_header_present":false,"hd_geocode_key_header_present":false,"header_names":["Accept","Authorization","Content-Type","User-Agent"],"input_fingerprint":"cb0005717a709aaeb3f4a652bafc33450f5e853d95fd60de034b2f805e49b0ff","input_tuple_posture":"synthetic non-PII coordinates tuple; full request body not persisted","legacy_v2_auth_header_posture":"HD-Api-Key not used for v2 chart routes","method":"POST","ops_task":"OPS-02","pf09_subtask_id":"HDE-FERM008.2","rails_required":{"ALLOW_NETWORK":"1","SAFE_MODE":"0"},"request_fields":["birthdate","birthtime","lat","lng"],"request_url_posture":"redacted base URL; version-neutral resource path joined by HdApiClient","resource_path":"charts/coordinates"}
 ```
 
-### stdout.log
+## Stdout Evidence
 
 ```json
 {"attempts":1,"duration_ms_rounded":4088.122,"response_shape":{"data_kind":"dict","errorCode_present":true,"success":true,"top_level_keys":["data","errorCode","message","success","timestamp","type"],"type":"ChartResult"},"status":"PASS","vendor_attempted":true}
 ```
 
-### stderr.log
+## Stderr Evidence
 
 ```text
 
 ```
 
-### exit_codes.txt
+## Exit Code Evidence
 
 ```text
 ops02_wrapper=0
 ```
 
-### result_summary.json
+## Result Summary Evidence
 
 ```json
 {"classification":"PASS","epic_id":"HDE-EPIC034","exit_code":0,"follow_up":"bind OPS-02 evidence in PR-06 without overclaiming full v2 conformance","full_v2_conformance_claim":false,"full_vendor_payload_persisted":false,"generated_at_utc":"2026-06-23T22:00:05Z","geocode_used":false,"hde_ferm008_3_4_5_completion_claim":false,"hde_ferm008_parent_completion_claim":false,"http_status_present":false,"legacy_hd_api_key_used_for_v2":false,"live_v2_success_claim":true,"ops_task":"OPS-02","pf09_subtask_id":"HDE-FERM008.2","raw_secret_persisted":false,"v2_auth_posture":"Authorization: Bearer <redacted>","vendor_attempted":true}
 ```
 
-### files_sha256.txt
+## Checksum Evidence
 
 ```text
 3346efd8375fc6b4e5a50550a22e97c6fe6bf32b43e4f71aff5fc14dd346864d  audit/ops/hde-epic034/ops-02/commands.txt
@@ -171,22 +144,22 @@ audit/ops/hde-epic034/ops-02/stderr.log: OK
 audit/ops/hde-epic034/ops-02/stdout.log: OK
 ```
 
-Secret and Bearer scans:
+Additional verification:
 
 ```text
+JSON_PARSE_OK
+PY_COMPILE_NO_WRITE_OK
+CONCRETE_COMMAND_OK
+LF_ENDINGS_OK
+PLACEHOLDER_SCAN_OK
+ACTIVATION_HOOK_SCAN_OK
 RAW_ENV_SECRET_SCAN=PASS
 RAW_BEARER_SCAN=PASS
 ```
 
-LF ending check:
+## Claim Boundaries
 
-```text
-LF_ENDINGS=PASS
-```
-
-## Safety and Claim Boundaries
-
-Confirmed:
+Confirmed supported claims:
 
 ```text
 classification=PASS
@@ -208,24 +181,26 @@ hde_ferm008_parent_completion_claim=false
 hde_ferm008_3_4_5_completion_claim=false
 public_reader_change_claim=false
 ai_scope_claim=false
+vendor_payload_persistence_claim=false
+vendor_rerun_by_remediation=false
 ```
 
-Follow-up recorded in OPS evidence:
+## Workspace State
+
+Current remediated OPS-02 changes:
 
 ```text
-bind OPS-02 evidence in PR-06 without overclaiming full v2 conformance
+ M .venv/bin/activate
+ M audit/ops/hde-epic034/ops-02/commands.txt
+ M audit/ops/hde-epic034/ops-02/files_sha256.txt
+ M audit/ops/hde-epic034/ops-02/ops02_full_action_report.md
+?? audit/ops/hde-epic034/ops-02/ops02_full_action_log_and_evidence_output.md
+?? audit/ops/hde-epic034/ops-02/ops02_open_rails_smoke_procedure.py
 ```
 
-## Workspace State After Session
+Unrelated pre-existing local change preserved:
 
 ```text
-original_session_reported_state= M .venv/bin/activate; ?? audit/ops/hde-epic034/ops-02/
-remediation_state_correction=.venv/bin/activate hook removed; OPS-02 procedure persisted under audit/ops/hde-epic034/ops-02/
+ M .devcontainer/scripts/codespaces-extension-doctor.sh
 ```
 
-Branch and commit:
-
-```text
-branch=main
-head=1c20dc7847bd2eebd4bf26d1cf4281de5f5480b7
-```

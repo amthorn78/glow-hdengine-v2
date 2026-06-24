@@ -275,7 +275,7 @@ fi
 if devcontainer_scan_has "post.*codex|codex.*install|npm .*install.*codex|pip .*install.*codex"; then
   repo_codex_reinstall=1
 fi
-if [ -f "$ROOT/.vscode/settings.json" ] && sed -n '/files\.watcherExclude/Ip;/search\.exclude/Ip' "$ROOT/.vscode/settings.json" | sed -n '1q' | grep -q .; then
+if [ -f "$ROOT/.vscode/settings.json" ] && grep -Eiq '"files\.watcherExclude"|"search\.exclude"' "$ROOT/.vscode/settings.json"; then
   watcher_exclusions=1
 fi
 if repo_scan_has "persistedshare|[.]codespaces|dotfiles"; then

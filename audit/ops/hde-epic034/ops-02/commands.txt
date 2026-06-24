@@ -2,6 +2,7 @@
 work_item=HDE-EPIC034 OPS-02
 operator_surface=Codex acting as PO tooling per user authorization
 execution_class=bounded open-rails HumanDesignAPI v2 smoke wrapper
+remediation_update_utc=2026-06-24T05:24:43Z
 route_resource_path=charts/coordinates
 method=POST
 rails=SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC
@@ -10,5 +11,9 @@ credential_env=HD_API_KEY
 geocode_env=GEO_API_KEY not required for charts/coordinates
 auth_header_shape=Authorization: Bearer <redacted>
 no_legacy_v2_auth_header=HD-Api-Key not used for v2 chart routes
-command=. .venv/bin/activate && python <ops02_wrapper>
+historical_placeholder_defect=initial packet recorded a placeholder wrapper command; the exact ephemeral wrapper path is not recoverable from repo evidence
+reproducible_operator_procedure=audit/ops/hde-epic034/ops-02/ops02_open_rails_smoke_procedure.py
+command=SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC .venv/bin/python audit/ops/hde-epic034/ops-02/ops02_open_rails_smoke_procedure.py
+procedure_status=repo-resident secret-safe procedure for a bounded charts/coordinates smoke; remediation did not re-execute the vendor call
+activation_bridge_status=not required; .venv/bin/glow-codespaces-env is not repo-resident and .venv/bin/activate is not part of OPS-02 evidence
 secret_policy=no raw API keys, bearer tokens, geocode keys, secret values, sensitive account details, uncontrolled production data, or full vendor payload bodies are persisted

@@ -1,6 +1,7 @@
-3e35bb55441ea6b79c3de38c74f3e86018c25e82d31a0b77872076267cb2acbd  audit/ops/hde-epic034/ops-02/commands.txt
+3346efd8375fc6b4e5a50550a22e97c6fe6bf32b43e4f71aff5fc14dd346864d  audit/ops/hde-epic034/ops-02/commands.txt
 566d06758ad3dc34d57427e6228e4808263fa7107b8abd28123df95397cd2fc5  audit/ops/hde-epic034/ops-02/env_presence_redacted.json
 354a244d8b29b8086dcaa4b6a48457b06dd6b77ed375ed56bfdf2c077c52e22c  audit/ops/hde-epic034/ops-02/exit_codes.txt
+407e1059596cdba51eed4b7f335ef28218f56a80df16148e19c0b7d95c5b4fca  audit/ops/hde-epic034/ops-02/ops02_open_rails_smoke_procedure.py
 e3caed458f4046b00bda819fac0e3fd16e569a885f88268253f4f49fb934ce87  audit/ops/hde-epic034/ops-02/request_summary.json
 128534056106a5e5e6184f5e89ec741a059d701a85de77b264a6db1ce65e4802  audit/ops/hde-epic034/ops-02/result_summary.json
 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b  audit/ops/hde-epic034/ops-02/stderr.log
