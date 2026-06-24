@@ -34,3 +34,15 @@ No PF-Canon document edits are required by PR-04. The PR proves structural adapt
 ## Status posture
 
 HDE-FERM007.4 is proven at the repo evidence level by this PR slice, pending final PO review. PF09.5 text remains unchanged by this PR.
+
+## PR-06 OPS-02 smoke evidence binding
+
+- OPS-02 repo-confirmed evidence supports PF09.5 HDE-FERM008.2 only.
+- Later PF09.5 drainage may update HDE-FERM008.2 from Not done to Done, subject to PO/canon status action.
+- No PF-Canon text edit is performed in PR-06.
+- No HDE-FERM008 parent completion or HDE-FERM008.3/.4/.5 completion is claimed.
+- Version ownership remains `HD_API_BASE_URL`; runtime route resources remain version-neutral, including `charts/coordinates`.
+- V2 chart auth remains `Authorization: Bearer <redacted>`; `HD-Api-Key` is not used as v2 chart-route auth.
+- No full HumanDesignAPI v2 runtime conformance, public Reader change, public route, public flag, public payload change, new HTTP home, public transport change, or AI scope is claimed.
+- Primary PR-06 binding evidence: `audit/qa/hde-epic034/pr-06/ops_smoke_evidence_binding.log`.
+- Bound OPS-02 evidence root: `audit/ops/hde-epic034/ops-02/`.

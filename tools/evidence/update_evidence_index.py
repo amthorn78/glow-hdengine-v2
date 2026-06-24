@@ -533,6 +533,11 @@ EPIC034_PR04_SUPERSEDED_INDEX_KEYS = {
     ("epic034.pr04.w005_final_validation_report", "audit/qa/hde-epic034/pr-04/w-005_final_validation_report.md"),
 }
 
+EPIC034_PR06_SUPERSEDED_INDEX_KEYS = {
+    ("epic034.pr04.doc_deltas", "audit/docdeltas/hde-epic034_doc_deltas.md"),
+    ("epic034.pr04.qa_meta_doc_deltas", "audit/qa/hde-epic034/00_meta/doc_deltas.md"),
+}
+
 EPIC032_PR03_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
         "artifact_key": "db_bridge.adapter_selection.snapshot",
@@ -987,6 +992,170 @@ def _load_epic034_pr05_entries() -> list[dict[str, object]]:
     return entries
 
 
+EPIC034_PR06_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "epic034.ops02.commands",
+        "discovered_physical_path": "audit/ops/hde-epic034/ops-02/commands.txt",
+        "epic_id": "HDE-EPIC034",
+        "record_type": "epic034_ops02_smoke_evidence",
+        "schema_version": "1.0",
+        "tokens": ["EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC034 OPS-02 retained command transcript for HDE-FERM008.2 open-rails smoke evidence; PR-06 binds without rerunning the smoke",
+    },
+    {
+        "artifact_key": "epic034.ops02.env_presence_redacted",
+        "discovered_physical_path": "audit/ops/hde-epic034/ops-02/env_presence_redacted.json",
+        "epic_id": "HDE-EPIC034",
+        "record_type": "epic034_ops02_smoke_evidence",
+        "schema_version": "1.0",
+        "tokens": ["EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC034 OPS-02 redacted environment-presence evidence for HDE-FERM008.2",
+    },
+    {
+        "artifact_key": "epic034.ops02.exit_codes",
+        "discovered_physical_path": "audit/ops/hde-epic034/ops-02/exit_codes.txt",
+        "epic_id": "HDE-EPIC034",
+        "record_type": "epic034_ops02_smoke_evidence",
+        "schema_version": "1.0",
+        "tokens": ["EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC034 OPS-02 wrapper exit-code evidence for HDE-FERM008.2",
+    },
+    {
+        "artifact_key": "epic034.ops02.files_sha256",
+        "discovered_physical_path": "audit/ops/hde-epic034/ops-02/files_sha256.txt",
+        "epic_id": "HDE-EPIC034",
+        "record_type": "epic034_ops02_smoke_evidence",
+        "schema_version": "1.0",
+        "tokens": ["EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC034 OPS-02 retained-file checksum manifest for HDE-FERM008.2",
+    },
+    {
+        "artifact_key": "epic034.ops02.moon_loop_rerun_transcript",
+        "discovered_physical_path": "audit/ops/hde-epic034/ops-02/moon_loop_rerun_transcript.txt",
+        "epic_id": "HDE-EPIC034",
+        "record_type": "epic034_ops02_smoke_evidence",
+        "schema_version": "1.0",
+        "tokens": ["EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC034 OPS-02 Moon Loop rerun transcript preserving command-to-output provenance for HDE-FERM008.2",
+    },
+    {
+        "artifact_key": "epic034.ops02.full_action_log",
+        "discovered_physical_path": "audit/ops/hde-epic034/ops-02/ops02_full_action_log_and_evidence_output.md",
+        "epic_id": "HDE-EPIC034",
+        "record_type": "epic034_ops02_smoke_evidence",
+        "schema_version": "1.0",
+        "tokens": ["EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC034 OPS-02 full action log and evidence output for HDE-FERM008.2",
+    },
+    {
+        "artifact_key": "epic034.ops02.smoke_procedure",
+        "discovered_physical_path": "audit/ops/hde-epic034/ops-02/ops02_open_rails_smoke_procedure.py",
+        "epic_id": "HDE-EPIC034",
+        "record_type": "epic034_ops02_smoke_evidence",
+        "schema_version": "1.0",
+        "tokens": ["EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC034 OPS-02 repo-retained smoke procedure; PR-06 governs the file without executing it",
+    },
+    {
+        "artifact_key": "epic034.ops02.request_summary",
+        "discovered_physical_path": "audit/ops/hde-epic034/ops-02/request_summary.json",
+        "epic_id": "HDE-EPIC034",
+        "record_type": "epic034_ops02_smoke_evidence",
+        "schema_version": "1.0",
+        "tokens": ["EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC034 OPS-02 request summary proving version-neutral charts/coordinates and redacted Bearer auth posture for HDE-FERM008.2",
+    },
+    {
+        "artifact_key": "epic034.ops02.result_summary",
+        "discovered_physical_path": "audit/ops/hde-epic034/ops-02/result_summary.json",
+        "epic_id": "HDE-EPIC034",
+        "record_type": "epic034_ops02_smoke_evidence",
+        "schema_version": "1.0",
+        "tokens": ["EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC034 OPS-02 result summary supporting HDE-FERM008.2 only with no parent-completion or full-v2-conformance claim",
+    },
+    {
+        "artifact_key": "epic034.ops02.stderr",
+        "discovered_physical_path": "audit/ops/hde-epic034/ops-02/stderr.log",
+        "epic_id": "HDE-EPIC034",
+        "record_type": "epic034_ops02_smoke_evidence",
+        "schema_version": "1.0",
+        "tokens": ["EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC034 OPS-02 stderr capture for HDE-FERM008.2",
+    },
+    {
+        "artifact_key": "epic034.ops02.stdout",
+        "discovered_physical_path": "audit/ops/hde-epic034/ops-02/stdout.log",
+        "epic_id": "HDE-EPIC034",
+        "record_type": "epic034_ops02_smoke_evidence",
+        "schema_version": "1.0",
+        "tokens": ["EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC034 OPS-02 stdout capture recording PASS and vendor_attempted=true for HDE-FERM008.2",
+    },
+    {
+        "artifact_key": "epic034.pr06.ops_smoke_evidence_binding",
+        "discovered_physical_path": "audit/qa/hde-epic034/pr-06/ops_smoke_evidence_binding.log",
+        "epic_id": "HDE-EPIC034",
+        "record_type": "epic034_pr06_ops02_binding",
+        "schema_version": "1.0",
+        "tokens": ["EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC034 PR-06 LF-terminated binding log for already-produced OPS-02 open-rails smoke evidence supporting HDE-FERM008.2 only; no full v2 runtime conformance, HDE-FERM008 parent completion, public Reader, or AI scope claim",
+    },
+    {
+        "artifact_key": "epic034.pr06.acceptance_map",
+        "discovered_physical_path": "docs/acceptance_map_epic034.json",
+        "epic_id": "HDE-EPIC034",
+        "record_type": "epic034_pr06_acceptance_map",
+        "schema_version": "1.0",
+        "tokens": ["EVIDENCE_PATH_PROOFS_OK", "DOC_DELTA_PRESENT_OK"],
+        "notes": "EPIC034 PR-06 acceptance map using existing baseline tokens only and binding PR-06 to HDE-FERM008.2 only",
+    },
+    {
+        "artifact_key": "epic034.pr06.doc_deltas",
+        "discovered_physical_path": "audit/docdeltas/hde-epic034_doc_deltas.md",
+        "epic_id": "HDE-EPIC034",
+        "record_type": "epic034_pr06_doc_delta",
+        "schema_version": "1.0",
+        "tokens": ["DOC_DELTA_PRESENT_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC034 PR-06 current-epic doc-delta surface records OPS-02 support for HDE-FERM008.2 only and no PF-Canon edit",
+    },
+    {
+        "artifact_key": "epic034.pr06.qa_meta_doc_deltas",
+        "discovered_physical_path": "audit/qa/hde-epic034/00_meta/doc_deltas.md",
+        "epic_id": "HDE-EPIC034",
+        "record_type": "epic034_pr06_doc_delta",
+        "schema_version": "1.0",
+        "tokens": ["DOC_DELTA_PRESENT_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC034 PR-06 QA meta doc-delta surface records OPS-02 support for HDE-FERM008.2 only and no PF-Canon edit",
+    },
+]
+
+
+def _load_epic034_pr06_entries() -> list[dict[str, object]]:
+    binding_log = ROOT / "audit/qa/hde-epic034/pr-06/ops_smoke_evidence_binding.log"
+    acceptance_map = ROOT / "docs/acceptance_map_epic034.json"
+    if not binding_log.exists() or not acceptance_map.exists():
+        return []
+    produced_at = None
+    for line in binding_log.read_text(encoding="utf-8").splitlines():
+        if line.startswith("ops02_result_hde_ferm008_2_evidence_ready=true"):
+            produced_at = "2026-06-24T06:28:13Z"
+            break
+    entries: list[dict[str, object]] = []
+    for entry in EPIC034_PR06_PRIMARY_ARTIFACTS:
+        artifact_path = ROOT / str(entry["discovered_physical_path"])
+        if not artifact_path.exists():
+            continue
+        normalized = dict(entry)
+        if produced_at is not None and normalized.get("record_type") in {
+            "epic034_ops02_smoke_evidence",
+            "epic034_pr06_ops02_binding",
+        }:
+            normalized["produced_at_utc"] = produced_at
+        entries.append(normalized)
+    return entries
+
+
 A7_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
         "artifact_key": "a7.success_encoding_invariance",
@@ -1317,6 +1486,8 @@ def _load_human_index() -> list[dict[str, object]]:
         not in EPIC034_PR03_SUPERSEDED_INDEX_KEYS
         and (entry.get("artifact_key"), entry.get("discovered_physical_path"))
         not in EPIC034_PR04_SUPERSEDED_INDEX_KEYS
+        and (entry.get("artifact_key"), entry.get("discovered_physical_path"))
+        not in EPIC034_PR06_SUPERSEDED_INDEX_KEYS
     ]
     return _dedupe_entries(
         [
@@ -1343,6 +1514,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *_load_epic034_pr03_entries(),
             *_load_epic034_pr04_entries(),
             *_load_epic034_pr05_entries(),
+            *_load_epic034_pr06_entries(),
             *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,

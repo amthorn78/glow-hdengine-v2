@@ -1,0 +1,36 @@
+work_item=PR-06
+epic_id=HDE-EPIC034
+pf09_document=PF09.5 — HDE Build Checklist Fermentation
+pf09_task_id=HDE-FERM008
+pf09_subtask_id=HDE-FERM008.2
+ops02_evidence_files_checked=audit/ops/hde-epic034/ops-02/commands.txt,audit/ops/hde-epic034/ops-02/env_presence_redacted.json,audit/ops/hde-epic034/ops-02/exit_codes.txt,audit/ops/hde-epic034/ops-02/files_sha256.txt,audit/ops/hde-epic034/ops-02/moon_loop_rerun_transcript.txt,audit/ops/hde-epic034/ops-02/ops02_full_action_log_and_evidence_output.md,audit/ops/hde-epic034/ops-02/ops02_open_rails_smoke_procedure.py,audit/ops/hde-epic034/ops-02/request_summary.json,audit/ops/hde-epic034/ops-02/result_summary.json,audit/ops/hde-epic034/ops-02/stderr.log,audit/ops/hde-epic034/ops-02/stdout.log
+ops02_classification=PASS
+command_to_output_provenance=PASS
+pass_producing_command=SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC .venv/bin/python audit/ops/hde-epic034/ops-02/ops02_open_rails_smoke_procedure.py
+ops02_exit_code=0
+ops02_stdout_status=PASS
+ops02_vendor_attempted=true
+v2_auth_posture=Authorization: Bearer <redacted>
+legacy_v2_auth_header_posture=HD-Api-Key not used for v2 chart routes
+configured_base_url_version_owner=HD_API_BASE_URL
+version_neutral_resource_path=charts/coordinates
+request_url_posture=redacted base URL; version-neutral resource path joined by HdApiClient
+secret_safety_classification=PASS; raw_secret_persisted=false; raw_request_payload_persisted=false; raw_response_payload_persisted=false; full_vendor_payload_persisted=false
+ops02_result_hde_ferm008_2_evidence_ready=true
+supportable_pf09_scope=HDE-FERM008.2 only
+nonclaim_full_humandesignapi_v2_runtime_conformance=true
+nonclaim_hde_ferm008_parent_completion=true
+nonclaim_hde_ferm008_3_error_retry_rate_limit_mapping=true
+nonclaim_hde_ferm008_4_normalized_live_data_path_proof=true
+nonclaim_hde_ferm008_5_full_live_conformance_evidence_loop=true
+nonclaim_public_reader_change=true
+nonclaim_public_route=true
+nonclaim_public_flag=true
+nonclaim_public_payload_change=true
+nonclaim_new_http_home=true
+nonclaim_ai_scope=true
+nonclaim_raw_request_payload_persistence=true
+nonclaim_raw_response_payload_persistence=true
+nonclaim_full_vendor_payload_persistence=true
+final_classification=PASS_PR06_EVIDENCE_BINDING_ONLY
+validation_rails=closed rails for PR-06 binding; OPS-02 open-rails smoke not rerun
