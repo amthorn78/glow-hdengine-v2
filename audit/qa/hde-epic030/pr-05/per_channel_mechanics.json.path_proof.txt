@@ -1,5 +1,5 @@
 path: audit/qa/hde-epic030/pr-05/per_channel_mechanics.json
 size_bytes: 12873
 sha256: 1d7eb1b31469468b9482a588f0bc5632c93f0d51ee2df455679fdfa8bdb762c7
-mtime_utc: 2026-06-24T18:42:20Z
-produced_at_utc: 2026-06-24T18:48:00Z
+mtime_utc: 2026-06-24T18:42:15Z
+produced_at_utc: 2026-06-24T19:08:09Z
