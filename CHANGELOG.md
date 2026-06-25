@@ -1,5 +1,15 @@
 # CHANGELOG
 
+Unreleased — HDE-EPIC034: Fermentation Pass 5 final repo docs sweep (README/CHANGELOG/AGENTS/docs/)
+
+### Added
+- Documented HDE-EPIC034 evidence families for source selection / v1 legacy isolation, request shaping, response-envelope mapping, adapter/presenter boundary proof, closed-rails deterministic shaping/refusal proof, OPS-02 open-rails smoke evidence, and PR-06 evidence binding.
+- Added repo-doc posture for `HD_API_BASE_URL` as the vendor API version owner, version-neutral runtime resources (`charts`, `charts/simple`, `charts/coordinates`), and v2 Bearer-auth versus legacy `HD-Api-Key` auth boundaries.
+
+### Changed / Fixed
+- Refreshed public and developer docs from HDE-EPIC033 inventory-only wording to HDE-EPIC034 current repo truth while preserving `artifacts/vendor/hdapi_v2/` as a governed evidence-family name rather than runtime API-version authority.
+- Clarified that OPS-02 / PR-06 supports HDE-FERM008.2 only and does not claim HDE-FERM008 parent completion, HDE-FERM008.3/.4/.5 completion, full HumanDesignAPI v2 runtime conformance, public Reader changes, a new HTTP home, public transport changes, OPS execution by this PR, or AI scope.
+
 Unreleased — HDE-EPIC033 PR-01: HDAPI contract-inventory evidence (README/CHANGELOG/AGENTS/docs/)
 
 ### Added
