@@ -1,0 +1,14 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-06-26T19:06:13Z", "check_id": "po-017-qa-plan-update-r1", "check_name": "PO-017 QA_PLAN_UPDATE Routing R1", "status": "PASS", "fail_status": "", "command": "record QA_PLAN_UPDATE routing basis from user-requested remediation", "command_provenance": "User request: It's your job to do the remediation; route receipt created before post-routing PO-017 proof", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic034/checks/po-017-qa-plan-update-r1/primary.log", "audit/qa/hde-epic034/checks/po-017-qa-plan-update-r1/primary.log.path_proof.txt", "audit/qa/hde-epic034/00_meta/HDE-EPIC034_po-013_through_po-018_qa-19_session_full_evidence_report.md", "audit/qa/hde-epic034/checks/po-017/primary.log", "audit/qa/hde-epic034/checks/po-017/primary.log.path_proof.txt", "audit/ops/hde-epic034/ops-02/files_sha256.txt.path_proof.txt", "docs/evidence/INDEX.json", "docs/evidence/INDEX.sha256", "artifacts/evidence_index.jsonl", "artifacts/evidence_index.jsonl.sha256"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 - HDE-Build Notes", "PF19 - Glow QA Guide", "PF12 - Schemas & Artifacts"], "intended_tokens": [], "claimed_tokens": []}
+check_id=po-017-qa-plan-update-r1
+check_name=PO-017 QA_PLAN_UPDATE Routing R1
+routing_type=QA_PLAN_UPDATE
+routing_source=user_request=It's your job to do the remediation.
+routing_review=Review Summary decision REMEDIATION NEEDED requested approved PR/OPS/QA_PLAN_UPDATE/DOC_UPDATE basis before final PASS-grade proof.
+routing_scope=HDE-EPIC034 PO-017 and qa-19 route provenance for the non-QA-root governed evidence refresh only.
+non_qa_root_refresh_bound_to=audit/ops/hde-epic034/ops-02/files_sha256.txt.path_proof.txt;docs/evidence/INDEX.json;docs/evidence/INDEX.sha256;artifacts/evidence_index.jsonl;artifacts/evidence_index.jsonl.sha256;related indexed path proofs.
+allowed_actions=Use canonical evidence tools to prove current governed evidence coherence; record accepted proof only after this QA_PLAN_UPDATE routing receipt exists.
+non_claims=no product code edit; no repo test edit; no evidence generator edit; no PF document edit; no public contract change; no acceptance token change; no live vendor rerun; no full runtime conformance claim; no PO closeout claim.
+post_routing_required_receipt=audit/qa/hde-epic034/checks/po-017-remediation-r1/primary.log
+rails SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev
+pins LC_ALL=C LANG=C TZ=UTC
+QA_PLAN_UPDATE_ROUTING_OK
