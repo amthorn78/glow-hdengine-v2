@@ -1,0 +1,11 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-06-26T11:28:39Z", "check_id": "po-011", "check_name": "PO-011", "status": "PASS", "fail_status": "", "command": "python audit/qa/hde-epic034/00_meta/hde034_live_qa_harness.py po-011", "command_provenance": "Copy/paste from PO instructions via QA-created harness", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic034/checks/po-011/primary.log", "audit/qa/hde-epic034/checks/po-011/primary.log.path_proof.txt", "artifacts/vendor/hdapi_v2/closed_rails_refusal.txt"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 - HDE-Build Notes", "PF19 - Glow QA Guide", "PF27 - Canon Plan Templates"], "intended_tokens": [], "claimed_tokens": []}
+check_id=po-011
+check_name=PO-011
+command=python audit/qa/hde-epic034/00_meta/hde034_live_qa_harness.py po-011
+rails=SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev
+pins=LC_ALL=C LANG=C TZ=UTC
+FILE_OK artifacts/vendor/hdapi_v2/closed_rails_refusal.txt sha256=b41135d431c627ce5d03a0248a60a1c2437ae5290cc973bf1ab7cfb61ee25bea
+TEXT_OK artifacts/vendor/hdapi_v2/closed_rails_refusal.txt :: typed_refusal_posture=PROVIDER_REFUSED before outbound transport under closed rails
+TEXT_OK artifacts/vendor/hdapi_v2/closed_rails_refusal.txt :: no_dns_socket_http_external_io_posture
+TEXT_OK artifacts/vendor/hdapi_v2/closed_rails_refusal.txt :: no_live_vendor_call_claim=NONE
+TEXT_OK artifacts/vendor/hdapi_v2/closed_rails_refusal.txt :: status=PASS

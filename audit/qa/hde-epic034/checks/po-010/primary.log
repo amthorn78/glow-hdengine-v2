@@ -1,0 +1,10 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-06-26T11:28:39Z", "check_id": "po-010", "check_name": "PO-010", "status": "PASS", "fail_status": "", "command": "python audit/qa/hde-epic034/00_meta/hde034_live_qa_harness.py po-010", "command_provenance": "Copy/paste from PO instructions via QA-created harness", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic034/checks/po-010/primary.log", "audit/qa/hde-epic034/checks/po-010/primary.log.path_proof.txt", "artifacts/vendor/hdapi_v2/adapter_boundary_proof.log"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 - HDE-Build Notes", "PF19 - Glow QA Guide", "PF27 - Canon Plan Templates"], "intended_tokens": [], "claimed_tokens": []}
+check_id=po-010
+check_name=PO-010
+command=python audit/qa/hde-epic034/00_meta/hde034_live_qa_harness.py po-010
+rails=SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev
+pins=LC_ALL=C LANG=C TZ=UTC
+FILE_OK artifacts/vendor/hdapi_v2/adapter_boundary_proof.log sha256=aeae687678351afc698acbd2ddaa0ca507b545714df05ca0a51e7b6f6d3181a6
+TEXT_OK artifacts/vendor/hdapi_v2/adapter_boundary_proof.log :: public_route_drift_proof_repair
+TEXT_OK artifacts/vendor/hdapi_v2/adapter_boundary_proof.log :: typed analyzer-owned route records replace string-first drift proof
+TEXT_OK artifacts/vendor/hdapi_v2/adapter_boundary_proof.log :: route_proof_contract_required_fields

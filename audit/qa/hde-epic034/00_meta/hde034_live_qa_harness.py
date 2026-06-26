@@ -4,6 +4,7 @@ import datetime
 import hashlib
 import json
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -72,6 +73,13 @@ def require_contains(path: str | Path, needle: str, body: list[str]) -> None:
     if needle not in text:
         raise FailBehavior(f"MISSING_TEXT:{path}:{needle}")
     body.append(f"TEXT_OK {path} :: {needle}")
+
+
+def require_regex(path: str | Path, pattern: str, body: list[str]) -> None:
+    text = read_text(path)
+    if not re.search(pattern, text):
+        raise FailBehavior(f"MISSING_REGEX:{path}:{pattern}")
+    body.append(f"REGEX_OK {path} :: {pattern}")
 
 
 def check_step0b(body: list[str]) -> tuple[list[str], list[str], list[str]]:
@@ -181,6 +189,40 @@ def check_po008(body: list[str]) -> tuple[list[str], list[str], list[str]]:
     return [artifact], [], []
 
 
+def check_po009(body: list[str]) -> tuple[list[str], list[str], list[str]]:
+    artifact = "artifacts/vendor/hdapi_v2/adapter_boundary_proof.log"
+    require_file(artifact, body)
+    require_regex(artifact, r"fail[- ]closed", body)
+    require_contains(artifact, "unproven route-shaped forms fail closed", body)
+    require_contains(artifact, "unknown_current_categories_fail_closed", body)
+    return [artifact], [], []
+
+
+def check_po010(body: list[str]) -> tuple[list[str], list[str], list[str]]:
+    artifact = "artifacts/vendor/hdapi_v2/adapter_boundary_proof.log"
+    require_file(artifact, body)
+    require_contains(artifact, "public_route_drift_proof_repair", body)
+    require_contains(
+        artifact, "typed analyzer-owned route records replace string-first drift proof", body
+    )
+    require_contains(artifact, "route_proof_contract_required_fields", body)
+    return [artifact], [], []
+
+
+def check_po011(body: list[str]) -> tuple[list[str], list[str], list[str]]:
+    artifact = "artifacts/vendor/hdapi_v2/closed_rails_refusal.txt"
+    require_file(artifact, body)
+    require_contains(
+        artifact,
+        "typed_refusal_posture=PROVIDER_REFUSED before outbound transport under closed rails",
+        body,
+    )
+    require_contains(artifact, "no_dns_socket_http_external_io_posture", body)
+    require_contains(artifact, "no_live_vendor_call_claim=NONE", body)
+    require_contains(artifact, "status=PASS", body)
+    return [artifact], [], []
+
+
 CHECKS = {
     "step-0b-doc-delta-capture": ("Step-0B - Doc Delta Capture", check_step0b),
     "po-001": ("PO-001", check_po001),
@@ -191,6 +233,9 @@ CHECKS = {
     "po-006": ("PO-006", check_po006),
     "po-007": ("PO-007", check_po007),
     "po-008": ("PO-008", check_po008),
+    "po-009": ("PO-009", check_po009),
+    "po-010": ("PO-010", check_po010),
+    "po-011": ("PO-011", check_po011),
 }
 
 
