@@ -1,0 +1,10 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-06-26T14:50:49Z", "check_id": "po-018", "check_name": "PO-018", "status": "PASS", "fail_status": "", "command": "python audit/qa/hde-epic034/00_meta/hde034_live_qa_harness.py po-018", "command_provenance": "Copy/paste from PO instructions via QA-created harness", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic034/checks/po-018/primary.log", "audit/qa/hde-epic034/checks/po-018/primary.log.path_proof.txt", "docs/acceptance_map_epic034.json"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 - HDE-Build Notes", "PF19 - Glow QA Guide", "PF27 - Canon Plan Templates"], "intended_tokens": [], "claimed_tokens": []}
+check_id=po-018
+check_name=PO-018
+command=python audit/qa/hde-epic034/00_meta/hde034_live_qa_harness.py po-018
+rails=SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev
+pins=LC_ALL=C LANG=C TZ=UTC
+FILE_OK docs/acceptance_map_epic034.json sha256=e34966e96a40b4132c2d1c4dbbc21cc9713ee59b04b2e35944ab7e270e9627ec
+TEXT_OK docs/acceptance_map_epic034.json :: "acceptance_claims_mode":"baseline_existing_tokens_only"
+TEXT_OK docs/acceptance_map_epic034.json :: No vendor-v2-specific acceptance token is minted or claimed.
+NO_VENDOR_SPECIFIC_ACCEPTANCE_MARKER_OK

@@ -1,0 +1,9 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-06-26T14:50:49Z", "check_id": "qa-19-close-out-deliverables", "check_name": "Close-out deliverables", "status": "PASS", "fail_status": "", "command": "python audit/qa/hde-epic034/00_meta/hde034_live_qa_harness.py qa-19-close-out-deliverables", "command_provenance": "Copy/paste from PO instructions via QA-created harness", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic034/checks/qa-19-close-out-deliverables/primary.log", "audit/qa/hde-epic034/checks/qa-19-close-out-deliverables/primary.log.path_proof.txt", "audit/qa/hde-epic034/qa_step_logs_manifest.json", "audit/qa/hde-epic034/qa_step_logs_manifest.json.path_proof.txt", "audit/qa/hde-epic034/00_meta/discovery_artifact.md", "audit/qa/hde-epic034/00_meta/discovery_artifact.md.path_proof.txt", "audit/qa/hde-epic034/00_meta/qa_rca_doc_delta_summary.md", "audit/qa/hde-epic034/00_meta/qa_rca_doc_delta_summary.md.path_proof.txt"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 - HDE-Build Notes", "PF19 - Glow QA Guide", "PF27 - Canon Plan Templates"], "intended_tokens": [], "claimed_tokens": []}
+check_id=qa-19-close-out-deliverables
+check_name=Close-out deliverables
+command=python audit/qa/hde-epic034/00_meta/hde034_live_qa_harness.py qa-19-close-out-deliverables
+rails=SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev
+pins=LC_ALL=C LANG=C TZ=UTC
+manifest=audit/qa/hde-epic034/qa_step_logs_manifest.json
+discovery_artifact=audit/qa/hde-epic034/00_meta/discovery_artifact.md
+qa_rca_doc_delta_summary=audit/qa/hde-epic034/00_meta/qa_rca_doc_delta_summary.md

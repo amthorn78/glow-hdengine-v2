@@ -1,0 +1,54 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-06-26T14:50:49Z", "check_id": "po-017", "check_name": "PO-017", "status": "PASS", "fail_status": "", "command": "python audit/qa/hde-epic034/00_meta/hde034_live_qa_harness.py po-017", "command_provenance": "Copy/paste from PO instructions via QA-created harness", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic034/checks/po-017/primary.log", "audit/qa/hde-epic034/checks/po-017/primary.log.path_proof.txt", "tests/bodygraph/test_vendor_client.py", "tests/evidence/test_hdapi_v2_contract_inventory.py", "tools/evidence/validate_evidence_paths.py", "tools/evidence/check_lf_endings.py", "tools/evidence/update_evidence_index.py", "ci/checks/check_mirror_schema.sh", "ci/checks/check_evidence_index_hash.sh", "ci/checks/check_final_lf.sh", "docs/evidence/INDEX.json", "docs/evidence/INDEX.sha256", "artifacts/evidence_index.jsonl", "artifacts/evidence_index.jsonl.sha256", "docs/acceptance_map_epic034.json"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 - HDE-Build Notes", "PF19 - Glow QA Guide", "PF27 - Canon Plan Templates"], "intended_tokens": ["EVIDENCE_INDEX_UPDATED_OK", "MACHINE_MIRROR_UPDATED_OK", "EVIDENCE_INDEX_HASH_OK", "EVIDENCE_PATHS_VALIDATED_OK", "EVIDENCE_PATH_PROOFS_OK", "TESTS_PASS_OK"], "claimed_tokens": ["EVIDENCE_INDEX_UPDATED_OK", "MACHINE_MIRROR_UPDATED_OK", "EVIDENCE_INDEX_HASH_OK", "EVIDENCE_PATHS_VALIDATED_OK", "EVIDENCE_PATH_PROOFS_OK", "TESTS_PASS_OK"]}
+check_id=po-017
+check_name=PO-017
+command=python audit/qa/hde-epic034/00_meta/hde034_live_qa_harness.py po-017
+rails=SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev
+pins=LC_ALL=C LANG=C TZ=UTC
+PYTEST_IMPORT_OK
+FILE_OK tests/bodygraph/test_vendor_client.py sha256=beddc94ef57ba51685285245ff477637cf9c504f13c883f41d4f20282c73d8d9
+FILE_OK tests/evidence/test_hdapi_v2_contract_inventory.py sha256=f9152695e7d4fa53e040808781c89087237f2d36b634c43e710fb21869cd8716
+FILE_OK tools/evidence/validate_evidence_paths.py sha256=bce88fdacf4b5af09f94829aa6fcc806256b2576e8d7ec443ba07cc4c8d29102
+FILE_OK tools/evidence/check_lf_endings.py sha256=046a43fb5dfa4cb7ebec3195a7a57633f07d8423337c90c9e3cb5130ff11297e
+FILE_OK tools/evidence/update_evidence_index.py sha256=1f3625577b203ee3db8d5e6c346502971e0b5eb351cdb387241a3fc455005a6a
+FILE_OK ci/checks/check_mirror_schema.sh sha256=867d00961e78955df15c50a499836d1150093d41bd5ff8df585011c27295e09f
+FILE_OK ci/checks/check_evidence_index_hash.sh sha256=f5cd0cc92fb4175d6cb692a94011afd1c21ceda29caedaf36530b77cfec04d75
+FILE_OK ci/checks/check_final_lf.sh sha256=eaa6feaf740bf06fdd33f7fe87519477325f2d785adc1d818bd93d47c00ec80c
+FILE_OK docs/evidence/INDEX.json sha256=54fdf8f25ec6e3de3d545f4cb37b05b8d38cc8bdc940d36a593f2fca48ff2dbe
+FILE_OK docs/evidence/INDEX.sha256 sha256=fc1b05cc760210c7e7db836cab6d4be1ed23dd0efed0e796b14316b43b9897a8
+FILE_OK artifacts/evidence_index.jsonl sha256=993805e1bc8f1de5ce2209dbeebc6b518984a005a92381596f5b71b69f50cd92
+FILE_OK artifacts/evidence_index.jsonl.sha256 sha256=a6dde2e0c56d1766e74a138bde057432145412ac2c09218299e9c7b3b6fb2b48
+FILE_OK docs/acceptance_map_epic034.json sha256=e34966e96a40b4132c2d1c4dbbc21cc9713ee59b04b2e35944ab7e270e9627ec
+COMMAND /usr/local/bin/python -m pytest tests/bodygraph/test_vendor_client.py tests/evidence/test_hdapi_v2_contract_inventory.py
+============================= test session starts ==============================
+platform linux -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0
+rootdir: /workspaces/glow-hdengine-v2
+configfile: pytest.ini
+plugins: cov-4.1.0, mock-3.15.1
+collected 333 items
+
+tests/bodygraph/test_vendor_client.py .................................. [ 10%]
+.                                                                        [ 10%]
+tests/evidence/test_hdapi_v2_contract_inventory.py ..................... [ 16%]
+........................................................................ [ 38%]
+........................................................................ [ 60%]
+........................................................................ [ 81%]
+.............................................................            [100%]
+
+============================= 333 passed in 57.48s =============================
+EXIT_CODE 0
+COMMAND /usr/local/bin/python tools/evidence/validate_evidence_paths.py
+EXIT_CODE 0
+COMMAND /usr/local/bin/python tools/evidence/check_lf_endings.py
+EXIT_CODE 0
+COMMAND /usr/local/bin/python tools/evidence/update_evidence_index.py --check
+[evidence-index] env pins: ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC
+EXIT_CODE 0
+COMMAND /usr/local/bin/python ci/checks/check_mirror_schema.sh
+EXIT_CODE 0
+COMMAND bash ci/checks/check_evidence_index_hash.sh
+EXIT_CODE 0
+COMMAND bash ci/checks/check_final_lf.sh
+EXIT_CODE 0
+TEXT_OK docs/acceptance_map_epic034.json :: "EVIDENCE_INDEX_UPDATED_OK"
+TEXT_OK docs/acceptance_map_epic034.json :: "MACHINE_MIRROR_UPDATED_OK"
+TEXT_OK docs/acceptance_map_epic034.json :: "TESTS_PASS_OK"

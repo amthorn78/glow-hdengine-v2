@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic034/00_meta/discovery_artifact.md
+size_bytes: 534
+sha256: 39c92a74500ec0f0b9761e67d154df44ac822947dc42fbe190ed5cc03e7631f3
+mtime_utc: 2026-06-26T14:50:49Z
+produced_at_utc: 2026-06-26T14:50:49Z

@@ -1,0 +1,13 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-06-26T14:48:06Z", "check_id": "po-016", "check_name": "PO-016", "status": "PASS", "fail_status": "", "command": "python audit/qa/hde-epic034/00_meta/hde034_live_qa_harness.py po-016", "command_provenance": "Copy/paste from PO instructions via QA-created harness", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic034/checks/po-016/primary.log", "audit/qa/hde-epic034/checks/po-016/primary.log.path_proof.txt", "audit/qa/hde-epic034/pr-06/ops_smoke_evidence_binding.log"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 - HDE-Build Notes", "PF19 - Glow QA Guide", "PF27 - Canon Plan Templates"], "intended_tokens": [], "claimed_tokens": []}
+check_id=po-016
+check_name=PO-016
+command=python audit/qa/hde-epic034/00_meta/hde034_live_qa_harness.py po-016
+rails=SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev
+pins=LC_ALL=C LANG=C TZ=UTC
+FILE_OK audit/qa/hde-epic034/pr-06/ops_smoke_evidence_binding.log sha256=4911de3748f85d25adb3c2ca2c930f619c966f0a0fb516a34b37808460f0271f
+TEXT_OK audit/qa/hde-epic034/pr-06/ops_smoke_evidence_binding.log :: nonclaim_public_reader_change=true
+TEXT_OK audit/qa/hde-epic034/pr-06/ops_smoke_evidence_binding.log :: nonclaim_public_route=true
+TEXT_OK audit/qa/hde-epic034/pr-06/ops_smoke_evidence_binding.log :: nonclaim_public_flag=true
+TEXT_OK audit/qa/hde-epic034/pr-06/ops_smoke_evidence_binding.log :: nonclaim_public_payload_change=true
+TEXT_OK audit/qa/hde-epic034/pr-06/ops_smoke_evidence_binding.log :: nonclaim_new_http_home=true
+TEXT_OK audit/qa/hde-epic034/pr-06/ops_smoke_evidence_binding.log :: nonclaim_ai_scope=true
