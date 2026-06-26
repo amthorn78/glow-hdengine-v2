@@ -7,6 +7,7 @@ import os
 import re
 import sys
 from pathlib import Path
+from typing import Any
 
 EPIC_ID = "HDE-EPIC034"
 EPIC_QA_ROOT = Path("audit/qa/hde-epic034")
@@ -61,6 +62,10 @@ def read_text(path: str | Path) -> str:
     return target.read_text(encoding="utf-8")
 
 
+def load_json(path: str | Path) -> dict[str, Any]:
+    return json.loads(read_text(path))
+
+
 def require_file(path: str | Path, body: list[str]) -> None:
     target = Path(path)
     if not target.exists():
@@ -80,6 +85,25 @@ def require_regex(path: str | Path, pattern: str, body: list[str]) -> None:
     if not re.search(pattern, text):
         raise FailBehavior(f"MISSING_REGEX:{path}:{pattern}")
     body.append(f"REGEX_OK {path} :: {pattern}")
+
+
+def require_json_value(path: str | Path, key: str, expected: Any, body: list[str]) -> None:
+    payload = load_json(path)
+    if key not in payload:
+        raise FailBehavior(f"MISSING_JSON_KEY:{path}:{key}")
+    actual = payload[key]
+    if actual != expected:
+        raise FailBehavior(f"JSON_VALUE_MISMATCH:{path}:{key}:{actual!r}!={expected!r}")
+    body.append(f"JSON_OK {path} :: {key}={expected!r}")
+
+
+def classify_ops_result(path: str | Path, body: list[str]) -> None:
+    payload = load_json(path)
+    classification = payload.get("classification")
+    if classification == "TOOLING_BLOCKED":
+        raise ToolingBlocked(f"OPS02_TOOLING_BLOCKED:{payload.get('exit_code')!r}")
+    if classification != "PASS":
+        raise FailBehavior(f"OPS02_CLASSIFICATION:{classification!r}")
 
 
 def check_step0b(body: list[str]) -> tuple[list[str], list[str], list[str]]:
@@ -223,6 +247,64 @@ def check_po011(body: list[str]) -> tuple[list[str], list[str], list[str]]:
     return [artifact], [], []
 
 
+def check_po012(body: list[str]) -> tuple[list[str], list[str], list[str]]:
+    artifacts = [
+        "audit/ops/hde-epic034/ops-02/commands.txt",
+        "audit/ops/hde-epic034/ops-02/stdout.log",
+        "audit/ops/hde-epic034/ops-02/files_sha256.txt",
+        "audit/ops/hde-epic034/ops-02/env_presence_redacted.json",
+        "audit/ops/hde-epic034/ops-02/request_summary.json",
+        "audit/ops/hde-epic034/ops-02/result_summary.json",
+    ]
+    for artifact in artifacts:
+        require_file(artifact, body)
+
+    result = "audit/ops/hde-epic034/ops-02/result_summary.json"
+    request = "audit/ops/hde-epic034/ops-02/request_summary.json"
+    env_presence = "audit/ops/hde-epic034/ops-02/env_presence_redacted.json"
+    commands = "audit/ops/hde-epic034/ops-02/commands.txt"
+
+    classify_ops_result(result, body)
+    require_json_value(result, "classification", "PASS", body)
+    require_json_value(result, "exit_code", 0, body)
+    require_json_value(result, "vendor_attempted", True, body)
+    require_json_value(result, "full_v2_conformance_claim", False, body)
+    require_json_value(result, "hde_ferm008_parent_completion_claim", False, body)
+    require_json_value(result, "pf09_subtask_id", "HDE-FERM008.2", body)
+    require_json_value(result, "raw_secret_persisted", False, body)
+    require_json_value(result, "full_vendor_payload_persisted", False, body)
+
+    require_json_value(request, "resource_path", "charts/coordinates", body)
+    require_json_value(request, "configured_base_url_key", "HD_API_BASE_URL", body)
+    require_json_value(request, "auth_header_posture", "Authorization: Bearer <redacted>", body)
+    require_json_value(request, "geocode_key_requirement", "not needed", body)
+    require_json_value(
+        request,
+        "legacy_v2_auth_header_posture",
+        "HD-Api-Key not used for v2 chart routes",
+        body,
+    )
+
+    require_json_value(env_presence, "SAFE_MODE", "0", body)
+    require_json_value(env_presence, "ALLOW_NETWORK", "1", body)
+    require_json_value(env_presence, "HD_API_BASE_URL", "SET", body)
+    require_json_value(env_presence, "HD_API_KEY", "SET", body)
+    require_json_value(env_presence, "GEO_API_KEY", "SET", body)
+
+    expected_command = (
+        "actual_pass_producing_command=SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev "
+        "LC_ALL=C LANG=C TZ=UTC .venv/bin/python "
+        "audit/ops/hde-epic034/ops-02/ops02_open_rails_smoke_procedure.py"
+    )
+    command_text = read_text(commands)
+    if expected_command not in command_text:
+        raise FailBehavior("MISSING_ACTUAL_PASS_PRODUCING_COMMAND")
+    body.append(
+        "TEXT_OK audit/ops/hde-epic034/ops-02/commands.txt :: actual_pass_producing_command"
+    )
+    return artifacts, [], []
+
+
 CHECKS = {
     "step-0b-doc-delta-capture": ("Step-0B - Doc Delta Capture", check_step0b),
     "po-001": ("PO-001", check_po001),
@@ -236,6 +318,7 @@ CHECKS = {
     "po-009": ("PO-009", check_po009),
     "po-010": ("PO-010", check_po010),
     "po-011": ("PO-011", check_po011),
+    "po-012": ("PO-012", check_po012),
 }
 
 

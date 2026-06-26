@@ -1,0 +1,31 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-06-26T13:49:52Z", "check_id": "po-012", "check_name": "PO-012", "status": "PASS", "fail_status": "", "command": "python audit/qa/hde-epic034/00_meta/hde034_live_qa_harness.py po-012", "command_provenance": "Copy/paste from PO instructions via QA-created harness", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic034/checks/po-012/primary.log", "audit/qa/hde-epic034/checks/po-012/primary.log.path_proof.txt", "audit/ops/hde-epic034/ops-02/commands.txt", "audit/ops/hde-epic034/ops-02/stdout.log", "audit/ops/hde-epic034/ops-02/files_sha256.txt", "audit/ops/hde-epic034/ops-02/env_presence_redacted.json", "audit/ops/hde-epic034/ops-02/request_summary.json", "audit/ops/hde-epic034/ops-02/result_summary.json"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 - HDE-Build Notes", "PF19 - Glow QA Guide", "PF27 - Canon Plan Templates"], "intended_tokens": [], "claimed_tokens": []}
+check_id=po-012
+check_name=PO-012
+command=python audit/qa/hde-epic034/00_meta/hde034_live_qa_harness.py po-012
+rails=SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev
+pins=LC_ALL=C LANG=C TZ=UTC
+FILE_OK audit/ops/hde-epic034/ops-02/commands.txt sha256=50b6b3ee7d8dfecb0a0155be9ed210008526165221710629cc0fa48c625ce739
+FILE_OK audit/ops/hde-epic034/ops-02/stdout.log sha256=0f0cd5ab2c25fbc719546fc5aa8c870955f814b4f1b556befd72d1ab9910ab82
+FILE_OK audit/ops/hde-epic034/ops-02/files_sha256.txt sha256=08dfbfdb14718e1584a1c4ba79c3ebcbffa1ae6fca5385aaaa33890618291c8b
+FILE_OK audit/ops/hde-epic034/ops-02/env_presence_redacted.json sha256=566d06758ad3dc34d57427e6228e4808263fa7107b8abd28123df95397cd2fc5
+FILE_OK audit/ops/hde-epic034/ops-02/request_summary.json sha256=40a29a73564be3945386134a231905c4daf99a77c5bde362aa4316eed8abb241
+FILE_OK audit/ops/hde-epic034/ops-02/result_summary.json sha256=a8e41e93d4f9b2f1330b8bd13e692b65398033695b5fe0fc41bca413070a45ac
+JSON_OK audit/ops/hde-epic034/ops-02/result_summary.json :: classification='PASS'
+JSON_OK audit/ops/hde-epic034/ops-02/result_summary.json :: exit_code=0
+JSON_OK audit/ops/hde-epic034/ops-02/result_summary.json :: vendor_attempted=True
+JSON_OK audit/ops/hde-epic034/ops-02/result_summary.json :: full_v2_conformance_claim=False
+JSON_OK audit/ops/hde-epic034/ops-02/result_summary.json :: hde_ferm008_parent_completion_claim=False
+JSON_OK audit/ops/hde-epic034/ops-02/result_summary.json :: pf09_subtask_id='HDE-FERM008.2'
+JSON_OK audit/ops/hde-epic034/ops-02/result_summary.json :: raw_secret_persisted=False
+JSON_OK audit/ops/hde-epic034/ops-02/result_summary.json :: full_vendor_payload_persisted=False
+JSON_OK audit/ops/hde-epic034/ops-02/request_summary.json :: resource_path='charts/coordinates'
+JSON_OK audit/ops/hde-epic034/ops-02/request_summary.json :: configured_base_url_key='HD_API_BASE_URL'
+JSON_OK audit/ops/hde-epic034/ops-02/request_summary.json :: auth_header_posture='Authorization: Bearer <redacted>'
+JSON_OK audit/ops/hde-epic034/ops-02/request_summary.json :: geocode_key_requirement='not needed'
+JSON_OK audit/ops/hde-epic034/ops-02/request_summary.json :: legacy_v2_auth_header_posture='HD-Api-Key not used for v2 chart routes'
+JSON_OK audit/ops/hde-epic034/ops-02/env_presence_redacted.json :: SAFE_MODE='0'
+JSON_OK audit/ops/hde-epic034/ops-02/env_presence_redacted.json :: ALLOW_NETWORK='1'
+JSON_OK audit/ops/hde-epic034/ops-02/env_presence_redacted.json :: HD_API_BASE_URL='SET'
+JSON_OK audit/ops/hde-epic034/ops-02/env_presence_redacted.json :: HD_API_KEY='SET'
+JSON_OK audit/ops/hde-epic034/ops-02/env_presence_redacted.json :: GEO_API_KEY='SET'
+TEXT_OK audit/ops/hde-epic034/ops-02/commands.txt :: actual_pass_producing_command
