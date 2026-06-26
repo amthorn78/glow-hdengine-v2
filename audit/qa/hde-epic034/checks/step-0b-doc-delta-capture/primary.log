@@ -1,0 +1,9 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-06-26T09:59:09Z", "check_id": "step-0b-doc-delta-capture", "check_name": "Step-0B - Doc Delta Capture", "status": "PASS", "fail_status": "", "command": "python audit/qa/hde-epic034/00_meta/hde034_live_qa_harness.py step-0b-doc-delta-capture", "command_provenance": "Copy/paste from PO instructions via QA-created harness", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic034/checks/step-0b-doc-delta-capture/primary.log", "audit/qa/hde-epic034/checks/step-0b-doc-delta-capture/primary.log.path_proof.txt", "audit/docdeltas/hde-epic034_doc_deltas.md", "audit/qa/hde-epic034/00_meta/doc_deltas.md"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 - HDE-Build Notes", "PF19 - Glow QA Guide", "PF27 - Canon Plan Templates"], "intended_tokens": ["DOC_DELTA_PRESENT_OK"], "claimed_tokens": ["DOC_DELTA_PRESENT_OK"]}
+check_id=step-0b-doc-delta-capture
+check_name=Step-0B - Doc Delta Capture
+command=python audit/qa/hde-epic034/00_meta/hde034_live_qa_harness.py step-0b-doc-delta-capture
+rails=SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev
+pins=LC_ALL=C LANG=C TZ=UTC
+FILE_OK audit/docdeltas/hde-epic034_doc_deltas.md sha256=e928a8a5db62be498ac4ecc0e8f0554cfa2c24ea1c0e6845374b894985d309a9
+FILE_OK audit/qa/hde-epic034/00_meta/doc_deltas.md sha256=e928a8a5db62be498ac4ecc0e8f0554cfa2c24ea1c0e6845374b894985d309a9
+DOC_DELTA_PRESENT_OK
