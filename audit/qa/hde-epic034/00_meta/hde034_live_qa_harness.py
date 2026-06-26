@@ -121,11 +121,76 @@ def check_po003(body: list[str]) -> tuple[list[str], list[str], list[str]]:
     return [snapshot, client], [], []
 
 
+def check_po004(body: list[str]) -> tuple[list[str], list[str], list[str]]:
+    artifact = "artifacts/vendor/hdapi_v2/request_shaping.snapshot.json"
+    require_file(artifact, body)
+    require_contains(
+        artifact, '"v2_auth_header_posture":"Authorization: Bearer <redacted>"', body
+    )
+    require_contains(
+        artifact, '"v1_legacy_auth_header_posture":"HD-Api-Key: <redacted>"', body
+    )
+    require_contains(artifact, '"credential_env_var":"HD_API_KEY"', body)
+    require_contains(artifact, "<redacted>", body)
+    return [artifact], [], []
+
+
+def check_po005(body: list[str]) -> tuple[list[str], list[str], list[str]]:
+    artifact = "artifacts/vendor/hdapi_v2/request_shaping.snapshot.json"
+    require_file(artifact, body)
+    require_contains(artifact, '"geocode_env_var":"GEO_API_KEY"', body)
+    require_contains(artifact, '"geocode_header_posture":"HD-Geocode-Key: <redacted>"', body)
+    require_contains(artifact, '"geocode_key_requirement":"required"', body)
+    require_contains(artifact, '"geocode_key_requirement":"not needed"', body)
+    require_contains(artifact, '"geocode_env_var":"not applicable"', body)
+    return [artifact], [], []
+
+
+def check_po006(body: list[str]) -> tuple[list[str], list[str], list[str]]:
+    artifact = "artifacts/vendor/hdapi_v2/response_mapping.snapshot.json"
+    require_file(artifact, body)
+    require_contains(
+        artifact,
+        '"response_envelope_fields":["timestamp","success","message","errorCode","type","data"]',
+        body,
+    )
+    require_contains(artifact, '"success_status_handling"', body)
+    require_contains(artifact, '"errorCode_handling"', body)
+    require_contains(artifact, '"data_payload_body_emitted":false', body)
+    require_contains(artifact, '"route_variant":"coordinates_chart"', body)
+    return [artifact], [], []
+
+
+def check_po007(body: list[str]) -> tuple[list[str], list[str], list[str]]:
+    artifact = "artifacts/vendor/hdapi_v2/response_mapping.snapshot.json"
+    require_file(artifact, body)
+    require_contains(artifact, '"schema_gap_status":"GAP_RECORDED"', body)
+    require_contains(artifact, '"no_compatibility_by_inference":true', body)
+    require_contains(artifact, '"normalized_data_path_proof_claim":"NONE"', body)
+    return [artifact], [], []
+
+
+def check_po008(body: list[str]) -> tuple[list[str], list[str], list[str]]:
+    artifact = "artifacts/vendor/hdapi_v2/adapter_boundary_proof.log"
+    require_file(artifact, body)
+    require_contains(artifact, "adapter/presenter boundary taxonomy proof", body)
+    require_contains(
+        artifact, "adapter routes resolve to sanctioned presenter/emitter calls", body
+    )
+    require_contains(artifact, "bounded_static_grammar_posture", body)
+    return [artifact], [], []
+
+
 CHECKS = {
     "step-0b-doc-delta-capture": ("Step-0B - Doc Delta Capture", check_step0b),
     "po-001": ("PO-001", check_po001),
     "po-002": ("PO-002", check_po002),
     "po-003": ("PO-003", check_po003),
+    "po-004": ("PO-004", check_po004),
+    "po-005": ("PO-005", check_po005),
+    "po-006": ("PO-006", check_po006),
+    "po-007": ("PO-007", check_po007),
+    "po-008": ("PO-008", check_po008),
 }
 
 
