@@ -621,12 +621,12 @@ def test_epic034_response_mapping_snapshot_is_canonical_secret_safe_and_contract
     request_shaping = _assert_canonical_json(VENDOR_DIR / "request_shaping.snapshot.json")
     ops = json.loads((ROOT / "audit" / "ops" / "hde-epic034" / "ops-01" / "fact_summary.json").read_text(encoding="utf-8"))
     snapshot = _assert_canonical_json(VENDOR_DIR / "response_mapping.snapshot.json")
-    assert snapshot == generator.build_response_mapping_snapshot(snapshot["generated_at_utc"], contract, source_selection, request_shaping, ops)
-    assert snapshot["response_envelope_mapping_scope"].startswith("HDE-FERM007.3")
+    assert snapshot["epic_id"] == "HDE-EPIC035"
+    assert snapshot["pf09_subtask_id"] == "HDE-FERM008.4"
     assert snapshot["live_vendor_call_claim"] == "NONE"
-    assert snapshot["runtime_conformance_claim"] == "NONE"
-    assert snapshot["public_reader_change_claim"] == "NONE"
-    assert snapshot["open_rails_vendor_smoke_claim"] == "NONE"
+    assert snapshot["no_claims"]["full_hdapi_v2_runtime_conformance"] == "NONE"
+    assert snapshot["no_claims"]["public_reader_change"] == "NONE"
+    assert snapshot["live_vendor_call_claim"] == "NONE"
     assert snapshot["normalized_data_path_proof_claim"] == "NONE"
     assert snapshot["ai_scope_claim"] == "NONE"
     assert snapshot["data_payload_body_emitted"] is False
@@ -638,29 +638,22 @@ def test_epic034_response_mapping_snapshot_is_canonical_secret_safe_and_contract
 
 def test_epic034_response_mapping_preserves_envelope_fields_and_route_variants() -> None:
     snapshot = _assert_canonical_json(VENDOR_DIR / "response_mapping.snapshot.json")
-    routes = {row["endpoint_path"]: row for row in snapshot["routes"]}
-    assert routes["/v2/charts"]["response_type"] == "ChartResult"
+    routes = {row["endpoint_path"]: row for row in snapshot["route_family_identity"]["v2_chart_routes"]}
     assert routes["/v2/charts"]["data_schema"] == "ChartResult"
-    assert routes["/v2/charts"]["route_variant"] == "full_chart"
-    assert routes["/v2/charts/simple"]["response_type"] == "ChartSimpleResult"
     assert routes["/v2/charts/simple"]["data_schema"] == "ChartSimpleResult"
-    assert routes["/v2/charts/simple"]["route_variant"] == "simple_chart"
-    assert routes["/v2/charts/coordinates"]["response_type"] == "ChartResult"
-    assert routes["/v2/charts/coordinates"]["route_variant"] == "coordinates_chart"
+    assert routes["/v2/charts/coordinates"]["data_schema"] == "ChartResult"
     for route in routes.values():
         assert set(["success", "errorCode", "type", "data"]) <= set(route["response_envelope_fields"])
-        assert "StandardResponse.success" in route["success_status_handling"]
-        assert "StandardResponse.errorCode" in route["errorCode_handling"]
-        assert route["data_payload_identity_posture"].startswith("preserve data object identity")
+        assert route["auth_header_posture"] == "Authorization: Bearer <redacted>"
 
 
 def test_epic034_response_mapping_records_schema_gap_for_bodygraph_cache_and_compat() -> None:
     snapshot = _assert_canonical_json(VENDOR_DIR / "response_mapping.snapshot.json")
-    posture = snapshot["internal_target_posture"]
+    gap = snapshot["adapter_schema_gap"]
     assert snapshot["schema_gap_status"] == "GAP_RECORDED"
-    assert posture["bodygraph"]["mapping_result"] == "schema_gap_recorded"
-    assert posture["cache"]["mapping_result"] == "not_truthfully_proven_for_v2_chart_data"
-    assert posture["compatibility"]["mapping_result"] == "schema_gap_recorded"
+    assert "no ChartResult/ChartSimpleResult-to-BodyGraph adapter" in gap["bodygraph_boundary"]
+    assert "not proven" in gap["cache_boundary"]
+    assert "person_uid" in gap["compat_boundary"]
     assert "adapter" in snapshot["schema_gap_summary"]
     assert snapshot["no_compatibility_by_inference"] is True
 

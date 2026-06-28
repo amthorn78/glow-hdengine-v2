@@ -1,5 +1,5 @@
 path: artifacts/vendor/hdapi_v2/response_mapping.snapshot.json
-size_bytes: 6538
-sha256: 0425b010ad22ddaee335fe98b3a276d9673ae3fbf41268f16f1f1158885f3db3
-mtime_utc: 2026-06-23T06:03:12Z
-produced_at_utc: 2026-06-23T06:03:10Z
+size_bytes: 9567
+sha256: b7ee708ad8a3b35c4b402d9304040ce55498c783a356c08ea3613c017b8a7a23
+mtime_utc: 2026-06-28T09:27:28Z
+produced_at_utc: 2026-06-28T09:27:28Z

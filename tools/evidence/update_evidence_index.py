@@ -850,6 +850,8 @@ def _load_epic034_pr03_entries() -> list[dict[str, object]]:
         payload = json.loads(snapshot.read_text(encoding="utf-8"))
     except json.JSONDecodeError as exc:
         raise SystemExit("INVALID_EPIC034_RESPONSE_MAPPING_SNAPSHOT") from exc
+    if payload.get("epic_id") == "HDE-EPIC035" and payload.get("pf09_subtask_id") == "HDE-FERM008.4":
+        return []
     produced = payload.get("generated_at_utc")
     if isinstance(produced, str) and produced:
         produced_at = produced
@@ -1034,6 +1036,46 @@ def _load_epic035_pr01_entries() -> list[dict[str, object]]:
         normalized = dict(entry)
         if produced_at is not None:
             normalized["produced_at_utc"] = produced_at
+        entries.append(normalized)
+    return entries
+
+EPIC035_PR02_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "hdapi_v2.response_mapping_pr02",
+        "discovered_physical_path": "artifacts/vendor/hdapi_v2/response_mapping.snapshot.json",
+        "epic_id": "HDE-EPIC035",
+        "record_type": "epic035_pr02_response_normalization_gap",
+        "schema_version": "1.0",
+        "tokens": ["JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC035 PR-02 canonical HDE-FERM008.4 response-normalization evidence recording exact ChartResult/ChartSimpleResult adapter/schema gap; no compatibility by inference, live vendor call, public Reader change, or full v2 runtime conformance claim",
+    },
+    {
+        "artifact_key": "hdapi_v2.release_binding",
+        "discovered_physical_path": "artifacts/vendor/hdapi_v2/release_binding.snapshot.json",
+        "epic_id": "HDE-EPIC035",
+        "record_type": "epic035_pr02_release_binding",
+        "schema_version": "1.0",
+        "tokens": ["JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC035 PR-02 release binding linking already-landed HDE-FERM008.3 provider outcome evidence to HDE-FERM008.4 exact adapter/schema gap evidence without claiming HDE-FERM008.5 closure or full v2 runtime conformance",
+    },
+]
+
+
+def _load_epic035_pr02_entries() -> list[dict[str, object]]:
+    snapshot = ROOT / "artifacts/vendor/hdapi_v2/response_mapping.snapshot.json"
+    release = ROOT / "artifacts/vendor/hdapi_v2/release_binding.snapshot.json"
+    if not snapshot.exists() or not release.exists():
+        return []
+    try:
+        payload = json.loads(snapshot.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise SystemExit("INVALID_EPIC035_RESPONSE_MAPPING_SNAPSHOT") from exc
+    produced = payload.get("generated_at_utc")
+    entries: list[dict[str, object]] = []
+    for entry in EPIC035_PR02_PRIMARY_ARTIFACTS:
+        normalized = dict(entry)
+        if isinstance(produced, str) and produced:
+            normalized["produced_at_utc"] = produced
         entries.append(normalized)
     return entries
 
@@ -1297,8 +1339,13 @@ EPIC035_PR01_ARTIFACT_RELS: set[str] = {
     "artifacts/vendor/hdapi_v2/error_mapping.snapshot.json",
     "artifacts/vendor/hdapi_v2/rate_limit_headers.snapshot.json",
 }
+EPIC035_PR02_ARTIFACT_RELS: set[str] = {
+    "artifacts/vendor/hdapi_v2/response_mapping.snapshot.json",
+    "artifacts/vendor/hdapi_v2/release_binding.snapshot.json",
+}
 NON_BACKDATED_PROOF_RELS: set[str] = {
     *EPIC035_PR01_ARTIFACT_RELS,
+    *EPIC035_PR02_ARTIFACT_RELS,
     "artifacts/evidence_index.jsonl",
     "artifacts/evidence_index.jsonl.sha256",
 }
@@ -1579,6 +1626,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *_load_epic034_pr05_entries(),
             *_load_epic034_pr06_entries(),
             *_load_epic035_pr01_entries(),
+            *_load_epic035_pr02_entries(),
             *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,
