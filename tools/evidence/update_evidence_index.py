@@ -850,8 +850,7 @@ def _load_epic034_pr03_entries() -> list[dict[str, object]]:
         payload = json.loads(snapshot.read_text(encoding="utf-8"))
     except json.JSONDecodeError as exc:
         raise SystemExit("INVALID_EPIC034_RESPONSE_MAPPING_SNAPSHOT") from exc
-    if payload.get("epic_id") == "HDE-EPIC035" and payload.get("pf09_subtask_id") == "HDE-FERM008.4":
-        return []
+    shared_snapshot_promoted = payload.get("epic_id") == "HDE-EPIC035" and payload.get("pf09_subtask_id") == "HDE-FERM008.4"
     produced = payload.get("generated_at_utc")
     if isinstance(produced, str) and produced:
         produced_at = produced
@@ -861,6 +860,8 @@ def _load_epic034_pr03_entries() -> list[dict[str, object]]:
     )
     entries: list[dict[str, object]] = []
     for entry in EPIC034_PR03_PRIMARY_ARTIFACTS:
+        if shared_snapshot_promoted and entry.get("discovered_physical_path") == snapshot.relative_to(ROOT).as_posix():
+            continue
         if pr04_doc_delta_active and entry.get("record_type") == "epic034_pr03_doc_delta":
             continue
         normalized = dict(entry)
@@ -1068,8 +1069,34 @@ def _load_epic035_pr02_entries() -> list[dict[str, object]]:
         return []
     try:
         payload = json.loads(snapshot.read_text(encoding="utf-8"))
+        release_payload = json.loads(release.read_text(encoding="utf-8"))
     except json.JSONDecodeError as exc:
-        raise SystemExit("INVALID_EPIC035_RESPONSE_MAPPING_SNAPSHOT") from exc
+        raise SystemExit("INVALID_EPIC035_PR02_SNAPSHOT") from exc
+    if (
+        payload.get("artifact_kind") != "hdapi_v2_response_normalization_gap"
+        or payload.get("epic_id") != "HDE-EPIC035"
+        or payload.get("pf09_task_id") != "HDE-FERM008"
+        or payload.get("pf09_subtask_id") != "HDE-FERM008.4"
+        or payload.get("response_normalization_posture") != "EXACT_SCHEMA_ADAPTER_GAP_RECORDED"
+        or payload.get("schema_gap_status") != "GAP_RECORDED"
+    ):
+        raise SystemExit("INVALID_EPIC035_RESPONSE_MAPPING_IDENTITY")
+    binding = (
+        release_payload.get("pr_evidence_bindings", {})
+        .get("pr02_hde_ferm008_4_response_normalization", {})
+    )
+    artifacts = binding.get("artifacts")
+    expected_path = snapshot.relative_to(ROOT).as_posix()
+    actual_sha = hashlib.sha256(snapshot.read_bytes()).hexdigest()
+    if (
+        release_payload.get("artifact_kind") != "hdapi_v2_release_binding"
+        or release_payload.get("epic_id") != "HDE-EPIC035"
+        or release_payload.get("pf09_task_id") != "HDE-FERM008"
+        or binding.get("subtask_id") != "HDE-FERM008.4"
+        or not isinstance(artifacts, list)
+        or {item.get("path"): item.get("sha256") for item in artifacts if isinstance(item, dict)}.get(expected_path) != actual_sha
+    ):
+        raise SystemExit("INVALID_EPIC035_RELEASE_BINDING_RESPONSE_REFERENCE")
     produced = payload.get("generated_at_utc")
     entries: list[dict[str, object]] = []
     for entry in EPIC035_PR02_PRIMARY_ARTIFACTS:

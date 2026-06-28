@@ -134,3 +134,62 @@ def test_pr02_index_mirror_do_not_retain_conflicting_epic034_response_mapping_ro
     }
     assert ("hdapi_v2.response_mapping", "artifacts/vendor/hdapi_v2/response_mapping.snapshot.json", "HDE-EPIC034") not in conflicting
     assert ("hdapi_v2.response_mapping_pr02", "artifacts/vendor/hdapi_v2/response_mapping.snapshot.json", "HDE-EPIC035") in conflicting
+
+
+def test_route_rows_fail_closed_on_required_schema_drift() -> None:
+    contract = _assert_canonical_json(VENDOR_DIR / "contract_map.json")
+    drifted = json.loads(json.dumps(contract))
+    for route in drifted["route_families"]:
+        if route.get("path") == "/v2/charts/coordinates":
+            route["success_envelope"] = "StandardResponse with type=Unexpected and data=Unexpected"
+    try:
+        generator._route_rows(drifted)
+    except ValueError as exc:
+        assert "HDAPI_V2_RESPONSE_NORMALIZATION_ENVELOPE_DRIFT:/v2/charts/coordinates" in str(exc)
+    else:  # pragma: no cover
+        raise AssertionError("route schema drift did not fail closed")
+
+
+def test_index_retains_epic034_pr03_check_log_when_pr02_snapshot_is_promoted() -> None:
+    index = json.loads((ROOT / "docs" / "evidence" / "INDEX.json").read_text(encoding="utf-8"))
+    by_path = {entry["discovered_physical_path"]: entry for entry in index}
+    entry = by_path["audit/qa/hde-epic034/pr-03/response_mapping_check.log"]
+    assert entry["artifact_key"] == "epic034.pr03.response_mapping_check"
+    assert entry["epic_id"] == "HDE-EPIC034"
+
+
+def test_pr02_loader_fails_closed_on_release_binding_sha_drift(tmp_path, monkeypatch) -> None:
+    from tools.evidence import update_evidence_index as updater
+
+    vendor = tmp_path / "artifacts" / "vendor" / "hdapi_v2"
+    vendor.mkdir(parents=True)
+    snapshot = vendor / "response_mapping.snapshot.json"
+    snapshot_payload = {
+        "artifact_kind": "hdapi_v2_response_normalization_gap",
+        "epic_id": "HDE-EPIC035",
+        "generated_at_utc": "2026-06-28T09:00:00Z",
+        "pf09_task_id": "HDE-FERM008",
+        "pf09_subtask_id": "HDE-FERM008.4",
+        "response_normalization_posture": "EXACT_SCHEMA_ADAPTER_GAP_RECORDED",
+        "schema_gap_status": "GAP_RECORDED",
+    }
+    snapshot.write_text(json.dumps(snapshot_payload, sort_keys=True) + "\n", encoding="utf-8")
+    release = vendor / "release_binding.snapshot.json"
+    release.write_text(json.dumps({
+        "artifact_kind": "hdapi_v2_release_binding",
+        "epic_id": "HDE-EPIC035",
+        "pf09_task_id": "HDE-FERM008",
+        "pr_evidence_bindings": {
+            "pr02_hde_ferm008_4_response_normalization": {
+                "artifacts": [{"path": "artifacts/vendor/hdapi_v2/response_mapping.snapshot.json", "sha256": "0" * 64}],
+                "subtask_id": "HDE-FERM008.4",
+            }
+        },
+    }, sort_keys=True) + "\n", encoding="utf-8")
+    monkeypatch.setattr(updater, "ROOT", tmp_path)
+    try:
+        updater._load_epic035_pr02_entries()
+    except SystemExit as exc:
+        assert str(exc) == "INVALID_EPIC035_RELEASE_BINDING_RESPONSE_REFERENCE"
+    else:  # pragma: no cover
+        raise AssertionError("release binding SHA drift did not fail closed")

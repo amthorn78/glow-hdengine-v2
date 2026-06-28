@@ -84,23 +84,43 @@ def _load_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+REQUIRED_ROUTE_SCHEMAS = {
+    "/v2/charts": "ChartResult",
+    "/v2/charts/simple": "ChartSimpleResult",
+    "/v2/charts/coordinates": "ChartResult",
+}
+REQUIRED_ENVELOPE_FIELDS = ["timestamp", "success", "message", "errorCode", "type", "data"]
+
+
 def _route_rows(contract: dict[str, Any]) -> list[dict[str, Any]]:
-    wanted = {"/v2/charts", "/v2/charts/simple", "/v2/charts/coordinates"}
+    routes_by_path = {
+        route.get("path"): route
+        for route in contract.get("route_families", [])
+        if isinstance(route, dict) and route.get("path") in REQUIRED_ROUTE_SCHEMAS
+    }
+    missing = sorted(set(REQUIRED_ROUTE_SCHEMAS) - set(routes_by_path))
+    if missing:
+        raise ValueError("HDAPI_V2_RESPONSE_NORMALIZATION_ROUTE_MISSING:" + ",".join(missing))
     rows = []
-    for route in contract.get("route_families", []):
-        if isinstance(route, dict) and route.get("path") in wanted:
-            envelope = str(route.get("success_envelope"))
-            data_schema = "ChartSimpleResult" if "ChartSimpleResult" in envelope else "ChartResult"
-            rows.append({
-                "auth_header_posture": "Authorization: Bearer <redacted>",
-                "data_schema": data_schema,
-                "endpoint_path": route["path"],
-                "method": route.get("method"),
-                "response_envelope_fields": route.get("response_envelope_fields"),
-                "route_family": "recommended_v2_chart",
-                "source_spec": route.get("source_spec"),
-                "success_envelope": route.get("success_envelope"),
-            })
+    for path, expected_schema in REQUIRED_ROUTE_SCHEMAS.items():
+        route = routes_by_path[path]
+        expected_envelope = f"StandardResponse with type={expected_schema} and data={expected_schema}"
+        if route.get("method") != "POST":
+            raise ValueError(f"HDAPI_V2_RESPONSE_NORMALIZATION_METHOD_DRIFT:{path}:{route.get('method')}")
+        if route.get("success_envelope") != expected_envelope:
+            raise ValueError(f"HDAPI_V2_RESPONSE_NORMALIZATION_ENVELOPE_DRIFT:{path}:{route.get('success_envelope')}")
+        if route.get("response_envelope_fields") != REQUIRED_ENVELOPE_FIELDS:
+            raise ValueError(f"HDAPI_V2_RESPONSE_NORMALIZATION_FIELDS_DRIFT:{path}:{route.get('response_envelope_fields')}")
+        rows.append({
+            "auth_header_posture": "Authorization: Bearer <redacted>",
+            "data_schema": expected_schema,
+            "endpoint_path": path,
+            "method": route.get("method"),
+            "response_envelope_fields": route.get("response_envelope_fields"),
+            "route_family": "recommended_v2_chart",
+            "source_spec": route.get("source_spec"),
+            "success_envelope": route.get("success_envelope"),
+        })
     return sorted(rows, key=lambda row: row["endpoint_path"])
 
 
