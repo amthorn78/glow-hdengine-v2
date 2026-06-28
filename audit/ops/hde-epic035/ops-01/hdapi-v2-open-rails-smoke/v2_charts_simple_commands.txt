@@ -1,0 +1,29 @@
+HDE-EPIC035 OPS-01 v2 charts/simple command-backed observation
+
+Command:
+
+SAFE_MODE=0 ALLOW_NETWORK=1 LC_ALL=C LANG=C TZ=UTC python - <<'PY' > audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/v2_charts_simple_stdout.log 2> audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/v2_charts_simple_stderr.log
+
+Helper behavior:
+
+- Reads `HD_API_BASE_URL` directly as the configured base URL.
+- Reads `HD_API_KEY` and `GEO_API_KEY` without printing values.
+- Builds the v2 `charts/simple` request with request fields `birthdate`, `birthtime`, and `location`.
+- Uses `Authorization: Bearer <redacted>`.
+- Uses `HD-Geocode-Key: <redacted>`.
+- Verifies `HD-Api-Key` is absent on the v2 chart path.
+- Persists only request/response shape facts, status/classification, and hashes.
+- Does not persist raw secrets, raw request body, raw response body, or raw vendor payload body.
+
+Sanitized input:
+
+user=qa-user; birthdate=1990-01-01; birthtime=12:00; location=Paris, FR
+
+Exit code:
+
+0
+
+Output artifacts:
+
+- audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/v2_charts_simple_stdout.log
+- audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/v2_charts_simple_stderr.log

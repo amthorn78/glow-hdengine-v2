@@ -1,0 +1,13 @@
+Command: git status --short --untracked-files=all
+Exit: 0
+Stdout:
+?? audit/ops/hde-epic035/ops-01/files_sha256.txt
+?? audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/final_classification.txt
+?? audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/final_repo_status.txt
+?? audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/v2_charts_simple_commands.txt
+?? audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/v2_charts_simple_result_summary.txt
+?? audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/v2_charts_simple_stderr.log
+?? audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/v2_charts_simple_stdout.log
+?? audit/ops/hde-epic035/ops-01/ops_evidence_manifest.txt
+Stderr:
+none

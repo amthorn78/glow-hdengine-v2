@@ -1,0 +1,49 @@
+HDE-EPIC035 OPS-01 evidence manifest
+
+Purpose: map approved-plan OPS-01 deliverable names to retained evidence paths without moving or deleting current evidence.
+
+| Approved-plan deliverable | Retained evidence path | Status |
+| --- | --- | --- |
+| audit/ops/hde-epic035/ops-01/commands.txt | audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/commands.txt | equivalent_by_mapping; nested smoke-root retained |
+| audit/ops/hde-epic035/ops-01/stdout.log | audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/stdout.log | partial_for_bg_resolve; supplemented by v2_charts_simple_stdout.log |
+| audit/ops/hde-epic035/ops-01/stderr.log | audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/stderr.log | equivalent_by_mapping for original bg:resolve capture |
+| audit/ops/hde-epic035/ops-01/exit_codes.txt | audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/exit_codes.txt | partial_for_bg_resolve; supplemented by v2_charts_simple_commands.txt |
+| audit/ops/hde-epic035/ops-01/env_presence_redacted.json | audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/redacted_env_presence.json | equivalent_by_content_name_mismatch |
+| audit/ops/hde-epic035/ops-01/request_summary.json | audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/request_summary.txt | partial_format_mismatch; supplemented by v2_charts_simple_stdout.log and v2_charts_simple_result_summary.txt |
+| audit/ops/hde-epic035/ops-01/result_summary.json | audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/result_summary.md | partial_format_mismatch; supplemented by final_classification.txt |
+| audit/ops/hde-epic035/ops-01/files_sha256.txt | audit/ops/hde-epic035/ops-01/files_sha256.txt | produced_by_remediation |
+
+Additional retained evidence:
+
+| Evidence path | Status |
+| --- | --- |
+| audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/session_summary_and_evidence.md | supplemental_session_summary |
+| audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/vendor_bodygraph_dry_run.json | bg_resolve_vendor_error_output |
+| audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/vendor_bodygraph_dry_run.stderr | bg_resolve_empty_stderr |
+| audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/vendor_bodygraph_dry_run_no_version.json | diagnostic_no_version_vendor_error_output |
+| audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/vendor_bodygraph_dry_run_no_version.stderr | diagnostic_no_version_empty_stderr |
+| audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/v2_charts_simple_commands.txt | command_backed_v2_geokey_observation |
+| audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/v2_charts_simple_stdout.log | command_backed_v2_geokey_stdout |
+| audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/v2_charts_simple_stderr.log | command_backed_v2_geokey_stderr |
+| audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/v2_charts_simple_result_summary.txt | command_backed_v2_geokey_result_summary |
+| audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/final_classification.txt | final_safe_classification |
+| audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/final_repo_status.txt | final_preservation_status |
+
+Final classification summary:
+
+- bg_resolve=vendor_error_class_observed
+- v2_charts_simple=success
+- geokey_header_posture=proven_for_v2_charts_simple
+- geokey_header_posture_not_proven_for_bg_resolve=true
+
+Nonclaims:
+
+- no QA PASS
+- no PF09 status movement
+- no epic closeout
+- no full HumanDesignAPI v2 runtime conformance
+- no public Reader change
+- no new public route
+- no app-side vendor credential ownership
+- no raw payload persistence
+- no AI scope

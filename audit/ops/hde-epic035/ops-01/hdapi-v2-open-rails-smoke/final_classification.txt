@@ -1,0 +1,31 @@
+HDE-EPIC035 OPS-01 final classification
+
+bg_resolve=vendor_error_class_observed
+bg_resolve_error_code=PROVIDER_NOT_FOUND
+bg_resolve_http_status=404
+bg_resolve_request_shape=/v2/bodygraphs
+bg_resolve_auth_posture=legacy_HD-Api-Key_present; Authorization_absent; HD-Geocode-Key_present
+
+v2_charts_simple=success
+v2_charts_simple_request_shape=/v2/charts/simple
+v2_charts_simple_auth_posture=Authorization_Bearer_present; HD-Geocode-Key_present; legacy_HD-Api-Key_absent
+v2_charts_simple_response_success=true
+v2_charts_simple_response_type=ChartSimpleResult
+
+geokey_header_posture=proven_for_v2_charts_simple
+geokey_header_posture_not_proven_for_bg_resolve=true
+
+provider_availability=provider_responding_on_correct_v2_chart_path
+runtime_gap=bg:resolve_still_uses_legacy_bodygraph_route_against_configured_v2_base
+
+Nonclaims:
+
+- no QA PASS
+- no PF09 status movement
+- no epic closeout
+- no full HumanDesignAPI v2 runtime conformance
+- no public Reader change
+- no new public route
+- no app-side vendor credential ownership
+- no raw payload persistence
+- no AI scope

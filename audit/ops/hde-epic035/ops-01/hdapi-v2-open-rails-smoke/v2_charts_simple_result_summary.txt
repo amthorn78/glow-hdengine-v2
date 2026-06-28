@@ -1,0 +1,41 @@
+HDE-EPIC035 OPS-01 v2 charts/simple result summary
+
+classification=success
+provider_responding=yes
+provider_attempted=true
+configured_base_url_key=HD_API_BASE_URL
+url_path_suffix=/v2/charts/simple
+route=vendor.hdapi.post:/charts/simple
+resource_path=charts/simple
+method=POST
+geocode_required=true
+request_fields=birthdate,birthtime,location
+authorization_header_shape=Authorization: Bearer <redacted>
+hd_geocode_key_header_shape=HD-Geocode-Key: <redacted>
+legacy_hd_api_key_on_v2_path=false
+has_authorization=true
+has_hd_geocode_key=true
+has_hd_api_key=false
+response_success=true
+response_type=ChartSimpleResult
+response_top_level_keys=data,errorCode,message,success,timestamp,type
+attempts=1
+
+Secret-safe posture:
+
+- raw_secret_persisted=false
+- raw_request_body_persisted=false
+- raw_response_body_persisted=false
+- raw_vendor_payload_persisted=false
+
+Nonclaims:
+
+- no QA PASS
+- no PF09 status movement
+- no epic closeout
+- no full HumanDesignAPI v2 runtime conformance
+- no public Reader change
+- no new public route
+- no app-side vendor credential ownership
+- no raw payload persistence
+- no AI scope
