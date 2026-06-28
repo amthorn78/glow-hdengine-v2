@@ -1,4 +1,4 @@
 orientation demo (evidence skeleton)
-total_artifacts: 390
+total_artifacts: 392
 status: ok
 sample: INDEX and mirror entries are coherent
