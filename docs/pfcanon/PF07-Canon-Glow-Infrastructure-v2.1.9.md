@@ -1,12 +1,12 @@
 # **0\. Front Matter**
 
 **Title:** PF07-Canon-Glow-Infrastructure  
-**Version:** v2.1.7
+**Version:** v2.1.9
 
 **Status:** Canon  
-**Effective date:** 2026-06-15
+**Effective date:** 2026-06-27
 
-**Last Update Gate:** BN 11.4.4 A13-14
+**Last Update Gate:** BN 11.7.4 A20-34
 
 **Invocation tag:** `INV-f2ac55d77ce9aacc`
 
@@ -63,6 +63,8 @@ Where a single shared canonical home exists for a given capability across multip
 * **PF07 as the required infrastructure source for plans and ops-task descriptions.** For planning and documentation posture, PF07 assumes no separate external infra or ops team outside the workspace. Any plan, implementation guide, QA plan, review artifact, remediation guide, or epic document that includes an infra task, ops task, infra-owned value, ops-owned value, environment binding, service binding, URL, port, provider name, project name, service name, repository name, config key, QA root, or start-command dependency MUST treat PF07 as the required source for that concrete infrastructure fact.  
 * **PF07-derived and PF07-gap postures.** A document that needs a PF07-owned fact MUST either cite the exact PF07 fact directly or identify the exact missing PF07 fact set, mark the affected step or claim as blocked by missing PF07 infrastructure inventory, and record the needed PF07 update as a drain target or doc-delta candidate. Placeholder ownership and guessed values are non-conforming, including “infra to provide,” “ops to confirm,” “infra-owned” without the actual PF07 fact, “ask infra,” “await ops details,” guessed hostnames, guessed ports, guessed URLs, guessed start commands, guessed environment bindings, or treating **TBD** as an executable input.  
 * **Specificity and review posture.** When PF07 is cited for an infra or ops task, the document MUST name the applicable provider, project, service, repository, base URL or port, database instance or schema, config key, governed evidence root or QA root, and the exact expected value or exact PF07 value source, as relevant. A plan or document that refers to infra or ops work without the concrete PF07-backed value, or without an explicit PF07-gap blocker, is non-conforming and must stop at the gap.  
+* **PS discovery for discoverable infrastructure facts.** When a PF07-owned fact needed by a plan, implementation guide, QA plan, OPS task, or remediation guide is missing but can be safely discovered by the PO through bounded OPS discovery or a bounded PO-authorized open-rails check, the artifact MUST route the unknown to that discovery work rather than treating the missing fact as automatic deferral. This does not authorize guessing, secret exposure, uncontrolled external action, or agent-performed OPS. If discovery is unsafe, not authorized, requires a decision that cannot be safely staged, or would require inventing facts, record the PF07 gap and stop at the gap.  
+* **Codex Audit repo-reality posture.** A supplied Codex Audit may be used as observed repo-reality evidence for existing repo-bound infrastructure loci, such as current config helpers, environment files, evidence helpers, or repo paths. Codex Audit observations do not prove live infrastructure truth, OPS completion, QA PASS, acceptance-token satisfaction, PF09 status, or canon authority. Live facts still require PF07, PO confirmation, OPS discovery, PO-authorized open-rails evidence, or repo validation as applicable.  
 * **Infrastructure examples and executable exactness in review posture.** Infrastructure examples in plans are not required to be paste-ready unless the artifact is explicitly an execution runbook. PF07-owned commands, paths, endpoints, config keys, environment variables, evidence roots, service names, provider names, base URLs, ports, QA roots, evidence paths, manifests, hash files, path-proof files, artifact identities, and environment or rails examples must be judged by source-level identity and infrastructure boundary preservation. Plan approval MUST NOT block on shell syntax, environment-variable command syntax, escaped command examples, helper-code formatting, heredoc form, or pasted command exactness. Escaped display in assistant output, rendered markdown, copied chat text, preview panes, review prose, or other display-layer text is not evidence that the underlying PF07-owned string is invalid. Infrastructure blockers require real rails, secrets, external-action, config, environment-authority, missing-PF07-fact, or source-level infrastructure defects. Command normalization during execution is allowed when the same infrastructure boundaries, authority, rails posture, config identity, and evidence identity are preserved.
 
 **Primary homes referenced in this document (titles-only).**
@@ -258,28 +260,78 @@ PF07 is **names-only**. Admin-only narratives persistence **DB/schema locations*
 **Proof surface (titles-only).**  
  Source-selection snapshots and refresh-policy snapshots are stored under governed `artifacts/**` with path-proofs and are indexed in the **machine JSONL mirror** (records-only; canonical; single LF; unknown-key reject).
 
-## **2.4 Env Deployment Inventory Required−NowRequired-NowRequired−Now**
+## **2.4 Env Deployment Inventory \[Required-Now\]**
 
-**Names-only (policy lives in Governance).** This matrix records the default rails posture and the canonical determinism pins per environment. Transport policy, refusal semantics, and acceptance tokens live in **HDE-Governance**; PF07 remains names-only and routes by title.
+**Inventory-only.** This matrix records currently protected HD Engine environment-variable bindings and rails/determinism pins. Transport policy, refusal semantics, requiredness, and acceptance tokens live in **HDE-Governance**, **HDE-Schemas & Artifacts**, **Glow QA Guide**, and related HDE homes by title. PF07 records provider/context, key names, redacted values or value patterns, and known drift only.
 
-| env | SAFE\_MODE (default) | ALLOW\_NETWORK (default) | determinism pins (must) | owner | change path |
-| ----- | ----- | ----- | ----- | ----- | ----- |
-| dev | 0 (open) | 1 (open) | LC\_ALL=C · LANG=C · TZ=UTC | PO | PR \+ Epic-Process-Guide |
-| stage | 0 (open) | 1 (open) | LC\_ALL=C · LANG=C · TZ=UTC | PO | PR \+ Epic-Process-Guide |
-| prod | 1 (closed) | 0 (closed) | LC\_ALL=C · LANG=C · TZ=UTC | PO | PR \+ Epic-Process-Guide |
-| CI | 1 (closed) | 0 (closed) | LC\_ALL=C · LANG=C · TZ=UTC | PO | PR \+ Epic-Process-Guide |
+**Secret handling.** Raw secrets are not stored here. Secret-bearing values are redacted or recorded as presence only. Non-secret base URLs, hostnames, ports, provider/context names, and redacted database URL forms may be recorded when supplied by PO or repo-proven evidence.
 
-**Notes.**
+### **Production — Railway**
 
-* Rails “open” permits network I/O *subject to policy*; “closed” forbids it (typed refusal).  
-* Determinism pins are required for all evidence/canonicalization jobs.  
-*  **No non-canonical pins.** Live QA plans and evidence steps MUST use only the canonical determinism pins listed here. `PYTHONHASHSEED` MUST NOT be added as a required determinism pin for plan approval or execution. If used for one-off diagnostics, it is non-governed and does not extend the canonical pins set.  
-* **No QA-time env var minting; `MODO_*` is non-canonical.** Environment variable names are governed interface surfaces. Live QA plans, runbooks, and evidence schemas MUST use only canon-approved environment variable names recorded in PF07 (§8) and MUST NOT introduce or require `MODO_*` variables (including `MODO_RAILS`, `MODO_AI_BUNDLE`, and `MODO_AI_VERBOSE`) as inputs, required evidence keys, or proof of rails posture or execution configuration. Any plan revision that introduces an unapproved env var name (including any `MODO_*`) as a required input or required evidence key is a mechanical blocker; the fix is removal or replacement with canon-approved key names only. New env var names MUST NOT be introduced during Live QA execution (including Moon Loop remediation); if a new env var name is required, it must be introduced via development work under PO approval and documented in canon (including PF07) before any plan relies on it. **EPIC025 exception:** the already-approved HDE-EPIC025 Live QA Plan may contain inert `MODO_*` placeholders due to iteration churn; these placeholders are non-binding for closure, MUST NOT be required for PASS/FAIL or required evidence keys, and MUST NOT be replicated.  
-* Details/tokens: see **HDE-Governance**; jobs/proofs: **HDE-Schemas & Artifacts**; process: **Epic-Process-Guide**.
+* `ALLOW_NETWORK=1`  
+* `APP_ENV=prod`  
+* `DATABASE_URL=postgresql://postgres:{redacted}@postgres.railway.internal:5432/railway`  
+* `GEO_API_KEY={redacted}`  
+* `HD_API_BASE_URL=https://api.humandesignapi.nl/v2`  
+* `HD_API_KEY={redacted}`  
+* `LANG=C`  
+* `LC_ALL=C`  
+* `SAFE_MODE=0`  
+* `TZ=UTC`
+
+  ### **Development — OpenAI Codex**
+
+* `ALLOW_NETWORK=0`  
+* `APP_ENV=dev`  
+* `DATABASE_URL=postgresql://postgres:{redacted}@postgres.railway.internal:5432/railway`  
+* `GEO_API_KEY={redacted}`  
+* `HD_API_BASE_URL=https://api.humandesignapi.nl/v2`  
+* `HD_API_KEY={redacted}`  
+* `LANG=C`  
+* `LC_ALL=C`  
+* `SAFE_MODE=1`  
+* `TZ=UTC`  
+* `PORT=8000`  
+* `DB_BRIDGE_URL=https://illustrious-freedom-production.up.railway.app`  
+* `DEV_SAMPLER_URL=http://127.0.0.1:8000/internal/dev/sampler`
+
+  ### **QA — GitHub Codespaces**
+
+* `ALLOW_NETWORK=0`  
+* `APP_ENV=dev`  
+* `DATABASE_URL=postgresql://postgres:REDACTED@metro.proxy.rlwy.net:52353/railway`  
+* `DB_BRIDGE_URL=https://illustrious-freedom-production.up.railway.app`  
+* `DEV_SAMPLER_URL=http://127.0.0.1:8000/internal/dev/sampler`  
+* `GEO_API_KEY=REDACTED`  
+* `HD_API_BASE_URL=https://api.humandesignapi.nl/v2`  
+* `HDAPI_BASE_URL` — deprecated compatibility alias only; not canonical. Do not use as an executable input unless an owning plan records a bounded compatibility posture.  
+* `HD_API_KEY=REDACTED`  
+* `LANG=C`  
+* `LC_ALL=C`  
+* `TZ=UTC`  
+* `SAFE_MODE` is listed in OPS-01 documented environment bindings, but the source matrix does not provide a general QA default value. Do not infer a default value in PF07 from an OPS-02 open-rails task.
+
+  ### **Key-spelling and downgrade rules**
+
+* `HD_API_BASE_URL` is the canonical HumanDesignAPI base URL environment variable.  
+* The configured `HD_API_BASE_URL` may include the vendor API version path, for example `https://api.humandesignapi.nl/v2`.  
+* Runtime route construction appends version-neutral resource paths to the configured base URL. Runtime route construction behavior is owned by **HDE-CLI-API-Vendor-Ref** and **HDE-Mechanics Guide** by title.  
+* `HDAPI_BASE_URL` is deprecated legacy drift. It may be recorded only as observed drift or temporary compatibility alias.  
+* If both `HD_API_BASE_URL` and `HDAPI_BASE_URL` exist and values differ, treat that as configuration ambiguity and fail closed through the owning implementation and policy homes.  
+* PO-provided deployed environment facts MUST NOT be downgraded to `OPEN/TBD`.  
+* PF07 does not define secret validation, runtime request behavior, OPS procedures, or QA PASS semantics.
 
 ## **2.5 QA windows (names‑only)**
 
 **Policy routing.** This section records only the existence and locations of prod QA windows and their harnesses. Rails semantics, override guards, and acceptance tokens live in HDE‑Governance and Glow QA Guide (titles‑only).
+
+**Production-affecting Live QA infrastructure posture (names-only).**
+
+For production-affecting HD Engine work, PF07 records only the infrastructure facts needed by the owning plan and QA homes: target environment, provider, service, base URL, database or bridge target, config-key names, secret-binding names, rails keys, and governed evidence roots.
+
+When an epic affects deployed service behavior, vendor ingest, HumanDesignAPI calls, request shaping, response mapping, database persistence or retrieval, DB bridge behavior, public or app-facing behavior, CLI/API behavior used in production, or environment-variable or secret-binding behavior, the owning Live QA Plan must include at least one bounded open-rails live QA step or an explicit authorized exemption. PF07 does not define the step, PASS/FAIL predicate, token semantics, or QA procedure.
+
+Live QA may verify deployed environment bindings, secret presence, base URL posture, external service reachability, and header-shape posture in redacted form. Live QA must not record raw secrets, raw database passwords, raw private payloads, or uncontrolled production data. Production, dev, QA, and Codespaces environment distinctions must remain explicit, and Live QA must use the correct environment and rails posture for the behavior being proven.
 
 ### **2.5.1 EPIC‑011 prod QA rails‑open window (Codespaces → prod)**
 
@@ -391,18 +443,19 @@ Any shell that can reach this base URL and/or connect to this DB instance with t
 **CLI-local vendor smoke target distinction (names-only).**
 
 * A controlled HD Engine vendor smoke may target the local HD Engine CLI in a PO-controlled execution context rather than a hosted HD Engine HTTP service.  
-* For this CLI-local vendor smoke target, the infrastructure target facts are: command target `hdctl showcompat`, data source `--source vendor`, vendor binding key `HDAPI_BASE_URL`, vendor credential key `HD_API_KEY`, optional geocoding credential key `GEO_API_KEY` when required by the command path, deterministic capture pins `LC_ALL=C`, `LANG=C`, `TZ=UTC`, open-rails keys `SAFE_MODE=0` and `ALLOW_NETWORK=1` for the vendor step only, and application environment key `APP_ENV=dev`.  
-* Presence-only environment captures for this target family may record the following PF07-owned key names without values: `ALLOW_NETWORK`, `APP_ENV`, `GEO_API_KEY`, `HDAPI_BASE_URL`, `HDE_BASE_URL`, `HD_API_KEY`, `LANG`, `LC_ALL`, `SAFE_MODE`, and `TZ`.  
+* For this CLI-local vendor smoke target, the infrastructure target facts are: command target `hdctl showcompat`, data source `--source vendor`, vendor binding key `HD_API_BASE_URL`, deprecated compatibility alias `HDAPI_BASE_URL` only when explicitly allowed by the owning task, vendor credential key `HD_API_KEY`, optional geocoding credential key `GEO_API_KEY` when required by the command path, deterministic capture pins `LC_ALL=C`, `LANG=C`, `TZ=UTC`, open-rails keys `SAFE_MODE=0` and `ALLOW_NETWORK=1` for the vendor step only, and application environment key `APP_ENV=dev`.  
+* Presence-only environment captures for this target family may record the following PF07-owned key names without secret values: `ALLOW_NETWORK`, `APP_ENV`, `GEO_API_KEY`, `HD_API_BASE_URL`, `HDAPI_BASE_URL`, `HDE_BASE_URL`, `HD_API_KEY`, `LANG`, `LC_ALL`, `SAFE_MODE`, and `TZ`.  
 * `HDE_BASE_URL` is not required for this CLI-local vendor smoke target unless the target changes to an HD Engine HTTP service call.  
 * If a task changes from CLI-local vendor execution to an HD Engine HTTP service call, the task must name a PF07-backed hosted-service target fact set before execution.  
 * PF07 records only the target names, key names, and target distinction. Command flags, run preflights, outcome classification, and QA or OPS policy are routed by title.
 
 **HDAPI v2 conformance target posture (names-only).**
 
-* HumanDesignAPI v2 conformance is pending. Current vendor ingest and CLI-local vendor-smoke facts in PF07 remain legacy or partially conforming until the governed HDAPI v2 contract inventory, v2 request shaping, response normalization, closed-rails proof, and PO-only open-rails smoke evidence are complete.  
-* Plans, implementation guides, QA plans, reviews, and closeout artifacts MUST NOT claim HumanDesignAPI v2 runtime conformance from documentation consolidation alone.  
-* PF07 currently records missing HDAPI v2 infrastructure facts as gaps: exact v2 base URL posture, exact v2 credential/config key names, secret-binding names, and a concrete epic-specific OPS root for PO-only open-rails smoke.  
-* Before HDE-FERM007.2 or HDE-FERM008.2 can execute, plans must use either a PF07-pinned v2 infrastructure fact or an explicit PF07-gap blocker.  
+* HumanDesignAPI v2 request-shaping posture now uses canonical `HD_API_BASE_URL` as the version-owning base URL key and version-neutral runtime resource paths such as `charts`, `charts/simple`, and `charts/coordinates`.  
+* `HDAPI_BASE_URL` remains deprecated compatibility drift only.  
+* HDE-EPIC034 produced bounded open-rails OPS evidence for the v2 `charts/coordinates` family under `audit/ops/hde-epic034/ops-02/`; this is a concrete OPS evidence root, not a remaining PF07 path gap.  
+* Plans, implementation guides, QA plans, reviews, and closeout artifacts MUST NOT claim full HumanDesignAPI v2 runtime conformance from documentation consolidation, request-shaping evidence, a single live vendor smoke, or PF07 inventory text alone.  
+* Legacy BodyGraph resource behavior under a configured v2 base URL remains a live-behavior risk unless separately proven by the owning implementation and QA artifacts.  
 * This HDAPI v2 conformance posture is deterministic vendor integration only. It does not create OpenAI, LLM, AI-agent, prompt, embedding, chatbot, model-call, AI-provider credential, AI-provider base URL, AI rails, AI evidence-family, or Glow App AI runtime scope.
 
 **Codespaces as canonical QA console.**  
@@ -528,6 +581,7 @@ Live QA Plans, QA reviews, and any QA runbooks MUST NOT invent or mint new repo 
 * **Source:** repository **amthorn78/glow-hdengine-v2** (repo root; no file paths pinned)  
 * **Build artifact:** container image (Railway) — **TBD**  
 * **Linked database (shared):** instance **ample-illumination/production/postgres** · schema **hde**  
+* **Vendor credential boundary (names-only):** `HD_API_BASE_URL`, `HD_API_KEY`, and `GEO_API_KEY` belong to the HD Engine infrastructure boundary. Glow app integration should consume HD Engine outputs through a controlled integration surface and should not require direct HumanDesignAPI credentials. Any future cross-service invocation must preserve secret isolation unless a future ADR or canon update explicitly changes this boundary.  
 * **Bridged access (names-only): pg-bridge (Railway).** See §9 Resource catalog. The per-environment mapping for `DB_BRIDGE_URL` lives in §8 Config keys; values are maintained there to avoid duplication. Connection precedence is defined in §7.0.  
 *  **Bridge in production (guard).** The HTTPS bridge is disabled by default in production; enable only when DB\_ALLOW\_BRIDGE\_IN\_PROD=1 (policy owned in HDE-Governance).  
 * **Start command (inventory):** see **§10** (canonical Railway command kept verbatim)  
@@ -956,73 +1010,57 @@ Each of the above artifacts has a corresponding path‑proof sidecar:
 
 **DATABASE\_URL**
 
-* Dev (CodEx): `postgresql://postgres:<redacted>@metro.proxy.rlwy.net:52353/railway?sslmode=require`
-
-* QA (Codespaces): `postgresql://postgres:<redacted>@metro.proxy.rlwy.net:52353/railway?sslmode=require`
-
-* Prod (Railway): `<internal>` (platform-provided)
+* Prod (Railway): `postgresql://postgres:{redacted}@postgres.railway.internal:5432/railway`  
+* Dev (OpenAI Codex): `postgresql://postgres:{redacted}@postgres.railway.internal:5432/railway`  
+* QA (GitHub Codespaces): `postgresql://postgres:REDACTED@metro.proxy.rlwy.net:52353/railway`
 
 **APP\_ENV**
 
-* Dev (CodEx): dev
+* Prod (Railway): `prod`  
+* Dev (OpenAI Codex): `dev`  
+* QA (GitHub Codespaces): `dev`
 
-* QA (Codespaces): dev
+**Note:** Infra-owned start helpers for the HD Engine, including dev/QA Reader start commands, MUST:
 
-* Prod (Railway): prod
+* Propagate `APP_ENV` from the caller (shell, harness, or platform) into the child process environment, and  
+* MUST NOT silently force a default when `APP_ENV` is empty or unset.
 
-	**Note:**  Infra-owned start helpers for the HD Engine (including dev/QA Reader start commands) MUST:
-
-* **Propagate `APP_ENV` from the caller** (shell, harness, or platform) into the child process environment, and
-
-* **MUST NOT silently force a default** (for example, `dev`) when `APP_ENV` is empty or unset.
-
-PF07 records this as an infra responsibility only. The meaning of each `APP_ENV` variant (such as `dev`, `prod`, empty, or unset) and the expected HTTP/rails behavior per value are defined by title in **HDE-Mechanics Guide**, **HDE-Phased Epics**, **HDE-Governance**, and **Glow QA Guide**. PF07 stays names-only and does not restate those semantics; it pins the key name and the requirement that infra helpers faithfully forward `APP_ENV` so that QA harnesses can exercise the configured gating behavior.
+PF07 records this as an infra responsibility only. The meaning of each `APP_ENV` variant and the expected HTTP/rails behavior per value are defined by title in **HDE-Mechanics Guide**, **HDE-Governance**, and **Glow QA Guide**. PF07 stays names-only and does not restate those semantics; it pins the key name and the requirement that infra helpers faithfully forward `APP_ENV` so QA harnesses can exercise the configured gating behavior.
 
 **Conjunction identity env keys (names-only)**
 
-* `ENGINE_TAG` — OPEN/TBD
-
-* `RELEASE_ID` — OPEN/TBD
-
+* `ENGINE_TAG` — OPEN/TBD  
+* `RELEASE_ID` — OPEN/TBD  
 * `PRODUCT_INVOCATION_TAG` — OPEN/TBD
 
 PF07 records only the key names here and does not define their byte-level behavior.
 
-**SAFE\_MODE** (rails posture; default, names-only)
+**SAFE\_MODE** (rails posture; current deployment inventory, names-only)
 
-* Dev (CodEx): 0 (open)
+* Prod (Railway): `0`  
+* Dev (OpenAI Codex): `1`  
+* QA (GitHub Codespaces): key listed in OPS-01 documented bindings; value not supplied in the source matrix.
 
-* QA (Codespaces): 0 (open)
+**ALLOW\_NETWORK** (rails posture; current deployment inventory, names-only)
 
-* Prod (Railway): 1 (closed)
-
-**ALLOW\_NETWORK** (rails posture; default, names-only)
-
-* Dev (CodEx): 1 (open)
-
-* QA (Codespaces): 1 (open)
-
-* Prod (Railway): 0 (closed)
+* Prod (Railway): `1`  
+* Dev (OpenAI Codex): `0`  
+* QA (GitHub Codespaces): `0`
 
 **Note (rails windows).**  
- During a PO-approved rails-open prod QA window (see §2.5), production may temporarily run with `SAFE_MODE=0` and `ALLOW_NETWORK=1`. PF07 treats §2.4 as the default posture and §2.5 as the named exception window; do not treat window overrides as the baseline.
+ Current deployment values are infrastructure inventory, not transport policy. Rails policy, refusal semantics, and any temporary window semantics remain owned by **HDE-Governance** and **Glow QA Guide** by title.
 
 **Environment pins** (names-only)
 
-* `LC_ALL` — C
-
-* `LANG` — C
-
+* `LC_ALL` — C  
+* `LANG` — C  
 * `TZ` — UTC
 
 **EVIDENCE\_ROOT** (QA evidence root; names-only)
 
-* Pattern: `audit/qa/<epic-id>`
-
-* Example (EPIC025): `audit/qa/hde-epic025`
-
-* Usage: Live QA plans may declare required evidence artifacts relative to `${EVIDENCE_ROOT}`.
-
+* Pattern: `audit/qa/<epic-id>`  
+* Example (EPIC025): `audit/qa/hde-epic025`  
+* Usage: Live QA plans may declare required evidence artifacts relative to `${EVIDENCE_ROOT}`.  
   * Common relative paths include `qa_step_logs_manifest.json`, `qa_step_logs_manifest.json.path_proof.txt`, `00_meta/doc_deltas.md`, and `checks/<check_id>/primary.log`.
 
 **Railway metadata** (names-only)  
@@ -1032,11 +1070,9 @@ PF07 records only the key names here and does not define their byte-level behavi
 
 **DB\_BRIDGE\_URL** (shared)
 
-* Dev (CodEx): `https://illustrious-freedom-production.up.railway.app`
-
-* QA: not used
-
-* Prod: not used
+* Prod (Railway): not set / not used  
+* Dev (OpenAI Codex): `https://illustrious-freedom-production.up.railway.app`  
+* QA (GitHub Codespaces): `https://illustrious-freedom-production.up.railway.app`
 
 **`DB_ALLOW_BRIDGE_IN_PROD`**  
  Names-only guard that enables the HTTPS bridge in production when set (policy owned in **HDE-Governance**).
@@ -1102,8 +1138,10 @@ PF07 records only the key names here and does not define their byte-level behavi
 
 **`DEV_SAMPLER_URL` — dev sampler HTTP harness base URL**
 
-*Dev/CodEx (local dev):* **OPEN/TBD** (must follow the `<base_url>/internal/dev/sampler` pattern; base URL derived from the local dev Reader wiring once confirmed).  
-*QA (Codespaces):* `http://127.0.0.1:8000/internal/dev/sampler`  
+*Dev/CodEx (local dev):* `http://127.0.0.1:8000/internal/dev/sampler`
+
+*QA (Codespaces):* `http://127.0.0.1:8000/internal/dev/sampler`
+
 *Prod (Railway):* not set / not applicable (internal/dev sampler HTTP harness is dev-only).
 
 **Binding ownership and pattern (names-only).**
@@ -1140,19 +1178,19 @@ PF07 records the **key name**, the **per-environment binding locations**, and th
 
 **Vendor-ingest keys (present where noted; secrets redacted)**
 
-• `HDAPI_BASE_URL`: `https://api.humandesignapi.nl/v1` (where configured; legacy v1 BodyGraph-oriented base URL posture, not proof of HumanDesignAPI v2 conformance)
-
-• `HD_API_KEY` (current legacy vendor credential key name; v2 credential mapping is OPEN/TBD)
-
-• `GEO_API_KEY` (current geocoding credential key name; v2 geocode mapping is OPEN/TBD)
-
-• HumanDesignAPI v2 base URL posture: OPEN/TBD (no exact v2 base URL or v2 base URL config key is pinned in PF07 yet)
-
-• HumanDesignAPI v2 credential and secret-binding names: OPEN/TBD (do not guess Bearer credential names, geocode credential names, or provider secret-binding names)
-
-• If `HDAPI_BASE_URL`, `HD_API_KEY`, or `GEO_API_KEY` are retained for v2, PF07 and the byte-authoritative vendor contract home must state the mapping to v2 without ambiguity before execution.
-
-• No OpenAI, LLM, AI-agent, prompt, embedding, chatbot, model-call, AI-provider base URL, AI-provider API key, AI-provider secret-binding name, or AI-provider runtime rail is required or permitted by this HDAPI v2 conformance update.
+* `HD_API_BASE_URL` — canonical HumanDesignAPI base URL environment variable. Current deployed v2 base URL value: `https://api.humandesignapi.nl/v2`. The configured base URL owns the vendor API version boundary.  
+* Runtime request construction must append only version-neutral resource paths to the configured base URL. PF07 records the infrastructure key and current base URL value only. Request construction, byte contracts, route contracts, and validation behavior live in **HDE-CLI-API-Vendor-Ref** and **HDE-Mechanics Guide** by title.  
+* `HDAPI_BASE_URL` — deprecated legacy alias only. It must not be used as the canonical key in plans, implementation prompts, QA plans, OPS tasks, or PF documentation.  
+* If both `HD_API_BASE_URL` and `HDAPI_BASE_URL` exist with different values, classify that as configuration ambiguity and fail closed through the owning implementation and policy homes. PF07 records the key posture only; runtime behavior remains owned by **HDE-CLI-API-Vendor-Ref** and **HDE-Mechanics Guide**.  
+* `HD_API_KEY` — canonical vendor API key environment variable. It is secret-bearing and belongs to the HD Engine infrastructure boundary.  
+* `GEO_API_KEY` — canonical geocoding/vendor-support key when required. It is secret-bearing and belongs to the HD Engine infrastructure boundary.  
+* Outbound vendor header projection is not the same as environment-variable naming:  
+  * HumanDesignAPI v1 legacy BodyGraph routes project `HD_API_KEY` as `HD-Api-Key: {redacted}`.  
+  * HumanDesignAPI v2 chart routes project `HD_API_KEY` as `Authorization: Bearer {redacted}`.  
+  * Routes requiring geocoding project `GEO_API_KEY` as `HD-Geocode-Key: {redacted}`.  
+* Glow app should not require direct vendor API credentials. Any future cross-service invocation must preserve secret isolation and avoid a parallel vendor credential path unless a future ADR or canon update explicitly changes this boundary.  
+* No raw API keys, bearer tokens, geocode keys, database passwords, full unredacted request headers, or full private vendor payloads may be recorded in PF07, plans, prompts, QA artifacts, OPS evidence, or closeout records.  
+* No OpenAI, LLM, AI-agent, prompt, embedding, chatbot, model-call, AI-provider base URL, AI-provider API key, AI-provider secret-binding name, or AI-provider runtime rail is required or permitted by this HDAPI v2 conformance update.
 
 **Notes (inventory-only).**
 
@@ -1487,11 +1525,26 @@ These check-local receipts do not replace, satisfy, or relocate canonical close-
 * `artifacts/vendor/hdapi_v2/release_binding.snapshot.json`  
 * `artifacts/vendor/hdapi_v2/release_binding.snapshot.json.path_proof.txt`
 
-**HDAPI v2 open-rails OPS root gap (names-only).**
+**HDE-EPIC034 OPS-02 HDAPI v2 open-rails OPS evidence root (names-only).**
 
-* The PO-only open-rails vendor-smoke root is not yet concrete because the HDE epic or card ID is still open. Before execution, PF07 and the owning Schemas & Artifacts home must bind a concrete lowercase root under `audit/ops/` for the HDAPI v2 open-rails smoke family.  
-* The concrete root must carry the command transcript, stdout, stderr, exit code, redacted environment presence, request summary, result summary, and file-checksum artifacts named by the owning plan or QA artifact. Until the concrete root is bound, the open-rails OPS path is a PF07/PF12 gap, not an executable path.  
-* This root family is HDAPI-only and must not create OpenAI, LLM, AI-agent, prompt, embedding, chatbot, model-call, or AI-provider evidence paths.
+The bounded PO-authorized HDE-EPIC034 OPS-02 open-rails HumanDesignAPI v2 smoke evidence family is carried under:
+
+* `audit/ops/hde-epic034/ops-02/`
+
+Concrete OPS-02 evidence surfaces include:
+
+* `audit/ops/hde-epic034/ops-02/commands.txt`  
+* `audit/ops/hde-epic034/ops-02/stdout.log`  
+* `audit/ops/hde-epic034/ops-02/stderr.log`  
+* `audit/ops/hde-epic034/ops-02/exit_codes.txt`  
+* `audit/ops/hde-epic034/ops-02/env_presence_redacted.json`  
+* `audit/ops/hde-epic034/ops-02/request_summary.json`  
+* `audit/ops/hde-epic034/ops-02/result_summary.json`  
+* `audit/ops/hde-epic034/ops-02/files_sha256.txt`
+
+This root records a bounded open-rails v2 smoke for HDE-EPIC034 OPS-02. It does not prove full HumanDesignAPI v2 runtime conformance, full vendor conformance, HDE-FERM008 parent completion, public Reader expansion, new public routes, new public flags, new HTTP homes, or AI runtime/evidence scope.
+
+This root family is HDAPI-only and must not create OpenAI, LLM, AI-agent, prompt, embedding, chatbot, model-call, or AI-provider evidence paths.
 
 **EPIC030 PR-01 normalization evidence family (names-only).** The governed PR-01 normalization evidence family is carried at:
 

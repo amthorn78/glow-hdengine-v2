@@ -1,12 +1,12 @@
 # **0\. Front Matter**
 
 **Title:** PF02-Canon-HDE-Architecture  
- **Version:** v2.3.2
+ **Version:** v2.3.4
 
  **Status:** Canon  
-**Effective date:** 2026-06-15
+**Effective date:** 2026-06-27
 
- **Last Update Gate:** BN 11.4.4 A13-14
+ **Last Update Gate:** BN 11.7.4 A20-34
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -1054,6 +1054,10 @@ For epics whose D-goals include live vendor behaviour or Reader/HTTP behaviour, 
 
 Reader and CLI surfaces are **peers** with respect to the single-emitter rule: both call the same Presenter emitter symbol. PF02 does not define which surface satisfies any particular D-goal; that choice and its evidence requirements are owned by **HDE-Phased Epics**, the **Glow QA Guide**, and **HDE-Governance**.
 
+**Production-affecting architecture classification.** When an epic affects deployed behavior, public or app-facing behavior, runtime request/response behavior, Engine compute, vendor ingest, external integration, DB persistence/retrieval, app/engine integration, or secret/environment binding, PF02 classifies the affected flow as production-affecting for QA planning. Production-affecting architecture requires live validation of at least one relevant production-facing boundary or an explicit authorized exemption.
+
+PF02 owns this architecture classification only. Exact Live QA steps, open-rails evidence shape, exemption handling, PASS/FAIL semantics, and closeout proof rules live in Glow QA Guide, HDE-Governance, Epic-Process-Guide, HDE-Schemas & Artifacts, and Plan Templates by title.
+
 ### **3.8.4 Discovery vs guessing**
 
 Environment and service discovery for dev/QA is **canon-first**. Before designing high-stakes HTTP QA steps, implementers and QA must consult:
@@ -1668,9 +1672,23 @@ Resolver semantics, connection details, and evidence live in **Glow Infrastructu
 * The vendor seam normalises vendor responses into BodyGraphs or other internal structures that match the schemas owned in other documents.  
 * Engine Core and sampler core receive only normalised data structures; they never see vendor transport details or directly open sockets or database connections.
 
-**HumanDesignAPI v2 vendor route posture (names-only; pending).** Under the pending v2 conformance path, vendor source selection distinguishes `POST /v2/charts`, `POST /v2/charts/simple`, and `POST /v2/charts/coordinates` as the recommended v2 chart route family, while `POST /v1/bodygraphs` and `POST /v1/bodygraphs/simple` remain explicit legacy route families unless later retired by PO decision and drained through the vendor-contract homes. PF02 records the route-family relationship only; auth headers, base URLs, request bodies, response envelopes, rate-limit behavior, retry posture, and error bytes are owned by HDE-CLI-API-Vendor-Ref, Glow Infrastructure, HDE-Governance, and HDE-Schemas & Artifacts by title.
+**Future Glow app integration ownership (architecture-level).** Unless a future ADR or PF canon supersedes this posture, the HD Engine owns HumanDesignAPI vendor acquisition, request shaping, BodyGraph/chart response normalization, BodyGraph storage and retrieval, and HD computation. The Glow app is the product shell and consumer of HD Engine outputs; it may request or trigger Engine behavior and receive normalized, app-safe outputs.
+
+Direct Glow app HumanDesignAPI calls, app-owned raw BodyGraph persistence, parallel vendor clients, parallel credential paths, or app-side reimplementation of vendor request shaping require a future ADR. The exact integration transport between the Glow app and the HD Engine is not decided here and remains future architecture or implementation scope.
+
+**HumanDesignAPI vendor API version boundary (architecture-level).** The vendor API version boundary is configuration-owned, not runtime-route-owned. `HD_API_BASE_URL` is the canonical base URL key for the HumanDesignAPI version boundary; runtime request construction must append only version-neutral resource paths to the configured base URL and must preserve any path prefix already present there.
+
+PF02 may name vendor endpoint families for source-selection, legacy-isolation, and documentation-provenance context. Versioned route strings such as `POST /v2/charts` and `POST /v1/bodygraphs` may appear only as vendor documentation, route-family labels, legacy/provenance text, or test inputs proving configurable-version behavior. They must not drive active runtime URL construction, auth selection, evidence-generator route construction, OPS instructions, PR prompts, or QA prompts.
+
+Auth selection must be represented by explicit route metadata or contract metadata, not by inspecting whether a runtime path starts with `/v1` or `/v2`. Exact environment bindings, outbound auth header bytes, request bodies, response envelopes, rate-limit behavior, retry posture, and error bytes remain owned by HDE-CLI-API-Vendor-Ref, Glow Infrastructure, HDE-Governance, and HDE-Schemas & Artifacts by title.
 
 **HumanDesignAPI v2 adapter boundary posture (names-only; pending).** V2 request shaping, route choice, response normalization, cache writes, CLI surfaces, and internal/admin compat flows must pass through the sanctioned vendor seam and existing Adapter/CLI source-selection boundary. They must not create a second HTTP home, bypass adapter guards, bypass the Presenter single-emitter boundary, place live HTTP or DB access inside Engine Core or sampler core, log payload bodies or secrets, or infer BodyGraph compatibility without governed mapping proof. Closed rails prove deterministic refusal and no external I/O only; they do not substitute for PO-only open-rails vendor conformance evidence.
+
+**HumanDesignAPI v2 boundary-proof posture (architecture-level).** Proofs that claim the vendor seam preserves adapter, presenter, engine, and evidence-tool boundaries MUST use a conservative fail-closed posture. Unknown public routes, response-producing paths, serializer paths, external-I/O paths, guard provenance, presenter provenance, adapter route-registration forms, or evidence-binding posture MUST NOT be treated as PASS by default.
+
+Boundary classification is architecture-level and must distinguish `allowed`, `forbidden`, `unknown / fail-closed`, and `out of scope`. Boundary analysis must be based on discovered current repo surfaces and must report the adapter, presenter, engine, vendor-seam, and evidence-tool loci inspected. Earlier planning text or hard-coded expected path lists are not sufficient by themselves.
+
+PF02 owns the architectural boundary rule only. Boundary analyzers, renderer separation, table-driven taxonomy, generated evidence artifacts, path proofs, tests, and validation mechanics live in HDE-Mechanics Guide, HDE-Schemas & Artifacts, HDE-Build Checklist Fermentation, and Glow QA Guide by title.
 
 **Repo-local seam location (names-only).**
 

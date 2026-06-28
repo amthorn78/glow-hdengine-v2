@@ -1,16 +1,16 @@
 # **0\. Document Control \[Required-Now\]**
 
-## **0.1 Header**
+## **\`0.1 Header**
 
 **Title:** PF05-Canon-HDE-CLI-API-Vendor-Ref
 
-**Version:** v2.3.6
+**Version:** v2.3.8
 
 **Status:** Canon
 
-**Effective date:** 2026-06-15
+**Effective date:** 2026-06-27
 
-**Last Update Gate:**  BN 11.4.4 A13-14
+**Last Update Gate:**  BN 11.7.4 A20-34
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -97,7 +97,7 @@
 
 * **Legacy BodyGraph request shaping — Implemented; HumanDesignAPI v2 pending.** Current PF05 request shaping is legacy BodyGraph-oriented and MUST NOT be treated as HumanDesignAPI v2 conformance. Until HDE-FERM006 through HDE-FERM008 close, v2 endpoint bytes, v2 auth names, request-body rules, response envelope mapping, and v1 legacy fallback policy remain pending and MUST be derived from the governed contract inventory rather than guessed. See §7.1.10 and §7.2.  
 * **HumanDesignAPI v2 pending route set — Required-Now.** The pending v2 conformance work must reconcile `POST /v2/charts`, `POST /v2/charts/simple`, and `POST /v2/charts/coordinates` as the recommended v2 chart routes, and `POST /v1/bodygraphs` and `POST /v1/bodygraphs/simple` as legacy v1 routes. The suspect `api-reference/openapi.json` artifact MUST be quarantined until domain, title, server, and path-family validation prove it is a HumanDesignAPI artifact.  
-* **Base-URL and credential posture — Required-Now.** Current legacy env names remain governed as currently stated. Exact v2 base URL posture, v2 auth header names, credential/config key names, and any mapping from existing legacy names to v2 MUST be pinned in PF05 and Glow-Infrastructure before v2 request-shaping execution. Do not silently repurpose legacy names for v2 without that drain.  
+* **Base-URL, API-version, and credential posture — Required-Now.** `HD_API_BASE_URL` is the canonical HumanDesignAPI base URL key and owns the vendor API-version boundary. Runtime request construction appends only version-neutral resource paths to the configured base URL, preserves any configured version path, and MUST NOT infer route behavior or auth-header family from hardcoded `/v1` or `/v2` path strings. `HDAPI_BASE_URL` is deprecated compatibility only, and conflicting `HD_API_BASE_URL` / `HDAPI_BASE_URL` values fail closed. `HD_API_KEY` is the canonical vendor credential key; v2 chart routes project it as `Authorization: Bearer`, and legacy v1 BodyGraph routes project it as `HD-Api-Key`. `GEO_API_KEY` is preserved where geocoding behavior requires `HD-Geocode-Key`.  
 * **Live HTTP gated by SAFE rails — Required-Now.** Vendor calls are permitted only when rails are explicitly open (`SAFE_MODE=0` and `ALLOW_NETWORK=1`); default posture for dev/CI is closed. Closed-rails refusal behavior, admin override, and rails evidence live in §7.1. HumanDesignAPI v2 open-rails smoke, when required, remains PO-only and evidence-backed.  
 * **Adapter data-source policy — Required-Now.** In prod, the adapter reads from DB on the hot path, using vendor only on explicit triggers (birth-data change, scheduled refresh, operator). In dev, direct vendor calls are allowed but must upsert into DB for repeatability. HumanDesignAPI v2 conformance MUST route through one sanctioned vendor seam and MUST NOT create a second HTTP home, bypass adapter guards, or bypass the presenter boundary. See §7.4.  
 * **No-AI vendor boundary — Required-Now.** HumanDesignAPI v2 conformance is deterministic vendor-contract work only. PF05 MUST NOT add OpenAI, LLM, AI-agent, prompt, embedding, chatbot, model-call, AI-provider credential, AI rails, AI evidence-family, AI acceptance-token, or AI-enablement bytes, flags, headers, config keys, routes, error mappings, or runtime obligations for this work.  
@@ -2615,16 +2615,19 @@ Evidence and tests (titles-only):
 
 ### **7.1.1 Rails defaults (env inventory; titles-only)**
 
-* **Dev / stage:** rails **OPEN** by default
-
-  * `SAFE_MODE = 0`
-
-  * `ALLOW_NETWORK = 1`
-
-* **Prod / CI:** rails **CLOSED** by default
+* **Dev / Codex and QA / Codespaces:** rails **CLOSED** in the current deployed records unless explicitly opened for a bounded, PO-authorized task.
 
   * `SAFE_MODE = 1`
 
+  * `ALLOW_NETWORK = 0`
+
+* **Prod / Railway:** rails **OPEN** only where the deployed environment inventory records the explicit PO-owned production binding.
+
+  * `SAFE_MODE = 0`
+
+  * `ALLOW_NETWORK = 1`  
+* **CI:** rails **CLOSED** by default.  
+  * `SAFE_MODE = 1`  
   * `ALLOW_NETWORK = 0`
 
 * Opening rails is an **explicit job/session decision** (ops/config), not a runtime toggle.
@@ -2657,11 +2660,11 @@ Evidence and tests (titles-only):
 
 ### **7.1.4 Environment variables (must be present and non-empty; names-only)**
 
-* `HDAPI_BASE_URL`
-
-* `HD_API_KEY`
-
+* `HD_API_BASE_URL`  
+* `HD_API_KEY`  
 * `GEO_API_KEY` (when needed)
+
+`HDAPI_BASE_URL` is deprecated legacy spelling. PF05 may mention it only as an observed drift key or temporary compatibility alias during migration. Resolution MUST be canonical-first: read `HD_API_BASE_URL`; if absent, a compatibility implementation MAY read `HDAPI_BASE_URL`; if both exist with different values, fail closed with a typed configuration ambiguity.
 
 Missing or empty env values **MUST** produce a typed failure **without** I/O.
 
@@ -2724,6 +2727,16 @@ The behavior above is covered by acceptance tokens owned in **HDE-Governance** (
 * `OPS_REFUSAL_BODY_OK`
 
 * `OPS_REFUSAL_MIRROR_LINK_OK`
+
+#### 7.1.8a OPS discovery, open-rails testing, and repo-reality observations (vendor ingest)
+
+PF05 vendor work MUST NOT be deferred merely because a vendor route, auth header, credential binding, config key, base URL posture, endpoint-family availability, account or tier posture, request shape, response shape, error envelope, rate-limit behavior, or open-rails precondition is unknown.
+
+If the missing fact is safely discoverable, the work MUST route through a bounded OPS discovery task or bounded OPS open-rails task instead of guessing, silently deferring, or treating the unknown as out of scope. OPS discovery and open-rails execution remain PO-only, IA-guided, secret-safe, and evidence-recorded. Automated agents MUST NOT perform live external vendor actions, expose secret values, simulate external state changes, or claim OPS completion.
+
+Open-rails testing is allowed when it is necessary to prove or discover live vendor reachability, endpoint availability, auth posture, credential-binding correctness, base URL posture, request/response compatibility, account or tier behavior, rate-limit or retry behavior, error-envelope behavior, or integration viability. A bounded live vendor smoke proves only the narrow interaction it was designed to prove. It MUST NOT be treated as full HumanDesignAPI runtime conformance, public Reader expansion, public payload expansion, new route creation, or acceptance-token satisfaction unless the owning governance source explicitly supports that stronger claim.
+
+Codex Audit or other supplied read-only repo-reality observations may support PF05 planning-time claims about existing vendor seams, route helpers, adapter loci, CLI loci, evidence tools, tests, or artifact families. Such observations do not create canon, do not prove live vendor truth, do not satisfy acceptance tokens, do not prove QA PASS, do not complete OPS work, and do not move PF09 status by themselves.
 
 ### **7.1.9 Routing (titles-only)**
 
@@ -2803,7 +2816,7 @@ Purpose (normative).
 
 ### **7.2.0 HumanDesignAPI v2 request and response contract pending**
 
-HumanDesignAPI v2 request shaping and response mapping are pending. The current §7.2.1 through §7.2.7 rules remain the legacy BodyGraph-oriented request-shaping contract until HDE-FERM006 through HDE-FERM008 are implemented and evidenced.
+HumanDesignAPI v2 full live/runtime conformance remains pending. Current governed evidence records source-selection, deterministic request-shaping proof, proof-level response-envelope mapping, adapter/presenter boundary proof, closed-rails refusal, and a bounded OPS-02 open-rails smoke for `charts/coordinates` bound by PR-06 for HDE-FERM008.2 only. These proof slices do not claim full HumanDesignAPI v2 runtime conformance, normalized data-path completion, HDE-FERM008 parent completion, HDE-FERM008.3/.4/.5 completion, public Reader changes, public route or payload changes, new HTTP homes, or AI scope.
 
 Pending v2 contract work MUST follow this source precedence:
 
@@ -2825,7 +2838,7 @@ The v2 request contract, when drained, MUST define:
 * retry and rate-limit handling,  
 * v1 legacy isolation or retirement posture.
 
-PF05 and Glow-Infrastructure MUST pin exact non-secret config key names, secret-presence expectations, and any mapping from existing `HDAPI_BASE_URL`, `HD_API_KEY`, or `GEO_API_KEY` names into v2 before execution depends on those names. Until then, v2 credential and base URL names remain open and MUST NOT be guessed.
+PF05 pins `HD_API_BASE_URL` as the canonical HumanDesignAPI base URL key, `HD_API_KEY` as the canonical vendor credential key, and `GEO_API_KEY` as the geocoding key where required. `HDAPI_BASE_URL` is deprecated legacy spelling and may be supported only as a temporary compatibility alias when `HD_API_BASE_URL` is absent; conflicting values MUST fail closed as configuration ambiguity. The configured `HD_API_BASE_URL` owns the vendor API-version path and may include a vendor version segment without changing runtime route constants. PF05 MUST NOT restate current deployed base URL values as runtime-contract text; deployed values belong to infrastructure inventory and OPS evidence. Legacy BodyGraph resource paths under a configured v2 base remain live-behavior-unproven and MUST NOT be claimed as live vendor conformance from route-version remediation alone.
 
 If v2 response `data` cannot truthfully feed the existing BodyGraph cache and compat inputs without schema changes, PF05 must record the mapping gap and route schema work to HDE-Schemas & Artifacts and HDE-Mechanics Guide by title. PF05 MUST NOT claim compatibility by inference.
 
@@ -2837,12 +2850,17 @@ No OpenAI, LLM, AI-agent, prompt, embedding, chatbot, model-call, AI-provider co
 
   * This is the **only** vendor BodyGraph endpoint HDE uses. No alternate vendor endpoint is defined here; see §7.1.10 for the explicit statement that `POST /bodygraphs/simple` is unsupported for this engine.
 
-* **Base-URL resolution (no fallback).**
+* **Endpoint and resource-path posture.**
 
-  * Resolve **only** from `HDAPI_BASE_URL`.
-
-  * If `HDAPI_BASE_URL` is missing or empty, fail closed with a typed error (see §7.1); do **not** default to any literal URL.
-
+  * egacy v1 BodyGraph source documentation remains `POST /v1/bodygraphs` and `POST /v1/bodygraphs/simple`.  
+  * Recommended v2 chart source documentation remains `POST /v2/charts`, `POST /v2/charts/simple`, and `POST /v2/charts/coordinates`.  
+  * Runtime request construction MUST use version-neutral resource paths joined to the configured `HD_API_BASE_URL`. The governed resource paths are `bodygraphs`, `bodygraphs/simple`, `charts`, `charts/simple`, and `charts/coordinates`.  
+  * Runtime request construction MUST preserve any API-version path already present in `HD_API_BASE_URL`; it MUST NOT hardcode active `/v1` or `/v2` route prefixes into runtime route constants.  
+* **Base-URL resolution.**  
+  * Resolve canonically from `HD_API_BASE_URL`.  
+  * If `HD_API_BASE_URL` is absent, a temporary compatibility implementation MAY read deprecated `HDAPI_BASE_URL`.  
+  * If both keys exist and values differ, fail closed with a typed configuration ambiguity.  
+  * If no usable base URL exists, fail closed with a typed error before I/O; do not default to any literal URL.  
 * **Method rules.**
 
   * `POST` is normative for JSON BodyGraph requests.
@@ -2853,14 +2871,11 @@ No OpenAI, LLM, AI-agent, prompt, embedding, chatbot, model-call, AI-provider co
 
 Send these verbatim on wire. Do not add other headers unless explicitly pinned.
 
-* `Accept: application/json`
-
-* `Content-Type: application/json; charset=utf-8`
-
-* `HD-Api-Key: <secret>`
-
-* `HD-Geocode-Key: <secret>`
-
+* `Accept: application/json`  
+* `Content-Type: application/json; charset=utf-8`  
+* `Legacy v1 BodyGraph routes: HD-Api-Key: <secret>`  
+* `HumanDesignAPI v2 chart routes: Authorization: Bearer <secret>`  
+* `Routes requiring geocoding: HD-Geocode-Key: <secret>`  
 * `User-Agent: GlowHDEngine/<release_id>` (lowercase 64-hex; contains no secrets)
 
 Capture normalization.  
@@ -2957,8 +2972,9 @@ Routing (titles-only).
 
 ## **7.3 Live HTTP Call Behavior \[Required-Now\]**
 
-Scope & prerequisites.  
- Rails open (`SAFE_MODE=0` and `ALLOW_NETWORK=1`); env ready (`HDAPI_BASE_URL`, `HD_API_KEY`, `GEO_API_KEY` when needed); shaping fixed per §7.2.
+Scope & prerequisites.
+
+Rails open (`SAFE_MODE=0` and `ALLOW_NETWORK=1`); env ready (`HD_API_BASE_URL`, `HD_API_KEY`, `GEO_API_KEY` when needed); shaping fixed per §7.2. Deprecated `HDAPI_BASE_URL` may be used only as an explicitly labeled temporary compatibility alias when `HD_API_BASE_URL` is absent; conflicting values fail closed.
 
 ### **7.3.2 Timeouts (closed integers)**
 
@@ -3035,7 +3051,7 @@ HumanDesignAPI v2 live conformance is pending and MUST NOT be claimed from docum
 
 Closed-rails v2 proof MUST show deterministic refusal with no DNS, socket, HTTP, or other external I/O. Any JSON emitted for refusal MUST be canonical, numeric-free where public, LF-terminated, and secret-free.
 
-Open-rails v2 smoke, when required, is an OPS task. It MUST be PO-executed, IA-guided, secret-safe, and stored under governed evidence. Automated agents MUST NOT execute vendor calls, claim completion, simulate external state changes, or modify commands by guesswork to force a PASS.
+Open-rails v2 smoke, when required, is an OPS task. It MUST be PO-executed, IA-guided, secret-safe, bounded, and stored under governed evidence. For vendor-ingest or other production-affecting epics, a Live QA plan MUST include at least one bounded open-rails live QA step unless an explicit authorized exemption is recorded. A live vendor smoke proves only the exercised route and MUST NOT overclaim full vendor conformance. Vendor failures should be classified by credential, environment, auth-header family, endpoint, account or tier, request shaping, response mapping, rate-limit or retry posture, vendor availability, or infrastructure gap where possible. Automated agents MUST NOT execute vendor calls, claim completion, simulate external state changes, or modify commands by guesswork to force a PASS.
 
 The v2 live-conformance evidence family MUST cover, as applicable:
 
@@ -3056,6 +3072,8 @@ The open-rails path is HumanDesignAPI-only. It MUST NOT include OpenAI, LLM, AI-
 ## **7.4 Adapter data-source policy (PF10-AA) \[Required-Now\]**
 
 **Purpose.** Pin where the adapter reads BodyGraph data in each environment without changing public transport bytes.
+
+**Glow app integration boundary.** HumanDesignAPI request shaping, vendor auth/header behavior, vendor evidence posture, BodyGraph persistence/retrieval, and HD computation remain HD Engine responsibilities. The Glow app is the product shell and consumer of HD Engine outputs. PF05 MUST NOT authorize duplicate vendor-client implementation in the Glow app, direct app-to-vendor request shaping, app-layer vendor secret handling, or bypass of the HD Engine vendor seam without a future ADR and canon update.
 
 **Prod (cached DB on the hot path).**
 
@@ -4013,6 +4031,66 @@ These anchors bind the HDE-EPIC033 PR-01 contract-inventory slice only. They sup
   * Lead closure decision, board update, merge provenance, formal close-pack completion, and PF09.5 canon drainage remain separate from PF05 evidence-anchor listing unless later source evidence explicitly binds them.  
   * HDE-FERM007 and HDE-FERM008 remain out of scope and not evidenced by this proof set. Do not treat this evidence as runtime v2 adapter conformance, live vendor conformance, public Reader change, new HTTP home, AI scope, or docs PR execution proof.  
 * **HDE-EPIC033 Lead retrospective closure-trace context.** The HDE-EPIC033 Lead Dev Epic Retrospective may be used to interpret **D.9b** through **D.9e** only as repo-supported closure-trace context for the HDE-FERM006 inventory-only contract slice. It does not create new PF05 runtime bytes, runtime request shaping, source-selection execution, open-rails vendor smoke, public Reader changes, new HTTP homes, AI scope, PF09.5 drainage, formal close-pack completion, merge provenance, board state, PO closeout, or proof that HDE-FERM007 or HDE-FERM008 is done.
+
+#### **D.9f HDE-EPIC034 HumanDesignAPI v2 source-selection, request-shaping, response-mapping, boundary, and closed-rails proof anchors**
+
+These anchors bind HDE-EPIC034 vendor-seam proof families only. They do not claim full HumanDesignAPI v2 live/runtime conformance, normalized data-path completion, open-rails vendor success, public Reader expansion, public payload expansion, new HTTP homes, AI scope, PF09 drainage, OPS completion, QA PASS, or epic closure unless a later source explicitly binds those stronger claims.
+
+* **OPS discovery and environment fact summary**  
+  * `audit/ops/hde-epic034/ops-01/fact_summary.json` *(secret-safe operational fact summary for canonical `HD_API_BASE_URL`, `HD_API_KEY`, `GEO_API_KEY`, deprecated `HDAPI_BASE_URL` compatibility posture, endpoint-family availability, and non-claim boundaries)*  
+* **Source selection and legacy isolation**  
+  * `artifacts/vendor/hdapi_v2/source_selection.snapshot.json` *(governed source-selection snapshot distinguishing recommended v2 chart routes from legacy v1 BodyGraph routes)*  
+  * `artifacts/vendor/hdapi_v2/v1_legacy_guard.log` *(legacy guard proving v1 BodyGraph behavior is explicit legacy behavior and not silently collapsed into recommended v2 chart behavior)*  
+* **Request shaping**  
+  * `artifacts/vendor/hdapi_v2/request_shaping.snapshot.json` *(governed request-shaping snapshot for canonical `HD_API_BASE_URL`, deprecated alias posture, version-neutral resource paths, v2 Bearer auth, v1 legacy `HD-Api-Key`, geocode posture, and no live-conformance claim)*  
+  * `audit/qa/hde-epic034/pr-02/request_shaping_check.log` *(PR-02 request-shaping check log)*  
+* **Response-envelope mapping**  
+  * `artifacts/vendor/hdapi_v2/response_mapping.snapshot.json` *(proof-level StandardResponse envelope mapping for response type, success posture, error-code posture, data identity posture, route variant, schema-gap status, and no vendor-payload-body emission)*  
+  * `audit/qa/hde-epic034/pr-03/response_mapping_check.log` *(PR-03 response-mapping check log)*  
+* **Adapter and presenter boundary**  
+  * `artifacts/vendor/hdapi_v2/adapter_boundary_proof.log` *(adapter/presenter boundary proof family after W-001 through W-005 remediation, including conservative fail-closed boundary classification and route-drift repair posture)*  
+  * `audit/qa/hde-epic034/pr-04/boundary_check.log` *(PR-04 boundary check log, if present in the governed evidence family)*  
+* **Closed-rails refusal**  
+  * `artifacts/vendor/hdapi_v2/closed_rails_refusal.txt` *(PR-05 closed-rails refusal proof for implemented current chart resource paths and legacy resource paths, no DNS/socket/HTTP external I/O, canonical base URL key, v1/v2 auth posture, no live vendor call, no open-rails smoke, no runtime v2 conformance, no public Reader change, and no AI scope)*  
+  * `audit/qa/hde-epic034/pr-05/closed_rails_check.log` *(PR-05 closed-rails validation log)*  
+* **Index and mirror coherence**  
+  * `docs/evidence/INDEX.json`  
+  * `docs/evidence/INDEX.sha256`  
+  * `artifacts/evidence_index.jsonl`  
+  * `artifacts/evidence_index.jsonl.sha256`  
+  * Sibling `*.path_proof.txt` transcripts for each indexed HDE-EPIC034 governed artifact.
+
+#### **D.9g HDE-EPIC034 OPS-02, PR-06, and Live QA proof anchors**
+
+These anchors bind the bounded open-rails HumanDesignAPI v2 smoke and its governed evidence binding only. They support HDE-FERM008.2 evidence posture only and do not claim full HumanDesignAPI v2 runtime conformance, HDE-FERM008 parent completion, HDE-FERM008.3/.4/.5 completion, public Reader change, public route, public flag, public payload change, new HTTP home, public transport change, AI scope, PO closeout, board update, merge provenance, or PF-canon drainage.
+
+* **OPS-02 open-rails smoke evidence bundle**  
+  * `audit/ops/hde-epic034/ops-02/commands.txt` *(PASS-producing command transcript for the bounded open-rails smoke; records open rails, deterministic pins, `HD_API_BASE_URL`, `HD_API_KEY`, `GEO_API_KEY` posture, and `charts/coordinates`)*  
+  * `audit/ops/hde-epic034/ops-02/env_presence_redacted.json` *(secret-safe environment presence snapshot)*  
+  * `audit/ops/hde-epic034/ops-02/exit_codes.txt` *(OPS wrapper exit-code capture)*  
+  * `audit/ops/hde-epic034/ops-02/files_sha256.txt` *(checksum listing for the OPS-02 evidence bundle)*  
+  * `audit/ops/hde-epic034/ops-02/moon_loop_rerun_transcript.txt` *(rerun transcript proving command-to-output provenance)*  
+  * `audit/ops/hde-epic034/ops-02/ops02_full_action_log_and_evidence_output.md` *(full action log and evidence output)*  
+  * `audit/ops/hde-epic034/ops-02/ops02_open_rails_smoke_procedure.py` *(repo-resident secret-safe procedure used for the PASS-producing smoke)*  
+  * `audit/ops/hde-epic034/ops-02/request_summary.json` *(redacted request summary; v2 chart auth posture, version-neutral `charts/coordinates`, no legacy v2 `HD-Api-Key`)*  
+  * `audit/ops/hde-epic034/ops-02/result_summary.json` *(OPS-02 result summary; classification PASS, vendor attempted, raw secrets not persisted, full vendor payload not persisted, HDE-FERM008.2 evidence ready)*  
+  * `audit/ops/hde-epic034/ops-02/stderr.log`  
+  * `audit/ops/hde-epic034/ops-02/stdout.log`  
+* **PR-06 OPS evidence binding**  
+  * `audit/qa/hde-epic034/pr-06/ops_smoke_evidence_binding.log` *(governed binding log; PR-06 does not rerun the live vendor call, binds OPS-02 evidence, and records HDE-FERM008.2-only support)*  
+  * `docs/acceptance_map_epic034.json` *(acceptance map; baseline existing tokens only, no vendor-v2-specific acceptance token, HDE-FERM008.2 supported, HDE-FERM008 parent and HDE-FERM008.3/.4/.5 not completed)*  
+  * `audit/docdeltas/hde-epic034_doc_deltas.md`  
+  * `audit/qa/hde-epic034/00_meta/doc_deltas.md`  
+* **Live QA and closeout proof anchors**  
+  * `audit/qa/hde-epic034/qa_step_logs_manifest.json` *(manifest listing Step-0B and PO-001 through PO-018 check logs as PASS)*  
+  * `audit/qa/hde-epic034/00_meta/discovery_artifact.md` *(records PO-012 as the bounded PO-authorized open-rails Live QA step and preserves nonclaim boundaries)*  
+  * `audit/qa/hde-epic034/00_meta/qa_rca_doc_delta_summary.md` *(QA RCA / Doc Delta summary; closeout assembly evidence only, not PO closeout, board update, merge, or canon drain)*  
+* **Index, mirror, and path-proof posture**  
+  * `docs/evidence/INDEX.json`  
+  * `docs/evidence/INDEX.sha256`  
+  * `artifacts/evidence_index.jsonl`  
+  * `artifacts/evidence_index.jsonl.sha256`  
+  * Sibling `*.path_proof.txt` transcripts for the OPS-02, PR-06, acceptance-map, Live QA, index, mirror, and hash artifacts listed above.
 
 ### **D.10 Runtime posture & env-resolver envelopes**
 

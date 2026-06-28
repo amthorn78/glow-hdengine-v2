@@ -2,21 +2,21 @@
 
 **Title:** PF06-Canon-Epic-Process-Guide 
 
-**Version:** v2.2.7
+**Version:** v2.2.9
 
 **Status:** Canon
 
-**Effective date**: 2026-06-15
+**Effective date**: 2026-06-27
 
-**Last Update Gate:**  BN 11.4.4 A13-14
+**Last Update Gate:**  BN 11.7.4 A20-34
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
 ## 0.1 Purpose and scope
 
-This guide defines the epic delivery process for a human \+ pair-programming \+ CodEx workflow. It supplies paste-ready headers, checklists, and prompts. It requires an Audit and a Sandbox Build/Test in each epoch. It sets Close to be PR-first. CodEx automatically opens the pull request and attaches the close pack and the acceptance tokens (PASS) list.
+This guide defines the epic delivery process for a human \+ pair-programming \+ CodEx workflow. It supplies paste-ready headers, checklists, and prompts. It requires an Audit and a Sandbox Build/Test for each epic. It sets Close to be PR-first. CodEx automatically opens the pull request and attaches the close pack and the acceptance tokens (PASS) list.
 
-This is process guidance only. It does not constrain execution environments, repository tooling, or any transport or payload bytes (those remain in their canonical homes).
+This is process guidance only. It does not constrain execution environments, repository tooling, transport bytes, or payload bytes. Those remain in their canonical homes.
 
 ## 0.2 Policy and principles
 
@@ -49,6 +49,15 @@ PF10 drain and any later drainage into PF-Canon, checklist, guide, or summary ho
 Allowed blockers remain limited to real truth-and-proof failures, such as incomplete required QA steps, missing required deliverables, untrusted or non-governed evidence, unresolved FAIL\_BEHAVIOR or FAIL\_TOOLING or TOOLING\_BLOCKED conditions that affect acceptance, or missing required close-gate QA artifacts.
 
 When a canon or checklist delta is known but not yet drained, PF10 remains the temporary live-truth home until the later drain occurs. Artifacts MUST record the drift or later drain target, use supportable-from-repo-evidence wording when the destination PF home is not yet updated, and MUST NOT require that drainage in order to approve execution, recommend merge, or support epic readiness or closeout.
+
+Closure axes remain separate. QA evidence, PF09 status drainage, PO closeout, board state, merge provenance, and PF-canon drainage are separate closure axes and MUST NOT be collapsed.
+
+* QA evidence proves QA-plan coverage and QA proof posture. It does not by itself perform PO closeout, board update, merge action, PF09 drain, or PF-canon drain.  
+* PF09 status drainage updates phased-checklist task or subtask status. It may be supported by PF10 and repo evidence, but it remains a documentation/status-drain action, not implementation work.  
+* PO closeout is a PO-owned process action. A Lead report or QA evidence package may support PO closeout, but does not perform it.  
+* Board state is a Scrum or board-state action. Board updates must be handled in the board source of truth and MUST NOT be inferred solely from QA evidence, PF10 text, or review approval.  
+* Merge provenance is a repo/history axis. It must be evidenced by repo, PR, or commit state where relevant and MUST NOT be inferred from planning approval or QA approval alone.  
+* PF-canon drainage applies stable documentation updates to the permanent PF homes. PF10 can stage live truth before drainage, but the drain itself is a separate documentation action.
 
 An epic MAY be delivered in a series of PRs (up to 10 PRs per epic), each PR carrying a coherent slice of work with its own code \+ evidence parity.
 
@@ -326,6 +335,12 @@ No governance drift. Ops tasks MUST NOT create new acceptance tokens or redefine
 Clarification. If a change is fully achievable as code (including tests and deterministic artifacts), it is PR work. If any step requires human console/config action, that step is an Ops task (even if adjacent code changes exist). Ops tasks can be prerequisites for epic completion, but they are proven by evidence artifacts, not by agent execution claims.
 
 Bounded Ops discovery and validation runs. An Ops task approved as DISCOVERY, command-discovery, validation-only, sequencing-correction, blocker-classification, or implementation-validation MUST be reviewed only for that bounded approved purpose. If exact command proof, target facts, required credentials, prerequisite proof, or safe execution context remain unproven, the task MUST record the unresolved posture and MUST NOT convert that state into FAIL\_BEHAVIOR.
+
+OPS discovery is first-class work, not a deferral substitute. When an in-scope implementation, QA, remediation, or OPS item depends on an operational, infrastructure, credential, environment, vendor, endpoint, open-rails, or evidence-root fact that can be safely discovered by the PO through a bounded OPS task, the plan MUST route bounded OPS discovery instead of deferring the item merely because the fact is not already pinned.
+
+Unknown classification. Plans MUST classify each operational unknown as one of: discoverable by OPS, discoverable by PR, discoverable by QA, requires PO or Thoth decision, requires PF10 live rule, requires permanent canon update before safe execution, unsafe to discover now, out of scope, phase drift, or valid deferral. “Unknown,” “OPS required,” and “open rails required” are not complete classifications by themselves.
+
+OPS discovery task minimums. A bounded OPS discovery task MUST state the exact fact to discover, why the fact matters, who owns discovery, whether secrets are involved, what may be recorded, what must not be recorded, what downstream PR, QA, OPS, or planning item depends on it, and what safe evidence or summary resolves the unknown. The discovery result may unblock later PR, OPS, or QA work only after the discovered fact is routed into the relevant plan, QA artifact, implementation artifact, or closeout proof.
 
 Dependent Ops execution guard. A downstream Ops execution task MUST NOT proceed from unresolved command proof or unresolved target facts. When the safe execution basis is not proven, classify the downstream task as TOOLING\_BLOCKED and record what proof would unblock it.
 
@@ -773,22 +788,20 @@ Plan path provenance (no fabricated required paths)
 
 If a path is not canon-defined and not audit-proven, it MUST either be created under QA with explicit instructions and justification, or it MUST NOT appear in the plan.
 
-Plan locus validation labels (required for asserted repo loci)  
+PPlan locus validation labels (required for asserted repo loci)  
  When a planning artifact asserts an implementation locus (repo path, directory root, module home, or “where this lives”), the statement MUST be validated using exactly one of the following labels:
 
-* Canon-cited (preferred): cite the governing PF canon home(s) that define the locus.
-
-* CA vetted: include a verbatim quote from the planning CodEx audit output that proves the locus.
-
-* IG Approved: include a verbatim quote from the approved Implementation Guide that proves the locus.
-
+* Canon-cited (preferred): cite the governing PF canon home(s) that define the locus.  
+* Codex Audit observed evidence: identify the supplied Codex Audit and embed the observed repo-reality fact as a short quote or precise paraphrase. This label may prove planning-time repo reality only.  
+* IG Approved: include a verbatim quote from the approved Implementation Guide that proves the locus.  
 * QA-created: include explicit creation instructions plus an explicit verification step that proves the locus exists and meets criteria; capture the proof in governed evidence output.
 
-Rules for CA vetted and IG Approved:
+Rules for Codex Audit observed evidence and IG Approved:
 
-* The quote MUST be verbatim. Paraphrase is not permitted for these labels.
-
-* The quote MUST be sufficient to prove the asserted locus. If it does not prove the locus, the plan must not assert it.
+* The embedded observation MUST be sufficient to prove the asserted planning-time locus. If it does not prove the locus, the plan must not assert it.  
+* Codex Audit observed evidence may support existing-locus claims, reuse-first planning, implementation scoping, PR task inputs, OPS task dependencies, QA-prep context, and gap identification.  
+* Codex Audit observed evidence does not by itself prove acceptance-token satisfaction, QA PASS, epic closure, PF09 status movement, PO closeout, Live QA execution, OPS completion, governed evidence freshness after later changes, production truth, external vendor truth, open-rails truth, secret validity, runtime conformance beyond the observed repo fact, canon authority, or new normative rules.  
+* CodEx must still verify repo reality during execution before editing or relying on the locus.
 
 File and directory minting posture (do not invent a home)  
  Plans MAY require minting new files and directories only under an already validated, canon-defined home, or under governed QA roots (`audit/**`, `artifacts/**`) when the creation occurs during QA. Plans MUST NOT introduce a new top-level root, a second home for an existing surface, or a guessed repo layout. If a new root or new home is required, treat it as an architecture change and route it via ADR and Doc-Delta before it appears as a required path in a plan.
@@ -798,51 +811,47 @@ Review gate
 
 QA-planning locus provenance lock (repo-resident loci)
 
-In QA planning artifacts (Live QA Plans, QA Guides, QA reviews, QA prompts, and QA checklists), the only allowed sources for repo-reality claims are:
+In QA planning artifacts (Live QA Plans, QA Guides, QA reviews, QA prompts, and QA checklists), the allowed sources for repo-reality claims are:
 
-* PF10 — HDE Build Notes
-
-* PF-Canon
-
+* PF10 — HDE Build Notes  
+* PF-Canon  
+* a supplied Codex Audit for the epic, task, or review artifact  
 * the initial QA Audit for the epic
 
 This lock applies to repo-resident and repo-reality strings, including:
 
-* file and directory paths
-
-* endpoint names and routes
-
-* module and component identifiers
-
-* script names, runbook names, and command strings
-
-* check and test identifiers, CI job names
-
-* environment variable names when treated as already-existing
-
-* fixed output locations when treated as already-existing
-
+* file and directory paths  
+* endpoint names and routes  
+* module and component identifiers  
+* script names, runbook names, and command strings  
+* check and test identifiers, CI job names  
+* environment variable names when treated as already-existing  
+* fixed output locations when treated as already-existing  
 * negative existence claims
 
-No invention, no inference, no memory. If the exact locus string does not appear verbatim in an allowed provenance source, it MUST NOT appear as a repo-resident claim in the plan.
+No invention, no inference, no memory. If the exact locus string is not supported by an allowed provenance source, it MUST NOT appear as a repo-resident claim in the plan.
 
-Verbatim-only requirement. When a repo-resident locus string is used, it MUST be copied character-for-character from the allowed provenance source. No renaming, case folding, equivalent substitutions, wildcard expansions, or invented variants.
+Verbatim-only requirement for exact locus strings. When a repo-resident locus string is used, it MUST be copied character-for-character from the allowed provenance source. No renaming, case folding, equivalent substitutions, wildcard expansions, or invented variants.
 
-Blocking posture. Any QA plan that contains a repo-resident locus string not proven verbatim by an allowed provenance source is invalid for approval and MUST be returned for revision.
+Blocking posture. Any QA plan that contains a repo-resident locus string not proven by an allowed provenance source is invalid for approval and MUST be returned for revision.
 
 Non-goal. This lock governs repo-reality claims and does not govern higher-level QA intent that does not assert repo-resident loci.
 
-Environment variable name governance (no QA-time minting)
+Environment variable name governance (no QA-time minting or silent normalization)
 
-Environment variable names referenced in QA plans, step logs, and QA evidence schemas are governed interface surfaces, not free text. A QA plan MUST NOT add a new environment variable name “because it would be useful,” and MUST NOT carry forward an unapproved variable name merely because it appeared in a prior iteration.
+Environment variable names referenced in QA plans, step logs, OPS tasks, implementation prompts, review packs, and QA evidence schemas are governed interface surfaces, not free text. A QA plan MUST NOT add a new environment variable name “because it would be useful,” and MUST NOT carry forward an unapproved variable name merely because it appeared in a prior iteration.
 
 No QA-time env var minting. Live QA (including Moon Loop execution) MUST NOT introduce new environment variable names as runtime requirements, rails pins, or required evidence keys. If a workflow would require a new environment variable name to function, treat that as development work under PO approval: the variable name MUST be explicitly defined and documented in canon before any QA plan relies on it.
+
+Mission-critical environment-variable preservation. When the PO provides deployed environment facts, plans and reviews MUST preserve exact key spelling, environment context, provider context, redacted value posture, requiredness, and secret-bearing status until the facts are routed into PF10 and the permanent infrastructure home. Do not normalize, collapse, rename, or replace supplied deployed facts with OPEN/TBD while they remain live.
+
+Key-name drift and migration. Environment-variable key-name drift MUST be handled through OPS discovery, OPS change, PF10 live rule, or permanent canon update, not by deferral or silent correction. A deprecated or alias key may be discussed only when labeled as deprecated drift, compatibility fallback, migration target, observed evidence, or configuration ambiguity. Review and closeout artifacts MUST distinguish canonical key migration or configuration ambiguity from implementation behavior failure.
 
 MODO\_\* variables are forbidden. Any environment variable name beginning with MODO\_ is non-canonical for Glow/HDE QA planning and QA execution. QA plans, QA runbooks, and QA evidence schemas MUST NOT introduce, require, or depend on MODO\_\* variables for PASS/FAIL or as required evidence structure (including required header fields, manifests, or required schema fields).
 
 Legacy handling (non-binding only). If an already-approved plan or previously captured QA artifact includes MODO\_\* keys, treat them as diagnostic-only inert placeholders: they MUST NOT be required for PASS/FAIL, MUST NOT be treated as required evidence keys, and MUST NOT be used as proof of rails posture or execution configuration. Remove them in the next plan revision and do not replicate the pattern.
 
-Review posture: any required reliance on an unapproved environment variable name, including any MODO\_\* name, is a mechanical blocker until removed or canon-defined.
+Review posture: any required reliance on an unapproved environment variable name, including any MODO\_\* name, is a mechanical blocker until removed, canon-defined, classified as OPS-discoverable, or explicitly labeled as deprecated drift or compatibility evidence.
 
 If QA must create a file that has no prior canonical existence, the relevant step MUST include:
 
@@ -996,14 +1005,16 @@ Before drafting any QA Plan or Implementation Plan for a Live QA epic, they MUST
   * the PF23 Anchors list (components used and loci/pathnames pulled)  
   * a brief “what changed / what did not” summary scoped to the epic or plan  
 * This consult record MUST live in existing closure surfaces (for example, the epic-scoped meta record under audit/qa//00\_meta/ and/or the epic close report). It MUST NOT appear in the acceptance token roster.  
-* Implementation Agents MUST NOT treat canonical infra/env details that PF-Canon already defines as PO inputs unless PF-Canon explicitly marks them OPEN/TBD.  
-* When a plan, review artifact, remediation guide, or epic document includes an infra or ops dependency, it MUST bind each required value in exactly one of these two ways:  
+* Implementation Agents MUST NOT treat canonical infra/env details that PF-Canon or current PF10 explicitly defines as PO inputs unless the source explicitly marks them OPEN/TBD.  
+* When a plan, review artifact, remediation guide, or epic document includes an infra or ops dependency, it MUST bind each required value in exactly one of these postures:  
   * PF07-derived posture: cite the exact PF07 fact directly.  
-  * PF07-gap posture: identify the exact missing PF07 fact and mark the affected task or claim blocked by missing PF07 infrastructure inventory.  
-* The artifact MUST NOT rely on placeholder ownership or vague sourcing such as infra to provide, ops to confirm, ask infra, await ops details, infra-owned without the concrete PF07-backed value, or guessed hostnames, guessed ports, guessed URLs, guessed start commands, guessed environment bindings, or guessed governed evidence roots.  
-* Any infra or ops task named in a plan MUST, where applicable, state the target provider, target project, target service, target repository, target base URL or port, target database instance or schema, exact config key name, exact governed evidence root or QA root, and the exact expected value or exact PF07 value source.  
-* QA and Live QA plans MUST NOT guess or redefine PF07-owned environment bindings or service facts. If PF07 is silent, the plan MUST stop at the explicit PF07-gap blocker and record the intended PF07 update as a doc-delta or drain target for PO action.  
-* Any QA Plan or Implementation Plan that asks the PO to “provide” such a value without citing an OPEN/TBD gap in PF-Canon is non-conforming and must be corrected before use.  
+  * PF10-live posture: cite the current PF10 addendum by addendum number and title when PF10 explicitly supplies the live fact.  
+  * OPS-discoverable posture: define the bounded OPS discovery task that will safely confirm or record the fact without exposing secrets.  
+  * PF07-gap posture: identify the exact missing PF07 fact and mark the affected task or claim blocked by missing PF07 infrastructure inventory only when no current PF10 live fact applies and safe OPS discovery cannot resolve the fact before execution.  
+* The artifact MUST NOT rely on placeholder ownership or vague sourcing such as infra to provide, ops to confirm, ask infra, await ops details, infra-owned without the concrete PF07-backed or PF10-backed value, or guessed hostnames, guessed ports, guessed URLs, guessed start commands, guessed environment bindings, or guessed governed evidence roots.  
+* Any infra or ops task named in a plan MUST, where applicable, state the target provider, target project, target service, target repository, target base URL or port, target database instance or schema, exact config key name, exact governed evidence root or QA root, and the exact expected value or exact PF07, PF10, or OPS-discovery value source.  
+* QA and Live QA plans MUST NOT guess or redefine PF07-owned environment bindings or service facts. If PF07 is silent but current PF10 explicitly speaks, use PF10-live posture. If PF07 and PF10 are both silent and the fact can be safely discovered, use OPS-discoverable posture. If neither applies, stop at the explicit PF07-gap blocker or valid deferral classification and record the intended PF07 update as a doc-delta or drain target for PO action.  
+* Any QA Plan or Implementation Plan that asks the PO to “provide” such a value without classifying the source as PF07-derived, PF10-live, OPS-discoverable, or PF07-gap is non-conforming and must be corrected before use.  
 * When a plan, QA plan, remediation guide, review pack, or OPS guide documents a non-prod local-style access address, the default documented client access host MUST be `127.0.0.1` with the correct port and endpoint path.  
 * This is a client access convention only. It MUST NOT be used to rename or obscure the real PF07 service identity, the real prod-facing address, or the server bind address.  
 * Production and prod-facing surfaces MUST keep the real hosted address recorded in canon, even when the operator is working from Codespaces, CI, or another remote shell.  
@@ -1035,6 +1046,12 @@ QA Plans MUST distinguish between:
 
 * Closed-rails determinism checks that run locally with rails closed (for example, serializer and bundle determinism jobs)  
 * Open-rails production checks that run from a console (for example, Codespaces) against the production HD Engine service and DB as defined in Glow Infrastructure and clarified in HDE-Build Notes (titles only)
+
+Open-rails testing may be included in implementation or QA planning when live operational information is necessary and the work is otherwise in scope. The plan MUST bound the task, identify PO authorization, preserve secret safety, state what may be recorded, state what must not be recorded, and avoid treating vendor smoke success as broader conformance than it proves.
+
+If open-rails proof or discovery is required, the plan MUST sequence the work explicitly as PR preparation or harness work, bounded PO-run OPS discovery or OPS open-rails execution, then QA verification or evidence binding as applicable. Open rails, live vendor access, credentials, or PO-run execution are not deferral reasons by themselves; they are OPS/QA sequencing facts unless the task is unsafe, unauthorized, out of scope, phase drift, or blocked by a real unresolved dependency.
+
+Open-rails failure classification. A failed open-rails run MUST be classified before it is treated as product behavior failure. Possible classes include credential issue, config issue, vendor account or tier limitation, endpoint unavailability, vendor contract mismatch, request-shaping defect, response-mapping defect, infrastructure gap, rate-limit or retry posture, external outage, product implementation defect, or QA plan expectation mismatch.
 
 Deterministic parity scenario requirement (acceptance). Any new or expanded error parity scenario used for acceptance (including DB-unavailable and closed-rails vendor attempt scenarios) MUST be reproducible under determinism pins \+ closed rails, without reliance on external network or a live database.
 
@@ -1803,6 +1820,51 @@ Behavior execution phase: Run the system/endpoint/harness step that exercises th
 Artifact capture \+ analysis phase: Capture governed evidence artifacts under audit/qa/\<epic-id\>/\<SUBPATH\> (and related required closeout artifacts). Perform analysis offline (e.g., in Codespace), producing the required summaries, diffs, and verification notes as governed artifacts.
 
 Rule: A Live QA step is not complete unless the artifact phase produces the specified deliverables in the QA root (or other governed locations referenced by Evidence Index/Machine Mirror), even if the behavior phase “looked correct” during execution.
+
+#### 1.1.5A Production-affecting open-rails Live QA requirement
+
+For any epic that can affect real production functionality, QA readiness and closeout review MUST account for at least one bounded open-rails Live QA step that proves relevant production-facing behavior in the deployed or PO-approved live target, unless an explicit exemption is approved and recorded.
+
+This applies when the epic can affect any of the following:
+
+* production surfaces  
+* public or app-facing behavior  
+* runtime compute  
+* vendor ingest  
+* HumanDesignAPI calls  
+* external API integrations  
+* database persistence  
+* database retrieval  
+* DB bridge behavior  
+* deployed service behavior  
+* environment-variable or secret-binding behavior  
+* request shaping  
+* response mapping  
+* authentication or authorization behavior  
+* public Reader behavior  
+* CLI/API behavior used in production  
+* queues, workers, jobs, schedulers, or runtime services  
+* any path that must work outside isolated closed-rails fixtures
+
+Closed-rails proof remains important, but closed-rails proof alone is not enough for production-affecting work. This applies even when closed-rails tests, repo tests, evidence refreshes, static checks, and generated proof artifacts are all green.
+
+The required open-rails Live QA step must be bounded, non-destructive unless explicitly approved, PO-authorized where secrets, external services, or deployed environments are involved, secret-safe, evidence-recorded, scoped to the epic’s actual production risk, clear about what it proves, and clear about what it does not prove. One open-rails Live QA step is the minimum. More are required when one live step cannot honestly prove the affected production functionality.
+
+A valid open-rails Live QA step may include, when scoped and authorized: live deployed service check, live vendor smoke, live API call against a deployed target, live DB bridge read/write check, live persistence and retrieval check, live request-shaping check with redacted proof, live response-shape check with redacted proof, live authentication or credential-binding confirmation, live environment-variable binding confirmation, live app-to-engine integration check, or live CLI/API behavior check against a real configured target.
+
+The following do not satisfy the required open-rails Live QA step by themselves: unit tests, integration tests against fake services, closed-rails fixture replay, static analysis, generated evidence artifacts, path-proof validation, Evidence Index refresh, Machine Mirror refresh, acceptance-map refresh, repository inspection, Codex audit, PF10 supportability note, implementation review approval, QA Plan approval, smoke procedure written but not run, or OPS discovery without live behavior proof.
+
+Open-rails Live QA evidence may record key names, redacted values, header names, redacted header-shape posture, environment label, endpoint family, status class, redacted response excerpt when safe, whether behavior matched expectation, and whether the live step proves only a narrow smoke or broader behavior. It MUST NOT record raw API keys, raw bearer tokens, raw database passwords, raw request secrets, raw private payloads, unredacted vendor response bodies unless explicitly approved and governed, or uncontrolled production data.
+
+Open-rails Live QA proves only what it actually exercises. A live vendor smoke does not prove full vendor conformance unless it covers the full conformance claim. A single DB bridge read does not prove all persistence behavior. A single deployed endpoint check does not prove all public app behavior. A successful response does not prove all error, retry, or rate-limit behavior. A live smoke does not automatically move unrelated PF09 rows to Done. The QA Plan MUST state the bounded proof meaning.
+
+Exemption is allowed only with explicit justification. A Live QA Plan may omit open-rails Live QA only when at least one of the following is true: the epic has no production, runtime, compute, vendor, persistence, deployed, integration, public, or external-service effect; the live step would be unsafe; the live step would expose secrets or private data and no redacted safe alternative exists; the PO explicitly withholds authorization; the required deployed target is unavailable and cannot be safely reached; the work is documentation-only and does not affect production behavior; the work is planning-only and does not claim implementation readiness; or the work is a closed-rails-only proof slice and no production functionality claim is being made.
+
+If an exemption is used, the Live QA Plan MUST state why open-rails Live QA is omitted, who authorized the omission, what production claim is not being made, and whether a later open-rails QA step is required before closeout or release. Default posture: no exemption.
+
+A Live QA Plan for a production-affecting epic is not approval-ready unless it includes at least one open-rails Live QA step or a clear, authorized exemption. Reviewers MUST NOT accept a closed-rails-only Live QA Plan for a production-affecting epic without explicit exemption language. This is a truth/proof requirement, not a formatting preference.
+
+PR, OPS, and QA sequencing MUST support bounded live proof when required. Open-rails Live QA may be PO-run or PO-authorized where secrets, external services, or deployed environments are involved. CodEx and implementation agents may prepare repo-local code, fixtures, validators, redaction helpers, harnesses, documentation, and evidence-processing logic, but they MUST NOT perform PO-only live external actions or handle secret values directly.
 
 ### **1.1.6 PO Live QA vendor-first scope**
 
@@ -4142,6 +4204,8 @@ An acceptance-ledger slice is not satisfied merely because the acceptance map, t
 If the final recommendation depends on a combined Original plus Remedial outcome, the review MUST state what earlier drift or blocker was reversed, what net-effective shipped state remains after remediation, and why that final combined outcome supports the status recommendation.
 
 When the review supports a PF09 task or subtask status move, the review SHOULD state the exact impacted PF09 row or rows, the current PF09 status posture, the recommended status move, and the specific final evidence basis for that recommendation.
+
+When a review uses Codex Audit observed evidence, the review MUST label it as planning-time or review-time repo-reality support and MUST NOT overclaim it as acceptance proof, QA PASS, OPS completion, PF09 status movement, PF-canon drain completion, epic closure, production truth, external vendor truth, open-rails truth, or canon authority.
 
 If a review identifies a remaining canon delta whose correct home is another PF document, the review pack MUST route that delta to the correct home and MUST NOT silently convert it into a PF06 process delta.
 

@@ -3,12 +3,12 @@
 ## 0.1 Header
 
  **Title:** PF04-Canon-HDE-Governance  
- **Version:** v2.6.6
+ **Version:** v2.6.8
 
 **Status:** Canon  
-**Effective date:** 2026-06-15
+**Effective date:** 2026-06-27
 
-**Last Update Gate:** BN 11.4.4 A13-14
+**Last Update Gate:** BN 11.7.4 A20-34
 
 **Invocation tag:** `INV-f2ac55d77ce9aacc`
 
@@ -358,6 +358,12 @@ EPIC-011 introduced a **preservation guard** over key public and admin surfaces.
 * Combined-evidence supportability does not by itself claim PF09 drainage, QA PASS, epic closure, live vendor behavior, HDAPI v2 runtime conformance, OPS evidence as QA evidence, or acceptance-token satisfaction for non-token DB proof labels. Any later QA, closeout, or checklist-drain artifact that uses the combined chain MUST state the supportable-versus-drained distinction explicitly.
 
 **Review-time requests vs close-out claims.** Planning-time requests for new tokens are allowed, but acceptance claims at epic close must reference registered tokens and governed evidence.
+
+**Operational discovery, open-rails, Codex Audit, and OPS evidence non-token posture.** Operational discovery, bounded OPS evidence, PO-authorized open-rails evidence, and read-only repo-reality observations may support planning, implementation, QA design, review, or later-drain supportability, but they do not mint, satisfy, or expand acceptance tokens by themselves. If an operational fact can be safely discovered and recorded without exposing secrets, Governance does not require a new acceptance token merely to permit discovery.
+
+Codex Audit observations and other read-only repo-reality observations may support bounded repo-reality facts when properly labeled, but they do not by themselves prove QA PASS, OPS completion, live vendor truth, PF09 status movement, epic closure, PF-canon drainage, or acceptance-token satisfaction. Governance review blocks only when such evidence is overclaimed as token, acceptance, closure, live-vendor, PF09, OPS-completion, or canon authority.
+
+If a discovery proof, open-rails proof, Codex Audit observation, OPS evidence bundle, or repo-reality proof must become a gated acceptance token, the token must be admitted through this registry or minted in a numbered PF10 addendum before any plan, acceptance map, matrix, closeout artifact, or evidence log claims that token.
 
 ### **2.0.1 Determinism & identity**
 
@@ -1446,10 +1452,11 @@ Routing (titles-only).
 
 ## 3.3 Secrets & env validation \[Required-Now\]
 
-* **Validate against PF12 (names-only allow-list).** Before any vendor action, validate required keys from the PF12 canonical env table (names-only; secrets not printed). Unknown keys **must** be flagged in CI; missing required **must** fail at prod start.  
-   **Required (examples):** `HDAPI_BASE_URL` (vendor base URL), `HD_API_KEY` (secret), `GEO_API_KEY` (secret).  
+* **Validate against canonical env and infrastructure homes (names-only allow-list).** Before any vendor action, validate required environment keys from the canonical env and infrastructure homes (names only; secrets not printed). `ALLOW_NETWORK`, `SAFE_MODE`, and `APP_ENV` are rails-governance keys. `HD_API_BASE_URL`, `HD_API_KEY`, and `GEO_API_KEY` are infrastructure/vendor configuration keys, not acceptance tokens. `HDAPI_BASE_URL` is deprecated compatibility spelling only where implementation or migration evidence explicitly records it. If both `HD_API_BASE_URL` and `HDAPI_BASE_URL` are present with different values, fail closed with configuration ambiguity before network I/O. Unknown keys **must** be flagged in CI; missing required keys **must** fail at prod start.  
+   **Required (examples):** `HD_API_BASE_URL` (vendor base URL), `HD_API_KEY` (secret), `GEO_API_KEY` (secret).  
    **Failure posture:** if rails are **open** but any required key is invalid/missing, the provider **MUST refuse** with a typed error; **do not** attempt partial requests or fallbacks.  
-* **Redaction rules (keys-only logs).** Never log secrets, request/response bodies, or header values. When secrets are referenced, print **redacted placeholders only** (e.g., `HD-Api-Key: REDACTED`). Labels remain bounded; **no PII**, **no free-text** payloads.  
+* **Environment-key drift is governance-relevant when it affects rails, secrets, or evidence.** A key-name mismatch, deprecated alias, ambiguous duplicate value, or missing canonical key is a governance-relevant operational risk when it can affect rails posture, secret handling, public/private boundary, acceptance evidence, or vendor request shaping. Treat that condition as configuration drift or tooling blockage, not as a reason to invent an acceptance token.  
+* **Redaction rules (keys-only logs).** Never log secrets, request/response bodies, or header values. When secrets are referenced, print **redacted placeholders only**. Labels remain bounded; **no PII**, **no free-text** payloads.  
 * **Deterministic diagnostics.** Configuration checks and refusal messages **MUST** be deterministic and order-neutral; **no** locale/time/random dependencies (run under `LC_ALL=C`).  
 * **CI checks.** Add tests that (a) **fail fast** on missing/empty env, (b) assert refusal posture with **no network I/O**, and (c) **grep-guard** logs to ensure no secrets or payload bodies appear.
 
@@ -1473,6 +1480,18 @@ Before execution, the task record and evidence MUST prove the exact command or a
 The evidence bundle MUST capture commands, stdout, stderr, exit codes, redacted environment presence, request summary, result summary, and checksum inventory in a secret-free posture. It MUST NOT persist plaintext secrets, header values, request or response bodies beyond the approved evidence shape, or vendor payload echoes.
 
 The result is `FAIL_TOOLING` if secret-bearing output is persisted. The result is `FAIL_BEHAVIOR` only when command, credentials, safe posture, source selection, target facts, and evidence shape are proven and the runtime behavior contradicts the expected vendor behavior. Open-rails success does not by itself claim QA PASS, Live QA completion, PF09 status change, epic closure, public Reader change, new route, new acceptance token, or PF-canon drainage.
+
+**Production-affecting epic live-proof requirement.** For any epic that can affect production surfaces, public or app-facing behavior, runtime compute, vendor ingest, HumanDesignAPI calls, external API integrations, database persistence or retrieval, DB bridge behavior, deployed service behavior, environment-variable or secret-binding behavior, request shaping, response mapping, authentication or authorization, production-used CLI/API behavior, queues, workers, jobs, schedulers, runtime services, or any path that must work outside isolated closed-rails fixtures, the Live QA Plan MUST include at least one bounded open-rails live QA step before acceptance unless an explicit approved exemption is recorded.
+
+Closed-rails tests, repo tests, static analysis, generated evidence artifacts, path-proof validation, Evidence Index refresh, Machine Mirror refresh, acceptance-map refresh, repository inspection, Codex audit, implementation review approval, QA Plan approval, PF10 supportability notes, a written smoke procedure, or OPS discovery without live behavior proof may support the QA package, but they do not replace the required open-rails live QA step for production-affecting work.
+
+The required live step must prove at least one real production-relevant behavior the epic could affect. It must be bounded, non-destructive unless explicitly approved, PO-authorized where secrets, external services, or deployed environments are involved, secret-safe, evidence-recorded, scoped to the actual production risk, clear about what it proves, and clear about what it does not prove.
+
+Open-rails live QA proves only what it exercises. It does not mint new acceptance tokens, satisfy unrelated tokens, prove full vendor conformance, move unrelated PF09 rows to Done, complete epic closeout, change public Reader scope, authorize new routes, or complete PF-canon drainage by itself.
+
+A Live QA Plan for a production-affecting epic is not approval-ready if it is closed-rails-only unless it records an explicit exemption. The exemption must state why open-rails live QA is omitted, who authorized the omission, what production claim is not being made, and whether a later open-rails QA step is required before closeout or release. This is a truth and proof requirement, not a formatting preference.
+
+Secret safety remains mandatory. Open-rails live QA may record key names, redacted values, header names, redacted header-shape posture, environment label, endpoint family, status class, safe redacted response excerpts, and bounded result classifications. It MUST NOT record raw API keys, raw bearer tokens, raw database passwords, raw request secrets, raw private payloads, unapproved unredacted vendor response bodies, or uncontrolled production data.
 
 **Controlled vendor-backed no-user validation.** When a remediation, OPS task, QA correction, or closeout review claims vendor-backed no-user behavior, PF04 distinguishes these proof classes:
 
@@ -4288,30 +4307,47 @@ In production, `/internal/version`:
 
 Existing SAFE rails, no-I/O refusal, typed error, keys-only logging, evidence-indexing, public Reader v1, and PO-only open-rails posture apply to HDAPI v2 vendor work. Plans, implementation guides, QA plans, reviews, acceptance maps, and closeout artifacts MUST distinguish contract-inventory proof, architecture update, closed-rails shaping proof, and PO-only open-rails vendor smoke.
 
+**HDAPI v2 response-envelope proof posture.** Response-envelope mapping proof may show that a governed vendor response shape preserves response type, success status, error-code posture, data identity posture, and route variant. That proof is not by itself a normalized-data-path proof, downstream BodyGraph compatibility proof, live vendor conformance proof, public Reader proof, open-rails smoke proof, or AI transformation proof.
+
+Response-envelope evidence must be governed, closed-rails unless explicitly scoped otherwise, and secret-safe. It MUST NOT persist raw vendor payload bodies, raw request bodies, raw response bodies, plaintext secrets, or unbounded vendor excerpts. If a schema or compatibility gap remains between chart data and existing internal BodyGraph-compatible flows, the evidence must record the gap plainly and MUST NOT hide it by inference.
+
 No vendor-v2-specific acceptance token may be claimed unless it exists in §2.0 or has been minted in PF10 pending drainage. HDE-FERM006 through HDE-FERM008 consume existing Governance tokens unless Governance explicitly registers a new token. If a future AI-related token is proposed, it is a separate PO-approved product decision outside HDAPI v2 conformance.
+
+**Future Glow app integration boundary.** HumanDesignAPI vendor acquisition, request shaping, auth/header handling, vendor response normalization, BodyGraph persistence and retrieval, and HD Engine computation remain HD Engine-governed responsibilities unless a future PF10 addendum or permanent PF canon explicitly approves a narrower exception. Glow app integration may request or consume HD Engine outputs through controlled integration surfaces, but it must not create a parallel HumanDesignAPI client, parallel credential path, parallel vendor request-shaping layer, parallel BodyGraph normalization layer, or direct app-side raw vendor persistence path by assumption.
+
+HumanDesignAPI credentials, geocode credentials, raw vendor auth headers, raw vendor request payloads, and raw vendor response payloads remain inside the HD Engine infrastructure and governance boundary unless an explicit future data contract authorizes a different exposure with security, privacy, evidence, and public/private-surface proof. App-facing or public-facing surfaces must receive normalized, app-safe outputs rather than ungoverned vendor secrets or raw vendor payloads.
 
 This conformance work does not authorize OpenAI, LLMs, AI agents, prompts, embeddings, chatbots, model calls, AI-provider credentials, AI-specific rails, AI evidence families, AI QA obligations, or Glow App AI features. Vendor AI/LLM-oriented documentation, including documentation-discovery files, may be used only as documentation-structure context and MUST NOT be interpreted as product or runtime scope.
 
+**HDAPI vendor boundary-proof governance.** A vendor-seam boundary proof is structural validation, not runtime conformance. It must prove that the vendor seam does not create a new HTTP home, bypass adapter guards, bypass the presenter boundary, introduce ad-hoc serialization, authorize external I/O inside pure compute modules, or silently change public Reader routes or public payloads.
+
+Boundary proof models must be conservative and fail closed. Unknown, unsupported, ambiguous, or unclassified current boundary behavior MUST NOT render as PASS. Public-route drift, presenter provenance drift, serializer drift, guard-provenance drift, external-I/O drift, evidence-family binding drift, or unsupported-scope claims must be classified explicitly before any PASS or supportable language may be used.
+
+A proof-model failure is a validation failure even when no live runtime failure has been proven. Boundary-proof evidence may support a later-drain or review posture only when it preserves its own non-claim boundaries and does not claim live vendor conformance, open-rails success, public Reader expansion, PF09 status movement, acceptance-token satisfaction, epic closure, or PF-canon drainage by itself.
+
 V2 endpoint bytes, auth names, request-body rules, response envelopes, rate-limit behavior, error mapping, and legacy-v1 fallback policy remain pending until their owning PF homes and governed evidence bind them. Existing v1 BodyGraph request shaping in this section MUST NOT be cited as v2 request shaping.
 
-### **11.1.1 Endpoint & method**
+### **11.1.1 Vendor route family, resource path, and base URL posture**
 
-* **Primary endpoint:** `POST /v1/bodygraphs` (JSON).  
-* **Alternate (optional):** `POST /v1/bodygraphs/simple` (feature-flagged; same headers/body).  
-* **Base URL resolution:** `${HDAPI_BASE_URL}` (must be present & non-empty; see §3.3).  
-* **Determinism:** URL construction is order-neutral (AB↔BA) and locale-neutral.
+* **Base URL resolution:** `HD_API_BASE_URL` is canonical. `HDAPI_BASE_URL` is deprecated compatibility spelling only where implementation or migration evidence explicitly records it. If both names are present with different values, the provider must fail closed with configuration ambiguity before network I/O.  
+* **Configured API-version boundary:** the vendor API version belongs to the configured base URL, not to hardcoded runtime route constants. Runtime request construction must append version-neutral resource paths only and must preserve any path prefix already present in `HD_API_BASE_URL`.  
+* **Governed resource paths:** current vendor request shaping distinguishes legacy BodyGraph resources `bodygraphs` and `bodygraphs/simple` from chart resources `charts`, `charts/simple`, and `charts/coordinates`. Legacy BodyGraph resources use the legacy BodyGraph auth posture. Chart resources use the Bearer auth posture.  
+* **Determinism:** URL construction is order-neutral and locale-neutral. Auth family must be represented by governed route metadata or contract metadata, not inferred from string checks for vendor API-version path segments.
 
-  ### **11.1.2 Canonical headers (dash-/case-exact)**
+### **11.1.2 Auth and geocode header posture**
 
-Send these verbatim; do not add others unless explicitly pinned here:
+Send only governed header families for the selected route family; do not add other vendor auth headers unless explicitly pinned here or in the owning byte-contract home:
 
 * `Accept: application/json`  
 * `Content-Type: application/json; charset=utf-8`  
-* `HD-Api-Key: <secret>`  
-* `HD-Geocode-Key: <secret>`  
-* `User-Agent: GlowHDEngine/<release_id>` (release\_id from §5.1)
+* `HD-Api-Key: REDACTED` for legacy BodyGraph resources only  
+* `Authorization: Bearer REDACTED` for chart resources  
+* `HD-Geocode-Key: REDACTED` when the governed route requires geocoding  
+* `User-Agent: GlowHDEngine/RELEASE_ID` where RELEASE\_ID is derived from §5.1
 
-**Redaction:** Never log header values; secrets **MUST** be redacted in diagnostics (keys-only posture; §7.1, §8.2).
+**Redaction:** header names and redacted header shapes may be recorded. Raw header values, raw Bearer token values, raw API key values, raw geocode key values, request bodies, response bodies, and vendor payload dumps MUST NOT be logged or persisted except inside an explicitly approved governed evidence shape.
+
+**Auth-family mismatch posture:** using `HD-Api-Key` for chart resources, using Bearer auth for legacy BodyGraph resources, omitting required geocode header posture, blurring the environment-variable name with the outbound header name, or deriving auth from a vendor API-version string is a governance-relevant request-shaping and secret-safety defect when it affects live vendor behavior, open-rails smoke, QA evidence, or acceptance claims.
 
 ### **11.1.3 Request body schema (exact three keys) \[Required-Now\]**
 

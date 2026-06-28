@@ -4,13 +4,13 @@
 
 **Title:** PF27-Canon-Plan-Templates
 
-**Version:** v1.8.9
+**Version:** v1.9.1
 
 **Status:** Canon
 
-**Effective date:** 2026-06-15
+**Effective date:** 2026-06-27
 
-**Last Update Gate:** BN 11.4.4 A13-14
+**Last Update Gate:** BN 11.7.4 A20-34
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -68,7 +68,21 @@ PF27 is the single PF home for **plan and runbook templates** used in the Glow p
   * evidence root normalization and per-run `QA_ROOT`,  
   * runbook check matrices and per-step blocks with explicit PASS/FAIL predicates.
 
- **Repository locus validation and file minting posture (hard).**
+ **Environment-variable and vendor-auth exactness (hard).**
+
+* Plans that depend on infrastructure variables MUST preserve exact key spelling and execution context. Do not collapse PO-supplied or source-supplied environment facts into vague `OPEN`, `TBD`, or generic “env var” placeholders when exact key names are known.  
+* For HumanDesignAPI base URL planning, use `HD_API_BASE_URL` as the canonical key. `HDAPI_BASE_URL` may appear only as deprecated drift, observed legacy state, or temporary compatibility notation. Plans MUST NOT silently normalize one spelling into the other.  
+* For HumanDesignAPI request-construction planning, treat the vendor API version as owned by configured `HD_API_BASE_URL`, not by runtime route constants, QA prompts, OPS instructions, evidence generator route definitions, plan examples, or Codex prompts. Plans MUST use version-neutral resource paths such as `charts`, `charts/simple`, and `charts/coordinates` when documenting active runtime request construction.  
+* Plans MUST NOT hardcode `/v1` or `/v2` as active route-construction inputs. Literal `/v1` and `/v2` strings may appear only when clearly classified as historical evidence text, artifact family name, non-runtime documentation or provenance, test input proving configurable version behavior, or legacy route-family label that does not drive active runtime URL construction.  
+* Plans MUST NOT infer runtime API-version authority from evidence-family names such as `artifacts/vendor/hdapi_v2/`.  
+* Auth-header selection MUST be described as contract-driven or route-metadata-driven, not inferred from `/v1` or `/v2` string inspection.  
+* For HumanDesignAPI secret-key planning, preserve `HD_API_KEY` and `GEO_API_KEY` as exact environment keys when those facts are in scope. `HD_API_KEY` is the environment secret projected into the relevant outbound vendor auth header; `GEO_API_KEY` supports geocoding where required. Plans MUST keep environment secret keys distinct from outbound header names.  
+* Environment key-name uncertainty MUST route through OPS discovery or OPS change posture rather than deferral when the fact can be safely discovered or corrected.  
+* Plans involving vendor request shaping MUST state version-specific auth-header posture when the distinction affects implementation or QA. Generic vendor-auth wording is not sufficient when current chart-style behavior and legacy BodyGraph behavior differ.  
+* When relevant, planning text MUST name the exact header family: current chart-style routes use `Authorization: Bearer` with the value redacted, and intentionally preserved legacy BodyGraph-style routes use `HD-Api-Key` with the value redacted. Geocode support, where required, uses `HD-Geocode-Key` with the value redacted.  
+* Plans MUST NOT record raw secret values, raw bearer tokens, raw API keys, private payload bodies, or unredacted vendor credential material.
+
+**Repository locus validation and file minting posture (hard).**
 
 * Validated references only. Plans MUST NOT include any repository path, module home, command, or uniqueness claim (for example, “only create\_app factory”) that cannot be confirmed via canon or repo inspection.
 
@@ -80,12 +94,14 @@ PF27 is the single PF home for **plan and runbook templates** used in the Glow p
 
   * IG Approved: quote the locus from the Implementation Guide Inventory (or other IG canon section) inside the plan.
 
-* CA vetted and IG Approved evidence MUST NOT be referenced as external attachments in downstream Codex prompts. If a plan needs the information, embed the quoted evidence in the plan and reference the plan section.
-
-* File minting is allowed. When a plan mints new files or new evidence outputs, it MUST name the exact repository paths and filenames that will be created and the exact primary evidence files that will be produced.
-
-* New roots and second homes are prohibited by default. Plans MUST NOT propose new top-level roots or alternate/duplicate locations for existing artifacts unless an ADR explicitly authorizes the new home and the PO approves the change.
-
+* CA vetted and IG Approved evidence MUST NOT be referenced as external attachments in downstream Codex prompts. If a plan needs the information, embed the quoted evidence in the plan and reference the plan section.  
+* Codex Audit observed evidence is also valid planning-time repo-reality support when a Codex Audit is explicitly supplied for the plan, review, implementation guide, remediation guide, or QA-prep artifact. The plan MUST embed the observation as a short quote or precise paraphrase, label it `Observed Evidence (Codex Audit)` or `Observed repo reality (Codex Audit)`, and keep the claim bounded to repo reality.  
+* Codex Audit observed evidence may support existing path, component, helper, test, artifact-family, and repo-locus claims. It does not prove acceptance-token satisfaction, QA PASS, OPS completion, PF09 status movement, epic closure, live vendor truth, external-system truth, or canon authority.  
+* A plan may label a path or component as `Existing: Observed Evidence — Codex Audit` only when the supplied audit observed that locus. If the audit says the locus was not found or unverified, the plan MUST NOT claim it exists.  
+* Codex-facing prompts may include embedded Codex Audit observations as planning context, but they MUST still direct Codex to verify current repo reality before editing or relying on the locus.  
+* If a Codex Audit observation is materially ambiguous, stale after later repo changes, or conflicts with PF10 or PF-Canon, record the conflict or freshness issue instead of treating the observation as settled proof.  
+* File minting is allowed. When a plan mints new files or new evidence outputs, it MUST name the exact repository paths and filenames that will be created and the exact primary evidence files that will be produced.  
+* New roots and second homes are prohibited by default. Plans MUST NOT propose new top-level roots or alternate/duplicate locations for existing artifacts unless an ADR explicitly authorizes the new home and the PO approves the change.  
 * Evidence is intentionally multi-root across established governed roots. Plans MUST NOT treat multi-root as drift by default. “Single-home” in evidence terms means a single authoritative catalog or index plus canonical path bindings (titles-only: PF12 — HDE-Schemas and Artifacts), not a single directory root.  
 * Dual-home patterns are allowed only within established governed roots and only when one path is explicitly declared as the source of truth and the other path is explicitly declared as a pointer or index.  
 * Source-of-truth artifacts are the governed catalogs, manifests, ledgers, and evidence bundles that bind acceptance to canonical paths. Documentation pointers (for example: link lists, summary indices, or anchor files) MAY exist in other roots, but MUST only point to the source-of-truth artifact and MUST NOT be treated as an independent truth home for acceptance.  
@@ -102,6 +118,17 @@ PF27 is the single PF home for **plan and runbook templates** used in the Glow p
 * Evidence output naming: plans must avoid wildcard or implied file path patterns and must state concrete filenames for primary governed evidence outputs. For high-churn logs, provide a manifest file path and a bundling rule that yields a stable evidence bundle.
 
 * Example (architecture audit incident): do not assume a new top-level `src/` root. If a plan claims a new root, it must be validated. In EPIC025 audits, HTTP adapter code was asserted to live under `adapter/` as the single home, and `src/` claims were treated as drift until proven.
+
+**Operational unknowns, deferral, OPS discovery, and open-rails posture (hard).**
+
+* Deferral is exception-only. A plan MUST NOT defer in-scope PF09.x work merely because operational, infrastructure, vendor, credential, environment, open-rails, or OPS-root facts are unknown when those facts can be safely discovered.  
+* Unknowns must be classified as exactly one of: discoverable by OPS, discoverable by PR, discoverable by QA, requires PO or Thoth decision, requires PF10 live rule, requires permanent canon update before safe execution, unsafe to discover now, out of scope, phase drift, or valid deferral.  
+* If a missing operational fact can be safely discovered, confirmed, or recorded by the PO, the plan MUST route a bounded OPS discovery task instead of deferring. The task must state the exact fact, why it matters, owner, secret involvement, what may be recorded, what must not be recorded, downstream dependency, and safe evidence or summary that resolves the unknown.  
+* Valid deferral requires explicit justification tied to approved scope, phase drift, missing PO or Thoth decision, unadmitted acceptance token, unauthorized mutation or live execution, unsafe secret handling, unmet prerequisite PR or OPS result, unsafe discovery, required invention, or unresolved canon contradiction not bridgeable by PF10.  
+* Open-rails testing may be included in Implementation Plans, QA Plans, and remediation guides when needed to prove or discover live vendor reachability, endpoint availability, auth posture, credential binding, config keys, base URL posture, request or response compatibility, account or tier behavior, rate-limit or retry behavior, vendor error-envelope behavior, integration viability, or QA acceptance posture that cannot honestly be proven closed-rails only.  
+* Open-rails work must be bounded, PO-authorized, secret-safe, and evidence-recorded. It must not expose secrets, perform uncontrolled production mutation, probe vendors open-endedly, expand public Reader scope, create a new HTTP home, mint acceptance tokens, or treat a narrow smoke as full conformance.  
+* An open-rails failure is not automatically a product failure. Plans and reviews must classify whether the failure indicates credential, config, vendor account or tier, endpoint availability, vendor contract, request shaping, response mapping, infrastructure, rate-limit, external outage, implementation, or QA-plan expectation posture before assigning behavior failure.  
+* OPS discovery and OPS open-rails tasks are first-class plan items. They may support implementation or QA, but they do not by themselves claim QA PASS, acceptance-token satisfaction, PF09 Done status, OPS completion beyond the bounded task, or epic closure.
 
 Template-safe placeholders and ellipsis prohibition (hard).
 
@@ -224,6 +251,30 @@ This plan explicitly excludes:
 * \[LIST CONTINUES\]
 
 #### PF10 overrides / conflicts (if any)
+
+### **Open-Rails Live QA Requirement for production-affecting epics**
+
+A Live QA Plan for a production-affecting epic MUST include at least one bounded open-rails live QA step, or an explicit authorized exemption.
+
+Production-affecting scope includes work that can affect production surfaces, public or app-facing behavior, runtime compute, vendor ingest, HumanDesignAPI calls, external API integrations, database persistence, database retrieval, DB bridge behavior, deployed service behavior, environment-variable or secret-binding behavior, request shaping, response mapping, authentication or authorization behavior, public Reader behavior, CLI/API behavior used in production, queues, workers, jobs, schedulers, runtime services, or any path that must work outside isolated closed-rails fixtures.
+
+The required open-rails live QA step MUST identify:
+
+* the production-relevant behavior being proved,  
+* the live target or PO-approved live target,  
+* the rails posture,  
+* the secret-safety posture,  
+* the evidence to capture,  
+* what the live step proves,  
+* what the live step does not prove.
+
+Closed-rails tests, fixture replay, static analysis, generated evidence, path-proof validation, Evidence Index refresh, Machine Mirror refresh, acceptance-map refresh, repository inspection, Codex audit, PF10 supportability notes, implementation review approval, QA Plan approval, unrun smoke procedures, and OPS discovery without live behavior proof do not satisfy this requirement by themselves.
+
+The open-rails live QA step must be bounded, non-destructive unless explicitly approved, PO-authorized where secrets, external services, or deployed environments are involved, secret-safe, evidence-recorded, scoped to the epic’s actual production risk, and explicit about proof limits.
+
+A Live QA Plan may omit open-rails live QA only with explicit exemption language. The exemption MUST state why open-rails live QA is omitted, who authorized the omission, what production claim is not being made, and whether a later open-rails QA step is required before closeout or release.
+
+A reviewer MUST NOT approve a closed-rails-only Live QA Plan for a production-affecting epic unless the plan includes explicit authorized exemption language.
 
 List each as:
 
@@ -1367,7 +1418,9 @@ Prompts:
 
   * If reusing an existing surface: explain why reuse is safe and preferred (and what safeguards apply).
 
-* **Backward-compat posture:** State what remains unchanged by default, what changes for existing users, and any rollout or migration posture needed to avoid accidental breaking changes.
+* **Backward-compat posture:** State what remains unchanged by default, what changes for existing users, and any rollout or migration posture needed to avoid accidental breaking changes.  
+* **Vendor-call ownership for Glow app integration:** If an epic or implementation plan involves Glow app integration, it MUST state which component owns vendor calls, BodyGraph persistence and retrieval, and HD Engine compute. The default planning posture is that the HD Engine owns vendor acquisition, persistence-facing behavior, retrieval-facing behavior, and compute-facing behavior; app shell responsibilities must be distinguished from HD Engine responsibilities.  
+* **Direct app vendor calls:** Any plan proposing direct app-side vendor calls or bypass of the HD Engine vendor seam requires explicit ADR justification and must name the secret boundary, app-to-engine contract boundary, and raw vendor-data boundary.
 
 Review posture:
 
@@ -1813,7 +1866,9 @@ Token hygiene examples:
 
 ##### **B. Close-pack baseline declared (planning gate)**
 
-* The Epic Plan MUST explicitly list the required close-pack artifacts (titles-only) for the epic close stage.
+* The Epic Plan MUST explicitly list the required close-pack artifacts (titles-only) for the epic close stage.  
+* Close-stage baseline surfaces MAY be listed in the Epic Plan at planning level without turning the Epic Plan into a QA runbook. The plan MUST keep QA commands, step logs, operator procedures, and runbook execution detail out of the Epic Plan unless a separate QA artifact explicitly owns them.  
+* Missing close-stage execution detail in an Epic Plan is not, by itself, a valid reason to defer implementation or QA. The plan must preserve the required close-pack baseline while routing execution detail to the owning QA, OPS, or closeout artifact.
 
 * At minimum, the close-pack baseline MUST include:
 

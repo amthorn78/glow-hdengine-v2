@@ -3,12 +3,12 @@
 ## 0.1 **Header**
 
 **Title:** PF14-Canon-HDE-Mechanics-Guide  
-**Version:** v3.3.7
+**Version:** v3.3.9
 
 **Status:** Canon  
-**Effective date:** 2026-06-15
+**Effective date:** 2026-06-27
 
-**Last Update Gate:** BN 11.4.4 A13-14  
+**Last Update Gate:** BN 11.7.4 A20-34  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
 ---
@@ -177,6 +177,10 @@ Non-task posture. This audit-classification note creates no new token, no new HD
 
 PF23 audit classification posture. Mechanics observations drawn from Reality Audits or other repo-reality audits MUST be routed to the owning PF canon home by subject. Such observations MUST NOT be converted into HDE-Build Checklist task deltas, implementation scope, remediation scope, OPS scope, evidence homes, or acceptance-token obligations by assumption. A PO or later canon decision is required before any such observation becomes executable work.
 
+Operational unknowns and OPS discovery posture. Mechanics planning MUST distinguish discoverable operational facts from real mechanics or design gaps. Missing environment, credential, base-url, vendor-account, endpoint-family, open-rails, or OPS-root facts are not mechanics gaps by themselves when they can be safely discovered by a bounded PO-run OPS task. This guide may describe the mechanical dependency and fail-closed behavior required around the unknown, but it MUST NOT convert the unknown into a deferral, acceptance token, PF09 status movement, implementation scope, QA PASS claim, OPS completion claim, or closure proof by itself.
+
+Codex Audit repo-reality posture. Codex Audit observations may identify current mechanics or component surfaces for planning, existing-locus support, reuse posture, and implementation scoping. They remain repo-reality observations. PF14 remains the mechanics authority; Codex Audit evidence does not prove QA PASS, OPS completion, acceptance-token satisfaction, PF09 drainage, runtime conformance, or canon authority.
+
 HDAPI v2 vendor conformance mechanics posture (pending, mechanics-only). HumanDesignAPI v2 conformance is pending until the owning Fermentation checklist rows are implemented and evidenced. This guide does not declare the HDE runtime v2-conformant, does not define vendor bytes, does not assign PF09 statuses, and does not create acceptance tokens. It defines the mechanical capabilities the repo must provide so the owning PF homes can later prove conformance.
 
 HDAPI v2 source and contract inventory mechanics. The repo MUST provide a governed vendor-contract inventory workflow for HumanDesignAPI v2 and legacy v1. That workflow MUST:
@@ -197,8 +201,19 @@ HDAPI v2 vendor seam mechanics. The repo MUST provide one sanctioned vendor seam
 
 HDAPI v2 request-shaping and response-mapping mechanics. The repo MUST provide deterministic request-shaping and response-mapping proofs for the pending v2 vendor path. These mechanics MUST:
 
-* Derive v2 endpoint selection, auth-header use, geocode-key handling, and request-body shaping from governed contract inventory and the owning bytes document, not from guesses.  
+* Use `HD_API_BASE_URL` as the canonical mechanics-facing HumanDesignAPI base URL key. `HDAPI_BASE_URL` is deprecated drift and MUST NOT be used as canonical mechanics language.  
+* If temporary compatibility fallback is implemented, resolve base URL configuration canonical-first: read `HD_API_BASE_URL`; read deprecated `HDAPI_BASE_URL` only when the canonical key is absent; use the canonical value when both exist and match; fail closed with configuration ambiguity when both exist and differ.  
+* Treat `HD_API_BASE_URL` as owning the vendor API version and any configured path prefix. Runtime request construction MUST preserve the configured prefix and append only version-neutral resource identifiers.  
+* Runtime request construction MUST NOT hardcode `/v1` or `/v2` as active route-construction constants, append versioned vendor paths to `HD_API_BASE_URL`, double-prefix configured versions, normalize away configured prefixes, or infer runtime behavior from vendor API version path strings.  
+* Versioned vendor endpoint strings MAY remain as source inventory, contract provenance, historical evidence, artifact-family naming, test input, or non-driving legacy labels. They MUST NOT drive active runtime URL construction.  
+* Route-family auth selection MUST be represented as route metadata or contract metadata. It MUST NOT be inferred by checking whether a path starts with `/v1` or `/v2`.  
+* Evidence generators and tests for this mechanics family MUST prove configured-base path preservation, no double-version prefix, route-metadata auth, and no-live-vendor or no-public-Reader-change posture where the proof family claims those predicates.  
+* Derive endpoint selection, base-url use, auth-header use, geocode-key handling, and request-body shaping from governed contract inventory and the owning bytes document, not from guesses.  
+* Project `HD_API_KEY` into `Authorization` Bearer auth for HumanDesignAPI v2 chart routes.  
+* Project `HD_API_KEY` into `HD-Api-Key` auth for legacy HumanDesignAPI v1 BodyGraph routes.  
+* Project `GEO_API_KEY` into `HD-Geocode-Key` only where the governed route requires geocoding.  
 * Preserve v1 BodyGraph behavior as explicit legacy behavior until the owning architecture and byte-contract homes decide whether v1 remains a fallback or is retired.  
+* Keep source-selection and response-mapping mechanics from collapsing v1 and v2 auth behavior, route-family identity, or evidence posture into a generic vendor-auth path.  
 * Map the standard v2 response envelope into HDE internal structures only after the mapping is proven.  
 * Prove whether v2 response data can feed the existing BodyGraph cache and compat input path, or identify that a schema update is required in the owning schema home.  
 * Preserve the public Reader contract. No public Reader byte change is implied by this mechanics posture.
@@ -231,11 +246,16 @@ HDAPI v2 evidence generators MUST fail closed when:
 * Required path-proof, Human Index, or Machine Mirror binding is absent for governed evidence.  
 * Closed-rails proof attempts outbound I/O.  
 * Open-rails evidence is not PO-executed, secret-safe, and governed.  
+* Any AI, OpenAI, LLM, AI-agent, prompt, embedding, chatbot, model-call, AI-provider credential, AI rails, or AI evidence family is introduced under this conformance work.  
 * Any AI, OpenAI, LLM, AI-agent, prompt, embedding, chatbot, model-call, AI-provider credential, AI rails, or AI evidence family is introduced under this conformance work.
 
-AI boundary for HDAPI v2 mechanics. OpenAI will not be used inside the HD Engine under this conformance work. AI remains a Glow development tool only. No mechanics, generator, QA harness, vendor seam, config key, evidence family, acceptance posture, or architecture flow may infer OpenAI, LLM, AI-agent, prompt, embedding, chatbot, model-call, or AI-enablement scope from HumanDesignAPI documentation.
+HDAPI adapter/presenter boundary-proof mechanics. Boundary-proof mechanics for the HDAPI vendor seam MUST use a conservative, fail-closed posture. Unknown public routes, response-producing paths, serializer paths, external-I/O paths, guard provenance, presenter provenance, adapter route registrations, or evidence-binding postures MUST NOT be silently treated as PASS.
 
-HDE-EPIC031 PR-01 provider-gate proof family observed (records-only). PF14 records these paths as the observed PR-01 proof family for the completed provider-gate slice. This is a records-only closure trace for HDE-EPIC031 PR-01 and does not pin future HDAPI v2 conformance paths.
+Analyzer and renderer separation. Boundary analysis MUST be separated from governed evidence rendering. The analyzer owns boundary truth classification and should return explicit findings, unknowns, public-route deltas, responder provenance, serializer findings, external-I/O findings, guard provenance, evidence-family bindings, and verdict status. The evidence renderer may render analyzer output into governed artifacts, path proofs, and index or mirror rows, but MUST NOT independently decide architecture-boundary truth.
+
+Boundary taxonomy mechanics. The boundary proof MUST use a table-driven taxonomy and invariant suite that covers route registration surfaces, public route signatures, response-producing paths, presenter-valid paths, presenter-bypass paths, serializer families, external-I/O families, import and alias forms, cross-file helper chains, vendor guard provenance, pure-compute forbidden operations, public/internal route classification, and evidence-family binding for the applicable PR proof family. Missing or unsupported taxonomy categories must remain visible as unknown or fail-closed outcomes, not be hidden by a PASS renderer.
+
+AI boundary for HDAPI v2 mechanics. OpenAI will not be used inside the HD Engine under this conformance work. AI remains a Glow development tool only. No mechanics, generator, QA harness, vendor seam, config key, evidence family, acceptance posture, or architecture flow may infer OpenAI, LLM, AI-agent, prompt, embedding, chatbot, model-call, or AI-enablement scope from HumanDesignAPI documentation.
 
 Observed PR-01 paths include:
 
@@ -3726,7 +3746,9 @@ Controlled vendor-backed no-user smoke posture.
   * command target: `hdctl showcompat`  
   * data source: `\--source vendor`  
   * execution context: PO-controlled terminal with `hdctl` available  
-  * vendor binding: `HDAPI_BASE_URL`  
+  * vendor binding: `HD_API_BASE_URL`  
+  * deprecated vendor binding, if compatibility fallback is still present: `HDAPI_BASE_URL` as legacy drift only  
+  * vendor base-url ambiguity handling: if canonical and deprecated values both exist and differ, fail closed before vendor execution  
   * vendor credential presence: `HD_API_KEY`  
   * geocoding credential presence, if required by the command path: `GEO_API_KEY`  
   * deterministic capture pins: `LC_ALL=C`, `LANG=C`, `TZ=UTC`  
@@ -3743,7 +3765,7 @@ OPS-02 command and preflight requirements.
 * The command MUST contain `\--source vendor`.  
 * The execution wrapper MUST set `SAFE_MODE=0` and `ALLOW_NETWORK=1` for the vendor command only.  
 * The execution wrapper MUST set `APP_ENV=dev`, `LC_ALL=C`, `LANG=C`, and `TZ=UTC`.  
-* `redacted_env_presence.json` MUST record presence booleans for `HDAPI_BASE_URL`, `HD_API_KEY`, and `GEO_API_KEY` as applicable.  
+* `redacted_env_presence.json` MUST record presence booleans for `HD_API_BASE_URL`, `HD_API_KEY`, and `GEO_API_KEY` as applicable. If deprecated `HDAPI_BASE_URL` is present during a compatibility window, the evidence may record its presence as legacy drift or fallback evidence, but MUST NOT treat it as the canonical base-url key.  
 * `request_summary.txt` MUST record PO authorization before the command runs.  
 * If `audit/ops/hde-epic030/ops-01/vendor_command_candidate.txt` contains the unresolved sentinel, OPS-02 MUST stop as TOOLING\_BLOCKED.
 
@@ -4283,6 +4305,8 @@ Policy (env-aware).
 * SAFE rails. SAFE rails apply in all environments; rails posture and acceptance tokens are owned by HDE-Governance (titles-only).
 
 BodyGraph I/O seam (normative). Mechanics treats BodyGraph resolution and ingest as a sanctioned I/O seam that is distinct from deterministic core compute.
+
+HD Engine ownership for Glow app integration. Vendor acquisition, BodyGraph persistence, BodyGraph retrieval, and HD computation remain HD Engine mechanics. Glow app integration consumes HD Engine outputs through controlled integration surfaces; it must not duplicate HumanDesignAPI vendor-client behavior, vendor normalization mechanics, raw vendor credential handling, or canonical raw BodyGraph persistence in the app layer unless a future ADR and owning canon explicitly change that boundary.
 
 Canonical seam location (implementation boundary). BodyGraph vendor and DB I/O is permitted only within the BodyGraph seam (currently implemented under engine/bodygraph/ in this repo). This seam is not part of the deterministic Engine Core or sampler core.
 

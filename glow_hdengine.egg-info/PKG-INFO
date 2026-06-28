@@ -7,7 +7,7 @@ Description-Content-Type: text/markdown
 License-File: LICENSE
 Dynamic: license-file
 
-# Glow HD Engine — HDE-EPIC033 final repo-docs sweep
+# Glow HD Engine — HDE-EPIC034 final repo-docs sweep
 
 The Glow HD Engine is a deterministic Human Design engine and CLI that emits governed, canonically serialized bytes. PF-Canon remains authoritative (titles only: PF05 — CLI/API/Vendor Ref, PF12 — Schemas & Artifacts, PF14 — Mechanics Guide, PF19 — QA Guide, PF20 — Phased Epics).
 
@@ -39,6 +39,13 @@ The Glow HD Engine is a deterministic Human Design engine and CLI that emits gov
   - DB parity/fallback posture evidence includes `tools/evidence/generate_db_bridge_parity.py`, provider parity proof `artifacts/db_bridge/provider_parity.proof.json`, non-dev typed failure artifact `artifacts/runtime/env_connectivity.nondev_failure.json`, and OPS-01 closure decision evidence at `audit/ops/hde-epic032/db-provider-parity/provider_parity_closure_decision.json`.
   - Proof labels `DB_PROVIDER_PARITY_OK`, `DB_BRIDGE_CAPS_OK`, and `DB_BRIDGE_FALLBACK_OK` are documented as evidence proof labels (non-acceptance-token labels in current repo posture), while `DEV_DB_BRIDGE_FALLBACK_OK` remains the acceptance token for dev bridge fallback scope.
   - Scope boundaries remain explicit: no public Reader route/flag/payload-field change, no narrative prose-generation contract, and no HDAPI v2 conformance claim introduced by EPIC032 docs.
+
+- What HDE-EPIC034 adds for Fermentation Pass 5:
+  - HDE-EPIC034 extends the HumanDesignAPI evidence posture from contract inventory into repo-supported source selection, request shaping, response-envelope mapping, adapter/presenter boundary proof, closed-rails deterministic shaping/refusal proof, and PR-06 binding of bounded OPS-02 smoke evidence.
+  - Vendor API version ownership is configuration-owned: `HD_API_BASE_URL` owns the versioned vendor base URL, while runtime route resources remain version-neutral (`charts`, `charts/simple`, `charts/coordinates`, plus legacy `bodygraphs` / `bodygraphs/simple` where intentionally preserved). `HDAPI_BASE_URL` is only a compatibility alias when `HD_API_BASE_URL` is absent.
+  - V2 chart-style routes use `Authorization: Bearer <redacted>`; legacy BodyGraph-style routes use `HD-Api-Key: <redacted>`. Auth selection is contract/metadata driven, not inferred from `/v1` or `/v2` string inspection.
+  - Evidence anchors include `artifacts/vendor/hdapi_v2/source_selection.snapshot.json`, `request_shaping.snapshot.json`, `response_mapping.snapshot.json`, `adapter_boundary_proof.log`, `closed_rails_refusal.txt`, `audit/qa/hde-epic034/pr-01/` through `audit/qa/hde-epic034/pr-06/`, `audit/ops/hde-epic034/ops-02/`, `docs/acceptance_map_epic034.json`, `audit/docdeltas/hde-epic034_doc_deltas.md`, and `audit/qa/hde-epic034/00_meta/doc_deltas.md`.
+  - OPS-02 was a bounded PO-authorized open-rails HumanDesignAPI v2 smoke for `charts/coordinates`, retained as secret-safe evidence and bound by PR-06 for HDE-FERM008.2 support only. This docs sweep does not run OPS, rerun live vendor calls, or claim HDE-FERM008 parent completion, HDE-FERM008.3/.4/.5, full HumanDesignAPI v2 runtime conformance, public Reader changes, a new HTTP home, public transport changes, or AI scope.
 
 - What HDE-EPIC033 adds for Fermentation Pass 4 / PR-01:
   - HDE-EPIC033 PR-01 adds a governed HumanDesignAPI v2 and legacy v1 contract-inventory evidence family for HDE-FERM006.1 through HDE-FERM006.4. It does not implement or claim HumanDesignAPI v2 runtime request shaping, runtime source selection, live conformance, open-rails vendor smoke, public Reader changes, a new HTTP home, or AI scope.
@@ -108,8 +115,9 @@ SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC hdctl aux-preview --pair-file
 - Use the determinism helper (`engine.runtime.determinism_env.ensure_determinism_env`) or `ci/checks/check_env_pins.sh` to confirm pins.
 - Release identity validation (closed rails): `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python scripts/release_id_recompute.py --check` (canonical bytes + fail-closed recompute), `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python ci/checks/check_release_identity.sh` (identity gate; Python entrypoint in CI), and `SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python tools/evidence/run_sanity_pipeline.py` (runs the gate plus deterministic suites). Evidence outputs: `artifacts/math/release_id.txt` (release_id), `artifacts/math/release_id_recompute.log` (recompute trace), `artifacts/math/checksums_audit.log` (manifest file audit), `artifacts/math/manifest_snapshot.json` (evidence-only summary), and `artifacts/proofs/env_pins.txt` (rails proof). `--check` writes the recompute log/sha sidecar; keep a clean workspace for governed artifacts.
 
-## Evidence & QA (EPIC030 + prior epics)
+## Evidence & QA (EPIC034 + prior epics)
 
+- EPIC034 governed evidence families: source-selection/v1 isolation (`audit/qa/hde-epic034/pr-01/`, `artifacts/vendor/hdapi_v2/source_selection.snapshot.json`, `v1_legacy_guard.log`), request shaping (`pr-02/`, `request_shaping.snapshot.json`), response-envelope mapping (`pr-03/`, `response_mapping.snapshot.json`), adapter/presenter boundary proof (`pr-04/`, `adapter_boundary_proof.log`), closed-rails deterministic shaping/refusal proof (`pr-05/`, `closed_rails_refusal.txt`), and PR-06 OPS-02 binding (`pr-06/`, `audit/ops/hde-epic034/ops-02/`).
 - Evidence skeleton (update in the same PR whenever governed bytes change): `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, `artifacts/evidence_index.jsonl` (+ `.path_proof.txt` siblings). Refresh with `python tools/evidence/update_evidence_index.py` → `python tools/evidence/orientation_demo.py` → their `--check` variants → `ci/checks/check_mirror_schema.sh` (entrypoints in `tools/evidence/` and `ci/checks/`).
 - EPIC031 governed SAFE rails evidence families (implementation-slice artifacts, not close-pack outputs): PR-01 provider-gate policy under `audit/qa/hde-epic031/pr-01/` plus `artifacts/vendor/`; PR-02 keys-only vendor log posture under `audit/qa/hde-epic031/pr-02/`; PR-03 evidence/index coherence under `audit/qa/hde-epic031/pr-03/`. All governed artifacts have per-file `.path_proof.txt` siblings and Index/Mirror rows.
 - EPIC030 governed evidence families (implementation-slice artifacts, not close-pack outputs): `audit/qa/hde-epic030/pr-01/`, `audit/qa/hde-epic030/pr-02/`, `audit/qa/hde-epic030/pr-03/`, `audit/qa/hde-epic030/pr-04/`, `audit/qa/hde-epic030/pr-05/` (all with per-file `.path_proof.txt` siblings).

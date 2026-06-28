@@ -6,10 +6,10 @@
 
 **Status:** Canon
 
-**Version:** v2.7  
-**Effective date:** 2026-06-15
+**Version:** v2.7.2  
+**Effective date:** 2026-06-27
 
-**Last Update Gate:** BN 11.4.4 A13-14
+**Last Update Gate:** BN 11.7.4 A20-34
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -1427,6 +1427,14 @@ Codespaces MAY temporarily act as a vendor client (for example, by setting SAFE\
 
 For non-vendor behavior (serializer determinism, guards, sanity pipeline, closed-rails tests), Codespaces MUST NOT be used as a surrogate “prod” environment in PO Live QA. Those checks remain in the CI/QA/infra domain and are out of scope for PO Live QA sessions.
 
+Production-affecting Live QA minimum is as follows.
+
+For any epic that can affect real production functionality, deployed runtime behavior, external integrations, vendor ingest, DB persistence or retrieval, public or app-facing behavior, runtime request or response behavior, compute used by production, or secret or environment binding, the Live QA Plan MUST include at least one bounded open-rails live QA step that proves a real production-relevant behavior in the deployed or live environment.
+
+Closed-rails proof remains required where applicable, but closed-rails proof alone is not sufficient for a production-affecting epic unless the plan records an explicit authorized exemption. A valid exemption must state why open-rails live QA is not safe or not applicable, what closed-rails proof remains available, what production claim is not being made, and what follow-up is required before the omitted production-facing claim can be made.
+
+The open-rails live QA step must be scoped, PO-authorized, secret-safe, mechanically evidenced, and clear about what it proves and does not prove. It must not rely only on mocked fixtures, closed-rails replay, static analysis, generated artifacts, documentation review, repo-local inspection, PF09 supportability language, or a written but unexecuted smoke procedure.
+
 ### **3.5.7 Vendor vs non-vendor steps in Live QA plans**
 
 Any Live QA Guide or QA Plan for an epic MUST:
@@ -1476,12 +1484,20 @@ All vendor-focused PO artifacts remain subject to the same evidence rules as oth
 * HDAPI v2 QA plans MUST distinguish at least these proof classes: contract-inventory proof, source-precedence and artifact-sanity proof, v2 request-shaping proof, v2 response-normalization proof, closed-rails refusal and deterministic shaping proof, PO-only open-rails vendor-smoke proof, v2 error, retry, and rate-limit mapping proof, and evidence-index plus path-proof coherence.  
 * Source-precedence proof MUST treat validated v2 and v1 YAML specifications as first-order vendor-contract evidence, rendered endpoint pages as second-order evidence, and high-level guide pages as third-order evidence. Suspect artifacts, including an advertised OpenAPI artifact that fails domain, title, server, or path-family validation, MUST be quarantined and MUST NOT define vendor bytes, QA obligations, or architecture conformance.  
 * QA must preserve v2 and v1 distinction. Vendor conformance proof MUST distinguish recommended v2 chart routes from legacy v1 BodyGraph routes, and MUST NOT silently collapse v2 chart behavior into legacy BodyGraph assumptions. Exact endpoint bytes, auth header names, request-body fields, response-envelope bytes, and credential names remain routed to their single homes.  
+* HDAPI vendor QA plans MUST use `HD_API_BASE_URL` as the canonical HumanDesignAPI base URL key. QA may check for `HDAPI_BASE_URL` only as deprecated alias, compatibility fallback, migration evidence, or drift evidence. QA MUST NOT treat `HDAPI_BASE_URL` as canonical. If `HD_API_BASE_URL` and `HDAPI_BASE_URL` both exist with conflicting values, QA must classify the result as configuration ambiguity, not product behavior failure.  
+* HDAPI v2 request-shaping proof and v2 open-rails smoke proof MUST distinguish auth-header family. QA may record that v2 chart routes used the `Authorization` Bearer header family, that legacy v1 BodyGraph routes used the `HD-Api-Key` header family, and that `HD-Geocode-Key` was present when geocoding was required. QA MUST NOT record raw header values, raw API keys, raw bearer token values, or unredacted vendor secrets.  
+* A wrong auth-header family is a request-shaping or auth setup failure, not vendor unavailability. If a v2 chart route is tested with the legacy `HD-Api-Key` header family, classify the finding as request-shaping or OPS setup failure. If a legacy v1 BodyGraph route is tested with the Bearer header family without an explicit future canon decision, classify the finding as legacy request-shaping or OPS setup failure.  
+* HDAPI versioning proof must treat `HD_API_BASE_URL` as the owner of the vendor API version boundary. QA plans, OPS instructions, evidence generators, tests, and review prompts MUST NOT require hardcoded active runtime route-construction constants such as `/v1/bodygraphs`, `/v2/charts`, `/v2/charts/simple`, or `/v2/charts/coordinates`. Runtime proof should expect version-neutral resource paths such as `bodygraphs`, `bodygraphs/simple`, `charts`, `charts/simple`, and `charts/coordinates`, joined to the configured base URL without discarding, replacing, double-prefixing, or reinterpreting the configured base path.  
+* Literal `/v1` and `/v2` strings are allowed only when classified as historical evidence text, artifact-family name, non-runtime documentation or provenance, test input proving configurable version behavior, or legacy route-family label that does not drive active runtime URL construction. If a remaining `/v1` or `/v2` string participates in active runtime URL construction, auth-header selection, QA prompt expectations, evidence-generator route construction, or test route construction, QA must classify it as architecture drift unless a later owning canon decision explicitly permits it.  
 * Closed-rails HDAPI v2 proof shows deterministic source selection, request shaping, typed refusal, and no DNS, socket, HTTP, or other external I/O under closed rails. Closed-rails refusal proof is not a substitute for PO-authorized open-rails vendor conformance when live vendor behavior is the claim.  
 * Open-rails HDAPI v2 vendor smoke is PO-only execution, IA-guided. Automated agents may define intent, safety rails, success criteria, evidence requirements, and rollback intent, but MUST NOT execute the vendor call, handle plaintext secrets, or claim completion without PO-run evidence.  
 * Open-rails HDAPI v2 smoke evidence MUST be secret-safe and mechanically reviewable. At minimum, QA or OPS evidence must preserve command provenance, stdout, stderr, exit code, redacted or presence-only environment posture, request summary, result summary, classification, and checksum or path-proof coverage. OPS evidence is not QA evidence unless the governing QA plan explicitly defines how it feeds QA evaluation.  
 * HDAPI v2 response-normalization proof MUST show that the v2 response envelope can feed the existing HDE BodyGraph, cache, compatibility, sampler, or admin paths without changing public Reader bytes or leaking admin-only data. If v2 response data cannot truthfully map into the existing model, QA MUST record a schema or adapter mapping gap rather than smoothing it over by inference.  
 * HDAPI v2 error, retry, and rate-limit proof MUST avoid vendor payload echo, avoid secrets in logs, preserve deterministic typed errors, and bind any governed snapshots through the Human Evidence Index, Machine Mirror, and path-proof discipline before a token or closeout claim depends on them.  
 * QA plans MUST NOT guess unresolved vendor-conformance facts. Unknown epic or card assignment, missing credential or config key names, unresolved v1 legacy fallback or retirement posture, absent vendor-v2 token registration, or unproven v2 response schema mapping MUST remain an open decision, doc-delta item, or `TOOLING_BLOCKED` prerequisite rather than a `PASS` claim or `FAIL_BEHAVIOR` result.  
+* Discoverable operational unknowns for HDAPI v2 QA MUST be classified before deferral. If a missing vendor, credential, config-key, base-url, endpoint-family, account-tier, route-family, open-rails, or OPS-evidence fact can be safely discovered by the PO through bounded OPS discovery, the QA Plan or QA-readiness artifact MUST route that discovery as a dependency instead of treating the fact as automatic deferral, `PASS`, `FAIL_BEHAVIOR`, or product failure. A bounded OPS discovery task must state the exact fact to discover, why it matters, who owns discovery, whether secrets are involved, what may be recorded, what must not be recorded, the downstream PR, QA, OPS, or planning item that depends on it, and the safe evidence or summary that resolves the unknown.  
+* Open-rails QA is allowed when live operational verification is necessary for the proof. A QA Plan may include a bounded PO-run OPS open-rails task for live vendor reachability, endpoint availability, credential-binding confirmation, account or tier posture, error-envelope confirmation, open-rails versus closed-rails contrast, or other acceptance evidence that cannot honestly be proven closed-rails only. The task MUST be PO-authorized, secret-safe, scoped to the narrow question, and mechanically evidenced. It MUST NOT become uncontrolled vendor probing, public Reader expansion, a new HTTP home, a new acceptance token, or a broader runtime-conformance claim.  
+* An open-rails failure is not automatically a product behavior failure. QA MUST classify the failure before acting. Valid classifications include credential issue, config issue, vendor account or tier limitation, endpoint unavailability, vendor contract mismatch, request-shaping defect, response-mapping defect, infrastructure gap, rate-limit or retry posture, external outage, product implementation defect, or QA plan expectation mismatch. Do not collapse those categories into a single `FAIL_BEHAVIOR` result without proof.  
 * No vendor-v2-specific acceptance token may be claimed unless it exists in HDE-Governance or is explicitly minted in HDE-Build Notes pending drainage. Existing token names may be consumed only with their canonical meanings.  
 * HDAPI v2 conformance work does not create a public Reader route and does not change Reader v1 bands-only, numeric-free posture.  
 * OpenAI, LLMs, AI agents, prompts, embeddings, chatbots, model calls, and AI enablement are outside HD Engine and Glow App runtime scope for this conformance work. Vendor documentation-discovery files such as `llms.txt` or `llms-full.txt`, and any vendor page written for AI or LLM consumers, may be used only as documentation-structure context. They MUST NOT create AI-provider config keys, credentials, rails, evidence families, acceptance tokens, QA obligations, architecture flows, or product/runtime work.
@@ -1637,6 +1653,14 @@ Before finalizing any Live QA plan for an epic, the Implementation Agent (or QA 
 * Prevent path/CLI drift between PF-Canon and the **running repo snapshot**.  
 * Ensure Live QA plans reflect actual tools, configs, ignore rules, and governed artifacts that exist in the repo at the time of planning.  
 * Produce mechanical planning evidence under `audit/qa/<epic-id>/…` that later reviewers can consult.
+
+**Codex Audit observed evidence (planning-time only)**
+
+A supplied Codex Audit may support QA planning context and pre-QA repo-reality framing for existing paths, components, tests, helpers, evidence helpers, governed artifacts, index or mirror files, and expected loci that QA should later verify. Acceptable labels include “Observed Evidence (Codex Audit)” and “Observed repo reality (Codex Audit).”
+
+Codex Audit observed evidence does not by itself prove QA PASS, acceptance-token satisfaction, Live QA execution, OPS completion, PF09 status movement, epic closure, live vendor truth, production truth, secret validity, runtime conformance beyond observed repo reality, or canon authority. Those claims still require the owning PF source, governed QA evidence, OPS evidence, PO confirmation, or later closeout evidence as applicable.
+
+QA plan reviewers MUST NOT reject a plan solely because repo-reality context came from a supplied Codex Audit. Reviewers must block only when the observation is overclaimed beyond repo reality, materially ambiguous, stale without a planned current check, contradictory to PF10 or PF-Canon, or used as acceptance, QA, OPS, closure, PF09-drainage, canon, or live-vendor proof without the owning source.
 
 **d0 introspection checklist**
 
@@ -3095,17 +3119,15 @@ Concrete token names for FE QA live in FE governance or build docs. PF19 suggest
 
 Segmentation (names-only; titles-only routing) is as follows:
 
-* App Backend (BE) owns vendor ingest and the DB/packs.
-
-* HDE must be capable of vendor calls when rails allow, but in normal prod rails reads DB/packs on /reader (transport/policy/tokens route by title).
+* HD Engine owns HumanDesignAPI vendor acquisition, request shaping, auth/header handling, BodyGraph or chart normalization, BodyGraph persistence and retrieval, and HD computation for HDE-owned flows.  
+* App Backend may invoke or consume HD Engine integration surfaces and owns app-specific orchestration, but it does not become the HumanDesignAPI vendor client, raw vendor credential holder, BodyGraph normalization owner, or canonical raw vendor-data persistence owner unless a future ADR changes that boundary.
 
 Intent is to prove that:
 
-* BE correctly ingests vendor data into DB and/or packs.
-
-* HDE can call the vendor when explicitly requested and rails permit.
-
-* In normal prod rails, HDE uses DB/packs (no live vendor on hot path).
+* HD Engine correctly owns HumanDesignAPI vendor acquisition, request shaping, auth and header handling, BodyGraph or chart normalization, BodyGraph persistence and retrieval, and HD computation for HDE-owned flows.  
+* App Backend and app-facing flows consume HD Engine outputs or invoke HD Engine integration surfaces without becoming the HumanDesignAPI vendor client, raw vendor credential holder, BodyGraph normalization owner, or canonical raw vendor-data persistence owner.  
+* Future Glow app integration QA must prove that the app does not bypass the HD Engine for vendor calls and must distinguish app-side UI success from HD Engine vendor acquisition proof.  
+* In normal prod rails, HDE uses DB/packs or governed persisted inputs on the hot path unless an explicitly scoped vendor path is requested and rails permit it.
 
 Scope is as follows:
 
@@ -3203,12 +3225,10 @@ Tokens (names-only; definitions live in HDE-Governance / HDE-Build Checklist) in
 
 Failures to watch include:
 
-* Vendor calls made without explicit \--source=vendor (or ops equivalent) or while rails are closed.
-
-* Missing env\_connectivity.snapshot.json when dev fallback occurs.
-
-* Non-deterministic retries (jitter), 429 auto-recovery in this epic, or logs with payload/secret content.
-
+* Vendor calls made without explicit \--source=vendor (or ops equivalent) or while rails are closed.  
+* Missing env\_connectivity.snapshot.json when dev fallback occurs.  
+* Non-deterministic retries (jitter), 429 auto-recovery in this epic, or logs with payload/secret content.  
+* Boundary proofs that can report `PASS` while unknown or unclassified adapter, presenter, public-route, serializer, external-I/O, guard-provenance, or evidence-binding categories remain unresolved. QA must classify this as proof-model failure, not live vendor runtime failure. A boundary proof may support acceptance language only when unknown categories fail closed or are explicitly classified as allowed, forbidden, unknown/fail-closed, or out of scope, and when the proof reports the current repo surfaces it actually inspected.  
 * Evidence captured but not indexed (human \+ mirror) in the same PR, or mirror records without path-proofs.
 
 ### **5.5.3 Vendor dry-run QA pattern (EPIC017 example)**
@@ -6519,6 +6539,29 @@ Key QA learnings:
 * A PF23-style audit observation that is already classified by current PF canon should remain a classification observation. It should not be converted into Must-act-now work, new PF09.x task deltas, PF14 or PF02 deltas, PF12 or PF05 deltas, PF20 historical corrections, or runnable-evidence work.
 
 Known non-goals: this entry does not redefine token semantics, A7 byte rules, transport bytes, public Reader posture, HDAPI v2 runtime conformance, exact vendor endpoint bytes, exact auth header names, exact request-body fields, exact response-envelope bytes, exact credential names, exact evidence paths, exact tests, exact docs PR paths, exact PF09.5 status rows, exact Live QA runbook bytes, exact Step-0B or PO-001 through PO-014 receipt bytes, exact qa-16 receipt bytes, exact final QA closeout report bytes, exact QA RCA bytes, HDE-FERM007 request-shaping work, HDE-FERM008 open-rails vendor-smoke work, AI runtime scope, public Reader changes, new HTTP homes, Lead closeout requirements, PF23 audit requirements, or concrete PF02, PF03, PF05, PF09.5, PF12, PF14, or PF20 doc deltas. PF19 records the QA posture and review learnings only.
+
+## **13.14 HDE-EPIC034 — QA learnings snapshot for HDAPI v2 source selection, request shaping, response mapping, boundary proof, OPS discovery, closed-rails refusal, and vendor non-claims**
+
+HDE-EPIC034 produced a durable QA posture around HDAPI v2 vendor-seam work. The durable lesson is proof-class separation. Source selection, OPS discovery, request shaping, response-envelope mapping, adapter and presenter boundary proof, closed-rails refusal, open-rails smoke, live runtime conformance, normalized data-path proof, error and rate-limit mapping, PF09.5 drainage, and epic closeout are separate closure axes.
+
+Durable QA learnings are as follows:
+
+* Source-selection proof may distinguish recommended v2 chart behavior from legacy v1 BodyGraph behavior, but it does not by itself prove request shaping, response mapping, open-rails smoke, runtime conformance, public Reader behavior, new HTTP homes, or AI scope.  
+* OPS discovery evidence may unblock downstream PR or QA design when it is bounded, secret-safe, and mechanically evidenced, but it does not by itself prove QA PASS, acceptance-token satisfaction, PF09 status movement, OPS completion beyond its own task, or epic closure.  
+* Request-shaping proof must preserve canonical environment-key posture, v1 versus v2 route-family distinction, v1 versus v2 auth-header family distinction, geocode-key conditions, closed-rails posture, and no-live-vendor-call non-claims unless a PO-authorized open-rails task supplies live evidence.  
+* Response-envelope mapping proof may prove that response type, success posture, error posture, data identity posture, and route variant are preserved at the proof layer, but it must not smooth over schema or compatibility gaps by inference and must not claim normalized-data-path completion unless that path is separately proven.  
+* Boundary proof must be conservative and fail closed. QA must treat a proof model that can report `PASS` while missing adapter bypass, presenter bypass, public route drift, ad-hoc serialization, pure-compute external I/O, stale evidence rows, or vendor guard weakness as proof-model failure, not as live vendor runtime failure.  
+* Closed-rails refusal proof may prove deterministic no-external-I/O refusal for implemented vendor paths under closed rails. It is not open-rails vendor smoke, live vendor success, full v2 runtime conformance, or normalized data-path proof.  
+* Vendor proof must preserve non-claims. HDE-EPIC034 review posture did not create public Reader expansion, public route expansion, public flag expansion, public payload expansion, new service-home creation, AI runtime scope, OpenAI scope, LLM scope, or model-call scope.  
+* Evidence-ledger refreshes and broad path-proof churn are acceptable only when final validation preserves Human Index, Machine Mirror, hash sentinel, path-proof, canonical JSON, final-LF, and evidence-path coherence. Evidence refresh alone does not expand behavioral scope.  
+* Version-neutral route remediation is now a reusable QA review pattern for HDAPI work. QA should verify that vendor API version ownership sits in `HD_API_BASE_URL`, that runtime route construction uses version-neutral resource paths, that doubled version prefixes cannot occur, and that auth-header selection is metadata-driven rather than inferred from `/v1` or `/v2` strings. Remaining `/v1` and `/v2` strings must be classified by use before they are treated as defects.  
+* The OPS-02 open-rails smoke and PR-06 evidence binding pattern is bounded. It may support the exercised live vendor route, credential-binding, endpoint availability, redacted response-shape, command-to-output provenance, and later HDE-FERM008.2 drainage posture. It does not prove full HumanDesignAPI v2 conformance, HDE-FERM008 parent completion, HDE-FERM008.3, HDE-FERM008.4, HDE-FERM008.5, normalized-data-path completion, all error and retry behavior, or public Reader expansion.  
+* Final QA closeout for HDE-EPIC034 was sufficient for Lead closure review because the evidence package preserved implementation evidence, OPS evidence, Live QA evidence, check-scoped QA logs, path proofs, QA manifest coverage, QA RCA and Doc Delta summary, explicit non-claims, and PF10-recorded status supportability. That sufficiency is a Lead review posture, not a claim that PO closeout, board update, merge provenance adjudication, PF-canon drainage, or formal PO close-pack action already occurred.  
+* PF09.5 drainage support and PF19 QA posture remain separate. HDE-EPIC034 supportability may justify later PF09.5 drainage for HDE-FERM007.1 through HDE-FERM007.5, HDE-FERM008.1, and HDE-FERM008.2, while HDE-FERM008 parent completion, HDE-FERM008.3, HDE-FERM008.4, and HDE-FERM008.5 remain future and unclaimed. PF19 records the QA posture only.  
+* Post-implementation audit observations are planning and classification inputs unless an owning PF home or later PO decision turns them into executable work. Audit-confirmed repo-reality drift that is already classified by PF canon should not become new QA obligations, PF09 task deltas, mechanics deltas, architecture deltas, evidence homes, or token obligations by assumption.  
+* Closure axes must remain separate. QA evidence, PF09 status drainage, PO closeout, board state, merge provenance, and PF-canon drainage are distinct. Documentation drainage alone is not a QA, implementation, or closure-review gate when current live truth and governed evidence support the result and no truth, proof, execution, safety, secret, scope, token, phase, production-functionality, or source-of-truth ambiguity remains.
+
+Known non-goals: this entry does not redefine token semantics, A7 byte rules, transport bytes, public Reader posture, HDAPI v2 runtime conformance, exact vendor endpoint bytes, exact auth header values, exact request-body fields, exact response-envelope bytes, exact credential values, exact evidence paths, exact tests, exact PF09.5 status rows, exact Live QA runbook bytes, final QA closeout report bytes, QA RCA bytes, AI runtime scope, public Reader changes, new HTTP homes, PF23 audit requirements, or concrete PF02, PF03, PF05, PF09.5, PF12, PF14, PF20, or PF27 doc deltas. PF19 records QA posture and review learnings only.
 
 # 14\. Codespaces QA environments (environment details)
 

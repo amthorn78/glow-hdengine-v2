@@ -4,13 +4,13 @@
 
 **Title:** PF12-Canon-HDE-Schemas-and-Artifacts
 
-**Version:** v2.6.8
+**Version:** v2.7
 
 **Status:** Canon
 
-**Effective date:** 2026-06-15
+**Effective date:** 2026-06-27
 
-**Last Update Gate:** BN 11.4.4 A13-14
+**Last Update Gate:** BN 11.7.4 A20-34
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -118,6 +118,16 @@ Tests that invoke schema validation MUST reflect the chosen posture and MUST NOT
 
 Evidence must live under governed repo paths (for example, artifacts/, docs/, audit/). Transient generator paths (e.g. codex/out/) are not authoritative and MUST NOT be indexed.
 
+### **Operational discovery and open-rails evidence summaries (governed evidence posture)**
+
+Bounded OPS discovery and open-rails evidence may become governed PF12 evidence only when the output is a text-first artifact under a governed repo root and the artifact records operational facts without exposing secret values.
+
+OPS discovery evidence MAY record key names, provider or environment labels, endpoint or route-family labels, credential-binding names, base URL posture, account or tier posture, and decision outcomes when those facts are needed to plan, unblock, or validate PR, OPS, or QA work. It MUST NOT record raw secret values, raw bearer tokens, raw API keys, unredacted database passwords, uncontrolled production data, or private payload bodies.
+
+Open-rails evidence MAY record task identity, operator role, environment label, target vendor or endpoint family, request class, high-level result, safe status code or error class, redacted response excerpt when approved, follow-up classification, and whether the evidence supports a bounded vendor-conformance claim. It MUST NOT claim QA PASS, PF09 status movement, epic closure, public Reader expansion, new public routes, new acceptance tokens, or broad runtime conformance unless those claims are separately bound by their owning canon and governed evidence.
+
+When an OPS discovery or open-rails artifact is promoted into governed evidence, it MUST be indexed in the Human Evidence Index, mirrored in the Machine Evidence Mirror, and paired with sibling path-proof transcripts under the normal PF12 rules. Candidate evidence is not authoritative until the exact repo-relative path is bound.
+
 ### **Directory naming (lower-case ASCII)**
 
 All directory names in the repository and application codebase MUST use lower-case ASCII. Under governed roots (including artifacts/, docs/, audit/, catalog/, schemas/\*\*), introducing any mixed-case or upper-case directory name is non-conforming and is treated as a QA failure.
@@ -188,6 +198,12 @@ These behaviors are transitional and scoped to EPIC020 Candidate 1\. They do not
 PF12 §8.x and §8.6 together form the Evidence Catalog: the single home for governed evidence artifact families and their titles/paths. Other PF documents (PF04/PF05/PF09/PF14/PF20) must refer to these families by name and must not maintain parallel path lists.
 
 Non-citation rule (MUST). PF20 MUST NOT be cited to define evidence surface paths, evidence shapes, or remediation predicate targets. For evidence paths/shapes and predicate target surfaces, cite PF12 (this document’s Evidence Catalog: §8.3 schemas and §8.6 entries).
+
+### **Planning-time repo-reality observations (non-substitute evidence)**
+
+Codex Audit or other supplied read-only repo-reality observations MAY identify existing governed artifacts, evidence helpers, Human Evidence Index files, Machine Evidence Mirror files, path-proof transcripts, and candidate evidence loci for planning or scoping. These observations are planning inputs only.
+
+A planning-time observation MUST NOT replace a governed artifact, Human Index record, Machine Mirror record, path-proof transcript, QA evidence artifact, OPS completion record, acceptance-token proof, PF09 status movement, or closeout record. Any plan or PR that relies on such an observation for later execution or QA MUST either verify the locus in repo before use or bind the resulting artifact through the normal PF12 evidence discipline.
 
 ### **Routing by title only**
 
@@ -903,9 +919,10 @@ Purpose. Govern the file-set shape for a PO-only HDAPI v2 open-rails smoke evide
 
 Concrete path-binding rule.
 
-* The exact OPS smoke root MUST be a lowercase ASCII repo-relative path under `audit/ops/` and MUST use `hdapi-v2-open-rails-smoke` as the final directory name.  
-* Until that concrete root is assigned and exact repo-relative paths are supplied, the artifacts below are candidate governed outputs only and MUST NOT be indexed, mirrored, or used to claim completion.  
-* Once the concrete root is assigned, PF12 path binding, the Human Evidence Index, the Machine Evidence Mirror, and sibling path-proofs MUST use the exact resulting repo-relative paths.
+* The exact OPS smoke root MUST be a lowercase ASCII repo-relative path under `audit/ops/`. The root is assigned by the epic or OPS plan and MUST be bound by exact repo-relative path before the family is indexed, mirrored, or used as acceptance-support evidence.  
+* For HDE-EPIC034 OPS-02, the assigned root is `audit/ops/hde-epic034/ops-02/`.  
+* Once the concrete root is assigned, PF12 path binding, the Human Evidence Index, the Machine Evidence Mirror, and sibling path-proofs MUST use the exact resulting repo-relative paths.  
+* PR work MAY bind already-produced OPS evidence into governed evidence without rerunning the live vendor action when the binding artifact states that posture and preserves nonclaims.
 
 Artifact filenames under the assigned OPS smoke root.
 
@@ -913,10 +930,20 @@ Artifact filenames under the assigned OPS smoke root.
 * `stdout.log`: Required when the open-rails smoke is executed. UTF-8 stdout capture. It MUST NOT persist plaintext secrets.  
 * `stderr.log`: Required when the open-rails smoke is executed. UTF-8 stderr capture. It MAY be empty only when the underlying command produced no stderr and the run still requires the file.  
 * `exit_codes.txt`: Required when the open-rails smoke is executed. LF-terminated ledger mapping executed command labels to integer exit codes.  
-* `redacted_env_presence.json`: Required when the open-rails smoke is executed. Canonical JSON containing key names and boolean or redacted values only. It MUST NOT persist secret values.  
-* `request_summary.txt`: Required when the open-rails smoke is executed. LF-terminated summary recording the HDAPI-only target, the v2 route exercised, request-shaping basis, secret-handling posture, and PO authorization posture.  
-* `result_summary.md`: Required when open-rails smoke completion is claimed. Non-empty UTF-8 markdown recording outcome classification, vendor-only scope, secret-free posture, and whether the result supports conformance evidence.  
-* `files_sha256.txt`: Required when open-rails smoke completion is claimed. LF-terminated checksum ledger for the OPS smoke evidence files in the assigned root.
+* `env_presence_redacted.json`: Required when the open-rails smoke is executed. Canonical JSON containing key names and presence-only or redacted values only. It MUST NOT persist secret values.  
+* `request_summary.json`: Required when the open-rails smoke is executed. Canonical JSON summary recording the HDAPI-only target, route family, version-neutral resource path, configured base-url key, redacted auth-header shape, request-shaping basis, secret-handling posture, and PO authorization posture.  
+* `result_summary.json`: Required when open-rails smoke completion is claimed. Canonical JSON summary recording outcome classification, vendor-only scope, secret-free posture, conformance claim boundary, parent-task nonclaims when applicable, and whether the result supports bounded conformance evidence.  
+* `files_sha256.txt`: Required when open-rails smoke completion is claimed. LF-terminated checksum ledger for the OPS smoke evidence files in the assigned root.  
+* `moon_loop_rerun_transcript.txt`: Optional but governed when retained. LF-terminated transcript preserving command-to-output provenance. If promoted, it MUST have a sibling path-proof transcript.  
+* `ops02_full_action_log_and_evidence_output.md`: Optional but governed when retained. UTF-8 action log and evidence-output summary. If promoted, it MUST have a sibling path-proof transcript.  
+* `ops02_open_rails_smoke_procedure.py`: Optional but governed when retained. UTF-8 repo-resident smoke procedure used for provenance or review. If promoted, it MUST have a sibling path-proof transcript and MUST NOT be treated as product runtime code.
+
+PR binding artifacts for already-produced OPS smoke evidence.
+
+* `audit/qa/hde-epic034/pr-06/ops_smoke_evidence_binding.log`: HDE-EPIC034 PR-06 LF-terminated binding log for already-produced OPS-02 open-rails smoke evidence. It supports HDE-FERM008.2 only and MUST preserve no full v2 runtime conformance, no HDE-FERM008 parent completion, no public Reader, and no AI scope claims.  
+* `docs/acceptance_map_epic034.json`: HDE-EPIC034 acceptance map when used to bind PR-06 evidence. It MUST use existing registered acceptance posture only and MUST NOT mint a vendor-specific acceptance token by itself.  
+* `audit/docdeltas/hde-epic034_doc_deltas.md` and `audit/qa/hde-epic034/00_meta/doc_deltas.md`: HDE-EPIC034 PR-06 doc-delta surfaces when used to record OPS-02 support and nonclaims. They are governed only when indexed, mirrored, and path-proven.  
+* 
 
 Path-proofs and indexing.
 
@@ -5325,7 +5352,7 @@ Engine Core evidence families participate in the existing Mirror and Index token
 
 * ##### `artifacts/vendor/hdapi_v2/source_selection.snapshot.json`: Canonical JSON snapshot of v2 source-selection policy and v1 legacy isolation.
 
-* ##### `artifacts/vendor/hdapi_v2/request_shaping.snapshot.json`: Canonical JSON snapshot of v2 request-shaping posture for the v2 chart endpoints. It MUST be derived from the governed contract map and MUST NOT guess credential names, base URLs, or request bytes not pinned by the owning contract and infrastructure homes.
+* ##### `artifacts/vendor/hdapi_v2/request_shaping.snapshot.json`: Canonical JSON snapshot of v2 request-shaping posture for the v2 chart endpoints. It MUST be derived from the governed contract map and MUST NOT guess credential names, base URLs, or request bytes not pinned by the owning contract and infrastructure homes. It MUST preserve `HD_API_BASE_URL` as the configured base-url owner when that posture is being proven, and it MAY record `HDAPI_BASE_URL` only as deprecated alias, compatibility, observed drift, or migration evidence. It MUST distinguish vendor endpoint provenance such as `/v2/charts` from active runtime resource paths such as `charts`, `charts/simple`, and `charts/coordinates`; active runtime resource paths MUST be version-neutral when that is the implementation posture being evidenced. It MUST preserve auth-header family as redacted shape, including `Authorization: Bearer <redacted>` for current v2 chart-style routes, `HD-Api-Key: <redacted>` for legacy v1 BodyGraph routes when intentionally preserved, and `HD-Geocode-Key: <redacted>` where geocoding is required. Auth-header source SHOULD be route or contract metadata rather than vendor API version-string inference when asserted. Raw header values and vendor payload bodies MUST NOT be persisted in this artifact.
 
 * ##### `artifacts/vendor/hdapi_v2/response_mapping.snapshot.json`: Canonical JSON snapshot of v2 response-envelope mapping into HDE internal inputs. It MUST preserve response type, success status, errorCode, data payload identity, and route variant. If v2 response data cannot truthfully feed existing BodyGraph, cache, compat, sampler, or admin paths without schema changes, this artifact MUST record the schema gap and MUST NOT claim compatibility by inference.
 
@@ -5512,6 +5539,18 @@ Engine Core evidence families participate in the existing Mirror and Index token
 ## **Epic QA harness ledger artifacts (per-epic; names-only; current-state)**
 
 These entries register QA harness ledger files that summarize Live QA results as current-state evidence, while keeping per-run retention optional and non-canon unless explicitly promoted. The invariant required outputs for a Live QA run are the per-check primary log and the step-logs manifest; additional ledger artifacts may exist but MUST NOT be required for closure by default.
+
+Production-affecting open-rails Live QA evidence.
+
+When a Live QA plan includes a bounded open-rails step for production-affecting behavior, the evidence MUST remain redacted, bounded, and governed. It MAY record header names, redacted header-shape posture, endpoint or route family, environment label, rails posture, request class, result class, and safe status or error classification. It MUST NOT record raw secrets, raw bearer tokens, raw API keys, uncontrolled production data, full private payloads, or full vendor payload bodies unless a later owning canon explicitly permits that payload and the evidence is still secret-safe.
+
+Open-rails Live QA evidence proves only the behavior actually exercised. It MUST preserve nonclaim boundaries for full runtime conformance, parent-task completion, public Reader expansion, new public routes, new public flags, public payload changes, new HTTP homes, AI scope, PO closeout, and epic closure unless those claims are separately bound by their owning canon and governed evidence.
+
+QA\_PLAN\_UPDATE routing for non-QA-root governed evidence.
+
+When final PASS-grade QA proof relies on a refreshed or newly bound governed evidence surface outside the QA root, the QA package MUST include a QA\_PLAN\_UPDATE routing receipt before the post-routing proof is accepted. The receipt MUST be a governed QA evidence artifact under the QA checks root, MUST have a sibling path-proof transcript when promoted, and MUST name the routing type, source or trigger, affected check or closeout proof, non-QA-root artifacts being bound, allowed action, required post-routing receipt, rails posture, and nonclaims.
+
+A QA\_PLAN\_UPDATE routing receipt does not by itself claim product behavior, token satisfaction, PF09 drainage, PO closeout, or epic closure. It records the provenance route that allows the later proof to rely on the named non-QA-root governed evidence.
 
 ### **Canonical epic QA root**
 
@@ -6396,13 +6435,19 @@ Indexing: list in machine mirror and human index (titles/paths only).
 
 Acceptance hints. START\_COMMAND\_CAPTURE\_OK.
 
-## **8.10 Environment inventories & validator outputs (names-only)**
+## **8.10 Environment inventories, redacted environment snapshots, and validator outputs (names-only)**
 
 Inventories: canonical JSON listing of environment variables consulted by the service; unknown keys flagged.
 
+Redacted environment snapshots: governed evidence that records exact environment-variable key names, provider/context labels, environment labels, redacted value posture, requiredness, and whether each key is rails-related, vendor-related, DB-related, dev-harness-related, vendor-related, or secret-bearing. Secret values MUST remain redacted or presence-only. Snapshots MAY record non-secret base URLs, URL hostnames and ports provided by PO or infrastructure canon, redacted database URL forms, and exact key-spelling differences across environments.
+
+Secret-safe header-shape evidence: governed evidence MAY record outbound header names, header family, and redacted header shape when those facts prove request-shaping posture. It MUST NOT record raw header values, raw bearer tokens, raw API keys, raw geocode keys, database credentials, or plaintext secrets. Acceptable redacted shapes include `Authorization: Bearer <redacted>`, `HD-Api-Key: <redacted>`, and `HD-Geocode-Key: <redacted>` when those shapes are required by the owning vendor contract and byte homes.
+
+HumanDesignAPI vendor environment evidence MUST preserve `HD_API_BASE_URL` as the canonical base-url key when that posture is being proven. `HDAPI_BASE_URL` MAY appear only as deprecated alias, compatibility, observed drift, or migration evidence. If both spellings are present and differ, the evidence MUST record configuration ambiguity and fail-closed posture rather than silently normalizing the keys.
+
 Validator outputs: records-only outputs to prove config sanity.
 
-Indexing: list in machine mirror and human index (titles/paths only).
+Indexing: list in machine mirror and human index (titles/paths only), with sibling path-proof transcripts when promoted into governed evidence.
 
 Acceptance hints. ENV\_INVENTORY\_OK, VALIDATOR\_OUTPUTS\_OK.
 
@@ -6477,6 +6522,8 @@ Acceptance hints (titles-only; tokens live in HDE-Governance §2.0). A7\_GET\_QU
 ## **8.13 Stateless QA export families (no-DB JSON mode) \[Required-Now\]**
 
 Purpose. Record the governed evidence families used to exercise the engine in a stateless/no-DB QA mode, using only CLI \+ files. These families do not replace existing DB-bound evidence; they provide a complementary way to prove engine math and Reader/CLI parity when no app user model or persistent BodyGraph records are available.
+
+HD Engine ownership posture. HumanDesignAPI vendor acquisition evidence, raw vendor BodyGraph or chart acquisition evidence, BodyGraph persistence evidence, BodyGraph retrieval evidence, HD computation evidence, and normalized app-facing export evidence belong to HD Engine governed evidence families unless future canon explicitly moves that responsibility. App-facing or stateless outputs MUST be normalized and governed artifacts; they MUST NOT make raw unbounded vendor payload ownership an app-layer, public payload, or direct app-to-vendor contract by inference.
 
 ### **Family: qa.bodygraph\_export.stateless**
 
