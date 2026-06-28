@@ -1029,6 +1029,12 @@ def _load_epic035_pr01_entries() -> list[dict[str, object]]:
     produced = payload.get("generated_at_utc")
     if isinstance(produced, str) and produced:
         produced_at = produced
+    if produced_at is not None:
+        produced_dt = _parse_utc_iso8601(produced_at)
+        latest_mtime = max(snapshot.stat().st_mtime, rate_limit.stat().st_mtime)
+        latest_mtime_dt = _dt.datetime.fromtimestamp(latest_mtime, tz=_dt.timezone.utc).replace(microsecond=0)
+        if produced_dt < latest_mtime_dt:
+            produced_at = _isoformat(latest_mtime_dt)
     entries: list[dict[str, object]] = []
     for entry in EPIC035_PR01_PRIMARY_ARTIFACTS:
         normalized = dict(entry)
@@ -1293,6 +1299,10 @@ STALE_PROOF_TRIGGER_RELS: set[str] = FORCE_REFRESH_ARTIFACT_RELS - {
     "docs/evidence/INDEX.json",
     "docs/evidence/INDEX.sha256",
 }
+EPIC035_PR01_ARTIFACT_RELS: set[str] = {
+    "artifacts/vendor/hdapi_v2/error_mapping.snapshot.json",
+    "artifacts/vendor/hdapi_v2/rate_limit_headers.snapshot.json",
+}
 
 
 def _sha256_bytes(data: bytes) -> str:
@@ -1401,6 +1411,13 @@ def _write_path_proof(
         except Exception:  # noqa: BLE001
             existing_mtime = None
     produced = requested_produced or existing_produced or default_produced_at
+    mtime_floor = requested_mtime or existing_mtime or stat_mtime_iso
+    if rel in EPIC035_PR01_ARTIFACT_RELS:
+        try:
+            if _parse_utc_iso8601(produced) < _parse_utc_iso8601(mtime_floor):
+                produced = mtime_floor
+        except Exception:  # noqa: BLE001
+            produced = default_produced_at
     if check:
         if not proof_path.exists():
             raise SystemExit(f"MISSING_PROOF:{proof_rel}")
@@ -1425,16 +1442,18 @@ def _write_path_proof(
             raise SystemExit(f"PROOF_FIELDS:{proof_rel}")
         try:
             mtime_parsed = _parse_utc_iso8601(mtime_raw)
-            _parse_utc_iso8601(produced_raw)
+            produced_parsed = _parse_utc_iso8601(produced_raw)
         except Exception as exc:  # noqa: BLE001
             raise SystemExit(f"PROOF_MTIME:{proof_rel}") from exc
+        if rel in EPIC035_PR01_ARTIFACT_RELS and produced_parsed < mtime_parsed:
+            raise SystemExit(f"PROOF_PRODUCED_BACKDATED:{proof_rel}")
 
         stat_mtime_dt = _dt.datetime.fromtimestamp(stat_mtime, tz=_dt.timezone.utc)
         if mtime_parsed > stat_mtime_dt:
             raise SystemExit(f"PROOF_MTIME_FUTURE:{proof_rel}")
         return proof_rel, produced
 
-    mtime = requested_mtime or existing_mtime or stat_mtime_iso
+    mtime = mtime_floor
     proof_lines = [
         f"path: {rel}",
         f"size_bytes: {size_bytes}",
