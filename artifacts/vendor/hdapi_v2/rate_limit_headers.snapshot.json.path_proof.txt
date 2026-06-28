@@ -1,0 +1,5 @@
+path: artifacts/vendor/hdapi_v2/rate_limit_headers.snapshot.json
+size_bytes: 1991
+sha256: 2d53f6f88247cae0fcd22704ad10cb72becc1fd0be0a91b98ec6170c793ffbf8
+mtime_utc: 2026-06-28T05:30:40Z
+produced_at_utc: 2026-06-28T00:00:00Z

@@ -992,6 +992,51 @@ def _load_epic034_pr05_entries() -> list[dict[str, object]]:
     return entries
 
 
+
+
+EPIC035_PR01_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "hdapi_v2.error_mapping",
+        "discovered_physical_path": "artifacts/vendor/hdapi_v2/error_mapping.snapshot.json",
+        "epic_id": "HDE-EPIC035",
+        "record_type": "epic035_pr01_provider_outcome_mapping",
+        "schema_version": "1.0",
+        "tokens": ["JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK", "PF04_LOG_ALLOWLIST_009_OK", "ERROR_TOKEN_MAP_OK"],
+        "notes": "EPIC035 PR-01 canonical provider error, retry, malformed-response, redirect, network-error, and secret-safe observability mapping evidence for HDE-FERM008.3; no live vendor call or full v2 runtime conformance claim",
+    },
+    {
+        "artifact_key": "hdapi_v2.rate_limit_headers",
+        "discovered_physical_path": "artifacts/vendor/hdapi_v2/rate_limit_headers.snapshot.json",
+        "epic_id": "HDE-EPIC035",
+        "record_type": "epic035_pr01_provider_outcome_mapping",
+        "schema_version": "1.0",
+        "tokens": ["JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK", "ERROR_TOKEN_MAP_OK"],
+        "notes": "EPIC035 PR-01 canonical Retry-After delta-seconds, HTTP-date, invalid, and overflow omission evidence for HDE-FERM008.3; 429 remains non-retryable",
+    },
+]
+
+
+def _load_epic035_pr01_entries() -> list[dict[str, object]]:
+    produced_at = None
+    snapshot = ROOT / "artifacts/vendor/hdapi_v2/error_mapping.snapshot.json"
+    rate_limit = ROOT / "artifacts/vendor/hdapi_v2/rate_limit_headers.snapshot.json"
+    if not snapshot.exists() or not rate_limit.exists():
+        return []
+    try:
+        payload = json.loads(snapshot.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise SystemExit("INVALID_EPIC035_ERROR_MAPPING_SNAPSHOT") from exc
+    produced = payload.get("generated_at_utc")
+    if isinstance(produced, str) and produced:
+        produced_at = produced
+    entries: list[dict[str, object]] = []
+    for entry in EPIC035_PR01_PRIMARY_ARTIFACTS:
+        normalized = dict(entry)
+        if produced_at is not None:
+            normalized["produced_at_utc"] = produced_at
+        entries.append(normalized)
+    return entries
+
 EPIC034_PR06_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
         "artifact_key": "epic034.ops02.commands",
@@ -1515,6 +1560,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *_load_epic034_pr04_entries(),
             *_load_epic034_pr05_entries(),
             *_load_epic034_pr06_entries(),
+            *_load_epic035_pr01_entries(),
             *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,
