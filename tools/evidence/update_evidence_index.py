@@ -1297,6 +1297,11 @@ EPIC035_PR01_ARTIFACT_RELS: set[str] = {
     "artifacts/vendor/hdapi_v2/error_mapping.snapshot.json",
     "artifacts/vendor/hdapi_v2/rate_limit_headers.snapshot.json",
 }
+NON_BACKDATED_PROOF_RELS: set[str] = {
+    *EPIC035_PR01_ARTIFACT_RELS,
+    "artifacts/evidence_index.jsonl",
+    "artifacts/evidence_index.jsonl.sha256",
+}
 
 
 def _sha256_bytes(data: bytes) -> str:
@@ -1406,7 +1411,7 @@ def _write_path_proof(
             existing_mtime = None
     produced = requested_produced or existing_produced or default_produced_at
     mtime_floor = requested_mtime or existing_mtime or stat_mtime_iso
-    if rel in EPIC035_PR01_ARTIFACT_RELS:
+    if rel in NON_BACKDATED_PROOF_RELS:
         try:
             if _parse_utc_iso8601(produced) < _parse_utc_iso8601(mtime_floor):
                 produced = mtime_floor
@@ -1439,7 +1444,7 @@ def _write_path_proof(
             produced_parsed = _parse_utc_iso8601(produced_raw)
         except Exception as exc:  # noqa: BLE001
             raise SystemExit(f"PROOF_MTIME:{proof_rel}") from exc
-        if rel in EPIC035_PR01_ARTIFACT_RELS and produced_parsed < mtime_parsed:
+        if rel in NON_BACKDATED_PROOF_RELS and produced_parsed < mtime_parsed:
             raise SystemExit(f"PROOF_PRODUCED_BACKDATED:{proof_rel}")
 
         stat_mtime_dt = _dt.datetime.fromtimestamp(stat_mtime, tz=_dt.timezone.utc)
