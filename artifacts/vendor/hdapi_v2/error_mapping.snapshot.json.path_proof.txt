@@ -1,5 +1,5 @@
 path: artifacts/vendor/hdapi_v2/error_mapping.snapshot.json
 size_bytes: 3150
-sha256: f13c9c7e8f145ef2ce4e9740e0a05a2678ca44000ff6de7b96f499a42695debe
-mtime_utc: 2026-06-28T05:30:40Z
-produced_at_utc: 2026-06-28T00:00:00Z
+sha256: d1b4a84fa6743bd4b0e0f4b595515e66d44900688f083d0741f165171f13be84
+mtime_utc: 2026-06-28T07:46:52Z
+produced_at_utc: 2026-06-28T07:46:52Z

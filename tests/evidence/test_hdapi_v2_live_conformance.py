@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import datetime as dt
 import json
+import os
 from pathlib import Path
 
 from tools.evidence import generate_hdapi_v2_live_conformance as generator
+from tools.evidence import update_evidence_index
 
 ROOT = Path(__file__).resolve().parents[2]
 VENDOR_DIR = ROOT / "artifacts" / "vendor" / "hdapi_v2"
@@ -22,6 +25,22 @@ def _assert_canonical_json(path: Path) -> dict:
     expected = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8") + b"\n"
     assert raw == expected
     return payload
+
+
+def _parse_utc_iso8601(raw: str) -> dt.datetime:
+    parsed = dt.datetime.fromisoformat(raw.replace("Z", "+00:00"))
+    assert parsed.tzinfo == dt.timezone.utc
+    assert parsed.microsecond == 0
+    return parsed
+
+
+def _load_path_proof(path: Path) -> dict[str, str]:
+    proof = {}
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if ": " in line:
+            key, value = line.split(": ", 1)
+            proof[key] = value
+    return proof
 
 
 def test_generator_rendered_outputs_are_canonical_and_scoped() -> None:
@@ -98,3 +117,42 @@ def test_live_conformance_index_and_path_proof_bindings_when_promoted() -> None:
         proof_text = proof.read_text(encoding="utf-8")
         assert f"path: {rel}" in proof_text
         assert "sha256: " in proof_text
+
+
+def test_live_conformance_evidence_chronology_is_not_backdated() -> None:
+    index = json.loads((ROOT / "docs" / "evidence" / "INDEX.json").read_text(encoding="utf-8"))
+    mirror_lines = [json.loads(line) for line in (ROOT / "artifacts" / "evidence_index.jsonl").read_text(encoding="utf-8").splitlines() if line]
+    index_by_path = {entry["discovered_physical_path"]: entry for entry in index}
+    mirror_by_path = {entry["discovered_physical_path"]: entry for entry in mirror_lines}
+
+    for path in REQUIRED_ARTIFACTS:
+        rel = path.relative_to(ROOT).as_posix()
+        payload_produced = _parse_utc_iso8601(_assert_canonical_json(path)["generated_at_utc"])
+        proof = _load_path_proof(ROOT / f"{rel}.path_proof.txt")
+        proof_mtime = _parse_utc_iso8601(proof["mtime_utc"])
+        proof_produced = _parse_utc_iso8601(proof["produced_at_utc"])
+        index_produced = _parse_utc_iso8601(index_by_path[rel]["produced_at_utc"])
+        mirror_produced = _parse_utc_iso8601(mirror_by_path[rel]["produced_at_utc"])
+
+        assert proof_produced >= proof_mtime
+        assert index_produced == payload_produced
+        assert mirror_produced == payload_produced
+
+
+def test_epic035_index_entries_use_payload_timestamp_not_checkout_mtime(monkeypatch, tmp_path) -> None:
+    vendor_dir = tmp_path / "artifacts" / "vendor" / "hdapi_v2"
+    vendor_dir.mkdir(parents=True)
+    generated_at = "2026-06-28T07:46:52Z"
+    future = dt.datetime(2026, 6, 29, 12, 0, tzinfo=dt.timezone.utc).timestamp()
+    for name in ["error_mapping.snapshot.json", "rate_limit_headers.snapshot.json"]:
+        path = vendor_dir / name
+        path.write_text(json.dumps({"generated_at_utc": generated_at}) + "\n", encoding="utf-8")
+        path.touch()
+        os.utime(path, (future, future))
+
+    monkeypatch.setattr(update_evidence_index, "ROOT", tmp_path)
+
+    entries = update_evidence_index._load_epic035_pr01_entries()
+
+    assert entries
+    assert {entry["produced_at_utc"] for entry in entries} == {generated_at}
