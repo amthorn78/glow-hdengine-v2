@@ -122,3 +122,15 @@ def test_pr02_index_mirror_path_proof_bindings_when_promoted() -> None:
         assert proof_data["path"] == rel
         assert len(proof_data["sha256"]) == 64
         assert _parse_utc(proof_data["produced_at_utc"]) >= _parse_utc(proof_data["mtime_utc"])
+
+
+def test_pr02_index_mirror_do_not_retain_conflicting_epic034_response_mapping_row() -> None:
+    index = json.loads((ROOT / "docs" / "evidence" / "INDEX.json").read_text(encoding="utf-8"))
+    mirror = [json.loads(line) for line in (ROOT / "artifacts" / "evidence_index.jsonl").read_text(encoding="utf-8").splitlines() if line]
+    conflicting = {
+        (entry.get("artifact_key"), entry.get("discovered_physical_path"), entry.get("epic_id"))
+        for entry in [*index, *mirror]
+        if entry.get("discovered_physical_path") == "artifacts/vendor/hdapi_v2/response_mapping.snapshot.json"
+    }
+    assert ("hdapi_v2.response_mapping", "artifacts/vendor/hdapi_v2/response_mapping.snapshot.json", "HDE-EPIC034") not in conflicting
+    assert ("hdapi_v2.response_mapping_pr02", "artifacts/vendor/hdapi_v2/response_mapping.snapshot.json", "HDE-EPIC035") in conflicting

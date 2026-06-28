@@ -850,6 +850,8 @@ def _load_epic034_pr03_entries() -> list[dict[str, object]]:
         payload = json.loads(snapshot.read_text(encoding="utf-8"))
     except json.JSONDecodeError as exc:
         raise SystemExit("INVALID_EPIC034_RESPONSE_MAPPING_SNAPSHOT") from exc
+    if payload.get("epic_id") == "HDE-EPIC035" and payload.get("pf09_subtask_id") == "HDE-FERM008.4":
+        return []
     produced = payload.get("generated_at_utc")
     if isinstance(produced, str) and produced:
         produced_at = produced
