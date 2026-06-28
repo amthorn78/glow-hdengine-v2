@@ -1,0 +1,10 @@
+{
+  "ALLOW_NETWORK": "not_visible_to_po",
+  "GEO_API_KEY": "not_visible_to_po",
+  "HD_API_BASE_URL": "not_visible_to_po",
+  "HD_API_KEY": "not_visible_to_po",
+  "LANG": "not_visible_to_po",
+  "LC_ALL": "not_visible_to_po",
+  "SAFE_MODE": "not_visible_to_po",
+  "TZ": "not_visible_to_po"
+}

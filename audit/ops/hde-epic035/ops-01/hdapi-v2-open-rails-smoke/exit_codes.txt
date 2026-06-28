@@ -1,0 +1,10 @@
+pwd: 0
+git rev-parse --show-toplevel: 0
+git rev-parse HEAD: 0
+git branch --show-current: 0
+git status --short (S1): 0
+mkdir -p audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke: 0
+manual_production_app_observation: n/a
+observed_app_flow: blocked
+blocker: production inputs I1 through I6 and production config visibility were not supplied in this Codex/local session; S4 was not executed
+git status --short (S7): pending until final preservation check

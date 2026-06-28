@@ -1,0 +1,20 @@
+S1 terminal stdout
+
+$ pwd
+/workspaces/glow-hdengine-v2
+
+$ git rev-parse --show-toplevel
+/workspaces/glow-hdengine-v2
+
+$ git rev-parse HEAD
+7e42e51a6b4ba4b43dd65c384b7f4fad05e6e41d
+
+$ git branch --show-current
+main
+
+$ git status --short
+<empty>
+
+S4 production observation stdout
+
+no terminal stdout; production app observation captured in request_summary.txt and result_summary.md

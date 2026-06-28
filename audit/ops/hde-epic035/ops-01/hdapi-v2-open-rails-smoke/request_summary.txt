@@ -1,0 +1,11 @@
+Target environment: production, not accessed in this Codex/local session.
+Production app/system entrypoint label: not supplied.
+Route-family label or app flow label: not supplied.
+Geocode behavior required: unknown; geocode-required test input was not supplied.
+GEO_API_KEY presence: not_visible_to_po.
+HD-Geocode-Key: <redacted> observed: not observed; S4 was not executed.
+Authorization: Bearer <redacted> observed: not observed; S4 was not executed.
+HD-Api-Key appeared on a v2 chart/geocode path: not observed; S4 was not executed.
+Vendor boundary: inconclusive_vendor_boundary; production app path was not observed.
+Secret-safe posture: no raw secrets, raw bearer tokens, raw API keys, raw geocode keys, raw request bodies, raw response bodies, raw vendor payload bodies, production user PII, or private payload bodies were recorded.
+Observation status: blocked before live production access because required production inputs I1 through I6 were not supplied.

@@ -1,0 +1,65 @@
+HDE-EPIC035 OPS-01 hdapi-v2-open-rails-smoke
+
+S1 repo preflight
+
+Command: pwd
+Exit: 0
+Stdout:
+/workspaces/glow-hdengine-v2
+Stderr: none
+
+Command: git rev-parse --show-toplevel
+Exit: 0
+Stdout:
+/workspaces/glow-hdengine-v2
+Stderr: none
+
+Command: git rev-parse HEAD
+Exit: 0
+Stdout:
+7e42e51a6b4ba4b43dd65c384b7f4fad05e6e41d
+Stderr: none
+
+Command: git branch --show-current
+Exit: 0
+Stdout:
+main
+Stderr: none
+
+Command: git status --short
+Exit: 0
+Stdout:
+<empty>
+Stderr: none
+
+S2 PO authorization and scope
+
+PO authorizes one bounded live production HumanDesignAPI geokey observation for HDE-EPIC035 OPS-01.
+
+Scope recorded: one bounded production HumanDesignAPI geokey observation for HDE-EPIC035 / Fermentation Pass 6. This OPS record does not perform QA closeout, PF09 status drainage, PR work, PF-canon edits, Human Evidence Index updates, Machine Mirror updates, hash sentinel updates, path-proof generation, or acceptance-map updates.
+
+S3 production config visibility
+
+Production config/status console source was not supplied in this Codex/local session. Secret-safe presence-only status is recorded in redacted_env_presence.json as not_visible_to_po.
+
+S4 production app observation
+
+Manual production app steps performed: none.
+
+S4 was not executed because the required production inputs were not supplied in this Codex/local session:
+- I1 production app/system URL or entrypoint label
+- I2 PO-controlled production test account or approved test record
+- I3 production app flow to trigger geocode-required HD behavior
+- I4 geocode-required test input
+- I5 expected app-visible success behavior
+- I6 production log/config console source used for redacted evidence
+
+Safe default applied: do not execute live production observation before the PO supplies I1 through I6.
+
+S7 preservation status
+
+Command: git status --short
+Exit: pending until final preservation check
+Stdout:
+pending until final preservation check
+Stderr: none
