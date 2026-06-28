@@ -1,5 +1,5 @@
 path: audit/gates/narratives/registry.diff.json
 size_bytes: 1372
 sha256: 15fc9dd6a1d03b6170fc619fbf53ada0f7fc5a8a63006a39178816ec6dd11911
-mtime_utc: 2026-06-28T05:29:03Z
-produced_at_utc: 2026-06-28T07:46:57Z
+mtime_utc: 2026-06-28T07:07:55Z
+produced_at_utc: 2026-06-28T08:36:04Z

@@ -156,3 +156,51 @@ def test_epic035_index_entries_use_payload_timestamp_not_checkout_mtime(monkeypa
 
     assert entries
     assert {entry["produced_at_utc"] for entry in entries} == {generated_at}
+
+
+def test_machine_mirror_path_proofs_are_not_backdated() -> None:
+    for rel in ["artifacts/evidence_index.jsonl", "artifacts/evidence_index.jsonl.sha256"]:
+        proof = _load_path_proof(ROOT / f"{rel}.path_proof.txt")
+        proof_mtime = _parse_utc_iso8601(proof["mtime_utc"])
+        proof_produced = _parse_utc_iso8601(proof["produced_at_utc"])
+        assert proof_produced >= proof_mtime
+
+
+def test_generator_refuses_non_closed_rails_without_writing(monkeypatch) -> None:
+    before = {path: (path.read_bytes(), path.stat().st_mtime_ns) for path in REQUIRED_ARTIFACTS}
+    monkeypatch.setenv("SAFE_MODE", "0")
+    monkeypatch.setenv("ALLOW_NETWORK", "0")
+    monkeypatch.setenv("LC_ALL", "C")
+    monkeypatch.setenv("LANG", "C")
+    monkeypatch.setenv("TZ", "UTC")
+
+    try:
+        generator.main([])
+    except SystemExit as exc:
+        assert "HDAPI_V2_LIVE_CONFORMANCE_CLOSED_RAILS_REQUIRED" in str(exc)
+    else:  # pragma: no cover - explicit failure path
+        raise AssertionError("generator accepted non-closed rails")
+
+    for path, (body, mtime_ns) in before.items():
+        assert path.read_bytes() == body
+        assert path.stat().st_mtime_ns == mtime_ns
+
+
+def test_generator_refuses_network_enabled_check_without_certifying(monkeypatch) -> None:
+    before = {path: (path.read_bytes(), path.stat().st_mtime_ns) for path in REQUIRED_ARTIFACTS}
+    monkeypatch.setenv("SAFE_MODE", "1")
+    monkeypatch.setenv("ALLOW_NETWORK", "1")
+    monkeypatch.setenv("LC_ALL", "C")
+    monkeypatch.setenv("LANG", "C")
+    monkeypatch.setenv("TZ", "UTC")
+
+    try:
+        generator.main(["--check"])
+    except SystemExit as exc:
+        assert "HDAPI_V2_LIVE_CONFORMANCE_CLOSED_RAILS_REQUIRED" in str(exc)
+    else:  # pragma: no cover - explicit failure path
+        raise AssertionError("generator check accepted network-enabled rails")
+
+    for path, (body, mtime_ns) in before.items():
+        assert path.read_bytes() == body
+        assert path.stat().st_mtime_ns == mtime_ns

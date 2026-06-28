@@ -14,6 +14,7 @@ if __package__ in {None, ""}:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from engine.bodygraph.vendor_client import HdApiClient, VendorRetryConfig, VendorTimeouts
+from engine.runtime.determinism_env import DeterminismEnvError, ensure_determinism_env
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "artifacts" / "vendor" / "hdapi_v2"
@@ -160,6 +161,16 @@ def build_rate_limit_headers(*, produced_at: str) -> dict[str, Any]:
     return data
 
 
+def enforce_closed_rails() -> dict[str, str]:
+    """Require closed deterministic rails before PR-01 evidence is certified."""
+
+    env = ensure_determinism_env()
+    mismatches = {key: env.get(key) for key, expected in CLOSED_RAILS_ENV.items() if env.get(key) != expected}
+    if mismatches:  # pragma: no cover - ensure_determinism_env should catch this first
+        raise DeterminismEnvError(f"HDAPI_V2_LIVE_CONFORMANCE_OPEN_RAILS:{mismatches!r}")
+    return env
+
+
 def render_outputs(*, produced_at: str | None = None) -> dict[Path, bytes]:
     timestamp = produced_at or _current_produced_at()
     return {
@@ -190,6 +201,10 @@ def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description="Generate HDE-EPIC035 HDAPI v2 provider outcome evidence")
     parser.add_argument("--check", action="store_true", help="verify generated artifacts are current")
     args = parser.parse_args(argv)
+    try:
+        enforce_closed_rails()
+    except DeterminismEnvError as exc:
+        raise SystemExit(f"HDAPI_V2_LIVE_CONFORMANCE_CLOSED_RAILS_REQUIRED:{exc}") from exc
     produced_at = _existing_generated_at(ERROR_MAPPING) if args.check else None
     write_outputs(render_outputs(produced_at=produced_at), check=args.check)
     print(f"checked {OUT.relative_to(ROOT).as_posix()} HDE-EPIC035 provider outcome artifacts" if args.check else f"generated {OUT.relative_to(ROOT).as_posix()} HDE-EPIC035 provider outcome artifacts")
