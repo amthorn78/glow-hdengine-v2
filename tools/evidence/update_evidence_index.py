@@ -1029,12 +1029,6 @@ def _load_epic035_pr01_entries() -> list[dict[str, object]]:
     produced = payload.get("generated_at_utc")
     if isinstance(produced, str) and produced:
         produced_at = produced
-    if produced_at is not None:
-        produced_dt = _parse_utc_iso8601(produced_at)
-        latest_mtime = max(snapshot.stat().st_mtime, rate_limit.stat().st_mtime)
-        latest_mtime_dt = _dt.datetime.fromtimestamp(latest_mtime, tz=_dt.timezone.utc).replace(microsecond=0)
-        if produced_dt < latest_mtime_dt:
-            produced_at = _isoformat(latest_mtime_dt)
     entries: list[dict[str, object]] = []
     for entry in EPIC035_PR01_PRIMARY_ARTIFACTS:
         normalized = dict(entry)
