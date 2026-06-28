@@ -1,0 +1,5 @@
+path: artifacts/vendor/hdapi_v2/release_binding.snapshot.json
+size_bytes: 2231
+sha256: b8b8e88f016374fba7c9ce13b1c63394c280889a1826e7c1ec011a7c7fe69c82
+mtime_utc: 2026-06-28T09:27:28Z
+produced_at_utc: 2026-06-28T09:27:28Z
