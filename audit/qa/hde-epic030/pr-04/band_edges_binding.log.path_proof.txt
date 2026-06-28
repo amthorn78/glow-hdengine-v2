@@ -1,5 +1,5 @@
 path: audit/qa/hde-epic030/pr-04/band_edges_binding.log
 size_bytes: 392
 sha256: 7767849cd7ba323fe6725f6096b1041578a800607c886635809b43ecbd509112
-mtime_utc: 2026-06-26T08:32:24Z
-produced_at_utc: 2026-06-26T14:49:31Z
+mtime_utc: 2026-06-28T01:57:43Z
+produced_at_utc: 2026-06-28T05:30:43Z
