@@ -1,0 +1,1 @@
+{"error":{"code":"PROVIDER_NOT_FOUND","details":{"status":404},"message":"vendor_error"},"resolver":{"allow_network":true,"dry_run":true,"requested_source":"vendor","resolved_source":"vendor","safe_mode":false,"upsert":false,"user_id":"qa-user"},"status":"error"}

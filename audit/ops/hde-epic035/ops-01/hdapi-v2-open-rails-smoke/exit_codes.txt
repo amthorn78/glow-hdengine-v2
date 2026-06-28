@@ -4,7 +4,13 @@ git rev-parse HEAD: 0
 git branch --show-current: 0
 git status --short (S1): 0
 mkdir -p audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke: 0
+hdctl bg:resolve --user qa-user --source vendor --birthdate 1990-01-01 --birthtime 12:00 --location "Paris, FR" --dry-run: 1
 manual_production_app_observation: n/a
-observed_app_flow: blocked
-blocker: production inputs I1 through I6 and production config visibility were not supplied in this Codex/local session; S4 was not executed
+observed_app_flow: vendor_error_class_observed
+observed_error_code: PROVIDER_NOT_FOUND
+observed_error_status: 404
+HD_API_BASE_URL=https://api.humandesignapi.nl hdctl bg:resolve --user qa-user --source vendor --birthdate 1990-01-01 --birthtime 12:00 --location "Paris, FR" --dry-run: 1
+no_version_observed_app_flow: vendor_error_class_observed
+no_version_observed_error_code: PROVIDER_NOT_FOUND
+no_version_observed_error_status: 404
 git status --short (S7): pending until final preservation check

@@ -1,11 +1,15 @@
-Target environment: production, not accessed in this Codex/local session.
-Production app/system entrypoint label: not supplied.
-Route-family label or app flow label: not supplied.
-Geocode behavior required: unknown; geocode-required test input was not supplied.
-GEO_API_KEY presence: not_visible_to_po.
-HD-Geocode-Key: <redacted> observed: not observed; S4 was not executed.
-Authorization: Bearer <redacted> observed: not observed; S4 was not executed.
-HD-Api-Key appeared on a v2 chart/geocode path: not observed; S4 was not executed.
-Vendor boundary: inconclusive_vendor_boundary; production app path was not observed.
+Target environment: production HD Engine Railway service.
+Production app/system entrypoint label: production_hd_engine_railway_service.
+Production app/system URL: https://glow-hdengine-v2-production.up.railway.app.
+Route-family label or app flow label: hd_engine_cli_open_rails_vendor_bodygraph_geocode_dry_run; legacy BodyGraph ingest path `vendor.hdapi.post:/bodygraphs`.
+Geocode behavior required: yes; sanitized input location=Paris, FR.
+GEO_API_KEY presence: present_redacted.
+HD-Geocode-Key: <redacted> observed: not visible in retained keys-only retry log; expected for geocode-required provider request but not proven by retained header-shape evidence.
+Authorization: Bearer <redacted> observed: not_applicable_to_current_bg_resolve_bodygraphs_path.
+HD-Api-Key appeared on a v2 chart/geocode path: not_applicable_unless_a_v2_charts_or_charts_simple_route_is_tested.
+HD-Api-Key legacy BodyGraph posture: applicable to current bodygraphs path per supplied PF10/PF07 posture; no raw header value was recorded.
+Observed safe result: status=error; error_code=PROVIDER_NOT_FOUND; error_status=404; route=vendor.hdapi.post:/bodygraphs; rails_state=open_exception.
+No-version rerun safe result: HD_API_BASE_URL was overridden to the versionless vendor base for one bounded rerun. The shaped URL path suffix was `/bodygraphs`, `HD-Api-Key` and `HD-Geocode-Key` were present in the in-memory request shape, `Authorization` was absent, and the provider still returned status=error; error_code=PROVIDER_NOT_FOUND; error_status=404.
+Vendor boundary: HD Engine CLI bg:resolve path exercised the sanctioned BodyGraph vendor seam; this does not prove v2 ChartResult / ChartSimpleResult normalization into compat.
 Secret-safe posture: no raw secrets, raw bearer tokens, raw API keys, raw geocode keys, raw request bodies, raw response bodies, raw vendor payload bodies, production user PII, or private payload bodies were recorded.
-Observation status: blocked before live production access because required production inputs I1 through I6 were not supplied.
+Observation status: vendor_error_class_observed.

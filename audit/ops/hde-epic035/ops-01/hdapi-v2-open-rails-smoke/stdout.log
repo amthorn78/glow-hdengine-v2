@@ -17,4 +17,32 @@ $ git status --short
 
 S4 production observation stdout
 
-no terminal stdout; production app observation captured in request_summary.txt and result_summary.md
+Command stdout was redirected to vendor_bodygraph_dry_run.json.
+
+Safe stdout summary:
+status=error
+error_code=PROVIDER_NOT_FOUND
+error_status=404
+requested_source=vendor
+resolved_source=vendor
+dry_run=True
+safe_mode=False
+allow_network=True
+upsert=False
+user_id=qa-user
+
+S4 no-version rerun stdout
+
+Command stdout was redirected to vendor_bodygraph_dry_run_no_version.json.
+
+Safe stdout summary:
+status=error
+error_code=PROVIDER_NOT_FOUND
+error_status=404
+requested_source=vendor
+resolved_source=vendor
+dry_run=True
+safe_mode=False
+allow_network=True
+upsert=False
+user_id=qa-user

@@ -40,26 +40,96 @@ Scope recorded: one bounded production HumanDesignAPI geokey observation for HDE
 
 S3 production config visibility
 
-Production config/status console source was not supplied in this Codex/local session. Secret-safe presence-only status is recorded in redacted_env_presence.json as not_visible_to_po.
+Production config/status source label supplied by PO: railway_hd_engine_service_redacted_env_config_status; railway_hd_engine_service_redacted_logs_if_available; vendor_bodygraph_dry_run.json.
 
-S4 production app observation
+Presence-only local operator shell probe:
 
-Manual production app steps performed: none.
+Command: env LC_ALL=C LANG=C TZ=UTC bash -lc 'for k in HD_API_BASE_URL HD_API_KEY GEO_API_KEY SAFE_MODE ALLOW_NETWORK LC_ALL LANG TZ; do if [ -n "${!k+x}" ]; then if [ -n "${!k}" ]; then printf "%s=present_redacted\n" "$k"; else printf "%s=not_present\n" "$k"; fi; else printf "%s=not_present\n" "$k"; fi; done'
+Exit: 0
+Stdout:
+HD_API_BASE_URL=present_redacted
+HD_API_KEY=present_redacted
+GEO_API_KEY=present_redacted
+SAFE_MODE=present_redacted
+ALLOW_NETWORK=present_redacted
+LC_ALL=present_redacted
+LANG=present_redacted
+TZ=present_redacted
+Stderr: none
 
-S4 was not executed because the required production inputs were not supplied in this Codex/local session:
-- I1 production app/system URL or entrypoint label
-- I2 PO-controlled production test account or approved test record
-- I3 production app flow to trigger geocode-required HD behavior
-- I4 geocode-required test input
-- I5 expected app-visible success behavior
-- I6 production log/config console source used for redacted evidence
+S4 production HD Engine observation
 
-Safe default applied: do not execute live production observation before the PO supplies I1 through I6.
+Production app/system entrypoint label: production_hd_engine_railway_service.
+Production app/system URL: https://glow-hdengine-v2-production.up.railway.app.
+Scope note: HD Engine production service, not Glow app product UI.
+PO-approved production test account / record label: qa-user.
+PII posture: no_pii_synthetic_test_record.
+Flow label: hd_engine_cli_open_rails_vendor_bodygraph_geocode_dry_run.
+Approved geocode-required test input, sanitized: user=qa-user; birthdate=1990-01-01; birthtime=12:00; location=Paris, FR.
+
+Command: SAFE_MODE=0 ALLOW_NETWORK=1 LC_ALL=C LANG=C TZ=UTC hdctl bg:resolve --user qa-user --source vendor --birthdate 1990-01-01 --birthtime 12:00 --location "Paris, FR" --dry-run > audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/vendor_bodygraph_dry_run.json 2> audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/vendor_bodygraph_dry_run.stderr
+Exit: 1
+Stdout destination: audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/vendor_bodygraph_dry_run.json
+Stderr destination: audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/vendor_bodygraph_dry_run.stderr
+
+Safe emitted JSON summary:
+status=error
+error_code=PROVIDER_NOT_FOUND
+error_status=404
+requested_source=vendor
+resolved_source=vendor
+dry_run=True
+safe_mode=False
+allow_network=True
+upsert=False
+user_id=qa-user
+
+Keys-only retry log observation:
+route=vendor.hdapi.post:/bodygraphs
+rails_state=open_exception
+outcome=failure
+error_class=4xx
+error_code=PROVIDER_NOT_FOUND
+status=404
+
+S4 rerun without version in HD_API_BASE_URL
+
+Command: HD_API_BASE_URL=https://api.humandesignapi.nl SAFE_MODE=0 ALLOW_NETWORK=1 LC_ALL=C LANG=C TZ=UTC hdctl bg:resolve --user qa-user --source vendor --birthdate 1990-01-01 --birthtime 12:00 --location "Paris, FR" --dry-run > audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/vendor_bodygraph_dry_run_no_version.json 2> audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/vendor_bodygraph_dry_run_no_version.stderr
+Exit: 1
+Stdout destination: audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/vendor_bodygraph_dry_run_no_version.json
+Stderr destination: audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/vendor_bodygraph_dry_run_no_version.stderr
+
+No-version safe emitted JSON summary:
+status=error
+error_code=PROVIDER_NOT_FOUND
+error_status=404
+requested_source=vendor
+resolved_source=vendor
+dry_run=True
+safe_mode=False
+allow_network=True
+upsert=False
+user_id=qa-user
+
+No-version request-shape probe summary:
+url_path_suffix=/bodygraphs
+route=vendor.hdapi.post:/bodygraphs
+has_HD_Api_Key=True
+has_HD_Geocode_Key=True
+has_Authorization=False
+
+No-version keys-only retry log observation:
+route=vendor.hdapi.post:/bodygraphs
+rails_state=open_exception
+outcome=failure
+error_class=4xx
+error_code=PROVIDER_NOT_FOUND
+status=404
 
 S7 preservation status
 
 Command: git status --short
-Exit: pending until final preservation check
+Exit: pending until final preservation check after final file updates
 Stdout:
-pending until final preservation check
+pending until final preservation check after final file updates
 Stderr: none
