@@ -1310,6 +1310,17 @@ EPIC035_PR03_OPS01_ARTIFACTS: list[dict[str, object]] = [
     },
 ]
 
+
+def _epic035_ops01_v2_stdout_is_valid(stdout_payload: Mapping[str, object]) -> bool:
+    return (
+        stdout_payload.get("authorization_header_shape") == "Authorization: Bearer <redacted>"
+        and stdout_payload.get("hd_geocode_key_header_shape") == "HD-Geocode-Key: <redacted>"
+        and stdout_payload.get("has_authorization") is True
+        and stdout_payload.get("has_hd_geocode_key") is True
+        and stdout_payload.get("legacy_hd_api_key_on_v2_path") is False
+        and stdout_payload.get("has_hd_api_key") is False
+    )
+
 def _load_epic035_pr03_entries() -> list[dict[str, object]]:
     acceptance = ROOT / "docs/acceptance_map_epic035.json"
     binding = ROOT / "audit/qa/hde-epic035/ops-01/ops_evidence_binding.log"
@@ -1335,7 +1346,11 @@ def _load_epic035_pr03_entries() -> list[dict[str, object]]:
             raise SystemExit("INVALID_EPIC035_OPS01_FINAL_CLASSIFICATION")
     if stdout.exists():
         text = stdout.read_text(encoding="utf-8")
-        if "Authorization: Bearer <redacted>" not in text or "HD-Geocode-Key: <redacted>" not in text or "legacy_hd_api_key_on_v2_path" not in text:
+        try:
+            stdout_payload = json.loads(text)
+        except json.JSONDecodeError as exc:
+            raise SystemExit("INVALID_EPIC035_OPS01_V2_STDOUT_JSON") from exc
+        if not _epic035_ops01_v2_stdout_is_valid(stdout_payload):
             raise SystemExit("INVALID_EPIC035_OPS01_V2_STDOUT")
     entries = []
     for entry in EPIC035_PR03_OPS01_ARTIFACTS:

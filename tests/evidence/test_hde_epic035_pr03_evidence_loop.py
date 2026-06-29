@@ -4,6 +4,8 @@ import hashlib
 import json
 from pathlib import Path
 
+from tools.evidence.update_evidence_index import _epic035_ops01_v2_stdout_is_valid
+
 ROOT = Path(__file__).resolve().parents[2]
 ACCEPTANCE = ROOT / "docs/acceptance_map_epic035.json"
 MATRIX = ROOT / "audit/qa/hde-epic035/token_evidence_matrix.md"
@@ -78,10 +80,17 @@ def test_ops01_paths_and_binding_preserve_success_gap_distinction() -> None:
         assert rel in payload["referenced_evidence_paths"]
         assert (ROOT / rel).exists()
     stdout = (ROOT / "audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/v2_charts_simple_stdout.log").read_text()
-    assert "Authorization: Bearer <redacted>" in stdout
-    assert "HD-Geocode-Key: <redacted>" in stdout
-    assert "legacy_hd_api_key_on_v2_path" in stdout
-    assert "raw payload persistence" not in stdout.lower()
+    stdout_payload = json.loads(stdout)
+    assert stdout_payload["authorization_header_shape"] == "Authorization: Bearer <redacted>"
+    assert stdout_payload["hd_geocode_key_header_shape"] == "HD-Geocode-Key: <redacted>"
+    assert stdout_payload["has_authorization"] is True
+    assert stdout_payload["has_hd_geocode_key"] is True
+    assert stdout_payload["legacy_hd_api_key_on_v2_path"] is False
+    assert stdout_payload["has_hd_api_key"] is False
+    assert stdout_payload["raw_request_body_persisted"] is False
+    assert stdout_payload["raw_response_body_persisted"] is False
+    assert stdout_payload["raw_secret_persisted"] is False
+    assert stdout_payload["raw_vendor_payload_persisted"] is False
     final = (ROOT / "audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/final_classification.txt").read_text()
     assert "v2_charts_simple=success" in final
     assert "bg_resolve_http_status=404" in final
@@ -137,3 +146,13 @@ def test_boundary_logs_are_not_closeout_or_runbooks() -> None:
     assert "ops_completion_claim=false" in text
     assert "pf09_status_movement_claim=false" in text
     assert "full_runtime_conformance_claim=false" in text
+
+
+def test_epic035_stdout_guard_rejects_legacy_hd_api_key_regression() -> None:
+    payload = json.loads((ROOT / "audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/v2_charts_simple_stdout.log").read_text())
+    assert _epic035_ops01_v2_stdout_is_valid(payload) is True
+    payload["legacy_hd_api_key_on_v2_path"] = True
+    assert _epic035_ops01_v2_stdout_is_valid(payload) is False
+    payload["legacy_hd_api_key_on_v2_path"] = False
+    payload["has_hd_api_key"] = True
+    assert _epic035_ops01_v2_stdout_is_valid(payload) is False
