@@ -1321,6 +1321,38 @@ def _epic035_ops01_v2_stdout_is_valid(stdout_payload: Mapping[str, object]) -> b
         and stdout_payload.get("has_hd_api_key") is False
     )
 
+
+def _load_epic035_ops01_checksum_ledger(ledger_path: Path) -> dict[str, str]:
+    ledger: dict[str, str] = {}
+    for line_number, raw_line in enumerate(ledger_path.read_text(encoding="utf-8").splitlines(), start=1):
+        if not raw_line.strip():
+            continue
+        parts = raw_line.split(maxsplit=1)
+        if len(parts) != 2 or len(parts[0]) != 64:
+            raise SystemExit(f"INVALID_EPIC035_OPS01_CHECKSUM_LEDGER_LINE:{line_number}")
+        sha, rel = parts
+        if any(char not in "0123456789abcdef" for char in sha):
+            raise SystemExit(f"INVALID_EPIC035_OPS01_CHECKSUM_LEDGER_SHA:{line_number}")
+        ledger[rel.strip()] = sha
+    return ledger
+
+
+def _validate_epic035_ops01_checksums() -> None:
+    ledger_path = ROOT / "audit/ops/hde-epic035/ops-01/files_sha256.txt"
+    if not ledger_path.exists():
+        raise SystemExit("MISSING_EPIC035_OPS01_CHECKSUM_LEDGER")
+    ledger = _load_epic035_ops01_checksum_ledger(ledger_path)
+    for entry in EPIC035_PR03_OPS01_ARTIFACTS:
+        rel = str(entry["discovered_physical_path"])
+        if not rel.startswith("audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/"):
+            continue
+        expected_sha = ledger.get(rel)
+        if expected_sha is None:
+            raise SystemExit(f"MISSING_EPIC035_OPS01_LEDGER_ENTRY:{rel}")
+        actual_sha = _sha256_path(ROOT / rel)
+        if actual_sha != expected_sha:
+            raise SystemExit(f"MISMATCH_EPIC035_OPS01_LEDGER_SHA:{rel}")
+
 def _load_epic035_pr03_entries() -> list[dict[str, object]]:
     acceptance = ROOT / "docs/acceptance_map_epic035.json"
     binding = ROOT / "audit/qa/hde-epic035/ops-01/ops_evidence_binding.log"
@@ -1352,6 +1384,7 @@ def _load_epic035_pr03_entries() -> list[dict[str, object]]:
             raise SystemExit("INVALID_EPIC035_OPS01_V2_STDOUT_JSON") from exc
         if not _epic035_ops01_v2_stdout_is_valid(stdout_payload):
             raise SystemExit("INVALID_EPIC035_OPS01_V2_STDOUT")
+    _validate_epic035_ops01_checksums()
     entries = []
     for entry in EPIC035_PR03_OPS01_ARTIFACTS:
         if not (ROOT / str(entry["discovered_physical_path"])).exists():

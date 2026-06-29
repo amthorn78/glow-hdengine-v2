@@ -4,7 +4,12 @@ import hashlib
 import json
 from pathlib import Path
 
-from tools.evidence.update_evidence_index import _epic035_ops01_v2_stdout_is_valid
+from tools.evidence.update_evidence_index import (
+    ROOT as INDEX_ROOT,
+    _epic035_ops01_v2_stdout_is_valid,
+    _load_epic035_ops01_checksum_ledger,
+    _validate_epic035_ops01_checksums,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 ACCEPTANCE = ROOT / "docs/acceptance_map_epic035.json"
@@ -156,3 +161,15 @@ def test_epic035_stdout_guard_rejects_legacy_hd_api_key_regression() -> None:
     payload["legacy_hd_api_key_on_v2_path"] = False
     payload["has_hd_api_key"] = True
     assert _epic035_ops01_v2_stdout_is_valid(payload) is False
+
+
+def test_epic035_ops01_checksum_ledger_matches_promoted_retained_files() -> None:
+    ledger_path = ROOT / "audit/ops/hde-epic035/ops-01/files_sha256.txt"
+    ledger = _load_epic035_ops01_checksum_ledger(ledger_path)
+    for rel in REQUIRED_OPS_PATHS:
+        if not rel.startswith("audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/"):
+            continue
+        assert rel in ledger
+        assert hashlib.sha256((ROOT / rel).read_bytes()).hexdigest() == ledger[rel]
+    assert INDEX_ROOT == ROOT
+    _validate_epic035_ops01_checksums()
