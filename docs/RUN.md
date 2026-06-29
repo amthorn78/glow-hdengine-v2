@@ -39,6 +39,13 @@ python tools/evidence/update_evidence_index.py  # index generated artifacts unde
 ```
 The config acceptance map lives at `audit/EPIC-018_config_acceptance_map.json` (governed). Sampler/core acceptance for EPIC019 is tracked in `docs/acceptance_map_epic019.json` with a path proof.
 
+## HumanDesignAPI v2 evidence / geokey posture (HDE-EPIC035)
+
+- HDE-EPIC035 is evidence work for HDE-FERM008.3 through HDE-FERM008.5, not a public Reader, public route, payload, transport, app-side credential, AI, or full runtime-conformance expansion.
+- Governed evidence anchors are `artifacts/vendor/hdapi_v2/error_mapping.snapshot.json`, `artifacts/vendor/hdapi_v2/rate_limit_headers.snapshot.json`, `artifacts/vendor/hdapi_v2/response_mapping.snapshot.json`, `artifacts/vendor/hdapi_v2/release_binding.snapshot.json`, `docs/acceptance_map_epic035.json`, `audit/qa/hde-epic035/token_evidence_matrix.md`, `audit/qa/hde-epic035/ops-01/ops_evidence_binding.log`, and retained OPS evidence under `audit/ops/hde-epic035/ops-01/`.
+- Secret/config names are `HD_API_BASE_URL`, `HD_API_KEY`, and `GEO_API_KEY`; document only names or redacted header shapes, never values. Retained OPS-01 evidence records v2 `charts/simple` using `Authorization: Bearer <redacted>` and `HD-Geocode-Key: <redacted>`, with legacy `HD-Api-Key` absent on that v2 path.
+- `hdctl bg:resolve --source vendor` remains the legacy BodyGraph ingest-path workflow and recorded a `PROVIDER_NOT_FOUND` / 404 runtime gap against the configured v2 base in retained OPS-01 evidence. Do not present it as the canonical v2 chart/geokey validation path; v2 `charts` / `charts/simple` observations carry that posture.
+
 ## Dev-only conjunction endpoints (do not enable in production)
 
 The conjunction preview routes `/dev/sampler/conjunction`, `/dev/reader/conjunction`, and `/dev/writer/conjunction` are dev-harness surfaces only. Runtime gating is enforced by `APP_ENV`: requests are allowed only when `APP_ENV` is `dev`, `test`, or `local`; all other values (including prod) are rejected with a forbidden writer-style envelope. Keep these endpoints limited to local/dev/test workflows under SAFE rails and never expose them on production surfaces.

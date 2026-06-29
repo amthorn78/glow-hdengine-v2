@@ -13,6 +13,7 @@ The CLI shares the canonical presenter/emitter and serializer with the Reader ha
   - `hdctl showcompat --conjunction` (reads one conjunction pair payload from stdin)
 - `hdctl aux-preview --pair-file <compat.json> --category <slug> --band <band> --perspective <perspective> [--show-narrative] [--admin-out <ids.json>]`
 - `hdctl bg:resolve --user <user> [--source auto|db|vendor] [--birthdate YYYY-MM-DD --birthtime HH:MM --location <place>]`
+  - HDE-EPIC035 note: `--source vendor` uses the preserved legacy BodyGraph ingest path. Do not use it as the canonical v2 chart/geokey validation path; v2 `charts` / `charts/simple` observations carry that evidence posture.
 - Dev-only sampler CLI (APP_ENV in `dev|test|local`, QA only): `hdctl dev:sampler --viewer <viewer_id> --candidates-file <candidates.json> [--seed <seed>]`
 - Flags for QA sidecars: `--dump-reader <out.json> --dump-admin-dir <dir>`
 
@@ -24,6 +25,14 @@ Exit codes: 0 success; 64 for usage/validation/IO errors surfaced via `CliError`
 - Serializer grep guard: `python tools/cli/serializer_grep_guard.py` → `artifacts/cli/guards/serializer_grep_guard.log`
 - Emitter symbol proof: `python tools/cli/emitter_symbol_proof.py` → `artifacts/cli/guards/emitter_symbol_proof.txt`
 Both guards fail fast if determinism rails are not pinned and protect the allow-listed presenter/emitter.
+
+
+## HumanDesignAPI v2 evidence posture (HDE-EPIC035)
+
+- PR-01 provider-outcome evidence for HDE-FERM008.3 is governed at `artifacts/vendor/hdapi_v2/error_mapping.snapshot.json` and `artifacts/vendor/hdapi_v2/rate_limit_headers.snapshot.json`.
+- PR-02 response-normalization evidence for HDE-FERM008.4 is governed at `artifacts/vendor/hdapi_v2/response_mapping.snapshot.json` and records the exact v2 ChartResult / ChartSimpleResult schema-adapter gap; `artifacts/vendor/hdapi_v2/release_binding.snapshot.json` binds PR-01 and PR-02 without claiming full runtime conformance.
+- Retained OPS-01 evidence under `audit/ops/hde-epic035/ops-01/` proves v2 `charts/simple` header posture with `Authorization: Bearer <redacted>` plus `HD-Geocode-Key: <redacted>` and legacy `HD-Api-Key` absent on that v2 path. The same retained evidence records `bg:resolve` as a legacy BodyGraph ingest-path runtime gap (`PROVIDER_NOT_FOUND` / 404) against the configured v2 base.
+- PR-03 evidence-loop binding is recorded at `docs/acceptance_map_epic035.json`, `audit/qa/hde-epic035/token_evidence_matrix.md`, and `audit/qa/hde-epic035/ops-01/ops_evidence_binding.log`; it is not a QA PASS, OPS completion, PF09 status movement, HDE-FERM008 parent Done claim, epic closeout, public Reader change, new HTTP home, full HumanDesignAPI v2 runtime-conformance claim, or AI scope.
 
 ## Evidence discipline
 - Conjunction evidence artifacts: `artifacts/audit/cli/pair.json`, `artifacts/audit/cli/pair_ba.json`, `artifacts/audit/cli/showcompat_ab.json`, `artifacts/audit/cli/showcompat_ba.json`, compare logs under `artifacts/audit/cli/`, and ABBA sidecar artifacts under `artifacts/cli/abba_sidecar.json` (with `.sha256` + `.path_proof.txt`).

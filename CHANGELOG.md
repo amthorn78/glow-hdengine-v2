@@ -1,5 +1,16 @@
 # CHANGELOG
 
+Unreleased — HDE-EPIC035: Fermentation Pass 6 final repo docs sweep (README/CHANGELOG/AGENTS/docs/)
+
+### Added
+- Documented HDE-EPIC035 evidence outcomes for PR-01 provider-outcome mapping, PR-02 response-normalization exact schema/adapter gap, OPS-01 retained v2 `charts/simple` geokey/auth evidence plus legacy `bg:resolve` runtime gap, and PR-03 evidence-loop binding.
+- Added repo-doc posture for secret-safe v2 chart/geokey validation: v2 chart-style routes use `Authorization: Bearer <redacted>`, geocode-required v2 chart routes use `HD-Geocode-Key: <redacted>`, and preserved legacy BodyGraph-style routes use `HD-Api-Key: <redacted>` only where intentionally retained.
+
+### Changed / Fixed
+- Refreshed public and developer docs from HDE-EPIC034 Fermentation Pass 5 wording to HDE-EPIC035 Fermentation Pass 6 current repo truth while preserving prior evidence history.
+- Clarified that `hdctl bg:resolve --source vendor` remains a legacy BodyGraph ingest-path workflow and must not be presented as the canonical v2 chart/geokey validation path; v2 `charts` / `charts/simple` observations carry that evidence posture.
+- Preserved HDE-EPIC035 nonclaims: no public Reader change, public route/flag/payload/transport change, new HTTP home, app-side HumanDesignAPI call path, raw secrets or raw payload persistence, vendor-v2-specific acceptance token, QA PASS, OPS completion, PF09 status movement, HDE-FERM008 parent Done, epic closeout, full HumanDesignAPI v2 runtime-conformance claim, or AI scope.
+
 Unreleased — HDE-EPIC034: Fermentation Pass 5 final repo docs sweep (README/CHANGELOG/AGENTS/docs/)
 
 ### Added
