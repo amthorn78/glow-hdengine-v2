@@ -1,8 +1,8 @@
 # 0\) Front Matter
 
 **Name:** PF10-HDE-Build-Notes   
-**Version:** v11.8.1  
-Effective Date: 2026.06.29
+**Version:** v11.8.3  
+Effective Date: 2026.06.30
 
 **Status:** Living  
 **Invocation tag:** INV-f2ac55d77ce9aacc
@@ -57,7 +57,9 @@ TEMPLATE Addendum Entry (do not edit/remove)
 2.5) PR-02 HDE-EPIC035  
 2.6) Implementation Retrospective  HDE-EPIC035  
 2.7) ADR — ChartResult adapter gap is accepted for HDE-EPIC035 evidence, but future runtime work must prove full BodyGraph-detail mapping  
-2.8) ADR — bg:resolve \--source vendor must resolve BodyGraph detail through an explicit vendor-route policy, not accidental legacy route composition
+2.8) ADR — bg:resolve \--source vendor must resolve BodyGraph detail through an explicit vendor-route policy, not accidental legacy route composition  
+2.9) Post Implementation Audit Analysis \- HDE-EPIC035  
+2.10) Permanent PF-Canon Must Forbid Syntax / Escape / Command-Literal Blocking in Plan Approval
 
 # 2\) Numbered Addenda
 
@@ -6540,5 +6542,721 @@ It does prohibit ambiguous route composition and unsupported runtime claims.
 Until drained, PF10 is the live source of truth:
 
 `bg:resolve --source vendor` must continue to resolve BodyGraph details, but future work must align it with an explicit vendor-route policy and must not treat the current legacy-route runtime gap as acceptable final behavior.
+
+## 2.9) Post Implementation Audit Analysis \- HDE-EPIC035
+
+Audit Report: Post Implementation Audit HDE-EPIC035.md
+
+Epic Plan: r1 Epic Plan HDE-EPIC035.md
+
+Repo root reviewed: amthorn78/glow-hdengine-v2 @ 2c077453eeb5a5db502c16ecc82a3ea9c05679ec
+
+Existing Issues List: none
+
+PF Canon: Latest PF10 \+ task-relevant PF-Canon as consulted
+
+Output: Audit Analysis — Doc Deltas
+
+Audit Summary
+
+* The audit compares post-implementation repo reality against the HDE-EPIC035 plan posture for HDAPI v2 error mapping, response normalization, live-conformance evidence-loop closure, evidence roots, endpoint/adapter boundaries, deterministic compute boundaries, vendor seam placement, and path/root discipline.  
+* Targeted repo cross-check was performed through current GitHub repo inspection against `amthorn78/glow-hdengine-v2`.  
+* 7 findings were mapped in audit order.  
+* 0 findings are marked Must-act-now.  
+* Top drift themes: presenter/adapter namespace ambiguity, split HTTP surface placement, multi-root evidence interpretation, deterministic compute versus operational I/O, engine-internal vendor seam placement, lowercase QA roots versus mixed-case filenames, and root proliferation.  
+* Repo cross-check confirmed the major audit themes, but narrowed them to already-classified canon posture rather than new PF doc-delta work.  
+* No PF09.x task deltas are proposed because the findings are classification observations, not new dev, OPS, runtime, infrastructure, test, or required runnable-evidence work.  
+* No PF14, PF02, PF12, PF05, or PF20 doc delta proposals are needed.  
+* PF doc homes consulted for classification: PF02 — HDE Architecture, PF05 — HDE CLI-API-Vendor Ref, PF12 — HDE Schemas and Artifacts, and PF14 — HDE Mechanics Guide.
+
+Repo Inspection Summary
+
+observed repo root
+
+amthorn78/glow-hdengine-v2
+
+observed HEAD
+
+2c077453eeb5a5db502c16ecc82a3ea9c05679ec
+
+Repo: "GitHub search\_commits HDE-EPIC035" → "sha: 2c077453eeb5a5db502c16ecc82a3ea9c05679ec"
+
+branch or detached state
+
+main default branch inspected through GitHub repo access. The Audit Report metadata separately states its local audit snapshot was on branch `work`.
+
+working tree status before analysis
+
+No mutable local working tree status was available through the GitHub connector. The Audit Report states `git status --porcelain` produced no output for its local audit snapshot.
+
+repo inspection scope
+
+Targeted repo inspection covered current repo metadata and current repo files or searches for `pyproject.toml`, `adapter/wsgi.py`, `engine/http/compat_handler.py`, `adapter/http_reader.py`, `engine/presenter/emitter.py`, `presenter/reader_v1/emitter.py`, `engine/sampler/core.py`, `engine/bodygraph/vendor_client.py`, `engine/bodygraph/ingest.py`, `tools/evidence/update_evidence_index.py`, `docs/evidence/INDEX.json`, `audit/EPIC-024_MANIFEST.json`, `artifacts/vendor/hdapi_v2/error_mapping.snapshot.json`, `artifacts/vendor/hdapi_v2/rate_limit_headers.snapshot.json`, and `artifacts/vendor/hdapi_v2/release_binding.snapshot.json`.
+
+repo commands or inspection methods used
+
+GitHub repo metadata lookup, GitHub commit search, GitHub file fetch, GitHub file-line fetch, and bounded GitHub code search. Local read-only inspection of attached Audit Report, Epic Plan, PF10, and task-relevant PF-Canon was also used.
+
+key repo cross-check outcomes
+
+Repo cross-check confirmed that the current repo contains `engine*`, `adapter*`, and `presenter*` package families; `hdctl = "engine.cli.main:cli"`; adapter-level WSGI registration of both `reader_bp` and `compat_blueprint`; `engine/http/compat_handler.py` with `/api/compat/v1`; canonical Evidence Index and Machine Mirror paths in `tools/evidence/update_evidence_index.py`; HDE-EPIC035 HDAPI v2 error/rate-limit/release-binding artifacts; deterministic sampler code; and vendor/ingest code using operational I/O seams.
+
+material audit findings contradicted or narrowed by Repo, if any
+
+No material audit finding was contradicted. Repo cross-check narrowed the findings to classification surfaces already handled by PF canon, so no PF doc delta is proposed.
+
+working tree status after analysis, if commands were run
+
+No local working tree was modified. GitHub connector inspection was read-only; no local repo commands were run.
+
+Findings → Doc Delta Map
+
+FND-001 —
+
+Finding: The audit observes adapter and presenter as both top-level and engine-internal package families, creating naming ambiguity, but current PF02 already classifies namespace split versus component-home ownership.
+
+Audit anchor: Observed: Adapter and presenter are both top-level packages and engine-internal packages also exist (engine/presenter, engine/http, engine/cli).
+
+Audit evidence pointer: Post Implementation Audit HDE-EPIC035.md: "Observed: Adapter and presenter are both top-level packages and engine-internal packages also exist (engine/presenter, engine/http, engine/cli)."
+
+Epic Plan linkage: The Epic Plan keeps existing public Reader behavior unchanged and does not introduce a new public Reader route, payload, or transport surface.
+
+Epic Plan anchor: r1 Epic Plan HDE-EPIC035.md: "\* Backward-compat posture: Existing public Reader behavior remains unchanged by default. Legacy v1 BodyGraph behavior remains explicitly legacy behavior. HDAPI v2 work must not collapse v1 and v2 auth behavior, source-family identity, response mapping, or evidence posture into a generic vendor path."
+
+Repo cross-check: Current repo confirms package discovery includes `engine*`, `adapter*`, and `presenter*`, and confirms both `engine/presenter/emitter.py` and `presenter/reader_v1/emitter.py` exist with emitter behavior.
+
+Repo posture: Confirmed
+
+Repo evidence pointer: Repo: "pyproject.toml" → "include \= \["engine\*", "adapter\*", "presenter\*"\]"; Repo: "engine/presenter/emitter.py" → "def emit\_public(envelope: Dict\[str, Any\], \*, sort\_keys: bool \= True) \-\> bytes:"; Repo: "presenter/reader\_v1/emitter.py" → "def emit\_reader\_v1(enriched: Dict\[str, Any\]) \-\> Tuple\[bytes, Dict\[str, Any\]\]:"
+
+Must-act-now: NO
+
+Disposition: No doc delta needed
+
+Correct home(s): PF02 — HDE Architecture
+
+PF09.x task delta: NO
+
+PF09.x target: N/A
+
+PF14 mechanics delta: NO
+
+PF02 architecture delta: NO
+
+Other PF doc delta(s): None
+
+PF20 historical correction: NO
+
+Existing issue duplicate: N/A
+
+Why these are the correct homes: PF02 owns architecture boundaries and component responsibility, and it already classifies presenter namespace split without making it drift by itself. PF02 — HDE Architecture, §Routing (titles-only) → "\* **Presenter component home (names-only).** The presenter component is single-home by role and byte-authoritative emitter symbol, not by one literal repository path." | "\* **Namespace split without serializer split.** Wrapper envelope builders MAY live under top-level `presenter/`, while the byte-authoritative emitter entrypoint MAY live under `engine/presenter/`, provided all public-byte emission delegates to the same governed emitter path."
+
+FND-002 —
+
+Finding: The audit observes compat HTTP route code in `engine/http/compat_handler.py` while app registration occurs in `adapter/wsgi.py`, but PF02/PF05/PF14 already distinguish handler placement from adapter ownership and endpoint proof class.
+
+Audit anchor: Observed: Compat HTTP route lives under engine/http/compat\_handler.py, while app registration is in adapter/wsgi.py.
+
+Audit evidence pointer: Post Implementation Audit HDE-EPIC035.md: "Observed: Compat HTTP route lives under engine/http/compat\_handler.py, while app registration is in adapter/wsgi.py."
+
+Epic Plan linkage: The Epic Plan states no public product contract change and constrains work to the internal vendor seam and governed evidence.
+
+Epic Plan anchor: r1 Epic Plan HDE-EPIC035.md: "\* Contract changes / new surfaces: No public product contract change is introduced by this epic. The planned work affects internal vendor acquisition, BodyGraph persistence-facing behavior, retrieval-facing behavior, and compute-facing behavior. The Glow app remains the product shell and consumer of HD Engine outputs."
+
+Repo cross-check: Current repo confirms `adapter/wsgi.py` imports and registers `compat_blueprint`, and `engine/http/compat_handler.py` defines the `/api/compat/v1` blueprint.
+
+Repo posture: Confirmed
+
+Repo evidence pointer: Repo: "adapter/wsgi.py" → "from engine.http.compat\_handler import compat\_blueprint" | "app.register\_blueprint(compat\_blueprint)"; Repo: "engine/http/compat\_handler.py" → "compat\_blueprint \= Blueprint("compat", **name**, url\_prefix="/api/compat/v1")"
+
+Must-act-now: NO
+
+Disposition: No doc delta needed
+
+Correct home(s): PF02 — HDE Architecture; PF05 — HDE CLI-API-Vendor Ref; PF14 — HDE Mechanics Guide
+
+PF09.x task delta: NO
+
+PF09.x target: N/A
+
+PF14 mechanics delta: NO
+
+PF02 architecture delta: NO
+
+Other PF doc delta(s): None
+
+PF20 historical correction: NO
+
+Existing issue duplicate: N/A
+
+Why these are the correct homes: PF02 owns HTTP-home architecture, PF05 owns Reader/compat API surface posture, and PF14 owns endpoint mechanics. Existing canon already distinguishes mounted HTTP family from handler package path. PF02 — HDE Architecture, §1.1 Single homes → "\* **Repo layout note (HTTP surfaces).** Single HTTP home means the adapter component owns route registration, guard rails, and surface mounting." | "Implementation may temporarily host some HTTP handlers in modules outside the `adapter/` directory, but Architecture still treats all HTTP entrypoints as belonging to the adapter component." PF05 — HDE CLI-API-Vendor Ref, §5.6 Endpoint Catalog (JSON success) \[Required−Now\] → "\* Public Reader output and internal/admin compatibility output are distinct proof classes. Do not treat `/api/compat/v1` proof as public `/reader` proof, and do not treat `/reader` proof-surface status as internal/admin compat enablement." PF14 — HDE Mechanics Guide, §9.1 Endpoint Catalog (JSON success) \[Required-Now\] → "Endpoint-class authority note (normative). Endpoint class, A7-eligibility posture, and dev/internal scope are per-endpoint catalog facts."
+
+FND-003 —
+
+Finding: The audit observes governed/evidence-like outputs across multiple roots, but PF12 already defines multi-root evidence as valid when bound by the Human Evidence Index, Machine Mirror, and path-proof discipline.
+
+Audit anchor: Observed: Governed/evidence-like outputs are spread across docs/, artifacts/, audit/, plus root-level reports and proof-like files.
+
+Audit evidence pointer: Post Implementation Audit HDE-EPIC035.md: "Observed: Governed/evidence-like outputs are spread across docs/, artifacts/, audit/, plus root-level reports and proof-like files."
+
+Epic Plan linkage: The Epic Plan uses PF12 as the governed evidence home and does not create alternate evidence homes.
+
+Epic Plan anchor: r1 Epic Plan HDE-EPIC035.md: "HDAPI v2 error mapping, rate-limit headers, and release binding are governed by HDE Schemas and Artifacts. Alternative homes for these proof families are not planned."
+
+Repo cross-check: Current repo confirms the canonical Human Evidence Index and Machine Mirror path constants in the evidence update tool, and current HDE-EPIC035 governed artifacts exist under `artifacts/vendor/hdapi_v2/`.
+
+Repo posture: Confirmed
+
+Repo evidence pointer: Repo: "tools/evidence/update\_evidence\_index.py" → "HUMAN\_INDEX \= ROOT / "docs/evidence/INDEX.json"" | "MIRROR\_PATH \= ROOT / "artifacts/evidence\_index.jsonl""; Repo: "artifacts/vendor/hdapi\_v2/error\_mapping.snapshot.json" → ""epic\_id":"HDE-EPIC035""
+
+Must-act-now: NO
+
+Disposition: No doc delta needed
+
+Correct home(s): PF12 — HDE Schemas and Artifacts
+
+PF09.x task delta: NO
+
+PF09.x target: N/A
+
+PF14 mechanics delta: NO
+
+PF02 architecture delta: NO
+
+Other PF doc delta(s): None
+
+PF20 historical correction: NO
+
+Existing issue duplicate: N/A
+
+Why these are the correct homes: PF12 owns artifact families, governed evidence paths, Human Evidence Index, Machine Mirror, and path-proof discipline. Current PF12 already treats multi-root evidence as valid when bound by those mechanisms. PF12 — HDE Schemas and Artifacts, §0.2 Scope & single homes \[Required-Now\] → "\* Evidence artifacts MAY be stored across multiple governed roots. Single-home means the Human Evidence Index and Machine Evidence Mirror are the single authoritative bindings between artifact keys and repo paths, with one co-located `*.path_proof.txt` transcript per governed artifact." | "\* Evidence layout is evaluated by index, mirror, and path-proof completeness and coherence, plus same-PR coupling and path validation, not by whether files live in one directory."
+
+FND-004 —
+
+Finding: The audit observes pure deterministic sampler code alongside vendor/ingest paths with time, network, DB, and file I/O, but PF02/PF14 already distinguish deterministic compute from sanctioned operational seams.
+
+Audit anchor: Observed: Core sampler states no clocks/random/external state, while vendor/ingest paths use time, network, DB, and file logs.
+
+Audit evidence pointer: Post Implementation Audit HDE-EPIC035.md: "Observed: Core sampler states no clocks/random/external state, while vendor/ingest paths use time, network, DB, and file logs."
+
+Epic Plan linkage: The Epic Plan preserves public Reader behavior and keeps HDAPI v2 proof posture distinct from public runtime contract changes.
+
+Epic Plan anchor: r1 Epic Plan HDE-EPIC035.md: "\* Backward-compat posture: Existing public Reader behavior remains unchanged by default. Legacy v1 BodyGraph behavior remains explicitly legacy behavior. HDAPI v2 work must not collapse v1 and v2 auth behavior, source-family identity, response mapping, or evidence posture into a generic vendor path."
+
+Repo cross-check: Current repo confirms sampler pure-compute text and confirms vendor/ingest I/O behavior through vendor client imports and ingest rails/network behavior.
+
+Repo posture: Confirmed
+
+Repo evidence pointer: Repo: "engine/sampler/core.py" → "- No randomness, clocks, or external state are consulted."; Repo: "engine/bodygraph/vendor\_client.py" → "import socket" | "import time" | "from urllib import request as urlrequest"; Repo: "engine/bodygraph/ingest.py" → "client \= client or HdApiClient.from\_env(log\_path=retry\_log)" | "vendor\_result \= client.fetch(request)"
+
+Must-act-now: NO
+
+Disposition: No doc delta needed
+
+Correct home(s): PF02 — HDE Architecture; PF14 — HDE Mechanics Guide
+
+PF09.x task delta: NO
+
+PF09.x target: N/A
+
+PF14 mechanics delta: NO
+
+PF02 architecture delta: NO
+
+Other PF doc delta(s): None
+
+PF20 historical correction: NO
+
+Existing issue duplicate: N/A
+
+Why these are the correct homes: PF02 owns architecture seam classification and PF14 owns mechanics responsibilities. Current canon already allows BodyGraph vendor/DB I/O as a sanctioned seam while preserving pure-compute restrictions for deterministic compute modules. PF02 — HDE Architecture, §1.1 Single homes → "Purity rule (normative). Any module designated as deterministic compute (including sampler core and Engine Core modules) MUST be pure-compute: no time, network, file I/O, randomness, or environment reads at compute time; no import-time side effects." | "BodyGraph seam carve-out (normative). BodyGraph resolution and ingest MAY perform vendor and DB I/O through the DB abstraction as a sanctioned seam, including when implemented under `engine/bodygraph/`." PF14 — HDE Mechanics Guide, §HDAPI v2 vendor seam mechanics → "HDAPI v2 vendor seam mechanics. The repo MUST provide one sanctioned vendor seam for HumanDesignAPI integration."
+
+FND-005 —
+
+Finding: The audit observes vendor client and BodyGraph ingest inside `engine/bodygraph/` rather than a top-level vendor package, but PF02/PF14 already classify this as a sanctioned BodyGraph vendor seam.
+
+Audit anchor: Observed: Vendor client and bodygraph ingest live inside engine/bodygraph/, not a top-level vendor/ package.
+
+Audit evidence pointer: Post Implementation Audit HDE-EPIC035.md: "Observed: Vendor client and bodygraph ingest live inside engine/bodygraph/, not a top-level vendor/ package."
+
+Epic Plan linkage: The Epic Plan explicitly says vendor acquisition, BodyGraph persistence-facing behavior, retrieval-facing behavior, and compute-facing behavior remain HD Engine scope.
+
+Epic Plan anchor: r1 Epic Plan HDE-EPIC035.md: "\* Contract changes / new surfaces: No public product contract change is introduced by this epic. The planned work affects internal vendor acquisition, BodyGraph persistence-facing behavior, retrieval-facing behavior, and compute-facing behavior. The Glow app remains the product shell and consumer of HD Engine outputs."
+
+Repo cross-check: Current repo confirms `engine/bodygraph/vendor_client.py` defines `HdApiClient` and `engine/bodygraph/ingest.py` defines `ingest_vendor_bodygraph`. Bounded repo search did not find a top-level `vendor/` path.
+
+Repo posture: Confirmed
+
+Repo evidence pointer: Repo: "engine/bodygraph/vendor\_client.py" → "class HdApiClient:"; Repo: "engine/bodygraph/ingest.py" → "def ingest\_vendor\_bodygraph("; Search method: searched Repo for "path:vendor/" (case: insensitive); scope: current repository code search; tool: GitHub.search; result: 0 hits.
+
+Must-act-now: NO
+
+Disposition: No doc delta needed
+
+Correct home(s): PF02 — HDE Architecture; PF14 — HDE Mechanics Guide; PF05 — HDE CLI-API-Vendor Ref
+
+PF09.x task delta: NO
+
+PF09.x target: N/A
+
+PF14 mechanics delta: NO
+
+PF02 architecture delta: NO
+
+Other PF doc delta(s): None
+
+PF20 historical correction: NO
+
+Existing issue duplicate: N/A
+
+Why these are the correct homes: PF02 and PF14 own vendor seam architecture/mechanics; PF05 owns CLI/API/vendor contract posture. Current PF02 and PF14 already classify the BodyGraph vendor seam under existing boundaries. PF14 — HDE Mechanics Guide, §HDAPI v2 vendor seam mechanics → "HDAPI v2 vendor seam mechanics. The repo MUST provide one sanctioned vendor seam for HumanDesignAPI integration. That seam MUST route source selection, request shaping, response normalization, cache writes, CLI surfaces, and internal/admin compat flows through the existing architecture boundaries." PF02 — HDE Architecture, §1.1 Single homes → "BodyGraph seam carve-out (normative). BodyGraph resolution and ingest MAY perform vendor and DB I/O through the DB abstraction as a sanctioned seam, including when implemented under `engine/bodygraph/`."
+
+FND-006 —
+
+Finding: The audit observes lowercase QA epic paths alongside mixed-case or symbol-heavy root-level report filenames, but PF12 already separates directory-case rails from filename-style posture and close-pack naming.
+
+Audit anchor: Observed: Most audit QA epic paths are lowercase audit/qa/hde-epic\#\#\#, while root contains mixed-case/symbol-heavy markdown filenames.
+
+Audit evidence pointer: Post Implementation Audit HDE-EPIC035.md: "Observed: Most audit QA epic paths are lowercase audit/qa/hde-epic\#\#\#, while root contains mixed-case/symbol-heavy markdown filenames."
+
+Epic Plan linkage: The Epic Plan requires lowercase ASCII naming for new epic-scoped directories.
+
+Epic Plan anchor: r1 Epic Plan HDE-EPIC035.md: "All new epic-scoped directories must use lowercase ASCII naming."
+
+Repo cross-check: Current repo confirms governed close-pack filename posture and lowercase QA root posture through existing manifest content.
+
+Repo posture: Confirmed
+
+Repo evidence pointer: Repo: "audit/EPIC-024\_MANIFEST.json" → ""close\_manifest":"audit/EPIC-024\_MANIFEST.json"" | ""qa\_root":"audit/qa/hde-epic024""
+
+Must-act-now: NO
+
+Disposition: No doc delta needed
+
+Correct home(s): PF12 — HDE Schemas and Artifacts
+
+PF09.x task delta: NO
+
+PF09.x target: N/A
+
+PF14 mechanics delta: NO
+
+PF02 architecture delta: NO
+
+Other PF doc delta(s): None
+
+PF20 historical correction: NO
+
+Existing issue duplicate: N/A
+
+Why these are the correct homes: PF12 owns governed artifact path and directory-name posture and already distinguishes lowercase directory rules from filename casing. PF12 — HDE Schemas and Artifacts, §Directory naming (lower-case ASCII) → "All directory names in the repository and application codebase MUST use lower-case ASCII." | "\* This rail applies to directory names only. Filenames MAY contain uppercase characters unless separately forbidden by canon." | "\* Canon-defined close-pack filenames such as `audit/EPIC-030_MANIFEST.json` and `audit/EPIC-030_close_report.md` are not directory-case drift when every directory segment remains lowercase ASCII and the filename follows the governed close-pack pattern."
+
+FND-007 —
+
+Finding: The audit observes 18 top-level roots that could look like truth/evidence/tooling homes, but PF12 already classifies root proliferation as drift only when a root is treated as an independent authoritative evidence home outside PF12 catalog, index, mirror, and path-proof discipline.
+
+Audit anchor: Observed: 18 top-level roots look like possible truth/evidence/tooling homes: audit, artifacts, docs, tools, scripts, catalog, schemas, config, fixtures, goldens, reports, scan\_reports, validation, proofs, math, release, freeze, migrations.
+
+Audit evidence pointer: Post Implementation Audit HDE-EPIC035.md: "Observed: 18 top-level roots look like possible truth/evidence/tooling homes: audit, artifacts, docs, tools, scripts, catalog, schemas, config, fixtures, goldens, reports, scan\_reports, validation, proofs, math, release, freeze, migrations."
+
+Epic Plan linkage: The Epic Plan explicitly states that alternative homes for the HDAPI v2 proof families are not planned.
+
+Epic Plan anchor: r1 Epic Plan HDE-EPIC035.md: "HDAPI v2 error mapping, rate-limit headers, and release binding are governed by HDE Schemas and Artifacts. Alternative homes for these proof families are not planned."
+
+Repo cross-check: Current repo confirms PF12-style index/mirror path binding through the update tool and HDE-EPIC035 artifacts under governed HDAPI v2 artifact roots.
+
+Repo posture: Confirmed
+
+Repo evidence pointer: Repo: "tools/evidence/update\_evidence\_index.py" → "HUMAN\_INDEX \= ROOT / "docs/evidence/INDEX.json"" | "MIRROR\_PATH \= ROOT / "artifacts/evidence\_index.jsonl""; Repo: "artifacts/vendor/hdapi\_v2/release\_binding.snapshot.json" → ""artifact\_kind":"hdapi\_v2\_release\_binding""
+
+Must-act-now: NO
+
+Disposition: No doc delta needed
+
+Correct home(s): PF12 — HDE Schemas and Artifacts
+
+PF09.x task delta: NO
+
+PF09.x target: N/A
+
+PF14 mechanics delta: NO
+
+PF02 architecture delta: NO
+
+Other PF doc delta(s): None
+
+PF20 historical correction: NO
+
+Existing issue duplicate: N/A
+
+Why these are the correct homes: PF12 owns evidence cataloging, evidence path bindings, and truth-home classification. Current PF12 already distinguishes multi-root storage from unauthorized truth homes. PF12 — HDE Schemas and Artifacts, §0.2 Scope & single homes \[Required-Now\] → "\* Root proliferation is drift only when a root is treated as an independent authoritative evidence home outside PF12 catalog, Human Index, Machine Mirror, and path-proof discipline." | "\* `tools/` and `scripts/` remain tooling and code roots by default. Outputs under those roots are non-governed unless explicitly cataloged as governed evidence outputs and bound by the Human Index, Machine Mirror, and path-proof discipline."
+
+Doc Delta Proposals — PF09.x (Tasks)
+
+None.
+
+Final line
+
+END OF AUDIT ANALYSIS
+
+## 2.10) Permanent PF-Canon Must Forbid Syntax / Escape / Command-Literal Blocking in Plan Approval
+
+Timestamp: 062926
+
+Status: Live PF10 staging decision pending permanent PF-Canon drain
+
+Decision owner: Isis / Lead Dev
+
+### **Details**
+
+Repeated plan-review loops have incorrectly blocked QA Plans, Live QA Plans, Implementation Plans, and other planning artifacts because embedded commands, helper scripts, heredocs, Python snippets, shell snippets, or copied chat text contained syntax defects, escape characters, Markdown damage, indentation damage, or non-literal command text.
+
+This pattern has recurred despite prior guidance that commands do not need to be paste-ready and that syntax can be normalized in flight.
+
+The failure is not merely that PF10 needed a temporary note. The deeper issue is that permanent PF-Canon is not strong enough, not visible enough, or not operationally decisive enough to prevent reviewers from treating correctable syntax as truth/proof blockers.
+
+PF10 is temporary. This addendum stages the immediate live rule, but the required durable fix is permanent PF-Canon drainage.
+
+### **Lead decision**
+
+Correctable syntax, escape, helper-code, heredoc, formatting, indentation, or command-literal defects must never block plan approval by themselves.
+
+This applies to:
+
+* Epic Plans;  
+* Implementation Plans;  
+* Live QA Plans;  
+* QA Plans;  
+* remediation plans;  
+* redline sets;  
+* QA-readiness reviews;  
+* plan reviews;  
+* closeout-review preparation;  
+* Codex prompts embedded in plans;  
+* PO procedure text embedded in plans;  
+* generated QA helper snippets;  
+* shell or Python snippets embedded in planning artifacts.
+
+Commands and helper code in plans are **intent carriers**, not byte-perfect execution artifacts, unless the plan explicitly states that exact bytes are the proof target.
+
+### **Core rule**
+
+A plan may be approved even when commands or helper snippets are not paste-ready, not literal, or locally syntactically damaged, provided the following are clear:
+
+* the proof target;  
+* the evidence family;  
+* the artifact identity;  
+* the intended execution lane;  
+* the PASS / FAIL / TOOLING meaning;  
+* the safety and rails posture;  
+* the secret-safety posture;  
+* the source authority;  
+* the PF09 or acceptance scope, where relevant;  
+* the nonclaim boundaries.
+
+When those are clear, syntax correction is in-flight execution normalization.
+
+### **What must never be a blocker by itself**
+
+Reviewers must not issue REVISE AND RESUBMIT, blocker, QA-readiness blocker, approval blocker, FAIL\_TOOLING, TOOLING\_BLOCKED, FAIL\_BEHAVIOR, token failure, evidence failure, or closure blocker solely for:
+
+* escaped underscores;  
+* escaped shell operators;  
+* Markdown bold-marker damage;  
+* heredoc formatting;  
+* quote escaping;  
+* redirection escaping;  
+* indentation damage;  
+* line wrapping;  
+* non-literal command examples;  
+* Python helper syntax damage;  
+* shell helper syntax damage;  
+* command invocation style;  
+* command spelling variations;  
+* missing copy-paste readiness;  
+* assistant-introduced formatting;  
+* reviewer-introduced formatting;  
+* chat-rendering artifacts;  
+* transcript-rendering artifacts;  
+* helper-code formatting that an executor can normalize without changing proof meaning.
+
+### **Raw-source damage rule**
+
+Even when the raw plan source itself contains syntax damage, that still does not make the issue a blocker unless the damage creates a separate substantive ambiguity.
+
+Raw-source syntax damage is in-flight normalization when the executor can correct it without changing:
+
+* proof target;  
+* scope;  
+* artifact identity;  
+* evidence family;  
+* PASS / FAIL / TOOLING predicate;  
+* safety posture;  
+* secret posture;  
+* token posture;  
+* PF09 posture;  
+* public/private boundary;  
+* repo locus;  
+* route family;  
+* endpoint family;  
+* source authority.
+
+Showing that the raw source is syntactically broken only proves that syntax damage exists. It does not prove that the plan must be revised.
+
+### **Required blocker test**
+
+Before any reviewer blocks on command/helper/syntax issues, the reviewer must answer this test:
+
+1. If the syntax damage is normalized in flight, does the proof target change?  
+2. Does the evidence family change?  
+3. Does the artifact identity change?  
+4. Does the PASS / FAIL / TOOLING meaning change?  
+5. Does the rails or secret-safety posture change?  
+6. Does the command ambiguity require inventing a repo locus, artifact family, acceptance predicate, PF09 scope, or source authority?  
+7. Does the defect hide a real implementation, QA, OPS, token, evidence, phase, public/private boundary, or source-of-truth issue?
+
+If the answer to all seven is no, the issue is not a blocker.
+
+Allowed reviewer classification:
+
+* Note  
+* Operator caution  
+* In-flight normalization  
+* Non-blocking caveat  
+* Executor must normalize syntax before running
+
+Forbidden reviewer classification:
+
+* REVISE AND RESUBMIT  
+* blocker  
+* approval blocker  
+* QA-readiness blocker  
+* closure blocker  
+* FAIL\_BEHAVIOR  
+* FAIL\_TOOLING  
+* TOOLING\_BLOCKED  
+* token failure  
+* path-proof failure  
+* evidence failure  
+* command-validity failure requiring plan revision
+
+### **Valid blocker boundary**
+
+A command or helper-code issue may block only if there is a separate non-syntax defect, such as:
+
+* missing proof target;  
+* missing evidence family;  
+* missing artifact identity;  
+* missing required QA check;  
+* missing required OPS evidence;  
+* unsafe execution;  
+* raw secret exposure;  
+* wrong route family;  
+* wrong endpoint family;  
+* wrong environment;  
+* wrong repo locus with no discovery posture;  
+* wrong token posture;  
+* public/private boundary violation;  
+* missing PASS / FAIL / TOOLING meaning;  
+* contradictory PF10 or PF-Canon authority;  
+* PF20 used as current authority;  
+* PF23 used as execution artifact or blocker source;  
+* documentation drainage treated as an execution gate;  
+* acceptance overclaim;  
+* PF09 scope overclaim;  
+* source-of-truth conflict that PF10 or permanent canon does not resolve.
+
+The blocker must be written against that substantive defect, not against syntax.
+
+### **Execution normalization evidence rule**
+
+When an executor normalizes syntax in flight, the evidence should record the correction when material.
+
+Acceptable evidence note:
+
+* Plan command normalized for shell/Python syntax before execution.  
+* Proof target unchanged.  
+* Evidence family unchanged.  
+* Output artifact identity unchanged.  
+* PASS / FAIL / TOOLING meaning unchanged.
+
+The final evidence should preserve the actually executed command or helper bytes when command bytes are material to trust.
+
+### **HDE-EPIC035 application**
+
+The HDE-EPIC035 Live QA Plan reviews incorrectly blocked on Step-0B helper syntax.
+
+The helper source had syntax/rendering damage, but the plan’s check identity, proof target, evidence root, artifact family, and PASS/FAIL posture were clear.
+
+That should have been classified as:
+
+**In-flight normalization / operator caution**
+
+It should not have been classified as:
+
+**REVISE AND RESUBMIT**
+
+Any current or future blocker based solely on Step-0B helper syntax, rendered escape characters, heredoc damage, indentation damage, or non-paste-ready commands is withdrawn unless a separate non-syntax blocker is proven.
+
+### **Permanent PF-Canon drain is required**
+
+PF10 is temporary.
+
+This rule must be drained into permanent PF-Canon because the current permanent language is either too weak, too distributed, or too easy for reviewers to override in practice.
+
+The permanent canon must use mandatory language:
+
+* MUST NOT block  
+* NEVER block solely  
+* blocker requires separate non-syntax defect  
+* syntax is in-flight normalization  
+* reviewer carries burden of proof for non-syntax harm
+
+### **Required permanent PF-Canon drain targets**
+
+#### **PF27 — Canon Plan Templates**
+
+Drain priority: highest.
+
+Required permanent-canon update:
+
+* Add a mandatory plan-review rule that plan approval must never block solely on command literalness, helper-code syntax, heredoc formatting, rendered escapes, Markdown damage, indentation damage, or paste-readiness.  
+* Add the seven-part blocker test from this PF10 addendum.  
+* Require all QA Plan, Live QA Plan, Implementation Plan, Epic Plan, and remediation-plan review templates to distinguish syntax normalization from proof defects.  
+* Require reviewers to state the separate non-syntax defect before issuing REVISE AND RESUBMIT.  
+* Require template language that commands and helper snippets are intent carriers unless exact bytes are explicitly the proof target.
+
+#### **PF19 — Glow QA Guide**
+
+Drain priority: highest.
+
+Required permanent-canon update:
+
+* Add a QA execution rule that QA may normalize command/helper syntax in flight when proof identity is unchanged.  
+* Add an evidence note requirement for material syntax normalization.  
+* State that QA Plan approval must not require byte-perfect commands.  
+* State that syntax defects become TOOLING\_BLOCKED only after actual execution normalization fails or proof identity becomes ambiguous.  
+* State that QA reviewers must not block Live QA Plans over paste-readiness.
+
+#### **PF06 — Epic Process Guide**
+
+Drain priority: highest.
+
+Required permanent-canon update:
+
+* Add this rule to all planning and review flows.  
+* REVISE AND RESUBMIT must identify a non-syntax defect.  
+* Documentation or formatting complaints must not be disguised as execution blockers.  
+* OPS, QA, PR, and documentation drainage lanes must remain distinct even when syntax normalization occurs.  
+* Correctable command syntax is handled during execution, not approval.
+
+#### **PF03 — Technical Writing Best Practices**
+
+Drain priority: high.
+
+Required permanent-canon update:
+
+* Record that rendered Markdown and copied-chat text are unreliable for byte-perfect execution.  
+* Require writing practices that reduce syntax damage, but state that such damage is not an approval gate.  
+* Define syntax normalization as an expected editorial/execution responsibility.  
+* Clarify that paste-safe is preferred but not equivalent to approval-required.
+
+#### **PF04 — HDE Governance**
+
+Drain priority: high.
+
+Required permanent-canon update:
+
+* Clarify that command syntax, helper-code syntax, and paste-readiness are not token conditions.  
+* Acceptance tokens depend on governed proof, not literal plan-command bytes.  
+* A command syntax issue can affect a token only if it changes the evidence identity, proof target, or executed result.  
+* Add reviewer burden-of-proof language for any claimed token impact.
+
+#### **PF12 — HDE Schemas and Artifacts**
+
+Drain priority: high.
+
+Required permanent-canon update:
+
+* Define how governed evidence records in-flight syntax normalization.  
+* Require final executed command/helper provenance when material.  
+* Preserve path-proof and hash-proof trust without making plan text byte-perfect.  
+* Distinguish intended plan text from executed evidence bytes.
+
+#### **PF05 — HDE CLI/API Vendor Ref**
+
+Drain priority: medium.
+
+Required permanent-canon update:
+
+* For command examples and vendor request examples, distinguish normative protocol bytes from illustrative invocation syntax.  
+* Do not treat shell-wrapper syntax as canonical transport behavior unless the command bytes themselves are the proof target.  
+* Vendor header names, route families, payload shape, auth posture, and secret safety are substantive; shell formatting is not.
+
+#### **PF07 — Glow Infrastructure**
+
+Drain priority: medium.
+
+Required permanent-canon update:
+
+* Environment variable names, secret handling, deployed bindings, and rails posture are substantive.  
+* Shell export syntax, copy-paste wrapper form, and local invocation style are not approval blockers when environment identity is clear.  
+* Operators may normalize command syntax while preserving redacted evidence.
+
+#### **PF14 — HDE Mechanics Guide**
+
+Drain priority: medium.
+
+Required permanent-canon update:
+
+* Mechanics proofs should distinguish actual mechanic behavior from helper-code formatting.  
+* Helper syntax can be normalized in execution if the mechanic being proven remains unchanged.  
+* Test and evidence helpers should report executed truth, not rely on plan-byte literalism.
+
+#### **PF10 — HDE Build Notes**
+
+Drain priority: temporary staging only.
+
+Required action:
+
+* Keep this addendum only until the permanent PF-Canon drains above are complete.  
+* After permanent drain, PF10 should reference that the rule has been absorbed and should not remain the sole authority.
+
+### **Drain verification requirement**
+
+Permanent PF-Canon drainage is not complete until PF27, PF19, PF06, PF03, PF04, and PF12 all contain strengthened language.
+
+The minimum sufficient permanent drain set is:
+
+* PF27  
+* PF19  
+* PF06  
+* PF03  
+* PF04  
+* PF12
+
+PF05, PF07, and PF14 should also be updated, but the rule becomes operationally enforceable once the minimum six permanent homes are updated.
+
+### **Documentation drainage posture**
+
+Documentation drainage is not an execution gate by itself, but this specific drain is governance-critical because repeated failures show the current permanent canon is not preventing churn.
+
+Until drained, PF10 carries the live rule.
+
+After drained, permanent PF-Canon governs and PF10 becomes historical staging.
+
+### **Final live rule**
+
+Never block a plan solely on syntax.
+
+Never block a QA Plan solely on command literalness.
+
+Never block a Live QA Plan solely on helper-code syntax.
+
+Never block approval solely on rendered escapes, Markdown damage, indentation damage, or heredoc formatting.
+
+Block only the underlying truth, proof, safety, authority, scope, evidence, token, PF09, phase, or public/private-boundary defect.
+
+If no such separate defect exists, approve with in-flight normalization.
 
 \<eof\>
