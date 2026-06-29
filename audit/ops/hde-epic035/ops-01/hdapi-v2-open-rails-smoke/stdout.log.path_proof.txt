@@ -1,0 +1,5 @@
+path: audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/stdout.log
+size_bytes: 859
+sha256: 5f7fe00bc7881d458343a494693201f8a9b5c5d28cb0780bf6b376a9cab8bc57
+mtime_utc: 2026-06-29T04:28:34Z
+produced_at_utc: 2026-06-29T00:00:00Z
