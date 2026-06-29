@@ -1,0 +1,5 @@
+path: audit/ops/hde-epic035/ops-01/ops_evidence_manifest.txt
+size_bytes: 3605
+sha256: b1381d9f5098cf1bc54e6e1ed6f706d319dc9b91735384ec5ba8613051a20056
+mtime_utc: 2026-06-29T04:28:34Z
+produced_at_utc: 2026-06-29T00:00:00Z

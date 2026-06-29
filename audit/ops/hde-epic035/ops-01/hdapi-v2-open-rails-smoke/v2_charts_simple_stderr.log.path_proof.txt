@@ -1,0 +1,5 @@
+path: audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/v2_charts_simple_stderr.log
+size_bytes: 19
+sha256: e16b17b0881ad09ea8af8d4d25753e31fc0ffd1977ba5bc872db363311f81272
+mtime_utc: 2026-06-29T04:28:34Z
+produced_at_utc: 2026-06-29T00:00:00Z
