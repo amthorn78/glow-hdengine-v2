@@ -1,0 +1,12 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-06-30T00:13:52Z", "check_id": "po-009", "check_name": "PO-009", "status": "PASS", "fail_status": "", "command": "python audit/qa/hde-epic035/00_meta/hde035_live_qa_harness.py po-009", "command_provenance": "Copy/paste from plan via QA-created helper", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic035/checks/po-009/primary.log", "audit/qa/hde-epic035/checks/po-009/primary.log.path_proof.txt", "artifacts/vendor/hdapi_v2/response_mapping.snapshot.json"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 - HDE-Build Notes", "PF19 - Glow QA Guide", "PF27 - Canon Plan Templates"], "intended_tokens": [], "claimed_tokens": []}
+check_id=po-009
+check_name=PO-009
+command=python audit/qa/hde-epic035/00_meta/hde035_live_qa_harness.py po-009
+rails=SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev
+pins=LC_ALL=C LANG=C TZ=UTC
+FILE_OK artifacts/vendor/hdapi_v2/response_mapping.snapshot.json sha256=b7ee708ad8a3b35c4b402d9304040ce55498c783a356c08ea3613c017b8a7a23
+TEXT_OK artifacts/vendor/hdapi_v2/response_mapping.snapshot.json :: ChartSimpleResult
+TEXT_OK artifacts/vendor/hdapi_v2/response_mapping.snapshot.json :: ChartResult/ChartSimpleResult-to-BodyGraph adapter
+TEXT_OK artifacts/vendor/hdapi_v2/response_mapping.snapshot.json :: schema_gap_recorded
+TEXT_OK artifacts/vendor/hdapi_v2/response_mapping.snapshot.json :: no_compatibility_by_inference
+JSON_OK artifacts/vendor/hdapi_v2/response_mapping.snapshot.json :: no_compatibility_by_inference=True

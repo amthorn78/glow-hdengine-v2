@@ -1,0 +1,15 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-06-30T00:13:51Z", "check_id": "po-002", "check_name": "PO-002", "status": "PASS", "fail_status": "", "command": "python audit/qa/hde-epic035/00_meta/hde035_live_qa_harness.py po-002", "command_provenance": "Copy/paste from plan via QA-created helper", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic035/checks/po-002/primary.log", "audit/qa/hde-epic035/checks/po-002/primary.log.path_proof.txt", "artifacts/vendor/hdapi_v2/rate_limit_headers.snapshot.json"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 - HDE-Build Notes", "PF19 - Glow QA Guide", "PF27 - Canon Plan Templates"], "intended_tokens": [], "claimed_tokens": []}
+check_id=po-002
+check_name=PO-002
+command=python audit/qa/hde-epic035/00_meta/hde035_live_qa_harness.py po-002
+rails=SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev
+pins=LC_ALL=C LANG=C TZ=UTC
+FILE_OK artifacts/vendor/hdapi_v2/rate_limit_headers.snapshot.json sha256=c3e5be1317fb6b2ff1de4e67dd1a8073e6e0696ad3fc938413fe56f05a552a7f
+JSON_OK artifacts/vendor/hdapi_v2/rate_limit_headers.snapshot.json :: artifact_kind='hdapi_v2_retry_after_mapping'
+JSON_OK artifacts/vendor/hdapi_v2/rate_limit_headers.snapshot.json :: epic_id='HDE-EPIC035'
+JSON_OK artifacts/vendor/hdapi_v2/rate_limit_headers.snapshot.json :: pf09_subtask_id='HDE-FERM008.3'
+JSON_OK artifacts/vendor/hdapi_v2/rate_limit_headers.snapshot.json :: rate_limit_status_record={'classification': '429', 'provider_code': 'PROVIDER_RATE_LIMITED', 'retry_after_header_supported': True, 'retryable': False, 'status': 429}
+JSON_RECORD_OK artifacts/vendor/hdapi_v2/rate_limit_headers.snapshot.json :: retry_after_records.case='delta_seconds'
+JSON_RECORD_OK artifacts/vendor/hdapi_v2/rate_limit_headers.snapshot.json :: retry_after_records.case='http_date'
+JSON_RECORD_OK artifacts/vendor/hdapi_v2/rate_limit_headers.snapshot.json :: retry_after_records.case='invalid'
+JSON_RECORD_OK artifacts/vendor/hdapi_v2/rate_limit_headers.snapshot.json :: retry_after_records.case='overflow'

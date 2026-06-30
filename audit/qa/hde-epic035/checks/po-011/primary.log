@@ -1,0 +1,14 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-06-30T00:13:52Z", "check_id": "po-011", "check_name": "PO-011", "status": "PASS", "fail_status": "", "command": "python audit/qa/hde-epic035/00_meta/hde035_live_qa_harness.py po-011", "command_provenance": "Copy/paste from plan via QA-created helper", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic035/checks/po-011/primary.log", "audit/qa/hde-epic035/checks/po-011/primary.log.path_proof.txt", "artifacts/vendor/hdapi_v2/release_binding.snapshot.json", "docs/acceptance_map_epic035.json", "audit/qa/hde-epic035/token_evidence_matrix.md"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 - HDE-Build Notes", "PF19 - Glow QA Guide", "PF27 - Canon Plan Templates"], "intended_tokens": [], "claimed_tokens": []}
+check_id=po-011
+check_name=PO-011
+command=python audit/qa/hde-epic035/00_meta/hde035_live_qa_harness.py po-011
+rails=SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev
+pins=LC_ALL=C LANG=C TZ=UTC
+FILE_OK artifacts/vendor/hdapi_v2/release_binding.snapshot.json sha256=b8b8e88f016374fba7c9ce13b1c63394c280889a1826e7c1ec011a7c7fe69c82
+FILE_OK docs/acceptance_map_epic035.json sha256=c2069cc489cd749f67e6335e8482a9a0bb488bfab4cfb72809637d983068a7e1
+FILE_OK audit/qa/hde-epic035/token_evidence_matrix.md sha256=5980d20f5cc1393c6c4647eea5610ed9a3d9a2f9edaeca3542bd2d8b75b6671d
+TEXT_OK artifacts/vendor/hdapi_v2/release_binding.snapshot.json :: pr01_hde_ferm008_3_provider_outcome
+TEXT_OK artifacts/vendor/hdapi_v2/release_binding.snapshot.json :: pr02_hde_ferm008_4_response_normalization
+TEXT_OK docs/acceptance_map_epic035.json :: ops_01
+TEXT_OK docs/acceptance_map_epic035.json :: HDE-FERM008.5 governed evidence-loop closure
+TEXT_OK audit/qa/hde-epic035/token_evidence_matrix.md :: HDE-FERM008.5 evidence-loop closure posture

@@ -1,0 +1,16 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-06-30T00:13:52Z", "check_id": "po-012", "check_name": "PO-012", "status": "PASS", "fail_status": "", "command": "python audit/qa/hde-epic035/00_meta/hde035_live_qa_harness.py po-012", "command_provenance": "Copy/paste from plan via QA-created helper", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic035/checks/po-012/primary.log", "audit/qa/hde-epic035/checks/po-012/primary.log.path_proof.txt", "docs/acceptance_map_epic035.json", "audit/qa/hde-epic035/ops-01/ops_evidence_binding.log"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 - HDE-Build Notes", "PF19 - Glow QA Guide", "PF27 - Canon Plan Templates"], "intended_tokens": [], "claimed_tokens": []}
+check_id=po-012
+check_name=PO-012
+command=python audit/qa/hde-epic035/00_meta/hde035_live_qa_harness.py po-012
+rails=SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev
+pins=LC_ALL=C LANG=C TZ=UTC
+FILE_OK docs/acceptance_map_epic035.json sha256=c2069cc489cd749f67e6335e8482a9a0bb488bfab4cfb72809637d983068a7e1
+FILE_OK audit/qa/hde-epic035/ops-01/ops_evidence_binding.log sha256=f732d67bbbdd47aaf65d4962c90c858311f3e38766161bd7c74b06cbff694ac9
+TEXT_OK docs/acceptance_map_epic035.json :: QA PASS
+TEXT_OK docs/acceptance_map_epic035.json :: OPS completion
+TEXT_OK docs/acceptance_map_epic035.json :: PF09 status movement
+TEXT_OK docs/acceptance_map_epic035.json :: HDE-FERM008 parent Done
+TEXT_OK docs/acceptance_map_epic035.json :: epic closeout
+TEXT_OK audit/qa/hde-epic035/ops-01/ops_evidence_binding.log :: qa_pass_claim=false
+TEXT_OK audit/qa/hde-epic035/ops-01/ops_evidence_binding.log :: pf09_status_movement_claim=false
+TEXT_OK audit/qa/hde-epic035/ops-01/ops_evidence_binding.log :: epic_closeout_claim=false

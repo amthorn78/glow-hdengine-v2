@@ -1,0 +1,13 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-06-30T00:13:51Z", "check_id": "po-006", "check_name": "PO-006", "status": "PASS", "fail_status": "", "command": "python audit/qa/hde-epic035/00_meta/hde035_live_qa_harness.py po-006", "command_provenance": "Copy/paste from plan via QA-created helper", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic035/checks/po-006/primary.log", "audit/qa/hde-epic035/checks/po-006/primary.log.path_proof.txt", "audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/final_classification.txt", "audit/qa/hde-epic035/ops-01/ops_evidence_binding.log"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 - HDE-Build Notes", "PF19 - Glow QA Guide", "PF27 - Canon Plan Templates"], "intended_tokens": [], "claimed_tokens": []}
+check_id=po-006
+check_name=PO-006
+command=python audit/qa/hde-epic035/00_meta/hde035_live_qa_harness.py po-006
+rails=SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev
+pins=LC_ALL=C LANG=C TZ=UTC
+FILE_OK audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/final_classification.txt sha256=72e8396ae5e717cd73a6372faf623796bf328c1fab54abaa79448ec7cb14875c
+FILE_OK audit/qa/hde-epic035/ops-01/ops_evidence_binding.log sha256=f732d67bbbdd47aaf65d4962c90c858311f3e38766161bd7c74b06cbff694ac9
+TEXT_OK audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/final_classification.txt :: v2_charts_simple=success
+TEXT_OK audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/final_classification.txt :: v2_charts_simple_request_shape=/v2/charts/simple
+TEXT_OK audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/final_classification.txt :: v2_charts_simple_response_type=ChartSimpleResult
+TEXT_OK audit/qa/hde-epic035/ops-01/ops_evidence_binding.log :: full_runtime_conformance_claim=false
+TEXT_OK audit/qa/hde-epic035/ops-01/ops_evidence_binding.log :: ops_completion_claim=false

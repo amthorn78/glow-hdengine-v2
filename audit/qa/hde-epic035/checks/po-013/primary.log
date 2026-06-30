@@ -1,0 +1,21 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-06-30T00:13:52Z", "check_id": "po-013", "check_name": "PO-013", "status": "PASS", "fail_status": "", "command": "python audit/qa/hde-epic035/00_meta/hde035_live_qa_harness.py po-013", "command_provenance": "Copy/paste from plan via QA-created helper", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic035/checks/po-013/primary.log", "audit/qa/hde-epic035/checks/po-013/primary.log.path_proof.txt", "docs/acceptance_map_epic035.json", "artifacts/vendor/hdapi_v2/response_mapping.snapshot.json", "audit/qa/hde-epic035/ops-01/ops_evidence_binding.log"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 - HDE-Build Notes", "PF19 - Glow QA Guide", "PF27 - Canon Plan Templates"], "intended_tokens": [], "claimed_tokens": []}
+check_id=po-013
+check_name=PO-013
+command=python audit/qa/hde-epic035/00_meta/hde035_live_qa_harness.py po-013
+rails=SAFE_MODE=1 ALLOW_NETWORK=0 APP_ENV=dev
+pins=LC_ALL=C LANG=C TZ=UTC
+FILE_OK docs/acceptance_map_epic035.json sha256=c2069cc489cd749f67e6335e8482a9a0bb488bfab4cfb72809637d983068a7e1
+FILE_OK artifacts/vendor/hdapi_v2/response_mapping.snapshot.json sha256=b7ee708ad8a3b35c4b402d9304040ce55498c783a356c08ea3613c017b8a7a23
+FILE_OK audit/qa/hde-epic035/ops-01/ops_evidence_binding.log sha256=f732d67bbbdd47aaf65d4962c90c858311f3e38766161bd7c74b06cbff694ac9
+TEXT_OK docs/acceptance_map_epic035.json :: full HumanDesignAPI v2 runtime conformance
+TEXT_OK docs/acceptance_map_epic035.json :: public Reader change
+TEXT_OK docs/acceptance_map_epic035.json :: public route
+TEXT_OK docs/acceptance_map_epic035.json :: public flag
+TEXT_OK docs/acceptance_map_epic035.json :: public payload or transport change
+TEXT_OK docs/acceptance_map_epic035.json :: new HTTP home
+TEXT_OK docs/acceptance_map_epic035.json :: app-side HumanDesignAPI credential ownership
+TEXT_OK docs/acceptance_map_epic035.json :: raw payload persistence
+TEXT_OK docs/acceptance_map_epic035.json :: AI scope
+JSON_OK artifacts/vendor/hdapi_v2/response_mapping.snapshot.json :: ai_scope_claim='NONE'
+TEXT_OK audit/qa/hde-epic035/ops-01/ops_evidence_binding.log :: full_runtime_conformance_claim=false
+TEXT_OK audit/qa/hde-epic035/ops-01/ops_evidence_binding.log :: ai_scope_claim=false

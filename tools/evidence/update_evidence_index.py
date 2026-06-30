@@ -1765,6 +1765,20 @@ def _write_path_proof(
     existing_mtime = _normalize_utc(existing.get("mtime_utc"))
     requested_produced = _normalize_utc(produced_at)
     requested_mtime = _normalize_utc(mtime_utc)
+    stat_mtime_dt = _dt.datetime.fromtimestamp(stat_mtime, tz=_dt.timezone.utc)
+    if not check:
+        for candidate in (requested_mtime, existing_mtime):
+            if not candidate:
+                continue
+            try:
+                if _parse_utc_iso8601(candidate) > stat_mtime_dt:
+                    requested_mtime = None
+                    existing_mtime = None
+                    break
+            except Exception:  # noqa: BLE001
+                requested_mtime = None
+                existing_mtime = None
+                break
     if rel in FORCE_REFRESH_ARTIFACT_RELS and not check:
         requested_produced = None
         requested_mtime = None
@@ -1814,7 +1828,6 @@ def _write_path_proof(
         if rel in NON_BACKDATED_PROOF_RELS and produced_parsed < mtime_parsed:
             raise SystemExit(f"PROOF_PRODUCED_BACKDATED:{proof_rel}")
 
-        stat_mtime_dt = _dt.datetime.fromtimestamp(stat_mtime, tz=_dt.timezone.utc)
         if mtime_parsed > stat_mtime_dt:
             raise SystemExit(f"PROOF_MTIME_FUTURE:{proof_rel}")
         return proof_rel, produced
