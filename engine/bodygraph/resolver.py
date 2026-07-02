@@ -12,7 +12,7 @@ from .ingest import (
     ingest_vendor_bodygraph,
     resolve_db_user_id,
 )
-from .vendor_client import VendorError
+from .vendor_client import VendorError, classify_bg_resolve_route_policy
 
 def _truthy(value: object) -> bool:
     if value is None:
@@ -126,6 +126,23 @@ def _resolve_vendor(
         }
         return ResolveBodygraphResult(status="error", payload=payload, exit_code=1)
     try:
+        route_policy = _classify_env_route_policy(env)
+    except VendorError as exc:
+        return _vendor_error(exc, resolver_meta)
+    resolver_meta = {**resolver_meta, "route_policy": route_policy}
+    if not route_policy["supported"]:
+        error = VendorError(
+            str(route_policy["error_code"]),
+            "bg:resolve vendor route unsupported for configured base",
+            details={
+                "classification": route_policy["classification"],
+                "configured_base_version": route_policy["configured_base_version"],
+                "route_family": route_policy["route_family"],
+                "resource_path": route_policy["resource_path"],
+            },
+        )
+        return _vendor_error(error, resolver_meta)
+    try:
         vendor_inputs = _resolve_inputs(user_id, birthdate, birthtime, location)
     except VendorError as exc:
         return _vendor_error(exc, resolver_meta)
@@ -163,6 +180,22 @@ def _resolve_vendor(
         "ingest": ingest_section,
     }
     return ResolveBodygraphResult(status="ok", payload=payload, exit_code=0)
+
+
+def _classify_env_route_policy(env: Mapping[str, object] | None) -> Mapping[str, object]:
+    source = env or {}
+    canonical = str(source.get("HD_API_BASE_URL") or "").strip().rstrip("/")
+    legacy = str(source.get("HDAPI_BASE_URL") or "").strip().rstrip("/")
+    if canonical and legacy and canonical != legacy:
+        raise VendorError("PROVIDER_CONFIG_INVALID", "ambiguous HD API base URL configuration")
+    base_url = canonical or legacy
+    if not base_url:
+        raise VendorError(
+            "PROVIDER_CONFIG_MISSING",
+            "missing vendor configuration",
+            details={"missing": ["HD_API_BASE_URL"]},
+        )
+    return classify_bg_resolve_route_policy(base_url)
 
 
 def _resolve_inputs(user_id: str, birthdate: str | None, birthtime: str | None, location: str | None) -> VendorInputs:

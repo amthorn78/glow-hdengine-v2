@@ -1,0 +1,19 @@
+HDE-EPIC036 PR-01 bg:resolve route-policy decision
+generated_at_utc=2026-07-02T01:24:37Z
+selected_route_policy_classification=unsupported_runtime_nonclaim
+configured_v2_bg_resolve_request_shape=NO_BODYGRAPHS_REQUEST_BUILT_UNSUPPORTED_RUNTIME_NONCLAIM
+explicit_legacy_fallback=PRESERVED_ONLY_FOR_NON_V2_CONFIGURED_BASE
+dual_route_policy=NOT_IMPLEMENTED_ADR_REQUIRED
+bodygraph_detail_sufficiency=UNSUPPORTED_RUNTIME_NONCLAIM
+v2_chart_data_feeds_existing_bodygraph_cache_person_compat_flows=false
+route_auth_posture=route_metadata_driven_redacted
+no_public_reader_change=true
+no_public_route=true
+no_public_flag=true
+no_public_payload_change=true
+no_new_http_home=true
+no_app_side_humandesignapi_credential_ownership=true
+no_raw_payload_persistence=true
+no_ai_scope=true
+no_full_hdapi_v2_runtime_conformance=true
+OPS-01 not required by PR-01; route-policy classification proved closed-rails from repo evidence.
