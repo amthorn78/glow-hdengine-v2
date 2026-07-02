@@ -1,5 +1,16 @@
 # CHANGELOG
 
+Unreleased — HDE-EPIC036: Fermentation Pass 7 final repo docs sweep (README/CHANGELOG/AGENTS/docs/)
+
+### Added
+- Documented HDE-EPIC036 `bg:resolve --source vendor` route-policy classification: configured v2 bases select `unsupported_runtime_nonclaim` before legacy `bodygraphs` request construction, while non-v2 bases preserve explicit legacy BodyGraph fallback.
+- Added repo-doc navigation for PR-01 route-policy artifacts under `artifacts/vendor/hdapi_v2/` and `audit/qa/hde-epic036/`, plus PR-02 evidence-loop binding through `docs/acceptance_map_epic036.json`, token matrix, viability log, doc-delta candidate surfaces, Human Evidence Index, Machine Mirror, hash sentinels, and path proofs.
+
+### Changed / Fixed
+- Refreshed public and developer docs from HDE-EPIC035 Fermentation Pass 6 wording to HDE-EPIC036 Fermentation Pass 7 current repo truth while preserving prior evidence history.
+- Clarified that HDE-FERM008.6 is supportable for later PF09.5 HDE Build Checklist Fermentation drainage from repo evidence, but this docs sweep does not move PF09.5 status or complete the HDE-FERM008 parent.
+- Preserved HDE-EPIC036 nonclaims: no QA PASS, OPS completion, OPS execution, live vendor observation, PF09.5 status movement, HDE-FERM008 parent Done, epic closeout, full HumanDesignAPI v2 runtime-conformance claim, public Reader change, public route/flag/payload/transport change, new HTTP home, app-side HumanDesignAPI credential ownership, raw payload persistence, or AI scope.
+
 Unreleased — HDE-EPIC035: Fermentation Pass 6 final repo docs sweep (README/CHANGELOG/AGENTS/docs/)
 
 ### Added

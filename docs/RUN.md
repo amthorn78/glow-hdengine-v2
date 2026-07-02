@@ -39,12 +39,12 @@ python tools/evidence/update_evidence_index.py  # index generated artifacts unde
 ```
 The config acceptance map lives at `audit/EPIC-018_config_acceptance_map.json` (governed). Sampler/core acceptance for EPIC019 is tracked in `docs/acceptance_map_epic019.json` with a path proof.
 
-## HumanDesignAPI v2 evidence / geokey posture (HDE-EPIC035)
+## HumanDesignAPI v2 route-policy / geokey posture (HDE-EPIC036)
 
-- HDE-EPIC035 is evidence work for HDE-FERM008.3 through HDE-FERM008.5, not a public Reader, public route, payload, transport, app-side credential, AI, or full runtime-conformance expansion.
-- Governed evidence anchors are `artifacts/vendor/hdapi_v2/error_mapping.snapshot.json`, `artifacts/vendor/hdapi_v2/rate_limit_headers.snapshot.json`, `artifacts/vendor/hdapi_v2/response_mapping.snapshot.json`, `artifacts/vendor/hdapi_v2/release_binding.snapshot.json`, `docs/acceptance_map_epic035.json`, `audit/qa/hde-epic035/token_evidence_matrix.md`, `audit/qa/hde-epic035/ops-01/ops_evidence_binding.log`, and retained OPS evidence under `audit/ops/hde-epic035/ops-01/`.
-- Secret/config names are `HD_API_BASE_URL`, `HD_API_KEY`, and `GEO_API_KEY`; document only names or redacted header shapes, never values. Retained OPS-01 evidence records v2 `charts/simple` using `Authorization: Bearer <redacted>` and `HD-Geocode-Key: <redacted>`, with legacy `HD-Api-Key` absent on that v2 path.
-- `hdctl bg:resolve --source vendor` remains the legacy BodyGraph ingest-path workflow and recorded a `PROVIDER_NOT_FOUND` / 404 runtime gap against the configured v2 base in retained OPS-01 evidence. Do not present it as the canonical v2 chart/geokey validation path; v2 `charts` / `charts/simple` observations carry that posture.
+- HDE-EPIC036 is route-policy and evidence-loop work for HDE-FERM008.6 supportability, not a public Reader, public route, payload, transport, app-side credential, AI, OPS, live-vendor, or full runtime-conformance expansion.
+- Governed evidence anchors are `artifacts/vendor/hdapi_v2/bg_resolve_route_policy.snapshot.json`, `artifacts/vendor/hdapi_v2/bg_resolve_bodygraph_detail_proof.json`, `artifacts/vendor/hdapi_v2/bg_resolve_runtime_nonclaims.json`, `artifacts/vendor/hdapi_v2/bg_resolve_request_shape.snapshot.json`, `artifacts/vendor/hdapi_v2/bg_resolve_policy_binding.snapshot.json`, `audit/qa/hde-epic036/route_policy_decision.log`, `docs/acceptance_map_epic036.json`, `audit/qa/hde-epic036/token_evidence_matrix.md`, `audit/qa/hde-epic036/acceptance_map_viability.log`, `audit/docdeltas/hde-epic036_doc_deltas.md`, and `audit/qa/hde-epic036/00_meta/doc_deltas.md`.
+- Secret/config names are `HD_API_BASE_URL`, `HDAPI_BASE_URL`, `HD_API_KEY`, and `GEO_API_KEY`; document only names or redacted header shapes, never values. Legacy BodyGraph route metadata uses `HD-Api-Key: <redacted>`, while earlier v2 `charts/simple` evidence records `Authorization: Bearer <redacted>` plus `HD-Geocode-Key: <redacted>`.
+- `hdctl bg:resolve --source vendor` classifies configured v2 bases as `unsupported_runtime_nonclaim` before any legacy `bodygraphs` request is built, while non-v2 configured bases preserve explicit legacy fallback. Do not present it as the canonical v2 chart/geokey validation path; v2 `charts` / `charts/simple` observations carry that posture.
 
 ## Dev-only conjunction endpoints (do not enable in production)
 
