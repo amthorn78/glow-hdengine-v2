@@ -12,7 +12,7 @@ from .ingest import (
     ingest_vendor_bodygraph,
     resolve_db_user_id,
 )
-from .vendor_client import VendorError
+from .vendor_client import VendorError, classify_bg_resolve_route_policy
 
 def _truthy(value: object) -> bool:
     if value is None:
@@ -125,6 +125,24 @@ def _resolve_vendor(
             "resolver": resolver_meta,
         }
         return ResolveBodygraphResult(status="error", payload=payload, exit_code=1)
+    vendor_env = _vendor_config_env(env)
+    try:
+        route_policy = _classify_env_route_policy(vendor_env)
+    except VendorError as exc:
+        return _vendor_error(exc, resolver_meta)
+    resolver_meta = {**resolver_meta, "route_policy": route_policy}
+    if not route_policy["supported"]:
+        error = VendorError(
+            str(route_policy["error_code"]),
+            "bg:resolve vendor route unsupported for configured base",
+            details={
+                "classification": route_policy["classification"],
+                "configured_base_version": route_policy["configured_base_version"],
+                "route_family": route_policy["route_family"],
+                "resource_path": route_policy["resource_path"],
+            },
+        )
+        return _vendor_error(error, resolver_meta)
     try:
         vendor_inputs = _resolve_inputs(user_id, birthdate, birthtime, location)
     except VendorError as exc:
@@ -142,7 +160,7 @@ def _resolve_vendor(
         return _vendor_error(unexpected, resolver_meta)
     vendor_inputs = replace(vendor_inputs, user_id=normalized_user_id)
     try:
-        outcome = ingest_vendor_bodygraph(vendor_inputs, env=env, dry_run=dry_run)
+        outcome = ingest_vendor_bodygraph(vendor_inputs, env=vendor_env, dry_run=dry_run)
     except VendorError as exc:
         return _vendor_error(exc, resolver_meta)
     ingest_section = {
@@ -163,6 +181,43 @@ def _resolve_vendor(
         "ingest": ingest_section,
     }
     return ResolveBodygraphResult(status="ok", payload=payload, exit_code=0)
+
+
+def _vendor_config_env(env: Mapping[str, object] | None) -> Mapping[str, object]:
+    import os
+
+    merged: dict[str, object] = dict(os.environ)
+    if env is not None:
+        if "HD_API_BASE_URL" in env or "HDAPI_BASE_URL" in env:
+            merged.pop("HD_API_BASE_URL", None)
+            merged.pop("HDAPI_BASE_URL", None)
+        for key, value in env.items():
+            if value is None:
+                merged.pop(key, None)
+            else:
+                merged[key] = value
+    return merged
+
+
+def _classify_env_route_policy(env: Mapping[str, object] | None) -> Mapping[str, object]:
+    source = env or {}
+
+    def _config_value(name: str) -> str:
+        value = source.get(name)
+        return value.strip() if isinstance(value, str) else ""
+
+    canonical = _config_value("HD_API_BASE_URL").rstrip("/")
+    legacy = _config_value("HDAPI_BASE_URL").rstrip("/")
+    if canonical and legacy and canonical != legacy:
+        raise VendorError("PROVIDER_CONFIG_INVALID", "ambiguous HD API base URL configuration")
+    base_url = canonical or legacy
+    if not base_url:
+        raise VendorError(
+            "PROVIDER_CONFIG_MISSING",
+            "missing vendor configuration",
+            details={"missing": ["HD_API_BASE_URL"]},
+        )
+    return classify_bg_resolve_route_policy(base_url)
 
 
 def _resolve_inputs(user_id: str, birthdate: str | None, birthtime: str | None, location: str | None) -> VendorInputs:

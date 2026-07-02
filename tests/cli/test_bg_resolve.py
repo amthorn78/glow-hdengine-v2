@@ -122,6 +122,8 @@ def test_bg_resolve_defaults_to_auto(monkeypatch: pytest.MonkeyPatch, capsys: py
 def test_bg_resolve_vendor_open_rails_success(monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
     _set_open_rails(monkeypatch)
     monkeypatch.setenv("APP_ENV", "dev")
+    monkeypatch.setenv("HD_API_BASE_URL", "https://vendor.test/v1")
+    monkeypatch.delenv("HDAPI_BASE_URL", raising=False)
 
     normalized_user_id = resolve_db_user_id("open-rails")
 

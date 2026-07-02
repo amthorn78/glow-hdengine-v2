@@ -192,7 +192,7 @@ def _build_parser() -> argparse.ArgumentParser:
 
 
 def _resolver_env() -> Dict[str, str | None]:
-    return {name: os.environ.get(name) for name in ("SAFE_MODE", "ALLOW_NETWORK", "APP_ENV")}
+    return {name: os.environ.get(name) for name in ("SAFE_MODE", "ALLOW_NETWORK", "APP_ENV", "HD_API_BASE_URL", "HDAPI_BASE_URL")}
 
 
 def _load_viewer_prefs(path: str | None) -> Dict[str, Any]:

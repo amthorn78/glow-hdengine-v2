@@ -25,6 +25,8 @@ __all__ = [
     "VendorRequest",
     "VendorResult",
     "HdApiClient",
+    "classify_bg_resolve_route_policy",
+    "route_auth_posture",
     "join_vendor_resource_url",
 ]
 
@@ -96,6 +98,55 @@ _VENDOR_LOG_ROUTE_LABELS = frozenset(
     {_VENDOR_LOG_ROUTE, *(f"vendor.hdapi.post:/{path}" for path in _ROUTE_CONTRACTS if path != "bodygraphs")}
 )
 
+
+def _configured_base_version(base_url: str) -> str:
+    parsed = urlparse(base_url)
+    segments = [segment.lower() for segment in parsed.path.split("/") if segment]
+    if "v2" in segments:
+        return "v2"
+    if "v1" in segments:
+        return "v1"
+    return "unversioned"
+
+
+def route_auth_posture(path: str) -> str:
+    contract = _ROUTE_CONTRACTS.get(path)
+    if contract is None:
+        raise VendorError("PROVIDER_CONFIG_INVALID", "unsupported governed HDAPI route")
+    auth_model = contract[2]
+    if auth_model == "bearer":
+        return "Authorization: Bearer <redacted>"
+    if auth_model == "hd_api_key":
+        return "HD-Api-Key: <redacted>"
+    raise VendorError("PROVIDER_CONFIG_INVALID", "unsupported governed HDAPI route")
+
+
+def classify_bg_resolve_route_policy(base_url: str) -> dict[str, Any]:
+    """Classify bg:resolve vendor routing before any BodyGraph request is built."""
+    version = _configured_base_version(base_url)
+    legacy_path = "bodygraphs"
+    contract = _ROUTE_CONTRACTS[legacy_path]
+    base_posture = {
+        "configured_base_version": version,
+        "resource_path": legacy_path,
+        "route_family": "legacy_bodygraph",
+        "route_auth_posture": route_auth_posture(legacy_path),
+        "geocode_required": contract[1],
+    }
+    if version == "v2":
+        return {
+            **base_posture,
+            "classification": "unsupported_runtime_nonclaim",
+            "supported": False,
+            "error_code": "PROVIDER_ROUTE_UNSUPPORTED",
+            "reason": "configured v2 base cannot use legacy bodygraphs as final BodyGraph-detail behavior without a v2 ChartResult-to-BodyGraph adapter",
+        }
+    return {
+        **base_posture,
+        "classification": "explicit_legacy_fallback",
+        "supported": True,
+        "reason": "configured base is not v2; bg:resolve remains on the governed legacy BodyGraph route",
+    }
 
 def _rails_state_from_env(env: Mapping[str, str] | None = None) -> str:
     source = env if env is not None else os.environ
@@ -271,11 +322,12 @@ class HdApiClient:
         timeouts: VendorTimeouts | None = None,
         release_id: str | None = None,
         request: Callable[[urlrequest.Request, float], tuple[int, bytes, Mapping[str, str]]] | None = None,
+        env: Mapping[str, object] | None = None,
     ) -> "HdApiClient":
-        env = os.environ
-        raw_base_url = _resolve_hdapi_base_url(env)
-        api_key = (env.get("HD_API_KEY") or "").strip()
-        geo_key = (env.get("GEO_API_KEY") or "").strip()
+        source = env if env is not None else os.environ
+        raw_base_url = _resolve_hdapi_base_url(source)
+        api_key = str(source.get("HD_API_KEY") or "").strip()
+        geo_key = str(source.get("GEO_API_KEY") or "").strip()
         pairs = (("HD_API_BASE_URL", raw_base_url), ("HD_API_KEY", api_key))
         missing = [key for key, value in pairs if not value]
         if missing:
@@ -285,7 +337,7 @@ class HdApiClient:
                 details={"missing": sorted(missing)},
             )
         base_url = raw_base_url
-        rid = (release_id or env.get("RELEASE_ID") or "").strip().lower()
+        rid = (release_id or str(source.get("RELEASE_ID") or "")).strip().lower()
         if not rid:
             rid = "0" * 64
         if len(rid) != 64 or any(ch not in "0123456789abcdef" for ch in rid):
@@ -300,11 +352,23 @@ class HdApiClient:
             retry=retry_cfg,
             timeouts=timeouts_cfg,
             log_path=log_path,
-            rails_state=_rails_state_from_env(env),
+            rails_state=_rails_state_from_env({key: str(value) for key, value in source.items()}),
             request=request,
         )
 
     def build_request(self, *, birthdate: str, birthtime: str, location: str) -> VendorRequest:
+        policy = classify_bg_resolve_route_policy(self._base_url)
+        if not policy["supported"]:
+            raise VendorError(
+                str(policy["error_code"]),
+                "bg:resolve vendor route unsupported for configured base",
+                details={
+                    "classification": policy["classification"],
+                    "configured_base_version": policy["configured_base_version"],
+                    "route_family": policy["route_family"],
+                    "resource_path": policy["resource_path"],
+                },
+            )
         return self.build_contract_route_request(
             path="bodygraphs",
             request_fields=("birthdate", "birthtime", "location"),
