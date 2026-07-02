@@ -2,13 +2,13 @@
 
 **Title:** PF03-Reference-Technical-Writing-Best-Practices
 
-**Version**: v1.7.6
+**Version**: v1.7.8
 
 **Status:** Reference
 
-**Effective date:** 2026-06-27
+**Effective date:** 2026-06-30
 
-**Last Update Gate:** BN 11.7.4 A20-34
+**Last Update Gate:** BN 11.8.7 A7-14
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -189,6 +189,8 @@ PF06 — Epic Process Guide. PR discipline; “update Evidence Index in the same
 
 PF07 — Glow Infrastructure. Provider/environment maps and names-only runtime topology.
 
+PF29 — HDE User Guide. Runnable operator and agent guide for current HD Engine usage workflows; routes architecture, transport, infrastructure, schemas, mechanics, QA, PF09 status, and governance to their single homes.
+
 ## **6\) Supersession & precedence**
 
 When multiple versions compete, resolve in this order:
@@ -282,6 +284,8 @@ Delete-on-merge — MUST. After the PF target is updated, the PO **deletes** the
 No in-doc edits by AI — MUST. AI lead devs are **read-only** for Build Notes; edits occur in the target PF.
 
 PF10 reference posture — MUST. When referencing Build Notes from other documents or reviews, reference Build Notes by **addendum number \+ addendum title** (for example, “Build Notes Addendum 2.10 — Token Load Reduction \[OMITTED\]”). Do not reference PF10 by version strings or PF10 section numbers as durable anchors; the stable unit is the addendum entry itself.
+
+PF10 freshness visibility — SHOULD. If a review, retrospective, audit analysis, closeout report, or redline workflow relies on a supplied in-session Build Notes source while a repo-resident Build Notes file appears older, different, absent, or not current, state that source split when freshness matters to the decision. Do not treat a stale or repo-only Build Notes file as the current source of truth when the session supplies a later Build Notes source; do not treat a session-only Build Notes source as repo-drained truth unless repo evidence proves that drainage.
 
 PF10 staging addenda for documentation outcomes — SHOULD. When a retrospective, review, audit analysis, or closeout report proposes temporary PF10 staging rather than immediate permanent drain, include these fields: addendum title, why, decision or rule or clarification, drain targets, supersedes or conflicts if any, and implementation impact.
 
@@ -658,6 +662,8 @@ Codespaces Live QA plans MUST include a Step-0 discovery snapshot and Doc Delta 
 * **Closed-rails proof is not a substitute for required live proof — MUST NOT.** Unit tests, closed-rails fixture replay, static analysis, generated evidence, path-proof validation, Evidence Index refresh, Machine Mirror refresh, acceptance-map refresh, repo inspection, Codex audit, PF10 supportability notes, implementation review approval, QA Plan approval, written-but-unrun smoke procedures, and OPS discovery without live behavior proof may support the QA package, but they do not by themselves satisfy the required open-rails live QA step.  
 * **Open-rails proof remains bounded — MUST.** The live step must be bounded, non-destructive unless explicitly approved, PO-authorized where secrets, external services, or deployed environments are involved, secret-safe, evidence-recorded, scoped to the epic’s actual production risk, clear about what it proves, and clear about what it does not prove. A successful live smoke must not be widened into full vendor conformance, full persistence proof, full public app proof, unrelated PF09 Done posture, or any broader claim not actually exercised.  
 * **Validated references, no guesswork — MUST.** Plans MUST NOT assert repo paths, filenames, or module loci without validation. If a locus cannot be validated at plan time, the plan MUST include an explicit discovery step that produces repo evidence and resolves the locus before implementation proceeds.  
+* **Task-like work must be PF09-accounted — MUST.** Plans, implementation guides, QA plans, remediation plans, QA-readiness reviews, retrospectives, closure reviews, implementation reports, and lead retrospectives must not list task-like items as free-floating backlog, future work, follow-up, later, optional, not now, or out of current epic. If the item affects implementation, QA, OPS, runtime, evidence, vendor, architecture, product behavior, or phase work, classify it as one of: exact phased PF09 task or subtask mapping, PF09 gap, out of HDE phased build scope, or documentation/status drainage only. If a relevant PF09 subtask exists, subtask-level mapping is required; parent-task-only mapping is valid only when no relevant subtask exists.  
+* **Backlog is scheduling posture, not scope authority — MUST NOT.** Do not use backlog, future epic, later, non-gating, optional, or out-of-current-epic language as a substitute for PF09 accountability. Documentation/status drainage only applies only when the item is document or status reconciliation and is not implementation, QA, OPS, runtime, evidence, vendor, product, architecture, or phase work.  
 * **AI-safe review practices — MUST.** Reviews MUST prioritize correctness, executability, evidence binding, and token validity. Presentation-only formatting variance and heading marker levels are not approval gates (see §12.5).
 
 * **Use standard playbooks — SHOULD.** When a standard playbook exists in the Glow QA Guide, plans SHOULD use it as the default source of steps and evidence. Deviations are allowed only when no playbook applies; deviations SHOULD be documented and proposed as playbook improvements.
@@ -925,6 +931,15 @@ Codespaces Live QA plans MUST include a Step-0 discovery snapshot and Doc Delta 
 * **Canon-alignment and documentation outcomes — SHOULD.** When relevant, include canon references used, proposed addenda or doc-delta intents, token or evidence semantics notes, and unresolved documentation outcomes that affect later documentation drain.  
 * **Open closure items or questions — SHOULD.** When closure posture remains unresolved, include explicit open closure items or questions tied to exact mapped work, later-drain posture, or remaining evidence gaps.  
 * **Keep closure questions concrete — SHOULD.** Phrase questions against exact mapped work, later-drain posture, or remaining evidence gaps rather than vague epic-summary questions.
+
+### **12.15 Runnable workflow and usage-guide documentation**
+
+* **Workflow guides are not contract homes — MUST.** A runnable usage guide may summarize how to operate current surfaces, but it must not replace or redefine architecture, transport bytes, infrastructure facts, schemas, evidence rules, mechanics, QA policy, PF09 status posture, governance tokens, acceptance semantics, public routes, public payloads, or runtime contracts. Route those details by title to their owning homes.  
+* **Current availability must be validated — MUST.** Any command, route, workflow, payload shape, evidence workflow, rails posture, or operational surface described as available must be checked against current repo reality or the controlling source before it is presented as runnable. Planned, intended, blocked, diagnostic, or gap-recording workflows may appear only when labeled that way.  
+* **Engine usage must stay separate from app UX — MUST.** HD Engine usage guides must describe how to run and inspect HD Engine surfaces. Do not turn an engine usage guide into Glow app product UX, swiping, onboarding, app-side vendor access, or end-user product-flow documentation unless the owning product doc explicitly scopes that content.  
+* **Nonclaims must be explicit — MUST.** If a workflow is dev-only, QA-only, admin-only, legacy, diagnostic, gap-recording, closed-rails-only, open-rails-only, PO-authorized, or not production-public, say so at the workflow boundary. Do not let examples imply public Reader expansion, app-side vendor credential ownership, full runtime conformance, full BodyGraph/cache/compat compatibility, PF09 Done status, QA PASS, OPS completion, epic closure, or raw payload/secret capture.  
+* **Observed runtime gaps must not become canonical success paths — MUST.** If evidence shows that one command or route is an error-class, legacy, or diagnostic observation while another route proves the intended success posture, the guide must preserve that distinction. Do not present the legacy or error-class observation as the canonical validation path unless a later implementation or owning canon proves that posture.  
+* **Retained OPS evidence mapping should be documented when paths diverge — SHOULD.** If approved OPS deliverable names, retained evidence paths, output formats, or nested run roots diverge, the guide or related evidence notes should require a manifest or mapping that ties approved deliverables to retained paths. Treat that mapping as traceability for retained evidence, not as a new schema, new evidence root, or broader OPS completion claim.
 
 ## 13\) Security & privacy for writing
 
@@ -2405,8 +2420,7 @@ Use this when you need a grounded retrospective after closure or near-close that
 * **PF-canon doc-delta completeness — SHOULD.** Do not stop at a bare doc title. For each proposed PF-canon delta, record the target doc, the target section or closest stable home, the delta itself, why that doc is the correct home, and the supporting evidence pointer.  
 * **No PF-canon doc-delta outcome must be explicit — SHOULD.** If a lead dev retrospective concludes that no PF-canon doc deltas are required, state that directly in the PF-Canon Doc Deltas section and cite the evidence basis or reviewed source that supports the no-delta posture.  
 * **No-delta posture is not no-review posture — MUST.** Do not leave the doc-delta section blank. A no-delta conclusion must still be reviewable as a stated outcome.  
-* **Future-work record shape — SHOULD.** For each build improvement or future-work item, record the short description, where it should live, which PF docs would be touched if pursued, and whether it depends on PF23-identified reality drift.  
-* **Recommendation-only closeout posture — SHOULD.** End with a recommendation-only section that states the readiness or closure recommendation, the most important process improvement, the most important system-level follow-up, whether any additional hard requirement appears necessary before close, and the final implementation posture recommendation.  
+* **Future-work record shape — SHOULD.** For each build improvement or future-work item, record the short description, where it should live, which PF docs would be touched if pursued, whether it depends on PF23-identified reality drift, and whether it is task-like. If it is task-like, record the exact phased PF09 document and task or subtask ID, or classify it as PF09 gap, out of HDE phased build scope, or documentation/status drainage only.  
 * **Internal retrospective title may omit repeated addendum identity — SHOULD.** If the parent PF10 addendum heading or enclosing artifact already carries the addendum identifier, the internal lead retrospective title may use `Lead Dev Epic Retrospective —` followed by the epic ID without repeating the addendum identity.  
 * **Standalone retrospective title still needs durable identity — MUST.** If the retrospective is not enclosed by a parent addendum heading or other durable artifact identity, the title line must include enough identity to route and audit the artifact without guessing.
 

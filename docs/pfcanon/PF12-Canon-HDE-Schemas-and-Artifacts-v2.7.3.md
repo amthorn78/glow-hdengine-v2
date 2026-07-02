@@ -4,13 +4,13 @@
 
 **Title:** PF12-Canon-HDE-Schemas-and-Artifacts
 
-**Version:** v2.7
+**Version:** v2.7.3
 
 **Status:** Canon
 
-**Effective date:** 2026-06-27
+**Effective date:** 2026-07-01
 
-**Last Update Gate:** BN 11.7.4 A20-34
+**Last Update Gate:** BN 11.8.7 A7-14
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -198,6 +198,21 @@ These behaviors are transitional and scoped to EPIC020 Candidate 1\. They do not
 PF12 §8.x and §8.6 together form the Evidence Catalog: the single home for governed evidence artifact families and their titles/paths. Other PF documents (PF04/PF05/PF09/PF14/PF20) must refer to these families by name and must not maintain parallel path lists.
 
 Non-citation rule (MUST). PF20 MUST NOT be cited to define evidence surface paths, evidence shapes, or remediation predicate targets. For evidence paths/shapes and predicate target surfaces, cite PF12 (this document’s Evidence Catalog: §8.3 schemas and §8.6 entries).
+
+### **PF09 accountability for PF12 evidence, artifact, and schema future work**
+
+Task-like PF12 future work MUST be PF09-accounted. This applies to evidence-family future work, artifact gaps, index or mirror gaps, path-proof gaps, schema gaps, evidence-loop gaps, governed-output remediation, and future evidence tooling work when the item would require implementation, QA, OPS, runtime, vendor, architecture, or product behavior work.
+
+Each task-like item MUST resolve to exactly one of:
+
+* mapped phased PF09 task/subtask;  
+* PF09 gap;  
+* out of HDE phased build scope;  
+* documentation/status drainage only.
+
+If a relevant PF09 parent task and subtask both exist, subtask-level mapping is required. Parent-task-only mapping is insufficient unless no relevant subtask exists.
+
+PF12 does not create PF09 rows, assign PF09 status, or convert evidence notes into implementation obligations by itself. This rule preserves scope accountability for PF12-owned evidence and schema work.
 
 ### **Planning-time repo-reality observations (non-substitute evidence)**
 
@@ -915,25 +930,29 @@ Path-proofs and indexing.
 
 HDAPI v2 open-rails OPS smoke evidence bundle.
 
-Purpose. Govern the file-set shape for a PO-only HDAPI v2 open-rails smoke evidence bundle after a concrete epic-specific OPS audit root is assigned. This family is HDAPI vendor-conformance evidence only. It does not by itself claim runtime v2 conformance, QA PASS, Live QA completion, PF09 status change, epic closure, a new public Reader route, a Reader v1 contract change, a new public flag, a new acceptance token, or any AI enablement.
+Purpose. Govern the file-set shape for a PO-only HDAPI v2 open-rails smoke evidence bundle after a concrete epic-specific OPS audit root is assigned. This family is HDAPI vendor-conformance evidence only. It does not by itself claim runtime v2 conformance, QA PASS, Live QA completion, PF09 status change, epic closure, a new public Reader route, a Reader v1 contract change, a new public flag, a new acceptance token, app-side vendor credential ownership, raw payload persistence, or any AI enablement.
 
 Concrete path-binding rule.
 
 * The exact OPS smoke root MUST be a lowercase ASCII repo-relative path under `audit/ops/`. The root is assigned by the epic or OPS plan and MUST be bound by exact repo-relative path before the family is indexed, mirrored, or used as acceptance-support evidence.  
-* For HDE-EPIC034 OPS-02, the assigned root is `audit/ops/hde-epic034/ops-02/`.  
-* Once the concrete root is assigned, PF12 path binding, the Human Evidence Index, the Machine Evidence Mirror, and sibling path-proofs MUST use the exact resulting repo-relative paths.  
+* A retained OPS smoke bundle MAY use a nested evidence root when the evidence was produced that way, provided a manifest maps approved deliverable names to retained evidence paths without moving or deleting current evidence.  
+* For HDE-EPIC035 OPS-01, the assigned OPS root is `audit/ops/hde-epic035/ops-01/`, the retained nested smoke root is `audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/`, and the manifest is `audit/ops/hde-epic035/ops-01/ops_evidence_manifest.txt`.  
+* Once the concrete root is assigned, PF12 path binding, the Human Evidence Index, the Machine Evidence Mirror, checksum ledgers, and sibling path-proofs MUST use the exact resulting repo-relative paths.  
 * PR work MAY bind already-produced OPS evidence into governed evidence without rerunning the live vendor action when the binding artifact states that posture and preserves nonclaims.
 
-Artifact filenames under the assigned OPS smoke root.
+Artifact filenames for retained OPS smoke evidence.
 
+* `ops_evidence_manifest.txt`: Required when approved deliverable names differ from retained paths or formats. LF-terminated manifest mapping planned deliverables to retained evidence paths and status classifications.  
+* `files_sha256.txt`: Required when open-rails smoke completion or retained evidence binding is claimed. LF-terminated checksum ledger for the OPS smoke evidence files in the assigned root or retained nested smoke root.  
 * `commands.txt`: Required when the open-rails smoke is executed. LF-terminated command ledger for the controlled PO-run HDAPI v2 vendor smoke.  
 * `stdout.log`: Required when the open-rails smoke is executed. UTF-8 stdout capture. It MUST NOT persist plaintext secrets.  
 * `stderr.log`: Required when the open-rails smoke is executed. UTF-8 stderr capture. It MAY be empty only when the underlying command produced no stderr and the run still requires the file.  
 * `exit_codes.txt`: Required when the open-rails smoke is executed. LF-terminated ledger mapping executed command labels to integer exit codes.  
-* `env_presence_redacted.json`: Required when the open-rails smoke is executed. Canonical JSON containing key names and presence-only or redacted values only. It MUST NOT persist secret values.  
-* `request_summary.json`: Required when the open-rails smoke is executed. Canonical JSON summary recording the HDAPI-only target, route family, version-neutral resource path, configured base-url key, redacted auth-header shape, request-shaping basis, secret-handling posture, and PO authorization posture.  
-* `result_summary.json`: Required when open-rails smoke completion is claimed. Canonical JSON summary recording outcome classification, vendor-only scope, secret-free posture, conformance claim boundary, parent-task nonclaims when applicable, and whether the result supports bounded conformance evidence.  
-* `files_sha256.txt`: Required when open-rails smoke completion is claimed. LF-terminated checksum ledger for the OPS smoke evidence files in the assigned root.  
+* `redacted_env_presence.json`: Required when the open-rails smoke is executed. Canonical JSON containing exact key names and presence-only or redacted values only. It MUST NOT persist secret values.  
+* `request_summary.txt` or `request_summary.json`: Required when the open-rails smoke is executed. The retained artifact MUST record the HDAPI-only target, route family, request-shaping basis, secret-handling posture, and PO authorization posture. Canonical JSON is preferred for new evidence; LF-terminated text remains governed when retained and manifest-bound.  
+* `result_summary.md`, `result_summary.txt`, or `result_summary.json`: Required when open-rails smoke completion or retained evidence binding is claimed. The retained artifact MUST record outcome classification, vendor-only scope, secret-free posture, conformance claim boundary, and whether the result supports bounded conformance evidence.  
+* `final_classification.txt`: Required when retained evidence distinguishes multiple live observations, such as `bg:resolve` versus a v2 chart route. It MUST record final safe classifications and nonclaims.  
+* Route-specific command, stdout, stderr, and result-summary files MAY be retained when needed to distinguish a successful v2 chart/geokey observation from a legacy BodyGraph-route observation. If promoted, each retained file MUST have a sibling path-proof transcript and MUST be included in the Human Evidence Index and Machine Evidence Mirror.  
 * `moon_loop_rerun_transcript.txt`: Optional but governed when retained. LF-terminated transcript preserving command-to-output provenance. If promoted, it MUST have a sibling path-proof transcript.  
 * `ops02_full_action_log_and_evidence_output.md`: Optional but governed when retained. UTF-8 action log and evidence-output summary. If promoted, it MUST have a sibling path-proof transcript.  
 * `ops02_open_rails_smoke_procedure.py`: Optional but governed when retained. UTF-8 repo-resident smoke procedure used for provenance or review. If promoted, it MUST have a sibling path-proof transcript and MUST NOT be treated as product runtime code.
@@ -942,8 +961,7 @@ PR binding artifacts for already-produced OPS smoke evidence.
 
 * `audit/qa/hde-epic034/pr-06/ops_smoke_evidence_binding.log`: HDE-EPIC034 PR-06 LF-terminated binding log for already-produced OPS-02 open-rails smoke evidence. It supports HDE-FERM008.2 only and MUST preserve no full v2 runtime conformance, no HDE-FERM008 parent completion, no public Reader, and no AI scope claims.  
 * `docs/acceptance_map_epic034.json`: HDE-EPIC034 acceptance map when used to bind PR-06 evidence. It MUST use existing registered acceptance posture only and MUST NOT mint a vendor-specific acceptance token by itself.  
-* `audit/docdeltas/hde-epic034_doc_deltas.md` and `audit/qa/hde-epic034/00_meta/doc_deltas.md`: HDE-EPIC034 PR-06 doc-delta surfaces when used to record OPS-02 support and nonclaims. They are governed only when indexed, mirrored, and path-proven.  
-* 
+* `audit/docdeltas/hde-epic034_doc_deltas.md` and `audit/qa/hde-epic034/00_meta/doc_deltas.md`: HDE-EPIC034 PR-06 doc-delta surfaces when used to record OPS-02 support and nonclaims. They are governed only when indexed, mirrored, and path-proven.
 
 Path-proofs and indexing.
 
@@ -1150,6 +1168,37 @@ HDE-EPIC033 PR-01 acceptance-ledger baseline (current-state).
 * If `audit/qa/hde-epic033/00_meta/doc_deltas.md` is present, it MUST remain byte-identical to `audit/docdeltas/hde-epic033_doc_deltas.md` unless a later PF12 entry explicitly permits divergence.  
 * Each concrete artifact above MUST have a sibling `.path_proof.txt` transcript when it is promoted into governed evidence, indexed, mirrored, or used as acceptance-support evidence.  
 * The HDE-EPIC033 PR-01 acceptance-ledger baseline is not a close-pack authoritative pair, not formal closeout, not a runtime v2 conformance claim, not an open-rails vendor smoke claim, not a public Reader change, and not AI scope.
+
+HDE-EPIC035 PR-03 acceptance-boundary and evidence-loop current-state artifacts.
+
+These artifacts are governed current-state evidence for HDE-EPIC035 PR-03 evidence-loop closure posture only. They do not by themselves claim QA PASS, OPS completion, PF09 status movement, HDE-FERM008 parent Done, epic closeout, full HumanDesignAPI v2 runtime conformance, public Reader change, public route, public flag, public payload or transport change, new HTTP home, app-side HumanDesignAPI credential ownership, raw payload persistence, or AI scope.
+
+* `docs/acceptance_map_epic035.json`: HDE-EPIC035 PR-03 acceptance map. Canonical JSON. It binds existing registered baseline tokens only and MUST preserve `pf09_scope_not_completed_by_this_pr` or equivalent nonclaim posture when the PR does not complete HDE-FERM008 parent, PF09 status drainage, or epic closeout.  
+* `docs/acceptance_map_epic035.json.path_proof.txt`: Required sibling path-proof transcript when the acceptance map is treated as governed evidence.  
+* `audit/qa/hde-epic035/token_evidence_matrix.md`: HDE-EPIC035 token-to-evidence matrix. UTF-8 markdown. It MUST distinguish token evidence binding from QA PASS, OPS completion, closeout review, and PF09 drainage.  
+* `audit/qa/hde-epic035/token_evidence_matrix.md.path_proof.txt`: Required sibling path-proof transcript when the token-evidence matrix is treated as governed evidence.  
+* `audit/qa/hde-epic035/acceptance_map_viability.log`: LF-terminated acceptance-map viability log for the PR-03 evidence-loop closure family.  
+* `audit/qa/hde-epic035/acceptance_map_viability.log.path_proof.txt`: Required sibling path-proof transcript when the viability log is treated as governed evidence.  
+* `audit/qa/hde-epic035/ops-01/ops_evidence_binding.log`: LF-terminated binding log for already-produced OPS-01 evidence. It MUST state that the live vendor action was not rerun by the PR when that is the posture, and MUST preserve no OPS completion, no QA PASS, no PF09 status movement, no epic closeout, no full runtime conformance, no public surface change, no app-side credential ownership, no raw payload persistence, and no AI-scope claims.  
+* `audit/qa/hde-epic035/ops-01/ops_evidence_binding.log.path_proof.txt`: Required sibling path-proof transcript when the OPS evidence binding log is treated as governed evidence.  
+* `audit/docdeltas/hde-epic035_doc_deltas.md`: HDE-EPIC035 doc-delta surface. UTF-8 markdown. It records later-drain targets and MUST NOT be treated as the PF-canon drain itself.  
+* `audit/docdeltas/hde-epic035_doc_deltas.md.path_proof.txt`: Required sibling path-proof transcript when the doc-delta surface is treated as governed evidence.  
+* `audit/qa/hde-epic035/00_meta/doc_deltas.md`: HDE-EPIC035 QA meta doc-delta surface. UTF-8 markdown. It records QA-root doc-delta context and MUST NOT be treated as the PF-canon drain itself.  
+* `audit/qa/hde-epic035/00_meta/doc_deltas.md.path_proof.txt`: Required sibling path-proof transcript when the QA meta doc-delta surface is treated as governed evidence.
+
+HDE-EPIC035 Live QA Pass 1 and qa-16 closeout current-state artifacts.
+
+These artifacts are governed current-state QA evidence for HDE-EPIC035 Live QA Pass 1 and qa-16 closeout-deliverables posture. They do not by themselves perform PO closeout, board update, PF edit, merge, PF09 status movement, OPS completion, full HumanDesignAPI v2 runtime conformance, public expansion, raw payload persistence, or AI scope.
+
+* `audit/qa/hde-epic035/qa_step_logs_manifest.json`: HDE-EPIC035 QA step-logs manifest. Canonical JSON. It records check IDs, statuses, primary-log paths, and primary-log path-proof paths when those fields are produced by the plan or harness.  
+* `audit/qa/hde-epic035/qa_step_logs_manifest.json.path_proof.txt`: Required sibling path-proof transcript when the QA step-logs manifest is treated as governed evidence.  
+* `audit/qa/hde-epic035/checks/<check_id>/primary.log`: Check-scoped primary log pattern for HDE-EPIC035 selected checks, including `step-0b-doc-delta-capture` and `po-001` through `po-014` when those checks are executed. Each concrete primary log MUST follow the normal PF12 primary-log and path-proof rules.  
+* `audit/qa/hde-epic035/checks/qa-16-close-out-deliverables/primary.log`: HDE-EPIC035 qa-16 closeout-deliverables primary log. Non-empty UTF-8 text. It records closeout assembly evidence and MUST preserve nonclaims when it is treated as governed evidence.  
+* `audit/qa/hde-epic035/checks/qa-16-close-out-deliverables/primary.log.path_proof.txt`: Required sibling path-proof transcript when the qa-16 primary log is treated as governed evidence.  
+* `audit/qa/hde-epic035/00_meta/discovery_artifact.md`: HDE-EPIC035 discovery artifact. Non-empty UTF-8 markdown when present. It records repo-locus grounding and retained OPS-evidence inspection posture.  
+* `audit/qa/hde-epic035/00_meta/discovery_artifact.md.path_proof.txt`: Required sibling path-proof transcript when the discovery artifact is treated as governed evidence.  
+* `audit/qa/hde-epic035/00_meta/qa_rca_doc_delta_summary.md`: HDE-EPIC035 QA RCA and Doc Delta summary artifact. Non-empty UTF-8 markdown when present. It supports QA closeout review only and MUST NOT be treated as PO closeout, board update, PF edit, merge, PF09 status movement, OPS completion, full runtime conformance, public expansion, raw payload persistence, or AI scope.  
+* `audit/qa/hde-epic035/00_meta/qa_rca_doc_delta_summary.md.path_proof.txt`: Required sibling path-proof transcript when the QA RCA and Doc Delta summary is treated as governed evidence.
 
 Titles-only routing rule
 
@@ -5354,7 +5403,7 @@ Engine Core evidence families participate in the existing Mirror and Index token
 
 * ##### `artifacts/vendor/hdapi_v2/request_shaping.snapshot.json`: Canonical JSON snapshot of v2 request-shaping posture for the v2 chart endpoints. It MUST be derived from the governed contract map and MUST NOT guess credential names, base URLs, or request bytes not pinned by the owning contract and infrastructure homes. It MUST preserve `HD_API_BASE_URL` as the configured base-url owner when that posture is being proven, and it MAY record `HDAPI_BASE_URL` only as deprecated alias, compatibility, observed drift, or migration evidence. It MUST distinguish vendor endpoint provenance such as `/v2/charts` from active runtime resource paths such as `charts`, `charts/simple`, and `charts/coordinates`; active runtime resource paths MUST be version-neutral when that is the implementation posture being evidenced. It MUST preserve auth-header family as redacted shape, including `Authorization: Bearer <redacted>` for current v2 chart-style routes, `HD-Api-Key: <redacted>` for legacy v1 BodyGraph routes when intentionally preserved, and `HD-Geocode-Key: <redacted>` where geocoding is required. Auth-header source SHOULD be route or contract metadata rather than vendor API version-string inference when asserted. Raw header values and vendor payload bodies MUST NOT be persisted in this artifact.
 
-* ##### `artifacts/vendor/hdapi_v2/response_mapping.snapshot.json`: Canonical JSON snapshot of v2 response-envelope mapping into HDE internal inputs. It MUST preserve response type, success status, errorCode, data payload identity, and route variant. If v2 response data cannot truthfully feed existing BodyGraph, cache, compat, sampler, or admin paths without schema changes, this artifact MUST record the schema gap and MUST NOT claim compatibility by inference.
+* ##### `artifacts/vendor/hdapi_v2/response_mapping.snapshot.json`: Canonical JSON snapshot of v2 response-envelope mapping into HDE internal inputs. It MUST preserve response type, success status, errorCode, data payload identity posture, route variant, route family, response-envelope fields, and no-claim posture. If v2 `ChartResult` or `ChartSimpleResult` response data cannot truthfully feed existing BodyGraph, person, cache, compat, sampler, or admin paths without schema or adapter changes, this artifact MUST record the exact adapter/schema gap and MUST NOT claim normalized data-path proof, BodyGraph cache compatibility, compat-input compatibility, runtime v2 conformance, public Reader change, app-side HumanDesignAPI call path, raw vendor payload persistence, or compatibility by inference. A later runtime compatibility claim requires a bounded adapter/schema proof or implementation that maps the selected vendor payload family into the existing BodyGraph/person/cache contract.
 
 * ##### `artifacts/vendor/hdapi_v2/v1_legacy_guard.log`: LF-terminated guard log proving v1 BodyGraph routes remain explicitly legacy behavior and are not silently collapsed into v2 chart routes.
 
@@ -5362,11 +5411,50 @@ Engine Core evidence families participate in the existing Mirror and Index token
 
 * ##### `artifacts/vendor/hdapi_v2/closed_rails_refusal.txt`: LF-terminated closed-rails refusal artifact proving deterministic no-external-I/O behavior for v2 vendor paths when rails are closed.
 
-* ##### `artifacts/vendor/hdapi_v2/error_mapping.snapshot.json`: Canonical JSON snapshot of v2 vendor HTTP outcomes, error-envelope mapping, malformed-response handling, and HDE typed-error mapping. It MUST avoid vendor payload echo and secrets.
+* `artifacts/vendor/hdapi_v2/error_mapping.snapshot.json`: Canonical JSON snapshot of v2 vendor HTTP outcomes, error-envelope mapping, malformed-response handling, retry classification, malformed-response classification, network-error posture, redirect-response posture, route/auth posture, and HDE typed-error mapping. It MUST be generated and checked under closed rails when used as closed-rails provider-outcome evidence. It MUST avoid vendor payload echo, raw request bodies, raw response bodies, raw vendor payloads, raw secret headers, plaintext secret values, public Reader changes, public route/flag/payload/transport changes, open-rails execution claims, live vendor claims, full runtime conformance claims, and AI scope claims.  
+* `artifacts/vendor/hdapi_v2/rate_limit_headers.snapshot.json`: Canonical JSON snapshot of v2 `429`, rate-limit, Retry-After, retryability, and Retry-After parsing posture. It MUST remain keys-only and secret-free. It MUST distinguish retryable and non-retryable status families, record bounded Retry-After cases without preserving sensitive provider payloads, and preserve the same no-claim posture as the provider-outcome evidence family when used for HDE-EPIC035 PR-01 or later equivalent evidence.
 
-* ##### `artifacts/vendor/hdapi_v2/rate_limit_headers.snapshot.json`: Canonical JSON snapshot of v2 rate-limit and Retry-After header observations or fixture-backed expectations. It MUST remain keys-only and secret-free.
+* ##### `artifacts/vendor/hdapi_v2/release_binding.snapshot.json`: Canonical JSON snapshot binding HDAPI v2 provider-outcome, response-normalization, schema-gap, release, pack, or BodyGraph-cache compatibility evidence when that binding is claimed. It MUST name the evidence families being bound, preserve SHA linkage to the referenced artifacts, preserve chronology where required by the evidence family, fail closed on stale or mismatched source artifacts, and preserve explicit nonclaims for full HumanDesignAPI v2 runtime conformance, HDE-FERM008 parent completion, HDE-FERM008.5 closure, public Reader change, new public routes, raw payload persistence, and AI scope unless those claims are separately proven and governed.
 
-* ##### `artifacts/vendor/hdapi_v2/release_binding.snapshot.json`: Canonical JSON snapshot binding v2 response-normalization evidence to the existing HDE release, pack, or BodyGraph cache compatibility posture when that binding is claimed.
+Future adapter/schema proof for v2 chart-to-BodyGraph compatibility.
+
+A future proof or implementation that claims v2 chart data feeds existing BodyGraph, person, cache, compatibility, sampler, or compute flows MUST be a governed, secret-safe evidence family. It MUST show:
+
+* which vendor payload family is used, including whether the evidence uses `ChartResult`, `ChartSimpleResult`, another v2 response family, or an explicit legacy fallback;  
+* which vendor response fields are required for the HD Engine contract;  
+* which internal BodyGraph, person, cache, compatibility, sampler, or compute fields are populated;  
+* which required fields are absent, unsupported, summarized, redacted, or intentionally excluded;  
+* whether the adapter is lossless enough for HD Engine compute;  
+* whether any legacy fallback remains;  
+* whether raw vendor payloads are persisted, redacted, summarized, excluded, or represented only by digest or field-coverage evidence;  
+* what normalized internal output contract is produced;  
+* what nonclaims remain after the proof.
+
+`ChartSimpleResult` MAY support bounded live smoke, authentication proof, geocode-key proof, provider availability proof, or minimal route-family confirmation. It MUST NOT be treated as sufficient for full BodyGraph, person, cache, compatibility, or compute input unless a governed adapter/schema proof demonstrates that it contains every required field for that contract.
+
+The preferred future v2 payload candidate is the richest relevant v2 chart response, currently the full chart route / `ChartResult` family, unless a future vendor-route policy or ADR proves another source. If full `ChartResult` does not contain all required BodyGraph details, the proof MUST record the exact field gap and either define a sanctioned adapter strategy, identify the correct vendor route for full BodyGraph detail, retain explicit legacy fallback, or route a new ADR before runtime compatibility is claimed.
+
+The proof MUST NOT persist raw secrets, uncontrolled raw vendor payloads, public Reader payload changes, new HTTP-home claims, app-side vendor credential ownership, or AI scope. Recording an adapter/schema gap is acceptable as gap evidence only; it MUST NOT be reused as proof of runtime compatibility.
+
+uture `bg:resolve --source vendor` route-policy evidence.
+
+A future proof or implementation that claims `bg:resolve --source vendor` resolves BodyGraph detail MUST be a governed, secret-safe evidence family. It MUST distinguish the selected route policy as exactly one of: v2 chart-backed BodyGraph resolution, explicit legacy BodyGraph fallback, dual-route policy, or unsupported runtime nonclaim.
+
+The evidence MUST record:
+
+* the configured base-url posture;  
+* the selected runtime resource path family;  
+* the request shape used by `bg:resolve --source vendor`;  
+* whether the route is v2 chart-backed, legacy BodyGraph, dual-route, or unsupported;  
+* the redacted auth-header family and geocode-key posture where applicable;  
+* whether the selected response contains the required BodyGraph detail;  
+* the normalized internal BodyGraph/person/cache output contract when compatibility is claimed;  
+* any legacy fallback or vendor-route gap that remains;  
+* the nonclaims preserved by the proof.
+
+The evidence MUST distinguish simple route availability from full BodyGraph-detail resolution. A successful `charts/simple` observation MAY prove provider availability, auth posture, geocode-key posture, or route-family availability. It MUST NOT prove that `bg:resolve --source vendor` resolves complete BodyGraph detail unless the route-policy and adapter/schema proof also establish the required internal contract.
+
+The evidence MUST NOT treat accidental `/v2/bodygraphs` composition, route-family mismatch, or a wrong-shape 404 as generic provider unavailability. It MUST classify route-shape mismatch separately from provider unavailability when that distinction is visible.
 
 ##### HDAPI v2 source-cache inputs.
 
@@ -5433,6 +5521,8 @@ Engine Core evidence families participate in the existing Mirror and Index token
 * ##### `hdapi_v2.request_shaping` maps to `artifacts/vendor/hdapi_v2/request_shaping.snapshot.json`
 
 * ##### `hdapi_v2.response_mapping` maps to `artifacts/vendor/hdapi_v2/response_mapping.snapshot.json`
+
+* `hdapi_v2.response_mapping_pr02` maps to `artifacts/vendor/hdapi_v2/response_mapping.snapshot.json` when the shared response-mapping snapshot is promoted as HDE-EPIC035 PR-02 evidence. The binding MUST validate that the payload is the expected PR-02 response-normalization or adapter/schema-gap payload before emitting the PR-02 artifact key. If an earlier epic also used the shared path, the updater MUST preserve distinct non-shared evidence rows and skip only the promoted shared-snapshot row required to prevent duplicate conflicting semantics.
 
 * ##### `hdapi_v2.v1_legacy_guard` maps to `artifacts/vendor/hdapi_v2/v1_legacy_guard.log`
 

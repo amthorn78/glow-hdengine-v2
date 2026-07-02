@@ -3,12 +3,12 @@
 ## 0.1 **Header**
 
 **Title:** PF14-Canon-HDE-Mechanics-Guide  
-**Version:** v3.3.9
+**Version:** v3.4.1
 
 **Status:** Canon  
-**Effective date:** 2026-06-27
+**Effective date:** 2026-07-01
 
-**Last Update Gate:** BN 11.7.4 A20-34  
+**Last Update Gate:** BN 11.8.7 A7-14  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
 ---
@@ -26,13 +26,12 @@ This guide:
 Scope boundary (normative).  
  This guide is a mechanics/components reference. It MUST NOT function as governance, a token registry, or an epic-planning authority.
 
-* Acceptance token registry, token naming, and token semantics are owned by HDE-Governance (titles-only). Newly minted tokens are canonical in HDE-Build Notes (titles-only) until drained into HDE-Governance. This guide MUST NOT list or curate acceptance tokens.
-
-* Epic planning structure and baseline close requirements are owned by Glow QA Guide, HDE-Phased Epics, and HDE-Build Checklist (titles-only). This guide MUST NOT add planning prerequisites or planning checklists.
-
-* Evidence families and acceptance token mapping are owned by Glow QA Guide and HDE-Build Checklist (titles-only). This guide MUST NOT redefine acceptance criteria.
-
-* Live QA runbooks are not epic-plan prerequisites. This guide may describe Live QA harness mechanics, but Live QA runbook planning lives in QA artifacts governed by Glow QA Guide (titles-only) and must not be treated as a prerequisite for epic planning.
+* Acceptance token registry, token naming, and token semantics are owned by HDE-Governance (titles-only). Newly minted tokens are canonical in HDE-Build Notes (titles-only) until drained into HDE-Governance. This guide MUST NOT list or curate acceptance tokens.  
+* Epic planning structure and baseline close requirements are owned by Glow QA Guide, HDE-Phased Epics, and HDE-Build Checklist (titles-only). This guide MUST NOT add planning prerequisites or planning checklists.  
+* Evidence families and acceptance token mapping are owned by Glow QA Guide and HDE-Build Checklist (titles-only). This guide MUST NOT redefine acceptance criteria.  
+* Live QA runbooks are not epic-plan prerequisites. This guide may describe Live QA harness mechanics, but Live QA runbook planning lives in QA artifacts governed by Glow QA Guide (titles-only) and must not be treated as a prerequisite for epic planning.  
+* Mechanics proof and helper-syntax posture. For PF14-owned mechanics, reviewers and writers must distinguish the mechanic being proven from helper-code formatting, shell wrapper form, heredoc formatting, indentation, rendered escape characters, or command-literal copy/paste defects. Correctable helper syntax may be normalized during execution or review when the mechanic, proof target, rails posture, evidence identity, public/private boundary, no-secret posture, and no-new-scope posture remain unchanged. Test and evidence helpers must report executed truth and must not rely on plan-byte literalism.  
+* PF09 accountability for mechanics gaps. When PF14 text, reviews, audits, implementation guidance, or future-work notes identify task-like mechanics work, the item must map to a phased PF09 task/subtask, be marked as a PF09 gap for PO/canon adjudication, or be clearly classified as out of PF09 scope. PF14 does not create PF09 rows, assign PF09 status, or turn free-floating recommendations into acceptance obligations by itself.
 
 Directory naming (normative).  
 All repository directories MUST use lowercase ASCII names. Mixed-case directories are non-conforming and must not be introduced by examples in this guide. This rule is directory-only. Filenames may contain uppercase characters unless another canon explicitly forbids them.
@@ -213,9 +212,16 @@ HDAPI v2 request-shaping and response-mapping mechanics. The repo MUST provide d
 * Project `HD_API_KEY` into `HD-Api-Key` auth for legacy HumanDesignAPI v1 BodyGraph routes.  
 * Project `GEO_API_KEY` into `HD-Geocode-Key` only where the governed route requires geocoding.  
 * Preserve v1 BodyGraph behavior as explicit legacy behavior until the owning architecture and byte-contract homes decide whether v1 remains a fallback or is retired.  
+* Treat `bg:resolve --source vendor` as a BodyGraph resolver workflow, not as the canonical v2 chart/geokey validation path. When the configured vendor base URL is v2, this command MUST NOT be used to prove v2 chart/geokey success unless a future explicit vendor-route policy aligns its route family, request shape, and auth/geokey posture with the required BodyGraph-detail strategy.  
+* Any future work that claims `bg:resolve --source vendor` proves v2 BodyGraph detail MUST show the selected vendor payload family, whether legacy fallback remains, and how the returned data maps to the existing BodyGraph/person/cache contract.  
 * Keep source-selection and response-mapping mechanics from collapsing v1 and v2 auth behavior, route-family identity, or evidence posture into a generic vendor-auth path.  
+* Treat `bg:resolve --source vendor` as a BodyGraph resolver workflow, not as the canonical v2 chart/geokey validation path. When the configured vendor base URL is v2, this command MUST NOT be used to prove v2 chart/geokey success unless a future explicit vendor-route policy aligns its route family, request shape, and auth/geokey posture with the required BodyGraph-detail strategy.  
+* Any future work that claims `bg:resolve --source vendor` proves v2 BodyGraph detail MUST show the selected vendor payload family, whether legacy fallback remains, and how the returned data maps to the existing BodyGraph/person/cache contract.  
 * Map the standard v2 response envelope into HDE internal structures only after the mapping is proven.  
 * Prove whether v2 response data can feed the existing BodyGraph cache and compat input path, or identify that a schema update is required in the owning schema home.  
+* Preserve the distinction between response-envelope proof, gap-recording evidence, and normalized data-path proof. A proof that records an adapter/schema gap does not by itself make v2 chart data compute-ready.  
+* Do not treat `ChartResult` or `ChartSimpleResult` StandardResponse data as feeding the existing BodyGraph cache, person/bodygraph compute input, compatibility input, or Glow app integration path until a bounded adapter/schema proof or implementation maps the required vendor fields into the existing internal BodyGraph/person/cache contract.  
+* If `ChartSimpleResult` is used for bounded live smoke, auth/geokey proof, route-family confirmation, or provider availability proof, the evidence must carry explicit nonclaims for full BodyGraph detail unless it proves every required field.  
 * Preserve the public Reader contract. No public Reader byte change is implied by this mechanics posture.
 
 HDAPI v2 rails and Live QA mechanics. The repo MUST provide closed-rails and open-rails proof mechanics for HumanDesignAPI v2 conformance. Closed-rails mechanics MUST prove deterministic refusal and no outbound I/O when rails are closed. Open-rails vendor smoke, when required, is PO-only execution and MUST be treated as an ops task, not PR work and not QA substitution. The mechanics MUST require secret-safe, governed evidence for any PO-run open-rails smoke, including command transcript, stdout, stderr, exit code, redacted or presence-only secret posture, request summary, result summary, and file checksums, while avoiding plaintext secrets and unapproved vendor payload storage.
@@ -245,6 +251,7 @@ HDAPI v2 evidence generators MUST fail closed when:
 * Recommended v2 chart routes are collapsed into legacy v1 BodyGraph routes without an explicit legacy decision.  
 * Required path-proof, Human Index, or Machine Mirror binding is absent for governed evidence.  
 * Closed-rails proof attempts outbound I/O.  
+* A governed closed-rails evidence generator certifies check or write output without enforcing deterministic closed rails (`SAFE_MODE=1`, `ALLOW_NETWORK=0`, `LC_ALL=C`, `LANG=C`, `TZ=UTC`) before rendering, checking, or writing the evidence.  
 * Open-rails evidence is not PO-executed, secret-safe, and governed.  
 * Any AI, OpenAI, LLM, AI-agent, prompt, embedding, chatbot, model-call, AI-provider credential, AI rails, or AI evidence family is introduced under this conformance work.  
 * Any AI, OpenAI, LLM, AI-agent, prompt, embedding, chatbot, model-call, AI-provider credential, AI rails, or AI evidence family is introduced under this conformance work.

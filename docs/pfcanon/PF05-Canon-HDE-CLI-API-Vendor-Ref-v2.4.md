@@ -1,16 +1,16 @@
 # **0\. Document Control \[Required-Now\]**
 
-## **\`0.1 Header**
+## **0.1 Header**
 
 **Title:** PF05-Canon-HDE-CLI-API-Vendor-Ref
 
-**Version:** v2.3.8
+**Version:** v2.4
 
 **Status:** Canon
 
-**Effective date:** 2026-06-27
+**Effective date:** 2026-07-01
 
-**Last Update Gate:**  BN 11.7.4 A20-34
+**Last Update Gate:**  BN 11.8.7 A7-14
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -49,7 +49,7 @@
 * **Deterministic CLI results.** Any CLI command results used in QA MUST satisfy determinism (AB↔BA) and be reproducible as described in §9. *(Token names live in Governance.)*  
 * **Evidence anchoring.** Any evidence pointer emitted by the CLI must use governed repo roots and must be path-proven in the evidence index (see **Glow QA Guide** and **HDE-Governance §9** by title).  
 * **Mirror schema check invocation (operator note).** `ci/checks/check_mirror_schema.sh` is a Python entrypoint. Invoke it as `python ci/checks/check_mirror_schema.sh` (or direct exec only if the executable bit is guaranteed). Do **not** run it via `bash ci/checks/check_mirror_schema.sh`; that invocation is invalid and is a known source of drift.  
-* **Live QA Plan command-invocation materiality and rendered-escape review.** PF05 may preserve preferred command invocations for execution and evidence reproducibility. Command examples in plans are not canonical invocation contracts unless PF05 or another owning PF explicitly makes them so. A mismatch from a preferred command spelling, path spelling, shell syntax, heredoc form, escaped option, interpreter choice, helper-code syntax, indentation, or pasted command form is a Live QA Plan approval blocker only when raw source changes execution, proves the wrong target, opens unsafe rails, exposes secrets, mutates prohibited state, prevents the check from running, makes PASS/FAIL unverdictable, or damages governed evidence trust. Rendered escape characters in commands, paths, artifact strings, endpoint strings, environment variable names, JSON keys, or transport-proof snippets are not material by themselves and are not source evidence. PF05 reviewers MUST judge raw command identity and raw artifact identity from source artifacts, governed records, canonical bindings, raw repo files, or execution transcripts, not assistant-rendered output, markdown previews, copied chat text, or review prose. A blocker based on escaping, syntax, or command exactness requires raw/source proof of a substantive executable, governed, canonical, or semantic defect; otherwise the issue belongs in caveats, suggestions, execution notes, or the captured QA evidence command transcript.  
+* **Live QA Plan command-invocation materiality and rendered-escape review.** PF05 may preserve preferred command invocations for execution and evidence reproducibility. Command examples and vendor request examples in plans are not canonical invocation contracts unless PF05 or another owning PF explicitly makes command bytes the proof target. Distinguish normative protocol bytes from illustrative invocation syntax: vendor header names, route families, endpoint families, payload shape, auth posture, environment-variable identity, rails posture, and secret safety are substantive; shell wrapper form, heredoc formatting, indentation, rendered escapes, copied-chat damage, local invocation style, and paste-readiness are not blockers by themselves. A mismatch from preferred command spelling, path spelling, shell syntax, heredoc form, escaped option, interpreter choice, helper-code syntax, indentation, or pasted command form is a Live QA Plan approval blocker only when raw source changes execution, proves the wrong target, opens unsafe rails, exposes secrets, mutates prohibited state, prevents the check from running, makes PASS/FAIL unverdictable, or damages governed evidence trust. PF05 reviewers MUST judge raw command identity and raw artifact identity from source artifacts, governed records, canonical bindings, raw repo files, or execution transcripts, not assistant-rendered output, markdown previews, copied chat text, or review prose. A blocker based on escaping, syntax, command exactness, or shell-wrapper form requires raw/source proof of a separate executable, governed, canonical, safety, scope, evidence-identity, or semantic defect; otherwise the issue belongs in caveats, suggestions, execution notes, in-flight normalization, or the captured QA evidence command transcript.  
 * **Process ownership.** Use the evidence-only PR template and follow the “update in same PR” workflow defined in **Epic-Process-Guide** (titles only). **Build Notes** are WIP only; drained guidance must land in canon.  
 * **Documentation drainage is never a blocker.** PF10 drain and any later documentation drainage are never prerequisites, required deliverables, required checks, acceptance conditions, or readiness blockers for PF05-owned CLI, Reader, or Vendor work. Allowed blockers remain limited to truth and proof failures, such as missing required QA artifacts, untrusted evidence, or unresolved fail states that affect acceptance.  
 * **PF10 carries live truth until later drain.** When an undrained canon delta affects PF05-owned surfaces, PF10 remains the temporary live-truth home until drainage occurs. Plans, reviews, QA artifacts, acceptance maps, step logs, and closeout materials may record later drain targets or doc-delta candidates, but they must not require PF document updates as execution or closeout conditions, and they must distinguish supportable-from-repo-evidence posture from already drained posture.  
@@ -886,10 +886,9 @@ Needs development.
 
 * `--source {db|vendor|auto}` selects the data source:
 
-  * `db` — resolve from DB only (no vendor I/O).
-
-  * `vendor` — resolve from vendor only; vendor HTTP calls are allowed **only** when SAFE rails are open (`SAFE_MODE=0` and `ALLOW_NETWORK=1`). Shaping and error mapping follow §7.1/§7.2/§7.3 and the policies in **HDE-Governance** and the **HDE-Mechanics Guide** (titles-only).
-
+  * `db` — resolve from DB only (no vendor I/O).  
+  * `vendor` — resolve from vendor only; vendor HTTP calls are allowed **only** when SAFE rails are open (`SAFE_MODE=0` and `ALLOW_NETWORK=1`). Shaping and error mapping follow §7.1/§7.2/§7.3 and the policies in **HDE-Governance** and the **HDE-Mechanics Guide** (titles-only).  
+  * `bg:resolve --source vendor` route-policy boundary — before any future runtime, production, app-integration, BodyGraph-resolution, or full HumanDesignAPI v2 conformance claim, `bg:resolve --source vendor` MUST resolve BodyGraph detail through an explicit vendor-route policy. That policy MUST classify the selected behavior as one of: v2 chart-backed BodyGraph resolution, explicit legacy BodyGraph fallback, dual-route policy, or unsupported nonclaim. It MUST preserve HD Engine ownership of vendor acquisition and BodyGraph resolution, keep secrets and raw payloads out of evidence, and distinguish simple v2 chart smoke from full BodyGraph-detail resolution. Current HDE-EPIC035 evidence records `bg:resolve --source vendor` as a legacy BodyGraph ingest-path observation against a configured v2 base, returning provider not found, while the v2 `charts/simple` route succeeded separately. Do not treat `charts/simple` success as proof that `bg:resolve` can resolve complete BodyGraph data.  
   * `auto` — DB-first, vendor-fallback according to the adapter’s environment policy (HDE-Mechanics Guide; titles-only).
 
 * Implementations MAY expose `--dry-run` and `--upsert` switches; when present they must follow the vendor rails and adapter data-source policy in §7.1/§7.4 and the **HDE-Mechanics Guide** (titles-only).
@@ -2840,7 +2839,7 @@ The v2 request contract, when drained, MUST define:
 
 PF05 pins `HD_API_BASE_URL` as the canonical HumanDesignAPI base URL key, `HD_API_KEY` as the canonical vendor credential key, and `GEO_API_KEY` as the geocoding key where required. `HDAPI_BASE_URL` is deprecated legacy spelling and may be supported only as a temporary compatibility alias when `HD_API_BASE_URL` is absent; conflicting values MUST fail closed as configuration ambiguity. The configured `HD_API_BASE_URL` owns the vendor API-version path and may include a vendor version segment without changing runtime route constants. PF05 MUST NOT restate current deployed base URL values as runtime-contract text; deployed values belong to infrastructure inventory and OPS evidence. Legacy BodyGraph resource paths under a configured v2 base remain live-behavior-unproven and MUST NOT be claimed as live vendor conformance from route-version remediation alone.
 
-If v2 response `data` cannot truthfully feed the existing BodyGraph cache and compat inputs without schema changes, PF05 must record the mapping gap and route schema work to HDE-Schemas & Artifacts and HDE-Mechanics Guide by title. PF05 MUST NOT claim compatibility by inference.
+PF05 MUST preserve the distinction between v2 chart smoke, v2 full chart payload, legacy BodyGraph payload, response-envelope proof, and normalized HD Engine BodyGraph/person/cache contract. `ChartSimpleResult` MUST NOT be presumed sufficient for full BodyGraph detail. `ChartResult` and `ChartSimpleResult` MUST NOT be claimed to feed existing BodyGraph cache, person/bodygraph compute inputs, compatibility inputs, or legacy BodyGraph replacement until a bounded adapter/schema proof or implementation maps the vendor payload family into the existing internal contract. Recording an exact schema/adapter gap is valid evidence posture for a scoped gap-recording slice, but it is not future runtime compatibility proof.
 
 No OpenAI, LLM, AI-agent, prompt, embedding, chatbot, model-call, AI-provider config key, AI credential, AI runtime rail, AI evidence family, or AI QA obligation is introduced by this v2 request and response contract work.
 
@@ -3047,7 +3046,7 @@ Acceptance impact.
 
 ### **7.3.9 HumanDesignAPI v2 live conformance pending**
 
-HumanDesignAPI v2 live conformance is pending and MUST NOT be claimed from documentation consolidation, contract inventory, or closed-rails shaping proof alone.
+HumanDesignAPI v2 full live/runtime conformance remains pending. HDE-EPIC035 evidence records provider-outcome and rate-limit mapping for HDE-FERM008.3, exact response-normalization schema/adapter gap posture for HDE-FERM008.4, retained OPS-01 live-vendor observations, and PR-03 governed evidence-loop binding for HDE-FERM008.5. These proof slices do not claim HDE-FERM008 parent completion, PF09 status movement, epic closeout, full HumanDesignAPI v2 runtime conformance, public Reader changes, public route or payload changes, new HTTP homes, app-side vendor credential ownership, raw payload persistence, or AI scope.
 
 Closed-rails v2 proof MUST show deterministic refusal with no DNS, socket, HTTP, or other external I/O. Any JSON emitted for refusal MUST be canonical, numeric-free where public, LF-terminated, and secret-free.
 
@@ -4091,6 +4090,64 @@ These anchors bind the bounded open-rails HumanDesignAPI v2 smoke and its govern
   * `artifacts/evidence_index.jsonl`  
   * `artifacts/evidence_index.jsonl.sha256`  
   * Sibling `*.path_proof.txt` transcripts for the OPS-02, PR-06, acceptance-map, Live QA, index, mirror, and hash artifacts listed above.
+
+#### **D.9h HDE-EPIC035 HumanDesignAPI v2 provider-outcome, response-normalization, OPS, and evidence-loop proof anchors**
+
+These anchors bind HDE-EPIC035 vendor-seam evidence only. They do not claim QA PASS, OPS completion, PF09 status movement, HDE-FERM008 parent Done, epic closeout, full HumanDesignAPI v2 runtime conformance, public Reader change, public route, public flag, public payload or transport change, new HTTP home, app-side HumanDesignAPI credential ownership, raw payload persistence, AI scope, board update, merge provenance, or PF-canon drainage.
+
+* **PR-01 provider-outcome and rate-limit evidence**  
+  * `artifacts/vendor/hdapi_v2/error_mapping.snapshot.json` *(HDE-FERM008.3 provider-outcome mapping; closed-rails only; maps provider HTTP statuses, malformed response posture, network-error posture, retryability, route/auth posture, and no-claim boundaries)*  
+  * `artifacts/vendor/hdapi_v2/error_mapping.snapshot.json.path_proof.txt`  
+  * `artifacts/vendor/hdapi_v2/rate_limit_headers.snapshot.json` *(HDE-FERM008.3 rate-limit and Retry-After evidence; closed-rails only)*  
+  * `artifacts/vendor/hdapi_v2/rate_limit_headers.snapshot.json.path_proof.txt`  
+  * `tools/evidence/generate_hdapi_v2_live_conformance.py` *(closed-rails evidence generator; generator certification must enforce closed deterministic rails before writing or checking provider-outcome evidence)*  
+  * `tests/evidence/test_hdapi_v2_live_conformance.py` *(targeted regression coverage for provider-outcome evidence, non-backdated proofs, and non-closed-rails refusal)*  
+* **PR-02 response-normalization and release binding**  
+  * `artifacts/vendor/hdapi_v2/response_mapping.snapshot.json` *(HDE-FERM008.4 exact schema/adapter gap evidence; records that v2 ChartResult and ChartSimpleResult are not proven to feed existing BodyGraph cache, person/bodygraph compute inputs, or compatibility inputs without adapter proof)*  
+  * `artifacts/vendor/hdapi_v2/response_mapping.snapshot.json.path_proof.txt`  
+  * `artifacts/vendor/hdapi_v2/release_binding.snapshot.json` *(binds PR-01 HDE-FERM008.3 provider-outcome evidence to PR-02 HDE-FERM008.4 exact schema/adapter gap evidence without claiming full runtime conformance or HDE-FERM008.5 closure)*  
+  * `artifacts/vendor/hdapi_v2/release_binding.snapshot.json.path_proof.txt`  
+  * `tools/evidence/generate_hdapi_v2_response_normalization.py`  
+  * `tests/evidence/test_hdapi_v2_response_normalization.py`  
+* **OPS-01 retained open-rails observations**  
+  * `audit/ops/hde-epic035/ops-01/ops_evidence_manifest.txt`  
+  * `audit/ops/hde-epic035/ops-01/files_sha256.txt`  
+  * `audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/final_classification.txt` *(records `bg:resolve --source vendor` as a legacy BodyGraph ingest-path observation against configured v2 base, v2 `charts/simple` success, geokey proof for `charts/simple`, and no full runtime-conformance claim)*  
+  * `audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/v2_charts_simple_commands.txt`  
+  * `audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/v2_charts_simple_stdout.log`  
+  * `audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/v2_charts_simple_stderr.log`  
+  * `audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/v2_charts_simple_result_summary.txt`  
+  * `audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/request_summary.txt`  
+  * `audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/result_summary.md`  
+  * `audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/stdout.log`  
+  * `audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/stderr.log`  
+  * `audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/exit_codes.txt`  
+  * `audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/vendor_bodygraph_dry_run.json`  
+  * `audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/vendor_bodygraph_dry_run_no_version.json`  
+* **PR-03 evidence-loop and acceptance-boundary artifacts**  
+  * `docs/acceptance_map_epic035.json` *(baseline existing tokens only; records HDE-FERM008.5 evidence-loop closure candidate posture and no parent completion)*  
+  * `docs/acceptance_map_epic035.json.path_proof.txt`  
+  * `audit/qa/hde-epic035/token_evidence_matrix.md`  
+  * `audit/qa/hde-epic035/token_evidence_matrix.md.path_proof.txt`  
+  * `audit/qa/hde-epic035/acceptance_map_viability.log`  
+  * `audit/qa/hde-epic035/acceptance_map_viability.log.path_proof.txt`  
+  * `audit/qa/hde-epic035/ops-01/ops_evidence_binding.log` *(binds retained OPS-01 evidence without rerunning OPS or claiming OPS completion)*  
+  * `audit/qa/hde-epic035/ops-01/ops_evidence_binding.log.path_proof.txt`  
+  * `audit/docdeltas/hde-epic035_doc_deltas.md`  
+  * `audit/docdeltas/hde-epic035_doc_deltas.md.path_proof.txt`  
+  * `audit/qa/hde-epic035/00_meta/doc_deltas.md`  
+  * `audit/qa/hde-epic035/00_meta/doc_deltas.md.path_proof.txt`  
+  * `tests/evidence/test_hde_epic035_pr03_evidence_loop.py`  
+* **Index, mirror, and path-proof posture**  
+  * `docs/evidence/INDEX.json`  
+  * `docs/evidence/INDEX.sha256`  
+  * `docs/evidence/INDEX.json.path_proof.txt`  
+  * `docs/evidence/INDEX.sha256.path_proof.txt`  
+  * `artifacts/evidence_index.jsonl`  
+  * `artifacts/evidence_index.jsonl.sha256`  
+  * `artifacts/evidence_index.jsonl.path_proof.txt`  
+  * `artifacts/evidence_index.jsonl.sha256.path_proof.txt`  
+  * Sibling `*.path_proof.txt` transcripts for each indexed HDE-EPIC035 governed artifact.
 
 ### **D.10 Runtime posture & env-resolver envelopes**
 

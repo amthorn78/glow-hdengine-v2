@@ -1,12 +1,12 @@
 # **0\. Front Matter**
 
 **Title:** PF02-Canon-HDE-Architecture  
- **Version:** v2.3.4
+ **Version:** v2.3.6
 
  **Status:** Canon  
-**Effective date:** 2026-06-27
+**Effective date:** 2026-06-30
 
- **Last Update Gate:** BN 11.7.4 A20-34
+ **Last Update Gate:** BN 11.8.7 A1-6
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -1682,13 +1682,17 @@ PF02 may name vendor endpoint families for source-selection, legacy-isolation, a
 
 Auth selection must be represented by explicit route metadata or contract metadata, not by inspecting whether a runtime path starts with `/v1` or `/v2`. Exact environment bindings, outbound auth header bytes, request bodies, response envelopes, rate-limit behavior, retry posture, and error bytes remain owned by HDE-CLI-API-Vendor-Ref, Glow Infrastructure, HDE-Governance, and HDE-Schemas & Artifacts by title.
 
-**HumanDesignAPI v2 adapter boundary posture (names-only; pending).** V2 request shaping, route choice, response normalization, cache writes, CLI surfaces, and internal/admin compat flows must pass through the sanctioned vendor seam and existing Adapter/CLI source-selection boundary. They must not create a second HTTP home, bypass adapter guards, bypass the Presenter single-emitter boundary, place live HTTP or DB access inside Engine Core or sampler core, log payload bodies or secrets, or infer BodyGraph compatibility without governed mapping proof. Closed rails prove deterministic refusal and no external I/O only; they do not substitute for PO-only open-rails vendor conformance evidence.
+**HumanDesignAPI v2 adapter/schema gap posture (architecture-level).** HDE-EPIC035 records v2 ChartResult and ChartSimpleResult evidence as an adapter/schema gap, not as a normalized data-path proof. PF02 must not describe v2 chart payloads as feeding the existing BodyGraph cache, person/bodygraph compute inputs, compatibility/conjunction flows, or app integration until a bounded adapter/schema proof or implementation maps the selected vendor payload family into the existing internal BodyGraph/person/cache contract.
 
-**HumanDesignAPI v2 boundary-proof posture (architecture-level).** Proofs that claim the vendor seam preserves adapter, presenter, engine, and evidence-tool boundaries MUST use a conservative fail-closed posture. Unknown public routes, response-producing paths, serializer paths, external-I/O paths, guard provenance, presenter provenance, adapter route-registration forms, or evidence-binding posture MUST NOT be treated as PASS by default.
+A future proof or implementation must distinguish the vendor payload family, required response fields, populated internal fields, unsupported fields, whether the adapter is sufficient for HD Engine compute, whether any legacy fallback remains, and whether raw vendor payloads are persisted, redacted, summarized, or excluded. Exact schemas, evidence artifacts, payload bytes, and QA acceptance posture live in HDE-Schemas & Artifacts, HDE-Mechanics Guide, HDE-CLI-API-Vendor-Ref, HDE-Build Checklist Fermentation, and Glow QA Guide by title.
 
 Boundary classification is architecture-level and must distinguish `allowed`, `forbidden`, `unknown / fail-closed`, and `out of scope`. Boundary analysis must be based on discovered current repo surfaces and must report the adapter, presenter, engine, vendor-seam, and evidence-tool loci inspected. Earlier planning text or hard-coded expected path lists are not sufficient by themselves.
 
 PF02 owns the architectural boundary rule only. Boundary analyzers, renderer separation, table-driven taxonomy, generated evidence artifacts, path proofs, tests, and validation mechanics live in HDE-Mechanics Guide, HDE-Schemas & Artifacts, HDE-Build Checklist Fermentation, and Glow QA Guide by title.
+
+**`bg:resolve --source vendor` v2 chart/geokey boundary (architecture-level).** HDE-EPIC035 records `bg:resolve --source vendor` as a legacy BodyGraph ingest-path observation against the configured v2 vendor base, not as the canonical v2 chart/geokey validation path and not as proof of full v2 BodyGraph resolution. The observed v2 chart/geokey success path is separate from this CLI BodyGraph ingest observation.
+
+PF02 must not treat `bg:resolve --source vendor` as proof that v2 chart data feeds the BodyGraph cache, compatibility inputs, or app integration. Future runtime work that keeps `bg:resolve --source vendor` supported must define an explicit vendor-route policy for resolving required BodyGraph detail, including whether the path uses a full v2 chart payload, another vendor route, or an explicit legacy fallback. Exact CLI flags, command bytes, outbound headers, request/response shapes, and evidence workflows remain owned by HDE-CLI-API-Vendor-Ref, Glow Infrastructure, HDE-Schemas & Artifacts, HDE-Mechanics Guide, HDE-Build Checklist Fermentation, and Glow QA Guide by title.
 
 **Repo-local seam location (names-only).**
 

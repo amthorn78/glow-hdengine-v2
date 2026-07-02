@@ -1,12 +1,12 @@
 # **0\. Front Matter**
 
 **Title:** PF07-Canon-Glow-Infrastructure  
-**Version:** v2.1.9
+**Version:** v2.2.1
 
 **Status:** Canon  
-**Effective date:** 2026-06-27
+**Effective date:** 2026-07-01
 
-**Last Update Gate:** BN 11.7.4 A20-34
+**Last Update Gate:** BN 11.8.7 A7-14
 
 **Invocation tag:** `INV-f2ac55d77ce9aacc`
 
@@ -456,6 +456,10 @@ Any shell that can reach this base URL and/or connect to this DB instance with t
 * HDE-EPIC034 produced bounded open-rails OPS evidence for the v2 `charts/coordinates` family under `audit/ops/hde-epic034/ops-02/`; this is a concrete OPS evidence root, not a remaining PF07 path gap.  
 * Plans, implementation guides, QA plans, reviews, and closeout artifacts MUST NOT claim full HumanDesignAPI v2 runtime conformance from documentation consolidation, request-shaping evidence, a single live vendor smoke, or PF07 inventory text alone.  
 * Legacy BodyGraph resource behavior under a configured v2 base URL remains a live-behavior risk unless separately proven by the owning implementation and QA artifacts.  
+* Future `bg:resolve --source vendor` work that needs both v1 and v2 vendor route families must define the base-url/config strategy before any runtime compatibility claim. The current canonical `HD_API_BASE_URL` remains the version-owning base URL key for the current v2 posture; it must not be overloaded in a way that makes route-family behavior ambiguous. If separate v1 and v2 base URLs, route-family-specific config keys, or an explicit fallback strategy are required, PF07 must pin the concrete key names and environment posture after the owning contract and mechanics homes define the behavior.  
+* HDE-EPIC035 OPS-01 retained evidence records that `bg:resolve --source vendor` is a BodyGraph ingest-path observation, not the canonical v2 chart/geokey validation path. Under the configured v2 base, the retained `bg:resolve` observation built the legacy BodyGraph route shape and returned `PROVIDER_NOT_FOUND` / 404\.  
+* For v2 chart/geokey validation posture, HDE-EPIC035 retained evidence used the v2 `charts/simple` route family and recorded success with `Authorization` and `HD-Geocode-Key` present and legacy `HD-Api-Key` absent.  
+* PF07 records this as a target distinction only. The command surface, route bytes, provider behavior, QA predicates, OPS execution rules, and future adapter strategy remain owned by the HDE CLI/API, Mechanics, Governance, QA, and Build Checklist homes by title.  
 * This HDAPI v2 conformance posture is deterministic vendor integration only. It does not create OpenAI, LLM, AI-agent, prompt, embedding, chatbot, model-call, AI-provider credential, AI-provider base URL, AI rails, AI evidence-family, or Glow App AI runtime scope.
 
 **Codespaces as canonical QA console.**  
@@ -1504,7 +1508,7 @@ qa-16 closeout support surfaces:
 
 These check-local receipts do not replace, satisfy, or relocate canonical close-pack artifacts, and they do not create HumanDesignAPI v2 runtime conformance, public Reader byte changes, public route changes, open-rails vendor-smoke proof, or AI runtime or evidence scope.
 
-`Downstream HDAPI v2 conformance candidate surfaces remain pending and are not acceptance-binding for HDE-EPIC033 PR-01:`
+HDAPI v2 conformance evidence surfaces shared across HDE-EPIC034 and HDE-EPIC035 (names-only; no runtime-conformance overclaim):
 
 * `artifacts/vendor/hdapi_v2/source_selection.snapshot.json`  
 * `artifacts/vendor/hdapi_v2/source_selection.snapshot.json.path_proof.txt`  
@@ -1524,6 +1528,37 @@ These check-local receipts do not replace, satisfy, or relocate canonical close-
 * `artifacts/vendor/hdapi_v2/rate_limit_headers.snapshot.json.path_proof.txt`  
 * `artifacts/vendor/hdapi_v2/release_binding.snapshot.json`  
 * `artifacts/vendor/hdapi_v2/release_binding.snapshot.json.path_proof.txt`
+
+HDE-EPIC035 classification for the shared HDAPI v2 evidence surfaces:
+
+* HDE-EPIC035 PR-01 provider-outcome evidence for HDE-FERM008.3 uses `artifacts/vendor/hdapi_v2/error_mapping.snapshot.json` and `artifacts/vendor/hdapi_v2/rate_limit_headers.snapshot.json`, with their sibling path-proof transcripts.  
+* HDE-EPIC035 PR-02 response-normalization evidence for HDE-FERM008.4 uses `artifacts/vendor/hdapi_v2/response_mapping.snapshot.json` and `artifacts/vendor/hdapi_v2/release_binding.snapshot.json`, with their sibling path-proof transcripts.  
+* HDE-EPIC035 PR-02 records an exact adapter/schema gap. It does not prove that v2 ChartResult or ChartSimpleResult data feeds the existing BodyGraph cache, person input, or compat path.  
+* HDE-EPIC035 PR-03 binds PR-01, PR-02, and retained OPS-01 evidence into the evidence-loop closure surface. The canonical PR-03 acceptance map lives at `docs/acceptance_map_epic035.json`, with sibling path proof.  
+* HDE-EPIC035 PR-03 QA and acceptance-boundary support surfaces include `audit/qa/hde-epic035/token_evidence_matrix.md`, `audit/qa/hde-epic035/acceptance_map_viability.log`, `audit/qa/hde-epic035/ops-01/ops_evidence_binding.log`, `audit/docdeltas/hde-epic035_doc_deltas.md`, and `audit/qa/hde-epic035/00_meta/doc_deltas.md`, with sibling path proofs where promoted into governed evidence.  
+* These HDE-EPIC035 evidence surfaces do not create full HumanDesignAPI v2 runtime conformance, PF09 status movement, QA PASS, OPS completion, epic closeout, public Reader change, public route change, public flag change, public payload or transport change, new HTTP home, app-side HumanDesignAPI credential ownership, raw payload persistence, or AI runtime or evidence scope.
+
+**HDE-EPIC035 Live QA Pass 1 and closeout evidence surfaces (names-only).**
+
+The HDE-EPIC035 Live QA Pass 1 and closeout evidence family is carried under:
+
+* `audit/qa/hde-epic035/`
+
+Concrete QA and closeout evidence surfaces include:
+
+* `audit/qa/hde-epic035/qa_step_logs_manifest.json`  
+* `audit/qa/hde-epic035/checks/step-0b-doc-delta-capture/primary.log`  
+* `audit/qa/hde-epic035/checks/step-0b-doc-delta-capture/primary.log.path_proof.txt`  
+* `audit/qa/hde-epic035/checks/po-001/primary.log`  
+* `audit/qa/hde-epic035/checks/po-001/primary.log.path_proof.txt`  
+* `audit/qa/hde-epic035/checks/po-014/primary.log`  
+* `audit/qa/hde-epic035/checks/po-014/primary.log.path_proof.txt`  
+* `audit/qa/hde-epic035/checks/qa-16-close-out-deliverables/primary.log`  
+* `audit/qa/hde-epic035/checks/qa-16-close-out-deliverables/primary.log.path_proof.txt`  
+* `audit/qa/hde-epic035/00_meta/discovery_artifact.md`  
+* `audit/qa/hde-epic035/00_meta/qa_rca_doc_delta_summary.md`
+
+This evidence family records QA and closeout-review surfaces only. It does not perform PO closeout, board update, PF edit, merge, PF09 status movement, OPS completion, full runtime conformance, public expansion, raw payload persistence, or AI scope.
 
 **HDE-EPIC034 OPS-02 HDAPI v2 open-rails OPS evidence root (names-only).**
 
@@ -1545,6 +1580,41 @@ Concrete OPS-02 evidence surfaces include:
 This root records a bounded open-rails v2 smoke for HDE-EPIC034 OPS-02. It does not prove full HumanDesignAPI v2 runtime conformance, full vendor conformance, HDE-FERM008 parent completion, public Reader expansion, new public routes, new public flags, new HTTP homes, or AI runtime/evidence scope.
 
 This root family is HDAPI-only and must not create OpenAI, LLM, AI-agent, prompt, embedding, chatbot, model-call, or AI-provider evidence paths.
+
+**HDE-EPIC035 OPS-01 HDAPI v2 open-rails retained OPS evidence root (names-only).**
+
+The bounded PO-authorized HDE-EPIC035 OPS-01 retained open-rails HumanDesignAPI evidence family is carried under:
+
+* `audit/ops/hde-epic035/ops-01/`
+
+The retained run-label evidence root is:
+
+* `audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/`
+
+Concrete retained OPS-01 evidence surfaces include:
+
+* `audit/ops/hde-epic035/ops-01/ops_evidence_manifest.txt`  
+* `audit/ops/hde-epic035/ops-01/files_sha256.txt`  
+* `audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/commands.txt`  
+* `audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/stdout.log`  
+* `audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/stderr.log`  
+* `audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/exit_codes.txt`  
+* `audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/redacted_env_presence.json`  
+* `audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/request_summary.txt`  
+* `audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/result_summary.md`  
+* `audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/session_summary_and_evidence.md`  
+* `audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/vendor_bodygraph_dry_run.json`  
+* `audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/vendor_bodygraph_dry_run.stderr`  
+* `audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/vendor_bodygraph_dry_run_no_version.json`  
+* `audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/vendor_bodygraph_dry_run_no_version.stderr`  
+* `audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/v2_charts_simple_commands.txt`  
+* `audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/v2_charts_simple_stdout.log`  
+* `audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/v2_charts_simple_stderr.log`  
+* `audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/v2_charts_simple_result_summary.txt`  
+* `audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/final_classification.txt`  
+* `audit/ops/hde-epic035/ops-01/hdapi-v2-open-rails-smoke/final_repo_status.txt`
+
+The manifest maps approved-plan deliverable names to retained evidence paths. This root records retained OPS evidence only. It does not prove QA PASS, PF09 status movement, epic closeout, full HumanDesignAPI v2 runtime conformance, public Reader change, new public route, app-side vendor credential ownership, raw payload persistence, or AI scope.
 
 **EPIC030 PR-01 normalization evidence family (names-only).** The governed PR-01 normalization evidence family is carried at:
 

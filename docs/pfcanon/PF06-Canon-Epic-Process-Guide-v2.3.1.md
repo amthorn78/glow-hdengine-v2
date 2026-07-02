@@ -2,13 +2,13 @@
 
 **Title:** PF06-Canon-Epic-Process-Guide 
 
-**Version:** v2.2.9
+**Version:** v2.3.1
 
 **Status:** Canon
 
-**Effective date**: 2026-06-27
+**Effective date**: 2026-07-01
 
-**Last Update Gate:**  BN 11.7.4 A20-34
+**Last Update Gate:**  BN 11.8.7 A7-14
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -58,6 +58,24 @@ Closure axes remain separate. QA evidence, PF09 status drainage, PO closeout, bo
 * Board state is a Scrum or board-state action. Board updates must be handled in the board source of truth and MUST NOT be inferred solely from QA evidence, PF10 text, or review approval.  
 * Merge provenance is a repo/history axis. It must be evidenced by repo, PR, or commit state where relevant and MUST NOT be inferred from planning approval or QA approval alone.  
 * PF-canon drainage applies stable documentation updates to the permanent PF homes. PF10 can stage live truth before drainage, but the drain itself is a separate documentation action.
+
+PF09 accountability for task-like work. PF09 remains the phased completion backbone for HDE implementation, QA, OPS, runtime, evidence, vendor, architecture, and product-behavior work. A task-like item may be outside the current epic, deferred, optional, future-scoped, backlog-scoped, non-gating, or follow-up work, but it may not escape PF09 accountability.
+
+Every task-like item in an Epic Plan, Implementation Plan, QA Plan, remediation plan, QA-readiness review, retrospective, closure review, Scrum handoff, PO planning handoff, or board-prep artifact MUST resolve to exactly one of:
+
+* in current epic with exact phased PF09 task or subtask mapping;  
+* out of current epic with exact phased PF09 task or subtask mapping;  
+* PF09 gap, when the work is legitimate HDE phased-build work but no current phased PF09 task or subtask accounts for it;  
+* documentation/status drainage only, when the item is only a document, board, archive, or status reconciliation action and not implementation, QA, OPS, runtime, evidence, vendor, architecture, or product-behavior work;  
+* out of HDE phased build scope, when the item truly does not belong to the HDE phased build checklist.
+
+Backlog is a scheduling state, not scope authority. If work is moved to backlog, the handoff MUST preserve the phased PF09 document, task ID, subtask ID where one exists, disposition, reason it is not included now, and whether a PF09 gap exists. If PF09 mapping cannot be proven, the item MUST be marked PF09 gap rather than placed into backlog without mapping.
+
+Future work must be PF09-accounted. Future runtime claims, future QA claims, future OPS work, future adapter work, future vendor work, future evidence work, future app-integration work, future build improvements, and future remediation work MUST state the PF09 task or subtask they will satisfy or advance, or be marked PF09 gap or out of HDE phased build scope.
+
+Subtask-level mapping is required when a relevant subtask exists. Parent-task-only mapping is invalid unless no relevant subtask exists. A parent PF09 row may not be treated as closed or supportable for Done merely because one child row or one evidence dimension is mapped.
+
+Reviewers MUST reject plans, retrospectives, closeout reviews, remediation guides, QA-readiness reports, and Scrum/PO handoffs that create unaccounted task-like backlog. This is a scope-accountability requirement, not a documentation-drainage requirement.
 
 An epic MAY be delivered in a series of PRs (up to 10 PRs per epic), each PR carrying a coherent slice of work with its own code \+ evidence parity.
 
@@ -320,13 +338,11 @@ Ops evidence provenance minima (required).
 
 Every Ops task evidence bundle MUST include, at minimum:
 
-* Command transcript: the exact command(s) run, recorded verbatim (including any env var names set). Secret values MUST be redacted or presence-only noted.
-
-* Outputs and exit status: stdout, stderr, and the exit code (or equivalent) captured as files.
-
-* Verification outputs are captured, not asserted: if a task claims “checksum OK”, “schema validated”, or similar, the evidence MUST include the tool output that shows the check result (not just a narrative statement).
-
-* Sanitized embedded excerpts: if file contents are embedded in a report, the excerpt MUST be sanitized to remove terminal control sequences. If sanitization would risk altering meaning, embed only a minimal safe excerpt and rely on the on-disk file path as the authoritative content.
+* Command transcript: the exact command(s) run, recorded verbatim (including any env var names set). Secret values MUST be redacted or presence-only noted.  
+  Outputs and exit status: stdout, stderr, and the exit code (or equivalent) captured as files.  
+* Verification outputs are captured, not asserted: if a task claims “checksum OK”, “schema validated”, or similar, the evidence MUST include the tool output that shows the check result (not just a narrative statement).  
+* Sanitized embedded excerpts: if file contents are embedded in a report, the excerpt MUST be sanitized to remove terminal control sequences. If sanitization would risk altering meaning, embed only a minimal safe excerpt and rely on the on-disk file path as the authoritative content.  
+* Retained-path manifest when evidence paths diverge: if a PO-run OPS task or later OPS review retains evidence under paths, names, formats, or nested run roots that differ from approved deliverable names, the OPS evidence bundle MUST include a manifest mapping each approved deliverable name to the retained evidence path and the equivalence status. The manifest MUST preserve the approved deliverable identity, the retained repo-relative path, any known format mismatch, any nested evidence-root convention used, and the remaining non-claim posture. It MUST NOT move, rename, or rewrite already-produced OPS evidence merely to make the paths match the plan unless the approved task explicitly requires that remediation.
 
 Build Checklist tracking requirement. Any Ops task included in an epic MUST be represented as a subtask in the module specific build checklist so it can be tracked and reused. The checklist entry MUST use the same Task ID and carry the same required fields listed above.
 
@@ -4329,6 +4345,8 @@ Common RCA checks:
 * If a PR adds or regenerates governed artifacts, reviewers MUST verify that changed artifacts, path-proofs, index rows, mirror rows, and checksum sidecars carry current and internally coherent chronology for the changed bytes. Stale or backdated produced\_at\_utc or mtime\_utc evidence is a blocker until the evidence family is regenerated with canonical tooling.  
 * Evidence generators and proof harnesses MUST derive top-level PASS from the current decisive predicate checks for the evidence family. Format-only validation, regex-only digest validation, parsed-object equality when byte identity is the claim, or stale local state MUST NOT satisfy a PASS claim.  
 * Evidence generators and proof harnesses MUST NOT serialize unexpected or unclassified behavior as PASS-grade evidence. If observed behavior deviates from expected success, expected failure, or an approved typed-error posture, the generator MUST fail closed or emit an approved non-PASS posture.  
+* When generated evidence or acceptance-boundary artifacts rely on governance metadata, review MUST verify that the metadata is mechanically checked where practical. This includes epic ID, PF09 task or subtask ID, artifact kind, record type, token roster or allowed-token boundary, claim or nonclaim posture, source artifact identity, and any release or binding identity that controls the review conclusion.  
+* Nonclaims that prevent overclaiming QA PASS, OPS completion, PF09 status movement, acceptance-token satisfaction, runtime conformance, public-surface expansion, or epic closeout SHOULD be asserted by tests, validators, generators, or acceptance-boundary artifacts when those nonclaims are decisive to the review. If machine checking is not practical, the review MUST state the limitation and preserve the nonclaim explicitly in the reviewed artifact.  
 * When generated evidence asserts environment-specific behavior, attempt ordering, selection order, typed errors, provider posture, adapter posture, or comparable runtime facts, the generator MUST derive those facts from the actual observed run, snapshot, command output, or governed input for the intended environment. It MUST NOT substitute another environment posture, hardcode observed-order claims, or synthesize proof facts that were not produced by the governed run.  
 * If a PR adds or modifies generated evidence that is later indexed, mirrored, aggregated, counted, or summarized, the review MUST verify that the generator and generator check ran before downstream updater, index, mirror, hash, path-proof, aggregate, or orientation checks that depend on those generated bytes.  
 * Downstream index, mirror, hash, path-proof, aggregate, or orientation checks do not by themselves prove generated-evidence freshness when the generating command did not run in the final governed proof path.  
