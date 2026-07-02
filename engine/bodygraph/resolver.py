@@ -184,8 +184,18 @@ def _resolve_vendor(
 
 def _classify_env_route_policy(env: Mapping[str, object] | None) -> Mapping[str, object]:
     source = env or {}
-    canonical = str(source.get("HD_API_BASE_URL") or "").strip().rstrip("/")
-    legacy = str(source.get("HDAPI_BASE_URL") or "").strip().rstrip("/")
+    explicit_base_scope = "HD_API_BASE_URL" in source or "HDAPI_BASE_URL" in source
+
+    def _config_value(name: str) -> str:
+        if explicit_base_scope:
+            value = source.get(name)
+            return value.strip() if isinstance(value, str) else ""
+        import os
+
+        return (os.environ.get(name) or "").strip()
+
+    canonical = _config_value("HD_API_BASE_URL").rstrip("/")
+    legacy = _config_value("HDAPI_BASE_URL").rstrip("/")
     if canonical and legacy and canonical != legacy:
         raise VendorError("PROVIDER_CONFIG_INVALID", "ambiguous HD API base URL configuration")
     base_url = canonical or legacy

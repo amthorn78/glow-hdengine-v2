@@ -1,5 +1,5 @@
 path: artifacts/vendor/hdapi_v2/bg_resolve_policy_binding.snapshot.json
 size_bytes: 1095
-sha256: ffa5b6d919dd0d23b0cf3ef2f33a401ce06a4fb6565994536acc5a5b4f1da2f1
-mtime_utc: 2026-07-02T01:24:37Z
-produced_at_utc: 2026-07-02T01:24:37Z
+sha256: 8a7f63514bd9defe6e99ddc48fa5e41ed1a95a9aa9b9e8e04b927477770c8788
+mtime_utc: 2026-07-02T01:57:39Z
+produced_at_utc: 2026-07-02T01:57:39Z

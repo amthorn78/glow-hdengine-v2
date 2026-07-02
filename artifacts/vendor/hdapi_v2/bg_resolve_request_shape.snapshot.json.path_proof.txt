@@ -1,5 +1,5 @@
 path: artifacts/vendor/hdapi_v2/bg_resolve_request_shape.snapshot.json
 size_bytes: 907
-sha256: 4115ac6561d65feee1e09ef74bf08d6e2031487c0ac16a0ad1744e225b320cc5
-mtime_utc: 2026-07-02T01:24:37Z
-produced_at_utc: 2026-07-02T01:24:37Z
+sha256: dc0ab46194c86fe1097a96c6ce46c30552103fa50516840e711e3d725b7327da
+mtime_utc: 2026-07-02T01:57:39Z
+produced_at_utc: 2026-07-02T01:57:39Z

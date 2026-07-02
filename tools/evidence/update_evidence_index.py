@@ -1107,6 +1107,99 @@ def _load_epic035_pr02_entries() -> list[dict[str, object]]:
     return entries
 
 
+EPIC036_PR01_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "hdapi_v2.bg_resolve_route_policy",
+        "discovered_physical_path": "artifacts/vendor/hdapi_v2/bg_resolve_route_policy.snapshot.json",
+        "epic_id": "HDE-EPIC036",
+        "record_type": "epic036_pr01_bg_resolve_route_policy",
+        "role": "snapshot",
+        "schema_version": "1.0",
+        "tokens": ["JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC036 PR-01 canonical bg:resolve route-policy classification for HDE-FERM008.6 selecting unsupported-runtime nonclaim for configured v2 BodyGraph-detail resolution; no live vendor call, public Reader change, or full v2 runtime conformance claim",
+    },
+    {
+        "artifact_key": "hdapi_v2.bg_resolve_bodygraph_detail_proof",
+        "discovered_physical_path": "artifacts/vendor/hdapi_v2/bg_resolve_bodygraph_detail_proof.json",
+        "epic_id": "HDE-EPIC036",
+        "record_type": "epic036_pr01_bg_resolve_route_policy",
+        "role": "snapshot",
+        "schema_version": "1.0",
+        "tokens": ["JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC036 PR-01 BodyGraph-detail sufficiency nonclaim proof for bg:resolve configured-v2 route policy; records no v2 ChartResult/ChartSimpleResult adapter sufficiency claim",
+    },
+    {
+        "artifact_key": "hdapi_v2.bg_resolve_runtime_nonclaims",
+        "discovered_physical_path": "artifacts/vendor/hdapi_v2/bg_resolve_runtime_nonclaims.json",
+        "epic_id": "HDE-EPIC036",
+        "record_type": "epic036_pr01_bg_resolve_route_policy",
+        "role": "snapshot",
+        "schema_version": "1.0",
+        "tokens": ["JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC036 PR-01 runtime nonclaims for bg:resolve route policy, including no public route, no app-side vendor credential ownership, no raw payload persistence, no AI scope, and no full v2 runtime conformance claim",
+    },
+    {
+        "artifact_key": "hdapi_v2.bg_resolve_request_shape",
+        "discovered_physical_path": "artifacts/vendor/hdapi_v2/bg_resolve_request_shape.snapshot.json",
+        "epic_id": "HDE-EPIC036",
+        "record_type": "epic036_pr01_bg_resolve_route_policy",
+        "role": "snapshot",
+        "schema_version": "1.0",
+        "tokens": ["JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC036 PR-01 request-shape evidence proving configured-v2 bg:resolve does not build a legacy bodygraphs request and preserves explicit legacy fallback only for non-v2 configured bases",
+    },
+    {
+        "artifact_key": "hdapi_v2.bg_resolve_policy_binding",
+        "discovered_physical_path": "artifacts/vendor/hdapi_v2/bg_resolve_policy_binding.snapshot.json",
+        "epic_id": "HDE-EPIC036",
+        "record_type": "epic036_pr01_bg_resolve_route_policy",
+        "role": "snapshot",
+        "schema_version": "1.0",
+        "tokens": ["JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC036 PR-01 policy-binding snapshot for HDE-FERM008.6 route-policy classification; PR-02 ledger binding remains follow-up",
+    },
+    {
+        "artifact_key": "epic036.pr01.route_policy_decision",
+        "discovered_physical_path": "audit/qa/hde-epic036/route_policy_decision.log",
+        "epic_id": "HDE-EPIC036",
+        "record_type": "epic036_pr01_bg_resolve_route_policy",
+        "role": "log",
+        "schema_version": "1.0",
+        "tokens": ["EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC036 PR-01 LF-terminated route-policy decision log recording unsupported-runtime nonclaim, explicit legacy fallback boundary, and OPS-01 not required by PR-01",
+    },
+]
+
+
+def _load_epic036_pr01_entries() -> list[dict[str, object]]:
+    snapshot = ROOT / "artifacts/vendor/hdapi_v2/bg_resolve_route_policy.snapshot.json"
+    if not snapshot.exists():
+        return []
+    try:
+        payload = json.loads(snapshot.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise SystemExit("INVALID_EPIC036_PR01_ROUTE_POLICY_SNAPSHOT") from exc
+    if (
+        payload.get("artifact_kind") != "bg_resolve_route_policy"
+        or payload.get("epic_id") != "HDE-EPIC036"
+        or payload.get("pf09_task_id") != "HDE-FERM008"
+        or payload.get("pf09_subtask_id") != "HDE-FERM008.6"
+        or payload.get("selected_posture") != "unsupported_runtime_nonclaim"
+    ):
+        raise SystemExit("INVALID_EPIC036_ROUTE_POLICY_IDENTITY")
+    produced = payload.get("generated_at_utc")
+    entries: list[dict[str, object]] = []
+    for entry in EPIC036_PR01_PRIMARY_ARTIFACTS:
+        rel = str(entry["discovered_physical_path"])
+        if not (ROOT / rel).exists():
+            raise SystemExit(f"MISSING_EPIC036_PR01_ARTIFACT:{rel}")
+        normalized = dict(entry)
+        if isinstance(produced, str) and produced:
+            normalized["produced_at_utc"] = produced
+        entries.append(normalized)
+    return entries
+
+
 EPIC035_PR03_OPS01_ARTIFACTS: list[dict[str, object]] = [
     {
         "artifact_key": "epic035.ops01.ops_evidence_manifest",
@@ -1663,9 +1756,18 @@ EPIC035_PR02_ARTIFACT_RELS: set[str] = {
     "artifacts/vendor/hdapi_v2/response_mapping.snapshot.json",
     "artifacts/vendor/hdapi_v2/release_binding.snapshot.json",
 }
+EPIC036_PR01_ARTIFACT_RELS: set[str] = {
+    "artifacts/vendor/hdapi_v2/bg_resolve_route_policy.snapshot.json",
+    "artifacts/vendor/hdapi_v2/bg_resolve_bodygraph_detail_proof.json",
+    "artifacts/vendor/hdapi_v2/bg_resolve_runtime_nonclaims.json",
+    "artifacts/vendor/hdapi_v2/bg_resolve_request_shape.snapshot.json",
+    "artifacts/vendor/hdapi_v2/bg_resolve_policy_binding.snapshot.json",
+    "audit/qa/hde-epic036/route_policy_decision.log",
+}
 NON_BACKDATED_PROOF_RELS: set[str] = {
     *EPIC035_PR01_ARTIFACT_RELS,
     *EPIC035_PR02_ARTIFACT_RELS,
+    *EPIC036_PR01_ARTIFACT_RELS,
     "artifacts/evidence_index.jsonl",
     "artifacts/evidence_index.jsonl.sha256",
 }
@@ -1961,6 +2063,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *_load_epic035_pr01_entries(),
             *_load_epic035_pr02_entries(),
             *_load_epic035_pr03_entries(),
+            *_load_epic036_pr01_entries(),
             *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,

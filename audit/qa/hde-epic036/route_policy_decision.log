@@ -1,5 +1,5 @@
 HDE-EPIC036 PR-01 bg:resolve route-policy decision
-generated_at_utc=2026-07-02T01:24:37Z
+generated_at_utc=2026-07-02T01:57:39Z
 selected_route_policy_classification=unsupported_runtime_nonclaim
 configured_v2_bg_resolve_request_shape=NO_BODYGRAPHS_REQUEST_BUILT_UNSUPPORTED_RUNTIME_NONCLAIM
 explicit_legacy_fallback=PRESERVED_ONLY_FOR_NON_V2_CONFIGURED_BASE
