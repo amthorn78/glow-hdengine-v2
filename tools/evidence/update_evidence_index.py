@@ -1171,6 +1171,60 @@ EPIC036_PR01_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
 ]
 
 
+EPIC036_PR02_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "epic036.pr02.acceptance_map",
+        "discovered_physical_path": "docs/acceptance_map_epic036.json",
+        "epic_id": "HDE-EPIC036",
+        "record_type": "epic036_pr02_evidence_loop_binding",
+        "role": "snapshot",
+        "schema_version": "1.0",
+        "tokens": ["JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK", "DOC_DELTA_PRESENT_OK"],
+        "notes": "EPIC036 PR-02 acceptance map binding already-landed bg:resolve route-policy evidence into HDE-FERM008.6 evidence-loop surfaces; no OPS execution, PF09 status movement, epic closeout, public Reader change, or full v2 runtime conformance claim",
+    },
+    {
+        "artifact_key": "epic036.pr02.token_matrix",
+        "discovered_physical_path": "audit/qa/hde-epic036/token_evidence_matrix.md",
+        "epic_id": "HDE-EPIC036",
+        "record_type": "epic036_pr02_evidence_loop_binding",
+        "role": "snapshot",
+        "schema_version": "1.0",
+        "tokens": ["EVIDENCE_PATH_PROOFS_OK", "DOC_DELTA_PRESENT_OK"],
+        "notes": "EPIC036 PR-02 token/evidence matrix mapping approved tokens to concrete PR-01 and PR-02 evidence paths without vendor-v2-specific tokens or QA PASS claim",
+    },
+    {
+        "artifact_key": "epic036.pr02.acceptance_map_viability",
+        "discovered_physical_path": "audit/qa/hde-epic036/acceptance_map_viability.log",
+        "epic_id": "HDE-EPIC036",
+        "record_type": "epic036_pr02_evidence_loop_binding",
+        "role": "log",
+        "schema_version": "1.0",
+        "tokens": ["EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC036 PR-02 viability log recording acceptance-map coherence with unsupported-runtime nonclaim route-policy evidence and no OPS execution",
+    },
+    {
+        "artifact_key": "epic036.pr02.doc_deltas",
+        "discovered_physical_path": "audit/docdeltas/hde-epic036_doc_deltas.md",
+        "epic_id": "HDE-EPIC036",
+        "record_type": "epic036_pr02_doc_delta_candidate",
+        "role": "audit",
+        "schema_version": "1.0",
+        "tokens": ["DOC_DELTA_PRESENT_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC036 PR-02 doc-delta candidate surface for HDE-FERM008.6 evidence-loop supportability; PF-Canon not edited and PF09 status movement remains separate",
+    },
+    {
+        "artifact_key": "epic036.pr02.qa_meta_doc_deltas",
+        "discovered_physical_path": "audit/qa/hde-epic036/00_meta/doc_deltas.md",
+        "epic_id": "HDE-EPIC036",
+        "record_type": "epic036_pr02_doc_delta_candidate",
+        "role": "audit",
+        "schema_version": "1.0",
+        "tokens": ["DOC_DELTA_PRESENT_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC036 PR-02 QA-meta doc-delta candidate mirror for HDE-FERM008.6 evidence-loop supportability; no PF-Canon edit, OPS completion, or full v2 runtime conformance claim",
+    },
+]
+
+
 def _load_epic036_pr01_entries() -> list[dict[str, object]]:
     snapshot = ROOT / "artifacts/vendor/hdapi_v2/bg_resolve_route_policy.snapshot.json"
     if not snapshot.exists():
@@ -1197,6 +1251,65 @@ def _load_epic036_pr01_entries() -> list[dict[str, object]]:
         if isinstance(produced, str) and produced:
             normalized["produced_at_utc"] = produced
         entries.append(normalized)
+    return entries
+
+
+def _load_epic036_pr02_entries() -> list[dict[str, object]]:
+    acceptance = ROOT / "docs/acceptance_map_epic036.json"
+    if not acceptance.exists():
+        return []
+    try:
+        raw = acceptance.read_bytes()
+        payload = json.loads(raw)
+    except json.JSONDecodeError as exc:
+        raise SystemExit("INVALID_EPIC036_PR02_ACCEPTANCE_MAP") from exc
+    if raw != json.dumps(payload, separators=(",", ":"), sort_keys=True).encode("utf-8") + b"\n":
+        raise SystemExit("NONCANONICAL_EPIC036_PR02_ACCEPTANCE_MAP")
+    allowed = {
+        "TESTS_PASS_OK",
+        "DOC_DELTA_PRESENT_OK",
+        "EVIDENCE_INDEX_UPDATED_OK",
+        "MACHINE_MIRROR_UPDATED_OK",
+        "EVIDENCE_INDEX_HASH_OK",
+        "EVIDENCE_PATHS_VALIDATED_OK",
+        "EVIDENCE_PATH_PROOFS_OK",
+        "JSON_CANONICAL_CHECK_OK",
+        "NO_EXTERNAL_IO_ON_REFUSAL_OK",
+        "ENV_RAILS_POLICY_OK",
+    }
+    token_names = {item.get("name") for item in payload.get("tokens", []) if isinstance(item, dict)}
+    if (
+        payload.get("epic_id") != "HDE-EPIC036"
+        or payload.get("selected_route_policy_classification") != "unsupported_runtime_nonclaim"
+        or token_names != allowed
+    ):
+        raise SystemExit("INVALID_EPIC036_PR02_ACCEPTANCE_IDENTITY")
+    required_nonclaims = {
+        "QA PASS",
+        "OPS completion",
+        "PF09 status movement",
+        "HDE-FERM008 parent Done",
+        "epic closeout",
+        "full HumanDesignAPI v2 runtime conformance",
+        "public Reader change",
+        "public route",
+        "public flag",
+        "public payload or transport change",
+        "new HTTP home",
+        "app-side HumanDesignAPI credential ownership",
+        "raw payload persistence",
+        "AI scope",
+    }
+    if not required_nonclaims <= set(payload.get("nonclaims", [])):
+        raise SystemExit("INVALID_EPIC036_PR02_NONCLAIMS")
+    if payload.get("ops_01", {}).get("executed_for_pr02") is not False:
+        raise SystemExit("INVALID_EPIC036_PR02_OPS01_POSTURE")
+    entries: list[dict[str, object]] = []
+    for entry in EPIC036_PR02_PRIMARY_ARTIFACTS:
+        rel = str(entry["discovered_physical_path"])
+        if not (ROOT / rel).exists():
+            raise SystemExit(f"MISSING_EPIC036_PR02_ARTIFACT:{rel}")
+        entries.append(dict(entry))
     return entries
 
 
@@ -2064,6 +2177,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *_load_epic035_pr02_entries(),
             *_load_epic035_pr03_entries(),
             *_load_epic036_pr01_entries(),
+            *_load_epic036_pr02_entries(),
             *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,
