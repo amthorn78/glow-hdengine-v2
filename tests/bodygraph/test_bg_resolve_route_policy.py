@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import pytest
+from pathlib import Path
 
 from engine.bodygraph.resolver import resolve_bodygraph
 from engine.bodygraph.vendor_client import (
@@ -213,3 +214,49 @@ def test_resolver_v2_override_refuses_even_when_process_env_is_v1(monkeypatch: p
     assert result.status == "error"
     assert result.payload["error"]["code"] == "PROVIDER_ROUTE_UNSUPPORTED"
     assert result.payload["resolver"]["route_policy"]["configured_base_version"] == "v2"
+
+
+def test_direct_ingest_merges_partial_env_with_process_credentials(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    from engine.bodygraph.ingest import VendorInputs, ingest_vendor_bodygraph
+    from engine.bodygraph.vendor_client import VendorRequest, VendorResult
+
+    monkeypatch.setenv("HD_API_BASE_URL", "https://process.test/v2")
+    monkeypatch.setenv("HD_API_KEY", "process-api-key")
+    monkeypatch.setenv("GEO_API_KEY", "process-geo-key")
+    captured: dict[str, object] = {}
+
+    class FakeClient:
+        def build_request(self, *, birthdate: str, birthtime: str, location: str) -> VendorRequest:
+            return VendorRequest(
+                url="https://override.test/v1/bodygraphs",
+                headers={},
+                body_bytes=b"{}\n",
+                input_fingerprint="fingerprint",
+                route="vendor.hdapi.post:/bodygraphs",
+            )
+
+        def fetch(self, request: VendorRequest) -> VendorResult:
+            return VendorResult(payload={"ok": True}, duration_ms=1.0, attempts=1)
+
+    def fake_from_env(*, log_path=None, env=None, **kwargs):
+        captured["env"] = env
+        return FakeClient()
+
+    monkeypatch.setattr("engine.bodygraph.ingest.HdApiClient.from_env", fake_from_env)
+    outcome = ingest_vendor_bodygraph(
+        VendorInputs(
+            user_id="operator-user",
+            birthdate="1990-01-01",
+            birthtime="12:00",
+            location="Amsterdam, NL",
+        ),
+        env={"SAFE_MODE": "0", "ALLOW_NETWORK": "1", "HD_API_BASE_URL": "https://override.test/v1"},
+        dry_run=True,
+        success_log=tmp_path / "success.log",
+    )
+
+    assert outcome.input_fingerprint == "fingerprint"
+    assert captured["env"]["HD_API_BASE_URL"] == "https://override.test/v1"
+    assert "HDAPI_BASE_URL" not in captured["env"]
+    assert captured["env"]["HD_API_KEY"] == "process-api-key"
+    assert captured["env"]["GEO_API_KEY"] == "process-geo-key"

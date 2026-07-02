@@ -109,6 +109,19 @@ def gather_inputs_from_env() -> VendorInputs:
     )
 
 
+def _client_config_env(env: Mapping[str, object]) -> Mapping[str, object]:
+    merged: dict[str, object] = dict(os.environ)
+    if "HD_API_BASE_URL" in env or "HDAPI_BASE_URL" in env:
+        merged.pop("HD_API_BASE_URL", None)
+        merged.pop("HDAPI_BASE_URL", None)
+    for key, value in env.items():
+        if value is None:
+            merged.pop(key, None)
+        else:
+            merged[key] = value
+    return merged
+
+
 def ingest_vendor_bodygraph(
     inputs: VendorInputs,
     *,
@@ -129,7 +142,7 @@ def ingest_vendor_bodygraph(
     if not allow_network:
         raise VendorError("PROVIDER_NETWORK_BLOCKED", "Network blocked by rails")
     start = time.monotonic()
-    client = client or HdApiClient.from_env(log_path=retry_log, env=env)
+    client = client or HdApiClient.from_env(log_path=retry_log, env=_client_config_env(env))
     request = client.build_request(birthdate=inputs.birthdate, birthtime=inputs.birthtime, location=inputs.location)
     vendor_result = client.fetch(request)
     payload_bytes, _ = emitter.emit_public_with_envelope(vendor_result.payload)
