@@ -1281,8 +1281,7 @@ def _load_epic036_pr02_entries() -> list[dict[str, object]]:
     if (
         payload.get("epic_id") != "HDE-EPIC036"
         or payload.get("selected_route_policy_classification") != "unsupported_runtime_nonclaim"
-        or not token_names
-        or not token_names <= allowed
+        or token_names != allowed
     ):
         raise SystemExit("INVALID_EPIC036_PR02_ACCEPTANCE_IDENTITY")
     required_nonclaims = {
