@@ -129,7 +129,7 @@ def ingest_vendor_bodygraph(
     if not allow_network:
         raise VendorError("PROVIDER_NETWORK_BLOCKED", "Network blocked by rails")
     start = time.monotonic()
-    client = client or HdApiClient.from_env(log_path=retry_log)
+    client = client or HdApiClient.from_env(log_path=retry_log, env=env)
     request = client.build_request(birthdate=inputs.birthdate, birthtime=inputs.birthtime, location=inputs.location)
     vendor_result = client.fetch(request)
     payload_bytes, _ = emitter.emit_public_with_envelope(vendor_result.payload)

@@ -125,8 +125,9 @@ def _resolve_vendor(
             "resolver": resolver_meta,
         }
         return ResolveBodygraphResult(status="error", payload=payload, exit_code=1)
+    vendor_env = _vendor_config_env(env)
     try:
-        route_policy = _classify_env_route_policy(env)
+        route_policy = _classify_env_route_policy(vendor_env)
     except VendorError as exc:
         return _vendor_error(exc, resolver_meta)
     resolver_meta = {**resolver_meta, "route_policy": route_policy}
@@ -159,7 +160,7 @@ def _resolve_vendor(
         return _vendor_error(unexpected, resolver_meta)
     vendor_inputs = replace(vendor_inputs, user_id=normalized_user_id)
     try:
-        outcome = ingest_vendor_bodygraph(vendor_inputs, env=env, dry_run=dry_run)
+        outcome = ingest_vendor_bodygraph(vendor_inputs, env=vendor_env, dry_run=dry_run)
     except VendorError as exc:
         return _vendor_error(exc, resolver_meta)
     ingest_section = {
@@ -182,17 +183,28 @@ def _resolve_vendor(
     return ResolveBodygraphResult(status="ok", payload=payload, exit_code=0)
 
 
+def _vendor_config_env(env: Mapping[str, object] | None) -> Mapping[str, object]:
+    import os
+
+    merged: dict[str, object] = dict(os.environ)
+    if env is not None:
+        if "HD_API_BASE_URL" in env or "HDAPI_BASE_URL" in env:
+            merged.pop("HD_API_BASE_URL", None)
+            merged.pop("HDAPI_BASE_URL", None)
+        for key, value in env.items():
+            if value is None:
+                merged.pop(key, None)
+            else:
+                merged[key] = value
+    return merged
+
+
 def _classify_env_route_policy(env: Mapping[str, object] | None) -> Mapping[str, object]:
     source = env or {}
-    explicit_base_scope = "HD_API_BASE_URL" in source or "HDAPI_BASE_URL" in source
 
     def _config_value(name: str) -> str:
-        if explicit_base_scope:
-            value = source.get(name)
-            return value.strip() if isinstance(value, str) else ""
-        import os
-
-        return (os.environ.get(name) or "").strip()
+        value = source.get(name)
+        return value.strip() if isinstance(value, str) else ""
 
     canonical = _config_value("HD_API_BASE_URL").rstrip("/")
     legacy = _config_value("HDAPI_BASE_URL").rstrip("/")

@@ -322,11 +322,12 @@ class HdApiClient:
         timeouts: VendorTimeouts | None = None,
         release_id: str | None = None,
         request: Callable[[urlrequest.Request, float], tuple[int, bytes, Mapping[str, str]]] | None = None,
+        env: Mapping[str, object] | None = None,
     ) -> "HdApiClient":
-        env = os.environ
-        raw_base_url = _resolve_hdapi_base_url(env)
-        api_key = (env.get("HD_API_KEY") or "").strip()
-        geo_key = (env.get("GEO_API_KEY") or "").strip()
+        source = env if env is not None else os.environ
+        raw_base_url = _resolve_hdapi_base_url(source)
+        api_key = str(source.get("HD_API_KEY") or "").strip()
+        geo_key = str(source.get("GEO_API_KEY") or "").strip()
         pairs = (("HD_API_BASE_URL", raw_base_url), ("HD_API_KEY", api_key))
         missing = [key for key, value in pairs if not value]
         if missing:
@@ -336,7 +337,7 @@ class HdApiClient:
                 details={"missing": sorted(missing)},
             )
         base_url = raw_base_url
-        rid = (release_id or env.get("RELEASE_ID") or "").strip().lower()
+        rid = (release_id or str(source.get("RELEASE_ID") or "")).strip().lower()
         if not rid:
             rid = "0" * 64
         if len(rid) != 64 or any(ch not in "0123456789abcdef" for ch in rid):
@@ -351,7 +352,7 @@ class HdApiClient:
             retry=retry_cfg,
             timeouts=timeouts_cfg,
             log_path=log_path,
-            rails_state=_rails_state_from_env(env),
+            rails_state=_rails_state_from_env({key: str(value) for key, value in source.items()}),
             request=request,
         )
 

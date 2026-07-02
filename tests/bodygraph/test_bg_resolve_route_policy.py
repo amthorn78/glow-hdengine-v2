@@ -151,3 +151,65 @@ def test_bg_resolve_dry_run_does_not_bypass_v2_route_policy(monkeypatch: pytest.
     captured = capsys.readouterr()
     assert "PROVIDER_ROUTE_UNSUPPORTED" in captured.out
     assert "unsupported_runtime_nonclaim" in captured.out
+
+
+def test_resolver_uses_single_merged_config_source_for_policy_and_ingest(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("HD_API_BASE_URL", "https://process.test/v2")
+    captured: dict[str, object] = {}
+
+    def fake_ingest(inputs, env=None, dry_run=False):
+        captured["env"] = env
+        from engine.bodygraph.ingest import IngestOutcome
+
+        return IngestOutcome(
+            vendor="hdapi",
+            vendor_version=1,
+            input_fingerprint="fingerprint",
+            idempotency_key="idem",
+            rows_written=0,
+            duration_ms=1.0,
+            payload_sha256="payload",
+            db_emitted_sha256="payload",
+            parity_match=True,
+            db_rows_after=0,
+            payload={"ok": True},
+        )
+
+    monkeypatch.setattr("engine.bodygraph.resolver.ingest_vendor_bodygraph", fake_ingest)
+    result = resolve_bodygraph(
+        "operator-user",
+        source="vendor",
+        upsert=False,
+        dry_run=True,
+        env={"SAFE_MODE": "0", "ALLOW_NETWORK": "1", "HD_API_BASE_URL": "https://override.test/v1"},
+        birthdate="1990-01-01",
+        birthtime="12:00",
+        location="Amsterdam, NL",
+    )
+
+    assert result.status == "ok"
+    assert captured["env"]["HD_API_BASE_URL"] == "https://override.test/v1"
+    assert result.payload["resolver"]["route_policy"]["classification"] == "explicit_legacy_fallback"
+
+
+def test_resolver_v2_override_refuses_even_when_process_env_is_v1(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("HD_API_BASE_URL", "https://process.test/v1")
+
+    def fail_ingest(*args, **kwargs):  # pragma: no cover - assertion guard
+        raise AssertionError("configured-v2 route policy must refuse before ingest")
+
+    monkeypatch.setattr("engine.bodygraph.resolver.ingest_vendor_bodygraph", fail_ingest)
+    result = resolve_bodygraph(
+        "operator-user",
+        source="vendor",
+        upsert=False,
+        dry_run=True,
+        env={"SAFE_MODE": "0", "ALLOW_NETWORK": "1", "HD_API_BASE_URL": "https://override.test/v2"},
+        birthdate="1990-01-01",
+        birthtime="12:00",
+        location="Amsterdam, NL",
+    )
+
+    assert result.status == "error"
+    assert result.payload["error"]["code"] == "PROVIDER_ROUTE_UNSUPPORTED"
+    assert result.payload["resolver"]["route_policy"]["configured_base_version"] == "v2"

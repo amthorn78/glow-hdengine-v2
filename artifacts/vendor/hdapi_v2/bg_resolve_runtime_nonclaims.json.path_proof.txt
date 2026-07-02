@@ -1,5 +1,5 @@
 path: artifacts/vendor/hdapi_v2/bg_resolve_runtime_nonclaims.json
 size_bytes: 912
-sha256: aa7336f011a728c6509c205a1010364ac6f7fd26990af22925d8e591be08ec98
-mtime_utc: 2026-07-02T01:57:39Z
-produced_at_utc: 2026-07-02T01:57:39Z
+sha256: 705d9f076f297202435b83f2bf77817c1a4f5522c199caf5ca71935d48deeeaf
+mtime_utc: 2026-07-02T02:33:07Z
+produced_at_utc: 2026-07-02T02:33:07Z
