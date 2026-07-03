@@ -1,5 +1,5 @@
 path: audit/qa/hde-epic036/00_meta/hde036_live_qa_harness.py
-size_bytes: 16052
-sha256: 6dee73957ce9d499bfd75fe406de40ed8956f21572bd0078134b60f8c8fe14f7
-mtime_utc: 2026-07-03T01:13:08Z
-produced_at_utc: 2026-07-03T01:13:08Z
+size_bytes: 29366
+sha256: 682c892d066be2e0d2e78c95b746fd8409148989665bc74856bacd71f23a01ff
+mtime_utc: 2026-07-03T04:07:19Z
+produced_at_utc: 2026-07-03T04:07:24Z

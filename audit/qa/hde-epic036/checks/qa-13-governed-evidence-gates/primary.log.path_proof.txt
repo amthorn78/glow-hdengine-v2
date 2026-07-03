@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic036/checks/qa-13-governed-evidence-gates/primary.log
+size_bytes: 7756
+sha256: 954836f84cf3a40eb405782ca18e888c770d9ee817a0a36096fb6e55f2b3b994
+mtime_utc: 2026-07-03T04:07:59Z
+produced_at_utc: 2026-07-03T04:07:59Z

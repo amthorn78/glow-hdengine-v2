@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic036/00_meta/hde_epic036_extra_files_manifest.json
+size_bytes: 3080
+sha256: 75a2463dda9363375d5ade8e2169174e701edd227c8d017687c4f17b93c6bf61
+mtime_utc: 2026-07-03T04:10:54Z
+produced_at_utc: 2026-07-03T04:11:11Z

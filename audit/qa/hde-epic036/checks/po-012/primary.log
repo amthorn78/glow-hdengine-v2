@@ -1,0 +1,12 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-07-03T04:05:34Z", "check_id": "po-012", "check_name": "PO-012", "status": "PASS", "fail_status": "", "command": "python audit/qa/hde-epic036/00_meta/hde036_live_qa_harness.py po-012", "command_provenance": "Copy/paste from plan via QA-created helper", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic036/checks/po-012/primary.log", "audit/qa/hde-epic036/checks/po-012/primary.log.path_proof.txt", "docs/acceptance_map_epic036.json", "artifacts/vendor/hdapi_v2/bg_resolve_bodygraph_detail_proof.json", "artifacts/vendor/hdapi_v2/bg_resolve_runtime_nonclaims.json"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 — HDE-Build Notes", "PF19 — Glow QA Guide", "PF27 — Canon Plan Templates", "PF05 — HDE CLI/API Vendor Reference", "PF02 — HDE Architecture"], "intended_tokens": [], "claimed_tokens": []}
+check_id=po-012
+check_name=PO-012
+command=python audit/qa/hde-epic036/00_meta/hde036_live_qa_harness.py po-012
+pins=LC_ALL=C LANG=C TZ=UTC
+FILE_OK docs/acceptance_map_epic036.json sha256=c92c1ed76c93066612b8807e5384aed0fd7ebf999619cdd34ce5d9078fb189f6
+FILE_OK artifacts/vendor/hdapi_v2/bg_resolve_bodygraph_detail_proof.json sha256=61a23685a75c9b6d53ee3e73d73c466ddad8c8f5b3bd0040b12d350571748f83
+FILE_OK artifacts/vendor/hdapi_v2/bg_resolve_runtime_nonclaims.json sha256=7c85c96654dfd2c82d6d5f1cdcdde53d46264c6248fc5f91896af95e83c15752
+JSON_OK docs/acceptance_map_epic036.json :: v2_chart_data_feeds_existing_bodygraph_cache_person_compat_flows=False
+JSON_OK docs/acceptance_map_epic036.json :: bodygraph_detail_sufficiency='UNSUPPORTED_RUNTIME_NONCLAIM'
+JSON_OK artifacts/vendor/hdapi_v2/bg_resolve_bodygraph_detail_proof.json :: v2_chart_data_feeds_existing_bodygraph_cache_person_compat_flows=False
+JSON_OK artifacts/vendor/hdapi_v2/bg_resolve_runtime_nonclaims.json :: chart_simple_success_bodygraph_detail_claim='NONE'

@@ -1,0 +1,71 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-07-03T04:07:59Z", "check_id": "qa-13-governed-evidence-gates", "check_name": "Governed evidence gates", "status": "PASS", "fail_status": "", "command": "python audit/qa/hde-epic036/00_meta/hde036_live_qa_harness.py qa-13-governed-evidence-gates", "command_provenance": "Copy/paste from plan via QA-created helper", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic036/checks/qa-13-governed-evidence-gates/primary.log", "audit/qa/hde-epic036/checks/qa-13-governed-evidence-gates/primary.log.path_proof.txt", "tests/bodygraph/test_bg_resolve_route_policy.py", "tests/bodygraph/test_resolver_vendor.py", "tests/cli/test_bg_resolve.py", "tests/evidence/test_hde_epic036_pr02_evidence_loop.py", "tools/evidence/generate_hde_epic036_bg_resolve_route_policy.py", "tools/evidence/validate_evidence_paths.py", "tools/evidence/check_lf_endings.py", "tools/evidence/update_evidence_index.py", "ci/checks/check_mirror_schema.sh", "ci/checks/check_evidence_index_hash.sh", "ci/checks/check_final_lf.sh", "docs/evidence/INDEX.json", "docs/evidence/INDEX.sha256", "artifacts/evidence_index.jsonl", "artifacts/evidence_index.jsonl.sha256", "docs/acceptance_map_epic036.json", "artifacts/vendor/hdapi_v2/bg_resolve_route_policy.snapshot.json", "artifacts/vendor/hdapi_v2/bg_resolve_bodygraph_detail_proof.json", "artifacts/vendor/hdapi_v2/bg_resolve_runtime_nonclaims.json", "artifacts/vendor/hdapi_v2/bg_resolve_request_shape.snapshot.json", "artifacts/vendor/hdapi_v2/bg_resolve_policy_binding.snapshot.json"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 — HDE-Build Notes", "PF19 — Glow QA Guide", "PF27 — Canon Plan Templates", "PF05 — HDE CLI/API Vendor Reference", "PF02 — HDE Architecture"], "intended_tokens": ["TESTS_PASS_OK", "EVIDENCE_INDEX_UPDATED_OK", "MACHINE_MIRROR_UPDATED_OK", "EVIDENCE_INDEX_HASH_OK", "EVIDENCE_PATHS_VALIDATED_OK", "EVIDENCE_PATH_PROOFS_OK", "JSON_CANONICAL_CHECK_OK"], "claimed_tokens": ["TESTS_PASS_OK", "EVIDENCE_INDEX_UPDATED_OK", "MACHINE_MIRROR_UPDATED_OK", "EVIDENCE_INDEX_HASH_OK", "EVIDENCE_PATHS_VALIDATED_OK", "EVIDENCE_PATH_PROOFS_OK", "JSON_CANONICAL_CHECK_OK"]}
+check_id=qa-13-governed-evidence-gates
+check_name=Governed evidence gates
+command=python audit/qa/hde-epic036/00_meta/hde036_live_qa_harness.py qa-13-governed-evidence-gates
+pins=LC_ALL=C LANG=C TZ=UTC
+PYTEST_IMPORT_OK
+FILE_OK tests/bodygraph/test_bg_resolve_route_policy.py sha256=d9a8219e1a2dd54ca1e63a5d1d871ce4eee291e6bd9770206733f1df260e9803
+FILE_OK tests/bodygraph/test_resolver_vendor.py sha256=fe896b81c531e6e417033408cad4f22413a60f4a292d4eb35c04f4c3653a4923
+FILE_OK tests/cli/test_bg_resolve.py sha256=1450afbf78c19d379f14ed93d218ddb21f36a277496e8d70343c2f28347e90fb
+FILE_OK tests/evidence/test_hde_epic036_pr02_evidence_loop.py sha256=8c2c00b2c54c78ccf51828046e02bb219751cade5b7275f295ff093dcc01bb2a
+FILE_OK tools/evidence/generate_hde_epic036_bg_resolve_route_policy.py sha256=a75c91dd827ba62350073a0f6953f47dd4c02946b45c002a21a844341cdae0a2
+FILE_OK tools/evidence/validate_evidence_paths.py sha256=bce88fdacf4b5af09f94829aa6fcc806256b2576e8d7ec443ba07cc4c8d29102
+FILE_OK tools/evidence/check_lf_endings.py sha256=046a43fb5dfa4cb7ebec3195a7a57633f07d8423337c90c9e3cb5130ff11297e
+FILE_OK tools/evidence/update_evidence_index.py sha256=6f1d97838f8d84e661868092bf3f207833021c4941e25e2d586307f84e9ec6b5
+FILE_OK ci/checks/check_mirror_schema.sh sha256=867d00961e78955df15c50a499836d1150093d41bd5ff8df585011c27295e09f
+FILE_OK ci/checks/check_evidence_index_hash.sh sha256=f5cd0cc92fb4175d6cb692a94011afd1c21ceda29caedaf36530b77cfec04d75
+FILE_OK ci/checks/check_final_lf.sh sha256=eaa6feaf740bf06fdd33f7fe87519477325f2d785adc1d818bd93d47c00ec80c
+FILE_OK docs/evidence/INDEX.json sha256=a204d9f913197d193a24262cc13f6a80d51b439df2b59ec1b0d49b8869730369
+FILE_OK docs/evidence/INDEX.sha256 sha256=5fa7776eebf5a1b71f1d777b1bb74d4b78446f4b2d0ea367d08f4e5ac36a0597
+FILE_OK artifacts/evidence_index.jsonl sha256=0e3a96670dc34dba843fc4225d74b5b61609e517d527968360627d1960e83b8a
+FILE_OK artifacts/evidence_index.jsonl.sha256 sha256=c7e19fe3602235e8c29aae4f9b7ab7830005abe3da48e9cb97a7b7b028ce1e66
+FILE_OK docs/acceptance_map_epic036.json sha256=c92c1ed76c93066612b8807e5384aed0fd7ebf999619cdd34ce5d9078fb189f6
+FILE_OK artifacts/vendor/hdapi_v2/bg_resolve_route_policy.snapshot.json sha256=fee2f82ebf247a2a6e39e1211782d38085a7ac78796ff78bcc24d223680ec410
+FILE_OK artifacts/vendor/hdapi_v2/bg_resolve_bodygraph_detail_proof.json sha256=61a23685a75c9b6d53ee3e73d73c466ddad8c8f5b3bd0040b12d350571748f83
+FILE_OK artifacts/vendor/hdapi_v2/bg_resolve_runtime_nonclaims.json sha256=7c85c96654dfd2c82d6d5f1cdcdde53d46264c6248fc5f91896af95e83c15752
+FILE_OK artifacts/vendor/hdapi_v2/bg_resolve_request_shape.snapshot.json sha256=8e27ac55371cb2b1ed1edbef5c0b0ff66e71ccd1c71e73ef2f9396fe98ae4e56
+FILE_OK artifacts/vendor/hdapi_v2/bg_resolve_policy_binding.snapshot.json sha256=3439dee7e7bc929e7d612929d3b594bd3f8564dff3e16541410cdd67f8d5bac4
+JSON_CANONICAL_OK docs/acceptance_map_epic036.json
+JSON_CANONICAL_OK artifacts/vendor/hdapi_v2/bg_resolve_route_policy.snapshot.json
+JSON_CANONICAL_OK artifacts/vendor/hdapi_v2/bg_resolve_bodygraph_detail_proof.json
+JSON_CANONICAL_OK artifacts/vendor/hdapi_v2/bg_resolve_runtime_nonclaims.json
+JSON_CANONICAL_OK artifacts/vendor/hdapi_v2/bg_resolve_request_shape.snapshot.json
+JSON_CANONICAL_OK artifacts/vendor/hdapi_v2/bg_resolve_policy_binding.snapshot.json
+COMMAND /workspaces/glow-hdengine-v2/.venv/bin/python -m pytest tests/bodygraph/test_bg_resolve_route_policy.py tests/bodygraph/test_resolver_vendor.py tests/cli/test_bg_resolve.py tests/evidence/test_hde_epic036_pr02_evidence_loop.py
+============================= test session starts ==============================
+platform linux -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0
+rootdir: /workspaces/glow-hdengine-v2
+configfile: pytest.ini
+plugins: cov-4.1.0, mock-3.15.1
+collected 25 items
+
+tests/bodygraph/test_bg_resolve_route_policy.py .........                [ 36%]
+tests/bodygraph/test_resolver_vendor.py ....                             [ 52%]
+tests/cli/test_bg_resolve.py ......                                      [ 76%]
+tests/evidence/test_hde_epic036_pr02_evidence_loop.py ......             [100%]
+
+============================== 25 passed in 0.10s ==============================
+EXIT_CODE 0
+COMMAND /workspaces/glow-hdengine-v2/.venv/bin/python tools/evidence/generate_hde_epic036_bg_resolve_route_policy.py --check
+checked HDE-EPIC036 PR-01 bg:resolve route-policy artifacts
+EXIT_CODE 0
+COMMAND /workspaces/glow-hdengine-v2/.venv/bin/python tools/evidence/validate_evidence_paths.py
+EXIT_CODE 0
+COMMAND /workspaces/glow-hdengine-v2/.venv/bin/python tools/evidence/check_lf_endings.py
+EXIT_CODE 0
+COMMAND /workspaces/glow-hdengine-v2/.venv/bin/python tools/evidence/update_evidence_index.py --check
+[evidence-index] env pins: ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC
+EXIT_CODE 0
+COMMAND /workspaces/glow-hdengine-v2/.venv/bin/python ci/checks/check_mirror_schema.sh
+EXIT_CODE 0
+COMMAND bash ci/checks/check_evidence_index_hash.sh
+EXIT_CODE 0
+COMMAND bash ci/checks/check_final_lf.sh
+EXIT_CODE 0
+TOKEN_OK docs/acceptance_map_epic036.json :: TESTS_PASS_OK
+TOKEN_OK docs/acceptance_map_epic036.json :: EVIDENCE_INDEX_UPDATED_OK
+TOKEN_OK docs/acceptance_map_epic036.json :: MACHINE_MIRROR_UPDATED_OK
+TOKEN_OK docs/acceptance_map_epic036.json :: EVIDENCE_INDEX_HASH_OK
+TOKEN_OK docs/acceptance_map_epic036.json :: EVIDENCE_PATHS_VALIDATED_OK
+TOKEN_OK docs/acceptance_map_epic036.json :: EVIDENCE_PATH_PROOFS_OK
+TOKEN_OK docs/acceptance_map_epic036.json :: JSON_CANONICAL_CHECK_OK

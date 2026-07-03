@@ -3,6 +3,7 @@ import datetime
 import hashlib
 import json
 import os
+import subprocess
 import sys
 from pathlib import Path
 from typing import Any
@@ -89,6 +90,51 @@ def require_json_list_contains(path: str | Path, dotted_key: str, expected: Any,
         raise FailBehavior(f"JSON_LIST_MISSING:{path}:{dotted_key}:{expected!r}")
     body.append(f"JSON_LIST_OK {path} :: {dotted_key} contains {expected!r}")
 
+def require_token(path: str | Path, token: str, body: list[str]) -> None:
+    text = read_text(path)
+    if token not in text:
+        raise FailBehavior(f"MISSING_TOKEN:{path}:{token}")
+    body.append(f"TOKEN_OK {path} :: {token}")
+
+def canonical_json_file(path: str | Path, body: list[str]) -> None:
+    p = Path(path)
+    raw = p.read_bytes()
+    if not raw.endswith(b"\n") or raw.endswith(b"\n\n") or raw.startswith(b"\xef\xbb\xbf"):
+        raise FailBehavior(f"JSON_CANONICAL_BYTES_FAIL:{p}")
+    payload = json.loads(raw.decode("utf-8"))
+    # The checked-in EPIC036 acceptance map currently uses escaped-Unicode canonical bytes.
+    ensure_ascii = p.as_posix() == "docs/acceptance_map_epic036.json"
+    expected = json.dumps(payload, ensure_ascii=ensure_ascii, sort_keys=True, separators=(",", ":")).encode("utf-8") + b"\n"
+    if raw != expected:
+        raise FailBehavior(f"JSON_CANONICAL_SORT_FAIL:{p}")
+    body.append(f"JSON_CANONICAL_OK {p}")
+
+def run_cmd(cmd: list[str], body: list[str], tooling: bool = False) -> None:
+    body.append("COMMAND " + " ".join(cmd))
+    try:
+        cp = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, check=False)
+    except FileNotFoundError as exc:
+        raise ToolingBlocked(f"COMMAND_MISSING:{cmd[0]}") from exc
+    if cp.stdout:
+        body.append(cp.stdout.strip())
+    body.append(f"EXIT_CODE {cp.returncode}")
+    if cp.returncode != 0:
+        if tooling:
+            raise FailTooling(f"COMMAND_FAILED:{' '.join(cmd)}:{cp.returncode}")
+        raise FailBehavior(f"COMMAND_FAILED:{' '.join(cmd)}:{cp.returncode}")
+
+def require_pytest(body: list[str]) -> None:
+    cp = subprocess.run(
+        [sys.executable, "-c", "import pytest"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+        check=False,
+    )
+    if cp.returncode != 0:
+        raise ToolingBlocked("PYTEST_IMPORT_MISSING")
+    body.append("PYTEST_IMPORT_OK")
+
 def check_step0b(body: list[str]) -> tuple[list[str], list[str], list[str]]:
     META_ROOT.mkdir(parents=True, exist_ok=True)
     DOCDELTA_DRAFT.parent.mkdir(parents=True, exist_ok=True)
@@ -102,6 +148,7 @@ def check_step0b(body: list[str]) -> tuple[list[str], list[str], list[str]]:
         "- Existing audit reported no repo-resident HDE-EPIC036 OPS-01 evidence root.",
         "- Bounded live production-like route-policy proof is required by this plan and is executed as PO-010 under the QA root.",
         "- PO-010 uses a PO-approved live v2 base value and expects configured-v2 refusal before legacy BodyGraph request construction.",
+        "- PF-Canon was not edited.",
         "- This plan does not claim OPS completion, PF09 status movement, HDE-FERM008 parent Done, epic closeout, public Reader change, new HTTP home, AI scope, raw payload persistence, or full HumanDesignAPI v2 runtime conformance.",
         "",
     ])
@@ -294,6 +341,152 @@ def check_po010(body: list[str]) -> tuple[list[str], list[str], list[str]]:
     body.append(f"PO010_LIVE_LOG_PROOF={live_log_proof}")
     return [str(live_log), str(live_log_proof)], [], []
 
+def check_po011(body: list[str]) -> tuple[list[str], list[str], list[str]]:
+    live_log = CHECKS_ROOT / "po-010" / "live_route_policy.log"
+    live_proof = Path(str(live_log) + ".path_proof.txt")
+    nonclaims = "artifacts/vendor/hdapi_v2/bg_resolve_runtime_nonclaims.json"
+    bodygraph = "artifacts/vendor/hdapi_v2/bg_resolve_bodygraph_detail_proof.json"
+    for p in [live_log, live_proof, nonclaims, bodygraph]:
+        require_file(p, body)
+    require_contains(live_log, "PROVIDER_ROUTE_UNSUPPORTED", body)
+    require_contains(live_log, "unsupported_runtime_nonclaim", body)
+    require_json_value(nonclaims, "chart_simple_success_bodygraph_detail_claim", "NONE", body)
+    require_json_value(nonclaims, "no_compatibility_by_inference", True, body)
+    require_json_value(bodygraph, "bodygraph_detail_sufficiency", "UNSUPPORTED_RUNTIME_NONCLAIM", body)
+    return [str(live_log), str(live_proof), nonclaims, bodygraph], [], []
+
+def check_po012(body: list[str]) -> tuple[list[str], list[str], list[str]]:
+    acceptance = "docs/acceptance_map_epic036.json"
+    bodygraph = "artifacts/vendor/hdapi_v2/bg_resolve_bodygraph_detail_proof.json"
+    nonclaims = "artifacts/vendor/hdapi_v2/bg_resolve_runtime_nonclaims.json"
+    for p in [acceptance, bodygraph, nonclaims]:
+        require_file(p, body)
+    require_json_value(acceptance, "v2_chart_data_feeds_existing_bodygraph_cache_person_compat_flows", False, body)
+    require_json_value(acceptance, "bodygraph_detail_sufficiency", "UNSUPPORTED_RUNTIME_NONCLAIM", body)
+    require_json_value(bodygraph, "v2_chart_data_feeds_existing_bodygraph_cache_person_compat_flows", False, body)
+    require_json_value(nonclaims, "chart_simple_success_bodygraph_detail_claim", "NONE", body)
+    return [acceptance, bodygraph, nonclaims], [], []
+
+def check_qa13(body: list[str]) -> tuple[list[str], list[str], list[str]]:
+    require_pytest(body)
+    artifacts = [
+        "tests/bodygraph/test_bg_resolve_route_policy.py",
+        "tests/bodygraph/test_resolver_vendor.py",
+        "tests/cli/test_bg_resolve.py",
+        "tests/evidence/test_hde_epic036_pr02_evidence_loop.py",
+        "tools/evidence/generate_hde_epic036_bg_resolve_route_policy.py",
+        "tools/evidence/validate_evidence_paths.py",
+        "tools/evidence/check_lf_endings.py",
+        "tools/evidence/update_evidence_index.py",
+        "ci/checks/check_mirror_schema.sh",
+        "ci/checks/check_evidence_index_hash.sh",
+        "ci/checks/check_final_lf.sh",
+        "docs/evidence/INDEX.json",
+        "docs/evidence/INDEX.sha256",
+        "artifacts/evidence_index.jsonl",
+        "artifacts/evidence_index.jsonl.sha256",
+        "docs/acceptance_map_epic036.json",
+        "artifacts/vendor/hdapi_v2/bg_resolve_route_policy.snapshot.json",
+        "artifacts/vendor/hdapi_v2/bg_resolve_bodygraph_detail_proof.json",
+        "artifacts/vendor/hdapi_v2/bg_resolve_runtime_nonclaims.json",
+        "artifacts/vendor/hdapi_v2/bg_resolve_request_shape.snapshot.json",
+        "artifacts/vendor/hdapi_v2/bg_resolve_policy_binding.snapshot.json",
+    ]
+    for p in artifacts:
+        require_file(p, body)
+    for p in [
+        "docs/acceptance_map_epic036.json",
+        "artifacts/vendor/hdapi_v2/bg_resolve_route_policy.snapshot.json",
+        "artifacts/vendor/hdapi_v2/bg_resolve_bodygraph_detail_proof.json",
+        "artifacts/vendor/hdapi_v2/bg_resolve_runtime_nonclaims.json",
+        "artifacts/vendor/hdapi_v2/bg_resolve_request_shape.snapshot.json",
+        "artifacts/vendor/hdapi_v2/bg_resolve_policy_binding.snapshot.json",
+    ]:
+        canonical_json_file(p, body)
+    run_cmd([sys.executable, "-m", "pytest", "tests/bodygraph/test_bg_resolve_route_policy.py", "tests/bodygraph/test_resolver_vendor.py", "tests/cli/test_bg_resolve.py", "tests/evidence/test_hde_epic036_pr02_evidence_loop.py"], body)
+    run_cmd([sys.executable, "tools/evidence/generate_hde_epic036_bg_resolve_route_policy.py", "--check"], body)
+    run_cmd([sys.executable, "tools/evidence/validate_evidence_paths.py"], body)
+    run_cmd([sys.executable, "tools/evidence/check_lf_endings.py"], body)
+    run_cmd([sys.executable, "tools/evidence/update_evidence_index.py", "--check"], body)
+    run_cmd([sys.executable, "ci/checks/check_mirror_schema.sh"], body)
+    run_cmd(["bash", "ci/checks/check_evidence_index_hash.sh"], body)
+    run_cmd(["bash", "ci/checks/check_final_lf.sh"], body)
+    tokens = [
+        "TESTS_PASS_OK",
+        "EVIDENCE_INDEX_UPDATED_OK",
+        "MACHINE_MIRROR_UPDATED_OK",
+        "EVIDENCE_INDEX_HASH_OK",
+        "EVIDENCE_PATHS_VALIDATED_OK",
+        "EVIDENCE_PATH_PROOFS_OK",
+        "JSON_CANONICAL_CHECK_OK",
+    ]
+    for token in tokens:
+        require_token("docs/acceptance_map_epic036.json", token, body)
+    return artifacts, tokens, tokens
+
+def check_closeout(body: list[str]) -> tuple[list[str], list[str], list[str]]:
+    expected = ["step-0b-doc-delta-capture"] + [f"po-{i:03d}" for i in range(1, 13)] + ["qa-13-governed-evidence-gates"]
+    entries = []
+    for check_id in expected:
+        log = CHECKS_ROOT / check_id / "primary.log"
+        proof = Path(str(log) + ".path_proof.txt")
+        if not log.exists():
+            raise ToolingBlocked(f"NOT_RUN:{check_id}:{log}")
+        if not proof.exists():
+            raise ToolingBlocked(f"MISSING_PATH_PROOF:{check_id}:{proof}")
+        header = json.loads(log.read_text(encoding="utf-8").splitlines()[0])
+        entries.append({"check_id": check_id, "status": header.get("status"), "log_path": str(log), "path_proof_path": str(proof)})
+    manifest = QA_ROOT / "qa_step_logs_manifest.json"
+    manifest.write_text(
+        json.dumps(
+            {"schema_version": "pf27.qa_step_logs_manifest.v1", "epic_id": EPIC_ID, "entries": entries},
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    manifest_proof = write_path_proof(manifest)
+    discovery = META_ROOT / "discovery_artifact.md"
+    discovery.write_text(
+        "\n".join(
+            [
+                "# HDE-EPIC036 Discovery Artifact",
+                "",
+                "Repo loci were grounded by PF10, QA audit, and live repo validation before this plan was drafted.",
+                "The QA run validates existing governed artifacts and creates check-scoped QA logs under audit/qa/hde-epic036/checks/.",
+                "PO-010 creates bounded live production-like route-policy evidence under the QA root using a PO-approved live v2 base value.",
+                "No OPS completion, PF09 status movement, HDE-FERM008 parent Done, epic closeout, public Reader change, new HTTP home, AI scope, raw payload persistence, or full HumanDesignAPI v2 runtime conformance is claimed.",
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
+    discovery_proof = write_path_proof(discovery)
+    rca = META_ROOT / "qa_rca_doc_delta_summary.md"
+    rca.write_text(
+        "\n".join(
+            [
+                "# HDE-EPIC036 QA RCA and Doc Delta Summary",
+                "",
+                "Coverage vs plan:",
+                "- Step-0B, PO-001 through PO-012, and qa-13 are represented by check-scoped primary logs and sibling path proofs under audit/qa/hde-epic036/checks/.",
+                "- qa-14-close-out-deliverables created this closeout assembly evidence.",
+                "",
+                "Doc deltas:",
+                "- Existing HDE-EPIC036 doc-delta surfaces remain audit/docdeltas/hde-epic036_doc_deltas.md and audit/qa/hde-epic036/00_meta/doc_deltas.md.",
+                "",
+                "Readiness posture:",
+                "- This artifact supports QA closeout review only. It does not perform PO closeout, board update, PF edit, merge, PF09 status movement, OPS completion, full runtime conformance, public expansion, raw payload persistence, or AI scope.",
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
+    rca_proof = write_path_proof(rca)
+    return [str(manifest), str(manifest_proof), str(discovery), str(discovery_proof), str(rca), str(rca_proof)], [], []
+
 CHECKS = {
     "step-0b-doc-delta-capture": ("Step-0B - Doc Delta Capture", check_step0b),
     "po-001": ("PO-001", check_po001),
@@ -306,6 +499,10 @@ CHECKS = {
     "po-008": ("PO-008", check_po008),
     "po-009": ("PO-009", check_po009),
     "po-010": ("PO-010", check_po010),
+    "po-011": ("PO-011", check_po011),
+    "po-012": ("PO-012", check_po012),
+    "qa-13-governed-evidence-gates": ("Governed evidence gates", check_qa13),
+    "qa-14-close-out-deliverables": ("Close-out deliverables", check_closeout),
 }
 
 def run(check_id: str) -> int:

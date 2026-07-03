@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic036/00_meta/hde_epic036_session_evidence_output.json
+size_bytes: 11379
+sha256: cee50362ca6cb0d12e1188cf972fc5a20bb69d70a1b93a68cfe3bd69fc1ed2fd
+mtime_utc: 2026-07-03T04:10:54Z
+produced_at_utc: 2026-07-03T04:11:11Z

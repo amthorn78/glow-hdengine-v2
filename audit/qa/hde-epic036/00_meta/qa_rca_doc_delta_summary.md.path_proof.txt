@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic036/00_meta/qa_rca_doc_delta_summary.md
+size_bytes: 688
+sha256: 2df6d6a71e1db00911014bc5607077e20436b817409de89c7a4df5c32fc497df
+mtime_utc: 2026-07-03T04:07:59Z
+produced_at_utc: 2026-07-03T04:07:59Z

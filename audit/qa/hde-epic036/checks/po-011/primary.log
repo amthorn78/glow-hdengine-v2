@@ -1,0 +1,14 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-07-03T04:05:34Z", "check_id": "po-011", "check_name": "PO-011", "status": "PASS", "fail_status": "", "command": "python audit/qa/hde-epic036/00_meta/hde036_live_qa_harness.py po-011", "command_provenance": "Copy/paste from plan via QA-created helper", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic036/checks/po-011/primary.log", "audit/qa/hde-epic036/checks/po-011/primary.log.path_proof.txt", "audit/qa/hde-epic036/checks/po-010/live_route_policy.log", "audit/qa/hde-epic036/checks/po-010/live_route_policy.log.path_proof.txt", "artifacts/vendor/hdapi_v2/bg_resolve_runtime_nonclaims.json", "artifacts/vendor/hdapi_v2/bg_resolve_bodygraph_detail_proof.json"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 — HDE-Build Notes", "PF19 — Glow QA Guide", "PF27 — Canon Plan Templates", "PF05 — HDE CLI/API Vendor Reference", "PF02 — HDE Architecture"], "intended_tokens": [], "claimed_tokens": []}
+check_id=po-011
+check_name=PO-011
+command=python audit/qa/hde-epic036/00_meta/hde036_live_qa_harness.py po-011
+pins=LC_ALL=C LANG=C TZ=UTC
+FILE_OK audit/qa/hde-epic036/checks/po-010/live_route_policy.log sha256=e0d0404f2dc2367b77215313a6571cbd7f06c3d1937aaf8bfce9fe9ccf839eea
+FILE_OK audit/qa/hde-epic036/checks/po-010/live_route_policy.log.path_proof.txt sha256=2d206cd945ba0545899776dc8f3e2425ebd333d3bda47c6e76046aedafb6d44c
+FILE_OK artifacts/vendor/hdapi_v2/bg_resolve_runtime_nonclaims.json sha256=7c85c96654dfd2c82d6d5f1cdcdde53d46264c6248fc5f91896af95e83c15752
+FILE_OK artifacts/vendor/hdapi_v2/bg_resolve_bodygraph_detail_proof.json sha256=61a23685a75c9b6d53ee3e73d73c466ddad8c8f5b3bd0040b12d350571748f83
+TEXT_OK audit/qa/hde-epic036/checks/po-010/live_route_policy.log :: PROVIDER_ROUTE_UNSUPPORTED
+TEXT_OK audit/qa/hde-epic036/checks/po-010/live_route_policy.log :: unsupported_runtime_nonclaim
+JSON_OK artifacts/vendor/hdapi_v2/bg_resolve_runtime_nonclaims.json :: chart_simple_success_bodygraph_detail_claim='NONE'
+JSON_OK artifacts/vendor/hdapi_v2/bg_resolve_runtime_nonclaims.json :: no_compatibility_by_inference=True
+JSON_OK artifacts/vendor/hdapi_v2/bg_resolve_bodygraph_detail_proof.json :: bodygraph_detail_sufficiency='UNSUPPORTED_RUNTIME_NONCLAIM'

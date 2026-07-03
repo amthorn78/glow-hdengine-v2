@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic036/checks/po-012/primary.log
+size_bytes: 2000
+sha256: 048ca75c87158efdf54b0dba9f9daef7c0636f9504728166f118101ee0cba3f4
+mtime_utc: 2026-07-03T04:05:34Z
+produced_at_utc: 2026-07-03T04:05:34Z
