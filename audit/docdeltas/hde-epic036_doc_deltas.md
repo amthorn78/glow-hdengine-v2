@@ -1,21 +1,10 @@
-# HDE-EPIC036 PR-02 Doc-Delta Candidates
+# HDE-EPIC036 Live QA Doc Delta Capture
 
-This candidate surface records documentation follow-up only. PF-Canon was not edited.
+BLOCKERS:
+- None at planning time.
 
-## Supportable from repo evidence
-
-- HDE-FERM008.6 is supportable from repo evidence for route-policy classification and PR-02 evidence-loop binding only after the PR-02 artifacts and validations pass.
-- The selected `bg:resolve --source vendor` route-policy classification remains `unsupported_runtime_nonclaim` for configured v2 bases.
-- Existing PR-01 evidence records BodyGraph-detail sufficiency as `UNSUPPORTED_RUNTIME_NONCLAIM` and records no v2 chart data feed into existing BodyGraph/cache/person/compat flows.
-- OPS-01 was not required by PR-01 and was not executed for PR-02.
-
-## Not drained by this PR
-
-- PF09 status movement remains a separate documentation/status-drain action.
-- This PR does not claim QA PASS, OPS completion, HDE-FERM008 parent Done, epic closeout, public Reader/API/transport expansion, full HumanDesignAPI v2 runtime conformance, raw payload persistence, or AI scope.
-
-## Likely permanent-home candidates by title only
-
-- HDE Build Checklist Fermentation: HDE-FERM008.6 supportable status note.
-- HDE CLI/API Vendor Ref: implemented `bg:resolve --source vendor` route-policy behavior.
-- HDE Schemas and Artifacts: `bg_resolve_*` governed evidence family if permanent catalog text is needed later.
+CAVEATS:
+- Existing audit reported no repo-resident HDE-EPIC036 OPS-01 evidence root.
+- Bounded live production-like route-policy proof is required by this plan and is executed as PO-010 under the QA root.
+- PO-010 uses a PO-approved live v2 base value and expects configured-v2 refusal before legacy BodyGraph request construction.
+- This plan does not claim OPS completion, PF09 status movement, HDE-FERM008 parent Done, epic closeout, public Reader change, new HTTP home, AI scope, raw payload persistence, or full HumanDesignAPI v2 runtime conformance.

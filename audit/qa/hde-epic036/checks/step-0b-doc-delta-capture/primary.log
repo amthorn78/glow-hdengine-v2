@@ -1,0 +1,8 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-07-03T01:13:08Z", "check_id": "step-0b-doc-delta-capture", "check_name": "Step-0B - Doc Delta Capture", "status": "PASS", "fail_status": "", "command": "python audit/qa/hde-epic036/00_meta/hde036_live_qa_harness.py step-0b-doc-delta-capture", "command_provenance": "Copy/paste from plan via QA-created helper", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic036/checks/step-0b-doc-delta-capture/primary.log", "audit/qa/hde-epic036/checks/step-0b-doc-delta-capture/primary.log.path_proof.txt", "audit/docdeltas/hde-epic036_doc_deltas.md", "audit/docdeltas/hde-epic036_doc_deltas.md.path_proof.txt", "audit/qa/hde-epic036/00_meta/doc_deltas.md", "audit/qa/hde-epic036/00_meta/doc_deltas.md.path_proof.txt", "audit/qa/hde-epic036/00_meta/hde036_live_qa_harness.py", "audit/qa/hde-epic036/00_meta/hde036_live_qa_harness.py.path_proof.txt"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 — HDE-Build Notes", "PF19 — Glow QA Guide", "PF27 — Canon Plan Templates", "PF05 — HDE CLI/API Vendor Reference", "PF02 — HDE Architecture"], "intended_tokens": ["DOC_DELTA_PRESENT_OK"], "claimed_tokens": ["DOC_DELTA_PRESENT_OK"]}
+check_id=step-0b-doc-delta-capture
+check_name=Step-0B - Doc Delta Capture
+command=python audit/qa/hde-epic036/00_meta/hde036_live_qa_harness.py step-0b-doc-delta-capture
+pins=LC_ALL=C LANG=C TZ=UTC
+DOC_DELTA_DRAFT=audit/docdeltas/hde-epic036_doc_deltas.md
+DOC_DELTA_CAPTURE=audit/qa/hde-epic036/00_meta/doc_deltas.md
+QA_HELPER=audit/qa/hde-epic036/00_meta/hde036_live_qa_harness.py

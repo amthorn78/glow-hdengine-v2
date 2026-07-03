@@ -1,0 +1,14 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-07-03T01:13:16Z", "check_id": "po-006", "check_name": "PO-006", "status": "PASS", "fail_status": "", "command": "python audit/qa/hde-epic036/00_meta/hde036_live_qa_harness.py po-006", "command_provenance": "Copy/paste from plan via QA-created helper", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic036/checks/po-006/primary.log", "audit/qa/hde-epic036/checks/po-006/primary.log.path_proof.txt", "artifacts/vendor/hdapi_v2/bg_resolve_runtime_nonclaims.json", "artifacts/vendor/hdapi_v2/bg_resolve_request_shape.snapshot.json"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 — HDE-Build Notes", "PF19 — Glow QA Guide", "PF27 — Canon Plan Templates", "PF05 — HDE CLI/API Vendor Reference", "PF02 — HDE Architecture"], "intended_tokens": [], "claimed_tokens": []}
+check_id=po-006
+check_name=PO-006
+command=python audit/qa/hde-epic036/00_meta/hde036_live_qa_harness.py po-006
+pins=LC_ALL=C LANG=C TZ=UTC
+FILE_OK artifacts/vendor/hdapi_v2/bg_resolve_runtime_nonclaims.json sha256=7c85c96654dfd2c82d6d5f1cdcdde53d46264c6248fc5f91896af95e83c15752
+FILE_OK artifacts/vendor/hdapi_v2/bg_resolve_request_shape.snapshot.json sha256=8e27ac55371cb2b1ed1edbef5c0b0ff66e71ccd1c71e73ef2f9396fe98ae4e56
+JSON_OK artifacts/vendor/hdapi_v2/bg_resolve_runtime_nonclaims.json :: no_claims.raw_payload_persistence='NONE'
+JSON_OK artifacts/vendor/hdapi_v2/bg_resolve_runtime_nonclaims.json :: no_claims.raw_request_body_persisted='NONE'
+JSON_OK artifacts/vendor/hdapi_v2/bg_resolve_runtime_nonclaims.json :: no_claims.raw_response_body_persisted='NONE'
+JSON_OK artifacts/vendor/hdapi_v2/bg_resolve_runtime_nonclaims.json :: no_claims.app_side_humandesignapi_credential_ownership='NONE'
+JSON_OK artifacts/vendor/hdapi_v2/bg_resolve_request_shape.snapshot.json :: raw_request_body_persisted=False
+JSON_OK artifacts/vendor/hdapi_v2/bg_resolve_request_shape.snapshot.json :: raw_response_body_persisted=False
+JSON_OK artifacts/vendor/hdapi_v2/bg_resolve_request_shape.snapshot.json :: raw_vendor_payload_persisted=False

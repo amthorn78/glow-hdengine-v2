@@ -1,0 +1,12 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-07-03T01:13:15Z", "check_id": "po-002", "check_name": "PO-002", "status": "PASS", "fail_status": "", "command": "python audit/qa/hde-epic036/00_meta/hde036_live_qa_harness.py po-002", "command_provenance": "Copy/paste from plan via QA-created helper", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic036/checks/po-002/primary.log", "audit/qa/hde-epic036/checks/po-002/primary.log.path_proof.txt", "artifacts/vendor/hdapi_v2/bg_resolve_route_policy.snapshot.json", "audit/qa/hde-epic036/route_policy_decision.log"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 — HDE-Build Notes", "PF19 — Glow QA Guide", "PF27 — Canon Plan Templates", "PF05 — HDE CLI/API Vendor Reference", "PF02 — HDE Architecture"], "intended_tokens": ["ENV_RAILS_POLICY_OK"], "claimed_tokens": ["ENV_RAILS_POLICY_OK"]}
+check_id=po-002
+check_name=PO-002
+command=python audit/qa/hde-epic036/00_meta/hde036_live_qa_harness.py po-002
+pins=LC_ALL=C LANG=C TZ=UTC
+FILE_OK artifacts/vendor/hdapi_v2/bg_resolve_route_policy.snapshot.json sha256=fee2f82ebf247a2a6e39e1211782d38085a7ac78796ff78bcc24d223680ec410
+FILE_OK audit/qa/hde-epic036/route_policy_decision.log sha256=02ea41e97558edc9f0975b4a6261987ea1c31738286b59861837a3823b609409
+JSON_OK artifacts/vendor/hdapi_v2/bg_resolve_route_policy.snapshot.json :: selected_posture='unsupported_runtime_nonclaim'
+JSON_OK artifacts/vendor/hdapi_v2/bg_resolve_route_policy.snapshot.json :: supported_postures.unsupported_runtime_nonclaim='SELECTED_FOR_CONFIGURED_V2_BASE'
+JSON_OK artifacts/vendor/hdapi_v2/bg_resolve_route_policy.snapshot.json :: supported_postures.explicit_legacy_fallback='PRESERVED_ONLY_FOR_NON_V2_CONFIGURED_BASE'
+JSON_OK artifacts/vendor/hdapi_v2/bg_resolve_route_policy.snapshot.json :: legacy_fallback_policy.classification='explicit_legacy_fallback'
+TEXT_OK audit/qa/hde-epic036/route_policy_decision.log :: explicit_legacy_fallback=PRESERVED_ONLY_FOR_NON_V2_CONFIGURED_BASE

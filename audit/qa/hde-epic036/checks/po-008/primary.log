@@ -1,0 +1,19 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-07-03T01:13:16Z", "check_id": "po-008", "check_name": "PO-008", "status": "PASS", "fail_status": "", "command": "python audit/qa/hde-epic036/00_meta/hde036_live_qa_harness.py po-008", "command_provenance": "Copy/paste from plan via QA-created helper", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic036/checks/po-008/primary.log", "audit/qa/hde-epic036/checks/po-008/primary.log.path_proof.txt", "artifacts/vendor/hdapi_v2/bg_resolve_route_policy.snapshot.json", "artifacts/vendor/hdapi_v2/bg_resolve_bodygraph_detail_proof.json", "artifacts/vendor/hdapi_v2/bg_resolve_runtime_nonclaims.json", "artifacts/vendor/hdapi_v2/bg_resolve_request_shape.snapshot.json", "artifacts/vendor/hdapi_v2/bg_resolve_policy_binding.snapshot.json", "audit/qa/hde-epic036/route_policy_decision.log", "artifacts/vendor/hdapi_v2/bg_resolve_route_policy.snapshot.json.path_proof.txt", "artifacts/vendor/hdapi_v2/bg_resolve_bodygraph_detail_proof.json.path_proof.txt", "artifacts/vendor/hdapi_v2/bg_resolve_runtime_nonclaims.json.path_proof.txt", "artifacts/vendor/hdapi_v2/bg_resolve_request_shape.snapshot.json.path_proof.txt", "artifacts/vendor/hdapi_v2/bg_resolve_policy_binding.snapshot.json.path_proof.txt", "audit/qa/hde-epic036/route_policy_decision.log.path_proof.txt"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 — HDE-Build Notes", "PF19 — Glow QA Guide", "PF27 — Canon Plan Templates", "PF05 — HDE CLI/API Vendor Reference", "PF02 — HDE Architecture"], "intended_tokens": [], "claimed_tokens": []}
+check_id=po-008
+check_name=PO-008
+command=python audit/qa/hde-epic036/00_meta/hde036_live_qa_harness.py po-008
+pins=LC_ALL=C LANG=C TZ=UTC
+FILE_OK artifacts/vendor/hdapi_v2/bg_resolve_route_policy.snapshot.json sha256=fee2f82ebf247a2a6e39e1211782d38085a7ac78796ff78bcc24d223680ec410
+FILE_OK artifacts/vendor/hdapi_v2/bg_resolve_route_policy.snapshot.json.path_proof.txt sha256=c7ac108a5171aa10c0fe32d54fda81aa0a0712495ceb6ebd5dbecd25bf3271d5
+FILE_OK artifacts/vendor/hdapi_v2/bg_resolve_bodygraph_detail_proof.json sha256=61a23685a75c9b6d53ee3e73d73c466ddad8c8f5b3bd0040b12d350571748f83
+FILE_OK artifacts/vendor/hdapi_v2/bg_resolve_bodygraph_detail_proof.json.path_proof.txt sha256=3ab6833447003278a77a81da71abc866bf4333b0dcb53dcbb2024b737a39350b
+FILE_OK artifacts/vendor/hdapi_v2/bg_resolve_runtime_nonclaims.json sha256=7c85c96654dfd2c82d6d5f1cdcdde53d46264c6248fc5f91896af95e83c15752
+FILE_OK artifacts/vendor/hdapi_v2/bg_resolve_runtime_nonclaims.json.path_proof.txt sha256=c9bd1834537b6dfa4ef704d2ecc940f7e0e919b8669040f5acf3ecaca5564969
+FILE_OK artifacts/vendor/hdapi_v2/bg_resolve_request_shape.snapshot.json sha256=8e27ac55371cb2b1ed1edbef5c0b0ff66e71ccd1c71e73ef2f9396fe98ae4e56
+FILE_OK artifacts/vendor/hdapi_v2/bg_resolve_request_shape.snapshot.json.path_proof.txt sha256=e355c31a547e3a06ec4dee9b4b7606d14870e246acad07bab5221d18fd6eef03
+FILE_OK artifacts/vendor/hdapi_v2/bg_resolve_policy_binding.snapshot.json sha256=3439dee7e7bc929e7d612929d3b594bd3f8564dff3e16541410cdd67f8d5bac4
+FILE_OK artifacts/vendor/hdapi_v2/bg_resolve_policy_binding.snapshot.json.path_proof.txt sha256=6e1f299d237a2c8a17f50f1c25f0162be80a031832c213bc827cd355716bafe6
+FILE_OK audit/qa/hde-epic036/route_policy_decision.log sha256=02ea41e97558edc9f0975b4a6261987ea1c31738286b59861837a3823b609409
+FILE_OK audit/qa/hde-epic036/route_policy_decision.log.path_proof.txt sha256=a2469bbe0f7b8443cd3448af3454a98c88b230a51ac3e8c11f54380d9a066be9
+JSON_OK artifacts/vendor/hdapi_v2/bg_resolve_policy_binding.snapshot.json :: policy_binding.selected_classification='unsupported_runtime_nonclaim'
+JSON_OK artifacts/vendor/hdapi_v2/bg_resolve_policy_binding.snapshot.json :: policy_binding.hde_ferm008_6_completion_role='Complete in this epic for route-policy classification only'

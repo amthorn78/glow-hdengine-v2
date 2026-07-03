@@ -1,0 +1,12 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-07-03T01:13:15Z", "check_id": "po-003", "check_name": "PO-003", "status": "PASS", "fail_status": "", "command": "python audit/qa/hde-epic036/00_meta/hde036_live_qa_harness.py po-003", "command_provenance": "Copy/paste from plan via QA-created helper", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic036/checks/po-003/primary.log", "audit/qa/hde-epic036/checks/po-003/primary.log.path_proof.txt", "artifacts/vendor/hdapi_v2/bg_resolve_bodygraph_detail_proof.json", "artifacts/vendor/hdapi_v2/bg_resolve_route_policy.snapshot.json", "artifacts/vendor/hdapi_v2/response_mapping.snapshot.json"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 — HDE-Build Notes", "PF19 — Glow QA Guide", "PF27 — Canon Plan Templates", "PF05 — HDE CLI/API Vendor Reference", "PF02 — HDE Architecture"], "intended_tokens": [], "claimed_tokens": []}
+check_id=po-003
+check_name=PO-003
+command=python audit/qa/hde-epic036/00_meta/hde036_live_qa_harness.py po-003
+pins=LC_ALL=C LANG=C TZ=UTC
+FILE_OK artifacts/vendor/hdapi_v2/bg_resolve_bodygraph_detail_proof.json sha256=61a23685a75c9b6d53ee3e73d73c466ddad8c8f5b3bd0040b12d350571748f83
+FILE_OK artifacts/vendor/hdapi_v2/bg_resolve_route_policy.snapshot.json sha256=fee2f82ebf247a2a6e39e1211782d38085a7ac78796ff78bcc24d223680ec410
+FILE_OK artifacts/vendor/hdapi_v2/response_mapping.snapshot.json sha256=b7ee708ad8a3b35c4b402d9304040ce55498c783a356c08ea3613c017b8a7a23
+JSON_OK artifacts/vendor/hdapi_v2/bg_resolve_bodygraph_detail_proof.json :: bodygraph_detail_sufficiency='UNSUPPORTED_RUNTIME_NONCLAIM'
+JSON_OK artifacts/vendor/hdapi_v2/bg_resolve_route_policy.snapshot.json :: route_family_identity.v2_chart_candidate.bodygraph_detail_sufficiency='NOT_CLAIMED'
+TEXT_OK artifacts/vendor/hdapi_v2/response_mapping.snapshot.json :: ChartSimpleResult
+TEXT_OK artifacts/vendor/hdapi_v2/bg_resolve_bodygraph_detail_proof.json :: NO_COMPLETE_V2_CHARTRESULT_OR_CHARTSIMPLERESULT_TO_BODYGRAPH_PERSON_CACHE_ADAPTER_FOUND_IN_INSPECTED_LOCI

@@ -1,0 +1,15 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-07-03T01:13:16Z", "check_id": "po-007", "check_name": "PO-007", "status": "PASS", "fail_status": "", "command": "python audit/qa/hde-epic036/00_meta/hde036_live_qa_harness.py po-007", "command_provenance": "Copy/paste from plan via QA-created helper", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic036/checks/po-007/primary.log", "audit/qa/hde-epic036/checks/po-007/primary.log.path_proof.txt", "docs/acceptance_map_epic036.json", "artifacts/vendor/hdapi_v2/bg_resolve_policy_binding.snapshot.json", "audit/qa/hde-epic036/route_policy_decision.log"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 — HDE-Build Notes", "PF19 — Glow QA Guide", "PF27 — Canon Plan Templates", "PF05 — HDE CLI/API Vendor Reference", "PF02 — HDE Architecture"], "intended_tokens": [], "claimed_tokens": []}
+check_id=po-007
+check_name=PO-007
+command=python audit/qa/hde-epic036/00_meta/hde036_live_qa_harness.py po-007
+pins=LC_ALL=C LANG=C TZ=UTC
+FILE_OK docs/acceptance_map_epic036.json sha256=c92c1ed76c93066612b8807e5384aed0fd7ebf999619cdd34ce5d9078fb189f6
+FILE_OK artifacts/vendor/hdapi_v2/bg_resolve_policy_binding.snapshot.json sha256=3439dee7e7bc929e7d612929d3b594bd3f8564dff3e16541410cdd67f8d5bac4
+FILE_OK audit/qa/hde-epic036/route_policy_decision.log sha256=02ea41e97558edc9f0975b4a6261987ea1c31738286b59861837a3823b609409
+JSON_LIST_OK docs/acceptance_map_epic036.json :: nonclaims contains 'QA PASS'
+JSON_LIST_OK docs/acceptance_map_epic036.json :: nonclaims contains 'OPS completion'
+JSON_LIST_OK docs/acceptance_map_epic036.json :: nonclaims contains 'PF09 status movement'
+JSON_LIST_OK docs/acceptance_map_epic036.json :: nonclaims contains 'HDE-FERM008 parent Done'
+JSON_LIST_OK docs/acceptance_map_epic036.json :: nonclaims contains 'epic closeout'
+JSON_OK artifacts/vendor/hdapi_v2/bg_resolve_policy_binding.snapshot.json :: policy_binding.ops_01_requirement='OPS-01 not required by PR-01; route-policy classification proved closed-rails from repo evidence.'
+TEXT_OK audit/qa/hde-epic036/route_policy_decision.log :: OPS-01 not required by PR-01; route-policy classification proved closed-rails from repo evidence.

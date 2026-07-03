@@ -1,0 +1,12 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-07-03T01:13:16Z", "check_id": "po-005", "check_name": "PO-005", "status": "PASS", "fail_status": "", "command": "python audit/qa/hde-epic036/00_meta/hde036_live_qa_harness.py po-005", "command_provenance": "Copy/paste from plan via QA-created helper", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic036/checks/po-005/primary.log", "audit/qa/hde-epic036/checks/po-005/primary.log.path_proof.txt", "artifacts/vendor/hdapi_v2/bg_resolve_route_policy.snapshot.json", "tests/bodygraph/test_bg_resolve_route_policy.py"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 — HDE-Build Notes", "PF19 — Glow QA Guide", "PF27 — Canon Plan Templates", "PF05 — HDE CLI/API Vendor Reference", "PF02 — HDE Architecture"], "intended_tokens": [], "claimed_tokens": []}
+check_id=po-005
+check_name=PO-005
+command=python audit/qa/hde-epic036/00_meta/hde036_live_qa_harness.py po-005
+pins=LC_ALL=C LANG=C TZ=UTC
+FILE_OK artifacts/vendor/hdapi_v2/bg_resolve_route_policy.snapshot.json sha256=fee2f82ebf247a2a6e39e1211782d38085a7ac78796ff78bcc24d223680ec410
+FILE_OK tests/bodygraph/test_bg_resolve_route_policy.py sha256=d9a8219e1a2dd54ca1e63a5d1d871ce4eee291e6bd9770206733f1df260e9803
+JSON_OK artifacts/vendor/hdapi_v2/bg_resolve_route_policy.snapshot.json :: legacy_fallback_policy.classification='explicit_legacy_fallback'
+JSON_OK artifacts/vendor/hdapi_v2/bg_resolve_route_policy.snapshot.json :: legacy_fallback_policy.supported=True
+JSON_OK artifacts/vendor/hdapi_v2/bg_resolve_route_policy.snapshot.json :: legacy_fallback_policy.configured_base_version='v1'
+JSON_OK artifacts/vendor/hdapi_v2/bg_resolve_route_policy.snapshot.json :: configured_v2_policy.supported=False
+TEXT_OK tests/bodygraph/test_bg_resolve_route_policy.py :: test_explicit_legacy_fallback_remains_available_for_non_v2_configured_base
