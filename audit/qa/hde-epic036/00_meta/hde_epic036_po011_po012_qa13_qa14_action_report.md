@@ -46,6 +46,14 @@
 - Extra non-EPIC036 changed paths: 35
 - Extra-file changes were introduced by governed evidence index/path-proof refresh operations and are preserved per operator instruction.
 
+## PF19 Routing Receipt (Remediation)
+
+- Routing class: PR
+- Routing work item: commit 1fe4fcfed55ca2ee38dd0ac1a23c9d09f981a4b3 on main (subject: "QA Pass 3 HDE-EPIC036").
+- Authorized scope: governed evidence refreshes outside audit/qa/hde-epic036/, including evidence index/mirror/hash/path-proof updates captured in the Extra Files Manifest.
+- Approval reference: operator instruction to preserve extra-file changes, recorded in this report's Impact Summary.
+- QA trust binding: final PASS-grade use of po-011, po-012, qa-13-governed-evidence-gates, and qa-14-close-out-deliverables is bound to this routing receipt and the existing check-scoped logs/path proofs.
+
 ## Evidence Outputs Produced In This Session
 
 - audit/qa/hde-epic036/00_meta/hde_epic036_po011_po012_qa13_qa14_action_report.md
