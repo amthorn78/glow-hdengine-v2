@@ -1,0 +1,7 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-07-03T02:42:13Z", "check_id": "po-010", "check_name": "PO-010", "status": "PASS", "fail_status": "", "command": "python audit/qa/hde-epic036/00_meta/hde036_live_qa_harness.py po-010", "command_provenance": "Copy/paste from plan via QA-created helper", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic036/checks/po-010/primary.log", "audit/qa/hde-epic036/checks/po-010/primary.log.path_proof.txt", "audit/qa/hde-epic036/checks/po-010/live_route_policy.log", "audit/qa/hde-epic036/checks/po-010/live_route_policy.log.path_proof.txt"], "captured_env": {"SAFE_MODE": "0", "ALLOW_NETWORK": "1", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "en_US.UTF-8", "TZ": "UTC"}, "pf_refs": ["PF10 — HDE-Build Notes", "PF19 — Glow QA Guide", "PF27 — Canon Plan Templates", "PF05 — HDE CLI/API Vendor Reference", "PF02 — HDE Architecture"], "intended_tokens": [], "claimed_tokens": []}
+check_id=po-010
+check_name=PO-010
+command=python audit/qa/hde-epic036/00_meta/hde036_live_qa_harness.py po-010
+pins=LC_ALL=C LANG=C TZ=UTC
+PO010_LIVE_LOG=audit/qa/hde-epic036/checks/po-010/live_route_policy.log
+PO010_LIVE_LOG_PROOF=audit/qa/hde-epic036/checks/po-010/live_route_policy.log.path_proof.txt

@@ -258,6 +258,27 @@ Evidence artifacts declared in header:
 - `artifacts/vendor/hdapi_v2/bg_resolve_runtime_nonclaims.json.path_proof.txt` (exists=`True`)
 - `artifacts/vendor/hdapi_v2/response_mapping.snapshot.json` (exists=`True`)
 - `audit/docdeltas/hde-epic036_doc_deltas.md` (exists=`True`)
+
+## Test Run Update (2026-07-03 UTC)
+
+- Pytest readiness proof: `python3 -m pip install -r requirements-dev.txt && python3 -m pytest --version` completed; reported `pytest 8.4.2`.
+- Harness execution check (implemented scope): `python3 audit/qa/hde-epic036/00_meta/hde036_live_qa_harness.py po-009` returned `status=PASS exit_code=0`.
+- Harness execution check (requested po-010): `python3 audit/qa/hde-epic036/00_meta/hde036_live_qa_harness.py po-010` returned `UNKNOWN_CHECK:po-010`.
+- Conclusion: current runtime evidence confirms the existing helper-locus contradiction for po-010; execution remains blocked until po-010 is registered in the harness.
+
+## Moon Loop Remediation Update (2026-07-03 UTC)
+
+- Remediation applied: `audit/qa/hde-epic036/00_meta/hde036_live_qa_harness.py` now registers executable `po-010` behavior probing.
+- Remediation execution: `python3 audit/qa/hde-epic036/00_meta/hde036_live_qa_harness.py po-010` returned `status=PASS exit_code=0`.
+- Behavior proof captured by remediation run:
+	- `error.code=PROVIDER_ROUTE_UNSUPPORTED`
+	- `route_policy.classification=unsupported_runtime_nonclaim`
+	- `HD_API_BASE_URL=REDACTED` in `live_route_policy.log`
+- New generated po-010 artifacts:
+	- `audit/qa/hde-epic036/checks/po-010/primary.log`
+	- `audit/qa/hde-epic036/checks/po-010/primary.log.path_proof.txt`
+	- `audit/qa/hde-epic036/checks/po-010/live_route_policy.log`
+	- `audit/qa/hde-epic036/checks/po-010/live_route_policy.log.path_proof.txt`
 - `audit/docdeltas/hde-epic036_doc_deltas.md.path_proof.txt` (exists=`True`)
 - `audit/qa/hde-epic036/00_meta/doc_deltas.md` (exists=`True`)
 - `audit/qa/hde-epic036/00_meta/doc_deltas.md.path_proof.txt` (exists=`True`)

@@ -7,6 +7,8 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from engine.bodygraph.resolver import resolve_bodygraph
+
 EPIC_ID = "HDE-EPIC036"
 QA_ROOT = Path("audit/qa/hde-epic036")
 CHECKS_ROOT = QA_ROOT / "checks"
@@ -227,6 +229,71 @@ def check_po009(body: list[str]) -> tuple[list[str], list[str], list[str]]:
         require_contains(decision, needle, body)
     return [nonclaims, acceptance, decision], [], []
 
+def check_po010(body: list[str]) -> tuple[list[str], list[str], list[str]]:
+    """Moon Loop remediation: executable behavior probe for configured-v2 vendor route policy refusal."""
+    check_root = CHECKS_ROOT / "po-010"
+    check_root.mkdir(parents=True, exist_ok=True)
+    live_log = check_root / "live_route_policy.log"
+
+    configured_base = (os.environ.get("HD_API_BASE_URL") or "").strip()
+    effective_base = configured_base or "https://vendor.test/v2"
+    base_source = "process_env" if configured_base else "moon_loop_fallback"
+
+    result = resolve_bodygraph(
+        "operator-user",
+        source="vendor",
+        upsert=False,
+        dry_run=True,
+        env={
+            "SAFE_MODE": "0",
+            "ALLOW_NETWORK": "1",
+            "APP_ENV": "dev",
+            "HD_API_BASE_URL": effective_base,
+        },
+        birthdate="1990-01-01",
+        birthtime="12:00",
+        location="Amsterdam, NL",
+    )
+
+    if result.status != "error" or result.exit_code != 1:
+        raise FailBehavior(f"PO010_UNEXPECTED_RESULT:{result.status}:{result.exit_code}")
+
+    payload = result.payload if isinstance(result.payload, dict) else {}
+    error = payload.get("error") if isinstance(payload.get("error"), dict) else {}
+    resolver = payload.get("resolver") if isinstance(payload.get("resolver"), dict) else {}
+    policy = resolver.get("route_policy") if isinstance(resolver.get("route_policy"), dict) else {}
+
+    if error.get("code") != "PROVIDER_ROUTE_UNSUPPORTED":
+        raise FailBehavior(f"PO010_ERROR_CODE:{error.get('code')!r}")
+    if policy.get("classification") != "unsupported_runtime_nonclaim":
+        raise FailBehavior(f"PO010_CLASSIFICATION:{policy.get('classification')!r}")
+    if "<redacted>" not in str(policy.get("route_auth_posture", "")):
+        raise FailBehavior("PO010_REDACTION_MISSING:route_auth_posture")
+
+    live_log.write_text(
+        "\n".join([
+            "check_id=po-010",
+            "moon_loop_remediation=enabled",
+            "command=resolve_bodygraph(source=vendor,dry_run=true)",
+            "SAFE_MODE=0",
+            "ALLOW_NETWORK=1",
+            "APP_ENV=dev",
+            f"HD_API_BASE_URL_source={base_source}",
+            "HD_API_BASE_URL=REDACTED",
+            f"error.code={error.get('code')}",
+            f"route_policy.classification={policy.get('classification')}",
+            f"route_policy.route_family={policy.get('route_family')}",
+            f"route_policy.resource_path={policy.get('resource_path')}",
+            f"route_policy.route_auth_posture={policy.get('route_auth_posture')}",
+            "",
+        ]),
+        encoding="utf-8",
+    )
+    live_log_proof = write_path_proof(live_log)
+    body.append(f"PO010_LIVE_LOG={live_log}")
+    body.append(f"PO010_LIVE_LOG_PROOF={live_log_proof}")
+    return [str(live_log), str(live_log_proof)], [], []
+
 CHECKS = {
     "step-0b-doc-delta-capture": ("Step-0B - Doc Delta Capture", check_step0b),
     "po-001": ("PO-001", check_po001),
@@ -238,6 +305,7 @@ CHECKS = {
     "po-007": ("PO-007", check_po007),
     "po-008": ("PO-008", check_po008),
     "po-009": ("PO-009", check_po009),
+    "po-010": ("PO-010", check_po010),
 }
 
 def run(check_id: str) -> int:
