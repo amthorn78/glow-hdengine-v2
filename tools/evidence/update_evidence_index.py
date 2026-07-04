@@ -1313,6 +1313,91 @@ def _load_epic036_pr02_entries() -> list[dict[str, object]]:
     return entries
 
 
+EPIC037_PR01_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "hdapi_v2.hde_epic037_field_sufficiency_proof",
+        "discovered_physical_path": "artifacts/vendor/hdapi_v2/hde_epic037_field_sufficiency_proof.json",
+        "epic_id": "HDE-EPIC037",
+        "record_type": "epic037_pr01_field_sufficiency",
+        "role": "snapshot",
+        "schema_version": "1.0",
+        "tokens": ["JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK", "VENDOR_NO_PAYLOAD_LOGGING_OK"],
+        "notes": "EPIC037 PR-01 machine-checkable v2 BodyGraph-detail field-sufficiency proof for HDE-FERM008.7; records typed insufficient classification without runtime conformance claim",
+    },
+    {
+        "artifact_key": "hdapi_v2.hde_epic037_adapter_contract",
+        "discovered_physical_path": "artifacts/vendor/hdapi_v2/hde_epic037_adapter_contract.snapshot.json",
+        "epic_id": "HDE-EPIC037",
+        "record_type": "epic037_pr01_field_sufficiency",
+        "role": "snapshot",
+        "schema_version": "1.0",
+        "tokens": ["JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC037 PR-01 internal HDE BodyGraph/person/cache/compat adapter contract snapshot for v2 ChartResult and ChartSimpleResult readiness",
+    },
+    {
+        "artifact_key": "hdapi_v2.hde_epic037_adapter_contract_nonclaims",
+        "discovered_physical_path": "artifacts/vendor/hdapi_v2/hde_epic037_adapter_contract_nonclaims.json",
+        "epic_id": "HDE-EPIC037",
+        "record_type": "epic037_pr01_field_sufficiency",
+        "role": "snapshot",
+        "schema_version": "1.0",
+        "tokens": ["JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK", "VENDOR_NO_PAYLOAD_LOGGING_OK"],
+        "notes": "EPIC037 PR-01 explicit nonclaims for unsupported vendor fields and unsupported HDE paths; no public Reader, route, flag, payload, app-side call path, live vendor call, raw payload persistence, AI behavior, QA PASS, OPS, or closeout claim",
+    },
+    {
+        "artifact_key": "epic037.pr01.doc_deltas",
+        "discovered_physical_path": "audit/docdeltas/hde-epic037_doc_deltas.md",
+        "epic_id": "HDE-EPIC037",
+        "record_type": "epic037_pr01_doc_delta_candidate",
+        "role": "audit",
+        "schema_version": "1.0",
+        "tokens": ["DOC_DELTA_PRESENT_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC037 PR-01 doc-delta candidate for HDE-FERM008.7 field-sufficiency evidence; PF-Canon not edited",
+    },
+    {
+        "artifact_key": "epic037.pr01.qa_meta_doc_deltas",
+        "discovered_physical_path": "audit/qa/hde-epic037/00_meta/doc_deltas.md",
+        "epic_id": "HDE-EPIC037",
+        "record_type": "epic037_pr01_doc_delta_candidate",
+        "role": "audit",
+        "schema_version": "1.0",
+        "tokens": ["DOC_DELTA_PRESENT_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC037 PR-01 QA-meta doc-delta mirror for HDE-FERM008.7 evidence; no PF09 status movement or runtime conformance claim",
+    },
+]
+
+
+def _load_epic037_pr01_entries() -> list[dict[str, object]]:
+    proof = ROOT / "artifacts/vendor/hdapi_v2/hde_epic037_field_sufficiency_proof.json"
+    if not proof.exists():
+        return []
+    try:
+        payload = json.loads(proof.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise SystemExit("INVALID_EPIC037_PR01_FIELD_SUFFICIENCY_PROOF") from exc
+    if (
+        payload.get("artifact_kind") != "hde_epic037_field_sufficiency_proof"
+        or payload.get("epic_id") != "HDE-EPIC037"
+        or payload.get("pf09_task_id") != "HDE-FERM008"
+        or payload.get("pf09_subtask_id") != "HDE-FERM008.7"
+        or payload.get("selected_payload_family") != "typed_insufficient_classification"
+        or payload.get("field_sufficiency_status") != "INSUFFICIENT_FAIL_CLOSED"
+        or payload.get("v2_chart_data_feeds_existing_bodygraph_person_cache_compat_contract") is not False
+    ):
+        raise SystemExit("INVALID_EPIC037_FIELD_SUFFICIENCY_IDENTITY")
+    produced = payload.get("generated_at_utc")
+    entries: list[dict[str, object]] = []
+    for entry in EPIC037_PR01_PRIMARY_ARTIFACTS:
+        rel = str(entry["discovered_physical_path"])
+        if not (ROOT / rel).exists():
+            raise SystemExit(f"MISSING_EPIC037_PR01_ARTIFACT:{rel}")
+        normalized = dict(entry)
+        if isinstance(produced, str) and produced:
+            normalized["produced_at_utc"] = produced
+        entries.append(normalized)
+    return entries
+
+
 EPIC035_PR03_OPS01_ARTIFACTS: list[dict[str, object]] = [
     {
         "artifact_key": "epic035.ops01.ops_evidence_manifest",
@@ -2178,6 +2263,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *_load_epic035_pr03_entries(),
             *_load_epic036_pr01_entries(),
             *_load_epic036_pr02_entries(),
+            *_load_epic037_pr01_entries(),
             *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,

@@ -1,0 +1,5 @@
+path: artifacts/vendor/hdapi_v2/hde_epic037_adapter_contract_nonclaims.json
+size_bytes: 1522
+sha256: b6abe1a1e88efa829dc4c26c1640942a099a777ca4e24bac1f5bd4a711e86d2c
+mtime_utc: 2026-07-04T22:06:51Z
+produced_at_utc: 2026-07-04T22:06:51Z
