@@ -1321,7 +1321,7 @@ EPIC037_PR01_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
         "record_type": "epic037_pr01_field_sufficiency",
         "role": "snapshot",
         "schema_version": "1.0",
-        "tokens": ["JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK", "VENDOR_NO_PAYLOAD_LOGGING_OK"],
+        "tokens": ["JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK"],
         "notes": "EPIC037 PR-01 machine-checkable v2 BodyGraph-detail field-sufficiency proof for HDE-FERM008.7; records typed insufficient classification without runtime conformance claim",
     },
     {
@@ -1341,7 +1341,7 @@ EPIC037_PR01_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
         "record_type": "epic037_pr01_field_sufficiency",
         "role": "snapshot",
         "schema_version": "1.0",
-        "tokens": ["JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK", "VENDOR_NO_PAYLOAD_LOGGING_OK"],
+        "tokens": ["JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK"],
         "notes": "EPIC037 PR-01 explicit nonclaims for unsupported vendor fields and unsupported HDE paths; no public Reader, route, flag, payload, app-side call path, live vendor call, raw payload persistence, AI behavior, QA PASS, OPS, or closeout claim",
     },
     {

@@ -58,10 +58,10 @@ INTERNAL_CONTRACT = [
     {"contract_area": "bodygraph", "internal_field": "resolved bodygraph/person mapping", "required": True, "consumer": "engine.bodygraph.resolver.resolve_bodygraph", "vendor_source": "ChartResult or ChartSimpleResult", "status": "adapter_required", "reason": "No inspected runtime adapter maps v2 chart schema into HDE resolved BodyGraph/person/cache contract."},
 ]
 
-NEGATIVE_FIXTURES = [
-    {"fixture_id": "chart_result_missing_person_uid", "payload_family": "ChartResult", "fields_present": sorted(CHART_RESULT_FIELDS), "expected_classification": "FAIL_CLOSED_UNSUPPORTED_FIELD", "missing_internal_fields": ["person_uid"]},
-    {"fixture_id": "chart_simple_missing_person_uid_and_activations", "payload_family": "ChartSimpleResult", "fields_present": sorted(CHART_SIMPLE_FIELDS), "expected_classification": "FAIL_CLOSED_INSUFFICIENT_SCHEMA", "missing_internal_fields": ["person_uid", "activations", "birthDateUtc", "authority", "definition"]},
-]
+NEGATIVE_FIXTURE_INPUTS = (
+    ("chart_result_typed_insufficient_contract", "ChartResult", CHART_RESULT_FIELDS),
+    ("chart_simple_typed_insufficient_contract_and_vendor_detail", "ChartSimpleResult", CHART_SIMPLE_FIELDS),
+)
 
 
 def canonical_json_bytes(obj: Any) -> bytes:
@@ -149,6 +149,24 @@ def evaluate_payload_family(payload_family: str, fields: set[str]) -> dict[str, 
     }
 
 
+def _negative_fixtures() -> list[dict[str, Any]]:
+    fixtures = []
+    for fixture_id, payload_family, fields in NEGATIVE_FIXTURE_INPUTS:
+        evaluation = evaluate_payload_family(payload_family, set(fields))
+        fixtures.append({
+            "fixture_id": fixture_id,
+            "payload_family": payload_family,
+            "fields_present": evaluation["fields_present"],
+            "expected_classification": evaluation["classification"],
+            "expected_field_sufficiency": evaluation["field_sufficiency"],
+            "expected_compute_ready": evaluation["compute_ready"],
+            "expected_fail_closed": evaluation["fail_closed"],
+            "missing_internal_contract_fields": evaluation["missing_internal_contract_fields"],
+            "missing_vendor_detail_fields": evaluation["missing_vendor_detail_fields"],
+        })
+    return fixtures
+
+
 def _common(produced_at: str) -> dict[str, Any]:
     return {"epic_id": "HDE-EPIC037", "generated_at_utc": produced_at, "pf09_document": PF09_DOCUMENT, "pf09_task_id": "HDE-FERM008", "pf09_subtask_id": "HDE-FERM008.7", "rails": {"allow_network": "0", "closed_rails_only": True, "safe_mode": "1"}}
 
@@ -178,7 +196,7 @@ def build_outputs(produced_at: str) -> dict[Path, bytes]:
         "v2_chart_data_feeds_existing_bodygraph_person_cache_compat_contract": False,
         "machine_checkable_contract_sha256": hashlib.sha256(canonical_json_bytes(contract)).hexdigest(),
         "candidate_evaluations": {"ChartResult": chart_result, "ChartSimpleResult": chart_simple},
-        "negative_fixtures": NEGATIVE_FIXTURES,
+        "negative_fixtures": _negative_fixtures(),
         "adapter_compatibility_proof": {"schema_adapter_gap_status": "GAP_RECORDED", "runtime_adapter_implemented": False, "resolver_rewired": False, "compat_compute_ready": False},
         "no_raw_vendor_payload_body_persisted_in_evidence": True,
         "inspected_internal_loci": _inspected_loci(),

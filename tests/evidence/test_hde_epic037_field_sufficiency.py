@@ -68,11 +68,14 @@ def test_adapter_contract_defines_internal_person_cache_compat_fields() -> None:
 def test_negative_fixtures_cover_missing_and_insufficient_vendor_fields() -> None:
     payload = _assert_canonical_json(VENDOR_DIR / "hde_epic037_field_sufficiency_proof.json")
     fixtures = {item["fixture_id"]: item for item in payload["negative_fixtures"]}
-    assert fixtures["chart_result_missing_person_uid"]["expected_classification"] == "FAIL_CLOSED_UNSUPPORTED_FIELD"
-    assert "person_uid" in fixtures["chart_result_missing_person_uid"]["missing_internal_fields"]
-    simple = fixtures["chart_simple_missing_person_uid_and_activations"]
-    assert simple["expected_classification"] == "FAIL_CLOSED_INSUFFICIENT_SCHEMA"
-    assert {"person_uid", "activations", "birthDateUtc"} <= set(simple["missing_internal_fields"])
+    chart_result = fixtures["chart_result_typed_insufficient_contract"]
+    assert chart_result["expected_classification"] == "TYPED_INSUFFICIENT_CLASSIFICATION"
+    assert "person_uid" in chart_result["missing_internal_contract_fields"]
+    assert chart_result["missing_vendor_detail_fields"] == []
+    simple = fixtures["chart_simple_typed_insufficient_contract_and_vendor_detail"]
+    assert simple["expected_classification"] == "TYPED_INSUFFICIENT_CLASSIFICATION"
+    assert "person_uid" in simple["missing_internal_contract_fields"]
+    assert {"activations", "birthDateUtc", "authority", "definition"} <= set(simple["missing_vendor_detail_fields"])
 
 
 def test_nonclaims_preserve_no_public_runtime_ai_or_vendor_claims() -> None:
@@ -103,6 +106,6 @@ def test_index_registration_does_not_claim_unproduced_log_or_privacy_tokens() ->
         for entry in updater.EPIC037_PR01_PRIMARY_ARTIFACTS
         if entry["artifact_key"] == "hdapi_v2.hde_epic037_adapter_contract_nonclaims"
     )
-    assert "VENDOR_NO_PAYLOAD_LOGGING_OK" in nonclaims["tokens"]
+    assert "VENDOR_NO_PAYLOAD_LOGGING_OK" not in nonclaims["tokens"]
     assert "LOGS_KEYS_ONLY_OK" not in nonclaims["tokens"]
     assert "BG_PRIVACY_REDACTION_OK" not in nonclaims["tokens"]
