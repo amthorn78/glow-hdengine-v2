@@ -1,0 +1,16 @@
+overall=PASS_WITH_NOTE
+branch=main
+head=3fc61d3bf7b3563c7f27054975738de8ffb0519b
+smoke_exit_code=0
+smoke_stderr_empty=True
+smoke_stdout_lf_terminated=True
+smoke_stdout_has_ansi=False
+smoke_sidecar_keys=composition_id,key,pack_sha,pair,release_id
+smoke_sidecar_canonical_sorted_compact_lf=True
+smoke_sidecar_pair_ids_present=True
+artifacts/cli/narrative/sidecar.json: human_index_count=1 machine_mirror_count=1 mirror_proof_anchor_matches=True
+artifacts/cli/narrative/stdout.txt: human_index_count=1 machine_mirror_count=1 mirror_proof_anchor_matches=True
+warnings=
+- artifacts/cli/narrative/stdout.txt index/mirror linkage mismatch (Human Index row is minimal key/path only; Machine Mirror sha/size/proof anchor matches artifact and path proof)
+- artifacts/cli/narrative/sidecar.json index/mirror linkage mismatch (Human Index row is minimal key/path only; Machine Mirror sha/size/proof anchor matches artifact and path proof)
+failures=none

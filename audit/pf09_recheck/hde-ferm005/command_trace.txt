@@ -1,0 +1,5 @@
+repo=glow-hdengine-v2
+branch=main
+head=3fc61d3bf7b3563c7f27054975738de8ffb0519b
+rails=LC_ALL=C LANG=C TZ=UTC SAFE_MODE=1 ALLOW_NETWORK=0
+command=python -m engine.cli aux-preview --pair-file artifacts/cli/showcompat/stdout.json --show-narrative --admin-out audit/pf09\ recheck/aux_preview_pair_sidecar.json

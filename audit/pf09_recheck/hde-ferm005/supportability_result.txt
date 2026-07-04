@@ -1,0 +1,14 @@
+classification=STILL_SUPPORTABLE_WITH_NOTE
+target=PF09.5 HDE-FERM005 / HDE-FERM005.1
+branch=main
+head=3fc61d3bf7b3563c7f27054975738de8ffb0519b
+functionality_smoke_status=PASS
+smoke_exit_code=0
+smoke_stderr_empty=True
+smoke_sidecar_has_expected_keys=True
+smoke_sidecar_pair_ids_present=True
+historical_preview_artifacts=PASS
+epic017_evidence=PASS
+index_mirror_linkage=PASS_WITH_NOTE
+index_mirror_note=Human Evidence Index contains one minimal key/path record for each preview artifact. Machine Mirror contains one record for each artifact with sha256, size_bytes, and proof_anchor. Machine Mirror sha/size/proof_anchor match the artifact path proofs.
+pf09_status_change=none

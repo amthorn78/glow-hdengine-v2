@@ -1,0 +1,169 @@
+{
+  "branch": "main",
+  "epic017_evidence": {
+    "audit/qa/hde-epic017/logs/step_aux_preview1.txt": {
+      "excerpt": "Together you feel warm and near. Curiosity brightens the air.",
+      "exists": true,
+      "has_crlf": false,
+      "lf_terminated": true,
+      "sha256": "92539263420e01974403f2facf1d59f34ba9933d81a495368c1dd40bb939ba4a",
+      "size_bytes": 62
+    },
+    "audit/qa/hde-epic017/logs/step_aux_preview1_admin.json": {
+      "exists": true,
+      "has_crlf": false,
+      "has_expected_admin_keys": true,
+      "json_keys": [
+        "composition_id",
+        "key",
+        "pack_sha",
+        "pair",
+        "release_id"
+      ],
+      "lf_terminated": true,
+      "pack_sha_hex64": true,
+      "pair_ids_present": true,
+      "release_id_hex64": true,
+      "sha256": "db58cb89637d3a9ff1fea6825a393b58a9be813207ea63431afac55ad7f59afe",
+      "size_bytes": 342
+    }
+  },
+  "failures": [],
+  "head": "3fc61d3bf7b3563c7f27054975738de8ffb0519b",
+  "historical_artifacts": {
+    "artifacts/cli/narrative/sidecar.json": {
+      "canonical_sorted_compact_lf": true,
+      "contains_fragment_ids": true,
+      "contains_narrative_prose_field": false,
+      "exists": true,
+      "has_ansi": false,
+      "has_crlf": false,
+      "json_keys": [
+        "composition_id",
+        "fragment_ids",
+        "pack_sha",
+        "release_id"
+      ],
+      "lf_terminated": true,
+      "path_proof": {
+        "mtime_utc": "2025-12-06T04:06:36Z",
+        "path": "artifacts/cli/narrative/sidecar.json",
+        "produced_at_utc": "2025-11-22T02:27:04Z",
+        "sha256": "8c5425aa890533ccb8877caf612b56a242abd27029d1245ba719b051c250f55b",
+        "size_bytes": "242"
+      },
+      "path_proof_exists": true,
+      "path_proof_matches_path": true,
+      "path_proof_matches_sha256": true,
+      "path_proof_matches_size": true,
+      "sha256": "8c5425aa890533ccb8877caf612b56a242abd27029d1245ba719b051c250f55b",
+      "size_bytes": 242
+    },
+    "artifacts/cli/narrative/stdout.txt": {
+      "excerpt": "Together you feel calm and even. The pace is kind and unforced.",
+      "exists": true,
+      "has_ansi": false,
+      "has_crlf": false,
+      "lf_terminated": true,
+      "path_proof": {
+        "mtime_utc": "2025-12-06T04:06:36Z",
+        "path": "artifacts/cli/narrative/stdout.txt",
+        "produced_at_utc": "2025-11-22T02:27:04Z",
+        "sha256": "e4a96e2bff6638158d95833660899525cbe0e124c84544b52942e3eb79fb69c9",
+        "size_bytes": "64"
+      },
+      "path_proof_exists": true,
+      "path_proof_matches_path": true,
+      "path_proof_matches_sha256": true,
+      "path_proof_matches_size": true,
+      "sha256": "e4a96e2bff6638158d95833660899525cbe0e124c84544b52942e3eb79fb69c9",
+      "size_bytes": 64
+    }
+  },
+  "index_mirror": {
+    "artifacts/cli/narrative/sidecar.json": {
+      "human_index_count": 1,
+      "human_index_records": [
+        {
+          "artifact_key": "cli.narrative.preview_sidecar",
+          "discovered_physical_path": "artifacts/cli/narrative/sidecar.json"
+        }
+      ],
+      "human_sha_size_match_artifact": false,
+      "machine_mirror_count": 1,
+      "machine_mirror_records": [
+        {
+          "artifact_key": "cli.narrative.preview_sidecar",
+          "discovered_physical_path": "artifacts/cli/narrative/sidecar.json",
+          "produced_at_utc": "2025-11-22T02:27:04Z",
+          "proof_anchor": "artifacts/cli/narrative/sidecar.json.path_proof.txt",
+          "role": "snapshot",
+          "sha256": "8c5425aa890533ccb8877caf612b56a242abd27029d1245ba719b051c250f55b",
+          "size_bytes": 242
+        }
+      ],
+      "mirror_proof_anchor_matches": true,
+      "mirror_sha_size_match_artifact": true
+    },
+    "artifacts/cli/narrative/stdout.txt": {
+      "human_index_count": 1,
+      "human_index_records": [
+        {
+          "artifact_key": "cli.narrative.preview_stdout",
+          "discovered_physical_path": "artifacts/cli/narrative/stdout.txt"
+        }
+      ],
+      "human_sha_size_match_artifact": false,
+      "machine_mirror_count": 1,
+      "machine_mirror_records": [
+        {
+          "artifact_key": "cli.narrative.preview_stdout",
+          "discovered_physical_path": "artifacts/cli/narrative/stdout.txt",
+          "produced_at_utc": "2025-11-22T02:27:04Z",
+          "proof_anchor": "artifacts/cli/narrative/stdout.txt.path_proof.txt",
+          "role": "snapshot",
+          "sha256": "e4a96e2bff6638158d95833660899525cbe0e124c84544b52942e3eb79fb69c9",
+          "size_bytes": 64
+        }
+      ],
+      "mirror_proof_anchor_matches": true,
+      "mirror_sha_size_match_artifact": true
+    }
+  },
+  "overall": "PASS_WITH_NOTE",
+  "repo": "glow-hdengine-v2",
+  "scope_note": "PF09 HDE-FERM005 local functionality recheck on current checkout; not a PF09 status change or governed index regeneration.",
+  "smoke": {
+    "command_trace_path": "audit/pf09 recheck/hde-ferm005/command_trace.txt",
+    "exit_code": "0",
+    "sidecar_canonical_sorted_compact_lf": true,
+    "sidecar_contains_obvious_narrative_words": false,
+    "sidecar_has_crlf": false,
+    "sidecar_has_expected_keys": true,
+    "sidecar_keys": [
+      "composition_id",
+      "key",
+      "pack_sha",
+      "pair",
+      "release_id"
+    ],
+    "sidecar_lf_terminated": true,
+    "sidecar_pack_sha_hex64": true,
+    "sidecar_pair_ids_present": true,
+    "sidecar_path": "audit/pf09 recheck/hde-ferm005/aux_preview_pair_sidecar.json",
+    "sidecar_release_id_hex64": true,
+    "sidecar_sha256": "b68b58e5db0759eede69b80c2570b79600ebe4a9fccf370dea129146838bf808",
+    "sidecar_size_bytes": 342,
+    "stderr_empty": true,
+    "stdout_excerpt": "Together you feel bright without rush. There is room to breathe.",
+    "stdout_has_ansi": false,
+    "stdout_has_crlf": false,
+    "stdout_lf_terminated": true,
+    "stdout_sha256": "f852e0dda97c4712f2aa295b33941b90b02d064450768234c92b766e2e2048b1",
+    "stdout_size_bytes": 65
+  },
+  "warnings": [
+    "artifacts/cli/narrative/stdout.txt index/mirror linkage mismatch (Human Index row is minimal key/path only; Machine Mirror sha/size/proof anchor matches artifact and path proof)",
+    "artifacts/cli/narrative/sidecar.json index/mirror linkage mismatch (Human Index row is minimal key/path only; Machine Mirror sha/size/proof anchor matches artifact and path proof)"
+  ]
+}
