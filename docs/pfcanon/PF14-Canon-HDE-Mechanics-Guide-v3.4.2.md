@@ -3,12 +3,12 @@
 ## 0.1 **Header**
 
 **Title:** PF14-Canon-HDE-Mechanics-Guide  
-**Version:** v3.4.1
+**Version:** v3.4.2
 
 **Status:** Canon  
-**Effective date:** 2026-07-01
+**Effective date:** 2026-07-03
 
-**Last Update Gate:** BN 11.8.7 A7-14  
+**Last Update Gate:** BN 11.9.9  
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
 ---
@@ -212,8 +212,11 @@ HDAPI v2 request-shaping and response-mapping mechanics. The repo MUST provide d
 * Project `HD_API_KEY` into `HD-Api-Key` auth for legacy HumanDesignAPI v1 BodyGraph routes.  
 * Project `GEO_API_KEY` into `HD-Geocode-Key` only where the governed route requires geocoding.  
 * Preserve v1 BodyGraph behavior as explicit legacy behavior until the owning architecture and byte-contract homes decide whether v1 remains a fallback or is retired.  
-* Treat `bg:resolve --source vendor` as a BodyGraph resolver workflow, not as the canonical v2 chart/geokey validation path. When the configured vendor base URL is v2, this command MUST NOT be used to prove v2 chart/geokey success unless a future explicit vendor-route policy aligns its route family, request shape, and auth/geokey posture with the required BodyGraph-detail strategy.  
+* BodyGraph resolver route-policy classification. `bg:resolve --source vendor` is a BodyGraph resolver workflow, not the canonical v2 chart/geokey validation path. For configured v2 vendor bases, mechanics MUST classify the current resolver posture as `unsupported_runtime_nonclaim` and refuse before accidental legacy `bodygraphs` request construction unless a future explicit route policy and adapter/schema proof supports BodyGraph-detail resolution.  
+* Non-v2 configured bases MAY preserve explicit legacy BodyGraph fallback only as a legacy route-family posture with `HD-Api-Key` auth, governed geokey handling, and no v2 BodyGraph-detail compatibility claim.  
+* Dual-route behavior is not implemented by this mechanics posture. Any future dual-route, v2 chart-backed BodyGraph-detail, or v2-to-internal BodyGraph/person/cache mapping behavior requires a future ADR or owning-canon decision before PF14 may treat it as a supported mechanic.  
 * Any future work that claims `bg:resolve --source vendor` proves v2 BodyGraph detail MUST show the selected vendor payload family, whether legacy fallback remains, and how the returned data maps to the existing BodyGraph/person/cache contract.  
+* Keep source-selection and response-mapping mechanics from collapsing v1 and v2 auth behavior, route-family identity, or evidence posture into a generic vendor-auth path.  
 * Keep source-selection and response-mapping mechanics from collapsing v1 and v2 auth behavior, route-family identity, or evidence posture into a generic vendor-auth path.  
 * Treat `bg:resolve --source vendor` as a BodyGraph resolver workflow, not as the canonical v2 chart/geokey validation path. When the configured vendor base URL is v2, this command MUST NOT be used to prove v2 chart/geokey success unless a future explicit vendor-route policy aligns its route family, request shape, and auth/geokey posture with the required BodyGraph-detail strategy.  
 * Any future work that claims `bg:resolve --source vendor` proves v2 BodyGraph detail MUST show the selected vendor payload family, whether legacy fallback remains, and how the returned data maps to the existing BodyGraph/person/cache contract.  
@@ -225,6 +228,10 @@ HDAPI v2 request-shaping and response-mapping mechanics. The repo MUST provide d
 * Preserve the public Reader contract. No public Reader byte change is implied by this mechanics posture.
 
 HDAPI v2 rails and Live QA mechanics. The repo MUST provide closed-rails and open-rails proof mechanics for HumanDesignAPI v2 conformance. Closed-rails mechanics MUST prove deterministic refusal and no outbound I/O when rails are closed. Open-rails vendor smoke, when required, is PO-only execution and MUST be treated as an ops task, not PR work and not QA substitution. The mechanics MUST require secret-safe, governed evidence for any PO-run open-rails smoke, including command transcript, stdout, stderr, exit code, redacted or presence-only secret posture, request summary, result summary, and file checksums, while avoiding plaintext secrets and unapproved vendor payload storage.
+
+Production/user-surface open-rails proof posture. Mechanics affecting runtime compute, BodyGraph resolution, vendor ingest, route-policy behavior, CLI/operator-facing runtime behavior, deployed behavior, or other production/user surfaces MUST distinguish closed-rails control-flow proof from open-rails runtime behavior proof. When the owning epic or QA plan affects such a surface, PF14 expects the relevant mechanics to support at least one bounded, intentional, secret-safe, evidence-recorded open-rails QA proof for the affected runtime behavior. PF14 records the mechanical proof distinction only; QA planning, acceptance tokens, gates, and closeout posture remain owned by their single homes.
+
+Selected-route behavior proof. For BodyGraph/vendor mechanics, the proof family MUST show the actual selected runtime route behavior and preserve nonclaims for any route family, payload family, adapter/schema mapping, public surface, OPS executi
 
 HDAPI v2 error, retry, and rate-limit mechanics. The repo MUST provide deterministic mapping proofs for v2 vendor HTTP outcomes, error envelope behavior, Retry-After behavior, rate-limit headers, malformed responses, and typed HDE errors. These proofs MUST avoid vendor payload echo, avoid secrets in logs, and preserve deterministic output. This guide names the mechanical responsibility only; token semantics remain owned by HDE-Governance.
 

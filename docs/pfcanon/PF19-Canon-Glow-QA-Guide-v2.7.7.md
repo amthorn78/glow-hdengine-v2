@@ -6,10 +6,10 @@
 
 **Status:** Canon
 
-**Version:** v2.7.5  
-**Effective date:** 2026-07-01
+**Version:** v2.7.7  
+**Effective date:** 2026-07-03
 
-**Last Update Gate:** BN 11.8.7 A7-14
+**Last Update Gate:** BN 11.9.9
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -800,6 +800,17 @@ Preflight check requirements (minimum):
 
 * explicit capture of the preflight output in the check evidence directory
 
+Helper and check-registration preflight requirements apply when a Live QA Plan uses a repo-provided harness, dispatcher, helper, or wrapper that executes checks by `check_id`, step name, subcommand, or selector.
+
+Minimum proof requirements are:
+
+* prove the helper or harness exists at the referenced path in the current workspace;  
+* prove the helper or harness recognizes each planned check ID, step name, subcommand, or selector before behavior validation begins;  
+* capture the registration or listing output in the relevant check evidence directory, or in a D0/preflight artifact that the check evidence references;  
+* if registration cannot be proven without running the check, record the first safe invocation result and classify unknown check or unknown selector failures as tooling or plan-validity failures, not product behavior failures.
+
+A missing helper registration is `TOOLING_BLOCKED` or a plan-validity defect until corrected. If a bounded Moon Loop correction adds or repairs registration for an already-approved check, the final evidence must record the deviation, the corrected registration or invocation proof, the rerun result, and the fact that the correction did not change the proof target, rails posture, evidence identity, acceptance posture, public/private boundary, no-secret posture, or scope.
+
 Approval blocking posture. Any plan that includes invented or speculative repo-resident loci, invented scripts, or required plan-created files without exact path, creation instructions, and stated reason is invalid for approval and MUST be returned for revision.
 
 This rule does not forbid canon tooling already in-repo or minimal plan-created outputs. It forbids invented repo-resident helpers, unproven helper paths, speculative loci, and non-existent entrypoints.
@@ -1431,7 +1442,7 @@ For non-vendor behavior (serializer determinism, guards, sanity pipeline, closed
 
 Production-affecting Live QA minimum is as follows.
 
-For any epic that can affect real production functionality, deployed runtime behavior, external integrations, vendor ingest, DB persistence or retrieval, public or app-facing behavior, runtime request or response behavior, compute used by production, or secret or environment binding, the Live QA Plan MUST include at least one bounded open-rails live QA step that proves a real production-relevant behavior in the deployed or live environment.
+For any epic that can affect real production functionality, deployed runtime behavior, external integrations, vendor ingest, vendor route policy, external API transport, DB persistence or retrieval, public or app-facing behavior, CLI behavior, operator-facing CLI surfaces, runtime request or response behavior, compute used by production, admin or ops-facing behavior that can affect production, or secret or environment binding, the Live QA Plan MUST include at least one bounded open-rails live QA step that proves a real production-relevant behavior in the deployed or live environment.
 
 Closed-rails proof remains required where applicable, but closed-rails proof alone is not sufficient for a production-affecting epic unless the plan records an explicit authorized exemption. A valid exemption must state why open-rails live QA is not safe or not applicable, what closed-rails proof remains available, what production claim is not being made, and what follow-up is required before the omitted production-facing claim can be made.
 
@@ -1667,6 +1678,14 @@ A supplied Codex Audit may support QA planning context and pre-QA repo-reality f
 Codex Audit observed evidence does not by itself prove QA PASS, acceptance-token satisfaction, Live QA execution, OPS completion, PF09 status movement, epic closure, live vendor truth, production truth, secret validity, runtime conformance beyond observed repo reality, or canon authority. Those claims still require the owning PF source, governed QA evidence, OPS evidence, PO confirmation, or later closeout evidence as applicable.
 
 QA plan reviewers MUST NOT reject a plan solely because repo-reality context came from a supplied Codex Audit. Reviewers must block only when the observation is overclaimed beyond repo reality, materially ambiguous, stale without a planned current check, contradictory to PF10 or PF-Canon, or used as acceptance, QA, OPS, closure, PF09-drainage, canon, or live-vendor proof without the owning source.
+
+**Audit provenance in QA planning (planning context only)**
+
+Audit provenance may be used in QA Plans, QA Guides, review artifacts, retrospectives, proof-obligation rationale, Tracked Issues, ADR stubs, and planning notes when it explains why work exists, what prior review observed, what risk or ambiguity was surfaced, what repo area should be inspected, what PF-canon or PF09 mapping may need attention, or why a future proof obligation exists.
+
+Audit provenance is not a blocker merely because it appears in a plan or review artifact. It becomes a blocker only when the artifact turns the audit into PR instructions, OPS instructions, step-by-step execution procedure, command source, acceptance authority, token authority, QA PASS proof, OPS completion proof, PF09 Done proof, closeout proof, current repo truth without repo validation, source of invented file or path existence, required deliverable authority, privileged live action authority, or source of secrets or external state.
+
+QA reviewers MUST distinguish audit provenance from operative task language. If audit context is needed for execution, convert it into neutral QA or implementation language such as inspect the current repo state, validate the current route policy, prove the current behavior, update governed evidence, preserve the nonclaim, or bind the evidence under the governed root.
 
 **d0 introspection checklist**
 
@@ -6590,6 +6609,23 @@ Durable QA learnings are as follows:
 * Final QA closeout review for HDE-EPIC035 was supportable for Lead closure review because the repo evidence, OPS evidence, Live QA logs, acceptance map, token-evidence matrix, evidence indexes, path proofs, QA RCA and Doc Delta summary, and nonclaim boundaries aligned for the scoped epic. That posture remains a QA and Lead review conclusion, not a claim that PF19 owns close-pack bytes, board state, PF09 status changes, merge provenance, or PF-canon drainage.  
 * HDE-EPIC035 QA RCA preserved two durable failure-prevention lessons. First, syntax or helper-code formatting defects must be classified separately from proof defects when proof identity is clear. Second, evidence-loop closure must preserve explicit nonclaims for full HumanDesignAPI v2 runtime conformance, public Reader change, new public route, app-side vendor credential ownership, raw payload persistence, and AI scope.  
 * HDE-EPIC035 post-implementation audit observations were classification observations, not new QA obligations by default. Audit findings about presenter or adapter namespace, route placement, evidence roots, deterministic compute boundaries, vendor seam placement, lower-case roots, and root proliferation should route to their owning PF homes and should not become PF19 acceptance criteria, new PF09 tasks, mechanics deltas, architecture deltas, evidence homes, token obligations, or runnable-evidence work by assumption.
+
+Known non-goals: this entry does not redefine token semantics, A7 byte rules, transport bytes, public Reader posture, exact vendor endpoint bytes, exact auth header values, exact request-body fields, exact response-envelope bytes, exact credential values, exact evidence paths, exact tests, exact PF09.5 status rows, exact Live QA runbook bytes, final QA closeout report bytes, QA RCA bytes, AI runtime scope, public Reader changes, new HTTP homes, PF23 audit requirements, PF29 workflow text, or concrete PF02, PF03, PF05, PF09.5, PF12, PF14, PF20, PF27, or PF29 doc deltas. PF19 records QA posture and review learnings only.
+
+## **13.16 HDE-EPIC036 — QA learnings snapshot for bg:resolve route-policy classification, evidence-loop binding, Live QA remediation, and closure-axis separation**
+
+HDE-EPIC036 produced a durable QA posture for the remaining Fermentation route-policy gap around `bg:resolve --source vendor`. The durable lesson is that route-policy classification, BodyGraph-detail runtime compatibility, evidence-loop binding, Live QA PASS, helper remediation, non-QA-root evidence refresh routing, PF09 drainage, PO closeout, board update, and PF-canon drainage are separate proof classes.
+
+Durable QA learnings are as follows:
+
+* PR-01 route-policy proof may establish that `bg:resolve --source vendor` selects `unsupported_runtime_nonclaim` for configured v2 bases while preserving explicit legacy BodyGraph fallback for non-v2 bases. That proof is acceptable only when it preserves closed-rails refusal semantics, route-auth metadata posture, no accidental `/v2/bodygraphs` request construction, no public Reader change, no new HTTP home, no app-side HumanDesignAPI ownership, no AI scope, no raw payload persistence, no OPS execution, and no full HumanDesignAPI v2 runtime-conformance claim.  
+* PR-02 evidence-loop binding may bind PR-01 route-policy evidence into governed acceptance-boundary artifacts, token-evidence matrices, viability logs, doc-delta surfaces, Human Index rows, Machine Mirror rows, hash sentinels, and path proofs. That binding may support later PF09.5 drainage for HDE-FERM008.6, but it does not itself perform PF09 status movement, HDE-FERM008 parent Done, epic closeout, OPS completion, public-surface change, or full runtime conformance.  
+* Live QA PASS for HDE-EPIC036 was check-scoped. Step-0B through PO-009, PO-010, and PO-011 through qa-14 were PASS-grade only because each selected check had current governed evidence, check-scoped primary logs or artifacts, path proofs, manifest coverage where required, and explicit nonclaims. A PASS review of the QA ladder does not by itself perform PO closeout, board update, merge action, PF09 drain, PF-canon drain, OPS completion, production deployment, or final acceptance.  
+* PO-010 proved a bounded open-rails route-policy behavior: `PROVIDER_ROUTE_UNSUPPORTED`, `unsupported_runtime_nonclaim`, redacted base posture, and redacted route-auth posture for the approved route-policy objective. It did not prove full HumanDesignAPI v2 runtime conformance, BodyGraph-detail compatibility, public Reader behavior, raw payload persistence, or AI scope.  
+* HDE-EPIC036 exposed a helper-registration failure pattern. If a plan-defined check is referenced as executable but the helper or harness does not register the check ID, QA must classify the issue as tooling or plan-validity failure, not product behavior failure. A bounded Moon Loop correction may make the check runnable only when it preserves proof identity and records the deviation, corrected registration, rerun result, and final PASS evidence.  
+* HDE-EPIC036 exposed a non-QA-root evidence-routing pattern. When final PASS-grade QA evidence depends on refreshed governed evidence outside the approved QA root, the PASS receipt must cite an approved routing receipt or work item. Such refreshes are PR, OPS, QA plan update, or documentation-update work as applicable; they must not be relabeled as bounded Moon Loop work merely because they unblock a QA PASS.  
+* Post-implementation audit triage remained classification-only. Findings about presenter namespace ambiguity, CLI entrypoint versus auxiliary script ambiguity, split HTTP or adapter placement, route concentration, multi-root evidence interpretation, deterministic compute versus sanctioned I/O seams, vendor or DB seam placement, path-case conventions, and truth-home-like root proliferation should route to owning PF homes and should not become PF19 acceptance criteria, new PF09 tasks, mechanics deltas, architecture deltas, evidence homes, token obligations, or runnable-evidence work by assumption.  
+* Final closeout posture was ready with caveats for Lead review. The evidence package was strong enough to support phase-close review under the recorded closure-trace standard, but the recommendation did not perform PO closeout, board update, PF09 status movement, PF-canon update, OPS completion, production deployment, or final acceptance.
 
 Known non-goals: this entry does not redefine token semantics, A7 byte rules, transport bytes, public Reader posture, exact vendor endpoint bytes, exact auth header values, exact request-body fields, exact response-envelope bytes, exact credential values, exact evidence paths, exact tests, exact PF09.5 status rows, exact Live QA runbook bytes, final QA closeout report bytes, QA RCA bytes, AI runtime scope, public Reader changes, new HTTP homes, PF23 audit requirements, PF29 workflow text, or concrete PF02, PF03, PF05, PF09.5, PF12, PF14, PF20, PF27, or PF29 doc deltas. PF19 records QA posture and review learnings only.
 

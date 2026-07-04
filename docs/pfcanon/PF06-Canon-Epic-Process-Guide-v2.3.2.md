@@ -2,13 +2,13 @@
 
 **Title:** PF06-Canon-Epic-Process-Guide 
 
-**Version:** v2.3.1
+**Version:** v2.3.2
 
 **Status:** Canon
 
-**Effective date**: 2026-07-01
+**Effective date**: 2026-07-03
 
-**Last Update Gate:**  BN 11.8.7 A7-14
+**Last Update Gate:**  BN 11.9.9
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -818,6 +818,14 @@ Rules for Codex Audit observed evidence and IG Approved:
 * Codex Audit observed evidence may support existing-locus claims, reuse-first planning, implementation scoping, PR task inputs, OPS task dependencies, QA-prep context, and gap identification.  
 * Codex Audit observed evidence does not by itself prove acceptance-token satisfaction, QA PASS, epic closure, PF09 status movement, PO closeout, Live QA execution, OPS completion, governed evidence freshness after later changes, production truth, external vendor truth, open-rails truth, secret validity, runtime conformance beyond the observed repo fact, canon authority, or new normative rules.  
 * CodEx must still verify repo reality during execution before editing or relying on the locus.
+
+Audit provenance in planning artifacts. Audit provenance is allowed in Epic Plans, Implementation Plans, QA Guides, QA Plans, review artifacts, and retrospectives when it is used as planning context, risk context, discovery context, source-trace context, rationale for inspection, rationale for a Tracked Issue, rationale for an ADR stub, rationale for a planned workstream, rationale for a QA proof obligation, rationale for repo validation, or rationale for PF-canon drainage.
+
+Audit provenance MUST NOT be treated as PR instruction, OPS instruction, step-by-step execution procedure, CodEx command source, acceptance authority, token authority, QA PASS proof, OPS completion proof, PF09 Done proof, closeout proof, current repo truth without repo validation, source of invented file/path/module/test existence, source of required deliverables unless adopted by the plan or PF source, source of privileged live action, or source of secrets or external state.
+
+A reviewer MUST NOT block a plan solely because it includes audit provenance. A blocker is valid only when the plan turns audit provenance into execution authority or proof authority. Allowed review classifications for context-only audit provenance include No issue, Note, Context accepted, Planning provenance accepted, Repo validation required before execution, and Keep out of PR or OPS instruction text.
+
+When audit provenance appears in PR or OPS planning, convert it into neutral work language before operative execution text. Examples of neutral work language include inspect the current repo state, validate the current route policy, prove the current behavior, update governed evidence, preserve the nonclaim, or bind the evidence under the governed root.
 
 File and directory minting posture (do not invent a home)  
  Plans MAY require minting new files and directories only under an already validated, canon-defined home, or under governed QA roots (`audit/**`, `artifacts/**`) when the creation occurs during QA. Plans MUST NOT introduce a new top-level root, a second home for an existing surface, or a guessed repo layout. If a new root or new home is required, treat it as an architecture change and route it via ADR and Doc-Delta before it appears as a required path in a plan.
@@ -2766,6 +2774,12 @@ Simplified QA planning posture (planning-time expectations)
 * If a plan does specify QA steps, each step MUST define a concrete pass predicate and point to a governed evidence output (single primary file or manifest) so that acceptance is deterministic. Steps MUST reference real repo entrypoints and registered routes; missing tooling is resolved by PR work, not by QA-time script creation.
 
 A QA plan is not approval-ready if any executable step depends on undeclared or unchecked tooling.
+
+Helper and selected-check registration preflight. If a Live QA Plan, QA Guide, QA helper, runbook, or QA prompt names a helper script, helper module, QA check ID, QA step selector, runbook-local command entrypoint, or generated check registry as executable, the plan MUST include a preflight proving that the helper exists and that every selected check is registered or otherwise accepted by the helper before behavior execution begins.
+
+Missing helper registration is a plan-to-execution tooling defect, not a product behavior failure. If selected-check registration cannot be proven before execution, classify the step as TOOLING\_BLOCKED or FAIL\_TOOLING as appropriate. Do not classify it as FAIL\_BEHAVIOR unless prerequisites are proven and the observed product behavior itself fails.
+
+A bounded Moon Loop may repair helper or selected-check registration only when the correction remains inside QA-created helper surfaces or the approved QA evidence stream, preserves the original proof target, PASS or FAIL predicate, scope boundary, rails posture, secret posture, evidence identity, nonclaim boundaries, and no-new-token posture, and captures both the original failure and accepted rerun proof.
 
 For each executable step that depends on a command-line tool, interpreter, importable module, virtual environment, helper binary, or equivalent runtime dependency, the plan MUST define all of the following:
 

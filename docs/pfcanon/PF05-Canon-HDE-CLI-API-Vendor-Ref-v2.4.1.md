@@ -4,13 +4,13 @@
 
 **Title:** PF05-Canon-HDE-CLI-API-Vendor-Ref
 
-**Version:** v2.4
+**Version:** v2.4.1
 
 **Status:** Canon
 
-**Effective date:** 2026-07-01
+**Effective date:** 2026-07-03
 
-**Last Update Gate:**  BN 11.8.7 A7-14
+**Last Update Gate:**  BN 11.9.9
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -888,7 +888,7 @@ Needs development.
 
   * `db` — resolve from DB only (no vendor I/O).  
   * `vendor` — resolve from vendor only; vendor HTTP calls are allowed **only** when SAFE rails are open (`SAFE_MODE=0` and `ALLOW_NETWORK=1`). Shaping and error mapping follow §7.1/§7.2/§7.3 and the policies in **HDE-Governance** and the **HDE-Mechanics Guide** (titles-only).  
-  * `bg:resolve --source vendor` route-policy boundary — before any future runtime, production, app-integration, BodyGraph-resolution, or full HumanDesignAPI v2 conformance claim, `bg:resolve --source vendor` MUST resolve BodyGraph detail through an explicit vendor-route policy. That policy MUST classify the selected behavior as one of: v2 chart-backed BodyGraph resolution, explicit legacy BodyGraph fallback, dual-route policy, or unsupported nonclaim. It MUST preserve HD Engine ownership of vendor acquisition and BodyGraph resolution, keep secrets and raw payloads out of evidence, and distinguish simple v2 chart smoke from full BodyGraph-detail resolution. Current HDE-EPIC035 evidence records `bg:resolve --source vendor` as a legacy BodyGraph ingest-path observation against a configured v2 base, returning provider not found, while the v2 `charts/simple` route succeeded separately. Do not treat `charts/simple` success as proof that `bg:resolve` can resolve complete BodyGraph data.  
+  * `g:resolve --source vendor` route-policy boundary — configured v2 bases MUST select `unsupported_runtime_nonclaim` and fail closed with `PROVIDER_ROUTE_UNSUPPORTED` before legacy `bodygraphs` request construction. Non-v2 configured bases MAY preserve the legacy BodyGraph route only as explicit legacy fallback. `v2_chart_backed_bodygraph_resolution` and `dual_route_policy` are not implemented and MUST NOT be inferred from `charts/simple` or other v2 chart evidence without a future adapter/schema proof or ADR-backed canon update. This route policy preserves HD Engine ownership of vendor acquisition and BodyGraph resolution, keeps secrets and raw payloads out of evidence, and preserves nonclaims for full HumanDesignAPI v2 runtime conformance, public Reader changes, public routes, public payload changes, new HTTP homes, app-side vendor credential ownership, raw payload persistence, and AI scope.  
   * `auto` — DB-first, vendor-fallback according to the adapter’s environment policy (HDE-Mechanics Guide; titles-only).
 
 * Implementations MAY expose `--dry-run` and `--upsert` switches; when present they must follow the vendor rails and adapter data-source policy in §7.1/§7.4 and the **HDE-Mechanics Guide** (titles-only).
@@ -3046,11 +3046,11 @@ Acceptance impact.
 
 ### **7.3.9 HumanDesignAPI v2 live conformance pending**
 
-HumanDesignAPI v2 full live/runtime conformance remains pending. HDE-EPIC035 evidence records provider-outcome and rate-limit mapping for HDE-FERM008.3, exact response-normalization schema/adapter gap posture for HDE-FERM008.4, retained OPS-01 live-vendor observations, and PR-03 governed evidence-loop binding for HDE-FERM008.5. These proof slices do not claim HDE-FERM008 parent completion, PF09 status movement, epic closeout, full HumanDesignAPI v2 runtime conformance, public Reader changes, public route or payload changes, new HTTP homes, app-side vendor credential ownership, raw payload persistence, or AI scope.
+HumanDesignAPI v2 full live/runtime conformance remains pending. HDE-EPIC035 evidence records provider-outcome and rate-limit mapping for HDE-FERM008.3, exact response-normalization schema/adapter gap posture for HDE-FERM008.4, retained OPS-01 live-vendor observations, and PR-03 governed evidence-loop binding for HDE-FERM008.5. HDE-EPIC036 evidence records explicit `bg:resolve --source vendor` route-policy classification and evidence-loop binding for HDE-FERM008.6: configured v2 bases select `unsupported_runtime_nonclaim`, no legacy `bodygraphs` request is built for configured v2 bases, non-v2 bases preserve explicit legacy fallback, and HDE-FERM008.6 is supportable for later PF09 status drainage from repo evidence. These proof slices do not claim HDE-FERM008 parent completion, PF09 status movement, epic closeout, full HumanDesignAPI v2 runtime conformance, public Reader changes, public route or payload changes, new HTTP homes, app-side vendor credential ownership, raw payload persistence, or AI scope.
 
 Closed-rails v2 proof MUST show deterministic refusal with no DNS, socket, HTTP, or other external I/O. Any JSON emitted for refusal MUST be canonical, numeric-free where public, LF-terminated, and secret-free.
 
-Open-rails v2 smoke, when required, is an OPS task. It MUST be PO-executed, IA-guided, secret-safe, bounded, and stored under governed evidence. For vendor-ingest or other production-affecting epics, a Live QA plan MUST include at least one bounded open-rails live QA step unless an explicit authorized exemption is recorded. A live vendor smoke proves only the exercised route and MUST NOT overclaim full vendor conformance. Vendor failures should be classified by credential, environment, auth-header family, endpoint, account or tier, request shaping, response mapping, rate-limit or retry posture, vendor availability, or infrastructure gap where possible. Automated agents MUST NOT execute vendor calls, claim completion, simulate external state changes, or modify commands by guesswork to force a PASS.
+Open-rails v2 smoke, when required, is an OPS or QA action according to the approved plan and must remain PO-authorized, secret-safe, bounded, and stored under governed evidence when promoted as proof. PF05-owned CLI and vendor-ingest surfaces are production-relevant surfaces. Any epic that alters, proves, routes, classifies, or constrains CLI behavior, operator-facing CLI surfaces, vendor ingestion, vendor transport, vendor route policy, HumanDesignAPI request shaping, HumanDesignAPI auth/header behavior, BodyGraph vendor ingest, vendor response normalization, vendor error/retry/rate-limit behavior, provider transport behavior, configured base URL behavior, or environment-key binding behavior MUST include at least one bounded open-rails QA step unless an explicit PO-authorized or controlling-canon exemption is recorded before QA approval. Closed-rails refusal proof remains valuable but is not sufficient by itself for these affected open-rails runtime surfaces. The open-rails evidence MUST distinguish actual exercised route behavior from inferred route behavior and MUST preserve nonclaims for any route, payload, environment, production deployment, BodyGraph-detail sufficiency, or full runtime-conformance behavior not exercised.
 
 The v2 live-conformance evidence family MUST cover, as applicable:
 
@@ -4148,6 +4148,67 @@ These anchors bind HDE-EPIC035 vendor-seam evidence only. They do not claim QA P
   * `artifacts/evidence_index.jsonl.path_proof.txt`  
   * `artifacts/evidence_index.jsonl.sha256.path_proof.txt`  
   * Sibling `*.path_proof.txt` transcripts for each indexed HDE-EPIC035 governed artifact.
+
+#### **D.9i HDE-EPIC036 `bg:resolve --source vendor` route-policy and evidence-loop proof anchors**
+
+These anchors bind HDE-EPIC036 route-policy and evidence-loop proof surfaces only. They do not claim QA PASS beyond the cited QA step result, OPS completion, PF09 status movement, HDE-FERM008 parent Done, epic closeout, full HumanDesignAPI v2 runtime conformance, public Reader change, public route, public flag, public payload or transport change, new HTTP home, app-side HumanDesignAPI credential ownership, raw payload persistence, AI scope, board update, merge provenance, or PF-canon drainage.
+
+* **PR-01 route-policy classification and closed-rails proof**  
+  * `artifacts/vendor/hdapi_v2/bg_resolve_route_policy.snapshot.json` *(HDE-FERM008.6 route-policy snapshot; configured v2 base selects `unsupported_runtime_nonclaim`; non-v2 configured base preserves explicit legacy fallback; v2 chart-backed BodyGraph resolution and dual-route policy are not claimed)*  
+  * `artifacts/vendor/hdapi_v2/bg_resolve_route_policy.snapshot.json.path_proof.txt`  
+  * `artifacts/vendor/hdapi_v2/bg_resolve_bodygraph_detail_proof.json` *(records BodyGraph-detail sufficiency as unsupported runtime nonclaim and records no complete v2 ChartResult or ChartSimpleResult to BodyGraph/person/cache adapter in inspected loci)*  
+  * `artifacts/vendor/hdapi_v2/bg_resolve_bodygraph_detail_proof.json.path_proof.txt`  
+  * `artifacts/vendor/hdapi_v2/bg_resolve_runtime_nonclaims.json`  
+  * `artifacts/vendor/hdapi_v2/bg_resolve_runtime_nonclaims.json.path_proof.txt`  
+  * `artifacts/vendor/hdapi_v2/bg_resolve_request_shape.snapshot.json`  
+  * `artifacts/vendor/hdapi_v2/bg_resolve_request_shape.snapshot.json.path_proof.txt`  
+  * `artifacts/vendor/hdapi_v2/bg_resolve_policy_binding.snapshot.json`  
+  * `artifacts/vendor/hdapi_v2/bg_resolve_policy_binding.snapshot.json.path_proof.txt`  
+  * `audit/qa/hde-epic036/route_policy_decision.log` *(records selected route policy, no configured-v2 `bodygraphs` request, preserved non-v2 explicit legacy fallback, no public expansion, no raw payload persistence, no AI scope, and no full v2 runtime conformance)*  
+  * `audit/qa/hde-epic036/route_policy_decision.log.path_proof.txt`  
+  * `tests/bodygraph/test_bg_resolve_route_policy.py`  
+  * `tests/bodygraph/test_resolver_vendor.py`  
+  * `tests/cli/test_bg_resolve.py`  
+  * `tools/evidence/generate_hde_epic036_bg_resolve_route_policy.py`  
+* **PR-02 evidence-loop and acceptance-boundary artifacts**  
+  * `docs/acceptance_map_epic036.json` *(HDE-FERM008.6 governed evidence-loop closure for HDE-EPIC036 PR-02; approved PR-02 token roster only; route-policy classification and evidence-loop binding only)*  
+  * `docs/acceptance_map_epic036.json.path_proof.txt`  
+  * `audit/qa/hde-epic036/token_evidence_matrix.md`  
+  * `audit/qa/hde-epic036/token_evidence_matrix.md.path_proof.txt`  
+  * `audit/qa/hde-epic036/acceptance_map_viability.log`  
+  * `audit/qa/hde-epic036/acceptance_map_viability.log.path_proof.txt`  
+  * `audit/docdeltas/hde-epic036_doc_deltas.md`  
+  * `audit/docdeltas/hde-epic036_doc_deltas.md.path_proof.txt`  
+  * `audit/qa/hde-epic036/00_meta/doc_deltas.md`  
+  * `audit/qa/hde-epic036/00_meta/doc_deltas.md.path_proof.txt`  
+  * `tests/evidence/test_hde_epic036_pr02_evidence_loop.py`  
+* **QA open-rails and closeout evidence anchors**  
+  * `audit/qa/hde-epic036/checks/po-010/primary.log` *(PO-010 primary log for bounded open-rails route-policy behavior proof)*  
+  * `audit/qa/hde-epic036/checks/po-010/primary.log.path_proof.txt`  
+  * `audit/qa/hde-epic036/checks/po-010/live_route_policy.log` *(records open rails, redacted base posture, `PROVIDER_ROUTE_UNSUPPORTED`, `unsupported_runtime_nonclaim`, legacy BodyGraph route family, `bodygraphs` resource path, and redacted route auth posture)*  
+  * `audit/qa/hde-epic036/checks/po-010/live_route_policy.log.path_proof.txt`  
+  * `audit/qa/hde-epic036/qa_step_logs_manifest.json` *(Step-0B through PO-012 and `qa-13-governed-evidence-gates` check log manifest)*  
+  * `audit/qa/hde-epic036/qa_step_logs_manifest.json.path_proof.txt`  
+  * `audit/qa/hde-epic036/checks/po-011/primary.log`  
+  * `audit/qa/hde-epic036/checks/po-011/primary.log.path_proof.txt`  
+  * `audit/qa/hde-epic036/checks/po-012/primary.log`  
+  * `audit/qa/hde-epic036/checks/po-012/primary.log.path_proof.txt`  
+  * `audit/qa/hde-epic036/checks/qa-13-governed-evidence-gates/primary.log`  
+  * `audit/qa/hde-epic036/checks/qa-13-governed-evidence-gates/primary.log.path_proof.txt`  
+  * `audit/qa/hde-epic036/00_meta/discovery_artifact.md`  
+  * `audit/qa/hde-epic036/00_meta/qa_rca_doc_delta_summary.md`  
+  * `audit/qa/hde-epic036/00_meta/hde_epic036_po011_po012_qa13_qa14_action_report.md`  
+  * `audit/qa/hde-epic036/00_meta/hde_epic036_po011_po012_qa13_qa14_remediation_evidence_addendum.md`  
+* **Index, mirror, and path-proof posture**  
+  * `docs/evidence/INDEX.json`  
+  * `docs/evidence/INDEX.sha256`  
+  * `docs/evidence/INDEX.json.path_proof.txt`  
+  * `docs/evidence/INDEX.sha256.path_proof.txt`  
+  * `artifacts/evidence_index.jsonl`  
+  * `artifacts/evidence_index.jsonl.sha256`  
+  * `artifacts/evidence_index.jsonl.path_proof.txt`  
+  * `artifacts/evidence_index.jsonl.sha256.path_proof.txt`  
+  * Sibling `*.path_proof.txt` transcripts for each indexed HDE-EPIC036 governed artifact.
 
 ### **D.10 Runtime posture & env-resolver envelopes**
 

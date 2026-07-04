@@ -1,12 +1,12 @@
 # **0\. Front Matter**
 
 **Title:** PF02-Canon-HDE-Architecture  
- **Version:** v2.3.6
+ **Version:** v2.3.7
 
  **Status:** Canon  
-**Effective date:** 2026-06-30
+**Effective date:** 2026-07-03
 
- **Last Update Gate:** BN 11.8.7 A1-6
+ **Last Update Gate:** BN 11.9.9
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -1690,9 +1690,11 @@ Boundary classification is architecture-level and must distinguish `allowed`, `f
 
 PF02 owns the architectural boundary rule only. Boundary analyzers, renderer separation, table-driven taxonomy, generated evidence artifacts, path proofs, tests, and validation mechanics live in HDE-Mechanics Guide, HDE-Schemas & Artifacts, HDE-Build Checklist Fermentation, and Glow QA Guide by title.
 
-**`bg:resolve --source vendor` v2 chart/geokey boundary (architecture-level).** HDE-EPIC035 records `bg:resolve --source vendor` as a legacy BodyGraph ingest-path observation against the configured v2 vendor base, not as the canonical v2 chart/geokey validation path and not as proof of full v2 BodyGraph resolution. The observed v2 chart/geokey success path is separate from this CLI BodyGraph ingest observation.
+**`bg:resolve --source vendor` route-policy boundary (architecture-level).** HDE-EPIC036 records an explicit `bg:resolve --source vendor` route-policy classification. When the configured HumanDesignAPI base is v2, this path selects `unsupported_runtime_nonclaim` rather than constructing a legacy `bodygraphs` request and treating that as valid BodyGraph-detail behavior. When the configured base is non-v2, the existing legacy BodyGraph fallback remains explicit legacy behavior.
 
-PF02 must not treat `bg:resolve --source vendor` as proof that v2 chart data feeds the BodyGraph cache, compatibility inputs, or app integration. Future runtime work that keeps `bg:resolve --source vendor` supported must define an explicit vendor-route policy for resolving required BodyGraph detail, including whether the path uses a full v2 chart payload, another vendor route, or an explicit legacy fallback. Exact CLI flags, command bytes, outbound headers, request/response shapes, and evidence workflows remain owned by HDE-CLI-API-Vendor-Ref, Glow Infrastructure, HDE-Schemas & Artifacts, HDE-Mechanics Guide, HDE-Build Checklist Fermentation, and Glow QA Guide by title.
+This posture does not prove that v2 chart data feeds the BodyGraph cache, compatibility inputs, app integration, or full HumanDesignAPI v2 runtime conformance. It also does not create a new HTTP home, public Reader change, public route, app-side HumanDesignAPI ownership, AI scope, raw payload persistence approval, or broad vendor-conformance claim. Future work that wants v2-backed BodyGraph resolution must implement or prove a bounded adapter/schema path from v2 ChartResult or ChartSimpleResult into the existing internal BodyGraph/person/cache contract, or adopt a future ADR-defined route policy.
+
+Exact CLI flags, command bytes, outbound headers, request/response shapes, error codes, evidence artifacts, and QA workflows remain owned by HDE-CLI-API-Vendor-Ref, Glow Infrastructure, HDE-Schemas & Artifacts, HDE-Mechanics Guide, HDE-Build Checklist Fermentation, and Glow QA Guide by title.
 
 **Repo-local seam location (names-only).**
 

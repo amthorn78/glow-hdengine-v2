@@ -4,13 +4,13 @@
 
 **Title:** PF12-Canon-HDE-Schemas-and-Artifacts
 
-**Version:** v2.7.3
+**Version:** v2.7.4
 
 **Status:** Canon
 
-**Effective date:** 2026-07-01
+**Effective date:** 2026-07-03
 
-**Last Update Gate:** BN 11.8.7 A7-14
+**Last Update Gate:** BN 11.9.9
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -1199,6 +1199,43 @@ These artifacts are governed current-state QA evidence for HDE-EPIC035 Live QA P
 * `audit/qa/hde-epic035/00_meta/discovery_artifact.md.path_proof.txt`: Required sibling path-proof transcript when the discovery artifact is treated as governed evidence.  
 * `audit/qa/hde-epic035/00_meta/qa_rca_doc_delta_summary.md`: HDE-EPIC035 QA RCA and Doc Delta summary artifact. Non-empty UTF-8 markdown when present. It supports QA closeout review only and MUST NOT be treated as PO closeout, board update, PF edit, merge, PF09 status movement, OPS completion, full runtime conformance, public expansion, raw payload persistence, or AI scope.  
 * `audit/qa/hde-epic035/00_meta/qa_rca_doc_delta_summary.md.path_proof.txt`: Required sibling path-proof transcript when the QA RCA and Doc Delta summary is treated as governed evidence.
+
+HDE-EPIC036 PR-02, Live QA, governed evidence, and closeout-support current-state artifacts.
+
+These artifacts are governed current-state evidence for HDE-EPIC036 route-policy, evidence-loop binding, Live QA, governed-evidence-gate, and closeout-support posture. They do not by themselves claim OPS completion, PF09 status movement, HDE-FERM008 parent Done, PO closeout, board update, merge action, PF edit, full HumanDesignAPI v2 runtime conformance, public Reader change, public route, public flag, public payload or transport change, new HTTP home, app-side HumanDesignAPI credential ownership, raw payload persistence, or AI scope.
+
+PR-02 evidence-loop artifacts.
+
+* `docs/acceptance_map_epic036.json`: HDE-EPIC036 PR-02 acceptance map. Canonical JSON. It binds existing registered baseline tokens only and MUST preserve HDE-FERM008.6 route-policy and evidence-loop scope, no OPS execution for PR-02, no QA PASS claim unless separately proven, no PF09 status movement, no HDE-FERM008 parent Done, no epic closeout, no full runtime conformance, and no public or AI scope claims.  
+* `docs/acceptance_map_epic036.json.path_proof.txt`: Required sibling path-proof transcript when the acceptance map is treated as governed evidence.  
+* `audit/qa/hde-epic036/token_evidence_matrix.md`: HDE-EPIC036 token-to-evidence matrix. UTF-8 markdown. It MUST distinguish token evidence binding from QA PASS, OPS completion, closeout review, and PF09 drainage.  
+* `audit/qa/hde-epic036/token_evidence_matrix.md.path_proof.txt`: Required sibling path-proof transcript when the token-evidence matrix is treated as governed evidence.  
+* `audit/qa/hde-epic036/acceptance_map_viability.log`: LF-terminated acceptance-map viability log for the PR-02 evidence-loop family.  
+* `audit/qa/hde-epic036/acceptance_map_viability.log.path_proof.txt`: Required sibling path-proof transcript when the viability log is treated as governed evidence.  
+* `audit/docdeltas/hde-epic036_doc_deltas.md`: HDE-EPIC036 doc-delta surface. UTF-8 markdown. It records later-drain targets and MUST NOT be treated as the PF-canon drain itself.  
+* `audit/docdeltas/hde-epic036_doc_deltas.md.path_proof.txt`: Required sibling path-proof transcript when the doc-delta surface is treated as governed evidence.  
+* `audit/qa/hde-epic036/00_meta/doc_deltas.md`: HDE-EPIC036 QA meta doc-delta surface. UTF-8 markdown. It records QA-root doc-delta context and MUST NOT be treated as the PF-canon drain itself.  
+* `audit/qa/hde-epic036/00_meta/doc_deltas.md.path_proof.txt`: Required sibling path-proof transcript when the QA meta doc-delta surface is treated as governed evidence.
+
+Live QA and route-policy check artifacts.
+
+* `audit/qa/hde-epic036/checks/po-010/live_route_policy.log`: LF-terminated open-rails route-policy log. It records the bounded open-rails QA observation for the `bg:resolve --source vendor` route-policy surface and MUST preserve unsupported-runtime nonclaim, redacted base URL, redacted auth posture, no raw payload persistence, and no full runtime conformance claims.  
+* `audit/qa/hde-epic036/checks/po-010/live_route_policy.log.path_proof.txt`: Required sibling path-proof transcript when the live-route-policy log is treated as governed evidence.  
+* `audit/qa/hde-epic036/qa_step_logs_manifest.json`: HDE-EPIC036 QA step-logs manifest. Canonical JSON. It records check IDs, statuses, primary-log paths, and primary-log path-proof paths when those fields are produced by the plan or harness.  
+* `audit/qa/hde-epic036/qa_step_logs_manifest.json.path_proof.txt`: Required sibling path-proof transcript when the QA step-logs manifest is treated as governed evidence.  
+* `audit/qa/hde-epic036/checks/qa-13-governed-evidence-gates/primary.log`: HDE-EPIC036 governed-evidence-gates primary log. Non-empty UTF-8 text. It records governed evidence checks, canonical JSON checks, targeted tests, evidence-index checks, mirror checks, hash checks, LF checks, and token-support posture when those checks are executed.  
+* `audit/qa/hde-epic036/checks/qa-13-governed-evidence-gates/primary.log.path_proof.txt`: Required sibling path-proof transcript when the qa-13 primary log is treated as governed evidence.  
+* `audit/qa/hde-epic036/checks/qa-14-close-out-deliverables/primary.log`: HDE-EPIC036 closeout-deliverables primary log. Non-empty UTF-8 text. It records closeout assembly evidence and MUST preserve nonclaims when it is treated as governed evidence.  
+* `audit/qa/hde-epic036/checks/qa-14-close-out-deliverables/primary.log.path_proof.txt`: Required sibling path-proof transcript when the qa-14 primary log is treated as governed evidence.
+
+Closeout-support and remediation-routing artifacts.
+
+* `audit/qa/hde-epic036/00_meta/discovery_artifact.md`: HDE-EPIC036 discovery artifact. Non-empty UTF-8 markdown when present. It records repo-locus grounding and retained evidence inspection posture.  
+* `audit/qa/hde-epic036/00_meta/discovery_artifact.md.path_proof.txt`: Required sibling path-proof transcript when the discovery artifact is treated as governed evidence.  
+* `audit/qa/hde-epic036/00_meta/qa_rca_doc_delta_summary.md`: HDE-EPIC036 QA RCA and Doc Delta summary artifact. Non-empty UTF-8 markdown when present. It supports QA closeout review only and MUST NOT be treated as PO closeout, board update, PF edit, merge, PF09 status movement, OPS completion, full runtime conformance, public expansion, raw payload persistence, or AI scope.  
+* `audit/qa/hde-epic036/00_meta/qa_rca_doc_delta_summary.md.path_proof.txt`: Required sibling path-proof transcript when the QA RCA and Doc Delta summary is treated as governed evidence.  
+* `audit/qa/hde-epic036/00_meta/hde_epic036_po011_po012_qa13_qa14_remediation_evidence_addendum.md`: HDE-EPIC036 remediation evidence addendum. Non-empty UTF-8 markdown when present. It records routing receipt posture for non-QA-root governed evidence refreshes used by final PASS-grade QA evidence and MUST distinguish PR routing from Moon Loop, OPS execution, PF09 movement, PO closeout, full runtime conformance, public expansion, raw payload persistence, and AI scope.  
+* `audit/qa/hde-epic036/00_meta/hde_epic036_po011_po012_qa13_qa14_remediation_evidence_addendum.md.path_proof.txt`: Required sibling path-proof transcript when the remediation evidence addendum is treated as governed evidence.
 
 Titles-only routing rule
 
@@ -5456,6 +5493,34 @@ The evidence MUST distinguish simple route availability from full BodyGraph-deta
 
 The evidence MUST NOT treat accidental `/v2/bodygraphs` composition, route-family mismatch, or a wrong-shape 404 as generic provider unavailability. It MUST classify route-shape mismatch separately from provider unavailability when that distinction is visible.
 
+##### HDE-EPIC036 `bg_resolve_*` route-policy evidence family.
+
+##### These artifacts are governed HDAPI v2 BodyGraph route-policy evidence for HDE-EPIC036. They do not by themselves claim QA PASS, OPS completion, PF09 status movement, HDE-FERM008 parent Done, epic closeout, full HumanDesignAPI v2 runtime conformance, public Reader change, public route, public flag, public payload or transport change, new HTTP home, app-side HumanDesignAPI credential ownership, raw payload persistence, or AI scope.
+
+* ##### `artifacts/vendor/hdapi_v2/bg_resolve_route_policy.snapshot.json`: Canonical JSON snapshot of the selected `bg:resolve --source vendor` route policy. It MUST record configured-v2 unsupported-runtime nonclaim, non-v2 explicit legacy fallback, dual-route policy nonimplementation unless later implemented, selected route family, redacted auth posture, geocode posture, and no-claim boundaries.
+
+* ##### `artifacts/vendor/hdapi_v2/bg_resolve_route_policy.snapshot.json.path_proof.txt`: Required sibling path-proof transcript when the route-policy snapshot is treated as governed evidence.
+
+* ##### `artifacts/vendor/hdapi_v2/bg_resolve_bodygraph_detail_proof.json`: Canonical JSON proof of BodyGraph-detail sufficiency or explicit unsupported-runtime nonclaim. It MUST NOT treat `charts/simple` success, route availability, provider availability, or wrong-shape legacy BodyGraph behavior as proof that v2 chart data feeds existing BodyGraph, person, cache, or compatibility flows.
+
+* ##### `artifacts/vendor/hdapi_v2/bg_resolve_bodygraph_detail_proof.json.path_proof.txt`: Required sibling path-proof transcript when the BodyGraph-detail proof is treated as governed evidence.
+
+* ##### `artifacts/vendor/hdapi_v2/bg_resolve_runtime_nonclaims.json`: Canonical JSON nonclaim ledger for `bg:resolve --source vendor` route-policy work. It MUST preserve no full runtime conformance, no public Reader change, no public route, no public flag, no public payload change, no new HTTP home, no app-side vendor credential ownership, no raw request or response body persistence, no raw payload persistence, and no AI scope claims unless later evidence explicitly changes those claims.
+
+* ##### `artifacts/vendor/hdapi_v2/bg_resolve_runtime_nonclaims.json.path_proof.txt`: Required sibling path-proof transcript when the runtime nonclaims artifact is treated as governed evidence.
+
+* ##### `artifacts/vendor/hdapi_v2/bg_resolve_request_shape.snapshot.json`: Canonical JSON request-shape snapshot for `bg:resolve --source vendor`. It MUST distinguish configured-v2 unsupported-runtime posture from explicit legacy fallback and MUST record whether a request is constructed or blocked before request construction.
+
+* ##### `artifacts/vendor/hdapi_v2/bg_resolve_request_shape.snapshot.json.path_proof.txt`: Required sibling path-proof transcript when the request-shape snapshot is treated as governed evidence.
+
+* ##### `artifacts/vendor/hdapi_v2/bg_resolve_policy_binding.snapshot.json`: Canonical JSON policy-binding snapshot that ties route-policy evidence, BodyGraph-detail evidence, request-shape evidence, runtime nonclaims, and follow-up boundaries together. It MUST distinguish PR implementation proof from later evidence-loop binding, QA proof, OPS execution, PF09 drainage, and closeout.
+
+* ##### `artifacts/vendor/hdapi_v2/bg_resolve_policy_binding.snapshot.json.path_proof.txt`: Required sibling path-proof transcript when the policy-binding snapshot is treated as governed evidence.
+
+* ##### `audit/qa/hde-epic036/route_policy_decision.log`: LF-terminated route-policy decision log for HDE-EPIC036 PR-01. It records the selected classification, request-shape posture, explicit legacy fallback posture, dual-route posture, BodyGraph-detail sufficiency posture, and no-claim boundaries.
+
+* ##### `audit/qa/hde-epic036/route_policy_decision.log.path_proof.txt`: Required sibling path-proof transcript when the route-policy decision log is treated as governed evidence.
+
 ##### HDAPI v2 source-cache inputs.
 
 * ##### `artifacts/vendor/hdapi_v2/source_cache/v2-routes.yaml`: Source-cache route-spec input for validated v2 routes. UTF-8 YAML text when present.
@@ -5535,6 +5600,18 @@ The evidence MUST NOT treat accidental `/v2/bodygraphs` composition, route-famil
 * ##### `hdapi_v2.rate_limit_headers` maps to `artifacts/vendor/hdapi_v2/rate_limit_headers.snapshot.json`
 
 * ##### `hdapi_v2.release_binding` maps to `artifacts/vendor/hdapi_v2/release_binding.snapshot.json`
+
+* `hdapi_v2.bg_resolve_route_policy` maps to `artifacts/vendor/hdapi_v2/bg_resolve_route_policy.snapshot.json`  
+* `hdapi_v2.bg_resolve_bodygraph_detail_proof` maps to `artifacts/vendor/hdapi_v2/bg_resolve_bodygraph_detail_proof.json`  
+* `hdapi_v2.bg_resolve_runtime_nonclaims` maps to `artifacts/vendor/hdapi_v2/bg_resolve_runtime_nonclaims.json`  
+* `hdapi_v2.bg_resolve_request_shape` maps to `artifacts/vendor/hdapi_v2/bg_resolve_request_shape.snapshot.json`  
+* `hdapi_v2.bg_resolve_policy_binding` maps to `artifacts/vendor/hdapi_v2/bg_resolve_policy_binding.snapshot.json`  
+* `epic036.pr01.route_policy_decision` maps to `audit/qa/hde-epic036/route_policy_decision.log`  
+* `epic036.pr02.acceptance_map` maps to `docs/acceptance_map_epic036.json`  
+* `epic036.pr02.token_matrix` maps to `audit/qa/hde-epic036/token_evidence_matrix.md`  
+* `epic036.pr02.acceptance_map_viability` maps to `audit/qa/hde-epic036/acceptance_map_viability.log`  
+* `epic036.pr02.doc_deltas` maps to `audit/docdeltas/hde-epic036_doc_deltas.md`  
+* `epic036.pr02.qa_meta_doc_deltas` maps to `audit/qa/hde-epic036/00_meta/doc_deltas.md`
 
 ##### Source precedence and quarantine.
 
@@ -5635,6 +5712,10 @@ Production-affecting open-rails Live QA evidence.
 When a Live QA plan includes a bounded open-rails step for production-affecting behavior, the evidence MUST remain redacted, bounded, and governed. It MAY record header names, redacted header-shape posture, endpoint or route family, environment label, rails posture, request class, result class, and safe status or error classification. It MUST NOT record raw secrets, raw bearer tokens, raw API keys, uncontrolled production data, full private payloads, or full vendor payload bodies unless a later owning canon explicitly permits that payload and the evidence is still secret-safe.
 
 Open-rails Live QA evidence proves only the behavior actually exercised. It MUST preserve nonclaim boundaries for full runtime conformance, parent-task completion, public Reader expansion, new public routes, new public flags, public payload changes, new HTTP homes, AI scope, PO closeout, and epic closure unless those claims are separately bound by their owning canon and governed evidence.
+
+Open-rails QA evidence-family distinction.
+
+When an epic requires open-rails QA, PF12-governed artifacts MUST keep the open-rails QA proof family distinguishable from closed-rails proof, OPS evidence, implementation evidence, repo inspection, static validation, schema validation, Evidence Index validation, Machine Mirror validation, and path-proof validation. The Human Evidence Index and Machine Evidence Mirror SHOULD preserve the distinction through artifact keys, roles, paths, notes, record types, or equivalent governed metadata emitted by the evidence tooling. A prior OPS observation may be referenced only when it is explicitly bound into QA evidence or accepted under QA posture by the owning QA plan and evidence artifacts.
 
 QA\_PLAN\_UPDATE routing for non-QA-root governed evidence.
 
