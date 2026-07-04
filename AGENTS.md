@@ -15,6 +15,7 @@
 
 ## Operating workflow (closed rails, evidence discipline)
 - Closed rails default: `LC_ALL=C`, `LANG=C`, `TZ=UTC`, `SAFE_MODE=1`, `ALLOW_NETWORK=0` enforced by `engine.runtime.determinism_env.ensure_determinism_env` and checked via `ci/checks/check_env_pins.sh`. No network access for public/QA surfaces unless explicitly allowed for a governed harness.
+- Search tooling note: `rg` is not available in this workspace container; use `find`/`grep`-based search instead of assuming ripgrep is installed.
 - Pytest readiness rule: always install dev test dependencies before pytest-dependent checks using `python -m pip install -r requirements-dev.txt` (or the environment-equivalent Python executable), then run `python -m pytest --version` as readiness proof.
 - PF05 showcompat posture: when Live QA requires `hdctl showcompat` in pre-Glow environments, use birth-argument inputs with `--source vendor` and allow open rails as required by the plan; record the active env values in the step log. Treat zero-arg showcompat plans as planning defects and apply a minimal Moon Loop deviation to align with PF05.
 - Conjunction surfaces (EPIC027): use `hdctl showcompat --conjunction` for CLI conjunction output. Input modes are verified in-repo as `--user-a/--user-b`, `--pair-file`, `--a-file/--b-file`, or stdin pair payloads; do not invent `--pair` syntax.
@@ -95,3 +96,6 @@
 ## EPIC022 lessons (anti-drift)
 - Deterministic scenarios first: parity/error envelopes and showcompat captures must run under pinned rails (no “environment roulette”) with stdout/stderr separation proven by tests and governed artifacts.
 - Acceptance artifacts stay single-source: token matrices and acceptance maps must bind to concrete evidence/tests (no duplicate rows or placeholder evidence once concrete artifacts exist); showcompat D2 captures stay indexed with sha256 sidecars and path proofs; `/internal/version` D3 bundles and the close-pack (manifest + close report + sanity log) are present and must not be claimed as missing. PF05 exit-code taxonomy remains canonical even while repo tests pin showcompat vendor/engine errors to exit 1; PF20 D3 references a provenance note while implementation follows the PF10 posture (governed two-run/coupling log) — document the mismatch when relevant.
+
+## Local Codex recovery note
+- If the VS Code Codex extension hangs without prompting for authentication, check `/home/vscode/.codex/auth.json` first. In the observed failure, the extension had cached ChatGPT tokens and therefore did not re-open auth, so the fix was to back up and remove `/home/vscode/.codex/auth.json`, delete `/home/vscode/.codex/.tmp/plugins/plugins/ngs-analysis`, and restart VS Code so Codex could rebuild a clean auth state and prompt again.
