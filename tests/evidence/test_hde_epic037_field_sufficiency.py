@@ -93,3 +93,16 @@ def test_evaluate_payload_family_fails_closed_for_unknown_family() -> None:
     assert result["field_sufficiency"] == "INSUFFICIENT"
     assert result["compute_ready"] is False
     assert result["fail_closed"] is True
+
+
+def test_index_registration_does_not_claim_unproduced_log_or_privacy_tokens() -> None:
+    from tools.evidence import update_evidence_index as updater
+
+    nonclaims = next(
+        entry
+        for entry in updater.EPIC037_PR01_PRIMARY_ARTIFACTS
+        if entry["artifact_key"] == "hdapi_v2.hde_epic037_adapter_contract_nonclaims"
+    )
+    assert "VENDOR_NO_PAYLOAD_LOGGING_OK" in nonclaims["tokens"]
+    assert "LOGS_KEYS_ONLY_OK" not in nonclaims["tokens"]
+    assert "BG_PRIVACY_REDACTION_OK" not in nonclaims["tokens"]
