@@ -1,5 +1,5 @@
 path: artifacts/vendor/hdapi_v2/hde_epic037_field_sufficiency_proof.json
 size_bytes: 5025
-sha256: f7cce4d055cb496a8b16702960e787e7eec23e916e686614ffdb8fe7709c9a46
-mtime_utc: 2026-07-04T23:12:48Z
-produced_at_utc: 2026-07-04T23:12:48Z
+sha256: c978f0c930f4c1b99cc9d2d2bd78537e0fbd1f317e8116a9da177b14782e8b91
+mtime_utc: 2026-07-05T14:58:27Z
+produced_at_utc: 2026-07-05T14:58:27Z

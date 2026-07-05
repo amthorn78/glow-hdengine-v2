@@ -124,25 +124,29 @@ def route_auth_posture(path: str) -> str:
 def classify_bg_resolve_route_policy(base_url: str) -> dict[str, Any]:
     """Classify bg:resolve vendor routing before any BodyGraph request is built."""
     version = _configured_base_version(base_url)
+    if version == "v2":
+        chart_path = "charts"
+        contract = _ROUTE_CONTRACTS[chart_path]
+        return {
+            "configured_base_version": version,
+            "resource_path": chart_path,
+            "route_family": "recommended_v2_chart",
+            "payload_family": "ChartResult",
+            "route_auth_posture": route_auth_posture(chart_path),
+            "geocode_required": contract[1],
+            "classification": "adapter_backed_v2_chart",
+            "supported": True,
+            "reason": "configured v2 base uses the governed chart route and deterministic ChartResult adapter for bg:resolve",
+        }
     legacy_path = "bodygraphs"
     contract = _ROUTE_CONTRACTS[legacy_path]
-    base_posture = {
+    return {
         "configured_base_version": version,
         "resource_path": legacy_path,
         "route_family": "legacy_bodygraph",
+        "payload_family": "BodyGraph",
         "route_auth_posture": route_auth_posture(legacy_path),
         "geocode_required": contract[1],
-    }
-    if version == "v2":
-        return {
-            **base_posture,
-            "classification": "unsupported_runtime_nonclaim",
-            "supported": False,
-            "error_code": "PROVIDER_ROUTE_UNSUPPORTED",
-            "reason": "configured v2 base cannot use legacy bodygraphs as final BodyGraph-detail behavior without a v2 ChartResult-to-BodyGraph adapter",
-        }
-    return {
-        **base_posture,
         "classification": "explicit_legacy_fallback",
         "supported": True,
         "reason": "configured base is not v2; bg:resolve remains on the governed legacy BodyGraph route",
@@ -358,6 +362,17 @@ class HdApiClient:
 
     def build_request(self, *, birthdate: str, birthtime: str, location: str) -> VendorRequest:
         policy = classify_bg_resolve_route_policy(self._base_url)
+        if policy["route_family"] == "recommended_v2_chart":
+            raise VendorError(
+                "PROVIDER_ROUTE_REQUIRES_ADAPTER",
+                "generic BodyGraph ingest cannot build v2 chart requests without the resolver adapter",
+                details={
+                    "classification": policy["classification"],
+                    "configured_base_version": policy["configured_base_version"],
+                    "route_family": policy["route_family"],
+                    "resource_path": policy["resource_path"],
+                },
+            )
         if not policy["supported"]:
             raise VendorError(
                 str(policy["error_code"]),

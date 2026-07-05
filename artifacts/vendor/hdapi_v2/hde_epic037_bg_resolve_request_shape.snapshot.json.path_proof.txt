@@ -1,0 +1,5 @@
+path: artifacts/vendor/hdapi_v2/hde_epic037_bg_resolve_request_shape.snapshot.json
+size_bytes: 2791
+sha256: 89d074f9097bea11d9658d93b966c9c0c2f925a26d7a13373c410dcb7b1cbefe
+mtime_utc: 2026-07-05T14:58:31Z
+produced_at_utc: 2026-07-05T14:58:31Z
