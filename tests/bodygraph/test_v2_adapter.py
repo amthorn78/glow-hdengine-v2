@@ -4,7 +4,15 @@ from engine.bodygraph.v2_adapter import CHART_RESULT_REQUIRED_FIELDS, V2ChartAda
 
 
 def chart_result_payload() -> dict[str, object]:
-    return {field: f"value:{field}" for field in CHART_RESULT_REQUIRED_FIELDS}
+    payload: dict[str, object] = {field: f"value:{field}" for field in CHART_RESULT_REQUIRED_FIELDS}
+    payload.update({
+        "activations": {"design": {}, "personality": {}},
+        "centers": ["G", "Sacral"],
+        "channelsLong": ["The Channel of Charisma (20-34)"],
+        "channelsShort": ["20-34"],
+        "gates": ["20", "34"],
+    })
+    return payload
 
 
 def context(**overrides: str) -> V2ChartAdapterContext:
@@ -68,6 +76,15 @@ def test_missing_vendor_detail_fields_fail_closed() -> None:
     assert result.code == "ADAPTER_VENDOR_DETAIL_INSUFFICIENT"
     assert result.status == "unsupported"
     assert {"authority", "birthDateUtc"} <= set(result.missing_vendor_detail_fields)
+
+
+def test_malformed_vendor_detail_shapes_fail_closed() -> None:
+    data = chart_result_payload()
+    data["centers"] = "G"
+    data["activations"] = "not-an-object"
+    result = adapt_v2_chart_payload(data, context())
+    assert result.code == "ADAPTER_VENDOR_DETAIL_INSUFFICIENT"
+    assert {"activations", "centers"} <= set(result.missing_vendor_detail_fields)
 
 
 def test_chart_simple_result_reports_detail_insufficient_on_simple_route() -> None:

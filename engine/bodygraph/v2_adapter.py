@@ -36,6 +36,9 @@ CHART_RESULT_REQUIRED_FIELDS = frozenset(
 SUPPORTED_ROUTE_FAMILIES = frozenset({"recommended_v2_chart"})
 SUPPORTED_ROUTES = frozenset({"charts", "charts/simple", "charts/coordinates", "/v2/charts", "/v2/charts/simple", "/v2/charts/coordinates", "vendor.hdapi.post:/charts", "vendor.hdapi.post:/charts/simple", "vendor.hdapi.post:/charts/coordinates"})
 _SHA256_HEX_RE = re.compile(r"^[0-9a-f]{64}$")
+_ARRAY_DETAIL_FIELDS = frozenset({"centers", "channelsLong", "channelsShort", "gates"})
+_OBJECT_DETAIL_FIELDS = frozenset({"activations"})
+_STRING_DETAIL_FIELDS = CHART_RESULT_REQUIRED_FIELDS - _ARRAY_DETAIL_FIELDS - _OBJECT_DETAIL_FIELDS
 
 
 @dataclass(frozen=True)
@@ -172,6 +175,21 @@ def _context_value(context: V2ChartAdapterContext | Mapping[str, Any], key: str)
     return value
 
 
+def _malformed_vendor_detail_fields(data: Mapping[str, Any]) -> tuple[str, ...]:
+    malformed: list[str] = []
+    for field in sorted(_STRING_DETAIL_FIELDS):
+        if field in data and _text(data[field]) is None:
+            malformed.append(field)
+    for field in sorted(_ARRAY_DETAIL_FIELDS):
+        value = data.get(field)
+        if field in data and (not isinstance(value, list) or any(not isinstance(item, str) for item in value)):
+            malformed.append(field)
+    for field in sorted(_OBJECT_DETAIL_FIELDS):
+        if field in data and not isinstance(data.get(field), Mapping):
+            malformed.append(field)
+    return tuple(malformed)
+
+
 def _unwrap_payload(payload: Mapping[str, Any], default_family: str) -> tuple[str, Mapping[str, Any] | None, str | None]:
     envelope_keys = {"data", "success", "message", "errorCode", "timestamp"}
     if envelope_keys.intersection(payload):
@@ -221,8 +239,9 @@ def adapt_v2_chart_payload(
         return _fail("ADAPTER_UNSUPPORTED_PAYLOAD_FAMILY", envelope_family)
     assert data is not None
     missing_vendor = tuple(sorted(CHART_RESULT_REQUIRED_FIELDS - set(data)))
-    if missing_vendor:
-        return _fail("ADAPTER_VENDOR_DETAIL_INSUFFICIENT", envelope_family, missing_vendor=missing_vendor)
+    malformed_vendor = _malformed_vendor_detail_fields(data)
+    if missing_vendor or malformed_vendor:
+        return _fail("ADAPTER_VENDOR_DETAIL_INSUFFICIENT", envelope_family, missing_vendor=tuple(sorted((*missing_vendor, *malformed_vendor))))
 
     person_uid = _context_value(context, "person_uid")
     resolved = {

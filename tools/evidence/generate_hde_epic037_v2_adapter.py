@@ -111,7 +111,15 @@ def _input_refs() -> dict[str, dict[str, str]]:
 
 
 def chart_result_payload() -> dict[str, Any]:
-    return {field: f"fixture:{field}" for field in sorted(CHART_RESULT_REQUIRED_FIELDS)}
+    payload: dict[str, Any] = {field: f"fixture:{field}" for field in sorted(CHART_RESULT_REQUIRED_FIELDS)}
+    payload.update({
+        "activations": {"design": {}, "personality": {}},
+        "centers": ["G", "Sacral"],
+        "channelsLong": ["The Channel of Charisma (20-34)"],
+        "channelsShort": ["20-34"],
+        "gates": ["20", "34"],
+    })
+    return payload
 
 
 def context(**overrides: str) -> V2ChartAdapterContext:
@@ -124,6 +132,7 @@ def _negative_cases() -> list[dict[str, Any]]:
     return [
         {"fixture_id": "missing_internal_identity_context", "result": adapt_v2_chart_payload({"type": "ChartResult", "data": chart_result_payload()}, context(person_uid="")).as_dict()},
         {"fixture_id": "missing_vendor_detail_fields", "result": adapt_v2_chart_payload({"type": "ChartResult", "data": {"type": "Generator"}}, context()).as_dict()},
+        {"fixture_id": "malformed_vendor_detail_shapes", "result": adapt_v2_chart_payload({**chart_result_payload(), "centers": "G", "activations": "not-an-object"}, context()).as_dict()},
         {"fixture_id": "chart_simple_result_detail_insufficient", "result": adapt_v2_chart_payload({"type": "ChartSimpleResult", "data": {"type": "Generator", "profile": "1/3", "gates": [], "channelsShort": [], "centers": {}}}, context(payload_family="ChartSimpleResult")).as_dict()},
         {"fixture_id": "malformed_payload", "result": adapt_v2_chart_payload([], context()).as_dict()},
         {"fixture_id": "missing_data", "result": adapt_v2_chart_payload({"type": "ChartResult", "success": True}, context()).as_dict()},

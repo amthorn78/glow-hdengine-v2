@@ -1,5 +1,5 @@
 path: artifacts/vendor/hdapi_v2/hde_epic037_no_raw_payload_persistence.json
 size_bytes: 1079
-sha256: 590101ec2f462862294a89bb50187c1920056e98094216ef8fff0a0f95da1465
-mtime_utc: 2026-07-05T03:26:05Z
-produced_at_utc: 2026-07-05T03:26:05Z
+sha256: 659e078677de7f02950ef9918c9e355673656a2cc1e3b843b32586db3dca1f8d
+mtime_utc: 2026-07-05T03:43:02Z
+produced_at_utc: 2026-07-05T03:43:02Z
