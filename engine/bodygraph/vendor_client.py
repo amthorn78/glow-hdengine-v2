@@ -362,6 +362,17 @@ class HdApiClient:
 
     def build_request(self, *, birthdate: str, birthtime: str, location: str) -> VendorRequest:
         policy = classify_bg_resolve_route_policy(self._base_url)
+        if policy["route_family"] == "recommended_v2_chart":
+            raise VendorError(
+                "PROVIDER_ROUTE_REQUIRES_ADAPTER",
+                "generic BodyGraph ingest cannot build v2 chart requests without the resolver adapter",
+                details={
+                    "classification": policy["classification"],
+                    "configured_base_version": policy["configured_base_version"],
+                    "route_family": policy["route_family"],
+                    "resource_path": policy["resource_path"],
+                },
+            )
         if not policy["supported"]:
             raise VendorError(
                 str(policy["error_code"]),
@@ -373,9 +384,8 @@ class HdApiClient:
                     "resource_path": policy["resource_path"],
                 },
             )
-        path = str(policy["resource_path"])
         return self.build_contract_route_request(
-            path=path,
+            path="bodygraphs",
             request_fields=("birthdate", "birthtime", "location"),
             geocode_required=True,
             birthdate=birthdate,

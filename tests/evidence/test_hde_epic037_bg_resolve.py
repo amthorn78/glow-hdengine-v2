@@ -41,6 +41,9 @@ def test_epic037_pr03_route_policy_and_request_shape_are_v2_chart_backed() -> No
     request = _load(ARTIFACTS[1])["request_shape"]
     assert request["resource_path"] == "charts"
     assert request["route"] == "vendor.hdapi.post:/charts"
+    assert request["configured_base_url"] == "<redacted>"
+    assert request["url_posture"] == "configured_base_url/charts"
+    assert "url" not in request
     assert request["no_double_version_prefix"] is True
     assert request["no_legacy_bodygraph_request_against_v2"] is True
     assert request["auth_header_posture"] == "Authorization: Bearer <redacted>"

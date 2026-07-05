@@ -94,11 +94,23 @@ def test_explicit_legacy_fallback_remains_available_for_non_v2_configured_base()
     assert policy["route_auth_posture"] == "HD-Api-Key: <redacted>"
 
 
-def test_hdapi_client_builds_v2_charts_not_bodygraphs_and_preserves_prefix() -> None:
+def test_generic_build_request_guards_v2_chart_route_from_raw_ingest() -> None:
     calls: list[str] = []
     client = _client("https://vendor.test/custom/v2", calls)
 
-    request = client.build_request(birthdate="1990-01-01", birthtime="12:00", location="Amsterdam, NL")
+    with pytest.raises(VendorError) as excinfo:
+        client.build_request(birthdate="1990-01-01", birthtime="12:00", location="Amsterdam, NL")
+
+    assert excinfo.value.code == "PROVIDER_ROUTE_REQUIRES_ADAPTER"
+    assert excinfo.value.details["resource_path"] == "charts"
+    assert calls == []
+
+
+def test_build_contract_route_request_builds_v2_charts_and_preserves_prefix() -> None:
+    calls: list[str] = []
+    client = _client("https://vendor.test/custom/v2", calls)
+
+    request = client.build_contract_route_request(path="charts", request_fields=("birthdate", "birthtime", "location"), geocode_required=True, birthdate="1990-01-01", birthtime="12:00", location="Amsterdam, NL")
 
     assert request.url == "https://vendor.test/custom/v2/charts"
     assert "/v2/v2/" not in request.url
@@ -147,7 +159,8 @@ def test_v2_resolver_dry_run_maps_payload_through_adapter(monkeypatch: pytest.Mo
     assert result.payload["resolved"]["source"] == "hdapi_v2_chart_adapter"
     assert result.payload["cache"]["payload_posture"] == "adapter_mapped_no_raw_vendor_payload"
     assert result.payload["resolver"]["request"]["header_posture"] == ["Authorization: Bearer <redacted>", "HD-Geocode-Key: <redacted>"]
-    assert "bodygraphs" not in result.payload["resolver"]["request"]["url"]
+    assert result.payload["resolver"]["request"]["configured_base_url"] == "<redacted>"
+    assert result.payload["resolver"]["request"]["url_posture"] == "configured_base_url/<resource_path>"
 
 
 def test_v2_adapter_unsupported_becomes_typed_resolver_error(monkeypatch: pytest.MonkeyPatch) -> None:

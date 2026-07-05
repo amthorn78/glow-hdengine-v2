@@ -1,5 +1,5 @@
 path: artifacts/vendor/hdapi_v2/hde_epic037_bg_resolve_legacy_fallback.snapshot.json
 size_bytes: 1184
-sha256: 1baf81d4b798d2d913cd0d1e26556f0bbee5cb88512a4a0f6b636e02bd05579e
-mtime_utc: 2026-07-05T14:15:07Z
-produced_at_utc: 2026-07-05T14:15:07Z
+sha256: 790a7331b1ee73ade34d9b0e9a2157e1c9aa2bfbe6eeb9ebd1ea17efb5ad8cdb
+mtime_utc: 2026-07-05T14:58:31Z
+produced_at_utc: 2026-07-05T14:58:31Z
