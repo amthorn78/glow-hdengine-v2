@@ -126,6 +126,15 @@ def test_incomplete_standard_response_envelope_fails_closed() -> None:
     assert result.code == "ADAPTER_MALFORMED_ENVELOPE"
 
 
+def test_success_envelope_requires_string_error_code() -> None:
+    result = adapt_v2_chart_payload(
+        {"timestamp": "2026-07-05T00:00:00.000Z", "success": True, "message": "Chart generated", "errorCode": None, "type": "ChartResult", "data": chart_result_payload()},
+        context(),
+    )
+    assert result.status == "unsupported"
+    assert result.code == "ADAPTER_MALFORMED_ENVELOPE"
+
+
 def test_failed_standard_response_envelope_fails_closed() -> None:
     result = adapt_v2_chart_payload(
         {"timestamp": "2026-07-05T00:00:00.000Z", "success": False, "message": "Invalid birthdate", "errorCode": "INVALID_BIRTHDATE", "type": "ChartResult", "data": chart_result_payload()},

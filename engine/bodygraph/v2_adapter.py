@@ -209,7 +209,10 @@ def _unwrap_payload(payload: Mapping[str, Any], default_family: str) -> tuple[st
         if _text(payload.get("timestamp")) is None or _text(payload.get("message")) is None or _text(payload.get("type")) is None:
             return family, None, "ADAPTER_MALFORMED_ENVELOPE"
         success = payload.get("success")
-        error_code = _text(payload.get("errorCode"))
+        raw_error_code = payload.get("errorCode")
+        if not isinstance(raw_error_code, str):
+            return family, None, "ADAPTER_MALFORMED_ENVELOPE"
+        error_code = _text(raw_error_code)
         if success is not True or error_code is not None:
             return family, None, "ADAPTER_VENDOR_ENVELOPE_UNSUCCESSFUL"
         data = payload.get("data")
