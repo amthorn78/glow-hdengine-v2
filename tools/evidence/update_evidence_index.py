@@ -2137,31 +2137,6 @@ CONJUNCTION_WRITER_ARTIFACTS: list[dict[str, object]] = [
 ]
 
 FORCE_REFRESH_ARTIFACT_RELS: set[str] = {
-    "audit/qa/hde-epic030/pr-04/band_edges_binding.log",
-    "audit/qa/hde-epic030/pr-04/band_thresholds_diff.json",
-    "audit/qa/hde-epic030/pr-04/band_thresholds_identity_hash.txt",
-    "audit/qa/hde-epic030/pr-05/category_framework_binding.log",
-    "audit/qa/hde-epic030/pr-05/per_channel_mechanics.json",
-    "audit/qa/hde-epic030/pr-05/category_canonical_compare.log",
-    "audit/qa/hde-epic030/pr-03/category_order_binding.log",
-    "audit/qa/hde-epic030/pr-03/compat_identity_binding.log",
-    "audit/qa/hde-epic030/pr-03/compat_parity_binding.log",
-    "artifacts/writer/conjunction_write_readback.log",
-    "artifacts/writer/conjunction_writer_summary.json",
-    "audit/gates/narratives/keys_10x4.table.json",
-    "artifacts/narratives/router/parity_abba.log",
-    "artifacts/narratives/router/cli_http_parity.log",
-    "audit/gates/narratives/registry.diff.json",
-    "audit/gates/narratives/pack_identity.txt",
-    "audit/docdeltas/hde-epic032_doc_deltas.md",
-    "audit/docdeltas/hde-epic034_doc_deltas.md",
-    "audit/qa/hde-epic034/00_meta/doc_deltas.md",
-    "docs/acceptance_map_epic035.json",
-    "audit/qa/hde-epic035/token_evidence_matrix.md",
-    "audit/qa/hde-epic035/acceptance_map_viability.log",
-    "audit/qa/hde-epic035/ops-01/ops_evidence_binding.log",
-    "audit/docdeltas/hde-epic035_doc_deltas.md",
-    "audit/qa/hde-epic035/00_meta/doc_deltas.md",
     "artifacts/evidence_index.jsonl",
     "artifacts/evidence_index.jsonl.sha256",
     "docs/evidence/INDEX.json",
@@ -2312,6 +2287,25 @@ def _write_path_proof(
         requested_mtime = None
         existing_produced = None
         existing_mtime = None
+    if not check and existing:
+        try:
+            existing_size_matches = int(existing.get("size_bytes", "")) == size_bytes
+        except ValueError:
+            existing_size_matches = False
+        existing_fields_match = all(existing.get(key) == value for key, value in extra_fields.items())
+        if (
+            existing.get("path") == rel
+            and existing.get("sha256") == sha256
+            and existing_size_matches
+            and existing_fields_match
+            and existing_mtime is not None
+            and existing_produced is not None
+        ):
+            try:
+                if _parse_utc_iso8601(existing_mtime) <= stat_mtime_dt:
+                    return proof_rel, existing_produced
+            except Exception:  # noqa: BLE001
+                pass
     if requested_produced and existing_mtime:
         try:
             if _parse_utc_iso8601(existing_mtime) < _parse_utc_iso8601(requested_produced):
