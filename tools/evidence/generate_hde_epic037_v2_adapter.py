@@ -39,8 +39,8 @@ INTERNAL_LOCI = (
 )
 PUBLIC_LOCI = (
     "docs/ENDPOINTS_CATALOG.json",
-    "engine/api.py",
-    "engine/reader.py",
+    "adapter/http_reader.py",
+    "adapter/wsgi.py",
     "engine/cli/main.py",
 )
 
@@ -97,8 +97,9 @@ def _loci(paths: tuple[str, ...]) -> list[dict[str, str]]:
     rows = []
     for rel in paths:
         path = ROOT / rel
-        if path.is_file():
-            rows.append({"path": rel, "sha256": _sha256_path(path)})
+        if not path.is_file():
+            raise ValueError(f"HDE_EPIC037_PR02_LOCUS_MISSING:{rel}")
+        rows.append({"path": rel, "sha256": _sha256_path(path)})
     return rows
 
 

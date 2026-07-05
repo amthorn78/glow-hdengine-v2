@@ -70,12 +70,13 @@ def test_missing_vendor_detail_fields_fail_closed() -> None:
     assert {"authority", "birthDateUtc"} <= set(result.missing_vendor_detail_fields)
 
 
-def test_chart_simple_result_remains_insufficient() -> None:
+def test_chart_simple_result_reports_detail_insufficient_on_simple_route() -> None:
     result = adapt_v2_chart_payload(
         {"type": "ChartSimpleResult", "data": {"type": "Generator", "profile": "1/3", "gates": [], "channelsShort": [], "centers": {}}},
         context(payload_family="ChartSimpleResult", route="charts/simple"),
     )
-    assert result.code == "ADAPTER_WRONG_ROUTE"
+    assert result.code == "ADAPTER_VENDOR_DETAIL_INSUFFICIENT"
+    assert "birthDateUtc" in result.missing_vendor_detail_fields
 
 
 def test_chart_simple_detail_insufficient_on_chart_route() -> None:

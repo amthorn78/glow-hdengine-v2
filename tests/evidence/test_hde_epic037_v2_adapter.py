@@ -58,6 +58,7 @@ def test_public_reader_and_runtime_nonclaims_preserved() -> None:
     public = _assert_canonical_json(VENDOR_DIR / "hde_epic037_public_reader_no_change.json")
     assert public["public_reader_change_claim"] == "NONE"
     assert public["new_http_home_claim"] == "NONE"
+    assert "adapter/http_reader.py" in {row["path"] for row in public["inspected_public_loci"]}
     no_raw = _assert_canonical_json(VENDOR_DIR / "hde_epic037_no_raw_payload_persistence.json")
     assert no_raw["adapter_calls_ingest_vendor_bodygraph"] is False
     assert no_raw["adapter_persists_raw_vendor_payload"] is False
