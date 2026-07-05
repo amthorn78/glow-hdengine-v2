@@ -1472,6 +1472,81 @@ def _load_epic037_pr02_entries() -> list[dict[str, object]]:
     return entries
 
 
+EPIC037_PR03_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "hdapi_v2.hde_epic037_bg_resolve_v2_route_policy",
+        "discovered_physical_path": "artifacts/vendor/hdapi_v2/hde_epic037_bg_resolve_v2_route_policy.snapshot.json",
+        "epic_id": "HDE-EPIC037",
+        "record_type": "epic037_pr03_bg_resolve",
+        "role": "snapshot",
+        "schema_version": "1.0",
+        "tokens": ["JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC037 PR-03 configured-v2 bg:resolve route policy selects version-neutral charts route and adapter-backed ChartResult mapping",
+    },
+    {
+        "artifact_key": "hdapi_v2.hde_epic037_bg_resolve_request_shape",
+        "discovered_physical_path": "artifacts/vendor/hdapi_v2/hde_epic037_bg_resolve_request_shape.snapshot.json",
+        "epic_id": "HDE-EPIC037",
+        "record_type": "epic037_pr03_bg_resolve",
+        "role": "snapshot",
+        "schema_version": "1.0",
+        "tokens": ["JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC037 PR-03 request-shape proof for HD_API_BASE_URL version ownership, charts resource construction, Bearer auth posture, and geocode posture",
+    },
+    {
+        "artifact_key": "hdapi_v2.hde_epic037_bg_resolve_closed_rails_no_io",
+        "discovered_physical_path": "artifacts/vendor/hdapi_v2/hde_epic037_bg_resolve_closed_rails_no_io.json",
+        "epic_id": "HDE-EPIC037",
+        "record_type": "epic037_pr03_bg_resolve",
+        "role": "snapshot",
+        "schema_version": "1.0",
+        "tokens": ["JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK", "NO_EXTERNAL_IO_ON_REFUSAL_OK", "ENV_RAILS_POLICY_OK"],
+        "notes": "EPIC037 PR-03 closed-rails no-I/O refusal proof before route policy, request construction, fetch, DNS/socket/HTTP, DB, or ingest",
+    },
+    {
+        "artifact_key": "hdapi_v2.hde_epic037_bg_resolve_legacy_fallback",
+        "discovered_physical_path": "artifacts/vendor/hdapi_v2/hde_epic037_bg_resolve_legacy_fallback.snapshot.json",
+        "epic_id": "HDE-EPIC037",
+        "record_type": "epic037_pr03_bg_resolve",
+        "role": "snapshot",
+        "schema_version": "1.0",
+        "tokens": ["JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC037 PR-03 explicit non-v2 legacy BodyGraph fallback proof with HD-Api-Key auth posture",
+    },
+]
+
+
+def _load_epic037_pr03_entries() -> list[dict[str, object]]:
+    proof = ROOT / "artifacts/vendor/hdapi_v2/hde_epic037_bg_resolve_v2_route_policy.snapshot.json"
+    if not proof.exists():
+        return []
+    try:
+        payload = json.loads(proof.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise SystemExit("INVALID_EPIC037_PR03_BG_RESOLVE_ROUTE_POLICY") from exc
+    if (
+        payload.get("artifact_kind") != "hde_epic037_bg_resolve_v2_route_policy"
+        or payload.get("epic_id") != "HDE-EPIC037"
+        or payload.get("pf09_task_id") != "HDE-FERM008"
+        or payload.get("pf09_subtask_id") != "HDE-FERM008.9"
+        or payload.get("route_policy", {}).get("route_family") != "recommended_v2_chart"
+        or payload.get("route_policy", {}).get("resource_path") != "charts"
+        or payload.get("resolver_adapter_code") != "ADAPTER_MAPPED"
+    ):
+        raise SystemExit("INVALID_EPIC037_PR03_BG_RESOLVE_IDENTITY")
+    produced = payload.get("generated_at_utc")
+    entries: list[dict[str, object]] = []
+    for entry in EPIC037_PR03_PRIMARY_ARTIFACTS:
+        rel = str(entry["discovered_physical_path"])
+        if not (ROOT / rel).exists():
+            raise SystemExit(f"MISSING_EPIC037_PR03_ARTIFACT:{rel}")
+        normalized = dict(entry)
+        if isinstance(produced, str) and produced:
+            normalized["produced_at_utc"] = produced
+        entries.append(normalized)
+    return entries
+
+
 EPIC035_PR03_OPS01_ARTIFACTS: list[dict[str, object]] = [
     {
         "artifact_key": "epic035.ops01.ops_evidence_manifest",
@@ -2339,6 +2414,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *_load_epic036_pr02_entries(),
             *_load_epic037_pr01_entries(),
             *_load_epic037_pr02_entries(),
+            *_load_epic037_pr03_entries(),
             *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,

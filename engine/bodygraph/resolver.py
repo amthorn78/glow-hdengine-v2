@@ -12,7 +12,8 @@ from .ingest import (
     ingest_vendor_bodygraph,
     resolve_db_user_id,
 )
-from .vendor_client import VendorError, classify_bg_resolve_route_policy
+from .v2_adapter import V2ChartAdapterContext, adapt_v2_chart_payload
+from .vendor_client import HdApiClient, VendorError, classify_bg_resolve_route_policy, route_auth_posture
 
 def _truthy(value: object) -> bool:
     if value is None:
@@ -159,6 +160,8 @@ def _resolve_vendor(
         )
         return _vendor_error(unexpected, resolver_meta)
     vendor_inputs = replace(vendor_inputs, user_id=normalized_user_id)
+    if route_policy.get("route_family") == "recommended_v2_chart":
+        return _resolve_v2_chart_vendor(vendor_inputs, resolver_meta, vendor_env=vendor_env, dry_run=dry_run)
     try:
         outcome = ingest_vendor_bodygraph(vendor_inputs, env=vendor_env, dry_run=dry_run)
     except VendorError as exc:
@@ -179,6 +182,82 @@ def _resolve_vendor(
         "status": "ok",
         "resolver": resolver_meta,
         "ingest": ingest_section,
+    }
+    return ResolveBodygraphResult(status="ok", payload=payload, exit_code=0)
+
+
+def _resolve_v2_chart_vendor(
+    vendor_inputs: VendorInputs,
+    resolver_meta: Mapping[str, object],
+    *,
+    vendor_env: Mapping[str, object],
+    dry_run: bool,
+) -> ResolveBodygraphResult:
+    if not dry_run:
+        error = VendorError(
+            "PROVIDER_ROUTE_UNSUPPORTED",
+            "v2 chart-backed bg:resolve persistence is not enabled without dry-run",
+            details={
+                "classification": "adapter_mapped_persistence_nonclaim",
+                "route_family": "recommended_v2_chart",
+                "resource_path": "charts",
+            },
+        )
+        return _vendor_error(error, resolver_meta)
+    try:
+        client = HdApiClient.from_env(env=vendor_env)
+        request = client.build_contract_route_request(
+            path="charts",
+            request_fields=("birthdate", "birthtime", "location"),
+            geocode_required=True,
+            birthdate=vendor_inputs.birthdate,
+            birthtime=vendor_inputs.birthtime,
+            location=vendor_inputs.location,
+        )
+        vendor_result = client.fetch(request)
+    except VendorError as exc:
+        return _vendor_error(exc, resolver_meta)
+    context = V2ChartAdapterContext(
+        person_uid=f"person:{vendor_inputs.user_id}",
+        user_id=vendor_inputs.user_id,
+        vendor="hdapi",
+        vendor_version=2,
+        input_fingerprint=request.input_fingerprint,
+        route_family="recommended_v2_chart",
+        route=request.route,
+        payload_family="ChartResult",
+    )
+    adapter_result = adapt_v2_chart_payload(vendor_result.payload, context)
+    adapter_payload = adapter_result.as_dict()
+    request_posture = {
+        "auth_header_posture": route_auth_posture("charts"),
+        "body_fields": ["birthdate", "birthtime", "location"],
+        "geocode_header_posture": "HD-Geocode-Key: <redacted>",
+        "input_fingerprint": request.input_fingerprint,
+        "method": "POST",
+        "resource_path": "charts",
+        "route": request.route,
+        "url": request.url,
+    }
+    if adapter_result.status != "mapped":
+        error = VendorError(
+            "PROVIDER_ROUTE_UNSUPPORTED",
+            "v2 ChartResult adapter did not map vendor payload",
+            details={
+                "adapter": adapter_payload,
+                "classification": "adapter_unsupported_nonclaim",
+                "route_family": "recommended_v2_chart",
+                "resource_path": "charts",
+            },
+        )
+        return _vendor_error(error, {**resolver_meta, "request": request_posture})
+    payload = {
+        "status": "ok",
+        "resolver": resolver_meta,
+        "request": request_posture,
+        "adapter": adapter_payload,
+        "resolved": adapter_result.resolved,
+        "cache": adapter_result.cache,
     }
     return ResolveBodygraphResult(status="ok", payload=payload, exit_code=0)
 

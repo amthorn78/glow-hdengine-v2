@@ -1,0 +1,5 @@
+path: artifacts/vendor/hdapi_v2/hde_epic037_bg_resolve_v2_route_policy.snapshot.json
+size_bytes: 2054
+sha256: c50882ccadddef11bf1427336b2b4cd3526e256bae9704c34cdb771dd30a8cbe
+mtime_utc: 2026-07-05T13:21:07Z
+produced_at_utc: 2026-07-05T13:21:07Z

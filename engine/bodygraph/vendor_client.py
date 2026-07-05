@@ -124,26 +124,33 @@ def route_auth_posture(path: str) -> str:
 def classify_bg_resolve_route_policy(base_url: str) -> dict[str, Any]:
     """Classify bg:resolve vendor routing before any BodyGraph request is built."""
     version = _configured_base_version(base_url)
+    if version == "v2":
+        chart_path = "charts"
+        contract = _ROUTE_CONTRACTS[chart_path]
+        return {
+            "classification": "adapter_backed_v2_chart",
+            "configured_base_version": version,
+            "error_code": None,
+            "expected_payload_family": "ChartResult",
+            "geocode_required": contract[1],
+            "request_fields": list(contract[0]),
+            "resource_path": chart_path,
+            "route_auth_posture": route_auth_posture(chart_path),
+            "route_family": "recommended_v2_chart",
+            "supported": True,
+            "reason": "configured v2 base uses governed version-neutral charts resource with the deterministic v2 ChartResult adapter",
+        }
     legacy_path = "bodygraphs"
     contract = _ROUTE_CONTRACTS[legacy_path]
-    base_posture = {
-        "configured_base_version": version,
-        "resource_path": legacy_path,
-        "route_family": "legacy_bodygraph",
-        "route_auth_posture": route_auth_posture(legacy_path),
-        "geocode_required": contract[1],
-    }
-    if version == "v2":
-        return {
-            **base_posture,
-            "classification": "unsupported_runtime_nonclaim",
-            "supported": False,
-            "error_code": "PROVIDER_ROUTE_UNSUPPORTED",
-            "reason": "configured v2 base cannot use legacy bodygraphs as final BodyGraph-detail behavior without a v2 ChartResult-to-BodyGraph adapter",
-        }
     return {
-        **base_posture,
         "classification": "explicit_legacy_fallback",
+        "configured_base_version": version,
+        "error_code": None,
+        "geocode_required": contract[1],
+        "request_fields": list(contract[0]),
+        "resource_path": legacy_path,
+        "route_auth_posture": route_auth_posture(legacy_path),
+        "route_family": "legacy_bodygraph",
         "supported": True,
         "reason": "configured base is not v2; bg:resolve remains on the governed legacy BodyGraph route",
     }
@@ -370,9 +377,9 @@ class HdApiClient:
                 },
             )
         return self.build_contract_route_request(
-            path="bodygraphs",
-            request_fields=("birthdate", "birthtime", "location"),
-            geocode_required=True,
+            path=str(policy["resource_path"]),
+            request_fields=tuple(policy.get("request_fields") or ("birthdate", "birthtime", "location")),
+            geocode_required=bool(policy["geocode_required"]),
             birthdate=birthdate,
             birthtime=birthtime,
             location=location,
