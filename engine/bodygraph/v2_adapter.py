@@ -289,6 +289,7 @@ def adapt_v2_chart_payload(
     }
     cache = {
         "input_fingerprint": _context_value(context, "input_fingerprint"),
+        "payload": resolved,
         "payload_posture": "adapter_mapped_no_raw_vendor_payload",
         "user_id": _context_value(context, "user_id"),
         "vendor": "hdapi",

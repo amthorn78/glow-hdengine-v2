@@ -40,6 +40,7 @@ def test_adapter_mapping_evidence_is_context_backed_and_non_wired() -> None:
     assert payload["mapping_result"]["status"] == "mapped"
     assert payload["mapping_result"]["resolved"]["person_uid"] == "person-epic037-pr02"
     assert payload["mapping_result"]["cache"]["payload_posture"] == "adapter_mapped_no_raw_vendor_payload"
+    assert payload["mapping_result"]["cache"]["payload"] == payload["mapping_result"]["resolved"]
     assert "resolver wiring" in payload["nonclaims"]
     assert payload["adapter_purity"] == {"database_io": False, "environment_reads": False, "file_io": False, "network_io": False, "randomness": False, "time_reads": False, "vendor_fetch": False}
 

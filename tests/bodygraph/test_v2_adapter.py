@@ -39,12 +39,13 @@ def test_context_backed_chart_result_maps_without_raw_payload() -> None:
     assert rendered["resolved"]["person"] == {"person_uid": "person-001"}
     assert rendered["cache"] == {
         "input_fingerprint": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "payload": rendered["resolved"],
         "payload_posture": "adapter_mapped_no_raw_vendor_payload",
         "user_id": "123e4567-e89b-12d3-a456-426614174000",
         "vendor": "hdapi",
         "vendor_version": 2,
     }
-    assert "activations" not in rendered["cache"]
+    assert "activations" not in rendered["cache"]["payload"]["bodygraph"]
     assert "data" not in rendered
 
 
