@@ -96,13 +96,12 @@ def test_chart_simple_result_reports_detail_insufficient_on_simple_route() -> No
     assert "birthDateUtc" in result.missing_vendor_detail_fields
 
 
-def test_chart_simple_detail_insufficient_on_chart_route() -> None:
+def test_chart_route_rejects_chart_simple_family() -> None:
     result = adapt_v2_chart_payload(
         {"type": "ChartSimpleResult", "data": {"type": "Generator", "profile": "1/3", "gates": [], "channelsShort": [], "centers": {}}},
         context(payload_family="ChartSimpleResult"),
     )
-    assert result.code == "ADAPTER_VENDOR_DETAIL_INSUFFICIENT"
-    assert "birthDateUtc" in result.missing_vendor_detail_fields
+    assert result.code == "ADAPTER_ROUTE_PAYLOAD_FAMILY_MISMATCH"
 
 
 def test_malformed_payload_and_missing_data_fail_closed() -> None:
@@ -119,6 +118,21 @@ def test_vendor_request_route_label_maps() -> None:
     result = adapt_v2_chart_payload(chart_result_payload(), context(route="vendor.hdapi.post:/charts"))
     assert result.status == "mapped"
     assert result.code == "ADAPTER_MAPPED"
+
+
+def test_failed_standard_response_envelope_fails_closed() -> None:
+    result = adapt_v2_chart_payload(
+        {"success": False, "errorCode": "INVALID_BIRTHDATE", "type": "ChartResult", "data": chart_result_payload()},
+        context(),
+    )
+    assert result.status == "unsupported"
+    assert result.code == "ADAPTER_VENDOR_ENVELOPE_UNSUCCESSFUL"
+
+
+def test_route_payload_family_mismatch_fails_closed() -> None:
+    result = adapt_v2_chart_payload(chart_result_payload(), context(route="charts/simple", payload_family="ChartResult"))
+    assert result.status == "unsupported"
+    assert result.code == "ADAPTER_ROUTE_PAYLOAD_FAMILY_MISMATCH"
 
 
 def test_wrong_route_family_fails_closed() -> None:

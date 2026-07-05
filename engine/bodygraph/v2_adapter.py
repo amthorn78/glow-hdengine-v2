@@ -190,10 +190,23 @@ def _malformed_vendor_detail_fields(data: Mapping[str, Any]) -> tuple[str, ...]:
     return tuple(malformed)
 
 
+def _route_payload_family(route: str) -> str | None:
+    normalized = route.strip().lower().removeprefix("vendor.hdapi.post:").strip("/")
+    if normalized in {"charts/simple", "v2/charts/simple"}:
+        return "ChartSimpleResult"
+    if normalized in {"charts", "charts/coordinates", "v2/charts", "v2/charts/coordinates"}:
+        return "ChartResult"
+    return None
+
+
 def _unwrap_payload(payload: Mapping[str, Any], default_family: str) -> tuple[str, Mapping[str, Any] | None, str | None]:
     envelope_keys = {"data", "success", "message", "errorCode", "timestamp"}
     if envelope_keys.intersection(payload):
         family = _text(payload.get("type")) or default_family or "UNKNOWN"
+        success = payload.get("success")
+        error_code = _text(payload.get("errorCode"))
+        if ("success" in payload and success is not True) or error_code is not None:
+            return family, None, "ADAPTER_VENDOR_ENVELOPE_UNSUCCESSFUL"
         data = payload.get("data")
         if not isinstance(data, Mapping):
             return family, None, "ADAPTER_MISSING_DATA"
@@ -221,12 +234,17 @@ def adapt_v2_chart_payload(
     assert context is not None
     if _context_value(context, "route_family") not in SUPPORTED_ROUTE_FAMILIES:
         return _fail("ADAPTER_WRONG_ROUTE_FAMILY", _context_value(context, "payload_family"))
-    if _context_value(context, "route") not in SUPPORTED_ROUTES:
+    route_value = str(_context_value(context, "route"))
+    if route_value not in SUPPORTED_ROUTES:
         return _fail("ADAPTER_WRONG_ROUTE", _context_value(context, "payload_family"))
+    route_family = _route_payload_family(route_value)
+    context_payload_family = str(_context_value(context, "payload_family"))
+    if context_payload_family in {"ChartResult", "ChartSimpleResult"} and route_family is not None and route_family != context_payload_family:
+        return _fail("ADAPTER_ROUTE_PAYLOAD_FAMILY_MISMATCH", context_payload_family)
     if _context_value(context, "vendor") != "hdapi":
         return _fail("ADAPTER_CONTEXT_INSUFFICIENT", _context_value(context, "payload_family"), missing_internal=("hde.body_graphs.vendor",))
 
-    expected_family = str(_context_value(context, "payload_family"))
+    expected_family = context_payload_family
     envelope_family, data, envelope_error = _unwrap_payload(payload, expected_family)
     if envelope_error is not None:
         return _fail(envelope_error, envelope_family)
