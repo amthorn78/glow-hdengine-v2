@@ -31,7 +31,7 @@ def context(**overrides: str) -> V2ChartAdapterContext:
 
 
 def test_context_backed_chart_result_maps_without_raw_payload() -> None:
-    result = adapt_v2_chart_payload({"success": True, "type": "ChartResult", "data": chart_result_payload()}, context())
+    result = adapt_v2_chart_payload({"timestamp": "2026-07-05T00:00:00.000Z", "success": True, "message": "Chart generated", "errorCode": "", "type": "ChartResult", "data": chart_result_payload()}, context())
     assert result.status == "mapped"
     assert result.code == "ADAPTER_MAPPED"
     rendered = result.as_dict()
@@ -62,7 +62,7 @@ def test_cache_metadata_must_match_persistence_contract() -> None:
 
 
 def test_missing_internal_identity_context_fails_closed() -> None:
-    result = adapt_v2_chart_payload({"type": "ChartResult", "data": chart_result_payload()}, context(person_uid=""))
+    result = adapt_v2_chart_payload({"timestamp": "2026-07-05T00:00:00.000Z", "success": True, "message": "Chart generated", "errorCode": "", "type": "ChartResult", "data": chart_result_payload()}, context(person_uid=""))
     assert result.status == "unsupported"
     assert result.code == "ADAPTER_CONTEXT_INSUFFICIENT"
     assert "person_uid" in result.missing_internal_contract_fields
@@ -72,7 +72,7 @@ def test_missing_vendor_detail_fields_fail_closed() -> None:
     data = chart_result_payload()
     data.pop("birthDateUtc")
     data.pop("authority")
-    result = adapt_v2_chart_payload({"type": "ChartResult", "data": data}, context())
+    result = adapt_v2_chart_payload({"timestamp": "2026-07-05T00:00:00.000Z", "success": True, "message": "Chart generated", "errorCode": "", "type": "ChartResult", "data": data}, context())
     assert result.code == "ADAPTER_VENDOR_DETAIL_INSUFFICIENT"
     assert result.status == "unsupported"
     assert {"authority", "birthDateUtc"} <= set(result.missing_vendor_detail_fields)
@@ -89,7 +89,7 @@ def test_malformed_vendor_detail_shapes_fail_closed() -> None:
 
 def test_chart_simple_result_reports_detail_insufficient_on_simple_route() -> None:
     result = adapt_v2_chart_payload(
-        {"type": "ChartSimpleResult", "data": {"type": "Generator", "profile": "1/3", "gates": [], "channelsShort": [], "centers": {}}},
+        {"timestamp": "2026-07-05T00:00:00.000Z", "success": True, "message": "Chart generated", "errorCode": "", "type": "ChartSimpleResult", "data": {"type": "Generator", "profile": "1/3", "gates": [], "channelsShort": [], "centers": {}}},
         context(payload_family="ChartSimpleResult", route="charts/simple"),
     )
     assert result.code == "ADAPTER_VENDOR_DETAIL_INSUFFICIENT"
@@ -98,7 +98,7 @@ def test_chart_simple_result_reports_detail_insufficient_on_simple_route() -> No
 
 def test_chart_route_rejects_chart_simple_family() -> None:
     result = adapt_v2_chart_payload(
-        {"type": "ChartSimpleResult", "data": {"type": "Generator", "profile": "1/3", "gates": [], "channelsShort": [], "centers": {}}},
+        {"timestamp": "2026-07-05T00:00:00.000Z", "success": True, "message": "Chart generated", "errorCode": "", "type": "ChartSimpleResult", "data": {"type": "Generator", "profile": "1/3", "gates": [], "channelsShort": [], "centers": {}}},
         context(payload_family="ChartSimpleResult"),
     )
     assert result.code == "ADAPTER_ROUTE_PAYLOAD_FAMILY_MISMATCH"
@@ -106,11 +106,11 @@ def test_chart_route_rejects_chart_simple_family() -> None:
 
 def test_malformed_payload_and_missing_data_fail_closed() -> None:
     assert adapt_v2_chart_payload([], context()).code == "ADAPTER_MALFORMED_PAYLOAD"
-    assert adapt_v2_chart_payload({"type": "ChartResult", "success": True}, context()).code == "ADAPTER_MISSING_DATA"
+    assert adapt_v2_chart_payload({"timestamp": "2026-07-05T00:00:00.000Z", "success": True, "message": "Chart generated", "errorCode": "", "type": "ChartResult", "data": None}, context()).code == "ADAPTER_MISSING_DATA"
 
 
 def test_unsupported_payload_family_fails_closed() -> None:
-    result = adapt_v2_chart_payload({"type": "OtherResult", "data": {}}, context(payload_family="OtherResult"))
+    result = adapt_v2_chart_payload({"timestamp": "2026-07-05T00:00:00.000Z", "success": True, "message": "Chart generated", "errorCode": "", "type": "OtherResult", "data": {}}, context(payload_family="OtherResult"))
     assert result.code == "ADAPTER_UNSUPPORTED_PAYLOAD_FAMILY"
 
 
@@ -120,9 +120,15 @@ def test_vendor_request_route_label_maps() -> None:
     assert result.code == "ADAPTER_MAPPED"
 
 
+def test_incomplete_standard_response_envelope_fails_closed() -> None:
+    result = adapt_v2_chart_payload({"data": chart_result_payload()}, context())
+    assert result.status == "unsupported"
+    assert result.code == "ADAPTER_MALFORMED_ENVELOPE"
+
+
 def test_failed_standard_response_envelope_fails_closed() -> None:
     result = adapt_v2_chart_payload(
-        {"success": False, "errorCode": "INVALID_BIRTHDATE", "type": "ChartResult", "data": chart_result_payload()},
+        {"timestamp": "2026-07-05T00:00:00.000Z", "success": False, "message": "Invalid birthdate", "errorCode": "INVALID_BIRTHDATE", "type": "ChartResult", "data": chart_result_payload()},
         context(),
     )
     assert result.status == "unsupported"
@@ -136,11 +142,11 @@ def test_route_payload_family_mismatch_fails_closed() -> None:
 
 
 def test_wrong_route_family_fails_closed() -> None:
-    result = adapt_v2_chart_payload({"type": "ChartResult", "data": chart_result_payload()}, context(route_family="legacy_bodygraph"))
+    result = adapt_v2_chart_payload({"timestamp": "2026-07-05T00:00:00.000Z", "success": True, "message": "Chart generated", "errorCode": "", "type": "ChartResult", "data": chart_result_payload()}, context(route_family="legacy_bodygraph"))
     assert result.code == "ADAPTER_WRONG_ROUTE_FAMILY"
 
 
 def test_partial_payload_fails_closed() -> None:
-    result = adapt_v2_chart_payload({"type": "ChartResult", "data": {"type": "Generator"}}, context())
+    result = adapt_v2_chart_payload({"timestamp": "2026-07-05T00:00:00.000Z", "success": True, "message": "Chart generated", "errorCode": "", "type": "ChartResult", "data": {"type": "Generator"}}, context())
     assert result.code == "ADAPTER_VENDOR_DETAIL_INSUFFICIENT"
     assert "profile" in result.missing_vendor_detail_fields

@@ -38,6 +38,7 @@ SUPPORTED_ROUTES = frozenset({"charts", "charts/simple", "charts/coordinates", "
 _SHA256_HEX_RE = re.compile(r"^[0-9a-f]{64}$")
 _ARRAY_DETAIL_FIELDS = frozenset({"centers", "channelsLong", "channelsShort", "gates"})
 _OBJECT_DETAIL_FIELDS = frozenset({"activations"})
+_STANDARD_RESPONSE_REQUIRED_FIELDS = frozenset({"timestamp", "success", "message", "errorCode", "type", "data"})
 _STRING_DETAIL_FIELDS = CHART_RESULT_REQUIRED_FIELDS - _ARRAY_DETAIL_FIELDS - _OBJECT_DETAIL_FIELDS
 
 
@@ -203,9 +204,13 @@ def _unwrap_payload(payload: Mapping[str, Any], default_family: str) -> tuple[st
     envelope_keys = {"data", "success", "message", "errorCode", "timestamp"}
     if envelope_keys.intersection(payload):
         family = _text(payload.get("type")) or default_family or "UNKNOWN"
+        if not _STANDARD_RESPONSE_REQUIRED_FIELDS <= set(payload):
+            return family, None, "ADAPTER_MALFORMED_ENVELOPE"
+        if _text(payload.get("timestamp")) is None or _text(payload.get("message")) is None or _text(payload.get("type")) is None:
+            return family, None, "ADAPTER_MALFORMED_ENVELOPE"
         success = payload.get("success")
         error_code = _text(payload.get("errorCode"))
-        if ("success" in payload and success is not True) or error_code is not None:
+        if success is not True or error_code is not None:
             return family, None, "ADAPTER_VENDOR_ENVELOPE_UNSUCCESSFUL"
         data = payload.get("data")
         if not isinstance(data, Mapping):

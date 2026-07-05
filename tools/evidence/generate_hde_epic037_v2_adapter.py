@@ -130,22 +130,23 @@ def context(**overrides: str) -> V2ChartAdapterContext:
 
 def _negative_cases() -> list[dict[str, Any]]:
     return [
-        {"fixture_id": "missing_internal_identity_context", "result": adapt_v2_chart_payload({"type": "ChartResult", "data": chart_result_payload()}, context(person_uid="")).as_dict()},
-        {"fixture_id": "missing_vendor_detail_fields", "result": adapt_v2_chart_payload({"type": "ChartResult", "data": {"type": "Generator"}}, context()).as_dict()},
+        {"fixture_id": "missing_internal_identity_context", "result": adapt_v2_chart_payload({"timestamp": "2026-07-05T00:00:00.000Z", "success": True, "message": "Chart generated", "errorCode": "", "type": "ChartResult", "data": chart_result_payload()}, context(person_uid="")).as_dict()},
+        {"fixture_id": "missing_vendor_detail_fields", "result": adapt_v2_chart_payload({"timestamp": "2026-07-05T00:00:00.000Z", "success": True, "message": "Chart generated", "errorCode": "", "type": "ChartResult", "data": {"type": "Generator"}}, context()).as_dict()},
         {"fixture_id": "malformed_vendor_detail_shapes", "result": adapt_v2_chart_payload({**chart_result_payload(), "centers": "G", "activations": "not-an-object"}, context()).as_dict()},
-        {"fixture_id": "chart_simple_result_detail_insufficient", "result": adapt_v2_chart_payload({"type": "ChartSimpleResult", "data": {"type": "Generator", "profile": "1/3", "gates": [], "channelsShort": [], "centers": {}}}, context(payload_family="ChartSimpleResult", route="charts/simple")).as_dict()},
+        {"fixture_id": "chart_simple_result_detail_insufficient", "result": adapt_v2_chart_payload({"timestamp": "2026-07-05T00:00:00.000Z", "success": True, "message": "Chart generated", "errorCode": "", "type": "ChartSimpleResult", "data": {"type": "Generator", "profile": "1/3", "gates": [], "channelsShort": [], "centers": {}}}, context(payload_family="ChartSimpleResult", route="charts/simple")).as_dict()},
         {"fixture_id": "malformed_payload", "result": adapt_v2_chart_payload([], context()).as_dict()},
-        {"fixture_id": "failed_standard_response_envelope", "result": adapt_v2_chart_payload({"success": False, "errorCode": "INVALID_BIRTHDATE", "type": "ChartResult", "data": chart_result_payload()}, context()).as_dict()},
+        {"fixture_id": "malformed_standard_response_envelope", "result": adapt_v2_chart_payload({"data": chart_result_payload()}, context()).as_dict()},
+        {"fixture_id": "failed_standard_response_envelope", "result": adapt_v2_chart_payload({"timestamp": "2026-07-05T00:00:00.000Z", "success": False, "message": "Invalid birthdate", "errorCode": "INVALID_BIRTHDATE", "type": "ChartResult", "data": chart_result_payload()}, context()).as_dict()},
         {"fixture_id": "route_payload_family_mismatch", "result": adapt_v2_chart_payload(chart_result_payload(), context(route="charts/simple", payload_family="ChartResult")).as_dict()},
-        {"fixture_id": "missing_data", "result": adapt_v2_chart_payload({"type": "ChartResult", "success": True}, context()).as_dict()},
-        {"fixture_id": "unsupported_payload_family", "result": adapt_v2_chart_payload({"type": "OtherResult", "data": {}}, context(payload_family="OtherResult")).as_dict()},
-        {"fixture_id": "wrong_route_family", "result": adapt_v2_chart_payload({"type": "ChartResult", "data": chart_result_payload()}, context(route_family="legacy_bodygraph")).as_dict()},
-        {"fixture_id": "wrong_route", "result": adapt_v2_chart_payload({"type": "ChartResult", "data": chart_result_payload()}, context(route="bodygraphs")).as_dict()},
+        {"fixture_id": "missing_data", "result": adapt_v2_chart_payload({"timestamp": "2026-07-05T00:00:00.000Z", "success": True, "message": "Chart generated", "errorCode": "", "type": "ChartResult", "data": None}, context()).as_dict()},
+        {"fixture_id": "unsupported_payload_family", "result": adapt_v2_chart_payload({"timestamp": "2026-07-05T00:00:00.000Z", "success": True, "message": "Chart generated", "errorCode": "", "type": "OtherResult", "data": {}}, context(payload_family="OtherResult")).as_dict()},
+        {"fixture_id": "wrong_route_family", "result": adapt_v2_chart_payload({"timestamp": "2026-07-05T00:00:00.000Z", "success": True, "message": "Chart generated", "errorCode": "", "type": "ChartResult", "data": chart_result_payload()}, context(route_family="legacy_bodygraph")).as_dict()},
+        {"fixture_id": "wrong_route", "result": adapt_v2_chart_payload({"timestamp": "2026-07-05T00:00:00.000Z", "success": True, "message": "Chart generated", "errorCode": "", "type": "ChartResult", "data": chart_result_payload()}, context(route="bodygraphs")).as_dict()},
     ]
 
 
 def build_outputs(produced_at: str) -> dict[Path, bytes]:
-    mapped = adapt_v2_chart_payload({"success": True, "type": "ChartResult", "data": chart_result_payload()}, context()).as_dict()
+    mapped = adapt_v2_chart_payload({"timestamp": "2026-07-05T00:00:00.000Z", "success": True, "message": "Chart generated", "errorCode": "", "type": "ChartResult", "data": chart_result_payload()}, context()).as_dict()
     common = _common(produced_at)
     mapping = {**common, "artifact_kind": "hde_epic037_adapter_mapping_snapshot", "adapter_scope": "pure_context_backed_chart_result_mapping_only", "adapter_purity": {"database_io": False, "environment_reads": False, "file_io": False, "network_io": False, "randomness": False, "time_reads": False, "vendor_fetch": False}, "input_references": _input_refs(), "inspected_internal_loci": _loci(INTERNAL_LOCI), "mapping_result": mapped, "nonclaims": ["resolver wiring", "compat compute end-to-end", "live vendor conformance", "public Reader change", "QA PASS", "OPS completion", "PF09 status movement", "HDE-FERM008 parent Done", "epic closeout"]}
     negative = {**common, "artifact_kind": "hde_epic037_adapter_negative_fixtures", "fixtures": _negative_cases(), "all_negative_fixtures_fail_closed": True, "unsupported_tokens_not_claimed": ["VENDOR_NO_PAYLOAD_LOGGING_OK", "LOGS_KEYS_ONLY_OK", "BG_PRIVACY_REDACTION_OK"]}
