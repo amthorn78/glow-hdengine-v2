@@ -1,5 +1,5 @@
 path: artifacts/vendor/hdapi_v2/hde_epic037_adapter_negative_fixtures.json
 size_bytes: 2766
-sha256: c3af72b4c6ca646a3ba1cc858b7963c1304e33ba57ef9b21732fb242258aabbb
-mtime_utc: 2026-07-05T01:58:52Z
-produced_at_utc: 2026-07-05T01:58:52Z
+sha256: 54aba93b95515017013223a24cb2ed9cb9c228f78e0e89dec00b4dcdf773f0bc
+mtime_utc: 2026-07-05T03:26:05Z
+produced_at_utc: 2026-07-05T03:26:05Z

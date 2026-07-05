@@ -34,7 +34,7 @@ CHART_RESULT_REQUIRED_FIELDS = frozenset(
     }
 )
 SUPPORTED_ROUTE_FAMILIES = frozenset({"recommended_v2_chart"})
-SUPPORTED_ROUTES = frozenset({"charts", "charts/simple", "charts/coordinates", "/v2/charts", "/v2/charts/simple", "/v2/charts/coordinates"})
+SUPPORTED_ROUTES = frozenset({"charts", "charts/simple", "charts/coordinates", "/v2/charts", "/v2/charts/simple", "/v2/charts/coordinates", "vendor.hdapi.post:/charts", "vendor.hdapi.post:/charts/simple", "vendor.hdapi.post:/charts/coordinates"})
 _SHA256_HEX_RE = re.compile(r"^[0-9a-f]{64}$")
 
 

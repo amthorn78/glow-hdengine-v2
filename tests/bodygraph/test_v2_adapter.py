@@ -98,6 +98,12 @@ def test_unsupported_payload_family_fails_closed() -> None:
     assert result.code == "ADAPTER_UNSUPPORTED_PAYLOAD_FAMILY"
 
 
+def test_vendor_request_route_label_maps() -> None:
+    result = adapt_v2_chart_payload(chart_result_payload(), context(route="vendor.hdapi.post:/charts"))
+    assert result.status == "mapped"
+    assert result.code == "ADAPTER_MAPPED"
+
+
 def test_wrong_route_family_fails_closed() -> None:
     result = adapt_v2_chart_payload({"type": "ChartResult", "data": chart_result_payload()}, context(route_family="legacy_bodygraph"))
     assert result.code == "ADAPTER_WRONG_ROUTE_FAMILY"
