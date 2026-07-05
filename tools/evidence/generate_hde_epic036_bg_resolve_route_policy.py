@@ -113,8 +113,31 @@ def _common(produced_at: str) -> dict[str, Any]:
     }
 
 
+def _epic036_historical_v2_policy() -> dict[str, Any]:
+    """Return the EPIC036 PR-01 route-policy decision as historical evidence.
+
+    EPIC037 PR-03 intentionally supersedes the shared runtime classifier for
+    configured-v2 bases after the deterministic v2 adapter exists. EPIC036
+    remains a closed-rails historical evidence family for the pre-adapter
+    unsupported-runtime-nonclaim decision, so this generator isolates that
+    recorded decision instead of re-evaluating the current classifier.
+    """
+
+    return {
+        "classification": "unsupported_runtime_nonclaim",
+        "configured_base_version": "v2",
+        "error_code": "PROVIDER_ROUTE_UNSUPPORTED",
+        "geocode_required": True,
+        "reason": "configured v2 base cannot use legacy bodygraphs as final BodyGraph-detail behavior without a v2 ChartResult-to-BodyGraph adapter",
+        "resource_path": "bodygraphs",
+        "route_auth_posture": route_auth_posture("bodygraphs"),
+        "route_family": "legacy_bodygraph",
+        "supported": False,
+    }
+
+
 def build_outputs(produced_at: str) -> dict[Path, bytes]:
-    v2_policy = classify_bg_resolve_route_policy("https://vendor.example.test/v2")
+    v2_policy = _epic036_historical_v2_policy()
     legacy_policy = classify_bg_resolve_route_policy("https://vendor.example.test/v1")
     nonclaims = {
         **_common(produced_at),

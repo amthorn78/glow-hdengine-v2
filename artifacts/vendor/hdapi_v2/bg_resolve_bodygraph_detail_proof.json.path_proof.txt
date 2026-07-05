@@ -1,5 +1,5 @@
 path: artifacts/vendor/hdapi_v2/bg_resolve_bodygraph_detail_proof.json
 size_bytes: 1822
-sha256: 61a23685a75c9b6d53ee3e73d73c466ddad8c8f5b3bd0040b12d350571748f83
-mtime_utc: 2026-07-02T02:54:45Z
-produced_at_utc: 2026-07-02T02:54:45Z
+sha256: 4d791d40f6bb9a4ef2c1be3c7a26b3f283f036047f68baf5f50ab104d1ef7fd2
+mtime_utc: 2026-07-05T15:13:12Z
+produced_at_utc: 2026-07-05T15:13:12Z
