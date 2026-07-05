@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 
 from engine.bodygraph.ingest import VendorInputs, ingest_vendor_bodygraph
-from engine.bodygraph.vendor_client import VendorRequest, VendorResult
+from engine.bodygraph.vendor_client import VendorError, VendorRequest, VendorResult
 
 
 class FakeClient:
@@ -16,6 +16,7 @@ class FakeClient:
             headers={},
             body_bytes=b"{}\n",
             input_fingerprint="abc123",
+            route="vendor.hdapi.post:/bodygraphs",
         )
 
     def build_request(self, *, birthdate: str, birthtime: str, location: str) -> VendorRequest:
@@ -126,3 +127,43 @@ def test_ingest_dry_run_skips_db(monkeypatch: pytest.MonkeyPatch) -> None:
     assert outcome.db_rows_after == 0
     assert outcome.parity_match is True
     assert outcome.payload == {"ok": True}
+
+
+def test_direct_ingest_rejects_v2_chart_route_before_fetch() -> None:
+    class V2ChartClient:
+        def __init__(self) -> None:
+            self.fetch_called = False
+
+        def build_request(self, *, birthdate: str, birthtime: str, location: str) -> VendorRequest:
+            return VendorRequest(
+                url="https://vendor.test/v2/charts",
+                headers={"Authorization": "Bearer raw", "HD-Geocode-Key": "raw"},
+                body_bytes=b"{}\n",
+                input_fingerprint="v2-chart-fingerprint",
+                route="vendor.hdapi.post:/charts",
+            )
+
+        def fetch(self, request: VendorRequest) -> VendorResult:
+            self.fetch_called = True
+            return VendorResult(payload={"raw": "chart-result"}, duration_ms=1.0, attempts=1)
+
+    client = V2ChartClient()
+
+    with pytest.raises(VendorError) as excinfo:
+        ingest_vendor_bodygraph(
+            VendorInputs(
+                user_id="user-v2",
+                birthdate="1990-01-01",
+                birthtime="12:00",
+                location="Amsterdam",
+            ),
+            env={"SAFE_MODE": "0", "ALLOW_NETWORK": "1"},
+            client=client,
+            dry_run=True,
+        )
+
+    assert excinfo.value.code == "PROVIDER_ROUTE_UNSUPPORTED"
+    assert excinfo.value.details["route"] == "vendor.hdapi.post:/charts"
+    assert excinfo.value.details["expected_route"] == "vendor.hdapi.post:/bodygraphs"
+    assert excinfo.value.details["persistence"] == "refused"
+    assert client.fetch_called is False

@@ -144,6 +144,16 @@ def ingest_vendor_bodygraph(
     start = time.monotonic()
     client = client or HdApiClient.from_env(log_path=retry_log, env=_client_config_env(env))
     request = client.build_request(birthdate=inputs.birthdate, birthtime=inputs.birthtime, location=inputs.location)
+    if request.route != "vendor.hdapi.post:/bodygraphs":
+        raise VendorError(
+            "PROVIDER_ROUTE_UNSUPPORTED",
+            "direct vendor ingest only supports legacy BodyGraph payloads",
+            details={
+                "route": request.route,
+                "expected_route": "vendor.hdapi.post:/bodygraphs",
+                "persistence": "refused",
+            },
+        )
     vendor_result = client.fetch(request)
     payload_bytes, _ = emitter.emit_public_with_envelope(vendor_result.payload)
     payload_text = payload_bytes.decode("utf-8")
