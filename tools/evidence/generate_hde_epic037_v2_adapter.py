@@ -114,7 +114,7 @@ def chart_result_payload() -> dict[str, Any]:
 
 
 def context(**overrides: str) -> V2ChartAdapterContext:
-    values = {"person_uid": "person-epic037-pr02", "user_id": "user-epic037-pr02", "vendor": "hdapi", "vendor_version": "v2", "input_fingerprint": "sha256:epic037-pr02-fixture", "route_family": "recommended_v2_chart", "route": "charts", "payload_family": "ChartResult"}
+    values = {"person_uid": "person-epic037-pr02", "user_id": "123e4567-e89b-12d3-a456-426614174000", "vendor": "hdapi", "vendor_version": 2, "input_fingerprint": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "route_family": "recommended_v2_chart", "route": "charts", "payload_family": "ChartResult"}
     values.update(overrides)
     return V2ChartAdapterContext(**values)
 

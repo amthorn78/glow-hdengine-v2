@@ -10,10 +10,10 @@ def chart_result_payload() -> dict[str, object]:
 def context(**overrides: str) -> V2ChartAdapterContext:
     values = {
         "person_uid": "person-001",
-        "user_id": "user-001",
+        "user_id": "123e4567-e89b-12d3-a456-426614174000",
         "vendor": "hdapi",
-        "vendor_version": "v2",
-        "input_fingerprint": "sha256:fixture",
+        "vendor_version": 2,
+        "input_fingerprint": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
         "route_family": "recommended_v2_chart",
         "route": "charts",
         "payload_family": "ChartResult",
@@ -30,14 +30,27 @@ def test_context_backed_chart_result_maps_without_raw_payload() -> None:
     assert rendered["resolved"]["person_uid"] == "person-001"
     assert rendered["resolved"]["person"] == {"person_uid": "person-001"}
     assert rendered["cache"] == {
-        "input_fingerprint": "sha256:fixture",
+        "input_fingerprint": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
         "payload_posture": "adapter_mapped_no_raw_vendor_payload",
-        "user_id": "user-001",
+        "user_id": "123e4567-e89b-12d3-a456-426614174000",
         "vendor": "hdapi",
-        "vendor_version": "v2",
+        "vendor_version": 2,
     }
     assert "activations" not in rendered["cache"]
     assert "data" not in rendered
+
+
+def test_unwrapped_chart_result_maps_without_envelope() -> None:
+    result = adapt_v2_chart_payload(chart_result_payload(), context())
+    assert result.status == "mapped"
+    assert result.code == "ADAPTER_MAPPED"
+    assert result.as_dict()["resolved"]["person_uid"] == "person-001"
+
+
+def test_cache_metadata_must_match_persistence_contract() -> None:
+    assert adapt_v2_chart_payload(chart_result_payload(), context(user_id="user-001")).code == "ADAPTER_CONTEXT_INSUFFICIENT"
+    assert adapt_v2_chart_payload(chart_result_payload(), context(input_fingerprint="sha256:fixture")).code == "ADAPTER_CONTEXT_INSUFFICIENT"
+    assert adapt_v2_chart_payload(chart_result_payload(), context(vendor_version=0)).code == "ADAPTER_CONTEXT_INSUFFICIENT"
 
 
 def test_missing_internal_identity_context_fails_closed() -> None:

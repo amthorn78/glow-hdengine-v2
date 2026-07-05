@@ -2,7 +2,9 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import re
 from typing import Any, Mapping
+from uuid import UUID
 
 CHART_RESULT_REQUIRED_FIELDS = frozenset(
     {
@@ -33,6 +35,7 @@ CHART_RESULT_REQUIRED_FIELDS = frozenset(
 )
 SUPPORTED_ROUTE_FAMILIES = frozenset({"recommended_v2_chart"})
 SUPPORTED_ROUTES = frozenset({"charts", "charts/coordinates", "/v2/charts", "/v2/charts/coordinates"})
+_SHA256_HEX_RE = re.compile(r"^[0-9a-f]{64}$")
 
 
 @dataclass(frozen=True)
@@ -42,7 +45,7 @@ class V2ChartAdapterContext:
     person_uid: str
     user_id: str
     vendor: str
-    vendor_version: str
+    vendor_version: int
     input_fingerprint: str
     route_family: str
     route: str
@@ -90,6 +93,31 @@ def _text(value: object) -> str | None:
     return None
 
 
+def _positive_int(value: object) -> int | None:
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, int) and value > 0:
+        return value
+    return None
+
+
+def _uuid_text(value: object) -> str | None:
+    raw = _text(value)
+    if raw is None:
+        return None
+    try:
+        return str(UUID(raw))
+    except ValueError:
+        return None
+
+
+def _sha256_hex(value: object) -> str | None:
+    raw = _text(value)
+    if raw is not None and _SHA256_HEX_RE.fullmatch(raw):
+        return raw
+    return None
+
+
 def _context_missing(context: V2ChartAdapterContext | Mapping[str, Any] | None) -> tuple[str, ...]:
     if context is None:
         return (
@@ -112,26 +140,47 @@ def _context_missing(context: V2ChartAdapterContext | Mapping[str, Any] | None) 
         "route": "request.route",
         "payload_family": "payload_family",
     }
-    missing = [label for key, label in required.items() if _text(values.get(key)) is None]
+    missing: list[str] = []
+    for key, label in required.items():
+        value = values.get(key)
+        if key == "user_id":
+            valid = _uuid_text(value) is not None
+        elif key == "input_fingerprint":
+            valid = _sha256_hex(value) is not None
+        elif key == "vendor_version":
+            valid = _positive_int(value) is not None
+        else:
+            valid = _text(value) is not None
+        if not valid:
+            missing.append(label)
     return tuple(missing)
 
 
-def _context_value(context: V2ChartAdapterContext | Mapping[str, Any], key: str) -> str:
+def _context_value(context: V2ChartAdapterContext | Mapping[str, Any], key: str) -> str | int:
     values = context.__dict__ if isinstance(context, V2ChartAdapterContext) else context
-    value = _text(values.get(key))
+    raw = values.get(key)
+    if key == "user_id":
+        value = _uuid_text(raw)
+    elif key == "input_fingerprint":
+        value = _sha256_hex(raw)
+    elif key == "vendor_version":
+        value = _positive_int(raw)
+    else:
+        value = _text(raw)
     if value is None:  # guarded by _context_missing
         raise AssertionError(f"missing context value {key}")
     return value
 
 
-def _unwrap_payload(payload: Mapping[str, Any]) -> tuple[str, Mapping[str, Any] | None, str | None]:
-    if "data" in payload or "success" in payload or "type" in payload:
-        family = _text(payload.get("type")) or "UNKNOWN"
+def _unwrap_payload(payload: Mapping[str, Any], default_family: str) -> tuple[str, Mapping[str, Any] | None, str | None]:
+    envelope_keys = {"data", "success", "message", "errorCode", "timestamp"}
+    if envelope_keys.intersection(payload):
+        family = _text(payload.get("type")) or default_family or "UNKNOWN"
         data = payload.get("data")
         if not isinstance(data, Mapping):
             return family, None, "ADAPTER_MISSING_DATA"
         return family, data, None
-    family = _text(payload.get("payload_family")) or _text(payload.get("type")) or "ChartResult"
+    family = _text(payload.get("payload_family")) or default_family or "ChartResult"
     return family, payload, None
 
 
@@ -159,8 +208,8 @@ def adapt_v2_chart_payload(
     if _context_value(context, "vendor") != "hdapi":
         return _fail("ADAPTER_CONTEXT_INSUFFICIENT", _context_value(context, "payload_family"), missing_internal=("hde.body_graphs.vendor",))
 
-    envelope_family, data, envelope_error = _unwrap_payload(payload)
-    expected_family = _context_value(context, "payload_family")
+    expected_family = str(_context_value(context, "payload_family"))
+    envelope_family, data, envelope_error = _unwrap_payload(payload, expected_family)
     if envelope_error is not None:
         return _fail(envelope_error, envelope_family)
     if envelope_family != expected_family:
