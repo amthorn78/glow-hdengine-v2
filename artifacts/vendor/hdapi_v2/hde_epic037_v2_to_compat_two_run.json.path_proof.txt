@@ -1,0 +1,5 @@
+path: artifacts/vendor/hdapi_v2/hde_epic037_v2_to_compat_two_run.json
+size_bytes: 3567
+sha256: 0fb18db647d6308811ce0aed9e19493baed286b987c2a36ce7c7eeda654c6a2b
+mtime_utc: 2026-07-05T18:00:42Z
+produced_at_utc: 2026-07-05T18:00:42Z

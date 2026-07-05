@@ -1,0 +1,5 @@
+path: artifacts/vendor/hdapi_v2/hde_epic037_admin_public_boundary.json
+size_bytes: 4262
+sha256: 79f1c8b301d72fcd3226a10dae4e9fcfd749054d883d6199556412cdc37a8705
+mtime_utc: 2026-07-05T18:00:42Z
+produced_at_utc: 2026-07-05T18:00:42Z

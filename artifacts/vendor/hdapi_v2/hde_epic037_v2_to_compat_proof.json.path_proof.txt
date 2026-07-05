@@ -1,0 +1,5 @@
+path: artifacts/vendor/hdapi_v2/hde_epic037_v2_to_compat_proof.json
+size_bytes: 4517
+sha256: d85cc6edd01da237d67117163481bb78e3800d522d79d34d117f74832476f11d
+mtime_utc: 2026-07-05T18:00:42Z
+produced_at_utc: 2026-07-05T18:00:42Z

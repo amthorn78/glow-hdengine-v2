@@ -1549,6 +1549,83 @@ def _load_epic037_pr03_entries() -> list[dict[str, object]]:
     return entries
 
 
+EPIC037_PR04_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "hdapi_v2.hde_epic037_v2_to_compat_proof",
+        "discovered_physical_path": "artifacts/vendor/hdapi_v2/hde_epic037_v2_to_compat_proof.json",
+        "epic_id": "HDE-EPIC037",
+        "record_type": "epic037_pr04_v2_to_compat",
+        "role": "proof",
+        "schema_version": "1.0",
+        "tokens": ["ENV_RAILS_POLICY_OK", "JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC037 PR-04 proof that mapped v2 ChartResult adapter output is shape-sufficient for existing compatibility computation for HDE-FERM008.10",
+    },
+    {
+        "artifact_key": "hdapi_v2.hde_epic037_v2_to_compat_two_run",
+        "discovered_physical_path": "artifacts/vendor/hdapi_v2/hde_epic037_v2_to_compat_two_run.json",
+        "epic_id": "HDE-EPIC037",
+        "record_type": "epic037_pr04_v2_to_compat",
+        "role": "proof",
+        "schema_version": "1.0",
+        "tokens": ["TWO_RUN_IDENTITY_OK", "ENV_RAILS_POLICY_OK", "JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC037 PR-04 two-run canonical identity proof for the closed-rails v2 adapter-to-compat fixture path",
+    },
+    {
+        "artifact_key": "hdapi_v2.hde_epic037_v2_to_compat_pair_order",
+        "discovered_physical_path": "artifacts/vendor/hdapi_v2/hde_epic037_v2_to_compat_pair_order.json",
+        "epic_id": "HDE-EPIC037",
+        "record_type": "epic037_pr04_v2_to_compat",
+        "role": "proof",
+        "schema_version": "1.0",
+        "tokens": ["COMPOSITE_ABBA_IDENTITY_OK", "ENV_RAILS_POLICY_OK", "JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC037 PR-04 AB/BA normalized pair-order identity proof for mapped v2 resolved parties entering compatibility computation",
+    },
+    {
+        "artifact_key": "hdapi_v2.hde_epic037_admin_public_boundary",
+        "discovered_physical_path": "artifacts/vendor/hdapi_v2/hde_epic037_admin_public_boundary.json",
+        "epic_id": "HDE-EPIC037",
+        "record_type": "epic037_pr04_v2_to_compat",
+        "role": "proof",
+        "schema_version": "1.0",
+        "tokens": ["ENV_RAILS_POLICY_OK", "JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC037 PR-04 public Reader no-change and admin/public boundary preservation proof; numeric, cache, adapter, and vendor internals remain out of public Reader bytes",
+    },
+]
+
+
+def _load_epic037_pr04_entries() -> list[dict[str, object]]:
+    proof = ROOT / "artifacts/vendor/hdapi_v2/hde_epic037_v2_to_compat_proof.json"
+    if not proof.exists():
+        return []
+    try:
+        payload = json.loads(proof.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise SystemExit("INVALID_EPIC037_PR04_V2_TO_COMPAT_PROOF") from exc
+    if (
+        payload.get("artifact_kind") != "hde_epic037_v2_to_compat_proof"
+        or payload.get("epic_id") != "HDE-EPIC037"
+        or payload.get("pf09_task_id") != "HDE-FERM008"
+        or payload.get("pf09_subtask_id") != "HDE-FERM008.10"
+        or payload.get("compat_acceptance", {}).get("accepted_mapped_resolved_parties") is not True
+        or payload.get("fixture_count") != 2
+    ):
+        raise SystemExit("INVALID_EPIC037_PR04_V2_TO_COMPAT_IDENTITY")
+    produced = payload.get("generated_at_utc")
+    entries: list[dict[str, object]] = []
+    for entry in EPIC037_PR04_PRIMARY_ARTIFACTS:
+        rel = str(entry["discovered_physical_path"])
+        path = ROOT / rel
+        if not path.exists():
+            raise SystemExit(f"MISSING_EPIC037_PR04_ARTIFACT:{rel}")
+        if not path.with_name(path.name + ".path_proof.txt").exists():
+            raise SystemExit(f"MISSING_EPIC037_PR04_PATH_PROOF:{rel}")
+        normalized = dict(entry)
+        if isinstance(produced, str) and produced:
+            normalized["produced_at_utc"] = produced
+        entries.append(normalized)
+    return entries
+
+
 EPIC035_PR03_OPS01_ARTIFACTS: list[dict[str, object]] = [
     {
         "artifact_key": "epic035.ops01.ops_evidence_manifest",
@@ -2417,6 +2494,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *_load_epic037_pr01_entries(),
             *_load_epic037_pr02_entries(),
             *_load_epic037_pr03_entries(),
+            *_load_epic037_pr04_entries(),
             *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,
