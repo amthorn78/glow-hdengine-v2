@@ -1398,6 +1398,80 @@ def _load_epic037_pr01_entries() -> list[dict[str, object]]:
     return entries
 
 
+EPIC037_PR02_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "hdapi_v2.hde_epic037_adapter_mapping",
+        "discovered_physical_path": "artifacts/vendor/hdapi_v2/hde_epic037_adapter_mapping.snapshot.json",
+        "epic_id": "HDE-EPIC037",
+        "record_type": "epic037_pr02_v2_adapter",
+        "role": "snapshot",
+        "schema_version": "1.0",
+        "tokens": ["JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC037 PR-02 deterministic pure v2 ChartResult adapter mapping proof for HDE-FERM008.8; context-backed only and not resolver wiring",
+    },
+    {
+        "artifact_key": "hdapi_v2.hde_epic037_adapter_negative_fixtures",
+        "discovered_physical_path": "artifacts/vendor/hdapi_v2/hde_epic037_adapter_negative_fixtures.json",
+        "epic_id": "HDE-EPIC037",
+        "record_type": "epic037_pr02_v2_adapter",
+        "role": "snapshot",
+        "schema_version": "1.0",
+        "tokens": ["JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC037 PR-02 negative fixture evidence for missing context, missing detail fields, malformed data, unsupported payloads, and wrong route failures",
+    },
+    {
+        "artifact_key": "hdapi_v2.hde_epic037_public_reader_no_change",
+        "discovered_physical_path": "artifacts/vendor/hdapi_v2/hde_epic037_public_reader_no_change.json",
+        "epic_id": "HDE-EPIC037",
+        "record_type": "epic037_pr02_v2_adapter",
+        "role": "snapshot",
+        "schema_version": "1.0",
+        "tokens": ["JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC037 PR-02 public Reader no-change evidence; no public route, flag, payload, transport, or HTTP home claim",
+    },
+    {
+        "artifact_key": "hdapi_v2.hde_epic037_no_raw_payload_persistence",
+        "discovered_physical_path": "artifacts/vendor/hdapi_v2/hde_epic037_no_raw_payload_persistence.json",
+        "epic_id": "HDE-EPIC037",
+        "record_type": "epic037_pr02_v2_adapter",
+        "role": "snapshot",
+        "schema_version": "1.0",
+        "tokens": ["JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC037 PR-02 scoped adapter no-raw-payload-persistence posture; does not claim generic log/privacy tokens",
+    },
+]
+
+
+def _load_epic037_pr02_entries() -> list[dict[str, object]]:
+    proof = ROOT / "artifacts/vendor/hdapi_v2/hde_epic037_adapter_mapping.snapshot.json"
+    if not proof.exists():
+        return []
+    try:
+        payload = json.loads(proof.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise SystemExit("INVALID_EPIC037_PR02_ADAPTER_MAPPING") from exc
+    if (
+        payload.get("artifact_kind") != "hde_epic037_adapter_mapping_snapshot"
+        or payload.get("epic_id") != "HDE-EPIC037"
+        or payload.get("pf09_task_id") != "HDE-FERM008"
+        or payload.get("pf09_subtask_id") != "HDE-FERM008.8"
+        or payload.get("mapping_result", {}).get("status") != "mapped"
+        or payload.get("mapping_result", {}).get("code") != "ADAPTER_MAPPED"
+    ):
+        raise SystemExit("INVALID_EPIC037_PR02_ADAPTER_IDENTITY")
+    produced = payload.get("generated_at_utc")
+    entries: list[dict[str, object]] = []
+    for entry in EPIC037_PR02_PRIMARY_ARTIFACTS:
+        rel = str(entry["discovered_physical_path"])
+        if not (ROOT / rel).exists():
+            raise SystemExit(f"MISSING_EPIC037_PR02_ARTIFACT:{rel}")
+        normalized = dict(entry)
+        if isinstance(produced, str) and produced:
+            normalized["produced_at_utc"] = produced
+        entries.append(normalized)
+    return entries
+
+
 EPIC035_PR03_OPS01_ARTIFACTS: list[dict[str, object]] = [
     {
         "artifact_key": "epic035.ops01.ops_evidence_manifest",
@@ -2264,6 +2338,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *_load_epic036_pr01_entries(),
             *_load_epic036_pr02_entries(),
             *_load_epic037_pr01_entries(),
+            *_load_epic037_pr02_entries(),
             *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,

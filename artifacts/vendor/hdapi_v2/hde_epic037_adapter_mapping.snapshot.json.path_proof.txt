@@ -1,0 +1,5 @@
+path: artifacts/vendor/hdapi_v2/hde_epic037_adapter_mapping.snapshot.json
+size_bytes: 3273
+sha256: 4844ae46a167bb0436b4c52298d0d64b411746564c61f3fc38fe109ef6578585
+mtime_utc: 2026-07-05T05:17:48Z
+produced_at_utc: 2026-07-05T05:17:48Z
