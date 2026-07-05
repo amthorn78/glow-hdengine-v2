@@ -1,0 +1,5 @@
+path: artifacts/vendor/hdapi_v2/hde_epic037_bg_resolve_closed_rails_no_io.json
+size_bytes: 1216
+sha256: 01e9c021455d4294eace6051fb0b225ffaef269f6b6f5acc1078644d4767e888
+mtime_utc: 2026-07-05T14:15:07Z
+produced_at_utc: 2026-07-05T14:15:07Z

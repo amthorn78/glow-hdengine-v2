@@ -1,5 +1,5 @@
 path: artifacts/vendor/hdapi_v2/hde_epic037_public_reader_no_change.json
 size_bytes: 953
-sha256: c5867518b61e45a9b26c665d23d2bdf23835a0720e8dc8e91543b9ca12345cb0
-mtime_utc: 2026-07-05T05:17:48Z
-produced_at_utc: 2026-07-05T05:17:48Z
+sha256: 15977494109efef1ae14603d504db6fb6e8c81ba04f9c1c9b43587bc4bd6f25b
+mtime_utc: 2026-07-05T14:15:05Z
+produced_at_utc: 2026-07-05T14:15:05Z

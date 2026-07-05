@@ -12,7 +12,8 @@ from .ingest import (
     ingest_vendor_bodygraph,
     resolve_db_user_id,
 )
-from .vendor_client import VendorError, classify_bg_resolve_route_policy
+from .v2_adapter import V2ChartAdapterContext, adapt_v2_chart_payload
+from .vendor_client import HdApiClient, VendorError, classify_bg_resolve_route_policy, route_auth_posture
 
 def _truthy(value: object) -> bool:
     if value is None:
@@ -159,6 +160,15 @@ def _resolve_vendor(
         )
         return _vendor_error(unexpected, resolver_meta)
     vendor_inputs = replace(vendor_inputs, user_id=normalized_user_id)
+    if route_policy["route_family"] == "recommended_v2_chart":
+        return _resolve_vendor_v2_chart(
+            user_id,
+            resolver_meta,
+            vendor_inputs,
+            vendor_env=vendor_env,
+            dry_run=dry_run,
+            route_policy=route_policy,
+        )
     try:
         outcome = ingest_vendor_bodygraph(vendor_inputs, env=vendor_env, dry_run=dry_run)
     except VendorError as exc:
@@ -181,6 +191,114 @@ def _resolve_vendor(
         "ingest": ingest_section,
     }
     return ResolveBodygraphResult(status="ok", payload=payload, exit_code=0)
+
+
+def _resolve_vendor_v2_chart(
+    original_user_id: str,
+    resolver_meta: MutableMapping[str, object],
+    vendor_inputs: VendorInputs,
+    *,
+    vendor_env: Mapping[str, object],
+    dry_run: bool,
+    route_policy: Mapping[str, object],
+) -> ResolveBodygraphResult:
+    if not dry_run:
+        error = VendorError(
+            "PROVIDER_WRITE_UNSUPPORTED",
+            "v2 chart-backed bg:resolve supports dry-run mapping only until mapped-cache persistence is implemented",
+            details={
+                "route_family": route_policy["route_family"],
+                "payload_posture": "adapter_mapped_no_raw_vendor_payload",
+            },
+        )
+        return _vendor_error(error, resolver_meta)
+    try:
+        client = HdApiClient.from_env(env=vendor_env)
+        request = client.build_contract_route_request(
+            path="charts",
+            request_fields=("birthdate", "birthtime", "location"),
+            geocode_required=True,
+            birthdate=vendor_inputs.birthdate,
+            birthtime=vendor_inputs.birthtime,
+            location=vendor_inputs.location,
+        )
+        vendor_result = client.fetch(request)
+    except VendorError as exc:
+        return _vendor_error(exc, resolver_meta)
+    context = V2ChartAdapterContext(
+        person_uid=_person_uid(original_user_id),
+        user_id=vendor_inputs.user_id,
+        vendor="hdapi",
+        vendor_version=2,
+        input_fingerprint=request.input_fingerprint,
+        route_family=str(route_policy["route_family"]),
+        route=request.route,
+        payload_family="ChartResult",
+    )
+    adapter = adapt_v2_chart_payload(vendor_result.payload, context).as_dict()
+    request_posture = _redacted_request_posture(request, route_policy)
+    resolver_meta = {**resolver_meta, "request": request_posture}
+    if adapter["status"] != "mapped":
+        error = VendorError(
+            str(adapter["code"]),
+            "v2 chart adapter could not map vendor payload into BodyGraph posture",
+            details={
+                "adapter_status": adapter["status"],
+                "payload_family": adapter["payload_family"],
+                "missing_internal_contract_fields": adapter["missing_internal_contract_fields"],
+                "missing_vendor_detail_fields": adapter["missing_vendor_detail_fields"],
+            },
+        )
+        return _vendor_error(error, resolver_meta)
+    payload = {
+        "status": "ok",
+        "resolver": resolver_meta,
+        "adapter": {
+            "status": adapter["status"],
+            "code": adapter["code"],
+            "payload_family": adapter["payload_family"],
+        },
+        "resolved": adapter["resolved"],
+        "cache": {
+            "input_fingerprint": adapter["cache"]["input_fingerprint"],
+            "payload_posture": adapter["cache"]["payload_posture"],
+            "user_id": adapter["cache"]["user_id"],
+            "vendor": adapter["cache"]["vendor"],
+            "vendor_version": adapter["cache"]["vendor_version"],
+        },
+        "ingest": {
+            "rows_written": 0,
+            "db_rows_after": 0,
+            "payload_posture": "adapter_mapped_no_raw_vendor_payload",
+        },
+    }
+    return ResolveBodygraphResult(status="ok", payload=payload, exit_code=0)
+
+
+def _person_uid(user_id: str) -> str:
+    normalized = (user_id or "").strip()
+    return normalized if normalized.startswith("person-") else f"person-{normalized}"
+
+
+def _redacted_request_posture(request: object, route_policy: Mapping[str, object]) -> Mapping[str, object]:
+    headers = getattr(request, "headers", {})
+    header_posture = []
+    if "Authorization" in headers:
+        header_posture.append("Authorization: Bearer <redacted>")
+    if "HD-Api-Key" in headers:
+        header_posture.append("HD-Api-Key: <redacted>")
+    if "HD-Geocode-Key" in headers:
+        header_posture.append("HD-Geocode-Key: <redacted>")
+    return {
+        "route": getattr(request, "route", ""),
+        "resource_path": route_policy["resource_path"],
+        "route_auth_posture": route_auth_posture(str(route_policy["resource_path"])),
+        "header_posture": sorted(header_posture),
+        "url": getattr(request, "url", ""),
+        "input_fingerprint": getattr(request, "input_fingerprint", ""),
+        "raw_body_emitted": False,
+        "raw_response_body_emitted": False,
+    }
 
 
 def _vendor_config_env(env: Mapping[str, object] | None) -> Mapping[str, object]:
