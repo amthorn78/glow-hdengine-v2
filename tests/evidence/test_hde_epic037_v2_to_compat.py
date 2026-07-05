@@ -75,3 +75,11 @@ def test_epic037_pr04_index_registration_is_fail_closed() -> None:
     }
     entries = updater._load_epic037_pr04_entries()
     assert {entry["artifact_key"] for entry in entries} == keys
+    assert {entry["role"] for entry in entries} == {"proof"}
+
+    mirror_roles = {}
+    for raw in (ROOT / "artifacts/evidence_index.jsonl").read_text(encoding="utf-8").splitlines():
+        record = json.loads(raw)
+        if record["artifact_key"] in keys:
+            mirror_roles[record["artifact_key"]] = record["role"]
+    assert mirror_roles == {key: "proof" for key in keys}

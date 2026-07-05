@@ -2383,6 +2383,7 @@ _ALLOWED_INDEX_FIELDS = {
     "discovered_physical_path",
     "epic_id",
     "record_type",
+    "role",
     "schema_version",
     "tokens",
     "notes",
@@ -2503,6 +2504,9 @@ def _render_human_index(entries: Iterable[Mapping[str, object]]) -> bytes:
 
 
 def _role_for(entry: Mapping[str, str], roles: Mapping[tuple[str, str], str]) -> str:
+    declared_role = entry.get("role")
+    if isinstance(declared_role, str) and declared_role:
+        return declared_role
     key = (entry["artifact_key"], entry["discovered_physical_path"])
     if key in roles:
         return roles[key]
