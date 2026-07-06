@@ -233,7 +233,8 @@ def verify_ops01() -> None:
         or request_summary.get("secret_policy", {}).get("uncontrolled_raw_vendor_payload_recorded") is not False
     ):
         raise SystemExit("INVALID_EPIC037_OPS01_POSTURE")
-    if "bg_resolve_exit_code=0" not in (OPS_ROOT / "exit_codes.txt").read_text(encoding="utf-8"):
+    exit_code_lines = (OPS_ROOT / "exit_codes.txt").read_text(encoding="utf-8").splitlines()
+    if exit_code_lines != ["bg_resolve_exit_code=0"]:
         raise SystemExit("INVALID_EPIC037_OPS01_EXIT_CODE")
     ledger = {
         line.split()[1]: line.split()[0]

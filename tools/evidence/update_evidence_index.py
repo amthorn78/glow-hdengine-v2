@@ -1918,7 +1918,10 @@ def _load_epic037_ops01_entries() -> list[dict[str, object]]:
         or env_secret_policy.get("plaintext_secrets_allowed_in_evidence") is not False
     ):
         raise SystemExit("INVALID_EPIC037_OPS01_RUNTIME_OR_ENV_POSTURE")
-    if "bg_resolve_exit_code=0" not in (ROOT / "audit/ops/hde-epic037/ops-hde-epic037-001/exit_codes.txt").read_text(encoding="utf-8"):
+    exit_code_lines = (
+        ROOT / "audit/ops/hde-epic037/ops-hde-epic037-001/exit_codes.txt"
+    ).read_text(encoding="utf-8").splitlines()
+    if exit_code_lines != ["bg_resolve_exit_code=0"]:
         raise SystemExit("INVALID_EPIC037_OPS01_EXIT_CODE")
     ledger_lines = (ROOT / "audit/ops/hde-epic037/ops-hde-epic037-001/files_sha256.txt").read_text(encoding="utf-8").splitlines()
     ledger = {line.split()[1]: line.split()[0] for line in ledger_lines if line.strip()}

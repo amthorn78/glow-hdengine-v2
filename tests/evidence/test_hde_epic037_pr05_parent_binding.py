@@ -119,7 +119,9 @@ def test_ops01_runtime_posture_is_secret_safe_before_registration() -> None:
     assert request["configured_base_url"] == "<redacted>"
     assert request["raw_body_emitted"] is False
     assert request["raw_response_body_emitted"] is False
-    assert "bg_resolve_exit_code=0" in (OPS_ROOT / "exit_codes.txt").read_text(encoding="utf-8")
+    assert (OPS_ROOT / "exit_codes.txt").read_text(encoding="utf-8").splitlines() == [
+        "bg_resolve_exit_code=0"
+    ]
     result = json.loads((OPS_ROOT / "result_summary.json").read_text(encoding="utf-8"))
     assert result["runtime_conformance_supported_by_this_smoke"] is True
     adapter = json.loads((OPS_ROOT / "adapter_mapping_result_summary.json").read_text(encoding="utf-8"))
