@@ -1825,6 +1825,7 @@ def _load_epic037_ops01_entries() -> list[dict[str, object]]:
     try:
         stdout_payload = json.loads(stdout_path.read_text(encoding="utf-8"))
         request_summary = json.loads((ROOT / "audit/ops/hde-epic037/ops-hde-epic037-001/request_summary.json").read_text(encoding="utf-8"))
+        env_presence = json.loads((ROOT / "audit/ops/hde-epic037/ops-hde-epic037-001/env_presence_redacted.json").read_text(encoding="utf-8"))
         result_summary = json.loads((ROOT / "audit/ops/hde-epic037/ops-hde-epic037-001/result_summary.json").read_text(encoding="utf-8"))
         adapter_summary = json.loads((ROOT / "audit/ops/hde-epic037/ops-hde-epic037-001/adapter_mapping_result_summary.json").read_text(encoding="utf-8"))
         compat_summary = json.loads((ROOT / "audit/ops/hde-epic037/ops-hde-epic037-001/compat_path_result_summary.json").read_text(encoding="utf-8"))
@@ -1834,6 +1835,10 @@ def _load_epic037_ops01_entries() -> list[dict[str, object]]:
     request = stdout_payload.get("resolver", {}).get("request", {})
     request_summary_request = request_summary.get("request", {})
     request_summary_policy = request_summary.get("route_policy", {})
+    env_rails = env_presence.get("rails", {})
+    env_secret_policy = env_presence.get("secret_policy", {})
+    env_base_url_posture = env_presence.get("base_url_posture", {})
+    env_locale = env_presence.get("locale", {})
     adapter = stdout_payload.get("adapter", {})
     if (
         stdout_payload.get("status") != "ok"
@@ -1861,8 +1866,27 @@ def _load_epic037_ops01_entries() -> list[dict[str, object]]:
         or compat_summary.get("compat_path_status") != "accepted"
         or compat_summary.get("category_count") != 10
         or failure.get("classification") != "not_applicable_success"
+        or env_presence.get("artifact_kind") != "hde_epic037_ops01_env_presence_redacted"
+        or env_presence.get("epic_id") != "HDE-EPIC037"
+        or env_presence.get("pf09_task_id") != "HDE-FERM008"
+        or env_presence.get("pf09_subtask_id") != "HDE-FERM008.11"
+        or env_presence.get("missing") != []
+        or env_presence.get("errors") != []
+        or env_rails.get("safe_mode") != "0"
+        or env_rails.get("allow_network") != "1"
+        or env_rails.get("app_env") != "dev"
+        or env_locale.get("lc_all") != "C"
+        or env_locale.get("lang") != "C"
+        or env_locale.get("tz") != "UTC"
+        or env_base_url_posture.get("hd_api_base_url_present") is not True
+        or env_base_url_posture.get("hd_api_base_url_expected_v2_value") is not True
+        or env_base_url_posture.get("hd_api_base_url_value_recorded") is not False
+        or env_base_url_posture.get("hdapi_base_url_alias_present") is not False
+        or env_secret_policy.get("hd_api_key_value_recorded") is not False
+        or env_secret_policy.get("geo_api_key_value_recorded") is not False
+        or env_secret_policy.get("plaintext_secrets_allowed_in_evidence") is not False
     ):
-        raise SystemExit("INVALID_EPIC037_OPS01_RUNTIME_POSTURE")
+        raise SystemExit("INVALID_EPIC037_OPS01_RUNTIME_OR_ENV_POSTURE")
     if "bg_resolve_exit_code=0" not in (ROOT / "audit/ops/hde-epic037/ops-hde-epic037-001/exit_codes.txt").read_text(encoding="utf-8"):
         raise SystemExit("INVALID_EPIC037_OPS01_EXIT_CODE")
     ledger_lines = (ROOT / "audit/ops/hde-epic037/ops-hde-epic037-001/files_sha256.txt").read_text(encoding="utf-8").splitlines()

@@ -128,6 +128,13 @@ def test_ops01_runtime_posture_is_secret_safe_before_registration() -> None:
     compat = json.loads((OPS_ROOT / "compat_path_result_summary.json").read_text(encoding="utf-8"))
     assert compat["compat_path_status"] == "accepted"
     assert compat["category_count"] == 10
+    env_presence = json.loads((OPS_ROOT / "env_presence_redacted.json").read_text(encoding="utf-8"))
+    assert env_presence["rails"] == {"allow_network": "1", "app_env": "dev", "safe_mode": "0"}
+    assert env_presence["locale"] == {"lang": "C", "lc_all": "C", "tz": "UTC"}
+    assert env_presence["base_url_posture"]["hd_api_base_url_value_recorded"] is False
+    assert env_presence["secret_policy"]["hd_api_key_value_recorded"] is False
+    assert env_presence["secret_policy"]["geo_api_key_value_recorded"] is False
+    assert env_presence["secret_policy"]["plaintext_secrets_allowed_in_evidence"] is False
     request_summary = json.loads((OPS_ROOT / "request_summary.json").read_text(encoding="utf-8"))
     assert request_summary["secret_policy"]["plaintext_secret_recorded"] is False
     assert request_summary["secret_policy"]["raw_request_body_recorded"] is False

@@ -160,12 +160,17 @@ def verify_ops01() -> None:
             raise SystemExit(f"MISSING_EPIC037_OPS01_ARTIFACT:{rel}")
     stdout = _load_json("audit/ops/hde-epic037/ops-hde-epic037-001/stdout.log")
     request_summary = _load_json("audit/ops/hde-epic037/ops-hde-epic037-001/request_summary.json")
+    env_presence = _load_json("audit/ops/hde-epic037/ops-hde-epic037-001/env_presence_redacted.json")
     result_summary = _load_json("audit/ops/hde-epic037/ops-hde-epic037-001/result_summary.json")
     adapter_summary = _load_json("audit/ops/hde-epic037/ops-hde-epic037-001/adapter_mapping_result_summary.json")
     compat_summary = _load_json("audit/ops/hde-epic037/ops-hde-epic037-001/compat_path_result_summary.json")
     failure = _load_json("audit/ops/hde-epic037/ops-hde-epic037-001/failure_classification.json")
     adapter = stdout.get("adapter", {})
     request = stdout.get("resolver", {}).get("request", {})
+    env_rails = env_presence.get("rails", {})
+    env_secret_policy = env_presence.get("secret_policy", {})
+    env_base_url_posture = env_presence.get("base_url_posture", {})
+    env_locale = env_presence.get("locale", {})
     if (
         stdout.get("status") != "ok"
         or adapter.get("status") != "mapped"
@@ -180,6 +185,25 @@ def verify_ops01() -> None:
         or compat_summary.get("compat_path_status") != "accepted"
         or compat_summary.get("category_count") != 10
         or failure.get("classification") != "not_applicable_success"
+        or env_presence.get("artifact_kind") != "hde_epic037_ops01_env_presence_redacted"
+        or env_presence.get("epic_id") != "HDE-EPIC037"
+        or env_presence.get("pf09_task_id") != "HDE-FERM008"
+        or env_presence.get("pf09_subtask_id") != "HDE-FERM008.11"
+        or env_presence.get("missing") != []
+        or env_presence.get("errors") != []
+        or env_rails.get("safe_mode") != "0"
+        or env_rails.get("allow_network") != "1"
+        or env_rails.get("app_env") != "dev"
+        or env_locale.get("lc_all") != "C"
+        or env_locale.get("lang") != "C"
+        or env_locale.get("tz") != "UTC"
+        or env_base_url_posture.get("hd_api_base_url_present") is not True
+        or env_base_url_posture.get("hd_api_base_url_expected_v2_value") is not True
+        or env_base_url_posture.get("hd_api_base_url_value_recorded") is not False
+        or env_base_url_posture.get("hdapi_base_url_alias_present") is not False
+        or env_secret_policy.get("hd_api_key_value_recorded") is not False
+        or env_secret_policy.get("geo_api_key_value_recorded") is not False
+        or env_secret_policy.get("plaintext_secrets_allowed_in_evidence") is not False
         or request_summary.get("secret_policy", {}).get("plaintext_secret_recorded") is not False
         or request_summary.get("secret_policy", {}).get("raw_request_body_recorded") is not False
         or request_summary.get("secret_policy", {}).get("raw_response_body_recorded") is not False
