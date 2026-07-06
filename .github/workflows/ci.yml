@@ -12,6 +12,8 @@ jobs:
     # Determinism-sensitive CI rails remain closed: LC_ALL=C, LANG=C, TZ=UTC, SAFE_MODE=1, ALLOW_NETWORK=0.
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -71,6 +73,8 @@ jobs:
       ALLOW_NETWORK: "0"
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -95,6 +99,8 @@ jobs:
       ALLOW_NETWORK: "0"
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -126,6 +132,8 @@ jobs:
       ALLOW_NETWORK: "0"
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -152,6 +160,8 @@ jobs:
       APP_ENV: ci
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -175,6 +185,8 @@ jobs:
       ALLOW_NETWORK: "0"
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
