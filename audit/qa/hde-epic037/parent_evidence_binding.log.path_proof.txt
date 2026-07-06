@@ -1,5 +1,5 @@
 path: audit/qa/hde-epic037/parent_evidence_binding.log
-size_bytes: 4619
-sha256: 7592b4d00638488fcc4a76e2aace2810645838220a4d5e7c45cfc8de6cdbf786
-mtime_utc: 2026-07-06T09:27:14Z
+size_bytes: 4659
+sha256: 6e4e5e966abe5e6b005dd6ab6039ca1592b56374256ce0cf46dc871463c814e0
+mtime_utc: 2026-07-06T00:00:00Z
 produced_at_utc: 2026-07-06T00:00:00Z

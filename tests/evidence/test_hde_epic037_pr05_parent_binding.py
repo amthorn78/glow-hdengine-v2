@@ -42,6 +42,8 @@ EXPECTED_INDEX_PATHS = {
     "audit/qa/hde-epic037/token_evidence_matrix.md",
     "audit/qa/hde-epic037/acceptance_map_viability.log",
     "audit/qa/hde-epic037/parent_evidence_binding.log",
+    "audit/docdeltas/hde-epic037_pr05_parent_binding_doc_deltas.md",
+    "audit/qa/hde-epic037/00_meta/pr05_parent_binding_doc_deltas.md",
     "audit/ops/hde-epic037/ops-hde-epic037-001/stdout.log",
     "audit/ops/hde-epic037/ops-hde-epic037-001/result_summary.json",
     "audit/ops/hde-epic037/ops-hde-epic037-001/adapter_mapping_result_summary.json",

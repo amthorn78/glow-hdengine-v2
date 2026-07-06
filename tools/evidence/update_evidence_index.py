@@ -538,6 +538,11 @@ EPIC034_PR06_SUPERSEDED_INDEX_KEYS = {
     ("epic034.pr04.qa_meta_doc_deltas", "audit/qa/hde-epic034/00_meta/doc_deltas.md"),
 }
 
+EPIC037_PR05_SUPERSEDED_INDEX_KEYS = {
+    ("epic037.pr05.doc_deltas", "audit/docdeltas/hde-epic037_doc_deltas.md"),
+    ("epic037.pr05.qa_meta_doc_deltas", "audit/qa/hde-epic037/00_meta/doc_deltas.md"),
+}
+
 EPIC032_PR03_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
         "artifact_key": "db_bridge.adapter_selection.snapshot",
@@ -1792,7 +1797,7 @@ EPIC037_PR05_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     },
     {
         "artifact_key": "epic037.pr05.doc_deltas",
-        "discovered_physical_path": "audit/docdeltas/hde-epic037_doc_deltas.md",
+        "discovered_physical_path": "audit/docdeltas/hde-epic037_pr05_parent_binding_doc_deltas.md",
         "epic_id": "HDE-EPIC037",
         "record_type": "epic037_pr05_doc_delta_candidate",
         "role": "audit",
@@ -1802,7 +1807,7 @@ EPIC037_PR05_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     },
     {
         "artifact_key": "epic037.pr05.qa_meta_doc_deltas",
-        "discovered_physical_path": "audit/qa/hde-epic037/00_meta/doc_deltas.md",
+        "discovered_physical_path": "audit/qa/hde-epic037/00_meta/pr05_parent_binding_doc_deltas.md",
         "epic_id": "HDE-EPIC037",
         "record_type": "epic037_pr05_doc_delta_candidate",
         "role": "audit",
@@ -2724,6 +2729,8 @@ def _load_human_index() -> list[dict[str, object]]:
         not in EPIC034_PR04_SUPERSEDED_INDEX_KEYS
         and (entry.get("artifact_key"), entry.get("discovered_physical_path"))
         not in EPIC034_PR06_SUPERSEDED_INDEX_KEYS
+        and (entry.get("artifact_key"), entry.get("discovered_physical_path"))
+        not in EPIC037_PR05_SUPERSEDED_INDEX_KEYS
     ]
     return _dedupe_entries(
         [

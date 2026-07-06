@@ -22,7 +22,7 @@ ai_scope_claim=false
 
 | Token | Evidence paths | Posture |
 | --- | --- | --- |
-| DOC_DELTA_PRESENT_OK | audit/docdeltas/hde-epic037_doc_deltas.md; audit/qa/hde-epic037/00_meta/doc_deltas.md | Supported only by listed current repo evidence; not a QA PASS or PF09 status movement claim. |
+| DOC_DELTA_PRESENT_OK | audit/docdeltas/hde-epic037_pr05_parent_binding_doc_deltas.md; audit/qa/hde-epic037/00_meta/pr05_parent_binding_doc_deltas.md | Supported only by listed current repo evidence; not a QA PASS or PF09 status movement claim. |
 | EVIDENCE_INDEX_UPDATED_OK | docs/evidence/INDEX.json | Supported only by listed current repo evidence; not a QA PASS or PF09 status movement claim. |
 | MACHINE_MIRROR_UPDATED_OK | artifacts/evidence_index.jsonl | Supported only by listed current repo evidence; not a QA PASS or PF09 status movement claim. |
 | EVIDENCE_INDEX_HASH_OK | docs/evidence/INDEX.sha256; artifacts/evidence_index.jsonl.sha256 | Supported only by listed current repo evidence; not a QA PASS or PF09 status movement claim. |
@@ -70,5 +70,5 @@ Bound evidence families:
 - docs/acceptance_map_epic037.json
 - audit/qa/hde-epic037/acceptance_map_viability.log
 - audit/qa/hde-epic037/parent_evidence_binding.log
-- audit/docdeltas/hde-epic037_doc_deltas.md
-- audit/qa/hde-epic037/00_meta/doc_deltas.md
+- audit/docdeltas/hde-epic037_pr05_parent_binding_doc_deltas.md
+- audit/qa/hde-epic037/00_meta/pr05_parent_binding_doc_deltas.md

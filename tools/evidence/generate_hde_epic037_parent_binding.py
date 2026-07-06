@@ -26,6 +26,8 @@ VIABILITY = ROOT / "audit" / "qa" / "hde-epic037" / "acceptance_map_viability.lo
 PARENT_BINDING = ROOT / "audit" / "qa" / "hde-epic037" / "parent_evidence_binding.log"
 DOC_DELTA = ROOT / "audit" / "docdeltas" / "hde-epic037_doc_deltas.md"
 QA_DOC_DELTA = ROOT / "audit" / "qa" / "hde-epic037" / "00_meta" / "doc_deltas.md"
+PR05_DOC_DELTA = ROOT / "audit" / "docdeltas" / "hde-epic037_pr05_parent_binding_doc_deltas.md"
+PR05_QA_DOC_DELTA = ROOT / "audit" / "qa" / "hde-epic037" / "00_meta" / "pr05_parent_binding_doc_deltas.md"
 OPS_ROOT = ROOT / "audit" / "ops" / "hde-epic037" / "ops-hde-epic037-001"
 OPS_QA_POINTER = ROOT / "audit" / "qa" / "hde-epic037" / "ops-hde-epic037-001" / "ops_evidence_pointer.md"
 CLOSED_RAILS_ENV = {"ALLOW_NETWORK": "0", "LANG": "C", "LC_ALL": "C", "SAFE_MODE": "1", "TZ": "UTC"}
@@ -74,8 +76,8 @@ PR05_PATHS = [
     "audit/qa/hde-epic037/token_evidence_matrix.md",
     "audit/qa/hde-epic037/acceptance_map_viability.log",
     "audit/qa/hde-epic037/parent_evidence_binding.log",
-    "audit/docdeltas/hde-epic037_doc_deltas.md",
-    "audit/qa/hde-epic037/00_meta/doc_deltas.md",
+    "audit/docdeltas/hde-epic037_pr05_parent_binding_doc_deltas.md",
+    "audit/qa/hde-epic037/00_meta/pr05_parent_binding_doc_deltas.md",
 ]
 SUBTASKS = ["HDE-FERM008.7", "HDE-FERM008.8", "HDE-FERM008.9", "HDE-FERM008.10", "HDE-FERM008.11", "HDE-FERM008.12"]
 TOKENS = [
@@ -236,7 +238,7 @@ def build_acceptance_map() -> dict[str, object]:
 
 def build_matrix() -> str:
     rows = {
-        "DOC_DELTA_PRESENT_OK": "audit/docdeltas/hde-epic037_doc_deltas.md; audit/qa/hde-epic037/00_meta/doc_deltas.md",
+        "DOC_DELTA_PRESENT_OK": "audit/docdeltas/hde-epic037_pr05_parent_binding_doc_deltas.md; audit/qa/hde-epic037/00_meta/pr05_parent_binding_doc_deltas.md",
         "EVIDENCE_INDEX_UPDATED_OK": "docs/evidence/INDEX.json",
         "MACHINE_MIRROR_UPDATED_OK": "artifacts/evidence_index.jsonl",
         "EVIDENCE_INDEX_HASH_OK": "docs/evidence/INDEX.sha256; artifacts/evidence_index.jsonl.sha256",
@@ -352,6 +354,8 @@ def build_outputs() -> dict[Path, bytes]:
         PARENT_BINDING: build_parent_binding().encode("utf-8"),
         DOC_DELTA: DOC_TEXT.encode("utf-8"),
         QA_DOC_DELTA: DOC_TEXT.encode("utf-8"),
+        PR05_DOC_DELTA: DOC_TEXT.encode("utf-8"),
+        PR05_QA_DOC_DELTA: DOC_TEXT.encode("utf-8"),
     }
 
 
