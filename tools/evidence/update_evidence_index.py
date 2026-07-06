@@ -1834,16 +1834,27 @@ def _load_epic037_ops01_entries() -> list[dict[str, object]]:
     )
     if "https://" in commands_text or "http://" in commands_text or any(token not in commands_text for token in required_command_rails):
         raise SystemExit("INVALID_EPIC037_OPS01_COMMAND_REDACTION")
-    try:
-        stdout_payload = json.loads(stdout_path.read_text(encoding="utf-8"))
-        request_summary = json.loads((ROOT / "audit/ops/hde-epic037/ops-hde-epic037-001/request_summary.json").read_text(encoding="utf-8"))
-        env_presence = json.loads((ROOT / "audit/ops/hde-epic037/ops-hde-epic037-001/env_presence_redacted.json").read_text(encoding="utf-8"))
-        result_summary = json.loads((ROOT / "audit/ops/hde-epic037/ops-hde-epic037-001/result_summary.json").read_text(encoding="utf-8"))
-        adapter_summary = json.loads((ROOT / "audit/ops/hde-epic037/ops-hde-epic037-001/adapter_mapping_result_summary.json").read_text(encoding="utf-8"))
-        compat_summary = json.loads((ROOT / "audit/ops/hde-epic037/ops-hde-epic037-001/compat_path_result_summary.json").read_text(encoding="utf-8"))
-        failure = json.loads((ROOT / "audit/ops/hde-epic037/ops-hde-epic037-001/failure_classification.json").read_text(encoding="utf-8"))
-    except json.JSONDecodeError as exc:
-        raise SystemExit("INVALID_EPIC037_OPS01_JSON") from exc
+    ops_root = ROOT / "audit/ops/hde-epic037/ops-hde-epic037-001"
+
+    def _load_canonical_ops_json(filename: str) -> object:
+        path = ops_root / filename
+        raw = path.read_bytes()
+        try:
+            payload = json.loads(raw)
+        except json.JSONDecodeError as exc:
+            raise SystemExit("INVALID_EPIC037_OPS01_JSON") from exc
+        canonical = json.dumps(payload, separators=(",", ":"), sort_keys=True).encode("utf-8") + b"\n"
+        if raw != canonical:
+            raise SystemExit(f"NONCANONICAL_EPIC037_OPS01_JSON:{path.relative_to(ROOT).as_posix()}")
+        return payload
+
+    stdout_payload = _load_canonical_ops_json("stdout.log")
+    request_summary = _load_canonical_ops_json("request_summary.json")
+    env_presence = _load_canonical_ops_json("env_presence_redacted.json")
+    result_summary = _load_canonical_ops_json("result_summary.json")
+    adapter_summary = _load_canonical_ops_json("adapter_mapping_result_summary.json")
+    compat_summary = _load_canonical_ops_json("compat_path_result_summary.json")
+    failure = _load_canonical_ops_json("failure_classification.json")
     request = stdout_payload.get("resolver", {}).get("request", {})
     request_summary_request = request_summary.get("request", {})
     request_summary_policy = request_summary.get("route_policy", {})
@@ -1852,6 +1863,8 @@ def _load_epic037_ops01_entries() -> list[dict[str, object]]:
     env_base_url_posture = env_presence.get("base_url_posture", {})
     env_locale = env_presence.get("locale", {})
     adapter = stdout_payload.get("adapter", {})
+    expected_header_posture = ["Authorization: Bearer <redacted>", "HD-Geocode-Key: <redacted>"]
+    expected_auth_posture = "Authorization: Bearer <redacted>"
     if (
         stdout_payload.get("status") != "ok"
         or adapter.get("status") != "mapped"
@@ -1861,15 +1874,21 @@ def _load_epic037_ops01_entries() -> list[dict[str, object]]:
         or request.get("configured_base_url") != "<redacted>"
         or request.get("raw_body_emitted") is not False
         or request.get("raw_response_body_emitted") is not False
+        or request.get("route_auth_posture") != expected_auth_posture
+        or request.get("header_posture") != expected_header_posture
         or request_summary_request.get("route") != "vendor.hdapi.post:/charts"
         or request_summary_request.get("configured_base_url") != "<redacted>"
         or request_summary_request.get("resource_path") != "charts"
         or request_summary_request.get("raw_body_emitted") is not False
         or request_summary_request.get("raw_response_body_emitted") is not False
+        or request_summary_request.get("route_auth_posture") != expected_auth_posture
+        or request_summary_request.get("header_posture") != expected_header_posture
         or request_summary_policy.get("route_family") != "recommended_v2_chart"
         or request_summary_policy.get("resource_path") != "charts"
         or request_summary_policy.get("payload_family") != "ChartResult"
         or request_summary_policy.get("supported") is not True
+        or request_summary_policy.get("route_auth_posture") != expected_auth_posture
+        or request_summary_policy.get("geocode_required") is not True
         or result_summary.get("runtime_conformance_supported_by_this_smoke") is not True
         or adapter_summary.get("mapped_shape", {}).get("resolved_bodygraph_present") is not True
         or adapter_summary.get("mapped_shape", {}).get("resolved_person_present") is not True

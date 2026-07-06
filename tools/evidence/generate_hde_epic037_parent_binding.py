@@ -168,6 +168,10 @@ def verify_ops01() -> None:
     failure = _load_json("audit/ops/hde-epic037/ops-hde-epic037-001/failure_classification.json")
     adapter = stdout.get("adapter", {})
     request = stdout.get("resolver", {}).get("request", {})
+    request_summary_request = request_summary.get("request", {})
+    request_summary_policy = request_summary.get("route_policy", {})
+    expected_header_posture = ["Authorization: Bearer <redacted>", "HD-Geocode-Key: <redacted>"]
+    expected_auth_posture = "Authorization: Bearer <redacted>"
     env_rails = env_presence.get("rails", {})
     env_secret_policy = env_presence.get("secret_policy", {})
     env_base_url_posture = env_presence.get("base_url_posture", {})
@@ -193,6 +197,12 @@ def verify_ops01() -> None:
         or request.get("configured_base_url") != "<redacted>"
         or request.get("raw_body_emitted") is not False
         or request.get("raw_response_body_emitted") is not False
+        or request.get("route_auth_posture") != expected_auth_posture
+        or request.get("header_posture") != expected_header_posture
+        or request_summary_request.get("route_auth_posture") != expected_auth_posture
+        or request_summary_request.get("header_posture") != expected_header_posture
+        or request_summary_policy.get("route_auth_posture") != expected_auth_posture
+        or request_summary_policy.get("geocode_required") is not True
         or result_summary.get("runtime_conformance_supported_by_this_smoke") is not True
         or adapter_summary.get("raw_vendor_payload_recorded") is not False
         or compat_summary.get("compat_path_status") != "accepted"

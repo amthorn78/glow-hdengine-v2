@@ -136,6 +136,13 @@ def test_ops01_runtime_posture_is_secret_safe_before_registration() -> None:
     assert env_presence["secret_policy"]["geo_api_key_value_recorded"] is False
     assert env_presence["secret_policy"]["plaintext_secrets_allowed_in_evidence"] is False
     request_summary = json.loads((OPS_ROOT / "request_summary.json").read_text(encoding="utf-8"))
+    expected_header_posture = ["Authorization: Bearer <redacted>", "HD-Geocode-Key: <redacted>"]
+    assert stdout["resolver"]["request"]["route_auth_posture"] == "Authorization: Bearer <redacted>"
+    assert stdout["resolver"]["request"]["header_posture"] == expected_header_posture
+    assert request_summary["request"]["route_auth_posture"] == "Authorization: Bearer <redacted>"
+    assert request_summary["request"]["header_posture"] == expected_header_posture
+    assert request_summary["route_policy"]["route_auth_posture"] == "Authorization: Bearer <redacted>"
+    assert request_summary["route_policy"]["geocode_required"] is True
     assert request_summary["secret_policy"]["plaintext_secret_recorded"] is False
     assert request_summary["secret_policy"]["raw_request_body_recorded"] is False
     assert request_summary["secret_policy"]["raw_response_body_recorded"] is False
@@ -155,6 +162,18 @@ def test_ops01_runtime_posture_is_secret_safe_before_registration() -> None:
         "TZ=UTC",
     ):
         assert expected_command_rail in commands_text
+    for ops_json_name in (
+        "stdout.log",
+        "request_summary.json",
+        "env_presence_redacted.json",
+        "result_summary.json",
+        "adapter_mapping_result_summary.json",
+        "compat_path_result_summary.json",
+        "failure_classification.json",
+    ):
+        raw = (OPS_ROOT / ops_json_name).read_bytes()
+        payload = json.loads(raw)
+        assert raw == json.dumps(payload, separators=(",", ":"), sort_keys=True).encode("utf-8") + b"\n"
     combined = "\n".join(path.read_text(encoding="utf-8", errors="ignore") for path in [*OPS_ROOT.iterdir(), ROOT / "audit/qa/hde-epic037/ops-hde-epic037-001/ops_evidence_pointer.md"] if path.is_file())
     assert "Bearer <redacted>" in combined
     assert "HD-Geocode-Key: <redacted>" in combined
