@@ -1,0 +1,5 @@
+path: audit/qa/hde-epic037/acceptance_map_viability.log
+size_bytes: 757
+sha256: c4354f9536ac6dbaa08023f8f158afd292296f70b41597c3b0e57272bca4e308
+mtime_utc: 2026-07-06T09:27:14Z
+produced_at_utc: 2026-07-06T00:00:00Z

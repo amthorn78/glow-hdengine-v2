@@ -1,0 +1,76 @@
+HDE-EPIC037 PR-05 parent evidence binding
+generated_at_utc=2026-07-06T00:00:00Z
+epic_id=HDE-EPIC037
+pf09_task_id=HDE-FERM008
+pf09_subtask_id=HDE-FERM008.12
+parent_posture=supportable_to_done
+parent_posture_scope=later-drain support statement only; no PF09 status movement
+
+evidence_families:
+- HDE-FERM008.7 PR-01 field sufficiency: Found; indexed=after_update_evidence_index; mirrored=after_update_evidence_index; hash_sentinel_aligned=after_update_evidence_index; path_proofed=after_update_evidence_index
+  - artifacts/vendor/hdapi_v2/hde_epic037_field_sufficiency_proof.json
+  - artifacts/vendor/hdapi_v2/hde_epic037_adapter_contract.snapshot.json
+  - artifacts/vendor/hdapi_v2/hde_epic037_adapter_contract_nonclaims.json
+  - audit/docdeltas/hde-epic037_doc_deltas.md
+  - audit/qa/hde-epic037/00_meta/doc_deltas.md
+- HDE-FERM008.8 PR-02 adapter mapping: Found; indexed=after_update_evidence_index; mirrored=after_update_evidence_index; hash_sentinel_aligned=after_update_evidence_index; path_proofed=after_update_evidence_index
+  - artifacts/vendor/hdapi_v2/hde_epic037_adapter_mapping.snapshot.json
+  - artifacts/vendor/hdapi_v2/hde_epic037_adapter_negative_fixtures.json
+  - artifacts/vendor/hdapi_v2/hde_epic037_no_raw_payload_persistence.json
+  - artifacts/vendor/hdapi_v2/hde_epic037_public_reader_no_change.json
+- HDE-FERM008.9 PR-03 resolver route policy: Found; indexed=after_update_evidence_index; mirrored=after_update_evidence_index; hash_sentinel_aligned=after_update_evidence_index; path_proofed=after_update_evidence_index
+  - artifacts/vendor/hdapi_v2/hde_epic037_bg_resolve_v2_route_policy.snapshot.json
+  - artifacts/vendor/hdapi_v2/hde_epic037_bg_resolve_request_shape.snapshot.json
+  - artifacts/vendor/hdapi_v2/hde_epic037_bg_resolve_closed_rails_no_io.json
+  - artifacts/vendor/hdapi_v2/hde_epic037_bg_resolve_legacy_fallback.snapshot.json
+- HDE-FERM008.10 PR-04 v2-to-compat: Found; indexed=after_update_evidence_index; mirrored=after_update_evidence_index; hash_sentinel_aligned=after_update_evidence_index; path_proofed=after_update_evidence_index
+  - artifacts/vendor/hdapi_v2/hde_epic037_v2_to_compat_proof.json
+  - artifacts/vendor/hdapi_v2/hde_epic037_v2_to_compat_two_run.json
+  - artifacts/vendor/hdapi_v2/hde_epic037_v2_to_compat_pair_order.json
+  - artifacts/vendor/hdapi_v2/hde_epic037_admin_public_boundary.json
+- HDE-FERM008.11 OPS-01 PO-produced runtime smoke: Found; indexed=after_update_evidence_index; mirrored=after_update_evidence_index; hash_sentinel_aligned=after_update_evidence_index; path_proofed=after_update_evidence_index
+  - audit/ops/hde-epic037/ops-hde-epic037-001/commands.txt
+  - audit/ops/hde-epic037/ops-hde-epic037-001/stdout.log
+  - audit/ops/hde-epic037/ops-hde-epic037-001/stderr.log
+  - audit/ops/hde-epic037/ops-hde-epic037-001/exit_codes.txt
+  - audit/ops/hde-epic037/ops-hde-epic037-001/env_presence_redacted.json
+  - audit/ops/hde-epic037/ops-hde-epic037-001/request_summary.json
+  - audit/ops/hde-epic037/ops-hde-epic037-001/result_summary.json
+  - audit/ops/hde-epic037/ops-hde-epic037-001/adapter_mapping_result_summary.json
+  - audit/ops/hde-epic037/ops-hde-epic037-001/compat_path_result_summary.json
+  - audit/ops/hde-epic037/ops-hde-epic037-001/failure_classification.json
+  - audit/ops/hde-epic037/ops-hde-epic037-001/files_sha256.txt
+  - audit/qa/hde-epic037/ops-hde-epic037-001/ops_evidence_pointer.md
+- HDE-FERM008.12 PR-05 parent binding: Found; indexed=after_update_evidence_index; mirrored=after_update_evidence_index; hash_sentinel_aligned=after_update_evidence_index; path_proofed=after_update_evidence_index
+  - docs/acceptance_map_epic037.json
+  - audit/qa/hde-epic037/token_evidence_matrix.md
+  - audit/qa/hde-epic037/acceptance_map_viability.log
+  - audit/qa/hde-epic037/parent_evidence_binding.log
+  - audit/docdeltas/hde-epic037_doc_deltas.md
+  - audit/qa/hde-epic037/00_meta/doc_deltas.md
+
+nonclaims:
+- QA PASS
+- OPS completion by PR work
+- PF09 status movement
+- PF09 status drainage
+- PO closeout
+- board update
+- merge action
+- PF-Canon edit
+- epic closeout
+- production deployment
+- full HumanDesignAPI v2 platform conformance beyond the bounded HDE-FERM008.7-.11 evidence chain
+- public Reader change
+- public route
+- public flag
+- public payload or transport change
+- new HTTP home
+- app-side HumanDesignAPI ownership
+- raw secret persistence
+- raw request body persistence
+- raw response body persistence
+- uncontrolled raw vendor payload persistence
+- AI scope
+
+gaps: none blocking later-drain support_to_done; PF09 status drainage, PO closeout, board update, merge, and epic closeout remain separate follow-up actions.

@@ -1626,6 +1626,276 @@ def _load_epic037_pr04_entries() -> list[dict[str, object]]:
     return entries
 
 
+EPIC037_OPS01_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "epic037.ops01.commands",
+        "discovered_physical_path": "audit/ops/hde-epic037/ops-hde-epic037-001/commands.txt",
+        "epic_id": "HDE-EPIC037",
+        "record_type": "epic037_ops01_po_produced_runtime_smoke",
+        "role": "log",
+        "schema_version": "1.0",
+        "tokens": ["EVIDENCE_PATH_PROOFS_OK", "ENV_RAILS_POLICY_OK"],
+        "notes": "EPIC037 OPS-01 PO-produced open-rails v2 chart-backed bg:resolve dry-run command transcript; bound by PR-05 without rerunning OPS or making a live vendor call",
+    },
+    {
+        "artifact_key": "epic037.ops01.stdout",
+        "discovered_physical_path": "audit/ops/hde-epic037/ops-hde-epic037-001/stdout.log",
+        "epic_id": "HDE-EPIC037",
+        "record_type": "epic037_ops01_po_produced_runtime_smoke",
+        "role": "log",
+        "schema_version": "1.0",
+        "tokens": ["EVIDENCE_PATH_PROOFS_OK", "JSON_CANONICAL_CHECK_OK"],
+        "notes": "EPIC037 OPS-01 stdout JSON records status ok, ADAPTER_MAPPED ChartResult, vendor.hdapi.post:/charts, and redacted request posture",
+    },
+    {
+        "artifact_key": "epic037.ops01.stderr",
+        "discovered_physical_path": "audit/ops/hde-epic037/ops-hde-epic037-001/stderr.log",
+        "epic_id": "HDE-EPIC037",
+        "record_type": "epic037_ops01_po_produced_runtime_smoke",
+        "role": "log",
+        "schema_version": "1.0",
+        "tokens": ["EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC037 OPS-01 stderr log is empty for successful PO-produced smoke",
+    },
+    {
+        "artifact_key": "epic037.ops01.exit_codes",
+        "discovered_physical_path": "audit/ops/hde-epic037/ops-hde-epic037-001/exit_codes.txt",
+        "epic_id": "HDE-EPIC037",
+        "record_type": "epic037_ops01_po_produced_runtime_smoke",
+        "role": "log",
+        "schema_version": "1.0",
+        "tokens": ["EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC037 OPS-01 exit-code evidence records bg_resolve_exit_code=0",
+    },
+    {
+        "artifact_key": "epic037.ops01.env_presence_redacted",
+        "discovered_physical_path": "audit/ops/hde-epic037/ops-hde-epic037-001/env_presence_redacted.json",
+        "epic_id": "HDE-EPIC037",
+        "record_type": "epic037_ops01_po_produced_runtime_smoke",
+        "role": "snapshot",
+        "schema_version": "1.0",
+        "tokens": ["EVIDENCE_PATH_PROOFS_OK", "JSON_CANONICAL_CHECK_OK", "ENV_RAILS_POLICY_OK"],
+        "notes": "EPIC037 OPS-01 presence-only environment proof; no plaintext HD_API_KEY or GEO_API_KEY value recorded",
+    },
+    {
+        "artifact_key": "epic037.ops01.request_summary",
+        "discovered_physical_path": "audit/ops/hde-epic037/ops-hde-epic037-001/request_summary.json",
+        "epic_id": "HDE-EPIC037",
+        "record_type": "epic037_ops01_po_produced_runtime_smoke",
+        "role": "snapshot",
+        "schema_version": "1.0",
+        "tokens": ["EVIDENCE_PATH_PROOFS_OK", "JSON_CANONICAL_CHECK_OK"],
+        "notes": "EPIC037 OPS-01 request summary records charts resource, recommended v2 chart route family, ChartResult payload family, redacted base URL, and no raw body emission",
+    },
+    {
+        "artifact_key": "epic037.ops01.result_summary",
+        "discovered_physical_path": "audit/ops/hde-epic037/ops-hde-epic037-001/result_summary.json",
+        "epic_id": "HDE-EPIC037",
+        "record_type": "epic037_ops01_po_produced_runtime_smoke",
+        "role": "snapshot",
+        "schema_version": "1.0",
+        "tokens": ["EVIDENCE_PATH_PROOFS_OK", "JSON_CANONICAL_CHECK_OK"],
+        "notes": "EPIC037 OPS-01 result summary supports bounded runtime conformance for this smoke only and records no ingest rows written",
+    },
+    {
+        "artifact_key": "epic037.ops01.adapter_mapping_result_summary",
+        "discovered_physical_path": "audit/ops/hde-epic037/ops-hde-epic037-001/adapter_mapping_result_summary.json",
+        "epic_id": "HDE-EPIC037",
+        "record_type": "epic037_ops01_po_produced_runtime_smoke",
+        "role": "snapshot",
+        "schema_version": "1.0",
+        "tokens": ["EVIDENCE_PATH_PROOFS_OK", "JSON_CANONICAL_CHECK_OK"],
+        "notes": "EPIC037 OPS-01 adapter mapping summary records mapped resolved BodyGraph/person/cache shape presence without raw vendor payload recording",
+    },
+    {
+        "artifact_key": "epic037.ops01.compat_path_result_summary",
+        "discovered_physical_path": "audit/ops/hde-epic037/ops-hde-epic037-001/compat_path_result_summary.json",
+        "epic_id": "HDE-EPIC037",
+        "record_type": "epic037_ops01_po_produced_runtime_smoke",
+        "role": "snapshot",
+        "schema_version": "1.0",
+        "tokens": ["EVIDENCE_PATH_PROOFS_OK", "JSON_CANONICAL_CHECK_OK"],
+        "notes": "EPIC037 OPS-01 compatibility-path summary records accepted compat path and category_count=10",
+    },
+    {
+        "artifact_key": "epic037.ops01.failure_classification",
+        "discovered_physical_path": "audit/ops/hde-epic037/ops-hde-epic037-001/failure_classification.json",
+        "epic_id": "HDE-EPIC037",
+        "record_type": "epic037_ops01_po_produced_runtime_smoke",
+        "role": "snapshot",
+        "schema_version": "1.0",
+        "tokens": ["EVIDENCE_PATH_PROOFS_OK", "JSON_CANONICAL_CHECK_OK"],
+        "notes": "EPIC037 OPS-01 failure classification records not_applicable_success with stdout JSON parse ok",
+    },
+    {
+        "artifact_key": "epic037.ops01.files_sha256",
+        "discovered_physical_path": "audit/ops/hde-epic037/ops-hde-epic037-001/files_sha256.txt",
+        "epic_id": "HDE-EPIC037",
+        "record_type": "epic037_ops01_po_produced_runtime_smoke",
+        "role": "manifest",
+        "schema_version": "1.0",
+        "tokens": ["EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC037 OPS-01 checksum ledger covering OPS evidence files and QA pointer",
+    },
+    {
+        "artifact_key": "epic037.ops01.ops_evidence_pointer",
+        "discovered_physical_path": "audit/qa/hde-epic037/ops-hde-epic037-001/ops_evidence_pointer.md",
+        "epic_id": "HDE-EPIC037",
+        "record_type": "epic037_ops01_po_produced_runtime_smoke",
+        "role": "audit",
+        "schema_version": "1.0",
+        "tokens": ["EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC037 OPS-01 QA pointer to PO-produced OPS evidence root; PR-05 binds it without rerunning OPS",
+    },
+]
+
+EPIC037_PR05_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "epic037.pr05.acceptance_map",
+        "discovered_physical_path": "docs/acceptance_map_epic037.json",
+        "epic_id": "HDE-EPIC037",
+        "record_type": "epic037_pr05_parent_evidence_binding",
+        "role": "snapshot",
+        "schema_version": "1.0",
+        "tokens": ["JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK", "DOC_DELTA_PRESENT_OK"],
+        "notes": "EPIC037 PR-05 parent acceptance map binds HDE-FERM008.7 through HDE-FERM008.12 and records supportable_to_done as later-drain support only",
+    },
+    {
+        "artifact_key": "epic037.pr05.token_matrix",
+        "discovered_physical_path": "audit/qa/hde-epic037/token_evidence_matrix.md",
+        "epic_id": "HDE-EPIC037",
+        "record_type": "epic037_pr05_parent_evidence_binding",
+        "role": "snapshot",
+        "schema_version": "1.0",
+        "tokens": ["EVIDENCE_PATH_PROOFS_OK", "DOC_DELTA_PRESENT_OK"],
+        "notes": "EPIC037 PR-05 token/evidence matrix maps registered tokens to current concrete evidence without QA PASS or PF09 status movement claim",
+    },
+    {
+        "artifact_key": "epic037.pr05.acceptance_map_viability",
+        "discovered_physical_path": "audit/qa/hde-epic037/acceptance_map_viability.log",
+        "epic_id": "HDE-EPIC037",
+        "record_type": "epic037_pr05_parent_evidence_binding",
+        "role": "log",
+        "schema_version": "1.0",
+        "tokens": ["EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC037 PR-05 acceptance-map viability log records parseability, path/proof/index/mirror posture, supported tokens, and parent posture supportability",
+    },
+    {
+        "artifact_key": "epic037.pr05.parent_evidence_binding",
+        "discovered_physical_path": "audit/qa/hde-epic037/parent_evidence_binding.log",
+        "epic_id": "HDE-EPIC037",
+        "record_type": "epic037_pr05_parent_evidence_binding",
+        "role": "log",
+        "schema_version": "1.0",
+        "tokens": ["EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC037 PR-05 parent evidence binding log lists HDE-FERM008.7 through HDE-FERM008.12 evidence families, index/mirror/hash/path-proof posture, nonclaims, and final supportable_to_done posture",
+    },
+    {
+        "artifact_key": "epic037.pr05.doc_deltas",
+        "discovered_physical_path": "audit/docdeltas/hde-epic037_doc_deltas.md",
+        "epic_id": "HDE-EPIC037",
+        "record_type": "epic037_pr05_doc_delta_candidate",
+        "role": "audit",
+        "schema_version": "1.0",
+        "tokens": ["DOC_DELTA_PRESENT_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC037 PR-05 doc-delta candidate surface for parent evidence binding; PF-Canon not edited",
+    },
+    {
+        "artifact_key": "epic037.pr05.qa_meta_doc_deltas",
+        "discovered_physical_path": "audit/qa/hde-epic037/00_meta/doc_deltas.md",
+        "epic_id": "HDE-EPIC037",
+        "record_type": "epic037_pr05_doc_delta_candidate",
+        "role": "audit",
+        "schema_version": "1.0",
+        "tokens": ["DOC_DELTA_PRESENT_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC037 PR-05 QA-meta doc-delta mirror for parent evidence binding; no PF09 status movement, OPS rerun, QA PASS, or closeout claim",
+    },
+]
+
+
+def _load_epic037_ops01_entries() -> list[dict[str, object]]:
+    stdout_path = ROOT / "audit/ops/hde-epic037/ops-hde-epic037-001/stdout.log"
+    if not stdout_path.exists():
+        return []
+    try:
+        stdout_payload = json.loads(stdout_path.read_text(encoding="utf-8"))
+        request_summary = json.loads((ROOT / "audit/ops/hde-epic037/ops-hde-epic037-001/request_summary.json").read_text(encoding="utf-8"))
+        result_summary = json.loads((ROOT / "audit/ops/hde-epic037/ops-hde-epic037-001/result_summary.json").read_text(encoding="utf-8"))
+        adapter_summary = json.loads((ROOT / "audit/ops/hde-epic037/ops-hde-epic037-001/adapter_mapping_result_summary.json").read_text(encoding="utf-8"))
+        compat_summary = json.loads((ROOT / "audit/ops/hde-epic037/ops-hde-epic037-001/compat_path_result_summary.json").read_text(encoding="utf-8"))
+        failure = json.loads((ROOT / "audit/ops/hde-epic037/ops-hde-epic037-001/failure_classification.json").read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise SystemExit("INVALID_EPIC037_OPS01_JSON") from exc
+    request = stdout_payload.get("resolver", {}).get("request", {})
+    adapter = stdout_payload.get("adapter", {})
+    if (
+        stdout_payload.get("status") != "ok"
+        or adapter.get("status") != "mapped"
+        or adapter.get("code") != "ADAPTER_MAPPED"
+        or adapter.get("payload_family") != "ChartResult"
+        or request.get("route") != "vendor.hdapi.post:/charts"
+        or request.get("configured_base_url") != "<redacted>"
+        or request.get("raw_body_emitted") is not False
+        or request.get("raw_response_body_emitted") is not False
+        or result_summary.get("runtime_conformance_supported_by_this_smoke") is not True
+        or adapter_summary.get("mapped_shape", {}).get("resolved_bodygraph_present") is not True
+        or adapter_summary.get("mapped_shape", {}).get("resolved_person_present") is not True
+        or adapter_summary.get("mapped_shape", {}).get("cache_input_fingerprint_present") is not True
+        or adapter_summary.get("raw_vendor_payload_recorded") is not False
+        or compat_summary.get("compat_path_status") != "accepted"
+        or compat_summary.get("category_count") != 10
+        or failure.get("classification") != "not_applicable_success"
+    ):
+        raise SystemExit("INVALID_EPIC037_OPS01_RUNTIME_POSTURE")
+    if "bg_resolve_exit_code=0" not in (ROOT / "audit/ops/hde-epic037/ops-hde-epic037-001/exit_codes.txt").read_text(encoding="utf-8"):
+        raise SystemExit("INVALID_EPIC037_OPS01_EXIT_CODE")
+    ledger_lines = (ROOT / "audit/ops/hde-epic037/ops-hde-epic037-001/files_sha256.txt").read_text(encoding="utf-8").splitlines()
+    ledger = {line.split()[1]: line.split()[0] for line in ledger_lines if line.strip()}
+    entries: list[dict[str, object]] = []
+    for entry in EPIC037_OPS01_PRIMARY_ARTIFACTS:
+        rel = str(entry["discovered_physical_path"])
+        path = ROOT / rel
+        if not path.exists():
+            raise SystemExit(f"MISSING_EPIC037_OPS01_ARTIFACT:{rel}")
+        if rel != "audit/ops/hde-epic037/ops-hde-epic037-001/files_sha256.txt" and ledger.get(rel) != _sha256_path(path):
+            raise SystemExit(f"INVALID_EPIC037_OPS01_LEDGER:{rel}")
+        normalized = dict(entry)
+        normalized["produced_at_utc"] = "2026-07-06T00:00:00Z"
+        entries.append(normalized)
+    if request_summary.get("secret_policy", {}).get("plaintext_secret_recorded") is not False:
+        raise SystemExit("INVALID_EPIC037_OPS01_SECRET_POSTURE")
+    return entries
+
+
+def _load_epic037_pr05_entries() -> list[dict[str, object]]:
+    acceptance_map = ROOT / "docs/acceptance_map_epic037.json"
+    if not acceptance_map.exists():
+        return []
+    try:
+        payload = json.loads(acceptance_map.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise SystemExit("INVALID_EPIC037_PR05_ACCEPTANCE_MAP") from exc
+    if (
+        payload.get("epic_id") != "HDE-EPIC037"
+        or payload.get("pf09_task_id") != "HDE-FERM008"
+        or payload.get("pf09_subtask_id") != "HDE-FERM008.12"
+        or payload.get("parent_posture") != "supportable_to_done"
+        or set(payload.get("pf09_subtasks_bound", [])) != {"HDE-FERM008.7", "HDE-FERM008.8", "HDE-FERM008.9", "HDE-FERM008.10", "HDE-FERM008.11", "HDE-FERM008.12"}
+        or "PF09 status movement" not in payload.get("nonclaims", [])
+        or "QA PASS" not in payload.get("nonclaims", [])
+    ):
+        raise SystemExit("INVALID_EPIC037_PR05_ACCEPTANCE_IDENTITY")
+    entries: list[dict[str, object]] = []
+    for entry in EPIC037_PR05_PRIMARY_ARTIFACTS:
+        rel = str(entry["discovered_physical_path"])
+        if not (ROOT / rel).exists():
+            raise SystemExit(f"MISSING_EPIC037_PR05_ARTIFACT:{rel}")
+        normalized = dict(entry)
+        normalized["produced_at_utc"] = str(payload.get("generated_at_utc") or "2026-07-06T00:00:00Z")
+        entries.append(normalized)
+    return entries
+
+
 EPIC035_PR03_OPS01_ARTIFACTS: list[dict[str, object]] = [
     {
         "artifact_key": "epic035.ops01.ops_evidence_manifest",
@@ -2352,7 +2622,7 @@ def _write_path_proof(
 
         if mtime_parsed > stat_mtime_dt:
             raise SystemExit(f"PROOF_MTIME_FUTURE:{proof_rel}")
-        return proof_rel, produced
+        return proof_rel, produced_raw
 
     mtime = mtime_floor
     proof_lines = [
@@ -2490,6 +2760,8 @@ def _load_human_index() -> list[dict[str, object]]:
             *_load_epic037_pr02_entries(),
             *_load_epic037_pr03_entries(),
             *_load_epic037_pr04_entries(),
+            *_load_epic037_ops01_entries(),
+            *_load_epic037_pr05_entries(),
             *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,
@@ -2818,7 +3090,7 @@ def main(argv: list[str] | None = None) -> None:
     # Mirror rendering depends on artifacts written by this same updater
     # (notably artifacts/evidence_index.jsonl.sha256 and related path proofs),
     # so a single rewrite is not always sufficient.
-    max_passes = 3
+    max_passes = 6
     last_error: SystemExit | None = None
     for _ in range(max_passes):
         _run_once(check=False)

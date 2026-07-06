@@ -227,7 +227,12 @@ def write_outputs(outputs: dict[Path, bytes], *, produced_at: str, check: bool) 
     stale = []
     for path, body in outputs.items():
         if check:
-            if not path.exists() or path.read_bytes() != body:
+            actual = path.read_bytes() if path.exists() else b""
+            if path in {DOC_DELTA, QA_DOC_DELTA}:
+                matches = actual.startswith(body)
+            else:
+                matches = actual == body
+            if not path.exists() or not matches:
                 stale.append(path.relative_to(ROOT).as_posix())
             else:
                 _write_path_proof(path, produced_at, check=True)

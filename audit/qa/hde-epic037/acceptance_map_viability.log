@@ -1,0 +1,19 @@
+HDE-EPIC037 PR-05 acceptance-map viability
+generated_at_utc=2026-07-06T00:00:00Z
+epic_id=HDE-EPIC037
+acceptance_map=docs/acceptance_map_epic037.json
+canonical_json_parseable=true
+referenced_artifact_paths_exist=true
+referenced_artifact_path_proofs_exist=after_update_evidence_index
+claimed_tokens_registered_and_supported=true
+human_evidence_index_includes_pr05_and_ops01=after_update_evidence_index
+machine_mirror_includes_pr05_and_ops01=after_update_evidence_index
+parent_posture=supportable_to_done
+parent_posture_supportable_from_current_evidence=true
+qa_pass_claim=false
+ops_completion_by_pr_work_claim=false
+pf09_status_movement_claim=false
+pf09_status_drainage_claim=false
+pf_canon_edit=false
+live_vendor_call_by_pr05=false
+external_io_by_pr05=false
