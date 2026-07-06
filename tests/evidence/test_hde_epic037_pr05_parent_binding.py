@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 from pathlib import Path
 
@@ -128,6 +129,11 @@ def test_ops01_runtime_posture_is_secret_safe_before_registration() -> None:
     compat = json.loads((OPS_ROOT / "compat_path_result_summary.json").read_text(encoding="utf-8"))
     assert compat["compat_path_status"] == "accepted"
     assert compat["category_count"] == 10
+    request_summary = json.loads((OPS_ROOT / "request_summary.json").read_text(encoding="utf-8"))
+    assert request_summary["secret_policy"]["plaintext_secret_recorded"] is False
+    assert request_summary["secret_policy"]["raw_request_body_recorded"] is False
+    assert request_summary["secret_policy"]["raw_response_body_recorded"] is False
+    assert request_summary["secret_policy"]["uncontrolled_raw_vendor_payload_recorded"] is False
     failure = json.loads((OPS_ROOT / "failure_classification.json").read_text(encoding="utf-8"))
     assert failure["classification"] == "not_applicable_success"
     combined = "\n".join(path.read_text(encoding="utf-8", errors="ignore") for path in [*OPS_ROOT.iterdir(), ROOT / "audit/qa/hde-epic037/ops-hde-epic037-001/ops_evidence_pointer.md"] if path.is_file())
@@ -152,8 +158,28 @@ def test_pr05_and_ops01_records_are_indexed_mirrored_and_path_proofed() -> None:
         assert (ROOT / record["proof_anchor"]).exists()
 
 
+def _review_base_ref() -> str:
+    candidates = []
+    base_ref = os.environ.get("GITHUB_BASE_REF")
+    if base_ref:
+        candidates.extend([f"origin/{base_ref}", base_ref])
+    candidates.extend(["origin/main", "main", "HEAD^"])
+    for candidate in candidates:
+        result = subprocess.run(
+            ["git", "merge-base", "HEAD", candidate],
+            cwd=ROOT,
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+        )
+        if result.returncode == 0 and result.stdout.strip():
+            return result.stdout.strip()
+    return "HEAD^"
+
+
 def test_pr05_did_not_edit_pfcanon() -> None:
-    result = subprocess.run(["git", "diff", "--name-only", "--", "docs/pfcanon"], cwd=ROOT, text=True, stdout=subprocess.PIPE, check=True)
+    base = _review_base_ref()
+    result = subprocess.run(["git", "diff", "--name-only", f"{base}...HEAD", "--", "docs/pfcanon"], cwd=ROOT, text=True, stdout=subprocess.PIPE, check=True)
     assert result.stdout.strip() == ""
 
 

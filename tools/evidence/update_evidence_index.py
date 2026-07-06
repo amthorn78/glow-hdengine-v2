@@ -1867,8 +1867,14 @@ def _load_epic037_ops01_entries() -> list[dict[str, object]]:
         normalized = dict(entry)
         normalized["produced_at_utc"] = "2026-07-06T00:00:00Z"
         entries.append(normalized)
-    if request_summary.get("secret_policy", {}).get("plaintext_secret_recorded") is not False:
-        raise SystemExit("INVALID_EPIC037_OPS01_SECRET_POSTURE")
+    secret_policy = request_summary.get("secret_policy", {})
+    if (
+        secret_policy.get("plaintext_secret_recorded") is not False
+        or secret_policy.get("raw_request_body_recorded") is not False
+        or secret_policy.get("raw_response_body_recorded") is not False
+        or secret_policy.get("uncontrolled_raw_vendor_payload_recorded") is not False
+    ):
+        raise SystemExit("INVALID_EPIC037_OPS01_SECRET_OR_RAW_PAYLOAD_POSTURE")
     return entries
 
 
