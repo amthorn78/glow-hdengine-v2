@@ -4,13 +4,13 @@
 
 **Title:** PF12-Canon-HDE-Schemas-and-Artifacts
 
-**Version:** v2.7.4
+**Version:** v2.7.6
 
 **Status:** Canon
 
-**Effective date:** 2026-07-03
+**Effective date:** 2026-07-04
 
-**Last Update Gate:** BN 11.9.9
+**Last Update Gate:** BN 12.0.1
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -38,6 +38,24 @@ This document is the single home for:
 * Titles and paths only; no payload bytes.  
 * Must maintain 1:1 parity with the Machine Evidence Mirror (see §8.3).  
 * Hash sentinel docs/evidence/INDEX.sha256 is computed over the canonical bytes of INDEX.json (merge-gating; token semantics live in HDE-Governance).
+
+### **Historical minimal Human Index rows (closed-task revalidation)**
+
+Older governed evidence artifacts MAY have Human Evidence Index rows that contain only key/path-style pointer data, such as artifact key and discovered physical path, when those rows predate the current richer evidence-shape expectations.
+
+A minimal Human Evidence Index row MAY remain sufficient for closed-task revalidation only when all of the following are true:
+
+* the underlying artifact bytes and governed path are unchanged;  
+* no new evidence regeneration, schema migration, acceptance claim, QA PASS, OPS completion, PF09 status movement, closeout, or runtime behavior claim is being made from the minimal row alone;  
+* the Human Evidence Index still preserves the expected title/path or key/path binding for the artifact;  
+* the Machine Evidence Mirror contains the matching artifact record with coherent `sha256`, `size_bytes`, and `proof_anchor`;  
+* the `proof_anchor` points to the matching sibling path-proof transcript;  
+* the sibling path-proof transcript records the same path, hash, and size for the governed artifact;  
+* the revalidation artifact records the minimal-row caveat rather than hiding it.
+
+Do not downgrade a historical evidence family solely because older Human Index rows are minimal when the Machine Mirror record and sibling path-proof transcript provide coherent hash, size, and proof-anchor linkage. Treat the condition as a historical evidence-shape caveat unless a later PO-governed evidence migration explicitly requires richer Human Index rows for older artifacts.
+
+If the artifact bytes change, the evidence family is regenerated, a new acceptance claim is made, or a migration explicitly updates the Human Index shape, current PF12 Human Index, Machine Mirror, hash-sentinel, and path-proof rules apply in full.
 
 ### **Machine Evidence Mirror (governed here)**
 

@@ -2,13 +2,13 @@
 
 **Title:** PF06-Canon-Epic-Process-Guide 
 
-**Version:** v2.3.2
+**Version:** v2.3.3
 
 **Status:** Canon
 
 **Effective date**: 2026-07-03
 
-**Last Update Gate:**  BN 11.9.9
+**Last Update Gate:**  BN 12.0.1
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -361,6 +361,12 @@ OPS discovery task minimums. A bounded OPS discovery task MUST state the exact f
 Dependent Ops execution guard. A downstream Ops execution task MUST NOT proceed from unresolved command proof or unresolved target facts. When the safe execution basis is not proven, classify the downstream task as TOOLING\_BLOCKED and record what proof would unblock it.
 
 Ops evidence overclaim guard. Bounded Ops discovery, validation, and implementation-validation evidence MUST NOT by itself claim QA PASS, Live QA completion, PF09 status change, acceptance-token satisfaction, PF-canon drain completion, or epic closure. It may support a later-drain posture only when the approved task claimed that posture and the governed evidence proves it.
+
+Closed-task OPS revalidation reviews. An OPS evidence review MAY revalidate an already-closed or already-recorded PF09 task or subtask when the approved task is bounded to revalidation, evidence inspection, or current-state confirmation. The review MUST preserve the distinction between OPS revalidation evidence, QA evidence, PF09 status drainage, acceptance-token claims, PF-canon drainage, and epic closeout.
+
+OPS revalidation evidence may support the current recorded PF09 posture or support a later-drain note only when the reviewed evidence proves that bounded posture. It does not replace QA evidence, does not perform QA execution, does not perform PF09 drainage, does not create a new acceptance token claim, does not imply implementation change, and does not perform PO closeout.
+
+When older governed evidence has a historical shape caveat, the revalidation review MUST classify the caveat precisely. A historical evidence-shape caveat is not by itself a reason to downgrade a closed PF09 task when the governing evidence requirement is still satisfied by coherent current evidence, mirror records, and path-proof linkage. If a later PO-governed migration or current PF-Canon rule requires richer evidence shape, record that as a separate migration or drain item rather than silently changing the closed-task posture.
 
 Ops closeout packaging run (OPS-01). When an epic uses an Ops task to surface already-produced close-pack artifacts and closure evidence, the run MUST remain packaging and evidence only:
 
