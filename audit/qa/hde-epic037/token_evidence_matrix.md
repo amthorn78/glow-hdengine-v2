@@ -27,10 +27,7 @@ ai_scope_claim=false
 | MACHINE_MIRROR_UPDATED_OK | artifacts/evidence_index.jsonl | Supported only by listed current repo evidence; not a QA PASS or PF09 status movement claim. |
 | EVIDENCE_INDEX_HASH_OK | docs/evidence/INDEX.sha256; artifacts/evidence_index.jsonl.sha256 | Supported only by listed current repo evidence; not a QA PASS or PF09 status movement claim. |
 | EVIDENCE_INDEX_MIRROR_OK | docs/evidence/INDEX.json; artifacts/evidence_index.jsonl | Supported only by listed current repo evidence; not a QA PASS or PF09 status movement claim. |
-| EVIDENCE_PATHS_VALIDATED_OK | tools/evidence/validate_evidence_paths.py; tools/evidence/update_evidence_index.py --check | Supported only by listed current repo evidence; not a QA PASS or PF09 status movement claim. |
 | EVIDENCE_PATH_PROOFS_OK | sibling .path_proof.txt files for PR-05 artifacts and OPS-01 bound artifacts | Supported only by listed current repo evidence; not a QA PASS or PF09 status movement claim. |
-| CI_CHECK_FINAL_LF_OK | ci/checks/check_final_lf.sh | Supported only by listed current repo evidence; not a QA PASS or PF09 status movement claim. |
-| CI_CHECK_MIRROR_SCHEMA_OK | ci/checks/check_mirror_schema.sh | Supported only by listed current repo evidence; not a QA PASS or PF09 status movement claim. |
 | JSON_CANONICAL_CHECK_OK | docs/acceptance_map_epic037.json and canonical JSON evidence snapshots | Supported only by listed current repo evidence; not a QA PASS or PF09 status movement claim. |
 | COMPOSITE_ABBA_IDENTITY_OK | artifacts/vendor/hdapi_v2/hde_epic037_v2_to_compat_pair_order.json | Supported only by listed current repo evidence; not a QA PASS or PF09 status movement claim. |
 | TWO_RUN_IDENTITY_OK | artifacts/vendor/hdapi_v2/hde_epic037_v2_to_compat_two_run.json | Supported only by listed current repo evidence; not a QA PASS or PF09 status movement claim. |

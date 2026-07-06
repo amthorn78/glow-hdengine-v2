@@ -86,10 +86,7 @@ TOKENS = [
     "MACHINE_MIRROR_UPDATED_OK",
     "EVIDENCE_INDEX_HASH_OK",
     "EVIDENCE_INDEX_MIRROR_OK",
-    "EVIDENCE_PATHS_VALIDATED_OK",
     "EVIDENCE_PATH_PROOFS_OK",
-    "CI_CHECK_FINAL_LF_OK",
-    "CI_CHECK_MIRROR_SCHEMA_OK",
     "JSON_CANONICAL_CHECK_OK",
     "COMPOSITE_ABBA_IDENTITY_OK",
     "TWO_RUN_IDENTITY_OK",
@@ -184,6 +181,8 @@ def verify_ops01() -> None:
         or compat_summary.get("category_count") != 10
         or failure.get("classification") != "not_applicable_success"
         or request_summary.get("secret_policy", {}).get("plaintext_secret_recorded") is not False
+        or request_summary.get("secret_policy", {}).get("raw_request_body_recorded") is not False
+        or request_summary.get("secret_policy", {}).get("raw_response_body_recorded") is not False
         or request_summary.get("secret_policy", {}).get("uncontrolled_raw_vendor_payload_recorded") is not False
     ):
         raise SystemExit("INVALID_EPIC037_OPS01_POSTURE")
@@ -243,10 +242,7 @@ def build_matrix() -> str:
         "MACHINE_MIRROR_UPDATED_OK": "artifacts/evidence_index.jsonl",
         "EVIDENCE_INDEX_HASH_OK": "docs/evidence/INDEX.sha256; artifacts/evidence_index.jsonl.sha256",
         "EVIDENCE_INDEX_MIRROR_OK": "docs/evidence/INDEX.json; artifacts/evidence_index.jsonl",
-        "EVIDENCE_PATHS_VALIDATED_OK": "tools/evidence/validate_evidence_paths.py; tools/evidence/update_evidence_index.py --check",
         "EVIDENCE_PATH_PROOFS_OK": "sibling .path_proof.txt files for PR-05 artifacts and OPS-01 bound artifacts",
-        "CI_CHECK_FINAL_LF_OK": "ci/checks/check_final_lf.sh",
-        "CI_CHECK_MIRROR_SCHEMA_OK": "ci/checks/check_mirror_schema.sh",
         "JSON_CANONICAL_CHECK_OK": "docs/acceptance_map_epic037.json and canonical JSON evidence snapshots",
         "COMPOSITE_ABBA_IDENTITY_OK": "artifacts/vendor/hdapi_v2/hde_epic037_v2_to_compat_pair_order.json",
         "TWO_RUN_IDENTITY_OK": "artifacts/vendor/hdapi_v2/hde_epic037_v2_to_compat_two_run.json",

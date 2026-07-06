@@ -1832,6 +1832,8 @@ def _load_epic037_ops01_entries() -> list[dict[str, object]]:
     except json.JSONDecodeError as exc:
         raise SystemExit("INVALID_EPIC037_OPS01_JSON") from exc
     request = stdout_payload.get("resolver", {}).get("request", {})
+    request_summary_request = request_summary.get("request", {})
+    request_summary_policy = request_summary.get("route_policy", {})
     adapter = stdout_payload.get("adapter", {})
     if (
         stdout_payload.get("status") != "ok"
@@ -1842,6 +1844,15 @@ def _load_epic037_ops01_entries() -> list[dict[str, object]]:
         or request.get("configured_base_url") != "<redacted>"
         or request.get("raw_body_emitted") is not False
         or request.get("raw_response_body_emitted") is not False
+        or request_summary_request.get("route") != "vendor.hdapi.post:/charts"
+        or request_summary_request.get("configured_base_url") != "<redacted>"
+        or request_summary_request.get("resource_path") != "charts"
+        or request_summary_request.get("raw_body_emitted") is not False
+        or request_summary_request.get("raw_response_body_emitted") is not False
+        or request_summary_policy.get("route_family") != "recommended_v2_chart"
+        or request_summary_policy.get("resource_path") != "charts"
+        or request_summary_policy.get("payload_family") != "ChartResult"
+        or request_summary_policy.get("supported") is not True
         or result_summary.get("runtime_conformance_supported_by_this_smoke") is not True
         or adapter_summary.get("mapped_shape", {}).get("resolved_bodygraph_present") is not True
         or adapter_summary.get("mapped_shape", {}).get("resolved_person_present") is not True
