@@ -1,5 +1,16 @@
 # CHANGELOG
 
+Unreleased — HDE-EPIC037: Fermentation Pass 8 final repo docs sweep (README/CHANGELOG/AGENTS/docs/)
+
+### Added
+- Documented HDE-EPIC037 as the completed Fermentation Pass 8 repo-evidence slice for HDE-FERM008.7 through HDE-FERM008.12, including field-sufficiency, deterministic v2 ChartResult adapter mapping, configured-v2 `bg:resolve --source vendor --dry-run` charts-route wiring, v2-to-compat proof, PO-produced OPS-01 smoke evidence, and PR-05 parent binding.
+- Added repo-doc navigation for PR-01 through PR-05 evidence families, PO-only OPS-01 evidence under `audit/ops/hde-epic037/ops-hde-epic037-001/`, and parent binding artifacts under `docs/acceptance_map_epic037.json` and `audit/qa/hde-epic037/`.
+
+### Changed / Fixed
+- Refreshed public and developer docs from HDE-EPIC036 Fermentation Pass 7 wording to HDE-EPIC037 Fermentation Pass 8 current repo truth while preserving EPIC036 as historical pre-adapter route-policy evidence.
+- Clarified that `parent_posture=supportable_to_done` is supportable for later PF09 drainage from repo evidence only; this docs sweep does not move PF09 status, claim QA PASS, rerun OPS, make live vendor calls, claim PO closeout, or close the epic.
+- Preserved HDE-EPIC037 nonclaims: no public Reader change, new public route, public flag, public payload or transport change, new HTTP home, app-side HumanDesignAPI ownership or call-path transfer, raw secret/request/response/vendor payload persistence, production deployment, board update, broad HumanDesignAPI v2 platform conformance, or AI scope.
+
 Unreleased — HDE-EPIC036: Fermentation Pass 7 final repo docs sweep (README/CHANGELOG/AGENTS/docs/)
 
 ### Added
