@@ -1,0 +1,31 @@
+# hde-epic037 ops-01 command transcript
+scope: one bounded po-only open-rails v2 chart-backed bg:resolve dry-run smoke
+
+repo preflight commands and observed results:
+pwd -> /workspaces/glow-hdengine-v2
+git rev-parse HEAD -> 0737388fcab4a6b7183c7e83d8f904fbc35c2fe6
+git branch --show-current -> main
+git status --short -> clean before OPS evidence creation
+git ls-files pyproject.toml engine/cli/__main__.py engine/cli/main.py engine/bodygraph/resolver.py engine/bodygraph/vendor_client.py engine/bodygraph/v2_adapter.py engine/compat/compute.py artifacts/vendor/hdapi_v2/hde_epic037_bg_resolve_v2_route_policy.snapshot.json artifacts/vendor/hdapi_v2/hde_epic037_v2_to_compat_proof.json -> all listed paths tracked
+
+evidence setup commands:
+export OPS_ROOT="audit/ops/hde-epic037/ops-hde-epic037-001"
+export OPS_QA_POINTER_ROOT="audit/qa/hde-epic037/ops-hde-epic037-001"
+mkdir/write commands.txt via local Python evidence script
+
+smoke command, redacted variable form:
+HD_API_BASE_URL=https://api.humandesignapi.nl/v2 SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python -m engine.cli bg:resolve --user "$OPS_USER_ID" --source vendor --dry-run --birthdate "$OPS_BIRTHDATE" --birthtime "$OPS_BIRTHTIME" --location "$OPS_LOCATION"
+
+secret policy: no plaintext hd_api_key, geo_api_key, bearer token, geocode key, request body, raw response body, or uncontrolled raw vendor payload is recorded here.
+
+redacted env preflight command: HD_API_BASE_URL=https://api.humandesignapi.nl/v2 SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC OPS_* fixture variables set; HDAPI_BASE_URL unset; write env_presence_redacted.json
+redacted env preflight result: OPS01_ENV_PREFLIGHT_OK
+executed smoke command: HD_API_BASE_URL=https://api.humandesignapi.nl/v2 SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python -m engine.cli bg:resolve --user "$OPS_USER_ID" --source vendor --dry-run --birthdate "$OPS_BIRTHDATE" --birthtime "$OPS_BIRTHTIME" --location "$OPS_LOCATION"
+stdout captured at: audit/ops/hde-epic037/ops-hde-epic037-001/stdout.log
+stderr captured at: audit/ops/hde-epic037/ops-hde-epic037-001/stderr.log
+exit code captured at: audit/ops/hde-epic037/ops-hde-epic037-001/exit_codes.txt
+summary command: write request/result/adapter/compat/failure summary JSON artifacts from captured stdout/stderr/exit code
+checksum command: write QA pointer and files_sha256.txt
+final repo status command: git status --short
+expected dirty paths: audit/ops/hde-epic037/ops-hde-epic037-001/ and audit/qa/hde-epic037/ops-hde-epic037-001/ only until PR-05 binding.
+post-final-status checksum refresh command: recompute files_sha256.txt after S7 command transcript update

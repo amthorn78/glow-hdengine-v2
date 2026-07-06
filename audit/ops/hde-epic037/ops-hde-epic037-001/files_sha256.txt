@@ -1,0 +1,11 @@
+62c920c14d6da469f1eb5a1974eff91e63e4fa29e8180eec880563c3558fc030  audit/ops/hde-epic037/ops-hde-epic037-001/commands.txt
+d3e0f60910dbb3a5085aa0a415369a9192d469b7b21d6321294a7658e882d257  audit/ops/hde-epic037/ops-hde-epic037-001/stdout.log
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  audit/ops/hde-epic037/ops-hde-epic037-001/stderr.log
+43d0e827d0835f2181a2d315016232313406bbc713ff1e989e5555ac6eb33a0c  audit/ops/hde-epic037/ops-hde-epic037-001/exit_codes.txt
+4ea39b6c5c471634463ac0f47ef313190ecb66745a642f23f5b38c94ff21cd44  audit/ops/hde-epic037/ops-hde-epic037-001/env_presence_redacted.json
+0f0ebefa01c4e14b3d2b6d9aa12a0608deffea88e2aa606ac58daef393791494  audit/ops/hde-epic037/ops-hde-epic037-001/request_summary.json
+4a1101e815c6f579ad97c86015e5f9d0a48b552c48212aad0fb4958ad0c400a8  audit/ops/hde-epic037/ops-hde-epic037-001/result_summary.json
+6c4226c426fc955270dab075381b1298e1a190ec35f42e3820eb40a4adbb4b8d  audit/ops/hde-epic037/ops-hde-epic037-001/adapter_mapping_result_summary.json
+ed678a9c22e36137364c4e7895db686b57a710ae50ea7b95f0e2d80f1f70e6da  audit/ops/hde-epic037/ops-hde-epic037-001/compat_path_result_summary.json
+242e166d69062ae36ea65b187398abe1cd56f1c413bd811238c9634f319b40ca  audit/ops/hde-epic037/ops-hde-epic037-001/failure_classification.json
+be559083fccc633ba1eb96091a21e22e6dc4fdafc35351320374947e9579d9f5  audit/qa/hde-epic037/ops-hde-epic037-001/ops_evidence_pointer.md
