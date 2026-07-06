@@ -14,13 +14,13 @@ export OPS_QA_POINTER_ROOT="audit/qa/hde-epic037/ops-hde-epic037-001"
 mkdir/write commands.txt via local Python evidence script
 
 smoke command, redacted variable form:
-HD_API_BASE_URL=https://api.humandesignapi.nl/v2 SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python -m engine.cli bg:resolve --user "$OPS_USER_ID" --source vendor --dry-run --birthdate "$OPS_BIRTHDATE" --birthtime "$OPS_BIRTHTIME" --location "$OPS_LOCATION"
+HD_API_BASE_URL=<redacted-v2-base> SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python -m engine.cli bg:resolve --user "$OPS_USER_ID" --source vendor --dry-run --birthdate "$OPS_BIRTHDATE" --birthtime "$OPS_BIRTHTIME" --location "$OPS_LOCATION"
 
 secret policy: no plaintext hd_api_key, geo_api_key, bearer token, geocode key, request body, raw response body, or uncontrolled raw vendor payload is recorded here.
 
-redacted env preflight command: HD_API_BASE_URL=https://api.humandesignapi.nl/v2 SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC OPS_* fixture variables set; HDAPI_BASE_URL unset; write env_presence_redacted.json
+redacted env preflight command: HD_API_BASE_URL=<redacted-v2-base> SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC OPS_* fixture variables set; HDAPI_BASE_URL unset; write env_presence_redacted.json
 redacted env preflight result: OPS01_ENV_PREFLIGHT_OK
-executed smoke command: HD_API_BASE_URL=https://api.humandesignapi.nl/v2 SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python -m engine.cli bg:resolve --user "$OPS_USER_ID" --source vendor --dry-run --birthdate "$OPS_BIRTHDATE" --birthtime "$OPS_BIRTHTIME" --location "$OPS_LOCATION"
+executed smoke command: HD_API_BASE_URL=<redacted-v2-base> SAFE_MODE=0 ALLOW_NETWORK=1 APP_ENV=dev LC_ALL=C LANG=C TZ=UTC python -m engine.cli bg:resolve --user "$OPS_USER_ID" --source vendor --dry-run --birthdate "$OPS_BIRTHDATE" --birthtime "$OPS_BIRTHTIME" --location "$OPS_LOCATION"
 stdout captured at: audit/ops/hde-epic037/ops-hde-epic037-001/stdout.log
 stderr captured at: audit/ops/hde-epic037/ops-hde-epic037-001/stderr.log
 exit code captured at: audit/ops/hde-epic037/ops-hde-epic037-001/exit_codes.txt

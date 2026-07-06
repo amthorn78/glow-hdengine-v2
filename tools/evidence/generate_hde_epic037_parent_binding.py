@@ -158,6 +158,7 @@ def verify_ops01() -> None:
     for rel in OPS_PATHS:
         if not (ROOT / rel).exists():
             raise SystemExit(f"MISSING_EPIC037_OPS01_ARTIFACT:{rel}")
+    commands_text = (OPS_ROOT / "commands.txt").read_text(encoding="utf-8")
     stdout = _load_json("audit/ops/hde-epic037/ops-hde-epic037-001/stdout.log")
     request_summary = _load_json("audit/ops/hde-epic037/ops-hde-epic037-001/request_summary.json")
     env_presence = _load_json("audit/ops/hde-epic037/ops-hde-epic037-001/env_presence_redacted.json")
@@ -172,7 +173,10 @@ def verify_ops01() -> None:
     env_base_url_posture = env_presence.get("base_url_posture", {})
     env_locale = env_presence.get("locale", {})
     if (
-        stdout.get("status") != "ok"
+        "https://" in commands_text
+        or "http://" in commands_text
+        or "HD_API_BASE_URL=<redacted-v2-base>" not in commands_text
+        or stdout.get("status") != "ok"
         or adapter.get("status") != "mapped"
         or adapter.get("code") != "ADAPTER_MAPPED"
         or adapter.get("payload_family") != "ChartResult"

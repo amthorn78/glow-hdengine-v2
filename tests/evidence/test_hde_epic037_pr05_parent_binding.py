@@ -142,6 +142,10 @@ def test_ops01_runtime_posture_is_secret_safe_before_registration() -> None:
     assert request_summary["secret_policy"]["uncontrolled_raw_vendor_payload_recorded"] is False
     failure = json.loads((OPS_ROOT / "failure_classification.json").read_text(encoding="utf-8"))
     assert failure["classification"] == "not_applicable_success"
+    commands_text = (OPS_ROOT / "commands.txt").read_text(encoding="utf-8")
+    assert "https://" not in commands_text
+    assert "http://" not in commands_text
+    assert "HD_API_BASE_URL=<redacted-v2-base>" in commands_text
     combined = "\n".join(path.read_text(encoding="utf-8", errors="ignore") for path in [*OPS_ROOT.iterdir(), ROOT / "audit/qa/hde-epic037/ops-hde-epic037-001/ops_evidence_pointer.md"] if path.is_file())
     assert "Bearer <redacted>" in combined
     assert "HD-Geocode-Key: <redacted>" in combined
