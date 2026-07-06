@@ -1,0 +1,5 @@
+path: audit/ops/hde-epic037/ops-hde-epic037-001/failure_classification.json
+size_bytes: 450
+sha256: 242e166d69062ae36ea65b187398abe1cd56f1c413bd811238c9634f319b40ca
+mtime_utc: 2026-07-06T09:24:51Z
+produced_at_utc: 2026-07-06T00:00:00Z

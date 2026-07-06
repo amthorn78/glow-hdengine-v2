@@ -1,0 +1,5 @@
+path: audit/ops/hde-epic037/ops-hde-epic037-001/compat_path_result_summary.json
+size_bytes: 682
+sha256: ed678a9c22e36137364c4e7895db686b57a710ae50ea7b95f0e2d80f1f70e6da
+mtime_utc: 2026-07-06T09:24:51Z
+produced_at_utc: 2026-07-06T00:00:00Z
