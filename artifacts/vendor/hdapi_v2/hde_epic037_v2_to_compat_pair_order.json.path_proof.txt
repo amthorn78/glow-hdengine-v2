@@ -1,0 +1,5 @@
+path: artifacts/vendor/hdapi_v2/hde_epic037_v2_to_compat_pair_order.json
+size_bytes: 3629
+sha256: 3ffc776431a163c0badafaf38715dbb7732328123ac50b603b7033543030f40f
+mtime_utc: 2026-07-05T18:00:42Z
+produced_at_utc: 2026-07-05T18:00:42Z

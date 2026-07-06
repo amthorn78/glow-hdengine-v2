@@ -1549,6 +1549,83 @@ def _load_epic037_pr03_entries() -> list[dict[str, object]]:
     return entries
 
 
+EPIC037_PR04_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "hdapi_v2.hde_epic037_v2_to_compat_proof",
+        "discovered_physical_path": "artifacts/vendor/hdapi_v2/hde_epic037_v2_to_compat_proof.json",
+        "epic_id": "HDE-EPIC037",
+        "record_type": "epic037_pr04_v2_to_compat",
+        "role": "proof",
+        "schema_version": "1.0",
+        "tokens": ["ENV_RAILS_POLICY_OK", "JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC037 PR-04 proof that mapped v2 ChartResult adapter output is shape-sufficient for existing compatibility computation for HDE-FERM008.10",
+    },
+    {
+        "artifact_key": "hdapi_v2.hde_epic037_v2_to_compat_two_run",
+        "discovered_physical_path": "artifacts/vendor/hdapi_v2/hde_epic037_v2_to_compat_two_run.json",
+        "epic_id": "HDE-EPIC037",
+        "record_type": "epic037_pr04_v2_to_compat",
+        "role": "proof",
+        "schema_version": "1.0",
+        "tokens": ["TWO_RUN_IDENTITY_OK", "ENV_RAILS_POLICY_OK", "JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC037 PR-04 two-run canonical identity proof for the closed-rails v2 adapter-to-compat fixture path",
+    },
+    {
+        "artifact_key": "hdapi_v2.hde_epic037_v2_to_compat_pair_order",
+        "discovered_physical_path": "artifacts/vendor/hdapi_v2/hde_epic037_v2_to_compat_pair_order.json",
+        "epic_id": "HDE-EPIC037",
+        "record_type": "epic037_pr04_v2_to_compat",
+        "role": "proof",
+        "schema_version": "1.0",
+        "tokens": ["COMPOSITE_ABBA_IDENTITY_OK", "ENV_RAILS_POLICY_OK", "JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC037 PR-04 AB/BA normalized pair-order identity proof for mapped v2 resolved parties entering compatibility computation",
+    },
+    {
+        "artifact_key": "hdapi_v2.hde_epic037_admin_public_boundary",
+        "discovered_physical_path": "artifacts/vendor/hdapi_v2/hde_epic037_admin_public_boundary.json",
+        "epic_id": "HDE-EPIC037",
+        "record_type": "epic037_pr04_v2_to_compat",
+        "role": "proof",
+        "schema_version": "1.0",
+        "tokens": ["ENV_RAILS_POLICY_OK", "JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK"],
+        "notes": "EPIC037 PR-04 public Reader no-change and admin/public boundary preservation proof; numeric, cache, adapter, and vendor internals remain out of public Reader bytes",
+    },
+]
+
+
+def _load_epic037_pr04_entries() -> list[dict[str, object]]:
+    proof = ROOT / "artifacts/vendor/hdapi_v2/hde_epic037_v2_to_compat_proof.json"
+    if not proof.exists():
+        return []
+    try:
+        payload = json.loads(proof.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise SystemExit("INVALID_EPIC037_PR04_V2_TO_COMPAT_PROOF") from exc
+    if (
+        payload.get("artifact_kind") != "hde_epic037_v2_to_compat_proof"
+        or payload.get("epic_id") != "HDE-EPIC037"
+        or payload.get("pf09_task_id") != "HDE-FERM008"
+        or payload.get("pf09_subtask_id") != "HDE-FERM008.10"
+        or payload.get("compat_acceptance", {}).get("accepted_mapped_resolved_parties") is not True
+        or payload.get("fixture_count") != 2
+    ):
+        raise SystemExit("INVALID_EPIC037_PR04_V2_TO_COMPAT_IDENTITY")
+    produced = payload.get("generated_at_utc")
+    entries: list[dict[str, object]] = []
+    for entry in EPIC037_PR04_PRIMARY_ARTIFACTS:
+        rel = str(entry["discovered_physical_path"])
+        path = ROOT / rel
+        if not path.exists():
+            raise SystemExit(f"MISSING_EPIC037_PR04_ARTIFACT:{rel}")
+        if not path.with_name(path.name + ".path_proof.txt").exists():
+            raise SystemExit(f"MISSING_EPIC037_PR04_PATH_PROOF:{rel}")
+        normalized = dict(entry)
+        if isinstance(produced, str) and produced:
+            normalized["produced_at_utc"] = produced
+        entries.append(normalized)
+    return entries
+
+
 EPIC035_PR03_OPS01_ARTIFACTS: list[dict[str, object]] = [
     {
         "artifact_key": "epic035.ops01.ops_evidence_manifest",
@@ -2060,31 +2137,6 @@ CONJUNCTION_WRITER_ARTIFACTS: list[dict[str, object]] = [
 ]
 
 FORCE_REFRESH_ARTIFACT_RELS: set[str] = {
-    "audit/qa/hde-epic030/pr-04/band_edges_binding.log",
-    "audit/qa/hde-epic030/pr-04/band_thresholds_diff.json",
-    "audit/qa/hde-epic030/pr-04/band_thresholds_identity_hash.txt",
-    "audit/qa/hde-epic030/pr-05/category_framework_binding.log",
-    "audit/qa/hde-epic030/pr-05/per_channel_mechanics.json",
-    "audit/qa/hde-epic030/pr-05/category_canonical_compare.log",
-    "audit/qa/hde-epic030/pr-03/category_order_binding.log",
-    "audit/qa/hde-epic030/pr-03/compat_identity_binding.log",
-    "audit/qa/hde-epic030/pr-03/compat_parity_binding.log",
-    "artifacts/writer/conjunction_write_readback.log",
-    "artifacts/writer/conjunction_writer_summary.json",
-    "audit/gates/narratives/keys_10x4.table.json",
-    "artifacts/narratives/router/parity_abba.log",
-    "artifacts/narratives/router/cli_http_parity.log",
-    "audit/gates/narratives/registry.diff.json",
-    "audit/gates/narratives/pack_identity.txt",
-    "audit/docdeltas/hde-epic032_doc_deltas.md",
-    "audit/docdeltas/hde-epic034_doc_deltas.md",
-    "audit/qa/hde-epic034/00_meta/doc_deltas.md",
-    "docs/acceptance_map_epic035.json",
-    "audit/qa/hde-epic035/token_evidence_matrix.md",
-    "audit/qa/hde-epic035/acceptance_map_viability.log",
-    "audit/qa/hde-epic035/ops-01/ops_evidence_binding.log",
-    "audit/docdeltas/hde-epic035_doc_deltas.md",
-    "audit/qa/hde-epic035/00_meta/doc_deltas.md",
     "artifacts/evidence_index.jsonl",
     "artifacts/evidence_index.jsonl.sha256",
     "docs/evidence/INDEX.json",
@@ -2235,6 +2287,25 @@ def _write_path_proof(
         requested_mtime = None
         existing_produced = None
         existing_mtime = None
+    if not check and existing:
+        try:
+            existing_size_matches = int(existing.get("size_bytes", "")) == size_bytes
+        except ValueError:
+            existing_size_matches = False
+        existing_fields_match = all(existing.get(key) == value for key, value in extra_fields.items())
+        if (
+            existing.get("path") == rel
+            and existing.get("sha256") == sha256
+            and existing_size_matches
+            and existing_fields_match
+            and existing_mtime is not None
+            and existing_produced is not None
+        ):
+            try:
+                if _parse_utc_iso8601(existing_mtime) <= stat_mtime_dt:
+                    return proof_rel, existing_produced
+            except Exception:  # noqa: BLE001
+                pass
     if requested_produced and existing_mtime:
         try:
             if _parse_utc_iso8601(existing_mtime) < _parse_utc_iso8601(requested_produced):
@@ -2312,6 +2383,7 @@ _ALLOWED_INDEX_FIELDS = {
     "discovered_physical_path",
     "epic_id",
     "record_type",
+    "role",
     "schema_version",
     "tokens",
     "notes",
@@ -2417,6 +2489,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *_load_epic037_pr01_entries(),
             *_load_epic037_pr02_entries(),
             *_load_epic037_pr03_entries(),
+            *_load_epic037_pr04_entries(),
             *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,
@@ -2431,6 +2504,9 @@ def _render_human_index(entries: Iterable[Mapping[str, object]]) -> bytes:
 
 
 def _role_for(entry: Mapping[str, str], roles: Mapping[tuple[str, str], str]) -> str:
+    declared_role = entry.get("role")
+    if isinstance(declared_role, str) and declared_role:
+        return declared_role
     key = (entry["artifact_key"], entry["discovered_physical_path"])
     if key in roles:
         return roles[key]
