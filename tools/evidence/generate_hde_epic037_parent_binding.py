@@ -352,8 +352,6 @@ def build_outputs() -> dict[Path, bytes]:
         TOKEN_MATRIX: build_matrix().encode("utf-8"),
         VIABILITY: build_viability().encode("utf-8"),
         PARENT_BINDING: build_parent_binding().encode("utf-8"),
-        DOC_DELTA: DOC_TEXT.encode("utf-8"),
-        QA_DOC_DELTA: DOC_TEXT.encode("utf-8"),
         PR05_DOC_DELTA: DOC_TEXT.encode("utf-8"),
         PR05_QA_DOC_DELTA: DOC_TEXT.encode("utf-8"),
     }
