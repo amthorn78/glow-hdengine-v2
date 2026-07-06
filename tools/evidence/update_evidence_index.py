@@ -1823,7 +1823,16 @@ def _load_epic037_ops01_entries() -> list[dict[str, object]]:
     if not stdout_path.exists():
         return []
     commands_text = (ROOT / "audit/ops/hde-epic037/ops-hde-epic037-001/commands.txt").read_text(encoding="utf-8")
-    if "https://" in commands_text or "http://" in commands_text or "HD_API_BASE_URL=<redacted-v2-base>" not in commands_text:
+    required_command_rails = (
+        "HD_API_BASE_URL=<redacted-v2-base>",
+        "SAFE_MODE=0",
+        "ALLOW_NETWORK=1",
+        "APP_ENV=dev",
+        "LC_ALL=C",
+        "LANG=C",
+        "TZ=UTC",
+    )
+    if "https://" in commands_text or "http://" in commands_text or any(token not in commands_text for token in required_command_rails):
         raise SystemExit("INVALID_EPIC037_OPS01_COMMAND_REDACTION")
     try:
         stdout_payload = json.loads(stdout_path.read_text(encoding="utf-8"))

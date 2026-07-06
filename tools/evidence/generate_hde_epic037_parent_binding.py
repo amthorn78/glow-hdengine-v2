@@ -172,10 +172,19 @@ def verify_ops01() -> None:
     env_secret_policy = env_presence.get("secret_policy", {})
     env_base_url_posture = env_presence.get("base_url_posture", {})
     env_locale = env_presence.get("locale", {})
+    required_command_rails = (
+        "HD_API_BASE_URL=<redacted-v2-base>",
+        "SAFE_MODE=0",
+        "ALLOW_NETWORK=1",
+        "APP_ENV=dev",
+        "LC_ALL=C",
+        "LANG=C",
+        "TZ=UTC",
+    )
     if (
         "https://" in commands_text
         or "http://" in commands_text
-        or "HD_API_BASE_URL=<redacted-v2-base>" not in commands_text
+        or any(token not in commands_text for token in required_command_rails)
         or stdout.get("status") != "ok"
         or adapter.get("status") != "mapped"
         or adapter.get("code") != "ADAPTER_MAPPED"
