@@ -153,3 +153,15 @@ def test_pr05_and_ops01_records_are_indexed_mirrored_and_path_proofed() -> None:
 def test_pr05_did_not_edit_pfcanon() -> None:
     result = subprocess.run(["git", "diff", "--name-only", "--", "docs/pfcanon"], cwd=ROOT, text=True, stdout=subprocess.PIPE, check=True)
     assert result.stdout.strip() == ""
+
+
+def test_parent_binding_generator_reproduces_governed_artifacts() -> None:
+    result = subprocess.run(
+        ["python", "tools/evidence/generate_hde_epic037_parent_binding.py", "--check"],
+        cwd=ROOT,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=True,
+    )
+    assert "checked HDE-EPIC037 PR-05 parent-binding artifacts" in result.stdout

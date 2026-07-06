@@ -211,9 +211,18 @@ def build_outputs(produced_at: str) -> dict[Path, bytes]:
         "no_claims": {"public_reader_change": "NONE", "public_route": "NONE", "public_flag": "NONE", "public_payload_or_transport_change": "NONE", "new_http_home": "NONE", "app_side_humandesignapi_call_path": "NONE", "live_vendor_call": "NONE", "open_rails_vendor_smoke": "NONE", "raw_request_body_persisted": "NONE", "raw_response_body_persisted": "NONE", "raw_vendor_payload_persisted": "NONE", "ai_llm_model_call_behavior": "NONE", "full_hdapi_v2_runtime_conformance": "NONE", "hde_ferm008_parent_done": "NONE", "qa_pass": "NONE", "ops_completion": "NONE", "pf09_status_movement": "NONE", "epic_closeout": "NONE"},
         "no_compatibility_by_inference": True,
     }
-    doc = "\n".join([
-        "# HDE-EPIC037 PR-01 doc deltas", "", "- Recorded HDE-FERM008.7 field-sufficiency evidence for v2 BodyGraph-detail readiness.", "- Selected payload family is a typed insufficient classification, not runtime conformance.", "- No public Reader, route, flag, payload, transport, AI, live-vendor, OPS, or PF-Canon change is claimed.", "",
-    ]).encode("utf-8")
+    doc = """# HDE-EPIC037 PR-01 doc deltas
+
+- Recorded HDE-FERM008.7 field-sufficiency evidence for v2 BodyGraph-detail readiness.
+- Selected payload family is a typed insufficient classification, not runtime conformance.
+- No public Reader, route, flag, payload, transport, AI, live-vendor, OPS, or PF-Canon change is claimed.
+## HDE-EPIC037 PR-05 parent evidence binding doc deltas
+
+- Bound HDE-FERM008.7 through HDE-FERM008.11 evidence into HDE-FERM008.12 parent-level evidence artifacts.
+- Recorded parent_posture=supportable_to_done as a later-drain support statement only; no PF09 status movement, QA PASS, OPS completion by PR work, or epic closeout is claimed.
+- Bound PO-produced OPS-01 evidence without rerunning OPS or making a live vendor call.
+- Preserved public-surface and nonclaim boundaries: no public Reader change, public route, public flag, payload/transport change, new HTTP home, app-side vendor ownership, raw secret/uncontrolled vendor payload persistence, or AI scope.
+""".encode("utf-8")
     return {FIELD_PROOF: canonical_json_bytes(proof), CONTRACT: canonical_json_bytes(contract), NONCLAIMS: canonical_json_bytes(nonclaims), DOC_DELTA: doc, QA_DOC_DELTA: doc}
 
 
@@ -227,12 +236,7 @@ def write_outputs(outputs: dict[Path, bytes], *, produced_at: str, check: bool) 
     stale = []
     for path, body in outputs.items():
         if check:
-            actual = path.read_bytes() if path.exists() else b""
-            if path in {DOC_DELTA, QA_DOC_DELTA}:
-                matches = actual.startswith(body)
-            else:
-                matches = actual == body
-            if not path.exists() or not matches:
+            if not path.exists() or path.read_bytes() != body:
                 stale.append(path.relative_to(ROOT).as_posix())
             else:
                 _write_path_proof(path, produced_at, check=True)
