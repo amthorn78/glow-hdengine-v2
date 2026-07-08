@@ -1,0 +1,162 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-07-08T18:40:16Z", "check_id": "po-008-remediation-r1", "check_name": "PO-008 Moon Loop Remediation R1", "status": "PASS", "fail_status": "", "command": "Moon Loop remediation for po-008 index/path-proof drift; canonical evidence index/orientation refresh; rerun po-008 predicates", "command_provenance": "Moon Loop remediation R1: clear PROOF_MTIME_FUTURE using canonical governed evidence tools; original po-008 failure retained", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic037/checks/po-008-remediation-r1/primary.log", "audit/qa/hde-epic037/checks/po-008-remediation-r1/preflight_stdout.log", "audit/qa/hde-epic037/checks/po-008-remediation-r1/preflight_stderr.log", "audit/qa/hde-epic037/checks/po-008-remediation-r1/preflight_exit_code.txt", "audit/qa/hde-epic037/checks/po-008-remediation-r1/failure_context.log", "audit/qa/hde-epic037/checks/po-008-remediation-r1/index_refresh_stdout.log", "audit/qa/hde-epic037/checks/po-008-remediation-r1/index_refresh_stderr.log", "audit/qa/hde-epic037/checks/po-008-remediation-r1/index_refresh_exit_code.txt", "audit/qa/hde-epic037/checks/po-008-remediation-r1/orientation_refresh_stdout.log", "audit/qa/hde-epic037/checks/po-008-remediation-r1/orientation_refresh_stderr.log", "audit/qa/hde-epic037/checks/po-008-remediation-r1/orientation_refresh_exit_code.txt", "audit/qa/hde-epic037/checks/po-008-remediation-r1/index_check_stdout.log", "audit/qa/hde-epic037/checks/po-008-remediation-r1/index_check_stderr.log", "audit/qa/hde-epic037/checks/po-008-remediation-r1/index_check_exit_code.txt", "audit/qa/hde-epic037/checks/po-008-remediation-r1/orientation_check_stdout.log", "audit/qa/hde-epic037/checks/po-008-remediation-r1/orientation_check_stderr.log", "audit/qa/hde-epic037/checks/po-008-remediation-r1/orientation_check_exit_code.txt", "audit/qa/hde-epic037/checks/po-008-remediation-r1/mirror_schema_stdout.log", "audit/qa/hde-epic037/checks/po-008-remediation-r1/mirror_schema_stderr.log", "audit/qa/hde-epic037/checks/po-008-remediation-r1/mirror_schema_exit_code.txt", "audit/qa/hde-epic037/checks/po-008-remediation-r1/parent_stdout.log", "audit/qa/hde-epic037/checks/po-008-remediation-r1/parent_stderr.log", "audit/qa/hde-epic037/checks/po-008-remediation-r1/parent_exit_code.txt", "audit/qa/hde-epic037/checks/po-008-remediation-r1/nonclaim_stdout.log", "audit/qa/hde-epic037/checks/po-008-remediation-r1/nonclaim_stderr.log", "audit/qa/hde-epic037/checks/po-008-remediation-r1/nonclaim_exit_code.txt", "audit/qa/hde-epic037/checks/po-008-remediation-r1/post_remediation_context.log", "audit/qa/hde-epic037/checks/po-008-remediation-r1/repo_status_before.log", "audit/qa/hde-epic037/checks/po-008-remediation-r1/repo_status_after.log"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 - HDE-Build Notes", "PF05 - HDE CLI/API Vendor Reference", "PF02 - HDE Architecture", "PF12 - HDE Schemas and Artifacts"], "intended_tokens": ["EVIDENCE_INDEX_UPDATED_OK", "MACHINE_MIRROR_UPDATED_OK", "EVIDENCE_INDEX_HASH_OK", "EVIDENCE_INDEX_MIRROR_OK", "EVIDENCE_PATH_PROOFS_OK"], "claimed_tokens": ["EVIDENCE_INDEX_UPDATED_OK", "MACHINE_MIRROR_UPDATED_OK", "EVIDENCE_INDEX_HASH_OK", "EVIDENCE_INDEX_MIRROR_OK", "EVIDENCE_PATH_PROOFS_OK"]}
+
+## remediation_scope
+original_po_008_status=FAIL_BEHAVIOR
+root_cause=global Evidence Index check found PROOF_MTIME_FUTURE on audit/gates/narratives/keys_10x4.table.json.path_proof.txt
+changed_product_code=NO
+changed_public_surface=NO
+changed_governed_index_or_path_proof_by_hand=NO
+canonical_tools_used=tools/evidence/update_evidence_index.py; tools/evidence/orientation_demo.py; ci/checks/check_mirror_schema.sh; tools/evidence/generate_hde_epic037_parent_binding.py --check
+original_po_008_failure_retained=audit/qa/hde-epic037/checks/po-008/primary.log
+
+## preflight_stdout.log
+missing=
+original_po_008_status=FAIL_BEHAVIOR
+original_po_008_exit_code=1
+original_po_008_fail_status=FAIL_BEHAVIOR
+
+## failure_context.log
+target_sha256=f7f5672a1cfc1b9feb1e94295805e85cb2b5bdf403b8e00f16197c202380eb6e
+target_stat=4746 1782462744 2026-06-26 08:32:24.089449183 +0000
+proof_stat=210 1783323966 2026-07-06 07:46:06.390120585 +0000
+proof_body_begin
+path: audit/gates/narratives/keys_10x4.table.json
+size_bytes: 4746
+sha256: f7f5672a1cfc1b9feb1e94295805e85cb2b5bdf403b8e00f16197c202380eb6e
+mtime_utc: 2026-07-05T03:41:53Z
+produced_at_utc: 2026-07-05T15:38:47Z
+proof_body_end
+original_po_008_index_stderr_begin
+PROOF_MTIME_FUTURE:audit/gates/narratives/keys_10x4.table.json.path_proof.txt
+original_po_008_index_stderr_end
+
+## index_refresh_stdout.log
+[evidence-index] env pins: ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC
+
+## index_refresh_stderr.log
+
+## orientation_refresh_stdout.log
+
+## orientation_refresh_stderr.log
+
+## index_check_stdout.log
+[evidence-index] env pins: ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC
+
+## index_check_stderr.log
+
+## orientation_check_stdout.log
+
+## orientation_check_stderr.log
+
+## mirror_schema_stdout.log
+
+## mirror_schema_stderr.log
+
+## parent_stdout.log
+checked HDE-EPIC037 PR-05 parent-binding artifacts
+
+## parent_stderr.log
+
+## nonclaim_stdout.log
+missing=
+
+## nonclaim_stderr.log
+
+## post_remediation_context.log
+target_sha256_after=f7f5672a1cfc1b9feb1e94295805e85cb2b5bdf403b8e00f16197c202380eb6e
+target_stat_after=4746 1782462744 2026-06-26 08:32:24.089449183 +0000
+proof_stat_after=210 1783536015 2026-07-08 18:40:15.112013262 +0000
+proof_body_after_begin
+path: audit/gates/narratives/keys_10x4.table.json
+size_bytes: 4746
+sha256: f7f5672a1cfc1b9feb1e94295805e85cb2b5bdf403b8e00f16197c202380eb6e
+mtime_utc: 2026-06-26T08:32:24Z
+produced_at_utc: 2026-07-05T15:38:47Z
+proof_body_after_end
+
+## repo_status_before.log
+pwd_before=/workspaces/glow-hdengine-v2
+head_before=a2b3693945221591b61474eadfea6d30669de0f9
+branch_before=main
+status_before_begin
+?? audit/qa/hde-epic037/00_meta/qa_rca_doc_delta_summary.md
+?? audit/qa/hde-epic037/checks/po-008-remediation-r1/
+?? audit/qa/hde-epic037/checks/po-008/
+?? audit/qa/hde-epic037/checks/po-009/
+?? audit/qa/hde-epic037/checks/po-010/
+?? audit/qa/hde-epic037/checks/po-011/
+?? audit/qa/hde-epic037/checks/po-012/
+?? audit/qa/hde-epic037/checks/qa-13-qa-rca-doc-delta-summary/
+status_before_end
+
+## repo_status_after.log
+pwd_after=/workspaces/glow-hdengine-v2
+head_after=a2b3693945221591b61474eadfea6d30669de0f9
+branch_after=main
+status_after_begin
+ M artifacts/evidence_index.jsonl
+ M artifacts/evidence_index.jsonl.path_proof.txt
+ M artifacts/evidence_index.jsonl.sha256
+ M artifacts/evidence_index.jsonl.sha256.path_proof.txt
+ M artifacts/narratives/router/cli_http_parity.log.path_proof.txt
+ M artifacts/narratives/router/parity_abba.log.path_proof.txt
+ M artifacts/writer/conjunction_write_readback.log.path_proof.txt
+ M artifacts/writer/conjunction_writer_summary.json.path_proof.txt
+ M audit/docdeltas/hde-epic032_doc_deltas.md.path_proof.txt
+ M audit/docdeltas/hde-epic034_doc_deltas.md.path_proof.txt
+ M audit/docdeltas/hde-epic035_doc_deltas.md.path_proof.txt
+ M audit/gates/narratives/keys_10x4.table.json.path_proof.txt
+ M audit/gates/narratives/pack_identity.txt.path_proof.txt
+ M audit/gates/narratives/registry.diff.json.path_proof.txt
+ M audit/gates/topology/orientation_demo.txt.path_proof.txt
+ M audit/ops/hde-epic037/ops-hde-epic037-001/adapter_mapping_result_summary.json.path_proof.txt
+ M audit/ops/hde-epic037/ops-hde-epic037-001/compat_path_result_summary.json.path_proof.txt
+ M audit/ops/hde-epic037/ops-hde-epic037-001/env_presence_redacted.json.path_proof.txt
+ M audit/ops/hde-epic037/ops-hde-epic037-001/exit_codes.txt.path_proof.txt
+ M audit/ops/hde-epic037/ops-hde-epic037-001/failure_classification.json.path_proof.txt
+ M audit/ops/hde-epic037/ops-hde-epic037-001/request_summary.json.path_proof.txt
+ M audit/ops/hde-epic037/ops-hde-epic037-001/result_summary.json.path_proof.txt
+ M audit/ops/hde-epic037/ops-hde-epic037-001/stderr.log.path_proof.txt
+ M audit/ops/hde-epic037/ops-hde-epic037-001/stdout.log.path_proof.txt
+ M audit/qa/hde-epic030/pr-03/category_order_binding.log.path_proof.txt
+ M audit/qa/hde-epic030/pr-03/compat_identity_binding.log.path_proof.txt
+ M audit/qa/hde-epic030/pr-03/compat_parity_binding.log.path_proof.txt
+ M audit/qa/hde-epic030/pr-04/band_edges_binding.log.path_proof.txt
+ M audit/qa/hde-epic030/pr-04/band_thresholds_diff.json.path_proof.txt
+ M audit/qa/hde-epic030/pr-04/band_thresholds_identity_hash.txt.path_proof.txt
+ M audit/qa/hde-epic030/pr-05/category_canonical_compare.log.path_proof.txt
+ M audit/qa/hde-epic030/pr-05/category_framework_binding.log.path_proof.txt
+ M audit/qa/hde-epic030/pr-05/per_channel_mechanics.json.path_proof.txt
+ M audit/qa/hde-epic034/00_meta/doc_deltas.md.path_proof.txt
+ M audit/qa/hde-epic034/pr-03/response_mapping_check.log.path_proof.txt
+ M audit/qa/hde-epic035/00_meta/doc_deltas.md.path_proof.txt
+ M audit/qa/hde-epic035/acceptance_map_viability.log.path_proof.txt
+ M audit/qa/hde-epic035/ops-01/ops_evidence_binding.log.path_proof.txt
+ M audit/qa/hde-epic035/token_evidence_matrix.md.path_proof.txt
+ M audit/qa/hde-epic037/ops-hde-epic037-001/ops_evidence_pointer.md.path_proof.txt
+ M docs/acceptance_map_epic035.json.path_proof.txt
+ M docs/evidence/INDEX.json.path_proof.txt
+ M docs/evidence/INDEX.sha256.path_proof.txt
+?? audit/qa/hde-epic037/00_meta/qa_rca_doc_delta_summary.md
+?? audit/qa/hde-epic037/checks/po-008-remediation-r1/
+?? audit/qa/hde-epic037/checks/po-008/
+?? audit/qa/hde-epic037/checks/po-009/
+?? audit/qa/hde-epic037/checks/po-010/
+?? audit/qa/hde-epic037/checks/po-011/
+?? audit/qa/hde-epic037/checks/po-012/
+?? audit/qa/hde-epic037/checks/qa-13-qa-rca-doc-delta-summary/
+status_after_end
+
+## predicate_notes
+preflight_exit_code=0
+failure_context_exit_code=0
+index_refresh_exit_code=0
+orientation_refresh_exit_code=0
+index_check_exit_code=0
+orientation_check_exit_code=0
+mirror_schema_exit_code=0
+parent_exit_code=0
+nonclaim_exit_code=0
+post_remediation_context_exit_code=0
+repo_status_before_exit_code=0
+repo_status_after_exit_code=0

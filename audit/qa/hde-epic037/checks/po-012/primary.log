@@ -1,0 +1,14 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-07-08T18:23:51Z", "check_id": "po-012", "check_name": "PO-012 — The Live QA Plan must treat this epic as QA-ready but not already QA-passed.", "status": "PASS", "fail_status": "", "command": "QA-ready but not already-QA-passed posture inspection", "command_provenance": "Approved Plan and live repo validation", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic037/checks/po-012/primary.log", "audit/qa/hde-epic037/checks/po-012/stdout.log", "audit/qa/hde-epic037/checks/po-012/stderr.log", "audit/qa/hde-epic037/checks/po-012/exit_code.txt"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 — HDE-Build Notes", "PF19 — Glow QA Guide", "PF05 — HDE CLI/API Vendor Reference", "PF02 — HDE Architecture"], "intended_tokens": [], "claimed_tokens": []}
+
+## preflight_stdout.log
+missing_loci=
+
+## stdout.log
+missing=
+
+## stderr.log
+
+## predicate_notes
+preflight_exit=0
+inspection_exit=0
+QA PASS is produced only by completed Live QA step evidence, not by plan approval, repo inspection, OPS evidence, or PF10 supportability notes alone.

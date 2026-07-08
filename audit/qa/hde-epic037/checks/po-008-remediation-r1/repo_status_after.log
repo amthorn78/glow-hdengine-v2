@@ -1,0 +1,56 @@
+pwd_after=/workspaces/glow-hdengine-v2
+head_after=a2b3693945221591b61474eadfea6d30669de0f9
+branch_after=main
+status_after_begin
+ M artifacts/evidence_index.jsonl
+ M artifacts/evidence_index.jsonl.path_proof.txt
+ M artifacts/evidence_index.jsonl.sha256
+ M artifacts/evidence_index.jsonl.sha256.path_proof.txt
+ M artifacts/narratives/router/cli_http_parity.log.path_proof.txt
+ M artifacts/narratives/router/parity_abba.log.path_proof.txt
+ M artifacts/writer/conjunction_write_readback.log.path_proof.txt
+ M artifacts/writer/conjunction_writer_summary.json.path_proof.txt
+ M audit/docdeltas/hde-epic032_doc_deltas.md.path_proof.txt
+ M audit/docdeltas/hde-epic034_doc_deltas.md.path_proof.txt
+ M audit/docdeltas/hde-epic035_doc_deltas.md.path_proof.txt
+ M audit/gates/narratives/keys_10x4.table.json.path_proof.txt
+ M audit/gates/narratives/pack_identity.txt.path_proof.txt
+ M audit/gates/narratives/registry.diff.json.path_proof.txt
+ M audit/gates/topology/orientation_demo.txt.path_proof.txt
+ M audit/ops/hde-epic037/ops-hde-epic037-001/adapter_mapping_result_summary.json.path_proof.txt
+ M audit/ops/hde-epic037/ops-hde-epic037-001/compat_path_result_summary.json.path_proof.txt
+ M audit/ops/hde-epic037/ops-hde-epic037-001/env_presence_redacted.json.path_proof.txt
+ M audit/ops/hde-epic037/ops-hde-epic037-001/exit_codes.txt.path_proof.txt
+ M audit/ops/hde-epic037/ops-hde-epic037-001/failure_classification.json.path_proof.txt
+ M audit/ops/hde-epic037/ops-hde-epic037-001/request_summary.json.path_proof.txt
+ M audit/ops/hde-epic037/ops-hde-epic037-001/result_summary.json.path_proof.txt
+ M audit/ops/hde-epic037/ops-hde-epic037-001/stderr.log.path_proof.txt
+ M audit/ops/hde-epic037/ops-hde-epic037-001/stdout.log.path_proof.txt
+ M audit/qa/hde-epic030/pr-03/category_order_binding.log.path_proof.txt
+ M audit/qa/hde-epic030/pr-03/compat_identity_binding.log.path_proof.txt
+ M audit/qa/hde-epic030/pr-03/compat_parity_binding.log.path_proof.txt
+ M audit/qa/hde-epic030/pr-04/band_edges_binding.log.path_proof.txt
+ M audit/qa/hde-epic030/pr-04/band_thresholds_diff.json.path_proof.txt
+ M audit/qa/hde-epic030/pr-04/band_thresholds_identity_hash.txt.path_proof.txt
+ M audit/qa/hde-epic030/pr-05/category_canonical_compare.log.path_proof.txt
+ M audit/qa/hde-epic030/pr-05/category_framework_binding.log.path_proof.txt
+ M audit/qa/hde-epic030/pr-05/per_channel_mechanics.json.path_proof.txt
+ M audit/qa/hde-epic034/00_meta/doc_deltas.md.path_proof.txt
+ M audit/qa/hde-epic034/pr-03/response_mapping_check.log.path_proof.txt
+ M audit/qa/hde-epic035/00_meta/doc_deltas.md.path_proof.txt
+ M audit/qa/hde-epic035/acceptance_map_viability.log.path_proof.txt
+ M audit/qa/hde-epic035/ops-01/ops_evidence_binding.log.path_proof.txt
+ M audit/qa/hde-epic035/token_evidence_matrix.md.path_proof.txt
+ M audit/qa/hde-epic037/ops-hde-epic037-001/ops_evidence_pointer.md.path_proof.txt
+ M docs/acceptance_map_epic035.json.path_proof.txt
+ M docs/evidence/INDEX.json.path_proof.txt
+ M docs/evidence/INDEX.sha256.path_proof.txt
+?? audit/qa/hde-epic037/00_meta/qa_rca_doc_delta_summary.md
+?? audit/qa/hde-epic037/checks/po-008-remediation-r1/
+?? audit/qa/hde-epic037/checks/po-008/
+?? audit/qa/hde-epic037/checks/po-009/
+?? audit/qa/hde-epic037/checks/po-010/
+?? audit/qa/hde-epic037/checks/po-011/
+?? audit/qa/hde-epic037/checks/po-012/
+?? audit/qa/hde-epic037/checks/qa-13-qa-rca-doc-delta-summary/
+status_after_end

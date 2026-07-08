@@ -1,0 +1,13 @@
+target_sha256=f7f5672a1cfc1b9feb1e94295805e85cb2b5bdf403b8e00f16197c202380eb6e
+target_stat=4746 1782462744 2026-06-26 08:32:24.089449183 +0000
+proof_stat=210 1783323966 2026-07-06 07:46:06.390120585 +0000
+proof_body_begin
+path: audit/gates/narratives/keys_10x4.table.json
+size_bytes: 4746
+sha256: f7f5672a1cfc1b9feb1e94295805e85cb2b5bdf403b8e00f16197c202380eb6e
+mtime_utc: 2026-07-05T03:41:53Z
+produced_at_utc: 2026-07-05T15:38:47Z
+proof_body_end
+original_po_008_index_stderr_begin
+PROOF_MTIME_FUTURE:audit/gates/narratives/keys_10x4.table.json.path_proof.txt
+original_po_008_index_stderr_end
