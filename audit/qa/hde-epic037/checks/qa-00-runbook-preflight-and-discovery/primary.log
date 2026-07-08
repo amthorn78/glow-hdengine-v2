@@ -1,0 +1,36 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-07-08T13:41:16Z", "check_id": "qa-00-runbook-preflight-and-discovery", "check_name": "Runbook preflight and discovery", "status": "PASS", "fail_status": "", "command": "mkdir -p; git status/rev-parse; python version check; required repo-loci preflight; pytest import check", "command_provenance": "Approved Plan plus generic shell scaffolding", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic037/checks/qa-00-runbook-preflight-and-discovery/primary.log", "audit/qa/hde-epic037/checks/qa-00-runbook-preflight-and-discovery/stdout.log", "audit/qa/hde-epic037/checks/qa-00-runbook-preflight-and-discovery/stderr.log", "audit/qa/hde-epic037/checks/qa-00-runbook-preflight-and-discovery/exit_code.txt", "audit/qa/hde-epic037/checks/qa-00-runbook-preflight-and-discovery/repo_status_before.log", "audit/qa/hde-epic037/checks/qa-00-runbook-preflight-and-discovery/repo_status_after.log", "audit/qa/hde-epic037/checks/qa-00-runbook-preflight-and-discovery/python_stdout.log", "audit/qa/hde-epic037/checks/qa-00-runbook-preflight-and-discovery/python_stderr.log", "audit/qa/hde-epic037/checks/qa-00-runbook-preflight-and-discovery/python_exit_code.txt", "audit/qa/hde-epic037/checks/qa-00-runbook-preflight-and-discovery/pytest_stdout.log", "audit/qa/hde-epic037/checks/qa-00-runbook-preflight-and-discovery/pytest_stderr.log", "audit/qa/hde-epic037/checks/qa-00-runbook-preflight-and-discovery/pytest_exit_code.txt"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 - HDE-Build Notes", "PF05 - HDE CLI/API Vendor Reference", "PF02 - HDE Architecture"], "intended_tokens": [], "claimed_tokens": []}
+
+## repo_status_before.log
+pwd_before=/workspaces/glow-hdengine-v2
+head_before=78676daca5771b3d779850866689370e04ce59a5
+branch_before=main
+status_before_begin
+?? audit/qa/hde-epic037/checks/
+status_before_end
+
+## python_stdout.log
+3.11.15 (main, Jun 11 2026, 05:00:56) [GCC 14.2.0]
+
+## stdout.log
+missing=
+
+## stderr.log
+
+## pytest_stdout.log
+pytest import ok
+
+## pytest_stderr.log
+
+## repo_status_after.log
+pwd_after=/workspaces/glow-hdengine-v2
+head_after=78676daca5771b3d779850866689370e04ce59a5
+branch_after=main
+status_after_begin
+?? audit/qa/hde-epic037/checks/
+status_after_end
+
+## predicate_notes
+path_exit=0
+python_exit=0
+pytest_exit=0
+pytest_exit is informational for downstream pytest-dependent checks.

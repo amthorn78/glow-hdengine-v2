@@ -1,0 +1,11 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0
+rootdir: /workspaces/glow-hdengine-v2
+configfile: pytest.ini
+plugins: cov-4.1.0, mock-3.15.1
+collected 7 items
+
+tests/evidence/test_hde_epic037_v2_to_compat.py ....                     [ 57%]
+tests/compat/test_hde_epic037_v2_adapter_to_compat.py ...                [100%]
+
+============================== 7 passed in 0.08s ===============================

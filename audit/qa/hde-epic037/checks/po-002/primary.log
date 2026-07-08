@@ -1,0 +1,15 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-07-08T13:44:33Z", "check_id": "po-002", "check_name": "PO-002 - The selected v2 payload family must be classified truthfully, including fail-closed handling where the payload alone is insufficient.", "status": "FAIL_BEHAVIOR", "fail_status": "FAIL_BEHAVIOR", "command": "preflight field-sufficiency loci; python tools/evidence/generate_hde_epic037_field_sufficiency.py --check; inspect field_sufficiency proof", "command_provenance": "Approved Plan and live repo validation", "exit_code": 1, "evidence_artifacts": ["audit/qa/hde-epic037/checks/po-002/preflight_stdout.log", "audit/qa/hde-epic037/checks/po-002/preflight_stderr.log", "audit/qa/hde-epic037/checks/po-002/preflight_exit_code.txt", "audit/qa/hde-epic037/checks/po-002/stdout.log", "audit/qa/hde-epic037/checks/po-002/stderr.log", "audit/qa/hde-epic037/checks/po-002/exit_code.txt", "audit/qa/hde-epic037/checks/po-002/inspection_exit_code.txt"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 - HDE-Build Notes", "PF05 - HDE CLI/API Vendor Reference", "PF02 - HDE Architecture"], "intended_tokens": ["JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK"], "claimed_tokens": []}
+
+## preflight_stdout.log
+missing=
+
+## stdout.log
+missing=
+
+## stderr.log
+STALE_HDE_EPIC037_FIELD_SUFFICIENCY:audit/docdeltas/hde-epic037_doc_deltas.md,audit/qa/hde-epic037/00_meta/doc_deltas.md
+
+## predicate_notes
+preflight_exit=0
+generator_exit=1
+inspection_exit=0

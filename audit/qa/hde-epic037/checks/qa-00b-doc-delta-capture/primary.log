@@ -1,0 +1,13 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-07-08T13:41:16Z", "check_id": "qa-00b-doc-delta-capture", "check_name": "Step-0B - Doc Delta Capture", "status": "PASS", "fail_status": "", "command": "mkdir -p; generate Step-0B doc delta surfaces; inspect BLOCKERS/CAVEATS/no deltas", "command_provenance": "Approved Plan", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic037/checks/qa-00b-doc-delta-capture/primary.log", "audit/qa/hde-epic037/checks/qa-00b-doc-delta-capture/stdout.log", "audit/qa/hde-epic037/checks/qa-00b-doc-delta-capture/stderr.log", "audit/qa/hde-epic037/checks/qa-00b-doc-delta-capture/exit_code.txt", "audit/qa/hde-epic037/checks/qa-00b-doc-delta-capture/inspection_exit_code.txt", "audit/docdeltas/hde-epic037_doc_deltas.md", "audit/qa/hde-epic037/00_meta/doc_deltas.md"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 - HDE-Build Notes", "PF05 - HDE CLI/API Vendor Reference", "PF02 - HDE Architecture"], "intended_tokens": [], "claimed_tokens": []}
+
+## stdout.log
+audit/docdeltas/hde-epic037_doc_deltas.md
+audit/qa/hde-epic037/00_meta/doc_deltas.md
+missing=
+absent=
+
+## stderr.log
+
+## predicate_notes
+exit_code=0
+inspection_exit_code=0

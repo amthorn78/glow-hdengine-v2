@@ -1,0 +1,29 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-07-08T13:44:35Z", "check_id": "po-004", "check_name": "PO-004 - Configured v2 vendor behavior must use the chart-backed adapter behavior and must preserve safe refusal before any live external work when live access is not authorized.", "status": "PASS", "fail_status": "", "command": "preflight bg-resolve loci; python tools/evidence/generate_hde_epic037_bg_resolve.py --check; optional pytest tests/evidence/test_hde_epic037_bg_resolve.py", "command_provenance": "Approved Plan and live repo validation", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic037/checks/po-004/primary.log", "audit/qa/hde-epic037/checks/po-004/preflight_stdout.log", "audit/qa/hde-epic037/checks/po-004/preflight_stderr.log", "audit/qa/hde-epic037/checks/po-004/preflight_exit_code.txt", "audit/qa/hde-epic037/checks/po-004/stdout.log", "audit/qa/hde-epic037/checks/po-004/stderr.log", "audit/qa/hde-epic037/checks/po-004/exit_code.txt", "audit/qa/hde-epic037/checks/po-004/pytest_stdout.log", "audit/qa/hde-epic037/checks/po-004/pytest_stderr.log", "audit/qa/hde-epic037/checks/po-004/pytest_exit_code.txt"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 - HDE-Build Notes", "PF05 - HDE CLI/API Vendor Reference", "PF02 - HDE Architecture"], "intended_tokens": ["NO_EXTERNAL_IO_ON_REFUSAL_OK", "ENV_RAILS_POLICY_OK", "JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK"], "claimed_tokens": ["NO_EXTERNAL_IO_ON_REFUSAL_OK", "ENV_RAILS_POLICY_OK", "JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK"]}
+
+## preflight_stdout.log
+missing=
+
+## stdout.log
+checked HDE-EPIC037 PR-03 bg:resolve artifacts
+
+## stderr.log
+
+## pytest_stdout.log
+============================= test session starts ==============================
+platform linux -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0
+rootdir: /workspaces/glow-hdengine-v2
+configfile: pytest.ini
+plugins: cov-4.1.0, mock-3.15.1
+collected 3 items
+
+tests/evidence/test_hde_epic037_bg_resolve.py ...                        [100%]
+
+============================== 3 passed in 0.04s ===============================
+
+## pytest_stderr.log
+
+## predicate_notes
+preflight_exit=0
+generator_exit=0
+pytest_exit=0
+pytest_exit=125 means supplementary pytest was TOOLING_BLOCKED by unavailable pytest.

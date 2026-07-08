@@ -1,0 +1,6 @@
+pwd_before=/workspaces/glow-hdengine-v2
+head_before=78676daca5771b3d779850866689370e04ce59a5
+branch_before=main
+status_before_begin
+?? audit/qa/hde-epic037/checks/
+status_before_end

@@ -1,0 +1,10 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0
+rootdir: /workspaces/glow-hdengine-v2
+configfile: pytest.ini
+plugins: cov-4.1.0, mock-3.15.1
+collected 3 items
+
+tests/evidence/test_hde_epic037_bg_resolve.py ...                        [100%]
+
+============================== 3 passed in 0.04s ===============================

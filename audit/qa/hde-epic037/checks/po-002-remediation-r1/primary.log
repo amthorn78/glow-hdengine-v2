@@ -1,0 +1,24 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-07-08T13:52:39Z", "check_id": "po-002-remediation-r1", "check_name": "PO-002 Moon Loop Remediation R1", "status": "PASS", "fail_status": "", "command": "restore Step-0B-clobbered EPIC037 doc-delta surfaces; python tools/evidence/generate_hde_epic037_field_sufficiency.py --check; inspect fail-closed classification and restored doc-delta markers", "command_provenance": "Moon Loop remediation R1: minimal evidence-assembly repair for qa-00b doc-delta clobber; original po-002 failure retained", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic037/checks/po-002-remediation-r1/primary.log", "audit/qa/hde-epic037/checks/po-002-remediation-r1/preflight_stdout.log", "audit/qa/hde-epic037/checks/po-002-remediation-r1/preflight_stderr.log", "audit/qa/hde-epic037/checks/po-002-remediation-r1/preflight_exit_code.txt", "audit/qa/hde-epic037/checks/po-002-remediation-r1/stdout.log", "audit/qa/hde-epic037/checks/po-002-remediation-r1/stderr.log", "audit/qa/hde-epic037/checks/po-002-remediation-r1/exit_code.txt", "audit/qa/hde-epic037/checks/po-002-remediation-r1/inspection_exit_code.txt", "audit/qa/hde-epic037/checks/po-002/primary.log", "audit/docdeltas/hde-epic037_doc_deltas.md", "audit/qa/hde-epic037/00_meta/doc_deltas.md"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 - HDE-Build Notes", "PF05 - HDE CLI/API Vendor Reference", "PF02 - HDE Architecture"], "intended_tokens": ["JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK"], "claimed_tokens": ["JSON_CANONICAL_CHECK_OK", "EVIDENCE_PATH_PROOFS_OK"]}
+
+## remediation_scope
+original_po_002_status=FAIL_BEHAVIOR
+root_cause=qa-00b-doc-delta-capture overwrote generator-owned EPIC037 doc-delta evidence with no-deltas template
+changed_product_code=NO
+changed_public_surface=NO
+changed_governed_index_or_path_proof_by_hand=NO
+rerun_original_qa_00b=NO; original command is the known clobber source and remains preserved in its own primary.log
+
+## preflight_stdout.log
+missing=
+
+## stdout.log
+checked HDE-EPIC037 PR-01 field-sufficiency artifacts
+missing=
+doc_missing=
+
+## stderr.log
+
+## predicate_notes
+preflight_exit=0
+generator_exit=0
+inspection_exit=0
