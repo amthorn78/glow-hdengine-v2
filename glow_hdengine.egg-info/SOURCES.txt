@@ -21,6 +21,7 @@ engine/bodygraph/__init__.py
 engine/bodygraph/ingest.py
 engine/bodygraph/resolver.py
 engine/bodygraph/retention.py
+engine/bodygraph/v2_adapter.py
 engine/bodygraph/vendor_client.py
 engine/categories/__init__.py
 engine/categories/registry.py

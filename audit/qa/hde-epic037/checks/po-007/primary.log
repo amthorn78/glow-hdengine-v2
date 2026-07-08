@@ -1,0 +1,56 @@
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-07-08T16:32:29Z", "check_id": "po-007", "check_name": "PO-007 — The PO-produced live-vendor validation must show a successful bounded runtime result without exposing secrets, raw request material, raw response material, or uncontrolled vendor payloads.", "status": "PASS", "fail_status": "", "command": "env preflight; python -m engine.cli bg:resolve --user $OPS_USER_ID --source vendor --dry-run --birthdate $OPS_BIRTHDATE --birthtime $OPS_BIRTHTIME --location $OPS_LOCATION; secret-safe summary extraction; restore closed rails", "command_provenance": "Approved Plan, PF05, PF02, live repo validation", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic037/checks/po-007/primary.log", "audit/qa/hde-epic037/checks/po-007/preflight_stdout.log", "audit/qa/hde-epic037/checks/po-007/preflight_stderr.log", "audit/qa/hde-epic037/checks/po-007/preflight_exit_code.txt", "audit/qa/hde-epic037/checks/po-007/stdout.json", "audit/qa/hde-epic037/checks/po-007/stderr.log", "audit/qa/hde-epic037/checks/po-007/exit_code.txt", "audit/qa/hde-epic037/checks/po-007/live_smoke_summary.json", "audit/qa/hde-epic037/checks/po-007/summary_exit_code.txt"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 — HDE-Build Notes", "PF05 — HDE CLI/API Vendor Reference", "PF02 — HDE Architecture"], "intended_tokens": ["ENV_RAILS_POLICY_OK"], "claimed_tokens": ["ENV_RAILS_POLICY_OK"]}
+
+## repo_status_before.log
+pwd_before=/workspaces/glow-hdengine-v2
+head_before=6fde4edc10df145e132066c8d156dbe4e4542fe3
+branch_before=main
+status_before_begin
+ M .devcontainer/devcontainer.json
+ M AGENTS.md
+ M glow_hdengine.egg-info/PKG-INFO
+ M glow_hdengine.egg-info/SOURCES.txt
+?? audit/qa/hde-epic037/checks/po-007/
+status_before_end
+
+## repo_loci_stdout.log
+missing_repo_loci=
+
+## prior_step_stdout.log
+prior_evidence_present=audit/qa/hde-epic037/checks/po-004/primary.log,audit/qa/hde-epic037/checks/post-remediation-suite-rerun-r1/primary.log
+
+## preflight_stdout.log
+missing=
+hdapi_base_url_alias_conflict=false
+po_authorization_confirmed=true
+bad=
+
+## preflight_stderr.log
+
+## stdout.json
+{"adapter":{"code":"ADAPTER_MAPPED","payload_family":"ChartResult","status":"mapped"},"cache":{"input_fingerprint":"557fd92ce9366f5623bae79a323b0353278250dfcd9e8f574143a548af0ac71e","payload_posture":"adapter_mapped_no_raw_vendor_payload","user_id":"845bd311-ac75-5af3-86d5-0e870ca8cc64","vendor":"hdapi","vendor_version":2},"ingest":{"db_rows_after":0,"payload_posture":"adapter_mapped_no_raw_vendor_payload","rows_written":0},"resolved":{"bodygraph":{"authority":"Sacral","birthDateUtc":"1990-01-01T17:00:00.000Z","centers":["Root","Sacral"],"channelsLong":["Concentration (9-52)"],"channelsShort":["9-52"],"definition":"Single Definition","gates":["38","39","13","7","37","61","9","41","52","54","58","1","48","21","49","4","11","6","14","10"],"profile":"2/4","strategy":"Wait to Respond","type":"Generator"},"person":{"person_uid":"person-po007-synthetic-user"},"person_uid":"person-po007-synthetic-user","source":"hdapi_v2_chart_adapter"},"resolver":{"allow_network":true,"dry_run":true,"request":{"configured_base_url":"<redacted>","header_posture":["Authorization: Bearer <redacted>","HD-Geocode-Key: <redacted>"],"input_fingerprint":"557fd92ce9366f5623bae79a323b0353278250dfcd9e8f574143a548af0ac71e","raw_body_emitted":false,"raw_response_body_emitted":false,"resource_path":"charts","route":"vendor.hdapi.post:/charts","route_auth_posture":"Authorization: Bearer <redacted>","url_posture":"configured_base_url/<resource_path>"},"requested_source":"vendor","resolved_source":"vendor","route_policy":{"classification":"adapter_backed_v2_chart","configured_base_version":"v2","geocode_required":true,"payload_family":"ChartResult","reason":"configured v2 base uses the governed chart route and deterministic ChartResult adapter for bg:resolve","resource_path":"charts","route_auth_posture":"Authorization: Bearer <redacted>","route_family":"recommended_v2_chart","supported":true},"safe_mode":false,"upsert":false,"user_id":"po007-synthetic-user"},"status":"ok"}
+
+## stderr.log
+
+## live_smoke_summary.json
+{"adapter_code":"ADAPTER_MAPPED","adapter_status":"mapped","cache_payload_posture":"adapter_mapped_no_raw_vendor_payload","header_posture":["Authorization: Bearer <redacted>","HD-Geocode-Key: <redacted>"],"payload_family":"ChartResult","raw_body_emitted":false,"raw_response_body_emitted":false,"raw_secret_recorded":false,"resolved_present":true,"route":"vendor.hdapi.post:/charts","route_auth_posture":"Authorization: Bearer <redacted>","status":"ok"}
+
+## repo_status_after.log
+pwd_after=/workspaces/glow-hdengine-v2
+head_after=6fde4edc10df145e132066c8d156dbe4e4542fe3
+branch_after=main
+status_after_begin
+ M .devcontainer/devcontainer.json
+ M AGENTS.md
+ M glow_hdengine.egg-info/PKG-INFO
+ M glow_hdengine.egg-info/SOURCES.txt
+?? audit/qa/hde-epic037/checks/po-007/
+status_after_end
+
+## predicate_notes
+repo_loci_exit=0
+prior_step_exit=0
+preflight_exit=0
+cli_exit=0
+summary_exit=0
+repo_before_exit=0
+repo_after_exit=0

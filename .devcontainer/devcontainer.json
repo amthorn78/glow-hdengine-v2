@@ -13,7 +13,10 @@
   "postCreateCommand": "bash .devcontainer/scripts/post-create.sh",
   "customizations": {
     "vscode": {
-      "settings": {}
+      "settings": {},
+      "extensions": [
+        "openai.chatgpt"
+      ]
     }
   }
 }

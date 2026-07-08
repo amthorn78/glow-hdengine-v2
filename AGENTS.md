@@ -106,3 +106,5 @@
 
 ## Local Codex recovery note
 - If the VS Code Codex extension hangs without prompting for authentication, check `/home/vscode/.codex/auth.json` first. In the observed failure, the extension had cached ChatGPT tokens and therefore did not re-open auth, so the fix was to back up and remove `/home/vscode/.codex/auth.json`, delete `/home/vscode/.codex/.tmp/plugins/plugins/ngs-analysis`, and restart VS Code so Codex could rebuild a clean auth state and prompt again.
+- Follow-up issue observed: after cache/auth resets and extension reinstall, Codex may open authentication in an isolated pane with no prior session history visible. Treat this as partial recovery (auth path restored, history linkage missing) and continue with the new pane/session when blocked.
+- Follow-up issue observed: Codex can activate without showing a sign-in prompt while `openai.chatgpt` logs continue to report `401 Unauthorized` on `https://chatgpt.com/backend-api/plugins/featured`. In this state, prioritize full remote extension reset plus Codex/Copilot home-state reset, then force first-run UI via `Open Codex Sidebar` and `Debug: reset NUX state`.
