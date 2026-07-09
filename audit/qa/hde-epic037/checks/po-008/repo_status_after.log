@@ -1,6 +1,22 @@
 pwd_after=/workspaces/glow-hdengine-v2
-head_after=a2b3693945221591b61474eadfea6d30669de0f9
+head_after=da0028883045bc482bd28d3fd81dcd3e3efaba28
 branch_after=main
 status_after_begin
-?? audit/qa/hde-epic037/checks/po-008/
+ M AGENTS.md
+ M audit/qa/hde-epic037/checks/po-008/preflight_stdout.log
+ M audit/qa/hde-epic037/checks/po-008/primary.log
+ M audit/qa/hde-epic037/checks/po-008/repo_status_after.log
+ M audit/qa/hde-epic037/checks/po-008/repo_status_before.log
+?? audit/qa/hde-epic037/checks/po-008/exit_code.txt
+?? audit/qa/hde-epic037/checks/po-008/index_check_exit_code.txt
+?? audit/qa/hde-epic037/checks/po-008/index_check_stderr.log
+?? audit/qa/hde-epic037/checks/po-008/index_check_stdout.log
+?? audit/qa/hde-epic037/checks/po-008/mirror_schema_exit_code.txt
+?? audit/qa/hde-epic037/checks/po-008/mirror_schema_stderr.log
+?? audit/qa/hde-epic037/checks/po-008/mirror_schema_stdout.log
+?? audit/qa/hde-epic037/checks/po-008/nonclaim_stderr.log
+?? audit/qa/hde-epic037/checks/po-008/nonclaim_stdout.log
+?? audit/qa/hde-epic037/checks/po-008/orientation_check_exit_code.txt
+?? audit/qa/hde-epic037/checks/po-008/orientation_check_stderr.log
+?? audit/qa/hde-epic037/checks/po-008/orientation_check_stdout.log
 status_after_end

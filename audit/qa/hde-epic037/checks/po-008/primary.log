@@ -1,40 +1,103 @@
-{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-07-08T18:23:51Z", "check_id": "po-008", "check_name": "PO-008 — The governed proof record must coherently bind the implementation slices, live-vendor validation, nonclaims, and parent support statement without overstating what was proven.", "status": "FAIL_BEHAVIOR", "fail_status": "FAIL_BEHAVIOR", "command": "parent binding check; evidence index check; nonclaim boundary inspection", "command_provenance": "Approved Plan and live repo validation", "exit_code": 1, "evidence_artifacts": ["audit/qa/hde-epic037/checks/po-008/parent_stdout.log", "audit/qa/hde-epic037/checks/po-008/parent_stderr.log", "audit/qa/hde-epic037/checks/po-008/parent_exit_code.txt", "audit/qa/hde-epic037/checks/po-008/index_stdout.log", "audit/qa/hde-epic037/checks/po-008/index_stderr.log", "audit/qa/hde-epic037/checks/po-008/index_exit_code.txt", "audit/qa/hde-epic037/checks/po-008/nonclaim_exit_code.txt"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 — HDE-Build Notes", "PF05 — HDE CLI/API Vendor Reference", "PF02 — HDE Architecture"], "intended_tokens": ["EVIDENCE_INDEX_UPDATED_OK", "MACHINE_MIRROR_UPDATED_OK", "EVIDENCE_INDEX_HASH_OK", "EVIDENCE_INDEX_MIRROR_OK", "EVIDENCE_PATH_PROOFS_OK"], "claimed_tokens": []}
+{"schema_version": "pf27.step_log_header.v1", "timestamp_utc": "2026-07-09T00:41:22Z", "check_id": "po-008", "check_name": "PO-008 - The governed proof record must coherently bind the implementation slices, live-vendor validation, nonclaims, and parent support statement without overstating what was proven.", "status": "PASS", "fail_status": "", "command": "canonical evidence index/orientation checks; mirror schema check; parent binding check; nonclaim boundary inspection", "command_provenance": "Approved Plan and live repo validation", "exit_code": 0, "evidence_artifacts": ["audit/qa/hde-epic037/checks/po-008/index_check_stdout.log", "audit/qa/hde-epic037/checks/po-008/index_check_stderr.log", "audit/qa/hde-epic037/checks/po-008/index_check_exit_code.txt", "audit/qa/hde-epic037/checks/po-008/orientation_check_stdout.log", "audit/qa/hde-epic037/checks/po-008/orientation_check_stderr.log", "audit/qa/hde-epic037/checks/po-008/orientation_check_exit_code.txt", "audit/qa/hde-epic037/checks/po-008/mirror_schema_stdout.log", "audit/qa/hde-epic037/checks/po-008/mirror_schema_stderr.log", "audit/qa/hde-epic037/checks/po-008/mirror_schema_exit_code.txt", "audit/qa/hde-epic037/checks/po-008/parent_stdout.log", "audit/qa/hde-epic037/checks/po-008/parent_stderr.log", "audit/qa/hde-epic037/checks/po-008/parent_exit_code.txt", "audit/qa/hde-epic037/checks/po-008/nonclaim_stdout.log", "audit/qa/hde-epic037/checks/po-008/nonclaim_stderr.log", "audit/qa/hde-epic037/checks/po-008/nonclaim_exit_code.txt", "audit/qa/hde-epic037/checks/po-008/index_stdout.log", "audit/qa/hde-epic037/checks/po-008/index_stderr.log", "audit/qa/hde-epic037/checks/po-008/index_exit_code.txt"], "captured_env": {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "APP_ENV": "dev", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"}, "pf_refs": ["PF10 - HDE-Build Notes", "PF05 - HDE CLI/API Vendor Reference", "PF02 - HDE Architecture", "PF12 - Schemas & Artifacts"], "intended_tokens": ["EVIDENCE_INDEX_UPDATED_OK", "MACHINE_MIRROR_UPDATED_OK", "EVIDENCE_INDEX_HASH_OK", "EVIDENCE_INDEX_MIRROR_OK", "EVIDENCE_PATH_PROOFS_OK"], "claimed_tokens": ["EVIDENCE_INDEX_UPDATED_OK", "MACHINE_MIRROR_UPDATED_OK", "EVIDENCE_INDEX_HASH_OK", "EVIDENCE_INDEX_MIRROR_OK", "EVIDENCE_PATH_PROOFS_OK"]}
 
 ## repo_status_before.log
 pwd_before=/workspaces/glow-hdengine-v2
-head_before=a2b3693945221591b61474eadfea6d30669de0f9
+head_before=da0028883045bc482bd28d3fd81dcd3e3efaba28
 branch_before=main
 status_before_begin
-?? audit/qa/hde-epic037/checks/po-008/
+ M AGENTS.md
+ M audit/qa/hde-epic037/checks/po-008/nonclaim_exit_code.txt
+ M audit/qa/hde-epic037/checks/po-008/preflight_stdout.log
+ M audit/qa/hde-epic037/checks/po-008/primary.log
+ M audit/qa/hde-epic037/checks/po-008/repo_status_after.log
+ M audit/qa/hde-epic037/checks/po-008/repo_status_before.log
+?? audit/qa/hde-epic037/checks/po-008/exit_code.txt
+?? audit/qa/hde-epic037/checks/po-008/index_check_exit_code.txt
+?? audit/qa/hde-epic037/checks/po-008/index_check_stderr.log
+?? audit/qa/hde-epic037/checks/po-008/index_check_stdout.log
+?? audit/qa/hde-epic037/checks/po-008/mirror_schema_exit_code.txt
+?? audit/qa/hde-epic037/checks/po-008/mirror_schema_stderr.log
+?? audit/qa/hde-epic037/checks/po-008/mirror_schema_stdout.log
+?? audit/qa/hde-epic037/checks/po-008/nonclaim_stderr.log
+?? audit/qa/hde-epic037/checks/po-008/nonclaim_stdout.log
+?? audit/qa/hde-epic037/checks/po-008/orientation_check_exit_code.txt
+?? audit/qa/hde-epic037/checks/po-008/orientation_check_stderr.log
+?? audit/qa/hde-epic037/checks/po-008/orientation_check_stdout.log
 status_before_end
 
+
 ## preflight_stdout.log
-missing=
+missing=0
+
+
+## preflight_stderr.log
+
+
+## index_check_stdout.log
+[evidence-index] env pins: ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC
+
+
+## index_check_stderr.log
+
+
+## orientation_check_stdout.log
+
+
+## orientation_check_stderr.log
+
+
+## mirror_schema_stdout.log
+
+
+## mirror_schema_stderr.log
+
 
 ## parent_stdout.log
 checked HDE-EPIC037 PR-05 parent-binding artifacts
 
+
 ## parent_stderr.log
 
-## index_stdout.log
-[evidence-index] env pins: ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC
-missing=
 
-## index_stderr.log
-PROOF_MTIME_FUTURE:audit/gates/narratives/keys_10x4.table.json.path_proof.txt
+## nonclaim_stdout.log
+nonclaims_checked=10
+missing=0
+
+
+## nonclaim_stderr.log
+
 
 ## repo_status_after.log
 pwd_after=/workspaces/glow-hdengine-v2
-head_after=a2b3693945221591b61474eadfea6d30669de0f9
+head_after=da0028883045bc482bd28d3fd81dcd3e3efaba28
 branch_after=main
 status_after_begin
-?? audit/qa/hde-epic037/checks/po-008/
+ M AGENTS.md
+ M audit/qa/hde-epic037/checks/po-008/preflight_stdout.log
+ M audit/qa/hde-epic037/checks/po-008/primary.log
+ M audit/qa/hde-epic037/checks/po-008/repo_status_after.log
+ M audit/qa/hde-epic037/checks/po-008/repo_status_before.log
+?? audit/qa/hde-epic037/checks/po-008/exit_code.txt
+?? audit/qa/hde-epic037/checks/po-008/index_check_exit_code.txt
+?? audit/qa/hde-epic037/checks/po-008/index_check_stderr.log
+?? audit/qa/hde-epic037/checks/po-008/index_check_stdout.log
+?? audit/qa/hde-epic037/checks/po-008/mirror_schema_exit_code.txt
+?? audit/qa/hde-epic037/checks/po-008/mirror_schema_stderr.log
+?? audit/qa/hde-epic037/checks/po-008/mirror_schema_stdout.log
+?? audit/qa/hde-epic037/checks/po-008/nonclaim_stderr.log
+?? audit/qa/hde-epic037/checks/po-008/nonclaim_stdout.log
+?? audit/qa/hde-epic037/checks/po-008/orientation_check_exit_code.txt
+?? audit/qa/hde-epic037/checks/po-008/orientation_check_stderr.log
+?? audit/qa/hde-epic037/checks/po-008/orientation_check_stdout.log
 status_after_end
 
+
 ## predicate_notes
-preflight_exit=0
-parent_exit=0
-index_exit=1
-nonclaim_exit=0
-repo_before_exit=0
-repo_after_exit=0
+preflight_exit_code=0
+index_check_exit_code=0
+orientation_check_exit_code=0
+mirror_schema_exit_code=0
+parent_exit_code=0
+nonclaim_exit_code=0
+repo_status_before_exit_code=0
+repo_status_after_exit_code=0

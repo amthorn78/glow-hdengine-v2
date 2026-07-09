@@ -10,7 +10,7 @@ Live QA found:
 - po-005: PASS; evidence: audit/qa/hde-epic037/checks/po-005/primary.log
 - po-006: PASS; evidence: audit/qa/hde-epic037/checks/po-006/primary.log
 - po-007: PASS; evidence: audit/qa/hde-epic037/checks/po-007/primary.log
-- po-008: FAIL_BEHAVIOR; evidence: audit/qa/hde-epic037/checks/po-008/primary.log
+- po-008: PASS; evidence: audit/qa/hde-epic037/checks/po-008/primary.log
 - po-009: PASS; evidence: audit/qa/hde-epic037/checks/po-009/primary.log
 - po-010: PASS; evidence: audit/qa/hde-epic037/checks/po-010/primary.log
 - po-011: PASS; evidence: audit/qa/hde-epic037/checks/po-011/primary.log
@@ -26,17 +26,25 @@ Coverage vs QA Plan:
 - po-005: COVERED; status: PASS; evidence: audit/qa/hde-epic037/checks/po-005/primary.log
 - po-006: COVERED; status: PASS; evidence: audit/qa/hde-epic037/checks/po-006/primary.log
 - po-007: COVERED; status: PASS; evidence: audit/qa/hde-epic037/checks/po-007/primary.log
-- po-008: COVERED; status: FAIL_BEHAVIOR; evidence: audit/qa/hde-epic037/checks/po-008/primary.log
+- po-008: COVERED; status: PASS; evidence: audit/qa/hde-epic037/checks/po-008/primary.log
 - po-009: COVERED; status: PASS; evidence: audit/qa/hde-epic037/checks/po-009/primary.log
 - po-010: COVERED; status: PASS; evidence: audit/qa/hde-epic037/checks/po-010/primary.log
 - po-011: COVERED; status: PASS; evidence: audit/qa/hde-epic037/checks/po-011/primary.log
 - po-012: COVERED; status: PASS; evidence: audit/qa/hde-epic037/checks/po-012/primary.log
-- qa-13-qa-rca-doc-delta-summary: COVERED BY CURRENT CHECK WHEN primary.log is assembled for this closeout step; evidence: audit/qa/hde-epic037/checks/qa-13-qa-rca-doc-delta-summary/primary.log
+- qa-13-qa-rca-doc-delta-summary: COVERED BY CURRENT CHECK; evidence: audit/qa/hde-epic037/checks/qa-13-qa-rca-doc-delta-summary/primary.log
+
+Selected log non-empty validation:
+- po-008: nonempty; evidence: audit/qa/hde-epic037/checks/po-008/primary.log
+- po-009: nonempty; evidence: audit/qa/hde-epic037/checks/po-009/primary.log
+- po-010: nonempty; evidence: audit/qa/hde-epic037/checks/po-010/primary.log
+- po-011: nonempty; evidence: audit/qa/hde-epic037/checks/po-011/primary.log
+- po-012: nonempty; evidence: audit/qa/hde-epic037/checks/po-012/primary.log
+- qa-13-qa-rca-doc-delta-summary: generated_by_this_step; evidence: audit/qa/hde-epic037/checks/qa-13-qa-rca-doc-delta-summary/primary.log
 
 Doc Delta summary:
-- Doc delta surfaces contain BLOCKERS or CAVEATS; use the Step-0B surfaces as the source records for PF title drain targets.
-- Step-0B draft/staging surface: audit/docdeltas/hde-epic037_doc_deltas.md
-- Step-0B epic-scoped capture surface: audit/qa/hde-epic037/00_meta/doc_deltas.md
+- Doc delta surfaces are present and non-empty; use Step-0B surfaces as source records for PF title drain targets.
+- Doc delta surface: audit/docdeltas/hde-epic037_doc_deltas.md
+- Doc delta surface: audit/qa/hde-epic037/00_meta/doc_deltas.md
 
 Deferrals:
 - PF09 status drainage: deferred as a separate documentation/status-drain action.
