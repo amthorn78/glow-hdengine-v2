@@ -3,12 +3,12 @@
 ## 0.1 Header
 
  **Title:** PF04-Canon-HDE-Governance  
- **Version:** v2.7.1
+ **Version:** v2.7.2
 
 **Status:** Canon  
-**Effective date:** 2026-07-01
+**Effective date:** 2026-07-09
 
-**Last Update Gate:** BN 11.9.9
+**Last Update Gate:** BN 12.1.7 A1-9
 
 **Invocation tag:** `INV-f2ac55d77ce9aacc`
 
@@ -364,6 +364,12 @@ EPIC-011 introduced a **preservation guard** over key public and admin surfaces.
 Codex Audit observations and other read-only repo-reality observations may support bounded repo-reality facts when properly labeled, but they do not by themselves prove QA PASS, OPS completion, live vendor truth, PF09 status movement, epic closure, PF-canon drainage, or acceptance-token satisfaction. Governance review blocks only when such evidence is overclaimed as token, acceptance, closure, live-vendor, PF09, OPS-completion, or canon authority.
 
 If a discovery proof, open-rails proof, Codex Audit observation, OPS evidence bundle, or repo-reality proof must become a gated acceptance token, the token must be admitted through this registry or minted in a numbered PF10 addendum before any plan, acceptance map, matrix, closeout artifact, or evidence log claims that token.
+
+**Token claim semantic-fit rule.** Registering a token name does not make that token reusable for every artifact in the same PR, epic, proof family, evidence bundle, or acceptance map. A token may be claimed only where the bound artifact, validator, QA step, or evidence family directly proves the registered token semantics.
+
+Generic privacy, logging, no-payload, no-I/O, canonical-JSON, path-proof, Evidence Index, Machine Mirror, and rails tokens must bind to the exact proof family that proves those predicates. Vendor field-sufficiency snapshots, adapter-contract snapshots, route-policy snapshots, parent-binding logs, nonclaim artifacts, doc-delta records, or acceptance maps MUST NOT claim `VENDOR_NO_PAYLOAD_LOGGING_OK`, `LOGS_KEYS_ONLY_OK`, `BG_PRIVACY_REDACTION_OK`, `NO_EXTERNAL_IO_ON_REFUSAL_OK`, or similar registered tokens unless the artifact itself or its paired validator directly proves the relevant no-payload logging, keys-only logging, privacy-redaction, or no-external-I/O predicate.
+
+If an artifact records only scope, nonclaims, route selection, field sufficiency, adapter mapping, compatibility posture, parent evidence binding, or documentation deltas, it may record those facts without claiming unrelated generic governance tokens. Token arrays, token/evidence matrices, acceptance maps, evidence-index metadata, and closeout-support artifacts must preserve this semantic-fit boundary.
 
 **Command syntax and helper-code non-token posture.** Command syntax, helper-code syntax, heredoc form, rendered escape characters, indentation damage, copied-chat formatting, command literalness, and paste-readiness are not acceptance-token conditions by themselves. Acceptance tokens depend on governed proof, evidence identity, proof target identity, executed-result truth, registered token semantics, and the required evidence family, not on literal plan-command bytes unless the plan or owning PF home explicitly makes exact command bytes the proof target.
 
@@ -4371,6 +4377,12 @@ V2 endpoint bytes, auth names, request-body rules, response envelopes, rate-limi
 `bg:resolve --source vendor` MUST NOT accidentally compose a legacy BodyGraph resource path against a configured v2 base URL and then treat the result as provider unavailability, full v2 runtime conformance, or acceptable final behavior. If the configured base URL is v2, appending a legacy BodyGraph resource is allowed only when vendor evidence and PF10 or permanent PF canon explicitly support that combination. If both v1 and v2 route families are required at runtime, the base-url and route-family configuration strategy must be defined explicitly and kept secret-safe.
 
 Simple chart success may prove provider reachability, v2 auth posture, geocode-key posture, or route-family availability only when those are the scoped proof targets. It MUST NOT be treated as proof that `bg:resolve --source vendor` resolves complete BodyGraph data, feeds the BodyGraph/person/cache contract, replaces legacy BodyGraph ingest, or supports full vendor runtime conformance.
+
+**Mapped-cache persistence boundary.** Scoped dry-run or evidence-flow proof that a configured-v2 chart route can be requested, mapped into HDE internal BodyGraph/person/cache/compat shape, and used for bounded compatibility evidence does not authorize durable BodyGraph cache persistence. Until a future governed implementation slice proves mapped-cache persistence, configured-v2 non-dry-run writes MUST remain fail-closed.
+
+A future mapped-cache persistence slice MUST NOT simply turn on writes. It must design and prove a safe persistence path that writes adapter-mapped HDE data, not raw HumanDesignAPI v2 envelopes, raw vendor response bodies, raw request bodies, plaintext secrets, or uncontrolled vendor payloads. The proof must cover mapped-cache write, mapped-cache read-back, canonical-equivalence between pre-write mapped output and post-read cached output for governed fields, idempotence for repeated writes of the same normalized identity, no raw vendor-payload persistence, closed-rails refusal before outbound I/O, and preservation of explicit legacy fallback behavior.
+
+Production persistence requires an additional authorization boundary. The safe path is dry-run evidence, then mapped-cache write and read-back proof, then controlled non-prod repeatability, then an explicit production authorization decision. Do not skip from configured-v2 dry-run evidence directly to production persistence, production upsert reopening, or durable reusable user BodyGraph data.
 
 ### **11.1.2 Auth and geocode header posture**
 

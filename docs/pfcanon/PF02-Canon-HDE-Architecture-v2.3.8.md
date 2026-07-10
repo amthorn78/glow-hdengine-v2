@@ -1,12 +1,12 @@
 # **0\. Front Matter**
 
 **Title:** PF02-Canon-HDE-Architecture  
- **Version:** v2.3.7
+ **Version:** v2.3.8
 
  **Status:** Canon  
-**Effective date:** 2026-07-03
+**Effective date:** 2026-07-09
 
- **Last Update Gate:** BN 11.9.9
+ **Last Update Gate:** BN 12.1.7 A1-9
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -1682,19 +1682,26 @@ PF02 may name vendor endpoint families for source-selection, legacy-isolation, a
 
 Auth selection must be represented by explicit route metadata or contract metadata, not by inspecting whether a runtime path starts with `/v1` or `/v2`. Exact environment bindings, outbound auth header bytes, request bodies, response envelopes, rate-limit behavior, retry posture, and error bytes remain owned by HDE-CLI-API-Vendor-Ref, Glow Infrastructure, HDE-Governance, and HDE-Schemas & Artifacts by title.
 
-**HumanDesignAPI v2 adapter/schema gap posture (architecture-level).** HDE-EPIC035 records v2 ChartResult and ChartSimpleResult evidence as an adapter/schema gap, not as a normalized data-path proof. PF02 must not describe v2 chart payloads as feeding the existing BodyGraph cache, person/bodygraph compute inputs, compatibility/conjunction flows, or app integration until a bounded adapter/schema proof or implementation maps the selected vendor payload family into the existing internal BodyGraph/person/cache contract.
+**HumanDesignAPI v2 adapter, compat, and cache-persistence boundary (architecture-level).** HDE-EPIC037 distinguishes four separate architecture states for configured-v2 BodyGraph-detail work:
 
-A future proof or implementation must distinguish the vendor payload family, required response fields, populated internal fields, unsupported fields, whether the adapter is sufficient for HD Engine compute, whether any legacy fallback remains, and whether raw vendor payloads are persisted, redacted, summarized, or excluded. Exact schemas, evidence artifacts, payload bytes, and QA acceptance posture live in HDE-Schemas & Artifacts, HDE-Mechanics Guide, HDE-CLI-API-Vendor-Ref, HDE-Build Checklist Fermentation, and Glow QA Guide by title.
+* v2 dry-run mapping works when a supported v2 ChartResult payload is mapped by the deterministic adapter into HDE BodyGraph/person/cache-shaped data.  
+* v2 mapped output can feed compatibility computation when the mapped parties are accepted by the existing compat path under governed proof.  
+* v2 mapped output can be durably written to and read back from the BodyGraph cache only after a mapped-cache persistence path proves write/read-back parity, idempotence, and no raw vendor envelope persistence.  
+* v2 mapped-cache writes are authorized for production or production-like operation only after a later production authorization decision and governed runtime evidence.
+
+The BodyGraph cache remains persistent Engine input storage, not a raw HumanDesignAPI envelope store. HDE-EPIC037 proves the first two states for its scoped evidence chain; it does not prove durable mapped-cache persistence, production upsert authorization, public Reader changes, new public routes, app-side HumanDesignAPI ownership, AI scope, or broad HumanDesignAPI platform conformance.
+
+Exact schemas, payload bytes, CLI behavior, write/read-back evidence, path proofs, QA acceptance posture, rails policy, and future task ownership live in HDE-Schemas & Artifacts, HDE-Mechanics Guide, HDE-CLI-API-Vendor-Ref, HDE-Build Checklist Fermentation, Glow QA Guide, HDE-Governance, and later phased build checklists by title.
 
 Boundary classification is architecture-level and must distinguish `allowed`, `forbidden`, `unknown / fail-closed`, and `out of scope`. Boundary analysis must be based on discovered current repo surfaces and must report the adapter, presenter, engine, vendor-seam, and evidence-tool loci inspected. Earlier planning text or hard-coded expected path lists are not sufficient by themselves.
 
 PF02 owns the architectural boundary rule only. Boundary analyzers, renderer separation, table-driven taxonomy, generated evidence artifacts, path proofs, tests, and validation mechanics live in HDE-Mechanics Guide, HDE-Schemas & Artifacts, HDE-Build Checklist Fermentation, and Glow QA Guide by title.
 
-**`bg:resolve --source vendor` route-policy boundary (architecture-level).** HDE-EPIC036 records an explicit `bg:resolve --source vendor` route-policy classification. When the configured HumanDesignAPI base is v2, this path selects `unsupported_runtime_nonclaim` rather than constructing a legacy `bodygraphs` request and treating that as valid BodyGraph-detail behavior. When the configured base is non-v2, the existing legacy BodyGraph fallback remains explicit legacy behavior.
+**`g:resolve --source vendor` route-policy boundary (architecture-level).** HDE-EPIC037 records configured-v2 `bg:resolve --source vendor` as an adapter-backed v2 chart flow for dry-run resolution. When the configured HumanDesignAPI base is v2, the resolver selects the recommended v2 chart route family, the version-neutral `charts` resource path, and the deterministic ChartResult adapter. When the configured base is non-v2, the legacy BodyGraph fallback remains explicit legacy behavior.
 
-This posture does not prove that v2 chart data feeds the BodyGraph cache, compatibility inputs, app integration, or full HumanDesignAPI v2 runtime conformance. It also does not create a new HTTP home, public Reader change, public route, app-side HumanDesignAPI ownership, AI scope, raw payload persistence approval, or broad vendor-conformance claim. Future work that wants v2-backed BodyGraph resolution must implement or prove a bounded adapter/schema path from v2 ChartResult or ChartSimpleResult into the existing internal BodyGraph/person/cache contract, or adopt a future ADR-defined route policy.
+Closed rails must refuse before outbound I/O. Configured-v2 request construction must not fall back to legacy `bodygraphs` as a substitute for v2 BodyGraph-detail behavior, and generic ingest must not silently treat v2 chart requests as legacy BodyGraph ingest. Resolver and vendor-client architecture may classify route family, auth posture, payload family, and adapter result, but exact CLI flags, command bytes, outbound headers, request/response shapes, error codes, evidence artifacts, and QA workflows remain owned by HDE-CLI-API-Vendor-Ref, Glow Infrastructure, HDE-Schemas & Artifacts, HDE-Mechanics Guide, HDE-Build Checklist Fermentation, and Glow QA Guide by title.
 
-Exact CLI flags, command bytes, outbound headers, request/response shapes, error codes, evidence artifacts, and QA workflows remain owned by HDE-CLI-API-Vendor-Ref, Glow Infrastructure, HDE-Schemas & Artifacts, HDE-Mechanics Guide, HDE-Build Checklist Fermentation, and Glow QA Guide by title.
+This posture does not prove durable mapped-cache persistence, production writes, a new HTTP home, public Reader change, public route, app-side HumanDesignAPI ownership, AI scope, raw payload persistence approval, or broad HumanDesignAPI platform conformance.
 
 **Repo-local seam location (names-only).**
 

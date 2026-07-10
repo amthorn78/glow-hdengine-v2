@@ -2,11 +2,11 @@
 
 **Status:** Reference
 
-**Version:** v1.9.1
+**Version:** v1.9.2
 
-**Effective date:** 2026-07-03
+**Effective date:** 2026-07-09
 
-**Last Update Gate:** HDE-EPIC036 Closure
+**Last Update Gate:** HDE-EPIC037 Closure
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -9186,4 +9186,452 @@ Deliverables register mismatch note: PF10’s closure review includes a separate
 * Canonical evidence-path binding is satisfied for PF10-recorded implementation, PR, and QA evidence families through `artifacts/vendor/hdapi_v2/`, `audit/qa/hde-epic036/`, `audit/docdeltas/`, `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, and `artifacts/evidence_index.jsonl`.  
 * Lowercase directory naming is preserved for directory segments such as `artifacts/vendor/hdapi_v2/`, `audit/qa/hde-epic036/`, `audit/docdeltas/`, `docs/evidence/`, and `artifacts/`; mixed-case `EPIC-036` appears in planned close-pack filenames, not directory names.  
 * Final archive posture: HDE-EPIC036 is SATISFIED for PF10’s closure trace, with implementation posture recommendation READY WITH CAVEATS. HDE-FERM008.6 is supportable from PF10-recorded evidence for later PF09 status drainage to Done, while HDE-FERM008 parent Done, actual PF09.5 physical drainage, formal close-pack pair production, PO closeout, board update, final acceptance, formal OPS completion, PF-canon drainage, and future full BodyGraph-detail compatibility remain separate from this archive entry rather than silently closed.
+
+### **2.22 HDE-EPIC037 Epic Plan — Fermentation Pass 8**
+
+#### **2.22.1 Meta**
+
+**Epic ID:** HDE-EPIC037  
+**Epic title (Implementation Guide):** Fermentation Pass 8 (`Epic Plan HDE-EPIC037.md`, §Meta)  
+**Epic name (short):** Fermentation Pass 8  
+**Phase:** Fermentation  
+**Status:** Archived  
+**Owner:** Unknown (not present in inputs)  
+**Priority:** Unknown (not present in inputs)  
+**Date started:** 2026-07-04 (operator-provided)  
+**Date completed:** 2026-07-09 (operator-provided)  
+**Epic outcome (per PF10 closure trace):** SATISFIED; implementation posture recommendation: READY WITH CAVEATS
+
+**Phase rationale (planned; 1–3 sentences):** This epic belongs in Fermentation because it completes the remaining live vendor/runtime conformance path for HumanDesignAPI v2 BodyGraph-detail resolution. Earlier Fermentation slices established route-policy nonclaims and evidence boundaries, while this epic was intended to turn the current nonclaim into an evidenced runtime adapter path. (`Epic Plan HDE-EPIC037.md`, §Meta)
+
+**Problem statement (planned):** The HD Engine cannot truthfully support future HumanDesignAPI v2 BodyGraph-detail runtime claims while the current v2 chart route remains disconnected from the existing HDE BodyGraph, cache/person, and compatibility input path. This matters because future Glow app integration depends on the HD Engine being the trusted vendor, persistence, retrieval, and compute boundary. (`Epic Plan HDE-EPIC037.md`, §Business Case)
+
+**Proposed change (planned):** Complete the remaining Fermentation work for the v2 BodyGraph-detail runtime path: define the adapter contract, implement the deterministic v2 ChartResult-to-HDE adapter, wire the chart-backed resolver path into the existing vendor BodyGraph workflow, prove the resolved BodyGraph can feed compatibility compute, execute the bounded PO-only open-rails runtime smoke, and bind the parent-level evidence loop. (`Epic Plan HDE-EPIC037.md`, §Business Case)
+
+**Value/impact (planned):** This reduces production and planning risk by replacing a known nonclaim with an evidenced runtime posture. It gives the project a truthful basis for future app integration while preserving secret safety, no public Reader expansion, no new HTTP home, and HD Engine ownership of vendor-facing behavior. (`Epic Plan HDE-EPIC037.md`, §Business Case)
+
+**Why now (planned):** HDE-FERM008 remains Partial because HDE-FERM008.1 through HDE-FERM008.6 closed scoped slices only. HDE-FERM008.7 through HDE-FERM008.12 are the explicit remaining child rows needed to prove the actual BodyGraph-detail runtime path. (`Epic Plan HDE-EPIC037.md`, §Business Case)
+
+**What success looks like (planned):** The epic succeeds when the selected v2 payload family is proven sufficient or explicitly classified as insufficient; the deterministic adapter exists and is tested; `bg:resolve --source vendor` has a source-grounded v2 chart-backed route policy; the resolved BodyGraph feeds the compatibility path without public Reader drift or admin-field leakage; a PO-only open-rails smoke is captured safely; and parent-level evidence binding states whether HDE-FERM008 is supportable to Done or remains Partial. (`Epic Plan HDE-EPIC037.md`, §Business Case)
+
+**Scope anchor (plan):** `Epic Plan HDE-EPIC037.md`, §Deliverables (Jobs To Be Done)  
+**Stakeholders:** Unknown (not present in inputs)
+
+**PR / OPS / remediation / QA stream (PF10):** PR-01 HDE-EPIC037; PR-02 HDE-EPIC037; PR-03 HDE-EPIC037; PR-04 HDE-EPIC037; OPS-01 HDE-EPIC037; PR-05 HDE-EPIC037; Implementation Retrospective HDE-EPIC037; HDE-EPIC037 Later-Phase Task Recommendations — mapped-cache persistence boundary; Audit Analysis HDE-EPIC037; QA Pass 1 HDE-EPIC037; QA Pass 2 HDE-EPIC037; QA Pass 2 HDE-EPIC037 Review Summary; Final QA Closeout Review \+ QA RCA HDE-EPIC037; Epic Closure Review HDE-EPIC037.  
+**QA log stream (PF10):** `qa-00-runbook-preflight-and-discovery`, `qa-00b-doc-delta-capture`, `po-001`, `po-002`, `po-003`, `po-004`, `po-005`, `po-006`, `po-007`, `po-008`, `po-009`, `po-010`, `po-011`, `po-012`, `qa-13-qa-rca-doc-delta-summary`.
+
+**Scope boundaries (planned):**
+
+* limited to HDE-FERM008.7 through HDE-FERM008.12 in PF09.5  
+* no work pulled from other PF09 phases  
+* no public Reader behavior change  
+* no new public route  
+* no new HTTP home  
+* no app-side HumanDesignAPI call path  
+* no raw secret or uncontrolled vendor payload persistence  
+* no AI scope
+
+**Non-goals (planned):**
+
+* no public Reader expansion  
+* no app-side HumanDesignAPI call path  
+* no new public API route or public flag  
+* no raw vendor request or response payload persistence outside approved governed evidence posture  
+* no AI, LLM, model-call, prompt, embedding, or chatbot scope
+
+**Contract changes / new surfaces (planned):** This epic changes the internal/admin runtime posture of the existing BodyGraph vendor resolver path. It does not create a new public surface. The planned contract shift is from configured-v2 `unsupported_runtime_nonclaim` to a source-grounded v2 chart-backed BodyGraph-detail resolver path only if the adapter contract, adapter implementation, resolver wiring, compatibility-path proof, open-rails smoke, and evidence binding all support that claim. (`Epic Plan HDE-EPIC037.md`, §Contract and Compatibility Posture)
+
+**Existing CLI surface (planned):** Existing CLI surface: `bg:resolve --source vendor`. (`Epic Plan HDE-EPIC037.md`, §Contract and Compatibility Posture)
+
+**Existing implementation loci (planned):** `engine/bodygraph/resolver.py`; `engine/bodygraph/vendor_client.py`; `engine/cli/main.py`. (`Epic Plan HDE-EPIC037.md`, §Contract and Compatibility Posture)
+
+**Flag strategy (planned):** No new public flag is planned. The plan preserves `HD_API_BASE_URL` as the configured vendor-version boundary. Deprecated compatibility spelling may appear only as observed legacy compatibility posture where implementation or evidence explicitly records it. (`Epic Plan HDE-EPIC037.md`, §Contract and Compatibility Posture)
+
+**Backward-compat posture (planned):** Public Reader bytes remain unchanged by default. Existing non-v2 legacy fallback may be preserved only as explicit legacy fallback with its own auth and geocode posture, not as v2 BodyGraph-detail compatibility. (`Epic Plan HDE-EPIC037.md`, §Contract and Compatibility Posture)
+
+**Open-rails QA declaration (planned):** Open-rails QA is mandatory because this epic affects vendor request shaping, vendor response handling, CLI/admin runtime behavior, and runtime truth. The open-rails portion is PO-only execution, IA-guided, bounded, secret-safe, and captured as governed evidence. (`Epic Plan HDE-EPIC037.md`, §Contract and Compatibility Posture)
+
+**Execution-governance addenda recorded in PF10:**
+
+* PF10 addendum 2.1 records that rendered escape characters must never block plans or tasks unless raw-source inspection proves a separate substantive defect.  
+* PF10 addendum 2.2 records PR-01 remediation for HDE-FERM008.7 and removal of unsupported `VENDOR_NO_PAYLOAD_LOGGING_OK` claims from EPIC037 PR-01 snapshot index entries.  
+* PF10 addendum 2.3 records PR-02 as a pure v2 chart adapter implementation at `engine/bodygraph/v2_adapter.py`.  
+* PF10 addendum 2.4 records PR-03 as configured-v2 `bg:resolve --source vendor` resolver wiring using the version-neutral `charts` route.  
+* PF10 addendum 2.5 records PR-04 as compatibility-path proof for mapped v2 ChartResult adapter outputs.  
+* PF10 addendum 2.6 records OPS-01 as a bounded PO-only open-rails v2 chart-backed `bg:resolve --source vendor --dry-run` smoke.  
+* PF10 addendum 2.7 records PR-05 as parent-level HDE-FERM008 evidence binding with `parent_posture = supportable_to_done` for later PF09 drainage only.  
+* PF10 addendum 2.9 records mapped-cache persistence and production write reopening as later-phase work, not part of HDE-EPIC037.  
+* PF10 addendum 2.15 records `Epic closure decision: HDE-EPIC037 is SATISFIED`.
+
+**Date provenance note:** `Epic Plan HDE-EPIC037.md` records `Date started: 2026-07-04` and `Date completed: [INTENTIONALLY LEFT BLANK]`. This archive record preserves the operator-provided close date `2026-07-09`.
+
+**Plan-source mismatch:** `Epic Plan HDE-EPIC037.md` states PF10 was checked and had no current addenda active for this scope, while PF10 later records HDE-EPIC037 implementation, OPS, QA, remediation, retrospective, audit, and closure addenda. PF10 wins for actual results.
+
+**Closeout-posture chronology mismatch:** PF10 addendum 2.14 records `Recommendation: Ready with caveats`. PF10 addendum 2.15 later records `Epic closure decision: HDE-EPIC037 is SATISFIED` and `Implementation posture recommendation: READY WITH CAVEATS`. This archive record preserves both postures.
+
+**Closure-axis boundary:** PF10 addendum 2.15 states SATISFIED means satisfied for this review’s closure trace only and does not perform PO closeout, PF09 drainage, board update, merge action, formal close-pack completion, PF-canon drainage, final acceptance, or production deployment.
+
+**Merged-PR provenance:** Partial. PF10 records PR \#339 / merge commit `e151b3cadf5345cbaec61bb08315590a25be8136`, PR \#340 / merge commit `b91e0e1d07a1e25d1374427f02b37491dcb32284`, PR \#342 / merge commit `a3fd0f3f24617e429e173d445008b3a4223c853b`, PR \#343 / merge commit `103f504cdb73818664bff4a2fd26a1004e41cef1`, OPS evidence commit `ef8a46e856085f97d8da979ea21cb058747e06e9`, PR \#344 / merge commit `c5e05d32dac49d0cea963d97cd0a6db77aab7fe4`, and docs sweep PR \#345 / commit `78676daca5771b3d779850866689370e04ce59a5`. Complete merge provenance for every QA/closeout evidence commit: Unknown (not present in inputs).
+
+#### **2.22.2 Existing Work Check (MUST)**
+
+**Planned existing-work posture (`Epic Plan HDE-EPIC037.md`, §Existing Work Check):**
+
+* HDE-FERM008 is currently Partial. The completed child rows HDE-FERM008.1 through HDE-FERM008.6 are reused only as prior scoped evidence and nonclaim context.  
+* The current configured-v2 resolver posture is an explicit `unsupported_runtime_nonclaim`, not runtime success.  
+* The current known gap is the lack of a complete v2 ChartResult or ChartSimpleResult to HDE BodyGraph/person/cache/compat adapter proof or implementation.  
+* Existing CLI surface: `bg:resolve --source vendor`.  
+* Existing resolver path: `engine/bodygraph/resolver.py`.  
+* Existing vendor client path: `engine/bodygraph/vendor_client.py`.  
+* Existing CLI path: `engine/cli/main.py`.
+
+**Planned existing tokens validated (`Epic Plan HDE-EPIC037.md`, §Existing Work Check):**
+
+* No prior token satisfaction is reused as closure proof for the new HDE-FERM008.7 through HDE-FERM008.12 work.  
+* Prior evidence may provide provenance for existing nonclaim posture, but this epic must generate and bind its own governed evidence for new closure claims.
+
+**Planned existing evidence located (`Epic Plan HDE-EPIC037.md`, §Existing Work Check):**
+
+* Existing governed evidence families for earlier HDE-FERM008 child rows remain historical support for prior slices only.  
+* Existing evidence from earlier Fermentation work supports route-policy classification and nonclaim boundaries, not parent HDE-FERM008 Done.  
+* This epic must produce new governed evidence for adapter contract, adapter implementation, resolver wiring, compatibility-path proof, PO-only runtime smoke, and parent-level evidence binding.
+
+**Planned gap statement (`Epic Plan HDE-EPIC037.md`, §Existing Work Check):**
+
+* No v2 BodyGraph-detail adapter contract and field-sufficiency proof exists for the selected v2 payload family.  
+* No deterministic v2 ChartResult-to-HDE adapter implementation is currently accepted as complete for the HDE BodyGraph/person/cache/compat contract.  
+* `bg:resolve --source vendor` is not yet wired as a proven v2 chart-backed BodyGraph-detail runtime path.  
+* A v2 chart-backed resolved BodyGraph has not yet been proven to feed the existing compatibility path.  
+* A bounded PO-only open-rails v2 BodyGraph-detail runtime smoke has not yet proven the live vendor response can pass through the implemented adapter into HDE compute.  
+* Parent-level evidence binding has not yet shown that HDE-FERM008 is supportable to Done.
+
+**Actual reuse and delta (PF10):**
+
+* PF10 addendum 2.2 records PR-01 final evidence for HDE-FERM008.7 after remediation, including `artifacts/vendor/hdapi_v2/hde_epic037_field_sufficiency_proof.json`, `artifacts/vendor/hdapi_v2/hde_epic037_adapter_contract.snapshot.json`, and `artifacts/vendor/hdapi_v2/hde_epic037_adapter_contract_nonclaims.json`.  
+* PF10 addendum 2.3 records PR-02 as implementing a pure v2 chart adapter at `engine/bodygraph/v2_adapter.py`, with `artifacts/vendor/hdapi_v2/hde_epic037_adapter_mapping.snapshot.json`, `artifacts/vendor/hdapi_v2/hde_epic037_adapter_negative_fixtures.json`, `artifacts/vendor/hdapi_v2/hde_epic037_no_raw_payload_persistence.json`, and `artifacts/vendor/hdapi_v2/hde_epic037_public_reader_no_change.json`.  
+* PF10 addendum 2.4 records PR-03 as configured-v2 resolver wiring for HDE-FERM008.9, including `artifacts/vendor/hdapi_v2/hde_epic037_bg_resolve_v2_route_policy.snapshot.json`, `artifacts/vendor/hdapi_v2/hde_epic037_bg_resolve_request_shape.snapshot.json`, `artifacts/vendor/hdapi_v2/hde_epic037_bg_resolve_closed_rails_no_io.json`, and `artifacts/vendor/hdapi_v2/hde_epic037_bg_resolve_legacy_fallback.snapshot.json`.  
+* PF10 addendum 2.5 records PR-04 as closed-rails compatibility proof for HDE-FERM008.10, including `artifacts/vendor/hdapi_v2/hde_epic037_v2_to_compat_proof.json`, `artifacts/vendor/hdapi_v2/hde_epic037_v2_to_compat_two_run.json`, `artifacts/vendor/hdapi_v2/hde_epic037_v2_to_compat_pair_order.json`, and `artifacts/vendor/hdapi_v2/hde_epic037_admin_public_boundary.json`.  
+* PF10 addendum 2.6 records OPS-01 as sufficient for HDE-FERM008.11 at the OPS level, with `audit/ops/hde-epic037/ops-hde-epic037-001/result_summary.json`, `audit/ops/hde-epic037/ops-hde-epic037-001/request_summary.json`, `audit/ops/hde-epic037/ops-hde-epic037-001/compat_path_result_summary.json`, and `audit/qa/hde-epic037/ops-hde-epic037-001/ops_evidence_pointer.md`.  
+* PF10 addendum 2.7 records PR-05 as parent evidence binding for HDE-FERM008.12, with `docs/acceptance_map_epic037.json`, `audit/qa/hde-epic037/token_evidence_matrix.md`, `audit/qa/hde-epic037/acceptance_map_viability.log`, and `audit/qa/hde-epic037/parent_evidence_binding.log`.  
+* PF10 addendum 2.15 records all six closure-trace deliverables as Satisfied and records HDE-FERM008 as `supportable_to_done` for later PF09 drainage.
+
+#### **2.22.3 Deliverables (Jobs-to-be-done) — Planned vs Actual Reconciliation**
+
+##### **D1 — v2 BodyGraph-detail adapter contract and field sufficiency**
+
+* **Planned (`Epic Plan HDE-EPIC037.md`, §Deliverable D1):** Define the selected v2 payload family and exact field-sufficiency contract needed to populate the existing HDE BodyGraph/person/cache/compat shape. Includes HDE-FERM008.7.  
+* **Actual (PF10):** PR-01 produced field-sufficiency evidence, but the final accepted posture is fail-closed insufficiency rather than full compute readiness. PF10 addendum 2.2 records `field_sufficiency_status:"INSUFFICIENT_FAIL_CLOSED"`, `compute_ready:false`, `fail_closed:true`, `runtime_adapter_implemented:false`, `resolver_rewired:false`, and `compat_compute_ready:false` in `artifacts/vendor/hdapi_v2/hde_epic037_field_sufficiency_proof.json`.  
+* **Remediation (PF10):** PR-01 remediation removed unsupported `VENDOR_NO_PAYLOAD_LOGGING_OK` claims from EPIC037 PR-01 snapshot index entries and aligned negative fixture expectations with `evaluate_payload_family`.  
+* **Evidence anchors (PF10):** `artifacts/vendor/hdapi_v2/hde_epic037_adapter_contract.snapshot.json`; `artifacts/vendor/hdapi_v2/hde_epic037_adapter_contract_nonclaims.json`; `artifacts/vendor/hdapi_v2/hde_epic037_field_sufficiency_proof.json`; `tests/evidence/test_hde_epic037_field_sufficiency.py`; `tools/evidence/generate_hde_epic037_field_sufficiency.py`.  
+* **Disposition (archive):** Satisfied for HDE-FERM008.7. PF10 addendum 2.15 records PR-01 as Satisfied and supportable for later Done drainage.
+
+##### **D2 — deterministic v2 ChartResult-to-HDE adapter implementation**
+
+* **Planned (`Epic Plan HDE-EPIC037.md`, §Deliverable D2):** Implement the deterministic adapter that maps the selected HumanDesignAPI v2 payload family into the HDE BodyGraph/person/cache/compat input shape defined by D1. Includes HDE-FERM008.8.  
+* **Actual (PF10):** PR-02 implemented a pure v2 chart adapter at `engine/bodygraph/v2_adapter.py`, exported through `engine/bodygraph/__init__.py`, with typed unsupported/fail-closed outcomes, no resolver wiring, no live vendor call, no OPS execution, and no public Reader expansion.  
+* **Evidence anchors (PF10):** `engine/bodygraph/v2_adapter.py`; `engine/bodygraph/__init__.py`; `artifacts/vendor/hdapi_v2/hde_epic037_adapter_mapping.snapshot.json`; `artifacts/vendor/hdapi_v2/hde_epic037_adapter_negative_fixtures.json`; `artifacts/vendor/hdapi_v2/hde_epic037_no_raw_payload_persistence.json`; `artifacts/vendor/hdapi_v2/hde_epic037_public_reader_no_change.json`; `tests/bodygraph/test_v2_adapter.py`; `tests/evidence/test_hde_epic037_v2_adapter.py`; `tools/evidence/generate_hde_epic037_v2_adapter.py`.  
+* **Disposition (archive):** Satisfied for HDE-FERM008.8. PF10 addendum 2.15 records PR-02 as Satisfied and supportable for later Done drainage.
+
+##### **D3 — v2 chart-backed resolver wiring for `bg:resolve --source vendor`**
+
+* **Planned (`Epic Plan HDE-EPIC037.md`, §Deliverable D3):** Wire the v2 adapter into the existing BodyGraph vendor resolver workflow so configured v2 bases use the selected chart-backed route family and do not accidentally compose legacy BodyGraph resource paths against a v2 base. Includes HDE-FERM008.9.  
+* **Actual (PF10):** PR-03 wired the deterministic v2 ChartResult adapter into `bg:resolve --source vendor` for configured v2 bases, selecting the version-neutral `charts` route instead of legacy `bodygraphs`, while preserving explicit legacy fallback for non-v2 bases.  
+* **Evidence anchors (PF10):** `artifacts/vendor/hdapi_v2/hde_epic037_bg_resolve_v2_route_policy.snapshot.json`; `artifacts/vendor/hdapi_v2/hde_epic037_bg_resolve_request_shape.snapshot.json`; `artifacts/vendor/hdapi_v2/hde_epic037_bg_resolve_closed_rails_no_io.json`; `artifacts/vendor/hdapi_v2/hde_epic037_bg_resolve_legacy_fallback.snapshot.json`; `tests/bodygraph/test_bg_resolve_route_policy.py`; `tests/evidence/test_hde_epic037_bg_resolve.py`; `tools/evidence/generate_hde_epic037_bg_resolve.py`; `engine/bodygraph/resolver.py`; `engine/bodygraph/vendor_client.py`.  
+* **Disposition (archive):** Satisfied for HDE-FERM008.9. PF10 addendum 2.15 records PR-03 as Satisfied and supportable for later Done drainage.
+
+##### **D4 — v2 resolved BodyGraph to compatibility proof**
+
+* **Planned (`Epic Plan HDE-EPIC037.md`, §Deliverable D4):** Prove that the v2 chart-backed resolved BodyGraph produced by the adapter can feed the existing HDE compatibility path without public Reader byte drift or admin-only field leakage. Includes HDE-FERM008.10.  
+* **Actual (PF10):** PR-04 added closed-rails evidence proving mapped v2 ChartResult adapter outputs can feed the existing compatibility path without public Reader drift or admin-only leakage. PF10 records `accepted_mapped_resolved_parties:true`, `category_count:10`, and `raw_request_response_vendor_bodies_absent:true` against `artifacts/vendor/hdapi_v2/hde_epic037_v2_to_compat_proof.json`.  
+* **Evidence anchors (PF10):** `artifacts/vendor/hdapi_v2/hde_epic037_v2_to_compat_proof.json`; `artifacts/vendor/hdapi_v2/hde_epic037_v2_to_compat_two_run.json`; `artifacts/vendor/hdapi_v2/hde_epic037_v2_to_compat_pair_order.json`; `artifacts/vendor/hdapi_v2/hde_epic037_admin_public_boundary.json`; `tests/compat/test_hde_epic037_v2_adapter_to_compat.py`; `tests/evidence/test_hde_epic037_v2_to_compat.py`; `tools/evidence/generate_hde_epic037_v2_to_compat.py`.  
+* **Disposition (archive):** Satisfied for HDE-FERM008.10. PF10 addendum 2.15 records PR-04 as Satisfied and supportable for later Done drainage.
+
+##### **D5 — PO-only open-rails v2 BodyGraph-detail runtime smoke**
+
+* **Planned (`Epic Plan HDE-EPIC037.md`, §Deliverable D5; §OPS Task Separation):** Execute a bounded PO-authorized open-rails smoke after D1 through D4 are implemented. The smoke must prove that the live vendor response can pass through the implemented adapter and reach the HDE BodyGraph/person/cache/compat path, or record the exact safe failure class without overclaiming product failure. Includes HDE-FERM008.11 and OPS-HDE-EPIC037-001.  
+* **Actual (PF10):** OPS-01 recorded one bounded PO-only open-rails v2 chart-backed `bg:resolve --source vendor --dry-run` smoke. PF10 records exit code `0`, parseable JSON with `status:"ok"`, v2 `charts` request posture, mapped adapter status, mapped-no-raw-vendor-payload cache posture, and accepted compatibility path summary.  
+* **Evidence anchors (PF10):** `audit/ops/hde-epic037/ops-hde-epic037-001/commands.txt`; `audit/ops/hde-epic037/ops-hde-epic037-001/stdout.log`; `audit/ops/hde-epic037/ops-hde-epic037-001/stderr.log`; `audit/ops/hde-epic037/ops-hde-epic037-001/exit_codes.txt`; `audit/ops/hde-epic037/ops-hde-epic037-001/env_presence_redacted.json`; `audit/ops/hde-epic037/ops-hde-epic037-001/request_summary.json`; `audit/ops/hde-epic037/ops-hde-epic037-001/result_summary.json`; `audit/ops/hde-epic037/ops-hde-epic037-001/adapter_mapping_result_summary.json`; `audit/ops/hde-epic037/ops-hde-epic037-001/compat_path_result_summary.json`; `audit/ops/hde-epic037/ops-hde-epic037-001/failure_classification.json`; `audit/ops/hde-epic037/ops-hde-epic037-001/files_sha256.txt`; `audit/qa/hde-epic037/ops-hde-epic037-001/ops_evidence_pointer.md`.  
+* **Disposition (archive):** Satisfied for HDE-FERM008.11 at the OPS evidence level. PF10 addendum 2.15 records OPS-01 as Satisfied; PR-05 parent binding remained the separate HDE-FERM008.12 follow-up.
+
+##### **D6 — v2 runtime conformance evidence binding and parent-support statement**
+
+* **Planned (`Epic Plan HDE-EPIC037.md`, §Deliverable D6):** Bind D1 through D5 into a governed parent-level evidence loop and state whether HDE-FERM008 is supportable to Done or remains Partial. Includes HDE-FERM008.12.  
+* **Actual (PF10):** PR-05 bound PR-01 through PR-04 evidence plus PO-produced OPS-01 evidence into parent-level HDE-FERM008 evidence artifacts, with parent posture recorded as `supportable_to_done` for later PF09 drainage only. PF10 addendum 2.15 records `HDE-FERM008 is supportable_to_done for later PF09 drainage`.  
+* **Evidence anchors (PF10):** `docs/acceptance_map_epic037.json`; `docs/acceptance_map_epic037.json.path_proof.txt`; `audit/qa/hde-epic037/token_evidence_matrix.md`; `audit/qa/hde-epic037/token_evidence_matrix.md.path_proof.txt`; `audit/qa/hde-epic037/acceptance_map_viability.log`; `audit/qa/hde-epic037/acceptance_map_viability.log.path_proof.txt`; `audit/qa/hde-epic037/parent_evidence_binding.log`; `audit/qa/hde-epic037/parent_evidence_binding.log.path_proof.txt`; `audit/docdeltas/hde-epic037_pr05_parent_binding_doc_deltas.md`; `audit/qa/hde-epic037/00_meta/pr05_parent_binding_doc_deltas.md`; `tests/evidence/test_hde_epic037_pr05_parent_binding.py`; `tools/evidence/generate_hde_epic037_parent_binding.py`.  
+* **Disposition (archive):** Satisfied for HDE-FERM008.12 and parent supportability. Actual PF09.5 physical status drainage remains Unknown (not present in inputs).
+
+##### **D7 — formal close-pack pair**
+
+* **Planned:** Unknown (not present in inputs).  
+* **Actual (PF10):** PF10 records formal close-pack completion as deferred as a separate closeout axis. PF10 addendum 2.15 explicitly states that SATISFIED does not perform formal close-pack completion.  
+* **Evidence anchors (PF10):** Unknown (not present in inputs).  
+* **Disposition (archive):** Unclear for formal close-pack pair production; not used here to override PF10’s SATISFIED closure-trace decision.
+
+**Planned-vs-actual mismatches archived explicitly:**
+
+* `Epic Plan HDE-EPIC037.md` says PF10 has no current live addenda, while PF10 later records HDE-EPIC037 addenda 2.2 through 2.15. PF10 wins for actual results.  
+* The plan says HDE-FERM008.7 through HDE-FERM008.12 are planned for completion. PF10 supports all six as Satisfied for the closure trace and supportable for later PF09 drainage, while actual PF09.5 physical status movement remains Unknown.  
+* The plan requires a PO-only open-rails smoke under OPS-HDE-EPIC037-001. PF10 records OPS-01 as executed and sufficient for the OPS level, with `runtime_conformance_supported_by_this_smoke:true` in `audit/ops/hde-epic037/ops-hde-epic037-001/result_summary.json`.  
+* The plan expects parent-level evidence binding to state whether HDE-FERM008 is supportable to Done or remains Partial. PF10 records `parent_posture:"supportable_to_done"` and preserves that this is not PF09 status movement.  
+* The plan does not open tracked issues at plan time. PF10 later records mapped-cache persistence, production write reopening, Step-0B doc-delta clobber, zero-byte package caveat, and proof-boundary hygiene as actual closeout/future-work items.
+
+#### **2.22.4 PF Reference Map**
+
+**Core phase and process references (from `Epic Plan HDE-EPIC037.md`, §PF Reference Map):**
+
+* `PF21 — 7 Phases of Alchemical Engineering`  
+* `PF06 — Epic Process Guide`  
+* `PF09.5 — HDE Build Checklist Fermentation`  
+* `PF27 — Canon Plan Templates`
+
+**Architecture and mechanics references (from `Epic Plan HDE-EPIC037.md`, §PF Reference Map):**
+
+* `PF02 — HDE Architecture`  
+* `PF14 — HDE Mechanics Guide`
+
+**Governance and transport references (from `Epic Plan HDE-EPIC037.md`, §PF Reference Map):**
+
+* `PF04 — HDE Governance`  
+* `PF05 — HDE CLI/API Vendor Ref`  
+* `PF07 — Glow Infrastructure`
+
+**Artifacts and evidence references (from `Epic Plan HDE-EPIC037.md`, §PF Reference Map):**
+
+* `PF12 — HDE Schemas and Artifacts`  
+* `PF19 — Glow QA Guide`
+
+**Math and deterministic compute reference (from `Epic Plan HDE-EPIC037.md`, §PF Reference Map):**
+
+* `PF01 — HDE Math Spec`
+
+**Planning-time consult reference (from `Epic Plan HDE-EPIC037.md`, §PF Reference Map):**
+
+* `PF23 — Reality Audits`
+
+**Current user/operator surface context (from `Epic Plan HDE-EPIC037.md`, §PF Reference Map):**
+
+* `PF29 — HDE Users Guide`
+
+**Historical context only (from `Epic Plan HDE-EPIC037.md`, §PF Reference Map):**
+
+* `PF20 — HDE Phased Epics`
+
+**Living addenda check (from `Epic Plan HDE-EPIC037.md`, §PF Reference Map):**
+
+* `PF10 — HDE Build Notes`
+
+**PF23 anchors carried in the plan:**
+
+* BodyGraph resolver  
+* vendor seam  
+* CLI/admin surface  
+* compatibility compute  
+* evidence index/mirror discipline
+
+**Execution and results sources used for this archive entry:**
+
+* PF10 addendum 2.2 — PR-01 HDE-EPIC037  
+* PF10 addendum 2.3 — PR-02 HDE-EPIC037  
+* PF10 addendum 2.4 — PR-03 HDE-EPIC037  
+* PF10 addendum 2.5 — PR-04 HDE-EPIC037  
+* PF10 addendum 2.6 — OPS-01 HDE-EPIC037  
+* PF10 addendum 2.7 — PR-05 HDE-EPIC037  
+* PF10 addendum 2.8 — Implementation Retrospective HDE-EPIC037  
+* PF10 addendum 2.9 — HDE-EPIC037 Later-Phase Task Recommendations — mapped-cache persistence boundary  
+* PF10 addendum 2.10 — Audit Analysis HDE-EPIC037  
+* PF10 addendum 2.11 — QA Pass 1 HDE-EPIC037  
+* PF10 addendum 2.12 — QA Pass 2 HDE-EPIC037  
+* PF10 addendum 2.13 — QA Pass 2 HDE-EPIC037 Review Summary  
+* PF10 addendum 2.14 — Final QA Closeout Review \+ QA RCA HDE-EPIC037  
+* PF10 addendum 2.15 — Epic Closure Review HDE-EPIC037  
+* `Epic Plan HDE-EPIC037.md`, §Existing Work Check, §Deliverables (Jobs To Be Done), §OPS Task Separation, §QA Planning Posture, §Tokens and Evidence (Acceptance), §QA Rails — Open/Close, §Documentation and Drainage Posture, §Tracked Issues, §Plan Integrity Check
+
+#### **2.22.5 Tokens and Evidence (Acceptance)**
+
+**Planned token inventory (`Epic Plan HDE-EPIC037.md`, §Tokens and Evidence (Acceptance)):**
+
+* Baseline tokens: `TESTS_PASS_OK`, `DOC_DELTA_PRESENT_OK`, `EVIDENCE_INDEX_UPDATED_OK`, `MACHINE_MIRROR_UPDATED_OK`, `EVIDENCE_INDEX_HASH_OK`  
+* QA rail tokens: `QA_PRECOMMIT_CHECKLIST_OK`, `QA_POSTCOMMIT_CHECKLIST_OK`, `ENV_RAILS_POLICY_OK`  
+* Evidence, canonicality, rails, and vendor-safety tokens expected where applicable: `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`, `EVIDENCE_PATH_PROOFS_OK`, `CI_CHECK_FINAL_LF_OK`, `CI_CHECK_MIRROR_SCHEMA_OK`, `JSON_CANONICAL_CHECK_OK`, `COMPOSITE_ABBA_IDENTITY_OK`, `TWO_RUN_IDENTITY_OK`, `NO_EXTERNAL_IO_ON_REFUSAL_OK`, `VENDOR_NO_PAYLOAD_LOGGING_OK`, `LOGS_KEYS_ONLY_OK`, `BG_PRIVACY_REDACTION_OK`
+
+**Planned token posture (`Epic Plan HDE-EPIC037.md`, §Tokens and Evidence (Acceptance)):**
+
+* No new acceptance token is introduced by this plan.  
+* PF09 scope/status binding for HDE-FERM008.7 through HDE-FERM008.12 is metadata, not an acceptance token.  
+* PR existence, branch identity, review status, merge state, and board state are metadata, not acceptance tokens.  
+* Documentation drainage is not an execution deliverable, acceptance gate, or closeout blocker by itself.
+
+**Planned evidence pointers (`Epic Plan HDE-EPIC037.md`, §Evidence pointers):**
+
+* `docs/evidence/INDEX.json`  
+* `docs/evidence/INDEX.sha256`  
+* `artifacts/evidence_index.jsonl`  
+* `artifacts/evidence_index.jsonl.sha256`  
+* `.path_proof.txt`  
+* `audit/qa/hde-epic037/`  
+* `audit/ops/hde-epic037/`  
+* `audit/docdeltas/hde-epic037_doc_deltas.md`  
+* `audit/qa/hde-epic037/00_meta/doc_deltas.md`
+
+**Actual evidence posture (PF10):**
+
+* **PR-01 field-sufficiency evidence:** `artifacts/vendor/hdapi_v2/hde_epic037_adapter_contract.snapshot.json`; `artifacts/vendor/hdapi_v2/hde_epic037_adapter_contract_nonclaims.json`; `artifacts/vendor/hdapi_v2/hde_epic037_field_sufficiency_proof.json`; path proofs; Human Evidence Index and Machine Mirror rows.  
+* **PR-02 adapter evidence:** `artifacts/vendor/hdapi_v2/hde_epic037_adapter_mapping.snapshot.json`; `artifacts/vendor/hdapi_v2/hde_epic037_adapter_negative_fixtures.json`; `artifacts/vendor/hdapi_v2/hde_epic037_no_raw_payload_persistence.json`; `artifacts/vendor/hdapi_v2/hde_epic037_public_reader_no_change.json`; `engine/bodygraph/v2_adapter.py`; `tests/bodygraph/test_v2_adapter.py`.  
+* **PR-03 resolver evidence:** `artifacts/vendor/hdapi_v2/hde_epic037_bg_resolve_v2_route_policy.snapshot.json`; `artifacts/vendor/hdapi_v2/hde_epic037_bg_resolve_request_shape.snapshot.json`; `artifacts/vendor/hdapi_v2/hde_epic037_bg_resolve_closed_rails_no_io.json`; `artifacts/vendor/hdapi_v2/hde_epic037_bg_resolve_legacy_fallback.snapshot.json`; `engine/bodygraph/resolver.py`; `engine/bodygraph/vendor_client.py`.  
+* **PR-04 compatibility evidence:** `artifacts/vendor/hdapi_v2/hde_epic037_v2_to_compat_proof.json`; `artifacts/vendor/hdapi_v2/hde_epic037_v2_to_compat_two_run.json`; `artifacts/vendor/hdapi_v2/hde_epic037_v2_to_compat_pair_order.json`; `artifacts/vendor/hdapi_v2/hde_epic037_admin_public_boundary.json`.  
+* **OPS-01 runtime smoke evidence:** `audit/ops/hde-epic037/ops-hde-epic037-001/commands.txt`; `audit/ops/hde-epic037/ops-hde-epic037-001/stdout.log`; `audit/ops/hde-epic037/ops-hde-epic037-001/stderr.log`; `audit/ops/hde-epic037/ops-hde-epic037-001/exit_codes.txt`; `audit/ops/hde-epic037/ops-hde-epic037-001/env_presence_redacted.json`; `audit/ops/hde-epic037/ops-hde-epic037-001/request_summary.json`; `audit/ops/hde-epic037/ops-hde-epic037-001/result_summary.json`; `audit/ops/hde-epic037/ops-hde-epic037-001/adapter_mapping_result_summary.json`; `audit/ops/hde-epic037/ops-hde-epic037-001/compat_path_result_summary.json`; `audit/ops/hde-epic037/ops-hde-epic037-001/failure_classification.json`; `audit/ops/hde-epic037/ops-hde-epic037-001/files_sha256.txt`; `audit/qa/hde-epic037/ops-hde-epic037-001/ops_evidence_pointer.md`.  
+* **Parent evidence binding:** `docs/acceptance_map_epic037.json`; `audit/qa/hde-epic037/token_evidence_matrix.md`; `audit/qa/hde-epic037/acceptance_map_viability.log`; `audit/qa/hde-epic037/parent_evidence_binding.log`; `audit/docdeltas/hde-epic037_doc_deltas.md`; `audit/qa/hde-epic037/00_meta/doc_deltas.md`; `audit/docdeltas/hde-epic037_pr05_parent_binding_doc_deltas.md`; `audit/qa/hde-epic037/00_meta/pr05_parent_binding_doc_deltas.md`.  
+* **Common governed evidence homes:** `docs/evidence/INDEX.json`; `docs/evidence/INDEX.sha256`; `docs/evidence/INDEX.json.path_proof.txt`; `docs/evidence/INDEX.sha256.path_proof.txt`; `artifacts/evidence_index.jsonl`; `artifacts/evidence_index.jsonl.sha256`; `artifacts/evidence_index.jsonl.path_proof.txt`; `artifacts/evidence_index.jsonl.sha256.path_proof.txt`.  
+* **QA closeout evidence:** `audit/qa/hde-epic037/checks/po-001/primary.log`; `audit/qa/hde-epic037/checks/po-002-remediation-r1/primary.log`; `audit/qa/hde-epic037/checks/post-remediation-suite-rerun-r1/primary.log`; `audit/qa/hde-epic037/checks/po-007/primary.log`; `audit/qa/hde-epic037/checks/po-008/primary.log`; `audit/qa/hde-epic037/checks/po-009/primary.log`; `audit/qa/hde-epic037/checks/po-010/primary.log`; `audit/qa/hde-epic037/checks/po-011/primary.log`; `audit/qa/hde-epic037/checks/po-012/primary.log`; `audit/qa/hde-epic037/checks/qa-13-qa-rca-doc-delta-summary/primary.log`; `audit/qa/hde-epic037/00_meta/qa_rca_doc_delta_summary.md`.
+
+**Actual token/evidence posture (PF10):**
+
+* PF10 explicitly records support for `JSON_CANONICAL_CHECK_OK`, `EVIDENCE_PATH_PROOFS_OK`, and `DOC_DELTA_PRESENT_OK` in PR-01 after unsupported `VENDOR_NO_PAYLOAD_LOGGING_OK` claims were removed.  
+* PF10 explicitly records PR-02 artifact entries using `JSON_CANONICAL_CHECK_OK` and `EVIDENCE_PATH_PROOFS_OK`, while avoiding unsupported `VENDOR_NO_PAYLOAD_LOGGING_OK`, `LOGS_KEYS_ONLY_OK`, and `BG_PRIVACY_REDACTION_OK` claims.  
+* PF10 explicitly records PR-03 token arrays including `ENV_RAILS_POLICY_OK`, `NO_EXTERNAL_IO_ON_REFUSAL_OK`, `JSON_CANONICAL_CHECK_OK`, and `EVIDENCE_PATH_PROOFS_OK`.  
+* PF10 explicitly records PR-04 support for `TWO_RUN_IDENTITY_OK` through `artifacts/vendor/hdapi_v2/hde_epic037_v2_to_compat_two_run.json` and `COMPOSITE_ABBA_IDENTITY_OK` through `artifacts/vendor/hdapi_v2/hde_epic037_v2_to_compat_pair_order.json`.  
+* PF10 explicitly records token matrix entries for `DOC_DELTA_PRESENT_OK`, `EVIDENCE_INDEX_UPDATED_OK`, `MACHINE_MIRROR_UPDATED_OK`, `EVIDENCE_INDEX_HASH_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATH_PROOFS_OK`, `JSON_CANONICAL_CHECK_OK`, `COMPOSITE_ABBA_IDENTITY_OK`, `TWO_RUN_IDENTITY_OK`, `NO_EXTERNAL_IO_ON_REFUSAL_OK`, and `ENV_RAILS_POLICY_OK`.  
+* PF10 addendum 2.15 records the final closure trace as SATISFIED while preserving that it does not perform final acceptance, PF09 drainage, formal close-pack completion, PO closeout, board update, production deployment, or PF-canon drainage.
+
+**Planned-token mismatch note:**
+
+* PF10 explicitly supports these planned token strings in the provided inputs: `TESTS_PASS_OK`, `DOC_DELTA_PRESENT_OK`, `EVIDENCE_INDEX_UPDATED_OK`, `MACHINE_MIRROR_UPDATED_OK`, `EVIDENCE_INDEX_HASH_OK`, `EVIDENCE_INDEX_MIRROR_OK`, `EVIDENCE_PATHS_VALIDATED_OK`, `EVIDENCE_PATH_PROOFS_OK`, `CI_CHECK_FINAL_LF_OK`, `CI_CHECK_MIRROR_SCHEMA_OK`, `JSON_CANONICAL_CHECK_OK`, `COMPOSITE_ABBA_IDENTITY_OK`, `TWO_RUN_IDENTITY_OK`, `NO_EXTERNAL_IO_ON_REFUSAL_OK`, and `ENV_RAILS_POLICY_OK`.  
+* PF10 does not explicitly claim these planned token strings as satisfied in the provided inputs: `QA_PRECOMMIT_CHECKLIST_OK`, `QA_POSTCOMMIT_CHECKLIST_OK`, `VENDOR_NO_PAYLOAD_LOGGING_OK`, `LOGS_KEYS_ONLY_OK`, and `BG_PRIVACY_REDACTION_OK`. Status for those token-string claims: Unknown (not present in inputs).  
+* PF10 explicitly records removal or avoidance of unsupported `VENDOR_NO_PAYLOAD_LOGGING_OK`, `LOGS_KEYS_ONLY_OK`, and `BG_PRIVACY_REDACTION_OK` claims for EPIC037 snapshot/log/privacy contexts where the evidence did not prove them.
+
+#### **2.22.6 QA Rails — Open/Close (Final PR)**
+
+**Planned rails posture (`Epic Plan HDE-EPIC037.md`, §QA Rails — Open/Close):**
+
+* Closed-rails posture is required for deterministic adapter tests, request-shape tests, resolver refusal tests, no-I/O proof, canonical JSON checks, index/mirror checks, and compatibility compute proofs.  
+* Open-rails posture is required for the bounded PO-only v2 BodyGraph-detail runtime smoke after D1 through D4 are implemented.  
+* QA execution boundary: the Epic Plan declares QA posture only and does not define Live QA steps, commands, operator procedure, logs, manifests, or step-level evidence.  
+* OPS boundary: the open-rails runtime smoke is OPS work, PO-only execution, IA-guided, and separate from PR work and QA execution.  
+* Secret posture: no plaintext secrets, raw bearer tokens, raw API keys, unredacted vendor credential material, private payload bodies, or uncontrolled production data may be recorded.
+
+**Actual QA event stream (PF10):**
+
+* CHECK `qa-00-runbook-preflight-and-discovery` — PASS. PF10 addendum 2.15 records repo-confirmed QA RCA summary coverage: `qa-00-runbook-preflight-and-discovery: PASS`.  
+* CHECK `qa-00b-doc-delta-capture` — PASS after remediation. PF10 addendum 2.15 records `qa-00b-doc-delta-capture: PASS` and notes that Step-0B originally clobbered generator-owned doc-delta evidence and caused po-002 FAIL\_BEHAVIOR.  
+* CHECK `po-001` — PASS. PF10 addendum 2.15 records repo-confirmed `audit/qa/hde-epic037/checks/po-001/primary.log` with `"status": "PASS"` and runtime-conformance-chain coherence.  
+* CHECK `po-002` — PASS after remediation. PF10 addendum 2.15 records `audit/qa/hde-epic037/checks/po-002-remediation-r1/primary.log` with original `FAIL_BEHAVIOR`, root cause `qa-00b-doc-delta-capture overwrote generator-owned EPIC037 doc-delta evidence`, and final generator exit `0`.  
+* CHECK `po-003` through `po-006` — PASS after post-remediation rerun. PF10 addendum 2.15 records `audit/qa/hde-epic037/checks/post-remediation-suite-rerun-r1/primary.log` with `po003_v2_adapter exit=0`, `po004_bg_resolve exit=0`, and `po005_v2_to_compat exit=0`.  
+* CHECK `po-007` — PASS. PF10 addendum 2.15 records `audit/qa/hde-epic037/checks/po-007/primary.log` with `"status": "PASS"`, `po_authorization_confirmed=true`, and `raw_response_body_emitted:false`.  
+* CHECK `po-008` — PASS. PF10 addendum 2.15 records `audit/qa/hde-epic037/checks/po-008/primary.log` with `"status": "PASS"`, `index_check_stdout.log`, and `missing=0`.  
+* CHECK `po-009` through `po-012` — PASS. PF10 addendum 2.15 records repo-confirmed final QA summary coverage with `"po-009: PASS"`, `"po-010: PASS"`, and `"po-011: PASS"`, and records `po-012` through selected-log validation.  
+* CHECK `qa-13-qa-rca-doc-delta-summary` — PASS. PF10 addendum 2.15 records `audit/qa/hde-epic037/checks/qa-13-qa-rca-doc-delta-summary/primary.log` with `"status": "PASS"`, `missing_primary_logs=`, and `selected_missing_or_empty=`.  
+* CHECK `Final QA Closeout Review + QA RCA` — Ready with caveats. PF10 addendum 2.14 records `Recommendation: Ready with caveats`.  
+* CHECK `Epic Closure Review` — SATISFIED. PF10 addendum 2.15 records `Epic closure decision: HDE-EPIC037 is SATISFIED`.
+
+**Remediation loops and decisions (PF10):**
+
+* PR-01 remediation corrected unsupported token overclaim and negative fixture/evaluator drift. Evidence anchor: `artifacts/vendor/hdapi_v2/hde_epic037_field_sufficiency_proof.json`.  
+* PR-02 remediation and CI-hardening addressed orientation drift and adapter edge-case findings. Evidence anchor: `engine/bodygraph/v2_adapter.py`.  
+* PR-03 remediation addressed raw ingest guarding, configured URL redaction, EPIC036 historical evidence synchronization, doc-delta proof mtime, and stale user-facing docs. Evidence anchor: `artifacts/vendor/hdapi_v2/hde_epic037_bg_resolve_v2_route_policy.snapshot.json`.  
+* PR-04 remediation addressed path-proof mtime drift and dropped declared evidence roles. Evidence anchor: `artifacts/vendor/hdapi_v2/hde_epic037_v2_to_compat_proof.json`.  
+* QA Pass 1 preserved the original po-002 failure, restored doc-delta surfaces, reran the field-sufficiency generator, and reran po-001 through po-006 successfully. Evidence anchors: `audit/qa/hde-epic037/checks/po-002-remediation-r1/primary.log`; `audit/qa/hde-epic037/checks/post-remediation-suite-rerun-r1/primary.log`.  
+* QA Pass 2 validated the bounded open-rails runtime smoke as PASS. Evidence anchor: `audit/qa/hde-epic037/checks/po-007/primary.log`.  
+* QA Pass 3.1 resolved po-008 and final closeout accounting with current tracked repo proof. Evidence anchors: `audit/qa/hde-epic037/checks/po-008/primary.log`; `audit/qa/hde-epic037/checks/qa-13-qa-rca-doc-delta-summary/primary.log`.  
+* PF10 addendum 2.15 records that zero-byte uploaded package entries are a caveat, not a blocker, when PF10 records the caveat and tracked repo evidence supplies the same proof.  
+* PF10 addendum 2.15 records that closure trace can be SATISFIED while PO closeout, PF09 drainage, board update, formal close-pack completion, and PF-canon drainage remain separate.
+
+**Closeout-posture chronology archived explicitly:**
+
+* PF10 addendum 2.14 — Final QA Closeout Review \+ QA RCA HDE-EPIC037: `Recommendation: Ready with caveats`.  
+* PF10 addendum 2.15 — Epic Closure Review HDE-EPIC037: `Epic closure decision: HDE-EPIC037 is SATISFIED`.  
+* PF10 addendum 2.15 — SATISFIED means satisfied for this review’s closure trace only.  
+* PF10 addendum 2.15 — Implementation posture recommendation: READY WITH CAVEATS.  
+* PF10 addendum 2.15 — No minimal follow-ups required for this review’s closure trace.  
+* PF10 addendum 2.15 — Not performed or implied by the closure decision: PO closeout, PF09 drainage, board update, merge action, formal close-pack completion, PF-canon drainage, final acceptance, or production deployment.
+
+#### **2.22.7 Tracked Issues**
+
+**Tracked issues at plan creation (`Epic Plan HDE-EPIC037.md`, §Tracked Issues):**
+
+* No tracked issues are opened at Epic Plan time.
+
+**Actual tracked issues / closeout drifts recorded in PF10:**
+
+* **Plan-source PF10 mismatch**  
+  * **Status:** Completed by PF10 actuality.  
+  * **Scope / description:** `Epic Plan HDE-EPIC037.md` says PF10 has no current live addenda, while PF10 later records HDE-EPIC037 addenda 2.2 through 2.15.  
+  * **Disposition:** PF10 wins for actual results. The mismatch is preserved explicitly.  
+* **PR-01 unsupported token overclaim and negative fixture/evaluator drift**  
+  * **Status:** Completed under HDE-EPIC037.  
+  * **Scope / description:** Early EPIC037 PR-01 snapshot entries overclaimed `VENDOR_NO_PAYLOAD_LOGGING_OK`, and negative fixture expectations were out of sync with `evaluate_payload_family`.  
+  * **Disposition:** PF10 addendum 2.2 records final registration using `JSON_CANONICAL_CHECK_OK` and `EVIDENCE_PATH_PROOFS_OK` only for field-sufficiency snapshots, with doc-delta `DOC_DELTA_PRESENT_OK` where applicable.  
+* **Step-0B generator-owned doc-delta clobber**  
+  * **Status:** Completed under HDE-EPIC037; canon/process follow-up proposed.  
+  * **Scope / description:** Step-0B originally overwrote generator-owned EPIC037 doc-delta evidence with a no-deltas template and caused po-002 FAIL\_BEHAVIOR.  
+  * **Disposition:** PF10 addendum 2.15 records remediation and future guidance that Step-0B must not overwrite generator-owned doc-delta evidence surfaces.  
+* **Zero-byte uploaded package entries**  
+  * **Status:** Non-blocking caveat.  
+  * **Scope / description:** PF10 records zero-byte entries in an uploaded final report archive, while current tracked repo evidence and qa-13 selected-log validation supplied readable alternate proof.  
+  * **Disposition:** PF10 addendum 2.15 records zero-byte package entries as a caveat, not a blocker, when tracked repo evidence supplies the same proof.  
+* **Mapped-cache persistence boundary**  
+  * **Status:** Carried forward to later-phase work.  
+  * **Scope / description:** HDE-EPIC037 proves v2 dry-run mapping and v2 mapped output feeding compatibility computation, but does not prove durable mapped-cache persistence.  
+  * **Disposition:** PF10 addendum 2.9 recommends future PF09.6 Distillation mapped-cache persistence hardening. Destination epic ID: Unknown (not present in inputs).  
+* **Production upsert reopening**  
+  * **Status:** Carried forward to later-phase work.  
+  * **Scope / description:** HDE-EPIC037 does not prove configured-v2 non-dry-run writes, `bg:resolve --source vendor --upsert`, or production user-bound BodyGraph persistence.  
+  * **Disposition:** PF10 addendum 2.9 recommends future PF09.7 Coagulation production-safe configured-v2 upsert reopening only if authorized. Destination epic ID: Unknown (not present in inputs).  
+* **PF09.5 physical status drainage**  
+  * **Status:** Carried forward as documentation/status-drain work.  
+  * **Scope / description:** PF10 addendum 2.15 records HDE-FERM008.7 through HDE-FERM008.12 and parent HDE-FERM008 as supportable for later PF09 drainage, while preserving that this is not PF09 status movement.  
+  * **Disposition:** Actual PF09.5 physical update: Unknown (not present in inputs).  
+* **Formal close-pack completion**  
+  * **Status:** Unknown (not present in inputs).  
+  * **Scope / description:** PF10 records formal close-pack completion as deferred as a separate closeout axis.  
+  * **Disposition:** Preserved as separate from this archive entry rather than silently closed.  
+* **PO closeout, board update, final acceptance, production deployment, and PF-canon drainage**  
+  * **Status:** Unknown (not present in inputs).  
+  * **Scope / description:** PF10 addendum 2.15 explicitly states that the closure decision does not perform PO closeout, board update, PF-canon drainage, final acceptance, or production deployment.  
+  * **Disposition:** Preserved as separate from this archive entry rather than silently closed.
+
+#### **2.22.8 Plan Preflight (MUST)**
+
+**Planned preflight posture (`Epic Plan HDE-EPIC037.md`, §Plan Integrity Check):**
+
+* Every HDE-FERM008.7 through HDE-FERM008.12 child row is represented exactly once.  
+* Every executable deliverable has exact PF09.5 mapping.  
+* Every executable deliverable has PF14 mechanics/component reference.  
+* OPS work is separated from PR work and labeled PO-only execution, IA-guided.  
+* QA posture is planning-level only and does not include a Live QA runbook.  
+* Repo-content claims are limited to scoped repo-validated surfaces or PF-owned canonical paths.  
+* PF20 is historical-only and does not define current planning scope.  
+* PF23 is planning-time consult only and does not prove current repo contents.  
+* PF10 has no active addendum for this scope, so owning PF-Canon governs.  
+* No new acceptance token is minted.  
+* No PF09 status change is performed by this plan.
+
+**Planned OPS posture (`Epic Plan HDE-EPIC037.md`, §OPS Task Separation):**
+
+* Task ID: `OPS-HDE-EPIC037-001`.  
+* Mapped PF09 subtask: HDE-FERM008.11.  
+* Execution owner: PO-only execution, IA-guided.  
+* Planned path: `audit/ops/hde-epic037/ops-hde-epic037-001/`.  
+* Planned QA pointer path: `audit/qa/hde-epic037/ops-hde-epic037-001/`.  
+* Secret handling note: record key names, presence posture, redacted header family, and safe result summaries only; do not record raw secret values or uncontrolled vendor payloads.
+
+**Planned ADR stubs (`Epic Plan HDE-EPIC037.md`, §ADR Stubs):**
+
+* None.
+
+**Actual ADR / decision posture (PF10):**
+
+* PF10 addendum 2.15 records a new canon proposal that Step-0B must not overwrite generator-owned doc-delta evidence surfaces and should preserve or append where needed.  
+* PF10 addendum 2.15 records that durable mapped-cache persistence and production write reopening remain future later-phase work, not closure blockers for this Fermentation trace.  
+* PF10 addendum 2.15 records that zero-byte uploaded package entries are a caveat, not a blocker, when PF10 records the caveat and tracked repo evidence supplies the same proof.  
+* PF10 addendum 2.15 records that closure trace can be SATISFIED while PO closeout, PF09 drainage, board update, formal close-pack completion, and PF-canon drainage remain separate.
+
+**Actual archive-level reconciliation:**
+
+* PF23 consult remained planning/context only. PF10 addendum 2.15 records PF23 as optional current-reality context only, superseded by repo validation if provided.  
+* Token registry posture remained bounded. PF10 records no new vendor-v2-specific acceptance token and explicitly removes or avoids unsupported log/privacy/no-payload token claims where evidence does not prove them.  
+* Close-pack baseline is not grounded as a completed artifact in the allowed inputs. Actual formal close-pack completion is Unknown (not present in inputs).  
+* QA boundary discipline is preserved. `Epic Plan HDE-EPIC037.md` contains planning-level QA posture only, while PF10 addenda 2.11 through 2.15 record separate QA execution, remediation, closeout review, QA RCA, and closure interpretation.  
+* Canonical evidence-path binding is satisfied for PF10-recorded implementation, OPS, PR, and QA evidence families through `artifacts/vendor/hdapi_v2/`, `audit/ops/hde-epic037/`, `audit/qa/hde-epic037/`, `audit/docdeltas/`, `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, and `artifacts/evidence_index.jsonl`.  
+* Lowercase directory naming is preserved for directory segments such as `artifacts/vendor/hdapi_v2/`, `audit/ops/hde-epic037/`, `audit/qa/hde-epic037/`, `audit/docdeltas/`, `docs/evidence/`, and `artifacts/`.  
+* Final archive posture: HDE-EPIC037 is SATISFIED for PF10’s closure trace, with implementation posture recommendation READY WITH CAVEATS. HDE-FERM008.7 through HDE-FERM008.12 and parent HDE-FERM008 are supportable from PF10-recorded evidence for later PF09 status drainage, while actual PF09.5 physical drainage, formal close-pack completion, PO closeout, board update, final acceptance, production deployment, PF-canon drainage, durable mapped-cache persistence, and production upsert reopening remain separate from this archive entry rather than silently closed.
 

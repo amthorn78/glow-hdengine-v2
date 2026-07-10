@@ -2,13 +2,13 @@
 
 **Title:** PF06-Canon-Epic-Process-Guide 
 
-**Version:** v2.3.3
+**Version:** v2.3.5
 
 **Status:** Canon
 
-**Effective date**: 2026-07-03
+**Effective date**: 2026-07-09
 
-**Last Update Gate:**  BN 12.0.1
+**Last Update Gate:**  BN 12.1.7 A10-13
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -76,6 +76,12 @@ Future work must be PF09-accounted. Future runtime claims, future QA claims, fut
 Subtask-level mapping is required when a relevant subtask exists. Parent-task-only mapping is invalid unless no relevant subtask exists. A parent PF09 row may not be treated as closed or supportable for Done merely because one child row or one evidence dimension is mapped.
 
 Reviewers MUST reject plans, retrospectives, closeout reviews, remediation guides, QA-readiness reports, and Scrum/PO handoffs that create unaccounted task-like backlog. This is a scope-accountability requirement, not a documentation-drainage requirement.
+
+Runtime-conformance sequencing for multi-slice epics. When an epic is trying to move a runtime or vendor surface from unsupported, insufficient, or nonclaim posture into bounded support, the plan SHOULD sequence proof from narrowest truth to broadest binding: first prove schema, field, or adapter insufficiency; then implement the pure mapping or adapter layer; then wire the runtime path; then prove internal compatibility; then run any required PO-only open-rails smoke; then bind parent or aggregate evidence. A parent-level evidence binding PR should be last when it depends on earlier PR slices and OPS evidence.
+
+Parent binding does not rerun OPS. A parent-binding or aggregate-evidence PR may consume PO-produced OPS evidence, but it MUST NOT claim to have executed OPS, completed OPS, made live vendor calls, moved PF09 status, produced QA PASS, or performed closeout unless those actions happened as separate authorized actions with their own evidence. The parent-binding artifact MUST state whether it binds existing OPS evidence, reruns nothing, and preserves the relevant nonclaims.
+
+Boundary repetition is protective. For runtime-conformance chains, each decisive evidence artifact SHOULD repeat the nonclaims that prevent evidence-to-product overclaim, including no public Reader change, no new public route, no new HTTP home, no app-side vendor ownership, no raw secret or uncontrolled payload persistence, no AI scope, no QA PASS, no OPS completion by PR work, no PF09 status movement by PR work, and no closeout unless those claims are explicitly in scope and proven.
 
 An epic MAY be delivered in a series of PRs (up to 10 PRs per epic), each PR carrying a coherent slice of work with its own code \+ evidence parity.
 
@@ -205,6 +211,8 @@ When referencing Build Notes in reviews, plans, or Doc Delta notes:
 * Prefer referencing by addendum number \+ addendum title.
 
 * Do not treat Build Notes section numbers as durable anchors for external enforcement.
+
+When PF10 or a closeout artifact records more than one QA pass, QA review, final review, or pass-like addendum for the same epic, each entry MUST be distinguishable by addendum number and addendum title or by another stable source-order label. Reviews and closeout summaries MUST NOT rely on repeated labels such as “QA Pass 2” alone when that label appears more than once for the same epic. If duplicate labels exist, cite source order and state the chronology explicitly.
 
 Canon mismatch posture (docs-only PRs).
 
@@ -971,6 +979,12 @@ Doc-Delta surfaces (draft \+ epic-scoped capture)
 This capture file is the stable record surface for the epic’s QA and closeout narrative. It MUST NOT be replaced by a placeholder reference.
 
 The approved plan’s Doc Delta Capture step (Step-0B or equivalent) MUST confirm these two fixed-path artifacts exist.
+
+Step-0B preservation rule. The Doc Delta Capture step is additive verification by default. It MUST NOT overwrite, truncate, replace, or template-over existing generator-owned, previously produced, or proof-bearing doc-delta surfaces with “no deltas,” empty placeholder content, or generic no-delta scaffolding.
+
+The Doc Delta Capture step may emit “no deltas” only when no proof-bearing doc-delta content exists for the epic. If either fixed doc-delta surface already contains generated, proof-bearing, remediation, drain-target, or closeout-relevant content, Step-0B MUST preserve that content and confirm, append, or copy only as explicitly required by the approved plan.
+
+If Step-0B overwrites proof-bearing doc-delta content, classify the issue as an evidence assembly or tooling failure, not product behavior failure. The remediation record MUST preserve the original failed receipt when available, restore the proof-bearing content from current governed source or approved remediation input, and rerun the affected approved check until the final evidence stream is auditable.
 
 The plan’s evidence bindings must clearly distinguish these two surfaces: draft (binding) vs epic-scoped capture (record).
 
@@ -4367,6 +4381,9 @@ Common RCA checks:
 * Evidence generators and proof harnesses MUST NOT serialize unexpected or unclassified behavior as PASS-grade evidence. If observed behavior deviates from expected success, expected failure, or an approved typed-error posture, the generator MUST fail closed or emit an approved non-PASS posture.  
 * When generated evidence or acceptance-boundary artifacts rely on governance metadata, review MUST verify that the metadata is mechanically checked where practical. This includes epic ID, PF09 task or subtask ID, artifact kind, record type, token roster or allowed-token boundary, claim or nonclaim posture, source artifact identity, and any release or binding identity that controls the review conclusion.  
 * Nonclaims that prevent overclaiming QA PASS, OPS completion, PF09 status movement, acceptance-token satisfaction, runtime conformance, public-surface expansion, or epic closeout SHOULD be asserted by tests, validators, generators, or acceptance-boundary artifacts when those nonclaims are decisive to the review. If machine checking is not practical, the review MUST state the limitation and preserve the nonclaim explicitly in the reviewed artifact.  
+* Evidence claims MUST be scoped to exactly what the artifact proves. A nonclaim snapshot, field-sufficiency snapshot, contract snapshot, or parent-binding summary MUST NOT claim log/privacy/no-payload, runtime conformance, QA PASS, OPS completion, PF09 status movement, or closeout tokens unless the artifact family actually produces the required proof. If an artifact type cannot prove a token or claim, the generator, registration source, acceptance map, matrix, mirror row, and review text must preserve the nonclaim instead of letting the claim survive through names, labels, or inherited token arrays.  
+* If a generated evidence family declares artifact roles, mirror roles, or equivalent role metadata, review MUST verify that the declared roles survive generation, registration, Human Evidence Index or Machine Mirror update, and path-proof refresh. Dropped, defaulted, or silently changed roles are evidence-identity defects when the role controls interpretation of the evidence family.  
+* When an evidence update uses a fixed-point loop across generated artifacts, Human Evidence Index, Machine Mirror, hash sentinels, path proofs, aggregate evidence, or orientation evidence, the review MUST verify that the loop is bounded, rerunnable, and converged from the final generator logic. A fixed-point loop is not accepted merely because a downstream file exists; the final evidence pass must show coherent generated bytes, hashes, sizes, proof anchors, and companion proof surfaces.  
 * When generated evidence asserts environment-specific behavior, attempt ordering, selection order, typed errors, provider posture, adapter posture, or comparable runtime facts, the generator MUST derive those facts from the actual observed run, snapshot, command output, or governed input for the intended environment. It MUST NOT substitute another environment posture, hardcode observed-order claims, or synthesize proof facts that were not produced by the governed run.  
 * If a PR adds or modifies generated evidence that is later indexed, mirrored, aggregated, counted, or summarized, the review MUST verify that the generator and generator check ran before downstream updater, index, mirror, hash, path-proof, aggregate, or orientation checks that depend on those generated bytes.  
 * Downstream index, mirror, hash, path-proof, aggregate, or orientation checks do not by themselves prove generated-evidence freshness when the generating command did not run in the final governed proof path.  

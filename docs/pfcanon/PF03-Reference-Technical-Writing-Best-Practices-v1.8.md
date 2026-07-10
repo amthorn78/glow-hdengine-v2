@@ -2,13 +2,13 @@
 
 **Title:** PF03-Reference-Technical-Writing-Best-Practices
 
-**Version**: v1.7.9
+**Version**: v1.8
 
 **Status:** Reference
 
-**Effective date:** 2026-07-03
+**Effective date:** 2026-07-09
 
-**Last Update Gate:** BN 11.9.9
+**Last Update Gate:** BN 12.1.7 A10-13
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -283,7 +283,9 @@ Delete-on-merge — MUST. After the PF target is updated, the PO **deletes** the
 
 No in-doc edits by AI — MUST. AI lead devs are **read-only** for Build Notes; edits occur in the target PF.
 
-PF10 reference posture — MUST. When referencing Build Notes from other documents or reviews, reference Build Notes by **addendum number \+ addendum title** (for example, “Build Notes Addendum 2.10 — Token Load Reduction \[OMITTED\]”). Do not reference PF10 by version strings or PF10 section numbers as durable anchors; the stable unit is the addendum entry itself.
+PF10 reference posture — MUST. When referencing Build Notes from other documents or reviews, reference Build Notes by **addendum number \+ addendum title** (for example, “Build Notes Addendum 2.10 — Token Load Reduction OMITTEDOMITTEDOMITTED”). Do not reference PF10 by version strings or PF10 section numbers as durable anchors; the stable unit is the addendum entry itself.
+
+PF10 addendum-heading hygiene — SHOULD. Addendum headings should remain distinct and should match the actual pass, review, or closure identity being recorded. Do not copy forward a stale pass number or duplicate heading label when the later addendum records a different pass, rerun, review cluster, or closeout step. If an older heading is historically wrong but already published, record the corrected identity in later review prose rather than silently relying on the stale heading.
 
 PF10 freshness visibility — SHOULD. If a review, retrospective, audit analysis, closeout report, or redline workflow relies on a supplied in-session Build Notes source while a repo-resident Build Notes file appears older, different, absent, or not current, state that source split when freshness matters to the decision. Do not treat a stale or repo-only Build Notes file as the current source of truth when the session supplies a later Build Notes source; do not treat a session-only Build Notes source as repo-drained truth unless repo evidence proves that drainage.
 
@@ -453,6 +455,7 @@ For QA plans, steps that say “run this tool/script” (for example, a sanity p
 
 * **Stream-silent success is not the same as no-output failure — MUST.** If a command emits no stdout or stderr but another authoritative artifact proves successful execution, the plan MUST not automatically classify the step as `FAIL_TOOLING`.  
 * **Required governed output logs must remain non-empty — MUST.** When the plan requires a governed output log under the stable check root, the plan MUST define a minimal non-empty capture rule for stream-silent success rather than allowing a zero-byte log.  
+* **Evidence-package zero-byte caveat handling — MUST.** If an uploaded deliverables package, archive, or external report contains zero-byte or missing selected log entries, do not trust that package alone as proof. Treat the condition as an evidence-packaging caveat or blocker unless the same proof is available from governed repo evidence that is readable, non-empty, tracked or otherwise mergeable, tied to the same QA event, and recorded by PF10 or the closeout artifact as the source of the resolved caveat. If those conditions are met, the caveat must be stated explicitly and kept separate from the product or runtime verdict.  
 * **Authoritative success artifact must be named — MUST.** The plan MUST state which artifact remains authoritative for success or failure when the governed output log is only a sentinel capture, such as the rc file, primary log, or structured result file.  
 * **Sentinel text must be factual and minimal — SHOULD.** The sentinel should say only that the command produced no stdout or stderr and name the authoritative success artifact. It should not add narrative interpretation or duplicate the PASS or FAIL claim.  
 * **Review posture for stream-silent success — MUST.** Reviewers must judge the step from the authoritative success artifact plus the non-empty sentinel capture, not from the empty stream alone.  
@@ -514,8 +517,8 @@ Apply these rules in addition to §12.1–§12.3, §12.12, and §13.1:
 
   * If the step only reads existing artifacts, Deliverables MUST still name the files being read and state that no new files are created.
 
-* **Plan-created outputs are allowed and expected — MUST.** When a plan requires creating a file (script, report, manifest, log, capture, or other on-disk artifact), the plan MUST name the exact repo-relative path and filename, include runnable creation instructions, and state why the file is required.
-
+* **Plan-created outputs are allowed and expected — MUST.** When a plan requires creating a file (script, report, manifest, log, capture, or other on-disk artifact), the plan MUST name the exact repo-relative path and filename, include runnable creation instructions, and state why the file is required.  
+* **Step-0B must preserve proof-bearing doc-delta surfaces — MUST.** A Doc Delta Capture step must not overwrite generator-owned, previously produced, or proof-bearing doc-delta surfaces with a generic no-deltas template. It must preserve existing proof-bearing content, append or copy only when explicitly instructed, and emit no-deltas output only when no proof-bearing doc-delta surface exists for the run. If a capture step discovers existing proof-bearing surfaces, the plan or run output must record that preservation posture rather than replacing the surfaces.  
 * **Plan-created scripts are constrained — MUST.** A plan MUST NOT invent or assume helper scripts exist. If a plan-created script is required, it MUST be minimal, purpose-bound to the deliverable, and created at the exact repo-relative path named in the plan.
 
 * **Provenance labeling posture — SHOULD.** The plan SHOULD label mentioned files as repo-resident or plan-created. Missing labels are non-blocking only when the file is clearly run-produced and the plan already provides exact path, creation instructions, and purpose.

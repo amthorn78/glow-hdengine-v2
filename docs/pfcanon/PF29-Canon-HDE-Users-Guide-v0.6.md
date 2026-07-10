@@ -4,13 +4,13 @@
 
 **Title:** PF29-Canon-HDE-Users-Guide
 
-**Version:** v0.5
+**Version:** v0.6
 
 **Status:** Canon
 
-**Effective date:** 2026-07-03
+**Effective date:** 2026-07-09
 
-**Last Update Gate:** BN 11.9.9
+**Last Update Gate:** BN 12.1.7 A1-9
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -85,7 +85,7 @@ When this guide names a command, route, or file, it is documenting how to run th
 | hdctl showcompat \--dump-admin-dir | \[Implemented\] | Emit left/right BodyGraph JSON, composite BodyGraph JSON, compat proof JSON, and .sha256 sidecars. |
 | hdctl showcompat \--conjunction | \[Implemented\] | Emit conjunction compat JSON. |
 | hdctl aux-preview | \[Implemented\] | Preview Aux narrative text and write IDs-only admin sidecar JSON. |
-| hdctl bg:resolve | \[Implemented\] | Resolve BodyGraph control-flow envelope and vendor route-policy classification. For configured v2 bases, current route policy selects unsupported\_runtime\_nonclaim before legacy BodyGraph request construction; explicit legacy fallback is preserved only for non-v2 configured bases |
+| hdctl bg:resolve | \[Implemented\] | Resolve BodyGraph control-flow envelope and vendor route-policy classification. With a configured v2 base and dry-run, current behavior uses the version-neutral charts resource path, route-metadata Bearer/geokey posture, and deterministic v2 ChartResult adapter mapping. Non-dry-run configured-v2 writes fail closed until mapped-cache persistence exists; non-v2 configured bases preserve explicit legacy BodyGraph fallback. |
 | hdctl dev:sampler | \[Implemented\] \[Dev or QA only\] | Deterministic CLI sampler harness. |
 | scripts/dev\_start\_reader.sh | \[Implemented\] \[Dev or QA only\] | Start local Reader/dev adapter harness. |
 | POST /internal/dev/sampler | \[Implemented\] \[Dev or QA only\] | HTTP dev sampler harness. |
@@ -104,9 +104,11 @@ When this guide names a command, route, or file, it is documenting how to run th
 | Fetch person or batch commands | \[Planned, not implemented\] | Explicitly disabled for current alpha-style posture. |
 | Production-public POST /api/compat/v1 | \[Current gap\] | Do not claim. Current code returns 404 when APP\_ENV=prod. |
 | Direct Glow app HumanDesignAPI credential path | \[Current gap\] | Do not claim. Vendor acquisition belongs to the HD Engine boundary unless a future ADR changes that. |
-| v2 ChartResult or ChartSimpleResult feeding BodyGraph cache and compat end-to-end | \[Current gap\] | Current evidence records an exact schema/adapter gap. ChartSimpleResult may support bounded smoke, auth, geokey, provider availability, or route-family confirmation, but it is not presumed sufficient for full BodyGraph detail. Do not claim compatibility until an adapter proof or implementation exists. |
-| Explicit bg:resolve \--source vendor route policy  | \[Implemented\] | urrent repo evidence binds the route-policy classification for HDE-FERM008.6: configured v2 bases select unsupported\_runtime\_nonclaim before a legacy BodyGraph request is built, and explicit legacy fallback is preserved only for non-v2 configured bases. This does not prove v2 BodyGraph-detail compatibility.  |
-| PF09 status movement, HDE-FERM008 parent Done, or HDE-EPIC035 closeout  | \[Current gap\] | HDE-EPIC036 PR-02 supports HDE-FERM008.6 route-policy classification and evidence-loop binding only. PF29 must not claim QA PASS, OPS completion, PF09 status movement, HDE-FERM008 parent Done, epic closeout, production deployment, final acceptance, or full HumanDesignAPI v2 runtime conformance. |
+| v2 ChartResult or ChartSimpleResult feeding BodyGraph cache and compat end-to-end | \[Implemented, Operator−authorized only\]  | With a configured v2 base and dry-run, current bg:resolve may use the version-neutral charts route and deterministic v2 ChartResult adapter. This is scoped dry-run/evidence posture, not durable cache persistence |
+| Mapped v2 ChartResult adapter output feeding compat computation | \[Implemented, Dev or QA only\] | Closed-rails evidence proves mapped v2 ChartResult adapter output can enter the existing compatibility computation path and preserve public Reader boundary posture. This does not change public Reader bytes or prove broad platform conformance.  |
+| ChartSimpleResult as full BodyGraph-detail source | \[Current gap\] | ChartSimpleResult may support bounded smoke, auth, geokey, provider availability, or route-family confirmation, but it is not presumed sufficient for full BodyGraph detail or durable cache use. |
+| Durable mapped-cache persistence for configured-v2 chart-backed BodyGraph resolution | \[Current gap\] | Current repo posture deliberately does not implement durable mapped-cache persistence for configured-v2 chart-backed BodyGraph resolution. Non-dry-run configured-v2 writes must remain fail-closed until safe mapped-cache persistence is implemented and governed. |
+| PF09 status movement, HDE-FERM008 parent Done, HDE-EPIC037 closeout, production deployment, or final acceptance | \[Current gap\] | HDE-EPIC037 evidence supports later-drain posture only. PF29 must not claim QA PASS, OPS completion, PF09 status movement, HDE-FERM008 parent Done, epic closeout, production deployment, final acceptance, or broad HumanDesignAPI v2 platform conformance. |
 
 Feature-availability rows are operator guidance only. They are not backlog items, future-work authorization, PF09 task creation, PF09 status movement, or closure recommendations. Any future work that changes implementation, QA, OPS, evidence, runtime, vendor, architecture, or product behavior must be accounted for in the owning phased PF09 task or subtask, or marked as a PF09 gap in planning artifacts.
 
@@ -595,7 +597,7 @@ LC\_ALL=C LANG=C TZ=UTC SAFE\_MODE=1 ALLOW\_NETWORK=0 hdctl bg:resolve \--user q
 
 Current bg:resolve \--source auto or \--source db is a control-flow envelope path for this command. It must not be overclaimed as proof that DB rows were read unless the emitted payload says so.
 
-### **11.2 Open-rails vendor dry-run \[Implemented\] \[Operator-authorized only\]**
+### **11.2 Open-rails configured-v2 vendor dry-run \[Implemented\] \[Operator−authorized only\]**
 
 Vendor source requires a full birth tuple.
 
@@ -603,31 +605,25 @@ Run only after confirming authorization and required environment keys are presen
 
 LC\_ALL=C LANG=C TZ=UTC SAFE\_MODE=0 ALLOW\_NETWORK=1 hdctl bg:resolve \--user qa-user \--source vendor \--birthdate YYYY-MM-DD \--birthtime HH:MM \--location "Place" \--dry-run \> vendor\_bodygraph\_dry\_run.json
 
+With a configured v2 base, current dry-run behavior uses the version-neutral charts route, route-metadata Bearer/geokey posture, and deterministic v2 ChartResult adapter mapping. Closed rails still refuse before outbound I/O. Dry-run output may include resolver route policy, redacted request posture, adapter status, resolved mapped BodyGraph/person posture, cache posture, and ingest rows\_written=0.
+
 Success is determined by the emitted JSON payload. For dry-run, do not claim persistence.
 
-### **11.3 Open-rails vendor persistence \[Implemented with DB and operator constraints\]**
+### **11.3 Non-v2 legacy fallback \[Implemented with rails and config constraints\]**
 
-Only run when DB configuration is present and persistence is intended.
+When the configured base is non-v2, explicit legacy BodyGraph fallback is preserved. Treat this as legacy fallback only, not v2 runtime conformance.
 
-The CLI exposes \--upsert as a durability-request flag, but the current help text labels it as a request once implemented. Do not use \--upsert by itself as proof that a write happened. Use emitted rows\_written, db\_rows\_after, db\_emitted\_sha256, and parity\_match fields when present.
+For non-v2 legacy fallback, persistent success must be determined by fields emitted in the JSON payload, including rows\_written, db\_rows\_after, db\_emitted\_sha256, and parity\_match where present. Do not claim rows were written by assumption.
 
-LC\_ALL=C LANG=C TZ=UTC SAFE\_MODE=0 ALLOW\_NETWORK=1 hdctl bg:resolve \--user qa-user \--source vendor \--birthdate YYYY-MM-DD \--birthtime HH:MM \--location "Place" \> vendor\_bodygraph\_persist.json
+### **11.4 Non-dry-run configured-v2 persistence boundary \[Currentgap\]**
 
-For persistence, success must be determined by fields emitted in the JSON payload, including rows\_written, db\_rows\_after, db\_emitted\_sha256, and parity\_match where present. Do not claim rows were written by assumption.
+Configured-v2 chart-backed bg:resolve supports dry-run mapping only until mapped-cache persistence is implemented. If a configured-v2 bg:resolve run omits \--dry-run, current behavior must fail closed with PROVIDER\_WRITE\_UNSUPPORTED.
 
-### **11.4 Vendor route-policy classification \[Implemented with current nonclaims\]**
+Generic BodyGraph ingest remains guarded from raw v2 ChartResult persistence. Do not use generic BodyGraph ingest, \--upsert, or a non-dry-run configured-v2 command as proof that mapped-cache persistence exists.
 
-Current bg:resolve \--source vendor classifies the vendor route policy before legacy BodyGraph request construction.
+Do not treat charts/simple success or ChartSimpleResult as proof of full BodyGraph detail. ChartSimpleResult may remain useful for bounded live smoke, authentication proof, geokey proof, provider availability proof, and minimal route-family confirmation, but the current mapped dry-run path uses ChartResult.
 
-When HD\_API\_BASE\_URL is configured with a v2 base, current behavior selects unsupported\_runtime\_nonclaim, returns PROVIDER\_ROUTE\_UNSUPPORTED posture, and does not build the legacy BodyGraph bodygraphs request. This is the expected current nonclaim, not a provider outage and not a v2 chart/geokey proof.
-
-When the configured base is non-v2, explicit legacy BodyGraph fallback is preserved. Treat that as legacy fallback only, not v2 runtime conformance.
-
-Do not use bg:resolve \--source vendor as the canonical v2 chart/geokey validation path. For v2 chart/geokey header posture, use a bounded v2 charts or charts/simple observation that records bearer authorization present, geocode key present when required, and legacy HD-Api-Key absent.
-
-Do not treat charts/simple success or ChartSimpleResult as proof of full BodyGraph detail. ChartSimpleResult may remain useful for bounded live smoke, authentication proof, geokey proof, provider availability proof, and minimal route-family confirmation. It is not the preferred product/runtime source for full BodyGraph detail unless a future bounded adapter/schema proof demonstrates that it contains every required field.
-
-Dual-route policy is not implemented and requires a future ADR. V2 chart-backed BodyGraph resolution is not claimed because v2 chart data is not proven to feed the existing BodyGraph cache, person/bodygraph compute input, compatibility helpers, or full vendor runtime conformance.
+Dual-route policy is not implemented and requires a future ADR.
 
 ## **12\. HDAPI configuration and geokey/header syntax**
 
@@ -725,19 +721,13 @@ PF29 does not create that production public endpoint.
 
 ### **13.3 Production/open-rails vendor BodyGraph acquisition \[Operator-authorized only\]**
 
-Use only with explicit authorization, correct production config, and secret-safe evidence capture.
+This workflow documents configured-v2 bg:resolve dry-run behavior, not production mapped-cache persistence and not full platform conformance. With a configured v2 base, current bg:resolve \--source vendor \--dry-run may use the charts route and deterministic ChartResult adapter. With a non-v2 configured base, explicit legacy fallback may proceed under normal rails, config, and payload-success rules.
 
-This workflow documents bg:resolve vendor route-policy behavior, not full v2 BodyGraph-detail compatibility. With a configured v2 base, current bg:resolve \--source vendor selects unsupported\_runtime\_nonclaim before a legacy BodyGraph request is built. With a non-v2 configured base, explicit legacy BodyGraph fallback may proceed under the normal rails, config, and payload-success rules.
+This workflow is not the canonical place to prove production persistence. Do not remove \--dry-run for configured-v2 bases to claim production writes. Current configured-v2 non-dry-run behavior must fail closed with PROVIDER\_WRITE\_UNSUPPORTED until safe mapped-cache persistence exists and production or production-like write semantics are explicitly authorized and evidenced.
 
-This workflow is not the canonical v2 chart/geokey validation path. If the operator’s goal is to prove v2 chart/geokey header posture, use a bounded v2 charts or charts/simple observation instead and keep raw secrets and raw payloads out of evidence.
+LC\_ALL=C LANG=C TZ=UTC SAFE\_MODE=0 ALLOW\_NETWORK=1 hdctl bg:resolve \--user approved-user-or-test-id \--source vendor \--birthdate YYYY-MM-DD \--birthtime HH:MM \--location "Place" \--dry-run \> vendor\_bodygraph\_dry\_run.json
 
-LC\_ALL=C LANG=C TZ=UTC SAFE\_MODE=0 ALLOW\_NETWORK=1 hdctl bg:resolve \--user \<approved-user-or-test-id\> \--source vendor \--birthdate YYYY-MM-DD \--birthtime HH:MM \--location "Place" \--dry-run \> vendor\_bodygraph\_dry\_run.json
-
-For persistent runs, remove \--dry-run only when DB config is present and the operator intends to write:
-
-LC\_ALL=C LANG=C TZ=UTC SAFE\_MODE=0 ALLOW\_NETWORK=1 hdctl bg:resolve \--user \<approved-user-or-test-id\> \--source vendor \--birthdate YYYY-MM-DD \--birthtime HH:MM \--location "Place" \> vendor\_bodygraph\_persist.json
-
-Persistent success is determined by emitted JSON fields, not by assumption.
+Persistent success for any supported non-v2 legacy fallback must be determined by emitted JSON fields, not by assumption.
 
 ## **14\. Evidence and validation workflow**
 
@@ -821,21 +811,21 @@ LC\_ALL=C LANG=C TZ=UTC SAFE\_MODE=1 ALLOW\_NETWORK=0 hdctl aux-preview \--pair-
 
 LC\_ALL=C LANG=C TZ=UTC SAFE\_MODE=1 ALLOW\_NETWORK=0 hdctl showcompat \--conjunction \--pair-file pair.json \> audit/tmp/pf29/conjunction.json
 
-### **Recipe F — open-rails vendor BodyGraph route-policy dry-run**
+### **Recipe F — open-rails configured-v2 vendor dry-run**
 
 Before running, confirm the operator environment has HD\_API\_BASE\_URL, HD\_API\_KEY, and, for geocode-required routes, GEO\_API\_KEY. Do not print their values.
 
-With a configured v2 base, current expected behavior is unsupported\_runtime\_nonclaim before legacy BodyGraph request construction. This recipe is not v2 chart/geokey validation and does not prove v2 BodyGraph detail.
+With a configured v2 base, current expected dry-run behavior is charts route selection, deterministic ChartResult adapter mapping, adapter-mapped no-raw-vendor-payload posture, and rows\_written=0.
 
 LC\_ALL=C LANG=C TZ=UTC SAFE\_MODE=0 ALLOW\_NETWORK=1 hdctl bg:resolve \--user qa-user \--source vendor \--birthdate YYYY-MM-DD \--birthtime HH:MM \--location "Place" \--dry-run \> vendor\_bodygraph\_dry\_run.json
 
-### **Recipe G — open-rails vendor BodyGraph persistence**
+### **Recipe G — configured-v2 non-dry-run write guard**
 
-Only run when DB configuration is present, persistence is intended, and the emitted route policy supports the selected vendor path. Do not use this recipe to force persistence for configured-v2 unsupported\_runtime\_nonclaim.
+Use this only as a bounded refusal check when explicitly authorized. With a configured v2 base, current expected behavior is PROVIDER\_WRITE\_UNSUPPORTED because mapped-cache persistence is not implemented.
 
-LC\_ALL=C LANG=C TZ=UTC SAFE\_MODE=0 ALLOW\_NETWORK=1 hdctl bg:resolve \--user qa-user \--source vendor \--birthdate YYYY-MM-DD \--birthtime HH:MM \--location "Place" \> vendor\_bodygraph\_persist.json
+LC\_ALL=C LANG=C TZ=UTC SAFE\_MODE=0 ALLOW\_NETWORK=1 hdctl bg:resolve \--user qa-user \--source vendor \--birthdate YYYY-MM-DD \--birthtime HH:MM \--location "Place" \> vendor\_bodygraph\_write\_guard.json
 
-Success is determined by the emitted JSON payload and, for persistence, by rows\_written, db\_rows\_after, and parity fields in the output.
+Do not treat this as persistence. A future mapped-cache persistence slice must prove write/read-back parity, idempotence, no raw vendor payload persistence, and governed evidence before configured-v2 non-dry-run writes become supported.
 
 ## **16\. Known limitations and nonclaims**
 
@@ -847,11 +837,13 @@ PF29 must preserve these nonclaims:
 
 * GET /reader is a dev/local Reader v1 harness route and requires safe fixture chart paths.
 
-* Current bg:resolve \--source vendor performs explicit route-policy classification. For configured v2 bases, it selects unsupported\_runtime\_nonclaim before legacy BodyGraph request construction. For non-v2 configured bases, explicit legacy BodyGraph fallback is preserved.
+* Current configured-v2 bg:resolve \--source vendor \--dry-run may use the version-neutral charts route and deterministic v2 ChartResult adapter. For non-v2 configured bases, explicit legacy BodyGraph fallback is preserved.
 
-* Current HDAPI v2 evidence records route-policy classification, v2 charts/simple proof boundaries, and exact adapter/schema gap posture. It does not prove full HumanDesignAPI v2 runtime conformance or v2 ChartResult/ChartSimpleResult normalization into the existing BodyGraph cache, person input, compute input, or compat path.
+* Current HDAPI v2 evidence supports scoped dry-run mapping, mapped v2 output feeding compatibility computation, PO-produced OPS-01 runtime smoke evidence, and parent evidence binding. It does not prove durable mapped-cache persistence, production upsert, public Reader changes, new public routes, app-side vendor ownership, or broad HumanDesignAPI v2 platform conformance.
 
-* PF29 does not complete HDE-FERM008.6, does not move PF09 status, does not mark HDE-FERM008 parent Done, and does not perform HDE-EPIC036 closeout, production deployment, OPS completion, PF-canon update, or final acceptance.
+* Current configured-v2 non-dry-run writes fail closed with PROVIDER\_WRITE\_UNSUPPORTED until safe mapped-cache persistence exists. bg:resolve \--source vendor \--upsert must not be used in production until a future epic explicitly reopens user-bound DB coverage.
+
+* PF29 does not complete HDE-FERM008.7 through HDE-FERM008.12, does not move PF09 status, does not mark HDE-FERM008 parent Done, and does not perform HDE-EPIC037 closeout, production deployment, OPS completion, PO closeout, board update, PF-canon update, or final acceptance.
 
 * No workflow may record raw vendor payload bodies, raw request bodies, raw response bodies, bearer token values, API key values, geocode key values, or production user PII.
 
@@ -873,8 +865,8 @@ PF29 must preserve these nonclaims:
 | PROVIDER\_NETWORK\_BLOCKED | Network access is disabled. | Confirm authorization and set ALLOW\_NETWORK=1 only for bounded open-rails runs. |
 | PROVIDER\_CONFIG\_MISSING | Required vendor config is absent. | Confirm HD\_API\_BASE\_URL, HD\_API\_KEY, and when needed GEO\_API\_KEY, without printing values. |
 | PROVIDER\_CONFIG\_INVALID | Vendor configuration is ambiguous or violates contract. | Check for conflicting HD\_API\_BASE\_URL and HDAPI\_BASE\_URL, invalid base URL, or unpinned vendor policy. |
-| PROVIDER\_ROUTE\_UNSUPPORTED from bg:resolve \--source vendor with a configured v2 base  | Expected current unsupported-runtime route-policy classification before legacy BodyGraph request construction. | Do not classify this as provider outage, v2 chart/geokey proof, or v2 BodyGraph-detail compatibility. Use a bounded v2 charts/simple observation for v2 header/geokey proof, or preserve the unsupported\_runtime\_nonclaim until a future adapter/schema proof exists. |
-| PROVIDER\_NOT\_FOUND or HTTP 404 from bg:resolve \--source vendor against a v2 base | Current vendor-route policy gap or unsupported legacy BodyGraph resource shape, such as /v2/bodygraphs.  | Do not classify this as provider unavailability or v2 chart/geokey proof. Use a bounded v2 charts/simple observation for v2 header/geokey proof, or preserve the unsupported nonclaim pending explicit vendor-route policy. |
+| PROVIDER\_ROUTE\_REQUIRES\_ADAPTER | Generic BodyGraph ingest attempted to build a v2 chart request outside the resolver adapter path. | Use bg:resolve \--source vendor \--dry-run through the resolver adapter path for configured-v2 dry-run mapping. Do not treat generic BodyGraph ingest as v2 adapter-backed resolution.  |
+| PROVIDER\_WRITE\_UNSUPPORTED | Configured-v2 bg:resolve attempted a non-dry-run write before mapped-cache persistence exists. | Re-run with \--dry-run for the current supported configured-v2 posture, or preserve the fail-closed result as a bounded refusal check. Do not claim persistence or production upsert.  |
 | DB\_QUERY\_FAILED | DB access failed in a DB-backed flow. | Confirm DB configuration and intended environment. Do not infer DB success from this error. |
 | BODYGRAPH\_NOT\_FOUND | No BodyGraph row was found for the requested user. | Confirm the user ID and whether ingest/persistence has actually completed. |
 | Evidence mirror or hash check fails | Generated evidence changed without refresh, or path-proof/index/mirror drift exists. | Run the write/update sequence, then the check sequence in §14. |
@@ -915,7 +907,7 @@ Run Aux preview:
 
 LC\_ALL=C LANG=C TZ=UTC SAFE\_MODE=1 ALLOW\_NETWORK=0 hdctl aux-preview \--pair-file compat.json \--category harmony \--band Cool \--perspective shared \--show-narrative \--admin-out aux\_sidecar.json
 
-Run open-rails vendor BodyGraph route-policy dry-run. With a configured v2 base, expect unsupported\_runtime\_nonclaim before legacy BodyGraph request construction. With a non-v2 base, explicit legacy fallback may proceed. This is not v2 chart/geokey validation:
+Run open-rails configured-v2 vendor dry-run. With a configured v2 base, expect charts route selection, deterministic ChartResult adapter mapping, adapter-mapped no-raw-vendor-payload posture, and rows\_written=0. Non-dry-run configured-v2 writes remain fail-closed until mapped-cache persistence exists:
 
 LC\_ALL=C LANG=C TZ=UTC SAFE\_MODE=0 ALLOW\_NETWORK=1 hdctl bg:resolve \--user qa-user \--source vendor \--birthdate YYYY-MM-DD \--birthtime HH:MM \--location "Place" \--dry-run \> vendor\_bodygraph\_dry\_run.json
 

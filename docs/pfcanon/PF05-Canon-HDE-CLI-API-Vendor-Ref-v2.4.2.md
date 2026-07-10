@@ -4,13 +4,13 @@
 
 **Title:** PF05-Canon-HDE-CLI-API-Vendor-Ref
 
-**Version:** v2.4.1
+**Version:** v2.4.2
 
 **Status:** Canon
 
-**Effective date:** 2026-07-03
+**Effective date:** 2026-07-09
 
-**Last Update Gate:**  BN 11.9.9
+**Last Update Gate:**  BN 12.1.7 A1-9
 
 **Invocation tag:** INV-f2ac55d77ce9aacc
 
@@ -888,7 +888,7 @@ Needs development.
 
   * `db` — resolve from DB only (no vendor I/O).  
   * `vendor` — resolve from vendor only; vendor HTTP calls are allowed **only** when SAFE rails are open (`SAFE_MODE=0` and `ALLOW_NETWORK=1`). Shaping and error mapping follow §7.1/§7.2/§7.3 and the policies in **HDE-Governance** and the **HDE-Mechanics Guide** (titles-only).  
-  * `g:resolve --source vendor` route-policy boundary — configured v2 bases MUST select `unsupported_runtime_nonclaim` and fail closed with `PROVIDER_ROUTE_UNSUPPORTED` before legacy `bodygraphs` request construction. Non-v2 configured bases MAY preserve the legacy BodyGraph route only as explicit legacy fallback. `v2_chart_backed_bodygraph_resolution` and `dual_route_policy` are not implemented and MUST NOT be inferred from `charts/simple` or other v2 chart evidence without a future adapter/schema proof or ADR-backed canon update. This route policy preserves HD Engine ownership of vendor acquisition and BodyGraph resolution, keeps secrets and raw payloads out of evidence, and preserves nonclaims for full HumanDesignAPI v2 runtime conformance, public Reader changes, public routes, public payload changes, new HTTP homes, app-side vendor credential ownership, raw payload persistence, and AI scope.  
+  * `bg:resolve --source vendor` configured-v2 route-policy boundary — configured v2 bases use the version-neutral `charts` resource path, route-metadata `Authorization: Bearer` auth posture, geocode posture, and deterministic v2 `ChartResult` adapter for `--dry-run` BodyGraph resolution. Generic legacy BodyGraph ingest is guarded from v2 chart routing and MUST NOT compose legacy `bodygraphs` resource paths against a configured v2 base. Non-v2 configured bases MAY preserve the legacy BodyGraph route only as explicit legacy fallback. Non-dry-run configured-v2 mapped-cache writes fail closed with `PROVIDER_WRITE_UNSUPPORTED` until safe mapped-cache persistence is implemented and evidenced. This route policy preserves HD Engine ownership of vendor acquisition and BodyGraph resolution, keeps secrets and raw payloads out of evidence, and preserves nonclaims for broad HumanDesignAPI v2 platform conformance, public Reader changes, public routes, public payload changes, new HTTP homes, app-side vendor credential ownership, raw payload persistence, and AI scope.  
   * `auto` — DB-first, vendor-fallback according to the adapter’s environment policy (HDE-Mechanics Guide; titles-only).
 
 * Implementations MAY expose `--dry-run` and `--upsert` switches; when present they must follow the vendor rails and adapter data-source policy in §7.1/§7.4 and the **HDE-Mechanics Guide** (titles-only).
@@ -2839,7 +2839,7 @@ The v2 request contract, when drained, MUST define:
 
 PF05 pins `HD_API_BASE_URL` as the canonical HumanDesignAPI base URL key, `HD_API_KEY` as the canonical vendor credential key, and `GEO_API_KEY` as the geocoding key where required. `HDAPI_BASE_URL` is deprecated legacy spelling and may be supported only as a temporary compatibility alias when `HD_API_BASE_URL` is absent; conflicting values MUST fail closed as configuration ambiguity. The configured `HD_API_BASE_URL` owns the vendor API-version path and may include a vendor version segment without changing runtime route constants. PF05 MUST NOT restate current deployed base URL values as runtime-contract text; deployed values belong to infrastructure inventory and OPS evidence. Legacy BodyGraph resource paths under a configured v2 base remain live-behavior-unproven and MUST NOT be claimed as live vendor conformance from route-version remediation alone.
 
-PF05 MUST preserve the distinction between v2 chart smoke, v2 full chart payload, legacy BodyGraph payload, response-envelope proof, and normalized HD Engine BodyGraph/person/cache contract. `ChartSimpleResult` MUST NOT be presumed sufficient for full BodyGraph detail. `ChartResult` and `ChartSimpleResult` MUST NOT be claimed to feed existing BodyGraph cache, person/bodygraph compute inputs, compatibility inputs, or legacy BodyGraph replacement until a bounded adapter/schema proof or implementation maps the vendor payload family into the existing internal contract. Recording an exact schema/adapter gap is valid evidence posture for a scoped gap-recording slice, but it is not future runtime compatibility proof.
+PF05 MUST preserve the distinction between v2 chart smoke, v2 full chart payload, legacy BodyGraph payload, raw vendor payload-family sufficiency, deterministic adapter mapping, mapped cache posture, mapped-cache persistence, and normalized HD Engine BodyGraph/person/cache contract. HDE-EPIC037 PR-01 proves that raw `ChartResult` and `ChartSimpleResult` payload families are not by themselves sufficient for the existing BodyGraph/person/cache/compat contract and must fail closed without an adapter. HDE-EPIC037 PR-02 proves a pure, context-backed deterministic `ChartResult` adapter for scoped mapping only. `ChartSimpleResult` MUST NOT be presumed sufficient for full BodyGraph detail. Adapter-mapped data may be used only within the scoped behavior that has been implemented and evidenced; it does not by itself prove live vendor success, generic raw payload compatibility, mapped-cache write persistence, production upsert, public Reader change, new HTTP home, app-side vendor ownership, or AI scope.
 
 No OpenAI, LLM, AI-agent, prompt, embedding, chatbot, model-call, AI-provider config key, AI credential, AI runtime rail, AI evidence family, or AI QA obligation is introduced by this v2 request and response contract work.
 
@@ -3046,7 +3046,7 @@ Acceptance impact.
 
 ### **7.3.9 HumanDesignAPI v2 live conformance pending**
 
-HumanDesignAPI v2 full live/runtime conformance remains pending. HDE-EPIC035 evidence records provider-outcome and rate-limit mapping for HDE-FERM008.3, exact response-normalization schema/adapter gap posture for HDE-FERM008.4, retained OPS-01 live-vendor observations, and PR-03 governed evidence-loop binding for HDE-FERM008.5. HDE-EPIC036 evidence records explicit `bg:resolve --source vendor` route-policy classification and evidence-loop binding for HDE-FERM008.6: configured v2 bases select `unsupported_runtime_nonclaim`, no legacy `bodygraphs` request is built for configured v2 bases, non-v2 bases preserve explicit legacy fallback, and HDE-FERM008.6 is supportable for later PF09 status drainage from repo evidence. These proof slices do not claim HDE-FERM008 parent completion, PF09 status movement, epic closeout, full HumanDesignAPI v2 runtime conformance, public Reader changes, public route or payload changes, new HTTP homes, app-side vendor credential ownership, raw payload persistence, or AI scope.
+HumanDesignAPI v2 broad platform conformance remains bounded and must not be overclaimed. HDE-EPIC035 evidence records provider-outcome and rate-limit mapping for HDE-FERM008.3, exact response-normalization schema/adapter gap posture for HDE-FERM008.4, retained OPS-01 live-vendor observations, and PR-03 governed evidence-loop binding for HDE-FERM008.5. HDE-EPIC036 evidence records explicit `bg:resolve --source vendor` route-policy classification and evidence-loop binding for HDE-FERM008.6. HDE-EPIC037 evidence records field-sufficiency proof for HDE-FERM008.7, deterministic v2 ChartResult adapter mapping for HDE-FERM008.8, configured-v2 `bg:resolve --source vendor --dry-run` charts-route wiring for HDE-FERM008.9, mapped v2-to-compat proof for HDE-FERM008.10, PO-produced bounded open-rails runtime smoke evidence for HDE-FERM008.11, and parent evidence binding for HDE-FERM008.12. The HDE-EPIC037 parent posture is supportable to Done for later PF09 drainage only. These proof slices do not themselves claim QA PASS, OPS completion by PR work, PF09 status movement, PO closeout, board update, merge action, PF-canon edit, epic closeout, production deployment, broad HumanDesignAPI v2 platform conformance beyond the bounded HDE-FERM008.7 through HDE-FERM008.11 evidence chain, public Reader changes, public route or payload changes, new HTTP homes, app-side vendor ownership, raw payload persistence, or AI scope.
 
 Closed-rails v2 proof MUST show deterministic refusal with no DNS, socket, HTTP, or other external I/O. Any JSON emitted for refusal MUST be canonical, numeric-free where public, LF-terminated, and secret-free.
 
@@ -3084,6 +3084,8 @@ The open-rails path is HumanDesignAPI-only. It MUST NOT include OpenAI, LLM, AI-
 
 * Direct vendor calls are permitted.  
 * The adapter **MUST upsert** the vendor result into the DB to make subsequent reads repeatable.
+
+**Configured-v2 mapped-cache write boundary.** Current configured-v2 `bg:resolve --source vendor --dry-run` may use the version-neutral `charts` route and deterministic v2 `ChartResult` adapter. Non-dry-run configured-v2 chart-backed mapped-cache writes are not supported and MUST fail closed until a separately scoped mapped-cache persistence slice proves safe durable write/read-back behavior. The future persistence slice must prove that stored data is adapter-mapped HDE BodyGraph/cache payload, not a raw HumanDesignAPI v2 envelope; must prove canonical write/read-back parity, idempotence, no raw secret persistence, no raw request body persistence, no raw response body persistence, no uncontrolled raw vendor payload persistence, and closed-rails refusal preservation; and must update governed evidence, Human Evidence Index, Machine Mirror, hash sentinels, and path proofs. Production or production-like upsert remains closed until a later authorized epic explicitly reopens user-bound DB coverage.
 
 **Rails & policy.**
 
@@ -4209,6 +4211,80 @@ These anchors bind HDE-EPIC036 route-policy and evidence-loop proof surfaces onl
   * `artifacts/evidence_index.jsonl.path_proof.txt`  
   * `artifacts/evidence_index.jsonl.sha256.path_proof.txt`  
   * Sibling `*.path_proof.txt` transcripts for each indexed HDE-EPIC036 governed artifact.
+
+#### **D.9j HDE-EPIC037 HumanDesignAPI v2 BodyGraph-detail runtime evidence-chain proof anchors**
+
+These anchors bind HDE-EPIC037 vendor-seam, CLI resolver, compatibility, OPS, and parent evidence-binding surfaces only. They do not claim QA PASS, OPS completion by PR work, PF09 status movement, PF09 status drainage, PO closeout, board update, merge action, PF-canon edit, epic closeout, production deployment, broad HumanDesignAPI v2 platform conformance beyond the bounded HDE-FERM008.7 through HDE-FERM008.11 evidence chain, public Reader change, public route, public flag, public payload or transport change, new HTTP home, app-side HumanDesignAPI ownership, raw secret persistence, raw request body persistence, raw response body persistence, uncontrolled raw vendor payload persistence, or AI scope.
+
+* **PR-01 field sufficiency and adapter-contract evidence**  
+  * `artifacts/vendor/hdapi_v2/hde_epic037_field_sufficiency_proof.json` *(HDE-FERM008.7 field-sufficiency proof; records raw `ChartResult` and `ChartSimpleResult` typed-insufficient classification, fail-closed posture, no runtime adapter implementation, no resolver rewiring, and no raw vendor payload body persisted in evidence)*  
+  * `artifacts/vendor/hdapi_v2/hde_epic037_adapter_contract.snapshot.json` *(internal HDE BodyGraph/person/cache/compat contract snapshot)*  
+  * `artifacts/vendor/hdapi_v2/hde_epic037_adapter_contract_nonclaims.json` *(nonclaim artifact for public Reader, live vendor, OPS, QA, PF09 movement, closeout, runtime conformance, and AI boundaries)*  
+  * Companion `*.path_proof.txt` transcripts for each listed PR-01 artifact.  
+* **PR-02 deterministic adapter evidence**  
+  * `artifacts/vendor/hdapi_v2/hde_epic037_adapter_mapping.snapshot.json` *(pure context-backed ChartResult adapter mapping proof; no DB, env, file, network, randomness, time, or vendor fetch)*  
+  * `artifacts/vendor/hdapi_v2/hde_epic037_adapter_negative_fixtures.json`  
+  * `artifacts/vendor/hdapi_v2/hde_epic037_no_raw_payload_persistence.json`  
+  * `artifacts/vendor/hdapi_v2/hde_epic037_public_reader_no_change.json`  
+  * `engine/bodygraph/v2_adapter.py`  
+  * `tests/bodygraph/test_v2_adapter.py`  
+  * `tests/evidence/test_hde_epic037_v2_adapter.py`  
+  * `tools/evidence/generate_hde_epic037_v2_adapter.py`  
+  * Companion `*.path_proof.txt` transcripts for each governed PR-02 artifact.  
+* **PR-03 `bg:resolve --source vendor --dry-run` configured-v2 route evidence**  
+  * `artifacts/vendor/hdapi_v2/hde_epic037_bg_resolve_v2_route_policy.snapshot.json` *(configured-v2 route policy: `adapter_backed_v2_chart`, version-neutral `charts` resource, route-metadata Bearer and geocode posture, deterministic adapter mapping)*  
+  * `artifacts/vendor/hdapi_v2/hde_epic037_bg_resolve_request_shape.snapshot.json`  
+  * `artifacts/vendor/hdapi_v2/hde_epic037_bg_resolve_closed_rails_no_io.json`  
+  * `artifacts/vendor/hdapi_v2/hde_epic037_bg_resolve_legacy_fallback.snapshot.json`  
+  * `engine/bodygraph/vendor_client.py`  
+  * `engine/bodygraph/resolver.py`  
+  * `engine/cli/main.py`  
+  * `tests/bodygraph/test_bg_resolve_route_policy.py`  
+  * `tools/evidence/generate_hde_epic037_bg_resolve_route_policy.py`  
+  * Companion `*.path_proof.txt` transcripts for each governed PR-03 artifact.  
+* **PR-04 mapped v2-to-compat evidence**  
+  * `artifacts/vendor/hdapi_v2/hde_epic037_v2_to_compat_proof.json` *(mapped adapter outputs accepted by existing compatibility computation; ten categories; no raw request, response, or vendor bodies persisted)*  
+  * `artifacts/vendor/hdapi_v2/hde_epic037_v2_to_compat_two_run.json`  
+  * `artifacts/vendor/hdapi_v2/hde_epic037_v2_to_compat_pair_order.json`  
+  * `artifacts/vendor/hdapi_v2/hde_epic037_admin_public_boundary.json`  
+  * `tests/compat/test_hde_epic037_v2_adapter_to_compat.py`  
+  * `tests/evidence/test_hde_epic037_v2_to_compat.py`  
+  * `tools/evidence/generate_hde_epic037_v2_to_compat.py`  
+  * Companion `*.path_proof.txt` transcripts for each governed PR-04 artifact.  
+* **OPS-01 bounded open-rails runtime smoke evidence**  
+  * `audit/ops/hde-epic037/ops-hde-epic037-001/commands.txt`  
+  * `audit/ops/hde-epic037/ops-hde-epic037-001/stdout.log`  
+  * `audit/ops/hde-epic037/ops-hde-epic037-001/stderr.log`  
+  * `audit/ops/hde-epic037/ops-hde-epic037-001/exit_codes.txt`  
+  * `audit/ops/hde-epic037/ops-hde-epic037-001/env_presence_redacted.json`  
+  * `audit/ops/hde-epic037/ops-hde-epic037-001/request_summary.json`  
+  * `audit/ops/hde-epic037/ops-hde-epic037-001/result_summary.json`  
+  * `audit/ops/hde-epic037/ops-hde-epic037-001/adapter_mapping_result_summary.json`  
+  * `audit/ops/hde-epic037/ops-hde-epic037-001/compat_path_result_summary.json`  
+  * `audit/ops/hde-epic037/ops-hde-epic037-001/failure_classification.json`  
+  * `audit/ops/hde-epic037/ops-hde-epic037-001/files_sha256.txt`  
+  * `audit/qa/hde-epic037/ops-hde-epic037-001/ops_evidence_pointer.md`  
+  * Companion `*.path_proof.txt` transcripts for each indexed OPS-01 artifact.  
+* **PR-05 parent evidence binding and acceptance-boundary artifacts**  
+  * `docs/acceptance_map_epic037.json` *(HDE-FERM008.12 parent evidence binding; binds HDE-FERM008.7 through HDE-FERM008.12 and records `supportable_to_done` as later-drain support only)*  
+  * `audit/qa/hde-epic037/token_evidence_matrix.md`  
+  * `audit/qa/hde-epic037/acceptance_map_viability.log`  
+  * `audit/qa/hde-epic037/parent_evidence_binding.log`  
+  * `audit/docdeltas/hde-epic037_pr05_parent_binding_doc_deltas.md`  
+  * `audit/qa/hde-epic037/00_meta/pr05_parent_binding_doc_deltas.md`  
+  * `tests/evidence/test_hde_epic037_parent_binding.py`  
+  * `tools/evidence/generate_hde_epic037_parent_binding.py`  
+  * Companion `*.path_proof.txt` transcripts for each indexed PR-05 artifact.  
+* **Index, mirror, hash, and path-proof posture**  
+  * `docs/evidence/INDEX.json`  
+  * `docs/evidence/INDEX.sha256`  
+  * `docs/evidence/INDEX.json.path_proof.txt`  
+  * `docs/evidence/INDEX.sha256.path_proof.txt`  
+  * `artifacts/evidence_index.jsonl`  
+  * `artifacts/evidence_index.jsonl.sha256`  
+  * `artifacts/evidence_index.jsonl.path_proof.txt`  
+  * `artifacts/evidence_index.jsonl.sha256.path_proof.txt`  
+  * Sibling `*.path_proof.txt` transcripts for each indexed HDE-EPIC037 governed artifact.
 
 ### **D.10 Runtime posture & env-resolver envelopes**
 
