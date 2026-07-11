@@ -56,11 +56,12 @@ def _stdin_bytes() -> bytes:
 
 def _capture_outputs() -> dict[Path, bytes]:
     env = _cli_env()
-    cmd = ["python", "scripts/hdctl.py", "showcompat"]
+    recorded_cmd = ["python", "scripts/hdctl.py", "showcompat"]
+    execution_cmd = [sys.executable, *recorded_cmd[1:]]
     stdin_bytes = _stdin_bytes()
     stdin_sha = hashlib.sha256(stdin_bytes).hexdigest()
 
-    result = subprocess.run(cmd, input=stdin_bytes, capture_output=True, env=env)
+    result = subprocess.run(execution_cmd, input=stdin_bytes, capture_output=True, env=env)
     if result.returncode != 0:
         raise SystemExit(f"showcompat failed (rc={result.returncode}): {result.stderr!r}")
     if result.stderr:
@@ -81,7 +82,7 @@ def _capture_outputs() -> dict[Path, bytes]:
     stdout_sha = hashlib.sha256(stdout_bytes).hexdigest()
     args_payload = {
         "generator": "tools/cli/generate_showcompat_artifacts.py",
-        "argv": cmd,
+        "argv": recorded_cmd,
         "env": {key: env[key] for key in ENV_KEYS},
         "identity": {
             "source": "engine.runtime.identity",
