@@ -101,3 +101,18 @@ def test_rails_closed_phase1_delegates_env_matrix_ownership():
     assert "generate_env_matrix_snapshot.main([])" in source
     assert "db_access.resolve_env_matrix()" not in source
     assert '_write_json("artifacts/runtime/env_matrix.snapshot.json"' not in source
+
+
+def test_env_matrix_v3_consumers_use_canonical_singleton_contract():
+    qa_source = Path("scripts/qa/epic009_precommit.sh").read_text(
+        encoding="utf-8"
+    )
+    ingest_source = Path("scripts/ingest/run_vendor_ingest.py").read_text(
+        encoding="utf-8"
+    )
+
+    assert "generate_env_matrix_snapshot.py --check" in qa_source
+    assert 'snap.get("result"' not in qa_source
+    assert 'snap.get("checks"' not in qa_source
+    assert "env_matrix.snapshot.json" not in ingest_source
+    assert "_capture_env_snapshot" not in ingest_source
