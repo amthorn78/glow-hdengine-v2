@@ -1,9 +1,10 @@
 name: Regenerate env matrix evidence
 
 on:
-  push:
+  pull_request:
     branches:
-      - codex/implement-pr-01-identity-and-evidence-foundations
+      - main
+  workflow_dispatch:
 
 permissions:
   contents: write
