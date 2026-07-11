@@ -89,5 +89,5 @@ def test_cli_conformance_check_capture_does_not_require_installed_console(
     expected = generator._capture_outputs(install=False)
 
     assert not (tmp_path / "hdctl").exists()
-    assert expected == {path: path.read_bytes() for path in ARTIFACTS}
+    assert expected == {path.resolve(): path.read_bytes() for path in ARTIFACTS}
 
