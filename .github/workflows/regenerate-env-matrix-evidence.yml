@@ -1,0 +1,54 @@
+name: Regenerate env matrix evidence
+
+on:
+  push:
+    branches:
+      - codex/implement-pr-01-identity-and-evidence-foundations
+
+permissions:
+  contents: write
+
+jobs:
+  regenerate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    env:
+      LC_ALL: C
+      LANG: C
+      TZ: UTC
+      SAFE_MODE: "1"
+      ALLOW_NETWORK: "0"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/implement-pr-01-identity-and-evidence-foundations
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install -e .
+      - name: Regenerate governed evidence
+        run: |
+          python tools/evidence/generate_env_matrix_snapshot.py
+          python tools/evidence/update_evidence_index.py
+          python tools/evidence/orientation_demo.py
+      - name: Verify governed evidence
+        run: |
+          python tools/evidence/generate_env_matrix_snapshot.py --check
+          python tools/evidence/update_evidence_index.py --check
+          python tools/evidence/orientation_demo.py --check
+          bash ci/checks/check_evidence_index_hash.sh
+          bash ci/checks/check_mirror_schema.sh
+          bash ci/checks/check_final_lf.sh
+          python tools/evidence/validate_evidence_paths.py
+      - name: Commit generated files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -u
+          if git diff --cached --quiet; then
+            echo "No generated changes"
+            exit 0
+          fi
+          git commit -m "Regenerate deterministic env evidence"
+          git push origin HEAD:codex/implement-pr-01-identity-and-evidence-foundations
