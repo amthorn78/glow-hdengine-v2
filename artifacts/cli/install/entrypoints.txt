@@ -1,9 +1,9 @@
 project.scripts.hdctl=engine.cli.main:cli
 declared_entrypoint=engine.cli.main:cli
-module_help_cmd=/root/.pyenv/versions/3.10.19/bin/python -m engine.cli --help
-script_help_cmd=/root/.pyenv/versions/3.10.19/bin/python scripts/hdctl.py --help
-console_help_cmd=/root/.pyenv/versions/3.10.19/bin/hdctl --help
-console_version_cmd=/root/.pyenv/versions/3.10.19/bin/hdctl --version
+module_help_cmd=python -m engine.cli --help
+script_help_cmd=python scripts/hdctl.py --help
+console_help_cmd=hdctl --help
+console_version_cmd=hdctl --version
 install_step=SUCCESS (pip install -e . --no-deps --no-build-isolation with PIP_NO_INDEX=1)
 console_entrypoint_available=true
-console_entrypoint_path=/root/.pyenv/versions/3.10.19/bin/hdctl
+console_entrypoint_path=hdctl
