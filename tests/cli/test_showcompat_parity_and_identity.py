@@ -10,7 +10,7 @@ import pytest
 
 from engine.cli import main as cli_main
 from engine.presenter import emitter
-from engine.runtime import emit_reader_public_envelope
+from engine.runtime import emit_reader_public_envelope, identity_meta
 
 AB_ARTIFACT = Path("artifacts/cli/ab.json")
 BA_ARTIFACT = Path("artifacts/cli/ba.json")
@@ -36,9 +36,6 @@ def _cli_env() -> dict[str, str]:
             "LC_ALL": "C",
             "LANG": "C",
             "TZ": "UTC",
-            "ENGINE_TAG": "hdengine-dev",
-            "RELEASE_ID": "0" * 64,
-            "PRODUCT_INVOCATION_TAG": "INV-TEST",
         }
     )
     return env
@@ -81,7 +78,7 @@ def _run_showcompat(payload: dict[str, object], extra_args: list[str] | None = N
     return proc
 
 
-def _canonical_reader_bytes(pair: dict, env: dict[str, str] | None = None) -> bytes:
+def _canonical_reader_bytes(pair: dict) -> bytes:
     left_norm = cli_main._normalize_party(pair["left"], "left")
     right_norm = cli_main._normalize_party(pair["right"], "right")
     left_person, left_chart = cli_main._party_from_normalized(left_norm)
@@ -89,16 +86,13 @@ def _canonical_reader_bytes(pair: dict, env: dict[str, str] | None = None) -> by
     left_person, right_person, left_chart, right_chart = cli_main._canonical_pair(
         left_person, right_person, left_chart, right_chart
     )
-    env_map = env or os.environ
-    engine_tag = env_map.get("ENGINE_TAG", "hdengine-dev")
-    release_id = env_map.get("RELEASE_ID", "0" * 64)
-    invocation_tag = env_map.get("PRODUCT_INVOCATION_TAG", "INV-LOCAL")
+    meta = identity_meta()
     reader_bytes, _ = emit_reader_public_envelope(
         left_chart,
         right_chart,
-        engine_tag=engine_tag,
-        invocation_tag=invocation_tag,
-        release_id=release_id,
+        engine_tag=meta["engine_tag"],
+        invocation_tag=meta["invocation_tag"],
+        release_id=meta["release_id"],
     )
     return reader_bytes
 
@@ -172,7 +166,7 @@ def test_reader_dump_matches_runtime(tmp_path: Path):
     assert "idempotence_hash" in envelope
 
     if not _open_rails(env):
-        expected = _canonical_reader_bytes(PAIR, env=env)
+        expected = _canonical_reader_bytes(PAIR)
         assert dump_bytes == expected
         assert PRESENTER_READER_ARTIFACT.read_bytes() == expected
 
@@ -202,3 +196,38 @@ def test_preimage_artifact_matches_log():
     assert log_parts.get("computed_sha256") == digest
     assert log_parts.get("stored_sha256") == envelope["idempotence_hash"]
     assert log_parts.get("match") == str(digest == envelope["idempotence_hash"]).lower()
+
+def test_governed_showcompat_capture_uses_immutable_identity():
+    env = _cli_env()
+    env.update(
+        {
+            "ENGINE_TAG": "poison-engine-tag",
+            "RELEASE_ID": "f" * 64,
+            "PRODUCT_INVOCATION_TAG": "POISON-INVOCATION",
+        }
+    )
+    paths = [
+        Path("artifacts/cli/showcompat/stdout.json"),
+        Path("artifacts/cli/showcompat/stdout.json.sha256"),
+        Path("artifacts/cli/showcompat/args.json"),
+    ]
+    before = {path: path.read_bytes() for path in paths}
+
+    result = subprocess.run(
+        [sys.executable, "tools/cli/generate_showcompat_artifacts.py", "--check"],
+        capture_output=True,
+        env=env,
+    )
+
+    assert result.returncode == 0, result.stderr.decode("utf-8")
+    assert result.stdout == result.stderr == b""
+    assert {path: path.read_bytes() for path in paths} == before
+
+    args_payload = json.loads(paths[2].read_bytes())
+    assert set(args_payload["env"]) == {"SAFE_MODE", "ALLOW_NETWORK", "LC_ALL", "LANG", "TZ"}
+    assert args_payload["identity"] == {
+        "source": "engine.runtime.identity",
+        "meta": identity_meta(),
+    }
+    stdout_payload = json.loads(paths[0].read_bytes())
+    assert stdout_payload["compat"]["meta"] == identity_meta()
