@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+from adapter.env_guard import validate_or_fail
 from tools.evidence import generate_env_matrix_snapshot as generator
 
 DEFAULT_RAILS = {
@@ -116,3 +117,7 @@ def test_env_matrix_v3_consumers_use_canonical_singleton_contract():
     assert 'snap.get("checks"' not in qa_source
     assert "env_matrix.snapshot.json" not in ingest_source
     assert "_capture_env_snapshot" not in ingest_source
+
+
+def test_env_matrix_prod_defaults_pass_startup_guard():
+    validate_or_fail({"APP_ENV": "prod", **DEFAULT_RAILS["prod"]})
