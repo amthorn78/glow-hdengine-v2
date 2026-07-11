@@ -45,6 +45,32 @@ def _release_eval():
     )
 
 
+def _load_validated_invocation(identity: dict[str, str]) -> dict[str, str]:
+    record = json.loads(
+        (ROOT / "artifacts/invocation.json").read_text(encoding="utf-8")
+    )
+    invocation = record.get("invocation") if isinstance(record, dict) else None
+    if not isinstance(invocation, dict):
+        raise SystemExit("INVOCATION_RECORD_INVALID")
+
+    tag = invocation.get("tag")
+    stored_digest = invocation.get("sha256")
+    if not isinstance(tag, str) or not tag:
+        raise SystemExit("INVOCATION_RECORD_INVALID")
+    if not isinstance(stored_digest, str) or not stored_digest:
+        raise SystemExit("INVOCATION_RECORD_INVALID")
+
+    computed_digest = hashlib.sha256(tag.encode("utf-8")).hexdigest()
+    if stored_digest != computed_digest:
+        raise SystemExit("INVOCATION_SHA256_MISMATCH")
+    if (
+        tag != identity["invocation_tag"]
+        or stored_digest != identity["invocation_sha256"]
+    ):
+        raise SystemExit("INVOCATION_IDENTITY_MISMATCH")
+    return {"tag": tag, "sha256": stored_digest}
+
+
 def _expected() -> dict[Path, bytes]:
     require_closed_rails()
     service_run1 = _identity_bytes()
@@ -57,9 +83,7 @@ def _expected() -> dict[Path, bytes]:
         raise SystemExit("RELEASE_ID_STATE_INVALID:" + ",".join(ev.problems))
     if identity["release_id"] != ev.expected_release_id:
         raise SystemExit("IDENTITY_RELEASE_ID_MISMATCH")
-    invocation = json.loads((ROOT / "artifacts/invocation.json").read_text(encoding="utf-8"))["invocation"]
-    if invocation["tag"] != identity["invocation_tag"] or invocation["sha256"] != identity["invocation_sha256"]:
-        raise SystemExit("INVOCATION_IDENTITY_MISMATCH")
+    invocation = _load_validated_invocation(identity)
     emitter_txt = (ROOT / "artifacts/identity/emitter_sha256.txt").read_text(encoding="utf-8").strip()
     if emitter_txt != identity["emitter_sha256"]:
         raise SystemExit("EMITTER_IDENTITY_MISMATCH")
