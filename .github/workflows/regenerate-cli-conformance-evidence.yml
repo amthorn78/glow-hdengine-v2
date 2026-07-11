@@ -1,0 +1,58 @@
+name: Regenerate immutable CLI conformance evidence
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - synchronize
+
+permissions:
+  contents: write
+
+jobs:
+  regenerate:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    env:
+      LC_ALL: C
+      LANG: C
+      TZ: UTC
+      SAFE_MODE: "1"
+      ALLOW_NETWORK: "0"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install -e . pytest
+      - name: Regenerate governed CLI evidence
+        run: |
+          python tools/cli/generate_cli_conformance_artifacts.py
+          python tools/evidence/update_evidence_index.py
+          python tools/evidence/orientation_demo.py
+      - name: Verify producers and focused regressions
+        run: |
+          python tools/cli/generate_cli_conformance_artifacts.py --check
+          python tools/evidence/generate_env_matrix_snapshot.py --check
+          python tools/evidence/update_evidence_index.py --check
+          python tools/evidence/orientation_demo.py --check
+          python ci/checks/check_mirror_schema.sh
+          bash ci/checks/check_evidence_index_hash.sh
+          python ci/checks/check_final_lf.sh
+          python tools/evidence/validate_evidence_paths.py
+          python -m pytest             tests/evidence/test_cli_conformance_artifacts.py             tests/evidence/test_env_matrix_snapshot_v3.py             tests/adapter/test_env_guard_forbidden_matrix.py             tests/adapter/test_env_guard_prod_variants.py             tests/adapter/test_env_guard_silence_and_idempotence.py
+      - name: Commit canonical outputs
+        run: |
+          git status --short
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No generated changes"
+            exit 1
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "refresh immutable CLI conformance evidence"
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
