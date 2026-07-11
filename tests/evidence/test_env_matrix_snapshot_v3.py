@@ -2,6 +2,8 @@ import json, subprocess
 from pathlib import Path
 
 def test_env_matrix_v3_presence_only_and_check_nonwriting(monkeypatch):
+    for key in ('DATABASE_URL','DB_BRIDGE_URL','DB_ALLOW_BRIDGE_IN_PROD'):
+        monkeypatch.delenv(key, raising=False)
     path = Path('artifacts/runtime/env_matrix.snapshot.json')
     before = path.read_bytes() if path.exists() else b''
     subprocess.run(['python','tools/evidence/generate_env_matrix_snapshot.py','--check'], check=True)
