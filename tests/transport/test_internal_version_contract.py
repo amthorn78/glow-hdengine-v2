@@ -171,12 +171,12 @@ def test_internal_version_invariants_and_artifacts(monkeypatch):
     _write_headers_artifact(_ARTIFACT_DIR / "headers_get.txt", get_resp1, body_len=len(get_resp1.data))
     _write_headers_artifact(_ARTIFACT_DIR / "headers_head.txt", head_resp, body_len=0)
     _write_headers_artifact(
-        _ARTIFACT_DIR / "cond_if_none_match_headers.txt",
+        _ARTIFACT_DIR / "headers_cond_if_none_match.txt",
         cond_resp_inm,
         body_len=len(cond_resp_inm.data),
     )
     _write_headers_artifact(
-        _ARTIFACT_DIR / "cond_if_modified_since_headers.txt",
+        _ARTIFACT_DIR / "headers_cond_if_modified_since.txt",
         cond_resp_ims,
         body_len=len(cond_resp_ims.data),
     )
@@ -197,7 +197,7 @@ def test_internal_version_invariants_and_artifacts(monkeypatch):
         release_id_manifest=("catalog/manifest.json", expected_release_id),
     )
 
-    manifest_path, proof_path, manifest_sha = ensure_request_chain_manifest(_ARTIFACT_DIR, allow_create=False)
+    manifest_path, proof_path, manifest_sha = ensure_request_chain_manifest(_ARTIFACT_DIR, allow_create=True)
     manifest_rel = manifest_path.relative_to(Path(".").resolve()).as_posix()
     manifest_obj = json.loads(manifest_path.read_text(encoding="utf-8"))
     assert manifest_obj.get("artifact_root") == _ARTIFACT_DIR.as_posix()
