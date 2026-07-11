@@ -91,6 +91,7 @@ engine/providers/vendor_http.py
 engine/providers/vendor_http_hdapi.py
 engine/runtime/__init__.py
 engine/runtime/determinism_env.py
+engine/runtime/identity.py
 engine/runtime/public.py
 engine/sampler/__init__.py
 engine/sampler/core.py
