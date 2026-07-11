@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from __future__ import annotations
-import argparse, json, os, sys
+import argparse, os, sys
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path: sys.path.insert(0,str(ROOT))
@@ -12,35 +12,16 @@ def require_closed_rails():
 
 OUT=ROOT/'artifacts/runtime/env_matrix.snapshot.json'
 PINS={'ALLOW_NETWORK':'0','LANG':'C','LC_ALL':'C','SAFE_MODE':'1','TZ':'UTC'}
-PRES=('DATABASE_URL','DB_BRIDGE_URL','DB_ALLOW_BRIDGE_IN_PROD')
 def _expected():
     require_closed_rails()
-    payload={'schema_version':3,'rails':PINS,'presence':{k: bool(os.environ.get(k)) for k in PRES}}
+    payload={'schema_version':3,'rails':PINS}
     return canon.sercanon(payload, sort_keys=True)
-def _validate_snapshot(body):
-    try:
-        payload=json.loads(body)
-    except (json.JSONDecodeError, UnicodeDecodeError):
-        raise SystemExit('DRIFT:'+OUT.as_posix())
-    presence=payload.get('presence') if isinstance(payload,dict) else None
-    valid=(
-        isinstance(payload,dict)
-        and set(payload)=={'schema_version','rails','presence'}
-        and payload.get('schema_version')==3
-        and payload.get('rails')==PINS
-        and isinstance(presence,dict)
-        and set(presence)==set(PRES)
-        and all(type(value) is bool for value in presence.values())
-    )
-    if not valid or canon.sercanon(payload,sort_keys=True)!=body:
-        raise SystemExit('DRIFT:'+OUT.as_posix())
 def main(argv=None):
     ap=argparse.ArgumentParser(); ap.add_argument('--check',action='store_true'); a=ap.parse_args(argv)
-    if a.check:
-        require_closed_rails()
-        if not OUT.exists(): raise SystemExit('DRIFT:'+OUT.as_posix())
-        _validate_snapshot(OUT.read_bytes())
-        return 0
     b=_expected()
+    if a.check:
+        if not OUT.exists() or OUT.read_bytes()!=b:
+            raise SystemExit('DRIFT:'+OUT.as_posix())
+        return 0
     OUT.parent.mkdir(parents=True,exist_ok=True); OUT.write_bytes(b); return 0
 if __name__=='__main__': raise SystemExit(main())
