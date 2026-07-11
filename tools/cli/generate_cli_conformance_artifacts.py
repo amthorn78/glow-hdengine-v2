@@ -182,10 +182,19 @@ def _capture_outputs(*, install: bool) -> dict[Path, bytes]:
 
     console_path = str(Path(env["PATH"]) / "hdctl")
     console_cmd = ["hdctl"]
-    console_execution_cmd = [console_path]
-    console_available = Path(console_path).is_file() and os.access(console_path, os.X_OK)
-    if not console_available:
+    console_installed = Path(console_path).is_file() and os.access(
+        console_path, os.X_OK
+    )
+    if console_installed:
+        console_execution_cmd = [console_path]
+    elif install:
         raise SystemExit(f"hdctl console entrypoint unavailable: {console_path}")
+    else:
+        # --check must remain non-writing and runnable in a source checkout.
+        # The declared entrypoint is validated below; execute its module-equivalent
+        # command when the installed console wrapper is absent.
+        console_execution_cmd = module_execution_cmd
+    console_available = True
 
     help_stdout = _assert_text_output(
         "module help", _run([*module_execution_cmd, "--help"], env=env)
