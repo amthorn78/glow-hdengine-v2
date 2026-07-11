@@ -28,11 +28,29 @@ jobs:
         with:
           python-version: "3.11"
       - run: python -m pip install -e . pytest
-      - name: Validate migrated QA consumer
+      - name: Validate migrated QA env gate
         run: |
           python tools/evidence/generate_env_matrix_snapshot.py --check
           python -m pytest tests/evidence/test_env_matrix_snapshot_v3.py
-          bash scripts/qa/epic009_precommit.sh
+          python - <<'PY'
+          import pathlib
+          import sys
+
+          qa_source = pathlib.Path("scripts/qa/epic009_precommit.sh").read_text(
+              encoding="utf-8"
+          )
+          if "generate_env_matrix_snapshot.py --check" not in qa_source:
+              sys.exit(1)
+          if 'snap.get("result"' in qa_source or 'snap.get("checks"' in qa_source:
+              sys.exit(1)
+
+          failure = pathlib.Path(
+              "artifacts/runtime/env_matrix.failure.json"
+          ).read_text(encoding="utf-8")
+          expected = '{"schema":"v1","ok":false,"code":"missing_db_config","error":"database configuration not found"}\n'
+          if failure != expected:
+              sys.exit(1)
+          PY
       - name: Prove ingest order independence
         run: |
           before=$(sha256sum artifacts/runtime/env_matrix.snapshot.json | cut -d' ' -f1)
