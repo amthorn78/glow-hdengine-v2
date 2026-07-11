@@ -10,6 +10,7 @@ from engine.runtime import emit_reader_public_bytes, identity_admin, identity_me
 from engine.narratives import emit_public_aux, get_pack
 from engine.compat.categories import CATEGORIES_ORDER_V1
 from engine.compat.compute import conjunction_public_resolved
+from engine.compat.identity import dev_compat_identity
 from engine.sampler.core import CandidateFeatures, ViewerProfile, sample_and_rank
 from adapter.no_io_guard import NoIoGuard
 from engine.compat.errors import error_envelope
@@ -651,15 +652,16 @@ def get_reader_bp(emit_fn=None):
         def _local_lookup(user_id: str) -> dict[str, str] | None:
             return local_people.get(user_id)
 
+        compat_identity = dev_compat_identity()
         try:
             payload = conjunction_public_resolved(
                 left,
                 right,
                 viewer_top=CATEGORIES_ORDER_V1[0],
                 viewer_weights=_default_viewer_weights(),
-                engine_tag=identity_meta()["engine_tag"],
-                release_id=identity_meta()["release_id"],
-                invocation_tag=identity_meta()["invocation_tag"],
+                engine_tag=compat_identity["engine_tag"],
+                release_id=compat_identity["release_id"],
+                invocation_tag=compat_identity["invocation_tag"],
                 env=rails_env,
                 local_lookup=_local_lookup,
             )
