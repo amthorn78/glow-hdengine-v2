@@ -11,6 +11,7 @@ import pytest
 from engine.cli import main as cli_main
 from engine.presenter import emitter
 from engine.runtime import emit_reader_public_envelope, identity_meta
+from tools.cli import generate_showcompat_artifacts as capture_generator
 
 AB_ARTIFACT = Path("artifacts/cli/ab.json")
 BA_ARTIFACT = Path("artifacts/cli/ba.json")
@@ -231,3 +232,35 @@ def test_governed_showcompat_capture_uses_immutable_identity():
     }
     stdout_payload = json.loads(paths[0].read_bytes())
     assert stdout_payload["compat"]["meta"] == identity_meta()
+
+
+def test_governed_showcompat_generator_uses_active_interpreter(monkeypatch):
+    stdout = capture_generator.sercanon(
+        {"compat": {"meta": capture_generator.identity_meta()}}
+    )
+    captured = {}
+
+    def fake_run(args, *, input, capture_output, env):
+        captured["args"] = args
+        captured["input"] = input
+        captured["capture_output"] = capture_output
+        captured["env"] = env
+        return subprocess.CompletedProcess(
+            args=args,
+            returncode=0,
+            stdout=stdout,
+            stderr=b"",
+        )
+
+    monkeypatch.setattr(capture_generator.subprocess, "run", fake_run)
+
+    outputs = capture_generator._capture_outputs()
+    args_payload = json.loads(outputs[capture_generator.ARGS_PATH])
+
+    assert captured["args"] == [sys.executable, "scripts/hdctl.py", "showcompat"]
+    assert captured["input"] == capture_generator._stdin_bytes()
+    assert captured["capture_output"] is True
+    assert {
+        key: captured["env"][key] for key in capture_generator.ENV_KEYS
+    } == capture_generator.ENV_PINS
+    assert args_payload["argv"] == ["python", "scripts/hdctl.py", "showcompat"]
