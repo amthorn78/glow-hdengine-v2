@@ -153,48 +153,40 @@ def _conjunction_meta(body: bytes) -> dict[str, object]:
     return meta
 
 
-def _capture_outputs(*, install: bool) -> dict[Path, bytes]:
+def _capture_outputs() -> dict[Path, bytes]:
     env = _env()
     module_cmd = ["python", "-m", "engine.cli"]
     module_execution_cmd = [sys.executable, *module_cmd[1:]]
     script_cmd = ["python", "scripts/hdctl.py"]
     script_execution_cmd = [sys.executable, *script_cmd[1:]]
 
-    if install:
-        install_proc = _run(
-            [
-                sys.executable,
-                "-m",
-                "pip",
-                "install",
-                "--no-deps",
-                "--no-build-isolation",
-                "-e",
-                ".",
-            ],
-            env=env,
+    install_proc = _run(
+        [
+            sys.executable,
+            "-m",
+            "pip",
+            "install",
+            "--no-deps",
+            "--no-build-isolation",
+            "-e",
+            ".",
+        ],
+        env=env,
+    )
+    if install_proc.returncode != 0:
+        raise SystemExit(
+            f"pip install -e . failed rc={install_proc.returncode}: "
+            f"{install_proc.stderr!r}"
         )
-        if install_proc.returncode != 0:
-            raise SystemExit(
-                f"pip install -e . failed rc={install_proc.returncode}: "
-                f"{install_proc.stderr!r}"
-            )
 
     console_path = str(Path(env["PATH"]) / "hdctl")
     console_cmd = ["hdctl"]
-    console_installed = Path(console_path).is_file() and os.access(
+    console_available = Path(console_path).is_file() and os.access(
         console_path, os.X_OK
     )
-    if console_installed:
-        console_execution_cmd = [console_path]
-    elif install:
+    if not console_available:
         raise SystemExit(f"hdctl console entrypoint unavailable: {console_path}")
-    else:
-        # --check must remain non-writing and runnable in a source checkout.
-        # The declared entrypoint is validated below; execute its module-equivalent
-        # command when the installed console wrapper is absent.
-        console_execution_cmd = module_execution_cmd
-    console_available = True
+    console_execution_cmd = [console_path]
 
     help_stdout = _assert_text_output(
         "module help", _run([*module_execution_cmd, "--help"], env=env)
@@ -438,7 +430,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args(argv)
-    expected = _capture_outputs(install=not args.check)
+    expected = _capture_outputs()
 
     if args.check:
         drift = [
