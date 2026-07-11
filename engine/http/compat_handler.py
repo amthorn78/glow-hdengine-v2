@@ -4,6 +4,7 @@ from typing import Dict, Any
 from flask import Blueprint, request, Response
 from engine.presenter import emit_public
 from engine.compat.errors import error_envelope
+from engine.compat.identity import dev_compat_identity
 from engine.compat.compute import compat_public
 from engine.validation.viewer_prefs import normalize_viewer_prefs, validate_viewer_prefs
 from engine.compat.ordering import UID_RE
@@ -118,9 +119,15 @@ def post_json():
     if err:
         return _writer_payload(err, status=400)
     vp = normalize_viewer_prefs(vp)
+    compat_identity = dev_compat_identity()
     body = compat_public(
-        a, b, vp["top_category"], vp["weights"],
-        engine_tag="dev", release_id="dev", invocation_tag="INV-DEV",
+        a,
+        b,
+        vp["top_category"],
+        vp["weights"],
+        engine_tag=compat_identity["engine_tag"],
+        release_id=compat_identity["release_id"],
+        invocation_tag=compat_identity["invocation_tag"],
     )
     body = dict(body)
     body["keys"] = _collect_keys_list(body)
