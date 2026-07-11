@@ -1,12 +1,1 @@
-{
-  "schema": "v1",
-  "ok": true,
-  "result": {"which": "CLOSED_RAILS_DEFAULTS"},
-  "checks": [
-    {"name": "LC_ALL", "value_kind": "literal", "value": "C"},
-    {"name": "LANG", "value_kind": "literal", "value": "C"},
-    {"name": "TZ", "value_kind": "literal", "value": "UTC"},
-    {"name": "SAFE_MODE", "value_kind": "literal", "value": "1"},
-    {"name": "ALLOW_NETWORK", "value": "0", "value_kind": "literal"}
-  ]
-}
+{"presence":{"DATABASE_URL":true,"DB_ALLOW_BRIDGE_IN_PROD":false,"DB_BRIDGE_URL":true},"rails":{"ALLOW_NETWORK":"0","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"schema_version":3}

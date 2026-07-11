@@ -7,6 +7,7 @@ from engine.compat.errors import error_envelope
 from engine.compat.compute import compat_public
 from engine.validation.viewer_prefs import normalize_viewer_prefs, validate_viewer_prefs
 from engine.compat.ordering import UID_RE
+from engine.runtime import identity_meta
 
 compat_blueprint = Blueprint("compat", __name__, url_prefix="/api/compat/v1")
 
@@ -118,9 +119,10 @@ def post_json():
     if err:
         return _writer_payload(err, status=400)
     vp = normalize_viewer_prefs(vp)
+    meta = identity_meta()
     body = compat_public(
         a, b, vp["top_category"], vp["weights"],
-        engine_tag="dev", release_id="dev", invocation_tag="INV-DEV",
+        engine_tag=meta["engine_tag"], release_id=meta["release_id"], invocation_tag=meta["invocation_tag"],
     )
     body = dict(body)
     body["keys"] = _collect_keys_list(body)

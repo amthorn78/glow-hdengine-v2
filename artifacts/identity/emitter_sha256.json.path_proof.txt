@@ -1,0 +1,5 @@
+path: artifacts/identity/emitter_sha256.json
+size_bytes: 135
+sha256: f090e1f068dcc20cb21588fae481eea5a14a4dc36dd915d1a39acebad1e74115
+mtime_utc: 2026-07-11T14:44:35Z
+produced_at_utc: 2026-07-08T18:40:15Z

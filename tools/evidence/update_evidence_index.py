@@ -2426,6 +2426,17 @@ def _load_epic034_pr06_entries() -> list[dict[str, object]]:
     return entries
 
 
+EPIC038_PR01_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {"artifact_key": "epic038.pr01.identity_release_id", "discovered_physical_path": "artifacts/identity/release_id.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr01_evidence", "schema_version": "1.0"},
+    {"artifact_key": "epic038.pr01.identity_release_id_recompute", "discovered_physical_path": "artifacts/identity/release_id_recompute.log", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr01_evidence", "schema_version": "1.0"},
+    {"artifact_key": "epic038.pr01.two_run_identity", "discovered_physical_path": "artifacts/parity/two_run_identity.log", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr01_evidence", "schema_version": "1.0"},
+    {"artifact_key": "epic038.pr01.service_identity", "discovered_physical_path": "artifacts/identity/service_identity.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr01_evidence", "schema_version": "1.0"},
+    {"artifact_key": "epic038.pr01.emitter_sha256", "discovered_physical_path": "artifacts/identity/emitter_sha256.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr01_evidence", "schema_version": "1.0"},
+    {"artifact_key": "epic038.pr01.invocation_sha256", "discovered_physical_path": "artifacts/identity/invocation_sha256.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr01_evidence", "schema_version": "1.0"},
+    {"artifact_key": "epic038.pr01.bodygraph_release_bindings", "discovered_physical_path": "artifacts/bodygraph/release_bindings.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr01_evidence", "schema_version": "1.0"},
+    {"artifact_key": "epic038.pr01.env_matrix_snapshot_v3", "discovered_physical_path": "artifacts/runtime/env_matrix.snapshot.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr01_evidence", "schema_version": "3"},
+]
+
 A7_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
         "artifact_key": "a7.success_encoding_invariance",
@@ -2844,6 +2855,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *_load_epic037_pr04_entries(),
             *_load_epic037_ops01_entries(),
             *_load_epic037_pr05_entries(),
+            *EPIC038_PR01_PRIMARY_ARTIFACTS,
             *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,

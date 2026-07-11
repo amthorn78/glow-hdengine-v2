@@ -6,7 +6,7 @@ from flask import Blueprint, Response, request, Flask, g
 from threading import Lock
 from engine.presenter.emitter import emit_public
 from engine.serializer import canon
-from engine.runtime import emit_reader_public_bytes
+from engine.runtime import emit_reader_public_bytes, identity_admin, identity_meta
 from engine.narratives import emit_public_aux, get_pack
 from engine.compat.categories import CATEGORIES_ORDER_V1
 from engine.compat.compute import conjunction_public_resolved
@@ -350,17 +350,7 @@ def get_reader_bp(emit_fn=None):
         except ValueError as e:
             return _error(str(e))
 
-        engine_tag     = os.environ.get("ENGINE_TAG", "hdengine-alpha")
-        invocation_tag = os.environ.get("PRODUCT_INVOCATION_TAG", "INV-UNKNOWN")
-        release_id     = os.environ.get("RELEASE_ID", "0" * 64)
-
-        body = emit_fn(
-            a,
-            b,
-            engine_tag=engine_tag,
-            invocation_tag=invocation_tag,
-            release_id=release_id,
-        )
+        body = emit_fn(a, b)
         etag = "\"" + _sha256_hex(body) + "\""
         tokens = _parse_if_none_match(request.headers.get("If-None-Match"))
 
@@ -400,7 +390,7 @@ def get_reader_bp(emit_fn=None):
         viewer_top = request.args.get("viewer_top") or None
         flags = _collect_query_values("flags") or _collect_query_values("flag")
         families = tuple(_collect_query_values("families_fired"))
-        release_id = request.args.get("release_id") or os.environ.get("RELEASE_ID", "0" * 64)
+        release_id = request.args.get("release_id") or identity_meta()["release_id"]
         requested_pack_sha = request.args.get("pack_sha") or pack.pack_sha
 
         emission = emit_public_aux(
@@ -660,9 +650,9 @@ def get_reader_bp(emit_fn=None):
                 right,
                 viewer_top=CATEGORIES_ORDER_V1[0],
                 viewer_weights=_default_viewer_weights(),
-                engine_tag=os.environ.get("ENGINE_TAG", "hdengine-alpha"),
-                release_id=os.environ.get("RELEASE_ID", "0" * 64),
-                invocation_tag=os.environ.get("PRODUCT_INVOCATION_TAG", "INV-UNKNOWN"),
+                engine_tag=identity_meta()["engine_tag"],
+                release_id=identity_meta()["release_id"],
+                invocation_tag=identity_meta()["invocation_tag"],
                 env=rails_env,
                 local_lookup=_local_lookup,
             )
@@ -799,69 +789,11 @@ def get_reader_bp(emit_fn=None):
 
 bp = get_reader_bp()
 
-_SERVICE_IDENTITY_PATH = Path("artifacts/identity/service_identity.json")
-_INVOCATION_PATH = Path("artifacts/invocation.json")
-_RELEASE_ID_PATH = Path("artifacts/math/release_id.txt")
-_EMITTER_SHA256_PATH = Path("artifacts/identity/emitter_sha256.txt")
-
-
 # === EPIC-005 /internal/version (Blueprint: bp) ===
-# 'bp', 'Response', and 'request' are already imported above
-# /internal/version stays DB-decoupled; no DB resolver imports or connections here.
-
-def _read_release_id() -> str:
-    try:
-        return _RELEASE_ID_PATH.read_text(encoding="utf-8").strip()
-    except FileNotFoundError:
-        manifest_path = Path("catalog/manifest.json")
-        manifest_obj = json.loads(manifest_path.read_text(encoding="utf-8"))
-        canonical_manifest = canon.sercanon(manifest_obj, sort_keys=True)
-        return hashlib.sha256(canonical_manifest).hexdigest()
-
-
-def _load_service_identity() -> dict[str, str]:
-    try:
-        raw = _SERVICE_IDENTITY_PATH.read_text(encoding="utf-8")
-    except FileNotFoundError:
-        return {}
-    try:
-        data = json.loads(raw)
-    except json.JSONDecodeError:
-        return {}
-    return data if isinstance(data, dict) else {}
-
-
-def _load_invocation_identity() -> tuple[str, str]:
-    try:
-        raw = _INVOCATION_PATH.read_text(encoding="utf-8")
-    except FileNotFoundError:
-        return "", ""
-    try:
-        data = json.loads(raw)
-    except json.JSONDecodeError:
-        return "", ""
-    invocation = data.get("invocation") if isinstance(data, dict) else {}
-    if not isinstance(invocation, dict):
-        return "", ""
-    return str(invocation.get("tag") or ""), str(invocation.get("sha256") or "")
-
+# /internal/version stays DB-decoupled and obtains immutable identity from the runtime authority.
 
 def _build_internal_version_payload() -> dict[str, str]:
-    identity = _load_service_identity()
-    invocation_tag, invocation_sha256 = _load_invocation_identity()
-    engine_tag = identity.get("engine_tag") or os.environ.get("ENGINE_TAG", "hdengine-alpha")
-    build_commit = identity.get("build_commit") or os.environ.get("BUILD_COMMIT", "unknown")
-    emitter_sha256 = identity.get("emitter_sha256") or (_EMITTER_SHA256_PATH.read_text(encoding="utf-8").strip() if _EMITTER_SHA256_PATH.exists() else os.environ.get("EMITTER_SHA256", "unknown"))
-    release_id = _read_release_id()
-    payload = {
-        "engine_tag": engine_tag,
-        "build_commit": build_commit,
-        "invocation_tag": invocation_tag or identity.get("invocation_tag") or os.environ.get("PRODUCT_INVOCATION_TAG", "INV-UNKNOWN"),
-        "invocation_sha256": invocation_sha256,
-        "emitter_sha256": emitter_sha256,
-        "release_id": release_id,
-    }
-    return payload
+    return identity_admin()
 
 
 # --- ensure blueprint exists for internal routes ---
@@ -873,6 +805,15 @@ except NameError:
 
 @bp.route("/internal/version", methods=["GET", "HEAD"])
 def internal_version():
+    if (os.environ.get("ENGINE_ENV") or "dev").lower() == "prod":
+        expected = os.environ.get("ENGINE_SERVICE_TOKEN") or ""
+        got = request.headers.get("Authorization", "")
+        if not expected or got != f"Bearer {expected}":
+            body_bytes = emit_public({"code":"Unauthorized","error":"InvalidOrMissingToken","ok":False,"schema":"v1"})
+            r = Response(body_bytes, status=401, mimetype="application/json; charset=utf-8")
+            r.headers["Cache-Control"] = "no-store"
+            r.headers.pop("ETag", None)
+            return r
     # deny identity overrides in prod
     if request.headers.get("X-Identity-Override"):
         body_bytes = emit_public({"error": "override_denied", "detail": "identity overrides disabled in prod"})

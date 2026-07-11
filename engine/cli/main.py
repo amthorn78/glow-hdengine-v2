@@ -33,7 +33,7 @@ from engine.constants import (
     CENTER_MAX,
 )
 from engine.presenter import emitter
-from engine.runtime import emit_reader_public_envelope
+from engine.runtime import emit_reader_public_envelope, identity_meta
 from engine.serializer.canon import sercanon
 from engine.narratives import emit_public_aux, get_pack
 from engine.narratives.constants import BANDS as AUX_BANDS, PERSPECTIVES as AUX_PERSPECTIVES
@@ -435,10 +435,8 @@ def _chart_for(uid: str) -> Dict[str, Any]:
 
 
 def _engine_identity() -> tuple[str, str, str]:
-    engine_tag = os.environ.get("ENGINE_TAG", "hdengine-dev")
-    release_id = os.environ.get("RELEASE_ID", "0" * 64)
-    invocation_tag = os.environ.get("PRODUCT_INVOCATION_TAG", "INV-LOCAL")
-    return engine_tag, release_id, invocation_tag
+    meta = identity_meta()
+    return meta["engine_tag"], meta["release_id"], meta["invocation_tag"]
 
 
 def _viewer_weights() -> Dict[str, int]:
@@ -610,7 +608,7 @@ def aux_preview(args: argparse.Namespace) -> int:
             raise CliError("MISSING_COMPAT_CATEGORY")
         perspective = args.perspective or "shared"
         meta = compat.get("meta") or {}
-        release_id = meta.get("release_id") or os.environ.get("RELEASE_ID", "0" * 64)
+        release_id = meta.get("release_id") or identity_meta()["release_id"]
         return category, band, perspective, release_id, data
 
     def _resolve_inputs() -> Tuple[str, str, str, str, Dict[str, Any] | None]:
@@ -618,7 +616,7 @@ def aux_preview(args: argparse.Namespace) -> int:
             return _resolve_from_pair_file()
         if not (args.category and args.band and args.perspective):
             raise CliError("MISSING_AUX_INPUT")
-        release_id = os.environ.get("RELEASE_ID", "0" * 64)
+        release_id = identity_meta()["release_id"]
         return args.category, args.band, args.perspective, release_id, None
 
     category, band, perspective, release_id, data = _resolve_inputs()
