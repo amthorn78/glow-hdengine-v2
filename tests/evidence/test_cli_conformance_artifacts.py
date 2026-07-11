@@ -7,6 +7,7 @@ import sys
 from pathlib import Path
 
 from engine.runtime import identity_meta
+from tools.cli import generate_cli_conformance_artifacts as generator
 
 ARTIFACTS = (
     Path("artifacts/cli/help/hdctl_help.txt"),
@@ -75,3 +76,18 @@ def test_cli_conformance_artifacts_use_immutable_identity_and_are_current():
     assert installability["module_version"]["stdout"] == expected_version
     assert installability["console_version"]["stdout"] == expected_version
     assert installability["console_entrypoint_path"] == "hdctl"
+
+def test_cli_conformance_check_capture_does_not_require_installed_console(
+    monkeypatch, tmp_path
+):
+    monkeypatch.setattr(
+        generator.sysconfig,
+        "get_paths",
+        lambda: {"scripts": str(tmp_path)},
+    )
+
+    expected = generator._capture_outputs(install=False)
+
+    assert not (tmp_path / "hdctl").exists()
+    assert expected == {path: path.read_bytes() for path in ARTIFACTS}
+
