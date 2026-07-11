@@ -1,16 +1,63 @@
 import json, subprocess
 from pathlib import Path
 
-def test_env_matrix_v3_presence_only_and_check_nonwriting(monkeypatch):
-    for key in ('DATABASE_URL','DB_BRIDGE_URL','DB_ALLOW_BRIDGE_IN_PROD'):
+import pytest
+
+from tools.evidence import generate_env_matrix_snapshot as generator
+
+PINS = {'ALLOW_NETWORK':'0','LANG':'C','LC_ALL':'C','SAFE_MODE':'1','TZ':'UTC'}
+OPTIONAL_DB_ENV = ('DATABASE_URL','DB_BRIDGE_URL','DB_ALLOW_BRIDGE_IN_PROD')
+
+
+def _set_closed_rails(monkeypatch):
+    for key, value in PINS.items():
+        monkeypatch.setenv(key, value)
+
+
+def test_env_matrix_v3_write_is_independent_of_optional_db_env(tmp_path, monkeypatch):
+    _set_closed_rails(monkeypatch)
+    out = tmp_path / 'env_matrix.snapshot.json'
+    monkeypatch.setattr(generator, 'OUT', out)
+
+    for key in OPTIONAL_DB_ENV:
         monkeypatch.delenv(key, raising=False)
+    assert generator.main([]) == 0
+    without_optional_env = out.read_bytes()
+
+    for key in OPTIONAL_DB_ENV:
+        monkeypatch.setenv(key, 'operator-specific-value')
+    assert generator.main([]) == 0
+
+    assert out.read_bytes() == without_optional_env
+    assert json.loads(without_optional_env) == {'schema_version': 3, 'rails': PINS}
+
+
+def test_env_matrix_v3_check_is_exact_and_nonwriting(monkeypatch):
+    _set_closed_rails(monkeypatch)
+    for key in OPTIONAL_DB_ENV:
+        monkeypatch.setenv(key, 'operator-specific-value')
+
     path = Path('artifacts/runtime/env_matrix.snapshot.json')
-    before = path.read_bytes() if path.exists() else b''
+    before = path.read_bytes()
     subprocess.run(['python','tools/evidence/generate_env_matrix_snapshot.py','--check'], check=True)
+
     assert path.read_bytes() == before
     assert before.endswith(b'\n') and b'\n' not in before[:-1]
-    data = json.loads(before)
-    assert data['schema_version'] == 3
-    assert data['rails'] == {'ALLOW_NETWORK':'0','LANG':'C','LC_ALL':'C','SAFE_MODE':'1','TZ':'UTC'}
-    assert set(data['presence']) == {'DATABASE_URL','DB_BRIDGE_URL','DB_ALLOW_BRIDGE_IN_PROD'}
-    assert all(isinstance(v, bool) for v in data['presence'].values())
+    assert json.loads(before) == {'schema_version': 3, 'rails': PINS}
+    assert all(key.encode() not in before for key in OPTIONAL_DB_ENV)
+
+
+def test_env_matrix_v3_check_rejects_operator_specific_presence(tmp_path, monkeypatch):
+    _set_closed_rails(monkeypatch)
+    out = tmp_path / 'env_matrix.snapshot.json'
+    monkeypatch.setattr(generator, 'OUT', out)
+    drift = {
+        'schema_version': 3,
+        'rails': PINS,
+        'presence': {key: True for key in OPTIONAL_DB_ENV},
+    }
+    out.write_text(json.dumps(drift, sort_keys=True, separators=(',', ':')) + '\n', encoding='utf-8')
+
+    with pytest.raises(SystemExit) as exc:
+        generator.main(['--check'])
+    assert str(exc.value).startswith('DRIFT:')
