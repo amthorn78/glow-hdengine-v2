@@ -61,3 +61,13 @@ def test_env_matrix_v3_check_rejects_operator_specific_presence(tmp_path, monkey
     with pytest.raises(SystemExit) as exc:
         generator.main(['--check'])
     assert str(exc.value).startswith('DRIFT:')
+
+
+def test_rails_closed_phase1_delegates_env_matrix_ownership():
+    source = Path('tools/evidence/generate_rails_closed_phase1.py').read_text(
+        encoding='utf-8'
+    )
+
+    assert 'generate_env_matrix_snapshot.main([])' in source
+    assert 'db_access.resolve_env_matrix()' not in source
+    assert '_write_json("artifacts/runtime/env_matrix.snapshot.json"' not in source
