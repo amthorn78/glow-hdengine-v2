@@ -9,7 +9,7 @@ import os
 from pathlib import Path
 from typing import Iterable, Mapping
 
-from adapter import db_access
+from tools.evidence import generate_env_matrix_snapshot
 
 ROOT = Path(__file__).resolve().parents[2]
 NOW = _dt.datetime.now(tz=_dt.timezone.utc).replace(microsecond=0)
@@ -74,10 +74,10 @@ app_env = (os.getenv("APP_ENV") or os.getenv("ENGINE_ENV") or "dev").strip()
 safe_mode = os.getenv("SAFE_MODE", "1")
 allow_network = os.getenv("ALLOW_NETWORK", "0")
 
-_resolver_ok, _env_snapshot = db_access.resolve_env_matrix()
-if not _resolver_ok:
-    _env_snapshot = db_access.MISSING_DB_CONFIG.copy()
-_write_json("artifacts/runtime/env_matrix.snapshot.json", _env_snapshot)
+# EPIC038 owns this singleton artifact. Delegate to its canonical producer so
+# Rails CLOSED Phase 1 cannot reintroduce the retired v1 schema or write a
+# competing path proof.
+generate_env_matrix_snapshot.main([])
 
 # ---------------------------------------------------------------------------
 # DB posture artifacts
