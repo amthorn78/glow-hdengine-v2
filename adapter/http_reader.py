@@ -12,7 +12,6 @@ from engine.compat.categories import CATEGORIES_ORDER_V1
 from engine.compat.compute import conjunction_public_resolved
 from engine.sampler.core import CandidateFeatures, ViewerProfile, sample_and_rank
 from adapter.no_io_guard import NoIoGuard
-from adapter.env_guard import _compute_env_mode
 from engine.compat.errors import error_envelope
 from engine.bodygraph.ingest import resolve_db_user_id
 from engine.bodygraph.vendor_client import VendorError
@@ -813,15 +812,6 @@ except NameError:
 
 @bp.route("/internal/version", methods=["GET", "HEAD"])
 def internal_version():
-    if _compute_env_mode(os.environ) == "prod":
-        expected = os.environ.get("ENGINE_SERVICE_TOKEN") or ""
-        got = request.headers.get("Authorization", "")
-        if not expected or got != f"Bearer {expected}":
-            body_bytes = emit_public({"code":"Unauthorized","error":"InvalidOrMissingToken","ok":False,"schema":"v1"})
-            r = Response(body_bytes, status=401, mimetype="application/json; charset=utf-8")
-            r.headers["Cache-Control"] = "no-store"
-            r.headers.pop("ETag", None)
-            return r
     # deny identity overrides in prod
     if request.headers.get("X-Identity-Override"):
         body_bytes = emit_public({"error": "override_denied", "detail": "identity overrides disabled in prod"})
