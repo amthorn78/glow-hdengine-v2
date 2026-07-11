@@ -33,6 +33,10 @@ def _json_bytes(obj: object) -> bytes:
     return canon.sercanon(obj, sort_keys=True)
 
 
+def _identity_bytes() -> bytes:
+    return _json_bytes(identity_admin())
+
+
 def _release_eval():
     return _evaluate_state(
         manifest_path=ROOT / "catalog/manifest.json",
@@ -43,7 +47,11 @@ def _release_eval():
 
 def _expected() -> dict[Path, bytes]:
     require_closed_rails()
-    identity = identity_admin()
+    service_run1 = _identity_bytes()
+    service_run2 = _identity_bytes()
+    if service_run1 != service_run2:
+        raise SystemExit("TWO_RUN_IDENTITY_MISMATCH")
+    identity = json.loads(service_run1)
     ev = _release_eval()
     if ev.problems:
         raise SystemExit("RELEASE_ID_STATE_INVALID:" + ",".join(ev.problems))
@@ -70,16 +78,15 @@ def _expected() -> dict[Path, bytes]:
     ]).encode("utf-8")
     emitter_payload = {"emitter_sha256": identity["emitter_sha256"], "source": "artifacts/identity/emitter_sha256.txt"}
     invocation_payload = {"invocation_sha256": identity["invocation_sha256"], "invocation_tag": identity["invocation_tag"], "source": "artifacts/invocation.json"}
-    service = _json_bytes(identity)
     two_run = "\n".join([
         "two_run_identity",
-        f"run1_sha256={hashlib.sha256(service).hexdigest()}",
-        f"run2_sha256={hashlib.sha256(service).hexdigest()}",
+        f"run1_sha256={hashlib.sha256(service_run1).hexdigest()}",
+        f"run2_sha256={hashlib.sha256(service_run2).hexdigest()}",
         "status=PASS",
         "",
     ]).encode("utf-8")
     return {
-        OUTPUTS["service"]: service,
+        OUTPUTS["service"]: service_run1,
         OUTPUTS["release"]: _json_bytes(release_payload),
         OUTPUTS["recompute"]: recompute_log,
         OUTPUTS["emitter"]: _json_bytes(emitter_payload),
