@@ -22,7 +22,6 @@ _FORBIDDEN_IN_PROD = (
     "FEATURE_TOGGLES",
     "PRESET_OVERRIDE",
     "COPY_OVERRIDE",
-    "ALLOW_NETWORK",
     "HD_ADMIN",
 )
 
@@ -55,6 +54,7 @@ def validate_or_fail(environ: Optional[Mapping[str, str]] = None) -> None:
     """
     Pure, silent guard. Reads env ONLY when called.
     In 'prod' mode, forbids any of the known override keys when value is present after .strip().
+    Canonical SAFE_MODE/ALLOW_NETWORK rails remain valid production configuration.
     Returns None if allowed; raises EnvGuardError otherwise.
     """
     env = os.environ if environ is None else environ
