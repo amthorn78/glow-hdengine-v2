@@ -1,0 +1,61 @@
+name: Regenerate manifest-bound internal version evidence
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - synchronize
+
+permissions:
+  contents: write
+
+jobs:
+  regenerate:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    env:
+      LC_ALL: C
+      LANG: C
+      TZ: UTC
+      SAFE_MODE: "1"
+      ALLOW_NETWORK: "0"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install -U pip
+      - run: test -f requirements.txt && python -m pip install -r requirements.txt || true
+      - run: test -f requirements-dev.txt && python -m pip install -r requirements-dev.txt || true
+      - run: python -m pip install -e . pytest
+      - name: Regenerate manifest-bound captures
+        run: python -m pytest tests/transport/test_internal_version_contract.py -q
+      - name: Refresh governed index and proofs
+        run: |
+          python tools/evidence/update_evidence_index.py
+          python tools/evidence/orientation_demo.py
+      - name: Verify read-only evidence checks
+        run: |
+          python tools/cli/generate_cli_conformance_artifacts.py --check
+          python tools/evidence/update_evidence_index.py --check
+          python tools/evidence/orientation_demo.py --check
+          python ci/checks/check_mirror_schema.sh
+          bash ci/checks/check_evidence_index_hash.sh
+          bash ci/checks/check_final_lf.sh
+          python tools/evidence/validate_evidence_paths.py
+          python -m pytest tests/evidence/test_internal_version_manifest_captures.py tests/evidence/test_cli_conformance_artifacts.py tests/evidence/test_dev_conjunction_identity.py
+      - name: Commit canonical outputs
+        run: |
+          git status --short
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Governed evidence already current"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "refresh manifest-bound internal version evidence"
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
