@@ -160,6 +160,8 @@ def _capture_outputs() -> dict[Path, bytes]:
     script_cmd = ["python", "scripts/hdctl.py"]
     script_execution_cmd = [sys.executable, *script_cmd[1:]]
 
+    install_env = env.copy()
+    install_env.pop("PIP_NO_INDEX", None)
     install_proc = _run(
         [
             sys.executable,
@@ -167,11 +169,10 @@ def _capture_outputs() -> dict[Path, bytes]:
             "pip",
             "install",
             "--no-deps",
-            "--no-build-isolation",
             "-e",
             ".",
         ],
-        env=env,
+        env=install_env,
     )
     if install_proc.returncode != 0:
         raise SystemExit(
@@ -277,7 +278,7 @@ def _capture_outputs() -> dict[Path, bytes]:
         f"script_help_cmd={' '.join(script_cmd + ['--help'])}\n"
         f"console_help_cmd={' '.join(console_cmd + ['--help'])}\n"
         f"console_version_cmd={' '.join(console_version_cmd)}\n"
-        "install_step=SUCCESS (pip install -e . --no-deps --no-build-isolation with PIP_NO_INDEX=1)\n"
+        "install_step=SUCCESS (pip install --no-deps -e . with PEP 517 build isolation)\n"
         f"console_entrypoint_available={str(console_available).lower()}\n"
         "console_entrypoint_path=hdctl\n"
     )
