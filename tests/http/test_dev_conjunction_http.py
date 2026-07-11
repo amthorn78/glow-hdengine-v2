@@ -1,6 +1,9 @@
 import json
 
+import pytest
+
 from adapter.http_reader import create_app
+from engine.compat.identity import dev_compat_identity
 
 
 def _client(monkeypatch, app_env: str):
@@ -39,10 +42,11 @@ def test_dev_conjunction_endpoints_closed_rails_refusal(monkeypatch):
             assert payload["type"] == "dev.writer.conjunction.error.v1"
 
 
-def test_dev_conjunction_endpoints_open_rails_success(monkeypatch):
+@pytest.mark.parametrize("app_env", ["dev", "test", "local"])
+def test_dev_conjunction_endpoints_open_rails_success(monkeypatch, app_env):
     monkeypatch.setenv("SAFE_MODE", "0")
     monkeypatch.setenv("ALLOW_NETWORK", "1")
-    client = _client(monkeypatch, "dev")
+    client = _client(monkeypatch, app_env)
 
     query = {
         "a_user_id": "left",
@@ -62,6 +66,7 @@ def test_dev_conjunction_endpoints_open_rails_success(monkeypatch):
         assert "conjunction" in conjunction_payload
         assert conjunction_payload["conjunction"]["left"]["person_uid"]
         assert conjunction_payload["conjunction"]["right"]["person_uid"]
+        assert conjunction_payload["conjunction"]["compat"]["meta"] == dev_compat_identity()
 
 
 def test_dev_writer_conjunction_is_idempotent_bytes(monkeypatch):
