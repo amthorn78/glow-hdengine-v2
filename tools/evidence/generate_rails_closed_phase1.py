@@ -6,12 +6,15 @@ import datetime as _dt
 import hashlib
 import json
 import os
+import sys
 from pathlib import Path
 from typing import Iterable, Mapping
 
-from tools.evidence import generate_env_matrix_snapshot
-
 ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from tools.evidence import generate_env_matrix_snapshot
 NOW = _dt.datetime.now(tz=_dt.timezone.utc).replace(microsecond=0)
 NOW_STR = NOW.isoformat().replace("+00:00", "Z")
 
