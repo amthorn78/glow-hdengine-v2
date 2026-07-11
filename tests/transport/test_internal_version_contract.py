@@ -94,7 +94,9 @@ def _write_two_run_log(
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
-def test_internal_version_invariants_and_artifacts():
+def test_internal_version_invariants_and_artifacts(monkeypatch):
+    monkeypatch.setenv("APP_ENV", "prod")
+    monkeypatch.setenv("ENGINE_SERVICE_TOKEN", "must-not-be-required")
     client = app.test_client()
     get_resp1 = client.get("/internal/version")
     head_resp = client.head("/internal/version")
