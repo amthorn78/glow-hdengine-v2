@@ -84,24 +84,24 @@ print("OK")
 PY
 case $? in 0) ok OBS_KEYS_ONLY_OK;; *) ko OBS_KEYS_ONLY_OK "canonical keys-only log mismatch";; esac
 
-python - <<'PY'
-import json, sys, pathlib
-snap = json.loads(pathlib.Path("artifacts/runtime/env_matrix.snapshot.json").read_text())
-fail = pathlib.Path("artifacts/runtime/env_matrix.failure.json").read_text()
-which = snap.get("result", {}).get("which")
-if which not in {"DATABASE_URL", "DB_BRIDGE_URL"}:
-    sys.exit(70)
-for c in snap.get("checks", []):
-    name = c.get("name")
-    if name in {"DATABASE_URL", "DB_BRIDGE_URL"}:
-        if c.get("found") and c.get("value_kind") != "dsn_redacted":
-            sys.exit(71)
+if python tools/evidence/generate_env_matrix_snapshot.py --check && python - <<'PY'
+import pathlib
+import sys
+
+failure = pathlib.Path("artifacts/runtime/env_matrix.failure.json").read_text(
+    encoding="utf-8"
+)
 expected = '{"schema":"v1","ok":false,"code":"missing_db_config","error":"database configuration not found"}\n'
-if fail != expected:
+if failure != expected:
     sys.exit(72)
 print("OK")
 PY
-case $? in 0) ok DB_CONN_ENV_OK; ok DB_CONN_TYPED_ERROR_OK;; *) ko ENV_MATRIX "snapshot/failure mismatch";; esac
+then
+  ok DB_CONN_ENV_OK
+  ok DB_CONN_TYPED_ERROR_OK
+else
+  ko ENV_MATRIX "v3 singleton/failure mismatch"
+fi
 
 python - <<'PY'
 import pathlib, sys
