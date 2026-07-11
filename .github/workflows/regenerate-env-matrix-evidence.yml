@@ -39,7 +39,7 @@ jobs:
           python tools/evidence/update_evidence_index.py --check
           python tools/evidence/orientation_demo.py --check
           bash ci/checks/check_evidence_index_hash.sh
-          bash ci/checks/check_mirror_schema.sh
+          python ci/checks/check_mirror_schema.sh
           bash ci/checks/check_final_lf.sh
           python tools/evidence/validate_evidence_paths.py
       - name: Commit generated files
