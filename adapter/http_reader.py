@@ -12,6 +12,7 @@ from engine.compat.categories import CATEGORIES_ORDER_V1
 from engine.compat.compute import conjunction_public_resolved
 from engine.sampler.core import CandidateFeatures, ViewerProfile, sample_and_rank
 from adapter.no_io_guard import NoIoGuard
+from adapter.env_guard import _compute_env_mode
 from engine.compat.errors import error_envelope
 from engine.bodygraph.ingest import resolve_db_user_id
 from engine.bodygraph.vendor_client import VendorError
@@ -350,7 +351,14 @@ def get_reader_bp(emit_fn=None):
         except ValueError as e:
             return _error(str(e))
 
-        body = emit_fn(a, b)
+        meta = identity_meta()
+        body = emit_fn(
+            a,
+            b,
+            engine_tag=meta["engine_tag"],
+            invocation_tag=meta["invocation_tag"],
+            release_id=meta["release_id"],
+        )
         etag = "\"" + _sha256_hex(body) + "\""
         tokens = _parse_if_none_match(request.headers.get("If-None-Match"))
 
@@ -805,7 +813,7 @@ except NameError:
 
 @bp.route("/internal/version", methods=["GET", "HEAD"])
 def internal_version():
-    if (os.environ.get("ENGINE_ENV") or "dev").lower() == "prod":
+    if _compute_env_mode(os.environ) == "prod":
         expected = os.environ.get("ENGINE_SERVICE_TOKEN") or ""
         got = request.headers.get("Authorization", "")
         if not expected or got != f"Bearer {expected}":

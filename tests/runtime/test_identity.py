@@ -40,3 +40,27 @@ def test_runtime_identity_paths_do_not_read_artifacts_or_identity_env():
             assert token not in text
         for token in banned_env:
             assert token not in text
+
+
+def test_reader_injected_emitter_receives_identity_kwargs(tmp_path, monkeypatch):
+    from flask import Flask
+    import adapter.http_reader as http_reader
+    from adapter.http_reader import get_reader_bp
+
+    a_path = tmp_path / "a.json"
+    b_path = tmp_path / "b.json"
+    a_path.write_text('{"person_uid":"a","mechanics":{"type":"Generator"}}', encoding="utf-8")
+    b_path.write_text('{"person_uid":"b","mechanics":{"type":"Projector"}}', encoding="utf-8")
+    seen = {}
+
+    def injected(a, b, *, engine_tag, invocation_tag, release_id):
+        seen.update({"engine_tag": engine_tag, "invocation_tag": invocation_tag, "release_id": release_id})
+        return b'{"ok":true}\n'
+
+    monkeypatch.setattr(http_reader, "ALLOWED_ROOT", tmp_path.resolve())
+    app = Flask(__name__)
+    app.register_blueprint(get_reader_bp(emit_fn=injected))
+    monkeypatch.setenv("APP_ENV", "dev")
+    resp = app.test_client().get(f"/reader?v=1&a={a_path}&b={b_path}&a_tz=UTC&b_tz=UTC")
+    assert resp.status_code == 200
+    assert seen == identity_meta()
