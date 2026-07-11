@@ -1,1 +1,1 @@
-{"presence":{"DATABASE_URL":true,"DB_ALLOW_BRIDGE_IN_PROD":false,"DB_BRIDGE_URL":true},"rails":{"ALLOW_NETWORK":"0","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"schema_version":3}
+{"rails":{"ALLOW_NETWORK":"0","LANG":"C","LC_ALL":"C","SAFE_MODE":"1","TZ":"UTC"},"schema_version":3}
