@@ -156,12 +156,16 @@ def test_close_report_mentions_matrix():
     assert "audit/qa/hde-epic022/token_evidence_matrix.md" in content, "Close report should point to the token matrix"
 
 
-def test_manifest_structure_matches_template():
-    template = json.loads(Path("audit/EPIC-018_MANIFEST.json").read_text(encoding="utf-8"))
+def test_manifest_has_epic022_named_close_pack_bindings():
     data = json.loads(MANIFEST.read_text(encoding="utf-8"))
-    assert set(data.keys()) == set(template.keys()), "Manifest keys should mirror the template"
-    assert data.get("epic_id") == "HDE-EPIC022", "Manifest epic_id should target EPIC022"
-    assert isinstance(data.get("tokens"), list), "Manifest tokens should be a list"
+    assert str(data.get("epic_id", "")).lower() == "hde-epic022"
+    key_outputs = data.get("key_outputs")
+    assert isinstance(key_outputs, dict)
+    assert key_outputs["close_manifest"] == "audit/EPIC-022_MANIFEST.json"
+    assert key_outputs["close_report"] == "audit/EPIC-022_close_report.md"
+    assert data["qa_step_manifest_path"] == (
+        "audit/qa/hde-epic022/qa_step_logs_manifest.json"
+    )
 
 
 def _parse_matrix_rows():
