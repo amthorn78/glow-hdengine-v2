@@ -29,9 +29,6 @@ def _cli_env() -> dict[str, str]:
             "LC_ALL": "C",
             "LANG": "C",
             "TZ": "UTC",
-            "ENGINE_TAG": "hdengine-dev",
-            "RELEASE_ID": "0" * 64,
-            "PRODUCT_INVOCATION_TAG": "INV-TEST",
         }
     )
     return env

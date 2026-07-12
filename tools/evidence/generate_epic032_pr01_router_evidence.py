@@ -2,6 +2,7 @@
 """Generate HDE-EPIC032 PR-01 narrative-router evidence artifacts."""
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
 import os
@@ -19,6 +20,7 @@ from adapter.http_reader import app
 from engine.serializer.canon import sercanon
 from engine.narratives import MISSING_NARRATIVE_KEY, get_pack, route_keys
 from engine.narratives.constants import BANDS, PERSPECTIVES
+from engine.runtime import identity_meta
 from engine.runtime.determinism_env import ensure_determinism_env
 
 KEY_TABLE_PATH = ROOT / "audit/gates/narratives/keys_10x4.table.json"
@@ -37,7 +39,7 @@ EXPECTED_CATEGORIES: tuple[str, ...] = (
     "balance",
 )
 EXPECTED_KEY_TABLE_ROWS = 40
-RELEASE_ID = "0" * 64
+RELEASE_ID = identity_meta()["release_id"]
 
 
 def _canonical_json_bytes(value: object) -> bytes:
@@ -207,7 +209,6 @@ def _run_cli_admin(category: str, band: str, perspective: str, admin_out: Path) 
             "TZ": "UTC",
             "SAFE_MODE": "1",
             "ALLOW_NETWORK": "0",
-            "RELEASE_ID": RELEASE_ID,
         }
     )
     cmd = [
@@ -329,12 +330,50 @@ def _generate_cli_http_log() -> None:
         raise SystemExit("ROUTER_CLI_HTTP_PARITY_FAILED")
 
 
-def main() -> None:
+def _capture_outputs() -> dict[Path, bytes]:
+    global KEY_TABLE_PATH, ABBA_LOG_PATH, CLI_HTTP_LOG_PATH
+
+    committed_paths = (KEY_TABLE_PATH, ABBA_LOG_PATH, CLI_HTTP_LOG_PATH)
+    with tempfile.TemporaryDirectory(prefix="hde_epic032_capture_") as tmp:
+        tmp_root = Path(tmp)
+        KEY_TABLE_PATH = tmp_root / "keys_10x4.table.json"
+        ABBA_LOG_PATH = tmp_root / "parity_abba.log"
+        CLI_HTTP_LOG_PATH = tmp_root / "cli_http_parity.log"
+        try:
+            _write_bytes(KEY_TABLE_PATH, _canonical_json_bytes(_key_table()))
+            _generate_abba_log()
+            _generate_cli_http_log()
+            captured = {
+                committed_paths[0]: KEY_TABLE_PATH.read_bytes(),
+                committed_paths[1]: ABBA_LOG_PATH.read_bytes(),
+                committed_paths[2]: CLI_HTTP_LOG_PATH.read_bytes(),
+            }
+        finally:
+            KEY_TABLE_PATH, ABBA_LOG_PATH, CLI_HTTP_LOG_PATH = committed_paths
+    return captured
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--check", action="store_true")
+    args = parser.parse_args(argv)
     ensure_determinism_env()
-    _write_bytes(KEY_TABLE_PATH, _canonical_json_bytes(_key_table()))
-    _generate_abba_log()
-    _generate_cli_http_log()
+    expected = _capture_outputs()
+
+    if args.check:
+        drift = [
+            path.relative_to(ROOT).as_posix()
+            for path, body in expected.items()
+            if not path.exists() or path.read_bytes() != body
+        ]
+        if drift:
+            raise SystemExit("DRIFT:" + ",".join(drift))
+        return 0
+
+    for path, body in expected.items():
+        _write_bytes(path, body)
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

@@ -1,5 +1,5 @@
 path: artifacts/ops/internal_version/headers_head.txt
-size_bytes: 128
-sha256: 5bc4d64d12bd4faea7f005a774a854f108b772f3404bf93922c87a4fce25829a
+size_bytes: 142
+sha256: 4449eb33f9f23c3f5b9a8fcedb35a06498d7c9f2567c81816e6135ed4e68b62e
 mtime_utc: 2025-12-06T04:06:36Z
 produced_at_utc: 2025-11-30T03:58:47Z

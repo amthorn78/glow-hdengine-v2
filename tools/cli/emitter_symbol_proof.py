@@ -148,7 +148,9 @@ def main(argv: list[str] | None = None) -> int:
     proofs = list(_parse_cli(args.cli_path, GOVERNED_HANDLERS))
     proof_body = _render_proof(proofs)
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(proof_body, encoding="utf-8")
+    encoded = proof_body.encode("utf-8")
+    if not args.output.exists() or args.output.read_bytes() != encoded:
+        args.output.write_bytes(encoded)
     failures = _failures(proofs)
     return 1 if failures else 0
 

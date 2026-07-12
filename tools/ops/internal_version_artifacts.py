@@ -35,7 +35,7 @@ _REQUEST_STEPS: list[dict[str, object]] = [
             "method": "GET",
             "path": "/internal/version",
         },
-        "artifacts": {"headers": "cond_if_none_match_headers.txt"},
+        "artifacts": {"headers": "headers_cond_if_none_match.txt"},
     },
     {
         "name": "conditional_if_modified_since",
@@ -44,7 +44,7 @@ _REQUEST_STEPS: list[dict[str, object]] = [
             "method": "GET",
             "path": "/internal/version",
         },
-        "artifacts": {"headers": "cond_if_modified_since_headers.txt"},
+        "artifacts": {"headers": "headers_cond_if_modified_since.txt"},
     },
 ]
 
@@ -87,8 +87,8 @@ def ensure_request_chain_manifest(
         digest_path,
         base_dir / "headers_get.txt",
         base_dir / "headers_head.txt",
-        base_dir / "cond_if_none_match_headers.txt",
-        base_dir / "cond_if_modified_since_headers.txt",
+        base_dir / "headers_cond_if_none_match.txt",
+        base_dir / "headers_cond_if_modified_since.txt",
         base_dir / "two_run_identity.log",
     ]
     _ensure_all_exist(required)
@@ -105,7 +105,12 @@ def ensure_request_chain_manifest(
     if manifest_path.exists():
         existing = manifest_path.read_bytes()
         if existing != manifest_bytes:
-            raise AssertionError("request_chain_manifest.json is not canonical or is stale")
+            if allow_create:
+                manifest_path.write_bytes(manifest_bytes)
+            else:
+                raise AssertionError(
+                    "request_chain_manifest.json is not canonical or is stale"
+                )
     elif allow_create:
         manifest_path.write_bytes(manifest_bytes)
     else:

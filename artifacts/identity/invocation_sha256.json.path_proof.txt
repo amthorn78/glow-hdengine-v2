@@ -1,0 +1,5 @@
+path: artifacts/identity/invocation_sha256.json
+size_bytes: 166
+sha256: f70565dd6dddd81419e9ef15246afa4b47f7dc4813aa25242ae111100172d985
+mtime_utc: 2026-07-11T14:44:35Z
+produced_at_utc: 2026-07-08T18:40:15Z

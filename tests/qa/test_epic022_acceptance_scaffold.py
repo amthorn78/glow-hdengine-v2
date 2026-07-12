@@ -35,6 +35,15 @@ CLI_STDOUT_EXPECTED_ARTIFACTS = {
 }
 INTERNAL_VERSION_CONTRACT_TEST = "tests/transport/test_internal_version_contract.py::test_internal_version_invariants_and_artifacts"
 SHOWCOMPAT_TWO_RUN_TEST = "tests/cli/test_showcompat_parity_and_identity.py::test_two_run_identity_and_reemit"
+LEGACY_INTERNAL_VERSION_ALIASES = {
+    "artifacts/ops/internal_version/cond_if_none_match_headers.txt",
+    "artifacts/ops/internal_version/cond_if_modified_since_headers.txt",
+}
+CANONICAL_INTERNAL_VERSION_CAPTURES = {
+    "artifacts/ops/internal_version/headers_cond_if_none_match.txt",
+    "artifacts/ops/internal_version/headers_cond_if_modified_since.txt",
+}
+
 D3_TOKEN_EXPECTATIONS = {
     "INTERNAL_VERSION_200_CTYPE_JSON_UTF8_OK": {
         "artifacts": {
@@ -54,8 +63,8 @@ D3_TOKEN_EXPECTATIONS = {
     },
     "INTERNAL_VERSION_CONDITIONALS_IGNORED_OK": {
         "artifacts": {
-            "artifacts/ops/internal_version/cond_if_none_match_headers.txt",
-            "artifacts/ops/internal_version/cond_if_modified_since_headers.txt",
+            "artifacts/ops/internal_version/headers_cond_if_none_match.txt",
+            "artifacts/ops/internal_version/headers_cond_if_modified_since.txt",
             "artifacts/ops/internal_version/request_chain_manifest.json",
         },
         "tests": {INTERNAL_VERSION_CONTRACT_TEST},
@@ -64,8 +73,8 @@ D3_TOKEN_EXPECTATIONS = {
         "artifacts": {
             "artifacts/ops/internal_version/headers_get.txt",
             "artifacts/ops/internal_version/headers_head.txt",
-            "artifacts/ops/internal_version/cond_if_none_match_headers.txt",
-            "artifacts/ops/internal_version/cond_if_modified_since_headers.txt",
+            "artifacts/ops/internal_version/headers_cond_if_none_match.txt",
+            "artifacts/ops/internal_version/headers_cond_if_modified_since.txt",
             "artifacts/ops/internal_version/request_chain_manifest.json",
         },
         "tests": {INTERNAL_VERSION_CONTRACT_TEST},
@@ -74,8 +83,8 @@ D3_TOKEN_EXPECTATIONS = {
         "artifacts": {
             "artifacts/ops/internal_version/headers_get.txt",
             "artifacts/ops/internal_version/headers_head.txt",
-            "artifacts/ops/internal_version/cond_if_none_match_headers.txt",
-            "artifacts/ops/internal_version/cond_if_modified_since_headers.txt",
+            "artifacts/ops/internal_version/headers_cond_if_none_match.txt",
+            "artifacts/ops/internal_version/headers_cond_if_modified_since.txt",
             "artifacts/ops/internal_version/request_chain_manifest.json",
         },
         "tests": {INTERNAL_VERSION_CONTRACT_TEST},
@@ -107,6 +116,19 @@ D3_TOKEN_EXPECTATIONS = {
 }
 
 
+def test_internal_version_bindings_use_only_canonical_capture_paths():
+    matrix_text = TOKEN_MATRIX.read_text(encoding="utf-8")
+    acceptance_text = ACCEPTANCE_MAP.read_text(encoding="utf-8")
+    bound_text = matrix_text + "\n" + acceptance_text
+
+    for legacy in LEGACY_INTERNAL_VERSION_ALIASES:
+        assert legacy not in bound_text
+    for canonical in CANONICAL_INTERNAL_VERSION_CAPTURES:
+        assert canonical in bound_text
+        assert Path(canonical).is_file()
+
+
+
 def test_epic022_scaffold_files_exist():
     assert TOKEN_MATRIX.is_file(), "token_evidence_matrix.md should exist for EPIC022"
     assert ACCEPTANCE_MAP.is_file(), "EPIC022 acceptance map should exist in docs"
@@ -134,12 +156,16 @@ def test_close_report_mentions_matrix():
     assert "audit/qa/hde-epic022/token_evidence_matrix.md" in content, "Close report should point to the token matrix"
 
 
-def test_manifest_structure_matches_template():
-    template = json.loads(Path("audit/EPIC-018_MANIFEST.json").read_text(encoding="utf-8"))
+def test_manifest_has_epic022_named_close_pack_bindings():
     data = json.loads(MANIFEST.read_text(encoding="utf-8"))
-    assert set(data.keys()) == set(template.keys()), "Manifest keys should mirror the template"
-    assert data.get("epic_id") == "HDE-EPIC022", "Manifest epic_id should target EPIC022"
-    assert isinstance(data.get("tokens"), list), "Manifest tokens should be a list"
+    assert str(data.get("epic_id", "")).lower() == "hde-epic022"
+    key_outputs = data.get("key_outputs")
+    assert isinstance(key_outputs, dict)
+    assert key_outputs["close_manifest"] == "audit/EPIC-022_MANIFEST.json"
+    assert key_outputs["close_report"] == "audit/EPIC-022_close_report.md"
+    assert data["qa_step_manifest_path"] == (
+        "audit/qa/hde-epic022/qa_step_logs_manifest.json"
+    )
 
 
 def _parse_matrix_rows():

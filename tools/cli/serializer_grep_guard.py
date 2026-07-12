@@ -128,7 +128,9 @@ def main(argv: list[str] | None = None) -> int:
 
     body = _render_log(Path.cwd(), scope, violations)
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(body, encoding="utf-8")
+    encoded = body.encode("utf-8")
+    if not args.output.exists() or args.output.read_bytes() != encoded:
+        args.output.write_bytes(encoded)
     return 1 if violations else 0
 
 

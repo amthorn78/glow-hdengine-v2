@@ -1,5 +1,5 @@
 path: artifacts/writer/conjunction_write_readback.log
-size_bytes: 710
-sha256: 896effc3b1cdda98e0f20edaf6002032ba19f461e2fffa6a4fa796e1e63b7fdb
+size_bytes: 760
+sha256: 4cb917d7c3a086c6e14e6b56c84c100adf7567cc0abffe594c798a8363793c32
 mtime_utc: 2026-06-26T08:32:24Z
 produced_at_utc: 2026-07-05T15:38:47Z

@@ -6,10 +6,11 @@ from flask import Blueprint, Response, request, Flask, g
 from threading import Lock
 from engine.presenter.emitter import emit_public
 from engine.serializer import canon
-from engine.runtime import emit_reader_public_bytes
+from engine.runtime import emit_reader_public_bytes, identity_admin, identity_meta
 from engine.narratives import emit_public_aux, get_pack
 from engine.compat.categories import CATEGORIES_ORDER_V1
 from engine.compat.compute import conjunction_public_resolved
+from engine.compat.identity import dev_compat_identity
 from engine.sampler.core import CandidateFeatures, ViewerProfile, sample_and_rank
 from adapter.no_io_guard import NoIoGuard
 from engine.compat.errors import error_envelope
@@ -350,16 +351,13 @@ def get_reader_bp(emit_fn=None):
         except ValueError as e:
             return _error(str(e))
 
-        engine_tag     = os.environ.get("ENGINE_TAG", "hdengine-alpha")
-        invocation_tag = os.environ.get("PRODUCT_INVOCATION_TAG", "INV-UNKNOWN")
-        release_id     = os.environ.get("RELEASE_ID", "0" * 64)
-
+        meta = identity_meta()
         body = emit_fn(
             a,
             b,
-            engine_tag=engine_tag,
-            invocation_tag=invocation_tag,
-            release_id=release_id,
+            engine_tag=meta["engine_tag"],
+            invocation_tag=meta["invocation_tag"],
+            release_id=meta["release_id"],
         )
         etag = "\"" + _sha256_hex(body) + "\""
         tokens = _parse_if_none_match(request.headers.get("If-None-Match"))
@@ -400,7 +398,7 @@ def get_reader_bp(emit_fn=None):
         viewer_top = request.args.get("viewer_top") or None
         flags = _collect_query_values("flags") or _collect_query_values("flag")
         families = tuple(_collect_query_values("families_fired"))
-        release_id = request.args.get("release_id") or os.environ.get("RELEASE_ID", "0" * 64)
+        release_id = request.args.get("release_id") or identity_meta()["release_id"]
         requested_pack_sha = request.args.get("pack_sha") or pack.pack_sha
 
         emission = emit_public_aux(
@@ -654,15 +652,16 @@ def get_reader_bp(emit_fn=None):
         def _local_lookup(user_id: str) -> dict[str, str] | None:
             return local_people.get(user_id)
 
+        compat_identity = dev_compat_identity()
         try:
             payload = conjunction_public_resolved(
                 left,
                 right,
                 viewer_top=CATEGORIES_ORDER_V1[0],
                 viewer_weights=_default_viewer_weights(),
-                engine_tag=os.environ.get("ENGINE_TAG", "hdengine-alpha"),
-                release_id=os.environ.get("RELEASE_ID", "0" * 64),
-                invocation_tag=os.environ.get("PRODUCT_INVOCATION_TAG", "INV-UNKNOWN"),
+                engine_tag=compat_identity["engine_tag"],
+                release_id=compat_identity["release_id"],
+                invocation_tag=compat_identity["invocation_tag"],
                 env=rails_env,
                 local_lookup=_local_lookup,
             )
@@ -799,69 +798,11 @@ def get_reader_bp(emit_fn=None):
 
 bp = get_reader_bp()
 
-_SERVICE_IDENTITY_PATH = Path("artifacts/identity/service_identity.json")
-_INVOCATION_PATH = Path("artifacts/invocation.json")
-_RELEASE_ID_PATH = Path("artifacts/math/release_id.txt")
-_EMITTER_SHA256_PATH = Path("artifacts/identity/emitter_sha256.txt")
-
-
 # === EPIC-005 /internal/version (Blueprint: bp) ===
-# 'bp', 'Response', and 'request' are already imported above
-# /internal/version stays DB-decoupled; no DB resolver imports or connections here.
-
-def _read_release_id() -> str:
-    try:
-        return _RELEASE_ID_PATH.read_text(encoding="utf-8").strip()
-    except FileNotFoundError:
-        manifest_path = Path("catalog/manifest.json")
-        manifest_obj = json.loads(manifest_path.read_text(encoding="utf-8"))
-        canonical_manifest = canon.sercanon(manifest_obj, sort_keys=True)
-        return hashlib.sha256(canonical_manifest).hexdigest()
-
-
-def _load_service_identity() -> dict[str, str]:
-    try:
-        raw = _SERVICE_IDENTITY_PATH.read_text(encoding="utf-8")
-    except FileNotFoundError:
-        return {}
-    try:
-        data = json.loads(raw)
-    except json.JSONDecodeError:
-        return {}
-    return data if isinstance(data, dict) else {}
-
-
-def _load_invocation_identity() -> tuple[str, str]:
-    try:
-        raw = _INVOCATION_PATH.read_text(encoding="utf-8")
-    except FileNotFoundError:
-        return "", ""
-    try:
-        data = json.loads(raw)
-    except json.JSONDecodeError:
-        return "", ""
-    invocation = data.get("invocation") if isinstance(data, dict) else {}
-    if not isinstance(invocation, dict):
-        return "", ""
-    return str(invocation.get("tag") or ""), str(invocation.get("sha256") or "")
-
+# /internal/version stays DB-decoupled and obtains immutable identity from the runtime authority.
 
 def _build_internal_version_payload() -> dict[str, str]:
-    identity = _load_service_identity()
-    invocation_tag, invocation_sha256 = _load_invocation_identity()
-    engine_tag = identity.get("engine_tag") or os.environ.get("ENGINE_TAG", "hdengine-alpha")
-    build_commit = identity.get("build_commit") or os.environ.get("BUILD_COMMIT", "unknown")
-    emitter_sha256 = identity.get("emitter_sha256") or (_EMITTER_SHA256_PATH.read_text(encoding="utf-8").strip() if _EMITTER_SHA256_PATH.exists() else os.environ.get("EMITTER_SHA256", "unknown"))
-    release_id = _read_release_id()
-    payload = {
-        "engine_tag": engine_tag,
-        "build_commit": build_commit,
-        "invocation_tag": invocation_tag or identity.get("invocation_tag") or os.environ.get("PRODUCT_INVOCATION_TAG", "INV-UNKNOWN"),
-        "invocation_sha256": invocation_sha256,
-        "emitter_sha256": emitter_sha256,
-        "release_id": release_id,
-    }
-    return payload
+    return identity_admin()
 
 
 # --- ensure blueprint exists for internal routes ---

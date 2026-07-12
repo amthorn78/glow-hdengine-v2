@@ -25,7 +25,6 @@ from engine.bodygraph.ingest import (
 )
 from engine.bodygraph.vendor_client import VendorError
 
-ENV_SNAPSHOT = Path("artifacts/runtime/env_matrix.snapshot.json")
 IDEMPOTENCY_LOG = INGEST_DIR / "idempotency_proof.log"
 ACCEPTANCE_FILE = INGEST_DIR / "_s9.acceptance.txt"
 VERIFY_OK_FILE = INGEST_DIR / "_s9.verify_ok.txt"
@@ -38,29 +37,6 @@ def _canonical_json(obj: Mapping[str, object]) -> str:
 
 def _print_json(payload: Mapping[str, object]) -> None:
     sys.stdout.write(_canonical_json(payload))
-
-
-def _capture_env_snapshot() -> None:
-    env = os.environ
-    payload = {
-        "schema": "v3",
-        "SAFE_MODE": env.get("SAFE_MODE"),
-        "ALLOW_NETWORK": env.get("ALLOW_NETWORK"),
-        "APP_ENV": env.get("APP_ENV"),
-        "LC_ALL": env.get("LC_ALL"),
-        "LANG": env.get("LANG"),
-        "TZ": env.get("TZ"),
-        "DATABASE_URL_present": bool(env.get("DATABASE_URL")),
-        "DB_BRIDGE_URL_present": bool(env.get("DB_BRIDGE_URL")),
-        "HDE_BASE_URL_present": bool(env.get("HDE_BASE_URL")),
-        "HD_API_KEY_present": bool(env.get("HD_API_KEY")),
-        "GEO_API_KEY_present": bool(env.get("GEO_API_KEY")),
-        "HDAPI_BASE_URL_present": bool(env.get("HDAPI_BASE_URL")),
-        "dev_stage_policy_posture": "open",
-        "prod_policy_posture": "closed",
-    }
-    ENV_SNAPSHOT.parent.mkdir(parents=True, exist_ok=True)
-    ENV_SNAPSHOT.write_text(_canonical_json(payload), encoding="utf-8")
 
 
 def _artifacts_exist(paths: Iterable[Path]) -> bool:
@@ -118,7 +94,6 @@ def _write_verify_file() -> None:
 
 
 def main() -> int:
-    _capture_env_snapshot()
     if _artifacts_exist(ARTIFACTS):
         _write_verify_file()
         _print_json({"status": "already_satisfied", "artifacts": "present"})

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-import datetime as _dt
 import hashlib
 import json
 import os
@@ -132,8 +131,12 @@ CONJUNCTION_PROBES: Sequence[Probe] = (
 )
 
 
-def _utc_now() -> str:
-    return _dt.datetime.now(tz=_dt.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+def _generated_at() -> str:
+    manifest = json.loads((ROOT / "catalog/manifest.json").read_text(encoding="utf-8"))
+    generated_at = manifest.get("built_at_utc")
+    if not isinstance(generated_at, str) or not generated_at.endswith("Z"):
+        raise ValueError("catalog_manifest_built_at_utc_invalid")
+    return generated_at
 
 
 def _sha256(data: bytes) -> str:
@@ -167,9 +170,17 @@ def _render_log_lines(rows: Iterable[Mapping[str, object]]) -> bytes:
     return ("\n".join(serialized) + "\n").encode("utf-8")
 
 
+def _stale_outputs(expected: Mapping[Path, bytes]) -> list[Path]:
+    return [
+        path
+        for path, expected_bytes in expected.items()
+        if not path.is_file() or path.read_bytes() != expected_bytes
+    ]
+
+
 def _run_gate(targets: Sequence[Target], *, check_only: bool = False) -> int:
     env = ensure_determinism_env(apply=True)
-    generated_at = _utc_now()
+    generated_at = _generated_at()
 
     check_rows: list[dict[str, object]] = []
     compare_rows: list[dict[str, object]] = []
@@ -331,55 +342,68 @@ def _run_gate(targets: Sequence[Target], *, check_only: bool = False) -> int:
                 }
             )
 
-    if not check_only:
-        check_bytes = _render_log_lines(check_rows)
-        compare_bytes = _render_log_lines(compare_rows)
-        gate_payload = {
-            "schema": "canonical_json.gate.v1",
-            "generated_at_utc": generated_at,
-            "status": "pass" if not failures else "fail",
-            "checked_targets": [target.rel_path for target in sorted(targets, key=lambda t: t.rel_path)],
-            "env": env,
-            "outputs": {
-                "check_log": "audit/gates/canonical_json/json_canonical_check.log",
-                "compare_log": "audit/gates/canonical_json/json_canon_compare.log",
-                "gate_summary": "audit/gates/canonical_json/canonical_json.gate.json",
-            },
-            "failures": failures,
-        }
+    check_bytes = _render_log_lines(check_rows)
+    compare_bytes = _render_log_lines(compare_rows)
+    gate_payload = {
+        "schema": "canonical_json.gate.v1",
+        "generated_at_utc": generated_at,
+        "status": "pass" if not failures else "fail",
+        "checked_targets": [
+            target.rel_path
+            for target in sorted(targets, key=lambda target: target.rel_path)
+        ],
+        "env": env,
+        "outputs": {
+            "check_log": "audit/gates/canonical_json/json_canonical_check.log",
+            "compare_log": "audit/gates/canonical_json/json_canon_compare.log",
+            "gate_summary": "audit/gates/canonical_json/canonical_json.gate.json",
+        },
+        "failures": failures,
+    }
+    json_gate_payload = {
+        "schema": "canonical_json.gate.v1",
+        "generated_at_utc": generated_at,
+        "status": "pass" if not failures else "fail",
+        "checked_targets": [
+            target.rel_path
+            for target in sorted(targets, key=lambda target: target.rel_path)
+        ],
+        "env": env,
+        "outputs": {
+            "check_log": "audit/gates/json_gate/canonical/json_gate_check_log.ndjson",
+            "compare_log": "audit/gates/json_gate/canonical/json_gate_compare_log.ndjson",
+            "structured_record": "audit/gates/json_gate/canonical/json_gate_structured_record.json",
+        },
+        "failures": failures,
+    }
+    outputs = {
+        CANON_DIR / "json_canonical_check.log": check_bytes,
+        CANON_DIR / "json_canon_compare.log": compare_bytes,
+        CANON_DIR / "canonical_json.gate.json": sercanon(
+            gate_payload,
+            sort_keys=True,
+        ),
+        JSON_GATE_DIR / "json_gate_check_log.ndjson": check_bytes,
+        JSON_GATE_DIR / "json_gate_compare_log.ndjson": compare_bytes,
+        JSON_GATE_DIR / "json_gate_structured_record.json": sercanon(
+            json_gate_payload,
+            sort_keys=True,
+        ),
+    }
 
-        json_gate_payload = {
-            "schema": "canonical_json.gate.v1",
-            "generated_at_utc": generated_at,
-            "status": "pass" if not failures else "fail",
-            "checked_targets": [target.rel_path for target in sorted(targets, key=lambda t: t.rel_path)],
-            "env": env,
-            "outputs": {
-                "check_log": "audit/gates/json_gate/canonical/json_gate_check_log.ndjson",
-                "compare_log": "audit/gates/json_gate/canonical/json_gate_compare_log.ndjson",
-                "structured_record": "audit/gates/json_gate/canonical/json_gate_structured_record.json",
-            },
-            "failures": failures,
-        }
-
-        _write_if_changed(CANON_DIR / "json_canonical_check.log", check_bytes)
-        _write_if_changed(CANON_DIR / "json_canon_compare.log", compare_bytes)
-        _write_if_changed(CANON_DIR / "canonical_json.gate.json", sercanon(gate_payload, sort_keys=True))
-        _write_path_proof("audit/gates/canonical_json/json_canonical_check.log", produced_at=generated_at)
-        _write_path_proof("audit/gates/canonical_json/json_canon_compare.log", produced_at=generated_at)
-        _write_path_proof("audit/gates/canonical_json/canonical_json.gate.json", produced_at=generated_at)
-        _write_if_changed(JSON_GATE_DIR / "json_gate_check_log.ndjson", check_bytes)
-        _write_if_changed(JSON_GATE_DIR / "json_gate_compare_log.ndjson", compare_bytes)
-        _write_if_changed(
-            JSON_GATE_DIR / "json_gate_structured_record.json",
-            sercanon(json_gate_payload, sort_keys=True),
+    if check_only:
+        failures.extend(
+            f"stale_gate_artifact:{path.relative_to(ROOT).as_posix()}"
+            for path in _stale_outputs(outputs)
         )
-        _write_path_proof("audit/gates/json_gate/canonical/json_gate_check_log.ndjson", produced_at=generated_at)
-        _write_path_proof("audit/gates/json_gate/canonical/json_gate_compare_log.ndjson", produced_at=generated_at)
-        _write_path_proof(
-            "audit/gates/json_gate/canonical/json_gate_structured_record.json",
-            produced_at=generated_at,
-        )
+    else:
+        for path, content in outputs.items():
+            _write_if_changed(path, content)
+        for path in outputs:
+            _write_path_proof(
+                path.relative_to(ROOT).as_posix(),
+                produced_at=generated_at,
+            )
 
     if failures:
         return 1

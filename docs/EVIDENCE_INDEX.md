@@ -137,12 +137,12 @@
 
 ## /internal/version identity bundle (D3)
 * Body and sha sidecar: `artifacts/ops/internal_version/body_get.json`, `artifacts/ops/internal_version/body_get.sha256`
-* Headers: `artifacts/ops/internal_version/headers_get.txt`, `artifacts/ops/internal_version/headers_head.txt`, `artifacts/ops/internal_version/cond_if_none_match_headers.txt`, `artifacts/ops/internal_version/cond_if_modified_since_headers.txt`
+* Headers: `artifacts/ops/internal_version/headers_get.txt`, `artifacts/ops/internal_version/headers_head.txt`, `artifacts/ops/internal_version/headers_cond_if_none_match.txt`, `artifacts/ops/internal_version/headers_cond_if_modified_since.txt`
 * Two-run identity log: `artifacts/ops/internal_version/two_run_identity.log`
 * Freeze-Pack SoT and schema: `catalog/manifest.json` (top-level keys exactly `root`, `version`, `built_at_utc`, `files`; no self-listing) with canonical bytes (UTF-8, ASCII-sorted keys, compact separators, one trailing `\n`); `release_id = sha256(canonical_bytes(catalog/manifest.json))`.
 * Evidence copy and evidence-only summaries: `artifacts/math/freeze_pack_manifest.json` is byte-identical to the SoT; `artifacts/math/manifest_snapshot.json` is evidence-only (not an identity input). Alternate manifest-like artifacts must be quarantined under different names/paths.
 * Supporting identity artifacts (must exist and be non-empty): `artifacts/math/release_id.txt`, `artifacts/math/release_id_recompute.log`, `artifacts/math/checksums_audit.log`, `artifacts/math/manifest_snapshot.json`, `artifacts/proofs/env_pins.txt`.
-* Validation entrypoints (closed rails; Python entrypoints in CI): `python scripts/release_id_recompute.py --check`, `python ci/checks/check_release_identity.sh` (runs the recompute check, schema/bytes validation, and evidence presence), and `python tools/evidence/run_sanity_pipeline.py` (runs the gate alongside other deterministic checks). `--check` writes the recompute log and sha sidecar; run in a clean workspace or discard local changes.
+* Validation entrypoints (closed rails; Python entrypoints in CI): `python scripts/release_id_recompute.py --check`, `python ci/checks/check_release_identity.sh` (runs the recompute check, schema/bytes validation, and evidence presence), and `python tools/evidence/run_sanity_pipeline.py` (runs the gate alongside other deterministic checks). `--check` is read-only and fails if any governed release artifact differs from deterministic expected bytes.
 * All governed with `.path_proof.txt` siblings and indexed in `docs/evidence/INDEX.json` / `artifacts/evidence_index.jsonl`
 * Known canon mismatch: PF20 references a provenance note for D3, while implementation follows the PF10 posture via the governed two-run/coupling log as the provenance proof.
 

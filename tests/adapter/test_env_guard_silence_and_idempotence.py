@@ -16,7 +16,7 @@ def test_success_is_silent_and_idempotent(caplog):
     assert len(caplog.records) == 0
 
 def test_failure_is_idempotent_and_keys_sorted():
-    env = _prod_env({"ALLOW_NETWORK": "0", "HD_ADMIN": "false"})  # both count as 'present'
+    env = _prod_env({"ENGINE_PROVIDER": "0", "HD_ADMIN": "false"})
     with pytest.raises(EnvGuardError) as e1:
         validate_or_fail(env)
     with pytest.raises(EnvGuardError) as e2:

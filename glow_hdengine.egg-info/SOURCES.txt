@@ -35,6 +35,7 @@ engine/compat/categories.py
 engine/compat/compute.py
 engine/compat/error_tokens.py
 engine/compat/errors.py
+engine/compat/identity.py
 engine/compat/ordering.py
 engine/compat/thresholds.py
 engine/compat/ts_v0.py
@@ -91,6 +92,7 @@ engine/providers/vendor_http.py
 engine/providers/vendor_http_hdapi.py
 engine/runtime/__init__.py
 engine/runtime/determinism_env.py
+engine/runtime/identity.py
 engine/runtime/public.py
 engine/sampler/__init__.py
 engine/sampler/core.py
