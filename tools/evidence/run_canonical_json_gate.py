@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-import datetime as _dt
 import hashlib
 import json
 import os
@@ -132,8 +131,12 @@ CONJUNCTION_PROBES: Sequence[Probe] = (
 )
 
 
-def _utc_now() -> str:
-    return _dt.datetime.now(tz=_dt.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+def _generated_at() -> str:
+    manifest = json.loads((ROOT / "catalog/manifest.json").read_text(encoding="utf-8"))
+    generated_at = manifest.get("built_at_utc")
+    if not isinstance(generated_at, str) or not generated_at.endswith("Z"):
+        raise ValueError("catalog_manifest_built_at_utc_invalid")
+    return generated_at
 
 
 def _sha256(data: bytes) -> str:
@@ -169,7 +172,7 @@ def _render_log_lines(rows: Iterable[Mapping[str, object]]) -> bytes:
 
 def _run_gate(targets: Sequence[Target], *, check_only: bool = False) -> int:
     env = ensure_determinism_env(apply=True)
-    generated_at = _utc_now()
+    generated_at = _generated_at()
 
     check_rows: list[dict[str, object]] = []
     compare_rows: list[dict[str, object]] = []
