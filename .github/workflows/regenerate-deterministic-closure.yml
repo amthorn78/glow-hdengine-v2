@@ -1,0 +1,64 @@
+name: Regenerate deterministic closure evidence
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - synchronize
+
+permissions:
+  contents: write
+
+jobs:
+  regenerate:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    env:
+      LC_ALL: C
+      LANG: C
+      TZ: UTC
+      SAFE_MODE: "1"
+      ALLOW_NETWORK: "0"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install -U pip
+      - run: test -f requirements.txt && python -m pip install -r requirements.txt || true
+      - run: test -f requirements-dev.txt && python -m pip install -r requirements-dev.txt || true
+      - run: python -m pip install -e . pytest
+      - name: Regenerate deterministic closure
+        run: python tools/evidence/regenerate_identity_closure.py
+      - name: Verify nonwriting closure
+        env:
+          PIP_NO_INDEX: "1"
+        run: |
+          before="$(git status --porcelain)"
+          python tools/evidence/regenerate_identity_closure.py --check
+          after="$(git status --porcelain)"
+          test "$before" = "$after"
+      - name: Verify governed evidence
+        run: |
+          python tools/evidence/update_evidence_index.py --check
+          python tools/evidence/orientation_demo.py --check
+          python ci/checks/check_mirror_schema.sh
+          bash ci/checks/check_evidence_index_hash.sh
+          bash ci/checks/check_final_lf.sh
+          python tools/evidence/validate_evidence_paths.py
+      - name: Commit canonical outputs
+        run: |
+          git status --short
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Closure evidence already current"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "refresh deterministic closure evidence"
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
