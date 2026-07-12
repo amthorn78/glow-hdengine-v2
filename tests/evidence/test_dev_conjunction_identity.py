@@ -4,9 +4,13 @@ import json
 import os
 import subprocess
 import sys
+import types
 from pathlib import Path
 
+import pytest
+
 from engine.compat.identity import dev_compat_identity
+from tools.evidence import generate_conjunction_writer_evidence as generator
 
 ARTIFACTS = (
     Path("artifacts/writer/conjunction_write_readback.log"),
@@ -48,3 +52,43 @@ def test_dev_conjunction_identity_evidence_is_current_and_nonwriting():
         "release_id": "dev",
         "invocation_tag": "INV-DEV",
     }
+
+
+def test_check_mode_neutralizes_database_url_and_preserves_artifacts(monkeypatch):
+    sentinel_dsn = "postgresql://sentinel-user:sentinel-pass@example.invalid:5432/hde"
+    connect_calls: list[str] = []
+
+    def fail_if_connect_called(*args, **kwargs):
+        connect_calls.append("connect")
+        pytest.fail("psycopg.connect must not be called by --check")
+
+    monkeypatch.setenv("DATABASE_URL", sentinel_dsn)
+    for key, value in OPEN_DEV_RAILS.items():
+        monkeypatch.setenv(key, value)
+    monkeypatch.setitem(
+        sys.modules,
+        "psycopg",
+        types.SimpleNamespace(connect=fail_if_connect_called),
+    )
+    before = {path: path.read_bytes() for path in ARTIFACTS}
+
+    assert generator.main(["--check"]) == 0
+
+    assert connect_calls == []
+    assert {path: path.read_bytes() for path in ARTIFACTS} == before
+    assert os.environ["DATABASE_URL"] == sentinel_dsn
+
+
+def test_check_mode_restores_database_url_when_capture_fails(monkeypatch):
+    sentinel_dsn = "postgresql://sentinel-user:sentinel-pass@example.invalid:5432/hde"
+    monkeypatch.setenv("DATABASE_URL", sentinel_dsn)
+
+    def fail_capture():
+        raise RuntimeError("expected capture failure")
+
+    monkeypatch.setattr(generator, "_capture_outputs", fail_capture)
+
+    with pytest.raises(RuntimeError, match="expected capture failure"):
+        generator.main(["--check"])
+
+    assert os.environ["DATABASE_URL"] == sentinel_dsn
