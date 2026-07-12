@@ -6,6 +6,7 @@ from pathlib import Path
 
 from engine.serializer import canon
 from scripts import release_id_recompute
+from tools.evidence import regenerate_identity_closure
 
 
 def _manifest_bytes(path: str, body: bytes) -> bytes:
@@ -135,3 +136,23 @@ def test_release_check_mode_does_not_write(tmp_path, monkeypatch):
 
     assert rc == 0
     assert {path: path.read_bytes() for path in before} == before
+
+
+def test_cut_time_release_refresh_updates_only_release_field():
+    old_release = "1" * 64
+    new_release = "2" * 64
+    source = (
+        '_CUT_TIME_IDENTITY = {\n'
+        '    "engine_tag": "hdengine@prod",\n'
+        f'    "release_id": "{old_release}",\n'
+        '}\n'
+    )
+
+    updated = regenerate_identity_closure._replace_cut_time_release_id(
+        source,
+        new_release,
+    )
+
+    assert f'"release_id": "{new_release}"' in updated
+    assert "hdengine@prod" in updated
+    assert old_release not in updated
