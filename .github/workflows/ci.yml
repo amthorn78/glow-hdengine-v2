@@ -29,14 +29,7 @@ jobs:
           PIP_NO_INDEX: "1"
         run: |
           git diff --exit-code
-          python scripts/release_id_recompute.py --check
-          python tools/evidence/generate_identity_provenance.py --check
-          python tools/evidence/generate_release_bindings.py --check
-          python tools/cli/generate_showcompat_artifacts.py --check
-          python tools/cli/generate_cli_conformance_artifacts.py --check
-          python tools/evidence/update_evidence_index.py --check
-          python tools/evidence/orientation_demo.py --check
-          python -m pytest             tests/qa/test_epic022_acceptance_scaffold.py             tests/qa/test_epic022_close_pack_ready.py             tests/evidence/test_aux_preview_identity_parity.py             tests/evidence/test_release_manifest_content_binding.py
+          python tools/evidence/regenerate_identity_closure.py --check
           git diff --exit-code
       # D3 (HDE-EPIC018): CLI serializer/emitter guards (PF09/PF19 rails)
       - run: python tools/cli/serializer_grep_guard.py
