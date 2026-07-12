@@ -87,3 +87,51 @@ def test_committed_release_manifest_entries_match_repository_bytes():
         body = source.read_bytes()
         assert entry["sha256"] == hashlib.sha256(body).hexdigest()
         assert entry["size"] == len(body)
+
+
+def test_release_check_mode_does_not_write(tmp_path, monkeypatch):
+    source = tmp_path / "payload.txt"
+    source.write_bytes(b"stable\n")
+    catalog = tmp_path / "catalog"
+    catalog.mkdir()
+    manifest_path = catalog / "manifest.json"
+    manifest_bytes = _manifest_bytes("payload.txt", source.read_bytes())
+    manifest_path.write_bytes(manifest_bytes)
+
+    freeze_path = tmp_path / "freeze.json"
+    freeze_path.write_bytes(manifest_bytes)
+    release_id_path = tmp_path / "release_id.txt"
+    release_id_path.write_text(
+        hashlib.sha256(manifest_bytes).hexdigest() + "\n",
+        encoding="utf-8",
+    )
+    log_path = tmp_path / "release.log"
+    log_path.write_bytes(b"preserve-me\n")
+    sidecar_path = log_path.with_suffix(log_path.suffix + ".sha256")
+    sidecar_path.write_bytes(b"preserve-sidecar\n")
+
+    monkeypatch.setattr(release_id_recompute, "require_closed_rails", lambda: None)
+    before = {
+        path: path.read_bytes()
+        for path in (
+            manifest_path,
+            freeze_path,
+            release_id_path,
+            log_path,
+            sidecar_path,
+        )
+    }
+
+    rc = release_id_recompute.recompute(
+        manifest_path=manifest_path,
+        freeze_path=freeze_path,
+        release_id_path=release_id_path,
+        manifest_snapshot_path=tmp_path / "snapshot.json",
+        checksums_path=tmp_path / "checksums.log",
+        env_pins_path=tmp_path / "env.txt",
+        log_path=log_path,
+        check=True,
+    )
+
+    assert rc == 0
+    assert {path: path.read_bytes() for path in before} == before
