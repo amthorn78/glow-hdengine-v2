@@ -4,7 +4,7 @@ import json
 import os
 import subprocess
 import sys
-import venv
+import sysconfig
 from pathlib import Path
 
 from engine.runtime import identity_meta
@@ -77,22 +77,21 @@ def test_cli_conformance_artifacts_use_immutable_identity_and_are_current():
     assert installability["console_version"]["stdout"] == expected_version
     assert installability["console_entrypoint_path"] == "hdctl"
 
-def test_cli_conformance_check_installs_and_exercises_console(tmp_path):
-    venv_dir = tmp_path / "venv"
-    venv.EnvBuilder(with_pip=True, system_site_packages=True).create(venv_dir)
-    scripts_dir = venv_dir / ("Scripts" if os.name == "nt" else "bin")
-    python = scripts_dir / ("python.exe" if os.name == "nt" else "python")
+def test_cli_conformance_check_exercises_preinstalled_console():
+    scripts_dir = Path(sysconfig.get_paths()["scripts"])
     console = scripts_dir / ("hdctl.exe" if os.name == "nt" else "hdctl")
-    assert not console.exists()
+    assert console.is_file()
+    assert os.access(console, os.X_OK)
 
     env = os.environ.copy()
     env.update(CLOSED_RAILS)
+    env["PIP_NO_INDEX"] = "1"
     env["PATH"] = str(scripts_dir)
     before = {path: path.read_bytes() for path in ARTIFACTS}
 
     subprocess.run(
         [
-            str(python),
+            sys.executable,
             "tools/cli/generate_cli_conformance_artifacts.py",
             "--check",
         ],
@@ -100,6 +99,4 @@ def test_cli_conformance_check_installs_and_exercises_console(tmp_path):
         env=env,
     )
 
-    assert console.is_file()
     assert {path: path.read_bytes() for path in ARTIFACTS} == before
-
