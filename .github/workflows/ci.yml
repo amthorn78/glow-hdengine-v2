@@ -35,7 +35,7 @@ jobs:
       - run: python tools/cli/serializer_grep_guard.py
       - run: python tools/cli/emitter_symbol_proof.py
       - name: Run canonical JSON gate (closed rails)
-        run: python tools/evidence/run_canonical_json_gate.py
+        run: python tools/evidence/run_canonical_json_gate.py --check-only
       - run: python tools/order/generate_ordering_artifacts.py --check
       - run: python tools/evidence/update_evidence_index.py --check
       - run: python tools/evidence/orientation_demo.py --check
