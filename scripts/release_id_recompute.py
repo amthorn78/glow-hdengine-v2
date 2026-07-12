@@ -273,7 +273,7 @@ def recompute(
                     ],
                 },
                 "release_id": eval_result.expected_release_id,
-                "produced_at_utc": _utcnow_iso(),
+                "produced_at_utc": eval_result.manifest_obj.built_at_utc,
             }
             _write_bytes(manifest_snapshot_path, canon.sercanon(snapshot_payload, sort_keys=True))
         _write_env_pins(env_pins_path)
@@ -286,9 +286,17 @@ def recompute(
             release_id_path=release_id_path,
         )
 
+    if check:
+        return 0 if not eval_result.problems else 1
+
+    produced_at_utc = (
+        eval_result.manifest_obj.built_at_utc
+        if eval_result.manifest_obj is not None
+        else ""
+    )
     log_lines = [
         "release_id_recompute",
-        f"produced_at_utc={_utcnow_iso()}",
+        f"produced_at_utc={produced_at_utc}",
         f"manifest_sha256={eval_result.manifest_digest}",
         f"release_id_txt={eval_result.release_id_value or ''}",
         f"expected_release_id={eval_result.expected_release_id}",
