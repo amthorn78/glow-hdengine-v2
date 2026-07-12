@@ -88,6 +88,7 @@ def _write_closure() -> None:
     _run("tools/cli/generate_showcompat_artifacts.py")
     _run("tools/cli/generate_cli_conformance_artifacts.py")
     _run("tools/evidence/generate_epic032_pr01_router_evidence.py")
+    _run("tools/evidence/run_canonical_json_gate.py")
     _run(
         "-m",
         "pytest",
@@ -107,6 +108,7 @@ def _check_closure() -> None:
     _run("tools/cli/generate_showcompat_artifacts.py", "--check")
     _run("tools/cli/generate_cli_conformance_artifacts.py", "--check")
     _run("tools/evidence/generate_epic032_pr01_router_evidence.py", "--check")
+    _run("tools/evidence/run_canonical_json_gate.py", "--check-only")
     _run("tools/evidence/update_evidence_index.py", "--check")
     _run("tools/evidence/orientation_demo.py", "--check")
     _run(
