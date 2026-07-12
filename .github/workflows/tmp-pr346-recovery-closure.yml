@@ -1,9 +1,9 @@
 name: Temporary PR 346 recovery closure
 
 on:
-  push:
-    branches:
-      - codex/implement-pr-01-identity-and-evidence-foundations
+  pull_request:
+    types:
+      - synchronize
 
 permissions:
   contents: write
