@@ -83,6 +83,7 @@ def _write_closure() -> None:
     _run("scripts/release_id_recompute.py", "--refresh-manifest")
     _refresh_cut_time_identity()
     _run("scripts/release_id_recompute.py", "--check")
+    _run("tools/evidence/generate_env_matrix_snapshot.py")
     _run("tools/evidence/generate_identity_provenance.py")
     _run("tools/evidence/generate_release_bindings.py")
     _run("tools/cli/generate_showcompat_artifacts.py")

@@ -8,7 +8,7 @@ import json
 import os
 import sys
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, Mapping
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
@@ -38,9 +38,13 @@ def _write_bytes(path: Path, data: bytes) -> None:
     path.write_bytes(data)
 
 
+def _sha256_sidecar_bytes(path: Path, digest: str) -> bytes:
+    return f"{digest}  {path.as_posix()}\n".encode("utf-8")
+
+
 def _write_sha256_sidecar(path: Path, digest: str) -> None:
     sidecar = path.with_suffix(path.suffix + ".sha256")
-    _write_text(sidecar, f"{digest}  {path.as_posix()}\n")
+    _write_bytes(sidecar, _sha256_sidecar_bytes(path, digest))
 
 
 def _compute_manifest_bytes(manifest_path: Path) -> tuple[Manifest | None, bytes, bytes, list[str]]:
@@ -110,7 +114,7 @@ def _refresh_manifest_entries(manifest_path: Path) -> None:
     manifest_path.write_bytes(canon.sercanon(payload, sort_keys=True))
 
 
-def _write_env_pins(env_pins_path: Path) -> None:
+def _env_pins_bytes() -> bytes:
     pins = [
         ("ALLOW_NETWORK", "0"),
         ("LANG", "C"),
@@ -119,7 +123,7 @@ def _write_env_pins(env_pins_path: Path) -> None:
         ("TZ", "UTC"),
     ]
     lines = [f"{key}={value}" for key, value in pins]
-    _write_text(env_pins_path, "\n".join(lines) + "\n")
+    return ("\n".join(lines) + "\n").encode("utf-8")
 
 
 class _EvalResult(tuple):
@@ -214,6 +218,107 @@ def _evaluate_state(
     )
 
 
+def _release_log_bytes(eval_result: _EvalResult) -> bytes:
+    produced_at_utc = (
+        eval_result.manifest_obj.built_at_utc
+        if eval_result.manifest_obj is not None
+        else ""
+    )
+    log_lines = [
+        "release_id_recompute",
+        f"produced_at_utc={produced_at_utc}",
+        f"manifest_sha256={eval_result.manifest_digest}",
+        f"release_id_txt={eval_result.release_id_value or ''}",
+        f"expected_release_id={eval_result.expected_release_id}",
+        f"freeze_pack_sha256={eval_result.freeze_digest or ''}",
+        f"match={str(not eval_result.problems).lower()}",
+        f"problems_count={len(eval_result.problems)}",
+    ]
+    log_lines.extend(f"problem={problem}" for problem in eval_result.problems)
+    return ("\n".join(log_lines) + "\n").encode("utf-8")
+
+
+def _expected_evidence_outputs(
+    eval_result: _EvalResult,
+    *,
+    manifest_path: Path,
+    freeze_path: Path,
+    release_id_path: Path,
+    manifest_snapshot_path: Path,
+    checksums_path: Path,
+    env_pins_path: Path,
+    log_path: Path,
+    schema_report_path: Path | None,
+) -> dict[Path, bytes]:
+    release_bytes = (eval_result.expected_release_id + "\n").encode("utf-8")
+    outputs = {
+        freeze_path: eval_result.canonical_bytes,
+        freeze_path.with_suffix(freeze_path.suffix + ".sha256"): _sha256_sidecar_bytes(
+            freeze_path,
+            eval_result.manifest_digest,
+        ),
+        release_id_path: release_bytes,
+        release_id_path.with_suffix(release_id_path.suffix + ".sha256"): _sha256_sidecar_bytes(
+            release_id_path,
+            hashlib.sha256(release_bytes).hexdigest(),
+        ),
+        env_pins_path: _env_pins_bytes(),
+    }
+
+    if eval_result.manifest_obj is not None:
+        audit = _audit_files(
+            eval_result.manifest_obj,
+            repo_root=manifest_path.parent.parent,
+        )
+        outputs[checksums_path] = ("\n".join(audit) + "\n").encode("utf-8")
+        snapshot_payload = {
+            "manifest": {
+                "root": eval_result.manifest_obj.root,
+                "version": eval_result.manifest_obj.version,
+                "built_at_utc": eval_result.manifest_obj.built_at_utc,
+                "files": [
+                    {"path": entry.path, "sha256": entry.sha256, "size": entry.size}
+                    for entry in eval_result.manifest_obj.files
+                ],
+            },
+            "release_id": eval_result.expected_release_id,
+            "produced_at_utc": eval_result.manifest_obj.built_at_utc,
+        }
+        outputs[manifest_snapshot_path] = canon.sercanon(
+            snapshot_payload,
+            sort_keys=True,
+        )
+
+    log_bytes = _release_log_bytes(eval_result)
+    outputs[log_path] = log_bytes
+    outputs[log_path.with_suffix(log_path.suffix + ".sha256")] = _sha256_sidecar_bytes(
+        log_path,
+        hashlib.sha256(log_bytes).hexdigest(),
+    )
+    if schema_report_path is not None:
+        schema_payload = {
+            "ok": not eval_result.problems,
+            "issues": eval_result.problems,
+        }
+        outputs[schema_report_path] = (
+            json.dumps(
+                schema_payload,
+                separators=(",", ":"),
+                ensure_ascii=False,
+            )
+            + "\n"
+        ).encode("utf-8")
+    return outputs
+
+
+def _stale_outputs(expected: Mapping[Path, bytes]) -> list[Path]:
+    return [
+        path
+        for path, expected_bytes in expected.items()
+        if not path.is_file() or path.read_bytes() != expected_bytes
+    ]
+
+
 def recompute(
     *,
     manifest_path: Path | str = Path("catalog/manifest.json"),
@@ -250,66 +355,36 @@ def recompute(
     )
     if not check:
         _write_bytes(freeze_path, eval_result.canonical_bytes)
-        _write_sha256_sidecar(freeze_path, eval_result.manifest_digest)
         _write_text(release_id_path, eval_result.expected_release_id + "\n")
-        _write_sha256_sidecar(
-            release_id_path,
-            hashlib.sha256((eval_result.expected_release_id + "\n").encode("utf-8")).hexdigest(),
-        )
-        if eval_result.manifest_obj is not None:
-            audit = _audit_files(
-                eval_result.manifest_obj,
-                repo_root=manifest_path.parent.parent,
-            )
-            _write_text(checksums_path, "\n".join(audit) + "\n")
-            snapshot_payload = {
-                "manifest": {
-                    "root": eval_result.manifest_obj.root,
-                    "version": eval_result.manifest_obj.version,
-                    "built_at_utc": eval_result.manifest_obj.built_at_utc,
-                    "files": [
-                        {"path": entry.path, "sha256": entry.sha256, "size": entry.size}
-                        for entry in eval_result.manifest_obj.files
-                    ],
-                },
-                "release_id": eval_result.expected_release_id,
-                "produced_at_utc": eval_result.manifest_obj.built_at_utc,
-            }
-            _write_bytes(manifest_snapshot_path, canon.sercanon(snapshot_payload, sort_keys=True))
-        _write_env_pins(env_pins_path)
-        if schema_report_path:
-            schema_payload = {"ok": not eval_result.problems, "issues": eval_result.problems}
-            _write_text(schema_report_path, json.dumps(schema_payload, separators=(",", ":"), ensure_ascii=False) + "\n")
         eval_result = _evaluate_state(
             manifest_path=manifest_path,
             freeze_path=freeze_path,
             release_id_path=release_id_path,
         )
 
-    if check:
-        return 0 if not eval_result.problems else 1
-
-    produced_at_utc = (
-        eval_result.manifest_obj.built_at_utc
-        if eval_result.manifest_obj is not None
-        else ""
+    expected_outputs = _expected_evidence_outputs(
+        eval_result,
+        manifest_path=manifest_path,
+        freeze_path=freeze_path,
+        release_id_path=release_id_path,
+        manifest_snapshot_path=manifest_snapshot_path,
+        checksums_path=checksums_path,
+        env_pins_path=env_pins_path,
+        log_path=log_path,
+        schema_report_path=schema_report_path,
     )
-    log_lines = [
-        "release_id_recompute",
-        f"produced_at_utc={produced_at_utc}",
-        f"manifest_sha256={eval_result.manifest_digest}",
-        f"release_id_txt={eval_result.release_id_value or ''}",
-        f"expected_release_id={eval_result.expected_release_id}",
-        f"freeze_pack_sha256={eval_result.freeze_digest or ''}",
-    ]
-    log_lines.append(f"match={str(not eval_result.problems).lower()}")
-    log_lines.append(f"problems_count={len(eval_result.problems)}")
-    for problem in eval_result.problems:
-        log_lines.append(f"problem={problem}")
 
-    _write_text(log_path, "\n".join(log_lines) + "\n")
-    _write_sha256_sidecar(log_path, hashlib.sha256("\n".join(log_lines).encode("utf-8") + b"\n").hexdigest())
+    if check:
+        stale_paths = _stale_outputs(expected_outputs)
+        if stale_paths:
+            print(
+                "STALE:" + ",".join(path.as_posix() for path in stale_paths),
+                file=sys.stderr,
+            )
+        return 0 if not eval_result.problems and not stale_paths else 1
 
+    for path, data in expected_outputs.items():
+        _write_bytes(path, data)
     return 0 if not eval_result.problems else 1
 
 
