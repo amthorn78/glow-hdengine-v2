@@ -35,6 +35,15 @@ CLI_STDOUT_EXPECTED_ARTIFACTS = {
 }
 INTERNAL_VERSION_CONTRACT_TEST = "tests/transport/test_internal_version_contract.py::test_internal_version_invariants_and_artifacts"
 SHOWCOMPAT_TWO_RUN_TEST = "tests/cli/test_showcompat_parity_and_identity.py::test_two_run_identity_and_reemit"
+LEGACY_INTERNAL_VERSION_ALIASES = {
+    "artifacts/ops/internal_version/cond_if_none_match_headers.txt",
+    "artifacts/ops/internal_version/cond_if_modified_since_headers.txt",
+}
+CANONICAL_INTERNAL_VERSION_CAPTURES = {
+    "artifacts/ops/internal_version/headers_cond_if_none_match.txt",
+    "artifacts/ops/internal_version/headers_cond_if_modified_since.txt",
+}
+
 D3_TOKEN_EXPECTATIONS = {
     "INTERNAL_VERSION_200_CTYPE_JSON_UTF8_OK": {
         "artifacts": {
@@ -54,8 +63,8 @@ D3_TOKEN_EXPECTATIONS = {
     },
     "INTERNAL_VERSION_CONDITIONALS_IGNORED_OK": {
         "artifacts": {
-            "artifacts/ops/internal_version/cond_if_none_match_headers.txt",
-            "artifacts/ops/internal_version/cond_if_modified_since_headers.txt",
+            "artifacts/ops/internal_version/headers_cond_if_none_match.txt",
+            "artifacts/ops/internal_version/headers_cond_if_modified_since.txt",
             "artifacts/ops/internal_version/request_chain_manifest.json",
         },
         "tests": {INTERNAL_VERSION_CONTRACT_TEST},
@@ -64,8 +73,8 @@ D3_TOKEN_EXPECTATIONS = {
         "artifacts": {
             "artifacts/ops/internal_version/headers_get.txt",
             "artifacts/ops/internal_version/headers_head.txt",
-            "artifacts/ops/internal_version/cond_if_none_match_headers.txt",
-            "artifacts/ops/internal_version/cond_if_modified_since_headers.txt",
+            "artifacts/ops/internal_version/headers_cond_if_none_match.txt",
+            "artifacts/ops/internal_version/headers_cond_if_modified_since.txt",
             "artifacts/ops/internal_version/request_chain_manifest.json",
         },
         "tests": {INTERNAL_VERSION_CONTRACT_TEST},
@@ -74,8 +83,8 @@ D3_TOKEN_EXPECTATIONS = {
         "artifacts": {
             "artifacts/ops/internal_version/headers_get.txt",
             "artifacts/ops/internal_version/headers_head.txt",
-            "artifacts/ops/internal_version/cond_if_none_match_headers.txt",
-            "artifacts/ops/internal_version/cond_if_modified_since_headers.txt",
+            "artifacts/ops/internal_version/headers_cond_if_none_match.txt",
+            "artifacts/ops/internal_version/headers_cond_if_modified_since.txt",
             "artifacts/ops/internal_version/request_chain_manifest.json",
         },
         "tests": {INTERNAL_VERSION_CONTRACT_TEST},
@@ -105,6 +114,19 @@ D3_TOKEN_EXPECTATIONS = {
         "tests": {INTERNAL_VERSION_CONTRACT_TEST},
     },
 }
+
+
+def test_internal_version_bindings_use_only_canonical_capture_paths():
+    matrix_text = TOKEN_MATRIX.read_text(encoding="utf-8")
+    acceptance_text = ACCEPTANCE_MAP.read_text(encoding="utf-8")
+    bound_text = matrix_text + "\n" + acceptance_text
+
+    for legacy in LEGACY_INTERNAL_VERSION_ALIASES:
+        assert legacy not in bound_text
+    for canonical in CANONICAL_INTERNAL_VERSION_CAPTURES:
+        assert canonical in bound_text
+        assert Path(canonical).is_file()
+
 
 
 def test_epic022_scaffold_files_exist():
