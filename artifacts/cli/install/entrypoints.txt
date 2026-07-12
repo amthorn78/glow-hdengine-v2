@@ -4,6 +4,6 @@ module_help_cmd=python -m engine.cli --help
 script_help_cmd=python scripts/hdctl.py --help
 console_help_cmd=hdctl --help
 console_version_cmd=hdctl --version
-install_step=SUCCESS (pip install --no-deps -e . with PEP 517 build isolation)
+install_step=EXTERNAL_PRECONDITION (real hdctl wrapper required before closed-rails evidence generation)
 console_entrypoint_available=true
 console_entrypoint_path=hdctl

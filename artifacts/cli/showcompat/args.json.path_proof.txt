@@ -1,5 +1,5 @@
 path: artifacts/cli/showcompat/args.json
 size_bytes: 822
-sha256: 875048470b150dadbb0e654baadebb3ce3d474336477020966ba24b7295e4c96
+sha256: cdf0ca67d2dbfa995fcf80111e096adf09836e133bfa064a82a9bdba0f438a18
 mtime_utc: 2025-12-19T05:17:15Z
 produced_at_utc: 2025-11-30T03:58:47Z
