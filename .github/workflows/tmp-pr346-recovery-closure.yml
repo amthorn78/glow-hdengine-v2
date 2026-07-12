@@ -22,7 +22,6 @@ jobs:
       LC_ALL: C
       LANG: C
       TZ: UTC
-      PIP_NO_INDEX: "1"
     steps:
       - uses: actions/checkout@v4
         with:
