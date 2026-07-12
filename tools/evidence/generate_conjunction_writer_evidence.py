@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+from contextlib import contextmanager
 import hashlib
 import json
 import os
@@ -18,6 +19,7 @@ from engine.serializer import canon
 
 WRITE_READBACK_LOG = ROOT / "artifacts/writer/conjunction_write_readback.log"
 WRITER_SUMMARY = ROOT / "artifacts/writer/conjunction_writer_summary.json"
+_ENV_UNSET = object()
 
 QUERY = {
     "a_user_id": "left",
@@ -160,13 +162,28 @@ def _capture_outputs() -> dict[Path, bytes]:
     }
 
 
+@contextmanager
+def _non_persistent_check_capture():
+    """Run check capture without enabling the dev writer database persistence path."""
+    original_database_url = os.environ.get("DATABASE_URL", _ENV_UNSET)
+    try:
+        os.environ.pop("DATABASE_URL", None)
+        yield
+    finally:
+        if original_database_url is _ENV_UNSET:
+            os.environ.pop("DATABASE_URL", None)
+        else:
+            os.environ["DATABASE_URL"] = original_database_url
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args(argv)
-    expected = _capture_outputs()
 
     if args.check:
+        with _non_persistent_check_capture():
+            expected = _capture_outputs()
         drift = [
             path.relative_to(ROOT).as_posix()
             for path, body in expected.items()
@@ -176,6 +193,7 @@ def main(argv: list[str] | None = None) -> int:
             raise SystemExit("DRIFT:" + ",".join(drift))
         return 0
 
+    expected = _capture_outputs()
     for path, body in expected.items():
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(body)
