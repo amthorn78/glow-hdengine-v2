@@ -71,10 +71,10 @@ def _compute_manifest_bytes(manifest_path: Path) -> tuple[Manifest | None, bytes
     return manifest_obj, manifest_bytes, canonical_bytes, problems
 
 
-def _audit_files(manifest: Manifest) -> list[str]:
+def _audit_files(manifest: Manifest, *, repo_root: Path = ROOT) -> list[str]:
     audit: list[str] = []
     for entry in manifest.files:
-        path = Path(entry.path)
+        path = repo_root / entry.path
         if not path.exists():
             audit.append(f"MISSING {entry.path}")
             continue
@@ -88,6 +88,26 @@ def _audit_files(manifest: Manifest) -> list[str]:
     if not audit:
         audit.append("EMPTY")
     return audit
+
+
+def _refresh_manifest_entries(manifest_path: Path) -> None:
+    repo_root = manifest_path.parent.parent
+    payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+    entries = payload.get("files") if isinstance(payload, dict) else None
+    if not isinstance(entries, list):
+        raise ValueError("manifest_files_invalid")
+
+    for entry in entries:
+        if not isinstance(entry, dict) or not isinstance(entry.get("path"), str):
+            raise ValueError("manifest_entry_invalid")
+        disk_path = repo_root / entry["path"]
+        if not disk_path.is_file():
+            raise FileNotFoundError(f"manifest_source_missing:{entry['path']}")
+        disk_bytes = disk_path.read_bytes()
+        entry["sha256"] = hashlib.sha256(disk_bytes).hexdigest()
+        entry["size"] = len(disk_bytes)
+
+    manifest_path.write_bytes(canon.sercanon(payload, sort_keys=True))
 
 
 def _write_env_pins(env_pins_path: Path) -> None:
@@ -177,6 +197,11 @@ def _evaluate_state(
 
     if manifest_obj is None:
         problems.append("manifest_unvalidated")
+    else:
+        repo_root = manifest_path.parent.parent
+        for audit_line in _audit_files(manifest_obj, repo_root=repo_root):
+            if not audit_line.startswith("PASS "):
+                problems.append(f"manifest_file_audit:{audit_line}")
 
     return _EvalResult(
         manifest_obj,
@@ -200,6 +225,7 @@ def recompute(
     log_path: Path | str = Path("artifacts/math/release_id_recompute.log"),
     schema_report_path: Path | str | None = None,
     check: bool = False,
+    refresh_manifest: bool = False,
 ) -> int:
     require_closed_rails()
 
@@ -211,6 +237,11 @@ def recompute(
     env_pins_path = Path(env_pins_path)
     log_path = Path(log_path)
     schema_report_path = Path(schema_report_path) if schema_report_path else None
+
+    if refresh_manifest:
+        if check:
+            raise ValueError("refresh_manifest_is_write_only")
+        _refresh_manifest_entries(manifest_path)
 
     eval_result = _evaluate_state(
         manifest_path=manifest_path,
@@ -226,7 +257,10 @@ def recompute(
             hashlib.sha256((eval_result.expected_release_id + "\n").encode("utf-8")).hexdigest(),
         )
         if eval_result.manifest_obj is not None:
-            audit = _audit_files(eval_result.manifest_obj)
+            audit = _audit_files(
+                eval_result.manifest_obj,
+                repo_root=manifest_path.parent.parent,
+            )
             _write_text(checksums_path, "\n".join(audit) + "\n")
             snapshot_payload = {
                 "manifest": {
@@ -275,8 +309,19 @@ def main(argv: Iterable[str] | None = None) -> int:  # pragma: no cover
     parser = argparse.ArgumentParser(description="Recompute and validate release_id from the canonical manifest")
     parser.add_argument("--manifest", default="catalog/manifest.json", help="Path to the source-of-truth manifest")
     parser.add_argument("--check", action="store_true", help="Fail non-zero on mismatches without suppressing writes")
+    parser.add_argument(
+        "--refresh-manifest",
+        action="store_true",
+        help="Refresh manifest file hashes and sizes before regenerating release artifacts",
+    )
     args = parser.parse_args(list(argv) if argv is not None else None)
-    return recompute(manifest_path=Path(args.manifest), check=args.check)
+    if args.check and args.refresh_manifest:
+        parser.error("--refresh-manifest cannot be combined with --check")
+    return recompute(
+        manifest_path=Path(args.manifest),
+        check=args.check,
+        refresh_manifest=args.refresh_manifest,
+    )
 
 
 if __name__ == "__main__":  # pragma: no cover
