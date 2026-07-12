@@ -19,6 +19,7 @@ from adapter.http_reader import app
 from engine.serializer.canon import sercanon
 from engine.narratives import MISSING_NARRATIVE_KEY, get_pack, route_keys
 from engine.narratives.constants import BANDS, PERSPECTIVES
+from engine.runtime import identity_meta
 from engine.runtime.determinism_env import ensure_determinism_env
 
 KEY_TABLE_PATH = ROOT / "audit/gates/narratives/keys_10x4.table.json"
@@ -37,7 +38,7 @@ EXPECTED_CATEGORIES: tuple[str, ...] = (
     "balance",
 )
 EXPECTED_KEY_TABLE_ROWS = 40
-RELEASE_ID = "0" * 64
+RELEASE_ID = identity_meta()["release_id"]
 
 
 def _canonical_json_bytes(value: object) -> bytes:
@@ -207,7 +208,6 @@ def _run_cli_admin(category: str, band: str, perspective: str, admin_out: Path) 
             "TZ": "UTC",
             "SAFE_MODE": "1",
             "ALLOW_NETWORK": "0",
-            "RELEASE_ID": RELEASE_ID,
         }
     )
     cmd = [
