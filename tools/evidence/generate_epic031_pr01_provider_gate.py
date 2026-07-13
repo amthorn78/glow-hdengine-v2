@@ -279,7 +279,6 @@ def _evidence_payloads() -> dict[str, object]:
 
 def _expected_outputs() -> dict[str, str]:
     outputs: dict[str, str] = {}
-    outputs.update(JOB_FILES)
     outputs["artifacts/vendor/policies_pinned.md"] = POLICIES_PINNED
     outputs["artifacts/vendor/retry_after_parse.log"] = "".join(_json_line(item) for item in RETRY_AFTER_PARSE)
     for rel, payload in _evidence_payloads().items():
@@ -325,8 +324,6 @@ def main() -> int:
         return _check_mode()
 
     ensure_determinism_env()
-    for rel, text in JOB_FILES.items():
-        _write(rel, text)
     _write_governed("artifacts/vendor/policies_pinned.md", POLICIES_PINNED)
     _write_governed("artifacts/vendor/retry_after_parse.log", "".join(_json_line(item) for item in RETRY_AFTER_PARSE))
     for rel, payload in _evidence_payloads().items():

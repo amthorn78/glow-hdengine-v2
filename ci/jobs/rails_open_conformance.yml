@@ -5,12 +5,12 @@ rails:
   LC_ALL: C
   LANG: C
   TZ: UTC
-scope: hde-epic031-pr-01-fixture-backed-only
+scope: reusable-hde-rails-open-conformance-fixture-backed-mocked-non-live
 live_vendor_calls: forbidden
 steps:
   - command: python -m pytest tests/bodygraph/test_vendor_client.py -q
     proves:
-      - open rails provider policy is local and mocked
-      - retry/backoff behavior is bounded and jitter-free
-      - HTTP 429 maps to PROVIDER_RATE_LIMITED and is not retried
-      - Retry-After delta-seconds and HTTP-date parsing are deterministic
+      - open rails provider policy is local fixture-backed mocked and non-live
+      - retry timeout and backoff profile sets are pinned integer values with no jitter
+      - retries occur only for network_error and 5xx while HTTP 429 and other 4xx are not retried
+      - redirects are not followed and Retry-After parsing is deterministic

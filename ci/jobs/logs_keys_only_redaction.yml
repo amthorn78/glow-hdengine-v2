@@ -5,14 +5,14 @@ rails:
   LC_ALL: C
   LANG: C
   TZ: UTC
-scope: hde-epic031-pr-02-local-deterministic
+scope: reusable-hde-rails-keys-only-redaction-local-deterministic
 live_vendor_calls: forbidden
 steps:
-  - command: python tools/evidence/generate_epic031_pr02_log_posture.py --check
+  - command: python tools/evidence/generate_rails_gate_evidence.py --check
     proves:
       - SAFE rails vendor logs are keys-only and payload-free
-      - plaintext secrets and raw secret headers are absent from governed samples
-      - route, outcome, rails_state, timeout_profile, and failure classes are bounded
+      - plaintext secrets raw secret headers bodies payloads and birth data are absent from governed samples
+      - route outcome rails_state timeout_profile retry metadata and failure classes are bounded
   - command: python -m pytest tests/bodygraph/test_vendor_client.py tests/bodygraph/test_resolver_vendor.py -q
     proves:
       - local mocked provider log posture remains tested without live vendor calls
