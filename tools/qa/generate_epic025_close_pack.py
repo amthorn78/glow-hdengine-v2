@@ -76,7 +76,6 @@ def _required_paths() -> list[Path]:
 
 def _optional_paths() -> list[Path]:
     return [
-        ROOT / "artifacts" / "proofs" / "encoding_invariance.txt",
         ROOT / "artifacts" / "cli" / "showcompat" / "stdout.json",
         ROOT / "artifacts" / "cli" / "showcompat" / "stdout.json.sha256",
         ROOT / "artifacts" / "cli" / "showcompat" / "args.json",
@@ -165,7 +164,6 @@ def _key_output_entries() -> dict[str, str]:
         outputs[f"qa_log_{check_id}"] = f"audit/qa/hde-epic025/checks/{check_id}/primary.log"
 
     optional_map = {
-        "encoding_invariance": "artifacts/proofs/encoding_invariance.txt",
         "showcompat_stdout_json": "artifacts/cli/showcompat/stdout.json",
         "showcompat_stdout_sha256": "artifacts/cli/showcompat/stdout.json.sha256",
         "showcompat_args_json": "artifacts/cli/showcompat/args.json",

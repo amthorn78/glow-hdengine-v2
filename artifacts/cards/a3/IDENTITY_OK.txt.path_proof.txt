@@ -1,0 +1,5 @@
+path: artifacts/cards/a3/IDENTITY_OK.txt
+size_bytes: 111
+sha256: 88e48239a5a3ec45c7ccf67cb1a3c460c9db164a01ef7ae2e6e2e5d7de88e66d
+mtime_utc: 2026-07-13T01:49:32Z
+produced_at_utc: 2026-07-12T00:52:16Z

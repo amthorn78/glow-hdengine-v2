@@ -56,7 +56,6 @@ TOKENS: list[dict[str, object]] = [
         "status": "implemented",
         "evidence_titles": [
             "artifacts/proofs/success_encoding_invariance.txt",
-            "artifacts/proofs/encoding_invariance.txt",
         ],
     },
     {
@@ -131,7 +130,7 @@ TOKEN_MATRIX_ROWS: list[dict[str, str]] = [
     {
         "token_name": "A7_ENCODING_INVARIANCE_OK",
         "owner_pf": "PF04 — Canon-HDE-Governance §2.0 Acceptance Tokens",
-        "evidence_artifacts": "artifacts/proofs/success_encoding_invariance.txt; artifacts/proofs/encoding_invariance.txt",
+        "evidence_artifacts": "artifacts/proofs/success_encoding_invariance.txt",
         "ci_tests_jobs": "python -m pytest -q tests/http/test_reader_a7_transport.py",
         "qa_root_logs": "acceptance_map_viability.log",
         "status": "Implemented",
@@ -256,7 +255,6 @@ def _ensure_required_paths() -> None:
         ROOT / "artifacts" / "proofs" / "success_head.txt",
         ROOT / "artifacts" / "proofs" / "success_304.txt",
         ROOT / "artifacts" / "proofs" / "success_encoding_invariance.txt",
-        ROOT / "artifacts" / "proofs" / "encoding_invariance.txt",
         ROOT / "artifacts" / "proofs" / "endpoints_env_gate_proof.log",
         ROOT / "catalog" / "magic10.json",
         ROOT / "engine" / "compat" / "categories.py",

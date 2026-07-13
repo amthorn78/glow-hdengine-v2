@@ -1,3 +1,5 @@
-HTTP/1.0 405 METHOD NOT ALLOWED
-cache-control: no-store
-etag: <absent>
+POST /reader
+status=405
+cache_control=no-store
+etag_absent=true
+conditional_not_304=true
