@@ -22,8 +22,8 @@ def catalog_obj():
  {'a7_eligible':False,'blueprint_module':'adapter.http_reader','classification':'dev_harness','description':'Conjunction sampler preview route (dev-only)','env_gate':'APP_ENV in {dev,test,local}','internal':True,'method':'GET','path':'/dev/sampler/conjunction','rails_profile':'dev-harness closed-by-default SAFE rails'},
  {'a7_eligible':False,'blueprint_module':'adapter.http_reader','classification':'internal_identity','description':'Internal version endpoint for ops evidence','env_gate':'operator-network-only','internal':True,'method':'GET','path':'/internal/version','rails_profile':'ops-only no-store'},
  {'a7_eligible':False,'blueprint_module':'adapter.http_reader','classification':'internal_identity','description':'Internal version endpoint for ops evidence','env_gate':'operator-network-only','internal':True,'method':'HEAD','path':'/internal/version','rails_profile':'ops-only no-store'},
- {'a7_eligible':True,'blueprint_module':'adapter.http_reader','classification':'public_reader','description':'Reader success route','env_gate':'APP_ENV=dev','internal':False,'method':'GET','path':'/reader','rails_profile':'public-reader reader a7'},
- {'a7_eligible':True,'blueprint_module':'adapter.http_reader','classification':'public_reader','description':'Reader success route','env_gate':'APP_ENV=dev','internal':False,'method':'HEAD','path':'/reader','rails_profile':'public-reader reader a7'},]
+ {'a7_eligible':True,'blueprint_module':'adapter.http_reader','classification':'dev_harness','description':'Reader success route (dev-only governed A7 proof surface)','env_gate':'APP_ENV=dev','internal':True,'method':'GET','path':'/reader','rails_profile':'dev-harness reader a7'},
+ {'a7_eligible':True,'blueprint_module':'adapter.http_reader','classification':'dev_harness','description':'Reader success route (dev-only governed A7 proof surface)','env_gate':'APP_ENV=dev','internal':True,'method':'HEAD','path':'/reader','rails_profile':'dev-harness reader a7'},]
  return {'endpoints':eps,'generated_at_utc':TS,'success_endpoints':[{'method':'GET','path':'/reader'}]}
 def validate_catalog(cat):
  if set(cat)!={'endpoints','generated_at_utc','success_endpoints'}: raise ValueError('catalog top-level keys invalid')
@@ -48,7 +48,7 @@ def validate_catalog(cat):
  matches=[e for e in cat['endpoints'] if e['method']==d['method'] and e['path']==d['path']]
  if len(matches)!=1: raise ValueError('success designation unresolved or ambiguous')
  e=matches[0]
- if e['path']!='/reader' or not e['a7_eligible'] or e['internal']: raise ValueError('invalid A7 target')
+ if e['path']!='/reader' or not e['a7_eligible'] or e['classification']!='dev_harness' or e['internal'] is not True: raise ValueError('invalid A7 target')
  return e
 def headers(resp): return {k.lower():v for k,v in resp.headers.items()}
 def q():
@@ -87,7 +87,8 @@ def validate_composite(obj):
  if [e['accept_encoding'] for e in obj['tested_encodings']]!=['identity','gzip','br']: raise ValueError('bad encodings')
 def build():
  cat, body, comp=capture(); validate_composite(comp); catb=cjson(cat); snap=cjson({'json_success':[{'method':'GET','path':'/reader'}]})
- outs={DOC:catb,DOCSHA:(f"{sha(catb)}  docs/ENDPOINTS_CATALOG.json\n").encode(),AUD:catb,AUDSHA:(f"{sha(catb)}  artifacts/audit/ENDPOINTS_CATALOG.json\n").encode(),SNAP:snap,PROOFS[0]:b'APP_ENV=prod\n/reader_success_unreachable=true\ncache_control=no-store\netag_absent=true\n',PROOFS[1]:(f"status=200\nbody_sha256={comp['get_200']['body_sha256']}\netag={comp['etag']}\n").encode(),PROOFS[2]:(f"status=200\nbody_empty=true\ncontent_length={comp['head_200']['content_length']}\netag={comp['etag']}\n").encode(),PROOFS[3]:(f"status=304\nbody_empty=true\ncontent_type_absent=true\ncontent_length_absent=true\netag={comp['etag']}\n").encode(),PROOFS[4]:b'POST /reader\nstatus=405\ncache_control=no-store\netag_absent=true\nconditional_not_304=true\n',PROOFS[5]:cjson({'tested_encodings':['identity','gzip','br'],'identity_etag':comp['etag'],'compression_claimed':False,'pass':True}),PROOFS[6]:cjson(comp)}
+ gh=comp['get_200']['headers']; hh=comp['head_200']['headers']
+ outs={DOC:catb,DOCSHA:(f"{sha(catb)}  docs/ENDPOINTS_CATALOG.json\n").encode(),AUD:catb,AUDSHA:(f"{sha(catb)}  artifacts/audit/ENDPOINTS_CATALOG.json\n").encode(),SNAP:snap,PROOFS[0]:b'APP_ENV=prod\n/reader_success_unreachable=true\ncache_control=no-store\netag_absent=true\n',PROOFS[1]:(f"status=200\nbody_sha256={comp['get_200']['body_sha256']}\netag={comp['etag']}\ncontent-type={gh.get('content-type')}\ncache-control={gh.get('cache-control')}\nvary={gh.get('vary')}\ncontent-length={gh.get('content-length')}\n").encode(),PROOFS[2]:(f"status=200\nbody_empty=true\ncontent_length={comp['head_200']['content_length']}\netag={comp['etag']}\ncontent-type={hh.get('content-type')}\ncache-control={hh.get('cache-control')}\nvary={hh.get('vary')}\ncontent-length={hh.get('content-length')}\n").encode(),PROOFS[3]:(f"status=304\nbody_empty=true\ncontent_type_absent=true\ncontent_length_absent=true\netag={comp['etag']}\ncache-control={comp['after_304']['headers'].get('cache-control')}\nvary={comp['after_304']['headers'].get('vary')}\n").encode(),PROOFS[4]:b'POST /reader\nstatus=405\ncache_control=no-store\netag_absent=true\nconditional_not_304=true\n',PROOFS[5]:cjson({'tested_encodings':['identity','gzip','br'],'identity_etag':comp['etag'],'compression_claimed':False,'pass':True}),PROOFS[6]:cjson(comp)}
  return outs
 def main():
  ap=argparse.ArgumentParser(); ap.add_argument('--check',action='store_true'); ns=ap.parse_args(); ensure_determinism_env(); outs=build()

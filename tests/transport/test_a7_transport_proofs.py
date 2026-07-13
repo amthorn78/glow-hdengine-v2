@@ -8,7 +8,11 @@ def invalid(mut):
     c=cat(); mut(c); 
     with pytest.raises(ValueError): g.validate_catalog(c)
 
-def test_valid_unique_reader_designation(): assert g.validate_catalog(cat())['path']=='/reader'
+def test_valid_unique_reader_designation():
+    target = g.validate_catalog(cat())
+    assert target['path']=='/reader'
+    assert target['classification']=='dev_harness'
+    assert target['internal'] is True
 def test_no_designation(): invalid(lambda c: c.__setitem__('success_endpoints', []))
 def test_duplicate_designation(): invalid(lambda c: c.__setitem__('success_endpoints', [{'method':'GET','path':'/reader'},{'method':'GET','path':'/reader'}]))
 def test_ambiguous_designation(): invalid(lambda c: c['endpoints'].append(dict(c['endpoints'][-2])))
@@ -29,6 +33,11 @@ def test_capture_get_head_304_writer_encoding_env_and_restore():
     comp=json.loads(outs[g.PROOFS[6]])
     assert comp['get_200']['pass'] and comp['head_200']['pass'] and comp['after_304']['pass']
     g.validate_composite(comp)
+    proof = outs[g.PROOFS[1]].decode()
+    assert 'content-type=application/json; charset=utf-8' in proof
+    assert 'cache-control=private, max-age=0, must-revalidate' in proof
+    assert 'vary=Authorization, Accept-Encoding' in proof
+    assert 'content-length=' in proof
 def test_composite_unknown_key_rejected():
     comp=json.loads(g.build()[g.PROOFS[6]]); comp['unknown']=True
     with pytest.raises(ValueError): g.validate_composite(comp)

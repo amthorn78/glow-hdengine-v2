@@ -1,3 +1,7 @@
 status=200
 body_sha256=bfe4773ad9985f34d2101edf80be7eb4b0340212e335983bd4918f3fef672385
 etag="bfe4773ad9985f34d2101edf80be7eb4b0340212e335983bd4918f3fef672385"
+content-type=application/json; charset=utf-8
+cache-control=private, max-age=0, must-revalidate
+vary=Authorization, Accept-Encoding
+content-length=330

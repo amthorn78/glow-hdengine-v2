@@ -3,3 +3,5 @@ body_empty=true
 content_type_absent=true
 content_length_absent=true
 etag="bfe4773ad9985f34d2101edf80be7eb4b0340212e335983bd4918f3fef672385"
+cache-control=private, max-age=0, must-revalidate
+vary=Authorization, Accept-Encoding

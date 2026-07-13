@@ -10,8 +10,8 @@ def test_endpoint_catalog_schema_is_strict_and_valid():
     target = validate_catalog(cat)
     assert target["method"] == "GET"
     assert target["path"] == "/reader"
-    assert target["classification"] == "public_reader"
-    assert target["internal"] is False
+    assert target["classification"] == "dev_harness"
+    assert target["internal"] is True
 
 def test_all_endpoint_methods_are_strings_and_internal_is_boolean():
     for entry in _catalog()["endpoints"]:
