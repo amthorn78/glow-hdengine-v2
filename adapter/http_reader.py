@@ -535,7 +535,8 @@ def get_reader_bp(emit_fn=None):
 
     # Discovery: internal/dev surfaces (e.g., /reader, ops probes) gate via APP_ENV
     # and return writer-style envelopes for errors. Reuse that posture here for
-    # the sampler harness while keeping it out of public catalogs/A7.
+    # the sampler harness. The route is included in the internal Endpoint
+    # Catalog inventory, but excluded from A7 and public contracts.
     def _dev_admin_gate() -> Response | None:
         raw_app_env = os.environ.get("APP_ENV")
         app_env = raw_app_env.strip().lower() if raw_app_env is not None else None
@@ -702,7 +703,8 @@ def get_reader_bp(emit_fn=None):
         Notes:
         - Mirrors the dev sampler CLI (PR3) but keeps the CLI as the primary harness.
         - Uses the sampler core directly (PR2) and echoes seed only (PF09 DISS003.5).
-        - Dev/admin gated via APP_ENV and excluded from public catalogs/A7 (PF04/PF05).
+        - Dev/admin gated via APP_ENV; internal Endpoint Catalog inventory only,
+          excluded from A7 and public contracts (PF04/PF05).
         """
 
         g._log_override = {"route": "internal.dev.sampler"}

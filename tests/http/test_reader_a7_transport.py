@@ -1,4 +1,3 @@
-import hashlib
 import os
 from pathlib import Path
 
@@ -23,32 +22,6 @@ def _reader_query_params() -> dict[str, str]:
         "a_tz": "UTC",
         "b_tz": "UTC",
     }
-
-
-def _format_status(resp) -> str:
-    status_text = resp.status.split(" ", 1)[1] if " " in resp.status else ""
-    return f"HTTP/1.0 {resp.status_code} {status_text}".rstrip()
-
-
-def _write_headers_proof(path: Path, resp, header_order: list[str]) -> None:
-    lines = [_format_status(resp)]
-    headers = {key.lower(): value for key, value in resp.headers.items()}
-    for key in header_order:
-        if key in headers:
-            lines.append(f"{key}: {headers[key]}")
-        else:
-            lines.append(f"{key}: <absent>")
-    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
-
-
-def _write_encoding_proof(path: Path, *, etag_identity: str, etag_gzip: str) -> None:
-    lines = [
-        "ENCODING_INVARIANCE",
-        f"etag_identity={etag_identity}",
-        f"etag_gzip={etag_gzip}",
-        f"match={str(etag_identity == etag_gzip).lower()}",
-    ]
-    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
 @pytest.mark.epic025
@@ -109,47 +82,3 @@ def test_reader_a7_transport_invariants(monkeypatch):
     assert post_resp.status_code == 405
     assert "ETag" not in post_resp.headers
     assert post_resp.headers.get("Cache-Control") == "no-store"
-
-    write_proofs = os.environ.get("HDE_WRITE_A7_PROOFS") == "1"
-    if not write_proofs:
-        return
-
-    proof_dir = Path("artifacts/proofs")
-    proof_dir.mkdir(parents=True, exist_ok=True)
-
-    with monkeypatch.context() as gate_ctx:
-        gate_ctx.setenv("APP_ENV", "prod")
-        blocked_resp = client.get("/reader", query_string=params)
-
-    _write_headers_proof(
-        proof_dir / "endpoints_env_gate_proof.log",
-        blocked_resp,
-        ["cache-control", "content-type", "etag"],
-    )
-
-    _write_headers_proof(
-        proof_dir / "success_get.txt",
-        get_resp_identity,
-        ["etag", "content-type", "cache-control", "vary", "content-length"],
-    )
-    _write_headers_proof(
-        proof_dir / "success_head.txt",
-        head_resp,
-        ["etag", "content-type", "cache-control", "vary", "content-length"],
-    )
-    _write_headers_proof(
-        proof_dir / "success_304.txt",
-        cond_resp,
-        ["etag", "cache-control", "vary", "content-type", "content-length"],
-    )
-    _write_headers_proof(
-        proof_dir / "success_writers_errors.txt",
-        post_resp,
-        ["cache-control", "etag"],
-    )
-    etag_gzip = get_resp_gzip.headers.get("ETag", "")
-    _write_encoding_proof(
-        proof_dir / "success_encoding_invariance.txt",
-        etag_identity=etag,
-        etag_gzip=etag_gzip,
-    )

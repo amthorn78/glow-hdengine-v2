@@ -2526,6 +2526,18 @@ FORCE_REFRESH_ARTIFACT_RELS: set[str] = {
     "docs/evidence/INDEX.json",
     "docs/evidence/INDEX.sha256",
     "audit/gates/topology/orientation_demo.txt",
+    "docs/ENDPOINTS_CATALOG.json",
+    "docs/ENDPOINTS_CATALOG.json.sha256",
+    "artifacts/audit/ENDPOINTS_CATALOG.json",
+    "artifacts/audit/ENDPOINTS_CATALOG.json.sha256",
+    "artifacts/reader/endpoints_snapshot.json",
+    "artifacts/proofs/endpoints_env_gate_proof.log",
+    "artifacts/proofs/success_get.txt",
+    "artifacts/proofs/success_head.txt",
+    "artifacts/proofs/success_304.txt",
+    "artifacts/proofs/success_writers_errors.txt",
+    "artifacts/proofs/success_encoding_invariance.txt",
+    "artifacts/proofs/reader_success_get_head_304.json",
 }
 STALE_PROOF_TRIGGER_RELS: set[str] = FORCE_REFRESH_ARTIFACT_RELS - {
     "artifacts/evidence_index.jsonl",
@@ -2555,7 +2567,33 @@ NON_BACKDATED_PROOF_RELS: set[str] = {
     *EPIC036_PR01_ARTIFACT_RELS,
     "artifacts/evidence_index.jsonl",
     "artifacts/evidence_index.jsonl.sha256",
+    *FORCE_REFRESH_ARTIFACT_RELS,
 }
+
+
+def _validate_epic038_pr02_semantics() -> None:
+    from tools.evidence import generate_a7_transport_proofs as a7
+
+    summary_path = ROOT / "audit/gates/parity/reader_cli/summary.json"
+    if summary_path.exists():
+        summary = json.loads(summary_path.read_text(encoding="utf-8"))
+        gate = summary.get("canonical_gate")
+        if summary.get("top_level_pass") is not True or not isinstance(gate, dict) or gate.get("passed") is not True or "command" not in gate:
+            raise SystemExit("EPIC038_PR02_DETERMINISM_CANON_GATE_INVALID")
+
+    cat = json.loads((ROOT / "docs/ENDPOINTS_CATALOG.json").read_text(encoding="utf-8"))
+    a7.validate_catalog(cat)
+    snap = json.loads((ROOT / "artifacts/reader/endpoints_snapshot.json").read_text(encoding="utf-8"))
+    if set(snap) != {"generated_at_utc", "endpoints", "envelope_keys"}:
+        raise SystemExit("EPIC038_PR02_ENDPOINT_SNAPSHOT_SHAPE")
+    if snap["endpoints"] != ["GET /reader"]:
+        raise SystemExit("EPIC038_PR02_ENDPOINT_SNAPSHOT_TARGETS")
+    comp = json.loads((ROOT / "artifacts/proofs/reader_success_get_head_304.json").read_text(encoding="utf-8"))
+    a7.validate_composite(comp)
+    enc = (ROOT / "artifacts/proofs/success_encoding_invariance.txt").read_text(encoding="utf-8")
+    for token in ("identity_etag=", "gzip_etag=", "br_etag=", "identity_head_identity_length=", "gzip_head_identity_length=", "br_head_identity_length=", "pass=true"):
+        if token not in enc:
+            raise SystemExit("EPIC038_PR02_ENCODING_PROOF_INSUFFICIENT")
 
 
 def _sha256_bytes(data: bytes) -> str:
@@ -3140,6 +3178,7 @@ def main(argv: list[str] | None = None) -> None:
     epic_ids = set(args.epic_id)
 
     def _run_once(*, check: bool) -> None:
+        _validate_epic038_pr02_semantics()
         produced_default = _isoformat(_dt.datetime.now(tz=_dt.timezone.utc))
         mirror_proof_path = MIRROR_PATH.with_suffix(".jsonl.path_proof.txt")
         mirror_proof_existing = _load_existing_proof(mirror_proof_path)

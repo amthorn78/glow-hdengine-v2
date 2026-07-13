@@ -3,3 +3,4 @@ status=405
 cache_control=no-store
 etag_absent=true
 conditional_not_304=true
+canonical_body=true

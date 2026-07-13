@@ -1,1 +1,10 @@
-{"compression_claimed":false,"identity_etag":"\"bfe4773ad9985f34d2101edf80be7eb4b0340212e335983bd4918f3fef672385\"","pass":true,"tested_encodings":["identity","gzip","br"]}
+ENCODING_INVARIANCE
+identity_etag="bfe4773ad9985f34d2101edf80be7eb4b0340212e335983bd4918f3fef672385"
+identity_head_identity_length=330
+gzip_etag="bfe4773ad9985f34d2101edf80be7eb4b0340212e335983bd4918f3fef672385"
+gzip_head_identity_length=330
+br_etag="bfe4773ad9985f34d2101edf80be7eb4b0340212e335983bd4918f3fef672385"
+br_head_identity_length=330
+etag_equal=true
+head_identity_length_equal=true
+pass=true
