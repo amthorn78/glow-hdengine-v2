@@ -149,11 +149,6 @@ def test_reader_a7_transport_invariants(monkeypatch):
     )
     etag_gzip = get_resp_gzip.headers.get("ETag", "")
     _write_encoding_proof(
-        proof_dir / "encoding_invariance.txt",
-        etag_identity=etag,
-        etag_gzip=etag_gzip,
-    )
-    _write_encoding_proof(
         proof_dir / "success_encoding_invariance.txt",
         etag_identity=etag,
         etag_gzip=etag_gzip,

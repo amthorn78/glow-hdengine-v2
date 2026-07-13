@@ -1,4 +1,4 @@
-HTTP/1.0 403 FORBIDDEN
-cache-control: no-store
-content-type: application/json; charset=utf-8
-etag: <absent>
+APP_ENV=prod
+/reader_success_unreachable=true
+cache_control=no-store
+etag_absent=true

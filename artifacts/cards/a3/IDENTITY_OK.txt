@@ -1,4 +1,2 @@
-CLI_AB_BA_IDENTITY: OK
-ABBA_BYTES_OK
-TWO_RUN_IDENTITY_OK
-SIDECAR_SEMANTIC_PARITY_OK
+IDENTITY_OK
+HDE-EPIC038 PR-02 deterministic predicate evidence only; no acceptance token satisfaction claimed.

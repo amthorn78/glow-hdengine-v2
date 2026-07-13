@@ -2437,6 +2437,29 @@ EPIC038_PR01_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {"artifact_key": "epic038.pr01.env_matrix_snapshot_v3", "discovered_physical_path": "artifacts/runtime/env_matrix.snapshot.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr01_evidence", "schema_version": "3"},
 ]
 
+EPIC038_PR02_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {"artifact_key": "epic038.pr02.reader_cli_ab", "discovered_physical_path": "audit/gates/parity/reader_cli/ab.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr02_predicate_evidence", "schema_version": "1.0", "notes": "Reader-to-CLI AB deterministic byte proof; predicate evidence only, no acceptance token satisfaction claim"},
+    {"artifact_key": "epic038.pr02.reader_cli_ba", "discovered_physical_path": "audit/gates/parity/reader_cli/ba.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr02_predicate_evidence", "schema_version": "1.0"},
+    {"artifact_key": "epic038.pr02.reader_cli_summary", "discovered_physical_path": "audit/gates/parity/reader_cli/summary.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr02_predicate_evidence", "schema_version": "1.0"},
+    {"artifact_key": "epic038.pr02.abba_bytes", "discovered_physical_path": "audit/gates/determinism/abba.bytes", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr02_predicate_evidence", "schema_version": "1.0"},
+    {"artifact_key": "epic038.pr02.tworun_identity", "discovered_physical_path": "audit/gates/determinism/tworun_identity.sha256", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr02_predicate_evidence", "schema_version": "1.0"},
+    {"artifact_key": "epic038.pr02.a3_identity_ok", "discovered_physical_path": "artifacts/cards/a3/IDENTITY_OK.txt", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr02_predicate_evidence", "schema_version": "1.0"},
+    {"artifact_key": "epic038.pr02.endpoint_catalog", "discovered_physical_path": "docs/ENDPOINTS_CATALOG.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr02_catalog_evidence", "schema_version": "1.0"},
+    {"artifact_key": "epic038.pr02.endpoint_catalog_sha256", "discovered_physical_path": "docs/ENDPOINTS_CATALOG.json.sha256", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr02_catalog_evidence", "schema_version": "1.0"},
+    {"artifact_key": "epic038.pr02.endpoint_catalog_audit", "discovered_physical_path": "artifacts/audit/ENDPOINTS_CATALOG.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr02_catalog_evidence", "schema_version": "1.0"},
+    {"artifact_key": "epic038.pr02.endpoint_catalog_audit_sha256", "discovered_physical_path": "artifacts/audit/ENDPOINTS_CATALOG.json.sha256", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr02_catalog_evidence", "schema_version": "1.0"},
+    {"artifact_key": "epic038.pr02.endpoints_snapshot", "discovered_physical_path": "artifacts/reader/endpoints_snapshot.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr02_catalog_evidence", "schema_version": "1.0"},
+    {"artifact_key": "epic038.pr02.a7_env_gate", "discovered_physical_path": "artifacts/proofs/endpoints_env_gate_proof.log", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr02_a7_predicate_evidence", "schema_version": "1.0"},
+    {"artifact_key": "epic038.pr02.a7_success_get", "discovered_physical_path": "artifacts/proofs/success_get.txt", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr02_a7_predicate_evidence", "schema_version": "1.0"},
+    {"artifact_key": "epic038.pr02.a7_success_head", "discovered_physical_path": "artifacts/proofs/success_head.txt", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr02_a7_predicate_evidence", "schema_version": "1.0"},
+    {"artifact_key": "epic038.pr02.a7_success_304", "discovered_physical_path": "artifacts/proofs/success_304.txt", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr02_a7_predicate_evidence", "schema_version": "1.0"},
+    {"artifact_key": "epic038.pr02.a7_success_writers_errors", "discovered_physical_path": "artifacts/proofs/success_writers_errors.txt", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr02_a7_predicate_evidence", "schema_version": "1.0"},
+    {"artifact_key": "epic038.pr02.a7_reader_success_composite", "discovered_physical_path": "artifacts/proofs/reader_success_get_head_304.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr02_a7_predicate_evidence", "schema_version": "1.0"},
+    {"artifact_key": "epic038.pr02.reader_success_schema", "discovered_physical_path": "schemas/proofs.reader_success.v1.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr02_schema", "schema_version": "1.0"},
+]
+
+EPIC038_PR02_SUPERSEDED_INDEX_KEYS: set[tuple[str, str]] = set()
+
 A7_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
         "artifact_key": "a7.success_encoding_invariance",
@@ -2817,6 +2840,8 @@ def _load_human_index() -> list[dict[str, object]]:
         not in EPIC034_PR06_SUPERSEDED_INDEX_KEYS
         and (entry.get("artifact_key"), entry.get("discovered_physical_path"))
         not in EPIC037_PR05_SUPERSEDED_INDEX_KEYS
+        and (entry.get("artifact_key"), entry.get("discovered_physical_path"))
+        not in EPIC038_PR02_SUPERSEDED_INDEX_KEYS
     ]
     return _dedupe_entries(
         [
@@ -2856,6 +2881,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *_load_epic037_ops01_entries(),
             *_load_epic037_pr05_entries(),
             *EPIC038_PR01_PRIMARY_ARTIFACTS,
+            *EPIC038_PR02_PRIMARY_ARTIFACTS,
             *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,

@@ -1,5 +1,5 @@
 path: artifacts/proofs/success_writers_errors.txt
-size_bytes: 71
-sha256: 78fca9abc2727232d17ceb9026cb7b6654212ce86dccfccf383ea8e1c4735347
+size_bytes: 89
+sha256: 8cd9e1647e1eee3c00d6d430a7e6686d87c995734c8296cc0ce31b0d60b47c2c
 mtime_utc: 2026-01-28T12:06:29Z
 produced_at_utc: 2026-01-05T05:39:56Z

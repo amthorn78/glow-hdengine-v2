@@ -1,4 +1,1 @@
-ENCODING_INVARIANCE
-etag_identity="1cbd848103ac56efd7bc284db333bd70e879a963ddb0c12a570fc05354291fac"
-etag_gzip="1cbd848103ac56efd7bc284db333bd70e879a963ddb0c12a570fc05354291fac"
-match=true
+{"compression_claimed":false,"identity_etag":"\"bfe4773ad9985f34d2101edf80be7eb4b0340212e335983bd4918f3fef672385\"","pass":true,"tested_encodings":["identity","gzip","br"]}
