@@ -118,6 +118,22 @@ def test_producer_validation_failure_leaves_existing_output_unchanged(monkeypatc
     assert target.read_text(encoding="utf-8") == "original\n"
 
 
+def test_refusal_proof_forces_closed_env_without_leaking(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("SAFE_MODE", "0")
+    monkeypatch.setenv("ALLOW_NETWORK", "1")
+    text = producer.build_ops_refusal()
+    assert "x-rails-mode: closed" in text
+    assert "rails remain closed" in text
+    assert os.environ["SAFE_MODE"] == "0"
+    assert os.environ["ALLOW_NETWORK"] == "1"
+
+
+def test_rails_keys_only_uses_dedicated_vendor_artifact_path() -> None:
+    assert producer.KEYS_ONLY_REL == "artifacts/vendor/rails_gate_keys_only.logs.sample"
+    assert producer.KEYS_ONLY_REL != "artifacts/bodygraph/keys_only.logs.sample"
+    assert (ROOT / "scripts/bodygraph/run_refresh_worker.py").read_text(encoding="utf-8").find("artifacts/bodygraph/keys_only.logs.sample") > -1
+
+
 def test_fixture_backed_open_rails_tests_do_not_reach_real_network() -> None:
     result = subprocess.run(
         [sys.executable, "-m", "pytest", "tests/bodygraph/test_vendor_client.py", "-q"],

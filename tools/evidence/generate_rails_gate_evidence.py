@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 from typing import Callable, Mapping
@@ -28,7 +29,7 @@ from tools.evidence import update_evidence_index  # noqa: E402
 PRODUCED_AT = "2026-07-13T00:00:00Z"
 OPS_REFUSAL_REL = "artifacts/proofs/ops_refusal_proof.txt"
 RETRY_AFTER_REL = "artifacts/vendor/retry_after_parse.log"
-KEYS_ONLY_REL = "artifacts/bodygraph/keys_only.logs.sample"
+KEYS_ONLY_REL = "artifacts/vendor/rails_gate_keys_only.logs.sample"
 ALLOWED_KEYS = {
     "at", "attempt", "backoff_ms", "duration_ms", "error_class", "error_code", "outcome",
     "profile", "rails_state", "retry_after_ms", "route", "status", "timeout_profile",
@@ -91,13 +92,23 @@ def _client(log_path: Path, request: Callable[[urlrequest.Request, float], tuple
 
 def build_ops_refusal() -> str:
     req = urlrequest.Request("https://vendor.test/v1/bodygraphs", data=b"{}\n", method="POST")
+    previous = {"SAFE_MODE": os.environ.get("SAFE_MODE"), "ALLOW_NETWORK": os.environ.get("ALLOW_NETWORK")}
+    os.environ["SAFE_MODE"] = "1"
+    os.environ["ALLOW_NETWORK"] = "0"
     try:
-        HdApiClient._default_request(req, 1.0)
-    except VendorError as exc:
-        if exc.code != "PROVIDER_REFUSED":
-            raise SystemExit("unexpected refusal code")
-    else:  # pragma: no cover
-        raise SystemExit("closed rails did not refuse")
+        try:
+            HdApiClient._default_request(req, 1.0)
+        except VendorError as exc:
+            if exc.code != "PROVIDER_REFUSED":
+                raise SystemExit("unexpected refusal code")
+        else:  # pragma: no cover
+            raise SystemExit("closed rails did not refuse")
+    finally:
+        for key, value in previous.items():
+            if value is None:
+                os.environ.pop(key, None)
+            else:
+                os.environ[key] = value
     body = {"code": "rails_closed", "error": "rails remain closed", "ok": False, "schema": "rails_closed"}
     return "cache-control: no-store\ncontent-type: application/json; charset=utf-8\nx-rails-mode: closed\n\n" + _json_line(body)
 
@@ -139,11 +150,21 @@ def build_keys_only() -> str:
         lambda req, timeout: (429, b'{"error":"rate_limited"}', {"retry-after": "4"}),
         lambda req, timeout: (_ for _ in ()).throw(VendorError("PROVIDER_REFUSED", "fixture refused")),
     ]
-    for func in cases:
-        try:
-            _client(tmp, func).fetch(request)
-        except VendorError:
-            pass
+    previous = {"SAFE_MODE": os.environ.get("SAFE_MODE"), "ALLOW_NETWORK": os.environ.get("ALLOW_NETWORK")}
+    os.environ["SAFE_MODE"] = "1"
+    os.environ["ALLOW_NETWORK"] = "0"
+    try:
+        for func in cases:
+            try:
+                _client(tmp, func).fetch(request)
+            except VendorError:
+                pass
+    finally:
+        for key, value in previous.items():
+            if value is None:
+                os.environ.pop(key, None)
+            else:
+                os.environ[key] = value
     text = tmp.read_text(encoding="utf-8")
     tmp.unlink(missing_ok=True)
     return text
