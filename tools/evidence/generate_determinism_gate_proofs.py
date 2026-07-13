@@ -34,9 +34,10 @@ def canonical_ok(b):
  return canon.sercanon(json.loads(b))==b
 def canonical_gate_result(runner=None):
  runner = runner or subprocess.run
+ stable_command='python tools/evidence/run_canonical_json_gate.py --check-only'
  cmd=[sys.executable,'tools/evidence/run_canonical_json_gate.py','--check-only']
  p=runner(cmd,cwd=ROOT,env=env(),capture_output=True,text=True)
- return {'command':' '.join(cmd),'returncode':p.returncode,'stdout_sha256':sha((p.stdout or '').encode()),'stderr_sha256':sha((p.stderr or '').encode()),'passed':p.returncode==0}
+ return {'command':stable_command,'returncode':p.returncode,'stdout_sha256':sha((p.stdout or '').encode()),'stderr_sha256':sha((p.stderr or '').encode()),'passed':p.returncode==0}
 def build(*, canon_gate=None, ba_override=None):
  rb=runtime_bytes(); cb=cli_bytes(); bab=ba_override if ba_override is not None else runtime_bytes(RIGHT,LEFT); run2=runtime_bytes()
  envj=json.loads(rb); pre=dict(envj); stored=pre.pop('idempotence_hash',None); recomputed=sha(emitter.emit_public(pre))

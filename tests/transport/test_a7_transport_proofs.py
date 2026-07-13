@@ -56,6 +56,11 @@ def test_encoding_proof_records_decisive_facts():
     proof=g.build()[g.PROOFS[5]].decode()
     for token in ['identity_etag=','gzip_etag=','br_etag=','identity_head_identity_length=','gzip_head_identity_length=','br_head_identity_length=','pass=true']:
         assert token in proof
+def test_composite_records_tested_encoding_facts():
+    comp=json.loads(g.build()[g.PROOFS[6]])
+    assert [e['accept_encoding'] for e in comp['tested_encodings']]==['identity','gzip','br']
+    assert all(e['etag']==comp['etag'] for e in comp['tested_encodings'])
+    assert all(e['head_identity_length']==comp['get_200']['content_length'] for e in comp['tested_encodings'])
 def test_write_mode_requires_env(monkeypatch):
     monkeypatch.delenv('HDE_WRITE_A7_PROOFS', raising=False)
     # build itself is non-writing and allowed

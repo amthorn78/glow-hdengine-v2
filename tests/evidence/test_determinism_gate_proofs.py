@@ -13,7 +13,7 @@ def test_successful_fixed_corpus_generation_predicates():
     assert summary['predicates']['preimage_hash_match']
     assert summary['predicates']['canonical_reserialization']
     assert summary['canonical_gate']['passed'] is True
-    assert 'run_canonical_json_gate.py --check-only' in summary['canonical_gate']['command']
+    assert summary['canonical_gate']['command'] == 'python tools/evidence/run_canonical_json_gate.py --check-only'
 
 def test_mismatched_abba_fails_top_level():
     top, _ = g.build(ba_override=b'{"bad":true}\n')

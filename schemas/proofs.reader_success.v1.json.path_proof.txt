@@ -1,5 +1,5 @@
 path: schemas/proofs.reader_success.v1.json
-size_bytes: 2512
-sha256: e8615dea19e222839022415ef6f18f36343359ee9c9f5d8aab5b0a1bdb372d42
+size_bytes: 2942
+sha256: 8f7dc051d9727a4741e6f2db6aa5cab522ea2993056cdd03ca6526def6dda24f
 mtime_utc: 2026-07-13T01:48:54Z
 produced_at_utc: 2026-07-12T00:52:16Z
