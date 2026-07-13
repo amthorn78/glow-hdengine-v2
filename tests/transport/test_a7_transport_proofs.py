@@ -13,6 +13,8 @@ def test_valid_unique_reader_designation():
     assert target['path']=='/reader'
     assert target['classification']=='dev_harness'
     assert target['internal'] is True
+    sampler=[e for e in cat()['endpoints'] if e['path']=='/internal/dev/sampler']
+    assert len(sampler)==1 and sampler[0]['method']=='POST' and sampler[0]['a7_eligible'] is False
 def test_no_designation(): invalid(lambda c: c.__setitem__('success_endpoints', []))
 def test_duplicate_designation(): invalid(lambda c: c.__setitem__('success_endpoints', [{'method':'GET','path':'/reader'},{'method':'GET','path':'/reader'}]))
 def test_ambiguous_designation(): invalid(lambda c: c['endpoints'].append(dict(c['endpoints'][-2])))
@@ -22,6 +24,12 @@ def test_ineligible_internal_version_and_internal_rejected():
     invalid(lambda c: c.__setitem__('success_endpoints',[{'method':'GET','path':'/dev/reader/conjunction'}]))
 def test_non_get_designation(): invalid(lambda c: c.__setitem__('success_endpoints',[{'method':'HEAD','path':'/reader'}]))
 def test_method_array_rejected(): invalid(lambda c: c['endpoints'][0].__setitem__('method',['POST']))
+def test_non_boolean_a7_and_bad_generated_at_rejected():
+    invalid(lambda c: c['endpoints'][0].__setitem__('a7_eligible','false'))
+    invalid(lambda c: c.__setitem__('generated_at_utc','2026-99-99'))
+def test_all_canon_valid_classifications_accepted():
+    for cls in g.CLASS:
+        c=cat(); c['endpoints'][0]['classification']=cls; g.validate_catalog(c)
 def test_missing_internal_invalid_class_duplicate_route_id():
     invalid(lambda c: c['endpoints'][0].pop('internal'))
     invalid(lambda c: c['endpoints'][0].__setitem__('classification','bad'))
@@ -41,6 +49,13 @@ def test_capture_get_head_304_writer_encoding_env_and_restore():
 def test_composite_unknown_key_rejected():
     comp=json.loads(g.build()[g.PROOFS[6]]); comp['unknown']=True
     with pytest.raises(ValueError): g.validate_composite(comp)
+def test_composite_nested_unknown_key_rejected():
+    comp=json.loads(g.build()[g.PROOFS[6]]); comp['get_200']['unknown']=True
+    with pytest.raises(ValueError): g.validate_composite(comp)
+def test_encoding_proof_records_decisive_facts():
+    proof=g.build()[g.PROOFS[5]].decode()
+    for token in ['identity_etag=','gzip_etag=','br_etag=','identity_head_identity_length=','gzip_head_identity_length=','br_head_identity_length=','pass=true']:
+        assert token in proof
 def test_write_mode_requires_env(monkeypatch):
     monkeypatch.delenv('HDE_WRITE_A7_PROOFS', raising=False)
     # build itself is non-writing and allowed

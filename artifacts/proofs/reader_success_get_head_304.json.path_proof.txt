@@ -1,5 +1,5 @@
 path: artifacts/proofs/reader_success_get_head_304.json
-size_bytes: 1637
-sha256: 44197fd12ebc1b0791b5514116e18bdab95c6f9fc157ddfe20b719f956a1a45a
-mtime_utc: 2026-07-13T01:49:33Z
-produced_at_utc: 2026-07-12T00:52:16Z
+size_bytes: 1296
+sha256: afc67f535465862452704e17c16eb5739fe37578ff0e823efe672ab34a19e549
+mtime_utc: 2026-07-13T15:18:56Z
+produced_at_utc: 2026-07-13T15:19:21Z

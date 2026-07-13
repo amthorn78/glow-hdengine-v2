@@ -32,13 +32,23 @@ def cli_bytes(l=LEFT,r=RIGHT):
 def canonical_ok(b):
  if b.startswith(b'\xef\xbb\xbf') or b'\r\n' in b or not b.endswith(b'\n') or b.endswith(b'\n\n'): return False
  return canon.sercanon(json.loads(b))==b
-def build(canon_check=True, ba_override=None):
+def canonical_gate_result(runner=None):
+ runner = runner or subprocess.run
+ cmd=[sys.executable,'tools/evidence/run_canonical_json_gate.py','--check-only']
+ p=runner(cmd,cwd=ROOT,env=env(),capture_output=True,text=True)
+ return {'command':' '.join(cmd),'returncode':p.returncode,'stdout_sha256':sha((p.stdout or '').encode()),'stderr_sha256':sha((p.stderr or '').encode()),'passed':p.returncode==0}
+def build(*, canon_gate=None, ba_override=None):
  rb=runtime_bytes(); cb=cli_bytes(); bab=ba_override if ba_override is not None else runtime_bytes(RIGHT,LEFT); run2=runtime_bytes()
  envj=json.loads(rb); pre=dict(envj); stored=pre.pop('idempotence_hash',None); recomputed=sha(emitter.emit_public(pre))
- preds={'reader_cli_byte_identity': rb==cb, 'abba_byte_identity': rb==bab, 'two_run_byte_identity': rb==run2, 'preimage_hash_match': stored==recomputed, 'canonical_gate_check': bool(canon_check)}
+ if canon_gate is None:
+  canon_gate=canonical_gate_result()
+ if not isinstance(canon_gate,dict) or 'command' not in canon_gate or canon_gate.get('passed') is not True:
+  canon_gate=dict(canon_gate or {})
+  canon_gate.setdefault('passed',False)
+ preds={'reader_cli_byte_identity': rb==cb, 'abba_byte_identity': rb==bab, 'two_run_byte_identity': rb==run2, 'preimage_hash_match': stored==recomputed, 'canonical_gate_check': canon_gate.get('passed') is True and 'command' in canon_gate}
  preds['canonical_reserialization'] = all(canonical_ok(x) for x in [rb,bab,cb,run2])
  top=all(preds.values())
- summary={'artifact_kind':'hde_epic038_pr02_determinism_proof','generated_at_utc':TS,'fixed_corpus':'hde-epic038-pr02-synthetic-ab','sources':{'runtime':'engine.runtime.public.emit_reader_public_envelope','cli':'python -m engine.cli showcompat --dump-reader'},'hashes':{'ab_sha256':sha(rb),'ba_sha256':sha(bab),'reader_sha256':sha(rb),'cli_sha256':sha(cb),'two_run_1_sha256':sha(rb),'two_run_2_sha256':sha(run2)},'idempotence_hash':{'stored':stored,'recomputed':recomputed},'predicates':preds,'top_level_pass':top,'acceptance_token_satisfied':False}
+ summary={'artifact_kind':'hde_epic038_pr02_determinism_proof','generated_at_utc':TS,'fixed_corpus':'hde-epic038-pr02-synthetic-ab','sources':{'runtime':'engine.runtime.public.emit_reader_public_envelope','cli':'python -m engine.cli showcompat --dump-reader'},'canonical_gate':canon_gate,'hashes':{'ab_sha256':sha(rb),'ba_sha256':sha(bab),'reader_sha256':sha(rb),'cli_sha256':sha(cb),'two_run_1_sha256':sha(rb),'two_run_2_sha256':sha(run2)},'idempotence_hash':{'stored':stored,'recomputed':recomputed},'predicates':preds,'top_level_pass':top,'acceptance_token_satisfied':False}
  outs={AB:rb,BA:bab,SUM:cjson(summary),ABB:(f"ab_sha256={sha(rb)}\nba_sha256={sha(bab)}\nbyte_identity={str(rb==bab).lower()}\n").encode(),TWO:(f"run1_sha256={sha(rb)}\nrun2_sha256={sha(run2)}\nbyte_identity={str(rb==run2).lower()}\n").encode(),ID:("IDENTITY_OK\nHDE-EPIC038 PR-02 deterministic predicate evidence only; no acceptance token satisfaction claimed.\n").encode()}
  return top, outs
 def main():
