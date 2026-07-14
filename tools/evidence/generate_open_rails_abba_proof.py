@@ -33,6 +33,18 @@ from engine.serializer import canon  # noqa: E402
 OPEN_ABBA_REL = "audit/gates/determinism/open_rails_abba.json"
 LIVE_ABBA_REL = "audit/gates/determinism/open_rails_vendor_abba.json"
 PRODUCED_AT = "2026-07-14T00:00:00Z"
+LIVE_REQUIRED_PREDICATES = frozenset(
+    {
+        "abba_byte_identity",
+        "canonical_json",
+        "distinct_input_fingerprints",
+        "distinct_normalized_payloads",
+        "normalized_payload_hashes_bound",
+        "request_bound_ok",
+        "same_normalized_inputs_reused",
+        "single_lf",
+    }
+)
 SENSITIVE_ENV = (
     "HD_API_KEY",
     "GEO_API_KEY",
@@ -57,6 +69,58 @@ def canonical_json_bytes(payload: Mapping[str, Any]) -> bytes:
 
 def sha(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
+
+
+def _is_sha256(value: object) -> bool:
+    return isinstance(value, str) and len(value) == 64 and all(char in "0123456789abcdef" for char in value)
+
+
+def _live_summary_predicates(proof: Mapping[str, Any]) -> dict[str, bool]:
+    results = proof.get("request_results")
+    if not isinstance(results, list) or len(results) != 2:
+        return {
+            "distinct_input_fingerprints": False,
+            "distinct_normalized_payloads": False,
+            "normalized_payload_hashes_bound": False,
+        }
+
+    by_party: dict[str, Mapping[str, Any]] = {}
+    for result in results:
+        if not isinstance(result, Mapping) or result.get("result_class") != "success":
+            break
+        party = result.get("party")
+        fingerprint = result.get("input_fingerprint_sha256")
+        payload_hash = result.get("normalized_payload_sha256")
+        if (
+            not isinstance(party, str)
+            or party not in {"a", "b"}
+            or party in by_party
+            or not _is_sha256(fingerprint)
+            or not _is_sha256(payload_hash)
+        ):
+            break
+        by_party[party] = result
+    if set(by_party) != {"a", "b"}:
+        return {
+            "distinct_input_fingerprints": False,
+            "distinct_normalized_payloads": False,
+            "normalized_payload_hashes_bound": False,
+        }
+
+    a_result = by_party["a"]
+    b_result = by_party["b"]
+    a_fingerprint = a_result["input_fingerprint_sha256"]
+    b_fingerprint = b_result["input_fingerprint_sha256"]
+    a_payload_hash = a_result["normalized_payload_sha256"]
+    b_payload_hash = b_result["normalized_payload_sha256"]
+    return {
+        "distinct_input_fingerprints": a_fingerprint != b_fingerprint,
+        "distinct_normalized_payloads": a_payload_hash != b_payload_hash,
+        "normalized_payload_hashes_bound": (
+            proof.get("normalized_a_sha256") == a_payload_hash
+            and proof.get("normalized_b_sha256") == b_payload_hash
+        ),
+    }
 
 
 def _assert_canonical(name: str, data: bytes) -> bool:
@@ -378,6 +442,8 @@ def build_live_proof(*, client_factory: Callable[[dict[str, int]], HdApiClient] 
     b_payload = outcomes[1][1]
     a_hash = sha(emitter.emit_public(a_payload))
     b_hash = sha(emitter.emit_public(b_payload))
+    proof["normalized_a_sha256"] = a_hash
+    proof["normalized_b_sha256"] = b_hash
     a_person, a_chart = cli_main._person_and_chart_from_payload(a_payload, uid_hint=a_inputs.user_id)
     b_person, b_chart = cli_main._person_and_chart_from_payload(b_payload, uid_hint=b_inputs.user_id)
     a_person2, b_person2, a_chart2, b_chart2 = cli_main._canonical_pair(a_person, b_person, a_chart, b_chart)
@@ -391,11 +457,10 @@ def build_live_proof(*, client_factory: Callable[[dict[str, int]], HdApiClient] 
         "abba_byte_identity": ab_reader == ba_reader,
         "canonical_json": _assert_canonical("ab", ab_reader) and _assert_canonical("ba", ba_reader),
         "single_lf": ab_reader.endswith(b"\n") and ba_reader.endswith(b"\n") and not ab_reader.endswith(b"\n\n") and b"\r" not in ab_reader + ba_reader,
+        **_live_summary_predicates(proof),
     }
     proof.update({
         "applied_abba_contract_mode": "raw_byte_identity_after_existing_canonical_pair_normalization",
-        "normalized_a_sha256": a_hash,
-        "normalized_b_sha256": b_hash,
         "same_normalized_inputs_reused_for_ab_ba": predicates["same_normalized_inputs_reused"],
         "reader_hashes": {"ab_sha256": sha(ab_reader), "ba_sha256": sha(ba_reader), "ab_run2_sha256": sha(ab_reader), "ba_run2_sha256": sha(ba_reader)},
         "predicates": predicates,
@@ -416,13 +481,16 @@ def _require_passing_live_proof(proof: dict[str, Any]) -> dict[str, Any]:
         raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
     if proof.get("no_raw_payload_predicate") is not True or proof.get("no_secret_value_predicate") is not True:
         raise SystemExit(f"UNSAFE_LIVE_PROOF:{LIVE_ABBA_REL}")
+    summary_predicates = _live_summary_predicates(proof)
     if (
         proof.get("top_level_pass") is not True
         or proof.get("result") != "pass"
         or proof.get("typed_result_class") != "PASS"
         or proof.get("same_normalized_inputs_reused_for_ab_ba") is not True
         or not isinstance(predicates, dict)
-        or not predicates
+        or not LIVE_REQUIRED_PREDICATES.issubset(predicates)
+        or any(predicates.get(key) is not value for key, value in summary_predicates.items())
+        or any(predicates.get(key) is not True for key in LIVE_REQUIRED_PREDICATES)
         or any(value is not True for value in predicates.values())
     ):
         raise SystemExit(f"FAILED_LIVE_PROOF:{LIVE_ABBA_REL}")

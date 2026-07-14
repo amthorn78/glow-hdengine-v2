@@ -108,23 +108,79 @@ def test_live_harness_individual_mode_request_bound_and_secret_safe(monkeypatch:
             self.input_fingerprint = label * 64
             self.payload_sha256 = proof.sha(proof.emitter.emit_public(self.payload))
 
+    class FakeClient:
+        def __init__(self, counter: dict[str, int]) -> None:
+            self.counter = counter
+
     calls = []
 
     def fake_ingest(inputs, **kwargs):
         calls.append(inputs.user_id)
         if len(calls) > 2:
             raise VendorError("PROVIDER_REQUEST_BOUND_EXCEEDED", "too many")
+        kwargs["client"].counter["attempted"] += 1
         return FakeOutcome("a" if len(calls) == 1 else "b")
 
     monkeypatch.setattr(proof, "ingest_vendor_bodygraph", fake_ingest)
-    monkeypatch.setattr(proof, "_bounded_live_client", lambda counter: object())
+    monkeypatch.setattr(proof, "_bounded_live_client", FakeClient)
     payload = proof.build_live_proof()
     assert len(calls) == 2
+    assert payload["top_level_pass"] is True
+    assert payload["requests_attempted"] == 2
     assert payload["requests_completed"] == 2
     assert payload["same_normalized_inputs_reused_for_ab_ba"] is True
+    assert payload["predicates"]["distinct_input_fingerprints"] is True
+    assert payload["predicates"]["distinct_normalized_payloads"] is True
+    assert payload["predicates"]["normalized_payload_hashes_bound"] is True
     encoded = proof.canonical_json_bytes(payload).decode("utf-8")
     assert "secret-key" not in encoded and "geo-key" not in encoded
     assert "Synthetic Alpha" not in encoded and "Synthetic Bravo" not in encoded
+
+
+@pytest.mark.parametrize("duplicate", ["fingerprint", "payload"])
+def test_live_harness_rejects_duplicate_acquisitions(monkeypatch: pytest.MonkeyPatch, duplicate: str) -> None:
+    for key, value in {
+        "SAFE_MODE": "0",
+        "ALLOW_NETWORK": "1",
+        "HD_API_BASE_URL": "https://sandbox.vendor.test/v1",
+        "HD_API_KEY": "secret-key",
+        "GEO_API_KEY": "geo-key",
+    }.items():
+        monkeypatch.setenv(key, value)
+
+    class FakeOutcome:
+        def __init__(self, label: str) -> None:
+            payload_label = "a" if duplicate == "payload" else label
+            self.payload = {
+                "person_uid": f"person-{payload_label}",
+                "mechanics": {"type": "Generator" if payload_label == "a" else "Projector"},
+            }
+            self.input_fingerprint = "same-input" if duplicate == "fingerprint" else label * 64
+            self.payload_sha256 = proof.sha(proof.emitter.emit_public(self.payload))
+
+    class FakeClient:
+        def __init__(self, counter: dict[str, int]) -> None:
+            self.counter = counter
+
+    calls = []
+
+    def fake_ingest(inputs, **kwargs):
+        calls.append(inputs.user_id)
+        kwargs["client"].counter["attempted"] += 1
+        return FakeOutcome("a" if len(calls) == 1 else "b")
+
+    monkeypatch.setattr(proof, "ingest_vendor_bodygraph", fake_ingest)
+    monkeypatch.setattr(proof, "_bounded_live_client", FakeClient)
+
+    payload = proof.build_live_proof()
+
+    assert payload["top_level_pass"] is False
+    assert payload["typed_result_class"] == "FAIL"
+    assert payload["result"] == "fail"
+    assert payload["requests_attempted"] == 2
+    assert payload["requests_completed"] == 2
+    predicate = "distinct_input_fingerprints" if duplicate == "fingerprint" else "distinct_normalized_payloads"
+    assert payload["predicates"][predicate] is False
 
 
 def test_live_harness_missing_config_is_inconclusive(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -158,8 +214,10 @@ def test_live_harness_v2_chart_success_uses_two_requests_and_local_abba(monkeypa
         monkeypatch.delenv(key, raising=False)
 
     class FakeRequest:
-        input_fingerprint = "a" * 64
         route = "vendor.hdapi.post:/charts"
+
+        def __init__(self, fingerprint: str) -> None:
+            self.input_fingerprint = fingerprint
 
     class FakeResult:
         payload = {"data": {}}
@@ -169,7 +227,8 @@ def test_live_harness_v2_chart_success_uses_two_requests_and_local_abba(monkeypa
             self.counter = counter
 
         def build_contract_route_request(self, **kwargs):
-            return FakeRequest()
+            label = "a" if self.counter["attempted"] == 0 else "b"
+            return FakeRequest(label * 64)
 
         def fetch(self, request):
             if self.counter["attempted"] >= 2:
@@ -202,6 +261,9 @@ def test_live_harness_v2_chart_success_uses_two_requests_and_local_abba(monkeypa
     assert payload["requests_completed"] == 2
     assert payload["same_normalized_inputs_reused_for_ab_ba"] is True
     assert payload["predicates"]["request_bound_ok"] is True
+    assert payload["predicates"]["distinct_input_fingerprints"] is True
+    assert payload["predicates"]["distinct_normalized_payloads"] is True
+    assert payload["predicates"]["normalized_payload_hashes_bound"] is True
 
 
 def test_legacy_live_harness_isolates_ingest_logs(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
@@ -312,6 +374,47 @@ def test_live_check_mode_rejects_ascii_escaped_unicode(monkeypatch: pytest.Monke
         proof.generate_live(check=True)
 
     assert path.read_bytes() == escaped
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        "missing_predicate",
+        "duplicate_fingerprint",
+        "duplicate_payload",
+        "invalid_party_shape",
+        "unbound_payload_hash",
+    ],
+)
+def test_live_check_mode_recomputes_distinctness(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    mutation: str,
+) -> None:
+    original = (proof.ROOT / proof.LIVE_ABBA_REL).read_bytes()
+    payload = json.loads(original)
+    if mutation == "missing_predicate":
+        payload["predicates"].pop("distinct_normalized_payloads")
+    elif mutation == "duplicate_fingerprint":
+        payload["request_results"][1]["input_fingerprint_sha256"] = payload["request_results"][0]["input_fingerprint_sha256"]
+    elif mutation == "duplicate_payload":
+        duplicate_hash = payload["request_results"][0]["normalized_payload_sha256"]
+        payload["request_results"][1]["normalized_payload_sha256"] = duplicate_hash
+        payload["normalized_b_sha256"] = duplicate_hash
+    elif mutation == "invalid_party_shape":
+        payload["request_results"][1]["party"] = []
+    else:
+        payload["normalized_b_sha256"] = "f" * 64
+
+    path = tmp_path / proof.LIVE_ABBA_REL
+    path.parent.mkdir(parents=True)
+    path.write_bytes(proof.canonical_json_bytes(payload))
+    monkeypatch.setattr(proof, "ROOT", tmp_path)
+
+    with pytest.raises(SystemExit, match="FAILED_LIVE_PROOF"):
+        proof.generate_live(check=True)
+
+    assert path.read_bytes() == proof.canonical_json_bytes(payload)
 
 
 @pytest.mark.parametrize(
