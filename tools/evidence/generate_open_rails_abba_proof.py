@@ -345,7 +345,20 @@ def build_live_proof(*, client_factory: Callable[[dict[str, int]], HdApiClient] 
                 raise VendorError("ADAPTER_CONTEXT_INSUFFICIENT", "mapped v2 payload missing HDE mechanics type")
             payload = {"person_uid": str(resolved.get("person_uid") or context.person_uid), "mechanics": {"type": mech_type.strip()}}
             return payload, request.input_fingerprint, sha(emitter.emit_public(payload))
-        outcome = ingest_vendor_bodygraph(inputs, env={**os.environ, **RAILS_OPEN}, dry_run=True, client=client)
+        # The legacy ingest helper writes dry-run logs even though it does not
+        # write database state. Keep those helper side effects outside the repo
+        # so this producer owns only its governed primary proof artifact.
+        with tempfile.TemporaryDirectory(prefix="hde-open-rails-abba-") as temp_dir:
+            temp_root = Path(temp_dir)
+            outcome = ingest_vendor_bodygraph(
+                inputs,
+                env={**os.environ, **RAILS_OPEN},
+                dry_run=True,
+                client=client,
+                retry_log=temp_root / "retry_trace.log",
+                success_log=temp_root / "ingest_success.log",
+                canon_log=temp_root / "json_canon_compare.log",
+            )
         return outcome.payload, outcome.input_fingerprint, outcome.payload_sha256
 
     for label, inputs in (("a", a_inputs), ("b", b_inputs)):
@@ -393,6 +406,29 @@ def build_live_proof(*, client_factory: Callable[[dict[str, int]], HdApiClient] 
     return proof
 
 
+def _require_passing_live_proof(proof: dict[str, Any]) -> dict[str, Any]:
+    predicates = proof.get("predicates")
+    if (
+        proof.get("acceptance_token_satisfied") is not False
+        or proof.get("requests_attempted") != 2
+        or proof.get("requests_completed") != 2
+    ):
+        raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
+    if proof.get("no_raw_payload_predicate") is not True or proof.get("no_secret_value_predicate") is not True:
+        raise SystemExit(f"UNSAFE_LIVE_PROOF:{LIVE_ABBA_REL}")
+    if (
+        proof.get("top_level_pass") is not True
+        or proof.get("result") != "pass"
+        or proof.get("typed_result_class") != "PASS"
+        or proof.get("same_normalized_inputs_reused_for_ab_ba") is not True
+        or not isinstance(predicates, dict)
+        or not predicates
+        or any(value is not True for value in predicates.values())
+    ):
+        raise SystemExit(f"FAILED_LIVE_PROOF:{LIVE_ABBA_REL}")
+    return proof
+
+
 def generate_live(*, check: bool = False) -> dict[str, Any]:
     if check:
         path = ROOT / LIVE_ABBA_REL
@@ -407,23 +443,8 @@ def generate_live(*, check: bool = False) -> dict[str, Any]:
             raise SystemExit(f"INVALID_JSON:{LIVE_ABBA_REL}") from exc
         if canonical_json_bytes(proof) != data:
             raise SystemExit(f"NONCANONICAL:{LIVE_ABBA_REL}")
-        predicates = proof.get("predicates")
-        if proof.get("acceptance_token_satisfied") is not False or proof.get("requests_attempted") != 2 or proof.get("requests_completed") != 2:
-            raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
-        if proof.get("no_raw_payload_predicate") is not True or proof.get("no_secret_value_predicate") is not True:
-            raise SystemExit(f"UNSAFE_LIVE_PROOF:{LIVE_ABBA_REL}")
-        if (
-            proof.get("top_level_pass") is not True
-            or proof.get("result") != "pass"
-            or proof.get("typed_result_class") != "PASS"
-            or proof.get("same_normalized_inputs_reused_for_ab_ba") is not True
-            or not isinstance(predicates, dict)
-            or not predicates
-            or any(value is not True for value in predicates.values())
-        ):
-            raise SystemExit(f"FAILED_LIVE_PROOF:{LIVE_ABBA_REL}")
-        return proof
-    proof = build_live_proof()
+        return _require_passing_live_proof(proof)
+    proof = _require_passing_live_proof(build_live_proof())
     _write_primary(LIVE_ABBA_REL, canonical_json_bytes(proof), check=False)
     return proof
 

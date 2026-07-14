@@ -6,8 +6,9 @@ from pathlib import Path
 
 import pytest
 
-from tools.evidence import generate_open_rails_abba_proof as proof
+from engine.bodygraph.ingest import CANON_COMPARE_LOG, RETRY_LOG, SUCCESS_LOG
 from engine.bodygraph.vendor_client import VendorError
+from tools.evidence import generate_open_rails_abba_proof as proof
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -194,15 +195,82 @@ def test_live_harness_v2_chart_success_uses_two_requests_and_local_abba(monkeypa
     assert payload["predicates"]["request_bound_ok"] is True
 
 
+def test_legacy_live_harness_isolates_ingest_logs(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    for key, value in {
+        "SAFE_MODE": "0",
+        "ALLOW_NETWORK": "1",
+        "HD_API_BASE_URL": "https://sandbox.vendor.test/v1",
+        "HD_API_KEY": "secret-key",
+        "GEO_API_KEY": "geo-key",
+    }.items():
+        monkeypatch.setenv(key, value)
+
+    class FakeRequest:
+        def __init__(self, fingerprint: str) -> None:
+            self.input_fingerprint = fingerprint
+
+    class FakeResult:
+        def __init__(self, payload: dict[str, object]) -> None:
+            self.payload = payload
+
+    class FakeClient:
+        def __init__(self, counter: dict[str, int]) -> None:
+            self.counter = counter
+
+        def build_request(self, *, birthdate: str, birthtime: str, location: str) -> FakeRequest:
+            label = "a" if birthdate == proof.LIVE_SYNTHETIC_A.birthdate else "b"
+            return FakeRequest(label * 64)
+
+        def fetch(self, request: FakeRequest) -> FakeResult:
+            if self.counter["attempted"] >= 2:
+                raise VendorError("PROVIDER_REQUEST_BOUND_EXCEEDED", "too many")
+            self.counter["attempted"] += 1
+            label = "a" if request.input_fingerprint.startswith("a") else "b"
+            return FakeResult(
+                {
+                    "person_uid": f"person-{label}",
+                    "mechanics": {"type": "Generator" if label == "a" else "Projector"},
+                }
+            )
+
+    governed_logs = tuple(proof.ROOT / path for path in (RETRY_LOG, SUCCESS_LOG, CANON_COMPARE_LOG))
+    before = {path: path.read_bytes() if path.exists() else None for path in governed_logs}
+    real_temporary_directory = proof.tempfile.TemporaryDirectory
+    created: list[Path] = []
+
+    class TrackingTemporaryDirectory:
+        def __init__(self, *args, **kwargs) -> None:
+            kwargs["dir"] = tmp_path
+            self._delegate = real_temporary_directory(*args, **kwargs)
+
+        def __enter__(self) -> str:
+            path = self._delegate.__enter__()
+            created.append(Path(path))
+            return path
+
+        def __exit__(self, exc_type, exc_value, traceback) -> bool | None:
+            return self._delegate.__exit__(exc_type, exc_value, traceback)
+
+    monkeypatch.setattr(proof.tempfile, "TemporaryDirectory", TrackingTemporaryDirectory)
+    payload = proof.build_live_proof(client_factory=lambda counter: FakeClient(counter))
+
+    after = {path: path.read_bytes() if path.exists() else None for path in governed_logs}
+    assert payload["top_level_pass"] is True
+    assert payload["requests_attempted"] == 2
+    assert payload["requests_completed"] == 2
+    assert before == after
+    assert len(created) == 2
+    assert all(not path.exists() for path in created)
+
+
 def test_live_check_mode_does_not_reexecute_vendor(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(proof, "build_live_proof", lambda: (_ for _ in ()).throw(AssertionError("live check reexecuted")))
     payload = proof.generate_live(check=True)
     assert payload["artifact_kind"] == "hde_epic038_pr03_open_rails_vendor_abba_proof"
 
 
-def test_live_check_mode_rejects_failed_or_inconclusive_artifact() -> None:
-    path = proof.ROOT / proof.LIVE_ABBA_REL
-    original = path.read_bytes()
+def test_live_check_mode_rejects_failed_or_inconclusive_artifact(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    original = (proof.ROOT / proof.LIVE_ABBA_REL).read_bytes()
     failed = json.loads(original)
     failed["top_level_pass"] = False
     failed["result"] = "inconclusive"
@@ -211,9 +279,65 @@ def test_live_check_mode_rejects_failed_or_inconclusive_artifact() -> None:
     failed["requests_completed"] = 0
     failed["same_normalized_inputs_reused_for_ab_ba"] = False
     failed["predicates"]["request_bound_ok"] = False
+    path = tmp_path / proof.LIVE_ABBA_REL
+    path.parent.mkdir(parents=True)
     path.write_bytes(proof.canonical_json_bytes(failed))
-    try:
-        with pytest.raises(SystemExit, match="INVALID_LIVE_PROOF|FAILED_LIVE_PROOF"):
-            proof.generate_live(check=True)
-    finally:
-        path.write_bytes(original)
+    monkeypatch.setattr(proof, "ROOT", tmp_path)
+    with pytest.raises(SystemExit, match="INVALID_LIVE_PROOF|FAILED_LIVE_PROOF"):
+        proof.generate_live(check=True)
+    assert path.read_bytes() == proof.canonical_json_bytes(failed)
+
+
+@pytest.mark.parametrize(
+    "typed_result,result,attempted,completed,predicate",
+    [
+        ("CONFIGURATION_INCOMPLETE", "inconclusive", 0, 0, "request_bound_ok"),
+        ("ACQUISITION_INCOMPLETE", "inconclusive", 1, 0, "request_bound_ok"),
+        ("FAIL", "fail", 2, 2, "abba_byte_identity"),
+    ],
+)
+def test_live_write_mode_rejects_nonpassing_proof_without_overwrite(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    typed_result: str,
+    result: str,
+    attempted: int,
+    completed: int,
+    predicate: str,
+) -> None:
+    original = (proof.ROOT / proof.LIVE_ABBA_REL).read_bytes()
+    failed = json.loads(original)
+    failed.update(
+        {
+            "top_level_pass": False,
+            "result": result,
+            "typed_result_class": typed_result,
+            "requests_attempted": attempted,
+            "requests_completed": completed,
+            "same_normalized_inputs_reused_for_ab_ba": False,
+        }
+    )
+    failed["predicates"][predicate] = False
+    path = tmp_path / proof.LIVE_ABBA_REL
+    path.parent.mkdir(parents=True)
+    path.write_bytes(original)
+    monkeypatch.setattr(proof, "ROOT", tmp_path)
+    monkeypatch.setattr(proof, "build_live_proof", lambda: failed)
+
+    with pytest.raises(SystemExit, match="INVALID_LIVE_PROOF|FAILED_LIVE_PROOF"):
+        proof.main(["--live"])
+
+    assert path.read_bytes() == original
+
+
+def test_live_write_mode_accepts_passing_proof(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    original = (proof.ROOT / proof.LIVE_ABBA_REL).read_bytes()
+    passing = json.loads(original)
+    path = tmp_path / proof.LIVE_ABBA_REL
+    monkeypatch.setattr(proof, "ROOT", tmp_path)
+    monkeypatch.setattr(proof, "build_live_proof", lambda: passing)
+
+    payload = proof.generate_live(check=False)
+
+    assert payload == passing
+    assert path.read_bytes() == original
