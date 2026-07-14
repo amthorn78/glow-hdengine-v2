@@ -69,6 +69,27 @@ def test_runner_orders_steps_and_isolates_open_environment(tmp_path: Path) -> No
     assert os.environ.get("SAFE_MODE") != "0" or os.environ.get("ALLOW_NETWORK") != "1"
 
 
+def test_runner_scrubs_ambient_vendor_credentials_from_child_env(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    for key in runner.CREDENTIAL_ENV_NAMES:
+        monkeypatch.setenv(key, f"ambient-{key.lower()}")
+    probe = tmp_path / "probe.py"
+    out = tmp_path / "out.txt"
+    probe.write_text(
+        "import os,sys,pathlib\nkeys=sys.argv[2:]\npathlib.Path(sys.argv[1]).write_text('\\n'.join(k for k in keys if os.environ.get(k))+'\\n', encoding='utf-8')\n",
+        encoding="utf-8",
+    )
+    job = {
+        "name": "rails_open_conformance",
+        "rails": {"SAFE_MODE": "0", "ALLOW_NETWORK": "1", "LC_ALL": "C", "LANG": "C", "TZ": "UTC"},
+        "steps": [{"command": f"{sys.executable} {probe} {out} " + " ".join(sorted(runner.CREDENTIAL_ENV_NAMES))}],
+    }
+
+    assert runner.run_job(job) == 0
+    assert out.read_text(encoding="utf-8") == "\n"
+    for key in runner.CREDENTIAL_ENV_NAMES:
+        assert os.environ[key] == f"ambient-{key.lower()}"
+
+
 @pytest.mark.parametrize(
     "mutate, expected",
     [

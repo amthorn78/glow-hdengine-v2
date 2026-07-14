@@ -162,6 +162,8 @@ def validate(path: Path) -> dict[str, Any]:
 
 def run_job(job: dict[str, Any]) -> int:
     env = dict(os.environ)
+    for key in CREDENTIAL_ENV_NAMES:
+        env.pop(key, None)
     env.update({str(k): str(v) for k, v in job["rails"].items()})
     for step in job["steps"]:
         cmd = step["command"]
