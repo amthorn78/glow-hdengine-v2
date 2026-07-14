@@ -72,7 +72,16 @@ def test_fixture_producer_check_writes_only_primary(tmp_path: Path) -> None:
     payload = proof.build_fixture_proof(canon_gate_result={"command": "fixture", "passed": True})
     data = proof.canonical_json_bytes(payload)
     assert data.endswith(b"\n") and not data.endswith(b"\n\n") and b"\r" not in data
+    assert data == proof.canon.sercanon(payload)
     assert json.loads(data)["top_level_pass"] is True
+
+
+def test_canonical_json_bytes_preserves_utf8_unicode() -> None:
+    payload = {"title": "PF09.6 — HDE-Build-Checklist-Distillation"}
+    data = proof.canonical_json_bytes(payload)
+    assert data == proof.canon.sercanon(payload)
+    assert "—".encode("utf-8") in data
+    assert b"\\u2014" not in data
 
 
 def test_live_harness_individual_mode_request_bound_and_secret_safe(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -286,6 +295,23 @@ def test_live_check_mode_rejects_failed_or_inconclusive_artifact(monkeypatch: py
     with pytest.raises(SystemExit, match="INVALID_LIVE_PROOF|FAILED_LIVE_PROOF"):
         proof.generate_live(check=True)
     assert path.read_bytes() == proof.canonical_json_bytes(failed)
+
+
+def test_live_check_mode_rejects_ascii_escaped_unicode(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    original = (proof.ROOT / proof.LIVE_ABBA_REL).read_bytes()
+    payload = json.loads(original)
+    escaped = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8") + b"\n"
+    assert b"\\u2014" in escaped
+    assert escaped != proof.canonical_json_bytes(payload)
+    path = tmp_path / proof.LIVE_ABBA_REL
+    path.parent.mkdir(parents=True)
+    path.write_bytes(escaped)
+    monkeypatch.setattr(proof, "ROOT", tmp_path)
+
+    with pytest.raises(SystemExit, match="NONCANONICAL"):
+        proof.generate_live(check=True)
+
+    assert path.read_bytes() == escaped
 
 
 @pytest.mark.parametrize(

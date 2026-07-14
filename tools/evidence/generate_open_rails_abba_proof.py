@@ -52,7 +52,7 @@ LIVE_SYNTHETIC_B = VendorInputs(resolve_db_user_id("hde-epic038-live-bravo"), "1
 
 
 def canonical_json_bytes(payload: Mapping[str, Any]) -> bytes:
-    return json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8") + b"\n"
+    return canon.sercanon(payload)
 
 
 def sha(data: bytes) -> str:
