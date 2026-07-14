@@ -573,6 +573,7 @@ def build_live_proof(
         "requests_attempted": 0,
         "requests_completed": 0,
         "request_results": [],
+        "optional_env_inputs_absent": [],
         "top_level_pass": False,
         "result": "inconclusive",
         "no_raw_payload_predicate": True,

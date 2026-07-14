@@ -140,10 +140,12 @@ def test_live_harness_individual_mode_request_bound_and_secret_safe(monkeypatch:
     assert payload["top_level_pass"] is True
     assert payload["requests_attempted"] == 2
     assert payload["requests_completed"] == 2
+    assert payload["optional_env_inputs_absent"] == []
     assert payload["same_normalized_inputs_reused_for_ab_ba"] is True
     assert payload["predicates"]["distinct_input_fingerprints"] is True
     assert payload["predicates"]["distinct_normalized_payloads"] is True
     assert payload["predicates"]["normalized_payload_hashes_bound"] is True
+    assert proof._require_passing_live_proof(dict(payload)) == payload
     assert payload["predicates"]["two_run_ab_identity"] is True
     assert payload["predicates"]["two_run_ba_identity"] is True
     encoded = proof.canonical_json_bytes(payload).decode("utf-8")
