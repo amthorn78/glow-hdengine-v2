@@ -1,5 +1,3 @@
-postgres hde.body_graphs SELECT
-postgres hde.body_graphs_current SELECT
-postgres public.hde_body_graphs_current SELECT
+NO_GRANT_STATEMENTS_ESTABLISHED source=migrations/011_body_graphs_durability.sql
 ALTER DEFAULT PRIVILEGES:
-(none)
+(none established by tracked PR-04 DDL)

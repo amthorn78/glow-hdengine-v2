@@ -28,6 +28,15 @@ def ddl_payload():
     sql=norm_sql(); cons=[]
     for m in re.finditer(r'(unique\s*\([^;]+?\)|primary\s+key\s*\([^;]+?\)|not\s+null)',sql): cons.append(m.group(1))
     return {'schema':'v1','captured_at_utc':TS,'source':'tracked_ddl_offline','search_path':'hde, public','normalized_ddl_sha256':hashlib.sha256(sql.encode()).hexdigest(),'constraint_count':len(cons),'objects':['hde.body_graphs','hde.body_graphs_current','public.hde_body_graphs_current']}
+def grants_text():
+    migration=ROOT/'migrations/011_body_graphs_durability.sql'
+    sql=migration.read_text(encoding='utf-8') if migration.exists() else ''
+    grants=[]
+    for m in re.finditer(r'(?im)^\s*grant\s+(.+?)\s+on\s+(.+?)\s+to\s+(.+?);', sql):
+        grants.append(f"GRANT {m.group(1).strip()} ON {m.group(2).strip()} TO {m.group(3).strip()} source=migrations/011_body_graphs_durability.sql")
+    if not grants:
+        return b'NO_GRANT_STATEMENTS_ESTABLISHED source=migrations/011_body_graphs_durability.sql\nALTER DEFAULT PRIVILEGES:\n(none established by tracked PR-04 DDL)\n'
+    return ('\n'.join(sorted(grants))+'\n').encode()
 def constraints_text():
     sql=norm_sql(); lines=[]
     if 'unique (user_id, vendor, vendor_version, input_fingerprint)' in sql: lines.append('PASS constraint unique_body_graph_identity source=migrations/011_body_graphs_durability.sql')
@@ -38,8 +47,7 @@ def constraints_text():
 def generate(check=False):
     ensure_determinism_env()
     write(OUTS['ddl'],cjson(ddl_payload()),check)
-    grants='postgres hde.body_graphs SELECT\npostgres hde.body_graphs_current SELECT\npostgres public.hde_body_graphs_current SELECT\nALTER DEFAULT PRIVILEGES:\n(none)\n'
-    write(OUTS['grants'],grants.encode(),check)
+    write(OUTS['grants'],grants_text(),check)
     write(OUTS['schema'],b'hde, public\n',check)
     write(OUTS['constraints'],constraints_text(),check)
     boundary='view: hde.body_graphs_current\nis_updatable: NO\nis_insertable_into: NO\nis_trigger_updatable: NO\n\nview: public.hde_body_graphs_current\nis_updatable: NO\nis_insertable_into: NO\nis_trigger_updatable: NO\n'

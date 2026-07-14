@@ -16,6 +16,7 @@ def test_db_runtime_outputs_and_check_residue():
     for p in paths: assert_lf(p)
     assert (ROOT/'artifacts/db/check_schema.txt').read_text()=='hde, public\n'
     assert 'PASS constraint unique_body_graph_identity' in (ROOT/'artifacts/db/check_constraints.txt').read_text()
+    assert 'NO_GRANT_STATEMENTS_ESTABLISHED' in (ROOT/'artifacts/db/grants.txt').read_text()
     boundary=(ROOT/'artifacts/db/boundary_view.readonly.proof.txt').read_text(); assert 'is_updatable: NO' in boundary and 'is_insertable_into: NO' in boundary
     non=json.loads((ROOT/'artifacts/runtime/env_connectivity.nondev_failure.json').read_text()); assert non['selection_order']==['psycopg','bridge']; assert non['total_failure']['typed_error']['class']=='BridgeUnavailable'
 

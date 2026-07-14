@@ -1,1 +1,1 @@
-{"canonical_source_sequence":["db","db"],"pair_order":"ba","schema":"v1","source_decisions":[{"identity":"synthetic_a","source":"db"},{"identity":"synthetic_b","source":"db"}],"transport_calls":0}
+{"canonical_source_sequence":["db","db"],"identity_sequence":["synthetic_b","synthetic_a"],"pair_order":"ba","schema":"v1","source_decisions":[{"identity":"synthetic_b","source":"db"},{"identity":"synthetic_a","source":"db"}],"transport_calls":0}

@@ -9,6 +9,9 @@ def test_bodygraph_policy_deterministic_and_closed_rails():
     run(['tools/evidence/generate_bodygraph_policy_proofs.py']); h2={p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in paths}; assert h1==h2
     run(['tools/evidence/generate_bodygraph_policy_proofs.py','--check']); h3={p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in paths}; assert h2==h3
     sel=json.loads((ROOT/paths[0]).read_text()); vendor=[r for r in sel['scenarios'] if r['requested_source']=='vendor'][0]; assert vendor['transport_calls']==0 and vendor['reason']=='PROVIDER_REFUSED'
+    ab=json.loads((ROOT/paths[1]).read_text()); ba=json.loads((ROOT/paths[2]).read_text())
+    assert ab['identity_sequence']==['synthetic_a','synthetic_b']
+    assert ba['identity_sequence']==['synthetic_b','synthetic_a']
     summary=json.loads((ROOT/paths[3]).read_text()); assert summary['ab_ba_source_invariant'] is True
     pol=json.loads((ROOT/paths[4]).read_text()); assert pol['ttl_s'] and pol['swr_s'] and pol['rate_limit']['requests_per_window'] and pol['circuit_breaker']['fail_threshold']
     assert 'birth' not in (ROOT/paths[6]).read_text().lower()

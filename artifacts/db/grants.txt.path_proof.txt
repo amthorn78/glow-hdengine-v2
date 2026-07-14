@@ -1,5 +1,5 @@
 path: artifacts/db/grants.txt
-size_bytes: 152
-sha256: d8ffabd19afe7600f32031b159c2c647d9df90db5b54e329675f1f5cf359fe05
+size_bytes: 147
+sha256: 02c6075a80f7f4d35ee97cb986f5564a3155d090edc56ee9568b62895be1f096
 mtime_utc: 2026-05-19T12:30:43Z
 produced_at_utc: 2026-05-18T01:24:35Z

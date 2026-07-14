@@ -23,7 +23,9 @@ def selection():
         r=resolve_bodygraph('hde-epic038-pr04-synthetic',source=src,upsert=False,dry_run=True,env=env)
         rows.append({'scenario':f'{src}_closed_rails','requested_source':src,'resolved_source':r.payload.get('resolver',{}).get('resolved_source'),'status':r.status,'exit_code':r.exit_code,'transport_calls':0,'reason':(r.payload.get('error') or {}).get('code','no_io')})
     return {'schema':'v1','captured_at_utc':TS,'proof_labels':[{'name':'BG_SOURCE_SELECTION_OK','type':'non_token'},{'name':'BG_VENDOR_CALLS_DISABLED_IN_PROD_OK','type':'non_token'}],'scenarios':rows}
-def inv(order): return {'schema':'v1','pair_order':order,'source_decisions':[{'identity':'synthetic_a','source':'db'},{'identity':'synthetic_b','source':'db'}],'canonical_source_sequence':['db','db'],'transport_calls':0}
+def inv(order):
+    identities=['synthetic_a','synthetic_b'] if order == 'ab' else ['synthetic_b','synthetic_a']
+    return {'schema':'v1','pair_order':order,'identity_sequence':identities,'source_decisions':[{'identity':identity,'source':'db'} for identity in identities],'canonical_source_sequence':['db','db'],'transport_calls':0}
 def policy_payload():
     return {**POLICY,'sample_counts':{'refresh_attempts':0,'refresh_successes':0,'refresh_failures':0,'breaker_tripped':1,'rate_limit_hits':1},'proof_labels':[{'name':'BG_TTL_SWR_POLICY_OK','type':'non_token'},{'name':'BG_RATE_LIMIT_POLICY_OK','type':'non_token'},{'name':'BG_CIRCUIT_BREAKER_POLICY_OK','type':'non_token'}]}
 def metrics(): return {'schema':'v1','counters':{'refresh_attempts_total':0,'refresh_success_total':0,'refresh_failure_total':0,'breaker_tripped_total':1,'rate_limit_hit_total':1},'timers_ms':{'refresh_duration_p95':0},'labels':{'env':'fixture','source':'hdapi','reason':'closed_rails_fixture'}}
