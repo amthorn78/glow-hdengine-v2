@@ -7,6 +7,7 @@ import json
 import os
 import sys
 from pathlib import Path
+import tempfile
 from typing import Callable, Mapping
 from urllib import request as urlrequest
 
@@ -24,8 +25,6 @@ from engine.bodygraph.vendor_client import (  # noqa: E402
     VendorRetryConfig,
     VendorTimeouts,
 )
-from tools.evidence import update_evidence_index  # noqa: E402
-
 PRODUCED_AT = "2026-07-13T00:00:00Z"
 OPS_REFUSAL_REL = "artifacts/proofs/ops_refusal_proof.txt"
 RETRY_AFTER_REL = "artifacts/vendor/retry_after_parse.log"
@@ -54,25 +53,19 @@ def _json_line(payload: object) -> str:
 
 
 def _write_governed(rel: str, text: str, *, check: bool) -> None:
+    """Write/check only the rails primary artifact bytes.
+
+    Governed sibling path proofs, Human Index, hash sentinels, and Machine
+    Mirror rows are owned solely by tools/evidence/update_evidence_index.py.
+    """
     data = text.encode("utf-8")
     path = ROOT / rel
     if check:
         if not path.exists() or path.read_bytes() != data:
             raise SystemExit(json.dumps({"status": "FAIL", "stale": rel}, sort_keys=True))
-    else:
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_bytes(data)
-    stat = path.stat()
-    update_evidence_index._write_path_proof(
-        rel,
-        sha256=update_evidence_index._sha256_path(path),
-        size_bytes=stat.st_size,
-        mtime_utc=None,
-        produced_at=PRODUCED_AT,
-        default_produced_at=PRODUCED_AT,
-        check=check,
-        stat_mtime=stat.st_mtime,
-    )
+        return
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(data)
 
 
 def _client(log_path: Path, request: Callable[[urlrequest.Request, float], tuple[int, bytes, Mapping[str, str]]]) -> HdApiClient:
@@ -134,8 +127,6 @@ def build_retry_after() -> str:
 
 
 def build_keys_only() -> str:
-    tmp = ROOT / ".rails_gate_keys_only.tmp"
-    tmp.write_text("", encoding="utf-8")
     request = VendorRequest(
         url="https://vendor.test/v1/bodygraphs",
         headers={"HD-Api-Key": "fixture-api-key-value", "HD-Geocode-Key": "fixture-geo-key-value"},
@@ -153,21 +144,22 @@ def build_keys_only() -> str:
     previous = {"SAFE_MODE": os.environ.get("SAFE_MODE"), "ALLOW_NETWORK": os.environ.get("ALLOW_NETWORK")}
     os.environ["SAFE_MODE"] = "1"
     os.environ["ALLOW_NETWORK"] = "0"
-    try:
-        for func in cases:
-            try:
-                _client(tmp, func).fetch(request)
-            except VendorError:
-                pass
-    finally:
-        for key, value in previous.items():
-            if value is None:
-                os.environ.pop(key, None)
-            else:
-                os.environ[key] = value
-    text = tmp.read_text(encoding="utf-8")
-    tmp.unlink(missing_ok=True)
-    return text
+    with tempfile.TemporaryDirectory(prefix="hde-rails-gate-keys-only-") as tmp_dir:
+        tmp = Path(tmp_dir) / "keys_only.log"
+        tmp.write_text("", encoding="utf-8")
+        try:
+            for func in cases:
+                try:
+                    _client(tmp, func).fetch(request)
+                except VendorError:
+                    pass
+            return tmp.read_text(encoding="utf-8")
+        finally:
+            for key, value in previous.items():
+                if value is None:
+                    os.environ.pop(key, None)
+                else:
+                    os.environ[key] = value
 
 
 def validate_outputs(outputs: dict[str, str]) -> None:

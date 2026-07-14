@@ -2470,6 +2470,24 @@ EPIC038_PR03_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
         "produced_at_utc": "2026-07-13T00:00:00Z",
         "notes": "Reusable HDE rails-gate fixture-backed keys-only vendor log sample",
     },
+    {
+        "artifact_key": "epic038.pr03.open_rails_abba",
+        "discovered_physical_path": "audit/gates/determinism/open_rails_abba.json",
+        "epic_id": "HDE-EPIC038",
+        "record_type": "epic038_pr03_open_rails_abba_proof",
+        "schema_version": "1.0",
+        "produced_at_utc": "2026-07-14T00:00:00Z",
+        "notes": "Fixture-backed open-rails ABBA determinism proof; live vendor calls forbidden and acceptance_token_satisfied=false",
+    },
+    {
+        "artifact_key": "epic038.pr03.open_rails_vendor_abba",
+        "discovered_physical_path": "audit/gates/determinism/open_rails_vendor_abba.json",
+        "epic_id": "HDE-EPIC038",
+        "record_type": "epic038_pr03_open_rails_vendor_abba_proof",
+        "schema_version": "1.0",
+        "produced_at_utc": "2026-07-14T00:00:00Z",
+        "notes": "PO-authorized bounded live vendor-backed ABBA acquisition proof with at most two requests; acceptance_token_satisfied=false",
+    },
 ]
 
 A7_PRIMARY_ARTIFACTS: list[dict[str, object]] = [

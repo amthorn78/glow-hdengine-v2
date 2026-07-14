@@ -7,6 +7,7 @@ import os
 import shlex
 import subprocess
 import sys
+import re
 from pathlib import Path
 from typing import Any
 
@@ -22,6 +23,18 @@ EXPECTED_RAILS = {
 }
 CREDENTIAL_KEYS = {"secrets", "secret", "credentials", "credential", "tokens", "token", "api_key", "apikey", "authorization", "password"}
 CREDENTIAL_ENV_NAMES = {"HD_API_KEY", "GEO_API_KEY", "HDAPI_BASE_URL", "HD_API_BASE_URL", "AUTHORIZATION", "API_KEY", "TOKEN", "SECRET"}
+NORMALIZED_CREDENTIAL_NAMES = {re.sub(r"[^A-Z0-9]", "", name.upper()) for name in CREDENTIAL_ENV_NAMES}
+ALLOWED_ARGV = {
+    "rails_closed_refusal": (("python", "-m", "pytest", "tests/bodygraph/test_resolver_vendor.py", "-q"),),
+    "rails_open_conformance": (
+        ("python", "-m", "pytest", "tests/bodygraph/test_vendor_client.py", "tests/evidence/test_open_rails_abba_proof.py", "-q"),
+        ("python", "tools/evidence/generate_open_rails_abba_proof.py", "--check"),
+    ),
+    "logs_keys_only_redaction": (
+        ("python", "tools/evidence/generate_rails_gate_evidence.py", "--check"),
+        ("python", "-m", "pytest", "tests/bodygraph/test_vendor_client.py", "tests/bodygraph/test_resolver_vendor.py", "-q"),
+    ),
+}
 
 
 class DefinitionError(Exception):
@@ -117,6 +130,40 @@ def _reject_structural_credentials(obj: Any, *, in_env: bool = False) -> None:
             _reject_structural_credentials(v, in_env=in_env)
 
 
+
+def _normalized_sensitive_name(raw: str) -> str:
+    return re.sub(r"[^A-Z0-9]", "", raw.upper())
+
+
+def _is_sensitive_name(raw: str) -> bool:
+    return _normalized_sensitive_name(raw) in NORMALIZED_CREDENTIAL_NAMES
+
+
+def _reject_credential_argv(argv: list[str]) -> None:
+    for idx, token in enumerate(argv):
+        if "=" in token:
+            name, value = token.split("=", 1)
+            if name.startswith("--"):
+                name = name[2:]
+            if _is_sensitive_name(name) and value.strip():
+                raise DefinitionError(f"credential-bearing command argument is forbidden: {name}")
+        if token.startswith("--"):
+            name = token[2:]
+            if "=" in name:
+                name = name.split("=", 1)[0]
+            if _is_sensitive_name(name) and idx + 1 < len(argv) and argv[idx + 1].strip():
+                raise DefinitionError(f"credential-bearing command option is forbidden: {token}")
+        if token == "env" or token.endswith("/env"):
+            raise DefinitionError("env wrapper is forbidden in rails job commands")
+
+
+def _validate_allowed_argv(job_name: str, argv: list[str]) -> None:
+    normalized = tuple("python" if arg == sys.executable else arg for arg in argv)
+    allowed = ALLOWED_ARGV.get(job_name, ())
+    if normalized not in allowed:
+        raise DefinitionError(f"command argv not allowlisted for {job_name}: {normalized}")
+
+
 def validate(path: Path) -> dict[str, Any]:
     job = load_closed_yaml(path)
     if not isinstance(job, dict):
@@ -157,6 +204,12 @@ def validate(path: Path) -> dict[str, Any]:
             raise DefinitionError("step command must be non-empty single-line string")
         if "proves" in step and (not isinstance(step["proves"], list) or not all(isinstance(x, str) for x in step["proves"])):
             raise DefinitionError("proves must be list of strings")
+        try:
+            argv = shlex.split(cmd)
+        except ValueError as exc:
+            raise DefinitionError("step command could not be parsed") from exc
+        _reject_credential_argv(argv)
+        _validate_allowed_argv(str(name), argv)
     return job
 
 
@@ -169,6 +222,8 @@ def run_job(job: dict[str, Any]) -> int:
         cmd = step["command"]
         print(f"RUN {job['name']}: {cmd}", flush=True)
         argv = shlex.split(cmd)
+        _reject_credential_argv(argv)
+        _validate_allowed_argv(str(job["name"]), argv)
         result = subprocess.run(argv, cwd=ROOT, env=env, text=True)
         if result.returncode != 0:
             return result.returncode
