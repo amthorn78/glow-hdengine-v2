@@ -1,5 +1,5 @@
 path: artifacts/db_bridge/provider_parity.proof.json
-size_bytes: 2607
-sha256: 09ee6cb404795c853bfaa845e71e09bcc0eaa70056af198958b1d9f287b8247e
+size_bytes: 3310
+sha256: 67ed1dde2cd6d2267ffd4071aff7bdf6bc95e7d48bec267c235403e5bdf2fd77
 mtime_utc: 2026-05-19T12:30:45Z
 produced_at_utc: 2026-05-18T01:24:35Z

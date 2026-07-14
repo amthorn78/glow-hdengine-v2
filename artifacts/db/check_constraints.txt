@@ -1,1 +1,7 @@
-
+PASS constraint unique_body_graph_identity source=migrations/011_body_graphs_durability.sql
+PASS not_null hde.body_graphs.created_at source=migrations/011_body_graphs_durability.sql
+PASS not_null hde.body_graphs.input_fingerprint source=migrations/011_body_graphs_durability.sql
+PASS not_null hde.body_graphs.payload source=migrations/011_body_graphs_durability.sql
+PASS not_null hde.body_graphs.user_id source=migrations/011_body_graphs_durability.sql
+PASS not_null hde.body_graphs.vendor source=migrations/011_body_graphs_durability.sql
+PASS not_null hde.body_graphs.vendor_version source=migrations/011_body_graphs_durability.sql

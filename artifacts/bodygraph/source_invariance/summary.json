@@ -1,1 +1,1 @@
-{"captured_at_utc":"2025-11-16T06:30:21Z","runs":{"ab":{"composite_fingerprint":"54ecb64d5cad35123ef0e48b0fe69fc40e80a7eab61b2c7f9e016fef8ade0e70","status":"match","variant":"ab"},"ba":{"composite_fingerprint":"23ab99b607211a30c32d016debe339a9ee21c56ca426120e940f9486e61b04f7","status":"match","variant":"ba"}},"schema":"v1","series":"PF12-BG-S10","user_id":"epic011-s10-invariance-1"}
+{"ab_ba_source_invariant":true,"captured_at_utc":"2026-07-14T00:00:00Z","proof_labels":[{"name":"BG_SOURCE_INVARIANCE_OK","type":"non_token"}],"schema":"v1"}

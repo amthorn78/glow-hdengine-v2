@@ -1,0 +1,5 @@
+path: artifacts/db/check_constraints.txt
+size_bytes: 633
+sha256: 053fb6d84d888fc3e1f34902fd04c3f0e0a5828fb7655c57a26a56f8a1213aff
+mtime_utc: 2026-07-14T22:19:21Z
+produced_at_utc: 2026-07-14T16:55:30Z

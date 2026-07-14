@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate deterministic HDE-EPIC032 PR-03 DB bridge evidence."""
+"""Generate deterministic DB bridge parity evidence."""
 from __future__ import annotations
 
 import argparse
@@ -24,6 +24,9 @@ ADAPTER_SELECTION_PATH = ROOT / "artifacts/db_bridge/adapter_selection.snapshot.
 PROVIDER_PARITY_PATH = ROOT / "artifacts/db_bridge/provider_parity.proof.json"
 ENV_CONNECTIVITY_PATH = ROOT / "artifacts/runtime/env_connectivity.snapshot.json"
 NONDEV_FAILURE_PATH = ROOT / "artifacts/runtime/env_connectivity.nondev_failure.json"
+VENDOR_UPSERT_PATH = ROOT / "artifacts/bodygraph/vendor_upsert.epic038_synthetic.json"
+DB_RESOLVE_PATH = ROOT / "artifacts/bodygraph/db_resolve.epic038_synthetic.json"
+PRESENTER_COMPARE_PATH = ROOT / "artifacts/presenter/json_canon_compare.log"
 
 PRODUCED_AT_UTC = "2026-05-18T00:00:00Z"
 REDACTED_DSN = "redacted_database_url_present"
@@ -241,7 +244,7 @@ def _deterministic_harness_payload() -> dict[str, Any]:
     cases = [_compare_case(name, direct, bridge) for name in ("select_one", "search_path", "version", "tx_select_one")]
     return {
         "cases": cases,
-        "corpus": "hde_epic032_pr03_canonical_corpus_v1",
+        "corpus": "hde_epic038_pr04_fixture_corpus_v1",
         "status": "pass" if all(case["parity"] == "pass" for case in cases) else "fail",
     }
 
@@ -296,12 +299,13 @@ def _provider_parity_payload(db: DBAccess) -> dict[str, Any]:
         "bridge_capability": _bridge_capability_payload(),
         "capabilities": _live_unavailable_capabilities(),
         "captured_at_utc": PRODUCED_AT_UTC,
+        "fixture_parity": _deterministic_harness_payload(),
         "deterministic_harness": _deterministic_harness_payload(),
         "environment": "dev",
         "live_provider_parity": {
             "direct_provider_rows": "unavailable",
-            "parity_status": "unavailable",
-            "reason": "coding_agent_closed_rails_no_secret_backed_database_url",
+            "parity_status": "not_pass",
+            "reason": "active_provider_rows_unavailable_or_not_exercised",
         },
         "proof_labels": [
             {"name": "DB_PROVIDER_PARITY_OK", "status": "not_claimed", "type": "non_token"},
@@ -373,6 +377,15 @@ def generate(*, check: bool = False) -> None:
 
     _write_or_check(PROVIDER_PARITY_PATH, parity_payload, check=check)
     _write_or_check(NONDEV_FAILURE_PATH, nondev_payload, check=check)
+    synthetic = {"schema":"v1","synthetic_identity":"hde-epic038-pr04-synthetic","payload_posture":"mapped_bounded_no_raw_vendor_payload","fields":["centers","channels","profile"],"live_provider":"not_exercised"}
+    _write_or_check(VENDOR_UPSERT_PATH, {**synthetic, "artifact":"vendor_upsert", "operation":"fixture_vendor_mapping"}, check=check)
+    _write_or_check(DB_RESOLVE_PATH, {**synthetic, "artifact":"db_resolve", "operation":"fixture_db_resolution"}, check=check)
+    compare = "JSON_CANONICAL_CHECK_OK fixture_presenter_serializer_compare=pass synthetic_identity=hde-epic038-pr04-synthetic live_provider=not_exercised\n"
+    if check:
+        if not PRESENTER_COMPARE_PATH.exists() or PRESENTER_COMPARE_PATH.read_text(encoding="utf-8") != compare:
+            raise SystemExit(f"STALE:{PRESENTER_COMPARE_PATH.relative_to(ROOT).as_posix()}")
+    else:
+        PRESENTER_COMPARE_PATH.parent.mkdir(parents=True, exist_ok=True); PRESENTER_COMPARE_PATH.write_text(compare, encoding="utf-8")
 
 
 def main(argv: Iterable[str] | None = None) -> int:
