@@ -47,6 +47,54 @@ LIVE_REQUIRED_PREDICATES = frozenset(
         "two_run_ba_identity",
     }
 )
+
+LIVE_TOP_LEVEL_KEYS = frozenset(
+    {
+        "acceptance_token_satisfied",
+        "applied_abba_contract_mode",
+        "artifact_kind",
+        "generated_at_utc",
+        "no_raw_payload_predicate",
+        "no_secret_value_predicate",
+        "non_production_environment",
+        "normalized_a_sha256",
+        "normalized_b_sha256",
+        "optional_env_inputs_absent",
+        "pf09_mapping",
+        "po_override_note",
+        "predicates",
+        "reader_hashes",
+        "request_results",
+        "requests_attempted",
+        "requests_completed",
+        "result",
+        "route_policy",
+        "same_normalized_inputs_reused_for_ab_ba",
+        "secret_presence",
+        "synthetic_input_names",
+        "synthetic_input_source",
+        "top_level_pass",
+        "typed_result_class",
+        "vendor_acquisition_architecture",
+    }
+)
+LIVE_FORBIDDEN_KEY_PARTS = (
+    "raw_request",
+    "raw_response",
+    "raw_payload",
+    "raw_vendor_payload",
+    "authorization",
+    "credential",
+    "birth",
+    "location",
+)
+LIVE_READER_HASH_KEYS = frozenset({"ab_sha256", "ab_run2_sha256", "ba_sha256", "ba_run2_sha256"})
+LIVE_REQUEST_RESULT_KEYS = frozenset({"party", "result_class", "input_fingerprint_sha256", "normalized_payload_sha256"})
+LIVE_NONPROD_KEYS = frozenset({"configured_base_url", "proven", "reason"})
+LIVE_SECRET_PRESENCE_KEYS = frozenset({"GEO_API_KEY", "HDAPI_BASE_URL", "HD_API_BASE_URL", "HD_API_KEY"})
+LIVE_SYNTHETIC_INPUT_NAME_KEYS = frozenset({"a", "b"})
+LIVE_PF09_KEYS = frozenset({"title", "task", "subtask", "status"})
+LIVE_ROUTE_POLICY_KEYS = frozenset({"classification", "configured_base_version", "payload_family", "resource_path", "route_family", "supported"})
 SENSITIVE_ENV = (
     "HD_API_KEY",
     "GEO_API_KEY",
@@ -79,6 +127,7 @@ def _is_sha256(value: object) -> bool:
 
 def _live_summary_predicates(proof: Mapping[str, Any]) -> dict[str, bool]:
     failed = {
+        "abba_byte_identity": False,
         "distinct_input_fingerprints": False,
         "distinct_normalized_payloads": False,
         "normalized_payload_hashes_bound": False,
@@ -126,6 +175,9 @@ def _live_summary_predicates(proof: Mapping[str, Any]) -> dict[str, bool]:
             proof.get("normalized_a_sha256") == a_payload_hash
             and proof.get("normalized_b_sha256") == b_payload_hash
         ),
+        "abba_byte_identity": bool(
+            hashes_valid and reader_hashes["ab_sha256"] == reader_hashes["ba_sha256"]
+        ),
         "two_run_ab_identity": bool(
             hashes_valid and reader_hashes["ab_sha256"] == reader_hashes["ab_run2_sha256"]
         ),
@@ -134,6 +186,124 @@ def _live_summary_predicates(proof: Mapping[str, Any]) -> dict[str, bool]:
         ),
     }
 
+
+
+def _keys_exact(value: object, expected: frozenset[str]) -> bool:
+    return isinstance(value, Mapping) and set(value) == set(expected)
+
+
+def _has_forbidden_live_key(value: object, *, _path: tuple[str, ...] = ()) -> bool:
+    if isinstance(value, Mapping):
+        for key, nested in value.items():
+            if not isinstance(key, str):
+                return True
+            lowered = key.lower()
+            next_path = (*_path, key)
+            is_safety_summary = len(next_path) == 1 and key in {"no_raw_payload_predicate", "no_secret_value_predicate"}
+            if not is_safety_summary and any(part in lowered for part in LIVE_FORBIDDEN_KEY_PARTS):
+                return True
+            if _has_forbidden_live_key(nested, _path=next_path):
+                return True
+    elif isinstance(value, list):
+        return any(_has_forbidden_live_key(item, _path=_path) for item in value)
+    return False
+
+
+def _derived_live_safety(proof: Mapping[str, Any]) -> dict[str, bool]:
+    nonprod = proof.get("non_production_environment")
+    configured = nonprod.get("configured_base_url") if isinstance(nonprod, Mapping) else None
+    return {
+        "no_raw_payload_predicate": not _has_forbidden_live_key(proof),
+        "no_secret_value_predicate": configured in {"<redacted>", "UNSET"},
+    }
+
+
+def _validate_live_shape(proof: Mapping[str, Any]) -> None:
+    live_keys = set(proof)
+    allowed_without_po = set(LIVE_TOP_LEVEL_KEYS) - {"po_override_note"}
+    if live_keys != set(LIVE_TOP_LEVEL_KEYS) and live_keys != allowed_without_po:
+        raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
+    if _has_forbidden_live_key(proof):
+        raise SystemExit(f"UNSAFE_LIVE_PROOF:{LIVE_ABBA_REL}")
+    if proof.get("artifact_kind") != "hde_epic038_pr03_open_rails_vendor_abba_proof":
+        raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
+    if proof.get("generated_at_utc") != PRODUCED_AT:
+        raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
+    if proof.get("applied_abba_contract_mode") != "raw_byte_identity_after_existing_canonical_pair_normalization":
+        raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
+    if proof.get("vendor_acquisition_architecture") != "individual_bodygraph":
+        raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
+    if proof.get("synthetic_input_source") not in {"fabricated_synthetic_defaults", "environment"}:
+        raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
+
+    nonprod = proof.get("non_production_environment")
+    if not _keys_exact(nonprod, LIVE_NONPROD_KEYS):
+        raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
+    configured = nonprod["configured_base_url"]
+    if configured not in {"<redacted>", "UNSET"} or not isinstance(nonprod.get("reason"), str):
+        raise SystemExit(f"UNSAFE_LIVE_PROOF:{LIVE_ABBA_REL}")
+    if not isinstance(nonprod.get("proven"), bool):
+        raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
+    if nonprod["proven"] is False and not str(proof.get("po_override_note") or "").strip():
+        raise SystemExit(f"UNSAFE_LIVE_PROOF:{LIVE_ABBA_REL}")
+
+    if not _keys_exact(proof.get("pf09_mapping"), LIVE_PF09_KEYS):
+        raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
+    pf09 = proof["pf09_mapping"]
+    if pf09 != {"title": "PF09.6 — HDE-Build-Checklist-Distillation", "task": "HDE-DIST001", "subtask": "HDE-DIST001.3", "status": "Partial"}:
+        raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
+
+    if not _keys_exact(proof.get("reader_hashes"), LIVE_READER_HASH_KEYS):
+        raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
+    if not _is_sha256(proof.get("normalized_a_sha256")) or not _is_sha256(proof.get("normalized_b_sha256")):
+        raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
+
+    results = proof.get("request_results")
+    if not isinstance(results, list) or len(results) != 2:
+        raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
+    parties: set[str] = set()
+    for result in results:
+        if not _keys_exact(result, LIVE_REQUEST_RESULT_KEYS):
+            raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
+        party = result.get("party")
+        if not isinstance(party, str) or party not in {"a", "b"} or party in parties or result.get("result_class") != "success":
+            raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
+        if not _is_sha256(result.get("input_fingerprint_sha256")) or not _is_sha256(result.get("normalized_payload_sha256")):
+            raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
+        parties.add(party)
+    if parties != {"a", "b"}:
+        raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
+
+    predicates = proof.get("predicates")
+    if not _keys_exact(predicates, LIVE_REQUIRED_PREDICATES):
+        raise SystemExit(f"FAILED_LIVE_PROOF:{LIVE_ABBA_REL}")
+    if not all(isinstance(predicates.get(key), bool) for key in LIVE_REQUIRED_PREDICATES):
+        raise SystemExit(f"FAILED_LIVE_PROOF:{LIVE_ABBA_REL}")
+
+    route_policy = proof.get("route_policy")
+    if not _keys_exact(route_policy, LIVE_ROUTE_POLICY_KEYS):
+        raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
+    if not isinstance(route_policy.get("supported"), bool):
+        raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
+    for key in LIVE_ROUTE_POLICY_KEYS - {"supported"}:
+        if not isinstance(route_policy.get(key), str) or not route_policy.get(key):
+            raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
+
+    if not _keys_exact(proof.get("secret_presence"), LIVE_SECRET_PRESENCE_KEYS):
+        raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
+    if not all(isinstance(value, bool) for value in proof["secret_presence"].values()):
+        raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
+    if not _keys_exact(proof.get("synthetic_input_names"), LIVE_SYNTHETIC_INPUT_NAME_KEYS):
+        raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
+    if not all(isinstance(value, str) and value for value in proof["synthetic_input_names"].values()):
+        raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
+    absent = proof.get("optional_env_inputs_absent")
+    if not isinstance(absent, list) or not all(isinstance(item, str) and item for item in absent):
+        raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
+
+    safety = _derived_live_safety(proof)
+    if any(proof.get(key) is not value for key, value in safety.items()) or not all(safety.values()):
+        raise SystemExit(f"UNSAFE_LIVE_PROOF:{LIVE_ABBA_REL}")
 
 def _assert_canonical(name: str, data: bytes) -> bool:
     if not data.endswith(b"\n") or data.endswith(b"\n\n") or b"\r" in data:
@@ -512,6 +682,7 @@ def build_live_proof(
 
 
 def _require_passing_live_proof(proof: dict[str, Any]) -> dict[str, Any]:
+    _validate_live_shape(proof)
     predicates = proof.get("predicates")
     if (
         proof.get("acceptance_token_satisfied") is not False

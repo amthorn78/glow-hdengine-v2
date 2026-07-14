@@ -473,7 +473,7 @@ def test_live_check_mode_recomputes_distinctness(
     path.write_bytes(proof.canonical_json_bytes(payload))
     monkeypatch.setattr(proof, "ROOT", tmp_path)
 
-    with pytest.raises(SystemExit, match="FAILED_LIVE_PROOF"):
+    with pytest.raises(SystemExit, match="FAILED_LIVE_PROOF|INVALID_LIVE_PROOF"):
         proof.generate_live(check=True)
 
     assert path.read_bytes() == proof.canonical_json_bytes(payload)
@@ -532,3 +532,84 @@ def test_live_write_mode_accepts_passing_proof(monkeypatch: pytest.MonkeyPatch, 
 
     assert payload == passing
     assert path.read_bytes() == original
+
+
+def _write_live_check_payload(monkeypatch: pytest.MonkeyPatch, tmp_path: Path, payload: dict[str, object]) -> Path:
+    path = tmp_path / proof.LIVE_ABBA_REL
+    path.parent.mkdir(parents=True)
+    path.write_bytes(proof.canonical_json_bytes(payload))
+    monkeypatch.setattr(proof, "ROOT", tmp_path)
+    return path
+
+
+def test_live_check_mode_derives_abba_identity_from_first_run_hashes(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    payload = json.loads((proof.ROOT / proof.LIVE_ABBA_REL).read_bytes())
+    different_valid_sha = "f" * 64
+    assert different_valid_sha != payload["reader_hashes"]["ab_sha256"]
+    payload["reader_hashes"]["ba_sha256"] = different_valid_sha
+    payload["reader_hashes"]["ba_run2_sha256"] = different_valid_sha
+    payload["predicates"]["abba_byte_identity"] = True
+    payload["predicates"]["two_run_ba_identity"] = True
+    path = _write_live_check_payload(monkeypatch, tmp_path, payload)
+
+    with pytest.raises(SystemExit, match="FAILED_LIVE_PROOF"):
+        proof.generate_live(check=True)
+
+    assert path.read_bytes() == proof.canonical_json_bytes(payload)
+
+
+@pytest.mark.parametrize(
+    "mutation,expected",
+    [
+        ("unknown_key", "INVALID_LIVE_PROOF"),
+        ("raw_vendor_payload", "INVALID_LIVE_PROOF|UNSAFE_LIVE_PROOF"),
+        ("raw_request", "INVALID_LIVE_PROOF|UNSAFE_LIVE_PROOF"),
+        ("raw_response", "INVALID_LIVE_PROOF|UNSAFE_LIVE_PROOF"),
+        ("authorization", "INVALID_LIVE_PROOF|UNSAFE_LIVE_PROOF"),
+        ("credential", "INVALID_LIVE_PROOF|UNSAFE_LIVE_PROOF"),
+        ("birth", "INVALID_LIVE_PROOF|UNSAFE_LIVE_PROOF"),
+        ("location", "INVALID_LIVE_PROOF|UNSAFE_LIVE_PROOF"),
+        ("unredacted_url", "UNSAFE_LIVE_PROOF"),
+        ("missing_po_override", "UNSAFE_LIVE_PROOF"),
+        ("inconsistent_safety_boolean", "UNSAFE_LIVE_PROOF"),
+    ],
+)
+def test_live_check_mode_rejects_closed_shape_and_safety_drift(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    mutation: str,
+    expected: str,
+) -> None:
+    payload = json.loads((proof.ROOT / proof.LIVE_ABBA_REL).read_bytes())
+    if mutation == "unknown_key":
+        payload["unexpected"] = True
+    elif mutation == "raw_vendor_payload":
+        payload["raw_vendor_payload"] = {"data": True}
+    elif mutation == "raw_request":
+        payload["request_results"][0]["raw_request"] = {}
+    elif mutation == "raw_response":
+        payload["request_results"][0]["raw_response"] = {}
+    elif mutation == "authorization":
+        payload["route_policy"]["authorization"] = "Bearer secret"
+    elif mutation == "credential":
+        payload["secret_presence"]["credential"] = "secret"
+    elif mutation == "birth":
+        payload["request_results"][0]["birthdate"] = "1990-01-01"
+    elif mutation == "location":
+        payload["request_results"][0]["location"] = "Amsterdam, NL"
+    elif mutation == "unredacted_url":
+        payload["non_production_environment"]["configured_base_url"] = "https://sandbox.vendor.test/v2"
+    elif mutation == "missing_po_override":
+        payload.pop("po_override_note")
+    else:
+        payload["no_secret_value_predicate"] = False
+
+    path = _write_live_check_payload(monkeypatch, tmp_path, payload)
+
+    with pytest.raises(SystemExit, match=expected):
+        proof.generate_live(check=True)
+
+    assert path.read_bytes() == proof.canonical_json_bytes(payload)
