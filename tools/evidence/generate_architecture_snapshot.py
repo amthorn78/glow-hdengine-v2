@@ -14,7 +14,7 @@ def cjson(o:Any)->bytes: return (json.dumps(o,sort_keys=True,separators=(',',':'
 def tracked():
     import subprocess
     out=subprocess.check_output(['git','ls-files'],cwd=ROOT,text=True)
-    return sorted(p for p in out.splitlines() if p.endswith('.py') and (p.startswith('engine/') or p.startswith('adapter/') or p.startswith('tools/evidence/') or p.startswith('scripts/bodygraph/') or p.startswith('scripts/db/')))
+    return sorted(p for p in out.splitlines() if p != 'tools/evidence/generate_architecture_snapshot.py' and p.endswith('.py') and (p.startswith('engine/') or p.startswith('adapter/') or p.startswith('tools/evidence/') or p.startswith('scripts/bodygraph/') or p.startswith('scripts/db/')))
 def classify(path:str)->str:
     if path.startswith('engine/bodygraph/vendor_client.py') or path.startswith('engine/db/providers/') or path.startswith('engine/bodygraph/ingest.py'): return 'allowed'
     if path.startswith('tools/evidence/') or path.startswith('scripts/db/') or path.startswith('scripts/bodygraph/'): return 'allowed'
@@ -31,8 +31,14 @@ def analyze()->dict[str,Any]:
         imports.extend(ext)
     routes=[]
     for p in tracked():
-        txt=(ROOT/p).read_text(encoding='utf-8')
-        if 'route(' in txt or 'Blueprint(' in txt:
+        tree=ast.parse((ROOT/p).read_text(encoding='utf-8'),filename=p)
+        has_route=False
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Call):
+                fn=node.func
+                if isinstance(fn, ast.Name) and fn.id == 'Blueprint': has_route=True
+                if isinstance(fn, ast.Attribute) and fn.attr == 'route': has_route=True
+        if has_route:
             routes.append({'path':p,'classification':'allowed' if p.startswith('adapter/') else 'out_of_scope','reason_code':'route_registration_static'})
     return {'schema':'architecture_snapshot.keys_only.v1','captured_at_utc':TS,'taxonomy':sorted(CLASSES),'verdict':'pass','analyzer_verdict':'pass','findings':findings,'routes':sorted(routes,key=lambda x:x['path']),'registrations':[{'path':'tools/evidence/update_evidence_index.py','classification':'allowed','reason_code':'governed_evidence_registry'},{'path':'schemas/architecture_snapshot.keys_only.v1.json','classification':'allowed','reason_code':'schema_registration'}],'forbidden_patterns':[],'unknown_count':0,'external_io_symbol_kinds':sorted(set(imports))}
 def schema_payload():
