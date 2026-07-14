@@ -8,9 +8,19 @@ rails:
 scope: reusable-hde-rails-open-conformance-fixture-backed-mocked-non-live
 live_vendor_calls: forbidden
 steps:
-  - command: python -m pytest tests/bodygraph/test_vendor_client.py -q
+  - command: python -m pytest tests/bodygraph/test_vendor_client.py tests/evidence/test_open_rails_abba_proof.py -q
     proves:
-      - open rails provider policy is local fixture-backed mocked and non-live
+      - fixture-backed open rails provider policy is mocked non-live and live vendor calls are forbidden
       - retry timeout and backoff profile sets are pinned integer values with no jitter
       - retries occur only for network_error and 5xx while HTTP 429 and other 4xx are not retried
       - redirects are not followed and Retry-After parsing is deterministic
+      - established ABBA contract Reader CLI coherence two-run identity open-versus-closed identity canonical JSON single LF and zero transport calls are tested
+  - command: python tools/evidence/generate_open_rails_abba_proof.py --check
+    proves:
+      - governed fixture-backed open-rails ABBA proof remains current
+      - live vendor calls are forbidden in CI
+      - Reader and CLI outputs match for both orders
+      - two-run identity holds for both orders
+      - open rails computation matches closed rails baseline computation
+      - canonical JSON emits exactly one terminal LF with no CRLF
+      - transport-call count is zero
