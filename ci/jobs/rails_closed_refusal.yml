@@ -5,10 +5,11 @@ rails:
   LC_ALL: C
   LANG: C
   TZ: UTC
-scope: hde-epic031-pr-01-local-deterministic
+scope: reusable-hde-rails-closed-refusal-local-deterministic
 live_vendor_calls: forbidden
 steps:
   - command: python -m pytest tests/bodygraph/test_resolver_vendor.py -q
     proves:
       - closed SAFE rails refuse provider behavior before vendor input resolution
       - closed-default state is SAFE_MODE=1 and ALLOW_NETWORK=0
+      - typed numeric-free refusal behavior occurs without outbound IO

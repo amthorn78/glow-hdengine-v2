@@ -13,8 +13,10 @@ check python tools/cli/serializer_grep_guard.py:OK
 check python tools/cli/emitter_symbol_proof.py:OK
 check pytest tests/cli/test_serializer_guards.py:OK
 check python tools/order/generate_ordering_artifacts.py:OK
+check python tools/evidence/generate_narrative_registry_diff.py:OK
 check python tools/evidence/update_evidence_index.py:OK
 check python tools/order/generate_ordering_artifacts.py --check:OK
+check python tools/evidence/generate_narrative_registry_diff.py --check:OK
 check python tools/evidence/update_evidence_index.py --check:OK
 check python tools/evidence/orientation_demo.py:OK
 check python tools/evidence/orientation_demo.py --check:OK

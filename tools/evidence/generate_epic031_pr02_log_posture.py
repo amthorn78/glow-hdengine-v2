@@ -265,7 +265,8 @@ def generate(*, check: bool = False) -> None:
     _write_governed(REDACTION_REL, _json_bytes(redaction).decode("utf-8"), check=check)
     _write_governed(BOUNDED_REL, _json_bytes(_bounded_payload(records)).decode("utf-8"), check=check)
     _write_governed(SCAN_REL, scan_text, check=check)
-    _write_text(JOB_REL, _job_text(), check=check)
+    # Current reusable rails gate definitions are owned by HDE rails-gate tooling;
+    # preserve historical EPIC031 evidence without rewriting the shared CI job file.
 
 
 def main(argv: list[str] | None = None) -> int:
