@@ -1,0 +1,134 @@
+name: PR351 two-run proof validation
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    if: github.head_ref == 'codex/pr351-distinctness-validation'
+    runs-on: ubuntu-latest
+    env:
+      LC_ALL: C
+      LANG: C
+      TZ: UTC
+      SAFE_MODE: "1"
+      ALLOW_NETWORK: "0"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -U pip
+      - run: test -f requirements.txt && python -m pip install -r requirements.txt || true
+      - run: test -f requirements-dev.txt && python -m pip install -r requirements-dev.txt || true
+      - run: python -m pip install -e .
+      - run: python -m pip install pytest
+      - name: Reconstruct recorded payloads and perform four local Reader emissions
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          from engine.bodygraph.ingest import resolve_db_user_id
+          from engine.cli import main as cli_main
+          from engine.presenter import emitter
+          from tools.evidence import generate_open_rails_abba_proof as proof
+
+          path = Path(proof.LIVE_ABBA_REL)
+          artifact = json.loads(path.read_bytes())
+          mechanics_types = tuple(cli_main._TYPE_SEQUENCE)
+
+          def reconstruct(name: str, target_hash: str):
+              person_uid = f"person-{resolve_db_user_id(name)}"
+              matches = []
+              for mechanics_type in mechanics_types:
+                  payload = {"person_uid": person_uid, "mechanics": {"type": mechanics_type}}
+                  if proof.sha(emitter.emit_public(payload)) == target_hash:
+                      matches.append(payload)
+              if len(matches) != 1:
+                  raise SystemExit(f"PAYLOAD_RECONSTRUCTION_NOT_UNIQUE:{name}:{len(matches)}")
+              return matches[0]
+
+          a_payload = reconstruct(
+              artifact["synthetic_input_names"]["a"], artifact["normalized_a_sha256"]
+          )
+          b_payload = reconstruct(
+              artifact["synthetic_input_names"]["b"], artifact["normalized_b_sha256"]
+          )
+          if a_payload == b_payload:
+              raise SystemExit("PAYLOAD_RECONSTRUCTION_NOT_DISTINCT")
+
+          a_inputs, b_inputs, _, _ = proof._live_inputs_from_env()
+          a_person, a_chart = cli_main._person_and_chart_from_payload(a_payload, uid_hint=a_inputs.user_id)
+          b_person, b_chart = cli_main._person_and_chart_from_payload(b_payload, uid_hint=b_inputs.user_id)
+          _, _, ab_left, ab_right = cli_main._canonical_pair(a_person, b_person, a_chart, b_chart)
+          _, _, ba_left, ba_right = cli_main._canonical_pair(b_person, a_person, b_chart, a_chart)
+
+          ab_run1 = proof._emit_live_reader_bytes(ab_left, ab_right)
+          ba_run1 = proof._emit_live_reader_bytes(ba_left, ba_right)
+          ab_run2 = proof._emit_live_reader_bytes(ab_left, ab_right)
+          ba_run2 = proof._emit_live_reader_bytes(ba_left, ba_right)
+          reader_hashes = {
+              "ab_sha256": proof.sha(ab_run1),
+              "ab_run2_sha256": proof.sha(ab_run2),
+              "ba_sha256": proof.sha(ba_run1),
+              "ba_run2_sha256": proof.sha(ba_run2),
+          }
+          if reader_hashes["ab_sha256"] != artifact["reader_hashes"]["ab_sha256"]:
+              raise SystemExit("RECORDED_AB_FIRST_RUN_NOT_REPRODUCED")
+          if reader_hashes["ba_sha256"] != artifact["reader_hashes"]["ba_sha256"]:
+              raise SystemExit("RECORDED_BA_FIRST_RUN_NOT_REPRODUCED")
+
+          artifact["reader_hashes"] = reader_hashes
+          artifact["predicates"]["two_run_ab_identity"] = ab_run1 == ab_run2
+          artifact["predicates"]["two_run_ba_identity"] = ba_run1 == ba_run2
+          proof._require_passing_live_proof(artifact)
+          path.write_bytes(proof.canonical_json_bytes(artifact))
+          PY
+      - name: Regenerate governed evidence closure
+        run: python tools/evidence/update_evidence_index.py
+      - name: Validate producer, proof, and closure
+        run: |
+          python tools/evidence/generate_open_rails_abba_proof.py --check
+          python tools/evidence/generate_open_rails_abba_proof.py --live --check
+          python tools/evidence/update_evidence_index.py --check
+          python ci/checks/check_mirror_schema.sh
+          python -m pytest -q tests/evidence/test_open_rails_abba_proof.py
+          git diff --check
+      - name: Package generated files
+        run: |
+          python - <<'PY'
+          import base64
+          import json
+          import subprocess
+          from pathlib import Path
+
+          paths = [
+              line
+              for line in subprocess.check_output(["git", "diff", "--name-only"], text=True).splitlines()
+              if line
+          ]
+          if "audit/gates/determinism/open_rails_vendor_abba.json" not in paths:
+              raise SystemExit("LIVE_PROOF_NOT_REGENERATED")
+          payload = {
+              "files": {
+                  path: base64.b64encode(Path(path).read_bytes()).decode("ascii")
+                  for path in paths
+              }
+          }
+          Path("pr351-two-run-generated.json").write_text(
+              json.dumps(payload, sort_keys=True, separators=(",", ":")) + "\n",
+              encoding="utf-8",
+          )
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pr351-two-run-generated
+          path: pr351-two-run-generated.json
+          if-no-files-found: error

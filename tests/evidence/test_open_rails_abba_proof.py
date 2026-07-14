@@ -84,7 +84,7 @@ def test_canonical_json_bytes_preserves_utf8_unicode() -> None:
     assert b"\\u2014" not in data
 
 
-def test_live_harness_individual_mode_request_bound_and_secret_safe(monkeypatch: pytest.MonkeyPatch) -> None:
+def _configure_individual_live_fake(monkeypatch: pytest.MonkeyPatch) -> list[str]:
     for key, value in {
         "SAFE_MODE": "0",
         "ALLOW_NETWORK": "1",
@@ -123,8 +123,20 @@ def test_live_harness_individual_mode_request_bound_and_secret_safe(monkeypatch:
 
     monkeypatch.setattr(proof, "ingest_vendor_bodygraph", fake_ingest)
     monkeypatch.setattr(proof, "_bounded_live_client", FakeClient)
-    payload = proof.build_live_proof()
+    return calls
+
+
+def test_live_harness_individual_mode_request_bound_and_secret_safe(monkeypatch: pytest.MonkeyPatch) -> None:
+    calls = _configure_individual_live_fake(monkeypatch)
+    reader_calls: list[tuple[dict[str, object], dict[str, object]]] = []
+
+    def tracked_reader(left, right):
+        reader_calls.append((dict(left), dict(right)))
+        return proof._emit_live_reader_bytes(left, right)
+
+    payload = proof.build_live_proof(reader_emitter=tracked_reader)
     assert len(calls) == 2
+    assert len(reader_calls) == 4
     assert payload["top_level_pass"] is True
     assert payload["requests_attempted"] == 2
     assert payload["requests_completed"] == 2
@@ -132,9 +144,48 @@ def test_live_harness_individual_mode_request_bound_and_secret_safe(monkeypatch:
     assert payload["predicates"]["distinct_input_fingerprints"] is True
     assert payload["predicates"]["distinct_normalized_payloads"] is True
     assert payload["predicates"]["normalized_payload_hashes_bound"] is True
+    assert payload["predicates"]["two_run_ab_identity"] is True
+    assert payload["predicates"]["two_run_ba_identity"] is True
     encoded = proof.canonical_json_bytes(payload).decode("utf-8")
     assert "secret-key" not in encoded and "geo-key" not in encoded
     assert "Synthetic Alpha" not in encoded and "Synthetic Bravo" not in encoded
+
+
+@pytest.mark.parametrize(
+    "drift_call,predicate,first_hash,run2_hash",
+    [
+        (3, "two_run_ab_identity", "ab_sha256", "ab_run2_sha256"),
+        (4, "two_run_ba_identity", "ba_sha256", "ba_run2_sha256"),
+    ],
+)
+def test_live_harness_rejects_second_reader_emission_drift(
+    monkeypatch: pytest.MonkeyPatch,
+    drift_call: int,
+    predicate: str,
+    first_hash: str,
+    run2_hash: str,
+) -> None:
+    _configure_individual_live_fake(monkeypatch)
+    reader_call_count = 0
+
+    def drifting_reader(left, right):
+        nonlocal reader_call_count
+        reader_call_count += 1
+        data = proof._emit_live_reader_bytes(left, right)
+        if reader_call_count == drift_call:
+            payload = json.loads(data)
+            payload["run2_drift_probe"] = True
+            return proof.canonical_json_bytes(payload)
+        return data
+
+    payload = proof.build_live_proof(reader_emitter=drifting_reader)
+
+    assert reader_call_count == 4
+    assert payload["top_level_pass"] is False
+    assert payload["typed_result_class"] == "FAIL"
+    assert payload["result"] == "fail"
+    assert payload["predicates"][predicate] is False
+    assert payload["reader_hashes"][first_hash] != payload["reader_hashes"][run2_hash]
 
 
 @pytest.mark.parametrize("duplicate", ["fingerprint", "payload"])
@@ -264,6 +315,8 @@ def test_live_harness_v2_chart_success_uses_two_requests_and_local_abba(monkeypa
     assert payload["predicates"]["distinct_input_fingerprints"] is True
     assert payload["predicates"]["distinct_normalized_payloads"] is True
     assert payload["predicates"]["normalized_payload_hashes_bound"] is True
+    assert payload["predicates"]["two_run_ab_identity"] is True
+    assert payload["predicates"]["two_run_ba_identity"] is True
 
 
 def test_legacy_live_harness_isolates_ingest_logs(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
@@ -384,6 +437,9 @@ def test_live_check_mode_rejects_ascii_escaped_unicode(monkeypatch: pytest.Monke
         "duplicate_payload",
         "invalid_party_shape",
         "unbound_payload_hash",
+        "missing_run2_predicate",
+        "run2_mismatch",
+        "invalid_run2_hash",
     ],
 )
 def test_live_check_mode_recomputes_distinctness(
@@ -403,8 +459,14 @@ def test_live_check_mode_recomputes_distinctness(
         payload["normalized_b_sha256"] = duplicate_hash
     elif mutation == "invalid_party_shape":
         payload["request_results"][1]["party"] = []
-    else:
+    elif mutation == "unbound_payload_hash":
         payload["normalized_b_sha256"] = "f" * 64
+    elif mutation == "missing_run2_predicate":
+        payload["predicates"].pop("two_run_ab_identity")
+    elif mutation == "run2_mismatch":
+        payload["reader_hashes"]["ab_run2_sha256"] = "f" * 64
+    else:
+        payload["reader_hashes"]["ba_run2_sha256"] = "not-a-sha256"
 
     path = tmp_path / proof.LIVE_ABBA_REL
     path.parent.mkdir(parents=True)
