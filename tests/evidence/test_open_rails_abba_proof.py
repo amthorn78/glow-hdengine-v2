@@ -575,6 +575,7 @@ def test_live_check_mode_derives_abba_identity_from_first_run_hashes(
         ("unredacted_url", "UNSAFE_LIVE_PROOF"),
         ("missing_po_override", "UNSAFE_LIVE_PROOF"),
         ("inconsistent_safety_boolean", "UNSAFE_LIVE_PROOF"),
+        ("secret_value_under_allowed_key", "UNSAFE_LIVE_PROOF"),
     ],
 )
 def test_live_check_mode_rejects_closed_shape_and_safety_drift(
@@ -604,8 +605,10 @@ def test_live_check_mode_rejects_closed_shape_and_safety_drift(
         payload["non_production_environment"]["configured_base_url"] = "https://sandbox.vendor.test/v2"
     elif mutation == "missing_po_override":
         payload.pop("po_override_note")
-    else:
+    elif mutation == "inconsistent_safety_boolean":
         payload["no_secret_value_predicate"] = False
+    else:
+        payload["synthetic_input_names"]["a"] = "Bearer secret-key"
 
     path = _write_live_check_payload(monkeypatch, tmp_path, payload)
 

@@ -6,6 +6,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -95,6 +96,13 @@ LIVE_SECRET_PRESENCE_KEYS = frozenset({"GEO_API_KEY", "HDAPI_BASE_URL", "HD_API_
 LIVE_SYNTHETIC_INPUT_NAME_KEYS = frozenset({"a", "b"})
 LIVE_PF09_KEYS = frozenset({"title", "task", "subtask", "status"})
 LIVE_ROUTE_POLICY_KEYS = frozenset({"classification", "configured_base_version", "payload_family", "resource_path", "route_family", "supported"})
+LIVE_FORBIDDEN_STRING_PATTERNS = (
+    re.compile(r"https?://", re.IGNORECASE),
+    re.compile(r"\bbearer\b", re.IGNORECASE),
+    re.compile(r"\b(secret|credential|token|api[_-]?key|authorization)\b", re.IGNORECASE),
+    re.compile(r"\b\d{4}-\d{2}-\d{2}\b"),
+    re.compile(r"\b\d{1,2}:\d{2}\b"),
+)
 SENSITIVE_ENV = (
     "HD_API_KEY",
     "GEO_API_KEY",
@@ -209,12 +217,24 @@ def _has_forbidden_live_key(value: object, *, _path: tuple[str, ...] = ()) -> bo
     return False
 
 
+def _has_forbidden_live_string(value: object, *, _path: tuple[str, ...] = ()) -> bool:
+    if isinstance(value, Mapping):
+        return any(_has_forbidden_live_string(nested, _path=(*_path, str(key))) for key, nested in value.items())
+    if isinstance(value, list):
+        return any(_has_forbidden_live_string(item, _path=_path) for item in value)
+    if not isinstance(value, str):
+        return False
+    if _path == ("non_production_environment", "configured_base_url"):
+        return value not in {"<redacted>", "UNSET"}
+    return any(pattern.search(value) for pattern in LIVE_FORBIDDEN_STRING_PATTERNS)
+
+
 def _derived_live_safety(proof: Mapping[str, Any]) -> dict[str, bool]:
     nonprod = proof.get("non_production_environment")
     configured = nonprod.get("configured_base_url") if isinstance(nonprod, Mapping) else None
     return {
         "no_raw_payload_predicate": not _has_forbidden_live_key(proof),
-        "no_secret_value_predicate": configured in {"<redacted>", "UNSET"},
+        "no_secret_value_predicate": configured in {"<redacted>", "UNSET"} and not _has_forbidden_live_string(proof),
     }
 
 
