@@ -407,10 +407,21 @@ def generate_live(*, check: bool = False) -> dict[str, Any]:
             raise SystemExit(f"INVALID_JSON:{LIVE_ABBA_REL}") from exc
         if canonical_json_bytes(proof) != data:
             raise SystemExit(f"NONCANONICAL:{LIVE_ABBA_REL}")
-        if proof.get("acceptance_token_satisfied") is not False or proof.get("requests_attempted", 999) > 2:
+        predicates = proof.get("predicates")
+        if proof.get("acceptance_token_satisfied") is not False or proof.get("requests_attempted") != 2 or proof.get("requests_completed") != 2:
             raise SystemExit(f"INVALID_LIVE_PROOF:{LIVE_ABBA_REL}")
         if proof.get("no_raw_payload_predicate") is not True or proof.get("no_secret_value_predicate") is not True:
             raise SystemExit(f"UNSAFE_LIVE_PROOF:{LIVE_ABBA_REL}")
+        if (
+            proof.get("top_level_pass") is not True
+            or proof.get("result") != "pass"
+            or proof.get("typed_result_class") != "PASS"
+            or proof.get("same_normalized_inputs_reused_for_ab_ba") is not True
+            or not isinstance(predicates, dict)
+            or not predicates
+            or any(value is not True for value in predicates.values())
+        ):
+            raise SystemExit(f"FAILED_LIVE_PROOF:{LIVE_ABBA_REL}")
         return proof
     proof = build_live_proof()
     _write_primary(LIVE_ABBA_REL, canonical_json_bytes(proof), check=False)

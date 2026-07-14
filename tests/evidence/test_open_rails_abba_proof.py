@@ -198,3 +198,22 @@ def test_live_check_mode_does_not_reexecute_vendor(monkeypatch: pytest.MonkeyPat
     monkeypatch.setattr(proof, "build_live_proof", lambda: (_ for _ in ()).throw(AssertionError("live check reexecuted")))
     payload = proof.generate_live(check=True)
     assert payload["artifact_kind"] == "hde_epic038_pr03_open_rails_vendor_abba_proof"
+
+
+def test_live_check_mode_rejects_failed_or_inconclusive_artifact() -> None:
+    path = proof.ROOT / proof.LIVE_ABBA_REL
+    original = path.read_bytes()
+    failed = json.loads(original)
+    failed["top_level_pass"] = False
+    failed["result"] = "inconclusive"
+    failed["typed_result_class"] = "MISSING_CREDENTIALS"
+    failed["requests_attempted"] = 0
+    failed["requests_completed"] = 0
+    failed["same_normalized_inputs_reused_for_ab_ba"] = False
+    failed["predicates"]["request_bound_ok"] = False
+    path.write_bytes(proof.canonical_json_bytes(failed))
+    try:
+        with pytest.raises(SystemExit, match="INVALID_LIVE_PROOF|FAILED_LIVE_PROOF"):
+            proof.generate_live(check=True)
+    finally:
+        path.write_bytes(original)
