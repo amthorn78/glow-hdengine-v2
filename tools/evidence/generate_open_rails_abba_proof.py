@@ -43,6 +43,8 @@ LIVE_REQUIRED_PREDICATES = frozenset(
         "request_bound_ok",
         "same_normalized_inputs_reused",
         "single_lf",
+        "two_run_ab_identity",
+        "two_run_ba_identity",
     }
 )
 SENSITIVE_ENV = (
@@ -76,13 +78,16 @@ def _is_sha256(value: object) -> bool:
 
 
 def _live_summary_predicates(proof: Mapping[str, Any]) -> dict[str, bool]:
+    failed = {
+        "distinct_input_fingerprints": False,
+        "distinct_normalized_payloads": False,
+        "normalized_payload_hashes_bound": False,
+        "two_run_ab_identity": False,
+        "two_run_ba_identity": False,
+    }
     results = proof.get("request_results")
     if not isinstance(results, list) or len(results) != 2:
-        return {
-            "distinct_input_fingerprints": False,
-            "distinct_normalized_payloads": False,
-            "normalized_payload_hashes_bound": False,
-        }
+        return failed
 
     by_party: dict[str, Mapping[str, Any]] = {}
     for result in results:
@@ -101,11 +106,7 @@ def _live_summary_predicates(proof: Mapping[str, Any]) -> dict[str, bool]:
             break
         by_party[party] = result
     if set(by_party) != {"a", "b"}:
-        return {
-            "distinct_input_fingerprints": False,
-            "distinct_normalized_payloads": False,
-            "normalized_payload_hashes_bound": False,
-        }
+        return failed
 
     a_result = by_party["a"]
     b_result = by_party["b"]
@@ -113,12 +114,23 @@ def _live_summary_predicates(proof: Mapping[str, Any]) -> dict[str, bool]:
     b_fingerprint = b_result["input_fingerprint_sha256"]
     a_payload_hash = a_result["normalized_payload_sha256"]
     b_payload_hash = b_result["normalized_payload_sha256"]
+    reader_hashes = proof.get("reader_hashes")
+    hashes_valid = isinstance(reader_hashes, Mapping) and all(
+        _is_sha256(reader_hashes.get(key))
+        for key in ("ab_sha256", "ab_run2_sha256", "ba_sha256", "ba_run2_sha256")
+    )
     return {
         "distinct_input_fingerprints": a_fingerprint != b_fingerprint,
         "distinct_normalized_payloads": a_payload_hash != b_payload_hash,
         "normalized_payload_hashes_bound": (
             proof.get("normalized_a_sha256") == a_payload_hash
             and proof.get("normalized_b_sha256") == b_payload_hash
+        ),
+        "two_run_ab_identity": bool(
+            hashes_valid and reader_hashes["ab_sha256"] == reader_hashes["ab_run2_sha256"]
+        ),
+        "two_run_ba_identity": bool(
+            hashes_valid and reader_hashes["ba_sha256"] == reader_hashes["ba_run2_sha256"]
         ),
     }
 
@@ -147,6 +159,18 @@ def reader_bytes(left: Mapping[str, Any], right: Mapping[str, Any]) -> bytes:
     left_person, right_person, left_chart, right_chart = cli_main._canonical_pair(left_person, right_person, left_chart, right_chart)
     meta = identity_meta()
     return emit_reader_public_envelope(left_chart, right_chart, engine_tag=meta["engine_tag"], invocation_tag=meta["invocation_tag"], release_id=meta["release_id"])[0]
+
+
+def _emit_live_reader_bytes(left_chart: Mapping[str, Any], right_chart: Mapping[str, Any]) -> bytes:
+    """Perform one complete Reader identity acquisition and emission."""
+    meta = identity_meta()
+    return emit_reader_public_envelope(
+        dict(left_chart),
+        dict(right_chart),
+        engine_tag=meta["engine_tag"],
+        invocation_tag=meta["invocation_tag"],
+        release_id=meta["release_id"],
+    )[0]
 
 
 def cli_reader_bytes(left: Mapping[str, Any], right: Mapping[str, Any], *, rails: Mapping[str, str]) -> bytes:
@@ -330,7 +354,11 @@ def _bounded_live_client(request_counter: dict[str, int]) -> HdApiClient:
     )
 
 
-def build_live_proof(*, client_factory: Callable[[dict[str, int]], HdApiClient] | None = None) -> dict[str, Any]:
+def build_live_proof(
+    *,
+    client_factory: Callable[[dict[str, int]], HdApiClient] | None = None,
+    reader_emitter: Callable[[Mapping[str, Any], Mapping[str, Any]], bytes] | None = None,
+) -> dict[str, Any]:
     base = (os.environ.get("HD_API_BASE_URL") or os.environ.get("HDAPI_BASE_URL") or "").strip().rstrip("/")
     nonprod_ok, nonprod_reason = _safe_nonprod_base(base) if base else (False, "HD_API_BASE_URL/HDAPI_BASE_URL is unset")
     a_inputs, b_inputs, missing_inputs, input_source = _live_inputs_from_env()
@@ -447,22 +475,34 @@ def build_live_proof(*, client_factory: Callable[[dict[str, int]], HdApiClient] 
     a_person, a_chart = cli_main._person_and_chart_from_payload(a_payload, uid_hint=a_inputs.user_id)
     b_person, b_chart = cli_main._person_and_chart_from_payload(b_payload, uid_hint=b_inputs.user_id)
     a_person2, b_person2, a_chart2, b_chart2 = cli_main._canonical_pair(a_person, b_person, a_chart, b_chart)
-    meta = identity_meta()
-    ab_reader, _ = emit_reader_public_envelope(a_chart2, b_chart2, engine_tag=meta["engine_tag"], invocation_tag=meta["invocation_tag"], release_id=meta["release_id"])
     b_person3, a_person3, b_chart3, a_chart3 = cli_main._canonical_pair(b_person, a_person, b_chart, a_chart)
-    ba_reader, _ = emit_reader_public_envelope(b_chart3, a_chart3, engine_tag=meta["engine_tag"], invocation_tag=meta["invocation_tag"], release_id=meta["release_id"])
+    reader_emitter = reader_emitter or _emit_live_reader_bytes
+    ab_reader = reader_emitter(a_chart2, b_chart2)
+    ba_reader = reader_emitter(b_chart3, a_chart3)
+    ab_reader_run2 = reader_emitter(a_chart2, b_chart2)
+    ba_reader_run2 = reader_emitter(b_chart3, a_chart3)
+    emitted_reader_bytes = (ab_reader, ba_reader, ab_reader_run2, ba_reader_run2)
+    reader_hashes = {
+        "ab_sha256": sha(ab_reader),
+        "ab_run2_sha256": sha(ab_reader_run2),
+        "ba_sha256": sha(ba_reader),
+        "ba_run2_sha256": sha(ba_reader_run2),
+    }
+    proof["reader_hashes"] = reader_hashes
     predicates = {
         "request_bound_ok": counter["attempted"] <= 2,
         "same_normalized_inputs_reused": a_hash == sha(emitter.emit_public(a_payload)) and b_hash == sha(emitter.emit_public(b_payload)),
         "abba_byte_identity": ab_reader == ba_reader,
-        "canonical_json": _assert_canonical("ab", ab_reader) and _assert_canonical("ba", ba_reader),
-        "single_lf": ab_reader.endswith(b"\n") and ba_reader.endswith(b"\n") and not ab_reader.endswith(b"\n\n") and b"\r" not in ab_reader + ba_reader,
+        "canonical_json": all(_assert_canonical("live_reader", value) for value in emitted_reader_bytes),
+        "single_lf": all(value.endswith(b"\n") and not value.endswith(b"\n\n") and b"\r" not in value for value in emitted_reader_bytes),
+        "two_run_ab_identity": ab_reader == ab_reader_run2,
+        "two_run_ba_identity": ba_reader == ba_reader_run2,
         **_live_summary_predicates(proof),
     }
     proof.update({
         "applied_abba_contract_mode": "raw_byte_identity_after_existing_canonical_pair_normalization",
         "same_normalized_inputs_reused_for_ab_ba": predicates["same_normalized_inputs_reused"],
-        "reader_hashes": {"ab_sha256": sha(ab_reader), "ba_sha256": sha(ba_reader), "ab_run2_sha256": sha(ab_reader), "ba_run2_sha256": sha(ba_reader)},
+        "reader_hashes": reader_hashes,
         "predicates": predicates,
         "typed_result_class": "PASS" if all(predicates.values()) else "FAIL",
         "result": "pass" if all(predicates.values()) else "fail",

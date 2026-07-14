@@ -1,5 +1,5 @@
 path: audit/gates/determinism/open_rails_vendor_abba.json
-size_bytes: 2994
-sha256: f45be756e1a2b38457003de6baf96e521fc0f4944bb9552d22f3b8b9754b888e
+size_bytes: 3048
+sha256: 7c679b51a761ff63b681444f4a38f8a133413f396043d8b3f07a22242ca851d7
 mtime_utc: 2026-07-14T04:48:43Z
 produced_at_utc: 2026-07-14T00:00:00Z
