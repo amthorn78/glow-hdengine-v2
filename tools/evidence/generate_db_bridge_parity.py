@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import sys
@@ -27,6 +28,13 @@ NONDEV_FAILURE_PATH = ROOT / "artifacts/runtime/env_connectivity.nondev_failure.
 VENDOR_UPSERT_PATH = ROOT / "artifacts/bodygraph/vendor_upsert.epic038_synthetic.json"
 DB_RESOLVE_PATH = ROOT / "artifacts/bodygraph/db_resolve.epic038_synthetic.json"
 PRESENTER_COMPARE_PATH = ROOT / "artifacts/presenter/json_canon_compare.log"
+PRESENTER_BASE_RECORDS = [
+    {"at":"2025-11-18T05:24:24Z","db_emitted_sha256":"a0f5c8a94da6df5a0f9fb0e4d0de394381f65c4593cdb95c5f0cfa7a39f7c4b1","input_fingerprint":"stub-db-payload","match":True,"notes":"deterministic stub payload compared under rails closed","schema":"v1","user_id":"epic011-s10-invariance-1","vendor":"hdapi","vendor_sha256":"a0f5c8a94da6df5a0f9fb0e4d0de394381f65c4593cdb95c5f0cfa7a39f7c4b1","vendor_version":"offline"},
+    {"at":"2025-11-20T01:10:21Z","compare":"DIFF","left_path":"artifacts/bodygraph/vendor_upsert.epic011-s10-invariance-1.json","left_sha256":"fa0baad03333ad1d03fde339a9ce25ebd5289431afc57edd3b220706d11d37c4","match":False,"right_path":"artifacts/bodygraph/db_resolve.epic011-s10-invariance-1.json","right_sha256":"5226051a12100ae06a91e17ed3264afba177708f18424666c1aefd4d85f395aa"},
+    {"at":"2026-03-01T02:32:34Z","db_emitted_sha256":"34f18c26416ce920f5a346b9ea1c730bff6210b6f1bc21aa57d3338c18d42eef","input_fingerprint":"a050279aa87c66070c04b4276b42428ed0621463d878d1fd5e09c32b2295442d","match":True,"user_id":"d8b2ce05-d2a8-5b91-8821-a894d20dd22c","vendor":"hdapi","vendor_sha256":"34f18c26416ce920f5a346b9ea1c730bff6210b6f1bc21aa57d3338c18d42eef","vendor_version":1},
+    {"at":"2026-03-01T02:32:36Z","db_emitted_sha256":"c8771cc1827261ef4264afd96bd2610bbe401f81c493b6710e7e045ccff5be14","input_fingerprint":"12970e0e4f417cc4e6ecbe2a2cd0dc9a347c0906e47adeeaef61bc469485179c","match":True,"user_id":"2d31ea34-c2d9-5103-9cf0-fc845565050d","vendor":"hdapi","vendor_sha256":"c8771cc1827261ef4264afd96bd2610bbe401f81c493b6710e7e045ccff5be14","vendor_version":1},
+]
+
 
 PRODUCED_AT_UTC = "2026-05-18T00:00:00Z"
 REDACTED_DSN = "redacted_database_url_present"
@@ -380,7 +388,8 @@ def generate(*, check: bool = False) -> None:
     synthetic = {"schema":"v1","synthetic_identity":"hde-epic038-pr04-synthetic","payload_posture":"mapped_bounded_no_raw_vendor_payload","fields":["centers","channels","profile"],"live_provider":"not_exercised"}
     _write_or_check(VENDOR_UPSERT_PATH, {**synthetic, "artifact":"vendor_upsert", "operation":"fixture_vendor_mapping"}, check=check)
     _write_or_check(DB_RESOLVE_PATH, {**synthetic, "artifact":"db_resolve", "operation":"fixture_db_resolution"}, check=check)
-    compare = "JSON_CANONICAL_CHECK_OK fixture_presenter_serializer_compare=pass synthetic_identity=hde-epic038-pr04-synthetic live_provider=not_exercised\n"
+    compare_record = {"at": PRODUCED_AT_UTC, "artifact_kind": "hde_epic038_pr04_presenter_compare", "schema": "v1", "synthetic_identity": "hde-epic038-pr04-synthetic", "left_path": VENDOR_UPSERT_PATH.relative_to(ROOT).as_posix(), "right_path": DB_RESOLVE_PATH.relative_to(ROOT).as_posix(), "left_sha256": hashlib.sha256(VENDOR_UPSERT_PATH.read_bytes()).hexdigest(), "right_sha256": hashlib.sha256(DB_RESOLVE_PATH.read_bytes()).hexdigest(), "match": False, "compare": "FIXTURE_BOUNDED_PAIR", "live_provider": "not_exercised"}
+    compare = "".join(json.dumps(record, sort_keys=True, separators=(",", ":")) + "\n" for record in [*PRESENTER_BASE_RECORDS, compare_record])
     if check:
         if not PRESENTER_COMPARE_PATH.exists() or PRESENTER_COMPARE_PATH.read_text(encoding="utf-8") != compare:
             raise SystemExit(f"STALE:{PRESENTER_COMPARE_PATH.relative_to(ROOT).as_posix()}")

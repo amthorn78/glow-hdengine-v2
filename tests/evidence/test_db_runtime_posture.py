@@ -29,3 +29,6 @@ def test_db_bridge_false_pass_and_fixture_separation():
     run(['tools/evidence/generate_db_bridge_parity.py','--check'])
     assert (ROOT/'artifacts/bodygraph/vendor_upsert.epic038_synthetic.json').exists()
     assert (ROOT/'artifacts/bodygraph/db_resolve.epic038_synthetic.json').exists()
+    records=[json.loads(line) for line in (ROOT/'artifacts/presenter/json_canon_compare.log').read_text().splitlines()]
+    assert len(records) >= 2
+    assert records[-1]['artifact_kind']=='hde_epic038_pr04_presenter_compare'

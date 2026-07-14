@@ -9,6 +9,8 @@ def test_architecture_snapshot_taxonomy_schema_and_check():
     run(['tools/evidence/generate_architecture_snapshot.py']); h2={p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in paths}; assert h1==h2
     run(['tools/evidence/generate_architecture_snapshot.py','--check']); assert h2=={p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in paths}
     p=json.loads((ROOT/paths[0]).read_text()); assert set(p['taxonomy'])=={'allowed','forbidden','unknown','out_of_scope'}; assert p['verdict']==p['analyzer_verdict']=='pass'; assert p['unknown_count']==0
+    compat=[r for r in p['routes'] if r['path']=='engine/http/compat_handler.py']
+    assert compat and compat[0]['classification']=='allowed'
     raw=(ROOT/paths[0]).read_text(); assert 'DATABASE_URL' not in raw and 'birthdate' not in raw and 'Authorization' not in raw
 
 def test_architecture_unknown_fail_closed():
