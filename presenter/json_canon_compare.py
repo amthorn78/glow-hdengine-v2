@@ -12,9 +12,6 @@ from typing import Any
 
 from engine.presenter import emitter
 
-DEFAULT_LOG_PATH = Path("artifacts/presenter/json_canon_compare.log")
-
-
 class JsonCanonCompareError(Exception):
     """Raised when parity inputs are invalid."""
 
@@ -75,8 +72,8 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--log",
         type=Path,
-        default=DEFAULT_LOG_PATH,
-        help="Optional log path for canonical parity records",
+        default=None,
+        help="Optional caller-supplied diagnostic log path",
     )
     return parser
 
@@ -104,7 +101,7 @@ def main(argv: list[str] | None = None) -> int:
         "compare": label,
         "match": match,
     }
-    if args.log:
+    if args.log is not None:
         _append_log(args.log, record)
     return 0
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from __future__ import annotations
-import argparse, hashlib, os, sys
+import argparse, hashlib, json, os, sys
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path: sys.path.insert(0,str(ROOT))
@@ -12,9 +12,33 @@ def require_closed_rails():
     if bad: raise SystemExit("DETERMINISM_ENV:"+",".join(bad))
 
 OUT=ROOT/'artifacts/bodygraph/release_bindings.json'
-INPUTS=('artifacts/bodygraph/source_selection.snapshot.json','artifacts/bodygraph/refresh_policy.snapshot.json')
+INPUTS=(
+    'artifacts/bodygraph/refresh_policy.snapshot.json',
+    'artifacts/bodygraph/source_invariance/summary.json',
+    'artifacts/bodygraph/source_selection.snapshot.json',
+)
+
+def _require_final_inputs():
+    if tuple(sorted(INPUTS)) != INPUTS:
+        raise SystemExit('UNSORTED_BINDING_INPUTS')
+    summary_rel='artifacts/bodygraph/source_invariance/summary.json'
+    if summary_rel not in INPUTS:
+        raise SystemExit('MISSING_FINAL_SOURCE_INVARIANCE_BINDING')
+    summary_path=ROOT/summary_rel
+    if not summary_path.exists():
+        raise SystemExit('MISSING:'+summary_rel)
+    try:
+        summary=json.loads(summary_path.read_bytes())
+    except (json.JSONDecodeError, OSError) as exc:
+        raise SystemExit('INVALID_FINAL_SOURCE_INVARIANCE') from exc
+    if (
+        summary.get('schema')!='bodygraph.source_invariance.summary.v2'
+        or summary.get('top_level_pass') is not True
+    ):
+        raise SystemExit('SOURCE_INVARIANCE_NOT_FINAL')
+
 def _expected():
-    require_closed_rails(); arts=[]
+    require_closed_rails(); _require_final_inputs(); arts=[]
     for rel in INPUTS:
         p=ROOT/rel
         if not p.exists(): raise SystemExit('MISSING:'+rel)

@@ -1,0 +1,5 @@
+path: schemas/bodygraph_source_invariance.summary.v2.json
+size_bytes: 2812
+sha256: 0c150db6995b4d759116369d5636ee1518fc5e1d9cdc13338b982f31104d09ca
+mtime_utc: 2026-07-15T18:39:55Z
+produced_at_utc: 2026-07-14T23:06:10Z

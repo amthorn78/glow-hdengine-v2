@@ -8,7 +8,14 @@ ROOT=Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path: sys.path.insert(0,str(ROOT))
 from engine.runtime.determinism_env import ensure_determinism_env
 OUTS={
- 'ddl':ROOT/'artifacts/db/ddl_fingerprint.json','grants':ROOT/'artifacts/db/grants.txt','schema':ROOT/'artifacts/db/check_schema.txt','constraints':ROOT/'artifacts/db/check_constraints.txt','boundary':ROOT/'artifacts/db/boundary_view.readonly.proof.txt','env':ROOT/'artifacts/runtime/env_connectivity.snapshot.json','nondev':ROOT/'artifacts/runtime/env_connectivity.nondev_failure.json'}
+ 'ddl':ROOT/'artifacts/db/ddl_fingerprint.json',
+ 'grants':ROOT/'artifacts/db/grants.txt',
+ 'schema':ROOT/'artifacts/db/check_schema.txt',
+ 'constraints':ROOT/'artifacts/db/check_constraints.txt',
+ 'boundary':ROOT/'artifacts/db/boundary_view.readonly.proof.txt',
+ 'partition_plan':ROOT/'artifacts/db/partition_plan.txt',
+ 'partition_verify':ROOT/'artifacts/db/partition_verify.log',
+}
 TS='2026-05-18T00:00:00Z'
 
 def cjson(o:Any)->bytes: return (json.dumps(o,sort_keys=True,separators=(',',':'))+'\n').encode()
@@ -52,10 +59,16 @@ def generate(check=False):
     write(OUTS['constraints'],constraints_text(),check)
     boundary='view: hde.body_graphs_current\nis_updatable: NO\nis_insertable_into: NO\nis_trigger_updatable: NO\n\nview: public.hde_body_graphs_current\nis_updatable: NO\nis_insertable_into: NO\nis_trigger_updatable: NO\n'
     write(OUTS['boundary'],boundary.encode(),check)
-    selection={'attempts':[{'provider':'psycopg','reason':'primary_connect_failed','status':'error'},{'provider':'bridge','status':'ok'}],'provider':'bridge','selection_order':['psycopg','bridge']}
-    env={'captured_at_utc':TS,'dev_only':True,'env_checks':[{'name':'DATABASE_URL','value_kind':'present_redacted'},{'name':'DB_BRIDGE_URL','value_kind':'present_redacted'},{'name':'APP_ENV','value_kind':'dev'}],'environment':'dev','fallback_rules':['DATABASE_URL is attempted first through DBAccess and psycopg health','dev/test/local may fall back to HTTPS DB_BRIDGE_URL through DBAccess when psycopg is unusable','production bridge remains guarded unless DB_ALLOW_BRIDGE_IN_PROD=1'],'final_selection':selection,'missing_config_envelope':{'code':'missing_db_config','error':'database configuration not found','ok':False,'schema':'v1'},'proof_labels':[{'name':'DEV_DB_BRIDGE_FALLBACK_OK','type':'acceptance_token'}],'rails_open':False,'schema':'v2','selection_order':['DATABASE_URL','DB_BRIDGE_URL'],'selection_result':selection}
-    non={'schema':'v1','captured_at_utc':TS,'environment':'stage','selection_attempts':[{'provider':'psycopg','status':'skip','reason':'missing_database_url'},{'provider':'bridge','status':'skip','reason':'missing_bridge_url'}],'selection_order':['psycopg','bridge'],'total_failure':{'ok':False,'typed_error':{'class':'BridgeUnavailable','code':'missing_bridge_url'}},'public_failure_posture':{'numeric_free':True,'secret_free':True,'raw_stack_trace':False},'probe_posture':{'no_proactive_probes':True,'adapter_path_only':True},'secret_posture':'presence_only'}
-    write(OUTS['env'],cjson(env),check); write(OUTS['nondev'],cjson(non),check)
+    write(
+        OUTS['partition_plan'],
+        b'hde.pair_evaluation RANGE (evaluated_at)\nhde.public_results RANGE (created_at)\n',
+        check,
+    )
+    write(
+        OUTS['partition_verify'],
+        b'expected: hde.public_results, hde.pair_evaluation\nobserved: hde.pair_evaluation, hde.public_results\nresult: PARTITION_PLAN_OK\n',
+        check,
+    )
 def main(argv:Iterable[str]|None=None)->int:
     p=argparse.ArgumentParser(); p.add_argument('--check',action='store_true'); a=p.parse_args(list(argv) if argv is not None else None); generate(a.check); return 0
 if __name__=='__main__': raise SystemExit(main())

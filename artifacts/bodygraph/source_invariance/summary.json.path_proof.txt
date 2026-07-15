@@ -1,5 +1,5 @@
 path: artifacts/bodygraph/source_invariance/summary.json
-size_bytes: 158
-sha256: 8c601ad0bad51d267d4947f544ad6a6240a087390bfa8f42c2fc15b44f993ebf
+size_bytes: 1460
+sha256: 509e1403561a6ff722294d2d17801fb2ce2050c5df4fe1c9eb83296c833c5de5
 mtime_utc: 2025-12-06T04:06:36Z
 produced_at_utc: 2025-11-22T02:27:04Z

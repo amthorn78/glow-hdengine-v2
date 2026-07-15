@@ -553,24 +553,6 @@ EPIC032_PR03_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
         "tokens": ["DB_CONN_ENV_OK"],
         "notes": "EPIC032 PR-03 DBAccess provider selection and guarded bridge fallback evidence for HDE-FERM004.2",
     },
-    {
-        "artifact_key": "epic032.pr03.provider_parity",
-        "discovered_physical_path": "artifacts/db_bridge/provider_parity.proof.json",
-        "epic_id": "HDE-EPIC032",
-        "record_type": "epic032_pr03_evidence",
-        "schema_version": "1.0",
-        "tokens": ["JSON_CANONICAL_CHECK_OK"],
-        "notes": "EPIC032 PR-03 provider-parity harness and non-token bridge capability proof-label evidence for HDE-FERM004.2",
-    },
-    {
-        "artifact_key": "epic032.pr03.env_connectivity",
-        "discovered_physical_path": "artifacts/runtime/env_connectivity.snapshot.json",
-        "epic_id": "HDE-EPIC032",
-        "record_type": "epic032_pr03_evidence",
-        "schema_version": "1.0",
-        "tokens": ["DEV_DB_BRIDGE_FALLBACK_OK", "DB_CONN_ENV_OK"],
-        "notes": "EPIC032 PR-03 secret-free dev DB bridge fallback proof through DBAccess for HDE-FERM004.2",
-    },
 ]
 
 
@@ -2460,6 +2442,28 @@ EPIC038_PR02_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
 
 EPIC038_PR02_SUPERSEDED_INDEX_KEYS: set[tuple[str, str]] = set()
 
+EPIC038_PR04_SUPERSEDED_INDEX_KEYS = {
+    ("epic038.pr04.db_ddl_fingerprint", "artifacts/db/ddl_fingerprint.json"),
+    ("epic038.pr04.db_grants", "artifacts/db/grants.txt"),
+    ("epic038.pr04.db_check_schema", "artifacts/db/check_schema.txt"),
+    ("epic038.pr04.db_boundary_view_readonly", "artifacts/db/boundary_view.readonly.proof.txt"),
+    ("epic038.pr04.env_connectivity", "artifacts/runtime/env_connectivity.snapshot.json"),
+    ("epic032.pr03.env_connectivity", "artifacts/runtime/env_connectivity.snapshot.json"),
+    ("epic038.pr04.env_nondev_failure", "artifacts/runtime/env_connectivity.nondev_failure.json"),
+    ("epic038.pr04.db_bridge_adapter_selection", "artifacts/db_bridge/adapter_selection.snapshot.json"),
+    ("epic038.pr04.db_bridge_provider_parity", "artifacts/db_bridge/provider_parity.proof.json"),
+    ("epic032.pr03.provider_parity", "artifacts/db_bridge/provider_parity.proof.json"),
+    ("epic038.pr04.bodygraph_source_selection", "artifacts/bodygraph/source_selection.snapshot.json"),
+    ("epic038.pr04.bodygraph_source_invariance_ab", "artifacts/bodygraph/source_invariance/ab.json"),
+    ("epic038.pr04.bodygraph_source_invariance_ba", "artifacts/bodygraph/source_invariance/ba.json"),
+    ("epic038.pr04.bodygraph_source_invariance_summary", "artifacts/bodygraph/source_invariance/summary.json"),
+    ("epic038.pr04.bodygraph_refresh_policy", "artifacts/bodygraph/refresh_policy.snapshot.json"),
+    ("epic038.pr04.bodygraph_metrics", "artifacts/bodygraph/metrics.snapshot.json"),
+    ("epic038.pr04.bodygraph_keys_only_logs", "artifacts/bodygraph/keys_only.logs.sample"),
+    ("epic038.pr04.presenter_json_canon_compare", "artifacts/presenter/json_canon_compare.log"),
+    ("ops.refusal_proof", "artifacts/proofs/ops_refusal_proof.txt"),
+}
+
 EPIC038_PR03_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
         "artifact_key": "rails_gate.keys_only_logs",
@@ -2491,25 +2495,13 @@ EPIC038_PR03_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
 ]
 
 EPIC038_PR04_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
-    {"artifact_key": "epic038.pr04.db_ddl_fingerprint", "discovered_physical_path": "artifacts/db/ddl_fingerprint.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr04_db_runtime_posture", "schema_version": "1.0"},
-    {"artifact_key": "epic038.pr04.db_grants", "discovered_physical_path": "artifacts/db/grants.txt", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr04_db_runtime_posture", "schema_version": "1.0"},
-    {"artifact_key": "epic038.pr04.db_check_schema", "discovered_physical_path": "artifacts/db/check_schema.txt", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr04_db_runtime_posture", "schema_version": "1.0"},
     {"artifact_key": "epic038.pr04.db_check_constraints", "discovered_physical_path": "artifacts/db/check_constraints.txt", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr04_db_runtime_posture", "schema_version": "1.0"},
-    {"artifact_key": "epic038.pr04.db_boundary_view_readonly", "discovered_physical_path": "artifacts/db/boundary_view.readonly.proof.txt", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr04_db_runtime_posture", "schema_version": "1.0"},
-    {"artifact_key": "epic038.pr04.env_connectivity", "discovered_physical_path": "artifacts/runtime/env_connectivity.snapshot.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr04_db_runtime_posture", "schema_version": "1.0"},
-    {"artifact_key": "epic038.pr04.env_nondev_failure", "discovered_physical_path": "artifacts/runtime/env_connectivity.nondev_failure.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr04_db_runtime_posture", "schema_version": "1.0"},
-    {"artifact_key": "epic038.pr04.db_bridge_adapter_selection", "discovered_physical_path": "artifacts/db_bridge/adapter_selection.snapshot.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr04_db_bridge_parity", "schema_version": "1.0"},
-    {"artifact_key": "epic038.pr04.db_bridge_provider_parity", "discovered_physical_path": "artifacts/db_bridge/provider_parity.proof.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr04_db_bridge_parity", "schema_version": "1.0"},
-    {"artifact_key": "epic038.pr04.bodygraph_source_selection", "discovered_physical_path": "artifacts/bodygraph/source_selection.snapshot.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr04_bodygraph_policy", "schema_version": "1.0"},
-    {"artifact_key": "epic038.pr04.bodygraph_source_invariance_ab", "discovered_physical_path": "artifacts/bodygraph/source_invariance/ab.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr04_bodygraph_policy", "schema_version": "1.0"},
-    {"artifact_key": "epic038.pr04.bodygraph_source_invariance_ba", "discovered_physical_path": "artifacts/bodygraph/source_invariance/ba.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr04_bodygraph_policy", "schema_version": "1.0"},
-    {"artifact_key": "epic038.pr04.bodygraph_source_invariance_summary", "discovered_physical_path": "artifacts/bodygraph/source_invariance/summary.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr04_bodygraph_policy", "schema_version": "1.0"},
-    {"artifact_key": "epic038.pr04.bodygraph_refresh_policy", "discovered_physical_path": "artifacts/bodygraph/refresh_policy.snapshot.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr04_bodygraph_policy", "schema_version": "1.0"},
-    {"artifact_key": "epic038.pr04.bodygraph_metrics", "discovered_physical_path": "artifacts/bodygraph/metrics.snapshot.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr04_bodygraph_policy", "schema_version": "1.0"},
-    {"artifact_key": "epic038.pr04.bodygraph_keys_only_logs", "discovered_physical_path": "artifacts/bodygraph/keys_only.logs.sample", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr04_bodygraph_policy", "schema_version": "1.0"},
     {"artifact_key": "epic038.pr04.bodygraph_vendor_upsert_synthetic", "discovered_physical_path": "artifacts/bodygraph/vendor_upsert.epic038_synthetic.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr04_synthetic_pair", "schema_version": "1.0"},
     {"artifact_key": "epic038.pr04.bodygraph_db_resolve_synthetic", "discovered_physical_path": "artifacts/bodygraph/db_resolve.epic038_synthetic.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr04_synthetic_pair", "schema_version": "1.0"},
-    {"artifact_key": "epic038.pr04.presenter_json_canon_compare", "discovered_physical_path": "artifacts/presenter/json_canon_compare.log", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr04_presenter_compare", "schema_version": "1.0"},
+    {"artifact_key": "epic038.pr04.presenter_db_bridge_compare", "discovered_physical_path": "artifacts/presenter/hde_epic038_pr04_db_bridge_compare.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr04_presenter_compare", "schema_version": "1.0"},
+    {"artifact_key": "epic038.pr04.presenter_db_bridge_compare_schema", "discovered_physical_path": "schemas/presenter_db_bridge_compare.v1.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr04_schema", "schema_version": "1.0"},
+    {"artifact_key": "bodygraph.source_invariance.schema.run.v2", "discovered_physical_path": "schemas/bodygraph_source_invariance.run.v2.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr04_schema", "schema_version": "2.0"},
+    {"artifact_key": "bodygraph.source_invariance.schema.summary.v2", "discovered_physical_path": "schemas/bodygraph_source_invariance.summary.v2.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr04_schema", "schema_version": "2.0"},
     {"artifact_key": "epic038.pr04.architecture_snapshot", "discovered_physical_path": "artifacts/architecture/architecture_snapshot.keys_only.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr04_architecture_snapshot", "schema_version": "1.0"},
     {"artifact_key": "epic038.pr04.architecture_schema", "discovered_physical_path": "schemas/architecture_snapshot.keys_only.v1.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr04_schema", "schema_version": "1.0"},
 ]
@@ -2934,6 +2926,8 @@ def _load_human_index() -> list[dict[str, object]]:
         not in EPIC037_PR05_SUPERSEDED_INDEX_KEYS
         and (entry.get("artifact_key"), entry.get("discovered_physical_path"))
         not in EPIC038_PR02_SUPERSEDED_INDEX_KEYS
+        and (entry.get("artifact_key"), entry.get("discovered_physical_path"))
+        not in EPIC038_PR04_SUPERSEDED_INDEX_KEYS
     ]
     return _dedupe_entries(
         [

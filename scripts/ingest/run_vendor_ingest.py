@@ -15,7 +15,6 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from engine.bodygraph.ingest import (
-    CANON_COMPARE_LOG,
     INGEST_DIR,
     RETRY_LOG,
     SUCCESS_LOG,
@@ -28,7 +27,8 @@ from engine.bodygraph.vendor_client import VendorError
 IDEMPOTENCY_LOG = INGEST_DIR / "idempotency_proof.log"
 ACCEPTANCE_FILE = INGEST_DIR / "_s9.acceptance.txt"
 VERIFY_OK_FILE = INGEST_DIR / "_s9.verify_ok.txt"
-ARTIFACTS = [SUCCESS_LOG, IDEMPOTENCY_LOG, RETRY_LOG, CANON_COMPARE_LOG]
+INGEST_CANON_COMPARE_LOG = INGEST_DIR / "json_canon_compare.log"
+ARTIFACTS = [SUCCESS_LOG, IDEMPOTENCY_LOG, RETRY_LOG, INGEST_CANON_COMPARE_LOG]
 
 
 def _canonical_json(obj: Mapping[str, object]) -> str:
@@ -107,7 +107,11 @@ def main() -> int:
         return 1
     outcomes: list[IngestOutcome] = []
     for _ in range(2):
-        outcome = ingest_vendor_bodygraph(inputs, env=os.environ)
+        outcome = ingest_vendor_bodygraph(
+            inputs,
+            env=os.environ,
+            canon_log=INGEST_CANON_COMPARE_LOG,
+        )
         outcomes.append(outcome)
     _write_idempotency_log(outcomes)
     _write_acceptance()
@@ -117,7 +121,7 @@ def main() -> int:
             "ingest_success": SUCCESS_LOG.exists(),
             "idempotency_proof": IDEMPOTENCY_LOG.exists(),
             "retry_trace": RETRY_LOG.exists(),
-            "json_canon_compare": CANON_COMPARE_LOG.exists(),
+            "json_canon_compare": INGEST_CANON_COMPARE_LOG.exists(),
         },
     }
     _print_json(summary)

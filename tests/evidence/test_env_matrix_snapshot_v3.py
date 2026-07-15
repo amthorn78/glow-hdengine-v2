@@ -94,14 +94,24 @@ def test_env_matrix_v3_check_rejects_unknown_keys(tmp_path, monkeypatch):
         assert str(exc.value).startswith("DRIFT:")
 
 
-def test_rails_closed_phase1_delegates_env_matrix_ownership():
+def test_rails_closed_phase1_is_a_no_write_retirement_guard():
     source = Path("tools/evidence/generate_rails_closed_phase1.py").read_text(
         encoding="utf-8"
     )
 
-    assert "generate_env_matrix_snapshot.main([])" in source
+    before = Path("artifacts/runtime/env_matrix.snapshot.json").read_bytes()
+    completed = subprocess.run(
+        [sys.executable, "tools/evidence/generate_rails_closed_phase1.py"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode != 0
+    assert completed.stderr == "RETIRED_EVIDENCE_GENERATOR: use focused generators\n"
+    assert Path("artifacts/runtime/env_matrix.snapshot.json").read_bytes() == before
+    assert "generate_env_matrix_snapshot" not in source
     assert "db_access.resolve_env_matrix()" not in source
-    assert '_write_json("artifacts/runtime/env_matrix.snapshot.json"' not in source
+    assert "write_" not in source
 
 
 def test_env_matrix_v3_consumers_use_canonical_singleton_contract():

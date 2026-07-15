@@ -9,7 +9,9 @@ def test_db_runtime_outputs_and_check_residue():
     proof=ROOT/'artifacts/db/boundary_view.readonly.proof.txt.path_proof.txt'; before=proof.read_bytes() if proof.exists() else b''
     run(['tools/evidence/generate_db_runtime_posture.py'])
     after=proof.read_bytes() if proof.exists() else b''; assert before==after
-    paths=['artifacts/db/ddl_fingerprint.json','artifacts/db/grants.txt','artifacts/db/check_schema.txt','artifacts/db/check_constraints.txt','artifacts/db/boundary_view.readonly.proof.txt','artifacts/runtime/env_connectivity.snapshot.json','artifacts/runtime/env_connectivity.nondev_failure.json']
+    env_paths=['artifacts/runtime/env_connectivity.snapshot.json','artifacts/runtime/env_connectivity.nondev_failure.json']
+    env_before={p:(ROOT/p).read_bytes() for p in env_paths}
+    paths=['artifacts/db/ddl_fingerprint.json','artifacts/db/grants.txt','artifacts/db/check_schema.txt','artifacts/db/check_constraints.txt','artifacts/db/boundary_view.readonly.proof.txt','artifacts/db/partition_plan.txt','artifacts/db/partition_verify.log']
     h1={p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in paths}
     run(['tools/evidence/generate_db_runtime_posture.py']); h2={p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in paths}; assert h1==h2
     run(['tools/evidence/generate_db_runtime_posture.py','--check']); h3={p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in paths}; assert h2==h3
@@ -18,7 +20,9 @@ def test_db_runtime_outputs_and_check_residue():
     assert 'PASS constraint unique_body_graph_identity' in (ROOT/'artifacts/db/check_constraints.txt').read_text()
     assert 'NO_GRANT_STATEMENTS_ESTABLISHED' in (ROOT/'artifacts/db/grants.txt').read_text()
     boundary=(ROOT/'artifacts/db/boundary_view.readonly.proof.txt').read_text(); assert 'is_updatable: NO' in boundary and 'is_insertable_into: NO' in boundary
-    non=json.loads((ROOT/'artifacts/runtime/env_connectivity.nondev_failure.json').read_text()); assert non['selection_order']==['psycopg','bridge']; assert non['total_failure']['typed_error']['class']=='BridgeUnavailable'
+    assert (ROOT/'artifacts/db/partition_plan.txt').read_text() == 'hde.pair_evaluation RANGE (evaluated_at)\nhde.public_results RANGE (created_at)\n'
+    assert (ROOT/'artifacts/db/partition_verify.log').read_text().endswith('result: PARTITION_PLAN_OK\n')
+    assert {p:(ROOT/p).read_bytes() for p in env_paths} == env_before
 
 def test_db_bridge_false_pass_and_fixture_separation():
     run(['tools/evidence/generate_db_bridge_parity.py'])
@@ -30,6 +34,6 @@ def test_db_bridge_false_pass_and_fixture_separation():
     run(['tools/evidence/generate_db_bridge_parity.py','--check'])
     assert (ROOT/'artifacts/bodygraph/vendor_upsert.epic038_synthetic.json').exists()
     assert (ROOT/'artifacts/bodygraph/db_resolve.epic038_synthetic.json').exists()
-    records=[json.loads(line) for line in (ROOT/'artifacts/presenter/json_canon_compare.log').read_text().splitlines()]
-    assert len(records) >= 2
-    assert records[-1]['artifact_kind']=='hde_epic038_pr04_presenter_compare'
+    receipt=json.loads((ROOT/'artifacts/presenter/hde_epic038_pr04_db_bridge_compare.json').read_text())
+    assert receipt['status']=='PASS'
+    assert receipt['predicates']['presenter_bytes_equal'] is True

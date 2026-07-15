@@ -1,0 +1,5 @@
+path: schemas/presenter_db_bridge_compare.v1.json
+size_bytes: 2924
+sha256: 33fd1bb4fdae92382f33f87fba09f2206b10e0a2b12882c920ea5ade060b469b
+mtime_utc: 2026-07-15T18:39:57Z
+produced_at_utc: 2026-07-14T23:06:10Z
