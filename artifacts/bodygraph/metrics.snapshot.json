@@ -1,1 +1,1 @@
-{"counters":{"breaker_tripped_total":1,"rate_limit_hit_total":1,"refresh_attempts_total":0,"refresh_failure_total":0,"refresh_success_total":0},"labels":{"env":"fixture","reason":"closed_rails_fixture","source":"hdapi"},"schema":"v1","timers_ms":{"refresh_duration_p95":0}}
+{"counters":{"breaker_tripped_total":0,"rate_limit_hit_total":0,"refresh_attempts_total":2,"refresh_failure_total":1,"refresh_success_total":1},"labels":{"env":"fixture","reason":"closed_rails_fixture","source":"hdapi"},"schema":"v1","timers_ms":{"refresh_duration_p95":0}}

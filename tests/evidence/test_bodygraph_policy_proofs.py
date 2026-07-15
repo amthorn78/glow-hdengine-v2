@@ -108,6 +108,17 @@ def test_bodygraph_policy_v2_is_deterministic_and_closed_rails():
         {"name": "BG_SOURCE_INVARIANCE_OK", "type": "non_token"}
     ]
 
+    policy = json.loads((ROOT / PATHS[6]).read_text())
+    metrics = json.loads((ROOT / PATHS[7]).read_text())
+    counts = policy["sample_counts"]
+    assert metrics["counters"] == {
+        "breaker_tripped_total": counts["breaker_tripped"],
+        "rate_limit_hit_total": counts["rate_limit_hits"],
+        "refresh_attempts_total": counts["refresh_attempts"],
+        "refresh_failure_total": counts["refresh_failures"],
+        "refresh_success_total": counts["refresh_successes"],
+    }
+
 
 def test_source_invariance_rejects_reused_or_mutated_evidence(tmp_path, monkeypatch):
     isolated = {key: tmp_path / path.name for key, path in generator.PATHS.items()}

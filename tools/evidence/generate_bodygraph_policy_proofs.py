@@ -57,6 +57,13 @@ UNSAFE_KEYS = {
     "token",
     "transport",
 }
+POLICY_SAMPLE_COUNTS = {
+    "breaker_tripped": 0,
+    "rate_limit_hits": 0,
+    "refresh_attempts": 2,
+    "refresh_failures": 1,
+    "refresh_successes": 1,
+}
 
 
 def _sha(data: bytes) -> str:
@@ -560,24 +567,18 @@ def policy_payload() -> dict[str, Any]:
             {"name": "BG_RATE_LIMIT_POLICY_OK", "type": "non_token"},
             {"name": "BG_CIRCUIT_BREAKER_POLICY_OK", "type": "non_token"},
         ],
-        "sample_counts": {
-            "breaker_tripped": 1,
-            "rate_limit_hits": 1,
-            "refresh_attempts": 0,
-            "refresh_failures": 0,
-            "refresh_successes": 0,
-        },
+        "sample_counts": dict(POLICY_SAMPLE_COUNTS),
     }
 
 
 def metrics() -> dict[str, Any]:
     return {
         "counters": {
-            "breaker_tripped_total": 1,
-            "rate_limit_hit_total": 1,
-            "refresh_attempts_total": 0,
-            "refresh_failure_total": 0,
-            "refresh_success_total": 0,
+            "breaker_tripped_total": POLICY_SAMPLE_COUNTS["breaker_tripped"],
+            "rate_limit_hit_total": POLICY_SAMPLE_COUNTS["rate_limit_hits"],
+            "refresh_attempts_total": POLICY_SAMPLE_COUNTS["refresh_attempts"],
+            "refresh_failure_total": POLICY_SAMPLE_COUNTS["refresh_failures"],
+            "refresh_success_total": POLICY_SAMPLE_COUNTS["refresh_successes"],
         },
         "labels": {
             "env": "fixture",
