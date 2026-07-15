@@ -1,5 +1,5 @@
 path: artifacts/engine/order/abba_identity.bytes
-size_bytes: 56
-sha256: c9b6a36be886690fa85bf6c15606ffce9e9f0e9a13f6e4b476dda4830796add7
+size_bytes: 32
+sha256: 5dd560e80a411b3e428d4f8190740f269c1020b401410129b28d55ab803e2ae2
 mtime_utc: 2025-11-22T04:02:02Z
 produced_at_utc: 2025-11-22T04:02:02Z
