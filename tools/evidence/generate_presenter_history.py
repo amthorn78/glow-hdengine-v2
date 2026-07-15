@@ -85,6 +85,7 @@ def _atomic_write(data: bytes) -> None:
     temporary = Path(raw_tmp)
     try:
         with os.fdopen(fd, "wb") as handle:
+            os.fchmod(handle.fileno(), 0o644)
             handle.write(data)
             handle.flush()
             os.fsync(handle.fileno())

@@ -2,4 +2,4 @@ path: artifacts/proofs/endpoints_env_gate_proof.log
 size_bytes: 86
 sha256: dd97d2b4e433da2c1dfff990ec4284d93513058f001313696c1984e2a4d14513
 mtime_utc: 2026-07-15T18:45:19Z
-produced_at_utc: 2026-07-15T20:13:37Z
+produced_at_utc: 2026-07-15T19:15:33Z

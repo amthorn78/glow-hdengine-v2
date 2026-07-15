@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Capture EPIC011 DB posture, provider parity, and env connectivity evidence."""
+"""Capture EPIC011 posture into task-scoped mutable OPS diagnostics."""
 from __future__ import annotations
 
 import contextlib
@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, List, Mapping, Sequence
 
 ROOT = Path(__file__).resolve().parents[2]
+CAPTURE_ROOT = ROOT / "artifacts/ops/epic011_posture"
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
@@ -49,32 +50,19 @@ def _iso(ts: dt.datetime) -> str:
 
 
 def _artifact_path(rel: str) -> Path:
-    path = ROOT / rel
+    requested = Path(rel)
+    try:
+        relative = requested.relative_to("artifacts")
+    except ValueError as exc:
+        raise ValueError(f"capture path must be under artifacts/: {rel}") from exc
+    path = CAPTURE_ROOT / relative
     path.parent.mkdir(parents=True, exist_ok=True)
     return path
-
-
-def _write_path_proof(path: Path) -> None:
-    stat = path.stat()
-    sha = _sha256(path.read_bytes())
-    mtime = dt.datetime.fromtimestamp(stat.st_mtime, tz=dt.timezone.utc).replace(microsecond=0)
-    proof = "\n".join(
-        (
-            f"path: {path.relative_to(ROOT)}",
-            f"sha256: {sha}",
-            f"size_bytes: {stat.st_size}",
-            f"mtime_utc: {_iso(mtime)}",
-            "",
-        )
-    )
-    proof_path = Path(f"{path}.path_proof.txt")
-    proof_path.write_text(proof, encoding="utf-8")
 
 
 def _write_bytes(rel: str, data: bytes) -> None:
     path = _artifact_path(rel)
     path.write_bytes(data)
-    _write_path_proof(path)
 
 
 def _write_text(rel: str, text: str) -> None:
@@ -86,12 +74,6 @@ def _write_text(rel: str, text: str) -> None:
 def _write_json(rel: str, payload: Mapping[str, Any]) -> None:
     text = json.dumps(payload, separators=(",", ":"), sort_keys=True) + "\n"
     _write_bytes(rel, text.encode("utf-8"))
-
-
-def _sha256(data: bytes) -> str:
-    import hashlib
-
-    return hashlib.sha256(data).hexdigest()
 
 
 def _env_tag() -> str:

@@ -1,5 +1,6 @@
 import hashlib, json, os, subprocess
 from pathlib import Path
+from tools.evidence import generate_db_runtime_posture as generator
 ROOT=Path(__file__).resolve().parents[2]
 ENV={**os.environ,'SAFE_MODE':'1','ALLOW_NETWORK':'0','LC_ALL':'C','LANG':'C','TZ':'UTC'}
 def run(args): return subprocess.run(['python',*args],cwd=ROOT,env=ENV,check=True,capture_output=True,text=True)
@@ -7,10 +8,13 @@ def assert_lf(p):
     b=(ROOT/p).read_bytes(); assert b.endswith(b'\n') and not b.endswith(b'\n\n') and b'\r\n' not in b
 def test_db_runtime_outputs_and_check_residue():
     proof=ROOT/'artifacts/db/boundary_view.readonly.proof.txt.path_proof.txt'; before=proof.read_bytes() if proof.exists() else b''
-    run(['tools/evidence/generate_db_runtime_posture.py'])
-    after=proof.read_bytes() if proof.exists() else b''; assert before==after
     env_paths=['artifacts/runtime/env_connectivity.snapshot.json','artifacts/runtime/env_connectivity.nondev_failure.json']
     env_before={p:(ROOT/p).read_bytes() for p in env_paths}
+    run(['tools/evidence/generate_db_runtime_posture.py','--check'])
+    assert (proof.read_bytes() if proof.exists() else b'') == before
+    assert {p:(ROOT/p).read_bytes() for p in env_paths} == env_before
+    run(['tools/evidence/generate_db_runtime_posture.py'])
+    after=proof.read_bytes() if proof.exists() else b''; assert before==after
     paths=['artifacts/db/ddl_fingerprint.json','artifacts/db/grants.txt','artifacts/db/check_schema.txt','artifacts/db/check_constraints.txt','artifacts/db/boundary_view.readonly.proof.txt','artifacts/db/partition_plan.txt','artifacts/db/partition_verify.log']
     h1={p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in paths}
     run(['tools/evidence/generate_db_runtime_posture.py']); h2={p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in paths}; assert h1==h2
@@ -18,11 +22,33 @@ def test_db_runtime_outputs_and_check_residue():
     for p in paths: assert_lf(p)
     assert (ROOT/'artifacts/db/check_schema.txt').read_text()=='hde, public\n'
     assert 'PASS constraint unique_body_graph_identity' in (ROOT/'artifacts/db/check_constraints.txt').read_text()
+    assert "PASS check hde.body_graphs.input_fingerprint predicate=input_fingerprint~'^[0-9a-f]{64}$'" in (ROOT/'artifacts/db/check_constraints.txt').read_text()
+    assert json.loads((ROOT/'artifacts/db/ddl_fingerprint.json').read_text())['constraint_count'] == 8
     assert 'NO_GRANT_STATEMENTS_ESTABLISHED' in (ROOT/'artifacts/db/grants.txt').read_text()
     boundary=(ROOT/'artifacts/db/boundary_view.readonly.proof.txt').read_text(); assert 'is_updatable: NO' in boundary and 'is_insertable_into: NO' in boundary
     assert (ROOT/'artifacts/db/partition_plan.txt').read_text() == 'hde.pair_evaluation RANGE (evaluated_at)\nhde.public_results RANGE (created_at)\n'
     assert (ROOT/'artifacts/db/partition_verify.log').read_text().endswith('result: PARTITION_PLAN_OK\n')
     assert {p:(ROOT/p).read_bytes() for p in env_paths} == env_before
+
+def test_db_runtime_fingerprint_uses_authoritative_migration_only(tmp_path, monkeypatch):
+    migration = tmp_path/'migrations/011_body_graphs_durability.sql'
+    migration.parent.mkdir(parents=True)
+    migration.write_text('CREATE TABLE example (value TEXT NOT NULL);\n', encoding='utf-8')
+    capture = tmp_path/'artifacts/db/ddl_applied.sql'
+    capture.parent.mkdir(parents=True)
+    capture.write_text('operator-specific command output\n', encoding='utf-8')
+    monkeypatch.setattr(generator, 'ROOT', tmp_path)
+    monkeypatch.setattr(generator, 'DDL_SOURCE', migration)
+    assert generator.norm_sql() == 'create table example (value text not null);'
+
+def test_db_runtime_contract_fails_closed_when_required_object_is_missing():
+    sql = generator.norm_sql().replace('create or replace view public.hde_body_graphs_current', 'create or replace view public.renamed')
+    try:
+        generator.ddl_objects(sql)
+    except SystemExit as exc:
+        assert str(exc) == 'MISSING_TRACKED_DDL_OBJECT:public.hde_body_graphs_current'
+    else:
+        raise AssertionError('missing governed DDL object was accepted')
 
 def test_db_bridge_false_pass_and_fixture_separation():
     run(['tools/evidence/generate_db_bridge_parity.py'])

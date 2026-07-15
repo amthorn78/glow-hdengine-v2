@@ -1,3 +1,4 @@
+PASS check hde.body_graphs.input_fingerprint predicate=input_fingerprint~'^[0-9a-f]{64}$' source=migrations/011_body_graphs_durability.sql
 PASS constraint unique_body_graph_identity source=migrations/011_body_graphs_durability.sql
 PASS not_null hde.body_graphs.created_at source=migrations/011_body_graphs_durability.sql
 PASS not_null hde.body_graphs.input_fingerprint source=migrations/011_body_graphs_durability.sql
