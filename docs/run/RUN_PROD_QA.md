@@ -51,16 +51,17 @@ This runbook defines the exact operator choreography for **EPIC011 — Vendor In
 3. Confirm the CLI/HTTP output shows `source":"db"` so the run proves the prod default is DB-first even when rails are open.
 
 ## Step 5 — Byte-level Parity Check
-1. Use the shared presenter/emitter parity helper (`python -m presenter.json_canon_compare artifacts/bodygraph/vendor_upsert.<EPIC011_TEST_USER>.json artifacts/bodygraph/db_resolve.<EPIC011_TEST_USER>.json`) or the ops script that canonicalizes both payloads with the same emitter. The helper prints the parity decision and can append the canonical JSON record directly to the governed log via `--log` (defaults to `artifacts/presenter/json_canon_compare.log`).
-2. Record the parity outcome to `artifacts/presenter/json_canon_compare.log` using the structure printed by the helper:
+1. Run the shared presenter/emitter parity helper with an explicit task-scoped diagnostic destination:
+   ```bash
+   python -m presenter.json_canon_compare \
+     artifacts/bodygraph/vendor_upsert.<EPIC011_TEST_USER>.json \
+     artifacts/bodygraph/db_resolve.<EPIC011_TEST_USER>.json \
+     --log artifacts/ops/admin_vendor_parity.jsonl \
+     --fail-on-diff
    ```
-   compare: FILE_EQ_CANON_BYTES_OK   # or compare: DIFF
-   ab_sha256: <sha256 of vendor_upsert file>
-   ba_sha256: <sha256 of db_resolve file>
-   ```
-   - Use canonical JSON bytes for hashing.
-   - Do not insert actual hashes in this repo; the operator will fill them in during the live run.
-3. If the comparison reports `DIFF`, note the discrepancy in the log and coordinate with engineering before proceeding.
+   The `--log` option is required for this QA capture. Omitting `--log` is stdout-only and must not write to `artifacts/presenter/json_canon_compare.log`, which is immutable historical evidence.
+2. The helper prints the human-readable comparison to stdout and appends one canonical JSONL diagnostic row to `artifacts/ops/admin_vendor_parity.jsonl`. Preserve both outputs with the live QA package. Use canonical JSON bytes for hashing; do not insert fabricated hashes or timestamps.
+3. `--fail-on-diff` returns nonzero when the canonical bytes differ. If it reports `DIFF`, stop the harness and coordinate with engineering before proceeding.
 
 ## Step 6 — Close Rails and Capture Post-window Refusal
 1. Ops restores the default posture: `SAFE_MODE=1` and/or `ALLOW_NETWORK=0` (rails closed).
@@ -73,7 +74,7 @@ This runbook defines the exact operator choreography for **EPIC011 — Vendor In
 | `artifacts/proofs/ops_refusal_proof.txt` | Demonstrates rails are closed outside the window, both before and after, with canonical refusal formatting. | SNAPSHOT_HEADER_LOWERCASE_OK, BG_VENDOR_CALLS_DISABLED_IN_PROD_OK |
 | `artifacts/bodygraph/vendor_upsert.<EPIC011_TEST_USER>.json` | Captures the successful vendor ingest while rails are open. | INGEST_OK |
 | `artifacts/bodygraph/db_resolve.<EPIC011_TEST_USER>.json` | Shows DB-first resolution for the same user without re-hitting the vendor. | INGEST_IDEMPOTENT_OK, BG_SOURCE_SELECTION_OK |
-| `artifacts/presenter/json_canon_compare.log` | Proves byte-level parity between vendor ingest and DB resolve outputs. | BG_SOURCE_INVARIANCE_OK |
+| `artifacts/ops/admin_vendor_parity.jsonl` | Task-scoped live QA diagnostic proving byte-level parity between vendor ingest and DB resolve outputs. | BG_SOURCE_INVARIANCE_OK |
 
 This runbook is preparatory; the actual QA execution will populate the governed artifacts and update `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`, and `artifacts/evidence_index.jsonl` in a follow-up PR.
 
@@ -83,7 +84,7 @@ This runbook is preparatory; the actual QA execution will populate the governed 
 - Confirmation that vendor credentials are configured before Step 3.
 
 ## Post-run Expectations
-- No prod code paths change; only artifacts under `artifacts/proofs/`, `artifacts/bodygraph/`, and `artifacts/presenter/` are produced during QA.
+- No prod code paths change; only task-scoped captures under `artifacts/proofs/`, `artifacts/bodygraph/`, and `artifacts/ops/` are produced during QA.
 - Refusal proofs remain deterministic and numeric-free.
 - Vendor ingest happens only inside the documented window.
 - All evidence files will later be indexed by path-proof + hash according to the EPIC011 evidence governance process.

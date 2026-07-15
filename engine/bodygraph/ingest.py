@@ -131,7 +131,7 @@ def ingest_vendor_bodygraph(
     db_access: DBAccess | None = None,
     retry_log: Path = RETRY_LOG,
     success_log: Path = SUCCESS_LOG,
-    canon_log: Path = CANON_COMPARE_LOG,
+    canon_log: Path | None = None,
     vendor_version: int = 1,
 ) -> IngestOutcome:
     env = env or os.environ
@@ -199,16 +199,17 @@ def ingest_vendor_bodygraph(
         "rows_affected": rows_written,
         "duration_ms": round(duration_ms, 3),
     })
-    _append_jsonl(canon_log, {
-        "at": _utc_iso(),
-        "user_id": inputs.user_id,
-        "vendor": "hdapi",
-        "vendor_version": vendor_version,
-        "input_fingerprint": request.input_fingerprint,
-        "vendor_sha256": payload_sha,
-        "db_emitted_sha256": db_emitted_sha,
-        "match": parity_match,
-    })
+    if canon_log is not None:
+        _append_jsonl(canon_log, {
+            "at": _utc_iso(),
+            "user_id": inputs.user_id,
+            "vendor": "hdapi",
+            "vendor_version": vendor_version,
+            "input_fingerprint": request.input_fingerprint,
+            "vendor_sha256": payload_sha,
+            "db_emitted_sha256": db_emitted_sha,
+            "match": parity_match,
+        })
     return IngestOutcome(
         vendor="hdapi",
         vendor_version=vendor_version,

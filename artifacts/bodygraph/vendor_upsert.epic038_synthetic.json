@@ -1,0 +1,1 @@
+{"artifact":"vendor_upsert","fields":["centers","channels","profile"],"live_provider":"not_exercised","operation":"fixture_vendor_mapping","payload_posture":"mapped_bounded_no_raw_vendor_payload","schema":"v1","synthetic_identity":"hde-epic038-pr04-synthetic"}

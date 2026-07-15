@@ -23,7 +23,7 @@ DB_OUTPUT = Path("artifacts/bodygraph/db_resolve.alice.json")
 VENDOR_COMPAT_OUTPUT = Path("artifacts/compat/vendor_pair.json")
 DB_COMPAT_OUTPUT = Path("artifacts/compat/db_pair.json")
 VIEWER_PREFS_PATH = Path("artifacts/compat/viewer.json")
-PARITY_LOG_PATH = Path("artifacts/presenter/json_canon_compare.log")
+PARITY_LOG_PATH = Path("artifacts/ops/admin_vendor_parity.jsonl")
 NARRATIVE_TEXT_PATH = Path("artifacts/narratives/vendor_pair.txt")
 NARRATIVE_SIDECAR_PATH = Path("artifacts/narratives/vendor_pair.sidecar.json")
 
@@ -126,6 +126,7 @@ def _run_parity_check() -> None:
         str(DB_OUTPUT),
         "--log",
         str(PARITY_LOG_PATH),
+        "--fail-on-diff",
     )
     _run_command(cmd)
 

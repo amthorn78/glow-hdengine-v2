@@ -1,0 +1,5 @@
+path: artifacts/bodygraph/vendor_upsert.epic038_synthetic.json
+size_bytes: 261
+sha256: cabee1754e151dca65ffa22257189024637e73637cb51c86a4700f865f28fa5c
+mtime_utc: 2026-07-14T22:19:22Z
+produced_at_utc: 2026-07-14T16:55:30Z

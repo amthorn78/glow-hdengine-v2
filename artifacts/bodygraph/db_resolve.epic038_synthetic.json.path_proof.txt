@@ -1,0 +1,5 @@
+path: artifacts/bodygraph/db_resolve.epic038_synthetic.json
+size_bytes: 257
+sha256: 3b5be0e2c7d5e44811e29f844abf33700f827479b1e00acf71ab4372e7f2012e
+mtime_utc: 2026-07-14T22:19:22Z
+produced_at_utc: 2026-07-14T16:55:30Z

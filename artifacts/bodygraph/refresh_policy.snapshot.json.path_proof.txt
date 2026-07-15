@@ -1,5 +1,5 @@
 path: artifacts/bodygraph/refresh_policy.snapshot.json
-size_bytes: 292
-sha256: 663225ae3d2d1e8cae987904673fa36b80c9eb62f5737b44517e4094d5c0ab20
+size_bytes: 473
+sha256: b36bf3cd7a6ae23d5d70c200f07a0bfcf89b42589ac81c85feae1cfa396acb68
 mtime_utc: 2025-12-06T04:06:36Z
 produced_at_utc: 2025-11-22T02:27:04Z
