@@ -157,11 +157,13 @@ def _selection_order(attempts: Any) -> list[str]:
     return [row["provider"] for row in attempts if isinstance(row, dict) and "provider" in row]
 
 
-def _ensure_selection_order(payload: dict[str, Any]) -> dict[str, Any]:
+def _ensure_structural_selection_order(payload: dict[str, Any]) -> dict[str, Any]:
     derived = _selection_order(payload.get("attempts"))
     observed = payload.get("selection_order")
     if observed is None:
         payload["selection_order"] = derived
+    elif not isinstance(observed, list):
+        raise SystemExit(f"SELECTION_ORDER_NOT_ARRAY:{observed!r}")
     elif observed != derived:
         raise SystemExit(f"SELECTION_ORDER_MISMATCH:{observed!r}:{derived!r}")
     return payload
@@ -307,7 +309,7 @@ def _provider_parity_payload(db: DBAccess) -> dict[str, Any]:
         "environment": "dev",
         "live_provider_parity": {
             "direct_provider_rows": "unavailable",
-            "parity_status": "not_pass",
+            "parity_status": "unavailable",
             "reason": "active_provider_rows_unavailable_or_not_exercised",
         },
         "proof_labels": [
@@ -555,7 +557,7 @@ def generate(*, check: bool = False) -> None:
     else:
         db = _run_dev_fallback_adapter(snapshot_path=ADAPTER_SELECTION_PATH)
         adapter_payload = json.loads(ADAPTER_SELECTION_PATH.read_text(encoding="utf-8"))
-    adapter_payload = _ensure_selection_order(adapter_payload)
+    adapter_payload = _ensure_structural_selection_order(adapter_payload)
     parity_payload = _provider_parity_payload(db)
     expected_parity_bytes = _canonical_json_bytes(parity_payload)
 

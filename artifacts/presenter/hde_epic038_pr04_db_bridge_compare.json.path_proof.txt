@@ -1,5 +1,5 @@
 path: artifacts/presenter/hde_epic038_pr04_db_bridge_compare.json
 size_bytes: 1621
-sha256: b46758b6d1ae070aeb51bd3cd3650475b209f2f3d3d4545999b0bd4aa77d7dd6
+sha256: 40cb7dc2a668660f641df15ed054c731432dc17294a1810ab4aeae324c59270b
 mtime_utc: 2026-07-15T18:39:57Z
 produced_at_utc: 2026-07-14T23:06:10Z
