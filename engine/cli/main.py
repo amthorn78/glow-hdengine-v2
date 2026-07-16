@@ -340,7 +340,12 @@ def _person_and_chart_from_payload(payload: Mapping[str, Any], *, uid_hint: str 
         uid = _derive_uid(birth)
     if not uid:
         uid = uid_hint or _derive_uid({"person_uid": "fallback"})
-    mechanics = payload.get("mechanics") or {}
+    mapped_bodygraph = payload.get("bodygraph")
+    if not isinstance(mapped_bodygraph, Mapping):
+        mapped_bodygraph = {}
+    mechanics = payload.get("mechanics") or mapped_bodygraph
+    if not isinstance(mechanics, Mapping):
+        mechanics = {}
     mech_type = mechanics.get("type") or payload.get("type")
     if not isinstance(mech_type, str) or not mech_type.strip():
         raise CliError("MISSING_MECHANICS_TYPE")
