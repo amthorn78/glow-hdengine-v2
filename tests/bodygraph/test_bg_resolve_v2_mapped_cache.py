@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import uuid
 
 import pytest
 
@@ -27,6 +28,26 @@ class Client:
     def fetch(self, request):
         self.calls += 1
         return VendorResult(payload={"timestamp": "2026-07-16T00:00:00Z", "success": True, "message": "Chart generated", "errorCode": "", "type": "ChartResult", "data": CHART}, duration_ms=1, attempts=1)
+
+
+class MemoryDB:
+    provider_name = "fixture"
+
+    def __init__(self):
+        self.rows = {}
+
+    def query(self, sql, params=None):
+        key = tuple(params)
+        if "COUNT" in sql:
+            return [(int(key in self.rows),)]
+        return [(self.rows[key],)] if key in self.rows else []
+
+    def tx(self, statements):
+        statement = statements[0]
+        key = tuple(statement.params[:4])
+        inserted = key not in self.rows
+        self.rows.setdefault(key, statement.params[4])
+        return [[(1,)]] if inserted else [[]]
 
 
 def install(monkeypatch, *, db=object()):
@@ -94,6 +115,61 @@ def test_success_uses_mapped_cache_once_and_snapshot_none(monkeypatch):
     assert calls == [{"snapshot_path": None}]
     assert captured["db"] is db and captured["cache"]["payload_posture"] == "adapter_mapped_no_raw_vendor_payload"
     assert result.payload["ingest"]["canonical_sha256"] == "b" * 64
+
+
+@pytest.mark.parametrize(
+    ("first_user_id", "second_user_id"),
+    [
+        ("3FA85F64-5717-4562-B3FC-2C963F66AFAA", "3fa85f64-5717-4562-b3fc-2c963f66afaa"),
+        ("3fa85f64-5717-4562-b3fc-2c963f66afaa", "3FA85F64-5717-4562-B3FC-2C963F66AFAA"),
+        ("{3fa85f64-5717-4562-b3fc-2c963f66afaa}", "3fa85f64-5717-4562-b3fc-2c963f66afaa"),
+        ("3fa85f6457174562b3fc2c963f66afaa", "3fa85f64-5717-4562-b3fc-2c963f66afaa"),
+    ],
+)
+def test_equivalent_uuid_spellings_share_one_canonical_mapped_cache_identity(
+    monkeypatch, first_user_id, second_user_id
+):
+    canonical_user_id = "3fa85f64-5717-4562-b3fc-2c963f66afaa"
+    db = MemoryDB()
+    install(monkeypatch, db=db)
+    kwargs = {
+        "source": "vendor",
+        "upsert": True,
+        "dry_run": False,
+        "env": env(),
+        "birthdate": "2000-01-01",
+        "birthtime": "00:00",
+        "location": "Fixture",
+    }
+
+    first = resolve_bodygraph(first_user_id, **kwargs)
+    second = resolve_bodygraph(second_user_id, **kwargs)
+
+    assert first.status == second.status == "ok"
+    assert first.payload["cache"]["user_id"] == second.payload["cache"]["user_id"] == canonical_user_id
+    assert first.payload["ingest"]["rows_written"] == 1
+    assert second.payload["ingest"]["rows_written"] == 0
+    assert first.payload["ingest"]["canonical_sha256"] == second.payload["ingest"]["canonical_sha256"]
+    assert len(db.rows) == 1
+    stored = json.loads(next(iter(db.rows.values())))
+    assert stored["person_uid"] == f"person-{canonical_user_id}"
+
+
+def test_non_uuid_alias_preserves_person_uid_while_using_database_uuid(monkeypatch):
+    install(monkeypatch)
+    result = resolve_bodygraph(
+        "operator",
+        source="vendor",
+        upsert=False,
+        dry_run=True,
+        env=env(),
+        birthdate="2000-01-01",
+        birthtime="00:00",
+        location="Fixture",
+    )
+    assert result.status == "ok"
+    assert result.payload["resolved"]["person_uid"] == "person-operator"
+    assert result.payload["cache"]["user_id"] == str(uuid.uuid5(uuid.NAMESPACE_URL, "operator"))
 
 
 def test_adapter_and_cache_failures_write_nothing_or_return_typed_error(monkeypatch):

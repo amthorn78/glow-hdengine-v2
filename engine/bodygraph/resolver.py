@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass, replace
 from typing import Mapping, MutableMapping, Optional
+from uuid import UUID
 
 from engine.db import DBAccess
 from engine.db.errors import AdapterError
@@ -37,6 +38,12 @@ class ResolveBodygraphResult:
     status: str
     payload: MutableMapping[str, object]
     exit_code: int
+
+
+@dataclass(frozen=True)
+class _ResolvedUserIdentity:
+    database_user_id: str
+    person_uid_seed: str
 
 
 def resolve_bodygraph(
@@ -149,7 +156,7 @@ def _resolve_vendor(
     except VendorError as exc:
         return _vendor_error(exc, resolver_meta)
     try:
-        normalized_user_id = resolve_db_user_id(vendor_inputs.user_id)
+        user_identity = _resolve_user_identity(vendor_inputs.user_id)
     except VendorError as exc:
         return _vendor_error(exc, resolver_meta)
     except Exception as exc:  # pragma: no cover - defensive guardrail
@@ -159,10 +166,10 @@ def _resolve_vendor(
             details={"error": exc.__class__.__name__},
         )
         return _vendor_error(unexpected, resolver_meta)
-    vendor_inputs = replace(vendor_inputs, user_id=normalized_user_id)
+    vendor_inputs = replace(vendor_inputs, user_id=user_identity.database_user_id)
     if route_policy["route_family"] == "recommended_v2_chart":
         return _resolve_vendor_v2_chart(
-            user_id,
+            user_identity,
             resolver_meta,
             vendor_inputs,
             vendor_env=vendor_env,
@@ -195,7 +202,7 @@ def _resolve_vendor(
 
 
 def _resolve_vendor_v2_chart(
-    original_user_id: str,
+    user_identity: _ResolvedUserIdentity,
     resolver_meta: MutableMapping[str, object],
     vendor_inputs: VendorInputs,
     *,
@@ -244,8 +251,8 @@ def _resolve_vendor_v2_chart(
     except VendorError as exc:
         return _vendor_error(exc, resolver_meta)
     context = V2ChartAdapterContext(
-        person_uid=_person_uid(original_user_id),
-        user_id=vendor_inputs.user_id,
+        person_uid=_person_uid(user_identity.person_uid_seed),
+        user_id=user_identity.database_user_id,
         vendor="hdapi",
         vendor_version=2,
         input_fingerprint=request.input_fingerprint,
@@ -316,6 +323,22 @@ def _resolve_vendor_v2_chart(
 def _person_uid(user_id: str) -> str:
     normalized = (user_id or "").strip()
     return normalized if normalized.startswith("person-") else f"person-{normalized}"
+
+
+def _resolve_user_identity(user_id: str) -> _ResolvedUserIdentity:
+    database_user_id = resolve_db_user_id(user_id)
+    person_uid_seed = (user_id or "").strip()
+    try:
+        canonical_uuid = str(UUID(person_uid_seed))
+    except ValueError:
+        return _ResolvedUserIdentity(
+            database_user_id=database_user_id,
+            person_uid_seed=person_uid_seed,
+        )
+    return _ResolvedUserIdentity(
+        database_user_id=canonical_uuid,
+        person_uid_seed=canonical_uuid,
+    )
 
 
 def _redacted_request_posture(request: object, route_policy: Mapping[str, object]) -> Mapping[str, object]:
