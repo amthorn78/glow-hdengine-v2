@@ -60,6 +60,14 @@ def test_production_like_refuses_before_vendor_and_db(monkeypatch, app_env):
     assert result.payload["error"]["code"] == "PROVIDER_WRITE_UNSUPPORTED"
 
 
+def test_process_production_environment_cannot_be_overridden_for_database_write(monkeypatch):
+    monkeypatch.setenv("APP_ENV", "production")
+    monkeypatch.setattr("engine.bodygraph.resolver.HdApiClient.from_env", lambda **kwargs: pytest.fail("vendor constructed"))
+    monkeypatch.setattr("engine.bodygraph.resolver.DBAccess.for_current_env", lambda **kwargs: pytest.fail("DB constructed"))
+    result = resolve_bodygraph("operator", source="vendor", upsert=True, dry_run=False, env=env(APP_ENV="test"), birthdate="2000-01-01", birthtime="00:00", location="Fixture")
+    assert result.payload["error"]["code"] == "PROVIDER_WRITE_UNSUPPORTED"
+
+
 def test_closed_rails_refuse_before_all_io(monkeypatch):
     monkeypatch.setattr("engine.bodygraph.resolver._classify_env_route_policy", lambda *_: pytest.fail("route classified"))
     result = resolve_bodygraph("operator", source="vendor", upsert=True, dry_run=False, env=env(SAFE_MODE="1", ALLOW_NETWORK="0"))

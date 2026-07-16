@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass, replace
 from typing import Mapping, MutableMapping, Optional
 
@@ -214,8 +215,9 @@ def _resolve_vendor_v2_chart(
             },
         )
         return _vendor_error(error, resolver_meta)
-    app_env = str(vendor_env.get("APP_ENV") or vendor_env.get("ENGINE_ENV") or "").strip().lower()
-    if not dry_run and app_env in {"prod", "production", "live"}:
+    requested_app_env = str(vendor_env.get("APP_ENV") or vendor_env.get("ENGINE_ENV") or "").strip().lower()
+    database_app_env = str(os.environ.get("APP_ENV") or os.environ.get("ENGINE_ENV") or "").strip().lower()
+    if not dry_run and {requested_app_env, database_app_env} & {"prod", "production", "live"}:
         return _vendor_error(
             VendorError("PROVIDER_WRITE_UNSUPPORTED", "mapped-cache persistence is refused in production-like environments"),
             resolver_meta,

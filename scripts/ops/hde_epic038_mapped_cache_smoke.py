@@ -15,7 +15,7 @@ if str(ROOT) not in sys.path:
 from engine.bodygraph.mapped_cache import persist_mapped_bodygraph
 from engine.bodygraph.projection import project_bodygraph
 from engine.bodygraph.v2_adapter import V2ChartAdapterContext, adapt_v2_chart_payload
-from engine.bodygraph.vendor_client import HdApiClient
+from engine.bodygraph.vendor_client import HdApiClient, classify_bg_resolve_route_policy
 from engine.db import DBAccess
 from engine.serializer.canon import sercanon
 
@@ -42,6 +42,9 @@ def _preflight(args: argparse.Namespace) -> None:
     missing = [name for name in REQUIRED_ENV if not os.environ.get(name, "").strip()]
     if missing:
         raise SystemExit("OPS_REFUSED: required environment names are unset: " + ",".join(missing))
+    route_policy = classify_bg_resolve_route_policy(os.environ["HD_API_BASE_URL"])
+    if not route_policy["supported"] or route_policy["route_family"] != "recommended_v2_chart":
+        raise SystemExit("OPS_REFUSED: HD_API_BASE_URL must select the configured-v2 charts route")
     try:
         uuid.UUID(args.synthetic_user_id)
     except ValueError as exc:

@@ -1,5 +1,5 @@
 path: artifacts/bodygraph/v2_mapped_cache/legacy_fallback_preservation.log
-size_bytes: 92
-sha256: e6004f2d5c7d93ae11c3af5848debacfccd6592088bf8ce5ed417fbb53a33883
+size_bytes: 96
+sha256: c47daffeae8c2022c706888a85659be3d252cff24a6ceb46d31eb3a10e038eb8
 mtime_utc: 2026-07-16T18:26:52Z
 produced_at_utc: 2026-07-16T01:13:34Z

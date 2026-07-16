@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 from jsonschema import Draft202012Validator, ValidationError
 
+from engine.bodygraph.resolver import ResolveBodygraphResult
 from tools.evidence import generate_v2_mapped_cache_evidence as generator
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -58,6 +59,17 @@ def test_negative_predicate_fails_before_writes() -> None:
     before = {path:path.read_bytes() for path in generator.build() if path.exists()}
     with pytest.raises(RuntimeError, match="PREDICATE_FAILURE"): generator.build(force_failure=True)
     assert before == {path:path.read_bytes() for path in before}
+
+
+def test_resolver_regression_cannot_emit_pass_evidence(monkeypatch) -> None:
+    actual = generator.resolve_bodygraph
+    def regressed(*args, **kwargs):
+        if kwargs.get("env", {}).get("SAFE_MODE") == "1":
+            return ResolveBodygraphResult("error", {"error":{"code":"WRONG_REFUSAL"}}, 1)
+        return actual(*args, **kwargs)
+    monkeypatch.setattr(generator, "resolve_bodygraph", regressed)
+    with pytest.raises(RuntimeError, match="PREDICATE_FAILURE"):
+        generator.build()
 
 
 def test_outputs_are_bounded_and_secret_free() -> None:

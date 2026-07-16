@@ -11,6 +11,7 @@ import sys
 import tempfile
 from pathlib import Path
 from typing import Any, Mapping
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
@@ -18,6 +19,8 @@ if str(ROOT) not in sys.path:
 
 from jsonschema import Draft202012Validator
 from engine.bodygraph.mapped_cache import persist_mapped_bodygraph
+from engine.bodygraph.ingest import IngestOutcome
+from engine.bodygraph.resolver import resolve_bodygraph
 from engine.serializer.canon import sercanon
 
 OUT = ROOT / "artifacts/bodygraph/v2_mapped_cache"
@@ -84,6 +87,57 @@ def _binding(path: str, data: bytes, schema_identity: str | None = None) -> dict
     return value
 
 
+def _exercise_resolver_policy() -> tuple[dict[str, bool], dict[str, int | str | bool]]:
+    calls = {"vendor": 0, "db": 0, "legacy": 0}
+
+    def client_forbidden(**_kwargs):
+        calls["vendor"] += 1
+        raise AssertionError("vendor construction was not authorized")
+
+    def db_forbidden(**_kwargs):
+        calls["db"] += 1
+        raise AssertionError("database construction was not authorized")
+
+    def legacy_ingest(*_args, **_kwargs):
+        calls["legacy"] += 1
+        return IngestOutcome(
+            vendor="hdapi", vendor_version=1, input_fingerprint="f" * 64,
+            idempotency_key="fixture", rows_written=0, duration_ms=0.0,
+            payload_sha256="a" * 64, db_emitted_sha256="a" * 64,
+            parity_match=True, db_rows_after=0, payload={},
+        )
+
+    base = {"birthdate": "fixture-date", "birthtime": "fixture-time", "location": "fixture-location"}
+    with patch.dict(os.environ, {"APP_ENV": "test"}, clear=False), \
+         patch("engine.bodygraph.resolver.HdApiClient.from_env", client_forbidden), \
+         patch("engine.bodygraph.resolver.DBAccess.for_current_env", db_forbidden):
+        closed = resolve_bodygraph(
+            "00000000-0000-4000-8000-000000000039", source="vendor", upsert=True,
+            dry_run=False, env={"SAFE_MODE": "1", "ALLOW_NETWORK": "0"},
+        )
+        missing_upsert = resolve_bodygraph(
+            "00000000-0000-4000-8000-000000000039", source="vendor", upsert=False,
+            dry_run=False, env={"SAFE_MODE": "0", "ALLOW_NETWORK": "1", "APP_ENV": "test", "HD_API_BASE_URL": "https://fixture.invalid/v2"}, **base,
+        )
+        production = resolve_bodygraph(
+            "00000000-0000-4000-8000-000000000039", source="vendor", upsert=True,
+            dry_run=False, env={"SAFE_MODE": "0", "ALLOW_NETWORK": "1", "APP_ENV": "production", "HD_API_BASE_URL": "https://fixture.invalid/v2"}, **base,
+        )
+        with patch("engine.bodygraph.resolver.ingest_vendor_bodygraph", legacy_ingest):
+            legacy = resolve_bodygraph(
+                "00000000-0000-4000-8000-000000000039", source="vendor", upsert=False,
+                dry_run=True, env={"SAFE_MODE": "0", "ALLOW_NETWORK": "1", "APP_ENV": "test", "HD_API_BASE_URL": "https://fixture.invalid/v1"}, **base,
+            )
+    predicates = {
+        "closed_rails_zero_io": closed.payload.get("error", {}).get("code") == "PROVIDER_REFUSED" and calls["vendor"] == 0 and calls["db"] == 0,
+        "missing_upsert_refused": missing_upsert.payload.get("error", {}).get("code") == "PROVIDER_WRITE_UNSUPPORTED" and calls["vendor"] == 0 and calls["db"] == 0,
+        "production_like_refused": production.payload.get("error", {}).get("code") == "PROVIDER_WRITE_UNSUPPORTED" and calls["vendor"] == 0 and calls["db"] == 0,
+        "explicit_legacy_fallback": legacy.status == "ok" and calls["legacy"] == 1 and legacy.payload["resolver"]["route_policy"]["classification"] == "explicit_legacy_fallback",
+    }
+    posture = {**calls, "closed_code": closed.payload["error"]["code"], "legacy_classification": legacy.payload["resolver"]["route_policy"]["classification"]}
+    return predicates, posture
+
+
 def build(*, force_failure: bool = False) -> dict[Path, bytes]:
     fixture_bytes = FIXTURE.read_bytes(); fixture = json.loads(fixture_bytes)
     cache = {"user_id":"00000000-0000-4000-8000-000000000039","vendor":"hdapi","vendor_version":2,
@@ -93,16 +147,25 @@ def build(*, force_failure: bool = False) -> dict[Path, bytes]:
     common = {"schema":SCHEMA_ID_TRANSCRIPT,"identity":identity,"safe_payload_keys":["bodygraph","person","person_uid"],"canonical_sha256":first.canonical_sha256,"row_count":len(db.rows),"provider":db.provider_name,"predicates":{"projected_before_persistence":True,"read_back_match":True}}
     write = {**common,"phase":"write","rows_written":first.rows_written}
     read = {**common,"phase":"read_back","rows_written":second.rows_written}
+    resolver_predicates, resolver_posture = _exercise_resolver_policy()
+    stored = next(iter(db.rows.values()))
+    stored_keys = sorted(json.loads(stored))
+    persistence_predicates = {
+        "canonical_write_read_back_equivalence": first.read_back_match and second.read_back_match and first.canonical_sha256 == second.canonical_sha256,
+        "idempotent_repeated_write": first.rows_written == 1 and second.rows_written == 0 and second.idempotent,
+        "no_raw_or_secret_persistence": stored_keys == ["bodygraph", "person", "person_uid"],
+        "normalized_identity_single_row": len(db.rows) == 1 and first.rows_after == second.rows_after == 1,
+    }
     files: dict[Path, bytes] = {
         TRANSCRIPT_SCHEMA:sercanon(transcript_schema()), MANIFEST_SCHEMA:sercanon(manifest_schema()),
         OUT/"write_transcript.json":sercanon(write), OUT/"read_back_transcript.json":sercanon(read),
         OUT/"canonical_parity.log":f"PASS canonical_sha256={first.canonical_sha256} write_read_back_match=true\n".encode(),
-        OUT/"no_raw_vendor_payload_persistence.log":b"PASS stored_keys=bodygraph,person,person_uid forbidden_keys_absent=true\n",
+        OUT/"no_raw_vendor_payload_persistence.log":f"PASS stored_keys={','.join(stored_keys)} forbidden_keys_absent={str(persistence_predicates['no_raw_or_secret_persistence']).lower()}\n".encode(),
         OUT/"idempotence.log":f"PASS first_rows_written=1 second_rows_written=0 identity_rows={len(db.rows)} canonical_hash_unchanged=true\n".encode(),
-        OUT/"closed_rails_refusal.log":b"PASS safe_mode=1 allow_network=0 vendor_calls=0 db_calls=0\n",
-        OUT/"legacy_fallback_preservation.log":b"PASS non_v2_route=bodygraphs configured_v2_route=charts configured_v2_legacy_fallback=false\n",
+        OUT/"closed_rails_refusal.log":f"PASS code={resolver_posture['closed_code']} safe_mode=1 allow_network=0 vendor_calls={resolver_posture['vendor']} db_calls={resolver_posture['db']}\n".encode(),
+        OUT/"legacy_fallback_preservation.log":f"PASS classification={resolver_posture['legacy_classification']} legacy_calls={resolver_posture['legacy']} configured_v2_legacy_fallback=false\n".encode(),
     }
-    predicates = {key:True for key in PREDICATE_KEYS}
+    predicates = {**persistence_predicates, **resolver_predicates}
     if force_failure: predicates["idempotent_repeated_write"] = False
     if not all(predicates.values()): raise RuntimeError("PREDICATE_FAILURE")
     artifact_bindings = [_binding(path.relative_to(ROOT).as_posix(), data) for path,data in files.items() if path.parent == OUT]

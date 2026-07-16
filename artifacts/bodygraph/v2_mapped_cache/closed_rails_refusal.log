@@ -1,1 +1,1 @@
-PASS safe_mode=1 allow_network=0 vendor_calls=0 db_calls=0
+PASS code=PROVIDER_REFUSED safe_mode=1 allow_network=0 vendor_calls=0 db_calls=0
