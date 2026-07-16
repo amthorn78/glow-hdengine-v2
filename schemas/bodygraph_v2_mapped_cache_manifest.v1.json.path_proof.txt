@@ -1,0 +1,5 @@
+path: schemas/bodygraph_v2_mapped_cache_manifest.v1.json
+size_bytes: 2117
+sha256: d886db7e653dc81141dcd2b36aabb7268693a757de2c1cd76677e0faa3bc689f
+mtime_utc: 2026-07-16T18:26:52Z
+produced_at_utc: 2026-07-16T01:13:34Z

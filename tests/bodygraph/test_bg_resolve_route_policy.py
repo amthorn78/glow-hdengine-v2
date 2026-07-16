@@ -179,12 +179,12 @@ def test_v2_adapter_unsupported_becomes_typed_resolver_error(monkeypatch: pytest
     assert result.payload["error"]["details"]["adapter_status"] == "unsupported"
 
 
-def test_v2_non_dry_run_fails_closed_before_fetch(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_v2_non_dry_run_without_upsert_fails_closed_before_fetch(monkeypatch: pytest.MonkeyPatch) -> None:
     def fail_from_env(**kwargs):  # pragma: no cover - assertion guard
         raise AssertionError("client construction must not happen for unsupported v2 write path")
 
     monkeypatch.setattr("engine.bodygraph.resolver.HdApiClient.from_env", fail_from_env)
-    result = resolve_bodygraph("operator-user", source="vendor", upsert=True, dry_run=False, env=_open_env(), birthdate="1990-01-01", birthtime="12:00", location="Amsterdam, NL")
+    result = resolve_bodygraph("operator-user", source="vendor", upsert=False, dry_run=False, env=_open_env(), birthdate="1990-01-01", birthtime="12:00", location="Amsterdam, NL")
 
     assert result.status == "error"
     assert result.payload["error"]["code"] == "PROVIDER_WRITE_UNSUPPORTED"

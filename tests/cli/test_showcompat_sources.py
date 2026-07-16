@@ -80,6 +80,42 @@ def test_showcompat_db_source(monkeypatch: pytest.MonkeyPatch, capsys: pytest.Ca
     assert compat["meta"]["invocation_tag"]
 
 
+def test_showcompat_db_source_accepts_projected_v2_mapped_cache(monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
+    mapped_payload = {
+        "bodygraph": {
+            "authority": "Emotional",
+            "birthDateUtc": "2000-01-01T00:00:00Z",
+            "centers": [],
+            "channelsLong": [],
+            "channelsShort": [],
+            "definition": "Single",
+            "gates": [],
+            "profile": "1/3",
+            "strategy": "Wait to Respond",
+            "type": "Manifesting Generator",
+        },
+        "person": {"person_uid": "fixture-person"},
+        "person_uid": "fixture-person",
+    }
+
+    class _DB:
+        def query(self, sql: str, params):
+            assert "body_graphs_current" in sql
+            return [(json.dumps(mapped_payload),)]
+
+    monkeypatch.setenv("SAFE_MODE", "1")
+    monkeypatch.setenv("ALLOW_NETWORK", "0")
+    monkeypatch.setattr("engine.cli.main.DBAccess.for_current_env", lambda: _DB())
+
+    exit_code = cli(["showcompat", "--source", "db", "--user-a", "user-1", "--user-b", "user-2"])
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    payload = json.loads(captured.out)
+    assert payload["compat"]["categories"]
+    assert captured.err == ""
+
+
 
 def test_showcompat_conjunction_surfaces_db_query_failed(monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
     monkeypatch.setenv("SAFE_MODE", "1")

@@ -79,3 +79,4 @@
 {"at":"2026-05-19T12:30:44.768Z","duration_ms":266.129,"route":"db_bridge.get:/introspect/fingerprint","status":200}
 {"at":"2026-05-19T12:30:44.946Z","duration_ms":176.944,"route":"db_bridge.get:/introspect/grants","status":200}
 {"at":"2026-05-19T12:30:45.038Z","duration_ms":91.454,"route":"db_bridge.post:/query","status":200}
+{"at":"2026-07-16T18:26:14.958Z","duration_ms":737.062,"route":"db_bridge.get:/health","status":200}

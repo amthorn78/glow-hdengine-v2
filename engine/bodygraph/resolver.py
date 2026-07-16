@@ -2,8 +2,13 @@
 
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass, replace
 from typing import Mapping, MutableMapping, Optional
+from uuid import UUID
+
+from engine.db import DBAccess
+from engine.db.errors import AdapterError
 
 from .ingest import (
     IngestOutcome,
@@ -13,6 +18,7 @@ from .ingest import (
     resolve_db_user_id,
 )
 from .v2_adapter import V2ChartAdapterContext, adapt_v2_chart_payload
+from .mapped_cache import MappedCacheError, persist_mapped_bodygraph
 from .vendor_client import HdApiClient, VendorError, classify_bg_resolve_route_policy, route_auth_posture
 
 def _truthy(value: object) -> bool:
@@ -34,6 +40,12 @@ class ResolveBodygraphResult:
     exit_code: int
 
 
+@dataclass(frozen=True)
+class _ResolvedUserIdentity:
+    database_user_id: str
+    person_uid_seed: str
+
+
 def resolve_bodygraph(
     user_id: str,
     *,
@@ -45,12 +57,7 @@ def resolve_bodygraph(
     birthtime: str | None = None,
     location: str | None = None,
 ) -> ResolveBodygraphResult:
-    """Return a deterministic placeholder resolution envelope for Phase S8a.
-
-    This function intentionally avoids network and database effects. It only
-    captures the control-flow decisions required for the CLI/ops surfaces while
-    the rails remain closed.
-    """
+    """Resolve BodyGraph data within the selected source and rail posture."""
 
     env = env or {}
     requested_source = (source or "auto").lower()
@@ -149,7 +156,7 @@ def _resolve_vendor(
     except VendorError as exc:
         return _vendor_error(exc, resolver_meta)
     try:
-        normalized_user_id = resolve_db_user_id(vendor_inputs.user_id)
+        user_identity = _resolve_user_identity(vendor_inputs.user_id)
     except VendorError as exc:
         return _vendor_error(exc, resolver_meta)
     except Exception as exc:  # pragma: no cover - defensive guardrail
@@ -159,13 +166,14 @@ def _resolve_vendor(
             details={"error": exc.__class__.__name__},
         )
         return _vendor_error(unexpected, resolver_meta)
-    vendor_inputs = replace(vendor_inputs, user_id=normalized_user_id)
+    vendor_inputs = replace(vendor_inputs, user_id=user_identity.database_user_id)
     if route_policy["route_family"] == "recommended_v2_chart":
         return _resolve_vendor_v2_chart(
-            user_id,
+            user_identity,
             resolver_meta,
             vendor_inputs,
             vendor_env=vendor_env,
+            upsert=upsert,
             dry_run=dry_run,
             route_policy=route_policy,
         )
@@ -194,24 +202,41 @@ def _resolve_vendor(
 
 
 def _resolve_vendor_v2_chart(
-    original_user_id: str,
+    user_identity: _ResolvedUserIdentity,
     resolver_meta: MutableMapping[str, object],
     vendor_inputs: VendorInputs,
     *,
     vendor_env: Mapping[str, object],
+    upsert: bool,
     dry_run: bool,
     route_policy: Mapping[str, object],
 ) -> ResolveBodygraphResult:
-    if not dry_run:
+    db: DBAccess | None = None
+    if not dry_run and not upsert:
         error = VendorError(
             "PROVIDER_WRITE_UNSUPPORTED",
-            "v2 chart-backed bg:resolve supports dry-run mapping only until mapped-cache persistence is implemented",
+            "v2 chart-backed mapped-cache persistence requires explicit upsert intent",
             details={
                 "route_family": route_policy["route_family"],
                 "payload_posture": "adapter_mapped_no_raw_vendor_payload",
             },
         )
         return _vendor_error(error, resolver_meta)
+    requested_app_env = str(vendor_env.get("APP_ENV") or vendor_env.get("ENGINE_ENV") or "").strip().lower()
+    database_app_env = str(os.environ.get("APP_ENV") or os.environ.get("ENGINE_ENV") or "").strip().lower()
+    if not dry_run and {requested_app_env, database_app_env} & {"prod", "production", "live"}:
+        return _vendor_error(
+            VendorError("PROVIDER_WRITE_UNSUPPORTED", "mapped-cache persistence is refused in production-like environments"),
+            resolver_meta,
+        )
+    if not dry_run:
+        try:
+            db = DBAccess.for_current_env(snapshot_path=None)
+        except AdapterError as exc:
+            return _vendor_error(
+                VendorError("DB_WRITER_UNAVAILABLE", "mapped-cache database target unavailable", details={"code": exc.code}),
+                resolver_meta,
+            )
     try:
         client = HdApiClient.from_env(env=vendor_env)
         request = client.build_contract_route_request(
@@ -226,8 +251,8 @@ def _resolve_vendor_v2_chart(
     except VendorError as exc:
         return _vendor_error(exc, resolver_meta)
     context = V2ChartAdapterContext(
-        person_uid=_person_uid(original_user_id),
-        user_id=vendor_inputs.user_id,
+        person_uid=_person_uid(user_identity.person_uid_seed),
+        user_id=user_identity.database_user_id,
         vendor="hdapi",
         vendor_version=2,
         input_fingerprint=request.input_fingerprint,
@@ -250,6 +275,26 @@ def _resolve_vendor_v2_chart(
             },
         )
         return _vendor_error(error, resolver_meta)
+    if not dry_run:
+        assert db is not None
+        try:
+            cache_result = persist_mapped_bodygraph(db, adapter["cache"])
+        except MappedCacheError as exc:
+            return _vendor_error(VendorError(exc.code, str(exc)), resolver_meta)
+        payload = {
+            "status": "ok",
+            "resolver": resolver_meta,
+            "adapter": {"status": adapter["status"], "code": adapter["code"], "payload_family": adapter["payload_family"]},
+            "cache": {
+                "input_fingerprint": adapter["cache"]["input_fingerprint"],
+                "payload_posture": adapter["cache"]["payload_posture"],
+                "user_id": adapter["cache"]["user_id"],
+                "vendor": adapter["cache"]["vendor"],
+                "vendor_version": adapter["cache"]["vendor_version"],
+            },
+            "ingest": cache_result.as_dict(),
+        }
+        return ResolveBodygraphResult(status="ok", payload=payload, exit_code=0)
     payload = {
         "status": "ok",
         "resolver": resolver_meta,
@@ -278,6 +323,22 @@ def _resolve_vendor_v2_chart(
 def _person_uid(user_id: str) -> str:
     normalized = (user_id or "").strip()
     return normalized if normalized.startswith("person-") else f"person-{normalized}"
+
+
+def _resolve_user_identity(user_id: str) -> _ResolvedUserIdentity:
+    database_user_id = resolve_db_user_id(user_id)
+    person_uid_seed = (user_id or "").strip()
+    try:
+        canonical_uuid = str(UUID(person_uid_seed))
+    except ValueError:
+        return _ResolvedUserIdentity(
+            database_user_id=database_user_id,
+            person_uid_seed=person_uid_seed,
+        )
+    return _ResolvedUserIdentity(
+        database_user_id=canonical_uuid,
+        person_uid_seed=canonical_uuid,
+    )
 
 
 def _redacted_request_posture(request: object, route_policy: Mapping[str, object]) -> Mapping[str, object]:

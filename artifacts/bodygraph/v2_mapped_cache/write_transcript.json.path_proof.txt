@@ -1,0 +1,5 @@
+path: artifacts/bodygraph/v2_mapped_cache/write_transcript.json
+size_bytes: 529
+sha256: 7b9fbda6c93074a7edff9d424001eb4a5c6b55e0b9ecba4f9c9fa4b92ed2f95e
+mtime_utc: 2026-07-16T18:26:52Z
+produced_at_utc: 2026-07-16T01:13:34Z

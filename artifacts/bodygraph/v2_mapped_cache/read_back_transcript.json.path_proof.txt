@@ -1,0 +1,5 @@
+path: artifacts/bodygraph/v2_mapped_cache/read_back_transcript.json
+size_bytes: 533
+sha256: 2f68ab6b4163e6f9145d6ea32b253991dd7c2e8cd3f00597ef3dec20702c87f4
+mtime_utc: 2026-07-16T18:26:52Z
+produced_at_utc: 2026-07-16T01:13:34Z

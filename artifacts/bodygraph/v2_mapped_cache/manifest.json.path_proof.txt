@@ -1,0 +1,5 @@
+path: artifacts/bodygraph/v2_mapped_cache/manifest.json
+size_bytes: 2261
+sha256: 9e2f7432c8c7f225402aad9743f816dd485b14dc5ec09485e0528f751924c8a4
+mtime_utc: 2026-07-16T18:26:52Z
+produced_at_utc: 2026-07-16T01:13:34Z

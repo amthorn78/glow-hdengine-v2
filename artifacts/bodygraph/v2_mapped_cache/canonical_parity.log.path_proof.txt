@@ -1,0 +1,5 @@
+path: artifacts/bodygraph/v2_mapped_cache/canonical_parity.log
+size_bytes: 114
+sha256: 8393ee37d8893e0ee38c10b20ecc25f2c3aa3b202d3b9d3b7a0e98b80ae1f9e9
+mtime_utc: 2026-07-16T18:26:52Z
+produced_at_utc: 2026-07-16T01:13:34Z

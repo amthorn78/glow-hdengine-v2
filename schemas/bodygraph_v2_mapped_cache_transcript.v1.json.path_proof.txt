@@ -1,0 +1,5 @@
+path: schemas/bodygraph_v2_mapped_cache_transcript.v1.json
+size_bytes: 1251
+sha256: a515f9d2818273932f8d3c3fe3c0d42b9e0d9b461c2f3fb092374e5ec05e1b11
+mtime_utc: 2026-07-16T18:26:52Z
+produced_at_utc: 2026-07-16T01:13:34Z
