@@ -1,0 +1,5 @@
+path: artifacts/bodygraph/v2_mapped_cache/closed_rails_refusal.log
+size_bytes: 59
+sha256: 7ed079052dc81283390dc290d73efdd750cf53b1c601f0fa478f28f18c304116
+mtime_utc: 2026-07-16T18:26:52Z
+produced_at_utc: 2026-07-16T01:13:34Z

@@ -5,6 +5,9 @@ from __future__ import annotations
 from dataclasses import dataclass, replace
 from typing import Mapping, MutableMapping, Optional
 
+from engine.db import DBAccess
+from engine.db.errors import AdapterError
+
 from .ingest import (
     IngestOutcome,
     VendorInputs,
@@ -13,6 +16,7 @@ from .ingest import (
     resolve_db_user_id,
 )
 from .v2_adapter import V2ChartAdapterContext, adapt_v2_chart_payload
+from .mapped_cache import MappedCacheError, persist_mapped_bodygraph
 from .vendor_client import HdApiClient, VendorError, classify_bg_resolve_route_policy, route_auth_posture
 
 def _truthy(value: object) -> bool:
@@ -45,12 +49,7 @@ def resolve_bodygraph(
     birthtime: str | None = None,
     location: str | None = None,
 ) -> ResolveBodygraphResult:
-    """Return a deterministic placeholder resolution envelope for Phase S8a.
-
-    This function intentionally avoids network and database effects. It only
-    captures the control-flow decisions required for the CLI/ops surfaces while
-    the rails remain closed.
-    """
+    """Resolve BodyGraph data within the selected source and rail posture."""
 
     env = env or {}
     requested_source = (source or "auto").lower()
@@ -166,6 +165,7 @@ def _resolve_vendor(
             resolver_meta,
             vendor_inputs,
             vendor_env=vendor_env,
+            upsert=upsert,
             dry_run=dry_run,
             route_policy=route_policy,
         )
@@ -199,19 +199,35 @@ def _resolve_vendor_v2_chart(
     vendor_inputs: VendorInputs,
     *,
     vendor_env: Mapping[str, object],
+    upsert: bool,
     dry_run: bool,
     route_policy: Mapping[str, object],
 ) -> ResolveBodygraphResult:
-    if not dry_run:
+    db: DBAccess | None = None
+    if not dry_run and not upsert:
         error = VendorError(
             "PROVIDER_WRITE_UNSUPPORTED",
-            "v2 chart-backed bg:resolve supports dry-run mapping only until mapped-cache persistence is implemented",
+            "v2 chart-backed mapped-cache persistence requires explicit upsert intent",
             details={
                 "route_family": route_policy["route_family"],
                 "payload_posture": "adapter_mapped_no_raw_vendor_payload",
             },
         )
         return _vendor_error(error, resolver_meta)
+    app_env = str(vendor_env.get("APP_ENV") or vendor_env.get("ENGINE_ENV") or "").strip().lower()
+    if not dry_run and app_env in {"prod", "production", "live"}:
+        return _vendor_error(
+            VendorError("PROVIDER_WRITE_UNSUPPORTED", "mapped-cache persistence is refused in production-like environments"),
+            resolver_meta,
+        )
+    if not dry_run:
+        try:
+            db = DBAccess.for_current_env(snapshot_path=None)
+        except AdapterError as exc:
+            return _vendor_error(
+                VendorError("DB_WRITER_UNAVAILABLE", "mapped-cache database target unavailable", details={"code": exc.code}),
+                resolver_meta,
+            )
     try:
         client = HdApiClient.from_env(env=vendor_env)
         request = client.build_contract_route_request(
@@ -250,6 +266,26 @@ def _resolve_vendor_v2_chart(
             },
         )
         return _vendor_error(error, resolver_meta)
+    if not dry_run:
+        assert db is not None
+        try:
+            cache_result = persist_mapped_bodygraph(db, adapter["cache"])
+        except MappedCacheError as exc:
+            return _vendor_error(VendorError(exc.code, str(exc)), resolver_meta)
+        payload = {
+            "status": "ok",
+            "resolver": resolver_meta,
+            "adapter": {"status": adapter["status"], "code": adapter["code"], "payload_family": adapter["payload_family"]},
+            "cache": {
+                "input_fingerprint": adapter["cache"]["input_fingerprint"],
+                "payload_posture": adapter["cache"]["payload_posture"],
+                "user_id": adapter["cache"]["user_id"],
+                "vendor": adapter["cache"]["vendor"],
+                "vendor_version": adapter["cache"]["vendor_version"],
+            },
+            "ingest": cache_result.as_dict(),
+        }
+        return ResolveBodygraphResult(status="ok", payload=payload, exit_code=0)
     payload = {
         "status": "ok",
         "resolver": resolver_meta,

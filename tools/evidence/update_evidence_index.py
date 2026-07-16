@@ -2519,6 +2519,19 @@ EPIC038_PR04_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {"artifact_key": "epic038.pr04.architecture_schema", "discovered_physical_path": "schemas/architecture_snapshot.keys_only.v1.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr04_schema", "schema_version": "1.0"},
 ]
 
+EPIC038_PR05_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {"artifact_key": "epic038.pr05.v2_mapped_cache.write_transcript", "discovered_physical_path": "artifacts/bodygraph/v2_mapped_cache/write_transcript.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr05_mapped_cache_evidence", "schema_version": "1.0"},
+    {"artifact_key": "epic038.pr05.v2_mapped_cache.read_back_transcript", "discovered_physical_path": "artifacts/bodygraph/v2_mapped_cache/read_back_transcript.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr05_mapped_cache_evidence", "schema_version": "1.0"},
+    {"artifact_key": "epic038.pr05.v2_mapped_cache.canonical_parity", "discovered_physical_path": "artifacts/bodygraph/v2_mapped_cache/canonical_parity.log", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr05_mapped_cache_evidence", "schema_version": "1.0"},
+    {"artifact_key": "epic038.pr05.v2_mapped_cache.no_raw_vendor_payload", "discovered_physical_path": "artifacts/bodygraph/v2_mapped_cache/no_raw_vendor_payload_persistence.log", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr05_mapped_cache_evidence", "schema_version": "1.0"},
+    {"artifact_key": "epic038.pr05.v2_mapped_cache.idempotence", "discovered_physical_path": "artifacts/bodygraph/v2_mapped_cache/idempotence.log", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr05_mapped_cache_evidence", "schema_version": "1.0"},
+    {"artifact_key": "epic038.pr05.v2_mapped_cache.closed_rails_refusal", "discovered_physical_path": "artifacts/bodygraph/v2_mapped_cache/closed_rails_refusal.log", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr05_mapped_cache_evidence", "schema_version": "1.0"},
+    {"artifact_key": "epic038.pr05.v2_mapped_cache.legacy_fallback", "discovered_physical_path": "artifacts/bodygraph/v2_mapped_cache/legacy_fallback_preservation.log", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr05_mapped_cache_evidence", "schema_version": "1.0"},
+    {"artifact_key": "epic038.pr05.v2_mapped_cache.manifest", "discovered_physical_path": "artifacts/bodygraph/v2_mapped_cache/manifest.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr05_mapped_cache_evidence", "schema_version": "1.0", "notes": "Predicate-derived PR evidence manifest; no acceptance-token satisfaction claim"},
+    {"artifact_key": "epic038.pr05.v2_mapped_cache.transcript_schema", "discovered_physical_path": "schemas/bodygraph_v2_mapped_cache_transcript.v1.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr05_schema", "schema_version": "1.0"},
+    {"artifact_key": "epic038.pr05.v2_mapped_cache.manifest_schema", "discovered_physical_path": "schemas/bodygraph_v2_mapped_cache_manifest.v1.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr05_schema", "schema_version": "1.0"},
+]
+
 A7_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
         "artifact_key": "a7.success_encoding_invariance",
@@ -2984,6 +2997,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *EPIC038_PR02_PRIMARY_ARTIFACTS,
             *EPIC038_PR03_PRIMARY_ARTIFACTS,
             *EPIC038_PR04_PRIMARY_ARTIFACTS,
+            *EPIC038_PR05_PRIMARY_ARTIFACTS,
             *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,

@@ -1,0 +1,5 @@
+path: artifacts/bodygraph/v2_mapped_cache/no_raw_vendor_payload_persistence.log
+size_bytes: 72
+sha256: 5bcd38db26c9c018dce74cbdb02a8bf19c5621a8fa81775aaaa10b6af25e9b54
+mtime_utc: 2026-07-16T18:26:52Z
+produced_at_utc: 2026-07-16T01:13:34Z

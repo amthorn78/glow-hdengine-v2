@@ -157,7 +157,7 @@ def _build_parser() -> argparse.ArgumentParser:
     bg.add_argument(
         "--upsert",
         action="store_true",
-        help="Request durability upsert once implemented",
+        help="Request controlled durability upsert when the selected source supports it",
     )
     bg.add_argument(
         "--dry-run",
