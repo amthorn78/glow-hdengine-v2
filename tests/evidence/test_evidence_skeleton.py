@@ -132,3 +132,33 @@ def test_index_entries_have_mirrors_and_path_proofs():
         assert int(proof.get("size_bytes", "0")) == rec["size_bytes"], f"size mismatch for {key}"
         assert proof.get("mtime_utc")
         assert proof.get("produced_at_utc")
+
+
+def test_runtime_env_connectivity_canonical_token_binding():
+    target = ("runtime.env_connectivity", "artifacts/runtime/env_connectivity.snapshot.json")
+    retired = {
+        ("epic038.pr04.env_connectivity", "artifacts/runtime/env_connectivity.snapshot.json"),
+        ("epic032.pr03.env_connectivity", "artifacts/runtime/env_connectivity.snapshot.json"),
+    }
+    entries = update_evidence_index._load_human_index()
+    matching_entries = [
+        entry for entry in entries
+        if entry["discovered_physical_path"] == target[1]
+        or (entry["artifact_key"], entry["discovered_physical_path"]) in retired
+    ]
+    assert [(entry["artifact_key"], entry["discovered_physical_path"]) for entry in matching_entries] == [target]
+    assert matching_entries[0].get("tokens") == ["DEV_DB_BRIDGE_FALLBACK_OK"]
+
+    artifact = json.loads(Path(target[1]).read_text(encoding="utf-8"))
+    proof_labels = artifact.get("proof_labels", [])
+    assert {label.get("name") for label in proof_labels} == {"DEV_DB_BRIDGE_FALLBACK_OK"}
+    assert {label.get("type") for label in proof_labels} == {"acceptance_token"}
+
+    mirror_records = [json.loads(raw) for raw in Path("artifacts/evidence_index.jsonl").read_text(encoding="utf-8").splitlines() if raw]
+    matching_mirror = [
+        rec for rec in mirror_records
+        if rec["discovered_physical_path"] == target[1]
+        or (rec["artifact_key"], rec["discovered_physical_path"]) in retired
+    ]
+    assert [(rec["artifact_key"], rec["discovered_physical_path"]) for rec in matching_mirror] == [target]
+    assert matching_mirror[0].get("tokens") == ["DEV_DB_BRIDGE_FALLBACK_OK"]

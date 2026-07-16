@@ -577,6 +577,19 @@ EPIC032_PR04_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
 ]
 
 
+RUNTIME_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {
+        "artifact_key": "runtime.env_connectivity",
+        "discovered_physical_path": "artifacts/runtime/env_connectivity.snapshot.json",
+        "epic_id": "HDE-EPIC038",
+        "record_type": "runtime_env_connectivity",
+        "schema_version": "2",
+        "tokens": ["DEV_DB_BRIDGE_FALLBACK_OK"],
+        "notes": "Canonical runtime environment connectivity snapshot carrying the PF04 dev DB bridge fallback acceptance token; duplicate PR-specific current keys are retired.",
+    },
+]
+
+
 EPIC033_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
         "artifact_key": "hdapi_v2.source_inventory_json",
@@ -2948,6 +2961,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *EPIC032_PR02_PRIMARY_ARTIFACTS,
             *EPIC032_PR03_PRIMARY_ARTIFACTS,
             *EPIC032_PR04_PRIMARY_ARTIFACTS,
+            *RUNTIME_PRIMARY_ARTIFACTS,
             *_load_epic033_entries(),
             *_load_epic034_pr01_entries(),
             *_load_epic034_pr02_entries(),
