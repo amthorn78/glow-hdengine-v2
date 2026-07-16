@@ -2,7 +2,7 @@ from argparse import Namespace
 
 import pytest
 
-from scripts.ops.hde_epic038_mapped_cache_smoke import _preflight
+from scripts.ops.hde_epic038_mapped_cache_smoke import SINGLE_REQUEST_RETRY, _preflight, main
 
 
 def args():
@@ -53,7 +53,34 @@ def test_database_is_health_checked_before_vendor_fetch(monkeypatch):
             raise RuntimeError("unavailable")
     monkeypatch.setattr("scripts.ops.hde_epic038_mapped_cache_smoke.DBAccess.for_current_env", lambda **kwargs: DB())
     monkeypatch.setattr("scripts.ops.hde_epic038_mapped_cache_smoke.HdApiClient.from_env", lambda **kwargs: calls.append("vendor") or None)
-    from scripts.ops.hde_epic038_mapped_cache_smoke import main
     with pytest.raises(RuntimeError, match="unavailable"):
         main(["--synthetic-user-id", args().synthetic_user_id, "--synthetic-person-uid", "fixture", "--birthdate", "fixture", "--birthtime", "fixture", "--location", "fixture"])
     assert calls == ["db_health"]
+
+
+def test_vendor_client_is_pinned_to_one_attempt_and_result_is_verified(monkeypatch):
+    configure(monkeypatch, "https://fixture.invalid/v2")
+    captured = {}
+
+    class DB:
+        def health(self):
+            return None
+
+    class Client:
+        def build_contract_route_request(self, **kwargs):
+            return object()
+
+        def fetch(self, request):
+            return type("VendorResult", (), {"attempts": 2, "payload": {}})()
+
+    def client_from_env(**kwargs):
+        captured.update(kwargs)
+        return Client()
+
+    monkeypatch.setattr("scripts.ops.hde_epic038_mapped_cache_smoke.DBAccess.for_current_env", lambda **kwargs: DB())
+    monkeypatch.setattr("scripts.ops.hde_epic038_mapped_cache_smoke.HdApiClient.from_env", client_from_env)
+
+    with pytest.raises(SystemExit, match="attempt count must equal one"):
+        main(["--synthetic-user-id", args().synthetic_user_id, "--synthetic-person-uid", "fixture", "--birthdate", "fixture", "--birthtime", "fixture", "--location", "fixture"])
+
+    assert captured["retry"] == SINGLE_REQUEST_RETRY
