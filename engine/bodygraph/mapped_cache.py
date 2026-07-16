@@ -81,20 +81,26 @@ def persist_mapped_bodygraph(db: DBAccess, cache: Mapping[str, Any]) -> MappedCa
         raise MappedCacheError("PROVIDER_WRITE_UNSUPPORTED", "mapped cache projection was refused") from exc
     canonical = sercanon(projected)
     identity = (normalized_user_id, _EXPECTED_VENDOR, vendor_version, fingerprint)
-    rows_before = _count(db, identity)
     statement = Statement(
         sql="""INSERT INTO hde.body_graphs (user_id, vendor, vendor_version, input_fingerprint, payload)
 VALUES (%s, %s, %s, %s, %s::jsonb)
-ON CONFLICT (user_id, vendor, vendor_version, input_fingerprint) DO NOTHING""",
+ON CONFLICT (user_id, vendor, vendor_version, input_fingerprint) DO NOTHING
+RETURNING 1""",
         params=(*identity, canonical.decode("utf-8")),
-        fetch=False,
+        fetch=True,
     )
     try:
-        db.tx([statement])
+        tx_results = db.tx([statement])
     except AdapterError as exc:
         raise MappedCacheError("DB_WRITER_UNAVAILABLE", "mapped cache write failed") from exc
+    if len(tx_results) != 1 or tx_results[0] is None:
+        raise MappedCacheError("DB_WRITER_UNAVAILABLE", "mapped cache write result is invalid")
+    inserted_rows = tx_results[0]
+    if list(inserted_rows) not in ([], [(1,)]):
+        raise MappedCacheError("DB_WRITER_UNAVAILABLE", "mapped cache write cardinality is invalid")
+    rows_written = len(inserted_rows)
     rows_after = _count(db, identity)
-    if rows_after != 1 or rows_before not in {0, 1}:
+    if rows_after != 1:
         raise MappedCacheError("DB_QUERY_FAILED", "mapped cache identity cardinality failed")
     stored = _read(db, identity)
     try:
@@ -107,11 +113,11 @@ ON CONFLICT (user_id, vendor, vendor_version, input_fingerprint) DO NOTHING""",
     return MappedCacheResult(
         provider=db.provider_name,
         canonical_sha256=sha256(canonical).hexdigest(),
-        rows_before=rows_before,
+        rows_before=1 - rows_written,
         rows_after=rows_after,
-        rows_written=rows_after - rows_before,
+        rows_written=rows_written,
         read_back_match=True,
-        idempotent=rows_before == 1 and rows_after == 1,
+        idempotent=rows_written == 0,
     )
 
 

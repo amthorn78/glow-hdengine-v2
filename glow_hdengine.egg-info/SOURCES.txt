@@ -19,6 +19,7 @@ engine/constants.py
 engine/emit_public.py
 engine/bodygraph/__init__.py
 engine/bodygraph/ingest.py
+engine/bodygraph/mapped_cache.py
 engine/bodygraph/projection.py
 engine/bodygraph/resolver.py
 engine/bodygraph/retention.py

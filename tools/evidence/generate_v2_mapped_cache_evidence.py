@@ -51,7 +51,8 @@ class MemoryDB:
         return [(self.rows[key],)] if key in self.rows else []
     def tx(self, statements):
         self.write_calls += 1; statement = statements[0]; key = tuple(statement.params[:4])
-        self.rows.setdefault(key, statement.params[4]); return [None]
+        inserted = key not in self.rows
+        self.rows.setdefault(key, statement.params[4]); return [[(1,)]] if inserted else [[]]
 
 
 def transcript_schema() -> dict[str, Any]:

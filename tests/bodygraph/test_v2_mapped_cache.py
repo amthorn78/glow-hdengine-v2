@@ -35,8 +35,9 @@ class MemoryDB:
         self.statements.extend(statements)
         statement = statements[0]
         key = tuple(statement.params[:4])
+        inserted = key not in self.rows
         self.rows.setdefault(key, statement.params[4])
-        return [None]
+        return [[(1,)]] if inserted else [[]]
 
 
 def cache(**changes):
@@ -66,6 +67,7 @@ def test_write_read_back_and_repeated_write_are_canonical_and_idempotent() -> No
     statement = db.statements[0]
     assert "INSERT INTO hde.body_graphs" in statement.sql
     assert "ON CONFLICT (user_id, vendor, vendor_version, input_fingerprint) DO NOTHING" in statement.sql
+    assert "RETURNING 1" in statement.sql and statement.fetch is True
     assert statement.params[:4] == tuple(cache()[key] for key in ("user_id", "vendor", "vendor_version", "input_fingerprint"))
     stored = json.loads(statement.params[4])
     assert set(stored) == {"bodygraph", "person", "person_uid"}
@@ -122,6 +124,19 @@ def test_typed_write_read_missing_and_parity_failures() -> None:
     with pytest.raises(MappedCacheError) as exc:
         persist_mapped_bodygraph(db, cache())
     assert exc.value.code == "DB_PAYLOAD_MISSING"
+
+
+def test_conflict_result_not_prewrite_count_controls_rows_written() -> None:
+    db = MemoryDB()
+    value = cache()
+    key = tuple(value[name] for name in ("user_id", "vendor", "vendor_version", "input_fingerprint"))
+    from engine.serializer.canon import sercanon
+    from engine.bodygraph.projection import project_bodygraph
+    db.rows[key] = sercanon(project_bodygraph(value["payload"])).decode("utf-8")
+    result = persist_mapped_bodygraph(db, value)
+    assert result.rows_written == 0
+    assert result.rows_before == 1
+    assert result.idempotent is True
 
 
 def test_exact_metadata_and_supported_contract_are_required() -> None:

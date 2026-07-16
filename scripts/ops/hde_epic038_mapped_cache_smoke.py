@@ -46,15 +46,19 @@ def _preflight(args: argparse.Namespace) -> None:
     if not route_policy["supported"] or route_policy["route_family"] != "recommended_v2_chart":
         raise SystemExit("OPS_REFUSED: HD_API_BASE_URL must select the configured-v2 charts route")
     try:
-        uuid.UUID(args.synthetic_user_id)
+        canonical_user_id = str(uuid.UUID(args.synthetic_user_id))
     except ValueError as exc:
         raise SystemExit("OPS_REFUSED: synthetic user identity must be a UUID") from exc
+    if canonical_user_id != args.synthetic_user_id:
+        raise SystemExit("OPS_REFUSED: synthetic user identity must use canonical UUID form")
     if not all(str(getattr(args, name)).strip() for name in ("synthetic_person_uid", "birthdate", "birthtime", "location")):
         raise SystemExit("OPS_REFUSED: complete synthetic inputs required")
 
 
 def main(argv=None) -> int:
     args = _parser().parse_args(argv); _preflight(args)
+    db = DBAccess.for_current_env(snapshot_path=None)
+    db.health()
     client = HdApiClient.from_env(env=os.environ)
     request = client.build_contract_route_request(path="charts", request_fields=("birthdate","birthtime","location"), geocode_required=True,
         birthdate=args.birthdate, birthtime=args.birthtime, location=args.location)
@@ -64,7 +68,6 @@ def main(argv=None) -> int:
     adapter = adapt_v2_chart_payload(vendor_result.payload,context).as_dict()
     if adapter["status"] != "mapped": raise SystemExit("OPS_FAILED: adapter mapping refused")
     project_bodygraph(adapter["cache"]["payload"])
-    db = DBAccess.for_current_env(snapshot_path=None)
     first = persist_mapped_bodygraph(db,adapter["cache"])
     second = persist_mapped_bodygraph(db,adapter["cache"])
     summary = {"status":"ok","vendor_requests":1,"adapter_status":adapter["code"],"provider":first.provider,
