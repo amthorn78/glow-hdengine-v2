@@ -1,0 +1,6 @@
+OPS_CAPTURE_OK
+direct_provider=ok
+bridge_provider=ok
+active_parity_rows=4
+parity_matches=4
+search_path=hde, public

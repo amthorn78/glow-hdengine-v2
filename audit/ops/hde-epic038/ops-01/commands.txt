@@ -1,0 +1,29 @@
+# HDE-EPIC038 OPS-01 — bounded read-only DB/bridge posture capture
+# Canonical console: GitHub Codespaces
+# Repository: /workspaces/glow-hdengine-v2
+# Branch: main
+# HEAD: b654f3ef26038f1ad014c0df618ec39f7ea3e469
+# Pre-execution worktree: clean
+# External posture: APP_ENV=dev SAFE_MODE=1 ALLOW_NETWORK=0
+# Secret posture: DATABASE_URL=SET/REDACTED DB_BRIDGE_URL=SET/REDACTED
+# Active ordered parity corpus: grants, search_path, select_one, ddl_fingerprint
+# BodyGraph selector: NOT_APPLICABLE (no payload-bearing row query in this corpus)
+
+# Readiness attempt 1 (exit 1 before any provider connection):
+APP_ENV=dev SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python -c 'from pathlib import Path; import scripts.db.capture_epic011_posture as m; m.CAPTURE_ROOT=Path("<temporary-staging>/capture"); m.main()'
+# Classification: repo-declared psycopg dependency missing; no provider call occurred.
+
+# Repo-declared dependency remediation:
+PIP_DISABLE_PIP_VERSION_CHECK=1 python -m pip install -r requirements.txt
+python -c 'import psycopg; print(psycopg.__version__)'
+
+# Authorized live capture (exit 0):
+APP_ENV=dev SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python -c 'from pathlib import Path; import scripts.db.capture_epic011_posture as m; stage=Path("<temporary-staging>"); m.CAPTURE_ROOT=stage/"capture"; m._util.ADAPTER_SNAPSHOT=str(stage/"adapter_selection.snapshot.json"); m.main()'
+# The capture surface temporarily forces psycopg and bridge independently; external DB_FORCE_PG and DB_FORCE_BRIDGE remained unset.
+
+# Bridge consistency logic:
+python -c 'load ci/checks/check_bridge_consistency.py; map its three JSON inputs to staged OPS capture files; run main()'
+
+# Checksum ledger (ledger excludes itself):
+(cd audit/ops/hde-epic038/ops-01 && sha256sum commands.txt stdout.log stderr.log exit_code.txt env_presence.json db_posture_summary.json provider_parity.proof.json bridge_consistency.result.json nonclaims.json result_summary.json > checksums.sha256)
+(cd audit/ops/hde-epic038/ops-01 && sha256sum --check checksums.sha256)
