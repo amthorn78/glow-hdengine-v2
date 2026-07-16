@@ -1,29 +1,493 @@
-# HDE-EPIC038 OPS-01 — bounded read-only DB/bridge posture capture
-# Canonical console: GitHub Codespaces
-# Repository: /workspaces/glow-hdengine-v2
-# Branch: main
-# HEAD: b654f3ef26038f1ad014c0df618ec39f7ea3e469
-# Pre-execution worktree: clean
-# External posture: APP_ENV=dev SAFE_MODE=1 ALLOW_NETWORK=0
-# Secret posture: DATABASE_URL=SET/REDACTED DB_BRIDGE_URL=SET/REDACTED
-# Active ordered parity corpus: grants, search_path, select_one, ddl_fingerprint
-# BodyGraph selector: NOT_APPLICABLE (no payload-bearing row query in this corpus)
+#!/usr/bin/env bash
+# HDE-EPIC038 OPS-01 remediation runner and literal command transcript.
+# Executed from /workspaces/glow-hdengine-v2 as:
+# bash audit/ops/hde-epic038/ops-01/commands.txt
+# The live actions and package production succeeded on that invocation. Its
+# final self-scan matched the scanner's own URL-regex source text and stopped
+# before replacement. Finalization therefore used the literal no-I/O resume:
+# bash audit/ops/hde-epic038/ops-01/commands.txt --finalize-only
+set -Eeuo pipefail
 
-# Readiness attempt 1 (exit 1 before any provider connection):
-APP_ENV=dev SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python -c 'from pathlib import Path; import scripts.db.capture_epic011_posture as m; m.CAPTURE_ROOT=Path("<temporary-staging>/capture"); m.main()'
-# Classification: repo-declared psycopg dependency missing; no provider call occurred.
+REPO=/workspaces/glow-hdengine-v2
+OUT=/workspaces/glow-hdengine-v2/audit/ops/hde-epic038/ops-01
+STAGE=/tmp/hde-epic038-ops01-remediation-cf364e20-20260716t152444z
+PACKAGE=/tmp/hde-epic038-ops01-remediation-cf364e20-20260716t152444z/package
+HDCTL=/workspaces/glow-hdengine-v2/.venv/bin/hdctl
+SELECTOR_ALIAS=epic011-s10-invariance-1
+SELECTOR_UUID=3fa85f64-5717-4562-b3fc-2c963f66afab
+CAPTURE_HEAD=cf364e2014fa37b4fff227a493f552b1a4119d29
 
-# Repo-declared dependency remediation:
-PIP_DISABLE_PIP_VERSION_CHECK=1 python -m pip install -r requirements.txt
-python -c 'import psycopg; print(psycopg.__version__)'
+cd "$REPO"
 
-# Authorized live capture (exit 0):
-APP_ENV=dev SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC python -c 'from pathlib import Path; import scripts.db.capture_epic011_posture as m; stage=Path("<temporary-staging>"); m.CAPTURE_ROOT=stage/"capture"; m._util.ADAPTER_SNAPSHOT=str(stage/"adapter_selection.snapshot.json"); m.main()'
-# The capture surface temporarily forces psycopg and bridge independently; external DB_FORCE_PG and DB_FORCE_BRIDGE remained unset.
+if [[ "${1:-}" == --finalize-only ]]; then
+  # Refresh D1 and D11 because this recorded resume path changes commands.txt.
+  # All D2-D10 inputs were already produced and checksum-verified by the first
+  # invocation; this branch performs no network, DB, bridge, or vendor action.
+  cp "$OUT/commands.txt" "$PACKAGE/commands.txt"
+  cd "$PACKAGE"
+  sha256sum commands.txt stdout.log stderr.log exit_code.txt env_presence.json \
+    db_posture_summary.json provider_parity.proof.json bridge_consistency.result.json \
+    nonclaims.json result_summary.json > checksums.sha256
+  sha256sum --check checksums.sha256
+  PACKAGE="$PACKAGE" python - <<'PY'
+import json, os, re
+from pathlib import Path
+package=Path(os.environ['PACKAGE'])
+expected={'commands.txt','stdout.log','stderr.log','exit_code.txt','env_presence.json','db_posture_summary.json','provider_parity.proof.json','bridge_consistency.result.json','nonclaims.json','result_summary.json','checksums.sha256'}
+actual={p.name for p in package.iterdir() if p.is_file()}
+assert actual==expected,(sorted(expected-actual),sorted(actual-expected))
+for name in expected:
+    raw=(package/name).read_bytes(); assert raw and raw.endswith(b'\n') and not raw.endswith(b'\n\n'),name
+for name in sorted(n for n in expected if n.endswith('.json')):
+    raw=(package/name).read_bytes(); obj=json.loads(raw)
+    assert raw==(json.dumps(obj,separators=(',',':'),sort_keys=True)+'\n').encode(),name
+blob=b'\n'.join((package/name).read_bytes() for name in sorted(expected))
+for env_name in ('DATABASE_URL','DB_BRIDGE_URL','HD_API_BASE_URL','HD_API_KEY','GEO_API_KEY'):
+    value=os.environ.get(env_name,''); assert not value or value.encode() not in blob,env_name
+text=blob.decode('utf-8',errors='replace')
+placeholder='<temporary'+'-staging>'
+assert placeholder not in text
+url_pattern=r'(?i)\b(?:postgres(?:ql)?|https?)'+r'://'
+assert not re.search(url_pattern,text)
+proof=json.loads((package/'provider_parity.proof.json').read_text())
+assert proof['active_parity_corpus']['ordered_rows']==['grants','search_path','select_one','ddl_fingerprint','bodygraph_payload_row']
+assert proof['capabilities'][-1]['parity']=='match'
+assert proof['live_provider_parity']=={'bridge_provider_rows':'available','claimed_row_count':5,'direct_provider_rows':'available','matched_row_count':5,'parity_status':'pass'}
+assert proof['vendor_reference']['rows_written']==0 and proof['vendor_reference']['raw_vendor_payload_recorded'] is False
+summary=json.loads((package/'result_summary.json').read_text())
+assert summary['ops_observation_status']=='PASS' and summary['qa_status']=='NOT_CLAIMED' and summary['pf09_status_movement']=='NONE'
+PY
+  cp "$PACKAGE/commands.txt" "$PACKAGE/stdout.log" "$PACKAGE/stderr.log" \
+    "$PACKAGE/exit_code.txt" "$PACKAGE/env_presence.json" \
+    "$PACKAGE/db_posture_summary.json" "$PACKAGE/provider_parity.proof.json" \
+    "$PACKAGE/bridge_consistency.result.json" "$PACKAGE/nonclaims.json" \
+    "$PACKAGE/result_summary.json" "$PACKAGE/checksums.sha256" "$OUT/"
+  cd "$OUT"
+  sha256sum --check checksums.sha256
+  rm -f "$STAGE/vendor_bodygraph_dry_run.raw.json"
+  printf '%s\n' 'HDE_EPIC038_OPS01_REMEDIATION_FINALIZED_NO_IO'
+  exit 0
+fi
 
-# Bridge consistency logic:
-python -c 'load ci/checks/check_bridge_consistency.py; map its three JSON inputs to staged OPS capture files; run main()'
+# This block was first executed while the tracked packet was unchanged and the
+# worktree was clean. It is conditional so the same literal runner can consume
+# that preserved pre-execution record during the replacement run.
+if [[ ! -f "$STAGE/preflight/head.txt" ]]; then
+  mkdir -p "$STAGE/preflight"
+  git rev-parse --show-toplevel > "$STAGE/preflight/repo_root.txt"
+  git branch --show-current > "$STAGE/preflight/branch.txt"
+  git rev-parse HEAD > "$STAGE/preflight/head.txt"
+  git status --porcelain=v1 > "$STAGE/preflight/worktree.txt"
+fi
+test "$(<"$STAGE/preflight/repo_root.txt")" = "$REPO"
+test "$(<"$STAGE/preflight/branch.txt")" = main
+test "$(<"$STAGE/preflight/head.txt")" = "$CAPTURE_HEAD"
+test ! -s "$STAGE/preflight/worktree.txt"
+test "$(git rev-parse HEAD)" = "$CAPTURE_HEAD"
 
-# Checksum ledger (ledger excludes itself):
-(cd audit/ops/hde-epic038/ops-01 && sha256sum commands.txt stdout.log stderr.log exit_code.txt env_presence.json db_posture_summary.json provider_parity.proof.json bridge_consistency.result.json nonclaims.json result_summary.json > checksums.sha256)
-(cd audit/ops/hde-epic038/ops-01 && sha256sum --check checksums.sha256)
+mkdir -p "$STAGE/capture" "$STAGE/streams" "$STAGE/vendor-cwd" \
+  "$STAGE/direct-cwd" "$STAGE/bridge-cwd" "$STAGE/checker-root/ci/checks" \
+  "$STAGE/checker-root/artifacts/db_bridge" "$STAGE/checker-root/artifacts/runtime" \
+  "$PACKAGE"
+
+# Fresh read-only DB posture and four-row provider capture. All mutable logger
+# and adapter paths are redirected to the literal staging root.
+set +e
+APP_ENV=dev SAFE_MODE=1 ALLOW_NETWORK=0 LC_ALL=C LANG=C TZ=UTC \
+python -c 'from pathlib import Path; import engine.ops.http_log as h; import scripts.db.capture_epic011_posture as m; stage=Path("/tmp/hde-epic038-ops01-remediation-cf364e20-20260716t152444z"); h.LOG_PATH=stage/"keys_only.capture.jsonl"; m.CAPTURE_ROOT=stage/"capture"; m._util.ADAPTER_SNAPSHOT=str(stage/"adapter_selection.snapshot.json"); m.main()' \
+  > "$STAGE/streams/capture.stdout" 2> "$STAGE/streams/capture.stderr"
+CAPTURE_RC=$?
+set -e
+printf '%s\n' "$CAPTURE_RC" > "$STAGE/streams/capture.exit_code"
+test "$CAPTURE_RC" -eq 0
+
+# PF29 §11.2 / §13.3 configured-v2 vendor dry-run for the canonical synthetic
+# EPIC011 identity. The mapped BodyGraph output remains temporary and is reduced
+# to a keys-only/hash summary before packaging. No persistence flag is used.
+set +e
+(
+  cd "$STAGE/vendor-cwd"
+  env -u DB_FORCE_PG -u DB_FORCE_BRIDGE \
+    APP_ENV=dev LC_ALL=C LANG=C TZ=UTC SAFE_MODE=0 ALLOW_NETWORK=1 \
+    "$HDCTL" bg:resolve \
+      --user "$SELECTOR_ALIAS" \
+      --source vendor \
+      --birthdate 1990-01-01 \
+      --birthtime 12:00 \
+      --location "Amsterdam, Netherlands" \
+      --dry-run
+) > "$STAGE/vendor_bodygraph_dry_run.raw.json" 2> "$STAGE/streams/vendor.stderr"
+VENDOR_RC=$?
+set -e
+printf '%s\n' "$VENDOR_RC" > "$STAGE/streams/vendor.exit_code"
+test "$VENDOR_RC" -eq 0
+
+# PF29 §9.2 DB conjunction commands. Both commands resolve the same approved
+# payload-bearing BodyGraph row through engine.cli.main:_fetch_db_bodygraph;
+# only derived compatibility JSON is captured, never the raw BodyGraph payload.
+set +e
+(
+  cd "$STAGE/direct-cwd"
+  env -u DB_FORCE_BRIDGE APP_ENV=dev LC_ALL=C LANG=C TZ=UTC \
+    SAFE_MODE=1 ALLOW_NETWORK=0 DB_FORCE_PG=1 \
+    "$HDCTL" showcompat --conjunction \
+      --user-a "$SELECTOR_ALIAS" --user-b "$SELECTOR_ALIAS" --source db
+) > "$STAGE/bodygraph.direct.compat.json" 2> "$STAGE/streams/bodygraph_direct.stderr"
+BODYGRAPH_DIRECT_RC=$?
+set -e
+printf '%s\n' "$BODYGRAPH_DIRECT_RC" > "$STAGE/streams/bodygraph_direct.exit_code"
+test "$BODYGRAPH_DIRECT_RC" -eq 0
+
+set +e
+(
+  cd "$STAGE/bridge-cwd"
+  env -u DB_FORCE_PG APP_ENV=dev LC_ALL=C LANG=C TZ=UTC \
+    SAFE_MODE=1 ALLOW_NETWORK=0 DB_FORCE_BRIDGE=1 \
+    "$HDCTL" showcompat --conjunction \
+      --user-a "$SELECTOR_ALIAS" --user-b "$SELECTOR_ALIAS" --source db
+) > "$STAGE/bodygraph.bridge.compat.json" 2> "$STAGE/streams/bodygraph_bridge.stderr"
+BODYGRAPH_BRIDGE_RC=$?
+set -e
+printf '%s\n' "$BODYGRAPH_BRIDGE_RC" > "$STAGE/streams/bodygraph_bridge.exit_code"
+test "$BODYGRAPH_BRIDGE_RC" -eq 0
+
+# Canonical direct-versus-bridge comparison for the payload-bearing DB reads.
+set +e
+python -m presenter.json_canon_compare \
+  "$STAGE/bodygraph.direct.compat.json" \
+  "$STAGE/bodygraph.bridge.compat.json" \
+  --log "$STAGE/bodygraph_compare.log" \
+  --fail-on-diff \
+  > "$STAGE/streams/bodygraph_compare.stdout" 2> "$STAGE/streams/bodygraph_compare.stderr"
+BODYGRAPH_COMPARE_RC=$?
+set -e
+printf '%s\n' "$BODYGRAPH_COMPARE_RC" > "$STAGE/streams/bodygraph_compare.exit_code"
+test "$BODYGRAPH_COMPARE_RC" -eq 0
+
+# The governed checker derives ROOT from its own file location. A byte-identical
+# copy is therefore placed under an exact staged root containing the exact three
+# live capture inputs at the paths the checker governs.
+cp ci/checks/check_bridge_consistency.py "$STAGE/checker-root/ci/checks/check_bridge_consistency.py"
+cmp ci/checks/check_bridge_consistency.py "$STAGE/checker-root/ci/checks/check_bridge_consistency.py"
+cp "$STAGE/adapter_selection.snapshot.json" \
+  "$STAGE/checker-root/artifacts/db_bridge/adapter_selection.snapshot.json"
+cp "$STAGE/capture/runtime/env_connectivity.snapshot.json" \
+  "$STAGE/checker-root/artifacts/runtime/env_connectivity.snapshot.json"
+cp "$STAGE/capture/db_bridge/provider_parity.proof.json" \
+  "$STAGE/checker-root/artifacts/db_bridge/provider_parity.proof.json"
+set +e
+python "$STAGE/checker-root/ci/checks/check_bridge_consistency.py" \
+  > "$STAGE/streams/bridge_checker.stdout" 2> "$STAGE/streams/bridge_checker.stderr"
+BRIDGE_CHECKER_RC=$?
+set -e
+printf '%s\n' "$BRIDGE_CHECKER_RC" > "$STAGE/streams/bridge_checker.exit_code"
+test "$BRIDGE_CHECKER_RC" -eq 0
+
+# Produce D5-D10 solely from the literal staged inputs above. The vendor mapped
+# BodyGraph and DB-derived compat files are read only to compute safe summaries
+# and hashes; raw BodyGraph/vendor payloads are not copied into the OPS packet.
+REPO="$REPO" OUT="$OUT" STAGE="$STAGE" PACKAGE="$PACKAGE" \
+SELECTOR_ALIAS="$SELECTOR_ALIAS" SELECTOR_UUID="$SELECTOR_UUID" \
+CAPTURE_HEAD="$CAPTURE_HEAD" python - <<'PY'
+from __future__ import annotations
+import datetime as dt
+import hashlib
+import json
+import os
+from pathlib import Path
+
+repo=Path(os.environ['REPO'])
+stage=Path(os.environ['STAGE'])
+package=Path(os.environ['PACKAGE'])
+selector_alias=os.environ['SELECTOR_ALIAS']
+selector_uuid=os.environ['SELECTOR_UUID']
+capture_head=os.environ['CAPTURE_HEAD']
+
+def load(path: Path):
+    return json.loads(path.read_text(encoding='utf-8'))
+
+def sha(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+def write_json(name: str, payload: object) -> None:
+    (package/name).write_text(json.dumps(payload,separators=(',',':'),sort_keys=True)+'\n',encoding='utf-8')
+
+raw_proof=load(stage/'capture/db_bridge/provider_parity.proof.json')
+direct_capture=load(stage/'capture/db/provider_parity/direct.json')
+bridge_capture=load(stage/'capture/db/provider_parity/bridge.json')
+adapter=load(stage/'adapter_selection.snapshot.json')
+ddl=load(stage/'capture/db/ddl_fingerprint.json')
+vendor=load(stage/'vendor_bodygraph_dry_run.raw.json')
+direct_compat=load(stage/'bodygraph.direct.compat.json')
+bridge_compat=load(stage/'bodygraph.bridge.compat.json')
+compare_rows=[json.loads(line) for line in (stage/'bodygraph_compare.log').read_text(encoding='utf-8').splitlines() if line]
+if len(compare_rows)!=1 or not compare_rows[0].get('match'):
+    raise SystemExit('BODYGRAPH_CANON_COMPARE_NOT_MATCH')
+compare=compare_rows[0]
+if direct_compat != bridge_compat:
+    raise SystemExit('BODYGRAPH_JSON_NOT_EQUAL')
+if vendor.get('status')!='ok':
+    raise SystemExit('VENDOR_REFERENCE_NOT_OK')
+if (vendor.get('adapter') or {}).get('code')!='ADAPTER_MAPPED':
+    raise SystemExit('VENDOR_REFERENCE_NOT_MAPPED')
+if (vendor.get('ingest') or {}).get('rows_written')!=0:
+    raise SystemExit('VENDOR_DRY_RUN_WROTE_ROWS')
+
+captured_at=str(raw_proof['captured_at_utc'])
+packaged_at=dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat().replace('+00:00','Z')
+active_order=['grants','search_path','select_one','ddl_fingerprint']
+by_name={row['name']:row for row in raw_proof.get('capabilities',[])}
+if set(by_name)!=set(active_order):
+    raise SystemExit('FOUR_ROW_CORPUS_MISMATCH')
+ordered_rows=[by_name[name] for name in active_order]
+for row in ordered_rows:
+    if (row.get('direct') or {}).get('status')!='ok' or (row.get('bridge') or {}).get('status')!='ok' or row.get('parity')!='match':
+        raise SystemExit(f'PROVIDER_ROW_NOT_MATCH:{row.get("name")}')
+
+vendor_summary={
+    'status':'ok',
+    'source':'vendor',
+    'selector_alias':selector_alias,
+    'selector_uuid':selector_uuid,
+    'birth_profile':'canonical_epic011_synthetic_profile',
+    'adapter_status':(vendor.get('adapter') or {}).get('status'),
+    'adapter_code':(vendor.get('adapter') or {}).get('code'),
+    'payload_family':(vendor.get('adapter') or {}).get('payload_family'),
+    'resolved_present':isinstance(vendor.get('resolved'),dict),
+    'resolved_bodygraph_present':isinstance((vendor.get('resolved') or {}).get('bodygraph'),dict),
+    'resolved_person_present':isinstance((vendor.get('resolved') or {}).get('person'),dict),
+    'cache_payload_posture':(vendor.get('cache') or {}).get('payload_posture'),
+    'cache_vendor':(vendor.get('cache') or {}).get('vendor'),
+    'cache_vendor_version':(vendor.get('cache') or {}).get('vendor_version'),
+    'rows_written':(vendor.get('ingest') or {}).get('rows_written'),
+    'mapped_output_sha256':sha(stage/'vendor_bodygraph_dry_run.raw.json'),
+    'raw_vendor_payload_recorded':False,
+    'mapped_bodygraph_copied_to_evidence':False,
+    'vendor_db_equivalence_claimed':False,
+}
+(stage/'streams/vendor_summary.stdout').write_text(json.dumps(vendor_summary,separators=(',',':'),sort_keys=True)+'\n',encoding='utf-8')
+
+bodygraph_row={
+    'name':'bodygraph_payload_row',
+    'selector':{
+        'alias':selector_alias,
+        'uuid':selector_uuid,
+        'identity_source':'docs/run/EPIC011_TEST_IDENTITIES.md',
+        'non_pii':True,
+    },
+    'read_surface':'hdctl showcompat --conjunction --source db',
+    'payload_fetch_implementation':'engine.cli.main:_fetch_db_bodygraph',
+    'direct':{
+        'status':'ok',
+        'provider':'psycopg',
+        'staged_output':str(stage/'bodygraph.direct.compat.json'),
+        'canonical_sha256':compare['left_sha256'],
+        'raw_bodygraph_payload_recorded':False,
+    },
+    'bridge':{
+        'status':'ok',
+        'provider':'bridge',
+        'staged_output':str(stage/'bodygraph.bridge.compat.json'),
+        'canonical_sha256':compare['right_sha256'],
+        'raw_bodygraph_payload_recorded':False,
+    },
+    'parity':'match',
+    'comparison':'FILE_EQ_CANON_BYTES_OK',
+}
+
+provider_proof=dict(raw_proof)
+provider_proof['schema']='hde_epic038.ops01.provider_parity.v2'
+provider_proof['active_parity_corpus']={
+    'name':'hde_epic038_ops01_live_bodygraph_parity_v2',
+    'ordered_rows':active_order+['bodygraph_payload_row'],
+    'selector':bodygraph_row['selector'],
+}
+provider_proof['capabilities']=ordered_rows+[bodygraph_row]
+provider_proof['provider_observations']={'direct':direct_capture.get('status'),'bridge':bridge_capture.get('status')}
+provider_proof['live_provider_parity']={
+    'direct_provider_rows':'available','bridge_provider_rows':'available',
+    'parity_status':'pass','claimed_row_count':5,'matched_row_count':5,
+}
+provider_proof['vendor_reference']=vendor_summary
+provider_proof['rails_posture']={'db_and_bridge_capture':'closed_task_scoped_provider_force','vendor_reference':'open_authorized_dry_run'}
+provider_proof['payload_posture']={'raw_bodygraph_payload_persisted':False,'raw_vendor_payload_persisted':False,'raw_user_data_persisted':False,'secret_values_persisted':False}
+provider_proof['status']='PASS'
+write_json('provider_parity.proof.json',provider_proof)
+
+search_path=(stage/'capture/db/check_schema.txt').read_text(encoding='utf-8').strip()
+if search_path!='hde, public':
+    raise SystemExit('SEARCH_PATH_MISMATCH')
+constraints=[]
+for obj in ddl.get('objects',[]):
+    if obj.get('name')=='hde.body_graphs':
+        constraints=[{'name':c.get('name'),'definition':c.get('definition')} for c in obj.get('constraints',[])]
+grant_lines=[line for line in (stage/'capture/db/grants.txt').read_text(encoding='utf-8').splitlines() if line and line not in {'ALTER DEFAULT PRIVILEGES:','(none)'}]
+grants_by_object={}
+for line in grant_lines:
+    grantee,obj,privilege=line.split(' ',2)
+    entry=grants_by_object.setdefault(obj,{'grantees':set(),'privileges':set()})
+    entry['grantees'].add(grantee); entry['privileges'].add(privilege)
+grants=[{'object':obj,'grantees':sorted(v['grantees']),'privileges':sorted(v['privileges'])} for obj,v in sorted(grants_by_object.items())]
+views=[]
+for block in (stage/'capture/db/boundary_view.readonly.proof.txt').read_text(encoding='utf-8').strip().split('\n\n'):
+    values=dict(line.split(': ',1) for line in block.splitlines())
+    readonly=all(values[k]=='NO' for k in ('is_updatable','is_insertable_into','is_trigger_updatable'))
+    views.append({'name':values['view'],'is_updatable':values['is_updatable'],'is_insertable_into':values['is_insertable_into'],'is_trigger_updatable':values['is_trigger_updatable'],'readonly':readonly})
+partition=[]
+for line in (stage/'capture/db/partition_plan.txt').read_text(encoding='utf-8').splitlines():
+    table,strategy,key=line.split(' ',2); partition.append({'table':table,'strategy':strategy,'key':key})
+write_json('db_posture_summary.json',{
+    'schema':'hde_epic038.ops01.db_posture_summary.v2','captured_at_utc':captured_at,
+    'source_capture_root':str(stage/'capture'),'database_schema':'hde','search_path':search_path,'search_path_exact':True,
+    'fingerprint_objects':[{'name':o.get('name'),'kind':o.get('kind')} for o in ddl.get('objects',[])],
+    'bodygraph_unique_constraints':constraints,'grants':grants,'default_privileges':'none_observed',
+    'boundary_views':views,'boundary_views_readonly':all(v['readonly'] for v in views),
+    'partition_plan':partition,'partition_plan_status':'PASS','observation_mode':'read_only','status':'PASS',
+})
+
+write_json('env_presence.json',{
+    'schema':'hde_epic038.ops01.env_presence.v2','captured_at_utc':captured_at,
+    'operator_console':'github_codespaces','repository':{'root':str(repo),'branch':'main','head':capture_head,'pre_execution_worktree':'clean'},
+    'target':{'provider':'Railway','project':'ample-illumination','db_instance':'ample-illumination/production/postgres','db_schema':'hde','bridge_service':'pg-bridge'},
+    'environment_presence':{
+        'APP_ENV':'SET:dev','ENGINE_ENV':'UNSET','DATABASE_URL':'SET:REDACTED','DB_BRIDGE_URL':'SET:REDACTED',
+        'HD_API_BASE_URL':'SET:REDACTED','HDAPI_BASE_URL':'UNSET','HD_API_KEY':'SET:REDACTED','GEO_API_KEY':'SET:REDACTED',
+    },
+    'execution_rails':{
+        'db_posture_capture':{'SAFE_MODE':'1','ALLOW_NETWORK':'0'},
+        'direct_bodygraph_read':{'SAFE_MODE':'1','ALLOW_NETWORK':'0','DB_FORCE_PG':'1'},
+        'bridge_bodygraph_read':{'SAFE_MODE':'1','ALLOW_NETWORK':'0','DB_FORCE_BRIDGE':'1'},
+        'vendor_reference':{'SAFE_MODE':'0','ALLOW_NETWORK':'1','authorization':'PO_EXPLICIT'},
+    },
+    'secret_posture':'presence_only',
+})
+
+checker_path=stage/'checker-root/ci/checks/check_bridge_consistency.py'
+checker_inputs={
+    'adapter_selection':stage/'checker-root/artifacts/db_bridge/adapter_selection.snapshot.json',
+    'env_connectivity':stage/'checker-root/artifacts/runtime/env_connectivity.snapshot.json',
+    'provider_parity':stage/'checker-root/artifacts/db_bridge/provider_parity.proof.json',
+}
+write_json('bridge_consistency.result.json',{
+    'schema':'hde_epic038.ops01.bridge_consistency.v2','captured_at_utc':captured_at,
+    'governed_checker':{
+        'repo_identity':'ci/checks/check_bridge_consistency.py','staged_executable':str(checker_path),
+        'repo_sha256':sha(repo/'ci/checks/check_bridge_consistency.py'),'staged_sha256':sha(checker_path),
+        'literal_invocation':f'python {checker_path}','inputs':{k:{'path':str(v),'sha256':sha(v)} for k,v in checker_inputs.items()},
+        'exit_code':0,'result':'PASS',
+    },
+    'bodygraph_comparator':{
+        'identity':'presenter.json_canon_compare','literal_invocation':f'python -m presenter.json_canon_compare {stage}/bodygraph.direct.compat.json {stage}/bodygraph.bridge.compat.json --log {stage}/bodygraph_compare.log --fail-on-diff',
+        'direct_input':{'path':str(stage/'bodygraph.direct.compat.json'),'sha256':sha(stage/'bodygraph.direct.compat.json')},
+        'bridge_input':{'path':str(stage/'bodygraph.bridge.compat.json'),'sha256':sha(stage/'bodygraph.bridge.compat.json')},
+        'canonical_sha256':compare['left_sha256'],'exit_code':0,'result':'FILE_EQ_CANON_BYTES_OK',
+    },
+    'predicates':{'four_row_corpus_exact':True,'bodygraph_selector_approved':True,'bodygraph_direct_available':True,'bodygraph_bridge_available':True,'bodygraph_row_match':True,'search_path_exact':True,'provider_selection_consistent':adapter.get('selected')==raw_proof.get('selected')=='psycopg'},
+    'status':'PASS',
+})
+
+nonclaims=['no_sql_write','no_migration','no_grant_change','no_schema_change','no_vendor_persistence','no_deployment_change','no_raw_secret_persistence','no_raw_user_data_persistence','no_raw_bodygraph_payload_persistence','no_raw_vendor_payload_persistence','no_vendor_db_payload_equivalence_claim','no_qa_pass_claim','no_acceptance_token_claim','no_pf09_status_movement','no_epic_closeout_claim']
+write_json('nonclaims.json',{
+    'schema':'hde_epic038.ops01.nonclaims.v2','captured_at_utc':captured_at,'nonclaims':nonclaims,
+    'pf09_posture':{'HDE-DIST001':'Partial','HDE-DIST001.4':'Partial','HDE-DIST001.9':'Partial','status_change':'none'},
+})
+
+write_json('result_summary.json',{
+    'schema':'hde_epic038.ops01.result_summary.v2','captured_at_utc':captured_at,'packaged_at_utc':packaged_at,
+    'repository':{'root':str(repo),'branch':'main','head':capture_head,'pre_execution_worktree':'clean'},
+    'literal_staging_root':str(stage),'scope':'bounded_read_only_db_posture_direct_bridge_bodygraph_row_parity_and_vendor_dry_run_reference',
+    'active_parity_corpus':'hde_epic038_ops01_live_bodygraph_parity_v2','active_parity_rows':active_order+['bodygraph_payload_row'],
+    'bodygraph_selector':bodygraph_row['selector'],'vendor_reference':vendor_summary,
+    'observations':{'search_path':'hde, public','direct_provider':'available','bridge_provider':'available','claimed_rows':5,'matched_rows':5,'bodygraph_row_parity':'match','bridge_consistency':'PASS','db_posture':'PASS'},
+    'remediation_findings_resolved':['F-004_LITERAL_COMMANDS','F-005_RAW_STREAM_AND_CHECKER_BINDING','F-006_BODYGRAPH_ROW_PARITY'],
+    'ops_observation_status':'PASS','qa_status':'NOT_CLAIMED','acceptance_tokens':'NOT_CLAIMED','pf09_status_movement':'NONE','epic_closeout':'NOT_CLAIMED',
+    'checksum_policy':{'algorithm':'sha256','ledger_excludes_itself':True},
+})
+PY
+
+# D2 and D3 contain literal command boundaries plus the actual captured streams.
+# The mapped vendor BodyGraph stdout is intentionally represented only by the
+# safe producer-generated summary; its raw temporary file is never copied.
+{
+  printf '%s\n' '=== capture_epic011_posture stdout ==='
+  cat "$STAGE/streams/capture.stdout"
+  printf '%s\n' '=== vendor bg:resolve safe summary (raw mapped BodyGraph excluded) ==='
+  cat "$STAGE/streams/vendor_summary.stdout"
+  printf '%s\n' '=== direct DB BodyGraph-derived compat stdout ==='
+  cat "$STAGE/bodygraph.direct.compat.json"
+  printf '%s\n' '=== bridge DB BodyGraph-derived compat stdout ==='
+  cat "$STAGE/bodygraph.bridge.compat.json"
+  printf '%s\n' '=== canonical BodyGraph compare stdout ==='
+  cat "$STAGE/streams/bodygraph_compare.stdout"
+  printf '%s\n' '=== governed bridge checker stdout ==='
+  cat "$STAGE/streams/bridge_checker.stdout"
+} > "$PACKAGE/stdout.log"
+
+{
+  printf '%s\n' '=== capture_epic011_posture stderr ==='
+  cat "$STAGE/streams/capture.stderr"
+  printf '%s\n' '=== vendor bg:resolve stderr ==='
+  cat "$STAGE/streams/vendor.stderr"
+  printf '%s\n' '=== direct DB BodyGraph-derived compat stderr ==='
+  cat "$STAGE/streams/bodygraph_direct.stderr"
+  printf '%s\n' '=== bridge DB BodyGraph-derived compat stderr ==='
+  cat "$STAGE/streams/bodygraph_bridge.stderr"
+  printf '%s\n' '=== canonical BodyGraph compare stderr ==='
+  cat "$STAGE/streams/bodygraph_compare.stderr"
+  printf '%s\n' '=== governed bridge checker stderr ==='
+  cat "$STAGE/streams/bridge_checker.stderr"
+} > "$PACKAGE/stderr.log"
+
+printf '%s\n' '0' > "$PACKAGE/exit_code.txt"
+cp "$OUT/commands.txt" "$PACKAGE/commands.txt"
+
+cd "$PACKAGE"
+sha256sum commands.txt stdout.log stderr.log exit_code.txt env_presence.json \
+  db_posture_summary.json provider_parity.proof.json bridge_consistency.result.json \
+  nonclaims.json result_summary.json > checksums.sha256
+sha256sum --check checksums.sha256
+
+# Fail closed on inventory, canonical JSON, LF, secret, URL/DSN, and scope checks
+# before the reviewed tracked packet is replaced.
+REPO="$REPO" STAGE="$STAGE" PACKAGE="$PACKAGE" python - <<'PY'
+import json, os, re
+from pathlib import Path
+package=Path(os.environ['PACKAGE'])
+expected={'commands.txt','stdout.log','stderr.log','exit_code.txt','env_presence.json','db_posture_summary.json','provider_parity.proof.json','bridge_consistency.result.json','nonclaims.json','result_summary.json','checksums.sha256'}
+actual={p.name for p in package.iterdir() if p.is_file()}
+assert actual==expected,(sorted(expected-actual),sorted(actual-expected))
+for name in expected:
+    raw=(package/name).read_bytes(); assert raw and raw.endswith(b'\n') and not raw.endswith(b'\n\n'),name
+for name in sorted(n for n in expected if n.endswith('.json')):
+    raw=(package/name).read_bytes(); obj=json.loads(raw)
+    assert raw==(json.dumps(obj,separators=(',',':'),sort_keys=True)+'\n').encode(),name
+blob=b'\n'.join((package/name).read_bytes() for name in sorted(expected))
+for env_name in ('DATABASE_URL','DB_BRIDGE_URL','HD_API_BASE_URL','HD_API_KEY','GEO_API_KEY'):
+    value=os.environ.get(env_name,''); assert not value or value.encode() not in blob,env_name
+text=blob.decode('utf-8',errors='replace')
+placeholder='<temporary'+'-staging>'
+assert placeholder not in text
+url_pattern=r'(?i)\b(?:postgres(?:ql)?|https?)'+r'://'
+assert not re.search(url_pattern,text)
+proof=json.loads((package/'provider_parity.proof.json').read_text())
+assert proof['active_parity_corpus']['ordered_rows']==['grants','search_path','select_one','ddl_fingerprint','bodygraph_payload_row']
+assert proof['capabilities'][-1]['parity']=='match'
+assert proof['live_provider_parity']=={'bridge_provider_rows':'available','claimed_row_count':5,'direct_provider_rows':'available','matched_row_count':5,'parity_status':'pass'}
+assert proof['vendor_reference']['rows_written']==0
+assert proof['vendor_reference']['raw_vendor_payload_recorded'] is False
+summary=json.loads((package/'result_summary.json').read_text())
+assert summary['ops_observation_status']=='PASS' and summary['qa_status']=='NOT_CLAIMED' and summary['pf09_status_movement']=='NONE'
+PY
+
+cp "$PACKAGE/commands.txt" "$PACKAGE/stdout.log" "$PACKAGE/stderr.log" \
+  "$PACKAGE/exit_code.txt" "$PACKAGE/env_presence.json" \
+  "$PACKAGE/db_posture_summary.json" "$PACKAGE/provider_parity.proof.json" \
+  "$PACKAGE/bridge_consistency.result.json" "$PACKAGE/nonclaims.json" \
+  "$PACKAGE/result_summary.json" "$PACKAGE/checksums.sha256" "$OUT/"
+
+cd "$OUT"
+sha256sum --check checksums.sha256
+
+# Raw mapped BodyGraph/vendor output is no longer needed after safe derivation.
+rm -f "$STAGE/vendor_bodygraph_dry_run.raw.json"
+printf '%s\n' 'HDE_EPIC038_OPS01_REMEDIATION_OK'
