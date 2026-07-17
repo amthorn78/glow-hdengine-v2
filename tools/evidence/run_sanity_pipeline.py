@@ -249,8 +249,69 @@ def _compare_provider_values(rows: Sequence[dict]) -> str:
     return direct_sha
 
 
+def _validate_ops01_environment(packet: Path) -> None:
+    env = _read_json(packet / "env_presence.json")
+    presence = env.get("environment_presence")
+    rails = env.get("execution_rails")
+    if (
+        env.get("secret_posture") != "presence_only"
+        or not isinstance(presence, dict)
+        or presence.get("APP_ENV") != "SET:dev"
+        or presence.get("DATABASE_URL") != "SET:REDACTED"
+        or presence.get("DB_BRIDGE_URL") != "SET:REDACTED"
+        or presence.get("ENGINE_ENV") != "UNSET"
+        or not isinstance(rails, dict)
+        or set(rails) != OPS01_BRIDGE_COMMANDS
+    ):
+        raise ValueError("ops-01: env_presence.json execution posture failed")
+    if any(
+        not isinstance(values, dict)
+        or values.get("SAFE_MODE") != "1"
+        or values.get("ALLOW_NETWORK") != "0"
+        for values in rails.values()
+    ):
+        raise ValueError("ops-01: env_presence.json closed-rails predicates failed")
+    if rails["direct_bodygraph_read"].get("DB_FORCE_PG") != "1" or rails["bridge_bodygraph_read"].get("DB_FORCE_BRIDGE") != "1":
+        raise ValueError("ops-01: env_presence.json provider-selection rails failed")
+
+
+def _validate_ops02_environment(packet: Path) -> dict:
+    env = _read_json(packet / "env_presence.json")
+    presence = env.get("environment_presence")
+    route_policy = env.get("route_policy")
+    required_presence = {
+        "ALLOW_NETWORK": "1",
+        "APP_ENV": "SET:dev",
+        "DATABASE_URL": "SET:REDACTED",
+        "GEO_API_KEY": "SET:REDACTED",
+        "HD_API_BASE_URL": "SET:REDACTED",
+        "HD_API_KEY": "SET:REDACTED",
+        "LANG": "C",
+        "LC_ALL": "C",
+        "SAFE_MODE": "0",
+        "TZ": "UTC",
+    }
+    required_route = {
+        "classification": "adapter_backed_v2_chart",
+        "configured_base_version": "v2",
+        "resource_path": "charts",
+        "route_auth_posture": "Authorization: Bearer <redacted>",
+        "route_family": "recommended_v2_chart",
+    }
+    if (
+        env.get("secret_posture") != "presence_only"
+        or not isinstance(presence, dict)
+        or any(presence.get(key) != value for key, value in required_presence.items())
+        or not isinstance(route_policy, dict)
+        or any(route_policy.get(key) != value for key, value in required_route.items())
+    ):
+        raise ValueError("ops-02: env_presence.json bounded dev open-rails posture failed")
+    return route_policy
+
+
 def _validate_ops01(packet: Path, summary: dict) -> None:
     """Derive OPS-01 PASS from its fixed corpus and lower-level primaries."""
+    _validate_ops01_environment(packet)
     observations = summary.get("observations")
     if not isinstance(observations, dict):
         raise ValueError("ops-01: result_summary.json observations must be an object")
@@ -429,6 +490,7 @@ def _validate_packet(root: Path, package: str, required: Sequence[str]) -> None:
     if package == "ops-01":
         _validate_ops01(packet, summary)
     else:
+        route_policy = _validate_ops02_environment(packet)
         predicates = summary.get("predicates", {})
         if not isinstance(predicates, dict):
             raise ValueError("ops-02: result_summary.json predicates must be an object")
@@ -439,10 +501,39 @@ def _validate_packet(root: Path, package: str, required: Sequence[str]) -> None:
         mapped = _read_json(packet / "mapped_output_summary.json")
         read_back = _read_json(packet / "read_back_summary.json")
         stdout = _read_json(packet / "stdout.log")
-        if request.get("vendor_requests") != 1 or request.get("request_values_persisted") is not False or request.get("configured_base") != "REDACTED" or request.get("auth_posture") != "Authorization: Bearer <redacted>":
+        if (
+            request.get("vendor_requests") != 1
+            or request.get("attempt_limit") != 1
+            or request.get("request_values_persisted") is not False
+            or request.get("configured_base") != "REDACTED"
+            or request.get("auth_posture") != "Authorization: Bearer <redacted>"
+            or request.get("route") != "vendor.hdapi.post:/charts"
+            or request.get("resource_path") != "charts"
+            or request.get("route_family") != "recommended_v2_chart"
+            or request.get("payload_family") != "ChartResult"
+            or request.get("geocode_required") is not True
+            or request.get("request_field_names") != ["birthdate", "birthtime", "location"]
+            or request.get("resource_path") != route_policy.get("resource_path")
+            or request.get("route_family") != route_policy.get("route_family")
+        ):
             raise ValueError("ops-02: request_summary.json predicate failed")
-        if mapped.get("adapter_status") != "mapped" or mapped.get("adapter_code") != "ADAPTER_MAPPED" or mapped.get("raw_vendor_envelope_persisted") is not False or mapped.get("payload_posture") != "adapter_mapped_no_raw_vendor_payload":
+        if mapped.get("adapter_status") != "mapped" or mapped.get("adapter_code") != "ADAPTER_MAPPED" or mapped.get("raw_vendor_envelope_persisted") is not False or mapped.get("payload_posture") != "adapter_mapped_no_raw_vendor_payload" or mapped.get("payload_family") != request.get("payload_family"):
             raise ValueError("ops-02: mapped_output_summary.json predicate failed")
+        identity = summary.get("identity")
+        fingerprint = request.get("input_fingerprint")
+        synthetic_user_id = read_back.get("synthetic_user_id")
+        if (
+            not isinstance(identity, dict)
+            or not isinstance(fingerprint, str)
+            or not re.fullmatch(r"[0-9a-f]{64}", fingerprint)
+            or identity.get("input_fingerprint") != fingerprint
+            or not isinstance(synthetic_user_id, str)
+            or not re.fullmatch(r"[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}", synthetic_user_id)
+            or identity.get("synthetic_user_id") != synthetic_user_id
+            or identity.get("vendor") != "hdapi"
+            or identity.get("vendor_version") != 2
+        ):
+            raise ValueError("ops-02: mapped-cache identity disagreement")
         canonical_sha = mapped.get("canonical_sha256")
         if not isinstance(canonical_sha, str) or not re.fullmatch(r"[0-9a-f]{64}", canonical_sha) or read_back.get("canonical_sha256") != canonical_sha or read_back.get("read_back_match") is not True or read_back.get("identity_rows") != 1 or read_back.get("retention_decision") != "retain" or read_back.get("stored_payload_posture") != "adapter_mapped_no_raw_vendor_payload":
             raise ValueError("ops-02: read_back_summary.json predicate failed")
@@ -512,8 +603,9 @@ def _rebind_failure_log() -> int:
 
 def run_pipeline(*, log_path: Path = SANITY_LOG, steps: Sequence[SanityStep] | None = None, refresh_index: bool = True) -> int:
     ensure_determinism_env()
+    log_path = (log_path if log_path.is_absolute() else ROOT / log_path).resolve()
     roster = list(default_steps() if steps is None else steps)
-    canonical_run = log_path == SANITY_LOG and steps is None
+    canonical_run = log_path == SANITY_LOG.resolve() and steps is None
     results: list[tuple[str, str]] = []
     failure = "NONE"
     code = 0
