@@ -384,6 +384,8 @@ def test_malformed_summary_nested_object_fails_cleanly(tmp_path, package, field)
     "HD_API_KEY=supersecret",
     "HD_API_KEY: live-secret",
     "GEO_API_KEY : live-secret",
+    '\"HD_API_KEY\": live-secret',
+    "'GEO_API_KEY': live-secret",
     "Authorization: Bearer live-secret",
     "HD-Geocode-Key: live-geocode-secret",
     "HD-Api-Key: live-legacy-secret",
@@ -415,6 +417,14 @@ def test_colon_delimited_redacted_credentials_are_allowed(tmp_path, safe_value):
     root = _packet_copy(tmp_path); packet = root / "audit/ops/hde-epic038/ops-02"
     path = packet / "stderr.log"
     path.write_text(f"HD_API_KEY: {safe_value}\n")
+    _refresh_ledger(packet, path.name)
+    sanity.validate_ops_packages(root)
+
+
+def test_quoted_colon_delimited_redacted_credential_is_allowed(tmp_path):
+    root = _packet_copy(tmp_path); packet = root / "audit/ops/hde-epic038/ops-02"
+    path = packet / "stderr.log"
+    path.write_text('\"HD_API_KEY\": REDACTED\n')
     _refresh_ledger(packet, path.name)
     sanity.validate_ops_packages(root)
 
