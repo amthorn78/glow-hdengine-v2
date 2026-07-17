@@ -42,3 +42,22 @@ def test_sanity_log_mirror_and_proof_are_consistent() -> None:
     assert proof_fields.get("sha256") == sha
     assert proof_fields.get("size_bytes") == str(size)
     assert mirror.get("produced_at_utc")
+
+    assert {entry.get("discovered_physical_path") for entry in index_entries} == {
+        relative_log
+    }
+    assert {record.get("discovered_physical_path") for record in mirror_records} == {
+        relative_log
+    }
+
+    legacy_log = Path("artifacts/sanity/sanity.log")
+    legacy_proof = Path("artifacts/sanity/sanity.log.path_proof.txt")
+    assert legacy_log.read_bytes() == log_path.read_bytes()
+    legacy_fields: dict[str, str] = {}
+    for line in legacy_proof.read_text(encoding="utf-8").splitlines():
+        if ":" in line:
+            key, value = line.split(":", 1)
+            legacy_fields[key.strip()] = value.strip()
+    assert legacy_fields.get("path") == legacy_log.as_posix()
+    assert legacy_fields.get("sha256") == sha
+    assert legacy_fields.get("size_bytes") == str(size)
