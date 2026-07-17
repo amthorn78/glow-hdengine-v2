@@ -1,8 +1,16 @@
 from argparse import Namespace
+import hashlib
 
 import pytest
 
-from scripts.ops.hde_epic038_mapped_cache_smoke import SINGLE_REQUEST_RETRY, _preflight, main
+from scripts.ops.hde_epic038_mapped_cache_smoke import (
+    PACKET_NAMES,
+    SINGLE_REQUEST_RETRY,
+    _preflight,
+    _success_files,
+    _write_packet,
+    main,
+)
 
 
 def args():
@@ -12,6 +20,8 @@ def args():
         birthdate="fixture-date",
         birthtime="fixture-time",
         location="fixture-location",
+        evidence_dir=None,
+        retention_decision=None,
     )
 
 
@@ -84,3 +94,80 @@ def test_vendor_client_is_pinned_to_one_attempt_and_result_is_verified(monkeypat
         main(["--synthetic-user-id", args().synthetic_user_id, "--synthetic-person-uid", "fixture", "--birthdate", "fixture", "--birthtime", "fixture", "--location", "fixture"])
 
     assert captured["retry"] == SINGLE_REQUEST_RETRY
+
+
+def test_packet_arguments_must_be_supplied_together(monkeypatch, tmp_path):
+    configure(monkeypatch, "https://fixture.invalid/v2")
+    value = args()
+    value.evidence_dir = tmp_path / "ops-02"
+    with pytest.raises(SystemExit, match="evidence directory and retention decision"):
+        _preflight(value)
+
+
+def test_secret_safe_packet_has_exact_file_set_and_valid_checksums(monkeypatch, tmp_path):
+    configure(monkeypatch, "https://fixture.invalid/v2")
+    value = args()
+    value.retention_decision = "retain"
+    observation = {
+        "adapter_code": "ADAPTER_MAPPED",
+        "adapter_status": "mapped",
+        "canonical_sha256": "a" * 64,
+        "first": {
+            "provider": "postgres",
+            "canonical_sha256": "a" * 64,
+            "rows_before": 0,
+            "rows_after": 1,
+            "rows_written": 1,
+            "read_back_match": True,
+            "idempotent": False,
+        },
+        "input_fingerprint": "b" * 64,
+        "payload_family": "ChartResult",
+        "payload_posture": "adapter_mapped_no_raw_vendor_payload",
+        "projected_keys": ["bodygraph", "person", "person_uid"],
+        "provider": "postgres",
+        "request_route": "vendor.hdapi.post:/charts",
+        "second": {
+            "provider": "postgres",
+            "canonical_sha256": "a" * 64,
+            "rows_before": 1,
+            "rows_after": 1,
+            "rows_written": 0,
+            "read_back_match": True,
+            "idempotent": True,
+        },
+        "vendor_requests": 1,
+    }
+    repository = {
+        "branch": "main",
+        "head": "c" * 40,
+        "pre_execution_worktree": "clean",
+        "root": "/workspace/repo",
+    }
+    legacy = {
+        "classification": "explicit_legacy_fallback",
+        "resource_path": "bodygraphs",
+        "route_family": "legacy_bodygraph",
+    }
+    files = _success_files(
+        value,
+        observation,
+        repository,
+        captured_at="2026-07-17T00:00:00Z",
+        production_refused=True,
+        legacy=legacy,
+    )
+    output = tmp_path / "packet"
+    _write_packet(output, files, value)
+
+    assert tuple(sorted(path.name for path in output.iterdir())) == tuple(sorted(PACKET_NAMES))
+    assert (output / "stderr.log").read_text() == "OPS_STDERR_EMPTY\n"
+    combined = b"".join(path.read_bytes() for path in output.iterdir())
+    for forbidden in ("fixture-date", "fixture-time", "fixture-location", "fixture-person", "set"):
+        assert forbidden.encode() not in combined
+
+    ledger = (output / "checksums.sha256").read_text().splitlines()
+    assert len(ledger) == len(PACKET_NAMES) - 1
+    for row in ledger:
+        digest, name = row.split("  ", 1)
+        assert hashlib.sha256((output / name).read_bytes()).hexdigest() == digest
