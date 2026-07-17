@@ -28,6 +28,13 @@ OPS_FILES = {
 }
 
 OPS01_CORPUS_NAME = "hde_epic038_ops01_live_bodygraph_parity_v3"
+OPS_COMMANDS_SHA256 = {
+    "ops-01": "e52ecbddc561cc177b95d92a890226983b71791891fb91204f58e74d2922d38b",
+    "ops-02": "d3ca676d0157ce30bf64d4b419610e3a5ceebc0dc13785475028b90ed31f163b",
+}
+OPS01_MUTATING_SQL = re.compile(
+    r"(?im)^\s*(?:INSERT|UPDATE|DELETE|DROP|ALTER|TRUNCATE|CREATE|GRANT|REVOKE|MERGE|COPY)\b"
+)
 OPS01_PARITY_ROWS = (
     "grants",
     "search_path",
@@ -546,6 +553,13 @@ def _validate_packet(root: Path, package: str, required: Sequence[str]) -> None:
         raise ValueError(f"{package}: packet directory is not readable") from exc
     retained_files = sorted(entry.name for entry in retained_entries if entry.is_file())
     _validate_secret_safety(packet, retained_files)
+    commands_bytes = (packet / "commands.txt").read_bytes()
+    if package == "ops-01" and OPS01_MUTATING_SQL.search(
+        commands_bytes.decode("utf-8")
+    ):
+        raise ValueError("ops-01: commands.txt contains a mutating SQL command")
+    if hashlib.sha256(commands_bytes).hexdigest() != OPS_COMMANDS_SHA256[package]:
+        raise ValueError(f"{package}: commands.txt is not the approved command surface")
     allowed_files = set(required) | {f"{name}.path_proof.txt" for name in required}
     unexpected = sorted(entry.name for entry in retained_entries if entry.name not in allowed_files)
     if unexpected:
@@ -630,9 +644,10 @@ def _validate_packet(root: Path, package: str, required: Sequence[str]) -> None:
         ):
             raise ValueError("ops-02: mapped-cache identity disagreement")
         canonical_sha = mapped.get("canonical_sha256")
-        if not isinstance(canonical_sha, str) or not re.fullmatch(r"[0-9a-f]{64}", canonical_sha) or read_back.get("canonical_sha256") != canonical_sha or read_back.get("read_back_match") is not True or read_back.get("identity_rows") != 1 or read_back.get("retention_decision") != "retain" or read_back.get("stored_payload_posture") != "adapter_mapped_no_raw_vendor_payload":
+        durable_provider = read_back.get("provider")
+        if not isinstance(canonical_sha, str) or not re.fullmatch(r"[0-9a-f]{64}", canonical_sha) or durable_provider != "psycopg" or read_back.get("canonical_sha256") != canonical_sha or read_back.get("read_back_match") is not True or read_back.get("identity_rows") != 1 or read_back.get("retention_decision") != "retain" or read_back.get("stored_payload_posture") != "adapter_mapped_no_raw_vendor_payload":
             raise ValueError("ops-02: read_back_summary.json predicate failed")
-        if stdout.get("vendor_requests") != 1 or stdout.get("adapter_status") != "ADAPTER_MAPPED" or stdout.get("canonical_sha256") != canonical_sha or stdout.get("read_back_match") is not True or stdout.get("idempotent") is not True or stdout.get("identity_rows") != 1 or stdout.get("second_write_rows") != 0 or stdout.get("retention_decision") != "retain":
+        if stdout.get("provider") != durable_provider or stdout.get("vendor_requests") != 1 or stdout.get("adapter_status") != "ADAPTER_MAPPED" or stdout.get("canonical_sha256") != canonical_sha or stdout.get("read_back_match") is not True or stdout.get("idempotent") is not True or stdout.get("identity_rows") != 1 or stdout.get("second_write_rows") != 0 or stdout.get("retention_decision") != "retain":
             raise ValueError("ops-02: stdout.log predicate failed")
         _require_log_predicates(packet / "canonical_parity.log", (f"canonical_sha256={canonical_sha}", "pre_write_post_read_match=true", "first_read_back_match=true", "second_read_back_match=true"))
         _require_log_predicates(packet / "idempotence.log", ("first_rows_written=1", "second_rows_written=0", "identity_rows=1", "canonical_hash_unchanged=true"))
