@@ -74,17 +74,18 @@ def default_steps() -> list[SanityStep]:
         SanityStep(STAGE_NAMES[13], (_py("tools/evidence/validate_evidence_paths.py"),)),
         SanityStep(STAGE_NAMES[14], (("ci/checks/check_mirror_schema.sh",), ("bash", "ci/checks/check_evidence_index_hash.sh"))),
         SanityStep(STAGE_NAMES[15], (_py("tools/evidence/orientation_demo.py"), _py("tools/evidence/update_evidence_index.py"), _py("tools/evidence/orientation_demo.py", "--check"))),
-        SanityStep(STAGE_NAMES[16], (_py("tools/evidence/update_evidence_index.py"), _py("tools/evidence/update_evidence_index.py"), _py("tools/evidence/update_evidence_index.py", "--check"), _py("tools/evidence/orientation_demo.py", "--check"), ("ci/checks/check_mirror_schema.sh",), ("bash", "ci/checks/check_evidence_index_hash.sh"), ("ci/checks/check_final_lf.sh",))),
+        SanityStep(STAGE_NAMES[16], (_py("tools/evidence/update_evidence_index.py"), _py("tools/evidence/orientation_demo.py"), _py("tools/evidence/update_evidence_index.py"), _py("tools/evidence/update_evidence_index.py", "--check"), _py("tools/evidence/orientation_demo.py", "--check"), ("ci/checks/check_mirror_schema.sh",), ("bash", "ci/checks/check_evidence_index_hash.sh"), ("ci/checks/check_final_lf.sh",))),
     ]
 
 
 def _read_json(path: Path) -> dict:
+    display_path = path.relative_to(ROOT).as_posix() if path.is_relative_to(ROOT) else path.as_posix()
     try:
         value = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, UnicodeError, json.JSONDecodeError) as exc:
-        raise ValueError(f"{path.relative_to(ROOT)}: invalid JSON") from exc
+        raise ValueError(f"{display_path}: invalid JSON") from exc
     if not isinstance(value, dict):
-        raise ValueError(f"{path.relative_to(ROOT)}: expected JSON object")
+        raise ValueError(f"{display_path}: expected JSON object")
     return value
 
 
@@ -120,10 +121,12 @@ def _validate_packet(root: Path, package: str, required: Sequence[str]) -> None:
     summary = _read_json(packet / "result_summary.json")
     nonclaims = _read_json(packet / "nonclaims.json").get("nonclaims", [])
     required_nonclaims = {"no_qa_pass_claim", "no_acceptance_token_claim", "no_pf09_status_movement", "no_epic_closeout_claim"}
-    if not required_nonclaims.issubset(nonclaims):
+    if not isinstance(nonclaims, list) or not all(isinstance(item, str) for item in nonclaims) or not required_nonclaims.issubset(nonclaims):
         raise ValueError(f"{package}: nonclaims.json is incomplete")
     if package == "ops-01":
         observations = summary.get("observations", {})
+        if not isinstance(observations, dict):
+            raise ValueError("ops-01: result_summary.json observations must be an object")
         if summary.get("ops_observation_status") != "PASS" or observations.get("db_posture") != "PASS" or observations.get("bridge_consistency") != "PASS":
             raise ValueError("ops-01: result_summary.json PASS predicates failed")
         parity = _read_json(packet / "provider_parity.proof.json")
@@ -144,6 +147,8 @@ def _validate_packet(root: Path, package: str, required: Sequence[str]) -> None:
             raise ValueError("ops-01: result_summary.json claimed parity row counts failed")
     else:
         predicates = summary.get("predicates", {})
+        if not isinstance(predicates, dict):
+            raise ValueError("ops-02: result_summary.json predicates must be an object")
         required_predicates = {"adapter_mapped", "exactly_one_vendor_request", "canonical_write_read_back_equivalence", "idempotent_repeated_write", "mapped_payload_only", "normalized_identity_single_row", "production_like_refused", "explicit_legacy_fallback_preserved", "retained_by_po_decision"}
         if summary.get("status") != "PASS" or summary.get("retention_decision") != "retain" or any(predicates.get(key) is not True for key in required_predicates):
             raise ValueError("ops-02: result_summary.json PASS predicate failed")
@@ -178,11 +183,26 @@ def _run_stage(step: SanityStep) -> int:
 
 
 def _write_log(path: Path, results: Sequence[tuple[str, str]], first_failure: str, summary: str) -> None:
-    lines = [f"pipeline:{PIPELINE_ID}", "environment:" + ",".join(f"{key}={DETERMINISM_ENV_PINS[key]}" for key in sorted(DETERMINISM_ENV_PINS)), "ops_evidence:validated_existing_bytes_only;not_rerun=true"]
-    lines.extend(f"stage:{name};status={status}" for name, status in results)
+    lines = ["run:sanity-pipeline", f"pipeline_identity:{PIPELINE_ID}", "env:" + ",".join(f"{key}={DETERMINISM_ENV_PINS[key]}" for key in sorted(DETERMINISM_ENV_PINS)), "env_pins:audit/gates/determinism/env_pins.log", "ops_evidence:validated_existing_bytes_only;not_rerun=true"]
+    for name, status in results:
+        canonical_status = "OK" if status == "OK" else "FAIL"
+        lines.append(f"check {name}:{canonical_status}")
+        if status.startswith("NOT_EXECUTED_EARLIER_FAILURE:"):
+            lines.append(f"not_executed {name}:earlier_mandatory_failure={status.split(':', 1)[1]}")
     lines.extend((f"first_failed_stage:{first_failure}", f"summary:{summary}"))
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(("\n".join(lines) + "\n").encode("utf-8"))
+
+
+def _rebind_failure_log() -> None:
+    """Best-effort binding of final FAIL bytes after a late-stage failure."""
+    commands = (
+        _py("tools/evidence/update_evidence_index.py"),
+        _py("tools/evidence/orientation_demo.py"),
+        _py("tools/evidence/update_evidence_index.py"),
+    )
+    for command in commands:
+        _run_command(command)
 
 
 def run_pipeline(*, log_path: Path = SANITY_LOG, steps: Sequence[SanityStep] | None = None, refresh_index: bool = True) -> int:
@@ -205,6 +225,8 @@ def run_pipeline(*, log_path: Path = SANITY_LOG, steps: Sequence[SanityStep] | N
             break
     passed = code == 0 and len(results) == len(roster) and all(status == "OK" for _, status in results)
     _write_log(log_path, results, failure, "PASS" if passed else "FAIL")
+    if not passed and log_path == SANITY_LOG and roster == default_steps():
+        _rebind_failure_log()
     return 0 if passed else (code or 1)
 
 

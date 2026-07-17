@@ -459,7 +459,7 @@ def _write_token_matrix(*, bootstrap_status: str) -> Path:
         {
             "token_name": "SANITY_PIPELINE_OK",
             "owner_pf": "PF19 — Glow QA Guide §Sanity Pipeline",
-            "evidence": "artifacts/sanity/sanity.log",
+            "evidence": "audit/gates/sanity_pipeline/sanity_pipeline.log",
             "ci": "python tools/evidence/run_sanity_pipeline.py",
             "qa_logs": "checks/D07_sanity_pipeline/primary.log",
             "status": "Implemented",
@@ -709,7 +709,7 @@ def _write_acceptance_map(*, bootstrap_status: str) -> Path:
             "owner_pf": "PF19 — Glow QA Guide §Sanity Pipeline",
             "status": "implemented",
             "evidence_titles": [
-                "artifacts/sanity/sanity.log",
+                "audit/gates/sanity_pipeline/sanity_pipeline.log",
             ],
         },
         {
@@ -982,7 +982,7 @@ def _check_specs() -> list[CheckSpec]:
             check_id="D07_sanity_pipeline",
             command=["python", "tools/evidence/run_sanity_pipeline.py"],
             description="python tools/evidence/run_sanity_pipeline.py",
-            evidence_outputs=["artifacts/sanity/sanity.log"],
+            evidence_outputs=["audit/gates/sanity_pipeline/sanity_pipeline.log"],
         ),
         CheckSpec(
             check_id="D08_update_evidence_index",

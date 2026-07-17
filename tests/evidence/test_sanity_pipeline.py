@@ -31,11 +31,11 @@ def test_pipeline_success(tmp_path, monkeypatch):
     exit_code = run_sanity_pipeline.run_pipeline(log_path=log_path, steps=steps)
     assert exit_code == 0
     log_text = log_path.read_text(encoding="utf-8")
-    assert log_text.startswith("pipeline:HDE-EPIC038-PR06-release-sanity\n")
-    assert "environment:ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC" in log_text
+    assert log_text.startswith("run:sanity-pipeline\n")
+    assert "env:ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC" in log_text
     assert "summary:PASS" in log_text
-    assert "stage:step-one;status=OK" in log_text
-    assert "stage:step-two;status=OK" in log_text
+    assert "check step-one:OK" in log_text
+    assert "check step-two:OK" in log_text
 
 
 def test_pipeline_failure_stops_and_records(tmp_path, monkeypatch):
@@ -49,9 +49,10 @@ def test_pipeline_failure_stops_and_records(tmp_path, monkeypatch):
     exit_code = run_sanity_pipeline.run_pipeline(log_path=log_path, steps=steps)
     assert exit_code == 1
     log_lines = log_path.read_text(encoding="utf-8").splitlines()
-    assert "stage:step-one;status=OK" in log_lines
-    assert "stage:step-two;status=FAIL" in log_lines
-    assert "stage:step-three;status=NOT_EXECUTED_EARLIER_FAILURE:step-two" in log_lines
+    assert "check step-one:OK" in log_lines
+    assert "check step-two:FAIL" in log_lines
+    assert "check step-three:FAIL" in log_lines
+    assert "not_executed step-three:earlier_mandatory_failure=step-two" in log_lines
     assert log_lines[-1] == "summary:FAIL"
 
 

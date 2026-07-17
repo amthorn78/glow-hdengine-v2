@@ -18,9 +18,11 @@ def _valid_log() -> bool:
         text = data.decode("utf-8")
     except (OSError, UnicodeError):
         return False
-    stages = [line for line in text.splitlines() if line.startswith("stage:")]
+    stages = [line for line in text.splitlines() if line.startswith("check ")]
     return (data.endswith(b"\n") and not data.endswith(b"\n\n") and len(stages) == 17
-            and all(";status=OK" in line for line in stages)
+            and text.startswith("run:sanity-pipeline\n")
+            and "\nenv:ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC\n" in text
+            and all(line.endswith(":OK") for line in stages)
             and "first_failed_stage:NONE\nsummary:PASS\n" in text
             and "ops_evidence:validated_existing_bytes_only;not_rerun=true\n" in text)
 

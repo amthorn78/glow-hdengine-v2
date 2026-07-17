@@ -32,7 +32,8 @@ def test_first_failure_is_fail_closed_and_later_stages_are_recorded(tmp_path, mo
     assert sanity.run_pipeline(log_path=log, steps=steps) == 7
     assert calls == [("one",), ("two",)]
     text = log.read_text()
-    assert "stage:three;status=NOT_EXECUTED_EARLIER_FAILURE:two" in text
+    assert "check three:FAIL" in text
+    assert "not_executed three:earlier_mandatory_failure=two" in text
     assert "first_failed_stage:two\nsummary:FAIL\n" in text
 
 
@@ -43,6 +44,19 @@ def test_pass_requires_every_stage_and_log_has_one_lf(tmp_path, monkeypatch):
     data = log.read_bytes()
     assert data.endswith(b"\n") and not data.endswith(b"\n\n")
     assert data.count(b"summary:PASS") == 1
+
+
+def test_canonical_failure_bytes_are_rebound(tmp_path, monkeypatch):
+    steps = [sanity.SanityStep("late", ["false"])]
+    log = tmp_path / "sanity.log"
+    rebound = []
+    monkeypatch.setattr(sanity, "SANITY_LOG", log)
+    monkeypatch.setattr(sanity, "default_steps", lambda: steps)
+    monkeypatch.setattr(sanity, "_run_command", lambda command: _result(1))
+    monkeypatch.setattr(sanity, "_rebind_failure_log", lambda: rebound.append(True))
+    assert sanity.run_pipeline(log_path=log) == 1
+    assert rebound == [True]
+    assert log.read_text().endswith("first_failed_stage:late\nsummary:FAIL\n")
 
 
 def _packet_copy(tmp_path: Path) -> Path:
@@ -120,6 +134,16 @@ def test_ops02_predicate_failure_is_not_pass(tmp_path):
     value["predicates"]["mapped_payload_only"] = False
     path.write_text(json.dumps(value, separators=(",", ":")) + "\n"); _refresh_ledger(packet, path.name)
     with pytest.raises(ValueError, match="predicate"):
+        sanity.validate_ops_packages(root)
+
+
+@pytest.mark.parametrize("package,field", [("ops-01", "observations"), ("ops-02", "predicates")])
+def test_malformed_summary_nested_object_fails_cleanly(tmp_path, package, field):
+    root = _packet_copy(tmp_path); packet = root / f"audit/ops/hde-epic038/{package}"
+    path = packet / "result_summary.json"; value = json.loads(path.read_text())
+    value[field] = None
+    path.write_text(json.dumps(value, separators=(",", ":")) + "\n"); _refresh_ledger(packet, path.name)
+    with pytest.raises(ValueError, match=field):
         sanity.validate_ops_packages(root)
 
 
