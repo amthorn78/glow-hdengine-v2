@@ -139,6 +139,9 @@ def _validate_secret_safety(packet: Path, required: Sequence[str]) -> None:
         r'(?i)"(?:DATABASE_URL|DB_BRIDGE_URL|HD_API_KEY|GEO_API_KEY|HD_API_BASE_URL|HDAPI_BASE_URL)"\s*:\s*"([^"]+)"'
     )
     bearer = re.compile(r"(?i)\bBearer\s+([^\s\"']+)")
+    vendor_header = re.compile(
+        r"(?i)(?:\"?HD-(?:Geocode|Api)-Key\"?\s*[:=]\s*[\"']?)([^\s,\"'}]+)"
+    )
     forbidden_uri = re.compile(r"(?i)\b(?:postgres(?:ql)?|railway)://")
     for name in required:
         if name == "checksums.sha256":
@@ -153,6 +156,10 @@ def _validate_secret_safety(packet: Path, required: Sequence[str]) -> None:
         for match in bearer.finditer(text):
             if match.group(1).lower() not in {"<redacted>", "redacted"}:
                 raise ValueError(f"{packet.name}: {name} contains an unredacted bearer value")
+        for match in vendor_header.finditer(text):
+            value = match.group(1).lower()
+            if value not in {"<redacted>", "redacted", "set:redacted", "set", "unset", "***"} and not value.startswith(("$", "${")):
+                raise ValueError(f"{packet.name}: {name} contains an unredacted vendor header value")
         for match in credential_assignment.finditer(text):
             value = match.group(2).strip().lower()
             if value not in {"redacted", "<redacted>", "set:redacted", "set", "unset"} and not value.startswith(("$", "${")):
@@ -171,6 +178,68 @@ def _require_log_predicates(path: Path, required: Sequence[str]) -> None:
         raise ValueError(f"ops-02: {path.name} is not readable UTF-8 evidence") from exc
     if not text.startswith("PASS ") or any(token not in text.split() for token in required):
         raise ValueError(f"ops-02: {path.name} predicate failed")
+
+
+def _normalize_ddl_provider_value(value: object) -> tuple[tuple[str, str, tuple[tuple[str, str], ...]], ...]:
+    if not isinstance(value, list) or not value:
+        raise ValueError("ops-01: ddl_fingerprint provider value must be a non-empty list")
+    normalized: list[tuple[str, str, tuple[tuple[str, str], ...]]] = []
+    for item in value:
+        if not isinstance(item, dict) or not isinstance(item.get("name"), str) or not isinstance(item.get("kind"), str):
+            raise ValueError("ops-01: ddl_fingerprint provider object is malformed")
+        columns = item.get("columns", [])
+        if not isinstance(columns, list):
+            raise ValueError("ops-01: ddl_fingerprint columns must be a list")
+        normalized_columns: list[tuple[str, str]] = []
+        for column in columns:
+            if not isinstance(column, dict) or not isinstance(column.get("name"), str):
+                raise ValueError("ops-01: ddl_fingerprint column is malformed")
+            data_type = column.get("data_type", column.get("type"))
+            if not isinstance(data_type, str):
+                raise ValueError("ops-01: ddl_fingerprint column type is malformed")
+            normalized_columns.append((column["name"], data_type))
+        normalized.append((item["name"], item["kind"], tuple(sorted(normalized_columns))))
+    return tuple(sorted(normalized))
+
+
+def _normalized_provider_value(name: str, provider: dict) -> object:
+    value = provider.get("value")
+    if name == "grants":
+        if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
+            raise ValueError("ops-01: grants provider value is malformed")
+        return tuple(sorted(value))
+    if name == "search_path":
+        if not isinstance(value, str):
+            raise ValueError("ops-01: search_path provider value is malformed")
+        return tuple(part.strip() for part in value.split(","))
+    if name == "select_one":
+        if type(value) is not int:
+            raise ValueError("ops-01: select_one provider value is malformed")
+        return value
+    if name == "ddl_fingerprint":
+        return _normalize_ddl_provider_value(value)
+    raise ValueError(f"ops-01: unsupported parity row {name}")
+
+
+def _compare_provider_values(rows: Sequence[dict]) -> str:
+    by_name = {row["name"]: row for row in rows}
+    for name in OPS01_PARITY_ROWS[:-1]:
+        row = by_name[name]
+        if _normalized_provider_value(name, row["direct"]) != _normalized_provider_value(name, row["bridge"]):
+            raise ValueError(f"ops-01: provider values disagree for {name}")
+    bodygraph = by_name["bodygraph_payload_row"]
+    direct_sha = bodygraph["direct"].get("canonical_sha256")
+    bridge_sha = bodygraph["bridge"].get("canonical_sha256")
+    if (
+        not isinstance(direct_sha, str)
+        or not re.fullmatch(r"[0-9a-f]{64}", direct_sha)
+        or bridge_sha != direct_sha
+        or bodygraph.get("comparison") != "FILE_EQ_CANON_BYTES_OK"
+        or bodygraph["direct"].get("raw_bodygraph_payload_recorded") is not False
+        or bodygraph["bridge"].get("raw_bodygraph_payload_recorded") is not False
+    ):
+        raise ValueError("ops-01: BodyGraph provider hashes or persistence posture disagree")
+    return direct_sha
 
 
 def _validate_ops01(packet: Path, summary: dict) -> None:
@@ -238,6 +307,7 @@ def _validate_ops01(packet: Path, summary: dict) -> None:
         for row in rows
     ):
         raise ValueError("ops-01: provider_parity.proof.json contains unavailable, errored, or unmatched claimed row")
+    bodygraph_sha = _compare_provider_values(rows)
     expected_count = len(OPS01_PARITY_ROWS)
     if (
         parity.get("status") != "PASS"
@@ -272,6 +342,8 @@ def _validate_ops01(packet: Path, summary: dict) -> None:
         and OPS01_BRIDGE_PREDICATES.issubset(bridge_predicates)
         and all(value is True for value in bridge_predicates.values())
     )
+    comparator_inputs = comparator.get("direct_input") if isinstance(comparator, dict) else None
+    comparator_bridge_input = comparator.get("bridge_input") if isinstance(comparator, dict) else None
     if (
         bridge.get("status") != "PASS"
         or not exit_codes_valid
@@ -281,6 +353,11 @@ def _validate_ops01(packet: Path, summary: dict) -> None:
         or not isinstance(comparator, dict)
         or comparator.get("exit_code") != 0
         or comparator.get("result") != "FILE_EQ_CANON_BYTES_OK"
+        or comparator.get("canonical_sha256") != bodygraph_sha
+        or not isinstance(comparator_inputs, dict)
+        or comparator_inputs.get("sha256") != bodygraph_sha
+        or not isinstance(comparator_bridge_input, dict)
+        or comparator_bridge_input.get("sha256") != bodygraph_sha
         or not predicates_valid
     ):
         raise ValueError("ops-01: bridge_consistency.result.json PASS predicates failed")
