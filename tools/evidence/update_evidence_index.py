@@ -26,6 +26,8 @@ HASH_SENTINEL = ROOT / "docs/evidence/INDEX.sha256"
 MIRROR_PATH = ROOT / "artifacts/evidence_index.jsonl"
 MIRROR_REL = MIRROR_PATH.relative_to(ROOT).as_posix()
 MIRROR_SHA_PATH = ROOT / "artifacts/evidence_index.jsonl.sha256"
+CANONICAL_SANITY_LOG = ROOT / "audit/gates/sanity_pipeline/sanity_pipeline.log"
+LEGACY_SANITY_LOG = ROOT / "artifacts/sanity/sanity.log"
 EPIC020_BUNDLE_DIR = ROOT / "artifacts" / "epic020" / "bundles"
 EPIC020_ACCEPTANCE_MAP = ROOT / "docs" / "acceptance_map_epic020.json"
 if str(ROOT) not in sys.path:
@@ -2543,6 +2545,10 @@ EPIC038_PR06_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
         "ops-02": ("commands.txt", "stdout.log", "stderr.log", "exit_code.txt", "env_presence.json", "request_summary.json", "mapped_output_summary.json", "read_back_summary.json", "canonical_parity.log", "idempotence.log", "no_raw_vendor_payload_persistence.log", "legacy_fallback_preservation.log", "nonclaims.json", "result_summary.json", "checksums.sha256"),
     }.items() for name in names
 ]
+EPIC038_PR06_INDEX_KEYS = {
+    (entry["artifact_key"], entry["discovered_physical_path"])
+    for entry in EPIC038_PR06_PRIMARY_ARTIFACTS
+}
 
 A7_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
@@ -2745,6 +2751,7 @@ def _write_path_proof(
     check: bool,
     stat_mtime: float,
     extra_fields: Mapping[str, str] | None = None,
+    reuse_existing_metadata: bool = True,
 ) -> tuple[str, str]:
     """Write or validate a path-proof for the given relative path.
 
@@ -2767,7 +2774,7 @@ def _write_path_proof(
             return None
         return raw
 
-    existing = _load_existing_proof(proof_path)
+    existing = _load_existing_proof(proof_path) if reuse_existing_metadata else {}
     stat_mtime_iso = _isoformat_from_timestamp(stat_mtime)
     extra_fields = dict(extra_fields or {})
     existing_produced = _normalize_utc(existing.get("produced_at_utc"))
@@ -2941,7 +2948,7 @@ def _dedupe_entries(entries: Iterable[Mapping[str, object]]) -> list[dict[str, o
     return sorted(deduped.values(), key=lambda item: (item["artifact_key"], item["discovered_physical_path"]))
 
 
-def _load_human_index() -> list[dict[str, object]]:
+def _load_human_index(*, include_epic038_pr06: bool = True) -> list[dict[str, object]]:
     payload = json.loads(HUMAN_INDEX.read_text(encoding="utf-8"))
     payload = [
         entry
@@ -2968,6 +2975,11 @@ def _load_human_index() -> list[dict[str, object]]:
         not in EPIC038_PR04_SUPERSEDED_INDEX_KEYS
         and (entry.get("artifact_key"), entry.get("discovered_physical_path"))
         not in EPIC038_PR06_SUPERSEDED_INDEX_KEYS
+        and (
+            include_epic038_pr06
+            or (entry.get("artifact_key"), entry.get("discovered_physical_path"))
+            not in EPIC038_PR06_INDEX_KEYS
+        )
     ]
     return _dedupe_entries(
         [
@@ -3012,7 +3024,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *EPIC038_PR03_PRIMARY_ARTIFACTS,
             *EPIC038_PR04_PRIMARY_ARTIFACTS,
             *EPIC038_PR05_PRIMARY_ARTIFACTS,
-            *EPIC038_PR06_PRIMARY_ARTIFACTS,
+            *(EPIC038_PR06_PRIMARY_ARTIFACTS if include_epic038_pr06 else ()),
             *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,
@@ -3243,9 +3255,43 @@ def _refresh_path_proof(path: Path, *, default_produced_at: str, check: bool) ->
     )
 
 
+def _sync_legacy_sanity_compatibility(*, default_produced_at: str, check: bool) -> None:
+    """Keep historical sanity bindings byte-identical without restoring Index authority."""
+    try:
+        canonical_bytes = CANONICAL_SANITY_LOG.read_bytes()
+    except OSError as exc:
+        raise SystemExit(f"MISSING_CANONICAL_SANITY:{CANONICAL_SANITY_LOG}") from exc
+    legacy_changed = not LEGACY_SANITY_LOG.is_file() or LEGACY_SANITY_LOG.read_bytes() != canonical_bytes
+    _write_if_changed(LEGACY_SANITY_LOG, canonical_bytes, check=check)
+    proof_path = ROOT / f"{LEGACY_SANITY_LOG.relative_to(ROOT).as_posix()}.path_proof.txt"
+    proof_existing = _load_existing_proof(proof_path)
+    stat = LEGACY_SANITY_LOG.stat()
+    _write_path_proof(
+        LEGACY_SANITY_LOG.relative_to(ROOT).as_posix(),
+        sha256=_sha256_path(LEGACY_SANITY_LOG),
+        size_bytes=stat.st_size,
+        mtime_utc=None if legacy_changed else proof_existing.get("mtime_utc"),
+        produced_at=None if legacy_changed else proof_existing.get("produced_at_utc"),
+        default_produced_at=default_produced_at,
+        check=check,
+        stat_mtime=stat.st_mtime,
+        reuse_existing_metadata=not legacy_changed,
+    )
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description="Maintain the evidence index and mirror")
     parser.add_argument("--check", action="store_true", help="Fail if files would change")
+    parser.add_argument(
+        "--exclude-epic038-pr06",
+        action="store_true",
+        help="Exclude unvalidated HDE-EPIC038 PR-06 OPS artifacts during FAIL-log binding",
+    )
+    parser.add_argument(
+        "--sync-legacy-sanity-only",
+        action="store_true",
+        help="Refresh only the non-authoritative legacy sanity compatibility mirror and proof",
+    )
     parser.add_argument(
         "--epic-id",
         action="append",
@@ -3256,6 +3302,13 @@ def main(argv: list[str] | None = None) -> None:
 
     ensure_determinism_env()
     print(f"[evidence-index] env pins: {_render_env_pins()}")
+
+    if args.sync_legacy_sanity_only:
+        _sync_legacy_sanity_compatibility(
+            default_produced_at=_isoformat(_dt.datetime.now(tz=_dt.timezone.utc)),
+            check=args.check,
+        )
+        return
 
     def _stale_proof(rel: str) -> bool:
         proof = _load_existing_proof(ROOT / f"{rel}.path_proof.txt")
@@ -3286,7 +3339,14 @@ def main(argv: list[str] | None = None) -> None:
         if any(_stale_proof(rel) for rel in STALE_PROOF_TRIGGER_RELS):
             produced_default = _isoformat(_dt.datetime.now(tz=_dt.timezone.utc))
 
-        entries = _load_human_index()
+        _sync_legacy_sanity_compatibility(
+            default_produced_at=produced_default,
+            check=check,
+        )
+
+        entries = _load_human_index(
+            include_epic038_pr06=not args.exclude_epic038_pr06
+        )
         if "HDE-EPIC020" in epic_ids:
             epic020_tokens = _load_epic020_tokens("HDE-EPIC020")
             entries = _dedupe_entries(entries + _load_epic020_bundle_entries("HDE-EPIC020", epic020_tokens))
