@@ -53,10 +53,49 @@ def test_canonical_failure_bytes_are_rebound(tmp_path, monkeypatch):
     monkeypatch.setattr(sanity, "SANITY_LOG", log)
     monkeypatch.setattr(sanity, "default_steps", lambda: steps)
     monkeypatch.setattr(sanity, "_run_command", lambda command: _result(1))
-    monkeypatch.setattr(sanity, "_rebind_failure_log", lambda: rebound.append(True))
+    monkeypatch.setattr(sanity, "_rebind_failure_log", lambda: rebound.append(True) or 0)
     assert sanity.run_pipeline(log_path=log) == 1
     assert rebound == [True]
     assert log.read_text().endswith("first_failed_stage:late\nsummary:FAIL\n")
+
+
+def test_canonical_failure_finalization_error_is_propagated(tmp_path, monkeypatch):
+    steps = [sanity.SanityStep("late", ["false"])]
+    log = tmp_path / "sanity.log"
+    monkeypatch.setattr(sanity, "SANITY_LOG", log)
+    monkeypatch.setattr(sanity, "default_steps", lambda: steps)
+    monkeypatch.setattr(sanity, "_run_command", lambda command: _result(1))
+    monkeypatch.setattr(sanity, "_rebind_failure_log", lambda: 9)
+    assert sanity.run_pipeline(log_path=log) == 9
+    assert log.read_text().endswith("first_failed_stage:late\nsummary:FAIL\n")
+
+
+def test_failure_rebind_runs_complete_checked_finalizer(monkeypatch):
+    calls = []
+    def run(command):
+        calls.append(command)
+        return _result()
+    monkeypatch.setattr(sanity, "_run_command", run)
+    assert sanity._rebind_failure_log() == 0
+    assert calls == list(sanity._finalization_commands())
+    assert (sanity.sys.executable, "tools/evidence/validate_evidence_paths.py") in calls
+    assert ("ci/checks/check_mirror_schema.sh",) in calls
+    assert ("bash", "ci/checks/check_evidence_index_hash.sh") in calls
+    assert ("ci/checks/check_final_lf.sh",) in calls
+
+
+def test_ops_validation_failure_records_stage_and_stops(monkeypatch, tmp_path):
+    steps = [
+        sanity.SanityStep(sanity.STAGE_NAMES[11], (("__validate_ops__",),)),
+        sanity.SanityStep(sanity.STAGE_NAMES[12], (("must-not-run",),)),
+    ]
+    monkeypatch.setattr(sanity, "validate_ops_packages", lambda: (_ for _ in ()).throw(ValueError("invalid OPS")))
+    monkeypatch.setattr(sanity, "_run_command", lambda command: pytest.fail("later stage executed"))
+    log = tmp_path / "sanity.log"
+    assert sanity.run_pipeline(log_path=log, steps=steps) == 1
+    text = log.read_text()
+    assert f"check {sanity.STAGE_NAMES[11]}:FAIL" in text
+    assert f"not_executed {sanity.STAGE_NAMES[12]}:earlier_mandatory_failure={sanity.STAGE_NAMES[11]}" in text
 
 
 def _packet_copy(tmp_path: Path) -> Path:
@@ -108,6 +147,103 @@ def _refresh_ledger(packet: Path, name: str):
             digest = hashlib.sha256((packet / name).read_bytes()).hexdigest()
         lines.append(f"{digest}  {current}")
     (packet / "checksums.sha256").write_text("\n".join(lines) + "\n")
+
+
+def _write_json_and_refresh(packet: Path, name: str, value: dict):
+    (packet / name).write_text(json.dumps(value, separators=(",", ":")) + "\n")
+    _refresh_ledger(packet, name)
+
+
+@pytest.mark.parametrize("missing_name", sanity.OPS01_PARITY_ROWS)
+def test_ops01_requires_every_exact_corpus_row(tmp_path, missing_name):
+    root = _packet_copy(tmp_path); packet = root / "audit/ops/hde-epic038/ops-01"
+    parity = json.loads((packet / "provider_parity.proof.json").read_text())
+    summary = json.loads((packet / "result_summary.json").read_text())
+    parity["capabilities"] = [row for row in parity["capabilities"] if row["name"] != missing_name]
+    parity["active_parity_corpus"]["ordered_rows"].remove(missing_name)
+    summary["active_parity_rows"].remove(missing_name)
+    count = len(sanity.OPS01_PARITY_ROWS) - 1
+    parity["live_provider_parity"]["claimed_row_count"] = count
+    parity["live_provider_parity"]["matched_row_count"] = count
+    summary["observations"]["claimed_rows"] = count
+    summary["observations"]["matched_rows"] = count
+    _write_json_and_refresh(packet, "provider_parity.proof.json", parity)
+    _write_json_and_refresh(packet, "result_summary.json", summary)
+    with pytest.raises(ValueError, match="exact corpus"):
+        sanity.validate_ops_packages(root)
+
+
+@pytest.mark.parametrize("mutation", ["reordered", "duplicate", "renamed", "extra", "corpus-name"])
+def test_ops01_rejects_noncanonical_corpus_variants(tmp_path, mutation):
+    root = _packet_copy(tmp_path); packet = root / "audit/ops/hde-epic038/ops-01"
+    parity = json.loads((packet / "provider_parity.proof.json").read_text())
+    summary = json.loads((packet / "result_summary.json").read_text())
+    if mutation == "reordered":
+        parity["capabilities"].reverse()
+        parity["active_parity_corpus"]["ordered_rows"].reverse()
+        summary["active_parity_rows"].reverse()
+    elif mutation == "duplicate":
+        parity["capabilities"].append(parity["capabilities"][-1])
+        parity["active_parity_corpus"]["ordered_rows"].append(sanity.OPS01_PARITY_ROWS[-1])
+        summary["active_parity_rows"].append(sanity.OPS01_PARITY_ROWS[-1])
+    elif mutation in {"renamed", "extra"}:
+        new_name = "renamed_row" if mutation == "renamed" else "extra_row"
+        if mutation == "renamed":
+            parity["capabilities"][-1]["name"] = new_name
+            parity["active_parity_corpus"]["ordered_rows"][-1] = new_name
+            summary["active_parity_rows"][-1] = new_name
+        else:
+            extra = dict(parity["capabilities"][-1]); extra["name"] = new_name
+            parity["capabilities"].append(extra)
+            parity["active_parity_corpus"]["ordered_rows"].append(new_name)
+            summary["active_parity_rows"].append(new_name)
+    else:
+        parity["active_parity_corpus"]["name"] = "self_reported_replacement"
+        summary["active_parity_corpus"] = "self_reported_replacement"
+    count = len(parity["capabilities"])
+    parity["live_provider_parity"]["claimed_row_count"] = count
+    parity["live_provider_parity"]["matched_row_count"] = count
+    summary["observations"]["claimed_rows"] = count
+    summary["observations"]["matched_rows"] = count
+    _write_json_and_refresh(packet, "provider_parity.proof.json", parity)
+    _write_json_and_refresh(packet, "result_summary.json", summary)
+    with pytest.raises(ValueError, match="exact corpus"):
+        sanity.validate_ops_packages(root)
+
+
+@pytest.mark.parametrize("field,value", [
+    ("status", "FAIL"),
+    ("observation_mode", "write_capable"),
+    ("search_path_exact", False),
+    ("boundary_views_readonly", False),
+    ("partition_plan_status", "FAIL"),
+])
+def test_ops01_db_posture_primary_failures_are_rejected(tmp_path, field, value):
+    root = _packet_copy(tmp_path); packet = root / "audit/ops/hde-epic038/ops-01"
+    path = packet / "db_posture_summary.json"; primary = json.loads(path.read_text())
+    primary[field] = value
+    _write_json_and_refresh(packet, path.name, primary)
+    with pytest.raises(ValueError, match="db_posture_summary"):
+        sanity.validate_ops_packages(root)
+
+
+@pytest.mark.parametrize("mutation", [
+    "status", "command-exit", "checker-exit", "checker-result",
+    "comparator-exit", "comparator-result", "predicate",
+])
+def test_ops01_bridge_primary_failures_are_rejected(tmp_path, mutation):
+    root = _packet_copy(tmp_path); packet = root / "audit/ops/hde-epic038/ops-01"
+    path = packet / "bridge_consistency.result.json"; primary = json.loads(path.read_text())
+    if mutation == "status": primary["status"] = "FAIL"
+    elif mutation == "command-exit": primary["command_exit_codes"]["canonical_comparison"] = 1
+    elif mutation == "checker-exit": primary["governed_checker"]["exit_code"] = 1
+    elif mutation == "checker-result": primary["governed_checker"]["result"] = "FAIL"
+    elif mutation == "comparator-exit": primary["bodygraph_comparator"]["exit_code"] = 1
+    elif mutation == "comparator-result": primary["bodygraph_comparator"]["result"] = "FILE_NE_CANON_BYTES"
+    else: primary["predicates"]["bodygraph_row_match"] = False
+    _write_json_and_refresh(packet, path.name, primary)
+    with pytest.raises(ValueError, match="bridge_consistency"):
+        sanity.validate_ops_packages(root)
 
 
 def test_unavailable_provider_row_is_not_pass(tmp_path):
