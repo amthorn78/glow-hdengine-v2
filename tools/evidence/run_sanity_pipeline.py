@@ -100,7 +100,13 @@ def _finalization_commands() -> tuple[tuple[str, ...], ...]:
 def default_steps() -> list[SanityStep]:
     return [
         SanityStep(STAGE_NAMES[0], (("ci/checks/check_env_pins.sh",),)),
-        SanityStep(STAGE_NAMES[1], (_py("tools/evidence/generate_identity_provenance.py"), _py("tools/evidence/generate_release_bindings.py"), _py("tools/evidence/generate_env_matrix_snapshot.py"))),
+        SanityStep(STAGE_NAMES[1], (
+            _py("tools/evidence/generate_identity_provenance.py"),
+            _py("tools/evidence/generate_release_bindings.py"),
+            _py("tools/evidence/generate_env_matrix_snapshot.py"),
+            _py("scripts/release_id_recompute.py", "--check"),
+            _py("ci/checks/check_release_identity.sh"),
+        )),
         SanityStep(STAGE_NAMES[2], (_py("tools/evidence/run_canonical_json_gate.py", "--check-only"),)),
         SanityStep(STAGE_NAMES[3], (_py("tools/evidence/generate_determinism_gate_proofs.py"), _py("tools/evidence/generate_open_rails_abba_proof.py", "--check"), _py("tools/evidence/generate_open_rails_abba_proof.py", "--live", "--check"))),
         SanityStep(STAGE_NAMES[4], (_py("tools/evidence/generate_a7_transport_proofs.py"),)),
@@ -463,7 +469,11 @@ def _validate_packet(root: Path, package: str, required: Sequence[str]) -> None:
     expected = set(required) - {"checksums.sha256"}
     rows: dict[str, str] = {}
     pattern = re.compile(r"^([0-9a-f]{64})  ([A-Za-z0-9_.-]+)$")
-    for line_number, line in enumerate((packet / "checksums.sha256").read_text(encoding="ascii").splitlines(), 1):
+    try:
+        checksum_lines = (packet / "checksums.sha256").read_text(encoding="ascii").splitlines()
+    except (OSError, UnicodeError) as exc:
+        raise ValueError(f"{package}: checksums.sha256 is not readable ASCII evidence") from exc
+    for line_number, line in enumerate(checksum_lines, 1):
         match = pattern.fullmatch(line)
         if not match:
             raise ValueError(f"{package}: checksums.sha256 malformed row {line_number}")
