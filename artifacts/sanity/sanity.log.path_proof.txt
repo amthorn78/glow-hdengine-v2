@@ -1,5 +1,5 @@
 path: artifacts/sanity/sanity.log
-size_bytes: 913
-sha256: b44d9b0e03c1d255e49a355ef87193250117fb5198cb903007b8cdcefe98cb94
-mtime_utc: 2026-07-17T22:46:57Z
-produced_at_utc: 2026-07-17T22:46:57Z
+size_bytes: 1261
+sha256: 75393c44c687b23de4cf3fe5034e5c34cece2542e3fa2258ca08234dc1766274
+mtime_utc: 2026-01-11T01:59:09Z
+produced_at_utc: 2026-01-11T01:59:18Z
