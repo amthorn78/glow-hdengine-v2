@@ -252,7 +252,7 @@ def test_ops01_db_posture_primary_failures_are_rejected(tmp_path, field, value):
 
 @pytest.mark.parametrize("mutation", [
     "status", "command-exit", "checker-exit", "checker-result",
-    "comparator-exit", "comparator-result", "predicate",
+    "comparator-exit", "comparator-result", "comparator-hash", "predicate",
 ])
 def test_ops01_bridge_primary_failures_are_rejected(tmp_path, mutation):
     root = _packet_copy(tmp_path); packet = root / "audit/ops/hde-epic038/ops-01"
@@ -263,6 +263,7 @@ def test_ops01_bridge_primary_failures_are_rejected(tmp_path, mutation):
     elif mutation == "checker-result": primary["governed_checker"]["result"] = "FAIL"
     elif mutation == "comparator-exit": primary["bodygraph_comparator"]["exit_code"] = 1
     elif mutation == "comparator-result": primary["bodygraph_comparator"]["result"] = "FILE_NE_CANON_BYTES"
+    elif mutation == "comparator-hash": primary["bodygraph_comparator"]["canonical_sha256"] = "0" * 64
     else: primary["predicates"]["bodygraph_row_match"] = False
     _write_json_and_refresh(packet, path.name, primary)
     with pytest.raises(ValueError, match="bridge_consistency"):
@@ -275,6 +276,21 @@ def test_unavailable_provider_row_is_not_pass(tmp_path):
     value["capabilities"][0]["direct"]["status"] = "unavailable"
     path.write_text(json.dumps(value, separators=(",", ":")) + "\n"); _refresh_ledger(packet, path.name)
     with pytest.raises(ValueError, match="unavailable"):
+        sanity.validate_ops_packages(root)
+
+
+@pytest.mark.parametrize("row_name", sanity.OPS01_PARITY_ROWS)
+def test_ops01_compares_provider_values_and_bodygraph_hashes(tmp_path, row_name):
+    root = _packet_copy(tmp_path); packet = root / "audit/ops/hde-epic038/ops-01"
+    path = packet / "provider_parity.proof.json"; value = json.loads(path.read_text())
+    row = next(item for item in value["capabilities"] if item["name"] == row_name)
+    if row_name == "grants": row["direct"]["value"].append("postgres hde.body_graphs BOGUS")
+    elif row_name == "search_path": row["direct"]["value"] = "public, hde"
+    elif row_name == "select_one": row["direct"]["value"] = 2
+    elif row_name == "ddl_fingerprint": row["direct"]["value"][0]["columns"][0]["data_type"] = "text"
+    else: row["direct"]["canonical_sha256"] = "0" * 64
+    _write_json_and_refresh(packet, path.name, value)
+    with pytest.raises(ValueError, match="provider values|BodyGraph"):
         sanity.validate_ops_packages(root)
 
 
@@ -309,6 +325,8 @@ def test_malformed_summary_nested_object_fails_cleanly(tmp_path, package, field)
 @pytest.mark.parametrize("leak", [
     "HD_API_KEY=supersecret",
     "Authorization: Bearer live-secret",
+    "HD-Geocode-Key: live-geocode-secret",
+    "HD-Api-Key: live-legacy-secret",
     "postgresql://user:password@host/database",
     '{"raw_vendor_payload":{"private":"value"}}',
 ])
