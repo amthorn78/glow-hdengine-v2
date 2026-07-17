@@ -27,6 +27,32 @@ OPS_FILES = {
     "ops-02": ("commands.txt", "stdout.log", "stderr.log", "exit_code.txt", "env_presence.json", "request_summary.json", "mapped_output_summary.json", "read_back_summary.json", "canonical_parity.log", "idempotence.log", "no_raw_vendor_payload_persistence.log", "legacy_fallback_preservation.log", "nonclaims.json", "result_summary.json", "checksums.sha256"),
 }
 
+OPS01_CORPUS_NAME = "hde_epic038_ops01_live_bodygraph_parity_v3"
+OPS01_PARITY_ROWS = (
+    "grants",
+    "search_path",
+    "select_one",
+    "ddl_fingerprint",
+    "bodygraph_payload_row",
+)
+OPS01_BRIDGE_COMMANDS = {
+    "bridge_bodygraph_read",
+    "canonical_comparison",
+    "db_posture_capture",
+    "direct_bodygraph_read",
+    "governed_checker",
+}
+OPS01_BRIDGE_PREDICATES = {
+    "all_actions_closed_rails",
+    "bodygraph_bridge_available",
+    "bodygraph_direct_available",
+    "bodygraph_row_match",
+    "bodygraph_selector_approved",
+    "four_row_corpus_exact",
+    "provider_selection_consistent",
+    "search_path_exact",
+}
+
 
 @dataclass(frozen=True)
 class SanityStep:
@@ -56,6 +82,21 @@ def _py(path: str, *args: str) -> tuple[str, ...]:
     return (sys.executable, path, *args)
 
 
+def _finalization_commands() -> tuple[tuple[str, ...], ...]:
+    """Return the bounded writer/check sequence for the final evidence bytes."""
+    return (
+        _py("tools/evidence/update_evidence_index.py"),
+        _py("tools/evidence/orientation_demo.py"),
+        _py("tools/evidence/update_evidence_index.py"),
+        _py("tools/evidence/update_evidence_index.py", "--check"),
+        _py("tools/evidence/orientation_demo.py", "--check"),
+        _py("tools/evidence/validate_evidence_paths.py"),
+        ("ci/checks/check_mirror_schema.sh",),
+        ("bash", "ci/checks/check_evidence_index_hash.sh"),
+        ("ci/checks/check_final_lf.sh",),
+    )
+
+
 def default_steps() -> list[SanityStep]:
     return [
         SanityStep(STAGE_NAMES[0], (("ci/checks/check_env_pins.sh",),)),
@@ -74,7 +115,7 @@ def default_steps() -> list[SanityStep]:
         SanityStep(STAGE_NAMES[13], (_py("tools/evidence/validate_evidence_paths.py"),)),
         SanityStep(STAGE_NAMES[14], (("ci/checks/check_mirror_schema.sh",), ("bash", "ci/checks/check_evidence_index_hash.sh"))),
         SanityStep(STAGE_NAMES[15], (_py("tools/evidence/orientation_demo.py"), _py("tools/evidence/update_evidence_index.py"), _py("tools/evidence/orientation_demo.py", "--check"))),
-        SanityStep(STAGE_NAMES[16], (_py("tools/evidence/update_evidence_index.py"), _py("tools/evidence/orientation_demo.py"), _py("tools/evidence/update_evidence_index.py"), _py("tools/evidence/update_evidence_index.py", "--check"), _py("tools/evidence/orientation_demo.py", "--check"), ("ci/checks/check_mirror_schema.sh",), ("bash", "ci/checks/check_evidence_index_hash.sh"), ("ci/checks/check_final_lf.sh",))),
+        SanityStep(STAGE_NAMES[16], _finalization_commands()),
     ]
 
 
@@ -105,7 +146,7 @@ def _validate_secret_safety(packet: Path, required: Sequence[str]) -> None:
         path = packet / name
         try:
             text = path.read_text(encoding="utf-8")
-        except UnicodeError as exc:
+        except (OSError, UnicodeError) as exc:
             raise ValueError(f"{packet.name}: {name} is not UTF-8 secret-safe evidence") from exc
         if forbidden_uri.search(text):
             raise ValueError(f"{packet.name}: {name} contains an unredacted service URI")
@@ -124,9 +165,138 @@ def _validate_secret_safety(packet: Path, required: Sequence[str]) -> None:
 
 
 def _require_log_predicates(path: Path, required: Sequence[str]) -> None:
-    text = path.read_text(encoding="utf-8").strip()
+    try:
+        text = path.read_text(encoding="utf-8").strip()
+    except (OSError, UnicodeError) as exc:
+        raise ValueError(f"ops-02: {path.name} is not readable UTF-8 evidence") from exc
     if not text.startswith("PASS ") or any(token not in text.split() for token in required):
         raise ValueError(f"ops-02: {path.name} predicate failed")
+
+
+def _validate_ops01(packet: Path, summary: dict) -> None:
+    """Derive OPS-01 PASS from its fixed corpus and lower-level primaries."""
+    observations = summary.get("observations")
+    if not isinstance(observations, dict):
+        raise ValueError("ops-01: result_summary.json observations must be an object")
+
+    db_posture = _read_json(packet / "db_posture_summary.json")
+    boundary_views = db_posture.get("boundary_views")
+    boundary_views_valid = (
+        isinstance(boundary_views, list)
+        and bool(boundary_views)
+        and all(
+            isinstance(view, dict)
+            and view.get("readonly") is True
+            and view.get("is_insertable_into") == "NO"
+            and view.get("is_trigger_updatable") == "NO"
+            and view.get("is_updatable") == "NO"
+            for view in boundary_views
+        )
+    )
+    if (
+        db_posture.get("status") != "PASS"
+        or db_posture.get("observation_mode") != "read_only"
+        or db_posture.get("search_path") != "hde, public"
+        or db_posture.get("search_path_exact") is not True
+        or db_posture.get("boundary_views_readonly") is not True
+        or db_posture.get("partition_plan_status") != "PASS"
+        or not boundary_views_valid
+    ):
+        raise ValueError("ops-01: db_posture_summary.json PASS predicates failed")
+
+    parity = _read_json(packet / "provider_parity.proof.json")
+    corpus = parity.get("active_parity_corpus")
+    live_parity = parity.get("live_provider_parity")
+    provider_observations = parity.get("provider_observations")
+    rows = parity.get("capabilities")
+    rows_well_formed = (
+        isinstance(rows, list)
+        and bool(rows)
+        and all(
+            isinstance(row, dict)
+            and isinstance(row.get("direct"), dict)
+            and isinstance(row.get("bridge"), dict)
+            for row in rows
+        )
+    )
+    if not rows_well_formed:
+        raise ValueError("ops-01: provider_parity.proof.json contains unavailable, errored, or malformed claimed row")
+    row_names = tuple(row.get("name") for row in rows)
+    if (
+        not isinstance(corpus, dict)
+        or corpus.get("name") != OPS01_CORPUS_NAME
+        or corpus.get("ordered_rows") != list(OPS01_PARITY_ROWS)
+        or row_names != OPS01_PARITY_ROWS
+        or summary.get("active_parity_corpus") != OPS01_CORPUS_NAME
+        or summary.get("active_parity_rows") != list(OPS01_PARITY_ROWS)
+    ):
+        raise ValueError("ops-01: provider parity exact corpus identity or ordered rows failed")
+    if any(
+        row.get("parity") != "match"
+        or row["direct"].get("status") != "ok"
+        or row["bridge"].get("status") != "ok"
+        for row in rows
+    ):
+        raise ValueError("ops-01: provider_parity.proof.json contains unavailable, errored, or unmatched claimed row")
+    expected_count = len(OPS01_PARITY_ROWS)
+    if (
+        parity.get("status") != "PASS"
+        or not isinstance(live_parity, dict)
+        or live_parity.get("direct_provider_rows") != "available"
+        or live_parity.get("bridge_provider_rows") != "available"
+        or live_parity.get("claimed_row_count") != expected_count
+        or live_parity.get("matched_row_count") != expected_count
+        or live_parity.get("parity_status") != "pass"
+        or not isinstance(provider_observations, dict)
+        or provider_observations.get("direct") != "ok"
+        or provider_observations.get("bridge") != "ok"
+    ):
+        raise ValueError("ops-01: provider_parity.proof.json PASS predicates failed")
+    selector = corpus.get("selector")
+    bodygraph_row = rows[-1]
+    if not isinstance(selector, dict) or summary.get("bodygraph_selector") != selector or bodygraph_row.get("selector") != selector:
+        raise ValueError("ops-01: provider parity selector identity disagreement")
+
+    bridge = _read_json(packet / "bridge_consistency.result.json")
+    command_exit_codes = bridge.get("command_exit_codes")
+    governed_checker = bridge.get("governed_checker")
+    comparator = bridge.get("bodygraph_comparator")
+    bridge_predicates = bridge.get("predicates")
+    exit_codes_valid = (
+        isinstance(command_exit_codes, dict)
+        and OPS01_BRIDGE_COMMANDS.issubset(command_exit_codes)
+        and all(type(value) is int and value == 0 for value in command_exit_codes.values())
+    )
+    predicates_valid = (
+        isinstance(bridge_predicates, dict)
+        and OPS01_BRIDGE_PREDICATES.issubset(bridge_predicates)
+        and all(value is True for value in bridge_predicates.values())
+    )
+    if (
+        bridge.get("status") != "PASS"
+        or not exit_codes_valid
+        or not isinstance(governed_checker, dict)
+        or governed_checker.get("exit_code") != 0
+        or governed_checker.get("result") != "PASS"
+        or not isinstance(comparator, dict)
+        or comparator.get("exit_code") != 0
+        or comparator.get("result") != "FILE_EQ_CANON_BYTES_OK"
+        or not predicates_valid
+    ):
+        raise ValueError("ops-01: bridge_consistency.result.json PASS predicates failed")
+
+    if (
+        summary.get("ops_observation_status") != "PASS"
+        or observations.get("db_posture") != db_posture.get("status")
+        or observations.get("bridge_consistency") != bridge.get("status")
+        or observations.get("direct_provider") != "available"
+        or observations.get("bridge_provider") != "available"
+        or observations.get("bodygraph_row_parity") != "match"
+        or observations.get("search_path") != db_posture.get("search_path")
+        or observations.get("claimed_rows") != expected_count
+        or observations.get("matched_rows") != expected_count
+    ):
+        raise ValueError("ops-01: result_summary.json disagrees with primary OPS evidence")
 
 
 def _validate_packet(root: Path, package: str, required: Sequence[str]) -> None:
@@ -165,27 +335,7 @@ def _validate_packet(root: Path, package: str, required: Sequence[str]) -> None:
     if not isinstance(nonclaims, list) or not all(isinstance(item, str) for item in nonclaims) or not required_nonclaims.issubset(nonclaims):
         raise ValueError(f"{package}: nonclaims.json is incomplete")
     if package == "ops-01":
-        observations = summary.get("observations", {})
-        if not isinstance(observations, dict):
-            raise ValueError("ops-01: result_summary.json observations must be an object")
-        if summary.get("ops_observation_status") != "PASS" or observations.get("db_posture") != "PASS" or observations.get("bridge_consistency") != "PASS":
-            raise ValueError("ops-01: result_summary.json PASS predicates failed")
-        parity = _read_json(packet / "provider_parity.proof.json")
-        rows = parity.get("capabilities", [])
-        rows_well_formed = (
-            isinstance(rows, list)
-            and bool(rows)
-            and all(
-                isinstance(row, dict)
-                and isinstance(row.get("direct"), dict)
-                and isinstance(row.get("bridge"), dict)
-                for row in rows
-            )
-        )
-        if not rows_well_formed or any(row.get("parity") != "match" or row["direct"].get("status") != "ok" or row["bridge"].get("status") != "ok" for row in rows):
-            raise ValueError("ops-01: provider_parity.proof.json contains unavailable, errored, or unmatched claimed row")
-        if observations.get("claimed_rows") != len(rows) or observations.get("matched_rows") != len(rows):
-            raise ValueError("ops-01: result_summary.json claimed parity row counts failed")
+        _validate_ops01(packet, summary)
     else:
         predicates = summary.get("predicates", {})
         if not isinstance(predicates, dict):
@@ -240,7 +390,7 @@ def _run_stage(step: SanityStep) -> int:
     return 0
 
 
-def _write_log(path: Path, results: Sequence[tuple[str, str]], first_failure: str, summary: str) -> None:
+def _render_log(results: Sequence[tuple[str, str]], first_failure: str, summary: str) -> bytes:
     lines = ["run:sanity-pipeline", f"pipeline_identity:{PIPELINE_ID}", "env:" + ",".join(f"{key}={DETERMINISM_ENV_PINS[key]}" for key in sorted(DETERMINISM_ENV_PINS)), "env_pins:audit/gates/determinism/env_pins.log", "ops_evidence:validated_existing_bytes_only;not_rerun=true"]
     for name, status in results:
         canonical_status = "OK" if status == "OK" else "FAIL"
@@ -248,33 +398,39 @@ def _write_log(path: Path, results: Sequence[tuple[str, str]], first_failure: st
         if status.startswith("NOT_EXECUTED_EARLIER_FAILURE:"):
             lines.append(f"not_executed {name}:earlier_mandatory_failure={status.split(':', 1)[1]}")
     lines.extend((f"first_failed_stage:{first_failure}", f"summary:{summary}"))
+    return ("\n".join(lines) + "\n").encode("utf-8")
+
+
+def _write_log(path: Path, results: Sequence[tuple[str, str]], first_failure: str, summary: str) -> bytes:
+    data = _render_log(results, first_failure, summary)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_bytes(("\n".join(lines) + "\n").encode("utf-8"))
+    path.write_bytes(data)
+    return data
 
 
-def _rebind_failure_log() -> None:
-    """Best-effort binding of final FAIL bytes after a late-stage failure."""
-    commands = (
-        _py("tools/evidence/update_evidence_index.py"),
-        _py("tools/evidence/orientation_demo.py"),
-        _py("tools/evidence/update_evidence_index.py"),
-    )
-    for command in commands:
-        _run_command(command)
+def _rebind_failure_log() -> int:
+    """Bind and validate final FAIL bytes through the canonical finalizer."""
+    for command in _finalization_commands():
+        result = _run_command(command)
+        if result.returncode:
+            return result.returncode or 1
+    return 0
 
 
 def run_pipeline(*, log_path: Path = SANITY_LOG, steps: Sequence[SanityStep] | None = None, refresh_index: bool = True) -> int:
     ensure_determinism_env()
     roster = list(default_steps() if steps is None else steps)
+    canonical_run = log_path == SANITY_LOG and steps is None
     results: list[tuple[str, str]] = []
     failure = "NONE"
     code = 0
+    prospective_pass: bytes | None = None
     for index, step in enumerate(roster):
         # The final updater must bind the final sanity bytes, not an interim
         # version.  Render the prospective PASS log before that updater runs;
         # the normal final render below is byte-identical on success.
-        if log_path == SANITY_LOG and index == len(roster) - 1 and not failure:
-            _write_log(log_path, [*results, (step.name, "OK")], "NONE", "PASS")
+        if canonical_run and index == len(roster) - 1 and not failure:
+            prospective_pass = _write_log(log_path, [*results, (step.name, "OK")], "NONE", "PASS")
         code = _run_stage(step)
         results.append((step.name, "OK" if code == 0 else "FAIL"))
         if code:
@@ -282,9 +438,29 @@ def run_pipeline(*, log_path: Path = SANITY_LOG, steps: Sequence[SanityStep] | N
             results.extend((later.name, f"NOT_EXECUTED_EARLIER_FAILURE:{step.name}") for later in roster[index + 1:])
             break
     passed = code == 0 and len(results) == len(roster) and all(status == "OK" for _, status in results)
+    final_bytes = _render_log(results, failure, "PASS" if passed else "FAIL")
+    if passed and canonical_run:
+        try:
+            current_bytes = log_path.read_bytes()
+        except OSError:
+            current_bytes = b""
+        if prospective_pass != final_bytes or current_bytes != final_bytes:
+            results[-1] = (results[-1][0], "FAIL")
+            failure = results[-1][0]
+            _write_log(log_path, results, failure, "FAIL")
+            seal_code = _rebind_failure_log()
+            if seal_code:
+                print(f"canonical FAIL evidence finalization failed with exit code {seal_code}", file=sys.stderr)
+                return seal_code
+            return 1
+        return 0
+
     _write_log(log_path, results, failure, "PASS" if passed else "FAIL")
-    if not passed and log_path == SANITY_LOG and roster == default_steps():
-        _rebind_failure_log()
+    if not passed and canonical_run:
+        seal_code = _rebind_failure_log()
+        if seal_code:
+            print(f"canonical FAIL evidence finalization failed with exit code {seal_code}", file=sys.stderr)
+            return seal_code
     return 0 if passed else (code or 1)
 
 
