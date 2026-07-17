@@ -449,7 +449,13 @@ def run_pipeline(*, log_path: Path = SANITY_LOG, steps: Sequence[SanityStep] | N
         except OSError:
             current_bytes = b""
         if prospective_pass != final_bytes or current_bytes != final_bytes:
-            print("canonical PASS bytes changed during final evidence sealing", file=sys.stderr)
+            print(
+                "canonical PASS bytes changed during final evidence sealing: "
+                f"prospective={hashlib.sha256(prospective_pass or b'').hexdigest()}:{len(prospective_pass or b'')} "
+                f"current={hashlib.sha256(current_bytes).hexdigest()}:{len(current_bytes)} "
+                f"final={hashlib.sha256(final_bytes).hexdigest()}:{len(final_bytes)}",
+                file=sys.stderr,
+            )
             results[-1] = (results[-1][0], "FAIL")
             failure = results[-1][0]
             _write_log(log_path, results, failure, "FAIL")
