@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import hmac
 import http.client
 import json
 import os
@@ -76,6 +77,27 @@ def _command_env(**changes: str) -> dict[str, str]:
     return env
 
 
+def _redacted_environment_value(redaction_key: bytes, name: str, value: str) -> str:
+    return hmac.new(
+        redaction_key,
+        f"{name}\0{value}".encode("utf-8"),
+        hashlib.sha256,
+    ).hexdigest()
+
+
+def _redacted_environment_snapshot(redaction_key: bytes) -> dict[str, tuple[bool, str | None]]:
+    """Return assertion-safe environment state without retaining raw values."""
+
+    snapshot: dict[str, tuple[bool, str | None]] = {}
+    for name in generator.HERMETIC_ENV_KEYS:
+        if name not in os.environ:
+            snapshot[name] = (False, None)
+            continue
+        digest = _redacted_environment_value(redaction_key, name, os.environ[name])
+        snapshot[name] = (True, digest)
+    return snapshot
+
+
 def _forbidden(name: str, calls: dict[str, int]):
     calls[name] = 0
 
@@ -86,12 +108,17 @@ def _forbidden(name: str, calls: dict[str, int]):
     return canary
 
 
-def _wrap_build_with_canaries(monkeypatch, targets, observations: dict[str, object]) -> dict[str, int]:
+def _wrap_build_with_canaries(
+    monkeypatch,
+    targets,
+    observations: dict[str, object],
+    redaction_key: bytes,
+) -> dict[str, int]:
     actual = generator._build_files
     calls: dict[str, int] = {}
 
     def guarded_build(guard, *, force_failure=False):
-        observations["inside_env"] = generator._environment_snapshot()
+        observations["inside_env"] = _redacted_environment_snapshot(redaction_key)
         observations["production_canaries"] = dict(guard.attempts)
         with ExitStack() as stack:
             for name, owner, attribute in targets:
@@ -146,6 +173,24 @@ def test_shared_primary_remains_byte_identical_for_build_and_real_check() -> Non
     assert http_log_module.LOG_PATH is original_log_path
 
 
+def test_environment_assertion_snapshot_redacts_ambient_values(monkeypatch) -> None:
+    ambient = {
+        "DATABASE_URL": "postgresql://user:password@database.invalid/db",
+        "DB_BRIDGE_URL": "https://bridge-with-private-host.invalid",
+        "HD_API_BASE_URL": "https://vendor-with-private-base.invalid/v2",
+        "HD_API_KEY": "private-api-key-marker",
+        "GEO_API_KEY": "private-geo-key-marker",
+    }
+    for name, value in ambient.items():
+        monkeypatch.setenv(name, value)
+
+    snapshot = _redacted_environment_snapshot(os.urandom(32))
+    rendered = repr(snapshot)
+
+    assert all(snapshot[name][0] and len(snapshot[name][1] or "") == 64 for name in ambient)
+    assert all(value not in rendered for value in ambient.values())
+
+
 def test_ambient_db_configuration_cannot_escape_and_environment_restores(monkeypatch) -> None:
     for key, value in {
         "DATABASE_URL": "postgresql://sentinel.invalid/db",
@@ -158,7 +203,8 @@ def test_ambient_db_configuration_cannot_escape_and_environment_restores(monkeyp
     }.items():
         monkeypatch.setenv(key, value)
     monkeypatch.delenv("ENGINE_ENV", raising=False)
-    caller_env = generator._environment_snapshot()
+    redaction_key = os.urandom(32)
+    caller_env = _redacted_environment_snapshot(redaction_key)
     shared = _shared_log_state()
     observations: dict[str, object] = {}
     calls = _wrap_build_with_canaries(monkeypatch, (
@@ -170,14 +216,17 @@ def test_ambient_db_configuration_cannot_escape_and_environment_restores(monkeyp
         ("bridge_request", bridge_provider_module, "_default_request"),
         ("bridge_urlopen", bridge_provider_module.urllib.request, "urlopen"),
         ("bridge_logger", bridge_provider_module, "log_http_call"),
-    ), observations)
+    ), observations, redaction_key)
     generator.build()
     inside = observations["inside_env"]
-    assert all(inside[key] == (True, value) for key, value in generator.DETERMINISM_ENV_PINS.items())
+    assert all(
+        inside[key] == (True, _redacted_environment_value(redaction_key, key, value))
+        for key, value in generator.DETERMINISM_ENV_PINS.items()
+    )
     assert all(inside[key] == (False, None) for key in generator._CONNECTION_ENV_KEYS)
     assert calls and set(calls.values()) == {0}
     assert observations["production_canaries"] and set(observations["production_canaries"].values()) == {0}
-    assert generator._environment_snapshot() == caller_env
+    assert _redacted_environment_snapshot(redaction_key) == caller_env
     assert _shared_log_state() == shared
 
 
@@ -191,7 +240,8 @@ def test_ambient_vendor_configuration_cannot_escape_in_build_or_check(monkeypatc
         "ALLOW_NETWORK": "1",
     }.items():
         monkeypatch.setenv(key, value)
-    caller_env = generator._environment_snapshot()
+    redaction_key = os.urandom(32)
+    caller_env = _redacted_environment_snapshot(redaction_key)
     shared = _shared_log_state()
     observations: dict[str, object] = {}
     calls = _wrap_build_with_canaries(monkeypatch, (
@@ -203,10 +253,10 @@ def test_ambient_vendor_configuration_cannot_escape_in_build_or_check(monkeypatc
         ("socket", vendor_client_module.socket, "create_connection"),
         ("http", http.client.HTTPConnection, "connect"),
         ("https", http.client.HTTPSConnection, "connect"),
-    ), observations)
+    ), observations, redaction_key)
     generator.build()
     assert calls and set(calls.values()) == {0}
-    assert generator._environment_snapshot() == caller_env
+    assert _redacted_environment_snapshot(redaction_key) == caller_env
     result = subprocess.run(
         [sys.executable, str(generator.__file__), "--check"], cwd=ROOT,
         env=_command_env(
@@ -246,7 +296,8 @@ def test_injected_exception_restores_environment_module_state_and_files(monkeypa
             monkeypatch.setenv(key, f"caller-value-{index}")
         else:
             monkeypatch.delenv(key, raising=False)
-    env_before = generator._environment_snapshot()
+    redaction_key = os.urandom(32)
+    env_before = _redacted_environment_snapshot(redaction_key)
     log_before = _shared_log_state()
     log_path_before = http_log_module.LOG_PATH
     producer_paths = list(generator.build())
@@ -261,7 +312,7 @@ def test_injected_exception_restores_environment_module_state_and_files(monkeypa
     monkeypatch.setattr(generator, "_exercise_resolver_policy", injected)
     with pytest.raises(RuntimeError, match="INJECTED_FIXTURE_FAILURE"):
         generator.build()
-    assert generator._environment_snapshot() == env_before
+    assert _redacted_environment_snapshot(redaction_key) == env_before
     assert http_log_module.LOG_PATH is log_path_before
     assert _shared_log_state() == log_before
     assert _bytes_and_mtimes(producer_paths) == producer_before
@@ -273,7 +324,8 @@ def test_schema_failure_restores_environment_module_state_and_files(monkeypatch)
     monkeypatch.setenv("SAFE_MODE", "0")
     monkeypatch.setenv("ALLOW_NETWORK", "1")
     monkeypatch.setenv("DATABASE_URL", "postgresql://sentinel.invalid/db")
-    environment = generator._environment_snapshot()
+    redaction_key = os.urandom(32)
+    environment = _redacted_environment_snapshot(redaction_key)
     shared = _shared_log_state()
     log_path = http_log_module.LOG_PATH
     producer_paths = list(generator.build())
@@ -286,7 +338,7 @@ def test_schema_failure_restores_environment_module_state_and_files(monkeypatch)
     monkeypatch.setattr(generator.Draft202012Validator, "validate", invalid)
     with pytest.raises(ValidationError, match="INJECTED_SCHEMA_FAILURE"):
         generator.build()
-    assert generator._environment_snapshot() == environment
+    assert _redacted_environment_snapshot(redaction_key) == environment
     assert http_log_module.LOG_PATH is log_path
     assert _shared_log_state() == shared
     assert _bytes_and_mtimes(producer_paths) == producer
@@ -296,7 +348,8 @@ def test_schema_failure_restores_environment_module_state_and_files(monkeypatch)
 def test_check_mode_drift_restores_environment_module_state_and_files(monkeypatch) -> None:
     monkeypatch.setenv("HD_API_BASE_URL", "https://vendor.invalid/v2")
     monkeypatch.setenv("HD_API_KEY", "sentinel-api-key")
-    environment = generator._environment_snapshot()
+    redaction_key = os.urandom(32)
+    environment = _redacted_environment_snapshot(redaction_key)
     shared = _shared_log_state()
     log_path = http_log_module.LOG_PATH
     governed = _governed_state()
@@ -307,7 +360,7 @@ def test_check_mode_drift_restores_environment_module_state_and_files(monkeypatc
     monkeypatch.setattr(generator, "write_or_check", stale)
     with pytest.raises(SystemExit, match="STALE:injected-check-drift"):
         generator.run(check=True)
-    assert generator._environment_snapshot() == environment
+    assert _redacted_environment_snapshot(redaction_key) == environment
     assert http_log_module.LOG_PATH is log_path
     assert _shared_log_state() == shared
     assert _governed_state() == governed
@@ -318,7 +371,8 @@ def test_write_failure_rolls_back_all_producer_owned_files(monkeypatch) -> None:
     before = _bytes_and_mtimes(paths)
     shared = _shared_log_state()
     governed = _governed_state()
-    environment = generator._environment_snapshot()
+    redaction_key = os.urandom(32)
+    environment = _redacted_environment_snapshot(redaction_key)
     stages = _stage_inventory()
     actual_replace = generator.os.replace
     calls = 0
@@ -336,7 +390,7 @@ def test_write_failure_rolls_back_all_producer_owned_files(monkeypatch) -> None:
     assert _bytes_and_mtimes(paths) == before
     assert _shared_log_state() == shared
     assert _governed_state() == governed
-    assert generator._environment_snapshot() == environment
+    assert _redacted_environment_snapshot(redaction_key) == environment
     assert _stage_inventory() == stages
 
 
