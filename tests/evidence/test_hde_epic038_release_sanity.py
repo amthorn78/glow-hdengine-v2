@@ -46,6 +46,29 @@ def test_pass_requires_every_stage_and_log_has_one_lf(tmp_path, monkeypatch):
     assert data.count(b"summary:PASS") == 1
 
 
+def test_canonical_pass_is_written_before_finalizer_and_not_rewritten(tmp_path, monkeypatch):
+    steps = [sanity.SanityStep("final", ["seal"])]
+    log = tmp_path / "sanity.log"
+    observed_during_finalizer = []
+    writes = []
+    original_write = sanity._write_log
+    def write(path, results, first_failure, summary):
+        writes.append((tuple(results), first_failure, summary))
+        return original_write(path, results, first_failure, summary)
+    def run(command):
+        observed_during_finalizer.append(log.read_bytes())
+        return _result()
+    monkeypatch.setattr(sanity, "SANITY_LOG", log)
+    monkeypatch.setattr(sanity, "default_steps", lambda: steps)
+    monkeypatch.setattr(sanity, "_write_log", write)
+    monkeypatch.setattr(sanity, "_run_command", run)
+    assert sanity.run_pipeline(log_path=log) == 0
+    expected = sanity._render_log([("final", "OK")], "NONE", "PASS")
+    assert observed_during_finalizer == [expected]
+    assert log.read_bytes() == expected
+    assert writes == [((("final", "OK"),), "NONE", "PASS")]
+
+
 def test_canonical_failure_bytes_are_rebound(tmp_path, monkeypatch):
     steps = [sanity.SanityStep("late", ["false"])]
     log = tmp_path / "sanity.log"
