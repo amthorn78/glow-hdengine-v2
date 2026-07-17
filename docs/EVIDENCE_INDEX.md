@@ -119,7 +119,7 @@
 
 ## Close-pack and acceptance bindings
 * Close-pack artifacts are complete: `audit/EPIC-022_MANIFEST.json`, `audit/EPIC-022_close_report.md`, `audit/qa/hde-epic022/token_evidence_matrix.md`, `docs/acceptance_map_epic022.json`.
-* Env pins and current sanity pipeline authority: `audit/gates/determinism/env_pins.log` (+ `.path_proof.txt`), `audit/gates/sanity_pipeline/sanity_pipeline.log` (+ `.path_proof.txt`). The updater keeps `artifacts/sanity/sanity.log` as a byte-identical, non-authoritative compatibility mirror for historical close-pack bindings.
+* Env pins and current sanity pipeline authority: `audit/gates/determinism/env_pins.log` (+ `.path_proof.txt`), `audit/gates/sanity_pipeline/sanity_pipeline.log` (+ `.path_proof.txt`). `artifacts/sanity/sanity.log` remains only as historical, unbound close-pack material and is not refreshed.
 
 ## CLI stream discipline and showcompat capture (D2)
 * Deterministic capture generator: `tools/cli/generate_showcompat_artifacts.py`
@@ -153,7 +153,7 @@
 * `artifacts/registry/registry_report.json.path_proof.txt`
 * `audit/gates/sanity_pipeline/sanity_pipeline.log`
 * `audit/gates/sanity_pipeline/sanity_pipeline.log.path_proof.txt`
-* Legacy compatibility only: `artifacts/sanity/sanity.log` (+ `.path_proof.txt`) is synchronized from the canonical log and is not indexed as `sanity.pipeline.log`.
+* Historical material only: `artifacts/sanity/sanity.log` (+ `.path_proof.txt`) is not refreshed and is not indexed as `sanity.pipeline.log`.
 * Evidence Index + sentinel: `docs/evidence/INDEX.json`, `docs/evidence/INDEX.sha256`
 * Machine mirror: `artifacts/evidence_index.jsonl`
 
