@@ -69,6 +69,21 @@ def test_canonical_pass_is_written_before_finalizer_and_not_rewritten(tmp_path, 
     assert writes == [((("final", "OK"),), "NONE", "PASS")]
 
 
+def test_relative_canonical_log_path_uses_the_sealing_path(tmp_path, monkeypatch):
+    relative = Path("audit/gates/sanity_pipeline/sanity_pipeline.log")
+    canonical = tmp_path / relative
+    steps = [sanity.SanityStep("final", ["seal"])]
+    observed = []
+    monkeypatch.setattr(sanity, "ROOT", tmp_path)
+    monkeypatch.setattr(sanity, "SANITY_LOG", canonical)
+    monkeypatch.setattr(sanity, "default_steps", lambda: steps)
+    monkeypatch.setattr(sanity, "_run_command", lambda command: observed.append(canonical.read_bytes()) or _result())
+    assert sanity.run_pipeline(log_path=relative) == 0
+    expected = sanity._render_log([("final", "OK")], "NONE", "PASS")
+    assert observed == [expected]
+    assert canonical.read_bytes() == expected
+
+
 def test_canonical_failure_bytes_are_rebound(tmp_path, monkeypatch):
     steps = [sanity.SanityStep("late", ["false"])]
     log = tmp_path / "sanity.log"
@@ -277,6 +292,26 @@ def test_ops01_bridge_primary_failures_are_rejected(tmp_path, mutation):
         sanity.validate_ops_packages(root)
 
 
+@pytest.mark.parametrize("package,mutation", [
+    ("ops-01", "open-rails"),
+    ("ops-01", "production-env"),
+    ("ops-02", "closed-rails"),
+    ("ops-02", "production-env"),
+])
+def test_ops_execution_rails_are_derived_from_env_presence(tmp_path, package, mutation):
+    root = _packet_copy(tmp_path); packet = root / f"audit/ops/hde-epic038/{package}"
+    path = packet / "env_presence.json"; value = json.loads(path.read_text())
+    if package == "ops-01":
+        if mutation == "open-rails": value["execution_rails"]["db_posture_capture"]["ALLOW_NETWORK"] = "1"
+        else: value["environment_presence"]["APP_ENV"] = "SET:prod"
+    else:
+        if mutation == "closed-rails": value["environment_presence"]["SAFE_MODE"] = "1"
+        else: value["environment_presence"]["APP_ENV"] = "SET:prod"
+    _write_json_and_refresh(packet, path.name, value)
+    with pytest.raises(ValueError, match="env_presence"):
+        sanity.validate_ops_packages(root)
+
+
 def test_unavailable_provider_row_is_not_pass(tmp_path):
     root = _packet_copy(tmp_path); packet = root / "audit/ops/hde-epic038/ops-01"
     path = packet / "provider_parity.proof.json"; value = json.loads(path.read_text())
@@ -363,6 +398,36 @@ def test_ops02_summary_predicates_are_derived_from_primary_evidence(tmp_path, pa
     path = packet / path_name; value = json.loads(path.read_text()); mutate(value)
     path.write_text(json.dumps(value, separators=(",", ":")) + "\n"); _refresh_ledger(packet, path.name)
     with pytest.raises(ValueError, match=match):
+        sanity.validate_ops_packages(root)
+
+
+@pytest.mark.parametrize("source", ["request", "read-back"])
+def test_ops02_identity_must_agree_across_request_summary_and_read_back(tmp_path, source):
+    root = _packet_copy(tmp_path); packet = root / "audit/ops/hde-epic038/ops-02"
+    if source == "request":
+        path = packet / "request_summary.json"; value = json.loads(path.read_text())
+        value["input_fingerprint"] = "0" * 64
+    else:
+        path = packet / "read_back_summary.json"; value = json.loads(path.read_text())
+        value["synthetic_user_id"] = "00000000-0000-4000-8000-000000000000"
+    _write_json_and_refresh(packet, path.name, value)
+    with pytest.raises(ValueError, match="identity disagreement"):
+        sanity.validate_ops_packages(root)
+
+
+@pytest.mark.parametrize("field,value", [
+    ("route", "vendor.hdapi.post:/legacy"),
+    ("resource_path", "legacy"),
+    ("route_family", "legacy_bodygraph"),
+    ("payload_family", "LegacyResponse"),
+    ("geocode_required", False),
+])
+def test_ops02_requires_exact_configured_v2_route_metadata(tmp_path, field, value):
+    root = _packet_copy(tmp_path); packet = root / "audit/ops/hde-epic038/ops-02"
+    path = packet / "request_summary.json"; request = json.loads(path.read_text())
+    request[field] = value
+    _write_json_and_refresh(packet, path.name, request)
+    with pytest.raises(ValueError, match="request_summary"):
         sanity.validate_ops_packages(root)
 
 
