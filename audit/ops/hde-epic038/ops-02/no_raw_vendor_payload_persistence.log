@@ -1,0 +1,1 @@
+PASS stored_keys=bodygraph,person,person_uid payload_posture=adapter_mapped_no_raw_vendor_payload raw_standard_response=false raw_chart_result_envelope=false request_body=false response_body=false secrets=false
