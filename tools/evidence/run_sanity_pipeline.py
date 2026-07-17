@@ -139,7 +139,7 @@ def _read_json(path: Path) -> dict:
 def _validate_secret_safety(packet: Path, required: Sequence[str]) -> None:
     """Reject recognizable secret values and persisted raw request/response data."""
     credential_assignment = re.compile(
-        r"(?i)\b(DATABASE_URL|DB_BRIDGE_URL|HD_API_KEY|GEO_API_KEY|HD_API_BASE_URL|HDAPI_BASE_URL)\s*=\s*[\"']?([^\s,\"'}]+)"
+        r"(?i)\b(DATABASE_URL|DB_BRIDGE_URL|HD_API_KEY|GEO_API_KEY|HD_API_BASE_URL|HDAPI_BASE_URL)\s*[:=]\s*[\"']?([^\s,\"'}]+)"
     )
     credential_json = re.compile(
         r'(?i)"(?:DATABASE_URL|DB_BRIDGE_URL|HD_API_KEY|GEO_API_KEY|HD_API_BASE_URL|HDAPI_BASE_URL)"\s*:\s*"([^"]+)"'
@@ -313,6 +313,51 @@ def _validate_ops02_environment(packet: Path) -> dict:
     ):
         raise ValueError("ops-02: env_presence.json bounded dev open-rails posture failed")
     return route_policy
+
+
+def _validate_ops02_production_refusal(root: Path) -> None:
+    """Corroborate the live OPS claim without substituting fixture evidence for it."""
+    manifest_path = root / "artifacts/bodygraph/v2_mapped_cache/manifest.json"
+    refusal_rel = "artifacts/bodygraph/v2_mapped_cache/closed_rails_refusal.log"
+    refusal_path = root / refusal_rel
+    try:
+        manifest = _read_json(manifest_path)
+        refusal_bytes = refusal_path.read_bytes()
+    except OSError as exc:
+        raise ValueError(
+            "ops-02: production-like refusal lacks independent PR-05 predicate evidence"
+        ) from exc
+    except ValueError as exc:
+        raise ValueError(
+            "ops-02: production-like refusal lacks independent PR-05 predicate evidence"
+        ) from exc
+    predicates = manifest.get("predicates")
+    nonclaims = manifest.get("nonclaims")
+    artifacts = manifest.get("artifacts")
+    refusal_records = (
+        [item for item in artifacts if isinstance(item, dict) and item.get("path") == refusal_rel]
+        if isinstance(artifacts, list)
+        else []
+    )
+    refusal_sha = hashlib.sha256(refusal_bytes).hexdigest()
+    if (
+        manifest.get("schema") != "bodygraph.v2_mapped_cache.manifest.v1"
+        or manifest.get("status") != "PASS"
+        or not isinstance(predicates, dict)
+        or predicates.get("production_like_refused") is not True
+        or predicates.get("closed_rails_zero_io") is not True
+        or not isinstance(nonclaims, list)
+        or "no_ops_execution" not in nonclaims
+        or "no_production_authorization" not in nonclaims
+        or len(refusal_records) != 1
+        or refusal_records[0].get("sha256") != refusal_sha
+        or refusal_records[0].get("size") != len(refusal_bytes)
+        or refusal_bytes
+        != b"PASS code=PROVIDER_REFUSED safe_mode=1 allow_network=0 vendor_calls=0 db_calls=0\n"
+    ):
+        raise ValueError(
+            "ops-02: production-like refusal lacks independent PR-05 predicate evidence"
+        )
 
 
 def _validate_ops01(packet: Path, summary: dict) -> None:
@@ -507,6 +552,7 @@ def _validate_packet(root: Path, package: str, required: Sequence[str]) -> None:
         required_predicates = {"adapter_mapped", "exactly_one_vendor_request", "canonical_write_read_back_equivalence", "idempotent_repeated_write", "mapped_payload_only", "normalized_identity_single_row", "production_like_refused", "explicit_legacy_fallback_preserved", "retained_by_po_decision"}
         if summary.get("status") != "PASS" or summary.get("retention_decision") != "retain" or any(predicates.get(key) is not True for key in required_predicates):
             raise ValueError("ops-02: result_summary.json PASS predicate failed")
+        _validate_ops02_production_refusal(root)
         request = _read_json(packet / "request_summary.json")
         mapped = _read_json(packet / "mapped_output_summary.json")
         read_back = _read_json(packet / "read_back_summary.json")
@@ -605,9 +651,12 @@ def _write_log(path: Path, results: Sequence[tuple[str, str]], first_failure: st
     return data
 
 
-def _rebind_failure_log() -> int:
+def _rebind_failure_log(*, ops_validated: bool) -> int:
     """Bind final FAIL bytes without replaying mandatory stages marked skipped."""
-    result = _run_command(_py("tools/evidence/update_evidence_index.py"))
+    command = _py("tools/evidence/update_evidence_index.py")
+    if not ops_validated:
+        command = (*command, "--exclude-epic038-pr06")
+    result = _run_command(command)
     return result.returncode or 0
 
 
@@ -619,6 +668,7 @@ def run_pipeline(*, log_path: Path = SANITY_LOG, steps: Sequence[SanityStep] | N
     results: list[tuple[str, str]] = []
     failure = "NONE"
     code = 0
+    ops_validated = False
     prospective_pass: bytes | None = None
     for index, step in enumerate(roster):
         # The final updater must bind the final sanity bytes, not an interim
@@ -627,6 +677,8 @@ def run_pipeline(*, log_path: Path = SANITY_LOG, steps: Sequence[SanityStep] | N
         if canonical_run and index == len(roster) - 1 and failure == "NONE":
             prospective_pass = _write_log(log_path, [*results, (step.name, "OK")], "NONE", "PASS")
         code = _run_stage(step)
+        if code == 0 and step.name == STAGE_NAMES[11]:
+            ops_validated = True
         results.append((step.name, "OK" if code == 0 else "FAIL"))
         if code:
             failure = step.name
@@ -650,7 +702,7 @@ def run_pipeline(*, log_path: Path = SANITY_LOG, steps: Sequence[SanityStep] | N
             results[-1] = (results[-1][0], "FAIL")
             failure = results[-1][0]
             _write_log(log_path, results, failure, "FAIL")
-            seal_code = _rebind_failure_log()
+            seal_code = _rebind_failure_log(ops_validated=ops_validated)
             if seal_code:
                 print(f"canonical FAIL evidence finalization failed with exit code {seal_code}", file=sys.stderr)
                 return seal_code
@@ -659,7 +711,7 @@ def run_pipeline(*, log_path: Path = SANITY_LOG, steps: Sequence[SanityStep] | N
 
     _write_log(log_path, results, failure, "PASS" if passed else "FAIL")
     if not passed and canonical_run:
-        seal_code = _rebind_failure_log()
+        seal_code = _rebind_failure_log(ops_validated=ops_validated)
         if seal_code:
             print(f"canonical FAIL evidence finalization failed with exit code {seal_code}", file=sys.stderr)
             return seal_code
