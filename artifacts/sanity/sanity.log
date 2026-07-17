@@ -1,24 +1,24 @@
 run:sanity-pipeline
+pipeline_identity:HDE-EPIC038-PR06-release-sanity
 env:ALLOW_NETWORK=0,LANG=C,LC_ALL=C,SAFE_MODE=1,TZ=UTC
-env_pins: audit/gates/determinism/env_pins.log
-check pytest tests/cli/test_cli_canonical_bytes.py:OK
-check pytest tests/cli/test_showcompat_parity_and_identity.py:OK
-check pytest tests/invariance/test_bytes_identity.py:OK
-check ci/checks/check_env_pins.sh:OK
-check python ci/checks/check_release_identity.sh:OK
-check python tools/evidence/generate_sampler_evidence.py:OK
-check python tools/evidence/generate_engine_core_evidence.py:OK
-check pytest tests/invariance/test_locale_tz.py:OK
-check python tools/cli/serializer_grep_guard.py:OK
-check python tools/cli/emitter_symbol_proof.py:OK
-check pytest tests/cli/test_serializer_guards.py:OK
-check python tools/order/generate_ordering_artifacts.py:OK
-check python tools/evidence/generate_narrative_registry_diff.py:OK
-check python tools/evidence/update_evidence_index.py:OK
-check python tools/order/generate_ordering_artifacts.py --check:OK
-check python tools/evidence/generate_narrative_registry_diff.py --check:OK
-check python tools/evidence/update_evidence_index.py --check:OK
-check python tools/evidence/orientation_demo.py:OK
-check python tools/evidence/orientation_demo.py --check:OK
-check update_evidence_index.post:OK
+env_pins:audit/gates/determinism/env_pins.log
+ops_evidence:validated_existing_bytes_only;not_rerun=true
+check 01 Environment pins:OK
+check 02 Identity and release provenance:OK
+check 03 Canonical JSON:OK
+check 04 Reader-to-CLI, AB-to-BA, two-run, and preimage checks:OK
+check 05 A7 Catalog transport:OK
+check 06 CI rails:OK
+check 07 DB posture:OK
+check 08 BodyGraph policy:OK
+check 09 DB-bridge parity:OK
+check 10 Architecture snapshot:OK
+check 11 Configured-v2 mapped-cache local evidence:OK
+check 12 OPS evidence checksum and summary validation:OK
+check 13 Human Index and Machine Mirror refresh:OK
+check 14 Path validation:OK
+check 15 Mirror schema and hash validation:OK
+check 16 Topology orientation validation:OK
+check 17 Final LF validation:OK
+first_failed_stage:NONE
 summary:PASS
