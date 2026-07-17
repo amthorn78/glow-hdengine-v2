@@ -1,12 +1,17 @@
 #!/usr/bin/env python3
+"""Run the HDE-EPIC038 closed-rails release-sanity chain."""
 from __future__ import annotations
 
 import argparse
+import hashlib
+import json
+import os
+import re
 import subprocess
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, List, Sequence
+from typing import Sequence
 
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
@@ -14,125 +19,191 @@ if str(ROOT) not in sys.path:
 
 from engine.runtime.determinism_env import DETERMINISM_ENV_PINS, ensure_determinism_env
 
+SANITY_LOG = ROOT / "audit/gates/sanity_pipeline/sanity_pipeline.log"
+PIPELINE_ID = "HDE-EPIC038-PR06-release-sanity"
 
-SANITY_LOG = Path("artifacts/sanity/sanity.log")
+OPS_FILES = {
+    "ops-01": ("commands.txt", "stdout.log", "stderr.log", "exit_code.txt", "env_presence.json", "db_posture_summary.json", "provider_parity.proof.json", "bridge_consistency.result.json", "nonclaims.json", "result_summary.json", "checksums.sha256"),
+    "ops-02": ("commands.txt", "stdout.log", "stderr.log", "exit_code.txt", "env_presence.json", "request_summary.json", "mapped_output_summary.json", "read_back_summary.json", "canonical_parity.log", "idempotence.log", "no_raw_vendor_payload_persistence.log", "legacy_fallback_preservation.log", "nonclaims.json", "result_summary.json", "checksums.sha256"),
+}
 
 
 @dataclass(frozen=True)
 class SanityStep:
     name: str
-    command: Sequence[str]
+    commands: tuple[tuple[str, ...], ...]
+
+    def __init__(self, name: str, command: Sequence[str] | Sequence[Sequence[str]]):
+        object.__setattr__(self, "name", name)
+        if command and isinstance(command[0], str):
+            object.__setattr__(self, "commands", (tuple(command),))
+        else:
+            object.__setattr__(self, "commands", tuple(tuple(item) for item in command))
 
 
-def _render_env_line() -> str:
-    ordered = [f"{key}={DETERMINISM_ENV_PINS[key]}" for key in sorted(DETERMINISM_ENV_PINS)]
-    return ",".join(ordered)
+STAGE_NAMES = (
+    "01 Environment pins", "02 Identity and release provenance", "03 Canonical JSON",
+    "04 Reader-to-CLI, AB-to-BA, two-run, and preimage checks", "05 A7 Catalog transport",
+    "06 CI rails", "07 DB posture", "08 BodyGraph policy", "09 DB-bridge parity",
+    "10 Architecture snapshot", "11 Configured-v2 mapped-cache local evidence",
+    "12 OPS evidence checksum and summary validation", "13 Human Index and Machine Mirror refresh",
+    "14 Path validation", "15 Mirror schema and hash validation",
+    "16 Topology orientation validation", "17 Final LF validation",
+)
 
 
-def _write_log(log_path: Path, steps: Iterable[tuple[str, str]], summary: str) -> None:
-    # EPIC023 format: Use "run:" prefix and add env_pins reference
-    lines = [
-        "run:sanity-pipeline",
-        f"env:{_render_env_line()}",
-        "env_pins: audit/gates/determinism/env_pins.log",
+def _py(path: str, *args: str) -> tuple[str, ...]:
+    return (sys.executable, path, *args)
+
+
+def default_steps() -> list[SanityStep]:
+    return [
+        SanityStep(STAGE_NAMES[0], (("ci/checks/check_env_pins.sh",),)),
+        SanityStep(STAGE_NAMES[1], (_py("tools/evidence/generate_identity_provenance.py"), _py("tools/evidence/generate_release_bindings.py"), _py("tools/evidence/generate_env_matrix_snapshot.py"))),
+        SanityStep(STAGE_NAMES[2], (_py("tools/evidence/run_canonical_json_gate.py", "--check-only"),)),
+        SanityStep(STAGE_NAMES[3], (_py("tools/evidence/generate_determinism_gate_proofs.py"), _py("tools/evidence/generate_open_rails_abba_proof.py", "--check"), _py("tools/evidence/generate_open_rails_abba_proof.py", "--live", "--check"))),
+        SanityStep(STAGE_NAMES[4], (_py("tools/evidence/generate_a7_transport_proofs.py"),)),
+        SanityStep(STAGE_NAMES[5], (_py("tools/evidence/generate_rails_gate_evidence.py"), _py("ci/checks/run_rails_job_definitions.py", "ci/jobs/rails_closed_refusal.yml", "ci/jobs/rails_open_conformance.yml", "ci/jobs/logs_keys_only_redaction.yml"))),
+        SanityStep(STAGE_NAMES[6], (_py("tools/evidence/generate_db_runtime_posture.py"),)),
+        SanityStep(STAGE_NAMES[7], (_py("tools/evidence/generate_bodygraph_policy_proofs.py"),)),
+        SanityStep(STAGE_NAMES[8], (_py("tools/evidence/generate_db_bridge_parity.py"),)),
+        SanityStep(STAGE_NAMES[9], (_py("tools/evidence/generate_architecture_snapshot.py"),)),
+        SanityStep(STAGE_NAMES[10], (_py("tools/evidence/generate_v2_mapped_cache_evidence.py"),)),
+        SanityStep(STAGE_NAMES[11], (("__validate_ops__",),)),
+        SanityStep(STAGE_NAMES[12], (_py("tools/evidence/update_evidence_index.py"),)),
+        SanityStep(STAGE_NAMES[13], (_py("tools/evidence/validate_evidence_paths.py"),)),
+        SanityStep(STAGE_NAMES[14], (("ci/checks/check_mirror_schema.sh",), ("bash", "ci/checks/check_evidence_index_hash.sh"))),
+        SanityStep(STAGE_NAMES[15], (_py("tools/evidence/orientation_demo.py"), _py("tools/evidence/update_evidence_index.py"), _py("tools/evidence/orientation_demo.py", "--check"))),
+        SanityStep(STAGE_NAMES[16], (_py("tools/evidence/update_evidence_index.py"), _py("tools/evidence/orientation_demo.py", "--check"), ("ci/checks/check_final_lf.sh",))),
     ]
-    for name, status in steps:
-        lines.append(f"check {name}:{status}")
-    lines.append(f"summary:{summary}")
-    log_text = "\n".join(lines) + "\n"
-    log_path.parent.mkdir(parents=True, exist_ok=True)
-    log_path.write_text(log_text, encoding="utf-8")
+
+
+def _read_json(path: Path) -> dict:
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        raise ValueError(f"{path.relative_to(ROOT)}: invalid JSON") from exc
+    if not isinstance(value, dict):
+        raise ValueError(f"{path.relative_to(ROOT)}: expected JSON object")
+    return value
+
+
+def _validate_packet(root: Path, package: str, required: Sequence[str]) -> None:
+    packet = root / "audit/ops/hde-epic038" / package
+    for name in required:
+        path = packet / name
+        if not path.is_file() or path.stat().st_size == 0:
+            raise ValueError(f"{package}: required file {name} is missing or empty")
+    expected = set(required) - {"checksums.sha256"}
+    rows: dict[str, str] = {}
+    pattern = re.compile(r"^([0-9a-f]{64})  ([A-Za-z0-9_.-]+)$")
+    for line_number, line in enumerate((packet / "checksums.sha256").read_text(encoding="ascii").splitlines(), 1):
+        match = pattern.fullmatch(line)
+        if not match:
+            raise ValueError(f"{package}: checksums.sha256 malformed row {line_number}")
+        digest, name = match.groups()
+        if name in rows:
+            raise ValueError(f"{package}: checksums.sha256 duplicate row for {name}")
+        if name not in expected:
+            raise ValueError(f"{package}: checksums.sha256 unknown or escaping path {name}")
+        rows[name] = digest
+    missing = expected - rows.keys()
+    if missing:
+        raise ValueError(f"{package}: checksums.sha256 missing {sorted(missing)[0]}")
+    for name in sorted(expected):
+        actual = hashlib.sha256((packet / name).read_bytes()).hexdigest()
+        if actual != rows[name]:
+            raise ValueError(f"{package}: checksums.sha256 mismatch for {name}")
+    if (packet / "exit_code.txt").read_text(encoding="utf-8").strip() != "0":
+        raise ValueError(f"{package}: exit_code.txt is not successful")
+
+    summary = _read_json(packet / "result_summary.json")
+    nonclaims = _read_json(packet / "nonclaims.json").get("nonclaims", [])
+    required_nonclaims = {"no_qa_pass_claim", "no_acceptance_token_claim", "no_pf09_status_movement", "no_epic_closeout_claim"}
+    if not required_nonclaims.issubset(nonclaims):
+        raise ValueError(f"{package}: nonclaims.json is incomplete")
+    if package == "ops-01":
+        observations = summary.get("observations", {})
+        if summary.get("ops_observation_status") != "PASS" or observations.get("db_posture") != "PASS" or observations.get("bridge_consistency") != "PASS":
+            raise ValueError("ops-01: result_summary.json PASS predicates failed")
+        parity = _read_json(packet / "provider_parity.proof.json")
+        rows = parity.get("capabilities", [])
+        if not rows or any(row.get("parity") != "match" or row.get("direct", {}).get("status") != "ok" or row.get("bridge", {}).get("status") != "ok" for row in rows):
+            raise ValueError("ops-01: provider_parity.proof.json contains unavailable, errored, or unmatched claimed row")
+        if observations.get("claimed_rows") != len(rows) or observations.get("matched_rows") != len(rows):
+            raise ValueError("ops-01: result_summary.json claimed parity row counts failed")
+    else:
+        predicates = summary.get("predicates", {})
+        required_predicates = {"adapter_mapped", "exactly_one_vendor_request", "canonical_write_read_back_equivalence", "idempotent_repeated_write", "mapped_payload_only", "normalized_identity_single_row", "production_like_refused", "explicit_legacy_fallback_preserved", "retained_by_po_decision"}
+        if summary.get("status") != "PASS" or summary.get("retention_decision") != "retain" or any(predicates.get(key) is not True for key in required_predicates):
+            raise ValueError("ops-02: result_summary.json PASS predicate failed")
+
+
+def validate_ops_packages(root: Path = ROOT) -> None:
+    for package, required in OPS_FILES.items():
+        _validate_packet(root, package, required)
 
 
 def _run_command(command: Sequence[str]) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(command, capture_output=True, text=True)
+    env = os.environ.copy()
+    env.update(DETERMINISM_ENV_PINS)
+    if any(item.endswith("generate_a7_transport_proofs.py") for item in command):
+        env["HDE_WRITE_A7_PROOFS"] = "1"
+    return subprocess.run(command, cwd=ROOT, env=env, capture_output=True, text=True)
 
 
-def default_steps() -> List[SanityStep]:
-    return [
-        SanityStep("pytest tests/cli/test_cli_canonical_bytes.py", ["python", "-m", "pytest", "tests/cli/test_cli_canonical_bytes.py"]),
-        SanityStep("pytest tests/cli/test_showcompat_parity_and_identity.py", ["python", "-m", "pytest", "tests/cli/test_showcompat_parity_and_identity.py"]),
-        SanityStep("pytest tests/invariance/test_bytes_identity.py", ["python", "-m", "pytest", "tests/invariance/test_bytes_identity.py"]),
-        SanityStep("ci/checks/check_env_pins.sh", ["ci/checks/check_env_pins.sh"]),
-        SanityStep("python ci/checks/check_release_identity.sh", ["python", "ci/checks/check_release_identity.sh"]),
-        SanityStep("python tools/evidence/generate_sampler_evidence.py", ["python", "tools/evidence/generate_sampler_evidence.py"]),
-        SanityStep("python tools/evidence/generate_engine_core_evidence.py", ["python", "tools/evidence/generate_engine_core_evidence.py"]),
-        SanityStep("pytest tests/invariance/test_locale_tz.py", ["python", "-m", "pytest", "tests/invariance/test_locale_tz.py"]),
-        SanityStep("python tools/cli/serializer_grep_guard.py", ["python", "tools/cli/serializer_grep_guard.py"]),
-        SanityStep("python tools/cli/emitter_symbol_proof.py", ["python", "tools/cli/emitter_symbol_proof.py"]),
-        SanityStep("pytest tests/cli/test_serializer_guards.py", ["python", "-m", "pytest", "tests/cli/test_serializer_guards.py"]),
-        SanityStep("python tools/order/generate_ordering_artifacts.py", ["python", "tools/order/generate_ordering_artifacts.py"]),
-        SanityStep("python tools/evidence/generate_narrative_registry_diff.py", ["python", "tools/evidence/generate_narrative_registry_diff.py"]),
-        SanityStep("python tools/evidence/update_evidence_index.py", ["python", "tools/evidence/update_evidence_index.py"]),
-        SanityStep("python tools/order/generate_ordering_artifacts.py --check", ["python", "tools/order/generate_ordering_artifacts.py", "--check"]),
-        SanityStep("python tools/evidence/generate_narrative_registry_diff.py --check", ["python", "tools/evidence/generate_narrative_registry_diff.py", "--check"]),
-        SanityStep("python tools/evidence/update_evidence_index.py --check", ["python", "tools/evidence/update_evidence_index.py", "--check"]),
-        SanityStep("python tools/evidence/orientation_demo.py", ["python", "tools/evidence/orientation_demo.py"]),
-        SanityStep("python tools/evidence/orientation_demo.py --check", ["python", "tools/evidence/orientation_demo.py", "--check"]),
-    ]
+def _run_stage(step: SanityStep) -> int:
+    for command in step.commands:
+        if command == ("__validate_ops__",):
+            try:
+                validate_ops_packages()
+            except ValueError as exc:
+                print(str(exc), file=sys.stderr)
+                return 1
+        else:
+            result = _run_command(command)
+            if result.returncode:
+                return result.returncode or 1
+    return 0
 
 
-def _run_post_index_refresh() -> str:
-    """Refresh the evidence index after writing the sanity log."""
-
-    try:
-        from tools.evidence import update_evidence_index
-
-        update_evidence_index.main([])
-    except SystemExit as exc:  # pragma: no cover - defensive
-        return "FAIL" if exc.code else "OK"
-    except Exception:  # pragma: no cover - defensive
-        return "FAIL"
-    return "OK"
+def _write_log(path: Path, results: Sequence[tuple[str, str]], first_failure: str, summary: str) -> None:
+    lines = [f"pipeline:{PIPELINE_ID}", "environment:" + ",".join(f"{key}={DETERMINISM_ENV_PINS[key]}" for key in sorted(DETERMINISM_ENV_PINS)), "ops_evidence:validated_existing_bytes_only;not_rerun=true"]
+    lines.extend(f"stage:{name};status={status}" for name, status in results)
+    lines.extend((f"first_failed_stage:{first_failure}", f"summary:{summary}"))
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(("\n".join(lines) + "\n").encode("utf-8"))
 
 
-def run_pipeline(
-    *,
-    log_path: Path = SANITY_LOG,
-    steps: Sequence[SanityStep] | None = None,
-    refresh_index: bool = True,
-) -> int:
+def run_pipeline(*, log_path: Path = SANITY_LOG, steps: Sequence[SanityStep] | None = None, refresh_index: bool = True) -> int:
     ensure_determinism_env()
-
-    resolved_steps = list(steps) if steps is not None else default_steps()
+    roster = list(default_steps() if steps is None else steps)
     results: list[tuple[str, str]] = []
-    exit_code = 0
-
-    for step in resolved_steps:
-        proc = _run_command(step.command)
-        status = "OK" if proc.returncode == 0 else "FAIL"
-        results.append((step.name, status))
-        if status != "OK":
-            exit_code = proc.returncode or 1
+    failure = "NONE"
+    code = 0
+    for index, step in enumerate(roster):
+        # The final updater must bind the final sanity bytes, not an interim
+        # version.  Render the prospective PASS log before that updater runs;
+        # the normal final render below is byte-identical on success.
+        if log_path == SANITY_LOG and index == len(roster) - 1 and not failure:
+            _write_log(log_path, [*results, (step.name, "OK")], "NONE", "PASS")
+        code = _run_stage(step)
+        results.append((step.name, "OK" if code == 0 else "FAIL"))
+        if code:
+            failure = step.name
+            results.extend((later.name, f"NOT_EXECUTED_EARLIER_FAILURE:{step.name}") for later in roster[index + 1:])
             break
-
-    # Write the initial log before refreshing the index so the refresh uses the
-    # artifacts from this run instead of the previous one.
-    summary = "PASS" if exit_code == 0 else "FAIL"
-    _write_log(log_path, results, summary)
-
-    post_index_status: str | None = None
-    if refresh_index and log_path == SANITY_LOG:
-        post_index_status = _run_post_index_refresh()
-        results.append(("update_evidence_index.post", post_index_status))
-        if post_index_status != "OK" and exit_code == 0:
-            exit_code = 1
-        summary = "PASS" if exit_code == 0 else "FAIL"
-        _write_log(log_path, results, summary)
-        _run_post_index_refresh()
-    return exit_code
+    passed = code == 0 and len(results) == len(roster) and all(status == "OK" for _, status in results)
+    _write_log(log_path, results, failure, "PASS" if passed else "FAIL")
+    return 0 if passed else (code or 1)
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Run the closed-rails sanity pipeline")
-    parser.add_argument("--log-path", type=Path, default=SANITY_LOG, help="sanity log destination")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--log-path", type=Path, default=SANITY_LOG)
     args = parser.parse_args(argv)
-
-    try:
-        return run_pipeline(log_path=args.log_path)
-    except Exception as exc:  # noqa: BLE001
-        raise SystemExit(str(exc)) from exc
+    return run_pipeline(log_path=args.log_path)
 
 
-if __name__ == "__main__":  # pragma: no cover - CLI entrypoint
+if __name__ == "__main__":
     raise SystemExit(main())

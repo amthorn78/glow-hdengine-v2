@@ -1,0 +1,5 @@
+path: audit/ops/hde-epic038/ops-02/no_raw_vendor_payload_persistence.log
+size_bytes: 211
+sha256: e9024baa8721a2f79cc23ae4bb5cc696c4ff5fd94d2c8c816ca6ec4a00813dad
+mtime_utc: 2026-07-17T18:53:07Z
+produced_at_utc: 2026-07-16T19:04:52Z

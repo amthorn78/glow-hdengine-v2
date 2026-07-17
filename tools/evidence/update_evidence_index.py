@@ -41,7 +41,7 @@ BASELINE_ENTRIES: list[dict[str, object]] = [
     },
     {
         "artifact_key": "sanity.pipeline.log",
-        "discovered_physical_path": "artifacts/sanity/sanity.log",
+        "discovered_physical_path": "audit/gates/sanity_pipeline/sanity_pipeline.log",
         "record_type": "sanity_log",
         "schema_version": "1.0",
     },
@@ -2532,6 +2532,14 @@ EPIC038_PR05_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {"artifact_key": "epic038.pr05.v2_mapped_cache.manifest_schema", "discovered_physical_path": "schemas/bodygraph_v2_mapped_cache_manifest.v1.json", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr05_schema", "schema_version": "1.0"},
 ]
 
+EPIC038_PR06_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
+    {"artifact_key": f"epic038.pr06.{package.replace('-', '')}.{name.replace('.', '_')}", "discovered_physical_path": f"audit/ops/hde-epic038/{package}/{name}", "epic_id": "HDE-EPIC038", "record_type": "epic038_pr06_ops_evidence", "schema_version": "1.0", "notes": "Retained OPS evidence bound read-only; no QA, acceptance-token, PF09, deployment, or closeout claim"}
+    for package, names in {
+        "ops-01": ("commands.txt", "stdout.log", "stderr.log", "exit_code.txt", "env_presence.json", "db_posture_summary.json", "provider_parity.proof.json", "bridge_consistency.result.json", "nonclaims.json", "result_summary.json", "checksums.sha256"),
+        "ops-02": ("commands.txt", "stdout.log", "stderr.log", "exit_code.txt", "env_presence.json", "request_summary.json", "mapped_output_summary.json", "read_back_summary.json", "canonical_parity.log", "idempotence.log", "no_raw_vendor_payload_persistence.log", "legacy_fallback_preservation.log", "nonclaims.json", "result_summary.json", "checksums.sha256"),
+    }.items() for name in names
+]
+
 A7_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
         "artifact_key": "a7.success_encoding_invariance",
@@ -2998,6 +3006,7 @@ def _load_human_index() -> list[dict[str, object]]:
             *EPIC038_PR03_PRIMARY_ARTIFACTS,
             *EPIC038_PR04_PRIMARY_ARTIFACTS,
             *EPIC038_PR05_PRIMARY_ARTIFACTS,
+            *EPIC038_PR06_PRIMARY_ARTIFACTS,
             *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,

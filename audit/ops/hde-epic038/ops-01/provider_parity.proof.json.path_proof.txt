@@ -1,0 +1,5 @@
+path: audit/ops/hde-epic038/ops-01/provider_parity.proof.json
+size_bytes: 6113
+sha256: 7c072e0f232dc5a8c45fe4972931b1fb01ed8a6ecccfb059a5e0bbd733cc3414
+mtime_utc: 2026-07-17T18:53:07Z
+produced_at_utc: 2026-07-16T19:04:52Z
