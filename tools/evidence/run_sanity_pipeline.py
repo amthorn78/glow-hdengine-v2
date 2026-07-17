@@ -167,8 +167,15 @@ def _validate_secret_safety(packet: Path, required: Sequence[str]) -> None:
         for match in credential_json.finditer(text):
             if match.group(1).lower() not in {"redacted", "<redacted>", "set:redacted", "set", "unset"}:
                 raise ValueError(f"{packet.name}: {name} contains an unredacted credential value")
-        if re.search(r'(?i)"(?:raw_vendor_(?:payload|envelope)|raw_(?:request|response)_body)"\s*:\s*(?!false\b|null\b|"(?:none|redacted)"\b)', text):
-            raise ValueError(f"{packet.name}: {name} contains persisted raw request, response, or vendor data")
+        raw_payload_key = re.compile(
+            r'(?i)"(?:raw_vendor_(?:payload|envelope)|raw_(?:request|response)_body)"\s*:'
+        )
+        safe_raw_value = re.compile(
+            r'(?i)^(?:false|null|"(?:none|redacted)")(?=\s*(?:[,}\]\n]|$))'
+        )
+        for match in raw_payload_key.finditer(text):
+            if not safe_raw_value.match(text[match.end():].lstrip()):
+                raise ValueError(f"{packet.name}: {name} contains persisted raw request, response, or vendor data")
 
 
 def _require_log_predicates(path: Path, required: Sequence[str]) -> None:
@@ -382,6 +389,16 @@ def _validate_packet(root: Path, package: str, required: Sequence[str]) -> None:
         path = packet / name
         if not path.is_file() or path.stat().st_size == 0:
             raise ValueError(f"{package}: required file {name} is missing or empty")
+    try:
+        retained_entries = list(packet.iterdir())
+    except OSError as exc:
+        raise ValueError(f"{package}: packet directory is not readable") from exc
+    retained_files = sorted(entry.name for entry in retained_entries if entry.is_file())
+    _validate_secret_safety(packet, retained_files)
+    allowed_files = set(required) | {f"{name}.path_proof.txt" for name in required}
+    unexpected = sorted(entry.name for entry in retained_entries if entry.name not in allowed_files)
+    if unexpected:
+        raise ValueError(f"{package}: unexpected retained packet entry {unexpected[0]}")
     expected = set(required) - {"checksums.sha256"}
     rows: dict[str, str] = {}
     pattern = re.compile(r"^([0-9a-f]{64})  ([A-Za-z0-9_.-]+)$")
@@ -404,8 +421,6 @@ def _validate_packet(root: Path, package: str, required: Sequence[str]) -> None:
             raise ValueError(f"{package}: checksums.sha256 mismatch for {name}")
     if (packet / "exit_code.txt").read_text(encoding="utf-8").strip() != "0":
         raise ValueError(f"{package}: exit_code.txt is not successful")
-    _validate_secret_safety(packet, required)
-
     summary = _read_json(packet / "result_summary.json")
     nonclaims = _read_json(packet / "nonclaims.json").get("nonclaims", [])
     required_nonclaims = {"no_qa_pass_claim", "no_acceptance_token_claim", "no_pf09_status_movement", "no_epic_closeout_claim"}
@@ -490,12 +505,9 @@ def _write_log(path: Path, results: Sequence[tuple[str, str]], first_failure: st
 
 
 def _rebind_failure_log() -> int:
-    """Bind and validate final FAIL bytes through the canonical finalizer."""
-    for command in _finalization_commands():
-        result = _run_command(command)
-        if result.returncode:
-            return result.returncode or 1
-    return 0
+    """Bind final FAIL bytes without replaying mandatory stages marked skipped."""
+    result = _run_command(_py("tools/evidence/update_evidence_index.py"))
+    return result.returncode or 0
 
 
 def run_pipeline(*, log_path: Path = SANITY_LOG, steps: Sequence[SanityStep] | None = None, refresh_index: bool = True) -> int:
