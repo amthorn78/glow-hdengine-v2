@@ -1,17 +1,105 @@
 from __future__ import annotations
 
+import hashlib
+import http.client
 import json
+import os
 import subprocess
 import sys
+from contextlib import ExitStack
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 from jsonschema import Draft202012Validator, ValidationError
 
+import engine.bodygraph.resolver as resolver_module
+import engine.bodygraph.vendor_client as vendor_client_module
+import engine.db.adapter as db_adapter_module
+import engine.db.providers.bridge_provider as bridge_provider_module
+import engine.db.providers.psycopg_provider as psycopg_provider_module
+import engine.ops.http_log as http_log_module
 from engine.bodygraph.resolver import ResolveBodygraphResult
 from tools.evidence import generate_v2_mapped_cache_evidence as generator
 
 ROOT = Path(__file__).resolve().parents[2]
+RETAINED_RECORD = b'{"at":"2026-07-16T18:26:14.958Z","duration_ms":737.062,"route":"db_bridge.get:/health","status":200}'
+GOVERNED_COMPANIONS = (
+    ROOT / "artifacts/logs/keys_only.sample.jsonl.path_proof.txt",
+    ROOT / "docs/evidence/INDEX.json",
+    ROOT / "docs/evidence/INDEX.sha256",
+    ROOT / "docs/evidence/INDEX.json.path_proof.txt",
+    ROOT / "docs/evidence/INDEX.sha256.path_proof.txt",
+    ROOT / "artifacts/evidence_index.jsonl",
+    ROOT / "artifacts/evidence_index.jsonl.sha256",
+    ROOT / "artifacts/evidence_index.jsonl.path_proof.txt",
+    ROOT / "artifacts/evidence_index.jsonl.sha256.path_proof.txt",
+    ROOT / "audit/gates/topology/orientation_demo.txt",
+    ROOT / "audit/gates/topology/orientation_demo.txt.path_proof.txt",
+    *(ROOT / f"artifacts/bodygraph/v2_mapped_cache/{name}.path_proof.txt" for name in generator.PRIMARY_NAMES),
+    ROOT / "schemas/bodygraph_v2_mapped_cache_transcript.v1.json.path_proof.txt",
+    ROOT / "schemas/bodygraph_v2_mapped_cache_manifest.v1.json.path_proof.txt",
+)
+
+
+def _bytes_and_mtimes(paths) -> dict[Path, tuple[bytes, int]]:
+    return {path: (path.read_bytes(), path.stat().st_mtime_ns) for path in paths}
+
+
+def _governed_state() -> dict[Path, bytes]:
+    return {path: path.read_bytes() for path in GOVERNED_COMPANIONS}
+
+
+def _shared_log_state() -> tuple[bool, bytes | None, str | None]:
+    exists = generator.SHARED_HTTP_LOG.exists()
+    data = generator.SHARED_HTTP_LOG.read_bytes() if exists else None
+    return exists, data, hashlib.sha256(data).hexdigest() if data is not None else None
+
+
+def _repo_inventory() -> set[str]:
+    ignored = {".git", ".venv", "__pycache__", ".pytest_cache"}
+    return {
+        path.relative_to(ROOT).as_posix()
+        for path in ROOT.rglob("*")
+        if path.is_file() and not ignored.intersection(path.relative_to(ROOT).parts)
+    }
+
+
+def _stage_inventory() -> set[str]:
+    return {path.name for path in ROOT.parent.glob("hde-epic038-pr05-*")}
+
+
+def _command_env(**changes: str) -> dict[str, str]:
+    env = dict(os.environ)
+    env.update({"LC_ALL": "C", "LANG": "C", "TZ": "UTC", "SAFE_MODE": "1", "ALLOW_NETWORK": "0", "PYTHONDONTWRITEBYTECODE": "1"})
+    env.update(changes)
+    return env
+
+
+def _forbidden(name: str, calls: dict[str, int]):
+    calls[name] = 0
+
+    def canary(*_args, **_kwargs):
+        calls[name] += 1
+        raise generator.HermeticityViolation(f"TEST_FORBIDDEN_SEAM:{name}")
+
+    return canary
+
+
+def _wrap_build_with_canaries(monkeypatch, targets, observations: dict[str, object]) -> dict[str, int]:
+    actual = generator._build_files
+    calls: dict[str, int] = {}
+
+    def guarded_build(guard, *, force_failure=False):
+        observations["inside_env"] = generator._environment_snapshot()
+        observations["production_canaries"] = dict(guard.attempts)
+        with ExitStack() as stack:
+            for name, owner, attribute in targets:
+                stack.enter_context(patch.object(owner, attribute, _forbidden(name, calls)))
+            return actual(guard, force_failure=force_failure)
+
+    monkeypatch.setattr(generator, "_build_files", guarded_build)
+    return calls
 
 
 def test_exact_primary_inventory_and_canonical_outputs() -> None:
@@ -40,25 +128,262 @@ def test_schema_validation_unknown_keys_and_manifest_bindings() -> None:
     assert manifest["status"] == ("PASS" if all(manifest["predicates"].values()) else "FAIL")
     for binding in manifest["artifacts"] + manifest["schemas"]:
         data = files[ROOT / binding["path"]]
-        import hashlib
         assert binding["sha256"] == hashlib.sha256(data).hexdigest() and binding["size"] == len(data)
 
 
-def test_write_twice_and_check_are_fixed_point_and_nonwriting() -> None:
-    subprocess.run([sys.executable, str(generator.__file__)], cwd=ROOT, check=True)
+def test_shared_primary_remains_byte_identical_for_build_and_real_check() -> None:
+    before = _shared_log_state()
+    original_log_path = http_log_module.LOG_PATH
+    generator.build()
+    assert _shared_log_state() == before
+    assert http_log_module.LOG_PATH is original_log_path
+    result = subprocess.run(
+        [sys.executable, str(generator.__file__), "--check"], cwd=ROOT, env=_command_env(),
+        check=True, capture_output=True, text=True,
+    )
+    assert result.stdout == "V2_MAPPED_CACHE_EVIDENCE_OK\n" and result.stderr == ""
+    assert _shared_log_state() == before
+    assert http_log_module.LOG_PATH is original_log_path
+
+
+def test_ambient_db_configuration_cannot_escape_and_environment_restores(monkeypatch) -> None:
+    for key, value in {
+        "DATABASE_URL": "postgresql://sentinel.invalid/db",
+        "DB_BRIDGE_URL": "https://bridge.invalid",
+        "DB_ALLOW_BRIDGE_IN_PROD": "1",
+        "DB_FORCE_BRIDGE": "1",
+        "SAFE_MODE": "0",
+        "ALLOW_NETWORK": "1",
+        "APP_ENV": "production",
+    }.items():
+        monkeypatch.setenv(key, value)
+    monkeypatch.delenv("ENGINE_ENV", raising=False)
+    caller_env = generator._environment_snapshot()
+    shared = _shared_log_state()
+    observations: dict[str, object] = {}
+    calls = _wrap_build_with_canaries(monkeypatch, (
+        ("dbaccess", resolver_module.DBAccess, "for_current_env"),
+        ("psycopg_ctor", db_adapter_module, "PsycopgProvider"),
+        ("psycopg_connect", psycopg_provider_module.PsycopgProvider, "_connect"),
+        ("bridge_ctor_adapter", db_adapter_module, "BridgeProvider"),
+        ("bridge_ctor_module", bridge_provider_module, "BridgeProvider"),
+        ("bridge_request", bridge_provider_module, "_default_request"),
+        ("bridge_urlopen", bridge_provider_module.urllib.request, "urlopen"),
+        ("bridge_logger", bridge_provider_module, "log_http_call"),
+    ), observations)
+    generator.build()
+    inside = observations["inside_env"]
+    assert all(inside[key] == (True, value) for key, value in generator.DETERMINISM_ENV_PINS.items())
+    assert all(inside[key] == (False, None) for key in generator._CONNECTION_ENV_KEYS)
+    assert calls and set(calls.values()) == {0}
+    assert observations["production_canaries"] and set(observations["production_canaries"].values()) == {0}
+    assert generator._environment_snapshot() == caller_env
+    assert _shared_log_state() == shared
+
+
+def test_ambient_vendor_configuration_cannot_escape_in_build_or_check(monkeypatch) -> None:
+    for key, value in {
+        "HD_API_BASE_URL": "https://vendor.invalid/v2",
+        "HDAPI_BASE_URL": "https://legacy.invalid/v1",
+        "HD_API_KEY": "sentinel-api-key",
+        "GEO_API_KEY": "sentinel-geo-key",
+        "SAFE_MODE": "0",
+        "ALLOW_NETWORK": "1",
+    }.items():
+        monkeypatch.setenv(key, value)
+    caller_env = generator._environment_snapshot()
+    shared = _shared_log_state()
+    observations: dict[str, object] = {}
+    calls = _wrap_build_with_canaries(monkeypatch, (
+        ("vendor_from_env", resolver_module.HdApiClient, "from_env"),
+        ("vendor_fetch", vendor_client_module.HdApiClient, "fetch"),
+        ("vendor_request", vendor_client_module.HdApiClient, "_default_request"),
+        ("vendor_opener", vendor_client_module.urlrequest, "build_opener"),
+        ("dns", vendor_client_module.socket, "getaddrinfo"),
+        ("socket", vendor_client_module.socket, "create_connection"),
+        ("http", http.client.HTTPConnection, "connect"),
+        ("https", http.client.HTTPSConnection, "connect"),
+    ), observations)
+    generator.build()
+    assert calls and set(calls.values()) == {0}
+    assert generator._environment_snapshot() == caller_env
+    result = subprocess.run(
+        [sys.executable, str(generator.__file__), "--check"], cwd=ROOT,
+        env=_command_env(
+            HD_API_BASE_URL="https://vendor.invalid/v2", HDAPI_BASE_URL="https://legacy.invalid/v1",
+            HD_API_KEY="sentinel-api-key", GEO_API_KEY="sentinel-geo-key", SAFE_MODE="0", ALLOW_NETWORK="1",
+        ), check=True, capture_output=True, text=True,
+    )
+    assert result.stdout == "V2_MAPPED_CACHE_EVIDENCE_OK\n" and result.stderr == ""
+    assert _shared_log_state() == shared
+
+
+@pytest.mark.parametrize("check", [False, True])
+def test_bridge_logger_invocation_fails_closed_without_being_reached(check) -> None:
+    calls: dict[str, int] = {}
+    shared = _shared_log_state()
+    with generator._hermetic_execution() as guard:
+        with patch.object(bridge_provider_module, "log_http_call", _forbidden("logger", calls)):
+            generator.write_or_check(generator._build_files(guard), check)
+    assert calls == {"logger": 0}
+    assert _shared_log_state() == shared
+
+
+@pytest.mark.parametrize("check", [False, True])
+def test_lower_bridge_transport_invocation_fails_closed_without_being_reached(check) -> None:
+    calls: dict[str, int] = {}
+    shared = _shared_log_state()
+    with generator._hermetic_execution() as guard:
+        with patch.object(bridge_provider_module.urllib.request, "urlopen", _forbidden("urlopen", calls)):
+            generator.write_or_check(generator._build_files(guard), check)
+    assert calls == {"urlopen": 0}
+    assert _shared_log_state() == shared
+
+
+def test_injected_exception_restores_environment_module_state_and_files(monkeypatch) -> None:
+    for index, key in enumerate(generator.HERMETIC_ENV_KEYS):
+        if index % 2:
+            monkeypatch.setenv(key, f"caller-value-{index}")
+        else:
+            monkeypatch.delenv(key, raising=False)
+    env_before = generator._environment_snapshot()
+    log_before = _shared_log_state()
+    log_path_before = http_log_module.LOG_PATH
+    producer_paths = list(generator.build())
+    producer_before = _bytes_and_mtimes(producer_paths)
+    governed_before = _governed_state()
+    inventory_before = _repo_inventory()
+
+    def injected(_guard):
+        http_log_module.LOG_PATH = Path("artifacts/logs/forbidden-replacement.jsonl")
+        raise RuntimeError("INJECTED_FIXTURE_FAILURE")
+
+    monkeypatch.setattr(generator, "_exercise_resolver_policy", injected)
+    with pytest.raises(RuntimeError, match="INJECTED_FIXTURE_FAILURE"):
+        generator.build()
+    assert generator._environment_snapshot() == env_before
+    assert http_log_module.LOG_PATH is log_path_before
+    assert _shared_log_state() == log_before
+    assert _bytes_and_mtimes(producer_paths) == producer_before
+    assert _governed_state() == governed_before
+    assert _repo_inventory() == inventory_before
+
+
+def test_schema_failure_restores_environment_module_state_and_files(monkeypatch) -> None:
+    monkeypatch.setenv("SAFE_MODE", "0")
+    monkeypatch.setenv("ALLOW_NETWORK", "1")
+    monkeypatch.setenv("DATABASE_URL", "postgresql://sentinel.invalid/db")
+    environment = generator._environment_snapshot()
+    shared = _shared_log_state()
+    log_path = http_log_module.LOG_PATH
+    producer_paths = list(generator.build())
+    producer = _bytes_and_mtimes(producer_paths)
+    governed = _governed_state()
+
+    def invalid(*_args, **_kwargs):
+        raise ValidationError("INJECTED_SCHEMA_FAILURE")
+
+    monkeypatch.setattr(generator.Draft202012Validator, "validate", invalid)
+    with pytest.raises(ValidationError, match="INJECTED_SCHEMA_FAILURE"):
+        generator.build()
+    assert generator._environment_snapshot() == environment
+    assert http_log_module.LOG_PATH is log_path
+    assert _shared_log_state() == shared
+    assert _bytes_and_mtimes(producer_paths) == producer
+    assert _governed_state() == governed
+
+
+def test_check_mode_drift_restores_environment_module_state_and_files(monkeypatch) -> None:
+    monkeypatch.setenv("HD_API_BASE_URL", "https://vendor.invalid/v2")
+    monkeypatch.setenv("HD_API_KEY", "sentinel-api-key")
+    environment = generator._environment_snapshot()
+    shared = _shared_log_state()
+    log_path = http_log_module.LOG_PATH
+    governed = _governed_state()
+
+    def stale(_files, _check):
+        raise SystemExit("STALE:injected-check-drift")
+
+    monkeypatch.setattr(generator, "write_or_check", stale)
+    with pytest.raises(SystemExit, match="STALE:injected-check-drift"):
+        generator.run(check=True)
+    assert generator._environment_snapshot() == environment
+    assert http_log_module.LOG_PATH is log_path
+    assert _shared_log_state() == shared
+    assert _governed_state() == governed
+
+
+def test_write_failure_rolls_back_all_producer_owned_files(monkeypatch) -> None:
     paths = list(generator.build())
-    first = {path:(path.read_bytes(),path.stat().st_mtime_ns) for path in paths}
-    subprocess.run([sys.executable, str(generator.__file__)], cwd=ROOT, check=True)
-    assert {path:path.read_bytes() for path in paths} == {path:value[0] for path,value in first.items()}
-    before = {path:(path.read_bytes(),path.stat().st_mtime_ns) for path in paths}
-    subprocess.run([sys.executable, str(generator.__file__), "--check"], cwd=ROOT, check=True)
-    assert before == {path:(path.read_bytes(),path.stat().st_mtime_ns) for path in paths}
+    before = _bytes_and_mtimes(paths)
+    shared = _shared_log_state()
+    governed = _governed_state()
+    environment = generator._environment_snapshot()
+    stages = _stage_inventory()
+    actual_replace = generator.os.replace
+    calls = 0
+
+    def fail_second(source, destination):
+        nonlocal calls
+        calls += 1
+        if calls == 2:
+            raise OSError("INJECTED_WRITE_FAILURE")
+        return actual_replace(source, destination)
+
+    monkeypatch.setattr(generator.os, "replace", fail_second)
+    with pytest.raises(OSError, match="INJECTED_WRITE_FAILURE"):
+        generator.run(check=False)
+    assert _bytes_and_mtimes(paths) == before
+    assert _shared_log_state() == shared
+    assert _governed_state() == governed
+    assert generator._environment_snapshot() == environment
+    assert _stage_inventory() == stages
+
+
+def test_command_fixed_point_check_nonmutation_and_no_repository_residue() -> None:
+    shared = _shared_log_state()
+    governed = _governed_state()
+    inventory = _repo_inventory()
+    command = [sys.executable, str(generator.__file__)]
+    first_result = subprocess.run(command, cwd=ROOT, env=_command_env(), check=True, capture_output=True, text=True)
+    first = {path: path.read_bytes() for path in generator.build()}
+    second_result = subprocess.run(command, cwd=ROOT, env=_command_env(), check=True, capture_output=True, text=True)
+    second = {path: path.read_bytes() for path in first}
+    assert first == second
+    before_check = _bytes_and_mtimes(first)
+    check_result = subprocess.run(command + ["--check"], cwd=ROOT, env=_command_env(), check=True, capture_output=True, text=True)
+    assert _bytes_and_mtimes(first) == before_check
+    assert all(result.stdout == "V2_MAPPED_CACHE_EVIDENCE_OK\n" and result.stderr == "" for result in (first_result, second_result, check_result))
+    assert _shared_log_state() == shared
+    assert _governed_state() == governed
+    assert _repo_inventory() == inventory
+
+
+def test_retained_provenance_record_remains_present_exactly_once() -> None:
+    before = generator.SHARED_HTTP_LOG.read_bytes()
+    generator.build()
+    after = generator.SHARED_HTTP_LOG.read_bytes()
+    assert after == before
+    assert after.splitlines().count(RETAINED_RECORD) == 1
+    assert after.splitlines()[-1] == RETAINED_RECORD
+
+
+def test_governed_companions_remain_unchanged() -> None:
+    before = _governed_state()
+    generator.build()
+    subprocess.run(
+        [sys.executable, str(generator.__file__), "--check"], cwd=ROOT, env=_command_env(),
+        check=True, capture_output=True, text=True,
+    )
+    assert _governed_state() == before
 
 
 def test_negative_predicate_fails_before_writes() -> None:
     before = {path:path.read_bytes() for path in generator.build() if path.exists()}
+    shared = _shared_log_state()
     with pytest.raises(RuntimeError, match="PREDICATE_FAILURE"): generator.build(force_failure=True)
     assert before == {path:path.read_bytes() for path in before}
+    assert _shared_log_state() == shared
 
 
 def test_resolver_regression_cannot_emit_pass_evidence(monkeypatch) -> None:

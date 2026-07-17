@@ -4,13 +4,17 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import http.client
 import json
 import os
 import shutil
 import sys
 import tempfile
+import time
+from contextlib import ExitStack, contextmanager
+from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any, Iterator, Mapping
 from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -18,9 +22,16 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from jsonschema import Draft202012Validator
+import engine.bodygraph.resolver as resolver_module
+import engine.bodygraph.vendor_client as vendor_client_module
+import engine.db.adapter as db_adapter_module
+import engine.db.providers.bridge_provider as bridge_provider_module
+import engine.db.providers.psycopg_provider as psycopg_provider_module
+import engine.ops.http_log as http_log_module
 from engine.bodygraph.mapped_cache import persist_mapped_bodygraph
 from engine.bodygraph.ingest import IngestOutcome
 from engine.bodygraph.resolver import resolve_bodygraph
+from engine.runtime.determinism_env import DETERMINISM_ENV_PINS
 from engine.serializer.canon import sercanon
 
 OUT = ROOT / "artifacts/bodygraph/v2_mapped_cache"
@@ -40,6 +51,129 @@ PREDICATE_KEYS = (
     "idempotent_repeated_write", "missing_upsert_refused", "no_raw_or_secret_persistence",
     "normalized_identity_single_row", "production_like_refused",
 )
+SHARED_HTTP_LOG = ROOT / "artifacts/logs/keys_only.sample.jsonl"
+_CONNECTION_ENV_KEYS = (
+    "APP_ENV",
+    "ENGINE_ENV",
+    "DATABASE_URL",
+    "DB_BRIDGE_URL",
+    "DB_ALLOW_BRIDGE_IN_PROD",
+    "DB_FORCE_BRIDGE",
+    "DB_FORCE_PG",
+    "HD_API_BASE_URL",
+    "HDAPI_BASE_URL",
+    "HD_API_KEY",
+    "GEO_API_KEY",
+)
+HERMETIC_ENV_KEYS = tuple((*DETERMINISM_ENV_PINS, *_CONNECTION_ENV_KEYS))
+
+
+class HermeticityViolation(AssertionError):
+    """Raised when fixture-backed evidence reaches a forbidden external seam."""
+
+
+@dataclass
+class HermeticGuard:
+    attempts: dict[str, int] = field(default_factory=dict)
+
+    def forbid(self, seam: str):
+        self.attempts.setdefault(seam, 0)
+
+        def _canary(*_args, **_kwargs):
+            self.attempts[seam] += 1
+            raise HermeticityViolation(f"FORBIDDEN_SEAM:{seam}")
+
+        return _canary
+
+
+def _environment_snapshot() -> dict[str, tuple[bool, str | None]]:
+    return {key: (key in os.environ, os.environ.get(key)) for key in HERMETIC_ENV_KEYS}
+
+
+def _set_process_timezone() -> None:
+    if hasattr(time, "tzset"):
+        time.tzset()
+
+
+def _apply_hermetic_environment() -> None:
+    for key in HERMETIC_ENV_KEYS:
+        os.environ.pop(key, None)
+    os.environ.update(DETERMINISM_ENV_PINS)
+    _set_process_timezone()
+
+
+def _restore_environment(snapshot: Mapping[str, tuple[bool, str | None]]) -> None:
+    for key, (was_present, value) in snapshot.items():
+        if was_present:
+            assert value is not None
+            os.environ[key] = value
+        else:
+            os.environ.pop(key, None)
+    _set_process_timezone()
+
+
+def _shared_log_snapshot() -> tuple[bool, bytes | None, str | None]:
+    exists = SHARED_HTTP_LOG.exists()
+    data = SHARED_HTTP_LOG.read_bytes() if exists else None
+    digest = hashlib.sha256(data).hexdigest() if data is not None else None
+    return exists, data, digest
+
+
+def _assert_shared_log_unchanged(snapshot: tuple[bool, bytes | None, str | None]) -> None:
+    existed, expected_bytes, expected_sha = snapshot
+    if SHARED_HTTP_LOG.exists() != existed:
+        raise HermeticityViolation("SHARED_HTTP_LOG_EXISTENCE_CHANGED")
+    if not existed:
+        return
+    actual = SHARED_HTTP_LOG.read_bytes()
+    if actual != expected_bytes or hashlib.sha256(actual).hexdigest() != expected_sha:
+        raise HermeticityViolation("SHARED_HTTP_LOG_BYTES_CHANGED")
+
+
+@contextmanager
+def _hermetic_execution() -> Iterator[HermeticGuard]:
+    """Bound fixture execution away from ambient providers, transports, and logs."""
+
+    env_snapshot = _environment_snapshot()
+    log_snapshot = _shared_log_snapshot()
+    original_log_path = http_log_module.LOG_PATH
+    original_bridge_logger = bridge_provider_module.log_http_call
+    guard = HermeticGuard()
+    forbidden = {
+        "resolver.DBAccess.for_current_env": (resolver_module.DBAccess, "for_current_env"),
+        "resolver.HdApiClient.from_env": (resolver_module.HdApiClient, "from_env"),
+        "db.adapter.PsycopgProvider": (db_adapter_module, "PsycopgProvider"),
+        "db.psycopg_provider.PsycopgProvider._connect": (psycopg_provider_module.PsycopgProvider, "_connect"),
+        "db.adapter.BridgeProvider": (db_adapter_module, "BridgeProvider"),
+        "db.bridge_provider.BridgeProvider": (bridge_provider_module, "BridgeProvider"),
+        "db.bridge_provider._default_request": (bridge_provider_module, "_default_request"),
+        "db.bridge_provider.urllib.request.urlopen": (bridge_provider_module.urllib.request, "urlopen"),
+        "db.bridge_provider.log_http_call": (bridge_provider_module, "log_http_call"),
+        "vendor.HdApiClient.fetch": (vendor_client_module.HdApiClient, "fetch"),
+        "vendor.HdApiClient._default_request": (vendor_client_module.HdApiClient, "_default_request"),
+        "vendor.urllib.request.build_opener": (vendor_client_module.urlrequest, "build_opener"),
+        "network.socket.create_connection": (vendor_client_module.socket, "create_connection"),
+        "network.socket.getaddrinfo": (vendor_client_module.socket, "getaddrinfo"),
+        "network.http.HTTPConnection.connect": (http.client.HTTPConnection, "connect"),
+        "network.http.HTTPSConnection.connect": (http.client.HTTPSConnection, "connect"),
+    }
+    _apply_hermetic_environment()
+    try:
+        with ExitStack() as stack:
+            for seam, (owner, attribute) in forbidden.items():
+                stack.enter_context(patch.object(owner, attribute, guard.forbid(seam)))
+            yield guard
+    finally:
+        _restore_environment(env_snapshot)
+        http_log_module.LOG_PATH = original_log_path
+        _assert_shared_log_unchanged(log_snapshot)
+        if http_log_module.LOG_PATH is not original_log_path:
+            raise HermeticityViolation("HTTP_LOG_PATH_NOT_RESTORED")
+        if bridge_provider_module.log_http_call is not original_bridge_logger:
+            raise HermeticityViolation("BRIDGE_LOGGER_NOT_RESTORED")
+        attempted = sorted(seam for seam, count in guard.attempts.items() if count)
+        if attempted:
+            raise HermeticityViolation("FORBIDDEN_SEAMS_ATTEMPTED:" + ",".join(attempted))
 
 
 class MemoryDB:
@@ -88,16 +222,8 @@ def _binding(path: str, data: bytes, schema_identity: str | None = None) -> dict
     return value
 
 
-def _exercise_resolver_policy() -> tuple[dict[str, bool], dict[str, int | str | bool]]:
+def _exercise_resolver_policy(guard: HermeticGuard) -> tuple[dict[str, bool], dict[str, int | str | bool]]:
     calls = {"vendor": 0, "db": 0, "legacy": 0}
-
-    def client_forbidden(**_kwargs):
-        calls["vendor"] += 1
-        raise AssertionError("vendor construction was not authorized")
-
-    def db_forbidden(**_kwargs):
-        calls["db"] += 1
-        raise AssertionError("database construction was not authorized")
 
     def legacy_ingest(*_args, **_kwargs):
         calls["legacy"] += 1
@@ -109,26 +235,25 @@ def _exercise_resolver_policy() -> tuple[dict[str, bool], dict[str, int | str | 
         )
 
     base = {"birthdate": "fixture-date", "birthtime": "fixture-time", "location": "fixture-location"}
-    with patch.dict(os.environ, {"APP_ENV": "test"}, clear=False), \
-         patch("engine.bodygraph.resolver.HdApiClient.from_env", client_forbidden), \
-         patch("engine.bodygraph.resolver.DBAccess.for_current_env", db_forbidden):
-        closed = resolve_bodygraph(
-            "00000000-0000-4000-8000-000000000039", source="vendor", upsert=True,
-            dry_run=False, env={"SAFE_MODE": "1", "ALLOW_NETWORK": "0"},
-        )
-        missing_upsert = resolve_bodygraph(
+    closed = resolve_bodygraph(
+        "00000000-0000-4000-8000-000000000039", source="vendor", upsert=True,
+        dry_run=False, env={"SAFE_MODE": "1", "ALLOW_NETWORK": "0"},
+    )
+    missing_upsert = resolve_bodygraph(
+        "00000000-0000-4000-8000-000000000039", source="vendor", upsert=False,
+        dry_run=False, env={"SAFE_MODE": "0", "ALLOW_NETWORK": "1", "APP_ENV": "test", "HD_API_BASE_URL": "https://fixture.invalid/v2"}, **base,
+    )
+    production = resolve_bodygraph(
+        "00000000-0000-4000-8000-000000000039", source="vendor", upsert=True,
+        dry_run=False, env={"SAFE_MODE": "0", "ALLOW_NETWORK": "1", "APP_ENV": "production", "HD_API_BASE_URL": "https://fixture.invalid/v2"}, **base,
+    )
+    with patch("engine.bodygraph.resolver.ingest_vendor_bodygraph", legacy_ingest):
+        legacy = resolve_bodygraph(
             "00000000-0000-4000-8000-000000000039", source="vendor", upsert=False,
-            dry_run=False, env={"SAFE_MODE": "0", "ALLOW_NETWORK": "1", "APP_ENV": "test", "HD_API_BASE_URL": "https://fixture.invalid/v2"}, **base,
+            dry_run=True, env={"SAFE_MODE": "0", "ALLOW_NETWORK": "1", "APP_ENV": "test", "HD_API_BASE_URL": "https://fixture.invalid/v1"}, **base,
         )
-        production = resolve_bodygraph(
-            "00000000-0000-4000-8000-000000000039", source="vendor", upsert=True,
-            dry_run=False, env={"SAFE_MODE": "0", "ALLOW_NETWORK": "1", "APP_ENV": "production", "HD_API_BASE_URL": "https://fixture.invalid/v2"}, **base,
-        )
-        with patch("engine.bodygraph.resolver.ingest_vendor_bodygraph", legacy_ingest):
-            legacy = resolve_bodygraph(
-                "00000000-0000-4000-8000-000000000039", source="vendor", upsert=False,
-                dry_run=True, env={"SAFE_MODE": "0", "ALLOW_NETWORK": "1", "APP_ENV": "test", "HD_API_BASE_URL": "https://fixture.invalid/v1"}, **base,
-            )
+    calls["vendor"] = guard.attempts["resolver.HdApiClient.from_env"]
+    calls["db"] = guard.attempts["resolver.DBAccess.for_current_env"]
     predicates = {
         "closed_rails_zero_io": closed.payload.get("error", {}).get("code") == "PROVIDER_REFUSED" and calls["vendor"] == 0 and calls["db"] == 0,
         "missing_upsert_refused": missing_upsert.payload.get("error", {}).get("code") == "PROVIDER_WRITE_UNSUPPORTED" and calls["vendor"] == 0 and calls["db"] == 0,
@@ -139,7 +264,7 @@ def _exercise_resolver_policy() -> tuple[dict[str, bool], dict[str, int | str | 
     return predicates, posture
 
 
-def build(*, force_failure: bool = False) -> dict[Path, bytes]:
+def _build_files(guard: HermeticGuard, *, force_failure: bool = False) -> dict[Path, bytes]:
     fixture_bytes = FIXTURE.read_bytes(); fixture = json.loads(fixture_bytes)
     cache = {"user_id":"00000000-0000-4000-8000-000000000039","vendor":"hdapi","vendor_version":2,
         "input_fingerprint":fixture["input_fingerprint"],"payload_posture":"adapter_mapped_no_raw_vendor_payload","payload":fixture["payload"]}
@@ -148,7 +273,7 @@ def build(*, force_failure: bool = False) -> dict[Path, bytes]:
     common = {"schema":SCHEMA_ID_TRANSCRIPT,"identity":identity,"safe_payload_keys":["bodygraph","person","person_uid"],"canonical_sha256":first.canonical_sha256,"row_count":len(db.rows),"provider":db.provider_name,"predicates":{"projected_before_persistence":True,"read_back_match":True}}
     write = {**common,"phase":"write","rows_written":first.rows_written}
     read = {**common,"phase":"read_back","rows_written":second.rows_written}
-    resolver_predicates, resolver_posture = _exercise_resolver_policy()
+    resolver_predicates, resolver_posture = _exercise_resolver_policy(guard)
     stored = next(iter(db.rows.values()))
     stored_keys = sorted(json.loads(stored))
     persistence_predicates = {
@@ -179,23 +304,55 @@ def build(*, force_failure: bool = False) -> dict[Path, bytes]:
     return files
 
 
+def build(*, force_failure: bool = False) -> dict[Path, bytes]:
+    with _hermetic_execution() as guard:
+        return _build_files(guard, force_failure=force_failure)
+
+
 def write_or_check(files: Mapping[Path, bytes], check: bool) -> None:
     if check:
         stale = [path.relative_to(ROOT).as_posix() for path,data in files.items() if not path.exists() or path.read_bytes()!=data]
         if stale: raise SystemExit("STALE:" + ",".join(stale))
         return
-    with tempfile.TemporaryDirectory(prefix="hde-epic038-pr05-") as temp:
+    with tempfile.TemporaryDirectory(prefix="hde-epic038-pr05-", dir=ROOT.parent) as temp:
         stage = Path(temp)
         staged = []
         for index,(path,data) in enumerate(files.items()):
-            candidate=stage/str(index); candidate.write_bytes(data); staged.append((candidate,path))
-        for candidate,path in staged:
-            path.parent.mkdir(parents=True,exist_ok=True); os.replace(candidate,path)
+            candidate=stage/f"candidate-{index}"; candidate.write_bytes(data)
+            backup=stage/f"backup-{index}"
+            existed=path.exists()
+            if existed: shutil.copy2(path,backup)
+            staged.append((candidate,backup,path,existed))
+        attempted = []
+        try:
+            for candidate,backup,path,existed in staged:
+                path.parent.mkdir(parents=True,exist_ok=True)
+                attempted.append((backup,path,existed))
+                os.replace(candidate,path)
+        except BaseException:
+            rollback_errors = []
+            for backup,path,existed in reversed(attempted):
+                try:
+                    if existed:
+                        os.replace(backup,path)
+                    elif path.exists():
+                        path.unlink()
+                except BaseException as exc:  # pragma: no cover - defensive rollback guard
+                    rollback_errors.append(f"{path.relative_to(ROOT).as_posix()}:{exc.__class__.__name__}")
+            if rollback_errors:
+                raise RuntimeError("ROLLBACK_FAILURE:" + ",".join(rollback_errors))
+            raise
+
+
+def run(*, check: bool = False, force_failure: bool = False) -> None:
+    with _hermetic_execution() as guard:
+        files = _build_files(guard, force_failure=force_failure)
+        write_or_check(files, check)
 
 
 def main(argv=None) -> int:
     parser=argparse.ArgumentParser(); parser.add_argument("--check",action="store_true"); parser.add_argument("--force-predicate-failure",action="store_true",help=argparse.SUPPRESS); args=parser.parse_args(argv)
-    write_or_check(build(force_failure=args.force_predicate_failure),args.check); print("V2_MAPPED_CACHE_EVIDENCE_OK"); return 0
+    run(check=args.check, force_failure=args.force_predicate_failure); print("V2_MAPPED_CACHE_EVIDENCE_OK"); return 0
 
 
 if __name__ == "__main__": raise SystemExit(main())
