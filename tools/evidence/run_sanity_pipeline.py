@@ -433,7 +433,7 @@ def run_pipeline(*, log_path: Path = SANITY_LOG, steps: Sequence[SanityStep] | N
         # The final updater must bind the final sanity bytes, not an interim
         # version.  Render the prospective PASS log before that updater runs;
         # the normal final render below is byte-identical on success.
-        if canonical_run and index == len(roster) - 1 and not failure:
+        if canonical_run and index == len(roster) - 1 and failure == "NONE":
             prospective_pass = _write_log(log_path, [*results, (step.name, "OK")], "NONE", "PASS")
         code = _run_stage(step)
         results.append((step.name, "OK" if code == 0 else "FAIL"))
