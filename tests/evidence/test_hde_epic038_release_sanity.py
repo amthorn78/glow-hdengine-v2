@@ -93,18 +93,14 @@ def test_canonical_failure_finalization_error_is_propagated(tmp_path, monkeypatc
     assert log.read_text().endswith("first_failed_stage:late\nsummary:FAIL\n")
 
 
-def test_failure_rebind_runs_complete_checked_finalizer(monkeypatch):
+def test_failure_rebind_uses_only_canonical_updater(monkeypatch):
     calls = []
     def run(command):
         calls.append(command)
         return _result()
     monkeypatch.setattr(sanity, "_run_command", run)
     assert sanity._rebind_failure_log() == 0
-    assert calls == list(sanity._finalization_commands())
-    assert (sanity.sys.executable, "tools/evidence/validate_evidence_paths.py") in calls
-    assert ("ci/checks/check_mirror_schema.sh",) in calls
-    assert ("bash", "ci/checks/check_evidence_index_hash.sh") in calls
-    assert ("ci/checks/check_final_lf.sh",) in calls
+    assert calls == [(sanity.sys.executable, "tools/evidence/update_evidence_index.py")]
 
 
 def test_ops_validation_failure_records_stage_and_stops(monkeypatch, tmp_path):
@@ -141,6 +137,17 @@ def test_zero_byte_ops_file_fails(tmp_path):
     root = _packet_copy(tmp_path)
     (root / "audit/ops/hde-epic038/ops-02/stdout.log").write_bytes(b"")
     with pytest.raises(ValueError, match="stdout.log"):
+        sanity.validate_ops_packages(root)
+
+
+@pytest.mark.parametrize("name,contents,match", [
+    ("debug.log", "benign diagnostic\n", "unexpected retained packet entry"),
+    ("raw_response.json", "HD-Geocode-Key: live-secret\n", "unredacted vendor header"),
+])
+def test_unledgered_packet_files_are_never_accepted(tmp_path, name, contents, match):
+    root = _packet_copy(tmp_path); packet = root / "audit/ops/hde-epic038/ops-02"
+    (packet / name).write_text(contents)
+    with pytest.raises(ValueError, match=match):
         sanity.validate_ops_packages(root)
 
 
@@ -335,6 +342,15 @@ def test_checksum_consistent_secret_or_raw_payload_is_rejected(tmp_path, leak):
     path = packet / "stderr.log"; path.write_text(leak + "\n"); _refresh_ledger(packet, path.name)
     with pytest.raises(ValueError, match="unredacted|raw request"):
         sanity.validate_ops_packages(root)
+
+
+@pytest.mark.parametrize("safe_value", ["false", "null", '"redacted"', '"none"'])
+def test_spaced_safe_raw_payload_values_are_allowed(tmp_path, safe_value):
+    root = _packet_copy(tmp_path); packet = root / "audit/ops/hde-epic038/ops-02"
+    path = packet / "stderr.log"
+    path.write_text(f'{{"raw_vendor_payload": {safe_value}}}\n')
+    _refresh_ledger(packet, path.name)
+    sanity.validate_ops_packages(root)
 
 
 @pytest.mark.parametrize("path_name,mutate,match", [
