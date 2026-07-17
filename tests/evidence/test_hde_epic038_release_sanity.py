@@ -192,6 +192,26 @@ def test_checksum_ledger_fails_closed(tmp_path, mutation, match):
         sanity.validate_ops_packages(root)
 
 
+def test_ops01_commands_are_pinned_and_mutating_sql_is_rejected(tmp_path):
+    root = _packet_copy(tmp_path)
+    packet = root / "audit/ops/hde-epic038/ops-01"
+    (packet / "commands.txt").write_text("DELETE FROM hde.body_graphs;\n")
+    _refresh_ledger(packet, "commands.txt")
+    with pytest.raises(ValueError, match="mutating SQL command"):
+        sanity.validate_ops_packages(root)
+
+
+@pytest.mark.parametrize("package", ["ops-01", "ops-02"])
+def test_ops_command_surfaces_are_exactly_pinned(tmp_path, package):
+    root = _packet_copy(tmp_path)
+    packet = root / f"audit/ops/hde-epic038/{package}"
+    commands = packet / "commands.txt"
+    commands.write_text(commands.read_text() + "# checksum-consistent drift\n")
+    _refresh_ledger(packet, commands.name)
+    with pytest.raises(ValueError, match="approved command surface"):
+        sanity.validate_ops_packages(root)
+
+
 def test_non_ascii_checksum_ledger_fails_cleanly(tmp_path):
     root = _packet_copy(tmp_path)
     ledger = root / "audit/ops/hde-epic038/ops-01/checksums.sha256"
@@ -498,6 +518,24 @@ def test_ops02_identity_must_agree_across_request_summary_and_read_back(tmp_path
         value["synthetic_user_id"] = "00000000-0000-4000-8000-000000000000"
     _write_json_and_refresh(packet, path.name, value)
     with pytest.raises(ValueError, match="identity disagreement"):
+        sanity.validate_ops_packages(root)
+
+
+@pytest.mark.parametrize("mutation", ["non-durable", "provider-mismatch"])
+def test_ops02_read_back_requires_agreed_durable_provider(tmp_path, mutation):
+    root = _packet_copy(tmp_path); packet = root / "audit/ops/hde-epic038/ops-02"
+    read_back_path = packet / "read_back_summary.json"
+    stdout_path = packet / "stdout.log"
+    read_back = json.loads(read_back_path.read_text())
+    stdout = json.loads(stdout_path.read_text())
+    if mutation == "non-durable":
+        read_back["provider"] = "memory"
+        stdout["provider"] = "memory"
+    else:
+        stdout["provider"] = "memory"
+    _write_json_and_refresh(packet, read_back_path.name, read_back)
+    _write_json_and_refresh(packet, stdout_path.name, stdout)
+    with pytest.raises(ValueError, match="read_back_summary|stdout"):
         sanity.validate_ops_packages(root)
 
 
