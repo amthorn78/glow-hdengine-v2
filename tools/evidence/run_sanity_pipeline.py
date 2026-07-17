@@ -148,7 +148,40 @@ def _validate_secret_safety(packet: Path, required: Sequence[str]) -> None:
     vendor_header = re.compile(
         r"(?i)(?:\"?HD-(?:Geocode|Api)-Key\"?\s*[:=]\s*[\"']?)([^\s,\"'}]+)"
     )
+    birth_json = re.compile(
+        r'(?i)"(?:birth[-_]?date|date[-_]?of[-_]?birth|dob|birth[-_]?time|time[-_]?of[-_]?birth|birth[-_]?place|place[-_]?of[-_]?birth|birth[-_]?location|location)"\s*:\s*("(?:\\.|[^"\\])*"|null|false|[^\s,}\]]+)'
+    )
+    birth_assignment = re.compile(
+        r"(?i)\b(?:birth[-_]?date|date[-_]?of[-_]?birth|dob|birth[-_]?time|time[-_]?of[-_]?birth|birth[-_]?place|place[-_]?of[-_]?birth|birth[-_]?location|location)\s*[:=]\s*(\"(?:\\.|[^\"\\])*\"|'(?:\\.|[^'\\])*'|[^\s,}\]]+)"
+    )
+    birth_option = re.compile(
+        r"(?i)--(?:birth[-_]?date|date[-_]?of[-_]?birth|dob|birth[-_]?time|time[-_]?of[-_]?birth|birth[-_]?place|place[-_]?of[-_]?birth|birth[-_]?location|location)(?:=|\s+)(\"(?:\\.|[^\"\\])*\"|'(?:\\.|[^'\\])*'|[^\s]+)"
+    )
     forbidden_uri = re.compile(r"(?i)\b(?:postgres(?:ql)?|railway)://")
+
+    def _birth_value_is_safe(raw: str) -> bool:
+        value = raw.strip().strip("\"'").lower()
+        if value in {
+            "<redacted>",
+            "redacted",
+            "set:redacted",
+            "unset",
+            "none",
+            "null",
+            "false",
+            "not-recorded",
+            "not_recorded",
+            "***",
+        }:
+            return True
+        if value.startswith(("$", "${")):
+            return True
+        return bool(
+            re.fullmatch(
+                r"<approved-synthetic-(?:birthdate|birthtime|location)>", value
+            )
+        )
+
     for name in required:
         if name == "checksums.sha256":
             continue
@@ -173,6 +206,12 @@ def _validate_secret_safety(packet: Path, required: Sequence[str]) -> None:
         for match in credential_json.finditer(text):
             if match.group(1).lower() not in {"redacted", "<redacted>", "set:redacted", "set", "unset"}:
                 raise ValueError(f"{packet.name}: {name} contains an unredacted credential value")
+        for pattern in (birth_json, birth_assignment, birth_option):
+            for match in pattern.finditer(text):
+                if not _birth_value_is_safe(match.group(1)):
+                    raise ValueError(
+                        f"{packet.name}: {name} contains an unredacted birth-input value"
+                    )
         raw_payload_key = re.compile(
             r'(?i)"(?:raw_vendor_(?:payload|envelope)|raw_(?:request|response)_body)"\s*:'
         )
