@@ -184,6 +184,14 @@ def test_checksum_ledger_fails_closed(tmp_path, mutation, match):
         sanity.validate_ops_packages(root)
 
 
+def test_non_ascii_checksum_ledger_fails_cleanly(tmp_path):
+    root = _packet_copy(tmp_path)
+    ledger = root / "audit/ops/hde-epic038/ops-01/checksums.sha256"
+    ledger.write_bytes(b"\xff\n")
+    with pytest.raises(ValueError, match="checksums.sha256 is not readable ASCII evidence"):
+        sanity.validate_ops_packages(root)
+
+
 def _refresh_ledger(packet: Path, name: str):
     lines = []
     for line in (packet / "checksums.sha256").read_text().splitlines():
@@ -445,6 +453,8 @@ def test_ops_validation_never_executes_commands(monkeypatch):
 
 def test_current_commands_and_exact_proof_paths_are_wired():
     commands = [command for step in sanity.default_steps() for command in step.commands]
+    assert (sanity.sys.executable, "scripts/release_id_recompute.py", "--check") in commands
+    assert (sanity.sys.executable, "ci/checks/check_release_identity.sh") in commands
     assert (sanity.sys.executable, "tools/evidence/generate_open_rails_abba_proof.py", "--check") in commands
     assert (sanity.sys.executable, "tools/evidence/generate_open_rails_abba_proof.py", "--live", "--check") in commands
     updater = (sanity.ROOT / "tools/evidence/update_evidence_index.py").read_text()
