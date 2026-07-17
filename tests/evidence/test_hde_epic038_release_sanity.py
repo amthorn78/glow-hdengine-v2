@@ -389,6 +389,10 @@ def test_malformed_summary_nested_object_fails_cleanly(tmp_path, package, field)
     "HD-Api-Key: live-legacy-secret",
     "postgresql://user:password@host/database",
     '{"raw_vendor_payload":{"private":"value"}}',
+    '{"birthdate":"1990-01-01","birthtime":"12:34","location":"Private Address"}',
+    "--birthdate 1990-01-01 --birthtime 12:34 --location 'Private Address'",
+    "birth_date=1990-01-01",
+    'dob: "1990-01-01"',
 ])
 def test_checksum_consistent_secret_or_raw_payload_is_rejected(tmp_path, leak):
     root = _packet_copy(tmp_path); packet = root / "audit/ops/hde-epic038/ops-02"
@@ -411,6 +415,20 @@ def test_colon_delimited_redacted_credentials_are_allowed(tmp_path, safe_value):
     root = _packet_copy(tmp_path); packet = root / "audit/ops/hde-epic038/ops-02"
     path = packet / "stderr.log"
     path.write_text(f"HD_API_KEY: {safe_value}\n")
+    _refresh_ledger(packet, path.name)
+    sanity.validate_ops_packages(root)
+
+
+@pytest.mark.parametrize("safe_value", ["REDACTED", "<redacted>", "null"])
+def test_redacted_birth_inputs_are_allowed(tmp_path, safe_value):
+    root = _packet_copy(tmp_path); packet = root / "audit/ops/hde-epic038/ops-02"
+    path = packet / "stderr.log"
+    path.write_text(
+        json.dumps(
+            {"birthdate": safe_value, "birthtime": safe_value, "location": safe_value}
+        )
+        + "\n"
+    )
     _refresh_ledger(packet, path.name)
     sanity.validate_ops_packages(root)
 
@@ -523,6 +541,9 @@ def test_wrapper_has_no_legacy_writer_or_epic024_identity():
     entries = update_evidence_index._load_human_index()
     sanity_paths = {entry["discovered_physical_path"] for entry in entries if entry["artifact_key"] == "sanity.pipeline.log"}
     assert sanity_paths == {"audit/gates/sanity_pipeline/sanity_pipeline.log"}
+    updater = (sanity.ROOT / "tools/evidence/update_evidence_index.py").read_text()
+    assert "LEGACY_SANITY_LOG" not in updater
+    assert "_sync_legacy_sanity_compatibility" not in updater
 
 
 def test_failure_index_mode_excludes_unvalidated_pr06_ops():
@@ -531,52 +552,3 @@ def test_failure_index_mode_excludes_unvalidated_pr06_ops():
     excluded = update_evidence_index._load_human_index(include_epic038_pr06=False)
     assert any(str(entry["artifact_key"]).startswith("epic038.pr06.") for entry in included)
     assert not any(str(entry["artifact_key"]).startswith("epic038.pr06.") for entry in excluded)
-
-
-def test_canonical_updater_owns_legacy_sanity_compatibility_mirror(tmp_path, monkeypatch):
-    from tools.evidence import update_evidence_index
-
-    canonical = tmp_path / "audit/gates/sanity_pipeline/sanity_pipeline.log"
-    legacy = tmp_path / "artifacts/sanity/sanity.log"
-    canonical.parent.mkdir(parents=True)
-    legacy.parent.mkdir(parents=True)
-    canonical_bytes = b"run:sanity-pipeline\nsummary:PASS\n"
-    canonical.write_bytes(canonical_bytes)
-    legacy.write_bytes(b"stale legacy bytes\n")
-    Path(f"{legacy}.path_proof.txt").write_text(
-        "path: artifacts/sanity/sanity.log\n"
-        "size_bytes: 19\n"
-        f"sha256: {hashlib.sha256(legacy.read_bytes()).hexdigest()}\n"
-        "mtime_utc: 2025-01-01T00:00:00Z\n"
-        "produced_at_utc: 2025-01-01T00:00:00Z\n"
-    )
-
-    monkeypatch.setattr(update_evidence_index, "ROOT", tmp_path)
-    monkeypatch.setattr(update_evidence_index, "CANONICAL_SANITY_LOG", canonical)
-    monkeypatch.setattr(update_evidence_index, "LEGACY_SANITY_LOG", legacy)
-
-    update_evidence_index._sync_legacy_sanity_compatibility(
-        default_produced_at="2026-07-17T00:00:00Z",
-        check=False,
-    )
-    assert legacy.read_bytes() == canonical_bytes
-
-    proof = {}
-    for line in Path(f"{legacy}.path_proof.txt").read_text(encoding="utf-8").splitlines():
-        key, value = line.split(":", 1)
-        proof[key.strip()] = value.strip()
-    assert proof["path"] == "artifacts/sanity/sanity.log"
-    assert proof["size_bytes"] == str(len(canonical_bytes))
-    assert proof["sha256"] == hashlib.sha256(canonical_bytes).hexdigest()
-    assert proof["produced_at_utc"] == "2026-07-17T00:00:00Z"
-
-    update_evidence_index._sync_legacy_sanity_compatibility(
-        default_produced_at="2026-07-17T00:00:00Z",
-        check=True,
-    )
-    legacy.write_bytes(b"drift\n")
-    with pytest.raises(SystemExit, match="STALE"):
-        update_evidence_index._sync_legacy_sanity_compatibility(
-            default_produced_at="2026-07-17T00:00:00Z",
-            check=True,
-        )
