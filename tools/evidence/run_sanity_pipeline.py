@@ -28,6 +28,8 @@ OPS_FILES = {
 }
 
 OPS01_CORPUS_NAME = "hde_epic038_ops01_live_bodygraph_parity_v3"
+OPS01_DIRECT_PROVIDER = "psycopg"
+OPS01_BRIDGE_PROVIDER = "bridge"
 OPS_COMMANDS_SHA256 = {
     "ops-01": "e52ecbddc561cc177b95d92a890226983b71791891fb91204f58e74d2922d38b",
     "ops-02": "d3ca676d0157ce30bf64d4b419610e3a5ceebc0dc13785475028b90ed31f163b",
@@ -293,11 +295,13 @@ def _compare_provider_values(rows: Sequence[dict]) -> str:
         not isinstance(direct_sha, str)
         or not re.fullmatch(r"[0-9a-f]{64}", direct_sha)
         or bridge_sha != direct_sha
+        or bodygraph["direct"].get("provider") != OPS01_DIRECT_PROVIDER
+        or bodygraph["bridge"].get("provider") != OPS01_BRIDGE_PROVIDER
         or bodygraph.get("comparison") != "FILE_EQ_CANON_BYTES_OK"
         or bodygraph["direct"].get("raw_bodygraph_payload_recorded") is not False
         or bodygraph["bridge"].get("raw_bodygraph_payload_recorded") is not False
     ):
-        raise ValueError("ops-01: BodyGraph provider hashes or persistence posture disagree")
+        raise ValueError("ops-01: BodyGraph provider identities, hashes, or persistence posture disagree")
     return direct_sha
 
 
@@ -476,6 +480,9 @@ def _validate_ops01(packet: Path, summary: dict) -> None:
     expected_count = len(OPS01_PARITY_ROWS)
     if (
         parity.get("status") != "PASS"
+        or parity.get("selected") != OPS01_DIRECT_PROVIDER
+        or parity.get("attempts")
+        != [{"provider": OPS01_DIRECT_PROVIDER, "status": "ok"}]
         or not isinstance(live_parity, dict)
         or live_parity.get("direct_provider_rows") != "available"
         or live_parity.get("bridge_provider_rows") != "available"
