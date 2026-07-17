@@ -139,7 +139,7 @@ def _read_json(path: Path) -> dict:
 def _validate_secret_safety(packet: Path, required: Sequence[str]) -> None:
     """Reject recognizable secret values and persisted raw request/response data."""
     credential_assignment = re.compile(
-        r"(?i)\b(DATABASE_URL|DB_BRIDGE_URL|HD_API_KEY|GEO_API_KEY|HD_API_BASE_URL|HDAPI_BASE_URL)\s*[:=]\s*[\"']?([^\s,\"'}]+)"
+        r"(?i)[\"']?\b(DATABASE_URL|DB_BRIDGE_URL|HD_API_KEY|GEO_API_KEY|HD_API_BASE_URL|HDAPI_BASE_URL)\b[\"']?\s*[:=]\s*[\"']?([^\s,\"'}]+)"
     )
     credential_json = re.compile(
         r'(?i)"(?:DATABASE_URL|DB_BRIDGE_URL|HD_API_KEY|GEO_API_KEY|HD_API_BASE_URL|HDAPI_BASE_URL)"\s*:\s*"([^"]+)"'
@@ -201,7 +201,7 @@ def _validate_secret_safety(packet: Path, required: Sequence[str]) -> None:
                 raise ValueError(f"{packet.name}: {name} contains an unredacted vendor header value")
         for match in credential_assignment.finditer(text):
             value = match.group(2).strip().lower()
-            if value not in {"redacted", "<redacted>", "set:redacted", "set", "unset"} and not value.startswith(("$", "${")):
+            if value not in {"redacted", "<redacted>", "set:redacted", "set", "unset", "presence("} and not value.startswith(("$", "${")):
                 raise ValueError(f"{packet.name}: {name} contains an unredacted credential value")
         for match in credential_json.finditer(text):
             if match.group(1).lower() not in {"redacted", "<redacted>", "set:redacted", "set", "unset"}:
