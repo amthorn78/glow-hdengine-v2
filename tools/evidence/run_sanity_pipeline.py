@@ -386,6 +386,10 @@ def _run_stage(step: SanityStep) -> int:
         else:
             result = _run_command(command)
             if result.returncode:
+                print(
+                    f"{step.name}: command exited {result.returncode}: {' '.join(command)}",
+                    file=sys.stderr,
+                )
                 return result.returncode or 1
     return 0
 
@@ -445,6 +449,7 @@ def run_pipeline(*, log_path: Path = SANITY_LOG, steps: Sequence[SanityStep] | N
         except OSError:
             current_bytes = b""
         if prospective_pass != final_bytes or current_bytes != final_bytes:
+            print("canonical PASS bytes changed during final evidence sealing", file=sys.stderr)
             results[-1] = (results[-1][0], "FAIL")
             failure = results[-1][0]
             _write_log(log_path, results, failure, "FAIL")
