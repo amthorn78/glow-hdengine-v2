@@ -89,6 +89,46 @@ def _read_json(path: Path) -> dict:
     return value
 
 
+def _validate_secret_safety(packet: Path, required: Sequence[str]) -> None:
+    """Reject recognizable secret values and persisted raw request/response data."""
+    credential_assignment = re.compile(
+        r"(?i)\b(DATABASE_URL|DB_BRIDGE_URL|HD_API_KEY|GEO_API_KEY|HD_API_BASE_URL|HDAPI_BASE_URL)\s*=\s*[\"']?([^\s,\"'}]+)"
+    )
+    credential_json = re.compile(
+        r'(?i)"(?:DATABASE_URL|DB_BRIDGE_URL|HD_API_KEY|GEO_API_KEY|HD_API_BASE_URL|HDAPI_BASE_URL)"\s*:\s*"([^"]+)"'
+    )
+    bearer = re.compile(r"(?i)\bBearer\s+([^\s\"']+)")
+    forbidden_uri = re.compile(r"(?i)\b(?:postgres(?:ql)?|railway)://")
+    for name in required:
+        if name == "checksums.sha256":
+            continue
+        path = packet / name
+        try:
+            text = path.read_text(encoding="utf-8")
+        except UnicodeError as exc:
+            raise ValueError(f"{packet.name}: {name} is not UTF-8 secret-safe evidence") from exc
+        if forbidden_uri.search(text):
+            raise ValueError(f"{packet.name}: {name} contains an unredacted service URI")
+        for match in bearer.finditer(text):
+            if match.group(1).lower() not in {"<redacted>", "redacted"}:
+                raise ValueError(f"{packet.name}: {name} contains an unredacted bearer value")
+        for match in credential_assignment.finditer(text):
+            value = match.group(2).strip().lower()
+            if value not in {"redacted", "<redacted>", "set:redacted", "set", "unset"} and not value.startswith(("$", "${")):
+                raise ValueError(f"{packet.name}: {name} contains an unredacted credential value")
+        for match in credential_json.finditer(text):
+            if match.group(1).lower() not in {"redacted", "<redacted>", "set:redacted", "set", "unset"}:
+                raise ValueError(f"{packet.name}: {name} contains an unredacted credential value")
+        if re.search(r'(?i)"(?:raw_vendor_(?:payload|envelope)|raw_(?:request|response)_body)"\s*:\s*(?!false\b|null\b|"(?:none|redacted)"\b)', text):
+            raise ValueError(f"{packet.name}: {name} contains persisted raw request, response, or vendor data")
+
+
+def _require_log_predicates(path: Path, required: Sequence[str]) -> None:
+    text = path.read_text(encoding="utf-8").strip()
+    if not text.startswith("PASS ") or any(token not in text.split() for token in required):
+        raise ValueError(f"ops-02: {path.name} predicate failed")
+
+
 def _validate_packet(root: Path, package: str, required: Sequence[str]) -> None:
     packet = root / "audit/ops/hde-epic038" / package
     for name in required:
@@ -117,6 +157,7 @@ def _validate_packet(root: Path, package: str, required: Sequence[str]) -> None:
             raise ValueError(f"{package}: checksums.sha256 mismatch for {name}")
     if (packet / "exit_code.txt").read_text(encoding="utf-8").strip() != "0":
         raise ValueError(f"{package}: exit_code.txt is not successful")
+    _validate_secret_safety(packet, required)
 
     summary = _read_json(packet / "result_summary.json")
     nonclaims = _read_json(packet / "nonclaims.json").get("nonclaims", [])
@@ -152,6 +193,23 @@ def _validate_packet(root: Path, package: str, required: Sequence[str]) -> None:
         required_predicates = {"adapter_mapped", "exactly_one_vendor_request", "canonical_write_read_back_equivalence", "idempotent_repeated_write", "mapped_payload_only", "normalized_identity_single_row", "production_like_refused", "explicit_legacy_fallback_preserved", "retained_by_po_decision"}
         if summary.get("status") != "PASS" or summary.get("retention_decision") != "retain" or any(predicates.get(key) is not True for key in required_predicates):
             raise ValueError("ops-02: result_summary.json PASS predicate failed")
+        request = _read_json(packet / "request_summary.json")
+        mapped = _read_json(packet / "mapped_output_summary.json")
+        read_back = _read_json(packet / "read_back_summary.json")
+        stdout = _read_json(packet / "stdout.log")
+        if request.get("vendor_requests") != 1 or request.get("request_values_persisted") is not False or request.get("configured_base") != "REDACTED" or request.get("auth_posture") != "Authorization: Bearer <redacted>":
+            raise ValueError("ops-02: request_summary.json predicate failed")
+        if mapped.get("adapter_status") != "mapped" or mapped.get("adapter_code") != "ADAPTER_MAPPED" or mapped.get("raw_vendor_envelope_persisted") is not False or mapped.get("payload_posture") != "adapter_mapped_no_raw_vendor_payload":
+            raise ValueError("ops-02: mapped_output_summary.json predicate failed")
+        canonical_sha = mapped.get("canonical_sha256")
+        if not isinstance(canonical_sha, str) or not re.fullmatch(r"[0-9a-f]{64}", canonical_sha) or read_back.get("canonical_sha256") != canonical_sha or read_back.get("read_back_match") is not True or read_back.get("identity_rows") != 1 or read_back.get("retention_decision") != "retain" or read_back.get("stored_payload_posture") != "adapter_mapped_no_raw_vendor_payload":
+            raise ValueError("ops-02: read_back_summary.json predicate failed")
+        if stdout.get("vendor_requests") != 1 or stdout.get("adapter_status") != "ADAPTER_MAPPED" or stdout.get("canonical_sha256") != canonical_sha or stdout.get("read_back_match") is not True or stdout.get("idempotent") is not True or stdout.get("identity_rows") != 1 or stdout.get("second_write_rows") != 0 or stdout.get("retention_decision") != "retain":
+            raise ValueError("ops-02: stdout.log predicate failed")
+        _require_log_predicates(packet / "canonical_parity.log", (f"canonical_sha256={canonical_sha}", "pre_write_post_read_match=true", "first_read_back_match=true", "second_read_back_match=true"))
+        _require_log_predicates(packet / "idempotence.log", ("first_rows_written=1", "second_rows_written=0", "identity_rows=1", "canonical_hash_unchanged=true"))
+        _require_log_predicates(packet / "no_raw_vendor_payload_persistence.log", ("payload_posture=adapter_mapped_no_raw_vendor_payload", "raw_standard_response=false", "raw_chart_result_envelope=false", "request_body=false", "response_body=false", "secrets=false"))
+        _require_log_predicates(packet / "legacy_fallback_preservation.log", ("classification=explicit_legacy_fallback", "route_family=legacy_bodygraph", "configured_v2_legacy_fallback=false", "external_io=0"))
 
 
 def validate_ops_packages(root: Path = ROOT) -> None:

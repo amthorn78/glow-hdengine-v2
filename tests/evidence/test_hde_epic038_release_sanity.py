@@ -147,6 +147,39 @@ def test_malformed_summary_nested_object_fails_cleanly(tmp_path, package, field)
         sanity.validate_ops_packages(root)
 
 
+@pytest.mark.parametrize("leak", [
+    "HD_API_KEY=supersecret",
+    "Authorization: Bearer live-secret",
+    "postgresql://user:password@host/database",
+    '{"raw_vendor_payload":{"private":"value"}}',
+])
+def test_checksum_consistent_secret_or_raw_payload_is_rejected(tmp_path, leak):
+    root = _packet_copy(tmp_path); packet = root / "audit/ops/hde-epic038/ops-02"
+    path = packet / "stderr.log"; path.write_text(leak + "\n"); _refresh_ledger(packet, path.name)
+    with pytest.raises(ValueError, match="unredacted|raw request"):
+        sanity.validate_ops_packages(root)
+
+
+@pytest.mark.parametrize("path_name,mutate,match", [
+    ("request_summary.json", lambda value: value.update(vendor_requests=2), "request_summary"),
+    ("mapped_output_summary.json", lambda value: value.update(raw_vendor_envelope_persisted=True), "mapped_output_summary"),
+    ("read_back_summary.json", lambda value: value.update(read_back_match=False), "read_back_summary"),
+])
+def test_ops02_summary_predicates_are_derived_from_primary_evidence(tmp_path, path_name, mutate, match):
+    root = _packet_copy(tmp_path); packet = root / "audit/ops/hde-epic038/ops-02"
+    path = packet / path_name; value = json.loads(path.read_text()); mutate(value)
+    path.write_text(json.dumps(value, separators=(",", ":")) + "\n"); _refresh_ledger(packet, path.name)
+    with pytest.raises(ValueError, match=match):
+        sanity.validate_ops_packages(root)
+
+
+def test_ops02_failed_lower_level_log_is_rejected(tmp_path):
+    root = _packet_copy(tmp_path); packet = root / "audit/ops/hde-epic038/ops-02"
+    path = packet / "canonical_parity.log"; path.write_text("FAIL pre_write_post_read_match=false\n"); _refresh_ledger(packet, path.name)
+    with pytest.raises(ValueError, match="canonical_parity"):
+        sanity.validate_ops_packages(root)
+
+
 def test_ops_validation_never_executes_commands(monkeypatch):
     monkeypatch.setattr(subprocess, "run", lambda *a, **k: pytest.fail("OPS command executed"))
     sanity.validate_ops_packages()
