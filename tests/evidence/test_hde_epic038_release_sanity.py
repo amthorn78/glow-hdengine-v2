@@ -91,9 +91,9 @@ def test_canonical_failure_bytes_are_rebound(tmp_path, monkeypatch):
     monkeypatch.setattr(sanity, "SANITY_LOG", log)
     monkeypatch.setattr(sanity, "default_steps", lambda: steps)
     monkeypatch.setattr(sanity, "_run_command", lambda command: _result(1))
-    monkeypatch.setattr(sanity, "_rebind_failure_log", lambda: rebound.append(True) or 0)
+    monkeypatch.setattr(sanity, "_rebind_failure_log", lambda *, ops_validated: rebound.append(ops_validated) or 0)
     assert sanity.run_pipeline(log_path=log) == 1
-    assert rebound == [True]
+    assert rebound == [False]
     assert log.read_text().endswith("first_failed_stage:late\nsummary:FAIL\n")
 
 
@@ -103,19 +103,23 @@ def test_canonical_failure_finalization_error_is_propagated(tmp_path, monkeypatc
     monkeypatch.setattr(sanity, "SANITY_LOG", log)
     monkeypatch.setattr(sanity, "default_steps", lambda: steps)
     monkeypatch.setattr(sanity, "_run_command", lambda command: _result(1))
-    monkeypatch.setattr(sanity, "_rebind_failure_log", lambda: 9)
+    monkeypatch.setattr(sanity, "_rebind_failure_log", lambda *, ops_validated: 9)
     assert sanity.run_pipeline(log_path=log) == 9
     assert log.read_text().endswith("first_failed_stage:late\nsummary:FAIL\n")
 
 
-def test_failure_rebind_uses_only_canonical_updater(monkeypatch):
+@pytest.mark.parametrize("ops_validated,extra", [
+    (False, ("--exclude-epic038-pr06",)),
+    (True, ()),
+])
+def test_failure_rebind_uses_only_canonical_updater(monkeypatch, ops_validated, extra):
     calls = []
     def run(command):
         calls.append(command)
         return _result()
     monkeypatch.setattr(sanity, "_run_command", run)
-    assert sanity._rebind_failure_log() == 0
-    assert calls == [(sanity.sys.executable, "tools/evidence/update_evidence_index.py")]
+    assert sanity._rebind_failure_log(ops_validated=ops_validated) == 0
+    assert calls == [(sanity.sys.executable, "tools/evidence/update_evidence_index.py", *extra)]
 
 
 def test_ops_validation_failure_records_stage_and_stops(monkeypatch, tmp_path):
@@ -137,6 +141,10 @@ def _packet_copy(tmp_path: Path) -> Path:
     target = root / "audit/ops/hde-epic038"
     target.parent.mkdir(parents=True)
     shutil.copytree(sanity.ROOT / "audit/ops/hde-epic038", target)
+    shutil.copytree(
+        sanity.ROOT / "artifacts/bodygraph/v2_mapped_cache",
+        root / "artifacts/bodygraph/v2_mapped_cache",
+    )
     return root
 
 
@@ -374,6 +382,8 @@ def test_malformed_summary_nested_object_fails_cleanly(tmp_path, package, field)
 
 @pytest.mark.parametrize("leak", [
     "HD_API_KEY=supersecret",
+    "HD_API_KEY: live-secret",
+    "GEO_API_KEY : live-secret",
     "Authorization: Bearer live-secret",
     "HD-Geocode-Key: live-geocode-secret",
     "HD-Api-Key: live-legacy-secret",
@@ -394,6 +404,46 @@ def test_spaced_safe_raw_payload_values_are_allowed(tmp_path, safe_value):
     path.write_text(f'{{"raw_vendor_payload": {safe_value}}}\n')
     _refresh_ledger(packet, path.name)
     sanity.validate_ops_packages(root)
+
+
+@pytest.mark.parametrize("safe_value", ["REDACTED", "<redacted>", "SET:REDACTED"])
+def test_colon_delimited_redacted_credentials_are_allowed(tmp_path, safe_value):
+    root = _packet_copy(tmp_path); packet = root / "audit/ops/hde-epic038/ops-02"
+    path = packet / "stderr.log"
+    path.write_text(f"HD_API_KEY: {safe_value}\n")
+    _refresh_ledger(packet, path.name)
+    sanity.validate_ops_packages(root)
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    ["missing", "predicate", "nonclaim", "proof-bytes", "proof-ledger"],
+)
+def test_ops02_production_refusal_requires_independent_pr05_evidence(tmp_path, mutation):
+    root = _packet_copy(tmp_path)
+    path = root / "artifacts/bodygraph/v2_mapped_cache/manifest.json"
+    if mutation == "missing":
+        path.unlink()
+    elif mutation == "proof-bytes":
+        (root / "artifacts/bodygraph/v2_mapped_cache/closed_rails_refusal.log").write_text(
+            "PASS code=PROVIDER_REFUSED safe_mode=1 allow_network=1 vendor_calls=0 db_calls=0\n"
+        )
+    else:
+        value = json.loads(path.read_text())
+        if mutation == "predicate":
+            value["predicates"]["production_like_refused"] = False
+        elif mutation == "nonclaim":
+            value["nonclaims"].remove("no_ops_execution")
+        else:
+            record = next(
+                item
+                for item in value["artifacts"]
+                if item["path"].endswith("closed_rails_refusal.log")
+            )
+            record["sha256"] = "0" * 64
+        path.write_text(json.dumps(value, separators=(",", ":")) + "\n")
+    with pytest.raises(ValueError, match="production-like refusal"):
+        sanity.validate_ops_packages(root)
 
 
 @pytest.mark.parametrize("path_name,mutate,match", [
@@ -473,3 +523,60 @@ def test_wrapper_has_no_legacy_writer_or_epic024_identity():
     entries = update_evidence_index._load_human_index()
     sanity_paths = {entry["discovered_physical_path"] for entry in entries if entry["artifact_key"] == "sanity.pipeline.log"}
     assert sanity_paths == {"audit/gates/sanity_pipeline/sanity_pipeline.log"}
+
+
+def test_failure_index_mode_excludes_unvalidated_pr06_ops():
+    from tools.evidence import update_evidence_index
+    included = update_evidence_index._load_human_index()
+    excluded = update_evidence_index._load_human_index(include_epic038_pr06=False)
+    assert any(str(entry["artifact_key"]).startswith("epic038.pr06.") for entry in included)
+    assert not any(str(entry["artifact_key"]).startswith("epic038.pr06.") for entry in excluded)
+
+
+def test_canonical_updater_owns_legacy_sanity_compatibility_mirror(tmp_path, monkeypatch):
+    from tools.evidence import update_evidence_index
+
+    canonical = tmp_path / "audit/gates/sanity_pipeline/sanity_pipeline.log"
+    legacy = tmp_path / "artifacts/sanity/sanity.log"
+    canonical.parent.mkdir(parents=True)
+    legacy.parent.mkdir(parents=True)
+    canonical_bytes = b"run:sanity-pipeline\nsummary:PASS\n"
+    canonical.write_bytes(canonical_bytes)
+    legacy.write_bytes(b"stale legacy bytes\n")
+    Path(f"{legacy}.path_proof.txt").write_text(
+        "path: artifacts/sanity/sanity.log\n"
+        "size_bytes: 19\n"
+        f"sha256: {hashlib.sha256(legacy.read_bytes()).hexdigest()}\n"
+        "mtime_utc: 2025-01-01T00:00:00Z\n"
+        "produced_at_utc: 2025-01-01T00:00:00Z\n"
+    )
+
+    monkeypatch.setattr(update_evidence_index, "ROOT", tmp_path)
+    monkeypatch.setattr(update_evidence_index, "CANONICAL_SANITY_LOG", canonical)
+    monkeypatch.setattr(update_evidence_index, "LEGACY_SANITY_LOG", legacy)
+
+    update_evidence_index._sync_legacy_sanity_compatibility(
+        default_produced_at="2026-07-17T00:00:00Z",
+        check=False,
+    )
+    assert legacy.read_bytes() == canonical_bytes
+
+    proof = {}
+    for line in Path(f"{legacy}.path_proof.txt").read_text(encoding="utf-8").splitlines():
+        key, value = line.split(":", 1)
+        proof[key.strip()] = value.strip()
+    assert proof["path"] == "artifacts/sanity/sanity.log"
+    assert proof["size_bytes"] == str(len(canonical_bytes))
+    assert proof["sha256"] == hashlib.sha256(canonical_bytes).hexdigest()
+    assert proof["produced_at_utc"] == "2026-07-17T00:00:00Z"
+
+    update_evidence_index._sync_legacy_sanity_compatibility(
+        default_produced_at="2026-07-17T00:00:00Z",
+        check=True,
+    )
+    legacy.write_bytes(b"drift\n")
+    with pytest.raises(SystemExit, match="STALE"):
+        update_evidence_index._sync_legacy_sanity_compatibility(
+            default_produced_at="2026-07-17T00:00:00Z",
+            check=True,
+        )
