@@ -372,6 +372,37 @@ def test_ops01_compares_provider_values_and_bodygraph_hashes(tmp_path, row_name)
         sanity.validate_ops_packages(root)
 
 
+@pytest.mark.parametrize(("side", "provider"), [
+    ("direct", "memory"),
+    ("bridge", "memory"),
+    ("direct", "bridge"),
+    ("bridge", "psycopg"),
+])
+def test_ops01_requires_distinct_observed_bodygraph_providers(tmp_path, side, provider):
+    root = _packet_copy(tmp_path); packet = root / "audit/ops/hde-epic038/ops-01"
+    path = packet / "provider_parity.proof.json"; value = json.loads(path.read_text())
+    row = next(item for item in value["capabilities"] if item["name"] == "bodygraph_payload_row")
+    row[side]["provider"] = provider
+    _write_json_and_refresh(packet, path.name, value)
+    with pytest.raises(ValueError, match="BodyGraph provider identities"):
+        sanity.validate_ops_packages(root)
+
+
+@pytest.mark.parametrize("mutation", ["selected", "attempt-provider", "extra-attempt"])
+def test_ops01_requires_exact_direct_provider_selection_provenance(tmp_path, mutation):
+    root = _packet_copy(tmp_path); packet = root / "audit/ops/hde-epic038/ops-01"
+    path = packet / "provider_parity.proof.json"; value = json.loads(path.read_text())
+    if mutation == "selected":
+        value["selected"] = "memory"
+    elif mutation == "attempt-provider":
+        value["attempts"][0]["provider"] = "memory"
+    else:
+        value["attempts"].append({"provider": "memory", "status": "ok"})
+    _write_json_and_refresh(packet, path.name, value)
+    with pytest.raises(ValueError, match="provider_parity.*PASS predicates"):
+        sanity.validate_ops_packages(root)
+
+
 def test_malformed_provider_row_is_recorded_as_validation_failure(tmp_path):
     root = _packet_copy(tmp_path); packet = root / "audit/ops/hde-epic038/ops-01"
     path = packet / "provider_parity.proof.json"; value = json.loads(path.read_text())
