@@ -72,6 +72,35 @@ class HermeticityViolation(AssertionError):
     """Raised when fixture-backed evidence reaches a forbidden external seam."""
 
 
+class _EnvironmentRestoreState:
+    """Hold raw caller state for restoration without exposing it through repr()."""
+
+    __slots__ = ("_values",)
+
+    def __init__(self) -> None:
+        self._values: dict[str, tuple[bool, str | None]] = {}
+        for name in HERMETIC_ENV_KEYS:
+            self._values[name] = (name in os.environ, os.environ.get(name))
+
+    def __repr__(self) -> str:
+        present = sum(1 for name in self._values if self._values[name][0])
+        return (
+            f"{self.__class__.__name__}(tracked={len(self._values)}, "
+            f"present={present}, values=<redacted>)"
+        )
+
+    def restore(self) -> None:
+        for name in self._values:
+            if self._values[name][0]:
+                if self._values[name][1] is None:
+                    raise HermeticityViolation(f"ENV_RESTORE_STATE_INVALID:{name}")
+                os.environ[name] = self._values[name][1]
+            else:
+                os.environ.pop(name, None)
+        _set_process_timezone()
+        self._values.clear()
+
+
 @dataclass
 class HermeticGuard:
     attempts: dict[str, int] = field(default_factory=dict)
@@ -86,10 +115,6 @@ class HermeticGuard:
         return _canary
 
 
-def _environment_snapshot() -> dict[str, tuple[bool, str | None]]:
-    return {key: (key in os.environ, os.environ.get(key)) for key in HERMETIC_ENV_KEYS}
-
-
 def _set_process_timezone() -> None:
     if hasattr(time, "tzset"):
         time.tzset()
@@ -99,16 +124,6 @@ def _apply_hermetic_environment() -> None:
     for key in HERMETIC_ENV_KEYS:
         os.environ.pop(key, None)
     os.environ.update(DETERMINISM_ENV_PINS)
-    _set_process_timezone()
-
-
-def _restore_environment(snapshot: Mapping[str, tuple[bool, str | None]]) -> None:
-    for key, (was_present, value) in snapshot.items():
-        if was_present:
-            assert value is not None
-            os.environ[key] = value
-        else:
-            os.environ.pop(key, None)
     _set_process_timezone()
 
 
@@ -134,7 +149,7 @@ def _assert_shared_log_unchanged(snapshot: tuple[bool, bytes | None, str | None]
 def _hermetic_execution() -> Iterator[HermeticGuard]:
     """Bound fixture execution away from ambient providers, transports, and logs."""
 
-    env_snapshot = _environment_snapshot()
+    environment_state = _EnvironmentRestoreState()
     log_snapshot = _shared_log_snapshot()
     original_log_path = http_log_module.LOG_PATH
     original_bridge_logger = bridge_provider_module.log_http_call
@@ -164,7 +179,7 @@ def _hermetic_execution() -> Iterator[HermeticGuard]:
                 stack.enter_context(patch.object(owner, attribute, guard.forbid(seam)))
             yield guard
     finally:
-        _restore_environment(env_snapshot)
+        environment_state.restore()
         http_log_module.LOG_PATH = original_log_path
         _assert_shared_log_unchanged(log_snapshot)
         if http_log_module.LOG_PATH is not original_log_path:

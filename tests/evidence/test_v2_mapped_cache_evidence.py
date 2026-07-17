@@ -191,6 +191,48 @@ def test_environment_assertion_snapshot_redacts_ambient_values(monkeypatch) -> N
     assert all(value not in rendered for value in ambient.values())
 
 
+def test_traceback_locals_redact_raw_environment_restore_state(tmp_path) -> None:
+    sentinels = {
+        "DATABASE_URL": "postgresql://trace-user:trace-password@database.invalid/db",
+        "DB_BRIDGE_URL": "https://trace-private-bridge.invalid",
+        "HD_API_BASE_URL": "https://trace-private-vendor.invalid/v2",
+        "HDAPI_BASE_URL": "https://trace-private-legacy.invalid/v1",
+        "HD_API_KEY": "trace-private-api-key",
+        "GEO_API_KEY": "trace-private-geo-key",
+    }
+    child_test = tmp_path / "test_environment_restore_traceback.py"
+    child_test.write_text(
+        """from tools.evidence import generate_v2_mapped_cache_evidence as generator
+
+
+def test_unhandled_failure_inside_hermetic_boundary(monkeypatch):
+    def injected_restore(self):
+        raise RuntimeError(\"INJECTED_RESTORE_TRACEBACK_FAILURE\")
+
+    monkeypatch.setattr(generator._EnvironmentRestoreState, \"restore\", injected_restore)
+    generator.build()
+""",
+        encoding="utf-8",
+    )
+    env = _command_env(**sentinels)
+    env["PYTHONPATH"] = os.pathsep.join(filter(None, (str(ROOT), env.get("PYTHONPATH", ""))))
+
+    result = subprocess.run(
+        [sys.executable, "-m", "pytest", "--showlocals", "--tb=long", "-q", str(child_test)],
+        cwd=ROOT,
+        env=env,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    output = result.stdout + result.stderr
+
+    assert result.returncode == 1
+    assert "INJECTED_RESTORE_TRACEBACK_FAILURE" in output
+    assert "values=<redacted>" in output
+    assert all(value not in output for value in sentinels.values())
+
+
 def test_ambient_db_configuration_cannot_escape_and_environment_restores(monkeypatch) -> None:
     for key, value in {
         "DATABASE_URL": "postgresql://sentinel.invalid/db",
