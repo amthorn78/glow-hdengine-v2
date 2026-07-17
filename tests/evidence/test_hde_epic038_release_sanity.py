@@ -105,6 +105,15 @@ def test_unavailable_provider_row_is_not_pass(tmp_path):
         sanity.validate_ops_packages(root)
 
 
+def test_malformed_provider_row_is_recorded_as_validation_failure(tmp_path):
+    root = _packet_copy(tmp_path); packet = root / "audit/ops/hde-epic038/ops-01"
+    path = packet / "provider_parity.proof.json"; value = json.loads(path.read_text())
+    value["capabilities"] = [None]
+    path.write_text(json.dumps(value, separators=(",", ":")) + "\n"); _refresh_ledger(packet, path.name)
+    with pytest.raises(ValueError, match="unavailable"):
+        sanity.validate_ops_packages(root)
+
+
 def test_ops02_predicate_failure_is_not_pass(tmp_path):
     root = _packet_copy(tmp_path); packet = root / "audit/ops/hde-epic038/ops-02"
     path = packet / "result_summary.json"; value = json.loads(path.read_text())
@@ -135,5 +144,7 @@ def test_wrapper_has_no_legacy_writer_or_epic024_identity():
     assert "D07_sanity_pipeline" not in text
     assert "hde-epic024" not in text
     assert "_write_path_proof" not in text
-    updater = (sanity.ROOT / "tools/evidence/update_evidence_index.py").read_text()
-    assert '"artifacts/sanity/sanity.log"' not in updater
+    from tools.evidence import update_evidence_index
+    entries = update_evidence_index._load_human_index()
+    sanity_paths = {entry["discovered_physical_path"] for entry in entries if entry["artifact_key"] == "sanity.pipeline.log"}
+    assert sanity_paths == {"audit/gates/sanity_pipeline/sanity_pipeline.log"}

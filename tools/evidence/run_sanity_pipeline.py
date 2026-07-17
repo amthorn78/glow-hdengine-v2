@@ -74,7 +74,7 @@ def default_steps() -> list[SanityStep]:
         SanityStep(STAGE_NAMES[13], (_py("tools/evidence/validate_evidence_paths.py"),)),
         SanityStep(STAGE_NAMES[14], (("ci/checks/check_mirror_schema.sh",), ("bash", "ci/checks/check_evidence_index_hash.sh"))),
         SanityStep(STAGE_NAMES[15], (_py("tools/evidence/orientation_demo.py"), _py("tools/evidence/update_evidence_index.py"), _py("tools/evidence/orientation_demo.py", "--check"))),
-        SanityStep(STAGE_NAMES[16], (_py("tools/evidence/update_evidence_index.py"), _py("tools/evidence/orientation_demo.py", "--check"), ("ci/checks/check_final_lf.sh",))),
+        SanityStep(STAGE_NAMES[16], (_py("tools/evidence/update_evidence_index.py"), _py("tools/evidence/update_evidence_index.py"), _py("tools/evidence/update_evidence_index.py", "--check"), _py("tools/evidence/orientation_demo.py", "--check"), ("ci/checks/check_mirror_schema.sh",), ("bash", "ci/checks/check_evidence_index_hash.sh"), ("ci/checks/check_final_lf.sh",))),
     ]
 
 
@@ -128,7 +128,17 @@ def _validate_packet(root: Path, package: str, required: Sequence[str]) -> None:
             raise ValueError("ops-01: result_summary.json PASS predicates failed")
         parity = _read_json(packet / "provider_parity.proof.json")
         rows = parity.get("capabilities", [])
-        if not rows or any(row.get("parity") != "match" or row.get("direct", {}).get("status") != "ok" or row.get("bridge", {}).get("status") != "ok" for row in rows):
+        rows_well_formed = (
+            isinstance(rows, list)
+            and bool(rows)
+            and all(
+                isinstance(row, dict)
+                and isinstance(row.get("direct"), dict)
+                and isinstance(row.get("bridge"), dict)
+                for row in rows
+            )
+        )
+        if not rows_well_formed or any(row.get("parity") != "match" or row["direct"].get("status") != "ok" or row["bridge"].get("status") != "ok" for row in rows):
             raise ValueError("ops-01: provider_parity.proof.json contains unavailable, errored, or unmatched claimed row")
         if observations.get("claimed_rows") != len(rows) or observations.get("matched_rows") != len(rows):
             raise ValueError("ops-01: result_summary.json claimed parity row counts failed")

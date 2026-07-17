@@ -4,7 +4,8 @@ from pathlib import Path
 
 
 def test_sanity_log_mirror_and_proof_are_consistent() -> None:
-    log_path = Path("artifacts/sanity/sanity.log")
+    relative_log = "audit/gates/sanity_pipeline/sanity_pipeline.log"
+    log_path = Path(relative_log)
     assert log_path.exists()
     sha = hashlib.sha256(log_path.read_bytes()).hexdigest()
     size = log_path.stat().st_size
@@ -12,11 +13,11 @@ def test_sanity_log_mirror_and_proof_are_consistent() -> None:
     index_entries = [
         entry
         for entry in json.loads(Path("docs/evidence/INDEX.json").read_text(encoding="utf-8"))
-        if entry.get("discovered_physical_path") == "artifacts/sanity/sanity.log"
+        if entry.get("artifact_key") == "sanity.pipeline.log"
     ]
     assert index_entries, "sanity log missing from INDEX.json"
 
-    proof_path = Path("artifacts/sanity/sanity.log.path_proof.txt")
+    proof_path = Path(f"{relative_log}.path_proof.txt")
     assert proof_path.exists()
     proof_fields: dict[str, str] = {}
     for line in proof_path.read_text(encoding="utf-8").splitlines():
@@ -29,12 +30,13 @@ def test_sanity_log_mirror_and_proof_are_consistent() -> None:
         if not raw.strip():
             continue
         obj = json.loads(raw)
-        if obj.get("discovered_physical_path") == "artifacts/sanity/sanity.log":
+        if obj.get("artifact_key") == "sanity.pipeline.log":
             mirror_records.append(obj)
 
     assert mirror_records, "sanity log missing from machine mirror"
     mirror = mirror_records[0]
-    assert mirror.get("proof_anchor") == "artifacts/sanity/sanity.log.path_proof.txt"
+    assert mirror.get("discovered_physical_path") == relative_log
+    assert mirror.get("proof_anchor") == f"{relative_log}.path_proof.txt"
     assert mirror.get("sha256") == sha
     assert int(mirror.get("size_bytes", 0)) == size
     assert proof_fields.get("sha256") == sha

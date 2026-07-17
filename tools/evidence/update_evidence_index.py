@@ -2455,6 +2455,10 @@ EPIC038_PR02_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
 
 EPIC038_PR02_SUPERSEDED_INDEX_KEYS: set[tuple[str, str]] = set()
 
+EPIC038_PR06_SUPERSEDED_INDEX_KEYS = {
+    ("sanity.pipeline.log", "artifacts/sanity/sanity.log"),
+}
+
 EPIC038_PR04_SUPERSEDED_INDEX_KEYS = {
     ("epic038.pr04.db_ddl_fingerprint", "artifacts/db/ddl_fingerprint.json"),
     ("epic038.pr04.db_grants", "artifacts/db/grants.txt"),
@@ -2962,6 +2966,8 @@ def _load_human_index() -> list[dict[str, object]]:
         not in EPIC038_PR02_SUPERSEDED_INDEX_KEYS
         and (entry.get("artifact_key"), entry.get("discovered_physical_path"))
         not in EPIC038_PR04_SUPERSEDED_INDEX_KEYS
+        and (entry.get("artifact_key"), entry.get("discovered_physical_path"))
+        not in EPIC038_PR06_SUPERSEDED_INDEX_KEYS
     ]
     return _dedupe_entries(
         [
