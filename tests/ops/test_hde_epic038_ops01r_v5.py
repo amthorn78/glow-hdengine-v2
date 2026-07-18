@@ -909,7 +909,14 @@ def _discovery_pair(
         source_commit="2" * 40,
         source_manifest_sha256=source_manifest,
     )
-    manifest: list[object] = []
+    manifest: list[object] = [
+        ["railway", "--version"],
+        ["railway", "help"],
+        ["railway", "project", "list"],
+        ["railway", "environment", "list"],
+        ["railway", "service", "list"],
+        ["railway", "run", "--", *target_probe_argv],
+    ]
     result = {
         "schema": "hde_epic038.ops01r.discovery.v1",
         "status": "PASS",
@@ -961,6 +968,32 @@ def test_discovery_result_replays_command_policy(tmp_path):
     result_path, authorization_path, expected = _discovery_pair(tmp_path)
     payload = json.loads(result_path.read_text())
     payload["command_manifest"] = [["railway", "deploy"]]
+    payload["command_manifest_sha256"] = _sha(_canon(payload["command_manifest"]))
+    payload["discovery_identity_sha256"] = _sha(
+        _canon(
+            {
+                key: value
+                for key, value in payload.items()
+                if key != "discovery_identity_sha256"
+            }
+        )
+    )
+    _write_json(result_path, payload)
+
+    result = validate_ops01r_discovery_result(
+        result_path,
+        authorization_path=authorization_path,
+        expected=expected,
+    )
+
+    assert not result.valid
+    assert "DISCOVERY_RESULT_ARGV_MISMATCH" in result.errors
+
+
+def test_discovery_result_requires_all_six_stages(tmp_path):
+    result_path, authorization_path, expected = _discovery_pair(tmp_path)
+    payload = json.loads(result_path.read_text())
+    payload["command_manifest"] = payload["command_manifest"][:-1]
     payload["command_manifest_sha256"] = _sha(_canon(payload["command_manifest"]))
     payload["discovery_identity_sha256"] = _sha(
         _canon(

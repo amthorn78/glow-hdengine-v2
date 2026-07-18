@@ -1603,7 +1603,7 @@ def validate_ops01r_discovery_result(
             != _sha(_canon(command_manifest))
         ):
             errors.add("DISCOVERY_RESULT_IDENTITY_MISMATCH")
-        if not isinstance(command_manifest, list) or len(command_manifest) > len(
+        if not isinstance(command_manifest, list) or len(command_manifest) != len(
             DISCOVERY_STAGES
         ):
             errors.add("DISCOVERY_RESULT_ARGV_MISMATCH")
