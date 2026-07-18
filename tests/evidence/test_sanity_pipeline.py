@@ -51,29 +51,12 @@ def test_pipeline_failure_stops_and_records(tmp_path, monkeypatch):
     log_lines = log_path.read_text(encoding="utf-8").splitlines()
     assert "check step-one:OK" in log_lines
     assert "check step-two:FAIL" in log_lines
-    assert all("step-three" not in line for line in log_lines)
+    assert "check step-three:FAIL" in log_lines
+    assert "not_executed step-three:earlier_mandatory_failure=step-two" in log_lines
     assert log_lines[-1] == "summary:FAIL"
 
 
-def test_pipeline_refresh_records_post_index(monkeypatch, tmp_path):
-    log_path = tmp_path / "sanity.log"
-    monkeypatch.setattr(run_sanity_pipeline, "SANITY_LOG", log_path)
-    steps = [run_sanity_pipeline.SanityStep("noop", ["true"])]
-    monkeypatch.setattr(run_sanity_pipeline, "_run_command", _fake_runner([0]))
-    monkeypatch.setattr(run_sanity_pipeline, "_run_post_index_refresh", lambda: "OK")
-    exit_code = run_sanity_pipeline.run_pipeline(log_path=log_path, steps=steps)
-    assert exit_code == 0
-    log_lines = log_path.read_text(encoding="utf-8").splitlines()
-    assert any(line.startswith("check update_evidence_index.post:") for line in log_lines)
-
-
-def test_default_pipeline_checks_narrative_registry_diff_before_index_check():
+def test_default_pipeline_refreshes_index_before_path_checks():
     names = [step.name for step in run_sanity_pipeline.default_steps()]
-
-    generate_index = names.index("python tools/evidence/generate_narrative_registry_diff.py")
-    update_index = names.index("python tools/evidence/update_evidence_index.py")
-    check_index = names.index("python tools/evidence/generate_narrative_registry_diff.py --check")
-    update_check_index = names.index("python tools/evidence/update_evidence_index.py --check")
-
-    assert generate_index < update_index
-    assert check_index < update_check_index
+    assert names == list(run_sanity_pipeline.STAGE_NAMES)
+    assert names.index("13 Human Index and Machine Mirror refresh") < names.index("14 Path validation")

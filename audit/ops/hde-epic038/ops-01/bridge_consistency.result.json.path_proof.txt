@@ -1,0 +1,5 @@
+path: audit/ops/hde-epic038/ops-01/bridge_consistency.result.json
+size_bytes: 2894
+sha256: 34693618739c3b98ebe57559412c2824803bcd60ededca62c505a5d158d51655
+mtime_utc: 2026-07-17T18:53:00Z
+produced_at_utc: 2026-07-16T19:04:52Z

@@ -1,0 +1,5 @@
+path: audit/ops/hde-epic038/ops-01/checksums.sha256
+size_bytes: 844
+sha256: f4fd52eff5c8f2b61bbb9d97c3889a4bff2d12f581ba8e26dfb2d250ad1049d8
+mtime_utc: 2026-07-17T18:53:00Z
+produced_at_utc: 2026-07-16T19:04:52Z

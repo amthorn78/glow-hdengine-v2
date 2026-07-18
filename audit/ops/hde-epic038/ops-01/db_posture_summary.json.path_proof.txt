@@ -1,0 +1,5 @@
+path: audit/ops/hde-epic038/ops-01/db_posture_summary.json
+size_bytes: 1659
+sha256: a70418a94a0a5c07e456e10ebe710869b92d79f199967c018c9d6d0e8ccab3cc
+mtime_utc: 2026-07-17T18:53:00Z
+produced_at_utc: 2026-07-16T19:04:52Z

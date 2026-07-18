@@ -1,0 +1,5 @@
+path: audit/ops/hde-epic038/ops-02/read_back_summary.json
+size_bytes: 394
+sha256: 43b3d756e51a32713ae031e924fd170c5c8dc36aee97561a0fd273b54102ce56
+mtime_utc: 2026-07-17T17:11:06Z
+produced_at_utc: 2026-07-16T19:04:52Z
