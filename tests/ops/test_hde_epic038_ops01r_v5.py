@@ -204,6 +204,31 @@ def test_candidate_is_bound_to_all_externally_reviewed_identity_fields(tmp_path)
         assert f"OPS01_V5_{field.upper()}_MISMATCH" in result.errors
 
 
+def test_candidate_rejects_nested_non_file_entries(tmp_path):
+    root, expected = _candidate(tmp_path)
+    extra = root / "extra"
+    extra.mkdir()
+    (extra / "raw.json").write_text('{"raw_request_body":{"secret":"x"}}\n')
+
+    result = validate_ops01_v5_package(root, expected=expected)
+
+    assert not result.valid
+    assert "OPS01_V5_WRITE_SET_MISMATCH" in result.errors
+
+
+def test_candidate_rejects_symlinked_primary_files(tmp_path):
+    root, expected = _candidate(tmp_path)
+    external = tmp_path / "external.log"
+    external.write_text("PASS\n")
+    (root / "stdout.log").unlink()
+    (root / "stdout.log").symlink_to(external)
+
+    result = validate_ops01_v5_package(root, expected=expected)
+
+    assert not result.valid
+    assert "OPS01_V5_WRITE_SET_MISMATCH" in result.errors
+
+
 def _discovery_pair(
     tmp_path: Path,
 ) -> tuple[Path, Path, Ops01RDiscoveryAuthorizationExpectedIdentity]:
@@ -341,7 +366,7 @@ def test_preflight_uses_canonical_nested_identity_fields(tmp_path):
     ).valid
 
 
-def test_runner_preflight_round_trips_through_independent_validator(tmp_path):
+def _stage_runner_source(tmp_path: Path) -> Path:
     source = tmp_path / "source"
     required_files = (
         "engine/db/ddl_identity_projection.py",
@@ -354,6 +379,11 @@ def test_runner_preflight_round_trips_through_independent_validator(tmp_path):
         destination = source / relative
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(relative, destination)
+    return source
+
+
+def test_runner_preflight_round_trips_through_independent_validator(tmp_path):
+    source = _stage_runner_source(tmp_path)
     environment = {
         name: value
         for name, value in os.environ.items()
@@ -390,3 +420,30 @@ def test_runner_preflight_round_trips_through_independent_validator(tmp_path):
         preflight_identity_sha256=record["preflight_identity_sha256"],
     )
     assert validate_ops01r_preflight(path, expected=expected).valid
+
+
+def test_runner_preflight_rejects_python_environment(tmp_path):
+    source = _stage_runner_source(tmp_path)
+    environment = {
+        name: value
+        for name, value in os.environ.items()
+        if not name.casefold().startswith("python")
+    }
+    environment["PYTHONPATH"] = "/tmp/unauthorized-python-path"
+
+    process = subprocess.run(
+        [
+            sys.executable,
+            "-I",
+            "-B",
+            str(source / "scripts/ops/hde_epic038_ops01r.py"),
+            "--preflight",
+        ],
+        cwd=tmp_path,
+        env=environment,
+        capture_output=True,
+        text=True,
+    )
+
+    assert process.returncode != 0
+    assert "OPS01_V5_PYTHON_ENVIRONMENT_INVALID" in process.stderr

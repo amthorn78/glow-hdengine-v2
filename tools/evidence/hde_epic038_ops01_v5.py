@@ -331,11 +331,23 @@ def validate_ops01_v5_package(
 ) -> Ops01V5ValidationResult:
     errors: set[str] = set()
     try:
-        files = tuple(path.name for path in root.iterdir() if path.is_file())
+        entries = tuple(root.iterdir())
+        files = tuple(path.name for path in entries)
+        all_entries_are_regular_files = all(
+            not path.is_symlink() and stat.S_ISREG(path.lstat().st_mode)
+            for path in entries
+        )
     except OSError:
         files = ()
-    if set(files) != set(V5_PRIMARY_FILES):
+        all_entries_are_regular_files = False
+    if (
+        root.is_symlink()
+        or set(files) != set(V5_PRIMARY_FILES)
+        or len(files) != len(V5_PRIMARY_FILES)
+        or not all_entries_are_regular_files
+    ):
         errors.add("OPS01_V5_WRITE_SET_MISMATCH")
+        return _result(errors)
 
     for name in V5_PRIMARY_FILES:
         path = root / name

@@ -46,9 +46,11 @@ def _birth_value_is_safe(raw: str) -> bool:
 
 def _iter_raw_marker_assignments(text: str) -> Iterator[tuple[str, str]]:
     for line in text.splitlines():
-        m = _RAW_MARKER.search(line)
-        if m:
-            yield ((m.group('key') or m.group('qkey')).lower(), line[m.end():].strip())
+        for match in _RAW_MARKER.finditer(line):
+            yield (
+                (match.group("key") or match.group("qkey")).lower(),
+                line[match.end():].strip(),
+            )
 
 def _raw_marker_value_is_safe(value: str) -> bool:
     

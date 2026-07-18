@@ -193,7 +193,7 @@ def _module_origins() -> list[dict[str, str]]:
 
 
 def preflight() -> int:
-    reject_python_env({})
+    reject_python_env(dict(os.environ))
     run_id = uuid.uuid4().hex
     staging_root = Path("/tmp/hde-epic038-ops01r") / run_id
     control_root = staging_root / "control"

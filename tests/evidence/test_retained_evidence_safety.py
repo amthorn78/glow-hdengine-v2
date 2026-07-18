@@ -18,3 +18,9 @@ def test_secret_patterns_are_nonsecret_codes():
     assert 'UNREDACTED_CREDENTIAL_VALUE' in errs('HD_API_KEY=${HD_API_KEY:-live-secret}\n')
     assert 'UNREDACTED_CREDENTIAL_VALUE' in errs('GEO_API_KEY=$(cat secret)\n')
     assert validate_retained_text_safety(Path('x'), b'\xff') == ('NON_UTF8_RETAINED_TEXT',)
+
+
+def test_compact_json_scans_every_raw_marker():
+    payload = '{"raw_vendor_payload":false,"raw_request_body":{"secret":"x"}}\n'
+
+    assert "UNSAFE_RAW_PAYLOAD_MARKER_VALUE" in errs(payload)
