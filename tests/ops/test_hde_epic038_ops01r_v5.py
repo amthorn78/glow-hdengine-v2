@@ -24,6 +24,7 @@ from tools.evidence.hde_epic038_ops01_v5 import (
     PREFLIGHT_NONCLAIMS,
     PREFLIGHT_ZERO_IO_FIELDS,
     V5_PRIMARY_FILES,
+    _manifest_delta,
     _tree_manifest,
     validate_ops01_v5_package,
     validate_ops01r_discovery_authorization,
@@ -110,6 +111,7 @@ def _candidate(
     ddl_parity: str = "projection_match",
     include_capabilities: bool = True,
     include_projection_contract: bool = True,
+    literal_staging_root: str | None = None,
 ) -> tuple[Path, Ops01V5ExpectedIdentity]:
     root = tmp_path / "candidate"
     root.mkdir(exist_ok=True)
@@ -121,7 +123,9 @@ def _candidate(
     runner_sha = "6" * 64
     validator_sha = "7" * 64
     projector_sha = "8" * 64
-    staging_root = "/tmp/hde-epic038-ops01r/" + "a" * 32
+    staging_root = literal_staging_root or (
+        "/tmp/hde-epic038-ops01r/" + "a" * 32
+    )
     if counts is None:
         counts = {
             "bodygraph_reads": 2,
@@ -135,39 +139,261 @@ def _candidate(
             "retries": 0,
             "vendor_requests": 0,
         }
+    source_root = f"{staging_root}/source"
+    runner_path = f"{source_root}/scripts/ops/hde_epic038_ops01r.py"
+    validator_path = f"{source_root}/tools/evidence/hde_epic038_ops01_v5.py"
+    projector_path = f"{source_root}/engine/db/ddl_identity_projection.py"
+    interpreter_path = "/usr/bin/python3"
+    argv_prefix = ["railway", "run", "--service", "glow-hdengine-v2", "--"]
+    child_argv = [
+        interpreter_path,
+        "-I",
+        "-B",
+        runner_path,
+        "--live-child",
+    ]
     discovery = {
         "schema": "hde_epic038.ops01r.discovery.v1",
         "status": "PASS",
         "discovery_authorization_sha256": "9" * 64,
+        "run_contract": {
+            "argv_prefix": argv_prefix,
+            "child_argv_start_index": len(argv_prefix),
+        },
     }
     discovery["discovery_identity_sha256"] = _sha(_canon(discovery))
     authorization = {
         "schema": "hde_epic038.ops01r.authorization.v1",
         "source": {
             "commit": source_commit,
+            "root": source_root,
             "source_manifest_sha256": source_manifest,
         },
-        "run": {"staging_root": staging_root},
-        "runner": {"sha256": runner_sha},
-        "validator": {"sha256": validator_sha},
-        "projector": {"sha256": projector_sha},
+        "run": {"child_argv": child_argv, "staging_root": staging_root},
+        "runner": {"path": runner_path, "sha256": runner_sha},
+        "validator": {"path": validator_path, "sha256": validator_sha},
+        "projector": {"path": projector_path, "sha256": projector_sha},
+        "interpreter": {"path": interpreter_path},
         "preflight_identity_sha256": preflight_identity,
         "discovery": discovery,
         "expected_call_counts": counts,
         "write_contract": {"pre_staging_manifest_sha256": pre_staging},
     }
-    commands = b"read-only observation\n"
+    commands = _canon(argv_prefix + child_argv)
     (root / "commands.txt").write_bytes(commands)
     (root / "stdout.log").write_text("PASS\n")
     (root / "stderr.log").write_text("none\n")
     (root / "exit_code.txt").write_text("0\n")
-    for name in (
-        "env_presence.json",
-        "db_posture_summary.json",
-        "bridge_consistency.result.json",
-        "nonclaims.json",
-    ):
-        _write_json(root / name, {})
+    captured_at = "2026-07-18T00:00:00Z"
+    selector = {
+        "alias": "epic011-s10-invariance-1",
+        "identity_source": "docs/run/EPIC011_TEST_IDENTITIES.md",
+        "non_pii": True,
+        "uuid": "3fa85f64-5717-4562-b3fc-2c963f66afab",
+    }
+    rails = {"ALLOW_DB_WRITE": "0", "ALLOW_NETWORK": "0", "SAFE_MODE": "1"}
+    _write_json(
+        root / "env_presence.json",
+        {
+            "captured_at_utc": captured_at,
+            "environment_presence": {
+                "ALLOW_DB_WRITE": "0",
+                "ALLOW_NETWORK": "0",
+                "APP_ENV": "SET:dev",
+                "DATABASE_URL": "SET:REDACTED",
+                "DB_BRIDGE_URL": "SET:REDACTED",
+                "ENGINE_ENV": "UNSET",
+                "LANG": "C",
+                "LC_ALL": "C",
+                "SAFE_MODE": "1",
+                "TZ": "UTC",
+            },
+            "execution_rails": {
+                "bridge_bodygraph_read": {
+                    **rails,
+                    "DB_FORCE_BRIDGE": "1",
+                    "DB_FORCE_PG": "UNSET",
+                },
+                "canonical_comparison": rails,
+                "db_posture_capture": rails,
+                "direct_bodygraph_read": {
+                    **rails,
+                    "DB_FORCE_BRIDGE": "UNSET",
+                    "DB_FORCE_PG": "1",
+                },
+                "governed_checker": rails,
+            },
+            "operator_console": "github_codespaces",
+            "repository": {
+                "branch": "DETACHED",
+                "head": source_commit,
+                "pre_execution_worktree": "clean",
+                "root": source_root,
+            },
+            "schema": "hde_epic038.ops01.env_presence.v3",
+            "secret_posture": "presence_only",
+            "target": {
+                "bridge_service": "pg-bridge",
+                "db_instance": "ample-illumination/production/postgres",
+                "db_schema": "hde",
+                "project": "ample-illumination",
+                "provider": "Railway",
+            },
+        },
+    )
+    objects = [
+        {"kind": "table", "name": "hde.body_graphs"},
+        {"kind": "view", "name": "hde.body_graphs_current"},
+        {"kind": "view", "name": "public.hde_body_graphs_current"},
+    ]
+    privileges = [
+        "DELETE",
+        "INSERT",
+        "REFERENCES",
+        "SELECT",
+        "TRIGGER",
+        "TRUNCATE",
+        "UPDATE",
+    ]
+    _write_json(
+        root / "db_posture_summary.json",
+        {
+            "bodygraph_unique_constraints": [
+                {
+                    "definition": "UNIQUE (user_id, vendor, vendor_version, input_fingerprint)",
+                    "name": "body_graphs_user_id_vendor_vendor_version_input_fingerprint_key",
+                }
+            ],
+            "boundary_views": [
+                {
+                    "is_insertable_into": "NO",
+                    "is_trigger_updatable": "NO",
+                    "is_updatable": "NO",
+                    "name": name,
+                    "readonly": True,
+                }
+                for name in (
+                    "hde.body_graphs_current",
+                    "public.hde_body_graphs_current",
+                )
+            ],
+            "boundary_views_readonly": True,
+            "captured_at_utc": captured_at,
+            "database_schema": "hde",
+            "default_privileges": "none_observed",
+            "fingerprint_objects": objects,
+            "grants": [
+                {
+                    "grantees": ["postgres"],
+                    "object": item["name"],
+                    "privileges": privileges,
+                }
+                for item in objects
+            ],
+            "observation_mode": "read_only",
+            "partition_plan": [
+                {
+                    "key": "(evaluated_at)",
+                    "strategy": "RANGE",
+                    "table": "hde.pair_evaluation",
+                },
+                {
+                    "key": "(created_at)",
+                    "strategy": "RANGE",
+                    "table": "hde.public_results",
+                },
+            ],
+            "partition_plan_status": "PASS",
+            "schema": "hde_epic038.ops01.db_posture_summary.v3",
+            "search_path": "hde, public",
+            "search_path_exact": True,
+            "source_capture_root": f"{staging_root}/capture",
+            "status": "PASS",
+        },
+    )
+    canonical_sha = "a" * 64
+    checker_sha = "b" * 64
+    input_pair = lambda name: {
+        "path": f"{staging_root}/{name}.json",
+        "sha256": canonical_sha,
+    }
+    _write_json(
+        root / "bridge_consistency.result.json",
+        {
+            "bodygraph_comparator": {
+                "bridge_input": input_pair("bodygraph.bridge"),
+                "canonical_sha256": canonical_sha,
+                "direct_input": input_pair("bodygraph.direct"),
+                "exit_code": 0,
+                "identity": "presenter.json_canon_compare",
+                "literal_invocation": "sanitized canonical comparison",
+                "result": "FILE_EQ_CANON_BYTES_OK",
+            },
+            "captured_at_utc": captured_at,
+            "command_exit_codes": {
+                "bridge_bodygraph_read": 0,
+                "canonical_comparison": 0,
+                "db_posture_capture": 0,
+                "direct_bodygraph_read": 0,
+                "governed_checker": 0,
+            },
+            "governed_checker": {
+                "exit_code": 0,
+                "inputs": {
+                    "adapter_selection": input_pair("adapter-selection"),
+                    "env_connectivity": input_pair("env-connectivity"),
+                    "provider_parity": input_pair("provider-parity"),
+                },
+                "literal_invocation": "sanitized governed checker",
+                "repo_identity": "ci/checks/check_bridge_consistency.py",
+                "repo_sha256": checker_sha,
+                "result": "PASS",
+                "staged_executable": f"{staging_root}/checker/check_bridge_consistency.py",
+                "staged_sha256": checker_sha,
+            },
+            "predicates": {
+                "all_actions_closed_rails": True,
+                "bodygraph_bridge_available": True,
+                "bodygraph_direct_available": True,
+                "bodygraph_provider_selection_provenance": True,
+                "bodygraph_row_match": True,
+                "bodygraph_selector_approved": True,
+                "four_row_corpus_exact": True,
+                "provider_selection_consistent": True,
+                "search_path_exact": True,
+            },
+            "schema": "hde_epic038.ops01.bridge_consistency.v3",
+            "status": "PASS",
+        },
+    )
+    _write_json(
+        root / "nonclaims.json",
+        {
+            "captured_at_utc": captured_at,
+            "nonclaims": [
+                "no_sql_write",
+                "no_migration",
+                "no_grant_change",
+                "no_schema_change",
+                "no_vendor_call",
+                "no_deployment_change",
+                "no_raw_secret_persistence",
+                "no_raw_user_data_persistence",
+                "no_raw_bodygraph_payload_persistence",
+                "no_qa_pass_claim",
+                "no_acceptance_token_claim",
+                "no_pf09_status_movement",
+                "no_epic_closeout_claim",
+            ],
+            "pf09_posture": {
+                "HDE-DIST001": "Partial",
+                "HDE-DIST001.4": "Partial",
+                "HDE-DIST001.9": "Partial",
+                "status_change": "none",
+            },
+            "schema": "hde_epic038.ops01.nonclaims.v3",
+        },
+    )
     provider_proof: dict[str, object] = {
         "schema": "hde_epic038.ops01.provider_parity.v5",
         "status": "PASS",
@@ -184,12 +410,52 @@ def _candidate(
                 "ddl_fingerprint",
                 "bodygraph_payload_row",
             ],
+            "selector": selector,
         },
+        "attempts": [{"provider": "psycopg", "status": "ok"}],
+        "captured_at_utc": captured_at,
+        "live_provider_parity": {
+            "bridge_provider_rows": "available",
+            "claimed_row_count": 5,
+            "direct_provider_rows": "available",
+            "matched_row_count": 5,
+            "parity_status": "pass",
+        },
+        "payload_posture": {
+            "raw_bodygraph_payload_persisted": False,
+            "raw_user_data_persisted": False,
+            "secret_values_persisted": False,
+        },
+        "provider_observations": {"bridge": "ok", "direct": "ok"},
+        "rails_posture": {
+            "ALLOW_DB_WRITE": "0",
+            "ALLOW_NETWORK": "0",
+            "APP_ENV": "dev",
+            "SAFE_MODE": "1",
+            "all_actions": "closed",
+        },
+        "remediation_marker": "F-009_DDL_IDENTITY_PROJECTION_CONTRACT",
     }
+    direct_ddl = [
+        {
+            "columns": [{"data_type": "uuid", "name": "user_id"}],
+            "kind": "table",
+            "name": "hde.body_graphs",
+        },
+        {"kind": "view", "name": "hde.body_graphs_current"},
+    ]
+    bridge_ddl = [
+        {
+            "columns": [{"name": "user_id", "type": "uuid"}],
+            "kind": "table",
+            "name": "hde.body_graphs",
+        },
+        {"kind": "view", "name": "hde.body_graphs_current"},
+    ]
     ddl_row: dict[str, object] = {
         "name": "ddl_fingerprint",
-        "direct": {"status": "available", "value": []},
-        "bridge": {"status": "available", "value": []},
+        "direct": {"status": "ok", "value": direct_ddl},
+        "bridge": {"status": "ok", "value": bridge_ddl},
         "parity": ddl_parity,
     }
     if include_projection_contract:
@@ -201,12 +467,62 @@ def _candidate(
             "ordering": "objects_by_kind_name_columns_by_name_type",
         }
     if include_capabilities:
+        def bodygraph_side(side: str) -> dict[str, object]:
+            provider = "psycopg" if side == "direct" else "bridge"
+            content = {
+                "attempts": [{"provider": provider, "status": "ok"}],
+                "flags": {
+                    "allow_bridge_prod": False,
+                    "env": "dev",
+                    "force_bridge": side == "bridge",
+                    "force_pg": side == "direct",
+                },
+                "schema": "v1",
+                "selected": provider,
+                "selection_order": [provider],
+            }
+            return {
+                "canonical_sha256": canonical_sha,
+                "provider": provider,
+                "raw_bodygraph_payload_recorded": False,
+                "selection_snapshot": {
+                    "content": content,
+                    "path": f"{staging_root}/{side}/adapter_selection.snapshot.json",
+                    "sha256": _sha(_canon(content)),
+                },
+                "staged_output": f"{staging_root}/bodygraph.{side}.json",
+                "status": "ok",
+            }
         provider_proof["capabilities"] = [
-            {"name": "grants"},
-            {"name": "search_path"},
-            {"name": "select_one"},
+            {
+                "name": "grants",
+                "direct": {"status": "ok", "value": ["grant"]},
+                "bridge": {"status": "ok", "value": ["grant"]},
+                "parity": "match",
+            },
+            {
+                "name": "search_path",
+                "direct": {"status": "ok", "value": "hde, public"},
+                "bridge": {"status": "ok", "value": "hde, public"},
+                "parity": "match",
+            },
+            {
+                "name": "select_one",
+                "direct": {"status": "ok", "value": 1},
+                "bridge": {"status": "ok", "value": 1},
+                "parity": "match",
+            },
             ddl_row,
-            {"name": "bodygraph_payload_row"},
+            {
+                "name": "bodygraph_payload_row",
+                "direct": bodygraph_side("direct"),
+                "bridge": bodygraph_side("bridge"),
+                "parity": "match",
+                "comparison": "FILE_EQ_CANON_BYTES_OK",
+                "payload_fetch_implementation": "engine.cli.main:_fetch_db_bodygraph",
+                "read_surface": "hdctl showcompat --conjunction --source db",
+                "selector": selector,
+            },
         ]
     _write_json(root / "provider_parity.proof.json", provider_proof)
     summary = {
@@ -332,6 +648,66 @@ def test_candidate_requires_active_projection_match_row(tmp_path):
     assert not result.valid
     assert "OPS01_V5_PROVIDER_PROOF_INVALID" in result.errors
 
+
+def test_candidate_rejects_semantically_invalid_primary_proofs(tmp_path):
+    cases = (
+        ("env_presence.json", "OPS01_V5_ENV_PRESENCE_INVALID"),
+        ("db_posture_summary.json", "OPS01_V5_DB_POSTURE_INVALID"),
+        (
+            "bridge_consistency.result.json",
+            "OPS01_V5_BRIDGE_CONSISTENCY_INVALID",
+        ),
+        ("nonclaims.json", "OPS01_V5_NONCLAIMS_INVALID"),
+    )
+    for name, code in cases:
+        case_root = tmp_path / name.replace(".", "-")
+        case_root.mkdir()
+        root, expected = _candidate(case_root)
+        _write_json(root / name, {})
+        ledger = _rewrite_candidate_ledger(root)
+        expected = replace(expected, candidate_ledger_sha256=_sha(ledger))
+
+        result = validate_ops01_v5_package(root, expected=expected)
+
+        assert not result.valid
+        assert code in result.errors
+
+
+def test_candidate_requires_full_provider_proof_roster(tmp_path):
+    root, expected = _candidate(tmp_path)
+    proof_path = root / "provider_parity.proof.json"
+    proof = json.loads(proof_path.read_text())
+    del proof["remediation_marker"]
+    _write_json(proof_path, proof)
+    ledger = _rewrite_candidate_ledger(root)
+    expected = replace(expected, candidate_ledger_sha256=_sha(ledger))
+
+    result = validate_ops01_v5_package(root, expected=expected)
+
+    assert not result.valid
+    assert "OPS01_V5_PROVIDER_PROOF_INVALID" in result.errors
+
+
+def test_candidate_reconstructs_the_authorized_live_command(tmp_path):
+    root, expected = _candidate(tmp_path)
+    commands = _canon(["railway", "run", "--", "python", "--live-child"])
+    (root / "commands.txt").write_bytes(commands)
+    summary_path = root / "result_summary.json"
+    summary = json.loads(summary_path.read_text())
+    summary["execution"]["commands_sha256"] = _sha(commands)
+    _write_json(summary_path, summary)
+    ledger = _rewrite_candidate_ledger(root)
+    expected = replace(
+        expected,
+        candidate_ledger_sha256=_sha(ledger),
+        commands_sha256=_sha(commands),
+    )
+
+    result = validate_ops01_v5_package(root, expected=expected)
+
+    assert not result.valid
+    assert "OPS01_V5_COMMANDS_INVALID" in result.errors
+
     legacy_case = tmp_path / "legacy-match"
     legacy_case.mkdir()
     root, expected = _candidate(legacy_case, ddl_parity="match")
@@ -347,7 +723,9 @@ def _live_capture(
     source_root = staging_root / "source"
     source_root.mkdir(parents=True)
     (source_root / "tracked.py").write_text("VALUE = 1\n")
-    candidate_root, expected = _candidate(staging_root)
+    candidate_root, expected = _candidate(
+        staging_root, literal_staging_root=staging_root.as_posix()
+    )
     control_root = staging_root / "control"
     control_root.mkdir()
     authorization_path = control_root / "live_authorization.json"
@@ -376,6 +754,7 @@ def _live_capture(
     authorization["run"] = {
         "authorization_path": authorization_path.as_posix(),
         "candidate_root": candidate_root.as_posix(),
+        "child_argv": authorization["run"]["child_argv"],
         "staging_root": staging_root.as_posix(),
     }
     authorization["write_contract"].update(
@@ -600,7 +979,33 @@ def test_discovery_result_rejects_tampered_authorization_hash(tmp_path):
 
 
 def test_preflight_uses_canonical_nested_identity_fields(tmp_path):
-    source_manifest = "1" * 64
+    staging_root = tmp_path / "run"
+    source_root = staging_root / "source"
+    control_root = staging_root / "control"
+    working_directory = staging_root / "preflight-work"
+    source_root.mkdir(parents=True)
+    control_root.mkdir()
+    working_directory.mkdir()
+    (source_root / "tracked.py").write_text("VALUE = 1\n")
+    path = control_root / "preflight.json"
+    source_manifest_object = _tree_manifest(
+        source_root, schema="hde_epic038.source_tree_manifest.v1"
+    )
+    source_manifest = _sha(_canon(source_manifest_object))
+    pre_staging_object = _tree_manifest(
+        staging_root,
+        schema="hde_epic038.non_source_staging_manifest.v1",
+        excluded_paths=(path,),
+        excluded_recursive_roots=(source_root,),
+    )
+    pre_staging = _sha(_canon(pre_staging_object))
+    path.touch()
+    post_staging_object = _tree_manifest(
+        staging_root,
+        schema="hde_epic038.non_source_staging_manifest.v1",
+        excluded_paths=(path,),
+        excluded_recursive_roots=(source_root,),
+    )
     record = {
         "schema": "hde_epic038.ops01r.preflight.v1",
         "status": "PASS",
@@ -620,7 +1025,13 @@ def test_preflight_uses_canonical_nested_identity_fields(tmp_path):
             "vendor_requests": 0,
         },
         "nonclaims": list(PREFLIGHT_NONCLAIMS),
-        "run": {"staging_root": "/tmp/hde-epic038-ops01r/" + "a" * 32},
+        "run": {
+            "control_root": control_root.as_posix(),
+            "preflight_path": path.as_posix(),
+            "source_root": source_root.as_posix(),
+            "staging_root": staging_root.as_posix(),
+            "working_directory": working_directory.as_posix(),
+        },
         "source": {
             "commit": "2" * 40,
             "source_manifest_sha256": source_manifest,
@@ -635,16 +1046,20 @@ def test_preflight_uses_canonical_nested_identity_fields(tmp_path):
         "source_write_validation": {
             "pre_source_manifest_sha256": source_manifest,
             "post_source_manifest_sha256": source_manifest,
-            "pre_staging_manifest_sha256": "8" * 64,
+            "pre_staging_manifest": pre_staging_object["entries"],
+            "pre_staging_manifest_sha256": pre_staging,
+            "post_staging_manifest_sha256": _sha(_canon(post_staging_object)),
+            "observed_staging_changes": _manifest_delta(
+                pre_staging_object["entries"], post_staging_object["entries"]
+            ),
         },
     }
     record["preflight_identity_sha256"] = _sha(_canon(record))
-    path = tmp_path / "preflight.json"
     _write_json(path, record)
     expected = Ops01RPreflightExpectedIdentity(
         source_commit="2" * 40,
         source_manifest_sha256=source_manifest,
-        pre_staging_manifest_sha256="8" * 64,
+        pre_staging_manifest_sha256=pre_staging,
         literal_staging_root=record["run"]["staging_root"],
         runner_sha256="3" * 64,
         validator_sha256="4" * 64,
@@ -701,6 +1116,19 @@ def test_preflight_uses_canonical_nested_identity_fields(tmp_path):
     )
     assert not result.valid
     assert "PREFLIGHT_NONCLAIMS_INVALID" in result.errors
+
+    (source_root / "tracked.py").write_text("VALUE = 2\n")
+    (staging_root / "unauthorized.txt").write_text("not authorized\n")
+    result = validate_ops01r_preflight(
+        path,
+        expected=replace(
+            expected,
+            preflight_identity_sha256=record["preflight_identity_sha256"],
+        ),
+    )
+    assert not result.valid
+    assert "PREFLIGHT_SOURCE_MANIFEST_MISMATCH" in result.errors
+    assert "PREFLIGHT_WRITE_SET_INVALID" in result.errors
 
 
 def _live_authorization_pair(

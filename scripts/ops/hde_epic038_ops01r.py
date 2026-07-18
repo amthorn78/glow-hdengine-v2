@@ -36,45 +36,102 @@ def sha_bytes(payload: bytes) -> str:
     return hashlib.sha256(payload).hexdigest()
 
 
-def tree_manifest(root: Path, *, schema: str) -> dict[str, object]:
+def _lexical_absolute(path: Path) -> Path:
+    return Path(os.path.abspath(os.fspath(path)))
+
+
+def tree_manifest(
+    root: Path,
+    *,
+    schema: str,
+    excluded_paths: tuple[Path, ...] = (),
+    excluded_recursive_roots: tuple[Path, ...] = (),
+) -> dict[str, object]:
+    root = _lexical_absolute(root)
+    excluded_exact = {_lexical_absolute(path) for path in excluded_paths}
+    excluded_roots = tuple(
+        _lexical_absolute(path) for path in excluded_recursive_roots
+    )
     entries: list[dict[str, object]] = []
-    for base, directories, files in os.walk(root, topdown=True, followlinks=False):
-        names = ["."] if Path(base) == root else []
-        for name in names + directories + files:
-            path = root if name == "." else Path(base) / name
-            relative = "." if path == root else path.relative_to(root).as_posix()
-            metadata = path.lstat()
-            if any(part == "__pycache__" for part in Path(relative).parts) or (
-                path.is_file() and path.name.endswith(".pyc")
+
+    def excluded(path: Path) -> bool:
+        return path in excluded_exact or any(
+            parent in (path, *path.parents) for parent in excluded_roots
+        )
+
+    def visit(path: Path) -> None:
+        if path != root and excluded(path):
+            return
+        metadata = path.lstat()
+        relative = "." if path == root else path.relative_to(root).as_posix()
+        if any(part == "__pycache__" for part in Path(relative).parts) or (
+            stat.S_ISREG(metadata.st_mode) and path.name.endswith(".pyc")
+        ):
+            raise RuntimeError("OPS01_V5_SOURCE_RESIDUE_DETECTED")
+        entry: dict[str, object] = {
+            "ctime_ns": metadata.st_ctime_ns,
+            "kind": "",
+            "mode": stat.S_IMODE(metadata.st_mode),
+            "mtime_ns": metadata.st_mtime_ns,
+            "path": relative,
+            "sha256": None,
+            "size": None,
+            "target": None,
+        }
+        if stat.S_ISDIR(metadata.st_mode):
+            entry["kind"] = "directory"
+        elif stat.S_ISREG(metadata.st_mode):
+            entry["kind"] = "regular_file"
+            data = path.read_bytes()
+            entry["sha256"] = sha_bytes(data)
+            entry["size"] = len(data)
+        elif stat.S_ISLNK(metadata.st_mode):
+            entry["kind"] = "symlink"
+            entry["target"] = os.readlink(path)
+        else:
+            raise RuntimeError("unsupported filesystem kind")
+        entries.append(entry)
+        if entry["kind"] == "directory":
+            for child in sorted(
+                path.iterdir(), key=lambda item: item.name.encode("utf-8")
             ):
-                raise RuntimeError("OPS01_V5_SOURCE_RESIDUE_DETECTED")
-            entry: dict[str, object] = {
-                "ctime_ns": metadata.st_ctime_ns,
-                "kind": "",
-                "mode": stat.S_IMODE(metadata.st_mode),
-                "mtime_ns": metadata.st_mtime_ns,
-                "path": relative,
-                "sha256": None,
-                "size": None,
-                "target": None,
-            }
-            if stat.S_ISDIR(metadata.st_mode):
-                entry["kind"] = "directory"
-            elif stat.S_ISREG(metadata.st_mode):
-                entry["kind"] = "regular_file"
-                data = path.read_bytes()
-                entry["sha256"] = sha_bytes(data)
-                entry["size"] = len(data)
-            elif stat.S_ISLNK(metadata.st_mode):
-                entry["kind"] = "symlink"
-                entry["target"] = os.readlink(path)
-            else:
-                raise RuntimeError("unsupported filesystem kind")
-            entries.append(entry)
+                visit(_lexical_absolute(child))
+
+    visit(root)
     return {
         "schema": schema,
         "entries": sorted(entries, key=lambda item: str(item["path"]).encode("utf-8")),
     }
+
+
+def manifest_delta(
+    before: list[dict[str, object]], after: list[dict[str, object]]
+) -> list[dict[str, object]]:
+    before_rows = {str(row["path"]): row for row in before}
+    after_rows = {str(row["path"]): row for row in after}
+    changes: list[dict[str, object]] = []
+    for path in sorted(set(before_rows) | set(after_rows), key=lambda item: item.encode("utf-8")):
+        if path not in before_rows:
+            kinds = ["created"]
+        elif path not in after_rows:
+            kinds = ["deleted"]
+        else:
+            kinds = sorted(
+                key
+                for key in (
+                    "ctime_ns",
+                    "kind",
+                    "mode",
+                    "mtime_ns",
+                    "sha256",
+                    "size",
+                    "target",
+                )
+                if before_rows[path].get(key) != after_rows[path].get(key)
+            )
+        if kinds:
+            changes.append({"change_kinds": kinds, "path": path})
+    return changes
 
 
 def bound_python_vector(script: Path, *arguments: str) -> tuple[str, ...]:
@@ -204,8 +261,19 @@ def preflight() -> int:
 
     source_manifest = tree_manifest(ROOT, schema=SOURCE_MANIFEST_SCHEMA)
     source_manifest_sha256 = sha_bytes(canonical_bytes(source_manifest))
+    source_exclusions = (
+        (ROOT,)
+        if _lexical_absolute(staging_root) in (
+            _lexical_absolute(ROOT),
+            *_lexical_absolute(ROOT).parents,
+        )
+        else ()
+    )
     pre_staging_manifest = tree_manifest(
-        staging_root, schema=STAGING_MANIFEST_SCHEMA
+        staging_root,
+        schema=STAGING_MANIFEST_SCHEMA,
+        excluded_paths=(preflight_path,),
+        excluded_recursive_roots=source_exclusions,
     )
     pre_staging_manifest_sha256 = sha_bytes(canonical_bytes(pre_staging_manifest))
 
@@ -248,6 +316,21 @@ def preflight() -> int:
         "direct_sql_statements": 0,
         "bridge_http_requests": 0,
     }
+    write_contained(preflight_path, b"", staging_root)
+    post_source_manifest = tree_manifest(ROOT, schema=SOURCE_MANIFEST_SCHEMA)
+    post_source_manifest_sha256 = sha_bytes(canonical_bytes(post_source_manifest))
+    if post_source_manifest_sha256 != source_manifest_sha256:
+        raise RuntimeError("OPS01_V5_SOURCE_MANIFEST_MISMATCH")
+    post_staging_manifest = tree_manifest(
+        staging_root,
+        schema=STAGING_MANIFEST_SCHEMA,
+        excluded_paths=(preflight_path,),
+        excluded_recursive_roots=source_exclusions,
+    )
+    post_staging_manifest_sha256 = sha_bytes(canonical_bytes(post_staging_manifest))
+    observed_staging_changes = manifest_delta(
+        pre_staging_manifest["entries"], post_staging_manifest["entries"]
+    )
     payload: dict[str, object] = {
         "schema": "hde_epic038.ops01r.preflight.v1",
         "status": "PASS",
@@ -309,9 +392,12 @@ def preflight() -> int:
             "python_argv": list(producer_argv),
             "python_environment_names": [],
             "pre_source_manifest_sha256": source_manifest_sha256,
-            "post_source_manifest_sha256": source_manifest_sha256,
+            "post_source_manifest_sha256": post_source_manifest_sha256,
             "pre_staging_manifest": pre_staging_manifest["entries"],
             "pre_staging_manifest_sha256": pre_staging_manifest_sha256,
+            "post_staging_manifest_sha256": post_staging_manifest_sha256,
+            "observed_staging_changes": observed_staging_changes,
+            "source_root": ROOT.as_posix(),
         },
     }
     payload["preflight_identity_sha256"] = sha_bytes(canonical_bytes(payload))

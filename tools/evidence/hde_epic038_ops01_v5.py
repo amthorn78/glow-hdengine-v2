@@ -18,6 +18,7 @@ from engine.db.ddl_identity_projection import (
     DDL_IDENTITY_PROJECTION_FIELDS,
     DDL_IDENTITY_PROJECTION_SCHEMA,
     DDL_IDENTITY_UNEXAMINED_FIELDS,
+    project_ddl_identity,
 )
 from tools.evidence.retained_evidence_safety import validate_retained_text_safety
 
@@ -155,6 +156,53 @@ DISCOVERY_STAGES = (
     "service_inventory",
     "target_identity_probe",
 )
+SELECTOR = {
+    "alias": "epic011-s10-invariance-1",
+    "identity_source": "docs/run/EPIC011_TEST_IDENTITIES.md",
+    "non_pii": True,
+    "uuid": "3fa85f64-5717-4562-b3fc-2c963f66afab",
+}
+PROVIDER_PROOF_KEYS = {
+    "active_parity_corpus",
+    "attempts",
+    "capabilities",
+    "captured_at_utc",
+    "environment",
+    "full_ddl_semantic_parity_claimed",
+    "live_provider_parity",
+    "payload_posture",
+    "provider_observations",
+    "rails_open",
+    "rails_posture",
+    "remediation_marker",
+    "schema",
+    "selected",
+    "status",
+}
+NONCLAIMS = (
+    "no_sql_write",
+    "no_migration",
+    "no_grant_change",
+    "no_schema_change",
+    "no_vendor_call",
+    "no_deployment_change",
+    "no_raw_secret_persistence",
+    "no_raw_user_data_persistence",
+    "no_raw_bodygraph_payload_persistence",
+    "no_qa_pass_claim",
+    "no_acceptance_token_claim",
+    "no_pf09_status_movement",
+    "no_epic_closeout_claim",
+)
+EXPECTED_PRIVILEGES = (
+    "DELETE",
+    "INSERT",
+    "REFERENCES",
+    "SELECT",
+    "TRIGGER",
+    "TRUNCATE",
+    "UPDATE",
+)
 T = TypeVar("T")
 
 
@@ -267,6 +315,26 @@ def _tree_manifest(
 
 def _mapping(value: object) -> Mapping[str, object]:
     return value if isinstance(value, Mapping) else {}
+
+
+def _has_exact_keys(value: object, keys: set[str]) -> bool:
+    return isinstance(value, Mapping) and set(value) == keys
+
+
+def _is_sha256(value: object) -> bool:
+    return (
+        isinstance(value, str)
+        and len(value) == 64
+        and all(character in "0123456789abcdef" for character in value)
+    )
+
+
+def _path_is_beneath(value: object, root: object) -> bool:
+    if not isinstance(value, str) or not isinstance(root, str):
+        return False
+    path = _lexical_absolute(Path(value))
+    parent = _lexical_absolute(Path(root))
+    return parent in (path, *path.parents)
 
 
 def _at(value: object, *keys: str) -> object:
@@ -433,6 +501,515 @@ def _candidate_actual_identity(
     return actual, errors
 
 
+def _provider_value(value: object) -> Mapping[str, object]:
+    if not _has_exact_keys(value, {"status", "value"}):
+        return {}
+    row = _mapping(value)
+    return row if row.get("status") == "ok" else {}
+
+
+def _validate_selection_snapshot(
+    value: object, *, side: str, staging_root: str
+) -> bool:
+    if not _has_exact_keys(value, {"content", "path", "sha256"}):
+        return False
+    snapshot = _mapping(value)
+    content = snapshot.get("content")
+    if not _has_exact_keys(
+        content, {"attempts", "flags", "schema", "selected", "selection_order"}
+    ):
+        return False
+    content = _mapping(content)
+    provider = "psycopg" if side == "direct" else "bridge"
+    expected_flags = {
+        "allow_bridge_prod": False,
+        "env": "dev",
+        "force_bridge": side == "bridge",
+        "force_pg": side == "direct",
+    }
+    return (
+        content.get("schema") == "v1"
+        and content.get("selected") == provider
+        and content.get("attempts") == [{"provider": provider, "status": "ok"}]
+        and content.get("selection_order") == [provider]
+        and _has_exact_keys(content.get("flags"), set(expected_flags))
+        and content.get("flags") == expected_flags
+        and _path_is_beneath(snapshot.get("path"), staging_root)
+        and snapshot.get("sha256") == _sha(_canon(content))
+    )
+
+
+def _provider_proof_valid(
+    proof: Mapping[str, object], *, staging_root: str
+) -> bool:
+    if set(proof) != PROVIDER_PROOF_KEYS:
+        return False
+    active = proof.get("active_parity_corpus")
+    if not _has_exact_keys(active, {"name", "ordered_rows", "selector"}):
+        return False
+    active = _mapping(active)
+    ordered_rows = (
+        "grants",
+        "search_path",
+        "select_one",
+        "ddl_fingerprint",
+        "bodygraph_payload_row",
+    )
+    if (
+        proof.get("schema") != "hde_epic038.ops01.provider_parity.v5"
+        or proof.get("status") != "PASS"
+        or proof.get("selected") != "psycopg"
+        or proof.get("environment") != "dev"
+        or proof.get("rails_open") is not False
+        or proof.get("full_ddl_semantic_parity_claimed") is not False
+        or proof.get("remediation_marker")
+        != "F-009_DDL_IDENTITY_PROJECTION_CONTRACT"
+        or not isinstance(proof.get("captured_at_utc"), str)
+        or not proof.get("captured_at_utc")
+        or active.get("name")
+        != "hde_epic038_ops01_live_bodygraph_parity_v4"
+        or tuple(active.get("ordered_rows", ())) != ordered_rows
+        or active.get("selector") != SELECTOR
+        or proof.get("attempts") != [{"provider": "psycopg", "status": "ok"}]
+        or proof.get("live_provider_parity")
+        != {
+            "bridge_provider_rows": "available",
+            "claimed_row_count": 5,
+            "direct_provider_rows": "available",
+            "matched_row_count": 5,
+            "parity_status": "pass",
+        }
+        or proof.get("payload_posture")
+        != {
+            "raw_bodygraph_payload_persisted": False,
+            "raw_user_data_persisted": False,
+            "secret_values_persisted": False,
+        }
+        or proof.get("provider_observations")
+        != {"bridge": "ok", "direct": "ok"}
+        or proof.get("rails_posture")
+        != {
+            "ALLOW_DB_WRITE": "0",
+            "ALLOW_NETWORK": "0",
+            "APP_ENV": "dev",
+            "SAFE_MODE": "1",
+            "all_actions": "closed",
+        }
+    ):
+        return False
+
+    capabilities = proof.get("capabilities")
+    if not isinstance(capabilities, list) or len(capabilities) != len(ordered_rows):
+        return False
+    for index, name in enumerate(ordered_rows[:3]):
+        row = capabilities[index]
+        if not _has_exact_keys(row, {"name", "direct", "bridge", "parity"}):
+            return False
+        row = _mapping(row)
+        direct = _provider_value(row.get("direct"))
+        bridge = _provider_value(row.get("bridge"))
+        if (
+            row.get("name") != name
+            or row.get("parity") != "match"
+            or not direct
+            or not bridge
+            or direct.get("value") != bridge.get("value")
+        ):
+            return False
+
+    ddl = capabilities[3]
+    if not _has_exact_keys(
+        ddl, {"name", "direct", "bridge", "parity", "comparison_contract"}
+    ):
+        return False
+    ddl = _mapping(ddl)
+    direct_ddl = _provider_value(ddl.get("direct"))
+    bridge_ddl = _provider_value(ddl.get("bridge"))
+    comparison = ddl.get("comparison_contract")
+    if not _has_exact_keys(
+        comparison,
+        {"schema", "mode", "included_fields", "unexamined_fields", "ordering"},
+    ):
+        return False
+    comparison = _mapping(comparison)
+    try:
+        direct_projection = project_ddl_identity(direct_ddl.get("value"))
+        bridge_projection = project_ddl_identity(bridge_ddl.get("value"))
+    except (TypeError, ValueError):
+        return False
+    if (
+        ddl.get("name") != "ddl_fingerprint"
+        or ddl.get("parity") != "projection_match"
+        or not direct_ddl
+        or not bridge_ddl
+        or direct_projection != bridge_projection
+        or comparison.get("schema") != DDL_IDENTITY_PROJECTION_SCHEMA
+        or comparison.get("mode") != "shared_identity_projection"
+        or tuple(comparison.get("included_fields", ()))
+        != DDL_IDENTITY_PROJECTION_FIELDS
+        or tuple(comparison.get("unexamined_fields", ()))
+        != DDL_IDENTITY_UNEXAMINED_FIELDS
+        or comparison.get("ordering")
+        != "objects_by_kind_name_columns_by_name_type"
+    ):
+        return False
+
+    bodygraph = capabilities[4]
+    if not _has_exact_keys(
+        bodygraph,
+        {
+            "name",
+            "direct",
+            "bridge",
+            "parity",
+            "comparison",
+            "payload_fetch_implementation",
+            "read_surface",
+            "selector",
+        },
+    ):
+        return False
+    bodygraph = _mapping(bodygraph)
+    sides: dict[str, Mapping[str, object]] = {}
+    for side, provider in (("direct", "psycopg"), ("bridge", "bridge")):
+        side_value = bodygraph.get(side)
+        if not _has_exact_keys(
+            side_value,
+            {
+                "canonical_sha256",
+                "provider",
+                "raw_bodygraph_payload_recorded",
+                "selection_snapshot",
+                "staged_output",
+                "status",
+            },
+        ):
+            return False
+        side_value = _mapping(side_value)
+        if (
+            side_value.get("provider") != provider
+            or side_value.get("status") != "ok"
+            or side_value.get("raw_bodygraph_payload_recorded") is not False
+            or not _is_sha256(side_value.get("canonical_sha256"))
+            or not _path_is_beneath(side_value.get("staged_output"), staging_root)
+            or not _validate_selection_snapshot(
+                side_value.get("selection_snapshot"),
+                side=side,
+                staging_root=staging_root,
+            )
+        ):
+            return False
+        sides[side] = side_value
+    return (
+        bodygraph.get("name") == "bodygraph_payload_row"
+        and bodygraph.get("parity") == "match"
+        and bodygraph.get("comparison") == "FILE_EQ_CANON_BYTES_OK"
+        and bodygraph.get("payload_fetch_implementation")
+        == "engine.cli.main:_fetch_db_bodygraph"
+        and bodygraph.get("read_surface")
+        == "hdctl showcompat --conjunction --source db"
+        and bodygraph.get("selector") == SELECTOR
+        and sides["direct"].get("canonical_sha256")
+        == sides["bridge"].get("canonical_sha256")
+    )
+
+
+def _env_presence_valid(
+    value: Mapping[str, object], *, authorization: Mapping[str, object]
+) -> bool:
+    rails = {"SAFE_MODE": "1", "ALLOW_NETWORK": "0", "ALLOW_DB_WRITE": "0"}
+    expected_environment = {
+        "ALLOW_DB_WRITE": "0",
+        "ALLOW_NETWORK": "0",
+        "APP_ENV": "SET:dev",
+        "DATABASE_URL": "SET:REDACTED",
+        "DB_BRIDGE_URL": "SET:REDACTED",
+        "ENGINE_ENV": "UNSET",
+        "LANG": "C",
+        "LC_ALL": "C",
+        "SAFE_MODE": "1",
+        "TZ": "UTC",
+    }
+    expected_execution = {
+        "bridge_bodygraph_read": {
+            **rails,
+            "DB_FORCE_BRIDGE": "1",
+            "DB_FORCE_PG": "UNSET",
+        },
+        "canonical_comparison": rails,
+        "db_posture_capture": rails,
+        "direct_bodygraph_read": {
+            **rails,
+            "DB_FORCE_BRIDGE": "UNSET",
+            "DB_FORCE_PG": "1",
+        },
+        "governed_checker": rails,
+    }
+    repository = value.get("repository")
+    target = value.get("target")
+    return (
+        _has_exact_keys(
+            value,
+            {
+                "captured_at_utc",
+                "environment_presence",
+                "execution_rails",
+                "operator_console",
+                "repository",
+                "schema",
+                "secret_posture",
+                "target",
+            },
+        )
+        and value.get("schema") == "hde_epic038.ops01.env_presence.v3"
+        and value.get("operator_console") == "github_codespaces"
+        and value.get("secret_posture") == "presence_only"
+        and value.get("environment_presence") == expected_environment
+        and value.get("execution_rails") == expected_execution
+        and _has_exact_keys(
+            repository, {"branch", "head", "pre_execution_worktree", "root"}
+        )
+        and _mapping(repository).get("branch") == "DETACHED"
+        and _mapping(repository).get("head") == _at(authorization, "source", "commit")
+        and _mapping(repository).get("root") == _at(authorization, "source", "root")
+        and _mapping(repository).get("pre_execution_worktree") == "clean"
+        and _has_exact_keys(
+            target, {"bridge_service", "db_instance", "db_schema", "project", "provider"}
+        )
+        and _mapping(target).get("bridge_service") == "pg-bridge"
+        and _mapping(target).get("db_instance")
+        == "ample-illumination/production/postgres"
+        and _mapping(target).get("db_schema") == "hde"
+        and _mapping(target).get("project") == "ample-illumination"
+        and _mapping(target).get("provider") == "Railway"
+    )
+
+
+def _db_posture_valid(value: Mapping[str, object], *, staging_root: str) -> bool:
+    objects = (
+        {"kind": "table", "name": "hde.body_graphs"},
+        {"kind": "view", "name": "hde.body_graphs_current"},
+        {"kind": "view", "name": "public.hde_body_graphs_current"},
+    )
+    views = tuple(
+        {
+            "is_insertable_into": "NO",
+            "is_trigger_updatable": "NO",
+            "is_updatable": "NO",
+            "name": name,
+            "readonly": True,
+        }
+        for name in ("hde.body_graphs_current", "public.hde_body_graphs_current")
+    )
+    grants = tuple(
+        {
+            "grantees": ["postgres"],
+            "object": item["name"],
+            "privileges": list(EXPECTED_PRIVILEGES),
+        }
+        for item in objects
+    )
+    return (
+        set(value)
+        == {
+            "bodygraph_unique_constraints",
+            "boundary_views",
+            "boundary_views_readonly",
+            "captured_at_utc",
+            "database_schema",
+            "default_privileges",
+            "fingerprint_objects",
+            "grants",
+            "observation_mode",
+            "partition_plan",
+            "partition_plan_status",
+            "schema",
+            "search_path",
+            "search_path_exact",
+            "source_capture_root",
+            "status",
+        }
+        and value.get("schema") == "hde_epic038.ops01.db_posture_summary.v3"
+        and value.get("database_schema") == "hde"
+        and value.get("observation_mode") == "read_only"
+        and value.get("search_path") == "hde, public"
+        and value.get("search_path_exact") is True
+        and value.get("boundary_views_readonly") is True
+        and value.get("default_privileges") == "none_observed"
+        and value.get("partition_plan_status") == "PASS"
+        and value.get("status") == "PASS"
+        and value.get("bodygraph_unique_constraints")
+        == [
+            {
+                "definition": "UNIQUE (user_id, vendor, vendor_version, input_fingerprint)",
+                "name": "body_graphs_user_id_vendor_vendor_version_input_fingerprint_key",
+            }
+        ]
+        and tuple(value.get("boundary_views", ())) == views
+        and tuple(value.get("fingerprint_objects", ())) == objects
+        and tuple(value.get("grants", ())) == grants
+        and value.get("partition_plan")
+        == [
+            {"key": "(evaluated_at)", "strategy": "RANGE", "table": "hde.pair_evaluation"},
+            {"key": "(created_at)", "strategy": "RANGE", "table": "hde.public_results"},
+        ]
+        and _path_is_beneath(value.get("source_capture_root"), staging_root)
+    )
+
+
+def _bridge_consistency_valid(
+    value: Mapping[str, object], *, staging_root: str
+) -> bool:
+    if set(value) != {
+        "bodygraph_comparator",
+        "captured_at_utc",
+        "command_exit_codes",
+        "governed_checker",
+        "predicates",
+        "schema",
+        "status",
+    }:
+        return False
+    comparator = value.get("bodygraph_comparator")
+    checker = value.get("governed_checker")
+    if not _has_exact_keys(
+        comparator,
+        {
+            "bridge_input",
+            "canonical_sha256",
+            "direct_input",
+            "exit_code",
+            "identity",
+            "literal_invocation",
+            "result",
+        },
+    ) or not _has_exact_keys(
+        checker,
+        {
+            "exit_code",
+            "inputs",
+            "literal_invocation",
+            "repo_identity",
+            "repo_sha256",
+            "result",
+            "staged_executable",
+            "staged_sha256",
+        },
+    ):
+        return False
+    comparator = _mapping(comparator)
+    checker = _mapping(checker)
+    pair_keys = {"path", "sha256"}
+    comparator_inputs = (
+        _mapping(comparator.get("direct_input")),
+        _mapping(comparator.get("bridge_input")),
+    )
+    checker_inputs = _mapping(checker.get("inputs"))
+    all_paths = [item.get("path") for item in comparator_inputs]
+    for name in ("adapter_selection", "env_connectivity", "provider_parity"):
+        item = _mapping(checker_inputs.get(name))
+        if not _has_exact_keys(item, pair_keys):
+            return False
+        all_paths.append(item.get("path"))
+    expected_exit_names = {
+        "bridge_bodygraph_read",
+        "canonical_comparison",
+        "db_posture_capture",
+        "direct_bodygraph_read",
+        "governed_checker",
+    }
+    expected_predicates = {
+        "all_actions_closed_rails",
+        "bodygraph_bridge_available",
+        "bodygraph_direct_available",
+        "bodygraph_provider_selection_provenance",
+        "bodygraph_row_match",
+        "bodygraph_selector_approved",
+        "four_row_corpus_exact",
+        "provider_selection_consistent",
+        "search_path_exact",
+    }
+    return (
+        value.get("schema") == "hde_epic038.ops01.bridge_consistency.v3"
+        and value.get("status") == "PASS"
+        and all(_has_exact_keys(item, pair_keys) for item in comparator_inputs)
+        and all(_path_is_beneath(path, staging_root) for path in all_paths)
+        and _path_is_beneath(checker.get("staged_executable"), staging_root)
+        and all(_is_sha256(item.get("sha256")) for item in comparator_inputs)
+        and comparator.get("identity") == "presenter.json_canon_compare"
+        and comparator.get("exit_code") == 0
+        and comparator.get("result") == "FILE_EQ_CANON_BYTES_OK"
+        and comparator.get("canonical_sha256")
+        == comparator_inputs[0].get("sha256")
+        == comparator_inputs[1].get("sha256")
+        and set(_mapping(value.get("command_exit_codes"))) == expected_exit_names
+        and all(type(item) is int and item == 0 for item in _mapping(value.get("command_exit_codes")).values())
+        and set(_mapping(value.get("predicates"))) == expected_predicates
+        and all(item is True for item in _mapping(value.get("predicates")).values())
+        and _has_exact_keys(checker_inputs, {"adapter_selection", "env_connectivity", "provider_parity"})
+        and checker.get("repo_identity") == "ci/checks/check_bridge_consistency.py"
+        and checker.get("repo_sha256") == checker.get("staged_sha256")
+        and _is_sha256(checker.get("repo_sha256"))
+        and checker.get("exit_code") == 0
+        and checker.get("result") == "PASS"
+    )
+
+
+def _nonclaims_valid(value: Mapping[str, object]) -> bool:
+    return (
+        set(value) == {"captured_at_utc", "nonclaims", "pf09_posture", "schema"}
+        and value.get("schema") == "hde_epic038.ops01.nonclaims.v3"
+        and value.get("nonclaims") == list(NONCLAIMS)
+        and value.get("pf09_posture")
+        == {
+            "HDE-DIST001": "Partial",
+            "HDE-DIST001.4": "Partial",
+            "HDE-DIST001.9": "Partial",
+            "status_change": "none",
+        }
+    )
+
+
+def _commands_match_authorization(
+    commands_bytes: bytes, authorization: Mapping[str, object]
+) -> bool:
+    try:
+        if b"\r" in commands_bytes or not commands_bytes.endswith(b"\n"):
+            return False
+        lines = commands_bytes.decode("utf-8").splitlines()
+        if len(lines) != 1:
+            return False
+        rendered = json.loads(lines[0], object_pairs_hook=_no_duplicate_object)
+        prefix = _at(authorization, "discovery", "run_contract", "argv_prefix")
+        boundary = _at(
+            authorization,
+            "discovery",
+            "run_contract",
+            "child_argv_start_index",
+        )
+        child = _at(authorization, "run", "child_argv")
+        expected_child = [
+            _at(authorization, "interpreter", "path"),
+            "-I",
+            "-B",
+            _at(authorization, "runner", "path"),
+            "--live-child",
+        ]
+        return (
+            isinstance(rendered, list)
+            and all(isinstance(token, str) for token in rendered)
+            and isinstance(prefix, list)
+            and all(isinstance(token, str) for token in prefix)
+            and type(boundary) is int
+            and boundary == len(prefix)
+            and child == expected_child
+            and rendered == prefix + child
+            and commands_bytes == _canon(rendered)
+        )
+    except (UnicodeError, ValueError, TypeError):
+        return False
+
+
 def validate_ops01_v5_package(
     root: Path, *, expected: Ops01V5ExpectedIdentity
 ) -> Ops01V5ValidationResult:
@@ -481,62 +1058,13 @@ def validate_ops01_v5_package(
         errors.add("OPS01_V5_WRITE_SET_MISMATCH")
 
     try:
-        proof = _mapping(_read_json(root / "provider_parity.proof.json"))
-        if proof.get("schema") != "hde_epic038.ops01.provider_parity.v5":
-            errors.add("OPS01_V5_SCHEMA_INVALID")
-        if (
-            proof.get("status") != "PASS"
-            or proof.get("selected") != "psycopg"
-            or proof.get("environment") != "dev"
-            or proof.get("rails_open") is not False
-            or proof.get("full_ddl_semantic_parity_claimed") is not False
-        ):
+        proof_path = root / "provider_parity.proof.json"
+        proof_bytes = proof_path.read_bytes()
+        proof = _mapping(_read_json(proof_path))
+        if _canon(proof) != proof_bytes:
             errors.add("OPS01_V5_PROVIDER_PROOF_INVALID")
-        active_corpus = _mapping(proof.get("active_parity_corpus"))
-        capabilities = proof.get("capabilities")
-        if (
-            active_corpus.get("name")
-            != "hde_epic038_ops01_live_bodygraph_parity_v4"
-            or tuple(active_corpus.get("ordered_rows", ()))
-            != (
-                "grants",
-                "search_path",
-                "select_one",
-                "ddl_fingerprint",
-                "bodygraph_payload_row",
-            )
-            or not isinstance(capabilities, list)
-            or len(capabilities) != 5
-            or tuple(_mapping(row).get("name") for row in capabilities)
-            != tuple(active_corpus.get("ordered_rows", ()))
-        ):
-            errors.add("OPS01_V5_PROVIDER_PROOF_INVALID")
-            capabilities = []
-        ddl_row = _mapping(capabilities[3]) if len(capabilities) == 5 else {}
-        comparison = _mapping(ddl_row.get("comparison_contract"))
-        if (
-            set(ddl_row)
-            != {"name", "direct", "bridge", "parity", "comparison_contract"}
-            or ddl_row.get("name") != "ddl_fingerprint"
-            or ddl_row.get("parity") != "projection_match"
-            or set(_mapping(ddl_row.get("direct"))) != {"status", "value"}
-            or set(_mapping(ddl_row.get("bridge"))) != {"status", "value"}
-            or set(comparison)
-            != {
-                "schema",
-                "mode",
-                "included_fields",
-                "unexamined_fields",
-                "ordering",
-            }
-            or comparison.get("schema") != DDL_IDENTITY_PROJECTION_SCHEMA
-            or comparison.get("mode") != "shared_identity_projection"
-            or tuple(comparison.get("included_fields", ()))
-            != DDL_IDENTITY_PROJECTION_FIELDS
-            or tuple(comparison.get("unexamined_fields", ()))
-            != DDL_IDENTITY_UNEXAMINED_FIELDS
-            or comparison.get("ordering")
-            != "objects_by_kind_name_columns_by_name_type"
+        if not _provider_proof_valid(
+            proof, staging_root=expected.literal_staging_root
         ):
             errors.add("OPS01_V5_PROVIDER_PROOF_INVALID")
     except Exception:
@@ -564,6 +1092,44 @@ def validate_ops01_v5_package(
         )
         errors.update(identity_errors)
         errors.update(_candidate_expected_errors(actual, expected))
+        authorization = _mapping(summary.get("authorization"))
+        if not _commands_match_authorization(commands_bytes, authorization):
+            errors.add("OPS01_V5_COMMANDS_INVALID")
+
+        primary_validators = (
+            (
+                "env_presence.json",
+                lambda value: _env_presence_valid(
+                    value, authorization=authorization
+                ),
+                "OPS01_V5_ENV_PRESENCE_INVALID",
+            ),
+            (
+                "db_posture_summary.json",
+                lambda value: _db_posture_valid(
+                    value, staging_root=expected.literal_staging_root
+                ),
+                "OPS01_V5_DB_POSTURE_INVALID",
+            ),
+            (
+                "bridge_consistency.result.json",
+                lambda value: _bridge_consistency_valid(
+                    value, staging_root=expected.literal_staging_root
+                ),
+                "OPS01_V5_BRIDGE_CONSISTENCY_INVALID",
+            ),
+            (
+                "nonclaims.json",
+                _nonclaims_valid,
+                "OPS01_V5_NONCLAIMS_INVALID",
+            ),
+        )
+        for name, validator, code in primary_validators:
+            path = root / name
+            raw_bytes = path.read_bytes()
+            value = _mapping(_read_json(path))
+            if _canon(value) != raw_bytes or not validator(value):
+                errors.add(code)
     except Exception:
         errors.add("OPS01_V5_RESULT_SUMMARY_INVALID")
 
@@ -592,6 +1158,125 @@ def _preflight_actual_identity(obj: Mapping[str, object]) -> dict[str, object]:
             obj, "preflight_identity_sha256"
         ),
     }
+
+
+def _manifest_delta(
+    before: list[object], after: list[object]
+) -> list[dict[str, object]]:
+    before_rows = {
+        _mapping(row).get("path"): _mapping(row)
+        for row in before
+        if isinstance(_mapping(row).get("path"), str)
+    }
+    after_rows = {
+        _mapping(row).get("path"): _mapping(row)
+        for row in after
+        if isinstance(_mapping(row).get("path"), str)
+    }
+    changes: list[dict[str, object]] = []
+    for path in sorted(set(before_rows) | set(after_rows), key=lambda item: item.encode("utf-8")):
+        if path not in before_rows:
+            kinds = ["created"]
+        elif path not in after_rows:
+            kinds = ["deleted"]
+        else:
+            kinds = sorted(
+                key
+                for key in (
+                    "ctime_ns",
+                    "kind",
+                    "mode",
+                    "mtime_ns",
+                    "sha256",
+                    "size",
+                    "target",
+                )
+                if before_rows[path].get(key) != after_rows[path].get(key)
+            )
+        if kinds:
+            changes.append({"change_kinds": kinds, "path": path})
+    return changes
+
+
+def _preflight_live_tree_errors(
+    path: Path,
+    obj: Mapping[str, object],
+    expected: Ops01RPreflightExpectedIdentity,
+) -> set[str]:
+    errors: set[str] = set()
+    run = _mapping(obj.get("run"))
+    source_write = _mapping(obj.get("source_write_validation"))
+    source_root_value = run.get("source_root")
+    staging_root_value = run.get("staging_root")
+    preflight_path_value = run.get("preflight_path")
+    if not all(
+        isinstance(value, str)
+        for value in (source_root_value, staging_root_value, preflight_path_value)
+    ):
+        return {"PREFLIGHT_SOURCE_MANIFEST_MISMATCH", "PREFLIGHT_WRITE_SET_INVALID"}
+    source_root = _lexical_absolute(Path(source_root_value))
+    staging_root = _lexical_absolute(Path(staging_root_value))
+    preflight_path = _lexical_absolute(Path(preflight_path_value))
+    if preflight_path != _lexical_absolute(path):
+        errors.add("PREFLIGHT_WRITE_SET_INVALID")
+    try:
+        source_manifest = _tree_manifest(
+            source_root, schema="hde_epic038.source_tree_manifest.v1"
+        )
+        source_sha = _sha(_canon(source_manifest))
+        if (
+            source_sha != expected.source_manifest_sha256
+            or source_sha != _at(obj, "source", "source_manifest_sha256")
+            or source_sha != source_write.get("pre_source_manifest_sha256")
+            or source_sha != source_write.get("post_source_manifest_sha256")
+        ):
+            errors.add("PREFLIGHT_SOURCE_MANIFEST_MISMATCH")
+
+        retained_pre = source_write.get("pre_staging_manifest")
+        if not isinstance(retained_pre, list):
+            errors.add("PREFLIGHT_WRITE_SET_INVALID")
+            retained_pre = []
+        retained_pre_manifest = {
+            "schema": "hde_epic038.non_source_staging_manifest.v1",
+            "entries": retained_pre,
+        }
+        retained_pre_sha = _sha(_canon(retained_pre_manifest))
+        if (
+            retained_pre_sha != expected.pre_staging_manifest_sha256
+            or retained_pre_sha != source_write.get("pre_staging_manifest_sha256")
+        ):
+            errors.add("PREFLIGHT_WRITE_SET_INVALID")
+
+        recursive_exclusions: tuple[Path, ...] = ()
+        if staging_root in (source_root, *source_root.parents):
+            recursive_exclusions = (source_root,)
+        post_manifest = _tree_manifest(
+            staging_root,
+            schema="hde_epic038.non_source_staging_manifest.v1",
+            excluded_paths=(preflight_path,),
+            excluded_recursive_roots=recursive_exclusions,
+        )
+        post_sha = _sha(_canon(post_manifest))
+        if post_sha != source_write.get("post_staging_manifest_sha256"):
+            errors.add("PREFLIGHT_WRITE_SET_INVALID")
+        delta = _manifest_delta(retained_pre, post_manifest["entries"])
+        if delta != source_write.get("observed_staging_changes"):
+            errors.add("PREFLIGHT_WRITE_SET_INVALID")
+        control_relative = _lexical_absolute(Path(run.get("control_root", ""))).relative_to(
+            staging_root
+        ).as_posix()
+        if any(
+            change.get("path") != control_relative
+            or not set(change.get("change_kinds", ())) <= {"ctime_ns", "mtime_ns"}
+            for change in delta
+        ):
+            errors.add("PREFLIGHT_WRITE_SET_INVALID")
+        working = _lexical_absolute(Path(str(run.get("working_directory", ""))))
+        if not working.is_dir() or any(working.iterdir()):
+            errors.add("PREFLIGHT_WRITE_SET_INVALID")
+    except (OSError, TypeError, ValueError):
+        errors.add("PREFLIGHT_WRITE_SET_INVALID")
+    return errors
 
 
 def validate_ops01r_preflight(
@@ -636,6 +1321,7 @@ def validate_ops01r_preflight(
             errors.add("PREFLIGHT_SOURCE_MANIFEST_MISMATCH")
         if not _all_expected_values_match(actual, expected):
             errors.add("PREFLIGHT_EXPECTED_IDENTITY_MISMATCH")
+        errors.update(_preflight_live_tree_errors(path, obj, expected))
     except OSError:
         errors.add("PREFLIGHT_FILE_UNREADABLE")
     except (UnicodeError, ValueError, TypeError):
