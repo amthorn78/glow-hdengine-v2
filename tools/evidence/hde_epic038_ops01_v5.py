@@ -158,6 +158,80 @@ def _sha(payload: bytes) -> str:
     return hashlib.sha256(payload).hexdigest()
 
 
+def _lexical_absolute(path: Path) -> Path:
+    return Path(os.path.abspath(os.fspath(path)))
+
+
+def _tree_manifest(
+    root: Path,
+    *,
+    schema: str,
+    excluded_paths: tuple[Path, ...] = (),
+    excluded_recursive_roots: tuple[Path, ...] = (),
+) -> dict[str, object]:
+    root = _lexical_absolute(root)
+    excluded_exact = {_lexical_absolute(path) for path in excluded_paths}
+    excluded_roots = tuple(
+        _lexical_absolute(path) for path in excluded_recursive_roots
+    )
+    for excluded in (*excluded_exact, *excluded_roots):
+        if root not in (excluded, *excluded.parents):
+            raise ValueError("manifest exclusion escapes its root")
+
+    entries: list[dict[str, object]] = []
+
+    def excluded(path: Path) -> bool:
+        return path in excluded_exact or any(
+            parent in (path, *path.parents) for parent in excluded_roots
+        )
+
+    def visit(path: Path) -> None:
+        if path != root and excluded(path):
+            return
+        metadata = path.lstat()
+        relative = "." if path == root else path.relative_to(root).as_posix()
+        if any(part == "__pycache__" for part in Path(relative).parts) or (
+            stat.S_ISREG(metadata.st_mode) and path.name.endswith(".pyc")
+        ):
+            raise ValueError("source or staging cache residue detected")
+        entry: dict[str, object] = {
+            "ctime_ns": metadata.st_ctime_ns,
+            "kind": "",
+            "mode": stat.S_IMODE(metadata.st_mode),
+            "mtime_ns": metadata.st_mtime_ns,
+            "path": relative,
+            "sha256": None,
+            "size": None,
+            "target": None,
+        }
+        if stat.S_ISDIR(metadata.st_mode):
+            entry["kind"] = "directory"
+        elif stat.S_ISREG(metadata.st_mode):
+            payload = path.read_bytes()
+            entry["kind"] = "regular_file"
+            entry["sha256"] = _sha(payload)
+            entry["size"] = len(payload)
+        elif stat.S_ISLNK(metadata.st_mode):
+            entry["kind"] = "symlink"
+            entry["target"] = os.readlink(path)
+        else:
+            raise ValueError("unsupported filesystem kind")
+        entries.append(entry)
+        if entry["kind"] == "directory":
+            for child in sorted(
+                path.iterdir(), key=lambda item: item.name.encode("utf-8")
+            ):
+                visit(_lexical_absolute(child))
+
+    visit(root)
+    return {
+        "schema": schema,
+        "entries": sorted(
+            entries, key=lambda item: str(item["path"]).encode("utf-8")
+        ),
+    }
+
+
 def _mapping(value: object) -> Mapping[str, object]:
     return value if isinstance(value, Mapping) else {}
 
@@ -701,10 +775,121 @@ def validate_ops01r_live_authorization(
 def validate_ops01r_live_capture(
     staging_root: Path, *, expected: Ops01V5ExpectedIdentity
 ) -> Ops01V5ValidationResult:
+    errors: set[str] = set()
+    staging_root = _lexical_absolute(staging_root)
     candidate_root = staging_root / "candidate"
-    if not candidate_root.is_dir() and (staging_root / "result_summary.json").is_file():
-        candidate_root = staging_root
-    return validate_ops01_v5_package(candidate_root, expected=expected)
+    candidate_result = validate_ops01_v5_package(candidate_root, expected=expected)
+    errors.update(candidate_result.errors)
+    try:
+        if (
+            staging_root.is_symlink()
+            or not stat.S_ISDIR(staging_root.lstat().st_mode)
+            or staging_root.as_posix() != expected.literal_staging_root
+        ):
+            raise ValueError("live staging root mismatch")
+
+        summary = _mapping(_read_json(candidate_root / "result_summary.json"))
+        authorization = _mapping(summary.get("authorization"))
+        source_write = _mapping(
+            _at(summary, "execution", "source_write_validation")
+        )
+        write_contract = _mapping(authorization.get("write_contract"))
+
+        source_root_value = _at(authorization, "source", "root")
+        if not isinstance(source_root_value, str):
+            raise ValueError("live source root missing")
+        source_root = _lexical_absolute(Path(source_root_value))
+        if (
+            source_root != staging_root / "source"
+            or source_root.is_symlink()
+            or not stat.S_ISDIR(source_root.lstat().st_mode)
+            or source_write.get("source_root") != source_root.as_posix()
+            or _at(authorization, "run", "candidate_root")
+            != candidate_root.as_posix()
+        ):
+            raise ValueError("live source or candidate root mismatch")
+
+        source_manifest = _tree_manifest(
+            source_root,
+            schema="hde_epic038.source_tree_manifest.v1",
+        )
+        if _sha(_canon(source_manifest)) != expected.source_manifest_sha256:
+            errors.add("OPS01_V5_SOURCE_MANIFEST_MISMATCH")
+
+        pre_staging_entries = source_write.get("pre_staging_manifest")
+        if not isinstance(pre_staging_entries, list):
+            errors.add("OPS01_V5_LIVE_PRE_STAGING_MANIFEST_MISMATCH")
+        else:
+            pre_staging_manifest = {
+                "schema": "hde_epic038.non_source_staging_manifest.v1",
+                "entries": pre_staging_entries,
+            }
+            if (
+                _sha(_canon(pre_staging_manifest))
+                != expected.live_pre_staging_manifest_sha256
+            ):
+                errors.add("OPS01_V5_LIVE_PRE_STAGING_MANIFEST_MISMATCH")
+
+        exact_values = source_write.get("self_bound_excluded_paths", [])
+        recursive_values = source_write.get(
+            "self_bound_excluded_recursive_roots", []
+        )
+        authorization_path = _at(authorization, "run", "authorization_path")
+        failure_summary_path = write_contract.get("failure_summary_path")
+        expected_exact_values = (
+            sorted(
+                (authorization_path, failure_summary_path),
+                key=lambda value: value.encode("utf-8"),
+            )
+            if isinstance(authorization_path, str)
+            and isinstance(failure_summary_path, str)
+            else None
+        )
+        if not (
+            isinstance(exact_values, list)
+            and all(isinstance(value, str) for value in exact_values)
+            and isinstance(recursive_values, list)
+            and all(isinstance(value, str) for value in recursive_values)
+            and exact_values
+            == write_contract.get("self_bound_excluded_paths", [])
+            and recursive_values
+            == write_contract.get("self_bound_excluded_recursive_roots", [])
+            and exact_values == expected_exact_values
+            and recursive_values == [candidate_root.as_posix()]
+        ):
+            raise ValueError("live staging exclusions mismatch")
+
+        authorization_file = _lexical_absolute(Path(authorization_path))
+        failure_summary_file = _lexical_absolute(Path(failure_summary_path))
+        authorization_bytes = authorization_file.read_bytes()
+        if (
+            authorization_file.is_symlink()
+            or not stat.S_ISREG(authorization_file.lstat().st_mode)
+            or authorization_bytes != _canon(authorization)
+            or _sha(authorization_bytes) != expected.authorization_sha256
+            or failure_summary_file.exists()
+        ):
+            raise ValueError("live excluded control file mismatch")
+
+        post_staging_manifest = _tree_manifest(
+            staging_root,
+            schema="hde_epic038.non_source_staging_manifest.v1",
+            excluded_paths=tuple(Path(value) for value in exact_values),
+            excluded_recursive_roots=(
+                source_root,
+                *(Path(value) for value in recursive_values),
+            ),
+        )
+        if (
+            _sha(_canon(post_staging_manifest))
+            != expected.live_post_staging_manifest_sha256
+        ):
+            errors.add("OPS01_V5_LIVE_POST_STAGING_MANIFEST_MISMATCH")
+    except OSError:
+        errors.add("OPS01_V5_WRITE_SET_MISMATCH")
+    except (TypeError, ValueError):
+        errors.add("OPS01_V5_LIVE_CAPTURE_IDENTITY_MISMATCH")
+    return _result(errors)
 
 
 def main(argv: list[str] | None = None) -> int:

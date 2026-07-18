@@ -21,9 +21,11 @@ from tools.evidence.hde_epic038_ops01_v5 import (
     Ops01RPreflightExpectedIdentity,
     Ops01V5ExpectedIdentity,
     V5_PRIMARY_FILES,
+    _tree_manifest,
     validate_ops01_v5_package,
     validate_ops01r_discovery_dispatch,
     validate_ops01r_discovery_result,
+    validate_ops01r_live_capture,
     validate_ops01r_preflight,
 )
 
@@ -41,6 +43,19 @@ def _sha(value: bytes) -> str:
 
 def _write_json(path: Path, value: object) -> None:
     path.write_bytes(_canon(value))
+
+
+def _rewrite_candidate_ledger(root: Path) -> bytes:
+    ledger = (
+        "\n".join(
+            f"{_sha((root / name).read_bytes())}  {name}"
+            for name in sorted(V5_PRIMARY_FILES)
+            if name != "checksums.sha256"
+        )
+        + "\n"
+    ).encode("ascii")
+    (root / "checksums.sha256").write_bytes(ledger)
+    return ledger
 
 
 def test_discovery_dispatch_rejects_mutating_tokens(tmp_path):
@@ -90,7 +105,7 @@ def _candidate(
     include_projection_contract: bool = True,
 ) -> tuple[Path, Ops01V5ExpectedIdentity]:
     root = tmp_path / "candidate"
-    root.mkdir()
+    root.mkdir(exist_ok=True)
     source_commit = "1" * 40
     source_manifest = "2" * 64
     pre_staging = "3" * 64
@@ -184,15 +199,10 @@ def _candidate(
         },
     }
     _write_json(root / "result_summary.json", summary)
-    ledger = "\n".join(
-        f"{_sha((root / name).read_bytes())}  {name}"
-        for name in sorted(V5_PRIMARY_FILES)
-        if name != "checksums.sha256"
-    ) + "\n"
-    (root / "checksums.sha256").write_text(ledger)
+    ledger = _rewrite_candidate_ledger(root)
     expected = Ops01V5ExpectedIdentity(
         authorization_sha256=summary["authorization_sha256"],
-        candidate_ledger_sha256=_sha(ledger.encode("ascii")),
+        candidate_ledger_sha256=_sha(ledger),
         commands_sha256=_sha(commands),
         discovery_identity_sha256=discovery["discovery_identity_sha256"],
         expected_call_counts_sha256=_sha(_canon(counts)),
@@ -279,6 +289,115 @@ def test_candidate_requires_ddl_projection_contract(tmp_path):
 
     assert not result.valid
     assert "OPS01_V5_PROVIDER_PROOF_INVALID" in result.errors
+
+
+def _live_capture(
+    tmp_path: Path,
+) -> tuple[Path, Path, Ops01V5ExpectedIdentity]:
+    staging_root = tmp_path / "run"
+    source_root = staging_root / "source"
+    source_root.mkdir(parents=True)
+    (source_root / "tracked.py").write_text("VALUE = 1\n")
+    candidate_root, expected = _candidate(staging_root)
+    control_root = staging_root / "control"
+    control_root.mkdir()
+    authorization_path = control_root / "live_authorization.json"
+    authorization_path.touch()
+    failure_summary_path = control_root / "failure.json"
+    summary_path = candidate_root / "result_summary.json"
+    summary = json.loads(summary_path.read_text())
+    authorization = summary["authorization"]
+    source_write = summary["execution"]["source_write_validation"]
+
+    source_manifest = _tree_manifest(
+        source_root,
+        schema="hde_epic038.source_tree_manifest.v1",
+    )
+    source_manifest_sha256 = _sha(_canon(source_manifest))
+    staging_manifest = _tree_manifest(
+        staging_root,
+        schema="hde_epic038.non_source_staging_manifest.v1",
+        excluded_paths=(authorization_path, failure_summary_path),
+        excluded_recursive_roots=(source_root, candidate_root),
+    )
+    staging_manifest_sha256 = _sha(_canon(staging_manifest))
+
+    authorization["source"]["root"] = source_root.as_posix()
+    authorization["source"]["source_manifest_sha256"] = source_manifest_sha256
+    authorization["run"] = {
+        "authorization_path": authorization_path.as_posix(),
+        "candidate_root": candidate_root.as_posix(),
+        "staging_root": staging_root.as_posix(),
+    }
+    authorization["write_contract"].update(
+        {
+            "pre_staging_manifest_sha256": staging_manifest_sha256,
+            "failure_summary_path": failure_summary_path.as_posix(),
+            "self_bound_excluded_paths": sorted(
+                (
+                    authorization_path.as_posix(),
+                    failure_summary_path.as_posix(),
+                ),
+                key=lambda value: value.encode("utf-8"),
+            ),
+            "self_bound_excluded_recursive_roots": [candidate_root.as_posix()],
+        }
+    )
+    source_write.update(
+        {
+            "post_source_manifest_sha256": source_manifest_sha256,
+            "post_staging_manifest_sha256": staging_manifest_sha256,
+            "pre_source_manifest_sha256": source_manifest_sha256,
+            "pre_staging_manifest": staging_manifest["entries"],
+            "pre_staging_manifest_sha256": staging_manifest_sha256,
+            "self_bound_excluded_paths": authorization["write_contract"][
+                "self_bound_excluded_paths"
+            ],
+            "self_bound_excluded_recursive_roots": [candidate_root.as_posix()],
+            "source_root": source_root.as_posix(),
+        }
+    )
+    summary["authorization_sha256"] = _sha(_canon(authorization))
+    summary["literal_staging_root"] = staging_root.as_posix()
+    _write_json(authorization_path, authorization)
+    _write_json(summary_path, summary)
+    ledger = _rewrite_candidate_ledger(candidate_root)
+    expected = replace(
+        expected,
+        authorization_sha256=summary["authorization_sha256"],
+        candidate_ledger_sha256=_sha(ledger),
+        literal_staging_root=staging_root.as_posix(),
+        live_post_staging_manifest_sha256=staging_manifest_sha256,
+        live_pre_staging_manifest_sha256=staging_manifest_sha256,
+        source_manifest_sha256=source_manifest_sha256,
+    )
+    return staging_root, source_root, expected
+
+
+def test_live_capture_recomputes_source_and_non_candidate_staging(tmp_path):
+    staging_root, source_root, expected = _live_capture(tmp_path)
+    assert validate_ops01r_live_capture(staging_root, expected=expected).valid
+
+    (staging_root / "unauthorized.txt").write_text("not authorized\n")
+    result = validate_ops01r_live_capture(staging_root, expected=expected)
+    assert not result.valid
+    assert "OPS01_V5_LIVE_POST_STAGING_MANIFEST_MISMATCH" in result.errors
+
+    (source_root / "tracked.py").write_text("VALUE = 2\n")
+    result = validate_ops01r_live_capture(staging_root, expected=expected)
+    assert not result.valid
+    assert "OPS01_V5_SOURCE_MANIFEST_MISMATCH" in result.errors
+
+
+def test_live_capture_revalidates_excluded_authorization(tmp_path):
+    staging_root, _, expected = _live_capture(tmp_path)
+    authorization_path = staging_root / "control" / "live_authorization.json"
+    authorization_path.write_bytes(authorization_path.read_bytes() + b" ")
+
+    result = validate_ops01r_live_capture(staging_root, expected=expected)
+
+    assert not result.valid
+    assert "OPS01_V5_LIVE_CAPTURE_IDENTITY_MISMATCH" in result.errors
 
 
 def _discovery_pair(
