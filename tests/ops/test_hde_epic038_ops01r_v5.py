@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
+import shutil
 import subprocess
 import sys
 from dataclasses import asdict, replace
@@ -337,3 +339,54 @@ def test_preflight_uses_canonical_nested_identity_fields(tmp_path):
         path,
         expected=replace(expected, runner_sha256="f" * 64),
     ).valid
+
+
+def test_runner_preflight_round_trips_through_independent_validator(tmp_path):
+    source = tmp_path / "source"
+    required_files = (
+        "engine/db/ddl_identity_projection.py",
+        "scripts/db/capture_epic011_posture.py",
+        "scripts/ops/hde_epic038_ops01r.py",
+        "tools/evidence/hde_epic038_ops01_v5.py",
+        "tools/evidence/retained_evidence_safety.py",
+    )
+    for relative in required_files:
+        destination = source / relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(relative, destination)
+    environment = {
+        name: value
+        for name, value in os.environ.items()
+        if not name.casefold().startswith("python")
+    }
+    process = subprocess.run(
+        [
+            sys.executable,
+            "-I",
+            "-B",
+            str(source / "scripts/ops/hde_epic038_ops01r.py"),
+            "--preflight",
+        ],
+        cwd=tmp_path,
+        env=environment,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    path = Path(process.stdout.strip())
+    record = json.loads(path.read_text())
+    expected = Ops01RPreflightExpectedIdentity(
+        source_commit=record["source"]["commit"],
+        source_manifest_sha256=record["source"]["source_manifest_sha256"],
+        pre_staging_manifest_sha256=record["source_write_validation"][
+            "pre_staging_manifest_sha256"
+        ],
+        literal_staging_root=record["run"]["staging_root"],
+        runner_sha256=record["components"]["runner"]["sha256"],
+        validator_sha256=record["components"]["validator"]["sha256"],
+        projector_sha256=record["components"]["projector"]["sha256"],
+        interpreter_sha256=record["interpreter"]["sha256"],
+        railway_executable_sha256=record["railway_executable"]["sha256"],
+        preflight_identity_sha256=record["preflight_identity_sha256"],
+    )
+    assert validate_ops01r_preflight(path, expected=expected).valid

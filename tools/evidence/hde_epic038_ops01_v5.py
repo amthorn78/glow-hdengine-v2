@@ -711,6 +711,14 @@ def main(argv: list[str] | None = None) -> int:
     if sum(getattr(args, mode.replace("-", "_")) for mode in modes) != 1:
         return 2
     if not args.expected_identity_stdin:
+        if args.validate_preflight:
+            raise SystemExit("PREFLIGHT_EXPECTED_INPUT_INVALID")
+        if args.validate_discovery_authorization:
+            raise SystemExit("DISCOVERY_AUTH_EXPECTED_INPUT_INVALID")
+        if args.validate_discovery_result:
+            raise SystemExit("DISCOVERY_RESULT_EXPECTED_INPUT_INVALID")
+        if args.validate_live_authorization:
+            raise SystemExit("OPS01_AUTH_EXPECTED_INPUT_INVALID")
         raise SystemExit("OPS01_V5_EXPECTED_INPUT_INVALID")
     if args.validate_discovery_result != (args.authorization_path is not None):
         return 2
