@@ -26,6 +26,8 @@ HASH_SENTINEL = ROOT / "docs/evidence/INDEX.sha256"
 MIRROR_PATH = ROOT / "artifacts/evidence_index.jsonl"
 MIRROR_REL = MIRROR_PATH.relative_to(ROOT).as_posix()
 MIRROR_SHA_PATH = ROOT / "artifacts/evidence_index.jsonl.sha256"
+SANITY_LOG_REL = "audit/gates/sanity_pipeline/sanity_pipeline.log"
+SANITY_LOG_KEY = ("sanity.pipeline.log", SANITY_LOG_REL)
 EPIC020_BUNDLE_DIR = ROOT / "artifacts" / "epic020" / "bundles"
 EPIC020_ACCEPTANCE_MAP = ROOT / "docs" / "acceptance_map_epic020.json"
 if str(ROOT) not in sys.path:
@@ -2543,11 +2545,6 @@ EPIC038_PR06_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
         "ops-02": ("commands.txt", "stdout.log", "stderr.log", "exit_code.txt", "env_presence.json", "request_summary.json", "mapped_output_summary.json", "read_back_summary.json", "canonical_parity.log", "idempotence.log", "no_raw_vendor_payload_persistence.log", "legacy_fallback_preservation.log", "nonclaims.json", "result_summary.json", "checksums.sha256"),
     }.items() for name in names
 ]
-EPIC038_PR06_INDEX_KEYS = {
-    (entry["artifact_key"], entry["discovered_physical_path"])
-    for entry in EPIC038_PR06_PRIMARY_ARTIFACTS
-}
-
 A7_PRIMARY_ARTIFACTS: list[dict[str, object]] = [
     {
         "artifact_key": "a7.success_encoding_invariance",
@@ -2945,7 +2942,7 @@ def _dedupe_entries(entries: Iterable[Mapping[str, object]]) -> list[dict[str, o
     return sorted(deduped.values(), key=lambda item: (item["artifact_key"], item["discovered_physical_path"]))
 
 
-def _load_human_index(*, include_epic038_pr06: bool = True) -> list[dict[str, object]]:
+def _load_human_index() -> list[dict[str, object]]:
     payload = json.loads(HUMAN_INDEX.read_text(encoding="utf-8"))
     payload = [
         entry
@@ -2972,11 +2969,6 @@ def _load_human_index(*, include_epic038_pr06: bool = True) -> list[dict[str, ob
         not in EPIC038_PR04_SUPERSEDED_INDEX_KEYS
         and (entry.get("artifact_key"), entry.get("discovered_physical_path"))
         not in EPIC038_PR06_SUPERSEDED_INDEX_KEYS
-        and (
-            include_epic038_pr06
-            or (entry.get("artifact_key"), entry.get("discovered_physical_path"))
-            not in EPIC038_PR06_INDEX_KEYS
-        )
     ]
     return _dedupe_entries(
         [
@@ -3021,7 +3013,7 @@ def _load_human_index(*, include_epic038_pr06: bool = True) -> list[dict[str, ob
             *EPIC038_PR03_PRIMARY_ARTIFACTS,
             *EPIC038_PR04_PRIMARY_ARTIFACTS,
             *EPIC038_PR05_PRIMARY_ARTIFACTS,
-            *(EPIC038_PR06_PRIMARY_ARTIFACTS if include_epic038_pr06 else ()),
+            *EPIC038_PR06_PRIMARY_ARTIFACTS,
             *A7_PRIMARY_ARTIFACTS,
             *COMPAT_PRIMARY_ARTIFACTS,
             *CLI_CONFORMANCE_ARTIFACTS,
@@ -3252,13 +3244,175 @@ def _refresh_path_proof(path: Path, *, default_produced_at: str, check: bool) ->
     )
 
 
+def _rebind_sanity_log_only() -> None:
+    """Rebind the canonical sanity log without changing evidence membership."""
+    try:
+        human_payload = json.loads(HUMAN_INDEX.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        raise SystemExit("SANITY_REBIND_HUMAN_INDEX_INVALID") from exc
+    if not isinstance(human_payload, list):
+        raise SystemExit("SANITY_REBIND_HUMAN_INDEX_INVALID")
+
+    human_keys: list[tuple[str, str]] = []
+    for entry in human_payload:
+        if not isinstance(entry, dict):
+            raise SystemExit("SANITY_REBIND_HUMAN_INDEX_INVALID")
+        normalized = _normalize_index_entry(entry)
+        human_keys.append(
+            (
+                str(normalized["artifact_key"]),
+                str(normalized["discovered_physical_path"]),
+            )
+        )
+    if human_keys != sorted(human_keys) or len(human_keys) != len(set(human_keys)):
+        raise SystemExit("SANITY_REBIND_HUMAN_INDEX_TOPOLOGY_INVALID")
+
+    expected_sentinel = (
+        f"{_sha256_path(HUMAN_INDEX)}  docs/evidence/INDEX.json\n"
+    ).encode("utf-8")
+    try:
+        current_sentinel = HASH_SENTINEL.read_bytes()
+    except OSError as exc:
+        raise SystemExit("SANITY_REBIND_HUMAN_INDEX_SENTINEL_INVALID") from exc
+    if current_sentinel != expected_sentinel:
+        raise SystemExit("SANITY_REBIND_HUMAN_INDEX_SENTINEL_INVALID")
+
+    records: list[dict[str, object]] = []
+    try:
+        mirror_lines = MIRROR_PATH.read_text(encoding="utf-8").splitlines()
+    except (OSError, UnicodeError) as exc:
+        raise SystemExit("SANITY_REBIND_MIRROR_INVALID") from exc
+    for raw in mirror_lines:
+        if not raw.strip():
+            continue
+        try:
+            record = json.loads(raw)
+        except json.JSONDecodeError as exc:
+            raise SystemExit("SANITY_REBIND_MIRROR_INVALID") from exc
+        if not isinstance(record, dict):
+            raise SystemExit("SANITY_REBIND_MIRROR_INVALID")
+        records.append(record)
+    try:
+        mirror_keys = [
+            (str(record["artifact_key"]), str(record["discovered_physical_path"]))
+            for record in records
+        ]
+    except KeyError as exc:
+        raise SystemExit("SANITY_REBIND_MIRROR_INVALID") from exc
+    if mirror_keys != human_keys:
+        raise SystemExit("SANITY_REBIND_TOPOLOGY_DRIFT")
+
+    by_key = {
+        (str(record["artifact_key"]), str(record["discovered_physical_path"])): record
+        for record in records
+    }
+    mirror_key = ("index.machine_mirror", MIRROR_REL)
+    if SANITY_LOG_KEY not in by_key or mirror_key not in by_key:
+        raise SystemExit("SANITY_REBIND_REQUIRED_ROW_MISSING")
+
+    sanity_path = ROOT / SANITY_LOG_REL
+    try:
+        sanity_bytes = sanity_path.read_bytes()
+    except OSError as exc:
+        raise SystemExit("SANITY_REBIND_LOG_MISSING") from exc
+    if not sanity_bytes:
+        raise SystemExit("SANITY_REBIND_LOG_EMPTY")
+    if not sanity_bytes.endswith(b"summary:FAIL\n"):
+        raise SystemExit("SANITY_REBIND_LOG_NOT_FAIL")
+
+    produced_default = _isoformat(_dt.datetime.now(tz=_dt.timezone.utc))
+    sanity_stat = sanity_path.stat()
+    sanity_proof = _load_existing_proof(ROOT / f"{SANITY_LOG_REL}.path_proof.txt")
+    proof_anchor, sanity_produced = _write_path_proof(
+        SANITY_LOG_REL,
+        sha256=_sha256_bytes(sanity_bytes),
+        size_bytes=len(sanity_bytes),
+        mtime_utc=sanity_proof.get("mtime_utc"),
+        produced_at=produced_default,
+        default_produced_at=produced_default,
+        check=False,
+        stat_mtime=sanity_stat.st_mtime,
+    )
+    by_key[SANITY_LOG_KEY].update(
+        {
+            "produced_at_utc": sanity_produced,
+            "proof_anchor": proof_anchor,
+            "sha256": _sha256_bytes(sanity_bytes),
+            "size_bytes": len(sanity_bytes),
+        }
+    )
+
+    mirror_record = by_key[mirror_key]
+    mirror_record["produced_at_utc"] = produced_default
+    mirror_record["proof_anchor"] = f"{MIRROR_REL}.path_proof.txt"
+    mirror_record["role"] = "self_record"
+
+    self_index = mirror_keys.index(mirror_key)
+    rendered = [json.dumps(record, separators=(",", ":"), sort_keys=True) for record in records]
+    body_lines = [line for index, line in enumerate(rendered) if index != self_index]
+    body_text = "\n".join(body_lines) + ("\n" if body_lines else "")
+    mirror_record["sha256"] = _sha256_bytes(body_text.encode("utf-8"))
+    while True:
+        rendered = [json.dumps(record, separators=(",", ":"), sort_keys=True) for record in records]
+        mirror_bytes = ("\n".join(rendered) + "\n").encode("utf-8")
+        if mirror_record.get("size_bytes") == len(mirror_bytes):
+            break
+        mirror_record["size_bytes"] = len(mirror_bytes)
+    _write_if_changed(MIRROR_PATH, mirror_bytes, check=False)
+
+    mirror_stat = MIRROR_PATH.stat()
+    mirror_file_sha = _sha256_path(MIRROR_PATH)
+    mirror_sha_bytes = f"{mirror_file_sha}  {MIRROR_REL}\n".encode("utf-8")
+    _write_if_changed(MIRROR_SHA_PATH, mirror_sha_bytes, check=False)
+    _refresh_path_proof(
+        MIRROR_SHA_PATH, default_produced_at=produced_default, check=False
+    )
+    mirror_proof = _load_existing_proof(ROOT / f"{MIRROR_REL}.path_proof.txt")
+    _write_path_proof(
+        MIRROR_REL,
+        sha256=mirror_file_sha,
+        size_bytes=mirror_stat.st_size,
+        mtime_utc=mirror_proof.get("mtime_utc"),
+        produced_at=produced_default,
+        default_produced_at=produced_default,
+        check=False,
+        stat_mtime=mirror_stat.st_mtime,
+        extra_fields={"mirror_body_sha256": str(mirror_record["sha256"])},
+    )
+
+    _write_path_proof(
+        SANITY_LOG_REL,
+        sha256=_sha256_bytes(sanity_bytes),
+        size_bytes=len(sanity_bytes),
+        mtime_utc=None,
+        produced_at=None,
+        default_produced_at=produced_default,
+        check=True,
+        stat_mtime=sanity_stat.st_mtime,
+    )
+    _refresh_path_proof(
+        MIRROR_SHA_PATH, default_produced_at=produced_default, check=True
+    )
+    _write_path_proof(
+        MIRROR_REL,
+        sha256=mirror_file_sha,
+        size_bytes=mirror_stat.st_size,
+        mtime_utc=None,
+        produced_at=None,
+        default_produced_at=produced_default,
+        check=True,
+        stat_mtime=mirror_stat.st_mtime,
+        extra_fields={"mirror_body_sha256": str(mirror_record["sha256"])},
+    )
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description="Maintain the evidence index and mirror")
     parser.add_argument("--check", action="store_true", help="Fail if files would change")
     parser.add_argument(
-        "--exclude-epic038-pr06",
+        "--rebind-sanity-log",
         action="store_true",
-        help="Exclude unvalidated HDE-EPIC038 PR-06 OPS artifacts during FAIL-log binding",
+        help="Rebind only the canonical sanity log after a failed pipeline run",
     )
     parser.add_argument(
         "--epic-id",
@@ -3270,6 +3424,12 @@ def main(argv: list[str] | None = None) -> None:
 
     ensure_determinism_env()
     print(f"[evidence-index] env pins: {_render_env_pins()}")
+
+    if args.rebind_sanity_log:
+        if args.check or args.epic_id:
+            parser.error("--rebind-sanity-log cannot be combined with --check or --epic-id")
+        _rebind_sanity_log_only()
+        return
 
     def _stale_proof(rel: str) -> bool:
         proof = _load_existing_proof(ROOT / f"{rel}.path_proof.txt")
@@ -3300,9 +3460,7 @@ def main(argv: list[str] | None = None) -> None:
         if any(_stale_proof(rel) for rel in STALE_PROOF_TRIGGER_RELS):
             produced_default = _isoformat(_dt.datetime.now(tz=_dt.timezone.utc))
 
-        entries = _load_human_index(
-            include_epic038_pr06=not args.exclude_epic038_pr06
-        )
+        entries = _load_human_index()
         if "HDE-EPIC020" in epic_ids:
             epic020_tokens = _load_epic020_tokens("HDE-EPIC020")
             entries = _dedupe_entries(entries + _load_epic020_bundle_entries("HDE-EPIC020", epic020_tokens))

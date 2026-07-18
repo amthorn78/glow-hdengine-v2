@@ -91,9 +91,9 @@ def test_canonical_failure_bytes_are_rebound(tmp_path, monkeypatch):
     monkeypatch.setattr(sanity, "SANITY_LOG", log)
     monkeypatch.setattr(sanity, "default_steps", lambda: steps)
     monkeypatch.setattr(sanity, "_run_command", lambda command: _result(1))
-    monkeypatch.setattr(sanity, "_rebind_failure_log", lambda *, ops_validated: rebound.append(ops_validated) or 0)
+    monkeypatch.setattr(sanity, "_rebind_failure_log", lambda: rebound.append("called") or 0)
     assert sanity.run_pipeline(log_path=log) == 1
-    assert rebound == [False]
+    assert rebound == ["called"]
     assert log.read_text().endswith("first_failed_stage:late\nsummary:FAIL\n")
 
 
@@ -103,23 +103,39 @@ def test_canonical_failure_finalization_error_is_propagated(tmp_path, monkeypatc
     monkeypatch.setattr(sanity, "SANITY_LOG", log)
     monkeypatch.setattr(sanity, "default_steps", lambda: steps)
     monkeypatch.setattr(sanity, "_run_command", lambda command: _result(1))
-    monkeypatch.setattr(sanity, "_rebind_failure_log", lambda *, ops_validated: 9)
+    monkeypatch.setattr(sanity, "_rebind_failure_log", lambda: 9)
     assert sanity.run_pipeline(log_path=log) == 9
     assert log.read_text().endswith("first_failed_stage:late\nsummary:FAIL\n")
 
 
-@pytest.mark.parametrize("ops_validated,extra", [
-    (False, ("--exclude-epic038-pr06",)),
-    (True, ()),
-])
-def test_failure_rebind_uses_only_canonical_updater(monkeypatch, ops_validated, extra):
+def test_failure_rebind_uses_only_targeted_canonical_updater(monkeypatch):
     calls = []
     def run(command):
         calls.append(command)
         return _result()
     monkeypatch.setattr(sanity, "_run_command", run)
-    assert sanity._rebind_failure_log(ops_validated=ops_validated) == 0
-    assert calls == [(sanity.sys.executable, "tools/evidence/update_evidence_index.py", *extra)]
+    assert sanity._rebind_failure_log() == 0
+    assert calls == [
+        (
+            sanity.sys.executable,
+            "tools/evidence/update_evidence_index.py",
+            "--rebind-sanity-log",
+        )
+    ]
+
+
+def test_pr05_proof_preflight_stops_before_generator(monkeypatch):
+    step = sanity.default_steps()[10]
+    calls = []
+    monkeypatch.setattr(
+        sanity,
+        "validate_pr05_path_proof_prerequisites",
+        lambda: (_ for _ in ()).throw(ValueError("missing inherited proof")),
+    )
+    monkeypatch.setattr(sanity, "_run_command", lambda command: calls.append(command) or _result())
+    assert step.commands[0] == ("__validate_pr05_proofs__",)
+    assert sanity._run_stage(step) == 1
+    assert calls == []
 
 
 def test_ops_validation_failure_records_stage_and_stops(monkeypatch, tmp_path):
@@ -503,12 +519,17 @@ def test_malformed_summary_nested_object_fails_cleanly(tmp_path, package, field)
     "Authorization: Bearer live-secret",
     "HD-Geocode-Key: live-geocode-secret",
     "HD-Api-Key: live-legacy-secret",
+    "HD_API_KEY=${HD_API_KEY:-live-secret}",
+    "HD-Geocode-Key: ${GEO_API_KEY:=live-secret}",
+    "HD_API_KEY=$(printf live-secret)",
     "postgresql://user:password@host/database",
     '{"raw_vendor_payload":{"private":"value"}}',
     '{"birthdate":"1990-01-01","birthtime":"12:34","location":"Private Address"}',
     "--birthdate 1990-01-01 --birthtime 12:34 --location 'Private Address'",
     "birth_date=1990-01-01",
     'dob: "1990-01-01"',
+    "{'birthdate': '1990-01-01'}",
+    "birthdate=${BIRTHDATE:-1990-01-01}",
 ])
 def test_checksum_consistent_secret_or_raw_payload_is_rejected(tmp_path, leak):
     root = _packet_copy(tmp_path); packet = root / "audit/ops/hde-epic038/ops-02"
@@ -539,6 +560,23 @@ def test_quoted_colon_delimited_redacted_credential_is_allowed(tmp_path):
     root = _packet_copy(tmp_path); packet = root / "audit/ops/hde-epic038/ops-02"
     path = packet / "stderr.log"
     path.write_text('\"HD_API_KEY\": REDACTED\n')
+    _refresh_ledger(packet, path.name)
+    sanity.validate_ops_packages(root)
+
+
+@pytest.mark.parametrize(
+    "safe_reference",
+    [
+        "HD_API_KEY=$HD_API_KEY",
+        "HD_API_KEY=${HD_API_KEY}",
+        "HD-Geocode-Key: $GEO_API_KEY",
+        "'birthdate': '${BIRTHDATE}'",
+    ],
+)
+def test_bare_environment_references_are_allowed(tmp_path, safe_reference):
+    root = _packet_copy(tmp_path); packet = root / "audit/ops/hde-epic038/ops-02"
+    path = packet / "stderr.log"
+    path.write_text(safe_reference + "\n")
     _refresh_ledger(packet, path.name)
     sanity.validate_ops_packages(root)
 
@@ -633,6 +671,16 @@ def test_ops02_read_back_requires_agreed_durable_provider(tmp_path, mutation):
         sanity.validate_ops_packages(root)
 
 
+def test_ops02_stdout_requires_success_status(tmp_path):
+    root = _packet_copy(tmp_path); packet = root / "audit/ops/hde-epic038/ops-02"
+    path = packet / "stdout.log"
+    value = json.loads(path.read_text())
+    value["status"] = "error"
+    _write_json_and_refresh(packet, path.name, value)
+    with pytest.raises(ValueError, match="stdout"):
+        sanity.validate_ops_packages(root)
+
+
 @pytest.mark.parametrize("field,value", [
     ("route", "vendor.hdapi.post:/legacy"),
     ("resource_path", "legacy"),
@@ -688,9 +736,110 @@ def test_wrapper_has_no_legacy_writer_or_epic024_identity():
     assert "_sync_legacy_sanity_compatibility" not in updater
 
 
-def test_failure_index_mode_excludes_unvalidated_pr06_ops():
+def test_pr05_preflight_roster_matches_governed_index_and_current_proofs():
     from tools.evidence import update_evidence_index
-    included = update_evidence_index._load_human_index()
-    excluded = update_evidence_index._load_human_index(include_epic038_pr06=False)
-    assert any(str(entry["artifact_key"]).startswith("epic038.pr06.") for entry in included)
-    assert not any(str(entry["artifact_key"]).startswith("epic038.pr06.") for entry in excluded)
+
+    indexed_paths = tuple(
+        str(entry["discovered_physical_path"])
+        for entry in update_evidence_index.EPIC038_PR05_PRIMARY_ARTIFACTS
+    )
+    assert sanity.PR05_PRIMARY_PATHS == indexed_paths
+    sanity.validate_pr05_path_proof_prerequisites()
+
+
+@pytest.mark.parametrize("mutation", ["missing", "stale"])
+def test_pr05_preflight_rejects_missing_or_stale_inherited_proof(tmp_path, mutation):
+    root = tmp_path / "repo"
+    for rel in sanity.PR05_PRIMARY_PATHS:
+        primary = root / rel
+        proof = root / f"{rel}.path_proof.txt"
+        primary.parent.mkdir(parents=True, exist_ok=True)
+        proof.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(sanity.ROOT / rel, primary)
+        shutil.copy2(sanity.ROOT / f"{rel}.path_proof.txt", proof)
+    target = root / f"{sanity.PR05_PRIMARY_PATHS[0]}.path_proof.txt"
+    if mutation == "missing":
+        target.unlink()
+    else:
+        target.write_text(target.read_text().replace("sha256: ", "sha256: 0"))
+    with pytest.raises(ValueError, match="path proof"):
+        sanity.validate_pr05_path_proof_prerequisites(root)
+
+
+def test_targeted_failure_rebind_preserves_index_and_orientation_topology(
+    tmp_path, monkeypatch
+):
+    from tools.evidence import update_evidence_index as updater
+
+    root = tmp_path / "repo"
+    copied = (
+        "docs/evidence/INDEX.json",
+        "docs/evidence/INDEX.sha256",
+        "artifacts/evidence_index.jsonl",
+        "artifacts/evidence_index.jsonl.sha256",
+        "artifacts/evidence_index.jsonl.path_proof.txt",
+        "artifacts/evidence_index.jsonl.sha256.path_proof.txt",
+        "audit/gates/sanity_pipeline/sanity_pipeline.log",
+        "audit/gates/sanity_pipeline/sanity_pipeline.log.path_proof.txt",
+        "audit/gates/topology/orientation_demo.txt",
+    )
+    for rel in copied:
+        target = root / rel
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(sanity.ROOT / rel, target)
+
+    human_path = root / "docs/evidence/INDEX.json"
+    sentinel_path = root / "docs/evidence/INDEX.sha256"
+    mirror_path = root / "artifacts/evidence_index.jsonl"
+    mirror_sha_path = root / "artifacts/evidence_index.jsonl.sha256"
+    sanity_path = root / updater.SANITY_LOG_REL
+    orientation_path = root / "audit/gates/topology/orientation_demo.txt"
+    human_before = human_path.read_bytes()
+    sentinel_before = sentinel_path.read_bytes()
+    orientation_before = orientation_path.read_bytes()
+    keys_before = [
+        (row["artifact_key"], row["discovered_physical_path"])
+        for row in map(json.loads, mirror_path.read_text().splitlines())
+    ]
+
+    monkeypatch.setattr(updater, "ROOT", root)
+    monkeypatch.setattr(updater, "HUMAN_INDEX", human_path)
+    monkeypatch.setattr(updater, "HASH_SENTINEL", sentinel_path)
+    monkeypatch.setattr(updater, "MIRROR_PATH", mirror_path)
+    monkeypatch.setattr(updater, "MIRROR_SHA_PATH", mirror_sha_path)
+
+    failure_bytes = b"run:sanity-pipeline\nfirst_failed_stage:11\nsummary:FAIL\n"
+    sanity_path.write_bytes(failure_bytes)
+    updater._rebind_sanity_log_only()
+
+    assert human_path.read_bytes() == human_before
+    assert sentinel_path.read_bytes() == sentinel_before
+    assert orientation_path.read_bytes() == orientation_before
+    records = list(map(json.loads, mirror_path.read_text().splitlines()))
+    keys_after = [
+        (row["artifact_key"], row["discovered_physical_path"]) for row in records
+    ]
+    assert keys_after == keys_before
+    assert any(str(key).startswith("epic038.pr06.") for key, _ in keys_after)
+
+    sanity_row = next(
+        row
+        for row in records
+        if (row["artifact_key"], row["discovered_physical_path"])
+        == updater.SANITY_LOG_KEY
+    )
+    assert sanity_row["sha256"] == hashlib.sha256(failure_bytes).hexdigest()
+    assert sanity_row["size_bytes"] == len(failure_bytes)
+    sanity_proof = updater._load_existing_proof(
+        root / f"{updater.SANITY_LOG_REL}.path_proof.txt"
+    )
+    assert sanity_proof["sha256"] == sanity_row["sha256"]
+
+    mirror_digest = hashlib.sha256(mirror_path.read_bytes()).hexdigest()
+    assert mirror_sha_path.read_text() == f"{mirror_digest}  {updater.MIRROR_REL}\n"
+    mirror_row = next(row for row in records if row["artifact_key"] == "index.machine_mirror")
+    mirror_proof = updater._load_existing_proof(
+        root / f"{updater.MIRROR_REL}.path_proof.txt"
+    )
+    assert mirror_proof["sha256"] == mirror_digest
+    assert mirror_proof["mirror_body_sha256"] == mirror_row["sha256"]

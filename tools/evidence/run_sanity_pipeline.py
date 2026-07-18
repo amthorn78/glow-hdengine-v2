@@ -91,6 +91,22 @@ OPS01_SELECTION_SNAPSHOT_CONTENT = {
     },
 }
 
+PR05_PRIMARY_PATHS = (
+    "artifacts/bodygraph/v2_mapped_cache/write_transcript.json",
+    "artifacts/bodygraph/v2_mapped_cache/read_back_transcript.json",
+    "artifacts/bodygraph/v2_mapped_cache/canonical_parity.log",
+    "artifacts/bodygraph/v2_mapped_cache/no_raw_vendor_payload_persistence.log",
+    "artifacts/bodygraph/v2_mapped_cache/idempotence.log",
+    "artifacts/bodygraph/v2_mapped_cache/closed_rails_refusal.log",
+    "artifacts/bodygraph/v2_mapped_cache/legacy_fallback_preservation.log",
+    "artifacts/bodygraph/v2_mapped_cache/manifest.json",
+    "schemas/bodygraph_v2_mapped_cache_transcript.v1.json",
+    "schemas/bodygraph_v2_mapped_cache_manifest.v1.json",
+)
+SAFE_ENV_REFERENCE = re.compile(
+    r"\$(?:[A-Za-z_][A-Za-z0-9_]*|\{[A-Za-z_][A-Za-z0-9_]*\})\Z"
+)
+
 
 @dataclass(frozen=True)
 class SanityStep:
@@ -153,7 +169,10 @@ def default_steps() -> list[SanityStep]:
         SanityStep(STAGE_NAMES[7], (_py("tools/evidence/generate_bodygraph_policy_proofs.py"),)),
         SanityStep(STAGE_NAMES[8], (_py("tools/evidence/generate_db_bridge_parity.py"),)),
         SanityStep(STAGE_NAMES[9], (_py("tools/evidence/generate_architecture_snapshot.py"),)),
-        SanityStep(STAGE_NAMES[10], (_py("tools/evidence/generate_v2_mapped_cache_evidence.py"),)),
+        SanityStep(STAGE_NAMES[10], (
+            ("__validate_pr05_proofs__",),
+            _py("tools/evidence/generate_v2_mapped_cache_evidence.py"),
+        )),
         SanityStep(STAGE_NAMES[11], (("__validate_ops__",),)),
         SanityStep(STAGE_NAMES[12], (_py("tools/evidence/update_evidence_index.py"),)),
         SanityStep(STAGE_NAMES[13], (_py("tools/evidence/validate_evidence_paths.py"),)),
@@ -176,30 +195,48 @@ def _read_json(path: Path) -> dict:
 
 def _validate_secret_safety(packet: Path, required: Sequence[str]) -> None:
     """Reject recognizable secret values and persisted raw request/response data."""
+    retained_value = (
+        r'(?:"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\'|'
+        r'presence\((?:"[^"]*"|\'[^\']*\')\)|'
+        r'\$\{[^}\r\n]*\}|[^\s,"\'}\]]+)'
+    )
     credential_assignment = re.compile(
-        r"(?i)[\"']?\b(DATABASE_URL|DB_BRIDGE_URL|HD_API_KEY|GEO_API_KEY|HD_API_BASE_URL|HDAPI_BASE_URL)\b[\"']?\s*[:=]\s*[\"']?([^\s,\"'}]+)"
+        rf"(?i)(?P<key_quote>[\"']?)\b(?:DATABASE_URL|DB_BRIDGE_URL|HD_API_KEY|GEO_API_KEY|HD_API_BASE_URL|HDAPI_BASE_URL)\b(?P=key_quote)\s*[:=]\s*(?P<value>{retained_value})"
     )
-    credential_json = re.compile(
-        r'(?i)"(?:DATABASE_URL|DB_BRIDGE_URL|HD_API_KEY|GEO_API_KEY|HD_API_BASE_URL|HDAPI_BASE_URL)"\s*:\s*"([^"]+)"'
-    )
-    bearer = re.compile(r"(?i)\bBearer\s+([^\s\"']+)")
+    bearer = re.compile(rf"(?i)\bBearer\s+(?P<value>{retained_value})")
     vendor_header = re.compile(
-        r"(?i)(?:\"?HD-(?:Geocode|Api)-Key\"?\s*[:=]\s*[\"']?)([^\s,\"'}]+)"
-    )
-    birth_json = re.compile(
-        r'(?i)"(?:birth[-_]?date|date[-_]?of[-_]?birth|dob|birth[-_]?time|time[-_]?of[-_]?birth|birth[-_]?place|place[-_]?of[-_]?birth|birth[-_]?location|location)"\s*:\s*("(?:\\.|[^"\\])*"|null|false|[^\s,}\]]+)'
+        rf"(?i)(?P<key_quote>[\"']?)\bHD-(?:Geocode|Api)-Key\b(?P=key_quote)\s*[:=]\s*(?P<value>{retained_value})"
     )
     birth_assignment = re.compile(
-        r"(?i)\b(?:birth[-_]?date|date[-_]?of[-_]?birth|dob|birth[-_]?time|time[-_]?of[-_]?birth|birth[-_]?place|place[-_]?of[-_]?birth|birth[-_]?location|location)\s*[:=]\s*(\"(?:\\.|[^\"\\])*\"|'(?:\\.|[^'\\])*'|[^\s,}\]]+)"
+        rf"(?i)(?P<key_quote>[\"']?)\b(?:birth[-_]?date|date[-_]?of[-_]?birth|dob|birth[-_]?time|time[-_]?of[-_]?birth|birth[-_]?place|place[-_]?of[-_]?birth|birth[-_]?location|location)\b(?P=key_quote)\s*[:=]\s*(?P<value>{retained_value})"
     )
     birth_option = re.compile(
-        r"(?i)--(?:birth[-_]?date|date[-_]?of[-_]?birth|dob|birth[-_]?time|time[-_]?of[-_]?birth|birth[-_]?place|place[-_]?of[-_]?birth|birth[-_]?location|location)(?:=|\s+)(\"(?:\\.|[^\"\\])*\"|'(?:\\.|[^'\\])*'|[^\s]+)"
+        rf"(?i)--(?:birth[-_]?date|date[-_]?of[-_]?birth|dob|birth[-_]?time|time[-_]?of[-_]?birth|birth[-_]?place|place[-_]?of[-_]?birth|birth[-_]?location|location)(?:=|\s+)(?P<value>{retained_value})"
     )
     forbidden_uri = re.compile(r"(?i)\b(?:postgres(?:ql)?|railway)://")
 
+    def _normalized_value(raw: str) -> str:
+        value = raw.strip()
+        if len(value) >= 2 and value[0] == value[-1] and value[0] in {"\"", "'"}:
+            value = value[1:-1]
+        return value
+
+    def _value_is_safe(
+        raw: str, allowed: set[str], *, allow_presence: bool = False
+    ) -> bool:
+        value = _normalized_value(raw)
+        if value.lower() in allowed or SAFE_ENV_REFERENCE.fullmatch(value) is not None:
+            return True
+        return allow_presence and re.fullmatch(
+            r"presence\((['\"])(?:DATABASE_URL|DB_BRIDGE_URL|HD_API_KEY|GEO_API_KEY|HD_API_BASE_URL|HDAPI_BASE_URL)\1\)",
+            value,
+            flags=re.IGNORECASE,
+        ) is not None
+
     def _birth_value_is_safe(raw: str) -> bool:
-        value = raw.strip().strip("\"'").lower()
-        if value in {
+        value = _normalized_value(raw)
+        lowered = value.lower()
+        if lowered in {
             "<redacted>",
             "redacted",
             "set:redacted",
@@ -212,11 +249,11 @@ def _validate_secret_safety(packet: Path, required: Sequence[str]) -> None:
             "***",
         }:
             return True
-        if value.startswith(("$", "${")):
+        if SAFE_ENV_REFERENCE.fullmatch(value):
             return True
         return bool(
             re.fullmatch(
-                r"<approved-synthetic-(?:birthdate|birthtime|location)>", value
+                r"<approved-synthetic-(?:birthdate|birthtime|location)>", lowered
             )
         )
 
@@ -231,22 +268,24 @@ def _validate_secret_safety(packet: Path, required: Sequence[str]) -> None:
         if forbidden_uri.search(text):
             raise ValueError(f"{packet.name}: {name} contains an unredacted service URI")
         for match in bearer.finditer(text):
-            if match.group(1).lower() not in {"<redacted>", "redacted"}:
+            if not _value_is_safe(match.group("value"), {"<redacted>", "redacted"}):
                 raise ValueError(f"{packet.name}: {name} contains an unredacted bearer value")
         for match in vendor_header.finditer(text):
-            value = match.group(1).lower()
-            if value not in {"<redacted>", "redacted", "set:redacted", "set", "unset", "***"} and not value.startswith(("$", "${")):
+            if not _value_is_safe(
+                match.group("value"),
+                {"<redacted>", "redacted", "set:redacted", "set", "unset", "***"},
+            ):
                 raise ValueError(f"{packet.name}: {name} contains an unredacted vendor header value")
         for match in credential_assignment.finditer(text):
-            value = match.group(2).strip().lower()
-            if value not in {"redacted", "<redacted>", "set:redacted", "set", "unset", "presence("} and not value.startswith(("$", "${")):
+            if not _value_is_safe(
+                match.group("value"),
+                {"redacted", "<redacted>", "set:redacted", "set", "unset"},
+                allow_presence=True,
+            ):
                 raise ValueError(f"{packet.name}: {name} contains an unredacted credential value")
-        for match in credential_json.finditer(text):
-            if match.group(1).lower() not in {"redacted", "<redacted>", "set:redacted", "set", "unset"}:
-                raise ValueError(f"{packet.name}: {name} contains an unredacted credential value")
-        for pattern in (birth_json, birth_assignment, birth_option):
+        for pattern in (birth_assignment, birth_option):
             for match in pattern.finditer(text):
-                if not _birth_value_is_safe(match.group(1)):
+                if not _birth_value_is_safe(match.group("value")):
                     raise ValueError(
                         f"{packet.name}: {name} contains an unredacted birth-input value"
                     )
@@ -259,6 +298,38 @@ def _validate_secret_safety(packet: Path, required: Sequence[str]) -> None:
         for match in raw_payload_key.finditer(text):
             if not safe_raw_value.match(text[match.end():].lstrip()):
                 raise ValueError(f"{packet.name}: {name} contains persisted raw request, response, or vendor data")
+
+
+def validate_pr05_path_proof_prerequisites(root: Path = ROOT) -> None:
+    """Require the inherited PR-05 proof siblings before Stage 11 can rewrite primaries."""
+    for rel in PR05_PRIMARY_PATHS:
+        primary = root / rel
+        proof = root / f"{rel}.path_proof.txt"
+        if not primary.is_file() or primary.stat().st_size == 0:
+            raise ValueError(f"pr-05: required primary is missing or empty: {rel}")
+        if not proof.is_file() or proof.stat().st_size == 0:
+            raise ValueError(f"pr-05: required path proof is missing or empty: {rel}.path_proof.txt")
+        fields: dict[str, str] = {}
+        try:
+            for line in proof.read_text(encoding="utf-8").splitlines():
+                if line.strip() and ":" in line:
+                    key, value = line.split(":", 1)
+                    fields[key.strip()] = value.strip()
+        except (OSError, UnicodeError) as exc:
+            raise ValueError(f"pr-05: path proof is not readable UTF-8: {rel}.path_proof.txt") from exc
+        digest = hashlib.sha256(primary.read_bytes()).hexdigest()
+        try:
+            size_matches = int(fields.get("size_bytes", "")) == primary.stat().st_size
+        except ValueError:
+            size_matches = False
+        if (
+            fields.get("path") != rel
+            or fields.get("sha256") != digest
+            or not size_matches
+            or not fields.get("mtime_utc")
+            or not fields.get("produced_at_utc")
+        ):
+            raise ValueError(f"pr-05: path proof does not bind the inherited primary: {rel}.path_proof.txt")
 
 
 def _require_log_predicates(path: Path, required: Sequence[str]) -> None:
@@ -740,7 +811,7 @@ def _validate_packet(root: Path, package: str, required: Sequence[str]) -> None:
         durable_provider = read_back.get("provider")
         if not isinstance(canonical_sha, str) or not re.fullmatch(r"[0-9a-f]{64}", canonical_sha) or durable_provider != "psycopg" or read_back.get("canonical_sha256") != canonical_sha or read_back.get("read_back_match") is not True or read_back.get("identity_rows") != 1 or read_back.get("retention_decision") != "retain" or read_back.get("stored_payload_posture") != "adapter_mapped_no_raw_vendor_payload":
             raise ValueError("ops-02: read_back_summary.json predicate failed")
-        if stdout.get("provider") != durable_provider or stdout.get("vendor_requests") != 1 or stdout.get("adapter_status") != "ADAPTER_MAPPED" or stdout.get("canonical_sha256") != canonical_sha or stdout.get("read_back_match") is not True or stdout.get("idempotent") is not True or stdout.get("identity_rows") != 1 or stdout.get("second_write_rows") != 0 or stdout.get("retention_decision") != "retain":
+        if stdout.get("status") != "ok" or stdout.get("provider") != durable_provider or stdout.get("vendor_requests") != 1 or stdout.get("adapter_status") != "ADAPTER_MAPPED" or stdout.get("canonical_sha256") != canonical_sha or stdout.get("read_back_match") is not True or stdout.get("idempotent") is not True or stdout.get("identity_rows") != 1 or stdout.get("second_write_rows") != 0 or stdout.get("retention_decision") != "retain":
             raise ValueError("ops-02: stdout.log predicate failed")
         _require_log_predicates(packet / "canonical_parity.log", (f"canonical_sha256={canonical_sha}", "pre_write_post_read_match=true", "first_read_back_match=true", "second_read_back_match=true"))
         _require_log_predicates(packet / "idempotence.log", ("first_rows_written=1", "second_rows_written=0", "identity_rows=1", "canonical_hash_unchanged=true"))
@@ -763,7 +834,13 @@ def _run_command(command: Sequence[str]) -> subprocess.CompletedProcess[str]:
 
 def _run_stage(step: SanityStep) -> int:
     for command in step.commands:
-        if command == ("__validate_ops__",):
+        if command == ("__validate_pr05_proofs__",):
+            try:
+                validate_pr05_path_proof_prerequisites()
+            except ValueError as exc:
+                print(str(exc), file=sys.stderr)
+                return 1
+        elif command == ("__validate_ops__",):
             try:
                 validate_ops_packages()
             except ValueError as exc:
@@ -798,12 +875,11 @@ def _write_log(path: Path, results: Sequence[tuple[str, str]], first_failure: st
     return data
 
 
-def _rebind_failure_log(*, ops_validated: bool) -> int:
-    """Bind final FAIL bytes without replaying mandatory stages marked skipped."""
-    command = _py("tools/evidence/update_evidence_index.py")
-    if not ops_validated:
-        command = (*command, "--exclude-epic038-pr06")
-    result = _run_command(command)
+def _rebind_failure_log() -> int:
+    """Bind only the final FAIL log while preserving the evidence topology."""
+    result = _run_command(
+        _py("tools/evidence/update_evidence_index.py", "--rebind-sanity-log")
+    )
     return result.returncode or 0
 
 
@@ -815,7 +891,6 @@ def run_pipeline(*, log_path: Path = SANITY_LOG, steps: Sequence[SanityStep] | N
     results: list[tuple[str, str]] = []
     failure = "NONE"
     code = 0
-    ops_validated = False
     prospective_pass: bytes | None = None
     for index, step in enumerate(roster):
         # The final updater must bind the final sanity bytes, not an interim
@@ -824,8 +899,6 @@ def run_pipeline(*, log_path: Path = SANITY_LOG, steps: Sequence[SanityStep] | N
         if canonical_run and index == len(roster) - 1 and failure == "NONE":
             prospective_pass = _write_log(log_path, [*results, (step.name, "OK")], "NONE", "PASS")
         code = _run_stage(step)
-        if code == 0 and step.name == STAGE_NAMES[11]:
-            ops_validated = True
         results.append((step.name, "OK" if code == 0 else "FAIL"))
         if code:
             failure = step.name
@@ -849,7 +922,7 @@ def run_pipeline(*, log_path: Path = SANITY_LOG, steps: Sequence[SanityStep] | N
             results[-1] = (results[-1][0], "FAIL")
             failure = results[-1][0]
             _write_log(log_path, results, failure, "FAIL")
-            seal_code = _rebind_failure_log(ops_validated=ops_validated)
+            seal_code = _rebind_failure_log()
             if seal_code:
                 print(f"canonical FAIL evidence finalization failed with exit code {seal_code}", file=sys.stderr)
                 return seal_code
@@ -858,7 +931,7 @@ def run_pipeline(*, log_path: Path = SANITY_LOG, steps: Sequence[SanityStep] | N
 
     _write_log(log_path, results, failure, "PASS" if passed else "FAIL")
     if not passed and canonical_run:
-        seal_code = _rebind_failure_log(ops_validated=ops_validated)
+        seal_code = _rebind_failure_log()
         if seal_code:
             print(f"canonical FAIL evidence finalization failed with exit code {seal_code}", file=sys.stderr)
             return seal_code
