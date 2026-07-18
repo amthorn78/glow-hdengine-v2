@@ -18,14 +18,19 @@ from engine.db.ddl_identity_projection import (
 )
 from tools.evidence.hde_epic038_ops01_v5 import (
     Ops01RDiscoveryAuthorizationExpectedIdentity,
+    Ops01RLiveAuthorizationExpectedIdentity,
     Ops01RPreflightExpectedIdentity,
     Ops01V5ExpectedIdentity,
+    PREFLIGHT_NONCLAIMS,
+    PREFLIGHT_ZERO_IO_FIELDS,
     V5_PRIMARY_FILES,
     _tree_manifest,
     validate_ops01_v5_package,
+    validate_ops01r_discovery_authorization,
     validate_ops01r_discovery_dispatch,
     validate_ops01r_discovery_result,
     validate_ops01r_live_capture,
+    validate_ops01r_live_authorization,
     validate_ops01r_preflight,
 )
 
@@ -102,6 +107,8 @@ def _candidate(
     tmp_path: Path,
     *,
     counts: dict[str, int] | None = None,
+    ddl_parity: str = "projection_match",
+    include_capabilities: bool = True,
     include_projection_contract: bool = True,
 ) -> tuple[Path, Ops01V5ExpectedIdentity]:
     root = tmp_path / "candidate"
@@ -168,13 +175,39 @@ def _candidate(
         "environment": "dev",
         "rails_open": False,
         "full_ddl_semantic_parity_claimed": False,
+        "active_parity_corpus": {
+            "name": "hde_epic038_ops01_live_bodygraph_parity_v4",
+            "ordered_rows": [
+                "grants",
+                "search_path",
+                "select_one",
+                "ddl_fingerprint",
+                "bodygraph_payload_row",
+            ],
+        },
+    }
+    ddl_row: dict[str, object] = {
+        "name": "ddl_fingerprint",
+        "direct": {"status": "available", "value": []},
+        "bridge": {"status": "available", "value": []},
+        "parity": ddl_parity,
     }
     if include_projection_contract:
-        provider_proof["comparison_contract"] = {
+        ddl_row["comparison_contract"] = {
             "schema": DDL_IDENTITY_PROJECTION_SCHEMA,
+            "mode": "shared_identity_projection",
             "included_fields": list(DDL_IDENTITY_PROJECTION_FIELDS),
             "unexamined_fields": list(DDL_IDENTITY_UNEXAMINED_FIELDS),
+            "ordering": "objects_by_kind_name_columns_by_name_type",
         }
+    if include_capabilities:
+        provider_proof["capabilities"] = [
+            {"name": "grants"},
+            {"name": "search_path"},
+            {"name": "select_one"},
+            ddl_row,
+            {"name": "bodygraph_payload_row"},
+        ]
     _write_json(root / "provider_parity.proof.json", provider_proof)
     summary = {
         "schema": "hde_epic038.ops01.result_summary.v4",
@@ -287,6 +320,22 @@ def test_candidate_requires_ddl_projection_contract(tmp_path):
 
     result = validate_ops01_v5_package(root, expected=expected)
 
+    assert not result.valid
+    assert "OPS01_V5_PROVIDER_PROOF_INVALID" in result.errors
+
+
+def test_candidate_requires_active_projection_match_row(tmp_path):
+    missing_case = tmp_path / "missing-capabilities"
+    missing_case.mkdir()
+    root, expected = _candidate(missing_case, include_capabilities=False)
+    result = validate_ops01_v5_package(root, expected=expected)
+    assert not result.valid
+    assert "OPS01_V5_PROVIDER_PROOF_INVALID" in result.errors
+
+    legacy_case = tmp_path / "legacy-match"
+    legacy_case.mkdir()
+    root, expected = _candidate(legacy_case, ddl_parity="match")
+    result = validate_ops01_v5_package(root, expected=expected)
     assert not result.valid
     assert "OPS01_V5_PROVIDER_PROOF_INVALID" in result.errors
 
@@ -419,7 +468,7 @@ def _discovery_pair(
             "preflight_identity_sha256": "4" * 64,
             "source_manifest_sha256": source_manifest,
         },
-        "railway_cli": {"sha256": "5" * 64},
+        "railway_cli": {"lexical_path": "railway", "sha256": "5" * 64},
         "output_contract": {"path": (control / "discovery.json").as_posix()},
         "write_contract": {"pre_staging_manifest_sha256": "6" * 64},
     }
@@ -477,6 +526,64 @@ def test_discovery_result_is_bound_to_reviewed_authorization(tmp_path):
     assert not result.valid
     assert "DISCOVERY_RESULT_AUTHORIZATION_MISMATCH" in result.errors
 
+
+def test_discovery_result_replays_command_policy(tmp_path):
+    result_path, authorization_path, expected = _discovery_pair(tmp_path)
+    payload = json.loads(result_path.read_text())
+    payload["command_manifest"] = [["railway", "deploy"]]
+    payload["command_manifest_sha256"] = _sha(_canon(payload["command_manifest"]))
+    payload["discovery_identity_sha256"] = _sha(
+        _canon(
+            {
+                key: value
+                for key, value in payload.items()
+                if key != "discovery_identity_sha256"
+            }
+        )
+    )
+    _write_json(result_path, payload)
+
+    result = validate_ops01r_discovery_result(
+        result_path,
+        authorization_path=authorization_path,
+        expected=expected,
+    )
+
+    assert not result.valid
+    assert "DISCOVERY_RESULT_ARGV_MISMATCH" in result.errors
+
+
+def test_discovery_authorization_requires_output_path(tmp_path):
+    _, authorization_path, expected = _discovery_pair(tmp_path)
+    authorization = json.loads(authorization_path.read_text())
+    authorization["output_contract"] = {}
+    authorization["discovery_authorization_sha256"] = _sha(
+        _canon(
+            {
+                key: value
+                for key, value in authorization.items()
+                if key != "discovery_authorization_sha256"
+            }
+        )
+    )
+    _write_json(authorization_path, authorization)
+    expected = replace(
+        expected,
+        discovery_authorization_sha256=authorization[
+            "discovery_authorization_sha256"
+        ],
+    )
+
+    result = validate_ops01r_discovery_authorization(
+        authorization_path, expected=expected
+    )
+
+    assert not result.valid
+    assert "DISCOVERY_AUTH_OUTPUT_CONTRACT_INVALID" in result.errors
+
+
+def test_discovery_result_rejects_tampered_authorization_hash(tmp_path):
+    result_path, authorization_path, expected = _discovery_pair(tmp_path)
     payload = json.loads(result_path.read_text())
     payload["discovery_authorization_sha256"] = "e" * 64
     payload["discovery_identity_sha256"] = _sha(
@@ -497,6 +604,22 @@ def test_preflight_uses_canonical_nested_identity_fields(tmp_path):
     record = {
         "schema": "hde_epic038.ops01r.preflight.v1",
         "status": "PASS",
+        "actual_external_io_counts": {
+            name: 0 for name in PREFLIGHT_ZERO_IO_FIELDS
+        },
+        "expected_call_counts": {
+            "bodygraph_reads": 2,
+            "bridge_http_requests": 0,
+            "bridge_provider_selections": 1,
+            "direct_connection_attempts": 0,
+            "direct_provider_selections": 1,
+            "direct_sql_statements": 0,
+            "fallbacks": 0,
+            "logical_observations": 10,
+            "retries": 0,
+            "vendor_requests": 0,
+        },
+        "nonclaims": list(PREFLIGHT_NONCLAIMS),
         "run": {"staging_root": "/tmp/hde-epic038-ops01r/" + "a" * 32},
         "source": {
             "commit": "2" * 40,
@@ -535,6 +658,126 @@ def test_preflight_uses_canonical_nested_identity_fields(tmp_path):
         path,
         expected=replace(expected, runner_sha256="f" * 64),
     ).valid
+
+    record["actual_external_io_counts"]["railway_subprocesses"] = 1
+    record["preflight_identity_sha256"] = _sha(
+        _canon(
+            {
+                key: value
+                for key, value in record.items()
+                if key != "preflight_identity_sha256"
+            }
+        )
+    )
+    _write_json(path, record)
+    result = validate_ops01r_preflight(
+        path,
+        expected=replace(
+            expected,
+            preflight_identity_sha256=record["preflight_identity_sha256"],
+        ),
+    )
+    assert not result.valid
+    assert "PREFLIGHT_ACTUAL_IO_NONZERO" in result.errors
+
+    record["actual_external_io_counts"]["railway_subprocesses"] = 0
+    del record["nonclaims"]
+    record["preflight_identity_sha256"] = _sha(
+        _canon(
+            {
+                key: value
+                for key, value in record.items()
+                if key != "preflight_identity_sha256"
+            }
+        )
+    )
+    _write_json(path, record)
+    result = validate_ops01r_preflight(
+        path,
+        expected=replace(
+            expected,
+            preflight_identity_sha256=record["preflight_identity_sha256"],
+        ),
+    )
+    assert not result.valid
+    assert "PREFLIGHT_NONCLAIMS_INVALID" in result.errors
+
+
+def _live_authorization_pair(
+    tmp_path: Path,
+) -> tuple[Path, dict[str, object], Ops01RLiveAuthorizationExpectedIdentity]:
+    counts = {
+        "bodygraph_reads": 2,
+        "bridge_http_requests": 0,
+        "bridge_provider_selections": 1,
+        "direct_connection_attempts": 0,
+        "direct_provider_selections": 1,
+        "direct_sql_statements": 0,
+        "fallbacks": 0,
+        "logical_observations": 10,
+        "retries": 0,
+        "vendor_requests": 0,
+    }
+    authorization: dict[str, object] = {
+        "schema": "hde_epic038.ops01r.authorization.v1",
+        "source": {
+            "commit": "1" * 40,
+            "source_manifest_sha256": "2" * 64,
+        },
+        "run": {"staging_root": "/tmp/hde-epic038-ops01r/" + "a" * 32},
+        "runner": {"sha256": "3" * 64},
+        "validator": {"sha256": "4" * 64},
+        "projector": {"sha256": "5" * 64},
+        "interpreter": {"sha256": "6" * 64},
+        "preflight_identity_sha256": "7" * 64,
+        "discovery": {
+            "discovery_identity_sha256": "8" * 64,
+            "railway_cli": {"sha256": "9" * 64},
+        },
+        "launch_limit": 1,
+        "expected_call_counts": counts,
+        "tracked_writes_authorized": False,
+        "write_contract": {"pre_staging_manifest_sha256": "a" * 64},
+    }
+    path = tmp_path / "live_authorization.json"
+    _write_json(path, authorization)
+    expected = Ops01RLiveAuthorizationExpectedIdentity(
+        authorization_sha256=_sha(_canon(authorization)),
+        discovery_identity_sha256="8" * 64,
+        interpreter_sha256="6" * 64,
+        live_pre_staging_manifest_sha256="a" * 64,
+        literal_staging_root=authorization["run"]["staging_root"],
+        preflight_identity_sha256="7" * 64,
+        projector_sha256="5" * 64,
+        railway_executable_sha256="9" * 64,
+        runner_sha256="3" * 64,
+        source_commit="1" * 40,
+        source_manifest_sha256="2" * 64,
+        validator_sha256="4" * 64,
+    )
+    return path, authorization, expected
+
+
+def test_live_authorization_requires_canonical_schema_closed_bytes(tmp_path):
+    path, authorization, expected = _live_authorization_pair(tmp_path)
+    assert validate_ops01r_live_authorization(path, expected=expected).valid
+
+    path.write_text(json.dumps(authorization, indent=2) + "\n")
+    result = validate_ops01r_live_authorization(path, expected=expected)
+    assert not result.valid
+    assert "OPS01_AUTH_BYTES_NONCANONICAL" in result.errors
+
+    authorization["schema"] = "wrong.schema"
+    _write_json(path, authorization)
+    result = validate_ops01r_live_authorization(
+        path,
+        expected=replace(
+            expected,
+            authorization_sha256=_sha(_canon(authorization)),
+        ),
+    )
+    assert not result.valid
+    assert "OPS01_AUTH_SCHEMA_INVALID" in result.errors
 
 
 def _stage_runner_source(tmp_path: Path) -> Path:

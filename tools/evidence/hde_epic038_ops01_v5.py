@@ -122,6 +122,39 @@ FIXED_COUNTS = {
     "retries": 0,
     "fallbacks": 0,
 }
+PREFLIGHT_ZERO_IO_FIELDS = (
+    "bridge_transport_delegations",
+    "candidate_writes",
+    "credential_reads",
+    "direct_connector_delegations",
+    "failure_summary_writes",
+    "provider_constructions",
+    "railway_subprocesses",
+    "sql_driver_delegations",
+    "vendor_transport_delegations",
+)
+PREFLIGHT_NONCLAIMS = (
+    "no_railway_subprocess",
+    "no_credential_read",
+    "no_provider_construction",
+    "no_direct_connector_delegation",
+    "no_sql_driver_delegation",
+    "no_bridge_transport_delegation",
+    "no_vendor_transport_delegation",
+    "no_candidate_write",
+    "no_failure_summary_write",
+    "no_source_tree_write",
+    "no_bytecode_cache_write",
+    "no_unauthorized_staging_write",
+)
+DISCOVERY_STAGES = (
+    "cli_version",
+    "cli_help",
+    "project_inventory",
+    "environment_inventory",
+    "service_inventory",
+    "target_identity_probe",
+)
 T = TypeVar("T")
 
 
@@ -459,16 +492,51 @@ def validate_ops01_v5_package(
             or proof.get("full_ddl_semantic_parity_claimed") is not False
         ):
             errors.add("OPS01_V5_PROVIDER_PROOF_INVALID")
-        comparison = _mapping(
-            proof.get("comparison_contract")
-            or proof.get("ddl_identity_projection_contract")
-        )
+        active_corpus = _mapping(proof.get("active_parity_corpus"))
+        capabilities = proof.get("capabilities")
         if (
-            comparison.get("schema") != DDL_IDENTITY_PROJECTION_SCHEMA
+            active_corpus.get("name")
+            != "hde_epic038_ops01_live_bodygraph_parity_v4"
+            or tuple(active_corpus.get("ordered_rows", ()))
+            != (
+                "grants",
+                "search_path",
+                "select_one",
+                "ddl_fingerprint",
+                "bodygraph_payload_row",
+            )
+            or not isinstance(capabilities, list)
+            or len(capabilities) != 5
+            or tuple(_mapping(row).get("name") for row in capabilities)
+            != tuple(active_corpus.get("ordered_rows", ()))
+        ):
+            errors.add("OPS01_V5_PROVIDER_PROOF_INVALID")
+            capabilities = []
+        ddl_row = _mapping(capabilities[3]) if len(capabilities) == 5 else {}
+        comparison = _mapping(ddl_row.get("comparison_contract"))
+        if (
+            set(ddl_row)
+            != {"name", "direct", "bridge", "parity", "comparison_contract"}
+            or ddl_row.get("name") != "ddl_fingerprint"
+            or ddl_row.get("parity") != "projection_match"
+            or set(_mapping(ddl_row.get("direct"))) != {"status", "value"}
+            or set(_mapping(ddl_row.get("bridge"))) != {"status", "value"}
+            or set(comparison)
+            != {
+                "schema",
+                "mode",
+                "included_fields",
+                "unexamined_fields",
+                "ordering",
+            }
+            or comparison.get("schema") != DDL_IDENTITY_PROJECTION_SCHEMA
+            or comparison.get("mode") != "shared_identity_projection"
             or tuple(comparison.get("included_fields", ()))
             != DDL_IDENTITY_PROJECTION_FIELDS
             or tuple(comparison.get("unexamined_fields", ()))
             != DDL_IDENTITY_UNEXAMINED_FIELDS
+            or comparison.get("ordering")
+            != "objects_by_kind_name_columns_by_name_type"
         ):
             errors.add("OPS01_V5_PROVIDER_PROOF_INVALID")
     except Exception:
@@ -539,6 +607,23 @@ def validate_ops01r_preflight(
             errors.add("PREFLIGHT_SCHEMA_INVALID")
         if obj.get("status") != "PASS":
             errors.add("PREFLIGHT_STATUS_INVALID")
+        actual_io = _mapping(obj.get("actual_external_io_counts"))
+        if set(actual_io) != set(PREFLIGHT_ZERO_IO_FIELDS) or any(
+            type(actual_io[field]) is not int or actual_io[field] != 0
+            for field in actual_io
+        ):
+            errors.add("PREFLIGHT_ACTUAL_IO_NONZERO")
+        if obj.get("nonclaims") != list(PREFLIGHT_NONCLAIMS):
+            errors.add("PREFLIGHT_NONCLAIMS_INVALID")
+        expected_counts = _mapping(obj.get("expected_call_counts"))
+        if set(expected_counts) != set(CALL_COUNT_FIELDS) or any(
+            type(expected_counts[field]) is not int or expected_counts[field] < 0
+            for field in expected_counts
+        ) or any(
+            expected_counts.get(field) != value
+            for field, value in FIXED_COUNTS.items()
+        ):
+            errors.add("PREFLIGHT_EXPECTED_COUNTS_INVALID")
         actual = _preflight_actual_identity(obj)
         if obj.get("preflight_identity_sha256") != actual["preflight_identity_sha256"]:
             errors.add("PREFLIGHT_IDENTITY_MISMATCH")
@@ -562,9 +647,6 @@ def _discovery_staging_root(obj: Mapping[str, object]) -> object:
     output_path = _at(obj, "output_contract", "path")
     if isinstance(output_path, str) and output_path:
         return Path(output_path).parent.parent.as_posix()
-    source_root = _at(obj, "source", "root")
-    if isinstance(source_root, str) and source_root:
-        return Path(source_root).parent.as_posix()
     return None
 
 
@@ -604,6 +686,14 @@ def _validate_discovery_authorization_object(
         errors.add("DISCOVERY_AUTH_BYTES_NONCANONICAL")
     if obj.get("schema") != "hde_epic038.ops01r.discovery_authorization.v1":
         errors.add("DISCOVERY_AUTH_SCHEMA_INVALID")
+    output_path = _at(obj, "output_contract", "path")
+    if (
+        not isinstance(output_path, str)
+        or not output_path
+        or Path(output_path).name != "discovery.json"
+        or Path(output_path).parent.name != "control"
+    ):
+        errors.add("DISCOVERY_AUTH_OUTPUT_CONTRACT_INVALID")
     if (
         obj.get("discovery_authorization_sha256")
         != actual["discovery_authorization_sha256"]
@@ -714,6 +804,27 @@ def validate_ops01r_discovery_result(
             != _sha(_canon(command_manifest))
         ):
             errors.add("DISCOVERY_RESULT_IDENTITY_MISMATCH")
+        if not isinstance(command_manifest, list) or len(command_manifest) > len(
+            DISCOVERY_STAGES
+        ):
+            errors.add("DISCOVERY_RESULT_ARGV_MISMATCH")
+        else:
+            railway_path = _at(authorization, "railway_cli", "lexical_path")
+            for index, rendered in enumerate(command_manifest):
+                if (
+                    not isinstance(rendered, list)
+                    or not rendered
+                    or any(not isinstance(token, str) for token in rendered)
+                    or not isinstance(railway_path, str)
+                    or rendered[0] != railway_path
+                    or not validate_ops01r_discovery_dispatch(
+                        authorization_path,
+                        stage=DISCOVERY_STAGES[index],
+                        prior_results={},
+                        rendered_argv=tuple(rendered),
+                    ).valid
+                ):
+                    errors.add("DISCOVERY_RESULT_ARGV_MISMATCH")
 
         if _at(obj, "railway_cli", "sha256") != expected.railway_executable_sha256:
             errors.add("DISCOVERY_RESULT_CLI_IDENTITY_MISMATCH")
@@ -740,9 +851,46 @@ def validate_ops01r_discovery_result(
 def validate_ops01r_live_authorization(
     path: Path, *, expected: Ops01RLiveAuthorizationExpectedIdentity
 ) -> Ops01V5ValidationResult:
+    errors: set[str] = set()
     try:
+        raw_bytes = path.read_bytes()
         obj = _mapping(_read_json(path))
-        authorization_sha256 = _sha(_canon(obj))
+        canonical_bytes = _canon(obj)
+        authorization_sha256 = _sha(canonical_bytes)
+        if raw_bytes != canonical_bytes:
+            errors.add("OPS01_AUTH_BYTES_NONCANONICAL")
+        if obj.get("schema") != "hde_epic038.ops01r.authorization.v1":
+            errors.add("OPS01_AUTH_SCHEMA_INVALID")
+        if set(obj) != {
+            "schema",
+            "source",
+            "run",
+            "runner",
+            "validator",
+            "projector",
+            "interpreter",
+            "preflight_identity_sha256",
+            "discovery",
+            "launch_limit",
+            "expected_call_counts",
+            "tracked_writes_authorized",
+            "write_contract",
+        }:
+            errors.add("OPS01_AUTH_UNKNOWN_KEY")
+        counts = _mapping(obj.get("expected_call_counts"))
+        if (
+            set(counts) != set(CALL_COUNT_FIELDS)
+            or any(
+                type(counts[field]) is not int or counts[field] < 0
+                for field in counts
+            )
+            or any(
+                counts.get(field) != value for field, value in FIXED_COUNTS.items()
+            )
+            or obj.get("launch_limit") != 1
+            or obj.get("tracked_writes_authorized") is not False
+        ):
+            errors.add("OPS01_AUTH_EXPECTED_IDENTITY_MISMATCH")
         actual = {
             "authorization_sha256": authorization_sha256,
             "discovery_identity_sha256": _at(
@@ -766,10 +914,10 @@ def validate_ops01r_live_authorization(
             "validator_sha256": _at(obj, "validator", "sha256"),
         }
         if not _all_expected_values_match(actual, expected):
-            return _result({"OPS01_AUTH_EXPECTED_IDENTITY_MISMATCH"})
-        return _result(set())
-    except Exception:
-        return _result({"OPS01_AUTH_EXPECTED_INPUT_INVALID"})
+            errors.add("OPS01_AUTH_EXPECTED_IDENTITY_MISMATCH")
+    except (OSError, UnicodeError, ValueError, TypeError):
+        errors.add("OPS01_AUTH_EXPECTED_INPUT_INVALID")
+    return _result(errors)
 
 
 def validate_ops01r_live_capture(
