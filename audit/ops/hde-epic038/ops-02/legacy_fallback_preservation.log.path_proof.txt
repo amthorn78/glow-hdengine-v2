@@ -1,5 +1,5 @@
 path: audit/ops/hde-epic038/ops-02/legacy_fallback_preservation.log
 size_bytes: 150
 sha256: a7af0e7b4356f8a86ccf608a9a0e5c44b6127250795ebaa2b5d75f66e2f307d7
-mtime_utc: 2026-07-17T18:53:00Z
+mtime_utc: 2026-07-17T17:11:06Z
 produced_at_utc: 2026-07-16T19:04:52Z

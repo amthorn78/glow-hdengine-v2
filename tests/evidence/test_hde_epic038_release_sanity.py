@@ -384,7 +384,70 @@ def test_ops01_requires_distinct_observed_bodygraph_providers(tmp_path, side, pr
     row = next(item for item in value["capabilities"] if item["name"] == "bodygraph_payload_row")
     row[side]["provider"] = provider
     _write_json_and_refresh(packet, path.name, value)
-    with pytest.raises(ValueError, match="BodyGraph provider identities"):
+    with pytest.raises(ValueError, match="BodyGraph.*provider"):
+        sanity.validate_ops_packages(root)
+
+
+@pytest.mark.parametrize("side", ["direct", "bridge"])
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        "missing",
+        "path-substitution",
+        "hash-drift",
+        "content-selected",
+        "row-provider",
+        "extra-attempt",
+        "selection-order",
+        "force-flag",
+    ],
+)
+def test_ops01_rejects_bodygraph_selection_snapshot_drift(tmp_path, side, mutation):
+    root = _packet_copy(tmp_path); packet = root / "audit/ops/hde-epic038/ops-01"
+    path = packet / "provider_parity.proof.json"; value = json.loads(path.read_text())
+    row = next(item for item in value["capabilities"] if item["name"] == "bodygraph_payload_row")
+    snapshot = row[side]["selection_snapshot"]
+    if mutation == "missing":
+        row[side].pop("selection_snapshot")
+    elif mutation == "path-substitution":
+        snapshot["path"] = snapshot["path"].replace(f"/{side}-cwd/", "/substituted-cwd/")
+    elif mutation == "hash-drift":
+        snapshot["sha256"] = "0" * 64
+    elif mutation == "content-selected":
+        snapshot["content"]["selected"] = "memory"
+        snapshot["content"]["attempts"] = [{"provider": "memory", "status": "ok"}]
+        snapshot["content"]["selection_order"] = ["memory"]
+        row[side]["provider"] = "memory"
+    elif mutation == "row-provider":
+        row[side]["provider"] = "memory"
+    elif mutation == "extra-attempt":
+        snapshot["content"]["attempts"].append({"provider": "memory", "status": "ok"})
+    elif mutation == "selection-order":
+        snapshot["content"]["selection_order"] = ["memory"]
+    else:
+        flag = "force_pg" if side == "direct" else "force_bridge"
+        snapshot["content"]["flags"][flag] = False
+    if mutation in {"content-selected", "extra-attempt", "selection-order", "force-flag"}:
+        canonical = sanity._canonical_json_bytes(snapshot["content"])
+        snapshot["sha256"] = hashlib.sha256(canonical).hexdigest()
+    _write_json_and_refresh(packet, path.name, value)
+    with pytest.raises(ValueError, match=rf"{side} BodyGraph selection snapshot"):
+        sanity.validate_ops_packages(root)
+
+
+@pytest.mark.parametrize(
+    ("target", "value"),
+    [
+        ("schema", "hde_epic038.ops01.provider_parity.v3"),
+        ("remediation_marker", "F-007_OPS01_SCOPE"),
+    ],
+)
+def test_ops01_requires_v4_provider_proof_binding(tmp_path, target, value):
+    root = _packet_copy(tmp_path); packet = root / "audit/ops/hde-epic038/ops-01"
+    path = packet / "provider_parity.proof.json"; proof = json.loads(path.read_text())
+    proof[target] = value
+    _write_json_and_refresh(packet, path.name, proof)
+    with pytest.raises(ValueError, match="exact corpus"):
         sanity.validate_ops_packages(root)
 
 

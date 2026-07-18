@@ -1,39 +1,40 @@
 #!/usr/bin/env bash
-# HDE-EPIC038 OPS-01 closed-rails remediation runner and literal transcript.
-# Frozen before execution and invoked exactly once from the repository root as:
-# bash audit/ops/hde-epic038/ops-01/commands.txt
+# HDE-EPIC038 OPS-01 provider-selection provenance remediation runner.
+# Frozen outside tracked evidence, hashed before execution, and invoked once.
 set -Eeuo pipefail
 
 REPO=/workspaces/glow-hdengine-v2
 OUT=/workspaces/glow-hdengine-v2/audit/ops/hde-epic038/ops-01
-STAGE=/tmp/hde-epic038-ops01-closed-remediation-be179833-20260716t162453z
-PACKAGE=/tmp/hde-epic038-ops01-closed-remediation-be179833-20260716t162453z/package
-BUNDLE=/tmp/hde-epic038-ops01-closed-remediation-be179833-20260716t162453z/ops-01-resubmission.zip
-HDCTL=/workspaces/glow-hdengine-v2/.venv/bin/hdctl
+FROZEN_RUNNER=/tmp/hde-epic038-ops01-provider-selection-6d5de673-20260717t235802z.runner.sh
+STAGE=/tmp/hde-epic038-ops01-provider-selection-6d5de673-20260717t235802z
+PACKAGE=/tmp/hde-epic038-ops01-provider-selection-6d5de673-20260717t235802z/package
+BUNDLE=/tmp/hde-epic038-ops01-provider-selection-6d5de673-20260717t235802z/ops-01-resubmission.zip
+PYTHON=/workspaces/glow-hdengine-v2/.venv/bin/python
 SELECTOR_ALIAS=epic011-s10-invariance-1
 SELECTOR_UUID=3fa85f64-5717-4562-b3fc-2c963f66afab
-CAPTURE_HEAD=be179833532a210afbd7fc019f27fc5281440469
+CAPTURE_BRANCH=codex/implement-pr-06-for-hde-epic038
+CAPTURE_HEAD=6d5de67344b8958daeb8ac689afb81e6bd0bf214
 
 export APP_ENV=dev
 export SAFE_MODE=1
 export ALLOW_NETWORK=0
+export ALLOW_DB_WRITE=0
 export LC_ALL=C
 export LANG=C
 export TZ=UTC
+unset ENGINE_ENV DB_FORCE_PG DB_FORCE_BRIDGE DB_ALLOW_BRIDGE_IN_PROD
 
 cd "$REPO"
-RUNNER_SHA_BEFORE="$(sha256sum "$OUT/commands.txt" | cut -d ' ' -f 1)"
+RUNNER_SHA_BEFORE="${FROZEN_RUNNER_SHA256:?FROZEN_RUNNER_SHA256 must be set from the pre-execution hash}"
+test "$(sha256sum "$FROZEN_RUNNER" | cut -d ' ' -f 1)" = "$RUNNER_SHA_BEFORE"
+test -x "$PYTHON"
 
-# The preflight was captured while current main was clean, before this frozen
-# runner replaced D1. Live actions must consume that exact preserved identity.
-test "$(<"$STAGE/preflight/repo_root.txt")" = "$REPO"
-test "$(<"$STAGE/preflight/branch.txt")" = main
-test "$(<"$STAGE/preflight/head.txt")" = "$CAPTURE_HEAD"
-test ! -s "$STAGE/preflight/worktree.txt"
+# Live actions must consume the clean, fetched PR head pinned above.
 test "$(git rev-parse HEAD)" = "$CAPTURE_HEAD"
-test "$(git branch --show-current)" = main
-test ! -e "$STAGE/capture"
-test ! -e "$PACKAGE"
+test "$(git branch --show-current)" = "$CAPTURE_BRANCH"
+test -z "$(git status --porcelain=v1)"
+test ! -e "$STAGE"
+"$PYTHON" -c 'import os; from urllib.parse import urlparse; db=os.environ.get("DATABASE_URL",""); bridge=os.environ.get("DB_BRIDGE_URL",""); host=urlparse(db).hostname or ""; assert db and bridge and host.endswith(".proxy.rlwy.net")'
 
 mkdir -p "$STAGE/capture" "$STAGE/streams" "$STAGE/direct-cwd" \
   "$STAGE/bridge-cwd" "$STAGE/checker-root/ci/checks" \
@@ -43,12 +44,14 @@ mkdir -p "$STAGE/capture" "$STAGE/streams" "$STAGE/direct-cwd" \
 # Fresh read-only DB posture and four-row direct/bridge provider capture. All
 # mutable logger, capture, and adapter paths are redirected to staging.
 set +e
-python -c 'from pathlib import Path; import engine.ops.http_log as h; import scripts.db.capture_epic011_posture as m; stage=Path("/tmp/hde-epic038-ops01-closed-remediation-be179833-20260716t162453z"); h.LOG_PATH=stage/"keys_only.capture.jsonl"; m.CAPTURE_ROOT=stage/"capture"; m._util.ADAPTER_SNAPSHOT=str(stage/"adapter_selection.snapshot.json"); m.main()' \
+"$PYTHON" -c 'from pathlib import Path; import engine.ops.http_log as h; import scripts.db.capture_epic011_posture as m; stage=Path("/tmp/hde-epic038-ops01-provider-selection-6d5de673-20260717t235802z"); h.LOG_PATH=stage/"keys_only.capture.jsonl"; m.CAPTURE_ROOT=stage/"capture"; m._util.ADAPTER_SNAPSHOT=str(stage/"adapter_selection.snapshot.json"); m.main()' \
   > "$STAGE/streams/capture.stdout" 2> "$STAGE/streams/capture.stderr"
 CAPTURE_RC=$?
 set -e
 printf '%s\n' "$CAPTURE_RC" > "$STAGE/streams/capture.exit_code"
 test "$CAPTURE_RC" -eq 0
+test "$(git rev-parse HEAD)" = "$CAPTURE_HEAD"
+test -z "$(git status --porcelain=v1)"
 
 # PF29 DB conjunction syntax. Both reads resolve the approved payload-bearing
 # synthetic row through engine.cli.main:_fetch_db_bodygraph. Only derived
@@ -57,29 +60,85 @@ set +e
 (
   cd "$STAGE/direct-cwd"
   env -u DB_FORCE_BRIDGE DB_FORCE_PG=1 \
-    "$HDCTL" showcompat --conjunction \
+    "$PYTHON" -m engine.cli showcompat --conjunction \
       --user-a "$SELECTOR_ALIAS" --user-b "$SELECTOR_ALIAS" --source db
 ) > "$STAGE/bodygraph.direct.compat.json" 2> "$STAGE/streams/bodygraph_direct.stderr"
 BODYGRAPH_DIRECT_RC=$?
 set -e
 printf '%s\n' "$BODYGRAPH_DIRECT_RC" > "$STAGE/streams/bodygraph_direct.exit_code"
 test "$BODYGRAPH_DIRECT_RC" -eq 0
+test "$(git rev-parse HEAD)" = "$CAPTURE_HEAD"
+test -z "$(git status --porcelain=v1)"
+DIRECT_SNAPSHOT="$STAGE/direct-cwd/artifacts/db_bridge/adapter_selection.snapshot.json"
+test -s "$DIRECT_SNAPSHOT"
+SNAPSHOT_PATH="$DIRECT_SNAPSHOT" EXPECTED_PROVIDER=psycopg \
+EXPECTED_FORCE_PG=true EXPECTED_FORCE_BRIDGE=false "$PYTHON" - <<'PY'
+import json
+import os
+from pathlib import Path
+
+path=Path(os.environ['SNAPSHOT_PATH'])
+content=json.loads(path.read_text(encoding='utf-8'))
+expected={
+    'schema':'v1',
+    'selected':os.environ['EXPECTED_PROVIDER'],
+    'attempts':[{'provider':os.environ['EXPECTED_PROVIDER'],'status':'ok'}],
+    'selection_order':[os.environ['EXPECTED_PROVIDER']],
+    'flags':{
+        'env':'dev',
+        'force_pg':os.environ['EXPECTED_FORCE_PG']=='true',
+        'force_bridge':os.environ['EXPECTED_FORCE_BRIDGE']=='true',
+        'allow_bridge_prod':False,
+    },
+}
+canonical=(json.dumps(content,ensure_ascii=True,separators=(',',':'),sort_keys=True)+'\n').encode()
+assert path.read_bytes()==canonical
+assert content==expected
+PY
 
 set +e
 (
   cd "$STAGE/bridge-cwd"
   env -u DB_FORCE_PG DB_FORCE_BRIDGE=1 \
-    "$HDCTL" showcompat --conjunction \
+    "$PYTHON" -m engine.cli showcompat --conjunction \
       --user-a "$SELECTOR_ALIAS" --user-b "$SELECTOR_ALIAS" --source db
 ) > "$STAGE/bodygraph.bridge.compat.json" 2> "$STAGE/streams/bodygraph_bridge.stderr"
 BODYGRAPH_BRIDGE_RC=$?
 set -e
 printf '%s\n' "$BODYGRAPH_BRIDGE_RC" > "$STAGE/streams/bodygraph_bridge.exit_code"
 test "$BODYGRAPH_BRIDGE_RC" -eq 0
+test "$(git rev-parse HEAD)" = "$CAPTURE_HEAD"
+test -z "$(git status --porcelain=v1)"
+BRIDGE_SNAPSHOT="$STAGE/bridge-cwd/artifacts/db_bridge/adapter_selection.snapshot.json"
+test -s "$BRIDGE_SNAPSHOT"
+SNAPSHOT_PATH="$BRIDGE_SNAPSHOT" EXPECTED_PROVIDER=bridge \
+EXPECTED_FORCE_PG=false EXPECTED_FORCE_BRIDGE=true "$PYTHON" - <<'PY'
+import json
+import os
+from pathlib import Path
+
+path=Path(os.environ['SNAPSHOT_PATH'])
+content=json.loads(path.read_text(encoding='utf-8'))
+expected={
+    'schema':'v1',
+    'selected':os.environ['EXPECTED_PROVIDER'],
+    'attempts':[{'provider':os.environ['EXPECTED_PROVIDER'],'status':'ok'}],
+    'selection_order':[os.environ['EXPECTED_PROVIDER']],
+    'flags':{
+        'env':'dev',
+        'force_pg':os.environ['EXPECTED_FORCE_PG']=='true',
+        'force_bridge':os.environ['EXPECTED_FORCE_BRIDGE']=='true',
+        'allow_bridge_prod':False,
+    },
+}
+canonical=(json.dumps(content,ensure_ascii=True,separators=(',',':'),sort_keys=True)+'\n').encode()
+assert path.read_bytes()==canonical
+assert content==expected
+PY
 
 # Canonical comparison for the payload-bearing derived DB reads.
 set +e
-python -m presenter.json_canon_compare \
+"$PYTHON" -m presenter.json_canon_compare \
   "$STAGE/bodygraph.direct.compat.json" \
   "$STAGE/bodygraph.bridge.compat.json" \
   --log "$STAGE/bodygraph_compare.log" \
@@ -102,7 +161,7 @@ cp "$STAGE/capture/runtime/env_connectivity.snapshot.json" \
 cp "$STAGE/capture/db_bridge/provider_parity.proof.json" \
   "$STAGE/checker-root/artifacts/db_bridge/provider_parity.proof.json"
 set +e
-python "$STAGE/checker-root/ci/checks/check_bridge_consistency.py" \
+"$PYTHON" "$STAGE/checker-root/ci/checks/check_bridge_consistency.py" \
   > "$STAGE/streams/bridge_checker.stdout" 2> "$STAGE/streams/bridge_checker.stderr"
 BRIDGE_CHECKER_RC=$?
 set -e
@@ -112,7 +171,8 @@ test "$BRIDGE_CHECKER_RC" -eq 0
 # Produce the JSON deliverables solely from the fresh staged DB/bridge inputs.
 REPO="$REPO" STAGE="$STAGE" PACKAGE="$PACKAGE" \
 SELECTOR_ALIAS="$SELECTOR_ALIAS" SELECTOR_UUID="$SELECTOR_UUID" \
-CAPTURE_HEAD="$CAPTURE_HEAD" RUNNER_SHA_BEFORE="$RUNNER_SHA_BEFORE" python - <<'PY'
+CAPTURE_HEAD="$CAPTURE_HEAD" CAPTURE_BRANCH="$CAPTURE_BRANCH" \
+RUNNER_SHA_BEFORE="$RUNNER_SHA_BEFORE" "$PYTHON" - <<'PY'
 from __future__ import annotations
 import datetime as dt
 import hashlib
@@ -126,6 +186,7 @@ package=Path(os.environ['PACKAGE'])
 selector_alias=os.environ['SELECTOR_ALIAS']
 selector_uuid=os.environ['SELECTOR_UUID']
 capture_head=os.environ['CAPTURE_HEAD']
+capture_branch=os.environ['CAPTURE_BRANCH']
 runner_sha=os.environ['RUNNER_SHA_BEFORE']
 
 def load(path: Path):
@@ -140,6 +201,23 @@ def write_json(name: str, payload: object) -> None:
         encoding='utf-8',
     )
 
+def selection_snapshot(path: Path, expected: dict) -> dict:
+    if not path.is_file():
+        raise SystemExit(f'SELECTION_SNAPSHOT_MISSING:{path}')
+    content=load(path)
+    canonical=(
+        json.dumps(content,ensure_ascii=True,separators=(',',':'),sort_keys=True)+'\n'
+    ).encode('utf-8')
+    if path.read_bytes()!=canonical:
+        raise SystemExit(f'SELECTION_SNAPSHOT_NOT_CANONICAL:{path}')
+    if content!=expected:
+        raise SystemExit(f'SELECTION_SNAPSHOT_UNEXPECTED:{path}')
+    return {
+        'path':str(path),
+        'sha256':hashlib.sha256(canonical).hexdigest(),
+        'content':content,
+    }
+
 raw_proof=load(stage/'capture/db_bridge/provider_parity.proof.json')
 direct_capture=load(stage/'capture/db/provider_parity/direct.json')
 bridge_capture=load(stage/'capture/db/provider_parity/bridge.json')
@@ -147,6 +225,36 @@ adapter=load(stage/'adapter_selection.snapshot.json')
 ddl=load(stage/'capture/db/ddl_fingerprint.json')
 direct_compat=load(stage/'bodygraph.direct.compat.json')
 bridge_compat=load(stage/'bodygraph.bridge.compat.json')
+direct_selection=selection_snapshot(
+    stage/'direct-cwd/artifacts/db_bridge/adapter_selection.snapshot.json',
+    {
+        'schema':'v1',
+        'selected':'psycopg',
+        'attempts':[{'provider':'psycopg','status':'ok'}],
+        'selection_order':['psycopg'],
+        'flags':{
+            'env':'dev',
+            'force_pg':True,
+            'force_bridge':False,
+            'allow_bridge_prod':False,
+        },
+    },
+)
+bridge_selection=selection_snapshot(
+    stage/'bridge-cwd/artifacts/db_bridge/adapter_selection.snapshot.json',
+    {
+        'schema':'v1',
+        'selected':'bridge',
+        'attempts':[{'provider':'bridge','status':'ok'}],
+        'selection_order':['bridge'],
+        'flags':{
+            'env':'dev',
+            'force_pg':False,
+            'force_bridge':True,
+            'allow_bridge_prod':False,
+        },
+    },
+)
 compare_rows=[
     json.loads(line)
     for line in (stage/'bodygraph_compare.log').read_text(encoding='utf-8').splitlines()
@@ -159,6 +267,10 @@ if direct_compat != bridge_compat:
     raise SystemExit('BODYGRAPH_JSON_NOT_EQUAL')
 if direct_capture.get('status')!='ok' or bridge_capture.get('status')!='ok':
     raise SystemExit('PROVIDER_INPUT_UNAVAILABLE')
+if direct_selection['content']['selected']!='psycopg':
+    raise SystemExit('DIRECT_BODYGRAPH_PROVIDER_UNEXPECTED')
+if bridge_selection['content']['selected']!='bridge':
+    raise SystemExit('BRIDGE_BODYGRAPH_PROVIDER_UNEXPECTED')
 
 captured_at=str(raw_proof['captured_at_utc'])
 packaged_at=dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat().replace('+00:00','Z')
@@ -188,14 +300,16 @@ bodygraph_row={
     'payload_fetch_implementation':'engine.cli.main:_fetch_db_bodygraph',
     'direct':{
         'status':'ok',
-        'provider':'psycopg',
+        'provider':direct_selection['content']['selected'],
+        'selection_snapshot':direct_selection,
         'staged_output':str(stage/'bodygraph.direct.compat.json'),
         'canonical_sha256':compare['left_sha256'],
         'raw_bodygraph_payload_recorded':False,
     },
     'bridge':{
         'status':'ok',
-        'provider':'bridge',
+        'provider':bridge_selection['content']['selected'],
+        'selection_snapshot':bridge_selection,
         'staged_output':str(stage/'bodygraph.bridge.compat.json'),
         'canonical_sha256':compare['right_sha256'],
         'raw_bodygraph_payload_recorded':False,
@@ -205,7 +319,7 @@ bodygraph_row={
 }
 
 provider_proof=dict(raw_proof)
-provider_proof['schema']='hde_epic038.ops01.provider_parity.v3'
+provider_proof['schema']='hde_epic038.ops01.provider_parity.v4'
 provider_proof['active_parity_corpus']={
     'name':'hde_epic038_ops01_live_bodygraph_parity_v3',
     'ordered_rows':active_order+['bodygraph_payload_row'],
@@ -228,12 +342,14 @@ provider_proof['rails_posture']={
     'APP_ENV':'dev',
     'SAFE_MODE':'1',
     'ALLOW_NETWORK':'0',
+    'ALLOW_DB_WRITE':'0',
 }
 provider_proof['payload_posture']={
     'raw_bodygraph_payload_persisted':False,
     'raw_user_data_persisted':False,
     'secret_values_persisted':False,
 }
+provider_proof['remediation_marker']='F-008_BODYGRAPH_PROVIDER_SELECTION_PROVENANCE'
 provider_proof['status']='PASS'
 write_json('provider_parity.proof.json',provider_proof)
 
@@ -318,7 +434,7 @@ write_json('env_presence.json',{
     'operator_console':'github_codespaces',
     'repository':{
         'root':str(repo),
-        'branch':'main',
+        'branch':capture_branch,
         'head':capture_head,
         'pre_execution_worktree':'clean',
     },
@@ -334,17 +450,31 @@ write_json('env_presence.json',{
         'ENGINE_ENV':presence('ENGINE_ENV'),
         'DATABASE_URL':presence('DATABASE_URL'),
         'DB_BRIDGE_URL':presence('DB_BRIDGE_URL'),
+        'SAFE_MODE':'1',
+        'ALLOW_NETWORK':'0',
+        'ALLOW_DB_WRITE':'0',
+        'LC_ALL':'C',
+        'LANG':'C',
+        'TZ':'UTC',
     },
     'execution_rails':{
-        'db_posture_capture':{'SAFE_MODE':'1','ALLOW_NETWORK':'0'},
+        'db_posture_capture':{
+            'SAFE_MODE':'1','ALLOW_NETWORK':'0','ALLOW_DB_WRITE':'0',
+        },
         'direct_bodygraph_read':{
-            'SAFE_MODE':'1','ALLOW_NETWORK':'0','DB_FORCE_PG':'1',
+            'SAFE_MODE':'1','ALLOW_NETWORK':'0','ALLOW_DB_WRITE':'0',
+            'DB_FORCE_PG':'1','DB_FORCE_BRIDGE':'UNSET',
         },
         'bridge_bodygraph_read':{
-            'SAFE_MODE':'1','ALLOW_NETWORK':'0','DB_FORCE_BRIDGE':'1',
+            'SAFE_MODE':'1','ALLOW_NETWORK':'0','ALLOW_DB_WRITE':'0',
+            'DB_FORCE_BRIDGE':'1','DB_FORCE_PG':'UNSET',
         },
-        'canonical_comparison':{'SAFE_MODE':'1','ALLOW_NETWORK':'0'},
-        'governed_checker':{'SAFE_MODE':'1','ALLOW_NETWORK':'0'},
+        'canonical_comparison':{
+            'SAFE_MODE':'1','ALLOW_NETWORK':'0','ALLOW_DB_WRITE':'0',
+        },
+        'governed_checker':{
+            'SAFE_MODE':'1','ALLOW_NETWORK':'0','ALLOW_DB_WRITE':'0',
+        },
     },
     'secret_posture':'presence_only',
 })
@@ -363,7 +493,7 @@ write_json('bridge_consistency.result.json',{
         'staged_executable':str(checker_path),
         'repo_sha256':sha(repo/'ci/checks/check_bridge_consistency.py'),
         'staged_sha256':sha(checker_path),
-        'literal_invocation':f'python {checker_path}',
+        'literal_invocation':f'{repo}/.venv/bin/python {checker_path}',
         'inputs':{
             key:{'path':str(path),'sha256':sha(path)}
             for key,path in checker_inputs.items()
@@ -374,7 +504,7 @@ write_json('bridge_consistency.result.json',{
     'bodygraph_comparator':{
         'identity':'presenter.json_canon_compare',
         'literal_invocation':(
-            f'python -m presenter.json_canon_compare '
+            f'{repo}/.venv/bin/python -m presenter.json_canon_compare '
             f'{stage}/bodygraph.direct.compat.json '
             f'{stage}/bodygraph.bridge.compat.json '
             f'--log {stage}/bodygraph_compare.log --fail-on-diff'
@@ -407,6 +537,10 @@ write_json('bridge_consistency.result.json',{
         'search_path_exact':True,
         'provider_selection_consistent':(
             adapter.get('selected')==raw_proof.get('selected')=='psycopg'
+        ),
+        'bodygraph_provider_selection_provenance':(
+            direct_selection['content']['selected']=='psycopg'
+            and bridge_selection['content']['selected']=='bridge'
         ),
         'all_actions_closed_rails':True,
     },
@@ -445,7 +579,7 @@ write_json('result_summary.json',{
     'packaged_at_utc':packaged_at,
     'repository':{
         'root':str(repo),
-        'branch':'main',
+        'branch':capture_branch,
         'head':capture_head,
         'pre_execution_worktree':'clean',
     },
@@ -469,6 +603,7 @@ write_json('result_summary.json',{
         'F-005_RAW_STREAM_AND_CHECKER_BINDING',
         'F-006_BODYGRAPH_ROW_PARITY',
         'F-007_OPS01_SCOPE',
+        'F-008_BODYGRAPH_PROVIDER_SELECTION_PROVENANCE',
     ],
     'runner_sha256':runner_sha,
     'ops_observation_status':'PASS',
@@ -508,7 +643,7 @@ PY
 } > "$PACKAGE/stderr.log"
 
 printf '%s\n' '0' > "$PACKAGE/exit_code.txt"
-cp "$OUT/commands.txt" "$PACKAGE/commands.txt"
+cp "$FROZEN_RUNNER" "$PACKAGE/commands.txt"
 test "$(sha256sum "$PACKAGE/commands.txt" | cut -d ' ' -f 1)" = "$RUNNER_SHA_BEFORE"
 
 cd "$PACKAGE"
@@ -520,7 +655,8 @@ sha256sum --check checksums.sha256
 
 # Fail closed on exact inventory, canonical JSON, final-LF, secret values,
 # DSNs/URLs, raw response markers, open rails, and task-scope contradictions.
-REPO="$REPO" PACKAGE="$PACKAGE" python - <<'PY'
+REPO="$REPO" PACKAGE="$PACKAGE" "$PYTHON" - <<'PY'
+import hashlib
 import json
 import os
 import re
@@ -561,6 +697,7 @@ assert not re.search(url_pattern,text)
 forbidden=[
     'SAFE_MODE='+'0',
     'ALLOW_NETWORK='+'1',
+    'ALLOW_DB_WRITE='+'1',
     '--source '+'vendor',
     'bg:'+'resolve',
     'vendor_'+'reference',
@@ -575,14 +712,20 @@ for marker in raw_markers:
 
 env_payload=json.loads((package/'env_presence.json').read_text())
 assert set(env_payload['environment_presence'])=={
-    'APP_ENV','ENGINE_ENV','DATABASE_URL','DB_BRIDGE_URL',
+    'APP_ENV','ENGINE_ENV','DATABASE_URL','DB_BRIDGE_URL','SAFE_MODE',
+    'ALLOW_NETWORK','ALLOW_DB_WRITE','LC_ALL','LANG','TZ',
 }
 for rails in env_payload['execution_rails'].values():
-    assert rails['SAFE_MODE']=='1' and rails['ALLOW_NETWORK']=='0'
+    assert rails['SAFE_MODE']=='1'
+    assert rails['ALLOW_NETWORK']=='0'
+    assert rails['ALLOW_DB_WRITE']=='0'
 
 proof=json.loads((package/'provider_parity.proof.json').read_text())
+summary=json.loads((package/'result_summary.json').read_text())
 assert 'vendor_'+'reference' not in proof
+assert proof['schema']=='hde_epic038.ops01.provider_parity.v4'
 assert proof['rails_open'] is False
+assert proof['remediation_marker']=='F-008_BODYGRAPH_PROVIDER_SELECTION_PROVENANCE'
 assert proof['active_parity_corpus']['ordered_rows']==[
     'grants','search_path','select_one','ddl_fingerprint','bodygraph_payload_row',
 ]
@@ -591,6 +734,43 @@ for row in proof['capabilities']:
     assert row['direct']['status']=='ok'
     assert row['bridge']['status']=='ok'
     assert row['parity']=='match'
+bodygraph=proof['capabilities'][-1]
+stage=Path(summary['literal_staging_root'])
+expected_snapshots={
+    'direct':(
+        stage/'direct-cwd/artifacts/db_bridge/adapter_selection.snapshot.json',
+        {
+            'schema':'v1','selected':'psycopg',
+            'attempts':[{'provider':'psycopg','status':'ok'}],
+            'selection_order':['psycopg'],
+            'flags':{
+                'env':'dev','force_pg':True,'force_bridge':False,
+                'allow_bridge_prod':False,
+            },
+        },
+    ),
+    'bridge':(
+        stage/'bridge-cwd/artifacts/db_bridge/adapter_selection.snapshot.json',
+        {
+            'schema':'v1','selected':'bridge',
+            'attempts':[{'provider':'bridge','status':'ok'}],
+            'selection_order':['bridge'],
+            'flags':{
+                'env':'dev','force_pg':False,'force_bridge':True,
+                'allow_bridge_prod':False,
+            },
+        },
+    ),
+}
+for side,(expected_path,expected_content) in expected_snapshots.items():
+    selection=bodygraph[side]['selection_snapshot']
+    canonical=(
+        json.dumps(selection['content'],ensure_ascii=True,separators=(',',':'),sort_keys=True)+'\n'
+    ).encode('utf-8')
+    assert selection['path']==str(expected_path)
+    assert selection['content']==expected_content
+    assert selection['sha256']==hashlib.sha256(canonical).hexdigest()
+    assert bodygraph[side]['provider']==selection['content']['selected']
 assert proof['live_provider_parity']=={
     'bridge_provider_rows':'available',
     'claimed_row_count':5,
@@ -615,15 +795,20 @@ assert all(bridge['predicates'].values())
 
 nonclaims=json.loads((package/'nonclaims.json').read_text())
 assert 'no_vendor_call' in nonclaims['nonclaims']
-summary=json.loads((package/'result_summary.json').read_text())
 assert summary['scope']=='bounded_read_only_db_posture_and_direct_bridge_bodygraph_row_parity'
 assert summary['ops_observation_status']=='PASS'
 assert summary['qa_status']=='NOT_CLAIMED'
 assert summary['pf09_status_movement']=='NONE'
 assert summary['epic_closeout']=='NOT_CLAIMED'
+assert 'F-008_BODYGRAPH_PROVIDER_SELECTION_PROVENANCE' in summary['remediation_findings_resolved']
 PY
 
 # Replace the tracked packet only after the complete staged D1-D11 set passes.
+cd "$REPO"
+test "$(sha256sum "$FROZEN_RUNNER" | cut -d ' ' -f 1)" = "$RUNNER_SHA_BEFORE"
+test "$(git rev-parse HEAD)" = "$CAPTURE_HEAD"
+test "$(git branch --show-current)" = "$CAPTURE_BRANCH"
+test -z "$(git status --porcelain=v1)"
 cp "$PACKAGE/commands.txt" "$PACKAGE/stdout.log" "$PACKAGE/stderr.log" \
   "$PACKAGE/exit_code.txt" "$PACKAGE/env_presence.json" \
   "$PACKAGE/db_posture_summary.json" "$PACKAGE/provider_parity.proof.json" \
@@ -645,7 +830,7 @@ done
 # Create the resubmission bundle from the tracked packet bytes, then prove every
 # member is byte-identical to its repository counterpart. This block performs
 # packaging and local byte validation only; it reruns no operational action.
-OUT="$OUT" BUNDLE="$BUNDLE" python - <<'PY'
+OUT="$OUT" BUNDLE="$BUNDLE" "$PYTHON" - <<'PY'
 import os
 import zipfile
 from pathlib import Path

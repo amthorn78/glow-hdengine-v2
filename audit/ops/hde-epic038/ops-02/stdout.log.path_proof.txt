@@ -1,5 +1,5 @@
 path: audit/ops/hde-epic038/ops-02/stdout.log
 size_bytes: 288
 sha256: 0f7533a88ba8e969a874aea81756a57476ea2b626343439586e6d0e14e263faa
-mtime_utc: 2026-07-17T18:53:00Z
+mtime_utc: 2026-07-17T17:11:06Z
 produced_at_utc: 2026-07-16T19:04:52Z

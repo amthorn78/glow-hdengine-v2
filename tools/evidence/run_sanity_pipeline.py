@@ -28,10 +28,12 @@ OPS_FILES = {
 }
 
 OPS01_CORPUS_NAME = "hde_epic038_ops01_live_bodygraph_parity_v3"
+OPS01_PROVIDER_PROOF_SCHEMA = "hde_epic038.ops01.provider_parity.v4"
+OPS01_STAGING_ROOT = "/tmp/hde-epic038-ops01-provider-selection-6d5de673-20260717t235802z"
 OPS01_DIRECT_PROVIDER = "psycopg"
 OPS01_BRIDGE_PROVIDER = "bridge"
 OPS_COMMANDS_SHA256 = {
-    "ops-01": "e52ecbddc561cc177b95d92a890226983b71791891fb91204f58e74d2922d38b",
+    "ops-01": "038c4f8fe7735c41a3679e7f80ba99f2cb23632fbf37a33bf70ddf0884087e45",
     "ops-02": "d3ca676d0157ce30bf64d4b419610e3a5ceebc0dc13785475028b90ed31f163b",
 }
 OPS01_MUTATING_SQL = re.compile(
@@ -56,10 +58,37 @@ OPS01_BRIDGE_PREDICATES = {
     "bodygraph_bridge_available",
     "bodygraph_direct_available",
     "bodygraph_row_match",
+    "bodygraph_provider_selection_provenance",
     "bodygraph_selector_approved",
     "four_row_corpus_exact",
     "provider_selection_consistent",
     "search_path_exact",
+}
+OPS01_SELECTION_SNAPSHOT_CONTENT = {
+    "direct": {
+        "schema": "v1",
+        "selected": OPS01_DIRECT_PROVIDER,
+        "attempts": [{"provider": OPS01_DIRECT_PROVIDER, "status": "ok"}],
+        "selection_order": [OPS01_DIRECT_PROVIDER],
+        "flags": {
+            "env": "dev",
+            "force_pg": True,
+            "force_bridge": False,
+            "allow_bridge_prod": False,
+        },
+    },
+    "bridge": {
+        "schema": "v1",
+        "selected": OPS01_BRIDGE_PROVIDER,
+        "attempts": [{"provider": OPS01_BRIDGE_PROVIDER, "status": "ok"}],
+        "selection_order": [OPS01_BRIDGE_PROVIDER],
+        "flags": {
+            "env": "dev",
+            "force_pg": False,
+            "force_bridge": True,
+            "allow_bridge_prod": False,
+        },
+    },
 }
 
 
@@ -282,6 +311,37 @@ def _normalized_provider_value(name: str, provider: dict) -> object:
     raise ValueError(f"ops-01: unsupported parity row {name}")
 
 
+def _canonical_json_bytes(value: object) -> bytes:
+    return (
+        json.dumps(value, ensure_ascii=True, separators=(",", ":"), sort_keys=True)
+        + "\n"
+    ).encode("utf-8")
+
+
+def _validate_bodygraph_selection_snapshot(bodygraph: dict, side: str) -> None:
+    provider = OPS01_DIRECT_PROVIDER if side == "direct" else OPS01_BRIDGE_PROVIDER
+    provider_row = bodygraph.get(side)
+    snapshot = provider_row.get("selection_snapshot") if isinstance(provider_row, dict) else None
+    if not isinstance(snapshot, dict):
+        raise ValueError(f"ops-01: {side} BodyGraph selection snapshot is missing or malformed")
+    content = snapshot.get("content")
+    expected_content = OPS01_SELECTION_SNAPSHOT_CONTENT[side]
+    if not isinstance(content, dict) or _canonical_json_bytes(content) != _canonical_json_bytes(expected_content):
+        raise ValueError(f"ops-01: {side} BodyGraph selection snapshot content drift")
+    expected_path = (
+        f"{OPS01_STAGING_ROOT}/{side}-cwd/artifacts/db_bridge/"
+        "adapter_selection.snapshot.json"
+    )
+    if snapshot.get("path") != expected_path:
+        raise ValueError(f"ops-01: {side} BodyGraph selection snapshot path substitution")
+    digest = snapshot.get("sha256")
+    recomputed = hashlib.sha256(_canonical_json_bytes(content)).hexdigest()
+    if not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest) or digest != recomputed:
+        raise ValueError(f"ops-01: {side} BodyGraph selection snapshot hash drift")
+    if content.get("selected") != provider or provider_row.get("provider") != provider:
+        raise ValueError(f"ops-01: {side} BodyGraph selection snapshot provider substitution")
+
+
 def _compare_provider_values(rows: Sequence[dict]) -> str:
     by_name = {row["name"]: row for row in rows}
     for name in OPS01_PARITY_ROWS[:-1]:
@@ -289,6 +349,8 @@ def _compare_provider_values(rows: Sequence[dict]) -> str:
         if _normalized_provider_value(name, row["direct"]) != _normalized_provider_value(name, row["bridge"]):
             raise ValueError(f"ops-01: provider values disagree for {name}")
     bodygraph = by_name["bodygraph_payload_row"]
+    _validate_bodygraph_selection_snapshot(bodygraph, "direct")
+    _validate_bodygraph_selection_snapshot(bodygraph, "bridge")
     direct_sha = bodygraph["direct"].get("canonical_sha256")
     bridge_sha = bodygraph["bridge"].get("canonical_sha256")
     if (
@@ -312,10 +374,19 @@ def _validate_ops01_environment(packet: Path) -> None:
     if (
         env.get("secret_posture") != "presence_only"
         or not isinstance(presence, dict)
-        or presence.get("APP_ENV") != "SET:dev"
-        or presence.get("DATABASE_URL") != "SET:REDACTED"
-        or presence.get("DB_BRIDGE_URL") != "SET:REDACTED"
-        or presence.get("ENGINE_ENV") != "UNSET"
+        or presence
+        != {
+            "ALLOW_DB_WRITE": "0",
+            "ALLOW_NETWORK": "0",
+            "APP_ENV": "SET:dev",
+            "DATABASE_URL": "SET:REDACTED",
+            "DB_BRIDGE_URL": "SET:REDACTED",
+            "ENGINE_ENV": "UNSET",
+            "LANG": "C",
+            "LC_ALL": "C",
+            "SAFE_MODE": "1",
+            "TZ": "UTC",
+        }
         or not isinstance(rails, dict)
         or set(rails) != OPS01_BRIDGE_COMMANDS
     ):
@@ -324,10 +395,16 @@ def _validate_ops01_environment(packet: Path) -> None:
         not isinstance(values, dict)
         or values.get("SAFE_MODE") != "1"
         or values.get("ALLOW_NETWORK") != "0"
+        or values.get("ALLOW_DB_WRITE") != "0"
         for values in rails.values()
     ):
         raise ValueError("ops-01: env_presence.json closed-rails predicates failed")
-    if rails["direct_bodygraph_read"].get("DB_FORCE_PG") != "1" or rails["bridge_bodygraph_read"].get("DB_FORCE_BRIDGE") != "1":
+    if (
+        rails["direct_bodygraph_read"].get("DB_FORCE_PG") != "1"
+        or rails["direct_bodygraph_read"].get("DB_FORCE_BRIDGE") != "UNSET"
+        or rails["bridge_bodygraph_read"].get("DB_FORCE_BRIDGE") != "1"
+        or rails["bridge_bodygraph_read"].get("DB_FORCE_PG") != "UNSET"
+    ):
         raise ValueError("ops-01: env_presence.json provider-selection rails failed")
 
 
@@ -460,13 +537,22 @@ def _validate_ops01(packet: Path, summary: dict) -> None:
     if not rows_well_formed:
         raise ValueError("ops-01: provider_parity.proof.json contains unavailable, errored, or malformed claimed row")
     row_names = tuple(row.get("name") for row in rows)
+    remediation_findings = summary.get("remediation_findings_resolved")
     if (
-        not isinstance(corpus, dict)
+        parity.get("schema") != OPS01_PROVIDER_PROOF_SCHEMA
+        or parity.get("remediation_marker")
+        != "F-008_BODYGRAPH_PROVIDER_SELECTION_PROVENANCE"
+        or not isinstance(corpus, dict)
         or corpus.get("name") != OPS01_CORPUS_NAME
         or corpus.get("ordered_rows") != list(OPS01_PARITY_ROWS)
         or row_names != OPS01_PARITY_ROWS
         or summary.get("active_parity_corpus") != OPS01_CORPUS_NAME
         or summary.get("active_parity_rows") != list(OPS01_PARITY_ROWS)
+        or summary.get("literal_staging_root") != OPS01_STAGING_ROOT
+        or summary.get("runner_sha256") != OPS_COMMANDS_SHA256["ops-01"]
+        or not isinstance(remediation_findings, list)
+        or "F-008_BODYGRAPH_PROVIDER_SELECTION_PROVENANCE"
+        not in remediation_findings
     ):
         raise ValueError("ops-01: provider parity exact corpus identity or ordered rows failed")
     if any(

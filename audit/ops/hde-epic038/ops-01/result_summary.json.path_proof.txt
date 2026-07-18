@@ -1,5 +1,5 @@
 path: audit/ops/hde-epic038/ops-01/result_summary.json
-size_bytes: 1469
-sha256: df27da7e36cfedcaf45620e3df874a08e38641586444703941a9f0751f258baf
+size_bytes: 1550
+sha256: 1b8a17e5b789a951db24859d6fb391e7ba1467aca077920af03076ba5b13bebf
 mtime_utc: 2026-07-17T18:53:00Z
 produced_at_utc: 2026-07-16T19:04:52Z
