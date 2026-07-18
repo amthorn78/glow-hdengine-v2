@@ -21,6 +21,7 @@ from tools.evidence.hde_epic038_ops01_v5 import (
     Ops01RLiveAuthorizationExpectedIdentity,
     Ops01RPreflightExpectedIdentity,
     Ops01V5ExpectedIdentity,
+    DISCOVERY_STAGES,
     PREFLIGHT_NONCLAIMS,
     PREFLIGHT_ZERO_IO_FIELDS,
     V5_PRIMARY_FILES,
@@ -835,6 +836,44 @@ def _discovery_pair(
     control = staging_root / "control"
     control.mkdir(parents=True)
     source_manifest = "1" * 64
+    target_probe_argv = [
+        "/usr/bin/python3",
+        "-I",
+        "-B",
+        (staging_root / "source/scripts/ops/hde_epic038_ops01r.py").as_posix(),
+        "--target-identity-probe",
+    ]
+    stage_commands = {
+        "cli_version": ["--version"],
+        "cli_help": ["help"],
+        "project_inventory": ["project", "list"],
+        "environment_inventory": ["environment", "list"],
+        "service_inventory": ["service", "list"],
+    }
+    policy_stages = []
+    for ordinal, stage in enumerate(DISCOVERY_STAGES, start=1):
+        descriptors = (
+            [{"kind": "literal", "value": token} for token in stage_commands[stage]]
+            if stage != "target_identity_probe"
+            else [
+                {"kind": "literal", "value": "run"},
+                {"kind": "literal", "value": "--"},
+                {"kind": "python_child"},
+            ]
+        )
+        policy_stages.append(
+            {
+                "stage": stage,
+                "templates": [
+                    {
+                        "argv": descriptors,
+                        "required_help_tokens": [],
+                        "template_id": f"{stage}-v1",
+                        "version_regex": "",
+                    }
+                ],
+            }
+        )
     authorization = {
         "schema": "hde_epic038.ops01r.discovery_authorization.v1",
         "source": {
@@ -848,6 +887,10 @@ def _discovery_pair(
             "source_manifest_sha256": source_manifest,
         },
         "railway_cli": {"lexical_path": "railway", "sha256": "5" * 64},
+        "policy": {
+            "python_execution": {"target_probe_argv": target_probe_argv},
+            "stages": policy_stages,
+        },
         "output_contract": {"path": (control / "discovery.json").as_posix()},
         "write_contract": {"pre_staging_manifest_sha256": "6" * 64},
     }
@@ -876,6 +919,14 @@ def _discovery_pair(
         "command_manifest": manifest,
         "command_manifest_sha256": _sha(_canon(manifest)),
         "railway_cli": {"sha256": "5" * 64},
+        "target": {
+            "project_id": "project-id",
+            "project_name": "ample-illumination",
+            "environment_id": "environment-id",
+            "environment_name": "production",
+            "service_id": "service-id",
+            "service_name": "glow-hdengine-v2",
+        },
         "source_write_validation": {
             "pre_source_manifest_sha256": source_manifest,
             "post_source_manifest_sha256": source_manifest,
@@ -930,6 +981,41 @@ def test_discovery_result_replays_command_policy(tmp_path):
 
     assert not result.valid
     assert "DISCOVERY_RESULT_ARGV_MISMATCH" in result.errors
+
+
+def test_discovery_dispatch_requires_exact_authorized_stage_argv(tmp_path):
+    _, authorization_path, _ = _discovery_pair(tmp_path)
+    assert validate_ops01r_discovery_dispatch(
+        authorization_path,
+        stage="cli_version",
+        prior_results={},
+        rendered_argv=("railway", "--version"),
+    ).valid
+
+    result = validate_ops01r_discovery_dispatch(
+        authorization_path,
+        stage="cli_version",
+        prior_results={},
+        rendered_argv=("railway", "run", "python", "-c", "print('unsafe')"),
+    )
+
+    assert not result.valid
+    assert "DISCOVERY_AUTH_PROHIBITED_COMMAND" in result.errors
+
+
+def test_discovery_result_requires_authorized_output_path(tmp_path):
+    result_path, authorization_path, expected = _discovery_pair(tmp_path)
+    copied_path = tmp_path / "copied-discovery.json"
+    copied_path.write_bytes(result_path.read_bytes())
+
+    result = validate_ops01r_discovery_result(
+        copied_path,
+        authorization_path=authorization_path,
+        expected=expected,
+    )
+
+    assert not result.valid
+    assert "DISCOVERY_RESULT_WRITE_SET_MISMATCH" in result.errors
 
 
 def test_discovery_authorization_requires_output_path(tmp_path):

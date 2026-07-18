@@ -1417,7 +1417,6 @@ def validate_ops01r_discovery_dispatch(
     prior_results: object,
     rendered_argv: tuple[str, ...],
 ) -> Ops01V5ValidationResult:
-    del authorization_path, stage, prior_results
     prohibited = {
         "add",
         "connect",
@@ -1440,7 +1439,114 @@ def validate_ops01r_discovery_dispatch(
     }
     if any(token.lstrip("-").casefold() in prohibited for token in rendered_argv):
         return _result({"DISCOVERY_AUTH_PROHIBITED_COMMAND"})
+    try:
+        authorization = _mapping(_read_json(authorization_path))
+        if tuple(rendered_argv) not in _authorized_stage_vectors(
+            authorization, stage=stage, prior_results=prior_results
+        ):
+            code = (
+                "DISCOVERY_AUTH_PYTHON_ARGV_MISMATCH"
+                if stage == "target_identity_probe"
+                else "DISCOVERY_AUTH_PROHIBITED_COMMAND"
+            )
+            return _result({code})
+    except (OSError, UnicodeError, ValueError, TypeError):
+        return _result({"DISCOVERY_AUTH_PROHIBITED_COMMAND"})
     return _result(set())
+
+
+def _prior_stage_value(
+    prior_results: object, source_stage: object, field: object
+) -> object:
+    if not isinstance(source_stage, str) or not isinstance(field, str):
+        return None
+    stage_value = _mapping(_mapping(prior_results).get(source_stage))
+    return stage_value.get(field)
+
+
+def _authorized_stage_vectors(
+    authorization: Mapping[str, object], *, stage: str, prior_results: object
+) -> set[tuple[str, ...]]:
+    policy = _mapping(authorization.get("policy"))
+    stages = policy.get("stages")
+    if not isinstance(stages, list):
+        return set()
+    matches = [row for row in stages if _mapping(row).get("stage") == stage]
+    if len(matches) != 1:
+        return set()
+    templates = _mapping(matches[0]).get("templates")
+    executable = _at(authorization, "railway_cli", "lexical_path")
+    target_probe_argv = _at(policy, "python_execution", "target_probe_argv")
+    if (
+        not isinstance(templates, list)
+        or not isinstance(executable, str)
+        or not executable
+    ):
+        return set()
+    vectors: set[tuple[str, ...]] = set()
+    for template in templates:
+        descriptors = _mapping(template).get("argv")
+        if not isinstance(descriptors, list) or not descriptors:
+            continue
+        tokens = [executable]
+        valid = True
+        for index, descriptor in enumerate(descriptors):
+            descriptor = _mapping(descriptor)
+            kind = descriptor.get("kind")
+            if kind == "literal" and set(descriptor) == {"kind", "value"}:
+                value = descriptor.get("value")
+            elif kind == "prior_result" and set(descriptor) == {
+                "field",
+                "kind",
+                "source_stage",
+            }:
+                value = _prior_stage_value(
+                    prior_results,
+                    descriptor.get("source_stage"),
+                    descriptor.get("field"),
+                )
+            elif (
+                kind == "python_child"
+                and set(descriptor) == {"kind"}
+                and stage == "target_identity_probe"
+                and index == len(descriptors) - 1
+                and isinstance(target_probe_argv, list)
+                and all(isinstance(token, str) for token in target_probe_argv)
+            ):
+                tokens.extend(target_probe_argv)
+                continue
+            else:
+                valid = False
+                break
+            if (
+                not isinstance(value, str)
+                or not value
+                or any(ord(character) < 32 or ord(character) == 127 for character in value)
+            ):
+                valid = False
+                break
+            tokens.append(value)
+        if valid:
+            vectors.add(tuple(tokens))
+    return vectors
+
+
+def _discovery_prior_results(obj: Mapping[str, object]) -> dict[str, object]:
+    target = _mapping(obj.get("target"))
+    return {
+        "project_inventory": {
+            "project_id": target.get("project_id"),
+            "project_name": target.get("project_name"),
+        },
+        "environment_inventory": {
+            "environment_id": target.get("environment_id"),
+            "environment_name": target.get("environment_name"),
+        },
+        "service_inventory": {
+            "service_id": target.get("service_id"),
+            "service_name": target.get("service_name"),
+        },
+    }
 
 
 def validate_ops01r_discovery_result(
@@ -1461,6 +1567,13 @@ def validate_ops01r_discovery_result(
 
         raw_bytes = path.read_bytes()
         obj = _mapping(_read_json(path))
+        output_path = _at(authorization, "output_contract", "path")
+        if (
+            not isinstance(output_path, str)
+            or _lexical_absolute(path) != _lexical_absolute(Path(output_path))
+            or path.is_symlink()
+        ):
+            errors.add("DISCOVERY_RESULT_WRITE_SET_MISMATCH")
         if _canon(obj) != raw_bytes:
             errors.add("DISCOVERY_RESULT_BYTES_NONCANONICAL")
         if obj.get("schema") != "hde_epic038.ops01r.discovery.v1":
@@ -1506,7 +1619,7 @@ def validate_ops01r_discovery_result(
                     or not validate_ops01r_discovery_dispatch(
                         authorization_path,
                         stage=DISCOVERY_STAGES[index],
-                        prior_results={},
+                        prior_results=_discovery_prior_results(obj),
                         rendered_argv=tuple(rendered),
                     ).valid
                 ):
