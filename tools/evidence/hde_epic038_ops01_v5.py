@@ -14,6 +14,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Type, TypeVar
 
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
 from engine.db.ddl_identity_projection import (
     DDL_IDENTITY_PROJECTION_FIELDS,
     DDL_IDENTITY_PROJECTION_SCHEMA,

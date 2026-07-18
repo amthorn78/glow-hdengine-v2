@@ -95,6 +95,25 @@ def test_expected_identity_requires_pipe(tmp_path):
     assert process.returncode != 0
 
 
+def test_validator_cli_imports_from_outside_the_repo(tmp_path):
+    validator = Path("tools/evidence/hde_epic038_ops01_v5.py").resolve()
+    environment = {
+        name: value
+        for name, value in os.environ.items()
+        if not name.casefold().startswith("python")
+    }
+
+    process = subprocess.run(
+        [sys.executable, "-I", "-B", str(validator), "--help"],
+        cwd=tmp_path,
+        env=environment,
+        capture_output=True,
+        text=True,
+    )
+
+    assert process.returncode == 0, process.stderr
+
+
 def test_runner_dormant_modes_do_not_run_external_ops():
     process = subprocess.run(
         [sys.executable, "scripts/ops/hde_epic038_ops01r.py", "--live-child"],
