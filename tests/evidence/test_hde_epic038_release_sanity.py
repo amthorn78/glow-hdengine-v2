@@ -747,7 +747,10 @@ def test_pr05_preflight_roster_matches_governed_index_and_current_proofs():
     sanity.validate_pr05_path_proof_prerequisites()
 
 
-@pytest.mark.parametrize("mutation", ["missing", "stale"])
+@pytest.mark.parametrize(
+    "mutation",
+    ["missing", "stale", "invalid-mtime", "future-mtime", "invalid-produced-at"],
+)
 def test_pr05_preflight_rejects_missing_or_stale_inherited_proof(tmp_path, mutation):
     root = tmp_path / "repo"
     for rel in sanity.PR05_PRIMARY_PATHS:
@@ -758,10 +761,26 @@ def test_pr05_preflight_rejects_missing_or_stale_inherited_proof(tmp_path, mutat
         shutil.copy2(sanity.ROOT / rel, primary)
         shutil.copy2(sanity.ROOT / f"{rel}.path_proof.txt", proof)
     target = root / f"{sanity.PR05_PRIMARY_PATHS[0]}.path_proof.txt"
+
+    def replace_field(field, value):
+        lines = target.read_text().splitlines(keepends=True)
+        target.write_text(
+            "".join(
+                f"{field}: {value}\n" if line.startswith(f"{field}: ") else line
+                for line in lines
+            )
+        )
+
     if mutation == "missing":
         target.unlink()
-    else:
+    elif mutation == "stale":
         target.write_text(target.read_text().replace("sha256: ", "sha256: 0"))
+    elif mutation == "invalid-mtime":
+        replace_field("mtime_utc", "invalid")
+    elif mutation == "future-mtime":
+        replace_field("mtime_utc", "9999-12-31T23:59:59Z")
+    else:
+        replace_field("produced_at_utc", "invalid")
     with pytest.raises(ValueError, match="path proof"):
         sanity.validate_pr05_path_proof_prerequisites(root)
 

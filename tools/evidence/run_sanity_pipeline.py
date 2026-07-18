@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import datetime as dt
 import hashlib
 import json
 import os
@@ -317,17 +318,31 @@ def validate_pr05_path_proof_prerequisites(root: Path = ROOT) -> None:
                     fields[key.strip()] = value.strip()
         except (OSError, UnicodeError) as exc:
             raise ValueError(f"pr-05: path proof is not readable UTF-8: {rel}.path_proof.txt") from exc
-        digest = hashlib.sha256(primary.read_bytes()).hexdigest()
         try:
-            size_matches = int(fields.get("size_bytes", "")) == primary.stat().st_size
-        except ValueError:
+            primary_stat = primary.stat()
+            digest = hashlib.sha256(primary.read_bytes()).hexdigest()
+            size_matches = int(fields.get("size_bytes", "")) == primary_stat.st_size
+            mtime_utc = dt.datetime.fromisoformat(
+                fields.get("mtime_utc", "").replace("Z", "+00:00")
+            )
+            produced_at_utc = dt.datetime.fromisoformat(
+                fields.get("produced_at_utc", "").replace("Z", "+00:00")
+            )
+            timestamps_valid = (
+                mtime_utc.tzinfo is not None
+                and produced_at_utc.tzinfo is not None
+                and mtime_utc.astimezone(dt.timezone.utc)
+                <= dt.datetime.fromtimestamp(primary_stat.st_mtime, tz=dt.timezone.utc)
+            )
+        except (OSError, ValueError):
+            digest = ""
             size_matches = False
+            timestamps_valid = False
         if (
             fields.get("path") != rel
             or fields.get("sha256") != digest
             or not size_matches
-            or not fields.get("mtime_utc")
-            or not fields.get("produced_at_utc")
+            or not timestamps_valid
         ):
             raise ValueError(f"pr-05: path proof does not bind the inherited primary: {rel}.path_proof.txt")
 
