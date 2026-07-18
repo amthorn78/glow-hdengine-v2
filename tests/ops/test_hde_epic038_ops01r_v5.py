@@ -11,6 +11,11 @@ from pathlib import Path
 
 import pytest
 
+from engine.db.ddl_identity_projection import (
+    DDL_IDENTITY_PROJECTION_FIELDS,
+    DDL_IDENTITY_PROJECTION_SCHEMA,
+    DDL_IDENTITY_UNEXAMINED_FIELDS,
+)
 from tools.evidence.hde_epic038_ops01_v5 import (
     Ops01RDiscoveryAuthorizationExpectedIdentity,
     Ops01RPreflightExpectedIdentity,
@@ -78,7 +83,12 @@ def test_runner_dormant_modes_do_not_run_external_ops():
     assert "dormant" in process.stderr
 
 
-def _candidate(tmp_path: Path) -> tuple[Path, Ops01V5ExpectedIdentity]:
+def _candidate(
+    tmp_path: Path,
+    *,
+    counts: dict[str, int] | None = None,
+    include_projection_contract: bool = True,
+) -> tuple[Path, Ops01V5ExpectedIdentity]:
     root = tmp_path / "candidate"
     root.mkdir()
     source_commit = "1" * 40
@@ -90,18 +100,19 @@ def _candidate(tmp_path: Path) -> tuple[Path, Ops01V5ExpectedIdentity]:
     validator_sha = "7" * 64
     projector_sha = "8" * 64
     staging_root = "/tmp/hde-epic038-ops01r/" + "a" * 32
-    counts = {
-        "bodygraph_reads": 2,
-        "bridge_http_requests": 0,
-        "bridge_provider_selections": 1,
-        "direct_connection_attempts": 0,
-        "direct_provider_selections": 1,
-        "direct_sql_statements": 0,
-        "fallbacks": 0,
-        "logical_observations": 10,
-        "retries": 0,
-        "vendor_requests": 0,
-    }
+    if counts is None:
+        counts = {
+            "bodygraph_reads": 2,
+            "bridge_http_requests": 0,
+            "bridge_provider_selections": 1,
+            "direct_connection_attempts": 0,
+            "direct_provider_selections": 1,
+            "direct_sql_statements": 0,
+            "fallbacks": 0,
+            "logical_observations": 10,
+            "retries": 0,
+            "vendor_requests": 0,
+        }
     discovery = {
         "schema": "hde_epic038.ops01r.discovery.v1",
         "status": "PASS",
@@ -135,17 +146,21 @@ def _candidate(tmp_path: Path) -> tuple[Path, Ops01V5ExpectedIdentity]:
         "nonclaims.json",
     ):
         _write_json(root / name, {})
-    _write_json(
-        root / "provider_parity.proof.json",
-        {
-            "schema": "hde_epic038.ops01.provider_parity.v5",
-            "status": "PASS",
-            "selected": "psycopg",
-            "environment": "dev",
-            "rails_open": False,
-            "full_ddl_semantic_parity_claimed": False,
-        },
-    )
+    provider_proof: dict[str, object] = {
+        "schema": "hde_epic038.ops01.provider_parity.v5",
+        "status": "PASS",
+        "selected": "psycopg",
+        "environment": "dev",
+        "rails_open": False,
+        "full_ddl_semantic_parity_claimed": False,
+    }
+    if include_projection_contract:
+        provider_proof["comparison_contract"] = {
+            "schema": DDL_IDENTITY_PROJECTION_SCHEMA,
+            "included_fields": list(DDL_IDENTITY_PROJECTION_FIELDS),
+            "unexamined_fields": list(DDL_IDENTITY_UNEXAMINED_FIELDS),
+        }
+    _write_json(root / "provider_parity.proof.json", provider_proof)
     summary = {
         "schema": "hde_epic038.ops01.result_summary.v4",
         "full_ddl_semantic_parity_claimed": False,
@@ -227,6 +242,43 @@ def test_candidate_rejects_symlinked_primary_files(tmp_path):
 
     assert not result.valid
     assert "OPS01_V5_WRITE_SET_MISMATCH" in result.errors
+
+
+def test_candidate_requires_exact_fixed_call_counts(tmp_path):
+    missing_case = tmp_path / "missing-count"
+    missing_case.mkdir()
+    missing_counts = {
+        "bodygraph_reads": 2,
+        "bridge_http_requests": 0,
+        "bridge_provider_selections": 1,
+        "direct_connection_attempts": 0,
+        "direct_provider_selections": 1,
+        "direct_sql_statements": 0,
+        "fallbacks": 0,
+        "logical_observations": 10,
+        "retries": 0,
+    }
+    root, expected = _candidate(missing_case, counts=missing_counts)
+    result = validate_ops01_v5_package(root, expected=expected)
+    assert not result.valid
+    assert "OPS01_V5_RESULT_SUMMARY_INVALID" in result.errors
+
+    nonzero_case = tmp_path / "nonzero-fixed-count"
+    nonzero_case.mkdir()
+    nonzero_counts = dict(missing_counts, vendor_requests=0, retries=1)
+    root, expected = _candidate(nonzero_case, counts=nonzero_counts)
+    result = validate_ops01_v5_package(root, expected=expected)
+    assert not result.valid
+    assert "OPS01_V5_RESULT_SUMMARY_INVALID" in result.errors
+
+
+def test_candidate_requires_ddl_projection_contract(tmp_path):
+    root, expected = _candidate(tmp_path, include_projection_contract=False)
+
+    result = validate_ops01_v5_package(root, expected=expected)
+
+    assert not result.valid
+    assert "OPS01_V5_PROVIDER_PROOF_INVALID" in result.errors
 
 
 def _discovery_pair(

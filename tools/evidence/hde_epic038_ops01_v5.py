@@ -389,7 +389,7 @@ def validate_ops01_v5_package(
             proof.get("comparison_contract")
             or proof.get("ddl_identity_projection_contract")
         )
-        if comparison and (
+        if (
             comparison.get("schema") != DDL_IDENTITY_PROJECTION_SCHEMA
             or tuple(comparison.get("included_fields", ()))
             != DDL_IDENTITY_PROJECTION_FIELDS
@@ -408,9 +408,13 @@ def validate_ops01_v5_package(
         ):
             errors.add("OPS01_V5_RESULT_SUMMARY_INVALID")
         counts = _mapping(summary.get("actual_call_counts"))
-        for field, value in counts.items():
-            if field in CALL_COUNT_FIELDS and (type(value) is not int or value < 0):
-                errors.add("OPS01_V5_RESULT_SUMMARY_INVALID")
+        if set(counts) != set(CALL_COUNT_FIELDS) or any(
+            type(counts[field]) is not int or counts[field] < 0
+            for field in counts
+        ):
+            errors.add("OPS01_V5_RESULT_SUMMARY_INVALID")
+        if any(counts.get(field) != value for field, value in FIXED_COUNTS.items()):
+            errors.add("OPS01_V5_RESULT_SUMMARY_INVALID")
         actual, identity_errors = _candidate_actual_identity(
             summary,
             ledger_bytes=ledger_bytes,
