@@ -1,5 +1,5 @@
 path: artifacts/proofs/success_get.txt
 size_bytes: 310
 sha256: 729d9a9de0a291c4162ed4c7634e127cd0d74241dc53911d90cd9d56adf0714a
-mtime_utc: 2026-07-18T00:15:31Z
-produced_at_utc: 2026-07-18T00:17:05Z
+mtime_utc: 2026-07-18T18:08:04Z
+produced_at_utc: 2026-07-18T18:08:39Z

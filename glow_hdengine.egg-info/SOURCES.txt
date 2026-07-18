@@ -53,6 +53,7 @@ engine/core/__init__.py
 engine/core/core.py
 engine/db/__init__.py
 engine/db/adapter.py
+engine/db/ddl_identity_projection.py
 engine/db/errors.py
 engine/db/providers/__init__.py
 engine/db/providers/bridge_provider.py

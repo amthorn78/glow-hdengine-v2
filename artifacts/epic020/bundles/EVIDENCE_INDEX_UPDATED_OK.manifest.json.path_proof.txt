@@ -1,5 +1,5 @@
 path: artifacts/epic020/bundles/EVIDENCE_INDEX_UPDATED_OK.manifest.json
-size_bytes: 1191
-sha256: a58e1409780231b8dbfc23b36e45880dbdecebe1eca3bcdd52f4b5edc7e7e772
+size_bytes: 1192
+sha256: 601a4efcc896351714887934a48e94601e7be448147eac6f991d1902ed446882
 mtime_utc: 2025-12-06T04:12:03Z
 produced_at_utc: 2025-12-06T04:11:16Z
